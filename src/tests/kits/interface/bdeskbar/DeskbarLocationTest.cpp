@@ -15,6 +15,8 @@
 #include <Deskbar.h>
 #include <InterfaceDefs.h>
 
+#include <assert.h>
+
 
 /*
  *  Method:  DeskbarLocationTest::DeskbarLocationTest()

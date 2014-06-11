@@ -1,9 +1,13 @@
 // ResourcesTest.cpp
 
 #include <stdio.h>
-#include <string>
+#include <stdlib.h>
 #include <unistd.h>
+
+#include <string>
+using std::string;
 #include <vector>
+using std::vector;
 
 #include <ByteOrder.h>
 #include <File.h>

@@ -31,10 +31,13 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 #include "BitmapStreamTest.h"
-#include <stdio.h>
+
 #include <TranslatorRoster.h>
 #include <Application.h>
 #include <Bitmap.h>
+
+#include <stdio.h>
+#include <string.h>
 
 /* cppunit framework */
 #include <cppunit/Test.h>

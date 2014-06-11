@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+using std::map;
+
 #include <TestCase.h>
 #include <TestUtils.h>
 #include <cppunit/Test.h>
@@ -601,7 +603,7 @@ public:
 	typedef typename KeyStrategy::Value							Key;
 	typedef typename ValueStrategy::Value						Value;
 //	typedef _CompareStrategy<Key>								Compare;
-	typedef typename CompareStrategyWrapper::Strategy<Key>		Compare;
+	typedef typename CompareStrategyWrapper::template Strategy<Key>		Compare;
 	typedef CompareWrapper<Key, Compare>						BoolCompare;
 	typedef _MyMap<Compare>										MyMap;
 	typedef map<Key, Value, BoolCompare>						ReferenceMap;
@@ -664,8 +666,6 @@ void
 GenericInsertTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::EntryStrategy	EntryStrategy;
-	typedef typename _TestStrategy::KeyStrategy		KeyStrategy;
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
 	typedef typename _TestStrategy::Key				Key;
 	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
@@ -707,8 +707,6 @@ void
 GenericPutTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::EntryStrategy	EntryStrategy;
-	typedef typename _TestStrategy::KeyStrategy		KeyStrategy;
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
 	typedef typename _TestStrategy::Key				Key;
 	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
@@ -750,13 +748,10 @@ void
 GenericGetTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::EntryStrategy	EntryStrategy;
-	typedef typename _TestStrategy::KeyStrategy		KeyStrategy;
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
 	typedef typename _TestStrategy::Key				Key;
 	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	typedef typename TestClass::Iterator			Iterator;
-	typedef typename TestClass::ConstIterator		ConstIterator;
 	EntryStrategy entryStrategy;
 	TestClass v;
 	GenericFill(v, entryStrategy, maxNumber);
@@ -818,10 +813,7 @@ void
 GenericRemoveTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::EntryStrategy	EntryStrategy;
-	typedef typename _TestStrategy::KeyStrategy		KeyStrategy;
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
 	typedef typename _TestStrategy::Key				Key;
-	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	EntryStrategy entryStrategy;
 	TestClass v;
@@ -862,10 +854,6 @@ void
 GenericEraseTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::EntryStrategy	EntryStrategy;
-	typedef typename _TestStrategy::KeyStrategy		KeyStrategy;
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::Key				Key;
-	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	EntryStrategy entryStrategy;
 	TestClass v;
@@ -904,10 +892,6 @@ void
 GenericMakeEmptyTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::EntryStrategy	EntryStrategy;
-	typedef typename _TestStrategy::KeyStrategy		KeyStrategy;
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::Key				Key;
-	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	EntryStrategy entryStrategy;
 	TestClass v;
@@ -945,10 +929,7 @@ void
 GenericFindTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::EntryStrategy	EntryStrategy;
-	typedef typename _TestStrategy::KeyStrategy		KeyStrategy;
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
 	typedef typename _TestStrategy::Key				Key;
-	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	typedef typename TestClass::Iterator			Iterator;
 	typedef typename TestClass::ConstIterator		ConstIterator;
@@ -1010,10 +991,7 @@ void
 GenericFindCloseTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::EntryStrategy	EntryStrategy;
-	typedef typename _TestStrategy::KeyStrategy		KeyStrategy;
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
 	typedef typename _TestStrategy::Key				Key;
-	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	typedef typename TestClass::Iterator			Iterator;
 	typedef typename TestClass::ConstIterator		ConstIterator;
@@ -1093,10 +1071,6 @@ void
 GenericIteratorTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::EntryStrategy	EntryStrategy;
-	typedef typename _TestStrategy::KeyStrategy		KeyStrategy;
-	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::Key				Key;
-	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	typedef typename TestClass::Iterator			Iterator;
 	typedef typename TestClass::ConstIterator		ConstIterator;

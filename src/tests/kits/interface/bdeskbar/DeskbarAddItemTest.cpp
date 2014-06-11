@@ -17,6 +17,8 @@
 #include <Entry.h>
 #include <image.h>
 
+#include <assert.h>
+
 
 const char *appName = "application/x-vnd.jsr-additemtest";
 const char *pulsePath = "/boot/system/apps/Pulse";

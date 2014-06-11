@@ -6,8 +6,13 @@
 #include <SupportDefs.h>
 #include <TestCase.h>
 #include <TestShell.h>
-#include <set>
 #include <stdio.h>
+
+#include <set>
+using std::set;
+#include <string>
+using std::string;
+
 
 class BasicTest : public BTestCase
 {

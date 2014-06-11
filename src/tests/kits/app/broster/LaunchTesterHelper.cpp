@@ -341,7 +341,7 @@ LaunchContext::AppMessengerFor(team_id team) const
 {
 	BAutolock _lock(fLock);
 	BMessenger result;
-	if (AppInfo *info = AppInfoFor(team)) {
+	if (AppInfoFor(team)) {
 		// We need to do some hacking.
 		BMessenger messenger;
 		struct fake_messenger {

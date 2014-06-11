@@ -10,6 +10,8 @@
 #include "RegionTestcase.h"
 #include <Region.h>
 #include <Rect.h>
+
+#include <assert.h>
 #include <math.h>
 
 

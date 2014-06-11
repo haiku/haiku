@@ -3,7 +3,6 @@
 #include <cppunit/Test.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
-#include <iostream.h>
 #include <stdio.h>
 #include <string.h>
 #include <Application.h>
@@ -12,6 +11,9 @@
 #include <TextView.h>
 #include <Button.h>
 #include <Rect.h>
+
+#include <iostream>
+using std::ostream;
 
 #define ASSERT_DEQUAL(x,y) CPPUNIT_ASSERT_DOUBLES_EQUAL((x),(y),0.01)
 

@@ -1,11 +1,16 @@
 // EntryTest.cpp
 
 #include <errno.h>
-#include <list>
-#include <map>
-#include <set>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
+
+#include <list>
+using std::list;
+#include <map>
+using std::map;
+#include <set>
+using std::set;
 
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>

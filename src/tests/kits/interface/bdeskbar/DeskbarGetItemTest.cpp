@@ -14,6 +14,8 @@
 #include "DeskbarGetItemTest.h"
 #include <Deskbar.h>
 
+#include <assert.h>
+
 
 /*
  *  Method:  DeskbarGetItemTest::DeskbarGetItemTest()

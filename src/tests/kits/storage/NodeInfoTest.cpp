@@ -1,8 +1,11 @@
 // NodeInfoTest.cpp
 
 #include <stdio.h>
-#include <string>
+#include <string.h>
 #include <unistd.h>
+
+#include <string>
+using std::string;
 
 #include <Application.h>
 #include <Bitmap.h>

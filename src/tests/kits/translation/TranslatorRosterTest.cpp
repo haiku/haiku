@@ -33,6 +33,7 @@
 #include "TranslatorRosterTest.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <Application.h>
 #include <Archivable.h>

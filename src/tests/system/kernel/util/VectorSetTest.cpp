@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include <set>
+using std::set;
 
 #include <TestUtils.h>
 #include <cppunit/Test.h>
@@ -518,7 +519,6 @@ void
 GenericInsertTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	ValueStrategy strategy;
 	TestClass v;
@@ -610,7 +610,6 @@ void
 GenericEraseTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	ValueStrategy strategy;
 	TestClass v;
@@ -650,7 +649,6 @@ void
 GenericMakeEmptyTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	ValueStrategy strategy;
 	TestClass v;
@@ -810,7 +808,6 @@ void
 GenericIteratorTest(int32 maxNumber)
 {
 	typedef typename _TestStrategy::ValueStrategy	ValueStrategy;
-	typedef typename _TestStrategy::Value			Value;
 	typedef typename _TestStrategy::TestClass		TestClass;
 	typedef typename TestClass::Iterator			Iterator;
 	typedef typename TestClass::ConstIterator		ConstIterator;

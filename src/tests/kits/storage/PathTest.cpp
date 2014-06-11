@@ -9,8 +9,12 @@
 #include <Path.h>
 #include <TypeConstants.h>
 #include <stdio.h>
-#include <string>
+#include <string.h>
 #include <unistd.h>
+
+#include <string>
+using std::string;
+
 
 // Suite
 CppUnit::Test*

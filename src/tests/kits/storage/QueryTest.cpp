@@ -95,6 +95,7 @@ public:
 };
 
 // float specialization
+template<>
 BString
 ValueNode<float>::toString() const
 {
@@ -104,6 +105,7 @@ ValueNode<float>::toString() const
 }
 
 // double specialization
+template<>
 BString
 ValueNode<double>::toString() const
 {

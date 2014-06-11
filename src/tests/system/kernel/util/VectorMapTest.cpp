@@ -83,7 +83,7 @@ string_hash(const char *name)
 {
 	uint32 h = 0;
 	for (; *name; name++) {
-		if (uint32 g = g & 0xf0000000)
+		if (uint32 g = h & 0xf0000000)
 			h ^= g >> 24;
 		h = (h << 4) + *name;
 	}

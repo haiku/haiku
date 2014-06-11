@@ -190,10 +190,10 @@ public:
 template<typename Value>
 class TestVector {
 public:
-	typedef Vector<Value>::Iterator					MyIterator;
-	typedef vector<Value>::iterator					ReferenceIterator;
-	typedef Vector<Value>::ConstIterator			MyConstIterator;
-	typedef vector<Value>::const_iterator			ReferenceConstIterator;
+	typedef typename Vector<Value>::Iterator		MyIterator;
+	typedef typename vector<Value>::iterator		ReferenceIterator;
+	typedef typename Vector<Value>::ConstIterator	MyConstIterator;
+	typedef typename vector<Value>::const_iterator	ReferenceConstIterator;
 	typedef TestIterator<Value, TestVector<Value>, MyIterator,
 						 ReferenceIterator>			Iterator;
 	typedef TestIterator<const Value, const TestVector<Value>, MyConstIterator,
@@ -238,7 +238,7 @@ public:
 	{
 		if (index >= 0 && index <= Count()) {
 			CHK(fMyVector.Insert(value, index) == B_OK);
-			vector<Value>::iterator it = fReferenceVector.begin();
+			typename vector<Value>::iterator it = fReferenceVector.begin();
 			for (int32 i = 0; i < index; i++)
 				++it;
 			fReferenceVector.insert(it, value);
@@ -873,9 +873,10 @@ GenericFindTest(ValueStrategy strategy, int32 maxNumber)
 	// find the values in the vector
 	const TestVector<Value> &cv = v;
 	for (int32 i = 0; i < maxNumber; i++) {
-		TestVector<Value>::ConstIterator cit = cv.Begin();
+		typename TestVector<Value>::ConstIterator cit = cv.Begin();
 		int32 index = 0;
-		for (TestVector<Value>::Iterator it = v.Begin(); it != v.End(); ) {
+		for (typename TestVector<Value>::Iterator it = v.Begin();
+				it != v.End(); ) {
 			CHK(&v[index] == &*it);
 			CHK(&cv[index] == &*cit);
 			CHK(*it == *cit);
@@ -887,8 +888,8 @@ GenericFindTest(ValueStrategy strategy, int32 maxNumber)
 	// try to find some random values
 	for (int32 i = 0; i < maxNumber; i++) {
 		Value value = strategy.Generate();
-		TestVector<Value>::Iterator it = v.Find(value);
-		TestVector<Value>::ConstIterator cit = cv.Find(value);
+		typename TestVector<Value>::Iterator it = v.Find(value);
+		typename TestVector<Value>::ConstIterator cit = cv.Find(value);
 		if (it != v.End())
 			CHK(&*it == &*cit);
 	}
@@ -926,8 +927,8 @@ GenericIteratorTest(ValueStrategy strategy, int32 maxNumber)
 	TestVector<Value> v;
 	GenericFill(v, strategy, maxNumber);
 	const TestVector<Value> &cv = v;
-	TestVector<Value>::Iterator it = v.Begin();
-	TestVector<Value>::ConstIterator cit = cv.Begin();
+	typename TestVector<Value>::Iterator it = v.Begin();
+	typename TestVector<Value>::ConstIterator cit = cv.Begin();
 	for (; it != v.End(); ++it, ++cit) {
 		CHK(&*it == &*cit);
 		CHK(&*it == it.operator->());

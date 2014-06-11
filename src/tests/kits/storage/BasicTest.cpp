@@ -1,13 +1,15 @@
 // BasicTest.cpp
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
-#include <string>
+
+#include <set>
+using std::set;
 
 #include "BasicTest.h"
 
 // count_available_fds
-#include <set>
 static
 int32
 count_available_fds()

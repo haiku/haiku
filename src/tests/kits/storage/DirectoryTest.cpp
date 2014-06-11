@@ -1,9 +1,12 @@
 // DirectoryTest.cpp
 
 #include <stdio.h>
-#include <string>
+#include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
+
+#include <string>
+using std::string;
 
 #include <Directory.h>
 #include <Entry.h>

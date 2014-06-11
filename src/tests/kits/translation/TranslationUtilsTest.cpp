@@ -31,7 +31,6 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 #include "TranslationUtilsTest.h"
-#include <stdio.h>
 #include <TranslatorFormats.h>
 	// for B_TRANSLATOR_EXT_*
 #include <TranslatorRoster.h>
@@ -43,6 +42,9 @@
 #include <BitmapStream.h>
 #include <Entry.h>
 #include <OS.h>
+
+#include <stdio.h>
+#include <string.h>
 
 /* cppunit framework */
 #include <cppunit/Test.h>

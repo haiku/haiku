@@ -106,7 +106,8 @@ DoublyLinkedListTest::TestList()
 	// count items in list
 
 	int count = 0;
-	DoublyLinkedList<Item, DoublyLinkedListMemberGetLink<Item> >::Iterator
+	typename DoublyLinkedList<Item,
+			DoublyLinkedListMemberGetLink<Item> >::Iterator
 		iterator = list.GetIterator();
 	while (iterator.Next() != NULL)
 		count++;

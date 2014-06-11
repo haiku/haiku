@@ -22,6 +22,8 @@
 #include <Rect.h>
 #include <Polygon.h>
 
+#include <assert.h>
+
 
 /*
  *  Method:  CreatePolygonTest::CreatePolygonTest()

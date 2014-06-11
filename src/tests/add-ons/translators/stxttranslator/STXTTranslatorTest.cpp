@@ -212,18 +212,21 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 	styled_path = new char[nlongest + 6];
 	plain_path = new char[nlongest + 6];
 	
+	BFile styled_file, plain_file;
+
 	// Perform translations on every file in the array
 	for (int32 i = 0; i < len; i++) {
 		strcpy(styled_path, paths[i]);
 		strcat(styled_path, ".stxt");
 		strcpy(plain_path, paths[i]);
 		strcat(plain_path, ".txt");
-		
-		// Setup input files	
+
+		// Setup input files
 		ptest->NextSubTest();
-		BFile styled_file, plain_file, *pinput_file;
 		CPPUNIT_ASSERT(styled_file.SetTo(styled_path, B_READ_ONLY) == B_OK);
 		CPPUNIT_ASSERT(plain_file.SetTo(plain_path, B_READ_ONLY) == B_OK);
+
+		BFile *pinput_file;
 		if (bplain) {
 			printf(" [%s] ", plain_path);
 			pinput_file = &plain_file;
@@ -231,9 +234,9 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 			printf(" [%s] ", styled_path);
 			pinput_file = &styled_file;
 		}
-		
+
 		BMallocIO mallio, dmallio;
-		
+
 		// Convert to B_TRANSLATOR_ANY_TYPE (should be B_TRANSLATOR_TEXT)
 		ptest->NextSubTest();
 		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
@@ -241,7 +244,7 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 		CPPUNIT_ASSERT(proster->Translate(pinput_file, NULL, NULL, &mallio,
 			B_TRANSLATOR_ANY_TYPE) == B_OK);
 		CPPUNIT_ASSERT(CompareStreams(mallio, plain_file) == true);
-		
+
 		// Convert to B_TRANSLATOR_TEXT
 		ptest->NextSubTest();
 		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
@@ -249,7 +252,7 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 		CPPUNIT_ASSERT(proster->Translate(pinput_file, NULL, NULL, &mallio,
 			B_TRANSLATOR_TEXT) == B_OK);
 		CPPUNIT_ASSERT(CompareStreams(mallio, plain_file) == true);
-		
+
 		// Convert plain mallio to B_TRANSLATOR_TEXT dmallio
 		ptest->NextSubTest();
 		CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
@@ -257,7 +260,7 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 		CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
 			B_TRANSLATOR_TEXT) == B_OK);
 		CPPUNIT_ASSERT(CompareStreams(dmallio, plain_file) == true);
-		
+
 		// Convert to B_STYLED_TEXT_FORMAT
 		ptest->NextSubTest();
 		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
@@ -265,7 +268,7 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 		CPPUNIT_ASSERT(proster->Translate(pinput_file, NULL, NULL, &mallio,
 			B_STYLED_TEXT_FORMAT) == B_OK);
 		CPPUNIT_ASSERT(CompareStreams(mallio, styled_file) == true);
-		
+
 		// Convert styled mallio to B_TRANSLATOR_TEXT dmallio
 		ptest->NextSubTest();
 		CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
@@ -273,7 +276,7 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 		CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
 			B_TRANSLATOR_TEXT) == B_OK);
 		CPPUNIT_ASSERT(CompareStreams(dmallio, plain_file) == true);
-		
+
 		// Convert styled mallio to B_STYLED_TEXT_FORMAT dmallio
 		ptest->NextSubTest();
 		CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);

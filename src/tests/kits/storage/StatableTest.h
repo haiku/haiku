@@ -7,7 +7,7 @@
 #include <cppunit/TestSuite.h>
 
 #include <list>
-#include <string>
+using std::list;
 
 #include "BasicTest.h"
 
@@ -27,7 +27,7 @@ struct TestEntries
 
 	void delete_all()
 	{
-		for (list<C*>::iterator it = entries.begin();
+		for (typename list<C*>::iterator it = entries.begin();
 			 it != entries.end();
 			 it++) {
 			// Arghh, BStatable has no virtual destructor!
@@ -74,10 +74,10 @@ struct TestEntries
 		entryNameIt = entryNames.begin();
 	}
 
-	list<C*>					entries;
-	list<string>				entryNames;
-	list<C*>::iterator			entryIt;
-	list<string>::iterator		entryNameIt;
+	list<C*>						entries;
+	list<string>					entryNames;
+	typename list<C*>::iterator		entryIt;
+	typename list<string>::iterator	entryNameIt;
 };
 
 typedef TestEntries<BStatable> TestStatables;

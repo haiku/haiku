@@ -11,6 +11,8 @@
 #include <Region.h>
 #include <Rect.h>
 
+#include <assert.h>
+
 
 /*
  *  Method:  RegionOffsetBy::RegionOffsetBy()
