@@ -24,12 +24,14 @@
 	\ingroup game
 	\ingroup libbe
 	\brief Playback audio from a sound file on disk.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BFileGameSound::BFileGameSound(const entry_ref *file, bool looping,
-		BGameSoundDevice *device)
+	\fn BFileGameSound::BFileGameSound(const entry_ref* file, bool looping,
+		BGameSoundDevice* device)
 	\brief Creates and initializes a BFileGameSound object from an
 		   \c entry_ref allowing you to play the specified sound file.
 
@@ -44,12 +46,14 @@
 	\param looping Whether or not to repeat the sound in a loop.
 	\param device The sound device to use to play the sound, use \c NULL for
 		   default.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BFileGameSound::BFileGameSound(const char *file, bool looping,
-		BGameSoundDevice *device)
+	\fn BFileGameSound::BFileGameSound(const char* file, bool looping,
+		BGameSoundDevice* device)
 	\brief Creates and initializes a BFileGameSound object from a file path
 		   allowing you to play the specified sound file.
 
@@ -63,19 +67,25 @@
 	\param file The path of the sound file on disk.
 	\param looping Whether or not to repeat the sound in a loop.
 	\param device The sound device to use to play the sound, use \c NULL for
-		   default.
+	       default.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BFileGameSound::~BFileGameSound()
 	\brief Destroys the BFileGameSound object.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BGameSound* BFileGameSound::Clone() const
 	\brief Not implemented, always returns \c NULL.
+
+	\since BeOS R5
 */
 
 
@@ -84,6 +94,8 @@
 	\brief Plays the sound file.
 
 	\returns A status code, \c B_OK on success or an error code on error.
+
+	\since BeOS R5
 */
 
 
@@ -92,6 +104,8 @@
 	\brief Stops playback of the sound file.
 
 	\returns A status code, \c B_OK on success or an error code on error.
+
+	\since BeOS R5
 */
 
 
@@ -100,32 +114,38 @@
 	\brief Preload the sound file into memory so that playback won't be delayed.
 
 	\returns A status code, \c B_OK on success or an error code if we were
-			 unable to communicate with the sound port.
+	         unable to communicate with the sound port.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn void BFileGameSound::FillBuffer(void *inBuffer, size_t inByteCount)
+	\fn void BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 	\brief Fill a buffer with sound data.
 
 	\param inBuffer The buffer to fill.
 	\param inByteCount The number of bytes to fill buffer with.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn status_t BFileGameSound::SetPaused(bool isPaused, bigtime_t rampTime)
 	\brief Pauses playback if \a isPaused is \c true or resumes play if
-		   \a isPaused is \c false.
+	       \a isPaused is \c false.
 
 	\param isPaused \c true to pause playback, \c false to resume playback.
 	\param rampTime Determines how long the change in playback state should
-		   take to complete in microseconds. Set to 0 for an instantaneous
-		   change.
+	       take to complete in microseconds. Set to 0 for an instantaneous
+	       change.
 
 	\returns A status code.
 	\retval B_OK The playback state was updated.
 	\retval EALREADY Already in the requested playback state.
+
+	\since BeOS R5
 */
 
 
@@ -137,4 +157,6 @@
 	\retval B_NOT_PAUSED Sound is playing.
 	\retval B_PAUSE_IN_PROGRESS The sound is transitioning to or from a paused state.
 	\retval B_PAUSED Sound is paused.
+
+	\since BeOS R5
 */

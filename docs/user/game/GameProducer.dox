@@ -28,31 +28,39 @@
 	\ingroup game
 	\ingroup libbe
 	\brief A MediaKit producer node which mixes sound from the GameKit
-		and sends them to the audio mixer.
+	       and sends them to the audio mixer.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn GameProducer::GameProducer(GameSoundBuffer * object,
-		const gs_audio_format * format);
+	\fn GameProducer::GameProducer(GameSoundBuffer* object,
+		const gs_audio_format* format);
 	\brief Initializes the GameProducer with the passed in GameSoundBuffer
-		and gs_audio_format.
+	       and gs_audio_format.
 
 	\param object The GameSoundBuffer to 'sync' the GameProducer with.
 	\param format The gs_audio_format to set the GameProducer's format.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn GameProducer::~GameProducer()
 	\brief Destroys the GameProducer object and stops the BMediaEventLooper
-		thread.
+	       thread.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn BMediaAddOn* GameProducer::AddOn(int32 *internal_id) const
+	\fn BMediaAddOn* GameProducer::AddOn(int32* internal_id) const
 	\brief Unimplemented.
+
+	\since Haiku R1
 */
 
 
@@ -71,6 +79,8 @@
 	\retval B_OK \a type is supported.
 	\retval B_BAD_VALUE No \a format was received.
 	\retval B_MEDIA_BAD_FORMAT The \a format is not supported.
+
+	\since Haiku R1
 */
 
 
@@ -87,9 +97,10 @@
 	\returns A status code.
 	\retval B_OK The \a format is supported.
 	\retval B_MEDIA_BAD_SOURCE The \a output doesn't match the current
-		output source.
+	        output source.
 	\retval B_MEDIA_BAD_FORMAT The \a format is not supported.
 
+	\since Haiku R1
 */
 
 
@@ -107,23 +118,27 @@
 	\param _deprecated_ This method is deprecated.
 
 	\returns B_ERROR as this function is deprecated, it has been removed, and
-		now only returns \a B_ERROR.
+	         now only returns \a B_ERROR.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t GameProducer::GetNextOutput(int32* cookie,
-		media_output* out_output)
+		media_output* _output)
 	\brief Gets the next output cookie.
 
 	Cookie can only be zero, as GameProducer supports one output.
 
 	\param cookie The output cookie value.
-	\param out_output The output that the cookie represents.
+	\param _output The output that the cookie represents.
 
 	\returns A status code.
 	\retval B_OK The cookie was successfully incremented.
 	\retval B_BAD_INDEX The cookie is not equal to zero.
+
+	\since Haiku R1
 */
 
 
@@ -134,45 +149,51 @@
 	\param cookie The cookie index.
 
 	\return Always returns B_OK.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t GameProducer::SetBufferGroup(const media_source& for_source,
+	\fn status_t GameProducer::SetBufferGroup(const media_source& forSource,
 		BBufferGroup* newGroup)
 	\brief Changes the buffer group from the current one, to the specified one.
 
-	\param for_source The output source. Can't be equivalent to the current
+	\param forSource The output source. Can't be equivalent to the current
 		output source.
 	\param newGroup The new BBufferGroup to assign the buffer group to.
 
 	\returns A status code.
 	\retval B_OK The change has succeeded.
-	\retval B_MEDIA_BAD_SOURCE \a for_source is equal to the current output source.
+	\retval B_MEDIA_BAD_SOURCE \a forSource is equal to the current output source.
 	\retval B_BAD_VALUE The new BBufferGroup's buffer list returns an error.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t GameProducer::GetLatency(bigtime_t* out_latency)
+	\fn status_t GameProducer::GetLatency(bigtime_t* _latency)
 	\brief Gets the total latency, including internal downstream plus scheduling.
 
-	\param out_latency Gets set to the current latency.
+	\param _latency Gets set to the current latency.
 
 	\returns B_OK.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t GameProducer::PrepareToConnect(const media_source& what,
 		const media_destination& where, media_format* format,
-		media_source* out_source, char* out_name)
+		media_source* _source, char* out_name)
 	\brief Confirms that the media format and wild cards are valid.
 
 	\param what The media source to output to.
 	\param where The destination for the connection.
 	\param format The format to finish specializing.
-	\param out_source The output source that the method retrieves.
+	\param _source The output source that the method retrieves.
 	\param out_name The variable that holds the output name.
 
 	\returns A status code.
@@ -181,39 +202,47 @@
 	\retval B_MEDIA_ALREADY_CONNECTED The GameProducer is already connected.
 	\retval B_MEDIA_BAD_FORMAT The \a format is not supported.
 
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void GameProducer::Connect(status_t error, const media_source& source,
-	     const media_destination& destination, const media_format& format, char* io_name)
+		const media_destination& destination, const media_format& format,
+		char* ioName)
 	\brief Connects to the output device.
 
 	\param error The variable that holds an error, should one arise.
 	\param source The output source to connect to.
 	\param destination The media destination, that is connected to.
 	\param format The variable that holds the format type.
-	\param io_name The variable that holds the output name.
+	\param ioName The variable that holds the output name.
 */
 
 
 /*!
-	\fn void GameProducer::Disconnect(const media_source& what, const media_destination& where)
+	\fn void GameProducer::Disconnect(const media_source& what,
+		const media_destination& where)
 	\brief Disconnects from the output device.
 
 	\param what The media destination.
 	\param where The media's output source.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void GameProducer::LateNoticeReceived(const media_source& what,
-		bigtime_t how_much, bigtime_t performance_time)
+		bigtime_t howMuch, bigtime_t performanceDuration)
 	\brief Attempts to catch up to the buffer.
 
 	\param what The media output source.
-	\param how_much The amount of 'lateness'.
-	\param performance_time Unused.
+	\param howMuch The amount of 'lateness'.
+	\param performanceDuration Unused.
+
+	\since Haiku R1
 */
 
 
@@ -227,17 +256,21 @@
 	\param what The media output source.
 	\param enabled Sets the output to enabled or disabled.
 	\param _deprecated_ This method is deprecated.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t GameProducer::SetPlayRate(int32 numer, int32 denom)
+	\fn status_t GameProducer::SetPlayRate(int32 numerator, int32 denominator)
 	\brief Play rates are not supported, returns \c B_ERROR.
 
-	\param numer The top part of the fraction.
-	\param denom The bottom part of the fraction.
+	\param numerator The top part of the fraction.
+	\param denominator The bottom part of the fraction.
 
 	\return Always returns \c B_ERROR since play rates aren't supported.
+
+	\since Haiku R1
 */
 
 
@@ -251,6 +284,8 @@
 	\param size The size of the message.
 
 	\returns Always returns \c B_ERROR since private messages aren't supported.
+
+	\since Haiku R1
 */
 
 
@@ -265,6 +300,8 @@
 	\param prev_buffer The previous buffer.
 	\param prev_time The previous buffer time.
 	\param prev_tag The previous buffer delimiter.
+
+	\since Haiku R1
 */
 
 
@@ -278,12 +315,16 @@
 	\param destination The connected output destination.
 	\param new_latency The new amount of latency.
 	\param flags Unused.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void GameProducer::NodeRegistered()
 	\brief Handles when an output source node is registered.
+
+	\since Haiku R1
 */
 
 
@@ -292,15 +333,19 @@
 	\brief Offline mode is not supported.
 
 	\param mode The mode of running.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void GameProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
-		bool realTimeEvent)
+	\fn void GameProducer::HandleEvent(const media_timed_event* event,
+		bigtime_t lateness, bool realTimeEvent)
 	\brief Handles when an event is triggered.
 
 	\param event The type of event.
 	\param lateness Unused.
 	\param realTimeEvent Unused.
+
+	\since Haiku R1
 */
