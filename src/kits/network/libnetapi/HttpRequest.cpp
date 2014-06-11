@@ -378,15 +378,14 @@ BHttpRequest::_ProtocolLoop()
 					if (authentication->Method() == B_HTTP_AUTHENTICATION_NONE) {
 						// There is no authentication context for this
 						// url yet, so let's create one.
-						authentication
-							= new(std::nothrow) BHttpAuthentication();
-						if (authentication == NULL)
-							status = B_NO_MEMORY;
-						else {
-							status = authentication->Initialize(
-								fHeaders["WWW-Authenticate"]);
-							fContext->AddAuthentication(fUrl, authentication);
-						}
+						BHttpAuthentication newAuth;
+						newAuth.Initialize(fHeaders["WWW-Authenticate"]);
+						fContext->AddAuthentication(fUrl, newAuth);
+
+						// Get the copy of the authentication we just added.
+						// That copy is owned by the BUrlContext and won't be
+						// deleted (unlike the temporary object above)
+						authentication = &fContext->GetAuthentication(fUrl);
 					}
 
 					newRequest = false;

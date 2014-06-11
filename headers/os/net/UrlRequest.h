@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2014 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_URL_REQUEST_H_
@@ -11,6 +11,7 @@
 #include <UrlProtocolListener.h>
 #include <UrlResult.h>
 #include <OS.h>
+#include <Referenceable.h>
 
 
 class BUrlRequest {
@@ -52,7 +53,7 @@ protected:
 										const char* format, ...);
 protected:
 			BUrl					fUrl;
-			BUrlContext*			fContext;
+			BReference<BUrlContext>	fContext;
 			BUrlProtocolListener*	fListener;
 
 			bool					fQuit;

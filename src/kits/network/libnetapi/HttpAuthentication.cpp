@@ -9,9 +9,12 @@
 
 #include <HttpAuthentication.h>
 
-#include <cstdlib>
+#include <stdlib.h>
+#include <stdio.h>
 
-#include <cstdio>
+#include <AutoLocker.h>
+
+
 #if DEBUG > 0
 #define PRINT(x) printf x
 #else
@@ -56,27 +59,35 @@ BHttpAuthentication::BHttpAuthentication(const BString& username, const BString&
 void
 BHttpAuthentication::SetUserName(const BString& username)
 {
+	fLock.Lock();
 	fUserName = username;
+	fLock.Unlock();
 }
 
 
 void
 BHttpAuthentication::SetPassword(const BString& password)
 {
+	fLock.Lock();
 	fPassword = password;
+	fLock.Unlock();
 }
 
 
 void
 BHttpAuthentication::SetMethod(BHttpAuthenticationMethod method)
 {
+	fLock.Lock();
 	fAuthenticationMethod = method;
+	fLock.Unlock();
 }
 
 
 status_t
 BHttpAuthentication::Initialize(const BString& wwwAuthenticate)
 {
+	BPrivate::AutoLocker<BLocker> lock(fLock);
+
 	fAuthenticationMethod = B_HTTP_AUTHENTICATION_NONE;
 	fDigestQop = B_HTTP_QOP_NONE;
 
@@ -171,6 +182,7 @@ BHttpAuthentication::Initialize(const BString& wwwAuthenticate)
 const BString&
 BHttpAuthentication::UserName() const
 {
+	BPrivate::AutoLocker<BLocker> lock(fLock);
 	return fUserName;
 }
 
@@ -178,6 +190,7 @@ BHttpAuthentication::UserName() const
 const BString&
 BHttpAuthentication::Password() const
 {
+	BPrivate::AutoLocker<BLocker> lock(fLock);
 	return fPassword;
 }
 
@@ -185,6 +198,7 @@ BHttpAuthentication::Password() const
 BHttpAuthenticationMethod
 BHttpAuthentication::Method() const
 {
+	BPrivate::AutoLocker<BLocker> lock(fLock);
 	return fAuthenticationMethod;
 }
 
@@ -192,6 +206,7 @@ BHttpAuthentication::Method() const
 BString
 BHttpAuthentication::Authorization(const BUrl& url, const BString& method) const
 {
+	BPrivate::AutoLocker<BLocker> lock(fLock);
 	BString authorizationString;
 
 	switch (fAuthenticationMethod) {

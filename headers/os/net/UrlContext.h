@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2014 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_URL_CONTEXT_H_
@@ -8,15 +8,16 @@
 
 #include <HttpAuthentication.h>
 #include <NetworkCookieJar.h>
+#include <Referenceable.h>
 
 
 namespace BPrivate {
-	template <class key, class value> class HashMap;
+	template <class key, class value> class SynchronizedHashMap;
 	class HashString;
 }
 
 
-class BUrlContext {
+class BUrlContext: public BReferenceable {
 public:
 								BUrlContext();
 								~BUrlContext();
@@ -25,7 +26,7 @@ public:
 			void				SetCookieJar(
 									const BNetworkCookieJar& cookieJar);
 			void				AddAuthentication(const BUrl& url,
-									BHttpAuthentication* const authentication);
+									const BHttpAuthentication& authentication);
 											
 	// Context accessors
 			BNetworkCookieJar&	GetCookieJar();
@@ -33,7 +34,7 @@ public:
 
 private:
 			BNetworkCookieJar	fCookieJar;
-			typedef BPrivate::HashMap<BPrivate::HashString,
+			typedef BPrivate::SynchronizedHashMap<BPrivate::HashString,
 				BHttpAuthentication*> BHttpAuthenticationMap;
 			BHttpAuthenticationMap* fAuthenticationMap;
 };

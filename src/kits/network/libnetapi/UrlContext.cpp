@@ -52,21 +52,25 @@ BUrlContext::SetCookieJar(const BNetworkCookieJar& cookieJar)
 
 void
 BUrlContext::AddAuthentication(const BUrl& url,
-	BHttpAuthentication* const authentication)
+	const BHttpAuthentication& authentication)
 {
 	BString domain = url.Host();
 	domain += url.Path();
 	BPrivate::HashString hostHash(domain.String(), domain.Length());
 
+	fAuthenticationMap->Lock();
+
 	BHttpAuthentication* previous = fAuthenticationMap->Get(hostHash);
 
-	// Make sure we don't leak memory by overriding a previous
-	// authentication for the same domain.
-	if (authentication != previous) {
-		fAuthenticationMap->Put(hostHash, authentication);
-			// replaces the old one, or adds it in case previous == NULL
-		delete previous;
+	if (previous)
+		*previous = authentication;
+	else {
+		BHttpAuthentication* copy
+			= new(std::nothrow) BHttpAuthentication(authentication);
+		fAuthenticationMap->Put(hostHash, copy);
 	}
+
+	fAuthenticationMap->Unlock();
 }
 
 

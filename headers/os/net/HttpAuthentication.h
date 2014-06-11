@@ -1,13 +1,14 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2014 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_HTTP_AUTHENTICATION_H_
 #define _B_HTTP_AUTHENTICATION_H_
 
 
-#include <Url.h>
+#include <Locker.h>
 #include <String.h>
+#include <Url.h>
 
 // HTTP authentication method
 enum BHttpAuthenticationMethod {
@@ -89,6 +90,8 @@ private:
 			BHttpAuthenticationQop fDigestQop;
 			
 			BString				fAuthorizationString;
+
+	mutable	BLocker				fLock;
 };
 
 #endif // _B_HTTP_AUTHENTICATION_H_
