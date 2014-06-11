@@ -53,8 +53,8 @@ public:
 	virtual void				AllDetached();
 	virtual void				FrameResized(float newWidth, float newHeight);
 	virtual void				FrameMoved(BPoint newPosition);
-	virtual void				TargetedByScrollView(BScrollView* scroller);
-	virtual void				WindowActivated(bool state);
+	virtual void				TargetedByScrollView(BScrollView* view);
+	virtual void				WindowActivated(bool active);
 
 	virtual void				MessageReceived(BMessage* message);
 	virtual void				KeyDown(const char* bytes, int32 numBytes);
@@ -142,7 +142,7 @@ public:
 
 	virtual BHandler*			ResolveSpecifier(BMessage* message,
 									int32 index, BMessage* specifier,
-									int32 form, const char* property);
+									int32 what, const char* property);
 	virtual status_t			GetSupportedSuites(BMessage* data);
 
 	virtual status_t			Perform(perform_code code, void* arg);

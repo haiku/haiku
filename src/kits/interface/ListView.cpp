@@ -160,22 +160,22 @@ BListView::Instantiate(BMessage* archive)
 
 
 status_t
-BListView::Archive(BMessage* archive, bool deep) const
+BListView::Archive(BMessage* data, bool deep) const
 {
-	status_t status = BView::Archive(archive, deep);
+	status_t status = BView::Archive(data, deep);
 	if (status < B_OK)
 		return status;
 
-	status = archive->AddInt32("_lv_type", fListType);
+	status = data->AddInt32("_lv_type", fListType);
 	if (status == B_OK && deep) {
 		BListItem* item;
 		int32 i = 0;
 
-		while ((item = ItemAt(i++))) {
+		while ((item = ItemAt(i++)) != NULL) {
 			BMessage subData;
 			status = item->Archive(&subData, true);
 			if (status >= B_OK)
-				status = archive->AddMessage("_l_items", &subData);
+				status = data->AddMessage("_l_items", &subData);
 
 			if (status < B_OK)
 				break;
@@ -183,10 +183,10 @@ BListView::Archive(BMessage* archive, bool deep) const
 	}
 
 	if (status >= B_OK && InvocationMessage() != NULL)
-		status = archive->AddMessage("_msg", InvocationMessage());
+		status = data->AddMessage("_msg", InvocationMessage());
 
 	if (status == B_OK && fSelectMessage != NULL)
-		status = archive->AddMessage("_2nd_msg", fSelectMessage);
+		status = data->AddMessage("_2nd_msg", fSelectMessage);
 
 	return status;
 }
@@ -250,21 +250,21 @@ BListView::AllDetached()
 
 
 void
-BListView::FrameResized(float width, float height)
+BListView::FrameResized(float newWidth, float newHeight)
 {
 	_FixupScrollBar();
 }
 
 
 void
-BListView::FrameMoved(BPoint new_position)
+BListView::FrameMoved(BPoint newPosition)
 {
-	BView::FrameMoved(new_position);
+	BView::FrameMoved(newPosition);
 }
 
 
 void
-BListView::TargetedByScrollView(BScrollView *view)
+BListView::TargetedByScrollView(BScrollView* view)
 {
 	fScrollView = view;
 	// TODO: We could SetFlags(Flags() | B_FRAME_EVENTS) here, but that
@@ -274,9 +274,9 @@ BListView::TargetedByScrollView(BScrollView *view)
 
 
 void
-BListView::WindowActivated(bool state)
+BListView::WindowActivated(bool active)
 {
-	BView::WindowActivated(state);
+	BView::WindowActivated(active);
 }
 
 
@@ -1306,12 +1306,12 @@ BListView::ItemFrame(int32 index)
 
 BHandler*
 BListView::ResolveSpecifier(BMessage* message, int32 index,
-	BMessage* specifier, int32 form, const char* property)
+	BMessage* specifier, int32 what, const char* property)
 {
 	BPropertyInfo propInfo(sProperties);
 
-	if (propInfo.FindMatch(message, 0, specifier, form, property) < 0) {
-		return BView::ResolveSpecifier(message, index, specifier, form,
+	if (propInfo.FindMatch(message, 0, specifier, what, property) < 0) {
+		return BView::ResolveSpecifier(message, index, specifier, what,
 			property);
 	}
 

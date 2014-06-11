@@ -316,510 +316,55 @@ BScrollBar::Archive(BMessage* data, bool deep) const
 	status_t err = BView::Archive(data, deep);
 	if (err != B_OK)
 		return err;
+
 	err = data->AddFloat("_range", fMin);
 	if (err != B_OK)
 		return err;
+
 	err = data->AddFloat("_range", fMax);
 	if (err != B_OK)
 		return err;
+
 	err = data->AddFloat("_steps", fSmallStep);
 	if (err != B_OK)
 		return err;
+
 	err = data->AddFloat("_steps", fLargeStep);
 	if (err != B_OK)
 		return err;
+
 	err = data->AddFloat("_val", fValue);
 	if (err != B_OK)
 		return err;
+
 	err = data->AddInt32("_orient", (int32)fOrientation);
 	if (err != B_OK)
 		return err;
+
 	err = data->AddFloat("_prop", fProportion);
 
 	return err;
 }
 
 
-// #pragma mark -
+void
+BScrollBar::AllAttached()
+{
+	BView::AllAttached();
+}
+
+
+void
+BScrollBar::AllDetached()
+{
+	BView::AllDetached();
+}
 
 
 void
 BScrollBar::AttachedToWindow()
 {
-}
-
-/*
-	From the BeBook (on ValueChanged()):
-
-Responds to a notification that the value of the scroll bar has changed to
-newValue. For a horizontal scroll bar, this function interprets newValue
-as the coordinate value that should be at the left side of the target
-view's bounds rectangle. For a vertical scroll bar, it interprets
-newValue as the coordinate value that should be at the top of the rectangle.
-It calls ScrollTo() to scroll the target's contents into position, unless
-they have already been scrolled.
-
-ValueChanged() is called as the result both of user actions
-(B_VALUE_CHANGED messages received from the Application Server) and of
-programmatic ones. Programmatically, scrolling can be initiated by the
-target view (calling ScrollTo()) or by the BScrollBar
-(calling SetValue() or SetRange()).
-
-In all these cases, the target view and the scroll bars need to be kept
-in synch. This is done by a chain of function calls: ValueChanged() calls
-ScrollTo(), which in turn calls SetValue(), which then calls
-ValueChanged() again. It's up to ValueChanged() to get off this
-merry-go-round, which it does by checking the target view's bounds
-rectangle. If newValue already matches the left or top side of the
-bounds rectangle, if forgoes calling ScrollTo().
-
-ValueChanged() does nothing if a target BView hasn't been set—or
-if the target has been set by name, but the name doesn't correspond to
-an actual BView within the scroll bar's window.
-
-*/
-
-
-void
-BScrollBar::SetValue(float value)
-{
-	if (value > fMax)
-		value = fMax;
-	else if (value < fMin)
-		value = fMin;
-	else if (isnan(value))
-		return;
-
-	value = roundf(value);
-	if (value == fValue)
-		return;
-
-	TRACE("BScrollBar(%s)::SetValue(%.1f)\n", Name(), value);
-
-	fValue = value;
-
-	_UpdateThumbFrame();
-	_UpdateArrowButtons();
-
-	ValueChanged(fValue);
-}
-
-
-float
-BScrollBar::Value() const
-{
-	return fValue;
-}
-
-
-void
-BScrollBar::ValueChanged(float newValue)
-{
-	TRACE("BScrollBar(%s)::ValueChanged(%.1f)\n", Name(), newValue);
-
-	if (fTarget != NULL) {
-		// cache target bounds
-		BRect targetBounds = fTarget->Bounds();
-		// if vertical, check bounds top and scroll if different from newValue
-		if (fOrientation == B_VERTICAL && targetBounds.top != newValue)
-			fTarget->ScrollBy(0.0, newValue - targetBounds.top);
-
-		// if horizontal, check bounds left and scroll if different from newValue
-		if (fOrientation == B_HORIZONTAL && targetBounds.left != newValue)
-			fTarget->ScrollBy(newValue - targetBounds.left, 0.0);
-	}
-
-	TRACE(" -> %.1f\n", newValue);
-
-	SetValue(newValue);
-}
-
-
-void
-BScrollBar::SetProportion(float value)
-{
-	if (value < 0.0f)
-		value = 0.0f;
-	else if (value > 1.0f)
-		value = 1.0f;
-
-	if (value == fProportion)
-		return;
-
-	TRACE("BScrollBar(%s)::SetProportion(%.1f)\n", Name(), value);
-
-	bool oldEnabled = fPrivateData->fEnabled && fMin < fMax
-		&& fProportion < 1.0f && fProportion >= 0.0f;
-
-	fProportion = value;
-
-	bool newEnabled = fPrivateData->fEnabled && fMin < fMax
-		&& fProportion < 1.0f && fProportion >= 0.0f;
-
-	_UpdateThumbFrame();
-
-	if (oldEnabled != newEnabled)
-		Invalidate();
-}
-
-
-float
-BScrollBar::Proportion() const
-{
-	return fProportion;
-}
-
-
-void
-BScrollBar::SetRange(float min, float max)
-{
-	if (min > max || isnanf(min) || isnanf(max)
-		|| isinff(min) || isinff(max)) {
-		min = 0.0f;
-		max = 0.0f;
-	}
-
-	min = roundf(min);
-	max = roundf(max);
-
-	if (fMin == min && fMax == max)
-		return;
-	TRACE("BScrollBar(%s)::SetRange(min=%.1f, max=%.1f)\n", Name(), min, max);
-
-	fMin = min;
-	fMax = max;
-
-	if (fValue < fMin || fValue > fMax)
-		SetValue(fValue);
-	else {
-		_UpdateThumbFrame();
-		Invalidate();
-	}
-}
-
-
-void
-BScrollBar::GetRange(float* min, float* max) const
-{
-	if (min != NULL)
-		*min = fMin;
-	if (max != NULL)
-		*max = fMax;
-}
-
-
-void
-BScrollBar::SetSteps(float smallStep, float largeStep)
-{
-	// Under R5, steps can be set only after being attached to a window,
-	// probably because the data is kept server-side. We'll just remove
-	// that limitation... :P
-
-	// The BeBook also says that we need to specify an integer value even
-	// though the step values are floats. For the moment, we'll just make
-	// sure that they are integers
-	smallStep = roundf(smallStep);
-	largeStep = roundf(largeStep);
-	if (fSmallStep == smallStep && fLargeStep == largeStep)
-		return;
-
-	TRACE("BScrollBar(%s)::SetSteps(small=%.1f, large=%.1f)\n", Name(),
-		smallStep, largeStep);
-
-	fSmallStep = smallStep;
-	fLargeStep = largeStep;
-
-	if (fProportion == 0.0) {
-		// special case, proportion is based on fLargeStep if it was never
-		// set, so it means we need to invalidate here
-		_UpdateThumbFrame();
-		Invalidate();
-	}
-
-	// TODO: test use of fractional values and make them work properly if
-	// they don't
-}
-
-
-void
-BScrollBar::GetSteps(float* smallStep, float* largeStep) const
-{
-	if (smallStep != NULL)
-		*smallStep = fSmallStep;
-
-	if (largeStep != NULL)
-		*largeStep = fLargeStep;
-}
-
-
-void
-BScrollBar::SetTarget(BView* target)
-{
-	if (fTarget) {
-		// unset the previous target's scrollbar pointer
-		if (fOrientation == B_VERTICAL)
-			fTarget->fVerScroller = NULL;
-		else
-			fTarget->fHorScroller = NULL;
-	}
-
-	fTarget = target;
-	if (fTarget) {
-		if (fOrientation == B_VERTICAL)
-			fTarget->fVerScroller = this;
-		else
-			fTarget->fHorScroller = this;
-	}
-}
-
-
-void
-BScrollBar::SetTarget(const char* targetName)
-{
-	// NOTE 1: BeOS implementation crashes for targetName == NULL
-	// NOTE 2: BeOS implementation also does not modify the target
-	// if it can't be found
-	if (!targetName)
-		return;
-
-	if (!Window())
-		debugger("Method requires window and doesn't have one");
-
-	BView* target = Window()->FindView(targetName);
-	if (target)
-		SetTarget(target);
-}
-
-
-BView*
-BScrollBar::Target() const
-{
-	return fTarget;
-}
-
-
-void
-BScrollBar::SetOrientation(orientation orientation)
-{
-	if (fOrientation == orientation)
-		return;
-
-	fOrientation = orientation;
-	InvalidateLayout();
-	Invalidate();
-}
-
-
-orientation
-BScrollBar::Orientation() const
-{
-	return fOrientation;
-}
-
-
-status_t
-BScrollBar::SetBorderHighlighted(bool state)
-{
-	if (fPrivateData->fBorderHighlighted == state)
-		return B_OK;
-
-	fPrivateData->fBorderHighlighted = state;
-
-	BRect dirty(Bounds());
-	if (fOrientation == B_HORIZONTAL)
-		dirty.bottom = dirty.top;
-	else
-		dirty.right = dirty.left;
-
-	Invalidate(dirty);
-
-	return B_OK;
-}
-
-
-void
-BScrollBar::MessageReceived(BMessage* message)
-{
-	switch(message->what) {
-		case B_VALUE_CHANGED:
-		{
-			int32 value;
-			if (message->FindInt32("value", &value) == B_OK)
-				ValueChanged(value);
-
-			break;
-		}
-
-		case B_MOUSE_WHEEL_CHANGED:
-		{
-			// Must handle this here since BView checks for the existence of
-			// scrollbars, which a scrollbar itself does not have
-			float deltaX = 0.0f;
-			float deltaY = 0.0f;
-			message->FindFloat("be:wheel_delta_x", &deltaX);
-			message->FindFloat("be:wheel_delta_y", &deltaY);
-
-			if (deltaX == 0.0f && deltaY == 0.0f)
-				break;
-
-			if (deltaX != 0.0f && deltaY == 0.0f)
-				deltaY = deltaX;
-
-			ScrollWithMouseWheelDelta(this, deltaY);
-		}
-
-		default:
-			BView::MessageReceived(message);
-	}
-}
-
-
-void
-BScrollBar::MouseDown(BPoint where)
-{
-	if (!fPrivateData->fEnabled || fMin == fMax)
-		return;
-
-	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-
-	int32 buttons;
-	if (Looper() == NULL || Looper()->CurrentMessage() == NULL
-		|| Looper()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK) {
-		buttons = B_PRIMARY_MOUSE_BUTTON;
-	}
-
-	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
-		// special absolute scrolling: move thumb to where we clicked
-		fPrivateData->fButtonDown = THUMB;
-		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
-		if (Orientation() == B_HORIZONTAL)
-			fPrivateData->fClickOffset.x = -fPrivateData->fThumbFrame.Width() / 2;
-		else
-			fPrivateData->fClickOffset.y = -fPrivateData->fThumbFrame.Height() / 2;
-
-		SetValue(_ValueFor(where + fPrivateData->fClickOffset));
-		return;
-	}
-
-	// hit test for the thumb
-	if (fPrivateData->fThumbFrame.Contains(where)) {
-		fPrivateData->fButtonDown = THUMB;
-		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
-		Invalidate(fPrivateData->fThumbFrame);
-		return;
-	}
-
-	// hit test for arrows or empty area
-	float scrollValue = 0.0;
-
-	// pressing the shift key scrolls faster
-	float buttonStepSize
-		= (modifiers() & B_SHIFT_KEY) != 0 ? fLargeStep : fSmallStep;
-
-	fPrivateData->fButtonDown = _ButtonFor(where);
-	switch (fPrivateData->fButtonDown) {
-		case ARROW1:
-			scrollValue = -buttonStepSize;
-			break;
-
-		case ARROW2:
-			scrollValue = buttonStepSize;
-			break;
-
-		case ARROW3:
-			scrollValue = -buttonStepSize;
-			break;
-
-		case ARROW4:
-			scrollValue = buttonStepSize;
-			break;
-
-		case NOARROW:
-			// we hit the empty area, figure out which side of the thumb
-			if (fOrientation == B_VERTICAL) {
-				if (where.y < fPrivateData->fThumbFrame.top)
-					scrollValue = -fLargeStep;
-				else
-					scrollValue = fLargeStep;
-			} else {
-				if (where.x < fPrivateData->fThumbFrame.left)
-					scrollValue = -fLargeStep;
-				else
-					scrollValue = fLargeStep;
-			}
-			_UpdateTargetValue(where);
-			break;
-	}
-	if (scrollValue != 0.0) {
-		SetValue(fValue + scrollValue);
-		Invalidate(_ButtonRectFor(fPrivateData->fButtonDown));
-
-		// launch the repeat thread
-		if (fPrivateData->fRepeaterThread == -1) {
-			fPrivateData->fExitRepeater = false;
-			fPrivateData->fRepeaterDelay = system_time() + kRepeatDelay;
-			fPrivateData->fThumbInc = scrollValue;
-			fPrivateData->fDoRepeat = true;
-			fPrivateData->fRepeaterThread
-				= spawn_thread(fPrivateData->button_repeater_thread,
-							   "scroll repeater", B_NORMAL_PRIORITY, fPrivateData);
-			resume_thread(fPrivateData->fRepeaterThread);
-		} else {
-			fPrivateData->fExitRepeater = false;
-			fPrivateData->fRepeaterDelay = system_time() + kRepeatDelay;
-			fPrivateData->fDoRepeat = true;
-		}
-	}
-}
-
-
-void
-BScrollBar::MouseUp(BPoint pt)
-{
-	if (fPrivateData->fButtonDown == THUMB)
-		Invalidate(fPrivateData->fThumbFrame);
-	else
-		Invalidate(_ButtonRectFor(fPrivateData->fButtonDown));
-
-	fPrivateData->fButtonDown = NOARROW;
-	fPrivateData->fExitRepeater = true;
-	fPrivateData->fDoRepeat = false;
-}
-
-
-void
-BScrollBar::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
-{
-	if (!fPrivateData->fEnabled || fMin >= fMax || fProportion >= 1.0f
-		|| fProportion < 0.0f) {
-		return;
-	}
-
-	if (fPrivateData->fButtonDown != NOARROW) {
-		if (fPrivateData->fButtonDown == THUMB) {
-			SetValue(_ValueFor(where + fPrivateData->fClickOffset));
-		} else {
-			// suspend the repeating if the mouse is not over the button
-			bool repeat = _ButtonRectFor(fPrivateData->fButtonDown).Contains(
-				where);
-			if (fPrivateData->fDoRepeat != repeat) {
-				fPrivateData->fDoRepeat = repeat;
-				Invalidate(_ButtonRectFor(fPrivateData->fButtonDown));
-			}
-		}
-	} else {
-		// update the value at which we want to stop repeating
-		if (fPrivateData->fDoRepeat) {
-			_UpdateTargetValue(where);
-			// we might have to turn arround
-			if ((fValue < fPrivateData->fStopValue
-					&& fPrivateData->fThumbInc < 0)
-				|| (fValue > fPrivateData->fStopValue
-					&& fPrivateData->fThumbInc > 0)) {
-				fPrivateData->fThumbInc = -fPrivateData->fThumbInc;
-			}
-		}
-	}
+	BView::AttachedToWindow();
 }
 
 
@@ -837,7 +382,7 @@ BScrollBar::Draw(BRect updateRect)
 
 	rgb_color normal = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-	// stroke a dark frame arround the entire scrollbar
+	// stroke a dark frame around the entire scrollbar
 	// (independent of enabled state)
 	// take care of border highlighting (scroll target is focus view)
 	SetHighColor(tint_color(normal, B_DARKEN_2_TINT));
@@ -1049,18 +594,458 @@ BScrollBar::FrameResized(float newWidth, float newHeight)
 }
 
 
-BHandler*
-BScrollBar::ResolveSpecifier(BMessage* message, int32 index,
-	BMessage* specifier, int32 form, const char* property)
+void
+BScrollBar::MessageReceived(BMessage* message)
 {
-	return BView::ResolveSpecifier(message, index, specifier, form, property);
+	switch(message->what) {
+		case B_VALUE_CHANGED:
+		{
+			int32 value;
+			if (message->FindInt32("value", &value) == B_OK)
+				ValueChanged(value);
+
+			break;
+		}
+
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			// Must handle this here since BView checks for the existence of
+			// scrollbars, which a scrollbar itself does not have
+			float deltaX = 0.0f;
+			float deltaY = 0.0f;
+			message->FindFloat("be:wheel_delta_x", &deltaX);
+			message->FindFloat("be:wheel_delta_y", &deltaY);
+
+			if (deltaX == 0.0f && deltaY == 0.0f)
+				break;
+
+			if (deltaX != 0.0f && deltaY == 0.0f)
+				deltaY = deltaX;
+
+			ScrollWithMouseWheelDelta(this, deltaY);
+		}
+
+		default:
+			BView::MessageReceived(message);
+	}
 }
 
 
 void
-BScrollBar::ResizeToPreferred()
+BScrollBar::MouseDown(BPoint where)
 {
-	BView::ResizeToPreferred();
+	if (!fPrivateData->fEnabled || fMin == fMax)
+		return;
+
+	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+
+	int32 buttons;
+	if (Looper() == NULL || Looper()->CurrentMessage() == NULL
+		|| Looper()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK) {
+		buttons = B_PRIMARY_MOUSE_BUTTON;
+	}
+
+	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
+		// special absolute scrolling: move thumb to where we clicked
+		fPrivateData->fButtonDown = THUMB;
+		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
+		if (Orientation() == B_HORIZONTAL)
+			fPrivateData->fClickOffset.x = -fPrivateData->fThumbFrame.Width() / 2;
+		else
+			fPrivateData->fClickOffset.y = -fPrivateData->fThumbFrame.Height() / 2;
+
+		SetValue(_ValueFor(where + fPrivateData->fClickOffset));
+		return;
+	}
+
+	// hit test for the thumb
+	if (fPrivateData->fThumbFrame.Contains(where)) {
+		fPrivateData->fButtonDown = THUMB;
+		fPrivateData->fClickOffset = fPrivateData->fThumbFrame.LeftTop() - where;
+		Invalidate(fPrivateData->fThumbFrame);
+		return;
+	}
+
+	// hit test for arrows or empty area
+	float scrollValue = 0.0;
+
+	// pressing the shift key scrolls faster
+	float buttonStepSize
+		= (modifiers() & B_SHIFT_KEY) != 0 ? fLargeStep : fSmallStep;
+
+	fPrivateData->fButtonDown = _ButtonFor(where);
+	switch (fPrivateData->fButtonDown) {
+		case ARROW1:
+			scrollValue = -buttonStepSize;
+			break;
+
+		case ARROW2:
+			scrollValue = buttonStepSize;
+			break;
+
+		case ARROW3:
+			scrollValue = -buttonStepSize;
+			break;
+
+		case ARROW4:
+			scrollValue = buttonStepSize;
+			break;
+
+		case NOARROW:
+			// we hit the empty area, figure out which side of the thumb
+			if (fOrientation == B_VERTICAL) {
+				if (where.y < fPrivateData->fThumbFrame.top)
+					scrollValue = -fLargeStep;
+				else
+					scrollValue = fLargeStep;
+			} else {
+				if (where.x < fPrivateData->fThumbFrame.left)
+					scrollValue = -fLargeStep;
+				else
+					scrollValue = fLargeStep;
+			}
+			_UpdateTargetValue(where);
+			break;
+	}
+	if (scrollValue != 0.0) {
+		SetValue(fValue + scrollValue);
+		Invalidate(_ButtonRectFor(fPrivateData->fButtonDown));
+
+		// launch the repeat thread
+		if (fPrivateData->fRepeaterThread == -1) {
+			fPrivateData->fExitRepeater = false;
+			fPrivateData->fRepeaterDelay = system_time() + kRepeatDelay;
+			fPrivateData->fThumbInc = scrollValue;
+			fPrivateData->fDoRepeat = true;
+			fPrivateData->fRepeaterThread = spawn_thread(
+				fPrivateData->button_repeater_thread, "scroll repeater",
+				B_NORMAL_PRIORITY, fPrivateData);
+			resume_thread(fPrivateData->fRepeaterThread);
+		} else {
+			fPrivateData->fExitRepeater = false;
+			fPrivateData->fRepeaterDelay = system_time() + kRepeatDelay;
+			fPrivateData->fDoRepeat = true;
+		}
+	}
+}
+
+
+void
+BScrollBar::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
+{
+	if (!fPrivateData->fEnabled || fMin >= fMax || fProportion >= 1.0f
+		|| fProportion < 0.0f) {
+		return;
+	}
+
+	if (fPrivateData->fButtonDown != NOARROW) {
+		if (fPrivateData->fButtonDown == THUMB) {
+			SetValue(_ValueFor(where + fPrivateData->fClickOffset));
+		} else {
+			// suspend the repeating if the mouse is not over the button
+			bool repeat = _ButtonRectFor(fPrivateData->fButtonDown).Contains(
+				where);
+			if (fPrivateData->fDoRepeat != repeat) {
+				fPrivateData->fDoRepeat = repeat;
+				Invalidate(_ButtonRectFor(fPrivateData->fButtonDown));
+			}
+		}
+	} else {
+		// update the value at which we want to stop repeating
+		if (fPrivateData->fDoRepeat) {
+			_UpdateTargetValue(where);
+			// we might have to turn arround
+			if ((fValue < fPrivateData->fStopValue
+					&& fPrivateData->fThumbInc < 0)
+				|| (fValue > fPrivateData->fStopValue
+					&& fPrivateData->fThumbInc > 0)) {
+				fPrivateData->fThumbInc = -fPrivateData->fThumbInc;
+			}
+		}
+	}
+}
+
+
+void
+BScrollBar::MouseUp(BPoint where)
+{
+	if (fPrivateData->fButtonDown == THUMB)
+		Invalidate(fPrivateData->fThumbFrame);
+	else
+		Invalidate(_ButtonRectFor(fPrivateData->fButtonDown));
+
+	fPrivateData->fButtonDown = NOARROW;
+	fPrivateData->fExitRepeater = true;
+	fPrivateData->fDoRepeat = false;
+}
+
+
+#if DISABLES_ON_WINDOW_DEACTIVATION
+void
+BScrollBar::WindowActivated(bool active)
+{
+	fPrivateData->fEnabled = active;
+	Invalidate();
+}
+#endif // DISABLES_ON_WINDOW_DEACTIVATION
+
+
+void
+BScrollBar::SetValue(float value)
+{
+	if (value > fMax)
+		value = fMax;
+	else if (value < fMin)
+		value = fMin;
+	else if (isnan(value) || isinf(value))
+		return;
+
+	value = roundf(value);
+	if (value == fValue)
+		return;
+
+	TRACE("BScrollBar(%s)::SetValue(%.1f)\n", Name(), value);
+
+	fValue = value;
+
+	_UpdateThumbFrame();
+	_UpdateArrowButtons();
+
+	ValueChanged(fValue);
+}
+
+
+float
+BScrollBar::Value() const
+{
+	return fValue;
+}
+
+
+void
+BScrollBar::ValueChanged(float newValue)
+{
+	TRACE("BScrollBar(%s)::ValueChanged(%.1f)\n", Name(), newValue);
+
+	if (fTarget != NULL) {
+		// cache target bounds
+		BRect targetBounds = fTarget->Bounds();
+		// if vertical, check bounds top and scroll if different from newValue
+		if (fOrientation == B_VERTICAL && targetBounds.top != newValue)
+			fTarget->ScrollBy(0.0, newValue - targetBounds.top);
+
+		// if horizontal, check bounds left and scroll if different from newValue
+		if (fOrientation == B_HORIZONTAL && targetBounds.left != newValue)
+			fTarget->ScrollBy(newValue - targetBounds.left, 0.0);
+	}
+
+	TRACE(" -> %.1f\n", newValue);
+
+	SetValue(newValue);
+}
+
+
+void
+BScrollBar::SetProportion(float value)
+{
+	if (value < 0.0f)
+		value = 0.0f;
+	else if (value > 1.0f)
+		value = 1.0f;
+
+	if (value == fProportion)
+		return;
+
+	TRACE("BScrollBar(%s)::SetProportion(%.1f)\n", Name(), value);
+
+	bool oldEnabled = fPrivateData->fEnabled && fMin < fMax
+		&& fProportion < 1.0f && fProportion >= 0.0f;
+
+	fProportion = value;
+
+	bool newEnabled = fPrivateData->fEnabled && fMin < fMax
+		&& fProportion < 1.0f && fProportion >= 0.0f;
+
+	_UpdateThumbFrame();
+
+	if (oldEnabled != newEnabled)
+		Invalidate();
+}
+
+
+float
+BScrollBar::Proportion() const
+{
+	return fProportion;
+}
+
+
+void
+BScrollBar::SetRange(float min, float max)
+{
+	if (min > max || isnanf(min) || isnanf(max)
+		|| isinff(min) || isinff(max)) {
+		min = 0.0f;
+		max = 0.0f;
+	}
+
+	min = roundf(min);
+	max = roundf(max);
+
+	if (fMin == min && fMax == max)
+		return;
+
+	TRACE("BScrollBar(%s)::SetRange(min=%.1f, max=%.1f)\n", Name(), min, max);
+
+	fMin = min;
+	fMax = max;
+
+	if (fValue < fMin || fValue > fMax)
+		SetValue(fValue);
+	else {
+		_UpdateThumbFrame();
+		Invalidate();
+	}
+}
+
+
+void
+BScrollBar::GetRange(float* min, float* max) const
+{
+	if (min != NULL)
+		*min = fMin;
+
+	if (max != NULL)
+		*max = fMax;
+}
+
+
+void
+BScrollBar::SetSteps(float smallStep, float largeStep)
+{
+	// Under R5, steps can be set only after being attached to a window,
+	// probably because the data is kept server-side. We'll just remove
+	// that limitation... :P
+
+	// The BeBook also says that we need to specify an integer value even
+	// though the step values are floats. For the moment, we'll just make
+	// sure that they are integers
+	smallStep = roundf(smallStep);
+	largeStep = roundf(largeStep);
+	if (fSmallStep == smallStep && fLargeStep == largeStep)
+		return;
+
+	TRACE("BScrollBar(%s)::SetSteps(small=%.1f, large=%.1f)\n", Name(),
+		smallStep, largeStep);
+
+	fSmallStep = smallStep;
+	fLargeStep = largeStep;
+
+	if (fProportion == 0.0) {
+		// special case, proportion is based on fLargeStep if it was never
+		// set, so it means we need to invalidate here
+		_UpdateThumbFrame();
+		Invalidate();
+	}
+
+	// TODO: test use of fractional values and make them work properly if
+	// they don't
+}
+
+
+void
+BScrollBar::GetSteps(float* smallStep, float* largeStep) const
+{
+	if (smallStep != NULL)
+		*smallStep = fSmallStep;
+
+	if (largeStep != NULL)
+		*largeStep = fLargeStep;
+}
+
+
+void
+BScrollBar::SetTarget(BView* target)
+{
+	if (fTarget) {
+		// unset the previous target's scrollbar pointer
+		if (fOrientation == B_VERTICAL)
+			fTarget->fVerScroller = NULL;
+		else
+			fTarget->fHorScroller = NULL;
+	}
+
+	fTarget = target;
+	if (fTarget) {
+		if (fOrientation == B_VERTICAL)
+			fTarget->fVerScroller = this;
+		else
+			fTarget->fHorScroller = this;
+	}
+}
+
+
+void
+BScrollBar::SetTarget(const char* targetName)
+{
+	// NOTE 1: BeOS implementation crashes for targetName == NULL
+	// NOTE 2: BeOS implementation also does not modify the target
+	// if it can't be found
+	if (targetName == NULL)
+		return;
+
+	if (Window() == NULL)
+		debugger("Method requires window and doesn't have one");
+
+	BView* target = Window()->FindView(targetName);
+	if (target != NULL)
+		SetTarget(target);
+}
+
+
+BView*
+BScrollBar::Target() const
+{
+	return fTarget;
+}
+
+
+void
+BScrollBar::SetOrientation(orientation direction)
+{
+	if (fOrientation == direction)
+		return;
+
+	fOrientation = direction;
+	InvalidateLayout();
+	Invalidate();
+}
+
+
+orientation
+BScrollBar::Orientation() const
+{
+	return fOrientation;
+}
+
+
+status_t
+BScrollBar::SetBorderHighlighted(bool highlight)
+{
+	if (fPrivateData->fBorderHighlighted == highlight)
+		return B_OK;
+
+	fPrivateData->fBorderHighlighted = highlight;
+
+	BRect dirty(Bounds());
+	if (fOrientation == B_HORIZONTAL)
+		dirty.bottom = dirty.top;
+	else
+		dirty.right = dirty.left;
+
+	Invalidate(dirty);
+
+	return B_OK;
 }
 
 
@@ -1084,30 +1069,17 @@ BScrollBar::GetPreferredSize(float* _width, float* _height)
 
 
 void
-BScrollBar::MakeFocus(bool state)
+BScrollBar::ResizeToPreferred()
 {
-	BView::MakeFocus(state);
+	BView::ResizeToPreferred();
 }
+
 
 
 void
-BScrollBar::AllAttached()
+BScrollBar::MakeFocus(bool focus)
 {
-	BView::AllAttached();
-}
-
-
-void
-BScrollBar::AllDetached()
-{
-	BView::AllDetached();
-}
-
-
-status_t
-BScrollBar::GetSupportedSuites(BMessage* message)
-{
-	return BView::GetSupportedSuites(message);
+	BView::MakeFocus(focus);
 }
 
 
@@ -1140,6 +1112,21 @@ BScrollBar::PreferredSize()
 		preferredSize.height *= 2;
 
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), preferredSize);
+}
+
+
+status_t
+BScrollBar::GetSupportedSuites(BMessage* message)
+{
+	return BView::GetSupportedSuites(message);
+}
+
+
+BHandler*
+BScrollBar::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
+{
+	return BView::ResolveSpecifier(message, index, specifier, what, property);
 }
 
 
@@ -1214,16 +1201,6 @@ BScrollBar::Perform(perform_code code, void* _data)
 
 	return BView::Perform(code, _data);
 }
-
-
-#if DISABLES_ON_WINDOW_DEACTIVATION
-void
-BScrollBar::WindowActivated(bool active)
-{
-	fPrivateData->fEnabled = active;
-	Invalidate();
-}
-#endif // DISABLES_ON_WINDOW_DEACTIVATION
 
 
 void BScrollBar::_ReservedScrollBar1() {}

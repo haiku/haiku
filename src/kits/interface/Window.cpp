@@ -2008,7 +2008,7 @@ BWindow::Activate(bool active)
 
 
 void
-BWindow::WindowActivated(bool state)
+BWindow::WindowActivated(bool focus)
 {
 	// hook function
 	// does nothing

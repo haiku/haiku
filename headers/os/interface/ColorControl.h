@@ -29,11 +29,11 @@ public:
 									float cellSize, const char* name,
 									BMessage* message = NULL,
 									bool useOffscreen = false);
-								BColorControl(BMessage* archive);
+								BColorControl(BMessage* data);
 	virtual						~BColorControl();
 
-	static	BArchivable*		Instantiate(BMessage* archive);
-	virtual	status_t			Archive(BMessage* archive,
+	static	BArchivable*		Instantiate(BMessage* data);
+	virtual	status_t			Archive(BMessage* data,
 									bool deep = true) const;
 
 	virtual	void				SetLayout(BLayout* layout);
@@ -91,7 +91,7 @@ private:
 
 			void				_InitData(color_control_layout layout,
 									float size, bool useOffscreen,
-									BMessage* archive = NULL);
+									BMessage* data = NULL);
 			void				_LayoutView();
 			void				_InitOffscreen();
 			void				_InvalidateSelector(int16 ramp,

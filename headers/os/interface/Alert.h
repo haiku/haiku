@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_ALERT_H
@@ -8,11 +8,6 @@
 
 #include <Window.h>
 
-
-class BBitmap;
-class BButton;
-class BInvoker;
-class BTextView;
 
 // enum for flavors of alert
 enum alert_type {
@@ -29,41 +24,46 @@ enum button_spacing {
 };
 
 
+class BBitmap;
+class BButton;
+class BInvoker;
+class BTextView;
+
 class BAlert : public BWindow {
-	public:
+public:
 							BAlert(const char* title, const char* text,
 								const char* button1, const char* button2 = NULL,
 								const char* button3 = NULL,
 								button_width width = B_WIDTH_AS_USUAL,
 								alert_type type = B_INFO_ALERT);
-							BAlert(const char *title, const char *text,
-								const char *button1, const char *button2,
-								const char *button3, button_width width,
+							BAlert(const char* title, const char* text,
+								const char* button1, const char* button2,
+								const char* button3, button_width width,
 								button_spacing spacing,
 								alert_type type = B_INFO_ALERT);
 		virtual				~BAlert();
 
 		// Archiving
-							BAlert(BMessage *data);
-		static	BArchivable	*Instantiate(BMessage *data);
-		virtual	status_t	Archive(BMessage *data, bool deep = true) const;
+							BAlert(BMessage* data);
+		static	BArchivable	*Instantiate(BMessage* data);
+		virtual	status_t	Archive(BMessage* data, bool deep = true) const;
 
 		// BAlert guts
 				void		SetShortcut(int32 button_index, char key);
 				char		Shortcut(int32 button_index) const;
 
 				int32		Go();
-				status_t	Go(BInvoker *invoker);
+				status_t	Go(BInvoker* invoker);
 
-		virtual	void		MessageReceived(BMessage *an_event);
+		virtual	void		MessageReceived(BMessage* message);
 		virtual	void		FrameResized(float new_width, float new_height);
 				BButton*	ButtonAt(int32 index) const;
 				BTextView*	TextView() const;
 
 		virtual BHandler*	ResolveSpecifier(BMessage* message, int32 index,
-								BMessage* specifier, int32 form,
+								BMessage* specifier, int32 what,
 								const char* property);
-		virtual	status_t	GetSupportedSuites(BMessage *data);
+		virtual	status_t	GetSupportedSuites(BMessage* data);
 
 		virtual void		DispatchMessage(BMessage* message, BHandler* handler);
 		virtual	void		Quit();
@@ -71,9 +71,9 @@ class BAlert : public BWindow {
 
 		static	BPoint		AlertPosition(float width, float height);
 
-		virtual status_t	Perform(perform_code d, void *arg);
+		virtual status_t	Perform(perform_code d, void* arg);
 
-	private:
+private:
 		friend class _BAlertFilter_;
 
 		virtual	void		_ReservedAlert1();

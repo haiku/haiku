@@ -1328,7 +1328,7 @@ BView::TargetedByScrollView(BScrollView* scroll_view)
 
 
 void
-BView::WindowActivated(bool state)
+BView::WindowActivated(bool active)
 {
 	// Hook function
 	STRACE(("\tHOOK: BView(%s)::WindowActivated()\n", Name()));
@@ -1602,33 +1602,34 @@ BView::GetMouse(BPoint* _location, uint32* _buttons, bool checkMessageQueue)
 
 
 void
-BView::MakeFocus(bool focusState)
+BView::MakeFocus(bool focus)
 {
-	if (fOwner) {
-		// TODO: If this view has focus and focusState==false,
-		// will there really be no other view with focus? No
-		// cycling to the next one?
-		BView* focus = fOwner->CurrentFocus();
-		if (focusState) {
-			// Unfocus a previous focus view
-			if (focus && focus != this)
-				focus->MakeFocus(false);
-			// if we want to make this view the current focus view
-			fOwner->_SetFocus(this, true);
-		} else {
-			// we want to unfocus this view, but only if it actually has focus
-			if (focus == this) {
-				fOwner->_SetFocus(NULL, true);
-			}
-		}
+	if (fOwner == NULL)
+		return;
+
+	// TODO: If this view has focus and focus == false,
+	// will there really be no other view with focus? No
+	// cycling to the next one?
+	BView* focusView = fOwner->CurrentFocus();
+	if (focus) {
+		// Unfocus a previous focus view
+		if (focusView != NULL && focusView != this)
+			focusView->MakeFocus(false);
+
+		// if we want to make this view the current focus view
+		fOwner->_SetFocus(this, true);
+	} else {
+		// we want to unfocus this view, but only if it actually has focus
+		if (focusView == this)
+			fOwner->_SetFocus(NULL, true);
 	}
 }
 
 
 BScrollBar*
-BView::ScrollBar(orientation posture) const
+BView::ScrollBar(orientation direction) const
 {
-	switch (posture) {
+	switch (direction) {
 		case B_VERTICAL:
 			return fVerScroller;
 
@@ -1795,9 +1796,9 @@ BView::PopState()
 
 
 void
-BView::SetOrigin(BPoint pt)
+BView::SetOrigin(BPoint where)
 {
-	SetOrigin(pt.x, pt.y);
+	SetOrigin(where.x, where.y);
 }
 
 

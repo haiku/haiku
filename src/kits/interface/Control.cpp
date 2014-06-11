@@ -258,14 +258,14 @@ BControl::MessageReceived(BMessage* message)
 
 
 void
-BControl::MakeFocus(bool focused)
+BControl::MakeFocus(bool focus)
 {
-	if (focused == IsFocus())
+	if (focus == IsFocus())
 		return;
 
-	BView::MakeFocus(focused);
+	BView::MakeFocus(focus);
 
- 	if (Window()) {
+	if (Window() != NULL) {
 		fFocusChanging = true;
 		Invalidate(Bounds());
 		Flush();

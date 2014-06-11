@@ -175,16 +175,16 @@ BPictureButton::FrameResized(float newWidth, float newHeight)
 
 
 void
-BPictureButton::WindowActivated(bool state)
+BPictureButton::WindowActivated(bool active)
 {
-	BControl::WindowActivated(state);
+	BControl::WindowActivated(active);
 }
 
 
 void
-BPictureButton::MakeFocus(bool state)
+BPictureButton::MakeFocus(bool focus)
 {
-	BControl::MakeFocus(state);
+	BControl::MakeFocus(focus);
 }
 
 
@@ -291,16 +291,16 @@ BPictureButton::MouseUp(BPoint where)
 
 
 void
-BPictureButton::MouseMoved(BPoint where, uint32 transit,
-	const BMessage* message)
+BPictureButton::MouseMoved(BPoint where, uint32 code,
+	const BMessage* dragMessage)
 {
 	if (IsEnabled() && IsTracking()) {
-		if (transit == B_EXITED_VIEW)
+		if (code == B_EXITED_VIEW)
 			SetValue(B_CONTROL_OFF);
-		else if (transit == B_ENTERED_VIEW)
+		else if (code == B_ENTERED_VIEW)
 			SetValue(B_CONTROL_ON);
 	} else
-		BControl::MouseMoved(where, transit, message);
+		BControl::MouseMoved(where, code, dragMessage);
 }
 
 
@@ -397,9 +397,10 @@ BPictureButton::Invoke(BMessage* message)
 
 BHandler*
 BPictureButton::ResolveSpecifier(BMessage* message, int32 index,
-	BMessage* specifier, int32 form, const char* property)
+	BMessage* specifier, int32 what, const char* property)
 {
-	return BControl::ResolveSpecifier(message, index, specifier, form, property);
+	return BControl::ResolveSpecifier(message, index, specifier,
+		what, property);
 }
 
 

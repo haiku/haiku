@@ -505,10 +505,11 @@ BOutlineListView::IsExpanded(int32 fullListIndex)
 
 
 BHandler*
-BOutlineListView::ResolveSpecifier(BMessage* msg, int32 index,
+BOutlineListView::ResolveSpecifier(BMessage* message, int32 index,
 	BMessage* specifier, int32 what, const char* property)
 {
-	return BListView::ResolveSpecifier(msg, index, specifier, what, property);
+	return BListView::ResolveSpecifier(message, index, specifier, what,
+		property);
 }
 
 

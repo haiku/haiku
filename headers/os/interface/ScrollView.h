@@ -1,6 +1,11 @@
 /*
- * Copyright 2004-2009, Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscpione@gmail.com
  */
 #ifndef _SCROLL_VIEW_H
 #define _SCROLL_VIEW_H
@@ -28,55 +33,57 @@ public:
 	virtual						~BScrollView();
 
 	static	BArchivable*		Instantiate(BMessage* archive);
-	virtual	status_t			Archive(BMessage* archive,
-									bool deep = true) const;
+	virtual	status_t			Archive(BMessage* archive, bool deep = true) const;
 
-	virtual void				AttachedToWindow();
-	virtual	void				DetachedFromWindow();
+	// Hook methods
 	virtual	void				AllAttached();
 	virtual	void				AllDetached();
 
-	virtual void				Draw(BRect updateRect);
+	virtual	void				AttachedToWindow();
+	virtual	void				DetachedFromWindow();
 
-	virtual void				WindowActivated(bool active);
-	virtual void				MakeFocus(bool state = true);
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				FrameMoved(BPoint newPosition);
+	virtual	void				FrameResized(float newWidth, float newHeight);
 
-	virtual void				GetPreferredSize(float* _width,
-									float* _height);
+	virtual	void				MessageReceived(BMessage* message);
+
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 code,
+									const BMessage* dragMessage);
+	virtual	void				MouseUp(BPoint where);
+
+	virtual	void				WindowActivated(bool active);
+
+	// Size
+	virtual	void				GetPreferredSize(float* _width, float* _height);
+	virtual	void				ResizeToPreferred();
+
+	virtual	void				MakeFocus(bool focus = true);
+
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
-	virtual void				ResizeToPreferred();
 
-	virtual	void				FrameMoved(BPoint position);
-	virtual	void				FrameResized(float width, float height);
-
-	virtual void				MessageReceived(BMessage* message);
-
-	virtual void				MouseDown(BPoint point);
-	virtual	void				MouseUp(BPoint point);
-	virtual	void				MouseMoved(BPoint point, uint32 code,
-									const BMessage* dragMessage);
-
-	// BScrollView
+	// BScrollBar
 			BScrollBar*			ScrollBar(orientation posture) const;
 
-	virtual void				SetBorder(border_style border);
+	virtual	void				SetBorder(border_style border);
 			border_style		Border() const;
 
-	virtual status_t			SetBorderHighlighted(bool state);
+	virtual	status_t			SetBorderHighlighted(bool highlight);
 			bool				IsBorderHighlighted() const;
 
 			void				SetTarget(BView* target);
 			BView*				Target() const;
 
 	// Scripting
-	virtual BHandler*			ResolveSpecifier(BMessage* message,
+	virtual	BHandler*			ResolveSpecifier(BMessage* message,
 									int32 index, BMessage* specifier,
-									int32 form, const char* property);
-	virtual status_t			GetSupportedSuites(BMessage* data);
+									int32 what, const char* property);
+	virtual	status_t			GetSupportedSuites(BMessage* message);
 
-	virtual status_t			Perform(perform_code d, void* arg);
+	virtual	status_t			Perform(perform_code d, void* arg);
 
 protected:
 	virtual	void				LayoutInvalidated(bool descendants = false);

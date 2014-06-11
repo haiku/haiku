@@ -149,7 +149,7 @@ public:
 			BView*				CurrentFocus() const;
 
 			void				Activate(bool = true);
-	virtual	void				WindowActivated(bool state);
+	virtual	void				WindowActivated(bool focus);
 
 			void				ConvertToScreen(BPoint* point) const;
 			BPoint				ConvertToScreen(BPoint point) const;

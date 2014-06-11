@@ -46,13 +46,13 @@ public:
 									const BMessage* dragMessage);
 	virtual	void				DetachedFromWindow();
 	virtual	void				FrameMoved(BPoint newPosition);
-	virtual	void				FrameResized(float width, float height);
+	virtual	void				FrameResized(float newWidth, float newHeight);
 
 	virtual	BHandler*			ResolveSpecifier(BMessage* message,
 									int32 index, BMessage* specifier,
 									int32 what, const char* property);
 
-	virtual	void				MakeFocus(bool focused = true);
+	virtual	void				MakeFocus(bool focus = true);
 	virtual	void				AllAttached();
 	virtual	void				AllDetached();
 	virtual	status_t			GetSupportedSuites(BMessage* message);

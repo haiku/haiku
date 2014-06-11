@@ -531,9 +531,9 @@ BMenuField::MessageReceived(BMessage* message)
 
 
 void
-BMenuField::WindowActivated(bool state)
+BMenuField::WindowActivated(bool active)
 {
-	BView::WindowActivated(state);
+	BView::WindowActivated(active);
 
 	if (IsFocus())
 		Invalidate();
@@ -548,9 +548,9 @@ BMenuField::MouseMoved(BPoint point, uint32 code, const BMessage* message)
 
 
 void
-BMenuField::MouseUp(BPoint point)
+BMenuField::MouseUp(BPoint where)
 {
-	BView::MouseUp(point);
+	BView::MouseUp(where);
 }
 
 

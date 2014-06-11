@@ -45,7 +45,7 @@ public:
 	virtual	void				AllDetached();
 
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				MakeFocus(bool focused = true);
+	virtual	void				MakeFocus(bool focus = true);
 
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MouseDown(BPoint where);

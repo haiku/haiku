@@ -36,7 +36,7 @@ public:
 	virtual	void				AllDetached();
 
 	virtual	void				FrameMoved(BPoint newPosition);
-	virtual	void				FrameResized(float width, float height);
+	virtual	void				FrameResized(float newWidth, float newHeight);
 	virtual	void				WindowActivated(bool active);
 
 	virtual	void				MessageReceived(BMessage* message);

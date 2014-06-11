@@ -33,11 +33,33 @@ public:
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
 
+	virtual void				AllAttached();
+	virtual void				AllDetached();
+
 	virtual	void				AttachedToWindow();
+	virtual	void				DetachedFromWindow();
+
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				FrameMoved(BPoint new_position);
+	virtual	void				FrameResized(float newWidth, float newHeight);
+
+	virtual void				MessageReceived(BMessage* message);
+
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 code,
+									const BMessage* dragMessage);
+
+#if DISABLES_ON_WINDOW_DEACTIVATION
+	virtual	void				WindowActivated(bool active);
+#endif
+
 			void				SetValue(float value);
 			float				Value() const;
+
 			void				SetProportion(float);
 			float				Proportion() const;
+
 	virtual	void				ValueChanged(float newValue);
 
 			void				SetRange(float min, float max);
@@ -45,10 +67,12 @@ public:
 			void				SetSteps(float smallStep, float largeStep);
 			void				GetSteps(float* _smallStep,
 									float* _largeStep) const;
+
 			void				SetTarget(BView *target);
 			void				SetTarget(const char* targetName);
 			BView*				Target() const;
-			void				SetOrientation(orientation orientation);
+
+			void				SetOrientation(orientation direction);
 			orientation			Orientation() const;
 
 			// TODO: Make this a virtual method, it should be one,
@@ -56,39 +80,23 @@ public:
 			// to be used in case the BScrollBar should draw part of
 			// the focus indication of the target view for aesthetical
 			// reasons. BScrollView will forward this method.
-			status_t			SetBorderHighlighted(bool state);
+			status_t			SetBorderHighlighted(bool highlight);
 
-	virtual void				MessageReceived(BMessage* message);
-	virtual	void				MouseDown(BPoint pt);
-	virtual	void				MouseUp(BPoint pt);
-	virtual	void				MouseMoved(BPoint pt, uint32 code,
-									const BMessage* dragMessage);
-	virtual	void				DetachedFromWindow();
-	virtual	void				Draw(BRect updateRect);
-	virtual	void				FrameMoved(BPoint new_position);
-	virtual	void				FrameResized(float newWidth, float newHeight);
-
-	virtual BHandler*			ResolveSpecifier(BMessage* message,
-									int32 index, BMessage* specifier,
-									int32 form, const char* property);
-
-	virtual void				ResizeToPreferred();
 	virtual void				GetPreferredSize(float* _width,
 									float* _height);
-	virtual void				MakeFocus(bool state = true);
-	virtual void				AllAttached();
-	virtual void				AllDetached();
-	virtual status_t			GetSupportedSuites(BMessage* data);
+	virtual void				ResizeToPreferred();
+	virtual void				MakeFocus(bool focus = true);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
 
-	virtual status_t			Perform(perform_code d, void* arg);
+	virtual status_t			GetSupportedSuites(BMessage* message);
+	virtual BHandler*			ResolveSpecifier(BMessage* message,
+									int32 index, BMessage* specifier,
+									int32 what, const char* property);
 
-#if DISABLES_ON_WINDOW_DEACTIVATION
-	virtual	void				WindowActivated(bool active);
-#endif
+	virtual status_t			Perform(perform_code d, void* arg);
 
 private:
 	class Private;

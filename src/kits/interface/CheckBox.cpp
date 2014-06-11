@@ -161,9 +161,9 @@ BCheckBox::FrameMoved(BPoint newPosition)
 
 
 void
-BCheckBox::FrameResized(float width, float height)
+BCheckBox::FrameResized(float newWidth, float newHeight)
 {
-	BControl::FrameResized(width, height);
+	BControl::FrameResized(newWidth, newHeight);
 }
 
 

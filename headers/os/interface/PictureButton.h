@@ -41,11 +41,11 @@ public:
 	virtual	void				ResizeToPreferred();
 	virtual	void				GetPreferredSize(float* _width,
 									float* _height);
-	virtual	void				FrameMoved(BPoint position);
-	virtual	void				FrameResized(float width, float height);
+	virtual	void				FrameMoved(BPoint newPosition);
+	virtual	void				FrameResized(float newWidth, float newHeight);
 
-	virtual	void				WindowActivated(bool state);
-	virtual	void				MakeFocus(bool state = true);
+	virtual	void				WindowActivated(bool active);
+	virtual	void				MakeFocus(bool focus = true);
 
 	virtual	void				Draw(BRect updateRect);
 
@@ -53,8 +53,8 @@ public:
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseUp(BPoint where);
-	virtual	void				MouseMoved(BPoint where, uint32 transit,
-									const BMessage* message);
+	virtual	void				MouseMoved(BPoint where, uint32 code,
+									const BMessage* dragMessage);
 
 	virtual	void				SetEnabledOn(BPicture* picture);
 	virtual	void				SetEnabledOff(BPicture* picture);
@@ -74,7 +74,7 @@ public:
 
 	virtual	BHandler*			ResolveSpecifier(BMessage* message,
 									int32 index, BMessage* specifier,
-									int32 form, const char* property);
+									int32 what, const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* data);
 
 	virtual	status_t			Perform(perform_code code, void* data);

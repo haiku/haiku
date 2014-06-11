@@ -469,16 +469,16 @@ BButton::FrameMoved(BPoint newPosition)
 
 
 void
-BButton::FrameResized(float width, float height)
+BButton::FrameResized(float newWidth, float newHeight)
 {
-	BControl::FrameResized(width, height);
+	BControl::FrameResized(newWidth, newHeight);
 }
 
 
 void
-BButton::MakeFocus(bool focused)
+BButton::MakeFocus(bool focus)
 {
-	BControl::MakeFocus(focused);
+	BControl::MakeFocus(focus);
 }
 
 

@@ -5,34 +5,36 @@
 #ifndef _CHANNEL_CONTROL_H
 #define _CHANNEL_CONTROL_H
 
+
 //! BChannelControl is the base class for controls that have several
 // independent values, with minima and maxima.
 
 #include <Control.h>
 #include <String.h>
 
+
 class BChannelControl : public BControl {
 public:
 								BChannelControl(BRect frame, const char* name,
 									const char* label, BMessage* model,
 									int32 channelCount = 1,
-									uint32 resizeFlags
+									uint32 resizingMode
 										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
-									uint32 viewFlags = B_WILL_DRAW);
+									uint32 flags = B_WILL_DRAW);
 								BChannelControl(const char* name,
 									const char* label, BMessage* model,
 									int32 channelCount = 1,
-									uint32 viewFlags = B_WILL_DRAW);
+									uint32 flags = B_WILL_DRAW);
 								BChannelControl(BMessage* archive);
 	virtual						~BChannelControl();
 
-	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
 
 	virtual	void				Draw(BRect updateRect) = 0;
 	virtual	void				MouseDown(BPoint where) = 0;
-	virtual	void				KeyDown(const char* bytes, int32 size) = 0;
+	virtual	void				KeyDown(const char* bytes, int32 numBytes) = 0;
 
-	virtual	void				FrameResized(float width, float height);
+	virtual	void				FrameResized(float newWidth, float newHeight);
 	virtual	void				SetFont(const BFont* font,
 									uint32 mask = B_FONT_ALL);
 
@@ -45,14 +47,14 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
-									BMessage* specifier, int32 form,
+									BMessage* specifier, int32 what,
 									const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* data);
 
 	virtual	void				SetModificationMessage(BMessage* message);
 			BMessage*			ModificationMessage() const;
-		
-	virtual	status_t			Invoke(BMessage* withMessage = NULL);
+
+	virtual	status_t			Invoke(BMessage* message = NULL);
 
 	//! These methods are similar to Invoke() Invoke() and InvokeNotify(), but
 	// include additional information about all of the channels in the control.
@@ -112,18 +114,18 @@ private:
 								BChannelControl(const BChannelControl& other);
 			BChannelControl&	operator=(const BChannelControl& other);
 
-	virtual	void				_Reserverd_ChannelControl_0(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_1(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_2(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_3(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_4(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_5(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_6(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_7(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_8(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_9(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_10(void *, ...);
-	virtual	void				_Reserverd_ChannelControl_11(void *, ...);
+	virtual	void				_Reserverd_ChannelControl_0(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_1(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_2(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_3(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_4(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_5(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_6(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_7(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_8(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_9(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_10(void*, ...);
+	virtual	void				_Reserverd_ChannelControl_11(void*, ...);
 
 protected:
 	inline	int32* const&		MinLimitList() const;

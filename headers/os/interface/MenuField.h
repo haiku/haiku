@@ -45,7 +45,7 @@ public:
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool focused);
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				WindowActivated(bool state);
+	virtual	void				WindowActivated(bool active);
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);

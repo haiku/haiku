@@ -34,8 +34,8 @@ public:
 			BRegion&			operator=(const BRegion& other);
 			bool				operator==(const BRegion& other) const;
 
-			void				Set(BRect newBounds);
-			void				Set(clipping_rect newBounds);
+			void				Set(BRect rect);
+			void				Set(clipping_rect clipping);
 
 			BRect				Frame() const;
 			clipping_rect		FrameInt() const;

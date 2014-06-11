@@ -1,13 +1,16 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Erik Jaesler (erik@cgsoftware.com)
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Erik Jaesler, erik@cgsoftware.com
+ *		John Scipione, jscipione@gmail.com
  */
 
-//!	BAlert displays a modal alert window.
+
+//	BAlert displays a modal alert window.
+
 
 #include <new>
 #include <stdio.h>
@@ -304,13 +307,13 @@ BAlert::Go(BInvoker* invoker)
 
 
 void
-BAlert::MessageReceived(BMessage* msg)
+BAlert::MessageReceived(BMessage* message)
 {
-	if (msg->what != kAlertButtonMsg)
-		return BWindow::MessageReceived(msg);
+	if (message->what != kAlertButtonMsg)
+		return BWindow::MessageReceived(message);
 
 	int32 which;
-	if (msg->FindInt32("which", &which) == B_OK) {
+	if (message->FindInt32("which", &which) == B_OK) {
 		if (fAlertSem < B_OK) {
 			// Semaphore hasn't been created; we're running asynchronous
 			if (fInvoker) {
@@ -361,10 +364,11 @@ BAlert::TextView() const
 
 
 BHandler*
-BAlert::ResolveSpecifier(BMessage* msg, int32 index,
-	BMessage* specifier, int32 form, const char* property)
+BAlert::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
 {
-	return BWindow::ResolveSpecifier(msg, index, specifier, form, property);
+	return BWindow::ResolveSpecifier(message, index, specifier, what,
+		property);
 }
 
 

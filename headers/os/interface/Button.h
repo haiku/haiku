@@ -66,9 +66,9 @@ public:
 	virtual	void				ResizeToPreferred();
 	virtual	status_t			Invoke(BMessage* message = NULL);
 	virtual	void				FrameMoved(BPoint newPosition);
-	virtual	void				FrameResized(float width, float height);
+	virtual	void				FrameResized(float newWidth, float newHeight);
 
-	virtual	void				MakeFocus(bool focused = true);
+	virtual	void				MakeFocus(bool focus = true);
 	virtual	void				AllAttached();
 	virtual	void				AllDetached();
 	
@@ -77,7 +77,6 @@ public:
 									int32 what, const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* message);
 	virtual	status_t			Perform(perform_code d, void* arg);
-
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();

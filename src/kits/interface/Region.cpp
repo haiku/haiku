@@ -117,24 +117,24 @@ BRegion::operator==(const BRegion& other) const
 
 // Set the region to contain just the given BRect.
 void
-BRegion::Set(BRect newBounds)
+BRegion::Set(BRect rect)
 {
-	Set(_Convert(newBounds));
+	Set(_Convert(rect));
 }
 
 
 //Set the region to contain just the given clipping_rect.
 void
-BRegion::Set(clipping_rect newBounds)
+BRegion::Set(clipping_rect clipping)
 {
 	_SetSize(1);
 
-	if (valid_rect(newBounds) && fData) {
+	if (valid_rect(clipping) && fData != NULL) {
 		fCount = 1;
 		// cheap convert to internal rect format
-		newBounds.right++;
-		newBounds.bottom++;
-		fData[0] = fBounds = newBounds;
+		clipping.right++;
+		clipping.bottom++;
+		fData[0] = fBounds = clipping;
 	} else
 		MakeEmpty();
 }
@@ -425,7 +425,12 @@ BRegion::ExclusiveInclude(const BRegion* region)
 //	#pragma mark - BRegion private methods
 
 
-// Takes over the data of a region and marks that region empty.
+/*!
+	\fn void BRegion::_AdoptRegionData(BRegion& region)
+	\brief Takes over the data of \a region and empties it.
+
+	\param region The \a region to adopt data from.
+*/
 void
 BRegion::_AdoptRegionData(BRegion& region)
 {
@@ -447,7 +452,13 @@ BRegion::_AdoptRegionData(BRegion& region)
 }
 
 
-// Reallocate the memory in the region.
+/*!
+	\fn bool BRegion::_SetSize(int32 newSize)
+	\brief Reallocate the memory in the region.
+
+	\param newSize The amount of rectangles that the region should be
+		able to hold.
+*/
 bool
 BRegion::_SetSize(int32 newSize)
 {

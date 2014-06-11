@@ -351,10 +351,10 @@ BRadioButton::FrameMoved(BPoint newPosition)
 
 
 void
-BRadioButton::FrameResized(float width, float height)
+BRadioButton::FrameResized(float newWidth, float newHeight)
 {
 	Invalidate();
-	BControl::FrameResized(width, height);
+	BControl::FrameResized(newWidth, newHeight);
 }
 
 
@@ -368,9 +368,9 @@ BRadioButton::ResolveSpecifier(BMessage* message, int32 index,
 
 
 void
-BRadioButton::MakeFocus(bool focused)
+BRadioButton::MakeFocus(bool focus)
 {
-	BControl::MakeFocus(focused);
+	BControl::MakeFocus(focus);
 }
 
 

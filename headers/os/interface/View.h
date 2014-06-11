@@ -170,7 +170,7 @@ public:
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 code,
 									const BMessage* dragMessage);
-	virtual	void				WindowActivated(bool state);
+	virtual	void				WindowActivated(bool active);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				KeyUp(const char* bytes, int32 numBytes);
 	virtual	void				Pulse();
@@ -285,7 +285,7 @@ public:
 			void				SetFillRule(int32 rule);
 			int32				FillRule() const;
 
-			void				SetOrigin(BPoint pt);
+			void				SetOrigin(BPoint where);
 			void				SetOrigin(float x, float y);
 			BPoint				Origin() const;
 
@@ -522,7 +522,7 @@ public:
 			void				ScrollBy(float dh, float dv);
 			void				ScrollTo(float x, float y);
 	virtual	void				ScrollTo(BPoint where);
-	virtual	void				MakeFocus(bool focusState = true);
+	virtual	void				MakeFocus(bool focus = true);
 			bool				IsFocus() const;
 
 	virtual	void				Show();
@@ -536,7 +536,7 @@ public:
 	virtual	void				GetPreferredSize(float* _width, float* _height);
 	virtual	void				ResizeToPreferred();
 
-			BScrollBar*			ScrollBar(orientation posture) const;
+			BScrollBar*			ScrollBar(orientation direction) const;
 
 	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
 									BMessage* specifier, int32 form,

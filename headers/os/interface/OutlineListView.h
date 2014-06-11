@@ -24,7 +24,7 @@ public:
 									uint32 flags = B_WILL_DRAW
 										| B_FRAME_EVENTS | B_NAVIGABLE);
 								BOutlineListView(BMessage* archive);
-	virtual 					~BOutlineListView();
+	virtual						~BOutlineListView();
 
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* archive,
@@ -36,16 +36,16 @@ public:
 	virtual	void				FrameResized(float newWidth, float newHeight);
 	virtual	void				MouseUp(BPoint where);
 
-	virtual bool				AddUnder(BListItem* item, BListItem* superItem);
+	virtual	bool				AddUnder(BListItem* item, BListItem* superItem);
 
-	virtual bool				AddItem(BListItem* item);
-	virtual bool				AddItem(BListItem* item, int32 fullListIndex);
-	virtual bool				AddList(BList* newItems);
-	virtual bool				AddList(BList* newItems, int32 fullListIndex);
+	virtual	bool				AddItem(BListItem* item);
+	virtual	bool				AddItem(BListItem* item, int32 fullListIndex);
+	virtual	bool				AddList(BList* newItems);
+	virtual	bool				AddList(BList* newItems, int32 fullListIndex);
 
-	virtual bool				RemoveItem(BListItem* item);
-	virtual BListItem*			RemoveItem(int32 fullListIndex);
-	virtual bool				RemoveItems(int32 fullListIndex, int32 count);
+	virtual	bool				RemoveItem(BListItem* item);
+	virtual	BListItem*			RemoveItem(int32 fullListIndex);
+	virtual	bool				RemoveItems(int32 fullListIndex, int32 count);
 
 			BListItem*			FullListItemAt(int32 fullListIndex) const;
 			int32				FullListIndexOf(BPoint where) const;
@@ -70,19 +70,19 @@ public:
 
 			bool				IsExpanded(int32 fullListIndex);
 
-	virtual BHandler*			ResolveSpecifier(BMessage* message,
+	virtual	BHandler*			ResolveSpecifier(BMessage* message,
 									int32 index, BMessage* specifier,
 									int32 what, const char* property);
-	virtual status_t			GetSupportedSuites(BMessage* data);
-	virtual status_t			Perform(perform_code code, void* data);
+	virtual	status_t			GetSupportedSuites(BMessage* data);
+	virtual	status_t			Perform(perform_code code, void* data);
 
-	virtual void				ResizeToPreferred();
-	virtual void				GetPreferredSize(float* _width,
+	virtual	void				ResizeToPreferred();
+	virtual	void				GetPreferredSize(float* _width,
 									float* _height);
-	virtual void				MakeFocus(bool focus = true);
-	virtual void				AllAttached();
-	virtual void				AllDetached();
-	virtual void				DetachedFromWindow();
+	virtual	void				MakeFocus(bool focus = true);
+	virtual	void				AllAttached();
+	virtual	void				AllDetached();
+	virtual	void				DetachedFromWindow();
 
 			void				FullListSortItems(int (*compareFunc)(
 										const BListItem* first,

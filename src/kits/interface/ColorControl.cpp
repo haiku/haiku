@@ -56,19 +56,19 @@ BColorControl::BColorControl(BPoint leftTop, color_control_layout layout,
 }
 
 
-BColorControl::BColorControl(BMessage* archive)
+BColorControl::BColorControl(BMessage* data)
 	:
-	BControl(archive)
+	BControl(data)
 {
 	int32 layout;
 	float cellSize;
 	bool useOffscreen;
 
-	archive->FindInt32("_layout", &layout);
-	archive->FindFloat("_csize", &cellSize);
-	archive->FindBool("_use_off", &useOffscreen);
+	data->FindInt32("_layout", &layout);
+	data->FindFloat("_csize", &cellSize);
+	data->FindBool("_use_off", &useOffscreen);
 
-	_InitData((color_control_layout)layout, cellSize, useOffscreen, archive);
+	_InitData((color_control_layout)layout, cellSize, useOffscreen, data);
 }
 
 
@@ -80,7 +80,7 @@ BColorControl::~BColorControl()
 
 void
 BColorControl::_InitData(color_control_layout layout, float size,
-	bool useOffscreen, BMessage* archive)
+	bool useOffscreen, BMessage* data)
 {
 	fPaletteMode = BScreen(B_MAIN_SCREEN_ID).ColorSpace() == B_CMAP8;
 		//TODO: we don't support workspace and colorspace changing for now
@@ -102,13 +102,13 @@ BColorControl::_InitData(color_control_layout layout, float size,
 	green = gSystemCatalog.GetString(green, "ColorControl");
 	blue = gSystemCatalog.GetString(blue, "ColorControl");
 
-	if (archive != NULL) {
+	if (data != NULL) {
 		fRedText = (BTextControl*)FindView("_red");
 		fGreenText = (BTextControl*)FindView("_green");
 		fBlueText = (BTextControl*)FindView("_blue");
 
 		int32 value = 0;
-		archive->FindInt32("_val", &value);
+		data->FindInt32("_val", &value);
 
 		SetValue(value);
 	} else {
@@ -219,26 +219,28 @@ BColorControl::_LayoutView()
 
 
 BArchivable*
-BColorControl::Instantiate(BMessage* archive)
+BColorControl::Instantiate(BMessage* data)
 {
-	if (validate_instantiation(archive, "BColorControl"))
-		return new BColorControl(archive);
+	if (validate_instantiation(data, "BColorControl"))
+		return new BColorControl(data);
 
 	return NULL;
 }
 
 
 status_t
-BColorControl::Archive(BMessage* archive, bool deep) const
+BColorControl::Archive(BMessage* data, bool deep) const
 {
-	status_t status = BControl::Archive(archive, deep);
+	status_t status = BControl::Archive(data, deep);
 
 	if (status == B_OK)
-		status = archive->AddInt32("_layout", Layout());
+		status = data->AddInt32("_layout", Layout());
+
 	if (status == B_OK)
-		status = archive->AddFloat("_csize", fCellSize);
+		status = data->AddFloat("_csize", fCellSize);
+
 	if (status == B_OK)
-		status = archive->AddBool("_use_off", fOffscreenView != NULL);
+		status = data->AddBool("_use_off", fOffscreenView != NULL);
 
 	return status;
 }
@@ -985,16 +987,16 @@ BColorControl::Invoke(BMessage* message)
 
 
 void
-BColorControl::FrameMoved(BPoint new_position)
+BColorControl::FrameMoved(BPoint newPosition)
 {
-	BControl::FrameMoved(new_position);
+	BControl::FrameMoved(newPosition);
 }
 
 
 void
-BColorControl::FrameResized(float new_width, float new_height)
+BColorControl::FrameResized(float newWidth, float newHeight)
 {
-	BControl::FrameResized(new_width, new_height);
+	BControl::FrameResized(newWidth, newHeight);
 }
 
 

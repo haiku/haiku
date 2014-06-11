@@ -630,7 +630,7 @@ BTextView::MouseUp(BPoint where)
 // Hook method that is called whenever the mouse cursor enters, exits
 // or moves inside the view.
 void
-BTextView::MouseMoved(BPoint where, uint32 code, const BMessage* message)
+BTextView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
 	// Check if it's a "click'n'move"
 	if (_PerformMouseMoved(where, code))
@@ -639,18 +639,17 @@ BTextView::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 	switch (code) {
 		case B_ENTERED_VIEW:
 		case B_INSIDE_VIEW:
-			_TrackMouse(where, message, true);
+			_TrackMouse(where, dragMessage, true);
 			break;
 
 		case B_EXITED_VIEW:
 			_DragCaret(-1);
-			if (Window()->IsActive() && message == NULL)
+			if (Window()->IsActive() && dragMessage == NULL)
 				SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 			break;
 
 		default:
-			BView::MouseMoved(where, code, message);
-			break;
+			BView::MouseMoved(where, code, dragMessage);
 	}
 }
 
@@ -658,11 +657,11 @@ BTextView::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 // Hook method that is called when the window becomes the active window
 // or gives up that status.
 void
-BTextView::WindowActivated(bool state)
+BTextView::WindowActivated(bool active)
 {
-	BView::WindowActivated(state);
+	BView::WindowActivated(active);
 
-	if (state && IsFocus()) {
+	if (active && IsFocus()) {
 		if (!fActive)
 			_Activate();
 	} else {
@@ -779,9 +778,9 @@ BTextView::Pulse()
 
 // Hook method that is called when the frame is resized.
 void
-BTextView::FrameResized(float width, float height)
+BTextView::FrameResized(float newWidth, float newHeight)
 {
-	BView::FrameResized(width, height);
+	BView::FrameResized(newWidth, newHeight);
 	_UpdateScrollbars();
 }
 
@@ -789,11 +788,11 @@ BTextView::FrameResized(float width, float height)
 // Highlight or unhighlight the selection when the view gets or loses its
 // focus state.
 void
-BTextView::MakeFocus(bool focusState)
+BTextView::MakeFocus(bool focus)
 {
-	BView::MakeFocus(focusState);
+	BView::MakeFocus(focus);
 
-	if (focusState && Window() && Window()->IsActive()) {
+	if (focus && Window() != NULL && Window()->IsActive()) {
 		if (!fActive)
 			_Activate();
 	} else {
@@ -1964,12 +1963,12 @@ BTextView::CanEndLine(int32 offset)
 
 // Returns the width of the line at the given index.
 float
-BTextView::LineWidth(int32 lineNum) const
+BTextView::LineWidth(int32 lineNumber) const
 {
-	if (lineNum < 0 || lineNum >= fLines->NumLines())
+	if (lineNumber < 0 || lineNumber >= fLines->NumLines())
 		return 0;
 
-	STELine* line = (*fLines)[lineNum];
+	STELine* line = (*fLines)[lineNumber];
 	int32 length = (line + 1)->offset - line->offset;
 
 	// skip newline at the end of the line, if any, as it does no contribute
@@ -1983,9 +1982,9 @@ BTextView::LineWidth(int32 lineNum) const
 
 // Returns the height of the line at the given index.
 float
-BTextView::LineHeight(int32 lineNum) const
+BTextView::LineHeight(int32 lineNumber) const
 {
-	float lineHeight = TextHeight(lineNum, lineNum);
+	float lineHeight = TextHeight(lineNumber, lineNumber);
 	if (lineHeight == 0.0) {
 		// We probably don't have text content yet. Take the initial
 		// style's font height or fall back to the plain font.
