@@ -116,7 +116,7 @@ SMInvoker4::Invoke(BMessenger &target, BHandler *replyHandler,
 				   BMessenger &replyMessenger)
 {
 	if (fUseReply)
-		fReplyMessage = new BMessage(0UL);
+		fReplyMessage = new BMessage(uint32(0));
 	status_t result = target.SendMessage(MSG_TEST, fReplyMessage);
 	return result;
 }
@@ -141,7 +141,7 @@ SMInvoker5::Invoke(BMessenger &target, BHandler *replyHandler,
 				   BMessenger &replyMessenger)
 {
 	if (fUseReply)
-		fReplyMessage = new BMessage(0UL);
+		fReplyMessage = new BMessage(uint32(0));
 	BMessage _message(MSG_TEST);
 	BMessage *message = (fUseMessage ? &_message : NULL);
 	status_t result = target.SendMessage(message, fReplyMessage,

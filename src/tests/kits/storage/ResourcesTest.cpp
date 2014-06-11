@@ -943,8 +943,8 @@ ResourcesTest::ReadTest()
 												  NULL, NULL) == true );
 		CPPUNIT_ASSERT( resources.GetResourceInfo(info.type, info.name,
 												  NULL, NULL) == true );
-		CPPUNIT_ASSERT( resources.GetResourceInfo(0L, (type_code*)NULL, NULL,
-												  NULL, NULL) == true );
+		CPPUNIT_ASSERT( resources.GetResourceInfo(int32(0), (type_code*)NULL,
+												  NULL, NULL, NULL) == true );
 		CPPUNIT_ASSERT( resources.GetResourceInfo(info.type, 0, NULL,
 												  NULL, NULL) == true );
 		// LoadResource

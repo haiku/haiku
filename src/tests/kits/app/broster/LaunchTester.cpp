@@ -715,7 +715,7 @@ CommonLaunchTest15(LaunchCaller &caller)
 	create_app(appFile1, appType1);
 	install_type(fileType1, appType1);
 	CHK(context(caller, fileType1, NULL) == B_OK);
-	context.WaitForMessage(MSG_STARTED, true);
+	context.WaitForMessage(uint32(MSG_STARTED), true);
 	team_id team = context.TeamAt(0);
 	CHK(team >= 0);
 	entry_ref ref = ref_for_team(team);

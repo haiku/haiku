@@ -108,7 +108,7 @@ RegionTestcase::RegionTestcase(std::string name) :
 RegionTestcase::~RegionTestcase()
 {
 	while(!listOfRegions.IsEmpty()) {
-		delete static_cast<BRegion *>(listOfRegions.RemoveItem((long int)0));
+		delete static_cast<BRegion *>(listOfRegions.RemoveItem(int32(0)));
 	}
 }
 

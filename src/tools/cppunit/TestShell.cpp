@@ -262,7 +262,7 @@ BTestShell::WasDebuggerCalled()
 {
 	void *var = tls_get(fTLSDebuggerCall);
 	tls_set(fTLSDebuggerCall, NULL);
-	return ((int)var > 1);
+	return ((addr_t)var > 1);
 }
 
 _EXPORT

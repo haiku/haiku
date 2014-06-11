@@ -183,7 +183,7 @@ int32
 _get_debug_indent_level()
 {
 #if !_KERNEL_MODE
-	return (int32)tls_get(get_tls_handle());
+	return (addr_t)tls_get(get_tls_handle());
 #else
 	return 1;
 #endif
@@ -200,7 +200,8 @@ void
 indent(uint8 tabCount)
 {
 #if !_KERNEL_MODE
-	tls_set(get_tls_handle(), (void*)(_get_debug_indent_level()+tabCount));
+	tls_set(get_tls_handle(),
+		(void*)(addr_t(_get_debug_indent_level()+tabCount)));
 #endif
 }
 
@@ -211,7 +212,8 @@ void
 unindent(uint8 tabCount)
 {
 #if !_KERNEL_MODE
-	tls_set(get_tls_handle(), (void*)(_get_debug_indent_level()-tabCount));
+	tls_set(get_tls_handle(),
+		(void*)(addr_t(_get_debug_indent_level()-tabCount)));
 #endif
 }
 
