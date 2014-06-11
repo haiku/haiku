@@ -1,13 +1,14 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
- * 
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscpione@gmail.com
+ *
  * Corresponds to:
- *		headers/os/app/Message.h	rev 21562
- *		src/kits/app/Message.cpp	rev 22240
+ *		headers/os/app/Message.h	hrev47355
+ *		src/kits/app/Message.cpp	hrev47355
  */
 
 
@@ -25,66 +26,88 @@
 /*!
 	\def B_FIELD_NAME_LENGTH
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
 /*!
 	\def B_PROPERTY_NAME_LENGTH
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_NO_SPECIFIER
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_DIRECT_SPECIFIER
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_INDEX_SPECIFIER
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_REVERSE_INDEX_SPECIFIER,
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_RANGE_SPECIFIER
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_REVERSE_RANGE_SPECIFIER
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_NAME_SPECIFIER
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
 /*!	
 	\var B_ID_SPECIFIER
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_SPECIFIERS_END
 	\brief Undocumented...
+
+	\since BeOS R3
 */
 
 
@@ -96,7 +119,7 @@
 	\ingroup app
 	\ingroup libbe
 	\brief A container that can be send and received using the Haiku messaging
-		subsystem.
+	       subsystem.
 
 	This class is at the center of the web of messaging classes, in the sense
 	that it defines the actual structure of the messages. Messages have two
@@ -126,6 +149,8 @@
 
 	To see how messages fit in with the greater picture, have a look at the
 	\ref app_messaging "Messaging Introduction".
+
+	\since BeOS R3
 */
 
 
@@ -134,46 +159,55 @@
 	\brief A 4-byte constant that determines the type of message.
 
 	You can directly manipulate this data member.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BMessage::BMessage()
 	\brief Construct an empty message, without any data members and with a 
-		\a what constant set to \c 0.
+	       \a what constant set to \c 0.
 
 	\see BMessage(uint32 what)
-	\see BMessage(const BMessage &other)
+	\see BMessage(const BMessage& other)
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BMessage::BMessage(uint32 what)
 	\brief Construct an empty message with the \a what member set to the
-		specified value.
+	       specified value.
 
 	\see BMessage::BMessage()
-	\see BMessage::BMessage(const BMessage &other)
+	\see BMessage::BMessage(const BMessage& other)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BMessage::BMessage(const BMessage &other)
+	\fn BMessage::BMessage(const BMessage& other)
 	\brief Construct a new message that is a copy of another message.
 
 	The \a what member and the data values are copied. The metadata, such as
-	whether or not the message is a drop message or reply information, is
-	not copied. So if the original message is a reply to a previous message,
-	which will make IsReply() return \c true, calling the same method on a copy
-	of the message will return \c false.
+	whether or not the message is a drop message or reply information is
+	not copied. If the original message is a reply to a previous message
+	this will make IsReply() return \c true, while calling the same method on
+	a copy of the message will return \c false.
 
-	\remarks BeOS R5 did keep the metadata of the message. Haiku deviates from
-	this behavior. Use the Haiku implementation of message copying as the
-	default behavior. This will keep your applications backwards compatible.
+	\remark BeOS kept the metadata of the message while Haiku deviates from
+	        this behavior. Use the Haiku implementation of message copying
+	        as the default behavior to keep your applications backwards
+	        compatible.
 
 	\see BMessage::BMessage()
 	\see BMessage(uint32 what)
-*/ 
+
+	\since BeOS R3
+*/
 
 
 /*!
@@ -182,15 +216,8 @@
 
 	If there still is a sender waiting for a reply, the \c B_NO_REPLY message
 	will be sent to inform them that there won't be a reply.
-*/
 
-
-/*!
-	\fn BMessage &BMessage::operator=(const BMessage &other)
-	\brief Copy one message into another.
-
-	See the copy constructor, BMessage(const BMessage &other), for details on
-	what is copied, and what isn't.
+	\since BeOS R3
 */
 
 
@@ -204,68 +231,75 @@
 
 /*!
 	\fn status_t BMessage::GetInfo(type_code typeRequested, int32 index,
-	 	char **nameFound, type_code *typeFound, int32 *countFound) const
+	 	char** nameFound, type_code* typeFound, int32* countFound) const
 	\brief Retrieve the name, the type and the number of items in a message by
-		an \a index.
+	       an \a index.
 
 	\param[in] typeRequested If you want to limit the search to only one type,
-	 	pass that type code here. If you don't care which type the data has,
-	 	you can pass \c B_ANY_TYPE.
+	           pass that type code here. If you don't care which type the data
+	           has, you can pass \c B_ANY_TYPE.
 	\param[in] index The index of the data you want to investigate.
 	\param[out] nameFound The name of the item if it is found. Haiku will fill
-		in a pointer to the internal name buffer in the message. This means
-		that you should not manipulate this name. If you are not interested in
-		the name, you can safely pass \c NULL.
+	            in a pointer to the internal name buffer in the message. This
+	            means that you should not manipulate this name. If you are not
+	            interested in the name, you can safely pass \c NULL.
 	\param[out] typeFound The type of the item at \a index. If you are
-		not interested in the type (because you specifically asked for a type),
-		you can safely pass \c NULL.
+	            not interested in the type (because you specifically asked for
+	            a type), you can safely pass \c NULL.
 	\param[out] countFound The number of items at \a index. If data
-		items have the same name, they will be placed under the same index.
+	            items have the same name, they will be placed under the same
+	            index.
 
 	\return If the \a index is found, and matches the requested type,
-		then the other parameters will be filled in. If this is not the case,
-		the method will return with an error.
+	        then the other parameters will be filled in. If this is not the
+	        case, the method will return with an error.
 	\retval B_OK An match was found. The values have been filled in.
 	\retval B_BAD_INDEX The \a index was out of range. None of the
-		passed variables have been altered.
+	        passed variables have been altered.
 	\retval B_BAD_TYPE The data field at \a index does not have the
-		requested type.
+	        requested type.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::GetInfo(const char *name, type_code *typeFound,
-	 	int32 *countFound) const
+	\fn status_t BMessage::GetInfo(const char* name, type_code* typeFound,
+	 	int32* countFound) const
 	\brief Retrieve the type and the number of data items in this message that
-		are associated with a \a name.
+	       are associated with a \a name.
 
 	\param[in] name The name of the data member that you are looking for.
 	\param[out] typeFound In case of a match, the name of the data member will
-		be put in this parameter. In case you are not interested, you can pass
-		\c NULL.
+	            be put in this parameter. In case you are not interested, you
+	            can pass \c NULL.
 	\param[out] countFound In case of a match, the number of items at this 
-		label will be in this parameter. In case you are not interested, you
-		can safely pass \c NULL.
+	            label will be in this parameter. In case you are not
+	            interested, you can safely pass \c NULL.
 
 	\return If the message has data associated with the given \a name,
-		the other parameters will contain information associated with the data,
-		else, the method will return with an error.
+	        the other parameters will contain information associated with the
+	        data, else, the method will return with an error.
 	\retval B_OK A match was found. The other parameters have been filled in.
 	\retval B_BAD_VALUE You passed \c NULL as argument to \a name.
 	\retval B_NAME_NOT_FOUND There is no data with the label \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::GetInfo(const char *name, type_code *typeFound,
-	 	bool *fixedSize) const
+	\fn status_t BMessage::GetInfo(const char* name, type_code* typeFound,
+	 	bool* fixedSize) const
 	\brief Retrieve the type and whether or not the size of the data is fixed
 		associated with a \a name.
 
-	This method is the same as GetInfo(const char *,type_code *, int32 *) const,
+	This method is the same as GetInfo(const char*, type_code*, int32*) const,
 	with the difference that you can find out whether or not the size of the
 	data associated with the \a name is fixed. You will get this value
 	in the variable you passed as \a fixedSize parameter.
+
+	\since BeOS R4
 */
 
 
@@ -277,10 +311,12 @@
 	It's practical use is limited to debugging purposes.
 
 	\param type The type you want to find. If you pass \c B_ANY_TYPE, this
-		method will return the total number of data items.
+	       method will return the total number of data items.
 
 	\return The number of data items in this message with the specified
-		\a type, or \c 0 in case no items match the type.
+	        \a type, or \c 0 in case no items match the type.
+
+	\since BeOS R3
 */
 
 
@@ -289,8 +325,11 @@
 	\brief Check if the message has data members.
 
 	\return If this message contains data members, this method will return
-		\c true, else it will return \c false.
+	        \c true, else it will return \c false.
+
 	\see MakeEmpty()
+
+	\since BeOS R3
 */
 
 
@@ -299,7 +338,9 @@
 	\brief Check if the message is a system message.
 
 	\return If this message is a system message, the method will return
-		\c true.
+	        \c true.
+
+	\since BeOS R3
 */
 
 
@@ -308,6 +349,8 @@
 	\brief Check if the message is a reply to a (previous) message.
 
 	\return If this message is a reply, this method will return \c true.
+
+	\since BeOS R3
 */
 
 
@@ -320,11 +363,13 @@
 	are present, and it can be used to debug your message handling routines,
 	especially the handling of those that are sent by external applications, to
 	see if you understand the semantics correctly.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::Rename(const char *oldEntry, const char *newEntry)
+	\fn status_t BMessage::Rename(const char* oldEntry, const char* newEntry)
 	\brief Rename a data label.
 
 	\param oldEntry The name of the label you want to rename.
@@ -333,9 +378,11 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK Renaming succeeded.
 	\retval B_BAD_VALUE Either the \a oldEntry or the
-		\a newEntry pointers are \c NULL.
+	        \a newEntry pointers are \c NULL.
 	\retval B_NAME_NOT_FOUND There is no data associated with the label
-		\a oldEntry.
+	        \a oldEntry.
+
+	\since Haiku R1
 */
 
 
@@ -358,13 +405,15 @@
 	method will return \c true.
 
 	\warning This method should not be abused by a thread that sends a message
-		to track whether or not a message was delivered. This is because the
-		ownership of the message goes to the receiving looper, which will
-		delete the message as soon as it is done with it.
+	         to track whether or not a message was delivered. This is because
+	         the ownership of the message goes to the receiving looper, which
+	         will delete the message as soon as it is done with it.
 
 	\warning If you need to check whether a message is delivered, you should
-		either ask for a reply, or use one of the synchronous 
-		BMessenger::SendMessage() methods.
+	         either ask for a reply, or use one of the synchronous 
+	         BMessenger::SendMessage() methods.
+
+	\since BeOS R3
 */
 
 
@@ -374,12 +423,16 @@
 
 	This method will return \c true, if the sender flagged that it is waiting
 	for a reply, and such a reply has not yet been sent.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool BMessage::IsSourceRemote() const
 	\brief Check if the message is sent by another application.
+
+	\since BeOS R3
 */
 
 
@@ -400,17 +453,21 @@
 
 	If this method is called on a message that has not been delivered (yet),
 	it will return an empty BMessenger object.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn const BMessage *BMessage::Previous() const
+	\fn const BMessage* BMessage::Previous() const
 	\brief Get the message to which this message is a reply.
 
 	\return Returns a new BMessage with the same data stuctures as the message
-		to which this message is a reply. You get the ownership of this
-		message, so free it when you're done. If this message isn't a reply to
-		another message, this method will return \c NULL.
+	        to which this message is a reply. You get the ownership of this
+	        message, so free it when you're done. If this message isn't a
+	        reply to another message, this method will return \c NULL.
+
+	\since BeOS R3
 */
 
 
@@ -419,16 +476,18 @@
 	\brief Check if the message was delivered through 'drag and drop'.
 
 	\return This method returns \c true if the message has been delivered
-		through drag and drop. It returns \c false if it has been delivered
-		through the regular messaging functions, or if the message has not
-		been delivered at all.
+	        through drag and drop. It returns \c false if it has been delivered
+	        through the regular messaging functions, or if the message has not
+	        been delivered at all.
 
 	\see DropPoint()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BPoint BMessage::DropPoint(BPoint *offset) const
+	\fn BPoint BMessage::DropPoint(BPoint* offset) const
 	\brief Get the coordinates of the drop point of the message.
 
 	If the message has been delivered because of drag and drop, which can be
@@ -443,6 +502,8 @@
 	a \c NULL pointer.
 
 	\see WasDropped()
+
+	\since BeOS R3
 */
 
 
@@ -458,28 +519,33 @@
 
 
 /*!
-	\fn status_t BMessage::SendReply(uint32 command, BHandler *replyTo)
+	\fn status_t BMessage::SendReply(uint32 command, BHandler* replyTo)
 	\brief Asynchronously send a reply to this message.
 
-	This is an overloaded member of SendReply(BMessage *, BMessenger, bigtime_t).
-	Use this variant if you want to send a message without data members.
+	This is an overloaded member of
+	SendReply(BMessage*, BMessenger, bigtime_t). Use this variant if you
+	want to send a message without data members.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::SendReply(BMessage *reply, BHandler *replyTo,
-	 	bigtime_t timeout)
+	\fn status_t BMessage::SendReply(BMessage* reply, BHandler* replyTo,
+		bigtime_t timeout)
 	\brief Asynchronously send a reply to this message.
 
-	This is an overloaded member of SendReply(BMessage *, BMessenger, bigtime_t).
+	This is an overloaded member of SendReply(BMessage*, BMessenger, bigtime_t).
 	Use this variant if you want to send the message to a specific handler
 	(instead of a complete messenger).
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::SendReply(BMessage *reply, BMessenger replyTo,
-	 	bigtime_t timeout)
+	\fn status_t BMessage::SendReply(BMessage* reply, BMessenger replyTo,
+		bigtime_t timeout)
 	\brief Asynchronously send a reply to this message.
 
 	This method sends a reply to this message to the sender. On your turn,
@@ -490,41 +556,46 @@
 
 	\param reply The message that is in reply to this message.
 	\param replyTo In case the receiver needs to reply to the message you are
-		sending, you can specify the return address with this argument.
+	       sending, you can specify the return address with this argument.
 	\param timeout The maximum time in microseconds this delivery may take. The
-		\a timeout is a relative timeout. You can also use
-		\c B_INFINITE_TIMEOUT if you want to wait infinitely for the message
-		to be delivered.
+	       \a timeout is a relative timeout. You can also use
+	       \c B_INFINITE_TIMEOUT if you want to wait infinitely for the message
+	       to be delivered.
 
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The message has been delivered.
 	\retval B_DUPLICATE_REPLY There already has been a reply to this message.
 	\retval B_BAD_PORT_ID The reply address is not valid (anymore).
 	\retval B_WOULD_BLOCK The delivery \a timeout was
-		\c B_INFINITE_TIMEOUT (\c 0) and the target port was full when trying
-		to deliver the message.
+	        \c B_INFINITE_TIMEOUT (\c 0) and the target port was full when
+	        trying to deliver the message.
 	\retval B_TIMED_OUT The timeout expired while trying to deliver the
-	  message.
-	\see SendReply(uint32 command, BHandler *replyTo)
+	        message.
+
+	\see SendReply(uint32 command, BHandler* replyTo)
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BMessage::SendReply(uint32 command, BMessage *replyToReply)
+	\fn status_t BMessage::SendReply(uint32 command, BMessage* replyToReply)
 	\brief Synchronously send a reply to this message, and wait for a reply
-	 	back.
+	       back.
 
-	This is an overloaded member of SendReply(BMessage *, BMessage *,
-	bigtime_t, bigtime_t) Use this variant if you want to send a message
-	without data members.
+	This is an overloaded member of
+	SendReply(BMessage*, BMessage*, bigtime_t, bigtime_t)
+	Use this variant if you want to send a message without data members.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::SendReply(BMessage *reply, BMessage *replyToReply,
+	\fn status_t BMessage::SendReply(BMessage* reply, BMessage* replyToReply,
 		bigtime_t sendTimeout, bigtime_t replyTimeout)
-	\brief 	Synchronously send a reply to this message, and wait for a reply
-		 back.
+	\brief Synchronously send a reply to this message, and wait for a reply
+	       back.
 
 	This method sends a reply to this message to the sender. The
 	\a reply is delivered, and then the method waits for a reply from
@@ -537,25 +608,28 @@
 	\param reply The message that is in reply to this message.
 	\param[out] replyToReply The reply is copied into this argument. 
 	\param sendTimeout The maximum time in microseconds this delivery may take.
-	 	The \a timeout is a relative timeout. You can also use
-		\c B_INFINITE_TIMEOUT if you want to wait infinitely for the message
-		to be delivered.
+	       The \a timeout is a relative timeout. You can also use
+	       \c B_INFINITE_TIMEOUT if you want to wait infinitely for the message
+	       to be delivered.
 	\param replyTimeout The maximum time in microseconds you want to wait for a
-		reply. Note that the timer starts when the message has been delivered.
+	       reply. Note that the timer starts when the message has been
+	       delivered.
 
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The message has been delivered.
 	\retval B_DUPLICATE_REPLY There already has been a reply to this message.
-	\retval B_BAD_VALUE Either \a reply or \a replyToReply is
-		\c NULL.
+	\retval B_BAD_VALUE Either \a reply or \a replyToReply is \c NULL.
 	\retval B_BAD_PORT_ID The reply address is not valid (anymore).
 	\retval B_WOULD_BLOCK The delivery \a timeout was
-		\c B_INFINITE_TIMEOUT (\c 0) and the target port was full when trying
-		to deliver the message.
+	        \c B_INFINITE_TIMEOUT (\c 0) and the target port was full when
+	        trying to deliver the message.
 	\retval B_TIMED_OUT The timeout expired while trying to deliver the
-	  message.
+	        message.
 	\retval B_NO_MORE_PORTS All reply ports are in use.
-	\see SendReply(uint32 command, BMessage *replyToReply)
+
+	\see SendReply(uint32 command, BMessage* replyToReply)
+
+	\since BeOS R3
 */
 
 
@@ -563,7 +637,7 @@
 
 
 /*!
-	\name Flattening methods
+	\name Flattening
 
 	Because of historical reasons and for binary compatibility, this class
 	provides a flattening API without inheriting the BFlattenable class. The
@@ -578,49 +652,57 @@
 /*!
 	\fn ssize_t BMessage::FlattenedSize() const
 	\brief Return the size in bytes required when you want to flatten this
-		message to a stream of bytes.
+	       message to a stream of bytes.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::Flatten(char *buffer, ssize_t size) const
+	\fn status_t BMessage::Flatten(char* buffer, ssize_t size) const
 	\brief Flatten the message to a \a buffer.
 
 	\param buffer The buffer to write the data to.
 	\param size The size of the buffer.
 
-	\return \c B_OK in case of success, or an error code in case something went
-		awry.
+	\return \c B_OK in case of success, or an error code in case something
+	        went awry.
 
 	\warning Make sure the buffer is large enough to hold the message. This
-	 	method does not double-check for you!
+	         method does not double-check for you!
+
 	\see FlattenedSize()
-	\see Flatten(BDataIO *stream, ssize_t *size) const
+	\see Flatten(BDataIO* stream, ssize_t* size) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::Flatten(BDataIO *stream, ssize_t *size) const
+	\fn status_t BMessage::Flatten(BDataIO* stream, ssize_t* size) const
 	\brief Flatten the message to a \a stream.
 
-	\param[in] stream The stream to flatten the message to.
-	\param[out] size The method writes the number of bytes actually written to
-		this argument. 
-	\return \c B_OK in case of success, or an error code in case something went
-		awry.
+	\param[in]  stream The stream to flatten the message to.
+	\param[out] size The method writes the number of bytes actually written
+	            to this argument. 
+	\return \c B_OK in case of success, or an error code in case something
+	        went awry.
 
 	\warning Make sure the subclass of the BDataIO interface either protects
-		against buffer overwrites, or check if the number of bytes that is
-		going to be written isn't larger than it can handle.
+	         against buffer overwrites, or check if the number of bytes that
+	         is going to be written isn't larger than it can handle.
+
 	\see FlattenedSize()
-	\see Flatten(char *buffer, ssize_t size) const
+	\see Flatten(char* buffer, ssize_t size) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::Unflatten(const char *flatBuffer)
+	\fn status_t BMessage::Unflatten(const char* flatBuffer)
 	\brief Unflatten a message from a buffer and put it into the current
-	 	object.
+	       object.
 
 	This action clears the current contents of the message.
 
@@ -630,16 +712,19 @@
 	\retval B_OK The buffer has been unflattened.
 	\retval B_BAD_VALUE The buffer does not contain a valid message.
 	\retval B_NO_MEMORY An error occured whilst allocating memory for the data
-		members.
-	\see Flatten(char *buffer, ssize_t size) const
-	\see Unflatten(BDataIO *stream)
+	        members.
+
+	\see Flatten(char* buffer, ssize_t size) const
+	\see Unflatten(BDataIO* stream)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::Unflatten(BDataIO *stream)
+	\fn status_t BMessage::Unflatten(BDataIO* stream)
 	\brief Unflatten a message from a stream and put it into the current
-	 	object.
+	       object.
 
 	This action clears the current contents of the message.
 
@@ -648,10 +733,13 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The message has been unflattened.
 	\retval B_BAD_VALUE The stream does not contain a valid message.
-	\retval B_NO_MEMORY An error occured whilst allocating memory for the data
-		members.
-	\see Flatten(BDataIO *stream, ssize_t *size) const
-	\see Unflatten(const char *flatBuffer)
+	\retval B_NO_MEMORY An error occured whilst allocating memory for the
+	        data members.
+
+	\see Flatten(BDataIO* stream, ssize_t* size) const
+	\see Unflatten(const char*)
+
+	\since BeOS R3
 */
 
 
@@ -659,7 +747,7 @@
 
 
 /*!
-	\name Specifiers (scripting)
+	\name Specifiers (Scripting)
 */
 
 
@@ -667,58 +755,76 @@
 
 
 /*!
-	\fn status_t BMessage::AddSpecifier(const char *property)
+	\fn status_t BMessage::AddSpecifier(const char* property)
 	\brief Undocumented.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddSpecifier(const char *property, int32 index)
+	\fn status_t BMessage::AddSpecifier(const char* property, int32 index)
 	\brief Undocumented.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddSpecifier(const char *property, int32 index,
-	 	int32 range)
+	\fn status_t BMessage::AddSpecifier(const char* property, int32 index,
+		int32 range)
 	\brief Undocumented.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddSpecifier(const char *property, const char *name)
+	\fn status_t BMessage::AddSpecifier(const char* property, const char* name)
 	\brief Undocumented.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddSpecifier(const BMessage *specifier)
+	\fn status_t BMessage::AddSpecifier(const BMessage* specifier)
 	\brief Undocumented.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BMessage::SetCurrentSpecifier(int32 index)
 	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BMessage::GetCurrentSpecifier(int32 *index,
-	 	BMessage *specifier, int32 *what, const char **property) const
+	\fn status_t BMessage::GetCurrentSpecifier(int32* index,
+		BMessage* specifier, int32* what, const char** property) const
 	\brief Undocumented.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool BMessage::HasSpecifiers() const
 	\brief Undocumented.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BMessage::PopSpecifier()
 	\brief Undocumented.
+
+	\since BeOS R3
 */
 
 
@@ -734,8 +840,8 @@
 
 
 /*!
-	\fn status_t BMessage::AddData(const char *name, type_code type,
-	 	const void *data, ssize_t numBytes, bool isFixedSize, int32 count)
+	\fn status_t BMessage::AddData(const char* name, type_code type,
+		const void* data, ssize_t numBytes, bool isFixedSize, int32 count)
 	\brief Add \a data of a certain \a type to the message.
 
 	The amount of \a numBytes is copied into the message. The data is
@@ -762,38 +868,39 @@
 	data you need to pass is too big, find another way to pass it.
 
 	\param name The label to which this data needs to be associated. If the
-		\a name already exists, the new data will be added in an
-		array-like style.
+	       \a name already exists, the new data will be added in an
+	       array-like style.
 	\param type The type of data. If you are adding data to the same
 	\a name, make sure it is the same type.
 	\param data The data buffer to copy the bytes from.
-	\param numBytes The number of bytes to be copied. If this is the first call
-		to this method for this type of data, and you set
-		\a isFixedSize to \c true, this will specify the size of all
-		consecutive calls to this
-		method.
+	\param numBytes The number of bytes to be copied. If this is the first
+	       call to this method for this type of data, and you set
+	       \a isFixedSize to \c true, this will specify the size of all
+	       consecutive calls to this method.
 	\param isFixedSize If this is the first call to this method with this
-		\a name, you can specify the whether or not all items in this
-		array should have the same fixed size.
+	       \a name, you can specify the whether or not all items in this
+	       array should have the same fixed size.
 	\param count If this is the first call to this method with this
-		\a name, you can instruct this message to allocate a number of
-		items in advance. This does not limit the amount of items though. The
-		array will grow if needed.
+	       \a name, you can instruct this message to allocate a number of
+	       items in advance. This does not limit the amount of items though.
+	       The array will grow if needed.
 
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The \a data is succesfully added.
 	\retval B_BAD_VALUE The \a numBytes is less than, or equal to \c 0,
-		or the size of this item is larger than the \a name allows,
-		since it has been specified to have a fixed size.
-	\retval B_ERROR There was an error whilst creating the label with your 
-		\a name.
+	        or the size of this item is larger than the \a name allows,
+	        since it has been specified to have a fixed size.
+	\retval B_ERROR There was an error whilst creating the label with
+	        your \a name.
 	\retval B_BAD_TYPE The \a type you specified is different than the
-		one already associated with \a name.
+	        one already associated with \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddRect(const char *name, BRect aRect)
+	\fn status_t BMessage::AddRect(const char* name, BRect aRect)
 	\brief Convenience method to add a BRect to the label \a name.
 
 	This method calls AddData() with the \c B_RECT_TYPE \a type.
@@ -807,11 +914,13 @@
 	\see FindRect()
 	\see GetRect()
 	\see ReplaceRect()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddPoint(const char *name, BPoint aPoint)
+	\fn status_t BMessage::AddPoint(const char* name, BPoint aPoint)
 	\brief Convenience method to add a BPoint to the label \a name.
 
 	This method calls AddData() with the \c B_POINT_TYPE \a type.
@@ -825,11 +934,13 @@
 	\see FindPoint()
 	\see GetPoint()
 	\see ReplacePoint()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddString(const char *name, const char *aString)
+	\fn status_t BMessage::AddString(const char* name, const char* aString)
 	\brief Convenience method to add a C-string to the label \a name.
 
 	This method calls AddData() with the \c B_STRING_TYPE \a type.
@@ -843,11 +954,13 @@
 	\see FindString()
 	\see GetString()
 	\see ReplaceString()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddString(const char *name, const BString &aString)
+	\fn status_t BMessage::AddString(const char* name, const BString& aString)
 	\brief Convenience method to add a BString to the label \a name.
 
 	This method calls AddData() with the \c B_STRING_TYPE \a type.
@@ -861,11 +974,13 @@
 	\see FindString()
 	\see GetString()
 	\see ReplaceString()
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn status_t BMessage::AddInt8(const char *name, int8 value)
+	\fn status_t BMessage::AddInt8(const char* name, int8 value)
 	\brief Convenience method to add an \c int8 to the label \a name.
 
 	This method calls AddData() with the \c B_INT8_TYPE \a type.
@@ -879,11 +994,13 @@
 	\see FindInt8()
 	\see GetInt8()
 	\see ReplaceInt8()
+
+	\since BeOS R3
 */
 
 
 /*! 
-	\fn status_t BMessage::AddInt16(const char *name, int16 value)
+	\fn status_t BMessage::AddInt16(const char* name, int16 value)
 	\brief Convenience method to add an \c int16 to the label \a name.
 
 	This method calls AddData() with the \c B_INT16_TYPE \a type.
@@ -897,11 +1014,13 @@
 	\see FindInt16()
 	\see GetInt16()
 	\see ReplaceInt16()
+
+	\since BeOS R3
 */
 
 
 /*!	
-	\fn status_t BMessage::AddInt32(const char *name, int32 value)
+	\fn status_t BMessage::AddInt32(const char* name, int32 value)
 	\brief Convenience method to add an \c int32 to the label \a name.
 
 	This method calls AddData() with the \c B_INT32_TYPE \a type.
@@ -915,11 +1034,13 @@
 	\see FindInt32()
 	\see GetInt32()
 	\see ReplaceInt32()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddInt64(const char *name, int64 value)
+	\fn status_t BMessage::AddInt64(const char* name, int64 value)
 	\brief Convenience method to add an \c int64 to the label \a name.
 
 	This method calls AddData() with the \c B_INT64_TYPE \a type.
@@ -933,11 +1054,13 @@
 	\see FindInt64()
 	\see GetInt64()
 	\see ReplaceInt64()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddBool(const char *name, bool aBoolean)
+	\fn status_t BMessage::AddBool(const char* name, bool aBoolean)
 	\brief Convenience method to add a \c bool to the label \a name.
 
 	This method calls AddData() with the \c B_BOOL_TYPE \a type.
@@ -951,10 +1074,12 @@
 	\see FindBool()
 	\see GetBool()
 	\see ReplaceBool()
+
+	\since BeOS R3
 */
 
 /*!
-	\fn status_t BMessage::AddFloat(const char *name, float aFloat)
+	\fn status_t BMessage::AddFloat(const char* name, float aFloat)
 	\brief Convenience method to add a \c float to the label \a name.
 
 	This method calls AddData() with the \c B_FLOAT_TYPE \a type.
@@ -968,11 +1093,13 @@
 	\see FindFloat()
 	\see GetFloat()
 	\see ReplaceFloat()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddDouble(const char *name, double aDouble)
+	\fn status_t BMessage::AddDouble(const char* name, double aDouble)
 	\brief Convenience method to add a \c double to the label \a name.
 
 	This method calls AddData() with the \c B_DOUBLE_TYPE \a type.
@@ -986,20 +1113,23 @@
 	\see FindDouble()
 	\see GetDouble()
 	\see ReplaceDouble()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddPointer(const char *name, const void *aPointer)
+	\fn status_t BMessage::AddPointer(const char* name, const void* aPointer)
 	\brief Convenience method to add a \c pointer to the label \a name.
 
 	This method calls AddData() with the \c B_POINTER_TYPE \a type.
 
 	\warning If you want to share objects between applications, remember
-		that each application has its own address space, and that it therefore
-		is useless to try to pass around objects by sending pointers in
-		messages. You should think about copying the entire object in the
-		message, or you should consider using shared memory.
+	         that each application has its own address space, and that it
+	         therefore is useless to try to pass around objects by sending
+	         pointers in messages. You should think about copying the
+	         entire object in the message, or you should consider using
+	         shared memory.
 
 	\param name The label to associate the data with.
 	\param aPointer The value to store in the message.
@@ -1010,11 +1140,13 @@
 	\see FindPointer()
 	\see GetPointer()
 	\see ReplacePointer()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddMessenger(const char *name, BMessenger messenger)
+	\fn status_t BMessage::AddMessenger(const char* name, BMessenger messenger)
 	\brief Convenience method to add a messenger to the label \a name.
 
 	This method calls AddData() with the \c B_MESSENGER_TYPE \a type.
@@ -1027,13 +1159,15 @@
 	\see AddData() for a more detailed overview of the inner workings.
 	\see FindMessenger()
 	\see ReplaceMessenger()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddRef(const char *name, const entry_ref *ref)
+	\fn status_t BMessage::AddRef(const char* name, const entry_ref* ref)
 	\brief Convenience method to add an \c entry_ref to the label
-		\a name.
+	       \a name.
 
 	This method calls AddData() with the \c B_REF_TYPE \a type.
 
@@ -1045,11 +1179,14 @@
 	\see AddData() for a more detailed overview of the inner workings.
 	\see FindRef()
 	\see ReplaceRef()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddMessage(const char *name, const BMessage *message)
+	\fn status_t BMessage::AddMessage(const char* name,
+		const BMessage* message)
 	\brief Convenience method to add a message to the label \a name.
 
 	This method calls AddData() with the \c B_MESSAGE_TYPE \a type.
@@ -1062,11 +1199,13 @@
 	\see AddData() for a more detailed overview of the inner workings.
 	\see FindMessage()
 	\see ReplaceMessage()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::AddFlat(const char *name, BFlattenable *object,
+	\fn status_t BMessage::AddFlat(const char* name, BFlattenable* object,
 		int32 count = 1)
 	\brief Convenience method to add a flattenable to the label \a name.
 
@@ -1079,13 +1218,15 @@
 	\param name The label to associate the data with.
 	\param object The object to flatten into the message.
 	\param count The number of items to pre-allocate associated with this
-		\a name.
+	       \a name.
 
 	\returns A status code, \c B_OK on success or an error code.
 
 	\see AddData() for a more detailed overview of the inner workings.
 	\see FindFlat()
 	\see ReplaceFlat()
+
+	\since BeOS R3
 */
 
 
@@ -1101,9 +1242,9 @@
 
 
 /*!
-	\fn status_t BMessage::RemoveData(const char *name, int32 index)
+	\fn status_t BMessage::RemoveData(const char* name, int32 index)
 	\brief Remove data associated with \a name at a specified
-		\a index.
+	       \a index.
 
 	If this is the only instance of the data, then the entire label will be
 	removed. This means you can recreate it with another type.
@@ -1120,11 +1261,13 @@
 
 	\see RemoveName()
 	\see MakeEmpty()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::RemoveName(const char *name)
+	\fn status_t BMessage::RemoveName(const char* name)
 	\brief Remove all data associated with a \a name.
 
 	This also removes the label, so that you can recreate it with another type,
@@ -1139,6 +1282,8 @@
 
 	\see RemoveData()
 	\see MakeEmpty()
+
+	\since BeOS R3
 */
 
 
@@ -1153,6 +1298,8 @@
 
 	\see RemoveData()
 	\see RemoveName()
+
+	\since BeOS R3
 */
 
 
@@ -1179,10 +1326,10 @@
 
 
 /*!
-	\fn status_t BMessage::FindData(const char *name, type_code type,
-		int32 index, const void **data, ssize_t *numBytes) const
+	\fn status_t BMessage::FindData(const char* name, type_code type,
+		int32 index, const void** data, ssize_t* numBytes) const
 	\brief Find \a data that is stored in this message at an
-		\a index.
+	       \a index.
 
 	This method matches the label \a name with the \a type you
 	are asking for, and it looks for the data that is stored at a certain
@@ -1190,7 +1337,7 @@
 	to the internal buffer, and the method will put the size of the item in
 	\a numBytes.
 
-	Note that only this method, and FindString(const char *, const char **),
+	Note that only this method, and FindString(const char*, const char**),
 	pass a pointer to the internal buffer. The other more specific methods,
 	such as FindBool() and FindRect() copy the data into a buffer you specify.
 	This means that the data retrieved with this method is valid until the
@@ -1198,9 +1345,9 @@
 
 	\param name The label the data should be associated with.
 	\param type The type of data you want to retrieve. You can pass 
-		\c B_ANY_TYPE if you don't mind which type the data is.
+	       \c B_ANY_TYPE if you don't mind which type the data is.
 	\param index The index in the array of the data that you want to retrieve.
-		Note that the array is zero-based.
+	       Note that the array is zero-based.
 	\param[out] data A pointer to a pointer where the data can point to.
 	\param[out] numBytes The size of the data will be put in this parameter.
 
@@ -1211,34 +1358,41 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see status_t FindData(const char *, type_code, int32,
-	 	const void **, ssize_t *) const
+	\see status_t FindData(const char*, type_code, int32,
+		const void**, ssize_t*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindData(const char *name, type_code type,
-	 	const void **data, ssize_t *numBytes) const
+	\fn status_t BMessage::FindData(const char* name, type_code type,
+		const void** data, ssize_t* numBytes) const
 	\brief Find \a data that is stored in this message.
 
 	This is an overloaded version of
-	FindData(const char *, type_code, int32, const void **, ssize_t *) const
+	FindData(const char*, type_code, int32, const void**, ssize_t*) const
 	where data is sought at \a index \c 0.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindRect(const char *name, BRect *rect) const
+	\fn status_t BMessage::FindRect(const char* name, BRect* rect) const
 	\brief Find a rectangle at the label \a name.
 
 	This is an overloaded version of
-	FindRect(const char *, int32, BRect *) const
+	FindRect(const char*, int32, BRect*) const
 	where the data is sought at \a index \c 0.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindRect(const char *name, int32 index, BRect *rect) const
+	\fn status_t BMessage::FindRect(const char* name, int32 index,
+		BRect* rect) const
 	\brief Find a rectangle at the label \a name at an \a index.
 
 	This method looks for the data with the \c B_RECT_TYPE, and copies it into
@@ -1253,22 +1407,27 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindRect(const char *, BRect *) const
+	\see FindRect(const char*, BRect*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindPoint(const char *name, BPoint *point) const
+	\fn status_t BMessage::FindPoint(const char* name, BPoint* point) const
 	\brief Find a point at the label \a name.
 
 	This is an overloaded version of
-	FindPoint(const char *, int32, BPoint *) const
+	FindPoint(const char*, int32, BPoint*) const
 	where the data is sought at \a index \c 0.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindPoint(const char *name, int32 index, BPoint *point) const
+	\fn status_t BMessage::FindPoint(const char* name, int32 index,
+		BPoint* point) const
 	\brief Find a point at the label \a name at an \a index.
 
 	This method looks for the data with the \c B_POINT_TYPE, and copies it into
@@ -1283,23 +1442,28 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindPoint(const char *, BPoint *) const
+	\see FindPoint(const char*, BPoint*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindString(const char *name, const char **string) const
+	\fn status_t BMessage::FindString(const char* name,
+		const char** string) const
 	\brief Find a string at the label \a name.
 
 	This is an overloaded version of
-	FindString(const char *, int32, const char **) const
+	FindString(const char*, int32, const char**) const
 	where the data is sought at \a index \c 0.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindString(const char *name, int32 index,
-		const char ** string) const
+	\fn status_t BMessage::FindString(const char* name, int32 index,
+		const char** string) const
 	\brief Find a string at the label \a name at an \a index.
 
 	This method looks for the data with the \c B_STRING_TYPE, and returns a
@@ -1315,23 +1479,28 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindString(const char *, const char **) const
-	\see FindString(const char *, int32, BString *) const
+	\see FindString(const char*, const char**) const
+	\see FindString(const char*, int32, BString*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindString(const char *name, BString *string) const
+	\fn status_t BMessage::FindString(const char* name, BString* string) const
 	\brief Find a string at the label \a name.
 
 	This is an overloaded version of
-	FindString(const char *, int32, BString *) const
+	FindString(const char*, int32, BString*) const
 	where the data is sought at \a index \c 0.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn status_t BMessage::FindString(const char *name, int32 index, BString *string) const
+	\fn status_t BMessage::FindString(const char* name, int32 index,
+		BString* string) const
 	\brief Find a string at the label \a name at an \a index.
 
 	This method looks for the data with the \c B_STRING_TYPE, and copies it
@@ -1346,22 +1515,28 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindString(const char *, BString *) const
-	\see FindString(const char *, int32, const char **) const
+	\see FindString(const char*, BString*) const
+	\see FindString(const char*, int32, const char**) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn status_t BMessage::FindInt8(const char *name, int8 *value) const
+	\fn status_t BMessage::FindInt8(const char* name, int8* value) const
 	\brief Find an integer at the label \a name.
 
-	This is an overloaded version of FindInt8(const char *, int32, int8 *) const
+	This is an overloaded version of
+	FindInt8(const char*, int32, int8*) const
 	where the data is sought at \a index \c 0.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindInt8(const char *name, int32 index, int8 *value) const
+	\fn status_t BMessage::FindInt8(const char* name, int32 index,
+		int8* value) const
 	\brief Find an integer at the label \a name at an \a index.
 
 	This method looks for the data with the \c B_INT8_TYPE, and copies it into
@@ -1376,15 +1551,17 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindInt8(const char *, int8 *) const
+	\see FindInt8(const char*, int8*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindInt16(const char *name, int16 *value) const
+	\fn status_t BMessage::FindInt16(const char* name, int16* value) const
 	\brief Find an integer at the label \a name.
 
-	This is an overloaded version of FindInt8(const char *, int32, int16 *) const
+	This is an overloaded version of FindInt8(const char*, int32, int16*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1393,11 +1570,14 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindInt16(const char *name, int32 index, int16 *value) const
+	\fn status_t BMessage::FindInt16(const char* name, int32 index,
+		int16* value) const
 	\brief Find an integer at the label \a name at an \a index.
 
 	This method looks for the data with the \c B_INT16_TYPE, and copies it into
@@ -1412,16 +1592,18 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindInt16(const char *, int16 *) const
+	\see FindInt16(const char*, int16*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindInt32(const char *name, int32 *value) const
+	\fn status_t BMessage::FindInt32(const char* name, int32* value) const
 	\brief Find an integer at the label \a name.
 
 	This is an overloaded version of
-	FindInt32(const char *, int32, int32 *) const
+	FindInt32(const char*, int32, int32*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1430,15 +1612,18 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindInt32(const char *name, int32 index, int32 *value) const
+	\fn status_t BMessage::FindInt32(const char* name, int32 index,
+		int32* value) const
 	\brief Find an integer at the label \a name at an \a index.
 
-	This method looks for the data with the \c B_INT32_TYPE, and copies it into
-	a provided buffer.
+	This method looks for the data with the \c B_INT32_TYPE, and copies
+	it into a provided buffer.
 
 	\param name The label to which the data is associated.
 	\param index The index from which the data should be copied.
@@ -1449,16 +1634,18 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindInt32(const char *, int32 *) const
+	\see FindInt32(const char*, int32*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindInt64(const char *name, int64 *value) const
+	\fn status_t BMessage::FindInt64(const char* name, int64* value) const
 	\brief Find an integer at the label \a name.
 
 	This is an overloaded version of
-	FindInt64(const char *, int32, int64 *) const
+	FindInt64(const char*, int32, int64*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1467,15 +1654,18 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindInt64(const char *name, int32 index, int64 *value) const
+	\fn status_t BMessage::FindInt64(const char* name, int32 index,
+		int64* value) const
 	\brief Find an integer at the label \a name at an \a index.
 
-	This method looks for the data with the \c B_INT64_TYPE, and copies it into
-	a provided buffer.
+	This method looks for the data with the \c B_INT64_TYPE, and copies
+	it into a provided buffer.
 
 	\param name The label to which the data is associated.
 	\param index The index from which the data should be copied.
@@ -1486,16 +1676,18 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindInt64(const char *, int64 *) const
+	\see FindInt64(const char*, int64*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindBool(const char *name, bool *value) const
+	\fn status_t BMessage::FindBool(const char* name, bool* value) const
 	\brief Find a boolean at the label \a name.
 
 	This is an overloaded version of
-	FindBool(const char *, int32, bool *) const
+	FindBool(const char*, int32, bool*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1504,11 +1696,14 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindBool(const char *name, int32 index, bool *value) const
+	\fn status_t BMessage::FindBool(const char* name, int32 index,
+		bool* value) const
 	\brief Find a boolean at the label \a name at an \a index.
 
 	This method looks for the data with the \c B_BOOL_TYPE, and copies it into
@@ -1523,16 +1718,18 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindBool(const char *, bool *) const
+	\see FindBool(const char*, bool*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindFloat(const char *name, float *value) const
+	\fn status_t BMessage::FindFloat(const char* name, float* value) const
 	\brief Find a float at the label \a name.
 
 	This is an overloaded version of
-	FindFloat(const char *, int32, float *) const
+	FindFloat(const char*, int32, float*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1541,15 +1738,18 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindFloat(const char *name, int32 index, float *value) const
+	\fn status_t BMessage::FindFloat(const char* name, int32 index,
+		float* value) const
 	\brief Find a float at the label \a name at an \a index.
 
-	This method looks for the data with the \c B_FLOAT_TYPE, and copies it into
-	a provided buffer.
+	This method looks for the data with the \c B_FLOAT_TYPE, and copies
+	it into a provided buffer.
 
 	\param name The label to which the data is associated.
 	\param index The index from which the data should be copied.
@@ -1560,16 +1760,18 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindFloat(const char *, float *) const
+	\see FindFloat(const char*, float*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindDouble(const char *name, double *value) const
+	\fn status_t BMessage::FindDouble(const char* name, double* value) const
 	\brief Find a double at the label \a name.
 
 	This is an overloaded version of
-	FindDouble(const char *, int32, double *) const
+	FindDouble(const char*, int32, double*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1578,11 +1780,14 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindDouble(const char *name, int32 index, double *value) const
+	\fn status_t BMessage::FindDouble(const char* name, int32 index,
+		double* value) const
 	\brief Find a double at the label \a name at an \a index.
 
 	This method looks for the data with the \c B_DOUBLE_TYPE, and copies it into
@@ -1597,16 +1802,18 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindDouble(const char *, double *) const
+	\see FindDouble(const char*, double*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindPointer(const char *name, void **pointer) const
+	\fn status_t BMessage::FindPointer(const char* name, void** pointer) const
 	\brief Find a pointer at the label \a name.
 
 	This is an overloaded version of
-	FindPointer(const char *, int32, void *) const
+	FindPointer(const char*, int32, void*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1615,21 +1822,24 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindPointer(const char *name, int32 index, void **pointer) const
+	\fn status_t BMessage::FindPointer(const char* name, int32 index,
+		void** pointer) const
 	\brief Find a pointer at the label \a name at an \a index.
 
-	This method looks for the data with the \c B_POINTER_TYPE, and copies it into
-	a provided buffer.
+	This method looks for the data with the \c B_POINTER_TYPE, and copies
+	it into a provided buffer.
 
 	\warning If you want to share objects between applications, remember
-		that each application has its own address space, and that it therefore
-		is useless to try to pass around objects by sending pointers in
-		messages. You should think about copying the entire object in the
-		message, or you should consider using shared memory.
+	         that each application has its own address space, and that it
+	         therefore is useless to try to pass around objects by sending
+	         pointers in messages. You should think about copying the entire
+	         object in the message, or you should consider using shared memory.
 
 	\param name The label to which the data is associated.
 	\param index The index from which the data should be copied.
@@ -1640,16 +1850,19 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindPointer(const char *, double *) const
+	\see FindPointer(const char*, double*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindMessenger(const char* name, BMessenger* messenger) const
+	\fn status_t BMessage::FindMessenger(const char* name,
+		BMessenger* messenger) const
 	\brief Find a messenger at the label \a name.
 
 	This is an overloaded version of
-	FindMessenger(const char *, int32, BMessenger *) const
+	FindMessenger(const char*, int32, BMessenger*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1658,11 +1871,14 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindMessenger(const char *name, int32 index, BMessenger *messenger) const
+	\fn status_t BMessage::FindMessenger(const char* name, int32 index,
+		BMessenger* messenger) const
 	\brief Find a messenger at the label \a name at an \a index.
 
 	This method looks for the data with the \c B_MESSENGER_TYPE, and copies it
@@ -1677,16 +1893,18 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindMessenger(const char *, BMessenger *) const
+	\see FindMessenger(const char*, BMessenger*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindRef(const char *name, entry_ref *ref) const
+	\fn status_t BMessage::FindRef(const char* name, entry_ref* ref) const
 	\brief Find a reference to a file at the label \a name.
 
 	This is an overloaded version of
-	FindRef(const char *, int32, entry_ref *) const
+	FindRef(const char*, int32, entry_ref*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1695,13 +1913,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindRef(const char *name, int32 index, entry_ref *ref) const
+	\fn status_t BMessage::FindRef(const char* name, int32 index,
+		entry_ref* ref) const
 	\brief Find a reference to a file at the label \a name at an
-		\a index.
+	       \a index.
 
 	This method looks for the data with the \c B_REF_TYPE, and copies it into
 	a provided buffer.
@@ -1715,16 +1936,19 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindRef(const char *, entry_ref *) const
+	\see FindRef(const char*, entry_ref*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindMessage(const char *name, BMessage *message) const
+	\fn status_t BMessage::FindMessage(const char* name,
+		BMessage* message) const
 	\brief Find a message at the label \a name.
 
 	This is an overloaded version of
-	FindMessage(const char *, int32, BMessage *) const
+	FindMessage(const char*, int32, BMessage*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1733,15 +1957,18 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindMessage(const char *name, int32 index, BMessage *message) const
+	\fn status_t BMessage::FindMessage(const char* name, int32 index,
+		BMessage* message) const
 	\brief Find a message at the label \a name at an \a index.
 
-	This method looks for the data with the \c B_MESSAGE_TYPE, and copies it
-	into a provided buffer.
+	This method looks for the data with the \c B_MESSAGE_TYPE, and
+	copies it into a provided buffer.
 
 	\param name The label to which the data is associated.
 	\param index The index from which the data should be copied.
@@ -1752,16 +1979,19 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindMessage(const char *, BMessage *) const
+	\see FindMessage(const char*, BMessage*) const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindFlat(const char *name, BFlattenable *object) const
+	\fn status_t BMessage::FindFlat(const char* name,
+		BFlattenable* object) const
 	\brief Find a flattened object at the label \a name.
 
 	This is an overloaded version of
-	FindFlat(const char *, int32, BFlattenable *) const
+	FindFlat(const char*, int32, BFlattenable*) const
 	where the data is sought at \a index \c 0.
 
 	\param name The label to which the data is associated.
@@ -1770,14 +2000,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::FindFlat(const char *name, int32 index,
-	 	BFlattenable *object) const
+	\fn status_t BMessage::FindFlat(const char* name, int32 index,
+		BFlattenable* object) const
 	\brief Find a flattened object at the label \a name at an
-		\a index.
+	       \a index.
 
 	The type is determined by the type of the passed object. If that type is
 	available at the specified label, then the Unflatten() method of that
@@ -1792,7 +2024,9 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindFlat(const char *, BFlattenable *) const
+	\see FindFlat(const char*, BFlattenable*) const
+
+	\since BeOS R3
 */
 
 
@@ -1810,33 +2044,34 @@
 
 
 /*!
-	\fn status_t BMessage::ReplaceData(const char *name, type_code type,
-		const void *data, ssize_t numBytes)
+	\fn status_t BMessage::ReplaceData(const char* name, type_code type,
+		const void* data, ssize_t numBytes)
 	\brief Replace the data at label \a name.
 
 	This method is an overloaded method that replaces the data at
 	\a index \c 0. See
-	ReplaceData(const char *, type_code, int32, const void *, ssize_t).
+	ReplaceData(const char*, type_code, int32, const void*, ssize_t).
 
 	\param name The name associated with the data to replace.
 	\param type The type of the data.
-	\param data A pointer to the new data that needs to be copied into the
-		message.
+	\param data A pointer to the new data that needs to be copied into
+	       the message.
 	\param numBytes The size of the new data.
 
 	\returns A status code, \c B_OK on success or an error code.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceData(const char *name, type_code type,
-	 	int32 index, const void *data, ssize_t numBytes)
+	\fn status_t BMessage::ReplaceData(const char* name, type_code type,
+	 	int32 index, const void* data, ssize_t numBytes)
 	\brief Replace the data at label \a name at a specified
-		\a index.
+	       \a index.
 
 	The conditions for replacing data are that the\a name is correct,
-		the \a type matches and the data entry at \a index
-		exists.
+	the \a type matches and the data entry at \a index exists.
 
 	There is also a collection of convenience methods, that allow you to
 	efficiently replace rectanges (ReplaceRect()), booleans (ReplaceBool()),
@@ -1845,25 +2080,28 @@
 	\param name The name associated with the data to replace.
 	\param type The type of the data.
 	\param index The index in the array to replace.
-	\param data A pointer to the new data that needs to be copied into the
-		message.
+	\param data A pointer to the new data that needs to be copied into
+	       the message.
 	\param numBytes The size of the new data.
 
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_BAD_VALUE One of the input parameters are invalid. Check that
-		you did not pass \c NULL, and in case the field has fixed sized data,
-		check that \a numBytes is the same as the specified fixed size.
+	        you did not pass \c NULL, and in case the field has fixed sized
+	        data, check that \a numBytes is the same as the specified fixed
+	        size.
 	\retval B_BAD_INDEX The \a index is out of range.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceRect(const char *name, BRect aRect)
+	\fn status_t BMessage::ReplaceRect(const char* name, BRect aRect)
 	\brief Replace a rectangle at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceRect(const char *, int32, BRect).
+	ReplaceRect(const char*, int32, BRect).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -1872,13 +2110,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceRect(const char *name, int32 index, BRect aRect)
+	\fn status_t BMessage::ReplaceRect(const char* name, int32 index,
+		BRect aRect)
 	\brief Replace a rectangle at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_RECT_TYPE.
@@ -1893,15 +2134,17 @@
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
 	\see ReplaceRect(const char*, BRect)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplacePoint(const char *name, BPoint aPoint)
+	\fn status_t BMessage::ReplacePoint(const char* name, BPoint aPoint)
 	\brief Replace a point at the label \a name.
 
 	This method is an overloaded method of
-	ReplacePoint(const char *, int32, BPoint).
+	ReplacePoint(const char*, int32, BPoint).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -1910,13 +2153,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The object now contains the requested data.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplacePoint(const char *name, int32 index, BPoint aPoint)
+	\fn status_t BMessage::ReplacePoint(const char* name, int32 index,
+		BPoint aPoint)
 	\brief Replace a point at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_POINT_TYPE.
@@ -1931,15 +2177,17 @@
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
 	\see ReplacePoint(const char*, aPoint)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceString(const char *name, const char *aString)
+	\fn status_t BMessage::ReplaceString(const char* name, const char* aString)
 	\brief Replace a string at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceString(const char *, int32, const char *).
+	ReplaceString(const char*, int32, const char*).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -1948,13 +2196,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceString(const char *name, int32 index, const char *aString)
+	\fn status_t BMessage::ReplaceString(const char* name, int32 index,
+		const char* aString)
 	\brief Replace a string at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be
 	replaced, if it matches the \c B_STRING_TYPE.
@@ -1968,16 +2219,19 @@
 	\retval B_BAD_INDEX The index was out of range.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see ReplaceString(const char*, const char *)
+	\see ReplaceString(const char*, const char*)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceString(const char *name, const BString &aString)
+	\fn status_t BMessage::ReplaceString(const char* name,
+		const BString& aString)
 	\brief Replace a string at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceString(const char *, int32, BString &).
+	ReplaceString(const char*, int32, BString&).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -1986,13 +2240,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceString(const char *name, int32 index, const BString &aString)
+	\fn status_t BMessage::ReplaceString(const char* name, int32 index,
+		const BString& aString)
 	\brief Replace a string at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_STRING_TYPE.
@@ -2006,16 +2263,18 @@
 	\retval B_BAD_INDEX The index was out of range.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see ReplaceString(const char*, BString &)
+	\see ReplaceString(const char*, BString&)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceInt8(const char *name, int8 value)
+	\fn status_t BMessage::ReplaceInt8(const char* name, int8 value)
 	\brief Replace an integer at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceInt8(const char *, int32, int8).
+	ReplaceInt8(const char*, int32, int8).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2024,13 +2283,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceInt8(const char *name, int32 index, int8 value)
+	\fn status_t BMessage::ReplaceInt8(const char* name, int32 index,
+		int8 value)
 	\brief Replace an integer at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_INT8_TYPE.
@@ -2045,15 +2307,17 @@
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
 	\see ReplaceInt8(const char*, int8)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceInt16(const char *name, int16 value)
+	\fn status_t BMessage::ReplaceInt16(const char* name, int16 value)
 	\brief Replace an integer at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceInt16(const char *, int32, int16).
+	ReplaceInt16(const char*, int32, int16).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2062,13 +2326,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceInt16(const char *name, int32 index, int16 value)
+	\fn status_t BMessage::ReplaceInt16(const char* name, int32 index,
+		int16 value)
 	\brief Replace an integer at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_INT16_TYPE.
@@ -2083,15 +2350,17 @@
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
 	\see ReplaceInt16(const char*, int16)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceInt32(const char *name, int32 value)
+	\fn status_t BMessage::ReplaceInt32(const char* name, int32 value)
 	\brief Replace an integer at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceInt8(const char *, int32, int32).
+	ReplaceInt8(const char*, int32, int32).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2100,13 +2369,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceInt32(const char *name, int32 index, int32 value)
+	\fn status_t BMessage::ReplaceInt32(const char* name, int32 index,
+		int32 value)
 	\brief Replace an integer at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_INT32_TYPE.
@@ -2121,15 +2393,17 @@
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
 	\see ReplaceInt32(const char*, int32)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceInt64(const char *name, int64 value)
+	\fn status_t BMessage::ReplaceInt64(const char* name, int64 value)
 	\brief Replace an integer at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceInt8(const char *, int32, int64).
+	ReplaceInt8(const char*, int32, int64).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2138,13 +2412,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceInt64(const char *name, int32 index, int64 value)
+	\fn status_t BMessage::ReplaceInt64(const char* name, int32 index,
+		int64 value)
 	\brief Replace an integer at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_INT64_TYPE.
@@ -2159,15 +2436,17 @@
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
 	\see ReplaceInt64(const char*, int64)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceBool(const char *name, bool aBoolean)
+	\fn status_t BMessage::ReplaceBool(const char* name, bool aBoolean)
 	\brief Replace a boolean at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceBool(const char *, int32, bool).
+	ReplaceBool(const char*, int32, bool).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2176,13 +2455,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceBool(const char *name, int32 index, bool aBoolean)
+	\fn status_t BMessage::ReplaceBool(const char* name, int32 index,
+		bool aBoolean)
 	\brief Replace a boolean at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_BOOL_TYPE.
@@ -2197,15 +2479,17 @@
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
 	\see ReplaceBool(const char*, bool)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceFloat(const char *name, float aFloat)
+	\fn status_t BMessage::ReplaceFloat(const char* name, float aFloat)
 	\brief Replace a float at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceFloat(const char *, int32, float).
+	ReplaceFloat(const char*, int32, float).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2214,13 +2498,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceFloat(const char *name, int32 index, float aFloat)
+	\fn status_t BMessage::ReplaceFloat(const char* name, int32 index,
+		float aFloat)
 	\brief Replace a float at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_FLOAT_TYPE.
@@ -2235,15 +2522,17 @@
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
 	\see ReplaceFloat(const char*, float)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceDouble(const char *name, double aDouble)
+	\fn status_t BMessage::ReplaceDouble(const char* name, double aDouble)
 	\brief Replace a double at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceDouble(const char *, int32, double).
+	ReplaceDouble(const char*, int32, double).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2252,13 +2541,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceDouble(const char *name, int32 index, double aDouble)
+	\fn status_t BMessage::ReplaceDouble(const char* name, int32 index,
+		double aDouble)
 	\brief Replace a double at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_DOUBLE_TYPE.
@@ -2273,15 +2565,18 @@
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
 	\see ReplaceDouble(const char*, double)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplacePointer(const char *name, const void *pointer)
+	\fn status_t BMessage::ReplacePointer(const char* name,
+		const void* pointer)
 	\brief Replace a pointer at the label \a name.
 
 	This method is an overloaded method of
-	ReplacePointer(const char *, int32, const void *).
+	ReplacePointer(const char*, int32, const void*).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2290,11 +2585,14 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplacePointer(const char *name, int32 index, const void *pointer)
+	\fn status_t BMessage::ReplacePointer(const char* name, int32 index,
+		const void* pointer)
 	\brief Replace a pointer at the label \a name at a specified \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
@@ -2309,16 +2607,19 @@
 	\retval B_BAD_INDEX The index was out of range.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see ReplacePointer(const char*, const void *)
+	\see ReplacePointer(const char*, const void*)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceMessenger(const char *name, BMessenger messenger)
+	\fn status_t BMessage::ReplaceMessenger(const char* name,
+		BMessenger messenger)
 	\brief Replace a messenger at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceMessenger(const char *, int32, BMessenger).
+	ReplaceMessenger(const char*, int32, BMessenger).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2327,13 +2628,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceMessenger(const char *name, int32 index, BMessenger messenger)
+	\fn status_t BMessage::ReplaceMessenger(const char* name, int32 index,
+		BMessenger messenger)
 	\brief Replace a messenger at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_MESSENGER_TYPE.
@@ -2348,15 +2652,17 @@
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
 	\see ReplaceMessenger(const char*, BMessenger)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceRef(const char *name,const entry_ref *ref)
+	\fn status_t BMessage::ReplaceRef(const char* name, const entry_ref* ref)
 	\brief Replace a reference to a file at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceRef(const char *, int32, entry_ref *).
+	ReplaceRef(const char*, int32, entry_ref*).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2365,11 +2671,14 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceRef(	const char *name, int32 index, const entry_ref *ref)
+	\fn status_t BMessage::ReplaceRef(const char* name, int32 index,
+		const entry_ref* ref)
 	\brief Replace a reference to a file at the label \a name at a
 		specified \a index.
 
@@ -2385,16 +2694,19 @@
 	\retval B_BAD_INDEX The index was out of range.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see ReplaceRef(const char*, entry_ref *)
+	\see ReplaceRef(const char*, entry_ref*)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceMessage(const char *name, const BMessage *message)
+	\fn status_t BMessage::ReplaceMessage(const char* name,
+		const BMessage* message)
 	\brief Replace a message at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceMessage(const char *, int32, BMessage *).
+	ReplaceMessage(const char*, int32, BMessage*).
 	It replaces the data at \a index \c 0.
 
 	\param name The name associated with the data to replace.
@@ -2403,13 +2715,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceMessage(const char *name, int32 index, const BMessage *message)
+	\fn status_t BMessage::ReplaceMessage(const char* name, int32 index,
+		const BMessage* message)
 	\brief Replace a message at the label \a name at a specified
-		\a index.
+	       \a index.
 
 	The data at the specified \a name and \a index will be replaced, if it
 	matches the \c B_MESSAGE_TYPE.
@@ -2423,16 +2738,18 @@
 	\retval B_BAD_INDEX The index was out of range.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see ReplaceMessage(const char*, BMessage *)
+	\see ReplaceMessage(const char*, BMessage*)
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceFlat(const char *name, BFlattenable *object)
+	\fn status_t BMessage::ReplaceFlat(const char* name, BFlattenable* object)
 	\brief Replace a flattened object at the label \a name.
 
 	This method is an overloaded method of
-	ReplaceFlat(const char *, int32, BFlattenable *).
+	ReplaceFlat(const char*, int32, BFlattenable*).
 
 	It replaces the data at \a index \c 0.
 
@@ -2442,13 +2759,16 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_OK The operation succeeded.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMessage::ReplaceFlat(const char *name, int32 index, BFlattenable *object)
+	\fn status_t BMessage::ReplaceFlat(const char* name, int32 index,
+		BFlattenable* object)
 	\brief Replace a flattened object at the label \a name at a
-		specified \a index.
+	       specified \a index.
 
 	The data at the specified \a name and \a index will be
 	replaced, if it matches the type returned by your object. This method uses
@@ -2463,7 +2783,9 @@
 	\retval B_BAD_INDEX The index was out of range.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see ReplaceFlat(const char*, BFlattenable *)
+	\see ReplaceFlat(const char*, BFlattenable*)
+
+	\since BeOS R3
 */
 
 
@@ -2471,7 +2793,62 @@
 
 
 /*!
-	\name Deprecated methods
+	\name Operators
+
+	The new and delete operators are deprecated and are only provided for
+	backwards compatibility.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BMessage& BMessage::operator=(const BMessage& other)
+	\brief Copy one message into another.
+
+	See the copy constructor, BMessage(const BMessage& other), for details on
+	what is copied, and what isn't.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void* BMessage::operator new(size_t size)
+	\brief Allocates \a size bytes of memory for a BMessage.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void* BMessage::operator new(size_t, void* pointer)
+	\brief Allocates \a size bytes of memory for a BMessage.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BMessage::operator delete(void* pointer, size_t size)
+	\brief Frees memory allocated by new.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R5
+*/
+
+
+//! @}
+
+
+/*!
+	\name Deprecated Methods
 
 	These methods are likely to disappear as they have been replaced by safer
 	and more powerful methods but are implemented for the purpose of binary
@@ -2483,182 +2860,272 @@
 
 
 /*!
-	\fn void *BMessage::operator new(size_t size)
-	\brief Internal operator.
-*/
-
-
-/*!
-	\fn void *BMessage::operator new(size_t, void *pointer)
-	\brief Internal operator.
-*/
-
-
-/*!
-	\fn void BMessage::operator delete(void *pointer, size_t size)
-	\brief Internal operator.
-*/
-
-
-/*!
-	\fn bool BMessage::HasRect(const char *, int32) const
+	\fn bool BMessage::HasRect(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasPoint(const char *, int32) const
+	\fn bool BMessage::HasPoint(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasString(const char *, int32) const
+	\fn bool BMessage::HasString(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasInt8(const char *, int32) const
+	\fn bool BMessage::HasInt8(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasInt16(const char *, int32) const
+	\fn bool BMessage::HasInt16(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn	bool BMessage::HasInt32(const char *, int32) const
+	\fn bool BMessage::HasInt32(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasInt64(const char *, int32) const
+	\fn bool BMessage::HasInt64(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasBool(const char *, int32) const
+	\fn bool BMessage::HasBool(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasFloat(const char *, int32) const
+	\fn bool BMessage::HasFloat(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasDouble(const char *, int32) const
+	\fn bool BMessage::HasDouble(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasPointer(const char *, int32) const
+	\fn bool BMessage::HasPointer(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasMessenger(const char *, int32) const
+	\fn bool BMessage::HasMessenger(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasRef(const char *, int32) const
+	\fn bool BMessage::HasRef(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasMessage(const char *, int32) const
+	\fn bool BMessage::HasMessage(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasFlat(const char *, const BFlattenable *) const
+	\fn bool BMessage::HasFlat(const char*, const BFlattenable*) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasFlat(const char *, int32, const BFlattenable *) const
+	\fn bool BMessage::HasFlat(const char*, int32, const BFlattenable*) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::HasData(const char *, type_code , int32) const
+	\fn bool BMessage::HasData(const char*, type_code, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BRect BMessage::FindRect(const char *, int32) const
+	\fn BRect BMessage::FindRect(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BPoint BMessage::FindPoint(const char *, int32) const
+	\fn BPoint BMessage::FindPoint(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn const char *BMessage::FindString(const char *, int32) const
+	\fn const char* BMessage::FindString(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn int8 BMessage::FindInt8(const char *, int32) const
+	\fn int8 BMessage::FindInt8(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn int16 BMessage::FindInt16(const char *, int32) const
+	\fn int16 BMessage::FindInt16(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn int32 BMessage::FindInt32(const char *, int32) const
+	\fn int32 BMessage::FindInt32(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn	int64 BMessage::FindInt64(const char *, int32) const
+	\fn int64 BMessage::FindInt64(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMessage::FindBool(const char *, int32) const
+	\fn bool BMessage::FindBool(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn float BMessage::FindFloat(const char *, int32) const
+	\fn float BMessage::FindFloat(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn double BMessage::FindDouble(const char *, int32) const
+	\fn double BMessage::FindDouble(const char*, int32) const
 	\brief Deprecated.
+
+	\warning This method is deprecated, do not use.
+
+	\since BeOS R3
 */
 
 
@@ -2705,6 +3172,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2720,6 +3189,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2733,6 +3204,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2748,6 +3221,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2761,6 +3236,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2776,6 +3253,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2789,6 +3268,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2804,6 +3285,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2817,6 +3300,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2832,6 +3317,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2845,6 +3332,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2860,6 +3349,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2873,6 +3364,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2888,6 +3381,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2901,6 +3396,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2916,6 +3413,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2929,6 +3428,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2944,6 +3445,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2957,6 +3460,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2972,6 +3477,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -2985,6 +3492,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3000,6 +3509,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3014,6 +3525,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3029,6 +3542,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3043,6 +3558,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3058,6 +3575,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3072,6 +3591,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3087,6 +3608,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3100,6 +3623,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3115,6 +3640,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3129,6 +3656,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3144,6 +3673,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3158,6 +3689,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 
@@ -3173,6 +3706,8 @@ bool enabled = GetBool("enabled", false);
 	       is not found.
 
 	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
 */
 
 

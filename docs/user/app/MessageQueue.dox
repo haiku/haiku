@@ -1,14 +1,16 @@
 /*
- * Copyright 2007, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		/trunk/headers/os/app/MessageQueue.h  rev 19956
- *		/trunk/src/kits/app/MessageQueue.cpp  rev 19956
+ *		/trunk/headers/os/app/MessageQueue.h	hrev47355
+ *		/trunk/src/kits/app/MessageQueue.cpp	hrev47355
  */
+
 
 /*!
 	\file MessageQueue.h
@@ -37,19 +39,23 @@
 	perform, that you only do this after the object has been locked (see
 	Lock()). The most important method, NextMessage() will fail if you have not
 	complied with this requirement.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BMessageQueue::BMessageQueue()
 	\brief Constructs an empty message queue.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BMessageQueue::~BMessageQueue()
 	\brief Destruct the BMessageQueue. It iterates over any messages left on
-		the queue and deletes them.
+	       the queue and deletes them.
 
 	The implementation is careful not to release the lock when the
 	BMessageQueue is deconstructed.  If the lock is released, it is
@@ -58,6 +64,8 @@
 	BLocker from the destructor once it is acquired. That way, any thread
 	waiting to do a AddMessage() will fail to acquire the lock since the
 	BLocker will be deleted before they can acquire it.
+
+	\since BeOS R3
 */
 
 
@@ -71,6 +79,8 @@
 
 	Because a BMessageQueue claims ownership of the \a message, it is important
 	that the message does not belong to another BMessageQueue.
+
+	\since BeOS R3
 */
 
 
@@ -80,45 +90,55 @@
 
 	If the \a message is indeed associated with this queue, it is removed from
 	it. This effectively means that you regain ownership of the message.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn int32 BMessageQueue::CountMessages() const
 	\brief Return the number of messages waiting in the queue.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool BMessageQueue::IsEmpty() const
 	\brief Check if there are messages waiting in the queue.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BMessage *BMessageQueue::FindMessage(int32 index) const
+	\fn BMessage* BMessageQueue::FindMessage(int32 index) const
 	\brief Retrieve the message at the \a index of this queue.
 
 	\param index A zero-based index of the message you want to retrieve.
 
 	\return A pointer to a message, or \c NULL if the \a index is out of
-		bounds.
+	        bounds.
 	\see FindMessage(uint32, int32) for a variant that takes a specific \c what
-		identifier.
+	     identifier.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BMessage *BMessageQueue::FindMessage(uint32 what, int32 index) const
+	\fn BMessage* BMessageQueue::FindMessage(uint32 what, int32 index) const
 	\brief Retrieve the message at the \a index of this queue, but only if it
-	 	has a specific \a what constant.
+	       has a specific \a what constant.
 
 	\param index A zero-based index of the message you want to retrieve.
 	\param what The \a what code of the message.
 
 	\return A pointer to a message, or \c NULL if there is no message at the
-		\a index with that \a what constant, or if the \a index is out of
-		bounds.
+	        \a index with that \a what constant, or if the \a index is out of
+	        bounds.
+
+	\since BeOS R3
 */
 
 
@@ -127,6 +147,8 @@
 	\brief Lock the queue so no other thread can perform operations on it.
 
 	\see Unlock()
+
+	\since BeOS R3
 */
 
 
@@ -135,6 +157,8 @@
 	\brief Unlock the queue after a Lock() request.
 
 	\see Lock()
+
+	\since BeOS R3
 */
 
 
@@ -142,21 +166,27 @@
 	\fn bool BMessageQueue::IsLocked() const
 	\brief Check if the queue is locked.
 
-	\see Lock() and Unlock()
+	\see Lock()
+	\see Unlock()
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn BMessage *BMessageQueue::NextMessage()
+	\fn BMessage* BMessageQueue::NextMessage()
 	\brief Remove the first BMessage on the queue and return it to the caller.
 
 	After calling this method, you get the ownership of the message, so make
 	sure it is deleted after you are done.
 
 	\return A pointer to a message, or \c NULL if the queue is empty, or the
-		object has not been properly locked.
+	        object has not been properly locked.
+
 	\see Lock()
 	\see IsNextMessage()
+
+	\since BeOS R3
 */
 
 
@@ -164,4 +194,6 @@
 	\fn bool BMessageQueue::IsNextMessage(const BMessage* message) const
 	\brief Check if the pointer to a \a message points at the next message on
 		the queue.
+
+	\since Haiku R1
 */

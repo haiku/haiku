@@ -1,13 +1,14 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
- * 
+ *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		headers/os/app/MessageFilter.h
- *		src/kits/app/MessageFilter.cpp
+ *		headers/os/app/MessageFilter.h	hrev47355
+ *		src/kits/app/MessageFilter.cpp	hrev47355
  */
 
 
@@ -25,20 +26,26 @@
 
 	These return codes should be used in your own filter_hook function, or by
 	your overridden BMessageFilter::Filter() method.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_SKIP_MESSAGE
 	\brief The message does not pass the filter criteria and should not be
-		handled.
+	       handled.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_DISPATCH_MESSAGE
 	\brief The message passes the filter criteria and should be dispatched to
-		a BHandler.
+	       a BHandler.
+
+	\since BeOS R3
 */
 
 
@@ -46,27 +53,29 @@
 	\typedef filter_result (*filter_hook) (BMessage* message,
 		 BHandler** target, BMessageFilter* filter)
 	\brief Prototype for a custom \c filter_hook for use in the BMessageFilter
-		class.
+	       class.
 
 	This hook can be used when you are constructing a new BMessageFilter
 	object. It is a custom filter function you can use.
 
 	This hook should handle the following parameters:
-	
+
 	\param[in] message The message that needs to be verified.
 	\param[out] target If your filter hook is conscious about the available
-		handlers, you can set a specific BHandler based on your filters
-		requirements. You do not have to change this field, because there will
-		always be a working default.
+	            handlers, you can set a specific BHandler based on your filters
+	            requirements. You do not have to change this field, because
+	            there will always be a working default.
 	\param[in] filter A pointer to the filter from which this hook is called.
 
 	\return You should return #B_SKIP_MESSAGE in case the message does not
-		conform to the filter criteria, or #B_DISPATCH_MESSAGE if the message
-		passes these criteria.
+	        conform to the filter criteria, or #B_DISPATCH_MESSAGE if the
+	        message passes these criteria.
 
 	\see BMessageFilter(uint32, filter_hook)
-		BMessageFilter(message_delivery, message_source, filter_hook)
-		BMessageFilter(message_delivery, message_source, uint32, filter_hook)
+	\see BMessageFilter(message_delivery, message_source, filter_hook)
+	\see BMessageFilter(message_delivery, message_source, uint32, filter_hook)
+
+	\since BeOS R3
 */
 
 
@@ -81,25 +90,33 @@
 	With this filter you can, for example, specify that your handler only
 	handles deliveries that were programmed by you, and not any random drag and
 	drop actions initiated by the user.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_ANY_DELIVERY
 	\brief Accept both delivery methods.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_DROPPED_DELIVERY
 	\brief Only accept messages that were dropped by the user in the GUI.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_PROGRAMMED_DELIVERY
 	\brief Only accept messages that were delivered using the
-		BLooper::PostMessage() method.
+	       BLooper::PostMessage() method.
+
+	\since BeOS R3
 */
 
 
@@ -116,27 +133,35 @@
 	You use these constants in the constructors of the BMessageFilter class.
 
 	\warning System messages, for example from the \c app_server, are
-		considered remote messages. Keep this in mind when you want to set up
-		criteria for your window and application loopers.
+	         considered remote messages. Keep this in mind when you want
+	         to set up criteria for your window and application loopers.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_ANY_SOURCE
 	\brief Accept both local and remote messages.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_REMOTE_SOURCE
 	\brief Only accept messages from a remote source, so from other
-		applications.
+	       applications.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_LOCAL_SOURCE
 	\brief Only accept messages from your own local application.
+
+	\since BeOS R3
 */
 
 
@@ -150,16 +175,15 @@
 	messages should have in order to be processed by a handler or a looper.
 	BMessageFilter provides three default filter criteria, the \c what
 	constant, the #message_source and the type of message_delivery,
-	 and an extendible #filter_hook.
+	and an extendible #filter_hook.
 
 	BMessageFilter's standard filter criteria can be extended in two ways:
 	-# Specify a #filter_hook. This is a static function that takes a message
-		 and a pointer to a BHandler as arguments, and allows you to accept or
-		reject the message, and even redirect it to a specific BHandler.
+	   and a pointer to a BHandler as arguments, and allows you to accept or
+	   reject the message, and even redirect it to a specific BHandler.
 	-# Subclass the BMessageFilter class and override the Filter() function.
-		This has the same capabilities as using a #filter_hook, but it allows
-		cleaner code (in some cases).
-	
+	   This has the same capabilities as using a #filter_hook, but it allows
+	   cleaner code (in some cases).
 	Both methods have their merits, but please remember that you have to choose
 	which one you want to use, since you can't use both. The order of
 	processing the criteria is in this order: the source, the delivery method,
@@ -212,6 +236,8 @@ looper->AddCommonFilter(filter);
 	The two classes that use BMessageFilter are BLooper and BHandler. In the
 	general messaging introduction, there is also a section on 
 	\ref app-messaging-receiving "handling messages".
+
+	\since BeOS R3
 */
 
 
@@ -225,6 +251,8 @@ looper->AddCommonFilter(filter);
 
 	\see BMessageFilter(message_delivery, message_source, filter_hook)
 	\see BMessageFilter(message_delivery, message_source, uint32 what, filter_hook)
+
+	\since BeOS R3
 */
 
 
@@ -239,6 +267,8 @@ looper->AddCommonFilter(filter);
 
 	\see BMessageFilter(uint32 what,filter_hook)
 	\see BMessageFilter(message_delivery, message_source, uint32 what, filter_hook)
+
+	\since BeOS R3
 */
 
 
@@ -253,30 +283,40 @@ looper->AddCommonFilter(filter);
 
 	\see BMessageFilter(uint32 what,filter_hook)
 	\see BMessageFilter(message_delivery, message_source, filter_hook)
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BMessageFilter::BMessageFilter(const BMessageFilter& filter)
 	\brief Copy constructor. Copy the criteria from another object.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BMessageFilter::BMessageFilter(const BMessageFilter* filter)
 	\brief Create a new object based on criteria of another object.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BMessageFilter::~BMessageFilter()
 	\brief Destructor. Does nothing.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BMessageFilter &BMessageFilter::operator=(const BMessageFilter& from)
+	\fn BMessageFilter& BMessageFilter::operator=(const BMessageFilter& from)
 	\brief Assignment operator. Copies criteria from another filter.
+
+	\since BeOS R3
 */
 
 
@@ -291,23 +331,29 @@ looper->AddCommonFilter(filter);
 
 	\param message The message that needs to be filtered.
 	\param target If you want to, you can specify a handler that should handle
-		this message. Note that you do have to pass a handler that is
-		associated with the looper that received the message.
+	       this message. Note that you do have to pass a handler that is
+	       associated with the looper that received the message.
 
 	\return You should return \c B_DISPATCH_MESSAGE in case the message passes
-		the tests, or \c B_SKIP_MESSAGE in case the message does not pass.
+	        the tests, or \c B_SKIP_MESSAGE in case the message does not pass.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn message_delivery BMessageFilter::MessageDelivery() const
 	\brief Return the message_delivery criterium of this filter.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn message_source BMessageFilter::MessageSource() const
 	\brief Return the message_source criterium of this filter.
+
+	\since BeOS R3
 */
 
 
@@ -319,6 +365,8 @@ looper->AddCommonFilter(filter);
 	the message constant.
 
 	\see FiltersAnyCommand() const
+
+	\since BeOS R3
 */
 
 
@@ -327,10 +375,14 @@ looper->AddCommonFilter(filter);
 	\brief Return whether or not this filter has a message command criterium.
 
 	\see Command() const
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BLooper *BMessageFilter::Looper() const
+	\fn BLooper* BMessageFilter::Looper() const
 	\brief Return the looper this filter is associated with.
+
+	\since BeOS R3
 */

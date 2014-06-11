@@ -1,13 +1,13 @@
 /*
- * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  * 
  * Corresponds to:
- *		headers/os/app/Application.h	rev 42794
- *		src/kits/app/Application.cpp	rev 42794
+ *		headers/os/app/Application.h	hrev47355
+ *		src/kits/app/Application.cpp	hrev47355
  */
 
 
@@ -16,6 +16,22 @@
 	\ingroup app
 	\ingroup libbe
 	\brief Provides the BApplication class.
+*/
+
+
+/*!
+	\var be_app
+	\brief Global system app object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var be_app_messenger
+	\brief Global system app messenger object.
+
+	\since BeOS R3
 */
 
 
@@ -45,7 +61,7 @@
 	Typically, you initialize the BApplication object in the programs main()
 	function. A typical main() function looks something like this:
 
-	\code
+\code
 #include Application.h
 
 main()
@@ -57,12 +73,14 @@ main()
 
 	return 0;
 }
-	\endcode
+\endcode
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BApplication::BApplication(const char *signature)
+	\fn BApplication::BApplication(const char* signature)
 	\brief Initialize a BApplication with the passed in \a signature.
 
 	The new BApplication is, by default, not running yet. If you have
@@ -72,13 +90,15 @@ main()
 	errors.
 
 	\param signature The \a signature of the application.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BApplication::BApplication(const char *signature, status_t *_error)
+	\fn BApplication::BApplication(const char* signature, status_t* _error)
 	\brief Initialize a BApplication with the passed in \a signature and a
-		pointer to an error message.
+	       pointer to an error message.
 
 	Any error that occurs while constructing the BApplication will be
 	set to the \a _error pointer. If \a _error points to a \c status_t
@@ -90,6 +110,8 @@ main()
 	\param signature The \a signature of the application.
 	\param _error A pointer to a \c status_t set by the BApplication
 		constructor.
+
+	\since BeOS R5
 */
 
 /*!
@@ -97,7 +119,9 @@ main()
 	\brief Returns the status of the constructor.
 
 	\returns If initialization succeeded returns \c B_OK, otherwise returns an
-		error status.
+	         error status.
+
+	\since BeOS R5
 */
 
 
@@ -110,21 +134,25 @@ main()
 
 
 /*!
-	\fn BApplication::BApplication(BMessage *data)
+	\fn BApplication::BApplication(BMessage* data)
 	\brief Initialize a BApplication object from a message.
 
 	The message must contain the signature of the application you wish to
 	initialize in the "mime_sig" variable.
 
 	\param data The message to initialize the BApplication from.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BApplication::Archive(BMessage *data, bool deep) const
+	\fn status_t BApplication::Archive(BMessage* data, bool deep) const
 	\brief Archive the BApplication object into a BMessage.
 
 	\sa BArchivable::Archive()
+
+	\since BeOS R3
 */
 
 
@@ -133,6 +161,8 @@ main()
 	\brief Restores the BApplication object from a BMessage.
 
 	\sa BArchivable::Instantiate()
+
+	\since BeOS R3
 */
 
 
@@ -142,6 +172,8 @@ main()
 /*!
 	\fn BApplication::~BApplication()
 	\brief Destructor Method
+
+	\since BeOS R3
 */
 
 
@@ -156,17 +188,20 @@ main()
 /*!
 	\fn thread_id BApplication::Run()
 	\brief Starts the message loop in the thread that it is called from,
-		and doesn't return until the message loop stops. Run() does not spawn
-		a new thread.
+	       and doesn't return until the message loop stops.
 
-	\returns the thread_id of the thread that the BApplication is called from.
+	Run() does not spawn a new thread.
+
+	\return The thread_id of the thread that the BApplication is called from.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BApplication::Quit()
 	\brief Tells the thread to finish processing the message queue, disallowing
-		any new messages.
+	       any new messages.
 
 	Quit() doesn't kill the looper thread. After Quit() returns, it doesn't wait
 	for the message queue to empty. Run() will be then able to return. 
@@ -175,6 +210,8 @@ main()
 	should delete the BApplication object yourself one Run() returns.
 	However Quit() does delete the object if it's called before the message loop
 	starts i.e. before Run() is called.
+
+	\since BeOS R3
 */
 
 
@@ -192,7 +229,7 @@ main()
 /*!
 	\fn bool BApplication::QuitRequested()
 	\brief Hook method that gets invoked when the BApplication receives a
-		\c B_QUIT_REQUESTED message.
+	       \c B_QUIT_REQUESTED message.
 
 	BApplication sends a QuitRequested() message to each of its BWindow objects.
 	If all of the BWindow s return \c true then the windows are
@@ -200,15 +237,17 @@ main()
 	\c true. If any of the BWindow returns \c false, the BWindow s
 	are not destroyed and QuitRequested() returns \c false.
 
-	\retval true The application quit.
-	\retval false The application failed to quit.
+	\return \c true if the application quit or \c false if the
+	        application failed to quit.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BApplication::ReadyToRun()
 	\brief Hook method that's invoked when the BApplication receives a
-		\c B_READY_TO_RUN message.
+	       \c B_READY_TO_RUN message.
 
 	The ReadyToRun() method is automatically called by the Run() method. It is
 	sent after the initial \c B_REFS_RECEIVED and \c B_ARGV_RECEIVED messages
@@ -219,13 +258,15 @@ main()
 	ReadyToRun() method to do whatever you want to do. If you haven't
 	constructed any windows in your application yet then this would be a good
 	place to do so.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BApplication::ArgvReceived(int32 argc, char **argv)
+	\fn void BApplication::ArgvReceived(int32 argc, char** argv)
 	\brief Hook method that gets invoked when the application receives a
-		\c B_ARGV_RECEIVED message.
+	       \c B_ARGV_RECEIVED message.
 
 	If command line arguments are specified when the application is launched
 	from the the shell, or if \c argv/argc values are passed to
@@ -251,6 +292,8 @@ main()
 	generate a \c B_ARGV_RECEIVED message and send it to the already running
 	instance. Thus in this case the \c B_ARGV_RECEIVED message can show
 	up at any time.
+
+	\since BeOS R3
 */
 
 
@@ -270,13 +313,15 @@ main()
 
 	This method is called after ReadyToRun() provided the application is
 	displaying a window that can be set active.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BApplication::RefsReceived(BMessage *message)
+	\fn void BApplication::RefsReceived(BMessage* message)
 	\brief Hook method that gets invoked when the application receives a
-		\c B_REFS_RECEIVED message.
+	       \c B_REFS_RECEIVED message.
 
 	The message is sent in response to a user action such as a user
 	drag-and-dropping a file on your app's icon or opening a file that the
@@ -288,20 +333,24 @@ main()
 	something with the received refs. Typically you create BEntry or BFile
 	objects from the passed in refs.
 
-	\param message contains a single field named "be:refs" that contains one or
-		more entry_ref (\c B_REF_TYPE) items, one for each file sent.
+	\param message contains a single field named "be:refs" that contains one
+	       or more entry_ref (\c B_REF_TYPE) items, one for each file sent.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BApplication::AboutRequested()
 	\brief Hook method that gets invoked when the BApplication receives a
-	\c B_ABOUT_REQUESTED message.
+	       \c B_ABOUT_REQUESTED message.
 
 	You should override this method to pop an alert to provide information
 	about the application.
 
 	The default implementation pops a basic alert dialog.
+
+	\since BeOS R3
 */
 
 
@@ -319,18 +368,24 @@ main()
 /*!
 	\fn BApplication::ShowCursor()
 	\brief Restores the cursor.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BApplication::HideCursor()
 	\brief Hides the cursor from the screen.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BApplication::ObscureCursor()
 	\brief Hides the cursor until the mouse is moved.
+
+	\since BeOS R3
 */
 
 
@@ -339,11 +394,13 @@ main()
 	\brief Returns whether or not the cursor is hidden.
 
 	\returns \c true if the cursor is hidden, \c false if not.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BApplication::SetCursor(const void *cursor)
+	\fn void BApplication::SetCursor(const void* cursor)
 	\brief Sets the \a cursor to be used when the application is active.
 
 	You can pass one of the pre-defined cursor constants such as
@@ -352,19 +409,23 @@ main()
 	class.
 
 	\param cursor The cursor data to set the cursor to.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BApplication::SetCursor(const BCursor *cursor, bool sync)
+	\fn void BApplication::SetCursor(const BCursor* cursor, bool sync)
 	\brief Sets the \a cursor to be used when the application is active
-		with \a sync immediately option.
+	       with \a sync immediately option.
 
 	The default BCursors to use are \c B_CURSOR_SYSTEM_DEFAULT for the hand
 	cursor and \c B_CURSOR_I_BEAM for the I-beam cursor.
 
 	\param cursor A BCursor object to set the \a cursor to.
 	\param sync synchronize the cursor immediately.
+
+	\since BeOS R5
 */
 
 
@@ -384,13 +445,15 @@ main()
 	\brief Returns the number of windows created by the application.
 
 	\returns the number of windows created by the application.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BWindow* BApplication::WindowAt(int32 index) const
 	\brief Returns the BWindow object at the specified \a index in the
-		application's window list.
+	       application's window list.
 
 	If \a index is out of range, this function returns \c NULL.
 
@@ -399,7 +462,9 @@ main()
 	\param index The \a index of the desired BWindow.
 
 	\returns The BWindow object at the specified \a index or \c NULL
-		if the \a index is out of range.
+	         if the \a index is out of range.
+
+	\since BeOS R3
 */
 
 
@@ -410,18 +475,22 @@ main()
 	\warning This method may return \c B_ERROR.
 
 	\returns The number of BLoopers in the application.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BLooper* BApplication::LooperAt(int32 index) const
 	\brief Returns the BLooper object at the specified index in the
-		application's looper list.
+	       application's looper list.
 
 	If index is out of range, this function returns \c NULL.
 
 	\returns The BLooper object at the specified \a index or \c NULL
-		if the \a index is out of range.
+	         if the \a index is out of range.
+
+	\since BeOS R5
 */
 
 
@@ -439,17 +508,19 @@ main()
 /*!
 	\fn bool BApplication::IsLaunching() const
 	\brief Returns whether or not the application is in the process of
-		launching.
+	       launching.
 
 	\returns \c true if the application is launching, \c false if the
-		application is already running.
+	         application is already running.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BApplication::GetAppInfo(app_info *info) const
 	\brief Fills out the \a info parameter with information about the
-		application.
+	       application.
 
 	This is equivalent to
 	be_roster->GetRunningAppInfo(be_app->Team(), info);
@@ -457,12 +528,16 @@ main()
 	\returns \c B_NO_INIT on an error or \c B_OK if all goes well.
 
 	\sa BRoster::GetAppInfo()
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BResources* BApplication::AppResources()
 	\brief Returns a BResources object for the application.
+
+	\since BeOS R5
 */
 
 
@@ -479,14 +554,14 @@ main()
 
 /*!
 	\fn void BApplication::MessageReceived(BMessage *message)
-	\sa BHandler::MessageReceived()
+	\copydoc BHandler::MessageReceived()
 */
 
 
 /*!
 	\fn void BApplication::DispatchMessage(BMessage *message,
 		BHandler *handler)
-	\sa BLooper::DispatchMessage()
+	\copydoc BLooper::DispatchMessage()
 */
 
 
@@ -504,7 +579,7 @@ main()
 /*!
 	\fn void BApplication::Pulse()
 	\brief Hook method that gets invoked when the BApplication receives a
-		\c B_PULSE message.
+	       \c B_PULSE message.
 
 	An action is performed each time app_server calls the Pulse() method. 
 	The pulse rate is set by SetPulseRate(). You can implement Pulse() to do
@@ -512,6 +587,8 @@ main()
 	is no better than once per 100,000 microseconds.
 
 	\sa SetPulseRate()
+
+	\since BeOS R3
 */
 
 
@@ -523,7 +600,9 @@ main()
 	The pulse rate can be no faster than once per 100,000 microseconds or so.
 
 	\param rate The rate at which \c B_PULSE messages are sent to the
-		application.
+	       application.
+
+	\since BeOS R3
 */
 
 
@@ -539,15 +618,15 @@ main()
 
 
 /*!
-	\fn BHandler* BApplication::ResolveSpecifier(BMessage *message, int32 index,
-		BMessage *specifier, int32 what, const char *property)
-	\sa BHandler::ResolveSpecifier()
+	\fn BHandler* BApplication::ResolveSpecifier(BMessage* message,
+		int32 index, BMessage *specifier, int32 what, const char *property)
+	\copydoc BHandler::ResolveSpecifier()
 */
 
 
 /*!
-	\fn status_t BApplication::GetSupportedSuites(BMessage *data)
-	\sa BHandler::GetSupportedSuites()
+	\fn status_t BApplication::GetSupportedSuites(BMessage* data)
+	\copydoc BHandler::GetSupportedSuites()
 */
 
 

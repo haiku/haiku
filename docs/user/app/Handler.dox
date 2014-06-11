@@ -1,13 +1,14 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
- * 
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
+ *
  * Corresponds to:
- *		headers/os/app/Handler.h	rev 22577
- *		src/kits/app/Handler.cpp	rev 21332
+ *		headers/os/app/Handler.h	hrev47355
+ *		src/kits/app/Handler.cpp	hrev47355
  */
 
 /*!
@@ -24,6 +25,8 @@
 /*!
 	\def B_OBSERVE_WHAT_CHANGE
 	\brief Internal.
+
+	\since BeOS R5
 */
 
 
@@ -37,6 +40,8 @@
 	but with the what constant set to \c B_OBSERVER_NOTICE_CHANGE. The original
 	\c what constant of the transmitted data message is stored behind the
 	label defined by this constant.
+
+	\since BeOS R5
 */
 
 
@@ -46,6 +51,8 @@
 	
 	\note Specifying this parameter as the \a what value, leads to the same
 		results as calling BHandler::StartWatchingAll().
+
+	\since BeOS R5
 */
 
 
@@ -120,16 +127,20 @@
 	BHandler is a part of the chain in the eloquent messaging structure. For a
 	proper understanding of all its facets, have a look at the \ref app_messaging
 	"messaging overview".
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BHandler::BHandler(const char *name)
+	\fn BHandler::BHandler(const char* name)
 	\brief Construct a new handler with a \a name.
 
 	The newly constructed handler is not associated with a looper until you
 	explicitly request this to happen. To associate this handler with a looper,
 	use BLooper::AddHandler().
+
+	\since BeOS R3
 */
 
 
@@ -144,16 +155,21 @@
 	\warning This constructor does no type check whatsoever. Since you can pass
 		any BMessage, you should - if you are not sure about the exact type -
 		use the Instantiate() method, which does check the type.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BArchivable *BHandler::Instantiate(BMessage *data)
+	\fn BArchivable* BHandler::Instantiate(BMessage* data)
 	\brief Static method to instantiate a handler from an archived message.
 
 	\return A pointer to the instantiated handler, or \c NULL if the \a data
 		is not a valid archived BHandler object.
+
 	\see BHandler(BMessage* data)
+
+	\since BeOS R3
 */
 
 
@@ -178,11 +194,13 @@
 	Note that only the name is stored. The filters, the associated looper and
 	the observers are not stored, and should be manually added when you are
 	using this object.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BHandler::Archive(BMessage *data, bool deep) const
+	\fn status_t BHandler::Archive(BMessage* data, bool deep) const
 	\brief Archive a handler to a message
 
 	Currently, only the name is archived. The filters, the associated looper
@@ -190,9 +208,14 @@
 
 	\param data The message to archive the object in.
 	\param deep This parameter is ignored, as BHandler does not have children.
+
+	\return A status code.
 	\retval B_OK Archiving succeeded.
 	\retval B_BAD_VALUE The \a data parameter is not a valid message.
-	\see BHandler::Instantiate(BMessage *data)
+
+	\see BHandler::Instantiate(BMessage* data)
+
+	\since BeOS R3
 */
 
 
@@ -211,7 +234,7 @@
 
 
 /*!
-	\fn void BHandler::MessageReceived(BMessage *message)
+	\fn void BHandler::MessageReceived(BMessage* message)
 	\brief Handle \a message that has been received by the associated looper.
 
 	This method is reimplemented by subclasses. If the messages that have
@@ -250,42 +273,53 @@ ShowImageApp::MessageReceived(BMessage *message)
 	which will reply with \c B_MESSAGE_NOT_UNDERSTOOD.
 
 	\attention If you want to keep or manipulate the \a message, have a
-		look at BLooper::DetachCurrentMessage() to receive ownership of
-		the \a message.
+	           look at BLooper::DetachCurrentMessage() to receive ownership
+	           of the \a message.
 
 	\param message The message that needs to be handled.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BLooper *BHandler::Looper() const
+	\fn BLooper* BHandler::Looper() const
 	\brief Return a pointer to the looper that this handler is associated with.
 
 	\return If the handler is not yet associated with a looper, it will return
-		\c NULL.
+	        \c NULL.
+
 	\see BLooper::AddHandler()
 	\see LockLooper()
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BHandler::SetName(const char *name)
 	\brief Set or change the name of this handler.
+
 	\see Name()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn const char *BHandler::Name() const
+	\fn const char* BHandler::Name() const
 	\brief Return the name of this handler.
+
 	\see SetName()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BHandler::SetNextHandler(BHandler *handler)
+	\fn void BHandler::SetNextHandler(BHandler* handler)
 	\brief Set the next handler in the chain that the message is passed on to
-		if this \a handler cannot process it.
+	       if this \a handler cannot process it.
 
 	This method has three requirements:
 	-# This \a handler should belong to a looper.
@@ -299,14 +333,19 @@ ShowImageApp::MessageReceived(BMessage *message)
 	a looper with BLooper::AddHander().
 
 	\see NextHandler()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BHandler *BHandler::NextHandler() const
+	\fn BHandler* BHandler::NextHandler() const
 	\brief Return the next hander in the chain to which the message is passed
-		on.
+	       on.
+
 	\see SetNextHandler()
+
+	\since BeOS R3
 */
 
 
@@ -335,12 +374,15 @@ ShowImageApp::MessageReceived(BMessage *message)
 	stored. As such, you need to make sure that the \a filter object exists as
 	long as it is added to this handler.
 
-	\see RemoveFilter(), SetFilterList()
+	\see RemoveFilter()
+	\see SetFilterList()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BHandler::RemoveFilter(BMessageFilter *filter)
+	\fn bool BHandler::RemoveFilter(BMessageFilter* filter)
 	\brief Remove \a filter from the filter list.
 
 	If the handler is associated with a looper, this looper needs to be locked
@@ -349,10 +391,13 @@ ShowImageApp::MessageReceived(BMessage *message)
 	Note that the \a filter is not deleted, merely removed from the list. You
 	need to take care of the memory yourself.
 
-	\retval true The \a filter was in the filter list and is removed.
-	\retval false The \a filter was not found in the filter list.
+	\return \c true if the \a filter was in the filter list and is removed,
+	        \c false if the \a filter was not found in the filter list.
 
-	\see AddFilter(), FilterList()
+	\see AddFilter()
+	\see FilterList()
+
+	\since BeOS R3
 */
 
 
@@ -367,18 +412,24 @@ ShowImageApp::MessageReceived(BMessage *message)
 	existing filters will be \b deleted.
 
 	\see AddFilter(), FilterList()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BList *BHandler::FilterList()
+	\fn BList* BHandler::FilterList()
 	\brief Return a pointer to the list of filters.
 
 	\return A pointer to the list of filters. Do not manipulate the list of
-		filters directly, but use the methods provided by this class, in order
-		to maintain internal consistency.
+	        filters directly, but use the methods provided by this class, in
+	        order to maintain internal consistency.
 
-	\see AddFilter(), RemoveFilter(), SetFilterList().
+	\see AddFilter()
+	\see RemoveFilter()
+	\see SetFilterList().
+
+	\since BeOS R3
 */
 
 
@@ -403,10 +454,13 @@ ShowImageApp::MessageReceived(BMessage *message)
 	\fn bool BHandler::LockLooper()
 	\brief Lock the looper associated with this handler.
 
-	\retval true The looper is locked.
-	\retval false There was an error acquiring the lock.
+	\return \c true if the looper is locked, \c false if there was an error
+	        acquiring the lock.
 
-	\see LockLooperWithTimeout(), UnlockLooper()
+	\see LockLooperWithTimeout()
+	\see UnlockLooper()
+
+	\since BeOS R4
 */
 
 
@@ -415,21 +469,27 @@ ShowImageApp::MessageReceived(BMessage *message)
 	\brief Lock the looper associated with this handler, with a time out value.
 
 	\param timeout The time to wait for acquiring the lock in microseconds. You
-		may also use B_INFINITE_TIMEOUT, in which this method will wait as long
-		as it takes to acquire the lock.
+	       may also use \c B_INFINITE_TIMEOUT, in which this method will wait
+	       as long as it takes to acquire the lock.
 
+	\return A status code.
 	\retval B_OK Locking succeeded.
 	\retval B_BAD_VALUE This handler is not associated with a looper (anymore).
 	\retval B_TIMED_OUT The time specified in \a timeout has passed without
 		locking the looper.
 
-	\see LockLooper(), UnlockLooper()
+	\see LockLooper()
+	\see UnlockLooper()
+
+	\since BeOS R4
 */
 
 
 /*!
 	\fn void BHandler::UnlockLooper()
 	\brief Unlock the looper.
+
+	\since BeOS R4
 */
 
 
@@ -448,16 +508,29 @@ ShowImageApp::MessageReceived(BMessage *message)
 
 
 /*!
-	\fn BHandler * BHandler::ResolveSpecifier(BMessage *msg, int32 index,
-		BMessage *specifier, int32 form, const char *property)
+	\fn BHandler* BHandler::ResolveSpecifier(BMessage* message, int32 index,
+		BMessage* specifier, int32 what, const char* property)
 	\brief Determine the proper handler for a scripting message.
+
+	\param message The scripting message to determine the handler.
+	\param index The index of the specifier.
+	\param specifier The message which contains the specifier.
+	\param what The 'what' field of the specifier message.
+	\param property The name of the target property.
+
+	\return A pointer to the proper BHandler for the given scripting
+	        message.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BHandler::GetSupportedSuites(BMessage *data)
+	\fn status_t BHandler::GetSupportedSuites(BMessage* data)
 	\brief Reports the suites of messages and specifiers that derived classes
 		understand.
+
+	\since BeOS R3
 */
 
 
@@ -488,7 +561,7 @@ ShowImageApp::MessageReceived(BMessage *message)
 /*!
 	\fn status_t BHandler::StartWatching(BMessenger target, uint32 what)
 	\brief Subscribe this handler to watch a specific state change of a
-		\a target.
+	       \a target.
 
 	Use this method to subscribe messengers to watch state changes in this
 	handler, this also means that observers from other teams can be
@@ -502,14 +575,16 @@ BMessenger messengerA(&A)
 B.StartWatching(messengerA, kNetworkConnection);
 \endcode
 
-	\param target The messenger from which the notifications would be
-		received.
+	\param target The messenger from which the notifications would be received.
 	\param what The state that needs to be watched.
+
 	\return During the call of this method, a notification will be transmitted
-		using the \a target. If this works, then this method will return
-		\c B_OK.
+	        using the \a target. If this works, then this method will return
+	        \c B_OK.
 
 	\see StartWatchingAll(BMessenger), StopWatching(BMessenger, uint32)
+
+	\since BeOS R5
 */
 
 
@@ -521,6 +596,8 @@ B.StartWatching(messengerA, kNetworkConnection);
 	but it will subscribe to all the state changes the \a target knows. 
 
 	\see StartWatching(BMessenger, uint32), StopWatchingAll(BMessenger)
+
+	\since BeOS R5
 */
 
 
@@ -532,6 +609,8 @@ B.StartWatching(messengerA, kNetworkConnection);
 	in a \a target.
 
 	\see StartWatching(BMessenger, uint32)
+
+	\since BeOS R5
 */
 
 
@@ -542,6 +621,8 @@ B.StartWatching(messengerA, kNetworkConnection);
 	This method will unsubscribe the \a target from watching all state changes.
 
 	\see StartWatchingAll(BMessenger)
+
+	\since BeOS R5
 */
 
 
@@ -570,6 +651,8 @@ A.StartWatching(&B, kNetworkConnection);
 		\c B_OK.
 
 	\see StartWatchingAll(BHandler*), StopWatching(BHandler*, uint32)	
+
+	\since BeOS R5
 */
 
 
@@ -582,6 +665,8 @@ A.StartWatching(&B, kNetworkConnection);
 	tracks.
 
 	\see StartWatching(BHandler*, uint32), StopWatchingAll(BHandler*)	
+
+	\since BeOS R5
 */
 
 
@@ -592,6 +677,8 @@ A.StartWatching(&B, kNetworkConnection);
 	This method will unsubscribe the \a handler from watching a specific event.
 
 	\see StartWatching(BHandler*, uint32)
+
+	\since BeOS R5
 */
 
 
@@ -602,6 +689,8 @@ A.StartWatching(&B, kNetworkConnection);
 	This method will unsubscribe the \a handler from watching all state changes.
 
 	\see StartWatchingAll(BHandler*)
+
+	\since BeOS R5
 */
 
 
@@ -624,26 +713,31 @@ A.StartWatching(&B, kNetworkConnection);
 
 
 /*!
-	\fn void BHandler::SendNotices(uint32 what, const BMessage *msg)
+	\fn void BHandler::SendNotices(uint32 what, const BMessage* notice)
 	\brief Emit a state change to the observers.
 
 	The actual state (specified by \a what) will not be transmitted. This is
 	merely for internal bookkeeping. It is not entirely unimaginable that you
 	still want to inform the observers of what actually took place. You can
-	use the \a msg to transmit this, and any other data you want. Note that the
-	message will be copied and slightly altered: the \c what member of the
+	use the \a msg to transmit this, and any other data you want. Note that
+	the message will be copied and slightly altered: the \c what member of the
 	message will be \c B_OBSERVER_NOTICE_CHANGE, and the \c what constant you
 	specified will be stored in the #B_OBSERVE_ORIGINAL_WHAT label.
 
 	\param what The identifier of the state.
-	\param msg Any data associated with the state change. You retain ownership
-		of this data, so make sure you dispose it when you are done.
+	\param notice Any data associated with the state change. You retain
+	       ownership of this data, so make sure you dispose it when you are
+	       done.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn bool BHandler::IsWatched() const
 	\brief Check if there are any observers watching this handler.
+
+	\since BeOS R5
 */
 
 

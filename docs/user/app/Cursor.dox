@@ -1,13 +1,13 @@
 /*
- * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  * 
  * Corresponds to:
- *		headers/os/app/Cursor.h	 hrev45039
- *		src/kits/app/Cursor.cpp	 hrev45039
+ *		headers/os/app/Cursor.h	 hrev47355
+ *		src/kits/app/Cursor.cpp	 hrev47355
  */
 
 
@@ -22,180 +22,240 @@
 /*!
 	\enum BCursorID
 	List of predefined cursor IDs
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_SYSTEM_DEFAULT
 	System default cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_CONTEXT_MENU
 	Context menu cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_COPY
 	Copy cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_CREATE_LINK
 	Symlink cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_CROSS_HAIR
 	Cross hairs cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_FOLLOW_LINK
 	Follow html link cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_GRAB
 	Grab cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_GRABBING
 	Grabbing cursor (mouse down)
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_HELP
 	Help cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_I_BEAM
 	I beam cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_I_BEAM_HORIZONTAL
 	Horizontal I beam cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_MOVE
 	Move cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_NO_CURSOR
 	No cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_NOT_ALLOWED
 	Not allowed cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_PROGRESS
 	Progress cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_NORTH
 	Resize north cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_EAST
 	Resize east cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_SOUTH
 	Resize south cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_WEST
 	Resize west cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_NORTH_EAST
 	Resize north east cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_NORTH_WEST
 	Resize north west cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_SOUTH_EAST
 	Resize south east cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_SOUTH_WEST
 	Resize south west cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_NORTH_SOUTH
 	Resize north south cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_EAST_WEST
 	Resize east west cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_NORTH_EAST_SOUTH_WEST
 	Resize north east south west cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_RESIZE_NORTH_WEST_SOUTH_EAST
 	Resize north west south east cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_ZOOM_IN
 	Zoom in cursor
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var BCursorID B_CURSOR_ID_ZOOM_OUT
 	Zoom out cursor
+
+	\since BeOS R5
 */
 
 
@@ -207,6 +267,8 @@
 
 	\note As BeOS only supports 16x16 monochrome cursors, to see a nice
 		  shadowed one we will need to extend this.
+
+	\since BeOS R5
 */
 
 
@@ -218,6 +280,8 @@
 	with the cursor data.
 
 	\param cursorData The cursor data.
+
+	\since BeOS R5
 */
 
 
@@ -226,6 +290,8 @@
 	\brief Initializes a new cursor object from a predefined cursor \a id.
 
 	\param id The predefined \a id to initialize to.
+
+	\since BeOS R5
 */
 
 
@@ -234,6 +300,8 @@
 	\brief Initializes a new cursor object from another cursor object.
 
 	\param other The cursor object to initialize from.
+
+	\since BeOS R5
 */
 
 
@@ -242,24 +310,32 @@
 	\brief Initializes a new cursor object from a message archive.
 
 	\param data The message data to initialize from.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BCursor::~BCursor()
 	\brief Destroy the cursor and free it's memory.
+
+	\since BeOS R5
 */
 
 
 /*!
 	status_t BCursor::Archive(BMessage *into, bool deep) const
 	\brief Archive the cursor. Not implemented.
+
+	\since BeOS R5
 */
 
 
 /*!
 	BArchivable* BCursor::Instantiate(BMessage *data)
 	\brief Instantiate the cursor from a message. Not implemented.
+
+	\since BeOS R5
 */
 
 
@@ -270,6 +346,8 @@
 	\param other The cursor object to copy from.
 
 	\returns the new cursor object.
+
+	\since BeOS R5
 */
 
 
@@ -280,7 +358,9 @@
 	\param other The cursor object to compare to.
 
 	\returns \c true if the cursor objects are equal, \c false if the cursor
-		objects are not equal.
+	         objects are not equal.
+
+	\since BeOS R5
 */
 
 
@@ -292,4 +372,6 @@
 
 	\returns \c true if the cursor objects are not equal, \c false if the cursor
 		objects are equal.
+
+	\since BeOS R5
 */

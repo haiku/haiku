@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		John Scipione, jscipione@gmail.com
  * 
  * Corresponds to:
- *		headers/os/app/Clipboard.h	 rev 42274
- *		src/kits/app/Clipboard.cpp	 rev 42274
+ *		headers/os/app/Clipboard.h	 hrev47355
+ *		src/kits/app/Clipboard.cpp	 hrev47355
  */
 
 
@@ -23,6 +23,8 @@
 /*!
 	\var be_clipboard
 	\brief Global system clipboard object.
+
+	\since BeOS R3
 */
 
 
@@ -97,11 +99,13 @@ if (be_clipboard->Lock()) {
 } else
 	fprintf(stderr, "could not lock clipboard.\n");
 \endcode
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BClipboard::BClipboard(const char *name, bool transient = false)
+	\fn BClipboard::BClipboard(const char* name, bool transient = false)
 	\brief Create a BClipboard object with the given \a name.
 
 	If the \a name parameter is \c NULL then the "system" BClipboard object
@@ -109,12 +113,16 @@ if (be_clipboard->Lock()) {
 
 	\param name The \a name of the clipboard.
 	\param transient If \c true, lose data after a reboot (currently unused).
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BClipboard::~BClipboard()
 	\brief Destroys the BClipboard object. The clipboard data is not destroyed.
+
+	\since BeOS R3
 */
 
 
@@ -123,11 +131,13 @@ if (be_clipboard->Lock()) {
 	\brief Returns the name of the BClipboard object.
 
 	\returns The name of the clipboard.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Commit Count Methods
+	\name Commit Count
 */
 
 
@@ -147,6 +157,8 @@ if (be_clipboard->Lock()) {
 	\return The number of commits to the clipboard.
 
 	\sa SystemCount()
+
+	\since BeOS R5
 */
 
 
@@ -164,6 +176,8 @@ if (be_clipboard->Lock()) {
 	\return The number of commits to the clipboard.
 
 	\sa LocalCount()
+
+	\since BeOS R5
 */
 
 
@@ -171,7 +185,7 @@ if (be_clipboard->Lock()) {
 
 
 /*!
-	\name Monitoring Methods
+	\name Monitoring
 */
 
 
@@ -190,6 +204,8 @@ if (be_clipboard->Lock()) {
 	\retval B_ERROR An error occured.
 
 	\sa StopWatching()
+
+	\since BeOS R5
 */
 
 
@@ -202,6 +218,8 @@ if (be_clipboard->Lock()) {
 	\retval B_ERROR An error occurred.
 
 	\sa StartWatching()
+
+	\since BeOS R5
 */
 
 
@@ -209,7 +227,7 @@ if (be_clipboard->Lock()) {
 
 
 /*!
-	\name Locking Methods
+	\name Locking
 */
 
 
@@ -219,13 +237,15 @@ if (be_clipboard->Lock()) {
 /*!
 	\fn bool BClipboard::Lock()
 	\brief Locks the clipboard so that no other tread can read from it or
-		write to it.
+	       write to it.
 
 	You should call Lock() before reading or writing to the clipboard.
 
 	\returns \c true if the clipboard was locked, \c false otherwise.
 
 	\sa Unlock()
+
+	\since BeOS R3
 */
 
 
@@ -234,6 +254,8 @@ if (be_clipboard->Lock()) {
 	\brief Unlocks the clipboard.
 
 	\sa Lock()
+
+	\since BeOS R3
 */
 
 
@@ -242,6 +264,8 @@ if (be_clipboard->Lock()) {
 	\brief Returns whether or not the clipboard is locked.
 
 	\returns \c true if the clipboard is locked, \c false if it is unlocked.
+
+	\since BeOS R5
 */
 
 
@@ -249,7 +273,7 @@ if (be_clipboard->Lock()) {
 
 
 /*!
-	\name Clipboard Data Transaction Methods
+	\name Clipboard Data Transaction
 */
 
 
@@ -262,10 +286,13 @@ if (be_clipboard->Lock()) {
 
 	You should call Clear() before adding new data to the BClipboard object.
 
+	\return A status code.
 	\retval B_OK Everything went find.
 	\retval B_NOT_ALLOWED The clipboard is not locked.
 	\retval B_NO_MEMORY Ran out of memory initializing the data message.
 	\retval B_ERROR Another error occurred.
+
+	\since BeOS R3
 */
 
 
@@ -273,9 +300,12 @@ if (be_clipboard->Lock()) {
 	\fn status_t BClipboard::Commit()
 	\brief Commits the clipboard data to the BClipboard object.
 
+	\return A status code.
 	\retval B_OK Everything went find.
 	\retval B_NOT_ALLOWED The clipboard is not locked.
 	\retval B_ERROR Another error occurred.
+
+	\since BeOS R3
 */
 
 
@@ -287,9 +317,12 @@ if (be_clipboard->Lock()) {
 	\param failIfChanged Whether or not to fail to commit the changes
 		if there is a change in the clipboard data.
 
+		\return A status code.
 	\retval B_OK Everything went find.
 	\retval B_NOT_ALLOWED The clipboard is not locked.
 	\retval B_ERROR Another error occurred.
+
+	\since BeOS R5
 */
 
 
@@ -301,10 +334,13 @@ if (be_clipboard->Lock()) {
 	clipboard data message and then decide to revert the change instead of
 	committing it.
 
+	\return A status code.
 	\retval B_OK Everything went find.
 	\retval B_NOT_ALLOWED The clipboard is not locked.
 	\retval B_NO_MEMORY Ran out of memory initializing the data message.
 	\retval B_ERROR Another error occurred.
+
+	\since BeOS R5
 */
 
 
@@ -312,7 +348,7 @@ if (be_clipboard->Lock()) {
 
 
 /*!
-	\name Clipboard Data Message Methods
+	\name Clipboard Data Message
 */
 
 
@@ -328,6 +364,8 @@ if (be_clipboard->Lock()) {
 
 	\returns A BMessenger object that targets the application that last
 		modified the clipboard.
+
+	\since BeOS R3
 */
 
 
@@ -340,6 +378,8 @@ if (be_clipboard->Lock()) {
 
 	\returns A pointer to the BMessage object that holds the clipboard
 		data or \c NULL if the clipboard is not locked.
+
+	\since BeOS R3
 */
 
 
