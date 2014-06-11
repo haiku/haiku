@@ -375,7 +375,7 @@ CookieTest::OrderTest()
 
 	// Check that the cookie with the most specific path is sent first
 	while (it.HasNext()) {
-		BNetworkCookie* cookie = it.Next();
+		const BNetworkCookie* cookie = it.Next();
 		switch(count)
 		{
 			case 0:
@@ -834,10 +834,10 @@ CookieTest::_GetCookie(BNetworkCookieJar& jar, const BUrl& url,
 	const char* name)
 {
 	BNetworkCookieJar::UrlIterator it = jar.GetUrlIterator(url);
-	BNetworkCookie* result = NULL;
+	const BNetworkCookie* result = NULL;
 
 	while (it.HasNext()) {
-		BNetworkCookie* cookie = it.Next();
+		const BNetworkCookie* cookie = it.Next();
 		if (cookie->Name() == name) {
 			// Make sure the cookie is found only once.
 			CPPUNIT_ASSERT(result == NULL);
