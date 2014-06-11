@@ -24,129 +24,117 @@
 //	Description:	A MediaKit producer node which mixes sound from the GameKit
 //					and sends them to the audio mixer
 //------------------------------------------------------------------------------
+#ifndef _GAME_PRODUCER_H
+#define _GAME_PRODUCER_H
 
-#ifndef _GAMEPRODUCER_H
-#define _GAMEPRODUCER_H
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <media/BufferProducer.h>
 #include <media/MediaEventLooper.h>
 #include <GameSoundDefs.h>
 
-// Project Includes ------------------------------------------------------------
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 class GameSoundBuffer;
-	
-// GameProducer class -------------------------------------------------------------	
-class GameProducer : public BBufferProducer,  public BMediaEventLooper
-{
+
+
+class GameProducer : public BBufferProducer, public BMediaEventLooper {
 public:
-						GameProducer(GameSoundBuffer * object, 
-										const gs_audio_format * format);
-						~GameProducer();
-	
+								GameProducer(GameSoundBuffer* object,
+									const gs_audio_format * format);
+								~GameProducer();
+
 	// BMediaNode methods
-	BMediaAddOn*		AddOn(int32* internal_id) const;
+			BMediaAddOn*		AddOn(int32* internal_id) const;
 
 	// BBufferProducer methods
-	status_t 			FormatSuggestionRequested(media_type type,
-												int32 quality,
-												media_format* format);
+			status_t			FormatSuggestionRequested(media_type type,
+									int32 quality, media_format* format);
 
-	status_t 		FormatProposal(const media_source& output,
+			status_t			FormatProposal(const media_source& output,
 									media_format* format);
 
-	status_t 		FormatChangeRequested(const media_source& source,
-											const media_destination& destination,
-											media_format* io_format,
-											int32* _deprecated_);
-
-	status_t 		GetNextOutput(int32* cookie,
-									media_output* out_output);
-
-	status_t 		DisposeOutputCookie(int32 cookie);
-
-	status_t 		SetBufferGroup(const media_source& for_source,
-									BBufferGroup* group);
-
-	
-	status_t 		GetLatency(bigtime_t* out_latency);
-
-	status_t 		PrepareToConnect(const media_source& what,
-									 const media_destination& where,
-									 media_format* format,
-									 media_source* out_source,
-									 char* out_name);
-
-	void 			Connect(status_t error, 
-							const media_source& source,
-							const media_destination& destination,
-							const media_format& format,
-							char* io_name);
-
-	void 			Disconnect(const media_source& what,
-								const media_destination& where);
-
-	void 			LateNoticeReceived(const media_source& what,
-										bigtime_t how_much,
-										bigtime_t performance_time);
-
-	void 			EnableOutput(const media_source & what,
-									bool enabled,
+			status_t	 		FormatChangeRequested(const media_source& source,
+									const media_destination& destination,
+									media_format* io_format,
 									int32* _deprecated_);
 
-	status_t 		SetPlayRate(int32 numer,
-								int32 denom);
+			status_t			GetNextOutput(int32* cookie,
+									media_output* _output);
 
-	status_t 		HandleMessage(int32 message,
-									const void* data,
+			status_t			DisposeOutputCookie(int32 cookie);
+
+			status_t			SetBufferGroup(const media_source& forSource,
+									BBufferGroup* group);
+
+
+			status_t			GetLatency(bigtime_t* _latency);
+
+			status_t			PrepareToConnect(const media_source& what,
+									const media_destination& where,
+									media_format* format,
+									media_source* _source,
+									char* out_name);
+
+			void				Connect(status_t error,
+									const media_source& source,
+									const media_destination& destination,
+									const media_format& format,
+									char* ioName);
+
+			void				Disconnect(const media_source& what,
+									const media_destination& where);
+
+			void				LateNoticeReceived(const media_source& what,
+									bigtime_t howMuch,
+									bigtime_t performanceDuration);
+
+			void				EnableOutput(const media_source & what,
+									bool enabled, int32* _deprecated_);
+
+			status_t			SetPlayRate(int32 numerator, int32 denominator);
+
+			status_t			HandleMessage(int32 message, const void* data,
 									size_t size);
 
-	void 			AdditionalBufferRequested(const media_source& source,
-												media_buffer_id prev_buffer,
-												bigtime_t prev_time,
-												const media_seek_tag* prev_tag);	
-												
-	void 			LatencyChanged(const media_source& source,
+			void				AdditionalBufferRequested(const media_source& source,
+									media_buffer_id prev_buffer,
+									bigtime_t prev_time,
+									const media_seek_tag* prev_tag);
+
+			void 				LatencyChanged(const media_source& source,
 									const media_destination& destination,
 									bigtime_t new_latency,
 									uint32 flags);
 
 	// BMediaEventLooper methods
-	void 			NodeRegistered();
-	void 			SetRunMode(run_mode mode);
-	void 			HandleEvent(const media_timed_event* event,
-								bigtime_t lateness,
-								bool realTimeEvent = false);
+			void 				NodeRegistered();
+			void 				SetRunMode(run_mode mode);
+			void 				HandleEvent(const media_timed_event* event,
+									bigtime_t lateness,
+									bool realTimeEvent = false);
 
 	// GameProducer
-	status_t			StartPlaying(GameSoundBuffer* sound);
-	status_t			StopPlaying(GameSoundBuffer* sound);
-	bool				IsPlaying(GameSoundBuffer* sound) const;
-	
-	int32				SoundCount() const;
-						
+			status_t			StartPlaying(GameSoundBuffer* sound);
+			status_t			StopPlaying(GameSoundBuffer* sound);
+			bool				IsPlaying(GameSoundBuffer* sound) const;
+
+			int32				SoundCount() const;
+
 private:
-	BBuffer* 			FillNextBuffer(bigtime_t event_time);
-	
-	BBufferGroup *	 	fBufferGroup;
-	bigtime_t 			fLatency, fInternalLatency;
-	media_output	 	fOutput;
-	bool 				fOutputEnabled;
-	media_format 		fPreferredFormat;
-	
-	bigtime_t			fStartTime;
-	size_t 				fFrameSize;
-	int64				fFramesSent;
-	GameSoundBuffer *	fObject;	
-	size_t				fBufferSize;
+			BBuffer* 			FillNextBuffer(bigtime_t event_time);
+
+			BBufferGroup*	 	fBufferGroup;
+			bigtime_t 			fLatency;
+			bigtime_t			fInternalLatency;
+			media_output	 	fOutput;
+			bool 				fOutputEnabled;
+			media_format 		fPreferredFormat;
+
+			bigtime_t			fStartTime;
+			size_t				fFrameSize;
+			int64				fFramesSent;
+			GameSoundBuffer*	fObject;
+			size_t				fBufferSize;
 };
 
-#endif
+
+#endif	// _GAME_PRODUCER_H

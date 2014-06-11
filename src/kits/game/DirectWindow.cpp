@@ -1,10 +1,10 @@
 /*
- * Copyright 2003-2009, Haiku Inc.
+ * Copyright 2003-2009 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
  * Authors:
  *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  *		Carwyn Jones <turok2@currantbun.com>
- *
- * Distributed under the terms of the MIT License.
  */
 
 
@@ -164,7 +164,7 @@ print_direct_buffer_info(const direct_buffer_info &info)
 //	#pragma mark -
 
 
-BDirectWindow::BDirectWindow(BRect frame, const char *title, window_type type,
+BDirectWindow::BDirectWindow(BRect frame, const char* title, window_type type,
 		uint32 flags, uint32 workspace)
 	:
 	BWindow(frame, title, type, flags, workspace)
@@ -173,7 +173,7 @@ BDirectWindow::BDirectWindow(BRect frame, const char *title, window_type type,
 }
 
 
-BDirectWindow::BDirectWindow(BRect frame, const char *title, window_look look,
+BDirectWindow::BDirectWindow(BRect frame, const char* title, window_look look,
 		window_feel feel, uint32 flags, uint32 workspace)
 	:
 	BWindow(frame, title, look, feel, flags, workspace)
@@ -191,15 +191,15 @@ BDirectWindow::~BDirectWindow()
 //	#pragma mark - BWindow API implementation
 
 
-BArchivable *
-BDirectWindow::Instantiate(BMessage *data)
+BArchivable*
+BDirectWindow::Instantiate(BMessage* data)
 {
 	return NULL;
 }
 
 
 status_t
-BDirectWindow::Archive(BMessage *data, bool deep) const
+BDirectWindow::Archive(BMessage* data, bool deep) const
 {
 	return inherited::Archive(data, deep);
 }
@@ -213,14 +213,14 @@ BDirectWindow::Quit()
 
 
 void
-BDirectWindow::DispatchMessage(BMessage *message, BHandler *handler)
+BDirectWindow::DispatchMessage(BMessage* message, BHandler* handler)
 {
 	inherited::DispatchMessage(message, handler);
 }
 
 
 void
-BDirectWindow::MessageReceived(BMessage *message)
+BDirectWindow::MessageReceived(BMessage* message)
 {
 	inherited::MessageReceived(message);
 }
@@ -310,23 +310,24 @@ BDirectWindow::Hide()
 }
 
 
-BHandler *
-BDirectWindow::ResolveSpecifier(BMessage *msg, int32 index,
-	BMessage *specifier, int32 form, const char *property)
+BHandler*
+BDirectWindow::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
 {
-	return inherited::ResolveSpecifier(msg, index, specifier, form, property);
+	return inherited::ResolveSpecifier(message, index, specifier, what,
+		property);
 }
 
 
 status_t
-BDirectWindow::GetSupportedSuites(BMessage *data)
+BDirectWindow::GetSupportedSuites(BMessage* data)
 {
 	return inherited::GetSupportedSuites(data);
 }
 
 
 status_t
-BDirectWindow::Perform(perform_code d, void *arg)
+BDirectWindow::Perform(perform_code d, void* arg)
 {
 	return inherited::Perform(d, arg);
 }
@@ -339,8 +340,8 @@ BDirectWindow::task_looper()
 }
 
 
-BMessage *
-BDirectWindow::ConvertToMessage(void *raw, int32 code)
+BMessage*
+BDirectWindow::ConvertToMessage(void* raw, int32 code)
 {
 	return inherited::ConvertToMessage(raw, code);
 }
@@ -350,14 +351,14 @@ BDirectWindow::ConvertToMessage(void *raw, int32 code)
 
 
 void
-BDirectWindow::DirectConnected(direct_buffer_info *info)
+BDirectWindow::DirectConnected(direct_buffer_info* info)
 {
 	// implemented in subclasses
 }
 
 
 status_t
-BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
+BDirectWindow::GetClippingRegion(BRegion* region, BPoint* origin) const
 {
 	if (region == NULL)
 		return B_BAD_VALUE;
@@ -452,9 +453,9 @@ BDirectWindow::SupportsWindowMode(screen_id id)
 
 
 /*static*/ int32
-BDirectWindow::_daemon_thread(void *arg)
+BDirectWindow::_daemon_thread(void* arg)
 {
-	return static_cast<BDirectWindow *>(arg)->_DirectDaemon();
+	return static_cast<BDirectWindow*>(arg)->_DirectDaemon();
 }
 
 
@@ -521,7 +522,7 @@ BDirectWindow::_LockDirect() const
 	status_t status = B_OK;
 
 #if DW_NEEDS_LOCKING
-	BDirectWindow *casted = const_cast<BDirectWindow *>(this);
+	BDirectWindow* casted = const_cast<BDirectWindow*>(this);
 
 	if (atomic_add(&casted->fDirectLock, 1) > 0) {
 		do {
@@ -543,7 +544,7 @@ void
 BDirectWindow::_UnlockDirect() const
 {
 #if DW_NEEDS_LOCKING
-	BDirectWindow *casted = const_cast<BDirectWindow *>(this);
+	BDirectWindow* casted = const_cast<BDirectWindow*>(this);
 
 	if (atomic_add(&casted->fDirectLock, -1) > 1)
 		release_sem(casted->fDirectSem);

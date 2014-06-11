@@ -94,15 +94,14 @@ private:
 			size_t				fFrameSize;
 			size_t				fBufferSize;
 			size_t				fPlayPosition;
-			
+
 			thread_id			fReadThread;
 			port_id				fPort;
-			
+
 			_gs_ramp*			fPausing;
 			bool				fPaused;
 			float				fPauseGain;
 
-				
 			uint32				_reserved[9];
 };
 

@@ -25,8 +25,8 @@
 const int32 kPages = 20;
 struct _gs_media_tracker
 {
-	BMediaFile *	file;
-	BMediaTrack * 	stream;
+	BMediaFile*		file;
+	BMediaTrack* 	stream;
 	int64			frames;
 	size_t			position;
 };
@@ -34,7 +34,7 @@ struct _gs_media_tracker
 
 // Local utility functions -----------------------------------------------
 bool
-FillBuffer(_gs_ramp * ramp, uint8 * data, uint8 * buffer, size_t * bytes)
+FillBuffer(_gs_ramp* ramp, uint8* data, uint8* buffer, size_t* bytes)
 {
 	int32 samples = *bytes / sizeof(uint8);
 
@@ -53,7 +53,7 @@ FillBuffer(_gs_ramp * ramp, uint8 * data, uint8 * buffer, size_t * bytes)
 
 
 bool
-FillBuffer(_gs_ramp * ramp, int16 * data, int16 * buffer, size_t * bytes)
+FillBuffer(_gs_ramp* ramp, int16* data, int16* buffer, size_t* bytes)
 {
 	int32 samples = *bytes / sizeof(int16);
 
@@ -72,7 +72,7 @@ FillBuffer(_gs_ramp * ramp, int16 * data, int16 * buffer, size_t * bytes)
 
 
 bool
-FillBuffer(_gs_ramp * ramp, int32 * data, int32 * buffer, size_t * bytes)
+FillBuffer(_gs_ramp* ramp, int32* data, int32* buffer, size_t* bytes)
 {
 	size_t byte = 0;
 	bool bytesAreReady = (*bytes > 0);
@@ -95,7 +95,7 @@ FillBuffer(_gs_ramp * ramp, int32 * data, int32 * buffer, size_t * bytes)
 
 
 bool
-FillBuffer(_gs_ramp * ramp, float * data, float * buffer, size_t * bytes)
+FillBuffer(_gs_ramp* ramp, float* data, float* buffer, size_t* bytes)
 {
 	size_t byte = 0;
 	bool bytesAreReady = (*bytes > 0);
@@ -118,8 +118,8 @@ FillBuffer(_gs_ramp * ramp, float * data, float * buffer, size_t * bytes)
 
 
 // BFileGameSound -------------------------------------------------------
-BFileGameSound::BFileGameSound(const entry_ref *file, bool looping,
-	BGameSoundDevice *device)
+BFileGameSound::BFileGameSound(const entry_ref* file, bool looping,
+	BGameSoundDevice* device)
 	:
 	BStreamingGameSound(device),
 	fAudioStream(NULL),
@@ -136,8 +136,8 @@ BFileGameSound::BFileGameSound(const entry_ref *file, bool looping,
 }
 
 
-BFileGameSound::BFileGameSound(const char *file, bool looping,
-	BGameSoundDevice *device)
+BFileGameSound::BFileGameSound(const char* file, bool looping,
+	BGameSoundDevice* device)
 	:
 	BStreamingGameSound(device),
 	fAudioStream(NULL),
@@ -182,7 +182,7 @@ BFileGameSound::~BFileGameSound()
 }
 
 
-BGameSound *
+BGameSound*
 BFileGameSound::Clone() const
 {
 	return NULL;
@@ -232,7 +232,7 @@ BFileGameSound::Preload()
 
 
 void
-BFileGameSound::FillBuffer(void *inBuffer, size_t inByteCount)
+BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 {
 	// Split or combine decoder buffers into mixer buffers
 	// fPlayPosition is where we got up to in the input buffer after last call
@@ -258,7 +258,7 @@ BFileGameSound::FillBuffer(void *inBuffer, size_t inByteCount)
 				}
 
 				// Fill the requested buffer, stopping if the paused flag is set
-				char * buffer = (char*)inBuffer;
+				char* buffer = (char*)inBuffer;
 
 				switch(Format().format) {
 					case gs_audio_format::B_GS_U8:
@@ -306,7 +306,7 @@ BFileGameSound::FillBuffer(void *inBuffer, size_t inByteCount)
 				Unlock();
 			} else {
 
-				char * buffer = (char*)inBuffer;
+				char* buffer = (char*)inBuffer;
 
 				// Need to be able to stop asap when the pause flag is flipped.
 				while (fPlayPosition < fBufferSize && (!fPaused || fPausing)
@@ -321,8 +321,7 @@ BFileGameSound::FillBuffer(void *inBuffer, size_t inByteCount)
 
 
 status_t
-BFileGameSound::Perform(int32 selector,
-						void *data)
+BFileGameSound::Perform(int32 selector, void* data)
 {
 	return B_ERROR;
 }
@@ -472,7 +471,7 @@ BFileGameSound::Load()
 
 
 bool
-BFileGameSound::Read(void * buffer, size_t bytes)
+BFileGameSound::Read(void* buffer, size_t bytes)
 {
 	return false;
 }

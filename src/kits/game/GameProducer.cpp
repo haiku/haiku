@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,7 +7,7 @@
  */
 
 
-/*!	A MediaKit producer node which mixes sound from the GameKit
+/*	A MediaKit producer node which mixes sound from the GameKit
 	and sends them to the audio mixer
 */
 
@@ -81,8 +81,8 @@ GameProducer::~GameProducer()
 
 
 // BMediaNode methods
-BMediaAddOn *
-GameProducer::AddOn(int32 *internal_id) const
+BMediaAddOn*
+GameProducer::AddOn(int32* internal_id) const
 {
 	return NULL;
 }
@@ -90,13 +90,13 @@ GameProducer::AddOn(int32 *internal_id) const
 
 // BBufferProducer methods
 status_t
-GameProducer::GetNextOutput(int32* cookie, media_output* out_output)
+GameProducer::GetNextOutput(int32* cookie, media_output* _output)
 {
 	// we currently support only one output
 	if (0 != *cookie)
 		return B_BAD_INDEX;
 
-	*out_output = fOutput;
+	*_output = fOutput;
 	*cookie += 1;
 	return B_OK;
 }
@@ -169,7 +169,7 @@ GameProducer::FormatProposal(const media_source& output, media_format* format)
 status_t
 GameProducer::PrepareToConnect(const media_source& what,
 	const media_destination& where, media_format* format,
-	media_source* out_source, char* out_name)
+	media_source* _source, char* out_name)
 {
 	// The format has been processed by the consumer at this point. We need
 	// to insure the format is still acceptable and any wild care are filled in.
@@ -201,7 +201,7 @@ GameProducer::PrepareToConnect(const media_source& what,
 	// Now reserve the connection, and return information about it
 	fOutput.destination = where;
 	fOutput.format = *format;
-	*out_source = fOutput.source;
+	*_source = fOutput.source;
 	strlcpy(out_name, fOutput.name, B_MEDIA_NAME_LENGTH);
 	return B_OK;
 }
@@ -210,7 +210,7 @@ GameProducer::PrepareToConnect(const media_source& what,
 void
 GameProducer::Connect(status_t error, const media_source& source,
 	const media_destination& destination, const media_format& format,
-	char* io_name)
+	char* ioName)
 {
 	// If something earlier failed, Connect() might still be called, but with a
 	// non-zero error code.  When that happens we simply unreserve the
@@ -225,7 +225,7 @@ GameProducer::Connect(status_t error, const media_source& source,
 	// format that we agreed on, and report our connection name again.
 	fOutput.destination = destination;
 	fOutput.format = format;
-	strlcpy(io_name, fOutput.name, B_MEDIA_NAME_LENGTH);
+	strlcpy(ioName, fOutput.name, B_MEDIA_NAME_LENGTH);
 
 	// Now that we're connected, we can determine our downstream latency.
 	// Do so, then make sure we get our events early enough.
@@ -297,11 +297,11 @@ GameProducer::FormatChangeRequested(const media_source& source,
 
 
 status_t
-GameProducer::SetBufferGroup(const media_source& for_source,
+GameProducer::SetBufferGroup(const media_source& forSource,
 	BBufferGroup* newGroup)
 {
 	// verify that we didn't get bogus arguments before we proceed
-	if (for_source != fOutput.source)
+	if (forSource != fOutput.source)
 		return B_MEDIA_BAD_SOURCE;
 
 	// Are we being passed the buffer group we're already using?
@@ -320,7 +320,7 @@ GameProducer::SetBufferGroup(const media_source& for_source,
 		fBufferGroup = newGroup;
 
 		// get buffer length from the first buffer
-		BBuffer *buffers[1];
+		BBuffer* buffers[1];
 		if (newGroup->GetBufferList(1, buffers) != B_OK)
 			return B_BAD_VALUE;
 		fBufferSize = buffers[0]->SizeAvailable();
@@ -337,17 +337,17 @@ GameProducer::SetBufferGroup(const media_source& for_source,
 
 
 status_t
-GameProducer::GetLatency(bigtime_t* out_latency)
+GameProducer::GetLatency(bigtime_t* _latency)
 {
 	// report our *total* latency:  internal plus downstream plus scheduling
-	*out_latency = EventLatency() + SchedulingLatency();
+	*_latency = EventLatency() + SchedulingLatency();
 	return B_OK;
 }
 
 
 void
-GameProducer::LateNoticeReceived(const media_source& what, bigtime_t how_much,
-	bigtime_t performance_time)
+GameProducer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
+	bigtime_t performanceDuration)
 {
 	// If we're late, we need to catch up.  Respond in a manner appropriate to
 	// our current run mode.
@@ -363,7 +363,7 @@ GameProducer::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 			// downstream nodes are not properly reporting their latency, but
 			// there's not much we can do about that at the moment, so we try
 			// to start producing buffers earlier to compensate.
-			fInternalLatency += how_much;
+			fInternalLatency += howMuch;
 			SetEventLatency(fLatency + fInternalLatency);
 		} else {
 			// The other run modes dictate various strategies for sacrificing
@@ -393,7 +393,7 @@ GameProducer::LatencyChanged(const media_source& source,
 
 
 status_t
-GameProducer::SetPlayRate(int32 numer, int32 denom)
+GameProducer::SetPlayRate(int32 numerator, int32 denominator)
 {
 	// Play rates are weird.  We don't support them
 	return B_ERROR;
