@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2011, Haiku.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Stephan Aßmus, superstippi@gmx.de
  *		Axel Dörfler, axeld@pinc-software.de
- *		Stephan Aßmus, <superstippi@gmx.de>
+ *		Adrian Oanca, adioanca@cotty.iren.ro
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -85,6 +86,7 @@ struct BWindow::unpack_cookie {
 	bool		found_focus;
 	bool		tokens_scanned;
 };
+
 
 class BWindow::Shortcut {
 public:
@@ -233,7 +235,7 @@ BWindow::unpack_cookie::unpack_cookie()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BWindow::Shortcut
 
 
 BWindow::Shortcut::Shortcut(uint32 key, uint32 modifiers, BMenuItem* item)
@@ -298,7 +300,7 @@ BWindow::Shortcut::PrepareKey(uint32 key)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BWindow
 
 
 BWindow::BWindow(BRect frame, const char* title, window_type type,
@@ -725,7 +727,8 @@ BWindow::MessageReceived(BMessage* message)
 			_KeyboardNavigation();
 
 		if (message->what == (int32)kMsgAppServerRestarted) {
-			fLink->SetSenderPort(BApplication::Private::ServerLink()->SenderPort());
+			fLink->SetSenderPort(
+				BApplication::Private::ServerLink()->SenderPort());
 
 			BPrivate::AppServerLink lockLink;
 				// we're talking to the server application using our own
@@ -1042,14 +1045,17 @@ BWindow::DispatchMessage(BMessage* message, BHandler* target)
 				&& message->FindInt32("height", &height) == B_OK) {
 				// combine with pending resize notifications
 				BMessage* pendingMessage;
-				while ((pendingMessage = MessageQueue()->FindMessage(B_WINDOW_RESIZED, 0))) {
+				while ((pendingMessage
+						= MessageQueue()->FindMessage(B_WINDOW_RESIZED, 0))) {
 					int32 nextWidth;
 					if (pendingMessage->FindInt32("width", &nextWidth) == B_OK)
 						width = nextWidth;
 
 					int32 nextHeight;
-					if (pendingMessage->FindInt32("height", &nextHeight) == B_OK)
+					if (pendingMessage->FindInt32("height", &nextHeight)
+							== B_OK) {
 						height = nextHeight;
+					}
 
 					MessageQueue()->RemoveMessage(pendingMessage);
 					delete pendingMessage;
@@ -2793,10 +2799,12 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	fNoQuitShortcut = IsModal();
 
 	if ((fFlags & B_NOT_CLOSABLE) == 0 && !IsModal()) {
-		// Modal windows default to non-closable, but you can add the shortcut manually,
-		// if a different behaviour is wanted
+		// Modal windows default to non-closable, but you can add the
+		// shortcut manually, if a different behaviour is wanted
 		AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 	}
+
+	// Edit modifier keys
 
 	AddShortcut('X', B_COMMAND_KEY, new BMessage(B_CUT), NULL);
 	AddShortcut('C', B_COMMAND_KEY, new BMessage(B_COPY), NULL);
@@ -2804,6 +2812,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), NULL);
 
 	// Window modifier keys
+
 	AddShortcut('M', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(_MINIMIZE_), NULL);
 	AddShortcut('Z', B_COMMAND_KEY | B_CONTROL_KEY,
@@ -2817,6 +2826,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	// Workspace modifier keys
 	BMessage* message;
+
 	message = new BMessage(_SWITCH_WORKSPACE_);
 	message->AddInt32("delta_x", -1);
 	AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
@@ -2836,22 +2846,26 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	message = new BMessage(_SWITCH_WORKSPACE_);
 	message->AddBool("take_me_there", true);
 	message->AddInt32("delta_x", -1);
-	AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY, message, NULL);
+	AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY,
+		message, NULL);
 
 	message = new BMessage(_SWITCH_WORKSPACE_);
 	message->AddBool("take_me_there", true);
 	message->AddInt32("delta_x", 1);
-	AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY, message, NULL);
+	AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY,
+		message, NULL);
 
 	message = new BMessage(_SWITCH_WORKSPACE_);
 	message->AddBool("take_me_there", true);
 	message->AddInt32("delta_y", -1);
-	AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY, message, NULL);
+	AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY,
+		message, NULL);
 
 	message = new BMessage(_SWITCH_WORKSPACE_);
 	message->AddBool("take_me_there", true);
 	message->AddInt32("delta_y", 1);
-	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY, message, NULL);
+	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY,
+		message, NULL);
 
 	// We set the default pulse rate, but we don't start the pulse
 	fPulseRate = 500000;
@@ -2877,10 +2891,12 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	// Create the server-side window
 
-	port_id receivePort = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, "w<app_server");
+	port_id receivePort = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY,
+		"w<app_server");
 	if (receivePort < B_OK) {
 		// TODO: huh?
-		debugger("Could not create BWindow's receive port, used for interacting with the app_server!");
+		debugger("Could not create BWindow's receive port, used for "
+				 "interacting with the app_server!");
 		delete this;
 		return;
 	}
