@@ -510,19 +510,16 @@ BMessage: what =  (0x0, or 0)
 			property_info array is declared in the globals section.
  */
 
-	status_t err = B_OK;
 	if (data == NULL)
-		err = B_BAD_VALUE;
+		return B_BAD_VALUE;
 
-	if (err != B_OK) {
-		err = data->AddString("suites", "suite/vnd.Be-handler");
-		if (err != B_OK) {
-			BPropertyInfo propertyInfo(sHandlerPropInfo);
-			err = data->AddFlat("messages", &propertyInfo);
-		}
+	status_t result = data->AddString("suites", "suite/vnd.Be-handler");
+	if (result == B_OK) {
+		BPropertyInfo propertyInfo(sHandlerPropInfo);
+		result = data->AddFlat("messages", &propertyInfo);
 	}
 
-	return err;
+	return result;
 }
 
 
