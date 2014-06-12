@@ -1,23 +1,23 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
  */
- 
+
 
 #include "BitFieldTesters.h"
 
- 
 #include <stdio.h>
+
 
 #define NOTE "NotFieldTester : "
 #define MINI "MinMatchFieldTester : "
 
+
 BitFieldTester::BitFieldTester()
 {
-	// empty
 }
 
 
@@ -25,7 +25,6 @@ BitFieldTester::BitFieldTester(BMessage* from)
 	:
 	BArchivable(from)
 {
-	// empty
 }
 
 
@@ -33,15 +32,16 @@ status_t
 BitFieldTester::Archive(BMessage* into, bool deep) const
 {
 	return BArchivable::Archive(into, deep);
-} 
+}
 
 
-// ---------------- ConstantFieldTester starts -------------------------------
+//	#pragma mark - ConstantFieldTester
+
+
 ConstantFieldTester::ConstantFieldTester(bool result)
 	:
 	fResult(result)
 {
-	// empty
 }
 
 
@@ -49,17 +49,17 @@ ConstantFieldTester::ConstantFieldTester(BMessage* from)
 	:
 	BitFieldTester(from)
 {
-	if (from->FindBool("ctRes", &fResult) != B_NO_ERROR)
+	if (from->FindBool("ctRes", &fResult) != B_OK)
 		printf("ConstantFieldTester: Error, no ctRes!\n");
 }
 
- 
+
 status_t
 ConstantFieldTester::Archive(BMessage* into, bool deep) const
 {
-	status_t ret = BitFieldTester::Archive(into, deep);
+	status_t result = BitFieldTester::Archive(into, deep);
 	into->AddBool("ctRes", fResult);
-	return ret;
+	return result;
 }
 
 
@@ -80,14 +80,15 @@ ConstantFieldTester::IsMatching(uint32 field)
 }
 
 
-// ---------------- HasBitsFieldTester starts -------------------------------
-HasBitsFieldTester::HasBitsFieldTester(uint32 requiredBits, 
+//	#pragma mark - HasBitsFieldTester
+
+
+HasBitsFieldTester::HasBitsFieldTester(uint32 requiredBits,
 	uint32 forbiddenBits)
-	: 
-	fRequiredBits(requiredBits), 
+	:
+	fRequiredBits(requiredBits),
 	fForbiddenBits(forbiddenBits)
 {
-	// empty
 }
 
 
@@ -95,10 +96,10 @@ HasBitsFieldTester::HasBitsFieldTester(BMessage* from)
 	:
 	BitFieldTester(from)
 {
-	if (from->FindInt32("rqBits", (int32*) &fRequiredBits) != B_NO_ERROR)
+	if (from->FindInt32("rqBits", (int32*) &fRequiredBits) != B_OK)
 		printf("HasBitsFieldTester: Error, no rqBits!\n");
-	
-	if (from->FindInt32("fbBits", (int32*) &fForbiddenBits) != B_NO_ERROR)
+
+	if (from->FindInt32("fbBits", (int32*) &fForbiddenBits) != B_OK)
 		printf("HasBitsFieldTester: Error, no fbBits!\n");
 }
 
@@ -106,10 +107,11 @@ HasBitsFieldTester::HasBitsFieldTester(BMessage* from)
 status_t
 HasBitsFieldTester::Archive(BMessage* into, bool deep) const
 {
-	status_t ret = BitFieldTester::Archive(into, deep);
+	status_t result = BitFieldTester::Archive(into, deep);
 	into->AddInt32("rqBits", fRequiredBits);
 	into->AddInt32("fbBits", fForbiddenBits);
-	return ret;
+
+	return result;
 }
 
 
@@ -126,17 +128,18 @@ HasBitsFieldTester::Instantiate(BMessage* from)
 bool
 HasBitsFieldTester::IsMatching(uint32 field)
 {
-	return ((((fRequiredBits & (~field)) == 0)) 
-				&& ((fForbiddenBits & (~field)) == fForbiddenBits));
+	return ((((fRequiredBits & (~field)) == 0))
+		&& ((fForbiddenBits & (~field)) == fForbiddenBits));
 }
 
 
-// ---------------- NotFieldTester starts -------------------------------
+//	#pragma mark - NotFieldTester
+
+
 NotFieldTester::NotFieldTester(BitFieldTester* slave)
 	:
 	fSlave(slave)
 {
-	// empty
 }
 
 
@@ -147,18 +150,18 @@ NotFieldTester::~NotFieldTester()
 
 
 NotFieldTester::NotFieldTester(BMessage* from)
-	: 
-	BitFieldTester(from), 
+	:
+	BitFieldTester(from),
 	fSlave(NULL)
 {
-	BMessage slaveMsg;
-	if (from->FindMessage("nSlave", &slaveMsg) == B_NO_ERROR) {
-		BArchivable* slaveObj = instantiate_object(&slaveMsg);
-		if (slaveObj) {
-			fSlave = dynamic_cast<BitFieldTester*>(slaveObj);
+	BMessage slaveMessage;
+	if (from->FindMessage("nSlave", &slaveMessage) == B_OK) {
+		BArchivable* slaveObject = instantiate_object(&slaveMessage);
+		if (slaveObject != NULL) {
+			fSlave = dynamic_cast<BitFieldTester*>(slaveObject);
 			if (fSlave == NULL) {
-				printf(NOTE "Error casting slaveObj to BitFieldTester!\n");
-				delete slaveObj;
+				printf(NOTE "Error casting slaveObject to BitFieldTester!\n");
+				delete slaveObject;
 			}
 		} else
 			printf(NOTE "instantiate_object returned NULL!\n");
@@ -173,15 +176,14 @@ NotFieldTester::Archive(BMessage* into, bool deep) const
 	if (fSlave == NULL)
 		return B_ERROR;
 
-	status_t ret = BitFieldTester::Archive(into, deep);
-
-	if (ret == B_NO_ERROR) {
-		BMessage msg;
-		ret = fSlave->Archive(&msg, deep);
-		into->AddMessage("nSlave", &msg);
+	status_t result = BitFieldTester::Archive(into, deep);
+	if (result == B_OK) {
+		BMessage message;
+		result = fSlave->Archive(&message, deep);
+		into->AddMessage("nSlave", &message);
 	}
 
-	return ret;
+	return result;
 }
 
 
@@ -202,49 +204,50 @@ NotFieldTester::IsMatching(uint32 field)
 }
 
 
-// ---------------- MinMatchFieldTester starts -------------------------------
-MinMatchFieldTester::MinMatchFieldTester(int minNum, bool deleteSlaves)
+//	#pragma mark - MinMatchFieldTester
+
+
+MinMatchFieldTester::MinMatchFieldTester(int32 minNum, bool deleteSlaves)
 	:
 	fMinNum(minNum),
 	fDeleteSlaves(deleteSlaves) // fDeleteSlaves state not archived!
 {
-	// empty
 }
 
 
 MinMatchFieldTester::~MinMatchFieldTester()
 {
 	if (fDeleteSlaves) {
-		int nr = fSlaves.CountItems();
-		for (int i = 0; i < nr; i++)
+		int32 last = fSlaves.CountItems();
+		for (int32 i = 0; i < last; i++)
 			delete ((BitFieldTester*) fSlaves.ItemAt(i));
 	}
 }
 
 
 MinMatchFieldTester::MinMatchFieldTester(BMessage* from)
-	: 
+	:
 	BitFieldTester(from),
 	fDeleteSlaves(true)
 {
-	int i = 0;
-	BMessage slaveMsg;
-	while (from->FindMessage("mSlave", i++, &slaveMsg) == B_NO_ERROR) {
-		BArchivable* slaveObj = instantiate_object(&slaveMsg);
-		if (slaveObj) {
-			BitFieldTester* nextSlave = dynamic_cast<BitFieldTester*>(slaveObj);
+	int32 i = 0;
+	BMessage slaveMessage;
+	while (from->FindMessage("mSlave", i++, &slaveMessage) == B_OK) {
+		BArchivable* slaveObject = instantiate_object(&slaveMessage);
+		if (slaveObject) {
+			BitFieldTester* nextSlave = dynamic_cast<BitFieldTester*>(slaveObject);
 			if (nextSlave)
 				fSlaves.AddItem(nextSlave);
 			else {
-				printf(MINI "Error casting slaveObj to BitFieldTester!\n");
-				delete slaveObj;
+				printf(MINI "Error casting slaveObject to BitFieldTester!\n");
+				delete slaveObject;
 			}
 		} else
 			printf(MINI "instantiate_object returned NULL!\n");
 	}
 
-	if (from->FindInt32("mMin", (int32*) &fMinNum) != B_NO_ERROR)
-		printf(MINI "Error getting mMin!\n");
+	if (from->FindInt32("mMin", (int32*)&fMinNum) != B_OK)
+		puts(MINI "Error getting mMin!");
 }
 
 
@@ -259,22 +262,21 @@ MinMatchFieldTester::AddSlave(const BitFieldTester* slave)
 status_t
 MinMatchFieldTester::Archive(BMessage* into, bool deep) const
 {
-	status_t ret = BitFieldTester::Archive(into, deep);
-
-	if (ret == B_NO_ERROR) {
-		int nr = fSlaves.CountItems();
-		for (int i = 0; i < nr; i++) {
+	status_t result = BitFieldTester::Archive(into, deep);
+	if (result == B_OK) {
+		int32 last = fSlaves.CountItems();
+		for (int32 i = 0; i < last; i++) {
 			BMessage msg;
-			ret = ((BitFieldTester*)fSlaves.ItemAt(i))->Archive(&msg, deep);
-			if (ret != B_NO_ERROR)
-				return ret;
+			result = ((BitFieldTester*)fSlaves.ItemAt(i))->Archive(&msg, deep);
+			if (result != B_OK)
+				return result;
 
 			into->AddMessage("mSlave", &msg);
 		}
 	}
-
 	into->AddInt32("mMin", fMinNum);
-	return ret;
+
+	return result;
 }
 
 
@@ -292,15 +294,20 @@ MinMatchFieldTester::Instantiate(BMessage* from)
 bool
 MinMatchFieldTester::IsMatching(uint32 field)
 {
-	int nr = fSlaves.CountItems();
-	if ((fMinNum == 0) && (nr == 0))
-		return true; // 0 >= 0, so this should return true!
+	int32 last = fSlaves.CountItems();
+	if (fMinNum == 0 && last == 0) {
+		// 0 >= 0, so this should return true
+		return true;
+	}
 
-	int count = 0;
-	
-	for (int i = 0; i < nr; i++)
-		if ((((BitFieldTester*)fSlaves.ItemAt(i))->IsMatching(field)) 
-				&& (++count >= fMinNum))
+	int32 count = 0;
+
+	for (int32 i = 0; i < last; i++) {
+		if ((((BitFieldTester*)fSlaves.ItemAt(i))->IsMatching(field))
+				&& (++count >= fMinNum)) {
 			return true;
+		}
+	}
+
 	return false;
 }

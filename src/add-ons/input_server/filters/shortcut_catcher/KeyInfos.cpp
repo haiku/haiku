@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,23 +9,24 @@
 
 #include "KeyInfos.h"
 
-
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-
 
 #include <InterfaceDefs.h>
 
 
 #define NUM_KEYS 128
-#define MAX_UTF8_LENGTH 5	// up to 4 chars, plus a nul terminator
+#define MAX_UTF8_LENGTH 5
+	// up to 4 chars, plus a \0 terminator
+
 
 struct KeyLabelMap {
 	const char* fLabel;
 	uint8 fKeyCode;
 };
+
 
 // This is a table of keys-codes that have special, hard-coded labels.
 static const struct KeyLabelMap keyLabels[] = {
@@ -90,19 +91,23 @@ static const struct KeyLabelMap keyLabels[] = {
 	{"PowerOn",		107},
 };
 
-// Key description strings (e.g. "A" or "Escape"). Null if no description is 
+
+// Key description strings (e.g. "A" or "Escape"). NULL if no description is
 // available.
 static const char* keyDescriptions[NUM_KEYS];
+
 
 // series of optional up-to-(4+1)-byte terminated UTF-8 character strings...
 static char utfDescriptions[NUM_KEYS * MAX_UTF8_LENGTH];
 
+
 static const char*
 FindSpecialKeyLabelFor(uint8 keyCode, uint32& last)
 {
-	while ((keyLabels[last].fKeyCode < keyCode) 
-		&& (last < (sizeof(keyLabels) / sizeof(struct KeyLabelMap)) - 1)) 
+	while ((keyLabels[last].fKeyCode < keyCode)
+		&& (last < (sizeof(keyLabels) / sizeof(struct KeyLabelMap)) - 1)) {
 		last++;
+	}
 
 	if (keyLabels[last].fKeyCode == keyCode)
 		return keyLabels[last].fLabel;
@@ -111,45 +116,47 @@ FindSpecialKeyLabelFor(uint8 keyCode, uint32& last)
 }
 
 
-void 
+void
 InitKeyIndices()
 {
 	uint32 nextSpecial = 0;
 	key_map* map;
 	char* keys;
 	get_key_map(&map, &keys);
-	
-	for (int j = 0; j < NUM_KEYS; j++) {
-		keyDescriptions[j] = NULL;	// default
 
-		const char* slabel = FindSpecialKeyLabelFor(j, nextSpecial);
+	for (uint8 j = 0; j < NUM_KEYS; j++) {
+		keyDescriptions[j] = NULL;
+			// default
+
+		const char* specialLabel = FindSpecialKeyLabelFor(j, nextSpecial);
 		int32 keyCode = map->normal_map[j];
 
 		if (keyCode >= 0) {
 			const char* mapDesc = &keys[keyCode];
-			uint8 len = *mapDesc;
-			
-			for (int m = 0; m < MAX_UTF8_LENGTH; m++) 
-				if (m < len)
+			uint8 length = *mapDesc;
+
+			for (int m = 0; m < MAX_UTF8_LENGTH; m++)
+				if (m < length)
 					utfDescriptions[j * MAX_UTF8_LENGTH + m] = mapDesc[m + 1];
 				else
-					utfDescriptions[j * MAX_UTF8_LENGTH + m] = '\0';		
+					utfDescriptions[j * MAX_UTF8_LENGTH + m] = '\0';
 
-			if (slabel)
-				keyDescriptions[j] = slabel;
+			if (specialLabel != NULL)
+				keyDescriptions[j] = specialLabel;
 			else {
 				// If it's an ASCII letter, capitalize it.
 				char& c = utfDescriptions[j * MAX_UTF8_LENGTH];
 
-				if ((len == 1) && (isalpha(c)))
+				if ((length == 1) && (isalpha(c)))
 					c = toupper(c);
 
-				if ((len > 1)||((len == 1) && (c > ' ')))
+				if (length > 1 || (length == 1 && c > ' '))
 					keyDescriptions[j] = &c;
 			}
 		} else
 			utfDescriptions[j * MAX_UTF8_LENGTH] = 0x00;
 	}
+
 	free(keys);
 	free(map);
 }
@@ -179,9 +186,13 @@ GetNumKeyIndices()
 uint8
 FindKeyCode(const char* keyName)
 {
-	for (int i = 0; i < NUM_KEYS; i++)
-		if ((keyDescriptions[i]) 
-			&& (strcasecmp(keyName, keyDescriptions[i]) == 0)) 
+	for (uint8 i = 0; i < NUM_KEYS; i++) {
+		if ((keyDescriptions[i])
+			&& (strcasecmp(keyName, keyDescriptions[i]) == 0)) {
 			return i;
-	return 0;	// default to sentinel value
+		}
+	}
+
+	return 0;
+		// default to sentinel value
 }

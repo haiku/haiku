@@ -9,7 +9,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-		#	Common files used here and in the app
+		# Common files used here and in the app
 		StaticLibrary [ MultiArchDefaultGristFiles libshortcuts_shared.a ] :
 			BitFieldTesters.cpp
 			CommandActuators.cpp

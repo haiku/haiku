@@ -1,14 +1,12 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
  */
- 
- 
-#ifndef ShortcutsServerFilter_h
-#define ShortcutsServerFilter_h
+#ifndef _SHORTCUTS_SERVER_FILTER_H
+#define _SHORTCUTS_SERVER_FILTER_H
 
 
 #include <stdio.h>
@@ -23,8 +21,10 @@
 #pragma export on
 #endif
 
+
 // export this for the input_server
 extern "C" _EXPORT BInputServerFilter* instantiate_input_filter();
+
 
 class KeyCommandMap;
 class CommandExecutor;
@@ -33,21 +33,24 @@ class ShortcutsServerFilter : public BInputServerFilter {
 public:
 								ShortcutsServerFilter();
 	virtual 					~ShortcutsServerFilter();
+
 	virtual status_t 			InitCheck();
-	virtual filter_result 		Filter(BMessage* message, BList* outlist);
+	virtual filter_result 		Filter(BMessage* message, BList* outList);
+
 private:
 			// Tells us what command goes with a given key
-			KeyCommandMap*		fMap;		
-	
+			KeyCommandMap*		fMap;
+
 			// Executes the given commands
 			CommandExecutor*	fExecutor;
-	
+
 			// Points to fExecutor:declaration order is important!
 			BMessenger			fMessenger;
 };
+
 
 #ifdef __POWERPC__
 #pragma export reset
 #endif
 
-#endif
+#endif	// _SHORTCUTS_SERVER_FILTER_H

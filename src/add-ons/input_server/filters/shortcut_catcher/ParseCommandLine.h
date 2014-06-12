@@ -1,16 +1,16 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
  */
+#ifndef _PARSE_COMMAND_STRING_H
+#define _PARSE_COMMAND_STRING_H
 
-
-#ifndef ParseCommandString_h
-#define ParseCommandString_h
 
 #include <String.h>
+
 
 // Utility methods to extract arguments from a typed-in string.
 
@@ -44,4 +44,5 @@ bool EscapeChars(BString& string, char badChar);
 // my various apps... 
 status_t LaunchCommand(char** argv, int32 argc);
 
-#endif
+
+#endif	// _PARSE_COMMAND_STRING_H

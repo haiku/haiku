@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,7 +33,8 @@
 #define IS_KEY_DOWN(msg) ((msg->what == B_KEY_DOWN) \
 	|| (msg->what == B_UNMAPPED_KEY_DOWN))
 
-// Factory function
+
+// factory function
 CommandActuator*
 CreateCommandActuator(const char* command)
 {
@@ -72,14 +73,11 @@ CreateCommandActuator(const char* command)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// CommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - CommandActuator
+
+
 CommandActuator::CommandActuator(int32 argc, char** argv)
 {
-	// empty
 }
 
 
@@ -87,7 +85,6 @@ CommandActuator::CommandActuator(BMessage* from)
 	:
 	BArchivable(from)
 {
-	// empty
 }
 
 
@@ -99,18 +96,15 @@ CommandActuator::Archive(BMessage* into, bool deep) const
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// LaunchCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - LaunchCommandActuator
+
+
 LaunchCommandActuator::LaunchCommandActuator(int32 argc, char** argv)
 	:
 	CommandActuator(argc, argv),
 	fArgv(CloneArgv(argv)),
 	fArgc(argc)
 {
-	// empty
 }
 
 
@@ -121,7 +115,7 @@ LaunchCommandActuator::LaunchCommandActuator(BMessage* from)
 	BList argList;
 	const char* temp;
 	int idx = 0;
-	while (from->FindString("largv", idx++, &temp) == B_NO_ERROR) {
+	while (from->FindString("largv", idx++, &temp) == B_OK) {
 		if (temp) {
 			char* copy = new char[strlen(temp) + 1];
 			strcpy(copy, temp);
@@ -146,10 +140,10 @@ LaunchCommandActuator::~LaunchCommandActuator()
 
 
 filter_result
-LaunchCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
-	void** setAsyncData, BMessage* lastMouseMove)
+LaunchCommandActuator::KeyEvent(const BMessage* keyMessage, BList* outList,
+	void** setAsyncData, BMessage* mouseMessage)
 {
-	if (IS_KEY_DOWN(keyMsg)) {
+	if (IS_KEY_DOWN(keyMessage)) {
 		// cause KeyEventAsync() to be called asynchronously
 		*setAsyncData = (void*) true;
 	}
@@ -170,7 +164,7 @@ LaunchCommandActuator::Archive(BMessage* into, bool deep) const
 
 
 BArchivable*
-LaunchCommandActuator ::Instantiate(BMessage* from)
+LaunchCommandActuator::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "LaunchCommandActuator"))
 		return new LaunchCommandActuator(from);
@@ -180,35 +174,34 @@ LaunchCommandActuator ::Instantiate(BMessage* from)
 
 
 void
-LaunchCommandActuator::KeyEventAsync(const BMessage* keyMsg,
+LaunchCommandActuator::KeyEventAsync(const BMessage* keyMessage,
 	void* asyncData)
 {
-	if (be_roster) {
-		status_t err = B_OK;
-		BString str;
-		BString str1("Shortcuts launcher error");
-		if (fArgc < 1)
-			str << "You didn't specify a command for this hotkey.";
-		else if ((err = LaunchCommand(fArgv, fArgc)) != B_NO_ERROR) {
-			str << "Can't launch " << fArgv[0];
-			str << ", no such file exists.";
-			str << " Please check your Shortcuts settings.";
-		}
+	if (be_roster == NULL)
+		return;
 
-		if (fArgc < 1 || err != B_NO_ERROR) {
-			BAlert* alert = new BAlert(str1.String(), str.String(), "OK");
-			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-			alert->Go(NULL);
-		}
+	status_t result = B_OK;
+	BString string;
+	if (fArgc < 1)
+		string << "You didn't specify a command for this hotkey.";
+	else if ((result = LaunchCommand(fArgv, fArgc)) != B_OK) {
+		string << "Can't launch " << fArgv[0];
+		string << ", no such file exists.";
+		string << " Please check your Shortcuts settings.";
+	}
+
+	if (fArgc < 1 || result != B_OK) {
+		BAlert* alert = new BAlert("Shortcuts launcher error",
+			string.String(), "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go(NULL);
 	}
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// MouseCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - MouseCommandActuator
+
+
 MouseCommandActuator::MouseCommandActuator(int32 argc, char** argv)
 	:
 	CommandActuator(argc, argv),
@@ -247,7 +240,6 @@ MouseCommandActuator::MouseCommandActuator(BMessage* from)
 
 MouseCommandActuator::~MouseCommandActuator()
 {
-	// empty
 }
 
 
@@ -269,9 +261,9 @@ MouseCommandActuator::_GetWhichButtons() const
 
 void
 MouseCommandActuator::_GenerateMouseButtonEvent(bool mouseDown,
-	const BMessage* keyMsg, BList* outlist, BMessage* lastMouseMove)
+	const BMessage* keyMessage, BList* outList, BMessage* mouseMessage)
 {
-	BMessage* fakeMouse = new BMessage(*lastMouseMove);
+	BMessage* fakeMouse = new BMessage(*mouseMessage);
 	fakeMouse->what = mouseDown ? B_MOUSE_DOWN : B_MOUSE_UP;
 
 	// Update the buttons to reflect which mouse buttons we are faking
@@ -285,32 +277,29 @@ MouseCommandActuator::_GenerateMouseButtonEvent(bool mouseDown,
 	int64 when;
 
 	const BMessage* lastMessage;
-
-	if (outlist->CountItems() > 0) {
-		int nr = outlist->CountItems() - 1;
-		lastMessage = (const BMessage*)outlist->ItemAt(nr);
+	if (outList->CountItems() > 0) {
+		int32 last = outList->CountItems() - 1;
+		lastMessage = (const BMessage*)outList->ItemAt(last);
 	} else
-		lastMessage =keyMsg;
+		lastMessage = keyMessage;
 
-	if (lastMessage->FindInt64("when", &when) == B_NO_ERROR) {
+	if (lastMessage->FindInt64("when", &when) == B_OK) {
 		when++;
 		fakeMouse->RemoveName("when");
 		fakeMouse->AddInt64("when", when);
 	}
-	outlist->AddItem(fakeMouse);
+
+	outList->AddItem(fakeMouse);
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// MouseDownCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - MouseDownCommandActuator
+
+
 MouseDownCommandActuator::MouseDownCommandActuator(int32 argc, char** argv)
 	:
 	MouseCommandActuator(argc, argv)
 {
-	// empty
 }
 
 
@@ -318,22 +307,20 @@ MouseDownCommandActuator::MouseDownCommandActuator(BMessage* from)
 	:
 	MouseCommandActuator(from)
 {
-	// empty
 }
 
 
 MouseDownCommandActuator::~MouseDownCommandActuator()
 {
-	// empty
 }
 
 
 filter_result
-MouseDownCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
-	void** setAsyncData, BMessage* lastMouseMove)
+MouseDownCommandActuator::KeyEvent(const BMessage* keyMessage, BList* outList,
+	void** setAsyncData, BMessage* mouseMessage)
 {
-	if (IS_KEY_DOWN(keyMsg))
-		_GenerateMouseButtonEvent(true, keyMsg, outlist, lastMouseMove);
+	if (IS_KEY_DOWN(keyMessage))
+		_GenerateMouseButtonEvent(true, keyMessage, outList, mouseMessage);
 
 	return B_DISPATCH_MESSAGE;
 }
@@ -347,7 +334,7 @@ MouseDownCommandActuator::Archive(BMessage* into, bool deep) const
 
 
 BArchivable*
-MouseDownCommandActuator ::Instantiate(BMessage* from)
+MouseDownCommandActuator::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "MouseDownCommandActuator"))
 		return new MouseDownCommandActuator(from);
@@ -356,16 +343,13 @@ MouseDownCommandActuator ::Instantiate(BMessage* from)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// MouseUpCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - MouseUpCommandActuator
+
+
 MouseUpCommandActuator::MouseUpCommandActuator(int32 argc, char** argv)
 	:
 	MouseCommandActuator(argc, argv)
 {
-	// empty
 }
 
 
@@ -373,22 +357,21 @@ MouseUpCommandActuator::MouseUpCommandActuator(BMessage* from)
 	:
 	MouseCommandActuator(from)
 {
-	// empty
 }
 
 
 MouseUpCommandActuator::~MouseUpCommandActuator()
 {
-	// empty
 }
 
 
 filter_result
-MouseUpCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
-	void** setAsyncData, BMessage* lastMouseMove)
+MouseUpCommandActuator::KeyEvent(const BMessage* keyMessage, BList* outList,
+	void** setAsyncData, BMessage* mouseMessage)
 {
-	if (IS_KEY_DOWN(keyMsg))
-		_GenerateMouseButtonEvent(false, keyMsg, outlist, lastMouseMove);
+	if (IS_KEY_DOWN(keyMessage))
+		_GenerateMouseButtonEvent(false, keyMessage, outList, mouseMessage);
+
 	return B_DISPATCH_MESSAGE;
 }
 
@@ -401,7 +384,7 @@ MouseUpCommandActuator::Archive(BMessage* into, bool deep) const
 
 
 BArchivable*
-MouseUpCommandActuator ::Instantiate(BMessage* from)
+MouseUpCommandActuator::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "MouseUpCommandActuator"))
 		return new MouseUpCommandActuator(from);
@@ -410,17 +393,14 @@ MouseUpCommandActuator ::Instantiate(BMessage* from)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// MouseButtonCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - MouseButtonCommandActuator
+
+
 MouseButtonCommandActuator::MouseButtonCommandActuator(int32 argc, char** argv)
 	:
 	MouseCommandActuator(argc, argv),
 	fKeyDown(false)
 {
-	// empty
 }
 
 
@@ -429,29 +409,29 @@ MouseButtonCommandActuator::MouseButtonCommandActuator(BMessage* from)
 	MouseCommandActuator(from),
 	fKeyDown(false)
 {
-	// empty
 }
 
 
 MouseButtonCommandActuator::~MouseButtonCommandActuator()
 {
-	// empty
 }
 
 
 filter_result
-MouseButtonCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
-	void** setAsyncData, BMessage* lastMouseMove)
+MouseButtonCommandActuator::KeyEvent(const BMessage* keyMessage, BList* outList,
+	void** setAsyncData, BMessage* mouseMessage)
 {
-	if (IS_KEY_DOWN(keyMsg) != fKeyDown) {
-		_GenerateMouseButtonEvent(IS_KEY_DOWN(keyMsg), keyMsg, outlist,
-			lastMouseMove);
-		fKeyDown = IS_KEY_DOWN(keyMsg);
+	if (IS_KEY_DOWN(keyMessage) != fKeyDown) {
+		_GenerateMouseButtonEvent(IS_KEY_DOWN(keyMessage), keyMessage, outList,
+			mouseMessage);
+		fKeyDown = IS_KEY_DOWN(keyMessage);
+
 		return B_DISPATCH_MESSAGE;
-	} else
+	} else {
 		// This will handle key-repeats, which we don't want turned into lots
 		// of B_MOUSE_DOWN messages.
 		return B_SKIP_MESSAGE;
+	}
 }
 
 
@@ -463,7 +443,7 @@ MouseButtonCommandActuator::Archive(BMessage* into, bool deep) const
 
 
 BArchivable*
-MouseButtonCommandActuator ::Instantiate(BMessage* from)
+MouseButtonCommandActuator::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "MouseButtonCommandActuator"))
 		return new MouseButtonCommandActuator(from);
@@ -472,11 +452,9 @@ MouseButtonCommandActuator ::Instantiate(BMessage* from)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// KeyStrokeSequenceCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - KeyStrokeSequenceCommandActuator
+
+
 KeyStrokeSequenceCommandActuator::KeyStrokeSequenceCommandActuator(int32 argc,
 	char** argv)
 	:
@@ -588,38 +566,41 @@ KeyStrokeSequenceCommandActuator::KeyStrokeSequenceCommandActuator(int32 argc,
 						lastWasDash = false;
 					} else
 						lastWasDash = (*s == '-');
+
 					s++;
 				}
 
 				// If we have a letter, try to make it the correct case
 				if ((unicodeVal >= 'A') && (unicodeVal <= 'Z')) {
-					if ((customMods &B_SHIFT_KEY) == 0)
+					if ((customMods & B_SHIFT_KEY) == 0)
 						unicodeVal += 'a'-'A';
-				} else if ((unicodeVal >= 'a') && (unicodeVal <= 'z'))
-					if ((customMods &B_SHIFT_KEY) != 0)
+				} else if ((unicodeVal >= 'a') && (unicodeVal <= 'z')) {
+					if ((customMods & B_SHIFT_KEY) != 0)
 						unicodeVal -= 'a'-'A';
+				}
 			} else {
-				unicodeVal = strtol(&(fSequence.String())[nextStart + 2], NULL,
-					 0);
+				unicodeVal = strtol(&(fSequence.String())[nextStart + 2],
+					NULL, 0);
 				customMods = (uint32) -1;
 			}
 
 			if (unicodeVal == 0)
 				unicodeVal = ' ';
 
-			BString newStr = fSequence;
-			newStr.Truncate(nextStart);
+			BString newString = fSequence;
+			newString.Truncate(nextStart);
 			fOverrides.AddItem((void*)(addr_t)unicodeVal);
-			fOverrideOffsets.AddItem((void*)(addr_t)newStr.Length());
+			fOverrideOffsets.AddItem((void*)(addr_t)newString.Length());
 			fOverrideModifiers.AddItem((void*)(addr_t)customMods);
 			fOverrideKeyCodes.AddItem((void*)(addr_t)customKey);
-			newStr.Append(((unicodeVal > 0) && (unicodeVal < 127)) ?
-				((char)unicodeVal): ' ',1);
-			newStr.Append(&fSequence.String()[nextEnd + 2]);
-			fSequence = newStr;
+			newString.Append((unicodeVal > 0
+				&& unicodeVal < 127) ? (char)unicodeVal : ' ', 1);
+			newString.Append(&fSequence.String()[nextEnd + 2]);
+			fSequence = newString;
 		} else
 			break;
 	}
+
 	_GenerateKeyCodes();
 }
 
@@ -629,39 +610,39 @@ KeyStrokeSequenceCommandActuator::KeyStrokeSequenceCommandActuator(
 	:
 	CommandActuator(from)
 {
-	const char* seq;
-	if (from->FindString("sequence", 0, &seq) == B_NO_ERROR)
-		fSequence = seq;
+	const char* sequence;
+	if (from->FindString("sequence", 0, &sequence) == B_OK)
+		fSequence = sequence;
 
 	int32 temp;
-	for (int32 i = 0; from->FindInt32("ooffsets", i, &temp) == B_NO_ERROR;
-		i++) {
+	for (int32 i = 0; from->FindInt32("ooffsets", i, &temp) == B_OK; i++) {
 		fOverrideOffsets.AddItem((void*)(addr_t)temp);
 
-		if (from->FindInt32("overrides", i, &temp) != B_NO_ERROR)
+		if (from->FindInt32("overrides", i, &temp) != B_OK)
 			temp = ' ';
 
 		fOverrides.AddItem((void*)(addr_t)temp);
 
-		if (from->FindInt32("omods", i, &temp) != B_NO_ERROR)
+		if (from->FindInt32("omods", i, &temp) != B_OK)
 			temp = -1;
 
 		fOverrideModifiers.AddItem((void*)(addr_t)temp);
 
-		if (from->FindInt32("okeys", i, &temp) != B_NO_ERROR)
+		if (from->FindInt32("okeys", i, &temp) != B_OK)
 			temp = 0;
 
 		fOverrideKeyCodes.AddItem((void*)(addr_t)temp);
 	}
+
 	_GenerateKeyCodes();
 }
 
 
 KeyStrokeSequenceCommandActuator::~KeyStrokeSequenceCommandActuator()
 {
-	delete [] fKeyCodes;
-	delete [] fModCodes;
-	delete [] fStates;
+	delete[] fKeyCodes;
+	delete[] fModCodes;
+	delete[] fStates;
 }
 
 
@@ -679,7 +660,7 @@ KeyStrokeSequenceCommandActuator::_GenerateKeyCodes()
 	char* keys;
 	get_key_map(&map, &keys);
 	for (int i = 0; i < slen; i++) {
-		uint32 overrideKey= 0;
+		uint32 overrideKey = 0;
 		uint32 overrideMods = (uint32)-1;
 		for (int32 j = fOverrideOffsets.CountItems()-1; j >= 0; j--) {
 			if ((int32)(addr_t)fOverrideOffsets.ItemAt(j) == i) {
@@ -690,116 +671,127 @@ KeyStrokeSequenceCommandActuator::_GenerateKeyCodes()
 		}
 
 		uint8* states = &fStates[i * 16];
-		int32& mod = fModCodes[i];
+		int32& modCode = fModCodes[i];
 		if (overrideKey == 0) {
 			// Gotta do reverse-lookups to find out the raw keycodes for a
 			// given character. Expensive--there oughtta be a better way to do
 			// this.
 			char next = fSequence.ByteAt(i);
-			int32 key = _LookupKeyCode(map, keys, map->normal_map, next, states
-							, mod, 0);
-			if (key < 0)
+			int32 key = _LookupKeyCode(map, keys, map->normal_map, next,
+				states, modCode, 0);
+			if (key < 0) {
 				key = _LookupKeyCode(map, keys, map->shift_map, next, states,
-							mod, B_LEFT_SHIFT_KEY | B_SHIFT_KEY);
+					modCode, B_LEFT_SHIFT_KEY | B_SHIFT_KEY);
+			}
 
-			if (key < 0)
+			if (key < 0) {
 				key = _LookupKeyCode(map, keys, map->caps_map, next, states,
-							mod, B_CAPS_LOCK);
+					modCode, B_CAPS_LOCK);
+			}
 
-			if (key < 0)
+			if (key < 0) {
 				key = _LookupKeyCode(map, keys, map->caps_shift_map, next,
-							states, mod, B_LEFT_SHIFT_KEY | B_SHIFT_KEY
-							| B_CAPS_LOCK);
+					states, modCode,
+					B_LEFT_SHIFT_KEY | B_SHIFT_KEY | B_CAPS_LOCK);
+			}
 
-			if (key < 0)
+			if (key < 0) {
 				key = _LookupKeyCode(map, keys, map->option_map, next, states,
-							mod, B_LEFT_OPTION_KEY | B_OPTION_KEY);
+					modCode, B_LEFT_OPTION_KEY | B_OPTION_KEY);
+			}
 
-			if (key < 0)
+			if (key < 0) {
 				key = _LookupKeyCode(map, keys, map->option_shift_map, next,
-							states, mod, B_LEFT_OPTION_KEY | B_OPTION_KEY
-							| B_LEFT_SHIFT_KEY | B_SHIFT_KEY);
+					states, modCode, B_LEFT_OPTION_KEY | B_OPTION_KEY
+						| B_LEFT_SHIFT_KEY | B_SHIFT_KEY);
+			}
 
-			if (key < 0)
+			if (key < 0) {
 				key = _LookupKeyCode(map, keys, map->option_caps_map, next,
-							states, mod, B_LEFT_OPTION_KEY | B_OPTION_KEY
-							| B_CAPS_LOCK);
+					states, modCode,
+					B_LEFT_OPTION_KEY | B_OPTION_KEY | B_CAPS_LOCK);
+			}
 
-			if (key < 0)
+			if (key < 0) {
 				key = _LookupKeyCode(map, keys, map->option_caps_shift_map,
-							next, states, mod, B_LEFT_OPTION_KEY | B_OPTION_KEY
-							 | B_CAPS_LOCK | B_LEFT_SHIFT_KEY | B_SHIFT_KEY);
+					next, states, modCode, B_LEFT_OPTION_KEY | B_OPTION_KEY
+						| B_CAPS_LOCK | B_LEFT_SHIFT_KEY | B_SHIFT_KEY);
+			}
 
-			if (key < 0)
+			if (key < 0) {
 				key = _LookupKeyCode(map, keys, map->control_map, next, states,
-							 mod, B_CONTROL_KEY);
+					modCode, B_CONTROL_KEY);
+			}
 
-			fKeyCodes[i] = (key >= 0) ? key : 0;
+			fKeyCodes[i] = key >= 0 ? key : 0;
 		}
 
 		if (overrideMods != (uint32)-1) {
-			mod = (int32) overrideMods;
+			modCode = (int32)overrideMods;
 
 			// Clear any bits that might have been set by the lookups...
-			_SetStateBit(states, map->caps_key,false);
-			_SetStateBit(states, map->scroll_key,false);
+			_SetStateBit(states, map->caps_key, false);
+			_SetStateBit(states, map->scroll_key, false);
 			_SetStateBit(states, map->num_key, false);
-			_SetStateBit(states, map->menu_key,false);
-			_SetStateBit(states, map->left_shift_key,false);
+			_SetStateBit(states, map->menu_key, false);
+			_SetStateBit(states, map->left_shift_key, false);
 			_SetStateBit(states, map->right_shift_key, false);
-			_SetStateBit(states, map->left_command_key,false);
+			_SetStateBit(states, map->left_command_key, false);
 			_SetStateBit(states, map->right_command_key, false);
-			_SetStateBit(states, map->left_control_key,false);
+			_SetStateBit(states, map->left_control_key, false);
 			_SetStateBit(states, map->right_control_key, false);
 			_SetStateBit(states, map->left_option_key, false);
-			_SetStateBit(states, map->right_option_key,false);
+			_SetStateBit(states, map->right_option_key, false);
 
 			// And then set any bits that were specified in our override.
-			if (mod & B_CAPS_LOCK)
+			if (modCode & B_CAPS_LOCK)
 				_SetStateBit(states, map->caps_key);
 
-			if (mod & B_SCROLL_LOCK)
+			if (modCode & B_SCROLL_LOCK)
 				_SetStateBit(states, map->scroll_key);
 
-			if (mod & B_NUM_LOCK)
+			if (modCode & B_NUM_LOCK)
 				_SetStateBit(states, map->num_key);
 
-			if (mod & B_MENU_KEY)
+			if (modCode & B_MENU_KEY)
 				_SetStateBit(states, map->menu_key);
 
-			if (mod & B_LEFT_SHIFT_KEY)
+			if (modCode & B_LEFT_SHIFT_KEY)
 				_SetStateBit(states, map->left_shift_key);
 
-			if (mod & B_RIGHT_SHIFT_KEY)
+			if (modCode & B_RIGHT_SHIFT_KEY)
 				_SetStateBit(states, map->right_shift_key);
 
-			if (mod & B_LEFT_COMMAND_KEY)
+			if (modCode & B_LEFT_COMMAND_KEY)
 				_SetStateBit(states, map->left_command_key);
 
-			if (mod & B_RIGHT_COMMAND_KEY)
+			if (modCode & B_RIGHT_COMMAND_KEY)
 				_SetStateBit(states, map->right_command_key);
 
-			if (mod & B_LEFT_CONTROL_KEY)
+			if (modCode & B_LEFT_CONTROL_KEY)
 				_SetStateBit(states, map->left_control_key);
 
-			if (mod & B_RIGHT_CONTROL_KEY)
+			if (modCode & B_RIGHT_CONTROL_KEY)
 				_SetStateBit(states, map->right_control_key);
 
-			if (mod & B_LEFT_OPTION_KEY)
+			if (modCode & B_LEFT_OPTION_KEY)
 				_SetStateBit(states, map->left_option_key);
 
-			if (mod & B_RIGHT_OPTION_KEY)
+			if (modCode & B_RIGHT_OPTION_KEY)
 				_SetStateBit(states, map->right_option_key);
 		}
 
 		if (overrideKey > 0) {
-			if (overrideKey > 127)
-				overrideKey = 0;// invalid value!?
+			if (overrideKey > 127) {
+				// invalid value?
+				overrideKey = 0;
+			}
 
 			fKeyCodes[i] = overrideKey;
 			_SetStateBit(states, overrideKey);
 		}
 	}
+
 	free(keys);
 	free(map);
 }
@@ -807,8 +799,8 @@ KeyStrokeSequenceCommandActuator::_GenerateKeyCodes()
 
 int32
 KeyStrokeSequenceCommandActuator::_LookupKeyCode(key_map* map, char* keys,
-	int32 offsets[128], char c, uint8* setStates, int32& setMod, int32 setTo)
-	const
+	int32 offsets[128], char c, uint8* setStates, int32& setModifier,
+	int32 setTo) const
 {
 	for (int i = 0; i < 128; i++) {
 		if (keys[offsets[i]+ 1] == c) {
@@ -826,10 +818,12 @@ KeyStrokeSequenceCommandActuator::_LookupKeyCode(key_map* map, char* keys,
 			if (setTo & B_CAPS_LOCK)
 				_SetStateBit(setStates, map->caps_key);
 
-			setMod = setTo;
+			setModifier = setTo;
+
 			return i;
 		}
 	}
+
 	return -1;
 }
 
@@ -839,52 +833,53 @@ KeyStrokeSequenceCommandActuator::_SetStateBit(uint8* setStates, uint32 key,
 	bool on) const
 {
 	if (on)
-		setStates[key / 8] |= (0x80 >> (key%8));
+		setStates[key / 8] |= (0x80 >> (key % 8));
 	else
-		setStates[key / 8] &= ~(0x80 >> (key%8));
+		setStates[key / 8] &= ~(0x80 >> (key % 8));
 }
 
 
 status_t
 KeyStrokeSequenceCommandActuator::Archive(BMessage* into, bool deep) const
 {
-	status_t ret = CommandActuator::Archive(into, deep);
+	status_t result = CommandActuator::Archive(into, deep);
+	if (result != B_OK)
+		return result;
+
 	into->AddString("sequence", fSequence.String());
 	int32 numOverrides = fOverrideOffsets.CountItems();
-	status_t tmp = B_OK;
+
+	status_t overridesResult = B_OK;
 	for (int32 i = 0; i < numOverrides; i++) {
-		ret = into->AddInt32("ooffsets",
+		result = into->AddInt32("ooffsets",
 			(int32)(addr_t)fOverrideOffsets.ItemAt(i));
-		if (ret != B_NO_ERROR)
-			tmp = B_ERROR;
+		if (result != B_OK)
+			overridesResult = B_ERROR;
 
-		ret = into->AddInt32("overrides",
+		result = into->AddInt32("overrides",
 			(int32)(addr_t)fOverrides.ItemAt(i));
-		if (ret != B_NO_ERROR)
-			tmp = B_ERROR;
+		if (result != B_OK)
+			overridesResult = B_ERROR;
 
-		ret = into->AddInt32("omods",
+		result = into->AddInt32("omods",
 			(int32)(addr_t)fOverrideModifiers.ItemAt(i));
-		if (ret != B_NO_ERROR)
-			tmp = B_ERROR;
+		if (result != B_OK)
+			overridesResult = B_ERROR;
 
-		ret = into->AddInt32("okeys",
+		result = into->AddInt32("okeys",
 			(int32)(addr_t)fOverrideKeyCodes.ItemAt(i));
 	}
 
-	if (tmp == B_ERROR)
- 		return tmp;
-	else
-		return ret;
+	return overridesResult == B_ERROR ? B_ERROR : result;
 }
 
 
 filter_result
-KeyStrokeSequenceCommandActuator::KeyEvent(const BMessage* keyMsg,
-	BList* outlist, void** setAsyncData, BMessage* lastMouseMove)
+KeyStrokeSequenceCommandActuator::KeyEvent(const BMessage* keyMessage,
+	BList* outList, void** setAsyncData, BMessage* mouseMessage)
 {
-	if (IS_KEY_DOWN(keyMsg)) {
-		BMessage temp(*keyMsg);
+	if (IS_KEY_DOWN(keyMessage)) {
+		BMessage temp(*keyMessage);
 		int numChars = fSequence.Length();
 		for (int i = 0; i < numChars; i++) {
 			char nextChar = fSequence.ByteAt(i);
@@ -939,13 +934,13 @@ KeyStrokeSequenceCommandActuator::KeyEvent(const BMessage* keyMsg,
 			temp.RemoveName("bytes");
 			temp.AddString("bytes", t);
 			temp.what = B_KEY_DOWN;
-			outlist->AddItem(new BMessage(temp));
+			outList->AddItem(new BMessage(temp));
 			temp.what = B_KEY_UP;
-			outlist->AddItem(new BMessage(temp));
+			outList->AddItem(new BMessage(temp));
 		}
+
 		return B_DISPATCH_MESSAGE;
-	}
-	else
+	} else
 		return B_SKIP_MESSAGE;
 }
 
@@ -960,17 +955,14 @@ KeyStrokeSequenceCommandActuator::Instantiate(BMessage* from)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// MIMEHandlerCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - MIMEHandlerCommandActuator
+
+
 MIMEHandlerCommandActuator::MIMEHandlerCommandActuator(int32 argc, char** argv)
 	:
 	CommandActuator(argc, argv),
 	fMimeType((argc > 1) ? argv[1] : "")
 {
-	// empty
 }
 
 
@@ -979,14 +971,13 @@ MIMEHandlerCommandActuator::MIMEHandlerCommandActuator(BMessage* from)
 	CommandActuator(from)
 {
 	const char* temp;
-	if (from->FindString("mimeType", 0, &temp) == B_NO_ERROR)
+	if (from->FindString("mimeType", 0, &temp) == B_OK)
 		fMimeType = temp;
 }
 
 
 MIMEHandlerCommandActuator::~MIMEHandlerCommandActuator()
 {
-	// empty
 }
 
 
@@ -1000,10 +991,10 @@ MIMEHandlerCommandActuator::Archive(BMessage* into, bool deep) const
 
 
 filter_result
-MIMEHandlerCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
-	void** setAsyncData, BMessage* lastMouseMove)
+MIMEHandlerCommandActuator::KeyEvent(const BMessage* keyMessage, BList* outList,
+	void** setAsyncData, BMessage* mouseMessage)
 {
-	if (IS_KEY_DOWN(keyMsg))
+	if (IS_KEY_DOWN(keyMessage))
 		// cause KeyEventAsync() to be called asynchronously
 		*setAsyncData = (void*) true;
 	return B_SKIP_MESSAGE;
@@ -1011,26 +1002,27 @@ MIMEHandlerCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
 
 
 void
-MIMEHandlerCommandActuator::KeyEventAsync(const BMessage* keyMsg,
+MIMEHandlerCommandActuator::KeyEventAsync(const BMessage* keyMessage,
 	void* asyncData)
 {
-	if (be_roster) {
-		BString str;
-		BString str1("Shortcuts MIME launcher error");
-		status_t ret = be_roster->Launch(fMimeType.String());
-		if ((ret != B_NO_ERROR) && (ret != B_ALREADY_RUNNING)) {
-			str << "Can't launch handler for ";
-			str << ", no such MIME type exists. Please check your Shortcuts";
-			str << " settings.";
-			BAlert* alert = new BAlert(str1.String(), str.String(), "OK");
-			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-			alert->Go(NULL);
-		}
+	if (be_roster == NULL)
+		return;
+
+	BString string;
+	status_t ret = be_roster->Launch(fMimeType.String());
+	if ((ret != B_OK) && (ret != B_ALREADY_RUNNING)) {
+		string << "Can't launch handler for ";
+		string << ", no such MIME type exists. Please check your Shortcuts";
+		string << " settings.";
+		BAlert* alert = new BAlert("Shortcuts MIME launcher error",
+			string.String(), "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go(NULL);
 	}
 }
 
 
-BArchivable* MIMEHandlerCommandActuator ::Instantiate(BMessage* from)
+BArchivable* MIMEHandlerCommandActuator::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "MIMEHandlerCommandActuator"))
 		return new MIMEHandlerCommandActuator(from);
@@ -1039,16 +1031,13 @@ BArchivable* MIMEHandlerCommandActuator ::Instantiate(BMessage* from)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// BeepCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - BeepCommandActuator
+
+
 BeepCommandActuator::BeepCommandActuator(int32 argc, char** argv)
 	:
 	CommandActuator(argc, argv)
 {
-	// empty
 }
 
 
@@ -1056,13 +1045,11 @@ BeepCommandActuator::BeepCommandActuator(BMessage* from)
 	:
 	CommandActuator(from)
 {
-	// empty
 }
 
 
 BeepCommandActuator::~BeepCommandActuator()
 {
-	// empty
 }
 
 
@@ -1074,7 +1061,7 @@ BeepCommandActuator::Archive(BMessage* into, bool deep) const
 
 
 BArchivable*
-BeepCommandActuator ::Instantiate(BMessage* from)
+BeepCommandActuator::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "BeepCommandActuator"))
 		return new BeepCommandActuator(from);
@@ -1084,27 +1071,25 @@ BeepCommandActuator ::Instantiate(BMessage* from)
 
 
 filter_result
-BeepCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
-	void** setAsyncData, BMessage* lastMouseMove)
+BeepCommandActuator::KeyEvent(const BMessage* keyMessage, BList* outList,
+	void** setAsyncData, BMessage* mouseMessage)
 {
-	if (IS_KEY_DOWN(keyMsg))
+	if (IS_KEY_DOWN(keyMessage))
 		beep();
 
 	return B_SKIP_MESSAGE;
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// MultiCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - MultiCommandActuator
+
+
 MultiCommandActuator::MultiCommandActuator(BMessage* from)
 	:
 	CommandActuator(from)
 {
 	BMessage msg;
-	for (int i = 0; from->FindMessage("subs", i, &msg) == B_NO_ERROR; i++) {
+	for (int i = 0; from->FindMessage("subs", i, &msg) == B_OK; i++) {
 		BArchivable* subObj = instantiate_object(&msg);
 		if (subObj) {
 			CommandActuator* ca = dynamic_cast < CommandActuator*>(subObj);
@@ -1145,7 +1130,7 @@ status_t
 MultiCommandActuator::Archive(BMessage* into, bool deep) const
 {
 	status_t ret = CommandActuator::Archive(into, deep);
-	if (ret != B_NO_ERROR)
+	if (ret != B_OK)
 		return ret;
 
 	int numSubs = fSubActuators.CountItems();
@@ -1153,17 +1138,17 @@ MultiCommandActuator::Archive(BMessage* into, bool deep) const
 		BMessage msg;
 		ret = ((CommandActuator*)fSubActuators.ItemAt(i))->Archive(&msg, deep);
 
-		if (ret != B_NO_ERROR)
+		if (ret != B_OK)
 			return ret;
 
 		into->AddMessage("subs", &msg);
 	}
-	return B_NO_ERROR;
+	return B_OK;
 }
 
 
 BArchivable*
-MultiCommandActuator ::Instantiate(BMessage* from)
+MultiCommandActuator::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "MultiCommandActuator"))
 		return new MultiCommandActuator(from);
@@ -1173,8 +1158,8 @@ MultiCommandActuator ::Instantiate(BMessage* from)
 
 
 filter_result
-MultiCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
-	void** asyncData, BMessage* lastMouseMove)
+MultiCommandActuator::KeyEvent(const BMessage* keyMessage, BList* outList,
+	void** asyncData, BMessage* mouseMessage)
 {
 	BList* aDataList = NULL; // demand-allocated
 	filter_result res = B_SKIP_MESSAGE;
@@ -1182,7 +1167,7 @@ MultiCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
 	for (int i = 0; i < numSubs; i++) {
 		void* aData = NULL;
 		status_t next = ((CommandActuator*)fSubActuators.ItemAt(i))->
-			KeyEvent(keyMsg, outlist, &aData, lastMouseMove);
+			KeyEvent(keyMessage, outList, &aData, mouseMessage);
 
 		if (next == B_DISPATCH_MESSAGE)
 			// dispatch message if at least one sub wants it dispatched
@@ -1216,25 +1201,23 @@ MultiCommandActuator::KeyEventAsync(const BMessage* keyUpMsg, void* asyncData)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// MoveMouseCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - MoveMouseCommandActuator
+
+
 MoveMouseCommandActuator::MoveMouseCommandActuator(BMessage* from)
 	:
 	CommandActuator(from)
 {
-	if (from->FindFloat("xPercent", &fXPercent) != B_NO_ERROR)
+	if (from->FindFloat("xPercent", &fXPercent) != B_OK)
 		fXPercent = 0.0f;
 
-	if (from->FindFloat("yPercent", &fYPercent) != B_NO_ERROR)
+	if (from->FindFloat("yPercent", &fYPercent) != B_OK)
 		fYPercent = 0.0f;
 
-	if (from->FindFloat("xPixels", &fXPixels) != B_NO_ERROR)
+	if (from->FindFloat("xPixels", &fXPixels) != B_OK)
 		fXPixels = 0;
 
-	if (from->FindFloat("yPixels", &fYPixels) != B_NO_ERROR)
+	if (from->FindFloat("yPixels", &fYPixels) != B_OK)
 		fYPixels = 0;
 }
 
@@ -1257,7 +1240,6 @@ MoveMouseCommandActuator::MoveMouseCommandActuator(int32 argc, char** argv)
 
 MoveMouseCommandActuator::~MoveMouseCommandActuator()
 {
-	// empty
 }
 
 
@@ -1284,45 +1266,45 @@ MoveMouseCommandActuator::CalculateCoords(float& setX, float& setY) const
 
 
 BMessage*
-MoveMouseCommandActuator::CreateMouseMovedMessage(const BMessage* origMsg,
-	BPoint p, BList* outlist) const
+MoveMouseCommandActuator::CreateMouseMessage(const BMessage* original,
+	BPoint where, BList* outList) const
 {
-	// Force p into the screen space
+	// Force where into the screen space
 	{
-		BScreen s;
-		p.ConstrainTo(s.Frame());
+		BScreen screen;
+		where.ConstrainTo(screen.Frame());
 	}
 
-	BMessage* newMsg = new BMessage(B_MOUSE_MOVED);
+	BMessage* newMessage = new BMessage(B_MOUSE_MOVED);
 
-	newMsg->AddPoint("where", p);
+	newMessage->AddPoint("where", where);
 
 	int32 buttons = 0;
-	(void)origMsg->FindInt32("buttons", &buttons);
+	(void)original->FindInt32("buttons", &buttons);
 
 	if (buttons == 0)
 		buttons = 1;
 
-	newMsg->AddInt32("buttons", buttons);
+	newMessage->AddInt32("buttons", buttons);
 
 	// Trey sez you gotta keep then "when"'s increasing if you want click&drag
 	// to work!
 	const BMessage* lastMessage;
-	int nr = outlist->CountItems() - 1;
+	int32 last = outList->CountItems() - 1;
 
-	if (outlist->CountItems() > 0)
-		lastMessage = (const BMessage*)outlist->ItemAt(nr);
+	if (outList->CountItems() > 0)
+		lastMessage = (const BMessage*)outList->ItemAt(last);
 	else
-		lastMessage = origMsg;
+		lastMessage = original;
 
 	int64 when;
 
-	if (lastMessage->FindInt64("when", &when) == B_NO_ERROR) {
+	if (lastMessage->FindInt64("when", &when) == B_OK) {
 		when++;
-		newMsg->RemoveName("when");
-		newMsg->AddInt64("when", when);
+		newMessage->RemoveName("when");
+		newMessage->AddInt64("when", when);
 	}
-	return newMsg;
+	return newMessage;
 }
 
 
@@ -1374,16 +1356,13 @@ MoveMouseCommandActuator::_ParseArg(const char* arg, float& setPercent,
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// MoveMouseToCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - MoveMouseToCommandActuator
+
+
 MoveMouseToCommandActuator::MoveMouseToCommandActuator(BMessage* from)
 	:
 	MoveMouseCommandActuator(from)
 {
-	// empty
 }
 
 
@@ -1391,13 +1370,11 @@ MoveMouseToCommandActuator::MoveMouseToCommandActuator(int32 argc, char** argv)
 	:
 	MoveMouseCommandActuator(argc, argv)
 {
-	// empty
 }
 
 
 MoveMouseToCommandActuator::~MoveMouseToCommandActuator()
 {
-	// empty
 }
 
 
@@ -1409,7 +1386,7 @@ MoveMouseToCommandActuator::Archive(BMessage* into, bool deep) const
 
 
 BArchivable*
-MoveMouseToCommandActuator ::Instantiate(BMessage* from)
+MoveMouseToCommandActuator::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "MoveMouseToCommandActuator"))
 		return new MoveMouseToCommandActuator(from);
@@ -1419,32 +1396,31 @@ MoveMouseToCommandActuator ::Instantiate(BMessage* from)
 
 
 filter_result
-MoveMouseToCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
-	void** setAsyncData, BMessage* lastMouseMove)
+MoveMouseToCommandActuator::KeyEvent(const BMessage* keyMessage, BList* outList,
+	void** setAsyncData, BMessage* mouseMessage)
 {
-	if (IS_KEY_DOWN(keyMsg)) {
+	if (IS_KEY_DOWN(keyMessage)) {
 		float x, y;
 		CalculateCoords(x, y);
-		BPoint p(x, y);
-		BMessage* newMsg = CreateMouseMovedMessage(keyMsg, p, outlist);
-		*lastMouseMove = *newMsg;
-		outlist->AddItem(newMsg);
+		BPoint where(x, y);
+		BMessage* newMessage = CreateMouseMessage(keyMessage, where, outList);
+		*mouseMessage = *newMessage;
+		outList->AddItem(newMessage);
+
 		return B_DISPATCH_MESSAGE;
 	}
+
 	return B_SKIP_MESSAGE;
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// MoveMouseByCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - MoveMouseByCommandActuator
+
+
 MoveMouseByCommandActuator::MoveMouseByCommandActuator(BMessage* from)
 	:
 	MoveMouseCommandActuator(from)
 {
-	// empty
 }
 
 
@@ -1452,13 +1428,11 @@ MoveMouseByCommandActuator::MoveMouseByCommandActuator(int32 argc, char** argv)
 	:
 	MoveMouseCommandActuator(argc, argv)
 {
-	// empty
 }
 
 
 MoveMouseByCommandActuator::~MoveMouseByCommandActuator()
 {
-	// empty
 }
 
 
@@ -1470,7 +1444,7 @@ status_t MoveMouseByCommandActuator::Archive(BMessage* into, bool deep) const
 
 
 BArchivable*
-MoveMouseByCommandActuator ::Instantiate(BMessage* from)
+MoveMouseByCommandActuator::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "MoveMouseByCommandActuator"))
 		return new MoveMouseByCommandActuator(from);
@@ -1480,21 +1454,20 @@ MoveMouseByCommandActuator ::Instantiate(BMessage* from)
 
 
 filter_result
-MoveMouseByCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
-	void** setAsyncData, BMessage* lastMouseMove)
+MoveMouseByCommandActuator::KeyEvent(const BMessage* keyMessage, BList* outList,
+	void** setAsyncData, BMessage* mouseMessage)
 {
-	if (IS_KEY_DOWN(keyMsg)) {
+	if (IS_KEY_DOWN(keyMessage)) {
 		// Get the current mouse position
-		BPoint p;
-		if (lastMouseMove->FindPoint("where", &p) == B_NO_ERROR) {
+		BPoint where;
+		if (mouseMessage->FindPoint("where", &where) == B_OK) {
 			// Get the desired offset
 			BPoint diff;
 			CalculateCoords(diff.x, diff.y);
-			p += diff;
-
-			BMessage* newMsg = CreateMouseMovedMessage(keyMsg, p, outlist);
-			*lastMouseMove = *newMsg;
-			outlist->AddItem(newMsg);
+			where += diff;
+			BMessage* newMessage = CreateMouseMessage(keyMessage, where, outList);
+			*mouseMessage = *newMessage;
+			outList->AddItem(newMessage);
 			return B_DISPATCH_MESSAGE;
 		}
 	}
@@ -1502,11 +1475,9 @@ MoveMouseByCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// SendMessageCommandActuator
-//
-///////////////////////////////////////////////////////////////////////////////
+//	#pragma mark - SendMessageCommandActuator
+
+
 SendMessageCommandActuator::SendMessageCommandActuator(int32 argc, char** argv)
 	:
 	CommandActuator(argc, argv),
@@ -1525,24 +1496,24 @@ SendMessageCommandActuator::SendMessageCommandActuator(int32 argc, char** argv)
 			// Translate the characters into the uint32 they stand for.
 			// Note that we must do this in a byte-endian-independant fashion
 			// (no casting!)
-			fSendMsg.what = 0;
+			fSendMessage.what = 0;
 			uint32 mult = 1;
 			for (int i = 0; i < 4; i++) {
-				fSendMsg.what += ((uint32)(whatStr[4 - i]))* mult;
+				fSendMessage.what += ((uint32)(whatStr[4 - i]))* mult;
 				mult <<= 8;
 			}
 		} else if (strncmp(whatStr, "0x", 2) == 0)
 			// translate hex string to decimal
-			fSendMsg.what = strtoul(&whatStr[2], NULL, 16);
+			fSendMessage.what = strtoul(&whatStr[2], NULL, 16);
 		else
-			fSendMsg.what = atoi(whatStr);
+			fSendMessage.what = atoi(whatStr);
 	} else
-		fSendMsg.what = 0;
+		fSendMessage.what = 0;
 
 	for (int i = 3; i < argc; i++) {
 		type_code tc = B_BOOL_TYPE;// default type when no value is present
 		const char* arg = argv[i];
-		BString argStr(arg);
+		BString argString(arg);
 		const char* equals = strchr(arg, ' = ');
 		const char* value = "true";// default if no value is present
 
@@ -1577,51 +1548,51 @@ SendMessageCommandActuator::SendMessageCommandActuator(int32 argc, char** argv)
 					tc = B_RECT_TYPE;
 
 				// remove the colon and stuff
-				argStr = argStr.Truncate(colon - arg);
+				argString = argString.Truncate(colon - arg);
 			} else
 				// remove the equals and arg
-				argStr = argStr.Truncate(equals - arg);
+				argString = argString.Truncate(equals - arg);
 		}
 
 		switch(tc) {
 			case B_STRING_TYPE:
-				fSendMsg.AddString(argStr.String(), value);
+				fSendMessage.AddString(argString.String(), value);
 				break;
 
 			case B_INT8_TYPE:
-				fSendMsg.AddInt8(argStr.String(), (int8)atoi(value));
+				fSendMessage.AddInt8(argString.String(), (int8)atoi(value));
 				break;
 
 			case B_INT16_TYPE:
-				fSendMsg.AddInt16(argStr.String(), (int16)atoi(value));
+				fSendMessage.AddInt16(argString.String(), (int16)atoi(value));
 				break;
 
 			case B_INT32_TYPE:
-				fSendMsg.AddInt32(argStr.String(), (int32)atoi(value));
+				fSendMessage.AddInt32(argString.String(), (int32)atoi(value));
 				break;
 
 			case B_INT64_TYPE:
-				fSendMsg.AddInt64(argStr.String(), (int64)atoi(value));
+				fSendMessage.AddInt64(argString.String(), (int64)atoi(value));
 				break;
 
 			case B_BOOL_TYPE:
-				fSendMsg.AddBool(argStr.String(), ((value[0] == 't')
+				fSendMessage.AddBool(argString.String(), ((value[0] == 't')
 					|| (value[0] == 'T')));
 				break;
 
 			case B_FLOAT_TYPE:
-				fSendMsg.AddFloat(argStr.String(), atof(value));
+				fSendMessage.AddFloat(argString.String(), atof(value));
 				break;
 
 			case B_DOUBLE_TYPE:
-				fSendMsg.AddDouble(argStr.String(), (double)atof(value));
+				fSendMessage.AddDouble(argString.String(), (double)atof(value));
 				break;
 
 			case B_POINT_TYPE:
 			{
 				float pts[2] = {0.0f, 0.0f};
 				_ParseFloatArgs(pts, 2, value);
-				fSendMsg.AddPoint(argStr.String(), BPoint(pts[0], pts[1]));
+				fSendMessage.AddPoint(argString.String(), BPoint(pts[0], pts[1]));
 				break;
 			}
 
@@ -1629,7 +1600,7 @@ SendMessageCommandActuator::SendMessageCommandActuator(int32 argc, char** argv)
 			{
 				float pts[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 				_ParseFloatArgs(pts, 4, value);
-				fSendMsg.AddRect(argStr.String(),
+				fSendMessage.AddRect(argString.String(),
 					BRect(pts[0], pts[1], pts[2], pts[3]));
 				break;
 			}
@@ -1658,16 +1629,15 @@ SendMessageCommandActuator::SendMessageCommandActuator(BMessage* from)
 {
 	const char* temp;
 
-	if (from->FindString("signature", 0, &temp) == B_NO_ERROR)
+	if (from->FindString("signature", 0, &temp) == B_OK)
 		fSignature = temp;
 
-	(void) from->FindMessage("sendmsg", &fSendMsg);
+	(void) from->FindMessage("sendmsg", &fSendMessage);
 }
 
 
 SendMessageCommandActuator::~SendMessageCommandActuator()
 {
-	// empty
 }
 
 
@@ -1676,16 +1646,16 @@ SendMessageCommandActuator::Archive(BMessage* into, bool deep) const
 {
 	status_t ret = CommandActuator::Archive(into, deep);
 	into->AddString("signature", fSignature.String());
-	into->AddMessage("sendmsg", &fSendMsg);
+	into->AddMessage("sendmsg", &fSendMessage);
 	return ret;
 }
 
 
 filter_result
-SendMessageCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
-	void** setAsyncData, BMessage* lastMouseMove)
+SendMessageCommandActuator::KeyEvent(const BMessage* keyMessage, BList* outList,
+	void** setAsyncData, BMessage* mouseMessage)
 {
-	if (IS_KEY_DOWN(keyMsg))
+	if (IS_KEY_DOWN(keyMessage))
 		// cause KeyEventAsync() to be called asynchronously
 		*setAsyncData = (void*) true;
 
@@ -1694,30 +1664,30 @@ SendMessageCommandActuator::KeyEvent(const BMessage* keyMsg, BList* outlist,
 
 
 void
-SendMessageCommandActuator::KeyEventAsync(const BMessage* keyMsg,
+SendMessageCommandActuator::KeyEventAsync(const BMessage* keyMessage,
 	void* asyncData)
 {
-	if (be_roster) {
-		BString str;
-		BString str1("Shortcuts SendMessage error");
-		if (fSignature.Length() == 0) {
-			str << "SendMessage: Target application signature not specified";
-			BAlert* alert = new BAlert(str1.String(), str.String(), "OK");
-			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-			alert->Go(NULL);
-		} else {
-			status_t error = B_OK;
-			BMessenger msngr(fSignature.String(), -1, &error);
+	if (be_roster == NULL)
+		return;
 
-			if (error == B_OK)
-				msngr.SendMessage(&fSendMsg);
-		}
+	BString string;
+	if (fSignature.Length() == 0) {
+		string << "SendMessage: Target application signature not specified";
+		BAlert* alert = new BAlert("Shortcuts SendMessage error",
+			string.String(), "OK");
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go(NULL);
+	} else {
+		status_t result = B_OK;
+		BMessenger messenger(fSignature.String(), -1, &result);
+		if (result == B_OK)
+			messenger.SendMessage(&fSendMessage);
 	}
 }
 
 
 BArchivable*
-SendMessageCommandActuator ::Instantiate(BMessage* from)
+SendMessageCommandActuator::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "SendMessageCommandActuator"))
 		return new SendMessageCommandActuator(from);

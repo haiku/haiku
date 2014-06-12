@@ -31,6 +31,9 @@
 #define FILE_UPDATED 'fiUp'
 
 
+//	#pragma mark - hks
+
+
 class hks {
 public:
 	hks(int32 key, BitFieldTester* tester, CommandActuator* actuator,
@@ -53,7 +56,7 @@ public:
 		{ return fKey; }
 	bool DoModifiersMatch(uint32 bits) const
 		{ return fTester->IsMatching(bits); }
-	const BMessage& GetActuatorMsg() const
+	const BMessage& GetActuatorMessage() const
 		{ return fActuatorMessage; }
 	CommandActuator* GetActuator()
 		{ return fActuator; }
@@ -62,8 +65,11 @@ private:
 	int32 				fKey;
 	BitFieldTester* 	fTester;
 	CommandActuator* 	fActuator;
-	const BMessage 		fActuatorMessage;
+	const BMessage		fActuatorMessage;
 };
+
+
+//	#pragma mark - KeyCommandMap
 
 
 KeyCommandMap::KeyCommandMap(const char* file)
@@ -84,9 +90,9 @@ KeyCommandMap::KeyCommandMap(const char* file)
 			B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
 	}
 
-	if (fileEntry.InitCheck() == B_NO_ERROR) {
-		BMessage msg(FILE_UPDATED);
-		PostMessage(&msg);
+	if (fileEntry.InitCheck() == B_OK) {
+		BMessage message(FILE_UPDATED);
+		PostMessage(&message);
 	}
 
 	fPort = create_port(1, SHORTCUTS_CATCHER_PORT_NAME);
@@ -100,64 +106,63 @@ KeyCommandMap::~KeyCommandMap()
 	if (fPort >= 0)
 		close_port(fPort);
 
-	for (int i = fInjects.CountItems() - 1; i >= 0; i--)
+	for (int32 i = fInjects.CountItems() - 1; i >= 0; i--)
 		delete (BMessage*)fInjects.ItemAt(i);
 
 	BPrivate::BPathMonitor::StopWatching(BMessenger(this, this));
 		// don't know if this is necessary, but it can't hurt
+
 	_DeleteHKSList(fSpecs);
-	delete [] fFileName;
+
+	delete[] fFileName;
 }
 
 
 void
-KeyCommandMap::MouseMoved(const BMessage* mouseMoved)
+KeyCommandMap::MouseMessageReceived(const BMessage* message)
 {
 	// Save the mouse state for later...
-	fLastMouseMessage = *mouseMoved;
+	fLastMouseMessage = *message;
 }
 
 
 filter_result
-KeyCommandMap::KeyEvent(const BMessage* keyMsg, BList* outlist,
+KeyCommandMap::KeyEvent(const BMessage* keyMessage, BList* outList,
 	const BMessenger& sendTo)
 {
 	filter_result result = B_DISPATCH_MESSAGE;
 	uint32 modifiers;
 	int32 key;
 
-	if (keyMsg->FindInt32("modifiers", (int32*) &modifiers) == B_OK
-		&& keyMsg->FindInt32("key", &key) == B_OK
-		&& fSyncSpecs.Lock()) {
-		if (fSpecs != NULL) {
-			int count = fSpecs->CountItems();
+	if (keyMessage->FindInt32("modifiers", (int32*)&modifiers) == B_OK
+		&& keyMessage->FindInt32("key", &key) == B_OK
+		&& fSpecs != NULL && fSyncSpecs.Lock()) {
+		int32 count = fSpecs->CountItems();
+		for (int32 i = 0; i < count; i++) {
+			hks* next = (hks*)fSpecs->ItemAt(i);
 
-			for (int i = 0; i < count; i++) {
-				hks* next = (hks*) fSpecs->ItemAt(i);
+			if (key == next->GetKey() && next->DoModifiersMatch(modifiers)) {
+				void* asyncData = NULL;
+				result = next->GetActuator()->KeyEvent(keyMessage, outList,
+					&asyncData, &fLastMouseMessage);
 
-				if (key == next->GetKey()
-					&& next->DoModifiersMatch(modifiers)) {
-					void* asyncData = NULL;
-					result = next->GetActuator()->KeyEvent(keyMsg, outlist,
-						&asyncData, &fLastMouseMessage);
-
-					if (asyncData != NULL) {
-						BMessage newMsg(*keyMsg);
-						newMsg.AddMessage("act", &next->GetActuatorMsg());
-						newMsg.AddPointer("adata", asyncData);
-						sendTo.SendMessage(&newMsg);
-					}
+				if (asyncData != NULL) {
+					BMessage newMessage(*keyMessage);
+					newMessage.AddMessage("act", &next->GetActuatorMessage());
+					newMessage.AddPointer("adata", asyncData);
+					sendTo.SendMessage(&newMessage);
 				}
 			}
 		}
 		fSyncSpecs.Unlock();
 	}
+
 	return result;
 }
 
 
 void
-KeyCommandMap::DrainInjectedEvents(const BMessage* keyMsg, BList* outlist,
+KeyCommandMap::DrainInjectedEvents(const BMessage* keyMessage, BList* outList,
 	const BMessenger& sendTo)
 {
 	BList temp;
@@ -167,51 +172,51 @@ KeyCommandMap::DrainInjectedEvents(const BMessage* keyMsg, BList* outlist,
 		fSyncSpecs.Unlock();
 	}
 
-	int count = temp.CountItems();
-	for (int i = 0; i < count; i++) {
-		BMessage* msg = (BMessage*)temp.ItemAt(i);
+	int32 count = temp.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BMessage* message = (BMessage*)temp.ItemAt(i);
 
-		BArchivable* archive = instantiate_object(msg);
+		BArchivable* archive = instantiate_object(message);
 		if (archive != NULL) {
 			CommandActuator* actuator = dynamic_cast<CommandActuator*>(archive);
 			if (actuator != NULL) {
-				BMessage newMsg(*keyMsg);
-				newMsg.what = B_KEY_DOWN;
+				BMessage newMessage(*keyMessage);
+				newMessage.what = B_KEY_DOWN;
 
 				void* asyncData = NULL;
-				actuator->KeyEvent(&newMsg, outlist, &asyncData,
+				actuator->KeyEvent(&newMessage, outList, &asyncData,
 					&fLastMouseMessage);
 
 				if (asyncData != NULL) {
-					newMsg.AddMessage("act", msg);
-					newMsg.AddPointer("adata", asyncData);
-					sendTo.SendMessage(&newMsg);
+					newMessage.AddMessage("act", message);
+					newMessage.AddPointer("adata", asyncData);
+					sendTo.SendMessage(&newMessage);
 				}
 			}
 			delete archive;
 		}
-		delete msg;
+		delete message;
 	}
 }
 
 
 void
-KeyCommandMap::MessageReceived(BMessage* msg)
+KeyCommandMap::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case EXECUTE_COMMAND:
 		{
-			BMessage subMsg;
-			if (msg->FindMessage("act", &subMsg) == B_NO_ERROR) {
+			BMessage substituteMessage;
+			if (message->FindMessage("act", &substituteMessage) == B_OK) {
 				if (fSyncSpecs.Lock()) {
-					fInjects.AddItem(new BMessage(subMsg));
+					fInjects.AddItem(new BMessage(substituteMessage));
 					fSyncSpecs.Unlock();
 
 					// This evil hack forces input_server to call Filter() on
 					// us so we can process the injected event.
 					BPoint lmp;
 					status_t err = fLastMouseMessage.FindPoint("where", &lmp);
-					if (err == B_NO_ERROR)
+					if (err == B_OK)
 						set_mouse_position((int32)lmp.x, (int32)lmp.y);
 				}
 			}
@@ -226,40 +231,42 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 		{
 			const char* path = "";
 			// only fall through for appropriate file
-			if (!(msg->FindString("path", &path) == B_OK
+			if (!(message->FindString("path", &path) == B_OK
 					&& strcmp(path, fFileName) == 0)) {
 				dev_t device;
 				ino_t node;
-				if (msg->FindInt32("device", &device) != B_OK
-					|| msg->FindInt64("node", &node) != B_OK
+				if (message->FindInt32("device", &device) != B_OK
+					|| message->FindInt64("node", &node) != B_OK
 					|| device != fNodeRef.device
-					|| node != fNodeRef.node)
+					|| node != fNodeRef.node) {
 					break;
+				}
 			}
 		}
+		// fall-through
 		case FILE_UPDATED:
 		{
-			BMessage fileMsg;
+			BMessage fileMessage;
 			BFile file(fFileName, B_READ_ONLY);
 			BList* newList = new BList;
 			BList* oldList = NULL;
-			if (file.InitCheck() == B_OK && fileMsg.Unflatten(&file) == B_OK) {
-
+			if (file.InitCheck() == B_OK && fileMessage.Unflatten(&file) == B_OK) {
 				file.GetNodeRef(&fNodeRef);
-				int i = 0;
-				BMessage msg;
-				while (fileMsg.FindMessage("spec", i++, &msg) == B_OK) {
+				int32 i = 0;
+				BMessage message;
+				while (fileMessage.FindMessage("spec", i++, &message) == B_OK) {
 					uint32 key;
-					BMessage testerMsg;
-					BMessage actMsg;
+					BMessage testerMessage;
+					BMessage actuatorMessage;
 
-					if (msg.FindInt32("key", (int32*) &key) == B_OK
-						&& msg.FindMessage("act", &actMsg) == B_OK
-						&& msg.FindMessage("modtester", &testerMsg) == B_OK) {
-						
+					if (message.FindInt32("key", (int32*)&key) == B_OK
+						&& message.FindMessage("act", &actuatorMessage) == B_OK
+						&& message.FindMessage("modtester", &testerMessage)
+							== B_OK) {
+
 						// Leave handling of add-ons shortcuts to Tracker
 						BString command;
-						if (msg.FindString("command", &command) == B_OK) {
+						if (message.FindString("command", &command) == B_OK) {
 							BPath path;
 							if (find_directory(B_SYSTEM_ADDONS_DIRECTORY, &path)
 									== B_OK) {
@@ -267,35 +274,40 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 								if (command.FindFirst(path.Path()) != B_ERROR)
 									continue;
 							}
+
 							if (find_directory(
-									B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-						  			&path) == B_OK) {
+								B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, &path)
+									== B_OK) {
 								path.Append("Tracker/");
 								if (command.FindFirst(path.Path()) != B_ERROR)
 									continue;
 							}
+
 							if (find_directory(B_USER_ADDONS_DIRECTORY, &path)
 									== B_OK) {
 								path.Append("Tracker/");
 								if (command.FindFirst(path.Path()) != B_ERROR)
 									continue;
 							}
+
 							if (find_directory(
-									B_USER_NONPACKAGED_ADDONS_DIRECTORY, &path)
+								B_USER_NONPACKAGED_ADDONS_DIRECTORY, &path)
 									== B_OK) {
 								path.Append("Tracker/");
 								if (command.FindFirst(path.Path()) != B_ERROR)
 									continue;
 							}
 						}
-						BArchivable* archive = instantiate_object(&testerMsg);
+
+						BArchivable* archive = instantiate_object(&testerMessage);
 						if (BitFieldTester* tester
 								= dynamic_cast<BitFieldTester*>(archive)) {
-							archive = instantiate_object(&actMsg);
-							if (CommandActuator* actuator
-									= dynamic_cast<CommandActuator*>(archive)) {
-								newList->AddItem(
-									new hks(key, tester, actuator, actMsg));
+							archive = instantiate_object(&actuatorMessage);
+							CommandActuator* actuator
+								= dynamic_cast<CommandActuator*>(archive);
+							if (actuator != NULL) {
+								newList->AddItem(new hks(key, tester, actuator,
+									actuatorMessage));
 							} else {
 								delete archive;
 								delete tester;
@@ -308,18 +320,20 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 				fNodeRef.device = -1;
 				fNodeRef.node = -1;
 			}
+
 			if (fSyncSpecs.Lock()) {
 				// swap in the new list
 				oldList = fSpecs;
 				fSpecs = newList;
 				fSyncSpecs.Unlock();
 			} else {
-				// wtf? This shouldn't happen...
-				oldList = newList; // but clean up if it does
+				// This should never happen... but clean up if it does.
+				oldList = newList;
 			}
+
 			_DeleteHKSList(oldList);
+			break;
 		}
-		break;
 	}
 }
 
@@ -348,7 +362,8 @@ KeyCommandMap::_PutMessageToPort()
 		char buffer[2048];
 		ssize_t size = message.FlattenedSize();
 		if (size <= (ssize_t)sizeof(buffer)
-			&& message.Flatten(buffer, size) == B_OK)
+			&& message.Flatten(buffer, size) == B_OK) {
 			write_port_etc(fPort, 0, buffer, size, B_TIMEOUT, 250000);
+		}
 	}
 }

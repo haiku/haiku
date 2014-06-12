@@ -1,14 +1,12 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
  */
-
-
-#ifndef BitFieldTesters_h
-#define BitFieldTesters_h
+#ifndef _BIT_FIELD_TESTERS_H
+#define _BIT_FIELD_TESTERS_H
 
 
 #include <Archivable.h>
@@ -16,24 +14,26 @@
 #include <Message.h>
 
 
-// This file contains various BitTester classes, each of which defines a 
+// This file contains various BitTester classes, each of which defines a
 // sequence of bit testing logics to do on a uint32.
 
 #ifndef __HAIKU__
 #ifndef __INTEL__
-#pragma export on 
+#pragma export on
 #endif
 #endif
+
 
 // The abstract base class. Defines the interface.
 _EXPORT class BitFieldTester;
 class BitFieldTester : public BArchivable {
 public:
-							BitFieldTester();
-							BitFieldTester(BMessage* from);
+								BitFieldTester();
+								BitFieldTester(BMessage* from);
 
-	virtual bool			IsMatching(uint32 field) = 0;
-	virtual status_t		Archive(BMessage* into, bool deep = true) const;
+	virtual bool				IsMatching(uint32 field) = 0;
+	virtual status_t			Archive(BMessage* into,
+									bool deep = true) const;
 };
 
 
@@ -41,15 +41,16 @@ public:
 _EXPORT class ConstantFieldTester;
 class ConstantFieldTester : public BitFieldTester {
 public:
-							ConstantFieldTester(bool result);
-							ConstantFieldTester(BMessage* from);
+								ConstantFieldTester(bool result);
+								ConstantFieldTester(BMessage* from);
 
-	virtual	status_t		Archive(BMessage* into, bool deep = true) const;
-	static	BArchivable*	Instantiate(BMessage* from);
-	virtual bool			IsMatching(uint32 field);
+	virtual	status_t			Archive(BMessage* into,
+									bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* from);
+	virtual	bool				IsMatching(uint32 field);
 
 private:
-			bool			fResult;
+			bool				fResult;
 };
 
 
@@ -58,17 +59,18 @@ private:
 _EXPORT class HasBitsFieldTester;
 class HasBitsFieldTester : public BitFieldTester {
 public:
-							HasBitsFieldTester(uint32 requiredBits, 
-								uint32 forbiddenBits = 0);
-							HasBitsFieldTester(BMessage* from);
+								HasBitsFieldTester(uint32 requiredBits,
+									uint32 forbiddenBits = 0);
+								HasBitsFieldTester(BMessage* from);
 
-	virtual	status_t		Archive(BMessage* into, bool deep = true) const;
-	static	BArchivable*	Instantiate(BMessage* from);
-	virtual	bool			IsMatching(uint32 field);
+	virtual	status_t			Archive(BMessage* into,
+									bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* from);
+	virtual	bool				IsMatching(uint32 field);
 
 private:
-			uint32			fRequiredBits;
-			uint32			fForbiddenBits;
+			uint32				fRequiredBits;
+			uint32				fForbiddenBits;
 };
 
 
@@ -77,16 +79,17 @@ _EXPORT class NotFieldTester;
 class NotFieldTester : public BitFieldTester {
 public:
 	// (slave) should be allocated with new, becomes property of this object.
-							NotFieldTester(BitFieldTester* slave);
-							NotFieldTester(BMessage* from);
-							~NotFieldTester();
+								NotFieldTester(BitFieldTester* slave);
+								NotFieldTester(BMessage* from);
+	virtual						~NotFieldTester();
 
-	virtual	status_t		Archive(BMessage* into, bool deep = true) const;
-	static	BArchivable*	Instantiate(BMessage* from);
-	virtual	bool			IsMatching(uint32 field);
+	virtual	status_t			Archive(BMessage* into,
+									bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* from);
+	virtual	bool				IsMatching(uint32 field);
 
 private:
-			BitFieldTester*	fSlave;
+			BitFieldTester*		fSlave;
 };
 
 
@@ -96,30 +99,31 @@ private:
 _EXPORT class MinMatchFieldTester;
 class MinMatchFieldTester : public BitFieldTester {
 public:
-							MinMatchFieldTester(int minNum, 
-								bool deleteSlaves = true);
-							MinMatchFieldTester(BMessage* from);
-							~MinMatchFieldTester();
+								MinMatchFieldTester(int32 minNum,
+									bool deleteSlaves = true);
+									MinMatchFieldTester(BMessage* from);
+	virtual						~MinMatchFieldTester();
 
 	// (slave) should be allocated with new, becomes property of this object.
-			void			AddSlave(const BitFieldTester* slave);
+			void				AddSlave(const BitFieldTester* slave);
 
-	virtual	status_t		Archive(BMessage* into, bool deep = true) const;
-	static	BArchivable*	Instantiate(BMessage* from);
-	virtual	bool			IsMatching(uint32 field);
+	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* from);
+	virtual	bool				IsMatching(uint32 field);
 
 private:
-			BList			fSlaves;
-			int32			fMinNum;
+			BList				fSlaves;
+			int32				fMinNum;
 
 	// true if we should delete all our slaves when we are deleted.
-			bool			fDeleteSlaves;
+			bool				fDeleteSlaves;
 };
+
 
 #ifndef __HAIKU__
 #ifndef __INTEL__
-#pragma export reset 
+#pragma export reset
 #endif
 #endif
 
-#endif
+#endif	// _BIT_FIELD_TESTERS_H

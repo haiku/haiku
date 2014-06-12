@@ -1,18 +1,17 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
  */
+#ifndef _SHORTCUTS_CONSTANTS_H
+#define _SHORTCUTS_CONSTANTS_H
 
-
-#ifndef ShortcutsConstants_h
-#define ShortcutsConstants_h
 
 #define SHORTCUTS_SETTING_FILE_NAME		"shortcuts_settings"
+#define SHORTCUTS_CATCHER_PORT_NAME		"ShortcutsCatcherPort"
 
-#define SHORTCUTS_CATCHER_PORT_NAME		"ShortcutsCatcherPort" 
 
 enum {
 	EXECUTE_COMMAND = 'exec',	// Code: Execute "command" as given
@@ -20,5 +19,5 @@ enum {
 	NUM_ACTION_CODES
 };
 
-#endif
 
+#endif	// _SHORTCUTS_CONSTANTS_H

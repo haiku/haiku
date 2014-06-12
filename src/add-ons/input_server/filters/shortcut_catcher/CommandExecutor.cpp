@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,28 +9,25 @@
 
 #include "CommandExecutor.h"
 
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-
 #include <image.h>
-
 
 #include "ShortcutsFilterConstants.h"
 #include "CommandActuators.h"
 
+
 CommandExecutor::CommandExecutor()
-	: BLooper("Shortcuts commands executor")
+	:
+	BLooper("Shortcuts commands executor")
 {
-	// empty
 }
 
 
 CommandExecutor::~CommandExecutor()
 {
-	// empty
 }
 
 
@@ -41,7 +38,8 @@ CommandExecutor::~CommandExecutor()
 bool
 CommandExecutor::GetNextWord(char** setBegin, char** setEnd) const
 {
-	char* next = *setEnd; // we'll start one after the end of the last one...
+	char* next = *setEnd;
+		// we'll start one after the end of the last one...
 
 	while (next++) {
 		if (*next == '\0')
@@ -49,40 +47,45 @@ CommandExecutor::GetNextWord(char** setBegin, char** setEnd) const
 		else if (*next <= ' ')
 			*next = '\0';
 		else
-			break;	// found a non-whitespace char!
+			break; // found a non-whitespace char!
 	}
 
-	*setBegin = next;	// we found the first char!
+	*setBegin = next;
+		// we found the first char!
 
 	while (next++) {
 		if (*next <= ' ') {
-			*next = '\0';	// terminate the word
+			*next = '\0'; // terminate the word
 			*setEnd = next;
 			return true;
 		}
 	}
-	return false;	// should never get here, actually
+
+	return false;
+		// should never get here, actuatorually
 }
 
 
 void
-CommandExecutor::MessageReceived(BMessage* msg)
+CommandExecutor::MessageReceived(BMessage* message)
 {
-	switch(msg->what) {
+	switch(message->what) {
 		case B_UNMAPPED_KEY_DOWN:
 		case B_KEY_DOWN:
 		{
-			BMessage actMessage;
+			BMessage actuatorMessage;
 			void* asyncData;
-			if ((msg->FindMessage("act", &actMessage) == B_NO_ERROR)
-				&& (msg->FindPointer("adata", &asyncData) == B_NO_ERROR)) {
-				BArchivable* arcObj = instantiate_object(&actMessage);
-				if (arcObj) {
-					CommandActuator* act = dynamic_cast<CommandActuator*>(arcObj);
+			if ((message->FindMessage("act", &actuatorMessage) == B_OK)
+				&& (message->FindPointer("adata", &asyncData) == B_OK)) {
+				BArchivable* archivedObject
+					= instantiate_object(&actuatorMessage);
+				if (archivedObject != NULL) {
+					CommandActuator* actuator
+						= dynamic_cast<CommandActuator*>(archivedObject);
 
-					if (act)
-						act->KeyEventAsync(msg, asyncData);
-					delete arcObj;
+					if (actuator)
+						actuator->KeyEventAsync(message, asyncData);
+					delete archivedObject;
 				}
 			}
 			break;
