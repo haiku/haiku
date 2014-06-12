@@ -1,10 +1,9 @@
 /*
- * Copyright 1999-2014 Haiku, Inc. All rights reserved.
+ * Copyright 1999-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
- *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -338,17 +337,16 @@ KeyCommandMap::MessageReceived(BMessage* message)
 }
 
 
-// deletes the BList and its contents
+//! Deletes an HKS-filled BList and its contents.
 void
-KeyCommandMap::_DeleteHKSList(BList* list)
+KeyCommandMap::_DeleteHKSList(BList* l)
 {
-	if (list == NULL)
-		return;
-
-	while (list->ItemAt(0) != NULL)
-		delete list->ItemAt(0);
-
-	delete list;
+	if (l != NULL) {
+		int num = l->CountItems();
+		for (int i = 0; i < num; i++)
+			delete ((hks*) l->ItemAt(i));
+		delete l;
+	}
 }
 
 
