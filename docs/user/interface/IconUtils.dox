@@ -36,6 +36,8 @@
 	older icons in bitmap format. These may still be useful at very small
 	sizes. Note you can't create an instance of BIconUtils, just call the
 	static methods.
+
+	\since Haiku R1
 */
 
 
@@ -52,6 +54,8 @@
 
 	\note If the colorspace is B_CMAP8, B_CMAP8 icons are preferred. In that
 		case, the bitmap size must also match the provided icon_size "size"!
+
+	\since Haiku R1
 */
 
 
@@ -70,6 +74,8 @@
 	\note The scale is derived from the bitmap width, the bitmap should have
 		square dimension, or the icon will be cut off at the bottom (or have
 		room left).
+
+	\since Haiku R1
 */
 
 
@@ -88,6 +94,8 @@
 	\note The scale is derived from the bitmap width, the bitmap should have
 		square dimension, or the icon will be cut off at the bottom (or have
 		room left).
+
+	\since Haiku R1
 */
 
 
@@ -101,6 +109,8 @@
 	either the small icon attribute or the large icon attribute as given in
 	\a smallIconAttrName and \a largeIconAttrName. Which icon is loaded depends
 	on the given \a size.
+
+	\since Haiku R1
 */
 
 
@@ -113,6 +123,8 @@
 	BBitmap \a result
 
 	\note result should be in B_RGBA32 colorspace, and source in B_CMAP8.
+
+	\since Haiku R1
 */
 
 
@@ -126,6 +138,8 @@
 	old-style icon.
 
 	\note result should be in B_CMAP8 colorspace, and source in B_RGBA32.
+
+	\since Haiku R1
 */
 
 
@@ -133,6 +147,8 @@
 	\fn static status_t BIconUtils::ConvertFromCMAP8(const uint8* data,
 		uint32 width, uint32 height, uint32 bytesPerRow, BBitmap* result);
 	\brief Convert raw data in B_CMAP8 colorspace to a B_RGBA32 BBitmap.
+
+	\since Haiku R1
 */
 
 
@@ -140,4 +156,6 @@
 	\fn static status_t BIconUtils::ConvertToCMAP8(const uint8* data,
 		uint32 width, uint32 height, uint32 bytesPerRow, BBitmap* result);
 	\brief Convert B_RGBA32 raw data into a B_CMAP8 BBitmap.
+
+	\since Haiku R1
 */

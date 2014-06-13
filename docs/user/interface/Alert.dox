@@ -26,12 +26,17 @@
 	Determines which icon (if any) is displayed in the alert dialog.
 	Choose one option. If the constructor doesn't include an
 	alert_type argument than \c B_EMPTY_ALERT is used.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var alert_type B_EMPTY_ALERT
 
 	No icon
+
+	\since BeOS R3
 */
 
 /*!
@@ -40,6 +45,8 @@
 	\image html http://api.haiku-os.org/images/alert_info_32.png
 
 	Info icon
+
+	\since BeOS R3
 */
 
 /*!
@@ -48,6 +55,8 @@
 	\image html http://api.haiku-os.org/images/alert_idea_32.png
 
 	Idea icon
+
+	\since BeOS R3
 */
 
 /*!
@@ -56,6 +65,8 @@
 	\image html http://api.haiku-os.org/images/alert_warning_32.png
 
 	Warning icon
+
+	\since BeOS R3
 */
 
 /*!
@@ -64,7 +75,10 @@
 	\image html http://api.haiku-os.org/images/alert_stop_32.png
 
 	Stop icon
+
+	\since BeOS R3
 */
+
 
 /*!
 	\enum button_spacing
@@ -73,14 +87,20 @@
 	Determines how the buttons on the alert dialog are spaced relative
 	to each other. Choose one option. If the constructor doesn't include a
 	button_spacing argument than \c B_EVEN_SPACING is used.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var button_spacing B_EVEN_SPACING
 
 	If the alert dialog has more than one button than the buttons are
 	spaced evenly across the bottom of the alert dialog.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var button_spacing B_OFFSET_SPACING
@@ -89,6 +109,8 @@
 	is offset to the left-hand side of the dialog while the rest of the
 	buttons are grouped on the right. This is useful to separate off a
 	leftmost "Cancel" or "Delete" button.
+
+	\since BeOS R3
 */
 
 
@@ -97,8 +119,8 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief The BAlert class defines a modal alert dialog which displays a short
-		message and provides a set of labeled buttons that allow the user to
-		respond.
+	       message and provides a set of labeled buttons that allow the user to
+	       respond.
 
 	The alert can be configured with a set of one to three buttons. These
 	buttons are assigned indexes 0, 1, and 2 from right-to-left respectively
@@ -142,12 +164,14 @@ int32 button_index = alert->Go();
 
 	The Go() method does the work of loading up and removing the alert
 	window and returns the index of the button that the user selected.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BAlert::BAlert(const char *title, const char *text,
-		const char *button1, const char *button2, const char *button3,
+	\fn BAlert::BAlert(const char* title, const char* text,
+		const char* button1, const char* button2, const char* button3,
 		button_width width, alert_type type)
 	\brief Creates and initializes a BAlert dialog.
 
@@ -174,11 +198,14 @@ int32 button_index = alert->Go();
 		\li \c B_STOP_ALERT
 
 		See alert_type for details.
+
+	\since BeOS R3
 */
 
+
 /*!
-	\fn BAlert::BAlert(const char *title, const char *text, const char *button1,
-		const char *button2, const char *button3, button_width width,
+	\fn BAlert::BAlert(const char* title, const char* text, const char* button1,
+		const char* button2, const char* button3, button_width width,
 		button_spacing spacing, alert_type type)
 	\brief Creates and initializes a BAlert dialog.
 
@@ -212,28 +239,50 @@ int32 button_index = alert->Go();
 		\li \c B_STOP_ALERT
 
 		See alert_type for details.
+
+	\since BeOS R4
 */
+
 
 /*!
 	\fn BAlert::BAlert(BMessage* data)
 	\brief Unarchives an alert from a BMessage.
 
 	\param data The archive.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\fn BAlert::~BAlert()
 	\brief Destructor method.
 
 	Standard Destructor method to delete a BAlert.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
 
 /*!
 	\fn BArchivable* BAlert::Instantiate(BMessage* data)
 	\brief Instantiates a BAlert from a BMessage.
+
 	\param data The message to instantiate the BAlert.
+
 	\returns a BArchivable object of the BAlert.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\fn status_t BAlert::Archive(BMessage* data, bool deep) const
@@ -241,14 +290,22 @@ int32 button_index = alert->Go();
 
 	\param data The target archive which the BAlert \a data will go into.
 	\param deep Whether or not to recursively archive the BAlert's children.
+
+	\return A status code.
 	\retval B_OK The archive operation was successful.
 	\retval B_BAD_VALUE The archive operation failed.
+
+	\since BeOS R3
 */
+
+
+//! @}
+
 
 /*!
 	\fn void BAlert::SetShortcut(int32 index, char key)
 	\brief Sets the shortcut character which is mapped to a button at the
-	specified \a index.
+	       specified \a index.
 
 	A button can only have one shortcut except for the rightmost button which,
 	in addition to the shortcut you set, is always mapped to \c B_ENTER.
@@ -258,18 +315,24 @@ int32 button_index = alert->Go();
 
 	\param index The \a index of the button to set the shortcut to.
 	\param key The shortcut character to set.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\fn char BAlert::Shortcut(int32 index) const
-	\brief Gets the shortcut character which is mapped to a button at the 
-	specified \a index.
+	\brief Gets the shortcut character which is mapped to a button at the
+	       specified \a index.
 
 	\param index The \a index of the button to get the shortcut of.
 
 	\return The shortcut character mapped to the button at the specified
 		\a index.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\fn int32 BAlert::Go()
@@ -284,7 +347,10 @@ int32 button_index = alert->Go();
 	window is still on screen then Go() returns -1.
 
 	\returns The index of the button clicked.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\fn status_t BAlert::Go(BInvoker* invoker)
@@ -303,26 +369,26 @@ int32 button_index = alert->Go();
 	window is still on screen then the message is not sent.
 
 	\returns A status code.
+
+	\since BeOS R3
 */
+
 
 /*!
-	\fn void BAlert::MessageReceived(BMessage* msg)
+	\fn void BAlert::MessageReceived(BMessage* message)
 	\brief Initiates an action from a received message.
 
-	\param msg The message
-
-	\see BWindow::MessagedReceived()
+	\copydetails BWindow::MessageReceived()
 */
+
 
 /*!
 	\fn void BAlert::FrameResized(float newWidth, float newHeight)
 	\brief Resizes the alert dialog.
 
-	\param newWidth The new alert dialog width.
-	\param newHeight The new alert dialog height.
-
-	\see BWindow::FrameResized()
+	\copydetails BWindow::FrameResized()
 */
+
 
 /*!
 	\fn BButton* BAlert::ButtonAt(int32 index) const
@@ -335,74 +401,80 @@ int32 button_index = alert->Go();
 	\param index The \a index of the desired button.
 
 	\return A pointer to the BButton at the specified \a index.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\fn BTextView* BAlert::TextView() const
 	\brief Returns a TextView containing the text of the Alert.
+
+	\since BeOS R3
 */
 
+
 /*!
-	\fn BHandler* BAlert::ResolveSpecifier(BMessage* msg, int32 index,
-		BMessage* specifier, int32 form, const char* property)
-	\brief Resolves specifiers for properties.
-	\see BHandler::ResolveSpecifier()
+	\fn BHandler* BAlert::ResolveSpecifier(BMessage* message, int32 index,
+		BMessage* specifier, int32 what, const char* property)
+	\copydoc BHandler::ResolveSpecifier()
 */
+
 
 /*!
 	\fn status_t BAlert::GetSupportedSuites(BMessage* data)
-	\brief Reports the suites of messages and specifiers that derived classes
-		understand.
-	
-	\param data The message to report the suite of messages and specifiers.
-
-	\see BWindow::GetSupportedSuites()
+	\copydoc BWindow::GetSupportedSuites()
 */
+
 
 /*!
 	\fn void BAlert::DispatchMessage(BMessage* msg, BHandler* handler)
 	\brief Sends out a message.
 
-	\see BWindow::DispatchMessage()
+	\copydetails BWindow::DispatchMessage()
 */
+
 
 /*!
 	\fn void BAlert::Quit()
 	\brief Quits the window closing it.
 
-	\see BWindow::Quit()
+	\copydetails BWindow::Quit()
 */
+
 
 /*!
 	\fn bool BAlert::QuitRequested()
 	\brief Hook method that gets called with the window is closed.
 
-	\returns \c true if the window closes.
-
-	\see BWindow::QuitRequested()
+	\copydetails BWindow::QuitRequested()
 */
+
 
 /*!
 	\fn BPoint BAlert::AlertPosition(float width, float height)
 	\brief Resizes the Alert window to the width and height specified and
-	return the Point of the top-left corner of the Alert window.
+	       return the Point of the top-left corner of the alert window.
 
 	\param width The desired \a width of the alert window.
 	\param height The desired \a height of the alert window.
 
 	\returns The BPoint of the top-left corner of the Alert window.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\fn status_t BAlert::Perform(perform_code code, void* _data)
-	\brief Performs an action give a perform_code and data
+	\brief Perform some action. (Internal Method)
 
-	Currently the only perform code available is \c PERFORM_CODE_SET_LAYOUT.
+	\param code The perform code.
+	\param _data A pointer to store some data.
 
-	\param code The perform code
-	\param _data A pointer to some data to perform on
+	\returns A status code.
 
-	\return A status code.
+	\sa BLooper::Perform()
 
-	\see BWindow::Perform().
+	\since Haiku R1
 */

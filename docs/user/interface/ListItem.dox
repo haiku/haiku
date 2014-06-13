@@ -24,6 +24,8 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief A list item, a member of a BListView or BOutlineListView.
+
+	\since BeOS R3
 */
 
 
@@ -38,6 +40,8 @@
 	\param expanded Whether or not the item is expanded.
 
 	\see BOutlineListView::AddItem()
+
+	\since BeOS R3
 */
 
 
@@ -46,6 +50,8 @@
 	\brief Create a new list item from archived message.
 
 	\param data The message to create the list item from.
+
+	\since BeOS R3
 */
 
 
@@ -54,7 +60,17 @@
 	\brief Destroy the list item freeing any memory used.
 
 	The default destructor is empty.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -63,6 +79,8 @@
 
 	\param archive The message to archive the list item to.
 	\param deep If \c true also archive child views.
+
+	\since BeOS R3
 */
 
 
@@ -74,7 +92,12 @@
 	\param frame The frame of the item.
 	\param complete Whether or not to draw the background in addition to the
 	       item's contents.
+
+	\since BeOS R3
 */
+
+
+//! @}
 
 
 /*!
@@ -82,6 +105,8 @@
 	\brief Return the height of the list item.
 
 	\return The height of the list item as a float.
+
+	\since BeOS R3
 */
 
 
@@ -90,6 +115,8 @@
 	\brief Return the width of the list item.
 
 	\return The width of the list item as a float.
+
+	\since BeOS R3
 */
 
 
@@ -98,18 +125,24 @@
 	\brief Return whether or not the list item is currently selected.
 
 	\return \c true if the list item is selected, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BListItem::Select()
 	\brief Select the list item.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BListItem::Deselect()
 	\brief Unselect the list item.
+
+	\since BeOS R3
 */
 
 
@@ -118,6 +151,8 @@
 	\brief Enable or disable the list item.
 
 	\param on Set \c true to enable, \c false to disable the list item.
+
+	\since BeOS R3
 */
 
 
@@ -126,6 +161,8 @@
 	\brief Returns whether or not the list item is currently enabled.
 
 	\return \c true if the list item is enabled, \c false if it is disabled.
+
+	\since BeOS R3
 */
 
 
@@ -134,6 +171,8 @@
 	\brief Set the height of the list item to \a height.
 
 	\param height The height to set the list item to.
+
+	\since BeOS R3
 */
 
 
@@ -142,6 +181,8 @@
 	\brief Set the width of the list item to \a width.
 
 	\param width The width to set the list item to.
+
+	\since BeOS R3
 */
 
 
@@ -156,6 +197,8 @@
 
 	\param owner The list item's new \a owner.
 	\param font The font set to the list item's current \a owner.
+
+	\since BeOS R3
 */
 
 
@@ -167,6 +210,8 @@
 	\param arg A pointer to some data to perform on.
 
 	\return A status code.
+
+	\since Haiku R1
 */
 
 
@@ -177,6 +222,8 @@
 
 	\param expanded \c true to expand the list item, \c false to un-expand the
 	       list item.
+
+	\since BeOS R3
 */
 
 
@@ -185,6 +232,8 @@
 	\brief Returns whether or not the list item is currently expanded.
 
 	\return \c true if the list item is expanded, \c false if it is not expanded.
+
+	\since BeOS R3
 */
 
 
@@ -194,6 +243,8 @@
 	       sense if the list item is part of a BOutlineListView.
 
 	\return The current outline level of the list item.
+
+	\since BeOS R3
 */
 
 
@@ -202,4 +253,6 @@
 	\brief Set the outline level of the list item.
 
 	\param level The outline level to set the list item to.
+
+	\since BeOS R3
 */

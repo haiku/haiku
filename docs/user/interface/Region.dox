@@ -31,6 +31,8 @@
 	clipping masks.
 
 	\warning BRegion is designed to be used with integral coordinates only.
+
+	\since BeOS R3
 */
 
 
@@ -38,6 +40,8 @@
 	\fn BRegion::BRegion()
 	\brief Initializes an empty region. The region contains no rectangles,
 	       and its bounds are invalid.
+
+	\since BeOS R3
 */
 
 
@@ -46,6 +50,8 @@
 	\brief Initializes a region as a copy of \a other.
 
 	\param other The region to copy.
+
+	\since BeOS R3
 */
 
 
@@ -54,6 +60,8 @@
 	\brief Initializes a region to contain a \a rect.
 
 	\param rect The BRect to add to the region.
+
+	\since BeOS R5
 */
 
 
@@ -63,13 +71,25 @@
 
 	\param clipping The clipping_rect to set the region to, already in
 	       internal rect format.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BRegion::~BRegion()
 	\brief Destroys the BRegion freeing any memory allocated by it.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Operators
+*/
+
+
+//! @{
 
 
 /*!
@@ -79,6 +99,8 @@
 	\param other the BRegion to copy.
 
 	\return This method always returns \c *this.
+
+	\since BeOS R3
 */
 
 
@@ -89,30 +111,41 @@
 	\param other the BRegion to compare to.
 
 	\return \c true if the regions are the same, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
+//! @}
+
+
 /*!
-	\fn void BRegion::Set(BRect newBounds)
+	\fn void BRegion::Set(BRect rect)
 	\brief Set the region to bounds of \a newBounds.
 
-	\param newBounds The BRect to set the bounds to.
+	\param rect The BRect to set the bounds to.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BRegion::Set(clipping_rect newBounds)
+	\fn void BRegion::Set(clipping_rect clipping)
 	\brief Set the region to the bounds of \a clipping_rect.
 
-	\param newBounds The clipping_rect to set the bounds to.
+	\param clipping The clipping_rect to set the bounds to.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BRect BRegion::Frame() const
-	\brief Returns the region's bounds.
+	\brief Returns a rectangle that encloses the BRegion.
 
-	\return A BRect which represents the region's bounds.
+	\return A BRect that encloses the BRegion.
+
+	\since BeOS R3
 */
 
 
@@ -122,6 +155,8 @@
 	       (which has integer coordinates).
 
 	\return The clipping_rect which represents the region's bounds.
+
+	\since Haiku R1
 */
 
 
@@ -133,6 +168,8 @@
 
 	\return If the given index is valid, it returns the BRect at that index,
 		otherwise, it returns an invalid BRect.
+
+	\since BeOS R3
 */
 
 
@@ -144,6 +181,8 @@
 
 	\return If the given index is valid, it returns the BRect at that index,
 		otherwise, it returns an invalid BRect.
+
+	\since Haiku R1
 */
 
 
@@ -156,6 +195,8 @@
 
 	\return If the given index is valid, it returns the clipping_rect at that
 	        index, otherwise, it returns an invalid clipping_rect.
+
+	\since Haiku R1
 */
 
 
@@ -168,6 +209,8 @@
 
 	\return If the given index is valid, it returns the clipping_rect at that
 	        index, otherwise, it returns an invalid clipping_rect.
+
+	\since Haiku R1
 */
 
 
@@ -176,6 +219,8 @@
 	\brief Returns the number of rectangles contained in the region.
 
 	\return The number of rectangles in the region as an int32.
+
+	\since BeOS R3
 */
 
 
@@ -184,6 +229,8 @@
 	\brief Returns the number of rectangles contained in the region.
 
 	\return The number of rectangles in the region as an int32.
+
+	\since Haiku R1
 */
 
 
@@ -196,6 +243,8 @@
 
 	\return \c true if the region has any area in common with the BRect,
 	        \c false if not.
+
+	\since BeOS R3
 */
 
 
@@ -208,6 +257,8 @@
 
 	\return \c true if the region has any area in common with the
 	        clipping_rect, \c false if not.
+
+	\since Haiku R1
 */
 
 
@@ -218,6 +269,8 @@
 	\param point The \a point to check.
 
 	\return \c true if the region contains the \a point, \c false if not.
+
+	\since BeOS R3
 */
 
 
@@ -229,6 +282,8 @@
 	\param y The \c y coordinate of the point to check.
 
 	\return \c true if the region contains the point, \c false if not.
+
+	\since Haiku R1
 */
 
 
@@ -240,12 +295,16 @@
 	\param y The \c y coordinate of the point to check.
 
 	\return \c true if the region contains the point, \c false if not.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BRegion::PrintToStream() const
 	\brief Prints each rect in the the BRegion to standard output.
+
+	\since BeOS R3
 */
 
 
@@ -256,6 +315,8 @@
 	       the region's bounds.
 
 	\param point The point to get the coordinates to offset by.
+
+	\since Haiku R1
 */
 
 
@@ -266,6 +327,8 @@
 
 	\param x The horizontal offset.
 	\param y The vertical offset.
+
+	\since BeOS R3
 */
 
 
@@ -273,6 +336,8 @@
 	\fn void BRegion::MakeEmpty()
 	\brief Empties the region so that it doesn't containt any rects, and
 	       invalidates its bounds.
+
+	\since BeOS R3
 */
 
 
@@ -281,6 +346,8 @@
 	\brief Modifies the region so that it includes the given \a rect.
 
 	\param rect The BRect to include in the region.
+
+	\since BeOS R3
 */
 
 
@@ -290,6 +357,8 @@
 	       rectangle.
 
 	\param clipping The clipping_rect to include in the region.
+
+	\since Haiku R1
 */
 
 
@@ -298,6 +367,8 @@
 	\brief Modifies the region to include the area of the given \a region.
 
 	\param region The \a region to be included.
+
+	\since BeOS R3
 */
 
 
@@ -306,6 +377,8 @@
 	\brief Modifies the region excluding the area of the given \a rect.
 
 	\param rect The BRect to be excluded.
+
+	\since BeOS R3
 */
 
 
@@ -315,6 +388,8 @@
 	       rectangle.
 
 	\param clipping The clipping_rect to be excluded.
+
+	\since Haiku R1
 */
 
 
@@ -324,6 +399,8 @@
 	      \a region.
 
 	\param region The BRegion to be excluded.
+
+	\since BeOS R3
 */
 
 
@@ -333,6 +410,8 @@
 		   in common with \a region.
 
 	\param region the BRegion to intersect with.
+
+	\since BeOS R3
 */
 
 
@@ -342,21 +421,6 @@
 	       which the BRegion and \a region do NOT have in common.
 
 	\param region the BRegion to exclusively include.
-*/
 
-
-/*!
-	\fn void BRegion::_AdoptRegionData(BRegion& region)
-	\brief Takes over the data of \a region and empties it.
-
-	\param region The \a region to adopt data from.
-*/
-
-
-/*!
-	\fn bool BRegion::_SetSize(int32 newSize)
-	\brief Reallocate the memory in the region.
-
-	\param newSize The amount of rectangles that the region should be
-		able to hold.
+	\since Haiku R1
 */

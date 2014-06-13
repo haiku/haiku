@@ -26,6 +26,8 @@
 	Menu bar border style constants.
 
 	\see BMenuBar::SetBorder()
+
+	\since BeOS R3
 */
 
 
@@ -33,6 +35,8 @@
 	\var menu_bar_border B_BORDER_FRAME
 
 	The border is drawn around the entire menu bar.
+
+	\since BeOS R3
 */
 
 
@@ -40,14 +44,17 @@
 	\var menu_bar_border B_BORDER_CONTENTS
 
 	The border is drawn around the list of items.
-*/
 
+	\since BeOS R3
+*/
 
 
 /*!
 	\var menu_bar_border B_BORDER_EACH_ITEM
 
 	The border is drawn around each individual item.
+
+	\since BeOS R3
 */
 
 
@@ -76,6 +83,8 @@
 	you'll need to call AddItem() or AddList() to add some. The top-level items
 	in a menu bar are typically menus which have menu items and menus added to
 	them in turn.
+
+	\since BeOS R3
 */
 
 
@@ -120,6 +129,8 @@
 	\param resizeToFit Whether or not the menu bar should automatically resize
 	       itself to fit its contents, this will not work in
 	       \c B_ITEMS_IN_MATRIX layout.
+
+	\since BeOS R3
 */
 
 
@@ -133,6 +144,8 @@
 	       - \c B_ITEMS_IN_ROW items are displayed in a single row,
 	       - \c B_ITEMS_IN_COLUMN items are displayed in a single column,
 	       - \c B_ITEMS_IN_MATRIX items are displayed in a custom matrix.
+
+	\since Haiku R1
 */
 
 
@@ -141,6 +154,8 @@
 	\brief Archive constructor.
 
 	\param archive The message data to construct the menu from.
+
+	\since BeOS R3
 */
 
 
@@ -149,7 +164,17 @@
 	\brief Destructor.
 
 	Also frees the memory used by any attached menus and menu items.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -158,6 +183,8 @@
 
 	\returns A newly created BMenuBar object or \c NULL if the message
 	         doesn't contain an archived BMenuBar.
+
+	\since BeOS R3
 */
 
 
@@ -172,7 +199,20 @@
 	        otherwise.
 	\retval B_OK The object was archived successfully.
 	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
 */
+
+
+//! @}
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
 
 
 /*!
@@ -181,6 +221,8 @@
 	       and resizes the menu to fit.
 
 	\see BWindow::SetKeyMenuBar()
+
+	\since BeOS R3
 */
 
 
@@ -190,8 +232,7 @@
 
 	Redraws the affected borders.
 
-	\param newWidth The new \a width of the menu bar.
-	\param newHeight The new \a height of the menu bar.
+	\copydetails BView::FrameResized()
 */
 
 
@@ -200,6 +241,8 @@
 	\brief Draws the menu bar.
 
 	\param updateRect The area to draw in.
+
+	\since BeOS R3
 */
 
 
@@ -209,14 +252,16 @@
 
 	Right clicking on a menu bar sends the window to back or brings it to front.
 
-	\param where The point on the screen where to mouse pointer is when
-		the mouse button is pressed.
+	\copydetails BView::MouseDown()
 */
+
+
+//! @}
 
 
 /*!
 	\fn void BMenuBar::SetBorder(menu_bar_border border)
-	\brief Sets how the menu bar border is drawn.
+	\brief Specifies how the menu bar border is drawn.
 
 	The default is \c B_BORDER_FRAME.
 
@@ -225,6 +270,8 @@
 	       - \c B_BORDER_CONTENTS The border is drawn around the list of items.
 	       - \c B_BORDER_EACH_ITEM The border is drawn around each individual
 	            item.
+
+	\since BeOS R3
 */
 
 
@@ -233,4 +280,6 @@
 	\brief Returns the currently set border style.
 
 	\see BMenuBar::SetBorder() for details.
+
+	\since BeOS R3
 */

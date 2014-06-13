@@ -36,6 +36,8 @@
 
 	\sa BView::StrokePolygon()
 	\sa BView::FillPolygon()
+
+	\since BeOS R3
 */
 
 
@@ -45,6 +47,8 @@
 
 	\param points The array of BPoint objects to add.
 	\param count The number of BPoint objects in the array.
+
+	\since BeOS R3
 */
 
 
@@ -53,9 +57,9 @@
 	\brief Initializes a new BPolygon object from another BPolygon and
 	       copies the list of BPoint objects from \a other.
 
-	\note This method was not available in BeOS R5.
-
 	\param other The BPolygon object to copy from.
+
+	\since Haiku R1
 */
 
 
@@ -65,6 +69,8 @@
 	       BPolygon and copies the list of BPoint objects from \a other.
 
 	\param other A pointer to a BPolygon object to copy from.
+
+	\since BeOS R3
 */
 
 
@@ -73,6 +79,8 @@
 	\brief Initializes an empty polygon without any points.
 
 	\see BPolygon::AddPoints() to add points to the BPolygon.
+
+	\since BeOS R3
 */
 
 
@@ -80,6 +88,8 @@
 	\fn BPolygon::~BPolygon()
 	\brief Destroys the object and frees the memory used by the associated
 	       BPoint objects.
+
+	\since BeOS R3
 */
 
 
@@ -89,12 +99,16 @@
 	       objects from \a other.
 
 	\param other The BPolygon object to copy from.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BRect BPolygon::Frame() const
 	\brief Returns the frame rectangle that encloses the BPolygon object.
+
+	\since BeOS R3
 */
 
 
@@ -104,12 +118,16 @@
 
 	\param points The array of BPoint objects to add.
 	\param count The number of BPoint objects in the array.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn int32 BPolygon::CountPoints() const
 	\brief Returns the number of points associated with the polygon.
+
+	\since BeOS R3
 */
 
 
@@ -122,6 +140,8 @@
 	proportionally. To modify a polygon so that it is inscribed in the
 	\a destination rectangle exactly, pass the frame rectangle as the
 	\a source.
+
+	\since BeOS R3
 */
 
 
@@ -130,4 +150,6 @@
 	\brief Prints each of the points of the BPolygon to standard output.
 
 	\see BPoint::PrintToStream()
+
+	\since BeOS R3
 */

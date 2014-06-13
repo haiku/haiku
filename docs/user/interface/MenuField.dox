@@ -61,6 +61,8 @@
 	typically used instead of a regular BMenu because it opens directly
 	underneath the mouse pointer and is set to radio mode and
 	label-from-marked mode by default, but, this is entirely up to you.
+
+	\since BeOS R3
 */
 
 
@@ -76,6 +78,8 @@
 	\param resizingMode Defines the menu field's behavior when its parent is
 	       resized, see BView for details.
 	\param flags The view flags, see BView for details.
+
+	\since BeOS R3
 */
 
 
@@ -93,6 +97,8 @@
 	\param resizingMode Defines the menu field's behavior when its parent is
 	       resized, see BView for details.
 	\param flags The view flags, see BView for details.
+
+	\since BeOS R3
 */
 
 
@@ -101,12 +107,12 @@
 		uint32 flags)
 	\brief Creates a new BMenuField object suitable as part of a BLayout.
 
-	\note This method was not available in BeOS R5.
-
 	\param name The \a name of the menu field, internal only, can be \c NULL.
 	\param label The \a label shown to the user, can be blank.
 	\param menu The \a menu of choices shown to the user, typically a BPopUpMenu.
 	\param flags The view flags, see BView for details.
+
+	\since Haiku R1
 */
 
 
@@ -115,11 +121,11 @@
 	\brief Creates a new BMenuField object suitable as part of a BLayout.
 	       This constructor omits the internal name parameter.
 
-	\note This method was not available in BeOS R5.
-
 	\param label The \a label shown to the user, can be blank.
 	\param menu The \a menu of choices shown to the user, typically a BPopUpMenu.
 	\param flags The view flags, see BView for details.
+
+	\since Haiku R1
 */
 
 
@@ -128,6 +134,8 @@
 	\brief Archive constructor.
 
 	\param data The message \a data to construct the menu field from.
+
+	\since BeOS R3
 */
 
 
@@ -136,7 +144,17 @@
 	\brief Destructor.
 
 	Also frees the memory used by the label and menu.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -145,6 +163,8 @@
 
 	\returns A newly created BMenuField object or \c NULL if the message
 	         doesn't contain an archived BMenuField.
+
+	\since BeOS R3
 */
 
 
@@ -161,7 +181,20 @@
 	        otherwise.
 	\retval B_OK The object was archived successfully.
 	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
 */
+
+
+//! @}
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
 
 
 /*!
@@ -171,6 +204,8 @@
 	Also archives the label and menu bar.
 
 	\param into Archived data message.
+
+	\since BeOS R3
 */
 
 
@@ -181,6 +216,8 @@
 	Also unarchives the label and menu bar.
 
 	\param from Unarchived data message.
+
+	\since BeOS R3
 */
 
 
@@ -191,6 +228,8 @@
 	Adjusts the background color to match the background color of the parent
 	view and adjusts the height to be the attached menu bar which depends on
 	the user's current menu font setting.
+
+	\since BeOS R3
 */
 
 
@@ -201,6 +240,8 @@
 
 	If the attached menu bar is too narrow it is resized it to fit the menu
 	items.
+
+	\since BeOS R3
 */
 
 
@@ -212,6 +253,8 @@
 	current focus view and whether or not it is enabled.
 
 	\param updateRect The rectangular area to be drawn.
+
+	\since BeOS R3
 */
 
 
@@ -221,8 +264,7 @@
 
 	Adjusts the menu bar size and location.
 
-	\param newWidth The new \a width of the menu field.
-	\param newHeight The new \a height of the menu field.
+	\copydetails BView::FrameResized()
 */
 
 
@@ -233,8 +275,7 @@
 	Provides for keyboard navigation allowing users to open the menu by pressing
 	the space bar, right arrow, or down arrow.
 
-	\param bytes The bytes of the key combination pressed.
-	\param numBytes The number of bytes in \a bytes.
+	\copydetails BView::KeyDown()
 */
 
 
@@ -245,22 +286,23 @@
 	Provides the ability to open the menu field menu using the mouse, even if
 	the user clicks on the menu field label.
 
-	\param where The point on the screen where to mouse pointer is when
-	       the mouse button is pressed.
+	\copydetails BView::MouseDown()
 */
 
 
 /*!
-	\fn void BMenuField::WindowActivated(bool state)
+	\fn void BMenuField::WindowActivated(bool active)
 	\brief Hook method called when the attached window is activated or
 	       deactivated.
 
 	Redraws the focus ring around the menu field when the window is activated
 	and deactivated if it is the window's current focus view.
 
-	\param state \c true if the window becomes activated, \c false if the
-	       window becomes deactivated.
+	\copydetails BView::WindowActivated()
 */
+
+
+//! @}
 
 
 /*!
@@ -271,6 +313,8 @@
 	Enables or disables keyboard navigation and invalidates the menu field.
 
 	\param focused \a true to set focus, \a false to remove it.
+
+	\since BeOS R3
 */
 
 
@@ -278,6 +322,8 @@
 	\fn BMenu* BMenuField::Menu() const
 	\brief Returns a pointer to the menu attached to the menu bar that opens
 	       when the user clicks on the menu field.
+
+	\since BeOS R3
 */
 
 
@@ -285,6 +331,8 @@
 	\fn BMenuBar* BMenuField::MenuBar() const
 	\brief Returns a pointer to the attached menu bar that contains the pop-up
 	       menu.
+
+	\since BeOS R3
 */
 
 
@@ -292,6 +340,8 @@
 	\fn BMenuItem* BMenuField::MenuItem() const
 	\brief Returns the first menu item attached to the menu bar containing
 	       the pop-up menu.
+
+	\since BeOS R3
 */
 
 
@@ -300,6 +350,8 @@
 	\brief Sets the menu field label to \a label.
 
 	\param label The \a label to set to the menu field.
+
+	\since BeOS R3
 */
 
 
@@ -308,6 +360,8 @@
 	\brief Returns the menu field label.
 
 	\return The menu field label or \c NULL if not assigned.
+
+	\since BeOS R3
 */
 
 
@@ -316,6 +370,8 @@
 	\brief Enables or disables the menu field.
 
 	\param on \c true to enable the menu field, \c false to disable it.
+
+	\since BeOS R3
 */
 
 
@@ -324,6 +380,8 @@
 	\brief Returns whether or not the menu is enabled.
 
 	\return \c true if the menu is enabled, \c false if disabled.
+
+	\since BeOS R3
 */
 
 
@@ -339,6 +397,8 @@
 		- \c B_ALIGN_LEFT
 		- \c B_ALIGN_CENTER
 		- \c B_ALIGN_RIGHT
+
+	\since BeOS R3
 */
 
 
@@ -349,6 +409,8 @@
 	\return The label's current alignment constant.
 
 	\see SetAlignment() for more details.
+
+	\since BeOS R3
 */
 
 
@@ -365,6 +427,8 @@
 	        menu fields.
 
 	\param position The divider \a position to set, should be an integral value.
+
+	\since BeOS R3
 */
 
 
@@ -375,6 +439,8 @@
 	\return The current divider position as a float.
 
 	\see SetDivider() for more details.
+
+	\since BeOS R3
 */
 
 
@@ -382,9 +448,9 @@
 	\fn void BMenuField::ShowPopUpMarker()
 	\brief Shows the pop-up marker located on the right edge of the menu bar.
 
-	\note This method was not available in BeOS R5.
-
 	\sa HidePopUpMarker()
+
+	\since Haiku R1
 */
 
 
@@ -392,9 +458,9 @@
 	\fn void BMenuField::HidePopUpMarker()
 	\brief Hides to pop-up marker.
 
-	\note This method was not available in BeOS R5.
-
 	\sa ShowPopUpMarker()
+
+	\since Haiku R1
 */
 
 
@@ -403,9 +469,9 @@
 	\brief Returns a pointer to the label layout item.
 	       (Layout constructor only)
 
-	\note This method was not available in BeOS R5.
-
 	\sa CreateMenuBarLayoutItem()
+
+	\since Haiku R1
 */
 
 
@@ -414,7 +480,7 @@
 	\brief Returns a pointer to the menu bar layout item.
 	       (Layout constructor only)
 
-	\note This method was not available in BeOS R5.
-
 	\sa CreateLabelLayoutItem()
+
+	\since Haiku R1
 */

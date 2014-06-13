@@ -33,14 +33,18 @@
 	starting in the top-left.
 
 	\warning This class is not yet finalized, if you use it in your software
-	assume that it will break some time in the future.
+	         assume that it will break some time in the future.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BGridLayout::BGridLayout(float horizontal = 0.0f, float vertical = 0.0f)
 	\brief Create a BGridLayout with \a horizontal space between columns and
-		\a vertical space between rows.
+	       \a vertical space between rows.
+
+	\since Haiku R1
 */
 
 
@@ -49,6 +53,8 @@
 	\brief Archive constructor.
 
 	\param from The message to build the BGridLayout from.
+
+	\since Haiku R1
 */
 
 
@@ -57,6 +63,8 @@
 	\brief Destructor method.
 
 	Standard Destructor.
+
+	\since Haiku R1
 */
 
 
@@ -65,6 +73,8 @@
 	\brief Returns the number of active columns in this layout.
 
 	\returns The number of active columns in the layout.
+
+	\since Haiku R1
 */
 
 
@@ -73,6 +83,8 @@
 	\brief Returns the number of active rows in this layout.
 
 	\returns the number of active rows in the layout.
+
+	\since Haiku R1
 */
 
 
@@ -81,6 +93,8 @@
 	\brief Returns the spacing between columns for this layout.
 
 	\returns The spacing between columns for the layout.
+
+	\since Haiku R1
 */
 
 
@@ -89,6 +103,8 @@
 	\brief Returns the spacing between rows for this layout.
 
 	\returns The spacing between rows for the layout.
+
+	\since Haiku R1
 */
 
 
@@ -97,6 +113,8 @@
 	\brief Set the spacing between columns for this layout.
 
 	\param spacing The number of pixels of spacing to set.
+
+	\since Haiku R1
 */
 
 
@@ -105,6 +123,8 @@
 	\brief Set the spacing between rows for this layout.
 
 	\param spacing The number of pixels of spacing to set.
+
+	\since Haiku R1
 */
 
 
@@ -114,6 +134,8 @@
 
 	\param horizontal The number of \a horizontal pixels of spacing to set.
 	\param vertical The number of \a vertical pixels of spacing to set.
+
+	\since Haiku R1
 */
 
 
@@ -122,6 +144,8 @@
 	\brief Returns the weight for the specified \a column.
 
 	\returns The \a column weight as a float.
+
+	\since Haiku R1
 */
 
 
@@ -131,6 +155,8 @@
 
 	\param column The column to set.
 	\param weight The weight to set.
+
+	\since Haiku R1
 */
 
 
@@ -141,6 +167,8 @@
 	\param column The column to get the minimum width of.
 
 	\returns The minimum width for \a column as a float.
+
+	\since Haiku R1
 */
 
 
@@ -150,6 +178,8 @@
 
 	\param column The \a column to set the minimum width of.
 	\param width The \a width to set.
+
+	\since Haiku R1
 */
 
 
@@ -160,6 +190,8 @@
 	\param column The column to get the maximum width of.
 
 	\returns The maximum width for \a column as a float.
+
+	\since Haiku R1
 */
 
 
@@ -169,6 +201,8 @@
 
 	\param column The column to set the maximum width of.
 	\param width The \a width to set.
+
+	\since Haiku R1
 */
 
 
@@ -177,39 +211,51 @@
 	\brief Returns the weight of the specified \a row.
 
 	\returns The weight of the \a row.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BGridLayout::SetRowWeight(int32 row, float weight)
-	\brief Set the weight for \a row to \a weight.
+	\brief Set the weight of \a row to \a weight.
 
 	\param row The \a row number.
-	\param weight The \a 
+	\param weight The \a weight to set.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn float BGridLayout::MinRowHeight(int row) const
 	\brief Returns the minimum height for \a row.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BGridLayout::SetMinRowHeight(int32 row, float height)
 	\brief Sets the minimum height for \a row to \a width.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn float BGridLayout::MaxRowHeight(int32 row) const
 	\brief Returns the maximum height for \a row.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BGridLayout::SetMaxRowHeight(int32 row, float height)
 	\brief Sets the maximum height for \a row to \a width.
+
+	\since Haiku R1
 */
 
 
@@ -217,12 +263,16 @@
 	\fn BLayoutItem* BGridLayout::AddView(BView* child)
 	\brief Adds \a child to this layout in the first empty cell available, or
 		in a new column in the first row if there are no emtpy cells.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BLayoutItem* BGridLayout::AddView(int32 index, BView* child);
 	\brief BGridLayout::AddView(BView*)
+
+	\since Haiku R1
 */
 
 
@@ -230,18 +280,22 @@
 	\fn BLayoutItem* BGridLayout::AddView(BView* child, int32 column, int32 row,
 			int32 columnCount = 1, int32 rowCount = 1);
 	\brief Adds \a child to this layout at \a column and \a row. \a child may
-		also occupy additional cells if \a columnCount or \a rowCount are
-		greater than \c 1.
+	       also occupy additional cells if \a columnCount or \a rowCount are
+	       greater than \c 1.
 
 	Fails and returns NULL if the requested area is occupied, or if internal
 	memory allocations fail.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BLayoutItem* BGridLayout::AddItem(BLayoutItem* item)
 	\brief Adds \a item to this layout in the first empty cell available, or
-		in a new column in the first row if there are no emtpy cells.
+	       in a new column in the first row if there are no emtpy cells.
+
+	\since Haiku R1
 */
 
 
@@ -255,9 +309,11 @@
 	\fn BLayoutItem* BGridLayout::AddItem(BLayoutItem* item, int32 column,
 		int32 row, int32 columnCount = 1, int32 rowCount = 1);
 	\brief Adds \a item to this layout at \a column and \a row. \a item may
-		also occupy additional cells if \a columnCount or \a rowCount are
-		greater than 1.
+	       also occupy additional cells if \a columnCount or \a rowCount are
+	       greater than 1.
 
 	Fails and returns \c NULL if the requested area is occupied, or if internal
 	memory allocations fail.
+
+	\since Haiku R1
 */

@@ -89,20 +89,26 @@ BLayoutBuilder::Group<>(B_HORIZONTAL)
 		.End()
 		// back to the Group<>::GridBuilder
 \endcode
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BLayoutBuilder::Base<ParentBuilder>::SetParent(ParentBuilder*
 		parent)
-	Internal method for use by BLayoutBuilder::Base subclasses, this is
-	essential to the builder stack semantics
+	\brief Internal method for use by BLayoutBuilder::Base subclasses,
+	       this is essential to the builder stack semantics.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn ParentBuilder& BLayoutBuilder::Base<ParentBuilder>::End()
 	\brief Returns this builder's parent.
+
+	\since Haiku R1
 */
 
 

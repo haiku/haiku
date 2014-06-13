@@ -30,6 +30,8 @@
 
 	\warning BSeparatorItems are only meant to be used with menus whose
 	         items are arranged in a \c B_ITEMS_IN_COLUMN layout.
+
+	\since BeOS R3
 */
 
 
@@ -39,6 +41,8 @@
 
 	The creates a new BSeparatorItem from BMenuItem with a blank label and
 	\c NULL message, then disables it.
+
+	\since BeOS R3
 */
 
 
@@ -47,13 +51,25 @@
 	\brief Archive constructor.
 
 	\param data The message \a data to construct the separator item from.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BSeparatorItem::~BSeparatorItem()
 	\brief Destructor, does nothing.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -67,6 +83,8 @@
 	        otherwise.
 	\retval B_OK The object was archived successfully.
 	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
 */
 
 
@@ -76,13 +94,22 @@
 
 	\return A newly created BSeparatorItem object or \c NULL if the message
 	        doesn't contain an archived BSeparatorItem.
+
+	\since BeOS R3
 */
+
+
+//! @}
 
 
 /*!
 	\fn void BSeparatorItem::SetEnabled(bool enable)
 	\brief Does nothing, this method is defined to override the default
 	       BMenuItem behavior.
+
+	\param enable Not used.
+
+	\since BeOS R3
 */
 
 
@@ -100,6 +127,8 @@
 
 	\sa ContentLocation()
 	\sa DrawContent()
+
+	\since BeOS R3
 */
 
 
@@ -112,4 +141,6 @@
 	to do something other than the default.
 
 	The default draws a light grey horizontal line through the middle of the item.
+
+	\since BeOS R3
 */

@@ -16,6 +16,8 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief Defines standard interface definitions for controls.
+
+	\since BeOS R3
 */
 
 
@@ -24,6 +26,8 @@
 	\ingroup interface
 
 	Collection of flags that determine the border style drawn around a BBox.
+
+	\since BeOS R3
 */
 
 
@@ -35,6 +39,8 @@
 	The right and bottom sides of the box are darker than the top and
 	left sides to produce a shadow effect and make the box look like it
 	is raised slightly above the surrounding surface.
+
+	\since BeOS R3
 */
 
 
@@ -45,6 +51,8 @@
 
 	The border is a bevelled to give it a 3D effect. The border is uniform
 	in appearance on all four sides. This is the default appearance.
+
+	\since BeOS R3
 */
 
 
@@ -52,6 +60,8 @@
 	\var border_style B_NO_BORDER
 
 	No border.
+
+	\since BeOS R3
 */
 
 
@@ -60,6 +70,8 @@
 
 	Orientation flag sets the layout to either horizontal or vertical
 	alignment.
+
+	\since BeOS R3
 */
 
 
@@ -69,11 +81,15 @@
 	Horizontal alignment
 */
 
+	\since BeOS R3
+
 
 /*!
 	\var orientation B_VERTICAL
 
 	Vertical alignment
+
+	\since BeOS R3
 */
 
 
@@ -82,6 +98,8 @@
 
 	Collection of flags that determine how wide to draw the buttons in a
 	BAlert dialog.
+
+	\since BeOS R3
 */
 
 
@@ -89,6 +107,8 @@
 	\var button_width B_WIDTH_AS_USUAL
 
 	Set the width of each button based on the standard width.
+
+	\since BeOS R3
 */
 
 
@@ -96,6 +116,8 @@
 	\var button_width B_WIDTH_FROM_WIDEST
 
 	Set the width of each button based on the width of the widest button.
+
+	\since BeOS R3
 */
 
 
@@ -104,6 +126,8 @@
 
 	Set the width of each button to accomidate the width of the button's
 	label.
+
+	\since BeOS R3
 */
 
 
@@ -114,6 +138,8 @@
 	\enum join_mode
 
 	PostScript-style line join modes used by BView::SetLineMode()
+
+	\since BeOS R3
 */
 
 
@@ -121,6 +147,8 @@
 	\var join_mode B_ROUND_JOIN
 
 	Round join mode.
+
+	\since BeOS R3
 */
 
 
@@ -128,6 +156,8 @@
 	\var join_mode B_MITER_JOIN
 
 	Miter join mode.
+
+	\since BeOS R3
 */
 
 
@@ -135,6 +165,8 @@
 	\var join_mode B_BEVEL_JOIN
 
 	Bevel join mode.
+
+	\since BeOS R3
 */
 
 
@@ -142,12 +174,16 @@
 	\var join_mode B_BUTT_JOIN
 
 	Butt join mode.
+
+	\since BeOS R3
 */
 
 /*!
 	\var join_mode B_SQUARE_JOIN
 
 	Square join mode.
+
+	\since BeOS R3
 */
 
 
@@ -155,6 +191,8 @@
 	\enum cap_mode
 
 	PostScript-style line cap modes used by BView::SetLineMode()
+
+	\since BeOS R3
 */
 
 
@@ -162,6 +200,8 @@
 	\var cap_mode B_ROUND_CAP
 
 	Round cap mode.
+
+	\since BeOS R3
 */
 
 
@@ -169,6 +209,8 @@
 	\var cap_mode B_BUTT_CAP
 
 	Butt cap mode.
+
+	\since BeOS R3
 */
 
 
@@ -176,6 +218,8 @@
 	\var cap_mode B_SQUARE_CAP
 
 	Square cap mode.
+
+	\since BeOS R3
 */
 
 
@@ -183,6 +227,8 @@
 	\var B_DEFAULT_MITER_LIMIT
 
 	Default miter limit used to calculate the angle cut off for miter joins.
+
+	\since BeOS R3
 */
 
 
@@ -218,6 +264,8 @@
 		- \c B_RIGHT_COMMAND_KEY
 
 	\returns A bitmap containing each active modifier keys and locks.
+
+	\since BeOS R3
 */
 
 
@@ -230,6 +278,8 @@
 
 	\retval B_OK Everything went fine.
 	\retval B_ERROR There was an error retrieving the key_info struct.
+
+	\since BeOS R3
 */
 
 
@@ -242,6 +292,8 @@
 
 	\param _map A pointer to the system keymap structure.
 	\param _keyBuffer A pointer containing the UTF-8 character encodings.
+
+	\since BeOS R3
 */
 
 
@@ -251,6 +303,8 @@
 
 	\retval B_OK Everything went fine.
 	\retval B_ERROR There was an error retrieving the keyboard id.
+
+	\since BeOS R3
 */
 
 
@@ -264,6 +318,8 @@
 
 	\retval B_OK Everything went fine.
 	\retval B_ERROR There was an error retrieving the modifier key.
+
+	\since BeOS R3
 */
 
 
@@ -274,6 +330,8 @@
 
 	\param modifier The modifier key to set in the system keymap.
 	\param key The key code to set the modifier key to.
+
+	\since BeOS R3
 */
 
 
@@ -290,4 +348,6 @@
 	absent will turn the lock off. Pass 0 in to turn off all locks.
 
 	\param modifiers A bitmap of lock keys to set.
+
+	\since BeOS R3
 */

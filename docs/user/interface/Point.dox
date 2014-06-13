@@ -22,6 +22,8 @@
 /*!
 	\var B_ORIGIN
 	\brief The origin point, equivalent to BPoint(0, 0).
+
+	\since BeOS R5
 */
 
 
@@ -30,18 +32,24 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief A point on a two-dimensional Cartesian coordinate system.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var BPoint::x
 	\brief The horizontal coordinate.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var BPoint::y
 	\brief The vertical coordinate.
+
+	\since BeOS R3
 */
 
 
@@ -50,6 +58,8 @@
 	\brief Initializes a BPoint object at the origin, (0, 0).
 
 	\see BPoint::Set()
+
+	\since BeOS R3
 */
 
 
@@ -60,6 +70,8 @@
 
 	\param x The \a x coordinate.
 	\param y The \a y coordinate.
+
+	\since BeOS R3
 */
 
 
@@ -68,15 +80,8 @@
 	\brief Initializes a BPoint object from another BPoint.
 
 	\param other The BPoint object to copy from.
-*/
 
-
-/*!
-	\fn inline BPoint& BPoint::operator=(const BPoint& other)
-	\brief Initializes a BPoint object from another BPoint by overloading
-	       the = operator.
-
-	\param other The BPoint object to copy from.
+	\since BeOS R3
 */
 
 
@@ -86,6 +91,8 @@
 
 	\param x The \a x coordinate to set.
 	\param y The \a y coordinate to set.
+
+	\since BeOS R3
 */
 
 
@@ -97,6 +104,8 @@
 	effect.
 
 	\param rect The BRect to constrain the BPoint within.
+
+	\since BeOS R3
 */
 
 
@@ -109,6 +118,27 @@
 \verbatim
 BPoint(x:%.0f, y:%.0f)
 \endverbatim
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\name Operators
+*/
+
+
+//! @{
+
+
+/*!
+	\fn inline BPoint& BPoint::operator=(const BPoint& other)
+	\brief Initializes a BPoint object from another BPoint by overloading
+	       the = operator.
+
+	\param other The BPoint object to copy from.
+
+	\since BeOS R3
 */
 
 
@@ -117,6 +147,8 @@ BPoint(x:%.0f, y:%.0f)
 	\brief Returns a BPoint object with the x and y coordinates negated.
 
 	\return A new BPoint object.
+
+	\since BeOS R3
 */
 
 
@@ -128,6 +160,8 @@ BPoint(x:%.0f, y:%.0f)
 	\param other The BPoint object to use in the addition.
 
 	\return A new BPoint object.
+
+	\since BeOS R3
 */
 
 
@@ -139,6 +173,8 @@ BPoint(x:%.0f, y:%.0f)
 	\param other The BPoint object to use in the subtraction.
 
 	\return A new BPoint object.
+
+	\since BeOS R3
 */
 
 
@@ -150,6 +186,8 @@ BPoint(x:%.0f, y:%.0f)
 	\param other The BPoint object to use in the addition.
 
 	\return The address of the BPoint object.
+
+	\since BeOS R3
 */
 
 
@@ -161,6 +199,8 @@ BPoint(x:%.0f, y:%.0f)
 	\param other The BPoint object to use in the subtraction.
 
 	\return The address of the BPoint object.
+
+	\since BeOS R3
 */
 
 
@@ -170,6 +210,8 @@ BPoint(x:%.0f, y:%.0f)
 	       objects differ.
 
 	\return \c true if the x or y coordinates differ, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -179,4 +221,9 @@ BPoint(x:%.0f, y:%.0f)
 	       objects are equal.
 
 	\return \c true if the x and y coordinates are equal, \c false otherwise.
+
+	\since BeOS R3
 */
+
+
+//! @}

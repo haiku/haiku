@@ -35,22 +35,28 @@
 
 	\warning This class is not yet finalized, if you use it in your software
 	assume that it will break some time in the future.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\struct BTwoDimensionalLayout::ColumnRowConstraints
 	\brief Used by BTwoDimensionalLayout derived classes to communicate the
-		size constraints for a given column or row to the 
-		BTwoDimensionalLayout class.
+	       size constraints for a given column or row to the
+	       BTwoDimensionalLayout class.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\struct BTwoDimensionalLayout::Dimensions
 	\brief Used by BTwoDimensionalLayout derived classes to communicate the
-		positioning and size of a BLayoutItem, in terms of columns and rows to
-		the BTwoDimensionalLayout class.
+	       positioning and size of a BLayoutItem, in terms of columns and rows
+	       to the BTwoDimensionalLayout class.
+
+	\since Haiku R1
 */
 
 
@@ -58,7 +64,7 @@
 	\fn void BTwoDimensionalLayout::AlignLayoutWith(
 		BTwoDimensionalLayout* other, orientation orientation)
 	\brief Align the BLayoutItem&apos;s in the specified \a orientation within
-		two or more BTwoDimensionalLayout&apos;s.
+	       two or more BTwoDimensionalLayout&apos;s.
 
 	When two (or more) BTwoDimensionalLayout&apos;s are aligned within a
 	certain \a orientation, then the BLayoutItem&apos;s within those
@@ -73,6 +79,8 @@
 
 	\param other The BTwoDimensionalLayout to be aligned with.
 	\param orientation The \a orientation on which to be aligned.
+
+	\since Haiku R1
 */
 
 
@@ -86,6 +94,8 @@
 	be replaced with the value returned by BControlLook::DefaultItemSpacing().
 
 	\see BTwoDimensionalLayout::GetInsets();
+
+	\since Haiku R1
 */
 
 
@@ -98,11 +108,13 @@
 	be ignored.
 
 	\see BTwoDimensionalLayout::SetInsets();
+
+	\since Haiku R1
 */
 
 
 /*!
-	\name BTwoDimensionalLayout Hook methods
+	\name Hook Methods
 
 	These methods are called automatically as needed during layout, and
 	provide the BTwoDimensionalLayout class with the necessary information
@@ -116,28 +128,34 @@
 /*!
 	\fn void BTwoDimensionalLayout::PrepareItems(orientation orientation)
 	\brief Prepare the BLayoutItem in this BTwoDimensionalLayout subclass
-		for layout within a certain \a orientation.
+	       for layout within a certain \a orientation.
 
 	This is a good place to update cache information that will be used in
 	other hook methods, for example.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bool BTwoDimensionalLayout::HasMultiColumnItems()
 	\brief Tests whether or not this BTwoDimensionalLayout contains any
-		BLayoutItem&apos;s spanning more than one column.
+	       BLayoutItem&apos;s spanning more than one column.
 
 	The BTwoDimensionalLayout implementation returns false.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bool BTwoDimensionalLayout::HasMultiRowItems()
 	\brief Tests whether or not this BTwoDimensionalLayout contains any
-		BLayoutItem&apos;s spanning more than one row.
+	       BLayoutItem&apos;s spanning more than one row.
 
 	The BTwoDimensionalLayout implementation returns false.
+
+	\since Haiku R1
 */
 
 
@@ -146,6 +164,8 @@
 	\brief Get the number of columns in the BTwoDimensionalLayout.
 
 	\returns The number of columns in the BTwoDimensionalLayout.
+
+	\since Haiku R1
 */
 
 
@@ -154,6 +174,8 @@
 	\brief Get the number of rows in the BTwoDimensionalLayout.
 
 	\returns The number of rows in the BTwoDimensionalLayout.
+
+	\since Haiku R1
 */
 
 
@@ -161,10 +183,12 @@
 	\fn void BTwoDimensionalLayout::GetColumnRowConstraints(
 		orientation orientation, int32 index, ColumnRowConstraints* constraints)
 	\brief Fill in the ColumnRowConstraints for a certain column or row in
-		the BTwoDimensionalLayout.
+	       the BTwoDimensionalLayout.
 
 	This method is used to communicate the size constraints and weight for
 	a given row/column in the BTwoDimensionalLayout.
+
+	\since Haiku R1
 */
 
 
@@ -172,7 +196,9 @@
 	\fn void BTwoDimensionalLayout::GetItemDimensions(BLayoutItem* item,
 		Dimensions* dimensions)
 	\brief Tell the base class what column and row a BLayoutItem is in as
-		well as how many columns and rows it covers.
+	       well as how many columns and rows it covers.
+
+	\since Haiku R1
 */
 
 

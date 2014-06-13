@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -65,6 +65,8 @@
 	\see BList in the Support Kit.
 	\see BOutlineListView
 	\see BListItem
+
+	\since BeOS R3
 */
 
 
@@ -79,6 +81,8 @@
 	       selections.
 	\param resizingMode The resizing mode flags. See BView for details.
 	\param flags The view flags. See BView for details.
+
+	\since BeOS R3
 */
 
 
@@ -92,6 +96,8 @@
 	\param type Whether the list view supports a single selection or multiple
 	       selections.
 	\param flags The view flags. See BView for details.
+
+	\since Haiku R1
 */
 
 
@@ -101,6 +107,8 @@
 
 	\param type Whether the list view supports a single selection or multiple
 	       selections.
+
+	\since Haiku R1
 */
 
 
@@ -109,6 +117,8 @@
 	\brief Creates a BListView object from the \a archive message.
 
 	\param archive The message to create the object from.
+
+	\since BeOS R3
 */
 
 
@@ -117,6 +127,8 @@
 	\brief Delete the BListView object and free the memory used by it.
 
 	This method does not free the attached list items.
+
+	\since BeOS R3
 */
 
 
@@ -132,16 +144,15 @@
 	\fn BArchivable* BListView::Instantiate(BMessage* archive)
 	\brief Create a new BListView object from the message \a archive.
 
-	\param archive The message to create the object from.
+	\copydetails BView::Instantiate()
 */
 
 
 /*!
-	\fn status_t BListView::Archive(BMessage* archive, bool deep) const
+	\fn status_t BListView::Archive(BMessage* data, bool deep) const
 	\brief Archive the BListView object to a message.
 
-	\param archive The message to archive the object to.
-	\param deep \c true to archive child views.
+	\copydetails BView::Archive()
 */
 
 
@@ -149,7 +160,7 @@
 
 
 /*!
-	\name Hook methods
+	\name Hook Methods
 */
 
 
@@ -165,6 +176,8 @@
 	\param updateRect The rectangular area to draw.
 
 	\see BView::Draw()
+
+	\since BeOS R3
 */
 
 
@@ -172,7 +185,7 @@
 	\fn void BListView::AttachedToWindow()
 	\brief Hook method called when the list view is added to the view hierarchy.
 
-	\see BView::AttachedToWindow()
+	\copydetails BView::AttachedToWindow()
 */
 
 
@@ -181,7 +194,7 @@
 	\brief Hook method that is called when the list view is removed from the
 	       view hierarchy.
 
-	\see BView::DetachedFromWindow()
+	\copydetails BView::DetachedFromWindow()
 */
 
 
@@ -189,7 +202,7 @@
 	\fn void BListView::AllAttached()
 	\brief Hook method called once all views are attached to the view.
 
-	\see BView::AllAttached()
+	\copydetails BView::AllAttached()
 */
 
 
@@ -197,46 +210,42 @@
 	\fn void BListView::AllDetached()
 	\brief Hook method called once all views are detached from the view.
 
-	\see BView::AllDetached()
+	\copydetails BView::AllDetached()
 */
 
 
 /*!
-	\fn void BListView::FrameResized(float width, float height)
+	\fn void BListView::FrameResized(float newWidth, float newHeight)
 	\brief Hook method called when the list view is resized.
 
-	\param width The new \a width of the list view.
-	\param height The new \a height of the list view.
-
-	\see BView::FrameResized()
+	\copydetails BView::FrameResized()
 */
 
 
 /*!
-	\fn void BListView::FrameMoved(BPoint new_position)
+	\fn void BListView::FrameMoved(BPoint newPosition)
 	\brief Hook method called when the list view is moved.
 
-	\param new_position The list view's new position.
+	\copydetails BView::FrameMoved()
 */
 
 
 /*!
-	\fn void BListView::TargetedByScrollView(BScrollView *view)
+	\fn void BListView::TargetedByScrollView(BScrollView* view)
 	\brief Hook method called when the list view is attached to a BScrollView.
 
 	\param view The BScrollView the list view is attached to.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BListView::WindowActivated(bool state)
+	\fn void BListView::WindowActivated(bool active)
 	\brief Hook method that is called when the window becomes the active window
 	       or gives up that status.
 
-	\param state If \c true, window has just been activated. If \c false the
-	       window has just been deactivated.
-
-	\see BView::WindowActivated()
+	\copydetails BView::WindowActivated()
 */
 
 
@@ -244,9 +253,7 @@
 	\fn void BListView::MessageReceived(BMessage* message)
 	\brief Hook method called when a message is received by the list view.
 
-	\param message The message received by the list view.
-
-	\see BView::MessageReceived()
+	\copydetails BView::MessageReceived()
 */
 
 
@@ -270,6 +277,8 @@
 	\param numBytes The size of \a bytes.
 
 	\see BView::KeyDown()
+
+	\since BeOS R3
 */
 
 
@@ -285,6 +294,8 @@
 	\param point The \a point where the mouse button was pushed down.
 
 	\see BView::MouseDown()
+
+	\since BeOS R3
 */
 
 
@@ -296,6 +307,8 @@
 	\param where The location that the mouse button was released.
 
 	\see BView::MouseUp()
+
+	\since BeOS R3
 */
 
 
@@ -310,6 +323,8 @@
 	\param dragMessage A message containing drag and drop information.
 
 	\see BView::MouseMoved()
+
+	\since BeOS R3
 */
 
 
@@ -329,6 +344,8 @@
 
 	\returns \c true if a drag & drop operation was initiated, \c false
 	         otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -338,6 +355,8 @@
 
 	This method should be implemented by derived classes, the default
 	implementation does nothing.
+
+	\since BeOS R3
 */
 
 
@@ -345,7 +364,7 @@
 
 
 /*!
-	\name Resize methods
+	\name Resizing
 */
 
 
@@ -357,6 +376,8 @@
 	\brief Resize the view to it's preferred size.
 
 	\see BView::ResizeToPreferred()
+
+	\since BeOS R3
 */
 
 
@@ -369,6 +390,8 @@
 	\param _height The list view's preferred height is written to \a _height.
 
 	\see BView::GetPreferredSize()
+
+	\since BeOS R3
 */
 
 
@@ -379,6 +402,8 @@
 	\return The minimum size of the list view as a BSize.
 
 	\see BView::MinSize()
+
+	\since Haiku R1
 */
 
 
@@ -389,6 +414,8 @@
 	\return The maximum size of the list view as a BSize.
 
 	\see BView::MaxSize()
+
+	\since Haiku R1
 */
 
 
@@ -399,6 +426,8 @@
 	\return The preferred size of the list view as a BSize.
 
 	\see BView::PreferredSize()
+
+	\since Haiku R1
 */
 
 
@@ -413,6 +442,8 @@
 	\param focused \c true to receive focus or \c false to lose it.
 
 	\see BView::MakeFocus()
+
+	\since BeOS R3
 */
 
 
@@ -425,6 +456,8 @@
 	\param mask A \a mask indicating which properties of \a font to set.
 
 	\see BView::SetFont()
+
+	\since BeOS R3
 */
 
 
@@ -435,11 +468,13 @@
 	\param point The location to scroll the list view to.
 
 	\see BView::ScrollTo()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Add and remove item methods
+	\name Adding/Removing Items
 */
 
 
@@ -455,6 +490,8 @@
 	       specified the item is added to the end.
 
 	\return \c true if the list item was added, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -468,6 +505,8 @@
 	       \a list is added to the end.
 
 	\return \c true if the \a list was added, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -478,6 +517,8 @@
 	\param list The \a list of list items to add.
 
 	\return \c true if the \a list was added, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -488,6 +529,8 @@
 	\param index The \a index of the item to remove.
 
 	\return \c true if the item was removed, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -498,6 +541,8 @@
 	\param item The list item to remove.
 
 	\return \c true if the \a item was removed, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -509,6 +554,8 @@
 	\param count The number of items past \a index to remove.
 
 	return \c true if the \a items were removed, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -516,7 +563,7 @@
 
 
 /*!
-	\name Selection and Invocation message methods
+	\name Selection and Invocation Message Methods
 */
 
 
@@ -529,6 +576,8 @@
 	       is selected.
 
 	\param message The selection \a message to set.
+
+	\since BeOS R3
 */
 
 
@@ -539,6 +588,8 @@
 	\param message The invocation \a message to set.
 
 	\see BInvoker::SetMessage()
+
+	\since BeOS R3
 */
 
 
@@ -549,6 +600,8 @@
 	\return The current invocation method as a BMessage.
 
 	\see BInvoker::Message()
+
+	\since BeOS R3
 */
 
 
@@ -559,6 +612,8 @@
 	\returns The what parameter of the currently set invocation method.
 
 	\see BInvoker::Command()
+
+	\since BeOS R3
 */
 
 
@@ -567,6 +622,8 @@
 	\brief Returns the message that is send when an item is selected.
 
 	\return The current selection message as a BMessage.
+
+	\since BeOS R3
 */
 
 
@@ -576,6 +633,8 @@
 	       selected.
 
 	\return The what parameter of the current selection message.
+
+	\since BeOS R3
 */
 
 
@@ -583,7 +642,7 @@
 
 
 /*!
-	\name List type methods
+	\name List Type Methods
 */
 
 
@@ -594,6 +653,8 @@
 	\fn void BListView::SetListType(list_view_type type)
 	\brief Sets the list view \a type.
 
+
+	\since BeOS R3
 	\param type The list view \a type to set.
 */
 
@@ -603,6 +664,8 @@
 	\brief Returns the current list view type.
 
 	\return The list view type.
+
+	\since BeOS R3
 */
 
 
@@ -610,7 +673,7 @@
 
 
 /*!
-	\name List methods
+	\name List Methods
 */
 
 
@@ -624,6 +687,8 @@
 	\param index
 
 	\return The list item at the specified \a index.
+
+	\since BeOS R3
 */
 
 
@@ -634,6 +699,8 @@
 	\param item The list item to get the index of.
 
 	\return The index of the specified \a item.
+
+	\since BeOS R3
 */
 
 
@@ -644,6 +711,8 @@
 	\param point The location of the list item to get the index of.
 
 	\return The index of the list item at the specified \a point.
+
+	\since BeOS R3
 */
 
 
@@ -652,6 +721,8 @@
 	\brief Returns a pointer to the first list item.
 
 	\return A pointer to the first item in the list or \c NULL there are no items.
+
+	\since BeOS R3
 */
 
 
@@ -660,6 +731,8 @@
 	\brief Returns a pointer to the last list item.
 
 	\return A pointer to the last item in the list or \c NULL there are no items.
+
+	\since BeOS R3
 */
 
 
@@ -670,6 +743,8 @@
 	\param item The list item to check.
 
 	\return \c true if \a item is in the list, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -678,12 +753,16 @@
 	\brief Returns the number of items contained in the list view.
 
 	\return The number of items.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BListView::MakeEmpty()
 	\brief Empties the list view of all items.
+
+	\since BeOS R3
 */
 
 
@@ -692,6 +771,8 @@
 	\brief Returns whether or not the list view is empty.
 
 	\return \c true if the list view is empty, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -707,6 +788,8 @@
 	The first argument of \a func is a pointer to the list item.
 
 	\param func The function to call on each item.
+
+	\since BeOS R3
 */
 
 
@@ -725,6 +808,8 @@
 
 	\param func The function to call on each item.
 	\param arg The second argument of the function.
+
+	\since BeOS R3
 */
 
 
@@ -733,6 +818,8 @@
 	\brief Returns a pointer to the list of list items.
 
 	\returns a pointer to the list of list items.
+
+	\since BeOS R3
 */
 
 
@@ -744,11 +831,13 @@
 	\brief Draws the list item at the specified \a index.
 
 	\param index The \a index of the list item to draw.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\name Selection methods
+	\name Selection
 */
 
 
@@ -758,6 +847,8 @@
 /*!
 	\fn void BListView::ScrollToSelection()
 	\brief Scrolls to selected list item.
+
+	\since BeOS R3
 */
 
 
@@ -767,6 +858,8 @@
 
 	\param index The \a index of the item to select.
 	\param extend Whether or not to also select child items.
+
+	\since BeOS R3
 */
 
 
@@ -777,6 +870,8 @@
 	\param start The index of the item to start the selection.
 	\param finish The index of the item to end the selection.
 	\param extend Whether or not to also select child items.
+
+	\since BeOS R3
 */
 
 
@@ -785,6 +880,8 @@
 	\brief Returns whether or not the item at \a index is selected.
 
 	\return \c true if the item was selected, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -800,6 +897,8 @@
 
 	\param index The \a index of the item to get relative to the selected item's
 	       index.
+
+	\since BeOS R3
 */
 
 
@@ -815,11 +914,13 @@
 	       message.
 
 	\see BControl::Invoke()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Deselection methods
+	\name Deselection
 */
 
 
@@ -829,6 +930,8 @@
 /*!
 	\fn void BListView::DeselectAll()
 	\brief Deselect all items.
+
+	\since BeOS R3
 */
 
 
@@ -839,6 +942,8 @@
 
 	\param exceptFrom The index of the start of the exception list.
 	\param exceptTo The index of the end of the exception list.
+
+	\since BeOS R3
 */
 
 
@@ -847,6 +952,8 @@
 	\brief Deselect the item at \a index.
 
 	\param index The \a index of the item to deselect.
+
+	\since BeOS R3
 */
 
 
@@ -858,6 +965,8 @@
 	\brief Sort the items according the the passed in \a cmp function.
 
 	\param cmp The compare function to use to sort the items.
+
+	\since BeOS R3
 */
 
 
@@ -869,6 +978,8 @@
 	\param b The index of the second item to swap.
 
 	\return \c true if the items were swapped, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -880,6 +991,8 @@
 	\param to The index to move the item to.
 
 	\return \c true if the item was moved, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -891,6 +1004,8 @@
 	\param item The \a item to replace the item at \a index with.
 
 	\return \c true if the item was replaced, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -901,23 +1016,17 @@
 	\param index The \a index of the item to get the frame of.
 
 	\returns The frame of the item at \a index.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BHandler* BListView::ResolveSpecifier(BMessage* message, int32 index,
-		BMessage* specifier, int32 form, const char* property);
-	\brief Returns the proper handler for the passed in scripting \a message.
+		BMessage* specifier, int32 what, const char* property);
+	\brief Determines the proper handler for the passed in scripting \a message.
 
-	\param message The scripting message to determine the handler.
-	\param index The index of the specifier.
-	\param specifier The message which contains the specifier.
-	\param form The 'what' field of the specifier message.
-	\param property The name of the target property.
-
-	\return The proper BHandler for the passed in scripting \a message.
-
-	\see BView::ResolveSpecifier()
+	\copydetails BView::ResolveSpecifier()
 */
 
 
@@ -926,9 +1035,7 @@
 	\brief Reports the suites of messages and specifiers that derived classes
 		understand.
 
-	\param data The message to report the suite of messages and specifiers.
-
-	\see BView::GetSupportedSuites()
+	\copydetails BView::GetSupportedSuites()
 */
 
 
@@ -936,10 +1043,20 @@
 	\fn status_t BListView::Perform(perform_code code, void* _data)
 	\brief Performs an action give a perform_code and data. (Internal Method)
 
-	\param code The perform code
-	\param _data A pointer to some data to perform on
+	\copydetails BHandler::Perform()
+*/
 
-	\return A status code.
 
-	\see BView::Perform()
+/*!
+	\fn bool BListView::DoMiscellaneous(MiscCode code, MiscData* data)
+	\brief Do a miscellaneous action.
+
+	\param code The action \a code to use.
+		- \c B_NO_OP: Do nothing
+		- \c B_REPLACE_OP: Replace the item in \a data
+		- \c B_MOVE_OP: Move the item in \a data.
+		- \c B_SWAP_OP: Swap the items in \a data.
+	\param data The \a data to act on.
+
+	\since Haiku R1
 */

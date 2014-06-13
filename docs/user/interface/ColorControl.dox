@@ -24,36 +24,53 @@
 	\ingroup interface
 
 	Enumeration of the color control layout options.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var color_control_layout B_CELLS_4x64
 
 	Cells are arranged in 4 columns, 64 rows.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var color_control_layout B_CELLS_8x32
 
 	Cells are arranged in 8 columns, 32 rows.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var color_control_layout B_CELLS_16x16
 
 	Cells are arranged in 16 columns, 16 rows.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var color_control_layout B_CELLS_32x8
 
 	Cells are arranged in 32 columns, 8 rows.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var color_control_layout B_CELLS_64x4
 
 	Cells are arranged in 64 columns, 4 rows.
+
+	\since BeOS R3
 */
 
 
@@ -94,6 +111,8 @@ colorControl->SetValue(0x336698);
 	\image html BColorControl_example_256_colors.png
 
 	You can set the size of these cells by calling the SetCellSize() method.
+
+	\since BeOS R3
 */
 
 
@@ -121,27 +140,33 @@ colorControl->SetValue(0x336698);
 		made to an off-screen bitmap and then copied to the screen
 		making the drawing smoother, but requiring more memory
 		(currently unused).
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BColorControl::BColorControl(BMessage* archive)
-	\brief Constructs a BColorControl object from an \a archive message.
+	\fn BColorControl::BColorControl(BMessage* data)
+	\brief Constructs a BColorControl object from an \a data message.
 
 	This method is usually not called directly. If you want to build a
 	color control from a message you should call Instantiate() which can
 	handle errors properly.
 
-	If the \a archive deep, the BColorControl object will also unarchive
+	If the \a data deep, the BColorControl object will also undata
 	each of its child views recursively.
 
-	\param archive The \a archive message to restore from.
+	\param data The \a data message to restore from.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BColorControl::~BColorControl()
 	\brief Destructor method.
+
+	\since BeOS R3
 */
 
 
@@ -152,6 +177,8 @@ colorControl->SetValue(0x336698);
 	\param layout The \a layout to set.
 
 	\sa BView::SetLayout()
+
+	\since Haiku R1
 */
 
 
@@ -167,8 +194,9 @@ colorControl->SetValue(0x336698);
 		- \c B_CELLS_32x8
 
 	\param layout The color control layout to set.
-*/
 
+	\since BeOS R3
+*/
 
 
 /*!
@@ -176,6 +204,8 @@ colorControl->SetValue(0x336698);
 	\brief Set the color of the BColorControl to \a value.
 
 	\param value The 32-bit color value to set.
+
+	\since BeOS R3
 */
 
 
@@ -184,6 +214,8 @@ colorControl->SetValue(0x336698);
 	\brief Set the color of the BColorControl to \a color.
 
 	\param color The rgb_color to set.
+
+	\since BeOS R3
 */
 
 
@@ -192,6 +224,8 @@ colorControl->SetValue(0x336698);
 	\brief Return the current color value as an rgb_color.
 
 	\returns The current color as an rgb_color.
+
+	\since BeOS R3
 */
 
 
@@ -200,6 +234,8 @@ colorControl->SetValue(0x336698);
 	\brief Enable and disable the color control.
 
 	\param enabled Whether to enable or disable the color control.
+
+	\since BeOS R3
 */
 
 
@@ -214,6 +250,8 @@ colorControl->SetValue(0x336698);
 
 	\sa BControl::AttachedToWindow()
 	\sa BView::SetViewColor()
+
+	\since BeOS R3
 */
 
 
@@ -228,6 +266,8 @@ colorControl->SetValue(0x336698);
 	\param updateRect The area to be drawn.
 
 	\sa BView::Draw()
+
+	\since BeOS R3
 */
 
 
@@ -236,6 +276,8 @@ colorControl->SetValue(0x336698);
 	\brief Set the size of the color cell in the color control.
 
 	\param cellSide The cell size to set.
+
+	\since BeOS R3
 */
 
 
@@ -244,6 +286,8 @@ colorControl->SetValue(0x336698);
 	\brief Get the current color cell size.
 
 	\returns the current color cell size as a float.
+
+	\since BeOS R3
 */
 
 
@@ -252,6 +296,8 @@ colorControl->SetValue(0x336698);
 	\brief Get the current color control layout.
 
 	\returns The current color_control_layout
+
+	\since BeOS R3
 */
 
 
@@ -260,7 +306,7 @@ colorControl->SetValue(0x336698);
 	\brief Hook method that is called when the object is detached from a
 		window.
 
-	\sa BView::DetachedFromWindow()
+	\copydetails BControl::DetachedFromWindow()
 */
 
 
@@ -273,6 +319,8 @@ colorControl->SetValue(0x336698);
 	\param _height Pointer to a \c float to hold the height of the checkbox.
 
 	\sa BView::GetPreferredSize()
+
+	\since BeOS R3
 */
 
 
@@ -281,47 +329,53 @@ colorControl->SetValue(0x336698);
 	\brief Resize the color control to its preferred size.
 
 	\sa BView::ResizeToPreferred()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BColorControl::Invoke(BMessage *msg)
+	\fn status_t BColorControl::Invoke(BMessage* message)
 	\brief Tells the messenger to send a message.
 
-	\param msg The message to send.
+	\param message The message to send.
 
 	\sa BControl::Invoke()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BColorControl::FrameMoved(BPoint new_position)
+	\fn void BColorControl::FrameMoved(BPoint newPosition)
 	\brief Hook method that gets called when the color control is moved.
 
-	\param new_position The point that the top left corner of the frame
-		is moved to.
-
-	\sa BView::FrameMoved()
+	\copydetails BView::FrameMoved()
 */
 
 
 /*!
-	\fn void BColorControl::FrameResized(float new_width, float new_height)
+	\fn void BColorControl::FrameResized(float newWidth, float newHeight)
 	\brief Hook method that gets called when the checkbox is resized.
 
-	\param new_width The new width of the checkbox.
-	\param new_height The new height of the checkbox.
-
-	\sa BView::FrameResized()
+	\copydetails BView::FrameResized()
 */
 
 
 /*!
 	\fn void BColorControl::MakeFocus(bool state)
-	\brief Gives focus to or removes focus from the color control.
+	\brief Gives focus to or removes focus from the control.
 
 	\param state \a true to set focus, \a false to remove it.
 
 	\sa BControl::MakeFocus()
 
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BHandler* BColorControl::ResolveSpecifier(BMessage* message,
+		int32 index, BMessage* specifier, int32 what, const char* property)
+	\copydoc BHandler::ResolveSpecifier()
 */

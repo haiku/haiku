@@ -48,6 +48,8 @@
 	If the pop-up menu is used as part of a BMenuField or BMenuBar it behaves
 	almost exactly like a BMenu would, but, the menu pops up directly under the
 	mouse pointer instead of underneath the BMenuBar or BMenuField.
+
+	\since BeOS R3
 */
 
 
@@ -72,6 +74,8 @@
 
 	\see BMenu::SetRadioMode()
 	\see BMenu::SetLabelFromMarked()
+
+	\since BeOS R3
 */
 
 
@@ -80,6 +84,20 @@
 	\brief Archive constructor.
 
 	\param archive The message data to construct the pop-up menu from.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BPopUpMenu& BPopUpMenu::operator=(const BPopUpMenu& other)
+	\brief Assignment overload method.
+
+	\param other The BPopUpMenu object to assign from.
+
+	\return The newly assigned BPopUpMenu object.
+
+	\since BeOS R3
 */
 
 
@@ -88,7 +106,17 @@
 	\brief Destructor method.
 
 	Also frees the memory used by any attached menu items.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -102,6 +130,8 @@
 	        otherwise.
 	\retval B_OK The object was archived successfully.
 	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
 */
 
 
@@ -111,7 +141,12 @@
 
 	\returns A newly created BPopUpMenu object or \c NULL if the message
 	         doesn't contain an archived BPopUpMenu.
+
+	\since BeOS R3
 */
+
+
+//! @}
 
 
 /*!
@@ -132,6 +167,8 @@
 	       \c false the menu will not return until a menu item is selected
 	       or it is dismissed by the user. If a menu item was selected a
 	       pointer to the menu item is returned, if not, \c NULL is returned.
+
+	\since BeOS R3
 */
 
 
@@ -161,6 +198,8 @@
 	       \c false the menu will not return until a menu item is selected
 	       or it is dismissed by the user. If a menu item was selected a
 	       pointer to the menu item is returned, if not, \c NULL is returned.
+
+	\since BeOS R3
 */
 
 
@@ -171,6 +210,8 @@
 
 	\param on \c true to turn async-auto-destruct mode on, \c false to turn
 	       async-auto-destruct mode off.
+
+	\since BeOS R5
 */
 
 
@@ -182,6 +223,8 @@
 	        async-auto-destruct mode is turned off.
 
 	\see SetAsyncAutoDestruct()
+
+	\since BeOS R5
 */
 
 
@@ -195,14 +238,6 @@
 
 	\returns The location that the pop-up-menu will appear on screen in the
 	         screen's coordinate system.
-*/
 
-
-/*!
-	\fn BPopUpMenu& BPopUpMenu::operator=(const BPopUpMenu& other)
-	\brief Assignment overload method.
-
-	\param other The BPopUpMenu object to assign from.
-
-	\return The newly assigned BPopUpMenu object.
+	\since BeOS R3
 */

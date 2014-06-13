@@ -42,6 +42,8 @@
 	state, and another unchecked check box with focus on it.
 
 	\image html BCheckBox_example.png
+
+	\since BeOS R3
 */
 
 
@@ -64,6 +66,8 @@
 	\param resizingMode Defines the behavior of the check box as the parent
 		view resizes. See BView for details.
 	\param flags Behavior \a flags for the check box. See BView for details.
+
+	\since BeOS R3
 */
 
 
@@ -81,6 +85,8 @@
 	\param message The \a message to send when the check box is activated.
 	       See BView for details.
 	\param flags Behavior \a flags for the check box. See BView for details.
+
+	\since Haiku R1
 */
 
 
@@ -94,6 +100,8 @@
 
 	\param label The \a label displayed along with the check box.
 	\param message The \a message to send when the check box is activated.
+
+	\since Haiku R1
 */
 
 
@@ -106,12 +114,16 @@
 	because it can handle errors properly.
 
 	\param archive The message to construct the BCheckBox object from.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BCheckBox::~BCheckBox()
 	\brief Destructor, does nothing.
+
+	\since BeOS R3
 */
 
 
@@ -127,8 +139,12 @@
 	\fn BArchivable* BCheckBox::Instantiate(BMessage* archive)
 	\brief Creates a new BCheckBox object from the \a archive message.
 
+	\param archive The \a archive message to restore from.
+
 	\return A newly created check box or \c NULL if the message doesn't
 	        contain an archived BCheckBox.
+
+	\since BeOS R3
 */
 
 
@@ -136,13 +152,7 @@
 	\fn status_t BCheckBox::Archive(BMessage* data, bool deep) const
 	\brief Archives the object into the \a data message.
 
-	\param data A pointer to the BMessage object to archive the object into.
-	\param deep Whether or not to archive child views as well.
-
-	\return A status code, \c B_OK if everything went well or an error code
-	        otherwise.
-
-	\sa BControl::Archive()
+	\copydetails BControl::Archive()
 */
 
 
@@ -161,9 +171,7 @@
 	\fn void BCheckBox::AttachedToWindow()
 	\brief Hook method called when the control is attached to a window.
 
-	The default implementation does nothing.
-
-	\sa BControl::AttachedToWindow()
+	\copydetails BControl::AttachedToWindow()
 */
 
 
@@ -171,9 +179,7 @@
 	\fn void BCheckBox::DetachedFromWindow()
 	\brief Hook method called when the control is detached from a window.
 
-	The default implementation does nothing.
-
-	\sa BControl::DetachedFromWindow()
+	\copydetails BControl::DetachedFromWindow()
 */
 
 
@@ -182,9 +188,7 @@
 	\brief Similar to AttachedToWindow() but this method is triggered after
 	       all child views have already been attached to a window.
 
-	The default implementation does nothing.
-
-	\sa BView::AllAttached()
+	\copydetails BView::AllAttached()
 */
 
 
@@ -193,9 +197,7 @@
 	\brief Similar to AttachedToWindow() but this method is triggered after
 	       all child views have already been detached from a window.
 
-	The default implementation does nothing.
-
-	\sa BView::AllDetached()
+	\copydetails BView::AllDetached()
 */
 
 
@@ -210,6 +212,8 @@
 	\param updateRect The rectangular area to be drawn.
 
 	\sa BView::Draw()
+
+	\since BeOS R3
 */
 
 
@@ -217,24 +221,15 @@
 	\fn void BCheckBox::FrameMoved(BPoint newPosition)
 	\brief Hook method called when the check box is moved.
 
-	The default implementation does nothing.
-
-	\param newPosition The point that the check box has been moved to.
-
-	\sa BView::FrameMoved()
+	\copydetails BView::FrameMoved()
 */
 
 
 /*!
-	\fn void BCheckBox::FrameResized(float width, float height)
+	\fn void BCheckBox::FrameResized(float newWidth, float newHeight)
 	\brief Hook method called when the check box is resized.
 
-	The default implementation does nothing.
-
-	\param width The new \a width of the check box.
-	\param height The new \a height of the check box.
-
-	\sa BView::FrameResized()
+	\copydetails BView::FrameResized()
 */
 
 
@@ -243,8 +238,7 @@
 	\brief Fill out the preferred width and height of the check box
 	       into the \a _width and \a _height parameters.
 
-	\param[out] _width Pointer to a \c float to store the width.
-	\param[out] _height Pointer to a \c float to store the height.
+	\copydetails BView::GetPreferredSize()
 */
 
 
@@ -258,8 +252,9 @@
 	\return \c B_OK if all went well or an error code otherwise.
 
 	\sa BControl::GetSupportedSuites();
-*/
 
+	\since BeOS R3
+*/
 
 
 /*!
@@ -268,8 +263,7 @@
 
 	Inverts the value on \a B_ENTER or \a B_SPACE.
 
-	\param bytes The bytes of the key combination pressed.
-	\param numBytes The number of bytes in \a bytes.
+	\copydetails BControl::KeyDown()
 */
 
 
@@ -277,9 +271,7 @@
 	\fn void BCheckBox::MessageReceived(BMessage* message)
 	\brief Handle \a message received by the associated looper.
 
-	\param message The \a message received by the associated looper.
-
-	\see BControl::MessageReceived()
+	\copydetails BControl::MessageReceived()
 */
 
 
@@ -289,8 +281,7 @@
 
 	Begins tracking the mouse cursor.
 
-	\param where The point on the screen where to mouse pointer is when
-	       the mouse button is pressed.
+	\copydetails BControl::MouseDown()
 */
 
 
@@ -302,19 +293,7 @@
 	Once MouseDown() has been called on a check box this method updates
 	the outline when the cursor is inside the control redrawing as necessary.
 
-	\param where The new location of the mouse in the control's coordinate system.
-	\param code One of the following:
-	- \c B_ENTERED_VIEW The cursor has just entered the control.
-	- \c B_INSIDE_VIEW The cursor is inside the control.
-	- \c B_EXITED_VIEW The cursor has left the control's bounds. This only gets
-	     sent if the scope of the mouse events that the control can receive has
-	     been expanded by BView::SetEventMask() or BView::SetMouseEventMask().
-	- \c B_OUTSIDE_VIEW The cursor is outside the button. This only gets sent if
-	     the scope of the mouse events that the control can receive has been
-	     expanded by SetEventMask() or SetMouseEventMask().
-	\param dragMessage If a drag-and-drop operation is taking place this is a
-	     pointer to a BMessage that holds the drag information, otherwise the
-	     pointer is \c NULL.
+	\copydetails BControl::MouseMoved()
 */
 
 
@@ -324,10 +303,7 @@
 
 	Inverts the check box value.
 
-	\param where The point on the screen where the mouse pointer is located when
-	       the mouse button is released in the view's coordinate system.
-
-	\sa BControl::MouseUp()
+	\copydetails BControl::MouseUp()
 */
 
 
@@ -337,12 +313,7 @@
 	\brief Hook method called when the attached window is activated or
 	       deactivated.
 
-	The default implementation does nothing.
-
-	\param active \c true if the window becomes activated, \c false if the
-	       window becomes deactivated.
-
-	\sa BControl::WindowActivated()
+	\copydetails BControl::WindowActivated()
 */
 
 
@@ -357,4 +328,13 @@
 		either \c B_CONTROL_ON or \c B_CONTROL_OFF.
 
 	\sa BControl::SetValue()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BHandler* BCheckBox::ResolveSpecifier(BMessage* message, int32 index,
+		BMessage* specifier, int32 what, const char* property)
+	\copydoc BHandler::ResolveSpecifier()
 */

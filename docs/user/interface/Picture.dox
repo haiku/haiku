@@ -59,18 +59,24 @@
 	\sa BView::AppendToPicture()
 	\sa BView::BeginPicture()
 	\sa BView::EndPicture()
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BPicture::BPicture()
 	\brief Initializes an empty BPicture object.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BPicture::BPicture(const BPicture& otherPicture)
 	\brief Initializes an BPicture object copying the data from \a otherPicture.
+
+	\since BeOS R3
 */
 
 
@@ -78,13 +84,25 @@
 	\fn BPicture::BPicture(BMessage* data)
 	\brief Initializes an BPicture object copying the data from from the
 	       passed in \a data archive.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BPicture::~BPicture()
 	\brief Destroys the BPicture object and deletes all associated data.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -96,6 +114,8 @@
 	         contain an archived BPicture.
 
 	\see BArchivable::Instantiate()
+
+	\since BeOS R3
 */
 
 
@@ -113,13 +133,20 @@
 
 	\sa BArchivable::Archive()
 	\sa BPicture::Instantiate()
+
+	\since BeOS R3
 */
+
+
+//! @}
 
 
 /*!
 	\fn status_t BPicture::Perform(perform_code code, void* arg)
 	\brief Perform some action (internal method defined for binary
 	       compatibility purposes).
+
+	\since Haiku R1
 */
 
 
@@ -139,6 +166,8 @@
 	\returns A status code.
 	\retval B_OK The BPicture object was played back successfully.
 	\retval B_ERROR BPicture data is \c NULL.
+
+	\since BeOS R3
 */
 
 
@@ -153,6 +182,8 @@
 	\retval B_BAD_VALUE The \a stream pointer was \c NULL or the data was invalid.
 	\retval B_IO_ERROR The number of bytes written does not equal the size
 	        of the contents of the BPicture object.
+
+	\since Haiku R1
 */
 
 
@@ -167,4 +198,6 @@
 	\retval B_BAD_VALUE The \a stream pointer was \c NULL or the data was invalid.
 	\retval B_IO_ERROR The number of bytes read does not equal the size
 	        of the contents of the BPicture object.
+
+	\since Haiku R1
 */

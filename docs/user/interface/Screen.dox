@@ -26,7 +26,7 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief The BScreen class provides methods to retrieve and change display
-		settings.
+	       settings.
 
 	Each BScreen object describes one display connected to the computer.
 	Multiple BScreen objects can represent the same physical display.
@@ -66,42 +66,50 @@
 	monitor into a low-power mode. Call DPMSCapabilites() to check what
 	modes are supported by your monitor. DPMSState() tells you what state
 	your monitor is currently in and SetDPMS() allows you to change it.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BScreen::BScreen(screen_id id)
 	\brief Creates a BScreen object which represents the display
-	 	connected to the computer with the given screen_id.
+	       connected to the computer with the given screen_id.
 
 	In the current implementation, there is only one display
 	(\c B_MAIN_SCREEN_ID). To be sure that the object was constructed
 	correctly, call IsValid().
 
 	\param id The screen_id of the screen to create a BScreen object from.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BScreen::BScreen(BWindow* window)
 	\brief Creates a BScreen object which represents the display that
-		contains \a window.
+	       contains \a window.
 
 	In the current implementation, there is only one display
 	(\c B_MAIN_SCREEN_ID). To be sure that the object was constructed
 	correctly, call IsValid().
 
 	\param window A BWindow object.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BScreen::~BScreen()
 	\brief Frees the resources used by the BScreen object and unlocks the
-		screen.
+	       screen.
 
 	\note The main screen object will never go away, even if you disconnect
-		all monitors.
+	      all monitors.
+
+	\since BeOS R3
 */
 
 
@@ -116,9 +124,11 @@
 /*! 
 	\fn bool BScreen::IsValid()
 	\brief Checks that the BScreen object represents a real display that is
-		connected to the computer.
+	       connected to the computer.
 
 	\return \c true if the BScreen object is valid, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -127,15 +137,19 @@
 	\brief Sets the BScreen object to the next display in the screen list.
 
 	\return \c B_OK if successful, otherwise \c B_ERROR.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn color_space BScreen::ColorSpace()
-	\brief Gets the color_space of the display.
+	\brief Returns the color_space of the display.
 
 	\return \c B_CMAP8, \c B_RGB15, \c B_RGB32, or \c B_NO_COLOR_SPACE
-		if the BScreen object is invalid.
+	        if the BScreen object is invalid.
+
+	\since BeOS R3
 */
 
 
@@ -151,6 +165,8 @@
 	You can set the frame programmatically by calling the SetMode() method.
 
 	\return a BRect frame of the screen in the screen's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -162,6 +178,8 @@
 	even if the object is invalid.
 
 	\return A screen_id that identifies the screen.
+
+	\since BeOS R3
 */
 
 
@@ -170,18 +188,22 @@
 	\brief Blocks until the monitor has finished its current vertical retrace.
 
 	\return \c B_OK or \c B_ERROR if the screen object is invalid.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BScreen::WaitForRetrace(bigtime_t timeout)
 	\brief Blocks until the monitor has finished its current vertical retrace
-		or until \a timeout has expired.
+	       or until \a timeout has expired.
 
 	\param timeout The amount of time to wait before returning.
 
 	\return \c B_OK if the monitor has retraced in the given \a timeout
-		duration, \c B_ERROR otherwise.
+	        duration, \c B_ERROR otherwise.
+
+	\since BeOS R5
 */
 
 
@@ -189,7 +211,7 @@
 
 
 /*!
-	\name Color Methods
+	\name Color
 */
 
 
@@ -198,20 +220,22 @@
 
 /*!
 	\fn inline uint8 BScreen::IndexForColor(rgb_color color)
-	\brief Gets the 8-bit color index that most closely matches a
-		32-bit \a color.
+	\brief Returns the 8-bit color index that most closely matches a
+	       32-bit \a color.
 
 	\param color The 32-bit \a color to get the 8-bit index of.
 
 	\return An 8-bit color index in the screen's color_map.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn uint8 BScreen::IndexForColor(uint8 red, uint8 green, uint8 blue,
-									 uint8 alpha)
-	\brief Gets the 8-bit color index that most closely matches a set of
-		\a red, \a green, \a blue, and \a alpha values.
+		uint8 alpha)
+	\brief Returns the 8-bit color index that most closely matches a set of
+	       \a red, \a green, \a blue, and \a alpha values.
 
 	\param red The \a red value.
 	\param green The \a green value.
@@ -219,6 +243,8 @@
 	\param alpha The \a alpha value.
 
 	\return An 8-bit color index in the screen's color_map.
+
+	\since BeOS R3
 */
 
 
@@ -229,6 +255,8 @@
 	\param index The 8-bit color \a index to convert to a 32-bit color.
 
 	\return A 32-bit rgb_color structure.
+
+	\since BeOS R3
 */
 
 
@@ -241,7 +269,9 @@
 	\param index The 8-bit color \a index.
 
 	\return An 8-bit color \a index that represents the "Inversion" of the
-		given color in the screen's color_map.
+	        given color in the screen's color_map.
+
+	\since BeOS R3
 */
 
 
@@ -250,6 +280,8 @@
 	\brief Gets the color_map of the BScreen.
 
 	\return A pointer to the BScreen object's color_map.
+
+	\since BeOS R3
 */
 
 
@@ -257,7 +289,7 @@
 
 
 /*!
-	\name Bitmap Methods
+	\name Bitmap
 */
 
 
@@ -266,39 +298,43 @@
 
 /*!
 	\fn status_t BScreen::GetBitmap(BBitmap** _bitmap, bool drawCursor,
-									BRect* bounds)
+		BRect* bounds)
 	\brief Allocates a BBitmap and copies the contents of the screen into it.
 
 	\note GetBitmap() will allocate a BBitmap object for you while
-		ReadBitmap() requires you to pre-allocate a BBitmap object first.
+	      ReadBitmap() requires you to pre-allocate a BBitmap object first.
 
 	\note The caller is responsible for freeing the BBitmap object.
 
 	\param _bitmap A pointer to a BBitmap pointer where this method will
-		store the contents of the display.
+	       store the contents of the display.
 	\param drawCursor Specifies whether or not to draw the cursor.
 	\param bounds Specifies the screen area that you want copied. If
-		\a bounds is \c NULL then the entire screen is copied.
+	       \a bounds is \c NULL then the entire screen is copied.
 
 	\return \c B_OK if the operation was successful, \c B_ERROR otherwise.
+
+	\since BeOS R4
 */
 
 
 /*!
 	\fn status_t BScreen::ReadBitmap(BBitmap* bitmap, bool drawCursor,
-									 BRect* bounds)
+		BRect* bounds)
 	\brief Copies the contents of the screen into a BBitmap.
 
 	\note ReadBitmap() requires you to pre-allocate a BBitmap object first,
-		while GetBitmap() will allocate a BBitmap object for you.
+	      while GetBitmap() will allocate a BBitmap object for you.
 
 	\param bitmap A pointer to a pre-allocated BBitmap where this
-		method will store the contents of the display.
+	       method will store the contents of the display.
 	\param drawCursor Specifies whether or not to draw the cursor.
 	\param bounds Specifies the screen area that you want copied. If
-		\a bounds is \c NULL then the entire screen is copied.
+	       \a bounds is \c NULL then the entire screen is copied.
 
 	\return \c B_OK if the operation was successful, \c B_ERROR otherwise.
+
+	\since BeOS R4
 */
 
 
@@ -306,7 +342,7 @@
 
 
 /*!
-	\name Desktop Color Methods
+	\name Desktop Color
 */
 
 
@@ -319,6 +355,8 @@
 
 	\return A 32-bit rgb_color structure containing the background color
 		of the current workspace.
+
+	\since BeOS R3
 */
 
 
@@ -331,6 +369,8 @@
 
 	\return An 32-bit rgb_color structure containing the background color
 		of the specified \a workspace.
+
+	\since Haiku R1
 */
 
 
@@ -340,17 +380,21 @@
 
 	\param color The 32-bit \a color to paint the desktop background.
 	\param stick Whether or not the \a color will stay after a reboot.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BScreen::SetDesktopColor(rgb_color color, uint32 workspace,
-									  bool stick)
+		bool stick)
 	\brief Set the background \a color of the specified \a workspace.
 
 	\param color The 32-bit \a color to paint the desktop background.
 	\param workspace The \a workspace index to update.
 	\param stick Whether or not the \a color will stay after a reboot.
+
+	\since Haiku R1
 */
 
 
@@ -358,7 +402,7 @@
 
 
 /*!
-	\name Display Mode Methods
+	\name Display Mode
 
 	The following methods retrieve and alter the display_mode structure
 	of a screen. The display_mode structure contains screen size,
@@ -371,8 +415,7 @@
 
 /*!
 	\fn status_t BScreen::ProposeMode(display_mode* target,
-									  const display_mode* low,
-									  const display_mode* high)
+		const display_mode* low, const display_mode* high)
 	\brief Adjust the \a target mode to make it a supported mode.
 
 	The list of supported modes for the graphics card is supplied by
@@ -382,11 +425,14 @@
 	\param low The lower display mode limit.
 	\param high The higher display mode limit.
 
+	\returns A status code.
 	\retval B_OK if \a target is supported and falls within the
-		\a low and \a high limits.
+	        \a low and \a high limits.
 	\retval B_BAD_VALUE if \a target is supported but does not
-		fall within the \a low and \a high limits.
+	        fall within the \a low and \a high limits.
 	\retval B_ERROR if the target mode isn't supported.
+
+	\since BeOS R5
 */
 
 
@@ -396,18 +442,20 @@
 		graphics card into \a _modeList.
 
 	\warning The monitor may not be able to display all of the modes that
-		GetModeList() retrieves.
+	         GetModeList() retrieves.
 
 	\note The caller is responsible for freeing the display_mode object.
 
 	\param _modeList A pointer to a display_mode pointer, where the function
-		will allocate an array of display_mode structures.
+	       will allocate an array of display_mode structures.
 	\param _count A pointer to an integer used to store the count of
-		available display modes.
+	       available display modes.
 
 	\retval B_OK if the operation was successful.
 	\retval B_ERROR if \a modeList or \a count is invalid.
 	\retval B_ERROR for all other errors.
+
+	\since BeOS R5
 */
 
 
@@ -420,13 +468,15 @@
 	\retval B_OK if the operation was successful.
 	\retval B_BAD_VALUE if \a mode is invalid.
 	\retval B_ERROR for all other errors.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn status_t BScreen::GetMode(uint32 workspace, display_mode* mode)
 	\brief Fills out the display_mode struct from the specified
-		\a workspace.
+	       \a workspace.
 
 	\param workspace The index of the \a workspace to query.
 	\param mode A pointer to a display_mode structure to copy into.
@@ -434,6 +484,8 @@
 	\retval B_OK if the operation was successful
 	\retval B_BAD_VALUE if \a mode is invalid.
 	\retval B_ERROR for all other errors.
+
+	\since Haiku R1
 */
 
 
@@ -445,20 +497,24 @@
 	\param makeDefault Whether or not \a mode is set as the default.
 
 	\return \c B_OK if the operation was successful, \c B_ERROR otherwise.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn status_t BScreen::SetMode(uint32 workspace, display_mode* mode,
-								  bool makeDefault)
+		bool makeDefault)
 	\brief Set the screen in the specified \a workspace to the given \a mode.
 
 	\param workspace The index of the workspace to set the \a mode of.
 	\param mode A pointer to a display_mode struct.
 	\param makeDefault Whether or not the \a mode is set as the default
-		for the specified \a workspace.
+	       for the specified \a workspace.
 
 	\return \c B_OK if the operation was successful, \c B_ERROR otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -466,7 +522,7 @@
 
 
 /*!
-	\name Display and Graphics Card Info Methods
+	\name Display and Graphics Card Info
 */
 
 
@@ -478,11 +534,13 @@
 	\brief Fills out the \a info struct with information about a graphics card.
 
 	\param info An accelerant_device_info struct to store the device
-		\a info.
+	       \a info.
 
 	\retval B_OK if the operation was successful.
 	\retval B_BAD_VALUE if \a info is invalid.
 	\retval B_ERROR for all other errors.
+
+	\since BeOS R5
 */
 
 
@@ -495,12 +553,14 @@
 	\retval B_OK if the operation was successful.
 	\retval B_BAD_VALUE if \a info is invalid.
 	\retval B_ERROR for all other errors.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BScreen::GetPixelClockLimits(display_mode* mode,
-											  uint32* _low, uint32* _high)
+		uint32* _low, uint32* _high)
 	\brief Gets the minimum and maximum pixel clock rates that are possible
 		for the specified \a mode.
 
@@ -513,21 +573,25 @@
 	\retval B_OK if the operation was successful.
 	\retval B_BAD_VALUE if \a mode, \a low, or \a high is invalid.
 	\retval B_ERROR for all other errors.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn status_t BScreen::GetTimingConstraints(display_timing_constraints*
-											   constraints)
+	\fn status_t BScreen::GetTimingConstraints(
+		display_timing_constraints* constraints)
 	\brief Fills out the \a constraints structure with the timing constraints
-		of the current display mode.
+	       of the current display mode.
 
 	\param constraints A pointer to a display_timing_constraints structure
-		to store the timing constraints.
+	       to store the timing constraints.
 
 	\retval B_OK if the operation was successful.
 	\retval B_BAD_VALUE if \a constraints is invalid.
 	\retval B_ERROR for all other errors.
+
+	\since BeOS R5
 */
 
 
@@ -563,26 +627,29 @@
 /*!
 	\fn status_t BScreen::SetDPMS(uint32 dpmsState)
 	\brief Sets the VESA Display Power Management Signaling (DPMS) state for
-		the display.
+	       the display.
 
-	\param dpmsState The DPMS state to set.
-		valid values are:
-		- \c B_DPMS_ON
-		- \c B_DPMS_STAND_BY
-		- \c B_DPMS_SUSPEND
-		- \c B_DPMS_OFF
+	\param dpmsState The DPMS state to set, valid values are:
+	- \c B_DPMS_ON
+	- \c B_DPMS_STAND_BY
+	- \c B_DPMS_SUSPEND
+	- \c B_DPMS_OFF
 
 	\return \c B_OK if the operation was successful, otherwise an error code.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn uint32 BScreen::DPMSState()
 	\brief Gets the current VESA Display Power Management Signaling (DPMS)
-		state of the screen.
+	       state of the screen.
 
 	\return The current VESA Display Power Management Signaling (DPMS) state
-		of the display or 0 in the case of an error.
+	        of the display or 0 in the case of an error.
+
+	\since BeOS R5
 */
 
 
@@ -590,7 +657,7 @@
 /*!
 	\fn uint32 BScreen::DPMSCapabilites()
 	\brief Gets the VESA Display Power Management Signaling (DPMS)
-		modes that the display supports as a bit mask.
+	       modes that the display supports as a bit mask.
 
 	- \c B_DPMS_ON is worth 1
 	- \c B_DPMS_STAND_BY is worth 2
@@ -598,7 +665,9 @@
 	- \c B_DPMS_OFF is worth 8
 
 	\return A bit mask of the VESA Display Power Management Signaling (DPMS)
-		modes that the display supports or 0 in the case of an error.
+	        modes that the display supports or 0 in the case of an error.
+
+	\since BeOS R5
 */
 
 
@@ -606,7 +675,7 @@
 
 
 /*!
-	\name Deprecated methods
+	\name Deprecated Methods
 */
 
 
@@ -617,28 +686,35 @@
 	\fn BPrivate::BPrivateScreen* BScreen::private_screen()
 	\brief Returns the BPrivateScreen used by the BScreen object.
 
-	\return A pointer to the BPrivateScreen class internally used by the BScreen
-		object.
+	\return A pointer to the BPrivateScreen class internally used by the
+	        BScreen object.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BScreen::ProposeDisplayMode(display_mode* target,
-											 const display_mode* low,
-											 const display_mode* high)
+		const display_mode* low, const display_mode* high)
 	\brief Deprecated, use ProposeMode() instead.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn void* BScreen::BaseAddress()
 	\brief Returns the base address of the frame buffer.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn uint32 BScreen::BytesPerRow()
 	\brief Returns the bytes per row of the frame buffer.
+
+	\since Haiku R1
 */
 
 

@@ -65,6 +65,8 @@
 	submenu may still be opened but each of the items will be disabled.
 
 	\sa SetEnabled()
+
+	\since BeOS R3
 */
 
 
@@ -79,6 +81,8 @@
 	\param shortcut The \a shortcut characters to activate the menu item.
 	\param modifiers The modifier keys to active the menu item,
 	       \c B_COMMAND_KEY is assumed.
+
+	\since BeOS R3
 */
 
 
@@ -92,6 +96,8 @@
 
 	\param menu The \a menu to assign to the item.
 	\param message The BMessage that is sent when the item is selected.
+
+	\since BeOS R3
 */
 
 
@@ -100,7 +106,27 @@
 	\brief Archive constructor.
 
 	\param data The message \a data to construct the menu item from.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\fn BMenuItem::~BMenuItem()
+	\brief Destructor.
+
+	Also frees the memory used by the label or submenu.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -109,6 +135,8 @@
 
 	\return A newly created BMenuItem object or \c NULL if the message
 	        doesn't contain an archived BMenuItem.
+
+	\since BeOS R3
 */
 
 
@@ -125,15 +153,12 @@
 	        otherwise.
 	\retval B_OK The object was archived successfully.
 	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
 */
 
 
-/*!
-	\fn BMenuItem::~BMenuItem()
-	\brief Destructor.
-
-	Also frees the memory used by the label or submenu.
-*/
+//! @}
 
 
 /*!
@@ -144,6 +169,8 @@
 	Setting the label invalidates the attached menu.
 
 	\param string The \a string to set the label to.
+
+	\since BeOS R3
 */
 
 
@@ -154,6 +181,8 @@
 	Enabling or disabling the menu item invalidates the attached menu.
 
 	\param enable \c true to enable the menu item, \c false to disable it.
+
+	\since BeOS R3
 */
 
 
@@ -169,6 +198,8 @@
 	\param mark \c true to mark the menu item, \c false to unmark it.
 
 	\sa BMenu::SetRadioMode()
+
+	\since BeOS R3
 */
 
 
@@ -180,6 +211,8 @@
 	\attention Triggers are currently disabled.
 
 	\param trigger The trigger character to set on this menu item.
+
+	\since BeOS R3
 */
 
 
@@ -194,6 +227,8 @@
 	\param shortcut The ASCII shortcut character to set.
 	\param modifiers A bitmap mask of modifier keys used to activate
 	       the shortcut.
+
+	\since BeOS R3
 */
 
 
@@ -202,6 +237,8 @@
 	\brief Returns the item's label.
 
 	\return The item's label as a const char array.
+
+	\since BeOS R3
 */
 
 
@@ -210,6 +247,8 @@
 	\brief Returns whether or not the item is enabled.
 
 	\return \c true if the item is enabled, \c false if disabled.
+
+	\since BeOS R3
 */
 
 
@@ -218,6 +257,8 @@
 	\brief Returns whether or not the item is marked.
 
 	\return \c true if the item is marked, \c false if unmarked.
+
+	\since BeOS R3
 */
 
 
@@ -226,6 +267,8 @@
 	\brief Returns the item's trigger character.
 
 	\return The current trigger character as a char or 0 if unset.
+
+	\since BeOS R3
 */
 
 
@@ -237,6 +280,8 @@
 	\param modifiers A pointer to a uint32 to fill out.
 
 	\return The shortcut character assigned to the menu item as a char.
+
+	\since BeOS R3
 */
 
 
@@ -245,6 +290,8 @@
 	\brief Returns a pointer to the attached menu.
 
 	\return A pointer to the attached menu.
+
+	\since BeOS R3
 */
 
 
@@ -253,6 +300,8 @@
 	\brief Returns a pointer to the menu that the item is attached to.
 
 	\return A pointer to the menu that the item is attached to.
+
+	\since BeOS R3
 */
 
 
@@ -262,6 +311,8 @@
 
 	\return The bounds rectangle of the menu item in the coordinate system
 	        of the menu that the item is attached to.
+
+	\since BeOS R3
 */
 
 
@@ -285,6 +336,8 @@
 
 	\sa ContentLocation()
 	\sa DrawContent()
+
+	\since BeOS R3
 */
 
 
@@ -298,6 +351,8 @@
 
 	\param maxWidth The maximum number of bytes to truncate the label to.
 	\param newLabel The buffer to store the truncated label in.
+
+	\since BeOS R3
 */
 
 
@@ -308,6 +363,8 @@
 	This method is called automatically by BMenu::Draw(), you need not call it
 	yourself. You may want to override this method in derived classes to do
 	something different than drawing a text label.
+
+	\since BeOS R3
 */
 
 
@@ -321,6 +378,8 @@
 	and possibly a right arrow to indicate there is submenu and then calls
 	DrawContent() to fill in the label. Lastly Highlight() is called if the item
 	is selected.
+
+	\since BeOS R3
 */
 
 
@@ -335,6 +394,8 @@
 
 	\param highlight Highlights if \a highlight is \c true,
 	       unhighlights if \c false.
+
+	\since BeOS R3
 */
 
 
@@ -343,6 +404,8 @@
 	\brief Returns whether or not the item is selected.
 
 	\return \c true if selected, \c false if not selected.
+
+	\since BeOS R3
 */
 
 
@@ -362,6 +425,8 @@
 
 	\sa GetContentSize()
 	\sa DrawContent()
+
+	\since BeOS R3
 */
 
 
@@ -385,4 +450,6 @@
 	\retval B_BAD_VALUE The message was \c NULL.
 
 	\sa BInvoker::Invoke()
+
+	\since BeOS R3
 */

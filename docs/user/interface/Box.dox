@@ -33,6 +33,8 @@
 	A box's label can either be composed of text or it can be a view such
 	as a checkbox or dropdown box. See SetLabel() for more details on setting
 	the box's label.
+
+	\since BeOS R3
 */
 
 
@@ -49,9 +51,11 @@
 	\param frame The bounds of the box.
 	\param name The name of the box.
 	\param resizingMode Defines the behavior of the box as the parent view
-		resizes. See BView for details.
+	       resizes. See BView for details.
 	\param flags Behavior flags for the box. See BView for details.
 	\param border The border_style of the box.
+
+	\since BeOS R3
 */
 
 
@@ -67,6 +71,8 @@
 	\param border The border_style of the box.
 	\param child Adds an initial child to the Box object. See the Layout
 		API for details.
+
+	\since Haiku R1
 */
 
 
@@ -77,6 +83,8 @@
 
 	There can only be a single child view. This view can, however, act as a
 	nesting container if you need to show more items inside the box.
+
+	\since Haiku R1
 */
 
 
@@ -92,6 +100,8 @@
 	child views recursively.
 
 	\param archive The \a archive message to restore from.
+
+	\since BeOS R3
 */
 
 
@@ -101,7 +111,17 @@
 
 	Calling the destructor will also free the memory used by the box's label
 	if it has one.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -117,11 +137,13 @@
 	\returns An instance of the object if \a archive is valid or \c NULL.
 
 	\sa BArchivable::Instantiate()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn virtual	status_t BBox::Archive(BMessage* archive,
+	\fn virtual status_t BBox::Archive(BMessage* archive,
 		bool deep = true) const;
 	\brief Archives the object into \a archive.
 
@@ -133,7 +155,12 @@
 	\retval B_ERROR The archive operation failed.
 
 	\sa BArchivable::Archive()
+
+	\since BeOS R3
 */
+
+
+//! @}
 
 
 /*!
@@ -146,6 +173,8 @@
 		- \c B_NO_BORDER Used to make a borderless box.
 
 	\param border The #border_style to set.
+
+	\since BeOS R3
 */
 
 
@@ -159,6 +188,8 @@
 		- \c B_NO_BORDER Used to make a borderless box.
 
 	\returns The #border_style of the box.
+
+	\since BeOS R3
 */
 
 
@@ -167,8 +198,7 @@
 	\brief Gets the distance from the very top of the box to the top border
 		line in pixels.
 
-	\warning This method is not part of the BeOS R5 API and is not yet
-		finalized.
+	\warning This method is not yet finalized.
 
 	The distance may vary depending on the text or view used as label and the
 	font settings. The border is drawn center-aligned with the label. This
@@ -177,6 +207,8 @@
 
 	\returns The distance from the very top of the box to the top border
 		line in pixels as a \c float.
+
+	\since Haiku R1
 */
 
 
@@ -184,10 +216,11 @@
 	\fn BRect BBox::InnerFrame()
 	\brief Gets the frame rectangle just inside the border of the box.
 
-	\warning This method is not part of the BeOS R5 API and is not yet
-		finalized.
+	\warning This method is not yet finalized.
 
 	\returns A BRect set to the dimensions of the box's inside border.
+
+	\since Haiku R1
 */
 
 
@@ -206,6 +239,8 @@ fIconBox->SetLabel("Icon");
 	\endcode
 
 	\param string The label text string to set as the box's title.
+
+	\since BeOS R3
 */
 
 
@@ -232,6 +267,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 	\param viewLabel A BView.
 
 	\returns \c B_OK
+
+	\since BeOS R3
 */
 
 
@@ -245,6 +282,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 
 	\returns The label text of the BBox if the box has a text label or
 		\c NULL otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -253,6 +292,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 	\brief Gets the BView representing the label.
 
 	\returns a pointer to a BView object.
+
+	\since BeOS R4
 */
 
 
@@ -265,6 +306,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 	consider calling Invalidate() instead.
 
 	\param updateRect The rectangular area to be drawn.
+
+	\since BeOS R3
 */
 
 
@@ -280,6 +323,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 	the layout of the parent view.
 
 	\sa BView::AttachedToWindow()
+
+	\since BeOS R3
 */
 
 
@@ -292,6 +337,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 
 	This method recomputes the layout of the BBox (including label and
 	contents) and makes it redraw as necessary.
+
+	\since BeOS R3
 */
 
 
@@ -300,6 +347,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 	\brief Resizes the box to its preferred dimensions.
 
 	\note This only works in the non-layout mode, as it forces the resizing.
+
+	\since BeOS R3
 */
 
 
@@ -317,6 +366,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 
 	\param[out] _width Pointer to a \c float to store the width of the view.
 	\param[out] _height Pointer to a \c float to store the height of the view.
+
+	\since BeOS R3
 */
 
 
@@ -327,6 +378,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 	Drawing the box at this size ensures the label and the child view are
 	visible. Reducing the size even more would mean that a view would not
 	be visible.
+
+	\since Haiku R1
 */
 
 
@@ -337,6 +390,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 	The maximum size depends on the maximize size of the child views.
 
 	\returns The maximum possible size of the BBox as a BSize.
+
+	\since Haiku R1
 */
 
 
@@ -348,6 +403,8 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 	convenient BSize object.
 
 	\returns The minimum possible size of the BBox as a BSize.
+
+	\since Haiku R1
 */
 
 
@@ -363,4 +420,6 @@ fVirtualMemoryBox->SetLabel(fVirtualMemoryEnabledCheckBox);
 	label, eventually truncating the label text if there is not enough space.
 	The exact border positions are also computed, then the child view is also
 	laid out if its size constraints change.
+
+	\since Haiku R1
 */

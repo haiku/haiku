@@ -24,6 +24,8 @@
 	\ingroup interface
 
 	Constants to define the layout of the menu items in a menu.
+
+	\since BeOS R3
 */
 
 
@@ -31,6 +33,8 @@
 	\var menu_layout B_ITEMS_IN_ROW
 
 	Items are arranged in a row, one next to the other.
+
+	\since BeOS R3
 */
 
 
@@ -38,6 +42,8 @@
 	\var menu_layout B_ITEMS_IN_COLUMN
 
 	Items are arranged in a column, one on top of the other.
+
+	\since BeOS R3
 */
 
 
@@ -45,6 +51,8 @@
 	\var menu_layout B_ITEMS_IN_MATRIX
 
 	Items are arranged in a matrix, a free-form arrangement that you create.
+
+	\since BeOS R3
 */
 
 
@@ -54,6 +62,8 @@
 	\ingroup libbe
 	\brief Information about a menu such as font size and family, background
 	       color, and flags.
+
+	\since BeOS R3
 */
 
 
@@ -61,6 +71,8 @@
 	\var menu_info::font_size
 
 	The font size to draw menu items with.
+
+	\since BeOS R3
 */
 
 
@@ -68,6 +80,8 @@
 	\var menu_info::f_family
 
 	The font family used to draw menu items.
+
+	\since BeOS R3
 */
 
 
@@ -75,6 +89,8 @@
 	\var menu_info::f_style
 
 	The font style used to draw menu items.
+
+	\since BeOS R3
 */
 
 
@@ -82,6 +98,8 @@
 	\var menu_info::background_color
 
 	The menu's background color.
+
+	\since BeOS R3
 */
 
 
@@ -89,6 +107,8 @@
 	\var menu_info::separator
 
 	The style of horizontal line to use to separates groups of items in a menu.
+
+	\since BeOS R3
 */
 
 
@@ -96,6 +116,8 @@
 	\var menu_info::click_to_open
 
 	Whether or not the menu opens on click. The default value is \c true.
+
+	\since BeOS R3
 */
 
 
@@ -104,12 +126,16 @@
 
 	Whether or not trigger underlines should always be shown. The default value
 	is \c false.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t get_menu_info(menu_info* info)
 	\brief Fill out the menu_info struct into \a info.
+
+	\since BeOS R3
 */
 
 
@@ -117,12 +143,16 @@
 	\fn status_t set_menu_info(menu_info* info)
 	\brief Set the menu's menu_info struct to \a info adjusting how the menu
 	       will look and work.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\typedef bool (*menu_tracking_hook)(BMenu* menu, void* state)
 	\brief Defines the function passed into BMenu::SetTrackingHook().
+
+	\since BeOS R3
 */
 
 
@@ -180,6 +210,8 @@
 
 	Several methods will only work in some layouts as noted in the method
 	description below.
+
+	\since BeOS R3
 */
 
 
@@ -194,6 +226,8 @@
 	\param layout The menu layout, possibilities include:
 	       - \c B_ITEMS_IN_ROW items are displayed in a single row,
 	       - \c B_ITEMS_IN_COLUMN items are displayed in a single column.
+
+	\since BeOS R3
 */
 
 
@@ -205,6 +239,8 @@
 	\param name The menu's \a name, serves as a label for submenus.
 	\param width The menu \a width.
 	\param height The menu \a height.
+
+	\since BeOS R3
 */
 
 
@@ -213,6 +249,8 @@
 	\brief Archive constructor.
 
 	\param archive The message data to construct the menu from.
+
+	\since BeOS R3
 */
 
 
@@ -221,7 +259,17 @@
 	\brief Destructor.
 
 	Also frees the memory used by any attached menu items and submenus.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -230,6 +278,8 @@
 
 	\returns A newly created BMenu object or \c NULL if the message doesn't
 	         contain an archived BMenu.
+
+	\since BeOS R3
 */
 
 
@@ -244,12 +294,27 @@
 	        otherwise.
 	\retval B_OK The object was archived successfully.
 	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
 */
+
+
+//! @}
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
 
 
 /*!
 	\fn void BMenu::AttachedToWindow()
 	\brief Lays out the menu items and resizes the menu to fit.
+
+	\since BeOS R3
 */
 
 
@@ -258,6 +323,8 @@
 	\brief Draws the menu.
 
 	\param updateRect The area to draw in.
+
+	\since BeOS R3
 */
 
 
@@ -270,6 +337,8 @@
 	to scroll faster.
 
 	\param message The \a message received by the associated looper.
+
+	\since BeOS R3
 */
 
 
@@ -281,7 +350,12 @@
 
 	\param bytes The bytes of the key combination pressed.
 	\param numBytes The number of bytes in \a bytes.
+
+	\since BeOS R3
 */
+
+
+//! @}
 
 
 /*!
@@ -295,6 +369,8 @@
 	\param item The menu \a item to add.
 
 	\return Whether or not the \a item was added to the menu.
+
+	\since BeOS R3
 */
 
 
@@ -310,6 +386,8 @@
 	\param index The \a index where to add the \a item to the menu.
 
 	\return Whether or not the \a item was added to the menu.
+
+	\since BeOS R3
 */
 
 
@@ -325,6 +403,8 @@
 	\param frame The \a frame rectangle where to add the \a item to the menu.
 
 	\return Whether or not the \a item was added to the menu.
+
+	\since BeOS R3
 */
 
 
@@ -339,6 +419,8 @@
 	\param submenu The submenu to add.
 
 	\return Whether or not the \a submenu was added to the menu.
+
+	\since BeOS R3
 */
 
 
@@ -354,6 +436,8 @@
 	\param index The \a index where to add the \a submenu to the menu.
 
 	\return Whether or not the \a submenu was added to the menu.
+
+	\since BeOS R3
 */
 
 
@@ -370,6 +454,8 @@
 	\param frame The \a frame rectangle where to add the submenu to the menu.
 
 	\return Whether or not the \a submenu was added to the menu.
+
+	\since BeOS R3
 */
 
 
@@ -385,6 +471,8 @@
 	\param index The \a index where to add the \a list to the menu.
 
 	\return Whether or not the \a list of menu items was added to the menu.
+
+	\since BeOS R3
 */
 
 
@@ -397,6 +485,8 @@
 	         \c B_ITEMS_IN_ROW or \c B_ITEMS_IN_MATRIX layout.
 
 	\return Whether or not the separator item was added to the menu.
+
+	\since BeOS R3
 */
 
 
@@ -405,6 +495,8 @@
 	\brief Remove and delete the specified \a item from the menu.
 
 	\return Whether or not the \a item was removed from the menu.
+
+	\since BeOS R3
 */
 
 
@@ -421,6 +513,8 @@
 	\param index The \a index of where to remove the menu item.
 
 	\return The menu item object or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -438,6 +532,8 @@
 	\param deleteItems Whether or not to delete the items after removing them.
 
 	\return Whether or not the items were removed from the menu.
+
+	\since BeOS R3
 */
 
 
@@ -448,6 +544,8 @@
 	\param submenu The submenu to remove.
 
 	\return Whether or not the \a submenu was removed from the menu.
+
+	\since BeOS R3
 */
 
 
@@ -456,6 +554,8 @@
 	\brief Returns the number of items added to the menu.
 
 	\return The number of items added to the menu.
+
+	\since BeOS R3
 */
 
 
@@ -468,6 +568,8 @@
 	         a menu in \c B_ITEMS_IN_MATRIX layout.
 
 	\return A pointer to a menu item or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -480,6 +582,8 @@
 	         menu in \c B_ITEMS_IN_MATRIX layout.
 
 	\return A pointer to a submenu or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -495,6 +599,8 @@
 	         a menu in \c B_ITEMS_IN_MATRIX layout.
 
 	\return The index of the menu \a item or \c B_ERROR of not found.
+
+	\since BeOS R3
 */
 
 
@@ -510,6 +616,8 @@
 	         a menu in \c B_ITEMS_IN_MATRIX layout.
 
 	\return The index of the \a submenu or \c B_ERROR of not found.
+
+	\since BeOS R3
 */
 
 
@@ -520,6 +628,8 @@
 	\param label The \a label of the menu item to find.
 
 	\return A pointer to a menu item or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -532,6 +642,8 @@
 	       find.
 
 	\return A pointer to a menu item or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -547,6 +659,8 @@
 	that have already been added to the menu.
 
 	\return \c B_OK on success or an error code on error.
+
+	\since BeOS R3
 */
 
 
@@ -563,6 +677,8 @@
 	                 to.
 
 	\return \c B_OK on success or an error code on error.
+
+	\since BeOS R3
 */
 
 
@@ -571,6 +687,8 @@
 	\brief Enables or disables the menu.
 
 	\param enable \c true to enable, \c false to disable.
+
+	\since BeOS R3
 */
 
 
@@ -592,6 +710,8 @@
 	the items yourself.
 
 	\param on \c true to turn radio mode on, \c false to turn it off.
+
+	\since BeOS R3
 */
 
 
@@ -600,6 +720,8 @@
 	\brief Enables or disables triggers.
 
 	\param enable \c true to enable triggers, \c false to disable triggers.
+
+	\since BeOS R3
 */
 
 
@@ -612,6 +734,8 @@
 	included as part of the maximum content width.
 
 	\param width The maximum width for the menu item contents to draw in.
+
+	\since BeOS R3
 */
 
 
@@ -624,6 +748,8 @@
 
 	\param on \c true to turn label-from-marked mode on, \c false to turn it
 	          off.
+
+	\since BeOS R3
 */
 
 
@@ -632,6 +758,8 @@
 	\brief Returns whether or not the menu is in label-from-marked mode.
 
 	\return \c true if menu is in label-from-marked mode, \c false if not.
+
+	\since BeOS R3
 */
 
 
@@ -640,6 +768,8 @@
 	\brief Returns whether or not the menu is enabled.
 
 	\return \c true if menu is enabled, \c false if it is disabled.
+
+	\since BeOS R3
 */
 
 
@@ -648,6 +778,8 @@
 	\brief Returns whether or not the menu is in radio mode.
 
 	\return \c true if menu is in radio mode, \c false if not.
+
+	\since BeOS R3
 */
 
 
@@ -656,6 +788,8 @@
 	\brief Returns whether or not triggers are enabled.
 
 	\return \c true if triggers are enabled, \c false if triggers are disabled.
+
+	\since BeOS R3
 */
 
 
@@ -664,6 +798,8 @@
 	\brief Returns whether or not the menu is in redraw-after-sticky mode.
 
 	\return \c true if menu is in redraw-after-sticky mode, \c false if not.
+
+	\since Haiku R1
 */
 
 
@@ -672,6 +808,10 @@
 	\brief Return the maximum width of the menu items' content area.
 
 	\return The maximum width of the menu items' content area as a float.
+
+	\sa SetMaxContentWidth()
+
+	\since BeOS R3
 */
 
 
@@ -687,6 +827,8 @@
 	         a menu in \c B_ITEMS_IN_MATRIX layout.
 
 	\return A pointer to the first marked menu item or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -702,6 +844,8 @@
 	         a menu in \c B_ITEMS_IN_MATRIX layout.
 
 	\return The index of the first marked menu item or -1 if not found.
+
+	\since Haiku R1
 */
 
 
@@ -710,6 +854,8 @@
 	\brief Returns the pointer to the menu that this menu it attached to.
 
 	\return A pointer to a BMenu object or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -718,6 +864,8 @@
 	\brief Returns the pointer to the menu item that this menu it attached to.
 
 	\return A pointer to a BMenuItem object or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -744,6 +892,8 @@
 	\param resizeToFit Whether or not the menu should automatically resize
 	       itself to fit its contents, this will not work in
 	       \c B_ITEMS_IN_MATRIX layout.
+
+	\since BeOS R3
 */
 
 
@@ -756,6 +906,8 @@
 	\param top The top margin to set.
 	\param right The right margin to set.
 	\param bottom The bottom margin to set.
+
+	\since BeOS R3
 */
 
 
@@ -768,12 +920,16 @@
 	\param _top The top margin to fill out, can be \c NULL.
 	\param _right The right margin to fill out, can be \c NULL.
 	\param _bottom The bottom margin to fill out, can be \c NULL.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn menu_layout BMenu::Layout() const
 	\brief Returns the current menu_layout constant.
+
+	\since BeOS R3
 */
 
 
@@ -795,6 +951,8 @@
 
 	\return A BMenuItem object if the user ends tracking by invoking an item or
 	        \c NULL if the user didn't invoke an item.
+
+	\since BeOS R3
 */
 
 
@@ -808,6 +966,8 @@
 	       - \c B_ABORT
 
 	\return \c true if the dynamic item was added, \c false otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -816,6 +976,8 @@
 	\brief Draw the menu background within the bounds of \a updateRect.
 
 	\param updateRect The area to draw the background in.
+
+	\since Haiku R1
 */
 
 
@@ -825,12 +987,6 @@
 
 	\param func The hook function to call.
 	\param state A variable passed to the hook function.
-*/
 
-
-/*!
-	\fn void BMenu::_DrawItems(BRect updateRect)
-	\brief Draw the menu items within \a updateRect.
-
-	\param updateRect The area to draw the menu items in.
+	\since Haiku R1
 */

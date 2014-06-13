@@ -46,6 +46,8 @@
 
 	The Show Replicants/Hide Replicants menu item in Deskbar shows and hides the
 	BDragger handles.
+
+	\since BeOS R3
 */
 
 
@@ -78,6 +80,8 @@
 		resized. See BView for more information on resizing options.
 	\param flags The flags mask sets what notifications the BDragger can
 		receive. See BView for more information on \a flags.
+
+	\since BeOS R3
 */
 
 
@@ -86,6 +90,8 @@
 	\brief Constructs a BDragger object from message \a data.
 
 	\param data The message \a data to restore from.
+
+	\since BeOS R3
 */
 
 
@@ -93,6 +99,8 @@
 	\fn BDragger::~BDragger()
 	\brief Destroys the BDragger object and frees the memory it uses,
 		primarily from the bitmap handle.
+
+	\since BeOS R3
 */
 
 
@@ -102,6 +110,8 @@
 
 	\returns A newly created BDragger or \c NULL if the message doesn't
 		contain an archived BDragger object.
+
+	\since BeOS R3
 */
 
 
@@ -115,6 +125,8 @@
 	\returns A status code, typically \c B_OK or \c B_ERROR on error.
 
 	\see BView::Archive()
+
+	\since BeOS R3
 */
 
 
@@ -122,6 +134,8 @@
 	\fn void BDragger::AttachedToWindow()
 	\brief Puts the BDragger under the control of HideAllDraggers() and
 		ShowAllDraggers().
+
+	\since BeOS R3
 */
 
 
@@ -129,6 +143,8 @@
 	\fn void BDragger::DetachedFromWindow()
 	\brief Removes the BDragger from the control of HideAllDraggers()
 		and ShowAllDraggers().
+
+	\since BeOS R3
 */
 
 
@@ -137,6 +153,8 @@
 	\brief Draws the dragger handle.
 
 	\param updateRect The rectangular area to draw the handle in.
+
+	\since BeOS R3
 */
 
 
@@ -150,6 +168,8 @@
 
 	\param point The point on the screen where to mouse pointer is when
 		the mouse is clicked.
+
+	\since BeOS R3
 */
 
 
@@ -160,6 +180,8 @@
 	\param msg The message received
 
 	\see BView::MessageReceived()
+
+	\since BeOS R3
 */
 
 
@@ -171,6 +193,8 @@
 	method.
 
 	\returns A status code, \c B_OK on success or an error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -182,6 +206,8 @@
 	method.
 
 	\returns A status code, \c B_OK on success or an error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -190,4 +216,6 @@
 	\brief Returns whether or not draggers are currently drawn.
 
 	\returns \c true if draggers are drawn, \c false otherwise.
+
+	\since BeOS R3
 */

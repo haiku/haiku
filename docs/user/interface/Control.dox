@@ -23,6 +23,8 @@
 	\var B_CONTROL_ON
 
 	Control on. Value equal to 1.
+
+	\since BeOS R3
 */
 
 
@@ -30,6 +32,8 @@
 	\var B_CONTROL_OFF
 
 	Control off. Value equal to 0.
+
+	\since BeOS R3
 */
 
 
@@ -52,6 +56,8 @@
 	values that you can use as a convenience if your control has a simple
 	on/off state. If your BControl derived class stores a larger set of
 	states then you should define your own integer values instead.
+
+	\since BeOS R3
 */
 
 
@@ -71,6 +77,8 @@
 	\param resizingMode Defines the behavior of the control as the parent
 	       view resizes, see BView for more details.
 	\param flags Behavior \a flags for the control, see BView for details.
+
+	\since BeOS R3
 */
 
 
@@ -83,12 +91,12 @@
 	The initial value of the control is set to 0 (\c B_CONTROL_OFF).
 	The \a label and the \a message parameters can be set to \c NULL.
 
-	\note This method was not available in BeOS R5.
-
 	\param name The \a name of the control.
 	\param label The \a label displayed along with the control.
 	\param message The \a message to send when the control is activated.
 	\param flags Behavior \a flags for the control, see BView for details.
+
+	\since Haiku R1
 */
 
 
@@ -96,53 +104,72 @@
 	\fn BControl::~BControl()
 	\brief Frees all memory used by the BControl object including the memory
 	       used by the model message.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BControl::BControl(BMessage* archive)
-	\brief Creates a new BControl object from an \a archive message.
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BControl::BControl(BMessage* data)
+	\brief Creates a new BControl object from an \a data message.
 
 	This method is usually not called directly. If you want to build a
 	control from a message you should call Instantiate() which can
 	handle errors properly.
 
-	If the \a archive deep, the BControl object will also unarchive each
+	If the \a data deep, the BControl object will also undata each
 	of its child views recursively.
 
-	\param archive The \a archive message to restore from.
+	\param data The \a data message to restore from.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BArchivable* BControl::Instantiate(BMessage* archive)
-	\brief Creates a new object from an \a archive.
+	\fn BArchivable* BControl::Instantiate(BMessage* data)
+	\brief Creates a new object from an \a data.
 
 	If the message is a valid object then the instance created from the
-	passed in \a archive will be returned. Otherwise this method will
+	passed in \a data will be returned. Otherwise this method will
 	return \c NULL.
 
-	\param archive The \a archive message.
+	\param data The \a data message.
 
-	\returns An instance of the object if \a archive is valid or \c NULL.
+	\returns An instance of the object if \a data is valid or \c NULL.
 
 	\sa BArchivable::Instantiate()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BControl::Archive(BMessage* archive, bool deep) const
-	\brief Archives the control into \a archive.
+	\fn status_t BControl::Archive(BMessage* data, bool deep) const
+	\brief Archives the control into \a data.
 
-	\param archive The target \a archive that the data will go into.
-	\param deep Whether or not to recursively archive child views.
+	\param data The target \a data that the data will go into.
+	\param deep Whether or not to recursively data child views.
 
-	\retval B_OK The archive operation was successful.
-	\retval B_BAD_VALUE \c NULL \a archive message.
+	\retval B_OK The data operation was successful.
+	\retval B_BAD_VALUE \c NULL \a data message.
 	\retval B_ERROR The archive operation failed.
 
 	\sa BArchivable::Archive()
+
+	\since BeOS R3
 */
+
+
+//! @}
 
 
 /*!
@@ -150,13 +177,15 @@
 	\brief Hook method called when the attached window is activated or
 	       deactivated.
 
-	Redraws the focus ring around the menu field when the window is activated
+	Redraws the focus ring around the control when the window is activated
 	or deactivated if it is the window's current focus view.
 
 	\param active \c true if the window becomes activated, \c false if the
 	       window becomes deactivated.
 
 	\sa BView::WindowActivated()
+
+	\since BeOS R3
 */
 
 
@@ -172,27 +201,25 @@
 	\sa BView::AttachedToWindow()
 	\sa Invoke()
 	\sa BInvoker::SetTarget()
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BControl::DetachedFromWindow()
-	\brief Hook method called when the object is detached from a window.
+	\brief Hook method called when the control is detached from a window.
 
-	The default implementation does nothing.
-
-	\sa BView::DetachedFromWindow()
+	\copydetails BView::DetachedFromWindow()
 */
 
 
 /*!
 	\fn void BControl::AllAttached()
 	\brief Similar to AttachedToWindow() but this method is triggered after
-	       all child views have already been attached to a window.
+	       all child views have already been detached from a window.
 
-	The default implementation does nothing.
-
-	\sa BView::AllAttached()
+	\copydetails BView::AllAttached()
 */
 
 
@@ -201,14 +228,12 @@
 	\brief Similar to AttachedToWindow() but this method is triggered after
 	       all child views have already been detached from a window.
 
-	The default implementation does nothing.
-
-	\sa BView::AllDetached()
+	\copydetails BView::AllDetached()
 */
 
 
 /*!
-	\fn void BControl::MakeFocus(bool focused)
+	\fn void BControl::MakeFocus(bool focus)
 	\brief Gives or removes focus from the control.
 
 	BControl::MakeFocus() overrides BView::MakeFocus() to call Draw() when
@@ -217,10 +242,12 @@
 
 	IsFocusChanging() returns \c true when Draw() is called from this method.
 
-	\param focused \a true to set focus, \a false to remove it.
+	\param focus \a true to set focus, \a false to remove it.
 
 	\sa BView::MakeFocus()
 	\sa IsFocusChanging()
+
+	\since BeOS R3
 */
 
 
@@ -241,6 +268,8 @@
 
 	\sa BView::KeyDown()
 	\sa MakeFocus()
+
+	\since BeOS R3
 */
 
 
@@ -248,9 +277,7 @@
 	\fn void BControl::MessageReceived(BMessage* message)
 	\brief Handle \a message received by the associated looper.
 
-	\param message The \a message received by the associated looper.
-
-	\see BView::MessageReceived()
+	\copydetails BView::MessageReceived()
 */
 
 
@@ -258,21 +285,7 @@
 	\fn void BControl::MouseDown(BPoint where)
 	\brief Hook method called when a mouse button is pressed.
 
-	\param where The point on the screen where the mouse pointer is when
-	       the mouse button is pressed in the view's coordinate system.
-
-	\sa BView::MouseDown()
-*/
-
-
-/*!
-	\fn void BControl::MouseUp(BPoint where)
-	\brief Hook method called when a mouse button is released.
-
-	\param where The point on the screen where the mouse pointer is located
-	       when the mouse button is released in the view's coordinate system.
-
-	\sa BView::MouseUp()
+	\copydetails BView::MouseDown()
 */
 
 
@@ -281,22 +294,17 @@
 		const BMessage* dragMessage)
 	\brief Hook method called when the mouse is moved.
 
-	\param where The new location of the mouse in the control's coordinate system.
-	\param code One of the following:
-	- \c B_ENTERED_VIEW The cursor has just entered the control.
-	- \c B_INSIDE_VIEW The cursor is inside the control.
-	- \c B_EXITED_VIEW The cursor has left the control's bounds. This only gets
-	     sent if the scope of the mouse events that the control can receive has
-	     been expanded by BView::SetEventMask() or BView::SetMouseEventMask().
-	- \c B_OUTSIDE_VIEW The cursor is outside the view. This only gets sent if the
-	     scope of the mouse events that the control can receive has been expanded
-	     by SetEventMask() or SetMouseEventMask().
-	\param dragMessage If a drag-and-drop operation is taking place this is a
-	       pointer to a BMessage that holds the drag information, otherwise the
-	       pointer is \c NULL.
-
-	\sa BView::MouseMoved()
+	\copydetails BView::MouseMoved()
 */
+
+
+/*!
+	\fn void BControl::MouseUp(BPoint where)
+	\brief Hook method called when a mouse button is released.
+
+	\copydetails BView::MouseUp()
+*/
+
 
 
 /*!
@@ -306,6 +314,8 @@
 	If the \a label changes the control is redrawn.
 
 	\param label The \a label to set, can be \c NULL.
+
+	\since BeOS R3
 */
 
 
@@ -314,6 +324,8 @@
 	\brief Gets the label of the control.
 
 	\return The control's label.
+
+	\since BeOS R3
 */
 
 
@@ -326,6 +338,8 @@
 	\param value The \a value to set.
 
 	\sa SetValueNoUpdate()
+
+	\since BeOS R3
 */
 
 
@@ -333,11 +347,11 @@
 	\fn void BControl::SetValueNoUpdate(int32 value)
 	\brief Sets the value of the control without redrawing.
 
-	\note This method was not available in BeOS R5.
-
 	\param value The \a value to set.
 
 	\sa SetValue()
+
+	\since Haiku R1
 */
 
 
@@ -346,6 +360,8 @@
 	\brief Gets the value of the control.
 
 	\return The control's value.
+
+	\since BeOS R3
 */
 
 
@@ -364,6 +380,8 @@
 	keyboard or mouse events.
 
 	\param enabled If \c true enables the control, if \c false, disables it.
+
+	\since BeOS R3
 */
 
 
@@ -372,6 +390,8 @@
 	\brief Gets whether or not the control is currently enabled.
 
 	\return \c true if the control is enabled, \c false if it is disabled.
+
+	\since BeOS R3
 */
 
 
@@ -387,6 +407,8 @@
 	\param[out] _height Pointer to a \c float to hold the height of the control.
 
 	\sa BView::GetPreferredSize()
+
+	\since BeOS R3
 */
 
 
@@ -395,6 +417,8 @@
 	\brief Resize the control to its preferred size.
 
 	\sa BView::ResizeToPreferred()
+
+	\since BeOS R3
 */
 
 
@@ -418,15 +442,15 @@
 
 	\sa BInvoker::Invoke()
 	\sa IsEnabled()
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BHandler* BControl::ResolveSpecifier(BMessage* message, int32 index,
 		BMessage* specifier, int32 what, const char* property)
-	\brief Determine the proper specifier for scripting messages.
-
-	\sa BHandler::ResolveSpecifier()
+	\copydoc BHandler::ResolveSpecifier()
 */
 
 
@@ -436,36 +460,13 @@
 
 	Adds the string "suite/vnd.Be-control" to the message.
 
-	\param message Allows you to add the names of the suites the control
-	       implements to the suites array.
-
-	\return \c B_OK if all went well or an error code otherwise.
-
-	\sa BHandler::GetSupportedSuites();
+	\copydetails BHandler::GetSupportedSuites();
 */
 
 
 /*!
 	\fn status_t BControl::Perform(perform_code code, void* _data)
-	\brief Perform some action. (Internal Method)
-
-	The following perform codes are recognized:
-		- \c PERFORM_CODE_MIN_SIZE
-		- \c PERFORM_CODE_MAX_SIZE
-		- \c PERFORM_CODE_PREFERRED_SIZE
-		- \c PERFORM_CODE_LAYOUT_ALIGNMENT
-		- \c PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH
-		- \c PERFORM_CODE_GET_HEIGHT_FOR_WIDTH
-		- \c PERFORM_CODE_SET_LAYOUT
-		- \c PERFORM_CODE_INVALIDATE_LAYOUT
-		- \c PERFORM_CODE_DO_LAYOUT
-
-	\param code The perform code.
-	\param _data A pointer to store some data.
-
-	\returns A status code.
-
-	\sa BHandler::Perform()
+	\copydoc BView::Perform()
 */
 
 
@@ -476,8 +477,6 @@
 
 	It also supports cropping the icon to its non-transparent area.
 	The icon is meant as an addition to or replacement of the label.
-
-	\note This method was not available in BeOS R5.
 
 	\param icon The \a icon to set.
 	\param flags Modify how the icon is set.
@@ -490,6 +489,8 @@
 	- \c B_CREATE_DISABLED_ICON_BITMAPS
 
 	\return \c B_OK if the icon was set or an error code otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -500,12 +501,12 @@
 	       partially on, each enabled or disabled, plus up to 125
 	       custom states) can be set individually.
 
-	\note This method was not available in BeOS R5.
-
 	\param bitmap The \a bitmap icon to set.
 	\param which The state to set the icon for.
 	\param flags Modify how the icon is set.
 		- \c B_KEEP_ICON_BITMAP Transfer ownership of the bitmap to the control.
 
 	\return \c B_OK if the icon was set or an error code otherwise.
+
+	\since Haiku R1
 */

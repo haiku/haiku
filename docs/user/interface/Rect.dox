@@ -49,30 +49,40 @@ BRect(0, 0, 31, 31);
 \code
 BRect(0, 0, width - 1, height -1);
 \endcode
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var BRect::left
 	\brief The value of the rectangle's left edge.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var BRect::top
 	\brief The value of the rectangle's top edge.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var BRect::right
 	\brief The value of the rectangle's right edge.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var BRect::bottom
 	\brief The value of the rectangle's bottom edge.
+
+	\since BeOS R3
 */
 
 
@@ -84,6 +94,8 @@ BRect(0, 0, width - 1, height -1);
 
 	 \sa BRect::Set()
 	 \sa BRect::IsValid()
+
+	\since BeOS R3
 */
 
 
@@ -95,6 +107,8 @@ BRect(0, 0, width - 1, height -1);
 	\param top The top dimension.
 	\param right The right dimension.
 	\param bottom The bottom dimension.
+
+	\since BeOS R3
 */
 
 
@@ -103,6 +117,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Creates a new BRect object as a copy of \a other.
 
 	\param other The BRect object to copy.
+
+	\since BeOS R3
 */
 
 
@@ -113,6 +129,8 @@ BRect(0, 0, width - 1, height -1);
 
 	\param leftTop The position to set the left top corner to.
 	\param rightBottom The position to set the bottom right corner to.
+
+	\since BeOS R3
 */
 
 
@@ -123,6 +141,8 @@ BRect(0, 0, width - 1, height -1);
 
 	\param leftTop The position of the left top corner.
 	\param size The \a size of the rect defining its width and height.
+
+	\since Haiku R1
 */
 
 
@@ -132,17 +152,8 @@ BRect(0, 0, width - 1, height -1);
 	       to 0 and setting the right and bottom dimensions to \a side - 1.
 
 	\param side The dimension to set the right and bottom sides.
-*/
 
-
-/*!
-	\fn inline BRect& BRect::operator=(const BRect& other)
-	\brief Creates a new BRect object as a copy of \a other by overloading
-	       the = operator.
-
-	\param other The BRect object to copy.
-
-	\return The newly created BRect object.
+	\since Haiku R1
 */
 
 
@@ -155,6 +166,8 @@ BRect(0, 0, width - 1, height -1);
 	is greater than or equal to its top value.
 
 	\return \c true if the BRect is valid, \c false if the BRect is invalid.
+
+	\since BeOS R3
 */
 
 
@@ -165,6 +178,8 @@ BRect(0, 0, width - 1, height -1);
 	\param rect The BRect to use to test for intersection.
 
 	\return \c true if the rectangles intersect, \a false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -175,6 +190,8 @@ BRect(0, 0, width - 1, height -1);
 	\param point The point to test.
 
 	\return \c true if the BRect contains \a point, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -185,6 +202,8 @@ BRect(0, 0, width - 1, height -1);
 	\param rect The rectangle to test.
 
 	\return \c true if the BRect contains \a rect, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -196,6 +215,8 @@ BRect(0, 0, width - 1, height -1);
 \verbatim
 	BRect(l:%.1f, t:%.1f, r:%.1f, b:%.1f).
 \endverbatim
+
+	\since BeOS R3
 */
 
 
@@ -205,6 +226,8 @@ BRect(0, 0, width - 1, height -1);
 	       ceil(\a right - \a left).
 
 	\return The width of the rectangle as an int32.
+
+	\since BeOS R3
 */
 
 
@@ -222,6 +245,8 @@ BRect(0, 0, width - 1, height -1);
 	       ceil(\a bottom - \a top).
 
 	\return The height of the rectangle as an int32.
+
+	\since BeOS R3
 */
 
 
@@ -230,6 +255,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Returns the height of the rectangle.
 
 	\return The height of the rectangle as a float.
+
+	\since BeOS R3
 */
 
 
@@ -238,6 +265,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Returns the dimensions of the BRect.
 
 	\return The dimensions of the BRect as a BSize.
+
+	\since Haiku R1
 */
 
 
@@ -250,6 +279,8 @@ BRect(0, 0, width - 1, height -1);
 	\param top The \a top dimension to set.
 	\param right The \a right dimension to set.
 	\param bottom The \a bottom dimension to set.
+
+	\since BeOS R3
 */
 
 
@@ -258,6 +289,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Sets the left top \a point of the BRect.
 
 	\param point The \a point to set.
+
+	\since BeOS R3
 */
 
 
@@ -266,6 +299,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Sets the right bottom \a point of the BRect.
 
 	\param point The \a point to set.
+
+	\since BeOS R3
 */
 
 
@@ -274,6 +309,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Sets the left bottom \a point of the BRect.
 
 	\param point The \a point to set.
+
+	\since BeOS R3
 */
 
 
@@ -282,6 +319,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Sets the right top \a point of the BRect.
 
 	\param point The \a point to set.
+
+	\since BeOS R3
 */
 
 
@@ -290,6 +329,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Returns the left top point of the BRect.
 
 	\return The left top point as a BPoint.
+
+	\since BeOS R3
 */
 
 
@@ -298,6 +339,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Returns the right bottom point of the BRect.
 
 	\return The right bottom point as a BPoint.
+
+	\since BeOS R3
 */
 
 
@@ -306,6 +349,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Returns the left bottom point of the BRect.
 
 	\return The left bottom point as a BPoint.
+
+	\since BeOS R3
 */
 
 
@@ -314,11 +359,13 @@ BRect(0, 0, width - 1, height -1);
 	\brief Returns the right top point of the BRect.
 
 	\return The left right point as a BPoint.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Transformation methods
+	\name Transformation
 
 	Positive values make the rectangle smaller, negative values make it larger.
 
@@ -335,6 +382,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Inset the BRect by the x and y coordinates of \a point.
 
 	\param point The \a point to use to inset the BRect.
+
+	\since BeOS R3
 */
 
 
@@ -345,6 +394,8 @@ BRect(0, 0, width - 1, height -1);
 
 	\param dx The horizontal distance to inset the BRect by.
 	\param dy The vertical distance to inset the BRect by.
+
+	\since BeOS R3
 */
 
 
@@ -357,6 +408,8 @@ BRect(0, 0, width - 1, height -1);
 	\return The transformed BRect.
 
 	\sa BRect::InsetBy(BPoint point)
+
+	\since BeOS R5
 */
 
 
@@ -370,6 +423,8 @@ BRect(0, 0, width - 1, height -1);
 	\return The transformed BRect.
 
 	\sa BRect::InsetBy(float dx, float dy)
+
+	\since BeOS R5
 */
 
 
@@ -383,6 +438,8 @@ BRect(0, 0, width - 1, height -1);
 	\return A copy of the BRect after it has been transformed.
 
 	\sa BRect::InsetBy(BPoint point)
+
+	\since BeOS R5
 */
 
 
@@ -397,6 +454,8 @@ BRect(0, 0, width - 1, height -1);
 	\return A copy of the BRect after it has been transformed.
 
 	\sa BRect::InsetBy(float dx, float dy)
+
+	\since BeOS R5
 */
 
 
@@ -404,7 +463,7 @@ BRect(0, 0, width - 1, height -1);
 
 
 /*!
-	\name Translation methods
+	\name Translation
 
 	Positive values move the rectangle right and down, negative values move the
 	rectangle left and up.
@@ -424,6 +483,8 @@ BRect(0, 0, width - 1, height -1);
 	       of the rectangle.
 
 	\param point The \a point to use to move the rectangle.
+
+	\since BeOS R3
 */
 
 
@@ -434,6 +495,8 @@ BRect(0, 0, width - 1, height -1);
 
 	\param dx The number of units the move the rectangle vertically.
 	\param dy The number of units the move the rectangle horizontally.
+
+	\since BeOS R3
 */
 
 
@@ -444,6 +507,8 @@ BRect(0, 0, width - 1, height -1);
 	\param point The \a point to use to move the rectangle.
 
 	\sa BRect::OffsetBy(BPoint point)
+
+	\since BeOS R5
 */
 
 
@@ -457,6 +522,8 @@ BRect(0, 0, width - 1, height -1);
 	\return The translated BRect.
 
 	\sa BRect::OffsetBy(float dx, float dy)
+
+	\since BeOS R5
 */
 
 
@@ -470,6 +537,8 @@ BRect(0, 0, width - 1, height -1);
 	\return A copy of the BRect after it has been translated.
 
 	\sa BRect::OffsetBy(BPoint point)
+
+	\since BeOS R5
 */
 
 
@@ -484,6 +553,8 @@ BRect(0, 0, width - 1, height -1);
 	\return A copy of the BRect after it has been translated.
 
 	\sa BRect::OffsetBy(float dx, float dy)
+
+	\since BeOS R5
 */
 
 
@@ -492,6 +563,8 @@ BRect(0, 0, width - 1, height -1);
 	\brief Move the BRect to the location specified by \a point.
 
 	\param point The location to move the BRect to.
+
+	\since BeOS R3
 */
 
 
@@ -502,6 +575,8 @@ BRect(0, 0, width - 1, height -1);
 
 	\param x The vertical coordinate of the point to move the BRect to.
 	\param y The horizontal coordinate of the point to move the BRect to.
+
+	\since BeOS R3
 */
 
 
@@ -514,6 +589,8 @@ BRect(0, 0, width - 1, height -1);
 	\return The translated BRect.
 
 	\sa BRect::OffsetTo(BPoint point)
+
+	\since BeOS R5
 */
 
 
@@ -527,6 +604,8 @@ BRect(0, 0, width - 1, height -1);
 	\return The translated BRect.
 
 	\sa BRect::OffsetTo(float x, float y)
+
+	\since BeOS R5
 */
 
 
@@ -540,13 +619,15 @@ BRect(0, 0, width - 1, height -1);
 	\return A copy of the BRect after it has been translated.
 
 	\sa BRect::OffsetTo(BPoint point)
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BRect BRect::OffsetToCopy(float x, float y) const
 	\brief Like BRect::OffsetTo() but returns a copy of the translated
-		  BRect leaving the original unmodified.
+	       BRect leaving the original unmodified.
 
 	\param x The number of units the move the rectangle vertically.
 	\param y The number of units the move the rectangle horizontally.
@@ -554,6 +635,8 @@ BRect(0, 0, width - 1, height -1);
 	\return A copy of the BRect after it has been translated.
 
 	\sa BRect::OffsetTo(float x, float y)
+
+	\since BeOS R5
 */
 
 
@@ -561,11 +644,24 @@ BRect(0, 0, width - 1, height -1);
 
 
 /*!
-	\name Comparison methods
+	\name Operators
 */
 
 
 //! @{
+
+
+/*!
+	\fn inline BRect& BRect::operator=(const BRect& other)
+	\brief Creates a new BRect object as a copy of \a other by overloading
+	       the = operator.
+
+	\param other The BRect object to copy.
+
+	\return The newly created BRect object.
+
+	\since BeOS R3
+*/
 
 
 /*!
@@ -575,6 +671,8 @@ BRect(0, 0, width - 1, height -1);
 	\param other The BRect to compare with.
 
 	\return \c true if the rectangles coincide, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -585,18 +683,9 @@ BRect(0, 0, width - 1, height -1);
 	\param other The BRect to compare with.
 
 	\return \c true if the rectangles do NOT coincide, \c false otherwise.
+
+	\since BeOS R3
 */
-
-
-//! @}
-
-
-/*!
-	\name Intersection and union methods
-*/
-
-
-//! @{
 
 
 /*!
@@ -609,6 +698,8 @@ BRect(0, 0, width - 1, height -1);
 	\param other The BRect to take the intersection of.
 
 	\return A new BRect that is the intersection of the BRect and \a other.
+
+	\since BeOS R3
 */
 
 
@@ -621,6 +712,8 @@ BRect(0, 0, width - 1, height -1);
 	\param other The BRect to take the union of.
 
 	\return A new BRect that is the union of the BRect and \a other.
+
+	\since BeOS R3
 */
 
 

@@ -17,7 +17,7 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief Defines the BBitmap class and global operators and functions for
-		handling bitmaps.
+	       handling bitmaps.
 */
 
 
@@ -64,6 +64,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	bitmap resides in you should call the Lock() and UnLock() methods. To
 	determine is a bitmap is currently locked you can call the IsLocked()
 	method.
+
+	\since BeOS R3
 */
 
 
@@ -79,6 +81,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 		   \c B_ANY_BYTES_PER_ROW to let the constructor choose an appropriate
 		   value.
 	\param screenID ???
+
+	\since Haiku R1
 */
 
 
@@ -94,6 +98,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 		   it.
 	\param needsContiguous If \c true a physically contiguous chunk of memory
 		   will be allocated.
+
+	\since BeOS R3
 */
 
 
@@ -108,6 +114,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 		   it.
 	\param needsContiguous If \c true a physically contiguous chunk of memory
 		   will be allocated.
+
+	\since Haiku R1
 */
 
 
@@ -117,6 +125,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 
 	\param source The source bitmap.
 	\param flags Creation flags.
+
+	\since Haiku R1
 */
 
 
@@ -125,6 +135,18 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Creates a BBitmap object as a clone of another bitmap.
 
 	\param source The source bitmap.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BBitmap::BBitmap(BMessage* data)
+	\brief Unarchives a bitmap from a BMessage.
+
+	\param data The archive.
+
+	\since BeOS R3
 */
 
 
@@ -133,6 +155,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Destructor Method
 
 	Frees all resources associated with this object.
+
+	\since BeOS R3
 */
 
 
@@ -145,20 +169,14 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 
 
 /*!
-	\fn BBitmap::BBitmap(BMessage* data)
-	\brief Unarchives a bitmap from a BMessage.
-
-	\param data The archive.
-*/
-
-
-/*!
 	\fn BArchivable* BBitmap::Instantiate(BMessage* data)
 	\brief Instantiates a BBitmap from an archive.
 
 	\param data The archive.
-	\return A bitmap reconstructed from the archive or \c NULL, if an error
-		occurred.
+	\return A bitmap reconstructed from the archive or \c NULL if an error
+	        occurred.
+
+	\since BeOS R3
 */
 
 
@@ -168,7 +186,10 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 
 	\param data The archive.
 	\param deep if \c true, child object will be archived as well.
+
 	\return \c B_OK, if everything went fine, an error code otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -180,7 +201,10 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Gets the status of the constructor.
 
 	\returns B_OK if initialization succeeded, otherwise returns an
-		error status.
+	         error status.
+
+
+	\since Haiku R1
 */
 
 
@@ -189,6 +213,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Determines whether or not the BBitmap object is valid.
 
 	\return \c true, if the object is properly initialized, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -212,6 +238,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 
 	\param state Unused
 	\returns \c B_OK on success or an error status code.
+
+	\since Haiku R1
 */
 
 
@@ -220,6 +248,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Unlocks the bitmap's buffer.
 
 	Counterpart to BBitmap::LockBits().
+
+	\since Haiku R1
 */
 
 
@@ -230,6 +260,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	The bitmap must accept views, if locking should work.
 
 	\returns \c true, if the lock was acquired successfully.
+
+	\since BeOS R3
 */
 
 
@@ -238,6 +270,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Unlocks the off-screen window that belongs to the bitmap.
 
 	The bitmap must accept views, if locking should work.
+
+	\since BeOS R3
 */
 
 
@@ -248,6 +282,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	The bitmap must accept views, if locking should work.
 
 	\return \c true, if the caller owns a lock , \c false otherwise.
+
+	\since BeOS R4
 */
 
 
@@ -267,6 +303,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Gets the ID of the area the bitmap data reside in.
 
 	\return The ID of the area the bitmap data reside in.
+
+	\since Haiku R1
 */
 
 
@@ -275,6 +313,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Gets the pointer to the bitmap data.
 
 	\return The pointer to the bitmap data.
+
+	\since BeOS R3
 */
 
 
@@ -283,6 +323,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Gets the length of the bitmap data.
 
 	\return The length of the bitmap data as an int32.
+
+	\since BeOS R3
 */
 
 
@@ -291,6 +333,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Gets the number of bytes used to store a row of bitmap data.
 
 	\return The number of bytes used to store a row of bitmap data.
+
+	\since BeOS R3
 */
 
 
@@ -299,6 +343,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Gets the bitmap's color space.
 
 	\return The bitmap's color space.
+
+	\since BeOS R3
 */
 
 
@@ -307,6 +353,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Gets a BRect the size of the bitmap's dimensions.
 
 	\return A BRect the size of the bitmap's dimensions.
+
+	\since BeOS R3
 */
 
 
@@ -319,21 +367,23 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	bitmap. If bitmap creation succeeded, all flags are fulfilled.
 
 	\return The bitmap's creation flags.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BBitmap::GetOverlayRestrictions(overlay_restrictions*
-		restrictions) const
+	\fn status_t BBitmap::GetOverlayRestrictions(
+		overlay_restrictions* restrictions) const
 	\brief Gets the overlay_restrictions structure for this bitmap.
-
-	\note This function is not part of the BeOS R5 API.
 
 	\param restrictions The overlay restrictions flag
 
 	\retval B_OK The overlay restriction structure was found.
 	\retval B_BAD_TYPE The overlay restriction structure for the bitmap could
 		not be found.
+
+	\since Haiku R1
 */
 
 
@@ -375,6 +425,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 		   data specifying the position at which the source data shall be
 		   written.
 	\param colorSpace Color space of the source data.
+
+	\since BeOS R3
 */
 
 
@@ -394,8 +446,6 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	<code>B_RGB{32,24,16,15}[_BIG]</code>, \c B_CMAP8 and
 	<code>B_GRAY{8,1}</code>.
 
-	\note This function is not part of the BeOS R5 API.
-
 	\param data The data to be copied.
 	\param length The length in bytes of the data to be copied.
 	\param bpr The number of bytes per row in the source data.
@@ -406,7 +456,9 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 
 	\retval B_OK The bits were imported into the bitmap.
 	\retval B_BAD_VALUE \c NULL \a data, invalid \a bpr or \a offset, or
-	  unsupported \a colorSpace.
+	        unsupported \a colorSpace.
+
+	\since Haiku R1
 */
 
 
@@ -424,8 +476,6 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	<code>B_RGB{32,24,16,15}[_BIG]</code>, \c B_CMAP8 and
 	<code>B_GRAY{8,1}</code>.
 
-	\note This function is not part of the BeOS R5 API.
-
 	\param data The data to be copied.
 	\param length The length in bytes of the data to be copied.
 	\param bpr The number of bytes per row in the source data.
@@ -438,6 +488,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\retval B_OK The bits were imported into the bitmap.
 	\retval B_BAD_VALUE: \c NULL \a data, invalid \a bpr, unsupported
 		\a colorSpace or invalid \a width or \a height.
+
+	\since Haiku R1
 */
 
 
@@ -452,13 +504,13 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	<code>B_RGB{32,24,16,15}[_BIG]</code>, \c B_CMAP8 and
 	<code>B_GRAY{8,1}</code>.
 
-	\note This function is not part of the BeOS R5 API.
-
 	\param bitmap The source bitmap.
 
 	\retval B_OK The bits were imported into the bitmap.
 	\retval B_BAD_VALUE \c NULL \a bitmap, or \a bitmap has other dimensions,
 		or the conversion from or to one of the color spaces is not supported.
+
+	\since Haiku R1
 */
 
 
@@ -476,8 +528,6 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	<code>B_RGB{32,24,16,15}[_BIG]</code>, \c B_CMAP8 and
 	<code>B_GRAY{8,1}</code>.
 
-	\note This function is not part of the BeOS R5 API.
-
 	\param bitmap The source bitmap.
 	\param from The offset in the source where reading should begin.
 	\param to The offset in the bitmap where the source should be written.
@@ -487,6 +537,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\retval B_OK The bits were imported into the bitmap.
 	\retval B_BAD_VALUE \c NULL \a bitmap, the conversion from or to one of
 	  	the color spaces is not supported, or invalid \a width or \a height.
+
+	\since Haiku R1
 */
 
 
@@ -494,7 +546,7 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 
 
 /*!
-	\name Child View Methods
+	\name View Hierarchy
 */
 
 
@@ -509,6 +561,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	another parent.
 
 	\param view The view to be added.
+
+	\since BeOS R3
 */
 
 
@@ -517,6 +571,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Removes a BView from the bitmap's view hierarchy.
 
 	\param view The view to be removed.
+
+	\since BeOS R3
 */
 
 
@@ -525,6 +581,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Gets the number of BViews currently belonging to the bitmap.
 
 	\returns The number of BViews currently belonging to the bitmap.
+
+	\since BeOS R3
 */
 
 
@@ -535,6 +593,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\param index The index of the BView to be returned.
 	\returns The BView at index \a index or \c NULL if the index is out of
 		range.
+
+	\since BeOS R3
 */
 
 
@@ -545,6 +605,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\param viewName The name of the BView to be returned.
 	\returns The BView with the name \a name or \c NULL if the bitmap doesn't
 		know a view with that name.
+
+	\since BeOS R3
 */
 
 
@@ -555,6 +617,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\param point The location.
 	\returns The BView with located at \a point or \c NULL if the bitmap
 		doesn't know a view at this location.
+
+	\since BeOS R3
 */
 
 

@@ -26,21 +26,29 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief text run struct
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var text_run::offset
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var text_run::font
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var text_run::color
+
+	\since BeOS R3
 */
 
 
@@ -49,16 +57,22 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief text run array struct
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var text_run_array::count
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var text_run_array::runs
+
+	\since BeOS R3
 */
 
 
@@ -67,36 +81,50 @@
 	\ingroup interface
 
 	Undo state flags.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var undo_state B_UNDO_UNAVAILABLE
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var undo_state B_UNDO_TYPING
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var undo_state B_UNDO_CUT
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var undo_state B_UNDO_PASTE
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var undo_state B_UNDO_CLEAR
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var undo_state B_UNDO_DROP
+
+	\since BeOS R3
 */
 
 
@@ -105,6 +133,8 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief Displays and manipulates styled text.
+
+	\since BeOS R3
 */
 
 
@@ -119,6 +149,8 @@
 	\param resizeMask Resizing mask, passed to BView.
 	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
 		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
+
+	\since BeOS R3
 */
 
 
@@ -136,6 +168,8 @@
 	\param resizeMask Resizing mask, passed to BView.
 	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
 		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
+
+	\since BeOS R3
 */
 
 
@@ -146,6 +180,8 @@
 	\param name The name of the object.
 	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
 		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
+
+	\since Haiku R1
 */
 
 
@@ -160,6 +196,8 @@
 	\param initialColor The text color to display.
 	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
 		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
+
+	\since Haiku R1
 */
 
 
@@ -168,12 +206,16 @@
 	\brief Creates a BTextView object from the passed in \a archive.
 
 	\param archive The BMessage object from which the object is created.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BTextView::~BTextView()
 	\brief Frees the memory allocated and destroys the object.
+
+	\since BeOS R3
 */
 
 
@@ -192,6 +234,8 @@
 	\param archive The BMessage object that the object is created from.
 
 	\return A new BTextView object as a BArchivable.
+
+	\since BeOS R3
 */
 
 
@@ -206,6 +250,8 @@
 	        otherwise.
 	\retval B_OK The object was archived.
 	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
 */
 
 
@@ -213,11 +259,23 @@
 
 
 /*!
-	\name Hook methods
+	\name Hook Methods
 */
 
 
 //! @{
+
+
+/*!
+	\fn void BTextView::AllAttached()
+	\copydoc BView::AllAttached()
+*/
+
+
+/*!
+	\fn void BTextView::AllDetached()
+	\copydoc BView::AllDetached()
+*/
 
 
 /*!
@@ -226,7 +284,7 @@
 
 	Sets the pulse rate to 2 per second and adjust scrollbars if needed.
 
-	\see BView::AttachedToWindow()
+	\copydetails BView::AttachedToWindow()
 */
 
 
@@ -235,7 +293,7 @@
 	\brief Hook method that is called when the text view is removed from the
 	       view hierarchy.
 
-	\see BView::DetachedFromWindow()
+	\copydetails BView::DetachedFromWindow()
 */
 
 
@@ -245,7 +303,34 @@
 
 	\param updateRect The rectangular area to draw.
 
-	\see BView::Draw()
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextView::FrameResized(float newWidth, float newHeight)
+	\brief Hook method that is called when the frame is resized.
+
+	This method updates any associated scrollbars.
+
+	\copydetails BView::FrameResized()
+*/
+
+
+/*!
+	\fn void BTextView::KeyDown(const char* bytes, int32 numBytes)
+	\brief Hook method that is called when a key is pressed while the view is
+	       the focus view of the active window.
+
+	\copydetails BView::KeyDown()
+*/
+
+
+/*!
+	\fn void BTextView::MessageReceived(BMessage* message)
+	\brief Hook method called with a message is received by the text view.
+
+	\copydetails BView::MessageReceived()
 */
 
 
@@ -254,9 +339,7 @@
 	\brief Hook method that is called when a mouse button is pushed down while
 	       the cursor is contained in the view.
 
-	\param where The location where the mouse button was pushed down.
-
-	\see BView::MouseDown()
+	\copydetails BView::MouseDown()
 */
 
 
@@ -267,44 +350,17 @@
 
 	This method stops asynchronous mouse tracking.
 
-	\param where The location that the mouse button was released.
-
-	\see BView::MouseUp()
+	\copydetails BView::MouseUp()
 */
 
 
 /*!
 	\fn void BTextView::MouseMoved(BPoint where, uint32 code,
-		const BMessage* message)
+		const BMessage* dragMessage)
 	\brief Hook method that is called whenever the mouse cursor enters, exits
 	       or moves inside the view.
 
-	\param where The point where the mouse cursor has moved to.
-	\param code A code which indicates if the mouse entered or exited the view.
-	\param message A message containing drag and drop information.
-
-	\see BView::MouseMoved()
-*/
-
-
-/*!
-	\fn void BTextView::WindowActivated(bool state)
-	\brief Hook method that is called when the window becomes the active window
-	       or gives up that status.
-
-	\param state If \c true, window has just been activated. If \c false the
-	       window has just been deactivated.
-
-	\see BView::WindowActivated()
-*/
-
-
-/*!
-	\fn void BTextView::KeyDown(const char* bytes, int32 numBytes)
-	\brief Hook method that is called when a key is pressed while the view is
-	       the focus view of the active window.
-
-	\see BView::KeyDown()
+	\copydetails BView::MouseMoved()
 */
 
 
@@ -312,32 +368,18 @@
 	\fn void BTextView::Pulse()
 	\brief Hook method that is called at a set interval.
 
-	This method is used to make the I-beam blink.
+	This method is used to make the I-beam cursor blink.
 
-	\see BView::Pulse()
+	\copydetails BView::Pulse()
 */
 
 
 /*!
-	\fn void BTextView::FrameResized(float width, float height)
-	\brief Hook method that is called when the frame is resized.
+	\fn void BTextView::WindowActivated(bool active)
+	\brief Hook method that is called when the window becomes the active window
+	       or gives up that status.
 
-	This method updates any associated scrollbars.
-
-	\param width The new view width.
-	\param height The new view height.
-
-	\see BView::FrameResized()
-*/
-
-
-/*!
-	\fn void BTextView::MessageReceived(BMessage* message)
-	\brief Hook method called with a message is received by the text view.
-
-	\param message The message received by the text view.
-
-	\see BView::MessageReceived()
+	\copydetails BView::WindowActivated()
 */
 
 
@@ -345,30 +387,18 @@
 
 
 /*!
-	\fn void BTextView::MakeFocus(bool focusState)
+	\fn void BTextView::MakeFocus(bool focus)
 	\brief Highlight or unhighlight the selection when the text view acquires
 		or loses its focus state.
 
-	\param focusState \c true to receive focus or \c false to lose it.
-
-	\see BView::MakeFocus()
+	\copydetails BView::MakeFocus()
 */
 
 
 /*!
 	\fn BHandler* BTextView::ResolveSpecifier(BMessage* message, int32 index,
 		BMessage* specifier, int32 what, const char* property)
-	\brief Returns the proper handler for the passed in scripting \a message.
-
-	\param message The scripting message to determine the handler.
-	\param index The index of the specifier.
-	\param specifier The message which contains the specifier.
-	\param what The 'what' field of the specifier message.
-	\param property The name of the target property.
-
-	\return The proper BHandler for the passed in scripting \a message.
-
-	\see BView::ResolveSpecifier()
+	\copydoc BHandler::ResolveSpecifier()
 */
 
 
@@ -400,6 +430,8 @@
 	\param text The text to set.
 	\param runs Set the font and color formats of the new text if provided. Only
 	       applies if the BTextView permits multiple character formats.
+
+	\since BeOS R3
 */
 
 
@@ -417,6 +449,8 @@
 	\param length The maximum number of bytes of \a text to use.
 	\param runs Set the font and color formats of the new text if provided. Only
 	       applies if the BTextView permits multiple character formats.
+
+	\since BeOS R3
 */
 
 
@@ -432,6 +466,8 @@
 	\param length The number of bytes of text to read from the file.
 	\param runs Set the font and color formats of the new text if provided. Only
 	       applies if the BTextView permits multiple character formats.
+
+	\since BeOS R3
 */
 
 
@@ -462,6 +498,8 @@
 
 	\param text The text to insert.
 	\param runs The text styling to set, can be \c NULL.
+
+	\since BeOS R3
 */
 
 
@@ -475,6 +513,8 @@
 	\param text The text to insert.
 	\param length The number of bytes of text to insert.
 	\param runs The text styling to use, can be \c NULL.
+
+	\since BeOS R3
 */
 
 
@@ -489,6 +529,8 @@
 	\param text The text to set.
 	\param length The number of bytes of text to insert.
 	\param runs The text styling to use, can be \c NULL.
+
+	\since BeOS R3
 */
 
 
@@ -506,14 +548,19 @@
 /*!
 	\fn void BTextView::Delete()
 	\brief Deletes the text within the current selection.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BTextView::Delete(int32 startOffset, int32 endOffset)
 	\brief Deletes the text enclosed within the given offsets.
+
 	\param startOffset The offset where the text to delete starts.
 	\param endOffset The offset where the text to delete ends.
+
+	\since BeOS R3
 */
 
 
@@ -521,7 +568,7 @@
 
 
 /*!
-	\name Text information
+	\name Text Information
 */
 
 
@@ -533,10 +580,12 @@
 	\brief Returns the BTextView text as a byte array.
 
 	\warning It is possible that the BTextView object had to do some operations
-	         on the text, to be able to return it as a C string. If you need to
+	         on the text to be able to return it as a C string. If you need to
 	         call Text() repeatedly, you'd better use GetText() instead.
 
 	\returns A pointer to the text as a byte array.
+
+	\since BeOS R3
 */
 
 
@@ -545,6 +594,8 @@
 	\brief Returns the text length of the BTextView text.
 
 	\return The text length of the BTextView text.
+
+	\since BeOS R3
 */
 
 
@@ -561,6 +612,8 @@
 	\param buffer A \a buffer to write the text to.
 
 	\see BString::GetString(int32 offset, int32 length, char* buffer)
+
+	\since BeOS R3
 */
 
 
@@ -571,6 +624,8 @@
 	\param offset The offset to the desired character.
 
 	\return The character at the given offset.
+
+	\since BeOS R3
 */
 
 
@@ -579,6 +634,8 @@
 	\brief Returns the number of lines that the BTextView object contains.
 
 	\return The number of lines contained in the BTextView object.
+
+	\since BeOS R3
 */
 
 
@@ -587,6 +644,8 @@
 	\brief Returns the index of the current line.
 
 	\return The index of the current line.
+
+	\since BeOS R3
 */
 
 
@@ -595,6 +654,8 @@
 	\brief Moves the caret to the specified line.
 
 	\param index The index of the line.
+
+	\since BeOS R3
 */
 
 
@@ -614,6 +675,8 @@
 	\brief Moves the current selection to the clipboard.
 
 	\param clipboard The clipboard object to move the text to.
+
+	\since BeOS R3
 */
 
 
@@ -622,6 +685,8 @@
 	\brief Copies the current selection to the clipboard.
 
 	\param clipboard The clipboard object to copy the selected text to.
+
+	\since BeOS R3
 */
 
 
@@ -630,6 +695,8 @@
 	\brief Copy the text contained in the clipboard to the BTextView.
 
 	\param clipboard A pointer to the clipboard.
+
+	\since BeOS R3
 */
 
 
@@ -640,6 +707,8 @@
 
 	\returns \c true if the BTextView can accept the pasted clipboard data,
 	         \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -650,6 +719,8 @@
 
 	\returns \c true if the BTextView can accept the dropped message data,
 	         \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -667,6 +738,8 @@
 /*!
 	\fn void BTextView::Clear()
 	\brief Deletes the currently selected text.
+
+	\since BeOS R4
 */
 
 
@@ -676,12 +749,18 @@
 
 	\param startOffset The offset where the text to select starts.
 	\param endOffset The offset where the text to select ends.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BTextView::SelectAll()
 	\brief Selects all text contained in the BTextView.
+
+	\sa Select()
+
+	\since BeOS R3
 */
 
 
@@ -693,6 +772,10 @@
 	\param _start A pointer to an int32 to contain the selection's start
 	       offset.
 	\param _end A pointer to an int32 to contain the selection's end offset.
+
+	\sa Select()
+
+	\since BeOS R3
 */
 
 
@@ -709,6 +792,10 @@
 	\param _size A pointer to an int32 to fill out the run array size.
 
 	\return A \c text_run_array for the text in the given offsets.
+
+	\sa SetRunArray()
+
+	\since BeOS R3
 */
 
 
@@ -720,6 +807,8 @@
 	\param offset The offset of the wanted character.
 
 	\return The line number of the character at the given offset.
+
+	\since BeOS R3
 */
 
 
@@ -729,6 +818,8 @@
 
 	\param point The point to get the line number of.
 	\return The line number for the passed in point.
+
+	\since BeOS R3
 */
 
 
@@ -740,6 +831,8 @@
 	\param _height A pointer to write the height of the character.
 
 	\return A BPoint object set to the location of the character.
+
+	\since BeOS R3
 */
 
 
@@ -750,6 +843,8 @@
 	\param point The desired point.
 
 	\return The offset for the passed in point.
+
+	\since BeOS R3
 */
 
 
@@ -761,6 +856,8 @@
 	\param line A line number.
 
 	\return The offset of the passed line.
+
+	\since BeOS R3
 */
 
 
@@ -776,6 +873,8 @@
 	\param offset The offset where to start looking.
 	\param _fromOffset A pointer to an integer to write the starting offset.
 	\param _toOffset A pointer to an integer to write the ending offset.
+
+	\since BeOS R3
 */
 
 
@@ -788,22 +887,32 @@
 
 	\returns \c true if the character can be the last character of a line,
 	         \c false otherwise.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn float BTextView::LineWidth(int32 lineNum) const
-	\brief Returns the width of the line at the given index.
+	\fn float BTextView::LineWidth(int32 lineNumber) const
+	\brief Returns the width of the line at the given \a lineNumber.
 
-	\param lineNum The index of the line to get the width of.
+	\param lineNumber The index of the line to get the width of, 0-indexed.
+
+	\returns The width of the line at the given \a lineNumber as a float.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn float BTextView::LineHeight(int32 lineNum) const
-	\brief Returns the height of the line at the given index.
+	\fn float BTextView::LineHeight(int32 lineNumber) const
+	\brief Returns the height of the line at the given \a lineNumber.
 
-	\param lineNum The index of the line to get the height of.
+	\param lineNumber The index of the line to get the height of, 0-indexed.
+
+	\returns The height of the line at the given \a lineNumber as a float.
+
+	\since BeOS R3
 */
 
 
@@ -813,6 +922,11 @@
 
 	\param startLine The index of the starting line.
 	\param endLine The index of the ending line.
+
+	\returns The height height of the text enclosed within the given lines
+	         as a float.
+
+	\since BeOS R3
 */
 
 
@@ -822,6 +936,8 @@
 
 	\param startOffset The start offset of the text to highlight.
 	\param endOffset The end offset of the text to highlight.
+
+	\since BeOS R3
 */
 
 
@@ -841,6 +957,8 @@
 	\brief Scrolls the text so that the character at \a offset is visible.
 
 	\param offset The offset of the character to scroll to.
+
+	\since BeOS R3
 */
 
 
@@ -848,6 +966,8 @@
 	\fn void BTextView::ScrollToSelection()
 	\brief Scrolls the text so that the character that begins the selection
 	       is visible.
+
+	\since BeOS R3
 */
 
 
@@ -867,6 +987,8 @@
 	\brief Sets the object's text frame to the passed in \a rect.
 
 	\param rect A BRect object to set the text frame to.
+
+	\since BeOS R3
 */
 
 
@@ -875,6 +997,10 @@
 	\brief Returns the BTextView's text frame.
 
 	\return The BTextView's text frame.
+
+	\see SetTextRect()
+
+	\since BeOS R3
 */
 
 
@@ -901,6 +1027,8 @@
 	\param top The top inset to set.
 	\param right The right inset to set.
 	\param bottom The bottom inset to set.
+
+	\since Haiku R1
 */
 
 
@@ -913,6 +1041,8 @@
 	\param _top A pointer to set to the frame's top inset.
 	\param _right A pointer to set to the frame's right inset.
 	\param _bottom A pointer to set to the frame's bottom inset.
+
+	\since BeOS R3
 */
 
 
@@ -931,20 +1061,25 @@
 
 /*!
 	\fn void BTextView::SetStylable(bool stylable)
-	\brief Sets whether or not the object accepts multiple character styles.
+	\brief Sets whether or not the object accepts multiple font styles.
 
-	\param stylable Pass in \c true to accept multiple character styles,
-	       \c false to NOT accept multiple character styles
+	\param stylable \c true to accept multiple font styles,
+	       \c false to NOT accept multiple font styles.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool BTextView::IsStylable() const
-	\brief Returns whether or not the object is stylable.
+	\brief Returns whether or not the object accepts multiple font styles.
 
-	If the object is stylable, it can show multiple fonts symultaneously.
+	\return \c true if the object is accepts multiple font styles,
+	        \c false otherwise.
 
-	\return \c true if the object is stylable, \c false otherwise.
+	\see SetStylable()
+
+	\since BeOS R3
 */
 
 
@@ -952,7 +1087,7 @@
 
 
 /*!
-	\name Tab width
+	\name Tab Width
 */
 
 
@@ -960,11 +1095,13 @@
 
 
 
-/*! 
+/*!
 	\fn void BTextView::SetTabWidth(float width)
 	\brief Sets the distance between tab stops in pixels.
 
 	\param width The distance in pixel between tab stops to set.
+
+	\since BeOS R3
 */
 
 
@@ -973,6 +1110,10 @@
 	\brief Returns the tab width of the BTextView.
 
 	\return The tab width of the BTextView.
+
+	\see SetTabWidth()
+
+	\since BeOS R3
 */
 
 
@@ -980,7 +1121,7 @@
 
 
 /*!
-	\name Selectable state
+	\name Selectable State
 */
 
 
@@ -994,6 +1135,8 @@
 
 	\param selectable Pass in \c true to set the text to be selectable,
 	       \c false to set the text to be not selectable.
+
+	\since BeOS R3
 */
 
 
@@ -1003,6 +1146,10 @@
 
 	\return \c true if the text is selectable,
 			\c false if the text is not selectable.
+
+	\see MakeSelectable()
+
+	\since BeOS R3
 */
 
 
@@ -1010,7 +1157,7 @@
 
 
 /*!
-	\name Editable state
+	\name Editable State
 */
 
 
@@ -1024,6 +1171,8 @@
 
 	\param editable Pass in \c true to set the text to be editable,
 	       \c false to set the object to be not editable.
+
+	\since BeOS R3
 */
 
 
@@ -1031,8 +1180,12 @@
 	\fn bool BTextView::IsEditable() const
 	\brief Returns whether or not the text is editable.
 
-	\return \c true if the text is editable,
-			\c false if the text is not editable.
+	\return \c true if the text is editable, \c false if the text is not
+	        editable.
+
+	\see MakeEditable()
+
+	\since BeOS R3
 */
 
 
@@ -1040,7 +1193,7 @@
 
 
 /*!
-	\name Word wrap
+	\name Word Wrap
 */
 
 
@@ -1054,6 +1207,8 @@
 
 	\param wrap Pass in \c true to turn on word wrapping mode,
 	       \c false to turn off word wrapping mode.
+
+	\since BeOS R3
 */
 
 
@@ -1063,6 +1218,10 @@
 
 	\return \c true if word wrapping is activated, \c false is word wrapping
 	        if not activated.
+
+	\see SetWordWrap()
+
+	\since BeOS R3
 */
 
 
@@ -1070,7 +1229,7 @@
 
 
 /*!
-	\name Max bytes
+	\name Max Bytes
 */
 
 
@@ -1083,6 +1242,8 @@
 	\brief Sets the maximum number of bytes that the BTextView can contain.
 
 	\param max The maximum number of bytes to set.
+
+	\since BeOS R3
 */
 
 
@@ -1091,6 +1252,10 @@
 	\brief Returns the maximum number of bytes that the BTextView can contain.
 
 	\return the maximum number of bytes that the BTextView can contain.
+
+	\see SetMaxBytes()
+
+	\since BeOS R3
 */
 
 
@@ -1098,7 +1263,7 @@
 
 
 /*!
-	\name Character filtering
+	\name Character Filtering
 */
 
 
@@ -1114,6 +1279,10 @@
 	by the textview anymore.
 
 	\param character The character to disallow.
+
+	\see AllowChar()
+
+	\since BeOS R3
 */
 
 
@@ -1125,6 +1294,10 @@
 	by the textview.
 
 	\param character The character to allow.
+
+	\see DisallowChar()
+
+	\since BeOS R3
 */
 
 
@@ -1150,6 +1323,8 @@
 	- \c B_ALIGN_CENTER
 
 	\param flag The text alignment to set.
+
+	\since BeOS R3
 */
 
 
@@ -1158,6 +1333,10 @@
 	\brief Returns the current text alignment.
 
 	\return The current alignment flag.
+
+	\see SetAlignment()
+
+	\since BeOS R3
 */
 
 
@@ -1165,7 +1344,7 @@
 
 
 /*!
-	\name Auto-indent
+	\name Autoindent
 */
 
 
@@ -1179,6 +1358,8 @@
 
 	\param state Pass in \c true to automatically indent the text,
 	       \c false to turn off automatic text indenting.
+
+	\since BeOS R3
 */
 
 
@@ -1187,6 +1368,10 @@
 	\brief Returns whether or not automatic indenting is active.
 
 	\return \c true if automatic indenting is activated, \c false otherwise.
+
+	\see SetAutoindent()
+
+	\since BeOS R3
 */
 
 
@@ -1194,7 +1379,7 @@
 
 
 /*!
-	\name Color space
+	\name Color Space
 */
 
 
@@ -1207,6 +1392,8 @@
 	\brief Set the color space of the offscreen BBitmap object.
 
 	\param colors The colorspace to set on the offscreen BBitmap object.
+
+	\since BeOS R3
 */
 
 
@@ -1215,6 +1402,10 @@
 	\brief Returns the colorspace set to the offscreen BBitmap object.
 
 	\return The colorspace of the offscreen BBitmap object.
+
+	\see SetColorSpace()
+
+	\since BeOS R3
 */
 
 
@@ -1241,6 +1432,8 @@
 	\param resize Pass in \c true to set the the BTextView to automatically
 	       resize itself, \c false to disable automatic resizing.
 	\param resizeView The BTextView object's parent view that resizes itself.
+
+	\since BeOS R3
 */
 
 
@@ -1249,6 +1442,10 @@
 	\brief Returns whether or not the object is resizable.
 
 	\returns \c true if the object is resizable, \c false otherwise.
+
+	\see MakeResizable()
+
+	\since BeOS R3
 */
 
 
@@ -1256,7 +1453,7 @@
 
 
 /*!
-	\name Undo state
+	\name Undo State
 */
 
 
@@ -1270,6 +1467,8 @@
 
 	\param undo Pass in \c true to enable the undo mechanism,
 	       \c false to disable it.
+
+	\since BeOS R3
 */
 
 
@@ -1278,6 +1477,10 @@
 	\brief Returns whether or not the undo mechanism is enabled.
 
 	\return \c true if undo is enabled, \c false otherwise.
+
+	\see SetDoesUndo()
+
+	\since BeOS R3
 */
 
 
@@ -1285,7 +1488,7 @@
 
 
 /*!
-	\name Hide typing
+	\name Hide Typing
 */
 
 
@@ -1299,6 +1502,8 @@
 
 	\param enabled Pass in \c true to enable type hiding,
 	       \c false to disable it.
+
+	\since BeOS R5
 */
 
 
@@ -1307,6 +1512,10 @@
 	\brief Returns whether or not typing is hidden.
 
 	\return \c true if typing is hidden, \c false otherwise.
+
+	\see HideTyping()
+
+	\since BeOS R5
 */
 
 

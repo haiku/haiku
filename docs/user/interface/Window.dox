@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,6 +28,8 @@
 
 	Combined window look and feel constants. Define both the appearance and
 	behavior of a window.
+
+	\since BeOS R3
 */
 
 
@@ -35,6 +37,8 @@
 	\var window_type B_UNTYPED_WINDOW
 
 	A window of unknown or undefined type.
+
+	\since BeOS R3
 */
 
 
@@ -42,6 +46,8 @@
 	\var window_type B_TITLED_WINDOW
 
 	\c B_TITLED_WINDOW_LOOK and \c B_NORMAL_WINDOW_FEEL.
+
+	\since BeOS R3
 */
 
 
@@ -49,6 +55,8 @@
 	\var window_type B_MODAL_WINDOW
 
 	\c B_MODAL_WINDOW_LOOK and \c B_MODAL_APP_WINDOW_FEEL.
+
+	\since BeOS R3
 */
 
 
@@ -56,6 +64,8 @@
 	\var window_type B_DOCUMENT_WINDOW
 
 	\c B_DOCUMENT_WINDOW_LOOK and \c B_NORMAL_WINDOW_FEEL.
+
+	\since BeOS R3
 */
 
 
@@ -63,6 +73,8 @@
 	\var window_type B_BORDERED_WINDOW
 
 	\c B_BORDERED_WINDOW_LOOK and \c B_NORMAL_WINDOW_FEEL.
+
+	\since BeOS R3
 */
 
 
@@ -70,6 +82,8 @@
 	\var window_type B_FLOATING_WINDOW
 
 	\c B_FLOATING_WINDOW_LOOK and \c B_FLOATING_APP_WINDOW_FEEL.
+
+	\since BeOS R3
 */
 
 
@@ -81,6 +95,8 @@
 	\ingroup interface
 
 	Window look constants, define window appearance.
+
+	\since BeOS R3
 */
 
 
@@ -88,6 +104,8 @@
 	\var window_look B_BORDERED_WINDOW_LOOK
 
 	No title bar, thin border, no resize control.
+
+	\since BeOS R3
 */
 
 
@@ -95,6 +113,8 @@
 	\var window_look B_NO_BORDER_WINDOW_LOOK
 
 	A borderless rectangle with no provisions to move or close the window.
+
+	\since BeOS R5
 */
 
 
@@ -103,6 +123,8 @@
 
 	Like \c B_DOCUMENT_WINDOW_LOOK, but with a resize corner instead of a resize
 	thumb.
+
+	\since BeOS R3
 */
 
 
@@ -110,6 +132,8 @@
 	\var window_look B_DOCUMENT_WINDOW_LOOK
 
 	Large title bar, thick border, draggable resize corner thumb.
+
+	\since BeOS R3
 */
 
 
@@ -118,6 +142,8 @@
 
 	For modal dialogs: no title bar, thick border, resize corner depending on the
 	\c B_NOT_RESIZABLE flag.
+
+	\since BeOS R3
 */
 
 
@@ -125,6 +151,8 @@
 	\var window_look B_FLOATING_WINDOW_LOOK
 
 	For floating sub windows: small title bar, thin border, resize corner.
+
+	\since BeOS R3
 */
 
 
@@ -136,6 +164,8 @@
 	\ingroup interface
 
 	Window feel constants, define window behavior.
+
+	\since BeOS R3
 */
 
 
@@ -143,6 +173,8 @@
 	\var window_feel B_NORMAL_WINDOW_FEEL
 
 	Behaves like a normal, non-modal, non-floating window.
+
+	\since BeOS R3
 */
 
 
@@ -151,6 +183,8 @@
 
 	Blocks all windows in its subset when displayed. Visible only if a window in
 	its subset is visible.
+
+	\since BeOS R3
 */
 
 
@@ -159,6 +193,8 @@
 
 	Blocks all windows in its app when displayed. Visible only if a window in its
 	app is visible.
+
+	\since BeOS R3
 */
 
 
@@ -167,6 +203,8 @@
 
 	Blocks all windows across the entire system when displayed. Always visible
 	in all workspaces.
+
+	\since BeOS R3
 */
 
 
@@ -175,6 +213,8 @@
 
 	Floats above all windows in its subset when displayed. Visible only if a
 	window in its subset is the frontmost window.
+
+	\since BeOS R3
 */
 
 
@@ -183,6 +223,8 @@
 
 	Floats above all windows in its app when displayed. Visible only if a
 	window in its app is the frontmost window.
+
+	\since BeOS R3
 */
 
 
@@ -191,6 +233,8 @@
 
 	Floats above all windows across the entire system when displayed. Always
 	visible in all workspaces.
+
+	\since BeOS R3
 */
 
 
@@ -202,6 +246,8 @@
 	\ingroup interface
 
 	Define window alignment.
+
+	\since BeOS R3
 */
 
 
@@ -210,6 +256,8 @@
 
 	Aligns window in terms of frame buffer offsets. Affects only horizontal
 	origin and width, can't align right and bottom edges in this mode.
+
+	\since BeOS R3
 */
 
 
@@ -217,6 +265,8 @@
 	\var window_alignment B_PIXEL_ALIGNMENT
 
 	Aligns window in pixel coordinates.
+
+	\since BeOS R3
 */
 
 
@@ -227,6 +277,8 @@
 	\var B_NOT_MOVABLE
 
 	Window cannot be moved by the user.
+
+	\since BeOS R3
 */
 
 
@@ -234,6 +286,8 @@
 	\var B_NOT_CLOSABLE
 
 	Window cannot be closed by the user, no close button is displayed.
+
+	\since BeOS R3
 */
 
 
@@ -241,6 +295,8 @@
 	\var B_NOT_ZOOMABLE
 
 	Window cannot be zoomed by the user, no zoom button is displayed.
+
+	\since BeOS R3
 */
 
 
@@ -248,6 +304,8 @@
 	\var B_NOT_MINIMIZABLE
 
 	Window cannot be minimized by the user.
+
+	\since BeOS R3
 */
 
 
@@ -255,6 +313,8 @@
 	\var B_NOT_RESIZABLE
 
 	Window cannot be resized by the user.
+
+	\since BeOS R3
 */
 
 
@@ -262,6 +322,8 @@
 	\var B_NOT_H_RESIZABLE
 
 	Window cannot be resized horizontally by the user.
+
+	\since BeOS R3
 */
 
 
@@ -269,6 +331,8 @@
 	\var B_NOT_V_RESIZABLE
 
 	Window cannot be resized vertically by the user.
+
+	\since BeOS R3
 */
 
 
@@ -276,6 +340,8 @@
 	\var B_AVOID_FRONT
 
 	Window cannot be brought to front.
+
+	\since BeOS R3
 */
 
 
@@ -283,6 +349,8 @@
 	\var B_AVOID_FOCUS
 
 	Window cannot receive keyboard focus.
+
+	\since BeOS R3
 */
 
 
@@ -291,6 +359,8 @@
 
 	The first click will not just bring the window to front, it will also be
 	processed by the window.
+
+	\since BeOS R3
 */
 
 
@@ -299,14 +369,18 @@
 
 	Window draws only it's outline as it's resized and doesn't draw its
 	contents.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_NO_WORKSPACE_ACTIVATION
 
-	Causes the current workspace to stay active even if the window is activated on
-	another workspace.
+	Causes the current workspace to stay active even if the window is activated
+	on another workspace.
+
+	\since BeOS R3
 */
 
 
@@ -315,6 +389,8 @@
 
 	Causes the window to move to the current workspace when activated if it already
 	exists on another workspace.
+
+	\since BeOS R3
 */
 
 
@@ -324,6 +400,8 @@
 	Quit the application when the window closes.
 
 	\note This flag existed but didn't function in BeOS R5.
+
+	\since BeOS R5
 */
 
 
@@ -333,6 +411,8 @@
 	Window maintains its position across workspaces.
 
 	\note This flag did not exist in BeOS R5.
+
+	\since Haiku R1
 */
 
 
@@ -342,6 +422,8 @@
 	Automatically adjust the window size according to the layout constraints.
 
 	\note This flag did not exist in BeOS R5.
+
+	\since Haiku R1
 */
 
 
@@ -351,15 +433,15 @@
 	Close the window when the user pushes the Escape key.
 
 	\note This flag did not exist in BeOS R5.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_NO_SERVER_SIDE_WINDOW_MODIFIERS
 
-	??
-
-	\note This flag did not exist in BeOS R5.
+	\since Haiku R1
 */
 
 
@@ -370,6 +452,8 @@
 	\def B_CURRENT_WORKSPACE
 
 	Applies to current workspace only.
+
+	\since BeOS R3
 */
 
 
@@ -377,6 +461,8 @@
 	\def B_ALL_WORKSPACES
 
 	Applies to all workspaces.
+
+	\since BeOS R3
 */
 
 
@@ -504,6 +590,8 @@
 			<td>Desktop window</td>
 		</tr>
 	</table>
+
+	\since BeOS R3
 */
 
 
@@ -551,6 +639,8 @@
 	\param workspace Mask that indicates which of the 32 potential workspace(s)
 	       the window should be displayed in or \c B_CURRENT_WORKSPACE or
 	       \c B_ALL_WORKSPACES constants.
+
+	\since BeOS R3
 */
 
 
@@ -621,6 +711,8 @@
 	\param workspace Mask that indicates which of the 32 potential workspace(s)
 	       the window should be displayed in or \c B_CURRENT_WORKSPACE or
 	       \c B_ALL_WORKSPACES constants.
+
+	\since BeOS R3
 */
 
 
@@ -629,6 +721,8 @@
 	\brief Archive constructor.
 
 	\param data A pointer to the BMessage object to build the object from.
+
+	\since BeOS R3
 */
 
 
@@ -638,12 +732,16 @@
 
 	\param frame The inner \a frame rectangle in the screen coordinate system.
 	\param bitmapToken Token to pass into App Server for offscreen window bitmap.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BWindow::~BWindow()
 	\brief Destroys the BWindow object and all attached views.
+
+	\since BeOS R3
 */
 
 
@@ -655,6 +753,8 @@
 
 	\returns A newly created BWindow object or \c NULL if the message doesn't
 		contain an archived BWindow.
+
+	\since BeOS R3
 */
 
 
@@ -667,6 +767,8 @@
 
 	\return A status code, \c B_OK if the object was archived or an error code
 	        otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -686,6 +788,8 @@
 	\warning The window must first be locked before calling Quit().
 
 	\see BLooper::Quit()
+
+	\since BeOS R3
 */
 
 
@@ -702,6 +806,8 @@
 
 	\param child The child view to add.
 	\param before The sibling view to add \a child before.
+
+	\since BeOS R3
 */
 
 
@@ -709,9 +815,9 @@
 	\fn void BWindow::AddChild(BLayoutItem* child)
 	\brief Add the \a child layout item to the view hierarchy.
 
-	\note This method was not available in BeOS R5.
-
 	\param child The child layout item to add.
+
+	\since Haiku R1
 */
 
 
@@ -722,6 +828,8 @@
 	\param child The child view to remove.
 
 	\return Whether or not \a child was removed from the view hierarchy.
+
+	\since BeOS R3
 */
 
 
@@ -730,6 +838,8 @@
 	\brief Returns the number of child views that the window has.
 
 	\return The number of child views as an int32.
+
+	\since BeOS R3
 */
 
 
@@ -740,6 +850,8 @@
 	\param index The index of the child view to return a pointer of.
 
 	\return A pointer to the child view at \a index or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -759,6 +871,8 @@
 
 	If you override Minimize() and you want to inherit BWindow's behavior, you
 	must call BWindow::Minimize().
+
+	\since BeOS R3
 */
 
 
@@ -769,6 +883,8 @@
 	\param window A pointer to the window to move behind.
 
 	\returns \c B_OK on success or \c B_ERROR on failure.
+
+	\since BeOS R3
 */
 
 
@@ -776,13 +892,18 @@
 	\fn void BWindow::Flush() const
 	\brief Flushes the window's connection to App Server causing any pending
 	messages to be processed then returns immediately.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BWindow::Sync() const
-	\brief Synchronizes the attached window's connection to App Server causing any
-	pending messages to be processed and then waits for the App Server to respond.
+	\brief Synchronizes the attached window's connection to App Server
+	       causing any pending messages to be processed and then waits for
+	       the App Server to respond.
+
+	\since BeOS R3
 */
 
 
@@ -790,8 +911,10 @@
 	\fn void BWindow::DisableUpdates()
 	\brief Suppresses drawing within the window.
 
-	If you want the results of several drawing operations to appear in the window
-	all at once you disable updates, draw, and then re-enable updates.
+	If you want the results of several drawing operations to appear in the
+	window all at once you disable updates, draw, and then re-enable updates.
+
+	\since BeOS R3
 */
 
 
@@ -801,6 +924,8 @@
 
 	If you want the results of several drawing operations to appear in the window
 	all at once you disable updates, draw, and then re-enable updates.
+
+	\since BeOS R3
 */
 
 
@@ -811,7 +936,7 @@
 
 	Unlike DisableUpdates() the messages are sent but are not processed.
 
-	\note This method was not available in BeOS R5.
+	\since Haiku R1
 */
 
 
@@ -819,7 +944,7 @@
 	\fn void BWindow::EndViewTransaction()
 	\brief Ends a view transaction allowing update to go to App Server again.
 
-	\note This method was not available in BeOS R5.
+	\since Haiku R1
 */
 
 
@@ -827,10 +952,10 @@
 	\fn bool BWindow::InViewTransaction() const
 	\brief Returns whether or not the window is currently in a view transaction.
 
-	\note This method was not available in BeOS R5.
-
 	\returns \c true if the window is currently in a view transaction,
 	         \c false otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -839,6 +964,8 @@
 	\brief Returns whether or not the window is the frontmost on screen.
 
 	\returns \c true if window is the frontmost on screen, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -849,6 +976,8 @@
 	\param message The \a message received by the looper.
 
 	\see BHandler::MessageReceived()
+
+	\since BeOS R3
 */
 
 
@@ -864,6 +993,8 @@
 	mechanism.
 
 	\see BLooper::DispatchMessage()
+
+	\since BeOS R3
 */
 
 
@@ -871,10 +1002,10 @@
 	\fn void BWindow::FrameMoved(BPoint newPosition)
 	\brief Hook method that gets called when the window is moved.
 
-	The default implementation does nothing.
-
 	\param newPosition The point of the top left corner of the frame
 		rectangle that the window has been moved to.
+
+	\since BeOS R3
 */
 
 
@@ -882,10 +1013,10 @@
 	\fn void BWindow::FrameResized(float newWidth, float newHeight)
 	\brief Hook method that gets called when the window is resized.
 
-	The default implementation does nothing.
-
 	\param newWidth The new \a width of the window.
 	\param newHeight The new \a height of the window.
+
+	\since BeOS R3
 */
 
 
@@ -894,10 +1025,10 @@
 		uint32 newWorkspaces)
 	\brief Hook method that gets called when the number of workspaces changes.
 
-	The default implementation does nothing.
-
 	\param oldWorkspaces The old number of workspaces.
 	\param newWorkspaces The new number of workspaces.
+
+	\since BeOS R3
 */
 
 
@@ -905,10 +1036,10 @@
 	\fn void BWindow::WorkspaceActivated(int32 workspace, bool state)
 	\brief Hook method that gets called when the active workspace changes.
 
-	The default implementation does nothing.
-
 	\param workspace The \a workspace number that was activated/deactivated.
 	\param state \c true if activated, \c false if deactivated.
+
+	\since BeOS R3
 */
 
 
@@ -917,10 +1048,10 @@
 	\brief Hook method that gets called just before a menu owned by the window is
 	       shown.
 
-	The default implementation does nothing.
-
 	\note This method is not invoked by a message, there is no
 	      \c B_MENUS_BEGINNING flag.
+
+	\since BeOS R3
 */
 
 
@@ -929,10 +1060,10 @@
 	\brief Hook method that gets called just before a menu owned by the window is
 	       hidden.
 
-	The default implementation does nothing.
-
 	\note This method is not invoked by a message, there is no
 	      \c B_MENUS_ENDED flag.
+
+	\since BeOS R3
 */
 
 
@@ -950,6 +1081,8 @@
 	\param maxWidth The maximum width of the window to set.
 	\param minHeight The minimum height of the window to set.
 	\param maxHeight The maximum height of the window to set.
+
+	\since BeOS R3
 */
 
 
@@ -962,7 +1095,9 @@
 	\param _maxWidth The maximum width of the window.
 	\param _minHeight The minimum height of the window.
 	\param _maxHeight The maximum height of the window.
-*
+
+	\since BeOS R3
+*/
 
 
 /*!
@@ -977,6 +1112,8 @@
 	invoked asynchronously, calling this method manually is necessary, if it is
 	desired to adjust the limits (and as a possible side effect the window size)
 	earlier, e.g. before the first call to the Show() method.)
+
+	\since Haiku R1
 */
 
 
@@ -988,6 +1125,8 @@
 
 	\returns \c B_OK if the decorator settings were set successfully or an error
 	         code otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -999,6 +1138,8 @@
 
 	\returns \c B_OK if the decorator settings were filled out successfully
 	         or an error code otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -1011,6 +1152,8 @@
 	set by SetSizeLimits(), and the maximum values set by this method.
 
 	/see Zoom()
+
+	\since BeOS R3
 */
 
 
@@ -1025,6 +1168,8 @@
 	\param origin The point that the window was moved to.
 	\param width The new width of the window.
 	\param height The new height of the window.
+
+	\since BeOS R3
 */
 
 
@@ -1037,6 +1182,8 @@
 	This method may move and resize the window resulting in both the FrameMoved()
 	and FrameResized() hook methods to be called. This is the method called when
 	the user clicks a window's zoom button.
+
+	\since BeOS R3
 */
 
 
@@ -1045,10 +1192,10 @@
 	\brief Hook method that is called when the screen that the window is located
 	       on changes size or location or the color space of the screen changes.
 
-	The default implementation does nothing.
-
 	\param screenSize The new screen size in the screen's coordinate system.
 	\param depth The new color space of the screen.
+
+	\since BeOS R3
 */
 
 
@@ -1064,6 +1211,8 @@
 	Setting the \a rate to 0 disables pulsing for all views attache to the window.
 
 	\param rate The pulse rate to set.
+
+	\since BeOS R3
 */
 
 
@@ -1075,11 +1224,13 @@
 	that no other messages are pending.
 
 	\returns The pulse rate of the window as a bigtime_t.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Shortcut methods
+	\name Shortcut Methods
 
 	The key parameter is specified in the form of a Unicode code point. This
 	is generally an ASCII character such as 'A' or a key constant such as
@@ -1095,8 +1246,6 @@
 	\fn void BWindow::AddShortcut(uint32 key, uint32 modifiers, BMenuItem* item)
 	\brief Creates a keyboard shortcut that activates a menu \a item.
 
-	\note This method was not available in BeOS R5.
-
 	\param key The character that activates the shortcut, case-insensitive.
 	\param modifiers A bit mask of modifiers in addition to \c B_COMMAND_KEY,
 	       options include:
@@ -1105,6 +1254,8 @@
 	       - \c B_CONTROL_KEY
 	       - \c B_MENU_KEY
 	\param item The menu \a item to activate.
+
+	\since Haiku R1
 */
 
 
@@ -1124,6 +1275,8 @@
 	       - \c B_MENU_KEY
 	\param message The \a message to send when the shortcut is activated. The
 	       BWindow takes ownership of the \a message.
+
+	\since BeOS R3
 */
 
 
@@ -1146,14 +1299,14 @@
 	\param message The \a message to send when the shortcut is activated. The
 	       BWindow takes ownership of the \a message.
 	\param target The handler to send the message to.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool BWindow::HasShortcut(uint32 key, uint32 modifiers)
 	\brief Returns whether or not the specified shortcut is set on the window.
-
-	\note This method was not available in BeOS R5.
 
 	\param key The character to check, case-insensitive.
 	\param modifiers A bit mask of modifiers in addition to \c B_COMMAND_KEY,
@@ -1165,6 +1318,8 @@
 
 	\returns \c true if the window has the specified shortcut, \c false
 	         otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -1181,6 +1336,8 @@
 	       - \c B_OPTION_KEY
 	       - \c B_CONTROL_KEY
 	       - \c B_MENU_KEY
+
+	\since BeOS R3
 */
 
 
@@ -1193,6 +1350,8 @@
 
 	\return A pointer to the window's default button or \c NULL if it doesn't
 	        have one.
+
+	\since BeOS R3
 */
 
 
@@ -1209,6 +1368,8 @@
 
 	\param button A pointer to the button to set as the default or \c NULL to
 	       unset.
+
+	\since BeOS R3
 */
 
 
@@ -1217,6 +1378,8 @@
 	\brief Returns whether or not any of the attached views need to be updated.
 
 	\return \c true if an attached view needs to be updated, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -1231,6 +1394,8 @@
 	You may call this method as part of a hook function such as MouseMoved() or
 	KeyDown() to force invalid views to be immediately redrawn without having to
 	wait for the hook function to finish.
+
+	\since BeOS R3
 */
 
 
@@ -1241,6 +1406,8 @@
 	\param viewName The name of the attached view to look for.
 
 	\return A pointer to the BView object or \c NULL if no view is found.
+
+	\since BeOS R3
 */
 
 
@@ -1253,6 +1420,8 @@
 	       system.
 
 	\return A pointer to the BView object or \c NULL if no view is found.
+
+	\since BeOS R3
 */
 
 
@@ -1262,6 +1431,8 @@
 
 	\return A pointer to the current focus view of the window or \c NULL if
 	        not found.
+
+	\since BeOS R3
 */
 
 
@@ -1275,18 +1446,20 @@
 
 	\param active \c true to activate the window, \c false to deactivate the
 	       window.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BWindow::WindowActivated(bool state)
+	\fn void BWindow::WindowActivated(bool active)
 	\brief Hook method that gets called when the window becomes activated or
 	       deactivated.
 
-	The default implementation does nothing.
-
-	\param state \c true if the window has become activated, \c false if the
+	\param active \c true if the window has become activated, \c false if the
 	       window has become deactivated.
+
+	\since BeOS R3
 */
 
 
@@ -1295,6 +1468,8 @@
 	\brief Convert \a point to the screen's coordinate system in place.
 
 	\param point A pointer to a BPoint object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -1305,6 +1480,8 @@
 	\param point A BPoint object to convert.
 
 	\return A new BPoint object in the screen's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1314,6 +1491,8 @@
 		   window's coordinate system in place.
 
 	\param point A pointer to a BPoint object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -1325,6 +1504,8 @@
 	\param point A BPoint object to convert.
 
 	\return A new BPoint object in the window's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1333,6 +1514,8 @@
 	\brief Convert \a rect to the screen's coordinate system in place.
 
 	\param rect A pointer to a BRect object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -1343,6 +1526,8 @@
 	\param rect A BRect object to convert.
 
 	\return A new BRect object in the screen's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1352,6 +1537,8 @@
 		   window's coordinate system in place.
 
 	\param rect A pointer to a BRect object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -1363,6 +1550,8 @@
 	\param rect A BRect object to convert.
 
 	\return A new BRect object in the window's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1371,6 +1560,8 @@
 	\brief Returns whether or not the window is minimized.
 
 	\return \c true if the window is minimized, \c false otherwise.
+
+	\since BeOS R5
 */
 
 
@@ -1380,6 +1571,10 @@
 
 	\return The bounding rectangle of the window as a BRect in the window's
 	        coordinate system.
+
+	\sa Frame()
+
+	\since BeOS R3
 */
 
 
@@ -1389,6 +1584,10 @@
 
 	\return The bounding rectangle of the window as a BRect in the screen
 	        coordinate system.
+
+	\sa Bounds()
+
+	\since BeOS R3
 */
 
 
@@ -1396,10 +1595,10 @@
 	\fn BRect BWindow::DecoratorFrame() const
 	\brief Returns the frame rectangle of the window decorator.
 
-	\note This method was not available in BeOS R5.
-
 	\return The bounding rectangle of the window decorator as a BRect in the
 	        screen coordinate system.
+
+	\since Haiku R1
 */
 
 
@@ -1407,9 +1606,9 @@
 	\fn BSize BWindow::Size() const
 	\brief Returns the size of the window.
 
-	\note This method was not available in BeOS R5.
-
 	\return The size of the window as a BSize in the screen coordinate system.
+
+	\since Haiku R1
 */
 
 
@@ -1418,6 +1617,8 @@
 	\brief Returns the window title as set by the constructor or SetTitle().
 
 	\return A pointer to the window title.
+
+	\since BeOS R3
 */
 
 
@@ -1427,6 +1628,8 @@
 
 	Also renames the window thread to "w>title" where "title" is the passed in
 	title string.
+
+	\since BeOS R5
 */
 
 
@@ -1435,6 +1638,8 @@
 	\brief Returns whether or not the window is active.
 
 	\return \c true if the window is active, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -1447,6 +1652,8 @@
 
 	\param bar A pointer to the menu \a bar to set as as the key menu \a bar for
 	       the window.
+
+	\since BeOS R3
 */
 
 
@@ -1462,6 +1669,8 @@
 	To explicitly set a menu bar as the key menu bar call SetKeyMenuBar().
 
 	\return A pointer to the key menu bar or \c NULL is not is set.
+
+	\since BeOS R3
 */
 
 
@@ -1470,6 +1679,8 @@
 	\brief Returns whether or not the window is modal.
 
 	\return \c true if the window is modal, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -1478,6 +1689,8 @@
 	\brief Returns whether or not the window is floating.
 
 	\return \c true if the window is floating, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -1491,6 +1704,8 @@
 	        object's feel is not set to \c B_MODAL_SUBSET_WINDOW_FEEL or
 			\c B_FLOATING_SUBSET_WINDOW_FEEL.
 	\retval B_ERROR Could not lock the BWindow object.
+
+	\since BeOS R3
 */
 
 
@@ -1504,6 +1719,8 @@
 	        object's feel is not set to \c B_MODAL_SUBSET_WINDOW_FEEL or
 			\c B_FLOATING_SUBSET_WINDOW_FEEL.
 	\retval B_ERROR Could not lock the BWindow object.
+
+	\since BeOS R3
 */
 
 
@@ -1512,6 +1729,8 @@
 	\brief Changes the window type set in the constructor to \a type.
 
 	\return \c B_OK on success or an error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -1520,6 +1739,8 @@
 	\brief Returns the current window type flag.
 
 	\return The currently set window type flag.
+
+	\since BeOS R3
 */
 
 
@@ -1528,6 +1749,8 @@
 	\brief Changes the window look set in the constructor to \a look.
 
 	\return \c B_OK on success or an error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -1536,6 +1759,8 @@
 	\brief Returns the current window look flag.
 
 	\return The currently set window look flag.
+
+	\since BeOS R3
 */
 
 
@@ -1544,6 +1769,8 @@
 	\brief Changes the window feel set in the constructor to \a feel.
 
 	\return \c B_OK on success or an error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -1552,6 +1779,8 @@
 	\brief Returns the current window feel flag.
 
 	\return The currently set window feel flag.
+
+	\since BeOS R3
 */
 
 
@@ -1560,6 +1789,8 @@
 	\brief Changes the window flags set in the constructor to \a flags.
 
 	\return \c B_OK on success or an error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -1568,26 +1799,37 @@
 	\brief Returns the current window flags.
 
 	\return The currently set window flags.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BWindow::SetWindowAlignment(window_alignment mode,
-	int32 h, int32 hOffset, int32 width, int32 widthOffset,
-	int32 v, int32 vOffset, int32 height, int32 heightOffset)
+		int32 h, int32 hOffset, int32 width, int32 widthOffset,
+		int32 v, int32 vOffset, int32 height, int32 heightOffset)
+	\brief Sets the alignment of the content of the window on the screen.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BWindow::GetWindowAlignment(window_alignment* mode,
-	int32* h, int32* hOffset, int32* width, int32* widthOffset,
-	int32* v, int32* vOffset, int32* height, int32* heightOffset) const
+		int32* h, int32* hOffset, int32* width, int32* widthOffset,
+		int32* v, int32* vOffset, int32* height, int32* heightOffset) const
+	\brief Fills out the pointers with the alignment of the content of the
+	       window on the screen.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn uint32 BWindow::Workspaces() const
 	\brief Returns the set of workspaces where the window can be displayed.
+
+	\since BeOS R3
 */
 
 
@@ -1599,6 +1841,8 @@
 	- \c B_CURRENT_WORKSPACE to place the window in the currently displayed
 	     workspace removing it from all others.
 	- \c B_ALL_WORKSPACES to make the window show up in all workspaces.
+
+	\since BeOS R3
 */
 
 
@@ -1609,6 +1853,8 @@
 
 	\return A pointer the BView object that most recently received a
 	        \c B_MOUSE_MOVED message or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -1621,6 +1867,8 @@
 
 	\param dx The number of pixels to move the window vertically.
 	\param dy The number of pixels to move the window horizontally.
+
+	\since BeOS R3
 */
 
 
@@ -1630,6 +1878,8 @@
 
 	\param point the location to move the window in the screen's coordinate
 	       system.
+
+	\since BeOS R3
 */
 
 
@@ -1643,6 +1893,8 @@
 	       coordinate system.
 	\param y The vertical coordinate to move the window to in the screen's
 	       coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1654,6 +1906,8 @@
 
 	\brief dx The number of pixels to resize the window horizontally.
 	\brief dy The number of pixels to resize the window vertically.
+
+	\since BeOS R3
 */
 
 
@@ -1665,6 +1919,8 @@
 
 	\param width The width to resize the window to.
 	\param height The height to resize the window to.
+
+	\since BeOS R3
 */
 
 
@@ -1673,18 +1929,24 @@
 	\brief Center the window in \a rect.
 
 	\param rect The rectangle to center the window in.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BWindow::CenterOnScreen()
 	\brief Centers the window on the screen the window is currently on.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BWindow::CenterOnScreen(screen_id id)
 	\brief Centers the window on the screen with the passed in \a id.
+
+	\since Haiku R1
 */
 
 
@@ -1697,6 +1959,8 @@
 	is started and it is unlocked.
 
 	Calls to Hide() and Show() are cumulative.
+
+	\since BeOS R3
 */
 
 
@@ -1706,6 +1970,8 @@
 	       list, and passes active status to another window.
 
 	Calls to Hide() and Show() are cumulative.
+
+	\since BeOS R3
 */
 
 
@@ -1715,6 +1981,8 @@
 
 	Windows are hidden by default, you must call Show() to show the window starting
 	the message loop going.
+
+	\since BeOS R3
 */
 
 
@@ -1725,6 +1993,8 @@
 
 	\see Quit()
 	\see BLooper::QuitRequested()
+
+	\since BeOS R3
 */
 
 
@@ -1733,6 +2003,8 @@
 	\brief Spawns the message loop thread and starts the window running.
 
 	\see BLooper::Run()
+
+	\since BeOS R3
 */
 
 
@@ -1741,6 +2013,8 @@
 	\brief Sets the \a layout of the window.
 
 	\param layout The \a layout to set.
+
+	\since Haiku R1
 */
 
 
@@ -1749,6 +2023,8 @@
 	\brief Get the layout of the window.
 
 	\returns The layout of the window.
+
+	\since Haiku R1
 */
 
 
@@ -1757,6 +2033,8 @@
 	\brief Invalidate layout.
 
 	\param descendants Also invalidate its children windows.
+
+	\since Haiku R1
 */
 
 
@@ -1766,6 +2044,8 @@
 	       to the window.
 
 	\param force If \c true, layout even if valid.
+
+	\since Haiku R1
 */
 
 
@@ -1773,16 +2053,12 @@
 	\fn status_t BWindow::GetSupportedSuites(BMessage* data)
 	\brief Reports the suites of messages and specifiers understood by the window.
 
-	\param data The message to use to report the suite of messages and specifiers.
-
-	\see BHandler::GetSupportedSuites()
+	\copydetails BLooper::GetSupportedSuites()
 */
 
 
 /*!
-	\fn BHandler* BView::ResolveSpecifier(BMessage* message, int32 index,
+	\fn BHandler* BWindow::ResolveSpecifier(BMessage* message, int32 index,
 		BMessage* specifier, int32 what, const char* property)
-	\brief Determine the proper handler for a scripting message.
-
-	\see BHandler::ResolveSpecifier()
+	\copydoc BLooper::ResolveSpecifier()
 */

@@ -24,6 +24,8 @@
 
 	Acts like a normal BButton, the value is set to \c B_CONTROL_ON when the
 	button is being pressed and is set to \c B_CONTROL_OFF otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -32,6 +34,8 @@
 
 	Acts like a checkbox, the value alternates between \c B_CONTROL_ON and
 	\c B_CONTROL_OFF each time the user presses and releases the button.
+
+	\since BeOS R3
 */
 
 
@@ -40,6 +44,16 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief A button draw with a BPicture image instead of a text label.
+
+	There are two types:
+	- \c B_ONE_STATE_BUTTON Acts like a normal BButton, the value is set to
+	     \c B_CONTROL_ON when the button is being pressed and is set to
+		 \c B_CONTROL_OFF otherwise.
+	- \c B_TWO_STATE_BUTTON Acts like a checkbox, the value alternates between
+	     \c B_CONTROL_ON and \c B_CONTROL_OFF each time the user presses and
+		 releases the button.
+
+	\since BeOS R3
 */
 
 
@@ -64,6 +78,8 @@
 	\sa BPictureButton::SetEnabledOff()
 	\sa BPictureButton::SetDisabledOn()
 	\sa BPictureButton::SetDisabledOff()
+
+	\since BeOS R3
 */
 
 
@@ -71,13 +87,25 @@
 	\fn BPictureButton::BPictureButton(BMessage* data)
 	\brief Initializes an BPictureButton object copying the data from from the
 	       passed in \a data archive.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BPictureButton::~BPictureButton()
 	\brief Destroys the BPictureButton along with the associated BPicture objects.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -89,6 +117,8 @@
 	         doesn't contain an archived BPictureButton.
 
 	\see BArchivable::Instantiate()
+
+	\since BeOS R3
 */
 
 
@@ -106,78 +136,63 @@
 
 	\sa BArchivable::Archive()
 	\sa BPictureButton::Instantiate()
+
+	\since BeOS R3
 */
+
+
+//! @}
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
 
 
 /*!
 	\fn void BPictureButton::AttachedToWindow()
-	\see BControl::AttachedToWindow()
+	\copydoc BControl::AttachedToWindow()
 */
 
 
 /*!
 	\fn void BPictureButton::DetachedFromWindow()
-	\see BControl::DetachedFromWindow()
+	\copydoc BControl::DetachedFromWindow()
 */
 
 
 /*!
 	\fn void BPictureButton::AllAttached()
-	\see BControl::AllAttached()
+	\copydoc BControl::AllAttached()
 */
 
 
 /*!
 	\fn void BPictureButton::AllDetached()
-	\see BControl::AllDetached()
-*/
-
-
-/*!
-	\fn void BPictureButton::ResizeToPreferred()
-	\see BControl::ResizeToPreferred()
-*/
-
-
-/*!
-	\fn void BPictureButton::GetPreferredSize(float* _width, float* _height)
-	\see BControl::GetPreferredSize()
-*/
-
-
-/*!
-	\fn void BPictureButton::FrameMoved(BPoint newPosition)
-	\see BControl::FrameMoved()
-*/
-
-
-/*!
-	\fn BPictureButton::FrameResized(float newWidth, float newHeight)
-	\see BControl::FrameResized()
-*/
-
-
-/*!
-	\fn void BPictureButton::WindowActivated(bool state)
-	\see BControl::WindowActivated()
-*/
-
-
-/*!
-	\fn void BPictureButton::MakeFocus(bool state)
-	\see BControl::MakeFocus()
+	\copydoc BControl::AllDetached()
 */
 
 
 /*!
 	\fn void BPictureButton::Draw(BRect updateRect)
 	\brief Draws the BPictureButton from its associated BPicture objects.
+
+	\copydetails BControl::Draw()
 */
 
 
 /*!
-	\fn void BPictureButton::MessageReceived(BMessage* message)
-	\see BControl::MessageReceived()
+	\fn void BPictureButton::FrameMoved(BPoint newPosition)
+	\copydoc BControl::FrameMoved()
+*/
+
+
+/*!
+	\fn BPictureButton::FrameResized(float newWidth, float newHeight)
+	\copydoc BControl::FrameResized()
 */
 
 
@@ -185,7 +200,13 @@
 	\fn void BPictureButton::KeyDown(const char* bytes, int32 numBytes)
 	\brief Invokes the button on either \c B_ENTER \c B_SPACE.
 
-	\sa BControl::KeyDown()
+	\copydetails BControl::KeyDown()
+*/
+
+
+/*!
+	\fn void BPictureButton::MessageReceived(BMessage* message)
+	\copydoc BControl::MessageReceived()
 */
 
 
@@ -193,8 +214,17 @@
 	\fn void BPictureButton::MouseDown(BPoint where)
 	\brief Sets the button value based on the buttons Behavior().
 
-	\sa BControl::MouseDown()
+	\copydetails BControl::MouseDown()
+
 	\sa Behavior()
+*/
+
+
+/*!
+	\fn void BPictureButton::MouseMoved(BPoint where, uint32 code,
+		const BMessage* dragMessage)
+
+	\copydetails BControl::MouseMoved()
 */
 
 
@@ -202,16 +232,34 @@
 	\fn void BPictureButton::MouseUp(BPoint where)
 	\brief Invokes the button.
 
-	\sa BControl::MouseUp()
+	\copydetails BControl::MouseUp()
 */
 
 
 /*!
-	\fn void BPictureButton::MouseMoved(BPoint where, uint32 transit,
-		const BMessage* message)
-	\brief
+	\fn void BPictureButton::WindowActivated(bool active)
+	\copydoc BControl::WindowActivated()
+*/
 
-	\sa BControl::MouseMoved()
+
+//! @}
+
+
+/*!
+	\fn void BPictureButton::ResizeToPreferred()
+	\copydoc BControl::ResizeToPreferred()
+*/
+
+
+/*!
+	\fn void BPictureButton::GetPreferredSize(float* _width, float* _height)
+	\copydoc BControl::GetPreferredSize()
+*/
+
+
+/*!
+	\fn void BPictureButton::MakeFocus(bool focus)
+	\copydoc BControl::MakeFocus()
 */
 
 
@@ -220,6 +268,8 @@
 	\brief Sets the BPicture to draw when the button is enabled and on.
 
 	\param picture A pointer to the BPicture object to set.
+
+	\since BeOS R3
 */
 
 
@@ -228,6 +278,8 @@
 	\brief Sets the BPicture to draw when the button is enabled and off.
 
 	\param picture A pointer to the BPicture object to set.
+
+	\since BeOS R3
 */
 
 
@@ -239,6 +291,8 @@
 	set because a disabled one-state control can never be on.
 
 	\param picture A pointer to the BPicture object to set.
+
+	\since BeOS R3
 */
 
 
@@ -247,6 +301,8 @@
 	\brief Sets the BPicture to draw when the button is disabled and off.
 
 	\param picture A pointer to the BPicture object to set.
+
+	\since BeOS R3
 */
 
 
@@ -256,6 +312,8 @@
 	       is enabled and on.
 
 	\returns A pointer to a BPicture object or \c NULL if not set.
+
+	\since BeOS R3
 */
 
 
@@ -265,6 +323,8 @@
 	       is enabled and off.
 
 	\returns A pointer to a BPicture object or \c NULL if not set.
+
+	\since BeOS R3
 */
 
 
@@ -274,6 +334,8 @@
 	       is disabled and on.
 
 	\returns A pointer to a BPicture object or \c NULL if not set.
+
+	\since BeOS R3
 */
 
 
@@ -283,6 +345,8 @@
 	       is disabled and off.
 
 	\returns A pointer to a BPicture object or \c NULL if not set.
+
+	\since BeOS R3
 */
 
 
@@ -298,6 +362,8 @@
 	the user presses and releases the button.
 
 	\param behavior Either \c B_ONE_STATE_BUTTON or \c B_TWO_STATE_BUTTON.
+
+	\since BeOS R3
 */
 
 
@@ -307,43 +373,46 @@
 
 	\returns Either \c B_ONE_STATE_BUTTON or B_TWO_STATE_BUTTON.
 
-	\see BPictureButton::SetBehavior()
+	\see SetBehavior()
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BPictureButton::SetValue(int32 value)
-	\see BControl::SetValue()
+	\copydoc BControl::SetValue()
 */
 
 
 /*!
 	\fn status_t BPictureButton::Invoke(BMessage* message)
-	\see BControl::Invoke()
+	\copydoc BControl::Invoke()
 */
 
 
 /*!
 	\fn BHandler* BPictureButton::ResolveSpecifier(BMessage* message,
-		int32 index, BMessage* specifier, int32 form, const char* property)
-	\see BControl::ResolveSpecifier()
+		int32 index, BMessage* specifier, int32 what, const char* property)
+	\copydoc BControl::ResolveSpecifier()
 */
 
 
 /*!
 	\fn status_t BPictureButton::GetSupportedSuites(BMessage* data)
-	\see BControl::GetSupportedSuites()
+	\copydoc BControl::GetSupportedSuites()
 */
 
 
 /*!
 	\fn status_t BPictureButton::Perform(perform_code code, void* _data)
-	\brief Perform some action (internal method defined for binary
-	       compatibility purposes).
+	\copydoc BHandler::GetSupportedSuites()
 */
 
 
 /*!
 	\fn status_t BPictureButton::SetIcon(const BBitmap* icon, uint32 flags)
 	\see BControl::SetIcon()
+
+	\since Haiku R1
 */

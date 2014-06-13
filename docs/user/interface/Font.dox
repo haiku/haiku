@@ -16,7 +16,7 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief BFont class definition, unicode_block class definition, and
-		font-related struct and enum definitions.
+	       font-related struct and enum definitions.
 */
 
 
@@ -24,6 +24,8 @@
 	\var B_CHAR_SPACING
 
 	Position each character without adjustment. Best mode for printing.
+
+	\since BeOS R3
 */
 
 
@@ -33,6 +35,8 @@
 	Optimizes the position of each character within it's space. Collisions
 	are unlikely but characters may touch each other. Best mode to use when
 	the screen needs to match what appears on the printed page.
+
+	\since BeOS R3
 */
 
 
@@ -41,6 +45,8 @@
 
 	The widths of the characters are chosen so that they never collide and
 	rarely touch. Best mode for drawing small amounts of text.
+
+	\since BeOS R3
 */
 
 
@@ -48,6 +54,8 @@
 	\var B_FIXED_SPACING
 
 	Positions characters at a constant width. Best mode for fixed-width fonts.
+
+	\since BeOS R3
 */
 
 
@@ -57,6 +65,8 @@
 
 	Determines the direction of the text rendered by the font,
 	left-to-right or right-to-left.
+
+	\since BeOS R3
 */
 
 
@@ -64,12 +74,17 @@
 	\var font_direction B_FONT_LEFT_TO_RIGHT
 
 	Left to right.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var font_direction B_FONT_RIGHT_TO_LEFT
 
 	Right to left.
+
+	\since BeOS R3
 */
 
 
@@ -77,6 +92,8 @@
 	\var B_DISABLE_ANTIALIASING
 
 	Disable antialiasing. Used by BFont::Flags() and BFont::SetFlags().
+
+	\since BeOS R3
 */
 
 
@@ -84,6 +101,8 @@
 	\var B_FORCE_ANTIALIASING
 
 	Force antialiasing. Used by BFont::Flags() and BFont::SetFlags().
+
+	\since BeOS R3
 */
 
 
@@ -91,6 +110,8 @@
 	\var B_TRUNCATE_END
 
 	Truncate from the end of the string.
+
+	\since BeOS R3
 */
 
 
@@ -98,6 +119,8 @@
 	\var B_TRUNCATE_BEGINNING
 
 	Truncate from the beginning of the string.
+
+	\since BeOS R3
 */
 
 
@@ -105,6 +128,8 @@
 	\var B_TRUNCATE_MIDDLE
 
 	Truncate from the middle of the string.
+
+	\since BeOS R3
 */
 
 
@@ -112,6 +137,8 @@
 	\var B_TRUNCATE_SMART
 
 	Truncate while keeping each string unique.
+
+	\since BeOS R3
 */
 
 
@@ -119,6 +146,8 @@
 	\var B_UNICODE_UTF8
 
 	UTF-8 font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -126,6 +155,8 @@
 	\var B_ISO_8859_1
 
 	ISO 8859-1 aka Latin 1 "Western European" font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -133,6 +164,8 @@
 	\var B_ISO_8859_2
 
 	ISO 8859-2 aka Latin 2 "Eastern European" font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -140,6 +173,8 @@
 	\var B_ISO_8859_3
 
 	ISO 8859-3 aka Latin 3 "South European" font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -147,6 +182,8 @@
 	\var B_ISO_8859_4
 
 	ISO 8859-4 aka Latin 4 "Northern European" font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -154,6 +191,8 @@
 	\var B_ISO_8859_5
 
 	ISO 8859-5 "Latin/Cyrillic" font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -161,6 +200,8 @@
 	\var B_ISO_8859_6
 
 	ISO 8859-6 "Latin/Arabic" font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -168,6 +209,8 @@
 	\var B_ISO_8859_7
 
 	ISO 8859-7 "Latin/Greek" font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -175,6 +218,8 @@
 	\var B_ISO_8859_8
 
 	ISO 8859-8 "Latin/Hebrew" font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -182,6 +227,8 @@
 	\var B_ISO_8859_9
 
 	ISO 8859-9 aka Latin 5 "Latin/Turkish" font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -189,6 +236,8 @@
 	\var B_ISO_8859_10
 
 	ISO 8859-10 aka Latin 6 "Nordic" font encoding.
+
+	\since BeOS R3
 */
 
 
@@ -196,20 +245,26 @@
 	\var B_MACINTOSH_ROMAN
 
 	Macintosh Roman font encoding.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_HAS_TUNED_FONT
 
-	Flags for get_font_family() and get_font_style()
+	Indicates that the font has been adjusted to look good on the screen.
+
+	\since BeOS R4
 */
 
 
 /*!
 	\var B_IS_FIXED
 
-	flags for get_font_family() and get_font_style()
+	Indicates that the font is non-proportional.
+
+	\since BeOS R4
 */
 
 
@@ -217,6 +272,8 @@
 	\var B_ITALIC_FACE
 
 	Italic font face flag.
+
+	\since BeOS R4
 */
 
 
@@ -224,6 +281,8 @@
 	\var B_UNDERSCORE_FACE
 
 	Underscore font face flag.
+
+	\since BeOS R4
 */
 
 
@@ -231,6 +290,8 @@
 	\var B_NEGATIVE_FACE
 
 	Negative font face flag.
+
+	\since BeOS R4
 */
 
 
@@ -238,6 +299,8 @@
 	\var B_OUTLINED_FACE
 
 	Outline font face flag.
+
+	\since BeOS R4
 */
 
 
@@ -245,6 +308,8 @@
 	\var B_STRIKEOUT_FACE
 
 	Strikeout font face flag.
+
+	\since BeOS R4
 */
 
 
@@ -252,6 +317,8 @@
 	\var B_BOLD_FACE
 
 	Bold font face flag.
+
+	\since BeOS R4
 */
 
 
@@ -259,27 +326,35 @@
 	\var B_REGULAR_FACE
 
 	Regular font face flag.
+
+	\since BeOS R4
 */
 
 
 /*!
 	\var B_CONDENSED_FACE
 
-	Condensed font face flag. Not in BeOS 5.
+	Condensed font face flag.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_LIGHT_FACE
 
-	Light font face flag. Not in BeOS 5.
+	Light font face flag.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_HEAVY_FACE
 
-	Heavy font face flag. Not in BeOS 5.
+	Heavy font face flag.
+
+	\since Haiku R1
 */
 
 
@@ -287,18 +362,26 @@
 	\enum font_metric_mode
 
 	Font metric mode, screen or printing.
+
+	\since BeOS R4
 */
+
 
 /*!
 	\var font_metric_mode B_SCREEN_METRIC
 
 	Screen font metric mode.
+
+	\since BeOS R4
 */
+
 
 /*!
 	\var font_metric_mode B_PRINTING_METRIC
 
 	Printing font metric mode.
+
+	\since BeOS R4
 */
 
 
@@ -309,18 +392,26 @@
 	Font file format, TrueType™ or PostScript™ Type1.
 
 	\see BFont::FileFormat()
+
+	\since BeOS R4
 */
+
 
 /*!
 	\var font_file_format B_TRUETYPE_WINDOWS
 
 	TrueType™ font file format.
+
+	\since BeOS R4
 */
+
 
 /*!
 	\var font_file_format B_POSTSCRIPT_TYPE1_WINDOWS
 
 	PostScript™ Type1 font file format.
+
+	\since BeOS R4
 */
 
 
@@ -331,6 +422,8 @@
 	\brief Describes the blocks of Unicode characters supported by a font.
 
 	\see BFont::Blocks()
+
+	\since BeOS R4
 */
 
 
@@ -339,16 +432,20 @@
 	\brief Construct a \c unicode_block and set block data to 0.
 
 	You must initialize the block data before before using this object.
+
+	\since BeOS R4
 */
 
 
 /*!
 	\fn unicode_block::unicode_block(uint64 block2, uint64 block1)
 	\brief Construct a \c unicode_block object and initialize it with the
-		supplied Unicode block range.
+	       supplied Unicode block range.
 
 	\param block2 End block.
 	\param block1 Begin block.
+
+	\since BeOS R4
 */
 
 
@@ -359,14 +456,16 @@
 	\param block The Unicode block to check.
 
 	\returns Whether or not \a block is a subset of the \c unicode_block
-		object.
+	         object.
 	\retval true \a block is a subset of the current \c unicode_block.
 	\retval false \a block is NOT a subset of the current \c unicode_block.
+
+	\since BeOS R4
 */
 
 
 /*!
-	\name Assignment operators
+	\name Operators
 */
 
 
@@ -381,6 +480,8 @@
 	\param block The Unicode block to intersect with.
 
 	\returns The intersection of \a block and the \c unicode_block object.
+
+	\since BeOS R4
 */
 
 
@@ -392,6 +493,8 @@
 	\param block The Unicode block to form a union with.
 
 	\returns The union of \a block and the \c unicode_block object.
+
+	\since BeOS R4
 */
 
 
@@ -402,18 +505,9 @@
 	\param block The unicode block to copy from.
 
 	\returns A copy of \a block.
+
+	\since BeOS R4
 */
-
-
-//! @}
-
-
-/*!
-	\name Comparison operators
-*/
-
-
-//! @{
 
 
 /*!
@@ -424,6 +518,8 @@
 
 	\returns \c true if the block object are exactly equal, \c false
 		otherwise.
+
+	\since BeOS R4
 */
 
 
@@ -435,6 +531,8 @@
 
 	\returns \c true if the block object are NOT equal, \c false
 		if the block objects are exactly equal.
+
+	\since BeOS R4
 */
 
 
@@ -452,6 +550,8 @@
 	get the correct value for the font.
 
 	\see BFont::GetEdges()
+
+	\since BeOS R3
 */
 
 
@@ -460,6 +560,8 @@
 
 	The distance that the character outline is inset from the left
 	escapement boundary.
+
+	\since BeOS R3
 */
 
 
@@ -468,6 +570,8 @@
 
 	The distance that the character outline is inset from the right
 	escapement boundary.
+
+	\since BeOS R3
 */
 
 
@@ -478,6 +582,8 @@
 	\brief The amount of vertical space surrounding a character.
 
 	\see BFont::GetHeight()
+
+	\since BeOS R3
 */
 
 
@@ -485,6 +591,8 @@
 	\var font_height::ascent
 
 	The distance characters can ascend above the baseline.
+
+	\since BeOS R3
 */
 
 
@@ -492,6 +600,8 @@
 	\var font_height::descent
 
 	The distance characters can descend below the baseline.
+
+	\since BeOS R3
 */
 
 
@@ -499,6 +609,8 @@
 	\var font_height::leading
 
 	The distance between lines, descent above to ascent below.
+
+	\since BeOS R3
 */
 
 
@@ -513,6 +625,8 @@
 	value for the font.
 
 	\see BFont::GetEscapements()
+
+	\since BeOS R3
 */
 
 
@@ -520,6 +634,8 @@
 	\var escapement_delta::nonspace
 
 	The amount of horizontal space to surround a visible glyph character with.
+
+	\since BeOS R3
 */
 
 
@@ -528,6 +644,8 @@
 
 	The amount of horizontal space to surround a whitespace character with, for
 	example \c B_TAB or \c B_SPACE.
+
+	\since BeOS R3
 */
 
 
@@ -536,6 +654,8 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief Font cache parameters.
+
+	\since BeOS R3
 */
 
 
@@ -543,6 +663,8 @@
 	\var font_cache_info::sheared_font_penalty
 
 	Sheared font penalty.
+
+	\since BeOS R3
 */
 
 
@@ -550,6 +672,8 @@
 	\var font_cache_info::rotated_font_penalty
 
 	Rotated font penalty.
+
+	\since BeOS R3
 */
 
 
@@ -557,6 +681,8 @@
 	\var font_cache_info::oversize_threshold
 
 	Oversize threshold.
+
+	\since BeOS R3
 */
 
 
@@ -564,12 +690,17 @@
 	\var font_cache_info::oversize_penalty
 
 	Oversize penalty.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var font_cache_info::cache_size
 
 	Cache size.
+
+	\since BeOS R3
 */
 
 
@@ -577,6 +708,8 @@
 	\var font_cache_info::spacing_size_threshold
 
 	Spacing size threshold.
+
+	\since BeOS R3
 */
 
 
@@ -589,6 +722,8 @@
 
 	\see BFont::GetTunedInfo()
 	\see BFont::CountTuned()
+
+	\since BeOS R3
 */
 
 
@@ -596,6 +731,8 @@
 	\var tuned_font_info::size
 
 	Font size.
+
+	\since BeOS R3
 */
 
 
@@ -603,6 +740,8 @@
 	\var tuned_font_info::shear
 
 	Font shear.
+
+	\since BeOS R3
 */
 
 
@@ -610,6 +749,8 @@
 	\var tuned_font_info::rotation
 
 	Font rotation.
+
+	\since BeOS R3
 */
 
 
@@ -617,12 +758,17 @@
 	\var tuned_font_info::flags
 
 	Font flags.
+
+	\since BeOS R3
 */
+
 
 /*!
 	\var tuned_font_info::face
 
 	Font face.
+
+	\since BeOS R3
 */
 
 
@@ -631,6 +777,8 @@
 	\brief Gets the number of installed font families
 
 	\return The number of installed font families
+
+	\since BeOS R3
 */
 
 
@@ -639,6 +787,8 @@
 	\brief Gets the number of styles available for a font family.
 
 	\return The number of styles available for a font family.
+
+	\since BeOS R3
 */
 
 
@@ -655,6 +805,8 @@
 	\return A status code, \c B_OK on success or an error code.
 	\retval B_BAD_VALUE \a _name is \c NULL.
 	\retval B_ERROR \a index does not correspond to a font family.
+
+	\since BeOS R3
 */
 
 
@@ -671,6 +823,8 @@
 
 	\return A status code, \c B_OK on success or an error code.
 	\retval B_ERROR \a index does not correspond to a font style.
+
+	\since BeOS R3
 */
 
 
@@ -692,6 +846,8 @@
 
 	\return A status code, \c B_OK on success or an error code.
 	\retval B_ERROR \a index does not correspond to a font style.
+
+	\since BeOS R3
 */
 
 
@@ -702,6 +858,8 @@
 	\param checkOnly Parameter is ignored.
 
 	\return \c true if the font list has changed, \c false if not.
+
+	\since BeOS R3
 */
 
 
@@ -752,6 +910,8 @@
 
 	You can also perform intelligent string truncation with the
 	TruncateString() and GetTruncatedStrings() methods.
+
+	\since BeOS R3
 */
 
 
@@ -760,32 +920,40 @@
 	\brief Creates a BFont object initialized to \c be_plain_font.
 
 	\see BView::GetFont()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BFont::BFont(const BFont &font)
+	\fn BFont::BFont(const BFont& font)
 	\brief Creates and initializes a BFont object from another BFont object.
 
 	\param font The BFont object to initialize from.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BFont::BFont(const BFont *font)
+	\fn BFont::BFont(const BFont* font)
 	\brief Creates and initializes a BFont object from a pointer to a BFont
-		object.
+	       object.
 
 	\param font The pointer to a BFont object to initialize from.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BFont::BFont(const BFont *font)
+	\fn BFont::BFont(const BFont* font)
 	\brief Creates and initializes a BFont object from a pointer to a BFont
-		object.
+	       object.
 
 	\param font The pointer to a BFont object to initialize from.
+
+	\since BeOS R3
 */
 
 
@@ -800,6 +968,8 @@
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_BAD_VALUE \a family is \c NULL and \a style is \c NULL.
 	\retval B_NAME_NOT_FOUND Family or style do not exist.
+
+	\since BeOS R3
 */
 
 
@@ -808,6 +978,8 @@
 	\brief Sets the font's family and style from a font identifier.
 
 	\param code Unique font identifier obtained from the server.
+
+	\since BeOS R3
 */
 
 
@@ -825,6 +997,8 @@
 
 	\returns A status code, \c B_OK on success or an error code.
 	\retval B_ERROR Family does not exists or face has an invalid value.
+
+	\since BeOS R4
 */
 
 
@@ -833,6 +1007,8 @@
 	\brief Sets the font size.
 
 	\param size The point size to set the font to.
+
+	\since BeOS R3
 */
 
 
@@ -844,6 +1020,8 @@
 	range is from 45.0° to 135.0°.
 
 	\param shear The shear in degrees to set the font to.
+
+	\since BeOS R3
 */
 
 
@@ -855,6 +1033,8 @@
 	supported by BTextView.
 
 	\param rotation The rotation in degrees to set the font to.
+
+	\since BeOS R3
 */
 
 
@@ -863,6 +1043,8 @@
 	\brief Sets the false bold width.
 
 	\param width The false bold width to set.
+
+	\since Haiku R1
 */
 
 
@@ -894,6 +1076,8 @@
 
 	\see BView::DrawString()
 	\see GetEscapements()
+
+	\since BeOS R3
 */
 
 
@@ -939,6 +1123,8 @@
 	the values representing the keys that the user presses.
 
 	\param encoding The character encoding to set the font to.
+
+	\since BeOS R3
 */
 
 
@@ -960,6 +1146,8 @@
 	- \c B_HEAVY_FACE Characters are drawn heavier than normal. Not in BeOS 5.
 
 	\param face The bitmap of font face flags to set.
+
+	\since BeOS R3
 */
 
 
@@ -972,11 +1160,13 @@
 	- \c B_FORCE_ANTIALIASING Force antialiasing.
 
 	\param flags The bitmap of flags to set.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BFont::GetFamilyAndStyle(font_family *family,
+	\fn void BFont::GetFamilyAndStyle(font_family* family,
 		font_style *style) const
 	\brief Writes out the name of the font family and/or font style.
 
@@ -985,6 +1175,8 @@
 
 	\param family A font_family pointer to be filled out.
 	\param style  A font_style pointer to be filled out.
+
+	\since BeOS R3
 */
 
 
@@ -995,6 +1187,8 @@
 	\returns The family and style combination encoded as a unique integer.
 
 	\see SetFamilyAndStyle(uint32 code)
+
+	\since BeOS R3
 */
 
 
@@ -1005,6 +1199,8 @@
 	\returns The font size in points.
 
 	\see SetSize()
+
+	\since BeOS R3
 */
 
 
@@ -1015,6 +1211,8 @@
 	\returns The font shear as an angle from 45.0° to 135.0°.
 
 	\see SetShear()
+
+	\since BeOS R3
 */
 
 
@@ -1025,6 +1223,8 @@
 	\returns The font rotation as an angle in degrees.
 
 	\see SetRotation()
+
+	\since BeOS R3
 */
 
 
@@ -1035,6 +1235,8 @@
 	\returns The font width of the bold font variety.
 
 	\see SetFalseBoldWidth()
+
+	\since Haiku R1
 */
 
 
@@ -1045,6 +1247,8 @@
 	\returns The spacing constant.
 
 	\see SetSpacing()
+
+	\since BeOS R3
 */
 
 
@@ -1055,6 +1259,8 @@
 	\returns The character encoding constant.
 
 	\see SetEncoding()
+
+	\since BeOS R3
 */
 
 
@@ -1065,6 +1271,8 @@
 	\returns The font face flags bitmap.
 
 	\see SetFace()
+
+	\since BeOS R3
 */
 
 
@@ -1075,6 +1283,8 @@
 	\returns The antialiasing flags.
 
 	\see SetFlags()
+
+	\since BeOS R3
 */
 
 
@@ -1083,6 +1293,8 @@
 	\brief Gets the font direction, left-to-right or right-to left.
 
 	\returns The font direction.
+
+	\since BeOS R3
 */
 
 
@@ -1091,6 +1303,8 @@
 	\brief Gets whether or not the font is fixed width.
 
 	\returns \c true if the font is fixed width, \c false otherwise.
+
+	\since BeOS R4
 */
 
 
@@ -1100,7 +1314,9 @@
 		full and half-width characters.
 
 	\note This was left unimplemented as of R5. It is a way to work with both
-		Kanji and Roman characters in the same fixed-width font.
+	      Kanji and Roman characters in the same fixed-width font.
+
+	\since BeOS R4
 */
 
 
@@ -1109,18 +1325,22 @@
 	\brief Gets a BRect that encloses the font text.
 
 	\returns A BRect that encloses the font text.
+
+	\since BeOS R4
 */
 
 
 /*!
 	\fn unicode_block BFont::Blocks() const
 	\brief Gets a \c unicode_block object that identifies the Unicode blocks
-		supported by this font face and family.
+	       supported by this font face and family.
 
 	\attention Currently unimplemented, returns an empty \a unicode_block
-		object.
+	           object.
 
 	\returns A \c unicode_block object containing supported Unicode blocks.
+
+	\since BeOS R4
 */
 
 
@@ -1129,6 +1349,8 @@
 	\brief Gets whether the font is a TrueType™ or PostScript™ Type1 font.
 
 	\returns A \c font_file_format struct containing the font file format.
+
+	\since BeOS R4
 */
 
 
@@ -1137,6 +1359,8 @@
 	\brief Gets the number of tuned fonts for the font family and style.
 
 	\returns The number of tuned fonts.
+
+	\since BeOS R3
 */
 
 
@@ -1149,6 +1373,8 @@
 
 	\param index The index of desired tuned font.
 	\param info The \a turned_font_info struct to be filled out.
+
+	\since BeOS R3
 */
 
 
@@ -1156,7 +1382,7 @@
 	\fn void BFont::TruncateString(BString *inOut, uint32 mode,
 		float width) const
 	\brief Truncates \a inOut to be no longer than \a width using the
-		supplied truncation \a mode.
+	       supplied truncation \a mode.
 
 	The following truncation modes are supported:
 	- \c B_TRUNCATE_BEGINNING Truncate from the beginning of the string.
@@ -1168,6 +1394,8 @@
 	\param inOut The BString to truncate.
 	\param mode Truncation mode to use.
 	\param width The maximum width to truncate to.
+
+	\since BeOS R5
 */
 
 
@@ -1176,20 +1404,22 @@
 		int32 numStrings, uint32 mode, float width,
 		BString resultArray[]) const
 	\brief Write truncated BString objects to \a resultArray given source
-		BString objects in \a stringArray.
+	       BString objects in \a stringArray.
 
 	The following truncation modes are supported:
 	- \c B_TRUNCATE_BEGINNING Truncate from the beginning of the string.
 	- \c B_TRUNCATE_MIDDLE Truncate from the middle of the string.
 	- \c B_TRUNCATE_END Truncate from the end of the string.
 	- \c B_TRUNCATE_SMART Truncate from anywhere, but do so so that each
-		string is made unique after being truncated.
+	     string is made unique after being truncated.
 
 	\param stringArray The source string array.
 	\param numStrings The number of strings in \a stringArray.
 	\param mode Truncation mode to use.
 	\param width The maximum width to truncate to.
 	\param resultArray The destination string array.
+
+	\since BeOS R5
 */
 
 
@@ -1197,7 +1427,7 @@
 	\fn void BFont::GetTruncatedStrings(const char *stringArray[],
 		int32 numStrings, uint32 mode, float width, char *resultArray[]) const
 	\brief Write truncated strings to \a resultArray given source
-		BString objects in \a stringArray.
+	       BString objects in \a stringArray.
 
 	\a resultArray is an array of pointers to string buffers which should be
 	allocated ahead of time and should be at least 3 bytes longer than the
@@ -1212,36 +1442,42 @@
 	- \c B_TRUNCATE_MIDDLE Truncate from the middle of the string.
 	- \c B_TRUNCATE_END Truncate from the end of the string.
 	- \c B_TRUNCATE_SMART Truncate from anywhere, but do so so that each
-		string is made unique after being truncated.
+	     string is made unique after being truncated.
 
 	\param stringArray The source string array.
 	\param numStrings The number of strings in \a stringArray.
 	\param mode Truncation mode to use.
 	\param width The maximum width to truncate to.
 	\param resultArray The destination string array.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn float BFont::StringWidth(const char *string) const
 	\brief Determines the amount of space required to draw \a string in the
-		current font.
+	       current font.
 
 	\param string The source string.
 
 	\returns The width required to draw the string.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn float BFont::StringWidth(const char *string, int32 length) const
 	\brief Determines the amount of space required to draw \a string in the
-		current font up to \a length characters.
+	       current font up to \a length characters.
 
 	\param string The source string.
 	\param length The number of characters in \a string to consider.
 
 	\returns The width required to draw the string.
+
+	\since BeOS R3
 */
 
 
@@ -1249,7 +1485,7 @@
 	\fn void BFont::GetStringWidths(const char *stringArray[],
 		const int32 lengthArray[], int32 numStrings, float widthArray[]) const
 	\brief Determines the amount of space required to draw each string in
-		\a stringArray and writes the result in \a widthArray.
+	       \a stringArray and writes the result in \a widthArray.
 
 	\param stringArray The source string array.
 	\param lengthArray The number of characters to consider for each string in
@@ -1257,6 +1493,8 @@
 	\param numStrings The number of strings in \a stringArray.
 	\param widthArray The destination array to put the widths required to draw
 		each string.
+
+	\since BeOS R3
 */
 
 
@@ -1269,12 +1507,14 @@
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
 	\param escapementArray The destination array to put the escapements.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BFont::GetEscapements(const char charArray[], int32 numChars,
-		escapement_delta *delta, float escapementArray[]) const
+		escapement_delta* delta, float escapementArray[]) const
 	\brief Determines the escapements for each char in \a charArray and writes
 		the result in \a escapementArray with consideration to the horizontal
 		space provided by the escapement \a delta.
@@ -1289,6 +1529,8 @@
 	\param numChars The number of characters to consider in \a charArray.
 	\param delta The escapement_delta structure to use.
 	\param escapementArray The destination array to put the escapements.
+
+	\since BeOS R3
 */
 
 
@@ -1311,6 +1553,8 @@
 	\param delta The escapement_delta structure to use.
 	\param escapementArray The destination array of escapements as BPoint
 		objects.
+
+	\since BeOS R4
 */
 
 
@@ -1335,6 +1579,8 @@
 	\param escapementArray The destination array of escapements as BPoint
 		objects.
 	\param offsetArray The destination array of offsets as BPoint objects.
+
+	\since BeOS R4
 */
 
 
@@ -1353,6 +1599,8 @@
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
 	\param edgeArray The destination array of \c edge_info structs.
+
+	\since BeOS R3
 */
 
 
@@ -1367,6 +1615,8 @@
 	- \c leading The distance between lines, descent above to ascent below.
 
 	\param _height The \c font_height struct to fill out.
+
+	\since BeOS R3
 */
 
 
@@ -1387,6 +1637,8 @@
 	\param numChars The number of characters to consider in \a charArray.
 	\param mode The \c font_metric_mode to use, screen or printing.
 	\param boundingBoxArray The destination array of BRect bounding boxes.
+
+	\since BeOS R4
 */
 
 
@@ -1420,6 +1672,8 @@
 	\param mode The \c font_metric_mode to use, screen or printing.
 	\param delta The escapement_delta structure to use.
 	\param boundingBoxArray The destination array of BRect bounding boxes.
+
+	\since BeOS R4
 */
 
 
@@ -1453,6 +1707,8 @@
 	\param mode The \c font_metric_mode to use, screen or printing.
 	\param deltas The array of escapement_delta structures to use.
 	\param boundingBoxArray The destination array of BRect bounding boxes.
+
+	\since BeOS R4
 */
 
 
@@ -1468,6 +1724,8 @@
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
 	\param glyphShapeArray The destination array of BShape glyphs.
+
+	\since BeOS R4
 */
 
 
@@ -1484,6 +1742,8 @@
 	\param charArray The source character array.
 	\param numChars The number of characters to consider in \a charArray.
 	\param hasArray The destination array of booleans.
+
+	\since BeOS R4
 */
 
 
@@ -1492,6 +1752,8 @@
 	\brief Assignment overload method.
 
 	\param font The BFont object to assign from.
+
+	\since BeOS R3
 */
 
 
@@ -1502,6 +1764,8 @@
 	\param font The BFont object to compare the current font to.
 
 	\returns \c true if the fonts objects are identical, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -1513,6 +1777,8 @@
 
 	\returns \c true if the fonts objects are NOT identical, \c true
 		otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -1523,4 +1789,6 @@
 	printf("BFont { %s (%d), %s (%d) 0x%x %f/%f %fpt (%f %f %f), %d }\n",
 		family, fFamilyID, style, fStyleID, fFace, fShear, fRotation, fSize,
 		fHeight.ascent, fHeight.descent, fHeight.leading, fEncoding);
+
+	\since BeOS R3
 */

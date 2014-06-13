@@ -25,6 +25,8 @@
 	\ingroup libbe
 	\brief A list item of a text string used as a member of a BListView
 	       or BOutlineListView.
+
+	\since BeOS R3
 */
 
 
@@ -37,7 +39,10 @@
 
 	\param text The \a text to display.
 	\param level The \a level of the item in a BOutlineListView.
-	\param expanded Whether or not the item is \a expanded in a BOutlineListView.
+	\param expanded Whether or not the item is \a expanded in a
+	       BOutlineListView.
+
+	\since BeOS R3
 */
 
 
@@ -46,13 +51,25 @@
 	\brief Archive constructor.
 
 	\param archive The message \a archive to construct the string item from.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BStringItem::~BStringItem()
 	\brief Destructor, frees the memory used by the string.
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
 
 
 /*!
@@ -61,6 +78,8 @@
 
 	\return A newly created BStringItem object or \c NULL if the message
 	        doesn't contain an archived BStringItem.
+
+	\since BeOS R3
 */
 
 
@@ -75,7 +94,12 @@
 	        otherwise.
 	\retval B_OK The object was archived successfully.
 	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
 */
+
+
+//! @}
 
 
 /*!
@@ -100,6 +124,8 @@
 
 	\sa IsSelected()
 	\sa IsEnabled()
+
+	\since BeOS R3
 */
 
 
@@ -109,6 +135,8 @@
 	       old string is freed.
 
 	\param text The \a text string to set in a C-string.
+
+	\since BeOS R3
 */
 
 
@@ -117,6 +145,8 @@
 	\returns The text set to the item.
 
 	\returns the text set to the item as a C-string.
+
+	\since BeOS R3
 */
 
 
@@ -131,6 +161,8 @@
 
 	\param owner The list item's new \a owner.
 	\param font The font set to the list item's current \a owner.
+
+	\since BeOS R3
 */
 
 
@@ -145,4 +177,6 @@
 	This may be overridden by derived classes to set the base line offset.
 
 	\returns The offset to the baseline of the text as a float.
+
+	\since Haiku R1
 */

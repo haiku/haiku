@@ -1,0 +1,580 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/ScrollBar.h	 hrev47312
+ *		src/kits/interface/ScrollBar.cpp	 hrev47312
+ */
+
+
+/*!
+	\file ScrollBar.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BScrollBar class definition.
+	\since BeOS R3
+*/
+
+
+/*!
+	\class BScrollBar
+	\ingroup interface
+	\ingroup libbe
+	\brief User interface element used to scroll a target view vertically or
+	       horizontally.
+
+	Scroll bars are usually added as siblings of the target view, that way
+	when the parent is resized the target view and scroll bars can be resized
+	as well. The BScrollView class conveniently provides such a container view
+	adding the scroll bars and target view making itself the parent.
+
+	Scroll bars control the target view, but a target can also be scrolled
+	independently by calling BView::ScrollTo() or BView::ScrollBy().
+	When a target view is set to a BScrollBar, the view is notified and stores
+	a pointer to the BScrollBar object so that it can communicate its scroll
+	information back to the scroll bar.
+
+	\sa BView::ScrollTo()
+	\sa BView::ScrollBy()
+	\sa BView::ScrollBar()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BScrollBar::BScrollBar(BRect frame, const char* name, BView* target,
+		float min, float max, orientation direction)
+	\brief Instantiates a new scroll bar and connects it to the \a target
+	       view.
+
+	The \a frame rectangle defines the location and size of the scroll bar
+	within its parent view. A horizontal scroll bar should be
+	\c B_H_SCROLL_BAR_HEIGHT pixels high, and a vertical scroll bar should be
+	\c B_V_SCROLL_BAR_WIDTH pixels wide.
+
+	Unlike most BView derived constructors in the Interface Kit this method
+	doesn't provide a resizing mode. Scroll bars are assigned a resizing
+	behavior based on their \a direction. Horizontal scroll bars resize
+	themselves horizontally (\c B_FOLLOW_LEFT_RIGHT | \c B_FOLLOW_BOTTOM) and
+	vertical scroll bars resize themselves vertically
+	(\c B_FOLLOW_TOP_BOTTOM | \c B_FOLLOW_RIGHT).
+
+	\param frame The \a frame rectangle of the scroll bar.
+	\param name The name of the scroll bar, can be \c NULL.
+	\param target The \a target view to scroll, can be \c NULL.
+	\param min The \a min scroll value.
+	\param max The \a max scroll value.
+	\param direction The scroll \a direction. Either \c B_HORIZONTAL
+	       or \c B_VERTICAL.
+
+	\sa SetTarget() to set the \a target.
+	\sa SetRange() to set the \a min and \a max values.
+	\sa SetOrientation() to set the scroll bar \a direction.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BScrollBar::BScrollBar(const char* name, BView* target,
+		float min, float max, orientation direction)
+	\brief Instantiates a new scroll bar to be used as part of a layout and
+	       connects it to the \a target view.
+
+	\param name The name of the scroll bar, can be \c NULL.
+	\param target The \a target view to scroll, can be \c NULL.
+	\param min The \a min scroll value.
+	\param max The \a max scroll value.
+	\param direction The scroll \a direction. Either \c B_HORIZONTAL
+	       or \c B_VERTICAL.
+
+	\sa SetTarget() to set the \a target.
+	\sa SetRange() to set the \a min and \a max values.
+	\sa SetOrientation() to set the scroll bar \a direction.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BScrollBar::BScrollBar(BMessage* data)
+	\brief Archive constructor.
+
+	\param data The message \a data to construct the scroll bar from.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BScrollBar::~BScrollBar()
+	\brief Destructor method.
+
+	Deletes the scroll bar, sets the target to \c NULL and frees any
+	memory used.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BArchivable* BScrollBar::Instantiate(BMessage* data)
+	\brief Creates a new BScrollBar object from the \a data message.
+
+	\return A newly created scroll bar or \c NULL if the message doesn't
+	        contain an archived BScrollBar object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BScrollBar::Archive(BMessage* data, bool deep) const
+	\brief Archives the object into the \a data message.
+
+	\param data A pointer to the BMessage object to archive the object into.
+	\param deep Whether or not to archive child views as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BScrollBar::SetValue(float value)
+	\brief Sets the value of the scroll bar scrolling the scroll thumb and
+	       target view accordingly.
+
+	Setting the \a value programmatically using this method causes the
+	ValueChanged() method to be called.
+
+	Derived classes can override this method to do something different than
+	scrolling the target view.
+
+	\param value The value to set the scroll bar value to, rounded to the
+	       nearest integer.
+
+	\sa ValueChanged()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn float BScrollBar::Value() const
+	\brief Returns the scroll bar's value.
+
+	\return The scroll bar's value as a float.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BScrollBar::SetProportion(float value)
+	\brief Set the ratio of the size of a scroll knob to the scroll bar.
+
+	\note If \a value is outside the range 0.0 to 1.0 it is clipped
+	      to that range.
+
+	\param value a number between 0.0 and 1.0 that represents the proportion of
+	       the document that can be displayed within the target view.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn float BScrollBar::Proportion() const
+	\brief Returns the ratio of the size of a scroll knob to the scroll bar.
+
+	\return A value between 0.0 and 1.0 as a float.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BScrollBar::SetRange(float min, float max)
+	\brief Set the range of values that the scroll bar represents from \a min to
+	       \a max.
+
+	These values should be calculated from the enclosing bounds of the target view.
+	If \a min and \a max are both 0 the scroll bar is disabled and the knob is not
+	drawn.
+
+	If the range changes such that the value is clipped SetValue() is called which
+	triggers ValueChanged() to be triggered.
+
+	\param min The \a min value of the range, rounded to the nearest integer.
+	\param max The \a max value of the range, rounded to the nearest integer.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BScrollBar::GetRange(float* min, float* max) const
+	\brief Fills out \a min and \a max with the minimum and maximum range values.
+
+	\remark Either \a min or \a max may be set to \c NULL if you only want to get
+	        the other one.
+
+	\param min A pointer to a float to be filled out with the \a min value.
+	\param max A pointer to a float to be filled out with the \a max value.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BScrollBar::SetSteps(float smallStep, float largeStep)
+	\brief Sets how far the scroll bar moves when it is scrolled.
+
+	\note In BeOS R5, steps can be set only after the scroll bar is attached
+	      to a window, probably because the data is kept server-side, in Haiku
+	      this limitation has been removed.
+
+	\note The BeBook also says that we need to specify an integral value even
+	      though the step values are floats, in Haiku we round the values
+	      instead.
+
+	\param smallStep The value to move the scroll bar under normal conditions.
+	\param largeStep The value to move the scroll bar taking a large step,
+	       this is usually triggered by holding down the \key{Shift} key while
+	       scrolling.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BScrollBar::GetSteps(float* smallStep, float* largeStep) const
+	\brief Fills out \a smallStop and \a largeStep with the small and large
+	       step values respectively.
+
+	\remark Either \a smallStep or \a largeStep may be set to \c NULL if you
+	        only want to get the other one.
+
+	\param smallStep A pointer to a float to be filled out with the small step
+	       value.
+	\param largeStep A pointer to a float to be filled out with the large step
+	       value.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BScrollBar::SetTarget(BView* target)
+	\brief Sets the \a target view that the scroll bar operates on unsetting
+	       the previous target.
+
+	\param target The \a target view to set.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BScrollBar::SetTarget(const char* targetName)
+	\brief Sets the target view to the view identified by \a targetName
+	       unsetting the previous target.
+
+	\note The BeOS R5 implementation crashes for \a targetName == \c NULL
+	      and also does not modify the target if it can't be found.
+
+	\param targetName The name of the view to target.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BView* BScrollBar::Target() const
+	\brief Returns a pointer to the target view.
+
+	\return A pointer to a BView object that represents the target view or
+	        \c NULL if the target is not set.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BScrollBar::SetOrientation(orientation direction)
+	\brief Sets the \a direction of the scroll view.
+
+	\param direction Either \a B_HORIZONTAL or \a B_VERTICAL.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn orientation BScrollBar::Orientation() const
+	\brief Returns the direction of the scroll bar.
+
+	\return Either \a B_HORIZONTAL or \a B_VERTICAL.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BScrollBar::SetBorderHighlighted(bool highlight)
+	\brief Highlights or unhighlights the border of the scroll bar.
+
+	\param highlight \c true to turn highlighting on, \c false to remove it.
+
+	\return If successful returns \c B_OK, otherwise, returns \c B_ERROR.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BScrollBar::AllAttached()
+	\copydoc BView::AllAttached()
+*/
+
+
+/*!
+	\fn void BScrollBar::AllDetached()
+	\copydoc BView::AllDetached()
+*/
+
+
+/*!
+	\fn void BScrollBar::AttachedToWindow()
+	\brief Hook method called when the scroll bar is attached to a window.
+
+	This method does nothing, unlike in BeOS R5. In BeOS scroll bars were
+	implemented directly in the App Server, the client BScrollBar was just a
+	proxy which needed to be synced up on AttachedToWindow(). On Haiku, scroll
+	bars are implemented more sanely and thus don't need to do this.
+
+	\copydetails BView::AttachedToWindow()
+*/
+
+
+/*!
+	\fn void BScrollBar::DetachedFromWindow()
+	\copydoc BView::DetachedFromWindow()
+*/
+
+
+/*!
+	\fn void BScrollBar::Draw(BRect updateRect)
+	\brief Draws the area of the scroll bar that intersects \a updateRect.
+
+	\param updateRect The rectangular area to be drawn.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BScrollBar::FrameMoved(BPoint newPosition)
+	\brief Hook method called when the scroll bar is moved.
+
+	\copydetails BView::FrameMoved()
+*/
+
+
+/*!
+	\fn void BScrollBar::FrameResized(float newWidth, float newHeight)
+	\brief Hook method called when the scroll bar is resized.
+
+	\copydetails BView::FrameResized()
+*/
+
+
+/*!
+	\fn void BScrollBar::MessageReceived(BMessage* message)
+	\brief Handle \a message received by the associated looper.
+
+	Calls ValueChanged() in response to \c B_VALUE_CHANGED.
+	Scrolls the view in response to \c B_MOUSE_WHEEL_CHANGED.
+
+	\copydetails BView::MessageReceived()
+*/
+
+
+/*!
+	\fn void BScrollBar::MouseDown(BPoint where)
+	\brief Hook method called when a mouse button is pressed.
+
+	Begins scrolling the target view in response to a mouse click. If the
+	user clicked the scroll bar thumb this begins scrolling and continues
+	in MouseMoved() ending on MouseUp(). If the user clicked on one of the
+	scroll arrows the view is scrolled a small amount, if the user clicks
+	on an area of the scroll view outside the arrows and thumb the view is
+	scrolled by a larger amount.
+
+	\copydetails BView::MouseDown()
+*/
+
+
+/*!
+	\fn void BScrollBar::MouseMoved(BPoint where, uint32 code,
+		const BMessage* dragMessage)
+	\brief Hook method called when the mouse is moved.
+
+	If the user clicked on the scroll bar thumb the view is scrolled as the user
+	moves the mouse up and down or left and right.
+
+	\copydetails BView::MouseMoved()
+*/
+
+
+/*!
+	\fn void BScrollBar::MouseUp(BPoint where)
+	\brief Hook method called when a mouse button is released.
+
+	Finishes scrolling and redraws the scroll bar if necessary.
+
+	\copydetails BView::MouseUp()
+*/
+
+
+/*!
+	\fn void BScrollBar::ValueChanged(float newValue)
+	\brief Hook method called when the value of the scroll bar changes.
+
+	\param newValue The new scroll bar value.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BScrollBar::WindowActivated(bool active)
+	\copydoc BView::WindowActivated()
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BScrollBar::ResizeToPreferred()
+	\copydoc BView::ResizeToPreferred()
+*/
+
+
+/*!
+	\fn void BScrollBar::GetPreferredSize(float* _width, float* _height)
+	\brief Fill out the preferred width and height of the scroll bar
+	       into the \a _width and \a _height parameters.
+
+	\copydetails BView::GetPreferredSize()
+*/
+
+
+/*!
+	\fn void BScrollBar::MakeFocus(bool focus)
+	\brief Makes the scroll bar the current focus view of the window or gives up
+	       being the window's focus view.
+
+	\copydetails BView::MakeFocus()
+*/
+
+
+/*!
+	\fn BSize BScrollBar::MinSize()
+	\brief Return the scroll bar's minimum size.
+
+	\return The minimum size of the scroll bar as a BSize.
+
+	\sa BAbstractLayout::MinSize()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSize BScrollBar::MaxSize()
+	\brief Return the scroll bar's maximum size.
+
+	\return The maximum size of the scroll bar as a BSize.
+
+	\sa BAbstractLayout::MaxSize()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSize BScrollBar::PreferredSize()
+	\brief Return the scroll bar's preferred size.
+
+	\return The preferred size of the scroll bar as a BSize.
+
+	\sa BAbstractLayout::PreferredSize()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BScrollBar::Perform(perform_code code, void* _data)
+	\brief Perform some action. (Internal Method)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Scripting
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BScrollBar::GetSupportedSuites(BMessage* message)
+	\brief Reports the suites of messages and specifiers understood by the
+	       scroll bar.
+
+	\copydetails BView::GetSupportedSuites()
+*/
+
+
+/*!
+	\fn BHandler* BScrollBar::ResolveSpecifier(BMessage* message, int32 index,
+		BMessage* specifier, int32 what, const char* property)
+	\brief Determine the proper handler for a scripting message.
+
+	\copydetails BView::ResolveSpecifier()
+*/
+
+
+//! @}

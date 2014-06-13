@@ -40,6 +40,8 @@
 	determine what action takes place when each radio button is selected, if
 	any. The message is sent only when a radio button is turned on, not when
 	it is turned off.
+
+	\since BeOS R3
 */
 
 
@@ -64,6 +66,8 @@
 	\param resizingMode Defines the behavior of the radio button as the parent
 		view resizes. See BView for details.
 	\param flags Behavior flags for the radio button. See BView for details.
+
+	\since BeOS R3
 */
 
 
@@ -81,6 +85,8 @@
 	\param message The \a message to send when the radio button is activated,
 	       can be \c NULL.
 	\param flags Behavior flags for the checkbox. See BView for details.
+
+	\since Haiku R1
 */
 
 
@@ -96,6 +102,8 @@
 	       can be \c NULL.
 	\param message The \a message to send when the radio button is activated,
 	       can be \c NULL.
+
+	\since Haiku R1
 */
 
 
@@ -108,12 +116,16 @@
 	instead because it can handle errors properly.
 
 	\param archive The message to construct the BRadioButton object from.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BRadioButton::~BRadioButton()
 	\brief Destructor, does nothing.
+
+	\since BeOS R3
 */
 
 
@@ -131,6 +143,8 @@
 
 	\return A newly created radio button or \c NULL if the message doesn't
 	        contain an archived BRadioButton.
+
+	\since BeOS R3
 */
 
 
@@ -145,6 +159,8 @@
 	        otherwise.
 
 	\sa BControl::Archive()
+
+	\since BeOS R3
 */
 
 
@@ -160,12 +176,22 @@
 
 
 /*!
+	\fn void BRadioButton::AllAttached()
+	\copydoc BView::AllAttached()
+*/
+
+
+/*!
+	\fn void BRadioButton::AllDetached()
+	\copydoc BView::AllDetached()
+*/
+
+
+/*!
 	\fn void BRadioButton::AttachedToWindow()
 	\brief Hook method called when the control is attached to a window.
 
-	The default implementation does nothing.
-
-	\sa BControl::AttachedToWindow()
+	\copydetails BControl::AttachedToWindow()
 */
 
 
@@ -173,31 +199,7 @@
 	\fn void BRadioButton::DetachedFromWindow()
 	\brief Hook method called when the control is detached from a window.
 
-	The default implementation does nothing.
-
-	\sa BControl::DetachedFromWindow()
-*/
-
-
-/*!
-	\fn void BRadioButton::AllAttached()
-	\brief Similar to AttachedToWindow() but this method is triggered after
-	       all child views have already been attached to a window.
-
-	The default implementation does nothing.
-
-	\sa BView::AllAttached()
-*/
-
-
-/*!
-	\fn void BRadioButton::AllDetached()
-	\brief Similar to AttachedToWindow() but this method is triggered after
-	       all child views have already been detached from a window.
-
-	The default implementation does nothing.
-
-	\sa BView::AllDetached()
+	\copydetails BControl::DetachedFromWindow()
 */
 
 
@@ -212,6 +214,8 @@
 	\param updateRect The rectangular area to be drawn.
 
 	\sa BView::Draw()
+
+	\since BeOS R3
 */
 
 
@@ -219,24 +223,15 @@
 	\fn void BRadioButton::FrameMoved(BPoint newPosition)
 	\brief Hook method called when the radio button is moved.
 
-	The default implementation does nothing.
-
-	\param newPosition The point that the radio button has been moved to.
-
-	\sa BView::FrameMoved()
+	\copydetails BView::FrameMoved()
 */
 
 
 /*!
-	\fn void BRadioButton::FrameResized(float width, float height)
+	\fn void BRadioButton::FrameResized(float newWidth, float newHeight)
 	\brief Hook method called when the radio button is resized.
 
-	The default implementation does nothing.
-
-	\param width The new \a width of the radio button.
-	\param height The new \a height of the radio button.
-
-	\sa BView::FrameResized()
+	\copydetails BView::FrameResized()
 */
 
 
@@ -247,8 +242,7 @@
 	Overrides \c B_RETURN and \c B_SPACE from BControl to toggle the value,
 	but don't allow turning the control off, only on.
 
-	\param bytes The bytes of the key combination pressed.
-	\param numBytes The number of bytes in \a bytes.
+	\copydetails BControl::KeyDown()
 */
 
 
@@ -256,11 +250,7 @@
 	\fn void BRadioButton::MessageReceived(BMessage* message)
 	\brief Handle \a message received by the associated looper.
 
-	The default implemenation does nothing.
-
-	\param message The \a message received by the associated looper.
-
-	\see BControl::MessageReceived()
+	\copydetails BControl::MessageReceived()
 */
 
 
@@ -270,8 +260,7 @@
 
 	Begins tracking the mouse cursor.
 
-	\param where The point on the screen where to mouse pointer is when
-	       the mouse button is pressed.
+	\copydetails BControl::MouseDown()
 */
 
 
@@ -283,19 +272,7 @@
 	Once MouseDown() has been called on a radio button this method updates
 	the outline when the cursor is inside the control redrawing as necessary.
 
-	\param where The new location of the mouse in the control's coordinate system.
-	\param code One of the following:
-	- \c B_ENTERED_VIEW The cursor has just entered the control.
-	- \c B_INSIDE_VIEW The cursor is inside the control.
-	- \c B_EXITED_VIEW The cursor has left the control's bounds. This only gets
-	     sent if the scope of the mouse events that the control can receive has
-	     been expanded by BView::SetEventMask() or BView::SetMouseEventMask().
-	- \c B_OUTSIDE_VIEW The cursor is outside the button. This only gets sent if
-	     the scope of the mouse events that the control can receive has been
-	     expanded by SetEventMask() or SetMouseEventMask().
-	\param dragMessage If a drag-and-drop operation is taking place this is a
-	     pointer to a BMessage that holds the drag information, otherwise the
-	     pointer is \c NULL.
+	\copydetails BControl::MouseMoved()
 */
 
 
@@ -307,10 +284,7 @@
 	Invoke() method. Unlike a BCheckBox, a BRadioButton only posts its message when
 	it is turned on, not when it is turned off.
 
-	\param where The point on the screen where the mouse pointer is located when
-	       the mouse button is released in the view's coordinate system.
-
-	\sa BControl::MouseUp()
+	\copydetails BControl::MouseUp()
 */
 
 
@@ -319,12 +293,7 @@
 	\brief Hook method called when the attached window is activated or
 	       deactivated.
 
-	The default implementation does nothing.
-
-	\param active \c true if the window becomes activated, \c false if the
-	       window becomes deactivated.
-
-	\sa BControl::WindowActivated()
+	\copydetails BControl::WindowActivated()
 */
 
 
@@ -332,26 +301,18 @@
 
 
 /*!
-	\fn void BRadioButton::MakeFocus(bool focused)
+	\fn void BRadioButton::MakeFocus(bool focus)
 	\brief Makes the radio button the current focus view of the window or
 	       gives up being the window's focus view.
 
-	The default implementation does nothing.
-
-	\param focused \a true to set focus, \a false to remove it.
-
-	\sa BControl::MakeFocus()
+	\copydetails BControl::MakeFocus()
 */
 
 
 /*!
 	\fn BHandler* BRadioButton::ResolveSpecifier(BMessage* message,
 		int32 index, BMessage* specifier, int32 what, const char* property)
-	\brief Determine the proper specifier for scripting messages.
-
-	The default implementation does nothing.
-
-	\sa BControl::ResolveSpecifier()
+	\copydoc BHandler::ResolveSpecifier()
 */
 
 
@@ -362,10 +323,7 @@
 	Turning a radio button on turns off all sibling radio buttons and calls the
 	Invoke() method.
 
-	\param value The value to set the radio button to, should be
-		either \c B_CONTROL_ON or \c B_CONTROL_OFF.
-
-	\sa BControl::SetValue()
+	\copydetails BControl::SetValue()
 */
 
 
@@ -379,35 +337,28 @@
 
 	\param[out] _width Pointer to a \c float to store the width.
 	\param[out] _height Pointer to a \c float to store the height.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BRadioButton::GetSupportedSuites(BMessage* message)
-	\brief Report the suites of messages this control understands.
-
-	\param message Allows you to add the names of the suites the radio button
-	       implements to the suites array.
-
-	\return \c B_OK if all went well or an error code otherwise.
-
-	\sa BControl::GetSupportedSuites();
+	\copydoc BControl::GetSupportedSuites();
 */
 
 
 /*!
 	\fn status_t BRadioButton::Invoke(BMessage* message)
-	\brief Sends a copy of the model \a message to the designated target.
-
-	The default implementation does nothing.
-
-	\sa BControl::Invoke()
+	\copydoc BControl::Invoke()
 */
 
 
 /*!
 	\fn status_t BRadioButton::Perform(perform_code code, void* _data)
 	\brief Perform some action. (Internal Method)
+
+	\since Haiku R1
 */
 
 
@@ -416,6 +367,8 @@
 	\brief Returns the alignment used by this control in a layout.
 
 	\return The alignment used by this control as a BAlignment.
+
+	\since Haiku R1
 */
 
 
@@ -426,6 +379,8 @@
 	\return The maximum size of the radio button as a BSize.
 
 	\sa BAbstractLayout::MaxSize()
+
+	\since Haiku R1
 */
 
 
@@ -436,6 +391,8 @@
 	The default implementation does nothing.
 
 	\sa BControl::ResizeToPreferred()
+
+	\since BeOS R3
 */
 
 
@@ -444,4 +401,6 @@
 	\brief Set the icon used by the radio button.
 
 	\see BControl::SetIcon()
+
+	\since Haiku R1
 */

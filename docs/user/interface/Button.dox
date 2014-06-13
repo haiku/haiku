@@ -44,6 +44,8 @@
 	label is set in the constructor or by the SetLabel() method. To set the
 	icon for a button use the SetIcon() method. The text label will draw
 	to the right of the icon.
+
+	\since BeOS R3
 */
 
 
@@ -73,6 +75,8 @@
 	       resized. See BView for more information on resizing options.
 	\param flags The \a flags mask sets what notifications the BButton can
 	       receive. See BView for more information on \a flags.
+
+	\since BeOS R3
 */
 
 
@@ -92,6 +96,8 @@
 	\param message The button's action \a message. Can be \c NULL.
 	\param flags The \a flags mask sets what notifications the button can
 	       receive. See BView for more information on \a flags.
+
+	\since Haiku R1
 */
 
 
@@ -104,6 +110,8 @@
 
 	\param label The button's \a label text. Can be \c NULL.
 	\param message The buttons action \a message. Can be \c NULL.
+
+	\since Haiku R1
 */
 
 
@@ -118,12 +126,16 @@
 	of its child views recursively.
 
 	\param data The \a data message to restore from.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BButton::~BButton()
 	\brief Destructor, does nothing.
+
+	\since BeOS R3
 */
 
 
@@ -139,8 +151,12 @@
 	\fn BArchivable* BButton::Instantiate(BMessage* archive)
 	\brief Creates a new BButton object from the \a archive message.
 
+	\param archive The \a archive message to restore from.
+
 	\return A newly created check box or \c NULL if the message doesn't
 	        contain an archived BButton.
+
+	\since BeOS R3
 */
 
 
@@ -155,6 +171,8 @@
 	        otherwise.
 
 	\sa BControl::Archive()
+
+	\since BeOS R3
 */
 
 
@@ -177,6 +195,8 @@
 	the default button the window's default button is updated.
 
 	\sa BControl::AttachedToWindow()
+
+	\since BeOS R3
 */
 
 
@@ -184,9 +204,7 @@
 	\fn void BButton::DetachedFromWindow()
 	\brief Hook method called when the button is detached from a window.
 
-	The default implementation does nothing.
-
-	\sa BControl::DetachedFromWindow()
+	\copydetails BControl::DetachedFromWindow()
 */
 
 
@@ -195,9 +213,7 @@
 	\brief Similar to AttachedToWindow() but this method is triggered after
 	       all child views have already been attached to a window.
 
-	The default implementation does nothing.
-
-	\sa BView::AllAttached()
+	\copydetails BView::AllAttached()
 */
 
 
@@ -206,9 +222,7 @@
 	\brief Similar to AttachedToWindow() but this method is triggered after
 	       all child views have already been detached from a window.
 
-	The default implementation does nothing.
-
-	\sa BView::AllDetached()
+	\copydetails BView::AllDetached()
 */
 
 
@@ -224,6 +238,8 @@
 	\param updateRect The rectangular area to be drawn.
 
 	\sa BView::Draw()
+
+	\since BeOS R3
 */
 
 
@@ -231,24 +247,15 @@
 	\fn void BButton::FrameMoved(BPoint newPosition)
 	\brief Hook method called when the button is moved.
 
-	The default implementation does nothing.
-
-	\param newPosition The point that the button has been moved to.
-
-	\sa BView::FrameMoved()
+	\copydetails BView::FrameMoved()
 */
 
 
 /*!
-	\fn void BButton::FrameResized(float width, float height)
+	\fn void BButton::FrameResized(float newWidth, float newHeight)
 	\brief Hook method called when the button is resized.
 
-	The default implementation does nothing.
-
-	\param width The new \a width of the button.
-	\param height The new \a height of the button.
-
-	\sa BView::FrameResized()
+	\copydetails BView::FrameResized()
 */
 
 
@@ -260,6 +267,8 @@
 
 	\param bytes The bytes of the key combination pressed.
 	\param numBytes The number of bytes in \a bytes.
+
+	\since BeOS R3
 */
 
 
@@ -269,9 +278,9 @@
 
 	Invalidate cached preferred size.
 
-	\note This method was not available in BeOS R5.
-
 	\param descendants Whether or not child views have also been invalidated.
+
+	\since Haiku R1
 */
 
 
@@ -279,11 +288,7 @@
 	\fn void BButton::MessageReceived(BMessage* message)
 	\brief Handle \a message received by the associated looper.
 
-	The default implemenation does nothing.
-
-	\param message The \a message received by the associated looper.
-
-	\see BControl::MessageReceived()
+	\copydetails BControl::MessageReceived()
 */
 
 
@@ -293,8 +298,7 @@
 
 	Begins tracking the mouse cursor.
 
-	\param where The point on the screen where to mouse pointer is when
-	       the mouse button is pressed.
+	\copydetails BControl::MouseDown()
 */
 
 
@@ -307,19 +311,7 @@
 	if the mouse cursor is inside the button. The value that is set depends on
 	if the button is using \c B_TOGGLE_BEHAVIOR or not.
 
-	\param where The new location of the mouse in the control's coordinate system.
-	\param code One of the following:
-	- \c B_ENTERED_VIEW The cursor has just entered the button.
-	- \c B_INSIDE_VIEW The cursor is inside the button.
-	- \c B_EXITED_VIEW The cursor has left the button's bounds. This only gets
-	     sent if the scope of the mouse events that the button can receive has
-	     been expanded by BView::SetEventMask() or BView::SetMouseEventMask().
-	- \c B_OUTSIDE_VIEW The cursor is outside the button. This only gets sent if
-	     the scope of the mouse events that the control can receive has been
-	     expanded by SetEventMask() or SetMouseEventMask().
-	\param dragMessage If a drag-and-drop operation is taking place this is a
-	     pointer to a BMessage that holds the drag information, otherwise the
-	     pointer is \c NULL.
+	\copydetails BControl::MouseMoved()
 */
 
 
@@ -331,8 +323,7 @@
 	button. The value that is set depends on if the button is using
 	\c B_TOGGLE_BEHAVIOR or not.
 
-	\param where The point on the screen where the mouse pointer is located when
-	       the mouse button is released in the view's coordinate system.
+	\copydetails BControl::MouseUp()
 */
 
 
@@ -341,12 +332,7 @@
 	\brief Hook method called when the attached window is activated or
 	       deactivated.
 
-	The default implementation does nothing.
-
-	\param active \c true if the window becomes activated, \c false if the
-	       window becomes deactivated.
-
-	\sa BControl::WindowActivated()
+	\copydetails BControl::WindowActivated()
 */
 
 
@@ -358,15 +344,7 @@
 	\brief Fill out the preferred width and height of the button
 		into the \a _width and \a _height parameters.
 
-	The size is computed from the children sizes, unless it was explicitly set
-	for the BButton, which can be done only if the BButton is configured to
-	use the Layout APIs.
-
-	\note Either the \a _width or \a _height parameter may be set to \c NULL
-	      if you only want to get the other one.
-
-	\param[out] _width Pointer to a \c float to store the width.
-	\param[out] _height Pointer to a \c float to store the height.
+	\copydetails BControl::GetPreferredSize()
 */
 
 
@@ -374,12 +352,7 @@
 	\fn status_t BButton::GetSupportedSuites(BMessage* message)
 	\brief Report the suites of messages this control understands.
 
-	\param message Allows you to add the names of the suites the button
-	       implements to the suites array.
-
-	\return \c B_OK if all went well or an error code otherwise.
-
-	\sa BControl::GetSupportedSuites();
+	\copydetails BControl::GetSupportedSuites();
 */
 
 
@@ -387,12 +360,7 @@
 	\fn status_t BButton::Invoke(BMessage* message)
 	\brief Sends a copy of the model \a message to the designated target.
 
-	\param message The \a message to send.
-
-	\return \c B_OK if the button was invoked, otherwise an error
-	        code is returned.
-
-	\sa BControl::Invoke()
+	\copydetails BControl::Invoke()
 */
 
 
@@ -407,19 +375,17 @@
 	       to remove the default button status.
 
 	\sa BWindow::SetDefaultButton()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BButton::MakeFocus(bool focused)
+	\fn void BButton::MakeFocus(bool focus)
 	\brief Makes the button the current focus view of the window or
 	       gives up being the window's focus view.
 
-	The default implementation does nothing.
-
-	\param focused \a true to set focus, \a false to remove it.
-
-	\sa BControl::MakeFocus()
+	\copydetails BControl::MakeFocus()
 */
 
 
@@ -427,9 +393,9 @@
 	\fn BSize BButton::MinSize()
 	\brief Returns the button's minimum size.
 
-	\note This method was not available in BeOS R5.
-
 	\return The button's minimum size as a BSize.
+
+	\since Haiku R1
 */
 
 
@@ -437,9 +403,9 @@
 	\fn BSize BButton::MaxSize()
 	\brief Returns the button's maximum size.
 
-	\note This method was not available in BeOS R5.
-
 	\return The button's maximum size as a BSize.
+
+	\since Haiku R1
 */
 
 
@@ -447,15 +413,15 @@
 	\fn BSize BButton::PreferredSize()
 	\brief Returns the button's preferred size.
 
-	\note This method was not available in BeOS R5.
-
 	\return The button's preferred size as a BSize.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BButton::Perform(perform_code code, void* _data)
-	\brief Perform some action. (Internal Method)
+	\copydoc BView::Perform()
 */
 
 
@@ -463,18 +429,14 @@
 	\fn void BButton::ResizeToPreferred()
 	\brief Resize the button to its preferred size.
 
-	\sa BView::ResizeToPreferred()
+	\copydetails BView::ResizeToPreferred()
 */
 
 
 /*!
 	\fn BHandler* BButton::ResolveSpecifier(BMessage* message,
 		int32 index, BMessage* specifier, int32 what, const char* property)
-	\brief Determine the proper specifier for scripting messages.
-
-	The default implementation does nothing.
-
-	\sa BControl::ResolveSpecifier()
+	\copydoc BHandler::ResolveSpecifier()
 */
 
 
@@ -483,6 +445,8 @@
 	\brief Sets the button's label.
 
 	\param label The string to set the label to.
+
+	\since BeOS R3
 */
 
 
@@ -492,6 +456,8 @@
 	       window, i.e. whether or not it responds to the \key{Enter} key.
 
 	\returns \c true if the button is the default button, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -499,9 +465,9 @@
 	\fn bool BButton::IsFlat() const
 	\brief Returns whether or not the button is flat or not.
 
-	\note This method was not available in BeOS R5.
-
 	\returns \c true if the button is flat, \c false otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -509,10 +475,10 @@
 	\fn void BButton::SetFlat(bool flat)
 	\brief Sets or unsets the button to be flat.
 
-	\note This method was not available in BeOS R5.
-
 	\param flat \c true to make the button flat, \c false to make the button
 	       not flat.
+
+	\since Haiku R1
 */
 
 
@@ -520,9 +486,9 @@
 	\fn BButton::BBehavior BButton::Behavior() const
 	\brief Returns the buttons behavior.
 
-	\note This method was not available in BeOS R5.
-
 	\return The button behavior flag.
+
+	\since Haiku R1
 */
 
 
@@ -530,13 +496,13 @@
 	\fn void BButton::SetBehavior(BBehavior behavior)
 	\brief Sets the button behavior.
 
-	\note This method was not available in BeOS R5.
-
 	\param behavior One of the following:
 	- \c B_BUTTON_BEHAVIOR Normal behavior,
 	- \c B_TOGGLE_BEHAVIOR Acts like a check box,
 	- \c B_POP_UP_BEHAVIOR Adds a pop-up marker to the button
 	     (similar to that of BMenuField).
+
+	\since Haiku R1
 */
 
 
@@ -545,9 +511,9 @@
 	\brief Returns the message sent to the button's target when the
 	       pop-up marker is selected using \c B_POP_UP_BEHAVIOR.
 
-	\note This method was not available in BeOS R5.
-
 	\return The message sent to the button's target.
+
+	\since Haiku R1
 */
 
 
@@ -556,9 +522,9 @@
 	\brief Sets the message sent to the button's target when the
 	       pop-up marker is selected using \c B_POP_UP_BEHAVIOR.
 
-	\note This method was not available in BeOS R5.
-
 	\param message The \a message sent to the button's target.
+
+	\since Haiku R1
 */
 
 
@@ -567,14 +533,14 @@
 	\brief This convenience method is used to set the bitmaps
 	       for the standard states from a single bitmap.
 
-	\note This method was not available in BeOS R5.
-
 	\param icon The \a icon to set.
 	\param flags Modify how the icon is set.
 
 	\return \c B_OK if the icon was set or an error code otherwise.
 
 	\sa BControl::SetIcon()
+
+	\since Haiku R1
 */
 
 
@@ -590,4 +556,6 @@
 		- \c 1 (\c B_CONTROL_ON)
 
 	\see BControl::SetValue()
+
+	\since BeOS R3
 */

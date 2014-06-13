@@ -16,9 +16,9 @@
 	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
-
 	\brief BLayout subclass providing convenience methods for derived
-	implementations.
+	       implementations.
+	\since Haiku R1
 
 	This class is designed to reduce the amount of boilerplate code required to
 	write a BLayout subclass. In most cases, you classes should derive from
@@ -30,7 +30,7 @@
 	locally.
 
 	\warning This class is not yet finalized, if you use it in your software
-	assume that it will break some time in the future.
+	         assume that it will break some time in the future.
 */
 
 
@@ -44,12 +44,16 @@
 /*!
 	\fn BAbstractLayout::BAbstractLayout()
 	\brief Construct a BAbstractLayout.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BAbstractLayout::BAbstractLayout(BMessage* from);
 	\brief Archive constructor.
+
+	\since Haiku R1
 */
 
 
@@ -59,6 +63,7 @@
 /*!
 	\fn BSize BAbstractLayout::MinSize()
 	\copydoc BLayoutItem::MinSize()
+	\since Haiku R1
 
 	The return value for this method is composed (using
 	BLayoutUtils::ComposeSize()) from the values returned by BaseMinSize() and
@@ -73,6 +78,8 @@
 	The return value for this method is composed (using
 	BLayoutUtils::ComposeSize()) from the values returned by BaseMaxSize() and
 	ExplicitMaxSize().
+
+	\since Haiku R1
 */
 
 
@@ -83,6 +90,8 @@
 	The return value for this method is composed (using
 	BLayoutUtils::ComposeSize()) from the values returned by BasePreferredSize()
 	and ExplicitPreferredSize().
+
+	\since Haiku R1
 */
 
 
@@ -92,13 +101,14 @@
 
 	The return value for this method is composed (using
 	BLayoutUtils::ComposeAlignment()) from the values returned by
-	BaseAlignment() and
-	ExplicitAlignment()
+	BaseAlignment() and ExplicitAlignment()
+
+	\since Haiku R1
 */
 
 
 /*!
-	\name BAbstractLayout hooks
+	\name Hook Methods
 
 	@{
 */
@@ -107,28 +117,34 @@
 /*!
 	\fn BSize BAbstractLayout::BaseMinSize()
 	\brief Method to be implemented in derived classes return the minimum size
-	constraint for this BAbstractLayout.
+	       constraint for this BAbstractLayout.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BSize BAbstractLayout::BaseMaxSize()
 	\brief Method to be implemented in derived classes return the maximum size
-	constraint for this BAbstractLayout.
+	       constraint for this BAbstractLayout.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BSize BAbstractLayout::BasePreferredSize()
 	\brief Method to be implemented in derived classes return the preferred size
-	constraint for this BAbstractLayout.
+	       constraint for this BAbstractLayout.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BAlignment BAbstractLayout::BaseAlignment()
 	\brief Method to be implemented in derived classes return the preferred
-	alignment for this BAbstractLayout.
+	       alignment for this BAbstractLayout.
 */
 
 

@@ -24,6 +24,8 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief A pattern to use when drawing.
+
+	\since BeOS R3
 */
 
 
@@ -31,6 +33,8 @@
 	\var B_SOLID_HIGH
 
 	Draw using the view's high color.
+
+	\since BeOS R3
 */
 
 
@@ -38,6 +42,8 @@
 	\var B_MIXED_COLORS
 
 	Draw a pattern of the view's high and low colors.
+
+	\since BeOS R3
 */
 
 
@@ -45,6 +51,8 @@
 	\var B_SOLID_LOW
 
 	Draw using the view's low color.
+
+	\since BeOS R3
 */
 
 
@@ -53,6 +61,8 @@
 	\ingroup interface
 
 	Blending alpha mode constants.
+
+	\since BeOS R3
 */
 
 
@@ -60,6 +70,8 @@
 	\var source_alpha B_PIXEL_ALPHA
 
 	Use the alpha value of each pixel when drawing a bitmap.
+
+	\since BeOS R3
 */
 
 
@@ -67,6 +79,8 @@
 	\var source_alpha B_CONSTANT_ALPHA
 
 	Use the alpha channel of the view's high color.
+
+	\since BeOS R3
 */
 
 
@@ -75,6 +89,8 @@
 	\ingroup interface
 
 	Blending alpha function constants.
+
+	\since BeOS R3
 */
 
 
@@ -82,6 +98,8 @@
 	\var alpha_function B_ALPHA_OVERLAY
 
 	Used for drawing a image with transparency over an opaque background.
+
+	\since BeOS R3
 */
 
 
@@ -90,4 +108,6 @@
 
 	Used to composite two or more transparent images together offscreen to
 	produce a new image drawn using \c B_ALPHA_OVERLAY mode.
+
+	\since BeOS R3
 */

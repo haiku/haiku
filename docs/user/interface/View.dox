@@ -16,6 +16,8 @@
 	\ingroup interface
 	\ingroup libbe
 	\brief BView class definition and support data structures.
+
+	\since BeOS R5
 */
 
 
@@ -24,22 +26,25 @@
 
 /*!
 	\var B_PRIMARY_MOUSE_BUTTON
+	\brief Primary mouse button mask parameter.
 
-	Primary mouse button mask parameter.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_SECONDARY_MOUSE_BUTTON
+	\brief Secondary mouse button mask parameter.
 
-	Secondary mouse button mask parameter.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_TERTIARY_MOUSE_BUTTON
+	\brief Tertiary mouse button mask parameter.
 
-	Tertiary mouse button mask parameter.
+	\since BeOS R3
 */
 
 
@@ -48,29 +53,33 @@
 
 /*!
 	\var B_ENTERED_VIEW
+	\brief Mouse transit entered view.
 
-	Mouse transit entered view.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_INSIDE_VIEW
+	\brief Mouse transit inside view.
 
-	Mouse transit inside view.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_EXITED_VIEW
+	\brief Mouse transit exited view.
 
-	Mouse transit exited view.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_OUTSIDE_VIEW
+	\brief Mouse transit outside view.
 
-	Mouse transit outside view.
+	\since BeOS R5
 */
 
 
@@ -79,15 +88,17 @@
 
 /*!
 	\var B_POINTER_EVENTS
+	\brief Mouse pointer events mask parameter.
 
-	Mouse pointer events mask parameter.
+	\since BeOS R5
 */
 
 
 /*!
 	\var B_KEYBOARD_EVENTS
+	\brief Keyboard events mask parameter.
 
-	Keyboard events mask parameter.
+	\since BeOS R5
 */
 
 
@@ -96,33 +107,37 @@
 
 /*!
 	\var B_LOCK_WINDOW_FOCUS
+	\brief Prevents the attached window from losing its focused state while
+	       the mouse is held down.
 
-	Prevents the attached window from losing its focused state while the mouse is
-	held down.
+	\since BeOS R5
 */
 
 
 /*!
 	\var B_SUSPEND_VIEW_FOCUS
+	\brief Events normally sent to the focus view are suppressed.
 
-	Events normally sent to the focus view are suppressed.
+	\since BeOS R5
 */
 
 
 /*!
 	\var B_NO_POINTER_HISTORY
-
-	Send only the most recent MouseMoved() event to the view.
+	\brief Send only the most recent MouseMoved() event to the view.
 
 	\note New in Haiku: unless this flag is specified, both BWindow and
 	      BView::GetMouse() will filter out older mouse moved messages.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var B_FULL_POINTER_HISTORY
+	\brief Send all MouseMoved() events to the view.
 
-	Send all MouseMoved() events to the view.
+	\since Haiku R1
 */
 
 
@@ -131,16 +146,18 @@
 
 /*!
 	\var B_TRACK_WHOLE_RECT
+	\brief The whole rectangle moves with the cursor.
 
-	The whole rectangle moves with the cursor.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_TRACK_RECT_CORNER
+	\brief The left top corner is fixed while the right and bottom edges
+	       move with the cursor.
 
-	The left top corner is fixed while the right and bottom edges move with the
-	cursor.
+	\since BeOS R3
 */
 
 
@@ -149,71 +166,81 @@
 
 /*!
 	\var B_FONT_FAMILY_AND_STYLE
+	\brief Font family and style mask parameter.
 
-	Font family and style mask parameter.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FONT_SIZE
+	\brief Font size mask parameter.
 
-	Font size mask parameter.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FONT_SHEAR
+	\brief Font shear mask parameter.
 
-	Font shear mask parameter.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FONT_ROTATION
+	\brief Font rotation mask parameter.
 
-	Font rotation mask parameter.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FONT_SPACING
+	\brief Font spacing mask parameter.
 
-	Font spacing mask parameter.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FONT_ENCODING
+	\brief Font encoding mask parameter.
 
-	Font encoding mask parameter.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FONT_FACE
+	\brief Font face mask parameter.
 
-	Font face mask parameter.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FONT_FLAGS
+	\brief Font flags mask parameter.
 
-	Font flags mask parameter.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FONT_FALSE_BOLD_WIDTH
+	\brief Font false bold width mask parameter.
 
-	Font false bold width mask parameter.
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_FONT_ALL
+	\brief Font all properties mask parameter.
 
-	Font all properties mask parameter.
+	\since BeOS R3
 */
 
 
@@ -222,94 +249,108 @@
 
 /*!
 	\var B_FULL_UPDATE_ON_RESIZE
+	\brief Redraw the entire view on resize.
 
-	Redraw the entire view on resize.
+	\since BeOS R3
 */
 
 
 /*!
 	\var _B_RESERVED1_
+	\brief Reserved for future use.
 
-	Reserved for future use.
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_WILL_DRAW
+	\brief Indicates that the view will do it's own drawing.
 
-	Indicates that the view will do it's own drawing.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_PULSE_NEEDED
+	\brief Indicates that the view accepts Pulse() messages.
 
-	Indicates that the view accepts Pulse() messages.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_NAVIGABLE_JUMP
+	\brief Indicates this is the default keyboard navigation view.
 
-	Indicates this is the default keyboard navigation view.
+	\since BeOS R3
 */
 
 /*!
 	\var B_FRAME_EVENTS
+	\brief View responds to frame move and resize events.
 
-	View responds to frame move and resize events.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_NAVIGABLE
+	\brief The view is able to receive focus for keyboard navigation.
+	Typically focus is indicated by drawing a blue rectangle around the view.
 
-	The view is able to receive focus for keyboard navigation. Typically focus is
-	indicated by drawing a blue rectangle around the view.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_SUBPIXEL_PRECISE
+	\brief The view draws with sub-pixel precision.
 
-	The view draws with sub-pixel precision.
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_DRAW_ON_CHILDREN
+	\brief Indicates that the view responds to the DrawAfterChildren() hook method.
 
-	Indicates that the view responds to the DrawAfterChildren() hook method.
+	\since BeOS R5
 */
 
 
 /*!
 	\var B_INPUT_METHOD_AWARE
+	\brief Allows the view to use input method add-ons to gain access to the
+	       input methods needed for Japanese and other languages.
 
-	Allows the view to use input method add-ons to gain access to the input
-	methods needed for Japanese and other languages.
+	\since Haiku R1
 */
 
 
 /*!
 	\var _B_RESERVED7_
+	\brief Reserved for future use.
 
-	Reserved for future use.
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_SUPPORTS_LAYOUT
+	\brief The view supports the layout APIs, i.e. it doesn't require an
+	       frame rectangle to be specified.
 
-	The view supports the layout APIs, i.e. it doesn't require an explicit frame
-	rectangle to be specified.
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_INVALIDATE_AFTER_LAYOUT
+	\brief Indicates that the view should be redraw after being added to
+	       a layout.
 
-	Indicates that the view should be redraw after being added to a layout.
+	\since Haiku R1
 */
 
 
@@ -318,49 +359,57 @@
 
 /*!
 	\var _RESIZE_MASK_
+	\brief Resize mask. Do not use.
 
-	Resize mask. Do not use.
+	\since Haiku R1
 */
 
 
 /*!
 	\var _VIEW_TOP_
+	\brief View top mask variable. Do not use.
 
-	View top mask variable. Do not use.
+	\since Haiku R1
 */
 
 
 /*!
 	\var _VIEW_LEFT_
+	\brief View left mask variable. Do not use.
 
-	View left mask variable. Do not use.
+	\since Haiku R1
 */
 
 
 /*!
 	\var _VIEW_BOTTOM_
+	\brief View bottom mask variable. Do not use.
 
-	View bottom mask variable. Do not use.
+	\since Haiku R1
 */
 
 
 /*!
 	\var _VIEW_RIGHT_
+	\brief View right mask variable. Do not use.
 
-	View right mask variable. Do not use.
+	\since Haiku R1
 */
 
 
 /*!
 	\var _VIEW_CENTER_
+	\brief View center mask variable. Do not use.
 
-	View center mask variable. Do not use.
+	\since Haiku R1
 */
 
 
 /*!
 	\fn inline uint32 _rule_(uint32 r1, uint32 r2, uint32 r3, uint32 r4)
 	\brief Internal function, do not use.
+
+	\since Haiku R1
 */
 
 
@@ -369,26 +418,30 @@
 
 /*!
 	\var B_FOLLOW_NONE
+	\brief Follow none resize mask parameter. Equivalent to
+	       \c B_FOLLOW_LEFT | \c B_FOLLOW_TOP. The view maintains its position
+	       in its parent's coordinate system but not in the screen coordinate
+	       system.
 
-	Follow none resize mask parameter. Equivalent to \c B_FOLLOW_LEFT
-	| \c B_FOLLOW_TOP. The view maintains its position in its parent's
-	coordinate system but not in the screen coordinate system.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FOLLOW_ALL_SIDES
+	\brief Follow all sides resize mask parameter. Equivalent to
+	\c B_FOLLOW_LEFT_RIGHT | \c B_FOLLOW_TOP_BOTTOM. The view will be resized
+	with its parent view both horizontally and vertically.
 
-	Follow all sides resize mask parameter. Equivalent to \c B_FOLLOW_LEFT_RIGHT |
-	\c B_FOLLOW_TOP_BOTTOM. The view will be resized with its parent view both
-	horizontally and vertically.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FOLLOW_ALL
+	\brief Equivalent to \c B_FOLLOW_ALL_SIDES.
 
-	Equivalent to \c B_FOLLOW_ALL_SIDES.
+	\since BeOS R3
 */
 
 
@@ -397,33 +450,37 @@
 
 /*!
 	\var B_FOLLOW_LEFT
+	\brief The margin between the left side of the view and the left side
+	       of its parent remains constant.
 
-	The margin between the left side of the view and the left side of its parent
-	remains constant.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FOLLOW_RIGHT
+	\brief The margin between the right side of the view and the right side
+	of its parent remains constant.
 
-	The margin between the right side of the view and the right side of its parent
-	remains constant.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FOLLOW_LEFT_RIGHT
+	\brief The margin between the left and right sides of the view and the left
+	       and right sides of its parent both remain constant.
 
-	The margin between the left and right sides of the view and the left and right
-	sides of its parent both remain constant.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FOLLOW_H_CENTER
+	\brief The view maintains a constant relationship to the horizontal center
+	       of its parent view.
 
-	The view maintains a constant relationship to the horizontal center of its
-	parent view.
+	\since BeOS R3
 */
 
 
@@ -432,33 +489,37 @@
 
 /*!
 	\var B_FOLLOW_TOP
+	\brief The margin between the top of the view and the top of its parent
+	       remains constant.
 
-	The margin between the top of the view and the top of its parent remains
-	constant.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FOLLOW_BOTTOM
+	\brief The margin between the bottom of the view and the bottom of its
+	       parent remains constant.
 
-	The margin between the bottom of the view and the bottom of its parent remains
-	constant.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FOLLOW_TOP_BOTTOM
+	\brief The margin between the top and bottom sides of the view and the
+	       top and bottom sides of its parent both remain constant.
 
-	The margin between the top and bottom sides of the view and the top and bottom
-	sides of its parent both remain constant.
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_FOLLOW_V_CENTER
+	\brief The view maintains a constant relationship to the vertical center
+	       of its parent view.
 
-	The view maintains a constant relationship to the vertical center of its
-	parent view.
+	\since BeOS R3
 */
 
 
@@ -548,6 +609,8 @@ if (Window()->LockLooper()) {
 \code
 SetViewColor(Parent()->ViewColor());
 \endcode
+
+	\since BeOS R3
 */
 
 
@@ -560,8 +623,6 @@ SetViewColor(Parent()->ViewColor());
 
 	\c B_SUPPORTS_LAYOUT is automatically set to the view. The view flags can be
 	set after the view has been constructed by calling the SetFlags() methods.
-
-	\note This method was not available in BeOS R5.
 
 	\param name The name of the view, can be \c NULL.
 	\param flags The view flags, a mask of one or more of the following:
@@ -578,6 +639,8 @@ SetViewColor(Parent()->ViewColor());
 	            use a frame rectangle.
 	       - \c B_INVALIDATE_AFTER_LAYOUT Is redraw after added to a layout.
 	\param layout A \a layout to set the view to.
+
+	\since Haiku R1
 */
 
 
@@ -640,6 +703,8 @@ SetViewColor(Parent()->ViewColor());
 	       - \c B_SUPPORTS_LAYOUT Supports the layout APIs, i.e. it doesn't
 	            use a frame rectangle.
 	       - \c B_INVALIDATE_AFTER_LAYOUT Is redraw after added to a layout.
+
+	\since BeOS R3
 */
 
 
@@ -648,6 +713,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Archive constructor.
 
 	\param archive The message data to construct the view from.
+
+	\since BeOS R3
 */
 
 
@@ -656,6 +723,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Destructor method.
 
 	Deletes the view and all children freeing any memory used.
+
+	\since BeOS R3
 */
 
 
@@ -673,6 +742,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\returns A newly created BView object or \c NULL if the message doesn't
 		contain an archived BView.
+
+	\since BeOS R3
 */
 
 
@@ -687,6 +758,8 @@ SetViewColor(Parent()->ViewColor());
 	        otherwise.
 	\retval B_OK The object was archived successfully.
 	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
 */
 
 
@@ -705,7 +778,7 @@ SetViewColor(Parent()->ViewColor());
 	\fn status_t BView::AllUnarchived(const BMessage* from)
 	\brief Hook method called when all views have been unarchived.
 
-	The default implementation does nothing.
+	\since Haiku R1
 */
 
 
@@ -713,15 +786,7 @@ SetViewColor(Parent()->ViewColor());
 	\fn status_t BView::AllArchived(BMessage* into) const
 	\brief Hook method called when all views have been archived.
 
-	The default implementation does nothing.
-*/
-
-
-/*!
-	\fn void BView::AttachedToWindow()
-	\brief Hook method called when the object is attached to a window.
-
-	The default implementation does nothing.
+	\since Haiku R1
 */
 
 
@@ -730,7 +795,7 @@ SetViewColor(Parent()->ViewColor());
 	\brief Similar to AttachedToWindow() but this method is triggered after
 	       all child views have already been attached to a window.
 
-	The default implementation does nothing.
+	\since BeOS R3
 */
 
 
@@ -738,7 +803,15 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::DetachedFromWindow()
 	\brief Hook method called when the object is detached from a window.
 
-	The default implementation does nothing.
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BView::AttachedToWindow()
+	\brief Hook method called when the object is attached to a window.
+
+	\since BeOS R3
 */
 
 
@@ -747,7 +820,7 @@ SetViewColor(Parent()->ViewColor());
 	\brief Similar to AttachedToWindow() but this method is triggered after
 	       all child views have already been detached from a window.
 
-	The default implementation does nothing.
+	\since BeOS R3
 */
 
 
@@ -761,9 +834,9 @@ SetViewColor(Parent()->ViewColor());
 	        call it yourself. If you need to forcefully redraw the view consider
 	        calling Invalidate() instead.
 
-	The default implementation does nothing.
-
 	\param updateRect The rectangular area to be drawn.
+
+	\since BeOS R3
 */
 
 
@@ -772,9 +845,9 @@ SetViewColor(Parent()->ViewColor());
 	\brief Perform any drawing that needs to be done after child view have
 	       already been drawn.
 
-	The default implementation does nothing.
-
 	\param updateRect The rectangular area to drawn in.
+
+	\since BeOS R5
 */
 
 
@@ -782,10 +855,10 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::FrameMoved(BPoint newPosition)
 	\brief Hook method called when the view is moved.
 
-	The default implementation does nothing.
-
 	\param newPosition The point of the top left corner of the frame
 	       that the view has been moved to.
+
+	\since BeOS R3
 */
 
 
@@ -793,10 +866,10 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::FrameResized(float newWidth, float newHeight)
 	\brief Hook method called when the view is resized.
 
-	The default implementation does nothing.
-
 	\param newWidth The new \a width of the view.
 	\param newHeight The new \a height of the view.
+
+	\since BeOS R3
 */
 
 
@@ -804,10 +877,10 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::KeyDown(const char* bytes, int32 numBytes)
 	\brief Hook method called when a keyboard key is pressed.
 
-	The default implementation sets keyboard navigation focus.
-
 	\param bytes The bytes of the key combination pressed.
 	\param numBytes The number of bytes in \a bytes.
+
+	\since BeOS R3
 */
 
 
@@ -815,10 +888,10 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::KeyUp(const char* bytes, int32 numBytes)
 	\brief Hook method called when a keyboard key is released.
 
-	The default implementation does nothing.
-
 	\param bytes The bytes of the key combination pressed.
 	\param numBytes The number of bytes in \a bytes.
+
+	\since BeOS R3
 */
 
 
@@ -826,11 +899,9 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::LayoutInvalidated(bool descendants)
 	\brief Hook method called when the layout is invalidated.
 
-	\note This method was not available in BeOS R5.
-
-	The default implementation does nothing.
-
 	\param descendants Whether or not child views have also been invalidated.
+
+	\since Haiku R1
 */
 
 
@@ -838,11 +909,11 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::MessageReceived(BMessage* message)
 	\brief Handle \a message received by the associated looper.
 
-	The default implementation does nothing.
-
 	\param message The \a message received by the associated looper.
 
 	\see BHandler::MessageReceived()
+
+	\since BeOS R3
 */
 
 
@@ -850,10 +921,10 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::MouseDown(BPoint where)
 	\brief Hook method called when a mouse button is pressed.
 
-	The default implementation does nothing.
-
 	\param where The point on the screen where to mouse pointer is when
 	       the mouse button is pressed.
+
+	\since BeOS R3
 */
 
 
@@ -861,10 +932,10 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::MouseUp(BPoint where)
 	\brief Hook method called when a mouse button is released.
 
-	The default implementation does nothing.
-
 	\param where The point on the screen where to mouse pointer is when
 	       the mouse button is released.
+
+	\since BeOS R3
 */
 
 
@@ -872,8 +943,6 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::MouseMoved(BPoint where, uint32 code,
 		const BMessage* dragMessage)
 	\brief Hook method called when the mouse is moved.
-
-	The default implementation does nothing.
 
 	\param where The new location of the mouse in the view's coordinate system.
 	\param code One of the following:
@@ -891,6 +960,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\sa SetEventMask(), SetMouseEventMask()
 	\sa DragMessage()
+
+	\since BeOS R3
 */
 
 
@@ -904,9 +975,9 @@ SetViewColor(Parent()->ViewColor());
 	anything you want. The default version does nothing. The pulse granularity
 	is no better than once per 100,000 microseconds.
 
-	The default implementation does nothing.
-
 	\sa SetPulseRate()
+
+	\since BeOS R3
 */
 
 
@@ -915,21 +986,21 @@ SetViewColor(Parent()->ViewColor());
 	\brief Hook method called when the view becomes the target of
 	       \a scrollView.
 
-	The default implementation does nothing.
-
 	\param scrollView The BScrollView object that has targeted the view.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BView::WindowActivated(bool state)
+	\fn void BView::WindowActivated(bool active)
 	\brief Hook method called when the attached window is activated or
 	       deactivated.
 
-	The default implementation does nothing.
-
-	\param state \c true if the window becomes activated, \c false if the
+	\param active \c true when the window becomes activated, \c false when the
 	       window becomes deactivated.
+
+	\since BeOS R3
 */
 
 
@@ -941,6 +1012,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the view's frame rectangle in the view's coordinate system.
 
 	\return The view's bounding rectangle in the view's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -949,11 +1022,13 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the view's frame rectangle in the parent's coordinate system.
 
 	\returns The view's frame rectangle in the parent's coordinate system.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Coordinate Conversion Methods
+	\name Coordinate Conversions
 */
 
 
@@ -965,6 +1040,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Convert \a point to the parent's coordinate system in place.
 
 	\param point A pointer to a BPoint object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -975,6 +1052,8 @@ SetViewColor(Parent()->ViewColor());
 	\param point A BPoint object to convert.
 
 	\return A new BPoint object in the parent's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -984,6 +1063,8 @@ SetViewColor(Parent()->ViewColor());
 		   view's coordinate system in place.
 
 	\param point A pointer to a BPoint object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -995,6 +1076,8 @@ SetViewColor(Parent()->ViewColor());
 	\param point A BPoint object to convert.
 
 	\return A new BPoint object in the view's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1003,6 +1086,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Convert \a rect to the parent's coordinate system in place.
 
 	\param rect A pointer to a BRect object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -1013,6 +1098,8 @@ SetViewColor(Parent()->ViewColor());
 	\param rect A BRect object to convert.
 
 	\return A new BRect object in the parent's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1022,6 +1109,8 @@ SetViewColor(Parent()->ViewColor());
 		   view's coordinate system in place.
 
 	\param rect A pointer to a BRect object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -1033,6 +1122,8 @@ SetViewColor(Parent()->ViewColor());
 	\param rect A BRect object to convert.
 
 	\return A new BRect object in the view's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1041,6 +1132,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Convert \a point to the screen's coordinate system in place.
 
 	\param point A pointer to a BPoint object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -1051,6 +1144,8 @@ SetViewColor(Parent()->ViewColor());
 	\param point A BPoint object to convert.
 
 	\return A new BPoint object in the screen's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1060,6 +1155,8 @@ SetViewColor(Parent()->ViewColor());
 		   view's coordinate system in place.
 
 	\param point A pointer to a BPoint object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -1071,6 +1168,8 @@ SetViewColor(Parent()->ViewColor());
 	\param point A BPoint object to convert.
 
 	\return A new BPoint object in the view's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1079,6 +1178,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Convert \a rect to the screen's coordinate system in place.
 
 	\param rect A pointer to a BRect object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -1089,6 +1190,8 @@ SetViewColor(Parent()->ViewColor());
 	\param rect A BRect object to convert.
 
 	\return A new BRect object in the screen's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1098,6 +1201,8 @@ SetViewColor(Parent()->ViewColor());
 		   view's coordinate system in place.
 
 	\param rect A pointer to a BRect object to convert.
+
+	\since BeOS R3
 */
 
 
@@ -1109,6 +1214,8 @@ SetViewColor(Parent()->ViewColor());
 	\param rect A BRect object to convert.
 
 	\return A new BRect object in the view's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1120,6 +1227,10 @@ SetViewColor(Parent()->ViewColor());
 	\brief Return the view flags set in the constructor or by SetFlags().
 
 	\return The view flags as a uint32 mask.
+
+	\sa SetFlags()
+
+	\since BeOS R3
 */
 
 
@@ -1128,6 +1239,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Sets the view flags to the \a flags mask.
 
 	\param flags The view flags to set as a uint32 mask.
+
+	\since BeOS R3
 */
 
 
@@ -1141,8 +1254,11 @@ SetViewColor(Parent()->ViewColor());
 	Calls to Hide() and Show() are cumulative. A visible view becomes hidden
 	once the number of Hide() calls exceeds the number of Show() calls.
 
-	\see BWindow::Hide()
-	\see IsHidden()
+	\sa Show()
+	\sa BWindow::Hide()
+	\sa IsHidden()
+
+	\since BeOS R3
 */
 
 
@@ -1153,8 +1269,11 @@ SetViewColor(Parent()->ViewColor());
 	Calls to Hide() and Show() are cumulative. A hidden view becomes visible
 	again once the number of Show() calls matches the number of Hide() calls.
 
-	\see BWindow::Show()
-	\see IsHidden()
+	\sa Hide()
+	\sa BWindow::Show()
+	\sa IsHidden()
+
+	\since BeOS R3
 */
 
 
@@ -1168,8 +1287,10 @@ SetViewColor(Parent()->ViewColor());
 
 	\returns \c true if the view is the current focus view, \c false otherwise.
 
-	\see MakeFocus()
-	\see BWindow::CurrentFocus()
+	\sa MakeFocus()
+	\sa BWindow::CurrentFocus()
+
+	\since BeOS R3
 */
 
 
@@ -1188,6 +1309,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\return \c true if the view was hidden via the Hide() method, \c false
 	        otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -1205,6 +1328,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\return \c true if the view was hidden via the Hide() method, \c false
 	        otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -1219,6 +1344,8 @@ SetViewColor(Parent()->ViewColor());
 	printer vs. when drawing to the screen.
 
 	\return Returns \c true if drawing to a printer, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -1227,6 +1354,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the left top corner point.
 
 	\return The left top corner of the view as a BPoint object.
+
+	\since BeOS R3
 */
 
 
@@ -1236,7 +1365,9 @@ SetViewColor(Parent()->ViewColor());
 
 	The resizing mode is first set in the BView constructor.
 
-	\see SetFlags()
+	\sa SetFlags()
+
+	\since BeOS R3
 */
 
 
@@ -1246,6 +1377,10 @@ SetViewColor(Parent()->ViewColor());
 	       SetResizingMode().
 
 	\returns the current resizing mode flags as a uint32 mask.
+
+	\sa SetResizingMode()
+
+	\since BeOS R3
 */
 
 
@@ -1259,6 +1394,8 @@ SetViewColor(Parent()->ViewColor());
 	\param sync If \c true App Server is synchronized immediately forcing the
 	       change to occur. If \c false, the change will be put in the queue and
 	       will take effect when the pending requests are processed. 
+
+	\since BeOS R5
 */
 
 
@@ -1267,6 +1404,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Flushes the attached window's connection to App Server.
 
 	If the view isn't attached to a window, Flush() does nothing.
+
+	\since BeOS R3
 */
 
 
@@ -1276,6 +1415,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\warning If the view isn't attached to a window, Sync() might crash the
 	         application.
+
+	\since BeOS R3
 */
 
 
@@ -1284,7 +1425,9 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the window the view is attached to.
 
 	\return The window the view is attached to or \c NULL if the view isn't
-	attached to a window.
+	        attached to a window.
+
+	\since BeOS R3
 */
 
 
@@ -1299,23 +1442,27 @@ SetViewColor(Parent()->ViewColor());
 	\remark Either the \a _width or \a _height parameter may be set to \c NULL
 		    if you only want to get the other one.
 
-	\param[out] _width Pointer to a \c float to store the width of the view.
-	\param[out] _height Pointer to a \c float to store the height of the view.
+	\param[out] _width Pointer to a float to store the width of the view.
+	\param[out] _height Pointer to a float to store the height of the view.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BView::ResizeToPreferred()
-	\brief Resizes the view to its preferred size keeping the left top corner
-	       constant.
+	\brief Resizes the view to its preferred size keeping the position of the
+	       left top corner constant.
 
 	\warning It is not recommended to use this method for views that are part of
 	         a BLayout.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Input Related Methods
+	\name Input Related
 */
 
 
@@ -1335,6 +1482,8 @@ SetViewColor(Parent()->ViewColor());
 	     while its size remains the same.
 	- \c B_TRACK_RECT_CORNER The left top corner is fixed while the right and
 	     bottom edges move with the cursor.
+
+	\since BeOS R3
 */
 
 
@@ -1344,6 +1493,8 @@ SetViewColor(Parent()->ViewColor());
 
 	BeginRectTracking() is typically called from the MouseDown() while this
 	method is typically called from the MouseUp() method.
+
+	\since BeOS R3
 */
 
 
@@ -1361,6 +1512,8 @@ SetViewColor(Parent()->ViewColor());
 	\param replyTo The target set to handle the message sent in reply to the
 	       dragged message. If \c NULL the reply is instead directed to the
 	       BView object that initiated the drag-and-drop session.
+
+	\since BeOS R3
 */
 
 
@@ -1380,6 +1533,8 @@ SetViewColor(Parent()->ViewColor());
 	\param replyTo The target set to handle the message sent in reply to the
 	       dragged message. If \c NULL the reply is instead directed to the
 	       BView object that initiated the drag-and-drop session.
+
+	\since BeOS R3
 */
 
 
@@ -1402,6 +1557,8 @@ SetViewColor(Parent()->ViewColor());
 	\param replyTo The target set to handle the message sent in reply to the
 	       dragged message. If \c NULL the reply is instead directed to the
 	       BView object that initiated the drag-and-drop session.
+
+	\since BeOS R5
 */
 
 
@@ -1424,19 +1581,21 @@ SetViewColor(Parent()->ViewColor());
 	\param checkMessageQueue If \c true pull from any pending MouseMoved() or
 	       MouseUp() events in the message queue top down before filling out
 	       the current mouse cursor state.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BView::MakeFocus(bool focusState)
+	\fn void BView::MakeFocus(bool focus)
 	\brief Makes the view the current focus view of the window or gives up
 	       being the window's focus view.
 
 	The focus view handles selections and KeyDown events when the the attached
 	window is active. There can be only one focus view at a time per window.
 
-	When called with \a focusState set to \c true this method first calls
-	MakeFocus() on the previously focused view with \a focusState set to
+	When called with \a focus set to \c true this method first calls
+	MakeFocus() on the previously focused view with \a focus set to
 	\c false.
 
 	The focus doesn't automatically change when MouseDown() is called so calling
@@ -1447,7 +1606,9 @@ SetViewColor(Parent()->ViewColor());
 
 	If the view isn't attached to a window this method has no effect.
 
-	\param focusState \a true to set focus, \a false to remove it.
+	\param focus \a true to set focus, \a false to remove it.
+
+	\since BeOS R3
 */
 
 
@@ -1461,6 +1622,8 @@ SetViewColor(Parent()->ViewColor());
 	\returns the Scrollbar object requested or \c NULL if none found.
 
 	\see BScrollBar::SetTarget()
+
+	\since BeOS R3
 */
 
 
@@ -1470,6 +1633,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param deltaX The amount to scroll horizontally.
 	\param deltaY The amount to scroll vertically.
+
+	\since BeOS R3
 */
 
 
@@ -1478,6 +1643,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Scroll the view to the point specified by \a where.
 
 	\param where The location to scroll the view to.
+
+	\since BeOS R3
 */
 
 
@@ -1486,8 +1653,6 @@ SetViewColor(Parent()->ViewColor());
 		float delta)
 	\brief Handle the scroll wheel changing over scrollbars.
 
-	\note This method was not available in BeOS R5.
-
 	- Extract the scrollbar change based on the mouse wheel \a delta into a
 	  protected method of BView.
 	- The method is called from the MessageReceived() method of BScrollBar.
@@ -1495,6 +1660,8 @@ SetViewColor(Parent()->ViewColor());
 	With this change it is now a bit easier to scroll horizontally around the
 	system by putting the mouse cursor over a horizontal scrollbar and using
 	the wheel.
+
+	\since Haiku R1
 */
 
 
@@ -1520,6 +1687,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\return \c B_OK if everything went fine or an error code, usually
 	        \c B_ERROR if something went wrong.
+
+	\since BeOS R5
 */
 
 
@@ -1528,6 +1697,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the current event mask.
 
 	\return The current event mask as a uint32.
+
+	\since BeOS R5
 */
 
 
@@ -1556,6 +1727,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\return \c B_OK if everything went fine or an error code, usually
 	        \c B_ERROR if something went wrong.
+
+	\since BeOS R5
 */
 
 
@@ -1563,7 +1736,7 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\name Graphics State Methods
+	\name Graphics State
 */
 
 
@@ -1588,20 +1761,26 @@ SetViewColor(Parent()->ViewColor());
 
 	A new state context is created after PushState() is called with a local scale
 	at 0, a local origin at (0, 0), and no clipping region.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BView::PopState()
 	\brief Restores the drawing state from the stack.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn void BView::SetOrigin(BPoint pt)
+	\fn void BView::SetOrigin(BPoint where)
 	\brief Sets the origin in the view's coordinate system.
 
-	\param pt The point to set the origin to.
+	\param where The point to set the origin to.
+
+	\since BeOS R3
 */
 
 
@@ -1611,6 +1790,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param x The x-coordinate to set the origin to.
 	\param y The y-coordinate to set the origin to.
+
+	\since BeOS R3
 */
 
 
@@ -1619,6 +1800,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the origin point in the view's coordinate system.
 
 	\return The local origin point in the view's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -1648,7 +1831,9 @@ SetViewColor(Parent()->ViewColor());
 	// view2's scale is 4
 \endcode
 
-	/param scale The scale factor to set.
+	\param scale The scale factor to set.
+
+	\since BeOS R3
 */
 
 
@@ -1657,6 +1842,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Return the current drawing scale.
 
 	\return The current drawing scale.
+
+	\since BeOS R3
 */
 
 
@@ -1686,6 +1873,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SQUARE_JOIN Same as \c B_SQUARE_CAP but for a join.
 	\param miterLimit Sets the cut off angle before a miter join becomes a bevel
 	       join calculated by 2*arcsin(1/\a miterLimit).
+
+	\since BeOS R3
 */
 
 
@@ -1694,6 +1883,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the current line join mode.
 
 	\return The current line join mode set to the view.
+
+	\since BeOS R3
 */
 
 
@@ -1702,6 +1893,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the current line cap mode.
 
 	\return The current line cap mode set to the view.
+
+	\since BeOS R3
 */
 
 
@@ -1710,6 +1903,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the miter limit used for \c B_MITER_JOIN join mode.
 
 	\return The current miter limit set to the view.
+
+	\since BeOS R3
 */
 
 
@@ -1731,6 +1926,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_OP_ADD
 	- \c B_OP_SUBTRACT
 	- \c B_OP_BLEND
+
+	\since BeOS R3
 */
 
 
@@ -1739,6 +1936,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Return the current drawing_mode.
 
 	\return The current drawing_mode.
+
+	\since BeOS R3
 */
 
 
@@ -1756,6 +1955,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_ALPHA_COMPOSITE Used to composite two or more transparent images
 	     together offscreen to produce a new image drawn using
 		 \c B_ALPHA_OVERLAY mode.
+
+	\since BeOS R5
 */
 
 
@@ -1767,6 +1968,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param[out] srcAlpha The alpha mode to fill out.
 	\param[out] alphaFunc The alpha function to fill out.
+
+	\since BeOS R5
 */
 
 
@@ -1775,6 +1978,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Move the pen to \a point in the view's coordinate system.
 
 	\param point the location to move the pen to.
+
+	\since BeOS R3
 */
 
 
@@ -1785,6 +1990,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param x The horizontal coordinate to move the pen to.
 	\param y The vertical coordinate to move the pen to.
+
+	\since BeOS R3
 */
 
 
@@ -1794,6 +2001,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param x The number of pixels to move the pen horizontally.
 	\param y The number of pixels to move the pen vertically.
+
+	\since BeOS R3
 */
 
 
@@ -1802,6 +2011,12 @@ SetViewColor(Parent()->ViewColor());
 	\brief Return the current pen location as a BPoint object.
 
 	\return The current pen location in the view's coordinate system.
+
+	\sa MovePenTo(BPoint)
+	\sa MovePenTo(float, float)
+	\sa MovePenBy(float, float)
+
+	\since BeOS R3
 */
 
 
@@ -1810,6 +2025,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set the pen size to \a size.
 
 	\param size The pen size to set.
+
+	\since BeOS R3
 */
 
 
@@ -1818,6 +2035,10 @@ SetViewColor(Parent()->ViewColor());
 	\brief Return the current pen size.
 
 	\return The current pen size as a float.
+
+	\sa SetPenSize()
+
+	\since BeOS R3
 */
 
 
@@ -1826,6 +2047,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set the high color of the view.
 
 	\param color The color to set.
+
+	\since BeOS R3
 */
 
 
@@ -1838,6 +2061,8 @@ SetViewColor(Parent()->ViewColor());
 	\param green The \a green component of the high color.
 	\param blue The \a blue component of the high color.
 	\param alpha The \a alpha component of the high color.
+
+	\since BeOS R3
 */
 
 
@@ -1846,6 +2071,11 @@ SetViewColor(Parent()->ViewColor());
 	\brief Return the current high color.
 
 	\return The current high color as an rgb_color struct.
+
+	\sa SetHighColor(rgb_color)
+	\sa SetHighColor(uchar, uchar, uchar, uchar)
+
+	\since BeOS R3
 */
 
 
@@ -1854,6 +2084,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set the low color of the view.
 
 	\param color The color to set.
+
+	\since BeOS R3
 */
 
 
@@ -1865,6 +2097,8 @@ SetViewColor(Parent()->ViewColor());
 	\param green The \a green component of the low color.
 	\param blue The \a blue component of the low color.
 	\param alpha The \a alpha component of the low color.
+
+	\since BeOS R3
 */
 
 
@@ -1873,6 +2107,11 @@ SetViewColor(Parent()->ViewColor());
 	\brief Return the current low color.
 
 	\return The current low color as an rgb_color struct.
+
+	\sa SetLowColor(rgb_color)
+	\sa SetLowColor(uchar, uchar, uchar, uchar)
+
+	\since BeOS R3
 */
 
 
@@ -1881,6 +2120,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set the view color of the view.
 
 	\param color The color to set.
+
+	\since BeOS R3
 */
 
 
@@ -1893,6 +2134,8 @@ SetViewColor(Parent()->ViewColor());
 	\param green The \a green component of the view color.
 	\param blue The \a blue component of the view color.
 	\param alpha The \a alpha component of the view color.
+
+	\since BeOS R3
 */
 
 
@@ -1901,6 +2144,11 @@ SetViewColor(Parent()->ViewColor());
 	\brief Return the current view color.
 
 	\return The current view color as an rgb_color struct.
+
+	\sa SetViewColor(rgb_color)
+	\sa SetViewColor(uchar, uchar, uchar, uchar)
+
+	\since BeOS R3
 */
 
 
@@ -1915,6 +2163,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param enable If \c true turn off anti-aliasing, if \c false turn on
 	       anti-aliasing.
+
+	\since BeOS R5
 */
 
 
@@ -1935,6 +2185,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_FONT_FACE
 	- \c B_FONT_ROTATION
 	- \c B_FONT_FLAGS
+
+	\since BeOS R3
 */
 
 
@@ -1943,6 +2195,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Fill out \a font with the font set to the view.
 
 	\param[out] font The BFont object to fill out.
+
+	\since BeOS R3
 */
 
 
@@ -1951,6 +2205,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Fill out the font_height struct with the view font.
 
 	\param[out] height The font_height struct to fill out.
+
+	\since BeOS R3
 */
 
 
@@ -1959,6 +2215,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set the size of the view's font to \a size.
 
 	\param size The font size to set to the view in points.
+
+	\since BeOS R3
 */
 
 
@@ -1969,6 +2227,8 @@ SetViewColor(Parent()->ViewColor());
 	\param string The \a string to get the width of.
 
 	\return The width of the string in the view's font as a float.
+
+	\since BeOS R3
 */
 
 
@@ -1981,6 +2241,8 @@ SetViewColor(Parent()->ViewColor());
 	\param length The maximum number of characters in \a string to consider.
 
 	\return The width of the string in the view's font as a float.
+
+	\since BeOS R3
 */
 
 
@@ -1996,6 +2258,8 @@ SetViewColor(Parent()->ViewColor());
 	\param numStrings The number of strings in \a stringArray.
 	\param widthArray The array to store the widths of the strings in
 	       \a stringArray.
+
+	\since BeOS R3
 */
 
 
@@ -2015,6 +2279,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_TRUNCATE_SMART Truncate from anywhere based on the string content.
 	     Not currently implemented.
 	\param width The maximum width to truncate the string to.
+
+	\since BeOS R5
 */
 
 
@@ -2033,6 +2299,8 @@ SetViewColor(Parent()->ViewColor());
 	\param picture The BPicture object to intersect with.
 	\param where Offset in the view's coordinate system.
 	\param sync If \c false, this method will execute asynchronously.
+
+	\since BeOS R5
 */
 
 
@@ -2047,6 +2315,8 @@ SetViewColor(Parent()->ViewColor());
 	\param sync If \c false, this method will execute asynchronously.
 
 	\see ClipToPicture()
+
+	\since BeOS R5
 */
 
 
@@ -2061,6 +2331,8 @@ SetViewColor(Parent()->ViewColor());
 	hiding parts of it, and overlapping windows) and the constrained clipping
 	regions set by calls to ConstrainClippingRegion() in the current stack of
 	drawing states.
+
+	\since BeOS R3
 */
 
 
@@ -2088,6 +2360,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param region The region to set the clipping region to or \c NULL
 	       to reset to default.
+
+	\since BeOS R3
 */
 
 
@@ -2095,7 +2369,7 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\name Drawing Related Methods
+	\name Drawing Related
 
 	The view must be attached to the window for these methods to work unless
 	otherwise stated. Notes on specific methods are provided below:
@@ -2154,6 +2428,8 @@ SetViewColor(Parent()->ViewColor());
 	\param viewRect The area in the view's coordinate system to draw the
 	       bitmap in.
 	\param options ??
+
+	\since Haiku R1
 */
 
 
@@ -2167,6 +2443,8 @@ SetViewColor(Parent()->ViewColor());
 	       coordinate system.
 	\param viewRect The area in the view's coordinate system to draw the
 	       bitmap in.
+
+	\since BeOS R3
 */
 
 
@@ -2177,6 +2455,8 @@ SetViewColor(Parent()->ViewColor());
 	\param bitmap The bitmap to draw onto the view.
 	\param viewRect The area in the view's coordinate system to draw the
 	       bitmap in.
+
+	\since BeOS R3
 */
 
 
@@ -2186,6 +2466,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param bitmap The bitmap to draw onto the view.
 	\param where The location to draw the bitmap in the view's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -2194,6 +2476,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Draws \a bitmap on the view asynchronously.
 
 	\param bitmap The bitmap to draw onto the view.
+
+	\since BeOS R3
 */
 
 
@@ -2208,6 +2492,8 @@ SetViewColor(Parent()->ViewColor());
 	\param viewRect The area in the view's coordinate system to draw the
 	       bitmap in.
 	\param options ??
+
+	\since Haiku R1
 */
 
 
@@ -2221,6 +2507,8 @@ SetViewColor(Parent()->ViewColor());
 	       coordinate system.
 	\param viewRect The area in the view's coordinate system to draw the
 	       bitmap in.
+
+	\since BeOS R3
 */
 
 
@@ -2231,6 +2519,8 @@ SetViewColor(Parent()->ViewColor());
 	\param bitmap The bitmap to draw onto the view.
 	\param viewRect The area in the view's coordinate system to draw the
 	       bitmap in.
+
+	\since BeOS R3
 */
 
 
@@ -2240,6 +2530,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param bitmap The bitmap to draw onto the view.
 	\param where The location to draw the bitmap in the view's coordinate system.
+
+	\since BeOS R3
 */
 
 
@@ -2248,6 +2540,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Draws \a bitmap on the view.
 
 	\param bitmap The bitmap to draw onto the view.
+
+	\since BeOS R3
 */
 
 
@@ -2258,6 +2552,8 @@ SetViewColor(Parent()->ViewColor());
 	The character is drawn in the view's current font.
 
 	\param c The character to draw.
+
+	\since BeOS R3
 */
 
 
@@ -2269,6 +2565,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param c The character to draw.
 	\param location The location in the view to draw the character.
+
+	\since BeOS R3
 */
 
 
@@ -2283,6 +2581,8 @@ SetViewColor(Parent()->ViewColor());
 	  glyphs.
 	- space(float) The amount of width to add to characters with escapements
 	  but don't have visible glyphs.
+
+	\since BeOS R3
 */
 
 
@@ -2299,6 +2599,8 @@ SetViewColor(Parent()->ViewColor());
 	  glyphs.
 	- space(float) The amount of width to add to characters with escapements
 	  but don't have visible glyphs.
+
+	\since BeOS R3
 */
 
 
@@ -2316,6 +2618,8 @@ SetViewColor(Parent()->ViewColor());
 	  glyphs.
 	- space(float) The amount of width to add to characters with escapements
 	  but don't have visible glyphs.
+
+	\since BeOS R3
 */
 
 
@@ -2334,6 +2638,8 @@ SetViewColor(Parent()->ViewColor());
 	  glyphs.
 	- space(float) The amount of width to add to characters with escapements
 	  but don't have visible glyphs.
+
+	\since BeOS R3
 */
 
 
@@ -2345,6 +2651,8 @@ SetViewColor(Parent()->ViewColor());
 	\param string The string to draw.
 	\param locations A pointer to an array of BPoint objects to draw the string.
 	\param locationCount The number of elements in \a locations.
+
+	\since Haiku R1
 */
 
 
@@ -2358,6 +2666,8 @@ SetViewColor(Parent()->ViewColor());
 	\param length The maximum number of characters in \a string to draw.
 	\param locations A pointer to an array of BPoint objects to draw the string.
 	\param locationCount The number of elements in \a locations.
+
+	\since Haiku R1
 */
 
 
@@ -2374,6 +2684,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2386,6 +2698,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2402,6 +2716,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2414,6 +2730,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2428,6 +2746,8 @@ SetViewColor(Parent()->ViewColor());
 	\param xRadius The horizontal radius.
 	\param yRadius The vertical radius.
 	\param gradient The gradient pattern to fill the ellipse with.
+
+	\since Haiku R1
 */
 
 
@@ -2438,6 +2758,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param rect The area within which to inscribe the shape.
 	\param gradient The gradient pattern to fill the ellipse with.
+
+	\since Haiku R1
 */
 
 
@@ -2457,6 +2779,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2473,6 +2797,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2492,6 +2818,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2509,6 +2837,8 @@ SetViewColor(Parent()->ViewColor());
 	\param startAngle The angle to begin drawing at.
 	\param arcAngle The number of degrees of the arc to draw.
 	\param gradient The gradient pattern to fill the arc with.
+
+	\since Haiku R1
 */
 
 
@@ -2525,6 +2855,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2538,6 +2870,8 @@ SetViewColor(Parent()->ViewColor());
 	\param startAngle The angle to begin drawing at.
 	\param arcAngle The number of degrees of the arc to draw.
 	\param gradient The gradient pattern to fill the arc with.
+
+	\since Haiku R1
 */
 
 
@@ -2550,6 +2884,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2562,6 +2898,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2572,11 +2910,14 @@ SetViewColor(Parent()->ViewColor());
 
 	\param controlPoints The list of points that form the bezier curve.
 	\param gradient The gradient pattern to fill the bezier curve with.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BView::StrokePolygon(const BPolygon* polygon, bool closed, ::pattern pattern)
+	\fn void BView::StrokePolygon(const BPolygon* polygon, bool closed,
+		::pattern pattern)
 	\brief Stroke a polygon shape.
 
 	\param polygon The polygon shape to stroke.
@@ -2586,6 +2927,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2594,7 +2937,8 @@ SetViewColor(Parent()->ViewColor());
 		bool closed, ::pattern pattern)
 	\brief Stroke a polygon shape made up of points specified by \a pointArray.
 
-	\param pointArray An array of points that specify the vertices of the polygon.
+	\param pointArray An array of points that specify the vertices of the
+	       polygon.
 	\param numPoints The number of points in \a pointArray.
 	\param closed Whether or not the last line of the polygon should intersect
 	       with the initial point.
@@ -2602,6 +2946,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2611,15 +2957,19 @@ SetViewColor(Parent()->ViewColor());
 	\brief Stroke a polygon shape made up of points specified by \a pointArray
 	       inscribed by \a bounds.
 
-	\param pointArray An array of points that specify the vertices of the polygon.
+	\param pointArray An array of points that specify the vertices of the
+	       polygon.
 	\param numPoints The number of points in \a pointArray.
-	\param bounds The smallest rectangle that encloses the points in \a pointArray.
+	\param bounds The smallest rectangle that encloses the points in
+	       \a pointArray.
 	\param closed Whether or not the last line of the polygon should intersect
 	       with the initial point.
 	\param pattern One of the following:
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2632,6 +2982,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2642,6 +2994,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param polygon The polygon shape to fill.
 	\param gradient The gradient pattern to fill the polygon with.
+
+	\since Haiku R1
 */
 
 
@@ -2656,6 +3010,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2669,6 +3025,8 @@ SetViewColor(Parent()->ViewColor());
 	       polygon.
 	\param numPoints The number of points in \a pointArray.
 	\param gradient The gradient pattern to fill the polygon with.
+
+	\since Haiku R1
 */
 
 
@@ -2687,6 +3045,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2702,6 +3062,8 @@ SetViewColor(Parent()->ViewColor());
 	\param bounds The smallest rectangle that encloses the points in
 	       \a pointArray.
 	\param gradient The gradient pattern to fill the polygon with.
+
+	\since Haiku R1
 */
 
 
@@ -2714,6 +3076,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2726,6 +3090,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2736,6 +3102,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param rect The rectangular area to fill.
 	\param gradient The gradient pattern to fill the rectangle with.
+
+	\since Haiku R1
 */
 
 
@@ -2752,6 +3120,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2768,6 +3138,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2781,6 +3153,8 @@ SetViewColor(Parent()->ViewColor());
 	\param xRadius The horizontal radius.
 	\param yRadius The vertical radius.
 	\param gradient The gradient pattern to fill the round rect with.
+
+	\since Haiku R1
 */
 
 
@@ -2793,6 +3167,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2802,6 +3178,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param region The \a region to fill.
 	\param gradient The gradient pattern to fill the \a region with.
+
+	\since Haiku R1
 */
 
 
@@ -2819,6 +3197,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2835,6 +3215,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2851,6 +3233,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2864,6 +3248,8 @@ SetViewColor(Parent()->ViewColor());
 	\param point2 The second point of the triangle.
 	\param point3 The third point of the triangle.
 	\param gradient The gradient pattern to fill the triangle with.
+
+	\since Haiku R1
 */
 
 
@@ -2881,6 +3267,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2896,6 +3284,8 @@ SetViewColor(Parent()->ViewColor());
 	\param point3 The third point of the triangle.
 	\param bounds The rectangular area that encloses the triangle.
 	\param gradient The gradient pattern to fill the triangle with.
+
+	\since Haiku R1
 */
 
 
@@ -2908,6 +3298,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2921,6 +3313,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R3
 */
 
 
@@ -2933,6 +3327,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R5
 */
 
 
@@ -2945,6 +3341,8 @@ SetViewColor(Parent()->ViewColor());
 	- \c B_SOLID_HIGH
 	- \c B_SOLID_LOW
 	- \c B_MIXED_COLORS
+
+	\since BeOS R5
 */
 
 
@@ -2954,6 +3352,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param shape The \a shape to fill.
 	\param gradient The gradient pattern to fill the \a shape with.
+
+	\since Haiku R1
 */
 
 
@@ -2973,6 +3373,8 @@ SetViewColor(Parent()->ViewColor());
 	\param count The maximum number of lines in the line array to draw.
 
 	\see StrokeLine()
+
+	\since BeOS R3
 */
 
 
@@ -2983,18 +3385,24 @@ SetViewColor(Parent()->ViewColor());
 	\param start The \a start point of the line.
 	\param end The \a end point of the line.
 	\param color The line \a color.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BView::EndLineArray()
 	\brief End the line array drawing the lines.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BView::SetDiskMode(char* filename, long offset)
 	\brief Unimplemented.
+
+	\since Haiku R1
 */
 
 
@@ -3017,6 +3425,8 @@ SetViewColor(Parent()->ViewColor());
 	resides outside the clipping region or the window is off-screen.
 
 	\param picture The BPicture object to record drawing instructions to.
+
+	\since BeOS R3
 */
 
 
@@ -3025,6 +3435,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Appends drawing instructions to \a picture without clearing it first.
 
 	\param picture The BPicture object to record drawing instructions to.
+
+	\since BeOS R3
 */
 
 
@@ -3034,6 +3446,8 @@ SetViewColor(Parent()->ViewColor());
 	       BPicture object passed to BeginPicture() or AppendToPicture().
 
 	\return The BPicture object passed to BeginPicture() or AppendToPicture().
+
+	\since BeOS R3
 */
 
 
@@ -3055,6 +3469,8 @@ SetViewColor(Parent()->ViewColor());
 	       constructor for more details.
 	\param options Specifies additional view options. The only option currently
 	       available is \c B_TILE_BITMAP which tiles the bitmap across the view.
+
+	\since BeOS R4
 */
 
 
@@ -3074,12 +3490,16 @@ SetViewColor(Parent()->ViewColor());
 	       constructor for more details.
 	\param options Specifies additional view options. The only option currently
 	       available is \c B_TILE_BITMAP which tiles the bitmap across the view.
+
+	\since BeOS R4
 */
 
 
 /*!
 	\fn void BView::ClearViewBitmap()
 	\brief Clears the background bitmap of the view if it has one.
+
+	\since BeOS R4
 */
 
 
@@ -3102,6 +3522,8 @@ SetViewColor(Parent()->ViewColor());
 	       constructor for more details.
 	\param options Specifies additional view options. The only option currently
 	       available is \c B_TILE_BITMAP which tiles the bitmap across the view.
+
+	\since BeOS R5
 */
 
 
@@ -3122,12 +3544,16 @@ SetViewColor(Parent()->ViewColor());
 	       constructor for more details.
 	\param options Specifies additional view options. The only option currently
 	       available is \c B_TILE_BITMAP which tiles the bitmap across the view.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn void BView::ClearViewOverlay()
 	\brief Clears the overlay bitmap of the view if it has one.
+
+	\since BeOS R5
 */
 
 
@@ -3144,6 +3570,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param src The source rectangle to copy bits from.
 	\param dst The destination rectangle to copy bits to.
+
+	\since BeOS R3
 */
 
 
@@ -3152,6 +3580,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Draws the \a picture at the view's current pen position.
 
 	\param picture The BPicture object to draw.
+
+	\since BeOS R3
 */
 
 
@@ -3161,6 +3591,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param picture The BPicture object to draw.
 	\param where The point on the view to draw \a picture.
+
+	\since BeOS R3
 */
 
 
@@ -3172,6 +3604,8 @@ SetViewColor(Parent()->ViewColor());
 	\param filename The filename of the file containing the picture to draw.
 	\param where The point on the view to draw the picture.
 	\param offset The number of bytes to offset in the file to find the picture.
+
+	\since BeOS R4
 */
 
 
@@ -3180,26 +3614,36 @@ SetViewColor(Parent()->ViewColor());
 	\brief Draws the \a picture at the view's current pen position.
 
 	\param picture The BPicture object to draw.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn void BView::DrawPictureAsync(const BPicture* picture, BPoint where)
-	\brief Draws the \a picture at the location in the view specified by \a where.
+	\brief Draws the \a picture at the location in the view specified by
+	       \a where.
 
 	\param picture The BPicture object to draw.
 	\param where The point on the view to draw \a picture.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn void BView::DrawPictureAsync(const char* filename, long offset, BPoint where)
-	\brief Draws the \a picture from the file specified by \a filename offset by
-	       \a offset bytes at the location in the view specified by \a where.
+	\fn void BView::DrawPictureAsync(const char* filename, long offset,
+		BPoint where)
+	\brief Draws the \a picture from the file specified by \a filename offset
+	       by \a offset bytes at the location in the view specified by
+	       \a where.
 
 	\param filename The filename of the file containing the picture to draw.
 	\param where The point on the view to draw the picture.
-	\param offset The number of bytes to offset in the file to find the picture.
+	\param offset The number of bytes to offset in the file to find the
+	       picture.
+
+	\since BeOS R5
 */
 
 
@@ -3209,6 +3653,8 @@ SetViewColor(Parent()->ViewColor());
 	       specified by \a invalRect.
 
 	\param invalRect The rectangular area of the view to redraw.
+
+	\since BeOS R3
 */
 
 
@@ -3218,12 +3664,16 @@ SetViewColor(Parent()->ViewColor());
 	       specified by \a region.
 
 	\param region The region of the view to redraw.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BView::Invalidate()
 	\brief Sends a message to App Server to redraw the view.
+
+	\since BeOS R3
 */
 
 
@@ -3234,6 +3684,8 @@ SetViewColor(Parent()->ViewColor());
 	This method is often used to draw a highlighted selection in a view.
 
 	\param rect The rectangular area in the view to invert the colors of.
+
+	\since BeOS R3
 */
 
 
@@ -3241,7 +3693,7 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\name View Hierarchy Methods
+	\name View Hierarchy
 */
 
 
@@ -3260,6 +3712,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param child The child view to add.
 	\param before The sibling view to add \a child before.
+
+	\since BeOS R3
 */
 
 
@@ -3269,6 +3723,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param child The child layout item to add.
 	\return Whether or not \a child was added to the view layout hierarchy.
+
+	\since Haiku R1
 */
 
 
@@ -3278,6 +3734,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param child The child view to remove.
 	\return Whether or not \a child was removed from the view hierarchy.
+
+	\since BeOS R3
 */
 
 
@@ -3286,6 +3744,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the number of child views that this view has.
 
 	\return The number of child views.
+
+	\since BeOS R3
 */
 
 
@@ -3296,6 +3756,8 @@ SetViewColor(Parent()->ViewColor());
 	\param index The index of the child view to return a pointer of.
 
 	\return A pointer to the child view at \a index or \c NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -3304,6 +3766,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns a pointer to the next sibling view.
 
 	\return A pointer to the next sibling view or \a NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -3312,6 +3776,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns a pointer to the previous sibling view.
 
 	\return A pointer to the previous sibling view or \a NULL if not found.
+
+	\since BeOS R3
 */
 
 
@@ -3320,6 +3786,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Removes the view and all child views from the view hierarchy.
 
 	\returns Whether or not the view was removed from the view hierarchy.
+
+	\since BeOS R3
 */
 
 
@@ -3328,6 +3796,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns a pointer to the view's parent.
 
 	\return A pointer to the parent view or \c NULL if not attached.
+
+	\since BeOS R3
 */
 
 
@@ -3337,6 +3807,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\return The view in the view hierarchy with the specified \a name or \c NULL
 	        if not found.
+
+	\since BeOS R3
 */
 
 
@@ -3344,7 +3816,7 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\name View Frame Alteration Methods
+	\name View Frame Alteration
 
 	As a view's frame rectangle must be aligned to pixel values all parameters are
 	rounded to the nearest integer. If the view isn't attached these methods alter the
@@ -3362,6 +3834,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param deltaX The number of pixels to move the view horizontally.
 	\param deltaY The number of pixels to move the view vertically.
+
+	\since BeOS R3
 */
 
 
@@ -3371,6 +3845,8 @@ SetViewColor(Parent()->ViewColor());
 	       view's coordinate system.
 
 	\param where The location to move the view to.
+
+	\since BeOS R3
 */
 
 
@@ -3382,6 +3858,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param x The horizontal coordinate to move the view to.
 	\param y The vertical coordinate to move the view to.
+
+	\since BeOS R3
 */
 
 
@@ -3392,6 +3870,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param deltaWidth The number of pixels to resize the view by horizontally.
 	\param deltaHeight The number of pixels to resize the view by vertically.
+
+	\since BeOS R3
 */
 
 
@@ -3401,6 +3881,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param width The width to resize the view to.
 	\param height The height to resize the view to.
+
+	\since BeOS R3
 */
 
 
@@ -3409,6 +3891,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Resize the view to the dimension specified by \a size.
 
 	\param size The \a size to resize the view to.
+
+	\since Haiku R1
 */
 
 
@@ -3417,20 +3901,17 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn status_t BView::GetSupportedSuites(BMessage* data)
-	\brief Reports the suites of messages and specifiers understood by the view.
+	\brief Reports the suites of messages and specifiers understood by the
+	       view.
 
-	\param data The message to use to report the suite of messages and specifiers.
-
-	\see BHandler::GetSupportedSuites()
+	\copydetails BHandler::GetSupportedSuites()
 */
 
 
 /*!
 	\fn BHandler* BView::ResolveSpecifier(BMessage* message, int32 index,
 		BMessage* specifier, int32 what, const char* property)
-	\brief Determine the proper handler for a scripting message.
-
-	\see BHandler::ResolveSpecifier()
+	\copydoc BHandler::ResolveSpecifier()
 */
 
 
@@ -3457,12 +3938,12 @@ SetViewColor(Parent()->ViewColor());
 
 	\returns A status code.
 
-	\sa BHandler::Perform()
+	\since Haiku R1
 */
 
 
 /*!
-	\name Layout Methods
+	\name Layouting
 
 	\note These methods were not available in BeOS R5.
 */
@@ -3473,31 +3954,37 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn BSize BView::MinSize()
-	\brief Get the minimum size of the view.
+	\brief Return the minimum size of the view.
 
 	\return The minimum size of the view as a BSize.
 
 	\sa BAbstractLayout::MinSize()
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BSize BView::MaxSize()
-	\brief Get the maximum size of the view.
+	\brief Return the maximum size of the view.
 
 	\return The maximum size of the view as a BSize.
 
 	\sa BAbstractLayout::MaxSize()
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BSize BView::PreferredSize()
-	\brief Get the preferred size of the view.
+	\brief Return the preferred size of the view.
 
 	\return The preferred size of the view as a BSize.
 
 	\sa BAbstractLayout::PreferredSize()
+
+	\since Haiku R1
 */
 
 
@@ -3506,6 +3993,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set this view's min size, to be used by MinSize().
 
 	\sa BAbstractLayout::SetExplicitMinSize()
+
+	\since Haiku R1
 */
 
 
@@ -3514,6 +4003,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set this view's max size, to be used by MaxSize().
 
 	\sa BAbstractLayout::SetExplicitMaxSize()
+
+	\since Haiku R1
 */
 
 
@@ -3522,6 +4013,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set this view's preferred size, to be used by PreferredSize().
 
 	\sa BAbstractLayout::SetExplicitPreferredSize()
+
+	\since Haiku R1
 */
 
 
@@ -3530,6 +4023,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set this view's alignment, to be used by Alignment().
 
 	\sa BAbstractLayout::SetExplicitAlignment()
+
+	\since Haiku R1
 */
 
 
@@ -3538,6 +4033,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Sets the \a layout of the view.
 
 	\param layout The \a layout to set.
+
+	\since Haiku R1
 */
 
 
@@ -3546,6 +4043,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Get the layout of the view.
 
 	\returns The layout of the view.
+
+	\since Haiku R1
 */
 
 
@@ -3554,18 +4053,24 @@ SetViewColor(Parent()->ViewColor());
 	\brief Invalidate layout.
 
 	\param descendants Also invalidate its children views.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BView::EnableLayoutInvalidation()
 	\brief Enable layout invalidation.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BView::DisableLayoutInvalidation()
 	\brief Disable layout invalidation.
+
+	\since Haiku R1
 */
 
 
@@ -3574,6 +4079,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns whether or not layout invalidation is disabled.
 
 	\return \c true of layout invalidation is disabled, \c false otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -3582,6 +4089,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns whether or not the layout is valid.
 
 	\brief Returns \c true if the layout is valid, \c false otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -3595,6 +4104,8 @@ SetViewColor(Parent()->ViewColor());
 	which it updates in methods other than DoLayout(), it has to invoke this
 	method, when it has done so, since otherwise the information might become
 	obsolete without the layout noticing.
+
+	\since Haiku R1
 */
 
 
@@ -3603,18 +4114,24 @@ SetViewColor(Parent()->ViewColor());
 	\brief Layout the view.
 
 	\param force If \c true layout even if valid.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BView::Relayout()
 	\brief Relayout the view.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BView::DoLayout()
 	\brief Layout view within the layout context.
+
+	\since Haiku R1
 */
 
 
@@ -3622,7 +4139,7 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\name Tool Tip Methods
+	\name Tool Tips
 
 	\note These methods were not available in BeOS R5.
 */
@@ -3636,6 +4153,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set the tool tip of the view to \a text.
 
 	\param text The \a text to set the view to or \c NULL or blank to unset.
+
+	\since Haiku R1
 */
 
 
@@ -3644,6 +4163,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Set the tool tip of the view to the \a tip object.
 
 	\param tip The tool tip object to set the view to or \c NULL to unset.
+
+	\since Haiku R1
 */
 
 
@@ -3652,6 +4173,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Return the tool tip set to the view or \c NULL if not set.
 
 	\return The BToolTip object set to the view.
+
+	\since Haiku R1
 */
 
 
@@ -3660,12 +4183,16 @@ SetViewColor(Parent()->ViewColor());
 	\brief Show the tool tip at the current mouse position.
 
 	\param tip The BToolTip object to show.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BView::HideToolTip()
 	\brief Hide the view's tool tip.
+
+	\since Haiku R1
 */
 
 
@@ -3675,6 +4202,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param point Currently unused.
 	\param _tip A pointer to a pointer to a BToolTip object to set.
+
+	\since Haiku R1
 */
 
 

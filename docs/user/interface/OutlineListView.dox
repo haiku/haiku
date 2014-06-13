@@ -35,6 +35,8 @@
 
 	\see BListView for more info on how to use a list view, most of which also
 	     applies to an outline list view.
+
+	\since BeOS R3
 */
 
 
@@ -49,6 +51,8 @@
 	       selections.
 	\param resizingMode The resizing mode flags. See BView for details.
 	\param flags The view flags. See BView for details.
+
+	\since BeOS R3
 */
 
 
@@ -61,6 +65,8 @@
 	\param type Whether the list view supports a single selection or multiple
 	       selections.
 	\param flags The view flags. See BView for details.
+
+	\since Haiku R1
 */
 
 
@@ -69,6 +75,8 @@
 	\brief Creates a BOutlineListView object from the \a archive message.
 
 	\param archive The message to create the object from.
+
+	\since BeOS R3
 */
 
 
@@ -78,6 +86,8 @@
 	       by it.
 
 	This method does not free the attached list items.
+
+	\since BeOS R3
 */
 
 
@@ -94,6 +104,8 @@
 	\brief Create a new BOutlineListView object from the message \a archive.
 
 	\param archive The message to create the object from.
+
+	\since BeOS R3
 */
 
 
@@ -103,6 +115,8 @@
 
 	\param archive The message to archive the object to.
 	\param deep \c true to archive child views.
+
+	\since BeOS R3
 */
 
 
@@ -110,7 +124,7 @@
 
 
 /*!
-	\name Hook methods
+	\name Hook Methods
 */
 
 
@@ -119,19 +133,13 @@
 
 /*!
 	\fn void BOutlineListView::AllAttached()
-	\brief Hook method called once all views are attached to the outline list
-	       view.
-
-	\see BView::AllAttached()
+	\copydoc BView::AllAttached()
 */
 
 
 /*!
 	\fn void BOutlineListView::AllDetached()
-	\brief Hook method called once all views are detached from the outline list
-	       view.
-
-	\see BView::AllDetached()
+	\copydoc BView::AllDetached()
 */
 
 
@@ -140,28 +148,23 @@
 	\brief Hook method that is called when the outline list view is removed from
 	       the view hierarchy.
 
-	\see BView::DetachedFromWindow()
+	\copydetails BView::DetachedFromWindow()
 */
 
 
 /*!
-	\fn void BOutlineListView::FrameMoved(BPoint new_position)
+	\fn void BOutlineListView::FrameMoved(BPoint newPosition)
 	\brief Hook method called when the outline list view is moved.
 
-	\param new_position The list view's new position.
-
-	\see BView::FrameMoved()
+	\copydetails BView::FrameMoved()
 */
 
 
 /*!
-	\fn void BOutlineListView::FrameResized(float width, float height)
+	\fn void BOutlineListView::FrameResized(float newWidth, float newHeight)
 	\brief Hook method called when the outline list view is resized.
 
-	\param width The new \a width of the view.
-	\param height The new \a height of the view.
-
-	\see BView::FrameResized()
+	\copydetails BView::FrameResized()
 */
 
 
@@ -182,6 +185,8 @@
 	\param numBytes The number of bytes in \a bytes.
 
 	\see BListView::KeyDown()
+
+	\since BeOS R3
 */
 
 
@@ -190,9 +195,7 @@
 	\brief Hook method called when a message is received by the outline list
 	       view.
 
-	\param message The message received by the view.
-
-	\see BView::MessageReceived()
+	\copydetails BView::MessageReceived()
 */
 
 
@@ -208,6 +211,8 @@
 	       the mouse button is pressed.
 
 	\see BListView::MouseDown()
+
+	\since BeOS R3
 */
 
 
@@ -216,9 +221,7 @@
 	\brief Hook method that is called when a mouse button is released while
 	       the cursor is contained in the frame of the outline list view.
 
-	\param where The location that the mouse button was released.
-
-	\see BView::MouseUp()
+	\copydetails BView::MouseUp()
 */
 
 
@@ -226,7 +229,7 @@
 
 
 /*!
-	\name Add and remove item methods
+	\name Adding/Removing Items
 */
 
 
@@ -241,6 +244,8 @@
 	\param superItem The item to add under, if \c NULL adds to end.
 
 	\return \c true if the \a item was added, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -251,6 +256,8 @@
 	\param item The \a item to add.
 
 	\return \c true if the \a item was added, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -262,6 +269,8 @@
 	\param fullListIndex The index to add \a item at.
 
 	\return \c true if the \a item was added, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -272,6 +281,8 @@
 	\param newItems The list of items to add.
 
 	\return \c true if the items was added, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -283,6 +294,8 @@
 	\param fullListIndex The index to add \a item at.
 
 	\return \c true if the items was added, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -293,6 +306,8 @@
 	\param item The \a item to remove.
 
 	\return \c true if the \a item was removed, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -301,6 +316,8 @@
 	\brief Removes the \a item located at \a fullListIndex from the list.
 
 	\return A pointer to the BListItem removed.
+
+	\since BeOS R3
 */
 
 
@@ -309,6 +326,8 @@
 	\brief Removes \a count items starting at \a fullListIndex from the list.
 
 	\return \c true if the items were removed, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -316,7 +335,7 @@
 
 
 /*!
-	\name Full list methods
+	\name Full List
 
 	These methods replicate similar methods in BListView except work on the
 	full list.
@@ -334,6 +353,8 @@
 	        found.
 
 	\see BListView::ItemAt(int32 index)
+
+	\since BeOS R3
 */
 
 
@@ -344,6 +365,8 @@
 	\return The index of the item at \a where or -1 if not found.
 
 	\see BListView::IndexOf(BListItem* item)
+
+	\since BeOS R3
 */
 
 
@@ -354,6 +377,8 @@
 	\return The index of the item at \a where or -1 if not found.
 
 	\see BListView::IndexOf(BPoint point)
+
+	\since BeOS R3
 */
 
 
@@ -365,6 +390,8 @@
 	        items.
 
 	\see BListView::FirstItem()
+
+	\since BeOS R3
 */
 
 
@@ -376,6 +403,8 @@
 	        items.
 
 	\see BListView::LastItem()
+
+	\since BeOS R3
 */
 
 
@@ -388,6 +417,8 @@
 	\return \c true if \a item is in the list, \c false otherwise.
 
 	\see BListView::HasItem(BListItem* item)
+
+	\since BeOS R3
 */
 
 
@@ -398,6 +429,8 @@
 	\return The number of items.
 
 	\see BListView::CountItems()
+
+	\since BeOS R3
 */
 
 
@@ -410,12 +443,16 @@
 	       index.
 
 	\see BListView::CurrentSelection(int32 index)
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BOutlineListView::MakeEmpty()
 	\brief Empties the outline list view of all items.
+
+	\since BeOS R3
 */
 
 
@@ -426,6 +463,8 @@
 	\return \c true if the outline list view is empty, \c false otherwise.
 
 	\see BListView::IsEmpty()
+
+	\since BeOS R3
 */
 
 
@@ -436,6 +475,8 @@
 	\param func The function to call on each item.
 
 	\see BListView::DoForEach(bool (*func)(BListItem* item))
+
+	\since BeOS R3
 */
 
 
@@ -449,6 +490,8 @@
 
 	\sa BListView::DoForEach(bool (*func)(BListItem* item, void* arg),
 		void* arg)
+
+	\since BeOS R3
 */
 
 
@@ -461,18 +504,24 @@
 
 	\return A pointer to the superitem of \a item or \c NULL if the \a item
 	       is at the outermost level or not found.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BOutlineListView::Expand(BListItem* item)
 	\brief Expands the section referenced by \a item.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BOutlineListView::Collapse(BListItem* item)
 	\brief Collapses the section referenced by \a item.
+
+	\since BeOS R3
 */
 
 
@@ -482,11 +531,13 @@
 	       is expanded or not.
 
 	\return \c true if the section is expanded, \c false if it is collapsed.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Sort methods
+	\name Sorting
 */
 
 
@@ -501,6 +552,8 @@
 	\param compareFunc The compare function to use to sort the items.
 
 	\see BListView::SortItems(int (*cmp)(const void *, const void *))
+
+	\since BeOS R3
 */
 
 
@@ -514,6 +567,8 @@
 	\param oneLevelOnly if \c true, only items located one level under
 	       superItem are considered.
 	\param compareFunc The compare function to use to sort the items.
+
+	\since BeOS R3
 */
 
 
@@ -530,6 +585,8 @@
 	       superItem are considered.
 
 	\return The number of items under \a superItem.
+
+	\since BeOS R3
 */
 
 
@@ -544,6 +601,8 @@
 	       superItem are considered.
 	\param eachFunc The function to call on each item.
 	\param arg The second argument of \a eachFunc.
+
+	\since BeOS R3
 */
 
 
@@ -563,6 +622,8 @@
 
 	\return A pointer to the item at \a index under \a superItem or \c NULL
 	        if not found.
+
+	\since BeOS R3
 */
 
 
@@ -575,6 +636,8 @@
 	\param data The \a data to act on.
 
 	\see BListView::DoMiscellaneous()
+
+	\since Haiku R1
 */
 
 
@@ -585,6 +648,8 @@
 	\param item The \a item to toggle.
 	\param expand If \c true, expand the \a item, if \c false, collapse the
 	        \a item.
+
+	\since Haiku R1
 */
 
 
@@ -594,6 +659,8 @@
 
 	\param itemRect The area of the item to get the latch area of.
 	\param level The \a level of the item to get the latch area of.
+
+	\since Haiku R1
 */
 
 
@@ -612,16 +679,20 @@
 	       \c false to draw the latch in an unselected state. Unused
 	       by the base class.
 	\param misTracked Unused by the base class.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BOutlineListView::DrawItem(BListItem* item, BRect itemRect,
 		bool complete)
-	\brief Used by derived classes to draw the \a item.
+	\brief Used by derived classes to override how an \a item is drawn.
 
 	\param item The \a item to draw.
 	\param itemRect The area of the \a item to draw.
 	\param complete Whether or not to draw the background in addition to the
 	       contents.
+
+	\since Haiku R1
 */
