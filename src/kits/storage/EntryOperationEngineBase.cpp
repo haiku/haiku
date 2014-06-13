@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -114,6 +114,70 @@ BEntryOperationEngineBase::Entry::Path() const
 	if (GetPath(pathBuffer, path) == B_OK)
 		return BString(path);
 	return BString();
+}
+
+
+status_t
+BEntryOperationEngineBase::Entry::GetPathOrName(BString& _path) const
+{
+	_path.Truncate(0);
+
+	BPath buffer;
+	const char* path;
+	status_t error = GetPath(buffer, path);
+	if (error == B_NO_MEMORY)
+		return error;
+
+	if (error == B_OK) {
+		_path = path;
+	} else if (fEntry != NULL) {
+		// GetPath() apparently failed, so just return the entry name.
+		_path = fEntry->Name();
+	} else if (fDirectory != NULL || fDirectoryRef != NULL) {
+		if (fPath != NULL && fPath[0] == '/') {
+			// absolute path -- just return it
+			_path = fPath;
+		} else {
+			// get the directory path
+			BEntry entry;
+			if (fDirectory != NULL) {
+				error = fDirectory->GetEntry(&entry);
+			} else {
+				BDirectory directory;
+				error = directory.SetTo(fDirectoryRef);
+				if (error == B_OK)
+					error = directory.GetEntry(&entry);
+			}
+
+			if (error != B_OK || (error = entry.GetPath(&buffer)) != B_OK)
+				return error;
+
+			_path = buffer.Path();
+
+			// If we additionally have a relative path, append it.
+			if (!_path.IsEmpty() && fPath != NULL) {
+				int32 length = _path.Length();
+				_path << '/' << fPath;
+				if (_path.Length() < length + 2)
+					return B_NO_MEMORY;
+			}
+		}
+	} else if (fEntryRef != NULL) {
+		// Getting the actual path apparently failed, so just return the entry
+		// name.
+		_path = fEntryRef->name;
+	} else if (fPath != NULL)
+		_path = fPath;
+
+	return _path.IsEmpty() ? B_NO_MEMORY : B_OK;
+}
+
+
+BString
+BEntryOperationEngineBase::Entry::PathOrName() const
+{
+	BString path;
+	return GetPathOrName(path) == B_OK ? path : BString();
 }
 
 

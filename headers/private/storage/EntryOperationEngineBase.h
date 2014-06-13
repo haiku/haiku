@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -43,6 +43,12 @@ public:
 			status_t			GetPath(BPath& buffer, const char*& _path)
 									const;
 			BString				Path() const;
+
+			status_t			GetPathOrName(BString& _path) const;
+									// Tries to return some kind of string
+									// representation. Useful only for debugging
+									// and error reporting.
+			BString				PathOrName() const;
 
 private:
 			const BDirectory*	fDirectory;
