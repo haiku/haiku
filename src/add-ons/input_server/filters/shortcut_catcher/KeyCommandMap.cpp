@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -208,18 +208,18 @@ KeyCommandMap::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case EXECUTE_COMMAND:
 		{
-			BMessage substituteMessage;
-			if (message->FindMessage("act", &substituteMessage) == B_OK) {
+			BMessage actuatorMessage;
+			if (message->FindMessage("act", &actuatorMessage) == B_OK) {
 				if (fSyncSpecs.Lock()) {
-					fInjects.AddItem(new BMessage(substituteMessage));
+					fInjects.AddItem(new BMessage(actuatorMessage));
 					fSyncSpecs.Unlock();
 
 					// This evil hack forces input_server to call Filter() on
 					// us so we can process the injected event.
-					BPoint lmp;
-					status_t err = fLastMouseMessage.FindPoint("where", &lmp);
+					BPoint where;
+					status_t err = fLastMouseMessage.FindPoint("where", &where);
 					if (err == B_OK)
-						set_mouse_position((int32)lmp.x, (int32)lmp.y);
+						set_mouse_position((int32)where.x, (int32)where.y);
 				}
 			}
 			break;
@@ -269,13 +269,13 @@ KeyCommandMap::MessageReceived(BMessage* message)
 
 						// Leave handling of add-ons shortcuts to Tracker
 						BString command;
-						if (msg.FindString("command", &command) == B_OK) {
+						if (message.FindString("command", &command) == B_OK) {
 							BStringList paths;
 							BPathFinder::FindPaths(
 								B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker/",
 								paths);
 							bool foundAddOn = false;
-							for (uint32 i = 0; i < paths.CountStrings(); i++) {
+							for (int32 i = 0; i < paths.CountStrings(); i++) {
 								if (command.FindFirst(paths.StringAt(i))
 										!= B_ERROR) {
 									foundAddOn = true;
@@ -325,16 +325,21 @@ KeyCommandMap::MessageReceived(BMessage* message)
 }
 
 
+//	#pragma mark - KeyCommandMap private methods
+
+
 //! Deletes an HKS-filled BList and its contents.
 void
-KeyCommandMap::_DeleteHKSList(BList* l)
+KeyCommandMap::_DeleteHKSList(BList* list)
 {
-	if (l != NULL) {
-		int num = l->CountItems();
-		for (int i = 0; i < num; i++)
-			delete ((hks*) l->ItemAt(i));
-		delete l;
-	}
+	if (list == NULL)
+		return;
+
+	int32 count = list->CountItems();
+	for (int32 i = 0; i < count; i++)
+		delete (hks*)list->ItemAt(i);
+
+	delete list;
 }
 
 
