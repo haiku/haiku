@@ -69,7 +69,6 @@
 #define _ZOOM_				'_WZO'
 #define _SEND_BEHIND_		'_WSB'
 #define _SEND_TO_FRONT_		'_WSF'
-#define _SWITCH_WORKSPACE_	'_SWS'
 
 
 void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
@@ -963,54 +962,6 @@ BWindow::DispatchMessage(BMessage* message, BHandler* target)
 		case _SEND_TO_FRONT_:
 			Activate();
 			break;
-
-		case _SWITCH_WORKSPACE_:
-		{
-			int32 deltaX = 0;
-			message->FindInt32("delta_x", &deltaX);
-			int32 deltaY = 0;
-			message->FindInt32("delta_y", &deltaY);
-			bool takeMeThere = false;
-			message->FindBool("take_me_there", &takeMeThere);
-
-			if (deltaX == 0 && deltaY == 0)
-				break;
-
-			BPrivate::AppServerLink link;
-			link.StartMessage(AS_GET_WORKSPACE_LAYOUT);
-
-			status_t status;
-			int32 columns;
-			int32 rows;
-			if (link.FlushWithReply(status) != B_OK || status != B_OK)
-				break;
-
-			link.Read<int32>(&columns);
-			link.Read<int32>(&rows);
-
-			int32 current = current_workspace();
-
-			int32 nextColumn = current % columns + deltaX;
-			int32 nextRow = current / columns + deltaY;
-			if (nextColumn >= columns)
-				nextColumn = columns - 1;
-			else if (nextColumn < 0)
-				nextColumn = 0;
-			if (nextRow >= rows)
-				nextRow = rows - 1;
-			else if (nextRow < 0)
-				nextRow = 0;
-
-			int32 next = nextColumn + nextRow * columns;
-			if (next != current) {
-				BPrivate::AppServerLink link;
-				link.StartMessage(AS_ACTIVATE_WORKSPACE);
-				link.Attach<int32>(next);
-				link.Attach<bool>(takeMeThere);
-				link.Flush();
-			}
-			break;
-		}
 
 		case B_MINIMIZE:
 		{
@@ -2823,49 +2774,6 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 		new BMessage(_SEND_TO_FRONT_), NULL);
 	AddShortcut('B', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(_SEND_BEHIND_), NULL);
-
-	// Workspace modifier keys
-	BMessage* message;
-
-	message = new BMessage(_SWITCH_WORKSPACE_);
-	message->AddInt32("delta_x", -1);
-	AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
-
-	message = new BMessage(_SWITCH_WORKSPACE_);
-	message->AddInt32("delta_x", 1);
-	AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
-
-	message = new BMessage(_SWITCH_WORKSPACE_);
-	message->AddInt32("delta_y", -1);
-	AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
-
-	message = new BMessage(_SWITCH_WORKSPACE_);
-	message->AddInt32("delta_y", 1);
-	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
-
-	message = new BMessage(_SWITCH_WORKSPACE_);
-	message->AddBool("take_me_there", true);
-	message->AddInt32("delta_x", -1);
-	AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY,
-		message, NULL);
-
-	message = new BMessage(_SWITCH_WORKSPACE_);
-	message->AddBool("take_me_there", true);
-	message->AddInt32("delta_x", 1);
-	AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY,
-		message, NULL);
-
-	message = new BMessage(_SWITCH_WORKSPACE_);
-	message->AddBool("take_me_there", true);
-	message->AddInt32("delta_y", -1);
-	AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY,
-		message, NULL);
-
-	message = new BMessage(_SWITCH_WORKSPACE_);
-	message->AddBool("take_me_there", true);
-	message->AddInt32("delta_y", 1);
-	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY,
-		message, NULL);
 
 	// We set the default pulse rate, but we don't start the pulse
 	fPulseRate = 500000;
