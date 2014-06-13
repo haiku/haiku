@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons input_server filters minimize_all ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders interface tracker ;
+
+Addon minimize_all
+	: MinimizeAllInputFilter.cpp
+	: be input_server $(TARGET_LIBSUPC++)
+	;
