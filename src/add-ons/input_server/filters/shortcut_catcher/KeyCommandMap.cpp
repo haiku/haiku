@@ -179,7 +179,8 @@ KeyCommandMap::DrainInjectedEvents(const BMessage* keyMessage, BList* outList,
 
 		BArchivable* archive = instantiate_object(message);
 		if (archive != NULL) {
-			CommandActuator* actuator = dynamic_cast<CommandActuator*>(archive);
+			CommandActuator* actuator
+				= dynamic_cast<CommandActuator*>(archive);
 			if (actuator != NULL) {
 				BMessage newMessage(*keyMessage);
 				newMessage.what = B_KEY_DOWN;
@@ -251,7 +252,8 @@ KeyCommandMap::MessageReceived(BMessage* message)
 			BFile file(fFileName, B_READ_ONLY);
 			BList* newList = new BList;
 			BList* oldList = NULL;
-			if (file.InitCheck() == B_OK && fileMessage.Unflatten(&file) == B_OK) {
+			if (file.InitCheck() == B_OK && fileMessage.Unflatten(&file)
+					== B_OK) {
 				file.GetNodeRef(&fNodeRef);
 				int32 i = 0;
 				BMessage message;
@@ -269,8 +271,9 @@ KeyCommandMap::MessageReceived(BMessage* message)
 						BString command;
 						if (msg.FindString("command", &command) == B_OK) {
 							BStringList paths;
-							BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
-								"Tracker/", paths);
+							BPathFinder::FindPaths(
+								B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker/",
+								paths);
 							bool foundAddOn = false;
 							for (uint32 i = 0; i < paths.CountStrings(); i++) {
 								if (command.FindFirst(paths.StringAt(i))
@@ -281,7 +284,9 @@ KeyCommandMap::MessageReceived(BMessage* message)
 							}
 							if (foundAddOn) continue;
 						}
-						BArchivable* archive = instantiate_object(&testerMessage);
+
+						BArchivable* archive
+							= instantiate_object(&testerMessage);
 						if (BitFieldTester* tester
 								= dynamic_cast<BitFieldTester*>(archive)) {
 							archive = instantiate_object(&actuatorMessage);
