@@ -50,7 +50,8 @@ enum {
 	ARCH_ARM_v5T,
 	ARCH_ARM_v5TE,
 	ARCH_ARM_v5TEJ,
-	ARCH_ARM_v6
+	ARCH_ARM_v6,
+	ARCH_ARM_v7
 };
 
 typedef struct arch_cpu_info {

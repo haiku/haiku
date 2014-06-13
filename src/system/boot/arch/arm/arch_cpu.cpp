@@ -39,7 +39,7 @@ static status_t
 check_cpu_features()
 {
 	uint32 result = 0;
-	int arch;
+	int arch = 0;
 	int variant = 0;
 	int part = 0;
 	int revision = 0;
@@ -49,41 +49,63 @@ check_cpu_features()
 
 	implementor = (result >> 24) & 0xff;
 
-	if (!(result & (1 << 19))) {
-		switch ((result >> 12) & 0xf) {
-			case 0:	/* early ARMv3 or even older */
-				arch = ARCH_ARM_PRE_ARM7;
-				break;
+	switch ((result >> 12) & 0xf) {
+		case 0:	/* early ARMv3 or even older */
+			arch = ARCH_ARM_PRE_ARM7;
+			break;
 
-			case 7:	/* ARM7 processor */
-				arch = (result & (1 << 23)) ? ARCH_ARM_v4T : ARCH_ARM_v3;
-				variant = (result >> 16) & 0x7f;
-				part = (result >> 4) & 0xfff;
-				revision = result & 0xf;
-				break;
+		case 7:	/* ARM7 processor */
+			arch = (result & (1 << 23)) ? ARCH_ARM_v4T : ARCH_ARM_v3;
+			variant = (result >> 16) & 0x7f;
+			part = (result >> 4) & 0xfff;
+			revision = result & 0xf;
+			break;
 
-			default:
-				revision = result & 0xf;
-				part = (result >> 4) & 0xfff;
-				switch((result >> 16) & 0xf) {
-					case 1: arch = ARCH_ARM_v4; break;
-					case 2: arch = ARCH_ARM_v4T; break;
-					case 3: arch = ARCH_ARM_v5; break;
-					case 4: arch = ARCH_ARM_v5T; break;
-					case 5: arch = ARCH_ARM_v5TE; break;
-					case 6: arch = ARCH_ARM_v5TEJ; break;
-					case 7: arch = ARCH_ARM_v6; break;
-					case 0xf: /* XXX TODO ARMv7 */; break;
-				}
-				variant = (result >> 20) & 0xf;
-				break;
-		}
+		default:
+			revision = result & 0xf;
+			part = (result >> 4) & 0xfff;
+			switch((result >> 16) & 0xf) {
+				case 1: arch = ARCH_ARM_v4; break;
+				case 2: arch = ARCH_ARM_v4T; break;
+				case 3: arch = ARCH_ARM_v5; break;
+				case 4: arch = ARCH_ARM_v5T; break;
+				case 5: arch = ARCH_ARM_v5TE; break;
+				case 6: arch = ARCH_ARM_v5TEJ; break;
+				case 7: arch = ARCH_ARM_v6; break;
+				case 0xf:
+					arch = ARCH_ARM_v7;
+					// TODO ... or later. We apparently need to scan the
+					// CPUID registers to decide.
+					break;
+			}
+			variant = (result >> 20) & 0xf;
+			break;
 	}
+
+	// TODO actually check for VFP support, and maybe there is a better place
+	// to do this.
+	if (arch >= ARCH_ARM_v7)
+	{
+		// Enable VFP/NEON. We HAVE to do this before the trace call below,
+		// which is the first time we call vprintf. Otherwise, it will crash
+		// when trying to push floating point registers on the stack.
+		asm volatile(
+		"	MRC p15, #0, r1, c1, c0, #2\n" // r1 = Access Control Register
+		"	ORR r1, r1, #(0xf << 20)\n" // enable full access for p10,11
+		"	MCR p15, #0, r1, c1, c0, #2\n" // Access Control Register = r1
+		"	MOV r1, #0\n"
+		"	MCR p15, #0, r1, c7, c5, #4\n" // flush prefetch buffer because of
+			// FMXR below and CP 10 & 11 were only just enabled
+		"	MOV r0,#0x40000000	\n" // Enable VFP itself
+		"	FMXR FPEXC, r0" //FPEXC = r0
+		:::"r0", "r1");
+	}
+
 
 	TRACE(("%s: implementor=0x%x('%c'), arch=%d, variant=0x%x, part=0x%x, revision=0x%x\n",
 		__func__, implementor, implementor, arch, variant, part, revision));
 
-	return B_OK;
+	return (arch < ARCH_ARM_v5) ? B_ERROR : B_OK;
 }
 
 
