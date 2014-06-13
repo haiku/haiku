@@ -1,0 +1,28 @@
+# Initialisation script for GDB to help debugging the Haiku ARM port with qemu.
+# Setup the gdbinit from reverse.put.as, then run gdb -x thisscript from the
+# generated dir. This will set everything up for you so you can start debugging
+# right away.
+
+# Needs http://reverse.put.as/gdbinit/
+
+# Set ARM mode
+arm
+# Show context on events
+context-on
+
+# Below are regular gdb commands (no need for that funky gdbinit script!)
+
+# Connect to qemu
+target remote localhost:1234
+
+# Show readable C++ symbols in asm listings
+set print asm-demangle on
+
+# Load the bootloader symbols so we can see what we're doing
+symbol-file objects/haiku/arm/release/system/boot/boot_loader_u-boot
+
+# Set a breakpoint at our entry point, so we can watch things roll after the
+# boring part of u-boot loading everything in RAM
+break *0x80008008
+
+continue
