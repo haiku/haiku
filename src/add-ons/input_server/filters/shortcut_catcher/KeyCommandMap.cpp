@@ -282,7 +282,8 @@ KeyCommandMap::MessageReceived(BMessage* message)
 									break;
 								}
 							}
-							if (foundAddOn) continue;
+							if (foundAddOn)
+								continue;
 						}
 
 						BArchivable* archive
