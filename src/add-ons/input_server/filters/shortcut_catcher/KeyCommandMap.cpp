@@ -19,7 +19,9 @@
 #include <NodeMonitor.h>
 #include <OS.h>
 #include <Path.h>
+#include <PathFinder.h>
 #include <PathMonitor.h>
+#include <StringList.h>
 #include <WindowScreen.h>
 
 #include "BitFieldTesters.h"
@@ -265,39 +267,20 @@ KeyCommandMap::MessageReceived(BMessage* message)
 
 						// Leave handling of add-ons shortcuts to Tracker
 						BString command;
-						if (message.FindString("command", &command) == B_OK) {
-							BPath path;
-							if (find_directory(B_SYSTEM_ADDONS_DIRECTORY, &path)
-									== B_OK) {
-								path.Append("Tracker/");
-								if (command.FindFirst(path.Path()) != B_ERROR)
-									continue;
+						if (msg.FindString("command", &command) == B_OK) {
+							BStringList paths;
+							BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
+								"Tracker/", paths);
+							bool foundAddOn = false;
+							for (uint32 i = 0; i < paths.CountStrings(); i++) {
+								if (command.FindFirst(paths.StringAt(i))
+										!= B_ERROR) {
+									foundAddOn = true;
+									break;
+								}
 							}
-
-							if (find_directory(
-								B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, &path)
-									== B_OK) {
-								path.Append("Tracker/");
-								if (command.FindFirst(path.Path()) != B_ERROR)
-									continue;
-							}
-
-							if (find_directory(B_USER_ADDONS_DIRECTORY, &path)
-									== B_OK) {
-								path.Append("Tracker/");
-								if (command.FindFirst(path.Path()) != B_ERROR)
-									continue;
-							}
-
-							if (find_directory(
-								B_USER_NONPACKAGED_ADDONS_DIRECTORY, &path)
-									== B_OK) {
-								path.Append("Tracker/");
-								if (command.FindFirst(path.Path()) != B_ERROR)
-									continue;
-							}
+							if (foundAddOn) continue;
 						}
-
 						BArchivable* archive = instantiate_object(&testerMessage);
 						if (BitFieldTester* tester
 								= dynamic_cast<BitFieldTester*>(archive)) {
