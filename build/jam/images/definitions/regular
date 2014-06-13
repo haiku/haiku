@@ -20,7 +20,7 @@ SYSTEM_APPS += [ FFilterByBuildFeatures
 	HaikuDepot
 	Icon-O-Matic Installer LaunchBox
 	Magnify Mail MediaConverter MediaPlayer MidiPlayer
-	PackageInstaller People	PoorMan PowerStatus
+	PackageInstaller People PoorMan PowerStatus
 	Screenshot SerialConnect SoundRecorder
 	TV
 	WebWatch
