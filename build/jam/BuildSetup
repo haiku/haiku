@@ -84,6 +84,11 @@ HAIKU_DEFAULT_ANYBOOT_NAME = haiku-anyboot.image ;
 HAIKU_DEFAULT_ANYBOOT_DIR = $(HAIKU_OUTPUT_DIR) ;
 HAIKU_DEFAULT_ANYBOOT_LABEL ?= Haiku ;
 
+# Haiku MMC defaults
+HAIKU_DEFAULT_MMC_IMAGE_NAME = haiku-mmc.image ;
+HAIKU_DEFAULT_MMC_DIR = $(HAIKU_OUTPUT_DIR) ;
+HAIKU_DEFAULT_MMC_LABEL ?= Haiku ;
+
 # analyze and optionally replace jam's target parameters
 ProcessCommandLineArguments ;
 

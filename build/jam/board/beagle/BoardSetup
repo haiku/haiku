@@ -29,13 +29,13 @@ HAIKU_BOARD_LOADER_STACK_BASE = 0x84000000 ;
 # OMAP x-loader image, must be first file on FAT partition
 HAIKU_BOARD_MLO_IMAGE ?= MLO ;
 HAIKU_BOARD_MLO_IMAGE_URL =
-	http://www.angstrom-distribution.org/demo/beagleboard/MLO ;
+       http://downloads.angstrom-distribution.org/demo/beagleboard/MLO ;
 
 # u-boot binary image filename, to build the flash image
 # XXX: Locate it somehow (for now just put it in generated/)
-HAIKU_BOARD_UBOOT_IMAGE ?= u-boot.bin ;
+HAIKU_BOARD_UBOOT_IMAGE ?= u-boot.img ;
 HAIKU_BOARD_UBOOT_IMAGE_URL =
-	http://www.angstrom-distribution.org/demo/beagleboard/u-boot.bin ;
+       http://downloads.angstrom-distribution.org/demo/beagleboard/u-boot.img ;
 
 #
 # mmc/SD image
@@ -47,13 +47,15 @@ HAIKU_BOARD_SDIMAGE_SIZE = 64 ;
 # in MB
 HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
 
-# offset in blocks XXX: FIXME
-# (autodetect from sfdisk or use cylinder count for fat size)
-HAIKU_BOARD_SDIMAGE_BFS_OFFSET = ;
+mloFile = [ DownloadFile $(HAIKU_BOARD_MLO_IMAGE)
+        : $(HAIKU_BOARD_MLO_IMAGE_URL) ] ;
+
+ubootFile = [ DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE)
+        : $(HAIKU_BOARD_UBOOT_IMAGE_URL) ] ;
 
 HAIKU_BOARD_SDIMAGE_FILES =
-	$(HAIKU_BOARD_MLO_IMAGE)
-	$(HAIKU_BOARD_UBOOT_IMAGE)
+	$(mloFile)
+	$(ubootFile)
 	haiku_loader_nbsd.ub
 ;
 

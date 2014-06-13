@@ -369,6 +369,14 @@ rule DefineBuildProfile name : type : path {
 			buildTarget = haiku-image ;
 		}
 
+		case "haiku-mmc-image" : {
+			targetName ?= $(HAIKU_MMC_IMAGE_NAME) ;
+			targetName ?= $(HAIKU_DEFAULT_MMC_IMAGE_NAME) ;
+			HAIKU_IMAGE_DIR = $(targetDir) ;
+			HAIKU_IMAGE_NAME = $(targetName) ;
+			buildTarget = haiku-mmc-image ;
+		}
+
 		case "vmware-image" : {
 			targetName ?= $(HAIKU_VMWARE_IMAGE_NAME) ;
 			targetName ?= $(HAIKU_DEFAULT_VMWARE_IMAGE_NAME) ;

@@ -155,13 +155,9 @@ rule BuildUBootSDImage image : files
 	Depends $(image) : $(files) ;
 	SDIMAGE_BLOCK_SIZE on $(image) = 1048576 ; # 1M
 	SDIMAGE_SIZE on $(image) = $(HAIKU_BOARD_SDIMAGE_SIZE) ;
-	SDIMAGE_FDISK on $(image) = $(HOST_SFDISK) ;
-	SDIMAGE_FDISK_SCRIPT on $(image) =
-		"0,$(HAIKU_BOARD_SDIMAGE_FAT_SIZE),0c,-\\\n,,eb\\\n\\\n" ;
-	SDIMAGE_FDISK_H on $(image) = 255 ;
-	SDIMAGE_FDISK_S on $(image) = 63 ;
-	SDIMAGE_FDISK_C on $(image) = ;
-	SDIMAGE_FDISK_UNIT on $(image) = M ;
+	SDIMAGE_MTOOLS_H on $(image) = 255 ;
+	SDIMAGE_MTOOLS_S on $(image) = 63 ;
+	SDIMAGE_MTOOLS_C on $(image) = 8 ;
 	BuildUBootSDImage1 $(image) : $(files) ;
 }
 
@@ -175,21 +171,29 @@ actions BuildUBootSDImage1
 		if=/dev/zero \
 		bs=$(SDIMAGE_BLOCK_SIZE) \
 		count=$(SDIMAGE_SIZE)
-	# partition it
-	printf '$(SDIMAGE_FDISK_SCRIPT)' | $(SDIMAGE_FDISK) -f -D \
-		-H $(SDIMAGE_FDISK_H) -S $(SDIMAGE_FDISK_S) \
-		-u$(SDIMAGE_FDISK_UNIT) $(<)
-		#-H $(SDIMAGE_FDISK_H) -S $(SDIMAGE_FDISK_S) -C \\\$(( $(SDIMAGE_SIZE) * 1024 * 1024 / $(SDIMAGE_FDISK_H) / $(SDIMAGE_FDISK_S))) \
 	# generate mtools config
-	echo 'drive i: file="$(<)" partition=1' > $(<).mtools
+	echo 'drive i: file="$(<)" partition=1 cylinders=$(SDIMAGE_MTOOLS_C)
+		heads=$(SDIMAGE_MTOOLS_H) sectors=$(SDIMAGE_MTOOLS_S)
+		mformat_only' > $(<).mtools
+	# partition it
+	MTOOLSRC=$(<).mtools mpartition -cI -T 0xc i:
 	# format the image
-	MTOOLSRC=$(<).mtools mformat -v "Haiku" i:
+	MTOOLSRC=$(<).mtools mformat -L 32 -v "Haiku" i:
+	# generate u-boot environment variables
+	echo 'uenvcmd=run loadImage; run mmcboot;
+		loadImage=fatload mmc0 0 0x80008000 haiku_loader_nbsd.ub
+		mmcboot=bootm 0x80008000' > uEnv.txt
 	# populate
 	MTOOLSRC=$(<).mtools mcopy $(>) i:
+	MTOOLSRC=$(<).mtools mcopy uEnv.txt i:
 	# list content
-	#MTOOLSRC=$(<).mtools mdir i:
+	MTOOLSRC=$(<).mtools mdir i:
 	# cleanup
 	$(RM) $(<).mtools
+	$(RM) uEnv.txt
+	# Add haiku bootstrap partition to MMC image
+	dd if=$(HAIKU_IMAGE_NAME) of=$(<) conv=notrunc oflag=append bs=1M \
+		count=`du -sm $(HAIKU_IMAGE_NAME) | cut -f 1`
 }
 
 # uimage targets
@@ -215,16 +219,6 @@ if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
 		$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT) ;
 }
 
-if $(HAIKU_BOARD_MLO_IMAGE) && $(HAIKU_BOARD_MLO_IMAGE_URL) {
-	DownloadFile $(HAIKU_BOARD_MLO_IMAGE) $(HAIKU_BOARD_MLO_IMAGE_URL) ;
-}
-
-if $(HAIKU_BOARD_UBOOT_IMAGE) && $(HAIKU_BOARD_UBOOT_IMAGE_URL) {
-	# Download the u-boot binary file.
-	ubootFile = [ DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE)
-		: $(HAIKU_BOARD_UBOOT_IMAGE_URL) ] ;
-}
-
 # flash image targets
 BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img : haiku_loader :
 	$(ubootFile) ;
@@ -245,6 +239,7 @@ Depends haiku-flash-uimage : haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img ;
 BuildUBootSDImage haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
 NotFile haiku-mmc-image ;
 Depends haiku-mmc-image : haiku-$(HAIKU_BOOT_BOARD).mmc ;
+Depends haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_IMAGE_NAME) ;
 
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;

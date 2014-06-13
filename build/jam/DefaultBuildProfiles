@@ -45,6 +45,7 @@ rule DefineDefaultBuildProfiles
 
 	# bootstrap profiles
 	DefineBuildProfile bootstrap-raw : image : "haiku-bootstrap.image" ;
+	DefineBuildProfile bootstrap-mmc : haiku-mmc-image : "haiku-mmc.image" ;
 	DefineBuildProfile bootstrap-vmware : vmware-image
 		: "haiku-bootstrap.vmdk" ;
 
