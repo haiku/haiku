@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,7 @@
 
 #include "PackageManager.h"
 
+#include <package/CommitTransactionResult.h>
 #include <package/DownloadFileRequest.h>
 #include <package/RefreshRepositoryRequest.h>
 #include <package/solver/SolverPackage.h>
@@ -222,10 +223,10 @@ PackageManager::ProgressStartApplyingChanges(InstalledRepository& repository)
 
 void
 PackageManager::ProgressTransactionCommitted(InstalledRepository& repository,
-	const char* transactionDirectoryName)
+	const BCommitTransactionResult& result)
 {
 	printf("[%s] Changes applied. Old activation state backed up in \"%s\"\n",
-		repository.Name().String(), transactionDirectoryName);
+		repository.Name().String(), result.OldStateDirectory().String());
 	printf("[%s] Cleaning up ...\n", repository.Name().String());
 }
 

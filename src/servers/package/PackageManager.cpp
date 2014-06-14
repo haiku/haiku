@@ -351,7 +351,7 @@ PackageManager::ProgressStartApplyingChanges(InstalledRepository& repository)
 
 void
 PackageManager::ProgressTransactionCommitted(InstalledRepository& repository,
-	const char* transactionDirectoryName)
+	const BCommitTransactionResult& result)
 {
 }
 

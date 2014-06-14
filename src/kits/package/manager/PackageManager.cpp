@@ -582,13 +582,11 @@ BPackageManager::_CommitPackageChanges(Transaction& transaction)
 		transactionResult);
 	if (error != B_OK)
 		DIE(error, "failed to commit transaction");
-	if (transactionResult.Error() != B_TRANSACTION_OK) {
-		DIE("failed to commit transaction: %s",
-			transactionResult.FullErrorMessage().String());
-	}
+	if (transactionResult.Error() != B_TRANSACTION_OK)
+		DIE(transactionResult);
 
 	fUserInteractionHandler->ProgressTransactionCommitted(
-		installationRepository, transactionResult.OldStateDirectory());
+		installationRepository, transactionResult);
 
 	BEntry transactionDirectoryEntry;
 	if ((error = transaction.TransactionDirectory()
@@ -1014,7 +1012,7 @@ BPackageManager::UserInteractionHandler::ProgressStartApplyingChanges(
 
 void
 BPackageManager::UserInteractionHandler::ProgressTransactionCommitted(
-	InstalledRepository& repository, const char* transactionDirectoryName)
+	InstalledRepository& repository, const BCommitTransactionResult& result)
 {
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,7 @@
 #define _PACKAGE__MANAGER__PRIVATE__EXCEPTIONS_H_
 
 
+#include <package/CommitTransactionResult.h>
 #include <package/Context.h>
 
 
@@ -38,6 +39,8 @@ public:
 								BFatalErrorException(const char* format, ...);
 								BFatalErrorException(status_t error,
 									const char* format, ...);
+								BFatalErrorException(
+									const BCommitTransactionResult& result);
 
 			const BString&		Details() const
 									{ return fDetails; }
@@ -46,9 +49,16 @@ public:
 			status_t			Error() const
 									{ return fError; }
 
+			bool				HasCommitTransactionFailed() const
+									{ return fCommitTransactionFailed; }
+			const BCommitTransactionResult& CommitTransactionResult() const
+									{ return fCommitTransactionResult; }
+
 private:
 			BString				fDetails;
 			status_t			fError;
+			BCommitTransactionResult fCommitTransactionResult;
+			bool				fCommitTransactionFailed;
 };
 
 

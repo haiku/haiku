@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,7 +58,7 @@ private:
 									InstalledRepository& repository);
 	virtual	void				ProgressTransactionCommitted(
 									InstalledRepository& repository,
-									const char* transactionDirectoryName);
+									const BCommitTransactionResult& result);
 	virtual	void				ProgressApplyingChangesDone(
 									InstalledRepository& repository);
 

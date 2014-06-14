@@ -77,7 +77,7 @@ private:
 									InstalledRepository& repository);
 	virtual	void				ProgressTransactionCommitted(
 									InstalledRepository& repository,
-									const char* transactionDirectoryName);
+									const BCommitTransactionResult& result);
 	virtual	void				ProgressApplyingChangesDone(
 									InstalledRepository& repository);
 

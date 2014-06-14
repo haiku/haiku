@@ -29,6 +29,7 @@ class ProblemWindow;
 class ResultWindow;
 
 
+using BPackageKit::BCommitTransactionResult;
 using BPackageKit::BContext;
 using BPackageKit::BPackageInstallationLocation;
 using BPackageKit::BRepositoryConfig;
@@ -107,7 +108,7 @@ private:
 									InstalledRepository& repository);
 	virtual	void				ProgressTransactionCommitted(
 									InstalledRepository& repository,
-									const char* transactionDirectoryName);
+									const BCommitTransactionResult& result);
 	virtual	void				ProgressApplyingChangesDone(
 									InstalledRepository& repository);
 
