@@ -13,6 +13,7 @@
 
 #include <Directory.h>
 #include <Entry.h>
+#include <package/CommitTransactionResult.h>
 #include <package/InstallationLocationInfo.h>
 #include <package/PackageInfo.h>
 
@@ -22,9 +23,6 @@
 
 namespace BPackageKit {
 namespace BPrivate {
-
-
-// #pragma mark - BCommitTransactionResult
 
 
 BDaemonClient::BDaemonClient()
@@ -131,26 +129,7 @@ BDaemonClient::CommitTransaction(const BActivationTransaction& transaction,
 		return B_ERROR;
 
 	// extract the result
-	int32 requestError;
-	error = reply.FindInt32("error", &requestError);
-	if (error != B_OK)
-		return error;
-
-	BString errorMessage;
-	BString errorPackage;
-	BString oldStateDirectory;
-	if (requestError == 0) {
-		error = reply.FindString("old state", &oldStateDirectory);
-		if (error != B_OK)
-			return error;
-	} else {
-		reply.FindString("error message", &errorMessage);
-		reply.FindString("error package", &errorPackage);
-	}
-
-	_result.SetTo(requestError, errorMessage, errorPackage, oldStateDirectory);
-	return B_OK;
-		// Even on error. B_OK just indicates that we have initialized _result.
+	return _result.ExtractFromMessage(reply);
 }
 
 
@@ -251,130 +230,6 @@ BDaemonClient::_ExtractPackageInfoSet(const BMessage& message,
 	}
 
 	return B_OK;
-}
-
-
-// #pragma mark - BCommitTransactionResult
-
-
-BDaemonClient::BCommitTransactionResult::BCommitTransactionResult()
-	:
-	fError(B_NO_INIT),
-	fErrorMessage(),
-	fErrorPackage(),
-	fOldStateDirectory()
-{
-}
-
-
-BDaemonClient::BCommitTransactionResult::BCommitTransactionResult(int32 error,
-	const BString& errorMessage, const BString& errorPackage,
-	const BString& oldStateDirectory)
-	:
-	fError(error),
-	fErrorMessage(errorMessage),
-	fErrorPackage(errorPackage),
-	fOldStateDirectory(oldStateDirectory)
-{
-}
-
-
-BDaemonClient::BCommitTransactionResult::~BCommitTransactionResult()
-{
-}
-
-
-void
-BDaemonClient::BCommitTransactionResult::SetTo(int32 error,
-	const BString& errorMessage, const BString& errorPackage,
-	const BString& oldStateDirectory)
-{
-	fError = error;
-	fErrorMessage = errorMessage;
-	fErrorPackage = errorPackage;
-	fOldStateDirectory = oldStateDirectory;
-}
-
-
-status_t
-BDaemonClient::BCommitTransactionResult::Error() const
-{
-	return fError <= 0 ? fError : B_ERROR;
-}
-
-
-BDaemonError
-BDaemonClient::BCommitTransactionResult::DaemonError() const
-{
-	return fError > 0 ? (BDaemonError)fError : B_DAEMON_OK;
-}
-
-
-const BString&
-BDaemonClient::BCommitTransactionResult::ErrorMessage() const
-{
-	return fErrorMessage;
-}
-
-
-const BString&
-BDaemonClient::BCommitTransactionResult::ErrorPackage() const
-{
-	return fErrorPackage;
-}
-
-
-BString
-BDaemonClient::BCommitTransactionResult::FullErrorMessage() const
-{
-	if (fError == 0)
-		return "no error";
-
-	const char* errorString;
-	if (fError > 0) {
-		switch ((BDaemonError)fError) {
-			case B_DAEMON_INSTALLATION_LOCATION_BUSY:
-				errorString = "another package operation already in progress";
-				break;
-			case B_DAEMON_CHANGE_COUNT_MISMATCH:
-				errorString = "transaction out of date";
-				break;
-			case B_DAEMON_BAD_REQUEST:
-				errorString = "invalid transaction";
-				break;
-			case B_DAEMON_NO_SUCH_PACKAGE:
-				errorString = "no such package";
-				break;
-			case B_DAEMON_PACKAGE_ALREADY_EXISTS:
-				errorString = "package already exists";
-				break;
-			case B_DAEMON_OK:
-			default:
-				errorString = "unknown error";
-				break;
-		}
-	} else
-		errorString = strerror(fError);
-
-	BString result;
-	if (!fErrorMessage.IsEmpty()) {
-		result = fErrorMessage;
-		result << ": ";
-	}
-
-	result << errorString;
-
-	if (!fErrorPackage.IsEmpty())
-		result << ", package: \"" << fErrorPackage << '"';
-
-	return result;
-}
-
-
-const BString&
-BDaemonClient::BCommitTransactionResult::OldStateDirectory() const
-{
-	return fOldStateDirectory;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,57 +7,77 @@
 #include "Exception.h"
 
 
-using namespace BPackageKit::BPrivate;
+using namespace BPackageKit;
 
 
-Exception::Exception(int32 error, const char* errorMessage,
-	const char* packageName)
+Exception::Exception(BTransactionError error)
 	:
 	fError(error),
-	fErrorMessage(errorMessage),
-	fPackageName(packageName)
+	fSystemError(B_ERROR),
+	fPackageName(),
+	fPath1(),
+	fPath2(),
+	fString1(),
+	fString2()
 {
 }
 
-
-BString
-Exception::ToString() const
+Exception&
+Exception::SetSystemError(status_t error)
 {
-	const char* error;
-	if (fError >= 0) {
-		switch (fError) {
-			case B_DAEMON_OK:
-				error = "no error";
-				break;
-			case B_DAEMON_CHANGE_COUNT_MISMATCH:
-				error = "transaction out of date";
-				break;
-			case B_DAEMON_BAD_REQUEST:
-				error = "invalid transaction";
-				break;
-			case B_DAEMON_NO_SUCH_PACKAGE:
-				error = "no such package";
-				break;
-			case B_DAEMON_PACKAGE_ALREADY_EXISTS:
-				error = "package already exists";
-				break;
-			default:
-				error = "unknown error";
-				break;
-		}
-	} else
-		error = strerror(fError);
+	fSystemError = error;
+	return *this;
+}
 
-	BString string;
-	if (!fErrorMessage.IsEmpty()) {
-		string = fErrorMessage;
-		string << ": ";
-	}
 
-	string << error;
+Exception&
+Exception::SetPackageName(const BString& packageName)
+{
+	fPackageName = packageName;
+	return *this;
+}
 
-	if (!fPackageName.IsEmpty())
-		string << ", package: \"" << fPackageName << '"';
 
-	return string;
+Exception&
+Exception::SetPath1(const BString& path)
+{
+	fPath1 = path;
+	return *this;
+}
+
+
+Exception&
+Exception::SetPath2(const BString& path)
+{
+	fPath2 = path;
+	return *this;
+}
+
+
+Exception&
+Exception::SetString1(const BString& string)
+{
+	fString1 = string;
+	return *this;
+}
+
+
+Exception&
+Exception::SetString2(const BString& string)
+{
+	fString2 = string;
+	return *this;
+}
+
+
+void
+Exception::SetOnResult(BCommitTransactionResult& result)
+{
+	result.SetError(fError);
+	result.SetSystemError(fSystemError);
+	result.SetErrorPackage(fPackageName);
+	result.SetPath1(fPath1);
+	result.SetPath2(fPath2);
+	result.SetString1(fString1);
+	result.SetString2(fString2);
 }

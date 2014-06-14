@@ -22,10 +22,18 @@
 typedef std::set<std::string> StringSet;
 
 
+namespace BPackageKit {
+	class BCommitTransactionResult;
+}
+
+using BPackageKit::BCommitTransactionResult;
+
+
 class CommitTransactionHandler {
 public:
 								CommitTransactionHandler(Volume* volume,
-									PackageFileManager* packageFileManager);
+									PackageFileManager* packageFileManager,
+									BCommitTransactionResult& result);
 								~CommitTransactionHandler();
 
 			void				Init(VolumeState* volumeState,
@@ -33,11 +41,9 @@ public:
 									const PackageSet& packagesAlreadyAdded,
 									const PackageSet& packagesAlreadyRemoved);
 
-			void				HandleRequest(BMessage* request,
-									BMessage* reply);
+			void				HandleRequest(BMessage* request);
 			void				HandleRequest(
-									const BActivationTransaction& transaction,
-									BMessage* reply);
+									const BActivationTransaction& transaction);
 			void				HandleRequest();
 									// uses packagesAlreadyAdded and
 									// packagesAlreadyRemoved from Init()
@@ -47,6 +53,9 @@ public:
 			const BString&		OldStateDirectoryName() const
 									{ return fOldStateDirectoryName; }
 
+			Package*			CurrentPackage() const
+									{ return fCurrentPackage; }
+
 			VolumeState*		DetachVolumeState();
 			bool				IsActiveVolumeState() const
 									{ return fVolumeStateIsActive; }
@@ -55,13 +64,15 @@ private:
 			typedef BObjectList<Package> PackageList;
 			typedef FSUtils::RelativePath RelativePath;
 
+			struct TransactionIssueBuilder;
+
 private:
 			void				_GetPackagesToDeactivate(
 									const BActivationTransaction& transaction);
 			void				_ReadPackagesToActivate(
 									const BActivationTransaction& transaction);
-			void				_ApplyChanges(BMessage* reply);
-			void				_CreateOldStateDirectory(BMessage* reply);
+			void				_ApplyChanges();
+			void				_CreateOldStateDirectory();
 			void				_RemovePackagesToDeactivate();
 			void				_AddPackagesToActivate();
 
@@ -102,13 +113,13 @@ private:
 									const char* fileName, uint32 openMode,
 									BFile& _file, BEntry* _entry = NULL);
 
-			status_t			_WriteActivationFile(
+			void				_WriteActivationFile(
 									const RelativePath& directoryPath,
 									const char* fileName,
 									const PackageSet& toActivate,
 									const PackageSet& toDeactivate,
 									BEntry& _entry);
-			status_t			_CreateActivationFileContent(
+			void				_CreateActivationFileContent(
 									const PackageSet& toActivate,
 									const PackageSet& toDeactivate,
 									BString& _content);
@@ -131,10 +142,13 @@ private:
 
 			bool				_IsSystemPackage(Package* package);
 
+			void				_AddIssue(
+									const TransactionIssueBuilder& builder);
+
 	static	BString				_GetPath(const FSUtils::Entry& entry,
 									const BString& fallback);
 
-	static	status_t			_TagPackageEntriesRecursively(
+	static	void				_TagPackageEntriesRecursively(
 									BDirectory& directory, const BString& value,
 									bool nonDirectoriesOnly);
 
@@ -157,6 +171,8 @@ private:
 			StringSet			fAddedGroups;
 			StringSet			fAddedUsers;
 			FSTransaction		fFSTransaction;
+			BCommitTransactionResult& fResult;
+			Package*			fCurrentPackage;
 };
 
 

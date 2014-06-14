@@ -97,6 +97,7 @@ BuildPlatformSharedLibrary libpackage_build.so
 	AddRepositoryRequest.cpp
 	Attributes.cpp
 	ChecksumAccessors.cpp
+	CommitTransactionResult.cpp
 	Context.cpp
 	DownloadFileRequest.cpp
 	DropRepositoryRequest.cpp

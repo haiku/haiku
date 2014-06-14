@@ -16,16 +16,6 @@ namespace BPrivate {
 #define B_PACKAGE_DAEMON_APP_SIGNATURE "application/x-vnd.haiku-package_daemon"
 
 
-enum BDaemonError {
-	B_DAEMON_OK = 0,
-	B_DAEMON_INSTALLATION_LOCATION_BUSY,
-	B_DAEMON_CHANGE_COUNT_MISMATCH,
-	B_DAEMON_BAD_REQUEST,
-	B_DAEMON_NO_SUCH_PACKAGE,
-	B_DAEMON_PACKAGE_ALREADY_EXISTS
-};
-
-
 // message codes for requests to and replies from the daemon
 enum {
 	B_MESSAGE_GET_INSTALLATION_LOCATION_INFO		= 'PKLI',
@@ -59,17 +49,40 @@ enum {
 		//		transaction directory
 	B_MESSAGE_COMMIT_TRANSACTION_REPLY	= 'PKTR'
 		// "error": int32
-		//		regular error code or BDaemonError describing how committing
-		//		the transaction went
-		// "error message": string
-		//		[error case only] gives some additional information what went
-		//		wrong; optional
+		//		a BTransactionError describing how committing the transaction
+		//		went
+		// "system error": int32
+		//		a status_t for the operation that failed; B_ERROR, if n/a
 		// "error package": string
 		//		[error case only] file name of the package causing the error,
 		//		if any in particarly; optional
+		// "path1": string
+		//		[error case only] first path specific to the error
+		// "path2": string
+		//		[error case only] second path specific to the error
+		// "string1": string
+		//		[error case only] first string specific to the error
+		// "string2": string
+		//		[error case only] second string specific to the error
 		// "old state": string
-		//		name of the directory (subdirectory of the administrative
-		//		directory) containing the deactivated packages
+		//		[success case only] name of the directory (subdirectory of the
+		//		administrative directory) containing the deactivated packages
+		// "issues": message[]
+		//		A list of non-critical issues that occurred while performing the
+		//		package activation. On success the user should be notified about
+		//		these. Each contains:
+		//		"type": int32
+		//			a BTransactionIssue::BType specifying the kind of issue
+		//		"package": string
+		//			file name of the package which the issue is related to
+		//		"path1": string
+		//			first path specific to the issue
+		//		"path2": string
+		//			second path specific to the issue
+		//		"system error": int32
+		//			a status_t for the operation that failed; B_OK, if n/a
+		//		"exit code": int32
+		//			a exit code of the program that failed; 0, if n/a
 };
 
 

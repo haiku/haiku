@@ -23,6 +23,7 @@
 #include <NodeMonitor.h>
 #include <Path.h>
 
+#include <package/CommitTransactionResult.h>
 #include <package/solver/Solver.h>
 #include <package/solver/SolverPackage.h>
 #include <package/solver/SolverProblem.h>
@@ -519,39 +520,18 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 void
 Volume::HandleCommitTransactionRequest(BMessage* message)
 {
-	// Prepare the reply in so far that we can at least set the error code
-	// without risk of failure.
+	BCommitTransactionResult result;
+	PackageSet dummy;
+	_CommitTransaction(message, NULL, dummy, dummy, result);
+
 	BMessage reply(B_MESSAGE_COMMIT_TRANSACTION_REPLY);
-	if (reply.AddInt32("error", B_ERROR) != B_OK)
+	status_t error = result.AddToMessage(reply);
+	if (error != B_OK) {
+		ERROR("Volume::HandleCommitTransactionRequest(): Failed to add "
+			"transaction result to reply: %s\n", strerror(error));
 		return;
-
-	// perform the request
-	CommitTransactionHandler handler(this, fPackageFileManager);
-	int32 error;
-	try {
-		PackageSet dummy;
-		handler.Init(fLatestState, fLatestState == fActiveState, dummy, dummy);
-		handler.HandleRequest(message, &reply);
-		_SetLatestState(handler.DetachVolumeState(),
-			handler.IsActiveVolumeState());
-		error = B_DAEMON_OK;
-	} catch (Exception& exception) {
-		error = exception.Error();
-
-		if (!exception.ErrorMessage().IsEmpty())
-			reply.AddString("error message", exception.ErrorMessage());
-		if (!exception.PackageName().IsEmpty())
-			reply.AddString("error package", exception.PackageName());
-	} catch (std::bad_alloc& exception) {
-		error = B_NO_MEMORY;
 	}
 
-	// revert on error
-	if (error != B_DAEMON_OK)
-		handler.Revert();
-
-	// send the reply
-	reply.ReplaceInt32("error", error);
 	message->SendReply(&reply, (BHandler*)NULL, kCommunicationTimeout);
 }
 
@@ -709,30 +689,15 @@ Volume::ProcessPendingPackageActivationChanges()
 		return;
 
 	// perform the request
-	CommitTransactionHandler handler(this, fPackageFileManager);
-	int32 error;
-	try {
-		handler.Init(fLatestState, fLatestState == fActiveState,
-			fPackagesToBeActivated, fPackagesToBeDeactivated);
-		handler.HandleRequest();
-		_SetLatestState(handler.DetachVolumeState(),
-			handler.IsActiveVolumeState());
-		error = B_DAEMON_OK;
-	} catch (Exception& exception) {
-		error = exception.Error();
+	BCommitTransactionResult result;
+	_CommitTransaction(NULL, NULL, fPackagesToBeActivated,
+		fPackagesToBeDeactivated, result);
+
+	if (result.Error() != B_TRANSACTION_OK) {
 		ERROR("Volume::ProcessPendingPackageActivationChanges(): package "
-			"activation failed: %s\n", exception.ToString().String());
-// TODO: Notify the user!
-	} catch (std::bad_alloc& exception) {
-		error = B_NO_MEMORY;
-		ERROR("Volume::ProcessPendingPackageActivationChanges(): package "
-			"activation failed: out of memory\n");
+			"activation failed: %s\n", result.FullErrorMessage().String());
 // TODO: Notify the user!
 	}
-
-	// revert on error
-	if (error != B_DAEMON_OK)
-		handler.Revert();
 
 	// clear the activation/deactivation sets in any event
 	fPackagesToBeActivated.clear();
@@ -793,33 +758,10 @@ Volume::CreateTransaction(BPackageInstallationLocation location,
 void
 Volume::CommitTransaction(const BActivationTransaction& transaction,
 	const PackageSet& packagesAlreadyAdded,
-	const PackageSet& packagesAlreadyRemoved,
-	BDaemonClient::BCommitTransactionResult& _result)
+	const PackageSet& packagesAlreadyRemoved, BCommitTransactionResult& _result)
 {
-	// perform the request
-	CommitTransactionHandler handler(this, fPackageFileManager);
-	int32 error;
-	try {
-		handler.Init(fLatestState, fLatestState == fActiveState,
-			packagesAlreadyAdded, packagesAlreadyRemoved);
-		handler.HandleRequest(transaction, NULL);
-		_SetLatestState(handler.DetachVolumeState(),
-			handler.IsActiveVolumeState());
-		error = B_DAEMON_OK;
-		_result.SetTo(error, BString(), BString(),
-			handler.OldStateDirectoryName());
-	} catch (Exception& exception) {
-		error = exception.Error();
-		_result.SetTo(error, exception.ErrorMessage(), exception.PackageName(),
-			BString());
-	} catch (std::bad_alloc& exception) {
-		error = B_NO_MEMORY;
-		_result.SetTo(error, BString(), BString(), BString());
-	}
-
-	// revert on error
-	if (error != B_DAEMON_OK)
-		handler.Revert();
+	_CommitTransaction(NULL, &transaction, packagesAlreadyAdded,
+		packagesAlreadyRemoved, _result);
 }
 
 
@@ -1324,4 +1266,48 @@ Volume::_OpenPackagesSubDirectory(const RelativePath& path, bool create,
 	}
 
 	return FSUtils::OpenSubDirectory(directory, path, create, _directory);
+}
+
+
+void
+Volume::_CommitTransaction(BMessage* message,
+	const BActivationTransaction* transaction,
+	const PackageSet& packagesAlreadyAdded,
+	const PackageSet& packagesAlreadyRemoved, BCommitTransactionResult& _result)
+{
+	_result.Unset();
+
+	// perform the request
+	CommitTransactionHandler handler(this, fPackageFileManager, _result);
+	BTransactionError error = B_TRANSACTION_INTERNAL_ERROR;
+	try {
+		handler.Init(fLatestState, fLatestState == fActiveState,
+			packagesAlreadyAdded, packagesAlreadyRemoved);
+
+		if (message != NULL)
+			handler.HandleRequest(message);
+		else if (transaction != NULL)
+			handler.HandleRequest(*transaction);
+		else
+			handler.HandleRequest();
+
+		_SetLatestState(handler.DetachVolumeState(),
+			handler.IsActiveVolumeState());
+		error = B_TRANSACTION_OK;
+	} catch (Exception& exception) {
+		error = exception.Error();
+		exception.SetOnResult(_result);
+		if (_result.ErrorPackage().IsEmpty()
+			&& handler.CurrentPackage() != NULL) {
+			_result.SetErrorPackage(handler.CurrentPackage()->FileName());
+		}
+	} catch (std::bad_alloc& exception) {
+		error = B_TRANSACTION_NO_MEMORY;
+	}
+
+	_result.SetError(B_TRANSACTION_OK);
+
+	// revert on error
+	if (error != B_TRANSACTION_OK)
+		handler.Revert();
 }

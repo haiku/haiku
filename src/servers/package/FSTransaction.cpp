@@ -7,6 +7,7 @@
 #include "FSTransaction.h"
 
 #include <Entry.h>
+#include <package/CommitTransactionResult.h>
 #include <Path.h>
 
 #include <CopyEngine.h>
@@ -197,9 +198,9 @@ FSTransaction::RemoveOperationAt(int32 index)
 {
 	int32 count = fOperations.size();
 	if (index < 0 || index >= count) {
-		throw Exception(B_ERROR,
-			BString().SetToFormat("FSTransaction::RemoveOperationAt(): invalid "
-				"operation index %" B_PRId32 "/%" B_PRId32, index, count));
+		ERROR("FSTransaction::RemoveOperationAt(): invalid "
+			"operation index %" B_PRId32 "/%" B_PRId32, index, count);
+		throw Exception(BPackageKit::B_TRANSACTION_INTERNAL_ERROR);
 	}
 
 	fOperations.erase(fOperations.begin() + index);
@@ -225,8 +226,14 @@ FSTransaction::_GetPath(const Entry& entry)
 		error = pathBuffer.SetTo(path);
 	}
 
-	if (error != B_OK)
-		throw Exception(error);
+	if (error != B_OK) {
+		if (error == B_NO_MEMORY)
+			throw Exception(BPackageKit::B_TRANSACTION_NO_MEMORY);
+
+		throw Exception(BPackageKit::B_TRANSACTION_FAILED_TO_GET_ENTRY_PATH)
+			.SetPath1(entry.PathOrName())
+			.SetSystemError(error);
+	}
 
 	return path;
 }

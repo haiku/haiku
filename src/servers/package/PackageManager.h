@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_MANAGER_H
@@ -16,6 +16,7 @@
 #include <package/manager/PackageManager.h>
 
 
+using BPackageKit::BCommitTransactionResult;
 using BPackageKit::BContext;
 using BPackageKit::BJob;
 using BPackageKit::BJobStateListener;
@@ -51,8 +52,7 @@ private:
 
 	virtual	status_t			PrepareTransaction(Transaction& transaction);
 	virtual	status_t			CommitTransaction(Transaction& transaction,
-									BDaemonClient::BCommitTransactionResult&
-										_result);
+									BCommitTransactionResult& _result);
 
 private:
 	// UserInteractionHandler

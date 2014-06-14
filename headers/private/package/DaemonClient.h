@@ -22,6 +22,7 @@ class BDirectory;
 namespace BPackageKit {
 
 
+class BCommitTransactionResult;
 class BInstallationLocationInfo;
 class BPackageInfoSet;
 
@@ -33,9 +34,6 @@ class BActivationTransaction;
 
 
 class BDaemonClient {
-public:
-			class BCommitTransactionResult;
-
 public:
 								BDaemonClient();
 								~BDaemonClient();
@@ -62,41 +60,6 @@ private:
 
 private:
 			BMessenger			fDaemonMessenger;
-};
-
-
-class BDaemonClient::BCommitTransactionResult {
-public:
-								BCommitTransactionResult();
-								BCommitTransactionResult(int32 error,
-									const BString& errorMessage,
-									const BString& errorPackage,
-									const BString& oldStateDirectory);
-								~BCommitTransactionResult();
-
-			void				SetTo(int32 error, const BString& errorMessage,
-									const BString& errorPackage,
-									const BString& oldStateDirectory);
-
-			status_t			Error() const;
-			BDaemonError		DaemonError() const;
-									// may be B_DAEMON_OK, even if Error() is
-									// != B_OK, then Error() is as specific as
-									// is known
-			const BString&		ErrorMessage() const;
-									// may be empty, even on error
-			const BString&		ErrorPackage() const;
-									// may be empty, even on error
-
-			BString				FullErrorMessage() const;
-
-			const BString&		OldStateDirectory() const;
-
-private:
-			int32				fError;
-			BString				fErrorMessage;
-			BString				fErrorPackage;
-			BString				fOldStateDirectory;
 };
 
 

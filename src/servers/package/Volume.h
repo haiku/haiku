@@ -137,8 +137,7 @@ public:
 									const BActivationTransaction& transaction,
 									const PackageSet& packagesAlreadyAdded,
 									const PackageSet& packagesAlreadyRemoved,
-									BDaemonClient::BCommitTransactionResult&
-										_result);
+									BCommitTransactionResult& _result);
 
 private:
 			struct NodeMonitorEvent;
@@ -174,6 +173,12 @@ private:
 			status_t			_OpenPackagesSubDirectory(
 									const RelativePath& path, bool create,
 									BDirectory& _directory);
+
+			void				_CommitTransaction(BMessage* message,
+									const BActivationTransaction* transaction,
+									const PackageSet& packagesAlreadyAdded,
+									const PackageSet& packagesAlreadyRemoved,
+									BCommitTransactionResult& _result);
 
 private:
 			BString				fPath;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
 #include <Alert.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <package/CommitTransactionResult.h>
 #include <package/PackageDefs.h>
 #include <Path.h>
 
@@ -330,8 +331,9 @@ Root::HandleRequest(BMessage* message)
 			// pending already.
 			if (volume->IsPackageJobPending()) {
 				BMessage reply(B_MESSAGE_COMMIT_TRANSACTION_REPLY);
-				if (reply.AddInt32("error", B_DAEMON_INSTALLATION_LOCATION_BUSY)
-						== B_OK) {
+				BCommitTransactionResult result(
+					B_TRANSACTION_INSTALLATION_LOCATION_BUSY);
+				if (result.AddToMessage(reply) == B_OK) {
 					message->SendReply(&reply, (BHandler*)NULL,
 						kCommunicationTimeout);
 				}

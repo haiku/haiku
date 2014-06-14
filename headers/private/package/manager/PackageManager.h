@@ -234,8 +234,7 @@ public:
 	virtual	status_t			PrepareTransaction(Transaction& transaction)
 									= 0;
 	virtual	status_t			CommitTransaction(Transaction& transaction,
-									BDaemonClient::BCommitTransactionResult&
-										_result) = 0;
+									BCommitTransactionResult& _result) = 0;
 };
 
 
@@ -250,8 +249,7 @@ public:
 
 	virtual	status_t			PrepareTransaction(Transaction& transaction);
 	virtual	status_t			CommitTransaction(Transaction& transaction,
-									BDaemonClient::BCommitTransactionResult&
-										_result);
+									BCommitTransactionResult& _result);
 
 private:
 			BDaemonClient		fDaemonClient;

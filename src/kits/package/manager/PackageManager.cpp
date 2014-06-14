@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,7 @@
 #include <package/manager/PackageManager.h>
 
 #include <Directory.h>
+#include <package/CommitTransactionResult.h>
 #include <package/DownloadFileRequest.h>
 #include <package/PackageRoster.h>
 #include <package/RefreshRepositoryRequest.h>
@@ -576,12 +577,12 @@ BPackageManager::_CommitPackageChanges(Transaction& transaction)
 		installationRepository);
 
 	// commit the transaction
-	BDaemonClient::BCommitTransactionResult transactionResult;
+	BCommitTransactionResult transactionResult;
 	status_t error = fInstallationInterface->CommitTransaction(transaction,
 		transactionResult);
 	if (error != B_OK)
 		DIE(error, "failed to commit transaction");
-	if (transactionResult.Error() != B_OK) {
+	if (transactionResult.Error() != B_TRANSACTION_OK) {
 		DIE("failed to commit transaction: %s",
 			transactionResult.FullErrorMessage().String());
 	}
@@ -933,7 +934,7 @@ BPackageManager::ClientInstallationInterface::PrepareTransaction(
 
 status_t
 BPackageManager::ClientInstallationInterface::CommitTransaction(
-	Transaction& transaction, BDaemonClient::BCommitTransactionResult& _result)
+	Transaction& transaction, BCommitTransactionResult& _result)
 {
 	return fDaemonClient.CommitTransaction(transaction.ActivationTransaction(),
 		_result);

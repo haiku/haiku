@@ -19,6 +19,7 @@
 #include <AutoDeleter.h>
 #include <CopyEngine.h>
 #include <NotOwningEntryRef.h>
+#include <package/CommitTransactionResult.h>
 #include <package/DaemonDefs.h>
 #include <RemoveEngine.h>
 
@@ -31,9 +32,84 @@
 
 using namespace BPackageKit::BPrivate;
 
+using BPackageKit::BTransactionIssue;
+
+
+// #pragma mark - TransactionIssueBuilder
+
+
+struct CommitTransactionHandler::TransactionIssueBuilder {
+	TransactionIssueBuilder(BTransactionIssue::BType type,
+		Package* package = NULL)
+		:
+		fType(type),
+		fPackageName(package != NULL ? package->FileName() : BString()),
+		fPath1(),
+		fPath2(),
+		fSystemError(B_OK),
+		fExitCode(0)
+	{
+	}
+
+	TransactionIssueBuilder& SetPath1(const BString& path)
+	{
+		fPath1 = path;
+		return *this;
+	}
+
+	TransactionIssueBuilder& SetPath1(const FSUtils::Entry& entry)
+	{
+		return SetPath1(entry.Path());
+	}
+
+	TransactionIssueBuilder& SetPath2(const BString& path)
+	{
+		fPath2 = path;
+		return *this;
+	}
+
+	TransactionIssueBuilder& SetPath2(const FSUtils::Entry& entry)
+	{
+		return SetPath2(entry.Path());
+	}
+
+	TransactionIssueBuilder& SetSystemError(status_t error)
+	{
+		fSystemError = error;
+		return *this;
+	}
+
+	TransactionIssueBuilder& SetExitCode(int exitCode)
+	{
+		fExitCode = exitCode;
+		return *this;
+	}
+
+	BTransactionIssue BuildIssue(Package* package) const
+	{
+		BString packageName(fPackageName);
+		if (packageName.IsEmpty() && package != NULL)
+			packageName = package->FileName();
+
+		return BTransactionIssue(fType, packageName, fPath1, fPath2,
+			fSystemError, fExitCode);
+	}
+
+private:
+	BTransactionIssue::BType	fType;
+	BString						fPackageName;
+	BString						fPath1;
+	BString						fPath2;
+	status_t					fSystemError;
+	int							fExitCode;
+};
+
+
+// #pragma mark - CommitTransactionHandler
+
 
 CommitTransactionHandler::CommitTransactionHandler(Volume* volume,
-	PackageFileManager* packageFileManager)
+	PackageFileManager* packageFileManager, BCommitTransactionResult& result)
 	:
 	fVolume(volume),
 	fPackageFileManager(packageFileManager),
@@ -52,7 +128,9 @@ CommitTransactionHandler::CommitTransactionHandler(Volume* volume,
 	fWritableFilesDirectory(),
 	fAddedGroups(),
 	fAddedUsers(),
-	fFSTransaction()
+	fFSTransaction(),
+	fResult(result),
+	fCurrentPackage(NULL)
 {
 }
 
@@ -100,7 +178,7 @@ CommitTransactionHandler::Init(VolumeState* volumeState,
 
 
 void
-CommitTransactionHandler::HandleRequest(BMessage* request, BMessage* reply)
+CommitTransactionHandler::HandleRequest(BMessage* request)
 {
 	status_t error;
 	BActivationTransaction transaction(request, &error);
@@ -108,21 +186,21 @@ CommitTransactionHandler::HandleRequest(BMessage* request, BMessage* reply)
 		error = transaction.InitCheck();
 	if (error != B_OK) {
 		if (error == B_NO_MEMORY)
-			throw Exception(B_NO_MEMORY);
-		throw Exception(B_DAEMON_BAD_REQUEST);
+			throw Exception(B_TRANSACTION_NO_MEMORY);
+		throw Exception(B_TRANSACTION_BAD_REQUEST);
 	}
 
-	HandleRequest(transaction, reply);
+	HandleRequest(transaction);
 }
 
 
 void
 CommitTransactionHandler::HandleRequest(
-	const BActivationTransaction& transaction, BMessage* reply)
+	const BActivationTransaction& transaction)
 {
 	// check the change count
 	if (transaction.ChangeCount() != fVolume->ChangeCount())
-		throw Exception(B_DAEMON_CHANGE_COUNT_MISMATCH);
+		throw Exception(B_TRANSACTION_CHANGE_COUNT_MISMATCH);
 
 	// collect the packages to deactivate
 	_GetPackagesToDeactivate(transaction);
@@ -132,11 +210,12 @@ CommitTransactionHandler::HandleRequest(
 
 	// anything to do at all?
 	if (fPackagesToActivate.IsEmpty() &&  fPackagesToDeactivate.empty()) {
-		throw Exception(B_DAEMON_BAD_REQUEST,
-			"no packages to activate or deactivate");
+		WARN("Bad package activation request: no packages to activate or"
+			" deactivate\n");
+		throw Exception(B_TRANSACTION_BAD_REQUEST);
 	}
 
-	_ApplyChanges(reply);
+	_ApplyChanges();
 }
 
 
@@ -151,7 +230,7 @@ CommitTransactionHandler::HandleRequest()
 
 	fPackagesToDeactivate = fPackagesAlreadyRemoved;
 
-	_ApplyChanges(NULL);
+	_ApplyChanges();
 }
 
 
@@ -197,8 +276,8 @@ CommitTransactionHandler::_GetPackagesToDeactivate(
 		BString packageName = packagesToDeactivate.StringAt(i);
 		Package* package = fVolumeState->FindPackage(packageName);
 		if (package == NULL) {
-			throw Exception(B_DAEMON_NO_SUCH_PACKAGE, "no such package",
-				packageName);
+			throw Exception(B_TRANSACTION_NO_SUCH_PACKAGE)
+				.SetPackageName(packageName);
 		}
 
 		fPackagesToDeactivate.insert(package);
@@ -225,7 +304,9 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 		|| transactionDirectoryName.FindFirst('/') >= 0
 		|| transactionDirectoryName == "."
 		|| transactionDirectoryName == "..") {
-		throw Exception(B_DAEMON_BAD_REQUEST);
+		WARN("Bad package activation request: malformed transaction"
+			" directory name: \"%s\"\n", transactionDirectoryName.String());
+		throw Exception(B_TRANSACTION_BAD_REQUEST);
 	}
 
 	// open the directory
@@ -233,13 +314,22 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 		transactionDirectoryName);
 	BDirectory directory;
 	status_t error = _OpenPackagesSubDirectory(directoryPath, false, directory);
-	if (error != B_OK)
-		throw Exception(error, "failed to open transaction directory");
+	if (error == B_OK) {
+		error = directory.GetNodeRef(&fTransactionDirectoryRef);
+		if (error != B_OK) {
+			ERROR("Failed to get transaction directory node ref: %s\n",
+				strerror(error));
+		}
+	} else
+		ERROR("Failed to open transaction directory: %s\n", strerror(error));
 
-	error = directory.GetNodeRef(&fTransactionDirectoryRef);
 	if (error != B_OK) {
-		throw Exception(error,
-			"failed to get transaction directory node ref");
+		throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(fVolume->PackagesDirectoryRef(),
+					directoryPath.ToString()),
+				directoryPath.ToString()))
+			.SetSystemError(error);
 	}
 
 	// read the packages
@@ -252,14 +342,14 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 			if (fPackagesAlreadyAdded.find(package)
 					!= fPackagesAlreadyAdded.end()) {
 				if (!fPackagesToActivate.AddItem(package))
-					throw Exception(B_NO_MEMORY);
+					throw Exception(B_TRANSACTION_NO_MEMORY);
 				continue;
 			}
 
 			if (fPackagesToDeactivate.find(package)
 					== fPackagesToDeactivate.end()) {
-				throw Exception(B_DAEMON_PACKAGE_ALREADY_EXISTS, NULL,
-					packageName);
+				throw Exception(B_TRANSACTION_PACKAGE_ALREADY_EXISTS)
+					.SetPackageName(packageName);
 			}
 		}
 
@@ -267,22 +357,32 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 		error = fPackageFileManager->CreatePackage(
 			NotOwningEntryRef(fTransactionDirectoryRef, packageName),
 			package);
-		if (error != B_OK)
-			throw Exception(error, "failed to read package", packageName);
+		if (error != B_OK) {
+			if (error == B_NO_MEMORY)
+				throw Exception(B_TRANSACTION_NO_MEMORY);
+			throw Exception(B_TRANSACTION_FAILED_TO_READ_PACKAGE_FILE)
+				.SetPackageName(packageName)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(
+						NotOwningEntryRef(fTransactionDirectoryRef,
+							packageName)),
+					packageName))
+				.SetSystemError(error);
+		}
 
 		if (!fPackagesToActivate.AddItem(package)) {
 			delete package;
-			throw Exception(B_NO_MEMORY);
+			throw Exception(B_TRANSACTION_NO_MEMORY);
 		}
 	}
 }
 
 
 void
-CommitTransactionHandler::_ApplyChanges(BMessage* reply)
+CommitTransactionHandler::_ApplyChanges()
 {
 	// create an old state directory
-	_CreateOldStateDirectory(reply);
+	_CreateOldStateDirectory();
 
 	// move packages to deactivate to old state directory
 	_RemovePackagesToDeactivate();
@@ -309,7 +409,7 @@ CommitTransactionHandler::_ApplyChanges(BMessage* reply)
 
 
 void
-CommitTransactionHandler::_CreateOldStateDirectory(BMessage* reply)
+CommitTransactionHandler::_CreateOldStateDirectory()
 {
 	// construct a nice name from the current date and time
 	time_t nowSeconds = time(NULL);
@@ -323,21 +423,28 @@ CommitTransactionHandler::_CreateOldStateDirectory(BMessage* reply)
 		baseName = "state";
 
 	if (baseName.IsEmpty())
-		throw Exception(B_NO_MEMORY);
+		throw Exception(B_TRANSACTION_NO_MEMORY);
 
 	// make sure the directory doesn't exist yet
 	BDirectory adminDirectory;
 	status_t error = _OpenPackagesSubDirectory(
 		RelativePath(kAdminDirectoryName), true, adminDirectory);
-	if (error != B_OK)
-		throw Exception(error, "failed to open administrative directory");
+	if (error != B_OK) {
+		ERROR("Failed to open administrative directory: %s\n", strerror(error));
+		throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(fVolume->PackagesDirectoryRef(),
+					kAdminDirectoryName),
+				kAdminDirectoryName))
+			.SetSystemError(error);
+	}
 
 	int uniqueId = 1;
 	BString directoryName = baseName;
 	while (BEntry(&adminDirectory, directoryName).Exists()) {
 		directoryName.SetToFormat("%s-%d", baseName.String(), uniqueId++);
 		if (directoryName.IsEmpty())
-			throw Exception(B_NO_MEMORY);
+			throw Exception(B_TRANSACTION_NO_MEMORY);
 	}
 
 	// create the directory
@@ -346,30 +453,31 @@ CommitTransactionHandler::_CreateOldStateDirectory(BMessage* reply)
 
 	error = adminDirectory.CreateDirectory(directoryName,
 		&fOldStateDirectory);
-	if (error != B_OK)
-		throw Exception(error, "failed to create old state directory");
+	if (error == B_OK) {
+		createOldStateDirectoryOperation.Finished();
 
-	createOldStateDirectoryOperation.Finished();
+		fOldStateDirectoryName = directoryName;
 
-	fOldStateDirectoryName = directoryName;
+		error = fOldStateDirectory.GetNodeRef(&fOldStateDirectoryRef);
+		if (error != B_OK)
+			ERROR("Failed get old state directory ref: %s\n", strerror(error));
+	} else
+		ERROR("Failed to create old state directory: %s\n", strerror(error));
 
-	error = fOldStateDirectory.GetNodeRef(&fOldStateDirectoryRef);
-	if (error != B_OK)
-		throw Exception(error, "failed get old state directory ref");
+	if (error != B_OK) {
+		throw Exception(B_TRANSACTION_FAILED_TO_CREATE_DIRECTORY)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(adminDirectory, directoryName),
+				directoryName))
+			.SetSystemError(error);
+	}
 
 	// write the old activation file
 	BEntry activationFile;
-	error = _WriteActivationFile(
-		RelativePath(kAdminDirectoryName, directoryName),
+	_WriteActivationFile(RelativePath(kAdminDirectoryName, directoryName),
 		kActivationFileName, PackageSet(), PackageSet(), activationFile);
-	if (error != B_OK)
-		throw Exception(error, "failed to write old activation file");
 
-	// add the old state directory to the reply
-	if (reply != NULL) {
-		if (reply->AddString("old state", fOldStateDirectoryName) != B_OK)
-			throw Exception(B_NO_MEMORY);
-	}
+	fResult.SetOldStateDirectory(fOldStateDirectoryName);
 }
 
 
@@ -399,8 +507,12 @@ CommitTransactionHandler::_RemovePackagesToDeactivate()
 		BEntry entry;
 		status_t error = entry.SetTo(&entryRef);
 		if (error != B_OK) {
-			throw Exception(error, "failed to get package entry",
-				package->FileName());
+			ERROR("Failed to get package entry for %s: %s\n",
+				package->FileName().String(), strerror(error));
+			throw Exception(B_TRANSACTION_FAILED_TO_GET_ENTRY_PATH)
+				.SetPath1(package->FileName())
+				.SetPackageName(package->FileName())
+				.SetSystemError(error);
 		}
 
 		// move entry
@@ -409,9 +521,15 @@ CommitTransactionHandler::_RemovePackagesToDeactivate()
 		error = entry.MoveTo(&fOldStateDirectory);
 		if (error != B_OK) {
 			fRemovedPackages.erase(package);
-			throw Exception(error,
-				"failed to move old package from packages directory",
-				package->FileName());
+			ERROR("Failed to move old package %s from packages directory: %s\n",
+				package->FileName().String(), strerror(error));
+			throw Exception(B_TRANSACTION_FAILED_TO_MOVE_FILE)
+				.SetPath1(
+					_GetPath(FSUtils::Entry(entryRef), package->FileName()))
+				.SetPath2(_GetPath(
+					FSUtils::Entry(fOldStateDirectory),
+					fOldStateDirectoryName))
+				.SetSystemError(error);
 		}
 
 		fPackageFileManager->PackageFileMoved(package->File(),
@@ -431,8 +549,12 @@ CommitTransactionHandler::_AddPackagesToActivate()
 	BDirectory packagesDirectory;
 	status_t error
 		= packagesDirectory.SetTo(&fVolume->PackagesDirectoryRef());
-	if (error != B_OK)
-		throw Exception(error, "failed to open packages directory");
+	if (error != B_OK) {
+		ERROR("Failed to open packages directory: %s\n", strerror(error));
+		throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+			.SetPath1("<packages>")
+			.SetSystemError(error);
+	}
 
 	int32 count = fPackagesToActivate.CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -450,8 +572,12 @@ CommitTransactionHandler::_AddPackagesToActivate()
 		BEntry entry;
 		error = entry.SetTo(&entryRef);
 		if (error != B_OK) {
-			throw Exception(error, "failed to get package entry",
-				package->FileName());
+			ERROR("Failed to get package entry for %s: %s\n",
+				package->FileName().String(), strerror(error));
+			throw Exception(B_TRANSACTION_FAILED_TO_GET_ENTRY_PATH)
+				.SetPath1(package->FileName())
+				.SetPackageName(package->FileName())
+				.SetSystemError(error);
 		}
 
 		// move entry
@@ -460,9 +586,15 @@ CommitTransactionHandler::_AddPackagesToActivate()
 		error = entry.MoveTo(&packagesDirectory);
 		if (error != B_OK) {
 			fAddedPackages.erase(package);
-			throw Exception(error,
-				"failed to move new package to packages directory",
-				package->FileName());
+			ERROR("Failed to move new package %s to packages directory: %s\n",
+				package->FileName().String(), strerror(error));
+			throw Exception(B_TRANSACTION_FAILED_TO_MOVE_FILE)
+				.SetPath1(
+					_GetPath(FSUtils::Entry(entryRef), package->FileName()))
+				.SetPath2(_GetPath(
+					FSUtils::Entry(packagesDirectory),
+					"packages"))
+				.SetSystemError(error);
 		}
 
 		fPackageFileManager->PackageFileMoved(package->File(),
@@ -480,6 +612,8 @@ CommitTransactionHandler::_AddPackagesToActivate()
 void
 CommitTransactionHandler::_PreparePackageToActivate(Package* package)
 {
+	fCurrentPackage = package;
+
 	// add groups
 	const BStringList& groups = package->Info().Groups();
 	int32 count = groups.CountStrings();
@@ -493,6 +627,8 @@ CommitTransactionHandler::_PreparePackageToActivate(Package* package)
 
 	// handle global writable files
 	_AddGlobalWritableFiles(package);
+
+	fCurrentPackage = NULL;
 }
 
 
@@ -516,10 +652,10 @@ CommitTransactionHandler::_AddGroup(Package* package, const BString& groupName)
 
 	if (system(commandLine.c_str()) != 0) {
 		fAddedGroups.erase(groupName.String());
-		throw Exception(error,
-			BString().SetToFormat("failed to add group \%s\"",
-				groupName.String()),
-			package->FileName());
+		ERROR("Failed to add group \"%s\".\n", groupName.String());
+		throw Exception(B_TRANSACTION_FAILED_TO_ADD_GROUP)
+			.SetPackageName(package->FileName())
+			.SetString1(groupName);
 	}
 }
 
@@ -566,10 +702,11 @@ CommitTransactionHandler::_AddUser(Package* package, const BUser& user)
 
 	if (system(commandLine.c_str()) != 0) {
 		fAddedUsers.erase(user.Name().String());
-		throw Exception(error,
-			BString().SetToFormat("failed to add user \%s\"",
-				user.Name().String()),
-			package->FileName());
+		ERROR("Failed to add user \"%s\".\n", user.Name().String());
+		throw Exception(B_TRANSACTION_FAILED_TO_ADD_USER)
+			.SetPackageName(package->FileName())
+			.SetString1(user.Name());
+
 	}
 
 	// add the supplementary groups
@@ -582,11 +719,12 @@ CommitTransactionHandler::_AddUser(Package* package, const BUser& user)
 				.String();
 		if (system(commandLine.c_str()) != 0) {
 			fAddedUsers.erase(user.Name().String());
-			throw Exception(error,
-				BString().SetToFormat("failed to add user \%s\" to group "
-					"\"%s\"", user.Name().String(),
-					user.Groups().StringAt(i).String()),
-				package->FileName());
+			ERROR("Failed to add user \"%s\" to group \"%s\".\n",
+				user.Name().String(), user.Groups().StringAt(i).String());
+			throw Exception(B_TRANSACTION_FAILED_TO_ADD_USER_TO_GROUP)
+				.SetPackageName(package->FileName())
+				.SetString1(user.Name())
+				.SetString2(user.Groups().StringAt(i));
 		}
 	}
 }
@@ -613,23 +751,28 @@ CommitTransactionHandler::_AddGlobalWritableFiles(Package* package)
 	BDirectory rootDirectory;
 	status_t error = rootDirectory.SetTo(&fVolume->RootDirectoryRef());
 	if (error != B_OK) {
-		throw Exception(error,
-			BString().SetToFormat("failed to get the root directory "
-				"for writable files"),
-			package->FileName());
+		throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(fVolume->RootDirectoryRef()),
+				"<packagefs root>"))
+			.SetSystemError(error);
 	}
 
 	// Open writable-files directory in the administrative directory.
 	if (fWritableFilesDirectory.InitCheck() != B_OK) {
-		error = _OpenPackagesSubDirectory(
-			RelativePath(kAdminDirectoryName, kWritableFilesDirectoryName),
-			true, fWritableFilesDirectory);
+		RelativePath directoryPath(kAdminDirectoryName,
+			kWritableFilesDirectoryName);
+		error = _OpenPackagesSubDirectory(directoryPath, true,
+			fWritableFilesDirectory);
 
 		if (error != B_OK) {
-			throw Exception(error,
-				BString().SetToFormat("failed to get the backup directory "
-					"for writable files"),
-				package->FileName());
+			throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(fVolume->PackagesDirectoryRef(),
+						directoryPath.ToString()),
+					directoryPath.ToString()))
+				.SetPackageName(package->FileName())
+				.SetSystemError(error);
 		}
 	}
 
@@ -679,13 +822,12 @@ CommitTransactionHandler::_AddGlobalWritableFile(Package* package,
 		status_t error = stackSourceDirectory.SetTo(
 			&extractedFilesDirectory, sourceParentPath);
 		if (error != B_OK) {
-			throw Exception(error,
-				BString().SetToFormat("failed to open directory \"%s\"",
-					_GetPath(
-						FSUtils::Entry(extractedFilesDirectory,
-							sourceParentPath),
-						sourceParentPath).String()),
-				package->FileName());
+			throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(extractedFilesDirectory, sourceParentPath),
+					sourceParentPath))
+				.SetPackageName(package->FileName())
+				.SetSystemError(error);
 		}
 	} else {
 		sourceDirectory = &extractedFilesDirectory;
@@ -704,13 +846,12 @@ CommitTransactionHandler::_AddGlobalWritableFile(Package* package,
 		status_t error = FSUtils::OpenSubDirectory(rootDirectory,
 			RelativePath(targetParentPath), true, targetDirectory);
 		if (error != B_OK) {
-			throw Exception(error,
-				BString().SetToFormat("failed to open/create directory "
-					"\"%s\"",
-					_GetPath(
-						FSUtils::Entry(rootDirectory,targetParentPath),
-						targetParentPath).String()),
-				package->FileName());
+			throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(rootDirectory, targetParentPath),
+					targetParentPath))
+				.SetPackageName(package->FileName())
+				.SetSystemError(error);
 		}
 		_AddGlobalWritableFileRecurse(package, *sourceDirectory,
 			relativeSourcePath, targetDirectory, lastSlash + 1,
@@ -752,13 +893,15 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 			if (targetDirectory.GetStatFor(targetName, &targetStat) == B_OK)
 				copyOperation.Finished();
 
-			throw Exception(error,
-				BString().SetToFormat("failed to copy entry \"%s\"",
-					_GetPath(
-						FSUtils::Entry(sourceDirectory,
-							relativeSourcePath.Leaf()),
-						relativeSourcePath).String()),
-				package->FileName());
+			throw Exception(B_TRANSACTION_FAILED_TO_COPY_FILE)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(sourceDirectory,
+						relativeSourcePath.Leaf()),
+					relativeSourcePath))
+				.SetPath2(_GetPath(
+					FSUtils::Entry(targetDirectory, targetName),
+					targetName))
+				.SetSystemError(error);
 		}
 		copyOperation.Finished();
 		return;
@@ -768,13 +911,12 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 	status_t error = sourceDirectory.GetStatFor(relativeSourcePath.Leaf(),
 		&sourceStat);
 	if (error != B_OK) {
-		throw Exception(error,
-			BString().SetToFormat("failed to get stat data for entry "
-				"\"%s\"",
-				_GetPath(
-					FSUtils::Entry(targetDirectory, targetName),
-					targetName).String()),
-			package->FileName());
+		throw Exception(B_TRANSACTION_FAILED_TO_ACCESS_ENTRY)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(sourceDirectory,
+					relativeSourcePath.Leaf()),
+				relativeSourcePath))
+			.SetSystemError(error);
 	}
 
 	if ((sourceStat.st_mode & S_IFMT) != (targetStat.st_mode & S_IFMT)
@@ -784,7 +926,11 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 		// we cannot handle. The user must handle this manually.
 		PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
 			"writable file exists, but type doesn't match previous type\n");
-// TODO: Notify user!
+		_AddIssue(TransactionIssueBuilder(
+				BTransactionIssue::B_WRITABLE_FILE_TYPE_MISMATCH)
+			.SetPath1(FSUtils::Entry(targetDirectory, targetName))
+			.SetPath2(FSUtils::Entry(sourceDirectory,
+				relativeSourcePath.Leaf())));
 		return;
 	}
 
@@ -794,24 +940,24 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 		error = sourceSubDirectory.SetTo(&sourceDirectory,
 			relativeSourcePath.Leaf());
 		if (error != B_OK) {
-			throw Exception(error,
-				BString().SetToFormat("failed to open directory \"%s\"",
-					_GetPath(
-						FSUtils::Entry(sourceDirectory,
-							relativeSourcePath.Leaf()),
-						relativeSourcePath).String()),
-				package->FileName());
+			throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(sourceDirectory,
+						relativeSourcePath.Leaf()),
+					relativeSourcePath))
+				.SetPackageName(package->FileName())
+				.SetSystemError(error);
 		}
 
 		BDirectory targetSubDirectory;
 		error = targetSubDirectory.SetTo(&targetDirectory, targetName);
 		if (error != B_OK) {
-			throw Exception(error,
-				BString().SetToFormat("failed to open directory \"%s\"",
-					_GetPath(
-						FSUtils::Entry(targetDirectory, targetName),
-						targetName).String()),
-				package->FileName());
+			throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(targetDirectory, targetName),
+					targetName))
+				.SetPackageName(package->FileName())
+				.SetSystemError(error);
 		}
 
 		entry_ref entry;
@@ -834,9 +980,13 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 			kPackageFileAttribute, &originalPackage) != B_OK) {
 		// Can't determine the original package. The user must handle this
 		// manually.
-// TODO: Notify user, if not B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD!
 		PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
 			"failed to get SYS:PACKAGE attribute\n");
+		if (updateType != B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD) {
+			_AddIssue(TransactionIssueBuilder(
+					BTransactionIssue::B_WRITABLE_FILE_NO_PACKAGE_ATTRIBUTE)
+				.SetPath1(FSUtils::Entry(targetDirectory, targetName)));
+		}
 		return;
 	}
 
@@ -855,8 +1005,9 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 		throw std::bad_alloc();
 
 	struct stat originalPackageStat;
-	if (fWritableFilesDirectory.GetStatFor(originalRelativeSourcePath,
-			&originalPackageStat) != B_OK
+	error = fWritableFilesDirectory.GetStatFor(originalRelativeSourcePath,
+		&originalPackageStat);
+	if (error != B_OK
 		|| (sourceStat.st_mode & S_IFMT)
 			!= (originalPackageStat.st_mode & S_IFMT)) {
 		// Original entry doesn't exist (either we don't have the data from
@@ -868,8 +1019,22 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 			_GetPath(FSUtils::Entry(fWritableFilesDirectory,
 					originalRelativeSourcePath),
 				originalRelativeSourcePath).String());
+		if (error != B_OK) {
+			_AddIssue(TransactionIssueBuilder(
+					BTransactionIssue
+						::B_WRITABLE_FILE_OLD_ORIGINAL_FILE_MISSING)
+				.SetPath1(FSUtils::Entry(targetDirectory, targetName))
+				.SetPath2(FSUtils::Entry(fWritableFilesDirectory,
+					originalRelativeSourcePath)));
+		} else {
+			_AddIssue(TransactionIssueBuilder(
+					BTransactionIssue
+						::B_WRITABLE_FILE_OLD_ORIGINAL_FILE_TYPE_MISMATCH)
+				.SetPath1(FSUtils::Entry(targetDirectory, targetName))
+				.SetPath2(FSUtils::Entry(fWritableFilesDirectory,
+					originalRelativeSourcePath)));
+		}
 		return;
-// TODO: Notify user!
 	}
 
 	if (S_ISREG(sourceStat.st_mode)) {
@@ -888,8 +1053,25 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 				"_AddGlobalWritableFile(): "
 				"file comparison failed (%s) or files aren't equal\n",
 				strerror(error));
+			if (updateType != B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD) {
+				if (error != B_OK) {
+					_AddIssue(TransactionIssueBuilder(
+							BTransactionIssue
+								::B_WRITABLE_FILE_COMPARISON_FAILED)
+						.SetPath1(FSUtils::Entry(targetDirectory, targetName))
+						.SetPath2(FSUtils::Entry(fWritableFilesDirectory,
+							originalRelativeSourcePath))
+						.SetSystemError(error));
+				} else {
+					_AddIssue(TransactionIssueBuilder(
+							BTransactionIssue
+								::B_WRITABLE_FILE_NOT_EQUAL)
+						.SetPath1(FSUtils::Entry(targetDirectory, targetName))
+						.SetPath2(FSUtils::Entry(fWritableFilesDirectory,
+							originalRelativeSourcePath)));
+				}
+			}
 			return;
-// TODO: Notify user, if not B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD!
 		}
 	} else {
 		// compare symlinks
@@ -906,8 +1088,25 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 				"_AddGlobalWritableFile(): "
 				"symlink comparison failed (%s) or symlinks aren't equal\n",
 				strerror(error));
+			if (updateType != B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD) {
+				if (error != B_OK) {
+					_AddIssue(TransactionIssueBuilder(
+							BTransactionIssue
+								::B_WRITABLE_SYMLINK_COMPARISON_FAILED)
+						.SetPath1(FSUtils::Entry(targetDirectory, targetName))
+						.SetPath2(FSUtils::Entry(fWritableFilesDirectory,
+							originalRelativeSourcePath))
+						.SetSystemError(error));
+				} else {
+					_AddIssue(TransactionIssueBuilder(
+							BTransactionIssue
+								::B_WRITABLE_SYMLINK_NOT_EQUAL)
+						.SetPath1(FSUtils::Entry(targetDirectory, targetName))
+						.SetPath2(FSUtils::Entry(fWritableFilesDirectory,
+							originalRelativeSourcePath)));
+				}
+			}
 			return;
-// TODO: Notify user, if not B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD!
 		}
 	}
 
@@ -928,13 +1127,15 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 		FSUtils::Entry(sourceDirectory, relativeSourcePath.Leaf()),
 		FSUtils::Entry(targetDirectory, tempTargetName));
 	if (error != B_OK) {
-		throw Exception(error,
-			BString().SetToFormat("failed to copy entry \"%s\"",
-				_GetPath(
-					FSUtils::Entry(sourceDirectory,
-						relativeSourcePath.Leaf()),
-					relativeSourcePath).String()),
-			package->FileName());
+		throw Exception(B_TRANSACTION_FAILED_TO_COPY_FILE)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(sourceDirectory,
+					relativeSourcePath.Leaf()),
+				relativeSourcePath))
+			.SetPath2(_GetPath(
+				FSUtils::Entry(targetDirectory, tempTargetName),
+				tempTargetName))
+			.SetSystemError(error);
 	}
 
 	copyOperation.Finished();
@@ -950,13 +1151,12 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 	if (error == B_OK)
 		error = targetEntry.Rename(targetName, true);
 	if (error != B_OK) {
-		throw Exception(error,
-			BString().SetToFormat("failed to rename entry \"%s\" to \"%s\"",
-				_GetPath(
-					FSUtils::Entry(targetDirectory, tempTargetName),
-					tempTargetName).String(),
-				targetName),
-			package->FileName());
+		throw Exception(B_TRANSACTION_FAILED_TO_MOVE_FILE)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(targetDirectory, tempTargetName),
+				tempTargetName))
+			.SetPath2(targetName)
+			.SetSystemError(error);
 	}
 
 	renameOperation.Finished();
@@ -1029,8 +1229,11 @@ CommitTransactionHandler::_RevertRemovePackagesToDeactivate()
 	BDirectory packagesDirectory;
 	status_t error
 		= packagesDirectory.SetTo(&fVolume->PackagesDirectoryRef());
-	if (error != B_OK)
-		throw Exception(error, "failed to open packages directory");
+	if (error != B_OK) {
+		throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+			.SetPath1("<packages>")
+			.SetSystemError(error);
+	}
 
 	for (PackageSet::iterator it = fRemovedPackages.begin();
 		it != fRemovedPackages.end(); ++it) {
@@ -1095,11 +1298,14 @@ CommitTransactionHandler::_RunPostInstallScripts()
 	for (PackageSet::iterator it = fAddedPackages.begin();
 		it != fAddedPackages.end(); ++it) {
 		Package* package = *it;
+		fCurrentPackage = package;
 		const BStringList& scripts = package->Info().PostInstallScripts();
 		int32 count = scripts.CountStrings();
 		for (int32 i = 0; i < count; i++)
 			_RunPostInstallScript(package, scripts.StringAt(i));
 	}
+
+	fCurrentPackage = NULL;
 }
 
 
@@ -1115,16 +1321,32 @@ CommitTransactionHandler::_RunPostInstallScript(Package* package,
 			"failed get path of post-installation script \"%s\" of package "
 			"%s: %s\n", script.String(), package->FileName().String(),
 			strerror(error));
-// TODO: Notify the user!
+		_AddIssue(TransactionIssueBuilder(
+				BTransactionIssue::B_POST_INSTALL_SCRIPT_NOT_FOUND)
+			.SetPath1(script)
+			.SetSystemError(error));
 		return;
 	}
 
-	if (system(scriptPath.Path()) != 0) {
+	errno = 0;
+	int result = system(scriptPath.Path());
+	if (result != 0) {
 		ERROR("Volume::CommitTransactionHandler::_RunPostInstallScript(): "
 			"running post-installation script \"%s\" of package %s "
-			"failed: %s\n", script.String(), package->FileName().String(),
-			strerror(error));
-// TODO: Notify the user!
+			"failed: %d (errno: %s)\n", script.String(),
+			package->FileName().String(), result,
+			strerror(errno));
+		if (result < 0 && errno != 0) {
+			_AddIssue(TransactionIssueBuilder(
+					BTransactionIssue::B_POST_INSTALL_SCRIPT_FAILED)
+				.SetPath1(BString(scriptPath.Path()))
+				.SetSystemError(errno));
+		} else {
+			_AddIssue(TransactionIssueBuilder(
+					BTransactionIssue::B_STARTING_POST_INSTALL_SCRIPT_FAILED)
+				.SetPath1(BString(scriptPath.Path()))
+				.SetExitCode(result));
+		}
 	}
 }
 
@@ -1140,12 +1362,12 @@ CommitTransactionHandler::_ExtractPackageContent(Package* package,
 	BEntry targetEntry;
 	status_t error = targetEntry.SetTo(&targetDirectory, targetName);
 	if (error != B_OK) {
-		throw Exception(error,
-			BString().SetToFormat("failed to init entry \"%s\"",
-				_GetPath(
-					FSUtils::Entry(targetDirectory, targetName),
-					targetName).String()),
-			package->FileName());
+		throw Exception(B_TRANSACTION_FAILED_TO_ACCESS_ENTRY)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(targetDirectory, targetName),
+				targetName))
+			.SetPackageName(package->FileName())
+			.SetSystemError(error);
 	}
 	if (targetEntry.Exists()) {
 		// nothing to do -- the very same version of the package has already
@@ -1153,12 +1375,12 @@ CommitTransactionHandler::_ExtractPackageContent(Package* package,
 		error = _extractedFilesDirectory.SetTo(&targetDirectory,
 			targetName);
 		if (error != B_OK) {
-			throw Exception(error,
-				BString().SetToFormat("failed to open directory \"%s\"",
-					_GetPath(
-						FSUtils::Entry(targetDirectory, targetName),
-						targetName).String()),
-				package->FileName());
+			throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(targetDirectory, targetName),
+					targetName))
+				.SetPackageName(package->FileName())
+				.SetSystemError(error);
 		}
 		return;
 	}
@@ -1172,25 +1394,24 @@ CommitTransactionHandler::_ExtractPackageContent(Package* package,
 
 	error = targetEntry.SetTo(&targetDirectory, temporaryTargetName);
 	if (error != B_OK) {
-		throw Exception(error,
-			BString().SetToFormat("failed to init entry \"%s\"",
-				_GetPath(
-					FSUtils::Entry(targetDirectory, temporaryTargetName),
-					temporaryTargetName).String()),
-			package->FileName());
+		throw Exception(B_TRANSACTION_FAILED_TO_ACCESS_ENTRY)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(targetDirectory, temporaryTargetName),
+				temporaryTargetName))
+			.SetPackageName(package->FileName())
+			.SetSystemError(error);
 	}
 
 	if (targetEntry.Exists()) {
 		// remove pre-existing
 		error = BRemoveEngine().RemoveEntry(FSUtils::Entry(targetEntry));
 		if (error != B_OK) {
-			throw Exception(error,
-				BString().SetToFormat("failed to remove directory \"%s\"",
-					_GetPath(
-						FSUtils::Entry(targetDirectory,
-							temporaryTargetName),
-						temporaryTargetName).String()),
-				package->FileName());
+			throw Exception(B_TRANSACTION_FAILED_TO_REMOVE_DIRECTORY)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(targetDirectory, temporaryTargetName),
+					temporaryTargetName))
+				.SetPackageName(package->FileName())
+				.SetSystemError(error);
 		}
 	}
 
@@ -1201,12 +1422,12 @@ CommitTransactionHandler::_ExtractPackageContent(Package* package,
 	error = targetDirectory.CreateDirectory(temporaryTargetName,
 		&subDirectory);
 	if (error != B_OK) {
-		throw Exception(error,
-			BString().SetToFormat("failed to create directory \"%s\"",
-				_GetPath(
-					FSUtils::Entry(targetDirectory, temporaryTargetName),
-					temporaryTargetName).String()),
-			package->FileName());
+		throw Exception(B_TRANSACTION_FAILED_TO_CREATE_DIRECTORY)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(targetDirectory, temporaryTargetName),
+				temporaryTargetName))
+			.SetPackageName(package->FileName())
+			.SetSystemError(error);
 	}
 
 	createSubDirectoryOperation.Finished();
@@ -1221,35 +1442,26 @@ CommitTransactionHandler::_ExtractPackageContent(Package* package,
 		error = FSUtils::ExtractPackageContent(FSUtils::Entry(packageRef),
 			contentPath, FSUtils::Entry(subDirectory));
 		if (error != B_OK) {
-			throw Exception(error,
-				BString().SetToFormat(
-					"failed to extract \"%s\" from package", contentPath),
-				package->FileName());
+			throw Exception(B_TRANSACTION_FAILED_TO_EXTRACT_PACKAGE_FILE)
+				.SetPath1(contentPath)
+				.SetPackageName(package->FileName())
+				.SetSystemError(error);
 		}
 	}
 
 	// tag all entries with the package attribute
-	error = _TagPackageEntriesRecursively(subDirectory, targetName, true);
-	if (error != B_OK) {
-		throw Exception(error,
-			BString().SetToFormat("failed to tag extract files in \"%s\" "
-				"with package attribute",
-				_GetPath(
-					FSUtils::Entry(targetDirectory, temporaryTargetName),
-					temporaryTargetName).String()),
-			package->FileName());
-	}
+	_TagPackageEntriesRecursively(subDirectory, targetName, true);
 
 	// rename the subdirectory
 	error = targetEntry.Rename(targetName);
 	if (error != B_OK) {
-		throw Exception(error,
-			BString().SetToFormat("failed to rename entry \"%s\" to \"%s\"",
-				_GetPath(
-					FSUtils::Entry(targetDirectory, temporaryTargetName),
-					temporaryTargetName).String(),
-				targetName.String()),
-			package->FileName());
+		throw Exception(B_TRANSACTION_FAILED_TO_MOVE_FILE)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(targetDirectory, temporaryTargetName),
+				temporaryTargetName))
+			.SetPath2(targetName)
+			.SetPackageName(package->FileName())
+			.SetSystemError(error);
 	}
 
 	// keep the directory, regardless of whether the transaction is rolled
@@ -1312,7 +1524,7 @@ CommitTransactionHandler::_OpenPackagesFile(
 }
 
 
-status_t
+void
 CommitTransactionHandler::_WriteActivationFile(
 	const RelativePath& directoryPath, const char* fileName,
 	const PackageSet& toActivate, const PackageSet& toDeactivate,
@@ -1320,26 +1532,24 @@ CommitTransactionHandler::_WriteActivationFile(
 {
 	// create the content
 	BString activationFileContent;
-	status_t error = _CreateActivationFileContent(toActivate, toDeactivate,
+	_CreateActivationFileContent(toActivate, toDeactivate,
 		activationFileContent);
-	if (error != B_OK)
-		return error;
 
 	// write the file
-	error = _WriteTextFile(directoryPath, fileName, activationFileContent,
-		_entry);
+	status_t error = _WriteTextFile(directoryPath, fileName,
+		activationFileContent, _entry);
 	if (error != B_OK) {
-		ERROR("CommitTransactionHandler::_WriteActivationFile(): failed to "
-			"write activation file \"%s/%s\": %s\n",
-			directoryPath.ToString().String(), fileName, strerror(error));
-		return error;
+		BString filePath = directoryPath.ToString() << '/' << fileName;
+		throw Exception(B_TRANSACTION_FAILED_TO_WRITE_ACTIVATION_FILE)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(fVolume->PackagesDirectoryRef(), filePath),
+				filePath))
+			.SetSystemError(error);
 	}
-
-	return B_OK;
 }
 
 
-status_t
+void
 CommitTransactionHandler::_CreateActivationFileContent(
 	const PackageSet& toActivate, const PackageSet& toDeactivate,
 	BString& _content)
@@ -1354,7 +1564,7 @@ CommitTransactionHandler::_CreateActivationFileContent(
 			activationFileContent << package->FileName() << '\n';
 			if (activationFileContent.Length()
 					< length + package->FileName().Length() + 1) {
-				return B_NO_MEMORY;
+				throw Exception(B_TRANSACTION_NO_MEMORY);
 			}
 		}
 	}
@@ -1366,12 +1576,11 @@ CommitTransactionHandler::_CreateActivationFileContent(
 		activationFileContent << package->FileName() << '\n';
 		if (activationFileContent.Length()
 				< length + package->FileName().Length() + 1) {
-			return B_NO_MEMORY;
+			throw Exception(B_TRANSACTION_NO_MEMORY);
 		}
 	}
 
 	_content = activationFileContent;
-	return B_OK;
 }
 
 
@@ -1413,11 +1622,9 @@ CommitTransactionHandler::_ChangePackageActivation(
 
 	// write the temporary package activation file
 	BEntry activationFileEntry;
-	status_t error = _WriteActivationFile(RelativePath(kAdminDirectoryName),
+	_WriteActivationFile(RelativePath(kAdminDirectoryName),
 		kTemporaryActivationFileName, packagesToActivate, packagesToDeactivate,
 		activationFileEntry);
-	if (error != B_OK)
-		throw Exception(error, "failed to write activation file");
 
 	// notify packagefs
 	if (fVolumeStateIsActive) {
@@ -1428,10 +1635,15 @@ CommitTransactionHandler::_ChangePackageActivation(
 	}
 
 	// rename the temporary activation file to the final file
-	error = activationFileEntry.Rename(kActivationFileName, true);
+	status_t error = activationFileEntry.Rename(kActivationFileName, true);
 	if (error != B_OK) {
-		throw Exception(error,
-			"failed to rename temporary activation file to final file");
+		throw Exception(B_TRANSACTION_FAILED_TO_MOVE_FILE)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(activationFileEntry),
+				activationFileEntry.Name()))
+			.SetPath2(kActivationFileName)
+			.SetSystemError(error);
+
 // TODO: We should probably try to revert the activation changes, though that
 // will fail, if this method has been called in response to node monitoring
 // events. Alternatively moving the package activation file could be made part
@@ -1472,7 +1684,7 @@ CommitTransactionHandler::_ChangePackageActivationIOCtl(
 	PackageFSActivationChangeRequest* request
 		= (PackageFSActivationChangeRequest*)malloc(requestSize);
 	if (request == NULL)
-		throw Exception(B_NO_MEMORY);
+		throw Exception(B_TRANSACTION_NO_MEMORY);
 	MemoryDeleter requestDeleter(request);
 
 	request->itemCount = itemCount;
@@ -1494,14 +1706,20 @@ CommitTransactionHandler::_ChangePackageActivationIOCtl(
 
 	// issue the request
 	int fd = fVolume->OpenRootDirectory();
-	if (fd < 0)
-		throw Exception(fd, "failed to open root directory");
+	if (fd < 0) {
+		throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
+			.SetPath1(_GetPath(
+				FSUtils::Entry(fVolume->RootDirectoryRef()),
+				"<packagefs root>"))
+			.SetSystemError(fd);
+	}
 	FileDescriptorCloser fdCloser(fd);
 
 	if (ioctl(fd, PACKAGE_FS_OPERATION_CHANGE_ACTIVATION, request, requestSize)
 			!= 0) {
 // TODO: We need more error information and error handling!
-		throw Exception(errno, "ioctl() to de-/activate packages failed");
+		throw Exception(B_TRANSACTION_FAILED_TO_CHANGE_PACKAGE_ACTIVATION)
+			.SetSystemError(errno);
 	}
 }
 
@@ -1541,6 +1759,13 @@ CommitTransactionHandler::_IsSystemPackage(Package* package)
 }
 
 
+void
+CommitTransactionHandler::_AddIssue(const TransactionIssueBuilder& builder)
+{
+	fResult.AddIssue(builder.BuildIssue(fCurrentPackage));
+}
+
+
 /*static*/ BString
 CommitTransactionHandler::_GetPath(const FSUtils::Entry& entry,
 	const BString& fallback)
@@ -1550,7 +1775,7 @@ CommitTransactionHandler::_GetPath(const FSUtils::Entry& entry,
 }
 
 
-/*static*/ status_t
+/*static*/ void
 CommitTransactionHandler::_TagPackageEntriesRecursively(BDirectory& directory,
 	const BString& value, bool nonDirectoriesOnly)
 {
@@ -1565,8 +1790,13 @@ CommitTransactionHandler::_TagPackageEntriesRecursively(BDirectory& directory,
 		// determine type
 		struct stat st;
 		status_t error = directory.GetStatFor(entry->d_name, &st);
-		if (error != B_OK)
-			return error;
+		if (error != B_OK) {
+			throw Exception(B_TRANSACTION_FAILED_TO_ACCESS_ENTRY)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(directory, entry->d_name),
+					entry->d_name))
+				.SetSystemError(error);
+		}
 		bool isDirectory = S_ISDIR(st.st_mode);
 
 		// open the node and set the attribute
@@ -1581,23 +1811,31 @@ CommitTransactionHandler::_TagPackageEntriesRecursively(BDirectory& directory,
 			error = stackNode.SetTo(&directory, entry->d_name);
 		}
 
-		if (error != B_OK)
-			return error;
+		if (error != B_OK) {
+			throw Exception(isDirectory
+					? B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY
+					: B_TRANSACTION_FAILED_TO_OPEN_FILE)
+				.SetPath1(_GetPath(
+					FSUtils::Entry(directory, entry->d_name),
+					entry->d_name))
+				.SetSystemError(error);
+		}
 
 		if (!isDirectory || !nonDirectoriesOnly) {
 			error = node->WriteAttrString(kPackageFileAttribute, &value);
-			if (error != B_OK)
-				return error;
+			if (error != B_OK) {
+				throw Exception(B_TRANSACTION_FAILED_TO_WRITE_FILE_ATTRIBUTE)
+					.SetPath1(_GetPath(
+						FSUtils::Entry(directory, entry->d_name),
+						entry->d_name))
+					.SetSystemError(error);
+			}
 		}
 
 		// recurse
 		if (isDirectory) {
-			error = _TagPackageEntriesRecursively(stackDirectory, value,
+			_TagPackageEntriesRecursively(stackDirectory, value,
 				nonDirectoriesOnly);
-			if (error != B_OK)
-				return error;
 		}
 	}
-
-	return B_OK;
 }
