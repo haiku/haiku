@@ -351,6 +351,7 @@ RemotePackageRepository HaikuPorts
 	ninja_x86-1.4.0-1
 	openal_x86-1.13.0-2
 	openal_x86_devel-1.13.0-2
+	openjdk_x86-1.7_2013_11_08-2
 	openssl_x86-1.0.0m-1
 	openssl_x86_devel-1.0.0m-1
 	openttd_x86-1.3.3-1
