@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Expander	2566211356
+1	greek, modern (1453-)	x-vnd.Haiku-Expander	3394631502
 Expand	ExpanderMenu		Επέκταση
 Close window when done expanding	ExpanderPreferences		Κλείσιμο παραθύρου μετά το πέρας
 Set destination…	ExpanderMenu		Ορισμός προορισμού...
@@ -38,7 +38,6 @@ Close	ExpanderMenu		Κλείσιμο
 The destination is not a folder.	ExpanderWindow		Ο προορισμός δεν είναι φάκελος.
 Open destination folder after extraction	ExpanderPreferences		Ανοιξε τον φάκελο προορισμού μετά την εξαγωγή
 Set source…	ExpanderMenu		Ορισμός πηγής...
-Select '%s'	DirectoryFilePanel		Επιλογή '%s'
 Show contents	ExpanderMenu		Εμφάνιση περιεχομένων
 Stop	ExpanderWindow		Σταμάτα
 Destination	ExpanderWindow		Προορισμός

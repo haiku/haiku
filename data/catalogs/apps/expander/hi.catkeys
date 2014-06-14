@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Expander	2566211356
+1	hindi	x-vnd.Haiku-Expander	3394631502
 Expand	ExpanderMenu		विस्तार
 Close window when done expanding	ExpanderPreferences		विस्तार करने के बाद विंडो बंद करें
 Set destination…	ExpanderMenu		गंतव्य सेट कीजिए...
@@ -38,7 +38,6 @@ Close	ExpanderMenu		बंद
 The destination is not a folder.	ExpanderWindow		गंतव्य एक फोल्डर नहीं है.
 Open destination folder after extraction	ExpanderPreferences		निकालने के बाद गंतव्य फ़ोल्डर खोलें
 Set source…	ExpanderMenu		सेट स्रोत...
-Select '%s'	DirectoryFilePanel		चुनें '%s'
 Show contents	ExpanderMenu		दिखाएँ सामग्री
 Stop	ExpanderWindow		रुक जाओ
 Destination	ExpanderWindow		गंतव्य

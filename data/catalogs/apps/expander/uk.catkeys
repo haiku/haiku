@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Expander	2603318510
+1	ukrainian	x-vnd.Haiku-Expander	3431738656
 Expand	ExpanderMenu		Розпакувати
 Close window when done expanding	ExpanderPreferences		Закрити вікно після розпаковки
 Set destination…	ExpanderMenu		Встановити ціль…
@@ -45,7 +45,6 @@ Close	ExpanderMenu		Закрити
 The destination is not a folder.	ExpanderWindow		Ціль не є папкою.
 Open destination folder after extraction	ExpanderPreferences		Відкрити папку призначення після розтиску
 Set source…	ExpanderMenu		Встановити джерело…
-Select '%s'	DirectoryFilePanel		Вибрати '%s'
 Show contents	ExpanderMenu		Показати вміст
 Stop	ExpanderWindow		Зупинити
 Destination	ExpanderWindow		Папка призначення

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Expander	2603318510
+1	belarusian	x-vnd.Haiku-Expander	3431738656
 Expand	ExpanderMenu		Распакаваць
 Close window when done expanding	ExpanderPreferences		Закрыць вакно пасля распакоўкі
 Set destination…	ExpanderMenu		Задаць прызначэнне…
@@ -45,7 +45,6 @@ Close	ExpanderMenu		Закрыць
 The destination is not a folder.	ExpanderWindow		Прызначэнне не з´яўляецца каталёгам.
 Open destination folder after extraction	ExpanderPreferences		Паказаць паку прызначэння пасля распакоўкі
 Set source…	ExpanderMenu		Задаць крыніцу…
-Select '%s'	DirectoryFilePanel		Пазначыць '%s'
 Show contents	ExpanderMenu		Паказаць змест
 Stop	ExpanderWindow		Спыніць
 Destination	ExpanderWindow		Прызначэнне

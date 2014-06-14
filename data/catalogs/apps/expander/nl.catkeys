@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Expander	282517174
+1	dutch; flemish	x-vnd.Haiku-Expander	1110937320
 Expand	ExpanderMenu		Uitpakken
 Close window when done expanding	ExpanderPreferences		Sluit dit venster wanneer het uitpakken klaar is
 Set destination…	ExpanderMenu		Bepaal doel…
@@ -42,7 +42,6 @@ Close	ExpanderMenu		Sluiten
 The destination is not a folder.	ExpanderWindow		Het doel is geen map.
 Open destination folder after extraction	ExpanderPreferences		Open doelmap na het uitpakken
 Set source…	ExpanderMenu		Bron bepalen…
-Select '%s'	DirectoryFilePanel		Selecteer '%s'
 Show contents	ExpanderMenu		Toon inhoud
 Stop	ExpanderWindow		Stop
 Destination	ExpanderWindow		Doel

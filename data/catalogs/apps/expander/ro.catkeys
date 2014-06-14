@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Expander	2566211356
+1	romanian	x-vnd.Haiku-Expander	3394631502
 Expand	ExpanderMenu		Extinde
 Close window when done expanding	ExpanderPreferences		Închide fereastra atunci când s-a încheiat extinderea
 Set destination…	ExpanderMenu		Setează destinația…
@@ -38,7 +38,6 @@ Close	ExpanderMenu		Închide
 The destination is not a folder.	ExpanderWindow		Destinația nu este un dosar.
 Open destination folder after extraction	ExpanderPreferences		Deschide dosarul destinație după extragere
 Set source…	ExpanderMenu		Setează sursa…
-Select '%s'	DirectoryFilePanel		Selectează '%s'
 Show contents	ExpanderMenu		Afișează conținut
 Stop	ExpanderWindow		Oprește
 Destination	ExpanderWindow		Destinație

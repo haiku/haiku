@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Expander	2603318510
+1	portuguese (brazil)	x-vnd.Haiku-Expander	3431738656
 Expand	ExpanderMenu		Expandir
 Close window when done expanding	ExpanderPreferences		Fechar a janela quando concluída a expansão
 Set destination…	ExpanderMenu		Selecionar destino…
@@ -45,7 +45,6 @@ Close	ExpanderMenu		Fechar
 The destination is not a folder.	ExpanderWindow		O destino não é uma pasta.
 Open destination folder after extraction	ExpanderPreferences		Abrir a pasta de destino após a extração
 Set source…	ExpanderMenu		Definir fonte…
-Select '%s'	DirectoryFilePanel		Selecionar '%s'
 Show contents	ExpanderMenu		Mostrar o conteúdo
 Stop	ExpanderWindow		Parar
 Destination	ExpanderWindow		Destino

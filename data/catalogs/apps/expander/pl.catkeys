@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Expander	2603318510
+1	polish	x-vnd.Haiku-Expander	3431738656
 Expand	ExpanderMenu		Rozpakuj
 Close window when done expanding	ExpanderPreferences		Zamknij okno po zakończeniu rozpakowywania
 Set destination…	ExpanderMenu		Wybierz miejsce docelowe…
@@ -45,7 +45,6 @@ Close	ExpanderMenu		Zamknij
 The destination is not a folder.	ExpanderWindow		Cel nie jest katalogiem.
 Open destination folder after extraction	ExpanderPreferences		Otwórz katalog docelowy po rozpakowaniu
 Set source…	ExpanderMenu		Wybierz źródło…
-Select '%s'	DirectoryFilePanel		Wybierz „%s”
 Show contents	ExpanderMenu		Pokaż zawartość
 Stop	ExpanderWindow		Zatrzymaj
 Destination	ExpanderWindow		Cel

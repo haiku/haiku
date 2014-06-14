@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Expander	2603318510
+1	lithuanian	x-vnd.Haiku-Expander	3431738656
 Expand	ExpanderMenu		Išskleisti
 Close window when done expanding	ExpanderPreferences		Viską išskleidus, užverti langą
 Set destination…	ExpanderMenu		Paskirties vieta…
@@ -45,7 +45,6 @@ Close	ExpanderMenu		Užverti
 The destination is not a folder.	ExpanderWindow		Nurodyta paskirties vieta nėra aplankas.
 Open destination folder after extraction	ExpanderPreferences		Viską išskleidus, atverti paskirties aplanką
 Set source…	ExpanderMenu		Parinkti šaltinį…
-Select '%s'	DirectoryFilePanel		Rinktis „%s“
 Show contents	ExpanderMenu		Rodyti turinį
 Stop	ExpanderWindow		Nutraukti
 Destination	ExpanderWindow		Paskirtis

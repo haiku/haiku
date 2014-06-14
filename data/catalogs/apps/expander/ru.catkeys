@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Expander	2603318510
+1	russian	x-vnd.Haiku-Expander	3431738656
 Expand	ExpanderMenu		Распаковать
 Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
 Set destination…	ExpanderMenu		Путь назначения для извлечения…
@@ -45,7 +45,6 @@ Close	ExpanderMenu		Закрыть
 The destination is not a folder.	ExpanderWindow		Указанный объект не является папкой.
 Open destination folder after extraction	ExpanderPreferences		Открыть папку с извлеченными файлами после распаковки
 Set source…	ExpanderMenu		Выбрать источник…
-Select '%s'	DirectoryFilePanel		Выбрать '%s'
 Show contents	ExpanderMenu		Показать содержимое
 Stop	ExpanderWindow		Остановить
 Destination	ExpanderWindow		Назначение

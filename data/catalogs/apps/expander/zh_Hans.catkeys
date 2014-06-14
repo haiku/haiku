@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Expander	2603318510
+1	english	x-vnd.Haiku-Expander	3431738656
 Expand	ExpanderMenu		解压缩
 Close window when done expanding	ExpanderPreferences		完成解压后，关闭窗口。
 Set destination…	ExpanderMenu		目标文件…
@@ -45,7 +45,6 @@ Close	ExpanderMenu		关闭
 The destination is not a folder.	ExpanderWindow		目标文件不是一个文件夹。
 Open destination folder after extraction	ExpanderPreferences		解压后，打开目标目录
 Set source…	ExpanderMenu		设定源文件…
-Select '%s'	DirectoryFilePanel		选择 '%s'
 Show contents	ExpanderMenu		显示内容
 Stop	ExpanderWindow		停止
 Destination	ExpanderWindow		目标文件

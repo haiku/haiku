@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Expander	2603318510
+1	slovak	x-vnd.Haiku-Expander	3431738656
 Expand	ExpanderMenu		Rozbaliť
 Close window when done expanding	ExpanderPreferences		Zatvoriť okno po dokončení rozbaľovania
 Set destination…	ExpanderMenu		Nastaviť cieľ…
@@ -45,7 +45,6 @@ Close	ExpanderMenu		Zatvoriť
 The destination is not a folder.	ExpanderWindow		Cieľ nie je priečinok.
 Open destination folder after extraction	ExpanderPreferences		Otvoriť cieľový priečinok po rozbalení
 Set source…	ExpanderMenu		Nastaviť zdroj…
-Select '%s'	DirectoryFilePanel		Vybrať „%s“
 Show contents	ExpanderMenu		Zobraziť obsah
 Stop	ExpanderWindow		Zastaviť
 Destination	ExpanderWindow		Cieľ

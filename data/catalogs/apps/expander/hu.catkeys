@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Expander	2603318510
+1	hungarian	x-vnd.Haiku-Expander	3431738656
 Expand	ExpanderMenu		Kicsomagol
 Close window when done expanding	ExpanderPreferences		A kicsomagolás végeztével zárja be az ablakot
 Set destination…	ExpanderMenu		Célmappa megadása…
@@ -45,7 +45,6 @@ Close	ExpanderMenu		Bezár
 The destination is not a folder.	ExpanderWindow		A cél nem egy mappa.
 Open destination folder after extraction	ExpanderPreferences		Kicsomagolás után nyissa meg a célmappát
 Set source…	ExpanderMenu		Csomag megadása…
-Select '%s'	DirectoryFilePanel		'%s' kiválasztása
 Show contents	ExpanderMenu		Tartalom megjelenítése
 Stop	ExpanderWindow		Leállítás
 Destination	ExpanderWindow		Célmappa

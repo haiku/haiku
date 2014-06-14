@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Expander	2603318510
+1	japanese	x-vnd.Haiku-Expander	3431738656
 Expand	ExpanderMenu		解凍
 Close window when done expanding	ExpanderPreferences		解凍終了後ウィンドウを閉じる
 Set destination…	ExpanderMenu		解凍先を指定…
@@ -45,7 +45,6 @@ Close	ExpanderMenu		閉じる
 The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
 Open destination folder after extraction	ExpanderPreferences		解凍後に解凍先フォルダーを開く
 Set source…	ExpanderMenu		書庫ファイルを指定…
-Select '%s'	DirectoryFilePanel		'%s' を選択
 Show contents	ExpanderMenu		内容を表示
 Stop	ExpanderWindow		中止
 Destination	ExpanderWindow		解凍先
