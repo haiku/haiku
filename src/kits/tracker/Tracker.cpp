@@ -1608,8 +1608,8 @@ TTracker::CloseParentWindowCommon(BContainerWindow* window)
 {
 	ASSERT(fWindowList.IsLocked());
 
-	if (dynamic_cast<BDeskWindow*>(window) == NULL) {
-		// don't close the destop
+	if (dynamic_cast<BDeskWindow*>(window) != NULL) {
+		// don't close the desktop
 		return false;
 	}
 
