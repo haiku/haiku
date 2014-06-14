@@ -71,6 +71,7 @@ const char* kShortcutsSettings = "shortcuts_settings";
 const char* kDefaultShortcut = "BEOS:default_shortcut";
 const uint32 kDefaultModifiers = B_OPTION_KEY | B_COMMAND_KEY;
 
+
 static struct AddonShortcut*
 MatchOne(struct AddonShortcut* item, void* castToName)
 {
@@ -88,6 +89,7 @@ AddOneShortcut(Model* model, char key, uint32 modifiers, BDeskWindow* window)
 {
 	if (key == '\0')
 		return;
+
 	BMessage* runAddon = new BMessage(kLoadAddOn);
 	runAddon->AddRef("refs", model->EntryRef());
 	window->AddShortcut(key, modifiers, runAddon);
@@ -107,6 +109,7 @@ RevertToDefault(struct AddonShortcut* item, void* castToWindow)
 			AddOneShortcut(item->model, item->key, item->modifiers, window);
 		}
 	}
+
 	return 0;
 }
 
@@ -182,10 +185,12 @@ LoadAddOnDir(directory_which dirName, BDeskWindow* window,
 }
 
 
-// #pragma mark -
+// #pragma mark - BDeskWindow
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DeskWindow"
+
 
 BDeskWindow::BDeskWindow(LockingList<BWindow>* windowList)
 	:
@@ -193,8 +198,8 @@ BDeskWindow::BDeskWindow(LockingList<BWindow>* windowList)
 		kPrivateDesktopWindowFeel, B_NOT_MOVABLE | B_WILL_ACCEPT_FIRST_CLICK
 			| B_NOT_ZOOMABLE | B_NOT_CLOSABLE | B_NOT_MINIMIZABLE
 			| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES),
-	fDeskShelf(0),
-	fTrashContextMenu(0),
+	fDeskShelf(NULL),
+	fTrashContextMenu(NULL),
 	fNodeRef(NULL),
 	fShortcutsSettings(NULL)
 {
@@ -309,10 +314,9 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 		}
 		shortcutSettings.GetNodeRef(fNodeRef);
 
-		int i = 0;
+		int32 i = 0;
 		BMessage message;
 		while (fileMsg.FindMessage("spec", i++, &message) == B_OK) {
-	
 			int32 key;
 			if (message.FindInt32("key", &key) == B_OK) {
 				// only handle shortcuts referring add-ons
@@ -389,13 +393,14 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 void
 BDeskWindow::Quit()
 {
-	if (fNavigationItem) {
+	if (fNavigationItem != NULL) {
 		// this duplicates BContainerWindow::Quit because
 		// fNavigationItem can be part of fTrashContextMenu
 		// and would get deleted with it
 		BMenu* menu = fNavigationItem->Menu();
-		if (menu)
+		if (menu != NULL)
 			menu->RemoveItem(fNavigationItem);
+
 		delete fNavigationItem;
 		fNavigationItem = 0;
 	}

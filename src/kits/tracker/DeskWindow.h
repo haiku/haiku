@@ -31,7 +31,7 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef	_DESK_WINDOW_H
+#ifndef _DESK_WINDOW_H
 #define _DESK_WINDOW_H
 
 
@@ -104,4 +104,5 @@ BDeskWindow::PoseView() const
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _DESK_WINDOW_H
