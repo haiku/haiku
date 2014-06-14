@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_DEBUGGER_H
@@ -13,6 +13,7 @@
 #include <debug_support.h>
 
 #include "DebugEvent.h"
+#include "Jobs.h"
 #include "Team.h"
 #include "TeamSettings.h"
 #include "ThreadHandler.h"
@@ -30,7 +31,8 @@ class WatchpointManager;
 
 
 class TeamDebugger : public BLooper, private UserInterfaceListener,
-	private JobListener, private Team::Listener {
+	private JobListener, private ImageDebugInfoJobListener,
+	private Team::Listener {
 public:
 	class Listener;
 
@@ -110,6 +112,9 @@ private:
 	virtual	void				JobFailed(Job* job);
 	virtual	void				JobAborted(Job* job);
 
+	virtual	void				ImageDebugInfoJobNeedsUserInput(Job* job,
+									ImageDebugInfoLoadingState* state);
+
 	// Team::Listener
 	virtual	void				ThreadStateChanged(
 									const ::Team::ThreadEvent& event);
@@ -177,6 +182,9 @@ private:
 									TeamMemoryBlock::Listener* listener);
 			status_t			_HandleSetArguments(int argc,
 									const char* const* argv);
+
+			void				_HandleDebugInfoJobUserInput(
+									ImageDebugInfoLoadingState* state);
 
 			ThreadHandler*		_GetThreadHandler(thread_id threadID);
 

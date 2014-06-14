@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -14,11 +14,31 @@
 #include "Team.h"
 
 
-LoadImageDebugInfoJob::LoadImageDebugInfoJob(Image* image)
+// #pragma mark - ImageDebugInfoJobListener
+
+
+ImageDebugInfoJobListener::~ImageDebugInfoJobListener()
+{
+}
+
+
+void
+ImageDebugInfoJobListener::ImageDebugInfoJobNeedsUserInput(Job* job,
+	ImageDebugInfoLoadingState* state)
+{
+}
+
+
+// #pragma mark - LoadImageDebugInfoJob
+
+
+LoadImageDebugInfoJob::LoadImageDebugInfoJob(Image* image,
+	ImageDebugInfoJobListener* listener)
 	:
 	fKey(image, JOB_TYPE_LOAD_IMAGE_DEBUG_INFO),
 	fImage(image),
-	fState()
+	fState(),
+	fListener(listener)
 {
 	fImage->AcquireReference();
 }
@@ -54,11 +74,9 @@ LoadImageDebugInfoJob::Do()
 	locker.Lock();
 
 	if (fState.UserInputRequired()) {
-		// TODO: notify the user interface
+		NotifyUserInputListener();
 		return WaitForUserInput();
-	}
-
-	if (error == B_OK) {
+	} else if (error == B_OK) {
 		error = fImage->SetImageDebugInfo(debugInfo, IMAGE_DEBUG_INFO_LOADED);
 		debugInfo->ReleaseReference();
 	} else
@@ -70,7 +88,7 @@ LoadImageDebugInfoJob::Do()
 
 /*static*/ status_t
 LoadImageDebugInfoJob::ScheduleIfNecessary(Worker* worker, Image* image,
-	ImageDebugInfo** _imageDebugInfo)
+	ImageDebugInfoJobListener* listener, ImageDebugInfo** _imageDebugInfo)
 {
 	AutoLocker<Team> teamLocker(image->GetTeam());
 
@@ -95,7 +113,8 @@ LoadImageDebugInfoJob::ScheduleIfNecessary(Worker* worker, Image* image,
 		return B_ERROR;
 
 	// schedule a job
-	LoadImageDebugInfoJob* job = new(std::nothrow) LoadImageDebugInfoJob(image);
+	LoadImageDebugInfoJob* job = new(std::nothrow) LoadImageDebugInfoJob(image,
+		listener);
 	if (job == NULL)
 		return B_NO_MEMORY;
 
@@ -111,3 +130,12 @@ LoadImageDebugInfoJob::ScheduleIfNecessary(Worker* worker, Image* image,
 		*_imageDebugInfo = NULL;
 	return B_OK;
 }
+
+
+void
+LoadImageDebugInfoJob::NotifyUserInputListener()
+{
+	if (fListener != NULL)
+		fListener->ImageDebugInfoJobNeedsUserInput(this, &fState);
+}
+

@@ -18,10 +18,12 @@
 
 
 GetStackTraceJob::GetStackTraceJob(DebuggerInterface* debuggerInterface,
-	Architecture* architecture, Thread* thread)
+	ImageDebugInfoJobListener* listener, Architecture* architecture,
+	Thread* thread)
 	:
 	fKey(thread, JOB_TYPE_GET_STACK_TRACE),
 	fDebuggerInterface(debuggerInterface),
+	fDebugInfoJobListener(listener),
 	fArchitecture(architecture),
 	fThread(thread)
 {
@@ -82,7 +84,7 @@ GetStackTraceJob::GetImageDebugInfo(Image* image, ImageDebugInfo*& _info)
 		// schedule a job, if not loaded
 		ImageDebugInfo* info;
 		status_t error = LoadImageDebugInfoJob::ScheduleIfNecessary(GetWorker(),
-			image, &info);
+			image, fDebugInfoJobListener, &info);
 		if (error != B_OK)
 			return error;
 

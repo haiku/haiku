@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef THREAD_HANDLER_H
@@ -17,6 +18,7 @@
 
 class BreakpointManager;
 class DebuggerInterface;
+class ImageDebugInfoJobListener;
 class StackFrame;
 class Statement;
 class Worker;
@@ -27,6 +29,7 @@ class ThreadHandler : public BReferenceable, private ImageDebugInfoProvider,
 public:
 								ThreadHandler(Thread* thread, Worker* worker,
 									DebuggerInterface* debuggerInterface,
+									ImageDebugInfoJobListener* listener,
 									BreakpointManager* breakpointManager);
 								~ThreadHandler();
 
@@ -103,6 +106,7 @@ private:
 			Thread*				fThread;
 			Worker*				fWorker;
 			DebuggerInterface*	fDebuggerInterface;
+			ImageDebugInfoJobListener* fDebugInfoJobListener;
 			BreakpointManager*	fBreakpointManager;
 			uint32				fStepMode;
 			Statement*			fStepStatement;

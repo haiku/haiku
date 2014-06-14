@@ -83,10 +83,19 @@ private:
 };
 
 
+class ImageDebugInfoJobListener {
+public:
+	virtual						~ImageDebugInfoJobListener();
+	virtual	void				ImageDebugInfoJobNeedsUserInput(Job* job,
+									ImageDebugInfoLoadingState* state);
+};
+
+
 class GetStackTraceJob : public Job, private ImageDebugInfoProvider {
 public:
 								GetStackTraceJob(
 									DebuggerInterface* debuggerInterface,
+									ImageDebugInfoJobListener* listener,
 									Architecture* architecture, Thread* thread);
 	virtual						~GetStackTraceJob();
 
@@ -101,6 +110,7 @@ private:
 private:
 			SimpleJobKey		fKey;
 			DebuggerInterface*	fDebuggerInterface;
+			ImageDebugInfoJobListener* fDebugInfoJobListener;
 			Architecture*		fArchitecture;
 			Thread*				fThread;
 			CpuState*			fCpuState;
@@ -109,7 +119,8 @@ private:
 
 class LoadImageDebugInfoJob : public Job {
 public:
-								LoadImageDebugInfoJob(Image* image);
+								LoadImageDebugInfoJob(Image* image,
+									ImageDebugInfoJobListener* listener);
 	virtual						~LoadImageDebugInfoJob();
 
 	virtual	const JobKey&		Key() const;
@@ -117,6 +128,7 @@ public:
 
 	static	status_t			ScheduleIfNecessary(Worker* worker,
 									Image* image,
+									ImageDebugInfoJobListener* listener,
 									ImageDebugInfo** _imageDebugInfo = NULL);
 										// If already loaded returns a
 										// reference, if desired. If not loaded
@@ -125,12 +137,19 @@ public:
 										// if scheduling the job failed, or the
 										// debug info already failed to load
 										// earlier.
+private:
+			void				NotifyUserInputListener();
+
+private:
+	typedef BObjectList<ImageDebugInfoJobListener> ListenerList;
+
 
 private:
 			SimpleJobKey		fKey;
 			Image*				fImage;
 			ImageDebugInfoLoadingState
 								fState;
+			ImageDebugInfoJobListener* fListener;
 };
 
 
