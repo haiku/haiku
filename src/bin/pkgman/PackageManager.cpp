@@ -225,9 +225,23 @@ void
 PackageManager::ProgressTransactionCommitted(InstalledRepository& repository,
 	const BCommitTransactionResult& result)
 {
+	const char* repositoryName = repository.Name().String();
+
+	int32 issueCount = result.CountIssues();
+	for (int32 i = 0; i < issueCount; i++) {
+		const BTransactionIssue* issue = result.IssueAt(i);
+		if (issue->PackageName().IsEmpty()) {
+			printf("[%s] warning: %s\n", repositoryName,
+				issue->ToString().String());
+		} else {
+			printf("[%s] warning: package %s: %s\n", repositoryName,
+				issue->PackageName().String(), issue->ToString().String());
+		}
+	}
+
 	printf("[%s] Changes applied. Old activation state backed up in \"%s\"\n",
-		repository.Name().String(), result.OldStateDirectory().String());
-	printf("[%s] Cleaning up ...\n", repository.Name().String());
+		repositoryName, result.OldStateDirectory().String());
+	printf("[%s] Cleaning up ...\n", repositoryName);
 }
 
 
