@@ -8,6 +8,7 @@
 #include "GraphicalUserInterface.h"
 
 #include <Alert.h>
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <FilePanel.h>
 #include <Locker.h>
