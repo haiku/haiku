@@ -170,9 +170,8 @@ LoadAddOnDir(BDirectory directory, BDeskWindow* window,
 		free(name);
 	}
 
-	BNode node(&directory, NULL);
 	node_ref nodeRef;
-	node.GetNodeRef(&nodeRef);
+	directory.GetNodeRef(&nodeRef);
 
 	TTracker::WatchNode(&nodeRef, B_WATCH_DIRECTORY, window);
 }
