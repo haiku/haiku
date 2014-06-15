@@ -34,6 +34,8 @@ public:
 									// shut down the UI *now* -- no more user
 									// feedback
 
+	virtual	bool				IsInteractive() const;
+
 	virtual status_t			LoadSettings(const TeamUiSettings* settings);
 	virtual status_t			SaveSettings(TeamUiSettings*& settings)	const;
 

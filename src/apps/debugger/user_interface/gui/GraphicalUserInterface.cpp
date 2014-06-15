@@ -191,6 +191,13 @@ GraphicalUserInterface::Terminate()
 }
 
 
+bool
+GraphicalUserInterface::IsInteractive() const
+{
+	return true;
+}
+
+
 status_t
 GraphicalUserInterface::LoadSettings(const TeamUiSettings* settings)
 {

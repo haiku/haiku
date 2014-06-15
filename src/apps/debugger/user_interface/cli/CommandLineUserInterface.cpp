@@ -171,6 +171,15 @@ CommandLineUserInterface::Terminate()
 }
 
 
+bool
+CommandLineUserInterface::IsInteractive() const
+{
+	// if we were invoked solely for the purpose of saving a crash report,
+	// then we're not taking user input into account.
+	return !fSaveReport;
+}
+
+
 status_t
 CommandLineUserInterface::LoadSettings(const TeamUiSettings* settings)
 {
