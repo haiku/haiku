@@ -9,6 +9,14 @@
 #include "ImageDebugLoadingStateHandler.h"
 
 
+namespace BPackageKit {
+	class BPackageVersion;
+}
+
+
+class BString;
+
+
 class DwarfLoadingStateHandler : public ImageDebugLoadingStateHandler {
 public:
 								DwarfLoadingStateHandler();
@@ -21,6 +29,15 @@ public:
 									SpecificImageDebugInfoLoadingState* state,
 									UserInterface* interface);
 
+private:
+			status_t			_GetMatchingDebugInfoPackage(
+									const BString& debugFileName,
+									BString& _packageName);
+
+			status_t			_GetResolvableName(const BString& debugFileName,
+									BString& _resolvableName,
+									BPackageKit::BPackageVersion&
+										_resolvableVersion);
 };
 
 
