@@ -29,7 +29,9 @@ static const char* const kShortUsage =
 
 static const char* const kLongUsage =
 	"Usage: %program% %command% <package> ...\n"
-	"Installs the specified packages.\n"
+	"Installs the specified packages. A <package> argument can be a search\n"
+	"string by which the package is looked up in a remote repository or a\n"
+	"path to a local package file. In the latter case the file is copied.\n"
 	"\n"
 	"Options:\n"
 	"  -H, --home\n"

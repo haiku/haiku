@@ -267,9 +267,14 @@ PackageManager::_PrintResult(InstalledRepository& installationRepository)
 
 	for (int32 i = 0; BSolverPackage* package = packagesToActivate.ItemAt(i);
 		i++) {
-		printf("    install package %s from repository %s\n",
-			package->Info().FileName().String(),
-			package->Repository()->Name().String());
+		if (dynamic_cast<MiscLocalRepository*>(package->Repository()) == NULL) {
+			printf("    install package %s from repository %s\n",
+				package->Info().FileName().String(),
+				package->Repository()->Name().String());
+		} else {
+			printf("    install package %s from local file\n",
+				package->Info().FileName().String());
+		}
 	}
 
 	for (int32 i = 0; BSolverPackage* package = packagesToDeactivate.ItemAt(i);
