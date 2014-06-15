@@ -163,22 +163,22 @@ rule BuildUBootSDImage image : files
 
 actions BuildUBootSDImage1
 {
-	$(RM) $(<)
-	$(RM) $(<).mtools
+	$(RM) $(1)
+	$(RM) $(1).mtools
 
 	# make an empty image
-	dd of=$(<) \
+	dd of=$(1) \
 		if=/dev/zero \
 		bs=$(SDIMAGE_BLOCK_SIZE) \
 		count=$(SDIMAGE_SIZE)
 	# generate mtools config
-	echo 'drive i: file="$(<)" partition=1 cylinders=$(SDIMAGE_MTOOLS_C)
+	echo 'drive i: file="$(1)" partition=1 cylinders=$(SDIMAGE_MTOOLS_C)
 		heads=$(SDIMAGE_MTOOLS_H) sectors=$(SDIMAGE_MTOOLS_S)
-		mformat_only' > $(<).mtools
+		mformat_only' > $(1).mtools
 	# partition it
-	MTOOLSRC=$(<).mtools mpartition -cI -T 0xc i:
+	MTOOLSRC=$(1).mtools mpartition -cI -T 0xc i:
 	# format the image
-	MTOOLSRC=$(<).mtools mformat -L 32 -v "Haiku" i:
+	MTOOLSRC=$(1).mtools mformat -L 32 -v "Haiku" i:
 
 	# generate u-boot environment variables
 	# We load the uImage 2MB above its final destination, bootm will decode
@@ -187,16 +187,15 @@ actions BuildUBootSDImage1
 		loadImage=fatload mmc0 0 0x80200000 haiku_loader_nbsd.ub
 		mmcboot=bootm 0x80200000' > uEnv.txt
 	# populate
-	MTOOLSRC=$(<).mtools mcopy $(>) i:
-	MTOOLSRC=$(<).mtools mcopy uEnv.txt i:
+	MTOOLSRC=$(1).mtools mcopy $(2[1-]) i:
+	MTOOLSRC=$(1).mtools mcopy uEnv.txt i:
 	# list content
-	MTOOLSRC=$(<).mtools mdir i:
+	MTOOLSRC=$(1).mtools mdir i:
 	# cleanup
-	$(RM) $(<).mtools
+	$(RM) $(1).mtools
 	$(RM) uEnv.txt
 	# Add haiku bootstrap partition to MMC image
-	dd if=$(HAIKU_IMAGE_NAME) of=$(<) conv=notrunc oflag=append bs=1M \
-		count=`du -sm $(HAIKU_IMAGE_NAME) | cut -f 1`
+	dd if=$(2[0]) of=$(1) conv=notrunc oflag=append bs=1M
 }
 
 # uimage targets
@@ -239,10 +238,9 @@ NotFile haiku-flash-uimage ;
 Depends haiku-flash-uimage : haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img ;
 
 # SD/mmc image targets
-BuildUBootSDImage haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
+BuildUBootSDImage haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_IMAGE) $(HAIKU_BOARD_SDIMAGE_FILES) ;
 NotFile haiku-mmc-image ;
 Depends haiku-mmc-image : haiku-$(HAIKU_BOOT_BOARD).mmc ;
-Depends haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_IMAGE_NAME) ;
 
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
