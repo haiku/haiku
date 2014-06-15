@@ -38,11 +38,14 @@ All rights reserved.
 #include <Locale.h>
 #include <NodeMonitor.h>
 #include <Path.h>
+#include <PathFinder.h>
 #include <PathMonitor.h>
 #include <PopUpMenu.h>
 #include <Resources.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <String.h>
+#include <StringList.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 
@@ -126,62 +129,52 @@ FindElement(struct AddonShortcut* item, void* castToOther)
 
 
 static void
-LoadAddOnDir(directory_which dirName, BDeskWindow* window,
+LoadAddOnDir(BDirectory directory, BDeskWindow* window,
 	LockingList<AddonShortcut>* list)
 {
-	BPath path;
-	if (find_directory(dirName, &path) == B_OK) {
-		path.Append("Tracker");
-		
-		BDirectory dir;
-		BEntry entry;
-
-		if (dir.SetTo(path.Path()) != B_OK)
-			return;
-		
-		while (dir.GetNextEntry(&entry) == B_OK) {
-			Model* model = new Model(&entry);
-			if (model->InitCheck() == B_OK && model->IsSymLink()) {
-				// resolve symlinks
-				Model* resolved = new Model(model->EntryRef(), true, true);
-				if (resolved->InitCheck() == B_OK)
-					model->SetLinkTo(resolved);
-				else
-					delete resolved;
-			}
-			if (model->InitCheck() != B_OK
-				|| !model->ResolveIfLink()->IsExecutable()) {
-				delete model;
-				continue;
-			}
-
-			char* name = strdup(model->Name());
-			if (!list->EachElement(MatchOne, name)) {
-				struct AddonShortcut* item = new struct AddonShortcut;
-				item->model = model;
-
-				BResources resources(model->ResolveIfLink()->EntryRef());
-				size_t size;
-				char* shortcut = (char*)resources.LoadResource(B_STRING_TYPE,
-					kDefaultShortcut, &size);
-				if (shortcut == NULL || strlen(shortcut) > 1)
-					item->key = '\0';
-				else
-					item->key = shortcut[0];
-				AddOneShortcut(model, item->key, kDefaultModifiers, window);
-				item->defaultKey = item->key;
-				item->modifiers = kDefaultModifiers;
-				list->AddItem(item);
-			}
-			free(name);
+	BEntry entry;
+	while (directory.GetNextEntry(&entry) == B_OK) {
+		Model* model = new Model(&entry);
+		if (model->InitCheck() == B_OK && model->IsSymLink()) {
+			// resolve symlinks
+			Model* resolved = new Model(model->EntryRef(), true, true);
+			if (resolved->InitCheck() == B_OK)
+				model->SetLinkTo(resolved);
+			else
+				delete resolved;
+		}
+		if (model->InitCheck() != B_OK
+			|| !model->ResolveIfLink()->IsExecutable()) {
+			delete model;
+			continue;
 		}
 
-		BNode node(path.Path());
-		node_ref nodeRef;
-		node.GetNodeRef(&nodeRef);
-	
-		TTracker::WatchNode(&nodeRef, B_WATCH_DIRECTORY, window);
+		char* name = strdup(model->Name());
+		if (!list->EachElement(MatchOne, name)) {
+			struct AddonShortcut* item = new struct AddonShortcut;
+			item->model = model;
+
+			BResources resources(model->ResolveIfLink()->EntryRef());
+			size_t size;
+			char* shortcut = (char*)resources.LoadResource(B_STRING_TYPE,
+				kDefaultShortcut, &size);
+			if (shortcut == NULL || strlen(shortcut) > 1)
+				item->key = '\0';
+			else
+				item->key = shortcut[0];
+			AddOneShortcut(model, item->key, kDefaultModifiers, window);
+			item->defaultKey = item->key;
+			item->modifiers = kDefaultModifiers;
+			list->AddItem(item);
+		}
+		free(name);
 	}
+
+	BNode node(&directory, NULL);
+	node_ref nodeRef;
+	node.GetNodeRef(&nodeRef);
+
+	TTracker::WatchNode(&nodeRef, B_WATCH_DIRECTORY, window);
 }
 
 
@@ -279,10 +272,13 @@ BDeskWindow::InitAddonsList(bool update)
 			fAddonsList->MakeEmpty(true);
 		}
 
-		LoadAddOnDir(B_USER_NONPACKAGED_ADDONS_DIRECTORY, this, fAddonsList);
-		LoadAddOnDir(B_USER_ADDONS_DIRECTORY, this, fAddonsList);
-		LoadAddOnDir(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, this, fAddonsList);
-		LoadAddOnDir(B_SYSTEM_ADDONS_DIRECTORY, this, fAddonsList);
+		BStringList addOnPaths;
+		BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker/",
+			addOnPaths);
+		for (int32 i = 0; i < addOnPaths.CountStrings(); i++) {
+			LoadAddOnDir(BDirectory(addOnPaths.StringAt(i)), this,
+				fAddonsList);
+		}
 	}
 }
 
@@ -324,31 +320,18 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 				if (message.FindString("command", &command) != B_OK)
 					continue;
 
-				BPath path;
 				bool isInAddons = false;
-				if (find_directory(B_SYSTEM_ADDONS_DIRECTORY, &path)
-						== B_OK) {
-					path.Append("Tracker/");
-					isInAddons = command.FindFirst(path.Path()) == 0;
+
+				BStringList addOnPaths;
+				BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
+					"Tracker/", addOnPaths);
+				for (int32 i = 0; i < addOnPaths.CountStrings(); i++) {
+					if (command.FindFirst(addOnPaths.StringAt(i)) == 0) {
+						isInAddons = true;
+						break;
+					}
 				}
-				if (!isInAddons
-					&& (find_directory(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-						&path) == B_OK)) {
-					path.Append("Tracker/");
-					isInAddons = command.FindFirst(path.Path()) == 0;
-				}
-				if (!isInAddons
-					&& (find_directory(B_USER_ADDONS_DIRECTORY, &path)
-						== B_OK)) {
-					path.Append("Tracker/");
-					isInAddons = command.FindFirst(path.Path()) == 0;
-				}
-				if (!isInAddons
-					&& (find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-						&path) == B_OK)) {
-					path.Append("Tracker/");
-					isInAddons = command.FindFirst(path.Path()) == 0;
-				}
+
 				if (!isInAddons)
 					continue;
 
