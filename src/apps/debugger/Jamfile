@@ -6,8 +6,10 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
 	system kernel ] ;
 
-UsePrivateHeaders app debug interface kernel shared libroot ;
+UsePrivateHeaders app debug interface kernel package shared libroot ;
 UsePrivateSystemHeaders ;
+
+LINKFLAGS += -Wl,--exclude-libs,ALL ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
@@ -349,14 +351,13 @@ Application Debugger :
 	<bin>debug_utils.a
 	libcolumnlistview.a
 	libshared.a
-	libshared.a
 	libexpression_parser.a
 	libmapm.a
 	libedit.a
 	libncurses.a
 
 	$(TARGET_LIBSTDC++)
-	be tracker libbsd.so libdebug.so
+	be package tracker libbsd.so libdebug.so
 
 	: Debugger.rdef
 ;
