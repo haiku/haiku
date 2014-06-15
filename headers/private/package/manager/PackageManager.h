@@ -10,6 +10,9 @@
 #define _PACKAGE__MANAGER__PRIVATE__PACKAGE_MANAGER_H_
 
 
+#include <map>
+#include <string>
+
 #include <Directory.h>
 #include <ObjectList.h>
 #include <package/Context.h>
@@ -42,6 +45,8 @@ using BPackageKit::BPrivate::BDaemonClient;
 class BPackageManager : protected BJobStateListener {
 public:
 			class RemoteRepository;
+			class LocalRepository;
+			class MiscLocalRepository;
 			class InstalledRepository;
 			class Transaction;
 			class InstallationInterface;
@@ -126,8 +131,8 @@ private:
 			void				_CommitPackageChanges(Transaction& transaction);
 
 			void				_ClonePackageFile(
-									InstalledRepository* repository,
-									const BString& fileName,
+									LocalRepository* repository,
+									BSolverPackage* package,
 							 		const BEntry& entry);
 			int32				_FindBasePackage(const PackageList& packages,
 									const BPackageInfo& info);
@@ -140,6 +145,13 @@ private:
 									const BRepositoryConfig& config,
 									bool refresh, BRepositoryCache& _cache);
 
+			void				_AddPackageSpecifiers(
+									const char* const* searchStrings,
+									int searchStringCount,
+									BSolverPackageSpecifierList& specifierList);
+			bool				_IsLocalPackage(const char* fileName);
+			BSolverPackage*		_AddLocalPackage(const char* fileName);
+
 			bool				_NextSpecificInstallationLocation();
 
 protected:
@@ -149,6 +161,7 @@ protected:
 			InstalledRepository* fHomeRepository;
 			InstalledRepositoryList fInstalledRepositories;
 			RemoteRepositoryList fOtherRepositories;
+			MiscLocalRepository* fLocalRepository;
 			TransactionList		fTransactions;
 
 			// must be set by the derived class
@@ -169,7 +182,33 @@ private:
 };
 
 
-class BPackageManager::InstalledRepository : public BSolverRepository {
+class BPackageManager::LocalRepository : public BSolverRepository {
+public:
+								LocalRepository();
+								LocalRepository(const BString& name);
+
+	virtual	void				GetPackagePath(BSolverPackage* package,
+									BPath& _path) = 0;
+};
+
+
+class BPackageManager::MiscLocalRepository : public LocalRepository {
+public:
+								MiscLocalRepository();
+
+			BSolverPackage*		AddLocalPackage(const char* fileName);
+
+	virtual	void				GetPackagePath(BSolverPackage* package,
+									BPath& _path);
+
+private:
+			typedef std::map<BSolverPackage*, std::string> PackagePathMap;
+private:
+			PackagePathMap		fPackagePaths;
+};
+
+
+class BPackageManager::InstalledRepository : public LocalRepository {
 public:
 			typedef BObjectList<BSolverPackage> PackageList;
 
@@ -184,6 +223,9 @@ public:
 									{ return fInitialName; }
 			int32				InitialPriority() const
 									{ return fInitialPriority; }
+
+	virtual	void				GetPackagePath(BSolverPackage* package,
+									BPath& _path);
 
 			void				DisablePackage(BSolverPackage* package);
 									// throws, if already disabled

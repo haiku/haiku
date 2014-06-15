@@ -59,6 +59,7 @@ BPackageManager::BPackageManager(BPackageInstallationLocation location,
 		B_PACKAGE_INSTALLATION_LOCATION_HOME, -3)),
 	fInstalledRepositories(10),
 	fOtherRepositories(10, true),
+	fLocalRepository(NULL),
 	fTransactions(5, true),
 	fInstallationInterface(installationInterface),
 	fUserInteractionHandler(userInteractionHandler)
@@ -71,6 +72,7 @@ BPackageManager::~BPackageManager()
 	delete fSolver;
 	delete fSystemRepository;
 	delete fHomeRepository;
+	delete fLocalRepository;
 }
 
 
@@ -87,6 +89,9 @@ BPackageManager::Init(uint32 flags)
 
 	if (fSystemRepository == NULL || fHomeRepository == NULL)
 		throw std::bad_alloc();
+
+	if (fLocalRepository != NULL)
+		BRepositoryBuilder(*fLocalRepository).AddToSolver(fSolver, false);
 
 	// add installation location repositories
 	if ((flags & B_ADD_INSTALLED_REPOSITORIES) != 0) {
@@ -128,8 +133,7 @@ void
 BPackageManager::Install(const char* const* packages, int packageCount)
 {
 	BSolverPackageSpecifierList packagesToInstall;
-	if (!packagesToInstall.AppendSpecifiers(packages, packageCount))
-		throw std::bad_alloc();
+	_AddPackageSpecifiers(packages, packageCount, packagesToInstall);
 	Install(packagesToInstall);
 }
 
@@ -256,8 +260,7 @@ void
 BPackageManager::Update(const char* const* packages, int packageCount)
 {
 	BSolverPackageSpecifierList packagesToUpdate;
-	if (!packagesToUpdate.AppendSpecifiers(packages, packageCount))
-		throw std::bad_alloc();
+	_AddPackageSpecifiers(packages, packageCount, packagesToUpdate);
 	Update(packagesToUpdate);
 }
 
@@ -532,14 +535,7 @@ BPackageManager::_PreparePackageChanges(
 
 		RemoteRepository* remoteRepository
 			= dynamic_cast<RemoteRepository*>(package->Repository());
-		if (remoteRepository == NULL) {
-			// clone the existing package (unless already present)
-			if (package->Repository() != &installationRepository) {
-				_ClonePackageFile(
-					dynamic_cast<InstalledRepository*>(package->Repository()),
-					fileName, entry);
-			}
-		} else {
+		if (remoteRepository != NULL) {
 			// download the package
 			BString url = remoteRepository->Config().PackagesURL();
 			url << '/' << fileName;
@@ -548,6 +544,15 @@ BPackageManager::_PreparePackageChanges(
 				package->Info().Checksum());
 			if (error != B_OK)
 				DIE(error, "failed to download package");
+		} else if (package->Repository() != &installationRepository) {
+			// clone the existing package
+			LocalRepository* localRepository
+				= dynamic_cast<LocalRepository*>(package->Repository());
+			if (localRepository == NULL) {
+				DIE("internal error: repository %s is not a local repository",
+					package->Repository()->Name().String());
+			}
+			_ClonePackageFile(localRepository, package, entry);
 		}
 
 		// add package to transaction
@@ -602,30 +607,18 @@ BPackageManager::_CommitPackageChanges(Transaction& transaction)
 
 
 void
-BPackageManager::_ClonePackageFile(InstalledRepository* repository,
-	const BString& fileName, const BEntry& entry)
+BPackageManager::_ClonePackageFile(LocalRepository* repository,
+	BSolverPackage* package, const BEntry& entry)
 {
-	// get the source and destination file paths
-	directory_which packagesWhich;
-	if (repository == fSystemRepository) {
-		packagesWhich = B_SYSTEM_PACKAGES_DIRECTORY;
-	} else {
-		DIE("don't know packages directory path for installation location "
-			"\"%s\"", repository->Name().String());
-	}
-
+	// get source and destination path
 	BPath sourcePath;
-	status_t error = find_directory(packagesWhich, &sourcePath);
-	if (error != B_OK || (error = sourcePath.Append(fileName)) != B_OK) {
-		DIE(error, "failed to get path of package file \"%s\" in installation "
-			"location \"%s\"", fileName.String(), repository->Name().String());
-	}
+	repository->GetPackagePath(package, sourcePath);
 
 	BPath destinationPath;
-	error = entry.GetPath(&destinationPath);
+	status_t error = entry.GetPath(&destinationPath);
 	if (error != B_OK) {
 		DIE(error, "failed to entry path of package file to install \"%s\"",
-			fileName.String());
+			package->Info().FileName().String());
 	}
 
 	// Copy the package. Ideally we would just hard-link it, but BFS doesn't
@@ -738,6 +731,46 @@ BPackageManager::_GetRepositoryCache(BPackageRoster& roster,
 }
 
 
+void
+BPackageManager::_AddPackageSpecifiers(const char* const* searchStrings,
+	int searchStringCount, BSolverPackageSpecifierList& specifierList)
+{
+	for (int i = 0; i < searchStringCount; i++) {
+		const char* searchString = searchStrings[i];
+		if (_IsLocalPackage(searchString)) {
+			BSolverPackage* package = _AddLocalPackage(searchString);
+			if (!specifierList.AppendSpecifier(package))
+				throw std::bad_alloc();
+		} else {
+			if (!specifierList.AppendSpecifier(searchString))
+				throw std::bad_alloc();
+		}
+	}
+}
+
+
+bool
+BPackageManager::_IsLocalPackage(const char* fileName)
+{
+	// Simple heuristic: fileName contains ".hpkg" and there's actually a file
+	// it refers to.
+	struct stat st;
+	return strstr(fileName, ".hpkg") != NULL && stat(fileName, &st) == 0
+		&& S_ISREG(st.st_mode);
+}
+
+
+BSolverPackage*
+BPackageManager::_AddLocalPackage(const char* fileName)
+{
+	// We need a local repository.
+	if (fLocalRepository == NULL)
+		fLocalRepository = new MiscLocalRepository;
+
+	return fLocalRepository->AddLocalPackage(fileName);
+}
+
+
 bool
 BPackageManager::_NextSpecificInstallationLocation()
 {
@@ -791,13 +824,70 @@ BPackageManager::RemoteRepository::Config() const
 }
 
 
+// #pragma mark - LocalRepository
+
+
+BPackageManager::LocalRepository::LocalRepository()
+	:
+	BSolverRepository()
+{
+}
+
+
+BPackageManager::LocalRepository::LocalRepository(const BString& name)
+	:
+	BSolverRepository(name)
+{
+}
+
+
+// #pragma mark - MiscLocalRepository
+
+
+BPackageManager::MiscLocalRepository::MiscLocalRepository()
+	:
+	LocalRepository("local"),
+	fPackagePaths()
+{
+	SetPriority(-127);
+}
+
+
+BSolverPackage*
+BPackageManager::MiscLocalRepository::AddLocalPackage(const char* fileName)
+{
+	BSolverPackage* package;
+	BRepositoryBuilder(*this).AddPackage(fileName, &package);
+
+	fPackagePaths[package] = fileName;
+
+	return package;
+}
+
+
+void
+BPackageManager::MiscLocalRepository::GetPackagePath(BSolverPackage* package,
+	BPath& _path)
+{
+	PackagePathMap::const_iterator it = fPackagePaths.find(package);
+	if (it == fPackagePaths.end()) {
+		DIE("package %s not in local repository",
+			package->VersionedName().String());
+	}
+
+	status_t error = _path.SetTo(it->second.c_str());
+	if (error != B_OK)
+		DIE(error, "failed to init package path %s", it->second.c_str());
+}
+
+
 // #pragma mark - InstalledRepository
 
 
 BPackageManager::InstalledRepository::InstalledRepository(const char* name,
 	BPackageInstallationLocation location, int32 priority)
 	:
-	BSolverRepository(),
+	LocalRepository(),
 	fDisabledPackages(10, true),
 	fPackagesToActivate(),
 	fPackagesToDeactivate(),
@@ -805,6 +895,32 @@ BPackageManager::InstalledRepository::InstalledRepository(const char* name,
 	fLocation(location),
 	fInitialPriority(priority)
 {
+}
+
+
+void
+BPackageManager::InstalledRepository::GetPackagePath(BSolverPackage* package,
+	BPath& _path)
+{
+	directory_which packagesWhich;
+	switch (fLocation) {
+		case B_PACKAGE_INSTALLATION_LOCATION_SYSTEM:
+			packagesWhich = B_SYSTEM_PACKAGES_DIRECTORY;
+			break;
+		case B_PACKAGE_INSTALLATION_LOCATION_HOME:
+			packagesWhich = B_USER_PACKAGES_DIRECTORY;
+			break;
+		default:
+			DIE("don't know packages directory path for installation location "
+				"\"%s\"", Name().String());
+	}
+
+	BString fileName(package->Info().FileName());
+	status_t error = find_directory(packagesWhich, &_path);
+	if (error != B_OK || (error = _path.Append(fileName)) != B_OK) {
+		DIE(error, "failed to get path of package file \"%s\" in installation "
+			"location \"%s\"", fileName.String(), Name().String());
+	}
 }
 
 
