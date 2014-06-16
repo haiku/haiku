@@ -37,6 +37,7 @@ class BButton;
 class BCheckBox;
 class BDirectory;
 class BFile;
+class BFilePanel;
 class BLayoutItem;
 class BMenu;
 class BMenuItem;
@@ -272,6 +273,7 @@ private:
 
 			BMenuItem*			fBookmarkBarMenuItem;
 			BookmarkBar*		fBookmarkBar;
+			BFilePanel*			fSavePanel;
 };
 
 

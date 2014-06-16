@@ -43,6 +43,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <FilePanel.h>
 #include <FindDirectory.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
@@ -96,6 +97,7 @@
 
 enum {
 	OPEN_LOCATION								= 'open',
+	SAVE_PAGE									= 'save',
 	GO_BACK										= 'goba',
 	GO_FORWARD									= 'gofo',
 	STOP										= 'stop',
@@ -398,6 +400,8 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		new BMessage(B_QUIT_REQUESTED), 'W', B_SHIFT_KEY));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Close tab"),
 		new BMessage(CLOSE_TAB), 'W'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Save page"),
+		new BMessage(SAVE_PAGE), 'S'));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Downloads"),
 		new BMessage(SHOW_DOWNLOAD_WINDOW), 'D'));
@@ -594,6 +598,9 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	} else
 		_ShowBookmarkBar(false);
 
+	fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0,
+		false);
+
 	// Layout
 	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, 0.0)
 #if !INTEGRATE_MENU_INTO_TAB_BAR
@@ -665,6 +672,7 @@ BrowserWindow::~BrowserWindow()
 	fAppSettings->RemoveListener(BMessenger(this));
 	delete fTabManager;
 	delete fPulseRunner;
+	delete fSavePanel;
 }
 
 
@@ -807,6 +815,29 @@ BrowserWindow::MessageReceived(BMessage* message)
 
 			_SetPageIcon(CurrentWebView(), NULL);
 			_SmartURLHandler(url);
+
+			break;
+		}
+
+		case SAVE_PAGE:
+		{
+			fSavePanel->SetSaveText(CurrentWebView()->MainFrameTitle());
+			fSavePanel->Show();
+			break;
+		}
+
+		case B_SAVE_REQUESTED:
+		{
+			entry_ref ref;
+			BString name;
+
+			if (message->FindRef("directory", &ref) == B_OK &&
+				message->FindString("name", &name) == B_OK) {
+				BDirectory dir(&ref);
+				BFile output(&dir, name,
+					B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+				CurrentWebView()->WebPage()->GetContentsAsMHTML(output);
+			}
 
 			break;
 		}
