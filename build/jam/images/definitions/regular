@@ -21,6 +21,7 @@ SYSTEM_APPS += [ FFilterByBuildFeatures
 	Icon-O-Matic Installer LaunchBox
 	Magnify Mail MediaConverter MediaPlayer MidiPlayer
 	PackageInstaller People PoorMan PowerStatus
+	RemoteDesktop
 	Screenshot SerialConnect SoundRecorder
 	TV
 	WebWatch
