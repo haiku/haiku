@@ -43,13 +43,15 @@ protected:
 private:
 			status_t			_MakeTermWindow();
 
-			void				_HandleChildCleanup();
 	static	void				_SigChildHandler(int signal, void* data);
-	static	status_t			_ChildCleanupThread(void* data);
+	static	status_t			_ChildCleanupThreadEntry(void* data);
+			status_t			_ChildCleanupThread();
 
 			void				_Usage(char *name);
 			void				_InitDefaultPalette();
 private:
+			thread_id			fChildCleanupThread;
+			bool				fTerminating;
 			bool				fStartFullscreen;
 			BString				fWindowTitle;
 

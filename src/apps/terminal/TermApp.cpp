@@ -56,7 +56,10 @@ main()
 #define B_TRANSLATION_CONTEXT "Terminal TermApp"
 
 TermApp::TermApp()
-	: BApplication(TERM_SIGNATURE),
+	:
+	BApplication(TERM_SIGNATURE),
+	fChildCleanupThread(-1),
+	fTerminating(false),
 	fStartFullscreen(false),
 	fTermWindow(NULL),
 	fArgs(NULL)
@@ -81,22 +84,37 @@ TermApp::ReadyToRun()
 		return;
 
 	// Install a SIGCHLD signal handler, so that we will be notified, when
-	// a shell exits.
+	// a shell exits. The handler itself will never be executed, since we block
+	// the signal in all threads and handle it with sigwaitinfo() in the child
+	// cleanup thread.
 	struct sigaction action;
-#ifdef __HAIKU__
 	action.sa_handler = (__sighandler_t)_SigChildHandler;
-#else
-	action.sa_handler = (__signal_func_ptr)_SigChildHandler;
-#endif
 	sigemptyset(&action.sa_mask);
-#ifdef SA_NODEFER
-	action.sa_flags = SA_NODEFER;
-#endif
-	action.sa_userdata = this;
+	action.sa_flags = 0;
 	if (sigaction(SIGCHLD, &action, NULL) < 0) {
-		fprintf(stderr, "sigaction() failed: %s\n",
-			strerror(errno));
+		fprintf(stderr, "sigaction() failed: %s\n", strerror(errno));
 		// continue anyway
+	}
+
+	// block SIGCHLD and SIGUSR1 -- we send the latter to wake up the child
+	// cleanup thread when quitting.
+	sigset_t blockedSignals;
+	sigemptyset(&blockedSignals);
+	sigaddset(&blockedSignals, SIGCHLD);
+	sigaddset(&blockedSignals, SIGUSR1);
+
+	int error = pthread_sigmask(SIG_BLOCK, &blockedSignals, NULL);
+	if (error != 0)
+		fprintf(stderr, "pthread_sigmask() failed: %s\n", strerror(errno));
+
+	// spawn the child cleanup thread
+	fChildCleanupThread = spawn_thread(_ChildCleanupThreadEntry,
+		"child cleanup", B_NORMAL_PRIORITY, this);
+	if (fChildCleanupThread >= 0) {
+		resume_thread(fChildCleanupThread);
+	} else {
+		fprintf(stderr, "Failed to start child cleanup thread: %s\n",
+			strerror(fChildCleanupThread));
 	}
 
 	// init the mouse copy'n'paste clipboard
@@ -145,6 +163,13 @@ TermApp::QuitRequested()
 void
 TermApp::Quit()
 {
+	fTerminating = true;
+
+	if (fChildCleanupThread >= 0) {
+		send_signal(fChildCleanupThread, SIGUSR1);
+		wait_for_thread(fChildCleanupThread, NULL);
+	}
+
 	BApplication::Quit();
 }
 
@@ -155,10 +180,6 @@ TermApp::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_ACTIVATE_TERM:
 			fTermWindow->Activate();
-			break;
-
-		case MSG_CHECK_CHILDREN:
-			_HandleChildCleanup();
 			break;
 
 		default:
@@ -264,35 +285,41 @@ TermApp::_MakeTermWindow()
 //}
 
 
-void
-TermApp::_HandleChildCleanup()
-{
-}
-
-
 /*static*/ void
 TermApp::_SigChildHandler(int signal, void* data)
 {
-	// Spawing a thread that does the actual signal handling is pretty much
-	// the only safe thing to do in a multi-threaded application. The
-	// interrupted thread might have been anywhere, e.g. in a critical section,
-	// holding locks. If we do anything that does require locking at any point
-	// (e.g. memory allocation, messaging), we risk a dead-lock or data
-	// structure corruption. Spawing a thread is safe though, since its only
-	// a system call.
-	thread_id thread = spawn_thread(_ChildCleanupThread, "child cleanup",
-		B_NORMAL_PRIORITY, ((TermApp*)data)->fTermWindow);
-	if (thread >= 0)
-		resume_thread(thread);
+	fprintf(stderr, "Terminal: _SigChildHandler() called! That should never "
+		"happen!\n");
 }
 
 
 /*static*/ status_t
-TermApp::_ChildCleanupThread(void* data)
+TermApp::_ChildCleanupThreadEntry(void* data)
 {
-	// Just drop the windowa message and let it do the actual work. This
-	// saves us additional synchronization measures.
-	return ((TermWindow*)data)->PostMessage(MSG_CHECK_CHILDREN);
+	return ((TermApp*)data)->_ChildCleanupThread();
+}
+
+	
+status_t
+TermApp::_ChildCleanupThread()
+{
+	sigset_t waitForSignals;
+	sigemptyset(&waitForSignals);
+	sigaddset(&waitForSignals, SIGCHLD);
+	sigaddset(&waitForSignals, SIGUSR1);
+	
+	for (;;) {
+		int signal;
+		int error = sigwait(&waitForSignals, &signal);
+
+		if (fTerminating)
+			break;
+
+		if (error == 0 && signal == SIGCHLD)
+			fTermWindow->PostMessage(MSG_CHECK_CHILDREN);
+	}
+
+	return B_OK;
 }
 
 
