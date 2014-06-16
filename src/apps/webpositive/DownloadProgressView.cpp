@@ -427,6 +427,7 @@ DownloadProgressView::MessageReceived(BMessage* message)
 			switch (opCode) {
 				case B_ENTRY_REMOVED:
 					fIconView->SetIconDimmed(true);
+					fDownload->Cancel();
 					DownloadCanceled();
 					break;
 				case B_ENTRY_MOVED:
@@ -641,6 +642,22 @@ DownloadProgressView::DownloadFinished()
 void
 DownloadProgressView::DownloadCanceled()
 {
+	// Show the cancel notification, and set the progress bar red, only if the
+	// download was still running. In cases where the file is deleted after
+	// the download was finished, we don't want these things to happen.
+	if (fDownload)
+	{
+		BNotification success(B_ERROR_NOTIFICATION);
+		success.SetTitle(B_TRANSLATE("Download aborted"));
+		success.SetContent(fPath.Leaf());
+		// Don't make a click on the notification open the file: it is not
+		// complete
+		success.SetIcon(fIconView->Bitmap());
+		success.Send();
+
+		fStatusBar->SetBarColor(ui_color(B_FAILURE_COLOR));
+	}
+
 	fDownload = NULL;
 	fTopButton->SetLabel(B_TRANSLATE("Restart"));
 	fTopButton->SetMessage(new BMessage(RESTART_DOWNLOAD));
@@ -649,14 +666,6 @@ DownloadProgressView::DownloadCanceled()
 	fBottomButton->SetMessage(new BMessage(REMOVE_DOWNLOAD));
 	fBottomButton->SetEnabled(true);
 	fInfoView->SetText("");
-	fStatusBar->SetBarColor(ui_color(B_FAILURE_COLOR));
-
-	BNotification success(B_ERROR_NOTIFICATION);
-	success.SetTitle(B_TRANSLATE("Download aborted"));
-	success.SetContent(fPath.Leaf());
-	// Don't make a click on the notification open the file: it is not complete
-	success.SetIcon(fIconView->Bitmap());
-	success.Send();
 
 	fPath.Unset();
 }
