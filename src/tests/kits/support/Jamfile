@@ -29,6 +29,9 @@ UnitTestLib libsupporttest.so
 		AutolockLockerTest.cpp
 		AutolockLooperTest.cpp
 
+		# BDateTime
+		DateTimeTest.cpp
+
 		# BLocker (all in ./blocker)
 		LockerTest.cpp
 		BenaphoreLockCountTest1.cpp

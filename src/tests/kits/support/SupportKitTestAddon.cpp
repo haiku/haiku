@@ -10,6 +10,7 @@
 #include "bstring/StringTest.h"
 #include "bblockcache/BlockCacheTest.h"
 #include "ByteOrderTest.h"
+#include "DateTimeTest.h"
 
 
 BTestSuite *
@@ -20,6 +21,7 @@ getTestSuite()
 	// ##### Add test suites here #####
 	suite->addTest("BArchivable", ArchivableTestSuite());
 	suite->addTest("BAutolock", AutolockTestSuite());
+	suite->addTest("BDateTime", DateTimeTestSuite());
 	suite->addTest("BLocker", LockerTestSuite());
 	suite->addTest("BMemoryIO", MemoryIOTestSuite());
 	suite->addTest("BMallocIO", MallocIOTestSuite());
