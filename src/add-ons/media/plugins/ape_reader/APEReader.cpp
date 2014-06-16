@@ -3,7 +3,7 @@
 /*============================================================================*/
 const char*	gAppName = "APE (Monkey's Audio) reader";
 const char*	gAppVer = "Ver 1.13";
-const char*	gCright = "Copyright "B_UTF8_COPYRIGHT" 2005-2009 by SHINTA";
+const char*	gCright = "Copyright " B_UTF8_COPYRIGHT " 2005-2009 by SHINTA";
 const char*	gAppSignature = "application/x-vnd.SHINTA-MediaKitAPEReader";
 /*============================================================================*/
 

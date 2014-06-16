@@ -27,7 +27,7 @@
 
 
 const char* kAuthor = "Stephan Aßmus, <superstippi@gmx.de>";
-const char* kWBICopyright = "Copyright "B_UTF8_COPYRIGHT" 2006 Haiku Inc.";
+const char* kWBICopyright = "Copyright " B_UTF8_COPYRIGHT " 2006 Haiku Inc.";
 
 
 void

@@ -4,8 +4,8 @@
 /*============================================================================*/
 const char*	gAppName = "Lib Monkey's Audio";
 const char*	gAppVer = "Ver 1.65";
-const char*	gCright = "Copyright "B_UTF8_COPYRIGHT" 2003-2008 by SHINTA";
-const char*	gOriginal = "MAC library Copyright "B_UTF8_COPYRIGHT" by Matthew T. Ashland";
+const char*	gCright = "Copyright " B_UTF8_COPYRIGHT " 2003-2008 by SHINTA";
+const char*	gOriginal = "MAC library Copyright " B_UTF8_COPYRIGHT " by Matthew T. Ashland";
 const char*	gAppSignature = "application/x-vnd.SHINTA-LibMonkeysAudio";
 /*============================================================================*/
 

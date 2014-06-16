@@ -1117,7 +1117,7 @@ overlay_std_ops(int32 op, ...)
 
 static file_system_module_info sOverlayFileSystem = {
 	{
-		"file_systems/log_overlay"B_CURRENT_FS_API_VERSION,
+		"file_systems/log_overlay" B_CURRENT_FS_API_VERSION,
 		0,
 		overlay_std_ops,
 	},

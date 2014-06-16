@@ -31,14 +31,14 @@ status_t InitCommon(int fd)
 	/* Contact driver and get a pointer to the registers and shared data */
 	if ((ret = ioctl(gFd, VMWARE_GET_PRIVATE_DATA, &gSharedArea,
 			sizeof(area_id))) != B_OK) {
-		TRACE("VMWARE_GET_PRIVATE_DATA failed (%"B_PRIx32"\n", ret);
+		TRACE("VMWARE_GET_PRIVATE_DATA failed (%" B_PRIx32 "\n", ret);
 		return ret;
 	}
 
 	/* Clone the shared area for our use */
 	if ((gSharedArea = clone_area("VMware shared", (void **)&gSi,
 			B_ANY_ADDRESS, B_READ_AREA|B_WRITE_AREA, gSharedArea)) < 0) {
-		TRACE("could not clone shared area (%"B_PRId32")\n", gSharedArea);
+		TRACE("could not clone shared area (%" B_PRId32 ")\n", gSharedArea);
 		return gSharedArea;
 	}
 
@@ -69,7 +69,7 @@ INIT_ACCELERANT(int fd)
 		INIT_BEN(gSi->fifoLock);
 	}
 
-	TRACE("INIT_ACCELERANT: %"B_PRIx32"\n", ret);
+	TRACE("INIT_ACCELERANT: %" B_PRIx32 "\n", ret);
 	return ret;
 }
 
@@ -119,7 +119,7 @@ CLONE_ACCELERANT(void *data)
 		INIT_BEN(gSi->fifoLock);
 	}
 
-	TRACE("CLONE_ACCELERANT: %"B_PRIx32"\n", ret);
+	TRACE("CLONE_ACCELERANT: %" B_PRIx32 "\n", ret);
 	return ret;
 }
 

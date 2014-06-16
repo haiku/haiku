@@ -116,7 +116,7 @@ IFSSaver::StartConfig(BView* view)
 	textView->SetViewColor(view->ViewColor());
 
 	BString aboutScreenSaver(B_TRANSLATE("%screenSaverName%\n\n"
-		""B_UTF8_COPYRIGHT" 1997 Massimino Pascal\n\n"
+		B_UTF8_COPYRIGHT " 1997 Massimino Pascal\n\n"
 		"xscreensaver port by Stephan Aßmus\n"
 		"<stippi@yellowbites.com>"));
 	BString screenSaverName(B_TRANSLATE("Iterated Function System"));

@@ -43,7 +43,8 @@
 
 #include "SGIImage.h"
 
-const char kSGICopyright[] = ""B_UTF8_COPYRIGHT" 1997-1998 Michael Sweet <mike@easysw.com>";
+const char kSGICopyright[] = "" B_UTF8_COPYRIGHT " 1997-1998 Michael Sweet "
+	"<mike@easysw.com>";
 
 // constructor
 SGIImage::SGIImage()

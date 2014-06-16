@@ -61,7 +61,7 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low,
 uint32
 ACCELERANT_MODE_COUNT()
 {
-	TRACE("ACCELERANT_MODE_COUNT: %"B_PRIuSIZE"\n", MODE_COUNT);
+	TRACE("ACCELERANT_MODE_COUNT: %" B_PRIuSIZE "\n", MODE_COUNT);
 	return MODE_COUNT;
 }
 

@@ -281,7 +281,7 @@ DriverSettingsMessageAdapter::_AppendSettings(
 					return result;
 
 				char buffer[100];
-				snprintf(buffer, sizeof(buffer), "%"B_PRId32, value);
+				snprintf(buffer, sizeof(buffer), "%" B_PRId32, value);
 				settings.Append(buffer, sizeof(buffer));
 				break;
 			}

@@ -32,7 +32,7 @@ GET_FRAME_BUFFER_CONFIG(frame_buffer_config *afb)
 	afb->frame_buffer_dma = (uint8 *)gSi->fbDma + gSi->fbOffset;
 	afb->bytes_per_row = gSi->bytesPerRow;
 
-	TRACE("fb: %p, fb_dma: %p, row: %"B_PRIu32" bytes\n", afb->frame_buffer,
+	TRACE("fb: %p, fb_dma: %p, row: %" B_PRIu32 " bytes\n", afb->frame_buffer,
 		afb->frame_buffer_dma, afb->bytes_per_row);
 
 	return B_OK;
