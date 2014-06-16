@@ -808,7 +808,7 @@ PathListView::SetMenu(BMenu* menu)
 		new BMessage(MSG_ADD_RECT));
 	fAddCircleMI = new BMenuItem(B_TRANSLATE("Add circle"/*B_UTF8_ELLIPSIS*/),
 		new BMessage(MSG_ADD_CIRCLE));
-//	fAddArcMI = new BMenuItem("Add arc"B_UTF8_ELLIPSIS,
+//	fAddArcMI = new BMenuItem("Add arc" B_UTF8_ELLIPSIS,
 //		new BMessage(MSG_ADD_ARC));
 	fDuplicateMI = new BMenuItem(B_TRANSLATE("Duplicate"), 
 		new BMessage(MSG_DUPLICATE));

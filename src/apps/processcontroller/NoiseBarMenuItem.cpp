@@ -27,7 +27,7 @@
 #define B_TRANSLATION_CONTEXT "ProcessController"
 
 NoiseBarMenuItem::NoiseBarMenuItem()
-	: BMenuItem(B_TRANSLATE("Gone teams"B_UTF8_ELLIPSIS), NULL)
+	: BMenuItem(B_TRANSLATE("Gone teams" B_UTF8_ELLIPSIS), NULL)
 {
 	fBusyWaiting = -1;
 	fLost = -1;

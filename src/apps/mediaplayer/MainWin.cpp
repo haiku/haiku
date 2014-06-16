@@ -1461,7 +1461,7 @@ void
 MainWin::_CreateMenu()
 {
 	fFileMenu = new BMenu(kApplicationName);
-	fPlaylistMenu = new BMenu(B_TRANSLATE("Playlist"B_UTF8_ELLIPSIS));
+	fPlaylistMenu = new BMenu(B_TRANSLATE("Playlist" B_UTF8_ELLIPSIS));
 	fAudioMenu = new BMenu(B_TRANSLATE("Audio"));
 	fVideoMenu = new BMenu(B_TRANSLATE("Video"));
 	fVideoAspectMenu = new BMenu(B_TRANSLATE("Aspect ratio"));
@@ -1477,7 +1477,7 @@ MainWin::_CreateMenu()
 	fMenuBar->AddItem(fVideoMenu);
 	fMenuBar->AddItem(fAttributesMenu);
 
-	BMenuItem* item = new BMenuItem(B_TRANSLATE("New player"B_UTF8_ELLIPSIS),
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("New player" B_UTF8_ELLIPSIS),
 		new BMessage(M_NEW_PLAYER), 'N');
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
@@ -1485,14 +1485,14 @@ MainWin::_CreateMenu()
 	// Add recent files to "Open File" entry as sub-menu.
 	BRecentFilesList recentFiles(10, false, NULL, kAppSig);
 	item = new BMenuItem(recentFiles.NewFileListMenu(
-		B_TRANSLATE("Open file"B_UTF8_ELLIPSIS), NULL, NULL, this, 10, true,
+		B_TRANSLATE("Open file" B_UTF8_ELLIPSIS), NULL, NULL, this, 10, true,
 		NULL, kAppSig), new BMessage(M_FILE_OPEN));
 	item->SetShortcut('O', 0);
 	fFileMenu->AddItem(item);
 
 	fFileMenu->AddSeparatorItem();
 
-	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("File info"B_UTF8_ELLIPSIS),
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("File info" B_UTF8_ELLIPSIS),
 		new BMessage(M_FILE_INFO), 'I'));
 	fFileMenu->AddItem(fPlaylistMenu);
 	fPlaylistMenu->Superitem()->SetShortcut('P', B_COMMAND_KEY);
@@ -1506,7 +1506,7 @@ MainWin::_CreateMenu()
 	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Always on top"),
 		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'A'));
 
-	item = new BMenuItem(B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
+	item = new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(M_SETTINGS), 'S');
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);

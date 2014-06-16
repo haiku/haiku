@@ -237,7 +237,7 @@ void SnowView::Draw(BRect ur)
 			SetLowColor(ViewColor());
 			SetHighColor(0,0,0);
 			SetFontSize(12);
-			DrawString(B_TRANSLATE("Drag me on your desktop"B_UTF8_ELLIPSIS),
+			DrawString(B_TRANSLATE("Drag me on your desktop" B_UTF8_ELLIPSIS),
 				BPoint(15,25));
 			BPoint arrowHead(Bounds().RightBottom() + BPoint(-10,-10));
 			StrokeLine(arrowHead, arrowHead - BPoint(7,0));
@@ -248,7 +248,7 @@ void SnowView::Draw(BRect ur)
 			SetLowColor(ViewColor());
 			SetHighColor(0,0,0);
 			SetFontSize(12);
-			DrawString(B_TRANSLATE("Click me to remove BSnow"B_UTF8_ELLIPSIS),
+			DrawString(B_TRANSLATE("Click me to remove BSnow" B_UTF8_ELLIPSIS),
 				BPoint(15,25));
 			return;
 		}

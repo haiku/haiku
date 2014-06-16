@@ -267,7 +267,7 @@ BJobSetupPanel::_SetupInterface()
 	if (fPrinterPopUp->FindMarked() == NULL)
 		pdf->SetMarked(true);
 
-	fProperties = new BButton("Properties"B_UTF8_ELLIPSIS , new BMessage('prop'));
+	fProperties = new BButton("Properties" B_UTF8_ELLIPSIS , new BMessage('prop'));
 	fPrinterInfo = new BStringView("label", "");
 	fPrinterInfo->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);

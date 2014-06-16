@@ -67,7 +67,7 @@ PersonWindow::PersonWindow(BRect frame, const char* title,
 		new BMessage(M_SAVE), 'S'));
 	fSave->SetEnabled(FALSE);
 	menu->AddItem(new BMenuItem(
-		B_TRANSLATE("Save as"B_UTF8_ELLIPSIS),
+		B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
 		new BMessage(M_SAVE_AS)));
 	menu->AddItem(fRevert = new BMenuItem(B_TRANSLATE("Revert"),
 		new BMessage(M_REVERT), 'R'));

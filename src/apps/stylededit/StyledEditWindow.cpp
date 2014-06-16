@@ -1114,7 +1114,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	menuItem->SetTarget(be_app);
 
 	menu->AddItem(menuItem = new BMenuItem(BRecentFilesList::NewFileListMenu(
-		B_TRANSLATE("Open"B_UTF8_ELLIPSIS), NULL, NULL, be_app, 9, true,
+		B_TRANSLATE("Open" B_UTF8_ELLIPSIS), NULL, NULL, be_app, 9, true,
 		NULL, APP_SIGNATURE), new BMessage(MENU_OPEN)));
 	menuItem->SetShortcut('O', 0);
 	menuItem->SetTarget(be_app);

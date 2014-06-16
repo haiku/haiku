@@ -353,7 +353,7 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 		if (button->Ref()) {
 			message = new BMessage(MSG_SET_DESCRIPTION);
 			message->AddPointer("be:source", (void*)button);
-			item = new BMenuItem(B_TRANSLATE("Set description"B_UTF8_ELLIPSIS),
+			item = new BMenuItem(B_TRANSLATE("Set description" B_UTF8_ELLIPSIS),
 				message);
 			item->SetTarget(window);
 			menu->AddItem(item);

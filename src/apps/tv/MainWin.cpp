@@ -210,7 +210,7 @@ MainWin::CreateMenu()
 	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Keep aspect ratio"),
 		new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K', B_COMMAND_KEY));
 	fSettingsMenu->AddSeparatorItem();
-	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Settings"B_UTF8_ELLIPSIS)
+	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS)
 		, new BMessage(M_PREFERENCES), 'P', B_COMMAND_KEY));
 
 	const char* pixel_ratio = B_TRANSLATE("pixel aspect ratio");

@@ -32,8 +32,8 @@ void PrintTestWindow::BuildGUI()
 	
 	BMenuBar* mb = new BMenuBar(Bounds(), "menubar");
 	BMenu* m = new BMenu("File");
-		m->AddItem(new BMenuItem("Page Setup"B_UTF8_ELLIPSIS, new BMessage('PStp'), 'P', B_SHIFT_KEY));
-		m->AddItem(new BMenuItem("Print"B_UTF8_ELLIPSIS, new BMessage('Prnt'), 'P'));
+		m->AddItem(new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, new BMessage('PStp'), 'P', B_SHIFT_KEY));
+		m->AddItem(new BMenuItem("Print" B_UTF8_ELLIPSIS, new BMessage('Prnt'), 'P'));
 		m->AddSeparatorItem();
 		m->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
 		m->SetTargetForItems(be_app_messenger);

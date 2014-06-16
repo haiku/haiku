@@ -175,7 +175,7 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	// Add the tool icons.
 
 //	fToolBarView->AddAction(MSG_FILE_OPEN, be_app,
-//		tool_bar_icon(kIconDocumentOpen), B_TRANSLATE("Open"B_UTF8_ELLIPSIS));
+//		tool_bar_icon(kIconDocumentOpen), B_TRANSLATE("Open" B_UTF8_ELLIPSIS));
 	fToolBarView->AddAction(MSG_FILE_PREV, this,
 		tool_bar_icon(kIconGoPrevious), B_TRANSLATE("Previous file"), false);
 	fToolBarView->AddAction(MSG_FILE_NEXT, this, tool_bar_icon(kIconGoNext),
@@ -397,7 +397,7 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 
 	// Add recent files to "Open File" entry as sub-menu.
 	BMenuItem* item = new BMenuItem(BRecentFilesList::NewFileListMenu(
-		B_TRANSLATE("Open"B_UTF8_ELLIPSIS), NULL, NULL, be_app, 10, true,
+		B_TRANSLATE("Open" B_UTF8_ELLIPSIS), NULL, NULL, be_app, 10, true,
 		NULL, kApplicationSignature), new BMessage(MSG_FILE_OPEN));
 	item->SetShortcut('O', 0);
 	item->SetTarget(be_app);

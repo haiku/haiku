@@ -616,7 +616,7 @@ TFilePanel::Init(const BMessage*)
 	favorites->AddItem(new BMenuItem(B_TRANSLATE("Add current folder"),
 		new BMessage(kAddCurrentDir)));
 	favorites->AddItem(new BMenuItem(
-		B_TRANSLATE("Edit favorites"B_UTF8_ELLIPSIS),
+		B_TRANSLATE("Edit favorites" B_UTF8_ELLIPSIS),
 		new BMessage(kEditFavorites)));
 
 	fMenuBar->AddItem(favorites);
@@ -938,7 +938,7 @@ TFilePanel::AddWindowContextMenus(BMenu* menu)
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
 
-	item = new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
+	item = new BMenuItem(B_TRANSLATE("Select" B_UTF8_ELLIPSIS),
 		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY);
 	item->SetTarget(PoseView());
 	menu->AddItem(item);

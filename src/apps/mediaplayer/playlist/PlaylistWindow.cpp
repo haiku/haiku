@@ -245,9 +245,9 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 	BMenuBar* menuBar = new BMenuBar(frame, "main menu");
 	BMenu* fileMenu = new BMenu(B_TRANSLATE("Playlist"));
 	menuBar->AddItem(fileMenu);
-	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Open"B_UTF8_ELLIPSIS),
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Open" B_UTF8_ELLIPSIS),
 		new BMessage(M_PLAYLIST_OPEN), 'O'));
-	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Save as"B_UTF8_ELLIPSIS),
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
 		new BMessage(M_PLAYLIST_SAVE_AS), 'S', B_SHIFT_KEY));
 //	fileMenu->AddItem(new BMenuItem("Save",
 //		new BMessage(M_PLAYLIST_SAVE), 'S'));

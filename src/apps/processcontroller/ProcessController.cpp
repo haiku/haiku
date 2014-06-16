@@ -325,7 +325,7 @@ ProcessController::MessageReceived(BMessage *message)
 					}
 				} else {
 					alert = new BAlert(B_TRANSLATE("Info"),
-						B_TRANSLATE("This team is already gone"B_UTF8_ELLIPSIS),
+						B_TRANSLATE("This team is already gone" B_UTF8_ELLIPSIS),
 						B_TRANSLATE("Ok!"), NULL, NULL, B_WIDTH_AS_USUAL,
 						B_STOP_ALERT);
 					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -370,7 +370,7 @@ ProcessController::MessageReceived(BMessage *message)
 					#endif
 				} else {
 					alert = new BAlert(B_TRANSLATE("Info"),
-						B_TRANSLATE("This thread is already gone"B_UTF8_ELLIPSIS),
+						B_TRANSLATE("This thread is already gone" B_UTF8_ELLIPSIS),
 						B_TRANSLATE("Ok!"),	NULL, NULL,
 						B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -882,7 +882,7 @@ thread_popup(void *arg)
 
 
 	item = new IconMenuItem(gPCView->fProcessControllerIcon,
-	B_TRANSLATE("About ProcessController"B_UTF8_ELLIPSIS),
+	B_TRANSLATE("About ProcessController" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED));
 	item->SetTarget(gPCView);
 	addtopbottom(item);

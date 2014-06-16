@@ -1172,24 +1172,24 @@ MainWindow::_CreateMenuBar()
 		new BMessage(MSG_NEW), 'N');
 	fileMenu->AddItem(item);
 	item->SetTarget(be_app);
-	item = new BMenuItem(B_TRANSLATE("Open"B_UTF8_ELLIPSIS),
+	item = new BMenuItem(B_TRANSLATE("Open" B_UTF8_ELLIPSIS),
 		new BMessage(MSG_OPEN), 'O');
 	fileMenu->AddItem(item);
 	BMessage* appendMessage = new BMessage(MSG_APPEND);
 	appendMessage->AddPointer("window", this);
-	item = new BMenuItem(B_TRANSLATE("Append"B_UTF8_ELLIPSIS),
+	item = new BMenuItem(B_TRANSLATE("Append" B_UTF8_ELLIPSIS),
 		appendMessage, 'O', B_SHIFT_KEY);
 	fileMenu->AddItem(item);
 	item->SetTarget(be_app);
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Save"),
 		new BMessage(MSG_SAVE), 'S'));
-	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Save as"B_UTF8_ELLIPSIS),
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
 		new BMessage(MSG_SAVE_AS), 'S', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Export"),
 		new BMessage(MSG_EXPORT), 'P'));
-	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Export as"B_UTF8_ELLIPSIS),
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Export as" B_UTF8_ELLIPSIS),
 		new BMessage(MSG_EXPORT_AS), 'P', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Close"),

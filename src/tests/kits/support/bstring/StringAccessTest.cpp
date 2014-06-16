@@ -21,7 +21,7 @@ StringAccessTest::PerformTest(void)
 {
 	//CountChars(), Length(), String()
 	NextSubTest();
-	BString string("Something"B_UTF8_ELLIPSIS);
+	BString string("Something" B_UTF8_ELLIPSIS);
 	CPPUNIT_ASSERT(string.CountChars() == 10);
 	CPPUNIT_ASSERT((unsigned)string.Length() == strlen(string.String()));
 
@@ -48,7 +48,7 @@ StringAccessTest::PerformTest(void)
 	//Truncate the string at end so we are left with an invalid
 	//UTF8 character
 	NextSubTest();
-	BString invalid("some text with utf8 characters"B_UTF8_ELLIPSIS);
+	BString invalid("some text with utf8 characters" B_UTF8_ELLIPSIS);
 	invalid.Truncate(invalid.Length() -1);
 	CPPUNIT_ASSERT(invalid.CountChars() == 31);
 

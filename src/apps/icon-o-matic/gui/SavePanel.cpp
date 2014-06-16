@@ -130,7 +130,7 @@ SavePanel::SavePanel(const char* name,
 	rect = cancel->Frame();
 	rect.OffsetTo(fFormatMF->Frame().right + 5.0, rect.top);
 	fSettingsB = new BButton(rect, "settings", 
-							 B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
+							 B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 							 new BMessage(MSG_SETTINGS),
 							 B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
 							 B_WILL_DRAW | B_NAVIGABLE);
