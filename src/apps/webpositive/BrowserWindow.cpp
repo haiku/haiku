@@ -400,7 +400,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		new BMessage(B_QUIT_REQUESTED), 'W', B_SHIFT_KEY));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Close tab"),
 		new BMessage(CLOSE_TAB), 'W'));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Save page"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Save page as"B_UTF8_ELLIPSIS),
 		new BMessage(SAVE_PAGE), 'S'));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Downloads"),
