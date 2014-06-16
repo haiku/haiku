@@ -1410,7 +1410,7 @@ BDateTime::SetTime_t(time_t seconds)
 	}
 
 	BTime time;
-	time.AddSeconds(seconds % kSecondsPerDay);
+	time.AddSeconds(timePart);
 	fTime.SetTime(time);
 
 	BDate date(1970, 1, 1);
