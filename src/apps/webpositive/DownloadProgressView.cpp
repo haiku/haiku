@@ -645,8 +645,7 @@ DownloadProgressView::DownloadCanceled()
 	// Show the cancel notification, and set the progress bar red, only if the
 	// download was still running. In cases where the file is deleted after
 	// the download was finished, we don't want these things to happen.
-	if (fDownload)
-	{
+	if (fDownload) {
 		BNotification success(B_ERROR_NOTIFICATION);
 		success.SetTitle(B_TRANSLATE("Download aborted"));
 		success.SetContent(fPath.Leaf());
