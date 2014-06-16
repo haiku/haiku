@@ -2,17 +2,17 @@
 
 # Main directories used by the build.
 HAIKU_OUTPUT_DIR					?= [ FDirName $(HAIKU_TOP) generated ] ;
-HAIKU_BUILD_OUTPUT_DIR				= [ FDirName $(HAIKU_OUTPUT_DIR) build ] ;
-HAIKU_BUILD_DIR						= [ FDirName $(HAIKU_TOP) build ] ;
-HAIKU_BUILD_RULES_DIR				= [ FDirName $(HAIKU_BUILD_DIR) jam ] ;
-HAIKU_OBJECT_DIR					= [ FDirName $(HAIKU_OUTPUT_DIR)
+HAIKU_BUILD_OUTPUT_DIR				?= [ FDirName $(HAIKU_OUTPUT_DIR) build ] ;
+HAIKU_BUILD_DIR						?= [ FDirName $(HAIKU_TOP) build ] ;
+HAIKU_BUILD_RULES_DIR				?= [ FDirName $(HAIKU_BUILD_DIR) jam ] ;
+HAIKU_OBJECT_DIR					?= [ FDirName $(HAIKU_OUTPUT_DIR)
 											objects ] ;
-HAIKU_CATALOGS_OBJECT_DIR			= [ FDirName $(HAIKU_OBJECT_DIR)
+HAIKU_CATALOGS_OBJECT_DIR			?= [ FDirName $(HAIKU_OBJECT_DIR)
 											catalogs ] ;
-HAIKU_COMMON_PLATFORM_OBJECT_DIR	= [ FDirName $(HAIKU_OBJECT_DIR) common ] ;
-HAIKU_DOWNLOAD_DIR					= [ FDirName $(HAIKU_OUTPUT_DIR)
+HAIKU_COMMON_PLATFORM_OBJECT_DIR	?= [ FDirName $(HAIKU_OBJECT_DIR) common ] ;
+HAIKU_DOWNLOAD_DIR					?= [ FDirName $(HAIKU_OUTPUT_DIR)
 											download ] ;
-HAIKU_OPTIONAL_BUILD_PACKAGES_DIR	= [ FDirName $(HAIKU_OUTPUT_DIR)
+HAIKU_OPTIONAL_BUILD_PACKAGES_DIR	?= [ FDirName $(HAIKU_OUTPUT_DIR)
 											build_packages ] ;
 
 # Cache files for header scanning and jamfile caching
