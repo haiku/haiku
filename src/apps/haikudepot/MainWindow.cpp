@@ -126,6 +126,9 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	if (settings.FindBool("show source packages", &showOption) == B_OK)
 		fModel.SetShowSourcePackages(showOption);
 
+	BPackageRoster().StartWatching(this,
+		B_WATCH_PACKAGE_INSTALLATION_LOCATIONS);
+
 	_StartRefreshWorker();
 
 	fPendingActionsSem = create_sem(0, "PendingPackageActions");
@@ -140,6 +143,8 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 
 MainWindow::~MainWindow()
 {
+	BPackageRoster().StopWatching(this);
+
 	fTerminating = true;
 	if (fModelWorker > 0)
 		wait_for_thread(fModelWorker, NULL);
@@ -178,6 +183,12 @@ MainWindow::MessageReceived(BMessage* message)
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
 			// TODO: ?
+			break;
+
+		case B_PACKAGE_UPDATE:
+			// TODO: We should do a more selective update depending on the
+			// "event", "location", and "change count" fields! 
+			_StartRefreshWorker(false);
 			break;
 
 		case MSG_REFRESH_DEPOTS:
