@@ -135,7 +135,7 @@ BTransactionIssue::ToString() const
 		case B_WRITABLE_FILE_NOT_EQUAL:			// !keep old
 			messageTemplate = "\"%path1%\" cannot be updated automatically,"
 				" since it was changed manually from previous version"
-				" \"%path2%\""
+				" \"%path2%\"."
 				" Please perform the update manually if needed.";
 			break;
 		case B_WRITABLE_SYMLINK_COMPARISON_FAILED:	// !keep old
@@ -147,7 +147,7 @@ BTransactionIssue::ToString() const
 		case B_WRITABLE_SYMLINK_NOT_EQUAL:			// !keep old
 			messageTemplate = "Symbolic link \"%path1%\" cannot be updated"
 				" automatically, since it was changed manually from previous"
-				" version  \"%path2%\""
+				" version \"%path2%\"."
 				" Please perform the update manually if needed.";
 			break;
 		case B_POST_INSTALL_SCRIPT_NOT_FOUND:
