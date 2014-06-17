@@ -48,6 +48,7 @@ enum {
 	B_MOUSE_UP 					= '_MUP',
 	B_MOUSE_WHEEL_CHANGED		= '_MWC',
 	B_OPEN_IN_WORKSPACE			= '_OWS',
+	B_PACKAGE_UPDATE			= '_PKU',
 	B_PRINTER_CHANGED			= '_PCH',
 	B_PULSE 					= '_PUL',
 	B_READY_TO_RUN 				= '_RTR',

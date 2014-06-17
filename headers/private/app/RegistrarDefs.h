@@ -124,6 +124,10 @@ enum {
 	B_REG_DELETE_USER						= 'rdus',
 	B_REG_UPDATE_GROUP						= 'rugr',
 	B_REG_DELETE_GROUP						= 'rdgr',
+
+	// package watching requests
+	B_REG_PACKAGE_START_WATCHING			= 'rgPw',
+	B_REG_PACKAGE_STOP_WATCHING				= 'rgPx',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants

@@ -22,8 +22,10 @@
 #include <MessageRunner.h>
 #include <NodeMonitor.h>
 #include <Path.h>
+#include <Roster.h>
 
 #include <package/CommitTransactionResult.h>
+#include <package/PackageRoster.h>
 #include <package/solver/Solver.h>
 #include <package/solver/SolverPackage.h>
 #include <package/solver/SolverProblem.h>
@@ -35,12 +37,14 @@
 #include <AutoLocker.h>
 #include <NotOwningEntryRef.h>
 #include <package/DaemonDefs.h>
+#include <RosterPrivate.h>
 
 #include "CommitTransactionHandler.h"
 #include "Constants.h"
 #include "DebugSupport.h"
 #include "Exception.h"
 #include "PackageFileManager.h"
+#include "Root.h"
 #include "VolumeState.h"
 
 
@@ -1193,6 +1197,19 @@ Volume::_SetLatestState(VolumeState* state, bool isActive)
 	delete fLatestState;
 	fLatestState = state;
 	fChangeCount++;
+
+	locker.Unlock();
+
+	// Send a notification, if this is a system root volume.
+	if (fRoot->IsSystemRoot()) {
+		BMessage message(B_PACKAGE_UPDATE);
+		if (message.AddInt32("event",
+				(int32)B_INSTALLATION_LOCATION_PACKAGES_CHANGED) == B_OK
+			&& message.AddInt32("location", (int32)Location()) == B_OK
+			&& message.AddInt64("change count", fChangeCount) == B_OK) {
+			BRoster::Private().SendTo(&message, NULL, false);
+		}
+	}
 }
 
 

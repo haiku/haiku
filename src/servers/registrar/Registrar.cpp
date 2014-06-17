@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,6 +29,7 @@
 #include "MessageRunnerManager.h"
 #include "MessagingService.h"
 #include "MIMEManager.h"
+#include "PackageWatchingManager.h"
 #include "ShutdownProcess.h"
 #include "TRoster.h"
 
@@ -64,7 +65,8 @@ Registrar::Registrar(status_t *error)
 	fMessageRunnerManager(NULL),
 	fSanityEvent(NULL),
 	fShutdownProcess(NULL),
-	fAuthenticationManager(NULL)
+	fAuthenticationManager(NULL),
+	fPackageWatchingManager(NULL)
 {
 	FUNCTION_START();
 
@@ -83,6 +85,7 @@ Registrar::~Registrar()
 	Lock();
 	fEventQueue->Die();
 	delete fAuthenticationManager;
+	delete fPackageWatchingManager;
 	delete fMessageRunnerManager;
 	delete fEventQueue;
 	delete fSanityEvent;
@@ -165,6 +168,9 @@ Registrar::ReadyToRun()
 		ERROR("Registrar::ReadyToRun(): Failed to init messaging service "
 			"(that's by design when running under R5): %s\n", strerror(error));
 	}
+
+	// create the package watching manager
+	fPackageWatchingManager = new PackageWatchingManager;
 
 	// create and schedule the sanity message event
 	fSanityEvent = new MessageEvent(system_time() + kRosterSanityEventInterval,
@@ -334,6 +340,15 @@ Registrar::_MessageReceived(BMessage *message)
 			break;
 		case B_REG_GET_MESSAGE_RUNNER_INFO:
 			fMessageRunnerManager->HandleGetRunnerInfo(message);
+			break;
+
+		// package watching requests
+		case B_REG_PACKAGE_START_WATCHING:
+		case B_REG_PACKAGE_STOP_WATCHING:
+			fPackageWatchingManager->HandleStartStopWatching(message);
+			break;
+		case B_PACKAGE_UPDATE:
+			fPackageWatchingManager->NotifyWatchers(message);
 			break;
 
 		// internal messages

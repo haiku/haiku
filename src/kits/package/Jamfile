@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src kits package ;
 
 UsePrivateHeaders
+	app
 	kernel
 	shared
 	storage

@@ -31,6 +31,8 @@
 
 #if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
 #	include <package/DaemonClient.h>
+#	include <RegistrarDefs.h>
+#	include <RosterPrivate.h>
 #endif
 
 
@@ -218,6 +220,74 @@ BPackageRoster::GetActivePackages(BPackageInstallationLocation location,
 		return error;
 
 	packageInfos = info.LatestActivePackageInfos();
+	return B_OK;
+#else
+	return B_NOT_SUPPORTED;
+#endif
+}
+
+
+status_t
+BPackageRoster::StartWatching(const BMessenger& target, uint32 eventMask)
+{
+// This method makes sense only on an installed Haiku, but not for the build
+// tools.
+#if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
+	// compose the registrar request
+	BMessage request(::BPrivate::B_REG_PACKAGE_START_WATCHING);
+	status_t error;
+	if ((error = request.AddMessenger("target", target)) != B_OK
+		|| (error = request.AddUInt32("events", eventMask)) != B_OK) {
+		return error;
+	}
+
+	// send it
+	BMessage reply;
+	error = BRoster::Private().SendTo(&request, &reply, false);
+	if (error != B_OK)
+		return error;
+
+	// get result
+	if (reply.what != ::BPrivate::B_REG_SUCCESS) {
+		int32 result;
+		if (reply.FindInt32("error", &result) != B_OK)
+			result = B_ERROR;
+		return (status_t)error;
+	}
+
+	return B_OK;
+#else
+	return B_NOT_SUPPORTED;
+#endif
+}
+
+
+status_t
+BPackageRoster::StopWatching(const BMessenger& target)
+{
+// This method makes sense only on an installed Haiku, but not for the build
+// tools.
+#if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
+	// compose the registrar request
+	BMessage request(::BPrivate::B_REG_PACKAGE_STOP_WATCHING);
+	status_t error = request.AddMessenger("target", target);
+	if (error  != B_OK)
+		return error;
+
+	// send it
+	BMessage reply;
+	error = BRoster::Private().SendTo(&request, &reply, false);
+	if (error != B_OK)
+		return error;
+
+	// get result
+	if (reply.what != ::BPrivate::B_REG_SUCCESS) {
+		int32 result;
+		if (reply.FindInt32("error", &result) != B_OK)
+			result = B_ERROR;
+		return (status_t)error;
+	}
+
 	return B_OK;
 #else
 	return B_NOT_SUPPORTED;
