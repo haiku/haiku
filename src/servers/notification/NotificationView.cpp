@@ -241,7 +241,12 @@ NotificationView::Draw(BRect updateRect)
 	
 	BRect stripeRect = Bounds();
 	stripeRect.right = kIconStripeWidth;
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_1_TINT));
+	FillRect(stripeRect);
+
 	SetHighColor(fStripeColor);
+	stripeRect.right = 2;
 	FillRect(stripeRect);
 	
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
