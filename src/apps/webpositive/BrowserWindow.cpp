@@ -135,6 +135,15 @@ static const int32 kModifiers = B_SHIFT_KEY | B_COMMAND_KEY
 	| B_CONTROL_KEY | B_OPTION_KEY | B_MENU_KEY;
 
 
+static const char* kHandledProtocols[] = {
+	"http",
+	"https",
+	"file",
+	"about",
+	"data"
+};
+
+
 static BLayoutItem*
 layoutItemFor(BView* view)
 {
@@ -1519,6 +1528,27 @@ BrowserWindow::MainDocumentError(const BString& failingURL,
 	if (!_ShowPage(view))
 		return;
 
+	// Try delegating the URL to an external app instead.
+	int32 at = failingURL.FindFirst(":");
+	if (at != B_ERROR) {
+		BString proto;
+		failingURL.CopyInto(proto, 0, at);
+
+		bool handled = false;
+
+		for (unsigned int i = 0; i < sizeof(kHandledProtocols) / sizeof(char*);
+				i++) {
+			handled = (proto == kHandledProtocols[i]);
+			if (handled)
+				break;
+		}
+
+		if (!handled) {
+			_SmartURLHandler(failingURL);
+			return;
+		}
+	}
+
 	BWebWindow::MainDocumentError(failingURL, localizedDescription, view);
 
 	// TODO: Remove the failing URL from the BrowsingHistory!
@@ -2421,17 +2451,25 @@ BrowserWindow::_SmartURLHandler(const BString& url)
 	// Only process if this doesn't look like a full URL (http:// or
 	// file://, etc.)
 
-	BString temp;
 	int32 at = url.FindFirst(":");
 
 	if (at != B_ERROR) {
 		BString proto;
 		url.CopyInto(proto, 0, at);
 
-		if (proto == "http" || 	proto == "https" ||	proto == "file"
-				|| proto == "about")
+		bool handled = false;
+
+		for (unsigned int i = 0; i < sizeof(kHandledProtocols) / sizeof(char*);
+				i++) {
+			handled = (proto == kHandledProtocols[i]);
+			if (handled)
+				break;
+		}
+
+		if (handled)
 			_VisitURL(url);
 		else {
+			BString temp;
 			temp = "application/x-vnd.Be.URL.";
 			temp += proto;
 
