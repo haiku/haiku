@@ -23,7 +23,7 @@ RemotePackageRepository HaikuPorts
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
 	cdrtools-3.01~a07-3
-	cmake-2.8.11.2-7
+	cmake-3.0.0_rc6-1
 	ctags-5.8-3
 	curl-7.36.0-1
 	curl_devel-7.36.0-1
@@ -70,6 +70,8 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher-1.2.7.10-1
 	less-451-4
 	libedit-2012_06_01_3.0-1
+	libexecinfo-1.1-1
+	libexecinfo_devel-1.1-1
 	libiconv-1.13.1-6
 	libiconv_devel-1.13.1-6
 	libogg-1.3.0-2
@@ -174,7 +176,7 @@ RemotePackageRepository HaikuPorts
 	gettext
 	git
 	glu
-	gmp	
+	gmp
 	gperf
 	grep
 	groff
@@ -188,6 +190,7 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher
 	less
 	libedit
+	libexecinfo
 	libiconv
 	libogg
 	libpcre
@@ -199,7 +202,7 @@ RemotePackageRepository HaikuPorts
 	libvpx
 	libxml2
 	libxslt
-	lz4	
+	lz4
 	m4
 	make
 	man
