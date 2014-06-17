@@ -17,7 +17,7 @@
 class entry_ref;
 class Architecture;
 class AreaInfo;
-class BString;
+class BFile;
 class DebuggerInterface;
 class SemaphoreInfo;
 class StackFrame;
@@ -65,16 +65,16 @@ private:
 
 private:
 			status_t			_GenerateReport(const entry_ref& outputPath);
-			status_t			_GenerateReportHeader(BString& _output);
-			status_t			_DumpLoadedImages(BString& _output);
-			status_t			_DumpAreas(BString& _output);
-			status_t			_DumpSemaphores(BString& _output);
-			status_t			_DumpRunningThreads(BString& _output);
-			status_t			_DumpDebuggedThreadInfo(BString& _output,
+			status_t			_GenerateReportHeader(BFile& _output);
+			status_t			_DumpLoadedImages(BFile& _output);
+			status_t			_DumpAreas(BFile& _output);
+			status_t			_DumpSemaphores(BFile& _output);
+			status_t			_DumpRunningThreads(BFile& _output);
+			status_t			_DumpDebuggedThreadInfo(BFile& _output,
 									::Thread* thread);
-			void				_DumpFunctionDisassembly(BString& _output,
+			status_t			_DumpFunctionDisassembly(BFile& _output,
 									target_addr_t instructionPointer);
-			void				_DumpStackFrameMemory(BString& _output,
+			status_t			_DumpStackFrameMemory(BFile& _output,
 									CpuState* state,
 									target_addr_t framePointer,
 									uint8 stackDirection);
