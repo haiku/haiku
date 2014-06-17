@@ -37,6 +37,9 @@ public:
 			ino_t				NodeID() const		{ return fNodeRef.node; }
 			const BString&		Path() const		{ return fPath; }
 
+			bool				IsSystemRoot() const
+									{ return fIsSystemRoot; }
+
 			status_t			RegisterVolume(Volume* volume);
 			void				UnregisterVolume(Volume* volume);
 									// deletes the volume (eventually)
