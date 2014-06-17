@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc.
+ * Copyright 2009-2014, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,7 +46,8 @@ main(int argc, char *argv[])
 
 	for (int32 i = 2; i < argc; i++) {
 		if (strcmp(argv[i], "-p") == 0) {
-			if (argc < i + 1 || sscanf(argv[i + 1], "%lu", &listenPort) != 1) {
+			if (argc < i + 1 || sscanf(argv[i + 1], "%" B_PRIu32, &listenPort)
+				!= 1) {
 				print_usage(argv[0]);
 				return 2;
 			}
@@ -56,7 +57,8 @@ main(int argc, char *argv[])
 		}
 
 		if (strcmp(argv[i], "-s") == 0) {
-			if (argc < i + 1 || sscanf(argv[i + 1], "%lu", &sshPort) != 1) {
+			if (argc < i + 1 || sscanf(argv[i + 1], "%" B_PRIu32, &sshPort)
+				!= 1) {
 				print_usage(argv[0]);
 				return 2;
 			}
@@ -103,8 +105,8 @@ main(int argc, char *argv[])
 
 		char shellCommand[4096];
 		snprintf(shellCommand, sizeof(shellCommand),
-			"echo connected; export TARGET_SCREEN=localhost:%lu; %s\n",
-			listenPort, terminalPath.Path());
+			"echo connected; export TARGET_SCREEN=localhost:%" B_PRIu32
+			"; %s\n", listenPort, terminalPath.Path());
 
 		int pipes[4];
 		if (pipe(&pipes[0]) != 0 || pipe(&pipes[2]) != 0) {
@@ -129,15 +131,15 @@ main(int argc, char *argv[])
 				close(pipes[i]);
 
 			char localRedirect[50];
-			sprintf(localRedirect, "localhost:%lu:localhost:%lu",
-				listenPort + 1, listenPort + 1);
+			sprintf(localRedirect, "localhost:%" B_PRIu32 ":localhost:%"
+				B_PRIu32, listenPort + 1, listenPort + 1);
 
 			char remoteRedirect[50];
-			sprintf(remoteRedirect, "localhost:%lu:localhost:%lu",
-				listenPort, listenPort);
+			sprintf(remoteRedirect, "localhost:%" B_PRIu32 ":localhost:%"
+				B_PRIu32, listenPort, listenPort);
 
 			char portNumber[10];
-			sprintf(portNumber, "%lu", sshPort);
+			sprintf(portNumber, "%" B_PRIu32, sshPort);
 
 			int result = execl("ssh", "-C", "-L", localRedirect,
 				"-R", remoteRedirect, "-p", portNumber, argv[1],

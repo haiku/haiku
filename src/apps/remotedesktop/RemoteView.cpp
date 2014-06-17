@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Haiku, Inc.
+ * Copyright 2009-2014, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -362,7 +362,7 @@ RemoteView::_CreateState(uint32 token)
 {
 	int32 index = fStates.BinarySearchIndexByKey(token, &_StateCompareByKey);
 	if (index >= 0) {
-		TRACE_ERROR("state for token %lu already in list\n", token);
+		TRACE_ERROR("state for token %" B_PRIu32 " already in list\n", token);
 		return;
 	}
 
@@ -619,7 +619,7 @@ RemoteView::_DrawThread()
 
 		engine_state *state = _FindState(token);
 		if (state == NULL) {
-			TRACE_ERROR("didn't find state for token %lu\n", token);
+			TRACE_ERROR("didn't find state for token %" B_PRIu32 "\n", token);
 			continue;
 		}
 
