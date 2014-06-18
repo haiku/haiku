@@ -17,11 +17,19 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits shared ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits support ] ;
 
 
-HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
+BootStaticLibrary boot_packagefs :
+	packagefs.cpp
+	PackageSettingsItem.cpp
+
+	# package kit
+
+	# package kit/hpkg
 	BlockBufferPool.cpp
 	BlockBufferPoolImpl.cpp
+	BlockBufferPoolNoLock.cpp
 	BufferDataOutput.cpp
 	BufferPool.cpp
+	PoolBuffer.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp
@@ -33,15 +41,7 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	PackageFileHeapAccessorBase.cpp
 	PackageFileHeapReader.cpp
 	PackageReaderImpl.cpp
-	PoolBuffer.cpp
 	ReaderImplBase.cpp
-;
-
-BootStaticLibrary boot_packagefs :
-	packagefs.cpp
-	PackageSettingsItem.cpp
-
-	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
 
 	# compression
 	DataIO.cpp
@@ -51,6 +51,8 @@ BootStaticLibrary boot_packagefs :
 	: -fno-pic
 ;
 
-Includes [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
-		ZlibCompressionBase.cpp ZlibDecompressor.cpp ]
+Includes [
+	FGristFiles ZlibCompressionBase.cpp package/hpkg/ZlibCompressor.h
+		shared/ZlibDecompressor.h
+	]
 	: [ BuildFeatureAttribute zlib : headers ] ;

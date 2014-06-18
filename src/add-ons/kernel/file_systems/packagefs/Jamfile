@@ -6,7 +6,7 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders package shared storage ;
 
 
-local subDirs =
+local subDirs = 
 	indices
 	nodes
 	package
@@ -106,8 +106,7 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1 =
 
 Includes
 	[ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
-		$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1)
-		ZlibCompressionBase.cpp ZlibDecompressor.cpp ]
+		$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1) ]
 	: [ BuildFeatureAttribute zlib : headers ] ;
 
 local libSharedSources =
