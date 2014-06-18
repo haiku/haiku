@@ -8,7 +8,7 @@
 
 #include <algorithm>
 
-#include <package/hpkg/BufferDataOutput.h>
+#include <package/hpkg/DataOutput.h>
 
 #include <util/AutoLock.h>
 #include <vm/VMCache.h>
