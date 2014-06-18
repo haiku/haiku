@@ -84,7 +84,7 @@ ZlibCompressor::CompressNext(const void* input, size_t inputSize)
 		if (fStream.avail_out < sizeof(outputBuffer)) {
 			status_t error = fOutput->Write(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
-			if (error < 0)
+			if (error < B_OK)
 				return error;
 		}
 	}
@@ -111,7 +111,7 @@ ZlibCompressor::Finish()
 		if (fStream.avail_out < sizeof(outputBuffer)) {
 			status_t error = fOutput->Write(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
-			if (error < 0)
+			if (error < B_OK)
 				return error;
 		}
 

@@ -85,10 +85,10 @@ ZlibDecompressor::DecompressNext(const void* input, size_t inputSize)
 			return TranslateZlibError(zlibError);
 
 		if (fStream.avail_out < sizeof(outputBuffer)) {
-			ssize_t result = fOutput->Write(outputBuffer,
+			status_t error = fOutput->Write(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
-			if (result < 0)
-				return result;
+			if (error < B_OK)
+				return error;
 		}
 	}
 
@@ -114,10 +114,10 @@ ZlibDecompressor::Finish()
 			return TranslateZlibError(zlibError);
 
 		if (fStream.avail_out < sizeof(outputBuffer)) {
-			ssize_t result = fOutput->Write(outputBuffer,
+			status_t error = fOutput->Write(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
-			if (result < 0)
-				return result;
+			if (error < B_OK)
+				return error;
 		}
 	}
 
