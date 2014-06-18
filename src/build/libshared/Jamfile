@@ -10,8 +10,4 @@ BuildPlatformStaticLibraryPIC libshared_build.a :
 	Keymap.cpp
 	NaturalCompare.cpp
 	SHA256.cpp
-	
-	# compression
-	ZlibCompressionBase.cpp
-	ZlibDecompressor.cpp
 ;

@@ -8,10 +8,7 @@
 
 #include <zlib.h>
 
-#include <ZlibCompressionBase.h>
-
-
-class BDataIO;
+#include <package/hpkg/ZlibCompressionBase.h>
 
 
 namespace BPackageKit {
@@ -19,12 +16,15 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
+class BDataOutput;
+
+
 namespace BPrivate {
 
 
-class ZlibCompressor : public ::BPrivate::ZlibCompressionBase {
+class ZlibCompressor : public ZlibCompressionBase {
 public:
-								ZlibCompressor(BDataIO* output);
+								ZlibCompressor(BDataOutput* output);
 								~ZlibCompressor();
 
 			status_t			Init(int compressionLevel = Z_BEST_COMPRESSION);
@@ -39,7 +39,7 @@ public:
 
 private:
 			z_stream			fStream;
-			BDataIO*			fOutput;
+			BDataOutput*		fOutput;
 			bool				fStreamInitialized;
 };
 

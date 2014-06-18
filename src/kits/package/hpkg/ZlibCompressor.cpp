@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include <package/hpkg/BufferDataOutput.h>
+#include <package/hpkg/DataOutput.h>
 
 
 namespace BPackageKit {
@@ -22,7 +22,7 @@ namespace BPrivate {
 static const size_t kOutputBufferSize = 1024;
 
 
-ZlibCompressor::ZlibCompressor(BDataIO* output)
+ZlibCompressor::ZlibCompressor(BDataOutput* output)
 	:
 	fOutput(output),
 	fStreamInitialized(false)
@@ -82,7 +82,7 @@ ZlibCompressor::CompressNext(const void* input, size_t inputSize)
 			return TranslateZlibError(zlibError);
 
 		if (fStream.avail_out < sizeof(outputBuffer)) {
-			status_t error = fOutput->Write(outputBuffer,
+			status_t error = fOutput->WriteData(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
 			if (error != B_OK)
 				return error;
@@ -109,7 +109,7 @@ ZlibCompressor::Finish()
 			return TranslateZlibError(zlibError);
 
 		if (fStream.avail_out < sizeof(outputBuffer)) {
-			status_t error = fOutput->Write(outputBuffer,
+			status_t error = fOutput->WriteData(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
 			if (error != B_OK)
 				return error;

@@ -4,13 +4,17 @@
  */
 
 
-#include <ZlibDecompressor.h>
+#include <package/hpkg/ZlibDecompressor.h>
 
 #include <errno.h>
 #include <stdio.h>
 
-#include <DataIO.h>
+#include <package/hpkg/DataOutput.h>
 
+
+namespace BPackageKit {
+
+namespace BHPKG {
 
 namespace BPrivate {
 
@@ -19,7 +23,7 @@ namespace BPrivate {
 static const size_t kOutputBufferSize = 1024;
 
 
-ZlibDecompressor::ZlibDecompressor(BDataIO* output)
+ZlibDecompressor::ZlibDecompressor(BDataOutput* output)
 	:
 	fOutput(output),
 	fStreamInitialized(false),
@@ -85,7 +89,7 @@ ZlibDecompressor::DecompressNext(const void* input, size_t inputSize)
 			return TranslateZlibError(zlibError);
 
 		if (fStream.avail_out < sizeof(outputBuffer)) {
-			status_t error = fOutput->Write(outputBuffer,
+			status_t error = fOutput->WriteData(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
 			if (error != B_OK)
 				return error;
@@ -114,7 +118,7 @@ ZlibDecompressor::Finish()
 			return TranslateZlibError(zlibError);
 
 		if (fStream.avail_out < sizeof(outputBuffer)) {
-			status_t error = fOutput->Write(outputBuffer,
+			status_t error = fOutput->WriteData(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
 			if (error != B_OK)
 				return error;
@@ -182,3 +186,7 @@ ZlibDecompressor::DecompressSingleBuffer(const void* input, size_t inputSize,
 
 
 }	// namespace BPrivate
+
+}	// namespace BHPKG
+
+}	// namespace BPackageKit

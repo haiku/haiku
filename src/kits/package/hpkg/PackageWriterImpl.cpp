@@ -37,7 +37,7 @@
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 
-#include <package/hpkg/BufferDataOutput.h>
+#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/PackageFileHeapWriter.h>
 #include <package/hpkg/PackageReaderImpl.h>

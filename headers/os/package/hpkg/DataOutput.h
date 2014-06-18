@@ -6,7 +6,6 @@
 #define _PACKAGE__HPKG__DATA_OUTPUT_H_
 
 
-#include <DataIO.h>
 #include <SupportDefs.h>
 
 
@@ -15,15 +14,21 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
-class BBufferDataOutput : public BDataIO {
+class BDataOutput {
+public:
+	virtual						~BDataOutput();
+
+	virtual	status_t			WriteData(const void* buffer, size_t size) = 0;
+};
+
+
+class BBufferDataOutput : public BDataOutput {
 public:
 								BBufferDataOutput(void* buffer, size_t size);
 
 			size_t				BytesWritten() const { return fBytesWritten; }
 
-	virtual	status_t			Write(const void* buffer, size_t size);
-	virtual ssize_t				Read(void* buffer, size_t size)
-									{ return B_NOT_SUPPORTED; }
+	virtual	status_t			WriteData(const void* buffer, size_t size);
 
 private:
 			void*				fBuffer;

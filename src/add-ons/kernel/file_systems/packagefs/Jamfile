@@ -75,8 +75,8 @@ HAIKU_PACKAGE_FS_SHARED_SOURCES =
 
 HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	BlockBufferPoolImpl.cpp
-	BufferDataOutput.cpp
 	BufferPool.cpp
+	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp
@@ -91,6 +91,10 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	PackageFileHeapReader.cpp
 	PackageReaderImpl.cpp
 	ReaderImplBase.cpp
+
+	# compression
+	ZlibCompressionBase.cpp
+	ZlibDecompressor.cpp
 ;
 
 HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1 =
@@ -111,14 +115,6 @@ Includes
 
 local libSharedSources =
 	NaturalCompare.cpp
-
-	# compression
-	ZlibCompressionBase.cpp
-	ZlibDecompressor.cpp
-;
-
-local supportKitSources =
-	DataIO.cpp
 ;
 
 
@@ -129,7 +125,6 @@ KernelAddon packagefs
 	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
 	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1)
 	$(libSharedSources)
-	$(supportKitSources)
 
 	: $(TARGET_KERNEL_LIBSUPC++) kernel_libz.a
 ;
@@ -143,5 +138,3 @@ SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1) ]
 	+= [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
 SEARCH on [ FGristFiles $(libSharedSources) ]
 	+= [ FDirName $(HAIKU_TOP) src kits shared ] ;
-SEARCH on [ FGristFiles $(supportKitSources) ]
-	+= [ FDirName $(HAIKU_TOP) src kits support ] ;

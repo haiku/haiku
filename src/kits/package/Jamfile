@@ -13,9 +13,9 @@ HPKG_SOURCES =
 	BlockBufferPool.cpp
 	BlockBufferPoolImpl.cpp
 	BlockBufferPoolNoLock.cpp
-	BufferDataOutput.cpp
 	BufferPool.cpp
 	CommitTransactionResult.cpp
+	DataOutput.cpp
 	DataReader.cpp
 	DataWriters.cpp
 	ErrorOutput.cpp
@@ -58,7 +58,9 @@ HPKG_SOURCES =
 	ReaderImplBaseV1.cpp
 
 	# compression
+	ZlibCompressionBase.cpp
 	ZlibCompressor.cpp
+	ZlibDecompressor.cpp
 	;
 
 local architectureObject ;

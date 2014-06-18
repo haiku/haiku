@@ -7,7 +7,7 @@
 #define _PACKAGE__HPKG__PRIVATE__DATA_WRITERS_H_
 
 
-#include <package/hpkg/BufferDataOutput.h>
+#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/ZlibCompressor.h>
 
 
@@ -59,7 +59,7 @@ private:
 };
 
 
-class ZlibDataWriter : public AbstractDataWriter, private BDataIO {
+class ZlibDataWriter : public AbstractDataWriter, private BDataOutput {
 public:
 								ZlibDataWriter(AbstractDataWriter* dataWriter);
 
@@ -71,7 +71,7 @@ public:
 
 private:
 	// BDataOutput
-	virtual	status_t			Write(const void* buffer, size_t size);
+	virtual	status_t			WriteData(const void* buffer, size_t size);
 
 private:
 			AbstractDataWriter*	fDataWriter;

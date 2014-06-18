@@ -39,6 +39,7 @@
 
 using namespace BPackageKit;
 
+using BPackageKit::BHPKG::BDataOutput;
 using BPackageKit::BHPKG::BErrorOutput;
 using BPackageKit::BHPKG::BFDDataReader;
 using BPackageKit::BHPKG::BPackageInfoAttributeValue;

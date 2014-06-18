@@ -22,11 +22,11 @@
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 
-#include <package/hpkg/BufferDataOutput.h>
+#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/PackageData.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
-#include <ZlibDecompressor.h>
+#include <package/hpkg/ZlibDecompressor.h>
 
 
 namespace BPackageKit {

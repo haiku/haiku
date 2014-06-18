@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src build libpackage ;
 
-UsePrivateBuildHeaders kernel package shared storage support ;
+UsePrivateBuildHeaders kernel package shared storage ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
@@ -33,9 +33,9 @@ HPKG_SOURCES =
 	BlockBufferPool.cpp
 	BlockBufferPoolImpl.cpp
 	BlockBufferPoolNoLock.cpp
-	BufferDataOutput.cpp
 	BufferPool.cpp
 	PoolBuffer.cpp
+	DataOutput.cpp
 	DataReader.cpp
 	DataWriters.cpp
 	ErrorOutput.cpp
@@ -77,7 +77,9 @@ HPKG_SOURCES =
 	ReaderImplBaseV1.cpp
 
 	# compression
+	ZlibCompressionBase.cpp
 	ZlibCompressor.cpp
+	ZlibDecompressor.cpp
 ;
 
 # TODO: remove this hack once gcc2 has -iquote implemented

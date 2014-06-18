@@ -14,11 +14,11 @@
 #include <new>
 
 #include <ByteOrder.h>
-#include <package/hpkg/BufferDataOutput.h>
+#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/ErrorOutput.h>
 
 #include <AutoDeleter.h>
-#include <ZlibDecompressor.h>
+#include <package/hpkg/ZlibDecompressor.h>
 
 
 namespace BPackageKit {
@@ -140,7 +140,7 @@ PackageFileHeapAccessorBase::~PackageFileHeapAccessorBase()
 
 status_t
 PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
-	BDataIO* output)
+	BDataOutput* output)
 {
 	if (size == 0)
 		return B_OK;
@@ -174,8 +174,8 @@ PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
 			// The last chunk may be shorter than kChunkSize, but since
 			// size (and thus remainingSize) had been clamped, that doesn't
 			// harm.
-		error = output->Write((char*)uncompressedDataBuffer + inChunkOffset,
-			toWrite);
+		error = output->WriteData(
+			(char*)uncompressedDataBuffer + inChunkOffset, toWrite);
 		if (error != B_OK)
 			return error;
 
@@ -213,7 +213,7 @@ PackageFileHeapAccessorBase::DecompressChunkData(void* compressedDataBuffer,
 	size_t uncompressedSize)
 {
 	size_t actualSize;
-	status_t error = ::BPrivate::ZlibDecompressor::DecompressSingleBuffer(
+	status_t error = ZlibDecompressor::DecompressSingleBuffer(
 		compressedDataBuffer, compressedSize, uncompressedDataBuffer,
 		uncompressedSize, actualSize);
 	if (error != B_OK) {

@@ -13,8 +13,6 @@ SubDirC++Flags -fno-rtti -include $(kernelC++Header) ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits shared ] ;
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits support ] ;
 
 
 BootStaticLibrary boot_packagefs :
@@ -27,9 +25,9 @@ BootStaticLibrary boot_packagefs :
 	BlockBufferPool.cpp
 	BlockBufferPoolImpl.cpp
 	BlockBufferPoolNoLock.cpp
-	BufferDataOutput.cpp
 	BufferPool.cpp
 	PoolBuffer.cpp
+	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp
@@ -44,7 +42,6 @@ BootStaticLibrary boot_packagefs :
 	ReaderImplBase.cpp
 
 	# compression
-	DataIO.cpp
 	ZlibCompressionBase.cpp
 	ZlibDecompressor.cpp
 
