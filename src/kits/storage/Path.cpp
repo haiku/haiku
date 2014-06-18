@@ -22,6 +22,7 @@
 
 #include "storage_support.h"
 
+
 using namespace std;
 
 
@@ -424,7 +425,7 @@ BPath::Flatten(void* buffer, ssize_t size) const
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
-	// ToDo: Re-implement for performance reasons: Don't call FlattenedSize().
+	// ToDo: Reimplement for performance reasons: Don't call FlattenedSize().
 	ssize_t flattenedSize = FlattenedSize();
 	if (flattenedSize < 0)
 		return flattenedSize;
@@ -497,7 +498,17 @@ void BPath::_WarPath2() {}
 void BPath::_WarPath3() {}
 
 
-// Sets the supplied path.
+/*!	Sets the supplied path.
+
+	The path is copied, if \a path is \c NULL the path of the object is set to
+	\c NULL as well. The old path is deleted.
+
+	\param path the path to be set
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY Insufficient memory.
+*/
 status_t
 BPath::_SetPath(const char* path)
 {
@@ -519,7 +530,19 @@ BPath::_SetPath(const char* path)
 }
 
 
-// Checks a path to see if normalization is required.
+/*!	Checks a path to see if normalization is required.
+
+	The following items require normalization:
+	- Relative pathnames (after concatenation; e.g. "boot/ltj")
+	- The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
+	- Redundant slashes ("/boot//ltj")
+	- A trailing slash ("/boot/ltj/")
+
+	\param _error A pointer to an error variable that will be set if the input
+		is not a valid path.
+
+	\return \c true if \a path requires normalization, \c false otherwise.
+*/
 bool
 BPath::_MustNormalize(const char* path, status_t* _error)
 {

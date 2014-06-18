@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NODE_H
@@ -18,12 +18,12 @@ struct entry_ref;
 struct node_ref {
 	node_ref();
 	node_ref(dev_t device, ino_t node);
-	node_ref(const node_ref &ref);
+	node_ref(const node_ref &other);
 
-	bool operator==(const node_ref& ref) const;
-	bool operator!=(const node_ref& ref) const;
-	bool operator<(const node_ref& ref) const;
-	node_ref& operator=(const node_ref& ref);
+	bool operator==(const node_ref& other) const;
+	bool operator!=(const node_ref& other) const;
+	bool operator<(const node_ref& other) const;
+	node_ref& operator=(const node_ref& other);
 
 	dev_t device;
 	ino_t node;
@@ -100,17 +100,21 @@ private:
 			status_t			_SetTo(int fd, const char* path, bool traverse);
 			status_t			_SetTo(const entry_ref* ref, bool traverse);
 
-	virtual	status_t			set_stat(struct stat& st, uint32 what);
+	virtual	status_t			set_stat(struct stat& stat, uint32 what);
 
-			status_t			_GetStat(struct stat* st) const;
-	virtual	status_t			_GetStat(struct stat_beos* st) const;
+			status_t			_GetStat(struct stat* stat) const;
+	virtual	status_t			_GetStat(struct stat_beos* stat) const;
 			status_t			InitAttrDir();
 
 private:
 			uint32				rudeData[4];
 			int					fFd;
+				// Ffile descriptor for the given node
 			int					fAttrFd;
+				// file descriptor for the attribute directory of the node,
+				// initialized lazily
 			status_t			fCStatus;
+				// the node's initialization status
 };
 
 

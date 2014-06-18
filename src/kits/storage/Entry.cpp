@@ -502,6 +502,16 @@ void BEntry::_PennyEntry5(){}
 void BEntry::_PennyEntry6(){}
 
 
+/*!	Updates the BEntry with the data from the stat structure according
+	to the \a what mask.
+
+	\param st The stat structure to set.
+	\param what A mask
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_FILE_ERROR There was an error writing to the BEntry object.
+*/
 status_t
 BEntry::set_stat(struct stat& st, uint32 what)
 {
@@ -513,6 +523,30 @@ BEntry::set_stat(struct stat& st, uint32 what)
 }
 
 
+/*!	Sets the entry to point to the entry specified by the path \a path
+	relative to the given directory.
+
+	If \a traverse is \c true and the given entry is a symbolic link, the
+	object is recursively set to point to the entry pointed to by the symlink.
+
+	If \a path is an absolute path, \a dirFD is ignored.
+
+	If \a dirFD is -1, \a path is considered relative to the current directory
+	(unless it is an absolute path).
+
+	The ownership of the file descriptor \a dirFD is transferred to the
+	method, regardless of whether it succeeds or fails. The caller must not
+	close the FD afterwards.
+
+	\param dirFD File descriptor of a directory relative to which path is to
+		be considered. May be -1 if the current directory shall be considered.
+	\param path Pointer to a path relative to the given directory.
+	\param traverse If \c true and the given entry is a symbolic link, the
+		object is recursively set to point to the entry linked to by the
+		symbolic link.
+
+	\returns \c B_OK on success, or an error code on failure.
+*/
 status_t
 BEntry::_SetTo(int dirFD, const char* path, bool traverse)
 {
@@ -643,6 +677,16 @@ BEntry::_SetTo(int dirFD, const char* path, bool traverse)
 }
 
 
+/*!	Handles string allocation, deallocation, and copying for the
+	leaf name of the entry.
+
+	\param name The leaf \a name of the entry.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a name is \c NULL.
+	\retval B_NO_MEMORY Ran out of memory trying to allocate \a name.
+*/
 status_t
 BEntry::_SetName(const char* name)
 {
@@ -659,6 +703,22 @@ BEntry::_SetName(const char* name)
 }
 
 
+/*!	Renames the entry referred to by this object to the location
+	specified by \a target.
+
+	If an entry exists at the target location, the method fails, unless
+	\a clobber is \c true, in which case that entry is overwritten (doesn't
+	work for non-empty directories, though).
+
+	If the operation was successful, this entry is made a clone of the
+	supplied one and the supplied one is uninitialized.
+
+	\param target The entry specifying the target location.
+	\param clobber If \c true, the an entry existing at the target location
+		   will be overwritten.
+
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
 status_t
 BEntry::_Rename(BEntry& target, bool clobber)
 {
@@ -680,6 +740,11 @@ BEntry::_Rename(BEntry& target, bool clobber)
 }
 
 
+/*!	Debugging function, dumps the given entry to stdout.
+
+	\param name A pointer to a string to be printed along with the dump for
+		   identification purposes.
+*/
 void
 BEntry::_Dump(const char* name)
 {

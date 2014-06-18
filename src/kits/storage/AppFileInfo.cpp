@@ -958,6 +958,7 @@ void BAppFileInfo::_ReservedAppFileInfo2() {}
 void BAppFileInfo::_ReservedAppFileInfo3() {}
 
 
+//!	Privatized assignment operator to prevent usage.
 BAppFileInfo&
 BAppFileInfo::operator=(const BAppFileInfo&)
 {
@@ -965,11 +966,25 @@ BAppFileInfo::operator=(const BAppFileInfo&)
 }
 
 
+//! Privatized copy constructor to prevent usage.
 BAppFileInfo::BAppFileInfo(const BAppFileInfo&)
 {
 }
 
 
+/*!	Initializes a BMimeType to the signature of the associated file.
+
+	\warning The parameter \a meta is not checked.
+
+	\param meta A pointer to a pre-allocated BMimeType that shall be
+		   initialized to the signature of the associated file.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a meta
+	\retval B_ENTRY_NOT_FOUND The file has not signature or the signature is
+	        (not installed in the MIME database.) no valid MIME string.
+*/
 status_t
 BAppFileInfo::GetMetaMime(BMimeType* meta) const
 {
@@ -985,6 +1000,31 @@ BAppFileInfo::GetMetaMime(BMimeType* meta) const
 }
 
 
+/*!	Reads data from an attribute or resource.
+
+	\note The data is read from the location specified by \a fWhere.
+
+	\warning The object must be properly initialized. The parameters are
+		\b NOT checked.
+
+	\param name The name of the attribute/resource to be read.
+	\param id The resource ID of the resource to be read. It is ignored
+		   when < 0.
+	\param type The type of the attribute/resource to be read.
+	\param buffer A pre-allocated buffer for the data to be read.
+	\param bufferSize The size of the supplied buffer.
+	\param bytesRead A reference parameter, set to the number of bytes
+		   actually read.
+	\param allocatedBuffer If not \c NULL, the method allocates a buffer
+		   large enough too store the whole data and writes a pointer to it
+		   into this variable. If \c NULL, the supplied buffer is used.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND The entry was not found.
+	\retval B_NO_MEMORY Ran out of memory allocating the buffer.
+	\retval B_BAD_VALUE \a type did not match.
+*/
 status_t
 BAppFileInfo::_ReadData(const char* name, int32 id, type_code type,
 	void* buffer, size_t bufferSize, size_t& bytesRead, void** allocatedBuffer)
@@ -1081,6 +1121,26 @@ BAppFileInfo::_ReadData(const char* name, int32 id, type_code type,
 }
 
 
+/*!	Writes data to an attribute or resource.
+
+	\note The data is written to the location(s) specified by \a fWhere.
+
+	\warning The object must be properly initialized. The parameters are
+		\b NOT checked.
+
+	\param name The name of the attribute/resource to be written.
+	\param id The resource ID of the resource to be written.
+	\param type The type of the attribute/resource to be written.
+	\param buffer A buffer containing the data to be written.
+	\param bufferSize The size of the supplied buffer.
+	\param findID If set to \c true use the ID that is already assigned to the
+		   \a name / \a type pair or take the first unused ID >= \a id.
+		   If \c false, \a id is used.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR An error occurred while trying to write the data.
+*/
 status_t
 BAppFileInfo::_WriteData(const char* name, int32 id, type_code type,
 	const void* buffer, size_t bufferSize, bool findID)
@@ -1118,6 +1178,21 @@ BAppFileInfo::_WriteData(const char* name, int32 id, type_code type,
 }
 
 
+/*!	Removes an attribute or resource.
+
+	\note The removal location is specified by \a fWhere.
+
+	\warning The object must be properly initialized. The parameters are
+		\b NOT checked.
+
+	\param name The name of the attribute/resource to be remove.
+	\param type The type of the attribute/resource to be removed.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT Not using attributes and not using resources.
+	\retval B_ENTRY_NOT_FOUND The attribute or resource was not found.
+*/
 status_t
 BAppFileInfo::_RemoveData(const char* name, type_code type)
 {

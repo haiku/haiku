@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STATABLE_H
@@ -18,58 +18,58 @@ class BVolume;
 
 
 class BStatable {
-	public:
+public:
 #if __GNUC__ > 3
-		virtual ~BStatable();
+	virtual ~BStatable();
 #endif
 
 private:
-		virtual status_t _GetStat(struct stat_beos *st) const = 0;
-			// provided for BeOS compatibility
+	virtual status_t _GetStat(struct stat_beos* stat) const = 0;
+		// provided for BeOS compatibility
 
 public:
-		virtual status_t GetStat(struct stat *st) const = 0;
+	virtual status_t GetStat(struct stat* stat) const = 0;
 
-		bool IsFile() const;
-		bool IsDirectory() const;
-		bool IsSymLink() const;
+	bool IsFile() const;
+	bool IsDirectory() const;
+	bool IsSymLink() const;
 
-		status_t GetNodeRef(node_ref *ref) const;
+	status_t GetNodeRef(node_ref* ref) const;
 
-		status_t GetOwner(uid_t *owner) const;
-		status_t SetOwner(uid_t owner);
+	status_t GetOwner(uid_t* owner) const;
+	status_t SetOwner(uid_t owner);
 
-		status_t GetGroup(gid_t *group) const;
-		status_t SetGroup(gid_t group);
+	status_t GetGroup(gid_t* group) const;
+	status_t SetGroup(gid_t group);
 
-		status_t GetPermissions(mode_t *perms) const;
-		status_t SetPermissions(mode_t perms);
+	status_t GetPermissions(mode_t* permissions) const;
+	status_t SetPermissions(mode_t permissions);
 
-		status_t GetSize(off_t *size) const;
+	status_t GetSize(off_t* size) const;
 
-		status_t GetModificationTime(time_t *mtime) const;
-		status_t SetModificationTime(time_t mtime);
+	status_t GetModificationTime(time_t* mtime) const;
+	status_t SetModificationTime(time_t mtime);
 
-		status_t GetCreationTime(time_t *ctime) const;
-		status_t SetCreationTime(time_t ctime);
+	status_t GetCreationTime(time_t* ctime) const;
+	status_t SetCreationTime(time_t ctime);
 
-		status_t GetAccessTime(time_t *atime) const;
-		status_t SetAccessTime(time_t atime);
+	status_t GetAccessTime(time_t* atime) const;
+	status_t SetAccessTime(time_t atime);
 
-		status_t GetVolume(BVolume *vol) const;
+	status_t GetVolume(BVolume* volume) const;
 
-		class Private;
+	class Private;
 
-	private:
-		friend class BEntry;
-		friend class BNode;
-		friend class Private;
+private:
+	friend class BEntry;
+	friend class BNode;
+	friend class Private;
 
-		virtual	void _OhSoStatable2();
-		virtual	void _OhSoStatable3();
-		uint32 _reserved[4];
+	virtual	void _OhSoStatable2();
+	virtual	void _OhSoStatable3();
+	uint32 _reserved[4];
 
-		virtual	status_t set_stat(struct stat &st, uint32 what) = 0;
+	virtual	status_t set_stat(struct stat &st, uint32 what) = 0;
 };
 
 #endif // _STATABLE_H

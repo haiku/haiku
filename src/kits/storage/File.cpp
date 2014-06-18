@@ -337,7 +337,12 @@ void BFile::_PhiloFile5() {}
 void BFile::_PhiloFile6() {}
 
 
-// Gets the file descriptor of the BFile.
+/*!	Gets the file descriptor of the BFile.
+
+	To be used instead of accessing the BNode's private \c fFd member directly.
+
+	\returns The file descriptor, or -1 if not properly initialized.
+*/
 int
 BFile::get_fd() const
 {
@@ -345,7 +350,7 @@ BFile::get_fd() const
 }
 
 
-// Overrides BNode::close_fd() for binary compatibility with BeOS R5.
+//! Overrides BNode::close_fd() for binary compatibility with BeOS R5.
 void
 BFile::close_fd()
 {

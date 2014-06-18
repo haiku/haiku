@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -27,9 +27,9 @@ public:
 	{
 	}
 
-	status_t GetStatBeOS(struct stat_beos* st)
+	status_t GetStatBeOS(struct stat_beos* stat)
 	{
-		return fObject->_GetStat(st);
+		return fObject->_GetStat(stat);
 	}
 
 private:
@@ -48,9 +48,9 @@ BStatable::~BStatable()
 bool
 BStatable::IsFile() const
 {
-	struct stat statData;
-	if (GetStat(&statData) == B_OK)
-		return S_ISREG(statData.st_mode);
+	struct stat stat;
+	if (GetStat(&stat) == B_OK)
+		return S_ISREG(stat.st_mode);
 	else
 		return false;
 }
@@ -60,9 +60,9 @@ BStatable::IsFile() const
 bool
 BStatable::IsDirectory() const
 {
-	struct stat statData;
-	if (GetStat(&statData) == B_OK)
-		return S_ISDIR(statData.st_mode);
+	struct stat stat;
+	if (GetStat(&stat) == B_OK)
+		return S_ISDIR(stat.st_mode);
 	else
 		return false;
 }
@@ -72,9 +72,9 @@ BStatable::IsDirectory() const
 bool
 BStatable::IsSymLink() const
 {
-	struct stat statData;
-	if (GetStat(&statData) == B_OK)
-		return S_ISLNK(statData.st_mode);
+	struct stat stat;
+	if (GetStat(&stat) == B_OK)
+		return S_ISLNK(stat.st_mode);
 	else
 		return false;
 }
@@ -82,31 +82,37 @@ BStatable::IsSymLink() const
 
 // Fills out ref with the node_ref of the node.
 status_t
-BStatable::GetNodeRef(node_ref *ref) const
+BStatable::GetNodeRef(node_ref* ref) const
 {
-	status_t error = (ref ? B_OK : B_BAD_VALUE);
-	struct stat statData;
-	if (error == B_OK)
-		error = GetStat(&statData);
-	if (error == B_OK) {
-		ref->device  = statData.st_dev;
-		ref->node = statData.st_ino;
+	status_t result = (ref ? B_OK : B_BAD_VALUE);
+	struct stat stat;
+
+	if (result == B_OK)
+		result = GetStat(&stat);
+
+	if (result == B_OK) {
+		ref->device  = stat.st_dev;
+		ref->node = stat.st_ino;
 	}
-	return error;
+
+	return result;
 }
 
 
 // Fills out the node's UID into owner.
 status_t
-BStatable::GetOwner(uid_t *owner) const
+BStatable::GetOwner(uid_t* owner) const
 {
-	status_t error = (owner ? B_OK : B_BAD_VALUE);
-	struct stat statData;
-	if (error == B_OK)
-		error = GetStat(&statData);
-	if (error == B_OK)
-		*owner = statData.st_uid;
-	return error;
+	status_t result = (owner ? B_OK : B_BAD_VALUE);
+	struct stat stat;
+
+	if (result == B_OK)
+		result = GetStat(&stat);
+
+	if (result == B_OK)
+		*owner = stat.st_uid;
+
+	return result;
 }
 
 
@@ -114,23 +120,27 @@ BStatable::GetOwner(uid_t *owner) const
 status_t
 BStatable::SetOwner(uid_t owner)
 {
-	struct stat statData;
-	statData.st_uid = owner;
-	return set_stat(statData, B_STAT_UID);
+	struct stat stat;
+	stat.st_uid = owner;
+
+	return set_stat(stat, B_STAT_UID);
 }
 
 
 // Fills out the node's GID into group.
 status_t
-BStatable::GetGroup(gid_t *group) const
+BStatable::GetGroup(gid_t* group) const
 {
-	status_t error = (group ? B_OK : B_BAD_VALUE);
-	struct stat statData;
-	if (error == B_OK)
-		error = GetStat(&statData);
-	if (error == B_OK)
-		*group = statData.st_gid;
-	return error;
+	status_t result = (group ? B_OK : B_BAD_VALUE);
+	struct stat stat;
+
+	if (result == B_OK)
+		result = GetStat(&stat);
+
+	if (result == B_OK)
+		*group = stat.st_gid;
+
+	return result;
 }
 
 
@@ -138,63 +148,74 @@ BStatable::GetGroup(gid_t *group) const
 status_t
 BStatable::SetGroup(gid_t group)
 {
-	struct stat statData;
-	statData.st_gid = group;
-	return set_stat(statData, B_STAT_GID);
+	struct stat stat;
+	stat.st_gid = group;
+
+	return set_stat(stat, B_STAT_GID);
 }
 
 
-// Fills out perms with the node's permissions.
+// Fills out permissions with the node's permissions.
 status_t
-BStatable::GetPermissions(mode_t *perms) const
+BStatable::GetPermissions(mode_t* permissions) const
 {
-	status_t error = (perms ? B_OK : B_BAD_VALUE);
-	struct stat statData;
-	if (error == B_OK)
-		error = GetStat(&statData);
-	if (error == B_OK)
-		*perms = (statData.st_mode & S_IUMSK);
-	return error;
+	status_t result = (permissions ? B_OK : B_BAD_VALUE);
+	struct stat stat;
+
+	if (result == B_OK)
+		result = GetStat(&stat);
+
+	if (result == B_OK)
+		*permissions = (stat.st_mode & S_IUMSK);
+
+	return result;
 }
 
 
-// Sets the node's permissions to perms.
+// Sets the node's permissions to permissions.
 status_t
-BStatable::SetPermissions(mode_t perms)
+BStatable::SetPermissions(mode_t permissions)
 {
-	struct stat statData;
+	struct stat stat;
 	// the FS should do the correct masking -- only the S_IUMSK part is
 	// modifiable
-	statData.st_mode = perms;
-	return set_stat(statData, B_STAT_MODE);
+	stat.st_mode = permissions;
+
+	return set_stat(stat, B_STAT_MODE);
 }
 
 
 // Fills out the size of the node's data (not counting attributes) into size.
 status_t
-BStatable::GetSize(off_t *size) const
+BStatable::GetSize(off_t* size) const
 {
-	status_t error = (size ? B_OK : B_BAD_VALUE);
-	struct stat statData;
-	if (error == B_OK)
-		error = GetStat(&statData);
-	if (error == B_OK)
-		*size = statData.st_size;
-	return error;
+	status_t result = (size ? B_OK : B_BAD_VALUE);
+	struct stat stat;
+
+	if (result == B_OK)
+		result = GetStat(&stat);
+
+	if (result == B_OK)
+		*size = stat.st_size;
+
+	return result;
 }
 
 
 // Fills out mtime with the last modification time of the node.
 status_t
-BStatable::GetModificationTime(time_t *mtime) const
+BStatable::GetModificationTime(time_t* mtime) const
 {
-	status_t error = (mtime ? B_OK : B_BAD_VALUE);
-	struct stat statData;
-	if (error == B_OK)
-		error = GetStat(&statData);
-	if (error == B_OK)
-		*mtime = statData.st_mtime;
-	return error;
+	status_t result = (mtime ? B_OK : B_BAD_VALUE);
+	struct stat stat;
+
+	if (result == B_OK)
+		result = GetStat(&stat);
+
+	if (result == B_OK)
+		*mtime = stat.st_mtime;
+
+	return result;
 }
 
 
@@ -202,23 +223,27 @@ BStatable::GetModificationTime(time_t *mtime) const
 status_t
 BStatable::SetModificationTime(time_t mtime)
 {
-	struct stat statData;
-	statData.st_mtime = mtime;
-	return set_stat(statData, B_STAT_MODIFICATION_TIME);
+	struct stat stat;
+	stat.st_mtime = mtime;
+
+	return set_stat(stat, B_STAT_MODIFICATION_TIME);
 }
 
 
 // Fills out ctime with the creation time of the node
 status_t
-BStatable::GetCreationTime(time_t *ctime) const
+BStatable::GetCreationTime(time_t* ctime) const
 {
-	status_t error = (ctime ? B_OK : B_BAD_VALUE);
-	struct stat statData;
-	if (error == B_OK)
-		error = GetStat(&statData);
-	if (error == B_OK)
-		*ctime = statData.st_crtime;
-	return error;
+	status_t result = (ctime ? B_OK : B_BAD_VALUE);
+	struct stat stat;
+
+	if (result == B_OK)
+		result = GetStat(&stat);
+
+	if (result == B_OK)
+		*ctime = stat.st_crtime;
+
+	return result;
 }
 
 
@@ -226,23 +251,27 @@ BStatable::GetCreationTime(time_t *ctime) const
 status_t
 BStatable::SetCreationTime(time_t ctime)
 {
-	struct stat statData;
-	statData.st_crtime = ctime;
-	return set_stat(statData, B_STAT_CREATION_TIME);
+	struct stat stat;
+	stat.st_crtime = ctime;
+
+	return set_stat(stat, B_STAT_CREATION_TIME);
 }
 
 
 // Fills out atime with the access time of the node.
 status_t
-BStatable::GetAccessTime(time_t *atime) const
+BStatable::GetAccessTime(time_t* atime) const
 {
-	status_t error = (atime ? B_OK : B_BAD_VALUE);
-	struct stat statData;
-	if (error == B_OK)
-		error = GetStat(&statData);
-	if (error == B_OK)
-		*atime = statData.st_atime;
-	return error;
+	status_t result = (atime ? B_OK : B_BAD_VALUE);
+	struct stat stat;
+
+	if (result == B_OK)
+		result = GetStat(&stat);
+
+	if (result == B_OK)
+		*atime = stat.st_atime;
+
+	return result;
 }
 
 
@@ -250,41 +279,45 @@ BStatable::GetAccessTime(time_t *atime) const
 status_t
 BStatable::SetAccessTime(time_t atime)
 {
-	struct stat statData;
-	statData.st_atime = atime;
-	return set_stat(statData, B_STAT_ACCESS_TIME);
+	struct stat stat;
+	stat.st_atime = atime;
+
+	return set_stat(stat, B_STAT_ACCESS_TIME);
 }
 
 
 // Fills out vol with the the volume that the node lives on.
 status_t
-BStatable::GetVolume(BVolume *vol) const
+BStatable::GetVolume(BVolume* volume) const
 {
-	status_t error = (vol ? B_OK : B_BAD_VALUE);
-	struct stat statData;
-	if (error == B_OK)
-		error = GetStat(&statData);
-	if (error == B_OK)
-		error = vol->SetTo(statData.st_dev);
-	return error;
+	status_t result = (volume ? B_OK : B_BAD_VALUE);
+	struct stat stat;
+	if (result == B_OK)
+		result = GetStat(&stat);
+
+	if (result == B_OK)
+		result = volume->SetTo(stat.st_dev);
+
+	return result;
 }
 
 
 // _OhSoStatable1() -> GetStat()
 extern "C" status_t
 #if __GNUC__ == 2
-_OhSoStatable1__9BStatable(const BStatable *self, struct stat *st)
+_OhSoStatable1__9BStatable(const BStatable* self, struct stat* stat)
 #else
-_ZN9BStatable14_OhSoStatable1Ev(const BStatable *self, struct stat *st)
+_ZN9BStatable14_OhSoStatable1Ev(const BStatable* self, struct stat* stat)
 #endif
 {
 	// No Perform() method -- we have to use the old GetStat() method instead.
 	struct stat_beos oldStat;
-	status_t error = BStatable::Private(self).GetStatBeOS(&oldStat);
-	if (error != B_OK)
-		return error;
+	status_t result = BStatable::Private(self).GetStatBeOS(&oldStat);
+	if (result != B_OK)
+		return result;
 
-	convert_from_stat_beos(&oldStat, st);
+	convert_from_stat_beos(&oldStat, stat);
+
 	return B_OK;
 }
 

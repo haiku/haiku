@@ -399,7 +399,10 @@ BQuery::CountEntries()
 }
 
 
-// Gets whether Fetch() has already been called on this object.
+/*!	Gets whether Fetch() has already been called on this object.
+
+	\return \c true, if Fetch() was already called, \c false otherwise.
+*/
 bool
 BQuery::_HasFetched() const
 {
@@ -407,7 +410,27 @@ BQuery::_HasFetched() const
 }
 
 
-// Pushes a node onto the predicate stack.
+/*!	Pushes a node onto the predicate stack.
+
+	If the stack has not been allocate until this time, this method does
+	allocate it.
+
+	If the supplied node is \c NULL, it is assumed that there was not enough
+	memory to allocate the node and thus \c B_NO_MEMORY is returned.
+
+	In case the method fails, the caller retains the ownership of the supplied
+	node and thus is responsible for deleting it, if \a deleteOnError is
+	\c false. If it is \c true, the node is deleted, if an error occurs.
+
+	\param node The node to push.
+	\param deleteOnError Whether or not to delete the node if an error occurs.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY \a node was \c NULL or there was insufficient memory to
+	        allocate the predicate stack or push the node.
+	\retval B_NOT_ALLOWED _PushNode() was called after Fetch().
+*/
 status_t
 BQuery::_PushNode(QueryNode* node, bool deleteOnError)
 {
@@ -428,7 +451,16 @@ BQuery::_PushNode(QueryNode* node, bool deleteOnError)
 }
 
 
-// Helper method to set the predicate.
+/*!	Helper method to set the predicate.
+
+	Does not check whether Fetch() has already been invoked.
+
+	\param expression The predicate string to set.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY There was insufficient memory to store the predicate.
+*/
 status_t
 BQuery::_SetPredicate(const char* expression)
 {
@@ -448,7 +480,17 @@ BQuery::_SetPredicate(const char* expression)
 }
 
 
-// Evaluates the predicate stack.
+/*!	Evaluates the predicate stack.
+
+	The method does nothing (and returns \c B_OK), if the stack is \c NULL.
+	If the stack is not  \c null and Fetch() has already been called, this
+	method fails.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY There was insufficient memory.
+	\retval B_NOT_ALLOWED _EvaluateStack() was called after Fetch().
+*/
 status_t
 BQuery::_EvaluateStack()
 {
@@ -473,6 +515,10 @@ BQuery::_EvaluateStack()
 }
 
 
+/*!	Fills out \a parsedPredicate with a parsed predicate string.
+
+	\param parsedPredicate The predicate string to fill out.
+*/
 void
 BQuery::_ParseDates(BString& parsedPredicate)
 {

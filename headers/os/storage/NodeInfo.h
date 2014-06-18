@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NODE_INFO_H
@@ -31,9 +31,9 @@ public:
 	virtual status_t			GetType(char* type) const;
 	virtual status_t			SetType(const char* type);
 	virtual status_t			GetIcon(BBitmap* icon,
-									icon_size size = B_LARGE_ICON) const;
+									icon_size which = B_LARGE_ICON) const;
 	virtual status_t			SetIcon(const BBitmap* icon,
-									icon_size size = B_LARGE_ICON);
+									icon_size which = B_LARGE_ICON);
 			status_t			GetIcon(uint8** data, size_t* size,
 									type_code* type) const;
 			status_t			SetIcon(const uint8* data, size_t size);
@@ -46,10 +46,10 @@ public:
 			status_t			SetAppHint(const entry_ref* ref);
 
 			status_t			GetTrackerIcon(BBitmap* icon,
-									icon_size size = B_LARGE_ICON) const;
+									icon_size which = B_LARGE_ICON) const;
 	static	status_t			GetTrackerIcon(const entry_ref* ref,
 									BBitmap* icon,
-									icon_size size = B_LARGE_ICON);
+									icon_size which = B_LARGE_ICON);
 private:
 			friend class BAppFileInfo;
   

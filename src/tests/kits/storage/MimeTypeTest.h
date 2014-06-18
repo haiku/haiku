@@ -23,10 +23,10 @@ class NotificationMessage;
 class MimeTypeTest : public BasicTest {
 public:
 	static CppUnit::Test* Suite();
-	
+
 	// This function called before *each* test added in Suite()
 	void setUp();
-	
+
 	// This function called after *each* test added in Suite()
 	void tearDown();
 
@@ -48,7 +48,7 @@ public:
 	void SupportingAppsTest();
 	void SupportedTypesTest();
 	void WildcardAppsTest();
-	
+
 	void InitTest();
 	void StringTest();
 	void MonitoringTest();

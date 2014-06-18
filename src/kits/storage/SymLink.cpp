@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku Inc.
+ * Copyright 2002-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,16 +31,16 @@ BSymLink::BSymLink()
 
 
 // Creates a copy of the supplied BSymLink object.
-BSymLink::BSymLink(const BSymLink &link)
+BSymLink::BSymLink(const BSymLink& other)
 	:
-	BNode(link)
+	BNode(other)
 {
 }
 
 
 // Creates a BSymLink object and initializes it to the symbolic link referred
 // to by the supplied entry_ref.
-BSymLink::BSymLink(const entry_ref *ref)
+BSymLink::BSymLink(const entry_ref* ref)
 	:
 	BNode(ref)
 {
@@ -49,7 +49,7 @@ BSymLink::BSymLink(const entry_ref *ref)
 
 // Creates a BSymLink object and initializes it to the symbolic link referred
 // to by the supplied BEntry.
-BSymLink::BSymLink(const BEntry *entry)
+BSymLink::BSymLink(const BEntry* entry)
 		: BNode(entry)
 {
 }
@@ -57,7 +57,7 @@ BSymLink::BSymLink(const BEntry *entry)
 
 // Creates a BSymLink object and initializes it to the symbolic link referred
 // to by the supplied path name.
-BSymLink::BSymLink(const char *path)
+BSymLink::BSymLink(const char* path)
 	:
 	BNode(path)
 {
@@ -66,7 +66,7 @@ BSymLink::BSymLink(const char *path)
 
 // Creates a BSymLink object and initializes it to the symbolic link referred
 // to by the supplied path name relative to the specified BDirectory.
-BSymLink::BSymLink(const BDirectory *dir, const char *path)
+BSymLink::BSymLink(const BDirectory* dir, const char* path)
 	:
 	BNode(dir, path)
 {
@@ -81,7 +81,7 @@ BSymLink::~BSymLink()
 
 // Reads the contents of the symbolic link into a buffer.
 ssize_t
-BSymLink::ReadLink(char *buffer, size_t size)
+BSymLink::ReadLink(char* buffer, size_t size)
 {
 	if (buffer == NULL)
 		return B_BAD_VALUE;
@@ -90,9 +90,9 @@ BSymLink::ReadLink(char *buffer, size_t size)
 		return B_FILE_ERROR;
 
 	size_t linkLen = size;
-	status_t error = _kern_read_link(get_fd(), NULL, buffer, &linkLen);
-	if (error < B_OK)
-		return error;
+	status_t result = _kern_read_link(get_fd(), NULL, buffer, &linkLen);
+	if (result < B_OK)
+		return result;
 
 	// null-terminate
 	if (linkLen >= size)
@@ -107,7 +107,7 @@ BSymLink::ReadLink(char *buffer, size_t size)
 // Combines a directory path and the contents of this symbolic link to form an
 // absolute path.
 ssize_t
-BSymLink::MakeLinkedPath(const char *dirPath, BPath *path)
+BSymLink::MakeLinkedPath(const char* dirPath, BPath* path)
 {
 	// BeOS seems to convert the dirPath to a BDirectory, which causes links
 	// to be resolved. This means that the dirPath must exist!
@@ -126,7 +126,7 @@ BSymLink::MakeLinkedPath(const char *dirPath, BPath *path)
 // Combines a directory path and the contents of this symbolic link to form an
 // absolute path.
 ssize_t
-BSymLink::MakeLinkedPath(const BDirectory *dir, BPath *path)
+BSymLink::MakeLinkedPath(const BDirectory* dir, BPath* path)
 {
 	if (dir == NULL || path == NULL)
 		return B_BAD_VALUE;
@@ -168,7 +168,13 @@ void BSymLink::_MissingSymLink5() {}
 void BSymLink::_MissingSymLink6() {}
 
 
-// Returns the file descriptor of the BSymLink.
+/*!	Returns the file descriptor of the BSymLink.
+
+	This method should be used instead of accessing the private \c fFd member
+	of the BNode directly.
+
+	\return The object's file descriptor, or -1 if not properly initialized.
+*/
 int
 BSymLink::get_fd() const
 {

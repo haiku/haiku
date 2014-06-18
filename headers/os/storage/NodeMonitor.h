@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku Inc. All Rights Reserved.
+ * Copyright 2003-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NODE_MONITOR_H
@@ -32,25 +32,31 @@ enum {
 // The presence and meaning of the other fields in that message specifying what
 // exactly caused the notification depend on this value.
 
-#define	B_ENTRY_CREATED		1
-#define	B_ENTRY_REMOVED		2
-#define	B_ENTRY_MOVED		3
-#define	B_STAT_CHANGED		4
-#define	B_ATTR_CHANGED		5
-#define	B_DEVICE_MOUNTED	6
-#define	B_DEVICE_UNMOUNTED	7
+enum {
+	B_ENTRY_CREATED = 1,
+	B_ENTRY_REMOVED,
+	B_ENTRY_MOVED,
+	B_STAT_CHANGED,
+	B_ATTR_CHANGED,
+	B_DEVICE_MOUNTED,
+	B_DEVICE_UNMOUNTED
+};
 
 
 // More specific info in the "cause" field of B_ATTR_CHANGED notification
 // messages. (Haiku only)
-#define	B_ATTR_CREATED		1
-#define	B_ATTR_REMOVED		2
-//		B_ATTR_CHANGED is reused
+
+enum {
+	B_ATTR_CREATED = 1,
+	B_ATTR_REMOVED,
+//	B_ATTR_CHANGED
+};
 
 
 // More specific info in the "fields" field of B_STAT_CHANGED notification
 // messages, specifying what parts of the stat data have actually been
 // changed. (Haiku only)
+
 enum {
 	B_STAT_MODE					= 0x0001,
 	B_STAT_UID					= 0x0002,
@@ -82,16 +88,17 @@ class BHandler;
 
 extern status_t watch_volume(dev_t volume, uint32 flags, BMessenger target);
 extern status_t watch_volume(dev_t volume, uint32 flags,
-					const BHandler *handler, const BLooper *looper = NULL);
+	const BHandler* handler, const BLooper* looper = NULL);
 
-extern status_t watch_node(const node_ref *node, uint32 flags,
-					BMessenger target);
-extern status_t watch_node(const node_ref *node, uint32 flags, 
-					const BHandler *handler, const BLooper *looper = NULL);
+extern status_t watch_node(const node_ref* node, uint32 flags,
+	BMessenger target);
+extern status_t watch_node(const node_ref* node, uint32 flags,
+	const BHandler* handler, const BLooper* looper = NULL);
 
 extern status_t stop_watching(BMessenger target);
-extern status_t stop_watching(const BHandler *handler, const BLooper *looper = NULL);
+extern status_t stop_watching(const BHandler* handler, const BLooper* looper = NULL);
 
 #endif	// __cplusplus && !_KERNEL_MODE
+
 
 #endif	// _NODE_MONITOR_H

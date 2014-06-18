@@ -84,7 +84,7 @@ static const char *attrInfoField_Editable	= "attr:editable";
 // Descriptions
 static const char *testDescr			= "Just a test, nothing more :-)";
 static const char *testDescr2			= "Another amazing test string";
-static const char *longDescr			= 
+static const char *longDescr			=
 "This description is longer than B_MIME_TYPE_LENGTH, which is quite useful for certain things... "
 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
@@ -138,13 +138,13 @@ public:
 					cout << "(Making a copy of your MIME database at '" + mimeDatabaseDir + "')" << endl;
 				std::string cmd = std::string("copyattr -d -r -- ") + R5DatabaseDir
 					+ " " + mimeDatabaseDir;
-				ExecCommand(cmd.c_str()); 
+				ExecCommand(cmd.c_str());
 			} else {
 				fMimeDirExisted = true;
 				if (BTestShell::GlobalBeVerbose())
 					cout << "(Using existing copy of MIME database in '" + mimeDatabaseDir + "')" << endl;
 			}
-		}	
+		}
 	}
 
 	virtual void tearDown()
@@ -153,7 +153,7 @@ public:
 			if (BTestShell::GlobalBeVerbose())
 				cout << "(Removing copy of MIME database in '" + mimeDatabaseDir + "')" << endl;
 			std::string cmd = std::string("rm -rf ") + mimeDatabaseDir;
-			ExecCommand(cmd.c_str()); 
+			ExecCommand(cmd.c_str());
 		}
 	}
 
@@ -161,7 +161,7 @@ public:
 	{
 		setUp();
 		CppUnit::TestSuite::run(result);
-		tearDown();	
+		tearDown();
 	}
 private:
 	bool fMimeDirExisted;
@@ -172,7 +172,7 @@ CppUnit::Test*
 MimeTypeTest::Suite() {
 	MimeTypeTestSuite *suite = new MimeTypeTestSuite();
 	typedef CppUnit::TestCaller<MimeTypeTest> TC;
-		
+
 	// Tyler
 	suite->addTest( new TC("BMimeType::Install/Delete Test",
 						   &MimeTypeTest::InstallDeleteTest) );
@@ -205,7 +205,7 @@ MimeTypeTest::Suite() {
 	suite->addTest( new TC("BMimeType::Wildcard Apps Test",
 						   &MimeTypeTest::WildcardAppsTest) );
 
-	// Ingo						   
+	// Ingo
 	suite->addTest( new TC("BMimeType::Initialization Test",
 						   &MimeTypeTest::InitTest) );
 	suite->addTest( new TC("BMimeType::MIME String Test",
@@ -222,10 +222,10 @@ MimeTypeTest::Suite() {
 						   &MimeTypeTest::SnifferRuleTest) );
 	suite->addTest( new TC("BMimeType::Sniffing Test",
 						   &MimeTypeTest::SniffingTest) );
-		
-						   
+
+
 	return suite;
-}		
+}
 
 // Handy comparison operators for BBitmaps. The size and color depth
 // are compared first, followed by the bitmap data.
@@ -246,7 +246,7 @@ operator==(BBitmap &bmp1, BBitmap &bmp2) {
 //					printf("i == %d\n", i);
 					return false;
 				}
-			} 
+			}
 /*			for (int i = 0; i < bmp1.Bounds().IntegerHeight(); i++) {
 				for (int j = 0; j < bmp1.Bounds().IntegerWidth(); j++) {
 //					printf("(%d, %d)", data1[(i * bmp1.BytesPerRow()) + j], data2[(i * bmp2.BytesPerRow()) + j]);
@@ -274,7 +274,7 @@ operator!=(BBitmap &bmp1, BBitmap &bmp2) {
 bool
 operator==(BMessage &msg1, BMessage &msg2) {
 	status_t err = B_OK;
-	
+
 	// For now I'm ignoring the what fields...I shall deal with that later :-)
 	if (msg1.what != msg2.what)
 		return false;
@@ -285,14 +285,14 @@ operator==(BMessage &msg1, BMessage &msg2) {
 	msg2.PrintToStream();
 	printf("----------------------------------------------------------------------\n");
 */
-	
+
 	// Check the counts of field names
-	int count1, count2;	
+	int count1, count2;
 	count1 = msg1.CountNames(B_ANY_TYPE);
 	count2 = msg2.CountNames(B_ANY_TYPE);
 	if (count1 != count2 && (count1 == 0 || count2 == 0))
 		return false;
-		
+
 	// Iterate over all the names in msg1 and check that the field
 	// with the same name exists in msg2, is of the same type, and
 	// contains identical data.
@@ -300,28 +300,28 @@ operator==(BMessage &msg1, BMessage &msg2) {
 		char *name;
 		type_code typeFound1, typeFound2;
 		int32 countFound1, countFound2;
-		
+
 		// Check type and count info
-		err = msg1.GetInfo(B_ANY_TYPE, i, &name, &typeFound1, &countFound1);			
-		if (!err) 
+		err = msg1.GetInfo(B_ANY_TYPE, i, &name, &typeFound1, &countFound1);
+		if (!err)
 			err = msg2.GetInfo(name, &typeFound2, &countFound2);
-		if (!err) 
+		if (!err)
 			err = (typeFound1 == typeFound2 && countFound1 == countFound2 ? B_OK : B_ERROR);
 		if (!err) {
 			// Check all the data items
 			for (int j = 0; j < countFound1; j++) {
 				void *data1, *data2;
 				ssize_t bytes1, bytes2;
-				
+
 				err = msg1.FindData(name, typeFound1, j, (const void**)&data1, &bytes1);
-				if (!err) 
+				if (!err)
 					err = msg2.FindData(name, typeFound2, j, (const void**)&data2, &bytes2);
-				if (!err) 
-					err = (bytes1 == bytes2 && memcmp(data1, data2, bytes1) == 0 ? B_OK : B_ERROR);			
+				if (!err)
+					err = (bytes1 == bytes2 && memcmp(data1, data2, bytes1) == 0 ? B_OK : B_ERROR);
 			}
 		}
 	}
-	
+
 	return !err;
 }
 
@@ -341,7 +341,7 @@ fill_bitmap(BBitmap &bmp, char value) {
 	}
 //	printf("\n");
 }
-	
+
 // Fills the bitmap data with the given character
 void
 fill_bitmap32(BBitmap &bmp, char r, char g, char b, char a) {
@@ -357,7 +357,7 @@ fill_bitmap32(BBitmap &bmp, char r, char g, char b, char a) {
 //		printf("\n");
 	}
 }
-	
+
 // Dumps the size, colorspace, and first data byte
 // of the bitmap to stdout
 /*void
@@ -368,18 +368,18 @@ dump_bitmap(BBitmap &bmp, char *name = "bmp") {
 		case B_CMAP8:
 			printf("B_CMAP8");
 			break;
-				
+
 		case B_RGB32:
 			printf("B_RGB32");
 			break;
-				
+
 		case B_RGBA32:
 			printf("B_RGBA32");
 			break;
-				
+
 		default:
 			printf("%x", bmp.ColorSpace());
-			break;		
+			break;
 	}
 	printf(", %d, [", *(char*)bmp.Bits());
 	char *data = (char*)bmp.Bits();
@@ -416,7 +416,7 @@ reduce_color_depth(BBitmap &src32, BBitmap &dest8)
 	return err;
 }
 #endif
-	
+
 // IconHelper and IconForTypeHelper:
 // Adapter(?) classes needed to reuse icon tests among {Get,Set}Icon() and {Get,Set}IconForType()
 // What originally were meant to encapsulate the variations among calls to the various BMimeType
@@ -443,12 +443,12 @@ public:
 	BRect BitmapBounds(icon_size isize) {
 		return isize == B_LARGE_ICON ? BRect(0,0,31,31) : BRect(0,0,15,15);
 	}
-	
+
 	// Returns the proper bitmap bounds for this helper's icon size
 	BRect BitmapBounds() {
 		return BitmapBounds(size);
-	}	
-	
+	}
+
 	// Used to call the appropriate GetIcon[ForType] function
 	virtual status_t GetIcon(BMimeType &mime, BBitmap *icon) {
 		return mime.GetIcon(icon, size);
@@ -458,7 +458,7 @@ public:
 	virtual status_t SetIcon(BMimeType &mime, BBitmap *icon) {
 		return mime.SetIcon(icon, size);
 	}
-	
+
 	// Used to call the appropriate DeleteIcon[ForType] function
 	virtual status_t DeleteIcon(BMimeType &mime) {
 #if TEST_R5
@@ -467,28 +467,28 @@ public:
 		return mime.DeleteIcon(size);
 #endif
 	}
-	
+
 	BBitmap* TempBitmap() {
 		return &bmpTemp;
 	}
-	
+
 	BBitmap* Bitmap1() {
 		return &bmp1;
 	}
-	
+
 	BBitmap* Bitmap2() {
 		return &bmp2;
 	}
-	
+
 	icon_size Size() {
 		return size;
 	}
-	
-protected:	
+
+protected:
 	BBitmap bmp1;
 	BBitmap bmp2;
 	BBitmap bmpTemp;
-	icon_size size;	
+	icon_size size;
 };
 
 class IconForTypeHelper : public IconHelper {
@@ -525,18 +525,18 @@ public:
 	SetAdapter(std::set<std::string> &set)
 		: fSet(set) { }
 	virtual void Add(std::string value) {
-		fSet.insert(value);	
+		fSet.insert(value);
 	}
 protected:
 	std::set<std::string> &fSet;
 };
-	
+
 class QueueAdapter : public ContainerAdapter {
 public:
 	QueueAdapter(std::queue<std::string> &queue)
 		: fQueue(queue) { }
 	virtual void Add(std::string value) {
-		fQueue.push(value);	
+		fQueue.push(value);
 	}
 protected:
 	std::queue<std::string> &fQueue;
@@ -553,7 +553,7 @@ MimeTypeTest::setUp()
 	// local mime database which we'll use for certain OpenBeOS tests
 	execCommand(string("mkdir ") + testDir
 				+ " ; copyattr -d -r -- " + mimeDatabaseDir + "/\* " + testDir
-				); */	
+				); */
 	// Setup our application
 	fApplication = new BTestApp(testSig);
 	if (fApplication->Init() != B_OK) {
@@ -561,9 +561,9 @@ MimeTypeTest::setUp()
 		delete fApplication;
 		fApplication = NULL;
 	}
-	
+
 }
-	
+
 // tearDown
 void
 MimeTypeTest::tearDown()
@@ -608,11 +608,11 @@ dump_ref(entry_ref *ref, char* name = "ref") {
 		} else
 			printf("%s == ERROR", name);
 		printf(" == (%ld, %Ld, '%s')\n", ref->device, ref->directory, ref->name);
-		
+
 	} else
 		printf("%s == (NULL)\n", name);
 }*/
-		
+
 // App Hint
 
 void
@@ -621,11 +621,11 @@ MimeTypeTest::AppHintTest() {
 	BEntry entry(testApp);
 	entry_ref appRef;
 	CHK(entry.InitCheck() == B_OK);
-	CHK(entry.GetRef(&appRef) == B_OK);	
+	CHK(entry.GetRef(&appRef) == B_OK);
 	BEntry entry2(testApp2);
 	entry_ref appRef2;
 	CHK(entry2.InitCheck() == B_OK);
-	CHK(entry2.GetRef(&appRef2) == B_OK);	
+	CHK(entry2.GetRef(&appRef2) == B_OK);
 	// Uninitialized
 	NextSubTest();
 	{
@@ -660,9 +660,9 @@ MimeTypeTest::AppHintTest() {
 		CHK(!mime.IsInstalled());
 		CHK(mime.SetAppHint(&appRef) == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(mime.GetAppHint(&ref) == B_OK);	
+		CHK(mime.GetAppHint(&ref) == B_OK);
 		CHK(ref == appRef);
-		CHK(mime.SetAppHint(NULL) == B_OK);		
+		CHK(mime.SetAppHint(NULL) == B_OK);
 		CHK(mime.IsInstalled());
 		CHK(mime.GetAppHint(&ref) != B_OK);		// B_ENTRY_NOT_FOUND
 #endif
@@ -678,15 +678,15 @@ MimeTypeTest::AppHintTest() {
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK(mime.DeleteAppHint() != B_OK);		
+		CHK(mime.DeleteAppHint() != B_OK);
 		CHK(!mime.IsInstalled());
 		CHK(mime.SetAppHint(&appRef) == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(mime.GetAppHint(&ref) == B_OK);	
+		CHK(mime.GetAppHint(&ref) == B_OK);
 		CHK(ref == appRef);
-		CHK(mime.DeleteAppHint() == B_OK);		
+		CHK(mime.DeleteAppHint() == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(mime.GetAppHint(&ref) != B_OK);	
+		CHK(mime.GetAppHint(&ref) != B_OK);
 #endif
 	}
 	// Non-installed type
@@ -735,13 +735,13 @@ MimeTypeTest::AppHintTest() {
 	{
 		entry_ref ref(-1, -1, NULL);
 		BMimeType mime(testType);
-		CHK(mime.InitCheck() == B_OK);		
+		CHK(mime.InitCheck() == B_OK);
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
 			CHK(mime.Install() == B_OK);
-		CHK(mime.IsInstalled());		
+		CHK(mime.IsInstalled());
 		CHK(mime.SetAppHint(&appRef) == B_OK);
 		CHK(mime.SetAppHint(&ref) != B_OK);	// R5 == B_BAD_VALUE
 	}
@@ -750,16 +750,16 @@ MimeTypeTest::AppHintTest() {
 	{
 		entry_ref ref(0, 0, "__this_ought_not_exist__");
 		BMimeType mime(testType);
-		CHK(mime.InitCheck() == B_OK);		
+		CHK(mime.InitCheck() == B_OK);
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
-		CHK(mime.IsInstalled());		
+			CHK(mime.Install() == B_OK);
+		CHK(mime.IsInstalled());
 		CHK(mime.SetAppHint(&appRef) == B_OK);
 		CHK(mime.SetAppHint(&ref) != B_OK);	// R5 == B_ENTRY_NOT_FOUND
-	}		
+	}
 	// Installed Type, abstract entry_ref
 	NextSubTest();
 	{
@@ -770,19 +770,19 @@ MimeTypeTest::AppHintTest() {
 		CHK(!entry.Exists());
 		CHK(entry.GetRef(&fakeRef) == B_OK);
 		BMimeType mime(testType);
-		CHK(mime.InitCheck() == B_OK);		
+		CHK(mime.InitCheck() == B_OK);
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
-		CHK(mime.IsInstalled());		
+			CHK(mime.Install() == B_OK);
+		CHK(mime.IsInstalled());
 		CHK(mime.SetAppHint(&appRef) == B_OK);
 		CHK(mime.SetAppHint(&fakeRef) == B_OK);
 		CHK(mime.GetAppHint(&ref) == B_OK);
 		CHK(ref == fakeRef);
 		CHK(ref != appRef);
-	}		
+	}
 }
 
 // Attr Info
@@ -810,13 +810,13 @@ MimeTypeTest::AttrInfoTest() {
 	CHK(msg2.AddInt32(attrInfoField_Type, B_DOUBLE_TYPE) == B_OK);
 	CHK(msg2.AddBool(attrInfoField_Viewable, true) == B_OK);
 	CHK(msg2.AddBool(attrInfoField_Editable, true) == B_OK);
-	
+
 	CHK(msg3.AddString(attrInfoField_Name, "Volume") == B_OK);
 	CHK(msg3.AddString(attrInfoField_PublicName, "Loudness") == B_OK);
 	CHK(msg3.AddInt32(attrInfoField_Type, B_DOUBLE_TYPE) == B_OK);
 	CHK(msg3.AddBool(attrInfoField_Viewable, true) == B_OK);
 	CHK(msg3.AddBool(attrInfoField_Editable, true) == B_OK);
-	
+
 	CHK(msgIncomplete1.AddString(attrInfoField_Name, "Color") == B_OK);
 	CHK(msgIncomplete1.AddString(attrInfoField_PublicName, "The Color") == B_OK);
 	CHK(msgIncomplete1.AddInt32(attrInfoField_Type, B_STRING_TYPE) == B_OK);
@@ -828,7 +828,7 @@ MimeTypeTest::AttrInfoTest() {
 	CHK(msgIncomplete1.AddInt32(attrInfoField_Type, B_INT32_TYPE) == B_OK);
 //	CHK(msgIncomplete1.AddBool(attrInfoField_Viewable, false) == B_OK);
 	CHK(msgIncomplete1.AddBool(attrInfoField_Editable, false) == B_OK);
-	
+
 	CHK(msgIncomplete2.AddString(attrInfoField_Name, "Color") == B_OK);
 //	CHK(msgIncomplete2.AddString(attrInfoField_PublicName, "The Color") == B_OK);
 //	CHK(msgIncomplete2.AddInt32(attrInfoField_Type, B_STRING_TYPE) == B_OK);
@@ -847,12 +847,12 @@ MimeTypeTest::AttrInfoTest() {
 	{
 		BMimeType mime;
 		BMessage msg;
-		
+
 		CHK(mime.InitCheck() == B_NO_INIT);
 		CHK(mime.GetAttrInfo(&msg) != B_OK);		// R5 == B_BAD_VALUE
 		CHK(mime.SetAttrInfo(&msg) != B_OK);		// R5 == B_BAD_VALUE
 	}
-	
+
 	// NULL params
 	NextSubTest();
 	{
@@ -864,18 +864,18 @@ MimeTypeTest::AttrInfoTest() {
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK(mime.DeleteAttrInfo() != B_OK);		
+		CHK(mime.DeleteAttrInfo() != B_OK);
 		CHK(!mime.IsInstalled());
 		msg1.RemoveName(typeField);						// Clear "type" field, since SAI() just adds another
 		CHK(mime.SetAttrInfo(&msg1) == B_OK);
 		CHK(mime.IsInstalled());
 		CHK(msg != msg1);
-		CHK(mime.GetAttrInfo(&msg) == B_OK);	
+		CHK(mime.GetAttrInfo(&msg) == B_OK);
 		CHK(msg1.AddString(typeField, testType) == B_OK);	// Add in "type" field as GAI() does
 		CHK(msg == msg1);
-		CHK(mime.SetAttrInfo(NULL) == B_OK);		
+		CHK(mime.SetAttrInfo(NULL) == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(mime.GetAttrInfo(&msg) != B_OK);	
+		CHK(mime.GetAttrInfo(&msg) != B_OK);
 #endif
 	}
 	// Delete test
@@ -889,38 +889,38 @@ MimeTypeTest::AttrInfoTest() {
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK(mime.DeleteAttrInfo() != B_OK);		
+		CHK(mime.DeleteAttrInfo() != B_OK);
 		CHK(!mime.IsInstalled());
 		msg1.RemoveName(typeField);						// Clear "type" field, since SAI() just adds another
 		CHK(mime.SetAttrInfo(&msg1) == B_OK);
 		CHK(mime.IsInstalled());
 		CHK(msg != msg1);
-		CHK(mime.GetAttrInfo(&msg) == B_OK);	
+		CHK(mime.GetAttrInfo(&msg) == B_OK);
 		CHK(msg1.AddString(typeField, testType) == B_OK);	// Add in "type" field as GAI() does
 		CHK(msg == msg1);
-		CHK(mime.DeleteAttrInfo() == B_OK);		
+		CHK(mime.DeleteAttrInfo() == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(mime.GetAttrInfo(&msg) != B_OK);	
+		CHK(mime.GetAttrInfo(&msg) != B_OK);
 #endif
 	}
-	
+
 	// Improperly formatted BMessages
 	NextSubTest();
 	{
 		BMessage msg(WHAT);
 		BMimeType mime(testType);
 		CHK(mime.InitCheck() == B_OK);
-		
+
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
+			CHK(mime.Install() == B_OK);
 		CHK(mime.IsInstalled());
 
 		// Initial Set()/Get()
 		msgIncomplete1.RemoveName(typeField);		// Clear "type" fields, since SAI() just adds another
-		msgIncomplete2.RemoveName(typeField);	
+		msgIncomplete2.RemoveName(typeField);
 		CHK(msg != msgIncomplete1);
 		CHK(msg != msgIncomplete2);
 		CHK(mime.SetAttrInfo(&msgIncomplete1) == B_OK);
@@ -930,24 +930,24 @@ MimeTypeTest::AttrInfoTest() {
 		CHK(msg == msgIncomplete1);
 		CHK(msg != msgIncomplete2);
 	}
-	
+
 	// Set() with improperly formatted message
 	NextSubTest();
 	{
 		BMessage msg(WHAT);
 		BMimeType mime(testType);
 		CHK(mime.InitCheck() == B_OK);
-		
+
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
+			CHK(mime.Install() == B_OK);
 		CHK(mime.IsInstalled());
 
 		// Initial Set()/Get()
 		msgIncomplete1.RemoveName(typeField);		// Clear "type" fields, since SAI() just adds another
-		msgIncomplete2.RemoveName(typeField);	
+		msgIncomplete2.RemoveName(typeField);
 		CHK(msg != msgIncomplete1);
 		CHK(msg != msgIncomplete2);
 		CHK(mime.SetAttrInfo(&msgIncomplete1) == B_OK);
@@ -957,7 +957,7 @@ MimeTypeTest::AttrInfoTest() {
 		CHK(msg == msgIncomplete1);
 		CHK(msg != msgIncomplete2);
 	}
-	
+
 	// Set() with empty message
 	NextSubTest();
 	{
@@ -965,14 +965,14 @@ MimeTypeTest::AttrInfoTest() {
 		BMessage msgEmpty(WHAT);
 		BMessage msg(WHAT);
 		CHK(msg.AddInt32("stuff", 1234) == B_OK);	// Add an extra attribute to give us something to compare with
-		
+
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
+			CHK(mime.Install() == B_OK);
 		CHK(mime.IsInstalled());
-		
+
 		// Set(empty)
 		CHK(msg != msgEmpty);
 		CHK(mime.SetAttrInfo(&msgEmpty) == B_OK);
@@ -980,7 +980,7 @@ MimeTypeTest::AttrInfoTest() {
 		CHK(msgEmpty.AddString(typeField, testType) == B_OK);	// Add in "type" fields as GFE() does
 		CHK(msg == msgEmpty);
 	}
-	
+
 	// Set() with extra attributes in message
 	NextSubTest();
 	{
@@ -992,17 +992,17 @@ MimeTypeTest::AttrInfoTest() {
 		CHK(msgExtraSet.AddInt32("more_extras", 456) == B_OK);
 		CHK(msgExtraSet.AddInt32("more_extras", 789) == B_OK);
 		BMessage msgExtraGet(msgExtraSet);
-		
+
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
+			CHK(mime.Install() == B_OK);
 		CHK(mime.IsInstalled());
-		
+
 		// Set(extra)/Get(empty)
 		msg1.RemoveName(typeField);		// Clear "type" fields, since SFE() just adds another
-		msg2.RemoveName(typeField);	
+		msg2.RemoveName(typeField);
 		CHK(msg != msg1);
 		CHK(msg != msgExtraSet);
 		CHK(mime.SetAttrInfo(&msgExtraSet) == B_OK);
@@ -1011,13 +1011,13 @@ MimeTypeTest::AttrInfoTest() {
 		CHK(msgExtraSet.AddString(typeField, testType) == B_OK);
 		CHK(msg == msgExtraSet);
 		CHK(msg != msg1);
-		
+
 		// Get(extra)
 		NextSubTest();
 		CHK(mime.GetAttrInfo(&msgExtraGet) == B_OK);
 		CHK(msgExtraGet == msgExtraSet);
 		CHK(msgExtraGet != msg1);
-		
+
 		// Get(extra and then some)
 		NextSubTest();
 		CHK(msgExtraGet.AddInt32("more_extras", 101112) == B_OK);
@@ -1025,20 +1025,20 @@ MimeTypeTest::AttrInfoTest() {
 		CHK(mime.GetAttrInfo(&msgExtraGet) == B_OK);	// Reinitializes result (clearing extra fields)
 		CHK(msgExtraGet == msgExtraSet);
 		CHK(msgExtraGet != msg1);
-		
-	}	
+
+	}
 	// Normal Function (Non-installed type)
 	NextSubTest();
 	{
 		BMimeType mime(testType);
 		BMessage msg(WHAT);
 		BMessage msg2(WHAT);
-		
+
 		CHK(mime.InitCheck() == B_OK);
 		// Make sure the type isn't installed
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
-			
+
 		CHK(!mime.IsInstalled());
 		CHK(mime.GetAttrInfo(&msg) != B_OK);		// R5 == B_ENTRY_NOT_FOUND
 		CHK(!mime.IsInstalled());
@@ -1048,24 +1048,24 @@ MimeTypeTest::AttrInfoTest() {
 		CHK(msg.AddString(typeField, testType) == B_OK);	// Add in "type" fields as GAI() does
 		CHK(msg == msg2);
 	}
-	
+
 	// Normal Function
 	NextSubTest();
 	{
 		BMessage msg(WHAT);
 		BMimeType mime(testType);
 		CHK(mime.InitCheck() == B_OK);
-		
+
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
+			CHK(mime.Install() == B_OK);
 		CHK(mime.IsInstalled());
 
 		// Initial Set()/Get()
 		msg1.RemoveName(typeField);		// Clear "type" fields, since SAI() just adds another
-		msg2.RemoveName(typeField);	
+		msg2.RemoveName(typeField);
 		CHK(msg != msg1);
 		CHK(msg != msg2);
 		CHK(mime.SetAttrInfo(&msg1) == B_OK);
@@ -1079,7 +1079,7 @@ MimeTypeTest::AttrInfoTest() {
 		NextSubTest();
 		CHK(msg.MakeEmpty() == B_OK);
 		msg1.RemoveName(typeField);		// Clear "type" fields, since SFE() just adds another
-		msg2.RemoveName(typeField);	
+		msg2.RemoveName(typeField);
 		CHK(msg != msg1);
 		CHK(msg != msg2);
 		CHK(mime.SetAttrInfo(&msg2) == B_OK);
@@ -1093,7 +1093,7 @@ MimeTypeTest::AttrInfoTest() {
 		NextSubTest();
 		CHK(msg.MakeEmpty() == B_OK);
 		msg1.RemoveName(typeField);		// Clear "type" fields, since SFE() just adds another
-		msg2.RemoveName(typeField);	
+		msg2.RemoveName(typeField);
 		CHK(msg != msg1);
 		CHK(msg != msg2);
 #if !TEST_R5
@@ -1122,10 +1122,10 @@ MimeTypeTest::FileExtensionsTest() {
 
 	CHK(msg2.AddString(fileExtField, ".data") == B_OK);
 	CHK(msg2.AddString(fileExtField, ".txt") == B_OK);
-	
+
 	CHK(msg3.AddString(fileExtField, ".data") == B_OK);
 	CHK(msg3.AddString(fileExtField, ".txt") == B_OK);
-	
+
 	CHK(msg1 == msg1);
 	CHK(msg2 == msg2);
 	CHK(msg3 == msg3);
@@ -1138,7 +1138,7 @@ MimeTypeTest::FileExtensionsTest() {
 	{
 		BMessage msg(WHAT);
 		BMimeType mime;
-		
+
 		CHK(mime.InitCheck() == B_NO_INIT);
 		CHK(mime.GetFileExtensions(&msg) != B_OK);	// R5 == B_BAD_VALUE
 		CHK(mime.SetFileExtensions(&msg) != B_OK);	// R5 == B_BAD_VALUE
@@ -1154,18 +1154,18 @@ MimeTypeTest::FileExtensionsTest() {
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK(mime.DeleteFileExtensions() != B_OK);		
+		CHK(mime.DeleteFileExtensions() != B_OK);
 		CHK(!mime.IsInstalled());
 		msg1.RemoveName(typeField);						// Clear "type" field, since SAI() just adds another
 		CHK(mime.SetFileExtensions(&msg1) == B_OK);
 		CHK(mime.IsInstalled());
 		CHK(msg != msg1);
-		CHK(mime.GetFileExtensions(&msg) == B_OK);	
+		CHK(mime.GetFileExtensions(&msg) == B_OK);
 		CHK(msg1.AddString(typeField, testType) == B_OK);	// Add in "type" field as GAI() does
 		CHK(msg == msg1);
-		CHK(mime.SetFileExtensions(NULL) == B_OK);		
+		CHK(mime.SetFileExtensions(NULL) == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(mime.GetFileExtensions(&msg) != B_OK);	
+		CHK(mime.GetFileExtensions(&msg) != B_OK);
 #endif
 	}
 	// Delete test
@@ -1179,18 +1179,18 @@ MimeTypeTest::FileExtensionsTest() {
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK(mime.DeleteFileExtensions() != B_OK);		
+		CHK(mime.DeleteFileExtensions() != B_OK);
 		CHK(!mime.IsInstalled());
 		msg1.RemoveName(typeField);						// Clear "type" field, since SAI() just adds another
 		CHK(mime.SetFileExtensions(&msg1) == B_OK);
 		CHK(mime.IsInstalled());
 		CHK(msg != msg1);
-		CHK(mime.GetFileExtensions(&msg) == B_OK);	
+		CHK(mime.GetFileExtensions(&msg) == B_OK);
 		CHK(msg1.AddString(typeField, testType) == B_OK);	// Add in "type" field as GAI() does
 		CHK(msg == msg1);
-		CHK(mime.DeleteFileExtensions() == B_OK);		
+		CHK(mime.DeleteFileExtensions() == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(mime.GetFileExtensions(&msg) != B_OK);	
+		CHK(mime.GetFileExtensions(&msg) != B_OK);
 #endif
 	}
 	// Set() with empty message
@@ -1200,14 +1200,14 @@ MimeTypeTest::FileExtensionsTest() {
 		BMessage msgEmpty(WHAT);
 		BMessage msg(WHAT);
 		CHK(msg.AddInt32("stuff", 1234) == B_OK);	// Add an extra attribute to give us something to compare with
-		
+
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
+			CHK(mime.Install() == B_OK);
 		CHK(mime.IsInstalled());
-		
+
 		// Set(empty)
 		CHK(msg != msgEmpty);
 		CHK(mime.SetFileExtensions(&msgEmpty) == B_OK);
@@ -1226,17 +1226,17 @@ MimeTypeTest::FileExtensionsTest() {
 		CHK(msgExtraSet.AddInt32("more_extras", 456) == B_OK);
 		CHK(msgExtraSet.AddInt32("more_extras", 789) == B_OK);
 		BMessage msgExtraGet(msgExtraSet);
-		
+
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
+			CHK(mime.Install() == B_OK);
 		CHK(mime.IsInstalled());
-		
+
 		// Set(extra)/Get(empty)
 		msg1.RemoveName(typeField);		// Clear "type" fields, since SFE() just adds another
-		msg2.RemoveName(typeField);	
+		msg2.RemoveName(typeField);
 		CHK(msg != msg1);
 		CHK(msg != msgExtraSet);
 		CHK(mime.SetFileExtensions(&msgExtraSet) == B_OK);
@@ -1245,13 +1245,13 @@ MimeTypeTest::FileExtensionsTest() {
 		CHK(msgExtraSet.AddString(typeField, testType) == B_OK);
 		CHK(msg == msgExtraSet);
 		CHK(msg != msg1);
-		
+
 		// Get(extra)
 		NextSubTest();
 		CHK(mime.GetFileExtensions(&msgExtraGet) == B_OK);
 		CHK(msgExtraGet == msgExtraSet);
 		CHK(msgExtraGet != msg1);
-		
+
 		// Get(extra and then some)
 		NextSubTest();
 		CHK(msgExtraGet.AddInt32("more_extras", 101112) == B_OK);
@@ -1259,24 +1259,24 @@ MimeTypeTest::FileExtensionsTest() {
 		CHK(mime.GetFileExtensions(&msgExtraGet) == B_OK);	// Reinitializes result (clearing extra fields)
 		CHK(msgExtraGet == msgExtraSet);
 		CHK(msgExtraGet != msg1);
-		
+
 	}
 	// Normal function
 	NextSubTest();
 	{
 		BMessage msg(WHAT);
 		BMimeType mime(testType);
-		
+
 		// Uninstall then reinstall to clear attributes
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
+			CHK(mime.Install() == B_OK);
 		CHK(mime.IsInstalled());
 
 		// Initial Set()/Get()
 		msg1.RemoveName(typeField);		// Clear "type" fields, since SFE() just adds another
-		msg2.RemoveName(typeField);	
+		msg2.RemoveName(typeField);
 		CHK(msg != msg1);
 		CHK(msg != msg2);
 		CHK(mime.SetFileExtensions(&msg1) == B_OK);
@@ -1290,7 +1290,7 @@ MimeTypeTest::FileExtensionsTest() {
 		NextSubTest();
 		CHK(msg.MakeEmpty() == B_OK);
 		msg1.RemoveName(typeField);		// Clear "type" fields, since SFE() just adds another
-		msg2.RemoveName(typeField);	
+		msg2.RemoveName(typeField);
 		CHK(msg != msg1);
 		CHK(msg != msg2);
 		CHK(mime.SetFileExtensions(&msg2) == B_OK);
@@ -1304,7 +1304,7 @@ MimeTypeTest::FileExtensionsTest() {
 		NextSubTest();
 		CHK(msg.MakeEmpty() == B_OK);
 		msg1.RemoveName(typeField);		// Clear "type" fields, since SFE() just adds another
-		msg2.RemoveName(typeField);	
+		msg2.RemoveName(typeField);
 		CHK(msg != msg1);
 		CHK(msg != msg2);
 #if !TEST_R5
@@ -1324,7 +1324,7 @@ MimeTypeTest::FileExtensionsTest() {
 void
 MimeTypeTest::IconTest(IconHelper &helper) {
 	BBitmap *bmp = helper.TempBitmap();
-	// Unitialized 
+	// Unitialized
 	NextSubTest();
 	{
 		BMimeType mime;
@@ -1388,17 +1388,17 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK(helper.DeleteIcon(mime) != B_OK);		
+		CHK(helper.DeleteIcon(mime) != B_OK);
 		CHK(!mime.IsInstalled());
 		CHK(helper.SetIcon(mime, helper.Bitmap2()) == B_OK);
 		CHK(mime.IsInstalled());
 		fill_bitmap(*bmp, 100);
 		CHK(*bmp != *helper.Bitmap2());
-		CHK(helper.GetIcon(mime, bmp) == B_OK);	
+		CHK(helper.GetIcon(mime, bmp) == B_OK);
 		CHK(*bmp == *helper.Bitmap2());
-		CHK(helper.DeleteIcon(mime) == B_OK);		
+		CHK(helper.DeleteIcon(mime) == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(helper.GetIcon(mime, bmp) != B_OK);	
+		CHK(helper.GetIcon(mime, bmp) != B_OK);
 #endif
 	}
 	// Invalid Bitmap Size (small -- 10x10)
@@ -1423,7 +1423,7 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		CHK(helper.SetIcon(mime, &testBmp) != B_OK);	// R5 == B_BAD_VALUE
 		CHK(helper.GetIcon(mime, bmp) == B_OK);
 		CHK(*bmp == *helper.Bitmap1());
-		CHK(*bmp != testBmp);		
+		CHK(*bmp != testBmp);
 		// Test Get()
 		fill_bitmap(testBmp, 3);
 		CHK(helper.SetIcon(mime, helper.Bitmap1()) == B_OK);
@@ -1456,7 +1456,7 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		fill_bitmap(testBmp, 3);
 		CHK(helper.SetIcon(mime, helper.Bitmap1()) == B_OK);
 		CHK(helper.GetIcon(mime, &testBmp) != B_OK);	// R5 == B_BAD_VALUE
-	}	
+	}
 	// Non-B_CMAP8 Color Depth (not really supported under R5)
 	NextSubTest();
 	{
@@ -1490,7 +1490,7 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		CHK(*bmp != testBmp);				// Shouldn't match, since SetIcon() reduces to B_CMAP8
 		CHK(*bmp == testBmp8);				// *Should* match, since it's the result of a similar reduction
 #endif
-	}	
+	}
 	// Normal Function
 	NextSubTest();
 	{
@@ -1513,19 +1513,19 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		CHK(helper.SetIcon(mime, helper.Bitmap2()) == B_OK);
 		CHK(helper.GetIcon(mime, bmp) == B_OK);
 		CHK(*bmp == *helper.Bitmap2());
-		CHK(*bmp != *helper.Bitmap1());		
-	}	
+		CHK(*bmp != *helper.Bitmap1());
+	}
 }
 
 // Icon For Type Helper Functions
 
 void
 MimeTypeTest::IconForTypeTest(IconForTypeHelper &helper) {
-	IconTest(helper);	// First run all the icon tests	
+	IconTest(helper);	// First run all the icon tests
 		// Then do some IconForType() specific tests
-		
+
 	BBitmap *bmp = helper.TempBitmap();
-		
+
 	// Invalid MIME string
 	NextSubTest();
 	{
@@ -1570,7 +1570,7 @@ MimeTypeTest::IconForTypeTest(IconForTypeHelper &helper) {
 		CHK(mime.SetIconForType(NULL, NULL, helper.Size()) == B_OK);
 		CHK(mime.GetIconForType(NULL, bmp, helper.Size()) != B_OK);	// B_ENTRY_NOT_FOUND
 		CHK(mime.GetIcon(bmp, helper.Size()) != B_OK);				// B_ENTRY_NOT_FOUND
-	}	
+	}
 }
 
 void
@@ -1603,7 +1603,7 @@ bool isMIMESupertype(const char *type) {
 	err = !type || !BMimeType::IsValid(type);
 
 	// See if the type is the same as it's supertype
-	if (!err) 
+	if (!err)
 		err = sub.SetTo(type);
 	if (!err)
 		return sub.GetSupertype(&super) == B_BAD_VALUE;
@@ -1621,7 +1621,7 @@ MimeTypeTest::VerifyInstalledTypes() {
 
 		// Get the list of installed types
 		CHK(BMimeType::GetInstalledTypes(&msg) == B_OK);
-		
+
 		// Add all the type strings to a std::set
 		std::set<std::string> typeSet;
 		SetAdapter typeAdapter(typeSet);
@@ -1632,7 +1632,7 @@ MimeTypeTest::VerifyInstalledTypes() {
 		// any files with names made of invalid characters, in case some bozo
 		// manually added such a file :-)
 		BDirectory rootDir(mimeDatabaseDir.c_str());
-		BEntry superEntry;		
+		BEntry superEntry;
 		CHK(rootDir.InitCheck() == B_OK);
 		rootDir.Rewind();
 		while (true) {
@@ -1642,20 +1642,20 @@ MimeTypeTest::VerifyInstalledTypes() {
 
 			CHK(!err);	// Any other error is unacceptable :-)
 
-			// Get the leaf name			
+			// Get the leaf name
 			char superLeafMixed[B_PATH_NAME_LENGTH+1];
 			CHK(superEntry.GetName(superLeafMixed) == B_OK);
 			std::string superLeaf;
 			to_lower(superLeafMixed, superLeaf);
-			
+
 			// We're only interested in directories, as they map to
 			// supertypes (and since they map thusly, they must also
 			// be valid MIME strings)
 			if (superEntry.IsDirectory() && BMimeType::IsValid(superLeaf.c_str())) {
-				// First, find and remove the supertype from our set				
+				// First, find and remove the supertype from our set
 				CHK(typeSet.find(superLeaf.c_str()) != typeSet.end());
 				typeSet.erase(superLeaf.c_str());
-				
+
 				// Second, iterate through all the entries in the directory.
 				// If the entry designates a valid MIME string, find it
 				// in the set and remove it.
@@ -1667,15 +1667,15 @@ MimeTypeTest::VerifyInstalledTypes() {
 					status_t err = superDir.GetNextEntry(&subEntry);
 					if (err == B_ENTRY_NOT_FOUND)
 						break;	// End of directory listing
-						
+
 					CHK(!err);	// Any other error is unacceptable :-)
-					
+
 					// Get the leaf name
 					char subLeafMixed[B_PATH_NAME_LENGTH+1];
 					CHK(subEntry.GetName(subLeafMixed) == B_OK);
 					std::string subLeaf;
 					to_lower(subLeafMixed, subLeaf);
-					
+
 					// Verify it's a valid mime string. If so, find and remove from our set
 					std::string subType = superLeaf + "/" + subLeaf;
 					if (BMimeType::IsValid(subType.c_str())) {
@@ -1684,10 +1684,10 @@ MimeTypeTest::VerifyInstalledTypes() {
 						CHK(typeSet.find(subType.c_str()) != typeSet.end());
 						typeSet.erase(subType.c_str());
 					}
-				}				
+				}
 			}
 		}
-		
+
 		// At this point our set should be empty :-) If it's not, you might check
 		// that you haven't added any superfluous files to your MIME database (like
 		// a __mime_table backup, for instance).
@@ -1701,18 +1701,18 @@ MimeTypeTest::VerifyInstalledTypes() {
 		// Get the list of installed types
 		CHK(BMimeType::GetInstalledSupertypes(&msg) == B_OK);
 //		msg.PrintToStream();
-		
+
 		// Add all the type strings to a std::set
 		std::set<std::string> typeSet;
 		SetAdapter typeAdapter(typeSet);
 		FillWithMimeTypes(typeAdapter, msg, "super_types");
-		
+
 		// Manually verify that the set of types returned by GetInstalledSupertypes()
 		// and the types present in the database are exactly the same (ignoring
 		// any files with names made of invalid characters, in case some bozo
 		// manually added such a file :-)
 		BDirectory rootDir(mimeDatabaseDir.c_str());
-		BEntry superEntry;		
+		BEntry superEntry;
 		CHK(rootDir.InitCheck() == B_OK);
 		rootDir.Rewind();
 		while (true) {
@@ -1722,12 +1722,12 @@ MimeTypeTest::VerifyInstalledTypes() {
 
 			CHK(!err);	// Any other error is unacceptable :-)
 
-			// Get the leaf name			
+			// Get the leaf name
 			char superLeafMixed[B_PATH_NAME_LENGTH+1];
 			CHK(superEntry.GetName(superLeafMixed) == B_OK);
 			std::string superLeaf;
 			to_lower(superLeafMixed, superLeaf);
-			
+
 			// We're only interested in directories, as they map to
 			// supertypes (and since they map thusly, they must also
 			// be valid MIME strings)
@@ -1735,17 +1735,17 @@ MimeTypeTest::VerifyInstalledTypes() {
 				// First, find and remove the supertype from our set
 				CHK(typeSet.find(superLeaf.c_str()) != typeSet.end());
 				typeSet.erase(superLeaf.c_str());
-				
+
 				// Second, get the list of corresponding subtypes and add them
 				// to a std::set to be used for verification
 				BMessage msg;
 				CHK(BMimeType::GetInstalledTypes(superLeaf.c_str(), &msg) == B_OK);
 //				msg.PrintToStream();
-				
+
 				std::set<std::string> subtypeSet;
 				SetAdapter subtypeAdapter(subtypeSet);
 				FillWithMimeTypes(subtypeAdapter, msg, "types");
-				
+
 				// Third, iterate through all the entries in the directory.
 				// If the entry designates a valid MIME string, find it
 				// in the subtype set and remove it.
@@ -1757,15 +1757,15 @@ MimeTypeTest::VerifyInstalledTypes() {
 					status_t err = superDir.GetNextEntry(&subEntry);
 					if (err == B_ENTRY_NOT_FOUND)
 						break;	// End of directory listing
-						
+
 					CHK(!err);	// Any other error is unacceptable :-)
-					
+
 					// Get the leaf name
 					char subLeafMixed[B_PATH_NAME_LENGTH+1];
 					CHK(subEntry.GetName(subLeafMixed) == B_OK);
 					std::string subLeaf;
 					to_lower(subLeafMixed, subLeaf);
-					
+
 					// Verify it's a valid mime string. If so, find and remove from our set
 					std::string subType = superLeaf + "/" + subLeaf;
 					if (BMimeType::IsValid(subType.c_str())) {
@@ -1773,17 +1773,17 @@ MimeTypeTest::VerifyInstalledTypes() {
 						subtypeSet.erase(subType.c_str());
 					}
 				}
-				
+
 				// At this point our subtype set should be empty :-)
-				CHK(subtypeSet.size() == 0);			
-								
+				CHK(subtypeSet.size() == 0);
+
 			}
 		}
-		
+
 		// At this point our set should be empty :-)
-		CHK(typeSet.size() == 0);			
+		CHK(typeSet.size() == 0);
 	}
-	
+
 }
 
 void
@@ -1854,9 +1854,9 @@ MimeTypeTest::ShortDescriptionTest() {
 	DescriptionTest(&BMimeType::GetShortDescription, &BMimeType::SetShortDescription,
 #if TEST_R5
 					   NULL
-#else						
+#else
 					   &BMimeType::DeleteShortDescription
-#endif					   
+#endif
 	);
 }
 
@@ -1867,9 +1867,9 @@ MimeTypeTest::LongDescriptionTest() {
 	DescriptionTest(&BMimeType::GetLongDescription, &BMimeType::SetLongDescription,
 #if TEST_R5
 					   NULL
-#else						
+#else
 					   &BMimeType::DeleteLongDescription
-#endif					   
+#endif
 	);
 }
 
@@ -1888,7 +1888,7 @@ MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc se
 		CPPUNIT_ASSERT(mime.InitCheck() == B_NO_INIT);
 		CPPUNIT_ASSERT((mime.*getDescr)(str) != B_OK);	// R5 == B_BAD_VALUE
 		CPPUNIT_ASSERT((mime.*setDescr)(str) != B_OK);	// R5 == B_BAD_VALUE
-	}	
+	}
 	// Non-installed type
 	NextSubTest();
 	{
@@ -1918,7 +1918,7 @@ MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc se
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK((mime.*getDescr)(NULL) == B_BAD_VALUE);	
+		CHK((mime.*getDescr)(NULL) == B_BAD_VALUE);
 		CHK(!mime.IsInstalled());
 		CHK((mime.*setDescr)(NULL) == B_ENTRY_NOT_FOUND);	// Trying to delete non-existent attribute
 		CHK(!mime.IsInstalled());
@@ -1943,16 +1943,16 @@ MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc se
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK((mime.*deleteDescr)() != B_OK);		
+		CHK((mime.*deleteDescr)() != B_OK);
 		CHK(!mime.IsInstalled());
 		CHK((mime.*setDescr)(testDescr) == B_OK);
 		CHK(mime.IsInstalled());
 		str[0] = 0;
-		CHK((mime.*getDescr)(str) == B_OK);	
+		CHK((mime.*getDescr)(str) == B_OK);
 		CHK(strcmp(str, testDescr) == 0);
-		CHK((mime.*deleteDescr)() == B_OK);		
+		CHK((mime.*deleteDescr)() == B_OK);
 		CHK(mime.IsInstalled());
-		CHK((mime.*getDescr)(str) != B_OK);	
+		CHK((mime.*getDescr)(str) != B_OK);
 #endif
 	}
 	// Installed type
@@ -1976,7 +1976,7 @@ MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc se
 		// Followup Set()/Get()
 		CHK((mime.*setDescr)(testDescr2) == B_OK);
 		CHK((mime.*getDescr)(str) == B_OK);
-		CHK(strcmp(str, testDescr2) == 0);		
+		CHK(strcmp(str, testDescr2) == 0);
 	}
 	// Installed Type, Description Too Long
 	NextSubTest();
@@ -1997,7 +1997,7 @@ MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc se
 		CHK((mime.*setDescr)(testDescr) == B_OK);
 		CHK((mime.*setDescr)(longDescr) != B_OK);		// R5 == B_BAD_VALUE
 		CHK((mime.*getDescr)(str) == B_OK);
-		CHK(strcmp(str, testDescr) == 0);		
+		CHK(strcmp(str, testDescr) == 0);
 	}
 
 }
@@ -2017,7 +2017,7 @@ MimeTypeTest::PreferredAppTest() {
 		CPPUNIT_ASSERT(mime.InitCheck() == B_NO_INIT);
 		CPPUNIT_ASSERT(mime.GetPreferredApp(str) != B_OK);	// R5 == B_BAD_VALUE
 		CPPUNIT_ASSERT(mime.SetPreferredApp(str) != B_OK);	// R5 == B_BAD_VALUE
-	}	
+	}
 	// Non-installed type
 	NextSubTest();
 	{
@@ -2055,12 +2055,12 @@ MimeTypeTest::PreferredAppTest() {
 		CHK(!mime.IsInstalled());
 		CHK(mime.SetPreferredApp(NULL) != B_OK);		// OBOS == B_ENTRY_NOT_FOUND
 		CHK(!mime.IsInstalled());
-		CHK(mime.SetPreferredApp(testSig) == B_OK);		
+		CHK(mime.SetPreferredApp(testSig) == B_OK);
 		CHK(mime.IsInstalled());
 		str[0] = 0;
 		CHK(mime.GetPreferredApp(str) == B_OK);
 		CHK(strcmp(str, testSig) == 0);
-		CHK(mime.SetPreferredApp(NULL) == B_OK);		
+		CHK(mime.SetPreferredApp(NULL) == B_OK);
 		CHK(mime.IsInstalled());
 		str[0] = 0;
 		CHK(mime.GetPreferredApp(str) != B_OK);			// OBOS == B_ENTRY_NOT_FOUND
@@ -2092,16 +2092,16 @@ MimeTypeTest::PreferredAppTest() {
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK(mime.DeletePreferredApp() != B_OK);		
+		CHK(mime.DeletePreferredApp() != B_OK);
 		CHK(!mime.IsInstalled());
 		CHK(mime.SetPreferredApp(testSig) == B_OK);
 		CHK(mime.IsInstalled());
 		str[0] = 0;
-		CHK(mime.GetPreferredApp(str) == B_OK);	
+		CHK(mime.GetPreferredApp(str) == B_OK);
 		CHK(strcmp(str, testSig) == 0);
-		CHK(mime.DeletePreferredApp() == B_OK);		
+		CHK(mime.DeletePreferredApp() == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(mime.GetPreferredApp(str) != B_OK);	
+		CHK(mime.GetPreferredApp(str) != B_OK);
 #endif
 	}
 	// Installed type
@@ -2124,7 +2124,7 @@ MimeTypeTest::PreferredAppTest() {
 		// Followup Set()/Get()
 		CHK(mime.SetPreferredApp(testSig2) == B_OK);
 		CHK(mime.GetPreferredApp(str) == B_OK);
-		CHK(strcmp(str, testSig2) == 0);		
+		CHK(strcmp(str, testSig2) == 0);
 	}
 	// Installed Type, Signature Too Long
 	NextSubTest();
@@ -2144,7 +2144,7 @@ MimeTypeTest::PreferredAppTest() {
 		CHK(mime.SetPreferredApp(testSig) == B_OK);
 		CHK(mime.SetPreferredApp(longSig) != B_OK);		// R5 == B_BAD_VALUE
 		CHK(mime.GetPreferredApp(str) == B_OK);
-		CHK(strcmp(str, testSig) == 0);		
+		CHK(strcmp(str, testSig) == 0);
 	}
 
 }
@@ -2172,17 +2172,17 @@ to_lower(const char *str) {
 void
 remove_type(const char *type, const char *databaseDir) {
 	CHK(type != NULL);
-	
+
 	// Since the MIME types are converted to lower case before their
 	// corresponding file is created in the database, we need to do
 	// the same
 	std::string typeLower;
-	to_lower(type, typeLower);	
+	to_lower(type, typeLower);
 
 	BEntry entry((std::string(mimeDatabaseDir) + "/" + typeLower).c_str());
-	CHK(entry.InitCheck() == B_OK);	
-	if (entry.Exists()) 
-		CHK(entry.Remove() == B_OK);	
+	CHK(entry.InitCheck() == B_OK);
+	if (entry.Exists())
+		CHK(entry.Remove() == B_OK);
 	CHK(!entry.Exists());
 }
 
@@ -2196,10 +2196,10 @@ type_exists(const char *type, const char *databaseDir) {
 	// corresponding file is created in the database, we need to do
 	// the same
 	std::string typeLower;
-	to_lower(type, typeLower);	
+	to_lower(type, typeLower);
 
 	BEntry entry((std::string(databaseDir) + "/" + typeLower).c_str());
-	CHK(entry.InitCheck() == B_OK);	
+	CHK(entry.InitCheck() == B_OK);
 	return entry.Exists();
 }
 
@@ -2242,23 +2242,23 @@ MimeTypeTest::InstallDeleteTest() {
 		CHK(!type_exists(testType));
 		CHK(!mime.IsInstalled());
 	}
-	
+
 }
 
 void FillWithMimeTypes(ContainerAdapter &container, BMessage &typeMessage, const char* fieldName) {
 	type_code type;
 	int32 count;
 	status_t err;
-			
-//	typeMessage.PrintToStream();		
-	
+
+//	typeMessage.PrintToStream();
+
 	// Get a count of types in the message
 	err = typeMessage.GetInfo(fieldName, &type, &count);
 	if (err == B_NAME_NOT_FOUND)
 		count = 0;			// No such types installed in the database! :-)
 	else
 		CHK(err == B_OK);	// Any other error is unacceptable
-				
+
 	// Add them all to the container, after converting to lowercase and
 	// checking validity
 	for (int i = 0; i < count; i++) {
@@ -2293,7 +2293,7 @@ types_fields_are_identical(const BMessage &msg1, const BMessage &msg2)
 		result &= to_lower(str1) == to_lower(str2);
 		i++;
 	}
-	return result;			
+	return result;
 }
 
 bool
@@ -2304,7 +2304,7 @@ is_supporting_app_for_all_types_in_message(const char *app, const BMessage &msg)
 	for (int i = 0; msg.FindString(typesField, i, &str) == B_OK; i++) {
 		BMimeType supportedType(str);
 		BMessage appMsg;
-		
+
 		// Get a list of supporting apps
 		CHK(supportedType.InitCheck() == B_OK);
 		CHK(supportedType.GetSupportingApps(&appMsg) == B_OK);
@@ -2312,7 +2312,7 @@ is_supporting_app_for_all_types_in_message(const char *app, const BMessage &msg)
 //		cout << str << endl;
 //		cout << "-----------------------------------------------------------" << endl;
 //		appMsg.PrintToStream();
-		
+
 		// Look for our supporting app
 		int32 directlySupportingAppsCount;
 		CHK(appMsg.FindInt32("be:sub", &directlySupportingAppsCount) == B_OK);
@@ -2356,21 +2356,21 @@ MimeTypeTest::SupportedTypesTest() {
 	CHK(msg3 == msg3);
 	CHK(msg1a != msg2);
 	CHK(msg1a != msg3);
-	CHK(msg1a != msgEmpty);	
+	CHK(msg1a != msgEmpty);
 
 	// Uninitialized
 	NextSubTest();
 	{
 		BMimeType mime;
 		BMessage msg;
-		
+
 		CHK(mime.InitCheck() == B_NO_INIT);
 		CHK(mime.SetSupportedTypes(&msg, true) != B_OK);
 		CHK(mime.SetSupportedTypes(&msg, false) != B_OK);
 		CHK(mime.GetSupportedTypes(&msg) != B_OK);
-		CHK(mime.DeleteSupportedTypes() != B_OK);		
+		CHK(mime.DeleteSupportedTypes() != B_OK);
 	}
-	
+
 	// Test that deleting a type from the database also removes
 	// the app as a supporting app for all types it previously
 	// supported
@@ -2388,15 +2388,15 @@ MimeTypeTest::SupportedTypesTest() {
 		// Verify that each of those types now lists the
 		// type as a directly supporting app
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg3) == true);
-		
+
 		// Delete the type
 		CHK(mime.Delete() == B_OK);
-		
+
 		// Verify that each of those types no longer lists the
 		// type as a directly supporting app
-		CHK(is_supporting_app_for_all_types_in_message(testType, msg3) == false);		
+		CHK(is_supporting_app_for_all_types_in_message(testType, msg3) == false);
 	}
-	
+
 	// Test that SetSupportedTypes(..., false) does not remove the app as a supporting
 	// app for newly unsupported types, while SetSupportedTypes(..., true) does. Also
 	// test that supported types stranded by multiple sequential calls to
@@ -2412,35 +2412,35 @@ MimeTypeTest::SupportedTypesTest() {
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		if (!mime.IsInstalled())
-			CHK(mime.Install() == B_OK);			
+			CHK(mime.Install() == B_OK);
 		CHK(mime.IsInstalled());
 
 		// Set a list of supported types
 		CHK(mime.SetSupportedTypes(&msg3, true) == B_OK);
 		CHK(mime.GetSupportedTypes(&msg) == B_OK);
-		CHK(types_fields_are_identical(msg3, msg) == true);		
-		CHK(types_fields_are_identical(msg2, msg) == false);		
-		CHK(types_fields_are_identical(msg1a, msg) == false);		
-		CHK(types_fields_are_identical(msg1b, msg) == false);		
-		CHK(types_fields_are_identical(msgEmpty, msg) == false);		
-		
+		CHK(types_fields_are_identical(msg3, msg) == true);
+		CHK(types_fields_are_identical(msg2, msg) == false);
+		CHK(types_fields_are_identical(msg1a, msg) == false);
+		CHK(types_fields_are_identical(msg1b, msg) == false);
+		CHK(types_fields_are_identical(msgEmpty, msg) == false);
+
 		// Verify that each of those types now lists the
 		// type as a directly supporting app
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg3) == true);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg2) == true);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg1a) == false);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg1b) == true);
-		
+
 		// Set (no sync) to a new list of supported types containing one
 		// fewer type than the original list
 		CHK(mime.SetSupportedTypes(&msg2, false) == B_OK);
 		CHK(mime.GetSupportedTypes(&msg) == B_OK);
-		CHK(types_fields_are_identical(msg3, msg) == false);		
-		CHK(types_fields_are_identical(msg2, msg) == true);		
-		CHK(types_fields_are_identical(msg1a, msg) == false);		
-		CHK(types_fields_are_identical(msg1b, msg) == false);		
-		CHK(types_fields_are_identical(msgEmpty, msg) == false);		
-		
+		CHK(types_fields_are_identical(msg3, msg) == false);
+		CHK(types_fields_are_identical(msg2, msg) == true);
+		CHK(types_fields_are_identical(msg1a, msg) == false);
+		CHK(types_fields_are_identical(msg1b, msg) == false);
+		CHK(types_fields_are_identical(msgEmpty, msg) == false);
+
 		// Verify that the app is still listed as a supporting app for
 		// *all* of the originally supported types (even the one no longer
 		// listed as being supported)
@@ -2448,17 +2448,17 @@ MimeTypeTest::SupportedTypesTest() {
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg2) == true);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg1a) == false);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg1b) == true);
-		
+
 		// Set (no sync) to a new list of supported types containing an
 		// entirely new, never supported type
 		CHK(mime.SetSupportedTypes(&msg1a, false) == B_OK);
 		CHK(mime.GetSupportedTypes(&msg) == B_OK);
-		CHK(types_fields_are_identical(msg3, msg) == false);		
-		CHK(types_fields_are_identical(msg2, msg) == false);		
-		CHK(types_fields_are_identical(msg1a, msg) == true);		
-		CHK(types_fields_are_identical(msg1b, msg) == false);		
-		CHK(types_fields_are_identical(msgEmpty, msg) == false);		
-		
+		CHK(types_fields_are_identical(msg3, msg) == false);
+		CHK(types_fields_are_identical(msg2, msg) == false);
+		CHK(types_fields_are_identical(msg1a, msg) == true);
+		CHK(types_fields_are_identical(msg1b, msg) == false);
+		CHK(types_fields_are_identical(msgEmpty, msg) == false);
+
 		// Verify that the app is still listed as a supporting app for
 		// *all* of the originally supported types (none of which are
 		// supported any longer) as well as the newly supported type.
@@ -2472,12 +2472,12 @@ MimeTypeTest::SupportedTypesTest() {
 		// removed.
 		CHK(mime.SetSupportedTypes(&msg1b, false) == B_OK);
 		CHK(mime.GetSupportedTypes(&msg) == B_OK);
-		CHK(types_fields_are_identical(msg3, msg) == false);		
-		CHK(types_fields_are_identical(msg2, msg) == false);		
-		CHK(types_fields_are_identical(msg1a, msg) == false);		
-		CHK(types_fields_are_identical(msg1b, msg) == true);		
-		CHK(types_fields_are_identical(msgEmpty, msg) == false);		
-		
+		CHK(types_fields_are_identical(msg3, msg) == false);
+		CHK(types_fields_are_identical(msg2, msg) == false);
+		CHK(types_fields_are_identical(msg1a, msg) == false);
+		CHK(types_fields_are_identical(msg1b, msg) == true);
+		CHK(types_fields_are_identical(msgEmpty, msg) == false);
+
 		// Verify that the app is still listed as a supporting app for
 		// *all* of the originally supported types (only one of which is
 		// supported any longer) as well as the previous supported type.
@@ -2490,24 +2490,24 @@ MimeTypeTest::SupportedTypesTest() {
 		// one type from the original list of supported types)
 		CHK(mime.SetSupportedTypes(&msg1b, true) == B_OK);
 		CHK(mime.GetSupportedTypes(&msg) == B_OK);
-		CHK(types_fields_are_identical(msg3, msg) == false);		
-		CHK(types_fields_are_identical(msg2, msg) == false);		
-		CHK(types_fields_are_identical(msg1a, msg) == false);		
-		CHK(types_fields_are_identical(msg1b, msg) == true);		
-		CHK(types_fields_are_identical(msgEmpty, msg) == false);		
+		CHK(types_fields_are_identical(msg3, msg) == false);
+		CHK(types_fields_are_identical(msg2, msg) == false);
+		CHK(types_fields_are_identical(msg1a, msg) == false);
+		CHK(types_fields_are_identical(msg1b, msg) == true);
+		CHK(types_fields_are_identical(msgEmpty, msg) == false);
 
 		// Verify that the app is now only listed as a supporting app for the
 		// most recently supported type.
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg3) == false);
-		CHK(is_supporting_app_for_all_types_in_message(testType, msg2) == false);		
+		CHK(is_supporting_app_for_all_types_in_message(testType, msg2) == false);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg1a) == false);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg1b) == true);
-		
+
 		// Test SetSupportedTypes(NULL, false) for shits and giggles
 		CHK(mime.SetSupportedTypes(NULL, false) == B_OK);
 		CHK(mime.GetSupportedTypes(&msg) == B_ENTRY_NOT_FOUND);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg3) == false);
-		CHK(is_supporting_app_for_all_types_in_message(testType, msg2) == false);		
+		CHK(is_supporting_app_for_all_types_in_message(testType, msg2) == false);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg1a) == false);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg1b) == true);
 
@@ -2515,12 +2515,12 @@ MimeTypeTest::SupportedTypesTest() {
 		// apps mappings, even if the supported types attribute has already
 		// been removed.
 		CHK(mime.SetSupportedTypes(NULL, true) == B_ENTRY_NOT_FOUND);
-		CHK(mime.GetSupportedTypes(&msg) == B_ENTRY_NOT_FOUND);		
+		CHK(mime.GetSupportedTypes(&msg) == B_ENTRY_NOT_FOUND);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg3) == false);
-		CHK(is_supporting_app_for_all_types_in_message(testType, msg2) == false);		
+		CHK(is_supporting_app_for_all_types_in_message(testType, msg2) == false);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg1a) == false);
 		CHK(is_supporting_app_for_all_types_in_message(testType, msg1b) == false);
-	}	
+	}
 #endif	// #if TEST_R5 else
 }
 
@@ -2553,13 +2553,13 @@ MimeTypeTest::SupportingAppsTest() {
 		msg.PrintToStream();
 	} */
 	NextSubTest();
-	if (true)	
+	if (true)
 	{
 		std::set<std::string> typeList;							// Stores all installed MIME types
 		std::set<std::string> appList;							// Stores all installed application subtypes
 		std::map< std::string, std::set<std::string> > typeAppMap;	// Stores mapping of types to apps that support them
 		std::map< std::string, std::set<std::string> > fakeTypeAppMap;	// Used to keep timing info for R5 and OBOS tests orthogonal
-		
+
 		// Get a list of all the types in the database
 		{
 			BMessage msg;
@@ -2575,7 +2575,7 @@ MimeTypeTest::SupportingAppsTest() {
 			SetAdapter appAdapter(appList);
 			FillWithMimeTypes(appAdapter, msg, "types");
 		}
-		
+
 		// For each app in the database, manually get a list of the MIME types
 		// it supports by reading its META:FILE_TYPES attribute from the database,
 		// and add the app to the type->app map for each such type
@@ -2584,31 +2584,31 @@ MimeTypeTest::SupportingAppsTest() {
 			for (i = appList.begin(); i != appList.end(); i++) {
 				// Grab the next application
 				std::string app = *i;
-				
+
 				// The leaf is all we're interested in -- it's the subtype
 //				CHK(StorageKit::split_path(app.c_str(), dir, leaf) == B_OK);
 				std::string appFile = std::string(mimeDatabaseDir) + "/" + app;
 //				printf("'%s'\n", appFile.c_str());
 				BNode node(appFile.c_str());
 				CHK(node.InitCheck() == B_OK);
-				
+
 				// Find out how much data there is in the META:FILE_TYPES attribute
 				// (assuming it even exists, which it may not...)
 				attr_info info;
 				if (node.GetAttrInfo("META:FILE_TYPES", &info) == B_OK) {
 //					printf("attr_info: type == %lx, size == %lld\n", info.type, info.size);
 					// Attribute exists, so alloc a buffer and read it
-					char *buffer = new char[info.size+1];								
+					char *buffer = new char[info.size+1];
 					CHK(node.ReadAttr("META:FILE_TYPES", B_MESSAGE_TYPE, 0, buffer, info.size) == info.size);
 					BMessage msg;
 					if (msg.Unflatten(buffer) == B_OK) {
 //						msg.PrintToStream();
-						
+
 						// Fill up a list with all the supported types
 						std::set<std::string> supportList;
 						SetAdapter supportAdapter(supportList);
 						FillWithMimeTypes(supportAdapter, msg, "types");
-						
+
 						// For each type, add the current application as a supporting
 						// app in our type->apps map
 						for (std::set<std::string>::iterator type = supportList.begin();
@@ -2626,14 +2626,14 @@ MimeTypeTest::SupportingAppsTest() {
 						printf("Warning: Unable to unflatten META:FILE_TYPES attribute for '%s' type.\n",
 							app.c_str());
 					}
-				
+
 					delete buffer;
-								
+
 				}
 			}
 		}
 
-//#if !TEST_R5		
+//#if !TEST_R5
 		// Now, add in all the types listed in MIME_DB_DIR/__mime_table
 		{
 			BEntry entry((std::string(mimeDatabaseDir) + "/__mime_table").c_str());
@@ -2645,9 +2645,9 @@ MimeTypeTest::SupportingAppsTest() {
 				CHK(msg.Unflatten(&file) == B_OK);
 
 //				msg.PrintToStream();
-				
-				char *type; 
-				uint32 typeVal; 
+
+				char *type;
+				uint32 typeVal;
 				int32 count;
 				for (int i = 0; msg.GetInfo(B_STRING_TYPE, i, &type, &typeVal, &count) == B_OK; i++ ) {
 					// Add all the associated applications. Interestingly (or maybe not),
@@ -2657,17 +2657,17 @@ MimeTypeTest::SupportingAppsTest() {
 					const char *app;
 					for (int j = 0; j < count; j++) {
 						CHK(msg.FindString(type, j, &app) == B_OK);
-#if TEST_R5		
+#if TEST_R5
 						typeAppMap[type].insert(to_lower(app));
 #else
 						fakeTypeAppMap[type].insert(to_lower(app));
 #endif
-					}					
+					}
 				}
 			}
 		}
 //#endif
-		
+
 		// For each installed type, get a list of the supported apps, and
 		// verify that the list matches the list we generated. Also check
 		// that the list of apps for the type's supertype (if it exists)
@@ -2679,7 +2679,7 @@ MimeTypeTest::SupportingAppsTest() {
 			CHK(mime.InitCheck() == B_OK);
 //			printf("------------------------------------------------------------\n");
 //			printf("%s\n", type.c_str());
-			
+
 			// Get the set of supporting apps for this type (and its supertype, if
 			// it's not a supertype itself) that we discovered by manually culling
 			// the database
@@ -2687,7 +2687,7 @@ MimeTypeTest::SupportingAppsTest() {
 			BMimeType superType;
 			if (mime.GetSupertype(&superType) == B_OK)
 				appSetSuper = typeAppMap[superType.Type()];		// Copy the supertype
-/*				
+/*
 			printf("sub.size == %ld\n", appSet.size());
 			std::set<std::string>::iterator i;
 			for (i = appSet.begin(); i != appSet.end(); i++) {
@@ -2710,14 +2710,14 @@ MimeTypeTest::SupportingAppsTest() {
 			std::queue<std::string> appList;
 			QueueAdapter appAdapter(appList);
 			FillWithMimeTypes(appAdapter, msg, "applications");
-						
+
 //			msg.PrintToStream();
-						
-			
+
+
 		}
 	}
 }
-	
+
 void
 MimeTypeTest::WildcardAppsTest() {
 	// NULL param
@@ -2726,14 +2726,14 @@ MimeTypeTest::WildcardAppsTest() {
 #if TEST_R5
 		CHK(BMimeType::GetWildcardApps(NULL) == B_OK);			// R5 == B_OK (???)
 #else
-		CHK(BMimeType::GetWildcardApps(NULL) == B_BAD_VALUE);		
+		CHK(BMimeType::GetWildcardApps(NULL) == B_BAD_VALUE);
 #endif
 	}
 	// Normal function (compare to BMimeType("application/octet-stream").GetSupportingApps())
 	NextSubTest();
 	{
 		BMessage msg1, msg2;
-		CHK(BMimeType::GetWildcardApps(&msg1) == B_OK);		
+		CHK(BMimeType::GetWildcardApps(&msg1) == B_OK);
 		BMimeType mime(wildcardType);
 		CHK(mime.InitCheck() == B_OK);
 		CHK(mime.GetSupportingApps(&msg2) == B_OK);
@@ -2837,7 +2837,7 @@ MimeTypeTest::InitTest()
 		CHK(type.InitCheck() == B_NO_INIT);
 		CHK(type.Type() == NULL);
 	}
-	
+
 	// SetTo()
 	// valid type
 	NextSubTest();
@@ -2929,7 +2929,7 @@ MimeTypeTest::InitTest()
 		CHK(type.InitCheck() == B_NO_INIT);
 		CHK(type.Type() == NULL);
 	}
-	
+
 	// reinitialization
 	NextSubTest();
 	{
@@ -3187,7 +3187,7 @@ MimeTypeTest::MonitoringTest()
 	// tests:
 	// * Start/StopWatching()
 	// * updates
-	
+
 	// test:
 	// * StartWatching()
 	// * change something, check message queue (not empty)
@@ -3544,7 +3544,7 @@ MimeTypeTest::UpdateMimeInfoTest()
 //	cout << "begin..." << endl;
 //	CHK(update_mime_info(NULL, true, true, false) == B_OK);
 //	cout << "end..." << endl;
-	
+
 	// tests:
 	// * update_mime_info()
 
@@ -3835,7 +3835,7 @@ public:
 					if (!buffer)
 						error = B_NO_MEMORY;
 				}
-				if (!error) 
+				if (!error)
 					error = msg.Flatten(buffer, msg.FlattenedSize());
 				if (!error)
 					error = resources.AddResource(B_MESSAGE_TYPE, 1, buffer,
@@ -4159,7 +4159,7 @@ MimeTypeTest::CreateAppMetaMimeTest()
 	// non-existing file
 	CHK(create_app_meta_mime(files[0].name.c_str(), false, true, false)
 		== B_OK);
-		
+
 }
 
 // CheckIconData
@@ -4300,10 +4300,10 @@ MimeTypeTest::SnifferRuleTest()
 // not invalid priorities. Thus our checker chokes on these rules,
 // whilest R5's does not
 #if TEST_R5
-		{ "1E25 ('ABCD')", NULL },	
+		{ "1E25 ('ABCD')", NULL },
 		{ "1e25 ('ABCD')", NULL },
 #else
-		{ "1E25 ('ABCD')", "Sniffer pattern error: invalid priority" },	
+		{ "1E25 ('ABCD')", "Sniffer pattern error: invalid priority" },
 		{ "1e25 ('ABCD')", "Sniffer pattern error: invalid priority" },
 #endif
 
@@ -4377,7 +4377,7 @@ MimeTypeTest::SnifferRuleTest()
 			"Sniffer pattern error: missing pattern"
 #endif
 		},
-		{ "0.5 [0:3] ('ABCD' | 'abcd' | [13] 'EFGH')", 
+		{ "0.5 [0:3] ('ABCD' | 'abcd' | [13] 'EFGH')",
 		  	"Sniffer pattern error: missing pattern" },
 		{ "0.5('ABCD'|'abcd'|[13]'EFGH')",
 		  	"Sniffer pattern error: missing pattern" },
@@ -4426,7 +4426,7 @@ MimeTypeTest::SnifferRuleTest()
 			"Sniffer pattern error: expecting '|', ')', or possibly '&'"
 #endif
 		},
-		
+
 		// Miscellaneous tests designed to hit every remaining
 		// relevant "throw new Err()" statement in our scanner.
 		// R5 versions may come later, but I don't really see any
@@ -4451,7 +4451,7 @@ MimeTypeTest::SnifferRuleTest()
 		{ "+1.e", "Sniffer pattern error: incomplete extended-notation floating point number" },
 		{ "-1.0e", "Sniffer pattern error: incomplete extended-notation floating point number" },
 		{ "+1.0e", "Sniffer pattern error: incomplete extended-notation floating point number" },
-		
+
 		{ "0.0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
 		{ "1.0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
 		{ ".0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
@@ -4463,7 +4463,7 @@ MimeTypeTest::SnifferRuleTest()
 		{ "+1.e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
 		{ "-1.0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
 		{ "+1.0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
-		
+
 		{ "0.0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
 		{ "1.0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
 		{ ".0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
@@ -4481,20 +4481,20 @@ MimeTypeTest::SnifferRuleTest()
 		{ "'Escape!! \\", "Sniffer pattern error: incomplete escape sequence" },
 
 		{ "\\x", "Sniffer pattern error: incomplete escaped hex code" },
-		{ "\\xNotAHexCode", "Sniffer pattern error: incomplete escaped hex code" },		
+		{ "\\xNotAHexCode", "Sniffer pattern error: incomplete escaped hex code" },
 		{ "\\xAlsoNotAHexCode", "Sniffer pattern error: incomplete escaped hex code" },
 		{ "\\x0", "Sniffer pattern error: incomplete escaped hex code" },
-		
+
 		{ "1.0 (\\377)", NULL },
 		{ "\\400", "Sniffer pattern error: invalid octal literal (octals must be between octal 0 and octal 377 inclusive)" },
 		{ "\\777", "Sniffer pattern error: invalid octal literal (octals must be between octal 0 and octal 377 inclusive)" },
 		{ "1.0 (\\800)", NULL },
-		
+
 		{ NULL, "Sniffer pattern error: NULL pattern" },
 
 		{ "-2", "Sniffer pattern error: invalid priority" },
 		{ "+2", "Sniffer pattern error: invalid priority" },
-		
+
 		{ "1.0", "Sniffer pattern error: missing expression" },
 #endif	// !TEST_R5
 
@@ -4507,7 +4507,7 @@ MimeTypeTest::SnifferRuleTest()
 //		{ "1E-25 ('ABCD')", NULL },
 #endif
 	};
-	
+
 	const int testCaseCount = sizeof(testCases) / sizeof(test_case);
 	BMimeType type;
 	CHK(type.SetTo(testType) == B_OK);
@@ -4645,7 +4645,7 @@ public:
 		if (!error && metaType.length() > 0) {
 			error = file.WriteAttr("META:TYPE", B_STRING_TYPE, 0, metaType.c_str(),
 				metaType.length()+1);
-			error = error == (ssize_t)(metaType.length()+1) ? B_OK : error;		
+			error = error == (ssize_t)(metaType.length()+1) ? B_OK : error;
 		}
 		return error;
 	}
@@ -4795,7 +4795,7 @@ printf("type: %s, should be: %s (file == '%s')\n", type.Type(), realType, filena
 #endif
 		// abstract entry_ref
 		CHK(get_ref_for_path(filename.c_str(), &ref) == B_OK);
-		// R5: B_NAME_NOT_FOUND, OBOS: 
+		// R5: B_NAME_NOT_FOUND, OBOS:
 		CHK(BMimeType::GuessMimeType(&ref, &type) != B_OK);
 	}
 
