@@ -54,7 +54,7 @@ ZlibDecompressor::Init()
 	fStream.adler = 0;
 	fStream.reserved = 0;
 
-	int zlibError = inflateInit2(&fStream, 32 + MAX_WBITS);
+	int zlibError = inflateInit(&fStream);
 	if (zlibError != Z_OK)
 		return TranslateZlibError(zlibError);
 
