@@ -8,8 +8,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/storage/Resources.h	hrev45283
- *		src/kits/storage/Resources.cpp	hrev45283
+ *		headers/os/storage/Resources.h	hrev47402
+ *		src/kits/storage/Resources.cpp	hrev47402
  */
 
 
@@ -37,6 +37,8 @@
 	never be invalid. It always serves as a resources container, even if
 	it is not associated with a file. It is always possible to WriteTo()
 	the resources BResources contains to a file (a valid one of course).
+
+	\since BeOS R3
 */
 
 
@@ -45,6 +47,8 @@
 	\brief Creates an uninitialized BResources object.
 
 	\see SetTo()
+
+	\since BeOS R3
 */
 
 
@@ -64,6 +68,8 @@
 
 	\param file The file to create a BResource object from.
 	\param clobber If \c true, the data of the file are erased.
+
+	\since BeOS R3
 */
 
 
@@ -80,6 +86,8 @@
 	\param path A path referring to the file to create a BResource object
 	       from.
 	\param clobber If \c true, the data of the file are erased.
+
+	\since Haiku R1
 */
 
 
@@ -96,6 +104,8 @@
 	\param ref An entry_ref referring to the file to create a BResource object
 	       from.
 	\param clobber If \c true, the data of the file are erased.
+
+	\since Haiku R1
 */
 
 
@@ -105,11 +115,13 @@
 
 	Sync() is first called to make sure that the changes are written back to
 	the file.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name SetTo methods
+	\name SetTo
 
 	What happens, if \a clobber is \c true, depends on the type of the file.
 	If the file is capable of containing resources, that is, is a resource
@@ -141,6 +153,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a file was \c NULL or uninitialized.
 	\retval B_ERROR Failed to initialize the object.
+
+	\since BeOS R3
 */
 
 
@@ -158,6 +172,8 @@
 	\retval B_BAD_VALUE \a path was \c NULL.
 	\retval B_ENTRY_NOT_FOUND The file referenced by \a path couldn't be found.
 	\retval B_ERROR Failed to initialize the object.
+
+	\since Haiku R1
 */
 
 
@@ -175,6 +191,8 @@
 	\retval B_BAD_VALUE \a ref was \c NULL.
 	\retval B_ENTRY_NOT_FOUND The file referenced by \a ref couldn't be found.
 	\retval B_ERROR Failed to initialize the object.
+
+	\since Haiku R1
 */
 
 
@@ -192,6 +210,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND The file referenced by \a ref couldn't be found.
 	\retval B_ERROR Failed to initialize the object.
+
+	\since Haiku R1
 */
 
 
@@ -215,6 +235,8 @@
 	\retval B_BAD_VALUE \a codeOrDataPointer was \c NULL.
 	\retval B_ENTRY_NOT_FOUND The image or the file couldn't be found.
 	\retval B_ERROR Failed to initialize the object.
+
+	\since Haiku R1
 */
 
 
@@ -222,7 +244,7 @@
 
 
 /*!
-	\name Constructor helper methods
+	\name Constructor Helpers
 */
 
 
@@ -237,6 +259,8 @@
 	written back to the file.
 
 	\note This method is not found in BeOS R5.
+
+	\since Haiku R1
 */
 
 
@@ -253,6 +277,8 @@
 
 	\return \c B_OK if the objects is properly initialized,
 	        \c B_NO_MEMORY otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -260,7 +286,7 @@
 
 
 /*!
-	\name LoadResources methods
+	\name LoadResources
 
 	A resource is loaded into memory only once. A second call with the same
 	parameters will result in the same pointer. The BResources object is the
@@ -283,8 +309,10 @@
 	       shall be written.
 
 	\return A pointer to the resource data if everything went fine, or
-			\c NULL if the file does not have a resource that matches the
-			parameters or an error occurred.
+	        \c NULL if the file does not have a resource that matches the
+	        parameters or an error occurred.
+
+	\since BeOS R4
 */
 
 
@@ -303,8 +331,10 @@
 		   shall be written.
 
 	\return A pointer to the resource data if everything went fine, or
-			\c NULL if the file does not have a resource that matches the
-			parameters or an error occurred.
+	        \c NULL if the file does not have a resource that matches the
+	        parameters or an error occurred.
+
+	\since BeOS R4
 */
 
 
@@ -321,6 +351,8 @@
 	         of errors that occurred.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_FILE The resource map is empty???
+
+	\since BeOS R4
 */
 
 
@@ -332,6 +364,8 @@
 	\brief Gets a reference to the internal BFile object.
 
 	\return A reference to the internal BFile object.
+
+	\since BeOS R4
 */
 
 
@@ -357,6 +391,8 @@
 	\retval B_FILE_ERROR A file error occurred.
 	\retval B_IO_ERROR An error occurred while writing the resources.
 	\retval B_NOT_ALLOWED The file was opened read only.
+
+	\since BeOS R4
 */
 
 
@@ -373,6 +409,8 @@
 	\retval B_BAD_VALUE \a fromFile was \c NULL.
 	\retval B_FILE_ERROR A file error occurred.
 	\retval B_IO_ERROR An error occurred while writing the resources.
+
+	\since BeOS R4
 */
 
 
@@ -389,6 +427,8 @@
 	\param file The file that the resources shall be written to.
 
 	\return \c B_OK if everything went fine or an error code otherwise.
+
+	\since BeOS R4
 */
 
 
@@ -416,6 +456,8 @@
 	\retval B_FILE_ERROR A file error occurred.
 	\retval B_NO_MEMORY Not enough memory for the operation.
 	\retval B_NOT_ALLOWED The file was opened read only.
+
+	\since BeOS R3
 */
 
 
@@ -429,6 +471,8 @@
 
 	\return \c true if the file contains a matching resource,
 	        \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -442,6 +486,8 @@
 
 	\return \c true, if the file contains a matching resource,
 	        \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -462,6 +508,8 @@
 
 	\return \c true, if a matching resource could be found,
 	        \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -482,6 +530,8 @@
 
 	\return \c true, if a matching resource could be found,
 	        \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -500,6 +550,8 @@
 
 	\return \c true, if a matching resource could be found,
 	        \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -518,6 +570,8 @@
 
 	\return \c true, if a matching resource could be found,
 	        \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -540,6 +594,8 @@
 
 	\return \c true, if a matching resource could be found,
 	        \c false otherwise.
+
+	\since BeOS R4
 */
 
 
@@ -557,6 +613,8 @@
 	\retval B_ERROR An error occurred while removing the resource.
 	\retval B_FILE_ERROR A file error occurred.
 	\retval B_NOT_ALLOWED The file was opened read only.
+
+	\since BeOS R4
 */
 
 
@@ -573,11 +631,13 @@
 	\retval B_ERROR An error occurred while removing the resource.
 	\retval B_FILE_ERROR A file error occurred.
 	\retval B_NOT_ALLOWED The file was opened read only.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Deprecated methods
+	\name Deprecated Methods
 
 	These methods are deprecated and should not be used as there is a better
 	method. See the method description for the replacement method to use.
@@ -603,7 +663,7 @@
 	\param id The ID of the resource to write data to.
 	\param data The data to be written.
 	\param offset The byte offset relative to the beginning of the resource at
-		   which the data shall be written.
+	       which the data shall be written.
 	\param length The size of the data to be written.
 
 	\return A status code.
@@ -612,6 +672,8 @@
 	        identify an existing resource.
 	\retval B_ERROR Error writing data.
 	\retval B_NO_MEMORY Not enough memory for this operation.
+
+	\since BeOS R3
 */
 
 
@@ -632,7 +694,7 @@
 	\param id The ID of the resource to be read.
 	\param data A pointer to a buffer into which the data shall be read
 	\param offset The byte offset relative to the beginning of the resource
-		   from which the data shall be read.
+	       from which the data shall be read.
 	\param length The size of the data to be read.
 
 	\return A status code.
@@ -641,6 +703,8 @@
 	        identify an existing resource.
 	\retval B_ERROR Error reading data.
 	\retval B_NO_MEMORY Not enough memory for this operation.
+
+	\since BeOS R3
 */
 
 
@@ -658,10 +722,12 @@
 	\param type The type of the resource to find.
 	\param id The ID of the resource to find.
 	\param lengthFound A pointer to a variable into which the size of the
-		   resource data shall be written.
+	       resource data shall be written.
 
 	\return A pointer to the resource data if everything went fine or \c NULL
 	        if an error occurred.
+
+	\since BeOS R3
 */
 
 
@@ -679,10 +745,12 @@
 	\param type The type of the resource to find.
 	\param name The name of the resource to find.
 	\param lengthFound A pointer to a variable into which the size of the
-		   resource data shall be written.
+	       resource data shall be written.
 
 	\return A pointer to the resource data if everything went fine or \c NULL
 	        if an error occurred.
+
+	\since BeOS R3
 */
 
 

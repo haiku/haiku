@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/storage/Entry.h  hrev43528
- *		src/kits/storage/Entry.cpp  hrev43528
+ *		headers/os/storage/Entry.h	hrev47402
+ *		src/kits/storage/Entry.cpp	hrev47402
  */
 
 
@@ -45,28 +45,34 @@
 	the old name (the upside in this case is that abstract entries may be
 	represented by entry_refs without preallocating an internal filesystem node
 	for them).
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn entry_ref::entry_ref()
 	\brief Creates an uninitialized entry_ref object.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn entry_ref::entry_ref(dev_t dev, ino_t dir, const char* name)
 	\brief Creates an entry_ref object initialized to the given file name in
-		the given directory on the given device.
+	       the given directory on the given device.
 
 	\a name may refer to either a pre-existing file in the given directory, or
 	a non-existent file. No explicit checking is done to verify validity of the
 	given arguments, but later use of the entry_ref will fail if \p dev is not
 	a valid device or \a dir is a not a directory on \p dev.
 
-	\param dev the device on which the entry's parent directory resides
-	\param dir the directory in which the entry resides
-	\param name the leaf name of the entry, which is not required to exist
+	\param dev The \a device on which the entry's parent directory resides.
+	\param dir The directory in which the entry resides.
+	\param name The leaf name of the entry, which is not required to exist.
+
+	\since BeOS R3
 */
 
 
@@ -75,41 +81,51 @@
 	\brief Returns a copy of the passed in entry_ref object.
 
 	\param ref A reference to an entry_ref to copy.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn entry_ref::~entry_ref()
 	\brief Destroys the object and frees the storage allocated for the leaf
-		name, if necessary.
+	       name, if necessary.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t entry_ref::set_name(const char* name)
 	\brief Set the entry_ref's leaf name, freeing the storage allocated for any
-		previous name and then making a copy of the new name.
+	       previous name and then making a copy of the new name.
 
 	\param name Pointer to a null-terminated string containing the new name for
-		the entry. May be \c NULL.
+	       the entry. May be \c NULL.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool entry_ref::operator==(const entry_ref& ref) const
 	\brief Compares the entry_ref object with the passed in entry_ref,
-		returning \c true if they are equal.
+	       returning \c true if they are equal.
 
 	\returns \c true if he entry_refs are equal, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool entry_ref::operator!=(const entry_ref& ref) const
 	\brief Compares the entry_ref object with the passed in entry_ref,
-		returning \c true if they are NOT equal.
+	       returning \c true if they are NOT equal.
 
 	\returns \c true if the entry_refs are NOT equal, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -120,6 +136,8 @@
 	\param ref The entry_ref to copy.
 
 	\returns A pointer to the resulting entry_ref copy.
+
+	\since BeOS R5
 */
 
 
@@ -128,6 +146,7 @@
 
 	The device id of the storage device on which the entry resides.
 
+	\since BeOS R3
 */
 
 
@@ -135,6 +154,8 @@
 	\var ino_t entry_ref::directory
 
 	The inode number of the directory in which the entry resides.
+
+	\since BeOS R3
 */
 
 
@@ -142,6 +163,8 @@
 	\var char *entry_ref::name
 
 	The leaf name of the entry
+
+	\since BeOS R3
 */
 
 
@@ -170,10 +193,13 @@ BEntry entry("/boot/home/fido");
 
 	Should be followed by a call to one of the SetTo() methods, or an
 	assignment.
-	- SetTo(const BDirectory*, const char*, bool)
-	- SetTo(const entry_ref*, bool)
-	- SetTo(const char*, bool)
-	- operator=(const BEntry&)
+
+	\sa SetTo(const BDirectory*, const char*, bool)
+	\sa SetTo(const entry_ref*, bool)
+	\sa SetTo(const char*, bool)
+	\sa operator=(const BEntry&)
+
+	\since BeOS R3
 */
 
 
@@ -191,6 +217,8 @@ BEntry entry("/boot/home/fido");
 	\param traverse Whether or not to traverse symbolic links.
 
 	\see BEntry::SetTo(const BDirectory*, const char *, bool)
+
+	\since BeOS R3
 */
 
 
@@ -207,6 +235,8 @@ BEntry entry("/boot/home/fido");
 	\param traverse Whether or not symlinks are to be traversed.
 
 	\sa BEntry::SetTo(const entry_ref*, bool)
+
+	\since BeOS R3
 */
 
 
@@ -223,6 +253,8 @@ BEntry entry("/boot/home/fido");
 	\param traverse Whether or not symlinks are to be traversed.
 
 	\sa BEntry::SetTo(const char*, bool)
+
+	\since BeOS R3
 */
 
 
@@ -233,6 +265,8 @@ BEntry entry("/boot/home/fido");
 	\param entry the entry to be copied
 
 	\sa operator=(const BEntry&)
+
+	\since BeOS R3
 */
 
 
@@ -241,6 +275,8 @@ BEntry entry("/boot/home/fido");
 	\brief Frees all of the allocated resources of the BEntry.
 
 	\sa Unset()
+
+	\since BeOS R3
 */
 
 
@@ -251,7 +287,9 @@ BEntry entry("/boot/home/fido");
 	\returns A status code.
 	\retval B_OK Success
 	\retval B_NO_INIT The object has been Unset() or is uninitialized.
-*/
+
+	\since BeOS R3
+
 
 
 /*!
@@ -259,6 +297,8 @@ BEntry entry("/boot/home/fido");
 	\brief Returns whether or not the entry exists in the filesystem.
 
 	\returns \c true if the entry exists, \c false if not.
+
+	\since BeOS R3
 */
 
 
@@ -276,6 +316,8 @@ BEntry entry("/boot/home/fido");
 		information is copied.
 
 	\returns \c B_OK on success, or an error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -283,20 +325,22 @@ BEntry entry("/boot/home/fido");
 	\fn status_t BEntry::SetTo(const BDirectory* dir, const char* path,
 		bool traverse)
 	\brief Reinitializes the BEntry to the path or directory path combination,
-		resolving symlinks if traverse is \c true.
+	       resolving symlinks if traverse is \c true.
 
 	\param dir The base directory in which the \a path resides.
 	\param path Relative path based off of \a dir.
 	\param traverse Whether or not to traverse symbolic links.
 
 	\returns \c B_OK on success, or an error code on failure.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BEntry::SetTo(const entry_ref* ref, bool traverse)
 	\brief Reinitializes the BEntry to the passed in entry_ref object
-		resolving symlinks if traverse is \c true.
+	       resolving symlinks if traverse is \c true.
 
 	\param ref The entry_ref referring to the given file.
 	\param traverse Whether or not symlinks are to be traversed.
@@ -304,13 +348,15 @@ BEntry entry("/boot/home/fido");
 	\returns \c B_OK on success, or an error code on failure.
 
 	\sa BEntry::BEntry(const entry_ref* ref, bool traverse)
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BEntry::SetTo(const char* path, bool traverse)
 	\brief Reinitializes the BEntry object to the path, resolving symlinks if
-		traverse is \c true.
+	       traverse is \c true.
 
 	\param path The path of the file.
 	\param traverse Whether or not symlinks are to be traversed.
@@ -318,12 +364,16 @@ BEntry entry("/boot/home/fido");
 	\returns \c B_OK on success, or an error code on failure.
 
 	\sa BEntry::BEntry(const char* path, bool traverse)
+
+	\since BeOS R3
 */
 
 
 /*!
 	void BEntry::Unset()
 	\brief Reinitializes the BEntry to an uninitialized BEntry object
+
+	\since BeOS R3
 */
 
 
@@ -335,6 +385,8 @@ BEntry entry("/boot/home/fido");
 		result is copied.
 
 	\returns \c B_OK on success, or an error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -346,6 +398,8 @@ BEntry entry("/boot/home/fido");
 		result is copied.
 
 	\returns \c B_OK on success, or an error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -382,12 +436,14 @@ if (err != B_ENTRY_NOT_FOUND)
 \endcode
 
 	\param entry A pointer to a pre-allocated BEntry object into which the
-		result is stored.
+	       result is stored.
 
 	\returns A status code.
 	\retval B_OK Success
 	\retval B_ENTRY_NOT_FOUND Attempted to get the parent of the root
-		directory.
+	        directory.
+
+	\since BeOS R3
 */
 
 
@@ -398,12 +454,14 @@ if (err != B_ENTRY_NOT_FOUND)
 	If the function fails, the argument is Unset().
 
 	\param dir A pointer to a pre-allocated BDirectory object into which the
-		result is copied.
+	       result is copied.
 
 	\returns A status code.
 	\retval B_OK Success
 	\retval B_ENTRY_NOT_FOUND Attempted to get the parent of the root
-		directory.
+	        directory.
+
+	\since BeOS R3
 */
 
 
@@ -415,32 +473,36 @@ if (err != B_ENTRY_NOT_FOUND)
 	entire string. A length of \c B_FILE_NAME_LENGTH is recommended.
 
 	\param buffer A pointer to a pre-allocated string into which the result
-		is copied.
+	       is copied.
 
 	\returns \c B_OK on success, or an error code on failure.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BEntry::Rename(const char* path, bool clobber)
 	\brief Renames the BEntry to \a path replacing an existing entry
-		if \a clobber is \c true.
+	       if \a clobber is \c true.
 
 	\note The BEntry object must refer to an existing file, if it is abstract,
-		this method will fail.
+	      this method will fail.
 
 	\param path A pointer to a string containing the new name for the entry.
-		It may be an absolute or relative path. If it is a relative path the
-		entry is renamed within its current directory.
+	       It may be an absolute or relative path. If it is a relative path
+	       the entry is renamed within its current directory.
 	\param clobber If \c false and a file with the name given by \c path
-		already exists, the method will fail. If \c true and such a file
-		exists, it will be overwritten.
+	       already exists, the method will fail. If \c true and such a file
+	       exists, it will be overwritten.
 
 	\returns A status code.
 	\retval B_OK Success
 	\retval B_ENTRY_EXISTS The new location already exists and \c clobber
-		is \c false.
+	        is \c false.
 	\retval B_ENTRY_NOT_FOUND Attempted to rename an abstract entry.
+
+	\since BeOS R3
 */
 
 
@@ -454,19 +516,21 @@ if (err != B_ENTRY_NOT_FOUND)
 		this method will fail.
 
 	\param dir A pointer to a pre-allocated BDirectory into which the entry
-		should be moved.
+	       should be moved.
 	\param path (optional) new leaf name for the entry. May be a simple leaf
-		or a relative path; either way, \c path is reckoned off of \c dir. If
-		\c NULL, the entry retains its previous leaf name.
+	       or a relative path; either way, \c path is reckoned off of \c dir.
+	       If \c NULL, the entry retains its previous leaf name.
 	\param clobber If \c false and an entry already exists at the specified
-		destination, the method will fail. If \c true and such an entry exists,
-		it will be overwritten.
+	       Spdestination, the method will fail. If \c true and such an entry
+	       exists, it will be overwritten.
 
 	\returns A status code.
 	\retval B_OK Success
 	\retval B_ENTRY_EXISTS The new location already exists and \c clobber
-		is \c false.
+	        is \c false.
 	\retval B_ENTRY_NOT_FOUND Attempted to rename an abstract entry.
+
+	\since BeOS R3
 */
 
 
@@ -480,28 +544,36 @@ if (err != B_ENTRY_NOT_FOUND)
 	no longer refers to any actual data in the filesystem.
 
 	\returns \c B_OK on success, or an error code on failure.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool BEntry::operator==(const BEntry& item) const
 	\brief Returns \c true if the BEntry and \a item refer to the same entry
-		or if they are both uninitialized.
+	       or if they are both uninitialized.
 
+	\returns Whether or not the items refer to the same entry.
 	\retval true Both BEntry objects refer to the same entry or they are
-		both uninitialized.
+	        both uninitialized.
 	\retval false The BEntry objects refer to different entries.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool BEntry::operator!=(const BEntry& item) const
 	\brief Returns false if the BEntry and \c item refer to the same entry or
-		if they are both uninitialized.
+	       if they are both uninitialized.
 
+	\returns Whether or not the items do NOT refer to the same entry.
 	\retval true The BEntry objects refer to different entries.
 	\retval false Both BEntry objects refer to the same entry or they are
-		both uninitialized.
+	        both uninitialized.
+
+	\since BeOS R3
 */
 
 
@@ -510,91 +582,8 @@ if (err != B_ENTRY_NOT_FOUND)
 	\brief Reinitializes the BEntry to be a copy of \a item.
 
 	\returns A pointer to the copy.
-*/
 
-
-/*!
-	\fn status_t BEntry::set_stat(struct stat& st, uint32 what)
-	\brief Updates the BEntry with the data from the stat structure according
-		to the \a what mask.
-
-	\param st The stat structure to set.
-	\param what A mask
-
-	\returns A status code.
-	\retval B_OK Everything went fine.
-	\retval B_FILE_ERROR There was an error writing to the BEntry object.
-*/
-
-
-/*!
-	\fn status_t BEntry::_SetTo(int dirFD, const char* path, bool traverse)
-	\brief Sets the entry to point to the entry specified by the path \a path
-	relative to the given directory.
-
-	If \a traverse is \c true and the given entry is a symbolic link, the
-	object is recursively set to point to the entry pointed to by the symlink.
-
-	If \a path is an absolute path, \a dirFD is ignored.
-
-	If \a dirFD is -1, \a path is considered relative to the current directory
-	(unless it is an absolute path).
-
-	The ownership of the file descriptor \a dirFD is transferred to the
-	method, regardless of whether it succeeds or fails. The caller must not
-	close the FD afterwards.
-
-	\param dirFD File descriptor of a directory relative to which path is to
-		be considered. May be -1 if the current directory shall be considered.
-	\param path Pointer to a path relative to the given directory.
-	\param traverse If \c true and the given entry is a symbolic link, the
-		object is recursively set to point to the entry linked to by the
-		symbolic link.
-
-	\returns \c B_OK on success, or an error code on failure.
-*/
-
-
-/*!
-	\fn status_t BEntry::_SetName(const char* name)
-	\brief Handles string allocation, deallocation, and copying for the
-		leaf name of the entry.
-
-	\param name The leaf \a name of the entry.
-
-	\returns A status code.
-	\retval B_OK Everything went fine.
-	\retval B_BAD_VALUE \a name is \c NULL.
-	\retval B_NO_MEMORY Ran out of memory trying to allocate \a name.
-*/
-
-
-/*!
-	\fn status_t BEntry::_Rename(BEntry& target, bool clobber)
-	\brief Renames the entry referred to by this object to the location
-		specified by \a target.
-
-	If an entry exists at the target location, the method fails, unless
-	\a clobber is \c true, in which case that entry is overwritten (doesn't
-	work for non-empty directories, though).
-
-	If the operation was successful, this entry is made a clone of the
-	supplied one and the supplied one is uninitialized.
-
-	\param target The entry specifying the target location.
-	\param clobber If \c true, the an entry existing at the target location
-		   will be overwritten.
-
-	\return \c B_OK, if everything went fine, another error code otherwise.
-*/
-
-
-/*!
-	\fn void BEntry::_Dump(const char* name)
-	\brief Debugging function, dumps the given entry to stdout.
-
-	\param name A pointer to a string to be printed along with the dump for
-		identification purposes.
+	\since BeOS R3
 */
 
 
@@ -610,6 +599,8 @@ if (err != B_ENTRY_NOT_FOUND)
 	\retval B_BAD_VALUE \c NULL \a path or \a ref.
 	\retval B_ENTRY_NOT_FOUND A (non-leaf) path component does not exist.
 	\retval B_NO_MEMORY Insufficient memory for successful completion.
+
+	\since BeOS R4
 */
 
 
@@ -622,4 +613,6 @@ if (err != B_ENTRY_NOT_FOUND)
 
 	\retval true a < b
 	\retval false a >= b
+
+	\since Haiku R1
 */

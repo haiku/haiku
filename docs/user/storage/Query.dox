@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Copyright 2002-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,8 +9,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/storage/Query.h	hrev45283
- *		src/kits/storage/Query.cpp	hrev45283
+ *		headers/os/storage/Query.h	hrev47402
+ *		src/kits/storage/Query.cpp	hrev47402
  */
 
 
@@ -28,6 +28,8 @@
 	\ingroup libbe
 	\brief Provides an interface for creating file system queries and
 	       implements BEntryList methods for iterating through the results.
+
+	\since BeOS R3
 */
 
 
@@ -36,12 +38,16 @@
 	\brief Creates an uninitialized BQuery object.
 
 	\see SetPredicate()
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BQuery::~BQuery()
 	\brief Destroys the BQuery object and frees any associated resources.
+
+	\since BeOS R3
 */
 
 
@@ -50,6 +56,8 @@
 	\brief Resets the object to a uninitialized state.
 
 	\return \c B_OK
+
+	\since BeOS R3
 */
 
 
@@ -69,11 +77,13 @@
 	\retval B_NO_INIT The object predicate or the volume wasn't set.
 	\retval B_BAD_VALUE The object predicate was invalid.
 	\retval B_NOT_ALLOWED Fetch() already called.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Predicate push methods
+	\name Predicate Push
 
 	Methods to push data onto the predicate stack.
 
@@ -101,6 +111,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED PushAttribute() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -114,6 +126,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED PushOp() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -127,6 +141,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED PushUInt32() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -140,6 +156,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED PushInt32() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -153,6 +171,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED PushUInt64() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -166,6 +186,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED PushInt64() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -179,6 +201,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED PushFloat() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -192,6 +216,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED PushDouble() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -207,6 +233,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED PushString() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -224,6 +252,8 @@
 	\retval B_NOT_ALLOWED PushDate() was called after Fetch().
 
 	\see parsedate()
+
+	\since Haiku R1
 */
 
 
@@ -231,7 +261,7 @@
 
 
 /*!
-	\name Assignment methods
+	\name Assignment
 */
 
 
@@ -252,6 +282,8 @@
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NOT_ALLOWED SetVolume() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -272,6 +304,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED SetPredicate() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -291,6 +325,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Not enough memory.
 	\retval B_NOT_ALLOWED SetTarget() was called after Fetch().
+
+	\since BeOS R3
 */
 
 
@@ -298,7 +334,7 @@
 
 
 /*!
-	\name Query information methods
+	\name Query Information
 */
 
 
@@ -308,7 +344,12 @@
 /*!
 	\fn bool BQuery::IsLive() const
 	\brief Gets whether the query associated with this object is live.
+
 	\return \c true, if the query is live, \c false otherwise.
+
+	\sa SetTarget()
+
+	\since BeOS R3
 */
 
 
@@ -318,6 +359,10 @@
 
 	\return The device ID of the volume or \c B_NO_INIT if the volume wasn't
 	        set.
+
+	\since BeOS R3
+
+	\since Haiku R1
 */
 
 
@@ -331,6 +376,10 @@
 	SetPredicate().
 
 	\return The length of the predicate string or 0 if an error occurred.
+
+	\see SetPredicate()
+
+	\since BeOS R3
 */
 
 
@@ -338,7 +387,7 @@
 
 
 /*!
-	\name Get predicate methods
+	\name Get Predicate
 
 	These methods fetch a string representation regardless of whether the
 	predicate has been constructed using the predicate stack or via
@@ -364,6 +413,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The predicate of the BQuery object wasn't set.
 	\retval B_BAD_VALUE \a buffer was \c NULL or too short.
+
+	\since BeOS R3
 */
 
 
@@ -379,6 +430,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The predicate of the BQuery object wasn't set.
 	\retval B_BAD_VALUE \a predicate was \c NULL.
+
+	\since Haiku R1
 */
 
 
@@ -386,7 +439,7 @@
 
 
 /*!
-	\name BEntryList interface methods
+	\name BEntryList Interface
 
 	These methods are used to traverse the results of a query as a BEntryList.
 
@@ -411,6 +464,8 @@
 	\retval B_ENTRY_NOT_FOUND At end of list.
 	\retval B_BAD_VALUE The predicate included unindexed attributes.
 	\retval B_NOT_ALLOWED Fetch() was not previously called on the object.
+
+	\since BeOS R3
 */
 
 
@@ -426,6 +481,8 @@
 	\retval B_ENTRY_NOT_FOUND At end of list.
 	\retval B_BAD_VALUE The predicate included unindexed attributes.
 	\retval B_NOT_ALLOWED Fetch() was not previously called on the object.
+
+	\since BeOS R3
 */
 
 
@@ -448,6 +505,8 @@
 	        are no more entries to be read, or an error code.
 	\retval B_BAD_VALUE The predicate included unindexed attributes.
 	\retval B_FILE_ERROR Fetch() was not previously called on the object.
+
+	\since BeOS R3
 */
 
 
@@ -460,6 +519,8 @@
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_FILE_ERROR Fetch() was not previously called on the object.
+
+	\since BeOS R3
 */
 
 
@@ -468,80 +529,9 @@
 	\brief Unimplemented.
 
 	\return \c B_ERROR.
+
+	\since BeOS R3
 */
 
 
 //! @}
-
-
-/// private methods, won't show up in docs
-
-
-/*!
-	\fn bool BQuery::_HasFetched() const
-	\brief Gets whether Fetch() has already been called on this object.
-
-	\return \c true, if Fetch() was already called, \c false otherwise.
-*/
-
-
-/*!
-	\fn status_t BQuery::_PushNode(QueryNode* node, bool deleteOnError)
-	\brief Pushes a node onto the predicate stack.
-
-	If the stack has not been allocate until this time, this method does
-	allocate it.
-
-	If the supplied node is \c NULL, it is assumed that there was not enough
-	memory to allocate the node and thus \c B_NO_MEMORY is returned.
-
-	In case the method fails, the caller retains the ownership of the supplied
-	node and thus is responsible for deleting it, if \a deleteOnError is
-	\c false. If it is \c true, the node is deleted, if an error occurs.
-
-	\param node The node to push.
-	\param deleteOnError Whether or not to delete the node if an error occurs.
-
-	\return A status code.
-	\retval B_OK Everything went fine.
-	\retval B_NO_MEMORY \a node was \c NULL or there was insufficient memory to
-	        allocate the predicate stack or push the node.
-	\retval B_NOT_ALLOWED _PushNode() was called after Fetch().
-*/
-
-
-/*!
-	\fn status_t BQuery::_SetPredicate(const char* expression)
-	\brief Helper method to set the predicate.
-
-	Does not check whether Fetch() has already been invoked.
-
-	\param expression The predicate string to set.
-
-	\return A status code.
-	\retval B_OK Everything went fine.
-	\retval B_NO_MEMORY There was insufficient memory to store the predicate.
-*/
-
-
-/*!
-	\fn status_t BQuery::_EvaluateStack()
-	Evaluates the predicate stack.
-
-	The method does nothing (and returns \c B_OK), if the stack is \c NULL.
-	If the stack is not  \c null and Fetch() has already been called, this
-	method fails.
-
-	\return A status code.
-	\retval B_OK Everything went fine.
-	\retval B_NO_MEMORY There was insufficient memory.
-	\retval B_NOT_ALLOWED _EvaluateStack() was called after Fetch().
-*/
-
-
-/*!
-	\fn void BQuery::_ParseDates(BString& parsedPredicate)
-	\brief Fills out \a parsedPredicate with a parsed predicate string.
-
-	\param parsedPredicate The predicate string to fill out.
-*/

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/storage/AppFileInfo.h	 rev 42274
- *		src/kits/storage/AppFileInfo.cpp	 rev 42274
+ *		headers/os/storage/AppFileInfo.h	 hrev47402
+ *		src/kits/storage/AppFileInfo.cpp	 hrev47402
  */
 
 
@@ -46,19 +46,23 @@
 	object will next look at the resource of the BFile. You can tell the
 	BFileInfo object to look only in the attributes or resources with the
 	SetInfoLocation() method.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BAppFileInfo::BAppFileInfo()
 	\brief Creates an uninitialized BAppFileInfo object.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BAppFileInfo::BAppFileInfo(BFile* file)
 	\brief Creates an BAppFileInfo object and initializes it to the supplied
-		file.
+	       file.
 
 	The caller retains ownership of the supplied BFile object. It must not
 	be deleted during the life time of the BAppFileInfo. It is not deleted
@@ -66,6 +70,8 @@
 
 	\param file The BFile object that the BAppFileInfo object shall be
 		initialized to.
+
+	\since BeOS R3
 */
 
 
@@ -74,6 +80,8 @@
 	\brief Frees all resources associated with this object.
 
 	The supplied BFile object is not deleted if one is specified.
+
+	\since BeOS R3
 */
 
 
@@ -91,6 +99,8 @@
 	\returns an status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \c NULL \a file or \a file is not properly initialized.
+
+	\since BeOS R3
 */
 
 
@@ -107,17 +117,19 @@
 	\brief Gets the MIME type of the associated file.
 
 	\param type A pointer to a pre-allocated character buffer of size
-		   \c B_MIME_TYPE_LENGTH or larger into which the MIME type of the
-		   file will be written.
+	       \c B_MIME_TYPE_LENGTH or larger into which the MIME type of the
+	       file will be written.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a type or the type string stored in the
-		attribute/resources is longer than \c B_MIME_TYPE_LENGTH.
+	        attribute/resources is longer than \c B_MIME_TYPE_LENGTH.
 	\retval B_BAD_TYPE The attribute/resources the type string is stored in
-		has the wrong type.
+	        has the wrong type.
 	\retval B_ENTRY_NOT_FOUND No type is set on the file.
+
+	\since BeOS R3
 */
 
 
@@ -128,13 +140,15 @@
 	If \a type is \c NULL if the file's MIME type is unset.
 
 	\param type The MIME type to be assigned to the file. It must not be
-		longer than \c B_MIME_TYPE_LENGTH (including the terminating null).
-		The MIME type may be \c NULL.
+	       longer than \c B_MIME_TYPE_LENGTH (including the terminating \0).
+	       The MIME type may be \c NULL.
 
 	\returns a status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \a type is longer than \c B_MIME_TYPE_LENGTH.
+
+	\since BeOS R3
 */
 
 
@@ -154,17 +168,19 @@
 	\brief Gets the application signature of the associated file.
 
 	\param signature A pointer to a pre-allocated character buffer of size
-		   \c B_MIME_TYPE_LENGTH or larger into which the application
-		   signature of the file will be written.
+	       \c B_MIME_TYPE_LENGTH or larger into which the application
+	       signature of the file will be written.
 
 	\returns a status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a signature or the signature stored in the
-		attribute/resources is longer than \c B_MIME_TYPE_LENGTH.
+	        attribute/resources is longer than \c B_MIME_TYPE_LENGTH.
 	\retval B_BAD_TYPE The attribute/resources the signature is stored in have
-		the wrong type.
+	        the wrong type.
 	\retval B_ENTRY_NOT_FOUND No signature is set on the file.
+
+	\since BeOS R3
 */
 
 
@@ -175,13 +191,15 @@
 	If \a signature is \c NULL the file's application signature is unset.
 
 	\param signature The application signature to be assigned to the file.
-		Must not be longer than \c B_MIME_TYPE_LENGTH (including the
-		terminating \c NUL). The \a signature may be \c NULL.
+	       Must not be longer than \c B_MIME_TYPE_LENGTH (including the
+	       terminating \0). The \a signature may be \c NULL.
 
 	\returns a status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \a signature is longer than \c B_MIME_TYPE_LENGTH.
+
+	\since BeOS R3
 */
 
 
@@ -201,17 +219,19 @@
 	\brief Gets the catalog entry of the associated file used for localization.
 
 	\param catalogEntry A pointer to a pre-allocated character buffer of size
-		   \c B_MIME_TYPE_LENGTH * 3 or larger into which the catalog entry
-		   of the file will be written.
+	       \c B_MIME_TYPE_LENGTH * 3 or larger into which the catalog entry
+	       of the file will be written.
 
 	\returns a status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a catalogEntry or the entry stored in the
-		attribute/resources is longer than \c B_MIME_TYPE_LENGTH * 3.
+	        attribute/resources is longer than \c B_MIME_TYPE_LENGTH * 3.
 	\retval B_BAD_TYPE The attribute/resources the entry is stored in have
-		the wrong type.
+	        the wrong type.
 	\retval B_ENTRY_NOT_FOUND No catalog entry is set on the file.
+
+	\since Haiku R1
 */
 
 
@@ -222,15 +242,17 @@
 	If \a catalogEntry is \c NULL the file's catalog entry is unset.
 
 	\param catalogEntry The catalog entry to be assigned to the file.
-		Of the form "x-vnd.Haiku-app:context:name". Must not be longer than
-		\c B_MIME_TYPE_LENGTH * 3 (including the terminating \c NUL).
-		The \a catalogEntry may be \c NULL.
+	       Of the form "x-vnd.Haiku-app:context:name". Must not be longer than
+	       \c B_MIME_TYPE_LENGTH * 3 (including the terminating \0).
+	       The \a catalogEntry may be \c NULL.
 
 	\returns a status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \a catalogEntry is longer than
-		\c B_MIME_TYPE_LENGTH * 3.
+	        \c B_MIME_TYPE_LENGTH * 3.
+
+	\since Haiku R1
 */
 
 
@@ -250,15 +272,17 @@
 	\brief Gets the application \a flags of the associated file.
 
 	\param flags A pointer to a pre-allocated \c uint32 into which the
-		application flags of the file are written.
+	       application flags of the file are written.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a flags.
 	\retval B_BAD_TYPE The attribute/resources the flags are stored in have
-		the wrong type.
+	        the wrong type.
 	\retval B_ENTRY_NOT_FOUND No application flags are set on the file.
+
+	\since BeOS R3
 */
 
 
@@ -271,6 +295,8 @@
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object was not properly initialized.
+
+	\since BeOS R3
 */
 
 
@@ -281,6 +307,8 @@
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object was not properly initialized.
+
+	\since Haiku R1
 */
 
 
@@ -303,24 +331,26 @@
 	\c B_STRING_TYPE in \a types.
 
 	\param types A pointer to a pre-allocated BMessage into which the
-		MIME types supported by the application will be written.
+	       MIME types supported by the application will be written.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a types.
 	\retval B_BAD_TYPE The attribute/resources that the supported types
-		are stored in have the wrong type.
+	        are stored in have the wrong type.
 	\retval B_ENTRY_NOT_FOUND No supported types are set on the file.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t BAppFileInfo::SetSupportedTypes(const BMessage* types,
 		bool updateMimeDB, bool syncAll)
-	\brief Sets the MIME types that are supported by the application and allows
-		you to specify whether or not the supported types in the MIME DB shall
-		be updated as well.
+	\brief Sets the MIME types that are supported by the application
+	       and allows you to specify whether or not the supported types
+	       in the MIME DB shall be updated as well.
 
 	If \a types is \c NULL then the application's supported types are unset.
 
@@ -338,15 +368,17 @@
 	is \c true.
 
 	\param types The supported types to be assigned to the file.
-		May be \c NULL.
+	       May be \c NULL.
 	\param updateMimeDB \c true to update the supported types in the MIME DB,
-		\c false otherwise.
+	       \c false otherwise.
 	\param syncAll \c true to also synchronize the no-longer supported
-		types, \c false otherwise.
+	       types, \c false otherwise.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
+
+	\since BeOS R3
 */
 
 
@@ -354,8 +386,8 @@
 	\fn status_t BAppFileInfo::SetSupportedTypes(const BMessage* types,
 		bool syncAll)
 	\brief Sets the MIME types that are supported by the application and allows
-		you to specify whether or not the no longer supported types shall be
-		updated as well.
+	       you to specify whether or not the no longer supported types shall be
+	       updated as well.
 
 	If \a types is \c NULL then the application's supported types are unset.
 
@@ -372,13 +404,15 @@
 	from the list of supporting applications.
 
 	\param types The supported types to be assigned to the file.
-		May be \c NULL.
+	       May be \c NULL.
 	\param syncAll \c true to also synchronize the no-longer supported
-		types, \c false otherwise.
+	       types, \c false otherwise.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
+
+	\since BeOS R3
 */
 
 
@@ -390,10 +424,12 @@
 	\see SetSupportedType(const BMessage*, bool) for detailed information.
 
 	\param types The supported types to be assigned to the file.
-		May be \c NULL.
+	       May be \c NULL.
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
+
+	\since BeOS R3
 */
 
 
@@ -408,6 +444,8 @@
 
 	\returns \c true if \a type is a valid MIME type and it is supported by
 		the application, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -424,6 +462,8 @@
 
 	\returns \c true if \a type is a valid MIME type and it is explicitly
 		supported by the application, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -440,21 +480,23 @@
 
 /*!
 	\fn status_t BAppFileInfo::GetIcon(BBitmap* icon, icon_size which) const
-	\brief Gets the icon of the associated file and puts it into a pre-allocated
-		   BBitmap.
+	\brief Gets the icon of the associated file and puts it into a
+	       pre-allocated BBitmap.
 
 	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
-		to store the requested icon (16x16 for the \c B_MINI_ICON and 32x32
-		for the \c B_LARGE_ICON).
+	       to store the requested icon (16x16 for the \c B_MINI_ICON and 32x32
+	       for the \c B_LARGE_ICON).
 	\param which Specifies the size of the icon to be retrieved:
-		\c B_MINI_ICON for the mini and \c B_LARGE_ICON for the large icon.
-		For HVIF icons this parameter has no effect.
+	       \c B_MINI_ICON for the mini and \c B_LARGE_ICON for the large icon.
+	       For HVIF icons this parameter has no effect.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a icon, unsupported icon size \a which or
-		bitmap dimensions (\a icon) and icon size (\a which) do not match.
+	        bitmap dimensions (\a icon) and icon size (\a which) do not match.
+
+	\since BeOS R3
 */
 
 
@@ -464,12 +506,14 @@
 
 	\param data The pointer in which the flat icon data will be returned.
 	\param size The pointer in which the size of the data found will be
-		returned.
+	       returned.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a data or \c NULL size.
+
+	\since BeOS R3
 */
 
 
@@ -481,19 +525,22 @@
 	If \a icon is \c NULL then the icon of the file is unset.
 
 	\param icon A pointer to the BBitmap containing the icon to be set.
-		May be \c NULL to specify no icon.
+	       May be \c NULL to specify no icon.
 	\param which Specifies the size of the icon to be set: \c B_MINI_ICON for
-		16x16 mini icon and \c B_LARGE_ICON for the 32x32 large icon.
-		For HVIF icons this parameter has no effect.
+	       16x16 mini icon and \c B_LARGE_ICON for the 32x32 large icon.
+	       For HVIF icons this parameter has no effect.
 	\param updateMimeDB \c true to also set the icon for the application in the
-		MIME DB. \c false otherwise.
+	       MIME DB. \c false otherwise.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE Unknown icon size \a which or bitmap dimensions
-		(\a icon) and icon size (\a which) do not match.
+	        (\a icon) and icon size (\a which) do not match.
+
+	\since Haiku R1
 */
+
 
 /*!
 	\fn status_t BAppFileInfo::SetIcon(const BBitmap* icon, icon_size which)
@@ -505,16 +552,18 @@
 	application signature.
 
 	\param icon A pointer to the BBitmap containing the icon to be set.
-		May be \c NULL to specify no icon.
+	       May be \c NULL to specify no icon.
 	\param which Specifies the size of the icon to be set: \c B_MINI_ICON for
-		16x16 mini icon and \c B_LARGE_ICON for the 32x32 large icon.
-		For HVIF icons this parameter has no effect.
+	       16x16 mini icon and \c B_LARGE_ICON for the 32x32 large icon.
+	       For HVIF icons this parameter has no effect.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE Unknown icon size \a which or bitmap dimensions
-		(\a icon) and icon size (\a which) do not match.
+	        (\a icon) and icon size (\a which) do not match.
+
+	\since BeOS R3
 */
 
 
@@ -526,15 +575,17 @@
 	If \a data is \c NULL then the icon of the file is unset.
 
 	\param data A pointer to the data buffer containing the vector icon
-		   to be set. May be \c NULL.
+	       to be set. May be \c NULL.
 	\param size Specifies the size of buffer pointed to by \a data.
 	\param updateMimeDB \c true to also set the icon for the application in the
-		MIME DB. \c false otherwise.
+	       MIME DB. \c false otherwise.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL data.
+
+	\since Haiku R1
 */
 
 
@@ -548,13 +599,15 @@
 	application signature.
 
 	\param data A pointer to the data buffer containing the vector icon
-		   to be set. May be \c NULL.
+	       to be set. May be \c NULL.
 	\param size Specifies the size of buffer pointed to by \a data.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL data.
+
+	\since Haiku R1
 */
 
 
@@ -562,23 +615,25 @@
 	\fn status_t BAppFileInfo::GetIconForType(const char* type, BBitmap* icon,
 		icon_size size) const
 	\brief Gets the icon the application provides for a given MIME type and
-		puts it into a BBitmap.
+	       puts it into a BBitmap.
 
 	\note If \a type is \c NULL, the application's icon is retrieved.
 
 	\param type The MIME type in question. May be \c NULL.
 	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
-		to store the requested icon (16x16 for the mini and 32x32 for the
-		large icon).
+	       to store the requested icon (16x16 for the mini and 32x32 for the
+	       large icon).
 	\param size Specifies the size of the icon to be retrieved:
-		\c B_MINI_ICON for the mini and \c B_LARGE_ICON for the large icon.
+	       \c B_MINI_ICON for the mini and \c B_LARGE_ICON for the large icon.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a icon, unsupported icon size
-		\a which or bitmap dimensions (\a icon) and icon size (\a which) do
-		not match.
+	        \a which or bitmap dimensions (\a icon) and icon size (\a which)
+	        do not match.
+
+	\since BeOS R3
 */
 
 
@@ -586,7 +641,7 @@
 	\fn status_t BAppFileInfo::GetIconForType(const char* type, uint8** data,
 		size_t* size) const
 	\brief Gets the icon the application provides for a given MIME type and
-		puts it into a buffer.
+	       puts it into a buffer.
 
 	\note If \a type is set to \c NULL the the application's icon is retrieved.
 
@@ -599,7 +654,9 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a data and/or \a size. Or the supplied
-		\a type is not a valid MIME type.
+	        \a type is not a valid MIME type.
+
+	\since Haiku R1
 */
 
 
@@ -607,7 +664,7 @@
 	\fn status_t BAppFileInfo::SetIconForType(const char* type,
 		const BBitmap* icon, icon_size which, bool updateMimeDB)
 	\brief Sets the icon the application provides for a given MIME type from a
-		BBitmap.
+	       BBitmap.
 
 	\note If \a type is \c NULL then the icon is set.
 	\note If \a icon is \c NULL then the icon is unset.
@@ -618,18 +675,20 @@
 
 	\param type The MIME type in question. May be \c NULL.
 	\param icon A pointer to the BBitmap containing the icon to be set.
-		May be \c NULL.
+	       May be \c NULL.
 	\param which Specifies the size of the icon to be set: \c B_MINI_ICON
-		for the mini and \c B_LARGE_ICON for the large icon.
+	       for the mini and \c B_LARGE_ICON for the large icon.
 	\param updateMimeDB \c true to also set the icon for the type in the MIME
-		DB. \c false otherwise.
+	       DB. \c false otherwise.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE Either the icon size \a which is unknown,
-		the bitmap dimensions (\a icon) and icon size (\a which) do not
-		match, or the provided \a type is not a valid MIME type. 
+	        the bitmap dimensions (\a icon) and icon size (\a which) do not
+	        match, or the provided \a type is not a valid MIME type. 
+
+	\since Haiku R1
 */
 
 
@@ -637,7 +696,7 @@
 	\fn status_t BAppFileInfo::SetIconForType(const char* type,
 		const BBitmap* icon, icon_size which)
 	\brief Sets the icon the application provides for a given MIME type from a
-		BBitmap.
+	       BBitmap.
 
 	\note If \a type is \c NULL then the icon is set.
 	\note If \a icon is \c NULL then the icon is unset.
@@ -656,8 +715,10 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE Either the icon size \a which is unknown,
-		the bitmap dimensions (\a icon) and icon size (\a which) do not
-		match, or the provided \a type is not a valid MIME type.
+	        the bitmap dimensions (\a icon) and icon size (\a which) do not
+	        match, or the provided \a type is not a valid MIME type.
+
+	\since BeOS R3
 */
 
 
@@ -665,7 +726,7 @@
 	\fn status_t BAppFileInfo::SetIconForType(const char* type,
 		const uint8* data, size_t size, bool updateMimeDB)
 	\brief Sets the icon the application provides for a given MIME type from a
-		buffer.
+	       buffer.
 
 	\note If \a type is \c NULL then the icon is set.
 	\note If \a data is \c NULL then the icon is unset.
@@ -676,15 +737,17 @@
 
 	\param type The MIME type in question. May be \c NULL.
 	\param data A pointer to the data containing the icon to be set.
-		   May be \c NULL.
+	       May be \c NULL.
 	\param size Specifies the size of buffer provided in \a data.
 	\param updateMimeDB \c true to also set the icon for the type in the MIME
-		DB. \c false otherwise.
+	       DB. \c false otherwise.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE The provided \a type is not a valid MIME type.
+
+	\since Haiku R1
 */
 
 
@@ -692,7 +755,7 @@
 	\fn status_t BAppFileInfo::SetIconForType(const char* type,
 		const uint8* data, size_t size)
 	\brief Sets the icon the application provides for a given MIME type from a
-		buffer.
+	       buffer.
 
 	\note If \a type is \c NULL then the icon is set.
 	\note If \a data is \c NULL then the icon is unset.
@@ -703,13 +766,15 @@
 
 	\param type The MIME type in question. May be \c NULL.
 	\param data A pointer to the data containing the icon to be set.
-		   May be \c NULL.
+	       May be \c NULL.
 	\param size Specifies the size of buffer provided in \a data.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE The provided \a type is not a valid MIME type.
+
+	\since Haiku R1
 */
 
 
@@ -740,6 +805,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE \c NULL \a info.
+
+	\since BeOS R3
 */
 
 
@@ -759,6 +826,8 @@
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT The object is not properly initialized.
+
+	\since BeOS R3
 */
 
 
@@ -783,6 +852,8 @@
 		- \c B_USE_BOTH_LOCATIONS: Store the data in attributes and resources.
 
 	\param location The location where the metadata shall be stored.
+
+	\since BeOS R3
 */
 
 
@@ -793,6 +864,8 @@
 
 	\returns \c true if the metadata are (also) stored in the file's
 		attributes, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -803,111 +876,9 @@
 
 	\returns \c true if the metadata are (also) stored in the file's
 		resources, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
 //! @}
-
-
-/*!
-	\fn BAppFileInfo & BAppFileInfo::operator=(const BAppFileInfo &)
-	\brief Privatized assignment operator to prevent usage.
-*/
-
-
-/*!
-	\fn BAppFileInfo::BAppFileInfo(const BAppFileInfo &)
-	\brief Privatized copy constructor to prevent usage.
-*/
-
-
-/*!
-	\fn status_t BAppFileInfo::GetMetaMime(BMimeType* meta) const
-	\brief Initializes a BMimeType to the signature of the associated file.
-
-	\warning The parameter \a meta is not checked.
-
-	\param meta A pointer to a pre-allocated BMimeType that shall be
-		   initialized to the signature of the associated file.
-
-	\returns A status code.
-	\retval B_OK Everything went fine.
-	\retval B_BAD_VALUE \c NULL \a meta
-	\retval B_ENTRY_NOT_FOUND The file has not signature or the signature is
-			(not installed in the MIME database.) no valid MIME string.
-*/
-
-
-/*!
-	\fn status_t BAppFileInfo::_ReadData(const char* name, int32 id,
-		type_code type, void* buffer, size_t bufferSize,
-		size_t &bytesRead, void** allocatedBuffer) const
-	\brief Reads data from an attribute or resource.
-
-	\note The data is read from the location specified by \a fWhere.
-
-	\warning The object must be properly initialized. The parameters are
-		\b NOT checked.
-
-	\param name The name of the attribute/resource to be read.
-	\param id The resource ID of the resource to be read. It is ignored
-		   when < 0.
-	\param type The type of the attribute/resource to be read.
-	\param buffer A pre-allocated buffer for the data to be read.
-	\param bufferSize The size of the supplied buffer.
-	\param bytesRead A reference parameter, set to the number of bytes
-		   actually read.
-	\param allocatedBuffer If not \c NULL, the method allocates a buffer
-		   large enough too store the whole data and writes a pointer to it
-		   into this variable. If \c NULL, the supplied buffer is used.
-
-	\returns A status code.
-	\retval B_OK Everything went fine.
-	\retval B_ENTRY_NOT_FOUND The entry was not found.
-	\retval B_NO_MEMORY Ran out of memory allocating the buffer.
-	\retval B_BAD_VALUE \a type did not match.
-*/
-
-
-/*!
-	\fn status_t BAppFileInfo::_WriteData(const char* name, int32 id,
-		type_code type, const void* buffer, size_t bufferSize, bool findID)
-	\brief Writes data to an attribute or resource.
-
-	\note The data is written to the location(s) specified by \a fWhere.
-
-	\warning The object must be properly initialized. The parameters are
-		\b NOT checked.
-
-	\param name The name of the attribute/resource to be written.
-	\param id The resource ID of the resource to be written.
-	\param type The type of the attribute/resource to be written.
-	\param buffer A buffer containing the data to be written.
-	\param bufferSize The size of the supplied buffer.
-	\param findID If set to \c true use the ID that is already assigned to the
-		   \a name / \a type pair or take the first unused ID >= \a id.
-		   If \c false, \a id is used.
-
-	\returns A status code.
-	\retval B_OK Everything went fine.
-	\retval B_ERROR An error occurred while trying to write the data.
-*/
-
-
-/*!
-	\fn status_t BAppFileInfo::_RemoveData(const char* name, type_code type)
-	\brief Removes an attribute or resource.
-
-	\note The removal location is specified by \a fWhere.
-
-	\warning The object must be properly initialized. The parameters are
-		\b NOT checked.
-
-	\param name The name of the attribute/resource to be remove.
-	\param type The type of the attribute/resource to be removed.
-
-	\returns A status code.
-	\retval B_OK Everything went fine.
-	\retval B_NO_INIT Not using attributes and not using resources.
-	\retval B_ENTRY_NOT_FOUND The attribute or resource was not found.
-*/

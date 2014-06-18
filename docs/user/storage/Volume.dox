@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Copyright 2002-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,8 +9,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/storage/Volume.h	hrev45306
- *		src/kits/storage/Volume.cpp	hrev45306
+ *		headers/os/storage/Volume.h	hrev47402
+ *		src/kits/storage/Volume.cpp	hrev47402
  */
 
 
@@ -31,6 +31,8 @@
 	The class is a simple wrapper for a \c dev_t and the function
 	fs_stat_dev(). The sole exception is the SetName() method which
 	sets the name of the volume.
+
+	\since BeOS R3
 */
 
 
@@ -41,6 +43,8 @@
 	InitCheck() will return \c B_NO_INIT.
 
 	\see SetTo()
+
+	\since BeOS R3
 */
 
 
@@ -53,11 +57,13 @@
 	successful.
 
 	\param device The device ID of the volume.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BVolume::BVolume(const BVolume &volume)
+	\fn BVolume::BVolume(const BVolume& volume)
 	\brief Creates a copy of the supplied BVolume object.
 
 	Afterwards the object refers to the same device the supplied object
@@ -65,17 +71,21 @@
 	either.
 
 	\param volume The volume object to be copied.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BVolume::~BVolume()
 	\brief Destroys the object and frees all associated resources.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Constructor helper methods
+	\name Constructor Helpers
 */
 
 
@@ -88,6 +98,8 @@
 
 	\return \c B_OK if the object was properly initialized, or an error code
 	        otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -97,8 +109,11 @@
 	       the supplied device ID.
 
 	\param device The device ID of the volume to set.
+
 	\return \c B_OK if the object was properly initialized, or an error code
 	        otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -107,6 +122,8 @@
 	\brief Brings the BVolume object to an uninitialized state.
 
 	InitCheck() will return \c B_NO_INIT.
+
+	\since BeOS R3
 */
 
 
@@ -114,7 +131,7 @@
 
 
 /*!
-	\name Volume information methods
+	\name Volume Information
 */
 
 
@@ -126,7 +143,9 @@
 	\brief Returns the device ID of the volume the object refers to.
 
 	\return Returns the device ID of the volume the object refers to
-			or -1 if the object was not properly initialized.
+	        or -1 if the object was not properly initialized.
+
+	\since BeOS R3
 */
 
 
@@ -136,12 +155,14 @@
 	       object into \a directory.
 
 	\param directory A pointer to a pre-allocated BDirectory to be initialized
-		   to the volume's root directory.
+	       to the volume's root directory.
 
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a directory was \c NULL or the object was not properly
 	        initialized.
+
+	\since BeOS R3
 */
 
 
@@ -151,6 +172,10 @@
 
 	\return The volume's total storage capacity (in bytes), or \c B_BAD_VALUE
 	        if the object is not properly initialized.
+
+	\see FreeBytes()
+
+	\since BeOS R3
 */
 
 
@@ -160,6 +185,8 @@
 
 	\return The amount of unused space on the volume (in bytes), or
 	        \c B_BAD_VALUE if the object is not properly initialized.
+
+	\since BeOS R3
 */
 
 
@@ -170,6 +197,8 @@
 
 	\return The block size in bytes, \c B_NO_INIT if the volume is not
 	        initialized or other errors forwarded from the file system.
+
+	\since Haiku R1
 */
 
 
@@ -177,7 +206,7 @@
 
 
 /*!
-	\name Volume name methods
+	\name Volume Name
 */
 
 
@@ -196,6 +225,10 @@
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a name was \c NULL or the object was not properly
 	        initialized.
+
+	\see SetName()
+
+	\since BeOS R3
 */
 
 
@@ -220,6 +253,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a name was \c NULL or the object was not properly
 	        initialized.
+
+	\since Haiku R1
 */
 
 
@@ -227,7 +262,7 @@
 
 
 /*!
-	\name Volume icon methods
+	\name Volume Icon
 */
 
 
@@ -239,11 +274,13 @@
 	\brief Writes the volume's icon into the supplied BBitmap.
 
 	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
-		   to store the requested icon (16x16 for the mini and 32x32 for the
-		   large icon).
+	       to store the requested icon (16x16 for the mini and 32x32 for the
+	       large icon).
 
 	\param which The icon size to be retrieved: \c B_MINI_ICON for the mini or
 	       \c B_LARGE_ICON for the large icon.
+
+	\since BeOS R4
 */
 
 
@@ -263,6 +300,8 @@
 
 	\see fs_stat_dev() for more return codes.
 	\see get_device_icon() for more return codes.
+
+	\since Haiku R1
 */
 
 
@@ -270,7 +309,7 @@
 
 
 /*!
-	\name Volume capability methods
+	\name Volume Capabilities
 */
 
 
@@ -283,6 +322,8 @@
 
 	\return \c true, if the volume was properly initialized and is removable,
 	        \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -292,6 +333,8 @@
 
 	\return \c true, if the volume was properly initialized and is read-only,
 	        \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -301,6 +344,8 @@
 
 	\return \c true, if the volume was properly initialized and is persistent,
 	       \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -310,6 +355,8 @@
 
 	return \c true, if the volume was properly initialized and is shared,
 	       \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -319,6 +366,8 @@
 
 	\return \c true, if the volume was properly initialized and supports
 	        MIME-types, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -328,6 +377,8 @@
 
 	\return \c true, if the volume was properly initialized and supports
 	        attributes, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -337,6 +388,8 @@
 
 	\return \c true, if the volume was properly initialized and supports
 	        queries, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -344,7 +397,7 @@
 
 
 /*!
-	\name Operator overload methods
+	\name Operators
 */
 
 
@@ -362,6 +415,8 @@
 	\param volume The volume to be tested for equality.
 
 	\return \c true, if the objects are equal, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -377,6 +432,8 @@
 	\param volume The volume to be tested for inequality.
 
 	\return \c true, if the objects and unequal, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -388,6 +445,8 @@
 	\param volume The volume to be assigned.
 
 	\return A reference to this object.
+
+	\since BeOS R3
 */
 
 

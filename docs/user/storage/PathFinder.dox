@@ -1,13 +1,14 @@
 /*
- * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Copyright 2013-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Documentation by:
+ *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *
  * Corresponds to:
- *		headers/os/storage/PathFinder.h	 hrev46390
- *		src/kits/storage/PathFinder.cpp	 hrev46390
+ *		headers/os/storage/PathFinder.h	 hrev47402
+ *		src/kits/storage/PathFinder.cpp	 hrev47402
  */
 
 
@@ -29,6 +30,8 @@
 	FindPath() for getting a single path in an installation location specified
 	via a constructor or a SetTo() invocation, and the static FindPaths() for
 	getting a list of paths for all installation locations.
+
+	\since Haiku R1
 */
 
 
@@ -36,7 +39,7 @@
 	\fn BPathFinder::BPathFinder(const void* codePointer,
 		const char* dependency)
 	\brief Creates an object referring to an installation location based on a
-		loaded image file.
+	       loaded image file.
 
 	When initialized with this constructor a FindPath() method called afterward
 	determines the path of the image (i.e. executable, library, or add-on) file
@@ -53,23 +56,25 @@
 	arguments, subsequent calls to FindPath() will return an error.
 
 	\param codePointer A pointer to code or static data belonging to the image
-		based on which FindPath() shall compute the path. The special value
-		\c B_APP_IMAGE_SYMBOL (the default) can be used to refer to the program
-		image, and \c B_CURRENT_IMAGE_SYMBOL for the caller's image.
+	       based on which FindPath() shall compute the path. The special value
+	       \c B_APP_IMAGE_SYMBOL (the default) can be used to refer to the
+	       program image, and \c B_CURRENT_IMAGE_SYMBOL for the caller's image.
 	\param dependency The name of the package's "requires" entry to be used for
-		resolving the installation location. Can be \c NULL (the default).
+	       resolving the installation location. Can be \c NULL (the default).
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BPathFinder::BPathFinder(const char* path, const char* dependency)
 	\brief Creates an object referring to an installation location based on a
-		given path.
+	       given \a path.
 
 	When initialized with this constructor a FindPath() method called afterward
 	evaluates the path constant passed to it based on \a path. In most cases
 	that means first determining the path of the installation location from the
-	given path.
+	given \a path.
 
 	If \a dependency is specified, instead of determining the installation
 	location path from the given path, the installation location path of the
@@ -80,48 +85,55 @@
 	arguments, subsequent calls to FindPath() will return an error.
 
 	\param path A path based on which FindPath() shall compute the path.
-	\param dependency The name of the package's "requires" entry to be used for
-		resolving the installation location. Can be \c NULL.
+	\param dependency The name of the package's "requires" entry to be used
+	       for resolving the installation location. Can be \c NULL.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BPathFinder::BPathFinder(const entry_ref& ref, const char* dependency)
 	\brief Creates an object referring to an installation location based on a
-		given entry_ref.
+	       given entry_ref.
 
 	The constructor converts the given entry_ref \a ref to a path and then
 	initializes the object like
 	BPathFinder::BPathFinder(const char*, const char*).
 
 	\param ref A reference to be resolved to a path based on which FindPath()
-		shall compute the path.
-	\param dependency The name of the package's "requires" entry to be used for
-		resolving the installation location. Can be \c NULL.
+	       shall compute the path.
+	\param dependency The name of the package's "requires" entry to be used
+	       for resolving the installation location. Can be \c NULL.
 
 	\see BPathFinder::BPathFinder(const char*, const char*)
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BPathFinder::BPathFinder(const BResolvableExpression& expression,
 		const char* dependency)
-	\brief Creates an object referring to an installation location based on the
-		path of a package satisfying the given resolvable expression.
+	\brief Creates an object referring to an installation location based on
+	       the path of a package satisfying the given resolvable expression.
 
 	The constructor finds the latest package that satisfies the resolvable
 	expression \a expression and then uses its path to initialize the object
 	like BPathFinder::BPathFinder(const char*, const char*).
 
-	\note When using this constructor linking against libpackage.so is required.
+	\note When using this constructor linking against libpackage.so is
+	      required.
 
-	\param expression A resolvable expression to be resolved to the path of the
-		latest package satisfying it, based on which FindPath() shall compute
-		the path.
-	\param dependency The name of the package's "requires" entry to be used for
-		resolving the installation location. Can be \c NULL.
+	\param expression A resolvable expression to be resolved to the path of
+	       the latest package satisfying it, based on which FindPath() shall
+	       compute the path.
+	\param dependency The name of the package's "requires" entry to be used
+	       for resolving the installation location. Can be \c NULL.
 
 	\see BPathFinder::BPathFinder(const char*, const char*)
+
+	\since Haiku R1
 */
 
 
@@ -129,14 +141,15 @@
 	\fn status_t BPathFinder::SetTo(const void* codePointer,
 		const char* dependency)
 	\brief Reinitializes the object to refer to an installation location based
-		on a loaded image file.
+	       on a loaded image file.
 
 	When reinitialized with this method a FindPath() method called afterward
-	determines the path of the image (i.e. executable, library, or add-on) file
-	associated with \a codePointer, a pointer to a location in the code or
-	static data of an image loaded in the caller's team. Based on that path the
-	path constant passed to FindPath() will be evaluated. In most cases that
-	means first determining the path of the installation location from the path.
+	determines the path of the image (i.e. executable, library, or add-on)
+	file associated with \a codePointer, a pointer to a location in the code
+	or static data of an image loaded in the caller's team. Based on that path
+	the path constant passed to FindPath() will be evaluated. In most cases
+	that means first determining the path of the installation location from
+	the path.
 
 	If \a dependency is specified, instead of determining the installation
 	location path from the image path, the installation location path of the
@@ -147,25 +160,28 @@
 	error.
 
 	\param codePointer A pointer to code or static data belonging to the image
-		based on which FindPath() shall compute the path. The special value
-		\c B_APP_IMAGE_SYMBOL (the default) can be used to refer to the program
-		image, and \c B_CURRENT_IMAGE_SYMBOL for the caller's image.
+	       based on which FindPath() shall compute the path. The special value
+	       \c B_APP_IMAGE_SYMBOL (the default) can be used to refer to the
+	       program image, and \c B_CURRENT_IMAGE_SYMBOL for the caller's image.
 	\param dependency The name of the package's "requires" entry to be used for
-		resolving the installation location. Can be \c NULL (the default).
+	       resolving the installation location. Can be \c NULL (the default).
+
 	\return A status code.
 	\retval B_OK Everything went fine.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BPathFinder::SetTo(const char* path, const char* dependency)
 	\brief Reinitializes the object to refer to an installation location based
-		on a given path.
+	       on a given \a path.
 
 	When reinitialized with this method a FindPath() method called afterward
 	evaluates the path constant passed to it based on \a path. In most cases
-	that means first determining the path of the installation location from the
-	given path.
+	that means first determining the path of the installation location from
+	the given \a path.
 
 	If \a dependency is specified, instead of determining the installation
 	location path from the given path, the installation location path of the
@@ -178,9 +194,11 @@
 
 	\param path A path based on which FindPath() shall compute the path.
 	\param dependency The name of the package's "requires" entry to be used for
-		resolving the installation location. Can be \c NULL.
-	\return A status code.
-	\retval B_OK Everything went fine.
+	       resolving the installation location. Can be \c NULL.
+
+	\return \c B_OK Everything if went fine or an error code otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -188,17 +206,21 @@
 	\fn status_t BPathFinder::SetTo(const entry_ref& ref,
 		const char* dependency)
 	\brief Reinitializes the object to refer to an installation location based
-		on a given entry_ref.
+	       on a given entry_ref.
 
 	This method converts the given entry_ref \a ref to a path and then calls
 	calls BPathFinder::SetTo(const char*, const char*).
 
 	\param ref A reference to be resolved to a path based on which FindPath()
-		shall compute the path.
-	\param dependency The name of the package's "requires" entry to be used for
-		resolving the installation location. Can be \c NULL.
+	       shall compute the path.
+	\param dependency The name of the package's "requires" entry to be used
+	       for resolving the installation location. Can be \c NULL.
 
 	\see status_t BPathFinder::SetTo(const char*, const char*)
+
+	\return \c B_OK Everything if went fine or an error code otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -221,6 +243,10 @@
 		resolving the installation location. Can be \c NULL.
 
 	\see status_t BPathFinder::SetTo(const char*, const char*)
+
+	\return \c B_OK Everything if went fine or an error code otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -258,27 +284,30 @@
 	resolved to is returned.
 
 	\param architecture The name of the architecture to be used for resolving
-		architecture dependent paths. Can be \c NULL, in which case the
-		architecture associated with the initial path is used.
+	       \a architecture dependent paths. Can be \c NULL, in which case the
+	       \a architecture associated with the initial path is used.
 	\param baseDirectory Constant indicating which path to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param flags Bitwise OR of any of the following flags:
-		- \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't exist,
-			create it as a directory (including all missing ancestors).
-		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's parent
-			doesn't exist, create the parent directory (including all missing
-			ancestors).
-		- \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
-			fail with \c B_ENTRY_NOT_FOUND.
+	       - \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't
+	         exist, create it as a directory (including all missing ancestors).
+	       - \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's
+	         parent doesn't exist, create the parent directory (including all
+	         missing ancestors).
+	       - \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
+	         fail with \c B_ENTRY_NOT_FOUND.
 	\param _path The variable to be set to the resulting path on success.
+
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
-		and the image file doesn't belong to a package, or \c dependency was
-		specified, but isn't a "requires" entry of the package, or
-		\c B_FIND_PATH_EXISTING_ONLY was specified and the resulting path
-		doesn't exist.
+	        path didn't exist, e.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+	        and the image file didn't belong to a package, or \c dependency
+	        was specified, but wasn't a "requires" entry of the package, or
+	        \c B_FIND_PATH_EXISTING_ONLY was specified and the resulting path
+	        didn't exist.
+
+	\since Haiku R1
 */
 
 
@@ -294,22 +323,25 @@
 	\param baseDirectory Constant indicating which path to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param flags Bitwise OR of any of the following flags:
-		- \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't exist,
-			create it as a directory (including all missing ancestors).
-		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's parent
-			doesn't exist, create the parent directory (including all missing
-			ancestors).
-		- \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
-			fail with \c B_ENTRY_NOT_FOUND.
+	       - \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't
+	         exist, create it as a directory (including all missing ancestors).
+	       - \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's
+	         parent doesn't exist, create the parent directory (including all
+	         missing ancestors).
+	       - \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
+	         fail with \c B_ENTRY_NOT_FOUND.
 	\param _path The variable to be set to the resulting path on success.
+
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
-		and the image file doesn't belong to a package, or \c dependency was
-		specified, but isn't a "requires" entry of the package, or
-		\c B_FIND_PATH_EXISTING_ONLY was specified and the resulting path
-		doesn't exist.
+	        path didn't exist, e.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+	        and the image file didn't belong to a package, or \c dependency
+	        was specified, but wasn't a "requires" entry of the package, or
+	        \c B_FIND_PATH_EXISTING_ONLY was specified and the resulting path
+	        didn't exist.
+
+	\since Haiku R1
 */
 
 
@@ -325,12 +357,13 @@
 	\param baseDirectory Constant indicating which path to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param _path The variable to be set to the resulting path on success.
+
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
-		and the image file doesn't belong to a package, or \c dependency was
-		specified, but isn't a "requires" entry of the package.
+		path didn't exist, e.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+		and the image file didn't belong to a package, or \c dependency was
+		specified, but wasn't a "requires" entry of the package.
 */
 
 
@@ -348,9 +381,11 @@
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
-		and the image file doesn't belong to a package, or \c dependency was
-		specified, but isn't a "requires" entry of the package.
+	        path didn't exist, e.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+	        and the image file didn't belong to a package, or \c dependency
+	        was specified, but wasn't a "requires" entry of the package.
+
+	\since Haiku R1
 */
 
 
@@ -373,26 +408,29 @@
 	valid arguments for this function.
 
 	\param architecture The name of the architecture to be used for resolving
-		architecture dependent paths. Can be \c NULL, in which case the caller's
-		architecture is used.
+	       \a architecture dependent paths. Can be \c NULL, in which case the
+	       caller's \a architecture is used.
 	\param baseDirectory Constant indicating which paths to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param flags Bitwise OR of any of the following flags:
-		- \c B_FIND_PATH_CREATE_DIRECTORY: If a resulting path doesn't exist,
-			create it as a directory (including all missing ancestors).
-		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If a resulting path's parent
-			doesn't exist, create the parent directory (including all missing
-			ancestors).
-		- \c B_FIND_PATH_EXISTING_ONLY: If a resulting path doesn't exist, skip
-			it. If none of the paths exist, fail with \c B_ENTRY_NOT_FOUND.
+	       - \c B_FIND_PATH_CREATE_DIRECTORY: If a resulting path doesn't
+	         exist, create it as a directory (including all missing ancestors).
+	       - \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If a resulting path's
+	         parent doesn't exist, create the parent directory (including all
+	         missing ancestors).
+	       - \c B_FIND_PATH_EXISTING_ONLY: If a resulting path doesn't exist,
+	         skip it. If none of the paths exist, fail with \c B_ENTRY_NOT_FOUND.
 	\param _paths The BStringList variable where the retrieved paths shall be
-		stored. The list is emptied before adding the paths. It is also emptied
-		on error.
+	       stored. The list is emptied before adding the paths. It is also
+	       emptied on error.
+
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was specified and
-		none of the resulting paths do exist.
+	        paths didn't exist, e.g. \c B_FIND_PATH_EXISTING_ONLY was
+	        specified and none of the resulting paths existed.
+
+	\since Haiku R1
 */
 
 
@@ -408,21 +446,25 @@
 	\param baseDirectory Constant indicating which paths to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param flags Bitwise OR of any of the following flags:
-		- \c B_FIND_PATH_CREATE_DIRECTORY: If a resulting path doesn't exist,
-			create it as a directory (including all missing ancestors).
-		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If a resulting path's parent
-			doesn't exist, create the parent directory (including all missing
-			ancestors).
-		- \c B_FIND_PATH_EXISTING_ONLY: If a resulting path doesn't exist, skip
-			it. If none of the paths exist, fail with \c B_ENTRY_NOT_FOUND.
+	       - \c B_FIND_PATH_CREATE_DIRECTORY: If a resulting path doesn't
+	         exist, create it as a directory (including all missing ancestors).
+	       - \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If a resulting path's
+	         parent doesn't exist, create the parent directory (including all
+	         missing ancestors).
+	       - \c B_FIND_PATH_EXISTING_ONLY: If a resulting path doesn't exist,
+	         skip it. If none of the paths exist, fail with
+	         \c B_ENTRY_NOT_FOUND.
 	\param _paths The BStringList variable where the retrieved paths shall be
-		stored. The list is emptied before adding the paths. It is also emptied
-		on error.
+	       stored. The list is emptied before adding the paths. It is also
+	       emptied on error.
+
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was specified and
-		none of the resulting paths do exist.
+	        paths didn't exist, e.g. \c B_FIND_PATH_EXISTING_ONLY was specified
+	        and none of the resulting paths existed.
+
+	\since Haiku R1
 */
 
 
@@ -438,13 +480,16 @@
 	\param baseDirectory Constant indicating which paths to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param _paths The BStringList variable where the retrieved paths shall be
-		stored. The list is emptied before adding the paths. It is also emptied
-		on error.
+	       stored. The list is emptied before adding the paths. It is also
+	       emptied on error.
+
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was specified and
-		none of the resulting paths do exist.
+	        paths didn't exist, e.g. \c B_FIND_PATH_EXISTING_ONLY was specified
+	        and none of the resulting paths existed.
+
+	\since Haiku R1
 */
 
 
@@ -459,11 +504,14 @@
 
 	\param baseDirectory Constant indicating which paths to retrieve.
 	\param _paths The BStringList variable where the retrieved paths shall be
-		stored. The list is emptied before adding the paths. It is also emptied
-		on error.
+	       stored. The list is emptied before adding the paths. It is also
+	       emptied on error.
+
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was specified and
-		none of the resulting paths do exist.
+	        paths didn't exist, e.g. \c B_FIND_PATH_EXISTING_ONLY was specified
+	        and none of the resulting paths existed.
+
+	\since Haiku R1
 */

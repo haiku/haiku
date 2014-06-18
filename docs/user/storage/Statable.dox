@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Copyright 2002-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/storage/Statable.h	hrev45306
- *		src/kits/storage/Statable.cpp	hrev45306
+ *		headers/os/storage/Statable.h	hrev47402
+ *		src/kits/storage/Statable.cpp	hrev47402
  */
 
 
@@ -46,22 +46,26 @@
 	  GetVolume() method.
 	- Get a node_ref of a node to pass into watch_node() via the GetNodeRef()
 	  method.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BStatable::GetStat(struct stat *st) const
+	\fn status_t BStatable::GetStat(struct stat* stat) const
 	\brief Fills out the stat structure for the node.
 
 	This method may be used to access the stat structure of a node directly.
 
-	\param st The stat structure to be filled in.
+	\param stat The stat structure to be filled in.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY Could not allocate enough memory.
 	\retval B_BAD_VALUE The node does not exist.
 	\retval B_NOT_ALLOWED Node or volume was read only.
+
+	\since BeOS R3
 */
 
 
@@ -71,6 +75,8 @@
 
 	\return \c true, if the node is properly initialized and is a file,
 	        \c false otherwise.
+
+	\since BeOS R5
 */
 
 
@@ -80,6 +86,8 @@
 
 	\return \c true, if the node is properly initialized and is a directory,
 	        \c false otherwise.
+
+	\since BeOS R5
 */
 
 
@@ -89,26 +97,33 @@
 
 	\return \c true, if the node is properly initialized and is a symlink,
 	        \c false otherwise.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn status_t BStatable::GetNodeRef(node_ref *ref) const
+	\fn status_t BStatable::GetNodeRef(node_ref* ref) const
 	\brief Fills out \a ref with the \c node_ref of the node.
 
 	\param ref the node_ref to be set.
 
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BStatable::GetOwner(uid_t *owner) const
+	\fn status_t BStatable::GetOwner(uid_t* owner) const
 	\brief Fills out the node's UID into \a owner.
 
 	\param owner A pointer to a \c uid_t to be set.
 
+	\see SetOwner()
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
@@ -119,16 +134,21 @@
 	\param owner The UID to set the node to.
 
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BStatable::GetGroup(gid_t *group) const
+	\fn status_t BStatable::GetGroup(gid_t* group) const
 	\brief Fills out the node's GID into \a group.
 
 	\param group a pointer to a \c gid_t variable to be set.
 
+	\see SetGroup()
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
@@ -139,47 +159,59 @@
 	\param group The GID to set the node to.
 
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BStatable::GetPermissions(mode_t *perms) const
+	\fn status_t BStatable::GetPermissions(mode_t* permissions) const
 	\brief Fills out \a perms with the permissions of the node.
 
-	\param perms A pointer to a \c mode_t variable to be set.
+	\param permissions The permissions to get from the node.
 
+	\see SetPermissions()
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BStatable::SetPermissions(mode_t perms)
+	\fn status_t BStatable::SetPermissions(mode_t permissions)
 	\brief Sets the node's permissions to \a perms.
 
-	\param perms The permissions to set the node to.
+	\param permissions The permissions to set the node to.
 
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BStatable::GetSize(off_t *size) const
+	\fn status_t BStatable::GetSize(off_t* size) const
 	\brief Fills out the size of the node's data (not counting attributes)
 	       into \a size.
 
 	\param size A pointer to a \c off_t variable to be set.
 
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BStatable::GetModificationTime(time_t *mtime) const
+	\fn status_t BStatable::GetModificationTime(time_t* mtime) const
 	\brief Fills out \a mtime with the last modification time of the node.
 
 	\param mtime A pointer to a \c time_t variable to be set.
 
+	\see SetModificationTime()
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
@@ -190,16 +222,21 @@
 	\param mtime The modification time to set the node to.
 
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BStatable::GetCreationTime(time_t *ctime) const
+	\fn status_t BStatable::GetCreationTime(time_t* ctime) const
 	\brief Fills out \a ctime with the creation time of the node.
 
 	\param ctime A pointer to a \c time_t variable to be set.
 
+	\see SetCreationTime()
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
@@ -210,15 +247,20 @@
 	\param ctime The creation time to set the node to.
 
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BStatable::GetAccessTime(time_t *atime) const
+	\fn status_t BStatable::GetAccessTime(time_t* atime) const
 	\brief Fills out \a atime with the access time of the node.
 
 	\see GetModificationTime()
+	\see SetAccessTime()
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
@@ -228,15 +270,19 @@
 
 	\see GetModificationTime()
 	\see GetStat() for return codes.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BStatable::GetVolume(BVolume *vol) const
+	\fn status_t BStatable::GetVolume(BVolume* volume) const
 	\brief Fills out \a vol with the the volume that the node lives on.
 
-	\param vol A pointer to a BVolume object to be set.
+	\param volume A pointer to a BVolume object to be set.
 
 	\see BVolume
 	\see GetStat() for return codes.
+
+	\since Haiku R1
 */

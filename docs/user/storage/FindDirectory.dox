@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Documentation by:
@@ -8,8 +8,8 @@
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *
  * Corresponds to:
- *		headers/os/storage/FindDirectory.h	 hrev46390
- *		src/kits/storage/FindDirectory.cpp	 hrev46390
+ *		headers/os/storage/FindDirectory.h	 hrev47402
+ *		src/kits/storage/FindDirectory.cpp	 hrev47402
  */
 
 
@@ -17,8 +17,8 @@
 	\file FindDirectory.h
 	\ingroup storage
 	\ingroup libbe
-	\brief Provides the find_directory(), find_path(), find_paths(), etc.
-		functions.
+	\brief Provides the find_directory(), find_path(), find_paths(), functions
+	       as well as the directory_which constants.
 
 	Haiku provides a set of directories for applications to use. These can be
 	accessed using the functions find_directory(), find_path(), find_path_etc(),
@@ -56,317 +56,929 @@
 	there are also a C++ version of find_directory() and the BPathFinder class
 	(both implemented in libbe), which may be more convenient to use in C++
 	code.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\enum directory_which
-	\brief Directory constants to use with find_directory.
+	\brief Directory constants to use with find_directory().
 
 	There are four kind of directories. Volume-local directories exist on each
-	volume. They may be at a different place in each of them, for example the
-	trash location depends on the filesystem. System and common directories are
-	system-wide. They live on only one volume. The difference is system is
-	only meant for internal system management and shouldn't be used by
-	applications. The common directories have a similar hierarchy, and they are
-	ignored when the user disable user add-ons in the boot menu. User
+	volume, they may be at a different location in each of them. For example
+	the location of the trash directory depends on the filesystem. System
+	directories are system-wide, they live on only one volume. System is meant
+	for internal system management and system-wide applications. User
 	directories have a different value depending on the UID of the application
-	calling the function. They are usually located in the user home directory.
+	calling the function. They are usually located in the user's home
+	directory.
 
-	Use common directories for system-wide files such as drivers. Use user
-	directories for application settings, since each user may want different
-	settings.
+	Use system directories for system-wide files such as drivers and use user
+	directories are for application settings, since each user may want
+	different settings.
+
+	\remark The \c B_COMMON_* constants have been intentionally removed in
+	        Haiku R1, use the \c B_SYSTEM_* constants instead.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var directory_which B_DESKTOP_DIRECTORY
-	The desktop for a given volume.
+	\brief The desktop directory for a given volume.
 
+	\since BeOS R3
+*/
+
+
+/*!
 	\var directory_which B_TRASH_DIRECTORY
-	The trash for a given volume.
+	\brief The trash directory for a given volume.
 
+	\since BeOS R3
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_DIRECTORY
-	The system directory.
+	\brief The system directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_ADDONS_DIRECTORY
-	The system add-ons directory
+	\brief The system add-ons directory
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_BOOT_DIRECTORY
-	The system boot directory. Contains the minimal set of files required for
-	booting Haiku.
+	\brief The system boot directory.
 
+	Contains the minimal set of files required for booting Haiku.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_FONTS_DIRECTORY
-	The system fonts directory
+	\brief The system fonts directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_LIB_DIRECTORY
-	The system lib directory.
+	\brief The system lib directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_SERVERS_DIRECTORY
-	The system servers directory.
+	\brief The system servers directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_APPS_DIRECTORY
-	The system applications directory. Contains applications with graphical
-	user interface.
+	\brief The system applications directory.
 
+	Contains applications with graphical user interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_BIN_DIRECTORY
-	The system bin directory. Contains command-line applications runnable from
-	Terminal.
+	\brief The system bin directory.
 
+	Contains command-line applications runnable from Terminal.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_DOCUMENTATION_DIRECTORY
-	The system documentation directory. Contains e.g. man pages.
+	\brief The system documentation directory, contains e.g. man pages.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_PREFERENCES_DIRECTORY
-	The system preferences directory.
+	\brief The system preferences directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_TRANSLATORS_DIRECTORY
-	The system translator directory.
+	\brief The system translator directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_MEDIA_NODES_DIRECTORY
-	The system media nodes directory.
+	\brief The system media nodes directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_SOUNDS_DIRECTORY
-	The system sounds directory.
+	\brief The system sounds directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_DATA_DIRECTORY
-	The system data directory.
+	\brief The system data directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_DEVELOP_DIRECTORY
-	The system directory containing development related files.
+	\brief The system directory containing development related files.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_PACKAGES_DIRECTORY
-	The system directory where activated packages live.
+	\brief The system directory where activated packages live.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_HEADERS_DIRECTORY
-	The system directory for development header files.
+	\brief The system directory for development header files.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_ETC_DIRECTORY
-	The system directory used for Unix-like installation location wide settings
-	(Unix "etc" directory).
+	\brief The system directory used for Unix-like installation location-wide
+	       settings (Unix "etc" directory).
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_SETTINGS_DIRECTORY
-	The system directory used for installation location wide settings.
+	\brief The system directory used for installation location-wide settings.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_LOG_DIRECTORY
-	The system directory where log files are put.
+	\brief The system directory where log files are put.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_SPOOL_DIRECTORY
-	The system directory for spool data (e.g. pending printer jobs).
+	\brief The system directory for spool data (e.g. pending printer jobs).
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_TEMP_DIRECTORY
-	The global directory for temporary files.
+	\brief The global directory for temporary files (Unix "tmp" directory).
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_VAR_DIRECTORY
-	The system directory for variable data (Unix "var" directory).
+	\brief The system directory for variable data (Unix "var" directory).
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_CACHE_DIRECTORY
-	The system directory used for cache files.
+	\brief The system directory used for cache files.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_DIRECTORY
-	The system non-packaged installation location directory.
+	\brief The system non-packaged installation location directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY
-	The system non-packaged add-ons directory
+	\brief The system non-packaged add-ons directory
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_TRANSLATORS_DIRECTORY
-	The system non-packaged translator directory.
+	\brief The system non-packaged translator directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_MEDIA_NODES_DIRECTORY
-	The system non-packaged media nodes directory.
+	\brief The system non-packaged media nodes directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_BIN_DIRECTORY
 	The system non-packaged bin directory. Contains command-line applications
-	runnable from Terminal.
+	\brief runnable from Terminal.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_DATA_DIRECTORY
-	The system non-packaged data directory.
+	\brief The system non-packaged data directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_FONTS_DIRECTORY
-	The system non-packaged fonts directory
+	\brief The system non-packaged fonts directory
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_SOUNDS_DIRECTORY
-	The system non-packaged sounds directory.
+	\brief The system non-packaged sounds directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_DOCUMENTATION_DIRECTORY
-	The system non-packaged documentation directory. Contains e.g. man pages.
+	\brief The system non-packaged documentation directory. Contains e.g. man pages.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_LIB_DIRECTORY
-	The system non-packaged lib directory.
+	\brief The system non-packaged lib directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_HEADERS_DIRECTORY
-	The system non-packaged directory for development header files.
+	\brief The system non-packaged directory for development header files.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_SYSTEM_NONPACKAGED_DEVELOP_DIRECTORY
-	The system non-packaged directory containing development related files.
+	\brief The system non-packaged directory containing development related
+	       files.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var directory_which B_USER_DIRECTORY
-	The user home directory. Do NOT store application settings here as on unix,
-	instead use B_USER_SETTINGS_DIRECTORY.
+	\brief The user home directory.
 
+	Do NOT store application settings here as on unix, instead use
+	\c B_USER_SETTINGS_DIRECTORY.
+
+	\since BeOS R3
+*/
+
+
+/*!
 	\var directory_which B_USER_CONFIG_DIRECTORY
-	The user's packaged installation location directory.
+	\brief The user packaged installation location directory.
 
+	\since BeOS R3
+*/
+
+
+/*!
 	\var directory_which B_USER_ADDONS_DIRECTORY
-	The user add-ons directory
+	\brief The user add-ons directory
 
+	\since BeOS R3
+*/
+
+
+/*!
 	\var directory_which B_USER_BOOT_DIRECTORY
-	The user directory containing booting related files.
+	\brief The user directory containing booting related files.
 
+	\since BeOS R3
+*/
+
+
+/*!
 	\var directory_which B_USER_FONTS_DIRECTORY
-	The user fonts directory
+	\brief The user fonts directory.
 
+	\since BeOS R3
+*/
+
+
+/*!
 	\var directory_which B_USER_LIB_DIRECTORY
-	The user lib directory.
+	\brief The user lib directory.
 
+	\since BeOS R3
+*/
+
+
+/*!
 	\var directory_which B_USER_SETTINGS_DIRECTORY
-	The user settings directory. You may store your application settings here.
-	Create a subdirectory for your application if you have multiple files to
-	store, else, put a single file. The file or directory should have the same
-	name as your application, so the user knows what it's used for.
+	\brief The user settings directory.
 
+	You may store your application settings here. Create a subdirectory for
+	your application if you have multiple files to store, else, put a single
+	file. The file or directory should have the same name as your
+	application, so the user knows what it's used for.
+
+	\since BeOS R3
+*/
+
+
+/*!
 	\var directory_which B_USER_DESKBAR_DIRECTORY
-	The user deskbar directory. You may add a link to your application here, so
-	it shows up in the user deskbar's leaf menu.
+	\brief The user Deskbar directory.
 
+	You may add a link to your application here, so it shows up in the user's
+	Deskbar leaf menu.
+
+	\since BeOS R3
+*/
+
+
+/*!
 	\var directory_which B_USER_PRINTERS_DIRECTORY
-	The user directory for printer settings.
+	\brief The user directory for printer settings.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_TRANSLATORS_DIRECTORY
-	The user translator directory.
+	\brief The user translator directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_MEDIA_NODES_DIRECTORY
-	The user media nodes directory.
+	\brief The user media nodes directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_SOUNDS_DIRECTORY
-	The user sounds directory.
+	\brief The user sounds directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_DATA_DIRECTORY
-	The user data directory.
+	\brief The user data directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_CACHE_DIRECTORY
-	The system directory used for cache files.
+	\brief The user directory used for cache files.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_PACKAGES_DIRECTORY
-	The user directory where activated packages live.
+	\brief The user directory where activated packages live.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_HEADERS_DIRECTORY
-	The user directory for development header files.
+	\brief The user directory for development header files.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_DEVELOP_DIRECTORY
-	The user directory containing development related files.
+	\brief The user directory containing development related files.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_DOCUMENTATION_DIRECTORY
-	The user documentation directory. Contains e.g. man pages.
+	\brief The user documentation directory, contains e.g. man pages.
 
- 	\var directory_which B_USER_SERVERS_DIRECTORY
-	The user servers directory.
+	\since Haiku R1
+*/
 
+
+/*!
+	\var directory_which B_USER_SERVERS_DIRECTORY
+	\brief The user servers directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_APPS_DIRECTORY
-	The user applications directory. Contains applications with graphical
-	user interface.
+	\brief The user applications directory.
 
+	Contains applications with graphical user interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_BIN_DIRECTORY
-	The user bin directory. Contains command-line applications runnable from
-	Terminal.
+	\brief The user bin directory.
 
+	Contains command-line applications runnable from Terminal.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_PREFERENCES_DIRECTORY
-	The user preference applications directory.
+	\brief The user preference applications directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_ETC_DIRECTORY
-	The user directory used for Unix-like installation location wide settings
-	(Unix "etc" directory).
+	\brief The user directory used for Unix-like installation location-wide
+	       settings (Unix "etc" directory).
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_LOG_DIRECTORY
-	The user directory where log files are put.
+	\brief The user directory where log files are put.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_SPOOL_DIRECTORY
-	The user directory for spool data (e.g. pending printer jobs).
+	\brief The user directory for spool data, e.g. pending printer jobs.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_VAR_DIRECTORY
-	The user directory for variable data (Unix "var" directory).
+	\brief The user directory for variable data (Unix "var" directory).
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_DIRECTORY
-	The user non-packaged installation location directory.
+	\brief The user non-packaged installation location directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_ADDONS_DIRECTORY
-	The user non-packaged add-ons directory
+	\brief The user non-packaged add-ons directory
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_TRANSLATORS_DIRECTORY
-	The user non-packaged translator directory.
+	\brief The user non-packaged translator directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_MEDIA_NODES_DIRECTORY
-	The user non-packaged media nodes directory.
+	\brief The user non-packaged media nodes directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_BIN_DIRECTORY
-	The user non-packaged bin directory. Contains command-line applications
-	runnable from Terminal.
+	\brief The user non-packaged bin directory.
 
+	Contains command-line applications runnable from Terminal.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_DATA_DIRECTORY
-	The user non-packaged data directory.
+	\brief The user non-packaged data directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_FONTS_DIRECTORY
-	The user non-packaged fonts directory
+	\brief The user non-packaged fonts directory
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_SOUNDS_DIRECTORY
-	The user non-packaged sounds directory.
+	\brief The user non-packaged sounds directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_DOCUMENTATION_DIRECTORY
-	The user non-packaged documentation directory. Contains e.g. man pages.
+	\brief The user non-packaged documentation directory, contains e.g. man
+	       pages.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_LIB_DIRECTORY
-	The user non-packaged lib directory.
+	\brief The user non-packaged lib directory.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_HEADERS_DIRECTORY
-	The user non-packaged directory for development header files.
+	\brief The user non-packaged directory for development header files.
 
+	\since Haiku R1
+*/
+
+
+/*!
 	\var directory_which B_USER_NONPACKAGED_DEVELOP_DIRECTORY
-	The user non-packaged directory containing development related files.
+	\brief The user non-packaged directory containing development related
+	       files.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var directory_which B_APPS_DIRECTORY
-	The global applications directory. Contains applications with graphical
-	user interface.
+	\brief The global applications directory.
 
-	\var directory_which B_PREFERENCES_DIRECTORY
-	The global preference applications directory.
+	Contains applications with graphical user interface.
 
-	\var directory_which B_UTILITIES_DIRECTORY
-	The global utility applications directory.
-
-	\var directory_which B_PACKAGE_LINKS_DIRECTORY
-	The global package links directory. This is where symlink directories for
-	all activated packages are exposed.
+	\since BeOS R3
 */
 
 
-/* find_path[s]() flags */
+/*!
+	\var directory_which B_PREFERENCES_DIRECTORY
+	\brief The global preference applications directory.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_UTILITIES_DIRECTORY
+	\brief The global utility applications directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var directory_which B_PACKAGE_LINKS_DIRECTORY
+	\brief The global package links directory.
+
+	This is where symlink directories for all activated packages are exposed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var directory_which B_BEOS_DIRECTORY
+	\brief The BeOS directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_SYSTEM_DIRECTORY
+	\brief The BeOS system directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_ADDONS_DIRECTORY
+	\brief The BeOS Add-ons directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_ADDONS_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_BOOT_DIRECTORY
+	\brief The BeOS boot directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_BOOT_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_FONTS_DIRECTORY
+	\brief The BeOS fonts directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_FONTS_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_LIB_DIRECTORY
+	\brief The BeOS lib directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_LIB_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_SERVERS_DIRECTORY
+	\brief The BeOS servers directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_SERVERS_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_APPS_DIRECTORY
+	\brief The BeOS apps directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_APPS_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_BIN_DIRECTORY
+	\brief The BeOS bin directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_BIN_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_ETC_DIRECTORY
+	\brief The BeOS etc directory used for Unix-like installation location-wide
+	       settings (Unix "etc" directory).
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_ETC_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_DOCUMENTATION_DIRECTORY
+	\brief The BeOS documentation directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_DOCUMENTATION_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_PREFERENCES_DIRECTORY
+	\brief The BeOS preferences directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_PREFERENCES_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_TRANSLATORS_DIRECTORY
+	\brief The BeOS translators directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_TRANSLATORS_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_MEDIA_NODES_DIRECTORY
+	\brief The BeOS media nodes directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_MEDIA_NODES_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_SOUNDS_DIRECTORY
+	\brief The BeOS sounds directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_SOUNDS_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var directory_which B_BEOS_DATA_DIRECTORY
+	\brief The BeOS data directory.
+
+	\deprecated Legacy BeOS definition to be phased out, use
+	            \c B_SYSTEM_DATA_DIRECTORY instead.
+
+	\since BeOS R3
+*/
+
+
+//// find_path[s]() flags
 
 
 /*!
 	\var B_FIND_PATH_CREATE_DIRECTORY
-	Flag for the find_path_etc(), find_path_for_path_etc(), find_paths_etc(),
-	and BPathFinder API. Specifies that, if the resulting path doesn't exist,
-	it shall be created as a directory, including all missing ancestors. Failure
-	to create the path will cause the respective function to fail.
+	\brief Specifies that if the resulting path doesn't exist, it shall be
+	       created a directory, including all missing ancestors.
 
+	Failure to create the path will cause the respective function to fail.
+
+	Flag for the find_path_etc(), find_path_for_path_etc(), find_paths_etc(),
+	and BPathFinder API.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\var B_FIND_PATH_CREATE_PARENT_DIRECTORY
-	Flag for the find_path_etc(), find_path_for_path_etc(), find_paths_etc(),
-	and BPathFinder API. Specifies that, if the resulting path's parent doesn't
-	exist, the parent shall be created as a directory, including all missing
-	ancestors. Failure to create the directory will cause the respective
-	function to fail.
+	\brief Specifies that if the resulting path's parent doesn't exist, the
+	       parent shall be created as a directory, including all missing
+	       ancestors.
 
-	\var B_FIND_PATH_EXISTING_ONLY
+	Failure to create the directory will cause the respective function to fail.
+
 	Flag for the find_path_etc(), find_path_for_path_etc(), find_paths_etc(),
-	and BPathFinder API. Specifies that, if the resulting path doesn't exist,
-	the respective function shall skip it. In case multiple paths shall be
-	retrieved and none of the paths exists, the function shall fail with
-	\c B_ENTRY_NOT_FOUND.
+	and BPathFinder API.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_EXISTING_ONLY
+	\brief Specifies that if the resulting path doesn't exist, the respective
+	       function shall skip it.
+
+	In case multiple paths shall be retrieved and none of the paths exists,
+	the function shall fail with \c B_ENTRY_NOT_FOUND.
+
+	Flag for the find_path_etc(), find_path_for_path_etc(), find_paths_etc(),
+	and BPathFinder API.
+
+	\since Haiku R1
 */
 
 
@@ -378,92 +990,230 @@
 	location and those that based off an image or given path. The latter are not
 	valid argument for all functions.
 
-	\var B_FIND_PATH_INSTALLATION_LOCATION_DIRECTORY
-	The installation location base directory.
-
-	\var B_FIND_PATH_ADD_ONS_DIRECTORY
-	The add-ons directory.
-
-	\var B_FIND_PATH_APPS_DIRECTORY
-	The application directory.
-
-	\var B_FIND_PATH_BIN_DIRECTORY
-	The command line application directory (Unix "bin" directory).
-
-	\var B_FIND_PATH_BOOT_DIRECTORY
-	The directory containing booting related files.
-
-	\var B_FIND_PATH_CACHE_DIRECTORY
-	The directory used for cache files.
-
-	\var B_FIND_PATH_DATA_DIRECTORY
-	The base directory used for read-only data.
-
-	\var B_FIND_PATH_DEVELOP_DIRECTORY
-	The directory containing development related files.
-
-	\var B_FIND_PATH_DEVELOP_LIB_DIRECTORY
-	The the development library directory. This is the directory where the
-	linker finds libraries.
-
-	\var B_FIND_PATH_DOCUMENTATION_DIRECTORY
-	The base directory used for documentation.
-
-	\var B_FIND_PATH_ETC_DIRECTORY
-	The directory used for Unix-like installation location wide settings (Unix
-	"etc" directory).
-
-	\var B_FIND_PATH_FONTS_DIRECTORY
-	The fonts directory.
-
-	\var B_FIND_PATH_HEADERS_DIRECTORY
-	The development header files directory.
-
-	\var B_FIND_PATH_LIB_DIRECTORY
-	The runtime library directory. This is where the runtime loader finds
-	libraries.
-
-	\var B_FIND_PATH_LOG_DIRECTORY
-	The directory where log files are put.
-
-	\var B_FIND_PATH_MEDIA_NODES_DIRECTORY
-	The media node add-ons directory.
-
-	\var B_FIND_PATH_PACKAGES_DIRECTORY
-	The directory where activated packages live.
-
-	\var B_FIND_PATH_PREFERENCES_DIRECTORY
-	The preference application directory.
-
-	\var B_FIND_PATH_SERVERS_DIRECTORY
-	The server and daemon program directory.
-
-	\var B_FIND_PATH_SETTINGS_DIRECTORY
-	The directory used for installation location wide settings. Note that for
-	the user's home config installation location, this is not the same as the
-	user's settings directory. Software installed in that installation location
-	puts their global settings files here.
-
-	\var B_FIND_PATH_SOUNDS_DIRECTORY
-	The directory for sound files.
-
-	\var B_FIND_PATH_SPOOL_DIRECTORY
-	The directory for spool data (e.g. pending printer jobs).
-
-	\var B_FIND_PATH_TRANSLATORS_DIRECTORY
-	The translator add-ons directory.
-
-	\var B_FIND_PATH_VAR_DIRECTORY
-	The directory for variable data (Unix "var" directory).
-
-	\var B_FIND_PATH_IMAGE_PATH
-	The path of the image file that was identified by a pointer argument passed
-	to the respective function.
-
-	\var B_FIND_PATH_PACKAGE_PATH
-	The path of the package the file referred to by the specified path belongs
-	to.
+	\since Haiku R1
 */
+
+
+/*!
+	\var B_FIND_PATH_INSTALLATION_LOCATION_DIRECTORY
+	\brief The installation location base directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_ADD_ONS_DIRECTORY
+	\brief The add-ons directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_APPS_DIRECTORY
+	\brief The application directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_BIN_DIRECTORY
+	\brief The command line application directory (Unix "bin" directory).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_BOOT_DIRECTORY
+	\brief The directory containing booting related files.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_CACHE_DIRECTORY
+	\brief The directory used for cache files.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_DATA_DIRECTORY
+	\brief The base directory used for read-only data.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_DEVELOP_DIRECTORY
+	\brief The directory containing development related files.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_DEVELOP_LIB_DIRECTORY
+	\brief The the development library directory.
+
+	This is the directory where the linker finds libraries.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_DOCUMENTATION_DIRECTORY
+	\brief The base directory used for documentation.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_ETC_DIRECTORY
+	\brief The directory used for Unix-like installation location wide
+	       settings (Unix "etc" directory).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_FONTS_DIRECTORY
+	\brief The fonts directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_HEADERS_DIRECTORY
+	\brief The development header files directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_LIB_DIRECTORY
+	\brief The runtime library directory.
+
+	This is where the runtime loader finds libraries.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_LOG_DIRECTORY
+	\brief The directory where log files are put.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_MEDIA_NODES_DIRECTORY
+	\brief The media node add-ons directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_PACKAGES_DIRECTORY
+	\brief The directory where activated packages live.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_PREFERENCES_DIRECTORY
+	\brief The preference application directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_SERVERS_DIRECTORY
+	\brief The server and daemon program directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_SETTINGS_DIRECTORY
+	\brief The directory used for installation location wide settings.
+
+	Note that for the user's home config installation location, this is not
+	the same as the user's settings directory. Software installed in that
+	installation location puts their global settings files here.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_SOUNDS_DIRECTORY
+	\brief The directory for sound files.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_SPOOL_DIRECTORY
+	\brief The directory for spool data, e.g. pending printer jobs.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_TRANSLATORS_DIRECTORY
+	\brief The translator add-ons directory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_VAR_DIRECTORY
+	\brief The directory for variable data (Unix "var" directory).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_IMAGE_PATH
+	\brief The path of the image file that was identified by a pointer
+	       argument passed to the respective function.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_FIND_PATH_PACKAGE_PATH
+	\brief The path of the package the file referred to by the specified path
+	       belongs to.
+
+	\since Haiku R1
+*/
+
+
+/*!
 
 
 /*!
@@ -474,6 +1224,8 @@
 	Fills up to \a length characters of \a pathString with the path to \a which
 	on \a volume. Creates the directory if it doesn't exists if \a createIt is
 	set.
+
+	\since BeOS R3
 */
 
 
@@ -483,6 +1235,8 @@
 	\brief C++ interface to find_directory
 
 	Set \a path to \a which on \a volume.
+
+	\since BeOS R3
 */
 
 
@@ -491,7 +1245,7 @@
 		path_base_directory baseDirectory, const char* subPath,
 		char* pathBuffer, size_t bufferSize)
 	\brief Retrieves a path in the file system layout based on a loaded image
-		file.
+	       file.
 
 	The function determines the path of the image (i.e. executable, library, or
 	add-on) file associated with \a codePointer, a pointer to a location in the
@@ -511,20 +1265,22 @@
 	image file, if any.
 
 	\param codePointer A pointer to code or static data belonging to the image
-		based on which the path shall be computed. The special value
-		\c B_APP_IMAGE_SYMBOL can be used to refer to the program image, and
-		\c B_CURRENT_IMAGE_SYMBOL for the caller's image.
+	       based on which the path shall be computed. The special value
+	       \c B_APP_IMAGE_SYMBOL can be used to refer to the program image, and
+	       \c B_CURRENT_IMAGE_SYMBOL for the caller's image.
 	\param baseDirectory Constant indicating which path to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param pathBuffer Pointer to a pre-allocated buffer the retrieved path
-		shall be stored in.
+	       shall be stored in.
 	\param bufferSize Size of the \a pathBuffer buffer.
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BUFFER_OVERFLOW The provided \a pathBuffer wasn't large enough.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
-		and the image file doesn't belong to a package.
+	        path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+	        and the image file doesn't belong to a package.
+
+	\since Haiku R1
 */
 
 
@@ -533,7 +1289,7 @@
 		const char* architecture, path_base_directory baseDirectory,
 		const char* subPath, uint32 flags, char* pathBuffer, size_t bufferSize)
 	\brief Retrieves a path in the file system layout based on a loaded image
-		file.
+	       file.
 
 	The function determines the path of the image (i.e. executable, library, or
 	add-on) file associated with \a codePointer, a pointer to a location in the
@@ -558,36 +1314,38 @@
 	package containing the image file, if any.
 
 	\param codePointer A pointer to code or static data belonging to the image
-		based on which the path shall be computed. The special value
-		\c B_APP_IMAGE_SYMBOL can be used to refer to the program image, and
-		\c B_CURRENT_IMAGE_SYMBOL for the caller's image.
+	       based on which the path shall be computed. The special value
+	       \c B_APP_IMAGE_SYMBOL can be used to refer to the program image, and
+	       \c B_CURRENT_IMAGE_SYMBOL for the caller's image.
 	\param dependency The name of the package's "requires" entry to be used for
-		resolving the installation location. Can be \c NULL.
+	       resolving the installation location. Can be \c NULL.
 	\param architecture The name of the architecture to be used for resolving
-		architecture dependent paths. Can be \c NULL, in which case the caller's
-		architecture is used.
+	       architecture dependent paths. Can be \c NULL, in which case the
+	       caller's architecture is used.
 	\param baseDirectory Constant indicating which path to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param flags Bitwise OR of any of the following flags:
-		- \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't exist,
-			create it as a directory (including all missing ancestors).
-		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's parent
-			doesn't exist, create the parent directory (including all missing
-			ancestors).
-		- \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
-			fail with \c B_ENTRY_NOT_FOUND.
+	       - \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't
+	         exist, create it as a directory (including all missing ancestors).
+	       - \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's
+	         parent doesn't exist, create the parent directory (including all
+	         missing ancestors).
+	       - \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
+	         fail with \c B_ENTRY_NOT_FOUND.
 	\param pathBuffer Pointer to a pre-allocated buffer the retrieved path
-		shall be stored in.
+	       shall be stored in.
 	\param bufferSize Size of the \a pathBuffer buffer.
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BUFFER_OVERFLOW The provided \a pathBuffer wasn't large enough.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
-		and the image file doesn't belong to a package, or \c dependency was
-		specified, but isn't a "requires" entry of the package, or
-		\c B_FIND_PATH_EXISTING_ONLY was specified and the resulting path
-		doesn't exist.
+	        path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+	        and the image file doesn't belong to a package, or \c dependency
+	        was specified, but isn't a "requires" entry of the package, or
+	        \c B_FIND_PATH_EXISTING_ONLY was specified and the resulting path
+	        doesn't exist.
+
+	\since Haiku R1
 */
 
 
@@ -616,14 +1374,16 @@
 	\param baseDirectory Constant indicating which path to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param pathBuffer Pointer to a pre-allocated buffer the retrieved path
-		shall be stored in.
+	       shall be stored in.
 	\param bufferSize Size of the \a pathBuffer buffer.
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BUFFER_OVERFLOW The provided \a pathBuffer wasn't large enough.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
-		and \a path does refer to a file that belongs to a package.
+	        path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+	        and \a path does refer to a file that belongs to a package.
+
+	\since Haiku R1
 */
 
 
@@ -657,32 +1417,34 @@
 
 	\param path A path based on which the path shall be computed.
 	\param dependency The name of the package's "requires" entry to be used for
-		resolving the installation location. Can be \c NULL.
+	       resolving the installation location. Can be \c NULL.
 	\param architecture The name of the architecture to be used for resolving
-		architecture dependent paths. Can be \c NULL, in which case the
-		architecture associated with \a path is used.
+	       architecture dependent paths. Can be \c NULL, in which case the
+	       architecture associated with \a path is used.
 	\param baseDirectory Constant indicating which path to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param flags Bitwise OR of any of the following flags:
-		- \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't exist,
-			create it as a directory (including all missing ancestors).
-		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's parent
-			doesn't exist, create the parent directory (including all missing
-			ancestors).
-		- \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
-			fail with \c B_ENTRY_NOT_FOUND.
+	       - \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't
+	         exist, create it as a directory (including all missing ancestors).
+	       - \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's
+	         parent doesn't exist, create the parent directory (including all
+	         missing ancestors).
+	       - \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
+	         fail with \c B_ENTRY_NOT_FOUND.
 	\param pathBuffer Pointer to a pre-allocated buffer the retrieved path
-		shall be stored in.
+	       shall be stored in.
 	\param bufferSize Size of the \a pathBuffer buffer.
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BUFFER_OVERFLOW The provided \a pathBuffer wasn't large enough.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
-		and \a path does refer to a file that belongs to a package, or
-		\c dependency was specified, but isn't a "requires" entry of the
-		package, or \c B_FIND_PATH_EXISTING_ONLY was specified and the resulting
-		path doesn't exist.
+	        path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+	        and \a path does refer to a file that belongs to a package, or
+	        \c dependency was specified, but isn't a "requires" entry of the
+	        package, or \c B_FIND_PATH_EXISTING_ONLY was specified and the
+	        resulting path doesn't exist.
+
+	\since Haiku R1
 */
 
 
@@ -709,13 +1471,16 @@
 	\param baseDirectory Constant indicating which paths to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param _paths Pointer to a pre-allocated variable where the pointer to the
-		allocated path array shall be stored on success.
+	       allocated path array shall be stored on success.
 	\param _pathCount Pointer to a pre-allocated variable where the number of
-		paths in the path array shall be stored on success.
+	       paths in the path array shall be stored on success.
+
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		paths doesn't exist.
+	        paths doesn't exist.
+
+	\since Haiku R1
 */
 
 
@@ -742,25 +1507,27 @@
 	pointer.
 
 	\param architecture The name of the architecture to be used for resolving
-		architecture dependent paths. Can be \c NULL, in which case the caller's
-		architecture is used.
+	       architecture dependent paths. Can be \c NULL, in which case the
+	       caller's architecture is used.
 	\param baseDirectory Constant indicating which paths to retrieve.
 	\param subPath Relative subpath that shall be appended. Can be \c NULL.
 	\param flags Bitwise OR of any of the following flags:
-		- \c B_FIND_PATH_CREATE_DIRECTORY: If a resulting path doesn't exist,
-			create it as a directory (including all missing ancestors).
-		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If a resulting path's parent
-			doesn't exist, create the parent directory (including all missing
-			ancestors).
-		- \c B_FIND_PATH_EXISTING_ONLY: If a resulting path doesn't exist, skip
-			it. If none of the paths exist, fail with \c B_ENTRY_NOT_FOUND.
+	       - \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't
+	         exist, create it as a directory (including all missing ancestors).
+	       - \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's
+	         parent doesn't exist, create the parent directory (including all
+	         missing ancestors).
+	       - \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
+	         fail with \c B_ENTRY_NOT_FOUND.
 	\param _paths Pointer to a pre-allocated variable where the pointer to the
-		allocated path array shall be stored on success.
+	       allocated path array shall be stored on success.
 	\param _pathCount Pointer to a pre-allocated variable where the number of
-		paths in the path array shall be stored on success.
+	       paths in the path array shall be stored on success.
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
-		paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was specified and
-		none of the resulting paths do exist.
+	        paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was
+	        specified and none of the resulting paths do exist.
+
+	\since Haiku R1
 */

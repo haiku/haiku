@@ -1,16 +1,15 @@
 /*
- * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Tyler Dauwalder
  *		Ingo Weinhold, bonefish@users.sf.net
  *		Axel Dörfler, axeld@pinc-software.de
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/storage/MimeType.h  hrev43528
- *		src/kits/storage/MimeType.cpp  hrev43528
+ *		headers/os/storage/MimeType.h  hrev47402
+ *		src/kits/storage/MimeType.cpp  hrev47402
  */
 
 
@@ -26,43 +25,51 @@
 	\class BMimeType
 	\ingroup storage
 	\ingroup libbe
-	\brief A class that represents a MIME (Multipurpose Internet Mail
-		Extensions) type string.
+	\brief A class that represents a MIME (Multi-purpose Internet Mail
+	       Extensions) type string.
 
 	MIME types use, has grown beyond describing the content of email
 	to describe the content types of applications and file formats.
 
-	MIME types consist of a super type and a 
+	MIME types consist of a supertype and a subtype.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BMimeType::BMimeType()
 	\brief Creates an uninitialized BMimeType object.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BMimeType::BMimeType(const char *mimeType)
+	\fn BMimeType::BMimeType(const char* mimeType)
 	\brief Creates a BMimeType object and initializes it to the supplied
-		MIME type.
+	       MIME type.
 
 	The supplied string must specify a valid MIME type or supertype.
 
 	\param mimeType The MIME string.
 
 	\sa SetTo() for further information.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BMimeType::~BMimeType()
 	\brief Frees all resources associated with this object.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::SetTo(const char *mimeType)
+	\fn status_t BMimeType::SetTo(const char* mimeType)
 	\brief Initializes this object to the supplied MIME type.
 
 	The supplied string must specify a valid MIME type or supertype.
@@ -85,15 +92,19 @@
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_NO_INIT \c NULL \a mimeType string.
 	\retval B_BAD_VALUE Invalid \a mimeType string.
+	\retval B_NO_INIT BMimeType was uninitialized.
 	\retval B_NO_MEMORY Insufficient memory to copy the MIME string.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BMimeType::Unset()
 	\brief Returns the object to an uninitialized state.
+
+	\since BeOS R3
 */
 
 
@@ -102,7 +113,9 @@
 	\brief Returns the result of the most recent constructor or SetTo() call.
 
 	\returns \c B_OK If the object is properly initialized, a specific
-		error code otherwise.
+	         error code otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -111,7 +124,9 @@
 	\brief Returns the MIME string represented by this object.
 
 	\return The MIME string, if the object is properly initialized, \c NULL
-			otherwise.
+	        otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -120,9 +135,11 @@
 	\brief Returns whether the object represents a valid MIME type.
 
 	\return \c true, if the object is properly initialized, \c false
-			otherwise.
+	        otherwise.
 
 	\sa SetTo() for further information.
+
+	\since BeOS R3
 */
 
 
@@ -131,39 +148,46 @@
 	\brief Returns whether this objects represents a supertype.
 
 	\return \c true, if the object is properly initialized and represents a
-			supertype, \c false otherwise.
+	        supertype, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool BMimeType::IsInstalled() const
 	\brief Returns whether or not this type is currently installed in the
-		   MIME database.
+	       MIME database.
 
 	To add the MIME type to the database, call \c Install().
 	To remove the MIME type from the database, call \c Delete().
 
-	\returns A \c bool indicating whether or not this type is currently
-			 installed in the MIME database.
+	\return A \c bool indicating whether or not this type is currently
+	        installed in the MIME database.
 	\retval true The MIME type is currently installed in the database.
 	\retval false The MIME type is not currently installed in the database.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetSupertype(BMimeType *superType) const
-	\brief Gets the supertype of the MIME type represented by this object.
+	\fn status_t BMimeType::GetSupertype(BMimeType* supertype) const
+	\brief Gets the \a supertype of the MIME type represented by this object.
 
-	The supplied object is initialized to this object's supertype. If this
+	The supplied object is initialized to this object's \a supertype. If this
 	BMimeType is not properly initialized, the supplied object will be Unset().
 
-	\param superType A pointer to the BMimeType object that shall be
-		   initialized to this object's supertype.
+	\param supertype A pointer to the BMimeType object that shall be
+	       initialized to this object's \a supertype.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \c NULL \a superType, this object is not initialized,
-		or this object is a supertype only.
+	        or this object is a supertype only.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since BeOS R3
 */
 
 
@@ -175,16 +199,18 @@
 	MIME string, ignoring case, or if both are not initialized.
 
 	\warning In BeOS R5 two uninitialized BMimeType objects were not
-		considered to be equal, in Haiku they are.
+	         considered to be equal, in Haiku they are.
 
 	\param type The BMimeType to be compared with.
 
 	\return \c true, if the objects are equal, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMimeType::operator==(const char *type) const
+	\fn bool BMimeType::operator==(const char* type) const
 	\brief Returns whether this and the supplied MIME type are equal.
 
 	A BMimeType objects equals a MIME string, if its MIME string equals the
@@ -192,23 +218,27 @@
 	is \c NULL.
 
 	\warning In BeOS R5 an uninitialized BMimeType object was not
-		considered to be equal to \c NULL, in Haiku it is.
+	         considered to be equal to \c NULL, in Haiku it is.
 
 	\param type The MIME string to be compared with.
 
 	\return \c true, if the MIME types are equal, \c false otherwise.
+
+	\since BeOS R4
 */
 
 
 /*!
-	\fn bool BMimeType::Contains(const BMimeType *type) const
+	\fn bool BMimeType::Contains(const BMimeType* type) const
 	\brief Returns whether this MIME type is a supertype of or equals the
 	supplied one.
 
 	\param type The MIME type.
 
 	\returns \c true, if this MIME type is a supertype of or equals the
-			supplied one, \c false otherwise.
+	         supplied one, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -218,11 +248,15 @@
 
 	To check if the MIME type is already installed, call \c IsInstalled().
 	To remove the MIME type from the database, call \c Delete().
-	
+
 	\note The R5 implementation returns random values if the type is already
 	installed, so be sure to check \c IsInstalled() first.
-	
+
 	\returns \c B_OK on success or another error code on failure.
+
+	\see Delete()
+
+	\since BeOS R3
 */
 
 
@@ -232,17 +266,19 @@
 
 	To check if the MIME type is already installed, call \c IsInstalled().
 	To add the MIME type to the database, call \c Install().
-	
+
 	\note Calling \c BMimeType::Delete() does not uninitialize or otherwise
-	deallocate the \c BMimeType object; it simply removes the type from the
-	database.
-	
+	      deallocate the \c BMimeType object; it simply removes the type from
+	      the database.
+
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetIcon(BBitmap *icon, icon_size size) const
+	\fn status_t BMimeType::GetIcon(BBitmap* icon, icon_size size) const
 	\brief Fetches the large or mini icon associated with the MIME type.
 
 	The icon is copied into the \c BBitmap pointed to by \c icon. The bitmap
@@ -251,14 +287,17 @@
 	(8-bit color).
 
 	\param icon Pointer to a pre-allocated \c BBitmap of proper size and
-				colorspace into which the icon is copied.
+	       colorspace into which the icon is copied.
 	\param size Value that specifies which icon to return.
-				Currently \c B_LARGE_ICON and \c B_MINI_ICON are supported.
+	       Currently \c B_LARGE_ICON and \c B_MINI_ICON are supported.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_ENTRY_NOT_FOUND: No icon of the given size exists for the
-		given type.
+	\retval B_ENTRY_NOT_FOUND No icon of the given size exists for the
+	        given type.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since BeOS R3
 */
 
 
@@ -268,22 +307,25 @@
 		The icon data is returned in \c data.
 
 	\param data Pointer in which the allocated icon data is returned. You
-		need to delete the buffer when you are done with it.
+	       need to delete the buffer when you are done with it.
 	\param size Pointer in which the size of the allocated icon data is
-		returned.
+	       returned.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_ENTRY_NOT_FOUND No icon of the given size exists for the given
-		type
+	\retval B_ENTRY_NOT_FOUND No icon of the given size found for the given
+	        type.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetPreferredApp(char *signature,
+	\fn status_t BMimeType::GetPreferredApp(char* signature,
 		app_verb verb) const
 	\brief Fetches the signature of the preferred application from
-		the MIME database.
+	       the MIME database.
 
 	The preferred app is the application that's used to access a file when,
 	for example, the user double-clicks the file in a Tracker window. Unless
@@ -294,24 +336,30 @@
 	The string pointed to by \c signature must be long enough to
 	hold the preferred applications signature; a length of
 	\c B_MIME_TYPE_LENGTH is recommended.
-	
+
 	\param signature Pointer to a pre-allocated string into which the
-		signature of the preferred app is copied. If the function fails,
-		the contents of the string are undefined.
+	       signature of the preferred app is copied. If the function fails,
+	       the contents of the string are undefined.
 	\param verb \c app_verb value that specifies the type of access for
 		which you are requesting the preferred app. Currently, the only
 		supported app verb is \c B_OPEN.
+
 	\returns A status code.
 	\retval B_OK Success
 	\retval B_ENTRY_NOT_FOUND No preferred app exists for the given type
-		and app_verb.
+	        and app_verb.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\see SetPreferredApp()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetAttrInfo(BMessage *info) const
+	\fn status_t BMimeType::GetAttrInfo(BMessage* info) const
 	\brief Fetches from the MIME database a BMessage describing the attributes
-		typically associated with files of the given MIME type.
+	       typically associated with files of the given MIME type.
 
 	The attribute information is returned in a pre-allocated BMessage pointed
 	to by the \c info parameter (note that the any prior contents of the
@@ -352,19 +400,23 @@
 				editable, \c false if not </td>
 		</tr>
 	</table>
-	
+
 	The \c BMessage::what value is set to decimal \c 233, but is otherwise
 	meaningless.
 
 	\param info Pointer to a pre-allocated BMessage into which information about
-	            the MIME type's associated file attributes is stored.
+	       the MIME type's associated file attributes is stored.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\see SetAttrInfo()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetFileExtensions(BMessage *extensions) const
+	\fn status_t BMimeType::GetFileExtensions(BMessage* extensions) const
 	\brief Fetches the MIME type's associated filename extensions from the
 		MIME database.
 
@@ -378,44 +430,53 @@
 	the message will be destroyed). If the method succeeds, the format of
 	the BMessage pointed to by \c extensions will be the following:
 
-		- The message's \c "extensions" field will contain an indexed array
-			of strings, one for each extension. The extensions are given
-			without the preceding \c "." character by convention. 
-		- The message's \c "type" field will be a string containing the
-			MIME type whose associated file extensions you are fetching.
-		- The \c what member of the BMessage will be set to \c 234, but
-			is otherwise irrelevant.
+	- The message's \c "extensions" field will contain an indexed array
+	  of strings, one for each extension. The extensions are given
+	  without the preceding \c "." character by convention.
+	- The message's \c "type" field will be a string containing the
+	  MIME type whose associated file extensions you are fetching.
+	- The \c what member of the BMessage will be set to \c 234, but
+	  is otherwise irrelevant.
 
 	Note that any other fields present in the BMessage passed to the most
 	recent \c SetFileExtensions() call will also be returned.
-	  
+
 	\param extensions Pointer to a pre-allocated BMessage into which the
-	                  MIME type's associated file extensions will be stored.
+	       MIME type's associated file extensions will be stored.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\see SetFileExtensions()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetShortDescription(char *description) const
+	\fn status_t BMimeType::GetShortDescription(char* description) const
 	\brief Fetches the MIME type's short description from the MIME database.
 
 	The string pointed to by \c description must be long enough to
 	hold the short description; a length of \c B_MIME_TYPE_LENGTH is
 	recommended.
-	
+
 	\param description Pointer to a pre-allocated string into which the long
-		description is copied. If the function fails, the contents of the
-		string are undefined.
+	       description is copied. If the function fails, the contents of the
+	       string are undefined.
 
 	\returns A status code.
 	\retval B_OK Success
-	\retval B_ENTRY_NOT_FOUND No short description exists for the given type
+	\retval B_ENTRY_NOT_FOUND No short description exists for the given type.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\see SetShortDescription()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetLongDescription(char *description) const
+	\fn status_t BMimeType::GetLongDescription(char* description) const
 	\brief Fetches the MIME type's long description from the MIME database.
 
 	The string pointed to by \c description must be long enough to
@@ -423,19 +484,24 @@
 	recommended.
 
 	\param description Pointer to a pre-allocated string into which the
-		long description is copied. If the function fails, the contents
-		of the string are undefined.
+	       long description is copied. If the function fails, the contents
+	       of the string are undefined.
 
 	\returns A status code.
 	\retval B_OK Success
 	\retval B_ENTRY_NOT_FOUND No long description exists for the given type.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\see SetLongDescription()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetSupportingApps(BMessage *signatures) const
+	\fn status_t BMimeType::GetSupportingApps(BMessage* signatures) const
 	\brief Fetches a \c BMessage containing a list of MIME signatures of
-		applications that are able to handle files of this MIME type.
+	       applications that are able to handle files of this MIME type.
 
 	If successful, the BMessage containing the MIME signatures will be of
 	the following format:
@@ -484,14 +550,18 @@
 	The \c BMessage::what value is meaningless and should be ignored.
 
 	\param signatures Pointer to a pre-allocated BMessage into which the
-		signatures of the supporting applications will be copied.
-	
-	\returns \c B_OK on success or another error code on failure.
+	       signatures of the supporting applications will be copied.
+
+	\returns \c B_OK on success or an error code on failure.
+
+	\see SetSupportingApps()
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::SetIcon(const BBitmap *icon, icon_size which)
+	\fn status_t BMimeType::SetIcon(const BBitmap* icon, icon_size which)
 	\brief Sets the large or mini icon for the MIME type.
 
 	The icon is copied from the \c BBitmap pointed to by \c icon. The bitmap
@@ -502,12 +572,14 @@
 	If you want to erase the current icon, pass \c NULL as the \c icon argument.
 
 	\param icon Pointer to a pre-allocated \c BBitmap of proper size and
-		colorspace containing the new icon, or \c NULL to clear the current
-		icon.
+	       colorspace containing the new icon, or \c NULL to clear the current
+	       icon.
 	\param which Value that specifies which icon to update. Currently
-		\c B_LARGE_ICON and \c B_MINI_ICON are supported.
+	       \c B_LARGE_ICON and \c B_MINI_ICON are supported.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -521,15 +593,17 @@
 	If you want to erase the current icon, pass \c NULL as the \a data argument.
 
 	\param data Pointer to a buffer containing the new icon, or \c NULL to clear
-				the current icon.
+	       the current icon.
 	\param size Size of the provided buffer.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BMimeType::SetPreferredApp(const char *signature,
+	\fn status_t BMimeType::SetPreferredApp(const char* signature,
 		app_verb verb)
 	\brief Sets the preferred application for the MIME type.
 
@@ -546,17 +620,19 @@
 	and then the preferred app will be set.
 
 	\param signature Pointer to a pre-allocated string containing the
-		signature of the new preferred app.
+	       signature of the new preferred app.
 	\param verb \c app_verb value that specifies the type of access for
-		which you are setting the preferred app. Currently, the only
-		supported app verb is \c B_OPEN.
+	       which you are setting the preferred app. Currently, the only
+	       supported app verb is \c B_OPEN.
 
 	\returns \c B_OK on success or another error code on failure.*/
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::SetAttrInfo(const BMessage *info)
+	\fn status_t BMimeType::SetAttrInfo(const BMessage* info)
 	\brief Sets the description of the attributes typically associated
 		with files of the given MIME type
 
@@ -597,56 +673,60 @@
 				user editable, \c false if not </td>
 		</tr>
 	</table>
-	
+
 	The \c BMessage::what value is ignored.
-	
+
 	\param info Pointer to a pre-allocated and properly formatted BMessage
-		containing  information about the file attributes typically associated
-		with the MIME type.
+	       containing information about the file attributes typically
+	       associated with the MIME type.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::SetFileExtensions(const BMessage *extensions)
+	\fn status_t BMimeType::SetFileExtensions(const BMessage* extensions)
 	\brief Sets the list of filename extensions associated with the MIME type.
 
 	The MIME database associates a list of filename extensions (a character
 	string following the rightmost dot, \c ".", character in the filename)
 	with each type. These extensions can then be used to help determine the
-	type of any untyped files that may be	encountered.
+	type of any untyped files that may be encountered.
 
 	The list of extensions is given in a pre-allocated BMessage pointed to by
 	the \c extensions parameter. The format of the message should be as follows:
-		- The message's \c "extensions" field should contain an indexed array of
-			strings, one for each extension. The extensions are to be given
-			without the preceding \c "." character (i.e. \c "html" or \c "mp3",
-			not \c ".html" or \c ".mp3" ).
-		- The \c what member of the BMessage is ignored.
-	  
-	\note any other fields present in the \c BMessage will currently be retained
-	and returned by calls to \c GetFileExtensions(); however, this may change in
-	the future, so it is recommended that you not rely on this behaviour, and
-	that no other fields be present. Also, note that no checking is performed to
-	verify the \c BMessage is properly formatted; it's up to you to do things
-	right.
+	- The message's \c "extensions" field should contain an indexed array of
+	  strings, one for each extension. The extensions are to be given
+	  without the preceding \c "." character (i.e. \c "html" or \c "mp3",
+	  not \c ".html" or \c ".mp3" ).
+	- The \c what member of the BMessage is ignored.
+
+	\note Any other fields present in the \c BMessage will currently be
+	      retained and returned by calls to \c GetFileExtensions(); however,
+	      this may change in the future, so it is recommended that you not rely
+	      on this behavior, and that no other fields be present. Also, note that
+	      no checking is performed to verify the \c BMessage is properly
+	      formatted; it's up to you to do things right.
 
 	Finally, bear in mind that \c SetFileExtensions() clobbers the existing set
 	of extensions. If you want to augment a type's extensions, you should
 	retrieve the existing set, add the new ones, and then call
-	\c SetFileExtensions(). 
-	  
+	\c SetFileExtensions().
+
 	\param extensions Pointer to a pre-allocated, properly formatted BMessage
-		containing the new list of file extensions to associate with this MIME
-		type.
+	       containing the new list of file extensions to associate with this
+	       MIME type.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::SetShortDescription(const char *description)
+	\fn status_t BMimeType::SetShortDescription(const char* description)
 	\brief Sets the short description field for the MIME type.
 
 	The string pointed to by \c description must be of length less than
@@ -656,14 +736,16 @@
 	and then the short description will be set.
 
 	\param description Pointer to a pre-allocated string containing the
-		new short description.
+	       new short description.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::SetLongDescription(const char *description)
+	\fn status_t BMimeType::SetLongDescription(const char* description)
 	\brief Sets the long description field for the MIME type.
 
 	The string pointed to by \c description must be of length less than
@@ -673,82 +755,92 @@
 	and then the long description will be set.
 
 	\param description Pointer to a pre-allocated string containing the new
-		long description
+	       long description
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetInstalledSupertypes(BMessage *supertypes)
-	\brief Fetches a BMessage listing all the MIME supertypes currently
-		installed in the MIME database.
+	\fn status_t BMimeType::GetInstalledSupertypes(BMessage* supertypes)
+	\brief Fetches a BMessage listing all the MIME \a supertypes currently
+	       installed in the MIME database.
 
 	The types are copied into the \c "super_types" field of the passed-in
 	\c BMessage. The \c BMessage must be pre-allocated.
-	
-	\param supertypes Pointer to a pre-allocated \c BMessage into which the 
-	                  MIME supertypes will be copied.
+
+	\param supertypes Pointer to a pre-allocated \c BMessage into which the
+	       MIME \a supertypes will be copied.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetInstalledTypes(BMessage *types)
+	\fn status_t BMimeType::GetInstalledTypes(BMessage* types)
 	\brief Fetches a BMessage listing all the MIME types currently installed
 	in the MIME database.
 
 	The types are copied into the \c "types" field of the passed-in \c BMessage.
 	The \c BMessage must be pre-allocated.
 
-	\param types Pointer to a pre-allocated \c BMessage into which the 
-	             MIME types will be copied.
-
-	\returns \c B_OK on success or another error code on failure.
-*/
-
-
-/*!
-	\fn status_t BMimeType::GetInstalledTypes(const char *supertype,
-		BMessage *types)
-	\brief Fetches a BMessage listing all the MIME subtypes of the given
-		supertype currently installed in the MIME database.
-
-	The types are copied into the \c "types" field of the passed-in \c BMessage.
-	The \c BMessage must be pre-allocated.
-
-	\param supertype Pointer to a string containing the MIME supertype whose
-					 subtypes you wish to retrieve.
 	\param types Pointer to a pre-allocated \c BMessage into which the
-				 appropriate MIME subtypes will be copied.
+	       MIME types will be copied.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetWildcardApps(BMessage *wild_ones)
+	\fn status_t BMimeType::GetInstalledTypes(const char* supertype,
+		BMessage* types)
+	\brief Fetches a BMessage listing all the MIME subtypes of the given
+	       \a supertype currently installed in the MIME database.
+
+	The types are copied into the \c "types" field of the passed-in
+	\c BMessage. The \c BMessage must be pre-allocated.
+
+	\param supertype Pointer to a string containing the MIME \a supertype whose
+	       subtypes you wish to retrieve.
+	\param types Pointer to a pre-allocated \c BMessage into which the
+	       appropriate MIME subtypes will be copied.
+
+	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BMimeType::GetWildcardApps(BMessage* wild_ones)
 	\brief Fetches a \c BMessage containing a list of MIME signatures of
-		applications that are able to handle files of any type.
+	       applications that are able to handle files of any type.
 
 	This function is the same as calling \c GetSupportingApps() on a
 	\c BMimeType object initialized to a MIME type of]
 	\c "application/octet-stream".
 
 	\param wild_ones Pointer to a pre-allocated BMessage into which
-					 signatures of applications supporting files of any type
-					 are copied.
+	       signatures of applications supporting files of any type
+	       are copied.
 
 	\returns \c B_OK on success or another error code on failure.
 
 	\sa GetSupportingApps() for details on the format of the data returned in
-		the \c BMessage pointed to by \c wild_ones.
+	    the \c BMessage pointed to by \c wild_ones.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn bool BMimeType::IsValid(const char *string)
+	\fn bool BMimeType::IsValid(const char* string)
 	\brief Returns whether the given string represents a valid MIME type.
 
 	\param string The MIME type string.
@@ -756,14 +848,15 @@
 	\return \c true, if the given string represents a valid MIME type.
 
 	\sa SetTo() for further information.
+
+	\since BeOS R3
 */
 
 
-
 /*!
-	\fn status_t BMimeType::GetAppHint(entry_ref *ref) const
+	\fn status_t BMimeType::GetAppHint(entry_ref* ref) const
 	\brief Fetches an \c entry_ref that serves as a hint as to where the MIME
-		type's preferred application might live
+	       type's preferred application might live
 
 	The app hint is a path that identifies the executable that should be used
 	when launching an application that has this signature. For example, when
@@ -776,18 +869,20 @@
 	The \c entry_ref pointed to by \c ref must be pre-allocated.
 
 	\param ref Pointer to a pre-allocated \c entry_ref into which the location
-			   of the app hint is copied. If the function fails, the contents of
-			   the \c entry_ref are undefined.
+	       of the app hint is copied. If the function fails, the contents of
+	       the \c entry_ref are undefined.
 
-	\return
-	- \c B_OK: Success
-	- \c B_ENTRY_NOT_FOUND: No app hint exists for the given type
-	- other error code: Failure
+	\return A status code, B_OK on success or an error code otherwise.
+	\retval B_OK The ref was retrieved successfully.
+	\retval B_ENTRY_NOT_FOUND No app hint existed for the given \a ref.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::SetAppHint(const entry_ref *ref)
+	\fn status_t BMimeType::SetAppHint(const entry_ref* ref)
 	\brief Sets the app hint field for the MIME type
 
 	The app hint is a path that identifies the executable that should be used
@@ -805,24 +900,30 @@
 	such an \c entry_ref would render the app hint useless.
 
 	\param ref Pointer to a pre-allocated \c entry_ref containting the location
-		of the new app hint
+	       of the new app hint
 
 	\returns \c B_OK on success or another error code on failure.
+	\retval B_OK The ref was retrieved successfully.
+	\retval B_NO_INIT BMimeType was uninitialized.
+	\retval B_BAD_VALUE \a ref was \c NULL.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetIconForType(const char *type, BBitmap *icon,
+	\fn status_t BMimeType::GetIconForType(const char* type, BBitmap* icon,
 		icon_size which) const
 	\brief Fetches the large or mini icon used by an application of this type
-		for files of the given type.
-	
+	       for files of the given type.
+
 	This can be confusing, so here's how this function is intended to be used:
-		- The actual \c BMimeType object should be set to the MIME signature
-			of an application for whom you want to look up custom icons for
-			custom MIME types.
-		- The \c type parameter specifies the file type whose custom icon you
-			are fetching.
+	- The actual \c BMimeType object should be set to the MIME signature
+	  of an application for whom you want to look up custom icons for
+	  custom MIME types.
+	- The \c type parameter specifies the file type whose custom icon you
+	  are fetching.
 
 	The type of the \c BMimeType object is not required to actually be a
 	subtype of \c "application/"; that is the intended use however, and calling
@@ -835,47 +936,53 @@
 	(8-bit color).
 
 	\param type Pointer to a pre-allocated string containing the MIME type
-		whose custom icon you wish to fetch.
+	       whose custom icon you wish to fetch.
 	\param icon Pointer to a pre-allocated \c BBitmap of proper size and
-		colorspace into which the icon is copied.
+	       colorspace into which the icon is copied.
 	\param which Value that specifies which icon to return. Currently
-		\c B_LARGE_ICON and \c B_MINI_ICON are supported.
+	       \c B_LARGE_ICON and \c B_MINI_ICON are supported.
 
-	\returns A status code.
+	\returns A status code, \c B_OK on success or an error code otherwise.
 	\retval B_OK Success
 	\retval B_ENTRY_NOT_FOUND No icon of the given size exists for the
-			given type
+	        given type.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t BMimeType::GetIconForType(const char *type,
+	\fn status_t BMimeType::GetIconForType(const char* type,
 		uint8** _data, size_t* _size) const
 	\brief Fetches the vector icon used by an application of this type for
-		files of the given type.
+	       files of the given type.
 
 	The icon data is returned in \c data.
 	See the other GetIconForType() for more information.
 
 	\param type Pointer to a pre-allocated string containing the MIME type whose
-				custom icon you wish to fetch.
+	       custom icon you wish to fetch.
 	\param _data Pointer in which the allocated icon data is returned. You need
-				to delete the buffer when you are done with it.
+	       to delete the buffer when you are done with it.
 	\param _size Pointer in which the size of the allocated icon data is
-				returned.
+	       filled out.
 
-	\returns A status code.
-	\retval B_OK Success
+	\returns A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK Success.
 	\retval B_ENTRY_NOT_FOUND No icon of the given size exists for the
-		given type.
+	        given type.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BMimeType::SetIconForType(const char *type,
-		const BBitmap *icon, icon_size which)
+	\fn status_t BMimeType::SetIconForType(const char* type,
+		const BBitmap* icon, icon_size which)
 	\brief Sets the large or mini icon used by an application of this type
-		for files of the given type.
+	       for files of the given type.
 
 	This can be confusing, so here's how this function is intended to be used:
 	- The actual \c BMimeType object should be set to the MIME signature of an
@@ -887,7 +994,7 @@
 	of \c "application/"; that is the intended use however, and
 	application-specific icons are not expected to be present for
 	non-application types.
-	
+
 	The icon is copied from the \c BBitmap pointed to by \c icon. The bitmap
 	must be the proper size: \c 32x32 for the large icon, \c 16x16 for the mini
 	icon.
@@ -895,14 +1002,16 @@
 	If you want to erase the current icon, pass \c NULL as the \c icon argument.
 
 	\param type Pointer to a pre-allocated string containing the MIME type whose
-	            custom icon you wish to set.
+	       custom icon you wish to set.
 	\param icon Pointer to a pre-allocated \c BBitmap of proper size and
-				colorspace containing the new icon, or \c NULL to clear the
-				current icon.
+	       colorspace containing the new icon, or \c NULL to clear the current
+	       icon.
 	\param which Value that specifies which icon to update. Currently
-				\c B_LARGE_ICON and \c B_MINI_ICON are supported.
+	       \c B_LARGE_ICON and \c B_MINI_ICON are supported.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R3
 */
 
 
@@ -918,12 +1027,12 @@
 	  application to whom you want to assign custom icons for custom MIME types.
 	- The \c type parameter specifies the file type whose custom icon you are
 	  setting.
-	
+
 	The type of the \c BMimeType object is not required to actually be a subtype
 	of \c "application/"; that is the intended use however, and
 	application-specific icons are not expected to be present for
 	non-application types.
-		
+
 	The icon is copied from the \c BBitmap pointed to by \c icon. The bitmap
 	must be the proper size: \c 32x32 for the large icon, \c 16x16 for the mini
 	icon.
@@ -931,33 +1040,40 @@
 	If you want to erase the current icon, pass \c NULL as the \c icon argument.
 
 	\param type Pointer to a pre-allocated string containing the MIME type whose
-	            custom icon you wish to set.
+	       custom icon you wish to set.
 	\param icon Pointer to a pre-allocated \c BBitmap of proper size and
-				colorspace containing the new icon, or \c NULL to clear the
-				current icon.
+	       colorspace containing the new icon, or \c NULL to clear the
+	       current icon.
 	\param icon_size Value that specifies which icon to update. Currently
-		\c B_LARGE_ICON and \c B_MINI_ICON are supported.
+	       \c B_LARGE_ICON and \c B_MINI_ICON are supported.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BMimeType::GetSnifferRule(BString *result) const
+	\fn status_t BMimeType::GetSnifferRule(BString* result) const
 	\brief Retrieves the MIME type's sniffer rule.
 
 	\param result Pointer to a pre-allocated BString into which the value is
-		   copied.
+	       copied.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \c NULL \a result or uninitialized BMimeType.
 	\retval B_ENTRY_NOT_FOUND The MIME type is not installed.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\see SetSnifferRule()
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BMimeType::SetSnifferRule(const char *rule)
+	\fn status_t BMimeType::SetSnifferRule(const char* rule)
 	\brief Sets the MIME type's sniffer rule.
 
 	If the supplied \a rule is \c NULL, the MIME type's sniffer rule is
@@ -972,14 +1088,17 @@
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE Uninitialized BMimeType.
 	\retval B_BAD_MIME_SNIFFER_RULE The supplied sniffer rule is invalid.
+	\retval B_NO_INIT BMimeType was uninitialized.
 
-	\sa CheckSnifferRule().
+	\sa CheckSnifferRule()
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BMimeType::CheckSnifferRule(const char *rule,
-		BString *parseError)
+	\fn status_t BMimeType::CheckSnifferRule(const char* rule,
+		BString* parseError)
 	\brief Checks whether a MIME sniffer rule is valid or not.
 
 	A MIME sniffer rule is valid, if it is well-formed with respect to the
@@ -1056,21 +1175,24 @@
 
 	\param rule The rule string.
 	\param parseError A pointer to a pre-allocated BString into which a
-		   description of the parse error is written (if any), may be \c NULL.
+	       description of the parse error is written (if any), may be \c NULL.
 
 	\returns A status code.
 	\retval B_OK The supplied sniffer rule is valid.
 	\retval B_BAD_VALUE \c NULL \a rule.
 	\retval B_BAD_MIME_SNIFFER_RULE The supplied sniffer rule is not valid. A
-			description of the error is written to \a parseError, if supplied.
+	        description of the error is written to \a parseError, if supplied.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BMimeType::GuessMimeType(const entry_ref *file,
-		BMimeType *type)
+	\fn status_t BMimeType::GuessMimeType(const entry_ref* file,
+		BMimeType* type)
 	\brief Guesses a MIME type for the entry referred to by the given
-		entry_ref.
+	       entry_ref.
 
 	This version of GuessMimeType() combines the features of the other
 	versions: First the data of the given file are checked (sniffed). Only
@@ -1079,33 +1201,39 @@
 
 	\param file Pointer to the entry_ref referring to the entry.
 	\param type Pointer to a pre-allocated BMimeType which is set to the
-		   resulting MIME type.
+	       resulting MIME type.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \c NULL \a ref or \a result.
 	\retval B_NAME_NOT_FOUND \a ref refers to an abstract entry.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BMimeType::GuessMimeType(const void *buffer, int32 length,
-		BMimeType *type)
+	\fn status_t BMimeType::GuessMimeType(const void* buffer, int32 length,
+		BMimeType* type)
 	\brief Guesses a MIME type for the supplied chunk of data.
 
 	\param buffer Pointer to the data buffer.
 	\param length Size of the buffer in bytes.
 	\param type Pointer to a pre-allocated BMimeType which is set to the
-		   resulting MIME type.
+	       resulting MIME type.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \c NULL \a buffer or \a result.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BMimeType::GuessMimeType(const char *filename, BMimeType *type)
+	\fn status_t BMimeType::GuessMimeType(const char* filename, BMimeType* type)
 	\brief Guesses a MIME type for the given filename.
 
 	Only the filename itself is taken into consideration (in particular its
@@ -1114,11 +1242,14 @@
 
 	\param filename The filename.
 	\param type Pointer to a pre-allocated BMimeType which is set to the
-		   resulting MIME type.
+	       resulting MIME type.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \c NULL \a ref or \a result.
+	\retval B_NO_INIT BMimeType was uninitialized.
+
+	\since Haiku R1
 */
 
 
@@ -1132,77 +1263,30 @@
 	\param target A BMessenger identifying the target for the update messages.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R4
 */
 
 
 /*!
 	\fn status_t BMimeType::StopWatching(BMessenger target)
 	\brief Stops monitoring the MIME database for a given target (previously
-		started via StartWatching()).
+	       started via StartWatching()).
 
 	\param target A BMessenger identifying the target for the update messages.
 
 	\returns \c B_OK on success or another error code on failure.
+
+	\since BeOS R4
 */
 
 
 /*!
-	\fn status_t BMimeType::SetType(const char *mimeType)
+	\fn status_t BMimeType::SetType(const char* mimeType)
 	\brief Initializes this object to the supplied MIME type.
 
 	\deprecated This method has the same semantics as SetTo().
-				Use SetTo() instead.
+	            Use SetTo() instead.
+
+	\since BeOS R3
 */
-
-
-/*!
-	\fn status_t BMimeType::SetSupportedTypes(const BMessage *types,
-		bool fullSync)
-	\brief Sets the list of MIME types supported by the MIME type (which is
-		assumed to be an application signature).
-
-	If \a types is \c NULL the application's supported types are unset.
-
-	The supported MIME types must be stored in a field "types" of type
-	\c B_STRING_TYPE in \a types.
-
-	For each supported type the result of BMimeType::GetSupportingApps() will
-	afterwards include the signature of this application. 
-
-	\a fullSync specifies whether or not any types that are no longer
-	listed as supported types as of this call to SetSupportedTypes() shall be
-	updated as well, i.e. whether this application shall be removed from their
-	lists of supporting applications.
-	
-	If \a fullSync is \c false, this application will not be removed from the
-	previously supported types' supporting apps lists until the next call
-	to BMimeType::SetSupportedTypes() or BMimeType::DeleteSupportedTypes()
-	with a \c true \a fullSync parameter, the next call to BMimeType::Delete(),
-	or the next reboot.
-
-	\param types The supported types to be assigned to the file.
-				 May be \c NULL.
-	\param fullSync \c true to also synchronize the previously supported
-					types, \c false otherwise.
-
-	\returns \c B_OK on success or another error code on failure.
-*/
-
-
-/*!
-	\fn status_t BMimeType::GetAssociatedTypes(const char *extension,
-		BMessage *types)
-	\brief Returns a list of mime types associated with the given file extension
-
-	The list of types is returned in the pre-allocated \c BMessage pointed to
-	by \a types. The types are stored in the message's "types" field, which
-	is an array of \c B_STRING_TYPE values.
-	
-	\param extension The file extension of interest
-	\param types Pointer to a pre-allocated BMessage into which the result will
-	             be stored
-	             
-	\returns \c B_OK on success or another error code on failure.
-*/
-
-

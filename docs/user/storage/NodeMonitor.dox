@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 Haiku Inc. All rights reserved.
+ * Copyright 2003-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,8 +9,8 @@
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  *
  * Corresponds to:
- *		headers/os/storage/NodeMonitor.h	hrev45253
- *		src/kits/storage/NodeMonitor.cpp	hrev45253
+ *		headers/os/storage/NodeMonitor.h	hrev47402
+ *		src/kits/storage/NodeMonitor.cpp	hrev47402
  */
 
 
@@ -21,7 +21,7 @@
 	\brief Provides functions and constants for monitoring changes to a node.
 
 	The are three main node monitoring functions are watch_volume(),
-	watch_node() and stop_watching().
+	watch_node(), and stop_watching().
 	- watch_volume() starts watching a volume and sends a message
 	  when a requested event occurs.
 	- watch_node() starts or stops watching a node, or watches for volumes
@@ -31,219 +31,279 @@
 */
 
 
+//// Flags for the watch_node() call.
+
+
 /*!
 	\var B_STOP_WATCHING
+	\brief Unsubscribe from watching a node.
 
-	Flag for watch_node(). Unsubscribe from watching a node.
+	Flag for watch_node().
 
 	\attention \c B_STOP_WATCHING does not apply to volume watching, you must
 	           call stop_watching() instead.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_WATCH_NAME
+	\brief Subscribe to watching for change to the name of a node.
 
-	Flag for watch_volume() and watch_node(). Subscribe to watching for
-	change to the name of a node.
+	Flag for watch_volume() and watch_node().
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_WATCH_STAT
+	\brief Subscribe to watching for changes to the stat information of a node.
 
-	Flag for watch_volume() and watch_node(). Subscribe to watching for
-	changes to the stat information of a node.
+	Flag for watch_volume() and watch_node().
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_WATCH_ATTR
+	\brief Subscribe to watching for changes to the attributes of a node.
 
-	Flag for watch_volume() and watch_node(). Subscribe to watching for
-	changes to the attributes of a node.
+	Flag for watch_volume() and watch_node().
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_WATCH_DIRECTORY
+	\brief Subscribe to watching for changes to the contents of a directory.
 
-	Flag for watch_node(). Subscribe to watching for changes to the contents
-	of a directory.
+	Flag for watch_node().
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_WATCH_ALL
+	\brief Flag for watch_node().
 
-	Flag for watch_node(). Subscribe to watching for changes to all
-	information of a node except \c B_WATCH_MOUNT.
+	Subscribe to watching for changes to all information of a node except
+	\c B_WATCH_MOUNT.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_WATCH_MOUNT
+	\brief  Subscribe to watching for when a volume is mounted or unmounted.
 
-	Flag for watch_node(). Subscribe to watching for when a volume is mounted
-	or unmounted. You may prefer to use BVolumeRoster for volume watching
-	instead.
+	You may prefer to use BVolumeRoster for volume watching instead.
+
+	Flag for watch_node().
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_WATCH_INTERIM_STAT
+	\brief To avoid a flood of messages for small and frequent write operations
+	       on an open file the file system can limit the number of
+	       notifications and mark them with the \c B_WATCH_INTERIM_STAT flag.
 
-	\internal Implementation detail. Not in Be Book.
+	\internal Implementation detail, not in Be Book.
 
-	To avoid a flood of messages for small and frequent write operations on an
-	open file the file system can limit the number of notifications and mark
-	them with the \c B_WATCH_INTERIM_STAT flag.
+	\since Haiku R1
 */
 
 
+//// The "opcode" field of the B_NODE_MONITOR notification message you get.
+
+
 /*!
-	\def B_ENTRY_CREATED
+	\var B_ENTRY_CREATED
 
 	\c B_NODE_MONITOR notification message "opcode" is set when entry is
 	created.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\def B_ENTRY_REMOVED
+	\var B_ENTRY_REMOVED
 
 	\c B_NODE_MONITOR notification message "opcode" is set when entry is
 	removed.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\def B_ENTRY_MOVED
+	\var B_ENTRY_MOVED
 
 	\c B_NODE_MONITOR notification message "opcode" is set when entry is
 	moved.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\def B_STAT_CHANGED
+	\var B_STAT_CHANGED
 
 	\c B_NODE_MONITOR notification message "opcode" set when stat info
 	changes. More information can be found in the "fields" field.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\def B_ATTR_CHANGED
+	\var B_ATTR_CHANGED
 
 	\c B_NODE_MONITOR notification message "opcode" set when attribute
 	changes. More information can be found in the "cause" field.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\def B_DEVICE_MOUNTED
+	\var B_DEVICE_MOUNTED
 
 	\c B_NODE_MONITOR notification message "opcode" set when device is
 	mounted.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\def B_DEVICE_UNMOUNTED
+	\var B_DEVICE_UNMOUNTED
 
 	\c B_NODE_MONITOR notification message "opcode" set when device is
 	unmounted.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\def B_ATTR_CREATED
+	\var B_ATTR_CREATED
 
 	\c B_ATTR_CHANGED notification message "cause" set when attribute is
-	created. (Haiku only)
+	created.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\def B_ATTR_REMOVED
+	\var B_ATTR_REMOVED
 
 	\c B_ATTR_CHANGED notification message "cause" set when attribute is
-	removed. (Haiku only)
+	removed.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_STAT_MODE
+	\brief Set when stat mode changes.
 
-	\c B_STAT_CHANGED notification messages "fields" flag set when stat mode
-	changes.
+	\c B_STAT_CHANGED notification messages "fields" flag.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_STAT_UID
+	\brief Set when UID changes.
 
-	\c B_STAT_CHANGED notification messages "fields" flag set when UID
-	changes.
+	\c B_STAT_CHANGED notification messages "fields" flag.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_STAT_GID
+	\brief Set when GID changes.
 
-	\c B_STAT_CHANGED notification messages "fields" flag set when GID
-	changes.
+	\c B_STAT_CHANGED notification messages "fields" flag.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_STAT_SIZE
+	\brief Set when stat size changes.
 
-	\c B_STAT_CHANGED notification messages "fields" flag set when stat size
-	changes.
+	\c B_STAT_CHANGED notification messages "fields" flag.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_STAT_ACCESS_TIME
+	\brief Set when access time changes.
 
-	\c B_STAT_CHANGED notification messages "fields" flag set when access time
-	changes.
+	\c B_STAT_CHANGED notification messages "fields" flag.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_STAT_MODIFICATION_TIME
+	\brief Set when modification time changes.
 
-	\c B_STAT_CHANGED notification messages "fields" flag set when
-	modification time changes.
+	\c B_STAT_CHANGED notification messages "fields" flag.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_STAT_CREATION_TIME
+	\brief Set when creation time changes.
 
-	\c B_STAT_CHANGED notification messages "fields" flag set when creation
-	time changes.
+	\c B_STAT_CHANGED notification messages "fields" flag.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_STAT_CHANGE_TIME
+	\brief Set when access, modification or creation time changes.
 
-	\c B_STAT_CHANGED notification messages "fields" flag set when access,
-	modification or creation time changes.
+	\c B_STAT_CHANGED notification messages "fields" flag.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_STAT_INTERIM_UPDATE
+	\brief Set when file is written to.
 
-	\internal Implementation detail. Not in Be Book.
+	\internal Implementation detail, not in Be Book.
 
-	\c B_STAT_CHANGED notification messages "fields" flag set when file is
-	written to.
+	\c B_STAT_CHANGED notification messages "fields" flag.
+
+	\since Haiku R1
 */
 
 
@@ -271,12 +331,14 @@
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a flags did not include one of \c B_WATCH_NAME,
 	        \c B_WATCH_STAT, or \c B_WATCH_ATTR.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t watch_volume(dev_t volume, uint32 flags,
-		const BHandler *handler, const BLooper *looper)
+		const BHandler* handler, const BLooper* looper)
 	\brief Subscribes \a handler or \a looper to watch node changes on
 	       \a volume.
 
@@ -303,11 +365,13 @@
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a flags did not include one of \c B_WATCH_NAME,
 	        \c B_WATCH_STAT, or \c B_WATCH_ATTR.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t watch_node(const node_ref *node, uint32 flags,
+	\fn status_t watch_node(const node_ref* node, uint32 flags,
 		BMessenger target)
 	\brief Subscribes or unsubscribes \a target to node and/or mount watching.
 
@@ -341,12 +405,14 @@
 	\param target BMessenger object referring to the \a target.
 
 	\return \c B_OK if everything went fine, an error code otherwise.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t watch_node(const node_ref *node, uint32 flags,
-		const BHandler *handler, const BLooper *looper)
+	\fn status_t watch_node(const node_ref* node, uint32 flags,
+		const BHandler* handler, const BLooper* looper)
 	\brief Subscribes or unsubscribes \a handler or \a looper to node and/or
 	       mount watching.
 
@@ -383,6 +449,8 @@
 	       \c NULL. Then the handler's looper is the target looper.
 
 	\return \c B_OK if everything went fine, an error code otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -403,11 +471,13 @@
 	\retval B_OK Stopped sending notification messages to the \a target.
 	\retval B_BAD_VALUE \a target was invalid.
 	\retval B_ENTRY_NOT_FOUND Node not found.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn status_t stop_watching(const BHandler *handler, const BLooper *looper)
+	\fn status_t stop_watching(const BHandler* handler, const BLooper* looper)
 	\brief Unsubscribes \a handler or \a looper target from node and mount
 	       monitoring.
 
@@ -427,4 +497,6 @@
 	\retval B_OK Stopped sending notification messages to the target.
 	\retval B_BAD_VALUE Target from \a handler or \a looper was invalid.
 	\retval B_ENTRY_NOT_FOUND Node not found.
+
+	\since BeOS R3
 */

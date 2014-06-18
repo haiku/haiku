@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Copyright 2002-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/storage/VolumeRoster.h	hrev45306
- *		src/kits/storage/VolumeRoster.cpp	hrev45306
+ *		headers/os/storage/VolumeRoster.h	hrev47402
+ *		src/kits/storage/VolumeRoster.cpp	hrev47402
  */
 
 
@@ -31,12 +31,16 @@
 	This class wraps the next_dev() function for iterating through the
 	list of available volumes and watch_node()/stop_watching() for
 	watching volumes.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BVolumeRoster::BVolumeRoster()
 	\brief Creates a BVolumeRoster object. The object is ready to be used.
+
+	\since BeOS R3
 */
 
 
@@ -45,6 +49,8 @@
 	\brief Deletes the volume roster and frees all associated resources.
 
 	If a watch was activated (by StartWatching()), it is deactivated.
+
+	\since BeOS R3
 */
 
 
@@ -60,6 +66,8 @@
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE The last volume in the list was already returned.
+
+	\since BeOS R3
 */
 
 
@@ -68,6 +76,8 @@
 	\brief Rewinds the list of available volumes back to the first item.
 
 	The next call to GetNextVolume() will return the first available volume.
+
+	\since BeOS R3
 */
 
 
@@ -80,10 +90,12 @@
 	volume is to rename "/boot" -- but, please refrain from doing this.
 
 	\param volume A pointer to a pre-allocated BVolume to be initialized to
-		   refer to the boot volume.
+	       refer to the boot volume.
 
 	\return A status code, \c B_OK if everything went fine or an error code
 	        otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -111,6 +123,8 @@
 	        operation.
 
 	\see watch_node()
+
+	\since BeOS R3
 */
 
 
@@ -119,6 +133,8 @@
 	\brief Stops watching volumes initiated by StartWatching().
 
 	\see stop_watching()
+
+	\since BeOS R3
 */
 
 
@@ -127,5 +143,7 @@
 	\brief Returns the messenger currently watching the volume list.
 
 	\return A messenger to the target currently watching the volume list, or
-			an invalid messenger if not watching.
+	        an invalid messenger if not watching.
+
+	\since BeOS R3
 */

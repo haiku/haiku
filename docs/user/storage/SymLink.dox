@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Copyright 2002-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/storage/SymLink.h	hrev45306
- *		src/kits/storage/SymLink.cpp	hrev45306
+ *		headers/os/storage/SymLink.h	hrev47402
+ *		src/kits/storage/SymLink.cpp	hrev47402
  */
 
 
@@ -27,58 +27,72 @@
 	\ingroup libbe
 	\brief Provides an interface for creating, manipulating, and accessing
 	       the contents of symbolic links.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BSymLink::BSymLink()
 	\brief Creates an uninitialized BSymLink object.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BSymLink::BSymLink(const BSymLink &link)
+	\fn BSymLink::BSymLink(const BSymLink& other)
 	\brief Creates a copy of the supplied BSymLink object.
 
-	\param link The BSymLink object to be copied.
+	\param other The BSymLink object to be copied.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BSymLink::BSymLink(const entry_ref *ref)
+	\fn BSymLink::BSymLink(const entry_ref* ref)
 	\brief Creates a BSymLink object and initializes it to the symbolic link
 	       referred to by the supplied entry_ref.
 
 	\param ref the entry_ref referring to the symbolic link.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BSymLink::BSymLink(const BEntry *entry)
+	\fn BSymLink::BSymLink(const BEntry* entry)
 	\brief Creates a BSymLink object and initializes it to the symbolic link
 	       referred to by the supplied BEntry.
 
 	\param entry The BEntry referring to the symbolic link.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BSymLink::BSymLink(const char *path)
+	\fn BSymLink::BSymLink(const char* path)
 	\brief Creates a BSymLink object and initializes it to the symbolic link
 	       referred to by the supplied path name.
 
 	\param path The path of the symbolic link.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BSymLink::BSymLink(const BDirectory *dir, const char *path)
+	\fn BSymLink::BSymLink(const BDirectory* dir, const char* path)
 	\brief Creates a BSymLink object and initializes it to the symbolic link
 	       referred to by the supplied path name relative to the specified
 	       BDirectory.
 
 	\param dir The base BDirectory.
 	\param path The path of the symbolic link relative to \a dir.
+
+	\since BeOS R3
 */
 
 
@@ -88,11 +102,13 @@
 
 	If the BSymLink was properly initialized, the file descriptor of the
 	symbolic link is also closed.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn ssize_t BSymLink::ReadLink(char *buffer, size_t size)
+	\fn ssize_t BSymLink::ReadLink(char* buffer, size_t size)
 	\brief Reads the contents of the symbolic link into \a buffer.
 
 	The string written to the buffer is guaranteed to be \c NULL terminated.
@@ -104,11 +120,13 @@
 	\retval B_BAD_VALUE \a buf was \c NULL or the object didn't refer to a
 	        symbolic link.
 	\retval B_FILE_ERROR The object was not initialized.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn ssize_t BSymLink::MakeLinkedPath(const char *dirPath, BPath *path)
+	\fn ssize_t BSymLink::MakeLinkedPath(const char* dirPath, BPath* path)
 	\brief Combines a directory path and the contents of this symbolic link to
 	       form an absolute path.
 
@@ -120,11 +138,13 @@
 	        refer to a symbolic link.
 	\retval B_FILE_ERROR The object was not initialized.
 	\retval B_NAME_TOO_LONG The resulting path name was too long to fit.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn ssize_t BSymLink::MakeLinkedPath(const BDirectory *dir, BPath *path)
+	\fn ssize_t BSymLink::MakeLinkedPath(const BDirectory* dir, BPath* path)
 	\brief Combines a directory path and the contents of this symbolic link to
 	       form an absolute path.
 
@@ -136,6 +156,8 @@
 	        refer to a symbolic link.
 	\retval B_FILE_ERROR The object was not initialized.
 	\retval B_NAME_TOO_LONG The resulting path name was too long to fit.
+
+	\since BeOS R3
 */
 
 
@@ -145,15 +167,6 @@
 
 	/return \c true if the object is properly initialized and the symbolic
 	        link refers to an absolute path, \c false otherwise.
-*/
 
-
-/*!
-	\fn int BSymLink::get_fd() const
-	\brief Returns the file descriptor of the BSymLink.
-
-	This method should be used instead of accessing the private \c fFd member
-	of the BNode directly.
-
-	\return The object's file descriptor, or -1 if not properly initialized.
+	\since BeOS R3
 */

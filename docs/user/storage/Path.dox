@@ -9,8 +9,8 @@
  *		Ingo Weinhold, bonefish@users.sf.net
  *
  * Corresponds to:
- *		headers/os/storage/Path.h	hrev45260
- *		src/kits/storage/Path.cpp	hrev45260
+ *		headers/os/storage/Path.h	hrev47402
+ *		src/kits/storage/Path.cpp	hrev47402
  */
 
 
@@ -27,6 +27,8 @@
 	\ingroup storage
 	\ingroup libbe
 	\brief A class representing a file system path.
+
+	\since BeOS R3
 */
 
 
@@ -43,6 +45,8 @@
 	\brief Creates a copy of the given BPath object.
 
 	\param path the object to be copied.
+
+	\since BeOS R3
 */
 
 
@@ -52,6 +56,8 @@
 	       specified by the passed in entry_ref struct.
 
 	\param ref the entry_ref to initialize from.
+
+	\since BeOS R5
 */
 
 
@@ -61,6 +67,8 @@
 	       specified by the passed in BEntry object.
 
 	\param entry the BEntry object to initialize from.
+
+	\since BeOS R4
 */
 
 
@@ -81,6 +89,8 @@
 	       - The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
 	       - Redundant slashes ("/boot//ltj")
 	       - A trailing slash ("/boot/ltj/")
+
+	\since BeOS R3
 */
 
 
@@ -100,17 +110,21 @@
 	       - The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
 	       - Redundant slashes ("/boot//ltj")
 	       - A trailing slash ("/boot/ltj/")
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BPath::~BPath()
 	\brief Destroys the BPath object and frees any associated resources.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\name Constructor helper methods
+	\name Constructor Helpers
 */
 
 
@@ -123,6 +137,8 @@
 
 	\return \c B_OK, if the BPath object was properly initialized, an error
 	        code otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -136,6 +152,8 @@
 	\retval B_OK Initialization was successful.
 	\retval B_BAD_VALUE \a ref was \c NULL.
 	\retval B_NAME_TOO_LONG The pathname was longer than \c B_PATH_NAME_LENGTH.
+
+	\since BeOS R5
 */
 
 
@@ -149,6 +167,8 @@
 	\retval B_OK Initialization was successful.
 	\retval B_BAD_VALUE \a ref was \c NULL.
 	\retval B_NAME_TOO_LONG The pathname was longer than \c B_PATH_NAME_LENGTH.
+
+	\since BeOS R4
 */
 
 
@@ -174,6 +194,8 @@
 	\retval B_OK Initialization was successful.
 	\retval B_BAD_VALUE \a ref was \c NULL.
 	\retval B_NAME_TOO_LONG The pathname was longer than \c B_PATH_NAME_LENGTH.
+
+	\since BeOS R3
 */
 
 
@@ -197,6 +219,8 @@
 	\retval B_OK Initialization was successful.
 	\retval B_BAD_VALUE \a ref was \c NULL.
 	\retval B_NAME_TOO_LONG The pathname was longer than \c B_PATH_NAME_LENGTH.
+
+	\since BeOS R3
 */
 
 
@@ -205,6 +229,8 @@
 	\brief Returns the object to an uninitialized state.
 
 	Frees any resources it allocated and marks the object as uninitialized.
+
+	\since BeOS R3
 */
 
 
@@ -212,7 +238,7 @@
 
 
 /*!
-	\name Path manipulation methods
+	\name Path Manipulation
 */
 
 
@@ -239,6 +265,8 @@
 	\retval B_OK Initialization was successful.
 	\retval B_BAD_VALUE \a ref was \c NULL.
 	\retval B_NAME_TOO_LONG The pathname was longer than \c B_PATH_NAME_LENGTH.
+
+	\since BeOS R3
 */
 
 
@@ -246,7 +274,7 @@
 
 
 /*!
-	\name Path information methods
+	\name Path Information
 */
 
 
@@ -259,6 +287,8 @@
 
 	\returns The path name of the object, or \c NULL if it is not properly
 	         initialized.
+
+	\since BeOS R3
 */
 
 
@@ -271,6 +301,8 @@
 
 	\returns The leaf portion of the path or \c NULL if it is not properly
 	         initialized.
+
+	\since BeOS R3
 */
 
 
@@ -305,7 +337,7 @@
 
 
 /*!
-	\name Operator overload methods
+	\name Operators
 */
 
 
@@ -322,6 +354,8 @@
 	\param item the BPath object to compare.
 
 	\return \c true, if the paths are equal, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -334,6 +368,8 @@
 	\param path The path to compare.
 
 	\return \c true, if the path names are equal, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -347,6 +383,8 @@
 	\param item the BPath object to compare.
 
 	\return \c true, if the path names are \b not equal, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -359,6 +397,8 @@
 	\param path The path to compare.
 
 	\return \c true, if the path names are \b not equal, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -369,6 +409,8 @@
 	\param item The BPath object to copy
 
 	\return A pointer to the newly initialized BPath object.
+
+	\since BeOS R3
 */
 
 
@@ -381,6 +423,8 @@
 	\param path the path to be assign to this object.
 
 	\return A pointer to the newly initialized BPath object.
+
+	\since BeOS R3
 */
 
 
@@ -388,7 +432,7 @@
 
 
 /*!
-	\name BFlattenable method implementations
+	\name BFlattenable Method Implementations
 */
 
 
@@ -400,6 +444,8 @@
 	\brief Implements BFlattenable::IsFixedSize(). Always returns \c false.
 
 	\return \c false
+
+	\since BeOS R3
 */
 
 
@@ -408,6 +454,8 @@
 	\brief Implements BFlattenable::TypeCode(). Always returns \c B_REF_TYPE.
 
 	\return \c B_REF_TYPE
+
+	\since BeOS R3
 */
 
 
@@ -418,6 +466,8 @@
 
 	\return The size of the flattened entry_ref struct that represents the
 	        path in bytes.
+
+	\since BeOS R3
 */
 
 
@@ -432,6 +482,8 @@
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a buffer was \c NULL or of insufficient size.
+
+	\since BeOS R3
 */
 
 
@@ -443,6 +495,8 @@
 	\param code The type code to test.
 
 	\return \c true if code is \c B_REF_TYPE, \c false otherwise.
+
+	\since BeOS R3
 */
 
 
@@ -461,42 +515,9 @@
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a buffer was \c NULL or didn't contain an entry_ref.
+
+	\since BeOS R3
 */
 
 
 //! @}
-
-
-/// private methods, won't show up in docs
-
-
-/*!
-	status_t BPath::_SetPath(const char* path)
-	\brief Sets the supplied path.
-
-	The path is copied, if \a path is \c NULL the path of the object is set to
-	\c NULL as well. The old path is deleted.
-
-	\param path the path to be set
-
-	\returns A status code.
-	\retval B_OK Everything went fine.
-	\retval B_NO_MEMORY Insufficient memory.
-*/
-
-
-/*!
-	bool BPath::_MustNormalize(const char* path, status_t* _error)
-	\brief Checks a path to see if normalization is required.
-
-	The following items require normalization:
-	- Relative pathnames (after concatenation; e.g. "boot/ltj")
-	- The presence of "." or ".." ("/boot/ltj/../ltj/./gwar")
-	- Redundant slashes ("/boot//ltj")
-	- A trailing slash ("/boot/ltj/")
-
-	\param _error A pointer to an error variable that will be set if the input
-		is not a valid path.
-
-	\return \c true if \a path requires normalization, \c false otherwise.
-*/

@@ -1,13 +1,13 @@
 /*
- * Copyright 2009-2012 Haiku, Inc. All rights reserved.
+ * Copyright 2009-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/storage/FilePanel.h  hrev45162
- *		src/kits/tracker/FilePanel.cpp  hrev45162
+ *		headers/os/storage/FilePanel.h	hrev47402
+ *		src/kits/tracker/FilePanel.cpp	hrev47402
  */
 
 
@@ -23,6 +23,8 @@
 	\enum file_panel_mode
 	\ingroup storage
 	\brief Whether the file panel is a save or open panel.
+
+	\since BeOS R3
 */
 
 
@@ -30,12 +32,16 @@
 	\var file_panel_mode B_OPEN_PANEL
 
 	Open panel
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var file_panel_mode B_SAVE_PANEL
 
+
+	\since BeOS R3
 	Save panel
 */
 
@@ -43,7 +49,9 @@
 /*!
 	\enum file_panel_button
 	\ingroup storage
-	\brief List of buttons used by the file panel
+	\brief List of buttons used by the file panel.
+
+	\since BeOS R3
 */
 
 
@@ -51,6 +59,8 @@
 	\var file_panel_button B_CANCEL_BUTTON
 
 	Cancel button
+
+	\since BeOS R3
 */
 
 
@@ -58,6 +68,8 @@
 	\var file_panel_button B_DEFAULT_BUTTON
 
 	Default button
+
+	\since BeOS R3
 */
 
 
@@ -66,6 +78,8 @@
 	\ingroup storage
 	\ingroup libbe
 	\brief Allows you to filter the items displayed in a file panel.
+
+	\since BeOS R3
 */
 
 
@@ -73,7 +87,7 @@
 	\fn virtual bool BRefFilter::Filter(const entry_ref* ref, BNode* node,
 		struct stat_beos* stat, const char* mimeType)
 	\brief Hook method that's called on each file in the target directory
-		displayed by a file panel.
+	       displayed by a file panel.
 
 	\param ref The file currently under consideration.
 	\param node The node currently under consideration.
@@ -81,9 +95,11 @@
 	\param mimeType The MIME type of the file.
 
 	\returns Whether or not the entry is a valid candidate for an open/save
-		dialog.
+	         dialog.
 
 	\see BFilePanel::SetRefFilter()
+
+	\since BeOS R3
 */
 
 
@@ -172,6 +188,8 @@
 	destroyed, it is hidden instead. You can then delete the BFilePanel
 	object or leave it be and simply call Show() to use the panel next time
 	you need it.
+
+	\since BeOS R3
 */
 
 
@@ -189,22 +207,28 @@
 	SetRefFilter(), and SetHideWhenDone() methods.
 
 	\param mode Set to \c B_OPEN_PANEL for an open panal or \c B_SAVE_PANEL
-		for a save panel. Default is \c B_OPEN_PANEL.
+	       for a save panel. Default is \c B_OPEN_PANEL.
 	\param target The BMessenger object that sends messages to the BLooper
-		or BHandler controlled by the file panel.
+	       or BHandler controlled by the file panel.
 	\param ref The directory to display, by default the current working
-		directory.
-	\param nodeFlavors One or more option flags, this applies to open panels only.
-		- \c B_FILE_NODE Can select files and symlinks to files.
-		- \c B_DIRECTORY_NODE Can select directories and symlinks to directories.
-		- \c B_SYMLINK_NODE Can select symlinks only.
+	       directory.
+	\param nodeFlavors One or more option flags, this applies to open panels
+	       only.
+	       - \c B_FILE_NODE Can select files and symlinks to files.
+	       - \c B_DIRECTORY_NODE Can select directories and symlinks to
+	         directories.
+	       - \c B_SYMLINK_NODE Can select symlinks only.
 	\param multipleSelection Whether or not the user is allowed to select more
-		than one item to open. Save panels should always set this to \c false.
+	       than one item to open. Save panels should always set this to
+	       \c false.
 	\param message Message sent by the file panel on confirms or cancels.
 	\param filter Hook method to call.
 	\param modal Whether or not the panel is modal, defaults to \c false.
 	\param hideWhenDone Set to \c false to keep the panel even after the user
-		confirms or cancels. The close button will hide the panel regardless.
+	       confirms or cancels. The close button will hide the panel
+	       regardless.
+
+	\since BeOS R3
 */
 
 
@@ -214,18 +238,24 @@
 
 	If file panel is currently being displayed it is closed. The BRefFilter
 	object references by this panel is not destroyed by this method.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BFilePanel::Show()
 	\brief Displays the file panel on screen.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BFilePanel::Hide()
 	\brief Hides the file panel.
+
+	\since BeOS R3
 */
 
 
@@ -234,6 +264,10 @@
 	\brief Determines whether or not the file panel is shown.
 
 	\returns \c true if visible, \c false if hidden.
+
+	\see Show()
+
+	\since BeOS R3
 */
 
 
@@ -246,6 +280,8 @@
 	\param message The message to send.
 
 	\see BMessenger::SendMessage()
+
+	\since BeOS R3
 */
 
 
@@ -253,8 +289,10 @@
 	\fn file_panel_mode BFilePanel::PanelMode() const
 	\brief Gets the panel mode, either \c B_OPEN_PANEL or \c B_SAVE_PANEL.
 
-	\returns \c B_OPEN_PANEL if the panel is an open panel or \c B_SAVE_PANEL
-		if the panel is a save panel.
+	\returns \c B_OPEN_PANEL if the panel is an open panel, or \c B_SAVE_PANEL
+	         if the panel is a save panel.
+
+	\since BeOS R3
 */
 
 
@@ -263,6 +301,8 @@
 	\brief Gets the panel's target messenger object.
 
 	\returns The BMessenger object that sends messages for this panel.
+
+	\since BeOS R3
 */
 
 
@@ -271,6 +311,8 @@
 	\brief Sets the target messenger.
 
 	\param target the target BMessenger object to set.
+
+	\since BeOS R3
 */
 
 
@@ -279,13 +321,17 @@
 	\brief Sets the target messenge.
 
 	\param message The BMessage object to send on confirm.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BFilePanel::Refresh()
 	\brief Refresh the directory or the panel causing the entries to be re-run
-		through the BRefFilter::Filter() method.
+	       through the BRefFilter::Filter() method.
+
+	\since BeOS R3
 */
 
 
@@ -296,6 +342,8 @@
 	\returns The BRefFilter set to the panel.
 
 	\see BRefFilter::Filter()
+
+	\since BeOS R3
 */
 
 
@@ -306,6 +354,8 @@
 	\param filter The BRefFilter object to set.
 
 	\see BRefFilter::Filter()
+
+	\since BeOS R3
 */
 
 
@@ -316,6 +366,8 @@
 
 	\param button The button to set the label of.
 	\param text The text to set the button label to.
+
+	\since BeOS R3
 */
 
 
@@ -324,6 +376,8 @@
 	\brief Gets the entry ref of the panel and sets \a ref to point to it.
 
 	\param ref The \c entry_ref pointer you want set.
+
+	\since BeOS R3
 */
 
 
@@ -332,42 +386,52 @@
 	\brief Set some save text to display in the save dialog.
 
 	\param text The text to display.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BFilePanel::SetPanelDirectory(const entry_ref* ref)
 	\brief Sets the entry ref of the panel to the directory contained
-		by \a ref.
+	       by \a ref.
 
 	\param ref The entry contained by the desired panel directory.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BFilePanel::SetPanelDirectory(const char* path)
 	\brief Sets the entry ref of the panel to the directory referenced
-		by \a path.
+	       by \a path.
 
 	\param path The path of the desired directory.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BFilePanel::SetPanelDirectory(const BEntry* entry)
 	\brief Sets the entry ref of the panel to the directory referenced
-		by \a entry.
+	       by \a entry.
 
 	\param entry The BEntry object pointing to the desired directory.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BFilePanel::SetPanelDirectory(const BDirectory* dir)
 	\brief Sets the entry ref of the panel to the directory referenced
-		by \a dir.
+	       by \a dir.
 
 	\param dir The BDirectory object pointing to the desired directory.
+
+	\since BeOS R3
 */
 
 
@@ -376,6 +440,8 @@
 	\brief Gets a pointer to the BWindow object used by the file panel.
 
 	\returns A pointer to the BWindow object used by the file panel.
+
+	\since BeOS R3
 */
 
 
@@ -384,6 +450,8 @@
 	\brief Sets the entry ref back to the top of the list.
 
 	\see SelectionChanged()
+
+	\since BeOS R3
 */
 
 
@@ -396,7 +464,10 @@
 	\retval B_ERROR Couldn't attain a lock on the window.
 	\retval B_ENTRY_NOT_FOUND End of the entry list.
 
+	\see Rewind()
 	\see SelectionChanged()
+
+	\since BeOS R3
 */
 
 
@@ -405,6 +476,8 @@
 	\brief Sets whether or not the panel should hide on confirm or cancel.
 
 	\param on \c true to hide, \c false to not hide when done.
+
+	\since BeOS R3
 */
 
 
@@ -415,23 +488,42 @@
 	Panel always hides if the user clicks the window's close button.
 
 	\returns \c true if panel will hide, \c false if panel will not hide.
+
+	\see SetHideWhenDone()
+
+	\since BeOS R3
 */
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
 
 
 /*!
 	\fn void BFilePanel::WasHidden()
 	\brief Hook method that gets called when the file panel is hidden due to
-		a user action.
+	       a user action.
 
 	WasHidden() is not called if you call Hide() manually.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn void BFilePanel::SelectionChanged()
 	\brief Hook method that gets called when the entry ref references by the
-		file panel changes.
+	       file panel changes.
 
 	\see GetNextSelectedRef()
 	\see Rewind()
+
+	\since BeOS R3
 */
+
+
+//! @}
