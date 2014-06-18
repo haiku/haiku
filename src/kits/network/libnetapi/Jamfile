@@ -9,13 +9,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
-		UseBuildFeatureHeaders zlib ;
-
 		local sslSources ;
 		local md5Sources ;
-
-		Includes [ FGristFiles $(HPKG_SOURCES) ]
-			: [ BuildFeatureAttribute zlib : headers ] ;
 
 		UsePrivateSystemHeaders ;
 
@@ -92,7 +87,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 			[ BuildFeatureAttribute openssl : libraries ]
-			[ BuildFeatureAttribute zlib : library ]
 			[ MultiArchDefaultGristFiles libshared.a ]
 			;
 	}

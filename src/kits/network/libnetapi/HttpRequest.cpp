@@ -1,11 +1,10 @@
 /*
- * Copyright 2010-2014 Haiku Inc. All rights reserved.
+ * Copyright 2010-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
- *		Adrien Destugues, pulkomandy@pulkomandy.tk
  */
 
 
@@ -19,12 +18,10 @@
 #include <new>
 
 #include <Debug.h>
-#include <DynamicBuffer.h>
 #include <File.h>
 #include <Socket.h>
 #include <SecureSocket.h>
 #include <StackOrHeapArray.h>
-#include <ZlibDecompressor.h>
 
 
 static const int32 kHttpBufferSize = 4096;
@@ -437,8 +434,6 @@ BHttpRequest::_ResolveHostName()
 	else
 		port = fSSL ? 443 : 80;
 
-	// FIXME stop forcing AF_INET, when BNetworkAddress stops giving IPv6
-	// addresses when there isn't an IPv6 link available.
 	fRemoteAddr = BNetworkAddress(AF_INET, fUrl.Host(), port);
 
 	if (fRemoteAddr.InitCheck() != B_OK)
@@ -575,17 +570,13 @@ BHttpRequest::_MakeRequest()
 	bool receiveEnd = false;
 	bool parseEnd = false;
 	bool readByChunks = false;
-	bool decompress = false;
 	status_t readError = B_OK;
 	ssize_t bytesRead = 0;
 	ssize_t bytesReceived = 0;
 	ssize_t bytesTotal = 0;
-	off_t bytesUnpacked = 0;
 	char* inputTempBuffer = new(std::nothrow) char[kHttpBufferSize];
 	ssize_t inputTempSize = kHttpBufferSize;
 	ssize_t chunkSize = -1;
-	DynamicBuffer decompressorStorage;
-	BPrivate::ZlibDecompressor decompressor(&decompressorStorage);
 
 	while (!fQuit && !(receiveEnd && parseEnd)) {
 		if (!receiveEnd) {
@@ -633,13 +624,6 @@ BHttpRequest::_MakeRequest()
 
 				if (BString(fHeaders["Transfer-Encoding"]) == "chunked")
 					readByChunks = true;
-
-				BString contentEncoding(fHeaders["Content-Encoding"]);
-				if (contentEncoding == "gzip"
-						|| contentEncoding == "deflate") {
-					decompress = true;
-					decompressor.Init();
-				}
 
 				int32 index = fHeaders.HasHeader("Content-Length");
 				if (index != B_ERROR)
@@ -727,40 +711,14 @@ BHttpRequest::_MakeRequest()
 				bytesReceived += bytesRead;
 
 				if (fListener != NULL) {
-					if (decompress) {
-						decompressor.DecompressNext(inputTempBuffer,
-							bytesRead);
-						ssize_t size = decompressorStorage.Size();
-						BStackOrHeapArray<char, 4096> buffer(size);
-						size = decompressorStorage.Read(buffer, size);
-						if (size > 0) {
-							fListener->DataReceived(this, buffer, bytesUnpacked,
-								size);
-							bytesUnpacked += size;
-						}
-					} else {
-						fListener->DataReceived(this, inputTempBuffer,
-							bytesReceived - bytesRead, bytesRead);
-					}
+					fListener->DataReceived(this, inputTempBuffer,
+						bytesReceived - bytesRead, bytesRead);
 					fListener->DownloadProgress(this, bytesReceived,
 						bytesTotal);
 				}
 
-				if (bytesTotal > 0 && bytesReceived >= bytesTotal) {
+				if (bytesTotal > 0 && bytesReceived >= bytesTotal)
 					receiveEnd = true;
-
-					if (decompress) {
-						decompressor.Finish();
-						ssize_t size = decompressorStorage.Size();
-						BStackOrHeapArray<char, 4096> buffer(size);
-						size = decompressorStorage.Read(buffer, size);
-						if (fListener != NULL && size > 0) {
-							fListener->DataReceived(this, buffer,
-								bytesUnpacked, size);
-							bytesUnpacked += size;
-						}
-					}
-				}
 			}
 		}
 
@@ -890,7 +848,7 @@ BHttpRequest::_SendHeaders()
 		fOutputHeaders.AddHeader("Host", Url().Host());
 
 		fOutputHeaders.AddHeader("Accept", "*/*");
-		fOutputHeaders.AddHeader("Accept-Encoding", "gzip,deflate");
+		fOutputHeaders.AddHeader("Accept-Encoding", "identity");
 			// Allow the remote server to send dynamic content by chunks
 			// rather than waiting for the full content to be generated and
 			// sending us data.
