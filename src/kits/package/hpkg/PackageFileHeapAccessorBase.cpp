@@ -176,7 +176,7 @@ PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
 			// harm.
 		error = output->Write((char*)uncompressedDataBuffer + inChunkOffset,
 			toWrite);
-		if (error < B_OK)
+		if (error != B_OK)
 			return error;
 
 		remainingBytes -= toWrite;

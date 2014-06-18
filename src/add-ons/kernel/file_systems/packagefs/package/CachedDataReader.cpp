@@ -40,9 +40,8 @@ struct CachedDataReader::PagesDataOutput : public BDataIO {
 	{
 	}
 
-	virtual ssize_t Write(const void* buffer, size_t size)
+	virtual status_t Write(const void* buffer, size_t size)
 	{
-		size_t totalSize = size;
 		while (size > 0) {
 			if (fPageCount == 0)
 				return B_BAD_VALUE;
@@ -51,7 +50,7 @@ struct CachedDataReader::PagesDataOutput : public BDataIO {
 			status_t error = vm_memcpy_to_physical(
 				fPages[0]->physical_page_number * B_PAGE_SIZE + fInPageOffset,
 				buffer, toCopy, false);
-			if (error < B_OK)
+			if (error != B_OK)
 				return error;
 
 			fInPageOffset += toCopy;
@@ -65,7 +64,7 @@ struct CachedDataReader::PagesDataOutput : public BDataIO {
 			size -= toCopy;
 		}
 
-		return totalSize;
+		return B_OK;
 	}
 
 	virtual ssize_t Read(void* buffer, size_t size)
@@ -161,7 +160,7 @@ CachedDataReader::ReadDataToOutput(off_t offset, size_t size,
 		// transfer the data of the cache line
 		status_t error = _ReadCacheLine(lineOffset, cacheLineEnd - lineOffset,
 			offset, requestLineLength, output);
-		if (error < B_OK)
+		if (error != B_OK)
 			return error;
 
 		offset = cacheLineEnd;
@@ -400,7 +399,7 @@ CachedDataReader::_WritePages(vm_page** pages, size_t pagesRelativeOffset,
 		// unmap the page
 		vm_put_physical_page(address, handle);
 
-		if (error < B_OK)
+		if (error != B_OK)
 			return error;
 
 		inPageOffset = 0;
