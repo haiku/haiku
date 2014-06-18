@@ -111,7 +111,7 @@ ZlibDataWriter::WriteDataNoThrow(const void* buffer,
 }
 
 
-ssize_t
+status_t
 ZlibDataWriter::Write(const void* buffer, size_t size)
 {
 	return fDataWriter->WriteDataNoThrow(buffer, size);

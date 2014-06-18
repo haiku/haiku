@@ -71,7 +71,7 @@ public:
 
 private:
 	// BDataOutput
-	virtual	ssize_t				Write(const void* buffer, size_t size);
+	virtual	status_t			Write(const void* buffer, size_t size);
 
 private:
 			AbstractDataWriter*	fDataWriter;
