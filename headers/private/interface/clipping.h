@@ -86,8 +86,8 @@ scale_rect(clipping_rect& rect, float x, float y)
 {
 	rect.left = (int)(rect.left * x);
 	rect.top = (int)(rect.top * y);
-	rect.right = (int)(rect.right * x);
-	rect.bottom = (int)(rect.bottom * y);
+	rect.right = (int)((rect.right + 1) * x) - 1;
+	rect.bottom = (int)((rect.bottom + 1) * y) - 1;
 }
 
 
