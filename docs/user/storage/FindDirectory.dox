@@ -17,8 +17,8 @@
 	\file FindDirectory.h
 	\ingroup storage
 	\ingroup libbe
-	\brief Provides the find_directory(), find_path(), find_paths(), functions
-	       as well as the directory_which constants.
+	\brief Provides the find_directory(), find_path(), find_paths() functions
+	       as well as the \c directory_which constants.
 
 	Haiku provides a set of directories for applications to use. These can be
 	accessed using the functions find_directory(), find_path(), find_path_etc(),
@@ -56,8 +56,6 @@
 	there are also a C++ version of find_directory() and the BPathFinder class
 	(both implemented in libbe), which may be more convenient to use in C++
 	code.
-
-	\since BeOS R3
 */
 
 
