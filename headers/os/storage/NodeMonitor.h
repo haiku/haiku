@@ -32,25 +32,21 @@ enum {
 // The presence and meaning of the other fields in that message specifying what
 // exactly caused the notification depend on this value.
 
-enum {
-	B_ENTRY_CREATED = 1,
-	B_ENTRY_REMOVED,
-	B_ENTRY_MOVED,
-	B_STAT_CHANGED,
-	B_ATTR_CHANGED,
-	B_DEVICE_MOUNTED,
-	B_DEVICE_UNMOUNTED
-};
+#define B_ENTRY_CREATED	 	1
+#define B_ENTRY_REMOVED	 	2
+#define B_ENTRY_MOVED	 	3
+#define B_STAT_CHANGED	 	4
+#define B_ATTR_CHANGED	 	5
+#define B_DEVICE_MOUNTED	6
+#define B_DEVICE_UNMOUNTED	7
 
 
 // More specific info in the "cause" field of B_ATTR_CHANGED notification
 // messages. (Haiku only)
 
-enum {
-	B_ATTR_CREATED = 1,
-	B_ATTR_REMOVED,
-//	B_ATTR_CHANGED
-};
+#define B_ATTR_CREATED		1
+#define B_ATTR_REMOVED		2
+//		B_ATTR_CHANGED is reused
 
 
 // More specific info in the "fields" field of B_STAT_CHANGED notification

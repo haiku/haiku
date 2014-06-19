@@ -9,8 +9,8 @@
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  *
  * Corresponds to:
- *		headers/os/storage/NodeMonitor.h	hrev47402
- *		src/kits/storage/NodeMonitor.cpp	hrev47402
+ *		headers/os/storage/NodeMonitor.h	hrev47403
+ *		src/kits/storage/NodeMonitor.cpp	hrev47403
  */
 
 
@@ -122,97 +122,101 @@
 */
 
 
-//// The "opcode" field of the B_NODE_MONITOR notification message you get.
+// The "opcode" field of the B_NODE_MONITOR notification message you get.
 
 
 /*!
-	\var B_ENTRY_CREATED
-
-	\c B_NODE_MONITOR notification message "opcode" is set when entry is
-	created.
+	\def B_ENTRY_CREATED
+	\brief \c B_NODE_MONITOR notification message "opcode" is set when entry is
+	       created.
 
 	\since BeOS R3
 */
 
 
 /*!
-	\var B_ENTRY_REMOVED
-
-	\c B_NODE_MONITOR notification message "opcode" is set when entry is
-	removed.
-
-	\since BeOS R3
-*/
-
-
-/*!
-	\var B_ENTRY_MOVED
-
-	\c B_NODE_MONITOR notification message "opcode" is set when entry is
-	moved.
+	\def B_ENTRY_REMOVED
+	\brief \c B_NODE_MONITOR notification message "opcode" is set when entry is
+	       removed.
 
 	\since BeOS R3
 */
 
 
 /*!
-	\var B_STAT_CHANGED
-
-	\c B_NODE_MONITOR notification message "opcode" set when stat info
-	changes. More information can be found in the "fields" field.
-
-	\since BeOS R3
-*/
-
-
-/*!
-	\var B_ATTR_CHANGED
-
-	\c B_NODE_MONITOR notification message "opcode" set when attribute
-	changes. More information can be found in the "cause" field.
+	\def B_ENTRY_MOVED
+	\brief \c B_NODE_MONITOR notification message "opcode" is set when entry is
+	       moved.
 
 	\since BeOS R3
 */
 
 
 /*!
-	\var B_DEVICE_MOUNTED
+	\def B_STAT_CHANGED
+	\brief \c B_NODE_MONITOR notification message "opcode" set when stat info
+	       changes.
 
-	\c B_NODE_MONITOR notification message "opcode" set when device is
-	mounted.
-
-	\since BeOS R3
-*/
-
-
-/*!
-	\var B_DEVICE_UNMOUNTED
-
-	\c B_NODE_MONITOR notification message "opcode" set when device is
-	unmounted.
+	More information can be found in the "fields" field.
 
 	\since BeOS R3
 */
 
 
 /*!
-	\var B_ATTR_CREATED
+	\def B_ATTR_CHANGED
+	\brief \c B_NODE_MONITOR notification message "opcode" set when attribute
+	       changes.
 
-	\c B_ATTR_CHANGED notification message "cause" set when attribute is
-	created.
+	More information can be found in the "cause" field.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_DEVICE_MOUNTED
+	\brief \c B_NODE_MONITOR notification message "opcode" set when device is
+	       mounted.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_DEVICE_UNMOUNTED
+	\brief \c B_NODE_MONITOR notification message "opcode" set when device is
+	       unmounted.
+
+	\since BeOS R3
+*/
+
+
+// More specific info in the "cause" field of B_ATTR_CHANGED notification
+// messages.
+
+
+/*!
+	\def B_ATTR_CREATED
+	\brief \c B_ATTR_CHANGED notification message "cause" set when attribute is
+	       created.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\var B_ATTR_REMOVED
-
-	\c B_ATTR_CHANGED notification message "cause" set when attribute is
-	removed.
+	\def B_ATTR_REMOVED
+	\brief \c B_ATTR_CHANGED notification message "cause" set when attribute is
+	       removed.
 
 	\since Haiku R1
 */
+
+
+// More specific info in the "fields" field of B_STAT_CHANGED notification
+// messages, specifying what parts of the stat data have actually been
+// changed.
 
 
 /*!
