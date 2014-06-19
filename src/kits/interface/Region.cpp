@@ -306,6 +306,23 @@ BRegion::OffsetBy(int32 x, int32 y)
 }
 
 
+void
+BRegion::ScaleBy(float x, float y)
+{
+	if (x == 1.0 && y == 1.0)
+		return;
+
+	if (fCount > 0) {
+		if (fData != &fBounds) {
+			for (int32 i = 0; i < fCount; i++)
+				scale_rect(fData[i], x, y);
+		}
+
+		scale_rect(fBounds, x, y);
+	}
+}
+
+
 // Empties the region, so that it doesn't include any rect, and invalidates
 // its bounds.
 void
