@@ -333,6 +333,29 @@
 
 
 /*!
+	\fn void BRegion::ScaleBy(BSize scale)
+	\brief Resize each of the contained rectangles by the given factor
+	       and recalculates the region's bounds.
+
+	\param scale The scale factor
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BRegion::ScaleBy(float x, float y)
+	\brief Resize each of the contained rectangles by the given factors
+	       and recalculates the region's bounds.
+
+	\param x The horizontal scale.
+	\param y The vertical scale.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn void BRegion::MakeEmpty()
 	\brief Empties the region so that it doesn't containt any rects, and
 	       invalidates its bounds.

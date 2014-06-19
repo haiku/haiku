@@ -59,6 +59,7 @@ public:
 
 			void				OffsetBy(const BPoint& point);
 			void				OffsetBy(int32 x, int32 y);
+			void				ScaleBy(BSize scale);
 			void				ScaleBy(float x, float y);
 
 			void				MakeEmpty();

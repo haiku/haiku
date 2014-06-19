@@ -307,6 +307,13 @@ BRegion::OffsetBy(int32 x, int32 y)
 
 
 void
+BRegion::ScaleBy(BSize scale)
+{
+	ScaleBy(scale.Width(), scale.Height());
+}
+
+
+void
 BRegion::ScaleBy(float x, float y)
 {
 	if (x == 1.0 && y == 1.0)
