@@ -59,7 +59,11 @@ All rights reserved.
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "TextWidget"
 
+
 const float kWidthMargin = 20;
+
+
+//	#pragma mark - BTextWidget
 
 
 BTextWidget::BTextWidget(Model* model, BColumn* column, BPoseView* view)
@@ -166,6 +170,7 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 				break;
 			default:
 				TRESPASS();
+				break;
 		}
 
 		result.bottom = poseLoc.y + (view->ListElemHeight() - 1);
@@ -217,6 +222,7 @@ BTextWidget::CalcClickRect(BPoint poseLoc, const BColumn* column,
 		else
 			result.right = result.left + kWidthMargin;
 	}
+
 	return result;
 }
 
@@ -413,8 +419,10 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	}
 	textView->MakeResizable(true, hitBorder ? NULL : scrollView);
 
-	view->SetActivePose(pose);		// tell view about pose
-	SetActive(true);				// for widget
+	view->SetActivePose(pose);
+		// tell view about pose
+	SetActive(true);
+		// for widget
 
 	textView->SelectAll();
 	textView->MakeFocus();
@@ -422,7 +430,8 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	// make this text widget invisible while we edit it
 	SetVisible(false);
 
-	ASSERT(view->Window());	// how can I not have a Window here???
+	ASSERT(view->Window());
+		// how can I not have a Window here???
 
 	if (view->Window()) {
 		// force immediate redraw so TextView appears instantly

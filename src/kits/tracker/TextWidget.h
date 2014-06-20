@@ -35,8 +35,10 @@ All rights reserved.
 #ifndef _TEXT_WIDGET_H
 #define _TEXT_WIDGET_H
 
+
 #include "Model.h"
 #include "WidgetAttributeText.h"
+
 
 namespace BPrivate {
 
@@ -184,5 +186,6 @@ BTextWidget::Draw(BRect widgetRect, BRect widgetTextRect, float width,
 } // namespace BPrivate
 
 using namespace BPrivate;
+
 
 #endif	// _TEXT_WIDGET_H
