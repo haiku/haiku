@@ -73,18 +73,19 @@ CalcFreeSpace(BVolume* volume)
 // symlink itself
 BPose::BPose(Model* model, BPoseView* view, uint32 clipboardMode,
 	bool selected)
-	:	fModel(model),
-		fWidgetList(4, true),
-		fClipboardMode(clipboardMode),
-		fPercent(-1),
-		fSelectionTime(0),
-		fIsSelected(selected),
-		fHasLocation(false),
-		fNeedsSaveLocation(false),
-		fListModeInited(false),
-		fWasAutoPlaced(false),
-		fBrokenSymLink(false),
-		fBackgroundClean(false)
+	:
+	fModel(model),
+	fWidgetList(4, true),
+	fClipboardMode(clipboardMode),
+	fPercent(-1),
+	fSelectionTime(0),
+	fIsSelected(selected),
+	fHasLocation(false),
+	fNeedsSaveLocation(false),
+	fListModeInited(false),
+	fWasAutoPlaced(false),
+	fBrokenSymLink(false),
+	fBackgroundClean(false)
 {
 	CreateWidgets(view);
 
@@ -130,7 +131,7 @@ BPose::CreateWidgets(BPoseView* poseView)
 {
 	for (int32 index = 0; ; index++) {
 		BColumn* column = poseView->ColumnAt(index);
-		if (!column)
+		if (column == NULL)
 			break;
 		fWidgetList.AddItem(new BTextWidget(fModel, column, poseView));
 	}
@@ -160,6 +161,7 @@ BPose::AddWidget(BPoseView* poseView, BColumn* column,
 
 	BTextWidget* widget = new BTextWidget(fModel, column, poseView);
 	fWidgetList.AddItem(widget);
+
 	return widget;
 }
 
@@ -203,6 +205,7 @@ OneMouseUp(BTextWidget* widget, BPose* pose, BPoseView* poseView,
 		widget->MouseUp(rect, poseView, pose, where);
 		return true;
 	}
+
 	return false;
 }
 
@@ -240,9 +243,9 @@ BPose::UpdateWidgetAndModel(Model* resolvedModel, const char* attrName,
 	if (poseView->ViewMode() != kListMode)
 		poseLoc = Location(poseView);
 
-	ASSERT(!resolvedModel || resolvedModel->IsNodeOpen());
+	ASSERT(resolvedModel == NULL || resolvedModel->IsNodeOpen());
 
-	if (attrName) {
+	if (attrName != NULL) {
 		// pick up new attributes and find out if icon needs updating
 		if (resolvedModel->AttrChanged(attrName) && visible)
 			UpdateIcon(poseLoc, poseView);
@@ -284,7 +287,7 @@ BPose::UpdateWidgetAndModel(Model* resolvedModel, const char* attrName,
 		// distribute stat changes
 		for (int32 index = 0; ; index++) {
 			BColumn* column = poseView->ColumnAt(index);
-			if (!column)
+			if (column == NULL)
 				break;
 
 			if (column->StatField()) {
@@ -327,6 +330,7 @@ BPose::UpdateVolumeSpaceBar(BVolume* volume)
 
 		return true;
 	}
+
 	return false;
 }
 
@@ -423,11 +427,11 @@ BPose::EditPreviousNextWidgetCommon(BPoseView* poseView, bool next)
 	for (int32 index = next ? 0 : poseView->CountColumns() - 1; ;
 			index += delta) {
 		BColumn* column = poseView->ColumnAt(index);
-		if (!column)
+		if (column == NULL)
 			break;
 
 		BTextWidget* widget = WidgetFor(column->AttrHash());
-		if (widget && widget->IsActive()) {
+		if (widget != NULL && widget->IsActive()) {
 			poseView->CommitActivePose();
 			found = true;
 			continue;
@@ -476,11 +480,10 @@ BPose::PointInPose(const BPoseView* poseView, BPoint where) const
 		rect.right += poseView->IconSizeInt() - 1;
 		rect.bottom += poseView->IconSizeInt() - 1;
 
-		if (rect.Contains(where))
+		if (rect.Contains(where)) {
 			return IconCache::sIconCache->IconHitTest(where - location,
-													  ResolvedModel(),
-													  kNormalIcon,
-													  poseView->IconSize());
+				ResolvedModel(), kNormalIcon, poseView->IconSize());
+		}
 
 		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 		if (widget) {
@@ -500,7 +503,7 @@ BPose::PointInPose(const BPoseView* poseView, BPoint where) const
 	rect.right += B_MINI_ICON + kMiniIconSeparator;
 	rect.bottom += poseView->IconPoseHeight();
 	BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
-	if (widget)
+	if (widget != NULL)
 		rect.right += ceil(widget->TextWidth(poseView) + 1);
 
 	return rect.Contains(where);
@@ -525,7 +528,7 @@ BPose::PointInPose(BPoint loc, const BPoseView* poseView, BPoint where,
 
 	for (int32 index = 0; ; index++) {
 		BColumn* column = poseView->ColumnAt(index);
-		if (!column)
+		if (column == NULL)
 			break;
 		BTextWidget* widget = WidgetFor(column->AttrHash());
 		if (widget
@@ -579,7 +582,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 
 		for (int32 index = 0; index < columnsToDraw; index++) {
 			BColumn* column = poseView->ColumnAt(index);
-			if (!column)
+			if (column == NULL)
 				break;
 
 			// if widget doesn't exist, create it
@@ -607,9 +610,9 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 							column->Width(), poseView, drawView, selected,
 							fClipboardMode, offset, directDraw);
 					} else {
-						widget->Draw(widgetTextRect, widgetTextRect, column->Width(),
-							poseView, drawView, false, fClipboardMode,
-							offset, directDraw);
+						widget->Draw(widgetTextRect, widgetTextRect,
+							column->Width(), poseView, drawView, false,
+							fClipboardMode, offset, directDraw);
 					}
 
 					if (index == 0 && selectDuringDraw)
@@ -632,7 +635,6 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 			}
 		}
 	} else {
-
 		// draw in icon mode
 		BPoint location(Location(poseView));
 		BPoint iconOrigin(location);
@@ -642,11 +644,11 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 			!windowActive && !showSelectionWhenInactive);
 
 		BColumn* column = poseView->FirstColumn();
-		if (!column)
+		if (column == NULL)
 			return;
 
 		BTextWidget* widget = WidgetFor(column, poseView, modelOpener);
-		if (!widget || !widget->IsVisible())
+		if (widget == NULL || !widget->IsVisible())
 			return;
 
 		rect = widget->CalcRect(location, 0, poseView);
@@ -696,11 +698,11 @@ BPose::DeselectWithoutErasingBackground(BRect, BPoseView* poseView)
 		UpdateIcon(location, poseView);
 
 	BColumn* column = poseView->FirstColumn();
-	if (!column)
+	if (column == NULL)
 		return;
 
 	BTextWidget* widget = WidgetFor(column->AttrHash());
-	if (!widget || !widget->IsVisible())
+	if (widget == NULL || !widget->IsVisible())
 		return;
 
 	// just invalidate the background, don't draw anything
@@ -709,7 +711,7 @@ BPose::DeselectWithoutErasingBackground(BRect, BPoseView* poseView)
 
 
 void
-BPose::MoveTo(BPoint point, BPoseView* poseView, bool inval)
+BPose::MoveTo(BPoint point, BPoseView* poseView, bool invalidate)
 {
 	point.x = floorf(point.x);
 	point.y = floorf(point.y);
@@ -722,7 +724,7 @@ BPose::MoveTo(BPoint point, BPoseView* poseView, bool inval)
 	if (point == oldLocation || poseView->ViewMode() == kListMode)
 		return;
 
-	if (inval)
+	if (invalidate)
 		oldBounds = CalcRect(poseView);
 
 	// might need to move a text view if we're active
@@ -744,7 +746,7 @@ BPose::MoveTo(BPoint point, BPoseView* poseView, bool inval)
 	fHasLocation = true;
 	fNeedsSaveLocation = true;
 
-	if (inval) {
+	if (invalidate) {
 		poseView->Invalidate(oldBounds);
 		poseView->Invalidate(CalcRect(poseView));
 	}
@@ -759,6 +761,7 @@ BPose::ActiveWidget() const
 		if (widget->IsActive())
 			return widget;
 	}
+
 	return NULL;
 }
 
@@ -770,8 +773,9 @@ BPose::WidgetFor(uint32 attr, int32* index) const
 	for (int32 i = 0; i < count; i++) {
 		BTextWidget* widget = fWidgetList.ItemAt(i);
 		if (widget->AttrHash() == attr) {
-			if (index)
+			if (index != NULL)
 				*index = i;
+
 			return widget;
 		}
 	}
@@ -785,7 +789,7 @@ BPose::WidgetFor(BColumn* column, BPoseView* poseView,
 	ModelNodeLazyOpener &opener, int32* index)
 {
 	BTextWidget* widget = WidgetFor(column->AttrHash(), index);
-	if (!widget)
+	if (widget == NULL)
 		widget = AddWidget(poseView, column, opener);
 
 	return widget;
@@ -815,7 +819,7 @@ BPose::DrawIcon(BPoint where, BView* view, icon_size kind, bool direct,
 
 	IconCache::sIconCache->Draw(ResolvedModel(), view, where,
 		fIsSelected && !drawUnselected ? kSelectedIcon : kNormalIcon, kind,
-			true);
+		true);
 
 	if (fPercent != -1)
 		DrawBar(where, view, kind);
@@ -823,14 +827,17 @@ BPose::DrawIcon(BPoint where, BView* view, icon_size kind, bool direct,
 
 
 void
-BPose::DrawBar(BPoint where,BView* view,icon_size kind)
+BPose::DrawBar(BPoint where, BView* view, icon_size kind)
 {
 	view->PushState();
 
-	int32 size, barWidth, barHeight, yOffset;
+	int32 size;
+	int32 barWidth;
+	int32 barHeight;
+	int32 yOffset;
 	if (kind >= B_LARGE_ICON) {
 		size = kind - 1;
-		barWidth = (int32)((float)7 / (float)32 * (float)kind);
+		barWidth = (int32)(7.0f / 32.0f * (float)kind);
 		yOffset = 2;
 		barHeight = size - 4 - 2 * yOffset;
 	} else {
@@ -851,8 +858,8 @@ BPose::DrawBar(BPoint where,BView* view,icon_size kind)
 
 	// the gray frame
 	view->SetHighColor(76, 76, 76, 192);
-	BRect rect(	where.x + size - barWidth,where.y + yOffset,
-				where.x + size - 1,where.y + size - 1 - yOffset);
+	BRect rect(where.x + size - barWidth,where.y + yOffset,
+		where.x + size - 1,where.y + size - 1 - yOffset);
 	view->StrokeRect(rect);
 
 	// calculate bar height
@@ -887,7 +894,6 @@ BPose::DrawBar(BPoint where,BView* view,icon_size kind)
 void
 BPose::DrawToggleSwitch(BRect, BPoseView*)
 {
-	return;
 }
 
 
@@ -910,8 +916,9 @@ BPose::SetLocation(BPoint point, const BPoseView* poseView)
 		scale = poseView->IconSize() / 32.0;
 
 	fLocation = BPoint(floorf(point.x / scale), floorf(point.y / scale));
-if (isinff(fLocation.x) || isinff(fLocation.y))
-debugger("BPose::SetLocation() - infinite location");
+	if (isinff(fLocation.x) || isinff(fLocation.y))
+		debugger("BPose::SetLocation() - infinite location");
+
 	fHasLocation = true;
 }
 
@@ -930,7 +937,7 @@ BPose::CalcRect(BPoint loc, const BPoseView* poseView, bool minimalRect) const
 
 	if (minimalRect) {
 		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
-		if (widget) {
+		if (widget != NULL) {
 			rect.right = widget->CalcRect(loc, poseView->FirstColumn(),
 				poseView).right;
 		}
@@ -978,7 +985,6 @@ BPose::CalcRect(const BPoseView* poseView) const
 
 
 #if DEBUG
-
 void
 BPose::PrintToStream()
 {
@@ -987,11 +993,14 @@ BPose::PrintToStream()
 		case kMoveSelectionTo:
 			PRINT(("clipboardMode: Cut\n"));
 			break;
+
 		case kCopySelectionTo:
 			PRINT(("clipboardMode: Copy\n"));
 			break;
+
 		default:
 			PRINT(("clipboardMode: 0 - not in clipboard\n"));
+			break;
 	}
 	PRINT(("%sselected\n", IsSelected() ? "" : "not "));
 	PRINT(("location %s x:%f y:%f\n", HasLocation() ? "" : "unknown ",
@@ -999,5 +1008,4 @@ BPose::PrintToStream()
 		HasLocation() ? fLocation.y : 0));
 	PRINT(("%s autoplaced \n", WasAutoPlaced() ? "was" : "not"));
 }
-
 #endif
