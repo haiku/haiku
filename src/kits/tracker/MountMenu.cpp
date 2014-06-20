@@ -34,6 +34,9 @@ All rights reserved.
 
 // MountMenu implements a context menu used for mounting/unmounting volumes
 
+
+#include "MountMenu.h"
+
 #include <Catalog.h>
 #include <Debug.h>
 #include <Locale.h>
@@ -42,10 +45,10 @@ All rights reserved.
 #include <InterfaceDefs.h>
 #include <VolumeRoster.h>
 #include <Volume.h>
+
 #include <fs_info.h>
 
 #include "Commands.h"
-#include "MountMenu.h"
 #include "IconMenuItem.h"
 #include "Tracker.h"
 #include "Bitmaps.h"
@@ -55,18 +58,24 @@ All rights reserved.
 
 #define SHOW_NETWORK_VOLUMES
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MountMenu"
+
 
 class AddMenuItemVisitor : public BDiskDeviceVisitor {
-	public:
-		AddMenuItemVisitor(BMenu* menu);
-		virtual ~AddMenuItemVisitor();
+public:
+	AddMenuItemVisitor(BMenu* menu);
+	virtual ~AddMenuItemVisitor();
 
-		virtual bool Visit(BDiskDevice* device);
-		virtual bool Visit(BPartition* partition, int32 level);
+	virtual bool Visit(BDiskDevice* device);
+	virtual bool Visit(BPartition* partition, int32 level);
 
-	private:
-		BMenu* fMenu;
+private:
+	BMenu* fMenu;
 };
+
+
+//	#pragma mark - AddMenuItemVisitor
 
 
 AddMenuItemVisitor::AddMenuItemVisitor(BMenu* menu)
@@ -153,11 +162,8 @@ AddMenuItemVisitor::Visit(BPartition* partition, int32 level)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - MountMenu
 
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "MountMenu"
 
 MountMenu::MountMenu(const char* name)
 	: BMenu(name)
@@ -200,8 +206,11 @@ MountMenu::AddDynamicItem(add_state)
 				continue;
 			}
 			// Use the shared icon instead of the device icon
-			if (get_device_icon(info.device_name, icon->Bits(), B_MINI_ICON) != B_OK)
-				GetTrackerResources()->GetIconResource(R_ShareIcon, B_MINI_ICON, icon);
+			if (get_device_icon(info.device_name, icon->Bits(), B_MINI_ICON)
+					!= B_OK) {
+				GetTrackerResources()->GetIconResource(R_ShareIcon,
+					B_MINI_ICON, icon);
+			}
 
 			BMessage* message = new BMessage(kUnmountVolume);
 			message->AddInt32("device_id", volume.Device());
