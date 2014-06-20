@@ -79,51 +79,52 @@ enum nav_flags {
 
 bool
 SpringLoadedFolderCompareMessages(const BMessage* incoming,
-	const BMessage* dragmessage)
+	const BMessage* dragMessage)
 {
-	if (!dragmessage || !incoming)
+	if (incoming == NULL || dragMessage == NULL)
 		return false;
 
-	bool retvalue = false;
+	bool refsMatch = false;
 	for (int32 inIndex = 0; incoming->HasRef("refs", inIndex); inIndex++) {
 		entry_ref inRef;
 		if (incoming->FindRef("refs", inIndex, &inRef) != B_OK) {
-			retvalue = false;
+			refsMatch = false;
 			break;
 		}
 
 		bool inRefMatch = false;
-		for (int32 dragIndex = 0; dragmessage->HasRef("refs", dragIndex);
+		for (int32 dragIndex = 0; dragMessage->HasRef("refs", dragIndex);
 			dragIndex++) {
 			entry_ref dragRef;
-			if (dragmessage->FindRef("refs", dragIndex, &dragRef) != B_OK) {
+			if (dragMessage->FindRef("refs", dragIndex, &dragRef) != B_OK) {
 				inRefMatch =  false;
 				break;
 			}
-			//	if the incoming ref matches any ref in the drag ref
-			//	then we can try the next incoming ref
+			// if the incoming ref matches any ref in the drag ref
+			// then we can try the next incoming ref
 			if (inRef == dragRef) {
 				inRefMatch = true;
 				break;
 			}
 		}
-		retvalue =  inRefMatch;
+		refsMatch = inRefMatch;
 		if (!inRefMatch)
 			break;
 	}
 
-	if (retvalue) {
-		//	if all the refs match
-		//	try and see if this is another instance of the same
-		//	drag contents, but new drag
-		retvalue = false;
-		BPoint inPt, dPt;
-		if (incoming->FindPoint("click_pt", &inPt) == B_OK)
-			if (dragmessage->FindPoint("click_pt", &dPt) == B_OK)
-				retvalue = (inPt == dPt);
+	if (refsMatch) {
+		// If all the refs match try and see if this is a new drag with
+		// the same drag contents.
+		refsMatch = false;
+		BPoint incomingPoint;
+		BPoint dragPoint;
+		if (incoming->FindPoint("click_pt", &incomingPoint) == B_OK
+			&& dragMessage->FindPoint("click_pt", &dragPoint) == B_OK) {
+			refsMatch = incomingPoint == dragPoint;
+		}
 	}
 
-	return retvalue;
+	return refsMatch;
 }
 
 
@@ -131,13 +132,11 @@ void
 SpringLoadedFolderSetMenuStates(const BMenu* menu,
 	const BObjectList<BString>* typeslist)
 {
-	if (!menu || !typeslist || typeslist->IsEmpty())
+	if (menu == NULL || typeslist == NULL || typeslist->IsEmpty())
 		return;
 
-	//	if a types list exists
-	//		iterate through the list and see if each item
-	//		can support any item in the list
-	//		set the enabled state of the item
+	// If a types list exists iterate through the list and see if each item
+	// can support any item in the list and set the enabled state of the item.
 	int32 count = menu->CountItems();
 	for (int32 index = 0 ; index < count ; index++) {
 		ModelMenuItem* item = dynamic_cast<ModelMenuItem*>(menu->ItemAt(index));
@@ -149,23 +148,25 @@ SpringLoadedFolderSetMenuStates(const BMenu* menu,
 			continue;
 
 		if (model->IsSymLink()) {
-			//	find out what the model is, resolve if symlink
+			// find out what the model is, resolve if symlink
 			BEntry entry(model->EntryRef(), true);
 			if (entry.InitCheck() == B_OK) {
 				if (entry.IsDirectory()) {
-					//	folder? always keep enabled
+					// folder? always keep enabled
 					item->SetEnabled(true);
 				} else {
-					//	other, check its support
+					// other, check its support
 					Model resolvedModel(&entry);
-					int32 supported = resolvedModel.SupportsMimeType(NULL, typeslist);
+					int32 supported
+						= resolvedModel.SupportsMimeType(NULL, typeslist);
 					item->SetEnabled(supported != kDoesNotSupportType);
 				}
-			} else
-				//	bad entry ref (bad symlink?), disable
+			} else {
+				// bad entry ref (bad symlink?), disable
 				item->SetEnabled(false);
+			}
 		} else if (model->IsDirectory() || model->IsRoot() || model->IsVolume())
-			//	always enabled if a container
+			// always enabled if a container
 			item->SetEnabled(true);
 		else if (model->IsFile() || model->IsExecutable()) {
 			int32 supported = model->SupportsMimeType(NULL, typeslist);
@@ -180,10 +181,10 @@ void
 SpringLoadedFolderAddUniqueTypeToList(entry_ref* ref,
 	BObjectList<BString>* typeslist)
 {
-	if (!ref || !typeslist)
+	if (ref == NULL || typeslist == NULL)
 		return;
 
-	//	get the mime type for the current ref
+	// get the mime type for the current ref
 	BNodeInfo nodeinfo;
 	BNode node(ref);
 	if (node.InitCheck() != B_OK)
@@ -192,30 +193,30 @@ SpringLoadedFolderAddUniqueTypeToList(entry_ref* ref,
 	nodeinfo.SetTo(&node);
 
 	char mimestr[B_MIME_TYPE_LENGTH];
-	//	add it to the list
+	// add it to the list
 	if (nodeinfo.GetType(mimestr) == B_OK && strlen(mimestr) > 0) {
-		//	if this is a symlink, add symlink to the list (below)
-		//	resolve the symlink, add the resolved type
-		//	to the list
+		// If this is a symlink, add symlink to the list (below)
+		// resolve the symlink, add the resolved type to the list.
 		if (strcmp(B_LINK_MIMETYPE, mimestr) == 0) {
 			BEntry entry(ref, true);
 			if (entry.InitCheck() == B_OK) {
 				entry_ref resolvedRef;
 				if (entry.GetRef(&resolvedRef) == B_OK)
-					SpringLoadedFolderAddUniqueTypeToList(&resolvedRef, typeslist);
+					SpringLoadedFolderAddUniqueTypeToList(&resolvedRef,
+						typeslist);
 			}
 		}
-		//	scan the current list, don't add dups
-		bool unique = true;
+		// scan the current list, don't add dups
+		bool isUnique = true;
 		int32 count = typeslist->CountItems();
 		for (int32 index = 0 ; index < count ; index++) {
 			if (typeslist->ItemAt(index)->Compare(mimestr) == 0) {
-				unique = false;
+				isUnique = false;
 				break;
 			}
 		}
 
-		if (unique)
+		if (isUnique)
 			typeslist->AddItem(new BString(mimestr));
 	}
 }
@@ -225,7 +226,7 @@ void
 SpringLoadedFolderCacheDragData(const BMessage* incoming, BMessage** message,
 	BObjectList<BString>** typeslist)
 {
-	if (!incoming)
+	if (incoming == NULL)
 		return;
 
 	delete* message;
@@ -249,25 +250,28 @@ SpringLoadedFolderCacheDragData(const BMessage* incoming, BMessage** message,
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BNavMenu
 
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "NavMenu"
 
+
 BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 	BWindow* parentWindow, const BObjectList<BString>* list)
-	:	BSlowMenu(title),
-		fMessage(message),
-		fMessenger(target, target->Looper()),
-		fParentWindow(parentWindow),
-		fFlags(0),
-		fItemList(0),
-		fContainer(0),
-		fTypesList(new BObjectList<BString>(10, true))
+	:
+	BSlowMenu(title),
+	fMessage(message),
+	fMessenger(target, target->Looper()),
+	fParentWindow(parentWindow),
+	fFlags(0),
+	fItemList(0),
+	fContainer(0),
+	fTypesList(new BObjectList<BString>(10, true))
 {
 	if (list != NULL)
 		*fTypesList = *list;
+
 	InitIconPreloader();
 
 	SetFont(be_plain_font);
@@ -276,9 +280,10 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 	// can be closed if option modifier held down during invocation
 	BContainerWindow* originatingWindow =
 		dynamic_cast<BContainerWindow*>(fParentWindow);
-	if (originatingWindow)
+	if (originatingWindow != NULL) {
 		fMessage.AddData("nodeRefsToClose", B_RAW_TYPE,
-			originatingWindow->TargetModel()->NodeRef(), sizeof (node_ref));
+			originatingWindow->TargetModel()->NodeRef(), sizeof(node_ref));
+	}
 
 	// too long to have triggers
 	SetTriggersEnabled(false);
@@ -288,17 +293,19 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 BNavMenu::BNavMenu(const char* title, uint32 message,
 	const BMessenger& messenger, BWindow* parentWindow,
 	const BObjectList<BString>* list)
-	:	BSlowMenu(title),
-		fMessage(message),
-		fMessenger(messenger),
-		fParentWindow(parentWindow),
-		fFlags(0),
-		fItemList(0),
-		fContainer(0),
-		fTypesList(new BObjectList<BString>(10, true))
+	:
+	BSlowMenu(title),
+	fMessage(message),
+	fMessenger(messenger),
+	fParentWindow(parentWindow),
+	fFlags(0),
+	fItemList(NULL),
+	fContainer(NULL),
+	fTypesList(new BObjectList<BString>(10, true))
 {
 	if (list != NULL)
 		*fTypesList = *list;
+
 	InitIconPreloader();
 
 	SetFont(be_plain_font);
@@ -307,9 +314,10 @@ BNavMenu::BNavMenu(const char* title, uint32 message,
 	// can be closed if option modifier held down during invocation
 	BContainerWindow* originatingWindow =
 		dynamic_cast<BContainerWindow*>(fParentWindow);
-	if (originatingWindow)
+	if (originatingWindow != NULL) {
 		fMessage.AddData("nodeRefsToClose", B_RAW_TYPE,
 			originatingWindow->TargetModel()->NodeRef(), sizeof (node_ref));
+	}
 
 	// too long to have triggers
 	SetTriggersEnabled(false);
@@ -328,12 +336,10 @@ BNavMenu::AttachedToWindow()
 	BSlowMenu::AttachedToWindow();
 
 	SpringLoadedFolderSetMenuStates(this, fTypesList);
-		//	if dragging (fTypesList != NULL)
-		//	set the menu items enabled state
-		//	relative to the ability to handle an item in the
-		//	drag message
+		// If dragging, (fTypesList != NULL) set the menu items enabled state
+		// relative to the ability to handle an item in the drag message.
 	ResetTargets();
-		//	allow an opportunity to reset the target for each of the items
+		// allow an opportunity to reset the target for each of the items
 }
 
 
@@ -383,7 +389,7 @@ BNavMenu::ClearMenuBuildingState()
 
 	// item list is non-owning, need to delete the items because
 	// they didn't get added to the menu
-	if (fItemList) {
+	if (fItemList != NULL) {
 		int32 count = fItemList->CountItems();
 		for (int32 index = count - 1; index >= 0; index--)
 			delete RemoveItem(index);
@@ -399,8 +405,9 @@ BNavMenu::StartBuildingItemList()
 	BEntry entry;
 
 	if (fNavDir.device < 0 || entry.SetTo(&fNavDir, true) != B_OK
-		|| !entry.Exists())
+		|| !entry.Exists()) {
 		return false;
+	}
 
 	fItemList = new BObjectList<BMenuItem>(50);
 
@@ -443,13 +450,15 @@ BNavMenu::StartBuildingItemList()
 
 			BDirectory trashDir;
 
-			if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK)
+			if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
 				dynamic_cast<EntryIteratorList*>(fContainer)->
 					AddItem(new DirectoryEntryList(trashDir));
+			}
 		}
-	} else
-		fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory*>
-			(startModel.Node()));
+	} else {
+		fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory*>(
+			startModel.Node()));
+	}
 
 	if (fContainer == NULL || fContainer->InitCheck() != B_OK)
 		return false;
@@ -467,13 +476,13 @@ BNavMenu::AddRootItemsIfNeeded()
 	roster.Rewind();
 	BVolume volume;
 	while (roster.GetNextVolume(&volume) == B_OK) {
-
 		BDirectory root;
 		BEntry entry;
 		if (!volume.IsPersistent()
 			|| volume.GetRootDirectory(&root) != B_OK
-			|| root.GetEntry(&entry) != B_OK)
+			|| root.GetEntry(&entry) != B_OK) {
 			continue;
+		}
 
 		Model model(&entry);
 		AddOneItem(&model);
@@ -496,7 +505,7 @@ BNavMenu::AddTrashItem()
 bool
 BNavMenu::AddNextItem()
 {
-	if (fFlags & kVolumesOnly) {
+	if ((fFlags & kVolumesOnly) != 0) {
 		BuildVolumeMenu();
 		return false;
 	}
@@ -529,19 +538,21 @@ BNavMenu::AddNextItem()
 
 	ssize_t size = -1;
 	PoseInfo poseInfo;
-
-	if (model.Node())
+	if (model.Node() != NULL) {
 		size = model.Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
 			&poseInfo, sizeof(poseInfo));
+	}
 
 	model.CloseNode();
 
 	// item might be in invisible
 	if (size == sizeof(poseInfo)
-			&& !BPoseView::PoseVisible(&model, &poseInfo))
+			&& !BPoseView::PoseVisible(&model, &poseInfo)) {
 		return true;
+	}
 
 	AddOneItem(&model);
+
 	return true;
 }
 
@@ -553,7 +564,7 @@ BNavMenu::AddOneItem(Model* model)
 		dynamic_cast<BContainerWindow*>(fParentWindow),
 		fTypesList, &fTrackingHook);
 
-	if (item)
+	if (item != NULL)
 		fItemList->AddItem(item);
 }
 
@@ -566,14 +577,14 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 {
 	if (model->InitCheck() != B_OK)
 		return 0;
+
 	entry_ref ref;
 	bool container = false;
 	if (model->IsSymLink()) {
-
 		Model* newResolvedModel = 0;
 		Model* result = model->LinkTo();
 
-		if (!result) {
+		if (result != NULL) {
 			newResolvedModel = new Model(model->EntryRef(), true, true);
 
 			if (newResolvedModel->InitCheck() != B_OK) {
@@ -584,16 +595,17 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 				result = newResolvedModel;
 		}
 
-		if (result) {
+		if (result != NULL) {
 			BModelOpener opener(result);
 				// open the model, if it ain't open already
 
 			PoseInfo poseInfo;
 			ssize_t size = -1;
 
-			if (result->Node())
+			if (result->Node() != NULL) {
 				size = result->Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
 					&poseInfo, sizeof(poseInfo));
+			}
 
 			result->CloseNode();
 
@@ -607,6 +619,7 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 			ref = *result->EntryRef();
 			container = result->IsContainer();
 		}
+
 		model->SetLinkTo(result);
 	} else {
 		ref = *model->EntryRef();
@@ -616,13 +629,13 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 	BMessage* message = new BMessage(*invokeMessage);
 	message->AddRef("refs", model->EntryRef());
 
-	// Truncate the name if necessary
+	// truncate name if necessary
 	BString truncatedString(model->Name());
 	be_plain_font->TruncateString(&truncatedString, B_TRUNCATE_END,
 		GetMaxMenuWidth());
 
 	ModelMenuItem* item = NULL;
-	if (!container || suppressFolderHierarchy) {
+	if (container || suppressFolderHierarchy) {
 		item = new ModelMenuItem(model, truncatedString.String(), message);
 		if (invokeMessage->what != B_REFS_RECEIVED)
 			item->SetEnabled(false);
@@ -633,9 +646,10 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 			invokeMessage->what, target, parentWindow, typeslist);
 
 		menu->SetNavDir(&ref);
-		if (hook)
+		if (hook != NULL) {
 			menu->InitTrackingHook(hook->fTrackingHook, &(hook->fTarget),
 				hook->fDragMessage);
+		}
 
 		item = new ModelMenuItem(model, menu);
 		item->SetMessage(message);
@@ -649,11 +663,10 @@ void
 BNavMenu::BuildVolumeMenu()
 {
 	BVolumeRoster roster;
-	BVolume	volume;
+	BVolume volume;
 
 	roster.Rewind();
 	while (roster.GetNextVolume(&volume) == B_OK) {
-
 		if (!volume.IsPersistent())
 			continue;
 
@@ -682,8 +695,7 @@ BNavMenu::BuildVolumeMenu()
 
 			item->SetMessage(message);
 			fItemList->AddItem(item);
-			ASSERT(item->Label());
-
+			ASSERT(item->Label() != NULL);
 		}
 	}
 }
@@ -695,8 +707,10 @@ BNavMenu::CompareFolderNamesFirstOne(const BMenuItem* i1, const BMenuItem* i2)
 	const ModelMenuItem* item1 = dynamic_cast<const ModelMenuItem*>(i1);
 	const ModelMenuItem* item2 = dynamic_cast<const ModelMenuItem*>(i2);
 
-	if (item1 != NULL && item2 != NULL)
-		return item1->TargetModel()->CompareFolderNamesFirst(item2->TargetModel());
+	if (item1 != NULL && item2 != NULL) {
+		return item1->TargetModel()->CompareFolderNamesFirst(
+			item2->TargetModel());
+	}
 
 	return strcasecmp(i1->Label(), i2->Label());
 }
@@ -721,7 +735,7 @@ BNavMenu::DoneBuildingItemList()
 	// if the parent link should be shown, it will be the first
 	// entry in the menu - but don't add the item if we're already
 	// at the file system's root
-	if (fFlags & kShowParent) {
+	if ((fFlags & kShowParent) != 0) {
 		BDirectory directory(&fNavDir);
 		BEntry entry(&fNavDir);
 		if (!directory.IsRootDirectory()
@@ -736,9 +750,10 @@ BNavMenu::DoneBuildingItemList()
 	int32 count = fItemList->CountItems();
 	for (int32 index = 0; index < count; index++)
 		AddItem(fItemList->ItemAt(index));
+
 	fItemList->MakeEmpty();
 
-	if (!count) {
+	if (count == 0) {
 		BMenuItem* item = new BMenuItem(B_TRANSLATE("Empty folder"), 0);
 		item->SetEnabled(false);
 		AddItem(item);
@@ -785,8 +800,8 @@ BNavMenu::AddNavParentDir(const char* name,const Model* model,
 	BNavMenu* menu = new BNavMenu(name, what, target);
 	menu->SetNavDir(model->EntryRef());
 	menu->SetShowParent(true);
-	menu->InitTrackingHook(fTrackingHook.fTrackingHook, &(fTrackingHook.fTarget),
-			fTrackingHook.fDragMessage);
+	menu->InitTrackingHook(fTrackingHook.fTrackingHook,
+		&fTrackingHook.fTarget, fTrackingHook.fDragMessage);
 
 	BMenuItem* item = new SpecialModelMenuItem(model, menu);
 
@@ -830,9 +845,9 @@ BNavMenu::TypesList() const
 
 
 void
-BNavMenu::SetTarget(const BMessenger& msngr)
+BNavMenu::SetTarget(const BMessenger& messenger)
 {
-	fMessenger = msngr;
+	fMessenger = messenger;
 }
 
 
@@ -848,10 +863,12 @@ BNavMenu::InitTrackingHook(bool (*hook)(BMenu*, void*),
 	const BMessenger* target, const BMessage* dragMessage)
 {
 	fTrackingHook.fTrackingHook = hook;
-	if (target)
+	if (target != NULL)
 		fTrackingHook.fTarget = *target;
+
 	fTrackingHook.fDragMessage = dragMessage;
 	SetTrackingHookDeep(this, hook, &fTrackingHook);
+
 	return &fTrackingHook;
 }
 
@@ -864,11 +881,11 @@ BNavMenu::SetTrackingHookDeep(BMenu* menu, bool (*func)(BMenu*, void*),
 	int32 count = menu->CountItems();
 	for (int32 index = 0 ; index < count; index++) {
 		BMenuItem* item = menu->ItemAt(index);
-		if (!item)
+		if (item == NULL)
 			continue;
 
 		BMenu* submenu = item->Submenu();
-		if (submenu)
+		if (submenu != NULL)
 			SetTrackingHookDeep(submenu, func, state);
 	}
 }
