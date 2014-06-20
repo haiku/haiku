@@ -500,8 +500,9 @@ FSGetPoseLocation(const BNode* node, BPoint* point)
 	PoseInfo poseInfo;
 	if (ReadAttr(node, kAttrPoseInfo, kAttrPoseInfoForeign,
 		B_RAW_TYPE, 0, &poseInfo, sizeof(poseInfo), &PoseInfo::EndianSwap)
-		== kReadAttrFailed)
+			== kReadAttrFailed) {
 		return false;
+	}
 
 	if (poseInfo.fInitedDirectory == -1LL)
 		return false;
@@ -517,16 +518,17 @@ SetUpPoseLocation(ino_t sourceParentIno, ino_t destParentIno,
 	const BNode* sourceNode, BNode* destNode, BPoint* loc)
 {
 	BPoint point;
-	if (!loc
+	if (loc == NULL
 		// we don't have a position yet
 		&& sourceParentIno != destParentIno
 		// we aren't  copying into the same directory
-		&& FSGetPoseLocation(sourceNode, &point))
+		&& FSGetPoseLocation(sourceNode, &point)) {
 		// the original has a valid inited location
 		loc = &point;
 		// copy the originals location
+	}
 
-	if (loc && loc != (BPoint*)-1) {
+	if (loc != NULL && loc != (BPoint*)-1) {
 		// loc of -1 is used when copying/moving into a window in list mode
 		// where copying positions would not work
 		// ToSo:
@@ -656,7 +658,6 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
 			"Shift key and click \"%toConfirmAction\"."));
 	} else if (DirectoryMatchesOrContains(entry, B_USER_CONFIG_DIRECTORY)
 		|| DirectoryMatchesOrContains(entry, B_SYSTEM_SETTINGS_DIRECTORY)) {
-
 		if (DirectoryMatchesOrContains(entry, "beos_mime",
 				B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatchesOrContains(entry, "beos_mime",
@@ -839,6 +840,7 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 			}
 			break;
 	}
+
 	return B_OK;
 }
 
@@ -980,8 +982,9 @@ MoveTask(BObjectList<entry_ref>* srcList, BEntry* destEntry, BList* pointList,
 				&& moveMode != kDuplicateSelection
 				&& !destIsTrash
 				&& (srcRef->device == destRef.device
-					&& srcRef->directory == deststat.st_ino))
+				&& srcRef->directory == deststat.st_ino)) {
 				continue;
+			}
 
 			if (loopControl.CheckUserCanceled())
 				break;
@@ -1000,7 +1003,7 @@ MoveTask(BObjectList<entry_ref>* srcList, BEntry* destEntry, BList* pointList,
 
 			// are we moving item to trash?
 			if (destIsTrash) {
-				if (pointList)
+				if (pointList != NULL)
 					loc = (BPoint*)pointList->ItemAt(i);
 
 				result = MoveEntryToTrash(&sourceEntry, loc, undo);
@@ -1082,10 +1085,10 @@ class FailWithAlert {
 		}
 
 		FailWithAlert(status_t error, const char* string, const char* name)
-		:
-		fString(string),
-		fName(name),
-		fError(error)
+			:
+			fString(string),
+			fName(name),
+			fError(error)
 		{
 		}
 
@@ -1094,20 +1097,22 @@ class FailWithAlert {
 		status_t fError;
 };
 
+
 class MoveError {
-	public:
-		static void FailOnError(status_t error)
-		{
-			if (error != B_OK)
-				throw MoveError(error);
-		}
+public:
+	static void FailOnError(status_t error)
+	{
+		if (error != B_OK)
+			throw MoveError(error);
+	}
 
-		MoveError(status_t error)
-		:	fError(error)
-		{
-		}
+	MoveError(status_t error)
+		:
+		fError(error)
+	{
+	}
 
-		status_t fError;
+	status_t fError;
 };
 
 
@@ -1273,12 +1278,17 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 		get_system_info(&sinfo);
 		size_t freesize = static_cast<size_t>(
 			(sinfo.max_pages - sinfo.used_pages) * B_PAGE_SIZE);
-		bufsize = freesize / 4;					// take 1/4 of RAM max
-		bufsize -= bufsize % (16* 1024);		// Round to 16 KB boundaries
-		if (bufsize < kMinBufferSize)			// at least kMinBufferSize
+		bufsize = freesize / 4;
+			// take 1/4 of RAM max
+		bufsize -= bufsize % (16* 1024);
+			// Round to 16 KB boundaries
+		if (bufsize < kMinBufferSize) {
+			// at least kMinBufferSize
 			bufsize = kMinBufferSize;
-		else if (bufsize > kMaxBufferSize)		// no more than kMaxBufferSize
+		} else if (bufsize > kMaxBufferSize) {
+			// no more than kMaxBufferSize
 			bufsize = kMaxBufferSize;
+		}
 	}
 
 	BFile destFile(destDir, destName, O_RDWR | O_CREAT);
@@ -1589,9 +1599,8 @@ RecursiveMove(BEntry* entry, BDirectory* destDir,
 				}
 			}
 			entry->Remove();
-		} else {
+		} else
 			MoveError::FailOnError(entry->MoveTo(destDir));
-		}
 	}
 
 	return B_OK;
@@ -1726,6 +1735,7 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 			loopControl->UpdateStatus(ref.name, ref, 1);
 			if (entry->IsDirectory())
 				return RecursiveMove(entry, destDir, loopControl);
+
 			MoveError::FailOnError(entry->MoveTo(destDir, newName));
 		} else {
 			bool makeOriginalName = (moveMode == kDuplicateSelection);
@@ -3695,7 +3705,9 @@ LaunchBrokenLink(const char* signature, const BMessage* refs)
 	return B_OK;
 }
 
+
 // external launch calls; need to be robust, work if Tracker is not running
+
 
 #if !B_BEOS_VERSION_DANO
 _IMPEXP_TRACKER
@@ -3717,7 +3729,7 @@ FSOpenWith(BMessage* listOfRefs)
 	status_t result = B_ERROR;
 	listOfRefs->what = B_REFS_RECEIVED;
 
-	if (dynamic_cast<TTracker*>(be_app))
+	if (dynamic_cast<TTracker*>(be_app) != NULL)
 		result = TrackerOpenWith(listOfRefs);
 	else
 		ASSERT(!"not yet implemented");
@@ -3725,7 +3737,9 @@ FSOpenWith(BMessage* listOfRefs)
 	return result;
 }
 
+
 // legacy calls, need for compatibility
+
 
 void
 FSOpenWithDocuments(const entry_ref* executable, BMessage* documents)
@@ -3734,12 +3748,13 @@ FSOpenWithDocuments(const entry_ref* executable, BMessage* documents)
 	delete documents;
 }
 
+
 status_t
 FSLaunchUsing(const entry_ref* ref, BMessage* listOfRefs)
 {
 	BMessage temp(B_REFS_RECEIVED);
 	if (listOfRefs == NULL) {
-		ASSERT(ref);
+		ASSERT(ref != NULL);
 		temp.AddRef("refs", ref);
 		listOfRefs = &temp;
 	}
@@ -3747,6 +3762,7 @@ FSLaunchUsing(const entry_ref* ref, BMessage* listOfRefs)
 
 	return B_OK;
 }
+
 
 status_t
 FSLaunchItem(const entry_ref* ref, BMessage* message, int32, bool async)
