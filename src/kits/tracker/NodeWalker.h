@@ -31,22 +31,21 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef WALKER_H
-#define WALKER_H
+#ifndef _NODE_WALKER_H
+#define _NODE_WALKER_H
 
 
 #ifndef _BE_BUILD_H
-#include <BeBuild.h>
+#	include <BeBuild.h>
 #endif
-#include <VolumeRoster.h>
-#include <Volume.h>
-#include <List.h>
-#include <EntryList.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <EntryList.h>
+#include <List.h>
+#include <ObjectList.h>
 #include <Query.h>
-
-#include "ObjectList.h"
+#include <Volume.h>
+#include <VolumeRoster.h>
 
 
 namespace BTrackerPrivate {
@@ -54,22 +53,21 @@ namespace BTrackerPrivate {
 class TWalker : public BEntryList {
 	// adds a virtual destructor that is severely missing in BEntryList
 	// BEntryList should never be used polymorphically because of that
-
 public:
 	virtual ~TWalker();
 
-	virtual	status_t GetNextEntry(BEntry*, bool traverse = false) = 0;
-	virtual	status_t GetNextRef(entry_ref*) = 0;
-	virtual	int32 GetNextDirents(struct dirent*, size_t,
+	virtual status_t GetNextEntry(BEntry*, bool traverse = false) = 0;
+	virtual status_t GetNextRef(entry_ref*) = 0;
+	virtual int32 GetNextDirents(struct dirent*, size_t,
 		int32 count = INT_MAX) = 0;
-	virtual	status_t Rewind() = 0;
-	virtual	int32 CountEntries() = 0;
+	virtual status_t Rewind() = 0;
+	virtual int32 CountEntries() = 0;
 };
 
 
 class TNodeWalker : public TWalker {
-// TNodeWalker supports iterating a single volume, starting from a specified
-// entry; if passed a non-directory entry it returns just that one entry
+	// TNodeWalker supports iterating a single volume, starting from a specified
+	// entry; if passed a non-directory entry it returns just that one entry
 public:
 	TNodeWalker(bool includeTopDirectory);
 	TNodeWalker(const char* path, bool includeTopDirectory);
@@ -114,8 +112,8 @@ private:
 
 
 class TVolWalker : public TNodeWalker {
-// TNodeWalker supports iterating over all the mounted volumes;
-// non-attribute and read-only volumes may optionaly be filtered out
+	// TNodeWalker supports iterating over all the mounted volumes;
+	// non-attribute and read-only volumes may optionaly be filtered out
 public:
 	TVolWalker(bool knows_attr = true, bool writable = true,
 		bool includeTopDirectory = true);
@@ -142,7 +140,7 @@ private:
 	bool fKnowsAttr;
 	bool fWritable;
 
-	typedef	TNodeWalker _inherited;
+	typedef TNodeWalker _inherited;
 };
 
 
@@ -157,13 +155,13 @@ public:
 	virtual int32 GetNextDirents(struct dirent*, size_t,
 		int32 count = INT_MAX);
 
-	virtual	status_t NextVolume();
+	virtual status_t NextVolume();
 	// skips to the next volume
-	virtual	status_t Rewind();
+	virtual status_t Rewind();
 
 private:
 	virtual int32 CountEntries();
-	// can't count
+		// can't count
 
 	BQuery fQuery;
 	BVolumeRoster fVolRoster;
@@ -178,4 +176,5 @@ private:
 
 using namespace BTrackerPrivate;
 
-#endif	// WALKER_H
+
+#endif	// _NODE_WALKER_H

@@ -48,6 +48,7 @@ TWalker::~TWalker()
 {
 }
 
+
 // all the following calls are pure viruals, should not get called
 status_t
 TWalker::GetNextEntry(BEntry*, bool )
@@ -56,12 +57,14 @@ TWalker::GetNextEntry(BEntry*, bool )
 	return B_ERROR;
 }
 
+
 status_t
 TWalker::GetNextRef(entry_ref*)
 {
 	TRESPASS();
 	return B_ERROR;
 }
+
 
 int32
 TWalker::GetNextDirents(struct dirent*, size_t, int32)
@@ -78,6 +81,7 @@ TWalker::Rewind()
 	return B_ERROR;
 }
 
+
 int32
 TWalker::CountEntries()
 {
@@ -87,26 +91,28 @@ TWalker::CountEntries()
 
 
 TNodeWalker::TNodeWalker(bool includeTopDirectory)
-	:	fDirs(20),
-		fTopIndex(-1),
-		fTopDir(0),
-		fIncludeTopDir(includeTopDirectory),
-		fOriginalIncludeTopDir(includeTopDirectory),
-		fJustFile(0),
-		fOriginalJustFile(0)
+	:
+	fDirs(20),
+	fTopIndex(-1),
+	fTopDir(NULL),
+	fIncludeTopDir(includeTopDirectory),
+	fOriginalIncludeTopDir(includeTopDirectory),
+	fJustFile(NULL),
+	fOriginalJustFile(NULL)
 {
 }
 
 
 TNodeWalker::TNodeWalker(const char* path, bool includeTopDirectory)
-	:	fDirs(20),
-		fTopIndex(-1),
-		fTopDir(0),
-		fIncludeTopDir(includeTopDirectory),
-		fOriginalIncludeTopDir(includeTopDirectory),
-		fJustFile(0),
-		fOriginalDirCopy(path),
-		fOriginalJustFile(0)
+	:
+	fDirs(20),
+	fTopIndex(-1),
+	fTopDir(NULL),
+	fIncludeTopDir(includeTopDirectory),
+	fOriginalIncludeTopDir(includeTopDirectory),
+	fJustFile(NULL),
+	fOriginalDirCopy(path),
+	fOriginalJustFile(NULL)
 {
 	if (fOriginalDirCopy.InitCheck() != B_OK) {
 		// not a directory, set up walking a single file
@@ -125,14 +131,15 @@ TNodeWalker::TNodeWalker(const char* path, bool includeTopDirectory)
 
 
 TNodeWalker::TNodeWalker(const entry_ref* ref, bool includeTopDirectory)
-	:	fDirs(20),
-		fTopIndex(-1),
-		fTopDir(0),
-		fIncludeTopDir(includeTopDirectory),
-		fOriginalIncludeTopDir(includeTopDirectory),
-		fJustFile(0),
-		fOriginalDirCopy(ref),
-		fOriginalJustFile(0)
+	:
+	fDirs(20),
+	fTopIndex(-1),
+	fTopDir(NULL),
+	fIncludeTopDir(includeTopDirectory),
+	fOriginalIncludeTopDir(includeTopDirectory),
+	fJustFile(NULL),
+	fOriginalDirCopy(ref),
+	fOriginalJustFile(NULL)
 {
 	if (fOriginalDirCopy.InitCheck() != B_OK) {
 		// not a directory, set up walking a single file
@@ -151,14 +158,15 @@ TNodeWalker::TNodeWalker(const entry_ref* ref, bool includeTopDirectory)
 
 
 TNodeWalker::TNodeWalker(const BDirectory* dir, bool includeTopDirectory)
-	:	fDirs(20),
-		fTopIndex(-1),
-		fTopDir(0),
-		fIncludeTopDir(includeTopDirectory),
-		fOriginalIncludeTopDir(includeTopDirectory),
-		fJustFile(0),
-		fOriginalDirCopy(*dir),
-		fOriginalJustFile(0)
+	:
+	fDirs(20),
+	fTopIndex(-1),
+	fTopDir(NULL),
+	fIncludeTopDir(includeTopDirectory),
+	fOriginalIncludeTopDir(includeTopDirectory),
+	fJustFile(NULL),
+	fOriginalDirCopy(*dir),
+	fOriginalJustFile(NULL)
 {
 	fTopDir = new BDirectory(*dir);
 	fTopIndex++;
@@ -167,25 +175,28 @@ TNodeWalker::TNodeWalker(const BDirectory* dir, bool includeTopDirectory)
 
 
 TNodeWalker::TNodeWalker()
-	:	fDirs(20),
-		fTopIndex(-1),
-		fTopDir(0),
-		fIncludeTopDir(false),
-		fOriginalIncludeTopDir(false),
-		fJustFile(0),
-		fOriginalJustFile(0)
+	:
+	fDirs(20),
+	fTopIndex(-1),
+	fTopDir(NULL),
+	fIncludeTopDir(false),
+	fOriginalIncludeTopDir(false),
+	fJustFile(NULL),
+	fOriginalJustFile(NULL)
 {
 }
 
+
 TNodeWalker::TNodeWalker(const char* path)
-	:	fDirs(20),
-		fTopIndex(-1),
-		fTopDir(0),
-		fIncludeTopDir(false),
-		fOriginalIncludeTopDir(false),
-		fJustFile(0),
-		fOriginalDirCopy(path),
-		fOriginalJustFile(0)
+	:
+	fDirs(20),
+	fTopIndex(-1),
+	fTopDir(NULL),
+	fIncludeTopDir(false),
+	fOriginalIncludeTopDir(false),
+	fJustFile(NULL),
+	fOriginalDirCopy(path),
+	fOriginalJustFile(NULL)
 {
 	if (fOriginalDirCopy.InitCheck() != B_OK) {
 		// not a directory, set up walking a single file
@@ -202,15 +213,17 @@ TNodeWalker::TNodeWalker(const char* path)
 	}
 }
 
+
 TNodeWalker::TNodeWalker(const entry_ref* ref)
-	:	fDirs(20),
-		fTopIndex(-1),
-		fTopDir(0),
-		fIncludeTopDir(false),
-		fOriginalIncludeTopDir(false),
-		fJustFile(0),
-		fOriginalDirCopy(ref),
-		fOriginalJustFile(0)
+	:
+	fDirs(20),
+	fTopIndex(-1),
+	fTopDir(NULL),
+	fIncludeTopDir(false),
+	fOriginalIncludeTopDir(false),
+	fJustFile(NULL),
+	fOriginalDirCopy(ref),
+	fOriginalJustFile(NULL)
 {
 	if (fOriginalDirCopy.InitCheck() != B_OK) {
 		// not a directory, set up walking a single file
@@ -228,19 +241,21 @@ TNodeWalker::TNodeWalker(const entry_ref* ref)
 }
 
 TNodeWalker::TNodeWalker(const BDirectory* dir)
-	:	fDirs(20),
-		fTopIndex(-1),
-		fTopDir(0),
-		fIncludeTopDir(false),
-		fOriginalIncludeTopDir(false),
-		fJustFile(0),
-		fOriginalDirCopy(*dir),
-		fOriginalJustFile(0)
+	:
+	fDirs(20),
+	fTopIndex(-1),
+	fTopDir(NULL),
+	fIncludeTopDir(false),
+	fOriginalIncludeTopDir(false),
+	fJustFile(NULL),
+	fOriginalDirCopy(*dir),
+	fOriginalJustFile(NULL)
 {
 	fTopDir = new BDirectory(*dir);
 	fTopIndex++;
 	fDirs.AddItem(fTopDir);
 }
+
 
 TNodeWalker::~TNodeWalker()
 {
@@ -250,9 +265,11 @@ TNodeWalker::~TNodeWalker()
 		BDirectory* directory = fDirs.RemoveItemAt(fTopIndex--);
 		if (directory == NULL)
 			break;
+
 		delete directory;
 	}
 }
+
 
 status_t
 TNodeWalker::PopDirCommon()
@@ -265,15 +282,17 @@ TNodeWalker::PopDirCommon()
 	delete fTopDir;
 	fTopDir = NULL;
 
-	if (fTopIndex == -1)
+	if (fTopIndex == -1) {
 		// done
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	// point to the new top dir
 	fTopDir = fDirs.ItemAt(fTopIndex);
 
 	return B_OK;
 }
+
 
 void
 TNodeWalker::PushDirCommon(const entry_ref* ref)
@@ -285,18 +304,20 @@ TNodeWalker::PushDirCommon(const entry_ref* ref)
 	fDirs.AddItem(fTopDir);
 }
 
+
 status_t
 TNodeWalker::GetNextEntry(BEntry* entry, bool traverse)
 {
-	if (fJustFile) {
+	if (fJustFile != NULL) {
 		*entry = *fJustFile;
 		fJustFile = 0;
 		return B_OK;
 	}
 
-	if (!fTopDir)
+	if (fTopDir == NULL) {
 		// done
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	// If requested to include the top directory, return that first.
 	if (fIncludeTopDir) {
@@ -305,37 +326,39 @@ TNodeWalker::GetNextEntry(BEntry* entry, bool traverse)
 	}
 
 	// Get the next entry.
-	status_t err = fTopDir->GetNextEntry(entry, traverse);
+	status_t result = fTopDir->GetNextEntry(entry, traverse);
+	if (result != B_OK) {
+		result = PopDirCommon();
+		if (result != B_OK)
+			return result;
 
-	if (err != B_OK) {
-		err = PopDirCommon();
-		if (err != B_OK)
-			return err;
 		return GetNextEntry(entry, traverse);
 	}
 	// See if this entry is a directory. If it is then push it onto the
 	// stack
 	entry_ref ref;
-	err = entry->GetRef(&ref);
+	result = entry->GetRef(&ref);
 
-	if (err == B_OK && fTopDir->Contains(ref.name, B_DIRECTORY_NODE))
+	if (result == B_OK && fTopDir->Contains(ref.name, B_DIRECTORY_NODE))
 		PushDirCommon(&ref);
 
-	return err;
+	return result;
 }
+
 
 status_t
 TNodeWalker::GetNextRef(entry_ref* ref)
 {
-	if (fJustFile) {
+	if (fJustFile != NULL) {
 		fJustFile->GetRef(ref);
 		fJustFile = 0;
 		return B_OK;
 	}
 
-	if (!fTopDir)
+	if (fTopDir == NULL) {
 		// done
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	// If requested to include the top directory, return that first.
 	if (fIncludeTopDir) {
@@ -347,7 +370,7 @@ TNodeWalker::GetNextRef(entry_ref* ref)
 		return err;
 	}
 
-	// Get the next entry.
+	// get the next entry
 	status_t err = fTopDir->GetNextRef(ref);
 	if (err != B_OK) {
 		err = PopDirCommon();
@@ -355,14 +378,14 @@ TNodeWalker::GetNextRef(entry_ref* ref)
 			return err;
 		return GetNextRef(ref);
 	}
-	// See if this entry is a directory. If it is then push it onto the
-	// stack
 
+	// See if this entry is a directory, if it is then push it onto the stack.
 	if (fTopDir->Contains(ref->name, B_DIRECTORY_NODE))
 		PushDirCommon(ref);
 
 	return B_OK;
 }
+
 
 static int32
 build_dirent(const BEntry* source, struct dirent* ent,
@@ -372,9 +395,10 @@ build_dirent(const BEntry* source, struct dirent* ent,
 	source->GetRef(&ref);
 
 	size_t recordLength = strlen(ref.name) + sizeof(dirent);
-	if (recordLength > size || count <= 0)
+	if (recordLength > size || count <= 0) {
 		// can't fit in buffer, bail
 		return 0;
+	}
 
 	// info about this node
 	ent->d_reclen = static_cast<ushort>(recordLength);
@@ -398,11 +422,12 @@ build_dirent(const BEntry* source, struct dirent* ent,
 	return 1;
 }
 
+
 int32
 TNodeWalker::GetNextDirents(struct dirent* ent, size_t size, int32 count)
 {
-	if (fJustFile) {
-		if (!count)
+	if (fJustFile != NULL) {
+		if (count == 0)
 			return 0;
 
 		// simulate GetNextDirents by building a single dirent structure
@@ -411,9 +436,10 @@ TNodeWalker::GetNextDirents(struct dirent* ent, size_t size, int32 count)
 		return result;
 	}
 
-	if (!fTopDir)
+	if (fTopDir == NULL) {
 		// done
 		return 0;
+	}
 
 	// If requested to include the top directory, return that first.
 	if (fIncludeTopDir) {
@@ -425,19 +451,18 @@ TNodeWalker::GetNextDirents(struct dirent* ent, size_t size, int32 count)
 		return build_dirent(fJustFile, ent, size, count);
 	}
 
-	// Get the next entry.
-	int32 result = fTopDir->GetNextDirents(ent, size, count);
-
-	if (!result) {
-		status_t err = PopDirCommon();
-		if (err != B_OK)
+	// get the next entry
+	int32 nextDirent = fTopDir->GetNextDirents(ent, size, count);
+	if (nextDirent == 0) {
+		status_t result = PopDirCommon();
+		if (result != B_OK)
 			return 0;
 
 		return GetNextDirents(ent, size, count);
 	}
 
 	// push any directories in the returned entries onto the stack
-	for (int32 i = 0; i < result; i++) {
+	for (int32 i = 0; i < nextDirent; i++) {
 		if (fTopDir->Contains(ent->d_name, B_DIRECTORY_NODE)) {
 			entry_ref ref(ent->d_dev, ent->d_ino, ent->d_name);
 			PushDirCommon(&ref);
@@ -445,13 +470,14 @@ TNodeWalker::GetNextDirents(struct dirent* ent, size_t size, int32 count)
 		ent = (dirent*)((char*)ent + ent->d_reclen);
 	}
 
-	return result;
+	return nextDirent;
 }
+
 
 status_t
 TNodeWalker::Rewind()
 {
-	if (fOriginalJustFile) {
+	if (fOriginalJustFile != NULL) {
 		// single file mode, rewind by pointing to the original file
 		fJustFile = fOriginalJustFile;
 		return B_OK;
@@ -460,8 +486,9 @@ TNodeWalker::Rewind()
 	// pop all the directories and point to the initial one
 	for (;;) {
 		BDirectory* directory = fDirs.RemoveItemAt(fTopIndex--);
-		if (!directory)
+		if (directory == NULL)
 			break;
+
 		delete directory;
 	}
 
@@ -469,8 +496,9 @@ TNodeWalker::Rewind()
 	fTopIndex = 0;
 	fIncludeTopDir = fOriginalIncludeTopDir;
 	fDirs.AddItem(fTopDir);
-	// rewind the directory
+
 	return fTopDir->Rewind();
+		// rewind the directory
 }
 
 int32
@@ -481,110 +509,118 @@ TNodeWalker::CountEntries()
 	return -1;
 }
 
-TVolWalker::TVolWalker(bool knowsAttributes, bool writable, bool includeTopDirectory)
-	: 	TNodeWalker(includeTopDirectory),
-		fKnowsAttr(knowsAttributes),
-		fWritable(writable)
+
+TVolWalker::TVolWalker(bool knowsAttributes, bool writable,
+	bool includeTopDirectory)
+	:
+	TNodeWalker(includeTopDirectory),
+	fKnowsAttr(knowsAttributes),
+	fWritable(writable)
 {
 	// Get things initialized. Find first volume, or find the first volume
 	// that supports attributes.
  	NextVolume();
 }
 
+
 TVolWalker::~TVolWalker()
 {
 }
 
+
 status_t
 TVolWalker::NextVolume()
 {
-	status_t err;
-
 	// The stack of directoies should be empty.
 	ASSERT(fTopIndex == -1);
 	ASSERT(fTopDir == NULL);
 
+	status_t result;
 	do {
-		err = fVolRoster.GetNextVolume(&fVol);
-		if (err != B_OK)
+		result = fVolRoster.GetNextVolume(&fVol);
+		if (result != B_OK)
 			break;
-	} while ((fKnowsAttr && !fVol.KnowsAttr()) || (fWritable && fVol.IsReadOnly()));
+	} while ((fKnowsAttr && !fVol.KnowsAttr())
+		|| (fWritable && fVol.IsReadOnly()));
 
-	if (err == B_OK) {
+	if (result == B_OK) {
 		// Get the root directory to get things started. There's always
 		// a root directory for a volume. So if there is an error then it
 		// means that something is really bad, like the system is out of
 		// memory.  In that case don't worry about truying to skip to the
 		// next volume.
 		fTopDir = new BDirectory();
-		err = fVol.GetRootDirectory(fTopDir);
+		result = fVol.GetRootDirectory(fTopDir);
 		fIncludeTopDir = fOriginalIncludeTopDir;
 		fTopIndex = 0;
 		fDirs.AddItem(fTopDir);
 	}
 
-	return err;
+	return result;
 }
 
 status_t
 TVolWalker::GetNextEntry(BEntry* entry, bool traverse)
 {
-	if (!fTopDir)
+	if (fTopDir == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	// Get the next entry.
-	status_t err = _inherited::GetNextEntry(entry, traverse);
-
-	while (err != B_OK) {
-		// We're done with the current volume. Go to the next one
-		err = NextVolume();
-		if (err != B_OK)
+	// get the next entry
+	status_t result = _inherited::GetNextEntry(entry, traverse);
+	while (result != B_OK) {
+		// we're done with the current volume, go to the next one
+		result = NextVolume();
+		if (result != B_OK)
 			break;
-		err = GetNextEntry(entry, traverse);
+
+		result = GetNextEntry(entry, traverse);
 	}
 
-	return err;
+	return result;
 }
+
 
 status_t
 TVolWalker::GetNextRef(entry_ref* ref)
 {
-	if (!fTopDir)
+	if (fTopDir == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	// Get the next ref.
-	status_t err = _inherited::GetNextRef(ref);
+	status_t result = _inherited::GetNextRef(ref);
 
-	while (err != B_OK) {
-		// We're done with the current volume. Go to the next one
-		err = NextVolume();
-		if (err != B_OK)
+	while (result != B_OK) {
+		// we're done with the current volume, go to the next one
+		result = NextVolume();
+		if (result != B_OK)
 			break;
-		err = GetNextRef(ref);
+		result = GetNextRef(ref);
 	}
 
-	return err;
+	return result;
 }
+
 
 int32
 TVolWalker::GetNextDirents(struct dirent* ent, size_t size, int32 count)
 {
-	if (!fTopDir)
+	if (fTopDir == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	// Get the next dirent.
-	status_t err = _inherited::GetNextDirents(ent, size, count);
-
-	while (err != B_OK) {
-		// We're done with the current volume. Go to the next one
-		err = NextVolume();
-		if (err != B_OK)
+	// get the next dirent
+	status_t result = _inherited::GetNextDirents(ent, size, count);
+	while (result != B_OK) {
+		// we're done with the current volume, go to the next one
+		result = NextVolume();
+		if (result != B_OK)
 			break;
-		err = GetNextDirents(ent, size, count);
+
+		result = GetNextDirents(ent, size, count);
 	}
 
-	return err;
+	return result;
 }
+
 
 status_t
 TVolWalker::Rewind()
@@ -593,52 +629,57 @@ TVolWalker::Rewind()
 	return NextVolume();
 }
 
+
 TQueryWalker::TQueryWalker(const char* predicate)
-	: TWalker(), fQuery(), fVolRoster(), fVol()
+	:
+	TWalker(), fQuery(), fVolRoster(), fVol()
 {
 	fPredicate = strdup(predicate);
 	NextVolume();
 }
 
+
 TQueryWalker::~TQueryWalker()
 {
-	free((char*) fPredicate);
+	free((char*)fPredicate);
 	fPredicate = NULL;
 }
+
 
 status_t
 TQueryWalker::GetNextEntry(BEntry* entry, bool traverse)
 {
-	status_t err;
-
+	status_t result;
 	do {
-		err = fQuery.GetNextEntry(entry, traverse);
-		if (err == B_ENTRY_NOT_FOUND) {
+		result = fQuery.GetNextEntry(entry, traverse);
+		if (result == B_ENTRY_NOT_FOUND) {
 			if (NextVolume() != B_OK)
 				break;
 		}
-	} while (err == B_ENTRY_NOT_FOUND);
+	} while (result == B_ENTRY_NOT_FOUND);
 
-	return err;
+	return result;
 }
+
 
 status_t
 TQueryWalker::GetNextRef(entry_ref* ref)
 {
-	status_t err;
+	status_t result;
 
 	for (;;) {
-		err = fQuery.GetNextRef(ref);
-		if (err != B_ENTRY_NOT_FOUND)
+		result = fQuery.GetNextRef(ref);
+		if (result != B_ENTRY_NOT_FOUND)
 			break;
 
-		err = NextVolume();
-		if (err != B_OK)
+		result = NextVolume();
+		if (result != B_OK)
 			break;
 	}
 
-	return err;
+	return result;
 }
+
 
 int32
 TQueryWalker::GetNextDirents(struct dirent* ent, size_t size, int32 count)
@@ -657,26 +698,27 @@ TQueryWalker::GetNextDirents(struct dirent* ent, size_t size, int32 count)
 	return result;
 }
 
+
 status_t
 TQueryWalker::NextVolume()
 {
-	status_t err;
+	status_t result;
 	do {
-		err = fVolRoster.GetNextVolume(&fVol);
-		if (err)
+		result = fVolRoster.GetNextVolume(&fVol);
+		if (result != B_OK)
 			break;
 	} while (!fVol.KnowsQuery());
 
-
-	if (err == B_OK) {
-		err = fQuery.Clear();
-		err = fQuery.SetVolume(&fVol);
-		err = fQuery.SetPredicate(fPredicate);
-		err = fQuery.Fetch();
+	if (result == B_OK) {
+		result = fQuery.Clear();
+		result = fQuery.SetVolume(&fVol);
+		result = fQuery.SetPredicate(fPredicate);
+		result = fQuery.Fetch();
 	}
 
-	return err;
+	return result;
 }
+
 
 int32
 TQueryWalker::CountEntries()
@@ -685,6 +727,7 @@ TQueryWalker::CountEntries()
 	TRESPASS();
 	return -1;
 }
+
 
 status_t
 TQueryWalker::Rewind()
