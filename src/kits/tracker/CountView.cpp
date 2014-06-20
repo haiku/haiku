@@ -34,6 +34,7 @@ All rights reserved.
 
 // defines the status area drawn in the bottom left corner of a Tracker window
 
+
 #include "CountView.h"
 
 #include <Application.h>
@@ -49,15 +50,20 @@ All rights reserved.
 #include "Utilities.h"
 
 
-const bigtime_t kBarberPoleDelay = 500000;
-
-
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "CountView"
 
+
+const bigtime_t kBarberPoleDelay = 500000;
+
+
+//	#pragma mark - BCountView
+
+
 BCountView::BCountView(BRect bounds, BPoseView* view)
-	: BView(bounds, "CountVw", B_FOLLOW_LEFT + B_FOLLOW_BOTTOM,
-			B_PULSE_NEEDED | B_WILL_DRAW),
+	:
+	BView(bounds, "CountVw", B_FOLLOW_LEFT + B_FOLLOW_BOTTOM,
+		B_PULSE_NEEDED | B_WILL_DRAW),
 	fLastCount(-1),
 	fPoseView(view),
 	fShowingBarberPole(false),
@@ -308,7 +314,7 @@ BCountView::MouseDown(BPoint)
 	window->Activate();
 	window->UpdateIfNeeded();
 
-	if (fPoseView->IsFilePanel() || !fPoseView->TargetModel())
+	if (fPoseView->IsFilePanel() || fPoseView->TargetModel() == NULL)
 		return;
 
 	if (!window->TargetModel()->IsRoot()) {

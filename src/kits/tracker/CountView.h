@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __COUNT_VIEW__
-#define __COUNT_VIEW__
+#ifndef _COUNT_VIEW_H
+#define _COUNT_VIEW_H
 
 
 #include <String.h>
@@ -50,9 +50,9 @@ public:
 	BCountView(BRect, BPoseView*);
 	~BCountView();
 
-	virtual	void Draw(BRect);
-	virtual	void MouseDown(BPoint);
-	virtual	void AttachedToWindow();
+	virtual void Draw(BRect);
+	virtual void MouseDown(BPoint);
+	virtual void AttachedToWindow();
 	virtual void Pulse();
 	virtual void WindowActivated(bool active);
 
@@ -94,4 +94,5 @@ private:
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _COUNT_VIEW_H
