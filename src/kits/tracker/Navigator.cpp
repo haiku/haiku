@@ -58,12 +58,16 @@ static const int32 kMaxHistory = 32;
 static BPicture sPicture;
 
 
+//	#pragma mark - BNavigatorButton
+
+
 BNavigatorButton::BNavigatorButton(BRect rect, const char* name,
 	BMessage* message, int32 resIDon, int32 resIDoff, int32 resIDdisabled)
-	:	BPictureButton(rect, name, &sPicture, &sPicture, message),
-		fResIDOn(resIDon),
-		fResIDOff(resIDoff),
-		fResIDDisabled(resIDdisabled)
+	:
+	BPictureButton(rect, name, &sPicture, &sPicture, message),
+	fResIDOn(resIDon),
+	fResIDOff(resIDoff),
+	fResIDDisabled(resIDdisabled)
 {
 	// Clear to background color to avoid ugly border on click
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -104,7 +108,7 @@ BNavigatorButton::AttachedToWindow()
 void
 BNavigatorButton::SetPicture(BBitmap* bitmap, bool enabled, bool on)
 {
-	if (bitmap) {
+	if (bitmap != NULL) {
 		BPicture picture;
 		BView view(bitmap->Bounds(), "", 0, 0);
 		AddChild(&view);
@@ -116,21 +120,19 @@ BNavigatorButton::SetPicture(BBitmap* bitmap, bool enabled, bool on)
 		view.EndPicture();
 		RemoveChild(&view);
 		if (enabled)
-			if (on)
-				SetEnabledOn(&picture);
-			else
-				SetEnabledOff(&picture);
+			on ? SetEnabledOn(&picture) : SetEnabledOff(&picture);
 		else
-			if (on)
-				SetDisabledOn(&picture);
-			else
-				SetDisabledOff(&picture);
+			on ? SetDisabledOn(&picture) : SetDisabledOff(&picture);
 	}
 }
 
 
+//	#pragma mark - BNavigator
+
+
 BNavigator::BNavigator(const Model* model, BRect rect, uint32 resizeMask)
-	:	BView(rect, "Navigator", resizeMask, B_WILL_DRAW),
+	:
+	BView(rect, "Navigator", resizeMask, B_WILL_DRAW),
 	fBack(0),
 	fForw(0),
 	fUp(0),
@@ -321,7 +323,7 @@ BNavigator::SendNavigationMessage(NavigationAction action, BEntry* entry,
 		// so we have to select the item manually
 		if (option) {
 			message.what = B_REFS_RECEIVED;
-			if (nodeRef) {
+			if (nodeRef != NULL) {
 				message.AddData("nodeRefToSelect", B_RAW_TYPE, nodeRef,
 					sizeof(node_ref));
 			}
@@ -388,11 +390,13 @@ BNavigator::UpdateLocation(const Model* newmodel, int32 action)
 	// Modify history according to commands
 	switch (action) {
 		case kActionBackward:
-			fForwHistory.AddItem(fBackHistory.RemoveItemAt(fBackHistory.CountItems()-1));
+			fForwHistory.AddItem(fBackHistory.RemoveItemAt(
+				fBackHistory.CountItems() - 1));
 			break;
 
 		case kActionForward:
-			fBackHistory.AddItem(fForwHistory.RemoveItemAt(fForwHistory.CountItems()-1));
+			fBackHistory.AddItem(fForwHistory.RemoveItemAt(
+				fForwHistory.CountItems() - 1));
 			break;
 
 		case kActionUpdatePath:
@@ -430,5 +434,5 @@ BNavigator::CalcNavigatorHeight(void)
 {
 	// Empiric formula from how much space the textview
 	// will take once it is attached (using be_plain_font):
-	return  ceilf(11.0f + be_plain_font->Size()*(1.0f + 7.0f / 30.0f));
+	return ceilf(11.0f + be_plain_font->Size() * (1.0f + 7.0f / 30.0f));
 }
