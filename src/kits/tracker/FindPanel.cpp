@@ -33,6 +33,8 @@ All rights reserved.
 */
 
 
+#include "FindPanel.h"
+
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
@@ -74,7 +76,6 @@ All rights reserved.
 #include "AutoLock.h"
 #include "Commands.h"
 #include "ContainerWindow.h"
-#include "FindPanel.h"
 #include "FSUtils.h"
 #include "FunctionObject.h"
 #include "IconMenuItem.h"
@@ -120,6 +121,7 @@ const int32 operators[] = {
 	B_GE,
 	B_LE
 };
+
 static const char* operatorLabels[] = {
 	B_TRANSLATE_MARK("contains"),
 	B_TRANSLATE_MARK("is"),
@@ -168,6 +170,9 @@ class MostUsedNames {
 MostUsedNames gMostUsedMimeTypes("MostUsedMimeTypes", "Tracker");
 
 
+//	#pragma mark - MoreOptionsStruct
+
+
 void
 MoreOptionsStruct::EndianSwap(void*)
 {
@@ -204,14 +209,14 @@ MoreOptionsStruct::QueryTemporary(const BNode* node)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - FindWindow
 
 
 FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 	:
 	BWindow(kInitialRect, B_TRANSLATE("Find"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
-		| B_AUTO_UPDATE_SIZE_LIMITS),
+			| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFile(TryOpening(newRef)),
 	fFromTemplate(false),
 	fEditTemplateOnly(false),
@@ -312,6 +317,7 @@ FindWindow::SwitchToTemplate(const entry_ref* ref)
 		ThrowOnInitCheckError(&templateFile);
 		fBackground->SwitchToTemplate(&templateFile);
 	} catch (...) {
+		;
 	}
 }
 
@@ -415,15 +421,18 @@ FindWindow::SaveQueryAttributes(BNode* file, bool queryTemplate)
 
 status_t
 FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
-	bool queryTemplate, const BMessage* oldAttributes, const BPoint* oldLocation)
+	bool queryTemplate, const BMessage* oldAttributes,
+	const BPoint* oldLocation)
 {
-	if (oldAttributes)
+	if (oldAttributes != NULL) {
 		// revive old window settings
 		BContainerWindow::SetLayoutState(file, oldAttributes);
+	}
 
-	if (oldLocation)
+	if (oldLocation != NULL) {
 		// and the file's location
 		FSSetPoseLocation(entry, *oldLocation);
+	}
 
 	BNodeInfo(file).SetType(queryTemplate
 		? B_QUERY_TEMPLATE_MIMETYPE : B_QUERY_MIMETYPE);
@@ -433,9 +442,10 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
 	GetPredicateString(predicate, dynamicDate);
 	file->WriteAttrString(kAttrQueryString, &predicate);
 
-	if (dynamicDate)
+	if (dynamicDate) {
 		file->WriteAttr(kAttrDynamicDateQuery, B_BOOL_TYPE, 0, &dynamicDate,
 			sizeof(dynamicDate));
+	}
 
 	int32 tmp = 1;
 	file->WriteAttr("_trk/recentQuery", B_INT32_TYPE, 0, &tmp, sizeof(int32));
@@ -651,9 +661,10 @@ FindWindow::MessageReceived(BMessage* message)
 					entry_ref tmpRef;
 					entry.GetRef(&tmpRef);
 					fFile = TryOpening(&tmpRef);
-					if (fFile) {
+					if (fFile != NULL) {
 						fRef = tmpRef;
-						SaveQueryAsAttributes(fFile, &entry, queryTemplate, 0, 0);
+						SaveQueryAsAttributes(fFile, &entry, queryTemplate,
+							0, 0);
 							// try to save whatever state we aleady have
 							// to the new query so that if the user
 							// opens it before runing it from the find panel,
@@ -693,7 +704,7 @@ FindWindow::MessageReceived(BMessage* message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - FindPanel
 
 
 FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
@@ -759,7 +770,8 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 		BRect draggableRect = DraggableIcon::PreferredRect(draggableIconOrigin,
 			B_LARGE_ICON);
 		fDraggableIcon = new DraggableQueryIcon(draggableRect,
-			"saveHere", &dragNDropMessage, self, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+			"saveHere", &dragNDropMessage, self,
+			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 		fDraggableIcon->SetExplicitMaxSize(
 			BSize(draggableRect.right - draggableRect.left,
 				draggableRect.bottom - draggableRect.top));
@@ -824,7 +836,8 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 	BBox* queryBox = new BBox("Outer Controls");
 	queryBox->SetLabel(new BMenuField("RecentQueries", NULL, fRecentQueries));
 
-	BGroupView* queryBoxView = new BGroupView(B_VERTICAL, B_USE_DEFAULT_SPACING);
+	BGroupView* queryBoxView = new BGroupView(B_VERTICAL,
+		B_USE_DEFAULT_SPACING);
 	queryBoxView->GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING);
 	queryBox->AddChild(queryBoxView);
 
@@ -837,7 +850,7 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 			.Add(fMimeTypeField)
 			.Add(mimeTypeFieldSpacer)
 			.Add(searchModeField)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(B_USE_DEFAULT_SPACING))
+			.AddStrut(B_USE_DEFAULT_SPACING)
 			.Add(volumeField)
 			.End()
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
@@ -902,11 +915,11 @@ FindPanel::AttachedToWindow()
 	}
 
 	BButton* button = dynamic_cast<BButton*>(FindView("remove button"));
-	if (button)
+	if (button != NULL)
 		button->SetTarget(this);
 
 	button = dynamic_cast<BButton*>(FindView("add button"));
-	if (button)
+	if (button != NULL)
 		button->SetTarget(this);
 
 	fVolMenu->SetTargetForItems(this);
@@ -919,7 +932,7 @@ FindPanel::AttachedToWindow()
 	}
 	fMimeTypeMenu->SetTargetForItems(this);
 
-	if (fDraggableIcon)
+	if (fDraggableIcon != NULL)
 		fDraggableIcon->SetTarget(BMessenger(this));
 
 	fRecentQueries->SetTargetForItems(Window());

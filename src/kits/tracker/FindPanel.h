@@ -31,16 +31,16 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef	_FIND_PANEL_H
+#ifndef _FIND_PANEL_H
 #define _FIND_PANEL_H
 
 
 #include <ByteOrder.h>
+#include <ObjectList.h>
 #include <Window.h>
 #include <View.h>
 
 #include "DialogPane.h"
-#include "ObjectList.h"
 #include "MimeTypeList.h"
 #include "Utilities.h"
 #include "NodeWalker.h"
@@ -352,4 +352,5 @@ class DraggableQueryIcon : public DraggableIcon {
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _FIND_PANEL_H
