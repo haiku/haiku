@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "DialogPane.h"
 
 #include <ControlLook.h>
@@ -69,7 +70,7 @@ ViewList::AddAll(BView* toParent)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - DialogPane
 
 
 DialogPane::DialogPane(BRect mode1Frame, BRect mode2Frame, int32 initialMode,
@@ -88,7 +89,8 @@ DialogPane::DialogPane(BRect mode1Frame, BRect mode2Frame, int32 initialMode,
 
 DialogPane::DialogPane(BRect mode1Frame, BRect mode2Frame, BRect mode3Frame,
 	int32 initialMode, const char* name, uint32 followFlags, uint32 flags)
-	: BView(FrameForMode(initialMode, mode1Frame, mode2Frame, mode3Frame),
+	:
+	BView(FrameForMode(initialMode, mode1Frame, mode2Frame, mode3Frame),
 		name, followFlags, flags),
 	fMode(initialMode),
 	fMode1Frame(mode1Frame),
@@ -160,6 +162,7 @@ DialogPane::SetMode(int32 mode, bool initialSetup)
 				"separatorLine"));
 			break;
 		}
+
 		case 1:
 		{
 			if (oldMode > 1)
@@ -176,6 +179,7 @@ DialogPane::SetMode(int32 mode, bool initialSetup)
 			}
 			break;
 		}
+
 		case 2:
 		{
 			fMode3Items.AddAll(this);
@@ -199,7 +203,7 @@ void
 DialogPane::AttachedToWindow()
 {
 	BView* parent = Parent();
-	if (parent) {
+	if (parent != NULL) {
 		SetViewColor(parent->ViewColor());
 		SetLowColor(parent->LowColor());
 	}
@@ -209,7 +213,7 @@ DialogPane::AttachedToWindow()
 void
 DialogPane::ResizeParentWindow(int32 from, int32 to)
 {
-	if (!Window())
+	if (Window() == NULL)
 		return;
 
 	BRect oldBounds = BoundsForMode(from);
@@ -228,6 +232,7 @@ DialogPane::AddItem(BView* view, int32 toMode)
 		fMode2Items.AddItem(view);
 	else if (toMode == 2)
 		fMode3Items.AddItem(view);
+
 	if (fMode >= toMode)
 		AddChild(view);
 }
@@ -239,11 +244,14 @@ DialogPane::FrameForMode(int32 mode)
 	switch (mode) {
 		case 0:
 			return fMode1Frame;
+
 		case 1:
 			return fMode2Frame;
+
 		case 2:
 			return fMode3Frame;
 	}
+
 	return fMode1Frame;
 }
 
@@ -256,14 +264,17 @@ DialogPane::BoundsForMode(int32 mode)
 		case 0:
 			result = fMode1Frame;
 			break;
+
 		case 1:
 			result = fMode2Frame;
 			break;
+
 		case 2:
 			result = fMode3Frame;
 			break;
 	}
 	result.OffsetTo(0, 0);
+
 	return result;
 }
 
@@ -275,11 +286,14 @@ DialogPane::FrameForMode(int32 mode, BRect mode1Frame, BRect mode2Frame,
 	switch (mode) {
 		case 0:
 			return mode1Frame;
+
 		case 1:
 			return mode2Frame;
+
 		case 2:
 			return mode3Frame;
 	}
+
 	return mode1Frame;
 }
 
@@ -405,9 +419,10 @@ void
 PaneSwitch::GetPreferredSize(float* _width, float* _height)
 {
 	BSize size = MinSize();
-	if (_width)
+	if (_width != NULL)
 		*_width = size.width;
-	if (_height)
+
+	if (_height != NULL)
 		*_height = size.height;
 }
 
@@ -422,10 +437,12 @@ PaneSwitch::MinSize()
 	size.width = sLatchSize;
 	if (labelWidth > 0.0)
 		size.width += ceilf(sLatchSize / 2.0) + labelWidth;
+
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	size.height = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
 	size.height = max_c(size.height, sLatchSize);
+
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
