@@ -44,9 +44,10 @@ const bigtime_t kDelayedNodeMonitorLifetime = 10000000;
 
 PendingNodeMonitorEntry::PendingNodeMonitorEntry(const node_ref* node,
 	const BMessage* nodeMonitor)
-	:	fExpiresAfter(system_time() + kDelayedNodeMonitorLifetime),
-		fNodeMonitor(*nodeMonitor),
-		fNode(*node)
+	:
+	fExpiresAfter(system_time() + kDelayedNodeMonitorLifetime),
+	fNodeMonitor(*nodeMonitor),
+	fNode(*node)
 {
 }
 
@@ -73,7 +74,8 @@ PendingNodeMonitorEntry::TooOld(bigtime_t now) const
 
 
 PendingNodeMonitorCache::PendingNodeMonitorCache()
-	:	fList(10, true)
+	:
+	fList(10, true)
 {
 }
 

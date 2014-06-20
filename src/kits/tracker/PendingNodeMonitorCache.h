@@ -39,14 +39,13 @@ All rights reserved.
 //	The respective node montior messages are stored in a list and applied
 //  later, when their target shows up. They get nuked when they become too
 //  old.
-#ifndef __PENDING_NODEMONITOR_CACHE_H__
-#define __PENDING_NODEMONITOR_CACHE_H__
+#ifndef _PENDING_NODE_MONITOR_CACHE_H
+#define _PENDING_NODE_MONITOR_CACHE_H
 
 
 #include <Message.h>
 #include <Node.h>
-
-#include "ObjectList.h"
+#include <ObjectList.h>
 
 
 namespace BPrivate {
@@ -67,7 +66,6 @@ private:
 	node_ref fNode;
 };
 
-
 class PendingNodeMonitorCache {
 public:
 	PendingNodeMonitorCache();
@@ -87,4 +85,5 @@ private:
 
 using namespace BPrivate;
 
-#endif	// __PENDING_NODEMONITOR_CACHE_H__
+
+#endif	// _PENDING_NODE_MONITOR_CACHE_H
