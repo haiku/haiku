@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef DIR_MENU_H
-#define DIR_MENU_H
+#ifndef _DIR_MENU_H
+#define _DIR_MENU_H
 
 
 #include <PopUpMenu.h>
@@ -77,4 +77,5 @@ BDirMenu::SetMenuBar(BMenuBar* bar)
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _DIR_MENU_H

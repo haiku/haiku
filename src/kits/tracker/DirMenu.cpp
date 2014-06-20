@@ -35,6 +35,7 @@ All rights reserved.
 // ToDo:
 // get rid of fMenuBar, SetMenuBar and related mess
 
+
 #include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
@@ -56,6 +57,9 @@ All rights reserved.
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DirMenu"
+
+
+//	#pragma mark - BDirMenu
 
 
 BDirMenu::BDirMenu(BMenuBar* bar, BMessenger target, uint32 command,
