@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku.
+ * Copyright 2005-2014, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,6 +21,20 @@ BDataIO::BDataIO()
 
 BDataIO::~BDataIO()
 {
+}
+
+
+ssize_t
+BDataIO::Read(void* buffer, size_t size)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+ssize_t
+BDataIO::Write(const void* buffer, size_t size)
+{
+	return B_NOT_SUPPORTED;
 }
 
 

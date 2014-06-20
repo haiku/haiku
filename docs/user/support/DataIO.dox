@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,7 +38,7 @@
 
 	The interface provided by this class applies to objects or data that are
 	limited to reading and writing data. Classes derived from this class should
-	re-implement both the Read() and Write() method from this class.
+	re-implement the Read() or the Write() method from this class or both.
 
 	Candidates of types of data or objects that should be derived from this class
 	are probably broadcasting media streams (which don't support reading at a
@@ -62,22 +62,28 @@
 
 
 /*!
-	\fn virtual ssize_t BDataIO::Read(void *buffer, size_t size) = 0
-	\brief Pure virtual to read data.
+	\fn virtual ssize_t BDataIO::Read(void *buffer, size_t size)
+	\brief Reads data from the object into a buffer.
 
 	Your implementation should copy data into \c buffer, with the maximum size
 	of \c size. 
-	\return You should return the amount of bytes actually read, or an error code
-    in case of failure.
+
+	The default implementation is a no-op returning \c B_NOT_SUPPORTED.
+
+	\return You should return the amount of bytes actually read, or an error
+    code in case of failure.
 */
 
 
 /*!
-	\fn virtual ssize_t BDataIO::Write(const void *buffer, size_t size) = 0
-	\brief Pure virtual to write data.
+	\fn virtual ssize_t BDataIO::Write(const void *buffer, size_t size)
+	\brief Writes data from a buffer to the object.
 
 	Your implementation should copy data from \c buffer, with the maximum size
 	of \c size. 
+
+	The default implementation is a no-op returning \c B_NOT_SUPPORTED.
+
 	\return You should return the amount of bytes actually written, or an error 
     code in case of failure.
 */

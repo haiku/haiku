@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2005-2014, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DATA_IO_H
@@ -14,8 +14,8 @@ public:
 								BDataIO();
 	virtual						~BDataIO();
 
-	virtual	ssize_t				Read(void* buffer, size_t size) = 0;
-	virtual	ssize_t				Write(const void* buffer, size_t size) = 0;
+	virtual	ssize_t				Read(void* buffer, size_t size);
+	virtual	ssize_t				Write(const void* buffer, size_t size);
 
 private:
 								BDataIO(const BDataIO&);
