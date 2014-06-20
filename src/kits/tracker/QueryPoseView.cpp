@@ -59,10 +59,12 @@ All rights reserved.
 #include <fs_attr.h>
 
 
+using std::nothrow;
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "QueryPoseView"
 
-using std::nothrow;
 
 // Currently filtering out Trash doesn't node monitor too well - if you
 // remove an item from the Trash, it doesn't show up in the query result
@@ -71,12 +73,17 @@ using std::nothrow;
 // query results and add/remove appropriately. Right now only moving to
 // Trash is supported
 
+
+//	#pragma mark - BQueryPoseView
+
+
 BQueryPoseView::BQueryPoseView(Model* model, BRect frame, uint32 resizeMask)
-	:	BPoseView(model, frame, kListMode, resizeMask),
-		fShowResultsFromTrash(false),
-		fQueryList(NULL),
-		fQueryListContainer(NULL),
-		fCreateOldPoseList(false)
+	:
+	BPoseView(model, frame, kListMode, resizeMask),
+	fShowResultsFromTrash(false),
+	fQueryList(NULL),
+	fQueryListContainer(NULL),
+	fCreateOldPoseList(false)
 {
 }
 
@@ -200,20 +207,23 @@ BQueryPoseView::ShouldShowPose(const Model* model, const PoseInfo* poseInfo)
 	// add_poses, etc. filter
 	ASSERT(TargetModel());
 
-	if (!fShowResultsFromTrash
-		&& dynamic_cast<TTracker*>(be_app)->InTrashNode(model->EntryRef()))
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+	if (!fShowResultsFromTrash && tracker != NULL
+		&& tracker->InTrashNode(model->EntryRef())) {
 		return false;
+	}
 
 	bool result = _inherited::ShouldShowPose(model, poseInfo);
 
 	PoseList* oldPoseList = fQueryListContainer->OldPoseList();
-	if (result && oldPoseList) {
+	if (result && oldPoseList != NULL) {
 		// pose will get added - remove it from the old pose list
 		// because it is supposed to be showing
 		BPose* pose = oldPoseList->FindPose(model);
-		if (pose)
+		if (pose != NULL)
 			oldPoseList->RemoveItem(pose);
 	}
+
 	return result;
 }
 
@@ -224,7 +234,7 @@ BQueryPoseView::AddPosesCompleted()
 	ASSERT(Window()->IsLocked());
 
 	PoseList* oldPoseList = fQueryListContainer->OldPoseList();
-	if (oldPoseList) {
+	if (oldPoseList != NULL) {
 		int32 count = oldPoseList->CountItems();
 		for (int32 index = count - 1; index >= 0; index--) {
 			BPose* pose = oldPoseList->ItemAt(index);
@@ -279,8 +289,8 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 	fQueryList = fQueryListContainer->QueryList();
 
 	if (fQueryListContainer->DynamicDateQuery()) {
-
 		// calculate the time to trigger the query refresh - next midnight
+
 		time_t now = time(0);
 
 		time_t nextMidnight = now + 60 * 60 * 24;
@@ -399,37 +409,40 @@ bool
 BQueryPoseView::ActiveOnDevice(dev_t device) const
 {
 	int32 count = fQueryList->CountItems();
-	for (int32 index = 0; index < count; index++)
+	for (int32 index = 0; index < count; index++) {
 		if (fQueryList->ItemAt(index)->TargetDevice() == device)
 			return true;
+	}
 
 	return false;
 }
 
 
-//	#pragma mark -
+//	#pragma mark - QueryEntryListCollection
 
 
 QueryEntryListCollection::QueryEntryListCollection(Model* model,
 	BHandler* target, PoseList* oldPoseList)
-	:	fQueryListRep(new QueryListRep(new BObjectList<BQuery>(5, true)))
+	:
+	fQueryListRep(new QueryListRep(new BObjectList<BQuery>(5, true)))
 {
 	Rewind();
 	attr_info info;
 	BQuery query;
 
-	if (!model->Node()) {
+	BNode* modelNode = model->Node();
+	if (modelNode == NULL) {
 		fStatus = B_ERROR;
 		return;
 	}
 
 	// read the actual query string
-	fStatus = model->Node()->GetAttrInfo(kAttrQueryString, &info);
+	fStatus = modelNode->GetAttrInfo(kAttrQueryString, &info);
 	if (fStatus != B_OK)
 		return;
 
 	BString buffer;
-	if (model->Node()->ReadAttr(kAttrQueryString, B_STRING_TYPE, 0,
+	if (modelNode->ReadAttr(kAttrQueryString, B_STRING_TYPE, 0,
 		buffer.LockBuffer((int32)info.size),
 			(size_t)info.size) != info.size) {
 		fStatus = B_ERROR;
@@ -440,7 +453,7 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 
 	// read the extra options
 	MoreOptionsStruct saveMoreOptions;
-	if (ReadAttr(model->Node(), kAttrQueryMoreOptions,
+	if (ReadAttr(modelNode, kAttrQueryMoreOptions,
 			kAttrQueryMoreOptionsForeign, B_RAW_TYPE, 0, &saveMoreOptions,
 			sizeof(MoreOptionsStruct),
 			&MoreOptionsStruct::EndianSwap) != kReadAttrFailed) {
@@ -455,7 +468,7 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 	fQueryListRep->fRefreshEveryHour = false;
 	fQueryListRep->fRefreshEveryMinute = false;
 
-	if (model->Node()->ReadAttr(kAttrDynamicDateQuery, B_BOOL_TYPE, 0,
+	if (modelNode->ReadAttr(kAttrDynamicDateQuery, B_BOOL_TYPE, 0,
 			&fQueryListRep->fDynamicDateQuery,
 			sizeof(bool)) != sizeof(bool)) {
 		fQueryListRep->fDynamicDateQuery = false;
@@ -481,13 +494,12 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 	status_t result = B_OK;
 
 	// get volumes to perform query on
-	if (model->Node()->GetAttrInfo(kAttrQueryVolume, &info) == B_OK) {
+	if (modelNode->GetAttrInfo(kAttrQueryVolume, &info) == B_OK) {
 		char* buffer = NULL;
 
 		if ((buffer = (char*)malloc((size_t)info.size)) != NULL
-			&& model->Node()->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0,
+			&& modelNode->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0,
 				buffer, (size_t)info.size) == info.size) {
-
 			BMessage message;
 			if (message.Unflatten(buffer) == B_OK) {
 				for (int32 index = 0; ;index++) {
@@ -533,6 +545,7 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 	}
 
 	fStatus = B_OK;
+
 	return;
 }
 
@@ -582,10 +595,14 @@ QueryEntryListCollection::Clone()
 }
 
 
+//	#pragma mark - QueryEntryListCollection
+
+
 QueryEntryListCollection::QueryEntryListCollection(
 	const QueryEntryListCollection &cloneThis)
-	:	EntryListBase(),
-		fQueryListRep(cloneThis.fQueryListRep)
+	:
+	EntryListBase(),
+	fQueryListRep(cloneThis.fQueryListRep)
 {
 	// only to be used by the Clone routine
 }
@@ -608,11 +625,12 @@ QueryEntryListCollection::GetNextEntry(BEntry* entry, bool traverse)
 		fQueryListRep->fQueryListIndex < count;
 		fQueryListRep->fQueryListIndex++) {
 		result = fQueryListRep->fQueryList->
-			ItemAt(fQueryListRep->fQueryListIndex)
-				->GetNextEntry(entry, traverse);
+			ItemAt(fQueryListRep->fQueryListIndex)->
+				GetNextEntry(entry, traverse);
 		if (result == B_OK)
 			break;
 	}
+
 	return result;
 }
 
@@ -624,15 +642,15 @@ QueryEntryListCollection::GetNextDirents(struct dirent* buffer, size_t length,
 	int32 result = 0;
 
 	for (int32 queryCount = fQueryListRep->fQueryList->CountItems();
-		fQueryListRep->fQueryListIndex < queryCount;
-		fQueryListRep->fQueryListIndex++) {
-
+			fQueryListRep->fQueryListIndex < queryCount;
+			fQueryListRep->fQueryListIndex++) {
 		result = fQueryListRep->fQueryList->
-			ItemAt(fQueryListRep->fQueryListIndex)->GetNextDirents(buffer,
-				length, count);
+			ItemAt(fQueryListRep->fQueryListIndex)->
+				GetNextDirents(buffer, length, count);
 		if (result > 0)
 			break;
 	}
+
 	return result;
 }
 

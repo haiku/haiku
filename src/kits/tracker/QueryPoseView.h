@@ -181,4 +181,5 @@ private:
 
 using namespace BPrivate;
 
+
 #endif	// _QUERY_POSE_VIEW_H
