@@ -50,13 +50,17 @@ All rights reserved.
 #include "MountMenu.h"
 
 
-
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "VolumeWindow"
 
+
+//	#pragma mark - BVolumeWindow
+
+
 BVolumeWindow::BVolumeWindow(LockingList<BWindow>* windowList,
-		uint32 openFlags)
-	:	BContainerWindow(windowList, openFlags)
+	uint32 openFlags)
+	:
+	BContainerWindow(windowList, openFlags)
 {
 }
 
@@ -89,7 +93,7 @@ BVolumeWindow::MenusBeginning()
 	}
 
 	BMenuItem* item = fMenuBar->FindItem(kUnmountVolume);
-	if (item)
+	if (item != NULL)
 		item->SetEnabled(ejectableVolumeSelected);
 }
 

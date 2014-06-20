@@ -64,4 +64,5 @@ class BVolumeWindow : public BContainerWindow {
 
 using namespace BPrivate;
 
+
 #endif	// _VOLUME_WINDOW_H
