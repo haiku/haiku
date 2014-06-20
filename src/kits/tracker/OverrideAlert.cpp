@@ -46,8 +46,9 @@ OverrideAlert::OverrideAlert(const char* title, const char* text,
 	const char* button2, uint32 modifiers2,
 	const char* button3, uint32 modifiers3,
 	button_width width, alert_type type)
-	:	BAlert(title, text, button1, button2, button3, width, type),
-		fCurModifiers(0)
+	:
+	BAlert(title, text, button1, button2, button3, width, type),
+	fCurModifiers(0)
 {
 	fButtonModifiers[0] = modifiers1;
 	fButtonModifiers[1] = modifiers2;
@@ -64,8 +65,9 @@ OverrideAlert::OverrideAlert(const char* title, const char* text,
 	const char* button2, uint32 modifiers2,
 	const char* button3, uint32 modifiers3,
 	button_width width, button_spacing spacing, alert_type type)
-	:	BAlert(title, text, button1, button2, button3, width, spacing, type),
-		fCurModifiers(0)
+	:
+	BAlert(title, text, button1, button2, button3, width, spacing, type),
+	fCurModifiers(0)
 {
 	fButtonModifiers[0] = modifiers1;
 	fButtonModifiers[1] = modifiers2;
@@ -108,7 +110,7 @@ OverrideAlert::OverPosition(float width, float height)
 	BRect desirableRect;
 	screenFrame = BScreen(window).Frame();
 
-	if (window) {
+	if (window != NULL) {
 		// If we found a window associated with this calling thread,
 		// place alert over that window so that the first button is
 		// on top of it.  This allows name editing confirmations to
@@ -123,7 +125,6 @@ OverrideAlert::OverPosition(float width, float height)
 		desirableRect.right = desirableRect.left+width;
 		desirableRect.top = midY - ceilf(height / 3.0f);
 		desirableRect.bottom = desirableRect.top + height;
-
 	} else {
 		// Otherwise, just place alert in center of screen.
 
@@ -150,7 +151,7 @@ OverrideAlert::UpdateButtons(uint32 modifiers, bool force)
 	fCurModifiers = modifiers;
 	for (int32 i = 0; i < 3; i++) {
 		BButton* button = ButtonAt(i);
-		if (button) {
+		if (button != NULL) {
 			button->SetEnabled(((fButtonModifiers[i] & fCurModifiers)
 				== fButtonModifiers[i]));
 		}

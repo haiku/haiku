@@ -31,8 +31,6 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef _OVERRIDE_ALERT_H
-#define _OVERRIDE_ALERT_H
 
 // This is a special BAlert for which you can specify modifier
 // keys that must be down for various buttons to be enabled.  It
@@ -43,6 +41,8 @@ All rights reserved.
 // normal BAlert, attempting to be on top of the calling window.
 // This allows it to work when confirming rename operations with
 // Focus Follows Mouse turned on.
+#ifndef _OVERRIDE_ALERT_H
+#define _OVERRIDE_ALERT_H
 
 
 #include <Alert.h>
@@ -80,5 +80,6 @@ private:
 } // namespace BPrivate
 
 using namespace BPrivate;
+
 
 #endif	// _OVERRIDE_ALERT_H
