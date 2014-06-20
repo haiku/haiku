@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef FILE_PERMISSIONS_VIEW_H
-#define FILE_PERMISSIONS_VIEW_H
+#ifndef _FILE_PERMISSIONS_VIEW_H
+#define _FILE_PERMISSIONS_VIEW_H
 
 
 #include <CheckBox.h>
@@ -94,9 +94,9 @@ class FilePermissionsView : public BView {
 		typedef BView _inherited;
 };
 
-
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif	// FILE_PERMISSIONS_VIEW_H
+
+#endif	// _FILE_PERMISSIONS_VIEW_H

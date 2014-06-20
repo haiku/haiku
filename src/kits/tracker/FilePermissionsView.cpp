@@ -43,17 +43,22 @@ All rights reserved.
 #include <Locale.h>
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FilePermissionsView"
+
+
 const uint32 kPermissionsChanged = 'prch';
 const uint32 kNewOwnerEntered = 'nwow';
 const uint32 kNewGroupEntered = 'nwgr';
 
 
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "FilePermissionsView"
+//	#pragma mark - FilePermissionsView
+
 
 FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
-	:	BView(rect, "FilePermissionsView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
-		fModel(model)
+	:
+	BView(rect, "FilePermissionsView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
+	fModel(model)
 {
 	// Constants for the column labels: "User", "Group" and "Other".
 	const float kColumnLabelMiddle = 77, kColumnLabelTop = 6,
@@ -269,8 +274,8 @@ FilePermissionsView::ModelChanged(Model* model)
 			} else
 				fGroupTextControl->SetText(B_TRANSLATE("Unknown"));
 
-			// Unless we're root, only allow the owner to transfer the ownership,
-			// i.e. disable text controls if uid:s doesn't match:
+			// Unless we're root, only allow the owner to transfer the
+			// ownership, i.e. disable text controls if uid:s doesn't match:
 			thread_id thisThread = find_thread(NULL);
 			thread_info threadInfo;
 			get_thread_info(thisThread, &threadInfo);
