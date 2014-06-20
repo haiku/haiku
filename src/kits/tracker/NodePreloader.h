@@ -42,13 +42,13 @@ All rights reserved.
 //  aliasing after a deletion, etc.
 //
 //  The node preloader knows which icons to preload
-#ifndef __NODE_CACHE_PRELOADER__
-#define __NODE_CACHE_PRELOADER__
+#ifndef _NODE_CACHE_PRELOADER_H
+#define _NODE_CACHE_PRELOADER_H
 
 
 #include <Handler.h>
+#include <ObjectList.h>
 
-#include "ObjectList.h"
 #include "Model.h"
 
 
@@ -82,4 +82,5 @@ private:
 
 using namespace BPrivate;
 
-#endif	// __NODE_CACHE_PRELOADER__
+
+#endif	// _NODE_CACHE_PRELOADER_H

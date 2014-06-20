@@ -59,17 +59,20 @@ NodePreloader::InstallNodePreloader(const char* name, BLooper* host)
 		AutoLock<BLooper> lock(host);
 		if (!lock)
 			return NULL;
+
 		host->AddHandler(result);
 	}
 	result->Run();
+
 	return result;
 }
 
 
 NodePreloader::NodePreloader(const char* name)
-	:	BHandler(name),
-		fModelList(20, true),
-		fQuitRequested(false)
+	:
+	BHandler(name),
+	fModelList(20, true),
+	fQuitRequested(false)
 {
 }
 
@@ -98,6 +101,7 @@ NodePreloader::FindModel(node_ref itemNode) const
 		if (*model->NodeRef() == itemNode)
 			return model;
 	}
+
 	return NULL;
 }
 
@@ -118,8 +122,9 @@ NodePreloader::MessageReceived(BMessage* message)
 					message->FindInt32("device", &itemNode.device);
 					message->FindInt64("node", &itemNode.node);
 					Model* model = FindModel(itemNode);
-					if (!model)
+					if (model == NULL)
 						break;
+
 					//PRINT(("preloader removing file %s\n", model->Name()));
 					IconCache::sIconCache->Removing(model);
 					fModelList.RemoveItem(model);
@@ -136,8 +141,9 @@ NodePreloader::MessageReceived(BMessage* message)
 					const char* attrName;
 					message->FindString("attr", &attrName);
 					Model* model = FindModel(itemNode);
-					if (!model)
+					if (model == NULL)
 						break;
+
 					BModelOpener opener(model);
 					IconCache::sIconCache->IconChanged(model->ResolveIfLink());
 					//PRINT(("preloader updating file %s\n", model->Name()));
@@ -181,9 +187,10 @@ NodePreloader::PreloadOne(const char* dirPath)
 
 		Model* model = new Model(&ref, true);
 		if (model->InitCheck() == B_OK && model->IconFrom() == kUnknownSource) {
-			TTracker::WatchNode(model->NodeRef(), B_WATCH_STAT
-				| B_WATCH_ATTR, this);
-			IconCache::sIconCache->Preload(model, kNormalIcon, B_MINI_ICON, true);
+			TTracker::WatchNode(model->NodeRef(),
+				B_WATCH_STAT | B_WATCH_ATTR, this);
+			IconCache::sIconCache->Preload(model, kNormalIcon, B_MINI_ICON,
+				true);
 			fModelList.AddItem(model);
 			model->CloseNode();
 		} else
@@ -196,7 +203,8 @@ void
 NodePreloader::Preload()
 {
 	for (int32 count = 100; count >= 0; count--) {
-		// wait for a little bit before going ahead to reduce disk access contention
+		// wait for a little bit before going ahead to reduce disk access
+		// contention
 		snooze(100000);
 		if (fQuitRequested) {
 			fLock.Unlock();
@@ -214,6 +222,7 @@ NodePreloader::Preload()
 	BPath path;
 	if (find_directory(B_BEOS_APPS_DIRECTORY, &path) == B_OK)
 		PreloadOne(path.Path());
+
 	if (find_directory(B_BEOS_PREFERENCES_DIRECTORY, &path) == B_OK)
 		PreloadOne(path.Path());
 
