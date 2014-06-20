@@ -40,7 +40,8 @@ All rights reserved.
 
 
 ShortMimeInfo::ShortMimeInfo(const BMimeType &mimeType)
-	:	fCommonMimeType(true)
+	:
+	fCommonMimeType(true)
 {
 	fPrivateName = mimeType.Type();
 
@@ -60,9 +61,11 @@ ShortMimeInfo::ShortMimeInfo(const BMimeType &mimeType)
 
 
 ShortMimeInfo::ShortMimeInfo(const char* shortDescription)
-	:	fShortDescription(shortDescription)
+	:
+	fShortDescription(shortDescription)
 {
 }
+
 
 const char*
 ShortMimeInfo::InternalName() const
@@ -70,11 +73,13 @@ ShortMimeInfo::InternalName() const
 	return fPrivateName.String();
 }
 
+
 const char*
 ShortMimeInfo::ShortDescription() const
 {
 	return fShortDescription.String();
 }
+
 
 int
 ShortMimeInfo::CompareShortDescription(const ShortMimeInfo* a,
@@ -83,6 +88,7 @@ ShortMimeInfo::CompareShortDescription(const ShortMimeInfo* a,
 	return a->fShortDescription.ICompare(b->fShortDescription);
 }
 
+
 bool
 ShortMimeInfo::IsCommonMimeType() const
 {
@@ -90,24 +96,27 @@ ShortMimeInfo::IsCommonMimeType() const
 }
 
 
-//	#pragma mark -
+//	#pragma mark - MimeTypeList
 
 
 MimeTypeList::MimeTypeList()
-	:	fMimeList(100, true),
-		fCommonMimeList(30, false),
-		fLock("mimeListLock")
+	:
+	fMimeList(100, true),
+	fCommonMimeList(30, false),
+	fLock("mimeListLock")
 {
 	fLock.Lock();
 	Thread::Launch(NewMemberFunctionObject(&MimeTypeList::Build, this),
 		B_NORMAL_PRIORITY);
 }
 
+
 static int
 MatchOneShortDescription(const ShortMimeInfo* a, const ShortMimeInfo* b)
 {
 	return strcasecmp(a->ShortDescription(), b->ShortDescription());
 }
+
 
 const ShortMimeInfo*
 MimeTypeList::FindMimeType(const char* shortDescription) const
@@ -119,6 +128,7 @@ MimeTypeList::FindMimeType(const char* shortDescription) const
 	return result;
 }
 
+
 const ShortMimeInfo*
 MimeTypeList::EachCommonType(bool (*func)(const ShortMimeInfo*, void*),
 	void* state) const
@@ -129,8 +139,10 @@ MimeTypeList::EachCommonType(bool (*func)(const ShortMimeInfo*, void*),
 		if ((func)(fCommonMimeList.ItemAt(index), state))
 			return fCommonMimeList.ItemAt(index);
 	}
+
 	return NULL;
 }
+
 
 void
 MimeTypeList::Build()
@@ -158,6 +170,7 @@ MimeTypeList::Build()
 		if (mimeInfo->IsCommonMimeType())
 			fCommonMimeList.AddItem(mimeInfo);
 	}
+
 	fCommonMimeList.SortItems(&ShortMimeInfo::CompareShortDescription);
 	fLock.Unlock();
 }
