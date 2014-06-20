@@ -60,7 +60,10 @@ const char* kBackgroundImageInfoMode 		= B_BACKGROUND_MODE;
 const char* kBackgroundImageInfoWorkspaces 	= B_BACKGROUND_WORKSPACES;
 const char* kBackgroundImageInfoPath 		= B_BACKGROUND_IMAGE;
 
-} // namespace BPrivate
+}	// namespace BPrivate
+
+
+//	#pragma mark - BackgroundImage
 
 
 BackgroundImage*
@@ -83,7 +86,7 @@ BackgroundImage::GetBackgroundImage(const BNode* node, bool isDesktop)
 	if (error != B_OK)
 		return NULL;
 
-	BackgroundImage* result = NULL;
+	BackgroundImage* backgroundImage = NULL;
 	for (int32 index = 0; ; index++) {
 		const char* path;
 		uint32 workspaces = B_ALL_WORKSPACES;
@@ -117,22 +120,24 @@ BackgroundImage::GetBackgroundImage(const BNode* node, bool isDesktop)
 			BackgroundImage::BackgroundImageInfo(workspaces, bitmap, mode,
 				offset, textWidgetLabelOutline);
 
-		if (!result)
-			result = new BackgroundImage(node, isDesktop);
+		if (backgroundImage == NULL)
+			backgroundImage = new BackgroundImage(node, isDesktop);
 
-		result->Add(imageInfo);
+		backgroundImage->Add(imageInfo);
 	}
-	return result;
+
+	return backgroundImage;
 }
 
 
 BackgroundImage::BackgroundImageInfo::BackgroundImageInfo(uint32 workspaces,
 	BBitmap* bitmap, Mode mode, BPoint offset, bool textWidgetOutline)
-	:	fWorkspace(workspaces),
-		fBitmap(bitmap),
-		fMode(mode),
-		fOffset(offset),
-		fTextWidgetOutline(textWidgetOutline)
+	:
+	fWorkspace(workspaces),
+	fBitmap(bitmap),
+	fMode(mode),
+	fOffset(offset),
+	fTextWidgetOutline(textWidgetOutline)
 {
 }
 
@@ -144,11 +149,12 @@ BackgroundImage::BackgroundImageInfo::~BackgroundImageInfo()
 
 
 BackgroundImage::BackgroundImage(const BNode* node, bool desktop)
-	:	fIsDesktop(desktop),
-		fDefinedByNode(*node),
-		fView(NULL),
-		fShowingBitmap(NULL),
-		fBitmapForWorkspaceList(1, true)
+	:
+	fIsDesktop(desktop),
+	fDefinedByNode(*node),
+	fView(NULL),
+	fShowingBitmap(NULL),
+	fBitmapForWorkspaceList(1, true)
 {
 }
 
@@ -232,6 +238,7 @@ BackgroundImage::Show(BackgroundImageInfo* info, BView* view)
 		case kAtOffset:
 			destinationBitmapBounds.OffsetTo(info->fOffset);
 			break;
+
 		case kTiled:
 			if (fIsDesktop) {
 				destinationBitmapBounds.OffsetBy(
@@ -276,15 +283,16 @@ BackgroundImage::BRectVerticalOverlap(BRect hostRect, BRect resizedRect)
 void
 BackgroundImage::Remove()
 {
-	if (fShowingBitmap) {
+	if (fShowingBitmap != NULL) {
 		fView->ClearViewBitmap();
 		fView->Invalidate();
 		BPoseView* poseView = dynamic_cast<BPoseView*>(fView);
 		// make sure text widgets draw the default way, erasing
 		// their background
-		if (poseView)
+		if (poseView != NULL)
 			poseView->SetWidgetTextOutline(true);
 	}
+
 	fShowingBitmap = NULL;
 }
 
@@ -307,6 +315,7 @@ BackgroundImage::ImageInfoForWorkspace(int32 workspace) const
 		BackgroundImageInfo* info = fBitmapForWorkspaceList.ItemAt(index);
 		if (info->fWorkspace == workspaceMask)
 			return info;
+
 		if (info->fWorkspace & workspaceMask)
 			result = info;
 	}
@@ -318,25 +327,29 @@ BackgroundImage::ImageInfoForWorkspace(int32 workspace) const
 void
 BackgroundImage::WorkspaceActivated(BView* view, int32 workspace, bool state)
 {
-	if (!fIsDesktop)
+	if (!fIsDesktop) {
 		// we only care for desktop bitmaps
 		return;
+	}
 
-	if (!state)
+	if (!state) {
 		// we only care comming into a new workspace, not leaving one
 		return;
+	}
 
 	BackgroundImageInfo* info = ImageInfoForWorkspace(workspace);
-
 	if (info != fShowingBitmap) {
-		if (info)
+		if (info != NULL)
 			Show(info, view);
 		else {
-			if (BPoseView* poseView = dynamic_cast<BPoseView*>(view))
+			BPoseView* poseView = dynamic_cast<BPoseView*>(view);
+			if (poseView != NULL)
 				poseView->SetWidgetTextOutline(true);
+
 			view->ClearViewBitmap();
 			view->Invalidate();
 		}
+
 		fShowingBitmap = info;
 	}
 }
@@ -345,7 +358,7 @@ BackgroundImage::WorkspaceActivated(BView* view, int32 workspace, bool state)
 void
 BackgroundImage::ScreenChanged(BRect, color_space)
 {
-	if (!fIsDesktop || !fShowingBitmap)
+	if (!fIsDesktop || fShowingBitmap == NULL)
 		return;
 
 	if (fShowingBitmap->fMode == kCentered) {
@@ -367,14 +380,14 @@ BackgroundImage*
 BackgroundImage::Refresh(BackgroundImage* oldBackgroundImage,
 	const BNode* fromNode, bool desktop, BPoseView* poseView)
 {
-	if (oldBackgroundImage) {
+	if (oldBackgroundImage != NULL) {
 		oldBackgroundImage->Remove();
 		delete oldBackgroundImage;
 	}
 
-	BackgroundImage* result = GetBackgroundImage(fromNode, desktop);
-	if (result && poseView->ViewMode() != kListMode)
-		result->Show(poseView, current_workspace());
+	BackgroundImage* backgroundImage = GetBackgroundImage(fromNode, desktop);
+	if (backgroundImage != NULL && poseView->ViewMode() != kListMode)
+		backgroundImage->Show(poseView, current_workspace());
 
-	return result;
+	return backgroundImage;
 }

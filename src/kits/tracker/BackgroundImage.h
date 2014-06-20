@@ -31,15 +31,16 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __BACKGROUND_IMAGE__
-#define __BACKGROUND_IMAGE__
-
 
 //  Classes used for setting up and managing background images
 
 
+#ifndef _BACKGROUND_IMAGE_H
+#define _BACKGROUND_IMAGE_H
+
+
+#include <ObjectList.h>
 #include <String.h>
-#include "ObjectList.h"
 
 
 class BNode;
@@ -132,4 +133,5 @@ private:
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _BACKGROUND_IMAGE_H
