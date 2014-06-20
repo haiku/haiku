@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef _SETTINGS_VIEWS
-#define _SETTINGS_VIEWS
+#ifndef _SETTINGS_VIEWS_H
+#define _SETTINGS_VIEWS_H
 
 
 #include <GroupView.h>
@@ -54,120 +54,121 @@ class BStringView;
 namespace BPrivate {
 
 class SettingsView : public BGroupView {
-	public:
-				SettingsView(const char* name);
-		virtual ~SettingsView();
+public:
+			SettingsView(const char* name);
+	virtual ~SettingsView();
 
-		virtual void SetDefaults();
-		virtual bool IsDefaultable() const;
-		virtual void Revert();
-		virtual void ShowCurrentSettings();
-		virtual void RecordRevertSettings();
-		virtual bool IsRevertable() const;
+	virtual void SetDefaults();
+	virtual bool IsDefaultable() const;
+	virtual void Revert();
+	virtual void ShowCurrentSettings();
+	virtual void RecordRevertSettings();
+	virtual bool IsRevertable() const;
 
-	protected:
-		typedef BGroupView _inherited;
+protected:
+	typedef BGroupView _inherited;
 };
 
 
 class DesktopSettingsView : public SettingsView {
-	public:
-		DesktopSettingsView();
+public:
+	DesktopSettingsView();
 
-		virtual void MessageReceived(BMessage* message);
-		virtual void AttachedToWindow();
+	virtual void MessageReceived(BMessage* message);
+	virtual void AttachedToWindow();
 
-		virtual void SetDefaults();
-		virtual bool IsDefaultable() const;
-		virtual void Revert();
-		virtual void ShowCurrentSettings();
-		virtual void RecordRevertSettings();
-		virtual bool IsRevertable() const;
+	virtual void SetDefaults();
+	virtual bool IsDefaultable() const;
+	virtual void Revert();
+	virtual void ShowCurrentSettings();
+	virtual void RecordRevertSettings();
+	virtual bool IsRevertable() const;
 
-	private:
-		void _SendNotices();
+private:
+	void _SendNotices();
 
-		BRadioButton*	fShowDisksIconRadioButton;
-		BRadioButton*	fMountVolumesOntoDesktopRadioButton;
-		BCheckBox*		fMountSharedVolumesOntoDesktopCheckBox;
-		BCheckBox*		fIntegrateNonBootBeOSDesktopsCheckBox;
-		BButton*		fMountButton;
+	BRadioButton*	fShowDisksIconRadioButton;
+	BRadioButton*	fMountVolumesOntoDesktopRadioButton;
+	BCheckBox*		fMountSharedVolumesOntoDesktopCheckBox;
+	BCheckBox*		fIntegrateNonBootBeOSDesktopsCheckBox;
+	BButton*		fMountButton;
 
-		bool fShowDisksIcon;
-		bool fMountVolumesOntoDesktop;
-		bool fMountSharedVolumesOntoDesktop;
-		bool fIntegrateNonBootBeOSDesktops;
-		bool fEjectWhenUnmounting;
+	bool fShowDisksIcon;
+	bool fMountVolumesOntoDesktop;
+	bool fMountSharedVolumesOntoDesktop;
+	bool fIntegrateNonBootBeOSDesktops;
+	bool fEjectWhenUnmounting;
 
-		typedef SettingsView _inherited;
+	typedef SettingsView _inherited;
 };
 
 
 class WindowsSettingsView : public SettingsView {
-	public:
-		WindowsSettingsView();
+public:
+	WindowsSettingsView();
 
-		virtual void MessageReceived(BMessage* message);
-		virtual void AttachedToWindow();
+	virtual void MessageReceived(BMessage* message);
+	virtual void AttachedToWindow();
 
-		virtual void SetDefaults();
-		virtual bool IsDefaultable() const;
-		virtual void Revert();
-		virtual void ShowCurrentSettings();
-		virtual void RecordRevertSettings();
-		virtual bool IsRevertable() const;
+	virtual void SetDefaults();
+	virtual bool IsDefaultable() const;
+	virtual void Revert();
+	virtual void ShowCurrentSettings();
+	virtual void RecordRevertSettings();
+	virtual bool IsRevertable() const;
 
-	private:
-		BCheckBox* fShowFullPathInTitleBarCheckBox;
-		BCheckBox* fSingleWindowBrowseCheckBox;
-		BCheckBox* fShowNavigatorCheckBox;
-		BCheckBox* fShowSelectionWhenInactiveCheckBox;
-		BCheckBox* fOutlineSelectionCheckBox;
-		BCheckBox* fSortFolderNamesFirstCheckBox;
-		BCheckBox* fTypeAheadFilteringCheckBox;
+private:
+	BCheckBox* fShowFullPathInTitleBarCheckBox;
+	BCheckBox* fSingleWindowBrowseCheckBox;
+	BCheckBox* fShowNavigatorCheckBox;
+	BCheckBox* fShowSelectionWhenInactiveCheckBox;
+	BCheckBox* fOutlineSelectionCheckBox;
+	BCheckBox* fSortFolderNamesFirstCheckBox;
+	BCheckBox* fTypeAheadFilteringCheckBox;
 
-		bool fShowFullPathInTitleBar;
-		bool fSingleWindowBrowse;
-		bool fShowNavigator;
-		bool fTransparentSelection;
-		bool fSortFolderNamesFirst;
-		bool fTypeAheadFiltering;
+	bool fShowFullPathInTitleBar;
+	bool fSingleWindowBrowse;
+	bool fShowNavigator;
+	bool fTransparentSelection;
+	bool fSortFolderNamesFirst;
+	bool fTypeAheadFiltering;
 
-		typedef SettingsView _inherited;
+	typedef SettingsView _inherited;
 };
 
 
 class SpaceBarSettingsView : public SettingsView {
-	public:
-		SpaceBarSettingsView();
-		virtual ~SpaceBarSettingsView();
+public:
+	SpaceBarSettingsView();
+	virtual ~SpaceBarSettingsView();
 
-		virtual void MessageReceived(BMessage* message);
-		virtual void AttachedToWindow();
+	virtual void MessageReceived(BMessage* message);
+	virtual void AttachedToWindow();
 
-		virtual void SetDefaults();
-		virtual bool IsDefaultable() const;
-		virtual void Revert();
-		virtual void ShowCurrentSettings();
-		virtual void RecordRevertSettings();
-		virtual bool IsRevertable() const;
+	virtual void SetDefaults();
+	virtual bool IsDefaultable() const;
+	virtual void Revert();
+	virtual void ShowCurrentSettings();
+	virtual void RecordRevertSettings();
+	virtual bool IsRevertable() const;
 
-	private:
-		BCheckBox*		fSpaceBarShowCheckBox;
-		BColorControl*	fColorControl;
-		BMenuField*		fColorPicker;
-		int32			fCurrentColor;
+private:
+	BCheckBox*		fSpaceBarShowCheckBox;
+	BColorControl*	fColorControl;
+	BMenuField*		fColorPicker;
+	int32			fCurrentColor;
 
-		bool			fSpaceBarShow;
-		rgb_color		fUsedSpaceColor;
-		rgb_color		fFreeSpaceColor;
-		rgb_color		fWarningSpaceColor;
+	bool			fSpaceBarShow;
+	rgb_color		fUsedSpaceColor;
+	rgb_color		fFreeSpaceColor;
+	rgb_color		fWarningSpaceColor;
 
-		typedef SettingsView _inherited;
+	typedef SettingsView _inherited;
 };
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif	// _SETTINGS_VIEWS
+
+#endif	// _SETTINGS_VIEWS_H

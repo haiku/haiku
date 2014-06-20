@@ -83,11 +83,12 @@ send_bool_notices(uint32 what, const char* name, bool value)
 }
 
 
-//	#pragma mark -
-
-
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "SettingsView"
+
+
+//	#pragma mark - SettingsView
+
 
 SettingsView::SettingsView(const char* name)
 	:
@@ -169,7 +170,7 @@ SettingsView::IsRevertable() const
 }
 
 
-// #pragma mark -
+// #pragma mark - DesktopSettingsView
 
 
 DesktopSettingsView::DesktopSettingsView()
@@ -256,7 +257,8 @@ DesktopSettingsView::MessageReceived(BMessage* message)
 				fMountSharedVolumesOntoDesktopCheckBox->Value() == 1);
 
 			// Send the notification message:
-			tracker->SendNotices(kVolumesOnDesktopChanged, &notificationMessage);
+			tracker->SendNotices(kVolumesOnDesktopChanged,
+				&notificationMessage);
 
 			// Tell the settings window the contents have changed:
 			Window()->PostMessage(kSettingsContentsModified);
@@ -288,7 +290,8 @@ DesktopSettingsView::MessageReceived(BMessage* message)
 				fMountSharedVolumesOntoDesktopCheckBox->Value() == 1);
 
 			// Send the notification message:
-			tracker->SendNotices(kVolumesOnDesktopChanged, &notificationMessage);
+			tracker->SendNotices(kVolumesOnDesktopChanged,\
+				&notificationMessage);
 
 			// Tell the settings window the contents have changed:
 			Window()->PostMessage(kSettingsContentsModified);
@@ -297,6 +300,7 @@ DesktopSettingsView::MessageReceived(BMessage* message)
 
 		default:
 			_inherited::MessageReceived(message);
+			break;
 	}
 }
 
@@ -405,7 +409,7 @@ DesktopSettingsView::IsRevertable() const
 }
 
 
-// #pragma mark -
+// #pragma mark - WindowsSettingsView
 
 
 WindowsSettingsView::WindowsSettingsView()
@@ -473,8 +477,9 @@ void
 WindowsSettingsView::MessageReceived(BMessage* message)
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!tracker)
+	if (tracker == NULL)
 		return;
+
 	TrackerSettings settings;
 
 	switch (message->what) {
@@ -703,7 +708,7 @@ WindowsSettingsView::IsRevertable() const
 }
 
 
-// #pragma mark -
+// #pragma mark - SpaceBarSettingsView
 
 
 SpaceBarSettingsView::SpaceBarSettingsView()
@@ -791,9 +796,11 @@ SpaceBarSettingsView::MessageReceived(BMessage* message)
 				case 0:
 					fColorControl->SetValue(settings.UsedSpaceColor());
 					break;
+
 				case 1:
 					fColorControl->SetValue(settings.FreeSpaceColor());
 					break;
+
 				case 2:
 					fColorControl->SetValue(settings.WarningSpaceColor());
 					break;
@@ -812,9 +819,11 @@ SpaceBarSettingsView::MessageReceived(BMessage* message)
 				case 0:
 					settings.SetUsedSpaceColor(color);
 					break;
+
 				case 1:
 					settings.SetFreeSpaceColor(color);
 					break;
+
 				case 2:
 					settings.SetWarningSpaceColor(color);
 					break;
@@ -836,7 +845,7 @@ void
 SpaceBarSettingsView::SetDefaults()
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!tracker)
+	if (tracker == NULL)
 		return;
 
 	TrackerSettings settings;
@@ -875,7 +884,7 @@ void
 SpaceBarSettingsView::Revert()
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!tracker)
+	if (tracker == NULL)
 		return;
 
 	TrackerSettings settings;
