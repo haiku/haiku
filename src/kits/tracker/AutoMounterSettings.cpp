@@ -53,12 +53,14 @@ All rights reserved.
 #include <MountServer.h>
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AutoMounterSettings"
+
+
 const uint32 kAutomountSettingsChanged = 'achg';
 const uint32 kBootMountSettingsChanged = 'bchg';
 const uint32 kEjectWhenUnmountingChanged = 'ejct';
 
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "AutoMounterSettings"
 
 class AutomountSettingsPanel : public BBox {
 public:
@@ -96,8 +98,11 @@ private:
 AutomountSettingsDialog* AutomountSettingsDialog::sOneCopyOnly = NULL;
 
 
+//	#pragma mark - AutomountSettingsPanel
+
+
 AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
-		const BMessenger& target)
+	const BMessenger& target)
 	:
 	BBox("", B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_NO_BORDER),
 	fTarget(target)
@@ -164,6 +169,7 @@ AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
 	fDone->MakeDefault(true);
 
 	// Layout the controls
+
 	BGroupView* contentView = new BGroupView(B_VERTICAL, 0);
 	AddChild(contentView);
 	BLayoutBuilder::Group<>(contentView)
@@ -293,15 +299,15 @@ AutomountSettingsPanel::_SendSettings(bool rescan)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - AutomountSettingsDialog
 
 
 AutomountSettingsDialog::AutomountSettingsDialog(BMessage* settings,
-		const BMessenger& target)
+	const BMessenger& target)
 	:
 	BWindow(BRect(100, 100, 320, 370), B_TRANSLATE("Disk mount settings"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
-		| B_AUTO_UPDATE_SIZE_LIMITS)
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	BView* view = new AutomountSettingsPanel(settings, target);
@@ -323,15 +329,14 @@ void
 AutomountSettingsDialog::RunAutomountSettings(const BMessenger& target)
 {
 	// either activate an existing mount settings dialog or create a new one
-	if (sOneCopyOnly) {
+	if (sOneCopyOnly != NULL) {
 		sOneCopyOnly->Activate();
 		return;
 	}
 
 	BMessage message(kGetAutomounterParams);
 	BMessage reply;
-	status_t ret = target.SendMessage(&message, &reply, 2500000);
-	if (ret != B_OK) {
+	if (target.SendMessage(&message, &reply, 2500000) != B_OK) {
 		BAlert* alert = new BAlert(B_TRANSLATE("Mount server error"),
 			B_TRANSLATE("The mount server could not be contacted."),
 			B_TRANSLATE("OK"),
