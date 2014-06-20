@@ -89,6 +89,51 @@
 */
 
 
+/*!
+	\fn virtual status_t BDataIO::ReadExactly(void* buffer, size_t size, size_t* _bytesRead)
+	\brief Reads an exact amount of data from the object into a buffer.
+
+	This is a convenience wrapper method for Read() for code that expects the
+	exact number of bytes requested to be read. This method calls Read() in a
+	loop to read the data. It fails when Read() returns an error or fails to
+	read any more data (i.e. returns 0).
+
+	\param buffer Pointer to pre-allocated storage of at least \a size bytes
+		into which the data shall be read. Won't be dereferenced, when \a size
+		is 0.
+	\param size The number of bytes to be read.
+	\param _bytesRead Optional pointer to a pre-allocated size_t into which the
+		number of bytes actually read will be written. When the method returns
+		\c B_OK this will always be \a size. Can be \c NULL.
+	\return An error code indicated whether the method succeeded.
+	\retval B_OK All data have been read.
+	\retval B_PARTIAL_READ Read() didn't fail, but couldn't provide as many
+		bytes as requested.
+*/
+
+
+/*!
+	\fn virtual status_t BDataIO::WriteExactly(const void* buffer, size_t size, size_t* _bytesWritten)
+	\brief Writes an exact amount of data from a buffer to the object.
+
+	This is a convenience wrapper method for Write() for code that expects the
+	exact number of bytes given to be written. This method calls Write() in a
+	loop to write the data. It fails when Write() returns an error or fails to
+	write any more data (i.e. returns 0).
+
+	\param buffer Pointer to a buffer of at least \a size bytes containing the
+		data to be written. Won't be dereferenced, when \a size is 0.
+	\param size The number of bytes to be written.
+	\param _bytesWritten Optional pointer to a pre-allocated size_t into which
+		the number of bytes actually written will be written. When the method
+		returns \c B_OK this will always be \a size. Can be \c NULL.
+	\return An error code indicated whether the method succeeded.
+	\retval B_OK All data have been written.
+	\retval B_PARTIAL_READ Write() didn't fail, but couldn't write as many
+		bytes as provided.
+*/
+
+
 //////////// BPositionIO
 
 

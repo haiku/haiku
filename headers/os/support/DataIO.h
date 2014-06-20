@@ -17,6 +17,11 @@ public:
 	virtual	ssize_t				Read(void* buffer, size_t size);
 	virtual	ssize_t				Write(const void* buffer, size_t size);
 
+			status_t			ReadExactly(void* buffer, size_t size,
+									size_t* _bytesRead = NULL);
+			status_t			WriteExactly(const void* buffer, size_t size,
+									size_t* _bytesWritten = NULL);
+
 private:
 								BDataIO(const BDataIO&);
 			BDataIO&			operator=(const BDataIO&);
