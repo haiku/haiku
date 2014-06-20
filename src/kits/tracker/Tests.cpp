@@ -107,15 +107,19 @@ private:
 }	// namespace BTrackerPrivate
 
 
+//	#pragma mark - IconSpewer
+
+
 IconSpewer::IconSpewer(bool newCache)
-	:	quitting(false),
-		cachingIterator(0),
-		searchPathIndex(0),
-		cycleTime(0),
-		lastCycleLap(0),
-		numDrawn(0),
-		watch("", true),
-		newCache(newCache)
+	:
+	quitting(false),
+	cachingIterator(0),
+	searchPathIndex(0),
+	cycleTime(0),
+	lastCycleLap(0),
+	numDrawn(0),
+	watch("", true),
+	newCache(newCache)
 {
 	walker = new TNodeWalker(pathsToSearch[searchPathIndex++]);
 	if (newCache)
@@ -307,13 +311,14 @@ IconSpewer::NextRef()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - IconTestWindow
 
 
 IconTestWindow::IconTestWindow()
-	:	BWindow(BRect(100, 100, 500, 600), "icon cache test",
-			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, 0),
-		iconSpewer(modifiers() == 0)
+	:
+	BWindow(BRect(100, 100, 500, 600), "icon cache test",
+		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, 0),
+	iconSpewer(modifiers() == 0)
 {
 	iconSpewer.SetTarget(this);
 	BView* view = new BView(Bounds(), "iconView", B_FOLLOW_ALL, B_WILL_DRAW);
@@ -333,7 +338,7 @@ IconTestWindow::QuitRequested()
 void
 RunIconCacheTests()
 {
-	(new IconTestWindow())->Show();
+	new IconTestWindow()->Show();
 }
 
-#endif
+#endif	// DEBUG
