@@ -189,4 +189,5 @@ namespace BPrivate {
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _ATTRIBUTES_H
