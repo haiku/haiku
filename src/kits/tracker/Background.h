@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef	_TRACKER_BACKGROUND_H
-#define	_TRACKER_BACKGROUND_H
+#ifndef _TRACKER_BACKGROUND_H
+#define _TRACKER_BACKGROUND_H
 
 
 #include <SupportDefs.h>
@@ -73,5 +73,6 @@ enum {
 
 const int32 B_RESTORE_BACKGROUND_IMAGE = 'Tbgr';
 	// force a Tracker window to use a new background image
+
 
 #endif // _TRACKER_BACKGROUND_H
