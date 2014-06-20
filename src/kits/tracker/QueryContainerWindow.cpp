@@ -48,14 +48,19 @@ All rights reserved.
 #include "QueryPoseView.h"
 
 
+//	#pragma mark - BQueryContainerWindow
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "QueryContainerWindow"
 
+
 BQueryContainerWindow::BQueryContainerWindow(LockingList<BWindow>* windowList,
-	uint32 containerWindowFlags, window_look look,
-	window_feel feel, uint32 flags, uint32 workspace)
-	:	BContainerWindow(windowList, containerWindowFlags, look, feel,
-			flags, workspace)
+	uint32 containerWindowFlags, window_look look, window_feel feel,
+	uint32 flags, uint32 workspace)
+	:
+	BContainerWindow(windowList, containerWindowFlags, look, feel,
+		flags, workspace)
 {
 }
 
@@ -131,6 +136,7 @@ BQueryContainerWindow::AddWindowContextMenus(BMenu* menu)
 	BMenuItem* closeItem = new BMenuItem(B_TRANSLATE("Close"),
 		new BMessage(B_QUIT_REQUESTED), 'W');
 	menu->AddItem(closeItem);
+
 	// target items as needed
 	menu->SetTargetForItems(PoseView());
 	closeItem->SetTarget(this);
@@ -145,7 +151,7 @@ BQueryContainerWindow::SetUpDefaultState()
 
 	WindowStateNodeOpener opener(this, true);
 		// this is our destination node, whatever it is for this window
-	if (!opener.StreamNode())
+	if (opener.StreamNode() == NULL)
 		return;
 
 	BString defaultStatePath(kQueryTemplates);

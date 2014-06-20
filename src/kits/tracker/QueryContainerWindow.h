@@ -76,4 +76,5 @@ private:
 
 using namespace BPrivate;
 
+
 #endif	// _QUERY_CONTAINER_WINDOW_H
