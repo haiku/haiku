@@ -91,6 +91,10 @@ All rights reserved.
 #include "VolumeWindow.h"
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Tracker"
+
+
 // prototypes for some private kernel calls that will some day be public
 #ifndef _IMPEXP_ROOT
 #	define _IMPEXP_ROOT
@@ -113,6 +117,7 @@ const int32 kNodeMonitorBumpValue = 512;
 namespace BPrivate {
 
 NodePreloader* gPreloader = NULL;
+
 
 class LaunchLooper : public BLooper {
 public:
@@ -147,7 +152,7 @@ public:
 BLooper* gLaunchLooper = NULL;
 
 
-// #pragma mark -
+// #pragma mark - functions
 
 
 void
@@ -235,10 +240,6 @@ public:
 
 
 //	#pragma mark - TTracker
-
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "Tracker"
 
 
 TTracker::TTracker()
@@ -329,11 +330,11 @@ TTracker::QuitRequested()
 	// save open windows in a message inside an attribute of the desktop
 	int32 count = fWindowList.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		BContainerWindow* window = dynamic_cast<BContainerWindow*>
-			(fWindowList.ItemAt(i));
+		BContainerWindow* window
+			= dynamic_cast<BContainerWindow*>(fWindowList.ItemAt(i));
 
-		if (window && window->Lock()) {
-			if (window->TargetModel()
+		if (window != NULL && window->Lock()) {
+			if (window->TargetModel() != NULL
 				&& !window->PoseView()->IsDesktopWindow()) {
 				if (window->TargetModel()->IsRoot())
 					message.AddBool("open_disks_window", true);
@@ -375,6 +376,7 @@ TTracker::QuitRequested()
 						}
 						if (!pathAlreadyExists)
 							message.AddString("paths", path.Path());
+
 						message.AddInt8(path.Path(), flags);
 					}
 				}
@@ -488,7 +490,6 @@ TTracker::MessageReceived(BMessage* message)
 			break;
 
 #ifdef MOUNT_MENU_IN_DESKBAR
-
 		case 'gmtv':
 		{
 			// Someone (probably the deskbar) has requested a list of
@@ -499,7 +500,6 @@ TTracker::MessageReceived(BMessage* message)
 			message->SendReply(&reply);
 			break;
 		}
-
 #endif
 
 		case kUnmountVolume:
@@ -665,18 +665,20 @@ public:
 	EntryAndNodeDoSoonWithMessageFunctor(FT func, T* target,
 		const entry_ref* child, const node_ref* parent,
 		const BMessage* message)
-		:	fFunc(func),
-			fTarget(target),
-			fNode(*parent),
-			fEntry(*child)
-		{
-			fSendMessage = (message != NULL);
-			if (message)
-				fMessage = *message;
-		}
+		:
+		fFunc(func),
+		fTarget(target),
+		fNode(*parent),
+		fEntry(*child)
+	{
+		fSendMessage = message != NULL;
+		if (message != NULL)
+			fMessage = *message;
+	}
 
 	virtual ~EntryAndNodeDoSoonWithMessageFunctor() {}
-	virtual void operator()() {
+	virtual void operator()()
+	{
 		result = (fTarget->*fFunc)(&fEntry, &fNode,
 			fSendMessage ? &fMessage : NULL);
 	}
@@ -804,7 +806,8 @@ TTracker::OpenRef(const entry_ref* ref, const node_ref* nodeToClose,
 				// This cruft is to support a hacky workaround for
 				// double-clicking broken refs for cifs; should get fixed
 				// in R5
-				LaunchBrokenLink(brokenLinkPreferredApp.String(), &refsReceived);
+				LaunchBrokenLink(brokenLinkPreferredApp.String(),
+					&refsReceived);
 			} else
 				TrackerLaunch(&refsReceived, true);
 		}
@@ -861,8 +864,9 @@ TTracker::RefsReceived(BMessage* message)
 				TrackerLaunch(&handlingApp, message, true);
 				break;
 			}
-		}	// fall thru, opening refs by the Tracker as if they were
-			// double-clicked
+		}
+		// fall thru, opening refs by the Tracker as if they were
+		// double-clicked
 		case kOpen:
 		{
 			// copy over "Poses" messenger so that refs received
@@ -1417,7 +1421,7 @@ TTracker::_OpenPreviouslyOpenedWindows(const char* pathFilter)
 		}
 	}
 
-	// Open disks window if needed
+	// open disks window if needed
 
 	if (pathFilter == NULL && TrackerSettings().ShowDisksIcon()
 		&& message.HasBool("open_disks_window")) {
@@ -1537,7 +1541,7 @@ TTracker::SelectPoseAtLocationInParent(node_ref parent, BPoint pointInPose)
 {
 	AutoLock<WindowList> lock(&fWindowList);
 	BContainerWindow* parentWindow = FindContainerWindow(&parent);
-	if (parentWindow) {
+	if (parentWindow != NULL) {
 		AutoLock<BWindow> lock(parentWindow);
 		parentWindow->PoseView()->SelectPoseAtLocation(pointInPose);
 	}
@@ -1551,7 +1555,7 @@ TTracker::CloseParentWaitingForChild(const entry_ref* child,
 	AutoLock<WindowList> lock(&fWindowList);
 
 	BContainerWindow* parentWindow = FindContainerWindow(parent);
-	if (!parentWindow) {
+	if (parentWindow == NULL) {
 		// parent window already closed, give up
 		return true;
 	}
@@ -1564,11 +1568,12 @@ TTracker::CloseParentWaitingForChild(const entry_ref* child,
 		resolvedChild = *child;
 
 	BContainerWindow* window = FindContainerWindow(&resolvedChild);
-	if (window) {
+	if (window != NULL) {
 		AutoLock<BWindow> lock(window);
 		if (!window->IsHidden())
 			return CloseParentWindowCommon(parentWindow);
 	}
+
 	return false;
 }
 
@@ -1634,7 +1639,7 @@ TTracker::SelectChildInParent(const entry_ref* parent, const node_ref* child)
 		BPoseView* view = window->PoseView();
 		int32 index;
 		BPose* pose = view->FindPose(child, &index);
-		if (pose) {
+		if (pose != NULL) {
 			view->SelectPose(pose, index);
 			return true;
 		}
