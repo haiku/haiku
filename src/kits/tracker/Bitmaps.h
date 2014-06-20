@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __BITS__
-#define __BITS__
+#ifndef _TRACKER_BITMAPS_H
+#define _TRACKER_BITMAPS_H
 
 
 #include <Locker.h>
@@ -104,4 +104,5 @@ BImageResources* GetTrackerResources();
 
 using namespace BPrivate;
 
-#endif	// __BITS__
+
+#endif	// _TRACKER_BITMAPS_H

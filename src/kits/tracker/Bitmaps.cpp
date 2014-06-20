@@ -48,6 +48,9 @@ All rights reserved.
 #endif
 
 
+//	#pragma mark - BImageResources
+
+
 BImageResources::BImageResources(void* memAddr)
 {
 	image_id image = find_image(memAddr);
@@ -99,6 +102,7 @@ BImageResources::FinishResources(BResources* res) const
 		return B_BAD_VALUE;
 
 	fLock.Unlock();
+
 	return B_OK;
 }
 
@@ -238,21 +242,21 @@ BImageResources::GetBitmapResource(type_code type, int32 id,
 	// Try to read as an archived bitmap.
 	stream.Seek(0, SEEK_SET);
 	BMessage archive;
-	status_t err = archive.Unflatten(&stream);
-	if (err != B_OK)
-		return err;
+	status_t result = archive.Unflatten(&stream);
+	if (result != B_OK)
+		return result;
 
 	*out = new BBitmap(&archive);
-	if (!*out)
+	if (*out == NULL)
 		return B_ERROR;
 
-	err = (*out)->InitCheck();
-	if (err != B_OK) {
+	result = (*out)->InitCheck();
+	if (result != B_OK) {
 		delete *out;
 		*out = NULL;
 	}
 
-	return err;
+	return result;
 }
 
 
@@ -263,7 +267,10 @@ static BImageResources* resources = NULL;
 // global object when the image is getting unloaded.
 class _TTrackerCleanupResources {
 public:
-	_TTrackerCleanupResources() { }
+	_TTrackerCleanupResources()
+	{
+	}
+
 	~_TTrackerCleanupResources()
 	{
 		delete resources;
@@ -276,14 +283,14 @@ namespace BPrivate {
 
 static _TTrackerCleanupResources CleanupResources;
 
-
 BImageResources* GetTrackerResources()
 {
 	if (!resources) {
 		BAutolock lock(&resLock);
 		resources = new BImageResources(&resources);
 	}
+
 	return resources;
 }
 
-}
+} // namespace BPrivate
