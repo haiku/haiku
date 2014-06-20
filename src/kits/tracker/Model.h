@@ -31,11 +31,10 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef _NU_MODEL_H
-#define _NU_MODEL_H
-
 
 //	Dedicated to BModel
+#ifndef _NU_MODEL_H
+#define _NU_MODEL_H
 
 
 #include <AppFileInfo.h>
@@ -53,6 +52,7 @@ class BHandler;
 class BEntry;
 class BQuery;
 
+
 #if __GNUC__ && __GNUC__ < 3
 // using std::stat instead of just stat here because of what
 // seems to be a gcc bug involving namespace and struct stat interaction
@@ -62,6 +62,7 @@ typedef struct std::stat StatStruct;
 // Also seems to be fixed in gcc 3.
 typedef struct stat StatStruct;
 #endif
+
 
 namespace BPrivate {
 
@@ -74,197 +75,197 @@ enum {
 };
 
 class Model {
-	public:
-		Model();
-		Model(const Model &);
-		Model(const BEntry* entry, bool open = false, bool writable = false);
-		Model(const entry_ref*, bool traverse = false, bool open = false,
-			bool writable = false);
-		Model(const node_ref* dirNode, const node_ref* node, const char* name,
-			bool open = false, bool writable = false);
-		~Model();
+public:
+	Model();
+	Model(const Model &);
+	Model(const BEntry* entry, bool open = false, bool writable = false);
+	Model(const entry_ref*, bool traverse = false, bool open = false,
+		bool writable = false);
+	Model(const node_ref* dirNode, const node_ref* node, const char* name,
+		bool open = false, bool writable = false);
+	~Model();
 
-		Model& operator=(const Model&);
+	Model& operator=(const Model&);
 
-		status_t InitCheck() const;
+	status_t InitCheck() const;
 
-		status_t SetTo(const BEntry*, bool open = false,
-			bool writable = false);
-		status_t SetTo(const entry_ref*, bool traverse = false,
-			bool open = false, bool writable = false);
-		status_t SetTo(const node_ref* dirNode, const node_ref* node,
-			const char* name, bool open = false, bool writable = false);
+	status_t SetTo(const BEntry*, bool open = false,
+		bool writable = false);
+	status_t SetTo(const entry_ref*, bool traverse = false,
+		bool open = false, bool writable = false);
+	status_t SetTo(const node_ref* dirNode, const node_ref* node,
+		const char* name, bool open = false, bool writable = false);
 
-		int CompareFolderNamesFirst(const Model* compareModel) const;
+	int CompareFolderNamesFirst(const Model* compareModel) const;
 
-		// node management
-		status_t OpenNode(bool writable = false);
-			// also used to switch from read-only to writable
-		void CloseNode();
-		bool IsNodeOpen() const;
-		bool IsNodeOpenForWriting() const;
+	// node management
+	status_t OpenNode(bool writable = false);
+		// also used to switch from read-only to writable
+	void CloseNode();
+	bool IsNodeOpen() const;
+	bool IsNodeOpenForWriting() const;
 
-		status_t UpdateStatAndOpenNode(bool writable = false);
-			// like OpenNode, called on zombie poses to check if they turned
-			// real, starts by rereading the stat structure
+	status_t UpdateStatAndOpenNode(bool writable = false);
+		// like OpenNode, called on zombie poses to check if they turned
+		// real, starts by rereading the stat structure
 
-		// basic getters
-		const char* Name() const;
-		const entry_ref* EntryRef() const;
-		const node_ref* NodeRef() const;
-		const StatStruct* StatBuf() const;
+	// basic getters
+	const char* Name() const;
+	const entry_ref* EntryRef() const;
+	const node_ref* NodeRef() const;
+	const StatStruct* StatBuf() const;
 
-		BNode* Node() const;
-			// returns null if not Open
-		void GetPath(BPath*) const;
-		void GetEntry(BEntry*) const;
+	BNode* Node() const;
+		// returns NULL if not open
+	void GetPath(BPath*) const;
+	void GetEntry(BEntry*) const;
 
-		const char* MimeType() const;
-		const char* PreferredAppSignature() const;
-			// only not-null if not default for type and not self for app
-		void SetPreferredAppSignature(const char*);
+	const char* MimeType() const;
+	const char* PreferredAppSignature() const;
+		// only not-null if not default for type and not self for app
+	void SetPreferredAppSignature(const char*);
 
-		void GetPreferredAppForBrokenSymLink(BString &result);
-			// special purpose call - if a symlink is unresolvable, it makes
-			// sense to be able to get at it's preferred handler which may be
-			// different from the Tracker. Used by the network neighborhood.
+	void GetPreferredAppForBrokenSymLink(BString &result);
+		// special purpose call - if a symlink is unresolvable, it makes
+		// sense to be able to get at it's preferred handler which may be
+		// different from the Tracker. Used by the network neighborhood.
 
-		// type getters
-		bool IsFile() const;
-		bool IsDirectory() const;
-		bool IsQuery() const;
-		bool IsQueryTemplate() const;
-		bool IsContainer() const;
-		bool IsExecutable() const;
-		bool IsSymLink() const;
-		bool IsRoot() const;
-		bool IsTrash() const;
-		bool IsDesktop() const;
-		bool IsVolume() const;
-		bool IsVirtualDirectory() const;
+	// type getters
+	bool IsFile() const;
+	bool IsDirectory() const;
+	bool IsQuery() const;
+	bool IsQueryTemplate() const;
+	bool IsContainer() const;
+	bool IsExecutable() const;
+	bool IsSymLink() const;
+	bool IsRoot() const;
+	bool IsTrash() const;
+	bool IsDesktop() const;
+	bool IsVolume() const;
+	bool IsVirtualDirectory() const;
 
-		IconSource IconFrom() const;
-		void SetIconFrom(IconSource);
-			// where is this model getting it's icon from
+	IconSource IconFrom() const;
+	void SetIconFrom(IconSource);
+		// where is this model getting it's icon from
 
-		void ResetIconFrom();
-			// called from the attribute changed calls to force a lookup of
-			// a new icon
+	void ResetIconFrom();
+		// called from the attribute changed calls to force a lookup of
+		// a new icon
 
-		// symlink handling calls, mainly used by the IconCache
-		const Model* ResolveIfLink() const;
-		Model* ResolveIfLink();
-			// works on anything
-		Model* LinkTo() const;
-			// fast, works only on symlinks
-		void SetLinkTo(Model*);
+	// symlink handling calls, mainly used by the IconCache
+	const Model* ResolveIfLink() const;
+	Model* ResolveIfLink();
+		// works on anything
+	Model* LinkTo() const;
+		// fast, works only on symlinks
+	void SetLinkTo(Model*);
 
-		status_t GetLongVersionString(BString &, version_kind);
-		status_t GetVersionString(BString &, version_kind);
-		status_t AttrAsString(BString &, int64* value,
-			const char* attributeName, uint32 attributeType);
+	status_t GetLongVersionString(BString &, version_kind);
+	status_t GetVersionString(BString &, version_kind);
+	status_t AttrAsString(BString &, int64* value,
+		const char* attributeName, uint32 attributeType);
 
-		// Node monitor update call
-		void UpdateEntryRef(const node_ref* dirRef, const char* name);
-		bool AttrChanged(const char*);
-			// returns true if pose needs to update it's icon, etc.
-			// pass null to force full update
-		bool StatChanged();
-			// returns true if pose needs to update it's icon
+	// Node monitor update call
+	void UpdateEntryRef(const node_ref* dirRef, const char* name);
+	bool AttrChanged(const char*);
+		// returns true if pose needs to update it's icon, etc.
+		// pass null to force full update
+	bool StatChanged();
+		// returns true if pose needs to update it's icon
 
-		status_t WatchVolumeAndMountPoint(uint32, BHandler*);
-			// correctly handles boot volume name watching
+	status_t WatchVolumeAndMountPoint(uint32, BHandler*);
+		// correctly handles boot volume name watching
 
-		bool IsDropTarget(const Model* forDocument = 0,
-			bool traverse = false) const;
-			// if nonzero <forDocument> passed, mime info is used to
-			// resolve if document can be opened
-			// if zero, all executables, directories and volumes pass
-			// if traverse, dereference symlinks
-		bool IsDropTargetForList(const BObjectList<BString>* list) const;
-			// <list> contains mime types of all documents about to be handled
-			// by model
+	bool IsDropTarget(const Model* forDocument = 0,
+		bool traverse = false) const;
+		// if nonzero <forDocument> passed, mime info is used to
+		// resolve if document can be opened
+		// if zero, all executables, directories and volumes pass
+		// if traverse, dereference symlinks
+	bool IsDropTargetForList(const BObjectList<BString>* list) const;
+		// <list> contains mime types of all documents about to be handled
+		// by model
 
-	#if DEBUG
-		void PrintToStream(int32 level = 1, bool deep = false);
-		void TrackIconSource(icon_size);
-	#endif
+#if DEBUG
+	void PrintToStream(int32 level = 1, bool deep = false);
+	void TrackIconSource(icon_size);
+#endif
 
-		bool IsSuperHandler() const;
-		int32 SupportsMimeType(const char* type,
-			const BObjectList<BString>* list, bool exactReason = false) const;
-			// pass in one string in <type> or a bunch in <list>
-			// if <exactReason> false, returns as soon as it figures out that
-			// app supports a given type, if true, returns an exact reason
+	bool IsSuperHandler() const;
+	int32 SupportsMimeType(const char* type,
+		const BObjectList<BString>* list, bool exactReason = false) const;
+		// pass in one string in <type> or a bunch in <list>
+		// if <exactReason> false, returns as soon as it figures out that
+		// app supports a given type, if true, returns an exact reason
 
-		// get rid of this??
-		ssize_t WriteAttr(const char* attr, type_code type, off_t,
-			const void* buffer, size_t );
-			// cover call, creates a writable node and writes out attributes
-			// into it; work around for file nodes not being writeable
-		ssize_t WriteAttrKillForeign(const char* attr,
-			const char* foreignAttr, type_code type, off_t,
-			const void* buffer, size_t);
+	// get rid of this??
+	ssize_t WriteAttr(const char* attr, type_code type, off_t,
+		const void* buffer, size_t );
+		// cover call, creates a writable node and writes out attributes
+		// into it; work around for file nodes not being writeable
+	ssize_t WriteAttrKillForeign(const char* attr,
+		const char* foreignAttr, type_code type, off_t,
+		const void* buffer, size_t);
 
-		bool Mimeset(bool force);
-			// returns true if mime type changed
+	bool Mimeset(bool force);
+		// returns true if mime type changed
 
-		bool HasLocalizedName() const;
+	bool HasLocalizedName() const;
 
-	private:
-		status_t OpenNodeCommon(bool writable);
-		void SetupBaseType();
-		void FinishSettingUpType();
-		void DeletePreferredAppVolumeNameLinkTo();
-		void CacheLocalizedName();
+private:
+	status_t OpenNodeCommon(bool writable);
+	void SetupBaseType();
+	void FinishSettingUpType();
+	void DeletePreferredAppVolumeNameLinkTo();
+	void CacheLocalizedName();
 
-		status_t FetchOneQuery(const BQuery*, BHandler* target,
-			BObjectList<BQuery>*, BVolume*);
+	status_t FetchOneQuery(const BQuery*, BHandler* target,
+		BObjectList<BQuery>*, BVolume*);
 
-		enum CanHandleResult {
-			kCanHandle,
-			kCannotHandle,
-			kNeedToCheckType
-		};
+	enum CanHandleResult {
+		kCanHandle,
+		kCannotHandle,
+		kNeedToCheckType
+	};
 
-		CanHandleResult CanHandleDrops() const;
+	CanHandleResult CanHandleDrops() const;
 
-		enum NodeType {
-			kPlainNode,
-			kExecutableNode,
-			kDirectoryNode,
-			kLinkNode,
-			kQueryNode,
-			kQueryTemplateNode,
-			kVolumeNode,
-			kRootNode,
-			kTrashNode,
-			kDesktopNode,
-			kVirtualDirectoryNode,
-			kUnknownNode
-		};
+	enum NodeType {
+		kPlainNode,
+		kExecutableNode,
+		kDirectoryNode,
+		kLinkNode,
+		kQueryNode,
+		kQueryTemplateNode,
+		kVolumeNode,
+		kRootNode,
+		kTrashNode,
+		kDesktopNode,
+		kVirtualDirectoryNode,
+		kUnknownNode
+	};
 
-		entry_ref fEntryRef;
-		StatStruct fStatBuf;
-		BString fMimeType;
-			// should use string that may be shared for common types
+	entry_ref fEntryRef;
+	StatStruct fStatBuf;
+	BString fMimeType;
+		// should use string that may be shared for common types
 
-		// bit of overloading hackery here to save on footprint
-		union {
-			char* fPreferredAppName;	// used if we are neither a volume
-										// nor a symlink
-			char* fVolumeName;			// used if we are a volume
-			Model* fLinkTo;				// used if we are a symlink
-		};
+	// bit of overloading hackery here to save on footprint
+	union {
+		char* fPreferredAppName;	// used if we are neither a volume
+									// nor a symlink
+		char* fVolumeName;			// used if we are a volume
+		Model* fLinkTo;				// used if we are a symlink
+	};
 
-		uint8 fBaseType;
-		uint8 fIconFrom;
-		bool fWritable;
-		BNode* fNode;
-		status_t fStatus;
-		BString fLocalizedName;
-		bool fHasLocalizedName;
-		bool fLocalizedNameIsCached;
+	uint8 fBaseType;
+	uint8 fIconFrom;
+	bool fWritable;
+	BNode* fNode;
+	status_t fStatus;
+	BString fLocalizedName;
+	bool fHasLocalizedName;
+	bool fLocalizedNameIsCached;
 };
 
 
@@ -543,5 +544,6 @@ ModelNodeLazyOpener::OpenNode(bool writable)
 }
 
 } // namespace BPrivate
+
 
 #endif	// _NU_MODEL_H
