@@ -1,12 +1,12 @@
 /*
- * Copyright 2013, Haiku, Inc.
+ * Copyright 2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
-#ifndef VIRTUAL_DIRECTORY_POSE_VIEW_H
-#define VIRTUAL_DIRECTORY_POSE_VIEW_H
+#ifndef _VIRTUAL_DIRECTORY_POSE_VIEW_H
+#define _VIRTUAL_DIRECTORY_POSE_VIEW_H
 
 
 #include <StringList.h>
@@ -15,7 +15,6 @@
 
 
 namespace BPrivate {
-
 
 class VirtualDirectoryEntryList;
 
@@ -74,4 +73,4 @@ private:
 } // namespace BPrivate
 
 
-#endif	// VIRTUAL_DIRECTORY_POSE_VIEW_H
+#endif	// _VIRTUAL_DIRECTORY_POSE_VIEW_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc.
+ * Copyright 2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,6 +23,8 @@
 
 
 namespace BPrivate {
+
+//	#pragma mark - VirtualDirectoryPoseView
 
 
 VirtualDirectoryPoseView::VirtualDirectoryPoseView(Model* model, BRect frame,
@@ -497,6 +499,5 @@ VirtualDirectoryPoseView::_UpdateDirectoryPaths()
 	manager->GetDefinitionFileChangeTime(*model->NodeRef(), fFileChangeTime);
 	return B_OK;
 }
-
 
 } // namespace BPrivate
