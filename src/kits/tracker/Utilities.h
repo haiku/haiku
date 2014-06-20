@@ -94,91 +94,90 @@ extern bool gLocalizedNamePreferred;
 
 // misc typedefs, constants and structs
 
-// Periodically updated poses (ones with a volume space bar) register
-// themselfs in this global list. This way they can be iterated over instead
-// of sending around update messages.
-
 class PeriodicUpdatePoses {
-	public:
-		PeriodicUpdatePoses();
-		~PeriodicUpdatePoses();
+	// Periodically updated poses (ones with a volume space bar) register
+	// themselfs in this global list. This way they can be iterated over instead
+	// of sending around update messages.
+public:
+	PeriodicUpdatePoses();
+	~PeriodicUpdatePoses();
 
-		typedef bool (*PeriodicUpdateCallback)(BPose* pose, void* cookie);
+	typedef bool (*PeriodicUpdateCallback)(BPose* pose, void* cookie);
 
-		void AddPose(BPose* pose, BPoseView* poseView,
-			PeriodicUpdateCallback callback, void* cookie);
-		bool RemovePose(BPose* pose, void** cookie);
+	void AddPose(BPose* pose, BPoseView* poseView,
+		PeriodicUpdateCallback callback, void* cookie);
+	bool RemovePose(BPose* pose, void** cookie);
 
-		void DoPeriodicUpdate(bool forceRedraw);
+	void DoPeriodicUpdate(bool forceRedraw);
 
-	private:
-		struct periodic_pose {
-			BPose*					pose;
-			BPoseView*				pose_view;
-			PeriodicUpdateCallback	callback;
-			void*					cookie;
-		};
+private:
+	struct periodic_pose {
+		BPose*					pose;
+		BPoseView*				pose_view;
+		PeriodicUpdateCallback	callback;
+		void*					cookie;
+	};
 
-		Benaphore* fLock;
-		BObjectList<periodic_pose> fPoseList;
+	Benaphore* fLock;
+	BObjectList<periodic_pose> fPoseList;
 };
 
 extern PeriodicUpdatePoses gPeriodicUpdatePoses;
 
 
-// PoseInfo is the structure that gets saved as attributes for every node on
-// disk, defining the node's position and visibility
 class PoseInfo {
-	public:
-		static void EndianSwap(void* castToThis);
-		void PrintToStream();
+	// PoseInfo is the structure that gets saved as attributes for every node
+	// on disk, defining the node's position and visibility
+public:
+	static void EndianSwap(void* castToThis);
+	void PrintToStream();
 
-		bool fInvisible;
-		ino_t fInitedDirectory;
-			// For a location to be valid, fInitedDirectory has to contain
-			// the inode of the items parent directory. This makes it
-			// impossible to for instance zip up files and extract them in
-			// the same location. This should probably be reworked.
-			// Tracker could strip the file location attributes when dropping
-			// files into a closed folder.
-		BPoint fLocation;
+	bool fInvisible;
+	ino_t fInitedDirectory;
+		// For a location to be valid, fInitedDirectory has to contain
+		// the inode of the items parent directory. This makes it
+		// impossible to for instance zip up files and extract them in
+		// the same location. This should probably be reworked.
+		// Tracker could strip the file location attributes when dropping
+		// files into a closed folder.
+	BPoint fLocation;
 };
 
 
-// extends PoseInfo adding workspace support; used for desktop
-// poses only
 class ExtendedPoseInfo {
-	public:
-		size_t Size() const;
-		static size_t Size(int32);
-		size_t SizeWithHeadroom() const;
-		static size_t SizeWithHeadroom(size_t);
-		bool HasLocationForFrame(BRect) const;
-		BPoint LocationForFrame(BRect) const;
-		bool SetLocationForFrame(BPoint, BRect);
+	// extends PoseInfo adding workspace support; used for desktop
+	// poses only
+public:
+	size_t Size() const;
+	static size_t Size(int32);
+	size_t SizeWithHeadroom() const;
+	static size_t SizeWithHeadroom(size_t);
+	bool HasLocationForFrame(BRect) const;
+	BPoint LocationForFrame(BRect) const;
+	bool SetLocationForFrame(BPoint, BRect);
 
-		static void EndianSwap(void* castToThis);
-		void PrintToStream();
+	static void EndianSwap(void* castToThis);
+	void PrintToStream();
 
+	uint32 fWorkspaces;
+	bool fInvisible;
+	bool fShowFromBootOnly;
+	bool fReservedBool1;
+	bool fReservedBool2;
+	int32 fReservedInt1;
+	int32 fReservedInt2;
+	int32 fReservedInt3;
+	int32 fReservedInt4;
+	int32 fReservedInt5;
+
+	int32 fNumFrames;
+	struct FrameLocation {
+		BPoint fLocation;
+		BRect fFrame;
 		uint32 fWorkspaces;
-		bool fInvisible;
-		bool fShowFromBootOnly;
-		bool fReservedBool1;
-		bool fReservedBool2;
-		int32 fReservedInt1;
-		int32 fReservedInt2;
-		int32 fReservedInt3;
-		int32 fReservedInt4;
-		int32 fReservedInt5;
+	};
 
-		int32 fNumFrames;
-		struct FrameLocation {
-			BPoint fLocation;
-			BRect fFrame;
-			uint32 fWorkspaces;
-		};
-
-		FrameLocation fLocations[0];
+	FrameLocation fLocations[0];
 };
 
 // misc functions
@@ -224,178 +223,179 @@ extern void FadeRGBA32Vertical(uint32* bits, int32 width, int32 height,
 class FlickerFreeStringView : public BStringView {
 	// adds support for offscreen bitmap drawing for string views that update
 	// often this would be better implemented as an option of BStringView
-	public:
-		FlickerFreeStringView(BRect bounds, const char* name,
-			const char* text, uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			uint32 flags = B_WILL_DRAW);
-		FlickerFreeStringView(BRect bounds, const char* name,
-			const char* text, BBitmap* existingOffscreen,
-			uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			uint32 flags = B_WILL_DRAW);
-		virtual ~FlickerFreeStringView();
-		virtual void Draw(BRect);
-		virtual void AttachedToWindow();
-		virtual void SetViewColor(rgb_color);
-		virtual void SetLowColor(rgb_color);
+public:
+	FlickerFreeStringView(BRect bounds, const char* name,
+		const char* text, uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		uint32 flags = B_WILL_DRAW);
+	FlickerFreeStringView(BRect bounds, const char* name,
+		const char* text, BBitmap* existingOffscreen,
+		uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		uint32 flags = B_WILL_DRAW);
+	virtual ~FlickerFreeStringView();
+	virtual void Draw(BRect);
+	virtual void AttachedToWindow();
+	virtual void SetViewColor(rgb_color);
+	virtual void SetLowColor(rgb_color);
 
-	private:
-		OffscreenBitmap* fBitmap;
-		rgb_color fViewColor;
-		rgb_color fLowColor;
-		BBitmap* fOrigBitmap;
+private:
+	OffscreenBitmap* fBitmap;
+	rgb_color fViewColor;
+	rgb_color fLowColor;
+	BBitmap* fOrigBitmap;
 
-		typedef BStringView _inherited;
+	typedef BStringView _inherited;
 };
 
 
 class DraggableIcon : public BView {
 	// used to determine a save location for a file
-	public:
-		DraggableIcon(BRect, const char*, const char* mimeType, icon_size,
-			const BMessage*, BMessenger,
-			uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			uint32 flags = B_WILL_DRAW);
-		virtual ~DraggableIcon();
+public:
+	DraggableIcon(BRect, const char*, const char* mimeType, icon_size,
+		const BMessage*, BMessenger,
+		uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		uint32 flags = B_WILL_DRAW);
+	virtual ~DraggableIcon();
 
-		static BRect PreferredRect(BPoint offset, icon_size);
-		void SetTarget(BMessenger);
+	static BRect PreferredRect(BPoint offset, icon_size);
+	void SetTarget(BMessenger);
 
-	protected:
-		virtual void AttachedToWindow();
-		virtual void MouseDown(BPoint);
-		virtual void Draw(BRect);
+protected:
+	virtual void AttachedToWindow();
+	virtual void MouseDown(BPoint);
+	virtual void Draw(BRect);
 
-		virtual bool DragStarted(BMessage* dragMessage);
+	virtual bool DragStarted(BMessage* dragMessage);
 
-	protected:
-		BBitmap* fBitmap;
-		BMessage fMessage;
-		BMessenger fTarget;
+protected:
+	BBitmap* fBitmap;
+	BMessage fMessage;
+	BMessenger fTarget;
 };
 
 
 class PositionPassingMenuItem : public BMenuItem {
-	public:
-		PositionPassingMenuItem(const char* title, BMessage*,
-			char shortcut = 0, uint32 modifiers = 0);
+public:
+	PositionPassingMenuItem(const char* title, BMessage*,
+		char shortcut = 0, uint32 modifiers = 0);
 
-		PositionPassingMenuItem(BMenu*, BMessage*);
+	PositionPassingMenuItem(BMenu*, BMessage*);
 
-	protected:
-		virtual status_t Invoke(BMessage* = 0);
-			// appends the invoke location for NewFolder, etc. to use
+protected:
+	virtual status_t Invoke(BMessage* = 0);
+		// appends the invoke location for NewFolder, etc. to use
 
-	private:
-		typedef BMenuItem _inherited;
+private:
+	typedef BMenuItem _inherited;
 };
 
 
 class Benaphore {
 	// aka benaphore
-	public:
-		Benaphore(const char* name = "Light Lock")
-		:	fSemaphore(create_sem(0, name)),
-			fCount(1)
-		{
-		}
+public:
+	Benaphore(const char* name = "Light Lock")
+	:	fSemaphore(create_sem(0, name)),
+		fCount(1)
+	{
+	}
 
-		~Benaphore()
-		{
-			delete_sem(fSemaphore);
-		}
+	~Benaphore()
+	{
+		delete_sem(fSemaphore);
+	}
 
-		bool Lock()
-		{
-			if (atomic_add(&fCount, -1) <= 0)
-				return acquire_sem(fSemaphore) == B_OK;
+	bool Lock()
+	{
+		if (atomic_add(&fCount, -1) <= 0)
+			return acquire_sem(fSemaphore) == B_OK;
 
-			return true;
-		}
+		return true;
+	}
 
-		void Unlock()
-		{
-			if (atomic_add(&fCount, 1) < 0)
-				release_sem(fSemaphore);
-		}
+	void Unlock()
+	{
+		if (atomic_add(&fCount, 1) < 0)
+			release_sem(fSemaphore);
+	}
 
-		bool IsLocked() const
-		{
-			return fCount <= 0;
-		}
+	bool IsLocked() const
+	{
+		return fCount <= 0;
+	}
 
-	private:
-		sem_id fSemaphore;
-		int32 fCount;
+private:
+	sem_id fSemaphore;
+	int32 fCount;
 };
 
 
 class SeparatorLine : public BView {
-	public:
-		SeparatorLine(BPoint, float, bool vertical, const char* name = "");
-		virtual void Draw(BRect bounds);
+public:
+	SeparatorLine(BPoint, float, bool vertical, const char* name = "");
+	virtual void Draw(BRect bounds);
 };
 
 
 class TitledSeparatorItem : public BMenuItem {
-	public:
-		TitledSeparatorItem(const char*);
-		virtual ~TitledSeparatorItem();
+public:
+	TitledSeparatorItem(const char*);
+	virtual ~TitledSeparatorItem();
 
-		virtual void SetEnabled(bool state);
+	virtual void SetEnabled(bool state);
 
-	protected:
-		virtual void GetContentSize(float* width, float* height);
-		virtual void Draw();
+protected:
+	virtual void GetContentSize(float* width, float* height);
+	virtual void Draw();
 
-	private:
-		typedef BMenuItem _inherited;
+private:
+	typedef BMenuItem _inherited;
 };
 
 
 class LooperAutoLocker {
-	public:
-		LooperAutoLocker(BHandler* handler)
-		:	fHandler(handler),
-			fHasLock(handler->LockLooper())
-		{
-		}
+public:
+	LooperAutoLocker(BHandler* handler)
+	:	fHandler(handler),
+		fHasLock(handler->LockLooper())
+	{
+	}
 
-		~LooperAutoLocker()
-		{
-			if (fHasLock)
-				fHandler->UnlockLooper();
-		}
+	~LooperAutoLocker()
+	{
+		if (fHasLock)
+			fHandler->UnlockLooper();
+	}
 
-		bool operator!() const
-		{
-			return !fHasLock;
-		}
+	bool operator!() const
+	{
+		return !fHasLock;
+	}
 
-		bool IsLocked() const
-		{
-			return fHasLock;
-		}
+	bool IsLocked() const
+	{
+		return fHasLock;
+	}
 
-	private:
-		BHandler* fHandler;
-		bool fHasLock;
+private:
+	BHandler* fHandler;
+	bool fHasLock;
 };
 
 
 class ShortcutFilter : public BMessageFilter {
-	public:
-		ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,
-			uint32 shortcutWhat, BHandler* target);
+public:
+	ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,
+		uint32 shortcutWhat, BHandler* target);
 
-	protected:
-		filter_result Filter(BMessage*, BHandler**);
+protected:
+	filter_result Filter(BMessage*, BHandler**);
 
-	private:
-		uint32 fShortcutKey;
-		uint32 fShortcutModifier;
-		uint32 fShortcutWhat;
-		BHandler* fTarget;
+private:
+	uint32 fShortcutKey;
+	uint32 fShortcutModifier;
+	uint32 fShortcutWhat;
+	BHandler* fTarget;
 };
+
 
 // iterates over all the refs in a message
 entry_ref* EachEntryRef(BMessage*, entry_ref* (*)(entry_ref*, void*),
@@ -446,6 +446,7 @@ bool operator==(const rgb_color&, const rgb_color&);
 bool operator!=(const rgb_color&, const rgb_color&);
 
 #endif
+
 
 inline rgb_color
 Color(int32 r, int32 g, int32 b, int32 alpha = 255)
@@ -561,18 +562,19 @@ inline void PrintDirToStream(const BDirectory*, const char* = 0) {}
 		va_end(ap);
 	}
 
-	#define WRITELOG(_ARGS_)													\
-		if (logFile == 0) 														\
-			logFile = fopen("/var/log/tracker.log", "a+"); 						\
-		if (logFile != 0) {														\
-			thread_info info;													\
-			get_thread_info(find_thread(NULL), &info);							\
-			PrintToLogFile("[t %Ld] \"%s\" (%s:%i) ", system_time(),			\
-				info.name, __FILE__, __LINE__);									\
-			PrintToLogFile _ARGS_;												\
-			PrintToLogFile("\n");												\
-			fflush(logFile);													\
-		}
+#define WRITELOG(_ARGS_)													\
+	if (logFile == 0) 														\
+		logFile = fopen("/var/log/tracker.log", "a+");						\
+																			\
+	if (logFile != 0) {														\
+		thread_info info;													\
+		get_thread_info(find_thread(NULL), &info);							\
+		PrintToLogFile("[t %Ld] \"%s\" (%s:%i) ", system_time(),			\
+			info.name, __FILE__, __LINE__);									\
+		PrintToLogFile _ARGS_;												\
+		PrintToLogFile("\n");												\
+		fflush(logFile);													\
+	}
 
 #else
 
@@ -604,5 +606,6 @@ float ComputeTypeAheadScore(const char* text, const char* match,
 	bool wordMode = false);
 
 } // namespace BPrivate
+
 
 #endif	// _UTILITIES_H

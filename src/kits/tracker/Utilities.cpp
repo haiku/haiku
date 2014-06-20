@@ -241,7 +241,6 @@ PeriodicUpdatePoses::DoPeriodicUpdate(bool forceRedraw)
 
 PeriodicUpdatePoses gPeriodicUpdatePoses;
 
-
 }	// namespace BPrivate
 
 
@@ -276,7 +275,7 @@ PoseInfo::PrintToStream()
 }
 
 
-// #pragma mark -
+// #pragma mark - ExtendedPoseInfo
 
 
 size_t
@@ -296,8 +295,7 @@ ExtendedPoseInfo::Size(int32 count)
 size_t
 ExtendedPoseInfo::SizeWithHeadroom() const
 {
-	return sizeof(ExtendedPoseInfo) + (fNumFrames + 1)
-		* sizeof(FrameLocation);
+	return sizeof(ExtendedPoseInfo) + (fNumFrames + 1) * sizeof(FrameLocation);
 }
 
 
@@ -394,7 +392,7 @@ ExtendedPoseInfo::PrintToStream()
 }
 
 
-// #pragma mark -
+// #pragma mark - OffscreenBitmap
 
 
 OffscreenBitmap::OffscreenBitmap(BRect frame)
@@ -475,7 +473,7 @@ OffscreenBitmap::View() const
 }
 
 
-// #pragma mark -
+// #pragma mark - BPrivate functions
 
 
 namespace BPrivate {
@@ -553,12 +551,12 @@ FadeRGBA32Vertical(uint32* bits, int32 width, int32 height, int32 from,
 }	// namespace BPrivate
 
 
-// #pragma mark -
+// #pragma mark - DraggableIcon
 
 
 DraggableIcon::DraggableIcon(BRect rect, const char* name,
-		const char* mimeType, icon_size size, const BMessage* message,
-		BMessenger target, uint32 resizeMask, uint32 flags)
+	const char* mimeType, icon_size size, const BMessage* message,
+	BMessenger target, uint32 resizeMask, uint32 flags)
 	:
 	BView(rect, name, resizeMask, flags),
 	fMessage(*message),
@@ -657,11 +655,11 @@ DraggableIcon::Draw(BRect)
 }
 
 
-// #pragma mark -
+// #pragma mark - FlickerFreeStringView
 
 
 FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char* name,
-		const char* text, uint32 resizeFlags, uint32 flags)
+	const char* text, uint32 resizeFlags, uint32 flags)
 	:
 	BStringView(bounds, name, text, resizeFlags, flags),
 	fBitmap(NULL),
@@ -671,7 +669,7 @@ FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char* name,
 
 
 FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char* name,
-		const char* text, BBitmap* inBitmap, uint32 resizeFlags, uint32 flags)
+	const char* text, BBitmap* inBitmap, uint32 resizeFlags, uint32 flags)
 	:
 	BStringView(bounds, name, text, resizeFlags, flags),
 	fBitmap(NULL),
@@ -695,7 +693,7 @@ FlickerFreeStringView::Draw(BRect)
 
 	BView* offscreen = fBitmap->BeginUsing(bounds);
 
-	if (Parent()) {
+	if (Parent() != NULL) {
 		fViewColor = Parent()->ViewColor();
 		fLowColor = Parent()->ViewColor();
 	}
@@ -714,7 +712,7 @@ FlickerFreeStringView::Draw(BRect)
 	else
 		offscreen->FillRect(bounds, B_SOLID_LOW);
 
-	if (Text()) {
+	if (Text() != NULL) {
 		BPoint loc;
 
 		font_height	height;
@@ -762,7 +760,7 @@ void
 FlickerFreeStringView::AttachedToWindow()
 {
 	_inherited::AttachedToWindow();
-	if (Parent()) {
+	if (Parent() != NULL) {
 		fViewColor = Parent()->ViewColor();
 		fLowColor = Parent()->ViewColor();
 	}
@@ -793,7 +791,7 @@ FlickerFreeStringView::SetLowColor(rgb_color color)
 }
 
 
-// #pragma mark -
+// #pragma mark - TitledSeparatorItem
 
 
 TitledSeparatorItem::TitledSeparatorItem(const char* label)
@@ -925,11 +923,11 @@ TitledSeparatorItem::Draw()
 }
 
 
-// #pragma mark -
+// #pragma mark - ShortcutFilter
 
 
 ShortcutFilter::ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,
-		uint32 shortcutWhat, BHandler* target)
+	uint32 shortcutWhat, BHandler* target)
 	:
 	BMessageFilter(B_KEY_DOWN),
 	fShortcutKey(shortcutKey),
@@ -970,11 +968,10 @@ ShortcutFilter::Filter(BMessage* message, BHandler**)
 }
 
 
-// #pragma mark -
+// #pragma mark - BPrivate functions
 
 
 namespace BPrivate {
-
 
 void
 EmbedUniqueVolumeInfo(BMessage* message, const BVolume* volume)
@@ -1522,8 +1519,11 @@ EachMenuItem(const BMenu* menu, bool recursive,
 }
 
 
+//	#pragma mark - PositionPassingMenuItem
+
+
 PositionPassingMenuItem::PositionPassingMenuItem(const char* title,
-		BMessage* message, char shortcut, uint32 modifiers)
+	BMessage* message, char shortcut, uint32 modifiers)
 	:
 	BMenuItem(title, message, shortcut, modifiers)
 {
@@ -1579,6 +1579,9 @@ PositionPassingMenuItem::Invoke(BMessage* message)
 
 	return BInvoker::Invoke(&clone);
 }
+
+
+//	#pragma mark - BPrivate functions
 
 
 bool
