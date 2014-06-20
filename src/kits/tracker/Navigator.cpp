@@ -344,8 +344,12 @@ BNavigator::SendNavigationMessage(NavigationAction action, BEntry* entry,
 				// Todo: Change the locking behaviour of
 				// StandAloneTaskLoop::Run() and subsequently called
 				// functions.
-			if (nodeRef)
-				dynamic_cast<TTracker*>(be_app)->SelectChildInParentSoon(&ref, nodeRef);
+			if (nodeRef != NULL) {
+				TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+				if (tracker != NULL)
+					tracker->SelectChildInParentSoon(&ref, nodeRef);
+			}
+
 			LockLooper();
 		}
 	}
