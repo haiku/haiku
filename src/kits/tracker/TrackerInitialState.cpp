@@ -138,6 +138,7 @@ const AttributeTemplate kDefaultQueryTemplate[] =
 	}
 };
 
+
 const AttributeTemplate kBookmarkQueryTemplate[] =
 	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
 		application_x-vnd.Be-bookmark */
@@ -172,6 +173,7 @@ const AttributeTemplate kBookmarkQueryTemplate[] =
 		"RCSTR\000\001"
 	}
 };
+
 
 const AttributeTemplate kPersonQueryTemplate[] =
 	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
@@ -209,6 +211,7 @@ const AttributeTemplate kPersonQueryTemplate[] =
 		"META:company\000CS\174RCSTR\000\001"
 	},
 };
+
 
 const AttributeTemplate kEmailQueryTemplate[] =
 	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
@@ -269,6 +272,9 @@ public:
 }	// namespace BPrivate
 
 
+//	#pragma mark - ExtraAttributeLazyInstaller
+
+
 ExtraAttributeLazyInstaller::ExtraAttributeLazyInstaller(const char* type)
 	:
 	fMimeType(type),
@@ -317,7 +323,7 @@ ExtraAttributeLazyInstaller::AddExtraAttribute(const char* publicName,
 }
 
 
-// #pragma mark -
+// #pragma mark - static functions
 
 
 static void
@@ -332,6 +338,7 @@ InstallTemporaryBackgroundImages(BNode* node, BMessage* message)
 			(size_t)size);
 		delete[] buffer;
 	} catch (...) {
+		;
 	}
 }
 
@@ -349,11 +356,12 @@ AddTemporaryBackgroundImages(BMessage* message, const char* imagePath,
 }
 
 
-// #pragma mark -
+// #pragma mark - TrackerInitialState
 
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "TrackerInitialState"
+
 
 bool
 TTracker::InstallMimeIfNeeded(const char* type, int32 bitsID,
