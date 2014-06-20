@@ -36,7 +36,8 @@ All rights reserved.
 
 
 #include <Looper.h>
-#include "ObjectList.h"
+#include <ObjectList.h>
+#include <Node.h>
 
 
 namespace BPrivate {
@@ -52,7 +53,7 @@ public:
 	bool IsTrashNode(const node_ref*) const;
 
 protected:
-	virtual	void MessageReceived(BMessage*);
+	virtual void MessageReceived(BMessage*);
 
 private:
 	void WatchTrashDirs();
@@ -67,5 +68,6 @@ private:
 } // namespace BPrivate
 
 using namespace BPrivate;
+
 
 #endif	// _TRASH_WATCHER_H

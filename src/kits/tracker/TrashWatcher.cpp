@@ -33,11 +33,9 @@ All rights reserved.
 */
 
 
-#include "Attributes.h"
-#include "Bitmaps.h"
-#include "FSUtils.h"
-#include "Tracker.h"
 #include "TrashWatcher.h"
+
+#include <string.h>
 
 #include <Debug.h>
 #include <Directory.h>
@@ -46,11 +44,18 @@ All rights reserved.
 #include <Volume.h>
 #include <VolumeRoster.h>
 
-#include <string.h>
+#include "Attributes.h"
+#include "Bitmaps.h"
+#include "FSUtils.h"
+#include "Tracker.h"
+
+
+//	 #pragma mark - BTrashWatcher
 
 
 BTrashWatcher::BTrashWatcher()
-	: BLooper("TrashWatcher", B_LOW_PRIORITY),
+	:
+	BLooper("TrashWatcher", B_LOW_PRIORITY),
 	fTrashNodeList(20, true)
 {
 	FSCreateTrashDirs();
@@ -109,8 +114,9 @@ BTrashWatcher::MessageReceived(BMessage* message)
 			message->FindInt64("to directory", &toDir);
 			if (fromDir == toDir)
 				break;
-		} // fall thru
-		case B_DEVICE_UNMOUNTED: // fall thru
+		}
+		// fall-through
+		case B_DEVICE_UNMOUNTED:
 		case B_ENTRY_REMOVED:
 		{
 			bool full = CheckTrashDirs();
