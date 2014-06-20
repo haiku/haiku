@@ -32,6 +32,7 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "FavoritesMenu.h"
 
 #include <compat/sys/stat.h>
@@ -61,17 +62,22 @@ All rights reserved.
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "FavoritesMenu"
 
+
+//	#pragma mark - FavoritesMenu
+
+
 FavoritesMenu::FavoritesMenu(const char* title, BMessage* openFolderMessage,
 	BMessage* openFileMessage, const BMessenger &target,
 	bool isSavePanel, BRefFilter* filter)
-	:	BSlowMenu(title),
-		fOpenFolderMessage(openFolderMessage),
-		fOpenFileMessage(openFileMessage),
-		fTarget(target),
-		fContainer(NULL),
-		fInitialItemCount(0),
-		fIsSavePanel(isSavePanel),
-		fRefFilter(filter)
+	:
+	BSlowMenu(title),
+	fOpenFolderMessage(openFolderMessage),
+	fOpenFileMessage(openFileMessage),
+	fTarget(target),
+	fContainer(NULL),
+	fInitialItemCount(0),
+	fIsSavePanel(isSavePanel),
+	fRefFilter(filter)
 {
 }
 
@@ -96,7 +102,7 @@ FavoritesMenu::StartBuildingItemList()
 {
 	// initialize the menu building state
 
-	if (!fInitialItemCount)
+	if (fInitialItemCount == 0)
 		fInitialItemCount = CountItems();
 	else {
 		// strip the old items so we can add new fresh ones
@@ -141,24 +147,22 @@ FavoritesMenu::AddNextItem()
 				fContainer = new QueryEntryListCollection(&startModel);
 			else if (startModel.IsVirtualDirectory())
 				fContainer = new VirtualDirectoryEntryList(&startModel);
-			else
+			else {
 				fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory*>
 					(startModel.Node()));
+			}
 
 			ThrowOnInitCheckError(fContainer);
 			ThrowOnError( fContainer->Rewind() );
-
 		} catch (...) {
 			delete fContainer;
 			fContainer = NULL;
 		}
 	}
 
-
 	if (fState == kAddingFavorites) {
 		entry_ref ref;
-		if (fContainer
-			&& fContainer->GetNextRef(&ref) == B_OK) {
+		if (fContainer != NULL && fContainer->GetNextRef(&ref) == B_OK) {
 			Model model(&ref, true);
 			if (model.InitCheck() != B_OK)
 				return true;
@@ -183,6 +187,7 @@ FavoritesMenu::AddNextItem()
 			fUniqueRefCheck.push_back(*model.EntryRef());
 			AddItem(item);
 			fSectionItemCount++;
+
 			return true;
 		}
 
@@ -272,7 +277,7 @@ FavoritesMenu::AddNextItem()
 
 			BMenuItem* item = BNavMenu::NewModelItem(&model,
 				fOpenFolderMessage, fTarget, true);
-			if (item) {
+			if (item != NULL) {
 				if (!fAddedSeparatorForSection) {
 					fAddedSeparatorForSection = true;
 					AddItem(new TitledSeparatorItem(
@@ -282,10 +287,12 @@ FavoritesMenu::AddNextItem()
 				item->SetEnabled(true);
 					// BNavMenu::NewModelItem returns a disabled item here -
 					// need to fix this in BNavMenu::NewModelItem
+
 				return true;
 			}
 		}
 	}
+
 	return false;
 }
 
@@ -326,12 +333,13 @@ FavoritesMenu::ShouldShowModel(const Model* model)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - RecentsMenu
 
 
 RecentsMenu::RecentsMenu(const char* name, int32 which, uint32 what,
 	BHandler* target)
-	: BNavMenu(name, what, target),
+	:
+	BNavMenu(name, what, target),
 	fWhich(which),
 	fRecentsCount(0),
 	fItemIndex(0)
@@ -420,18 +428,19 @@ RecentsMenu::AddRecents(int32 count)
 		if (fRecentList.FindRef("refs", fItemIndex++, &ref) != B_OK)
 			break;
 
-		if (ref.name && strlen(ref.name) > 0) {
+		if (ref.name != NULL && strlen(ref.name) > 0) {
 			Model model(&ref, true);
 			ModelMenuItem* item = BNavMenu::NewModelItem(&model,
 					new BMessage(fMessage.what),
 					Target(), false, NULL, TypesList());
 
-			if (item) {
+			if (item != NULL) {
 				AddItem(item);
 
 				//	return true so that we know to reenter this list
 				return true;
 			}
+
 			return true;
 		}
 	}

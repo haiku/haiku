@@ -31,14 +31,15 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __FAVORITES_MENU__
-#define __FAVORITES_MENU__
+#ifndef _FAVORITES_MENU_H
+#define _FAVORITES_MENU_H
 
 
 #include <vector>
 
+#include <ObjectList.h>
+
 #include "NavMenu.h"
-#include "ObjectList.h"
 
 
 class BRefFilter;
@@ -137,4 +138,5 @@ class RecentsMenu : public BNavMenu {
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _FAVORITES_MENU_H
