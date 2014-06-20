@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc.
+ * Copyright 2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,6 +57,8 @@ All rights reserved.
 
 
 namespace BPrivate {
+
+//	#pragma mark - VirtualDirectoryWindow
 
 
 VirtualDirectoryWindow::VirtualDirectoryWindow(LockingList<BWindow>* windowList,
@@ -174,6 +176,5 @@ VirtualDirectoryWindow::AddWindowContextMenus(BMenu* menu)
 	closeItem->SetTarget(this);
 	resizeItem->SetTarget(this);
 }
-
 
 } // namespace BPrivate
