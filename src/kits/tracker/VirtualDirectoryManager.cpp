@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc.
+ * Copyright 2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,13 +29,12 @@
 
 namespace BPrivate {
 
-
 static const size_t kMaxVirtualDirectoryFileSize = 10 * 1024;
 static const char* const kTemporaryDefinitionFileBaseDirectoryPath
 	= "/tmp/tracker/virtual-directories";
 
 
-// #pragma mark - Info
+// #pragma mark - VirtualDirectoryManager::Info
 
 
 class VirtualDirectoryManager::Info {
@@ -170,7 +169,7 @@ private:
 };
 
 
-// #pragma mark - RootInfo
+// #pragma mark - VirtualDirectoryManager::RootInfo
 
 
 class VirtualDirectoryManager::RootInfo {
@@ -430,15 +429,16 @@ VirtualDirectoryManager::TranslateDirectoryEntry(
 	NotOwningEntryRef entryRef(buffer->d_pdev, buffer->d_pino, buffer->d_name);
 	node_ref nodeRef(buffer->d_dev, buffer->d_ino);
 
-	status_t error = TranslateDirectoryEntry(definitionFileRef, entryRef,
+	status_t result = TranslateDirectoryEntry(definitionFileRef, entryRef,
 		nodeRef);
-	if (error != B_OK)
-		return error;
+	if (result != B_OK)
+		return result;
 
 	buffer->d_pdev = entryRef.device;
 	buffer->d_pino = entryRef.directory;
 	buffer->d_dev = nodeRef.device;
 	buffer->d_ino = nodeRef.node;
+
 	return B_OK;
 }
 
@@ -534,6 +534,7 @@ VirtualDirectoryManager::TranslateDirectoryEntry(
 	_nodeRef = info->DefinitionFileNodeRef();
 	_entryRef.device = entryRef.device;
 	_entryRef.directory = entryRef.directory;
+
 	return B_OK;
 }
 
@@ -630,8 +631,8 @@ void
 VirtualDirectoryManager::_UpdateTree(RootInfo* root)
 {
 	bool changed = false;
-	status_t error = root->ReadDefinition(&changed);
-	if (error != B_OK) {
+	status_t result = root->ReadDefinition(&changed);
+	if (result != B_OK) {
 		DirectoryRemoved(root->Info()->DefinitionFileNodeRef());
 		return;
 	}
@@ -758,6 +759,7 @@ VirtualDirectoryManager::_ResolveUnknownDefinitionFile(
 	}
 
 	_info = info;
+
 	return B_OK;
 }
 
@@ -783,6 +785,7 @@ VirtualDirectoryManager::_CreateRootInfo(const node_ref& definitionFileNodeRef,
 
 	rootDeleter.Detach();
 	_info = root->Info();
+
 	return B_OK;
 }
 
@@ -813,9 +816,9 @@ VirtualDirectoryManager::_ReadSubDirectoryDefinitionFileInfo(
 
 	_rootDefinitionFileEntryRef = entry_ref(device, directory, name);
 	_subDirPath = subDirPath;
+
 	return !_subDirPath.IsEmpty() && _rootDefinitionFileEntryRef.name != NULL
 		? B_OK : B_NO_MEMORY;
 }
-
 
 } // namespace BPrivate

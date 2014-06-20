@@ -1,12 +1,12 @@
 /*
- * Copyright 2013, Haiku, Inc.
+ * Copyright 2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
-#ifndef VIRTUAL_DIRECTORY_MANAGER_H
-#define VIRTUAL_DIRECTORY_MANAGER_H
+#ifndef _VIRTUAL_DIRECTORY_MANAGER_H
+#define _VIRTUAL_DIRECTORY_MANAGER_H
 
 
 #include <dirent.h>
@@ -21,7 +21,6 @@ class BStringList;
 
 
 namespace BPrivate {
-
 
 class Model;
 
@@ -110,8 +109,7 @@ private:
 			NodeRefInfoMap		fInfos;
 };
 
-
 } // namespace BPrivate
 
 
-#endif	// VIRTUAL_DIRECTORY_MANAGER_H
+#endif	// _VIRTUAL_DIRECTORY_MANAGER_H
