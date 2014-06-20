@@ -48,15 +48,15 @@ All rights reserved.
 namespace BPrivate {
 
 class SettingsItem : public BStringItem {
-	public:
-		SettingsItem(const char* label, SettingsView* view);
+public:
+	SettingsItem(const char* label, SettingsView* view);
 
-		void DrawItem(BView* owner, BRect rect, bool drawEverything);
+	void DrawItem(BView* owner, BRect rect, bool drawEverything);
 
-		SettingsView* View();
+	SettingsView* View();
 
-	private:
-		SettingsView* fSettingsView;
+private:
+	SettingsView* fSettingsView;
 };
 
 }	// namespace BPrivate
@@ -71,12 +71,15 @@ const uint32 kRevertButtonPressed = 'Rebp';
 #define B_TRANSLATION_CONTEXT "TrackerSettingsWindow"
 
 
+//	#pragma mark - TrackerSettingsWindow
+
+
 TrackerSettingsWindow::TrackerSettingsWindow()
 	:
 	BWindow(BRect(80, 80, 450, 350), B_TRANSLATE("Tracker preferences"),
 		B_TITLED_WINDOW, B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
-		| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-		| B_AUTO_UPDATE_SIZE_LIMITS)
+			| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	fSettingsTypeListView = new BListView("List View",
 		B_SINGLE_SELECTION_LIST);
@@ -163,6 +166,7 @@ TrackerSettingsWindow::MessageReceived(BMessage* message)
 
 		default:
 			_inherited::MessageReceived(message);
+			break;
 	}
 }
 
@@ -294,7 +298,7 @@ TrackerSettingsWindow::_HandleChangedSettingsView()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - SettingsItem
 
 
 SettingsItem::SettingsItem(const char* label, SettingsView* view)

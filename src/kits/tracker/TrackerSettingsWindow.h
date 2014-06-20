@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef TRACKER_SETTINGS_WINDOW_H
-#define TRACKER_SETTINGS_WINDOW_H
+#ifndef _TRACKER_SETTINGS_WINDOW_H
+#define _TRACKER_SETTINGS_WINDOW_H
 
 
 #include <Box.h>
@@ -47,32 +47,33 @@ All rights reserved.
 namespace BPrivate {
 
 class TrackerSettingsWindow : public BWindow {
-	public:
-		TrackerSettingsWindow();
+public:
+	TrackerSettingsWindow();
 
-		bool QuitRequested();
-		void MessageReceived(BMessage* message);
-		void Show();
+	bool QuitRequested();
+	void MessageReceived(BMessage* message);
+	void Show();
 
-	private:
-		SettingsView* _ViewAt(int32 i);
+private:
+	SettingsView* _ViewAt(int32 i);
 
-		void _HandleChangedContents();
-		void _HandlePressedDefaultsButton();
-		void _HandlePressedRevertButton();
-		void _HandleChangedSettingsView();
-		void _UpdateButtons();
+	void _HandleChangedContents();
+	void _HandlePressedDefaultsButton();
+	void _HandlePressedRevertButton();
+	void _HandleChangedSettingsView();
+	void _UpdateButtons();
 
-		BListView*	fSettingsTypeListView;
-		BBox*		fSettingsContainerBox;
-		BButton*	fDefaultsButton;
-		BButton*	fRevertButton;
+	BListView*	fSettingsTypeListView;
+	BBox*		fSettingsContainerBox;
+	BButton*	fDefaultsButton;
+	BButton*	fRevertButton;
 
-		typedef BWindow _inherited;
+	typedef BWindow _inherited;
 };
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif	// TRACKER_SETTINGS_WINDOW_H
+
+#endif	// _TRACKER_SETTINGS_WINDOW_H
