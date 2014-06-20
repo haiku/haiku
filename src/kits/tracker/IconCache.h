@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __NU_ICON_CACHE__
-#define __NU_ICON_CACHE__
+#ifndef _NU_ICON_CACHE_H
+#define _NU_ICON_CACHE_H
 
 
 // Icon cache is used for drawing node icons; it caches icons
@@ -40,11 +40,11 @@ All rights reserved.
 
 
 #include <Bitmap.h>
+#include <ObjectList.h>
 #include <Mime.h>
 #include <String.h>
 
 #include "AutoLock.h"
-#include "ObjectList.h"
 #include "OpenHashTable.h"
 #include "Utilities.h"
 
@@ -525,4 +525,5 @@ SharedIconCache::EntryIndex(const SharedCacheEntry* entry) const
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _NU_ICON_CACHE_H

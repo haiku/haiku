@@ -1021,6 +1021,7 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 
 				default:
 					TRESPASS();
+					break;
 			}
 		}
 
