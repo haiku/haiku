@@ -89,7 +89,9 @@ enum {
 	REGEXP_CORRUPTED_OPCODE
 };
 
+
 const int32 kSubExpressionMax = 10;
+
 
 struct regexp {
 	const char* startp[kSubExpressionMax];
@@ -182,5 +184,6 @@ private:
 } // namespace BPrivate
 
 using namespace BPrivate;
+
 
 #endif	// _REG_EXP_H

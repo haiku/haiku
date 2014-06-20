@@ -168,6 +168,7 @@ const char* kMeta = "^$.[()|?+*\\";
 const int32 kMaxSize = 32767L;
 	// Probably could be 65535L.
 
+
 // Flags to be passed up and down:
 enum {
 	kHasWidth =	01,	// Known never to match null string.
@@ -175,6 +176,7 @@ enum {
 	kSPStart = 04,	// Starts with * or +.
 	kWorst = 0	// Worst case.
 };
+
 
 const char* kRegExpErrorStringArray[] = {
 	"Unmatched parenthesis.",
@@ -194,28 +196,36 @@ const char* kRegExpErrorStringArray[] = {
 	"Corrupted opcode."
 };
 
+
 #ifdef DEBUG
 int32 regnarrate = 0;
 #endif
 
+
+//	#pragma mark - RegExp
+
+
 RegExp::RegExp()
-	:	fError(B_OK),
-		fRegExp(NULL)
+	:
+	fError(B_OK),
+	fRegExp(NULL)
 {
 }
 
 
 RegExp::RegExp(const char* pattern)
-	:	fError(B_OK),
-		fRegExp(NULL)
+	:
+	fError(B_OK),
+	fRegExp(NULL)
 {
 	fRegExp = Compile(pattern);
 }
 
 
 RegExp::RegExp(const BString &pattern)
-	:	fError(B_OK),
-		fRegExp(NULL)
+	:
+	fError(B_OK),
+	fRegExp(NULL)
 {
 	fRegExp = Compile(pattern.String());
 }
@@ -257,7 +267,7 @@ RegExp::SetTo(const BString &pattern)
 bool
 RegExp::Matches(const char* string) const
 {
-	if (!fRegExp || !string)
+	if (fRegExp == NULL || string == NULL)
 		return false;
 
 	return RunMatcher(fRegExp, string) == 1;
@@ -267,7 +277,7 @@ RegExp::Matches(const char* string) const
 bool
 RegExp::Matches(const BString &string) const
 {
-	if (!fRegExp)
+	if (fRegExp == NULL)
 		return false;
 
 	return RunMatcher(fRegExp, string.String()) == 1;
@@ -320,7 +330,7 @@ RegExp::Compile(const char* exp)
 	r = (regexp*)malloc(sizeof(regexp) + fCodeSize);
 		// Allocate space
 
-	if (!r) {
+	if (r == NULL) {
 		SetError(B_NO_MEMORY);
 		return NULL;
 	}
@@ -336,7 +346,8 @@ RegExp::Compile(const char* exp)
 	}
 
 	// Dig out information for optimizations.
-	r->regstart = '\0';	// Worst-case defaults.
+	r->regstart = '\0';
+		// Worst-case defaults.
 	r->reganch = 0;
 	r->regmust = NULL;
 	r->regmlen = 0;
@@ -358,15 +369,16 @@ RegExp::Compile(const char* exp)
 		// the regstart check works with the beginning of the r.e.
 		// and avoiding duplication strengthens checking.  Not a
 		// strong reason, but sufficient in the absence of others.
-		if (flags&kSPStart) {
+		if ((flags & kSPStart) != 0) {
 			longest = NULL;
 			len = 0;
-			for (; scan != NULL; scan = Next((char*)scan))
+			for (; scan != NULL; scan = Next((char*)scan)) {
 				if (*scan == kRegExpExactly
 					&& (int32)strlen(Operand(scan)) >= len) {
 					longest = Operand(scan);
 					len = (int32)strlen(Operand(scan));
 				}
+			}
 			r->regmust = longest;
 			r->regmlen = len;
 		}
@@ -387,8 +399,9 @@ const char*
 RegExp::ErrorString() const
 {
 	if (fError >= REGEXP_UNMATCHED_PARENTHESIS
-		&& fError <= REGEXP_CORRUPTED_OPCODE)
+		&& fError <= REGEXP_CORRUPTED_OPCODE) {
 		return kRegExpErrorStringArray[fError - B_ERRORS_END];
+	}
 
 	return strerror(fError);
 }
@@ -419,7 +432,8 @@ RegExp::Reg(int32 paren, int32* flagp)
 	int32 parno = 0;
 	int32 flags;
 
-	*flagp = kHasWidth;	// Tentatively.
+	*flagp = kHasWidth;
+		// Tentatively.
 
 	// Make an kRegExpOpen node, if parenthesized.
 	if (paren) {
@@ -437,21 +451,28 @@ RegExp::Reg(int32 paren, int32* flagp)
 	br = Branch(&flags);
 	if (br == NULL)
 		return NULL;
-	if (ret != NULL)
-		Tail(ret, br);	// kRegExpOpen -> first
-	else
+
+	if (ret != NULL) {
+		Tail(ret, br);
+			// kRegExpOpen -> first
+	} else
 		ret = br;
+
 	if (!(flags & kHasWidth))
 		*flagp &= ~kHasWidth;
+
 	*flagp |= flags&kSPStart;
 	while (*fInputScanPointer == '|') {
 		fInputScanPointer++;
 		br = Branch(&flags);
 		if (br == NULL)
 			return NULL;
-		Tail(ret, br);	// kRegExpBranch -> kRegExpBranch.
+
+		Tail(ret, br);
+			// kRegExpBranch -> kRegExpBranch.
 		if (!(flags & kHasWidth))
 			*flagp &= ~kHasWidth;
+
 		*flagp |= flags&kSPStart;
 	}
 
@@ -495,7 +516,8 @@ RegExp::Branch(int32* flagp)
 	char* latest;
 	int32 flags;
 
-	*flagp = kWorst;		// Tentatively.
+	*flagp = kWorst;
+		// Tentatively.
 
 	ret = Node(kRegExpBranch);
 	chain = NULL;
@@ -505,15 +527,21 @@ RegExp::Branch(int32* flagp)
 		latest = Piece(&flags);
 		if (latest == NULL)
 			return NULL;
+
 		*flagp |= flags & kHasWidth;
-		if (chain == NULL)	// First piece.
+		if (chain == NULL) {
+			// First piece.
 			*flagp |= flags & kSPStart;
-		else
+		} else
 			Tail(chain, latest);
+
 		chain = latest;
 	}
-	if (chain == NULL)	// Loop ran zero times.
+
+	if (chain == NULL) {
+		// Loop ran zero times.
 		Node(kRegExpNothing);
+	}
 
 	return ret;
 }
@@ -556,33 +584,47 @@ RegExp::Piece(int32* flagp)
 		Insert(kRegExpStar, ret);
 	else if (op == '*') {
 		// Emit x* as (x&|), where & means "self".
-		Insert(kRegExpBranch, ret);				// Either x
-		OpTail(ret, Node(kRegExpBack));		// and loop
-		OpTail(ret, ret);				// back
-		Tail(ret, Node(kRegExpBranch));		// or
-		Tail(ret, Node(kRegExpNothing));		// null.
+		Insert(kRegExpBranch, ret);
+			// Either x
+		OpTail(ret, Node(kRegExpBack));
+			// and loop
+		OpTail(ret, ret);
+			// back
+		Tail(ret, Node(kRegExpBranch));
+			// or
+		Tail(ret, Node(kRegExpNothing));
+			// null.
 	} else if (op == '+' && (flags & kSimple))
 		Insert(kRegExpPlus, ret);
 	else if (op == '+') {
 		// Emit x+ as x(&|), where & means "self".
-		next = Node(kRegExpBranch);				// Either
+		next = Node(kRegExpBranch);
+			// Either
 		Tail(ret, next);
-		Tail(Node(kRegExpBack), ret);		// loop back
-		Tail(next, Node(kRegExpBranch));		// or
-		Tail(ret, Node(kRegExpNothing));		// null.
+		Tail(Node(kRegExpBack), ret);
+			// loop back
+		Tail(next, Node(kRegExpBranch));
+			// or
+		Tail(ret, Node(kRegExpNothing));
+			// null.
 	} else if (op == '?') {
 		// Emit x? as (x|)
-		Insert(kRegExpBranch, ret);			// Either x
-		Tail(ret, Node(kRegExpBranch));	// or
-		next = Node(kRegExpNothing);		// null.
+		Insert(kRegExpBranch, ret);
+			// Either x
+		Tail(ret, Node(kRegExpBranch));
+			// or
+		next = Node(kRegExpNothing);
+			// null.
 		Tail(ret, next);
 		OpTail(ret, next);
 	}
+
 	fInputScanPointer++;
 	if (IsMult(*fInputScanPointer)) {
 		SetError(REGEXP_NESTED_STAR_QUESTION_PLUS);
 		return NULL;
 	}
+
 	return ret;
 }
 
@@ -601,77 +643,87 @@ RegExp::Atom(int32* flagp)
 	char* ret;
 	int32 flags;
 
-	*flagp = kWorst;		// Tentatively.
+	*flagp = kWorst;
+		// tentatively
 
 	switch (*fInputScanPointer++) {
 		case '^':
 			ret = Node(kRegExpBol);
 			break;
+
 		case '$':
 			ret = Node(kRegExpEol);
 			break;
+
 		case '.':
 			ret = Node(kRegExpAny);
 			*flagp |= kHasWidth|kSimple;
 			break;
-		case '[':
-			{
-				int32 cclass;
-				int32 classend;
 
-				if (*fInputScanPointer == '^') {	// Complement of range.
-					ret = Node(kRegExpAnyBut);
-					fInputScanPointer++;
-				} else
-					ret = Node(kRegExpAnyOf);
-				if (*fInputScanPointer == ']' || *fInputScanPointer == '-')
-					Char(*fInputScanPointer++);
-				while (*fInputScanPointer != '\0'
-					&& *fInputScanPointer != ']') {
-					if (*fInputScanPointer == '-') {
-						fInputScanPointer++;
-						if (*fInputScanPointer == ']'
-							|| *fInputScanPointer == '\0') {
-							Char('-');
-						} else {
-							cclass = UCharAt(fInputScanPointer - 2) + 1;
-							classend = UCharAt(fInputScanPointer);
-							if (cclass > classend + 1) {
-								SetError(REGEXP_INVALID_BRACKET_RANGE);
-								return NULL;
-							}
-							for (; cclass <= classend; cclass++)
-								Char((char)cclass);
-							fInputScanPointer++;
-						}
-					} else
-						Char(*fInputScanPointer++);
-				}
-				Char('\0');
-				if (*fInputScanPointer != ']') {
-					SetError(REGEXP_UNMATCHED_BRACKET);
-					return NULL;
-				}
+		case '[':
+		{
+			int32 cclass;
+			int32 classend;
+
+			if (*fInputScanPointer == '^') {
+				// complement of range
+				ret = Node(kRegExpAnyBut);
 				fInputScanPointer++;
-				*flagp |= kHasWidth | kSimple;
+			} else
+				ret = Node(kRegExpAnyOf);
+			if (*fInputScanPointer == ']' || *fInputScanPointer == '-')
+				Char(*fInputScanPointer++);
+			while (*fInputScanPointer != '\0'
+				&& *fInputScanPointer != ']') {
+				if (*fInputScanPointer == '-') {
+					fInputScanPointer++;
+					if (*fInputScanPointer == ']'
+						|| *fInputScanPointer == '\0') {
+						Char('-');
+					} else {
+						cclass = UCharAt(fInputScanPointer - 2) + 1;
+						classend = UCharAt(fInputScanPointer);
+						if (cclass > classend + 1) {
+							SetError(REGEXP_INVALID_BRACKET_RANGE);
+							return NULL;
+						}
+						for (; cclass <= classend; cclass++)
+							Char((char)cclass);
+						fInputScanPointer++;
+					}
+				} else
+					Char(*fInputScanPointer++);
 			}
+			Char('\0');
+			if (*fInputScanPointer != ']') {
+				SetError(REGEXP_UNMATCHED_BRACKET);
+				return NULL;
+			}
+			fInputScanPointer++;
+			*flagp |= kHasWidth | kSimple;
 			break;
+		}
+
 		case '(':
 			ret = Reg(1, &flags);
 			if (ret == NULL)
 				return NULL;
 			*flagp |= flags & (kHasWidth | kSPStart);
 			break;
+
 		case '\0':
 		case '|':
 		case ')':
 			SetError(REGEXP_INTERNAL_ERROR);
-			return NULL; //  Supposed to be caught earlier.
+			return NULL;
+				//  supposed to be caught earlier
+
 		case '?':
 		case '+':
 		case '*':
 			SetError(REGEXP_QUESTION_PLUS_STAR_FOLLOWS_NOTHING);
 			return NULL;
+
 		case '\\':
 			if (*fInputScanPointer == '\0') {
 				SetError(REGEXP_TRAILING_BACKSLASH);
@@ -682,6 +734,7 @@ RegExp::Atom(int32* flagp)
 			Char('\0');
 			*flagp |= kHasWidth|kSimple;
 			break;
+
 		default:
 		{
 			int32 len;
@@ -695,8 +748,10 @@ RegExp::Atom(int32* flagp)
 			}
 
 			ender = *(fInputScanPointer + len);
-			if (len > 1 && IsMult(ender))
-				len--;		// Back off clear of ?+* operand.
+			if (len > 1 && IsMult(ender)) {
+				// Back off clear of ?+* operand.
+				len--;
+			}
 
 			*flagp |= kHasWidth;
 			if (len == 1)
@@ -720,7 +775,9 @@ RegExp::Atom(int32* flagp)
 //
 // - Node - emit a node
 //
-char*			// Location.
+// Returns location.
+//
+char*
 RegExp::Node(char op)
 {
 	char* ret;
@@ -734,7 +791,8 @@ RegExp::Node(char op)
 
 	ptr = ret;
 	*ptr++ = op;
-	*ptr++ = '\0';		// Null "next" pointer.
+	*ptr++ = '\0';
+		// Null "next" pointer.
 	*ptr++ = '\0';
 	fCodeEmitPointer = ptr;
 
@@ -778,7 +836,8 @@ RegExp::Insert(char op, char* opnd)
 	while (src > opnd)
 		*--dst = *--src;
 
-	place = opnd;		// Op node, where operand used to be.
+	place = opnd;
+		// Op node, where operand used to be.
 	*place++ = op;
 	*place++ = '\0';
 	*place++ = '\0';
@@ -826,6 +885,7 @@ RegExp::OpTail(char* p, char* val)
 	// "Operandless" and "op != kRegExpBranch" are synonymous in practice.
 	if (p == NULL || p == &fDummy || *p != kRegExpBranch)
 		return;
+
 	Tail(Operand(p), val);
 }
 
@@ -842,54 +902,59 @@ RegExp::RunMatcher(regexp* prog, const char* string) const
 {
 	const char* s;
 
-	// Be paranoid...
+	// be paranoid...
 	if (prog == NULL || string == NULL) {
 		SetError(B_BAD_VALUE);
 		return 0;
 	}
 
-	// Check validity of program.
+	// check validity of program
 	if (UCharAt(prog->program) != kRegExpMagic) {
 		SetError(REGEXP_CORRUPTED_PROGRAM);
 		return 0;
 	}
 
-	// If there is a "must appear" string, look for it.
+	// if there is a "must appear" string, look for it
 	if (prog->regmust != NULL) {
 		s = string;
 		while ((s = strchr(s, prog->regmust[0])) != NULL) {
-			if (strncmp(s, prog->regmust, (size_t)prog->regmlen) == 0)
-				break;	// Found it.
+			if (strncmp(s, prog->regmust, (size_t)prog->regmlen) == 0) {
+				// found it
+				break;
+			}
 			s++;
 		}
-		if (s == NULL)	// Not present.
+		if (s == NULL) {
+			// not present
 			return 0;
+		}
 	}
 
-	// Mark beginning of line for ^ .
+	// mark beginning of line for ^
 	fRegBol = string;
 
-	// Simplest case:  anchored match need be tried only once.
+	// simplest case:  anchored match need be tried only once
 	if (prog->reganch)
 		return Try(prog, (char*)string);
 
-	// Messy cases:  unanchored match.
+	// messy cases: unanchored match
 	s = string;
-	if (prog->regstart != '\0')
-		// We know what char it must start with.
+	if (prog->regstart != '\0') {
+		// we know what char it must start with
 		while ((s = strchr(s, prog->regstart)) != NULL) {
 			if (Try(prog, (char*)s))
 				return 1;
 			s++;
 		}
-	else
-		// We don't -- general case.
+	} else {
+		// we don't -- general case.
 		do {
 			if (Try(prog, (char*)s))
 				return 1;
 		} while (*s++ != '\0');
+	}
 
-	// Failure.
+	// failure
 	return 0;
 }
 
@@ -897,7 +962,9 @@ RegExp::RunMatcher(regexp* prog, const char* string) const
 //
 // - Try - try match at specific point
 //
-int32			// 0 failure, 1 success
+// Returns 0 on failure, 1 on success.
+//
+int32
 RegExp::Try(regexp* prog, const char* string) const
 {
 	int32 i;
@@ -932,8 +999,10 @@ RegExp::Try(regexp* prog, const char* string) const
 // recursion, in particular by going through "ordinary" nodes (that don't
 // need to know whether the rest of the match failed) by a loop instead of
 // by recursion.
-///
-int32			// 0 failure, 1 success
+//
+// Returns 0 on failure, 1 on success.
+//
+int32
 RegExp::Match(const char* prog) const
 {
 	const char* scan;	// Current node.
@@ -956,47 +1025,57 @@ RegExp::Match(const char* prog) const
 				if (fStringInputPointer != fRegBol)
 					return 0;
 				break;
+
 			case kRegExpEol:
 				if (*fStringInputPointer != '\0')
 					return 0;
 				break;
+
 			case kRegExpAny:
 				if (*fStringInputPointer == '\0')
 					return 0;
 				fStringInputPointer++;
 				break;
+
 			case kRegExpExactly:
-				{
-					const char* opnd = Operand(scan);
-					// Inline the first character, for speed.
-					if (*opnd != *fStringInputPointer)
-						return 0;
+			{
+				const char* opnd = Operand(scan);
+				// Inline the first character, for speed.
+				if (*opnd != *fStringInputPointer)
+					return 0;
 
-					uint32 len = strlen(opnd);
-					if (len > 1
-						&& strncmp(opnd, fStringInputPointer, len) != 0) {
-						return 0;
-					}
-
-					fStringInputPointer += len;
+				uint32 len = strlen(opnd);
+				if (len > 1
+					&& strncmp(opnd, fStringInputPointer, len) != 0) {
+					return 0;
 				}
-				break;
+
+				fStringInputPointer += len;
+			}
+			break;
+
 			case kRegExpAnyOf:
 				if (*fStringInputPointer == '\0'
-					|| strchr(Operand(scan), *fStringInputPointer) == NULL)
+					|| strchr(Operand(scan), *fStringInputPointer) == NULL) {
 					return 0;
+				}
 				fStringInputPointer++;
 				break;
+
 			case kRegExpAnyBut:
 				if (*fStringInputPointer == '\0'
-					|| strchr(Operand(scan), *fStringInputPointer) != NULL)
+					|| strchr(Operand(scan), *fStringInputPointer) != NULL) {
 					return 0;
+				}
 				fStringInputPointer++;
 				break;
+
 			case kRegExpNothing:
 				break;
+
 			case kRegExpBack:
 				break;
+
 			case kRegExpOpen + 1:
 			case kRegExpOpen + 2:
 			case kRegExpOpen + 3:
@@ -1006,26 +1085,27 @@ RegExp::Match(const char* prog) const
 			case kRegExpOpen + 7:
 			case kRegExpOpen + 8:
 			case kRegExpOpen + 9:
-				{
-					int32 no;
-					const char* save;
+			{
+				int32 no;
+				const char* save;
 
-					no = *scan - kRegExpOpen;
-					save = fStringInputPointer;
+				no = *scan - kRegExpOpen;
+				save = fStringInputPointer;
 
-					if (Match(next)) {
-						//
-						// Don't set startp if some later
-						// invocation of the same parentheses
-						// already has.
-						//
-						if (fStartPArrayPointer[no] == NULL)
-							fStartPArrayPointer[no] = save;
-						return 1;
-					} else
-						return 0;
-				}
-				break;
+				if (Match(next)) {
+					//
+					// Don't set startp if some later
+					// invocation of the same parentheses
+					// already has.
+					//
+					if (fStartPArrayPointer[no] == NULL)
+						fStartPArrayPointer[no] = save;
+					return 1;
+				} else
+					return 0;
+			}
+			break;
+
 			case kRegExpClose + 1:
 			case kRegExpClose + 2:
 			case kRegExpClose + 3:
@@ -1035,45 +1115,49 @@ RegExp::Match(const char* prog) const
 			case kRegExpClose + 7:
 			case kRegExpClose + 8:
 			case kRegExpClose + 9:
-				{
-					int32 no;
-					const char* save;
+			{
+				int32 no;
+				const char* save;
 
-					no = *scan - kRegExpClose;
-					save = fStringInputPointer;
+				no = *scan - kRegExpClose;
+				save = fStringInputPointer;
 
-					if (Match(next)) {
-						//
-						// Don't set endp if some later
-						// invocation of the same parentheses
-						// already has.
-						//
-						if (fEndPArrayPointer[no] == NULL)
-							fEndPArrayPointer[no] = save;
-						return 1;
-					} else
-						return 0;
-				}
-				break;
+				if (Match(next)) {
+					//
+					// Don't set endp if some later
+					// invocation of the same parentheses
+					// already has.
+					//
+					if (fEndPArrayPointer[no] == NULL)
+						fEndPArrayPointer[no] = save;
+					return 1;
+				} else
+					return 0;
+			}
+			break;
+
 			case kRegExpBranch:
-				{
-					const char* save;
+			{
+				const char* save;
 
-					if (*next != kRegExpBranch)		// No choice.
-						next = Operand(scan);	// Avoid recursion.
-					else {
-						do {
-							save = fStringInputPointer;
-							if (Match(Operand(scan)))
-								return 1;
-							fStringInputPointer = save;
-							scan = Next(scan);
-						} while (scan != NULL && *scan == kRegExpBranch);
-						return 0;
-						// NOTREACHED/
-					}
+				if (*next != kRegExpBranch) {
+					// no choice
+					next = Operand(scan);
+						// avoid recursion
+				} else {
+					do {
+						save = fStringInputPointer;
+						if (Match(Operand(scan)))
+							return 1;
+						fStringInputPointer = save;
+						scan = Next(scan);
+					} while (scan != NULL && *scan == kRegExpBranch);
+					return 0;
+					// NOTREACHED
 				}
-				break;
+			}
+			break;
+
 			case kRegExpStar:
 			case kRegExpPlus:
 				{
@@ -1083,7 +1167,7 @@ RegExp::Match(const char* prog) const
 					int32 min;
 
 					//
-					//Lookahead to avoid useless match attempts
+					// Lookahead to avoid useless match attempts
 					// when we know what character comes next.
 					//
 					nextch = '\0';
@@ -1093,19 +1177,22 @@ RegExp::Match(const char* prog) const
 					save = fStringInputPointer;
 					no = Repeat(Operand(scan));
 					while (no >= min) {
-						// If it could work, try it.
-						if (nextch == '\0' || *fStringInputPointer == nextch)
+						// if it could work, try it
+						if (nextch == '\0' || *fStringInputPointer == nextch) {
 							if (Match(next))
 								return 1;
-						// Couldn't or didn't -- back up.
+						}
+						// couldn't or didn't, back up
 						no--;
 						fStringInputPointer = save + no;
 					}
 					return 0;
 				}
 				break;
+
 			case kRegExpEnd:
-				return 1;	// Success!
+				return 1;
+					// Success!
 
 			default:
 				SetError(REGEXP_MEMORY_CORRUPTION);
@@ -1120,6 +1207,7 @@ RegExp::Match(const char* prog) const
 	// the terminating point.
 	//
 	SetError(REGEXP_CORRUPTED_POINTERS);
+
 	return 0;
 }
 
@@ -1163,9 +1251,11 @@ RegExp::Repeat(const char* p) const
 			}
 			break;
 
-		default:		// Oh dear.  Called inappropriately.
+		default:
+			// oh dear, called inappropriately
 			SetError(REGEXP_INTERNAL_ERROR);
-			count = 0;	// Best compromise.
+			count = 0;
+				// best compromise
 			break;
 	}
 	fStringInputPointer = scan;
@@ -1253,22 +1343,27 @@ void
 RegExp::Dump()
 {
 	const char* s;
-	char op = kRegExpExactly;	// Arbitrary non-kRegExpEnd op.
+	char op = kRegExpExactly;
+		// Arbitrary non-kRegExpEnd op.
 	const char* next;
 
 	s = fRegExp->program + 1;
-	while (op != kRegExpEnd) {	// While that wasn't kRegExpEnd last time...
+	while (op != kRegExpEnd) {
+		// While that wasn't kRegExpEnd last time...
 		op = *s;
-		printf("%2ld%s", s - fRegExp->program, Prop(s));	// Where, what.
+		printf("%2ld%s", s - fRegExp->program, Prop(s));
+			// Where, what.
 		next = Next(s);
-		if (next == NULL)		// Next ptr.
+		if (next == NULL) {
+			// next ptr
 			printf("(0)");
-		else
+		} else
 			printf("(%ld)", (s - fRegExp->program) + (next - s));
+
 		s += 3;
 		if (op == kRegExpAnyOf || op == kRegExpAnyBut
 			|| op == kRegExpExactly) {
-			// Literal string, where present.
+			// literal string, where present
 			while (*s != '\0') {
 				putchar(*s);
 				s++;
@@ -1278,13 +1373,16 @@ RegExp::Dump()
 		putchar('\n');
 	}
 
-	// Header fields of interest.
+	// header fields of interest
 	if (fRegExp->regstart != '\0')
 		printf("start `%c' ", fRegExp->regstart);
+
 	if (fRegExp->reganch)
 		printf("anchored ");
+
 	if (fRegExp->regmust != NULL)
 		printf("must have \"%s\"", fRegExp->regmust);
+
 	printf("\n");
 }
 
@@ -1298,39 +1396,49 @@ RegExp::Prop(const char* op) const
 	const char* p = NULL;
 	static char buf[50];
 
-	(void) strcpy(buf, ":");
+	strcpy(buf, ":");
 
 	switch (*op) {
 		case kRegExpBol:
 			p = "kRegExpBol";
 			break;
+
 		case kRegExpEol:
 			p = "kRegExpEol";
 			break;
+
 		case kRegExpAny:
 			p = "kRegExpAny";
 			break;
+
 		case kRegExpAnyOf:
 			p = "kRegExpAnyOf";
 			break;
+
 		case kRegExpAnyBut:
 			p = "kRegExpAnyBut";
 			break;
+
 		case kRegExpBranch:
 			p = "kRegExpBranch";
 			break;
+
 		case kRegExpExactly:
 			p = "kRegExpExactly";
 			break;
+
 		case kRegExpNothing:
 			p = "kRegExpNothing";
 			break;
+
 		case kRegExpBack:
 			p = "kRegExpBack";
 			break;
+
 		case kRegExpEnd:
 			p = "kRegExpEnd";
 			break;
+
 		case kRegExpOpen + 1:
 		case kRegExpOpen + 2:
 		case kRegExpOpen + 3:
@@ -1343,6 +1451,7 @@ RegExp::Prop(const char* op) const
 			sprintf(buf + strlen(buf), "kRegExpOpen%d", *op - kRegExpOpen);
 			p = NULL;
 			break;
+
 		case kRegExpClose + 1:
 		case kRegExpClose + 2:
 		case kRegExpClose + 3:
@@ -1355,12 +1464,15 @@ RegExp::Prop(const char* op) const
 			sprintf(buf + strlen(buf), "kRegExpClose%d", *op - kRegExpClose);
 			p = NULL;
 			break;
+
 		case kRegExpStar:
 			p = "kRegExpStar";
 			break;
+
 		case kRegExpPlus:
 			p = "kRegExpPlus";
 			break;
+
 		default:
 			RegExpError("corrupted opcode");
 			break;
@@ -1379,4 +1491,4 @@ RegExp::RegExpError(const char*) const
 	// does nothing now, perhaps it should printf?
 }
 
-#endif
+#endif	// DEBUG
