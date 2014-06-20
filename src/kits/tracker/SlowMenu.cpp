@@ -36,15 +36,19 @@ All rights reserved.
 #include "SlowMenu.h"
 
 
-BSlowMenu::BSlowMenu(const char* title, menu_layout layout)
-	:	BMenu(title, layout),
-		fMenuBuilt(false)
-{
-}
-
-
 const int32 kItemsToAddChunk = 20;
 const bigtime_t kMaxTimeBuildingMenu = 200000;
+
+
+//	#pragma mark - BSlowMenu
+
+
+BSlowMenu::BSlowMenu(const char* title, menu_layout layout)
+	:
+	BMenu(title, layout),
+	fMenuBuilt(false)
+{
+}
 
 
 bool

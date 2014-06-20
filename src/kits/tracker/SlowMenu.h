@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __SLOW_MENU__
-#define __SLOW_MENU__
+#ifndef _SLOW_MENU_H
+#define _SLOW_MENU_H
 
 
 // SlowMenu is a convenience class that makes it easier to
@@ -49,31 +49,32 @@ All rights reserved.
 namespace BPrivate {
 
 class BSlowMenu : public BMenu {
-	public:
-		BSlowMenu(const char* title, menu_layout layout = B_ITEMS_IN_COLUMN);
+public:
+	BSlowMenu(const char* title, menu_layout layout = B_ITEMS_IN_COLUMN);
 
-	protected:
-		virtual bool StartBuildingItemList();
-			// set up state to start building the item list
-			// returns false if setup failed
-		virtual bool AddNextItem() = 0;
-			// returns false if done
-		virtual void DoneBuildingItemList() = 0;
-			// default version adds items from itemList to menu and deletes
-			// the list; override to sort items first, etc.
+protected:
+	virtual bool StartBuildingItemList();
+		// set up state to start building the item list
+		// returns false if setup failed
+	virtual bool AddNextItem() = 0;
+		// returns false if done
+	virtual void DoneBuildingItemList() = 0;
+		// default version adds items from itemList to menu and deletes
+		// the list; override to sort items first, etc.
 
-		virtual void ClearMenuBuildingState() = 0;
+	virtual void ClearMenuBuildingState() = 0;
 
-	protected:
-		virtual bool AddDynamicItem(add_state state);
-			// this is the callback from BMenu, you shouldn't need to
-			// override this
+protected:
+	virtual bool AddDynamicItem(add_state state);
+		// this is the callback from BMenu, you shouldn't need to
+		// override this
 
-		bool fMenuBuilt;
+	bool fMenuBuilt;
 };
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif	// __SLOW_MENU__
+
+#endif	// _SLOW_MENU_H
