@@ -49,12 +49,13 @@ PoseList::FindPose(const node_ref* node, int32* resultingIndex) const
 		BPose* pose = ItemAt(index);
 		ASSERT(pose->TargetModel());
 		if (*pose->TargetModel()->NodeRef() == *node) {
-			if (resultingIndex)
+			if (resultingIndex != NULL)
 				*resultingIndex = index;
 
 			return pose;
 		}
 	}
+
 	return NULL;
 }
 
@@ -67,7 +68,7 @@ PoseList::FindPose(const entry_ref* entry, int32* resultingIndex) const
 		BPose* pose = ItemAt(index);
 		ASSERT(pose->TargetModel());
 		if (*pose->TargetModel()->EntryRef() == *entry) {
-			if (resultingIndex)
+			if (resultingIndex != NULL)
 				*resultingIndex = index;
 
 			return pose;
@@ -92,7 +93,7 @@ PoseList::DeepFindPose(const node_ref* node, int32* resultingIndex) const
 		BPose* pose = ItemAt(index);
 		Model* model = pose->TargetModel();
 		if (*model->NodeRef() == *node) {
-			if (resultingIndex)
+			if (resultingIndex != NULL)
 				*resultingIndex = index;
 
 			return pose;
@@ -101,8 +102,8 @@ PoseList::DeepFindPose(const node_ref* node, int32* resultingIndex) const
 		// of the link
 		if (model->IsSymLink()) {
 			model = model->LinkTo();
-			if (model && *model->NodeRef() == *node) {
-				if (resultingIndex)
+			if (model != NULL && *model->NodeRef() == *node) {
+				if (resultingIndex != NULL)
 					*resultingIndex = index;
 
 				return pose;
@@ -142,6 +143,7 @@ PoseList::FindAllPoses(const node_ref* node) const
 				result->AddItem(pose);
 		}
 	}
+
 	return result;
 }
 
@@ -154,11 +156,12 @@ PoseList::FindPoseByFileName(const char* name, int32* _index) const
 		BPose* pose = ItemAt(index);
 		ASSERT(pose->TargetModel());
 		if (strcmp(pose->TargetModel()->EntryRef()->name, name) == 0) {
-			if (_index)
+			if (_index != NULL)
 				*_index = index;
 
 			return pose;
 		}
 	}
+
 	return NULL;
 }
