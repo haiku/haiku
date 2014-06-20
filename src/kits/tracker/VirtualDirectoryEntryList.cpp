@@ -18,6 +18,8 @@
 
 namespace BPrivate {
 
+//	#pragma mark - VirtualDirectoryEntryList
+
 
 VirtualDirectoryEntryList::VirtualDirectoryEntryList(Model* model)
 	:
@@ -148,6 +150,5 @@ VirtualDirectoryEntryList::_InitMergedDirectory(
 
 	return B_OK;
 }
-
 
 } // namespace BPrivate

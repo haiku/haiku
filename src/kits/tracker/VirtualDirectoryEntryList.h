@@ -5,8 +5,8 @@
  * Authors:
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
-#ifndef VIRTUAL_DIRECTORY_ENTRY_LIST_H
-#define VIRTUAL_DIRECTORY_ENTRY_LIST_H
+#ifndef _VIRTUAL_DIRECTORY_ENTRY_LIST_H
+#define _VIRTUAL_DIRECTORY_ENTRY_LIST_H
 
 
 #include <StringList.h>
@@ -18,9 +18,7 @@
 
 namespace BPrivate {
 
-
 class Model;
-
 
 class VirtualDirectoryEntryList : public EntryListBase {
 public:
@@ -50,8 +48,7 @@ private:
 			BMergedDirectory	fMergedDirectory;
 };
 
-
 } // namespace BPrivate
 
 
-#endif	// VIRTUAL_DIRECTORY_ENTRY_LIST_H
+#endif	// _VIRTUAL_DIRECTORY_ENTRY_LIST_H
