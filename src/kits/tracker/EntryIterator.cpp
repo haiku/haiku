@@ -32,8 +32,10 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include <Debug.h>
 #include <Entry.h>
+#include <ObjectList.h>
 #include <Path.h>
 
 #include <new>
@@ -41,7 +43,9 @@ All rights reserved.
 
 #include "EntryIterator.h"
 #include "NodeWalker.h"
-#include "ObjectList.h"
+
+
+//	#pragma mark - TWalkerWrapper
 
 
 TWalkerWrapper::TWalkerWrapper(BTrackerPrivate::TWalker* walker)
@@ -69,6 +73,7 @@ status_t
 TWalkerWrapper::GetNextEntry(BEntry* entry, bool traverse)
 {
 	fStatus = fWalker->GetNextEntry(entry, traverse);
+
 	return fStatus;
 }
 
@@ -77,6 +82,7 @@ status_t
 TWalkerWrapper::GetNextRef(entry_ref* ref)
 {
 	fStatus = fWalker->GetNextRef(ref);
+
 	return fStatus;
 }
 
@@ -87,6 +93,7 @@ TWalkerWrapper::GetNextDirents(struct dirent* buffer, size_t length,
 {
 	int32 result = fWalker->GetNextDirents(buffer, length, count);
 	fStatus = result < B_OK ? result : (result ? B_OK : B_ENTRY_NOT_FOUND);
+
 	return result;
 }
 
@@ -105,11 +112,12 @@ TWalkerWrapper::CountEntries()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - EntryListBase
 
 
 EntryListBase::EntryListBase()
-	:	fStatus(B_OK)
+	:
+	fStatus(B_OK)
 {
 }
 
@@ -128,11 +136,11 @@ EntryListBase::Next(dirent* ent)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - CachedEntryIterator
 
 
 CachedEntryIterator::CachedEntryIterator(BEntryList* iterator,
-		int32 numEntries, bool sortInodes)
+	int32 numEntries, bool sortInodes)
 	:
 	fIterator(iterator),
 	fEntryRefBuffer(NULL),
@@ -163,10 +171,11 @@ CachedEntryIterator::GetNextEntry(BEntry* result, bool traverse)
 	ASSERT(!fDirentBuffer);
 	ASSERT(!fEntryRefBuffer);
 
-	if (!fEntryBuffer) {
+	if (fEntryBuffer == NULL) {
 		fEntryBuffer = new BEntry [fCacheSize];
 		ASSERT(fIndex == 0 && fNumEntries == 0);
 	}
+
 	if (fIndex >= fNumEntries) {
 		// fill up the buffer or stop if error; keep error around
 		// and return it when appropriate
@@ -179,6 +188,7 @@ CachedEntryIterator::GetNextEntry(BEntry* result, bool traverse)
 		}
 		fIndex = 0;
 	}
+
 	*result = fEntryBuffer[fIndex++];
 	if (fIndex > fNumEntries) {
 		// we are at the end of the cache we loaded up, time to return
@@ -193,10 +203,10 @@ CachedEntryIterator::GetNextEntry(BEntry* result, bool traverse)
 status_t
 CachedEntryIterator::GetNextRef(entry_ref* ref)
 {
-	ASSERT(!fDirentBuffer);
-	ASSERT(!fEntryBuffer);
+	ASSERT(fDirentBuffer == NULL);
+	ASSERT(fEntryBuffer == NULL);
 
-	if (!fEntryRefBuffer) {
+	if (fEntryRefBuffer == NULL) {
 		fEntryRefBuffer = new entry_ref[fCacheSize];
 		ASSERT(fIndex == 0 && fNumEntries == 0);
 	}
@@ -212,11 +222,13 @@ CachedEntryIterator::GetNextRef(entry_ref* ref)
 		}
 		fIndex = 0;
 	}
+
 	*ref = fEntryRefBuffer[fIndex++];
-	if (fIndex > fNumEntries)
+	if (fIndex > fNumEntries) {
 		// we are at the end of the cache we loaded up, time to return
 		// an error, if we had one
 		return fStatus;
+	}
 
 	return B_OK;
 }
@@ -227,6 +239,7 @@ CachedEntryIterator::_CompareInodes(const dirent* ent1, const dirent* ent2)
 {
 	if (ent1->d_ino < ent2->d_ino)
 		return -1;
+
 	if (ent1->d_ino == ent2->d_ino)
 		return 0;
 
@@ -238,14 +251,14 @@ int32
 CachedEntryIterator::GetNextDirents(struct dirent* ent, size_t size,
 	int32 count)
 {
-	ASSERT(!fEntryRefBuffer);
-	if (!fDirentBuffer) {
+	ASSERT(fEntryRefBuffer == NULL);
+	if (fDirentBuffer == NULL) {
 		fDirentBuffer = (dirent*)malloc(kDirentBufferSize);
 		ASSERT(fIndex == 0 && fNumEntries == 0);
 		ASSERT(size > sizeof(dirent) + B_FILE_NAME_LENGTH);
 	}
 
-	if (!count)
+	if (count == 0)
 		return 0;
 
 	if (fIndex >= fNumEntries) {
@@ -346,11 +359,12 @@ CachedEntryIterator::SetTo(BEntryList* iterator)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - CachedDirectoryEntryList
 
 
 CachedDirectoryEntryList::CachedDirectoryEntryList(const BDirectory &dir)
-	: CachedEntryIterator(0, 40, true),
+	:
+	CachedEntryIterator(0, 40, true),
 	fDir(dir)
 {
 	fStatus = fDir.InitCheck();
@@ -363,7 +377,7 @@ CachedDirectoryEntryList::~CachedDirectoryEntryList()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - DirectoryEntryList
 
 
 DirectoryEntryList::DirectoryEntryList(const BDirectory &dir)
@@ -414,7 +428,7 @@ DirectoryEntryList::CountEntries()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - EntryIteratorList
 
 
 EntryIteratorList::EntryIteratorList()
@@ -535,11 +549,12 @@ EntryIteratorList::CountEntries()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - CachedEntryIteratorList
 
 
 CachedEntryIteratorList::CachedEntryIteratorList(bool sortInodes)
-	: CachedEntryIterator(NULL, 10, sortInodes)
+	:
+	CachedEntryIterator(NULL, 10, sortInodes)
 {
 	fStatus = B_OK;
 	SetTo(&fIteratorList);

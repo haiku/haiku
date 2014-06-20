@@ -31,19 +31,19 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __ENTRY_ITERATOR__
-#define __ENTRY_ITERATOR__
-
 
 //  A lot of the code in here wouldn't be needed if the destructor
 //  for BEntryList was virtual
 
 // TODO: get rid of all BEntryList API's in here, replace them with
 //       EntryListBase ones
+#ifndef _ENTRY_ITERATOR_H
+#define _ENTRY_ITERATOR_H
 
 
 #include <Directory.h>
-#include "ObjectList.h"
+#include <ObjectList.h>
+
 #include "NodeWalker.h"
 
 
@@ -207,4 +207,5 @@ protected:
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _ENTRY_ITERATOR_H
