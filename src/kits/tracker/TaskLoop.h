@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __TASK_LOOP__
-#define __TASK_LOOP__
+#ifndef _TASK_LOOP_H
+#define _TASK_LOOP_H
 
 
 // Delayed Tasks, Periodic Delayed Tasks, Periodic Delayed Tasks with timeout,
@@ -40,9 +40,9 @@ All rights reserved.
 
 
 #include <Locker.h>
+#include <ObjectList.h>
 
 #include "FunctionObject.h"
-#include "ObjectList.h"
 
 
 namespace BPrivate {
@@ -259,4 +259,5 @@ DelayedTask::RunAfterTime() const
 
 using namespace BPrivate;
 
-#endif	// __TASK_LOOP__
+
+#endif	// _TASK_LOOP_H

@@ -64,10 +64,15 @@ const char* kTemplatesDirectory = "Tracker/Tracker New Templates";
 
 } // namespace BPrivate
 
+
+//	#pragma mark - TemplatesMenu
+
+
 TemplatesMenu::TemplatesMenu(const BMessenger &target, const char* label)
-	:	BMenu(label),
-		fTarget(target),
-		fOpenItem(NULL)
+	:
+	BMenu(label),
+	fTarget(target),
+	fOpenItem(NULL)
 {
 }
 
@@ -118,19 +123,19 @@ TemplatesMenu::UpdateMenuState()
 bool
 TemplatesMenu::BuildMenu(bool addItems)
 {
-	// Clear everything...
+	// clear everything...
 	fOpenItem = NULL;
 	int32 count = CountItems();
 	while (count--)
 		delete RemoveItem((int32)0);
 
-	// Add the Folder
+	// add the folder
 	IconMenuItem* menuItem = new IconMenuItem(B_TRANSLATE("New folder"),
 		new BMessage(kNewFolder), B_DIR_MIMETYPE, B_MINI_ICON);
 	AddItem(menuItem);
 	menuItem->SetShortcut('N', 0);
 
-	// The Templates folder
+	// the templates folder
 	BPath path;
 	find_directory (B_USER_SETTINGS_DIRECTORY, &path, true);
 	path.Append(kTemplatesDirectory);
@@ -176,16 +181,17 @@ TemplatesMenu::BuildMenu(bool addItems)
 
 	AddSeparatorItem();
 
-	// This is the message sent to open the templates folder.
+	// this is the message sent to open the templates folder
 	BMessage* message = new BMessage(B_REFS_RECEIVED);
 	entry_ref dirRef;
 	if (templatesDir.GetEntry(&entry) == B_OK)
 		entry.GetRef(&dirRef);
+
 	message->AddRef("refs", &dirRef);
 
-	// Add item to show templates folder.
-	fOpenItem =	new BMenuItem(B_TRANSLATE("Edit templates" B_UTF8_ELLIPSIS),
-			message);
+	// add item to show templates folder
+	fOpenItem = new BMenuItem(B_TRANSLATE("Edit templates" B_UTF8_ELLIPSIS),
+		message);
 	AddItem(fOpenItem);
 	if (dirRef == entry_ref())
 		fOpenItem->SetEnabled(false);
