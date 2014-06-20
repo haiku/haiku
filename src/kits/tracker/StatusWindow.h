@@ -31,17 +31,16 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef STATUS_WINDOW_H
-#define STATUS_WINDOW_H
+#ifndef _STATUS_WINDOW_H
+#define _STATUS_WINDOW_H
 
 
-#include <Window.h>
-#include <View.h>
 #include <Bitmap.h>
+#include <ObjectList.h>
 #include <StatusBar.h>
 #include <String.h>
-
-#include "ObjectList.h"
+#include <View.h>
+#include <Window.h>
 
 
 namespace BPrivate {
@@ -204,4 +203,4 @@ extern BStatusWindow* gStatusWindow;
 using namespace BPrivate;
 
 
-#endif // STATUS_WINDOW_H
+#endif // _STATUS_WINDOW_H

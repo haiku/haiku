@@ -58,7 +58,11 @@ All rights reserved.
 #include "DeskWindow.h"
 
 
-const float	kDefaultStatusViewHeight = 50;
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "StatusWindow"
+
+
+const float kDefaultStatusViewHeight = 50;
 const bigtime_t kMaxUpdateInterval = 100000LL;
 const bigtime_t kSpeedReferenceInterval = 2000000LL;
 const bigtime_t kShowSpeedInterval = 8000000LL;
@@ -68,6 +72,7 @@ const BRect kStatusRect(200, 200, 550, 200);
 static bigtime_t sLastEstimatedFinishSpeedToggleTime = -1;
 static bool sShowSpeed = true;
 static const time_t kSecondsPerDay = 24 * 60 * 60;
+
 
 class TCustomButton : public BButton {
 public:
@@ -88,6 +93,9 @@ public:
 namespace BPrivate {
 BStatusWindow* gStatusWindow = NULL;
 }
+
+
+//	#pragma mark - BStatusMouseFilter
 
 
 BStatusMouseFilter::BStatusMouseFilter()
@@ -113,6 +121,9 @@ BStatusMouseFilter::Filter(BMessage* message, BHandler** target)
 
 	return B_DISPATCH_MESSAGE;
 }
+
+
+//	#pragma mark - TCustomButton
 
 
 TCustomButton::TCustomButton(BRect frame, uint32 what)
@@ -154,13 +165,14 @@ TCustomButton::Draw(BRect updateRect)
 }
 
 
-// #pragma mark -
+// #pragma mark - StatusBackgroundView
 
 
 class StatusBackgroundView : public BView {
 public:
 	StatusBackgroundView(BRect frame)
-		: BView(frame, "BackView", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED)
+		:
+		BView(frame, "BackView", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED)
 	{
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	}
@@ -183,11 +195,7 @@ public:
 };
 
 
-// #pragma mark - BStatusWindow
-
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "StatusWindow"
+//	#pragma mark - BStatusWindow
 
 
 BStatusWindow::BStatusWindow()
@@ -611,9 +619,6 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 		case kRestoreFromTrashState:
 			fStatusBar->Reset(B_TRANSLATE("Restoring: "), buffer.String());
 			break;
-
-		default:
-			break;
 	}
 
 	fStatusBar->SetMaxValue(1);
@@ -756,6 +761,7 @@ BStatusView::_FullSpeedString()
 		buffer.ReplaceFirst("%BytesPerSecond",
 			string_for_size(fBytesPerSecond, sizeBuffer, sizeof(sizeBuffer)));
 	}
+
 	return buffer;
 }
 
@@ -770,6 +776,7 @@ BStatusView::_ShortSpeedString()
 		buffer.ReplaceFirst("%BytesPerSecond",
 			string_for_size(fBytesPerSecond, sizeBuffer, sizeof(sizeBuffer)));
 	}
+
 	return buffer;
 }
 
@@ -804,6 +811,7 @@ BStatusView::_TimeStatusString(float availableSpace, float* _width)
 
 	if (_width != NULL)
 		*_width = width;
+
 	return string;
 }
 
