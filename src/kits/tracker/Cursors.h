@@ -1,12 +1,12 @@
 /*
- * Copyright 2009, Haiku Inc. All rights reserved.
+ * Copyright 2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * 		Alexandre Deckner <alex@zappotek.com>
+ *		Alexandre Deckner, alex@zappotek.com
  */
-#ifndef CURSORS_H
-#define CURSORS_H
+#ifndef _CURSORS_H
+#define _CURSORS_H
 
 
 // Exported with Wonderbrush from haiku/data/artwork/cursors/Overlays_Tracker
@@ -47,4 +47,5 @@ const unsigned char kHelpCursor[] = {16, 1, 0, 1,
 	0xff, 0xfe, 0xff, 0xfe, 0x7f, 0xff, 0x1f, 0xff,
 	0x07, 0xfe, 0x01, 0xfc, 0x00, 0x08, 0x00, 0x1c};
 
-#endif // CURSORS_H
+
+#endif	// _CURSORS_H
