@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef _SETTINGS_H_
-#define _SETTINGS_H_
+#ifndef _SETTINGS_H
+#define _SETTINGS_H
 
 
 #include <String.h>
@@ -138,4 +138,5 @@ protected:
 
 using namespace BPrivate;
 
-#endif	// _SETTINGS_H_
+
+#endif	// _SETTINGS_H
