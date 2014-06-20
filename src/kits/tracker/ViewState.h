@@ -423,4 +423,5 @@ BViewState::StateNeedsSaving()
 
 using namespace BPrivate;
 
+
 #endif	// _VIEW_STATE_H

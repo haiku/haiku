@@ -78,6 +78,9 @@ static const int32 kColumnStateMinArchiveVersion = 21;
 	// bump version when layout changes
 
 
+//	#pragma mark - BColumn
+
+
 BColumn::BColumn(const char* title, float offset, float width,
 	alignment align, const char* attributeName, uint32 attrType,
 	const char* displayAs, bool statField, bool editable)
@@ -244,7 +247,7 @@ BColumn::ArchiveToMessage(BMessage &message) const
 }
 
 
-BColumn *
+BColumn*
 BColumn::_Sanitize(BColumn* column)
 {
 	if (column == NULL)
@@ -273,7 +276,7 @@ BColumn::_Sanitize(BColumn* column)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BViewState
 
 
 BViewState::BViewState()
@@ -469,15 +472,19 @@ BViewState::_Sanitize(BViewState* state, bool fixOnly)
 	if (state->fViewMode == kListMode) {
 		if (state->fListOrigin.x < 0)
 			state->fListOrigin.x = 0;
+
 		if (state->fListOrigin.y < 0)
 			state->fListOrigin.y = 0;
 	}
 	if (state->fIconSize < 16)
 		state->fIconSize = 16;
+
 	if (state->fIconSize > 128)
 		state->fIconSize = 128;
+
 	if (state->fLastIconSize < 16)
 		state->fLastIconSize = 16;
+
 	if (state->fLastIconSize > 128)
 		state->fLastIconSize = 128;
 
