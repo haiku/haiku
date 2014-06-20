@@ -60,13 +60,14 @@ DimmedIconBlitter(BView* view, BPoint where, BBitmap* bitmap, void*)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - ModelMenuItem
 
 
 ModelMenuItem::ModelMenuItem(const Model* model, const char* title,
-		BMessage* message, char shortcut, uint32 modifiers,
-		bool drawText, bool extraPad)
-	: BMenuItem(title, message, shortcut, modifiers),
+	BMessage* message, char shortcut, uint32 modifiers,
+	bool drawText, bool extraPad)
+	:
+	BMenuItem(title, message, shortcut, modifiers),
 	fModel(*model),
 	fHeightDelta(0),
 	fDrawText(drawText),
@@ -90,11 +91,12 @@ ModelMenuItem::ModelMenuItem(const Model* model, const char* title,
 
 ModelMenuItem::ModelMenuItem(const Model* model, BMenu* menu, bool drawText,
 	bool extraPad)
-	:	BMenuItem(menu),
-		fModel(*model),
-		fHeightDelta(0),
-		fDrawText(drawText),
-		fExtraPad(extraPad)
+	:
+	BMenuItem(menu),
+	fModel(*model),
+	fHeightDelta(0),
+	fDrawText(drawText),
+	fExtraPad(extraPad)
 {
 	ThrowOnInitCheckError(&fModel);
 	// ModelMenuItem is used in synchronously invoked menus, make sure
@@ -184,16 +186,16 @@ ModelMenuItem::GetContentSize(float* width, float* height)
 status_t
 ModelMenuItem::Invoke(BMessage* message)
 {
-	if (!Menu())
+	if (Menu() == NULL)
 		return B_ERROR;
 
 	if (!IsEnabled())
 		return B_ERROR;
 
-	if (!message)
+	if (message == NULL)
 		message = Message();
 
-	if (!message)
+	if (message == NULL)
 		return B_BAD_VALUE;
 
 	BMessage clone(*message);
@@ -211,7 +213,7 @@ ModelMenuItem::Invoke(BMessage* message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - SpecialModelMenuItem
 
 
 /*!
@@ -240,7 +242,7 @@ SpecialModelMenuItem::DrawContent()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - IconMenuItem
 
 
 /*!
@@ -248,7 +250,8 @@ SpecialModelMenuItem::DrawContent()
 	It's currently used in the mount and new file template menus.
 */
 IconMenuItem::IconMenuItem(const char* label, BMessage* message, BBitmap* icon)
-	: PositionPassingMenuItem(label, message),
+	:
+	PositionPassingMenuItem(label, message),
 	fDeviceIcon(icon),
 	fHeightDelta(0)
 {
@@ -259,8 +262,9 @@ IconMenuItem::IconMenuItem(const char* label, BMessage* message, BBitmap* icon)
 
 
 IconMenuItem::IconMenuItem(const char* label, BMessage* message,
-		const BNodeInfo* nodeInfo, icon_size which)
-	: PositionPassingMenuItem(label, message),
+	const BNodeInfo* nodeInfo, icon_size which)
+	:
+	PositionPassingMenuItem(label, message),
 	fDeviceIcon(NULL),
 	fHeightDelta(0)
 {
@@ -284,8 +288,9 @@ IconMenuItem::IconMenuItem(const char* label, BMessage* message,
 
 
 IconMenuItem::IconMenuItem(const char* label, BMessage* message,
-		const char* iconType, icon_size which)
-	: PositionPassingMenuItem(label, message),
+	const char* iconType, icon_size which)
+	:
+	PositionPassingMenuItem(label, message),
 	fDeviceIcon(NULL),
 	fHeightDelta(0)
 {
@@ -312,8 +317,9 @@ IconMenuItem::IconMenuItem(const char* label, BMessage* message,
 
 
 IconMenuItem::IconMenuItem(BMenu* submenu, BMessage* message,
-		const char* iconType, icon_size which)
-	: PositionPassingMenuItem(submenu, message),
+	const char* iconType, icon_size which)
+	:
+	PositionPassingMenuItem(submenu, message),
 	fDeviceIcon(NULL),
 	fHeightDelta(0)
 {
@@ -393,4 +399,3 @@ IconMenuItem::DrawContent()
 
 	Menu()->PopState();
 }
-
