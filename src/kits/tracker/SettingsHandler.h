@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __SETTINGS_FILE__
-#define __SETTINGS_FILE__
+#ifndef _SETTINGS_FILE_H
+#define _SETTINGS_FILE_H
 
 
 #include <SupportDefs.h>
@@ -55,6 +55,7 @@ typedef const char* (*ArgvHandler)(int argc, const char* const *argv,
 	// return 0 or error string if parsing failed
 
 const int32 kBufferSize = 1024;
+
 
 class ArgvParser {
 	// this class opens a text file and passes the context in argv
@@ -101,6 +102,7 @@ private:
 	const char* fFileName;
 };
 
+
 class SettingsArgvDispatcher {
 	// base class for a single setting item
 public:
@@ -127,8 +129,7 @@ protected:
 		// override this to save the current value of this setting in a
 		// text format
 
-	virtual bool NeedsSaving() const
-		{ return true; }
+	virtual bool NeedsSaving() const { return true; }
 		// override to return false if current value is equal to the default
 		// and does not need saving
 
@@ -169,8 +170,9 @@ private:
 	BFile* fCurrentSettings;
 };
 
-}
+}	// namespace BPrivate
 
 using namespace BPrivate;
 
-#endif	// __SETTINGS_FILE__
+
+#endif	// _SETTINGS_FILE_H
