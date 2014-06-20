@@ -36,8 +36,9 @@ All rights reserved.
 
 
 #include <Looper.h>
+#include <ObjectList.h>
+
 #include "Model.h"
-#include "ObjectList.h"
 #include "Pose.h"
 #include "PoseView.h"
 

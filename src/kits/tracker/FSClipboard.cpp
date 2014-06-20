@@ -32,12 +32,15 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "FSClipboard.h"
+
 #include <Clipboard.h>
 #include <Alert.h>
 #include <Catalog.h>
 #include <Locale.h>
 #include <NodeMonitor.h>
+
 #include "Commands.h"
 #include "FSUtils.h"
 #include "Tracker.h"
@@ -106,11 +109,12 @@ CompareModeAndRefName(const char* modeName, const char* refName)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - FSClipBoard
 
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "FSClipBoard"
+
 
 bool
 FSClipboardHasRefs()
@@ -196,7 +200,6 @@ FSClipboardClear()
  *	It will check if the entries are already present, so that there can only
  *	be one reference to them in the clipboard.
  */
-
 uint32
 FSClipboardAddPoses(const node_ref* directory, PoseList* list,
 	uint32 moveMode, bool clearClipboard)
