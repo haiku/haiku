@@ -105,7 +105,7 @@ const uint32 kPasteAttributes = 'Tpat';
 const uint32 kAttributeItem = 'Tatr';
 const uint32 kMIMETypeItem = 'Tmim';
 const uint32 kAddCurrentDir = 'Tadd';
-const uint32 kEditFavorites	= 'Tedf';
+const uint32 kEditFavorites = 'Tedf';
 const uint32 kSwitchDirectory = 'Tswd';
 const uint32 kQuitTracker = 'Tqit';
 
@@ -147,4 +147,5 @@ const uint32 kAskBeforeDeleteFileChanged = 'STad';
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _COMMANDS_H
