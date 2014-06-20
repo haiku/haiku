@@ -31,14 +31,15 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __MINI_MENU_FIELD__
-#define __MINI_MENU_FIELD__
+#ifndef _MINI_MENU_FIELD_H
+#define _MINI_MENU_FIELD_H
 
 
 #include <View.h>
 
 
 class BPopUpMenu;
+
 
 namespace BPrivate {
 
@@ -67,4 +68,5 @@ private:
 
 using namespace BPrivate;
 
-#endif	// __MINI_MENU_FIELD__
+
+#endif	// _MINI_MENU_FIELD_H

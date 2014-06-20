@@ -44,8 +44,9 @@ All rights reserved.
 
 MiniMenuField::MiniMenuField(BRect frame, const char* name, BPopUpMenu* menu,
 	uint32 resizeFlags, uint32 flags)
-	:	BView(frame, name, resizeFlags, flags),
-		fMenu(menu)
+	:
+	BView(frame, name, resizeFlags, flags),
+	fMenu(menu)
 {
 	SetFont(be_plain_font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
 }
@@ -60,10 +61,11 @@ MiniMenuField::~MiniMenuField()
 void
 MiniMenuField::AttachedToWindow()
 {
-	if (Parent()) {
+	if (Parent() != NULL) {
 		SetViewColor(Parent()->ViewColor());
 		SetLowColor(Parent()->ViewColor());
 	}
+
 	SetHighColor(0, 0, 0);
 }
 
@@ -150,4 +152,3 @@ MiniMenuField::MouseDown(BPoint)
 {
 	fMenu->Go(ConvertToScreen(BPoint(4, 4)), true);
 }
-
