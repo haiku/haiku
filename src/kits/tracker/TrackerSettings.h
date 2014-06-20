@@ -42,91 +42,92 @@ All rights reserved.
 namespace BPrivate {
 
 enum FormatSeparator {
-		kNoSeparator,
-		kSpaceSeparator,
-		kMinusSeparator,
-		kSlashSeparator,
-		kBackslashSeparator,
-		kDotSeparator,
-		kSeparatorsEnd
+	kNoSeparator,
+	kSpaceSeparator,
+	kMinusSeparator,
+	kSlashSeparator,
+	kBackslashSeparator,
+	kDotSeparator,
+	kSeparatorsEnd
 };
 
 enum DateOrder {
-		kYMDFormat,
-		kDMYFormat,
-		kMDYFormat,
-		kDateFormatEnd
+	kYMDFormat,
+	kDMYFormat,
+	kMDYFormat,
+	kDateFormatEnd
 };
 
 
 class TrackerSettings {
-	public:
-		TrackerSettings();
+public:
+	TrackerSettings();
 
-		//TTrackerState* Settings() const { return fSettings; }
-		void SaveSettings(bool onlyIfNonDefault = true);
+	//TTrackerState* Settings() const { return fSettings; }
+	void SaveSettings(bool onlyIfNonDefault = true);
 
-		bool ShowDisksIcon();
-		void SetShowDisksIcon(bool);
-		bool DesktopFilePanelRoot();
-		void SetDesktopFilePanelRoot(bool);
-		bool MountVolumesOntoDesktop();
-		void SetMountVolumesOntoDesktop(bool);
-		bool MountSharedVolumesOntoDesktop();
-		void SetMountSharedVolumesOntoDesktop(bool);
-		bool EjectWhenUnmounting();
-		void SetEjectWhenUnmounting(bool);
+	bool ShowDisksIcon();
+	void SetShowDisksIcon(bool);
+	bool DesktopFilePanelRoot();
+	void SetDesktopFilePanelRoot(bool);
+	bool MountVolumesOntoDesktop();
+	void SetMountVolumesOntoDesktop(bool);
+	bool MountSharedVolumesOntoDesktop();
+	void SetMountSharedVolumesOntoDesktop(bool);
+	bool EjectWhenUnmounting();
+	void SetEjectWhenUnmounting(bool);
 
-		bool ShowVolumeSpaceBar();
-		void SetShowVolumeSpaceBar(bool);
-	 	rgb_color UsedSpaceColor();
-		void SetUsedSpaceColor(rgb_color color);
-	 	rgb_color FreeSpaceColor();
-		void SetFreeSpaceColor(rgb_color color);
-	 	rgb_color WarningSpaceColor();
-		void SetWarningSpaceColor(rgb_color color);
+	bool ShowVolumeSpaceBar();
+	void SetShowVolumeSpaceBar(bool);
+	rgb_color UsedSpaceColor();
+	void SetUsedSpaceColor(rgb_color color);
+	rgb_color FreeSpaceColor();
+	void SetFreeSpaceColor(rgb_color color);
+	rgb_color WarningSpaceColor();
+	void SetWarningSpaceColor(rgb_color color);
 
-		bool ShowFullPathInTitleBar();
-		void SetShowFullPathInTitleBar(bool);
-		bool SortFolderNamesFirst();
-		void SetSortFolderNamesFirst(bool);
-		bool HideDotFiles();
-		void SetHideDotFiles(bool hide);
-		bool TypeAheadFiltering();
-		void SetTypeAheadFiltering(bool enabled);
+	bool ShowFullPathInTitleBar();
+	void SetShowFullPathInTitleBar(bool);
+	bool SortFolderNamesFirst();
+	void SetSortFolderNamesFirst(bool);
+	bool HideDotFiles();
+	void SetHideDotFiles(bool hide);
+	bool TypeAheadFiltering();
+	void SetTypeAheadFiltering(bool enabled);
 
-		bool ShowSelectionWhenInactive();
-		void SetShowSelectionWhenInactive(bool);
-		bool TransparentSelection();
-		void SetTransparentSelection(bool);
+	bool ShowSelectionWhenInactive();
+	void SetShowSelectionWhenInactive(bool);
+	bool TransparentSelection();
+	void SetTransparentSelection(bool);
 
-		bool SingleWindowBrowse();
-		void SetSingleWindowBrowse(bool);
-		bool ShowNavigator();
-		void SetShowNavigator(bool);
+	bool SingleWindowBrowse();
+	void SetSingleWindowBrowse(bool);
+	bool ShowNavigator();
+	void SetShowNavigator(bool);
 
-		void RecentCounts(int32* applications, int32* documents,
-			int32* folders);
-		void SetRecentApplicationsCount(int32);
-		void SetRecentDocumentsCount(int32);
-		void SetRecentFoldersCount(int32);
+	void RecentCounts(int32* applications, int32* documents,
+		int32* folders);
+	void SetRecentApplicationsCount(int32);
+	void SetRecentDocumentsCount(int32);
+	void SetRecentFoldersCount(int32);
 
-		FormatSeparator TimeFormatSeparator();
-		void SetTimeFormatSeparator(FormatSeparator);
-		DateOrder DateOrderFormat();
-		void SetDateOrderFormat(DateOrder);
-		bool ClockIs24Hr();
-		void SetClockTo24Hr(bool);
+	FormatSeparator TimeFormatSeparator();
+	void SetTimeFormatSeparator(FormatSeparator);
+	DateOrder DateOrderFormat();
+	void SetDateOrderFormat(DateOrder);
+	bool ClockIs24Hr();
+	void SetClockTo24Hr(bool);
 
-		bool DontMoveFilesToTrash();
-		void SetDontMoveFilesToTrash(bool);
-		bool AskBeforeDeleteFile();
-		void SetAskBeforeDeleteFile(bool);
+	bool DontMoveFilesToTrash();
+	void SetDontMoveFilesToTrash(bool);
+	bool AskBeforeDeleteFile();
+	void SetAskBeforeDeleteFile(bool);
 
-	private:
-		//TTrackerState* fSettings;
+private:
+	//TTrackerState* fSettings;
 };
 
 } // namespace BPrivate
+
 
 #endif	// _TRACKER_SETTINGS_H

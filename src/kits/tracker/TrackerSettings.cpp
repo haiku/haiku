@@ -42,57 +42,58 @@ All rights reserved.
 
 
 class TTrackerState : public Settings {
-	public:
-		static TTrackerState* Get();
-		void Release();
+public:
+	static TTrackerState* Get();
+	void Release();
 
-		void LoadSettingsIfNeeded();
-		void SaveSettings(bool onlyIfNonDefault = true);
+	void LoadSettingsIfNeeded();
+	void SaveSettings(bool onlyIfNonDefault = true);
 
-		TTrackerState();
-		~TTrackerState();
+	TTrackerState();
+	~TTrackerState();
 
-	private:
-		friend class BPrivate::TrackerSettings;
+private:
+	friend class BPrivate::TrackerSettings;
 
-		static void InitIfNeeded();
-		TTrackerState(const TTrackerState&);
+	static void InitIfNeeded();
+	TTrackerState(const TTrackerState&);
 
-		BooleanValueSetting* fShowDisksIcon;
-		BooleanValueSetting* fMountVolumesOntoDesktop;
-		BooleanValueSetting* fDesktopFilePanelRoot;
-		BooleanValueSetting* fMountSharedVolumesOntoDesktop;
-		BooleanValueSetting* fEjectWhenUnmounting;
+	BooleanValueSetting* fShowDisksIcon;
+	BooleanValueSetting* fMountVolumesOntoDesktop;
+	BooleanValueSetting* fDesktopFilePanelRoot;
+	BooleanValueSetting* fMountSharedVolumesOntoDesktop;
+	BooleanValueSetting* fEjectWhenUnmounting;
 
-		BooleanValueSetting* fShowFullPathInTitleBar;
-		BooleanValueSetting* fSingleWindowBrowse;
-		BooleanValueSetting* fShowNavigator;
-		BooleanValueSetting* fShowSelectionWhenInactive;
-		BooleanValueSetting* fTransparentSelection;
-		BooleanValueSetting* fSortFolderNamesFirst;
-		BooleanValueSetting* fHideDotFiles;
-		BooleanValueSetting* fTypeAheadFiltering;
+	BooleanValueSetting* fShowFullPathInTitleBar;
+	BooleanValueSetting* fSingleWindowBrowse;
+	BooleanValueSetting* fShowNavigator;
+	BooleanValueSetting* fShowSelectionWhenInactive;
+	BooleanValueSetting* fTransparentSelection;
+	BooleanValueSetting* fSortFolderNamesFirst;
+	BooleanValueSetting* fHideDotFiles;
+	BooleanValueSetting* fTypeAheadFiltering;
 
-		ScalarValueSetting* fRecentApplicationsCount;
-		ScalarValueSetting* fRecentDocumentsCount;
-		ScalarValueSetting* fRecentFoldersCount;
+	ScalarValueSetting* fRecentApplicationsCount;
+	ScalarValueSetting* fRecentDocumentsCount;
+	ScalarValueSetting* fRecentFoldersCount;
 
-		BooleanValueSetting* fShowVolumeSpaceBar;
-		HexScalarValueSetting* fUsedSpaceColor;
-		HexScalarValueSetting* fFreeSpaceColor;
-		HexScalarValueSetting* fWarningSpaceColor;
+	BooleanValueSetting* fShowVolumeSpaceBar;
+	HexScalarValueSetting* fUsedSpaceColor;
+	HexScalarValueSetting* fFreeSpaceColor;
+	HexScalarValueSetting* fWarningSpaceColor;
 
-		BooleanValueSetting* fDontMoveFilesToTrash;
-		BooleanValueSetting* fAskBeforeDeleteFile;
+	BooleanValueSetting* fDontMoveFilesToTrash;
+	BooleanValueSetting* fAskBeforeDeleteFile;
 
-		Benaphore fInitLock;
-		bool fInited;
-		bool fSettingsLoaded;
+	Benaphore fInitLock;
+	bool fInited;
+	bool fSettingsLoaded;
 
-		int32 fUseCounter;
+	int32 fUseCounter;
 
-		typedef Settings _inherited;
+	typedef Settings _inherited;
 };
+
 
 static TTrackerState gTrackerState;
 
@@ -116,7 +117,7 @@ int32 ColorToValue(rgb_color color)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - TTrackerState
 
 
 TTrackerState::TTrackerState()
@@ -181,7 +182,7 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fHideDotFiles = new BooleanValueSetting("HideDotFiles", false));
 	Add(fTypeAheadFiltering
 		= new BooleanValueSetting("TypeAheadFiltering", false));
- 	Add(fSingleWindowBrowse
+	Add(fSingleWindowBrowse
 		= new BooleanValueSetting("SingleWindowBrowse", false));
 	Add(fShowNavigator = new BooleanValueSetting("ShowNavigator", false));
 
@@ -218,7 +219,7 @@ TTrackerState::LoadSettingsIfNeeded()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - TrackerSettings
 
 
 TrackerSettings::TrackerSettings()
