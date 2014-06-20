@@ -240,40 +240,54 @@ WidgetAttributeText::NewWidgetText(const Model* model,
 
 	if (strcmp(attrName, kAttrPath) == 0)
 		return new PathAttributeText(model, column);
+
 	if (strcmp(attrName, kAttrMIMEType) == 0)
 		return new KindAttributeText(model, column);
+
 	if (strcmp(attrName, kAttrStatName) == 0)
 		return new NameAttributeText(model, column);
+
 	if (strcmp(attrName, kAttrRealName) == 0)
 		return new RealNameAttributeText(model, column);
+
 	if (strcmp(attrName, kAttrStatSize) == 0)
 		return new SizeAttributeText(model, column);
+
 	if (strcmp(attrName, kAttrStatModified) == 0)
 		return new ModificationTimeAttributeText(model, column);
+
 	if (strcmp(attrName, kAttrStatCreated) == 0)
 		return new CreationTimeAttributeText(model, column);
+
 #ifdef OWNER_GROUP_ATTRIBUTES
 	if (strcmp(attrName, kAttrStatOwner) == 0)
 		return new OwnerAttributeText(model, column);
+
 	if (strcmp(attrName, kAttrStatGroup) == 0)
 		return new GroupAttributeText(model, column);
 #endif
 	if (strcmp(attrName, kAttrStatMode) == 0)
 		return new ModeAttributeText(model, column);
+
 	if (strcmp(attrName, kAttrOpenWithRelation) == 0)
 		return new OpenWithRelationAttributeText(model, column, view);
+
 	if (strcmp(attrName, kAttrAppVersion) == 0)
 		return new AppShortVersionAttributeText(model, column);
+
 	if (strcmp(attrName, kAttrSystemVersion) == 0)
 		return new SystemShortVersionAttributeText(model, column);
+
 	if (strcmp(attrName, kAttrOriginalPath) == 0)
 		return new OriginalPathAttributeText(model, column);
 
 	if (column->DisplayAs() != NULL) {
 		if (!strncmp(column->DisplayAs(), "checkbox", 8))
 			return new CheckboxAttributeText(model, column);
+
 		if (!strncmp(column->DisplayAs(), "duration", 8))
 			return new DurationAttributeText(model, column);
+
 		if (!strncmp(column->DisplayAs(), "rating", 6))
 			return new RatingAttributeText(model, column);
 	}
@@ -283,7 +297,7 @@ WidgetAttributeText::NewWidgetText(const Model* model,
 
 
 WidgetAttributeText::WidgetAttributeText(const Model* model,
-		const BColumn* column)
+	const BColumn* column)
 	:
 	fModel(const_cast<Model*>(model)),
 	fColumn(column),
@@ -304,8 +318,9 @@ const char*
 WidgetAttributeText::FittingText(const BPoseView* view)
 {
 	if (fDirty || fColumn->Width() != fOldWidth || CheckSettingsChanged()
-		|| !fValueIsDefined )
+		|| !fValueIsDefined) {
 		CheckViewChanged(view);
+	}
 
 	ASSERT(!fDirty);
 	return fText.String();
@@ -469,7 +484,7 @@ WidgetAttributeText::SetDirty(bool value)
 }
 
 
-// #pragma mark -
+// #pragma mark - StringAttributeText
 
 
 StringAttributeText::StringAttributeText(const Model* model,
@@ -570,7 +585,7 @@ StringAttributeText::CommitEditedText(BTextView* textView)
 }
 
 
-// #pragma mark -
+// #pragma mark - ScalarAttributeText
 
 
 ScalarAttributeText::ScalarAttributeText(const Model* model,
@@ -599,7 +614,8 @@ ScalarAttributeText::CheckAttributeChanged()
 		return false;
 
 	fValue = newValue;
-	fDirty = true;		// have to redo fitted string
+	fDirty = true;
+		// have to redo fitted string
 	return true;
 }
 
@@ -629,7 +645,7 @@ ScalarAttributeText::Compare(WidgetAttributeText& attr, BPoseView*)
 }
 
 
-// #pragma mark -
+// #pragma mark - PathAttributeText
 
 
 PathAttributeText::PathAttributeText(const Model* model, const BColumn* column)
@@ -651,11 +667,12 @@ PathAttributeText::ReadValue(BString* result)
 		TruncateLeaf(result);
 	} else
 		*result = "-";
+
 	fValueDirty = false;
 }
 
 
-// #pragma mark -
+// #pragma mark - OriginalPathAttributeText
 
 
 OriginalPathAttributeText::OriginalPathAttributeText(const Model* model,
@@ -677,15 +694,15 @@ OriginalPathAttributeText::ReadValue(BString* result)
 		*result = path.Path();
 	else
 		*result = "-";
+
 	fValueDirty = false;
 }
 
 
-// #pragma mark -
+// #pragma mark - KindAttributeText
 
 
-KindAttributeText::KindAttributeText(const Model* model,
-		const BColumn* column)
+KindAttributeText::KindAttributeText(const Model* model, const BColumn* column)
 	:
 	StringAttributeText(model, column)
 {
@@ -701,20 +718,21 @@ KindAttributeText::ReadValue(BString* result)
 	// get the mime type
 	if (mime.SetType(fModel->MimeType()) != B_OK)
 		*result = B_TRANSLATE("Unknown");
-	// get the short mime type description
-	else if (mime.GetShortDescription(desc) == B_OK)
+	else if (mime.GetShortDescription(desc) == B_OK) {
+		// get the short mime type description
 		*result = desc;
-	else
+	} else
 		*result = fModel->MimeType();
+
 	fValueDirty = false;
 }
 
 
-// #pragma mark -
+// #pragma mark - NameAttributeText
 
 
 NameAttributeText::NameAttributeText(const Model* model,
-		const BColumn* column)
+	const BColumn* column)
 	:
 	StringAttributeText(model, column)
 {
@@ -791,9 +809,7 @@ NameAttributeText::CommitEditedTextFlavor(BTextView* textView)
 			B_TRANSLATE("Replace other file"),
 			B_TRANSLATE("OK"),
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-
 		alert->SetShortcut(0, 'r');
-
 		if (alert->Go())
 			return false;
 
@@ -847,7 +863,7 @@ NameAttributeText::IsEditable() const
 }
 
 
-// #pragma mark -
+// #pragma mark - RealNameAttributeText
 
 
 RealNameAttributeText::RealNameAttributeText(const Model* model,
@@ -981,8 +997,6 @@ RealNameAttributeText::SetSortFolderNamesFirst(bool enabled)
 
 
 #ifdef OWNER_GROUP_ATTRIBUTES
-
-
 OwnerAttributeText::OwnerAttributeText(const Model* model,
 	const BColumn* column)
 	:
@@ -1035,9 +1049,10 @@ GroupAttributeText::ReadValue(BString* result)
 
 	fValueDirty = false;
 }
-
-
 #endif  // OWNER_GROUP_ATTRIBUTES
+
+
+//	#pragma mark - ModeAttributeText
 
 
 ModeAttributeText::ModeAttributeText(const Model* model,
@@ -1080,7 +1095,7 @@ ModeAttributeText::ReadValue(BString* result)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - SizeAttributeText
 
 
 SizeAttributeText::SizeAttributeText(const Model* model,
@@ -1137,7 +1152,7 @@ SizeAttributeText::PreferredWidth(const BPoseView* pose) const
 }
 
 
-// #pragma mark - time related
+// #pragma mark - TimeAttributeText
 
 
 TimeAttributeText::TimeAttributeText(const Model* model,
@@ -1176,6 +1191,9 @@ TimeAttributeText::CheckSettingsChanged(void)
 }
 
 
+//	#pragma mark - CreationTimeAttributeText
+
+
 CreationTimeAttributeText::CreationTimeAttributeText(const Model* model,
 	const BColumn* column)
 	:
@@ -1191,6 +1209,9 @@ CreationTimeAttributeText::ReadValue()
 	fValueIsDefined = true;
 	return fModel->StatBuf()->st_crtime;
 }
+
+
+//	#pragma mark - ModificationTimeAttributeText
 
 
 ModificationTimeAttributeText::ModificationTimeAttributeText(
@@ -1210,7 +1231,7 @@ ModificationTimeAttributeText::ReadValue()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - GenericAttributeText
 
 
 GenericAttributeText::GenericAttributeText(const Model* model,
@@ -1326,11 +1347,13 @@ GenericAttributeText::ReadValue(BString* result)
 
 							default:
 								TRESPASS();
+								break;
 						}
 					} else {
 						// handle the standard data types
 						switch (info.size) {
-							case sizeof(char):	// Takes care of bool too.
+							case sizeof(char):
+								// Takes care of bool too.
 								fValueIsDefined = true;
 								fValue.int8t = tmp.int8t;
 								break;
@@ -1340,18 +1363,21 @@ GenericAttributeText::ReadValue(BString* result)
 								fValue.int16t = tmp.int16t;
 								break;
 
-							case sizeof(int32):	// Takes care of time_t too.
+							case sizeof(int32):
+								// Takes care of time_t too.
 								fValueIsDefined = true;
 								fValue.int32t = tmp.int32t;
 								break;
 
-							case sizeof(int64):	// Takes care of off_t too.
+							case sizeof(int64):
+								// Takes care of off_t too.
 								fValueIsDefined = true;
 								fValue.int64t = tmp.int64t;
 								break;
 
 							default:
 								TRESPASS();
+								break;
 						}
 					}
 				}
@@ -1528,9 +1554,10 @@ GenericAttributeText::Compare(WidgetAttributeText& attr, BPoseView*)
 	if (compareTo->fValueDirty)
 		compareTo->ReadValue(&compareTo->fFullValueText);
 
-	// Sort undefined values last, regardless of the other value:
+	// sort undefined values last, regardless of the other value
 	if (!fValueIsDefined)
 		return compareTo->fValueIsDefined ? 1 : 0;
+
 	if (!compareTo->fValueIsDefined)
 		return -1;
 
@@ -1598,6 +1625,7 @@ GenericAttributeText::Compare(WidgetAttributeText& attr, BPoseView*)
 			return fValue.uint64t >= compareTo->fValue.uint64t ?
 				(fValue.uint64t == compareTo->fValue.uint64t ? 0 : 1) : -1;
 	}
+
 	return 0;
 }
 
@@ -1794,7 +1822,6 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView* textView)
 
 				default:
 					TRESPASS();
-
 			}
 
 			size = fModel->WriteAttr(columnName, type, 0, &tmp, scalarSize);
@@ -1819,7 +1846,7 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView* textView)
 }
 
 
-// #pragma mark - display as: duration
+// #pragma mark - DurationAttributeText (display as: duration)
 
 
 DurationAttributeText::DurationAttributeText(const Model* model,
@@ -1901,7 +1928,7 @@ DurationAttributeText::FitValue(BString* result, const BPoseView* view)
 }
 
 
-// #pragma mark - display as: checkbox
+// #pragma mark - CheckboxAttributeText (display as: checkbox)
 
 
 CheckboxAttributeText::CheckboxAttributeText(const Model* model,
@@ -1981,7 +2008,7 @@ CheckboxAttributeText::FitValue(BString* result, const BPoseView* view)
 }
 
 
-// #pragma mark - display as: rating
+// #pragma mark - RatingAttributeText (display as: rating)
 
 
 RatingAttributeText::RatingAttributeText(const Model* model,
@@ -2052,7 +2079,7 @@ RatingAttributeText::FitValue(BString* result, const BPoseView* view)
 }
 
 
-// #pragma mark -
+// #pragma mark - OpenWithRelationAttributeText
 
 
 OpenWithRelationAttributeText::OpenWithRelationAttributeText(const Model* model,
@@ -2108,6 +2135,9 @@ OpenWithRelationAttributeText::FitValue(BString* result, const BPoseView* view)
 		fRelationText.Length(), view, fOldWidth, B_TRUNCATE_END);
 	fDirty = false;
 }
+
+
+// #pragma mark - VersionAttributeText
 
 
 VersionAttributeText::VersionAttributeText(const Model* model,
