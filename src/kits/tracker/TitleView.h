@@ -31,15 +31,14 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef	_TITLE_VIEW_H
+#ifndef _TITLE_VIEW_H
 #define _TITLE_VIEW_H
 
 
 #include <Cursor.h>
 #include <DataIO.h>
+#include <ObjectList.h>
 #include <View.h>
-
-#include "ObjectList.h"
 
 
 namespace BPrivate {
@@ -215,5 +214,6 @@ BTitleView::PoseView() const
 } // namespace BPrivate
 
 using namespace BPrivate;
+
 
 #endif	// _TITLE_VIEW_H

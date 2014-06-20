@@ -56,6 +56,7 @@ All rights reserved.
 
 #define APP_SERVER_CLEARS_BACKGROUND 1
 
+
 static rgb_color sTitleBackground;
 static rgb_color sDarkTitleBackground;
 static rgb_color sShineColor;
@@ -98,11 +99,12 @@ _DrawOutline(BView* view, BRect where)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BTitleView
 
 
 BTitleView::BTitleView(BRect frame, BPoseView* view)
-	: BView(frame, "TitleView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
+	:
+	BView(frame, "TitleView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
 	fPoseView(view),
 	fTitleList(10, true),
 	fHorizontalResizeCursor(B_CURSOR_ID_RESIZE_EAST_WEST),
@@ -404,6 +406,7 @@ BTitleView::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 			break;
 	}
+
 	_inherited::MouseMoved(where, code, message);
 }
 
@@ -450,7 +453,7 @@ BTitleView::FindColumnTitle(const BColumn* column) const
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BColumnTitle
 
 
 BColumnTitle::BColumnTitle(BTitleView* view, BColumn* column)
@@ -590,11 +593,11 @@ BColumnTitle::Draw(BView* view, bool pressed)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - ColumnTrackState
 
 
 ColumnTrackState::ColumnTrackState(BTitleView* view, BColumnTitle* title,
-		BPoint where, bigtime_t pastClickTime)
+	BPoint where, bigtime_t pastClickTime)
 	:
 	fTitleView(view),
 	fTitle(title),
@@ -633,12 +636,13 @@ ColumnTrackState::MouseMoved(BPoint where, uint32 buttons)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - ColumnResizeState
 
 
 ColumnResizeState::ColumnResizeState(BTitleView* view, BColumnTitle* title,
 		BPoint where, bigtime_t pastClickTime)
-	: ColumnTrackState(view, title, where, pastClickTime),
+	:
+	ColumnTrackState(view, title, where, pastClickTime),
 	fLastLineDrawPos(-1),
 	fInitialTrackOffset((title->fColumn->Offset() + title->fColumn->Width())
 		- where.x)
@@ -728,12 +732,13 @@ ColumnResizeState::UndrawLine()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - ColumnDragState
 
 
 ColumnDragState::ColumnDragState(BTitleView* view, BColumnTitle* columnTitle,
-		BPoint where, bigtime_t pastClickTime)
-	: ColumnTrackState(view, columnTitle, where, pastClickTime),
+	BPoint where, bigtime_t pastClickTime)
+	:
+	ColumnTrackState(view, columnTitle, where, pastClickTime),
 	fInitialMouseTrackOffset(where.x),
 	fTrackingRemovedColumn(false)
 {
