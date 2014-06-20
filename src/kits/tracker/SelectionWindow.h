@@ -79,4 +79,5 @@ private:
 
 using namespace BPrivate;
 
+
 #endif	// _SELECTION_WINDOW_H

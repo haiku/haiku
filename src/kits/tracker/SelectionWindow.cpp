@@ -50,6 +50,9 @@ All rights reserved.
 const uint32 kSelectButtonPressed = 'sbpr';
 
 
+//	#pragma mark - SelectionWindow
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "SelectionWindow"
 
@@ -58,8 +61,8 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 	:
 	BWindow(BRect(0, 0, 270, 0), B_TRANSLATE("Select"),	B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_V_RESIZABLE
-		| B_NO_WORKSPACE_ACTIVATION | B_ASYNCHRONOUS_CONTROLS
-		| B_NOT_ANCHORED_ON_ACTIVATE),
+			| B_NO_WORKSPACE_ACTIVATION | B_ASYNCHRONOUS_CONTROLS
+			| B_NOT_ANCHORED_ON_ACTIVATE),
 	fParentWindow(window)
 {
 	if (window->Feel() & kPrivateDesktopWindowFeel) {
@@ -220,6 +223,7 @@ SelectionWindow::MessageReceived(BMessage* message)
 
 		default:
 			_inherited::MessageReceived(message);
+			break;
 	}
 }
 
@@ -265,7 +269,7 @@ SelectionWindow::ExpressionType() const
 		return kNone;
 
 	BMenuItem* item = fMatchingTypeMenuField->Menu()->FindMarked();
-	if (!item) {
+	if (item == NULL) {
 		fMatchingTypeMenuField->UnlockLooper();
 		return kNone;
 	}
@@ -300,7 +304,7 @@ bool
 SelectionWindow::IgnoreCase() const
 {
 	if (!fIgnoreCaseCheckBox->LockLooper()) {
-		// default action.
+		// default action
 		return true;
 	}
 
@@ -316,7 +320,7 @@ bool
 SelectionWindow::Invert() const
 {
 	if (!fInverseCheckBox->LockLooper()) {
-		// default action.
+		// default action
 		return false;
 	}
 
