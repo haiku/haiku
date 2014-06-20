@@ -51,11 +51,13 @@ class RecentItemsMenu : public BSlowMenu {
 public:
 	RecentItemsMenu(const char* title, BMessage* openMessage,
 		BHandler* itemTarget, int32 maxItems)
-		:	BSlowMenu(title),
-			fTargetMesage(openMessage),
-			fItemTarget(itemTarget),
-			fMaxCount(maxItems)
-		{}
+		:
+		BSlowMenu(title),
+		fTargetMesage(openMessage),
+		fItemTarget(itemTarget),
+		fMaxCount(maxItems)
+	{
+	}
 	virtual ~RecentItemsMenu();
 
 	virtual bool StartBuildingItemList();
@@ -69,7 +71,7 @@ protected:
 	virtual const BMessage* ContainerMessage()
 		{ return fTargetMesage; }
 
-	BRecentItemsList* fTterator;
+	BRecentItemsList* fIterator;
 	BMessage* fTargetMesage;
 	BHandler* fItemTarget;
 	int32 fCount;
@@ -116,12 +118,12 @@ public:
 };
 
 
-// #pragma mark -
+// #pragma mark - RecentItemsMenu
 
 
 RecentItemsMenu::~RecentItemsMenu()
 {
-	delete fTterator;
+	delete fIterator;
 	delete fTargetMesage;
 }
 
@@ -129,10 +131,9 @@ RecentItemsMenu::~RecentItemsMenu()
 bool
 RecentItemsMenu::AddNextItem()
 {
-	BMenuItem* item = fTterator->GetNextMenuItem(FileMessage(),
+	BMenuItem* item = fIterator->GetNextMenuItem(FileMessage(),
 		ContainerMessage(), fItemTarget);
-
-	if (item) {
+	if (item != NULL) {
 		AddItem(item);
 		fCount++;
 	}
@@ -154,7 +155,8 @@ RecentItemsMenu::StartBuildingItemList()
 
 	fCount = 0;
 	fSanityCount = 0;
-	fTterator->Rewind();
+	fIterator->Rewind();
+
 	return true;
 }
 
@@ -164,11 +166,11 @@ RecentItemsMenu::ClearMenuBuildingState()
 {
 	fMenuBuilt = false;
 		// force rebuilding each time
-	fTterator->Rewind();
+	fIterator->Rewind();
 }
 
 
-// #pragma mark -
+// #pragma mark - RecentFilesMenu
 
 
 RecentFilesMenu::RecentFilesMenu(const char* title, BMessage* openFileMessage,
@@ -178,7 +180,7 @@ RecentFilesMenu::RecentFilesMenu(const char* title, BMessage* openFileMessage,
 	RecentItemsMenu(title, openFileMessage, target, maxItems),
 	openFolderMessage(openFolderMessage)
 {
-	fTterator = new BRecentFilesList(maxItems + 10, navMenuFolders,
+	fIterator = new BRecentFilesList(maxItems + 10, navMenuFolders,
 		ofType, openedByAppSig);
 }
 
@@ -191,7 +193,7 @@ RecentFilesMenu::RecentFilesMenu(const char* title, BMessage* openFileMessage,
 	RecentItemsMenu(title, openFileMessage, target, maxItems),
 	openFolderMessage(openFolderMessage)
 {
-	fTterator = new BRecentFilesList(maxItems + 10, navMenuFolders,
+	fIterator = new BRecentFilesList(maxItems + 10, navMenuFolders,
 		ofTypeList, ofTypeListCount, openedByAppSig);
 }
 
@@ -202,7 +204,7 @@ RecentFilesMenu::~RecentFilesMenu()
 }
 
 
-// #pragma mark -
+// #pragma mark - RecentFoldersMenu
 
 
 RecentFoldersMenu::RecentFoldersMenu(const char* title, BMessage* openMessage,
@@ -211,23 +213,24 @@ RecentFoldersMenu::RecentFoldersMenu(const char* title, BMessage* openMessage,
 	:
 	RecentItemsMenu(title, openMessage, target, maxItems)
 {
-	fTterator = new BRecentFoldersList(maxItems + 10, navMenuFolders,
+	fIterator = new BRecentFoldersList(maxItems + 10, navMenuFolders,
 		openedByAppSig);
 }
 
 
-// #pragma mark -
+// #pragma mark - RecentAppsMenu
 
 
 RecentAppsMenu::RecentAppsMenu(const char* title, BMessage* openMessage,
 	BHandler* target, int32 maxItems)
-	:	RecentItemsMenu(title, openMessage, target, maxItems)
+	:
+	RecentItemsMenu(title, openMessage, target, maxItems)
 {
-	fTterator = new BRecentAppsList(maxItems);
+	fIterator = new BRecentAppsList(maxItems);
 }
 
 
-// #pragma mark -
+// #pragma mark - BRecentItemsList
 
 
 BRecentItemsList::BRecentItemsList(int32 maxItems, bool navMenuFolders)
@@ -268,7 +271,7 @@ BRecentItemsList::GetNextMenuItem(const BMessage* fileOpenInvokeMessage,
 		Model* newResolvedModel = NULL;
 		Model* result = model.LinkTo();
 
-		if (!result) {
+		if (result == NULL) {
 			newResolvedModel = new Model(model.EntryRef(), true, true);
 
 			if (newResolvedModel->InitCheck() != B_OK) {
@@ -277,16 +280,14 @@ BRecentItemsList::GetNextMenuItem(const BMessage* fileOpenInvokeMessage,
 				result = NULL;
 			} else
 				result = newResolvedModel;
-		}
-
-		if (result) {
+		} else {
 			BModelOpener opener(result);
 				// open the model, if it ain't open already
 
 			PoseInfo poseInfo;
-
-			if (result->Node()) {
-				result->Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
+			BNode* resultNode = result->Node();
+			if (resultNode != NULL) {
+				resultNode->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
 					&poseInfo, sizeof(poseInfo));
 			}
 
@@ -302,7 +303,7 @@ BRecentItemsList::GetNextMenuItem(const BMessage* fileOpenInvokeMessage,
 	}
 
 	// if user asked for it, return the current item ref
-	if (currentItemRef)
+	if (currentItemRef != NULL)
 		*currentItemRef = ref;
 
 	BMessage* message;
@@ -333,7 +334,7 @@ BRecentItemsList::GetNextMenuItem(const BMessage* fileOpenInvokeMessage,
 		item->SetMessage(message);
 	}
 
-	if (item && target)
+	if (item != NULL && target != NULL)
 		item->SetTarget(target);
 
 	return item;
@@ -347,7 +348,7 @@ BRecentItemsList::GetNextRef(entry_ref* result)
 }
 
 
-// #pragma mark -
+// #pragma mark - BRecentFilesList
 
 
 BRecentFilesList::BRecentFilesList(int32 maxItems, bool navMenuFolders,
@@ -372,7 +373,7 @@ BRecentFilesList::BRecentFilesList(int32 maxItems, bool navMenuFolders,
 	fTypeCount(ofTypeListCount),
 	fAppSig(openedByAppSig)
 {
-	if (fTypeCount) {
+	if (fTypeCount > 0) {
 		fTypes = new char *[ofTypeListCount];
 		for (int32 index = 0; index < ofTypeListCount; index++)
 			fTypes[index] = strdup(ofTypeList[index]);
@@ -382,7 +383,7 @@ BRecentFilesList::BRecentFilesList(int32 maxItems, bool navMenuFolders,
 
 BRecentFilesList::~BRecentFilesList()
 {
-	if (fTypeCount) {
+	if (fTypeCount > 0) {
 		for (int32 index = 0; index < fTypeCount; index++)
 			free(fTypes[index]);
 		delete[] fTypes;
@@ -395,16 +396,18 @@ BRecentFilesList::GetNextRef(entry_ref* ref)
 {
 	if (fIndex == 0) {
 		// Lazy roster Get
-		if (fTypes)
+		if (fTypes != NULL) {
 			BRoster().GetRecentDocuments(&fItems, fMaxItems,
 				const_cast<const char**>(fTypes),
 				fTypeCount, fAppSig.Length() ? fAppSig.String() : NULL);
-		else
+		} else {
 			BRoster().GetRecentDocuments(&fItems, fMaxItems,
 				fType.Length() ? fType.String() : NULL,
 				fAppSig.Length() ? fAppSig.String() : NULL);
+		}
 
 	}
+
 	return BRecentItemsList::GetNextRef(ref);
 }
 
@@ -434,7 +437,7 @@ BRecentFilesList::NewFileListMenu(const char* title,
 }
 
 
-// #pragma mark -
+// #pragma mark - BRecentFoldersList
 
 
 BMenu*
@@ -465,11 +468,12 @@ BRecentFoldersList::GetNextRef(entry_ref* ref)
 			fAppSig.Length() ? fAppSig.String() : NULL);
 
 	}
+
 	return BRecentItemsList::GetNextRef(ref);
 }
 
 
-// #pragma mark -
+// #pragma mark - BRecentAppsList
 
 
 BRecentAppsList::BRecentAppsList(int32 maxItems)
@@ -486,6 +490,7 @@ BRecentAppsList::GetNextRef(entry_ref* ref)
 		// Lazy roster Get
 		BRoster().GetRecentApps(&fItems, fMaxItems);
 	}
+
 	return BRecentItemsList::GetNextRef(ref);
 }
 

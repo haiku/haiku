@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __RECENT_ITEMS_LIST__
-#define __RECENT_ITEMS_LIST__
+#ifndef _RECENT_ITEMS_LIST_H
+#define _RECENT_ITEMS_LIST_H
 
 
 // BRecentItemsList classes allow creating an entire menu with
@@ -48,6 +48,7 @@ All rights reserved.
 
 class BMenuItem;
 class BMenu;
+
 
 class BRecentItemsList {
 public:
@@ -81,18 +82,18 @@ protected:
 	bool fNavMenuFolders;
 
 private:
-	virtual	void _r1();
-	virtual	void _r2();
-	virtual	void _r3();
-	virtual	void _r4();
-	virtual	void _r5();
-	virtual	void _r6();
-	virtual	void _r7();
-	virtual	void _r8();
-	virtual	void _r9();
-	virtual	void _r10();
+	virtual void _r1();
+	virtual void _r2();
+	virtual void _r3();
+	virtual void _r4();
+	virtual void _r5();
+	virtual void _r6();
+	virtual void _r7();
+	virtual void _r8();
+	virtual void _r9();
+	virtual void _r10();
 
-			uint32 _reserved[20];
+	uint32 _reserved[20];
 };
 
 
@@ -129,18 +130,18 @@ protected:
 	BString fAppSig;
 
 private:
-	virtual	void _r11();
-	virtual	void _r12();
-	virtual	void _r13();
-	virtual	void _r14();
-	virtual	void _r15();
-	virtual	void _r16();
-	virtual	void _r17();
-	virtual	void _r18();
-	virtual	void _r19();
-	virtual	void _r110();
+	virtual void _r11();
+	virtual void _r12();
+	virtual void _r13();
+	virtual void _r14();
+	virtual void _r15();
+	virtual void _r16();
+	virtual void _r17();
+	virtual void _r18();
+	virtual void _r19();
+	virtual void _r110();
 
-			uint32 _reserved[20];
+	uint32 _reserved[20];
 };
 
 
@@ -162,18 +163,18 @@ protected:
 	BString fAppSig;
 
 private:
-	virtual	void _r21();
-	virtual	void _r22();
-	virtual	void _r23();
-	virtual	void _r24();
-	virtual	void _r25();
-	virtual	void _r26();
-	virtual	void _r27();
-	virtual	void _r28();
-	virtual	void _r29();
-	virtual	void _r210();
+	virtual void _r21();
+	virtual void _r22();
+	virtual void _r23();
+	virtual void _r24();
+	virtual void _r25();
+	virtual void _r26();
+	virtual void _r27();
+	virtual void _r28();
+	virtual void _r29();
+	virtual void _r210();
 
-			uint32 _reserved[20];
+	uint32 _reserved[20];
 };
 
 
@@ -190,18 +191,19 @@ public:
 	virtual status_t GetNextRef(entry_ref*);
 
 private:
-	virtual	void _r31();
-	virtual	void _r32();
-	virtual	void _r33();
-	virtual	void _r34();
-	virtual	void _r35();
-	virtual	void _r36();
-	virtual	void _r37();
-	virtual	void _r38();
-	virtual	void _r39();
-	virtual	void _r310();
+	virtual void _r31();
+	virtual void _r32();
+	virtual void _r33();
+	virtual void _r34();
+	virtual void _r35();
+	virtual void _r36();
+	virtual void _r37();
+	virtual void _r38();
+	virtual void _r39();
+	virtual void _r310();
 
-			uint32 _reserved[20];
+	uint32 _reserved[20];
 };
 
-#endif	// __RECENT_ITEMS_LIST__
+
+#endif	// _RECENT_ITEMS_LIST_H
