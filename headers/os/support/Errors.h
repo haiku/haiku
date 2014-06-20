@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ERRORS_H
@@ -115,6 +115,8 @@
 #define B_BUSTED_PIPE						(B_STORAGE_ERROR_BASE + 13)
 #define B_UNSUPPORTED						(B_STORAGE_ERROR_BASE + 14)
 #define B_PARTITION_TOO_SMALL				(B_STORAGE_ERROR_BASE + 15)
+#define B_PARTIAL_READ						(B_STORAGE_ERROR_BASE + 16)
+#define B_PARTIAL_WRITE						(B_STORAGE_ERROR_BASE + 17)
 
 /* POSIX Errors */
 #ifdef B_USE_POSITIVE_POSIX_ERRORS

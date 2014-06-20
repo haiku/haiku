@@ -218,6 +218,10 @@ error_description(int error)
 			return "Operation not supported";
 		case B_PARTITION_TOO_SMALL:
 			return "Partition too small to contain filesystem";
+		case B_PARTIAL_READ:
+			return "Data read partially";
+		case B_PARTIAL_WRITE:
+			return "Data written partially";
 
 		// Media Kit Errors
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2007-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_API_WRAPPER_H
@@ -573,6 +573,8 @@
 #define B_BUSTED_PIPE			FSSH_B_BUSTED_PIPE
 #define B_UNSUPPORTED			FSSH_B_UNSUPPORTED
 #define B_PARTITION_TOO_SMALL	FSSH_B_PARTITION_TOO_SMALL
+#define B_PARTIAL_READ			FSSH_B_PARTIAL_READ
+#define B_PARTIAL_WRITE			FSSH_B_PARTIAL_WRITE
 
 /* POSIX Errors */
 #define E2BIG			FSSH_E2BIG

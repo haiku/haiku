@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_ERRORS_H
@@ -111,6 +111,8 @@ enum {
 #define FSSH_B_BUSTED_PIPE			(FSSH_B_STORAGE_ERROR_BASE + 13)
 #define FSSH_B_UNSUPPORTED			(FSSH_B_STORAGE_ERROR_BASE + 14)
 #define FSSH_B_PARTITION_TOO_SMALL	(FSSH_B_STORAGE_ERROR_BASE + 15)
+#define FSSH_B_PARTIAL_READ			(FSSH_B_STORAGE_ERROR_BASE + 16)
+#define FSSH_B_PARTIAL_WRITE		(FSSH_B_STORAGE_ERROR_BASE + 17)
 
 /* POSIX Errors */
 #define FSSH_E2BIG				(FSSH_B_POSIX_ERROR_BASE + 1)
