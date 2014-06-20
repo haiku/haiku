@@ -54,41 +54,41 @@ class AttributeView;
 
 
 class BInfoWindow : public BWindow {
-	public:
-		BInfoWindow(Model*, int32 groupIndex,
-			LockingList<BWindow>* list = NULL);
-		~BInfoWindow();
+public:
+	BInfoWindow(Model*, int32 groupIndex,
+		LockingList<BWindow>* list = NULL);
+	~BInfoWindow();
 
-		virtual bool IsShowing(const node_ref*) const;
-		Model* TargetModel() const;
-		void SetSizeStr(const char*);
-		bool StopCalc();
-		void OpenFilePanel(const entry_ref*);
+	virtual bool IsShowing(const node_ref*) const;
+	Model* TargetModel() const;
+	void SetSizeString(const char*);
+	bool StopCalc();
+	void OpenFilePanel(const entry_ref*);
 
-		static void GetSizeString(BString &result, off_t size,
-			int32 fileCount);
+	static void GetSizeString(BString &result, off_t size,
+		int32 fileCount);
 
-	protected:
-		virtual void Quit();
-		virtual void MessageReceived(BMessage*);
-		virtual void Show();
+protected:
+	virtual void Quit();
+	virtual void MessageReceived(BMessage*);
+	virtual void Show();
 
-	private:
-		static BRect InfoWindowRect(bool displayingSymlink);
-		static int32 CalcSize(void*);
+private:
+	static BRect InfoWindowRect(bool displayingSymlink);
+	static int32 CalcSize(void*);
 
-		Model* fModel;
-		volatile bool fStopCalc;
-		int32 fIndex;
-			// tells where it lives with respect to other
-		thread_id fCalcThreadID;
-		LockingList<BWindow>* fWindowList;
-		FilePermissionsView* fPermissionsView;
-		AttributeView* fAttributeView;
-		BFilePanel* fFilePanel;
-		bool fFilePanelOpen;
+	Model* fModel;
+	volatile bool fStopCalc;
+	int32 fIndex;
+		// tells where it lives with respect to other
+	thread_id fCalcThreadID;
+	LockingList<BWindow>* fWindowList;
+	FilePermissionsView* fPermissionsView;
+	AttributeView* fAttributeView;
+	BFilePanel* fFilePanel;
+	bool fFilePanelOpen;
 
-		typedef BWindow _inherited;
+	typedef BWindow _inherited;
 };
 
 
@@ -108,5 +108,6 @@ BInfoWindow::TargetModel() const
 } // namespace BPrivate
 
 using namespace BPrivate;
+
 
 #endif	// INFO_WINDOW_H

@@ -89,105 +89,109 @@ enum track_state {
 	path_track,
 	icon_track,
 	size_track,
-	open_only_track		// This is for items that can be opened, but can't be
-						// drag and dropped or renamed (Trash, Desktop Folder...)
+	open_only_track
+		// This is for items that can be opened, but can't be
+		// drag and dropped or renamed (Trash, Desktop Folder...)
 };
+
 
 class TrackingView : public BControl {
-	public:
-		TrackingView(BRect, const char* str, BMessage* message);
+public:
+	TrackingView(BRect, const char* str, BMessage* message);
 
-		virtual void MouseDown(BPoint);
-		virtual void MouseMoved(BPoint, uint32 transit, const BMessage* message);
-		virtual void MouseUp(BPoint);
-		virtual void Draw(BRect);
+	virtual void MouseDown(BPoint);
+	virtual void MouseMoved(BPoint where, uint32 transit, const BMessage*);
+	virtual void MouseUp(BPoint);
+	virtual void Draw(BRect);
 
-	private:
-		bool fMouseDown;
-		bool fMouseInView;
+private:
+	bool fMouseDown;
+	bool fMouseInView;
 };
 
+
 class AttributeView : public BView {
-	public:
-		AttributeView(BRect, Model*);
-		~AttributeView();
+public:
+	AttributeView(BRect, Model*);
+	~AttributeView();
 
-		void ModelChanged(Model*, BMessage*);
-		void ReLinkTargetModel(Model*);
-		void BeginEditingTitle();
-		void FinishEditingTitle(bool);
-		float CurrentFontHeight(float size = -1);
+	void ModelChanged(Model*, BMessage*);
+	void ReLinkTargetModel(Model*);
+	void BeginEditingTitle();
+	void FinishEditingTitle(bool);
+	float CurrentFontHeight(float size = -1);
 
-		BTextView* TextView() const { return fTitleEditView; }
+	BTextView* TextView() const { return fTitleEditView; }
 
-		static filter_result TextViewFilter(BMessage*, BHandler**,
-			BMessageFilter*);
+	static filter_result TextViewFilter(BMessage*, BHandler**,
+		BMessageFilter*);
 
-		off_t LastSize() const;
-		void SetLastSize(off_t);
+	off_t LastSize() const;
+	void SetLastSize(off_t);
 
-		void SetSizeStr(const char*);
+	void SetSizeString(const char*);
 
-		status_t BuildContextMenu(BMenu* parent);
+	status_t BuildContextMenu(BMenu* parent);
 
-		void SetPermissionsSwitchState(int32 state);
+	void SetPermissionsSwitchState(int32 state);
 
-	protected:
-		virtual void MouseDown(BPoint);
-		virtual void MouseMoved(BPoint, uint32, const BMessage*);
-		virtual void MouseUp(BPoint);
-		virtual void MessageReceived(BMessage*);
-		virtual void AttachedToWindow();
-		virtual void Draw(BRect);
-		virtual void Pulse();
-		virtual void MakeFocus(bool);
-		virtual void WindowActivated(bool);
+protected:
+	virtual void MouseDown(BPoint where);
+	virtual void MouseMoved(BPoint where, uint32, const BMessage* dragMessage);
+	virtual void MouseUp(BPoint where);
+	virtual void MessageReceived(BMessage* message);
+	virtual void AttachedToWindow();
+	virtual void Draw(BRect);
+	virtual void Pulse();
+	virtual void MakeFocus(bool focus);
+	virtual void WindowActivated(bool active);
 
-	private:
-		void InitStrings(const Model*);
-		void CheckAndSetSize();
-		void OpenLinkSource();
-		void OpenLinkTarget();
+private:
+	void InitStrings(const Model*);
+	void CheckAndSetSize();
+	void OpenLinkSource();
+	void OpenLinkTarget();
 
-		BString fPathStr;
-		BString fLinkToStr;
-		BString fSizeStr;
-		BString fModifiedStr;
-		BString fCreatedStr;
-		BString fKindStr;
-		BString fDescStr;
+	BString fPathStr;
+	BString fLinkToStr;
+	BString fSizeString;
+	BString fModifiedStr;
+	BString fCreatedStr;
+	BString fKindStr;
+	BString fDescStr;
 
-		off_t fFreeBytes;
-		off_t fLastSize;
+	off_t fFreeBytes;
+	off_t fLastSize;
 
-		BRect fPathRect;
-		BRect fLinkRect;
-		BRect fDescRect;
-		BRect fTitleRect;
-		BRect fIconRect;
-		BRect fSizeRect;
-		BPoint fClickPoint;
-		float fDivider;
+	BRect fPathRect;
+	BRect fLinkRect;
+	BRect fDescRect;
+	BRect fTitleRect;
+	BRect fIconRect;
+	BRect fSizeRect;
+	BPoint fClickPoint;
+	float fDivider;
 
-		BMenuField* fPreferredAppMenu;
-		Model* fModel;
-		Model* fIconModel;
-		BBitmap* fIcon;
-		bool fMouseDown;
-		bool fDragging;
-		bool fDoubleClick;
-		track_state fTrackingState;
-		bool fIsDropTarget;
-		BTextView* fTitleEditView;
-		PaneSwitch* fPermissionsSwitch;
-		BWindow* fPathWindow;
-		BWindow* fLinkWindow;
-		BWindow* fDescWindow;
+	BMenuField* fPreferredAppMenu;
+	Model* fModel;
+	Model* fIconModel;
+	BBitmap* fIcon;
+	bool fMouseDown;
+	bool fDragging;
+	bool fDoubleClick;
+	track_state fTrackingState;
+	bool fIsDropTarget;
+	BTextView* fTitleEditView;
+	PaneSwitch* fPermissionsSwitch;
+	BWindow* fPathWindow;
+	BWindow* fLinkWindow;
+	BWindow* fDescWindow;
 
-		typedef BView _inherited;
+	typedef BView _inherited;
 };
 
 }	// namespace BPrivate
+
 
 const float kDrawMargin = 3.0f;
 const float kBorderMargin = 15.0f;
@@ -281,7 +285,8 @@ OpenToolTipWindow(BScreen& screen, BRect rect, const char* name,
 
 BInfoWindow::BInfoWindow(Model* model, int32 group_index,
 	LockingList<BWindow>* list)
-	: BWindow(BInfoWindow::InfoWindowRect(false),
+	:
+	BWindow(BInfoWindow::InfoWindowRect(false),
 		"InfoWindow", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_CURRENT_WORKSPACE),
 	fModel(model),
@@ -293,7 +298,8 @@ BInfoWindow::BInfoWindow(Model* model, int32 group_index,
 	fFilePanel(NULL),
 	fFilePanelOpen(false)
 {
-	SetPulseRate(1000000);		// we use pulse to check freebytes on volume
+	SetPulseRate(1000000);
+		// we use pulse to check freebytes on volume
 
 	TTracker::WatchNode(model->NodeRef(), B_WATCH_ALL | B_WATCH_MOUNT, this);
 
@@ -389,7 +395,7 @@ BInfoWindow::Show()
 	if (!TargetModel()->IsVolume() && !TargetModel()->IsRoot()) {
 		if (TargetModel()->IsDirectory()) {
 			// if this is a folder then spawn thread to calculate size
-			SetSizeStr(B_TRANSLATE("calculating" B_UTF8_ELLIPSIS));
+			SetSizeString(B_TRANSLATE("calculating" B_UTF8_ELLIPSIS));
 			fCalcThreadID = spawn_thread(BInfoWindow::CalcSize, "CalcSize",
 				B_NORMAL_PRIORITY, this);
 			resume_thread(fCalcThreadID);
@@ -398,7 +404,7 @@ BInfoWindow::Show()
 
 			BString sizeStr;
 			GetSizeString(sizeStr, fAttributeView->LastSize(), 0);
-			SetSizeStr(sizeStr.String());
+			SetSizeString(sizeStr.String());
 		}
 	}
 
@@ -470,7 +476,7 @@ BInfoWindow::MessageReceived(BMessage* message)
 
 			// Start recalculating..
 			fStopCalc = false;
-			SetSizeStr(B_TRANSLATE("calculating" B_UTF8_ELLIPSIS));
+			SetSizeString(B_TRANSLATE("calculating" B_UTF8_ELLIPSIS));
 			fCalcThreadID = spawn_thread(BInfoWindow::CalcSize, "CalcSize",
 				B_NORMAL_PRIORITY, this);
 			resume_thread(fCalcThreadID);
@@ -487,8 +493,8 @@ BInfoWindow::MessageReceived(BMessage* message)
 			if (!fModel->IsSymLink())
 				break;
 			// supposed to fall through
-
 		// An item was selected from the file panel
+		// fall-through
 		case kNewTargetSelected:
 		{
 			// Extract the BEntry, and set its full path to the string value
@@ -615,19 +621,16 @@ BInfoWindow::MessageReceived(BMessage* message)
 					break;
 
 				case B_DEVICE_UNMOUNTED:
-					{
-						// We were watching a volume that is no longer
-						// mounted, we might as well quit
-						node_ref itemNode;
-						// Only the device information is available
-						message->FindInt32("device", &itemNode.device);
-						if (TargetModel()->NodeRef()->device
-								== itemNode.device) {
-							Close();
-						}
-
-						break;
-					}
+				{
+					// We were watching a volume that is no longer
+					// mounted, we might as well quit
+					node_ref itemNode;
+					// Only the device information is available
+					message->FindInt32("device", &itemNode.device);
+					if (TargetModel()->NodeRef()->device == itemNode.device)
+						Close();
+					break;
+				}
 
 				default:
 					break;
@@ -725,7 +728,7 @@ BInfoWindow::CalcSize(void* castToWindow)
 		if (!lock)
 			return B_ERROR;
 
-		window->SetSizeStr(B_TRANSLATE("Error calculating folder size."));
+		window->SetSizeString(B_TRANSLATE("Error calculating folder size."));
 		return B_ERROR;
 	}
 
@@ -747,8 +750,7 @@ BInfoWindow::CalcSize(void* castToWindow)
 
 		// got the size value, update the size string
 		GetSizeString(sizeString, size, fileCount);
-	}
-	else {
+	} else {
 		// in the trash case, iterate through and sum up
 		// size/counts for all present trash dirs
 		off_t totalSize = 0, currentSize;
@@ -785,19 +787,19 @@ BInfoWindow::CalcSize(void* castToWindow)
 
 	AutoLock<BWindow> lock(window);
 	if (lock.IsLocked())
-		window->SetSizeStr(sizeString.String());
+		window->SetSizeString(sizeString.String());
 
 	return B_OK;
 }
 
 
 void
-BInfoWindow::SetSizeStr(const char* sizeStr)
+BInfoWindow::SetSizeString(const char* sizeString)
 {
 	AttributeView* view
-		= dynamic_cast<AttributeView *>(FindView("attr_view"));
-	if (view)
-		view->SetSizeStr(sizeStr);
+		= dynamic_cast<AttributeView*>(FindView("attr_view"));
+	if (view != NULL)
+		view->SetSizeString(sizeString);
 }
 
 
@@ -834,11 +836,12 @@ BInfoWindow::OpenFilePanel(const entry_ref* ref)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - AttributeView
 
 
 AttributeView::AttributeView(BRect rect, Model* model)
-	: BView(rect, "attr_view", B_FOLLOW_ALL_SIDES,
+	:
+	BView(rect, "attr_view", B_FOLLOW_ALL_SIDES,
 		B_WILL_DRAW | B_PULSE_NEEDED),
 	fDivider(0),
 	fPreferredAppMenu(NULL),
@@ -897,7 +900,7 @@ AttributeView::AttributeView(BRect rect, Model* model)
 	fTitleRect.InsetBy(-1, -2);
 
 	fFreeBytes = -1;
-	fSizeStr = "";
+	fSizeString = "";
 	fSizeRect.Set(0, 0, 0, 0);
 
 	// Find offset for attributes, might be overiden below if there
@@ -1052,8 +1055,10 @@ AttributeView::InitStrings(const Model* model)
 		char linkToPath[B_PATH_NAME_LENGTH];
 		symLink.ReadLink(linkToPath, B_PATH_NAME_LENGTH);
 		fLinkToStr = linkToPath;
-		if (!linked)
-			fLinkToStr += " (broken)";	// link points to missing object
+		if (!linked) {
+			// link points to missing object
+			fLinkToStr += " (broken)";
+		}
 	} else if (model->IsExecutable()) {
 		if (((Model*)model)->GetLongVersionString(fDescStr,
 				B_APP_VERSION_KIND) == B_OK) {
@@ -1149,8 +1154,8 @@ AttributeView::ModelChanged(Model* model, BMessage* message)
 				// don't change the size if it's a directory
 				if (!model->IsDirectory()) {
 					fLastSize = model->StatBuf()->st_size;
-					fSizeStr = "";
-					BInfoWindow::GetSizeString(fSizeStr, fLastSize, 0);
+					fSizeString = "";
+					BInfoWindow::GetSizeString(fSizeString, fLastSize, 0);
 				}
 				model->CloseNode();
 			}
@@ -1238,7 +1243,7 @@ AttributeView::ReLinkTargetModel(Model* model)
 
 
 void
-AttributeView::MouseDown(BPoint point)
+AttributeView::MouseDown(BPoint where)
 {
 	BEntry entry;
 	fModel->GetEntry(&entry);
@@ -1247,13 +1252,13 @@ AttributeView::MouseDown(BPoint point)
 	fDoubleClick = false;
 
 	// Start tracking the mouse if we are in any of the hotspots
-	if (fLinkRect.Contains(point)) {
+	if (fLinkRect.Contains(where)) {
 		InvertRect(fLinkRect);
 		fTrackingState = link_track;
-	} else if (fPathRect.Contains(point)) {
+	} else if (fPathRect.Contains(where)) {
 		InvertRect(fPathRect);
 		fTrackingState = path_track;
-	} else if (fTitleRect.Contains(point)) {
+	} else if (fTitleRect.Contains(where)) {
 		if (!fModel->HasLocalizedName()
 			&& ConfirmChangeIfWellKnownDirectory(&entry,
 				B_TRANSLATE_COMMENT("rename",
@@ -1268,14 +1273,14 @@ AttributeView::MouseDown(BPoint point)
 			BeginEditingTitle();
 	} else if (fTitleEditView) {
 		FinishEditingTitle(true);
-	} else if (fSizeRect.Contains(point)) {
+	} else if (fSizeRect.Contains(where)) {
 		if (fModel->IsDirectory() && !fModel->IsVolume()
 			&& !fModel->IsRoot()) {
 			InvertRect(fSizeRect);
 			fTrackingState = size_track;
 		} else
 			fTrackingState = no_track;
-	} else if (fIconRect.Contains(point)) {
+	} else if (fIconRect.Contains(where)) {
 		uint32 buttons;
 		Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 		if (SecondaryMouseButtonDown(modifiers(), buttons)) {
@@ -1285,7 +1290,7 @@ AttributeView::MouseDown(BPoint point)
 			if (contextMenu) {
 				BuildContextMenu(contextMenu);
 				contextMenu->SetAsyncAutoDestruct(true);
-				contextMenu->Go(ConvertToScreen(point), true, true,
+				contextMenu->Go(ConvertToScreen(where), true, true,
 					ConvertToScreen(fIconRect));
 			}
 		} else {
@@ -1293,8 +1298,8 @@ AttributeView::MouseDown(BPoint point)
 			// versus just in the container rect. The icons are always
 			// the large version
 			BPoint offsetPoint;
-			offsetPoint.x = point.x - fIconRect.left;
-			offsetPoint.y = point.y - fIconRect.top;
+			offsetPoint.x = where.x - fIconRect.left;
+			offsetPoint.y = where.y - fIconRect.top;
 			if (IconCache::sIconCache->IconHitTest(offsetPoint, fIconModel,
 					kNormalIcon, B_LARGE_ICON)) {
 				// Can't drag the trash anywhere..
@@ -1302,8 +1307,8 @@ AttributeView::MouseDown(BPoint point)
 					? open_only_track : icon_track;
 
 				// Check for possible double click
-				if (abs((int32)(fClickPoint.x - point.x)) < kDragSlop
-					&& abs((int32)(fClickPoint.y - point.y)) < kDragSlop) {
+				if (abs((int32)(fClickPoint.x - where.x)) < kDragSlop
+					&& abs((int32)(fClickPoint.y - where.y)) < kDragSlop) {
 					int32 clickCount;
 					Window()->CurrentMessage()->FindInt32("clicks",
 						&clickCount);
@@ -1320,21 +1325,22 @@ AttributeView::MouseDown(BPoint point)
 			}
 		}
 	}
-	fClickPoint = point;
+
+	fClickPoint = where;
 	fMouseDown = true;
 	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 }
 
 
 void
-AttributeView::MouseMoved(BPoint point, uint32, const BMessage* message)
+AttributeView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 {
-	// Highlight Drag target
-	if (message	&& message->ReturnAddress() != BMessenger(this)
-		&& message->what == B_SIMPLE_DATA
-		&& BPoseView::CanHandleDragSelection(fModel, message,
+	if (dragMessage != NULL && dragMessage->ReturnAddress() != BMessenger(this)
+		&& dragMessage->what == B_SIMPLE_DATA
+		&& BPoseView::CanHandleDragSelection(fModel, dragMessage,
 			(modifiers() & B_CONTROL_KEY) != 0)) {
-		bool overTarget = fIconRect.Contains(point);
+		// highlight drag target
+		bool overTarget = fIconRect.Contains(where);
 		SetDrawingMode(B_OP_OVER);
 		if (overTarget != fIsDropTarget) {
 			IconCache::sIconCache->Draw(fIconModel, this, fIconRect.LeftTop(),
@@ -1345,21 +1351,21 @@ AttributeView::MouseMoved(BPoint point, uint32, const BMessage* message)
 
 	switch (fTrackingState) {
 		case link_track:
-			if (fLinkRect.Contains(point) != fMouseDown) {
+			if (fLinkRect.Contains(where) != fMouseDown) {
 				fMouseDown = !fMouseDown;
 				InvertRect(fLinkRect);
 			}
 			break;
 
 		case path_track:
-			if (fPathRect.Contains(point) != fMouseDown) {
+			if (fPathRect.Contains(where) != fMouseDown) {
 				fMouseDown = !fMouseDown;
 				InvertRect(fPathRect);
 			}
 			break;
 
 		case size_track:
-			if (fSizeRect.Contains(point) != fMouseDown) {
+			if (fSizeRect.Contains(where) != fMouseDown) {
 				fMouseDown = !fMouseDown;
 				InvertRect(fSizeRect);
 			}
@@ -1367,8 +1373,8 @@ AttributeView::MouseMoved(BPoint point, uint32, const BMessage* message)
 
 		case icon_track:
 			if (fMouseDown && !fDragging
-				&& (abs((int32)(point.x - fClickPoint.x)) > kDragSlop
-					|| abs((int32)(point.y - fClickPoint.y)) > kDragSlop)) {
+				&& (abs((int32)(where.x - fClickPoint.x)) > kDragSlop
+					|| abs((int32)(where.y - fClickPoint.y)) > kDragSlop)) {
 				// Find the required height
 				BFont font;
 				GetFont(&font);
@@ -1422,19 +1428,19 @@ AttributeView::MouseMoved(BPoint point, uint32, const BMessage* message)
 				view->Sync();
 				dragBitmap->Unlock();
 
-				BMessage message(B_REFS_RECEIVED);
-				message.AddPoint("click_pt", fClickPoint);
+				BMessage dragMessage(B_REFS_RECEIVED);
+				dragMessage.AddPoint("click_pt", fClickPoint);
 				BPoint tmpLoc;
 				uint32 button;
 				GetMouse(&tmpLoc, &button);
 				if (button)
-					message.AddInt32("buttons", (int32)button);
+					dragMessage.AddInt32("buttons", (int32)button);
 
-				message.AddInt32("be:actions",
+				dragMessage.AddInt32("be:actions",
 					(modifiers() & B_OPTION_KEY) != 0
 						? B_COPY_TARGET : B_MOVE_TARGET);
-				message.AddRef("refs", fModel->EntryRef());
-				DragMessage(&message, dragBitmap, B_OP_ALPHA,
+				dragMessage.AddRef("refs", fModel->EntryRef());
+				DragMessage(&dragMessage, dragBitmap, B_OP_ALPHA,
 					BPoint((fClickPoint.x - fIconRect.left)
 					+ hIconOffset, fClickPoint.y - fIconRect.top), this);
 				fDragging = true;
@@ -1552,18 +1558,18 @@ AttributeView::OpenLinkTarget()
 
 
 void
-AttributeView::MouseUp(BPoint point)
+AttributeView::MouseUp(BPoint where)
 {
 	// Are we in the link rect?
-	if (fTrackingState == link_track && fLinkRect.Contains(point)) {
+	if (fTrackingState == link_track && fLinkRect.Contains(where)) {
 		InvertRect(fLinkRect);
 		OpenLinkTarget();
-	} else if (fTrackingState == path_track && fPathRect.Contains(point)) {
+	} else if (fTrackingState == path_track && fPathRect.Contains(where)) {
 		InvertRect(fPathRect);
 		OpenLinkSource();
 	} else if ((fTrackingState == icon_track
 			|| fTrackingState == open_only_track)
-		&& fIconRect.Contains(point)) {
+		&& fIconRect.Contains(where)) {
 		// If it was a double click, then tell Tracker to open the item
 		// The CurrentMessage() here does* not* have a "clicks" field,
 		// which is why we are tracking the clicks with this temp var
@@ -1578,7 +1584,7 @@ AttributeView::MouseUp(BPoint point)
 			be_app->PostMessage(&message);
 			fDoubleClick = false;
 		}
-	} else if (fTrackingState == size_track && fSizeRect.Contains(point)) {
+	} else if (fTrackingState == size_track && fSizeRect.Contains(where)) {
 		// Recalculate size
 		Window()->PostMessage(kRecalculateSize);
 	}
@@ -1617,15 +1623,15 @@ AttributeView::CheckAndSetSize()
 
 		fFreeBytes = freeBytes;
 
-		fSizeStr.SetTo(B_TRANSLATE("%capacity (%used used -- %free free)"));
+		fSizeString.SetTo(B_TRANSLATE("%capacity (%used used -- %free free)"));
 
 		char sizeStr[128];
 		string_for_size(capacity, sizeStr, sizeof(sizeStr));
-		fSizeStr.ReplaceFirst("%capacity", sizeStr);
+		fSizeString.ReplaceFirst("%capacity", sizeStr);
 		string_for_size(capacity - fFreeBytes, sizeStr, sizeof(sizeStr));
-		fSizeStr.ReplaceFirst("%used", sizeStr);
+		fSizeString.ReplaceFirst("%used", sizeStr);
 		string_for_size(fFreeBytes, sizeStr, sizeof(sizeStr));
-		fSizeStr.ReplaceFirst("%free", sizeStr);
+		fSizeString.ReplaceFirst("%free", sizeStr);
 
 	} else if (fModel->IsFile()) {
 		// poll for size changes because they do not get node monitored
@@ -1642,8 +1648,8 @@ AttributeView::CheckAndSetSize()
 			return;
 
 		fLastSize = statBuf.st_size;
-		fSizeStr = "";
-		BInfoWindow::GetSizeString(fSizeStr, fLastSize, 0);
+		fSizeString = "";
+		BInfoWindow::GetSizeString(fSizeString, fLastSize, 0);
 	} else
 		return;
 
@@ -1695,12 +1701,13 @@ AttributeView::MessageReceived(BMessage* message)
 
 		default:
 			_inherited::MessageReceived(message);
+			break;
 	}
 }
 
 
 void
-AttributeView::Draw(BRect updateRect)
+AttributeView::Draw(BRect)
 {
 	// Set the low color for anti-aliasing
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -1777,17 +1784,17 @@ AttributeView::Draw(BRect updateRect)
 	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
 	SetHighColor(kAttrValueColor);
 	// Check for possible need of truncation
-	if (StringWidth(fSizeStr.String())
+	if (StringWidth(fSizeString.String())
 			> (Bounds().Width() - (fDivider + kBorderMargin))) {
-		BString tmpString(fSizeStr.String());
+		BString tmpString(fSizeString.String());
 		TruncateString(&tmpString, B_TRUNCATE_MIDDLE,
 			Bounds().Width() - (fDivider + kBorderMargin));
 		DrawString(tmpString.String());
 		fSizeRect.right = fSizeRect.left + StringWidth(tmpString.String())
 			+ 3;
 	} else {
-		DrawString(fSizeStr.String());
-		fSizeRect.right = fSizeRect.left + StringWidth(fSizeStr.String()) + 3;
+		DrawString(fSizeString.String());
+		fSizeRect.right = fSizeRect.left + StringWidth(fSizeString.String()) + 3;
 	}
 	lineBase += lineHeight;
 
@@ -2032,34 +2039,35 @@ AttributeView::FinishEditingTitle(bool commit)
 
 
 void
-AttributeView::MakeFocus(bool isFocus)
+AttributeView::MakeFocus(bool focus)
 {
-	if (!isFocus && fTitleEditView != NULL)
+	if (!focus && fTitleEditView != NULL)
 		FinishEditingTitle(true);
 }
 
 
 void
-AttributeView::WindowActivated(bool isFocus)
+AttributeView::WindowActivated(bool active)
 {
-	if (!isFocus) {
-		if (fTitleEditView != NULL)
-			FinishEditingTitle(true);
+	if (active)
+		return;
 
-		if (fPathWindow->Lock()) {
-			fPathWindow->Quit();
-			fPathWindow = NULL;
-		}
+	if (fTitleEditView != NULL)
+		FinishEditingTitle(true);
 
-		if (fLinkWindow->Lock()) {
-			fLinkWindow->Quit();
-			fLinkWindow = NULL;
-		}
+	if (fPathWindow->Lock()) {
+		fPathWindow->Quit();
+		fPathWindow = NULL;
+	}
 
-		if (fDescWindow->Lock()) {
-			fDescWindow->Quit();
-			fDescWindow = NULL;
-		}
+	if (fLinkWindow->Lock()) {
+		fLinkWindow->Quit();
+		fLinkWindow = NULL;
+	}
+
+	if (fDescWindow->Lock()) {
+		fDescWindow->Quit();
+		fDescWindow = NULL;
 	}
 }
 
@@ -2082,6 +2090,9 @@ AttributeView::CurrentFontHeight(float size)
 status_t
 AttributeView::BuildContextMenu(BMenu* parent)
 {
+	if (parent == NULL)
+		return B_BAD_VALUE;
+
 	// Add navigation menu if this is not a symlink
 	// Symlink's to directories are OK however!
 	BEntry entry(fModel->EntryRef());
@@ -2231,9 +2242,9 @@ AttributeView::SetLastSize(off_t lastSize)
 
 
 void
-AttributeView::SetSizeStr(const char* sizeStr)
+AttributeView::SetSizeString(const char* sizeString)
 {
-	fSizeStr = sizeStr;
+	fSizeString = sizeString;
 
 	BRect bounds(Bounds());
 	float lineHeight = CurrentFontHeight(kAttribFontHeight) + 6;
