@@ -167,7 +167,7 @@ ActivateWindowFilter(BMessage*, BHandler** target, BMessageFilter*)
 
 	// activate the window if no PoseView or DraggableContainerIcon had been
 	// pressed (those will activate the window themselves, if necessary)
-	if (view
+	if (view != NULL
 		&& !dynamic_cast<BPoseView*>(view)
 		&& !dynamic_cast<DraggableContainerIcon*>(view)
 		&& view->Window())
@@ -310,7 +310,7 @@ AddMimeTypeString(BObjectList<BString> &list, Model* model)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - DraggableContainerIcon
 
 
 DraggableContainerIcon::DraggableContainerIcon(BRect rect, const char* name,
@@ -519,7 +519,7 @@ DraggableContainerIcon::Draw(BRect updateRect)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BContainerWindow
 
 
 BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
@@ -1064,7 +1064,7 @@ BContainerWindow::RestoreStateCommon()
 	WindowStateNodeOpener opener(this, false);
 
 	bool isDesktop = dynamic_cast<BDeskWindow*>(this) != NULL;
-	if (!TargetModel()->IsRoot() && opener.Node()) {
+	if (!TargetModel()->IsRoot() && opener.Node() != NULL) {
 		// don't pick up background image for root disks
 		// to do this, would have to have a unique attribute for the
 		// disks window that doesn't collide with the desktop
@@ -1115,7 +1115,7 @@ BContainerWindow::UpdateBackgroundImage()
 	bool isDesktop = dynamic_cast<BDeskWindow*>(this) != NULL;
 	WindowStateNodeOpener opener(this, false);
 
-	if (!TargetModel()->IsRoot() && opener.Node()) {
+	if (!TargetModel()->IsRoot() && opener.Node() != NULL) {
 		fBackgroundImage = BackgroundImage::Refresh(fBackgroundImage,
 			opener.Node(), isDesktop, PoseView());
 	}
@@ -1225,7 +1225,7 @@ BContainerWindow::SaveState(bool hide)
 {
 	if (SaveStateIsEnabled()) {
 		WindowStateNodeOpener opener(this, true);
-		if (opener.StreamNode())
+		if (opener.StreamNode() != NULL)
 			SaveWindowState(opener.StreamNode());
 
 		if (hide)
@@ -1729,6 +1729,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 
 					default:
 						_inherited::MessageReceived(message);
+						break;
 				}
 			}
 			break;
@@ -1742,13 +1743,15 @@ BContainerWindow::MessageReceived(BMessage* message)
 			FSUndo();
 			break;
 
-		//case B_REDO:	// only defined in Dano/Zeta/OpenBeOS
+		//case B_REDO:
+			// only defined in Dano/Zeta/OpenBeOS
 		case kRedo:
 			FSRedo();
 			break;
 
 		default:
 			_inherited::MessageReceived(message);
+			break;
 	}
 }
 
@@ -3185,10 +3188,10 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 		EnableNamedMenuItem(menu, B_SELECT_ALL, count > 0);
 
 		BMenuItem* item = menu->FindItem(B_TRANSLATE("New"));
-		if (item) {
+		if (item != NULL) {
 			TemplatesMenu* templateMenu = dynamic_cast<TemplatesMenu*>
 				(item->Submenu());
-			if (templateMenu)
+			if (templateMenu != NULL)
 				templateMenu->UpdateMenuState();
 		}
 	}
@@ -3661,9 +3664,10 @@ BContainerWindow::NeedsDefaultStateSetup()
 		return false;
 
 	WindowStateNodeOpener opener(this, false);
-	if (!opener.StreamNode())
+	if (opener.StreamNode() == NULL) {
 		// can't read state, give up
 		return false;
+	}
 
 	return !NodeHasSavedState(opener.Node());
 }
@@ -3736,7 +3740,7 @@ BContainerWindow::SetUpDefaultState()
 
 	WindowStateNodeOpener opener(this, true);
 		// this is our destination node, whatever it is for this window
-	if (!opener.StreamNode())
+	if (opener.StreamNode() == NULL)
 		return;
 
 	if (!TargetModel()->IsRoot()) {
@@ -3806,7 +3810,7 @@ BContainerWindow::SetUpDefaultState()
 void
 BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 {
-	if (node == NULL || dynamic_cast<BDeskWindow*>(this)) {
+	if (node == NULL || dynamic_cast<BDeskWindow*>(this) != NULL) {
 		// don't restore any window state if we are a desktop window
 		return;
 	}
@@ -4218,14 +4222,15 @@ BContainerWindow::PopulateArrangeByMenu(BMenu* menu)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - WindowStateNodeOpener
 
 
 WindowStateNodeOpener::WindowStateNodeOpener(BContainerWindow* window,
 	bool forWriting)
-	:	fModelOpener(NULL),
-		fNode(NULL),
-		fStreamNode(NULL)
+	:
+	fModelOpener(NULL),
+	fNode(NULL),
+	fStreamNode(NULL)
 {
 	if (window->TargetModel() && window->TargetModel()->IsRoot()) {
 		BDirectory dir;
@@ -4314,12 +4319,13 @@ WindowStateNodeOpener::Node() const
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BackgroundView
 
 
 BackgroundView::BackgroundView(BRect frame)
-	:	BView(frame, "", B_FOLLOW_ALL,
-			B_FRAME_EVENTS | B_WILL_DRAW | B_PULSE_NEEDED)
+	:
+	BView(frame, "", B_FOLLOW_ALL,
+		B_FRAME_EVENTS | B_WILL_DRAW | B_PULSE_NEEDED)
 {
 }
 
@@ -4431,4 +4437,3 @@ BackgroundView::Pulse()
 	if (window)
 		window->PulseTaskLoop();
 }
-
