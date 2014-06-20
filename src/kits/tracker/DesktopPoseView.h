@@ -34,7 +34,7 @@ All rights reserved.
 
 //	DesktopPoseView adds support for displaying integrated desktops
 //	from multiple volumes to BPoseView
-#ifndef	_DESKTOP_POSE_VIEW_H
+#ifndef _DESKTOP_POSE_VIEW_H
 #define _DESKTOP_POSE_VIEW_H
 
 
@@ -88,4 +88,5 @@ DesktopPoseView::IsDesktopView() const
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _DESKTOP_POSE_VIEW_H

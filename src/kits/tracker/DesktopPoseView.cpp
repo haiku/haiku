@@ -32,10 +32,11 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-//	DesktopPoseView adds support for displaying integrated desktops
-//	from multiple volumes to BPoseView
+// DesktopPoseView adds support for displaying integrated desktops
+// from multiple volumes to BPoseView
 //
-//	Used by the Desktop window and by the root view in file panels
+// Used by the Desktop window and by the root view in file panels
+
 
 #include "DesktopPoseView.h"
 
@@ -52,7 +53,7 @@ All rights reserved.
 #include "TrackerString.h"
 
 
-//	#pragma mark -
+//	#pragma mark - DesktopPoseView
 
 
 DesktopPoseView::DesktopPoseView(Model* model, BRect frame, uint32 viewMode,
@@ -190,6 +191,7 @@ DesktopPoseView::ShowVolumes(bool visible, bool showShared)
 			RemoveRootPoses();
 		else
 			AddRootPoses(true, showShared);
+
 		UnlockLooper();
 	}
 }
@@ -221,7 +223,7 @@ void
 DesktopPoseView::AdaptToVolumeChange(BMessage* message)
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!tracker)
+	if (tracker == NULL)
 		return;
 
 	bool showDisksIcon = false;
@@ -247,7 +249,7 @@ DesktopPoseView::AdaptToVolumeChange(BMessage* message)
 			if (entry.GetRef(&ref) == B_OK) {
 				BContainerWindow* disksWindow
 					= tracker->FindContainerWindow(&ref);
-				if (disksWindow) {
+				if (disksWindow != NULL) {
 					disksWindow->Lock();
 					disksWindow->Close();
 				}
@@ -259,7 +261,7 @@ DesktopPoseView::AdaptToVolumeChange(BMessage* message)
 		entryMessage.AddString("name", model.EntryRef()->name);
 		BContainerWindow* deskWindow
 			= dynamic_cast<BContainerWindow*>(Window());
-		if (deskWindow)
+		if (deskWindow != NULL)
 			deskWindow->PostMessage(&entryMessage, deskWindow->PoseView());
 	}
 
