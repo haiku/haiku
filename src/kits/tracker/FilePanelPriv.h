@@ -31,7 +31,7 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef	_FILE_PANEL_PRIV_H
+#ifndef _FILE_PANEL_PRIV_H
 #define _FILE_PANEL_PRIV_H
 
 
@@ -70,31 +70,31 @@ public:
 
 	BFilePanelPoseView* PoseView() const;
 
-	virtual	bool QuitRequested();
-	virtual	void MenusBeginning();
-	virtual	void MenusEnded();
-	virtual	void DispatchMessage(BMessage* message, BHandler* handler);
-	virtual	void ShowContextMenu(BPoint, const entry_ref*, BView*);
+	virtual bool QuitRequested();
+	virtual void MenusBeginning();
+	virtual void MenusEnded();
+	virtual void DispatchMessage(BMessage* message, BHandler* handler);
+	virtual void ShowContextMenu(BPoint, const entry_ref*, BView*);
 
-			void SetClientObject(BFilePanel*);
-			void SetRefFilter(BRefFilter*);
-			void SetSaveText(const char* text);
-			void SetButtonLabel(file_panel_button, const char* text);
-			void SetTo(const entry_ref* ref);
-	virtual	void SelectionChanged();
-			void HandleOpenButton();
-			void HandleSaveButton();
-			void Rewind();
-			bool IsSavePanel() const;
-			void Refresh();
-			const BMessenger* Target() const;
+	void SetClientObject(BFilePanel*);
+	void SetRefFilter(BRefFilter*);
+	void SetSaveText(const char* text);
+	void SetButtonLabel(file_panel_button, const char* text);
+	void SetTo(const entry_ref* ref);
+	virtual void SelectionChanged();
+	void HandleOpenButton();
+	void HandleSaveButton();
+	void Rewind();
+	bool IsSavePanel() const;
+	void Refresh();
+	const BMessenger* Target() const;
 	BRefFilter* Filter() const;
 
 	void SetTarget(BMessenger);
 	void SetMessage(BMessage* message);
 
-	virtual	status_t GetNextEntryRef(entry_ref*);
-	virtual	void MessageReceived(BMessage*);
+	virtual status_t GetNextEntryRef(entry_ref*);
+	virtual void MessageReceived(BMessage*);
 
 	void SetHideWhenDone(bool);
 	bool HidesWhenDone(void);
@@ -111,49 +111,49 @@ protected:
 	virtual void RestoreWindowState(const BMessage&);
 	virtual void RestoreState(const BMessage&);
 
-	virtual	void AddFileContextMenus(BMenu*);
-	virtual	void AddWindowContextMenus(BMenu*);
-	virtual	void AddDropContextMenus(BMenu*);
-	virtual	void AddVolumeContextMenus(BMenu*);
+	virtual void AddFileContextMenus(BMenu*);
+	virtual void AddWindowContextMenus(BMenu*);
+	virtual void AddDropContextMenus(BMenu*);
+	virtual void AddVolumeContextMenus(BMenu*);
 
-	virtual	void SetupNavigationMenu(const entry_ref*, BMenu*);
-	virtual	void OpenDirectory();
-	virtual	void OpenParent();
-	virtual	void WindowActivated(bool state);
+	virtual void SetupNavigationMenu(const entry_ref*, BMenu*);
+	virtual void OpenDirectory();
+	virtual void OpenParent();
+	virtual void WindowActivated(bool state);
 
-	static	filter_result FSFilter(BMessage*, BHandler**, BMessageFilter*);
-	static	filter_result MessageDropFilter(BMessage*, BHandler**,
+	static filter_result FSFilter(BMessage*, BHandler**, BMessageFilter*);
+	static filter_result MessageDropFilter(BMessage*, BHandler**,
 		BMessageFilter*);
 
-			int32 ShowCenteredAlert(const char* text, const char* button1,
-				const char* button2 = NULL, const char* button3 = NULL);
+	int32 ShowCenteredAlert(const char* text, const char* button1,
+		const char* button2 = NULL, const char* button3 = NULL);
 
 private:
-			bool SwitchDirToDesktopIfNeeded(entry_ref &ref);
-			bool CanOpenParent() const;
-			void SwitchDirMenuTo(const entry_ref* ref);
-			void AdjustButton();
-			bool SelectChildInParent(const entry_ref* parent,
-				const node_ref* child);
-			void OpenSelectionCommon(BMessage*);
+	friend class BackgroundView;
 
-			bool			fIsSavePanel;
-			uint32			fNodeFlavors;
-			BackgroundView*	fBackView;
-			BDirMenu*		fDirMenu;
-			BMenuField*		fDirMenuField;
-			BTextControl*	fTextControl;
-			BMessenger		fTarget;
-			BFilePanel*		fClientObject;
-			int32			fSelectionIterator;
-			BMessage*		fMessage;
-			BString			fButtonText;
-			bool			fHideWhenDone;
-			bool			fIsTrackingMenu;
+	bool SwitchDirToDesktopIfNeeded(entry_ref &ref);
+	bool CanOpenParent() const;
+	void SwitchDirMenuTo(const entry_ref* ref);
+	void AdjustButton();
+	bool SelectChildInParent(const entry_ref* parent,
+		const node_ref* child);
+	void OpenSelectionCommon(BMessage*);
 
-			typedef BContainerWindow _inherited;
+	bool fIsSavePanel;
+	uint32 fNodeFlavors;
+	BackgroundView* fBackView;
+	BDirMenu* fDirMenu;
+	BMenuField* fDirMenuField;
+	BTextControl* fTextControl;
+	BMessenger fTarget;
+	BFilePanel* fClientObject;
+	int32 fSelectionIterator;
+	BMessage* fMessage;
+	BString fButtonText;
+	bool fHideWhenDone;
+	bool fIsTrackingMenu;
 
-			friend class BackgroundView;
+	typedef BContainerWindow _inherited;
 };
 
 
@@ -169,29 +169,29 @@ public:
 protected:
 	// don't do any volume watching and memtamime watching in file panels
 	// for now
-	virtual	void StartWatching();
-	virtual	void StopWatching();
+	virtual void StartWatching();
+	virtual void StopWatching();
 
-	virtual	void RestoreState(AttributeStreamNode*);
-	virtual	void RestoreState(const BMessage &);
-	virtual	void SavePoseLocations(BRect* = NULL);
+	virtual void RestoreState(AttributeStreamNode*);
+	virtual void RestoreState(const BMessage &);
+	virtual void SavePoseLocations(BRect* = NULL);
 
-	virtual	EntryListBase* InitDirentIterator(const entry_ref*);
-	virtual	void AddPosesCompleted();
-	virtual	bool IsDesktopView() const;
+	virtual EntryListBase* InitDirentIterator(const entry_ref*);
+	virtual void AddPosesCompleted();
+	virtual bool IsDesktopView() const;
 
-			void ShowVolumes(bool visible, bool showShared);
+	void ShowVolumes(bool visible, bool showShared);
 
-			void AdaptToVolumeChange(BMessage*);
-			void AdaptToDesktopIntegrationChange(BMessage*);
+	void AdaptToVolumeChange(BMessage*);
+	void AdaptToDesktopIntegrationChange(BMessage*);
 
 private:
-			bool fIsDesktop;
-				// This flags makes the distinction between the Desktop as
-				// the root of the world and "/boot/home/Desktop" to which
-				// we might have navigated from the home dir.
+	bool fIsDesktop;
+		// This flags makes the distinction between the Desktop as
+		// the root of the world and "/boot/home/Desktop" to which
+		// we might have navigated from the home dir.
 
-			typedef BPoseView _inherited;
+	typedef BPoseView _inherited;
 };
 
 
@@ -249,4 +249,5 @@ TFilePanel::TrackingMenu() const
 
 using namespace BPrivate;
 
-#endif
+
+#endif	// _FILE_PANEL_PRIV_H

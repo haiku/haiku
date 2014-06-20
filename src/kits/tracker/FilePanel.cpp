@@ -76,7 +76,7 @@ run_save_panel()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BFilePanel
 
 
 BFilePanel::BFilePanel(file_panel_mode mode, BMessenger* target,

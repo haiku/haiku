@@ -33,23 +33,9 @@ All rights reserved.
 */
 
 
-#include "Attributes.h"
-#include "AttributeStream.h"
-#include "AutoLock.h"
-#include "Commands.h"
-#include "DesktopPoseView.h"
-#include "DirMenu.h"
-#include "FavoritesMenu.h"
 #include "FilePanelPriv.h"
-#include "FSUtils.h"
-#include "FSClipboard.h"
-#include "IconMenuItem.h"
-#include "MimeTypes.h"
-#include "NavMenu.h"
-#include "PoseView.h"
-#include "Tracker.h"
-#include "tracker_private.h"
-#include "Utilities.h"
+
+#include <string.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -76,7 +62,23 @@ All rights reserved.
 #include <Volume.h>
 #include <VolumeRoster.h>
 
-#include <string.h>
+#include "Attributes.h"
+#include "AttributeStream.h"
+#include "AutoLock.h"
+#include "Commands.h"
+#include "DesktopPoseView.h"
+#include "DirMenu.h"
+#include "FavoritesMenu.h"
+#include "FSUtils.h"
+#include "FSClipboard.h"
+#include "IconMenuItem.h"
+#include "MimeTypes.h"
+#include "NavMenu.h"
+#include "PoseView.h"
+#include "Tracker.h"
+#include "Utilities.h"
+
+#include "tracker_private.h"
 
 
 const char* kDefaultFilePanelTemplate = "FilePanelSettings";
@@ -1271,6 +1273,7 @@ TFilePanel::MessageReceived(BMessage* message)
 
 		default:
 			_inherited::MessageReceived(message);
+			break;
 	}
 }
 
