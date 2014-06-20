@@ -108,7 +108,7 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage* entriesToOpen,
 	fLaunchButton->ResizeToPreferred();
 	fLaunchButton->MoveTo(rect.right - 10 - kDocumentKnobWidth
 		- fLaunchButton->Bounds().Width(),
-		rect.bottom - 10 - fLaunchButton->Bounds().Height());
+		rect.bottom - 10.0f - fLaunchButton->Bounds().Height());
 	backgroundView->AddChild(fLaunchButton);
 
 	BRect buttonRect = fLaunchButton->Frame();
@@ -117,8 +117,8 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage* entriesToOpen,
 		new BMessage(kOpenAndMakeDefault), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	// wide button, have to resize to fit text
 	fLaunchAndMakeDefaultButton->ResizeToPreferred();
-	fLaunchAndMakeDefaultButton->MoveBy(-10
-		- fLaunchAndMakeDefaultButton->Bounds().Width(), 0);
+	fLaunchAndMakeDefaultButton->MoveBy(-10.0f
+		- fLaunchAndMakeDefaultButton->Bounds().Width(), 0.0f);
 	backgroundView->AddChild(fLaunchAndMakeDefaultButton);
 	fLaunchAndMakeDefaultButton->SetEnabled(false);
 
@@ -126,21 +126,21 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage* entriesToOpen,
 	BButton* button = new BButton(buttonRect, "cancel", B_TRANSLATE("Cancel"),
 		new BMessage(kCancelButton), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
-	button->MoveBy(-10 - button->Bounds().Width(), 0);
+	button->MoveBy(-10.0f - button->Bounds().Width(), 0.0f);
 	backgroundView->AddChild(button);
 
 	fMinimalWidth = button->Bounds().Width() + fLaunchButton->Bounds().Width()
-		+ fLaunchAndMakeDefaultButton->Bounds().Width() + kDocumentKnobWidth 
-		+ 40;
+		+ fLaunchAndMakeDefaultButton->Bounds().Width() + kDocumentKnobWidth
+		+ 40.0f;
 
 	fLaunchButton->MakeDefault(true);
 
 	// add pose view
 
-	rect.OffsetTo(10, 10);
-	rect.bottom = buttonRect.top - 15;
+	rect.OffsetTo(10.0f, 10.0f);
+	rect.bottom = buttonRect.top - 15.0f;
 
-	rect.right -= B_V_SCROLL_BAR_WIDTH + 20;
+	rect.right -= B_V_SCROLL_BAR_WIDTH + 20.0f;
 	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
 		// make room for scrollbars and a margin
 	fPoseView = NewPoseView(0, rect, kListMode);
