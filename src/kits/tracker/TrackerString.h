@@ -158,4 +158,5 @@ TrackerString::CharsAreEqual(char char1, char char2,
 
 using namespace BPrivate;
 
+
 #endif	// _TRACKER_STRING_H

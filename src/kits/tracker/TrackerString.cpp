@@ -37,25 +37,32 @@ All rights reserved.
 #include <stdio.h>
 #include <stdlib.h>
 
+
+//	#pragma mark - TrackerString
+
+
 TrackerString::TrackerString()
 {
 }
 
 
 TrackerString::TrackerString(const char* string)
-	:	BString(string)
+	:
+	BString(string)
 {
 }
 
 
 TrackerString::TrackerString(const TrackerString &string)
-	:	BString(string)
+	:
+	BString(string)
 {
 }
 
 
 TrackerString::TrackerString(const char* string, int32 maxLength)
-	:	BString(string, maxLength)
+	:
+	BString(string, maxLength)
 {
 }
 
@@ -191,7 +198,7 @@ TrackerString::FindFirst(const BString &string, int32 fromOffset) const
 int32
 TrackerString::FindFirst(const char* string, int32 fromOffset) const
 {
-	if (!string)
+	if (string == NULL)
 		return -1;
 
 	int32 length = Length();
@@ -263,7 +270,7 @@ TrackerString::FindLast(const BString &string, int32 beforeOffset) const
 int32
 TrackerString::FindLast(const char* string, int32 beforeOffset) const
 {
-	if (!string)
+	if (string == NULL)
 		return -1;
 
 	int32 length = Length();
@@ -336,7 +343,7 @@ TrackerString::IFindFirst(const BString &string, int32 fromOffset) const
 int32
 TrackerString::IFindFirst(const char* string, int32 fromOffset) const
 {
-	if (!string)
+	if (string == NULL)
 		return -1;
 
 	int32 length = Length();
@@ -392,7 +399,7 @@ TrackerString::IFindLast(const BString &string, int32 beforeOffset) const
 int32
 TrackerString::IFindLast(const char* string, int32 beforeOffset) const
 {
-	if (!string)
+	if (string == NULL)
 		return -1;
 
 	int32 length = Length();
@@ -519,7 +526,6 @@ TrackerString::StringMatchesPattern(const char* string, const char* pattern,
 				string++;
 				if (IsInsideGlyph(string[0]))
 					string = MoveToEndOfGlyph(string);
-
 				break;
 
 			case '*':
@@ -635,7 +641,6 @@ TrackerString::StringMatchesPattern(const char* string, const char* pattern,
 						string = sStorage[patternLevel];
 				} else
 					return false;
-
 				break;
 			}
 		}
