@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef __PUBLIC_COMMANDS__
-#define __PUBLIC_COMMANDS__
+#ifndef _PUBLIC_COMMANDS_H
+#define _PUBLIC_COMMANDS_H
 
 
 #include <SupportDefs.h>
@@ -60,4 +60,5 @@ const uint32 kFSClipboardChanges = 'TCch';
 
 using namespace BPrivate;
 
-#endif	// __PUBLIC_COMMANDS__
+
+#endif	// _PUBLIC_COMMANDS_H
