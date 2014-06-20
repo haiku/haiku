@@ -36,7 +36,7 @@ All rights reserved.
 
 
 #include <Locker.h>
-#include "ObjectList.h"
+#include <ObjectList.h>
 
 
 namespace BPrivate {
@@ -46,9 +46,9 @@ class LockingList : public BObjectList<T> {
 public:
 	LockingList(int32 itemsPerBlock = 20, bool owning = false);
 	~LockingList()
-		{
+	{
 		Lock();
-		}
+	}
 
 	bool Lock();
 	void Unlock();
@@ -61,7 +61,8 @@ private:
 
 template<class T>
 LockingList<T>::LockingList(int32 itemsPerBlock, bool owning)
-	:	BObjectList<T>(itemsPerBlock, owning)
+	:
+	BObjectList<T>(itemsPerBlock, owning)
 {
 }
 
@@ -92,5 +93,6 @@ LockingList<T>::IsLocked() const
 } // namespace BPrivate
 
 using namespace BPrivate;
+
 
 #endif	// _LOCKING_LIST_H
