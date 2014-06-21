@@ -393,6 +393,7 @@ BNavMenu::ClearMenuBuildingState()
 		int32 count = fItemList->CountItems();
 		for (int32 index = count - 1; index >= 0; index--)
 			delete RemoveItem(index);
+
 		delete fItemList;
 		fItemList = NULL;
 	}
@@ -579,7 +580,7 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 		return 0;
 
 	entry_ref ref;
-	bool container = false;
+	bool isContainer = false;
 	if (model->IsSymLink()) {
 		Model* newResolvedModel = 0;
 		Model* result = model->LinkTo();
@@ -617,13 +618,13 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 			}
 
 			ref = *result->EntryRef();
-			container = result->IsContainer();
+			isContainer = result->IsContainer();
 		}
 
 		model->SetLinkTo(result);
 	} else {
 		ref = *model->EntryRef();
-		container = model->IsContainer();
+		isContainer = model->IsContainer();
 	}
 
 	BMessage* message = new BMessage(*invokeMessage);
@@ -635,7 +636,7 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 		GetMaxMenuWidth());
 
 	ModelMenuItem* item = NULL;
-	if (container || suppressFolderHierarchy) {
+	if (!isContainer || suppressFolderHierarchy) {
 		item = new ModelMenuItem(model, truncatedString.String(), message);
 		if (invokeMessage->what != B_REFS_RECEIVED)
 			item->SetEnabled(false);
@@ -644,7 +645,6 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 	} else {
 		BNavMenu* menu = new BNavMenu(truncatedString.String(),
 			invokeMessage->what, target, parentWindow, typeslist);
-
 		menu->SetNavDir(&ref);
 		if (hook != NULL) {
 			menu->InitTrackingHook(hook->fTrackingHook, &(hook->fTarget),
@@ -801,12 +801,11 @@ BNavMenu::AddNavParentDir(const char* name,const Model* model,
 	menu->SetNavDir(model->EntryRef());
 	menu->SetShowParent(true);
 	menu->InitTrackingHook(fTrackingHook.fTrackingHook,
-		&fTrackingHook.fTarget, fTrackingHook.fDragMessage);
+		&(fTrackingHook.fTarget), fTrackingHook.fDragMessage);
 
 	BMenuItem* item = new SpecialModelMenuItem(model, menu);
-
 	BMessage* message = new BMessage(what);
-	message->AddRef("refs",model->EntryRef());
+	message->AddRef("refs", model->EntryRef());
 	item->SetMessage(message);
 
 	AddItem(item);
