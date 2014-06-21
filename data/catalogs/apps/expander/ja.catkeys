@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Expander	3431738656
+1	japanese	x-vnd.Haiku-Expander	2177073262
 Expand	ExpanderMenu		解凍
 Close window when done expanding	ExpanderPreferences		解凍終了後ウィンドウを閉じる
 Set destination…	ExpanderMenu		解凍先を指定…
@@ -34,6 +34,7 @@ Automatically show contents listing	ExpanderPreferences		内容リストを自�
 OK	ExpanderPreferences		OK
 Leave destination folder path empty	ExpanderPreferences		パスを空にしておく
 Failed to create the destination folder.	ExpanderWindow		展開先のフォルダーを作成できませんでした:
+Select '%s'…	DirectoryFilePanel		'%s' を選択…
 Create	ExpanderWindow		作成
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		指定されたフォルダーが移動されたか、名前が変更されたか、\nサポートされていません。
 The file doesn't exist	ExpanderWindow		ファイルがありません
