@@ -668,7 +668,7 @@ OpenWithPoseView::InitDirentIterator(const entry_ref*)
 		return NULL;
 	}
 	SetRefFilter(new OpenWithRefFilter(fIterator, entryList,
-		fHaveCommonPreferredApp ? &fPreferredRef : 0));
+		(fHaveCommonPreferredApp ? &fPreferredRef : 0)));
 
 	return fIterator;
 }
@@ -1112,7 +1112,7 @@ OpenWithMenu::AddNextItem()
 	Model* model = new Model(&entry, true);
 	if (model->InitCheck() != B_OK
 		|| !fIterator->CanOpenWithFilter(model, &fEntriesToOpen,
-			fHaveCommonPreferredApp ? &fPreferredRef : 0)) {
+			(fHaveCommonPreferredApp ? &fPreferredRef : 0))) {
 		// only allow executables, filter out multiple copies of the Tracker,
 		// filter out version that don't list the correct types, etc.
 		delete model;

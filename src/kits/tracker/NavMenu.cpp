@@ -120,7 +120,7 @@ SpringLoadedFolderCompareMessages(const BMessage* incoming,
 		BPoint dragPoint;
 		if (incoming->FindPoint("click_pt", &incomingPoint) == B_OK
 			&& dragMessage->FindPoint("click_pt", &dragPoint) == B_OK) {
-			refsMatch = incomingPoint == dragPoint;
+			refsMatch = (incomingPoint == dragPoint);
 		}
 	}
 
