@@ -338,7 +338,7 @@ IconTestWindow::QuitRequested()
 void
 RunIconCacheTests()
 {
-	new IconTestWindow()->Show();
+	(new IconTestWindow())->Show();
 }
 
 #endif	// DEBUG
