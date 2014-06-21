@@ -265,8 +265,8 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 	fMessenger(target, target->Looper()),
 	fParentWindow(parentWindow),
 	fFlags(0),
-	fItemList(0),
-	fContainer(0),
+	fItemList(NULL),
+	fContainer(NULL),
 	fTypesList(new BObjectList<BString>(10, true))
 {
 	if (list != NULL)
