@@ -1661,7 +1661,7 @@ ConditionalAllAppsIterator::ConditionalAllAppsIterator(
 void
 ConditionalAllAppsIterator::Instantiate()
 {
-	if (fWalker == NULL)
+	if (fWalker != NULL)
 		return;
 
 	BString lookForAppsPredicate;
