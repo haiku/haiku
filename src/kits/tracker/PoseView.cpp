@@ -6936,7 +6936,10 @@ BPoseView::FindNearbyPose(char arrowKey, int32* poseIndex)
 		return poseToSelect;
 	}
 
-	BRect selectionRect(selectedPose->CalcRect(this));
+	BRect selectionRect;
+	if (selectedPose != NULL)
+		selectionRect = selectedPose->CalcRect(this);
+
 	BRect bestRect;
 
 	// we're not in list mode so scan visually for pose to select
