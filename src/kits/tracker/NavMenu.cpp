@@ -140,7 +140,7 @@ SpringLoadedFolderSetMenuStates(const BMenu* menu,
 	int32 count = menu->CountItems();
 	for (int32 index = 0 ; index < count ; index++) {
 		ModelMenuItem* item = dynamic_cast<ModelMenuItem*>(menu->ItemAt(index));
-		if (!item)
+		if (item == NULL)
 			continue;
 
 		const Model* model = item->TargetModel();
