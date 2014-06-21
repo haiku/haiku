@@ -885,7 +885,8 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 		// resultingOpenCache is the locker that points to the cache that
 		// ended with a hit and will be used for the drawing
 
-	{	// scope for modelOpener
+	{
+		// scope for modelOpener
 
 		ModelNodeLazyOpener modelOpener(model);
 			// this opener takes care of opening the model and possibly
@@ -903,39 +904,41 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 					&resultingOpenCache, model, source, mode, size,
 					&lazyBitmap, entry, permanent);
 
-				if (!entry || !entry->HaveIconBitmap(mode, size))
+				if (entry == NULL || !entry->HaveIconBitmap(mode, size)) {
 					// look for volume defined icon
 					entry = GetVolumeIcon(nodeCacheLocker, sharedCacheLocker,
 						&resultingOpenCache, model, source, mode,
 						size, &lazyBitmap);
-
+				}
 			} else if (model->IsRoot()) {
-
 				entry = GetRootIcon(nodeCacheLocker, sharedCacheLocker,
-					&resultingOpenCache, model, source, mode, size, &lazyBitmap);
-				ASSERT(entry);
-
+					&resultingOpenCache, model, source, mode, size,
+						&lazyBitmap);
+				ASSERT(entry != NULL);
 			} else {
-				if (source == kUnknownSource)
+				if (source == kUnknownSource) {
 					// look for node icons first
 					entry = GetNodeIcon(&modelOpener, nodeCacheLocker,
 						&resultingOpenCache, model, source,
 						mode, size, &lazyBitmap, entry, permanent);
+				}
 
-
-				if (!entry) {
+				if (entry == NULL) {
 					// no node icon, look for file type based one
 					modelOpener.OpenNode();
 					// use file types to get the icon
 					resultingOpenCache = sharedCacheLocker;
 					resultingOpenCache->Lock();
 
-					entry = GetIconFromFileTypes(&modelOpener, source, mode, size,
-						&lazyBitmap, 0);
+					entry = GetIconFromFileTypes(&modelOpener, source, mode,
+						size, &lazyBitmap, 0);
 
-					if (!entry) // we don't have an icon, go with the generic
-						entry = GetGenericIcon(sharedCacheLocker, &resultingOpenCache,
-							model, source, mode, size, &lazyBitmap, entry);
+					if (entry == NULL) {
+						// we don't have an icon, go with the generic
+						entry = GetGenericIcon(sharedCacheLocker,
+							&resultingOpenCache, model, source, mode,
+							size, &lazyBitmap, entry);
+					}
 				}
 			}
 
@@ -953,8 +956,9 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 						&resultingOpenCache, model, source, mode,
 						size, &lazyBitmap, entry, permanent);
 
-					if (entry) {
-						entry = IconCacheEntry::ResolveIfAlias(&fSharedCache, entry);
+					if (entry != NULL) {
+						entry = IconCacheEntry::ResolveIfAlias(&fSharedCache,
+							entry);
 						if (!entry->HaveIconBitmap(mode, size)
 							&& entry->HaveIconBitmap(NORMAL_ICON_ONLY, size)) {
 							entry->ConstructBitmap(mode, size, &lazyBitmap);
@@ -970,11 +974,11 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 							&lazyBitmap);
 						break;
 					} else {
-						entry = GetWellKnownIcon(nodeCacheLocker, sharedCacheLocker,
-							&resultingOpenCache, model, source, mode, size,
-							&lazyBitmap);
+						entry = GetWellKnownIcon(nodeCacheLocker,
+							sharedCacheLocker, &resultingOpenCache, model,
+							source, mode, size, &lazyBitmap);
 
-						if (entry)
+						if (entry != NULL)
 							break;
 					}
 					// fall through
@@ -984,10 +988,12 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 						entry = GetNodeIcon(&modelOpener, nodeCacheLocker,
 							&resultingOpenCache, model, source,
 							mode, size, &lazyBitmap, entry, permanent);
-						if (!entry || !entry->HaveIconBitmap(mode, size))
-							entry = GetVolumeIcon(nodeCacheLocker, sharedCacheLocker,
-								&resultingOpenCache, model, source, mode, size,
-								&lazyBitmap);
+						if (entry == NULL
+							|| !entry->HaveIconBitmap(mode, size)) {
+							entry = GetVolumeIcon(nodeCacheLocker,
+								sharedCacheLocker, &resultingOpenCache, model,
+								source, mode, size, &lazyBitmap);
+						}
 						break;
 					}
 					// fall through
@@ -997,25 +1003,27 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 					resultingOpenCache = sharedCacheLocker;
 					resultingOpenCache->Lock();
 
-					entry = GetIconFromFileTypes(&modelOpener, source, mode, size,
-						&lazyBitmap, 0);
-					ASSERT(!entry || entry->HaveIconBitmap(mode, size));
+					entry = GetIconFromFileTypes(&modelOpener, source, mode,
+						size, &lazyBitmap, 0);
+					ASSERT(entry != NULL || entry->HaveIconBitmap(mode, size));
 
-					if (!entry || !entry->HaveIconBitmap(mode, size))
+					if (entry == NULL || !entry->HaveIconBitmap(mode, size)) {
 						// we don't have an icon, go with the generic
-						entry = GetGenericIcon(sharedCacheLocker, &resultingOpenCache,
-							model, source, mode, size, &lazyBitmap, entry);
+						entry = GetGenericIcon(sharedCacheLocker,
+							&resultingOpenCache, model, source, mode, size,
+							&lazyBitmap, entry);
+					}
 
 					model->SetIconFrom(source);
-						// the source shouldn't change in this case; if it does though we
-						// might never be hitting the correct icon and instead keep leaking
-						// entries after each miss
-						// this now happens if an app defines an icon but a GetIconForType
-						// fails and we fall back to generic icon
-						// ToDo:
-						// fix this and add an assert to the effect
+						// The source shouldn't change in this case; if it does
+						// though we might never be hitting the correct icon and
+						// instead keep leaking entries after each miss this now
+						// happens if an app defines an icon but a
+						// GetIconForType() fails and we fall back to generic
+						// icon.
+						// ToDo: fix this and add an assert to the effect
 
-					ASSERT(entry);
+					ASSERT(entry != NULL);
 					ASSERT(entry->HaveIconBitmap(mode, size));
 					break;
 
@@ -1025,7 +1033,7 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 			}
 		}
 
-		if (!entry || !entry->HaveIconBitmap(mode, size)) {
+		if (entry == NULL || !entry->HaveIconBitmap(mode, size)) {
 			// we don't have an icon, go with the generic
 			PRINT(
 				("icon cache complete miss, falling back on generic icon "
@@ -1035,7 +1043,7 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 
 			// we don't even have generic, something is really broken,
 			// go with hardcoded generic icon
-			if (!entry || !entry->HaveIconBitmap(mode, size)) {
+			if (entry == NULL || !entry->HaveIconBitmap(mode, size)) {
 				PRINT(
 				("icon cache complete miss, falling back on generic "
 				 "icon for %s\n", model->Name()));
@@ -1050,9 +1058,9 @@ IconCache::Preload(AutoLock<SimpleIconCache>* nodeCacheLocker,
 		}
 	}
 
-	ASSERT(entry && entry->HaveIconBitmap(mode, size));
+	ASSERT(entry != NULL && entry->HaveIconBitmap(mode, size));
 
-	if (resultingCache)
+	if (resultingCache != NULL)
 		*resultingCache = resultingOpenCache;
 
 	return entry;
@@ -1075,10 +1083,10 @@ IconCache::Draw(Model* model, BView* view, BPoint where, IconDrawMode mode,
 		// Preload finds/creates the appropriate entry, locking down the
 		// cache it is in and returns the whole state back to here
 
-	if (!entry)
+	if (entry == NULL)
 		return;
 
-	ASSERT(entry);
+	ASSERT(entry != NULL);
 	ASSERT(entry->HaveIconBitmap(mode, size));
 	// got the entry, now draw it
 	resultingCacheLocker->LockedItem()->Draw(entry, view, where, mode,
@@ -1102,10 +1110,10 @@ IconCache::SyncDraw(Model* model, BView* view, BPoint where,
 	IconCacheEntry* entry = Preload(&nodeCacheLocker, &sharedCacheLocker,
 		&resultingCacheLocker, model, mode, size, false);
 
-	if (!entry)
+	if (entry == NULL)
 		return;
 
-	ASSERT(entry);
+	ASSERT(entry != NULL);
 	ASSERT(entry->HaveIconBitmap(mode, size));
 	resultingCacheLocker->LockedItem()->Draw(entry, view, where,
 		mode, size, blitFunc, passThruState);
@@ -1139,7 +1147,7 @@ IconCache::Preload(const char* fileType, IconDrawMode mode, icon_size size)
 	// try getting the icon from the preferred app for the signature
 	IconCacheEntry* entry = GetIconForPreferredApp(fileType, preferredAppSig,
 		mode, size, &lazyBitmap, 0);
-	if (entry)
+	if (entry != NULL)
 		return B_OK;
 
 	// try getting the icon directly from the metamime
@@ -1207,13 +1215,13 @@ IconCache::IconChanged(const char* mimeType, const char* appSignature)
 {
 	AutoLock<SimpleIconCache> sharedLock(&fSharedCache);
 	SharedCacheEntry* entry = fSharedCache.FindItem(mimeType, appSignature);
-	if (!entry)
+	if (entry == NULL)
 		return;
 
 	AutoLock<SimpleIconCache> nodeLock(&fNodeCache);
 
 	entry = (SharedCacheEntry*)fSharedCache.ResolveIfAlias(entry);
-	ASSERT(entry);
+	ASSERT(entry != NULL);
 	int32 index = fSharedCache.EntryIndex(entry);
 
 	fNodeCache.RemoveAliasesTo(index);
@@ -1350,7 +1358,7 @@ IconCache::IconHitTest(BPoint where, const Model* model, IconDrawMode mode,
 		// Preload finds/creates the appropriate entry, locking down the
 		// cache it is in and returns the whole state back to here
 
-	if (entry)
+	if (entry != NULL)
 		return entry->IconHitTest(where, mode, size);
 
 	return false;
