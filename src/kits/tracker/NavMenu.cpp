@@ -585,7 +585,7 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 		Model* newResolvedModel = 0;
 		Model* result = model->LinkTo();
 
-		if (result != NULL) {
+		if (result == NULL) {
 			newResolvedModel = new Model(model->EntryRef(), true, true);
 
 			if (newResolvedModel->InitCheck() != B_OK) {
