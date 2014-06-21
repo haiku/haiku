@@ -6920,14 +6920,17 @@ BPoseView::FindNearbyPose(char arrowKey, int32* poseIndex)
 			if (pose == NULL)
 				break;
 
-			BRect selectedBounds(poseToSelect->CalcRect(this));
-			BRect poseRect(pose->CalcRect(this));
+			if (poseToSelect != NULL) {
+				BRect selectedBounds;
+				selectedBounds = poseToSelect->CalcRect(this);
+				BRect poseRect(pose->CalcRect(this));
 
-			if (poseRect.top > selectedBounds.top)
-				break;
+				if (poseRect.top > selectedBounds.top)
+					break;
 
-			if (poseRect.left < selectedBounds.left)
-				poseToSelect = pose;
+				if (poseRect.left < selectedBounds.left)
+					poseToSelect = pose;
+			}
 		}
 
 		return poseToSelect;
