@@ -1165,8 +1165,9 @@ TFilePanel::MessageReceived(BMessage* message)
 			BPath homePath;
 			entry_ref ref;
 			if (find_directory(B_USER_DIRECTORY, &homePath) != B_OK
-				|| get_ref_for_path(homePath.Path(), &ref) != B_OK)
+				|| get_ref_for_path(homePath.Path(), &ref) != B_OK) {
 				break;
+			}
 
 			SetTo(&ref);
 			break;
