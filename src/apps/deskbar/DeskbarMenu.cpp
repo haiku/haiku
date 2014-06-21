@@ -65,26 +65,23 @@ All rights reserved.
 #define ROSTER_SIG "application/x-vnd.Be-ROST"
 
 #ifdef MOUNT_MENU_IN_DESKBAR
-
 class DeskbarMountMenu : public BPrivate::MountMenu {
-	public:
-		DeskbarMountMenu(const char* name);
-		virtual bool AddDynamicItem(add_state s);
+public:
+	DeskbarMountMenu(const char* name);
+	virtual bool AddDynamicItem(add_state s);
 };
+#endif	// MOUNT_MENU_IN_DESKBAR
 
-#endif
-
-// #define SHOW_RECENT_FIND_ITEMS
+//#define SHOW_RECENT_FIND_ITEMS
 
 namespace BPrivate {
 	BMenu* TrackerBuildRecentFindItemsMenu(const char*);
 }
 
-
 using namespace BPrivate;
 
 
-//	#pragma mark -
+//	#pragma mark - TDeskbarMenu
 
 
 TDeskbarMenu::TDeskbarMenu(TBarView* barView)
@@ -99,7 +96,7 @@ TDeskbarMenu::TDeskbarMenu(TBarView* barView)
 void
 TDeskbarMenu::AttachedToWindow()
 {
-	if (fBarView && fBarView->LockLooper()) {
+	if (fBarView != NULL && fBarView->LockLooper()) {
 		if (fBarView->Dragging()) {
 			SetTypesList(fBarView->CachedTypesList());
 			SetTarget(BMessenger(fBarView));
@@ -122,9 +119,9 @@ TDeskbarMenu::AttachedToWindow()
 void
 TDeskbarMenu::DetachedFromWindow()
 {
-	if (fBarView) {
+	if (fBarView != NULL) {
 		BLooper* looper = fBarView->Looper();
-		if (looper && looper->Lock()) {
+		if (looper != NULL && looper->Lock()) {
 			fBarView->DragStop();
 			looper->Unlock();
 		}
@@ -656,12 +653,10 @@ TRecentsMenu::ResetTargets()
 }
 
 
-//*****************************************************************************
-//	#pragma mark -
+//	#pragma mark - DeskbarMountMenu
 
 
 #ifdef MOUNT_MENU_IN_DESKBAR
-
 DeskbarMountMenu::DeskbarMountMenu(const char* name)
 	: BPrivate::MountMenu(name)
 {
@@ -678,5 +673,4 @@ DeskbarMountMenu::AddDynamicItem(add_state s)
 
 	return false;
 }
-
-#endif
+#endif	// MOUNT_MENU_IN_DESKBAR
