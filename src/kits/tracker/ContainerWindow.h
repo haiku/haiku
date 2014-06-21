@@ -332,11 +332,11 @@ private:
 
 
 class WindowStateNodeOpener {
-// this class manages opening and closing the proper node for
-// state restoring / saving; the constructor knows how to decide whether
-// to use a special directory for root, etc.
-// setter calls used when no attributes can be read from a node and
-// defaults are to be substituted
+	// this class manages opening and closing the proper node for
+	// state restoring / saving; the constructor knows how to decide whether
+	// to use a special directory for root, etc.
+	// setter calls used when no attributes can be read from a node and
+	// defaults are to be substituted
 public:
 	WindowStateNodeOpener(BContainerWindow* window, bool forWriting);
 	virtual ~WindowStateNodeOpener();
@@ -356,7 +356,7 @@ private:
 
 
 class BackgroundView : public BView {
-// background view placed in a BContainerWindow, under the pose view
+	// background view placed in a BContainerWindow, under the pose view
 public:
 	BackgroundView(BRect);
 	virtual	void AttachedToWindow();
