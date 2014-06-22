@@ -11,7 +11,7 @@ RemotePackageRepository HaikuPorts
 	texi2html-1.82-2
 	timgmsoundfont-2004_01_24-3
 	wqy_microhei-0.2.0~beta-3
-	youtube_dl-2014.02.08-1
+	youtube_dl-2014.06.19-1
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
@@ -366,7 +366,7 @@ RemotePackageRepository HaikuPorts
 	qtcore_x86-4.8.5.git-4
 	qtcore_x86_devel-4.8.5.git-4
 	quassel_x86-0.10.0-1
-	quicklaunch-0.9.7-1
+	quicklaunch-0.9.7-2
 	qupzilla_x86-1.7.x-1
 	rocksndiamonds_x86-3.3.1.2-1
 	sdl_gfx_x86-2.0.24-1
