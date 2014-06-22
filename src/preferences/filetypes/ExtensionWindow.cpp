@@ -137,15 +137,16 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 		new BMessage(kMsgAccept));
 	fAcceptButton->SetEnabled(false);
 
-	BButton* button = new BButton(B_TRANSLATE("Cancel"),
+	BButton* cancelButton = new BButton(B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
 	float padding = be_control_look->DefaultItemSpacing();
 	BLayoutBuilder::Grid<>(this, padding, padding)
 		.SetInsets(padding, padding, padding, padding)
-		.AddTextControl(fExtensionControl, 0, 0)
-		.Add(fAcceptButton, 0, 1)
-		.Add(button, 1, 1);
+		.AddTextControl(fExtensionControl, 0, 0, B_ALIGN_HORIZONTAL_UNSET, 1, 2)
+		.Add(BSpaceLayoutItem::CreateGlue(), 0, 1)
+		.Add(cancelButton, 1, 1)
+		.Add(fAcceptButton, 2, 1);
 
 	// omit the leading dot
 	if (fExtension.ByteAt(0) == '.')
