@@ -4,7 +4,9 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
+	buildbot_slave-0.8.8-1
 	ca_root_certificates-2012_12_29-1
+	python_zope.interface-4.1.1-1
 	texi2html-1.82-2
 	timgmsoundfont-2004_01_24-3
 	wqy_microhei-0.2.0~beta-3
@@ -129,6 +131,7 @@ RemotePackageRepository HaikuPorts
 	perl-5.18.2-2
 	pkgconfig-0.27.1-2
 	python-2.6.9-1
+	python_twisted-13.2.0-1
 	qrencode-3.3.0-1
 	qrencode_devel-3.3.0-1
 	readline-6.3-2
@@ -223,6 +226,7 @@ RemotePackageRepository HaikuPorts
 	binutils
 	binutils_x86_gcc2
 	bison
+	buildbot_slave
 	bzip2
 	cdrtools
 	clang
@@ -243,7 +247,7 @@ RemotePackageRepository HaikuPorts
 	gettext
 	git
 	glu
-	gmp	
+	gmp
 	gperf
 	grep
 	groff
@@ -268,7 +272,7 @@ RemotePackageRepository HaikuPorts
 	libvpx
 	libxml2
 	libxslt
-	lz4	
+	lz4
 	m4
 	make
 	man
@@ -287,6 +291,8 @@ RemotePackageRepository HaikuPorts
 	perl
 	pkgconfig
 	python
+	python_twisted
+	python_zope.interface
 	qrencode
 	readline
 	ruby

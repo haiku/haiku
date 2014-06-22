@@ -4,10 +4,12 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
+	buildbot_slave-0.8.8-1
 	ca_root_certificates-2012_12_29-1
 	openttd_gfx-0.4.7-1
 	openttd_msx-0.3.1-1
 	openttd_sfx-0.2.3-1
+	python_zope.interface-4.1.1-1
 	texi2html-1.82-2
 	timgmsoundfont-2004_01_24-3
 	wqy_microhei-0.2.0~beta-3
@@ -167,6 +169,7 @@ RemotePackageRepository HaikuPorts
 	pipepanic-0.1.3-3
 	pkgconfig-0.27.1-1
 	python-2.6.8-6
+	python_twisted-13.2.0-1
 	qrencode-3.3.0-1
 	qrencode_devel-3.3.0-1
 	readline-6.3-2
@@ -519,6 +522,8 @@ RemotePackageRepository HaikuPorts
 	pkgconfig
 	protrekkr_x86
 	python
+	python_twisted
+	python_zope.interface
 	qemu_x86
 	qrencode
 	qtcore_x86
@@ -558,7 +563,7 @@ RemotePackageRepository HaikuPorts
 	vcmi_x86
 	vim
 	vision
-	wget	
+	wget
 	which
 	wpa_supplicant
 	yab
