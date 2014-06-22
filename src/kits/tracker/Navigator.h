@@ -38,6 +38,7 @@ All rights reserved.
 #include <PictureButton.h>
 #include <View.h>
 
+#include "ContainerWindow.h"
 #include "Model.h"
 
 
