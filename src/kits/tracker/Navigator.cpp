@@ -33,17 +33,17 @@ All rights reserved.
 */
 
 
-#include "Bitmaps.h"
-#include "Commands.h"
-#include "ContainerWindow.h"
-#include "FSUtils.h"
-#include "Model.h"
 #include "Navigator.h"
-#include "Tracker.h"
 
 #include <Picture.h>
 #include <TextControl.h>
 #include <Window.h>
+
+#include "Bitmaps.h"
+#include "Commands.h"
+#include "FSUtils.h"
+#include "Model.h"
+#include "Tracker.h"
 
 
 namespace BPrivate {
