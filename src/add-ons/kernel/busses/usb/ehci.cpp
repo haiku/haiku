@@ -1613,6 +1613,22 @@ EHCI::FinishTransfers()
 					break;
 				}
 
+				if(((status>>EHCI_QTD_PID_SHIFT) & EHCI_QTD_PID_MASK) == EHCI_QTD_PID_IN 
+					&& ((status>>EHCI_QTD_BYTES_SHIFT) & EHCI_QTD_BYTES_MASK) !=0) {
+					// a short packet condition existed on this descriptor
+					if(transfer->transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE) {
+						// for control pipes, the next descriptor
+						// executed is the Status descriptor
+						while(!(descriptor->next_phy & EHCI_ITEM_TERMINATE)) {
+							descriptor = descriptor->next_log;
+						}
+						continue;
+					}
+					// for bulk/interrupt pipes, no other descriptors are executed
+					transferDone = true;
+					break;
+				}
+				
 				descriptor = descriptor->next_log;
 			}
 
@@ -2093,7 +2109,7 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 	if (transfer->VectorCount() > 0) {
 		ehci_qtd *lastDescriptor = NULL;
 		status_t result = CreateDescriptorChain(pipe, &dataDescriptor,
-			&lastDescriptor, strayDescriptor, transfer->VectorLength(),
+			&lastDescriptor, statusDescriptor, transfer->VectorLength(),
 			directionIn ? EHCI_QTD_PID_IN : EHCI_QTD_PID_OUT);
 
 		if (result < B_OK) {
@@ -2108,7 +2124,7 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 		}
 
 		LinkDescriptors(setupDescriptor, dataDescriptor, strayDescriptor);
-		LinkDescriptors(lastDescriptor, statusDescriptor, strayDescriptor);
+		LinkDescriptors(lastDescriptor, statusDescriptor, statusDescriptor);
 	} else {
 		// no data: link setup and status descriptors directly
 		LinkDescriptors(setupDescriptor, statusDescriptor, strayDescriptor);
