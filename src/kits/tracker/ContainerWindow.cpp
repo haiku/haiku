@@ -563,7 +563,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 {
 	InitIconPreloader();
 
-	if (list) {
+	if (list != NULL) {
 		ASSERT(list->IsLocked());
 		list->AddItem(this);
 	}
@@ -888,8 +888,8 @@ BContainerWindow::Init(const BMessage* message)
 	float y_delta;
 	BEntry entry;
 
-	ASSERT(fPoseView);
-	if (!fPoseView)
+	ASSERT(fPoseView != NULL);
+	if (fPoseView == NULL)
 		return;
 
 	// deal with new unconfigured folders
@@ -985,7 +985,7 @@ BContainerWindow::Init(const BMessage* message)
 	}
 	unmodified.MakeEmpty();
 
-	if (message)
+	if (message != NULL)
 		RestoreState(*message);
 	else
 		RestoreState();
