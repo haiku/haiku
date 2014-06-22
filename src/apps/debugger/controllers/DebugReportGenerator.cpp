@@ -16,6 +16,7 @@
 
 #include "Architecture.h"
 #include "AreaInfo.h"
+#include "AutoDeleter.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
 #include "DisassembledCode.h"
@@ -235,37 +236,41 @@ DebugReportGenerator::_GenerateReportHeader(BFile& _output)
 		fTeam->Name(), fTeam->ID());
 	WRITE_AND_CHECK(_output, data);
 
-	SystemInfo sysInfo;
-
-	uint32 topologyNodeCount = 0;
-	cpu_topology_node_info* topology = NULL;
-	get_cpu_topology_info(NULL, &topologyNodeCount);
-	if (topologyNodeCount != 0)
-		topology = new cpu_topology_node_info[topologyNodeCount];
-	get_cpu_topology_info(topology, &topologyNodeCount);
-
 	cpu_platform platform = B_CPU_UNKNOWN;
 	cpu_vendor cpuVendor = B_CPU_VENDOR_UNKNOWN;
 	uint32 cpuModel = 0;
-	for (uint32 i = 0; i < topologyNodeCount; i++) {
-		switch (topology[i].type) {
-			case B_TOPOLOGY_ROOT:
-				platform = topology[i].data.root.platform;
-				break;
+	uint32 topologyNodeCount = 0;
+	cpu_topology_node_info* topology = NULL;
+	get_cpu_topology_info(NULL, &topologyNodeCount);
+	if (topologyNodeCount != 0) {
+		topology = new(std::nothrow) cpu_topology_node_info[topologyNodeCount];
+		if (topology == NULL)
+			return B_NO_MEMORY;
 
-			case B_TOPOLOGY_PACKAGE:
-				cpuVendor = topology[i].data.package.vendor;
-				break;
+		BPrivate::ArrayDeleter<cpu_topology_node_info> deleter(topology);
+		get_cpu_topology_info(topology, &topologyNodeCount);
 
-			case B_TOPOLOGY_CORE:
-				cpuModel = topology[i].data.core.model;
-				break;
+		for (uint32 i = 0; i < topologyNodeCount; i++) {
+			switch (topology[i].type) {
+				case B_TOPOLOGY_ROOT:
+					platform = topology[i].data.root.platform;
+					break;
 
-			default:
-				break;
+				case B_TOPOLOGY_PACKAGE:
+					cpuVendor = topology[i].data.package.vendor;
+					break;
+
+				case B_TOPOLOGY_CORE:
+					cpuModel = topology[i].data.core.model;
+					break;
+
+				default:
+					break;
+			}
 		}
 	}
 
+	SystemInfo sysInfo;
 	if (fDebuggerInterface->GetSystemInfo(sysInfo) == B_OK) {
 		const system_info &info = sysInfo.GetSystemInfo();
 		data.SetToFormat("CPU(s): %" B_PRId32 "x %s %s\n",
@@ -289,7 +294,6 @@ DebugReportGenerator::_GenerateReportHeader(BFile& _output)
 		WRITE_AND_CHECK(_output, data);
 	}
 
-	delete[] topology;
 	return B_OK;
 }
 
