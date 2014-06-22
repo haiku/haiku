@@ -35,10 +35,10 @@ All rights reserved.
 #define _NAVIGATOR_H
 
 
-#include "Model.h"
-
 #include <PictureButton.h>
 #include <View.h>
+
+#include "Model.h"
 
 
 class BTextControl;
@@ -67,12 +67,12 @@ enum NavigationAction
 // bitmap resource IDs as arguments
 class BNavigatorButton : public BPictureButton {
 public:
-	BNavigatorButton(BRect rect, const char* name, BMessage* message, int32 resIDon,
-		int32 resIDoff, int32 resIDdisabled);
+	BNavigatorButton(BRect rect, const char* name, BMessage* message,
+		int32 resIDon, int32 resIDoff, int32 resIDdisabled);
 
 	~BNavigatorButton();
 
-	virtual	void AttachedToWindow();
+	virtual void AttachedToWindow();
 
 	void SetPicture(BBitmap*, bool enabled, bool on);
 
@@ -99,9 +99,10 @@ protected:
 	virtual void Draw(BRect rect);
 	virtual void MessageReceived(BMessage* msg);
 	virtual void AttachedToWindow();
-	virtual	void AllAttached();
+	virtual void AllAttached();
 
-	void GoForward(bool option); // is option key held down?
+	void GoForward(bool option);
+		// is option key held down?
 	void GoBackward(bool option);
 	void GoUp(bool option);
 	void SendNavigationMessage(NavigationAction, BEntry*, bool option);
@@ -109,11 +110,11 @@ protected:
 	void GoTo();
 
 private:
-	BPath				fPath;
-	BNavigatorButton*	fBack;
-	BNavigatorButton*	fForw;
-	BNavigatorButton*	fUp;
-	BTextControl*		fLocation;
+	BPath fPath;
+	BNavigatorButton* fBack;
+	BNavigatorButton* fForw;
+	BNavigatorButton* fUp;
+	BTextControl* fLocation;
 
 	BObjectList<BPath> fBackHistory;
 	BObjectList<BPath> fForwHistory;
