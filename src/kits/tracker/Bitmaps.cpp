@@ -210,7 +210,7 @@ BImageResources::find_image(void* memAddr) const
 {
 	image_info info;
 	int32 cookie = 0;
-	while (get_next_image_info(0, &cookie, &info) == B_OK)
+	while (get_next_image_info(0, &cookie, &info) == B_OK) {
 		if ((info.text <= memAddr
 			&& (((uint8*)info.text)+info.text_size) > memAddr)
 				|| (info.data <= memAddr
@@ -218,6 +218,7 @@ BImageResources::find_image(void* memAddr) const
 			// Found the image.
 			return info.id;
 		}
+	}
 
 	return -1;
 }
