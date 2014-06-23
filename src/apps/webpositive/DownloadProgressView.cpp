@@ -407,7 +407,6 @@ DownloadProgressView::MessageReceived(BMessage* message)
 			break;
 
 		case CANCEL_DOWNLOAD:
-			fDownload->Cancel();
 			DownloadCanceled();
 			break;
 
@@ -427,7 +426,6 @@ DownloadProgressView::MessageReceived(BMessage* message)
 			switch (opCode) {
 				case B_ENTRY_REMOVED:
 					fIconView->SetIconDimmed(true);
-					fDownload->Cancel();
 					DownloadCanceled();
 					break;
 				case B_ENTRY_MOVED:
@@ -462,8 +460,6 @@ DownloadProgressView::MessageReceived(BMessage* message)
 							// The entry was moved into the Trash.
 							// If the download is still in progress,
 							// cancel it.
-							if (fDownload)
-								fDownload->Cancel();
 							fIconView->SetIconDimmed(true);
 							DownloadCanceled();
 							break;
@@ -646,6 +642,8 @@ DownloadProgressView::DownloadCanceled()
 	// download was still running. In cases where the file is deleted after
 	// the download was finished, we don't want these things to happen.
 	if (fDownload) {
+		// Also cancel the download
+		fDownload->Cancel();
 		BNotification success(B_ERROR_NOTIFICATION);
 		success.SetTitle(B_TRANSLATE("Download aborted"));
 		success.SetContent(fPath.Leaf());
