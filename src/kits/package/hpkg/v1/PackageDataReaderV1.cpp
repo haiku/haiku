@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,9 +11,9 @@
 #include <algorithm>
 #include <new>
 
+#include <DataIO.h>
 #include <package/hpkg/BufferPool.h>
 #include <package/hpkg/PoolBuffer.h>
-#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/v1/HPKGDefsPrivate.h>
 #include <package/hpkg/v1/PackageData.h>
 #include <package/hpkg/ZlibDecompressor.h>
@@ -98,7 +98,7 @@ public:
 	}
 
 	virtual status_t ReadDataToOutput(off_t offset, size_t size,
-		BDataOutput* output)
+		BDataIO* output)
 	{
 		if (size == 0)
 			return B_OK;
@@ -125,7 +125,7 @@ public:
 				return error;
 
 			// write to the output
-			error = output->WriteData(buffer->Buffer(), toRead);
+			error = output->WriteExactly(buffer->Buffer(), toRead);
 			if (error != B_OK)
 				return error;
 
@@ -205,7 +205,7 @@ public:
 	}
 
 	virtual status_t ReadDataToOutput(off_t offset, size_t size,
-		BDataOutput* output)
+		BDataIO* output)
 	{
 		// check offset and size
 		if (size == 0)
@@ -244,7 +244,7 @@ public:
 
 			// write data to output
 			size_t toCopy = std::min(size, (size_t)fChunkSize - inChunkOffset);
-			error = output->WriteData(
+			error = output->WriteExactly(
 				(uint8*)fUncompressBuffer->Buffer() + inChunkOffset, toCopy);
 			if (error != B_OK)
 				return error;

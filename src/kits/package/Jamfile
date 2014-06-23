@@ -15,7 +15,6 @@ HPKG_SOURCES =
 	BlockBufferPoolNoLock.cpp
 	BufferPool.cpp
 	CommitTransactionResult.cpp
-	DataOutput.cpp
 	DataReader.cpp
 	DataWriters.cpp
 	ErrorOutput.cpp

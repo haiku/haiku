@@ -1,6 +1,6 @@
 /*
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -111,10 +111,11 @@ ZlibDataWriter::WriteDataNoThrow(const void* buffer,
 }
 
 
-status_t
-ZlibDataWriter::WriteData(const void* buffer, size_t size)
+ssize_t
+ZlibDataWriter::Write(const void* buffer, size_t size)
 {
-	return fDataWriter->WriteDataNoThrow(buffer, size);
+	status_t error = fDataWriter->WriteDataNoThrow(buffer, size);
+	return error == B_OK ? (ssize_t)size : (ssize_t)error;
 }
 
 

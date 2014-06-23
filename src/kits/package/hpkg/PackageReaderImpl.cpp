@@ -22,7 +22,6 @@
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 
-#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/PackageData.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>

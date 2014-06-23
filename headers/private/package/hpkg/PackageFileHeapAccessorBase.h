@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__HPKG__PRIVATE__PACKAGE_FILE_HEAP_ACCESSOR_BASE_H_
@@ -48,8 +48,8 @@ public:
 									{ fFD = fd; }
 
 	// BAbstractBufferedDataReader
-	virtual	status_t			ReadDataToOutput(off_t offset, size_t size,
-									BDataOutput* output);
+	virtual	status_t			ReadDataToOutput(off_t offset,
+									size_t size, BDataIO* output);
 
 public:
 	static	const size_t		kChunkSize = 64 * 1024;

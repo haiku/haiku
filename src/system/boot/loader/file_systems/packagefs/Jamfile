@@ -27,7 +27,6 @@ BootStaticLibrary boot_packagefs :
 	BlockBufferPoolNoLock.cpp
 	BufferPool.cpp
 	PoolBuffer.cpp
-	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp

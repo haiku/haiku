@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -461,7 +461,7 @@ PackageFileHeapWriter::ReadAndDecompressChunk(size_t chunkIndex,
 		// The chunk has not been written to disk yet. Its data are still in the
 		// pending data buffer.
 		memcpy(uncompressedDataBuffer, fPendingDataBuffer, fPendingDataSize);
-		// TODO: This can be optimized. Since we write to a BDataOutput anyway,
+		// TODO: This can be optimized. Since we write to a BDataIO anyway,
 		// there's no need to copy the data.
 		return B_OK;
 	}

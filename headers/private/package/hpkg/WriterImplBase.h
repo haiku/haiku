@@ -10,7 +10,6 @@
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 
-#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/DataWriters.h>
 #include <package/hpkg/PackageWriter.h>
 #include <package/hpkg/Strings.h>

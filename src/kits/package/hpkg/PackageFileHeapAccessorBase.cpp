@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,7 +14,7 @@
 #include <new>
 
 #include <ByteOrder.h>
-#include <package/hpkg/DataOutput.h>
+#include <DataIO.h>
 #include <package/hpkg/ErrorOutput.h>
 
 #include <AutoDeleter.h>
@@ -140,7 +140,7 @@ PackageFileHeapAccessorBase::~PackageFileHeapAccessorBase()
 
 status_t
 PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
-	BDataOutput* output)
+	BDataIO* output)
 {
 	if (size == 0)
 		return B_OK;
@@ -174,7 +174,7 @@ PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
 			// The last chunk may be shorter than kChunkSize, but since
 			// size (and thus remainingSize) had been clamped, that doesn't
 			// harm.
-		error = output->WriteData(
+		error = output->WriteExactly(
 			(char*)uncompressedDataBuffer + inChunkOffset, toWrite);
 		if (error != B_OK)
 			return error;

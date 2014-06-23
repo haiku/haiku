@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -16,10 +16,10 @@
 #include <new>
 
 #include <ByteOrder.h>
+#include <DataIO.h>
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 
-#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/PackageFileHeapReader.h>
 #include <package/hpkg/ZlibDecompressor.h>
 
@@ -1358,7 +1358,7 @@ ReaderImplBase::ReadBuffer(off_t offset, void* buffer, size_t size)
 status_t
 ReaderImplBase::ReadSection(const PackageFileSection& section)
 {
-	BBufferDataOutput output(section.data, section.uncompressedLength);
+	BMemoryIO output(section.data, section.uncompressedLength);
 	return fHeapReader->ReadDataToOutput(section.offset,
 		section.uncompressedLength, &output);
 }

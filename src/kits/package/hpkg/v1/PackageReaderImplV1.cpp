@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -22,7 +22,6 @@
 
 #include <package/hpkg/v1/HPKGDefsPrivate.h>
 
-#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/v1/PackageData.h>
 #include <package/hpkg/v1/PackageEntry.h>

@@ -132,6 +132,7 @@ KernelMergeObject kernel_lib_posix.o :
 SEARCH_SOURCE = [ FDirName $(HAIKU_TOP) src kits support ] ;
 
 KernelMergeObject kernel_misc.o :
+	DataIO.cpp
 	Referenceable.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)

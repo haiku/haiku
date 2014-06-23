@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__HPKG__PRIVATE__ZLIB_DECOMPRESSOR_H_
@@ -11,20 +11,19 @@
 #include <package/hpkg/ZlibCompressionBase.h>
 
 
+class BDataIO;
+
+
 namespace BPackageKit {
 
 namespace BHPKG {
-
-
-class BDataOutput;
-
 
 namespace BPrivate {
 
 
 class ZlibDecompressor : public ZlibCompressionBase {
 public:
-								ZlibDecompressor(BDataOutput* output);
+								ZlibDecompressor(BDataIO* output);
 								~ZlibDecompressor();
 
 			status_t			Init();
@@ -39,7 +38,7 @@ public:
 
 private:
 			z_stream			fStream;
-			BDataOutput*		fOutput;
+			BDataIO*			fOutput;
 			bool				fStreamInitialized;
 			bool				fFinished;
 };

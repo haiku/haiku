@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -39,7 +39,6 @@
 
 using namespace BPackageKit;
 
-using BPackageKit::BHPKG::BDataOutput;
 using BPackageKit::BHPKG::BErrorOutput;
 using BPackageKit::BHPKG::BFDDataReader;
 using BPackageKit::BHPKG::BPackageInfoAttributeValue;

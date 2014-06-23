@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HEAP_CACHE_H
@@ -15,7 +15,6 @@
 
 
 using BPackageKit::BHPKG::BAbstractBufferedDataReader;
-using BPackageKit::BHPKG::BDataOutput;
 using BPackageKit::BHPKG::BDataReader;
 
 
@@ -30,7 +29,7 @@ public:
 	virtual	status_t			ReadData(off_t offset, void* buffer,
 									size_t size);
 	virtual	status_t			ReadDataToOutput(off_t offset, size_t size,
-									BDataOutput* output);
+									BDataIO* output);
 
 private:
 			class CacheLineLocker
@@ -121,7 +120,7 @@ private:
 private:
 			status_t			_ReadCacheLine(off_t lineOffset,
 									size_t lineSize, off_t requestOffset,
-							 		size_t requestLength, BDataOutput* output);
+							 		size_t requestLength, BDataIO* output);
 
 			void				_DiscardPages(vm_page** pages, size_t firstPage,
 									size_t pageCount);
@@ -129,7 +128,7 @@ private:
 									size_t pageCount);
 			status_t			_WritePages(vm_page** pages,
 									size_t pagesRelativeOffset,
-									size_t requestLength, BDataOutput* output);
+									size_t requestLength, BDataIO* output);
 			status_t			_ReadIntoPages(vm_page** pages,
 									size_t firstPage, size_t pageCount);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -16,10 +16,10 @@
 #include <new>
 
 #include <ByteOrder.h>
+#include <DataIO.h>
 
 #include <package/hpkg/v1/HPKGDefsPrivate.h>
 
-#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/ZlibDecompressor.h>
 
@@ -1031,8 +1031,7 @@ ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
 		case B_HPKG_COMPRESSION_ZLIB:
 		{
 			// init the decompressor
-			BBufferDataOutput bufferOutput(section.data,
-				section.uncompressedLength);
+			BMemoryIO bufferOutput(section.data, section.uncompressedLength);
 			ZlibDecompressor decompressor(&bufferOutput);
 			status_t error = decompressor.Init();
 			if (error != B_OK)
@@ -1060,7 +1059,7 @@ ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
 				return error;
 
 			// verify that all data have been read
-			if (bufferOutput.BytesWritten() != section.uncompressedLength) {
+			if ((uint64)bufferOutput.Position() != section.uncompressedLength) {
 				fErrorOutput->PrintError("Error: Missing bytes in uncompressed "
 					"buffer!\n");
 				return B_BAD_DATA;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include <package/hpkg/DataOutput.h>
+#include <DataIO.h>
 
 
 namespace BPackageKit {
@@ -22,7 +22,7 @@ namespace BPrivate {
 static const size_t kOutputBufferSize = 1024;
 
 
-ZlibCompressor::ZlibCompressor(BDataOutput* output)
+ZlibCompressor::ZlibCompressor(BDataIO* output)
 	:
 	fOutput(output),
 	fStreamInitialized(false)
@@ -82,7 +82,7 @@ ZlibCompressor::CompressNext(const void* input, size_t inputSize)
 			return TranslateZlibError(zlibError);
 
 		if (fStream.avail_out < sizeof(outputBuffer)) {
-			status_t error = fOutput->WriteData(outputBuffer,
+			status_t error = fOutput->WriteExactly(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
 			if (error != B_OK)
 				return error;
@@ -109,7 +109,7 @@ ZlibCompressor::Finish()
 			return TranslateZlibError(zlibError);
 
 		if (fStream.avail_out < sizeof(outputBuffer)) {
-			status_t error = fOutput->WriteData(outputBuffer,
+			status_t error = fOutput->WriteExactly(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
 			if (error != B_OK)
 				return error;

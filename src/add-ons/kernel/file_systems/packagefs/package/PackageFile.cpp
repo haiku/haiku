@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,12 +11,12 @@
 
 #include <fs_cache.h>
 
-#include <AutoDeleter.h>
-#include <util/AutoLock.h>
-
-#include <package/hpkg/DataOutput.h>
+#include <DataIO.h>
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/PackageDataReader.h>
+
+#include <AutoDeleter.h>
+#include <util/AutoLock.h>
 
 #include "DebugSupport.h"
 #include "GlobalFactory.h"
@@ -29,7 +29,7 @@ using namespace BPackageKit::BHPKG;
 // #pragma mark - DataAccessor
 
 
-struct PackageFile::IORequestOutput : BDataOutput {
+struct PackageFile::IORequestOutput : BDataIO {
 public:
 	IORequestOutput(io_request* request)
 		:
@@ -37,9 +37,10 @@ public:
 	{
 	}
 
-	virtual status_t WriteData(const void* buffer, size_t size)
+	virtual ssize_t Write(const void* buffer, size_t size)
 	{
-		RETURN_ERROR(write_to_io_request(fRequest, buffer, size));
+		status_t error = write_to_io_request(fRequest, buffer, size);
+		RETURN_ERROR(error == B_OK ? (ssize_t)size : (ssize_t)error);
 	}
 
 private:

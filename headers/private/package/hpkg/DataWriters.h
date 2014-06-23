@@ -1,13 +1,13 @@
 /*
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__HPKG__PRIVATE__DATA_WRITERS_H_
 #define _PACKAGE__HPKG__PRIVATE__DATA_WRITERS_H_
 
 
-#include <package/hpkg/DataOutput.h>
+#include <DataIO.h>
 #include <package/hpkg/ZlibCompressor.h>
 
 
@@ -59,7 +59,7 @@ private:
 };
 
 
-class ZlibDataWriter : public AbstractDataWriter, private BDataOutput {
+class ZlibDataWriter : public AbstractDataWriter, private BDataIO {
 public:
 								ZlibDataWriter(AbstractDataWriter* dataWriter);
 
@@ -70,8 +70,8 @@ public:
 									size_t size);
 
 private:
-	// BDataOutput
-	virtual	status_t			WriteData(const void* buffer, size_t size);
+	// BDataIO
+	virtual	ssize_t				Write(const void* buffer, size_t size);
 
 private:
 			AbstractDataWriter*	fDataWriter;

@@ -76,7 +76,6 @@ HAIKU_PACKAGE_FS_SHARED_SOURCES =
 HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	BlockBufferPoolImpl.cpp
 	BufferPool.cpp
-	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -37,7 +37,6 @@
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 
-#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/PackageFileHeapWriter.h>
 #include <package/hpkg/PackageReaderImpl.h>

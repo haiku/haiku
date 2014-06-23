@@ -83,6 +83,7 @@ BootStaticLibrary boot_loader :
 	safemode_settings.cpp
 	StringHash.cpp
 
+	DataIO.cpp
 	Referenceable.cpp
 
 	: -fno-pic
@@ -135,7 +136,7 @@ SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp PartitionMapParser.cpp ]
 SEARCH on [ FGristFiles stage2_crt0.S ]
     = [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ] ;
 
-SEARCH on [ FGristFiles Referenceable.cpp ]
+SEARCH on [ FGristFiles DataIO.cpp Referenceable.cpp ]
     = [ FDirName $(HAIKU_TOP) src kits support ] ;
 
 
