@@ -13,6 +13,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <Errors.h>
+
 
 BDataIO::BDataIO()
 {
