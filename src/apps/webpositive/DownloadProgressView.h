@@ -48,7 +48,7 @@ public:
 			bool				IsFinished() const;
 
 			void				DownloadFinished();
-			void				DownloadCanceled();
+			void				CancelDownload();
 
 	static	void				SpeedVersusEstimatedFinishTogglePulse();
 

@@ -407,7 +407,7 @@ DownloadProgressView::MessageReceived(BMessage* message)
 			break;
 
 		case CANCEL_DOWNLOAD:
-			DownloadCanceled();
+			CancelDownload();
 			break;
 
 		case REMOVE_DOWNLOAD:
@@ -426,7 +426,7 @@ DownloadProgressView::MessageReceived(BMessage* message)
 			switch (opCode) {
 				case B_ENTRY_REMOVED:
 					fIconView->SetIconDimmed(true);
-					DownloadCanceled();
+					CancelDownload();
 					break;
 				case B_ENTRY_MOVED:
 				{
@@ -461,7 +461,7 @@ DownloadProgressView::MessageReceived(BMessage* message)
 							// If the download is still in progress,
 							// cancel it.
 							fIconView->SetIconDimmed(true);
-							DownloadCanceled();
+							CancelDownload();
 							break;
 						} else if (fIconView->IsIconDimmed()) {
 							// Maybe it was moved out of the trash.
@@ -636,7 +636,7 @@ DownloadProgressView::DownloadFinished()
 
 
 void
-DownloadProgressView::DownloadCanceled()
+DownloadProgressView::CancelDownload()
 {
 	// Show the cancel notification, and set the progress bar red, only if the
 	// download was still running. In cases where the file is deleted after
