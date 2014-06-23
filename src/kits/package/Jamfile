@@ -16,7 +16,6 @@ HPKG_SOURCES =
 	BufferPool.cpp
 	CommitTransactionResult.cpp
 	DataReader.cpp
-	DataWriters.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp
 	GlobalWritableFileInfo.cpp

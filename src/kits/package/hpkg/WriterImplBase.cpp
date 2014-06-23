@@ -222,8 +222,7 @@ WriterImplBase::WriterImplBase(const char* fileType, BErrorOutput* errorOutput)
 	fFileName(NULL),
 	fParameters(),
 	fFD(-1),
-	fFinished(false),
-	fDataWriter(NULL)
+	fFinished(false)
 {
 }
 
@@ -269,7 +268,6 @@ WriterImplBase::Init(const char* fileName, size_t headerSize,
 	fHeapWriter = new PackageFileHeapWriter(fErrorOutput, FD(), headerSize,
 		fParameters.CompressionLevel());
 	fHeapWriter->Init();
-	fDataWriter = fHeapWriter->DataWriter();
 
 	return B_OK;
 }
@@ -649,7 +647,7 @@ WriterImplBase::WriteAttributeValue(const AttributeValue& value, uint8 encoding)
 			if (encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP)
 				WriteUnsignedLEB128(value.data.offset);
 			else
-				fDataWriter->WriteDataThrows(value.data.raw, value.data.size);
+				fHeapWriter->AddDataThrows(value.data.raw, value.data.size);
 			break;
 		}
 
@@ -672,7 +670,7 @@ WriterImplBase::WriteUnsignedLEB128(uint64 value)
 		bytes[count++] = byte | (value != 0 ? 0x80 : 0);
 	} while (value != 0);
 
-	fDataWriter->WriteDataThrows(bytes, count);
+	fHeapWriter->AddDataThrows(bytes, count);
 }
 
 

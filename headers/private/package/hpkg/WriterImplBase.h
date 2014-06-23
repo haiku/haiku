@@ -10,7 +10,7 @@
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 
-#include <package/hpkg/DataWriters.h>
+#include <package/hpkg/PackageFileHeapWriter.h>
 #include <package/hpkg/PackageWriter.h>
 #include <package/hpkg/Strings.h>
 #include <package/hpkg/ZlibCompressor.h>
@@ -29,9 +29,6 @@ class BErrorOutput;
 
 namespace BPrivate {
 
-
-class AbstractDataWriter;
-class PackageFileHeapWriter;
 
 struct hpkg_header;
 
@@ -183,8 +180,6 @@ private:
 			int					fFD;
 			bool				fFinished;
 
-			AbstractDataWriter*	fDataWriter;
-
 			StringCache			fPackageStringCache;
 			PackageAttributeList	fPackageAttributes;
 };
@@ -208,7 +203,7 @@ WriterImplBase::WriteString(const char* string)
 inline void
 WriterImplBase::WriteBuffer(const void* data, size_t size)
 {
-	fDataWriter->WriteDataThrows(data, size);
+	fHeapWriter->AddDataThrows(data, size);
 }
 
 

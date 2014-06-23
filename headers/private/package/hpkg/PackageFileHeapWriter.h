@@ -7,7 +7,6 @@
 
 
 #include <Array.h>
-#include <package/hpkg/DataWriters.h>
 #include <package/hpkg/PackageFileHeapAccessorBase.h>
 
 
@@ -31,8 +30,7 @@ namespace BPrivate {
 class PackageFileHeapReader;
 
 
-class PackageFileHeapWriter : public PackageFileHeapAccessorBase,
-	private AbstractDataWriter {
+class PackageFileHeapWriter : public PackageFileHeapAccessorBase {
 public:
 								PackageFileHeapWriter(BErrorOutput* errorOutput,
 									int fd, off_t heapOffset,
@@ -42,11 +40,9 @@ public:
 			void				Init();
 			void				Reinit(PackageFileHeapReader* heapReader);
 
-			AbstractDataWriter* DataWriter()
-									{ return this; }
-
 			status_t			AddData(BDataReader& dataReader, off_t size,
 									uint64& _offset);
+			void				AddDataThrows(const void* buffer, size_t size);
 			void				RemoveDataRanges(
 									const ::BPrivate::RangeArray<uint64>&
 										ranges);
@@ -57,11 +53,6 @@ protected:
 	virtual	status_t			ReadAndDecompressChunk(size_t chunkIndex,
 									void* compressedDataBuffer,
 									void* uncompressedDataBuffer);
-
-private:
-	// AbstractDataWriter
-	virtual	status_t			WriteDataNoThrow(const void* buffer,
-									size_t size);
 
 private:
 			struct Chunk;

@@ -19,6 +19,7 @@
 #include <AutoDeleter.h>
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/PackageFileHeapReader.h>
+#include <package/hpkg/ZlibCompressor.h>
 #include <RangeArray.h>
 
 
@@ -285,6 +286,17 @@ PackageFileHeapWriter::AddData(BDataReader& dataReader, off_t size,
 
 
 void
+PackageFileHeapWriter::AddDataThrows(const void* buffer, size_t size)
+{
+	BBufferDataReader reader(buffer, size);
+	uint64 dummyOffset;
+	status_t error = AddData(reader, size, dummyOffset);
+	if (error != B_OK)
+		throw status_t(error);
+}
+
+
+void
 PackageFileHeapWriter::RemoveDataRanges(
 	const ::BPrivate::RangeArray<uint64>& ranges)
 {
@@ -400,7 +412,7 @@ PackageFileHeapWriter::RemoveDataRanges(
 		}
 
 		// add chunk data
-		WriteDataThrows((uint8*)uncompressedData + segment.toKeepOffset,
+		AddDataThrows((uint8*)uncompressedData + segment.toKeepOffset,
 			segment.toKeepSize);
 
 		chunkBuffer.CurrentSegmentDone();
@@ -473,15 +485,6 @@ PackageFileHeapWriter::ReadAndDecompressChunk(size_t chunkIndex,
 
 	return ReadAndDecompressChunkData(offset, compressedSize, kChunkSize,
 		compressedDataBuffer, uncompressedDataBuffer);
-}
-
-
-status_t
-PackageFileHeapWriter::WriteDataNoThrow(const void* buffer, size_t size)
-{
-	BBufferDataReader reader(buffer, size);
-	uint64 dummyOffset;
-	return AddData(reader, size, dummyOffset);
 }
 
 
