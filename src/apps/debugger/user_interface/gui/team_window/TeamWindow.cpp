@@ -21,12 +21,16 @@
 #include <MessageFilter.h>
 #include <MessageRunner.h>
 #include <Path.h>
+#include <PopUpMenu.h>
+#include <Query.h>
 #include <StringView.h>
 #include <TabView.h>
 #include <ScrollView.h>
 #include <SplitView.h>
 #include <TextView.h>
+#include <VolumeRoster.h>
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 
 #include "Breakpoint.h"
@@ -378,24 +382,7 @@ TeamWindow::MessageReceived(BMessage* message)
 		}
 		case MSG_LOCATE_SOURCE_IF_NEEDED:
 		{
-			if (fActiveFunction != NULL
-				&& fActiveFunction->GetFunctionDebugInfo()
-					->SourceFile() != NULL && fActiveSourceCode != NULL
-				&& fActiveSourceCode->GetSourceFile() == NULL
-				&& fActiveFunction->GetFunction()->SourceCodeState()
-					!= FUNCTION_SOURCE_NOT_LOADED) {
-				try {
-					if (fFilePanel == NULL) {
-						fFilePanel = new BFilePanel(B_OPEN_PANEL,
-							new BMessenger(this));
-					}
-					fFilePanel->Show();
-				} catch (...) {
-					delete fFilePanel;
-					fFilePanel = NULL;
-				}
-			}
-			break;
+			_HandleLocateSourceRequest();
 		}
 		case MSG_THREAD_RUN:
 		case MSG_THREAD_STOP:
@@ -1579,6 +1566,135 @@ TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 			fListener->FunctionSourceCodeRequested(fActiveFunction);
 		}
 	}
+}
+
+
+void
+TeamWindow::_HandleLocateSourceRequest()
+{
+	if (fActiveFunction == NULL)
+		return;
+	else if (fActiveFunction->GetFunctionDebugInfo()->SourceFile() == NULL)
+		return;
+	else if (fActiveSourceCode == NULL)
+		return;
+	else if (fActiveSourceCode->GetSourceFile() != NULL)
+		return;
+	else if (fActiveFunction->GetFunction()->SourceCodeState()
+		== FUNCTION_SOURCE_NOT_LOADED) {
+		return;
+	}
+
+	BStringList entries;
+	if (_RetrieveMatchingSourceEntries(entries) != B_OK)
+		return;
+
+	int32 count = entries.CountStrings();
+	if (count > 0) {
+		entries.Sort();
+		BPopUpMenu* menu = new(std::nothrow) BPopUpMenu("");
+		if (menu == NULL)
+			return;
+
+		BPrivate::ObjectDeleter<BPopUpMenu> menuDeleter(menu);
+		BMenuItem* item = NULL;
+		for (int32 i = 0; i < count; i++) {
+			item = new(std::nothrow) BMenuItem(entries.StringAt(i).String(),
+				NULL);
+			if (item == NULL || !menu->AddItem(item)) {
+				delete item;
+				return;
+			}
+		}
+
+		menu->AddSeparatorItem();
+		BMenuItem* manualItem = new(std::nothrow) BMenuItem(
+			"Locate manually" B_UTF8_ELLIPSIS, NULL);
+		if (manualItem == NULL || !menu->AddItem(manualItem)) {
+			delete manualItem;
+			return;
+		}
+
+		BPoint point;
+		fSourcePathView->GetMouse(&point, NULL, false);
+		fSourcePathView->ConvertToScreen(&point);
+		item = menu->Go(point, false, true);
+		if (item == NULL)
+			return;
+		else if (item != manualItem) {
+			// if the user picks to locate the entry manually,
+			// then fall through to the usual file panel logic
+			// as if we'd found no matches at all.
+			entry_ref ref;
+			if (get_ref_for_path(item->Label(), &ref) == B_OK) {
+				_HandleResolveMissingSourceFile(ref);
+				return;
+			}
+		}
+	}
+
+	try {
+		if (fFilePanel == NULL) {
+			fFilePanel = new BFilePanel(B_OPEN_PANEL,
+				new BMessenger(this));
+		}
+		fFilePanel->Show();
+	} catch (...) {
+		delete fFilePanel;
+		fFilePanel = NULL;
+	}
+}
+
+
+status_t
+TeamWindow::_RetrieveMatchingSourceEntries(BStringList& _entries)
+{
+	BString data;
+	fActiveFunction->GetFunctionDebugInfo()->SourceFile()->GetPath(data);
+
+	BPath path;
+	status_t error = path.SetTo(data);
+	if (error != B_OK)
+		return error;
+
+	_entries.MakeEmpty();
+
+	BQuery query;
+	BString predicate;
+	query.PushAttr("name");
+	query.PushString(path.Leaf());
+	query.PushOp(B_EQ);
+
+	error = query.GetPredicate(&predicate);
+	if (error != B_OK)
+		return error;
+
+	BVolumeRoster roster;
+	BVolume volume;
+	while (roster.GetNextVolume(&volume) == B_OK) {
+		if (!volume.KnowsQuery())
+			continue;
+
+		if (query.SetVolume(&volume) != B_OK)
+			continue;
+
+		error = query.SetPredicate(predicate.String());
+		if (error != B_OK)
+			continue;
+
+		if (query.Fetch() != B_OK)
+			continue;
+
+		entry_ref ref;
+		while (query.GetNextRef(&ref) == B_OK) {
+			path.SetTo(&ref);
+			_entries.Add(path.Path());
+		}
+
+		query.Clear();
+	}
+
+	return B_OK;
 }
 
 

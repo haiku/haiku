@@ -28,6 +28,7 @@ class BFilePanel;
 class BMenuBar;
 class BMessageRunner;
 class BSplitView;
+class BStringList;
 class BStringView;
 class BTabView;
 class ConsoleOutputView;
@@ -169,6 +170,9 @@ private:
 									Watchpoint* watchpoint);
 			void				_HandleResolveMissingSourceFile(entry_ref&
 									locatedPath);
+			void				_HandleLocateSourceRequest();
+			status_t			_RetrieveMatchingSourceEntries(
+									BStringList& _entries);
 
 			status_t			_SaveInspectorSettings(
 									const BMessage* settings);
