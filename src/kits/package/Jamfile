@@ -5,6 +5,7 @@ UsePrivateHeaders
 	kernel
 	shared
 	storage
+	support
 	;
 UsePrivateSystemHeaders ;
 
@@ -54,18 +55,12 @@ HPKG_SOURCES =
 	PackageReaderImplV1.cpp
 	PackageReaderV1.cpp
 	ReaderImplBaseV1.cpp
-
-	# compression
-	ZlibCompressionBase.cpp
-	ZlibCompressor.cpp
-	ZlibDecompressor.cpp
 	;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		UseBuildFeatureHeaders curl ;
-		UseBuildFeatureHeaders zlib ;
 
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
@@ -76,8 +71,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			: [ BuildFeatureAttribute curl : headers ] ;
 		Includes [ FGristFiles InitTerminateLibPackage.cpp ]
 			: [ BuildFeatureAttribute curl : headers ] ;
-		Includes [ FGristFiles $(HPKG_SOURCES) ]
-			: [ BuildFeatureAttribute zlib : headers ] ;
 
 		SharedLibrary [ MultiArchDefaultGristFiles libpackage.so ]
 			:
@@ -139,7 +132,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ MultiArchDefaultGristFiles libshared.a ]
 			be
 			[ BuildFeatureAttribute curl : library ]
-			[ BuildFeatureAttribute zlib : library ]
 			$(TARGET_LIBSTDC++)
 			;
 	}

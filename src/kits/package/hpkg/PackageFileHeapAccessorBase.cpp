@@ -18,7 +18,7 @@
 #include <package/hpkg/ErrorOutput.h>
 
 #include <AutoDeleter.h>
-#include <package/hpkg/ZlibDecompressor.h>
+#include <ZlibDecompressor.h>
 
 
 namespace BPackageKit {
@@ -213,7 +213,7 @@ PackageFileHeapAccessorBase::DecompressChunkData(void* compressedDataBuffer,
 	size_t uncompressedSize)
 {
 	size_t actualSize;
-	status_t error = ZlibDecompressor::DecompressSingleBuffer(
+	status_t error = BZlibDecompressor::DecompressSingleBuffer(
 		compressedDataBuffer, compressedSize, uncompressedDataBuffer,
 		uncompressedSize, actualSize);
 	if (error != B_OK) {

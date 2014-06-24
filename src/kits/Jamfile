@@ -45,7 +45,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ MultiArchDefaultGristFiles libicon.a ]
 			[ MultiArchDefaultGristFiles libagg.a ]
 
-			$(TARGET_LIBSTDC++) [ BuildFeatureAttribute icu : libraries ]
+			$(TARGET_LIBSTDC++)
+			[ BuildFeatureAttribute icu : libraries ]
+			[ BuildFeatureAttribute zlib : library ]
 			;
 	}
 }
@@ -71,7 +73,9 @@ SharedLibrary libbe_test.so :
 	[ MultiArchDefaultGristFiles libicon.a ]
 	[ MultiArchDefaultGristFiles libagg.a ]
 
-	$(TARGET_LIBSTDC++) [ BuildFeatureAttribute icu : libraries ]
+	$(TARGET_LIBSTDC++)
+	[ BuildFeatureAttribute icu : libraries ]
+	[ BuildFeatureAttribute zlib : library ]
 ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) interface ] ;

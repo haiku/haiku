@@ -13,7 +13,6 @@
 #include <package/hpkg/PackageFileHeapWriter.h>
 #include <package/hpkg/PackageWriter.h>
 #include <package/hpkg/Strings.h>
-#include <package/hpkg/ZlibCompressor.h>
 
 #include <package/PackageInfo.h>
 

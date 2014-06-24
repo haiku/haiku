@@ -16,7 +16,7 @@
 #include <package/hpkg/PoolBuffer.h>
 #include <package/hpkg/v1/HPKGDefsPrivate.h>
 #include <package/hpkg/v1/PackageData.h>
-#include <package/hpkg/ZlibDecompressor.h>
+#include <ZlibDecompressor.h>
 
 
 namespace BPackageKit {
@@ -27,7 +27,6 @@ namespace V1 {
 
 
 using BHPKG::BPrivate::PoolBufferPutter;
-using BHPKG::BPrivate::ZlibDecompressor;
 
 
 // minimum/maximum zlib chunk size we consider sane
@@ -295,7 +294,7 @@ private:
 				return error;
 
 			size_t actuallyUncompressedSize;
-			error = ZlibDecompressor::DecompressSingleBuffer(
+			error = BZlibDecompressor::DecompressSingleBuffer(
 				readBuffer->Buffer(), compressedSize,
 				fUncompressBuffer->Buffer(), uncompressedSize,
 				actuallyUncompressedSize);

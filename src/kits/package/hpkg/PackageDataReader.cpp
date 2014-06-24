@@ -13,7 +13,6 @@
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 #include <package/hpkg/PackageData.h>
-#include <package/hpkg/ZlibDecompressor.h>
 
 
 namespace BPackageKit {

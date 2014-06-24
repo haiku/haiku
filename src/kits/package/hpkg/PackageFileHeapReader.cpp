@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,10 +14,6 @@
 
 #include <AutoDeleter.h>
 #include <package/hpkg/PoolBuffer.h>
-
-
-// minimum length of data we require before trying to zlib compress them
-static const size_t kZlibCompressionSizeThreshold = 64;
 
 
 namespace BPackageKit {

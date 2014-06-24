@@ -26,7 +26,6 @@
 #include <package/hpkg/v1/PackageData.h>
 #include <package/hpkg/v1/PackageEntry.h>
 #include <package/hpkg/v1/PackageEntryAttribute.h>
-#include <package/hpkg/ZlibDecompressor.h>
 
 
 namespace BPackageKit {

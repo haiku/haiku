@@ -58,10 +58,6 @@ namespace BHPKG {
 namespace BPrivate {
 
 
-// minimum length of data we require before trying to zlib compress them
-static const size_t kZlibCompressionSizeThreshold = 64;
-
-
 // #pragma mark - Attributes
 
 

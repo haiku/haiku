@@ -9,6 +9,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
+		UseBuildFeatureHeaders zlib ;
+
+		Includes [ FGristFiles ZlibCompressionBasePrivate.h ]
+			: [ BuildFeatureAttribute zlib : headers ] ;
+
 		MergeObject <libbe!$(architecture)>support_kit.o :
 			Architecture.cpp
 			Archivable.cpp
@@ -31,6 +36,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			StringList.cpp
 			Url.cpp
 			Uuid.cpp
+			ZlibCompressionBase.cpp
+			ZlibCompressor.cpp
+			ZlibDecompressor.cpp
 			;
 
 		StaticLibrary [ MultiArchDefaultGristFiles libreferenceable.a ]

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -25,7 +25,6 @@
 #include <package/hpkg/PackageData.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
-#include <package/hpkg/ZlibDecompressor.h>
 
 
 namespace BPackageKit {

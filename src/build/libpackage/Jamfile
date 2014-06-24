@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src build libpackage ;
 
-UsePrivateBuildHeaders kernel package shared storage ;
+UsePrivateBuildHeaders kernel package shared storage support ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
@@ -73,11 +73,6 @@ HPKG_SOURCES =
 	PackageReaderImplV1.cpp
 	PackageReaderV1.cpp
 	ReaderImplBaseV1.cpp
-
-	# compression
-	ZlibCompressionBase.cpp
-	ZlibCompressor.cpp
-	ZlibDecompressor.cpp
 ;
 
 # TODO: remove this hack once gcc2 has -iquote implemented
@@ -143,7 +138,7 @@ BuildPlatformSharedLibrary libpackage_build.so
 	SolverRepository.cpp
 	SolverResult.cpp
 	:
-	libshared_build.a $(HOST_LIBBE) curl z $(HOST_LIBSTDC++)
+	libshared_build.a $(HOST_LIBBE) curl $(HOST_LIBSTDC++)
 ;
 
 HaikuSubInclude solver ;

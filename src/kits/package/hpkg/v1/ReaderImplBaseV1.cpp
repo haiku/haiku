@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <algorithm>
 #include <new>
@@ -21,7 +22,7 @@
 #include <package/hpkg/v1/HPKGDefsPrivate.h>
 
 #include <package/hpkg/ErrorOutput.h>
-#include <package/hpkg/ZlibDecompressor.h>
+#include <ZlibDecompressor.h>
 
 
 namespace BPackageKit {
@@ -31,9 +32,6 @@ namespace BHPKG {
 namespace V1 {
 
 namespace BPrivate {
-
-
-using BHPKG::BPrivate::ZlibDecompressor;
 
 
 static const size_t kScratchBufferSize = 64 * 1024;
@@ -1032,7 +1030,7 @@ ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
 		{
 			// init the decompressor
 			BMemoryIO bufferOutput(section.data, section.uncompressedLength);
-			ZlibDecompressor decompressor(&bufferOutput);
+			BZlibDecompressor decompressor(&bufferOutput);
 			status_t error = decompressor.Init();
 			if (error != B_OK)
 				return error;

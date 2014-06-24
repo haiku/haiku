@@ -19,8 +19,8 @@
 #include <AutoDeleter.h>
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/PackageFileHeapReader.h>
-#include <package/hpkg/ZlibCompressor.h>
 #include <RangeArray.h>
+#include <ZlibCompressor.h>
 
 
 // minimum length of data we require before trying to zlib compress them
@@ -551,7 +551,7 @@ PackageFileHeapWriter::_WriteDataCompressed(const void* data, size_t size)
 		return B_BUFFER_OVERFLOW;
 
 	size_t compressedSize;
-	status_t error = ZlibCompressor::CompressSingleBuffer(data, size,
+	status_t error = BZlibCompressor::CompressSingleBuffer(data, size,
 		fCompressedDataBuffer, size, compressedSize, fCompressionLevel);
 	if (error != B_OK) {
 		if (error != B_BUFFER_OVERFLOW) {
