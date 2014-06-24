@@ -1358,9 +1358,8 @@ ReaderImplBase::ReadBuffer(off_t offset, void* buffer, size_t size)
 status_t
 ReaderImplBase::ReadSection(const PackageFileSection& section)
 {
-	BMemoryIO output(section.data, section.uncompressedLength);
-	return fHeapReader->ReadDataToOutput(section.offset,
-		section.uncompressedLength, &output);
+	return fHeapReader->ReadData(section.offset,
+		section.data, section.uncompressedLength);
 }
 
 
