@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PARSEDATE_H
@@ -19,7 +19,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif	/*  __cplusplus */
 
 extern time_t parsedate(const char *dateString, time_t now);
 extern time_t parsedate_etc(const char *dateString, time_t now, int *_storedFlags);
@@ -29,6 +29,6 @@ extern const char **get_dateformats(void);
 
 #ifdef __cplusplus
 }
-#endif
+#endif	/*  __cplusplus */
 
 #endif	/* _PARSEDATE_H */

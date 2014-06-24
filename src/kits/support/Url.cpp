@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009 Haiku Inc. All rights reserved.
+ * Copyright 2007-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -275,7 +275,5 @@ BUrl::Path() const
 	return fPath;
 }
 
-
 } // namespace Support
 } // namespace BPrivate
-

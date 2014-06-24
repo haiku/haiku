@@ -1,10 +1,10 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Julun <host.haiku@gmx.de>
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Julun, host.haiku@gmx.de
  */
 
 #include "DateTime.h"
@@ -17,7 +17,6 @@
 
 
 namespace BPrivate {
-
 
 const int32			kSecondsPerMinute			= 60;
 
@@ -1496,5 +1495,4 @@ BDateTime::operator>=(const BDateTime& dateTime) const
 	return false;
 }
 
-
-}	//namespace BPrivate
+}	/* namespace BPrivate */

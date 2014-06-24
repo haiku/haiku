@@ -51,11 +51,12 @@ template<class T> class BObjectList;
 
 template<class T>
 struct UnaryPredicate {
-
 	virtual int operator()(const T *) const
 		// virtual could be avoided here if FindBinaryInsertionIndex,
 		// etc. were member template functions
-		{ return 0; }
+	{
+		return 0;
+	}
 
 private:
 	static int _unary_predicate_glue(const void *item, void *context);
@@ -112,7 +113,6 @@ protected:
 template<class T>
 class BObjectList : private _PointerList_ {
 public:
-
 	// iteration and sorting
 	typedef	T*					(*EachFunction)(T*, void*);
 	typedef	const T*			(*ConstEachFunction)(const T*, void*);
@@ -424,7 +424,7 @@ BObjectList<T>::BObjectList(int32 itemsPerBlock, bool owning)
 
 
 template<class T>
-BObjectList<T>::BObjectList(const BObjectList<T> &list)
+BObjectList<T>::BObjectList(const BObjectList<T>& list)
 	:
 	_PointerList_(list)
 {
@@ -483,25 +483,25 @@ BObjectList<T>::AddItem(T* item)
 
 template<class T>
 bool
-BObjectList<T>::AddItem(T* item, int32 atIndex)
+BObjectList<T>::AddItem(T* item, int32 index)
 {
-	return _PointerList_::AddItem((void*)item, atIndex);
+	return _PointerList_::AddItem((void*)item, index);
 }
 
 
 template<class T>
 bool
-BObjectList<T>::AddList(BObjectList<T>* newItems)
+BObjectList<T>::AddList(BObjectList<T>* list)
 {
-	return _PointerList_::AddList(newItems);
+	return _PointerList_::AddList(list);
 }
 
 
 template<class T>
 bool
-BObjectList<T>::AddList(BObjectList<T>* newItems, int32 atIndex)
+BObjectList<T>::AddList(BObjectList<T>* list, int32 index)
 {
-	return _PointerList_::AddList(newItems, atIndex);
+	return _PointerList_::AddList(list, index);
 }
 
 
@@ -540,16 +540,18 @@ BObjectList<T>::ReplaceItem(int32 index, T* item)
 {
 	if (owning)
 		delete ItemAt(index);
+
 	return _PointerList_::ReplaceItem(index, (void*)item);
 }
 
 
 template<class T>
 T*
-BObjectList<T>::SwapWithItem(int32 index, T* newItem)
+BObjectList<T>::SwapWithItem(int32 index, T* item)
 {
 	T* result = ItemAt(index);
-	_PointerList_::ReplaceItem(index, (void*)newItem);
+	_PointerList_::ReplaceItem(index, (void*)item);
+
 	return result;
 }
 
@@ -711,6 +713,7 @@ BObjectList<T>::BinarySearch(const T& key, CompareFunction func) const
 {
 	return (T*)_PointerList_::BinarySearch(&key, (GenericCompareFunction)func);
 }
+
 
 template<class T>
 T*
@@ -942,4 +945,4 @@ BObjectList<T>::BinaryInsertUnique(T* item, const UnaryPredicate<T>& pred)
 }
 
 
-#endif	/* _OBJECT_LIST_H */
+#endif	// _OBJECT_LIST_H

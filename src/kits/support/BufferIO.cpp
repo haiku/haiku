@@ -1,9 +1,9 @@
 /*
- *	Copyright (c) 2001-2008, Haiku
+ *	Copyright 2001-2008 Haiku, Inc. All rights reserved.
  *	Distributed under the terms of the MIT license
  *
  *	Authors:
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini, burton666@libero.it
  */
 
 
@@ -253,7 +253,7 @@ BBufferIO::PrintToStream() const
 }
 
 
-//	#pragma mark -
+//	#pragma mark - FBC padding
 
 
 // These functions are here to maintain future binary

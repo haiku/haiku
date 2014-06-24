@@ -2,8 +2,8 @@
  * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef	_SUPPORT_AUTOLOCK_H
-#define	_SUPPORT_AUTOLOCK_H
+#ifndef	_AUTOLOCK_H
+#define	_AUTOLOCK_H
 
 
 #include <Locker.h>
@@ -101,4 +101,5 @@ BAutolock::Unlock()
 		fLocker->Unlock();
 }
 
-#endif // _SUPPORT_AUTOLOCK_H
+
+#endif	// _AUTOLOCK_H

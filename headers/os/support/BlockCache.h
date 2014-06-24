@@ -61,4 +61,5 @@ class BBlockCache {
 		uint32		_reserved[2];
 };
 
+
 #endif	// _BLOCK_CACHE_H

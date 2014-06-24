@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2010, Haiku, Inc.
+ * Copyright 2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Alex Wilson (yourpalal2@gmail.com)
+ *		Alex Wilson, yourpalal2@gmail.com
  */
+
 
 #include "ArchivingManagers.h"
 

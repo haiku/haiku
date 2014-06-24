@@ -57,4 +57,3 @@ add_system_beep_event(const char* name, uint32 flags)
 
 	return status;
 }
-

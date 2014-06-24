@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stefano Ceccherini (burton666@libero.it)
- *		Oliver Tappe (openbeos@hirschkaefer.de)
+ *		Stefano Ceccherini, burton666@libero.it
  *		Axel Dörfler, axeld@pinc-software.de
- *		Julun <host.haiku@gmx.de>
- *		Michael Lotz <mmlr@mlotz.ch>
+ *		Marc Flerackers, mflerackers@androme.be
+ *		Julun, host.haiku@gmx.de
+ *		Michael Lotz, mmlr@mlotz.ch
+ *		Oliver Tappe, openbeos@hirschkaefer.de
  */
 
 
@@ -54,10 +54,10 @@ min_clamp0(int32 num1, int32 num2)
 
 //! Returns length of given string (but clamps to given maximum).
 static inline int32
-strlen_clamp(const char* str, int32 max)
+strlen_clamp(const char* string, int32 max)
 {
 	// this should yield 0 for max<0:
-	return max <= 0 ? 0 : strnlen(str, max);
+	return max <= 0 ? 0 : strnlen(string, max);
 }
 
 
@@ -71,9 +71,9 @@ string_length(const char* string)
 
 //! helper function, massages given pointer into a legal c-string:
 static inline const char*
-safestr(const char* str)
+safestr(const char* string)
 {
-	return str ? str : "";
+	return string != NULL ? string : "";
 }
 
 
@@ -110,6 +110,7 @@ public:
 		}
 
 		fBuffer[fSize++] = pos;
+
 		return true;
 	}
 
@@ -134,7 +135,8 @@ private:
 
 
 BStringRef::BStringRef(BString& string, int32 position)
-	: fString(string), fPosition(position)
+	:
+	fString(string), fPosition(position)
 {
 }
 

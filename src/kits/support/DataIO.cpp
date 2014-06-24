@@ -1,9 +1,9 @@
 /*
- * Copyright 2005-2014, Haiku, Inc.
+ * Copyright 2005-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini, burton666@libero.it
  */
 
 
@@ -145,7 +145,7 @@ BPositionIO::~BPositionIO()
 
 
 ssize_t
-BPositionIO::Read(void *buffer, size_t size)
+BPositionIO::Read(void* buffer, size_t size)
 {
 	off_t curPos = Position();
 	ssize_t result = ReadAt(curPos, buffer, size);
@@ -157,7 +157,7 @@ BPositionIO::Read(void *buffer, size_t size)
 
 
 ssize_t
-BPositionIO::Write(const void *buffer, size_t size)
+BPositionIO::Write(const void* buffer, size_t size)
 {
 	off_t curPos = Position();
 	ssize_t result = WriteAt(curPos, buffer, size);
@@ -216,7 +216,7 @@ void BPositionIO::_ReservedPositionIO12(){}
 //	#pragma mark -
 
 
-BMemoryIO::BMemoryIO(void *buffer, size_t length)
+BMemoryIO::BMemoryIO(void* buffer, size_t length)
 	:
 	fReadOnly(false),
 	fBuffer(static_cast<char*>(buffer)),
@@ -227,7 +227,7 @@ BMemoryIO::BMemoryIO(void *buffer, size_t length)
 }
 
 
-BMemoryIO::BMemoryIO(const void *buffer, size_t length)
+BMemoryIO::BMemoryIO(const void* buffer, size_t length)
 	:
 	fReadOnly(true),
 	fBuffer(const_cast<char*>(static_cast<const char*>(buffer))),
@@ -244,7 +244,7 @@ BMemoryIO::~BMemoryIO()
 
 
 ssize_t
-BMemoryIO::ReadAt(off_t pos, void *buffer, size_t size)
+BMemoryIO::ReadAt(off_t pos, void* buffer, size_t size)
 {
 	if (buffer == NULL || pos < 0)
 		return B_BAD_VALUE;
@@ -254,12 +254,13 @@ BMemoryIO::ReadAt(off_t pos, void *buffer, size_t size)
 		sizeRead = min_c((off_t)size, (off_t)fLength - pos);
 		memcpy(buffer, fBuffer + pos, sizeRead);
 	}
+
 	return sizeRead;
 }
 
 
 ssize_t
-BMemoryIO::WriteAt(off_t pos, const void *buffer, size_t size)
+BMemoryIO::WriteAt(off_t pos, const void* buffer, size_t size)
 {
 	if (fReadOnly)
 		return B_NOT_ALLOWED;
@@ -296,6 +297,7 @@ BMemoryIO::Seek(off_t position, uint32 seek_mode)
 		default:
 			break;
 	}
+
 	return fPosition;
 }
 
@@ -317,6 +319,7 @@ BMemoryIO::SetSize(off_t size)
 		return B_ERROR;
 
 	fLength = size;
+
 	return B_OK;
 }
 
@@ -363,7 +366,7 @@ BMallocIO::~BMallocIO()
 
 
 ssize_t
-BMallocIO::ReadAt(off_t pos, void *buffer, size_t size)
+BMallocIO::ReadAt(off_t pos, void* buffer, size_t size)
 {
 	if (buffer == NULL)
 		return B_BAD_VALUE;
@@ -373,12 +376,13 @@ BMallocIO::ReadAt(off_t pos, void *buffer, size_t size)
 		sizeRead = min_c((off_t)size, (off_t)fLength - pos);
 		memcpy(buffer, fData + pos, sizeRead);
 	}
+
 	return sizeRead;
 }
 
 
 ssize_t
-BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
+BMallocIO::WriteAt(off_t pos, const void* buffer, size_t size)
 {
 	if (buffer == NULL)
 		return B_BAD_VALUE;
@@ -394,6 +398,7 @@ BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
 		if (pos + size > fLength)
 			fLength = pos + size;
 	}
+
 	return error != B_OK ? error : size;
 }
 
@@ -439,7 +444,7 @@ BMallocIO::SetSize(off_t size)
 		size_t newSize = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
 		if (size != (off_t)fMallocSize) {
 			// we need to resize
-			if (char *newData = static_cast<char*>(realloc(fData, newSize))) {
+			if (char* newData = static_cast<char*>(realloc(fData, newSize))) {
 				// set the new area to 0
 				if (newSize > fMallocSize)
 					memset(newData + fMallocSize, 0, newSize - fMallocSize);
@@ -462,12 +467,13 @@ BMallocIO::SetBlockSize(size_t blockSize)
 {
 	if (blockSize == 0)
 		blockSize = 1;
+
 	if (blockSize != fBlockSize)
 		fBlockSize = blockSize;
 }
 
 
-const void *
+const void*
 BMallocIO::Buffer() const
 {
 	return fData;

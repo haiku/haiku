@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CLASS_INFO_H
@@ -20,5 +20,5 @@
 	(dynamic_cast<class*>(object) != NULL)
 #define is_instance_of(object, class) \
 	(typeid(*(object)) == typeid(class))
-	
+
 #endif // _CLASS_INFO_H

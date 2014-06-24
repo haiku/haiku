@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BE_LIST_H
@@ -12,14 +12,14 @@
 class BList {
 public:
 								BList(int32 count = 20);
-								BList(const BList& anotherList);
+								BList(const BList& other);
 	virtual						~BList();
 
 			BList&				operator=(const BList& other);
 			bool				operator==(const BList& other) const;
 			bool				operator!=(const BList& other) const;
 
-	// Adding and removing items.
+	// Adding and removing items
 			bool				AddItem(void* item, int32 index);
 			bool				AddItem(void* item);
 			bool				AddList(const BList* list, int32 index);
@@ -28,7 +28,7 @@ public:
 			bool				RemoveItem(void* item);
 			void*				RemoveItem(int32 index);
 			bool				RemoveItems(int32 index, int32 count);
-			bool				ReplaceItem(int32 index, void* newItem);
+			bool				ReplaceItem(int32 index, void* item);
 
 			void				MakeEmpty();
 
@@ -36,7 +36,7 @@ public:
 			void				SortItems(int (*compareFunc)(const void*,
 									const void*));
 			bool				SwapItems(int32 indexA, int32 indexB);
-			bool				MoveItem(int32 fromIndex, int32 toIndex);
+			bool				MoveItem(int32 from, int32 to);
 
 	// Retrieve items
 			void*				ItemAt(int32 index) const;
@@ -75,5 +75,6 @@ private:
 
 			uint32				_reserved[1];
 };
+
 
 #endif // _BE_LIST_H

@@ -1,9 +1,9 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TLS_H
-#define	_TLS_H
+#define _TLS_H
 
 
 #include <BeBuild.h>
@@ -19,7 +19,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif	/* __cplusplus */
 
 extern int32 tls_allocate(void);
 
@@ -54,16 +54,16 @@ tls_set(int32 index, void *value)
 		: : "r" (index), "r" (value));
 }
 
-#else
+#else	/* !_NO_INLINE_ASM && __INTEL__ && __GNUC__ */
 
 extern void *tls_get(int32 index);
 extern void **tls_address(int32 index);
 extern void tls_set(int32 index, void *value);
 
-#endif
+#endif	/* !_NO_INLINE_ASM && __INTEL__ && __GNUC__ */
 
 #ifdef __cplusplus
 }
-#endif
+#endif	/* __cplusplus */
 
 #endif	/* _TLS_H */

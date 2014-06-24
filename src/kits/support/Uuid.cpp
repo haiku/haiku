@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc.
+ * Copyright 2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -32,12 +32,12 @@ init_random_seed()
 	seed ^= (uint32)(addr_t)&time;
 
 	srandom(seed);
+
 	return true;
 }
 
 
 namespace BPrivate {
-
 
 BUuid::BUuid()
 {
@@ -93,6 +93,7 @@ BUuid::ToString() const
 		buffer[2 * i] = kHexChars[fValue[i] >> 4];
 		buffer[2 * i + 1] = kHexChars[fValue[i] & 0xf];
 	}
+
 	return BString().SetToFormat("%.8s-%.4s-%.4s-%.4s-%.12s",
 		buffer, buffer + 8, buffer + 12, buffer + 16, buffer + 20);
 }
@@ -109,6 +110,7 @@ BUuid&
 BUuid::operator=(const BUuid& other)
 {
 	memcpy(fValue, other.fValue, sizeof(fValue));
+
 	return *this;
 }
 
@@ -152,7 +154,6 @@ BUuid::_SetToRandomFallback()
 	for (int32 i = 0; i < 4; i++)
 		fValue[4 * i] |= (bitsToMove << i) & 0x80;
 }
-
 
 }	// namespace BPrivate
 

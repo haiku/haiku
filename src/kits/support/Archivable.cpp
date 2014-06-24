@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2012, Haiku, Inc.
+ * Copyright 2001-2012 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -237,9 +237,7 @@ check_signature(const char* signature, image_info& info)
 }
 
 
-namespace BPrivate
-{
-
+namespace BPrivate {
 
 instantiation_func
 find_instantiation_func(const char* className, const char* signature,
@@ -294,11 +292,10 @@ find_instantiation_func(const char* className, const char* signature,
 	return instantiationFunc;
 }
 
+}	// namespace BPrivate
 
-}
 
-
-//	#pragma mark -
+//	#pragma mark - BArchivable
 
 
 BArchivable::BArchivable()
@@ -374,6 +371,7 @@ BArchivable::Perform(perform_code d, void* arg)
 			return B_OK;
 		}
 	}
+
 	return B_NAME_NOT_FOUND;
 }
 
@@ -392,7 +390,7 @@ BArchivable::AllArchived(BMessage* archive) const
 }
 
 
-// #pragma mark -
+// #pragma mark - BArchiver
 
 
 BArchiver::BArchiver(BMessage* archive)
@@ -401,7 +399,7 @@ BArchiver::BArchiver(BMessage* archive)
 	fArchive(archive),
 	fFinished(false)
 {
-	if (!fManager)
+	if (fManager == NULL)
 		fManager = new BArchiveManager(this);
 }
 
@@ -467,7 +465,7 @@ BArchiver::RegisterArchivable(const BArchivable* archivable)
 }
 
 
-// #pragma mark -
+// #pragma mark - BUnarchiver
 
 
 BUnarchiver::BUnarchiver(const BMessage* archive)
@@ -525,6 +523,7 @@ BUnarchiver::IsInstantiated(const char* field, int32 index)
 	int32 token;
 	if (fArchive->FindInt32(field, index, &token) == B_OK)
 		return IsInstantiated(token);
+
 	return false;
 }
 
@@ -573,7 +572,7 @@ BUnarchiver::IsArchiveManaged(const BMessage* archive)
 	if (BManagerBase::ManagerPointer(archive))
 		return true;
 
-	if (!archive)
+	if (archive == NULL)
 		return false;
 
 	// managed top level archives return here
@@ -588,7 +587,7 @@ BUnarchiver::IsArchiveManaged(const BMessage* archive)
 template<>
 status_t
 BUnarchiver::InstantiateObject<BArchivable>(BMessage* from,
-	BArchivable*& object)
+	BArchivable* &object)
 {
 	BUnarchiver unarchiver(BUnarchiver::PrepareArchive(from));
 	object = instantiate_object(from);
@@ -597,7 +596,7 @@ BUnarchiver::InstantiateObject<BArchivable>(BMessage* from,
 
 
 BMessage*
-BUnarchiver::PrepareArchive(BMessage*& archive)
+BUnarchiver::PrepareArchive(BMessage* &archive)
 {
 	// this check allows PrepareArchive to be
 	// called on new or old-style archives
@@ -605,8 +604,10 @@ BUnarchiver::PrepareArchive(BMessage*& archive)
 		BUnarchiveManager* manager = BManagerBase::UnarchiveManager(archive);
 		if (!manager)
 			manager = new BUnarchiveManager(archive);
+
 		manager->Acquire();
 	}
+
 	return archive;
 }
 
@@ -744,6 +745,9 @@ instantiate_object(BMessage* from)
 }
 
 
+//	#pragma mark - support_globals
+
+
 bool
 validate_instantiation(BMessage* from, const char* className)
 {
@@ -807,9 +811,10 @@ find_instantiation_func(BMessage* archive)
 }
 
 
-// BArchivable binary compatibility
-#if __GNUC__ == 2
+//	#pragma mark - BArchivable binary compatibility
 
+
+#if __GNUC__ == 2
 
 extern "C" status_t
 _ReservedArchivable1__11BArchivable(BArchivable* archivable,
@@ -839,7 +844,6 @@ _ReservedArchivable2__11BArchivable(BArchivable* archivable,
 
 #elif __GNUC__ > 2
 
-
 extern "C" status_t
 _ZN11BArchivable20_ReservedArchivable1Ev(BArchivable* archivable,
 	const BMessage* archive)
@@ -865,10 +869,7 @@ _ZN11BArchivable20_ReservedArchivable2Ev(BArchivable* archivable,
 	return performData.return_value;
 }
 
-
 #endif // _GNUC__ > 2
 
 
 void BArchivable::_ReservedArchivable3() {}
-
-

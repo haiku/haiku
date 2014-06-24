@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
@@ -63,23 +63,37 @@ enum {
 	B_NETWORK_ADDRESS_TYPE			= 'NWAD',
 	B_MIME_STRING_TYPE				= 'MIMS',
 
-	// deprecated, do not use
-	B_ASCII_TYPE					= 'TEXT'	// use B_STRING_TYPE instead
+	/* deprecated, do not use */
+	B_ASCII_TYPE					= 'TEXT'
+		/* use B_STRING_TYPE instead */
 };
 
-// System-wide MIME types for handling URL's
+/* System-wide MIME types for handling URL's */
 
-extern const char *B_URL_HTTP; 		// application/x-vnd.Be.URL.http
-extern const char *B_URL_HTTPS; 	// application/x-vnd.Be.URL.https
-extern const char *B_URL_FTP;		// application/x-vnd.Be.URL.ftp
-extern const char *B_URL_GOPHER; 	// application/x-vnd.Be.URL.gopher
-extern const char *B_URL_MAILTO; 	// application/x-vnd.Be.URL.mailto
-extern const char *B_URL_NEWS;		// application/x-vnd.Be.URL.news
-extern const char *B_URL_NNTP;		// application/x-vnd.Be.URL.nntp
-extern const char *B_URL_TELNET; 	// application/x-vnd.Be.URL.telnet
-extern const char *B_URL_RLOGIN; 	// application/x-vnd.Be.URL.rlogin
-extern const char *B_URL_TN3270; 	// application/x-vnd.Be.URL.tn3270
-extern const char *B_URL_WAIS;		// application/x-vnd.Be.URL.wais
-extern const char *B_URL_FILE;		// application/x-vnd.Be.URL.file
+extern const char* B_URL_HTTP;
+	/* application/x-vnd.Be.URL.http */
+extern const char* B_URL_HTTPS;
+	/* application/x-vnd.Be.URL.https */
+extern const char* B_URL_FTP;
+	/*  application/x-vnd.Be.URL.ftp */
+extern const char* B_URL_GOPHER;
+	/*  application/x-vnd.Be.URL.gopher */
+extern const char* B_URL_MAILTO;
+	/*  application/x-vnd.Be.URL.mailto */
+extern const char* B_URL_NEWS;
+	/*  application/x-vnd.Be.URL.news */
+extern const char* B_URL_NNTP;
+	/*  application/x-vnd.Be.URL.nntp */
+extern const char* B_URL_TELNET;
+	/*  application/x-vnd.Be.URL.telnet */
+extern const char* B_URL_RLOGIN;
+	/*  application/x-vnd.Be.URL.rlogin */
+extern const char* B_URL_TN3270;
+	/*  application/x-vnd.Be.URL.tn3270 */
+extern const char* B_URL_WAIS;
+	/*  application/x-vnd.Be.URL.wais */
+extern const char* B_URL_FILE;
+	/*  application/x-vnd.Be.URL.file */
 
-#endif	// _TYPE_CONSTANTS_H
+
+#endif	/* _TYPE_CONSTANTS_H */

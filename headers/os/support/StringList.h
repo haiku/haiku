@@ -1,9 +1,9 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _SUPPORT_BSTRING_LIST_H_
-#define _SUPPORT_BSTRING_LIST_H_
+#ifndef _STRING_LIST_H
+#define _STRING_LIST_H
 
 
 #include <BeBuild.h>
@@ -100,4 +100,4 @@ BStringList::operator!=(const BStringList& other) const
 }
 
 
-#endif	// _SUPPORT_BSTRING_LIST_H_
+#endif	// _STRING_LIST_H

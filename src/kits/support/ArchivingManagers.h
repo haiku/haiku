@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ARCHIVING_MANAGERS_H
@@ -165,4 +165,5 @@ private:
 } // namespace Archiving
 } // namespace BPrivate
 
-#endif
+
+#endif	// _ARCHIVING_MANAGERS_H
