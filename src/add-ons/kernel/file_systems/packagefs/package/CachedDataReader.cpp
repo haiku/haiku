@@ -124,14 +124,6 @@ CachedDataReader::Init(BAbstractBufferedDataReader* reader, off_t size)
 
 
 status_t
-CachedDataReader::ReadData(off_t offset, void* buffer, size_t size)
-{
-	BMemoryIO output(buffer, size);
-	return ReadDataToOutput(offset, size, &output);
-}
-
-
-status_t
 CachedDataReader::ReadDataToOutput(off_t offset, size_t size,
 	BDataIO* output)
 {

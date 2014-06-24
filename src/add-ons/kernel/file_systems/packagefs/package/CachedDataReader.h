@@ -26,8 +26,6 @@ public:
 			status_t			Init(BAbstractBufferedDataReader* reader,
 									off_t size);
 
-	virtual	status_t			ReadData(off_t offset, void* buffer,
-									size_t size);
 	virtual	status_t			ReadDataToOutput(off_t offset, size_t size,
 									BDataIO* output);
 
