@@ -1,10 +1,11 @@
 /*
- * Copyright 2007,Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini, burton666@libero.it
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
  *		headers/os/support/BufferIO.h	rev 38225
@@ -47,15 +48,18 @@
 	done with it will also flush the stream and update the original stream.
 
 	\note This class is not meant to be used in cases where the
-		original stream requires to be in a consistent state. Neither should
-		this class be used as a way to perform 'atomic' writes, because the
-		object might need to do partial writes if it needs to 'move' the
-		buffer. This happens for instance if the original stream is bigger
-		than the buffer.
+	      original stream requires to be in a consistent state. Neither should
+	      this class be used as a way to perform 'atomic' writes, because the
+	      object might need to do partial writes if it needs to 'move' the
+	      buffer. This happens for instance if the original stream is bigger
+	      than the buffer.
+
+	\since Haiku R1
 */
 
+
 /*!
-	\fn BBufferIO::BBufferIO(BPositionIO *stream, size_t bufferSize,
+	\fn BBufferIO::BBufferIO(BPositionIO* stream, size_t bufferSize,
 		bool ownsStream)
 	\brief Initialize a BBufferIO object.
 
@@ -64,10 +68,13 @@
 
 	\param stream A pointer to a BPositionIO object.
 	\param bufferSize The size of the buffer that the object will allocate and 
-    	use.
+	       use.
 	\param ownsStream Specifies if the object will delete the stream on 
-		destruction.
+	       destruction.
+
+	\since Haiku R1
 */
+
 
 /*!
 	\fn BBufferIO::~BBufferIO()
@@ -76,11 +83,13 @@
 	Flush pending changes to the stream and free the allocated memory.
 	If the \c owns_stream property is \c true, the destructor also
 	deletes the stream associated with the BBufferIO object.
+
+	\since Haiku R1
 */
 
 
-/*! 
-	\fn ssize_t BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
+/*!
+	\fn ssize_t BBufferIO::ReadAt(off_t pos, void* buffer, size_t size)
 	\brief Read the specified amount of bytes at the given position.
 
 	\param pos The offset into the stream where to read.
@@ -89,11 +98,14 @@
 
 	\return The amount of bytes actually read, or an error code.
 	\retval B_NO_INIT The object is not associated with a valid BPositionIO
-    stream.
+	        stream.
 	\retval B_BAD_VALUE The \c buffer parameter is not valid.
+
+	\since Haiku R1
 */
 
-/*! 
+
+/*!
 	\fn ssize_t BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	\brief Write the specified amount of bytes at the given position.
 
@@ -103,11 +115,14 @@
 
 	\return The amount of bytes actually written, or an error code.
 	\retval B_NO_INIT The object is not associated with a valid BPositionIO
-		stream.
+	        stream.
 	\retval B_BAD_VALUE The \c buffer parameter is not valid.
+
+	\since Haiku R1
 */
 
-/*! 
+
+/*!
 	\fn off_t BBufferIO::Seek(off_t position, uint32 seekMode)
 	\brief Set the position in the stream.
 
@@ -117,21 +132,24 @@
 
 	\param position The position where you want to seek.
 	\param seekMode Can have three values:
-		- \c SEEK_SET The position passed is an offset from the beginning of
-			the stream; in other words, the current position is set to
-			position. For this mode, position should be a positive value. 
-		- \c SEEK_CUR The position argument is an offset from the current
-			position; the value of the argument is added to the current
-			position.
-		- \c SEEK_END. The position argument is an offset from the end of the
-			stream. In this mode the position argument should be negative
-			(or zero).
+	       - \c SEEK_SET The position passed is an offset from the beginning
+	         of the stream; in other words, the current position is set to
+	         position. For this mode, position should be a positive value.
+	       - \c SEEK_CUR The position argument is an offset from the current
+	         position; the value of the argument is added to the current
+	         position.
+	       - \c SEEK_END. The position argument is an offset from the end of
+	         the stream. In this mode the position argument should be negative
+	         (or zero).
 
 	\return The current position as an offset in bytes from the beginning of
-		the stream.
+	        the stream.
 	\retval B_NO_INIT The object is not associated with a valid BPositionIO
-		stream.
+	        stream.
+
+	\since Haiku R1
 */
+
 
 /*!
 	\fn off_t BBufferIO::Position() const
@@ -140,8 +158,11 @@
 	\return The current position as an offset in bytes
 	from the beginning of the stream.
 	\retval B_NO_INIT The object is not associated with a valid BPositionIO
-		stream.
+	        stream.
+
+	\since Haiku R1
 */
+
 
 /*!
 	\fn status_t BBufferIO::SetSize(off_t size)
@@ -152,23 +173,30 @@
 	\returns A status code.
 	\retval B_OK The stream is resized.
 	\retval B_NO_INIT The object is not associated with a valid BPositionIO
-		stream.
+	        stream.
+
+	\since Haiku R1
 */
+
 
 /*!
 	\fn status_t BBufferIO::Flush()
 	\brief Write pending modifications to the stream.
 
-	\return The amount of bytes written, or if it failed it will return an error
-    code.
+	\return The amount of bytes written, or if it failed it will return an
+	        error code.
+
+	\since Haiku R1
 */
 
 
-/*! 
-	\fn BPositionIO *BBufferIO::Stream() const
+/*!
+	\fn BPositionIO* BBufferIO::Stream() const
 	\brief Return a pointer to the stream specified on construction.
 
 	\return A pointer to the BPositionIO stream specified on construction.
+
+	\since Haiku R1
 */
 
 
@@ -177,18 +205,23 @@
 	\brief Return the size of the internal buffer.
 
 	\return The size of the buffer allocated by the object.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bool BBufferIO::OwnsStream() const
-	\brief Tell if the BBufferIO object "owns" the specified stream.
+	\brief Return whether or not the BBufferIO object "owns" the stream.
 
+	\return Whether or not the BBufferIO object "owns" the stream.
 	\retval true The object "owns" the stream and will destroy it upon
-		destruction.
+	        destruction.
 	\retval false The object does not own the stream.
 
 	\see SetOwnsStream()
+
+	\since Haiku R1
 */
 
 
@@ -197,11 +230,15 @@
 	\brief Set the \c owns_stream property of the object.
 
 	\param owns_stream If you pass \c true, the object will delete the stream
-		upon destruction, if you pass \c false it will not.
+	       upon destruction, if you pass \c false it will not.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BBufferIO::PrintToStream() const
-	\brief Print the object to stdout.
+	\brief Print the object to standard output.
+
+	\since Haiku R1
 */

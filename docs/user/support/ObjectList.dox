@@ -1,0 +1,509 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/support/ObjectList.h	hrev40252
+ */
+
+
+/*!
+	\file ObjectList.h
+	\ingroup support
+	\ingroup libbe
+	\brief Defines the BObjectList class.
+*/
+
+
+/*!
+	\class BObjectList
+	\ingroup support
+	\ingroup libbe
+	\brief BObjectList is a wrapper around BList that adds type safety,
+	       optional object ownership, search, and insert operations.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> BObjectList<T>::BObjectList(int32 itemsPerBlock,
+		bool owning)
+	\brief Creates a new BObjectList.
+
+	\param itemsPerBlock The number of items per block to allocate.
+	\param owning Whether or not the BObjectList deletes its items when
+	       it is emptied or deleted.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> BObjectList<T>::BObjectList(
+		const BObjectList<T>& list)
+	\brief Creates a new BObjectList as a copy of another \a list.
+
+	\param list The \a list to copy from.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> BObjectList<T>::~BObjectList()
+	\brief Deletes the list.
+
+	If the list owns its items they are deleted too.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Operators
+*/
+
+
+//! @{
+
+
+/*!
+	\fn template<class T> BObjectList<T>& BObjectList<T>::operator=(
+		const BObjectList<T>& list)
+	\brief Creates a new BObjectList as a copy of another \a list by
+	       overloading the = operator.
+
+	\param list The \a list to copy from.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Adding and Removing Items
+*/
+
+
+//! @{
+
+
+/*!
+	\fn template<class T> bool BObjectList<T>::AddItem(T* item)
+	\brief Append the \a item to the end of the list.
+
+	\param item The \a item to append.
+
+	\return Whether or not the \a item was appended.
+	\retval true The \a item was appended.
+	\retval false \a item was not appended, since resizing the BObjectList
+	        failed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> bool BObjectList<T>::AddItem(T* item, int32 index)
+	\brief Add \a item at the specified \a index.
+
+	\param item The \a item to add.
+	\param index The place in the list to add the \a item.
+
+	\return Whether or not the item was added.
+	\retval true The item was added.
+	\retval false Item was not added. Either the index is negative or invalid,
+	        or resizing the BObjectList failed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> bool BObjectList<T>::AddList(BObjectList<T>* list)
+	\brief Append a \a list of items to this list.
+
+	The original list is not altered.
+
+	\param list The \a list to be added.
+
+	\return Whether or not the \a list was added.
+	\retval true The \a list was added.
+	\retval false Failed to append the list, resizing failed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> bool BObjectList<T>::AddList(BObjectList<T>* list,
+		int32 index)
+	\brief Add a \a list of items to this list at the specified \a index.
+
+	The original list is not altered.
+
+	\param list The \a list to be added.
+	\param index The position in the current \a list where the new item(s) are
+	       added.
+
+	\return Whether or not the \a list was added.
+	\retval true The \a list was added.
+	\retval false Failed to insert the \a list resizing failed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> bool BObjectList<T>::RemoveItem(T* item,
+		bool deleteIfOwning)
+	\brief Remove \a item from the list.
+
+	\param item The \a item to be removed.
+	\param deleteIfOwning Also delete the \a item if owned.
+
+	\return Whether or not the \a item was removed.
+	\retval true The \a item was found and removed.
+	\retval false The \a item was not in this list and thus not removed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> T* BObjectList<T>::RemoveItemAt(int32 index)
+	\brief Remove the item at \a index from the list.
+
+	\param index The \a index of the item to be removed.
+
+	\return The pointer to the item that was removed, or \c NULL if the
+	        \a index was invalid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> inline T* BObjectList<T>::ItemAt(int32 index) const
+	\brief Return a pointer to the item at the given \a index.
+
+	\param index The item to retrieve.
+
+	\return A pointer to the item in that position, or \c NULL if the
+	        \a index is out of bounds.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> bool BObjectList<T>::ReplaceItem(int32 index, T* item)
+	\brief Replace an item with another one.
+
+	\param index The offset in the list where to put the \a item.
+	\param item The new \a item to put in the list.
+
+	\return Whether or not the item was replaced.
+	\retval true The item was replaced.
+	\retval false The \a index was invalid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> void BObjectList<T>::MakeEmpty(bool deleteIfOwning)
+	\brief Clear all the items from the list.
+
+	\param deleteIfOwning Also deletes items if owned.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Reordering Items
+*/
+
+
+//! @{
+
+
+/*!
+	\fn template<class T> T* BObjectList<T>::SwapWithItem(int32 index, T* item)
+	\brief Swap the \a item with the item at \a index.
+
+	\param index The offset in the list where to put the \a item.
+	\param item The new \a item to put in the list.
+
+	\return A pointer to the item in that position, or \c NULL if the
+	        \a index is out of bounds.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> bool BObjectList<T>::MoveItem(int32 from, int32 to)
+	\brief Move the item at \a from to the position of \a to.
+
+	\param from The index to move the item \a from.
+	\param to The index to move the item \a to.
+
+	\return Whether or not the items were moved.
+	\retval true The items were moved.
+	\retval false The \a from or \a to index was invalid.
+
+	\see BList::MoveItem()
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Querying Items
+*/
+
+
+//! @{
+
+
+/*!
+	\fn template<class T> int32 BObjectList<T>::IndexOf(const T* item) const
+	\brief Return the index of \a item.
+
+	\return The index of the item, or -1 when the item is not in the list.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> T* BObjectList<T>::FirstItem() const
+	\brief Return a pointer to the first item in the list.
+
+	\return A pointer to the first item or \c NULL if the list is empty.
+
+	\see BObjectList<T>::LastItem() const
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> T* BObjectList<T>::LastItem() const
+	\brief Return a pointer to the last item in the list.
+
+	\return A pointer to the last item or \c NULL if the list is empty.
+
+	\see BObjectList<T>::FirstItem() const
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> bool BObjectList<T>::HasItem(const T* item) const
+	\brief Return whether or not \a item is in the list.
+
+	\return \c true if the \a item was in the list, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> bool BObjectList<T>::IsEmpty() const
+	\brief Return whether or not there are items in the list.
+
+	\return \c true if the list was empty, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> int32 BObjectList<T>::CountItems() const
+	\brief Returns the number of items in the list.
+
+	\return The number of items in the list as an int32.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Iterating Over Items
+*/
+
+
+//! @{
+
+
+/*!
+	\fn template<class T> T* BObjectList<T>::EachElement(EachFunction func,
+		void* params)
+	\brief Perform an action on each item in the list.
+
+	\param func A function that takes a \c void* argument and returns a
+	       boolean.
+	\param params parameters for \a func.
+
+	\return A pointer to the item.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> const T* BObjectList<T>::EachElement(
+		ConstEachFunction func, void* params) const
+	\brief Perform an action on each item in the list.
+
+	\param func A function that takes a \c void* argument and returns a
+	       boolean.
+	\param params parameters for \a func.
+
+	\return A pointer to the item.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Finding Items
+*/
+
+
+//! @{
+
+
+/*!
+	\fn template<class T> const T* BObjectList<T>::FindIf(
+		const UnaryPredicate<T>& predicate) const
+	\brief Find items that match \a predicate.
+
+	\return A const pointer to T.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> T* BObjectList<T>::FindIf(
+		const UnaryPredicate<T>& predicate)
+	\brief Find items that match \a predicate.
+
+	\return A pointer to T.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> T* BObjectList<T>::BinarySearch(const T& key,
+		CompareFunction func) const
+	\brief Search for \a key in the list of items using the supplied comparison
+	       function via a binary search algorithm.
+
+	\param key The \a key to search for.
+	\param func The comparison function to use.
+
+	\return A pointer to T.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> T* BObjectList<T>::BinarySearch(const T& key,
+		CompareFunctionWithState func, void* state) const
+	\brief Search for \a key in the list of items using the supplied comparison
+	       function via a binary search algorithm.
+
+	\param key The \a key to search for.
+	\param func The comparison function to use.
+	\param state Additional information used to search for the item.
+
+	\return A pointer to T.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Reordering Items
+*/
+
+
+//! @{
+
+
+/*!
+	\fn template<class T> void BObjectList<T>::SortItems(
+		CompareFunction function)
+	\brief Sort the items with the use of a supplied comparison \a function.
+
+	\param function The \a function used to sort the items.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> void BObjectList<T>::SortItems(
+		CompareFunctionWithState function, void* state)
+	\brief Sort the items with the use of a supplied comparison \a function and
+	       addtional \a state.
+
+	\param function The \a function used to sort the items.
+	\param state Additional information used to sort the items.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn template<class T> void BObjectList<T>::HSortItems(
+		CompareFunction function)
+	\brief Sort the items with the use of a supplied comparison \a function.
+
+	\param function The \a function used to sort the items.
+
+	\since Haiku R1
+*/
+
+
+/*
+	\fn template<class T> void BObjectList<T>::HSortItems(
+		CompareFunctionWithState function, void* state)
+
+	\param function The \a function used to sort the items.
+	\param state Additional information used to sort the items.
+
+	\since Haiku R1
+*/
+
+
+//! @}

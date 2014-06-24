@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Documentation written by:
@@ -37,11 +37,13 @@
 	Reset() to reset the timer back to 0 clearing all lap info. When the
 	object is destroyed the timing information is streamed to standard out
 	unless you set the \a silent parameter to \c true in the constructor.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BStopWatch::BStopWatch(const char *name, bool silent)
+	\fn BStopWatch::BStopWatch(const char* name, bool silent)
 	\brief Constructs a BStopWatch object and starts the timer.
 
 	This method creates a new BStopWatch object. As soon as the object is
@@ -55,6 +57,8 @@
 	       anonymous stop watch.
 	\param silent Pass \c true to suppress time information from streaming to
 	       standard output when the object is destroyed.
+
+	\since BeOS R3
 */
 
 
@@ -64,6 +68,8 @@
 
 	If \a silent was set to \c false in the constructor then this method
 	will print elapsed time information to standard output.
+
+	\since BeOS R3
 */
 
 
@@ -72,6 +78,8 @@
 	\brief Resume the timer from a suspended state.
 
 	\see Suspend()
+
+	\since BeOS R3
 */
 
 
@@ -80,6 +88,8 @@
 	\brief Suspend the timer.
 
 	\see Resume()
+
+	\since BeOS R3
 */
 
 
@@ -97,6 +107,8 @@
 	      the time that has passed since the last lap). Any call to Lap()
 	      beyond the 10th lap will overwrite the last value. Calling Lap()
 	      while the timer is suspended does nothing and returns 0.
+
+	\since BeOS R3
 */
 
 
@@ -105,6 +117,8 @@
 	\brief Gets the elapsed time the object has counted.
 
 	\return The elapsed time in microseconds.
+
+	\since BeOS R3
 */
 
 
@@ -114,6 +128,8 @@
 
 	Resets the stop watch clearing the start time and stored laps and
 	restarts the timer.
+
+	\since BeOS R3
 */
 
 
@@ -125,4 +141,6 @@
 	string.
 
 	\return the name of the stop watch set in the constructor.
+
+	\since BeOS R3
 */

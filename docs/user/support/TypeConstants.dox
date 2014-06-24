@@ -1,9 +1,10 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
  *		headers/os/support/TypeConstants.h	rev 43506
@@ -14,10 +15,10 @@
 	\file TypeConstants.h
 	\ingroup support
 	\ingroup libbe
-	\brief Represents typecodes that are used in various part of the Haiku API.
+	\brief Represents type codes that are used in various part of the Haiku API.
 
 	The type codes all refer to a specified type, except one. B_ANY_TYPE can
-	refer to literaly any type. This type could be used in case you send or receive
+	refer to literally any type. This type could be used in case you send or receive
 	data of which you don't know the type, but you want to send or receive it
 	anyway.
 */
@@ -26,6 +27,8 @@
 /*!
 	\var B_ANY_TYPE
 	\brief General type when the exact contents is not yet known.
+
+	\since Haiku R1
 */
 
 
@@ -34,6 +37,8 @@
 	\brief Reference to a BAtomic class that was going to be in BeOS R6.
 
 	Unused in Haiku.
+
+	\since Haiku R1
 */
 
 
@@ -42,102 +47,136 @@
 	\brief Reference to a BAtomic class that was going to be in BeOS R6.
 
 	Unused in Haiku.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_BOOL_TYPE
 	\brief Boolean value.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_CHAR_TYPE
 	\brief Represents the \c char type.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_COLOR_8_BIT_TYPE
 	\brief Represents a one-byte color.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_DOUBLE_TYPE
 	\brief Represents the \c double type.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_FLOAT_TYPE
 	\brief Represents the \c float type.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_GRAYSCALE_8_BIT_TYPE
 	\brief Represents a byte-long grayscale value.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_INT16_TYPE
 	\brief Represents a \c short type.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_INT32_TYPE
 	\brief Represents a \c long type.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_INT64_TYPE
 	\brief Represents a \c long \c long type.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_INT8_TYPE
 	\brief Represents a \c char type used for integer storage.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_LARGE_ICON_TYPE
 	\brief Represents a large icon.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_MEDIA_PARAMETER_GROUP_TYPE
 	\brief Represents the BParameterGroup type from the media kit.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_MEDIA_PARAMETER_TYPE
 	\brief Represents the BParameter type from the media kit.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_MEDIA_PARAMETER_WEB_TYPE
 	\brief Represents the BParameterWeb type from the media kit.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_MESSAGE_TYPE
 	\brief Represents a BMessage type.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_MESSENGER_TYPE
 	\brief Represents a BMessenger type.
+
+	\since Haiku R1
 */
 
 
@@ -155,72 +194,96 @@
 /*!
 	\var B_URL_HTTP
 	\brief application/x-vnd.Be.URL.http
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_HTTPS
 	\brief application/x-vnd.Be.URL.https
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_FTP
 	\brief application/x-vnd.Be.URL.ftp
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_GOPHER
 	\brief application/x-vnd.Be.URL.gopher
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_MAILTO
 	\brief application/x-vnd.Be.URL.mailto
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_NEWS
 	\brief application/x-vnd.Be.URL.news
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_NNTP
 	\brief application/x-vnd.Be.URL.nntp
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_TELNET
 	\brief application/x-vnd.Be.URL.telnet
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_RLOGIN
 	\brief application/x-vnd.Be.URL.rlogin
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_TN3270
 	\brief application/x-vnd.Be.URL.tn3270
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_WAIS
 	\brief application/x-vnd.Be.URL.wais
+
+	\since Haiku R1
 */
 
 
 /*!
 	\var B_URL_FILE
 	\brief application/x-vnd.Be.URL.file
+
+	\since Haiku R1
 */
 
 

@@ -1,9 +1,10 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
  *		headers/os/support/Beep.h	rev 19972
@@ -21,6 +22,8 @@
 	\ingroup support
 	\ingroup libbe
 	\brief Functions to generate sounds from the computer.
+
+	\since BeOS R3
 */
 
 
@@ -35,26 +38,37 @@
 /*!
 	\fn status_t beep()
 	\brief Invoke the standard system beep to alert users.
+
 	From Beep.h and in libbe.so.
+
 	\see system_beep() and add_system_beep_event()
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn status_t system_beep(const char* eventName)
 	\brief Invokes the sound for event \a eventName.
+
 	You can add the events using add_system_beep_event().
 	From Beep.h and in libbe.so.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn status_t add_system_beep_event(const char* eventName, uint32 flags = 0)
 	\brief Adds an event to the media server.
+
 	Call this method to add a specific event to the media server.
 	From Beep.h and in libbe.so.
+
 	\param eventName The name of the event.
 	\param flags Currently unused. Pass \c 0.
+
+	\since BeOS R5
 */
 
 

@@ -1,9 +1,10 @@
 /*
- * Copyright 2007-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
  *		headers/os/support/Autolock.h	rev 33370
@@ -41,35 +42,38 @@
 status_t
 Receiver::HandleCall(Call *call)
 {
-	... work on call data ...
-	 fDataLocker->Lock()
-	 ... perform changes ...
-	 if (!success)
-	{
-	  fDataLocker->Unlock();
-	  return B_ERROR;
-	}
-	  
-	fDataLocker->Unlock()
-	return B_OK;
+    ... work on call data ...
+
+    fDataLocker->Lock()
+
+    ... perform changes ...
+
+    if (!success) {
+      fDataLocker->Unlock();
+      return B_ERROR;
+    }
+
+    fDataLocker->Unlock()
+
+    return B_OK;
 }
 \endcode
-	With the BAutolock this example can be rewritten as follows:
+    With the BAutolock this example can be rewritten as follows:
 
 \code
 status_t
 Receiver::HandleCall(Call *call)
 {
-	... work on call data ...
-	
-	BAutolock autolock(fDataLocker);
-	
-	... perform changes ...
-	
-	if (!success)
-	  return B_ERROR;
-	
-	return B_OK;
+    ... work on call data ...
+
+    BAutolock autolock(fDataLocker);
+
+    ... perform changes ...
+
+    if (!success)
+        return B_ERROR;
+
+    return B_OK;
 }
 \endcode
 
@@ -77,37 +81,47 @@ Receiver::HandleCall(Call *call)
 	the function. Because the destruction of the object causes it to unlock
 	the BLocker or BLooper, you don't have to manually make sure that every
 	exit from the function is properly unlocked.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BAutolock::BAutolock(BLooper *looper)
+	\fn BAutolock::BAutolock(BLooper* looper)
 	\brief Create an object and lock the BLooper
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BAutolock::BAutolock(BLocker *locker)
+	\fn BAutolock::BAutolock(BLocker* locker)
 	\brief Create an object and lock the BLocker
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn BAutolock::BAutolock(BLocker &locker)
+	\fn BAutolock::BAutolock(BLocker& locker)
 	\brief Create an object and lock the BLocker
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BAutolock::~BAutolock()
 	\brief Destroy the object and unlock the associated BLocker or BLooper
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool BAutolock::IsLocked()
-	\brief Verify whether the  associated BLocker or BLooper are actually
-		locked.
+	\brief Verify whether the associated BLocker or BLooper are actually
+	       locked.
 
 	Basically you may assume that when the object is created, you are
 	almost always sure the actual locking succeeds. It might fail if the
@@ -116,27 +130,36 @@ Receiver::HandleCall(Call *call)
 
 	If you expect this to happen, you can use this method to help you
 	protect yourself from any harm.
+
+	\return Whether or not the BLocker or BLooper is locked.
 	\retval true The lock was acquired.
 	\retval false Failed to acquire the lock.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool BAutolock::Lock()
 	\brief Lock the BAutolock if it has not already happened
-	
+
 	Note that unlike BLocker, the object is not locked with lock count. That
 	means that if the lock is already taken, this method returns \c true
 	without any action.
 
+	\return Whether or not the BLocker or BLooper was locked.
 	\retval true The lock was acquired (or had already been acquired).
 	\retval false Failed to acquire the lock.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BAutolock::Unlock()
-	\brief Unlock the BAutolock if the lock is being held
+	\brief Unlock the BAutolock if the lock is being held.
 
 	If the lock is not held, the method does nothing.
+
+	\since Haiku R1
 */

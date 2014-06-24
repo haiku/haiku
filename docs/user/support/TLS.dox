@@ -1,9 +1,10 @@
 /*
- * Copyright 2007 Haiku Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
  *		headers/os/support/TLS.h	rev 19972
@@ -64,18 +65,22 @@ public:
 	\note
 	-# It is impossible to get data other than from your thread.
 	-# There is a limit to the number of TLS variables you can allocate. This
-		limit is define by #TLS_MAX_KEYS, but do realize that you share this
-			limit with all the libraries your application is linked to.
+	   limit is define by #TLS_MAX_KEYS, but do realize that you share this
+	   limit with all the libraries your application is linked to.
 	-# The actual global variables, in the example \c gThreadName and
-		\c gThreadData, are only indexes. You cannot use these variables to
-		access data without the TLS API.
+	   \c gThreadData, are only indexes. You cannot use these variables to
+	   access data without the TLS API.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\def TLS_MAX_KEYS
 	\brief The maximum number of thread local storage variables. This number is
-		   process wide.
+	       process wide.
+
+	\since BeOS R5
 */
 
 
@@ -87,42 +92,50 @@ public:
 	you can reuse in every thread.
 
 	\return A unique index to which you can associate per thread data. If we
-		    overrun the maximum number of keys, as defined by #TLS_MAX_KEYS,
-		    the function will return \c B_NO_MEMORY.
+	        overrun the maximum number of keys, as defined by #TLS_MAX_KEYS,
+	        the function will return \c B_NO_MEMORY.
 
 	\sa tls_get()
 	\sa tls_set()
 	\sa tls_address()
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn void *tls_get(int32 index)
+	\fn void* tls_get(int32 index)
 	\brief Retrieve the data stored for this thread at the provided \a index.
 
 	\param index The \a index that you retrieved with tls_allocate().
 
 	\return The data you set using tls_set() for this thread, or \c NULL if there
-			is no data set, or the \a index is invalid.
+	        is no data set, or the \a index is invalid.
 
 	\sa tls_allocate()
 	\sa tls_set()
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn void **tls_address(int32 index)
+	\fn void** tls_address(int32 index)
 	\brief Retrieve the pointer that refers to the data of this thread at the
     provided \a index.
 
 	You can use this pointer to directly manipulate your thread data.
 
 	\param index The \a index that you retrieved with tls_allocate().
+
 	\return The pointer to where your thread's data is, or \c NULL if the index
-			is invalid.
+	        is invalid.
+
 	\sa tls_allocate()
 	\sa tls_set()
 	\sa tls_get()
+
+	\since BeOS R5
 */
 
 
@@ -135,8 +148,10 @@ public:
 
 	\param index The \a index that you retrieved with tls_allocate().
 	\param value The data that should be associated with the index for this
-    	   thread.
+	       thread.
 
 	\sa tls_allocate()
 	\sa tls_get()
+
+	\since BeOS R5
 */

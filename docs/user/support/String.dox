@@ -1,11 +1,12 @@
 /*
- * Copyright 2007-2011 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini, burton666@freemail.it
  *		Marc Flerackers, mflerackers@androme.be
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
  *		Oliver Tappe, openbeos@hirschaefer.de
  *
  * Corresponds to:
@@ -13,13 +14,15 @@
  *		src/kits/support/String.cpp  rev 42682
  */
 
+
 /*!
 	\file String.h
 	\ingroup support
 	\ingroup libbe
 	\brief Defines the BString class and global operators and functions for
-		handling strings.
+	       handling strings.
 */
+
 
 /*!
 	\class BString String.h
@@ -39,38 +42,52 @@
 	BString::CopyCharsInto() methods. The main difference is that if there are
 	any position argumens, the regular method counts the bytes and the 
 	Chars methods counts characters.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString::BString()
 	\brief Creates an empty BString.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString::BString(const char* string)
-	\brief Creates and initializes a BString from a \a string.
+	\brief Creates and initializes a BString from \a string.
+
+	\param string The \a string to copy from.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString::BString(const BString &string)
-	\brief Creates and initializes a BString from another BString.
+	\fn BString::BString(const BString& string)
+	\brief Creates and initializes a BString as a copy of another \a string.
+
+	\param string The BString object to copy from.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString::BString(const char *string, int32 maxLength)
+	\fn BString::BString(const char* string, int32 maxLength)
 	\brief Creates and initializes a BString from a \a string up to
-		\a maxLength characters.
+	       \a maxLength characters.
 
 	If \a maxLength is greater than the length of the source \a string then the
 	entire source \a string is copied. If \a maxLength is less than or equal
 	to 0 then the result is an empty BString.
 
 	\warning In BeOS R5 passing in a negative \a maxLength argument will copy
-		the entire \a string.
+	         the entire \a string.
+
+	\since BeOS R5
 */
 
 
@@ -79,11 +96,13 @@
 	\brief Free all resources associated with the object.
 
 	The destructor also frees the internal buffer associated with the string.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\name Access Methods
+	\name Access
 */
 
 
@@ -102,6 +121,8 @@
 	have a look at LockBuffer().
 
 	\return A pointer to the object string.
+
+	\since BeOS R5
 */
 
 
@@ -110,7 +131,10 @@
 	\brief Get the length of the string in bytes.
 
 	\return An integer with the length of the string, measured in bytes.
+
 	\sa CountChars()
+
+	\since BeOS R5
 */
 
 
@@ -122,7 +146,10 @@
 	the actual number of characters in the string.
 
 	\return An integer which is the number of characters in the string.
+
 	\sa Length()
+
+	\since BeOS R5
 */
 
 
@@ -135,13 +162,15 @@
 	the string contains.
 
 	\warning This method does not check whether the input is outside of the
-		boundaries, so make sure that you check your input values.
+	         boundaries, so make sure that you check your input values.
 
-	\param fromCharOffset The index of the character (not the byte!) from 
-		which to start the count
+	\param fromCharOffset The index of the character (not the byte!) from
+	       which to start the count
 	\param charCount The number of characters to count
 
 	\return An integer with the number of bytes.
+
+	\since Haiku R1
 */
 
 
@@ -150,6 +179,8 @@
 	\brief Check whether the string is empty.
 
 	\return Returns \c true if the string is empty.
+
+	\since Haiku R1
 */
 
 
@@ -157,7 +188,9 @@
 	\fn uint32 BString::HashValue() const
 	\brief Return a hash value for the current string
 
-	\sa HashValue(const char *string)
+	\sa HashValue(const char*)
+
+	\since Haiku R1
 */
 
 
@@ -171,6 +204,8 @@
 	\param string The string that you want to have hashed.
 
 	\sa HashValue()
+
+	\since Haiku R1
 */
 
 
@@ -178,7 +213,7 @@
 
 
 /*!
-	\name Assignment Methods
+	\name Assignment
 
 	To assign a string to the object, thus overriding the previous string
 	that was stored, there are different methods to use. Use one of the
@@ -192,23 +227,27 @@
 
 
 /*!
-	\fn BString& BString::operator=(const BString &string)
+	\fn BString& BString::operator=(const BString& string)
 	\brief Re-initialize the object to a copy  of the data of a BString.
 
 	\param string The string object to copy.
 
 	\return The function always returns \c *this.
 
-	\sa Adopt(BString &from)
-	\sa SetTo(const BString &string, int32 length)
+	\sa Adopt(BString&)
+	\sa SetTo(const BString&, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::operator=(const char *str)
+	\fn BString& BString::operator=(const char* str)
 	\brief Re-initialize the object to a copy of the data of a string.
 
-	\sa SetTo(const char *str, int32 maxLength)
+	\sa SetTo(const char*, int32)
+
+	\since BeOS R5
 */
 
 
@@ -217,48 +256,56 @@
 	\brief Re-initialize the object to a character.
 
 	\param c The character which you want to initialize the string to.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::SetTo(const char *str)
+	\fn BString& BString::SetTo(const char* str)
 	\brief Re-initialize the object to a copy of the data of a string.
 
-	This method calls operator=(const char *str).
+	This method calls operator=(const char*).
 
-	\sa SetTo(const char *str, int32 maxLength)
+	\sa SetTo(const char*, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::SetTo(const char *str, int32 maxLength)
+	\fn BString& BString::SetTo(const char* str, int32 maxLength)
 	\brief Re-initialize the object to a copy of the data of a string.
 
 	\param str The string to copy.
 	\param maxLength Amount of characters to copy from the string.
 
-	\sa operator=(const char *str)
+	\sa operator=(const char*)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::SetTo(const BString &from)
+	\fn BString& BString::SetTo(const BString& from)
 	\brief Re-initialize the object to a copy of the data of a BString.
 
 	\param from The string object to copy.
 
 	\return The function always returns \c *this.
 
-	\sa SetTo(const BString &string, int32 length)
-	\sa Adopt(BString &from)
+	\sa SetTo(const BString&, int32)
+	\sa Adopt(BString&)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Adopt(BString &from)
+	\fn BString& BString::Adopt(BString& from)
 	\brief Adopt the data of the given BString object.
 
-	This method adopts the data from a BString. 
+	This method adopts the data from a BString.
 
 	\note The object that is adopted from is not deleted, only its private
 	data is initialized to a \c NULL string. So if the from object was
@@ -268,12 +315,14 @@
 
 	\return The function always returns \c *this.
 
-	\sa operator=(const BString &string)
+	\sa operator=(const BString&)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::SetTo(const BString &string, int32 maxLength)
+	\fn BString& BString::SetTo(const BString& string, int32 maxLength)
 	\brief Re-initialize the string to a copy of the given BString object.
 
 	\param string The BString object to copy.
@@ -281,29 +330,33 @@
 
 	\return The function always returns \c *this.
 
-	\sa operator=(const BString &string)
-	\sa Adopt(BString &from, int32 maxLength)
+	\sa operator=(const BString&)
+	\sa Adopt(BString&, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Adopt(BString &from, int32 maxLength)
+	\fn BString& BString::Adopt(BString& from, int32 maxLength)
 	\brief Adopt the data of the given BString object up to \a maxLength
-		characters.
+	       characters.
 
 	\param from The string object to adopt.
 	\param maxLength Number of characters to adopt from the original BString.
 
 	\return The function always returns \c *this.
 
-	\sa SetTo(const BString &string, int32 maxLength)
+	\sa SetTo(const BString&, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::SetTo(char c, int32 count)
 	\brief Re-initialize the object to a string composed of a character you
-		specify.
+	       specify.
 
 	This method lets you specify the length of a string and what character
 	you want the string to contain repeatedly.
@@ -314,30 +367,40 @@
 	\return The function always returns \c *this.
 
 	\sa operator=(char c)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::SetToChars(const char *string, int32 charCount)
-	\brief Undocumented
+	\fn BString& BString::SetToChars(const char* string, int32 charCount)
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BString& BString::SetToChars(const BString& string, int32 charCount)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BString& BString::AdoptChars(BString& from, int32 charCount)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn BString& BString::SetToFormat(const char *format, ...)
-	\brief Undocumented
+	\fn BString& BString::SetToFormat(const char* format, ...)
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
@@ -353,7 +416,7 @@
 
 
 /*!
-	\fn BString &BString::CopyInto(BString &into, int32 fromOffset,
+	\fn BString& BString::CopyInto(BString& into, int32 fromOffset,
 		int32 length) const
 	\brief Copy the object's data (or part of it)  into another BString.
 
@@ -366,12 +429,14 @@
 	\param length The amount of bytes to copy.
 
 	\return This method always returns a pointer to the string passed as the
-		\c into parameter.
+	        \c into parameter.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn void BString::CopyInto(char *into, int32 fromOffset, int32 length) const
+	\fn void BString::CopyInto(char* into, int32 fromOffset, int32 length) const
 	\brief Copy the BString data (or part of it) into the supplied buffer.
 
 	This methods makes sure you don't copy more bytes than are available
@@ -383,20 +448,39 @@
 	\param into The buffer where to copy the object.
 	\param fromOffset The (zero-based) offset where to begin the copy.
 	\param length The amount of bytes to copy.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::CopyCharsInto(BString& into, int32 fromOffset,
 		int32 charCount) const
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bool BString::CopyCharsInto(char* into, int32* intoLength,
 		int32 fromCharOffset, int32 charCount) const
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::Split(const char* separator, bool noEmptyStrings,
+		BStringList& _list) const
+	\brief Split the string by the \a separator chars into \a _list.
+
+	\param separator The list of \a separator characters to split on.
+	\param noEmptyStrings If \c true, do not add empty strings to \a _list.
+	\param _list The BStringList to add the strings into.
+
+	\since Haiku R1
 */
 
 
@@ -404,7 +488,7 @@
 
 
 /*!
-	\name Appending Methods
+	\name Appending
 */
 
 
@@ -412,26 +496,30 @@
 
 
 /*!
-	\fn BString & BString::operator+=(const BString &string)
+	\fn BString& BString::operator+=(const BString& string)
 	\brief Append the given string to the object
 
-	\param string The string to append
+	\param string The string to append.
 
 	\return This method always returns \c *this.
 
-	\sa Append(const BString &string, int32 length)
+	\sa Append(const BString&, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::operator+=(const char *str)
+	\fn BString& BString::operator+=(const char* str)
 	\brief Append the given string to the object.
 
 	\param str A pointer to the NULL-terminated string to append.
 
 	\return This method always returns \c *this.
 
-	\sa Append(const char *str, int32 length)
+	\sa Append(const char*, int32)
+
+	\since BeOS R5
 */
 
 
@@ -443,67 +531,75 @@
 
 	\return This method always returns \c *this.
 
-	\sa Append(char c, int32 count)
+	\sa Append(char, int32)
 */
 
 
 /*!
-	\fn BString & BString::operator+=(const BString &string)
-	\brief Append the given string to the object
+	\fn BString& BString::operator+=(const BString& string)
+	\brief Append the given string to the object.
 
-	\param string The string to append
+	\param string The string to append.
 
 	\return This method always returns \c *this.
 
-	\sa Append(const BString &string, int32 length)
+	\sa Append(const BString&, int32)
 */
 
 
 /*!
-	\fn BString &BString::Append(const BString &string)
-	\brief Append the given string to the object
+	\fn BString& BString::Append(const BString&)
+	\brief Append the given string to the object.
 
-	\param string The string to append
+	\param string The string to append.
 
 	\return This method always returns \c *this.
 
-	\sa Append(const BString &string, int32 length)
+	\sa Append(const BString&, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString &BString::Append(const char *str)
+	\fn BString& BString::Append(const char* str)
 	\brief Append the given string to the object.
 
 	This method calls operator+=(const char *str).
 
-	\sa Append(const char *str, int32 length)
+	\sa Append(const char*, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Append(const BString &string, int32 length)
+	\fn BString& BString::Append(const BString& string, int32 length)
 	\brief Append a part of the given BString to the object.
 
 	\param string The BString to append.
-	\param length The maximum number ofbytes to get from the original object.
+	\param length The maximum number of bytes to get from the original.
 
 	\return This method always returns \c *this.
 
-	\sa operator+=(const BString &string)
+	\sa operator+=(const BString&)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Append(const char *str, int32 length)
-	\brief Append a part of the given string to the object.
+	\fn BString& BString::Append(const char* str, int32 length)
+	\brief Append a part of the given string to the BString.
 
 	\param str A pointer to the string to append.
 	\param length The maximum bytes to get from the original string.
 
 	\return This method always returns \c *this.
 
-	\sa operator+=(const char *str)
+	\sa operator+=(const char*)
+
+	\since BeOS R5
 */
 
 
@@ -517,18 +613,24 @@
 	\return This method always returns \c *this.
 
 	\sa operator+=(char c)
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::AppendChars(const BString& string, int32 charCount)
-	\brief undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn BString& BString::AppendChars(const char *string, int32 charCount)
-	\brief undocumented
+	\fn BString& BString::AppendChars(const char* string, int32 charCount)
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
@@ -536,7 +638,7 @@
 
 
 /*!
-	\name Prepending Methods
+	\name Prepending
 */
 
 
@@ -544,75 +646,89 @@
 
 
 /*!
-	\fn BString& BString::Prepend(const char *str)
-	\brief Prepend the given string to the object.
+	\fn BString& BString::Prepend(const char* str)
+	\brief Prepend the given string to the BString.
 
 	\param str A pointer to the string to prepend.
 
 	\return This method always returns \c *this.
 
-	\sa Prepend(const char *str, int32 length)
+	\sa Prepend(const char*, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Prepend(const BString &string)
+	\fn BString& BString::Prepend(const BString& string)
 	\brief Prepend the given BString to the object.
 
 	\param string The BString object to prepend.
 
 	\return This method always returns \c *this.
 
-	\sa Prepend(const BString &string, int32 len)
+	\sa Prepend(const BString&, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Prepend(const char *str, int32 length)
-	\brief Prepend the given string to the object.
+	\fn BString& BString::Prepend(const char* str, int32 length)
+	\brief Prepend the given string to the BString.
 
 	\param str A pointer to the string to prepend.
 	\param length The maximum amount of bytes to get from the string.
 
 	\return This method always returns \c *this.
 
-	\sa Prepend(const char *str)
+	\sa Prepend(const char*)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Prepend(const BString &string, int32 length)
+	\fn BString& BString::Prepend(const BString& string, int32 length)
 	\brief Prepend the given BString to the object.
 
-	\param string The BString object to prepend.
+	\param string The BString to prepend.
 	\param length The maximum amount of bytes to get from the BString.
 
 	\return This method always returns \c *this.
 
-	\sa Prepend(const BString &string)
+	\sa Prepend(const BString&)
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::Prepend(char c, int32 count)
-	\brief Prepend the given character repeatedly to the object.
+	\brief Prepend the given character \a count times to the BString.
 
 	\param c The character to prepend.
 	\param count The number of times this character should be prepended.
 
 	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::PrependChars(const char *string, int32 charCount)
-	\brief undocumented
+	\fn BString& BString::PrependChars(const char* string, int32 charCount)
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BString& BString::PrependChars(const BString& string, int32 charCount)
-	\brief undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
@@ -620,7 +736,7 @@
 
 
 /*!
-	\name Inserting Methods
+	\name Inserting
 */
 
 
@@ -628,158 +744,186 @@
 
 
 /*!
-	\fn BString& BString::Insert(const char *string, int32 position)
+	\fn BString& BString::Insert(const char* string, int32 position)
 	\brief Insert the given string at the given position into the object's
-		data.
+	       data.
 
 	\param string A pointer to the string to insert.
 	\param position The offset in bytes into the BString's data where to insert
-		the string.
+	       the string.
 
 	\return This method always returns \c *this.
 
-	\sa Insert(const char *string, int32 length, int32 position)
-	\sa Insert(const char *string, int32 fromOffset, int32 length, int32 position)
+	\sa Insert(const char*, int32, int32)
+	\sa Insert(const char*, int32, int32, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Insert(const char *string, int32 length, int32 position)
+	\fn BString& BString::Insert(const char* string, int32 length,
+		int32 position)
 	\brief Inserts the given string at the given position into the object's
-		data.
+	       data.
 
 	\param string A pointer to the string to insert.
-	\param length The amount of bytes to insert.	
-	\param position The offset in bytes into the BString's data where to insert
-		the string.
+	\param length The amount of bytes to insert.
+	\param position The offset in bytes into the data of the BString where to
+	       insert the string.
 
 	\return This method always returns \c *this.
 
-	\sa Insert(const char *string, int32 position)
-	\sa Insert(const char *string, int32 fromOffset, int32 length, int32 position)
+	\sa Insert(const char*, int32)
+	\sa Insert(const char*, int32, int32, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Insert(const char *string, int32 fromOffset,
+	\fn BString& BString::Insert(const char* string, int32 fromOffset,
 		int32 length, int32 position)
 	\brief Insert the given string at the given position into the object's
-		data.
+	       data.
 
 	\param string A pointer to the string to insert.
 	\param fromOffset The offset in the string that is to be inserted
-	\param length The amount of bytes to insert.	
-	\param position The offset in bytes into the BString's data where to insert
-		the string.
+	\param length The amount of bytes to insert.
+	\param position The offset in bytes into the data of the BString where to
+	       insert the string.
 
 	\return This method always returns \c *this.
 
-	\sa Insert(const char *string, int32 position)
-	\sa Insert(const char *string, int32 length, int32 position)
+	\sa Insert(const char*, int32)
+	\sa Insert(const char*, int32, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Insert(const BString &string, int32 position)
+	\fn BString& BString::Insert(const BString& string, int32 position)
 	\brief Insert the given BString at the given position into the object's	
-		data.
+	       data.
+
 	\param string The BString object to insert.
-	\param position The offset in bytes into the BString's data where to insert	
-		the string.
+	\param position The offset in bytes into the data of the BString where to
+	       insert the string.
 
 	\return This method always returns \c *this.
 
-	\sa Insert(const BString &string, int32 length, int32 position)
-	\sa Insert(const BString &string, int32 fromOffset, int32 length, int32 position)
+	\sa Insert(const BString&, int32, int32)
+	\sa Insert(const BString&, int32, int32, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Insert(const BString &string, int32 length, int32 position)
+	\fn BString& BString::Insert(const BString& string, int32 length, int32 position)
 	\brief Insert the given BString at the given position into the object's
-		data.
+	       data.
 	\param string The BString object to insert.
 	\param length The amount of bytes to insert.
-	\param position The offset in bytes into the BString's data where to insert
-		the string.
+	\param position The offset in bytes into the data of the BString where to
+	       insert the string.
 
 	\return This method always returns \c *this.
 
-	\sa Insert(const BString &string, int32 position)
-	\sa Insert(const BString &string, int32 fromOffset, int32 length, int32 position)
+	\sa Insert(const BString&, int32)
+	\sa Insert(const BString&, int32, int32, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Insert(const BString &string, int32 fromOffset,
+	\fn BString& BString::Insert(const BString& string, int32 fromOffset,
 		int32 length, int32 position)
 	\brief Insert the given string at the given position into the object's
-		data.
+	       data.
 
 	\param string The BString object to insert.
 	\param fromOffset The offset in the string that is to be inserted
 	\param length The amount of bytes to insert.
-	\param position The offset in bytes into the BString's data where to insert
-		the string.
+	\param position The offset in bytes into the data of the BString where to
+	       insert the string.
 
 	\return This method always returns \c *this.
 
-	\sa Insert(const BString &string, int32 position)
-	\sa Insert(const BString &string, int32 length, int32 position)
+	\sa Insert(const BString&, int32)
+	\sa Insert(const BString&, int32, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::Insert(char c, int32 count, int32 pos)
-	\brief Insert the given character repeatedly at the given position	
-		into the object's data.
+	\brief Insert the given character repeatedly at the given position
+	       into the object's data.
 
 	\param c The character to insert.
 	\param count The number of times to insert the character.
-	\param pos The offset in bytes into the BString's data where to insert	
-		the string.
+	\param pos The offset in bytes into the data of the BString where to
+	       insert the string.
 
 	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::InsertChars(const char *string, int32 charPosition)
-	\brief Undocumented
+	\fn BString& BString::InsertChars(const char* string, int32 charPosition)
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BString& BString::InsertChars(const char* string, int32 charCount,
 		int32 charPosition)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BString& BString::InsertChars(const char* string, int32 fromCharOffset,
 		int32 charCount, int32 charPosition)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BString& BString::InsertChars(const BString& string, int32 charPosition)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BString& BString::InsertChars(const BString& string, int32 charCount,
 		int32 charPosition)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BString& BString::InsertChars(const BString& string, int32 fromCharOffset,
 		int32 charCount, int32 charPosition)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
@@ -787,7 +931,7 @@
 
 
 /*!
-	\name Removing Methods
+	\name Removing
 */
 
 
@@ -802,12 +946,16 @@
 	\param lazy If true, the memory-optimization is postponed to later
 
 	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::TruncateChars(int32 newCharCount, bool lazy)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
@@ -819,124 +967,152 @@
 	\param length The number of bytes to remove
 
 	\return This function always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::RemoveChars(int32 fromCharOffset, int32 charCount)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn BString& BString::RemoveFirst(const BString &string)
+	\fn BString& BString::RemoveFirst(const BString& string)
 	\brief Remove the first occurrence of the given BString.
 
 	\param string The BString to remove.
 
 	\return This function always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::RemoveLast(const BString &string)
+	\fn BString& BString::RemoveLast(const BString& string)
 	\brief Remove the last occurrence of the given BString.
 
 	\param string The BString to remove.
 
 	\return This function always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::RemoveAll(const BString &string)
+	\fn BString& BString::RemoveAll(const BString& string)
 	\brief Remove all occurrences of the given BString.
 
 	\param string The BString to remove.
 
 	\return This function always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::RemoveFirst(const char *string)
+	\fn BString& BString::RemoveFirst(const char* string)
 	\brief Remove the first occurrence of the given string.
 
 	\param string A pointer to the string to remove.
 
 	\return This function always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::RemoveLast(const char *string)
+	\fn BString& BString::RemoveLast(const char* string)
 	\brief Remove the last occurrence of the given string.
 
 	\param string A pointer to the string to remove.
 
 	\return This function always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::RemoveAll(const char *str)
+	\fn BString& BString::RemoveAll(const char* str)
 	\brief Remove all occurrences of the given string.
 
 	\param str A pointer to the string to remove.
 
 	\return This function always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::RemoveSet(const char *setOfCharsToRemove)
+	\fn BString& BString::RemoveSet(const char* setOfCharsToRemove)
 	\brief Remove all the characters specified.
 
 	\param setOfCharsToRemove The set of characters to remove.
 
 	\return This function always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::RemoveCharsSet(const char*setOfCharsToRemove)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn BString& BString::MoveInto(BString &into, int32 from, int32 length)
+	\fn BString& BString::MoveInto(BString& into, int32 from, int32 length)
 	\brief Move the BString data (or part of it) into another BString.
 
-	\param into The BString where to move the object.
+	\param into The BString where to move the string into.
 	\param from The offset (zero-based) where to begin the move.
-	\param length The amount of bytes to move.
+	\param length The number of bytes to move.
 
-	\return This method always returns \c into .
+	\return This method always returns \c into.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn void BString::MoveInto(char *into, int32 from, int32 length)
+	\fn void BString::MoveInto(char* into, int32 from, int32 length)
 	\brief Move the BString data (or part of it) into the given buffer.
 
-	\param into The buffer where to move the object.
+	\param into The buffer where to move the string into.
 	\param from The offset (zero-based) where to begin the move.
-	\param length The amount of bytes to move.
+	\param length The number of bytes to move.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::MoveCharsInto(BString &into, int32 fromCharOffset,
+	\fn BString& BString::MoveCharsInto(BString& into, int32 fromCharOffset,
 		int32 charCount)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bool BString::MoveCharsInto(char* into, int32* intoLength,
 		int32 fromCharOffset, int32 charCount)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
@@ -944,7 +1120,7 @@
 
 
 /*!
-	\name Comparison Methods
+	\name Comparison
 
 	There are two different comparison methods. First of all there
 	is the whole range of operators that return a boolean value, secondly
@@ -963,242 +1139,299 @@
 
 
 /*!
-	\fn bool BString::operator<(const BString &string) const
-	\brief Lexicographically compare if this string is less than a given string.
+	\fn bool BString::operator<(const BString& string) const
+	\brief Lexicographically compare if this BString is less than the given
+	       \a string.
 
-	\param string The string to compare with.
+	\param string The \a string to compare against.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn bool BString::operator<=(const BString &string) const
-	\brief Lexicographically compare if this string is less than or equal to
-		a given string.
+	\fn bool BString::operator<=(const BString& string) const
+	\brief Lexicographically compare if this BString is less than or equal to
+	       the given \a string.
 
-	\param string The string to compare with.
+	\param string The \a string to compare against.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn bool BString::operator==(const BString &string) const
-	\brief Lexicographically compare if this string is equal to a given string.
+	\fn bool BString::operator==(const BString& string) const
+	\brief Lexicographically compare if this BString is equal to the given
+	       \a string.
 
-	\param string The string to compare with.
+	\param string The \a string to compare against.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn bool BString::operator>=(const BString &string) const
+	\fn bool BString::operator>=(const BString& string) const
+	\brief Lexicographically compare if this BString is greater than or equal
+	       to the given \a string.
+
+	\param string The string to compare against.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn bool BString::operator>(const BString& string) const
+	\brief Lexicographically compare if this BString is greater than the given
+	       \a string.
+
+	\param string The string to compare against.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn bool BString::operator!=(const BString& string) const
+	\brief Lexicographically compare if this BString is not equal to the given
+	       \a string.
+
+	\param string The string to compare against.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn bool BString::operator<(const char* string) const
+	\brief Lexicographically compare if this BString is less than the given
+	       \a string.
+
+	\param string The string to compare against.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn bool BString::operator<=(const char* string) const
+	\brief Lexicographically compare if this BString is less than or equal to
+	       the given \a string.
+
+	\param string The \a string to compare against.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn bool BString::operator==(const char* string) const
+	\brief Lexicographically compare if this BString is equal to the given
+	       \a string.
+
+	\param string The \a string to compare against.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn bool BString::operator>=(const char* string) const
 	\brief Lexicographically compare if this string is more than or equal
-		to a given string.
+	       to a given \a string.
 
-	\param string The string to compare with.
+	\param string The \a string to compare against.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn bool BString::operator>(const BString &string) const
+	\fn bool BString::operator>(const char* string) const
 	\brief Lexicographically compare if this string is more than a given string.
 
-	\param string The string to compare with.
+	\param string The \a string to compare against.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn bool BString::operator!=(const BString &string) const
+	\fn bool BString::operator!=(const char* string) const
 	\brief Lexicographically compare if this string is not equal to a given	
-		string.
+	       string.
 
-	\param string The string to compare with.
-*/
+	\param string The \a string to compare against.
 
-
-/*!
-	\fn bool BString::operator<(const char *string) const
-	\brief Lexicographically compare if this string is less than a given string.
-
-	\param string The string to compare with.
-*/
-
-
-/*!
-	\fn bool BString::operator<=(const char *string) const
-	\brief Lexicographically compare if this string is less than or equal to
-		a given string.
-
-	\param string The string to compare with.
-*/
-
-
-/*!
-	\fn bool BString::operator==(const char *string) const
-	\brief Lexicographically compare if this string is equal to a given string.
-
-	\param string The string to compare with.
-*/
-
-
-/*!
-	\fn bool BString::operator>=(const char *string) const
-	\brief Lexicographically compare if this string is more than or equal
-		to a given string.
-
-	\param string The string to compare with.
-*/
-
-
-/*!
-	\fn bool BString::operator>(const char *string) const
-	\brief Lexicographically compare if this string is more than a given string.
-
-	\param string The string to compare with.
-*/
-
-
-/*!
-	\fn bool BString::operator!=(const char *string) const
-	\brief Lexicographically compare if this string is not equal to a given	
-		string.
-
-	\param string The string to compare with.
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString::operator const char*() const
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn int BString::Compare(const BString &string) const
-	\brief Lexicographically compare this string to another.
+	\fn int BString::Compare(const BString& string) const
+	\brief Lexicographically compare this BString to another \a string.
 
-	\param string The string to compare to.
+	\param string The \a string to compare against.
 
-	\retval >0 The object sorts lexicographically after \c string.
-	\retval =0 The object is equal to \c string.
-	\retval <0 The object sorts lexicographically before \c string.
+	\return An int representing the strings relationship to each other.
+	\retval >0 The BString sorts lexicographically after \a string.
+	\retval =0 The BString is equal to \a string.
+	\retval <0 The BString sorts lexicographically before \a string.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int BString::Compare(const char *string) const
-	\brief Lexicographically compare this string to another.
+	\fn int BString::Compare(const char* string) const
+	\brief Lexicographically compare this BString to another \a string.
 
-	\param string The string to compare to.
+	\param string The \a string to compare against.
 
-	\retval >0 The object sorts lexicographically after \c string.
-	\retval =0 The object is equal to \c string.
-	\retval <0 The object sorts lexicographically before \c string.
+	\return An int representing the strings relationship to each other.
+	\retval >0 The BString sorts lexicographically after \a string.
+	\retval =0 The BString is equal to \a string.
+	\retval <0 The BString sorts lexicographically before \a string.
 
-	\sa Compare(const BString &string) const
+	\sa Compare(const BString&) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int BString::Compare(const BString &string, int32 length) const
-	\brief Lexicographically compare a number of characters of a string to
-		another.
+	\fn int BString::Compare(const BString& string, int32 length) const
+	\brief Lexicographically compare \a length characters of this BString to
+	       another \a string.
 
-	\param string The string to compare to.
-	\param length The number of characters to compare
-
-	\retval >0 The object sorts lexicographically after \c string.
-	\retval =0 The object is equal to \c string.
-	\retval <0 The object sorts lexicographically before \c string.
-*/
-
-
-/*!
-	\fn int BString::Compare(const char *string, int32 length) const
-	\brief Lexicographically compare a number of characters of a string to
-		another.
-
-	\param string The string to compare to.
+	\param string The \a string to compare against.
 	\param length The number of characters to compare.
 
-	\retval >0 The object sorts lexicographically after \c string.
-	\retval =0 The object is equal to \c string.
-	\retval <0 The object sorts lexicographically before \c string.
+	\return An int representing the strings relationship to each other.
+	\retval >0 The BString sorts lexicographically after \a string.
+	\retval =0 The BString is equal to \a string.
+	\retval <0 The BString sorts lexicographically before \a string.
 
-	\sa Compare(const BString &string, int32 n) const
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int BString::CompareChars(const BString& string,
-		int32 charCount) const
-	\brief Undocumented
+	\fn int BString::Compare(const char* string, int32 length) const
+	\brief Lexicographically compare \a length characters of this BString to
+	       another \a string.
+
+	\param string The \a string to compare against.
+	\param length The number of characters to compare.
+
+	\return An int representing the strings relationship to each other.
+	\retval >0 The BString sorts lexicographically after \a string.
+	\retval =0 The BString is equal to \a string.
+	\retval <0 The BString sorts lexicographically before \a string.
+
+	\sa Compare(const BString&, int32) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int BString::CompareChars(const char *string,
-		int32 charCount) const
-	\brief Undocumented
+	\fn int BString::CompareChars(const BString& string, int32 charCount) const
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn int BString::ICompare(const BString &string) const
-	\brief Lexicographically compare a string to another in a
-		case-insensitive way.
+	\fn int BString::CompareChars(const char* string, int32 charCount) const
+	\brief Undocumented.
 
-	\param string The string to compare to.
+	\since Haiku R1
+*/
 
-	\retval >0 The object sorts lexicographically after \c string.
-	\retval =0 The object is equal to \c string.
-	\retval <0 The object sorts lexicographically before \c string.
 
-	\sa Compare(const BString &string) const
+/*!
+	\fn int BString::ICompare(const BString& string) const
+	\brief Lexicographically compare this BString to another \a string
+	       case-insensitively.
+
+	\param string The \a string to compare against.
+
+	\return An int representing the strings relationship to each other.
+	\retval >0 The BString sorts lexicographically after \a string.
+	\retval =0 The BString is equal to \a string.
+	\retval <0 The BString sorts lexicographically before \a string.
+
+	\sa Compare(const BString&) const
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn int BString::ICompare(const char* string) const
-	\brief Lexicographically compare this string to another in a
-		case-insensitive way.
+	\brief Lexicographically compare this BString to another \a string
+	       case-insensitively.
 
-	\param string The string to compare to.
+	\param string The \a string to compare against.
 
-	\retval >0 The object sorts lexicographically after \c string.
-	\retval =0 The object is equal to \c string.
-	\retval <0 The object sorts lexicographically before \c string.
+	\return An int representing the strings relationship to each other.
+	\retval >0 The BString sorts lexicographically after \a string.
+	\retval =0 The BString is equal to \a string.
+	\retval <0 The BString sorts lexicographically before \a string.
 
-	\sa Compare(const BString &string) const
+	\sa Compare(const BString&) const
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn int BString::ICompare(const BString& string, int32 length) const
-	\brief Lexicographically compare a number of characters of this string	
-		to another.
+	\brief Lexicographically compare \a length characters of this BString
+	       to another \a string.
 
-	\param string The string to compare to.
-	\param length The number of characters to compare
+	\param string The \a string to compare against.
+	\param length The number of characters to compare.
 
-	\retval >0 The object sorts lexicographically after \c string.
-	\retval =0 The object is equal to \c string.
-	\retval <0 The object sorts lexicographically before \c string.
+	\return An int representing the strings relationship to each other.
+	\retval >0 The BString sorts lexicographically after \a string.
+	\retval =0 The BString is equal to \a string.
+	\retval <0 The BString sorts lexicographically before \a string.
 
-	\sa Compare(const BString &string, int32 length) const
+	\sa Compare(const BString&, int32) const
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn int BString::ICompare(const char* string, int32 length) const
-	\brief Lexicographically compare a number of characters of this string	
-		to another.
+	\brief Lexicographically compare \a length characters of this BString
+	       to another \a string.
 
-	\param string The string to compare to.
+	\param string The \a string to compare against.
 	\param length The number of characters to compare
 
-	\retval >0 The object sorts lexicographically after \c string.
-	\retval =0 The object is equal to \c string.
-	\retval <0 The object sorts lexicographically before \c string.
+	\return An int representing the strings relationship to each other.
+	\retval >0 The BString sorts lexicographically after \a string.
+	\retval =0 The BString is equal to \a string.
+	\retval <0 The BString sorts lexicographically before \a string.
 
-	\sa Compare(const BString &string, int32 length) const
+	\sa Compare(const BString&, int32) const
+
+	\since BeOS R5
 */
 
 
@@ -1206,7 +1439,7 @@
 
 
 /*!
-	\name Searching Methods
+	\name Searching
 */
 
 
@@ -1214,68 +1447,69 @@
 
 
 /*!
-	\fn int32 BString::FindFirst(const BString &string) const
-	\brief Find the first occurrence of the given BString.
+	\fn int32 BString::FindFirst(const BString& string) const
+	\brief Find the first occurrence of the given \a string.
 
-	\param string The BString to search for.
+	\param string The \a string to search for.
 
-	\return  The offset (zero-based) into the data where the given BString	
-		has been found.
+	\return The offset (zero-based) into the data where the given BString
+	        was found  or \c B_ERROR if we could not find \c string.
 
-	\retval B_ERROR Could not find \c string.
+	\sa IFindFirst(const BString&) const
 
-	\sa IFindFirst(const BString &string) const
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int32 BString::FindFirst(const char *string) const
-	\brief Find the first occurrence of the given string.
+	\fn int32 BString::FindFirst(const char* string) const
+	\brief Find the first occurrence of the given \a string.
 
-	\param string The string to search for.
+	\param string The \a string to search for.
 
-	\return The offset (zero-based) into the data where the given string	
-		has been found.
+	\return The offset (zero-based) into the data where the given string
+	        was found, \c B_BAD_VALUE if the \c string pointer is invalid,
+	        or \c B_ERROR if we could not find \c string.
 
-	\retval B_BAD_VALUE The \c string pointer is invalid.
-	\retval B_ERROR Could not find \c string.
+	\sa IFindFirst(const char*) const
 
-	\sa IFindFirst(const char *string) const
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int32 BString::FindFirst(const BString &string, int32 fromOffset) const
-	\brief Find the first occurrence of the given BString, starting from
-		the given offset.
+	\fn int32 BString::FindFirst(const BString& string, int32 fromOffset) const
+	\brief Find the first occurrence of the given \a string starting from
+	       the given offset.
 
-	\param string The BString to search for.
+	\param string The \a string to search for.
 	\param fromOffset The offset where to start the search.
 
 	\return An integer which is the offset (zero-based) into the data
-		where the given BString has been found.
+	        where the given BString was found or \c B_ERROR if we could
+	        not find the \c string.
 
-	\retval B_ERROR Could not find \c string.
+	\sa IFindFirst(const BString&, int32) const
 
-	\sa IFindFirst(const BString &string, int32 fromOffset) const
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int32 BString::FindFirst(const char *string, int32 fromOffset) const
-	\brief Find the first occurrence of the given string,
-		starting from the given offset.
+	\fn int32 BString::FindFirst(const char* string, int32 fromOffset) const
+	\brief Find the first occurrence of the given \a string, starting from the
+	       given offset.
 
-	\param string The string to search for.
+	\param string The \a string to search for.
 	\param fromOffset The offset where to start the search.
 
-	\return The offset (zero-based) into the data where the given string	
-		has been found.
+	\return The offset (zero-based) into the data where the given string
+	        was found, \c B_BAD_VALUE if the \c string pointer is invalid,
+	        or \c B_ERROR if we could not find the \c string.
 
-	\retval B_BAD_VALUE The \c string pointer is invalid.
-	\retval B_ERROR Could not find \c string.
+	\sa IFindFirst(const char*, int32) const
 
-	\sa IFindFirst(const char *string, int32 fromOffset) const
+	\since BeOS R5
 */
 
 
@@ -1285,104 +1519,109 @@
 
 	\param c The character to search for.
 
-	\return The offset (zero-based) into the data
-		where the given character has been found.
+	\return The offset (zero-based) into the data where the given character
+	        was found, or \c B_ERROR if we could not find the character.
 
-	\retval B_ERROR Could not find \c c.
+	\since BeOS R5
 */
 
 
 /*!
 	\fn int32 BString::FindFirst(char c, int32 fromOffset) const
-	\brief Find the first occurrence of the given character,
-		starting from the given offset.
+	\brief Find the first occurrence of the given character, starting from the
+	       given offset.
 
 	\param c The character to search for.
 	\param fromOffset The offset where to start the search.
 
-	\return The offset (zero-based) into the data
-		where the given character has been found.
+	\return The offset (zero-based) into the data where the given character
+	        was found, or \c B_ERROR if we could not find the character.
 
-	\retval B_ERROR Could not find \c c.
+	\since BeOS R5
 */
 
 
 /*!
 	\fn int32 BString::FindFirstChars(const BString& string,
 		int32 fromCharOffset) const
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn int32 BString::FindFirstChars(const char *string,
+	\fn int32 BString::FindFirstChars(const char* string,
 		int32 fromCharOffset) const
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn int32 BString::FindLast(const BString &string) const
-	\brief Find the last occurrence of the given BString.
+	\fn int32 BString::FindLast(const BString& string) const
+	\brief Find the last occurrence of the given \a string.
 
-	\param string The BString to search for.
+	\param string The \a string to search for.
 
 	\return The offset (zero-based) into the data where the given BString
-		has been found.
+	        was found, or \c B_ERROR if we could not find the \c string.
 
-	\retval B_ERROR Could not find \c string.
-	\sa IFindLast(const BString &string) const
+	\sa IFindLast(const BString&) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int32 BString::FindLast(const char *string) const
+	\fn int32 BString::FindLast(const char* string) const
 	\brief Find the last occurrence of the given string.
 
 	\param string The string to search for.
 
 	\return The offset (zero-based) into the data where the given string
-		has been found.
+	        was found, \c B_BAD_VALUE if the \c string pointer is invalid,
+	        or \c B_ERROR if we could not find the \c string.
 
-	\retval B_BAD_VALUE The \c string pointer is invalid.
-	\retval B_ERROR Could not find \c string.
+	\sa IFindLast(const char*) const
 
-	\sa IFindLast(const char *string) const
+	\since BeOS R5
+*/
+
+
 /*!
-
-
-/*!
-	\fn int32 BString::FindLast(const BString &string, int32 beforeOffset) const
+	\fn int32 BString::FindLast(const BString& string, int32 beforeOffset) const
 	\brief Find the last occurrence of the given BString,
 		starting from the given offset, and going backwards.
 
 	\param string The BString to search for.
 	\param beforeOffset The offset where to start the search.
 
-	\return An integer which is the offset (zero-based) into the data
-		where the given BString has been found.
+	\return The offset (zero-based) into the data where the given BString
+	        was found, or \c B_ERROR if we could not find the \c string.
 
-	\retval B_ERROR Could not find \c string.
+	\sa IFindLast(const BString&, int32) const
 
-	\sa IFindLast(const BString &string, int32 beforeOffset) const
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int32 BString::FindLast(const char *string, int32 beforeOffset) const
+	\fn int32 BString::FindLast(const char* string, int32 beforeOffset) const
 	\brief Find the last occurrence of the given string,
 		starting from the given offset, and going backwards.
 
 	\param string The string to search for.
 	\param beforeOffset The offset where to start the search.
 
-	\return The offset (zero-based) into the data
-		where the given string has been found.
+	\return The offset (zero-based) into the data where the given string
+	        was found, \c B_BAD_VALUE if the \c string pointer is invalid,
+	        or \c B_ERROR if we could not find the \c string.
 
-	\retval B_BAD_VALUE The \c string pointer is invalid.
-	\retval B_ERROR Could not find \c string.
+	\sa IFindLast(const char*, int32) const
 
-	\sa IFindLast(const char *string, int32 beforeOffset) const
+	\since BeOS R5
 */
 
 
@@ -1391,107 +1630,115 @@
 	\brief Find the last occurrence of the given character.
 
 	\param c The character to search for.
-	\return The offset (zero-based) into the data where the given character
-		has been found.
+	\return The offset (zero-based) into the data where the given BString
+	        was found, or \c B_ERROR if we could not find the character.
 
-	\retval B_ERROR Could not find \c c.
+	\since BeOS R5
 */
 
 
 /*!
 	\fn int32 BString::FindLast(char c, int32 beforeOffset) const
 	\brief Find the last occurrence of the given character,
-		starting from the given offset and going backwards.
+	       starting from the given offset going backwards from the end.
 
 	\param c The character to search for.
 	\param beforeOffset The offset where to start the search.
 
 	\return The offset (zero-based) into the data where the given character	
-		has been found.
+	        was found, or \c B_ERROR Could not find the character.
 
-	\retval B_ERROR Could not find \c c.
+	\since BeOS R5
 */
 
 
 /*!
 	\fn int32 BString::FindLastChars(const BString& string,
 		int32 beforeCharOffset) const
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int32 BString::FindLastChars(const char *string,
+	\fn int32 BString::FindLastChars(const char* string,
 		int32 beforeCharOffset) const
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn int32 BString::IFindFirst(const BString &string) const
-	\brief Find the first occurrence of the given BString case-insensitively.
+	\fn int32 BString::IFindFirst(const BString& string) const
+	\brief Find the first occurrence of the given \a string case-insensitively.
 
-	\sa FindFirst(const BString &string) const
+	\copydetails FindFirst(const BString&) const
 */
 
 
 /*!
-	\fn int32 BString::IFindFirst(const char *string) const
-	\brief Find the first occurrence of the given BString case-insensitively.
+	\fn int32 BString::IFindFirst(const char* string) const
+	\brief Find the first occurrence of the given \a string case-insensitively.
 
-	\sa FindFirst(const char *string) const
+	\param string The \a string to search for.
+
+	\copydetails FindFirst(const char*) const
 */
 
 
 /*!
-	\fn int32 BString::IFindFirst(const BString &string, int32 fromOffset) const
+	\fn int32 BString::IFindFirst(const BString& string, int32 fromOffset) const
 	\brief Find the first occurrence of the given BString case-insensitively,
-		starting from the given offset.
+	       starting from the given offset.
 
-	\sa FindFirst(const BString &string, int32 fromOffset) const
+	\copydetails FindFirst(const BString&, int32) const
 */
 
 
 /*!
-	\fn int32 BString::IFindFirst(const char *string, int32 fromOffset) const
+	\fn int32 BString::IFindFirst(const char* string, int32 fromOffset) const
 	\brief Find the first occurrence of the given string case-insensitively,
-		starting from the given offset.
+	       starting from the given offset.
 
-	\sa FindFirst(const char *string, int32 fromOffset) const
+	\copydetails FindFirst(const char*, int32) const
 */
 
 
 /*!
-	\fn int32 BString::IFindLast(const BString &string) const
+	\fn int32 BString::IFindLast(const BString& string) const
 	\brief Find the last occurrence of the given BString case-insensitively.
 
-	\sa FindLast(const BString &string) const
+	\copydetails FindLast(const BString&) const
 */
 
 
 /*!
-	\fn int32 BString::IFindLast(const char *string) const
+	\fn int32 BString::IFindLast(const char* string) const
 	\brief Find the last occurrence of the given string case-insensitively.
 
-	\sa FindLast(const char *string) const
+	\copydetails FindLast(const char*) const
 */
 
 
 /*!
-	\fn int32 BString::IFindLast(const BString &string, int32 beforeOffset)	const
+	\fn int32 BString::IFindLast(const BString& string, int32 beforeOffset)	const
 	\brief Find the last occurrence of the given BString case-insensitively,
-		starting from the given offset, and going backwards.
+	       starting from the given offset going backwards.
 
-	\sa FindLast(const BString &string, int32 beforeOffset) const
+	\copydetails FindLast(const BString&, int32) const
 */
 
 
 /*!
-	\fn int32 BString::IFindLast(const char *string, int32 beforeOffset) const
+	\fn int32 BString::IFindLast(const char* string, int32 beforeOffset) const
 	\brief Find the last occurrence of the given string case-insensitively,
-		starting from the given offset, and going backwards.
+	       starting from the given offset going backwards.
 
-	\sa FindLast(const char *string, int32 beforeOffset) const
+	\copydetails FindLast(const char*, int32) const
 */
 
 
@@ -1499,7 +1746,7 @@
 
 
 /*!
-	\name Replacing Methods
+	\name Replacing
 */
 
 
@@ -1511,11 +1758,13 @@
 	\brief Replace the first occurrence of a character with another character.
 
 	\param replaceThis The character to replace.
-	\param withThis The character to put in that place
+	\param withThis The character to put in its place.
 
 	\return This method always returns \c *this.
 
-	\sa IReplaceFirst(char replaceThis, char withThis)
+	\sa IReplaceFirst(char, char)
+
+	\since BeOS R5
 */
 
 
@@ -1524,26 +1773,30 @@
 	\brief Replace the last occurrence of a character with another character.
 
 	\param replaceThis The character to replace.
-	\param withThis The character to put in that place
+	\param withThis The character to put in its place
 
 	\return This method always returns \c *this.
 
-	\sa ReplaceLast(char replaceThis, char withThis)
+	\sa IReplaceLast(char, char)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::ReplaceAll(char replaceThis, char withThis,	
+	\fn BString& BString::ReplaceAll(char replaceThis, char withThis,
 		int32 fromOffset)
 	\brief Replace all occurrences of a character with another character.
 
 	\param replaceThis The character to replace.
-	\param withThis The character to put in that place
+	\param withThis The character to put in its place
 	\param fromOffset The offset where to start looking for the character.
 
 	\return This method always returns \c *this.
 
-	\sa IReplaceAll(char replaceThis, char withThis, int32 fromOffset)
+	\sa IReplaceAll(char, char, int32)
+
+	\since BeOS R5
 */
 
 
@@ -1554,129 +1807,142 @@
 		character.
 
 	\param replaceThis The character to replace.
-	\param withThis The character to put in that place
+	\param withThis The character to put in its place
 	\param maxReplaceCount The maximum number of characters that should be
-		replaced.
+	       replaced.
 	\param fromOffset The offset where to start looking for the character
 
 	\return This method always returns \c *this.
 
-	\sa IReplace(char replaceThis, char withThis, int32 maxReplaceCount,
-		int32 fromOffset)
+	\sa IReplace(char, char, int32, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::ReplaceFirst(const char *replaceThis,
-		const char *withThis)
+	\fn BString& BString::ReplaceFirst(const char* replaceThis,
+		const char* withThis)
 	\brief Replace the first occurrence of a string with another string.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
+	\param withThis The string to put in its place
 
 	\return This method always returns \c *this.
 
-	\sa IReplaceFirst(const char *replaceThis, const char *withThis)
+	\sa IReplaceFirst(const char*, const char*)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::ReplaceLast(const char *replaceThis,
-		const char *withThis)
+	\fn BString& BString::ReplaceLast(const char* replaceThis,
+		const char* withThis)
 	\brief Replace the last occurrence of a string with another string.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
+	\param withThis The string to put in its place
 
 	\return This method always returns \c *this.
 
-	\sa IReplaceLast(const char *replaceThis, const char *withThis)
+	\sa IReplaceLast(const char*, const char*)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::ReplaceAll(const char *replaceThis,
-		const char *withThis, int32 fromOffset)
+	\fn BString& BString::ReplaceAll(const char* replaceThis,
+		const char* withThis, int32 fromOffset)
 	\brief Replace all occurrences of a string with another string.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
+	\param withThis The string to put in its place
 	\param fromOffset The offset where to start looking for the string.
 
 	\return This method always returns \c *this.
 
-	\sa IReplaceAll(const char *replaceThis, const char *withThis,
-		int32 fromOffset)
+	\sa IReplaceAll(const char*, const char*, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::Replace(const char *replaceThis,
-		const char *withThis, int32 maxReplaceCount, int32 fromOffset)
+	\fn BString& BString::Replace(const char* replaceThis,
+		const char* withThis, int32 maxReplaceCount, int32 fromOffset)
 	\brief Replace a number of occurrences of a string with another string.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
-	\param maxReplaceCount The maximum number of occurences that should
-		be replaced.
+	\param withThis The string to put in its place
+	\param maxReplaceCount The maximum number of occurrences that should
+	       be replaced.
 	\param fromOffset The offset where to start looking for the string
 
 	\return This method always returns \c *this.
 
-	\sa IReplace(const char *replaceThis, const char *withThis,
-		int32 maxReplaceCount, int32 fromOffset)
+	\sa IReplace(const char*, const char*, int32, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::ReplaceAllChars(const char* replaceThis,
 		const char* withThis, int32 fromCharOffset)
-	\brief Undocumented
+	\brief Undocumented.
 */
 
 
 /*!
-	\fn BString& BString::ReplaceChars(const char* replaceThis, const char* withThis,
-		int32 maxReplceCount, int32 fromCharOffset)
-	\brief Undocumented
+	\fn BString& BString::ReplaceChars(const char* replaceThis,
+		const char* withThis, int32 maxReplceCount, int32 fromCharOffset)
+	\brief Undocumented.
 */
 
 
 /*!
 	\fn BString& BString::IReplaceFirst(char replaceThis, char withThis)
 	\brief Replace the first occurrence of a character with another
-		character. Case insensitive.
+	       character case-insensitively.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
+	\param withThis The string to put in its place
 
-	\sa ReplaceFirst(char replaceThis, char withThis)
+	\sa ReplaceFirst(char, char)
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::IReplaceLast(char replaceThis, char withThis)
 	\brief Replace the last occurrence of a character with another
-		character. Case-insensitive.
+	       character case-insensitively.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
+	\param withThis The string to put in its place
 
-	\sa ReplaceLast(char replaceThis, char withThis)
+	\sa ReplaceLast(char, char)
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::IReplaceAll(char replaceThis, char withThis,
-		int32 fromOffset) 
-	\brief Replace all occurrences of a character with another character.
-		Case-insensitive.
+		int32 fromOffset)
+	\brief Replace all occurrences of a character with another character
+	       case-insensitively.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
+	\param withThis The string to put in its place
 	\param fromOffset The offset where to start looking for the string
 
-	\sa ReplaceAll(char replaceThis, char withThis, int32 fromOffset) 
+	\sa ReplaceAll(char, char, int32)
+
+	\since BeOS R5
 */
 
 
@@ -1684,84 +1950,94 @@
 	\fn BString& BString::IReplace(char replaceThis, char withThis,
 		int32 maxReplaceCount, int32 fromOffset)
 	\brief Replace a number of occurrences of a character with another
-		character. Case-insensive.
+	       character case-insensitively.
 
 	\param replaceThis The char to replace.
-	\param withThis The char to put in that place
-	\param maxReplaceCount The maximum number of occurences that should
-		be replaced.
+	\param withThis The char to put in its place
+	\param maxReplaceCount The maximum number of occurrences that should
+	       be replaced.
 	\param fromOffset The offset where to start looking for the string
 
-	\sa Replace(char replaceThis, char withThis, int32 maxReplaceCount,
-		int32 fromOffset)
+	\sa Replace(char, char, int32, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::IReplaceFirst(const char *replaceThis,
-		const char *withThis)
-	\brief Replace the first occurrence of a string with another string.
-		Case-insensitive.
+	\fn BString& BString::IReplaceFirst(const char* replaceThis,
+		const char* withThis)
+	\brief Replace the first occurrence of a string with another string
+	       case-insensitively.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
+	\param withThis The string to put in its place.
 
-	\sa ReplaceFirst(const char *replaceThis, const char *withThis)
+	\sa ReplaceFirst(const char*, const char*)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::IReplaceLast(const char *replaceThis,
-		const char *withThis)
+	\fn BString& BString::IReplaceLast(const char* replaceThis,
+		const char* withThis)
 	\brief Replace the last occurrence of a string with another string. Case-insensitive.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
+	\param withThis The string to put in its place.
 
-	\sa ReplaceLast(const char *replaceThis, const char *withThis)
+	\sa ReplaceLast(const char*, const char*)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::IReplaceAll(const char *replaceThis,
-		const char *withThis, int32 fromOffset)
-	\brief Replace all occurrences of a string with another string.
-		Case-insensitive.
+	\fn BString& BString::IReplaceAll(const char* replaceThis,
+		const char* withThis, int32 fromOffset)
+	\brief Replace all occurrences of a string with another string
+	       case-insensitively.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
-	\param fromOffset The offset where to start looking for the string
+	\param withThis The string to put in its place.
+	\param fromOffset The offset where to start looking for the string.
 
-	\sa ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
+	\sa ReplaceAll(const char*, const char*, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::IReplace(const char *replaceThis,
-		const char *withThis, int32 maxReplaceCount, int32 fromOffset)
-	\brief Replace a number of occurrences of a string with another string.
-		Case-insensitive.
+	\fn BString& BString::IReplace(const char* replaceThis,
+		const char* withThis, int32 maxReplaceCount, int32 fromOffset)
+	\brief Replace a number of occurrences of a string with another string
+	       case-insensitively.
 
 	\param replaceThis The string to replace.
-	\param withThis The string to put in that place
-	\param maxReplaceCount The maximum number of occurences that should
-		be replaced.
+	\param withThis The string to put in its place
+	\param maxReplaceCount The maximum number of occurrences that should
+	       be replaced.
 	\param fromOffset The offset where to start looking for the string
 
-	\sa Replace(const char *replaceThis, const char *withThis,
-		int32 maxReplaceCount, int32 fromOffset)
+	\sa Replace(const char*, const char*, int32, int32)
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::ReplaceSet(const char* setOfBytes, char with)
 	\brief Replaces characters that are in a certain set with a chosen
-		character.
+	       character.
 
 	\param setOfBytes The set of characters that need to be replaced.
-	\param with The character to replace the occurences with.
+	\param with The character to replace the occurrences with.
 
 	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
@@ -1770,16 +2046,20 @@
 	\brief Replaces characters that are in a certain set with a chosen string.
 
 	\param setOfBytes The set of characters that need to be replaced.
-	\param with The string to replace the occurences with.
+	\param with The string to replace the occurrences with.
 
 	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::ReplaceCharsSet(const char* setOfChars, 
+	\fn BString& BString::ReplaceCharsSet(const char* setOfChars,
 		const char* with)
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
@@ -1787,7 +2067,7 @@
 
 
 /*!
-	\name Character Access
+	\name Indexing
 */
 
 
@@ -1807,6 +2087,8 @@
 	\return Returns a reference to the specified byte.
 
 	\sa ByteAt(int32 index) for a safer version.
+
+	\since BeOS R5
 */
 
 
@@ -1821,6 +2103,8 @@
 	\param index The index (zero-based) of the byte to get.
 
 	\return Returns a reference to the specified byte.
+
+	\since BeOS R5
 */
 
 
@@ -1828,25 +2112,31 @@
 	\fn char BString::ByteAt(int32 index) const
 	\brief Returns the character in the string at the given offset.
 
-	This function can be used to read a single byte. 
+	This function can be used to read a single byte.
 
 	\param index The index (zero-based) of the byte to get.
 
-	\return Returns a reference to the specified byte. If you are out of
-		bounds, it will return 0. 
+	\return A reference to the specified byte, if we are out of bounds
+	        it will return 0.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn const char* BString::CharAt(int32 charIndex, int32* bytes) const
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn bool BString::CharAt(int32 charIndex, char* buffer, 
+	\fn bool BString::CharAt(int32 charIndex, char* buffer,
 		int32* bytes) const
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
@@ -1865,31 +2155,35 @@
 	\fn char* BString::LockBuffer(int32 maxLength)
 	\brief Locks the buffer and return the internal string for manipulation.
 
-	If you want to do any lowlevel string manipulation on  the internal buffer,
+	If you want to do any low-level string manipulation on  the internal buffer,
 	you should call this method. This method includes the possibility to grow
 	the buffer so that you don't have to worry about that yourself.
 
 	Make sure you call UnlockBuffer() when you're done with the manipulation.
 
-	\param maxLength The size of the buffer. If you don't want a biggerx
-		buffer, passing anything under the length of the string will simply
-		return it as is.
+	\param maxLength The size of the buffer. If you don't want a bigger
+	       buffer, passing anything under the length of the string will simply
+	       return it as is.
 
 	\return A pointer to the buffer you may manipulate.
 
 	\sa UnlockBuffer()
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::UnlockBuffer(int32 length)
-	\brief Unlocks the buffer after you are done with lowlevel manipulation.
+	\brief Unlocks the buffer after you are done with low-level manipulation.
 
 	\param length The length to trim the string to in order to keep the
-		internal buffer sane. If you don't pass a value in it, a \c strlen
-		call will be used to determine the length.
+	       internal buffer sane. If you don't pass a value in it, \c strlen()
+	       will be used to determine the length.
 
 	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
@@ -1907,34 +2201,45 @@
 /*!
 	\fn BString& BString::ToLower()
 	\brief Convert the BString to lowercase.
+
 	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::ToUpper()
 	\brief Convert the BString to uppercase.
+
 	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::Capitalize()
 	\brief Convert the first character to uppercase, rest to lowercase
+
 	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::CapitalizeEachWord()
 	\brief Convert the first character of every word to uppercase, rest
-		to lowercase.
+	       to lowercase.
 
 	Converts the first character of every "word" (series of alphabetical
 	characters separated by non alphabetical characters) to uppercase, and
 	the rest to lowercase.
 
 	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
@@ -1942,7 +2247,7 @@
 
 
 /*!
-	\name Escaping and De-escaping Methods
+	\name Escaping and De-escaping
 
 	This class contains some methods to help you with escaping and
 	de-escaping certain characters. Note that this is the C-style of
@@ -1970,8 +2275,10 @@
 
 	\return This method always returns \c *this.
 
-	\sa CharacterDeescape(char escapeChar)
-	\sa CharacterDeescape(const char *original, char escapeChar)
+	\sa CharacterDeescape(char)
+	\sa CharacterDeescape(const char*, char)
+
+	\since BeOS R5
 */
 
 
@@ -1985,7 +2292,9 @@
 
 	\return This method always returns \c *this.
 
-	\sa CharacterDeescape(char escapeChar)
+	\sa CharacterDeescape(char)
+
+	\since BeOS R5
 */
 
 
@@ -2002,8 +2311,9 @@
 
 	\return This method always returns \c *this.
 
-	\sa CharacterEscape(const char *original, const char *setOfCharsToEscape,
-		char escapeWith)
+	\sa CharacterEscape(const char*, const char*, char)
+
+	\since BeOS R5
 */
 
 
@@ -2015,7 +2325,7 @@
 
 	\return This method always returns \c *this.
 
-	\sa CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
+	\sa CharacterEscape(const char*, char)
 */
 
 
@@ -2023,7 +2333,7 @@
 
 
 /*!
-	\name Trimming methods
+	\name Trimming
 */
 
 
@@ -2032,7 +2342,9 @@
 
 /*!
 	\fn BString& BString::Trim()
-	\brief Undocumented
+	\brief Undocumented.
+
+	\since Haiku R1
 */
 
 
@@ -2040,9 +2352,9 @@
 
 
 /*!
-	\name Simple sprintf Replacement Methods
+	\name sprintf() Replacement Methods
 
-	These methods may be slower than sprintf(), but they are overflow safe.
+	These methods may be slower than \c sprintf(), but they are overflow safe.
 */
 
 
@@ -2050,66 +2362,106 @@
 
 
 /*!
-	\fn BString& BString::operator<<(const char *string)
-	\brief Append the string \a string.
+	\fn BString& BString::operator<<(const char* string)
+	\brief Append \a string to the BString.
+
+	\param string The \a string to append.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn BString& BString::operator<<(const BString &string)
-	\brief Append the BString \a string.
+	\fn BString& BString::operator<<(const BString& string)
+	\brief Append \a string to the BString.
+
+	\return This method always returns \c *this.
 */
 
 
 /*!
 	\fn BString& BString::operator<<(char c)
-	\brief Append the \c char \a c.
+	\brief Append \a c to the BString.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::operator<<(bool value)
-	\brief Append the boolean \c value to the string.
+	\brief Convert the \c bool \c value to a string and append it.
 
 	In case the \a value is true, the string \c true is appended to the string.
 	Otherwise, the string \c false is appended.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::operator<<(int value)
 	\brief Convert the \c int \a value to a string and append it.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::operator<<(unsigned int value)
-	\brief Convert the \c unsigned \c int \a value to a string and append it.
+	\brief Convert the <tt>unsigned int</tt> \a value to a string and append it.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::operator<<(unsigned long value)
-	\brief Convert the \c unsigned \c long \a value to a string and append it.
+	\brief Convert the <tt>unsigned long</tt> \a value to a string and append it.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::operator<<(long value)
 	\brief Convert the \c long \a value to a string and append it.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::operator<<(unsigned long long value)
-	\brief Convert the \c unsigned \c long \c long \a value to a string and
-		append it.
+	\brief Convert the <tt>unsigned long long</tt> \a value to a string and
+	       append it.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\fn BString& BString::operator<<(long long value)
-	\brief Convert the \c long \c long \a value to a string and append it.
+	\brief Convert the <tt>long long</tt> \a value to a string and append it.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
@@ -2117,7 +2469,11 @@
 	\fn BString& BString::operator<<(float value)
 	\brief Convert the \c float \a value to a string and append it.
 
-	Using this operator will append in the \c %.2f style formatting.
+	Using this operator will append in the <tt>%.2f</tt> style formatting.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
@@ -2126,6 +2482,10 @@
 	\brief Convert the \c double \a value to a string and append it.
 
 	Using this operator will append in the \c %.2f style formatting.
+
+	\return This method always returns \c *this.
+
+	\since BeOS R5
 */
 
 
@@ -2142,146 +2502,200 @@
 
 
 /*!
-	\fn bool operator<(const char *a, const BString &b)
-	\brief Lexicographically compare if \c a is less than a given BString.
+	\fn bool operator<(const char* a, const BString& b)
+	\brief Lexicographically compare if \c a is less than the given BString \a b.
 
 	From String.h and in libbe.so.
 
 	\param a The first string to compare.
 	\param b The second string to compare.
 
-	\sa BString::operator<(const char *string) const
+	\return \c true if \a a is less than \a b, \c false otherwise.
+
+	\sa BString::operator<(const char*) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn bool operator<=(const char *a, const BString &b)
+	\fn bool operator<=(const char* a, const BString& b)
 	\brief Lexicographically compare if \c a is less than or equal to a
-		given BString.
+		given BString \a b.
 
 	From String.h and in libbe.so.
 
 	\param a The first string to compare.
 	\param b The second string to compare.
 
-	\sa BString::operator<=(const char *string) const
+	\return \c true if \a a is less than or equal to \a b,
+	        \c false otherwise.
+
+	\sa BString::operator<=(const char*) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn bool operator==(const char *a, const BString &b)
-	\brief Lexicographically compare if \c a is equal to a given BString.
+	\fn bool operator==(const char* a, const BString& b)
+	\brief Lexicographically compare if \c a is equal to a given BString \a b.
 
 	From String.h and in libbe.so.
 
 	\param a The first string to compare.
 	\param b The second string to compare.
 
-	\sa BString::operator==(const char *string) const
+	\sa BString::operator==(const char*) const
+
+	\return \c true if \a a is equal to \a b, \c false otherwise.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn bool operator>(const char *a, const BString &b)
-	\brief Lexicographically compare if \c a is more than a given BString.
+	\fn bool operator>(const char* a, const BString& b)
+	\brief Lexicographically compare if \c a is greater than a given BString \a b.
 
 	From String.h and in libbe.so.
 
 	\param a The first string to compare.
 	\param b The second string to compare.
 
-	\sa BString::operator>(const char *string) const
+	\sa BString::operator>(const char*) const
+
+	\return \c true if \a a is greater than \a b, \c false otherwise.
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn bool operator>=(const char *a, const BString &b)
-	\brief Lexicographically compare if \c a is more than or equal to a
-		given BString.
+	\fn bool operator>=(const char* a, const BString& b)
+	\brief Lexicographically compare if \c a is greater than or equal to a
+	       given BString \a b.
 
 	From String.h and in libbe.so.
 
 	\param a The first string to compare.
 	\param b The second string to compare.
 
-	\sa BString::operator>=(const char *string) const
+	\return \c true if \a a is greater than or equal to \a b,
+	        \c false otherwise.
+
+	\sa BString::operator>=(const char*) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn bool operator!=(const char *a, const BString &b)
-	\brief Lexicographically compare if \c a is not equal to given BString.
+	\fn bool operator!=(const char* a, const BString& b)
+	\brief Lexicographically compare if \c a is not equal to given BString \a b.
 
 	From String.h and in libbe.so.
 
 	\param a The first string to compare.
 	\param b The second string to compare.
 
-	\sa BString::operator!=(const char *string) const
+	\return \c true if \a a is NOT equal to \a b, \c false otherwise.
+
+	\sa BString::operator!=(const char*) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int Compare(const BString &a, const BString &b)
+	\fn int Compare(const BString& a, const BString& b)
 	\brief Lexicographically compare two strings.
 
 	This function is useful if you need a global compare function to feed to
-	BList::SortItems() for example.
+	BList::SortItems().
 
 	\param a The first string to compare.
 	\param b The second string to compare.
 
 	From String.h and in libbe.so.
 
-	\sa BString::Compare(const BString &string) const
+	\return An int representing the strings relationship to each other.
+	\retval >0 \a a sorts lexicographically after \a b.
+	\retval =0 \a a is equal to \a b.
+	\retval <0 \a a sorts lexicographically before \a b.
+
+	\sa BString::Compare(const BString&) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int ICompare(const BString &a, const BString &b)
+	\fn int ICompare(const BString& a, const BString& b)
 	\brief Lexicographically compare two strings case-insensitively.
 
 	This function is useful if you need a global compare function to feed to
-	BList::SortItems() for example.
+	BList::SortItems().
 
 	From String.h and in libbe.so.
 
 	\param a The first string to compare.
 	\param b The second string to compare.
 
-	\sa BString::Compare(const BString &string) const
+	\return An int representing the strings relationship to each other.
+	\retval >0 \a a sorts lexicographically after \a b.
+	\retval =0 \a a is equal to \a b.
+	\retval <0 \a a sorts lexicographically before \a b.
+
+	\sa BString::Compare(const BString&) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int Compare(const BString *a, const BString *b)
+	\fn int Compare(const BString* a, const BString* b)
 	\brief Lexicographically compare two strings.
 
 	This function is useful if you need a global compare function to feed to
-	BList::SortItems() for example.
+	BList::SortItems().
 
 	From String.h and in libbe.so.
 
 	\param a The first string to compare.
 	\param b The second string to compare.
 
-	\sa BString::Compare(const BString &string) const
+	\return An int representing the strings relationship to each other.
+	\retval >0 \a a sorts lexicographically after \a b.
+	\retval =0 \a a is equal to \a b.
+	\retval <0 \a a sorts lexicographically before \a b.
+
+	\sa BString::Compare(const BString&) const
+
+	\since BeOS R5
 */
 
 
 /*!
-	\fn int ICompare(const BString *a, const BString *b)
+	\fn int ICompare(const BString* a, const BString* b)
 	\brief Lexicographically compare two strings case-insensitively.
 
 	This function is useful if you need a global compare function to feed to
-	BList::SortItems() for example.
+	BList::SortItems().
 
 	From String.h and in libbe.so.
 
 	\param a The first string to compare.
 	\param b The second string to compare.
 
-	\sa BString::Compare(const BString &string) const
+	\return An int representing the strings relationship to each other.
+	\retval >0 \a a sorts lexicographically after \a b.
+	\retval =0 \a a is equal to \a b.
+	\retval <0 \a a sorts lexicographically before \a b.
+
+	\sa BString::Compare(const BString&) const
+
+	\since BeOS R5
 */
 
 

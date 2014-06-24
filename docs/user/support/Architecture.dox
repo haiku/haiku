@@ -1,13 +1,14 @@
 /*
- * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Copyright 2013-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Documentation by:
+ *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *
  * Corresponds to:
- *		headers/os/storage/PathFinder.h	 hrev46390
- *		src/kits/storage/PathFinder.cpp	 hrev46390
+ *		headers/os/support/Architecture.h	 hrev47419
+ *		src/kits/support/Architecture.cpp	 hrev47419
  */
 
 
@@ -16,7 +17,7 @@
 	\ingroup support
 	\ingroup libbe
 	\brief Provides functions for getting the primary and secondary
-		architectures of the system.
+	       architectures of the system.
 */
 
 
@@ -30,6 +31,8 @@
 	\return The name of the caller's architecture.
 
 	\see get_primary_architecture()
+
+	\since Haiku R1
 */
 
 
@@ -40,6 +43,8 @@
 	This is the packaging architecture the main system has been built for.
 
 	\return The name of the system's primary architecture.
+
+	\since Haiku R1
 */
 
 
@@ -56,12 +61,15 @@
 	if it would be possible to install the support for gcc 4.
 
 	\param architectures A pre-allocated array of size \a count where the names
-		of the secondary architectures will be stored. Can be \c NULL, if
-		\a count is 0.
+	       of the secondary architectures will be stored. Can be \c NULL, if
+	       \a count is 0.
 	\param count The size of the \a architectures array.
+
 	\return The actual number of secondary architectures. May be greater than
-		\a count, but at most \a count names will be written to
-		\a architectures.
+	        \a count, but at most \a count names will be written to
+	        \a architectures.
+
+	\since Haiku R1
 */
 
 
@@ -75,13 +83,16 @@
 	Note that this version can fail when running out of memory.
 
 	\param _architectures Reference to a BStringList that will be set to the
-		list of names of secondary architectures. On error the list will be
-		emptied.
+	       list of names of secondary architectures. On error the list will be
+	       emptied.
+
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY A memory allocation failed.
 
 	\see get_secondary_architectures(const char**,size_t)
+
+	\since Haiku R1
 */
 
 
@@ -89,24 +100,24 @@
 	\fn size_t get_architectures(const char** architectures,
 		size_t count)
 	\brief Returns the names of the system's primary and secondary
-		architectures.
+	       architectures.
 
 	This is a convenience function that returns both the primary architecture
 	as returned by get_primary_architecture() and the secondary architectures
 	as returned by get_secondary_architectures() in the provided array.
 
 	\param architectures A pre-allocated array of size \a count where the names
-		of the architectures will be stored. Can be \c NULL, if \a count is 0.
+	       of the architectures will be stored. Can be \c NULL if \a count is 0.
 	\param count The size of the \a architectures array.
 	\return The actual number of architectures. May be greater than \a count,
-		but at most \a count names will be written to \a architectures.
+	        but at most \a count names will be written to \a architectures.
 */
 
 
 /*!
 	\fn status_t get_architectures(BStringList& _architectures)
 	\brief Returns the names of the system's primary and secondary
-		architectures.
+	       architectures.
 
 	This is a C++ interface similar to
 	get_architectures(const char**,size_t). Instead of returning the
@@ -114,13 +125,16 @@
 	Note that this version can fail when running out of memory.
 
 	\param _architectures Reference to a BStringList that will be set to the
-		list of names of primary and secondary architectures. On error the list
-		will be emptied.
+	       list of names of primary and secondary architectures. On error the
+	       list will be emptied.
+
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_NO_MEMORY A memory allocation failed.
 
 	\see get_architectures(const char**,size_t)
+
+	\since Haiku R1
 */
 
 
@@ -135,6 +149,9 @@
 	inconclusive the name of the primary architecture is returned.
 
 	\param path The path to be analyzed. It doesn't necessarily have to point to
-		an existing file or directory.
+	       an existing file or directory.
+
 	\return The name of the architecture determined from \a path.
+
+	\since Haiku R1
 */

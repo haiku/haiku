@@ -1,9 +1,10 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
  *		headers/os/support/Flattenable.h	rev 39675
@@ -24,21 +25,21 @@
 	\ingroup support
 	\ingroup libbe
 	\brief Interface for classes that can flatten and unflatten themselves to
-		   a stream of bytes.
+	       a stream of bytes.
 
 	It is convenient that objects can be stored as a flat stream of bytes. In
 	this way, they can be written to disk, exchanged between applications or send
-	over networks. This ability, which is known in many other programming
-	languages as marshalling, is not native in C++. The Haiku API has created a
-	universal interface that classes have if they are able to be flattened. This
+	over networks. This ability, known as marshaling in many other programming
+	languages, is not native to C++. The Haiku API has created a universal
+	interface that classes have if they are able to be flattened. This
 	class defines the interface. This class does nothing on its own, and
-	therefore contains pure virtuals. By inheriting this class and inmplementing
-	the methods in your own class, you will be able to use your objects as
-	flattenable objects throughout the Haiku API.
+	therefore contains pure virtual functions. By inheriting this class and
+	implementing the methods in your own class, you will be able to use your
+	objects as flattenable objects throughout the Haiku API.
 
 	Flattened objects can be used for example when sending messages within an
 	application or between applications. The BMessage class uses the interface
-	to store and transmit custom classes. 
+	to store and transmit custom classes.
 
 	If you want to be able to flatten your objects, you will need to implement
 	various methods. Flatten() and Unflatten() are where the magic happen. These
@@ -56,33 +57,37 @@
 \code
 type_code CUSTOM_STRING_TYPE = 'CUST';
 
-class CustomString : public BFlattenable
-{
+class CustomString : public BFlattenable {
 public:
-    char data[100];
+	char data[100];
 
-    // From BFlattenable
-    bool IsFixedSize() const { return false; };
-    type_code TypeCode() const { return CUSTOM_STRING_TYPE; };
-    ssize_t FlattenedSize() const { return strlen(data); };
+	// from BFlattenable
+	bool IsFixedSize() const { return false; };
+	type_code TypeCode() const { return CUSTOM_STRING_TYPE; };
+	ssize_t FlattenedSize() const { return strlen(data); };
 
-    status_t Flatten(void* buffer, ssize_t size) const
-    {
-        if ((strlen(data) + 1) < size)
-            return B_BAD_VALUE;
-        memcpy(buffer, data, size);
-        return B_OK;
-    };
+	status_t Flatten(void* buffer, ssize_t size) const
+	{
+		if ((strlen(data) + 1) < size)
+			return B_BAD_VALUE;
 
-    status_t Unflatten(type_code code, const void* buffer, ssize_t size)
-    {
-        if (code != CUSTOM_STRING_TYPE)
-            return B_BAD_TYPE;
-        if (size > 100)
-            return B_NO_MEMORY;
-        memcpy(data, buffer, size);
-        return B_OK;
-    };
+		memcpy(buffer, data, size);
+
+		return B_OK;
+	};
+
+	status_t Unflatten(type_code code, const void* buffer, ssize_t size)
+	{
+		if (code != CUSTOM_STRING_TYPE)
+			return B_BAD_TYPE;
+
+		if (size > 100)
+			return B_NO_MEMORY;
+
+		memcpy(data, buffer, size);
+
+		return B_OK;
+	};
 };
 \endcode
 
@@ -102,13 +107,20 @@ public:
 	to disk. Another example is BPath. Because of that you can store paths and
 	send them over via messages. Throughout the Haiku API you will find classes
 	that provide the flattening interface.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn virtual bool BFlattenable::IsFixedSize() const
-	\brief Pure virtual that should return whether or not flattened objects of 
-		   this type always have a fixed size.
+	\brief Pure virtual that should return whether or not flattened objects of
+	       this type always have a fixed size.
+
+	\return Should return whether or not the flattened objects of this type
+	        always have a fixed size.
+
+	\since BeOS R3
 */
 
 
@@ -117,22 +129,26 @@ public:
 	\brief Pure virtual that returns the type_code this class flattens to.
 
 	\return Either one of the existing typecodes found in TypeConstants.h
-		if your class actually is compatible to those formats, or a
-		custom four-byte integer constant if not.
+	        if your class actually is compatible to those formats, or a
+	        custom four-byte integer constant if not.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn virtual ssize_t BFlattenable::FlattenedSize() const
 	\brief Pure virtual that should return the size of the flattened object in
-		   bytes.
+	       bytes.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn virtual status_t BFlattenable::Flatten(void* buffer, ssize_t size) const
 	\brief Pure virtual that should flatten the object into the supplied
-		   \a buffer.
+	       \a buffer.
 
 	Please make sure that you check that the supplied buffer is not a \c NULL
 	pointer. Also make sure that the size of the flattened object does isn't
@@ -144,6 +160,8 @@ public:
 	\retval B_OK The object was flattened.
 	\retval B_NO_MEMORY The buffer was smaller than required.
 	\retval B_BAD_VALUE The buffer was a \c NULL pointer.
+
+	\since BeOS R3
 */
 
 
@@ -159,6 +177,8 @@ public:
 	\returns Whether or not the supplied type_code is supported.
 	\retval true The type_code is supported.
 	\retval false The type_code is not supported.
+
+	\since BeOS R3
 */
 
 
@@ -166,7 +186,7 @@ public:
 	\fn virtual status_t BFlattenable::Unflatten(type_code code,
 		const void* buffer, ssize_t size)
 	\brief Pure virtual that should unflatten the buffer and put the contents
-		   into the current object.
+	       into the current object.
 
 	Make sure that the supplied buffer is not \c NULL and that you actually
 	support the typecode.
@@ -179,10 +199,14 @@ public:
 	\retval B_OK The object is unflattened.
 	\retval B_BAD_VALUE The \a buffer pointer is \c NULL or the data is invalid.
 	\retval B_BAD_TYPE You don't support data with this \a code. 
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn virtual BFlattenable::~BFlattenable()
 	\brief Destructor. Does nothing.
+
+	\since Haiku R1
 */

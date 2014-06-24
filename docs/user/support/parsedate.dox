@@ -1,12 +1,13 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Axel Dörfler
+ *		Axel DÃ¶rfler
+ *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/support/parsedate.h rev 19972
+ *		headers/os/support/parsedate.h	rev 19972
  */
 
 
@@ -36,20 +37,20 @@
 	Here are some examples of input strings that parsedate() will be able
 	to convert along with some notes:
 	- "last friday", "this wednesday", "next July"
-		"last", "next", and "this" refer to the week or year (depending
-		on the context). So "last friday" means last week's friday.
-		"This wednesday" is referring to this week's wednesday, no matter
-		if it has already passed or not.
-		"Next July" refers to next year's July. All of these dates are
-		parsed relative to the specified time (usually "now"), and will
-		be set to the first moment of that time span: "next monday" is
-		monday, 0:00:00, midnight.
+	  "last", "next", and "this" refer to the week or year (depending
+	  on the context). So "last friday" means last week's friday.
+	  "This wednesday" is referring to this week's wednesday, no matter
+	  if it has already passed or not.
+	  "Next July" refers to next year's July. All of these dates are
+	  parsed relative to the specified time (usually "now"), and will
+	  be set to the first moment of that time span: "next monday" is
+	  monday, 0:00:00, midnight.
 	- "now" just returns the time all calculations are relative to.
 	- "next 5 minutes", "5 minutes", "+5 mins" all mean the same thing,
-		that is, current time plus exactly 5 minutes.
+	  that is, current time plus exactly 5 minutes.
 	- "5 weeks" means in 5 weeks from now on.
 	- "8/5/2003", "5.8.2003", "2003-08-05" are all referring to August
-		5th, 2003, again at 0:00 midnight.
+	  5th, 2003, again at 0:00 midnight.
 	- "Thursday 3:00" means this week's thursday, at 3 o'clock.
 
 	\anchor parsedateFormats 
@@ -84,8 +85,8 @@
 	not a valid meridian specifier), or "4:66" (minutes out of range).
 
 	\note At the time of this writing, the parsedate() functions are not
-		localized and will only recognize English time specifications
-		following the examples above.
+	      localized and will only recognize English time specifications
+	      following the examples above.
 */
 
 
@@ -129,15 +130,15 @@
 	\fn time_t parsedate(const char *dateString, time_t relativeTo)
 	\brief Parses \a dateString relative to \a relativeTo
 
-	Parses the given \a dateString relative to the time 
-	specified by \a relativeTo using the internal formats 
-	table.
+	Parses the given \a dateString relative to the time specified by
+	\a relativeTo using the internal formats table.
 
 	\param dateString the date that should be parsed, i.e. "next thursday".
 	\param relativeTo all relative dates will be relative to this time, if -1
-    is passed, the current time will be used.
-	\return the parsed time value or -1 if the \a dateString
-    could not be parsed.
+	       is passed, the current time will be used.
+
+	\return The parsed time value or -1 if the \a dateString could not be
+	        parsed.
 */
 
 
@@ -145,55 +146,55 @@
 	\fn time_t parsedate_etc(const char *dateString, time_t relativeTo,
 		int *_storedFlags)
 	\brief Parses <span class="var">dateString</span> relative to
-		   <span class="var">relativeTo</span>
+	       <span class="var">relativeTo</span>
 
 	This does basically the same as parsedate(), but will set the following 
 	flags in <span class="var">_storedFlags</span>:
-	\htmlonly
-	<table border=1>
-		<!-- ToDo: this certainly is a hack -->
-		<tr><th bgcolor="#eeeeee">Constant</th><th bgcolor="#eeeeee">Meaning</th></tr>
-		<tr><td class="mdname1">PARSEDATE_RELATIVE_TIME</td>
-			<td>\endhtmlonly \copydoc PARSEDATE_RELATIVE_TIME \htmlonly
-		</td></tr>
-		<tr><td class="mdname1">PARSEDATE_DAY_RELATIVE_TIME</td>
-			<td>\endhtmlonly \copydoc PARSEDATE_DAY_RELATIVE_TIME \htmlonly
-		</td></tr>
-		<tr><td class="mdname1">PARSEDATE_MINUTE_RELATIVE_TIME</td>
-			<td>\endhtmlonly \copydoc PARSEDATE_MINUTE_RELATIVE_TIME \htmlonly
-		</td></tr>
-		<tr><td class="mdname1">PARSEDATE_INVALID_DATE</td>
-		<td>
-		\endhtmlonly \copydoc PARSEDATE_INVALID_DATE \htmlonly
-			This flag will only be set if the function returns -1.
-		</td></tr>
-	</table>
-	\endhtmlonly
+\htmlonly
+<table border=1>
+    <!-- ToDo: this certainly is a hack -->
+    <tr><th bgcolor="#eeeeee">Constant</th><th bgcolor="#eeeeee">Meaning</th></tr>
+    <tr><td class="mdname1">PARSEDATE_RELATIVE_TIME</td>
+        <td>\endhtmlonly \copydoc PARSEDATE_RELATIVE_TIME \htmlonly
+    </td></tr>
+    <tr><td class="mdname1">PARSEDATE_DAY_RELATIVE_TIME</td>
+        <td>\endhtmlonly \copydoc PARSEDATE_DAY_RELATIVE_TIME \htmlonly
+    </td></tr>
+    <tr><td class="mdname1">PARSEDATE_MINUTE_RELATIVE_TIME</td>
+        <td>\endhtmlonly \copydoc PARSEDATE_MINUTE_RELATIVE_TIME \htmlonly
+    </td></tr>
+    <tr><td class="mdname1">PARSEDATE_INVALID_DATE</td>
+    <td>
+    \endhtmlonly \copydoc PARSEDATE_INVALID_DATE \htmlonly
+        This flag will only be set if the function returns -1.
+    </td></tr>
+</table>
+\endhtmlonly
 */
 
 
 /*!
-	\fn void set_dateformats(const char *formatTable[])
+	\fn void set_dateformats(const char* formatTable[])
 	\brief sets the internal format table for parsedate()
 
 	This function let you set the format table which is used by parsedate().
-	When <span class="var">formatTable</span> is NULL, the standard built-in format table will be set again.
-	\param formatTable the NULL terminated formats list. This list must stay
-    valid when using parsedate() - it is not copied, but directly used.
+	When <span class="var">formatTable</span> is NULL, the standard built-in
+	format table will be set again.
 
-	\see 
-		\ref parsedateFormats Format!
+	\param formatTable the NULL terminated formats list. This list must stay
+	       valid when using parsedate() - it is not copied, but directly used.
+
+	\see \ref parsedateFormats Format!
 */
 
 
 /*!
-	\fn const char **get_dateformats(void)
+	\fn const char** get_dateformats(void)
 	\brief returns the internal format table currently used by parsedate()
 
 	Returns the internal format table currently used by parsedate() - this is
 	either a pointer to the built-in one, or one that you have previously
 	set using set_dateformats().
 
-	\see
-		\ref set_dateformats()
+	\see \ref set_dateformats()
 */

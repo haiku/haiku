@@ -5,6 +5,7 @@
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *		Alex Wilson, yourpalal2@gmail.com
+ *		John Scipione, jscipione@gmail.com
  *
  * Proofreader:
  *		David Weizades, ddewbofh@hotmail.com
@@ -21,7 +22,7 @@
 	\ingroup support
 	\ingroup libbe
 	\brief Provides the BArchivable interface and declares the BArchiver and
-		BUnarchiver classes.
+	       BUnarchiver classes.
 */
 
 
@@ -64,6 +65,8 @@
 	You should also consider implementing the AllArchived() and AllUnarchived()
 	methods, which were designed to ease archiving and unarchiving in such
 	a situation.
+
+	\since BeOS R3
 */
 
 
@@ -76,36 +79,43 @@
 	that takes one BMessage argument. In that constructor, you should call 
 	your parent class' archive constructor (even if your parent class is
 	BArchivable).
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BArchivable::BArchivable()
 	\brief Constructor. Does nothing.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BArchivable::~BArchivable()
 	\brief Destructor. Does nothing.
+
+	\since BeOS R3
 */
 
 
 /*!
-	\fn virtual status_t BArchivable::Archive(BMessage* into,
-		 bool deep = true) const
+	\fn virtual status_t BArchivable::Archive(BMessage* into, bool deep) const
 	\brief Archive the object into a BMessage.
-	
+
 	You should call this method from your derived implementation as it adds the
 	data needed to instantiate your object to the message.
-	
+
 	\param into The message you store your object in.
 	\param deep If \c true, all children of this object should be archived as
-		well.
+	       well.
 
 	\retval B_OK The archive operation was successful.
 	\retval B_BAD_VALUE \c NULL \a archive message.
 	\retval B_ERROR The archive operation failed.
+
+	\since BeOS R3
 */
 
 
@@ -117,17 +127,22 @@
 	your class. The automatic functions, such as #instantiate_object() and
 	BUnarchiver::InstantiateObject() will not choose the wrong class but manual
 	calls to this member might be faulty. You can verify that \c archive
-	stores an object of your calss with the validate_instantiation() function.
+	stores an object of your class with the validate_instantiation() function.
 
 	\param archive The message with the data of the object to restore.
+
+	\return A pointer to a BArchivable object.
 	\retval You should return a pointer to the object you create with
-		\c archive, or \c NULL if unarchival fails.
+	        \c archive, or \c NULL if the unarchival fails.
+
 	\warning The default implementation will always return \c NULL. Even though
 		it is possible to store plain BArchivable objects, it is impossible to
-		restore them. 
+		restore them.
 
-	\see instantiate_object(BMessage *from)
+	\see instantiate_object(BMessage*)
 	\see BUnarchiver::InstantiateObject()
+
+	\since BeOS R3
 */
 
 
@@ -137,13 +152,16 @@
 		   compatibility purposes).
 
 	\internal This method is defined for binary compatibility purposes, it is
-		used to ensure that the correct AllUnarchived() and AllArchived()
-		methods are called for objects, as those methods are new to Haiku.
+	          used to ensure that the correct AllUnarchived() and AllArchived()
+	          methods are called for objects, as those methods are new to
+	          Haiku.
 
 	\param d The perform code.
 	\param arg A pointer to store some data.
 
 	\returns A status code.
+
+	\since Haiku R1
 */
 
 
@@ -158,10 +176,12 @@
 	their parent class, the same as for the Archive() method.
 
 	\warning To guarantee that your AllUnarchived() method will be called
-		during unarchival, you must create a BUnarchiver object in your
-		archive constructor.
+	         during unarchival, you must create a BUnarchiver object in your
+	         archive constructor.
 
 	\see BUnarchiver, BUnarchiver::Finish()
+
+	\since Haiku R1
 */
 
 
@@ -184,6 +204,8 @@
 		method implementation, and \b NOT your AllArchived() method.
 
 	\see BArchiver BArchiver::Finish()
+
+	\since Haiku R1
 */
 
 
@@ -195,7 +217,7 @@
 	\ingroup support
 	\ingroup libbe
 	\brief A class that simplifies the archiving of complicated BArchivable
-		hierarchies.
+	       hierarchies.
 
 	The BArchiver class is a small class that is used for archiving of
 	complicated BArchivable hierarchies. Such a hierarchy may include
@@ -208,19 +230,25 @@
 	present in your original hierarchy.
 
 	The objects you archive can be retrieved using a BUnarchiver object.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BArchiver::BArchiver(BMessage* archive)
 	\brief Constructs a BArchiver object that manages \c archive.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BArchiver::~BArchiver()
 	\brief Destroys a BArchiver object. If the BArchiver object has not had its
-	Finish() method called, this will be done now.
+	       Finish() method called, this will be done now.
+
+	\since Haiku R1
 */
 
 
@@ -228,12 +256,12 @@
 	\fn status_t BArchiver::AddArchivable(const char* name,
 			BArchivable* archivable, bool deep = true)
 	\brief Adds a reference to \c archivable to the archive used to
-		construct this BArchiver. May call \c archivable's Archive() method.
+	       construct this BArchiver. May call \c archivable's Archive() method.
 
 	\param name Where this reference will be stored in the archive.
 	\param archivable The BArchivable* object that to reference.
 	\param deep Passed to \c archivable->Archive() if \c archivable must
-		be archived.
+	       be archived.
 
 	Adds a reference to \c archivable to your archive. If \c archivable has
 	not yet been archived, then its Archive() method is called. BArchiver
@@ -241,9 +269,11 @@
 	method or the GetTokenForArchivable() methods.
 
 	\warning If you manually archive an object, and then pass it to
-		AddArchivable() or GetTokenForArchivable(), it will be archived again,
-		and when unarchived you will end up with two different BArchivable
-		objects.
+	         AddArchivable() or GetTokenForArchivable(), it will be archived
+	         again, and when unarchived you will end up with two different
+	         BArchivable objects.
+
+	\since Haiku R1
 */
 
 
@@ -251,12 +281,12 @@
 	\fn status_t BArchiver::GetTokenForArchivable(BArchivable* archivable,
 		bool deep, int32& _token);
 	\brief Get a token representing a BArchivable object for this archiving
-		session.
+	       session.
 
 	\param archivable The BArchivable object for which you wish to get a
-		token.
+	       token.
 	\param deep Controls how \c archivable will be archived, if it has not yet
-		been archived in this session.
+	       been archived in this session.
 	\param[out] _token The token representing \c archivable is stored here.
 
 	Retrieves or creates a token to represent \c archivable in this archiving
@@ -265,8 +295,10 @@
 	Archive() method.
 
 	\warning If you manually archive an object, and then pass it to
-		GetTokenForArchivable(), it will be archived again, and when unarchived
-		you will end up with two different BArchivable objects.
+	         GetTokenForArchivable(), it will be archived again, and when
+	         unarchived you will end up with two different BArchivable objects.
+
+	\since Haiku R1
 */
 
 
@@ -274,46 +306,58 @@
 	\fn status_t BArchiver::GetTokenForArchivable(BArchivable* archivable,
 		int32 &_token)
 	\brief Equivalent to calling the expanded GetTokenForArchivable(
-		BArchivable*, bool, int32&), with the deep parameter equal to true.
+	       BArchivable*, bool, int32&), with the deep parameter equal to
+	       \c true.
 
 	\see GetTokenForArchivable(BArchivable*, bool, int32&)
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bool BArchiver::IsArchived(BArchivable* archivable);
 	\brief Returns whether \c archivable has already been archived in this
-		session.
+	       session.
 
+	\return Whether or not the object has already been archived.
 	\retval true \c archivable has been archived in this archiving session.
 	\retval false \c archivable has not been archived in this archiving session.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BArchiver::Finish(status_t err = B_OK);
 	\brief Report any archiving errors and possibly complete the archiving
-		session.
-	\return The first error reported in this archiving session, or B_OK.
+	       session.
 
 	This method may finish an archiving session (triggering the call of all
 	archived objects' AllArchived() methods) if the following conditions
 	are true:
-	\li No errors have been reported to this or any other BArchiver object
-		within this session.
-	\li This is the last remaining BArchiver that has not had its Finish()
-		method invoked.
+	- No errors have been reported to this or any other BArchiver object
+	  within this session.
+	- This is the last remaining BArchiver that has not had its Finish()
+	  method invoked.
+
 	If you call this method with an error code not equal to B_OK, then this
 	archiving session has failed, archived objects will not have their
 	AllArchived() methods called, and any subsequent calls to this method
 	on any BArchiver objects in this session will return your error code.
+
+	\return The first error reported in this archiving session, or \c B_OK.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn	const BMessage*	BArchiver::ArchiveMessage() const
+	\fn const BMessage*	BArchiver::ArchiveMessage() const
 	\brief Returns the BMessage* used to construct this BArchiver. This is
-		the archive that AddArchivable() modifies.
+	       the archive that AddArchivable() modifies.
+
+	\since Haiku R1
 */
 
 
@@ -325,7 +369,7 @@
 	\ingroup support
 	\ingroup libbe
 	\brief A class that simplifies the unarchiving of complicated BArchivable
-		   hierarchies.
+	       hierarchies.
 
 	The BUnarchiver class is a small class used to recover BArchivable objects
 	that have been archived with the BArchiver class. It also provides ownership
@@ -343,9 +387,11 @@
 	BUnarchiver helper classes, and want to maintain backwards compatibility
 	with old archive, this can be done using the IsArchiveManaged() method. 
 
- 	\warning Calling methods on your BUnarchiver with a legacy archive (one that
-		was not managed by a BArchiver during archival) will result in a
-		call to debugger().
+	\warning Calling methods on your BUnarchiver with a legacy archive (one
+	         that was not managed by a BArchiver during archival) will result
+	         in a call to debugger().
+
+	\since Haiku R1
 */
 
 
@@ -354,15 +400,18 @@
 	\brief Constructs a BUnarchiver object to manage \c archive.
 
 	\note To guarantee that your AllUnarchived() method will be called during
-		archival, you must create a BUnarchiver object in your archive
-		constructor. It is necessary to do this even if you won't use the
-		BUnarchiver object in your archive constructor.
+	      archival, you must create a BUnarchiver object in your archive
+	      constructor. It is necessary to do this even if you won't use the
+	      BUnarchiver object in your archive constructor.
 
 	\warning Do not construct a BUnarchiver object without first calling
-		BUnarchiver::PrepareArchive() on \c archive. It is only safe to build a
-		BUnarchiver without this call in your AllUnarchived() implementation. 
+	         BUnarchiver::PrepareArchive() on \c archive. It is only safe to
+	         build a BUnarchiver without this call in your AllUnarchived()
+	         implementation.
 
 	\see BUnarchiver::PrepareArchive()
+
+	\since Haiku R1
 */
 
 
@@ -371,17 +420,21 @@
 	\brief Destroys a BUnarchiver object.
 
 	Calls this objects Finish() method, if it has not yet been called.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BUnarchiver::EnsureUnarchived(int32 token)
 	\brief Ensure the object represented by \a token is unarchived and
-		instantiated.
+	       instantiated.
 
 	\param token the object \a token
 
 	\returns A status code.
+
+	\since Haiku R1
 */
 
 
@@ -389,35 +442,41 @@
 	\fn status_t BUnarchiver::EnsureUnarchived(const char* name,
 		int32 index = 0)
 	\brief Ensure the object archived under \a name at \a index is unarchived
-		and instantiated.
+	       and instantiated.
 
 	\param name The archive \a name.
 	\param index The archive \a index.
 
 	\returns A status code.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bool BUnarchiver::IsInstantiated(int32 token)
 	\brief Checks whether the object represented by \c token has been
-		instantiated in this session.
+	       instantiated in this session.
 
 	\param token The object \a token.
 
 	\returns \c true if instantiated, \c false otherwise
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn bool BUnarchiver::IsInstantiated(const char* name, int32 index = 0)
 	\brief Checks whether the object archived under \a name at \a index has been
-		instantiated in this session.
+	       instantiated in this session.
 
 	\param name The archive \a name.
 	\param index The arcive \a token.
 
 	\returns \c true if instantiated, \c false otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -431,18 +490,20 @@
 	If the retrieved object is not of the type T, then this method will fail.
 	If this method fails, you will not receive ownership of the object, no
 	matter what you specified in \c owning.
-	
+
 	\tparam T The type of \a object you wish to find.
 
 	\param token The \a token you got for this object from
-		BArchiver::GetTokenForArchivable() during archival.
+	       BArchiver::GetTokenForArchivable() during archival.
 	\param owning Whether or not you wish to take ownership of the
-		retrieved object.
+	       retrieved object.
 	\param object Return parameter for the retrieved object of type T.
 
 	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
+
+	\since Haiku R1
 */
 
 
@@ -456,12 +517,14 @@
 	\tparam T The type of \a object you wish to find.
 
 	\param token The \a token you got for this object from
-		BArchiver::GetTokenForArchivable() during archival.
+	       BArchiver::GetTokenForArchivable() during archival.
 	\param object The return parameter for the retrieved object of type T.
 
 	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
+
+	\since Haiku R1
 */
 
 
@@ -469,7 +532,7 @@
 	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
 		int32 index, ownership_policy owning, T*& object)
 	\brief Recover an object that had previously been archived using
-		the BArchiver::AddArchivable() method.
+	       the BArchiver::AddArchivable() method.
 
 	If the object has not yet been instantiated, and this request is not
 	coming from an AllUnarchived() implementation, the object will be
@@ -478,20 +541,22 @@
 	If the retrieved object is not of the type T, then this method will fail.
 	If this method fails, you will not receive ownership of the object, no
 	matter what you specified in \c owning.
-	
+
 	\tparam T The type of object you wish to find.
 
 	\param name The name that was passed to BArchiver::AddArchivable() when
-		adding this object.
+	       adding this object.
 	\param index The index of the object you wish to recover (\c 0-based,
-		like BMessage::FindData().
+	       like BMessage::FindData().
 	\param owning Dictates whether or not you wish to take ownership of the
-		retrieved object.
+	       retrieved object.
 	\param object Return parameter for the retrieved object of type T.
 
 	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
+
+	\since Haiku R1
 */
 
 
@@ -499,19 +564,21 @@
 	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
 		int32 index, T*& object)
 	\brief Recover and take ownership of an object that had previously been
-		archived using the BArchiver::AddArchivable() method.
+	       archived using the BArchiver::AddArchivable() method.
 
 	\tparam T The type of object you wish to find.
 
 	\param name The name that was passed to BArchiver::AddArchivable() when
-		adding this object.
+	       adding this object.
 	\param index The index of the object you wish to recover (\c 0-based,
-		like #BMessage::FindData().
+	       like #BMessage::FindData().
 	\param object Return parameter for the retrieved object of type T.
 
 	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
+
+	\since Haiku R1
 */
 
 
@@ -519,21 +586,23 @@
 	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
 		ownership_policy owning, T*& object)
 	\brief Recover an object at index \c 0 that had previously been
-		archived using the BArchiver::AddArchivable() method.
+	       archived using the BArchiver::AddArchivable() method.
 
 	Equivalent to calling FindObject(name, \c 0, owning, object).
 
 	\tparam T The type of \a object you wish to find.
 
 	\param name The name that was passed to BArchiver::AddArchivable() when
-		adding this object.
+	       adding this object.
 	\param owning Dictates whether or not you wish to take ownership of the
-		retrieved object.
+	       retrieved object.
 	\param object Return parameter for the retrieved object of type T.
 
 	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
+
+	\since Haiku R1
 */
 
 
@@ -544,33 +613,35 @@
 		previously been archived using the BArchiver::AddArchivable() method.
 
 	Equivalent to calling FindObject(name, \c 0,
-		BUnarchiver::B_ASSUME_OWNERSHIP, object).
+	BUnarchiver::B_ASSUME_OWNERSHIP, object).
 
 	\tparam T The type of \a object you wish to find.
 
 	\param name The name that was passed to BArchiver::AddArchivable() when
-		adding this object.
+	       adding this object.
 	\param object Return parameter for the retrieved \a object of type T.
 
 	\returns A status code.
 	\retval B_OK The \a object retrieved was of type T.
 	\retval B_BAD_TYPE The \a object retrieved was not of type T.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BUnarchiver::Finish(status_t err = B_OK);
 	\brief Report any unarchiving errors and possibly complete the archiving
-		session.
+	       session.
 
 	This method may finish an unarchiving session (triggering the call of all
 	instantiated objects' AllUnarchived() methods) if the following conditions
 	are true:
 
-	\li No errors have been reported to this or any other BUnarchiver
-		object within this session.
-	\li This is the last remaining BUnarchiver that has not had its
-		Finish() method invoked.
+	- No errors have been reported to this or any other BUnarchiver
+	  object within this session.
+	- This is the last remaining BUnarchiver that has not had its
+	  Finish() method invoked.
 
 	If you call this method with an error code not equal to B_OK, then this
 	unarchiving session has failed, instantiated objects will not have their
@@ -581,11 +652,13 @@
 	the root object).
 
 	\return The first error reported in this unarchiving session, or \c B_OK.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn	const BMessage*	BUnarchiver::ArchiveMessage() const
+	\fn const BMessage* BUnarchiver::ArchiveMessage() const
 	\brief Returns the BMessage* used to construct this BUnarchiver.
 
 	This is the archive that FindObject() uses.
@@ -623,6 +696,8 @@ MyArchivableClas::MyArchivableClass(BMessage* archive)
 	\returns Whether \a archive was managed by a BArchiver object.
 	\retval true if \a archive was managed by a BArchiver object.
 	\retval false otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -650,6 +725,8 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 	\param archive The archive you wish to have prepared.
 
 	\return The same #BMessage as is passed in.
+
+	\since Haiku R1
 */
 
 
@@ -661,16 +738,20 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 	\a archivable.
 
 	\param archivable The \a archivable object.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn void BUnarchiver::RelinquishOwnership(BArchivable* archivable)
 	\brief Relinquish ownership of \a archivable. If \a archivable remains
-		unclaimed at the end of the unarchiving session, it will be deleted
-		(unless it is the root object).
+	       unclaimed at the end of the unarchiving session, it will be deleted
+	       (unless it is the root object).
 
 	\param archivable The \a archivable object.
+
+	\since Haiku R1
 */
 
 
@@ -678,7 +759,7 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 	\fn template<class T> status_t BUnarchiver::InstantiateObject(
 		BMessage* from, T*& object)
 	\brief Attempt to instantiate an object of type T from BMessage*
-		\a from.
+	       \a from.
 
 	If the instantiated object is not of type T, then it will be deleted,
 	and this method will return \c B_BAD_TYPE. This method is similar to
@@ -691,6 +772,8 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 	\returns A status code.
 	\retval B_OK The object retrieved was of type T.
 	\retval B_BAD_TYPE The object retrieved was not of type T.
+
+	\since Haiku R1
 */
 
 
@@ -708,45 +791,55 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 /*!
 	\typedef typedef BArchivable* (*instantiation_func)(BMessage*)
 	\brief Internal definition of a function that can instantiate objects that
-		have been created with the BArchivable API.
+	       have been created with the BArchivable API.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BArchivable* instantiate_object(BMessage *from, image_id *id)
 	\brief Instantiate an archived object with the object being defined in a
-		different application or library.
-	
+	       different application or library.
+
 	This function is similar to instantiate_object(BMessage *from), except that
 	it takes the \a id argument referring to an image where the object might be
-	stored. 
-	
+	stored.
+
 	\note Images are names for executable files. Image id's refer to these
-		executable files that have been loaded by your application. Have a look
-		at the kernel API for further information.
+	      executable files that have been loaded by your application. Have a
+	      look at the kernel API for further information.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn BArchivable* instantiate_object(BMessage *from)
 	\brief Instantiate an archived object.
-	
+
 	This global function will determine the base class, based on the \a from
 	argument, and it will call the Instantiate() function of that object to
-	restore it. 
-	
+	restore it.
+
 	\param from The archived object.
+
 	\return The object returns a pointer to the instantiated object, or \c NULL
-		if the instantiation failed. The global \c errno variable will contain
-		the reason why it failed.
+	        if the instantiation failed. The global \c errno variable will
+	        contain the reason why it failed.
+
 	\see instantiate_object(BMessage *from, image_id *id)
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn bool validate_instantiation(BMessage* from, const char* className)
 	\brief Internal function that checks if the \a className is the same as the
-		one stored in the \a from message.
+	       one stored in the \a from message.
+
+	\since BeOS R3
 */
 
 
@@ -754,21 +847,27 @@ MyArchivableClas::MyArchivableClas(BMessage* archive)
 	\fn instantiation_func find_instantiation_func(const char* className,
 		const char* signature)
 	\brief Internal function that searches for the instantiation func with a
-		specific signature. Use instantiate_object() instead.
+	       specific signature. Use instantiate_object() instead.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn instantiation_func find_instantiation_func(const char* className)
 	\brief Internal function that searches for the instantiation func of a
-		specific class. Use instantiate_object() instead.
+	       specific class. Use instantiate_object() instead.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\fn instantiation_func find_instantiation_func(BMessage* archive)
 	\brief Internal function that searches for the instantiation func that
-		works on the specified \a archive. Use instantiate_object() instead.
+	       works on the specified \a archive. Use instantiate_object() instead.
+
+	\since BeOS R3
 */
 
 
