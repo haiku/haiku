@@ -2591,9 +2591,11 @@ BRoster::_SendToRunning(team_id team, int argc, const char* const* args,
 		} else if (alreadyRunning && (!messageList || messageList->IsEmpty()))
 			messenger.SendMessage(B_SILENT_RELAUNCH);
 
-		// send B_READY_TO_RUN
-		if (!alreadyRunning)
+		if (!alreadyRunning) {
+			// send B_READY_TO_RUN
+			DBG(OUT("_SendToRunning : B_READY_TO_RUN\n"));
 			messenger.SendMessage(B_READY_TO_RUN);
+		}
 	}
 
 	return error;
