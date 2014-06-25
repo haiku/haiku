@@ -374,7 +374,12 @@
 
 /*!
 	\fn BString& BString::SetToChars(const char* string, int32 charCount)
-	\brief Undocumented.
+	\brief UTF-8 aware version of SetTo(const char*, int32)
+
+	\param string The \a string to copy.
+	\param charCount The number of UTF-8 characters to copy.
+
+	\see SetTo(const char*, int32)
 
 	\since Haiku R1
 */
@@ -382,7 +387,14 @@
 
 /*!
 	\fn BString& BString::SetToChars(const BString& string, int32 charCount)
-	\brief Undocumented.
+	\brief UTF-8 aware version of SetTo(BString&, int32)
+
+	\param string The \a string to copy.
+	\param charCount The number of UTF-8 characters to copy.
+
+	\see SetTo(BString&, int32)
+
+	\return This method always returns \c *this.
 
 	\since Haiku R1
 */
@@ -390,7 +402,12 @@
 
 /*!
 	\fn BString& BString::AdoptChars(BString& from, int32 charCount)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Adopt(BString&, int32)
+
+	\param from The string data to start adopting from.
+	\param charCount Number of UTF-8 characters to adopt.
+
+	\return This method always returns \c *this.
 
 	\since Haiku R1
 */
@@ -398,7 +415,12 @@
 
 /*!
 	\fn BString& BString::SetToFormat(const char* format, ...)
-	\brief Undocumented.
+	\brief Sets the string to a formatted string ala sprintf().
+
+	\param format The \a format string to use.
+	\param ... The rest of the parameters that are filled into \a format.
+
+	\return This method always returns \c *this.
 
 	\since Haiku R1
 */
@@ -418,15 +440,15 @@
 /*!
 	\fn BString& BString::CopyInto(BString& into, int32 fromOffset,
 		int32 length) const
-	\brief Copy the object's data (or part of it)  into another BString.
+	\brief Copy the object's data (or part of it) into another BString.
 
 	This methods makes sure you don't copy more bytes than are available
 	in the string. If the length exceeds the length of the string, it only
 	copies the number of characters that are actually available.
 
-	\param into The BString to where to copy the object.
+	\param into The BString to copy into.
 	\param fromOffset The (zero-based) offset where to begin the copy.
-	\param length The amount of bytes to copy.
+	\param length The number of bytes to copy.
 
 	\return This method always returns a pointer to the string passed as the
 	        \c into parameter.
@@ -447,7 +469,7 @@
 
 	\param into The buffer where to copy the object.
 	\param fromOffset The (zero-based) offset where to begin the copy.
-	\param length The amount of bytes to copy.
+	\param length The number of bytes to copy.
 
 	\since BeOS R5
 */
@@ -456,7 +478,16 @@
 /*!
 	\fn BString& BString::CopyCharsInto(BString& into, int32 fromOffset,
 		int32 charCount) const
-	\brief Undocumented.
+	\brief UTF-8 aware version of CopyInto(BString&, int32, int32) const.
+
+	\param into The BString to copy into.
+	\param fromOffset The (zero-based) offset in bytes where to begin the copy.
+	\param charCount The number of UTF-8 characters to copy.
+
+	\return This method always returns a pointer to the string passed as the
+	        \c into parameter.
+
+	\see CopyInto(BString&, int32, int32) const
 
 	\since Haiku R1
 */
@@ -465,7 +496,17 @@
 /*!
 	\fn bool BString::CopyCharsInto(char* into, int32* intoLength,
 		int32 fromCharOffset, int32 charCount) const
-	\brief Undocumented.
+	\brief UTF-8 aware version of CopyInto(char*, int32, int32) const.
+
+	\param into The buffer where to copy the object.
+	\param intoLength The length of \a into in bytes.
+	\param fromCharOffset The (zero-based) offset UTF-8 characters where to
+	       begin the copy.
+	\param charCount The number of UTF-8 characters to copy.
+
+	\see CopyInto(char*, int32, int32) const
+
+	\return \c false if \a into was \c NULL, \c true otherwise.
 
 	\since Haiku R1
 */
@@ -593,7 +634,7 @@
 	\brief Append a part of the given string to the BString.
 
 	\param str A pointer to the string to append.
-	\param length The maximum bytes to get from the original string.
+	\param length The maximum number of bytes to append.
 
 	\return This method always returns \c *this.
 
@@ -620,7 +661,14 @@
 
 /*!
 	\fn BString& BString::AppendChars(const BString& string, int32 charCount)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Append(const BString&, int32).
+
+	\param string The \a string to append to.
+	\param charCount The maximum number of UTF-8 characters to append.
+
+	\return This method always returns \c *this.
+
+	\see Append(const BString&, int32)
 
 	\since Haiku R1
 */
@@ -628,7 +676,14 @@
 
 /*!
 	\fn BString& BString::AppendChars(const char* string, int32 charCount)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Append(const char*, int32).
+
+	\param string The \a string to append to.
+	\param charCount The maximum number of UTF-8 characters to append.
+
+	\return This method always returns \c *this.
+
+	\see Append(const char*, int32)
 
 	\since Haiku R1
 */
@@ -677,8 +732,8 @@
 	\fn BString& BString::Prepend(const char* str, int32 length)
 	\brief Prepend the given string to the BString.
 
-	\param str A pointer to the string to prepend.
-	\param length The maximum amount of bytes to get from the string.
+	\param str The \a string to prepend.
+	\param length The maximum number of bytes to prepend.
 
 	\return This method always returns \c *this.
 
@@ -692,8 +747,8 @@
 	\fn BString& BString::Prepend(const BString& string, int32 length)
 	\brief Prepend the given BString to the object.
 
-	\param string The BString to prepend.
-	\param length The maximum amount of bytes to get from the BString.
+	\param string The \a string to prepend.
+	\param length The maximum number of bytes to prepend.
 
 	\return This method always returns \c *this.
 
@@ -718,7 +773,14 @@
 
 /*!
 	\fn BString& BString::PrependChars(const char* string, int32 charCount)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Prepend(const char*, int32).
+
+	\param string The \a string to prepend.
+	\param charCount The maximum number of UTF-8 characters to prepend.
+
+	\return This method always returns \c *this.
+
+	\see Prepend(const char*, int32)
 
 	\since Haiku R1
 */
@@ -726,7 +788,14 @@
 
 /*!
 	\fn BString& BString::PrependChars(const BString& string, int32 charCount)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Prepend(const BString&, int32).
+
+	\param string The \a string to prepend.
+	\param charCount The maximum number of UTF-8 characters to prepend.
+
+	\return This method always returns \c *this.
+
+	\see Prepend(const BString&, int32)
 
 	\since Haiku R1
 */
@@ -748,9 +817,9 @@
 	\brief Insert the given string at the given position into the object's
 	       data.
 
-	\param string A pointer to the string to insert.
-	\param position The offset in bytes into the BString's data where to insert
-	       the string.
+	\param string The \a string to insert.
+	\param position The offset in bytes where to insert the \a string into
+	       the BString's data.
 
 	\return This method always returns \c *this.
 
@@ -824,6 +893,7 @@
 	\fn BString& BString::Insert(const BString& string, int32 length, int32 position)
 	\brief Insert the given BString at the given position into the object's
 	       data.
+
 	\param string The BString object to insert.
 	\param length The amount of bytes to insert.
 	\param position The offset in bytes into the data of the BString where to
@@ -845,7 +915,7 @@
 	       data.
 
 	\param string The BString object to insert.
-	\param fromOffset The offset in the string that is to be inserted
+	\param fromOffset The offset in bytes of the string to be inserted.
 	\param length The amount of bytes to insert.
 	\param position The offset in bytes into the data of the BString where to
 	       insert the string.
@@ -877,7 +947,15 @@
 
 /*!
 	\fn BString& BString::InsertChars(const char* string, int32 charPosition)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Insert(const char*, int32).
+
+	\param string The \a string to insert.
+	\param charPosition The offset in UTF-8 characters where to insert
+	       the string into the data of the BString.
+
+	\return This method always returns \c *this.
+
+	\see Insert(const char*, int32)
 
 	\since Haiku R1
 */
@@ -886,7 +964,16 @@
 /*!
 	\fn BString& BString::InsertChars(const char* string, int32 charCount,
 		int32 charPosition)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Insert(const char*, int32, int32).
+
+	\param string The \a string to insert.
+	\param charCount The number of UTF-8 characters to insert.
+	\param charPosition The offset in UTF-8 characters where to insert
+	       the string into the data of the BString.
+
+	\return This method always returns \c *this.
+
+	\see Insert(const char*, int32, int32)
 
 	\since Haiku R1
 */
@@ -895,7 +982,18 @@
 /*!
 	\fn BString& BString::InsertChars(const char* string, int32 fromCharOffset,
 		int32 charCount, int32 charPosition)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Insert(const char*, int32, int32, int32).
+
+	\param string The \a string to insert.
+	\param fromCharOffset The offset in UTF-8 characters of the string to be
+	       inserted.
+	\param charCount The number of UTF-8 characters to insert.
+	\param charPosition The offset in UTF-8 characters where to insert
+	       the string into the data of the BString.
+
+	\return This method always returns \c *this.
+
+	\see Insert(const char*, int32, int32, int32)
 
 	\since Haiku R1
 */
@@ -903,7 +1001,15 @@
 
 /*!
 	\fn BString& BString::InsertChars(const BString& string, int32 charPosition)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Insert(const BString&, int32).
+
+	\param string The \a string to insert.
+	\param charPosition The offset in UTF-8 characters where to insert
+	       the string into the data of the BString.
+
+	\return This method always returns \c *this.
+
+	\see Insert(const BString&, int32)
 
 	\since Haiku R1
 */
@@ -912,7 +1018,16 @@
 /*!
 	\fn BString& BString::InsertChars(const BString& string, int32 charCount,
 		int32 charPosition)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Insert(const BString&, int32, int32).
+
+	\param string The \a string to insert.
+	\param charCount The number of UTF-8 characters to insert.
+	\param charPosition The offset in UTF-8 characters where to insert
+	       the string into the data of the BString.
+
+	\return This method always returns \c *this.
+
+	\see Insert(const BString&, int32, int32)
 
 	\since Haiku R1
 */
@@ -921,7 +1036,18 @@
 /*!
 	\fn BString& BString::InsertChars(const BString& string, int32 fromCharOffset,
 		int32 charCount, int32 charPosition)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Insert(const BString&, int32, int32, int32)
+
+	\param string The \a string to insert.
+	\param fromCharOffset The offset in UTF-8 characters of the string to be
+	       inserted.
+	\param charCount The number of UTF-8 characters to insert.
+	\param charPosition The offset in UTF-8 characters where to insert
+	       the string into the data of the BString.
+
+	\return This method always returns \c *this.
+
+	\see Insert(const BString&, int32, int32, int32)
 
 	\since Haiku R1
 */
@@ -939,11 +1065,24 @@
 
 
 /*!
+	\fn BString& BString::Trim()
+	\brief Removes spaces from the beginning and end of the string.
+
+	The definition of a space is set by the isspace() function.
+
+	\return This method always returns \c *this.
+
+	\since Haiku R1
+*/
+
+
+
+/*!
 	\fn BString& BString::Truncate(int32 newLength, bool lazy)
 	\brief Truncate the string to the new length.
 
-	\param newLength The new length of the string.
-	\param lazy If true, the memory-optimization is postponed to later
+	\param newLength The new length of the string in bytes.
+	\param lazy If true, the memory-optimization is postponed until later.
 
 	\return This method always returns \c *this.
 
@@ -953,7 +1092,12 @@
 
 /*!
 	\fn BString& BString::TruncateChars(int32 newCharCount, bool lazy)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Truncate(int32, bool).
+
+	\param newCharCount The new length of the string in UTF-8 characters.
+	\param lazy If true, the memory-optimization is postponed until later.
+
+	\see Truncate(int32, bool)
 
 	\since Haiku R1
 */
@@ -963,8 +1107,8 @@
 	\fn BString& BString::Remove(int32 from, int32 length)
 	\brief Remove some bytes, starting at the given offset
 
-	\param from The offset from which you want to start removing
-	\param length The number of bytes to remove
+	\param from The offset in bytes to start removing.
+	\param length The number of bytes to remove.
 
 	\return This function always returns \c *this.
 
@@ -974,7 +1118,14 @@
 
 /*!
 	\fn BString& BString::RemoveChars(int32 fromCharOffset, int32 charCount)
-	\brief Undocumented.
+	\brief UTF-8 aware version of Remove(int32, int32).
+
+	\param fromCharOffset The offset in UTF-8 characters to start removing.
+	\param charCount The number of UTF-8 characters to remove.
+
+	\return This function always returns \c *this.
+
+	\see Remove(int32, int32)
 
 	\since Haiku R1
 */
@@ -1065,8 +1216,14 @@
 
 
 /*!
-	\fn BString& BString::RemoveCharsSet(const char*setOfCharsToRemove)
-	\brief Undocumented.
+	\fn BString& BString::RemoveCharsSet(const char* setOfCharsToRemove)
+	\brief UTF-8 aware version of RemoveSet(const char*).
+
+	\param setOfCharsToRemove The set of characters to remove.
+
+	\return This function always returns \c *this.
+
+	\see RemoveSet(const char*)
 
 	\since Haiku R1
 */
@@ -1076,8 +1233,8 @@
 	\fn BString& BString::MoveInto(BString& into, int32 from, int32 length)
 	\brief Move the BString data (or part of it) into another BString.
 
-	\param into The BString where to move the string into.
-	\param from The offset (zero-based) where to begin the move.
+	\param into The BString to move the string into.
+	\param from The offset (zero-based) in bytes where to begin the move.
 	\param length The number of bytes to move.
 
 	\return This method always returns \c into.
@@ -1090,8 +1247,8 @@
 	\fn void BString::MoveInto(char* into, int32 from, int32 length)
 	\brief Move the BString data (or part of it) into the given buffer.
 
-	\param into The buffer where to move the string into.
-	\param from The offset (zero-based) where to begin the move.
+	\param into The buffer to move the string into.
+	\param from The offset (zero-based) in bytes where to begin the move.
 	\param length The number of bytes to move.
 
 	\since BeOS R5
@@ -1101,7 +1258,14 @@
 /*!
 	\fn BString& BString::MoveCharsInto(BString& into, int32 fromCharOffset,
 		int32 charCount)
-	\brief Undocumented.
+	\brief UTF-8 aware version of MoveInto(BString&, int32, int32)
+
+	\param into The BString where to move the string into.
+	\param fromCharOffset The offset (zero-based) in UTF-8 characters where to
+	       begin the move.
+	\param charCount The number of UTF-8 characters to move.
+
+	\see MoveInto(BString&, int32, int32)
 
 	\since Haiku R1
 */
@@ -1110,7 +1274,17 @@
 /*!
 	\fn bool BString::MoveCharsInto(char* into, int32* intoLength,
 		int32 fromCharOffset, int32 charCount)
-	\brief Undocumented.
+	\brief UTF-8 aware version of MoveInto(char*, int32*, int32, int32).
+
+	\param into The buffer to move the string into.
+	\param intoLength The offset (zero-based) in bytes where to begin the move.
+	\param fromCharOffset The offset (zero-based) in UTF-8 characters where to
+	       begin the move.
+	\param charCount The number of UTF-8 characters to move.
+
+	\returns \c false if \a into was \c NULL, \c true otherwise.
+
+	\see MoveInto(char*, int32*, int32, int32)
 
 	\since Haiku R1
 */
@@ -1271,7 +1445,9 @@
 
 /*!
 	\fn BString::operator const char*() const
-	\brief Undocumented.
+	\brief Return an empty string.
+
+	\return An empty string.
 
 	\since Haiku R1
 */
@@ -1315,7 +1491,7 @@
 	       another \a string.
 
 	\param string The \a string to compare against.
-	\param length The number of characters to compare.
+	\param length The number of bytes to compare.
 
 	\return An int representing the strings relationship to each other.
 	\retval >0 The BString sorts lexicographically after \a string.
@@ -1332,7 +1508,7 @@
 	       another \a string.
 
 	\param string The \a string to compare against.
-	\param length The number of characters to compare.
+	\param length The number of bytes to compare.
 
 	\return An int representing the strings relationship to each other.
 	\retval >0 The BString sorts lexicographically after \a string.
@@ -1347,7 +1523,17 @@
 
 /*!
 	\fn int BString::CompareChars(const BString& string, int32 charCount) const
-	\brief Undocumented.
+	\brief UTF-8 aware version of Compare(const BString&, int32).
+
+	\param string The \a string to compare against.
+	\param charCount The number of UTF-8 characters to compare.
+
+	\return An int representing the strings relationship to each other.
+	\retval >0 The BString sorts lexicographically after \a string.
+	\retval =0 The BString is equal to \a string.
+	\retval <0 The BString sorts lexicographically before \a string.
+
+	\see Compare(const BString&, int32)
 
 	\since Haiku R1
 */
@@ -1355,7 +1541,17 @@
 
 /*!
 	\fn int BString::CompareChars(const char* string, int32 charCount) const
-	\brief Undocumented.
+	\brief UTF-8 aware version of Compare(const char*, int32).
+
+	\param string The \a string to compare against.
+	\param charCount The number of UTF-8 characters to compare.
+
+	\return An int representing the strings relationship to each other.
+	\retval >0 The BString sorts lexicographically after \a string.
+	\retval =0 The BString is equal to \a string.
+	\retval <0 The BString sorts lexicographically before \a string.
+
+	\see Compare(const char*, int32)
 
 	\since Haiku R1
 */
@@ -1483,7 +1679,7 @@
 	       the given offset.
 
 	\param string The \a string to search for.
-	\param fromOffset The offset where to start the search.
+	\param fromOffset The offset in bytes to start the search.
 
 	\return An integer which is the offset (zero-based) into the data
 	        where the given BString was found or \c B_ERROR if we could
@@ -1501,7 +1697,7 @@
 	       given offset.
 
 	\param string The \a string to search for.
-	\param fromOffset The offset where to start the search.
+	\param fromOffset The offset in bytes to start the search.
 
 	\return The offset (zero-based) into the data where the given string
 	        was found, \c B_BAD_VALUE if the \c string pointer is invalid,
@@ -1544,7 +1740,16 @@
 /*!
 	\fn int32 BString::FindFirstChars(const BString& string,
 		int32 fromCharOffset) const
-	\brief Undocumented.
+	\brief UTF-8 aware version of FindFirst(const BString&, int32).
+
+	\param string The \a string to search for.
+	\param fromCharOffset The offset in UTF-8 characters to start the search.
+
+	\return An integer which is the offset (zero-based) into the data
+	        where the given BString was found or \c B_ERROR if we could
+	        not find the \c string.
+
+	\see FindFirst(const BString&, int32)
 
 	\since Haiku R1
 */
@@ -1553,7 +1758,12 @@
 /*!
 	\fn int32 BString::FindFirstChars(const char* string,
 		int32 fromCharOffset) const
-	\brief Undocumented.
+	\brief UTF-8 aware version of FindChars(const char*, int32).
+
+	\param string The \a string to search for.
+	\param fromCharOffset The offset in UTF-8 characters to start the search.
+
+	\see FindChars(const char*, int32)
 
 	\since Haiku R1
 */
@@ -1580,8 +1790,8 @@
 
 	\param string The string to search for.
 
-	\return The offset (zero-based) into the data where the given string
-	        was found, \c B_BAD_VALUE if the \c string pointer is invalid,
+	\return The offset in bytes (zero-based) into the data where the given
+	        string was found, \c B_BAD_VALUE if the \c string pointer is invalid,
 	        or \c B_ERROR if we could not find the \c string.
 
 	\sa IFindLast(const char*) const
@@ -1596,7 +1806,7 @@
 		starting from the given offset, and going backwards.
 
 	\param string The BString to search for.
-	\param beforeOffset The offset where to start the search.
+	\param beforeOffset The offset in bytes to start the search.
 
 	\return The offset (zero-based) into the data where the given BString
 	        was found, or \c B_ERROR if we could not find the \c string.
@@ -1613,7 +1823,7 @@
 		starting from the given offset, and going backwards.
 
 	\param string The string to search for.
-	\param beforeOffset The offset where to start the search.
+	\param beforeOffset The offset in bytes to start the search.
 
 	\return The offset (zero-based) into the data where the given string
 	        was found, \c B_BAD_VALUE if the \c string pointer is invalid,
@@ -1643,7 +1853,7 @@
 	       starting from the given offset going backwards from the end.
 
 	\param c The character to search for.
-	\param beforeOffset The offset where to start the search.
+	\param beforeOffset The offset in bytes to start the search.
 
 	\return The offset (zero-based) into the data where the given character	
 	        was found, or \c B_ERROR Could not find the character.
@@ -1655,18 +1865,34 @@
 /*!
 	\fn int32 BString::FindLastChars(const BString& string,
 		int32 beforeCharOffset) const
-	\brief Undocumented.
+	\brief UTF-8 aware version of FindLast(const BString&, int32).
+
+	\param string The BString to search for.
+	\param beforeCharOffset The offset in UTF-8 characters to start the search.
+
+	\return The offset in bytes (zero-based) into the data where the given
+	        BString was found, or \c B_ERROR if we could not find the
+	        \c string.
+
+	\see FindLast(const BString&, int32)
 
 	\since Haiku R1
-
-	\since BeOS R5
 */
 
 
 /*!
 	\fn int32 BString::FindLastChars(const char* string,
 		int32 beforeCharOffset) const
-	\brief Undocumented.
+	\brief UTF-8 aware version of FindLast(const char*, int32).
+
+	\param string The string to search for.
+	\param beforeCharOffset The offset in UTF-8 characters to start the search.
+
+	\return The offset in bytes (zero-based) into the data where the given
+	        string was found, \c B_BAD_VALUE if the \c string pointer is
+	        invalid, or \c B_ERROR if we could not find the \c string.
+
+	\see FindLast(const char*, int32)
 
 	\since Haiku R1
 */
@@ -1790,7 +2016,7 @@
 
 	\param replaceThis The character to replace.
 	\param withThis The character to put in its place
-	\param fromOffset The offset where to start looking for the character.
+	\param fromOffset The offset in bytes to start looking for the character.
 
 	\return This method always returns \c *this.
 
@@ -1810,7 +2036,7 @@
 	\param withThis The character to put in its place
 	\param maxReplaceCount The maximum number of characters that should be
 	       replaced.
-	\param fromOffset The offset where to start looking for the character
+	\param fromOffset The offset in bytes to start looking for the character
 
 	\return This method always returns \c *this.
 
@@ -1859,7 +2085,7 @@
 
 	\param replaceThis The string to replace.
 	\param withThis The string to put in its place
-	\param fromOffset The offset where to start looking for the string.
+	\param fromOffset The offset in bytes to start looking for the string.
 
 	\return This method always returns \c *this.
 
@@ -1878,7 +2104,7 @@
 	\param withThis The string to put in its place
 	\param maxReplaceCount The maximum number of occurrences that should
 	       be replaced.
-	\param fromOffset The offset where to start looking for the string
+	\param fromOffset The offset in bytes to start looking for the string.
 
 	\return This method always returns \c *this.
 
@@ -1891,14 +2117,39 @@
 /*!
 	\fn BString& BString::ReplaceAllChars(const char* replaceThis,
 		const char* withThis, int32 fromCharOffset)
-	\brief Undocumented.
+	\brief UTF-8 aware version of ReplaceAll(const char*, const char*, int32).
+
+	\param replaceThis The string to replace.
+	\param withThis The string to put in its place
+	\param fromCharOffset The offset in UTF-8 characters to start looking for
+	       the string.
+
+	\return This method always returns \c *this.
+
+	\see ReplaceAll(const char*, const char*, int32)
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BString& BString::ReplaceChars(const char* replaceThis,
-		const char* withThis, int32 maxReplceCount, int32 fromCharOffset)
-	\brief Undocumented.
+		const char* withThis, int32 maxReplaceCount, int32 fromCharOffset)
+	\brief UTF-8 aware version of
+	       ReplaceAll(const char*, const char*, int32, int32).
+
+	\param replaceThis The string to replace.
+	\param withThis The string to put in its place
+	\param maxReplaceCount The maximum number of occurrences that should
+	       be replaced.
+	\param fromCharOffset The offset in UTF-8 characters to start looking for
+	       the string.
+
+	\return This method always returns \c *this.
+
+	\see ReplaceAll(const char*, const char*, int32, int32)
+
+	\since Haiku R1
 */
 
 
@@ -2045,7 +2296,7 @@
 	\fn BString& BString::ReplaceSet(const char* setOfBytes, const char* with)
 	\brief Replaces characters that are in a certain set with a chosen string.
 
-	\param setOfBytes The set of characters that need to be replaced.
+	\param setOfBytes The set of chars that need to be replaced.
 	\param with The string to replace the occurrences with.
 
 	\return This method always returns \c *this.
@@ -2057,7 +2308,12 @@
 /*!
 	\fn BString& BString::ReplaceCharsSet(const char* setOfChars,
 		const char* with)
-	\brief Undocumented.
+	\brief UTF-8 aware version of ReplaceSet(const char*, const char*)
+
+	\param setOfChars The set of UTF-8 characters that need to be replaced.
+	\param with The string to replace the occurrences with.
+
+	\return This method always returns \c *this.
 
 	\since Haiku R1
 */
@@ -2116,8 +2372,7 @@
 
 	\param index The index (zero-based) of the byte to get.
 
-	\return A reference to the specified byte, if we are out of bounds
-	        it will return 0.
+	\return A reference to the specified byte, if out of bounds return 0.
 
 	\since BeOS R5
 */
@@ -2125,7 +2380,15 @@
 
 /*!
 	\fn const char* BString::CharAt(int32 charIndex, int32* bytes) const
-	\brief Undocumented.
+	\brief UTF-8 aware version of ByteAt(int32).
+
+	\param charIndex The index (zero-based) of the UTF-8 character to get.
+	\param bytes An int32 pointer to hold the UTF-8 character.
+
+	\return A reference to the specified UTF-8 character, if out of bounds
+	        return 0.
+
+	\see ByteAt(int32)
 
 	\since Haiku R1
 */
@@ -2134,7 +2397,14 @@
 /*!
 	\fn bool BString::CharAt(int32 charIndex, char* buffer,
 		int32* bytes) const
-	\brief Undocumented.
+	\brief UTF-8 aware version of ByteAt(int32) with a \a buffer parameter.
+
+	\param charIndex The index (zero-based) of the UTF-8 character to get.
+	\param buffer Set to the position in the string where the character is
+	       found.
+	\param bytes An int32 pointer to hold the UTF-8 character.
+
+	\see ByteAt(int32, char*, int32*)
 
 	\since Haiku R1
 */
@@ -2326,25 +2596,6 @@
 	\return This method always returns \c *this.
 
 	\sa CharacterEscape(const char*, char)
-*/
-
-
-//! @}
-
-
-/*!
-	\name Trimming
-*/
-
-
-//! @{
-
-
-/*!
-	\fn BString& BString::Trim()
-	\brief Undocumented.
-
-	\since Haiku R1
 */
 
 
