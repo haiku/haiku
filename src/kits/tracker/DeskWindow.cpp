@@ -32,6 +32,9 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
+#include "DeskWindow.h"
+
 #include <Catalog.h>
 #include <Debug.h>
 #include <FindDirectory.h>
@@ -56,8 +59,6 @@ All rights reserved.
 #include "AutoLock.h"
 #include "BackgroundImage.h"
 #include "Commands.h"
-#include "DesktopPoseView.h"
-#include "DeskWindow.h"
 #include "FSUtils.h"
 #include "IconMenuItem.h"
 #include "KeyInfos.h"
