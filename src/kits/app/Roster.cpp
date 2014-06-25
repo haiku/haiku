@@ -56,10 +56,11 @@ using namespace BPrivate;
 //#define DBG(x) x
 #define DBG(x)
 #ifdef DEBUG_PRINTF
-	#define OUT DEBUG_PRINTF
+#	define OUT DEBUG_PRINTF
 #else
-	#define OUT	printf
+#	define OUT printf
 #endif
+
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -946,7 +947,7 @@ BRoster::Launch(const char* mimeType, BMessage* initialMessage,
 		return B_BAD_VALUE;
 
 	BList messageList;
-	if (initialMessage)
+	if (initialMessage != NULL)
 		messageList.AddItem(initialMessage);
 
 	return _LaunchApp(mimeType, NULL, &messageList, 0, NULL, appTeam);
@@ -987,7 +988,7 @@ BRoster::Launch(const entry_ref* ref, const BMessage* initialMessage,
 		return B_BAD_VALUE;
 
 	BList messageList;
-	if (initialMessage)
+	if (initialMessage != NULL)
 		messageList.AddItem(const_cast<BMessage*>(initialMessage));
 
 	return _LaunchApp(NULL, ref, &messageList, 0, NULL, appTeam);
@@ -1977,8 +1978,8 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 		// If the target app is B_ARGV_ONLY, only if it is newly launched
 		// messages are sent to it (namely B_ARGV_RECEIVED and B_READY_TO_RUN).
 		// An already running B_ARGV_ONLY app won't get any messages.
-		bool argvOnly = (appFlags & B_ARGV_ONLY)
-			|| (alreadyRunning && (otherAppFlags & B_ARGV_ONLY));
+		bool argvOnly = (appFlags & B_ARGV_ONLY) != 0
+			|| (alreadyRunning && (otherAppFlags & B_ARGV_ONLY) != 0);
 		const BList* _messageList = (argvOnly ? NULL : messageList);
 		// don't send ref, if it refers to the app or is included in the
 		// argument vector
@@ -2549,6 +2550,7 @@ BRoster::_SendToRunning(team_id team, int argc, const char* const* args,
 	bool alreadyRunning) const
 {
 	status_t error = B_OK;
+
 	// Construct a messenger to the app: We can't use the public constructor,
 	// since the target application may be B_ARGV_ONLY.
 	app_info info;
@@ -2559,16 +2561,16 @@ BRoster::_SendToRunning(team_id team, int argc, const char* const* args,
 			B_PREFERRED_TOKEN);
 
 		// send messages from the list
-		if (messageList) {
+		if (messageList != NULL) {
 			for (int32 i = 0;
-				 BMessage* message = (BMessage*)messageList->ItemAt(i);
-				 i++) {
+					BMessage* message = (BMessage*)messageList->ItemAt(i);
+					i++) {
 				messenger.SendMessage(message);
 			}
 		}
 
-		// send B_ARGV_RECEIVED or B_REFS_RECEIVED or B_SILENT_RELAUNCH (if
-		// already running)
+		// send B_ARGV_RECEIVED or B_REFS_RECEIVED or B_SILENT_RELAUNCH
+		// (if already running)
 		if (args != NULL && argc > 1) {
 			BMessage message(B_ARGV_RECEIVED);
 			message.AddInt32("argc", argc);
