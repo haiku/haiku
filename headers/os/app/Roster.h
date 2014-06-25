@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ROSTER_H
@@ -54,132 +54,185 @@ class BList;
 
 
 class BRoster {
-	public:
-		BRoster();
-		~BRoster();
+public:
+								BRoster();
+								~BRoster();
 
-		// running apps
-		bool IsRunning(const char *mimeSig) const;
-		bool IsRunning(entry_ref *ref) const;
-		team_id TeamFor(const char *mimeSig) const;
-		team_id TeamFor(entry_ref *ref) const;
-		void GetAppList(BList *teamIDList) const;
-		void GetAppList(const char *sig, BList *teamIDList) const;
+	// running apps
+			bool				IsRunning(const char* signature) const;
+			bool				IsRunning(entry_ref* ref) const;
 
-		// app infos
-		status_t GetAppInfo(const char *sig, app_info *info) const;
-		status_t GetAppInfo(entry_ref *ref, app_info *info) const;
-		status_t GetRunningAppInfo(team_id team, app_info *info) const;
-		status_t GetActiveAppInfo(app_info *info) const;
+			team_id				TeamFor(const char* signature) const;
+			team_id				TeamFor(entry_ref* ref) const;
 
-		// find app
-		status_t FindApp(const char *mimeType, entry_ref *app) const;
-		status_t FindApp(entry_ref *ref, entry_ref *app) const;
+			void				GetAppList(BList* teamIDList) const;
+			void				GetAppList(const char* signature,
+									BList* teamIDList) const;
 
-		// broadcast
-		status_t Broadcast(BMessage *message) const;
-		status_t Broadcast(BMessage *message, BMessenger replyTo) const;
+	// app infos
+			status_t			GetAppInfo(const char* signature,
+									app_info* info) const;
+			status_t			GetAppInfo(entry_ref* ref,
+									app_info* info) const;
 
-		// watching
-		status_t StartWatching(BMessenger target,
-					uint32 eventMask = B_REQUEST_LAUNCHED | B_REQUEST_QUIT) const;
-		status_t StopWatching(BMessenger target) const;
+			status_t			GetRunningAppInfo(team_id team,
+									app_info* info) const;
+			status_t			GetActiveAppInfo(app_info* info) const;
 
-		status_t ActivateApp(team_id team) const;
+	// find app
+			status_t			FindApp(const char* mimeType,
+									entry_ref* app) const;
+			status_t			FindApp(entry_ref* ref, entry_ref* app) const;
 
-		// launch app
-		status_t Launch(const char *mimeType, BMessage *initialMessage = 0,
-					team_id *appTeam = 0) const;
-		status_t Launch(const char *mimeType, BList *messageList,
-					team_id *appTeam = 0) const;
-		status_t Launch(const char *mimeType, int argc, char **args,
-					team_id *appTeam = 0) const;
-		status_t Launch(const entry_ref *ref, const BMessage *initialMessage = 0,
-					team_id *appTeam = 0) const;
-		status_t Launch(const entry_ref *ref, const BList *messageList,
-					team_id *appTeam = 0) const;
-		status_t Launch(const entry_ref *ref, int argc, const char * const *args,
-					team_id *appTeam = 0) const;
+	// broadcast
+			status_t			Broadcast(BMessage* message) const;
+			status_t			Broadcast(BMessage* message,
+									BMessenger replyTo) const;
 
-		// recent documents, folders, apps
-		void GetRecentDocuments(BMessage *refList, int32 maxCount,
-					const char *fileType = 0,
-					const char *appSig = 0) const;
-		void GetRecentDocuments(BMessage *refList, int32 maxCount,
-					const char *fileTypes[], int32 fileTypesCount,
-					const char *appSig = 0) const;
-		void GetRecentFolders(BMessage *refList, int32 maxCount,
-					const char *appSig = 0) const;
-		void GetRecentApps(BMessage *refList, int32 maxCount) const;
-		void AddToRecentDocuments(const entry_ref *doc,
-					const char *appSig = 0) const;
-		void AddToRecentFolders(const entry_ref *folder,
-					const char *appSig = 0) const;
+	// watching
+			status_t			StartWatching(BMessenger target,
+									uint32 eventMask
+										= B_REQUEST_LAUNCHED
+											| B_REQUEST_QUIT) const;
+			status_t			StopWatching(BMessenger target) const;
 
-		// private/reserved stuff starts here
-		class Private;
+			status_t			ActivateApp(team_id team) const;
 
-	private:
-		class ArgVector;
-		friend class Private;
+	// launch app
+			status_t			Launch(const char* mimeType,
+									BMessage* initialMessage = 0,
+									team_id* appTeam = 0) const;
+			status_t			Launch(const char* mimeType, BList* messageList,
+									team_id* appTeam = 0) const;
+			status_t			Launch(const char* mimeType, int argc,
+									char* *args, team_id* appTeam = 0) const;
+			status_t			Launch(const entry_ref* ref,
+									const BMessage* initialMessage = 0,
+									team_id* appTeam = 0) const;
+			status_t			Launch(const entry_ref* ref,
+									const BList* messageList,
+									team_id* appTeam = 0) const;
+			status_t			Launch(const entry_ref* ref, int argc,
+									const char* const* args,
+									team_id* appTeam = 0) const;
 
-		status_t _ShutDown(bool reboot, bool confirm, bool synchronous);
+	// recent documents, folders, apps
+			void				GetRecentDocuments(BMessage* refList,
+									int32 maxCount, const char* fileType = NULL,
+									const char* signature = NULL) const;
+			void				GetRecentDocuments(BMessage* refList,
+									int32 maxCount, const char* fileTypes[],
+									int32 fileTypesCount,
+									const char* signature = NULL) const;
 
-		status_t _AddApplication(const char *mimeSig, const entry_ref *ref,
-					uint32 flags, team_id team, thread_id thread,
-					port_id port, bool fullReg, uint32 *pToken,
-					team_id *otherTeam) const;
-		status_t _SetSignature(team_id team, const char *mimeSig) const;
-		void _SetThread(team_id team, thread_id thread) const;
-		status_t _SetThreadAndTeam(uint32 entryToken, thread_id thread,
-					team_id team) const;
-		status_t _CompleteRegistration(team_id team, thread_id thread,
-					port_id port) const;
-		bool _IsAppPreRegistered(const entry_ref *ref, team_id team,
-					app_info *info) const;
-		status_t _IsAppRegistered(const entry_ref *ref, team_id team,
-					uint32 token, bool *preRegistered, app_info *info) const;
-		status_t _RemovePreRegApp(uint32 entryToken) const;
-		status_t _RemoveApp(team_id team) const;
-		void _ApplicationCrashed(team_id team);
+			void				GetRecentFolders(BMessage* refList,
+									int32 maxCount,
+									const char* signature = NULL) const;
 
-		status_t _LaunchApp(const char *mimeType, const entry_ref *ref,
-					const BList *messageList, int argc,
-					const char *const *args,
-					team_id *appTeam) const;
-		status_t _UpdateActiveApp(team_id team) const;
-		void _SetAppFlags(team_id team, uint32 flags) const;
-		void _DumpRoster() const;
-		status_t _ResolveApp(const char *inType, entry_ref *ref, entry_ref *appRef,
-					char *appSig, uint32 *appFlags,
-					bool *wasDocument) const;
-		status_t _TranslateRef(entry_ref *ref, BMimeType *appMeta,
-					entry_ref *appRef, BFile *appFile,
-					bool *wasDocument) const;
-		status_t _TranslateType(const char *mimeType, BMimeType *appMeta,
-					entry_ref *appRef, BFile *appFile) const;
-		status_t _GetFileType(const entry_ref *file, BNodeInfo *nodeInfo,
-					char *mimeType) const;
-		status_t _SendToRunning(team_id team, int argc, const char *const *args,
-					const BList *messageList, const entry_ref *ref,
-					bool readyToRun) const;
-		void _InitMessenger();
-		static status_t _InitMimeMessenger(void* data);
-		BMessenger& _MimeMessenger();
-		void _AddToRecentApps(const char *appSig) const;
-		void _ClearRecentDocuments() const;
-		void _ClearRecentFolders() const;
-		void _ClearRecentApps() const;
-		void _LoadRecentLists(const char *filename) const;
-		void _SaveRecentLists(const char *filename) const;
+			void				GetRecentApps(BMessage* refList,
+									int32 maxCount) const;
 
-		BMessenger	fMessenger;
-		BMessenger	fMimeMessenger;
-		int32		fMimeMessengerInitOnce;
-		uint32		_reserved[2];
+			void				AddToRecentDocuments(const entry_ref* document,
+									const char* signature = NULL) const;
+			void				AddToRecentFolders(const entry_ref* folder,
+									const char* signature = NULL) const;
+
+	// private/reserved stuff starts here
+	class Private;
+
+private:
+	class ArgVector;
+	friend class Private;
+
+			status_t			_ShutDown(bool reboot, bool confirm,
+									bool synchronous);
+
+			status_t			_AddApplication(const char* signature,
+									const entry_ref* ref, uint32 flags,
+									team_id team, thread_id thread,
+									port_id port, bool fullRegistration,
+									uint32* pToken, team_id* otherTeam) const;
+
+			status_t			_SetSignature(team_id team,
+									const char* signature) const;
+
+			void				_SetThread(team_id team,
+									thread_id thread) const;
+
+			status_t			_SetThreadAndTeam(uint32 entryToken,
+									thread_id thread, team_id team) const;
+
+			status_t			_CompleteRegistration(team_id team,
+									thread_id thread, port_id port) const;
+
+			bool				_IsAppPreRegistered(const entry_ref* ref,
+									team_id team, app_info* info) const;
+
+			status_t			_IsAppRegistered(const entry_ref* ref,
+									team_id team, uint32 token,
+									bool* preRegistered, app_info* info) const;
+
+			status_t			_RemovePreRegApp(uint32 entryToken) const;
+			status_t			_RemoveApp(team_id team) const;
+
+			void				_ApplicationCrashed(team_id team);
+
+			status_t			_LaunchApp(const char* mimeType,
+									const entry_ref* ref,
+									const BList* messageList, int argc,
+									const char* const* args,
+									team_id* appTeam) const;
+
+			status_t			_UpdateActiveApp(team_id team) const;
+
+			void				_SetAppFlags(team_id team, uint32 flags) const;
+
+			void				_DumpRoster() const;
+
+			status_t			_ResolveApp(const char* inType, entry_ref* ref,
+									entry_ref* appRef,
+									char* signature,
+									uint32* appFlags,
+									bool* wasDocument) const;
+
+			status_t			_TranslateRef(entry_ref* ref,
+									BMimeType* appMeta, entry_ref* appRef,
+									BFile* appFile, bool* wasDocument) const;
+
+			status_t			_TranslateType(const char* mimeType,
+									BMimeType* appMeta, entry_ref* appRef,
+									BFile* appFile) const;
+
+			status_t			_GetFileType(const entry_ref* file,
+									BNodeInfo* nodeInfo, char* mimeType) const;
+			status_t			_SendToRunning(team_id team, int argc,
+									const char* const* args,
+									const BList* messageList,
+									const entry_ref* ref,
+									bool readyToRun) const;
+
+			void				_InitMessenger();
+
+	static	status_t			_InitMimeMessenger(void* data);
+
+			BMessenger&			_MimeMessenger();
+
+			void				_AddToRecentApps(const char* signature) const;
+
+			void				_ClearRecentDocuments() const;
+			void				_ClearRecentFolders() const;
+			void				_ClearRecentApps() const;
+			void				_LoadRecentLists(const char* filename) const;
+			void				_SaveRecentLists(const char* filename) const;
+
+			BMessenger			fMessenger;
+			BMessenger			fMimeMessenger;
+			int32				fMimeMessengerInitOnce;
+			uint32				_reserved[2];
 };
 
 // global BRoster instance
-extern const BRoster *be_roster;
+extern const BRoster* be_roster;
+
 
 #endif	// _ROSTER_H

@@ -1,0 +1,952 @@
+/*
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *
+ * Corresponds to:
+ *		headers/os/app/Roster.h	hrev47355
+ *		src/kits/app/Roster.cpp	hrev47355
+ */
+
+
+/*!
+	\file Roster.h
+	\ingroup app
+	\ingroup libbe
+	\brief Provides the app_info struct, the BRoster class and the
+	       \c be_roster global.
+*/
+
+
+/*!
+	\def B_SINGLE_LAUNCH
+	\brief Single launch.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_MULTIPLE_LAUNCH
+	\brief Multiple launch.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_EXCLUSIVE_LAUNCH
+	\brief Exclusive launch.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_LAUNCH_MASK
+	\brief Bitwise and this with app_info::flags to get at the flags above.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_BACKGROUND_APP
+	\brief Background app, won't appear in Deskbar.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def B_ARGV_ONLY
+	\brief The application can't receive messages, information must be
+	       passed at launch through argv, typically from the command line.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\def _B_APP_INFO_RESERVED1_
+	\brief Reserved for future use, do not use.
+*/
+
+
+/*!
+	\var B_REQUEST_LAUNCHED
+	\brief \c B_SOME_APP_LAUNCHED
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_REQUEST_QUIT
+	\brief \c B_SOME_APP_QUIT
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_REQUEST_ACTIVATED
+	\brief \c B_SOME_APP_ACTIVATED
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\struct app_info
+	\ingroup app
+	\ingroup libbe
+	\brief Provides info for a running app.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn app_info::app_info()
+	\brief Creates an uninitialized app_info.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn app_info::~app_info()
+	\brief Does nothing.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var app_info::thread
+	\brief The main thread id or -1 if the application isn't running.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var app_info::team
+	\brief The team id or -1 if the application isn't running.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var app_info::port
+	\brief The main thread port, or -1 if the application isn't running.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var app_info::flags
+	\brief Mask of flags that determine the behavior of the application.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var app_info::ref
+	\brief A file ref that was executed to run the application.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var app_info::signature[]
+	\brief The signature that uniquely identifies the application.
+*/
+
+
+/*!
+	\var be_roster
+	\brief Represents the default BRoster.
+*/
+
+
+/*!
+	\class BRoster
+	\ingroup app
+	\ingroup libbe
+	\brief The BRoster class lets you launch apps and keeps track of apps
+	       that are running.
+
+	Global be_roster represents the default BRoster.
+	app_info structure provides info for a running app.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BRoster::BRoster()
+	\brief Creates a new BRoster and sets up the connection to the roster
+	       service.
+
+	You should not need to call this, use the be_roster global instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BRoster::~BRoster()
+	\brief Does nothing.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\name Querying
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BRoster::IsRunning(const char* signature) const
+	\brief Returns whether or not an application with the supplied signature
+	       is currently running.
+
+	\param signature The app \a signature.
+
+	\return \c true, if the supplied \a signature is not \c NULL and an
+	        application with this \a signature is running, \c false otherwise.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BRoster::IsRunning(entry_ref* ref) const
+	\brief Returns whether or not an application ran from an executable
+	       referred to by the supplied entry_ref is currently running.
+
+	\param ref The app's entry_ref
+	\return \c true, if the supplied entry_ref is not \c NULL and an
+	        application executing this file is running, \c false otherwise.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn team_id BRoster::TeamFor(const char* signature) const
+	\brief Returns the team ID of a currently running application with the
+	       supplied \a signature.
+
+	\param signature The app \a signature.
+
+	\return The team ID of a running application with the supplied \a signature.
+	\retval B_BAD_VALUE \a signature is \c NULL.
+	\retval B_ERROR No application with the supplied \a signature is currently
+	        running.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn team_id BRoster::TeamFor(entry_ref* ref) const
+	\brief Returns the team ID of a currently running application executing
+	       the executable referred to by the supplied entry_ref.
+
+	\param ref The app's entry_ref
+
+	\return The team ID of a running application executing the file referred
+	        to by \a ref.
+	\retval B_BAD_VALUE \a ref is \c NULL.
+	\retval B_ERROR No application executing the file referred to by \a ref is
+	        currently running.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BRoster::GetAppList(BList* teamIDList) const
+	\brief Returns a list of all currently running applications.
+
+	The supplied list is not emptied before adding the team IDs of the
+	running applications. The list elements are team_id's, not pointers.
+
+	\param teamIDList A pointer to a pre-allocated BList to be filled with
+		   the team IDs.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BRoster::GetAppList(const char* signature,
+		BList* teamIDList) const
+	\brief Returns a list of all currently running applications with the
+	       specified \a signature.
+
+	The supplied list is not emptied before adding the team IDs of the
+	running applications. The list elements are team_id's, not pointers.
+	If \a sig is \c NULL or invalid, no team IDs are added to the list.
+
+	\param signature The application \a signature.
+	\param teamIDList A pointer to a pre-allocated BList to be filled with
+	       the team IDs.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::GetAppInfo(const char* signature,
+		app_info* info) const
+	\brief Returns the app_info of a currently running application with the
+	       supplied \a signature.
+
+	\param signature The application \a signature.
+	\param info A pointer to a pre-allocated app_info structure to be filled
+		   by this method.
+
+	\return A status code.
+	\retval B_OK: Everything went fine.
+	\retval B_BAD_VALUE \a sig is \c NULL.
+	\retval B_ERROR No application with the supplied signature is currently
+	        running.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::GetAppInfo(entry_ref* ref, app_info* info) const
+	\brief Returns the app_info of a currently running application executing
+	       the executable referred to by the supplied entry_ref.
+
+	\param ref The app's entry_ref
+	\param info A pointer to a pre-allocated app_info structure to be filled
+		   in by this method.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a ref is \c NULL.
+	\retval B_ERROR No application executing the file referred to by \a ref was
+	        currently running.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::GetRunningAppInfo(team_id team, app_info* info) const
+	\brief Returns the app_info of a currently running application identified
+		   by the supplied team ID.
+
+	\param team The app's team ID.
+	\param info A pointer to a pre-allocated app_info structure to be filled
+		   in by this method.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a info was \c NULL.
+	\retval B_BAD_TEAM_ID \a team did not identify a running application.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::GetActiveAppInfo(app_info* info) const
+	\brief Returns the app_info of a currently active application.
+
+	\param info A pointer to a pre-allocated app_info structure to be filled
+	       in by this method.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a info was \c NULL.
+	\retval B_ERROR No application was currently active.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::GetActiveAppInfo(app_info* info) const
+	\brief Returns the app_info of a currently active application.
+
+	\param info A pointer to a pre-allocated app_info structure to be filled
+		   in by this method.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a info was \c NULL.
+	\retval B_ERROR No application was currently active.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::FindApp(const char* mimeType, entry_ref* app) const
+	\brief Finds an application associated with a MIME type.
+
+	The method gets the signature of the supplied type's preferred application
+	and the signature of the super type's preferred application. It will also
+	get all supporting applications for the type and super type and build a
+	list of candiate handlers. In the case that a preferred handler is
+	configured for the sub-type, other supporting apps will be inserted in the
+	candidate list before the super-type preferred and supporting handlers,
+	since it is assumed that the super type handlers are not well suited for
+	the sub-type. The following resolving algorithm is performed on each
+	signature of the resulting list:
+	The MIME database is asked which executable is associated with the
+	signature. If the database doesn't have a reference to an exectuable, the
+	boot volume is queried for a file with the signature. If more than one file
+	has been found, the one with the greatest version is picked, or if no file
+	has a version info, the one with the most recent modification date. The
+	first application from the signature list which can be successfully
+	resolved by this algorithm is returned. Contrary to BeOS behavior, this
+	means that if the preferred application of the provided MIME type cannot
+	be resolved, or if it does not have a preferred application associated,
+	the method will return other applications with direct support for the MIME
+	type before it resorts to the preferred application or supporting
+	applications of the super type.
+
+	\param mimeType The MIME type for which an application shall be found.
+	\param app A pointer to a pre-allocated entry_ref to be filled with
+	       a reference to the found application's executable.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a mimeType or \a app.
+	\retval B_LAUNCH_FAILED_NO_PREFERRED_APP Neither with the supplied type nor
+	        with its supertype (if the supplied isn't a supertype itself) a
+	        preferred application is associated and no other supporting
+	        applications could be identified.
+	\retval B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type was not installed or
+	        its preferred application could not be found.
+	\retval B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's only supporting
+	        application was in the trash.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::FindApp(entry_ref* ref, entry_ref* app) const
+	\brief Finds an application associated with a file.
+
+	The method first checks, if the file has a preferred application
+	associated with it (see BNodeInfo::GetPreferredApp()) and if so,
+	tries to find the executable the same way FindApp(const char*, entry_ref*)
+	does. If not, it gets the MIME type of the file and searches an
+	application for it exactly like the first FindApp() method.
+
+	The type of the file is defined in a file attribute (BNodeInfo::GetType()),
+	but if it is not set yet, the method tries to guess it via
+	BMimeType::GuessMimeType().
+
+	As a special case the file may have execute permission. Then preferred
+	application and type are ignored and an entry_ref to the file itself is
+	returned.
+
+	\param ref An entry_ref referring to the file for which an application
+		   shall be found.
+	\param app A pointer to a pre-allocated entry_ref to be filled with
+		   a reference to the found application's executable.
+	\return
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a mimeType or \a app.
+	\retval B_LAUNCH_FAILED_NO_PREFERRED_APP Neither with the supplied type nor
+	        with its supertype (if the supplied isn't a supertype itself) a
+	        preferred application is associated.
+	\retval B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type was not installed or
+	        its preferred application could not be found.
+	\retval B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	        application was in the trash.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\name Launching, Activating, and Broadcasting
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BRoster::Broadcast(BMessage* message) const
+	\brief Sends a message to all running applications.
+
+	The methods doesn't broadcast the message itself, but it asks the roster
+	to do so. It immediatly returns after sending the request. The return
+	value only tells about whether the request has successfully been sent.
+
+	The message is sent asynchronously. Replies to it go to the application.
+	(\c be_app_messenger).
+
+	\param message The message to be broadcast.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a message.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::Broadcast(BMessage* message, BMessenger replyTo) const
+	\brief Sends a message to all running applications.
+
+	The methods doesn't broadcast the message itself, but it asks the roster
+	to do so. It immediatly returns after sending the request. The return
+	value only tells about whether the request has successfully been sent.
+
+	The message is sent asynchronously. Replies to it go to the specified
+	target (\a replyTo).
+
+	\param message The message to be broadcast.
+	\param replyTo Reply target for the message.
+
+	\return A status code.
+	\retval B_OK: Everything went fine.
+	\retval B_BAD_VALUE: \c NULL \a message.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BRoster::StartWatching(BMessenger target, uint32 eventMask) const
+	\brief Adds a new roster application monitor.
+
+	After StartWatching() event messages will be sent to the supplied target
+	according to the specified flags until a respective StopWatching() call.
+
+	\a eventMask must be a bitwise OR of one or more of the following flags:
+	- \c B_REQUEST_LAUNCHED: A \c B_SOME_APP_LAUNCHED is sent, whenever an
+	  application has been launched.
+	- \c B_REQUEST_QUIT: A \c B_SOME_APP_QUIT is sent, whenever an
+	  application has quit.
+	- \c B_REQUEST_ACTIVATED: A \c B_SOME_APP_ACTIVATED is sent, whenever an
+	  application has been activated.
+
+	All event messages contain the following fields supplying more information
+	about the concerned application:
+	- \c "be:signature", \c B_STRING_TYPE: The signature of the application.
+	- \c "be:team", \c B_INT32_TYPE: The team ID of the application
+	  (\c team_id).
+	- \c "be:thread", \c B_INT32_TYPE: The ID of the application's main thread
+	  (\c thread_id).
+	- \c "be:flags", \c B_INT32_TYPE: The application flags (\c uint32).
+	- \c "be:ref", \c B_REF_TYPE: An entry_ref referring to the application's
+	  executable.
+
+	A second call to StartWatching() with the same \a target simply sets
+	the new \a eventMask. The messages won't be sent twice to the target.
+
+	\param target The target the event messages shall be sent to.
+	\param eventMask Specifies the events the caller is interested in.
+
+	\return \c B_OK if everything went fine or an error code, if some error
+	        occurred.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BRoster::StopWatching(BMessenger target) const
+	\brief Removes a roster application monitor added with StartWatching().
+
+	\param target The target that shall not longer receive any event messages.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE No application monitor has been associated with the
+	        specified \a target before.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BRoster::ActivateApp(team_id team) const
+	\brief Activates the application identified by the supplied team ID.
+
+	\param team The app's team ID
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_TEAM_ID \a team does not identify a running application.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::Launch(const char* mimeType,
+		BMessage* initialMessage, team_id* appTeam) const
+	\brief Launches the application associated with the supplied MIME type.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	\a initialMessage is a message to be sent to the application "on launch",
+	i.e. before ReadyToRun() is invoked on the BApplication object. The
+	caller retains ownership of the supplied BMessage. In case the method
+	fails with \c B_ALREADY_RUNNING the message is delivered to the already
+	running instance.
+
+	\param mimeType MIME type for which the application shall be launched.
+	\param initialMessage Optional message to be sent to the application
+	       "on launch". May be \c NULL.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+	       the team ID of the launched application.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a mimeType
+	\retval B_LAUNCH_FAILED_NO_PREFERRED_APP Neither with the supplied type
+	        nor with its supertype (if the supplied isn't a supertype itself)
+	        a preferred application is associated.
+	\retval B_LAUNCH_FAILED_APP_NOT_FOUND The supplied type is not installed
+	        or its preferred application could not be found.
+	\retval B_LAUNCH_FAILED_APP_IN_TRASH The supplied type's preferred
+	        application was in the trash.
+	\retval B_LAUNCH_FAILED_EXECUTABLE The found application was not
+	        executable.
+	\retval B_ALREADY_RUNNING The application's app flags specify
+	\retval B_SINGLE_LAUNCH or \c B_EXCLUSIVE_LAUNCH and the application (the very
+	        same (single) or at least one with the same signature (exclusive)) is
+	        already running.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::Launch(const char* mimeType, BList* messageList,
+		team_id* appTeam) const
+	\brief Launches the application associated with the supplied MIME type.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	\a messageList contains messages to be sent to the application
+	"on launch", i.e. before ReadyToRun() is invoked on the BApplication
+	object. The caller retains ownership of the supplied BList and the
+	contained BMessages. In case the method fails with \c B_ALREADY_RUNNING
+	the messages are delivered to the already running instance.
+
+	\param mimeType MIME type for which the application shall be launched.
+	\param messageList Optional list of messages to be sent to the application
+	       "on launch". May be \c NULL.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+	       the team ID of the launched application.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a mimeType
+	\retval B_LAUNCH_FAILED_NO_PREFERRED_APP Neither with the supplied type
+	        nor with its supertype (if the supplied isn't a supertype itself)
+	        a preferred application is associated.
+	\retval B_LAUNCH_FAILED_APP_NOT_FOUND The supplied type is not installed
+	        or its preferred application could not be found.
+	\retval B_LAUNCH_FAILED_APP_IN_TRASH The supplied type's preferred
+	        application was in the trash.
+	\retval B_LAUNCH_FAILED_EXECUTABLE The found application was not
+	        executable.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::Launch(const char* mimeType, int argc, char** args,
+		team_id* appTeam) const
+	\brief Launches the application associated with the supplied MIME type.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	The supplied \a argc and \a args are (if containing at least one argument)
+	put into a \c B_ARGV_RECEIVED message and sent to the launched application
+	"on launch". The caller retains ownership of the supplied \a args.
+	In case the method fails with \c B_ALREADY_RUNNING the message is
+	delivered to the already running instance.
+
+	\param mimeType MIME type for which the application shall be launched.
+	\param argc Specifies the number of elements in \a args.
+	\param args An array of C-strings to be sent as B_ARGV_RECEIVED messaged
+		   to the launched application.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a mimeType
+	\retval B_LAUNCH_FAILED_NO_PREFERRED_APP Neither with the supplied type
+	        nor with its supertype (if the supplied isn't a supertype itself)
+	        a preferred application is associated.
+	\retval B_LAUNCH_FAILED_APP_NOT_FOUND The supplied type is not installed
+	        or its preferred application could not be found.
+	\retval B_LAUNCH_FAILED_APP_IN_TRASH The supplied type's preferred
+	        application was in the trash.
+	\retval B_LAUNCH_FAILED_EXECUTABLE The found application was not
+	        executable.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::Launch(const entry_ref* ref,
+		const BMessage* initialMessage, team_id* appTeam) const
+	\brief Launches the application associated with the entry referred to by
+		   the supplied entry_ref.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	If \a ref does refer to an application executable, that application is
+	launched. Otherwise the respective application is searched and launched,
+	and \a ref is sent to it in a \c B_REFS_RECEIVED message.
+
+	\a initialMessage is a message to be sent to the application "on launch",
+	i.e. before ReadyToRun() is invoked on the BApplication object. The
+	caller retains ownership of the supplied BMessage. In case the method
+	fails with \c B_ALREADY_RUNNING the message is delivered to the already
+	running instance. The same applies to the \c B_REFS_RECEIVED message.
+
+	\param ref entry_ref referring to the file for which an application shall
+		   be launched.
+	\param initialMessage Optional message to be sent to the application
+		   "on launch". May be \c NULL.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a mimeType
+	\retval B_LAUNCH_FAILED_NO_PREFERRED_APP Neither with the supplied type
+	        nor with its supertype (if the supplied isn't a supertype itself)
+	        a preferred application is associated.
+	\retval B_LAUNCH_FAILED_APP_NOT_FOUND The supplied type is not installed
+	        or its preferred application could not be found.
+	\retval B_LAUNCH_FAILED_APP_IN_TRASH The supplied type's preferred
+	        application was in the trash.
+	\retval B_LAUNCH_FAILED_EXECUTABLE The found application was not
+	        executable.
+	\retval B_ALREADY_RUNNING: The application's app flags specify
+	        \c B_SINGLE_LAUNCH or \c B_EXCLUSIVE_LAUNCH and the application
+	        (the very same (single) or at least one with the same signature
+	        (exclusive)) was already running.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::Launch(const entry_ref* ref, const BList* messageList,
+		team_id* appTeam) const
+	\brief Launches the application associated with the entry referred to by
+		   the supplied entry_ref.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	If \a ref does refer to an application executable, that application is
+	launched. Otherwise the respective application is searched and launched,
+	and \a ref is sent to it in a \c B_REFS_RECEIVED message.
+
+	\a messageList contains messages to be sent to the application
+	"on launch", i.e. before ReadyToRun() is invoked on the BApplication
+	object. The caller retains ownership of the supplied BList and the
+	contained BMessages. In case the method fails with \c B_ALREADY_RUNNING
+	the messages are delivered to the already running instance. The same
+	applies to the \c B_REFS_RECEIVED message.
+
+	\param ref entry_ref referring to the file for which an application shall
+		   be launched.
+	\param messageList Optional list of messages to be sent to the application
+		   "on launch". May be \c NULL.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a mimeType
+	\retval B_LAUNCH_FAILED_NO_PREFERRED_APP Neither with the supplied type
+	        nor with its supertype (if the supplied isn't a supertype itself)
+	        a preferred application is associated.
+	\retval B_LAUNCH_FAILED_APP_NOT_FOUND The supplied type is not installed
+	        or its preferred application could not be found.
+	\retval B_LAUNCH_FAILED_APP_IN_TRASH The supplied type's preferred
+	        application was in the trash.
+	\retval B_LAUNCH_FAILED_EXECUTABLE The found application was not
+	        executable.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BRoster::Launch(const entry_ref* ref, int argc,
+		const char* const* args, team_id* appTeam) const
+	\brief Launches the application associated with the entry referred to by
+		   the supplied entry_ref.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	If \a ref does refer to an application executable, that application is
+	launched. Otherwise the respective application is searched and launched,
+	and \a ref is sent to it in a \c B_REFS_RECEIVED message, unless other
+	arguments are passed via \a argc and \a args -- then the entry_ref is
+	converted into a path (C-string) and added to the argument vector.
+
+	The supplied \a argc and \a args are (if containing at least one argument)
+	put into a \c B_ARGV_RECEIVED message and sent to the launched application
+	"on launch". The caller retains ownership of the supplied \a args.
+	In case the method fails with \c B_ALREADY_RUNNING the message is
+	delivered to the already running instance. The same applies to the
+	\c B_REFS_RECEIVED message, if no arguments are supplied via \a argc and
+	\a args.
+
+	\param ref entry_ref referring to the file for which an application shall
+		   be launched.
+	\param argc Specifies the number of elements in \a args.
+	\param args An array of C-strings to be sent as B_ARGV_RECEIVED messaged
+		   to the launched application.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \c NULL \a mimeType
+	\retval B_LAUNCH_FAILED_NO_PREFERRED_APP Neither with the supplied type
+	        nor with its supertype (if the supplied isn't a supertype itself)
+	        a preferred application is associated.
+	\retval B_LAUNCH_FAILED_APP_NOT_FOUND The supplied type is not installed
+	        or its preferred application could not be found.
+	\retval B_LAUNCH_FAILED_APP_IN_TRASH The supplied type's preferred
+	        application was in the trash.
+	\retval B_LAUNCH_FAILED_EXECUTABLE The found application was not
+	        executable.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\name Recent Information
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BRoster::GetRecentDocuments(BMessage* refList, int32 maxCount,
+		const char* fileType, const char* signature) const
+	\brief Returns a list of the most recently used documents.
+
+	\param refList Filled out with information about recently used documents.
+	\param maxCount The maximum number of documents to get information on.
+	\param fileType Filter documents by MIME-type string.
+	\param signature Get info only on documents that were used by a
+	       specific application.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn void BRoster::GetRecentDocuments(BMessage* refList, int32 maxCount,
+		const char* fileTypes[], int32 fileTypesCount,
+		const char* signature) const
+	\brief Returns a list of the most recently used documents.
+
+	\param refList Filled out with information about recently used documents.
+	\param maxCount The maximum number of documents to get information on.
+	\param fileTypes Filter documents by and array of MIME-type string.
+	\param fileTypesCount The number of MIME-types in \a fileType.
+	\param signature Get info only on documents that were used by a
+	       specific application.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn void BRoster::GetRecentFolders(BMessage* refList, int32 maxCount,
+		const char* signature) const
+	\brief Returns a list of recently accessed folders.
+
+	\param refList Filled out with information about recently used folders.
+	\param maxCount The maximum number of folders to get information on.
+	\param signature Get info only on folders that were used by a
+	       specific application.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn void BRoster::GetRecentApps(BMessage* refList, int32 maxCount) const
+	\brief Returns a list of the most recently launched applications.
+
+	\param refList Filled out with information about recently used apps.
+	\param maxCount The maximum number of apps to get information on.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn void BRoster::AddToRecentDocuments(const entry_ref* document,
+		const char* signature) const
+	\brief Adds the \a document to the list of recent documents.
+
+	\param document The \a document to add.
+	\param signature To record that a specific application
+	       used the document.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn void BRoster::AddToRecentFolders(const entry_ref* folder,
+		const char* signature) const
+	\brief Adds \a folder to the list of recent folders.
+
+	\param folder The \a folder to add.
+	\param signature To record that a specific application
+	       used the folder.
+
+	\since BeOS R5
+*/
+
+
+//! @}
