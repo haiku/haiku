@@ -2,7 +2,15 @@
  * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2005-2007, François Revol, revol@free.fr.
  * Copyright 2009, Jonas Sundström, jonas@kirilla.com.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		François Revol, revol@free.fr
+ *		John Scipione, jscipione@gmail.com
+ *		Jonas Sundström, jonas@kirilla.com
  */
 
 /*! Launches an application/document from the shell */
@@ -20,8 +28,7 @@
 #include <String.h>
 #include <Url.h>
 
-
-const char *kTrackerSignature = "application/x-vnd.Be-TRAK";
+#include <tracker_private.h>
 
 
 status_t
