@@ -787,8 +787,7 @@ TTracker::OpenRef(const entry_ref* ref, const node_ref* nodeToClose,
 			CloseParentWaitingForChildSoon(ref, nodeToClose);
 	} else {
 		delete model;
-		// run Launch in a separate thread
-		// and close parent if successfull
+		// run Launch in a separate thread and close parent if successful
 		if (nodeToClose) {
 			Thread::Launch(new EntryAndNodeDoSoonWithMessageFunctor<TTracker,
 				bool (TTracker::*)(const entry_ref*, const node_ref*,
