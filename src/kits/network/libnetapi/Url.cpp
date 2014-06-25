@@ -154,6 +154,24 @@ BUrl::BUrl()
 }
 
 
+BUrl::BUrl(const BPath& path)
+	:
+	fUrlString(),
+	fProtocol(),
+	fUser(),
+	fPassword(),
+	fHost(),
+	fPort(0),
+	fPath(),
+	fRequest(),
+	fHasHost(false),
+	fHasFragment(false)
+{
+	SetUrlString(UrlEncode(path.Path(), true, true));
+	SetProtocol("file");
+}
+
+
 BUrl::~BUrl()
 {
 }

@@ -372,6 +372,7 @@ void
 BrowserApp::_RefsReceived(BMessage* message, int32* _pagesCreated,
 	bool* _fullscreen)
 {
+	puts("refs!");
 	int32 pagesCreated = 0;
 
 	BrowserWindow* window = NULL;
@@ -390,9 +391,9 @@ BrowserApp::_RefsReceived(BMessage* message, int32* _pagesCreated,
 		BPath path;
 		if (entry.GetPath(&path) != B_OK)
 			continue;
-		BString url;
-		url << path.Path();
-		window = _CreateNewPage(url, window, fullscreen, pagesCreated == 0);
+		BUrl url(path);
+		window = _CreateNewPage(url.UrlString(), window, fullscreen,
+			pagesCreated == 0);
 		pagesCreated++;
 	}
 

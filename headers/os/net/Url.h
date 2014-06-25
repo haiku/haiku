@@ -8,6 +8,7 @@
 
 #include <Archivable.h>
 #include <Message.h>
+#include <Path.h>
 #include <String.h>
 
 
@@ -17,6 +18,7 @@ public:
 								BUrl(BMessage* archive);
 								BUrl(const BUrl& other);
 								BUrl(const BUrl& base, const BString& relative);
+								BUrl(const BPath& path);
 								BUrl();
 	virtual						~BUrl();
 

@@ -68,6 +68,7 @@
 #include <StringView.h>
 #include <TextControl.h>
 #include <UnicodeChar.h>
+#include <Url.h>
 
 #include <map>
 #include <stdio.h>
@@ -967,7 +968,9 @@ BrowserWindow::MessageReceived(BMessage* message)
 			BPath path;
 			if (!entry.Exists() || entry.GetPath(&path) != B_OK)
 				break;
-			CurrentWebView()->LoadURL(path.Path());
+
+			BUrl url(path);
+			CurrentWebView()->LoadURL(url);
 			break;
 		}
 
