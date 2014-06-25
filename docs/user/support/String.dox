@@ -87,6 +87,9 @@
 	\warning In BeOS R5 passing in a negative \a maxLength argument will copy
 	         the entire \a string.
 
+	\param string The \a string data to initialize the BString to.
+	\param maxLength Maximum number of characters (bytes) to copy.
+
 	\since BeOS R5
 */
 
@@ -142,7 +145,7 @@
 	\fn int32 BString::CountChars() const
 	\brief Returns the length of the object measured in characters.
 
-	BString is aware of UTF8 characters, so this method will count
+	BString is somewhat aware of UTF-8 characters, so this method will count
 	the actual number of characters in the string.
 
 	\return An integer which is the number of characters in the string.
@@ -157,7 +160,7 @@
 	\fn int32 BString::CountBytes(int32 fromCharOffset, int32 charCount) const
 	\brief Count the number of bytes starting from a specified character
 
-	BString is somewhat aware of UTF8 characters, which can take up more than
+	BString is somewhat aware of UTF-8 characters, which can take up more than
 	one byte. With this method you can count the number of bytes a subset of
 	the string contains.
 
@@ -228,9 +231,9 @@
 
 /*!
 	\fn BString& BString::operator=(const BString& string)
-	\brief Re-initialize the object to a copy  of the data of a BString.
+	\brief Re-initialize the object to a copy of the data of a BString.
 
-	\param string The string object to copy.
+	\param string The \a string to copy.
 
 	\return The function always returns \c *this.
 
@@ -243,7 +246,11 @@
 
 /*!
 	\fn BString& BString::operator=(const char* str)
-	\brief Re-initialize the object to a copy of the data of a string.
+	\brief Re-initialize the BString to a copy of the data of a string.
+
+	\param str The string data to re-initialize the BString to.
+
+	\return This method always returns \c *this.
 
 	\sa SetTo(const char*, int32)
 
@@ -253,9 +260,11 @@
 
 /*!
 	\fn BString& BString::operator=(char c)
-	\brief Re-initialize the object to a character.
+	\brief Re-initialize the BString to a character.
 
-	\param c The character which you want to initialize the string to.
+	\param c The \c char to re-initialize the BString to.
+
+	\return This method always returns \c *this.
 
 	\since BeOS R5
 */
@@ -263,9 +272,13 @@
 
 /*!
 	\fn BString& BString::SetTo(const char* str)
-	\brief Re-initialize the object to a copy of the data of a string.
+	\brief Re-initialize the BString to a copy of the data of a string.
 
 	This method calls operator=(const char*).
+
+	\param str The string data to re-initialize the BString to.
+
+	\return This method always returns \c *this.
 
 	\sa SetTo(const char*, int32)
 
@@ -275,10 +288,12 @@
 
 /*!
 	\fn BString& BString::SetTo(const char* str, int32 maxLength)
-	\brief Re-initialize the object to a copy of the data of a string.
+	\brief Re-initialize the BString to a copy of the data of a string.
 
-	\param str The string to copy.
-	\param maxLength Amount of characters to copy from the string.
+	\param str The string data to re-initialize the BString to.
+	\param maxLength Maximum number of characters (bytes) to copy.
+
+	\return This method always returns \c *this.
 
 	\sa operator=(const char*)
 
@@ -288,9 +303,9 @@
 
 /*!
 	\fn BString& BString::SetTo(const BString& from)
-	\brief Re-initialize the object to a copy of the data of a BString.
+	\brief Re-initialize the BString to a copy of the data of a BString.
 
-	\param from The string object to copy.
+	\param from The string data to re-initialize the BString to.
 
 	\return The function always returns \c *this.
 
@@ -302,31 +317,11 @@
 
 
 /*!
-	\fn BString& BString::Adopt(BString& from)
-	\brief Adopt the data of the given BString object.
-
-	This method adopts the data from a BString.
-
-	\note The object that is adopted from is not deleted, only its private
-	data is initialized to a \c NULL string. So if the from object was
-	created on the heap, you need to clean it up yourself.
-
-	\param from The string object to adopt.
-
-	\return The function always returns \c *this.
-
-	\sa operator=(const BString&)
-
-	\since BeOS R5
-*/
-
-
-/*!
 	\fn BString& BString::SetTo(const BString& string, int32 maxLength)
 	\brief Re-initialize the string to a copy of the given BString object.
 
-	\param string The BString object to copy.
-	\param maxLength Amount of characters to copy from the original BString.
+	\param string The string data to re-initialize the BString to.
+	\param maxLength Maximum number of characters (bytes) to copy.
 
 	\return The function always returns \c *this.
 
@@ -338,12 +333,36 @@
 
 
 /*!
+	\fn BString& BString::Adopt(BString& from)
+	\brief Adopt the data of the given BString object.
+
+	This method adopts the data from a BString removing the data from \a from
+	and putting it into the BString.
+
+	\warning The object that is adopted from is not deleted, only its private
+	         data is initialized to a \c NULL string. If the \a from object
+	         was created on the heap you need to clean it up yourself.
+
+	\param from The string data to adopt.
+
+	\return The function always returns \c *this.
+
+	\sa operator=(const BString&)
+
+	\since BeOS R5
+*/
+
+
+/*!
 	\fn BString& BString::Adopt(BString& from, int32 maxLength)
 	\brief Adopt the data of the given BString object up to \a maxLength
 	       characters.
 
+	This method adopts the data from a BString removing the data from \a from
+	and putting it into the BString.
+
 	\param from The string object to adopt.
-	\param maxLength Number of characters to adopt from the original BString.
+	\param maxLength Maximum number of characters (bytes) to adopt.
 
 	\return The function always returns \c *this.
 
@@ -415,7 +434,7 @@
 
 /*!
 	\fn BString& BString::SetToFormat(const char* format, ...)
-	\brief Sets the string to a formatted string ala sprintf().
+	\brief Sets the string to a formatted string ala <tt>sprintf()</tt>.
 
 	\param format The \a format string to use.
 	\param ... The rest of the parameters that are filled into \a format.
@@ -538,7 +557,7 @@
 
 /*!
 	\fn BString& BString::operator+=(const BString& string)
-	\brief Append the given string to the object
+	\brief Append the given \a string to the end of the BString
 
 	\param string The string to append.
 
@@ -552,7 +571,7 @@
 
 /*!
 	\fn BString& BString::operator+=(const char* str)
-	\brief Append the given string to the object.
+	\brief Append the given string to the end of the BString.
 
 	\param str A pointer to the NULL-terminated string to append.
 
@@ -566,7 +585,7 @@
 
 /*!
 	\fn BString& BString::operator+=(char c)
-	\brief Append the given character to the object.
+	\brief Append the given character to the end of the BString.
 
 	\param c The character to append.
 
@@ -578,7 +597,7 @@
 
 /*!
 	\fn BString& BString::operator+=(const BString& string)
-	\brief Append the given string to the object.
+	\brief Append the given \a string to the end of the BString.
 
 	\param string The string to append.
 
@@ -589,8 +608,8 @@
 
 
 /*!
-	\fn BString& BString::Append(const BString&)
-	\brief Append the given string to the object.
+	\fn BString& BString::Append(const BString& string)
+	\brief Append the given \a string to the end of the BString.
 
 	\param string The string to append.
 
@@ -604,7 +623,7 @@
 
 /*!
 	\fn BString& BString::Append(const char* str)
-	\brief Append the given string to the object.
+	\brief Append the string data to the end of the BString.
 
 	This method calls operator+=(const char *str).
 
@@ -616,10 +635,10 @@
 
 /*!
 	\fn BString& BString::Append(const BString& string, int32 length)
-	\brief Append a part of the given BString to the object.
+	\brief Append a part of the given \a string to the end of the BString.
 
 	\param string The BString to append.
-	\param length The maximum number of bytes to get from the original.
+	\param length The maximum number of bytes to append.
 
 	\return This method always returns \c *this.
 
@@ -631,7 +650,7 @@
 
 /*!
 	\fn BString& BString::Append(const char* str, int32 length)
-	\brief Append a part of the given string to the BString.
+	\brief Append a part of the given string to end of the BString.
 
 	\param str A pointer to the string to append.
 	\param length The maximum number of bytes to append.
@@ -646,7 +665,7 @@
 
 /*!
 	\fn BString& BString::Append(char c, int32 count)
-	\brief Append the given character repeatedly to the object.
+	\brief Append the given character repeatedly to the end of the BString.
 
 	\param c The character to append.
 	\param count The number of times this character should be appended.
@@ -702,9 +721,9 @@
 
 /*!
 	\fn BString& BString::Prepend(const char* str)
-	\brief Prepend the given string to the BString.
+	\brief Prepend the given string to the beginning of the BString.
 
-	\param str A pointer to the string to prepend.
+	\param str The \a string to prepend.
 
 	\return This method always returns \c *this.
 
@@ -716,9 +735,9 @@
 
 /*!
 	\fn BString& BString::Prepend(const BString& string)
-	\brief Prepend the given BString to the object.
+	\brief Prepend the given BString to the beginning of the BString.
 
-	\param string The BString object to prepend.
+	\param string The \a string to prepend.
 
 	\return This method always returns \c *this.
 
@@ -730,7 +749,7 @@
 
 /*!
 	\fn BString& BString::Prepend(const char* str, int32 length)
-	\brief Prepend the given string to the BString.
+	\brief Prepend the given string to the beginning of the BString.
 
 	\param str The \a string to prepend.
 	\param length The maximum number of bytes to prepend.
@@ -745,7 +764,7 @@
 
 /*!
 	\fn BString& BString::Prepend(const BString& string, int32 length)
-	\brief Prepend the given BString to the object.
+	\brief Prepend the given BString to  the beginning of the BString.
 
 	\param string The \a string to prepend.
 	\param length The maximum number of bytes to prepend.
@@ -760,7 +779,8 @@
 
 /*!
 	\fn BString& BString::Prepend(char c, int32 count)
-	\brief Prepend the given character \a count times to the BString.
+	\brief Prepend the given character \a count times to the beginning of the
+	       BString.
 
 	\param c The character to prepend.
 	\param count The number of times this character should be prepended.
@@ -814,7 +834,7 @@
 
 /*!
 	\fn BString& BString::Insert(const char* string, int32 position)
-	\brief Insert the given string at the given position into the object's
+	\brief Inserts the given string at the given position into the BString
 	       data.
 
 	\param string The \a string to insert.
@@ -833,11 +853,11 @@
 /*!
 	\fn BString& BString::Insert(const char* string, int32 length,
 		int32 position)
-	\brief Inserts the given string at the given position into the object's
+	\brief Inserts the given string at the given position into the BString
 	       data.
 
-	\param string A pointer to the string to insert.
-	\param length The amount of bytes to insert.
+	\param string The \a string to insert.
+	\param length The number of bytes to insert.
 	\param position The offset in bytes into the data of the BString where to
 	       insert the string.
 
@@ -853,12 +873,12 @@
 /*!
 	\fn BString& BString::Insert(const char* string, int32 fromOffset,
 		int32 length, int32 position)
-	\brief Insert the given string at the given position into the object's
+	\brief Inserts the given string at the given position into the BString
 	       data.
 
-	\param string A pointer to the string to insert.
-	\param fromOffset The offset in the string that is to be inserted
-	\param length The amount of bytes to insert.
+	\param string The \a string to insert.
+	\param fromOffset The offset in bytes in the \a string to be inserted.
+	\param length The number of bytes to insert.
 	\param position The offset in bytes into the data of the BString where to
 	       insert the string.
 
@@ -873,10 +893,10 @@
 
 /*!
 	\fn BString& BString::Insert(const BString& string, int32 position)
-	\brief Insert the given BString at the given position into the object's	
+	\brief Inserts the given BString at the given position into the BString
 	       data.
 
-	\param string The BString object to insert.
+	\param string The \a string to insert.
 	\param position The offset in bytes into the data of the BString where to
 	       insert the string.
 
@@ -891,11 +911,11 @@
 
 /*!
 	\fn BString& BString::Insert(const BString& string, int32 length, int32 position)
-	\brief Insert the given BString at the given position into the object's
+	\brief Inserts the given BString at the given position into the BString
 	       data.
 
-	\param string The BString object to insert.
-	\param length The amount of bytes to insert.
+	\param string The \a string to insert.
+	\param length The number of bytes to insert.
 	\param position The offset in bytes into the data of the BString where to
 	       insert the string.
 
@@ -911,10 +931,10 @@
 /*!
 	\fn BString& BString::Insert(const BString& string, int32 fromOffset,
 		int32 length, int32 position)
-	\brief Insert the given string at the given position into the object's
+	\brief Inserts the given string at the given position into the BString
 	       data.
 
-	\param string The BString object to insert.
+	\param string The \a string to insert.
 	\param fromOffset The offset in bytes of the string to be inserted.
 	\param length The amount of bytes to insert.
 	\param position The offset in bytes into the data of the BString where to
@@ -931,8 +951,8 @@
 
 /*!
 	\fn BString& BString::Insert(char c, int32 count, int32 pos)
-	\brief Insert the given character repeatedly at the given position
-	       into the object's data.
+	\brief Inserts the given character repeatedly at the given position
+	       into the BString data.
 
 	\param c The character to insert.
 	\param count The number of times to insert the character.
@@ -1036,7 +1056,7 @@
 /*!
 	\fn BString& BString::InsertChars(const BString& string, int32 fromCharOffset,
 		int32 charCount, int32 charPosition)
-	\brief UTF-8 aware version of Insert(const BString&, int32, int32, int32)
+	\brief UTF-8 aware version of Insert(const BString&, int32, int32, int32).
 
 	\param string The \a string to insert.
 	\param fromCharOffset The offset in UTF-8 characters of the string to be
@@ -1068,7 +1088,7 @@
 	\fn BString& BString::Trim()
 	\brief Removes spaces from the beginning and end of the string.
 
-	The definition of a space is set by the isspace() function.
+	The definition of a space is set by the <tt>isspace()</tt> function.
 
 	\return This method always returns \c *this.
 
@@ -2431,11 +2451,11 @@
 
 	Make sure you call UnlockBuffer() when you're done with the manipulation.
 
-	\param maxLength The size of the buffer. If you don't want a bigger
-	       buffer, passing anything under the length of the string will simply
-	       return it as is.
+	\param maxLength The size of the buffer in bytes. If you don't want a
+	       bigger buffer, passing anything under the length of the string will
+	       simply return it as is.
 
-	\return A pointer to the buffer you may manipulate.
+	\return A pointer to the buffer to manipulate.
 
 	\sa UnlockBuffer()
 
@@ -2447,9 +2467,9 @@
 	\fn BString& BString::UnlockBuffer(int32 length)
 	\brief Unlocks the buffer after you are done with low-level manipulation.
 
-	\param length The length to trim the string to in order to keep the
-	       internal buffer sane. If you don't pass a value in it, \c strlen()
-	       will be used to determine the length.
+	\param length The length in bytes to trim the string to in order to keep
+	       the internal buffer sane. If you don't pass a value in it,
+	       <tt>strlen()</tt> will be used to determine the length.
 
 	\return This method always returns \c *this.
 
@@ -2470,7 +2490,7 @@
 
 /*!
 	\fn BString& BString::ToLower()
-	\brief Convert the BString to lowercase.
+	\brief Convert each of the characters in the BString to lowercase.
 
 	\return This method always returns \c *this.
 
@@ -2480,7 +2500,7 @@
 
 /*!
 	\fn BString& BString::ToUpper()
-	\brief Convert the BString to uppercase.
+	\brief Convert each of the characters in the BString to uppercase.
 
 	\return This method always returns \c *this.
 
@@ -2490,7 +2510,7 @@
 
 /*!
 	\fn BString& BString::Capitalize()
-	\brief Convert the first character to uppercase, rest to lowercase
+	\brief Convert the first character to uppercase, and the rest to lowercase.
 
 	\return This method always returns \c *this.
 
@@ -2500,7 +2520,7 @@
 
 /*!
 	\fn BString& BString::CapitalizeEachWord()
-	\brief Convert the first character of every word to uppercase, rest
+	\brief Convert the first character of every word to uppercase, and the rest
 	       to lowercase.
 
 	Converts the first character of every "word" (series of alphabetical
@@ -2536,7 +2556,7 @@
 	\brief Escape selected characters on a given string.
 
 	This version sets itself to the string supplied in the \c original
-	paramater, and then escapes the selected characters with a supplied
+	parameter, and then escapes the selected characters with a supplied
 	character.
 
 	\param original The string to be escaped.
@@ -2603,9 +2623,9 @@
 
 
 /*!
-	\name sprintf() Replacement Methods
+	\name <tt>sprintf()</tt> Replacement Methods
 
-	These methods may be slower than \c sprintf(), but they are overflow safe.
+	These methods may be slower than <tt>sprintf()</tt>, but they are overflow safe.
 */
 
 
@@ -2628,6 +2648,8 @@
 	\fn BString& BString::operator<<(const BString& string)
 	\brief Append \a string to the BString.
 
+	\param string The \a string to append.
+
 	\return This method always returns \c *this.
 */
 
@@ -2635,6 +2657,8 @@
 /*!
 	\fn BString& BString::operator<<(char c)
 	\brief Append \a c to the BString.
+
+	\param c The character to append.
 
 	\return This method always returns \c *this.
 
@@ -2646,8 +2670,10 @@
 	\fn BString& BString::operator<<(bool value)
 	\brief Convert the \c bool \c value to a string and append it.
 
-	In case the \a value is true, the string \c true is appended to the string.
-	Otherwise, the string \c false is appended.
+	In case the \a value is true, the string "true" is appended to the string.
+	Otherwise, the string "false" is appended.
+
+	\param value The boolean \c value ("true" of "false") to append.
 
 	\return This method always returns \c *this.
 
@@ -2659,6 +2685,8 @@
 	\fn BString& BString::operator<<(int value)
 	\brief Convert the \c int \a value to a string and append it.
 
+	\param value The \c int \a value to append.
+
 	\return This method always returns \c *this.
 
 	\since BeOS R5
@@ -2668,6 +2696,8 @@
 /*!
 	\fn BString& BString::operator<<(unsigned int value)
 	\brief Convert the <tt>unsigned int</tt> \a value to a string and append it.
+
+	\param value The <tt>unsigned int</tt> \a value to append.
 
 	\return This method always returns \c *this.
 
@@ -2679,6 +2709,8 @@
 	\fn BString& BString::operator<<(unsigned long value)
 	\brief Convert the <tt>unsigned long</tt> \a value to a string and append it.
 
+	\param value The <tt>unsigned long</tt> \a value to append.
+
 	\return This method always returns \c *this.
 
 	\since BeOS R5
@@ -2688,6 +2720,8 @@
 /*!
 	\fn BString& BString::operator<<(long value)
 	\brief Convert the \c long \a value to a string and append it.
+
+	\param value The \c long \a value to append.
 
 	\return This method always returns \c *this.
 
@@ -2700,6 +2734,8 @@
 	\brief Convert the <tt>unsigned long long</tt> \a value to a string and
 	       append it.
 
+	\param value The <tt>unsigned long long</tt> \a value to append.
+
 	\return This method always returns \c *this.
 
 	\since BeOS R5
@@ -2709,6 +2745,8 @@
 /*!
 	\fn BString& BString::operator<<(long long value)
 	\brief Convert the <tt>long long</tt> \a value to a string and append it.
+
+	\param value The <tt>long long</tt> \a value to append.
 
 	\return This method always returns \c *this.
 
@@ -2720,7 +2758,9 @@
 	\fn BString& BString::operator<<(float value)
 	\brief Convert the \c float \a value to a string and append it.
 
-	Using this operator will append in the <tt>%.2f</tt> style formatting.
+	Using this operator will append using <tt>%.2f</tt> formatting.
+
+	\param value The \c float \a value to append.
 
 	\return This method always returns \c *this.
 
@@ -2732,7 +2772,9 @@
 	\fn BString& BString::operator<<(double value)
 	\brief Convert the \c double \a value to a string and append it.
 
-	Using this operator will append in the \c %.2f style formatting.
+	Using this operator will append using <tt>%.2f</tt> formatting.
+
+	\param value The \c double \a value to append.
 
 	\return This method always returns \c *this.
 
