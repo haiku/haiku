@@ -372,7 +372,6 @@ void
 BrowserApp::_RefsReceived(BMessage* message, int32* _pagesCreated,
 	bool* _fullscreen)
 {
-	puts("refs!");
 	int32 pagesCreated = 0;
 
 	BrowserWindow* window = NULL;

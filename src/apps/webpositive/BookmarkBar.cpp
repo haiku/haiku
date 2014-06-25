@@ -79,15 +79,15 @@ BookmarkBar::MessageReceived(BMessage* message)
 				}
 				case B_ENTRY_MOVED:
 				{
+					entry_ref ref;
+					const char *name;
+
+					message->FindInt32("device", &ref.device);
+					message->FindInt64("to directory", &ref.directory);
+					message->FindString("name", &name);
+					ref.set_name(name);
+
 					if (fItemsMap[inode] == NULL) {
-						entry_ref ref;
-						const char *name;
-
-						message->FindInt32("device", &ref.device);
-						message->FindInt64("to directory", &ref.directory);
-						message->FindString("name", &name);
-						ref.set_name(name);
-
 						BEntry entry(&ref);
 						_AddItem(inode, &entry);
 						break;
@@ -101,6 +101,12 @@ BookmarkBar::MessageReceived(BMessage* message)
 							const char *name;
 							if (message->FindString("name", &name) == B_OK)
 								fItemsMap[inode]->SetLabel(name);
+
+							BMessage* itemMessage = new BMessage(
+								B_REFS_RECEIVED);
+							itemMessage->AddRef("refs", &ref);
+							fItemsMap[inode]->SetMessage(itemMessage);
+
 							break;
 						}
 					}
