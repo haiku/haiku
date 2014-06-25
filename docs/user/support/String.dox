@@ -663,7 +663,7 @@
 	\fn BString& BString::AppendChars(const BString& string, int32 charCount)
 	\brief UTF-8 aware version of Append(const BString&, int32).
 
-	\param string The \a string to append to.
+	\param string The \a string to append.
 	\param charCount The maximum number of UTF-8 characters to append.
 
 	\return This method always returns \c *this.
@@ -678,7 +678,7 @@
 	\fn BString& BString::AppendChars(const char* string, int32 charCount)
 	\brief UTF-8 aware version of Append(const char*, int32).
 
-	\param string The \a string to append to.
+	\param string The \a string to append.
 	\param charCount The maximum number of UTF-8 characters to append.
 
 	\return This method always returns \c *this.
