@@ -4,12 +4,10 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
-	buildbot_slave-0.8.8-1
 	ca_root_certificates-2012_12_29-1
 	openttd_gfx-0.4.7-1
 	openttd_msx-0.3.1-1
 	openttd_sfx-0.2.3-1
-	python_zope.interface-4.1.1-1
 	texi2html-1.82-2
 	timgmsoundfont-2004_01_24-3
 	wqy_microhei-0.2.0~beta-3
@@ -30,6 +28,7 @@ RemotePackageRepository HaikuPorts
 #	bezillabrowser-2.0.0.22pre_2010_05_02-1
 	binutils-2.17_2013_04_21-2
 	bison-2.4.3-6
+	buildbot_slave-0.8.8-2
 	bzip2-1.0.6-3
 	caya-2013.07.31-3
 	cdrtools-3.01~a18-1
@@ -171,6 +170,7 @@ RemotePackageRepository HaikuPorts
 	pkgconfig-0.27.1-1
 	python-2.6.8-6
 	python_twisted-13.2.0-1
+	python_zope.interface-4.1.1-2
 	qrencode-3.3.0-1
 	qrencode_devel-3.3.0-1
 	readline-6.3-2
