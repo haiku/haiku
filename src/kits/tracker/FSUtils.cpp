@@ -2550,7 +2550,7 @@ FSGetDeskDir(BDirectory* deskDir, dev_t)
 	// than /boot, redirect to FSGetDeskDir ignoring the volume argument
 	return FSGetDeskDir(deskDir);
 }
-#endif
+#endif // __GNUC__ && __GNUC__ < 3
 
 
 status_t
@@ -2590,12 +2590,12 @@ FSGetDeskDir(BDirectory* deskDir)
 status_t
 FSGetBootDeskDir(BDirectory* deskDir)
 {
-	BVolume	bootVol;
-	BVolumeRoster().GetBootVolume(&bootVol);
+	BVolume bootVolume;
+	BVolumeRoster().GetBootVolume(&bootVolume);
 	BPath path;
 
 	status_t result = find_directory(B_DESKTOP_DIRECTORY, &path, true,
-		&bootVol);
+		&bootVolume);
 	if (result != B_OK)
 		return result;
 
@@ -2746,7 +2746,7 @@ DirectoryMatches(const BEntry* entry, const char* additionalPath,
 extern status_t
 FSFindTrackerSettingsDir(BPath* path, bool autoCreate)
 {
-	status_t result = find_directory (B_USER_SETTINGS_DIRECTORY, path,
+	status_t result = find_directory(B_USER_SETTINGS_DIRECTORY, path,
 		autoCreate);
 	if (result != B_OK)
 		return result;
@@ -3261,6 +3261,7 @@ AsynchLaunchBinder(void (*func)(const entry_ref*, const BMessage*, bool on),
 	gLaunchLooper->PostMessage(task);
 }
 
+
 static bool
 SniffIfGeneric(const entry_ref* ref)
 {
@@ -3283,6 +3284,7 @@ SniffIfGeneric(const entry_ref* ref)
 	return true;
 }
 
+
 static void
 SniffIfGeneric(const BMessage* refs)
 {
@@ -3293,6 +3295,7 @@ SniffIfGeneric(const BMessage* refs)
 		SniffIfGeneric(&ref);
 	}
 }
+
 
 static void
 _TrackerLaunchAppWithDocuments(const entry_ref* appRef, const BMessage* refs,

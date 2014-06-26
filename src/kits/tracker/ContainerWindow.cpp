@@ -659,8 +659,9 @@ BContainerWindow::Quit()
 	// get rid of context menus
 	if (fNavigationItem) {
 		BMenu* menu = fNavigationItem->Menu();
-		if (menu)
+		if (menu != NULL)
 			menu->RemoveItem(fNavigationItem);
+
 		delete fNavigationItem;
 		fNavigationItem = NULL;
 	}
@@ -692,12 +693,16 @@ BContainerWindow::Quit()
 
 	delete fFileContextMenu;
 	fFileContextMenu = NULL;
+
 	delete fWindowContextMenu;
 	fWindowContextMenu = NULL;
+
 	delete fDropContextMenu;
 	fDropContextMenu = NULL;
+
 	delete fVolumeContextMenu;
 	fVolumeContextMenu = NULL;
+
 	delete fDragContextMenu;
 	fDragContextMenu = NULL;
 
@@ -705,7 +710,7 @@ BContainerWindow::Quit()
 
 	// This is a deadlock code sequence - need to change this
 	// to acquire the window list while this container window is unlocked
-	if (fWindowList) {
+	if (fWindowList != NULL) {
 		AutoLock<LockingList<BWindow> > lock(fWindowList);
 		if (lock.IsLocked()) {
 			fWindowList->RemoveItem(this);
@@ -716,7 +721,7 @@ BContainerWindow::Quit()
 	if (StateNeedsSaving())
 		SaveState();
 
-	if (fWindowList && windowCount == 0)
+	if (fWindowList != NULL && windowCount == 0)
 		be_app->PostMessage(B_QUIT_REQUESTED);
 
 	_inherited::Quit();
@@ -3708,12 +3713,13 @@ BContainerWindow::DelayedTaskLoop()
 bool
 BContainerWindow::NeedsDefaultStateSetup()
 {
-	if (!TargetModel())
+	if (TargetModel() == NULL)
 		return false;
 
-	if (TargetModel()->IsRoot())
+	if (TargetModel()->IsRoot()) {
 		// don't try to set up anything if we are root
 		return false;
+	}
 
 	WindowStateNodeOpener opener(this, false);
 	if (opener.StreamNode() == NULL) {
@@ -3729,7 +3735,7 @@ bool
 BContainerWindow::DefaultStateSourceNode(const char* name, BNode* result,
 	bool createNew, bool createFolder)
 {
-//	PRINT(("looking for default state in tracker settings dir\n"));
+	//PRINT(("looking for default state in tracker settings dir\n"));
 	BPath settingsPath;
 	if (FSFindTrackerSettingsDir(&settingsPath) != B_OK)
 		return false;
@@ -3772,7 +3778,7 @@ BContainerWindow::DefaultStateSourceNode(const char* name, BNode* result,
 		}
 	}
 
-// 	PRINT(("using default state from %s\n", path.Path()));
+	//PRINT(("using default state from %s\n", path.Path()));
 	result->SetTo(path.Path());
 	return result->InitCheck() == B_OK;
 }
@@ -3786,7 +3792,7 @@ BContainerWindow::SetUpDefaultState()
 	bool gotDefaultingNode = 0;
 	bool shouldStagger = false;
 
-	ASSERT(TargetModel());
+	ASSERT(TargetModel() != NULL);
 
 	PRINT(("folder %s does not have any saved state\n", TargetModel()->Name()));
 
@@ -3796,15 +3802,15 @@ BContainerWindow::SetUpDefaultState()
 		return;
 
 	if (!TargetModel()->IsRoot()) {
-		BDirectory desktop;
-		FSGetDeskDir(&desktop);
+		BDirectory deskDir;
+		FSGetDeskDir(&deskDir);
 
 		// try copying state from our parent directory, unless it is the
 		// desktop folder
 		BEntry entry(TargetModel()->EntryRef());
 		BNode parent;
 		if (FSGetParentVirtualDirectoryAware(entry, parent) == B_OK
-			&& parent != desktop) {
+			&& parent != deskDir) {
 			PRINT(("looking at parent for state\n"));
 			if (NodeHasSavedState(&parent)) {
 				PRINT(("got state from parent\n"));
@@ -3823,8 +3829,10 @@ BContainerWindow::SetUpDefaultState()
 		// changes that didn't get committed if home is still open in
 		// a window, that's probably not a problem; would be OK if state
 		// got committed after every change
-		&& !DefaultStateSourceNode(kDefaultFolderTemplate, &defaultingNode, true))
+		&& !DefaultStateSourceNode(kDefaultFolderTemplate, &defaultingNode,
+			true)) {
 		return;
+	}
 
 	// copy over the attributes
 
@@ -3863,7 +3871,7 @@ void
 BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 {
 	if (node == NULL || dynamic_cast<BDeskWindow*>(this) != NULL) {
-		// don't restore any window state if we are a desktop window
+		// don't restore any window state if we are the Desktop
 		return;
 	}
 
@@ -3888,12 +3896,12 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 	fPreviousBounds = Bounds();
 
 	uint32 workspace;
-	if ((fContainerWindowFlags & kRestoreWorkspace)
+	if (((fContainerWindowFlags & kRestoreWorkspace) != 0)
 		&& node->Read(workspaceAttributeName, 0, B_INT32_TYPE, sizeof(uint32),
 			&workspace) == sizeof(uint32))
 		SetWorkspaces(workspace);
 
-	if (fContainerWindowFlags & kIsHidden)
+	if ((fContainerWindowFlags & kIsHidden) != 0)
 		Minimize(true);
 
 #ifdef __HAIKU__
@@ -3901,7 +3909,7 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 	int32 size = node->Contains(kAttrWindowDecor, B_RAW_TYPE);
 	if (size > 0) {
 		char buffer[size];
-		if ((fContainerWindowFlags & kRestoreDecor)
+		if (((fContainerWindowFlags & kRestoreDecor) != 0)
 			&& node->Read(kAttrWindowDecor, 0, B_RAW_TYPE, size, buffer)
 				== size) {
 			BMessage decorSettings;
@@ -3914,10 +3922,10 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 
 
 void
-BContainerWindow::RestoreWindowState(const BMessage &message)
+BContainerWindow::RestoreWindowState(const BMessage& message)
 {
 	if (dynamic_cast<BDeskWindow*>(this)) {
-		// don't restore any window state if we are a desktop window
+		// don't restore any window state if we are the Desktop
 		return;
 	}
 
@@ -3962,10 +3970,11 @@ BContainerWindow::RestoreWindowState(const BMessage &message)
 void
 BContainerWindow::SaveWindowState(AttributeStreamNode* node)
 {
-	ASSERT(node);
+	ASSERT(node != NULL);
+
 	const char* rectAttributeName;
 	const char* workspaceAttributeName;
-	if (TargetModel() && TargetModel()->IsRoot()) {
+	if (TargetModel() != NULL && TargetModel()->IsRoot()) {
 		rectAttributeName = kAttrDisksFrame;
 		workspaceAttributeName = kAttrDisksWorkspace;
 	} else {
@@ -3995,12 +4004,12 @@ BContainerWindow::SaveWindowState(AttributeStreamNode* node)
 
 
 void
-BContainerWindow::SaveWindowState(BMessage &message) const
+BContainerWindow::SaveWindowState(BMessage& message) const
 {
 	const char* rectAttributeName;
 	const char* workspaceAttributeName;
 
-	if (TargetModel() && TargetModel()->IsRoot()) {
+	if (TargetModel() != NULL && TargetModel()->IsRoot()) {
 		rectAttributeName = kAttrDisksFrame;
 		workspaceAttributeName = kAttrDisksWorkspace;
 	} else {

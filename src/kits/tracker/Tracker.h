@@ -95,8 +95,8 @@ public:
 		// themselves as a preferred handler (case of applications)
 
 	bool TrashFull() const;
-	bool IsTrashNode(const node_ref*) const;
-	bool InTrashNode(const entry_ref*) const;
+	bool IsTrashNode(const node_ref* node) const;
+	bool InTrashNode(const entry_ref* ref) const;
 
 	void CloseParentWaitingForChildSoon(const entry_ref* child,
 			const node_ref* parent);

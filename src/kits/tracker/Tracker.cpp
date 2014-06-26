@@ -32,34 +32,32 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include "Tracker.h"
 
 #include <errno.h>
+#include <fs_attr.h>
+#include <fs_info.h>
+#include <image.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/resource.h>
 #include <unistd.h>
-
-#include "Tracker.h"
 
 #include <Alert.h>
 #include <Autolock.h>
 #include <Catalog.h>
 #include <Debug.h>
 #include <FindDirectory.h>
-#include <fs_attr.h>
-#include <fs_info.h>
-#include <image.h>
 #include <Locale.h>
 #include <MenuItem.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
 #include <Path.h>
+#include <PathMonitor.h>
 #include <Roster.h>
 #include <StopWatch.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
-
-#include <PathMonitor.h>
 
 #include "Attributes.h"
 #include "AutoLock.h"
@@ -698,7 +696,7 @@ TTracker::LaunchAndCloseParentIfOK(const entry_ref* launchThis,
 	const node_ref* closeThis, const BMessage* messageToBundle)
 {
 	BMessage refsReceived(B_REFS_RECEIVED);
-	if (messageToBundle) {
+	if (messageToBundle != NULL) {
 		refsReceived = *messageToBundle;
 		refsReceived.what = B_REFS_RECEIVED;
 	}
@@ -709,6 +707,7 @@ TTracker::LaunchAndCloseParentIfOK(const entry_ref* launchThis,
 		fTaskLoop->RunLater(NewMemberFunctionObject(&TTracker::CloseParent,
 			this, *closeThis), 1000000);
 	}
+
 	return false;
 }
 
@@ -960,9 +959,10 @@ TTracker::OpenContainerWindow(Model* model, BMessage* originalRefsList,
 {
 	AutoLock<WindowList> lock(&fWindowList);
 	BContainerWindow* window = NULL;
+	const node_ref* modelNodeRef = model->NodeRef();
 	if (checkAlreadyOpen && openSelector != kRunOpenWithWindow) {
 		// find out if window already open
-		window = FindContainerWindow(model->NodeRef());
+		window = FindContainerWindow(modelNodeRef);
 	}
 
 	bool someWindowActivated = false;
@@ -1105,8 +1105,8 @@ TTracker::FindContainerWindow(const node_ref* node, int32 number) const
 	int32 count = fWindowList.CountItems();
 	int32 windowsFound = 0;
 	for (int32 index = 0; index < count; index++) {
-		BContainerWindow* window = dynamic_cast<BContainerWindow*>
-			(fWindowList.ItemAt(index));
+		BContainerWindow* window = dynamic_cast<BContainerWindow*>(
+			fWindowList.ItemAt(index));
 
 		if (window != NULL && window->IsShowing(node)
 			&& number == windowsFound++) {
@@ -1704,13 +1704,6 @@ TTracker::MountServer() const
 
 
 bool
-TTracker::InTrashNode(const entry_ref* node) const
-{
-	return FSInTrashDir(node);
-}
-
-
-bool
 TTracker::TrashFull() const
 {
 	return fTrashWatcher->CheckTrashDirs();
@@ -1721,4 +1714,10 @@ bool
 TTracker::IsTrashNode(const node_ref* node) const
 {
 	return fTrashWatcher->IsTrashNode(node);
+}
+
+bool
+TTracker::InTrashNode(const entry_ref* ref) const
+{
+	return FSInTrashDir(ref);
 }
