@@ -372,12 +372,13 @@ URLInputGroup::URLTextView::InsertText(const char* inText, int32 inLength,
 	int32 baseUrlEnd = text.FindFirst("/", baseUrlStart);
 	if (baseUrlEnd < 0)
 		baseUrlEnd = TextLength();
+
 	BFont font;
 	GetFont(&font);
 	const rgb_color black = (rgb_color) { 0, 0, 0, 255 };
 	const rgb_color gray = (rgb_color) { 60, 60, 60, 255 };
 	if (baseUrlStart > 0)
-		SetFontAndColor(0, baseUrlStart - 1, &font, B_FONT_ALL, &gray);
+		SetFontAndColor(0, baseUrlStart, &font, B_FONT_ALL, &gray);
 	if (baseUrlEnd > baseUrlStart) {
 		font.SetFace(B_BOLD_FACE);
 		SetFontAndColor(baseUrlStart, baseUrlEnd, &font, B_FONT_ALL, &black);
