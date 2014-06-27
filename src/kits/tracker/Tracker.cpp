@@ -448,14 +448,14 @@ TTracker::MessageReceived(BMessage* message)
 			break;
 
 		case kCloseWindowAndChildren:
-			{
-				const node_ref* itemNode;
-				ssize_t bytes;
-				message->FindData("node_ref", B_RAW_TYPE,
-					(const void**)&itemNode, &bytes);
-				CloseWindowAndChildren(itemNode);
-				break;
-			}
+		{
+			const node_ref* itemNode;
+			ssize_t bytes;
+			message->FindData("node_ref", B_RAW_TYPE,
+				(const void**)&itemNode, &bytes);
+			CloseWindowAndChildren(itemNode);
+			break;
+		}
 
 		case kCloseAllWindows:
 			CloseAllWindows();

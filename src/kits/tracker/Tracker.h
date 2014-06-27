@@ -85,9 +85,9 @@ public:
 	virtual void Quit();
 	virtual bool QuitRequested();
 	virtual void ReadyToRun();
-	virtual void MessageReceived(BMessage*);
+	virtual void MessageReceived(BMessage* message);
 	virtual void Pulse();
-	virtual void RefsReceived(BMessage*);
+	virtual void RefsReceived(BMessage* message);
 	virtual void ArgvReceived(int32 argc, char** argv);
 
 	MimeTypeList* MimeTypes() const;
