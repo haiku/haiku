@@ -2484,6 +2484,9 @@ CalcItemsAndSize(CopyLoopControl* loopControl,
 status_t
 FSGetTrashDir(BDirectory* trashDir, dev_t dev)
 {
+	if (trashDir == NULL)
+		return B_BAD_VALUE;
+
 	BVolume volume(dev);
 	status_t result = volume.InitCheck();
 	if (result != B_OK)
@@ -2556,6 +2559,9 @@ FSGetDeskDir(BDirectory* deskDir, dev_t)
 status_t
 FSGetDeskDir(BDirectory* deskDir)
 {
+	if (deskDir == NULL)
+		return B_BAD_VALUE;
+
 	BPath path;
 	status_t result = find_directory(B_DESKTOP_DIRECTORY, &path, true);
 	if (result != B_OK)
