@@ -557,7 +557,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fDragMessage(NULL),
 	fCachedTypesList(NULL),
 	fStateNeedsSaving(false),
-	fSaveStateIsEnabled(true),
+	fSaveStateIsEnabled(dynamic_cast<BDeskWindow*>(this) == NULL),
 	fIsWatchingPath(false)
 {
 	InitIconPreloader();
@@ -3835,6 +3835,11 @@ BContainerWindow::SetUpDefaultState()
 		return;
 	}
 
+	if (dynamic_cast<BDeskWindow*>(this) != NULL) {
+		// don't copy over the attributes if we are the Desktop
+		return;
+	}
+
 	// copy over the attributes
 
 	// set up a filter of the attributes we want copied
@@ -3971,6 +3976,11 @@ BContainerWindow::RestoreWindowState(const BMessage& message)
 void
 BContainerWindow::SaveWindowState(AttributeStreamNode* node)
 {
+	if (dynamic_cast<BDeskWindow*>(this) != NULL) {
+		// don't save window state if we are the Desktop
+		return;
+	}
+
 	ASSERT(node != NULL);
 
 	const char* rectAttributeName;
