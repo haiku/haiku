@@ -2498,46 +2498,51 @@ FSGetTrashDir(BDirectory* trashDir, dev_t dev)
 		return result;
 
 	result = trashDir->SetTo(path.Path());
-	if (result == B_OK) {
-		// Directory already exists, we're done
-		return B_OK;
+	if (result != B_OK) {
+		// Trash directory does not exist yet, create it.
+		result = create_directory(path.Path(), 0755);
+		if (result != B_OK)
+			return result;
+
+		result = trashDir->SetTo(path.Path());
+		if (result != B_OK)
+			return result;
+
+		// make Trash directory invisible
+		StatStruct sbuf;
+		trashDir->GetStat(&sbuf);
+
+		PoseInfo poseInfo;
+		poseInfo.fInvisible = true;
+		poseInfo.fInitedDirectory = sbuf.st_ino;
+		trashDir->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
+			sizeof(PoseInfo));
 	}
 
-	// The trash directory does not exist yet - change that!
-
-	result = create_directory(path.Path(), 0755);
-	if (result != B_OK)
-		return result;
-
-	result = trashDir->SetTo(path.Path());
-	if (result != B_OK)
-		return result;
-
-	// make trash invisible
-	StatStruct sbuf;
-	trashDir->GetStat(&sbuf);
-
-	PoseInfo poseInfo;
-	poseInfo.fInvisible = true;
-	poseInfo.fInitedDirectory = sbuf.st_ino;
-	trashDir->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
-		sizeof(PoseInfo));
-
-	// set trash icon
+	// set Trash icons (if they haven't already been set)
+	attr_info attrInfo;
 	size_t size;
-	const void* data
-		= GetTrackerResources()->LoadResource('ICON', R_TrashIcon, &size);
-	if (data != NULL)
-		trashDir->WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
+	const void* data;
+	if (trashDir->GetAttrInfo(kAttrLargeIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
+		data = GetTrackerResources()->LoadResource('ICON', R_TrashIcon, &size);
+		if (data != NULL)
+			trashDir->WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
+	}
 
-	data = GetTrackerResources()->LoadResource('MICN', R_TrashIcon, &size);
-	if (data != NULL)
-		trashDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
+	if (trashDir->GetAttrInfo(kAttrMiniIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
+		data = GetTrackerResources()->LoadResource('MICN', R_TrashIcon, &size);
+		if (data != NULL)
+			trashDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
+	}
 
-	data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE,
-		R_TrashIcon, &size);
-	if (data != NULL)
-		trashDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
+#ifdef __HAIKU__
+	if (trashDir->GetAttrInfo(kAttrIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
+		data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE,
+			R_TrashIcon, &size);
+		if (data != NULL)
+			trashDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
+	}
+#endif // __HAIKU__
 
 	return B_OK;
 }
