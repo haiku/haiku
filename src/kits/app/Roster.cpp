@@ -80,7 +80,7 @@ const BRoster* be_roster;
 
 	\param message The message
 	\param info A pointer to a pre-allocated app_info to be filled in with the
-		   info found in the message.
+	       info found in the message.
 
 	\return A status code.
 	\retval B_OK Everything went fine.
@@ -307,7 +307,7 @@ compare_queried_apps(const entry_ref* app1, const entry_ref* app2)
 
 	\param signature The app's signature.
 	\param appRef A pointer to a pre-allocated entry_ref to be filled with
-		   a reference to the found application's executable.
+	       a reference to the found application's executable.
 
 	\return A status code.
 	\retval B_OK Everything went fine.
@@ -482,9 +482,9 @@ BRoster::ArgVector::~ArgVector()
 	\param argc Specifies the number of elements \a args contains.
 	\param args Argument vector. May be \c NULL.
 	\param appRef entry_ref referring to the entry whose path shall be the
-		   first element of the resulting argument vector.
+	       first element of the resulting argument vector.
 	\param docRef entry_ref referring to the entry whose path shall be the
-		   last element of the resulting argument vector. May be \c NULL.
+	       last element of the resulting argument vector. May be \c NULL.
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a appRef.
@@ -1312,12 +1312,12 @@ BRoster::AddToRecentFolders(const entry_ref* folder,
 	When \c synchronous is \c true and the method succeeds, it doesn't return.
 
 	\param reboot If \c true, the system will be rebooted instead of being
-		   powered off.
+	       powered off.
 	\param confirm If \c true, the user will be asked to confirm to shut down
-		   the system.
+	       the system.
 	\param synchronous If \c false, the method will return as soon as the
-		   shutdown process has been initiated successfully (or an error
-		   occurred). Otherwise the method doesn't return, if successfully.
+	       shutdown process has been initiated successfully (or an error
+	       occurred). Otherwise the method doesn't return, if successfully.
 
 	\return A status code, \c B_OK on success or another error code in case
 	        something went wrong.
@@ -1385,10 +1385,10 @@ BRoster::_ShutDown(bool reboot, bool confirm, bool synchronous)
 	\param port The application's looper port
 	\param fullRegistration \c true for full, \c false for pre-registration
 	\param pToken A pointer to a pre-allocated uint32 into which the token
-		   assigned by the registrar is written (may be \c NULL)
+	       assigned by the registrar is written (may be \c NULL)
 	\param otherTeam A pointer to a pre-allocated team_id into which the
-		   team ID of the already running instance of a single/exclusive
-		   launch application is written (may be \c NULL)
+	       team ID of the already running instance of a single/exclusive
+	       launch application is written (may be \c NULL)
 
 	\return A status code
 	\retval B_OK Everything went fine.
@@ -1519,7 +1519,7 @@ BRoster::_SetThread(team_id team, thread_id thread) const
 	method.
 
 	\param entryToken The token identifying the application (returned by
-		   AddApplication())
+	       AddApplication())
 	\param thread The app's thread ID
 	\param team The app's team ID
 
@@ -1615,12 +1615,12 @@ BRoster::_CompleteRegistration(team_id team, thread_id thread,
 	\param ref An entry_ref referring to the app's executable
 	\param team The app's team ID. May be -1, if \a token is given.
 	\param token The app's pre-registration token. May be 0, if \a team is
-				 given.
+	       given.
 	\param preRegistered: Pointer to a pre-allocated bool to be filled in
-		   by this method, indicating whether or not the app was
-		   pre-registered.
+	       by this method, indicating whether or not the app was
+	       pre-registered.
 	\param info A pointer to a pre-allocated app_info structure to be filled
-		   in by this method (may be \c NULL)
+	       in by this method (may be \c NULL)
 
 	\return \c B_OK, if the application is registered and all requested
 	        information could be retrieved, or another error code, if the app
@@ -1676,7 +1676,7 @@ BRoster::_IsAppRegistered(const entry_ref* ref, team_id team,
 	RemoveApp().
 
 	\param entryToken The token identifying the application (returned by
-		   AddApplication())
+	       AddApplication())
 
 	\return A status code.
 	\retval B_OK Everything went fine.
