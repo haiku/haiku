@@ -2571,23 +2571,30 @@ FSGetDeskDir(BDirectory* deskDir)
 	if (result != B_OK)
 		return result;
 
+	// set Desktop icons (if they haven't already been set)
+	attr_info attrInfo;
 	size_t size;
-	const void* data = GetTrackerResources()->
-		LoadResource('ICON', R_DeskIcon, &size);
-	if (data != NULL)
-		deskDir->WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
+	const void* data;
+	if (deskDir->GetAttrInfo(kAttrLargeIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
+		data = GetTrackerResources()->LoadResource('ICON', R_DeskIcon, &size);
+		if (data != NULL)
+			deskDir->WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
+	}
 
-	data = GetTrackerResources()->
-		LoadResource('MICN', R_DeskIcon, &size);
-	if (data != NULL)
-		deskDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
+	if (deskDir->GetAttrInfo(kAttrMiniIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
+		data = GetTrackerResources()->LoadResource('MICN', R_DeskIcon, &size);
+		if (data != NULL)
+			deskDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
+	}
 
 #ifdef __HAIKU__
-	data = GetTrackerResources()->
-		LoadResource(B_VECTOR_ICON_TYPE, R_DeskIcon, &size);
-	if (data != NULL)
-		deskDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
-#endif
+	if (deskDir->GetAttrInfo(kAttrIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
+		data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE,
+			R_DeskIcon, &size);
+		if (data != NULL)
+			deskDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
+	}
+#endif // __HAIKU__
 
 	return B_OK;
 }
