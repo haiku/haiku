@@ -670,7 +670,7 @@ BPoseView::SaveColumnState(AttributeStreamNode* node)
 
 
 void
-BPoseView::SaveColumnState(BMessage &message) const
+BPoseView::SaveColumnState(BMessage& message) const
 {
 	for (int32 index = 0; ; index++) {
 		const BColumn* column = ColumnAt(index);
@@ -695,7 +695,7 @@ BPoseView::SaveState(AttributeStreamNode* node)
 
 	const char* viewStateAttr;
 	const char* viewStateAttrForeign;
-	if (TargetModel() && TargetModel()->IsRoot()) {
+	if (TargetModel() != NULL && TargetModel()->IsRoot()) {
 		viewStateAttr = kAttrDisksViewState;
 		viewStateAttrForeign = kAttrDisksViewStateForeign;
 	} else {
@@ -711,7 +711,7 @@ BPoseView::SaveState(AttributeStreamNode* node)
 
 
 void
-BPoseView::SaveState(BMessage &message) const
+BPoseView::SaveState(BMessage& message) const
 {
 	SaveColumnState(message);
 	fViewState->ArchiveToMessage(message);
@@ -757,7 +757,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 		return;
 	}
 
-	bool desktop = IsDesktopWindow() && (frameIfDesktop != NULL);
+	bool isDesktop = IsDesktopWindow() && (frameIfDesktop != NULL);
 
 	int32 count = fPoseList->CountItems();
 	for (int32 index = 0; index < count; index++) {
@@ -777,7 +777,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 			size_t extendedPoseInfoSize = 0;
 			ModelNodeLazyOpener opener(model, true);
 
-			if (desktop) {
+			if (isDesktop) {
 				opener.OpenNode(true);
 				// if saving desktop icons, save an extended pose info too
 				extendedPoseInfo = ReadExtendedPoseInfo(model);
@@ -810,27 +810,28 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 			ASSERT(model);
 			ASSERT(model->InitCheck() == B_OK);
 			// special handling for "root" disks icon
-			// and trash pose on desktop dir
+			// and Trash pose on Desktop directory
 			bool isTrash = model->IsTrash() && IsDesktopView();
 			if (model->IsRoot() || isTrash) {
-				BDirectory dir;
-				if (FSGetDeskDir(&dir) == B_OK) {
+				BDirectory deskDir;
+				if (FSGetDeskDir(&deskDir) == B_OK) {
 					const char* poseInfoAttr = isTrash ? kAttrTrashPoseInfo
 						: kAttrDisksPoseInfo;
 					const char* poseInfoAttrForeign = isTrash
 						? kAttrTrashPoseInfoForeign
 						: kAttrDisksPoseInfoForeign;
-						if (dir.WriteAttr(poseInfoAttr, B_RAW_TYPE, 0,
-						&poseInfo, sizeof(poseInfo)) == sizeof(poseInfo))
+					if (deskDir.WriteAttr(poseInfoAttr, B_RAW_TYPE, 0,
+						&poseInfo, sizeof(poseInfo)) == sizeof(poseInfo)) {
 						// nuke opposite endianness
-						dir.RemoveAttr(poseInfoAttrForeign);
+						deskDir.RemoveAttr(poseInfoAttrForeign);
+					}
 
-					if (!isTrash && desktop
-						&& dir.WriteAttr(kAttrExtendedDisksPoseInfo,
+					if (!isTrash && isDesktop
+						&& deskDir.WriteAttr(kAttrExtendedDisksPoseInfo,
 						B_RAW_TYPE, 0, extendedPoseInfo, extendedPoseInfoSize)
 							== (ssize_t)extendedPoseInfoSize) {
 						// nuke opposite endianness
-						dir.RemoveAttr(kAttrExtendedDisksPoseInfoForegin);
+						deskDir.RemoveAttr(kAttrExtendedDisksPoseInfoForegin);
 					}
 				}
 			} else {
@@ -838,7 +839,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 					kAttrPoseInfoForeign, B_RAW_TYPE, 0, &poseInfo,
 					sizeof(poseInfo));
 
-				if (desktop) {
+				if (isDesktop) {
 					model->WriteAttrKillForeign(kAttrExtendedPoseInfo,
 						kAttrExtendedPoseInfoForegin,
 						B_RAW_TYPE, 0, extendedPoseInfo,
@@ -5741,7 +5742,8 @@ BPoseView::AttributeChanged(const BMessage* message)
 	message->FindInt64("node", (int64*)&itemNode.node);
 
 	const char* attrName;
-	message->FindString("attr", &attrName);
+	if (message->FindString("attr", &attrName) != B_OK)
+		attrName = NULL;
 
 	Model* targetModel = TargetModel();
 	if (targetModel != NULL && *targetModel->NodeRef() == itemNode
@@ -5799,7 +5801,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 		}
 
 		BPoint loc(0, index * fListElemHeight);
-		if (attrName && poseModel->Node() != NULL) {
+		if (attrName != NULL && poseModel->Node() != NULL) {
 			memset(&info, 0, sizeof(attr_info));
 			// the call below might fail if the attribute has been removed
 			poseModel->Node()->GetAttrInfo(attrName, &info);
@@ -5841,7 +5843,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 				continue;
 
 			for (int i = sizeof(sAttrColumnMap) / sizeof(attr_column_relation);
-				i--;) {
+					i--;) {
 				if (sAttrColumnMap[i].attrHash == PrimarySort()
 					|| sAttrColumnMap[i].attrHash == SecondarySort()) {
 					if ((fields & sAttrColumnMap[i].fieldMask) != 0) {
@@ -8973,7 +8975,7 @@ void
 BPoseView::Draw(BRect updateRect)
 {
 	if (IsDesktopWindow()) {
-		BScreen	screen(Window());
+		BScreen screen(Window());
 		rgb_color color = screen.DesktopColor();
 		SetLowColor(color);
 		SetViewColor(color);
