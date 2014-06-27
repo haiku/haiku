@@ -167,10 +167,11 @@ ActivateWindowFilter(BMessage*, BHandler** target, BMessageFilter*)
 	// activate the window if no PoseView or DraggableContainerIcon had been
 	// pressed (those will activate the window themselves, if necessary)
 	if (view != NULL
-		&& !dynamic_cast<BPoseView*>(view)
-		&& !dynamic_cast<DraggableContainerIcon*>(view)
-		&& view->Window())
+		&& dynamic_cast<BPoseView*>(view) == NULL
+		&& dynamic_cast<DraggableContainerIcon*>(view) == NULL
+		&& view->Window() != NULL) {
 		view->Window()->Activate(true);
+	}
 
 	return B_DISPATCH_MESSAGE;
 }
@@ -570,14 +571,14 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 
 	Run();
 
-	// Watch out for settings changes:
-	if (TTracker* app = dynamic_cast<TTracker*>(be_app)) {
-		app->Lock();
-		app->StartWatching(this, kWindowsShowFullPathChanged);
-		app->StartWatching(this, kSingleWindowBrowseChanged);
-		app->StartWatching(this, kShowNavigatorChanged);
-		app->StartWatching(this, kDontMoveFilesToTrashChanged);
-		app->Unlock();
+	// watch out for settings changes
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+	if (tracker != NULL && tracker->Lock()) {
+		tracker->StartWatching(this, kWindowsShowFullPathChanged);
+		tracker->StartWatching(this, kSingleWindowBrowseChanged);
+		tracker->StartWatching(this, kShowNavigatorChanged);
+		tracker->StartWatching(this, kDontMoveFilesToTrashChanged);
+		tracker->Unlock();
 	}
 
 	// ToDo: remove me once we have undo/redo menu items
@@ -592,13 +593,13 @@ BContainerWindow::~BContainerWindow()
 	ASSERT(IsLocked());
 
 	// stop the watchers
-	if (TTracker* app = dynamic_cast<TTracker*>(be_app)) {
-		app->Lock();
-		app->StopWatching(this, kWindowsShowFullPathChanged);
-		app->StopWatching(this, kSingleWindowBrowseChanged);
-		app->StopWatching(this, kShowNavigatorChanged);
-		app->StopWatching(this, kDontMoveFilesToTrashChanged);
-		app->Unlock();
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+	if (tracker != NULL && tracker->Lock()) {
+		tracker->StopWatching(this, kWindowsShowFullPathChanged);
+		tracker->StopWatching(this, kSingleWindowBrowseChanged);
+		tracker->StopWatching(this, kShowNavigatorChanged);
+		tracker->StopWatching(this, kDontMoveFilesToTrashChanged);
+		tracker->Unlock();
 	}
 
 	delete fTaskLoop;
@@ -3924,7 +3925,7 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 void
 BContainerWindow::RestoreWindowState(const BMessage& message)
 {
-	if (dynamic_cast<BDeskWindow*>(this)) {
+	if (dynamic_cast<BDeskWindow*>(this) != NULL) {
 		// don't restore any window state if we are the Desktop
 		return;
 	}
@@ -4411,7 +4412,7 @@ BackgroundView::PoseViewFocused(bool focused)
 	Invalidate();
 
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
-	if (!window)
+	if (window == NULL)
 		return;
 
 	BScrollBar* hScrollBar = window->PoseView()->HScrollBar();
@@ -4439,7 +4440,7 @@ void
 BackgroundView::Draw(BRect updateRect)
 {
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
-	if (!window)
+	if (window == NULL)
 		return;
 
 	BPoseView* poseView = window->PoseView();
@@ -4495,6 +4496,6 @@ void
 BackgroundView::Pulse()
 {
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
-	if (window)
+	if (window != NULL)
 		window->PulseTaskLoop();
 }
