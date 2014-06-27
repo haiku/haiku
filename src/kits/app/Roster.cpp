@@ -566,8 +566,6 @@ BRoster::~BRoster()
 //	#pragma mark - Querying for apps
 
 
-// Returns whether or not an application with the supplied signature
-// is currently running.
 bool
 BRoster::IsRunning(const char* signature) const
 {
@@ -575,8 +573,6 @@ BRoster::IsRunning(const char* signature) const
 }
 
 
-// Returns whether or not an application ran from an executable
-// referred to by the supplied entry_ref is currently running.
 bool
 BRoster::IsRunning(entry_ref* ref) const
 {
@@ -584,8 +580,6 @@ BRoster::IsRunning(entry_ref* ref) const
 }
 
 
-// Returns the team ID of a currently running application with the
-// supplied signature.
 team_id
 BRoster::TeamFor(const char* signature) const
 {
@@ -601,8 +595,6 @@ BRoster::TeamFor(const char* signature) const
 }
 
 
-// Returns the team ID of a currently running application executing
-// the executable referred to by the supplied entry_ref.
 team_id
 BRoster::TeamFor(entry_ref* ref) const
 {
@@ -617,7 +609,6 @@ BRoster::TeamFor(entry_ref* ref) const
 }
 
 
-// Returns a list of all currently running applications.
 void
 BRoster::GetAppList(BList* teamIDList) const
 {
@@ -648,8 +639,6 @@ BRoster::GetAppList(BList* teamIDList) const
 }
 
 
-// Returns a list of all currently running applications with the
-// specified signature.
 void
 BRoster::GetAppList(const char* signature, BList* teamIDList) const
 {
@@ -679,8 +668,6 @@ BRoster::GetAppList(const char* signature, BList* teamIDList) const
 }
 
 
-// Returns the app_info of a currently running application with the
-// supplied signature.
 status_t
 BRoster::GetAppInfo(const char* signature, app_info* info) const
 {
@@ -710,8 +697,6 @@ BRoster::GetAppInfo(const char* signature, app_info* info) const
 }
 
 
-// Returns the app_info of a currently running application executing
-// the executable referred to by the supplied entry_ref.
 status_t
 BRoster::GetAppInfo(entry_ref* ref, app_info* info) const
 {
@@ -737,8 +722,6 @@ BRoster::GetAppInfo(entry_ref* ref, app_info* info) const
 }
 
 
-// Returns the app_info of a currently running application identified
-// by the supplied team ID.
 status_t
 BRoster::GetRunningAppInfo(team_id team, app_info* info) const
 {
@@ -765,7 +748,6 @@ BRoster::GetRunningAppInfo(team_id team, app_info* info) const
 }
 
 
-// Returns the app_info of a currently active application.
 status_t
 BRoster::GetActiveAppInfo(app_info* info) const
 {
@@ -788,7 +770,6 @@ BRoster::GetActiveAppInfo(app_info* info) const
 }
 
 
-// Finds an application associated with a MIME type.
 status_t
 BRoster::FindApp(const char* mimeType, entry_ref* app) const
 {
@@ -799,7 +780,6 @@ BRoster::FindApp(const char* mimeType, entry_ref* app) const
 }
 
 
-// Finds an application associated with a file.
 status_t
 BRoster::FindApp(entry_ref* ref, entry_ref* app) const
 {
@@ -814,7 +794,6 @@ BRoster::FindApp(entry_ref* ref, entry_ref* app) const
 //	#pragma mark - Launching, activating, and broadcasting to apps
 
 
-// Sends a message to all running applications.
 status_t
 BRoster::Broadcast(BMessage* message) const
 {
@@ -822,7 +801,6 @@ BRoster::Broadcast(BMessage* message) const
 }
 
 
-// Sends a message to all running applications.
 status_t
 BRoster::Broadcast(BMessage* message, BMessenger replyTo) const
 {
@@ -850,7 +828,6 @@ BRoster::Broadcast(BMessage* message, BMessenger replyTo) const
 }
 
 
-// Adds a new roster application monitor.
 status_t
 BRoster::StartWatching(BMessenger target, uint32 eventMask) const
 {
@@ -876,7 +853,6 @@ BRoster::StartWatching(BMessenger target, uint32 eventMask) const
 }
 
 
-// Removes a roster application monitor added with StartWatching().
 status_t
 BRoster::StopWatching(BMessenger target) const
 {
@@ -900,12 +876,6 @@ BRoster::StopWatching(BMessenger target) const
 }
 
 
-/*!	\brief Activates the application identified by the supplied team ID.
-	\param team The app's team ID
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_BAD_TEAM_ID: \a team does not identify a running application.
-*/
 status_t
 BRoster::ActivateApp(team_id team) const
 {
@@ -938,7 +908,6 @@ BRoster::ActivateApp(team_id team) const
 }
 
 
-// Launches the application associated with the supplied MIME type.
 status_t
 BRoster::Launch(const char* mimeType, BMessage* initialMessage,
 	team_id* appTeam) const
@@ -954,7 +923,6 @@ BRoster::Launch(const char* mimeType, BMessage* initialMessage,
 }
 
 
-// Launches the application associated with the supplied MIME type.
 status_t
 BRoster::Launch(const char* mimeType, BList* messageList,
 	team_id* appTeam) const
@@ -966,7 +934,6 @@ BRoster::Launch(const char* mimeType, BList* messageList,
 }
 
 
-// Launches the application associated with the supplied MIME type.
 status_t
 BRoster::Launch(const char* mimeType, int argc, char** args,
 	team_id* appTeam) const
@@ -978,8 +945,6 @@ BRoster::Launch(const char* mimeType, int argc, char** args,
 }
 
 
-// Launches the application associated with the entry referred to by
-// the supplied entry_ref.
 status_t
 BRoster::Launch(const entry_ref* ref, const BMessage* initialMessage,
 	team_id* appTeam) const
@@ -995,8 +960,6 @@ BRoster::Launch(const entry_ref* ref, const BMessage* initialMessage,
 }
 
 
-// Launches the application associated with the entry referred to by
-// the supplied entry_ref.
 status_t
 BRoster::Launch(const entry_ref* ref, const BList* messageList,
 	team_id* appTeam) const
@@ -1008,8 +971,6 @@ BRoster::Launch(const entry_ref* ref, const BList* messageList,
 }
 
 
-// Launches the application associated with the entry referred to by
-// the supplied entry_ref.
 status_t
 BRoster::Launch(const entry_ref* ref, int argc, const char* const* args,
 	team_id* appTeam) const
