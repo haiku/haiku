@@ -67,6 +67,7 @@ enum {
 	MSG_CHOOSE_DEBUG_REPORT_LOCATION	= 'ccrl',
 	MSG_DEBUG_REPORT_SAVED				= 'drsa',
 	MSG_LOCATE_SOURCE_IF_NEEDED			= 'lsin',
+	MSG_SOURCE_ENTRY_QUERY_COMPLETE		= 'seqc',
 	MSG_CLEAR_STACK_TRACE				= 'clst'
 };
 
@@ -134,7 +135,8 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fConsoleSplitView(NULL),
 	fBreakConditionConfigWindow(NULL),
 	fInspectorWindow(NULL),
-	fFilePanel(NULL)
+	fFilePanel(NULL),
+	fActiveSourceWorker(-1)
 {
 	fTeam->Lock();
 	BString name = fTeam->Name();
@@ -172,6 +174,9 @@ TeamWindow::~TeamWindow()
 	_SetActiveThread(NULL);
 
 	delete fFilePanel;
+
+	if (fActiveSourceWorker > 0)
+		wait_for_thread(fActiveSourceWorker, NULL);
 }
 
 
@@ -383,6 +388,17 @@ TeamWindow::MessageReceived(BMessage* message)
 		case MSG_LOCATE_SOURCE_IF_NEEDED:
 		{
 			_HandleLocateSourceRequest();
+			break;
+		}
+		case MSG_SOURCE_ENTRY_QUERY_COMPLETE:
+		{
+			BStringList* entries;
+			if (message->FindPointer("entries", (void**)&entries) != B_OK)
+				break;
+			ObjectDeleter<BStringList> entryDeleter(entries);
+			_HandleLocateSourceRequest(entries);
+			fActiveSourceWorker = -1;
+			break;
 		}
 		case MSG_THREAD_RUN:
 		case MSG_THREAD_STOP:
@@ -1529,6 +1545,44 @@ TeamWindow::_HandleWatchpointChanged(Watchpoint* watchpoint)
 }
 
 
+status_t
+TeamWindow::_RetrieveMatchingSourceWorker(void* arg)
+{
+	TeamWindow* window = (TeamWindow*)arg;
+
+	BStringList* entries = new(std::nothrow) BStringList();
+	if (entries == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<BStringList> stringListDeleter(entries);
+
+	if (!window->Lock())
+		return B_BAD_VALUE;
+
+	BString path;
+	window->fActiveFunction->GetFunctionDebugInfo()->SourceFile()
+		->GetPath(path);
+	window->Unlock();
+
+	status_t error = window->_RetrieveMatchingSourceEntries(path, entries);
+	if (error != B_OK)
+		return error;
+
+	entries->Sort();
+	BMessenger messenger(window);
+	if (messenger.IsValid() && messenger.LockTarget()) {
+		if (window->fActiveSourceWorker == find_thread(NULL)) {
+			BMessage message(MSG_SOURCE_ENTRY_QUERY_COMPLETE);
+			message.AddPointer("entries", entries);
+			if (messenger.SendMessage(&message) == B_OK)
+				stringListDeleter.Detach();
+		}
+		window->Unlock();
+	}
+
+	return B_OK;
+}
+
+
 void
 TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 {
@@ -1570,7 +1624,7 @@ TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 
 
 void
-TeamWindow::_HandleLocateSourceRequest()
+TeamWindow::_HandleLocateSourceRequest(BStringList* entries)
 {
 	if (fActiveFunction == NULL)
 		return;
@@ -1585,13 +1639,18 @@ TeamWindow::_HandleLocateSourceRequest()
 		return;
 	}
 
-	BStringList entries;
-	if (_RetrieveMatchingSourceEntries(entries) != B_OK)
+	if (entries == NULL) {
+		if (fActiveSourceWorker < 0) {
+			fActiveSourceWorker = spawn_thread(&_RetrieveMatchingSourceWorker,
+				"source file query worker", B_NORMAL_PRIORITY, this);
+			if (fActiveSourceWorker > 0)
+				resume_thread(fActiveSourceWorker);
+		}
 		return;
+	}
 
-	int32 count = entries.CountStrings();
+	int32 count = entries->CountStrings();
 	if (count > 0) {
-		entries.Sort();
 		BPopUpMenu* menu = new(std::nothrow) BPopUpMenu("");
 		if (menu == NULL)
 			return;
@@ -1599,7 +1658,7 @@ TeamWindow::_HandleLocateSourceRequest()
 		BPrivate::ObjectDeleter<BPopUpMenu> menuDeleter(menu);
 		BMenuItem* item = NULL;
 		for (int32 i = 0; i < count; i++) {
-			item = new(std::nothrow) BMenuItem(entries.StringAt(i).String(),
+			item = new(std::nothrow) BMenuItem(entries->StringAt(i).String(),
 				NULL);
 			if (item == NULL || !menu->AddItem(item)) {
 				delete item;
@@ -1647,22 +1706,20 @@ TeamWindow::_HandleLocateSourceRequest()
 
 
 status_t
-TeamWindow::_RetrieveMatchingSourceEntries(BStringList& _entries)
+TeamWindow::_RetrieveMatchingSourceEntries(const BString& path,
+	BStringList* _entries)
 {
-	BString data;
-	fActiveFunction->GetFunctionDebugInfo()->SourceFile()->GetPath(data);
-
-	BPath path;
-	status_t error = path.SetTo(data);
+	BPath filePath(path);
+	status_t error = filePath.InitCheck();
 	if (error != B_OK)
 		return error;
 
-	_entries.MakeEmpty();
+	_entries->MakeEmpty();
 
 	BQuery query;
 	BString predicate;
 	query.PushAttr("name");
-	query.PushString(path.Leaf());
+	query.PushString(filePath.Leaf());
 	query.PushOp(B_EQ);
 
 	error = query.GetPredicate(&predicate);
@@ -1687,8 +1744,8 @@ TeamWindow::_RetrieveMatchingSourceEntries(BStringList& _entries)
 
 		entry_ref ref;
 		while (query.GetNextRef(&ref) == B_OK) {
-			path.SetTo(&ref);
-			_entries.Add(path.Path());
+			filePath.SetTo(&ref);
+			_entries->Add(filePath.Path());
 		}
 
 		query.Clear();

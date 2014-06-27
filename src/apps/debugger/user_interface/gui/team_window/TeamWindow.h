@@ -168,11 +168,15 @@ private:
 									UserBreakpoint* breakpoint);
 			void				_HandleWatchpointChanged(
 									Watchpoint* watchpoint);
+
+	static	status_t			_RetrieveMatchingSourceWorker(void* arg);
 			void				_HandleResolveMissingSourceFile(entry_ref&
 									locatedPath);
-			void				_HandleLocateSourceRequest();
-			status_t			_RetrieveMatchingSourceEntries(
-									BStringList& _entries);
+			void				_HandleLocateSourceRequest(
+									BStringList* entries = NULL);
+	static	status_t			_RetrieveMatchingSourceEntries(
+									const BString& path,
+									BStringList* _entries);
 
 			status_t			_SaveInspectorSettings(
 									const BMessage* settings);
@@ -214,6 +218,7 @@ private:
 			InspectorWindow*	fInspectorWindow;
 			GuiTeamUiSettings	fUiSettings;
 			BFilePanel*			fFilePanel;
+			thread_id			fActiveSourceWorker;
 };
 
 
