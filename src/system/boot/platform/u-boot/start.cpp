@@ -137,7 +137,8 @@ start_netbsd(struct board_info *bd, struct image_header *image,
 {
 	const char *argv[] = { "haiku", cmdline };
 	int argc = 1;
-	if (cmdline)
+	// TODO: Ensure cmdline is mapped into memory by MMU before usage.
+	if (cmdline && *cmdline)
 		argc++;
 	gUImage = image;
 	return start_raw(argc, argv);
