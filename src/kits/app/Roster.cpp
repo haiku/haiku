@@ -1569,7 +1569,7 @@ BRoster::_SetThreadAndTeam(uint32 entryToken, thread_id thread,
 	\param thread The app's thread ID
 	\param thread The app looper port
 
-	\return
+	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_REG_APP_NOT_PRE_REGISTERED \a team did not identify an existing
 	        application or the identified application was already fully
