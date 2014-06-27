@@ -15,6 +15,7 @@
 #include <stdio.h>
 
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Locale.h>
 #include <ObjectList.h>
 
@@ -196,28 +197,44 @@ AttributeItem::DrawItem(BView* owner, BRect frame, bool drawEverything)
 {
 	BStringItem::DrawItem(owner, frame, drawEverything);
 
+	BString type;
+	name_for_type(type, fType, fDisplayAs.String());
+	const char* typeString = type.String();
+	if (typeString == NULL)
+		return;
+
 	rgb_color highColor = owner->HighColor();
 	rgb_color lowColor = owner->LowColor();
 
+	// set the low color
 	if (IsSelected())
-		owner->SetLowColor(tint_color(lowColor, B_DARKEN_2_TINT));
-
-	rgb_color black = {0, 0, 0, 255};
-
-	if (!IsEnabled())
-		owner->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
+		owner->SetLowColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 	else
-		owner->SetHighColor(black);
+		owner->SetLowColor(ui_color(B_LIST_BACKGROUND_COLOR));
 
-	owner->MovePenTo(frame.left + frame.Width() / 2.0f + 5.0f,
+	// set the high color
+	if (!IsEnabled()) {
+		rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
+		if (textColor.red + textColor.green + textColor.blue > 128 * 3)
+			owner->SetHighColor(tint_color(textColor, B_DARKEN_2_TINT));
+		else
+			owner->SetHighColor(tint_color(textColor, B_LIGHTEN_2_TINT));
+	} else {
+		if (IsSelected())
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+		else
+			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+	}
+
+	// move the pen into position
+	owner->MovePenTo(frame.left + frame.Width() / 2.0f
+			+ be_control_look->DefaultLabelSpacing(),
 		owner->PenLocation().y);
 
-	BString type;
-	name_for_type(type, fType, fDisplayAs.String());
-	owner->DrawString(type.String());
+	// draw the type string
+	owner->DrawString(typeString);
 
-	owner->SetHighColor(tint_color(owner->ViewColor(), B_DARKEN_1_TINT));
-
+	// set the high color and low color back to the original
 	owner->SetHighColor(highColor);
 	owner->SetLowColor(lowColor);
 }
