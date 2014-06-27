@@ -12,33 +12,43 @@
 #include <Locale.h>
 #include <ObjectList.h>
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Attribute ListView"
 
+
 const struct type_map kTypeMap[] = {
-	{B_TRANSLATE("String"),		B_STRING_TYPE},
-	{B_TRANSLATE("Boolean"),		B_BOOL_TYPE},
-	{B_TRANSLATE("Integer 8 bit"),	B_INT8_TYPE},
-	{B_TRANSLATE("Integer 16 bit"),	B_INT16_TYPE},
-	{B_TRANSLATE("Integer 32 bit"),	B_INT32_TYPE},
-	{B_TRANSLATE("Integer 64 bit"),	B_INT64_TYPE},
-	{B_TRANSLATE("Float"),			B_FLOAT_TYPE},
-	{B_TRANSLATE("Double"),			B_DOUBLE_TYPE},
-	{B_TRANSLATE("Time"),			B_TIME_TYPE},
-	{NULL,							0}
+	{ B_TRANSLATE("String"),         B_STRING_TYPE },
+	{ B_TRANSLATE("Boolean"),        B_BOOL_TYPE   },
+	{ B_TRANSLATE("Integer 8 bit"),  B_INT8_TYPE   },
+	{ B_TRANSLATE("Integer 16 bit"), B_INT16_TYPE  },
+	{ B_TRANSLATE("Integer 32 bit"), B_INT32_TYPE  },
+	{ B_TRANSLATE("Integer 64 bit"), B_INT64_TYPE  },
+	{ B_TRANSLATE("Float"),          B_FLOAT_TYPE  },
+	{ B_TRANSLATE("Double"),         B_DOUBLE_TYPE },
+	{ B_TRANSLATE("Time"),           B_TIME_TYPE   },
+	{ NULL,                          0             }
 };
+
 
 // TODO: in the future, have a (private) Tracker API that exports these
 //	as well as a nice GUI for them.
 const struct display_as_map kDisplayAsMap[] = {
-	{B_TRANSLATE("Default"),	NULL,		{}},
-	{B_TRANSLATE("Checkbox"),	B_TRANSLATE("checkbox"),
-		{B_BOOL_TYPE, B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE}},
-	{B_TRANSLATE("Duration"),	B_TRANSLATE("duration"),
-		{B_TIME_TYPE, B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE, B_INT64_TYPE}},
-	{B_TRANSLATE("Rating"),		B_TRANSLATE("rating"),
-		{B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE}},
-	{NULL,			NULL,		{}}
+	{ B_TRANSLATE("Default"),	NULL,
+		{}
+	},
+	{ B_TRANSLATE("Checkbox"),	B_TRANSLATE("checkbox"),
+		{ B_BOOL_TYPE, B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE }
+	},
+	{ B_TRANSLATE("Duration"),	B_TRANSLATE("duration"),
+		{ B_TIME_TYPE, B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE, B_INT64_TYPE }
+	},
+	{ B_TRANSLATE("Rating"),	B_TRANSLATE("rating"),
+		{ B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE }
+	},
+	{ NULL,						NULL,
+		{}
+	}
 };
 
 
@@ -131,12 +141,12 @@ create_attribute_item(BMessage& attributes, int32 index)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - AttributeItem
 
 
 AttributeItem::AttributeItem(const char* name, const char* publicName,
-		type_code type, const char* displayAs, int32 alignment,
-		int32 width, bool visible, bool editable)
+	type_code type, const char* displayAs, int32 alignment,
+	int32 width, bool visible, bool editable)
 	:
 	BStringItem(publicName),
 	fName(name),
@@ -247,11 +257,12 @@ AttributeItem::operator!=(const AttributeItem& other) const
 }
 
 
-//	#pragma mark -
+//	#pragma mark - AttributeListView
 
 
 AttributeListView::AttributeListView(const char* name)
-	: BListView(name, B_SINGLE_SELECTION_LIST,
+	:
+	BListView(name, B_SINGLE_SELECTION_LIST,
 		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 {
 }
@@ -266,9 +277,9 @@ AttributeListView::~AttributeListView()
 void
 AttributeListView::_DeleteItems()
 {
-	for (int32 i = CountItems(); i-- > 0;) {
+	for (int32 i = CountItems() - 1; i >= 0; i--)
 		delete ItemAt(i);
-	}
+
 	MakeEmpty();
 }
 
@@ -367,4 +378,3 @@ AttributeListView::Draw(BRect updateRect)
 	float middle = Bounds().Width() / 2.0f;
 	StrokeLine(BPoint(middle, 0.0f), BPoint(middle, Bounds().bottom));
 }
-
