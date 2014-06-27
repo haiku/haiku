@@ -2,6 +2,7 @@
 
 #include <asm_defs.h>
 
+#include <board_config.h>
 
 	.text
 
@@ -61,6 +62,7 @@ SYMBOL(_start_common):
 
 
 
+	ldr	sp,=SDRAM_BASE + 0x2000000
 	ldrb	r4,gUBootOS
 	cmp	r4,#0
 	beq	start_raw
