@@ -1,6 +1,12 @@
 /*
  * Copyright 2006-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -212,9 +218,6 @@ AttributeItem::DrawItem(BView* owner, BRect frame, bool drawEverything)
 
 	owner->SetHighColor(tint_color(owner->ViewColor(), B_DARKEN_1_TINT));
 
-	float middle = frame.left + frame.Width() / 2.0f;
-	owner->StrokeLine(BPoint(middle, 0.0f), BPoint(middle, frame.bottom));
-
 	owner->SetHighColor(highColor);
 	owner->SetLowColor(lowColor);
 }
@@ -373,7 +376,8 @@ AttributeListView::Draw(BRect updateRect)
 {
 	BListView::Draw(updateRect);
 
-	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_2_TINT));
 
 	float middle = Bounds().Width() / 2.0f;
 	StrokeLine(BPoint(middle, 0.0f), BPoint(middle, Bounds().bottom));
