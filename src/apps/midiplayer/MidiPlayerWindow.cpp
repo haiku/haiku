@@ -25,8 +25,7 @@
 #include "MidiPlayerWindow.h"
 
 #include <Catalog.h>
-#include <GroupLayoutBuilder.h>
-#include <GridLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MidiProducer.h>
 #include <MidiRoster.h>
@@ -259,33 +258,41 @@ MidiPlayerWindow::CreateViews()
 
 	BStringView* volumeLabel = new BStringView(NULL, B_TRANSLATE("Volume:"));
 	volumeLabel->SetAlignment(B_ALIGN_LEFT);
-	volumeLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_SMALL_SPACING)
 		.Add(fScopeView)
-		.Add(BGridLayoutBuilder(10, 10)
-			.Add(BSpaceLayoutItem::CreateGlue(), 0, 0)
-			.Add(fShowScopeCheckBox, 1, 0)
+		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+			.AddGroup(B_HORIZONTAL, 0.0f)
+				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+					.Add(fShowScopeCheckBox, 1, 0)
 
-			.Add(fReverbMenuField->CreateLabelLayoutItem(), 0, 1)
-			.Add(fReverbMenuField->CreateMenuBarLayoutItem(), 1, 1)
+					.Add(fReverbMenuField->CreateLabelLayoutItem(), 0, 1)
+					.AddGroup(B_HORIZONTAL, 0.0f, 1, 1)
+						.Add(fReverbMenuField->CreateMenuBarLayoutItem())
+						.AddGlue()
+						.End()
 
-			.Add(fInputMenuField->CreateLabelLayoutItem(), 0, 2)
-			.Add(fInputMenuField->CreateMenuBarLayoutItem(), 1, 2)
+					.Add(fInputMenuField->CreateLabelLayoutItem(), 0, 2)
+					.AddGroup(B_HORIZONTAL, 0.0f, 1, 2)
+						.Add(fInputMenuField->CreateMenuBarLayoutItem())
+						.AddGlue()
+						.End()
 
-			.Add(volumeLabel, 0, 3)
-			.Add(fVolumeSlider, 1, 3)
-		)
-		.AddGlue()
-		.Add(divider)
-		.AddGlue()
-		.Add(fPlayButton)
-		.AddGlue()
-		.SetInsets(5, 5, 5, 5)
-	);
+					.Add(volumeLabel, 0, 3)
+					.Add(fVolumeSlider, 0, 4, 2, 1)
+					.End()
+				.AddGlue()
+				.End()
+			.AddGlue()
+			.Add(divider)
+			.AddGlue()
+			.Add(fPlayButton)
+			.AddGlue()
+			.SetInsets(B_USE_WINDOW_INSETS)
+			.End()
+		.SetInsets(0)
+		.End();
 }
 
 
