@@ -10,7 +10,8 @@ resource app_version {
 	variety    = B_APPV_BETA,
 	internal   = 0,
 	short_info = "MidiPlayer",
-	long_info  = "MidiPlayer ©2004-2009 Haiku, Inc."
+	long_info  = "MidiPlayer Copyright (c) 2004 Matthijs Hollemans, "
+				 "(c) 2008-2014 Haiku, Inc. All rights reserved."
 };
 
 resource app_flags B_SINGLE_LAUNCH;
