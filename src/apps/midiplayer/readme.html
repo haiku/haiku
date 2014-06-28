@@ -1,34 +1,34 @@
 <html>
 <head>
-<title>Haiku MIDI Player</title>
+  <title>Haiku MIDI Player</title>
 </head>
 <body>
 
-<h1>Haiku MIDI Player 1.0.0 beta</h1>
+<h1>Haiku MIDI Player 1.0.1</h1>
 
 <p>This is a simple application to play MIDI songs.</p>
 
-<p>To play a MIDI song, you can:</p>
+<h3>To play a MIDI song, you can:</h3>
 
 <ul>
-<li>double-click it, or</li>
-<li>drag it on the MidiPlayer icon, or</li>
-<li>drag it into the MidiPlayer window, or</li>
-<li>type "MidiPlayer song.mid" in Terminal.</li>
+  <li>double-click it, or</li>
+  <li>drag it on the MidiPlayer icon, or</li>
+  <li>drag it into the MidiPlayer window, or</li>
+  <li>type "MidiPlayer song.mid" in Terminal.</li>
 </ul>
 
 <p>Hopefully, most of the options will be obvious, although Live Input may require a few lines of explanation.</p>
 
 <p>The <b>Live Input</b> feature enables you to attach other applications to the Haiku software synthesizer, for example a virtual MIDI keyboard. MidiPlayer looks at the MIDI roster for compatible producer endpoints. If none are found, Live Input is not available.</p>
 
-<h3>Differences with the BeOS R5 MidiPlayer:</h3>
+<h3>Differences from the BeOS R5 MidiPlayer:</h3>
 
 <ul>
-<li>User interface looks slightly different (better?)</li>
-<li>Play and Stop are now one and the same button.</li>
-<li>There is no Open File... function.</li>
-<li>You cannot set the Quality of the sound (always 44100 Hz).</li>
-<li>While the song fades out, the scope temporarily freezes; the R5 MidiPlayer kept repainting during the fade-out (which, admittedly, looks better). At one point, the Haiku MidiPlayer did that too but the code made my head hurt, so I pulled it out again :-)</li>
+  <li>User interface looks slightly different (better?)</li>
+  <li>Play and Stop are now one and the same button.</li>
+  <li>There is no Open File... function.</li>
+  <li>You cannot set the Quality of the sound (always 44100 Hz).</li>
+  <li>While the song fades out, the scope temporarily freezes; the R5 MidiPlayer kept repainting during the fade-out (which, admittedly, looks better). At one point, the Haiku MidiPlayer did that too but the code made my head hurt, so I pulled it out again :-)</li>
 </ul>
 
 <p>If people really <i>really</i> want these missing features, then feel free to add them :-)</p>
