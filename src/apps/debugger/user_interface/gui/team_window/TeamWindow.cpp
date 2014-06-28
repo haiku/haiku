@@ -236,8 +236,10 @@ TeamWindow::DispatchMessage(BMessage* message, BHandler* handler)
 		case B_COPY:
 		case B_SELECT_ALL:
 			BView* focusView = CurrentFocus();
-			if (focusView != NULL)
+			if (focusView != NULL) {
 				focusView->MessageReceived(message);
+				return;
+			}
 			break;
 	}
 	BWindow::DispatchMessage(message, handler);
