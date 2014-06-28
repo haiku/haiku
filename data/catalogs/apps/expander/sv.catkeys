@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Expander	3431738656
+1	swedish	x-vnd.Haiku-Expander	2177073262
 Expand	ExpanderMenu		Expandera
 Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar
 Set destination…	ExpanderMenu		Ange mål…
@@ -34,6 +34,7 @@ Automatically show contents listing	ExpanderPreferences		Automatiskt visa list i
 OK	ExpanderPreferences		OK
 Leave destination folder path empty	ExpanderPreferences		Lämna destinations folder tom
 Failed to create the destination folder.	ExpanderWindow		Kunde inte skapa målmappen.
+Select '%s'…	DirectoryFilePanel		Välj '%s'…
 Create	ExpanderWindow		Skapa
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Foldern har antingen flyttats, omdöpt eller\nsupporteras inte.
 The file doesn't exist	ExpanderWindow		Filen finns inte
