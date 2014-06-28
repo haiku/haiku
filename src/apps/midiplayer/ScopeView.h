@@ -19,16 +19,15 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  * DEALINGS IN THE SOFTWARE.
  */
+#ifndef _SCOPE_VIEW_H
+#define _SCOPE_VIEW_H
 
-#ifndef SCOPE_VIEW_H
-#define SCOPE_VIEW_H
 
 #include <View.h>
 
-class ScopeView : public BView
-{
-public:
 
+class ScopeView : public BView {
+public:
 	ScopeView();
 	virtual ~ScopeView();
 
@@ -36,14 +35,13 @@ public:
 	virtual void DetachedFromWindow();
 	virtual void Draw(BRect updateRect);
 
-	void SetPlaying(bool flag);
-	void SetEnabled(bool flag);
-	void SetHaveFile(bool flag);
-	void SetLoading(bool flag);
-	void SetLiveInput(bool flag);
+	void SetPlaying(bool playing);
+	void SetEnabled(bool enabled);
+	void SetHaveFile(bool haveFile);
+	void SetLoading(bool loading);
+	void SetLiveInput(bool liveInput);
 
 private:
-
 	typedef BView super;
 
 	static int32 _Thread(void* data);
@@ -54,19 +52,57 @@ private:
 	void DrawDisabled();
 	void DrawStopped();
 	void DrawPlaying();
-	
+
 	void DrawText(const char* text);
 
-	bool finished;
-	bool playing;
-	bool enabled;
-	bool haveFile;
-	bool loading;
-	bool liveInput;
-	int32 sampleCount;
-	int16* leftSamples;
-	int16* rightSamples;
-	thread_id threadId;
+	bool fIsFinished;
+	bool fIsPlaying;
+	bool fIsEnabled;
+	bool fHaveFile;
+	bool fIsLoading;
+	bool fIsLiveInput;
+
+	int32 fSampleCount;
+	int16* fLeftSamples;
+	int16* fRightSamples;
+
+	thread_id fScopeThreadID;
 };
 
-#endif // SCOPE_VIEW_H
+
+inline void
+ScopeView::SetPlaying(bool playing)
+{
+	fIsPlaying = playing;
+}
+
+
+inline void
+ScopeView::SetEnabled(bool enabled)
+{
+	fIsEnabled = enabled;
+}
+
+
+inline void
+ScopeView::SetHaveFile(bool haveFile)
+{
+	fHaveFile = haveFile;
+}
+
+
+inline void
+ScopeView::SetLoading(bool loading)
+{
+	fIsLoading = loading;
+}
+
+
+inline void
+ScopeView::SetLiveInput(bool liveInput)
+{
+	fIsLiveInput = liveInput;
+}
+
+
+#endif // _SCOPE_VIEW_H

@@ -20,10 +20,12 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+
+#include "MidiPlayerWindow.h"
+
 #include <Catalog.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <GridLayoutBuilder.h>
 #include <Locale.h>
 #include <MidiProducer.h>
 #include <MidiRoster.h>
@@ -31,7 +33,6 @@
 #include <SpaceLayoutItem.h>
 
 #include "MidiPlayerApp.h"
-#include "MidiPlayerWindow.h"
 #include "ScopeView.h"
 #include "SynthBridge.h"
 
@@ -44,25 +45,28 @@
 #define B_TRANSLATION_CONTEXT "Main Window"
 
 
+//	#pragma mark - MidiPlayerWindow
+
+
 MidiPlayerWindow::MidiPlayerWindow()
 	:
 	BWindow(BRect(0, 0, 1, 1), B_TRANSLATE_SYSTEM_NAME("MidiPlayer"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE
-		| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+			| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	playing = false;
-	scopeEnabled = true;
-	reverb = B_REVERB_BALLROOM;
-	volume = 75;
-	windowX = -1;
-	windowY = -1;
-	inputId = -1;
-	instrLoaded = false;
+	fIsPlaying = false;
+	fScopeEnabled = true;
+	fReverbMode = B_REVERB_BALLROOM;
+	fVolume = 75;
+	fWindowX = -1;
+	fWindowY = -1;
+	fInputId = -1;
+	fInstrumentLoaded = false;
 
 	be_synth->SetSamplingRate(44100);
 
-	bridge = new SynthBridge;
-	//bridge->Register();
+	fSynthBridge = new SynthBridge;
+	//fSynthBridge->Register();
 
 	CreateViews();
 	LoadSettings();
@@ -74,8 +78,8 @@ MidiPlayerWindow::~MidiPlayerWindow()
 {
 	StopSynth();
 
-	//bridge->Unregister();
-	bridge->Release();
+	//fSynthBridge->Unregister();
+	fSynthBridge->Release();
 }
 
 
@@ -88,9 +92,9 @@ MidiPlayerWindow::QuitRequested()
 
 
 void
-MidiPlayerWindow::MessageReceived(BMessage* msg)
+MidiPlayerWindow::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case MSG_PLAY_STOP:
 			OnPlayStop();
 			break;
@@ -100,7 +104,7 @@ MidiPlayerWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case MSG_INPUT_CHANGED:
-			OnInputChanged(msg);
+			OnInputChanged(message);
 			break;
 
 		case MSG_REVERB_NONE:
@@ -132,11 +136,11 @@ MidiPlayerWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case B_SIMPLE_DATA:
-			OnDrop(msg);
+			OnDrop(message);
 			break;
 
 		default:
-			super::MessageReceived(msg);
+			super::MessageReceived(message);
 			break;
 	}
 }
@@ -146,8 +150,8 @@ void
 MidiPlayerWindow::FrameMoved(BPoint origin)
 {
 	super::FrameMoved(origin);
-	windowX = Frame().left;
-	windowY = Frame().top;
+	fWindowX = Frame().left;
+	fWindowY = Frame().top;
 	SaveSettings();
 }
 
@@ -155,23 +159,23 @@ MidiPlayerWindow::FrameMoved(BPoint origin)
 void
 MidiPlayerWindow::MenusBeginning()
 {
-	for (int32 t = inputPopUp->CountItems() - 1; t > 0; --t)
-		delete inputPopUp->RemoveItem(t);
+	for (int32 t = fInputPopUpMenu->CountItems() - 1; t > 0; --t)
+		delete fInputPopUpMenu->RemoveItem(t);
 
 	// Note: if the selected endpoint no longer exists, then no endpoint is
 	// marked. However, we won't disconnect it until you choose another one.
 
-	inputOff->SetMarked(inputId == -1);
+	fInputOffMenuItem->SetMarked(fInputId == -1);
 
 	int32 id = 0;
 	while (BMidiEndpoint* endpoint = BMidiRoster::NextEndpoint(&id)) {
 		if (endpoint->IsProducer()) {
-			BMessage* msg = new BMessage(MSG_INPUT_CHANGED);
-			msg->AddInt32("id", id);
+			BMessage* message = new BMessage(MSG_INPUT_CHANGED);
+			message->AddInt32("id", id);
 
-			BMenuItem* item = new BMenuItem(endpoint->Name(), msg);
-			inputPopUp->AddItem(item);
-			item->SetMarked(inputId == id);
+			BMenuItem* item = new BMenuItem(endpoint->Name(), message);
+			fInputPopUpMenu->AddItem(item);
+			item->SetMarked(fInputId == id);
 		}
 
 		endpoint->Release();
@@ -182,45 +186,44 @@ MidiPlayerWindow::MenusBeginning()
 void
 MidiPlayerWindow::CreateInputMenu()
 {
-	inputPopUp = new BPopUpMenu("inputPopUp");
+	fInputPopUpMenu = new BPopUpMenu("inputPopUp");
 
-	BMessage* msg = new BMessage;
-	msg->what = MSG_INPUT_CHANGED;
-	msg->AddInt32("id", -1);
+	BMessage* message = new BMessage(MSG_INPUT_CHANGED);
+	message->AddInt32("id", -1);
 
-	inputOff = new BMenuItem(B_TRANSLATE("Off"), msg);
+	fInputOffMenuItem = new BMenuItem(B_TRANSLATE("Off"), message);
+	fInputPopUpMenu->AddItem(fInputOffMenuItem);
 
-	inputPopUp->AddItem(inputOff);
-
-	inputMenu = new BMenuField(B_TRANSLATE("Live input:"), inputPopUp);
+	fInputMenuField = new BMenuField(B_TRANSLATE("Live input:"),
+		fInputPopUpMenu);
 }
 
 
 void
 MidiPlayerWindow::CreateReverbMenu()
 {
-	BPopUpMenu* reverbPopUp = new BPopUpMenu("reverbPopUp");
-	reverbNone = new BMenuItem(
-		B_TRANSLATE("None"), new BMessage(MSG_REVERB_NONE));
-	reverbCloset = new BMenuItem(
-		B_TRANSLATE("Closet"), new BMessage(MSG_REVERB_CLOSET));
-	reverbGarage = new BMenuItem(
-		B_TRANSLATE("Garage"), new BMessage(MSG_REVERB_GARAGE));
-	reverbIgor = new BMenuItem(
-		B_TRANSLATE("Igor's lab"), new BMessage(MSG_REVERB_IGOR));
-	reverbCavern = new BMenuItem(
-		B_TRANSLATE("Cavern"), new BMessage(MSG_REVERB_CAVERN));
-	reverbDungeon = new BMenuItem(
-		B_TRANSLATE("Dungeon"), new BMessage(MSG_REVERB_DUNGEON));
+	BPopUpMenu* reverbPopUpMenu = new BPopUpMenu("reverbPopUp");
+	fReverbNoneMenuItem = new BMenuItem(B_TRANSLATE("None"),
+		new BMessage(MSG_REVERB_NONE));
+	fReverbClosetMenuItem = new BMenuItem(B_TRANSLATE("Closet"),
+		new BMessage(MSG_REVERB_CLOSET));
+	fReverbGarageMenuItem = new BMenuItem(B_TRANSLATE("Garage"),
+		new BMessage(MSG_REVERB_GARAGE));
+	fReverbIgorMenuItem = new BMenuItem(B_TRANSLATE("Igor's lab"),
+		new BMessage(MSG_REVERB_IGOR));
+	fReverbCavern = new BMenuItem(B_TRANSLATE("Cavern"),
+		new BMessage(MSG_REVERB_CAVERN));
+	fReverbDungeon = new BMenuItem(B_TRANSLATE("Dungeon"),
+		new BMessage(MSG_REVERB_DUNGEON));
 
-	reverbPopUp->AddItem(reverbNone);
-	reverbPopUp->AddItem(reverbCloset);
-	reverbPopUp->AddItem(reverbGarage);
-	reverbPopUp->AddItem(reverbIgor);
-	reverbPopUp->AddItem(reverbCavern);
-	reverbPopUp->AddItem(reverbDungeon);
+	reverbPopUpMenu->AddItem(fReverbNoneMenuItem);
+	reverbPopUpMenu->AddItem(fReverbClosetMenuItem);
+	reverbPopUpMenu->AddItem(fReverbGarageMenuItem);
+	reverbPopUpMenu->AddItem(fReverbIgorMenuItem);
+	reverbPopUpMenu->AddItem(fReverbCavern);
+	reverbPopUpMenu->AddItem(fReverbDungeon);
 
-	reverbMenu = new BMenuField(B_TRANSLATE("Reverb:"), reverbPopUp);
+	fReverbMenuField = new BMenuField(B_TRANSLATE("Reverb:"), reverbPopUpMenu);
 }
 
 
@@ -228,29 +231,30 @@ void
 MidiPlayerWindow::CreateViews()
 {
 	// Set up needed views
-	scopeView = new ScopeView;
+	fScopeView = new ScopeView();
 
-	showScope = new BCheckBox("showScope", B_TRANSLATE("Scope"),
+	fShowScopeCheckBox = new BCheckBox("showScope", B_TRANSLATE("Scope"),
 		new BMessage(MSG_SHOW_SCOPE));
-	showScope->SetValue(B_CONTROL_ON);
+	fShowScopeCheckBox->SetValue(B_CONTROL_ON);
 
 	CreateInputMenu();
 	CreateReverbMenu();
 
-	volumeSlider = new BSlider("volumeSlider", NULL, NULL, 0, 100,
+	fVolumeSlider = new BSlider("volumeSlider", NULL, NULL, 0, 100,
 		B_HORIZONTAL);
-	rgb_color col = { 152, 152, 255 };
-	volumeSlider->UseFillColor(true, &col);
-	volumeSlider->SetModificationMessage(new BMessage(MSG_VOLUME));
+	rgb_color color = (rgb_color){ 152, 152, 255 };
+	fVolumeSlider->UseFillColor(true, &color);
+	fVolumeSlider->SetModificationMessage(new BMessage(MSG_VOLUME));
+	fVolumeSlider->SetExplicitMinSize(
+		BSize(fScopeView->Frame().Width(), B_SIZE_UNSET));
 
-	playButton = new BButton("playButton", B_TRANSLATE("Play"),
+	fPlayButton = new BButton("playButton", B_TRANSLATE("Play"),
 		new BMessage(MSG_PLAY_STOP));
-	playButton->SetEnabled(false);
+	fPlayButton->SetEnabled(false);
 
 	BBox* divider = new BBox(B_EMPTY_STRING, B_WILL_DRAW | B_FRAME_EVENTS,
 		B_FANCY_BORDER);
-	divider->SetExplicitMaxSize(
-		BSize(B_SIZE_UNLIMITED, 1));
+	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
 	BStringView* volumeLabel = new BStringView(NULL, B_TRANSLATE("Volume:"));
 	volumeLabel->SetAlignment(B_ALIGN_LEFT);
@@ -260,24 +264,24 @@ MidiPlayerWindow::CreateViews()
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(scopeView)
+		.Add(fScopeView)
 		.Add(BGridLayoutBuilder(10, 10)
 			.Add(BSpaceLayoutItem::CreateGlue(), 0, 0)
-			.Add(showScope, 1, 0)
+			.Add(fShowScopeCheckBox, 1, 0)
 
-			.Add(reverbMenu->CreateLabelLayoutItem(), 0, 1)
-			.Add(reverbMenu->CreateMenuBarLayoutItem(), 1, 1)
+			.Add(fReverbMenuField->CreateLabelLayoutItem(), 0, 1)
+			.Add(fReverbMenuField->CreateMenuBarLayoutItem(), 1, 1)
 
-			.Add(inputMenu->CreateLabelLayoutItem(), 0, 2)
-			.Add(inputMenu->CreateMenuBarLayoutItem(), 1, 2)
+			.Add(fInputMenuField->CreateLabelLayoutItem(), 0, 2)
+			.Add(fInputMenuField->CreateMenuBarLayoutItem(), 1, 2)
 
 			.Add(volumeLabel, 0, 3)
-			.Add(volumeSlider, 1, 3)
+			.Add(fVolumeSlider, 1, 3)
 		)
 		.AddGlue()
 		.Add(divider)
 		.AddGlue()
-		.Add(playButton)
+		.Add(fPlayButton)
 		.AddGlue()
 		.SetInsets(5, 5, 5, 5)
 	);
@@ -289,23 +293,23 @@ MidiPlayerWindow::InitControls()
 {
 	Lock();
 
-	showScope->SetValue(scopeEnabled ? B_CONTROL_ON : B_CONTROL_OFF);
-	scopeView->SetEnabled(scopeEnabled);
+	fShowScopeCheckBox->SetValue(fScopeEnabled ? B_CONTROL_ON : B_CONTROL_OFF);
+	fScopeView->SetEnabled(fScopeEnabled);
 
-	inputOff->SetMarked(true);
+	fInputOffMenuItem->SetMarked(true);
 
-	reverbNone->SetMarked(reverb == B_REVERB_NONE);
-	reverbCloset->SetMarked(reverb == B_REVERB_CLOSET);
-	reverbGarage->SetMarked(reverb == B_REVERB_GARAGE);
-	reverbIgor->SetMarked(reverb == B_REVERB_BALLROOM);
-	reverbCavern->SetMarked(reverb == B_REVERB_CAVERN);
-	reverbDungeon->SetMarked(reverb == B_REVERB_DUNGEON);
-	be_synth->SetReverb(reverb);
+	fReverbNoneMenuItem->SetMarked(fReverbMode == B_REVERB_NONE);
+	fReverbClosetMenuItem->SetMarked(fReverbMode == B_REVERB_CLOSET);
+	fReverbGarageMenuItem->SetMarked(fReverbMode == B_REVERB_GARAGE);
+	fReverbIgorMenuItem->SetMarked(fReverbMode == B_REVERB_BALLROOM);
+	fReverbCavern->SetMarked(fReverbMode == B_REVERB_CAVERN);
+	fReverbDungeon->SetMarked(fReverbMode == B_REVERB_DUNGEON);
+	be_synth->SetReverb(fReverbMode);
 
-	volumeSlider->SetValue(volume);
+	fVolumeSlider->SetValue(fVolume);
 
-	if (windowX != -1 && windowY != -1)
-		MoveTo(windowX, windowY);
+	if (fWindowX != -1 && fWindowY != -1)
+		MoveTo(fWindowX, fWindowY);
 	else
 		CenterOnScreen();
 
@@ -320,11 +324,11 @@ MidiPlayerWindow::LoadSettings()
 	if (file.InitCheck() != B_OK || file.Lock() != B_OK)
 		return;
 
-	file.ReadAttr("Scope", B_BOOL_TYPE, 0, &scopeEnabled, sizeof(bool));
-	file.ReadAttr("Reverb", B_INT32_TYPE, 0, &reverb, sizeof(int32));
-	file.ReadAttr("Volume", B_INT32_TYPE, 0, &volume, sizeof(int32));
-	file.ReadAttr("WindowX", B_FLOAT_TYPE, 0, &windowX, sizeof(float));
-	file.ReadAttr("WindowY", B_FLOAT_TYPE, 0, &windowY, sizeof(float));
+	file.ReadAttr("Scope", B_BOOL_TYPE, 0, &fScopeEnabled, sizeof(bool));
+	file.ReadAttr("Reverb", B_INT32_TYPE, 0, &fReverbMode, sizeof(int32));
+	file.ReadAttr("Volume", B_INT32_TYPE, 0, &fWindowX, sizeof(int32));
+	file.ReadAttr("WindowX", B_FLOAT_TYPE, 0, &fWindowX, sizeof(float));
+	file.ReadAttr("WindowY", B_FLOAT_TYPE, 0, &fWindowY, sizeof(float));
 
 	file.Unlock();
 }
@@ -337,11 +341,11 @@ MidiPlayerWindow::SaveSettings()
 	if (file.InitCheck() != B_OK || file.Lock() != B_OK)
 		return;
 
-	file.WriteAttr("Scope", B_BOOL_TYPE, 0, &scopeEnabled, sizeof(bool));
-	file.WriteAttr("Reverb", B_INT32_TYPE, 0, &reverb, sizeof(int32));
-	file.WriteAttr("Volume", B_INT32_TYPE, 0, &volume, sizeof(int32));
-	file.WriteAttr("WindowX", B_FLOAT_TYPE, 0, &windowX, sizeof(float));
-	file.WriteAttr("WindowY", B_FLOAT_TYPE, 0, &windowY, sizeof(float));
+	file.WriteAttr("Scope", B_BOOL_TYPE, 0, &fScopeEnabled, sizeof(bool));
+	file.WriteAttr("Reverb", B_INT32_TYPE, 0, &fReverbMode, sizeof(int32));
+	file.WriteAttr("Volume", B_INT32_TYPE, 0, &fVolume, sizeof(int32));
+	file.WriteAttr("WindowX", B_FLOAT_TYPE, 0, &fWindowX, sizeof(float));
+	file.WriteAttr("WindowY", B_FLOAT_TYPE, 0, &fWindowY, sizeof(float));
 
 	file.Sync();
 	file.Unlock();
@@ -351,35 +355,35 @@ MidiPlayerWindow::SaveSettings()
 void
 MidiPlayerWindow::LoadFile(entry_ref* ref)
 {
-	if (playing) {
-		scopeView->SetPlaying(false);
-		scopeView->Invalidate();
+	if (fIsPlaying) {
+		fScopeView->SetPlaying(false);
+		fScopeView->Invalidate();
 		UpdateIfNeeded();
 
 		StopSynth();
 	}
 
-	synth.UnloadFile();
+	fMidiSynthFile.UnloadFile();
 
-	if (synth.LoadFile(ref) == B_OK) {
+	if (fMidiSynthFile.LoadFile(ref) == B_OK) {
 		// Ideally, we would call SetVolume() in InitControls(),
 		// but for some reason that doesn't work: BMidiSynthFile
 		// will use the default volume instead. So we do it here.
-		synth.SetVolume(volume / 100.0f);
+		fMidiSynthFile.SetVolume(fVolume / 100.0f);
 
-		playButton->SetEnabled(true);
-		playButton->SetLabel(B_TRANSLATE("Stop"));
-		scopeView->SetHaveFile(true);
-		scopeView->SetPlaying(true);
-		scopeView->Invalidate();
+		fPlayButton->SetEnabled(true);
+		fPlayButton->SetLabel(B_TRANSLATE("Stop"));
+		fScopeView->SetHaveFile(true);
+		fScopeView->SetPlaying(true);
+		fScopeView->Invalidate();
 
 		StartSynth();
 	} else {
-		playButton->SetEnabled(false);
-		playButton->SetLabel(B_TRANSLATE("Play"));
-		scopeView->SetHaveFile(false);
-		scopeView->SetPlaying(false);
-		scopeView->Invalidate();
+		fPlayButton->SetEnabled(false);
+		fPlayButton->SetLabel(B_TRANSLATE("Play"));
+		fScopeView->SetHaveFile(false);
+		fScopeView->SetPlaying(false);
+		fScopeView->Invalidate();
 
 		BAlert* alert = new BAlert(NULL, B_TRANSLATE("Could not load song"),
 			B_TRANSLATE("OK"), NULL, NULL,
@@ -393,19 +397,19 @@ MidiPlayerWindow::LoadFile(entry_ref* ref)
 void
 MidiPlayerWindow::StartSynth()
 {
-	synth.Start();
-	synth.SetFileHook(_StopHook, (int32)(addr_t)this);
-	playing = true;
+	fMidiSynthFile.Start();
+	fMidiSynthFile.SetFileHook(_StopHook, (int32)(addr_t)this);
+	fIsPlaying = true;
 }
 
 
 void
 MidiPlayerWindow::StopSynth()
 {
-	if (!synth.IsFinished())
-		synth.Fade();
+	if (!fMidiSynthFile.IsFinished())
+		fMidiSynthFile.Fade();
 
-	playing = false;
+	fIsPlaying = false;
 }
 
 
@@ -422,12 +426,12 @@ MidiPlayerWindow::StopHook()
 	Lock();
 		// we may be called from the synth's thread
 
-	playing = false;
+	fIsPlaying = false;
 
-	scopeView->SetPlaying(false);
-	scopeView->Invalidate();
-	playButton->SetEnabled(true);
-	playButton->SetLabel(B_TRANSLATE("Play"));
+	fScopeView->SetPlaying(false);
+	fScopeView->Invalidate();
+	fPlayButton->SetEnabled(true);
+	fPlayButton->SetLabel(B_TRANSLATE("Play"));
 
 	Unlock();
 }
@@ -436,17 +440,17 @@ MidiPlayerWindow::StopHook()
 void
 MidiPlayerWindow::OnPlayStop()
 {
-	if (playing) {
-		playButton->SetEnabled(false);
-		scopeView->SetPlaying(false);
-		scopeView->Invalidate();
+	if (fIsPlaying) {
+		fPlayButton->SetEnabled(false);
+		fScopeView->SetPlaying(false);
+		fScopeView->Invalidate();
 		UpdateIfNeeded();
 
 		StopSynth();
 	} else {
-		playButton->SetLabel(B_TRANSLATE("Stop"));
-		scopeView->SetPlaying(true);
-		scopeView->Invalidate();
+		fPlayButton->SetLabel(B_TRANSLATE("Stop"));
+		fScopeView->SetPlaying(true);
+		fScopeView->Invalidate();
 
 		StartSynth();
 	}
@@ -456,48 +460,48 @@ MidiPlayerWindow::OnPlayStop()
 void
 MidiPlayerWindow::OnShowScope()
 {
-	scopeEnabled = !scopeEnabled;
-	scopeView->SetEnabled(scopeEnabled);
-	scopeView->Invalidate();
+	fScopeEnabled = !fScopeEnabled;
+	fScopeView->SetEnabled(fScopeEnabled);
+	fScopeView->Invalidate();
 	SaveSettings();
 }
 
 
 void
-MidiPlayerWindow::OnInputChanged(BMessage* msg)
+MidiPlayerWindow::OnInputChanged(BMessage* message)
 {
 	int32 newId;
-	if (msg->FindInt32("id", &newId) == B_OK) {
-		BMidiProducer* endpoint = BMidiRoster::FindProducer(inputId);
+	if (message->FindInt32("id", &newId) == B_OK) {
+		BMidiProducer* endpoint = BMidiRoster::FindProducer(fInputId);
 		if (endpoint != NULL) {
-			endpoint->Disconnect(bridge);
+			endpoint->Disconnect(fSynthBridge);
 			endpoint->Release();
 		}
 
-		inputId = newId;
+		fInputId = newId;
 
-		endpoint = BMidiRoster::FindProducer(inputId);
+		endpoint = BMidiRoster::FindProducer(fInputId);
 		if (endpoint != NULL) {
-			if (!instrLoaded) {
-				scopeView->SetLoading(true);
-				scopeView->Invalidate();
+			if (!fInstrumentLoaded) {
+				fScopeView->SetLoading(true);
+				fScopeView->Invalidate();
 				UpdateIfNeeded();
 
-				bridge->Init(B_BIG_SYNTH);
-				instrLoaded = true;
+				fSynthBridge->Init(B_BIG_SYNTH);
+				fInstrumentLoaded = true;
 
-				scopeView->SetLoading(false);
-				scopeView->Invalidate();
+				fScopeView->SetLoading(false);
+				fScopeView->Invalidate();
 			}
 
-			endpoint->Connect(bridge);
+			endpoint->Connect(fSynthBridge);
 			endpoint->Release();
 
-			scopeView->SetLiveInput(true);
-			scopeView->Invalidate();
+			fScopeView->SetLiveInput(true);
+			fScopeView->Invalidate();
 		} else {
-			scopeView->SetLiveInput(false);
-			scopeView->Invalidate();
+			fScopeView->SetLiveInput(false);
+			fScopeView->Invalidate();
 		}
 	}
 }
@@ -506,8 +510,8 @@ MidiPlayerWindow::OnInputChanged(BMessage* msg)
 void
 MidiPlayerWindow::OnReverb(reverb_mode mode)
 {
-	reverb = mode;
-	be_synth->SetReverb(reverb);
+	fReverbMode = mode;
+	be_synth->SetReverb(fReverbMode);
 	SaveSettings();
 }
 
@@ -515,16 +519,16 @@ MidiPlayerWindow::OnReverb(reverb_mode mode)
 void
 MidiPlayerWindow::OnVolume()
 {
-	volume = volumeSlider->Value();
-	synth.SetVolume(volume / 100.0f);
+	fVolume = fVolumeSlider->Value();
+	fMidiSynthFile.SetVolume(fVolume / 100.0f);
 	SaveSettings();
 }
 
 
 void
-MidiPlayerWindow::OnDrop(BMessage* msg)
+MidiPlayerWindow::OnDrop(BMessage* message)
 {
 	entry_ref ref;
-	if (msg->FindRef("refs", &ref) == B_OK)
+	if (message->FindRef("refs", &ref) == B_OK)
 		LoadFile(&ref);
 }

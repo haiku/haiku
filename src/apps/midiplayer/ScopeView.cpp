@@ -20,237 +20,192 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+
+#include "ScopeView.h"
+
 #include <Catalog.h>
 #include <Locale.h>
 #include <Synth.h>
 #include <Window.h>
 
-#include "ScopeView.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Scope View"
 
 
-//------------------------------------------------------------------------------
+//	#pragma mark - ScopeView
+
 
 ScopeView::ScopeView()
-	: BView(BRect(0, 0, 180, 63), NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-	        B_WILL_DRAW)
+	:
+	BView(BRect(0, 0, 180, 63), NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		B_WILL_DRAW),
+	fIsPlaying(false),
+	fIsEnabled(true),
+	fHaveFile(false),
+	fIsLoading(false),
+	fIsLiveInput(false),
+	fSampleCount(Bounds().IntegerWidth()),
+	fLeftSamples(new int16[fSampleCount]),
+	fRightSamples(new int16[fSampleCount]),
+	fScopeThreadID(-1)
 {
-	SetViewColor(0, 0, 0);
-
-	playing = false;
-	enabled = true;
-	haveFile = false;
-	loading = false;
-	liveInput = false;
-
-	sampleCount = (int32) Bounds().Width();
-	leftSamples = new int16[sampleCount];
-	rightSamples = new int16[sampleCount];
 }
 
-//------------------------------------------------------------------------------
 
 ScopeView::~ScopeView()
 {
-	delete[] leftSamples;
-	delete[] rightSamples;
+	delete[] fLeftSamples;
+	delete[] fRightSamples;
 }
 
-//------------------------------------------------------------------------------
 
 void ScopeView::AttachedToWindow()
 {
-	finished = false;
-	threadId = spawn_thread(_Thread, "ScopeThread", B_NORMAL_PRIORITY, this);
-	if (threadId >= B_OK)
-	{
-		resume_thread(threadId);
-	}
+	SetViewColor(0, 0, 0);
+
+	fIsFinished = false;
+	fScopeThreadID = spawn_thread(_Thread, "ScopeThread",
+		B_NORMAL_PRIORITY, this);
+	if (fScopeThreadID > 0)
+		resume_thread(fScopeThreadID);
 }
 
-//------------------------------------------------------------------------------
 
-void ScopeView::DetachedFromWindow()
+void
+ScopeView::DetachedFromWindow()
 {
-	if (threadId >= B_OK)
-	{
-		finished = true;
+	if (fScopeThreadID > 0) {
+		fIsFinished = true;
 		status_t exitValue;
-		wait_for_thread(threadId, &exitValue);
+		wait_for_thread(fScopeThreadID, &exitValue);
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void ScopeView::Draw(BRect updateRect)
+void
+ScopeView::Draw(BRect updateRect)
 {
 	super::Draw(updateRect);
 
-	if (loading)
-	{
+	if (fIsLoading)
 		DrawLoading();
-	}
-	else if (!haveFile && !liveInput)
-	{
+	else if (!fHaveFile && !fIsLiveInput)
 		DrawNoFile();
-	}
-	else if (!enabled)
-	{
+	else if (!fIsEnabled)
 		DrawDisabled();
-	}
-	else if (playing || liveInput)
-	{
+	else if (fIsPlaying || fIsLiveInput)
 		DrawPlaying();
-	}
 	else
-	{
 		DrawStopped();
-	}
 }
 
-//------------------------------------------------------------------------------
 
-void ScopeView::SetPlaying(bool flag)
-{
-	playing = flag;
-}
-
-//------------------------------------------------------------------------------
-
-void ScopeView::SetEnabled(bool flag)
-{
-	enabled = flag;
-}
-
-//------------------------------------------------------------------------------
-
-void ScopeView::SetHaveFile(bool flag)
-{
-	haveFile = flag;
-}
-
-//------------------------------------------------------------------------------
-
-void ScopeView::SetLoading(bool flag)
-{
-	loading = flag;
-}
-
-//------------------------------------------------------------------------------
-
-void ScopeView::SetLiveInput(bool flag)
-{
-	liveInput = flag;
-}
-
-//------------------------------------------------------------------------------
-
-int32 ScopeView::_Thread(void* data)
+int32
+ScopeView::_Thread(void* data)
 {
 	return ((ScopeView*) data)->Thread();
 }
 
-//------------------------------------------------------------------------------
 
-int32 ScopeView::Thread()
+int32
+ScopeView::Thread()
 {
 	// Because Pulse() was too slow, I created a thread that tells the
 	// ScopeView to repaint itself. Note that we need to call LockLooper
 	// with a timeout, otherwise we'll deadlock in DetachedFromWindow().
 
-	while (!finished)
-	{
-		if (enabled && (playing || liveInput))
-		{
-			if (LockLooperWithTimeout(50000) == B_OK)
-			{
+	while (!fIsFinished) {
+		if (fIsEnabled && (fIsPlaying || fIsLiveInput)) {
+			if (LockLooperWithTimeout(50000) == B_OK) {
 				Invalidate();
 				UnlockLooper();
 			}
 		}
 		snooze(50000);
 	}
+
 	return 0;
 }
 
-//------------------------------------------------------------------------------
 
-void ScopeView::DrawLoading()
+void
+ScopeView::DrawLoading()
 {
-	DrawText("Loading instruments" B_UTF8_ELLIPSIS);
+	DrawText(B_TRANSLATE("Loading instruments" B_UTF8_ELLIPSIS));
 }
 
-//------------------------------------------------------------------------------
 
-void ScopeView::DrawNoFile()
+void
+ScopeView::DrawNoFile()
 {
 	DrawText(B_TRANSLATE("Drop MIDI file here"));
 }
 
-//------------------------------------------------------------------------------
 
-void ScopeView::DrawDisabled()
+void
+ScopeView::DrawDisabled()
 {
 	SetHighColor(64, 64, 64);
 
-	StrokeLine(
-		BPoint(0, Bounds().Height() / 2),
+	StrokeLine(BPoint(0, Bounds().Height() / 2),
 		BPoint(Bounds().Width(), Bounds().Height() / 2));
 }
 
-//------------------------------------------------------------------------------
 
-void ScopeView::DrawStopped()
+void
+ScopeView::DrawStopped()
 {
 	SetHighColor(0, 130, 0);
 
-	StrokeLine(
-		BPoint(0, Bounds().Height() / 2),
+	StrokeLine(BPoint(0, Bounds().Height() / 2),
 		BPoint(Bounds().Width(), Bounds().Height() / 2));
 }
 
-//------------------------------------------------------------------------------
 
-void ScopeView::DrawPlaying()
+void
+ScopeView::DrawPlaying()
 {
 	int32 width = (int32) Bounds().Width();
 	int32 height = (int32) Bounds().Height();
 
 	// Scope drawing magic based on code by Michael Pfeiffer.
 
-	int32 size = be_synth->GetAudio(leftSamples, rightSamples, sampleCount);
-	if (size > 0)
-	{
+	int32 size = be_synth->GetAudio(fLeftSamples, fRightSamples, fSampleCount);
+	if (size > 0) {
 		SetHighColor(255, 0, 130);
 		SetLowColor(0, 130, 0);
-		#define N 16
-		int32 x, y, sx = 0, f = (height << N) / 65535, dy = height / 2 + 1;
-		for (int32 i = 0; i < width; i++)
-		{
+
+		int32 x;
+		int32 y;
+		int32 sx = 0;
+		int32 f = (height << 16) / 65535;
+		int32 dy = height / 2 + 1;
+		for (int32 i = 0; i < width; i++) {
 			x = sx / width;
-			y = ((leftSamples[x] * f) >> N) + dy;
+			y = ((fLeftSamples[x] * f) >> 16) + dy;
 			FillRect(BRect(i, y, i, y));
-			y = ((rightSamples[x] * f) >> N) + dy;
+
+			y = ((fRightSamples[x] * f) >> 16) + dy;
 			FillRect(BRect(i, y, i, y), B_SOLID_LOW);
+
 			sx += size;
 		}
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void ScopeView::DrawText(const char* text)
+void
+ScopeView::DrawText(const char* text)
 {
 	font_height height;
 	GetFontHeight(&height);
 
-	float strWidth = StringWidth(text);
-	float strHeight = height.ascent + height.descent;
+	float stringWidth = StringWidth(text);
+	float stringHeight = height.ascent + height.descent;
 
-	float x = (Bounds().Width() - strWidth)/2;
-	float y = height.ascent + (Bounds().Height() - strHeight)/2;
+	float x = (Bounds().Width() - stringWidth) / 2;
+	float y = height.ascent + (Bounds().Height() - stringHeight) / 2;
 
 	SetHighColor(255, 255, 255);
 	SetLowColor(ViewColor());
@@ -258,5 +213,3 @@ void ScopeView::DrawText(const char* text)
 
 	DrawString(text, BPoint(x, y));
 }
-
-//------------------------------------------------------------------------------

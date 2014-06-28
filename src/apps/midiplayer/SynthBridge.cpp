@@ -20,97 +20,93 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+
 #include "SynthBridge.h"
 
-//------------------------------------------------------------------------------
+
+//	#pragma mark - SynthBridge
+
 
 SynthBridge::SynthBridge()
-	: BMidiLocalConsumer("Internal Synthesizer")
+	:
+	BMidiLocalConsumer("Internal Synthesizer")
 {
-	// do nothing
 }
 
-//------------------------------------------------------------------------------
 
-bool SynthBridge::Init(synth_mode mode)
+bool
+SynthBridge::Init(synth_mode mode)
 {
-	if (be_synth->LoadSynthData(mode) == B_OK)
-	{
-		midiSynth.EnableInput(true, true);
+	if (be_synth->LoadSynthData(mode) == B_OK) {
+		fMidiSynth.EnableInput(true, true);
 		return true;
 	}
+
 	return false;
 }
 
-//------------------------------------------------------------------------------
 
-BMidiSynth* SynthBridge::MidiSynth()
+BMidiSynth*
+SynthBridge::MidiSynth()
 {
-	return &midiSynth;
+	return &fMidiSynth;
 }
 
-//------------------------------------------------------------------------------
 
-void SynthBridge::NoteOff(
-	uchar channel, uchar note, uchar velocity, bigtime_t time)
+void
+SynthBridge::NoteOff(uchar channel, uchar note, uchar velocity, bigtime_t time)
 {
-	midiSynth.NoteOff(channel + 1, note, velocity, time / 1000);
+	fMidiSynth.NoteOff(channel + 1, note, velocity, time / 1000);
 }
 
-//------------------------------------------------------------------------------
 
-void SynthBridge::NoteOn(
-	uchar channel, uchar note, uchar velocity, bigtime_t time)
+void
+SynthBridge::NoteOn(uchar channel, uchar note, uchar velocity, bigtime_t time)
 {
-	midiSynth.NoteOn(channel + 1, note, velocity, time / 1000);
+	fMidiSynth.NoteOn(channel + 1, note, velocity, time / 1000);
 }
 
-//------------------------------------------------------------------------------
 
-void SynthBridge::KeyPressure(
-	uchar channel, uchar note, uchar pressure, bigtime_t time)
+void
+SynthBridge::KeyPressure(uchar channel, uchar note, uchar pressure,
+	bigtime_t time)
 {
-	midiSynth.KeyPressure(channel + 1, note, pressure, time / 1000);
+	fMidiSynth.KeyPressure(channel + 1, note, pressure, time / 1000);
 }
 
-//------------------------------------------------------------------------------
 
-void SynthBridge::ControlChange(
-	uchar channel, uchar controlNumber, uchar controlValue, bigtime_t time)
+void
+SynthBridge::ControlChange(uchar channel, uchar controlNumber,
+	uchar controlValue, bigtime_t time)
 {
-	midiSynth.ControlChange(
-		channel + 1, controlNumber, controlValue, time / 1000);
+	fMidiSynth.ControlChange(channel + 1, controlNumber, controlValue,
+		time / 1000);
 }
 
-//------------------------------------------------------------------------------
 
-void SynthBridge::ProgramChange(
-	uchar channel, uchar programNumber, bigtime_t time)
+void
+SynthBridge::ProgramChange(uchar channel, uchar programNumber, bigtime_t time)
 {
-	midiSynth.ProgramChange(channel + 1, programNumber, time / 1000);
+	fMidiSynth.ProgramChange(channel + 1, programNumber, time / 1000);
 }
 
-//------------------------------------------------------------------------------
 
-void SynthBridge::ChannelPressure(
-	uchar channel, uchar pressure, bigtime_t time)
+void
+SynthBridge::ChannelPressure(uchar channel, uchar pressure, bigtime_t time)
 {
-	midiSynth.ChannelPressure(channel + 1, pressure, time / 1000);
+	fMidiSynth.ChannelPressure(channel + 1, pressure, time / 1000);
 }
 
-//------------------------------------------------------------------------------
 
-void SynthBridge::PitchBend(
-	uchar channel, uchar lsb, uchar msb, bigtime_t time)
+void
+SynthBridge::PitchBend(uchar channel, uchar lsb, uchar msb, bigtime_t time)
 {
-	midiSynth.PitchBend(channel + 1, lsb, msb, time / 1000);
+	fMidiSynth.PitchBend(channel + 1, lsb, msb, time / 1000);
 }
 
-//------------------------------------------------------------------------------
 
-void SynthBridge::AllNotesOff(bool justChannel, bigtime_t time)
+void
+SynthBridge::AllNotesOff(bool justChannel, bigtime_t time)
 {
-	midiSynth.AllNotesOff(justChannel, time / 1000);
+	fMidiSynth.AllNotesOff(justChannel, time / 1000);
 }
-
-//------------------------------------------------------------------------------

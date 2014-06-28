@@ -20,21 +20,30 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+
+#include "MidiPlayerApp.h"
+
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Catalog.h>
 #include <Locale.h>
 #include <StorageKit.h>
 
-#include "MidiPlayerApp.h"
 #include "MidiPlayerWindow.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Main Application"
 
+
+//	#pragma mark - MidiPlayerApp
+
+
 MidiPlayerApp::MidiPlayerApp()
-	: BApplication(MIDI_PLAYER_SIGNATURE)
+	:
+	BApplication(MIDI_PLAYER_SIGNATURE)
 {
-	window = new MidiPlayerWindow;
+	window = new MidiPlayerWindow();
 }
 
 
@@ -62,10 +71,10 @@ MidiPlayerApp::AboutRequested()
 
 
 void
-MidiPlayerApp::RefsReceived(BMessage* msg)
+MidiPlayerApp::RefsReceived(BMessage* message)
 {
-	msg->what = B_SIMPLE_DATA;
-	window->PostMessage(msg);
+	message->what = B_SIMPLE_DATA;
+	window->PostMessage(message);
 }
 
 
@@ -90,7 +99,7 @@ MidiPlayerApp::ArgvReceived(int32 argc, char** argv)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - main method
 
 
 int
@@ -100,4 +109,3 @@ main()
 	app.Run();
 	return 0;
 }
-

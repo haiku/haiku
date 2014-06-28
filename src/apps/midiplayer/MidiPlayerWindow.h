@@ -7,10 +7,10 @@
  * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the 
  * Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in 
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
@@ -19,14 +19,16 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  * DEALINGS IN THE SOFTWARE.
  */
+#ifndef _MIDI_PLAYER_WINDOW_H
+#define _MIDI_PLAYER_WINDOW_H
 
-#ifndef MIDI_PLAYER_WINDOW_H
-#define MIDI_PLAYER_WINDOW_H
 
 #include <InterfaceKit.h>
 #include <MidiSynthFile.h>
 
+
 #define SETTINGS_FILE "/boot/home/config/settings/MidiPlayerSettings"
+
 
 enum
 {
@@ -42,25 +44,23 @@ enum
 	MSG_VOLUME,
 };
 
+
 class ScopeView;
 class SynthBridge;
 
-class MidiPlayerWindow : public BWindow
-{
+class MidiPlayerWindow : public BWindow {
 public:
-
 	MidiPlayerWindow();
 	virtual ~MidiPlayerWindow();
 
 	virtual bool QuitRequested();
-	virtual void MessageReceived(BMessage* msg);
+	virtual void MessageReceived(BMessage* message);
 	virtual void FrameMoved(BPoint origin);
 	virtual void MenusBeginning();
 
 private:
-
 	typedef BWindow super;
-	
+
 	void CreateInputMenu();
 	void CreateReverbMenu();
 	void CreateViews();
@@ -77,36 +77,37 @@ private:
 
 	void OnPlayStop();
 	void OnShowScope();
-	void OnInputChanged(BMessage* msg);
+	void OnInputChanged(BMessage* message);
 	void OnReverb(reverb_mode mode);
 	void OnVolume();
-	void OnDrop(BMessage* msg);
+	void OnDrop(BMessage* message);
 
-	ScopeView* scopeView;
-	BCheckBox* showScope;
-	BMenuField* inputMenu;
-	BPopUpMenu* inputPopUp; 
-	BMenuItem* inputOff;
-	BMenuField* reverbMenu;
-	BMenuItem* reverbNone;
-	BMenuItem* reverbCloset;
-	BMenuItem* reverbGarage;
-	BMenuItem* reverbIgor;
-	BMenuItem* reverbCavern;
-	BMenuItem* reverbDungeon;
-	BSlider* volumeSlider;
-	BButton* playButton;
+	ScopeView* fScopeView;
+	BCheckBox* fShowScopeCheckBox;
+	BMenuField* fInputMenuField;
+	BPopUpMenu* fInputPopUpMenu;
+	BMenuItem* fInputOffMenuItem;
+	BMenuField* fReverbMenuField;
+	BMenuItem* fReverbNoneMenuItem;
+	BMenuItem* fReverbClosetMenuItem;
+	BMenuItem* fReverbGarageMenuItem;
+	BMenuItem* fReverbIgorMenuItem;
+	BMenuItem* fReverbCavern;
+	BMenuItem* fReverbDungeon;
+	BSlider* fVolumeSlider;
+	BButton* fPlayButton;
 
-	bool playing;
-	bool scopeEnabled;
-	int32 inputId;
-	reverb_mode reverb;
-	int32 volume;
-	float windowX;
-	float windowY;
-	BMidiSynthFile synth;
-	SynthBridge* bridge;
-	bool instrLoaded;
+	bool fIsPlaying;
+	bool fScopeEnabled;
+	int32 fInputId;
+	reverb_mode fReverbMode;
+	int32 fVolume;
+	float fWindowX;
+	float fWindowY;
+	BMidiSynthFile fMidiSynthFile;
+	SynthBridge* fSynthBridge;
+	bool fInstrumentLoaded;
 };
 
-#endif // MIDI_PLAYER_WINDOW_H
+
+#endif // _MIDI_PLAYER_WINDOW_H

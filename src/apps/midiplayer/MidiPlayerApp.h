@@ -19,12 +19,15 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  * DEALINGS IN THE SOFTWARE.
  */
-#ifndef MIDI_PLAYER_APP_H
-#define MIDI_PLAYER_APP_H
+#ifndef _MIDI_PLAYER_APP_H
+#define _MIDI_PLAYER_APP_H
+
 
 #include <Application.h>
 
+
 #define MIDI_PLAYER_SIGNATURE  "application/x-vnd.Haiku-MidiPlayer"
+
 
 class MidiPlayerWindow;
 
@@ -42,4 +45,5 @@ class MidiPlayerApp : public BApplication {
 		MidiPlayerWindow* window;
 };
 
-#endif // MIDI_PLAYER_APP_H
+
+#endif // _MIDI_PLAYER_APP_H
