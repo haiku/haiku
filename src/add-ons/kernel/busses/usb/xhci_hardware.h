@@ -5,10 +5,22 @@
  * Authors:
  *		Jian Chiang <j.jian.chiang@gmail.com>
  *		Jérôme Duval <jerome.duval@gmail.com>
+ *		Akshay Jaggi <akshay1994.leo@gmail.com>
  */
 #ifndef XHCI_HARDWARE_H
 #define XHCI_HARDWARE_H
 
+// PCI IDs
+#define	PCI_VENDOR_INTEL						0x8086
+#define	PCI_DEVICE_INTEL_PANTHER_POINT_XHCI		0x1e31
+#define	PCI_DEVICE_INTEL_LYNX_POINT_XHCI		0x8c31
+#define	PCI_DEVICE_INTEL_LYNX_POINT_LP_XHCI		0x9c31
+
+// Intel quirks registers in PCI config
+#define	XHCI_INTEL_USB3PRM				0xdc	// USB 3.0 Port Routing Mask
+#define	XHCI_INTEL_USB3_PSSEN			0xd8	// USB 3.0 Port SuperSpeed Enable
+#define	XHCI_INTEL_USB2PRM				0xd4	// USB 2.0 Port Routing Mask
+#define	XHCI_INTEL_XUSB2PR				0xd0	// USB 2.0 Port Routing
 
 // Host Controller Capability Registers
 #define XHCI_HCI_CAPLENGTH	0x00		// HCI Capability Register Length
@@ -17,12 +29,12 @@
 #define XHCI_HCSPARAMS1		0x04		// Structural Parameters 1
 // HCSPARAMS1
 #define HCS_MAX_SLOTS(p)		(((p) >> 0) & 0xff)
-#define HCS_MAX_PORTS(p)		(((p) >> 24) & 0x7f)
+#define HCS_MAX_PORTS(p)		(((p) >> 24) & 0xff)
 #define XHCI_HCSPARAMS2		0x08		// Structural Parameters 2
 #define HCS_IST(p)				(((p) >> 0) & 0xf)
 #define HCS_ERST_MAX(p)			(((p) >> 4) & 0xf)
 #define HCS_SPR(p)				(((p) >> 26) & 0x1)
-#define HCS_MAX_SC_BUFFERS(p)	(((p) >> 27) & 0x1f)
+#define HCS_MAX_SC_BUFFERS(p)	(((((p) >> 21) & 0x1f)<<5)|(((p) >> 27) & 0x1f))
 #define XHCI_HCSPARAMS3		0x0C		// Structural Parameters 3
 #define HCS_U1_DEVICE_LATENCY(p)	(((p) >> 0) & 0xff)
 #define HCS_U2_DEVICE_LATENCY(p)	(((p) >> 16) & 0xffff)
@@ -98,7 +110,8 @@
 #define XHCI_LEGSUP_BIOSOWNED	(1 << 16)	// BIOS Owned Semaphore
 
 #define XHCI_LEGCTLSTS			0x04
-#define XHCI_LEGCTLSTS_DISABLE_SMI	((0x3 << 1) + (0xff << 5) + (0x7 << 17))
+#define XHCI_LEGCTLSTS_DISABLE_SMI	((0x7 << 1) + (0xff << 5) + (0x7 << 17))
+#define XHCI_LEGCTLSTS_EVENTS_SMI (0x7 << 29)
 
 #define XHCI_SUPPORTED_PROTOCOLS_CAPID	0x02
 #define XHCI_SUPPORTED_PROTOCOLS_0_MINOR(x)	(((x) >> 16) & 0xff)
@@ -336,14 +349,15 @@ struct xhci_slot_ctx {
 #define SLOT_2_PORT_NUM_GET(x)			(((x) >> 8) & 0xFF)
 #define SLOT_2_TT_TIME(x)				(((x) & 0x3) << 16)
 #define SLOT_2_TT_TIME_GET(x)			(((x) >> 16) & 0x3)
-#define SLOT_2_IRQ_TARGET(x)				(((x) & 0x1F) << 27)
-#define SLOT_2_IRQ_TARGET_GET(x)			(((x) >> 27) & 0x1f)
+#define SLOT_2_IRQ_TARGET(x)				(((x) & 0x7F) << 22)
+#define SLOT_2_IRQ_TARGET_GET(x)			(((x) >> 22) & 0x7F)
 
 #define SLOT_3_DEVICE_ADDRESS(x)		((x) & 0xFF)
 #define SLOT_3_DEVICE_ADDRESS_GET(x)	((x) & 0xFF)
 #define SLOT_3_SLOT_STATE(x)			(((x) & 0x1F) << 27)
 #define SLOT_3_SLOT_STATE_GET(x)		(((x) >> 27) & 0x1F)
 
+#define	HUB_TTT_GET(x)					(((x) >> 5) & 0x3)
 
 struct xhci_endpoint_ctx {
 	uint32	dwendpoint0;

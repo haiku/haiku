@@ -17,9 +17,9 @@
 
 Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
 	usb_device_descriptor &desc, int8 deviceAddress, usb_speed speed,
-	bool isRootHub)
+	bool isRootHub, void *controllerCookie)
 	:	Device(parent, hubAddress, hubPort, desc, deviceAddress, speed,
-			isRootHub),
+			isRootHub, controllerCookie),
 		fInterruptPipe(NULL)
 {
 	TRACE("creating hub\n");

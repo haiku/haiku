@@ -45,6 +45,8 @@ typedef struct xhci_td {
 	struct xhci_td	*next;
 	Transfer *transfer;
 	uint8	trb_count;
+	uint8	trb_completion_code;
+	uint32	trb_left;
 } xhci_td __attribute__((__aligned__(16)));
 
 

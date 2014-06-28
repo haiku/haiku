@@ -60,11 +60,14 @@ Stack::Stack()
 	// companion host controllers (per the EHCI specs) and it would therefore
 	// be enumerated as the last item. As this does not apply to us we have to
 	// ensure ordering using another method.
+	// Intel Lynx Point and Panther Point chipsets have ports shared between
+	// EHCI and XHCI, defaulting to EHCI. The XHCI module will switch USB 2.0
+	// ports before the EHCI module discovers them.
 	const char *moduleNames[] = {
+		"busses/usb/xhci",
 		"busses/usb/uhci",
 		"busses/usb/ohci",
 		"busses/usb/ehci",
-		"busses/usb/xhci",
 		NULL
 	};
 
