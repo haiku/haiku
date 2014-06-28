@@ -4,10 +4,10 @@ resource app_signature "application/x-vnd.Haiku-MidiPlayer";
 resource app_name_catalog_entry "x-vnd.Haiku-MidiPlayer:System name:MidiPlayer";
 
 resource app_version {
-	major      = 1, 
+	major      = 1,
 	middle     = 0,
-	minor      = 0,
-	variety    = B_APPV_BETA,
+	minor      = 1,
+	variety    = B_APPV_FINAL,
 	internal   = 0,
 	short_info = "MidiPlayer",
 	long_info  = "MidiPlayer Copyright (c) 2004 Matthijs Hollemans, "

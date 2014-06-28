@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src apps midiplayer ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateHeaders interface ;
+
 Application MidiPlayer :
 	MidiPlayerApp.cpp 
 	MidiPlayerWindow.cpp 

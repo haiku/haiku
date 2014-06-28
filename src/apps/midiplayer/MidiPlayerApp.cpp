@@ -58,16 +58,38 @@ MidiPlayerApp::ReadyToRun()
 void
 MidiPlayerApp::AboutRequested()
 {
-	BAlert* alert = new BAlert(NULL,
-		B_TRANSLATE_COMMENT("Haiku MIDI Player 1.0.0 beta\n\n"
+	BAboutWindow* window = new BAboutWindow("MidiPlayer",
+		MIDI_PLAYER_SIGNATURE);
+
+	const char* extraCopyrights[] = {
+		"2008-2014 Haiku, Inc.",
+		NULL
+	};
+	window->AddCopyright(2004, "Matthijs Hollemans", extraCopyrights);
+
+	const char* authors[] = {
+		"Adrien Destugues",
+		"Axel Dörfler",
+		"Matthijs Hollemans",
+		"Humdinger",
+		"Ryan Leavengood",
+		"Matt Madia",
+		"John Scipione",
+		"Jonas Sundström",
+		"Oliver Tappe",
+		NULL
+	};
+	window->AddAuthors(authors);
+
+	window->AddDescription(B_TRANSLATE_COMMENT(
 		"This tiny program\n"
 		"Knows how to play thousands of\n"
-		"Cheesy sounding songs", "This is a haiku. First line has five "
-		"syllables, second has seven and last has five again. "
-		"Create your own."), B_TRANSLATE("OK"), NULL, NULL,
-		B_WIDTH_AS_USUAL, B_INFO_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		alert->Go();
+		"Cheesy sounding songs",
+		"This is a haiku. First line has five syllables, "
+		"second has seven and last has five again. "
+		"Create your own."));
+
+	window->Show();
 }
 
 
