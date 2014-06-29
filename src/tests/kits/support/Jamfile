@@ -83,6 +83,9 @@ UnitTestLib libsupporttest.so
 	: be $(TARGET_LIBSTDC++) libsupporttest_RemoteTestObject.so
 ;
 
+UsePrivateHeaders support ;
+
+SimpleTest compression_test : compression_test.cpp : be ;
 SimpleTest string_utf8_tests : string_utf8_tests.cpp : be ;
 
 SubInclude HAIKU_TOP src tests kits support barchivable ;
