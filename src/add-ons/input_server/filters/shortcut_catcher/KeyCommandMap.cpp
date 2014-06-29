@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Jeremy Friesner
+ *		Jessica Hamilton, jessica.l.hamilton@gmail.com
  *		John Scipione, jscipione@gmail.com
  */
 
