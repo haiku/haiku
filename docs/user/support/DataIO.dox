@@ -102,8 +102,24 @@
 
 
 /*!
-	\fn virtual status_t BDataIO::ReadExactly(void* buffer, size_t size,
-		size_t* _bytesRead)
+	\fn virtual status_t BDataIO::Flush()
+	\brief Writes pending data to underlying storage.
+
+	This method is relevant for BDataIO implementations that buffer data passed
+	to Write(). The Flush() implementation should make sure that all such data
+	are written to the underlying storage.
+
+	The default implementation is a no-op returning \c B_OK.
+
+	\return An error code indicating whether flushing the buffered data
+		succeeded.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BDataIO::ReadExactly(void* buffer, size_t size, size_t* _bytesRead)
 	\brief Reads an exact amount of data from the object into a buffer.
 
 	This is a convenience wrapper method for Read() for code that expects the

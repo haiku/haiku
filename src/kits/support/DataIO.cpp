@@ -41,6 +41,13 @@ BDataIO::Write(const void* buffer, size_t size)
 
 
 status_t
+BDataIO::Flush()
+{
+	return B_OK;
+}
+
+
+status_t
 BDataIO::ReadExactly(void* buffer, size_t size, size_t* _bytesRead)
 {
 	uint8* out = (uint8*)buffer;
@@ -116,8 +123,32 @@ BDataIO::operator=(const BDataIO &)
 }
 
 
+#if __GNUC__ == 2
+
+
+extern "C" status_t
+_ReservedDataIO1__7BDataIO(BDataIO* self)
+{
+	return self->BDataIO::Flush();
+}
+
+
+#else
+
+
+// TODO: RELEASE: Remove!
+
+extern "C" status_t
+_ZN7BDataIO16_ReservedDataIO1Ev(BDataIO* self)
+{
+	return self->BDataIO::Flush();
+}
+
+
+#endif
+
+
 // FBC
-void BDataIO::_ReservedDataIO1(){}
 void BDataIO::_ReservedDataIO2(){}
 void BDataIO::_ReservedDataIO3(){}
 void BDataIO::_ReservedDataIO4(){}
