@@ -272,9 +272,10 @@ BDeskWindow::InitAddonsList(bool update)
 		}
 
 		BStringList addOnPaths;
-		BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker/",
+		BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker",
 			addOnPaths);
-		for (int32 i = 0; i < addOnPaths.CountStrings(); i++) {
+		int32 count = addOnPaths.CountStrings();
+		for (int32 i = 0; i < count; i++) {
 			LoadAddOnDir(BDirectory(addOnPaths.StringAt(i)), this,
 				fAddonsList);
 		}
