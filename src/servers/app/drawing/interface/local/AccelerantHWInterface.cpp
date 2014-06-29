@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Haiku.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Lotz, mmlr@mlotz.ch
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -34,7 +35,9 @@
 #include <Accelerant.h>
 #include <Cursor.h>
 #include <FindDirectory.h>
+#include <PathFinder.h>
 #include <String.h>
+#include <StringList.h>
 
 #include "AccelerantBuffer.h"
 #include "MallocBuffer.h"
@@ -277,25 +280,21 @@ AccelerantHWInterface::_OpenAccelerant(int device)
 
 	ATRACE(("accelerant signature is: %s\n", signature));
 
-	struct stat accelerant_stat;
-	const static directory_which dirs[] = {
-		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-		B_USER_ADDONS_DIRECTORY,
-		B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-		B_SYSTEM_ADDONS_DIRECTORY
-	};
-
 	fAccelerantImage = -1;
 
-	for (uint32 i = 0; i < sizeof(dirs) / sizeof(directory_which); i++) {
-		char path[PATH_MAX];
-		if (find_directory(dirs[i], -1, false, path, PATH_MAX) != B_OK)
+	BString leafPath("/accelerants/");
+	leafPath << signature;
+	BStringList addOnPaths;
+	BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, leafPath.String(),
+		addOnPaths);
+	int32 count = addOnPaths.CountStrings();
+	for (int32 i = 0; i < count; i++) {
+		const char* path = addOnPaths.StringAt(i).String();
+		struct stat accelerantStat;
+		if (stat(path, &accelerantStat) != 0)
 			continue;
 
-		strcat(path, "/accelerants/");
-		strcat(path, signature);
-		if (stat(path, &accelerant_stat) != 0)
-			continue;
+		ATRACE(("accelerant path is: %s\n", path));
 
 		fAccelerantImage = load_add_on(path);
 		if (fAccelerantImage >= 0) {
