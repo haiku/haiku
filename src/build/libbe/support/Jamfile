@@ -10,6 +10,7 @@ BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	Archivable.cpp
 	BlockCache.cpp
 	ByteOrder.cpp
+	CompressionAlgorithm.cpp
 	DataIO.cpp
 	Flattenable.cpp
 	List.cpp
@@ -18,6 +19,7 @@ BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	Referenceable.cpp
 	String.cpp
 	StringList.cpp
+	ZlibCompressionAlgorithm.cpp
 	ZlibCompressionBase.cpp
 	ZlibCompressor.cpp
 	ZlibDecompressor.cpp

@@ -24,6 +24,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			BufferedDataIO.cpp
 			BufferIO.cpp
 			ByteOrder.cpp
+			CompressionAlgorithm.cpp
 			DataIO.cpp
 			DateTime.cpp
 			Flattenable.cpp
@@ -36,6 +37,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			StringList.cpp
 			Url.cpp
 			Uuid.cpp
+			ZlibCompressionAlgorithm.cpp
 			ZlibCompressionBase.cpp
 			ZlibCompressor.cpp
 			ZlibDecompressor.cpp
