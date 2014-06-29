@@ -3,38 +3,38 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Lotz <mmlr@mlotz.ch>
- *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		DarkWyrm, bpmagic@columbus.rr.com
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Michael Lotz, mmlr@mlotz.ch
  */
 
 
-/*!	Accelerant based HWInterface implementation */
+//!	Accelerant based HWInterface implementation
 
 
 #include "AccelerantHWInterface.h"
 
-#include <dirent.h>
 #include <new>
+
+#include <dirent.h>
+#include <edid.h>
+#include <driver_settings.h>
+#include <graphic_driver.h>
+#include <image.h>
+#include <safemode_defs.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <syscalls.h>
 #include <syslog.h>
 #include <unistd.h>
 
 #include <Accelerant.h>
 #include <Cursor.h>
-#include <driver_settings.h>
 #include <FindDirectory.h>
-#include <graphic_driver.h>
-#include <image.h>
 #include <String.h>
-
-#include <edid.h>
-#include <safemode_defs.h>
-#include <syscalls.h>
 
 #include "AccelerantBuffer.h"
 #include "MallocBuffer.h"
@@ -91,7 +91,7 @@ use_fail_safe_video_mode()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - AccelerantHWInterface
 
 
 AccelerantHWInterface::AccelerantHWInterface()
@@ -151,8 +151,8 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fDisplayMode.space = B_RGB32;
 
 	// NOTE: I have no clue what I'm doing here.
-//	fSyncToken.counter = 0;
-//	fSyncToken.engine_id = 0;
+	//fSyncToken.counter = 0;
+	//fSyncToken.engine_id = 0;
 	memset(&fSyncToken, 0, sizeof(sync_token));
 }
 
@@ -169,7 +169,8 @@ AccelerantHWInterface::~AccelerantHWInterface()
 }
 
 
-/*!	\brief Opens the first available graphics device and initializes it
+/*!	Opens the first available graphics device and initializes it.
+
 	\return B_OK on success or an appropriate error message on failure.
 */
 status_t
@@ -201,15 +202,19 @@ AccelerantHWInterface::Initialize()
 }
 
 
-/*!	\brief Opens a graphics device for read-write access
-	\param deviceNumber Number identifying which graphics card to open (1 for first card)
-	\return The file descriptor for the opened graphics device
+/*!	Opens a graphics device for read-write access.
 
-	The deviceNumber is relative to the number of graphics devices that can be successfully
-	opened.  One represents the first card that can be successfully opened (not necessarily
+	The \a deviceNumber is relative to the number of graphics devices that can
+	be opened. One represents the first card that can be opened (not necessarily
 	the first one listed in the directory).
+
 	Graphics drivers must be able to be opened more than once, so we really get
 	the first working entry.
+
+	\param deviceNumber Number identifying which graphics card to open
+	       (1 for first card).
+
+	\return The file descriptor of the opened graphics device.
 */
 int
 AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
@@ -266,8 +271,9 @@ AccelerantHWInterface::_OpenAccelerant(int device)
 {
 	char signature[1024];
 	if (ioctl(device, B_GET_ACCELERANT_SIGNATURE,
-			&signature, sizeof(signature)) != B_OK)
+			&signature, sizeof(signature)) != B_OK) {
 		return B_ERROR;
+	}
 
 	ATRACE(("accelerant signature is: %s\n", signature));
 
@@ -294,7 +300,7 @@ AccelerantHWInterface::_OpenAccelerant(int device)
 		fAccelerantImage = load_add_on(path);
 		if (fAccelerantImage >= 0) {
 			if (get_image_symbol(fAccelerantImage, B_ACCELERANT_ENTRY_POINT,
-				B_SYMBOL_TYPE_ANY, (void**)(&fAccelerantHook)) != B_OK ) {
+					B_SYMBOL_TYPE_ANY, (void**)(&fAccelerantHook)) != B_OK) {
 				ATRACE(("unable to get B_ACCELERANT_ENTRY_POINT\n"));
 				unload_add_on(fAccelerantImage);
 				fAccelerantImage = -1;
@@ -434,7 +440,7 @@ AccelerantHWInterface::Shutdown()
 }
 
 
-/*! Finds the mode in the mode list that is closest to the mode specified.
+/*!	Finds the mode in the mode list that is closest to the mode specified.
 	As long as the mode list is not empty, this method will always succeed.
 */
 status_t
@@ -482,9 +488,11 @@ AccelerantHWInterface::_FindBestMode(const display_mode& compareMode,
 
 /*!	This method is used for the initial mode set only - because that one
 	should really not fail.
+
 	Basically we try to set all modes as found in the mode list the driver
 	returned, but we start with the one that best fits the originally
 	desired mode.
+
 	The mode list must have been retrieved already.
 */
 status_t
@@ -494,8 +502,9 @@ AccelerantHWInterface::_SetFallbackMode(display_mode& newMode) const
 	// supported modes - if that fails, we just take one
 
 	if (_FindBestMode(newMode, 0, newMode) == B_OK
-		&& fAccSetDisplayMode(&newMode) == B_OK)
+		&& fAccSetDisplayMode(&newMode) == B_OK) {
 		return B_OK;
+	}
 
 	// That failed as well, this looks like a bug in the graphics
 	// driver, but we have to try to be as forgiving as possible
