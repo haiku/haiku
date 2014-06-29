@@ -1,9 +1,10 @@
 /*
- * Copyright 1999-2009 Haiku, Inc. All rights reserved.
+ * Copyright 1999-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -266,18 +267,17 @@ KeyCommandMap::MessageReceived(BMessage* message)
 						&& message.FindMessage("act", &actuatorMessage) == B_OK
 						&& message.FindMessage("modtester", &testerMessage)
 							== B_OK) {
-
 						// Leave handling of add-ons shortcuts to Tracker
 						BString command;
 						if (message.FindString("command", &command) == B_OK) {
 							BStringList paths;
 							BPathFinder::FindPaths(
-								B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker/",
+								B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker",
 								paths);
 							bool foundAddOn = false;
-							for (int32 i = 0; i < paths.CountStrings(); i++) {
-								if (command.FindFirst(paths.StringAt(i))
-										!= B_ERROR) {
+							int32 count = paths.CountStrings();
+							for (int32 i = 0; i < count; i++) {
+								if (command.FindFirst(paths.StringAt(i)) == 0) {
 									foundAddOn = true;
 									break;
 								}
