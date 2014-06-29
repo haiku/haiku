@@ -478,7 +478,7 @@ actions DownloadLocatedFile1
 		echo "ERROR: Would need to download $(URL), but HAIKU_NO_DOWNLOADS is set!"
 		exit 1
 	fi
-	wget -O "$(1)" $(URL) || exit 1
+	wget --retry-connrefused -O "$(1)" $(URL) || exit 1
 	touch "$(1)"
 }
 
