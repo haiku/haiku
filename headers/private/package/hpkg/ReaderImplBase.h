@@ -197,9 +197,6 @@ private:
 			PackageFileSection*	fCurrentSection;
 
 			AttributeHandlerList fAttributeHandlerStack;
-
-			uint8*				fScratchBuffer;
-			size_t				fScratchBufferSize;
 };
 
 

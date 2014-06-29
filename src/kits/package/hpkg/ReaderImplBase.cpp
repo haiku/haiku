@@ -767,9 +767,7 @@ ReaderImplBase::ReaderImplBase(const char* fileType, BErrorOutput* errorOutput)
 	fOwnsFD(false),
 	fRawHeapReader(NULL),
 	fHeapReader(NULL),
-	fCurrentSection(NULL),
-	fScratchBuffer(NULL),
-	fScratchBufferSize(0)
+	fCurrentSection(NULL)
 {
 }
 
@@ -782,8 +780,6 @@ ReaderImplBase::~ReaderImplBase()
 
 	if (fOwnsFD && fFD >= 0)
 		close(fFD);
-
-	delete[] fScratchBuffer;
 }
 
 
@@ -1053,14 +1049,6 @@ ReaderImplBase::_Init(int fd, bool keepFD)
 {
 	fFD = fd;
 	fOwnsFD = keepFD;
-
-	// allocate a scratch buffer
-	fScratchBuffer = new(std::nothrow) uint8[kScratchBufferSize];
-	if (fScratchBuffer == NULL) {
-		fErrorOutput->PrintError("Error: Out of memory!\n");
-		return B_NO_MEMORY;
-	}
-	fScratchBufferSize = kScratchBufferSize;
 
 	return B_OK;
 }
