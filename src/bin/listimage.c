@@ -26,7 +26,7 @@ list_images_for_team_by_id(team_id id)
 	image_info imageInfo;
 	int32 cookie = 0;
 	team_info teamInfo;
-	const char* header;
+	char* header;
 	char* format;
 	int i;
 	status_t result = get_team_info(id, &teamInfo);
@@ -41,8 +41,10 @@ list_images_for_team_by_id(team_id id)
 	i = asprintf(&format, "%%5" B_PRId32 " 0x%%0%" B_PRIu32 PRIxPTR
 		" 0x%%0%" B_PRIu32 PRIxPTR "  %%4" B_PRId32 " %%10" B_PRIu32 " %%s\n",
 		sizeof(uintptr_t) * 2, sizeof(uintptr_t) * 2);
-	if (i == -1)
+	if (i == -1) {
+		free(header);
 		return B_NO_MEMORY;
+	}
 
 	if (id == 1)
 		printf("\nKERNEL TEAM:\n");
@@ -59,6 +61,7 @@ list_images_for_team_by_id(team_id id)
 			imageInfo.sequence, imageInfo.init_order, imageInfo.name);
 	}
 
+	free(header);
 	free(format);
 
 	if (result != B_ENTRY_NOT_FOUND && result != EINVAL) {
