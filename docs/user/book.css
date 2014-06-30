@@ -154,13 +154,24 @@ h4 a:hover, a:active, h5 a:hover, a:active, h6 a:hover, a:active {
 
 #banner span.subtitle {
 	position: relative;
-	top: 54px;
+	top: 30px;
 	left: 272px;
 	color: #333333; /* mine shaft */
 	text-transform: uppercase;
 	letter-spacing: 3px;
 	font-family: Myriad Pro,Myriad Web Pro Regular,Lucida Grande,Geneva,Trebuchet MS,sans-serif;
 	font-weight: normal;
+}
+
+input[type=text], input[type=password] {
+  font-size: inherit;
+  border-top: 1px solid #818181;
+  border-left: 1px solid #818181;
+  border-bottom: 1px solid #858585;
+  border-right: 1px solid #858585;
+  margin-top: 3px;
+  padding: 2px;
+  width: 200px;
 }
 
 div.header {
