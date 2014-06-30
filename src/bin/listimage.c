@@ -23,12 +23,11 @@
 static status_t
 list_images_for_team_by_id(team_id id)
 {
-	team_info teamInfo;
 	image_info imageInfo;
 	int32 cookie = 0;
+	team_info teamInfo;
 	const char* header;
 	char* format;
-	char* name;
 	int i;
 	status_t result = get_team_info(id, &teamInfo);
 	if (id != 1 && result < B_OK)
@@ -100,7 +99,6 @@ main(int argc, char** argv)
 {
 	int32 cookie = 0;
 	team_info info;
-	const char* programName;
 	status_t result;
 
 	if (argc == 1) {
