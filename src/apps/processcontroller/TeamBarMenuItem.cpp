@@ -219,9 +219,11 @@ void
 TeamBarMenuItem::GetContentSize(float* width, float* height)
 {
 	BMenuItem::GetContentSize(width, height);
-	if (*height < 16)
+	if (height != NULL && *height < 16)
 		*height = 16;
-	*width += 40 + kBarWidth;
+
+	if (width != NULL)
+		*width += 40 + kBarWidth;
 }
 
 
