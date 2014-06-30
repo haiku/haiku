@@ -278,7 +278,7 @@ KeyCommandMap::MessageReceived(BMessage* message)
 							bool foundAddOn = false;
 							int32 count = paths.CountStrings();
 							for (int32 i = 0; i < count; i++) {
-								if (command.FindFirst(paths.StringAt(i)) == 0) {
+								if (command.StartsWith(paths.StringAt(i))) {
 									foundAddOn = true;
 									break;
 								}

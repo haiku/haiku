@@ -326,7 +326,7 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 				BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
 					"Tracker/", addOnPaths);
 				for (int32 i = 0; i < addOnPaths.CountStrings(); i++) {
-					if (command.FindFirst(addOnPaths.StringAt(i)) == 0) {
+					if (command.StartsWith(addOnPaths.StringAt(i))) {
 						isInAddons = true;
 						break;
 					}
