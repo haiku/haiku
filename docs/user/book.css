@@ -154,7 +154,7 @@ h4 a:hover, a:active, h5 a:hover, a:active, h6 a:hover, a:active {
 
 #banner span.subtitle {
 	position: relative;
-	top: 30px;
+	top: 48px;
 	left: 272px;
 	color: #333333; /* mine shaft */
 	text-transform: uppercase;
@@ -163,15 +163,21 @@ h4 a:hover, a:active, h5 a:hover, a:active, h6 a:hover, a:active {
 	font-weight: normal;
 }
 
+#banner span.search {
+	position: relative;
+	top: 48px;
+	left: 462px;
+}
+
 input[type=text], input[type=password] {
-  font-size: inherit;
-  border-top: 1px solid #818181;
-  border-left: 1px solid #818181;
-  border-bottom: 1px solid #858585;
-  border-right: 1px solid #858585;
-  margin-top: 3px;
-  padding: 2px;
-  width: 200px;
+	font-size: inherit;
+	border-top: 1px solid #818181;
+	border-left: 1px solid #818181;
+	border-bottom: 1px solid #858585;
+	border-right: 1px solid #858585;
+	margin-top: 3px;
+	padding: 2px;
+	width: 200px;
 }
 
 div.header {
