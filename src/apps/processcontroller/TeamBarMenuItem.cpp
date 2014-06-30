@@ -46,9 +46,9 @@ TeamBarMenuItem::TeamBarMenuItem(BMenu* menu, BMessage* kill_team, team_id team,
 void
 TeamBarMenuItem::Init()
 {
-	team_info teamInfo;
-	get_team_info(fTeamID, &teamInfo);
-	get_team_usage_info(fTeamID, B_USAGE_SELF, &fTeamUsageInfo);
+	if (get_team_usage_info(fTeamID, B_USAGE_SELF, &fTeamUsageInfo) != B_OK)
+		fTeamUsageInfo.kernel_time = fTeamUsageInfo.user_time = 0;
+
 	if (fTeamID == B_SYSTEM_TEAM) {
 		thread_info thinfos;
 		bigtime_t idle = 0;
