@@ -27,7 +27,9 @@ public:
 								PackageFileHeapReader(BErrorOutput* errorOutput,
 									int fd, off_t heapOffset,
 									off_t compressedHeapSize,
-									uint64 uncompressedHeapSize);
+									uint64 uncompressedHeapSize,
+									DecompressionAlgorithmOwner*
+										decompressionAlgorithm);
 								~PackageFileHeapReader();
 
 			status_t			Init();

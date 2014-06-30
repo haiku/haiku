@@ -10,6 +10,8 @@
 #include <package/hpkg/PackageFileHeapAccessorBase.h>
 
 
+class BCompressionParameters;
+
 namespace BPrivate {
 	template<typename Value> class RangeArray;
 }
@@ -34,7 +36,10 @@ class PackageFileHeapWriter : public PackageFileHeapAccessorBase {
 public:
 								PackageFileHeapWriter(BErrorOutput* errorOutput,
 									int fd, off_t heapOffset,
-									int32 compressionLevel);
+									CompressionAlgorithmOwner*
+										compressionAlgorithm,
+									DecompressionAlgorithmOwner*
+										decompressionAlgorithm);
 								~PackageFileHeapWriter();
 
 			void				Init();
@@ -81,7 +86,7 @@ private:
 			void*				fCompressedDataBuffer;
 			size_t				fPendingDataSize;
 			Array<uint64>		fOffsets;
-			int32				fCompressionLevel;
+			CompressionAlgorithmOwner* fCompressionAlgorithm;
 };
 
 

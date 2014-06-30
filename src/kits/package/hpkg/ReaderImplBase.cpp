@@ -19,10 +19,10 @@
 #include <ByteOrder.h>
 #include <DataIO.h>
 
-#include <package/hpkg/HPKGDefsPrivate.h>
+#include <ZlibCompressionAlgorithm.h>
 
+#include <package/hpkg/HPKGDefsPrivate.h>
 #include <package/hpkg/PackageFileHeapReader.h>
-#include <ZlibDecompressor.h>
 
 
 namespace BPackageKit {
@@ -814,8 +814,21 @@ ReaderImplBase::InitHeapReader(uint32 compression, uint32 chunkSize,
 		return B_BAD_DATA;
 	}
 
+	DecompressionAlgorithmOwner* decompressionAlgorithm
+		= DecompressionAlgorithmOwner::Create(
+			new(std::nothrow) BZlibCompressionAlgorithm,
+			new(std::nothrow) BZlibDecompressionParameters);
+	BReference<DecompressionAlgorithmOwner> decompressionAlgorithmReference(
+		decompressionAlgorithm, true);
+
+	if (decompressionAlgorithm == NULL
+		|| decompressionAlgorithm->algorithm == NULL
+		|| decompressionAlgorithm->parameters == NULL) {
+		return B_NO_MEMORY;
+	}
+
 	fRawHeapReader = new(std::nothrow) PackageFileHeapReader(fErrorOutput, fFD,
-		offset, compressedSize, uncompressedSize);
+		offset, compressedSize, uncompressedSize, decompressionAlgorithm);
 	if (fRawHeapReader == NULL)
 		return B_NO_MEMORY;
 

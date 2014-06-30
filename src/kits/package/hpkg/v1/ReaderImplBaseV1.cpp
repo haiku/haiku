@@ -19,10 +19,11 @@
 #include <ByteOrder.h>
 #include <DataIO.h>
 
-#include <package/hpkg/v1/HPKGDefsPrivate.h>
-
 #include <package/hpkg/ErrorOutput.h>
-#include <ZlibDecompressor.h>
+
+#include <AutoDeleter.h>
+#include <package/hpkg/v1/HPKGDefsPrivate.h>
+#include <ZlibCompressionAlgorithm.h>
 
 
 namespace BPackageKit {
@@ -1028,12 +1029,16 @@ ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
 
 		case B_HPKG_COMPRESSION_ZLIB:
 		{
-			// init the decompressor
+			// create the decompression stream
 			BMemoryIO bufferOutput(section.data, section.uncompressedLength);
-			BZlibDecompressor decompressor(&bufferOutput);
-			status_t error = decompressor.Init();
+			BZlibCompressionAlgorithm algorithm;
+			BDataIO* zlibOutput;
+			status_t error = algorithm.CreateDecompressingOutputStream(
+				&bufferOutput, NULL, zlibOutput);
 			if (error != B_OK)
 				return error;
+
+			ObjectDeleter<BDataIO> zlibOutputDeleter(zlibOutput);
 
 			while (compressedSize > 0) {
 				// read compressed buffer
@@ -1044,7 +1049,7 @@ ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
 					return error;
 
 				// uncompress
-				error = decompressor.DecompressNext(fScratchBuffer, toRead);
+				error = zlibOutput->WriteExactly(fScratchBuffer, toRead);
 				if (error != B_OK)
 					return error;
 
@@ -1052,7 +1057,7 @@ ReaderImplBase::ReadCompressedBuffer(const SectionInfo& section)
 				offset += toRead;
 			}
 
-			error = decompressor.Finish();
+			error = zlibOutput->Flush();
 			if (error != B_OK)
 				return error;
 

@@ -24,9 +24,11 @@ namespace BPrivate {
 
 
 PackageFileHeapReader::PackageFileHeapReader(BErrorOutput* errorOutput, int fd,
-	off_t heapOffset, off_t compressedHeapSize, uint64 uncompressedHeapSize)
+	off_t heapOffset, off_t compressedHeapSize, uint64 uncompressedHeapSize,
+	DecompressionAlgorithmOwner* decompressionAlgorithm)
 	:
-	PackageFileHeapAccessorBase(errorOutput, fd, heapOffset),
+	PackageFileHeapAccessorBase(errorOutput, fd, heapOffset,
+		decompressionAlgorithm),
 	fOffsets()
 {
 	fCompressedHeapSize = compressedHeapSize;
@@ -87,7 +89,7 @@ PackageFileHeapReader::Clone() const
 {
 	PackageFileHeapReader* clone = new(std::nothrow) PackageFileHeapReader(
 		fErrorOutput, fFD, fHeapOffset, fCompressedHeapSize,
-		fUncompressedHeapSize);
+		fUncompressedHeapSize, fDecompressionAlgorithm);
 	if (clone == NULL)
 		return NULL;
 

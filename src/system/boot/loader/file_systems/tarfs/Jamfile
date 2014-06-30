@@ -14,11 +14,12 @@ SubDirC++Flags -fno-rtti $(defines) ;
 
 
 local zlibSources =
-	inflate.c
-	inffast.c
-	inftrees.c
 	adler32.c
 	crc32.c
+	inffast.c
+	inflate.c
+	inftrees.c
+	uncompr.c
 	zutil.c
 	;
 

@@ -6,8 +6,11 @@
 #define _PACKAGE__HPKG__PRIVATE__PACKAGE_FILE_HEAP_ACCESSOR_BASE_H_
 
 
-#include <SupportDefs.h>
+#include <new>
 
+#include <Referenceable.h>
+
+#include <CompressionAlgorithm.h>
 #include <package/hpkg/DataReader.h>
 
 
@@ -22,6 +25,46 @@ class BErrorOutput;
 namespace BPrivate {
 
 
+template<typename Parameters>
+struct GenericCompressionAlgorithmOwner : BReferenceable {
+	BCompressionAlgorithm*	algorithm;
+	Parameters*				parameters;
+
+	GenericCompressionAlgorithmOwner(BCompressionAlgorithm* algorithm,
+		Parameters* parameters)
+		:
+		algorithm(algorithm),
+		parameters(parameters)
+	{
+	}
+
+	~GenericCompressionAlgorithmOwner()
+	{
+		delete algorithm;
+		delete parameters;
+	}
+
+	static GenericCompressionAlgorithmOwner* Create(
+		BCompressionAlgorithm* algorithm, Parameters* parameters)
+	{
+		GenericCompressionAlgorithmOwner* owner
+			= new(std::nothrow) GenericCompressionAlgorithmOwner(algorithm,
+				parameters);
+		if (owner == NULL) {
+			delete algorithm;
+			delete parameters;
+		}
+
+		return owner;
+	}
+};
+
+typedef GenericCompressionAlgorithmOwner<BCompressionParameters>
+	CompressionAlgorithmOwner;
+typedef GenericCompressionAlgorithmOwner<BDecompressionParameters>
+	DecompressionAlgorithmOwner;
+
+
 class PackageFileHeapAccessorBase : public BAbstractBufferedDataReader {
 public:
 			class OffsetArray;
@@ -29,7 +72,9 @@ public:
 public:
 								PackageFileHeapAccessorBase(
 									BErrorOutput* errorOutput, int fd,
-									off_t heapOffset);
+									off_t heapOffset,
+									DecompressionAlgorithmOwner*
+										decompressionAlgorithm);
 	virtual						~PackageFileHeapAccessorBase();
 
 			off_t				HeapOffset() const
@@ -77,6 +122,7 @@ protected:
 			off_t				fHeapOffset;
 			uint64				fCompressedHeapSize;
 			uint64				fUncompressedHeapSize;
+			DecompressionAlgorithmOwner* fDecompressionAlgorithm;
 };
 
 

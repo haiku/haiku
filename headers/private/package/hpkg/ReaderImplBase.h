@@ -22,6 +22,10 @@
 #include <package/hpkg/PackageInfoAttributeValue.h>
 
 
+class BCompressionAlgorithm;
+class BDecompressionParameters;
+
+
 namespace BPackageKit {
 
 namespace BHPKG {

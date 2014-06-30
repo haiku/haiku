@@ -16,7 +16,7 @@
 #include <package/hpkg/PoolBuffer.h>
 #include <package/hpkg/v1/HPKGDefsPrivate.h>
 #include <package/hpkg/v1/PackageData.h>
-#include <ZlibDecompressor.h>
+#include <ZlibCompressionAlgorithm.h>
 
 
 namespace BPackageKit {
@@ -294,7 +294,7 @@ private:
 				return error;
 
 			size_t actuallyUncompressedSize;
-			error = BZlibDecompressor::DecompressSingleBuffer(
+			BZlibCompressionAlgorithm().DecompressBuffer(
 				readBuffer->Buffer(), compressedSize,
 				fUncompressBuffer->Buffer(), uncompressedSize,
 				actuallyUncompressedSize);

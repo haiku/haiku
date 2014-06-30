@@ -103,7 +103,7 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1 =
 	ReaderImplBaseV1.cpp
 ;
 
-Includes [ FGristFiles ZlibCompressionBasePrivate.h ]
+Includes [ FGristFiles ZlibCompressionAlgorithm.cpp ]
 	: [ BuildFeatureAttribute zlib : headers ] ;
 
 local libSharedSources =
@@ -111,8 +111,8 @@ local libSharedSources =
 ;
 
 local supportKitSources =
-	ZlibCompressionBase.cpp
-	ZlibDecompressor.cpp
+	CompressionAlgorithm.cpp
+	ZlibCompressionAlgorithm.cpp
 ;
 
 KernelAddon packagefs

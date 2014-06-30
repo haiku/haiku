@@ -18,12 +18,12 @@
 #include <ByteOrder.h>
 
 #include <AutoDeleter.h>
+#include <ZlibCompressionAlgorithm.h>
 
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/ErrorOutput.h>
 
 #include <package/hpkg/HPKGDefsPrivate.h>
-#include <package/hpkg/PackageFileHeapWriter.h>
 
 
 namespace BPackageKit {
@@ -218,6 +218,10 @@ WriterImplBase::PackageAttribute::_DeleteChildren()
 WriterImplBase::WriterImplBase(const char* fileType, BErrorOutput* errorOutput)
 	:
 	fHeapWriter(NULL),
+	fCompressionAlgorithm(NULL),
+	fCompressionParameters(NULL),
+	fDecompressionAlgorithm(NULL),
+	fDecompressionParameters(NULL),
 	fFileType(fileType),
 	fErrorOutput(errorOutput),
 	fFileName(NULL),
@@ -231,6 +235,10 @@ WriterImplBase::WriterImplBase(const char* fileType, BErrorOutput* errorOutput)
 WriterImplBase::~WriterImplBase()
 {
 	delete fHeapWriter;
+	delete fCompressionAlgorithm;
+	delete fCompressionParameters;
+	delete fDecompressionAlgorithm;
+	delete fDecompressionParameters;
 
 	if (fFD >= 0)
 		close(fFD);
@@ -265,9 +273,40 @@ WriterImplBase::Init(const char* fileName, size_t headerSize,
 
 	fFileName = fileName;
 
+	DecompressionAlgorithmOwner* decompressionAlgorithm
+		= DecompressionAlgorithmOwner::Create(
+			new(std::nothrow) BZlibCompressionAlgorithm,
+			new(std::nothrow) BZlibDecompressionParameters);
+	BReference<DecompressionAlgorithmOwner> decompressionAlgorithmReference(
+		decompressionAlgorithm, true);
+
+	if (decompressionAlgorithm == NULL
+		|| decompressionAlgorithm->algorithm == NULL
+		|| decompressionAlgorithm->parameters == NULL) {
+		throw std::bad_alloc();
+	}
+
+	CompressionAlgorithmOwner* compressionAlgorithm = NULL;
+
+	if (fParameters.CompressionLevel() != B_HPKG_COMPRESSION_LEVEL_NONE) {
+		compressionAlgorithm = CompressionAlgorithmOwner::Create(
+			new(std::nothrow) BZlibCompressionAlgorithm,
+			new(std::nothrow) BZlibCompressionParameters(
+				fParameters.CompressionLevel()));
+
+		if (compressionAlgorithm == NULL
+			|| compressionAlgorithm->algorithm == NULL
+			|| compressionAlgorithm->parameters == NULL) {
+			throw std::bad_alloc();
+		}
+	}
+
+	BReference<CompressionAlgorithmOwner> compressionAlgorithmReference(
+		compressionAlgorithm, true);
+
 	// create heap writer
 	fHeapWriter = new PackageFileHeapWriter(fErrorOutput, FD(), headerSize,
-		fParameters.CompressionLevel());
+		compressionAlgorithm, decompressionAlgorithm);
 	fHeapWriter->Init();
 
 	return B_OK;

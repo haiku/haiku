@@ -20,11 +20,11 @@
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/PackageFileHeapReader.h>
 #include <RangeArray.h>
-#include <ZlibCompressor.h>
+#include <CompressionAlgorithm.h>
 
 
-// minimum length of data we require before trying to zlib compress them
-static const size_t kZlibCompressionSizeThreshold = 64;
+// minimum length of data we require before trying to compress them
+static const size_t kCompressionSizeThreshold = 64;
 
 
 namespace BPackageKit {
@@ -197,21 +197,28 @@ private:
 
 
 PackageFileHeapWriter::PackageFileHeapWriter(BErrorOutput* errorOutput, int fd,
-	off_t heapOffset, int32 compressionLevel)
+	off_t heapOffset, CompressionAlgorithmOwner* compressionAlgorithm,
+	DecompressionAlgorithmOwner* decompressionAlgorithm)
 	:
-	PackageFileHeapAccessorBase(errorOutput, fd, heapOffset),
+	PackageFileHeapAccessorBase(errorOutput, fd, heapOffset,
+		decompressionAlgorithm),
 	fPendingDataBuffer(NULL),
 	fCompressedDataBuffer(NULL),
 	fPendingDataSize(0),
 	fOffsets(),
-	fCompressionLevel(compressionLevel)
+	fCompressionAlgorithm(compressionAlgorithm)
 {
+	if (fCompressionAlgorithm != NULL)
+		fCompressionAlgorithm->AcquireReference();
 }
 
 
 PackageFileHeapWriter::~PackageFileHeapWriter()
 {
 	_Uninit();
+
+	if (fCompressionAlgorithm != NULL)
+		fCompressionAlgorithm->ReleaseReference();
 }
 
 
@@ -522,8 +529,8 @@ PackageFileHeapWriter::_WriteChunk(const void* data, size_t size,
 		return B_NO_MEMORY;
 	}
 
-	// Try to use zlib compression only for data large enough.
-	bool compress = mayCompress && size >= (off_t)kZlibCompressionSizeThreshold;
+	// Try to use compression only for data large enough.
+	bool compress = mayCompress && size >= (off_t)kCompressionSizeThreshold;
 	if (compress) {
 		status_t error = _WriteDataCompressed(data, size);
 		if (error != B_OK) {
@@ -547,12 +554,13 @@ PackageFileHeapWriter::_WriteChunk(const void* data, size_t size,
 status_t
 PackageFileHeapWriter::_WriteDataCompressed(const void* data, size_t size)
 {
-	if (fCompressionLevel == B_HPKG_COMPRESSION_LEVEL_NONE)
+	if (fCompressionAlgorithm == NULL)
 		return B_BUFFER_OVERFLOW;
 
 	size_t compressedSize;
-	status_t error = BZlibCompressor::CompressSingleBuffer(data, size,
-		fCompressedDataBuffer, size, compressedSize, fCompressionLevel);
+	status_t error = fCompressionAlgorithm->algorithm->CompressBuffer(data,
+		size, fCompressedDataBuffer, size, compressedSize,
+		fCompressionAlgorithm->parameters);
 	if (error != B_OK) {
 		if (error != B_BUFFER_OVERFLOW) {
 			fErrorOutput->PrintError("Failed to compress chunk data: %s\n",

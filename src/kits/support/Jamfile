@@ -11,7 +11,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		UseBuildFeatureHeaders zlib ;
 
-		Includes [ FGristFiles ZlibCompressionBasePrivate.h ]
+		Includes [ FGristFiles ZlibCompressionAlgorithm.cpp ]
 			: [ BuildFeatureAttribute zlib : headers ] ;
 
 		MergeObject <libbe!$(architecture)>support_kit.o :
@@ -38,9 +38,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Url.cpp
 			Uuid.cpp
 			ZlibCompressionAlgorithm.cpp
-			ZlibCompressionBase.cpp
-			ZlibCompressor.cpp
-			ZlibDecompressor.cpp
 			;
 
 		StaticLibrary [ MultiArchDefaultGristFiles libreferenceable.a ]

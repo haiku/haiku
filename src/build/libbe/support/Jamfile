@@ -20,7 +20,4 @@ BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	String.cpp
 	StringList.cpp
 	ZlibCompressionAlgorithm.cpp
-	ZlibCompressionBase.cpp
-	ZlibCompressor.cpp
-	ZlibDecompressor.cpp
 ;

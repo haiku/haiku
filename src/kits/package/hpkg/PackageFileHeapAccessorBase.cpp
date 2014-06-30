@@ -18,7 +18,7 @@
 #include <package/hpkg/ErrorOutput.h>
 
 #include <AutoDeleter.h>
-#include <ZlibDecompressor.h>
+#include <CompressionAlgorithm.h>
 
 
 namespace BPackageKit {
@@ -122,19 +122,25 @@ PackageFileHeapAccessorBase::OffsetArray::Init(size_t totalChunkCount,
 
 
 PackageFileHeapAccessorBase::PackageFileHeapAccessorBase(
-	BErrorOutput* errorOutput, int fd, off_t heapOffset)
+	BErrorOutput* errorOutput, int fd, off_t heapOffset,
+	DecompressionAlgorithmOwner* decompressionAlgorithm)
 	:
 	fErrorOutput(errorOutput),
 	fFD(fd),
 	fHeapOffset(heapOffset),
 	fCompressedHeapSize(0),
-	fUncompressedHeapSize(0)
+	fUncompressedHeapSize(0),
+	fDecompressionAlgorithm(decompressionAlgorithm)
 {
+	if (fDecompressionAlgorithm != NULL)
+		fDecompressionAlgorithm->AcquireReference();
 }
 
 
 PackageFileHeapAccessorBase::~PackageFileHeapAccessorBase()
 {
+	if (fDecompressionAlgorithm != NULL)
+		fDecompressionAlgorithm->ReleaseReference();
 }
 
 
@@ -213,9 +219,9 @@ PackageFileHeapAccessorBase::DecompressChunkData(void* compressedDataBuffer,
 	size_t uncompressedSize)
 {
 	size_t actualSize;
-	status_t error = BZlibDecompressor::DecompressSingleBuffer(
+	status_t error = fDecompressionAlgorithm->algorithm->DecompressBuffer(
 		compressedDataBuffer, compressedSize, uncompressedDataBuffer,
-		uncompressedSize, actualSize);
+		uncompressedSize, actualSize, fDecompressionAlgorithm->parameters);
 	if (error != B_OK) {
 		fErrorOutput->PrintError("Failed to decompress chunk data: %s\n",
 			strerror(error));

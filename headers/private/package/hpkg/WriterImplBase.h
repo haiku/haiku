@@ -10,11 +10,17 @@
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 
-#include <package/hpkg/PackageFileHeapWriter.h>
 #include <package/hpkg/PackageWriter.h>
 #include <package/hpkg/Strings.h>
 
 #include <package/PackageInfo.h>
+
+#include <package/hpkg/PackageFileHeapWriter.h>
+
+
+class BCompressionAlgorithm;
+class BCompressionParameters;
+class BDecompressionParameters;
 
 
 namespace BPackageKit {
@@ -156,6 +162,10 @@ protected:
 
 protected:
 			PackageFileHeapWriter* fHeapWriter;
+			BCompressionAlgorithm* fCompressionAlgorithm;
+			BCompressionParameters* fCompressionParameters;
+			BCompressionAlgorithm* fDecompressionAlgorithm;
+			BDecompressionParameters* fDecompressionParameters;
 
 private:
 	static const BHPKGAttributeID kDefaultVersionAttributeID

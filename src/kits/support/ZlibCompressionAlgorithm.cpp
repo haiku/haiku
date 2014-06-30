@@ -232,7 +232,11 @@ struct BZlibCompressionAlgorithm::Stream : BaseClass {
 		BDataIO*& _stream)
 	{
 		const typename Strategy::Parameters* parameters
+#ifdef _BOOT_MODE
+			= static_cast<const typename Strategy::Parameters*>(_parameters);
+#else
 			= dynamic_cast<const typename Strategy::Parameters*>(_parameters);
+#endif
 		Stream* stream = new(std::nothrow) Stream(io);
 		if (stream == NULL)
 			return B_NO_MEMORY;
