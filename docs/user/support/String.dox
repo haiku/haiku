@@ -1688,6 +1688,8 @@
 	        or \c B_ERROR if we could not find \c string.
 
 	\sa IFindFirst(const char*) const
+	\sa StartsWith(const char*) const
+	\sa StartsWith(const char*, int32) const
 
 	\since BeOS R5
 */
@@ -1706,6 +1708,7 @@
 	        not find the \c string.
 
 	\sa IFindFirst(const BString&, int32) const
+	\sa StartsWith(const char*, int32) const
 
 	\since BeOS R5
 */
@@ -1799,6 +1802,7 @@
 	        was found, or \c B_ERROR if we could not find the \c string.
 
 	\sa IFindLast(const BString&) const
+	\sa EndsWith(const BString&) const
 
 	\since BeOS R5
 */
@@ -1815,6 +1819,8 @@
 	        or \c B_ERROR if we could not find the \c string.
 
 	\sa IFindLast(const char*) const
+	\sa EndsWith(const char*) const
+	\sa EndsWith(const char*, int32) const
 
 	\since BeOS R5
 */
@@ -1823,7 +1829,7 @@
 /*!
 	\fn int32 BString::FindLast(const BString& string, int32 beforeOffset) const
 	\brief Find the last occurrence of the given BString,
-		starting from the given offset, and going backwards.
+	       starting from the given offset, and going backwards.
 
 	\param string The BString to search for.
 	\param beforeOffset The offset in bytes to start the search.
@@ -1840,7 +1846,7 @@
 /*!
 	\fn int32 BString::FindLast(const char* string, int32 beforeOffset) const
 	\brief Find the last occurrence of the given string,
-		starting from the given offset, and going backwards.
+	       starting from the given offset, and going backwards.
 
 	\param string The string to search for.
 	\param beforeOffset The offset in bytes to start the search.
@@ -1985,6 +1991,84 @@
 	       starting from the given offset going backwards.
 
 	\copydetails FindLast(const char*, int32) const
+*/
+
+
+/*!
+	\fn bool BString::StartsWith(const BString& string) const
+	\brief Returns whether or not the BString starts with \a string.
+
+	\param string The \a string to search for.
+
+	\return \c true if the BString started with \a string, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::StartsWith(const char* string) const
+	\brief Returns whether or not the BString starts with \a string.
+
+	\param string The \a string to search for.
+
+	\return \c true if the BString started with \a string, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::StartsWith(const char* string, int32 length) const
+	\brief Returns whether or not the BString starts with \a length characters
+	       of \a string.
+
+	\param string The \a string to search for.
+	\param length The number of characters (bytes) of \a string to search for.
+
+	\return \c true if the BString started with \a length characters of
+	        \a string, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::EndsWith(const BString& string) const
+	\brief Returns whether or not the BString ends with \a string.
+
+	\param string The \a string to search for.
+
+	\return \c true if the BString ended with \a string, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::EndsWith(const char* string) const
+	\brief Returns whether or not the BString ends with \a string.
+
+	\param string The \a string to search for.
+
+	\return \c true if the BString ended with \a string, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::EndsWith(const char* string, int32 length) const
+	\brief Returns whether or not the BString ends with \a length characters
+	       of \a string.
+
+	\param string The \a string to search for.
+	\param length The number of characters (bytes) of \a string to search for.
+
+	\return \c true if the BString ended with \a length characters of
+	        \a string, \c false otherwise.
+
+	\since Haiku R1
 */
 
 
