@@ -36,7 +36,6 @@ namespace BPrivate {
 
 
 struct hpkg_header;
-class PackageFileHeapWriter;
 
 
 class PackageWriterImpl : public WriterImplBase {
@@ -115,11 +114,6 @@ private:
 									uint64 dataSize, const uint8* data);
 
 			status_t			_AddData(BDataReader& dataReader, off_t size);
-
-			status_t			_WriteZlibCompressedData(
-									BDataReader& dataReader,
-									off_t size, uint64 writeOffset,
-									uint64& _compressedSize);
 
 private:
 			BPackageWriterListener*	fListener;
