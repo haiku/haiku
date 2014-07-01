@@ -45,7 +45,8 @@ BZlibCompressionParameters::BZlibCompressionParameters(
 	:
 	BCompressionParameters(),
 	fCompressionLevel(compressionLevel),
-	fBufferSize(kDefaultBufferSize)
+	fBufferSize(kDefaultBufferSize),
+	fGzipFormat(false)
 {
 }
 
@@ -80,6 +81,20 @@ void
 BZlibCompressionParameters::SetBufferSize(size_t size)
 {
 	fBufferSize = sanitize_buffer_size(size);
+}
+
+
+bool
+BZlibCompressionParameters::IsGzipFormat() const
+{
+	return fGzipFormat;
+}
+
+
+void
+BZlibCompressionParameters::SetGzipFormat(bool gzipFormat)
+{
+	fGzipFormat = gzipFormat;
 }
 
 
@@ -127,10 +142,18 @@ struct BZlibCompressionAlgorithm::CompressionStrategy {
 	static int Init(z_stream& stream,
 		const BZlibCompressionParameters* parameters)
 	{
-		return deflateInit(&stream,
-			parameters != NULL
-				? parameters->CompressionLevel()
-				: B_ZLIB_COMPRESSION_DEFAULT);
+		int32 compressionLevel = B_ZLIB_COMPRESSION_DEFAULT;
+		bool gzipFormat = false;
+		if (parameters != NULL) {
+			compressionLevel = parameters->CompressionLevel();
+			gzipFormat = parameters->IsGzipFormat();
+		}
+
+		return deflateInit2(&stream, compressionLevel,
+			Z_DEFLATED,
+			MAX_WBITS + (gzipFormat ? 16 : 0),
+			MAX_MEM_LEVEL,
+			Z_DEFAULT_STRATEGY);
 	}
 
 	static void Uninit(z_stream& stream)
@@ -159,7 +182,8 @@ struct BZlibCompressionAlgorithm::DecompressionStrategy {
 	static int Init(z_stream& stream,
 		const BZlibDecompressionParameters* /*parameters*/)
 	{
-		return inflateInit(&stream);
+		// auto-detect zlib/gzip header
+		return inflateInit2(&stream, 32 + MAX_WBITS);
 	}
 
 	static void Uninit(z_stream& stream)

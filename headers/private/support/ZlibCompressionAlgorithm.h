@@ -31,9 +31,14 @@ public:
 			size_t				BufferSize() const;
 			void				SetBufferSize(size_t size);
 
+			// TODO: Support setting the gzip header.
+			bool				IsGzipFormat() const;
+			void				SetGzipFormat(bool gzipFormat);
+
 private:
 			int32				fCompressionLevel;
 			size_t				fBufferSize;
+			bool				fGzipFormat;
 };
 
 
