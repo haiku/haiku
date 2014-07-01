@@ -221,6 +221,7 @@ RemotePackageRepository HaikuPorts
 	ubertuber-0.9.10-1
 	unrar-5.1.5-1
 	vim-7.4-1
+	virtualbox_guest_additions-4.3.53_svn-1
 	vision-0.9.7.r949-2
 	wget-1.15-1
 	which-2.20-1
