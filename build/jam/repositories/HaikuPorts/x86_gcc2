@@ -79,6 +79,7 @@ RemotePackageRepository HaikuPorts
 	guilib_devel-1.2.1-1
 	gutenprint-5.2.9-1
 	gutenprint_devel-5.2.9-1
+	gyp-r1948-1
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
 	icu-4.8.1.1-4
@@ -169,6 +170,7 @@ RemotePackageRepository HaikuPorts
 	pipepanic-0.1.3-3
 	pkgconfig-0.27.1-1
 	python-2.6.9-2
+	python_setuptools-5.3-1
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
 	qrencode-3.3.0-1
@@ -453,6 +455,7 @@ RemotePackageRepository HaikuPorts
 	groff
 	guilib
 	gutenprint
+	gyp
 	haikuwebkit_x86
 	help2man
 	htmldoc
@@ -524,6 +527,7 @@ RemotePackageRepository HaikuPorts
 	pkgconfig
 	protrekkr_x86
 	python
+	python_setuptools
 	python_twisted
 	python_zope.interface
 	qemu_x86
