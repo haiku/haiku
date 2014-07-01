@@ -19,6 +19,12 @@ extern const char* __progname;
 const char* kCommandName = __progname;
 
 
+enum CompressionType {
+	ZlibCompression,
+	GzipCompression,
+};
+
+
 static const char* kUsage =
 	"Usage: %s <options> <input file> <output file>\n"
 	"Compresses or decompresses (option -d) a file.\n"
@@ -29,6 +35,8 @@ static const char* kUsage =
 	"      Defaults to 9.\n"
 	"  -d, --decompress\n"
 	"      Decompress the input file (default is compress).\n"
+	"  -f <format>\n"
+	"      Specify the compression format: \"zlib\" (default), or \"gzip\"\n"
 	"  -h, --help\n"
 	"      Print this usage info.\n"
 	"  -i, --input-stream\n"
@@ -50,6 +58,7 @@ main(int argc, const char* const* argv)
 	int compressionLevel = B_ZLIB_COMPRESSION_DEFAULT;
 	bool compress = true;
 	bool useInputStream = true;
+	CompressionType compressionType = ZlibCompression;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -60,7 +69,7 @@ main(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+0123456789dhi",
+		int c = getopt_long(argc, (char**)argv, "+0123456789df:hi",
 			sLongOptions, NULL);
 		if (c == -1)
 			break;
@@ -85,6 +94,18 @@ main(int argc, const char* const* argv)
 
 			case 'd':
 				compress = false;
+				break;
+
+			case 'f':
+				if (strcmp(optarg, "zlib") == 0) {
+					compressionType = ZlibCompression;
+				} else if (strcmp(optarg, "gzip") == 0) {
+					compressionType = GzipCompression;
+				} else {
+					fprintf(stderr, "Error: Unsupported compression type "
+						"\"%s\"\n", optarg);
+					return 1;
+				}
 				break;
 
 			case 'i':
@@ -123,19 +144,34 @@ main(int argc, const char* const* argv)
 		return 1;
 	}
 
-	// init parameters
-	BZlibCompressionParameters compressionParameters(compressionLevel);
-	BZlibDecompressionParameters decompressionParameters;
+	// create compression algorithm and parameters
+	BCompressionAlgorithm* compressionAlgorithm;
+	BCompressionParameters* compressionParameters;
+	BDecompressionParameters* decompressionParameters;
+	switch (compressionType) {
+		case ZlibCompression:
+		case GzipCompression:
+		{
+			compressionAlgorithm = new BZlibCompressionAlgorithm;
+			BZlibCompressionParameters* zlibCompressionParameters
+				= new BZlibCompressionParameters(compressionLevel);
+			zlibCompressionParameters->SetGzipFormat(
+				compressionType == GzipCompression);
+			compressionParameters = zlibCompressionParameters;
+			decompressionParameters = new BZlibDecompressionParameters;
+			break;
+		}
+	}
 
 	if (useInputStream) {
 		// create input stream
 		BDataIO* inputStream;
 		if (compress) {
-			error = BZlibCompressionAlgorithm().CreateCompressingInputStream(
-				&inputFile, &compressionParameters, inputStream);
+			error = compressionAlgorithm->CreateCompressingInputStream(
+				&inputFile, compressionParameters, inputStream);
 		} else {
-			error = BZlibCompressionAlgorithm().CreateDecompressingInputStream(
-				&inputFile, &decompressionParameters, inputStream);
+			error = compressionAlgorithm->CreateDecompressingInputStream(
+				&inputFile, decompressionParameters, inputStream);
 		}
 
 		if (error != B_OK) {
@@ -167,11 +203,11 @@ main(int argc, const char* const* argv)
 		// create output stream
 		BDataIO* outputStream;
 		if (compress) {
-			error = BZlibCompressionAlgorithm().CreateCompressingOutputStream(
-				&outputFile, &compressionParameters, outputStream);
+			error = compressionAlgorithm->CreateCompressingOutputStream(
+				&outputFile, compressionParameters, outputStream);
 		} else {
-			error = BZlibCompressionAlgorithm().CreateDecompressingOutputStream(
-				&outputFile, &decompressionParameters, outputStream);
+			error = compressionAlgorithm->CreateDecompressingOutputStream(
+				&outputFile, decompressionParameters, outputStream);
 		}
 
 		if (error != B_OK) {

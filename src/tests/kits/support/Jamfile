@@ -85,7 +85,7 @@ UnitTestLib libsupporttest.so
 
 UsePrivateHeaders support ;
 
-SimpleTest compression_test : compression_test.cpp : be ;
+SimpleTest compression_test : compression_test.cpp : be $(TARGET_LIBSUPC++) ;
 SimpleTest string_utf8_tests : string_utf8_tests.cpp : be ;
 
 SubInclude HAIKU_TOP src tests kits support barchivable ;
