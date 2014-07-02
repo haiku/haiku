@@ -33,21 +33,21 @@ All rights reserved.
 */
 
 
-#include "Attributes.h"
-#include "MimeTypes.h"
-#include "Model.h"
-#include "PoseView.h"
 #include "Utilities.h"
-#include "ContainerWindow.h"
 
-#include <IconUtils.h>
-
-#include <Bitmap.h>
-#include <Catalog.h>
-#include <Debug.h>
-#include <Directory.h>
+#include <ctype.h>
 #include <fs_attr.h>
 #include <fs_info.h>
+#include <stdarg.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+#include <BitmapStream.h>
+#include <Catalog.h>
+#include <Debug.h>
+#include <Font.h>
+#include <IconUtils.h>
 #include <MenuItem.h>
 #include <OS.h>
 #include <PopUpMenu.h>
@@ -58,11 +58,11 @@ All rights reserved.
 #include <VolumeRoster.h>
 #include <Window.h>
 
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdarg.h>
+#include "Attributes.h"
+#include "ContainerWindow.h"
+#include "MimeTypes.h"
+#include "Model.h"
+#include "PoseView.h"
 
 
 #ifndef _IMPEXP_BE
@@ -138,8 +138,9 @@ ValidateStream(BMallocIO* stream, uint32 key, int32 version)
 	int32 testVersion;
 
 	if (stream->Read(&testKey, sizeof(uint32)) <= 0
-		|| stream->Read(&testVersion, sizeof(int32)) <=0)
+		|| stream->Read(&testVersion, sizeof(int32)) <= 0) {
 		return false;
+	}
 
 	return testKey == key && testVersion == version;
 }
@@ -354,6 +355,7 @@ ExtendedPoseInfo::SetLocationForFrame(BPoint newLocation, BRect frame)
 	fLocations[fNumFrames].fLocation = newLocation;
 	fLocations[fNumFrames].fWorkspaces = 0xffffffff;
 	fNumFrames++;
+
 	return true;
 }
 
@@ -904,7 +906,7 @@ TitledSeparatorItem::Draw()
 
 	parent->EndLineArray();
 
-	font_height	finfo;
+	font_height finfo;
 	parent->GetFontHeight(&finfo);
 
 	parent->SetLowColor(parent->ViewColor());
@@ -1401,12 +1403,12 @@ GetAppSignatureFromAttr(BFile* file, char* result)
 		return (status_t)readResult;
 
 	return B_OK;
-#endif	// B_APP_FILE_INFO_IS_FAST
+#endif // B_APP_FILE_INFO_IS_FAST
 }
 
 
 status_t
-GetAppIconFromAttr(BFile* file, BBitmap* result, icon_size size)
+GetAppIconFromAttr(BFile* file, BBitmap* icon, icon_size which)
 {
 	// This call is a performance improvement that
 	// avoids using the BAppFileInfo API when retrieving the
@@ -1415,7 +1417,7 @@ GetAppIconFromAttr(BFile* file, BBitmap* result, icon_size size)
 
 //#ifdef B_APP_FILE_INFO_IS_FAST
 	BAppFileInfo appFileInfo(file);
-	return appFileInfo.GetIcon(result, size);
+	return appFileInfo.GetIcon(icon, which);
 //#else
 //
 //	const char* attrName = kAttrIcon;
@@ -1423,25 +1425,25 @@ GetAppIconFromAttr(BFile* file, BBitmap* result, icon_size size)
 //
 //	// try vector icon
 //	attr_info ainfo;
-//	status_t ret = file->GetAttrInfo(attrName, &ainfo);
+//	status_t result = file->GetAttrInfo(attrName, &ainfo);
 //
-//	if (ret == B_OK) {
+//	if (result == B_OK) {
 //		uint8 buffer[ainfo.size];
 //		ssize_t readResult = file->ReadAttr(attrName, type, 0, buffer,
-//											ainfo.size);
+//			ainfo.size);
 //		if (readResult == ainfo.size) {
-//			if (BIconUtils::GetVectorIcon(buffer, ainfo.size, result) == B_OK)
+//			if (BIconUtils::GetVectorIcon(buffer, ainfo.size, icon) == B_OK)
 //				return B_OK;
 //		}
 //	}
 //
 //	// try again with R5 icons
-//	attrName = size == B_LARGE_ICON ? kAttrLargeIcon : kAttrMiniIcon;
-//	type = size == B_LARGE_ICON ? LARGE_ICON_TYPE : MINI_ICON_TYPE;
+//	attrName = which == B_LARGE_ICON ? kAttrLargeIcon : kAttrMiniIcon;
+//	type = which == B_LARGE_ICON ? LARGE_ICON_TYPE : MINI_ICON_TYPE;
 //
-//	ret = file->GetAttrInfo(attrName, &ainfo);
-//	if (ret < B_OK)
-//		return ret;
+//	result = file->GetAttrInfo(attrName, &ainfo);
+//	if (result < B_OK)
+//		return result;
 //
 //	uint8 buffer[ainfo.size];
 //
@@ -1449,22 +1451,21 @@ GetAppIconFromAttr(BFile* file, BBitmap* result, icon_size size)
 //	if (readResult <= 0)
 //		return (status_t)readResult;
 //
-//	if (result->ColorSpace() != B_CMAP8) {
-//		ret = BIconUtils::ConvertFromCMAP8(buffer, size, size, size, result);
-//	} else {
-//		result->SetBits(buffer, result->BitsLength(), 0, B_CMAP8);
-//	}
+//	if (icon->ColorSpace() != B_CMAP8)
+//		result = BIconUtils::ConvertFromCMAP8(buffer, which, which, which, icon);
+//	else
+//		icon->SetBits(buffer, icon->BitsLength(), 0, B_CMAP8);
 //
-//	return ret;
+//	return result;
 //#endif	// B_APP_FILE_INFO_IS_FAST
 }
 
 
 status_t
-GetFileIconFromAttr(BNode* file, BBitmap* result, icon_size size)
+GetFileIconFromAttr(BNode* node, BBitmap* icon, icon_size size)
 {
-	BNodeInfo fileInfo(file);
-	return fileInfo.GetIcon(result, size);
+	BNodeInfo fileInfo(node);
+	return fileInfo.GetIcon(icon, size);
 }
 
 
@@ -1483,7 +1484,7 @@ EachMenuItem(BMenu* menu, bool recursive, BMenuItem* (*func)(BMenuItem *))
 	for (int32 index = 0; index < count; index++) {
 		BMenuItem* item = menu->ItemAt(index);
 		BMenuItem* result = (func)(item);
-		if (result)
+		if (result != NULL)
 			return result;
 
 		if (recursive) {
@@ -1540,16 +1541,16 @@ PositionPassingMenuItem::PositionPassingMenuItem(BMenu* menu, BMessage* message)
 status_t
 PositionPassingMenuItem::Invoke(BMessage* message)
 {
-	if (!Menu())
+	if (Menu() == NULL)
 		return B_ERROR;
 
 	if (!IsEnabled())
 		return B_ERROR;
 
-	if (!message)
+	if (message == NULL)
 		message = Message();
 
-	if (!message)
+	if (message == NULL)
 		return B_BAD_VALUE;
 
 	BMessage clone(*message);
@@ -1564,6 +1565,7 @@ PositionPassingMenuItem::Invoke(BMessage* message)
 	for (;;) {
 		if (!menu->Supermenu())
 			break;
+
 		menu = menu->Supermenu();
 	}
 

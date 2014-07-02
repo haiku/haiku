@@ -32,7 +32,8 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-// menu items with small icons.
+//! Menu items with small icons.
+
 
 #include "IconCache.h"
 #include "IconMenuItem.h"
@@ -216,8 +217,8 @@ ModelMenuItem::Invoke(BMessage* message)
 //	#pragma mark - SpecialModelMenuItem
 
 
-/*!
-	A ModelMenuItem subclass that draws its label in italics.
+/*!	A ModelMenuItem subclass that draws its label in italics.
+
 	It's used for example in the "Copy To" menu to indicate some special
 	folders like the parent folder.
 */
@@ -245,8 +246,8 @@ SpecialModelMenuItem::DrawContent()
 //	#pragma mark - IconMenuItem
 
 
-/*!
-	A menu item that draws an icon alongside the label.
+/*!	A menu item that draws an icon alongside the label.
+
 	It's currently used in the mount and new file template menus.
 */
 IconMenuItem::IconMenuItem(const char* label, BMessage* message, BBitmap* icon)
@@ -268,12 +269,9 @@ IconMenuItem::IconMenuItem(const char* label, BMessage* message,
 	fDeviceIcon(NULL),
 	fHeightDelta(0)
 {
-	if (nodeInfo) {
-#ifdef __HAIKU__
-		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGBA32);
-#else
-		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
-#endif
+	if (nodeInfo != NULL) {
+		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1),
+			kDefaultIconDepth);
 
 		if (nodeInfo->GetTrackerIcon(fDeviceIcon, B_MINI_ICON)) {
 			delete fDeviceIcon;
@@ -295,11 +293,8 @@ IconMenuItem::IconMenuItem(const char* label, BMessage* message,
 	fHeightDelta(0)
 {
 	BMimeType mime(iconType);
-#ifdef __HAIKU__
-	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGBA32);
-#else
-	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
-#endif
+	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1),
+		kDefaultIconDepth);
 
 	if (mime.GetIcon(fDeviceIcon, which) != B_OK) {
 		BMimeType super;
@@ -324,11 +319,8 @@ IconMenuItem::IconMenuItem(BMenu* submenu, BMessage* message,
 	fHeightDelta(0)
 {
 	BMimeType mime(iconType);
-#ifdef __HAIKU__
-	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGBA32);
-#else
-	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
-#endif
+	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1),
+		kDefaultIconDepth);
 
 	if (mime.GetIcon(fDeviceIcon, which) != B_OK) {
 		BMimeType super;

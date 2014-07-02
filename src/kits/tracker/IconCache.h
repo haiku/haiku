@@ -127,10 +127,11 @@ public:
 	IconCacheEntry();
 	~IconCacheEntry();
 
-	void SetAliasFor(const SharedIconCache*, const SharedCacheEntry*);
-	static IconCacheEntry* ResolveIfAlias(const SharedIconCache*,
-		IconCacheEntry*);
-	IconCacheEntry* ResolveIfAlias(const SharedIconCache*);
+	void SetAliasFor(const SharedIconCache* sharedCache,
+		const SharedCacheEntry* entry);
+	static IconCacheEntry* ResolveIfAlias(const SharedIconCache* sharedCache,
+		IconCacheEntry* entry);
+	IconCacheEntry* ResolveIfAlias(const SharedIconCache* sharedCache);
 
 	void SetIcon(BBitmap* bitmap, IconDrawMode mode, icon_size size,
 		bool create = false);
@@ -159,15 +160,14 @@ public:
 		// while we are drawing them, shouldn't be a practical problem
 
 protected:
-
 	BBitmap* IconForMode(IconDrawMode mode, icon_size size) const;
 	void SetIconForMode(BBitmap* bitmap, IconDrawMode mode, icon_size size);
 
 	// list of most common icons
 	BBitmap* fLargeIcon;
+	BBitmap* fHilightedLargeIcon;
 	BBitmap* fMiniIcon;
-	BBitmap* fHilitedLargeIcon;
-	BBitmap* fHilitedMiniIcon;
+	BBitmap* fHilightedMiniIcon;
 	int32 fAliasForIndex;
 
 	// list of other icon kinds would be added here
@@ -254,7 +254,7 @@ public:
 		// because adding to the hash table makes any pending pointer invalid
 	void IconChanged(SharedCacheEntry*);
 
-	void SetAliasFor(IconCacheEntry* alias,
+	void SetAliasFor(IconCacheEntry* entry,
 		const SharedCacheEntry* original) const;
 	IconCacheEntry* ResolveIfAlias(IconCacheEntry* entry) const;
 	int32 EntryIndex(const SharedCacheEntry* entry) const;
@@ -332,7 +332,6 @@ public:
 		// used by permanent NodeIconCache entries, when an entry gets deleted
 	void Deleting(const BView*);
 	void IconChanged(const Model*);
-
 
 	void RemoveAliasesTo(int32 index);
 
@@ -455,20 +454,20 @@ private:
 	NodeIconCache fNodeCache;
 	SharedIconCache fSharedCache;
 
-	void InitHiliteTable();
+	void InitHighlightTable();
 
-	int32 fHiliteTable[kColorTransformTableSize];
-	bool fInitHiliteTable;
-		// on if we still need to initialize the hilite table
+	int32 fHighlightTable[kColorTransformTableSize];
+	bool fInitHighlightTable;
+		// whether or not we need to initialize the highlight table
 };
 
 
 class LazyBitmapAllocator {
-// Utility class used when we aren't sure that we will keep a bitmap,
-// need a bitmap or be able to construct it properly
+	// Utility class used when we aren't sure that we will keep a bitmap,
+	// need a bitmap or be able to construct it properly
 public:
 	LazyBitmapAllocator(icon_size size,
-						color_space colorSpace = kDefaultIconDepth,
+		color_space colorSpace = kDefaultIconDepth,
 		bool preallocate = false);
 	~LazyBitmapAllocator();
 

@@ -39,12 +39,11 @@ All rights reserved.
 #include <stdarg.h>
 #include <stdlib.h>
 
-#include <ByteOrder.h>
 #include <Bitmap.h>
+#include <ByteOrder.h>
 #include <DataIO.h>
 #include <Directory.h>
 #include <Entry.h>
-#include <Font.h>
 #include <GraphicsDefs.h>
 #include <Looper.h>
 #include <MenuItem.h>
@@ -59,10 +58,9 @@ All rights reserved.
 
 
 class BMessage;
-class BVolume;
-class BBitmap;
 class BTextView;
 class BView;
+class BVolume;
 
 namespace BPrivate {
 
@@ -490,8 +488,8 @@ void _ThrowOnError(status_t, const char* debugStr, const char*, int32);
 
 // stub calls that work around BAppFile info inefficiency
 status_t GetAppSignatureFromAttr(BFile*, char*);
-status_t GetAppIconFromAttr(BFile*, BBitmap*, icon_size);
-status_t GetFileIconFromAttr(BNode*, BBitmap*, icon_size);
+status_t GetAppIconFromAttr(BFile* file, BBitmap* icon, icon_size which);
+status_t GetFileIconFromAttr(BNode* node, BBitmap* icon, icon_size which);
 
 // debugging
 void HexDump(const void* buffer, int32 length);
