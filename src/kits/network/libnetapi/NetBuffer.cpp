@@ -54,8 +54,8 @@ BNetBuffer::BNetBuffer(BMessage* archive) :
 		&bufferSize) == B_OK) {
 		fImpl = new (std::nothrow) DynamicBuffer(bufferSize);
 		if (fImpl != NULL) {
-			status_t result = fImpl->Write(bufferPtr, bufferSize);
-			if (result == B_OK)
+			ssize_t result = fImpl->Write(bufferPtr, bufferSize);
+			if (result >= 0)
 				fInit = fImpl->InitCheck();
 			else
 				fInit = result;
@@ -185,7 +185,10 @@ BNetBuffer::AppendString(const char* data)
 status_t
 BNetBuffer::AppendData(const void* data, size_t size)
 {
-	return fImpl->Write(data, size);
+	ssize_t bytesWritten = fImpl->Write(data, size);
+	if (bytesWritten < 0)
+		return (status_t)bytesWritten;
+	return (size_t)bytesWritten == size ? B_OK : B_ERROR;
 }
 
 
@@ -332,7 +335,10 @@ BNetBuffer::RemoveString(char* data, size_t size)
 status_t
 BNetBuffer::RemoveData(void* data, size_t size)
 {
-	return fImpl->Read(data, size);
+	ssize_t bytesRead = fImpl->Read(data, size);
+	if (bytesRead < 0)
+		return (status_t)bytesRead;
+	return (size_t)bytesRead == size ? B_OK : B_BUFFER_OVERFLOW;
 }
 
 
