@@ -1162,8 +1162,12 @@
 	\brief Move window to \a origin, then resize to \a width and \a height.
 
 	You may call Zoom() even if the window has the \c B_NOT_ZOOMABLE flag set.
-	This method may move and resize the window resulting in both the FrameMoved()
-	and FrameResized() hook methods to be called.
+
+	This method may move and resize the window resulting in both the
+	FrameMoved() and FrameResized() hook methods to be called.
+
+	You can override this method to change how your window behaves when the
+	user clicks the zoom button or when Zoom() is called.
 
 	\param origin The point that the window was moved to.
 	\param width The new width of the window.
@@ -1175,13 +1179,26 @@
 
 /*!
 	\fn void BWindow::Zoom()
-	\brief Resize the window to the minimum of the screen size, the maximum values
-	       set by SetSizeLimits(), and the maximum values set by SetZoomLimits().
+	\brief Resize the window to the minimum of the screen size, the maximum
+	       values set by SetSizeLimits(), and the maximum values set by
+	       SetZoomLimits().
 
 	You may call Zoom() even if the window has the \c B_NOT_ZOOMABLE flag set.
-	This method may move and resize the window resulting in both the FrameMoved()
-	and FrameResized() hook methods to be called. This is the method called when
-	the user clicks a window's zoom button.
+
+	This is the method called when the user clicks the window's zoom button.
+	It can also be called programmatically.
+
+	The window dimensions are calculated from the smallest of three rectangles:
+	-# the screen frame,
+	-# the rectangle defined by SetZoomLimits(),
+	-# the rectangle defined by SetSizeLimits().
+
+	However if the window frame already matches these new dimensions, Zoom()
+	uses the previous size and location of the window instead.
+
+	This method calls Zoom(BPoint, float, float) to do the actualy zooming.
+
+	\see Zoom(BPoint, float, float);
 
 	\since BeOS R3
 */
