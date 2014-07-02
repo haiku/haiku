@@ -67,7 +67,7 @@ DynamicBuffer::InitCheck() const
 }
 
 
-status_t
+ssize_t
 DynamicBuffer::Write(const void* data, size_t size)
 {
 	if (fInit != B_OK)
@@ -80,7 +80,7 @@ DynamicBuffer::Write(const void* data, size_t size)
 	memcpy(fBuffer + fDataEnd, data, size);
 	fDataEnd += size;
 
-	return B_OK;
+	return (ssize_t)size;
 }
 
 

@@ -26,11 +26,11 @@ public:
 	
 	// Insert data at the end of the buffer. The buffer will be increased to
 	// accomodate the data if needed.
-	status_t Write(const void* data, size_t size);
+	virtual ssize_t Write(const void* data, size_t size);
 	
 	// Remove data from the start of the buffer. Move the buffer start
 	// pointer to point to the data following it.
-	ssize_t Read(void* data, size_t size);
+	virtual ssize_t Read(void* data, size_t size);
 
 	// Return a pointer to the underlying buffer. Note this will not
 	// necessarily be a pointer to the start of the allocated memory as the
