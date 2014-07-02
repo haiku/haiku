@@ -160,8 +160,8 @@ RemotePackageRepository HaikuPorts
 	netsurf-3.1-1
 	openssh-6.0p1-8
 	# sync openssl with secondary architecture (x86)
-	openssl-1.0.0m-1
-	openssl_devel-1.0.0m-1
+	openssl-1.0.0m-2
+	openssl_devel-1.0.0m-2
 	p7zip-9.20.1-4
 	pe-2.4.4_2014_05_29-1
 	perl-5.18.2-2
@@ -323,6 +323,8 @@ RemotePackageRepository HaikuPorts
 	libpaper_x86_devel-1.1.24-1
 	libpng_x86-1.5.12-3
 	libpng_x86_devel-1.5.12-3
+	libqt4_x86-4.8.6.1-4
+	libqt4_x86_devel-4.8.6.1-4
 	libsdl_x86-1.2.15-5
 	libsdl_x86_devel-1.2.15-5
 	libsdl2_x86-2.0.1-3
@@ -358,8 +360,8 @@ RemotePackageRepository HaikuPorts
 	openal_x86-1.13.0-2
 	openal_x86_devel-1.13.0-2
 	openjdk_x86-1.7_2013_11_08-2
-	openssl_x86-1.0.0m-1
-	openssl_x86_devel-1.0.0m-1
+	openssl_x86-1.0.0m-2
+	openssl_x86_devel-1.0.0m-2
 	openttd_x86-1.3.3-1
 	physfs_x86-2.0.3-1
 	physfs_x86_devel-2.0.3-1
@@ -368,11 +370,9 @@ RemotePackageRepository HaikuPorts
 	pkgconfig_x86-0.27.1-2
 	protrekkr_x86-2.5.4-2
 	qemu_x86-1.7.0-1
-	qtcore_x86-4.8.5.git-4
-	qtcore_x86_devel-4.8.5.git-4
-	quassel_x86-0.10.0-1
+	quassel_x86-0.10.0-2
 	quicklaunch-0.9.7-2
-	qupzilla_x86-1.7.x-1
+	qupzilla_x86-1.7.x-4
 	rocksndiamonds_x86-3.3.1.2-1
 	sdl_gfx_x86-2.0.24-1
 	sdl_gfx_x86_devel-2.0.24-1
@@ -478,6 +478,7 @@ RemotePackageRepository HaikuPorts
 	libpaper
 	libpcre
 	libpng
+	libqt4_x86
 	libsolv
 	libsdl
 	libsdl2_x86
@@ -531,7 +532,6 @@ RemotePackageRepository HaikuPorts
 	python_zope.interface
 	qemu_x86
 	qrencode
-	qtcore_x86
 	quassel_x86
 	quicklaunch
 	qupzilla_x86
