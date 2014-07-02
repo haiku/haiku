@@ -350,7 +350,7 @@ div.contents hr {
 	display: none;
 }
 
-div.contents ol,ul {
+div.contents ul {
 	list-style: none;
 }
 
