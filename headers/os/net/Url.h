@@ -71,6 +71,12 @@ public:
 	static	BString				UrlDecode(const BString& url, 
 									bool strict = false);
 
+	// utility functionality
+			bool				HasPreferredApplication() const;
+			BString				PreferredApplication() const;
+			status_t			OpenWithPreferredApplication(
+									bool onProblemAskUser = true) const;
+
 	// BArchivable members
 	virtual	status_t			Archive(BMessage* into,
 									bool deep = true) const;
@@ -103,6 +109,8 @@ private:
 	static	bool				_IsUnreserved(char c);
 	static	bool				_IsGenDelim(char c);
 	static	bool				_IsSubDelim(char c);
+
+			BString				_UrlMimeType() const;
 
 private:
 	mutable	BString				fUrlString;

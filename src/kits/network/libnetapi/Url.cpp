@@ -14,6 +14,9 @@
 #include <cstdlib>
 #include <new>
 
+#include <MimeType.h>
+#include <Roster.h>
+
 #include <RegExp.h>
 
 
@@ -573,6 +576,76 @@ BUrl::UrlDecode(bool strict)
 }
 
 
+// #pragma mark - utility functionality
+
+
+bool
+BUrl::HasPreferredApplication() const
+{
+	BString appSignature = PreferredApplication();
+	BMimeType mime(appSignature.String());
+
+	if (appSignature.IFindFirst("application/") == 0
+		&& mime.IsValid())
+		return true;
+
+	return false;
+}
+
+
+BString
+BUrl::PreferredApplication() const
+{
+	BString appSignature;
+	BMimeType mime(_UrlMimeType().String());
+	mime.GetPreferredApp(appSignature.LockBuffer(B_MIME_TYPE_LENGTH));
+	appSignature.UnlockBuffer();
+
+	return BString(appSignature);
+}
+
+
+status_t
+BUrl::OpenWithPreferredApplication(bool onProblemAskUser) const
+{
+	if (!IsValid())
+		return B_BAD_VALUE;
+
+	BString urlString = UrlString();
+	if (urlString.Length() > B_PATH_NAME_LENGTH) {
+		// TODO: BAlert
+		//	if (onProblemAskUser)
+		//		BAlert ... Too long URL!
+#if DEBUG
+		fprintf(stderr, "URL too long");
+#endif
+		return B_NAME_TOO_LONG;
+	}
+
+	char* argv[] = {
+		const_cast<char*>("BUrlInvokedApplication"),
+		const_cast<char*>(urlString.String()),
+		NULL
+	};
+
+#if DEBUG
+	if (HasPreferredApplication())
+		printf("HasPreferredApplication() == true\n");
+	else
+		printf("HasPreferredApplication() == false\n");
+#endif
+
+	status_t status = be_roster->Launch(_UrlMimeType().String(), 1, argv+1);
+	if (status != B_OK) {
+#if DEBUG
+		fprintf(stderr, "Opening URL failed: %s\n", strerror(status));
+#endif
+	}
+
+	return status;
+}
+
+
 // #pragma mark Url encoding/decoding of string
 
 
@@ -981,4 +1054,14 @@ BUrl::_IsSubDelim(char c)
 	return c == '!' || c == '$' || c == '&' || c == '\'' || c == '('
 		|| c == ')' || c == '*' || c == '+' || c == ',' || c == ';'
 		|| c == '=';
+}
+
+
+BString
+BUrl::_UrlMimeType() const
+{
+	BString mime;
+	mime << "application/x-vnd.Be.URL." << fProtocol;
+
+	return BString(mime);
 }
