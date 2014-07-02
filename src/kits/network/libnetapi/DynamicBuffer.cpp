@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <algorithm>
+
 #include <Errors.h>
 #include <SupportDefs.h>
 
@@ -90,8 +92,9 @@ DynamicBuffer::Read(void* data, size_t size)
 	if (fInit != B_OK)
 		return fInit;
 
-	if (size > Size())
-		size = Size();
+	size = std::min(size, Size());
+	if (size == 0)
+		return 0;
 
 	memcpy(data, fBuffer + fDataStart, size);
 	fDataStart += size;
