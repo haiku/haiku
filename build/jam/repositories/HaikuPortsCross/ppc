@@ -12,7 +12,7 @@ BootstrapPackageRepository HaikuPortsCross
 	flex_bootstrap-2.5.35-1
 	icu_bootstrap-4.8.1.1-1
 	icu_bootstrap_devel-4.8.1.1-1
-	gcc_bootstrap-4.8.2_2014_03_30-1
+	gcc_bootstrap-4.8.3_2014_05_28-1
 	grep_bootstrap-2.14-1
 	freetype_bootstrap-2.4.9-1
 	freetype_bootstrap_devel-2.4.9-1
