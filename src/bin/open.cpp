@@ -96,7 +96,7 @@ main(int argc, char** argv)
 				result = B_OK;
 		} else if (strchr(*argv, ':')) {
 			// try to open it as an URI
-			BPrivate::Support::BUrl url(*argv);
+			BUrl url(*argv);
 			if (url.OpenWithPreferredApplication() == B_OK)
 				continue;
 

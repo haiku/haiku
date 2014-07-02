@@ -119,19 +119,19 @@ CheckItOut::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 	
-	BPrivate::Support::BUrl url(argv[1]);
+	BUrl url(argv[1]);
 	fUrlString = url;
 
-	BString full = url.Full();
-	BString proto = url.Proto();
+	BString full = BUrl(url).SetProtocol(BString()).UrlString();
+	BString proto = url.Protocol();
 	BString host = url.Host();
-	BString port = url.Port();
-	BString user = url.User();
-	BString pass = url.Pass();
+	BString port = BString() << url.Port();
+	BString user = url.UserInfo();
+	BString pass = url.Password();
 	BString path = url.Path();
 
-	if (url.InitCheck() < 0) {
-		fprintf(stderr, "malformed url: '%s'\n", url.String());
+	if (!url.IsValid()) {
+		fprintf(stderr, "malformed url: '%s'\n", url.UrlString().String());
 		return;
 	}
 	
@@ -158,15 +158,15 @@ CheckItOut::_DoCheckItOut(entry_ref *ref, const char *name)
 	const char* pausec = " ; read -p 'Press any key'";
 	char* args[] = { (char *)"/bin/sh", (char *)"-c", NULL, NULL};
 
-	BPrivate::Support::BUrl url(fUrlString.String());
-	BString full = url.Full();
-	BString proto = url.Proto();
+	BUrl url(fUrlString);
+	BString full = BUrl(url).SetProtocol(BString()).UrlString();
+	BString proto = url.Protocol();
 	BString host = url.Host();
-	BString port = url.Port();
-	BString user = url.User();
-	BString pass = url.Pass();
+	BString port = BString() << url.Port();
+	BString user = url.UserInfo();
+	BString pass = url.Password();
 	BString path = url.Path();
-	PRINT(("url %s\n", url.String()));
+	PRINT(("url %s\n", url.UrlString().String()));
 	BPath refPath(ref);
 
 	if (proto == "git") {

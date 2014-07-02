@@ -35,7 +35,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			StopWatch.cpp
 			String.cpp
 			StringList.cpp
-			Url.cpp
 			Uuid.cpp
 			ZlibCompressionAlgorithm.cpp
 			;

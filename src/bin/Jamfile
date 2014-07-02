@@ -93,7 +93,6 @@ StdBinCommands
 	message.cpp
 	modifiers.cpp
 	mvattr.cpp
-	open.cpp
 	play.cpp
 	query.cpp
 	quit.cpp
@@ -129,6 +128,12 @@ StdBinCommands
 StdBinCommands
 	ramdisk.cpp
 	: libshared.a be $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+
+# standard commands that need libbe.so, libbnetapi.solibsupc++.so
+StdBinCommands
+	open.cpp
+	urlwrapper.cpp
+	: be bnetapi $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
 # commands that need libbe.so and the stub catalog
 StdBinCommands
@@ -221,10 +226,10 @@ StdBinCommands
 	: be libbluetooth.so $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
 
-# standard commands that need libbe.so, libtracker.so
+# standard commands that need libbe.so, libbnetapi.so, libtracker.so
 StdBinCommands
 	checkitout.cpp
-	: be tracker $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+	: be bnetapi tracker $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
 #standard commands that need libbe.so, libtracker.so and the stub catalog
 StdBinCommands

@@ -24,8 +24,7 @@
 #include <SpaceLayoutItem.h>
 #include <StatusBar.h>
 #include <StringView.h>
-
-#include <support/Url.h>
+#include <Url.h>
 
 #include "BitmapButton.h"
 #include "BitmapView.h"
@@ -930,7 +929,7 @@ public:
 
 			case MSG_VISIT_PUBLISHER_WEBSITE:
 			{
-				BPrivate::Support::BUrl url(fWebsiteLinkView->Text());
+				BUrl url(fWebsiteLinkView->Text());
 				url.OpenWithPreferredApplication();
 				break;
 			}

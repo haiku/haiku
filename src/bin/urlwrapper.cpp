@@ -117,10 +117,10 @@ UrlWrapper::RefsReceived(BMessage* msg)
 					}
 				}
 				if (url.Length()) {
-					BPrivate::Support::BUrl u(url.String());
-					args[1] = (char*)u.String();
+					BUrl u(url.String());
+					args[1] = (char*)u.UrlString().String();
 					mimetype = kURLHandlerSigBase;
-					mimetype += u.Proto();
+					mimetype += u.Protocol();
 					err = be_roster->Launch(mimetype.String(), 1, args + 1);
 					if (err != B_OK && err != B_ALREADY_RUNNING)
 						err = be_roster->Launch(kAppSig, 1, args + 1);
@@ -185,10 +185,10 @@ UrlWrapper::RefsReceived(BMessage* msg)
 					}
 				}
 				if (url.Length()) {
-					BPrivate::Support::BUrl u(url.String());
-					args[1] = (char*)u.String();
+					BUrl u(url.String());
+					args[1] = (char*)u.UrlString().String();
 					mimetype = kURLHandlerSigBase;
-					mimetype += u.Proto();
+					mimetype += u.Protocol();
 					err = be_roster->Launch(mimetype.String(), 1, args + 1);
 					if (err != B_OK && err != B_ALREADY_RUNNING)
 						err = be_roster->Launch(kAppSig, 1, args + 1);
@@ -199,10 +199,10 @@ UrlWrapper::RefsReceived(BMessage* msg)
 			// NetPositive Bookmark or any file with a META:url attribute
 			if (f.ReadAttr("META:url", B_STRING_TYPE, 0LL, buff,
 				B_PATH_NAME_LENGTH) > 0) {
-				BPrivate::Support::BUrl u(buff);
-				args[1] = (char*)u.String();
+				BUrl u(buff);
+				args[1] = (char*)u.UrlString().String();
 				mimetype = kURLHandlerSigBase;
-				mimetype += u.Proto();
+				mimetype += u.Protocol();
 				err = be_roster->Launch(mimetype.String(), 1, args + 1);
 				if (err != B_OK && err != B_ALREADY_RUNNING)
 					err = be_roster->Launch(kAppSig, 1, args + 1);
@@ -224,18 +224,18 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	char* args[] = { (char *)"/bin/sh", (char *)"-c", NULL, NULL};
 	status_t err;
 
-	BPrivate::Support::BUrl url(argv[1]);
+	BUrl url(argv[1]);
 
-	BString full = url.Full();
-	BString proto = url.Proto();
+	BString full = BUrl(url).SetProtocol(BString()).UrlString();
+	BString proto = url.Protocol();
 	BString host = url.Host();
-	BString port = url.Port();
-	BString user = url.User();
-	BString pass = url.Pass();
+	BString port = BString() << url.Port();
+	BString user = url.UserInfo();
+	BString pass = url.Password();
 	BString path = url.Path();
 
-	if (url.InitCheck() < 0) {
-		fprintf(stderr, "malformed url: '%s'\n", url.String());
+	if (!url.IsValid()) {
+		fprintf(stderr, "malformed url: '%s'\n", url.UrlString().String());
 		return;
 	}
 	
@@ -266,7 +266,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	
 	if (proto == "telnet") {
 		BString cmd("telnet ");
-		if (url.HasUser())
+		if (url.HasUserInfo())
 			cmd << "-l " << user << " ";
 		cmd << host;
 		if (url.HasPort())
@@ -283,7 +283,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	if (proto == "ssh") {
 		BString cmd("ssh ");
 		
-		if (url.HasUser())
+		if (url.HasUserInfo())
 			cmd << "-l " << user << " ";
 		if (url.HasPort())
 			cmd << "-oPort=" << port << " ";
@@ -320,7 +320,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		//cmd << url;
 		if (url.HasPort())
 			cmd << "-oPort=" << port << " ";
-		if (url.HasUser())
+		if (url.HasUserInfo())
 			cmd << user << "@";
 		cmd << host;
 		if (url.HasPath())
@@ -336,7 +336,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	if (proto == "finger") {
 		BString cmd("/bin/finger ");
 		
-		if (url.HasUser())
+		if (url.HasUserInfo())
 			cmd << user;
 		if (url.HasHost() == 0)
 			host = "127.0.0.1";
@@ -354,7 +354,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		
 		//cmd << url;
 		cmd << proto << "://";
-		if (url.HasUser())
+		if (url.HasUserInfo())
 			cmd << user << "@";
 		cmd << full;
 		PRINT(("CMD='%s'\n", cmd.String()));
@@ -414,7 +414,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 
 	if (proto == "sh") {
 		BString cmd(full);
-		if (_Warn(url.String()) != B_OK)
+		if (_Warn(url.UrlString()) != B_OK)
 			return;
 		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << pausec;
@@ -463,7 +463,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	}
 
 	if (proto == "mms" || proto == "rtp" || proto == "rtsp") {
-		args[0] = (char*)url.String();
+		args[0] = (char*)url.UrlString().String();
 		be_roster->Launch(kVLCSig, 1, args);
 		return;
 	}
@@ -509,12 +509,12 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		BString mimetype;
 
 		url << full;
-		BPrivate::Support::BUrl u(url.String());
+		BUrl u(url.String());
 		args[0] = const_cast<char*>("urlwrapper"); //XXX
-		args[1] = (char*)u.String();
+		args[1] = (char*)u.UrlString().String();
 		args[2] = NULL;
 		mimetype = kURLHandlerSigBase;
-		mimetype += u.Proto();
+		mimetype += u.Protocol();
 
 		err = be_roster->Launch(mimetype.String(), 1, args + 1);
 		if (err != B_OK && err != B_ALREADY_RUNNING)
