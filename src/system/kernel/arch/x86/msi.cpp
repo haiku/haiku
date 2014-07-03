@@ -57,7 +57,7 @@ msi_allocate_vectors(uint8 count, uint8 *startVector, uint64 *address,
 	if (result != B_OK)
 		return result;
 
-	if (vector >= 256) {
+	if (vector >= NUM_IO_VECTORS) {
 		free_io_interrupt_vectors(count, vector);
 		return B_NO_MEMORY;
 	}
