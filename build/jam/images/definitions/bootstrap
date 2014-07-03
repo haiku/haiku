@@ -9,3 +9,8 @@ CopyDirectoryToHaikuImage home haikuports
 	: input-source-packages : -x  *_source-*.hpkg : isTarget ;
 AddFilesToHaikuImage home haikuports
 	: [ BuildHaikuPortsRepositoryConfig /boot/home/haikuports ] ;
+
+# copy the haikuports format versions file
+local formatVersionsFile = <haikuports>FormatVersions ;
+SEARCH on $(formatVersionsFile) = $(HAIKU_PORTS) ;
+AddFilesToHaikuImage home haikuports : $(formatVersionsFile) ;
