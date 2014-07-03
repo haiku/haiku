@@ -10,19 +10,22 @@
 //! B+Tree implementation
 
 
-#include "Debug.h"
 #include "BPlusTree.h"
+
+#include <file_systems/QueryParserUtils.h>
+
+#include "Debug.h"
 #include "Utility.h"
 
 #if !_BOOT_MODE
-#include "Inode.h"
+#	include "Inode.h"
 #else
-#include "Stream.h"
+#	include "Stream.h"
 
 // BFS::Stream from the bootloader has the same API as Inode.
-#define Inode BFS::Stream
+#	define Inode BFS::Stream
 
-#define strerror(x)		"error message unavailable"
+#	define strerror(x)		"error message unavailable"
 
 namespace BFS {
 #endif
@@ -1032,7 +1035,7 @@ BPlusTree::_CompareKeys(const void* key1, int keyLength1, const void* key2,
 	    	type = B_DOUBLE_TYPE;
 	    	break;
 	}
-   	return compareKeys(type, key1, keyLength1, key2, keyLength2);
+	return QueryParser::compareKeys(type, key1, keyLength1, key2, keyLength2);
 }
 
 
@@ -3119,97 +3122,6 @@ duplicate_array::Remove(off_t value)
 	count = HOST_ENDIAN_TO_BFS_INT64(newSize);
 
 	return true;
-}
-
-
-// #pragma mark -
-
-
-int32
-compareKeys(type_code type, const void* key1, int keyLength1,
-	const void* key2, int keyLength2)
-{
-	// if one of the keys is NULL, bail out gracefully
-	if (key1 == NULL || key2 == NULL) {
-		// even if it's most probably a bug in the calling code, we try to
-		// give a meaningful result
-		if (key1 == NULL && key2 != NULL)
-			return 1;
-		if (key2 == NULL && key1 != NULL)
-			return -1;
-
-		return 0;
-	}
-
-	switch (type) {
-	    case B_STRING_TYPE:
-    	{
-			int result = memcmp(key1, key2, min_c(keyLength1, keyLength2));
-			if (result == 0) {
-				// ignore trailing null bytes
-				if ((keyLength1 == keyLength2 + 1
-						&& ((uint8*)key1)[keyLength2] == '\0')
-					|| (keyLength2 == keyLength1 + 1
-						&& ((uint8*)key2)[keyLength1] == '\0'))
-					return 0;
-
-				result = keyLength1 - keyLength2;
-			}
-
-			return result;
-		}
-
-		case B_SSIZE_T_TYPE:
-		case B_INT32_TYPE:
-			return *(int32*)key1 - *(int32*)key2;
-
-		case B_SIZE_T_TYPE:
-		case B_UINT32_TYPE:
-			if (*(uint32*)key1 == *(uint32*)key2)
-				return 0;
-			if (*(uint32*)key1 > *(uint32*)key2)
-				return 1;
-
-			return -1;
-
-		case B_OFF_T_TYPE:
-		case B_INT64_TYPE:
-			if (*(int64*)key1 == *(int64*)key2)
-				return 0;
-			if (*(int64*)key1 > *(int64*)key2)
-				return 1;
-
-			return -1;
-
-		case B_UINT64_TYPE:
-			if (*(uint64*)key1 == *(uint64*)key2)
-				return 0;
-			if (*(uint64*)key1 > *(uint64*)key2)
-				return 1;
-
-			return -1;
-
-		case B_FLOAT_TYPE:
-		{
-			float result = *(float*)key1 - *(float*)key2;
-			if (result == 0.0f)
-				return 0;
-
-			return (result < 0.0f) ? -1 : 1;
-		}
-
-		case B_DOUBLE_TYPE:
-		{
-			double result = *(double*)key1 - *(double*)key2;
-			if (result == 0.0)
-				return 0;
-
-			return (result < 0.0) ? -1 : 1;
-		}
-	}
-
-	// if the type is unknown, the entries don't match...
-	return -1;
 }
 
 

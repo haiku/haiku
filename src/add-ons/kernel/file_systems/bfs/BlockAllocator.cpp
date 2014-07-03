@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -36,7 +36,7 @@
 // be improved a lot. Furthermore, the allocation policies used here should
 // have some real world tests.
 
-#if BFS_TRACING && !defined(BFS_SHELL)
+#if BFS_TRACING && !defined(FS_SHELL)
 namespace BFSBlockTracing {
 
 

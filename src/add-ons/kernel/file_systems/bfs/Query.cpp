@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * This file may be used under the terms of the MIT License.
  */
@@ -15,6 +15,7 @@
 
 #include "Query.h"
 
+#include <file_systems/QueryParserUtils.h>
 #include <query_private.h>
 
 #include "BPlusTree.h"
@@ -37,6 +38,9 @@
 // are.
 
 
+using namespace QueryParser;
+
+
 enum ops {
 	OP_NONE,
 
@@ -54,20 +58,6 @@ enum ops {
 	OP_LESS_THAN_OR_EQUAL,
 };
 
-enum match {
-	NO_MATCH = 0,
-	MATCH_OK = 1,
-
-	MATCH_BAD_PATTERN = -2,
-	MATCH_INVALID_CHARACTER
-};
-
-// return values from isValidPattern()
-enum {
-	PATTERN_INVALID_ESCAPE = -3,
-	PATTERN_INVALID_RANGE,
-	PATTERN_INVALID_SET
-};
 
 union value {
 	int64	Int64;
@@ -211,267 +201,9 @@ private:
 //	#pragma mark -
 
 
-void
-skipWhitespace(char** expr, int32 skip = 0)
-{
-	char* string = (*expr) + skip;
-	while (*string == ' ' || *string == '\t') string++;
-	*expr = string;
-}
-
-
-void
-skipWhitespaceReverse(char** expr, char* stop)
-{
-	char* string = *expr;
-	while (string > stop && (*string == ' ' || *string == '\t'))
-		string--;
-	*expr = string;
-}
-
-
-//	#pragma mark -
-
-
-uint32
-utf8ToUnicode(char** string)
-{
-	uint8* bytes = (uint8*)*string;
-	int32 length;
-	uint8 mask = 0x1f;
-
-	switch (bytes[0] & 0xf0) {
-		case 0xc0:
-		case 0xd0:
-			length = 2;
-			break;
-		case 0xe0:
-			length = 3;
-			break;
-		case 0xf0:
-			mask = 0x0f;
-			length = 4;
-			break;
-		default:
-			// valid 1-byte character
-			// and invalid characters
-			(*string)++;
-			return bytes[0];
-	}
-	uint32 c = bytes[0] & mask;
-	int32 i = 1;
-	for (; i < length && (bytes[i] & 0x80) > 0; i++)
-		c = (c << 6) | (bytes[i] & 0x3f);
-
-	if (i < length) {
-		// invalid character
-		(*string)++;
-		return (uint32)bytes[0];
-	}
-	*string += length;
-	return c;
-}
-
-
-int32
-getFirstPatternSymbol(char* string)
-{
-	char c;
-
-	for (int32 index = 0; (c = *string++); index++) {
-		if (c == '*' || c == '?' || c == '[')
-			return index;
-	}
-	return -1;
-}
-
-
-bool
-isPattern(char* string)
-{
-	return getFirstPatternSymbol(string) >= 0 ? true : false;
-}
-
-
-status_t
-isValidPattern(char* pattern)
-{
-	while (*pattern) {
-		switch (*pattern++) {
-			case '\\':
-				// the escape character must not be at the end of the pattern
-				if (!*pattern++)
-					return PATTERN_INVALID_ESCAPE;
-				break;
-
-			case '[':
-				if (pattern[0] == ']' || !pattern[0])
-					return PATTERN_INVALID_SET;
-
-				while (*pattern != ']') {
-					if (*pattern == '\\' && !*++pattern)
-						return PATTERN_INVALID_ESCAPE;
-
-					if (!*pattern)
-						return PATTERN_INVALID_SET;
-
-					if (pattern[0] == '-' && pattern[1] == '-')
-						return PATTERN_INVALID_RANGE;
-
-					pattern++;
-				}
-				break;
-		}
-	}
-	return B_OK;
-}
-
-
-/*!	Matches the string against the given wildcard pattern.
-	Returns either MATCH_OK, or NO_MATCH when everything went fine, or
-	values < 0 (see enum at the top of Query.cpp) if an error occurs.
-*/
-status_t
-matchString(char* pattern, char* string)
-{
-	while (*pattern) {
-		// end of string == valid end of pattern?
-		if (!string[0]) {
-			while (pattern[0] == '*')
-				pattern++;
-			return !pattern[0] ? MATCH_OK : NO_MATCH;
-		}
-
-		switch (*pattern++) {
-			case '?':
-			{
-				// match exactly one UTF-8 character; we are
-				// not interested in the result
-				utf8ToUnicode(&string);
-				break;
-			}
-
-			case '*':
-			{
-				// compact pattern
-				while (true) {
-					if (pattern[0] == '?') {
-						if (!*++string)
-							return NO_MATCH;
-					} else if (pattern[0] != '*')
-						break;
-
-					pattern++;
-				}
-
-				// if the pattern is done, we have matched the string
-				if (!pattern[0])
-					return MATCH_OK;
-
-				while(true) {
-					// we have removed all occurences of '*' and '?'
-					if (pattern[0] == string[0]
-						|| pattern[0] == '['
-						|| pattern[0] == '\\') {
-						status_t status = matchString(pattern, string);
-						if (status < B_OK || status == MATCH_OK)
-							return status;
-					}
-
-					// we could be nice here and just jump to the next
-					// UTF-8 character - but we wouldn't gain that much
-					// and it'd be slower (since we're checking for
-					// equality before entering the recursion)
-					if (!*++string)
-						return NO_MATCH;
-				}
-				break;
-			}
-
-			case '[':
-			{
-				bool invert = false;
-				if (pattern[0] == '^' || pattern[0] == '!') {
-					invert = true;
-					pattern++;
-				}
-
-				if (!pattern[0] || pattern[0] == ']')
-					return MATCH_BAD_PATTERN;
-
-				uint32 c = utf8ToUnicode(&string);
-				bool matched = false;
-
-				while (pattern[0] != ']') {
-					if (!pattern[0])
-						return MATCH_BAD_PATTERN;
-
-					if (pattern[0] == '\\')
-						pattern++;
-
-					uint32 first = utf8ToUnicode(&pattern);
-
-					// Does this character match, or is this a range?
-					if (first == c) {
-						matched = true;
-						break;
-					} else if (pattern[0] == '-' && pattern[1] != ']'
-							&& pattern[1]) {
-						pattern++;
-
-						if (pattern[0] == '\\') {
-							pattern++;
-							if (!pattern[0])
-								return MATCH_BAD_PATTERN;
-						}
-						uint32 last = utf8ToUnicode(&pattern);
-
-						if (c >= first && c <= last) {
-							matched = true;
-							break;
-						}
-					}
-				}
-
-				if (invert)
-					matched = !matched;
-
-				if (matched) {
-					while (pattern[0] != ']') {
-						if (!pattern[0])
-							return MATCH_BAD_PATTERN;
-						pattern++;
-					}
-					pattern++;
-					break;
-				}
-				return NO_MATCH;
-			}
-
-            case '\\':
-				if (!pattern[0])
-					return MATCH_BAD_PATTERN;
-				// supposed to fall through
-			default:
-				if (pattern[-1] != string[0])
-					return NO_MATCH;
-				string++;
-				break;
-		}
-	}
-
-	if (string[0])
-		return NO_MATCH;
-
-	return MATCH_OK;
-}
-
-
-//	#pragma mark -
-
-
 Equation::Equation(char** expr)
-	: Term(OP_EQUATION),
+	:
+	Term(OP_EQUATION),
 	fAttribute(NULL),
 	fString(NULL),
 	fType(0),
@@ -1143,7 +875,8 @@ Equation::GetNextMatching(Volume* volume, TreeIterator* iterator,
 
 
 Operator::Operator(Term* left, int8 op, Term* right)
-	: Term(op),
+	:
+	Term(op),
 	fLeft(left),
 	fRight(right)
 {

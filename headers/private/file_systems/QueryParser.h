@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * This file may be used under the terms of the MIT License.
@@ -27,24 +27,30 @@
 // The API is not fully available, just the Query and the Expression class
 // are.
 
+#ifdef FS_SHELL
+#	include <new>
 
-#include <dirent.h>
-#include <stdlib.h>
-#include <string.h>
+#	include "fssh_api_wrapper.h"
+#	include "fssh_auto_deleter.h"
+#else
+#	include <dirent.h>
+#	include <stdlib.h>
+#	include <string.h>
 
-#include <algorithm>
-#include <new>
+#	include <algorithm>
+#	include <new>
 
-#include <fs_interface.h>
-#include <fs_query.h>
-#include <TypeConstants.h>
+#	include <fs_interface.h>
+#	include <fs_query.h>
+#	include <TypeConstants.h>
 
-#include <util/SinglyLinkedList.h>
-#include <util/Stack.h>
+#	include <util/SinglyLinkedList.h>
+#	include <util/Stack.h>
 
-#include <query_private.h>
+#	include <query_private.h>
 
-#include <lock.h>
+#	include <lock.h>
+#endif	// !FS_SHELL
 
 #include <file_systems/QueryParserUtils.h>
 

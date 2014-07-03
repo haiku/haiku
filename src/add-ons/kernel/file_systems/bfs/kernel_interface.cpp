@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -18,7 +18,7 @@
 #include "bfs_disk_system.h"
 
 // TODO: temporary solution as long as there is no public I/O requests API
-#ifndef BFS_SHELL
+#ifndef FS_SHELL
 #	include <io_requests.h>
 #	include <util/fs_trim_support.h>
 #endif
@@ -487,7 +487,7 @@ bfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-#ifndef BFS_SHELL
+#ifndef FS_SHELL
 	if (io_request_is_write(request) && volume->IsReadOnly()) {
 		notify_io_request(request, B_READ_ONLY_DEVICE);
 		return B_READ_ONLY_DEVICE;
@@ -495,7 +495,7 @@ bfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 #endif
 
 	if (inode->FileCache() == NULL) {
-#ifndef BFS_SHELL
+#ifndef FS_SHELL
 		notify_io_request(request, B_BAD_VALUE);
 #endif
 		RETURN_ERROR(B_BAD_VALUE);
@@ -625,7 +625,7 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	switch (cmd) {
-#ifndef BFS_SHELL
+#ifndef FS_SHELL
 		case B_TRIM_DEVICE:
 		{
 			fs_trim_data* trimData;

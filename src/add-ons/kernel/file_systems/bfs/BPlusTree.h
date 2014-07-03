@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef B_PLUS_TREE_H
@@ -372,10 +372,6 @@ private:
 
 
 //	#pragma mark - helper classes/functions
-
-
-extern int32 compareKeys(type_code type, const void* key1, int keyLength1,
-	const void* key2, int keyLength2);
 
 
 class TreeIterator : public SinglyLinkedListLinkImpl<TreeIterator> {

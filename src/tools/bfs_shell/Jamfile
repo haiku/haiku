@@ -9,7 +9,7 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 {
 	local defines =
 		#BFS_BIG_ENDIAN_ONLY
-		BFS_SHELL
+		FS_SHELL
 		;
 
 	if $(DEBUG) = 0 {
@@ -42,6 +42,7 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 
 UsePrivateHeaders shared storage ;
 UsePrivateHeaders fs_shell ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
 
 local bfsSource =
@@ -54,6 +55,7 @@ local bfsSource =
 	Inode.cpp
 	Journal.cpp
 	Query.cpp
+	QueryParserUtils.cpp
 	Volume.cpp
 
 	kernel_interface.cpp
@@ -79,3 +81,6 @@ BuildPlatformMain <build>bfs_fuse
 	$(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	$(HOST_STATIC_LIBROOT) $(fsShellCommandLibs) fuse
 ;
+
+SEARCH on [ FGristFiles QueryParserUtils.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -86,7 +86,7 @@ private:
 };
 
 
-#if BFS_TRACING && !defined(BFS_SHELL) && !defined(_BOOT_MODE)
+#if BFS_TRACING && !defined(FS_SHELL) && !defined(_BOOT_MODE)
 namespace BFSJournalTracing {
 
 class LogEntry : public AbstractTraceEntry {

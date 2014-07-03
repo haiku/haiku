@@ -6,14 +6,14 @@
 #define _SYSTEM_DEPENDENCIES_H
 
 
-#ifdef BFS_SHELL
+#ifdef FS_SHELL
 
 #include <new>
 
 #include "fssh_api_wrapper.h"
 #include "fssh_auto_deleter.h"
 
-#else	// !BFS_SHELL
+#else	// !FS_SHELL
 
 #include <AutoDeleter.h>
 #include <util/AutoLock.h>
@@ -51,7 +51,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#endif	// !BFS_SHELL
+#endif	// !FS_SHELL
 
 
 #endif	// _SYSTEM_DEPENDENCIES_H

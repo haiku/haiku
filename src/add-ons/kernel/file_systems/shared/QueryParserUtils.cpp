@@ -1,18 +1,21 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * This file may be used under the terms of the MIT License.
  */
 
 
-#include <file_systems/QueryParserUtils.h>
-
-#include <string.h>
-
+// This needs to be the first include because of the fs shell API wrapper
 #include <algorithm>
 
-#include <TypeConstants.h>
+#include <file_systems/QueryParserUtils.h>
+
+#ifndef FS_SHELL
+#	include <string.h>
+
+#	include <TypeConstants.h>
+#endif
 
 
 namespace QueryParser {
@@ -24,7 +27,7 @@ compare_integral(const Key& a, const Key& b)
 {
 	if (a < b)
 		return -1;
-	else if (a > b)
+	if (a > b)
 		return 1;
 	return 0;
 }

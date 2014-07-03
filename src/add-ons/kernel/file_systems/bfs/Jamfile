@@ -1,12 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems bfs ;
 
-# R5 support has been removed!
-#
-# Have a look in src/tests/add-ons/kernel/file_systems/bfs/r5/
-# for an R5 compatible version.
-# In order to make the current BFS version R5 compatible again,
-# we would need to port over the Haiku cache API to R5.
-
 # set some additional defines
 {
 	local defines =
@@ -39,12 +32,14 @@ KernelAddon bfs :
 	Inode.cpp
 	Journal.cpp
 	Query.cpp
+	QueryParserUtils.cpp
 	Volume.cpp
 
 	kernel_interface.cpp
 	;
 
-SEARCH on [ FGristFiles
-		kernel_cpp.cpp
-	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+SEARCH on [ FGristFiles kernel_cpp.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
+SEARCH on [ FGristFiles QueryParserUtils.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

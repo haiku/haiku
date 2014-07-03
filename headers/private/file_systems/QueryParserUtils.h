@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * This file may be used under the terms of the MIT License.
@@ -8,9 +8,17 @@
 #define _FILE_SYSTEMS_QUERY_PARSER_UTILS_H
 
 
-#include <sys/cdefs.h>
+#ifdef FS_SHELL
+#	include <new>
 
-#include <SupportDefs.h>
+#	include "fssh_api_wrapper.h"
+#	include "fssh_auto_deleter.h"
+#else
+#	include <sys/cdefs.h>
+
+#	include <SupportDefs.h>
+#endif	// !FS_SHELL
+
 
 
 namespace QueryParser {

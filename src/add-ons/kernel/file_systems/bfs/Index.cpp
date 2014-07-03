@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -7,8 +7,11 @@
 //! Index access functions
 
 
-#include "Debug.h"
 #include "Index.h"
+
+#include <file_systems/QueryParserUtils.h>
+
+#include "Debug.h"
 #include "Volume.h"
 #include "Inode.h"
 #include "BPlusTree.h"
@@ -230,8 +233,13 @@ Index::Update(Transaction& transaction, const char* name, int32 type,
 	// If the two keys are identical, don't do anything - only compare if the
 	// type has been set, until we have a real type code, we can't do much
 	// about the comparison here
-	if (!compareKeys(type, oldKey, oldLength, newKey, newLength))
+	if (oldLength == 0) {
+		if (newLength == 0)
+			return B_OK;
+	} else if (newLength != 0 && !QueryParser::compareKeys(type,
+			oldKey, oldLength, newKey, newLength)) {
 		return B_OK;
+	}
 
 	// update all live queries about the change, if they have an index or not
 	fVolume->UpdateLiveQueries(inode, name, type, oldKey, oldLength,

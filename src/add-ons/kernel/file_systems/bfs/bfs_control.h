@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BFS_CONTROL_H
@@ -9,7 +9,7 @@
 //! additional functionality exported via ioctl()
 
 
-#ifdef BFS_SHELL
+#ifdef FS_SHELL
 #	include "system_dependencies.h"
 #else
 #	include <SupportDefs.h>
