@@ -476,8 +476,8 @@ BUrl::Fragment() const
 bool
 BUrl::IsValid() const
 {
-	// TODO
-	return false;
+	// TODO: Implement for real!
+	return fHasProtocol && (fHasHost || fHasPath);
 }
 
 
