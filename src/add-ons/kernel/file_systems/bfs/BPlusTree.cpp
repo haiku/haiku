@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  *
  * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
@@ -2362,8 +2362,8 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 		uint16 keyLength;
 		uint8* key = parent->KeyAt(i, &keyLength);
 		if (largestKey != NULL) {
-			int result = compareKeys(fHeader.DataType(), key, keyLength,
-				largestKey, largestKeyLength);
+			int result = _CompareKeys(key, keyLength, largestKey,
+				largestKeyLength);
 			if (result >= 0) {
 				dprintf("inode %" B_PRIdOFF ": node %" B_PRIdOFF " key %"
 					B_PRIu32 " larger than it should!\n",
