@@ -221,7 +221,8 @@ struct BZlibCompressionAlgorithm::Stream : BaseClass {
 
 	status_t Init(const typename Strategy::Parameters* parameters)
 	{
-		status_t error = this->BaseClass::Init(parameters->BufferSize());
+		status_t error = this->BaseClass::Init(
+			parameters != NULL ? parameters->BufferSize() : kDefaultBufferSize);
 		if (error != B_OK)
 			return error;
 
