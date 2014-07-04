@@ -190,7 +190,7 @@ void
 BackgroundImage::Show(BackgroundImageInfo* info, BView* view)
 {
 	BPoseView* poseView = dynamic_cast<BPoseView*>(view);
-	if (poseView)
+	if (poseView != NULL)
 		poseView->SetWidgetTextOutline(info->fTextWidgetOutline);
 
 	if (info->fBitmap == NULL) {
