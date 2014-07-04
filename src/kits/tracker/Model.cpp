@@ -890,12 +890,12 @@ Model::WatchVolumeAndMountPoint(uint32 , BHandler* target)
 		BEntry mountPointEntry(bootMountPoint.String());
 		Model mountPointModel(&mountPointEntry);
 
-		TTracker::WatchNode(mountPointModel.NodeRef(), B_WATCH_NAME
-			| B_WATCH_STAT | B_WATCH_ATTR, target);
+		TTracker::WatchNode(mountPointModel.NodeRef(),
+			B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR, target);
 	}
 
-	return TTracker::WatchNode(NodeRef(), B_WATCH_NAME | B_WATCH_STAT
-		| B_WATCH_ATTR, target);
+	return TTracker::WatchNode(NodeRef(),
+		B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR, target);
 }
 
 
@@ -907,13 +907,13 @@ Model::AttrChanged(const char* attrName)
 	// return true if icon needs updating
 
 	ASSERT(IsNodeOpen());
-	if (attrName
+	if (attrName != NULL
 		&& (strcmp(attrName, kAttrIcon) == 0
 			|| strcmp(attrName, kAttrMiniIcon) == 0
 			|| strcmp(attrName, kAttrLargeIcon) == 0))
 		return true;
 
-	if (!attrName
+	if (attrName == NULL
 		|| strcmp(attrName, kAttrMIMEType) == 0
 		|| strcmp(attrName, kAttrPreferredApp) == 0) {
 		char mimeString[B_MIME_TYPE_LENGTH];
@@ -923,24 +923,24 @@ Model::AttrChanged(const char* attrName)
 		else {
 			// node has a specific mime type
 			fMimeType = mimeString;
-			if (!IsVolume()
-				&& !IsSymLink()
-				&& info.GetPreferredApp(mimeString) == B_OK)
+			if (!IsVolume() && !IsSymLink()
+				&& info.GetPreferredApp(mimeString) == B_OK) {
 				SetPreferredAppSignature(mimeString);
+			}
 		}
 
 #if xDEBUG
-		if (fIconFrom != kNode)
+		if (fIconFrom != kNode) {
 			PRINT(("%s, %s:updating icon because file type changed\n",
-				Name(), attrName ? attrName : ""));
-		else
-			PRINT(("not updating icon even thoug type changed "
-				"because icon from node\n"));
-
+				Name(), attrName != NULL ? attrName : ""));
+		} else {
+			PRINT(("Not updating icon even though type changed "
+				"because icon is from node.\n"));
+		}
 #endif
 
 		return fIconFrom != kNode;
-		// update icon unless it is comming from a node
+			// update icon unless it is coming from a node
 	}
 
 	return attrName == NULL;

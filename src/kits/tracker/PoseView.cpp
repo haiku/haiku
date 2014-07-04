@@ -5748,7 +5748,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 		&& targetModel->IsNodeOpen()
 		&& targetModel->AttrChanged(attrName)) {
 		// the icon of our target has changed, update drag icon
-		// TODO: make this simpler (ie. store the icon with the window)
+		// TODO: make this simpler (i.e. store the icon with the window)
 		BView* view = Window()->FindView("MenuBar");
 		if (view != NULL) {
 			view = view->FindView("ThisContainer");
@@ -5766,7 +5766,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 	for (int i = 0; i < posesCount; i++) {
 		BPose* pose = posesFound->ItemAt(i);
 		Model* poseModel = pose->TargetModel();
-		if (poseModel->IsSymLink() && *poseModel->NodeRef() != itemNode) {
+		if (poseModel->IsSymLink() && *(poseModel->NodeRef()) != itemNode) {
 			// change happened on symlink's target
 			poseModel = poseModel->ResolveIfLink();
 		}

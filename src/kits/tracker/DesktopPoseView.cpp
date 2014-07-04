@@ -80,18 +80,17 @@ DesktopPoseView::InitDesktopDirentIterator(BPoseView* nodeMonitoringTarget,
 
 	ASSERT(!sourceModel.IsQuery());
 	ASSERT(!sourceModel.IsVirtualDirectory());
-	ASSERT(sourceModel.Node());
-	BDirectory* sourceDirectory
-		= dynamic_cast<BDirectory*>(sourceModel.Node());
+	ASSERT(sourceModel.Node() != NULL);
 
-	ASSERT(sourceDirectory);
+	BDirectory* sourceDirectory = dynamic_cast<BDirectory*>(sourceModel.Node());
+	ASSERT(sourceDirectory != NULL);
 
 	// build an iterator list, start with boot
 	EntryListBase* perDesktopIterator
 		= new CachedDirectoryEntryList(*sourceDirectory);
 
 	result->AddItem(perDesktopIterator);
-	if (nodeMonitoringTarget) {
+	if (nodeMonitoringTarget != NULL) {
 		TTracker::WatchNode(sourceModel.NodeRef(),
 			B_WATCH_DIRECTORY | B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR,
 			nodeMonitoringTarget);
@@ -99,7 +98,7 @@ DesktopPoseView::InitDesktopDirentIterator(BPoseView* nodeMonitoringTarget,
 
 	if (result->Rewind() != B_OK) {
 		delete result;
-		if (nodeMonitoringTarget)
+		if (nodeMonitoringTarget != NULL)
 			nodeMonitoringTarget->HideBarberPole();
 
 		return NULL;

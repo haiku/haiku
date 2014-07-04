@@ -121,10 +121,9 @@ class DraggableContainerIcon : public BView {
 
 		virtual void AttachedToWindow();
 		virtual void MouseDown(BPoint where);
-		virtual void MouseUp(BPoint where);
-		virtual void MouseMoved(BPoint point, uint32 /*transit*/,
-			const BMessage* message);
-		virtual void FrameMoved(BPoint newLocation);
+		virtual void MouseUp(BPoint);
+		virtual void MouseMoved(BPoint point, uint32, const BMessage*);
+		virtual void FrameMoved(BPoint);
 		virtual void Draw(BRect updateRect);
 
 	private:
@@ -333,7 +332,7 @@ DraggableContainerIcon::AttachedToWindow()
 
 
 void
-DraggableContainerIcon::MouseDown(BPoint point)
+DraggableContainerIcon::MouseDown(BPoint where)
 {
 	// we only like container windows
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
@@ -347,13 +346,13 @@ DraggableContainerIcon::MouseDown(BPoint point)
 	uint32 buttons;
 	window->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 
-	if (IconCache::sIconCache->IconHitTest(point, window->TargetModel(),
+	if (IconCache::sIconCache->IconHitTest(where, window->TargetModel(),
 			kNormalIcon, B_MINI_ICON)) {
 		// The click hit the icon, initiate a drag
 		fDragButton = buttons
 			& (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON);
 		fDragStarted = false;
-		fClickPoint = point;
+		fClickPoint = where;
 	} else
 		fDragButton = 0;
 
@@ -363,7 +362,7 @@ DraggableContainerIcon::MouseDown(BPoint point)
 
 
 void
-DraggableContainerIcon::MouseUp(BPoint /*point*/)
+DraggableContainerIcon::MouseUp(BPoint)
 {
 	if (!fDragStarted)
 		Window()->Activate(true);
@@ -374,12 +373,11 @@ DraggableContainerIcon::MouseUp(BPoint /*point*/)
 
 
 void
-DraggableContainerIcon::MouseMoved(BPoint point, uint32 /*transit*/,
-	const BMessage* /*message*/)
+DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 {
 	if (fDragButton == 0 || fDragStarted
-		|| (abs((int32)(point.x - fClickPoint.x)) <= kDragSlop
-			&& abs((int32)(point.y - fClickPoint.y)) <= kDragSlop))
+		|| (abs((int32)(where.x - fClickPoint.x)) <= kDragSlop
+			&& abs((int32)(where.y - fClickPoint.y)) <= kDragSlop))
 		return;
 
 	BContainerWindow* window = static_cast<BContainerWindow*>(Window());
@@ -461,7 +459,7 @@ DraggableContainerIcon::MouseMoved(BPoint point, uint32 /*transit*/,
 
 
 void
-DraggableContainerIcon::FrameMoved(BPoint /*newLocation*/)
+DraggableContainerIcon::FrameMoved(BPoint)
 {
 	BMenuBar* bar = dynamic_cast<BMenuBar*>(Parent());
 	if (bar == NULL)
@@ -667,27 +665,27 @@ BContainerWindow::Quit()
 		fNavigationItem = NULL;
 	}
 
-	if (fOpenWithItem && !fOpenWithItem->Menu()) {
+	if (fOpenWithItem != NULL && fOpenWithItem->Menu() == NULL) {
 		delete fOpenWithItem;
 		fOpenWithItem = NULL;
 	}
 
-	if (fMoveToItem && !fMoveToItem->Menu()) {
+	if (fMoveToItem != NULL && fMoveToItem->Menu() == NULL) {
 		delete fMoveToItem;
 		fMoveToItem = NULL;
 	}
 
-	if (fCopyToItem && !fCopyToItem->Menu()) {
+	if (fCopyToItem != NULL && fCopyToItem->Menu() == NULL) {
 		delete fCopyToItem;
 		fCopyToItem = NULL;
 	}
 
-	if (fCreateLinkItem && !fCreateLinkItem->Menu()) {
+	if (fCreateLinkItem != NULL && fCreateLinkItem->Menu() == NULL) {
 		delete fCreateLinkItem;
 		fCreateLinkItem = NULL;
 	}
 
-	if (fAttrMenu && !fAttrMenu->Supermenu()) {
+	if (fAttrMenu != NULL && fAttrMenu->Supermenu() == NULL) {
 		delete fAttrMenu;
 		fAttrMenu = NULL;
 	}
@@ -1563,14 +1561,14 @@ BContainerWindow::MessageReceived(BMessage* message)
 						|| isRoot != PoseView()->TargetModel()->IsRoot())
 						RepopulateMenus();
 
-					// Update Navigation bar
-					if (Navigator()) {
+					if (Navigator() != NULL) {
+						// update Navigation bar
 						int32 action = kActionSet;
-						if (message->FindInt32("action", &action) != B_OK)
+						if (message->FindInt32("action", &action) != B_OK) {
 							// Design problem? Why does FindInt32 touch
 							// 'action' at all if he can't find it??
 							action = kActionSet;
-
+						}
 						Navigator()->UpdateLocation(PoseView()->TargetModel(),
 							action);
 					}

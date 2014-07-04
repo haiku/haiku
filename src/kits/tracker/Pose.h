@@ -77,7 +77,7 @@ public:
 
 	void DrawBar(BPoint where, BView* view, icon_size kind);
 
-	void DrawIcon(BPoint, BView*, icon_size, bool direct,
+	void DrawIcon(BPoint where, BView* view, icon_size kind, bool direct,
 		bool drawUnselected = false);
 	void DrawToggleSwitch(BRect, BPoseView*);
 	void MouseUp(BPoint poseLoc, BPoseView*, BPoint where, int32 index);
@@ -166,13 +166,15 @@ BPose::TargetModel() const
 inline Model*
 BPose::ResolvedModel() const
 {
-	return fModel->IsSymLink() ?
-		(fModel->LinkTo() ? fModel->LinkTo() : fModel) : fModel;
+	if (fModel->IsSymLink())
+		return fModel->LinkTo() != NULL ? fModel->LinkTo() : fModel;
+	else
+		return fModel;
 }
 
 
 inline bool
-BPose::IsSelected()	const
+BPose::IsSelected() const
 {
 	return fIsSelected;
 }

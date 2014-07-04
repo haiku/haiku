@@ -304,7 +304,7 @@ BInfoWindow::BInfoWindow(Model* model, int32 group_index,
 	TTracker::WatchNode(model->NodeRef(), B_WATCH_ALL | B_WATCH_MOUNT, this);
 
 	// window list is Locked by Tracker around this constructor
-	if (list)
+	if (list != NULL)
 		list->AddItem(this);
 
 	AddShortcut('E', 0, new BMessage(kEditItem));
@@ -597,15 +597,15 @@ BInfoWindow::MessageReceived(BMessage* message)
 		case B_NODE_MONITOR:
 			switch (message->FindInt32("opcode")) {
 				case B_ENTRY_REMOVED:
-					{
-						node_ref itemNode;
-						message->FindInt32("device", &itemNode.device);
-						message->FindInt64("node", &itemNode.node);
-						// our window itself may be deleted
-						if (*TargetModel()->NodeRef() == itemNode)
-							Close();
-						break;
-					}
+				{
+					node_ref itemNode;
+					message->FindInt32("device", &itemNode.device);
+					message->FindInt64("node", &itemNode.node);
+					// our window itself may be deleted
+					if (*TargetModel()->NodeRef() == itemNode)
+						Close();
+					break;
+				}
 
 				case B_ENTRY_MOVED:
 				case B_STAT_CHANGED:
@@ -640,11 +640,12 @@ BInfoWindow::MessageReceived(BMessage* message)
 		case kPermissionsSelected:
 			if (fPermissionsView == NULL) {
 				// Only true on first call.
-				fPermissionsView
-					= new FilePermissionsView(BRect(kBorderWidth + 1,
-					fAttributeView->Bounds().bottom,
-					fAttributeView->Bounds().right,
-					fAttributeView->Bounds().bottom+80), fModel);
+				fPermissionsView = new FilePermissionsView(
+					BRect(kBorderWidth + 1,
+						fAttributeView->Bounds().bottom,
+						fAttributeView->Bounds().right,
+						fAttributeView->Bounds().bottom + 80),
+					fModel);
 
 				ResizeBy(0, fPermissionsView->Bounds().Height());
 				fAttributeView->AddChild(fPermissionsView);
@@ -1168,11 +1169,9 @@ AttributeView::ModelChanged(Model* model, BMessage* message)
 			if (message->FindString("attr", &attrName) == B_OK) {
 				if (strcmp(attrName, kAttrLargeIcon) == 0
 					|| strcmp(attrName, kAttrIcon) == 0) {
-
 					IconCache::sIconCache->IconChanged(model->ResolveIfLink());
 					Invalidate();
 				} else if (strcmp(attrName, kAttrMIMEType) == 0) {
-
 					if (model->OpenNode() == B_OK) {
 						model->AttrChanged(attrName);
 						InitStrings(model);

@@ -74,6 +74,7 @@ enum {
 	kModelSupportsFile
 };
 
+
 class Model {
 public:
 	Model();
@@ -482,9 +483,10 @@ Model::HasLocalizedName() const
 inline
 ModelNodeLazyOpener::ModelNodeLazyOpener(Model* model, bool writable,
 	bool openLater)
-	:	fModel(model),
-		fWasOpen(model->IsNodeOpen()),
-		fWasOpenForWriting(model->IsNodeOpenForWriting())
+	:
+	fModel(model),
+	fWasOpen(model->IsNodeOpen()),
+	fWasOpenForWriting(model->IsNodeOpenForWriting())
 {
 	if (!openLater)
 		OpenNode(writable);
