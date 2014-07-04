@@ -308,7 +308,7 @@ ClipboardApp::Print(bool debug)
 		clip->PrintToStream();
 	} else {
 		const char * textBuffer;
-		int32 textLength;
+		ssize_t textLength;
 		clip->FindData("text/plain", B_MIME_TYPE, (const void **)&textBuffer, &textLength);
 
 		if (textBuffer != NULL && textLength > 0) {
