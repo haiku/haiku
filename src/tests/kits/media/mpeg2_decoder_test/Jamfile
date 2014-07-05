@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src tests kits media mpeg2_decoder_test ;
+
+local ffmpegHeaders = [ BuildFeatureAttribute ffmpeg : headers : path ] ;
+UseHeaders $(ffmpegHeaders) ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavcodec ] ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavformat ] ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavutil ] ;
+
+SubDirC++Flags -D__STDC_CONSTANT_MACROS -Wno-deprecated-declarations ;
+
+SimpleTest mpeg2_decoder_test :
+	mpeg2_decoder_test.cpp
+	: be media translation $(TARGET_LIBSUPC++)
+;
+
+Includes [ FGristFiles mpeg2_decoder_test.cpp ]
+	: [ BuildFeatureAttribute ffmpeg : headers ] ;
