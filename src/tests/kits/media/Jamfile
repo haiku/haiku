@@ -19,6 +19,7 @@ SimpleTest mediaDescriptions :
 
 SubInclude HAIKU_TOP src tests kits media media_decoder ;
 SubInclude HAIKU_TOP src tests kits media mpeg2_decoder_test ;
+SubInclude HAIKU_TOP src tests kits media mp3_decoder_test ;
 SubInclude HAIKU_TOP src tests kits media notificationtest ;
 SubInclude HAIKU_TOP src tests kits media nodetest ;
 SubInclude HAIKU_TOP src tests kits media playwav ;
