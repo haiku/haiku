@@ -69,10 +69,10 @@ KPartitioningSystem::Identify(KPartition *partition, void **cookie)
 	int fd = -1;
 	if (partition->Open(O_RDONLY, &fd) != B_OK)
 		return -1;
-
-	// if BlockSize is 0, identify_partition will cause a KDL
-	if (partition->BlockSize() == 0)
+	if (partition->BlockSize() == 0) {
+		close(fd);
 		return -1;
+	}
 
 	float result = fModule->identify_partition(fd, partition->PartitionData(),
 		cookie);
