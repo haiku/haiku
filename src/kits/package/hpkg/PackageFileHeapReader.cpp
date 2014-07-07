@@ -44,17 +44,32 @@ PackageFileHeapReader::~PackageFileHeapReader()
 status_t
 PackageFileHeapReader::Init()
 {
-	if (fUncompressedHeapSize == 0)
+	if (fUncompressedHeapSize == 0) {
+		if (fCompressedHeapSize != 0) {
+			fErrorOutput->PrintError(
+				"Invalid total compressed heap size (!= 0, empty heap)\n");
+			return B_BAD_DATA;
+		}
 		return B_OK;
+	}
 
 	// Determine number of chunks and adjust the compressed heap size (subtract
 	// the size of the chunk size array at the end). Note that the size of the
-	// last chunk has not been saved, since it size is implied.
+	// last chunk has not been saved, since its size is implied.
 	ssize_t chunkCount = (fUncompressedHeapSize + kChunkSize - 1) / kChunkSize;
-	if (chunkCount <= 0)
+	if (chunkCount == 0)
 		return B_OK;
 
-	fCompressedHeapSize -= (chunkCount - 1) * 2;
+	size_t chunkSizeTableSize = (chunkCount - 1) * 2; 
+	if (fCompressedHeapSize <= chunkSizeTableSize) {
+		fErrorOutput->PrintError(
+			"Invalid total compressed heap size (%" B_PRIu64 ", "
+			"uncompressed %" B_PRIu64 ")\n", fCompressedHeapSize,
+			fUncompressedHeapSize);
+		return B_BAD_DATA;
+	}
+
+	fCompressedHeapSize -= chunkSizeTableSize;
 
 	// allocate a buffer
 	uint16* buffer = (uint16*)malloc(kChunkSize);
@@ -78,6 +93,21 @@ PackageFileHeapReader::Init()
 		remainingChunks -= toRead;
 		index += toRead;
 		offset += toRead * 2;
+	}
+
+	// Sanity check: The sum of the chunk sizes must match the compressed heap
+	// size. The information aren't stored redundantly, so we check, if things
+	// look at least plausible.
+	uint64 lastChunkOffset = fOffsets[chunkCount - 1];
+	if (lastChunkOffset >= fCompressedHeapSize
+			|| fCompressedHeapSize - lastChunkOffset > kChunkSize
+			|| fCompressedHeapSize - lastChunkOffset
+				> fUncompressedHeapSize - (chunkCount - 1) * kChunkSize) {
+		fErrorOutput->PrintError(
+			"Invalid total compressed heap size (%" B_PRIu64 ", uncompressed: "
+			"%" B_PRIu64 ", last chunk offset: %" B_PRIu64 ")\n",
+			fCompressedHeapSize, fUncompressedHeapSize, lastChunkOffset);
+		return B_BAD_DATA;
 	}
 
 	return B_OK;
