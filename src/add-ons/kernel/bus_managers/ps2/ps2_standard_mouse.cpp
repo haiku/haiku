@@ -1,13 +1,14 @@
 /*
- * Copyright 2001-2010 Haiku, Inc.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors (in chronological order):
- * 		Elad Lahav (elad@eldarshany.com)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Elad Lahav, elad@eldarshany.com
+ *		Stefano Ceccherini, burton666@libero.it
  *		Axel Dörfler, axeld@pinc-software.de
- *      Marcus Overhagen <marcus@overhagen.de>
- *		Clemens Zeidler	<czeidler@gmx.de>
+ *		Marcus Overhagen, marcus@overhagen.de
+ *		Clemens Zeidler, czeidler@gmx.de
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -69,6 +70,7 @@ const char* kStandardMousePath[4] = {
 	"input/mouse/ps2/standard_2",
 	"input/mouse/ps2/standard_3"
 };
+
 const char* kIntelliMousePath[4] = {
 	"input/mouse/ps2/intelli_0",
 	"input/mouse/ps2/intelli_1",
@@ -77,20 +79,18 @@ const char* kIntelliMousePath[4] = {
 };
 
 
-/*!	Set sampling rate of the ps2 port.
-*/
+//!	Set sampling rate of the ps2 port.
 static inline status_t
-ps2_set_sample_rate(ps2_dev *dev, uint8 rate)
+ps2_set_sample_rate(ps2_dev* dev, uint8 rate)
 {
 	return ps2_dev_command(dev, PS2_CMD_SET_SAMPLE_RATE, &rate, 1, NULL, 0);
 }
 
 
-/*!	Converts a packet received by the mouse to a "movement".
-*/
+//!	Converts a packet received by the mouse to a "movement".
 static void
-ps2_packet_to_movement(standard_mouse_cookie *cookie, uint8 packet[],
-	mouse_movement *pos)
+ps2_packet_to_movement(standard_mouse_cookie* cookie, uint8 packet[],
+	mouse_movement* pos)
 {
 	int buttons = packet[0] & 7;
 	int xDelta = ((packet[0] & 0x10) ? ~0xff : 0) | packet[1];
@@ -115,7 +115,7 @@ ps2_packet_to_movement(standard_mouse_cookie *cookie, uint8 packet[],
  		if (packet[3] & 0x08)
 			yDeltaWheel |= ~0x07;
 	}
-/*
+#if 0
 	if (cookie->flags & F_MOUSE_TYPE_2WHEELS) {
 		switch (packet[3] & 0x0F) {
 			case 0x01: yDeltaWheel = +1; break; // wheel 1 down
@@ -124,14 +124,16 @@ ps2_packet_to_movement(standard_mouse_cookie *cookie, uint8 packet[],
 			case 0x0E: xDeltaWheel = -1; break; // wheel 2 up
 		}
 	}
-*/
+#endif
 
-// 	TRACE("packet: %02x %02x %02x %02x: xd %d, yd %d, 0x%x (%d), w-xd %d, "
-//		"w-yd %d\n", packet[0], packet[1], packet[2], packet[3],
-//		xDelta, yDelta, buttons, cookie->click_count, xDeltaWheel,
-//		yDeltaWheel);
+#if 0
+	TRACE("packet: %02x %02x %02x %02x: xd %d, yd %d, 0x%x (%d), w-xd %d, "
+		"w-yd %d\n", packet[0], packet[1], packet[2], packet[3],
+		xDelta, yDelta, buttons, cookie->click_count, xDeltaWheel,
+		yDeltaWheel);
+#endif
 
-	if (pos) {
+	if (pos != NULL) {
 		pos->xdelta = xDelta;
 		pos->ydelta = yDelta;
 		pos->buttons = buttons;
@@ -148,11 +150,10 @@ ps2_packet_to_movement(standard_mouse_cookie *cookie, uint8 packet[],
 }
 
 
-/*!	Read a mouse event from the mouse events chain buffer.
-*/
+//!	Read a mouse event from the mouse events chain buffer.
 static status_t
-standard_mouse_read_event(standard_mouse_cookie *cookie,
-	mouse_movement *movement)
+standard_mouse_read_event(standard_mouse_cookie* cookie,
+	mouse_movement* movement)
 {
 	uint8 packet[PS2_MAX_PACKET_SIZE];
 	status_t status;
@@ -184,16 +185,16 @@ standard_mouse_read_event(standard_mouse_cookie *cookie,
 }
 
 
-// #pragma mark -
+//	#pragma mark - Interrupt handler functions
 
 
 void
-standard_mouse_disconnect(ps2_dev *dev)
+standard_mouse_disconnect(ps2_dev* dev)
 {
 	// the mouse device might not be opened at this point
 	INFO("ps2: ps2_standard_mouse_disconnect %s\n", dev->name);
 	if (dev->flags & PS2_FLAG_OPEN)
-		release_sem(((standard_mouse_cookie *)dev->cookie)->standard_mouse_sem);
+		release_sem(((standard_mouse_cookie*)dev->cookie)->standard_mouse_sem);
 }
 
 
@@ -204,27 +205,28 @@ standard_mouse_disconnect(ps2_dev *dev)
 	calls to the handler, each holds a different byte on the data port.
 */
 int32
-standard_mouse_handle_int(ps2_dev *dev)
+standard_mouse_handle_int(ps2_dev* dev)
 {
-	standard_mouse_cookie *cookie = (standard_mouse_cookie*)dev->cookie;
+	standard_mouse_cookie* cookie = (standard_mouse_cookie*)dev->cookie;
 	const uint8 data = dev->history[0].data;
 
 	TRACE("ps2: standard mouse: %1x\t%1x\t%1x\t%1x\t%1x\t%1x\t%1x\t%1x\n",
-				data >> 7 & 1, data >> 6 & 1, data >> 5 & 1,
-				data >> 4 & 1, data >> 3 & 1, data >> 2 & 1,
-				data >> 1 & 1, data >> 0 & 1);
+		data >> 7 & 1, data >> 6 & 1, data >> 5 & 1,
+		data >> 4 & 1, data >> 3 & 1, data >> 2 & 1,
+		data >> 1 & 1, data >> 0 & 1);
 
-	if (cookie->packet_index == 0 && !(data & 8)) {
+	if (cookie->packet_index == 0 && (data & 8) == 0) {
 		INFO("ps2: bad mouse data, trying resync\n");
 		return B_HANDLED_INTERRUPT;
 	}
 
 	// Workarounds for active multiplexing keyboard controllers
 	// that lose data or send them to the wrong port.
-	if (cookie->packet_index == 0 && (data & 0xc0)) {
+	if (cookie->packet_index == 0 && (data & 0xc0) != 0) {
 		INFO("ps2: strange mouse data, x/y overflow, trying resync\n");
 		return B_HANDLED_INTERRUPT;
 	}
+
 	if (cookie->packet_index == 1) {
 		int xDelta
 			= ((cookie->buffer[0] & 0x10) ? 0xFFFFFF00 : 0) | data;
@@ -263,15 +265,16 @@ standard_mouse_handle_int(ps2_dev *dev)
 	}
 
 	release_sem_etc(cookie->standard_mouse_sem, 1, B_DO_NOT_RESCHEDULE);
+
 	return B_INVOKE_SCHEDULER;
 }
 
 
-//	#pragma mark -
+//	#pragma mark - probe_standard_mouse()
 
 
 status_t
-probe_standard_mouse(ps2_dev * dev)
+probe_standard_mouse(ps2_dev* dev)
 {
 	status_t status;
 	uint8 deviceId = 0;
@@ -323,11 +326,11 @@ probe_standard_mouse(ps2_dev * dev)
 
 
 status_t
-standard_mouse_open(const char *name, uint32 flags, void **_cookie)
+standard_mouse_open(const char* name, uint32 flags, void** _cookie)
 {
-	standard_mouse_cookie *cookie;
+	standard_mouse_cookie* cookie;
 	status_t status;
-	ps2_dev *dev = NULL;
+	ps2_dev* dev = NULL;
 	int i;
 
 	TRACE("ps2: standard_mouse_open %s\n", name);
@@ -337,11 +340,13 @@ standard_mouse_open(const char *name, uint32 flags, void **_cookie)
 			dev = &ps2_device[i];
 			break;
 		}
-		/*if (0 == strcmp(g_passthrough_dev.name, name)) {
+#if 0
+		if (0 == strcmp(g_passthrough_dev.name, name)) {
 			dev = &g_passthrough_dev;
 			isSynapticsPTDevice = true;
 			break;
-		}*/
+		}
+#endif
 	}
 
 	if (dev == NULL) {
@@ -412,9 +417,9 @@ err1:
 
 
 status_t
-standard_mouse_close(void *_cookie)
+standard_mouse_close(void* _cookie)
 {
-	standard_mouse_cookie *cookie = (standard_mouse_cookie*)_cookie;
+	standard_mouse_cookie* cookie = (standard_mouse_cookie*)_cookie;
 
 	TRACE("ps2: standard_mouse_close %s enter\n", cookie->dev->name);
 
@@ -433,16 +438,16 @@ standard_mouse_close(void *_cookie)
 
 
 status_t
-standard_mouse_freecookie(void *_cookie)
+standard_mouse_freecookie(void* _cookie)
 {
-	standard_mouse_cookie *cookie = (standard_mouse_cookie*)_cookie;
+	standard_mouse_cookie* cookie = (standard_mouse_cookie*)_cookie;
 	free(cookie);
 	return B_OK;
 }
 
 
 static status_t
-standard_mouse_read(void *cookie, off_t pos, void *buffer, size_t *_length)
+standard_mouse_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 {
 	*_length = 0;
 	return B_NOT_ALLOWED;
@@ -450,8 +455,8 @@ standard_mouse_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 
 
 static status_t
-standard_mouse_write(void *cookie, off_t pos, const void *buffer,
-	size_t *_length)
+standard_mouse_write(void* cookie, off_t pos, const void* buffer,
+	size_t* _length)
 {
 	*_length = 0;
 	return B_NOT_ALLOWED;
@@ -459,9 +464,9 @@ standard_mouse_write(void *cookie, off_t pos, const void *buffer,
 
 
 status_t
-standard_mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
+standard_mouse_ioctl(void* _cookie, uint32 op, void* buffer, size_t length)
 {
-	standard_mouse_cookie *cookie = (standard_mouse_cookie*)_cookie;
+	standard_mouse_cookie* cookie = (standard_mouse_cookie*)_cookie;
 
 	switch (op) {
 		case MS_NUM_EVENTS:

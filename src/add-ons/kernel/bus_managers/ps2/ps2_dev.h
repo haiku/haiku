@@ -1,11 +1,10 @@
 /*
- * Copyright 2005-2010 Haiku, Inc.
+ * Copyright 2005-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * PS/2 bus manager
  *
  * Authors (in chronological order):
  *		Marcus Overhagen (marcus@overhagen.de)
+ *		Clemens Zeidler (haiku@clemens-zeidler.de)
  */
 #ifndef __PS2_DEV_H
 #define __PS2_DEV_H
@@ -24,24 +23,24 @@ typedef struct {
 } data_history;
 
 struct ps2_dev {
-	const char *	name;
+	const char*		name;
 	bool			active;
 	uint8           idx;
 	sem_id			result_sem;
 	int32			flags;
-	uint8 *			result_buf;
+	uint8*			result_buf;
 	int				result_buf_idx;
 	int				result_buf_cnt;
-	void *			cookie;
+	void*			cookie;
 	data_history	history[2];
-	ps2_dev *		parent_dev;
+	ps2_dev*		parent_dev;
 	size_t			packet_size;
 
 // functions
-	void          (*disconnect)(ps2_dev *);
-	int32		  (*handle_int)(ps2_dev *);
-	status_t	  (*command)(ps2_dev *dev, uint8 cmd, const uint8 *out,
-					int out_count, uint8 *in, int in_count, bigtime_t timeout);
+	void			(*disconnect)(ps2_dev *);
+	int32			(*handle_int)(ps2_dev *);
+	status_t		(*command)(ps2_dev *dev, uint8 cmd, const uint8 *out,
+						int out_count, uint8 *in, int in_count, bigtime_t timeout);
 };
 
 #define PS2_DEVICE_COUNT 6
@@ -81,7 +80,6 @@ status_t	ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out = NULL,
 status_t	ps2_dev_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
 				int out_count, uint8 *in, int in_count, bigtime_t timeout);
 status_t	ps2_dev_sliced_command(ps2_dev *dev, uint8 cmd);
-
 
 status_t	ps2_reset_mouse(ps2_dev *dev);
 

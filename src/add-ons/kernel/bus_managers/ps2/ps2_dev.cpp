@@ -1,14 +1,14 @@
 /*
- * Copyright 2005-2007 Haiku, Inc.
+ * Copyright 2005-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * PS/2 bus manager
  *
  * Authors (in chronological order):
  *		Marcus Overhagen (marcus@overhagen.de)
  *		Clemens Zeidler (haiku@clemens-zeidler.de)
  */
 
+
+/*!	PS/2 bus manager */
 
 #include "ps2_dev.h"
 #include "ps2_service.h"
@@ -28,7 +28,7 @@ ps2_dev ps2_device[PS2_DEVICE_COUNT];
 
 
 status_t
-ps2_reset_mouse(ps2_dev *dev)
+ps2_reset_mouse(ps2_dev* dev)
 {
 	uint8 data[2];
 	status_t status;
@@ -40,8 +40,8 @@ ps2_reset_mouse(ps2_dev *dev)
 	if (status == B_OK && data[0] == 0xFE && data[1] == 0xAA) {
 		// workaround for HP/Compaq KBCs timeout condition. #2867 #3594 #4315
 		TRACE("ps2: KBC has timed out the mouse reset request. "
-				"Response was: 0x%02x 0x%02x. Requesting the answer data.\n",
-				data[0], data[1]);
+			"Response was: 0x%02x 0x%02x. Requesting the answer data.\n",
+			data[0], data[1]);
 		status = ps2_dev_command(dev, PS2_CMD_RESEND, NULL, 0, data, 2);
 	}
 
@@ -60,7 +60,7 @@ ps2_reset_mouse(ps2_dev *dev)
 
 
 status_t
-ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks)
+ps2_dev_detect_pointing(ps2_dev* dev, device_hooks** hooks)
 {
 	status_t status = ps2_reset_mouse(dev);
 	if (status != B_OK) {
@@ -161,14 +161,16 @@ ps2_dev_init(void)
 
 	int i;
 	for (i = 0; i < PS2_DEVICE_COUNT; i++) {
-		ps2_dev *dev = &ps2_device[i];
+		ps2_dev* dev = &ps2_device[i];
 		dev->result_sem = create_sem(0, "ps2 result");
 		if (dev->result_sem < 0)
 			goto err;
 	}
 	return B_OK;
+
 err:
 	ps2_dev_exit();
+
 	return B_ERROR;
 }
 
@@ -176,9 +178,8 @@ err:
 void
 ps2_dev_exit(void)
 {
-	int i;
-	for (i = 0; i < PS2_DEVICE_COUNT; i++) {
-		ps2_dev *dev = &ps2_device[i];
+	for (int i = 0; i < PS2_DEVICE_COUNT; i++) {
+		ps2_dev* dev = &ps2_device[i];
 		if (dev->result_sem >= 0) {
 			delete_sem(dev->result_sem);
 			dev->result_sem = -1;
@@ -188,7 +189,7 @@ ps2_dev_exit(void)
 
 
 void
-ps2_dev_publish(ps2_dev *dev)
+ps2_dev_publish(ps2_dev* dev)
 {
 	status_t status = B_OK;
 	TRACE("ps2: ps2_dev_publish %s\n", dev->name);
@@ -218,7 +219,7 @@ ps2_dev_publish(ps2_dev *dev)
 		}
 
 		if (status == B_OK) {
-			device_hooks *hooks;
+			device_hooks* hooks;
 			status = ps2_dev_detect_pointing(dev, &hooks);
 			if (status == B_OK) {
 				status = devfs_publish_device(dev->name, hooks);
@@ -234,7 +235,7 @@ ps2_dev_publish(ps2_dev *dev)
 
 
 void
-ps2_dev_unpublish(ps2_dev *dev)
+ps2_dev_unpublish(ps2_dev* dev)
 {
 	status_t status;
 	TRACE("ps2: ps2_dev_unpublish %s\n", dev->name);
@@ -255,7 +256,7 @@ ps2_dev_unpublish(ps2_dev *dev)
 
 
 int32
-ps2_dev_handle_int(ps2_dev *dev)
+ps2_dev_handle_int(ps2_dev* dev)
 {
 	const uint8 data = dev->history[0].data;
 	uint32 flags;
@@ -365,8 +366,8 @@ pass_to_handler:
 
 
 status_t
-standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
-	int out_count, uint8 *in, int in_count, bigtime_t timeout)
+standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
+	int out_count, uint8* in, int in_count, bigtime_t timeout)
 {
 	status_t res;
 	bigtime_t start;
@@ -484,8 +485,8 @@ standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
 
 
 status_t
-ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count,
-	uint8 *in, int in_count)
+ps2_dev_command(ps2_dev* dev, uint8 cmd, const uint8* out, int out_count,
+	uint8* in, int in_count)
 {
 	return ps2_dev_command_timeout(dev, cmd, out, out_count, in, in_count,
 		4000000);
@@ -493,29 +494,35 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count,
 
 
 status_t
-ps2_dev_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
-	int out_count, uint8 *in, int in_count, bigtime_t timeout)
+ps2_dev_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
+	int out_count, uint8* in, int in_count, bigtime_t timeout)
 {
 	return dev->command(dev, cmd, out, out_count, in, in_count, timeout);
 }
 
 
 status_t
-ps2_dev_sliced_command(ps2_dev *dev, uint8 cmd)
+ps2_dev_sliced_command(ps2_dev* dev, uint8 cmd)
 {
+	uint8 val;
 	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_SCALE11) != B_OK)
 		return B_ERROR;
-	uint8 val = (cmd >> 6) & 3;
+
+	val = (cmd >> 6) & 3;
 	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_RES, &val, 1) != B_OK)
 		return B_ERROR;
+
 	val = (cmd >> 4) & 3;
 	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_RES, &val, 1) != B_OK)
 		return B_ERROR;
+
 	val = (cmd >> 2) & 3;
 	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_RES, &val, 1) != B_OK)
 		return B_ERROR;
+
 	val = cmd & 3;
 	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_RES, &val, 1) != B_OK)
 		return B_ERROR;
+
 	return B_OK;
 }

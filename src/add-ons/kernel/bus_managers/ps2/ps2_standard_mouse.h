@@ -1,15 +1,14 @@
 /*
- * Copyright 2001-2010 Haiku, Inc.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * PS/2 mouse device driver
- *
  * Authors (in chronological order):
- * 		Elad Lahav (elad@eldarshany.com)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Elad Lahav, elad@eldarshany.com
+ *		Stefano Ceccherini, burton666@libero.it
  *		Axel Dörfler, axeld@pinc-software.de
- *      Marcus Overhagen <marcus@overhagen.de>
- *		Clemens Zeidler	<czeidler@gmx.de>
+ *		Marcus Overhagen, marcus@overhagen.de
+ *		Clemens Zeidler, czeidler@gmx.de
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef __PS2_STANDARD_MOUSE_H
 #define __PS2_STANDARD_MOUSE_H
@@ -27,17 +26,17 @@
 #define F_MOUSE_TYPE_INTELLIMOUSE		0x2
 
 typedef struct {
-	ps2_dev*			dev;
+	ps2_dev*				dev;
 
-	sem_id				standard_mouse_sem;
-struct packet_buffer*	standard_mouse_buffer;
-	bigtime_t			click_last_time;
-	bigtime_t			click_speed;
-	int					click_count;
-	int					buttons_state;
-	int					flags;
-	size_t				packet_index;
-	uint8				buffer[PS2_MAX_PACKET_SIZE];
+	sem_id					standard_mouse_sem;
+	struct packet_buffer*	standard_mouse_buffer;
+	bigtime_t				click_last_time;
+	bigtime_t				click_speed;
+	int						click_count;
+	int						buttons_state;
+	int						flags;
+	size_t					packet_index;
+	uint8					buffer[PS2_MAX_PACKET_SIZE];
 } standard_mouse_cookie;
 
 
