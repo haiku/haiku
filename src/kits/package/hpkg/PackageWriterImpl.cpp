@@ -662,6 +662,69 @@ PackageWriterImpl::_Init(const char* fileName,
 
 
 status_t
+PackageWriterImpl::_Finish()
+{
+	// write entries
+	for (EntryList::ConstIterator it = fRootEntry->ChildIterator();
+			Entry* entry = it.Next();) {
+		char pathBuffer[B_PATH_NAME_LENGTH];
+		pathBuffer[0] = '\0';
+		_AddEntry(AT_FDCWD, entry, entry->Name(), pathBuffer);
+	}
+
+	hpkg_header header;
+
+	// write the TOC and package attributes
+	uint64 tocLength;
+	_WriteTOC(header, tocLength);
+
+	uint64 attributesLength;
+	_WritePackageAttributes(header, attributesLength);
+
+	// flush the heap
+	status_t error = fHeapWriter->Finish();
+	if (error != B_OK)
+		return error;
+
+	uint64 compressedHeapSize = fHeapWriter->CompressedHeapSize();
+
+	header.heap_compression = B_HOST_TO_BENDIAN_INT16(B_HPKG_COMPRESSION_ZLIB);
+	header.heap_chunk_size = B_HOST_TO_BENDIAN_INT32(fHeapWriter->ChunkSize());
+	header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(compressedHeapSize);
+	header.heap_size_uncompressed = B_HOST_TO_BENDIAN_INT64(
+		fHeapWriter->UncompressedHeapSize());
+
+	// Truncate the file to the size it is supposed to have. In update mode, it
+	// can be greater when one or more files are shrunk. In creation mode it
+	// should already have the correct size.
+	off_t totalSize = fHeapWriter->HeapOffset() + (off_t)compressedHeapSize;
+	if (ftruncate(FD(), totalSize) != 0) {
+		fListener->PrintError("Failed to truncate package file to new "
+			"size: %s\n", strerror(errno));
+		return errno;
+	}
+
+	fListener->OnPackageSizeInfo(fHeaderSize, compressedHeapSize, tocLength,
+		attributesLength, totalSize);
+
+	// prepare the header
+
+	// general
+	header.magic = B_HOST_TO_BENDIAN_INT32(B_HPKG_MAGIC);
+	header.header_size = B_HOST_TO_BENDIAN_INT16(fHeaderSize);
+	header.version = B_HOST_TO_BENDIAN_INT16(B_HPKG_VERSION);
+	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
+	header.minor_version = B_HOST_TO_BENDIAN_INT16(B_HPKG_MINOR_VERSION);
+
+	// write the header
+	RawWriteBuffer(&header, sizeof(hpkg_header), 0);
+
+	SetFinished(true);
+	return B_OK;
+}
+
+
+status_t
 PackageWriterImpl::_CheckLicenses()
 {
 	BPath systemLicensePath;
@@ -1067,70 +1130,6 @@ PackageWriterImpl::_AttributeRemoved(Attribute* attribute)
 			Attribute* child = it.Next();) {
 		_AttributeRemoved(child);
 	}
-}
-
-
-status_t
-PackageWriterImpl::_Finish()
-{
-	// write entries
-	for (EntryList::ConstIterator it = fRootEntry->ChildIterator();
-			Entry* entry = it.Next();) {
-		char pathBuffer[B_PATH_NAME_LENGTH];
-		pathBuffer[0] = '\0';
-		_AddEntry(AT_FDCWD, entry, entry->Name(), pathBuffer);
-	}
-
-	hpkg_header header;
-
-	// write the TOC and package attributes
-	uint64 tocLength;
-	_WriteTOC(header, tocLength);
-
-	uint64 attributesLength;
-	_WritePackageAttributes(header, attributesLength);
-
-	// flush the heap
-	status_t error = fHeapWriter->Finish();
-	if (error != B_OK)
-		return error;
-
-	uint64 compressedHeapSize = fHeapWriter->CompressedHeapSize();
-
-	header.heap_compression = B_HOST_TO_BENDIAN_INT16(B_HPKG_COMPRESSION_ZLIB);
-	header.heap_chunk_size = B_HOST_TO_BENDIAN_INT32(fHeapWriter->ChunkSize());
-	header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(
-		fHeapWriter->CompressedHeapSize());
-	header.heap_size_uncompressed = B_HOST_TO_BENDIAN_INT64(
-		fHeapWriter->UncompressedHeapSize());
-
-	// Truncate the file to the size it is supposed to have. In update mode, it
-	// can be greater when one or more files are shrunk. In creation mode it
-	// should already have the correct size.
-	off_t totalSize = fHeapWriter->HeapOffset() + (off_t)compressedHeapSize;
-	if (ftruncate(FD(), totalSize) != 0) {
-		fListener->PrintError("Failed to truncate package file to new "
-			"size: %s\n", strerror(errno));
-		return errno;
-	}
-
-	fListener->OnPackageSizeInfo(fHeaderSize, compressedHeapSize, tocLength,
-		attributesLength, totalSize);
-
-	// prepare the header
-
-	// general
-	header.magic = B_HOST_TO_BENDIAN_INT32(B_HPKG_MAGIC);
-	header.header_size = B_HOST_TO_BENDIAN_INT16(fHeaderSize);
-	header.version = B_HOST_TO_BENDIAN_INT16(B_HPKG_VERSION);
-	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
-	header.minor_version = B_HOST_TO_BENDIAN_INT16(B_HPKG_MINOR_VERSION);
-
-	// write the header
-	RawWriteBuffer(&header, sizeof(hpkg_header), 0);
-
-	SetFinished(true);
-	return B_OK;
 }
 
 
