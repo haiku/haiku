@@ -151,6 +151,7 @@ protected:
 
 	inline	int					FD() const;
 	inline	uint32				Flags() const;
+	inline	const BPackageWriterParameters& Parameters() const;
 
 	inline	const PackageAttributeList&	PackageAttributes() const;
 	inline	PackageAttributeList&	PackageAttributes();
@@ -227,6 +228,13 @@ inline uint32
 WriterImplBase::Flags() const
 {
 	return fParameters.Flags();
+}
+
+
+inline const BPackageWriterParameters&
+WriterImplBase::Parameters() const
+{
+	return fParameters;
 }
 
 

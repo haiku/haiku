@@ -24,6 +24,7 @@ class BAbstractBufferedDataReader;
 class BErrorOutput;
 class BLowLevelPackageContentHandler;
 class BPackageContentHandler;
+class BPackageWriter;
 
 
 class BPackageReader {
@@ -42,6 +43,9 @@ public:
 
 			BAbstractBufferedDataReader* HeapReader() const;
 									// Only valid as long as the reader lives.
+
+private:
+			friend class BPackageWriter;
 
 private:
 			PackageReaderImpl*	fImpl;

@@ -38,6 +38,7 @@
 #include <package/hpkg/HPKGDefsPrivate.h>
 
 #include <package/hpkg/DataReader.h>
+#include <package/hpkg/PackageFileHeapReader.h>
 #include <package/hpkg/PackageFileHeapWriter.h>
 #include <package/hpkg/PackageReaderImpl.h>
 #include <package/hpkg/Stacker.h>
@@ -606,6 +607,23 @@ PackageWriterImpl::Finish()
 
 
 status_t
+PackageWriterImpl::Recompress(PackageReaderImpl* reader)
+{
+	if (reader == NULL)
+		return B_BAD_VALUE;
+
+	try {
+		return _Recompress(reader);
+	} catch (status_t error) {
+		return error;
+	} catch (std::bad_alloc) {
+		fListener->PrintError("Out of memory!\n");
+		return B_NO_MEMORY;
+	}
+}
+
+
+status_t
 PackageWriterImpl::_Init(const char* fileName,
 	const BPackageWriterParameters& parameters)
 {
@@ -718,6 +736,69 @@ PackageWriterImpl::_Finish()
 
 	// write the header
 	RawWriteBuffer(&header, sizeof(hpkg_header), 0);
+
+	SetFinished(true);
+	return B_OK;
+}
+
+
+status_t
+PackageWriterImpl::_Recompress(PackageReaderImpl* reader)
+{
+	if (reader == NULL)
+		return B_BAD_VALUE;
+
+	// read the header
+	hpkg_header header;
+	status_t error = reader->ReadBuffer(0, &header, sizeof(header));
+	if (error != B_OK) {
+		fListener->PrintError("Failed to reader hpkg header: %s\n",
+			strerror(error));
+		return error;
+	}
+
+	// Update some header fields, assuming no compression. We'll rewrite the
+	// header later, should compression have been used. Doing it this way allows
+	// for streaming an uncompressed package.
+	uint64 uncompressedHeapSize
+		= reader->RawHeapReader()->UncompressedHeapSize();
+	uint64 compressedHeapSize = uncompressedHeapSize
+		+ fHeapWriter->HeapOverhead(uncompressedHeapSize);
+
+	off_t totalSize = fHeapWriter->HeapOffset() + (off_t)compressedHeapSize;
+
+	header.heap_compression = B_HOST_TO_BENDIAN_INT16(B_HPKG_COMPRESSION_ZLIB);
+	header.heap_chunk_size = B_HOST_TO_BENDIAN_INT32(fHeapWriter->ChunkSize());
+	header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(compressedHeapSize);
+	header.heap_size_uncompressed
+		= B_HOST_TO_BENDIAN_INT64(uncompressedHeapSize);
+	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
+
+	if (Parameters().CompressionLevel() == 0)
+		RawWriteBuffer(&header, sizeof(hpkg_header), 0);
+
+	// copy the heap data
+	uint64 bytesCompressed;
+	error = fHeapWriter->AddData(*reader->RawHeapReader(), uncompressedHeapSize,
+		bytesCompressed);
+	if (error != B_OK)
+		return error;
+
+	// flush the heap
+	error = fHeapWriter->Finish();
+	if (error != B_OK)
+		return error;
+
+	// If compression is enabled, update and write the header.
+	if (Parameters().CompressionLevel() != 0) {
+		compressedHeapSize = fHeapWriter->CompressedHeapSize();
+		totalSize = fHeapWriter->HeapOffset() + (off_t)compressedHeapSize;
+		header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(compressedHeapSize);
+		header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
+
+		// write the header
+		RawWriteBuffer(&header, sizeof(hpkg_header), 0);
+	}
 
 	SetFinished(true);
 	return B_OK;

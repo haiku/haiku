@@ -22,6 +22,9 @@ class BPackageEntryAttribute;
 namespace BPrivate {
 
 
+class PackageWriterImpl;
+
+
 class PackageReaderImpl : public ReaderImplBase {
 	typedef	ReaderImplBase		inherited;
 public:
@@ -57,6 +60,8 @@ private:
 			struct AttributeAttributeHandler;
 			struct EntryAttributeHandler;
 			struct RootAttributeHandler;
+
+			friend class PackageWriterImpl;
 
 private:
 			status_t			_ParseTOC(AttributeHandlerContext* context,

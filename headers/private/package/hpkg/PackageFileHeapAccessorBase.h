@@ -92,6 +92,10 @@ public:
 			void				SetFD(int fd)
 									{ fFD = fd; }
 
+			uint64				HeapOverhead(uint64 uncompressedSize) const;
+									// additional bytes needed when storing
+									// the given amount of data
+
 	// BAbstractBufferedDataReader
 	virtual	status_t			ReadDataToOutput(off_t offset,
 									size_t size, BDataIO* output);

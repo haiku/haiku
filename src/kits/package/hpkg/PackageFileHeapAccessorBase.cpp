@@ -144,6 +144,16 @@ PackageFileHeapAccessorBase::~PackageFileHeapAccessorBase()
 }
 
 
+uint64
+PackageFileHeapAccessorBase::HeapOverhead(uint64 uncompressedSize) const
+{
+	// Determine number of chunks and the size of the chunk size table. Note
+	// that the size of the last chunk is not saved, since its size is implied.
+	size_t chunkCount = (uncompressedSize + kChunkSize - 1) / kChunkSize;
+	return chunkCount > 1 ? (chunkCount - 1) * 2 : 0;
+}
+
+
 status_t
 PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
 	BDataIO* output)

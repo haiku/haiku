@@ -16,6 +16,9 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
+class BPackageReader;
+
+
 namespace BPrivate {
 	class PackageWriterImpl;
 }
@@ -71,6 +74,9 @@ public:
 			void				SetCheckLicenses(bool checkLicenses);
 			status_t			AddEntry(const char* fileName, int fd = -1);
 			status_t			Finish();
+
+			status_t			Recompress(BPackageReader* reader);
+									// to be called after Init(); no Finish()
 
 private:
 			PackageWriterImpl*	fImpl;
