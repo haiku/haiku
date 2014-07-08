@@ -217,12 +217,12 @@ CDDBServer::Read(QueryResponseData* diskData, ReadResponseData* readResponse)
 					|| (errno != 0 && year == 0)) {
 					// Year out of range.
 					printf("Year out of range: %s\n", line.String());
-					return B_ERROR;
+					year = 0;
 				}
 				
 				if (firstInvalid == line.String()) {
 					printf("Invalid year: %s\n", line.String());
-					return B_ERROR;
+					year = 0;
 				}
 							
 				readResponse->year = year;

@@ -8,20 +8,19 @@
 
 #include "cddb_daemon.h"
 
-#include "cddb_server.h"
-
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <Directory.h>
 #include <Entry.h>
-#include <NodeMonitor.h>
+#include <fs_info.h>
 #include <Message.h>
+#include <NodeMonitor.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 
-#include <fs_info.h>
-#include <stdlib.h>
+#include "cddb_server.h"
 
 
 static const char* kCddaFsName = "cdda";
@@ -162,7 +161,7 @@ CDDBDaemon::_CanLookup(const dev_t device, uint32* cddbId,
 	if (directory.ReadAttr("CD:do_lookup", B_BOOL_TYPE, 0, (void *)&doLookup,
 		sizeof(bool)) < B_OK || !doLookup)
 		return false;
-	
+
 	// Does it have the CD:cddbid attribute?
 	if (directory.ReadAttr("CD:cddbid", B_UINT32_TYPE, 0, (void *)cddbId,
 		sizeof(uint32)) < B_OK)
@@ -237,6 +236,14 @@ CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
 		name = data->title;
 		name.ReplaceSet("/", " ");
 		
+		// Add track number to the beginning of the string.
+		int trackNum = index + 1; // index=0 is actually Track 1
+		char trackNumString[3]; // 2 digits + '\0'
+		snprintf(trackNumString, sizeof(trackNumString), "%02d", trackNum);
+		name.Prepend(" ");
+		name.Prepend(trackNumString, sizeof(trackNumString));
+		name.Append(".wav");
+
 		if ((result = entry.Rename(name.String())) != B_OK) {
 			printf("Failed renaming entry at index %d to \"%s\".\n", index,
 				name.String());
@@ -252,11 +259,15 @@ CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
 		node.WriteAttr("Audio:Album", B_STRING_TYPE, 0,
 			(readResponse->title).String(),
 			(readResponse->title).Length());
-		node.WriteAttr("Media:Genre", B_STRING_TYPE, 0,
-			(readResponse->genre).String(),
-			(readResponse->genre).Length());
-		node.WriteAttr("Media:Year", B_INT32_TYPE, 0, &(readResponse->year),
-			sizeof(int32));
+		if (readResponse->genre.Length() != 0) {
+			node.WriteAttr("Media:Genre", B_STRING_TYPE, 0,
+				(readResponse->genre).String(),
+				(readResponse->genre).Length());
+		}
+		if (readResponse->year != 0) {
+			node.WriteAttr("Media:Year", B_INT32_TYPE, 0,
+				&(readResponse->year), sizeof(int32));
+		}
 
 		if (data->artist == "") {
 			node.WriteAttr("Audio:Artist", B_STRING_TYPE, 0,
