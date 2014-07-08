@@ -63,7 +63,6 @@ BNodeInfo::~BNodeInfo()
 }
 
 
-// Initializes the BNodeInfo to the supplied node.
 status_t
 BNodeInfo::SetTo(BNode* node)
 {
@@ -77,7 +76,6 @@ BNodeInfo::SetTo(BNode* node)
 }
 
 
-// Returns whether the object has been properly initialized.
 status_t
 BNodeInfo::InitCheck() const
 {
@@ -85,7 +83,6 @@ BNodeInfo::InitCheck() const
 }
 
 
-// Writes the MIME type of the node into type.
 status_t
 BNodeInfo::GetType(char* type) const
 {
@@ -93,12 +90,15 @@ BNodeInfo::GetType(char* type) const
 	status_t result = (type ? B_OK : B_BAD_VALUE);
 	if (result == B_OK && InitCheck() != B_OK)
 		result = B_NO_INIT;
+
 	// get the attribute info and check type and length of the attr contents
 	attr_info attrInfo;
 	if (result == B_OK)
 		result = fNode->GetAttrInfo(kNITypeAttribute, &attrInfo);
+
 	if (result == B_OK && attrInfo.type != B_MIME_STRING_TYPE)
 		result = B_BAD_TYPE;
+
 	if (result == B_OK && attrInfo.size > B_MIME_TYPE_LENGTH)
 		result = B_BAD_DATA;
 
@@ -120,8 +120,7 @@ BNodeInfo::GetType(char* type) const
 	return result;
 }
 
-// Sets the MIME type of the node. If type is NULL the BEOS:TYPE attribute is
-// removed instead.
+
 status_t
 BNodeInfo::SetType(const char* type)
 {
@@ -129,16 +128,16 @@ BNodeInfo::SetType(const char* type)
 	status_t result = B_OK;
 	if (result == B_OK && type && strlen(type) >= B_MIME_TYPE_LENGTH)
 		result = B_BAD_VALUE;
+
 	if (result == B_OK && InitCheck() != B_OK)
 		result = B_NO_INIT;
 
 	// write/remove the attribute
 	if (result == B_OK) {
-		if (type) {
+		if (type != NULL) {
 			size_t toWrite = strlen(type) + 1;
 			ssize_t written = fNode->WriteAttr(kNITypeAttribute,
-											   B_MIME_STRING_TYPE, 0, type,
-											   toWrite);
+				B_MIME_STRING_TYPE, 0, type, toWrite);
 			if (written < 0)
 				result = written;
 			else if (written != (ssize_t)toWrite)
@@ -146,11 +145,11 @@ BNodeInfo::SetType(const char* type)
 		} else
 			result = fNode->RemoveAttr(kNITypeAttribute);
 	}
+
 	return result;
 }
 
 
-// Gets the icon of the node.
 status_t
 BNodeInfo::GetIcon(BBitmap* icon, icon_size which) const
 {
@@ -160,92 +159,9 @@ BNodeInfo::GetIcon(BBitmap* icon, icon_size which) const
 
 	return BIconUtils::GetIcon(fNode, iconAttribute, miniIconAttribute,
 		largeIconAttribute, which, icon);
-#if 0
-	status_t result = B_OK;
-	// set some icon size related variables
-	const char* attribute = NULL;
-	BRect bounds;
-	uint32 attrType = 0;
-	size_t attrSize = 0;
-	switch (k) {
-		case B_MINI_ICON:
-			attribute = kNIMiniIconAttribute;
-			bounds.Set(0, 0, 15, 15);
-			attrType = B_MINI_ICON_TYPE;
-			attrSize = 16 * 16;
-			break;
-		case B_LARGE_ICON:
-			attribute = kNILargeIconAttribute;
-			bounds.Set(0, 0, 31, 31);
-			attrType = B_LARGE_ICON_TYPE;
-			attrSize = 32 * 32;
-			break;
-		default:
-			result = B_BAD_VALUE;
-			break;
-	}
-
-	// check parameter and initialization
-	if (result == B_OK
-		&& (icon == NULL || icon->InitCheck() != B_OK
-			|| icon->Bounds() != bounds)) {
-		result = B_BAD_VALUE;
-	}
-	if (result == B_OK && InitCheck() != B_OK)
-		result = B_NO_INIT;
-
-	// get the attribute info and check type and size of the attr contents
-	attr_info attrInfo;
-	if (result == B_OK)
-		result = fNode->GetAttrInfo(attribute, &attrInfo);
-
-	if (result == B_OK && attrInfo.type != attrType)
-		result = B_BAD_TYPE;
-
-	if (result == B_OK && attrInfo.size != attrSize)
-		result = B_BAD_DATA;
-
-	// read the attribute
-	if (result == B_OK) {
-		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
-		char *buffer = NULL;
-		ssize_t read;
-		if (otherColorSpace) {
-			// other color space than stored in attribute
-			buffer = new(nothrow) char[attrSize];
-			if (!buffer)
-				result = B_NO_MEMORY;
-			if (result == B_OK) {
-				read = fNode->ReadAttr(attribute, attrType, 0, buffer,
-					attrSize);
-			}
-		} else {
-			read = fNode->ReadAttr(attribute, attrType, 0, icon->Bits(),
-				attrSize);
-		}
-		if (result == B_OK) {
-			if (read < 0)
-				result = read;
-			else if (read != attrInfo.size)
-				result = B_ERROR;
-		}
-		if (otherColorSpace) {
-			// other color space than stored in attribute
-			if (result == B_OK) {
-				result = icon->ImportBits(buffer, attrSize, B_ANY_BYTES_PER_ROW,
-					 0, B_CMAP8);
-			}
-			delete[] buffer;
-		}
-	}
-
-	return result;
-#endif
 }
 
 
-// Sets the icon of the node. If icon is NULL, the attribute is removed
-// instead.
 status_t
 BNodeInfo::SetIcon(const BBitmap* icon, icon_size which)
 {
@@ -320,7 +236,6 @@ BNodeInfo::SetIcon(const BBitmap* icon, icon_size which)
 }
 
 
-// Gets the icon of the node.
 status_t
 BNodeInfo::GetIcon(uint8** data, size_t* size, type_code* type) const
 {
@@ -334,9 +249,9 @@ BNodeInfo::GetIcon(uint8** data, size_t* size, type_code* type) const
 
 	// get the attribute info and check type and size of the attr contents
 	attr_info attrInfo;
-	status_t ret = fNode->GetAttrInfo(kNIIconAttribute, &attrInfo);
-	if (ret < B_OK)
-		return ret;
+	status_t result = fNode->GetAttrInfo(kNIIconAttribute, &attrInfo);
+	if (result != B_OK)
+		return result;
 
 	// chicken out on unrealisticly large attributes
 	if (attrInfo.size > 128 * 1024)
@@ -346,8 +261,7 @@ BNodeInfo::GetIcon(uint8** data, size_t* size, type_code* type) const
 	*type = attrInfo.type;
 	*size = attrInfo.size;
 	*data = new (nothrow) uint8[*size];
-
-	if (!*data)
+	if (*data == NULL)
 		return B_NO_MEMORY;
 
 	// featch the data
@@ -362,8 +276,6 @@ BNodeInfo::GetIcon(uint8** data, size_t* size, type_code* type) const
 }
 
 
-// Sets the node icon of the node. If data is NULL of size is 0, the
-// "BEOS:ICON" attribute is removed instead.
 status_t
 BNodeInfo::SetIcon(const uint8* data, size_t size)
 {
@@ -390,7 +302,6 @@ BNodeInfo::SetIcon(const uint8* data, size_t size)
 }
 
 
-// Gets the preferred application of the node.
 status_t
 BNodeInfo::GetPreferredApp(char* signature, app_verb verb) const
 {
@@ -429,8 +340,6 @@ BNodeInfo::GetPreferredApp(char* signature, app_verb verb) const
 }
 
 
-// Sets the preferred application of the node. If signature is NULL, the
-// "BEOS:PREF_APP" attribute is removed instead.
 status_t
 BNodeInfo::SetPreferredApp(const char* signature, app_verb verb)
 {
@@ -460,8 +369,6 @@ BNodeInfo::SetPreferredApp(const char* signature, app_verb verb)
 }
 
 
-// Fills out ref with a pointer to a hint about what application will open
-// this node.
 status_t
 BNodeInfo::GetAppHint(entry_ref* ref) const
 {
@@ -505,8 +412,6 @@ BNodeInfo::GetAppHint(entry_ref* ref) const
 }
 
 
-// Sets the app hint of the node. If ref is NULL, the "BEOS:PPATH" attribute
-// is removed instead.
 status_t
 BNodeInfo::SetAppHint(const entry_ref* ref)
 {
@@ -535,7 +440,6 @@ BNodeInfo::SetAppHint(const entry_ref* ref)
 }
 
 
-// Gets the icon displayed by Tracker for the icon.
 status_t
 BNodeInfo::GetTrackerIcon(BBitmap* icon, icon_size which) const
 {
@@ -661,7 +565,6 @@ BNodeInfo::GetTrackerIcon(BBitmap* icon, icon_size which) const
 }
 
 
-// Gets the icon displayed by Tracker for the node referred to by ref.
 status_t
 BNodeInfo::GetTrackerIcon(const entry_ref* ref, BBitmap* icon, icon_size which)
 {
@@ -686,8 +589,9 @@ BNodeInfo::GetTrackerIcon(const entry_ref* ref, BBitmap* icon, icon_size which)
 }
 
 
-// NOTE: The following method is provided for binary compatibility purposes
-// (for example the program "Guido" depends on this.)
+/*!	This method is provided for binary compatibility purposes
+	(for example the program "Guido" depends on it.)
+*/
 extern "C"
 status_t
 GetTrackerIcon__9BNodeInfoP9entry_refP7BBitmap9icon_size(
@@ -704,8 +608,9 @@ void BNodeInfo::_ReservedNodeInfo2() {}
 void BNodeInfo::_ReservedNodeInfo3() {}
 
 
-// Assignment operator is declared private to prevent it from being created
-// automatically by the compiler.
+/*!	Assignment operator is declared private to prevent it from being created
+	automatically by the compiler.
+*/
 BNodeInfo&
 BNodeInfo::operator=(const BNodeInfo &nodeInfo)
 {
@@ -713,8 +618,9 @@ BNodeInfo::operator=(const BNodeInfo &nodeInfo)
 }
 
 
-// Copy constructor is declared private to prevent it from being created
-// automatically by the compiler.
+/*!	Copy constructor is declared private to prevent it from being created
+	automatically by the compiler.
+*/
 BNodeInfo::BNodeInfo(const BNodeInfo &)
 {
 }
@@ -722,8 +628,10 @@ BNodeInfo::BNodeInfo(const BNodeInfo &)
 
 namespace BPrivate {
 
-// Private method used by Tracker. This should be moved to the Tracker
-// source.
+/*!	Private method used by Tracker.
+
+	This should be moved to the Tracker source.
+*/
 extern bool
 CheckNodeIconHintPrivate(const BNode* node, bool checkMiniIconOnly)
 {
