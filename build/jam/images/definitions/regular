@@ -15,7 +15,7 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_APPS += [ FFilterByBuildFeatures
-	CDPlayer CodyCam
+	CodyCam
 	GLInfo@mesa
 	HaikuDepot
 	Icon-O-Matic Installer LaunchBox
@@ -28,7 +28,7 @@ SYSTEM_APPS += [ FFilterByBuildFeatures
 ] ;
 
 DESKBAR_APPLICATIONS +=
-	CodyCam CDPlayer
+	CodyCam
 	HaikuDepot
 	Icon-O-Matic Installer
 	Magnify Mail MediaConverter MediaPlayer MidiPlayer
