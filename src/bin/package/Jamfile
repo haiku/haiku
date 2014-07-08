@@ -9,6 +9,7 @@ BinCommand package :
 	command_extract.cpp
 	command_info.cpp
 	command_list.cpp
+	command_recompress.cpp
 	package.cpp
 	PackageWriterListener.cpp
 	PackageWritingUtils.cpp

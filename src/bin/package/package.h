@@ -14,6 +14,7 @@ int		command_dump(int argc, const char* const* argv);
 int		command_extract(int argc, const char* const* argv);
 int		command_info(int argc, const char* const* argv);
 int		command_list(int argc, const char* const* argv);
+int		command_recompress(int argc, const char* const* argv);
 
 
 #endif	// PACKAGE_H
