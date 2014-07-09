@@ -738,8 +738,10 @@ Volume::Mount(const char* device)
 		(const uint8*)toc, B_BENDIAN_TO_HOST_INT16(toc->data_length) + 2);
 
 	_RestoreSharedAttributes();
-	if (fd >= 0)
+	if (fd >= 0) {
 		_RestoreAttributes(fd);
+		close(fd);
+	}
 
 	// determine volume title
 	DetermineName(fDiscID, fDevice, title, sizeof(title));
