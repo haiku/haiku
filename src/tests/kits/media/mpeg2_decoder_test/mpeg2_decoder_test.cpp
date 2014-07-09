@@ -120,6 +120,27 @@ main(int argc, char* argv[])
 	BFile* mpeg2EncodedFile = new BFile(kTestVideoFilename, O_RDONLY);
 	BMediaDecoder* mpeg2Decoder = new FileDecoder(mpeg2EncodedFile);
 
+	// TODO: The following code block is a workaround for the bug #11018
+	// (https://dev.haiku-os.org/ticket/11018). Please remove this code block,
+	// once the bug is being resolved.
+	// The workaround triggers the loading of all media plugins prior to using
+	// methods of class BMediaFormats. Using the function get_next_encoder()
+	// is used because of two facts
+	//     1. It is publicly available and thus can be used by 3rd party apps,
+	//        too.
+	//     2. It is already available by including BMediaFormats.h, so there is
+	//        no need to include another header for this workaround.
+	// Also, please leave the workaround code at this -prominent- place
+	// instead of moving it to the more appropriate place in
+	// CreateMpeg2MediaFormat(). This way it acts as a reminder to fix
+	// the bug :)
+	int32 workaroundCookie = 0;
+	media_codec_info workaroundMediaCodecInfo;
+	status_t workaroundStatus = get_next_encoder(&workaroundCookie,
+		&workaroundMediaCodecInfo);
+	if (workaroundStatus < B_OK)
+		exit(99);
+
 	media_format* mpeg2MediaFormat = CreateMpeg2MediaFormat();
 	mpeg2Decoder->SetTo(mpeg2MediaFormat);
 	status_t settingMpeg2DecoderStatus = mpeg2Decoder->InitCheck();
@@ -192,7 +213,7 @@ CreateMpeg2MediaFormat()
 		return kFailedToCreateMpeg2MediaFormat;
 	}
 
-	// The following code block can be removed, once the ffmpeg addon can
+	// TODO: The following code block can be removed, once the ffmpeg addon can
 	// determine the codec output parameters from the encoded data.
 	mpeg2MediaFormat->u.encoded_video.output.first_active = 0;
 	mpeg2MediaFormat->u.encoded_video.output.last_active = 575;
