@@ -23,13 +23,14 @@ RemotePackageRepository HaikuPorts
 	autoconf-2.69-5
 	automake-1.13.1-4
 	beam-1.2alpha-1
-	bepdf-1.1.1~beta5_2013_04_28-1
+	bepdf-1.2.0-1
 	bescreencapture-1.9.4-1
 #	bezillabrowser-2.0.0.22pre_2010_05_02-1
 	binutils-2.17_2013_04_21-2
 	bison-2.4.3-6
 	buildbot_slave-0.8.8-2
-	bzip2-1.0.6-3
+	bzip2-1.0.6-5
+	bzip2_devel-1.0.6-5
 	caya-2013.07.31-3
 	cdrtools-3.01~a18-1
 	cdrtools_devel-3.01~a18-1
@@ -116,6 +117,8 @@ RemotePackageRepository HaikuPorts
 	libpcre_devel-8.21-5
 	libpng-1.5.12-3
 	libpng_devel-1.5.12-3
+	libsanta-3.0.0-3
+	libsanta_devel-3.0.0-3
 	libsdl-1.2.15-5
 	libsdl_devel-1.2.15-5
 	libsolv-0.3.0_haiku_2013_10_01-1
@@ -479,6 +482,7 @@ RemotePackageRepository HaikuPorts
 	libpcre
 	libpng
 	libqt4_x86
+	libsanta
 	libsolv
 	libsdl
 	libsdl2_x86
