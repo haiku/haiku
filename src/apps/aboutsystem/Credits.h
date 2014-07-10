@@ -18,7 +18,7 @@ typedef struct {
 
 static const Translation kTranslations[] = {
 	{ "ar",
-		"Khaled Berraoui - khallebal\n"
+		"Khaled Berraoui (khallebal)\n"
 		"Kendhia\n"
 	},
 	{ "be",
@@ -41,37 +41,37 @@ static const Translation kTranslations[] = {
 		"leszek\n"
 		"Christian Morgenroth\n"
 		"Aleksas Pantechovskis\n"
-		"Joachim Seemer - Humdinger\n"
+		"Joachim Seemer (Humdinger)\n"
 		"Matthias Spreiter\n"
 		"Ivaylo Tsenkov\n"
 		"svend\n"
 	},
 	{ "el",
-		"Γιάννης Κωνσταντινίδης (Giannis Konstantinidis) - giannisk\n"
-		"Βαγγέλης Μαμαλάκης (Vaggelis Mamalakis)\n"
-		"Άλεξ-Π. Νάτσιος (Alex-P. Natsios) - Drakevr\n"
+		"Γιάννης Κωνσταντινίδης [Giannis Konstantinidis] (giannisk)\n"
+		"Βαγγέλης Μαμαλάκης [Vaggelis Mamalakis]\n"
+		"Άλεξ-Π. Νάτσιος [Alex-P. Natsios] (Drakevr)\n"
 	},
 	{ "eo",
-		"Travis D. Reed - Dancxjo\n"
+		"Travis D. Reed (Dancxjo)\n"
 	},
 	{ "es",
 		"Pedro Arregui\n"
 		"Zola Bridges\n"
-		"Nicolás C - CapitanPico\n"
-		"Oscar Carballal - oscarcp\n"
-		"Miguel Zúñiga González - miguel~1.mx\n"
+		"Nicolás C (CapitanPico)\n"
+		"Oscar Carballal (oscarcp)\n"
+		"Miguel Zúñiga González (miguel~1.mx)\n"
 		"Luis Gustavo Lira\n"
 		"Victor Madariaga\n"
-		"César Ortiz Pantoja - ccortiz\n"
+		"César Ortiz Pantoja (ccortiz)\n"
 	},
 	{ "fi",
-		"Jorma Karvonen - Karvjorm\n"
-		"Jaakko Leikas - Garjala\n"
+		"Jorma Karvonen (Karvjorm\n"
+		"Jaakko Leikas (Garjala)\n"
 		"Slavi Stefanov Sotirov\n"
 	},
 	{ "fr",
 		"Jean-Loïc Charroud\n"
-		"Adrien Destugues - PulkoMandy\n"
+		"Adrien Destugues (PulkoMandy)\n"
 		"Florent Revest\n"
 		"Harsh Vardhan\n"
 	},
@@ -88,11 +88,11 @@ static const Translation kTranslations[] = {
 	},
 	{ "hu",
 		"Zsolt Bicskei\n"
-		"Róbert Dancsó - dsjonny\n"
+		"Róbert Dancsó (dsjonny)\n"
 		"Kálmán Kéménczy\n"
-		"Zoltán Mizsei - miqlas\n"
+		"Zoltán Mizsei (miqlas)\n"
 		"Bence Nagy\n"
-		"Zoltán Szabó - Bird\n"
+		"Zoltán Szabó (Bird)\n"
 	},
 	{ "it",
 		"Andrea Bernardi\n"
@@ -107,7 +107,7 @@ static const Translation kTranslations[] = {
 		"Shota Fukumori\n"
 		"hiromu1996\n"
 		"Hironori Ichimiya\n"
-		"Jorge G. Mare - Koki\n"
+		"Jorge G. Mare (Koki)\n"
 		"Takashi Murai\n"
 		"nolze\n"
 		"SHINTA\n"
@@ -133,15 +133,15 @@ static const Translation kTranslations[] = {
 		"Artur Wyszyński\n"
 	},
 	{ "pt",
-		"Marcos Alves - Xeon3D\n"
-		"Vasco Costa - gluon\n"
-		"Michael Vinícius de Oliveira - michaelvo\n"
+		"Marcos Alves (Xeon3D)\n"
+		"Vasco Costa (gluon)\n"
+		"Michael Vinícius de Oliveira (michaelvo)\n"
 	},
 	{ "pt_BR",
-		"Cabral Bandeira - beyraq\n"
-		"Adriano A. Duarte - Sri_Dhryko\n"
-		"Tiago Matos - tiagoms\n"
-		"Nadilson Santana - nadilsonsantana\n"
+		"Cabral Bandeira (beyraq)\n"
+		"Adriano A. Duarte (Sri_Dhryko)\n"
+		"Tiago Matos (tiagoms)\n"
+		"Nadilson Santana (nadilsonsantana)\n"
 	},
 	{ "ro",
 		"Victor Carbune\n"
@@ -155,11 +155,11 @@ static const Translation kTranslations[] = {
 		"Călinescu Valentin\n"
 	},
 	{ "ru",
-		"Tatyana Fursic - iceid\n"
+		"Tatyana Fursic (iceid)\n"
 		"StoroZ Gneva\n"
-		"Rodastahm Islamov - RISC\n"
-		"Eugene Katashov - mrNoisy\n"
-		"Reznikov Sergei - Diver\n"
+		"Rodastahm Islamov (RISC)\n"
+		"Eugene Katashov (mrNoisy)\n"
+		"Reznikov Sergei (Diver)\n"
 		"Michael Smirnov\n"
 		"Vladimir Vasilenko\n"
 	},
@@ -172,7 +172,7 @@ static const Translation kTranslations[] = {
 	{ "sv",
 		"Patrik Gissberg\n"
 		"Johan Holmberg\n"
-		"Jimmy Olsson - phalax\n"
+		"Jimmy Olsson (phalax)\n"
 		"Jonas Sundström\n"
 		"Victor Widell\n"
 	},
@@ -185,11 +185,11 @@ static const Translation kTranslations[] = {
 	},
 	{ "uk",
 		"Mariya Pilipchuk\n"
-		"Alex Rudyk - totish\n"
+		"Alex Rudyk (totish)\n"
 		"Oleg Varunok\n"
 	},
 	{ "zh",
-		"Pengfei Han - kurain\n"
+		"Pengfei Han (kurain)\n"
 	}
 };
 
@@ -293,7 +293,7 @@ static const Translation kTranslations[] = {
 	"Janito Ferreira Filho\n" \
 	"Pier Luigi Fiorini\n" \
 	"Marc Flerackers\n" \
-	"Michele Frau - zuMi\n" \
+	"Michele Frau (zuMi)\n" \
 	"Landon Fuller\n" \
 	"Deyan Genovski\n" \
 	"Pete Goodeve\n" \
@@ -324,7 +324,7 @@ static const Translation kTranslations[] = {
 	"Brian Luft\n" \
 	"Christof Lutteroth\n" \
 	"Graham MacDonald\n" \
-	"Jorge G. Mare - Koki\n" \
+	"Jorge G. Mare (Koki)\n" \
 	"Jan Matějek\n" \
 	"Brian Matzon\n" \
 	"Christopher ML Zumwalt May\n" \
@@ -339,7 +339,7 @@ static const Translation kTranslations[] = {
 	"Alan Murta\n" \
 	"Raghuram Nagireddy\n" \
 	"Kazuho Okui\n" \
-	"Jeroen Oortwijn - idefix\n" \
+	"Jeroen Oortwijn (idefix)\n" \
 	"Pahtz\n" \
 	"Michael Paine\n" \
 	"Adrian Panasiuk\n" \
@@ -381,7 +381,7 @@ static const Translation kTranslations[] = {
 	"Gavin James\n" \
 	"Urias McCullough\n" \
 	"Niels Sascha Reedijk\n" \
-	"Joachim Seemer - Humdinger\n" \
+	"Joachim Seemer (Humdinger)\n" \
 	"Jonathan Yoder\n" \
 	"\n"
 
