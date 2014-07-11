@@ -471,7 +471,7 @@ AddOnManager::_RegisterFilter(BInputServerFilter* filter, const entry_ref& ref,
 
 	for (int32 i = fFilterList.CountItems(); i-- > 0;) {
 		filter_info* info = fFilterList.ItemAt(i);
-		if (!strcmp(info->ref.name, ref.name)) {
+		if (strcmp(info->ref.name, ref.name) == 0) {
 			// we already know this ref
 			delete filter;
 			return B_NAME_IN_USE;
