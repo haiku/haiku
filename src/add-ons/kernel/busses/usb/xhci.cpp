@@ -501,7 +501,16 @@ XHCI::Start()
 	fCmdRing[XHCI_MAX_COMMANDS - 1].qwtrb0 = dmaAddress;
 
 	TRACE("setting interrupt rate\n");
-	WriteRunReg32(XHCI_IMOD(0), 160); // 25000 irq/s
+	
+	// Setting IMOD below 0x3F8 on Intel Lynx Point can cause IRQ lockups
+	if (fPCIInfo->vendor_id == PCI_VENDOR_INTEL 
+		&& (fPCIInfo->device_id == PCI_DEVICE_INTEL_PANTHER_POINT_XHCI
+			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_XHCI
+			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_LP_XHCI)) {
+		WriteRunReg32(XHCI_IMOD(0), 0x000003f8); // 4000 irq/s
+	} else {
+		WriteRunReg32(XHCI_IMOD(0), 0x000001f4); // 8000 irq/s
+	}
 
 	TRACE("enabling interrupt\n");
 	WriteRunReg32(XHCI_IMAN(0), ReadRunReg32(XHCI_IMAN(0)) | IMAN_INTR_ENA);
@@ -1017,8 +1026,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 {
 	TRACE("AllocateDevice hubAddress %d hubPort %d speed %d\n", hubAddress,
 		hubPort, speed);
-	GetPortSpeed(hubPort - 1, &speed);
-	TRACE("speed %d\n", speed);
 
 	uint8 slot = XHCI_MAX_SLOTS;
 	if (EnableSlot(&slot) != B_OK) {
@@ -1072,6 +1079,13 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		routePort = hubDevice->HubPort();
 	}
 
+	// Get speed of port, only if device connected to root hub port
+	// else we have to rely on value reported by the Hub Explore thread
+	if (route == 0) {
+		GetPortSpeed(hubPort - 1, &speed);
+		TRACE("speed updated %d\n", speed);
+	}
+
 	device->input_ctx->slot.dwslot0 = SLOT_0_NUM_ENTRIES(1) | SLOT_0_ROUTE(route);
 
 	// add the speed
@@ -1095,8 +1109,16 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	device->input_ctx->slot.dwslot1 = SLOT_1_RH_PORT(rhPort); // TODO enable power save
 	device->input_ctx->slot.dwslot2 = SLOT_2_IRQ_TARGET(0);
-	if (0)
+	
+	// If LS/FS device connected to non-root HS device
+	if (route != 0 && parent->Speed() == USB_SPEED_HIGHSPEED
+		&& (speed == USB_SPEED_LOWSPEED || speed == USB_SPEED_FULLSPEED)) {
+		struct xhci_device *parenthub = (struct xhci_device *)
+			parent->ControllerCookie();
 		device->input_ctx->slot.dwslot2 |= SLOT_2_PORT_NUM(hubPort);
+		device->input_ctx->slot.dwslot2 |= SLOT_2_TT_HUB_SLOT(parenthub->slot);
+	}
+
 	device->input_ctx->slot.dwslot3 = SLOT_3_SLOT_STATE(0)
 		| SLOT_3_DEVICE_ADDRESS(0);
 
@@ -1226,6 +1248,17 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	TRACE("device_class: %d device_subclass %d device_protocol %d\n",
 		deviceDescriptor.device_class, deviceDescriptor.device_subclass,
 		deviceDescriptor.device_protocol);
+		
+	if (speed == USB_SPEED_FULLSPEED && deviceDescriptor.max_packet_size_0 != 8) {
+		TRACE("Full speed device with different max packet size for Endpoint 0\n");
+		device->input_ctx->endpoints[0].dwendpoint1 &=
+			~ENDPOINT_1_MAXPACKETSIZE(0xffff);
+		device->input_ctx->endpoints[0].dwendpoint1 |=
+			ENDPOINT_1_MAXPACKETSIZE(deviceDescriptor.max_packet_size_0);
+		device->input_ctx->input.dropFlags = 0;
+		device->input_ctx->input.addFlags = (1 << 1);
+		EvaluateContext(device->input_ctx_addr, device->slot);
+	}
 
 	Device *deviceObject = NULL;
 	if (deviceDescriptor.device_class == 0x09) {
@@ -1547,25 +1580,28 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, uint64 ringAddr, u
 status_t
 XHCI::GetPortSpeed(uint8 index, usb_speed *speed)
 {
-	if (fPortSpeeds[index] == USB_SPEED_SUPER)
-		*speed = USB_SPEED_SUPER;
-	else {
-		uint32 portStatus = ReadOpReg(XHCI_PORTSC(index));
+	uint32 portStatus = ReadOpReg(XHCI_PORTSC(index));
 
-		switch (PS_SPEED_GET(portStatus)) {
-		case 3:
-			*speed = USB_SPEED_HIGHSPEED;
-			break;
-		case 2:
-			*speed = USB_SPEED_LOWSPEED;
-			break;
-		case 1:
-			*speed = USB_SPEED_FULLSPEED;
-			break;
-		default:
-			*speed = USB_SPEED_SUPER;
-		}
+	switch (PS_SPEED_GET(portStatus)) {
+	case 3:
+		*speed = USB_SPEED_HIGHSPEED;
+		break;
+	case 2:
+		*speed = USB_SPEED_LOWSPEED;
+		break;
+	case 1:
+		*speed = USB_SPEED_FULLSPEED;
+		break;
+	case 4:
+		*speed = USB_SPEED_SUPER;
+		break;
+	default:
+		TRACE("Non Standard Port Speed\n");
+		TRACE("Assuming Superspeed\n");
+		*speed = USB_SPEED_SUPER;
+		break;
 	}
+
 	return B_OK;
 }
 

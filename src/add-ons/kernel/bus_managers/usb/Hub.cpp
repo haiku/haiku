@@ -258,6 +258,9 @@ Hub::Explore(change_item **changeList)
 					}
 
 					usb_speed speed = USB_SPEED_FULLSPEED;
+					// Hack - We currently do not support USB3.0 Hubs
+					// This is for XHCI, which anyway rechecks the port speed
+					// This will in no way work for non-root USB3.0 Hubs
 					if (fDeviceDescriptor.usb_version == 0x300)
 						speed = USB_SPEED_SUPER;
 					else if (fPortStatus[i].status & PORT_STATUS_LOW_SPEED)
@@ -327,7 +330,7 @@ Hub::Explore(change_item **changeList)
 		}
 
 		if (fPortStatus[i].change & PORT_STATUS_RESET) {
-			TRACE_ALWAYS("port %" B_PRId32 "was reset\n", i);
+			TRACE_ALWAYS("port %" B_PRId32 " was reset\n", i);
 			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
 				USB_REQUEST_CLEAR_FEATURE, C_PORT_RESET, i + 1,
 				0, NULL, 0, NULL);

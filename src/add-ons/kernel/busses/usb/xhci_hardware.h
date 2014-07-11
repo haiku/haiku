@@ -344,7 +344,7 @@ struct xhci_slot_ctx {
 #define SLOT_1_NUM_PORTS_GET(x)			(((x) >> 24) & 0xFF)
 
 #define SLOT_2_TT_HUB_SLOT(x)			((x) & 0xFF)
-#define SLOT_2_TT_HUB_SLOT(x)			((x) & 0xFF)
+#define SLOT_2_TT_HUB_SLOT_GET(x)		((x) & 0xFF)
 #define SLOT_2_PORT_NUM(x)				(((x) & 0xFF) << 8)
 #define SLOT_2_PORT_NUM_GET(x)			(((x) >> 8) & 0xFF)
 #define SLOT_2_TT_TIME(x)				(((x) & 0x3) << 16)
