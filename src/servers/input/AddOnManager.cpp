@@ -496,7 +496,7 @@ AddOnManager::_RegisterFilter(BInputServerFilter* filter, const entry_ref& ref,
 
 	BAutolock locker(InputServer::gInputFilterListLocker);
 	if (!InputServer::gInputFilterList.AddItem(filter)) {
-		fFilterList.RemoveItem(info);
+		fFilterList.RemoveItem(info, false);
 		delete info;
 		return B_NO_MEMORY;
 	}
