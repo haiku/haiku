@@ -307,12 +307,12 @@ private:
 			void*				fUserlandVolume;
 			ino_t				fRootID;
 			VNode*				fRootNode;
-			vint32				fOpenFiles;
-			vint32				fOpenDirectories;
-			vint32				fOpenAttributeDirectories;
-			vint32				fOpenAttributes;
-			vint32				fOpenIndexDirectories;
-			vint32				fOpenQueries;
+			int32				fOpenFiles;
+			int32				fOpenDirectories;
+			int32				fOpenAttributeDirectories;
+			int32				fOpenAttributes;
+			int32				fOpenIndexDirectories;
+			int32				fOpenQueries;
 			VNodeMap*			fVNodes;
 			IORequestIDMap*		fIORequestInfosByID;
 			IORequestStructMap*	fIORequestInfosByStruct;

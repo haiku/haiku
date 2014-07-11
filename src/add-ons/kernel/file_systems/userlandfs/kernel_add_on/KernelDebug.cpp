@@ -12,7 +12,7 @@
 #include "UserlandFS.h"
 #include "Volume.h"
 
-static vint32 sCommandsAdded = 0;
+static int32 sCommandsAdded = 0;
 
 // DebugUFS
 int

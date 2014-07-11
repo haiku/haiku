@@ -207,7 +207,7 @@ struct Volume::IterativeFDIOCookie : public BReferenceable {
 // AutoIncrementer
 class Volume::AutoIncrementer {
 public:
-	AutoIncrementer(vint32* variable)
+	AutoIncrementer(int32* variable)
 		: fVariable(variable)
 	{
 		if (fVariable)
@@ -226,7 +226,7 @@ public:
 	}
 
 private:
-	vint32*	fVariable;
+	int32*	fVariable;
 };
 
 
@@ -4520,27 +4520,27 @@ PRINT(("Volume::_PutAllPendingVNodes()\n"));
 		return USERLAND_IOCTL_VNODE_COUNTING_DISABLED;
 	}
 	// Check whether there are open entities at the moment.
-	if (fOpenFiles > 0) {
+	if (atomic_get(&fOpenFiles) > 0) {
 		PRINT(("Volume::_PutAllPendingVNodes() failed: open files\n"));
 		return USERLAND_IOCTL_OPEN_FILES;
 	}
-	if (fOpenDirectories > 0) {
+	if (atomic_get(&fOpenDirectories) > 0) {
 		PRINT(("Volume::_PutAllPendingVNodes() failed: open dirs\n"));
 		return USERLAND_IOCTL_OPEN_DIRECTORIES;
 	}
-	if (fOpenAttributeDirectories > 0) {
+	if (atomic_get(&fOpenAttributeDirectories) > 0) {
 		PRINT(("Volume::_PutAllPendingVNodes() failed: open attr dirs\n"));
 		return USERLAND_IOCTL_OPEN_ATTRIBUTE_DIRECTORIES;
 	}
-	if (fOpenAttributes > 0) {
+	if (atomic_get(&fOpenAttributes) > 0) {
 		PRINT(("Volume::_PutAllPendingVNodes() failed: open attributes\n"));
 		return USERLAND_IOCTL_OPEN_ATTRIBUTES;
 	}
-	if (fOpenIndexDirectories > 0) {
+	if (atomic_get(&fOpenIndexDirectories) > 0) {
 		PRINT(("Volume::_PutAllPendingVNodes() failed: open index dirs\n"));
 		return USERLAND_IOCTL_OPEN_INDEX_DIRECTORIES;
 	}
-	if (fOpenQueries > 0) {
+	if (atomic_get(&fOpenQueries) > 0) {
 		PRINT(("Volume::_PutAllPendingVNodes() failed: open queries\n"));
 		return USERLAND_IOCTL_OPEN_QUERIES;
 	}
