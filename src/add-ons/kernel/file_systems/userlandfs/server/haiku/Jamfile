@@ -29,7 +29,6 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	lock.cpp
 	low_resource_manager.cpp
 	misc.cpp
-	scheduler.cpp
 	slab.cpp
 	vm.cpp
 

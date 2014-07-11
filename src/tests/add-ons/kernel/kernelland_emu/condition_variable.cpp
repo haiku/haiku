@@ -162,7 +162,7 @@ ConditionVariable::Publish(const void* object, const char* objectType)
 
 
 void
-ConditionVariable::Unpublish(bool threadsLocked)
+ConditionVariable::Unpublish()
 {
 	ASSERT(fObject != NULL);
 
@@ -194,7 +194,7 @@ ConditionVariable::Wait(uint32 flags, bigtime_t timeout)
 
 
 void
-ConditionVariable::_Notify(bool all, bool threadsLocked, status_t result)
+ConditionVariable::_Notify(bool all, status_t result)
 {
 	MutexLocker locker(sConditionVariablesLock);
 
