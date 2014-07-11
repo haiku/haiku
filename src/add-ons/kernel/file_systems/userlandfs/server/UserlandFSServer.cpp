@@ -11,10 +11,13 @@
 
 #include <Application.h>
 #include <Clipboard.h>
+#include <Entry.h>
 #include <FindDirectory.h>
 #include <fs_interface.h>
 #include <Locker.h>
 #include <Path.h>
+#include <PathFinder.h>
+#include <StringList.h>
 
 #include <image_private.h>
 
@@ -64,16 +67,32 @@ status_t
 UserlandFSServer::Init(const char* fileSystem, port_id port)
 {
 	// get the add-on path
+	BPathFinder pathFinder;
+	BStringList paths;
+	status_t error = pathFinder.FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
+		"userlandfs", B_FIND_PATH_EXISTING_ONLY, paths);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
 	BPath addOnPath;
-	status_t error = find_directory(B_USER_ADDONS_DIRECTORY, &addOnPath);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-	error = addOnPath.Append("userlandfs");
-	if (error != B_OK)
-		RETURN_ERROR(error);
-	error = addOnPath.Append(fileSystem);
-	if (error != B_OK)
-		RETURN_ERROR(error);
+	for (int index = 0; index < paths.CountStrings(); index++) {
+		error = addOnPath.SetTo(paths.StringAt(index));
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		error = addOnPath.Append(fileSystem);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		BEntry entry(addOnPath.Path());
+		if (entry.Exists())
+			break;
+		else
+			addOnPath.Unset();
+	}
+
+	if (addOnPath.InitCheck() != B_OK)
+		RETURN_ERROR(B_BAD_VALUE);
 
 	// load the add-on
 	fAddOnImage = load_add_on(addOnPath.Path());
