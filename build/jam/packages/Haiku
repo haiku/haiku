@@ -38,7 +38,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 
 AddFilesToPackage add-ons kernel busses random : virtio_rng ;
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
-AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci <usb>xhci ;
+AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToPackage add-ons kernel busses virtio : virtio_pci ;
 AddFilesToPackage add-ons kernel console : vga_text ;
 AddFilesToPackage add-ons kernel debugger
@@ -206,7 +206,7 @@ AddBootModuleSymlinksToPackage
 	openpic@ppc
 	packagefs pci
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112
-	usb usb_disk <usb>ehci <usb>ohci <usb>uhci <usb>xhci
+	usb usb_disk <usb>ehci <usb>ohci <usb>uhci
 	virtio virtio_block virtio_pci virtio_scsi
 ;
 

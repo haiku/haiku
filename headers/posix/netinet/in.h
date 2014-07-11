@@ -64,7 +64,6 @@ typedef uint32_t in_addr_t;
 #define IPPROTO_NONE			59	/* 59, IPv6 no next header */
 #define IPPROTO_DSTOPTS			60	/* 60, IPv6 destination option */
 #define IPPROTO_ETHERIP			97	/* 97, Ethernet in IPv4 */
-#define IPPROTO_UDPLITE         136 /* 136, UDPLite */
 #define IPPROTO_RAW				255	/* 255 */
 
 #define IPPROTO_MAX				256

@@ -223,12 +223,10 @@ public:
 
 			status_t			InitCheck() const;
 
-			status_t			ReceiveData(net_buffer* buffer,
-									bool isUDPLite = false);
+			status_t			ReceiveData(net_buffer* buffer);
 			status_t			ReceiveError(status_t error,
 									net_buffer* buffer);
-			status_t			Deframe(net_buffer* buffer,
-									bool isUDPLite = false);
+			status_t			Deframe(net_buffer* buffer);
 
 			UdpDomainSupport*	OpenEndpoint(UdpEndpoint* endpoint);
 			status_t			FreeEndpoint(UdpDomainSupport* domain);
@@ -694,7 +692,7 @@ UdpEndpointManager::DumpEndpoints(int argc, char *argv[])
 
 
 status_t
-UdpEndpointManager::ReceiveData(net_buffer *buffer, bool isUDPLite)
+UdpEndpointManager::ReceiveData(net_buffer *buffer)
 {
 	TRACE_EPM("ReceiveData(%p [%" B_PRIu32 " bytes])", buffer, buffer->size);
 
@@ -705,7 +703,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer, bool isUDPLite)
 		return B_ERROR;
 	}
 
-	status_t status = Deframe(buffer, isUDPLite);
+	status_t status = Deframe(buffer);
 	if (status != B_OK)
 		return status;
 
@@ -761,7 +759,7 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 
 
 status_t
-UdpEndpointManager::Deframe(net_buffer* buffer, bool isUDPLite)
+UdpEndpointManager::Deframe(net_buffer* buffer)
 {
 	TRACE_EPM("Deframe(%p [%ld bytes])", buffer, buffer->size);
 
@@ -788,33 +786,26 @@ UdpEndpointManager::Deframe(net_buffer* buffer, bool isUDPLite)
 	TRACE_EPM("  Deframe(): data from %s to %s", source.AsString(true).Data(),
 		destination.AsString(true).Data());
 
-	bool liteCheck = isUDPLite;
 	uint16 udpLength = ntohs(header.udp_length);
-	if (isUDPLite && udpLength == 0) {
-		udpLength = buffer->size;
-		liteCheck = false;
-	}
 	if (udpLength > buffer->size) {
 		TRACE_EPM("  Deframe(): buffer is too short, expected %hu.",
 			udpLength);
 		return B_MISMATCHED_VALUES;
 	}
 
-	if (!isUDPLite && buffer->size > udpLength)
+	if (buffer->size > udpLength)
 		gBufferModule->trim(buffer, udpLength);
 
 	if (header.udp_checksum != 0) {
 		// check UDP-checksum (simulating a so-called "pseudo-header"):
 		uint16 sum = Checksum::PseudoHeader(addressModule, gBufferModule,
-			buffer, isUDPLite ? IPPROTO_UDPLITE : IPPROTO_UDP);
+			buffer, IPPROTO_UDP);
 		if (sum != 0) {
 			TRACE_EPM("  Deframe(): bad checksum 0x%hx.", sum);
 			return B_BAD_VALUE;
 		}
 	}
 
-	// TODO check for udpLength < configured min length
-	
 	bufferHeader.Remove();
 		// remove UDP-header from buffer before passing it on
 
@@ -1000,7 +991,7 @@ UdpEndpoint::SendRoutedData(net_buffer *buffer, net_route *route)
 	if (buffer->size > (0xffff - sizeof(udp_header)))
 		return EMSGSIZE;
 
-	buffer->protocol = Socket()->protocol;
+	buffer->protocol = IPPROTO_UDP;
 
 	// add and fill UDP-specific header:
 	NetBufferPrepend<udp_header> header(buffer);
@@ -1080,7 +1071,7 @@ UdpEndpoint::DeliverData(net_buffer *_buffer)
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = sUdpEndpointManager->Deframe(buffer, Socket()->protocol);
+	status_t status = sUdpEndpointManager->Deframe(buffer);
 	if (status < B_OK) {
 		gBufferModule->free(buffer);
 		return status;
@@ -1115,21 +1106,6 @@ udp_init_protocol(net_socket *socket)
 		delete endpoint;
 		return NULL;
 	}
-
-	return endpoint;
-}
-
-
-net_protocol *
-udplite_init_protocol(net_socket *socket)
-{	
-	UdpEndpoint *endpoint = new (std::nothrow) UdpEndpoint(socket);
-	if (endpoint == NULL || endpoint->InitCheck() < B_OK) {
-		delete endpoint;
-		return NULL;
-	}
-	
-	socket->protocol = IPPROTO_UDPLITE;
 
 	return endpoint;
 }
@@ -1288,13 +1264,6 @@ status_t
 udp_receive_data(net_buffer *buffer)
 {
 	return sUdpEndpointManager->ReceiveData(buffer);
-}
-
-
-status_t
-udplite_receive_data(net_buffer *buffer)
-{
-	return sUdpEndpointManager->ReceiveData(buffer, true);
 }
 
 
@@ -1495,48 +1464,6 @@ net_protocol_module_info sUDPModule = {
 	NULL,		// send_data_no_buffer()
 	NULL		// read_data_no_buffer()
 };
-
-
-net_protocol_module_info sUDPLiteModule = {
-	{
-		"network/protocols/udplite/v1",
-		0,
-		NULL
-	},
-	NET_PROTOCOL_ATOMIC_MESSAGES,
-
-	udplite_init_protocol,
-	udp_uninit_protocol,
-	udp_open,
-	udp_close,
-	udp_free,
-	udp_connect,
-	udp_accept,
-	udp_control,
-	udp_getsockopt,
-	udp_setsockopt,
-	udp_bind,
-	udp_unbind,
-	udp_listen,
-	udp_shutdown,
-	udp_send_data,
-	udp_send_routed_data,
-	udp_send_avail,
-	udp_read_data,
-	udp_read_avail,
-	udp_get_domain,
-	udp_get_mtu,
-	udplite_receive_data,
-	udp_deliver_data,
-	udp_error_received,
-	udp_error_reply,
-	NULL,		// add_ancillary_data()
-	NULL,		// process_ancillary_data()
-	udp_process_ancillary_data_no_container,
-	NULL,		// send_data_no_buffer()
-	NULL		// read_data_no_buffer()
-};
-
 
 module_dependency module_dependencies[] = {
 	{NET_STACK_MODULE_NAME, (module_info **)&gStackModule},
