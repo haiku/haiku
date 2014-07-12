@@ -4,6 +4,7 @@
  * Copyright (C) 2001 Axel Dörfler
  * Copyright (C) 2004 Marcus Overhagen
  * Copyright (C) 2009 Stephan Amßus <superstippi@gmx.de>
+ * Copyright (C) 2014 Colin Günther <coling@gmx.de>
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -637,10 +638,9 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 {
 	bool firstRun = true;
 	while (true) {
-		const void* data;
-		size_t size;
 		media_header chunkMediaHeader;
-		status_t err = GetNextChunk(&data, &size, &chunkMediaHeader);
+		status_t err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize,
+			&chunkMediaHeader);
 		if (err != B_OK) {
 			TRACE("AVCodecDecoder::_DecodeVideo(): error from "
 				"GetNextChunk(): %s\n", strerror(err));
@@ -648,8 +648,8 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 		}
 #ifdef LOG_STREAM_TO_FILE
 		if (sDumpedPackets < 100) {
-			sStreamLogFile.Write(data, size);
-			printf("wrote %ld bytes\n", size);
+			sStreamLogFile.Write(fChunkBuffer, fChunkBufferSize);
+			printf("wrote %ld bytes\n", fChunkBufferSize);
 			sDumpedPackets++;
 		} else if (sDumpedPackets == 100)
 			sStreamLogFile.Unset();
@@ -687,8 +687,8 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 		// packet buffers are supposed to contain complete frames only so we
 		// don't seem to be required to buffer any packets because not the
 		// complete packet has been read.
-		fTempPacket.data = (uint8_t*)data;
-		fTempPacket.size = size;
+		fTempPacket.data = (uint8_t*)fChunkBuffer;
+		fTempPacket.size = fChunkBufferSize;
 		int gotPicture = 0;
 		int len = avcodec_decode_video2(fContext, fInputPicture, &gotPicture,
 			&fTempPacket);
