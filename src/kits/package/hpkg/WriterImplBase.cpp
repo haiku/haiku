@@ -228,6 +228,7 @@ WriterImplBase::WriterImplBase(const char* fileType, BErrorOutput* errorOutput)
 	fFileName(NULL),
 	fParameters(),
 	fFile(NULL),
+	fOwnsFile(false),
 	fFinished(false)
 {
 }
@@ -241,7 +242,8 @@ WriterImplBase::~WriterImplBase()
 	delete fDecompressionAlgorithm;
 	delete fDecompressionParameters;
 
-	delete fFile;
+	if (fOwnsFile)
+		delete fFile;
 
 	if (!fFinished && fFileName != NULL
 		&& (Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) == 0) {
@@ -251,7 +253,7 @@ WriterImplBase::~WriterImplBase()
 
 
 status_t
-WriterImplBase::Init(const char* fileName,
+WriterImplBase::Init(BPositionIO* file, bool keepFile, const char* fileName,
 	const BPackageWriterParameters& parameters)
 {
 	fParameters = parameters;
@@ -259,21 +261,31 @@ WriterImplBase::Init(const char* fileName,
 	if (fPackageStringCache.Init() != B_OK)
 		throw std::bad_alloc();
 
-	// open file (don't truncate in update mode)
-	int openMode = O_RDWR;
-	if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) == 0)
-		openMode |= O_CREAT | O_TRUNC;
+	if (file == NULL) {
+		if (fileName == NULL)
+			return B_BAD_VALUE;
 
-	BFile* file = new BFile;
-	status_t error = file->SetTo(fileName, openMode);
-	if (error != B_OK) {
-		fErrorOutput->PrintError("Failed to open %s file \"%s\": %s\n",
-			fFileType, fileName, strerror(errno));
-		delete file;
-		return error;
+		// open file (don't truncate in update mode)
+		int openMode = O_RDWR;
+		if ((parameters.Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) == 0)
+			openMode |= O_CREAT | O_TRUNC;
+
+		BFile* newFile = new BFile;
+		status_t error = newFile->SetTo(fileName, openMode);
+		if (error != B_OK) {
+			fErrorOutput->PrintError("Failed to open %s file \"%s\": %s\n",
+				fFileType, fileName, strerror(errno));
+			delete newFile;
+			return error;
+		}
+
+		fFile = newFile;
+		fOwnsFile = true;
+	} else {
+		fFile = file;
+		fOwnsFile = keepFile;
 	}
 
-	fFile = file;
 	fFileName = fileName;
 
 	return B_OK;

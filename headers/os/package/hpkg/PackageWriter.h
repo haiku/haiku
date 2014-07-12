@@ -11,6 +11,9 @@
 #include <package/hpkg/ErrorOutput.h>
 
 
+class BPositionIO;
+
+
 namespace BPackageKit {
 
 namespace BHPKG {
@@ -72,6 +75,9 @@ public:
 								~BPackageWriter();
 
 			status_t			Init(const char* fileName,
+									const BPackageWriterParameters* parameters
+										= NULL);
+			status_t			Init(BPositionIO* file, bool keepFile,
 									const BPackageWriterParameters* parameters
 										= NULL);
 			status_t			SetInstallPath(const char* installPath);

@@ -464,7 +464,22 @@ PackageWriterImpl::Init(const char* fileName,
 	const BPackageWriterParameters& parameters)
 {
 	try {
-		return _Init(fileName, parameters);
+		return _Init(NULL, false, fileName, parameters);
+	} catch (status_t error) {
+		return error;
+	} catch (std::bad_alloc) {
+		fListener->PrintError("Out of memory!\n");
+		return B_NO_MEMORY;
+	}
+}
+
+
+status_t
+PackageWriterImpl::Init(BPositionIO* file, bool keepFile,
+	const BPackageWriterParameters& parameters)
+{
+	try {
+		return _Init(file, keepFile, NULL, parameters);
 	} catch (status_t error) {
 		return error;
 	} catch (std::bad_alloc) {
@@ -624,10 +639,10 @@ PackageWriterImpl::Recompress(PackageReaderImpl* reader)
 
 
 status_t
-PackageWriterImpl::_Init(const char* fileName,
+PackageWriterImpl::_Init(BPositionIO* file, bool keepFile, const char* fileName,
 	const BPackageWriterParameters& parameters)
 {
-	status_t result = inherited::Init(fileName, parameters);
+	status_t result = inherited::Init(file, keepFile, fileName, parameters);
 	if (result != B_OK)
 		return result;
 

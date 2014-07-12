@@ -264,7 +264,8 @@ RepositoryWriterImpl::Finish()
 status_t
 RepositoryWriterImpl::_Init(const char* fileName)
 {
-	status_t error = inherited::Init(fileName, BPackageWriterParameters());
+	status_t error = inherited::Init(NULL, false, fileName,
+		BPackageWriterParameters());
 	if (error != B_OK)
 		return error;
 

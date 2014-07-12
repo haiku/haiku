@@ -108,6 +108,20 @@ BPackageWriter::Init(const char* fileName,
 
 
 status_t
+BPackageWriter::Init(BPositionIO* file, bool keepFile,
+	const BPackageWriterParameters* parameters)
+{
+	if (fImpl == NULL)
+		return B_NO_MEMORY;
+
+	BPackageWriterParameters defaultParameters;
+
+	return fImpl->Init(file, keepFile,
+		parameters != NULL ? *parameters : defaultParameters);
+}
+
+
+status_t
 BPackageWriter::SetInstallPath(const char* installPath)
 {
 	if (fImpl == NULL)

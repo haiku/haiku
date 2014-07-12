@@ -101,7 +101,8 @@ protected:
 			typedef DoublyLinkedList<PackageAttribute> PackageAttributeList;
 
 protected:
-			status_t			Init(const char* fileName,
+			status_t			Init(BPositionIO* file, bool keepFile,
+									const char* fileName,
 									const BPackageWriterParameters& parameters);
 			status_t			InitHeapReader(size_t headerSize);
 
@@ -191,6 +192,7 @@ private:
 			const char*			fFileName;
 			BPackageWriterParameters fParameters;
 			BPositionIO*		fFile;
+			bool				fOwnsFile;
 			bool				fFinished;
 
 			StringCache			fPackageStringCache;
