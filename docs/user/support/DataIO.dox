@@ -270,6 +270,62 @@
 
 
 /*!
+	\fn virtual status_t BPositionIO::ReadAtExactly(off_t position, void* buffer, size_t size, size_t* _bytesRead)
+	\brief Reads an exact amount of data from the object at the specified
+		position into a buffer.
+
+	This is a convenience wrapper method for ReadAt() for code that expects the
+	exact number of bytes requested to be read. This method calls ReadAt() in a
+	loop to read the data. It fails when ReadAt() returns an error or fails to
+	read any more data (i.e. returns 0).
+
+	\param position The object position at which to read the data.
+	\param buffer Pointer to pre-allocated storage of at least \a size bytes
+	       into which the data shall be read. Won't be dereferenced, when
+	       \a size is 0.
+	\param size The number of bytes to be read.
+	\param _bytesRead Optional pointer to a pre-allocated size_t into which the
+	       number of bytes actually read will be written. When the method
+	       returns \c B_OK this will always be \a size. Can be \c NULL.
+
+	\return An error code indicating whether or not the method succeeded.
+	\retval B_OK All data have been read.
+	\retval B_PARTIAL_READ ReadAt() didn't fail, but couldn't provide as many
+	        bytes as requested.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BPositionIO::WriteAtExactly(off_t position, const void* buffer, size_t size,
+		size_t* _bytesWritten)
+	\brief Writes an exact amount of data from a buffer to the object at the
+		specified position.
+
+	This is a convenience wrapper method for WriteAt() for code that expects the
+	exact number of bytes given to be written. This method calls WriteAt() in a
+	loop to write the data. It fails when WriteAt() returns an error or fails to
+	write any more data (i.e. returns 0).
+
+	\param position The object position at which to write the data.
+	\param buffer Pointer to a buffer of at least \a size bytes containing the
+	       data to be written. Won't be dereferenced, when \a size is 0.
+	\param size The number of bytes to be written.
+	\param _bytesWritten Optional pointer to a pre-allocated size_t into which
+	       the number of bytes actually written will be written. When the
+	       method returns \c B_OK this will always be \a size. Can be \c NULL.
+
+	\return An error code indicated whether the method succeeded.
+	\retval B_OK All data have been written.
+	\retval B_PARTIAL_READ WriteAt() didn't fail, but couldn't write as many
+	        bytes as provided.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn virtual off_t BPositionIO::Seek(off_t position, uint32 seekMode) = 0
 	\brief Pure virtual to move the cursor to a certain position.
 

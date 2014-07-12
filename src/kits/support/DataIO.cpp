@@ -200,6 +200,70 @@ BPositionIO::Write(const void* buffer, size_t size)
 
 
 status_t
+BPositionIO::ReadAtExactly(off_t position, void* buffer, size_t size,
+	size_t* _bytesRead)
+{
+	uint8* out = (uint8*)buffer;
+	size_t bytesRemaining = size;
+	status_t error = B_OK;
+
+	while (bytesRemaining > 0) {
+		ssize_t bytesRead = ReadAt(position, out, bytesRemaining);
+		if (bytesRead < 0) {
+			error = bytesRead;
+			break;
+		}
+
+		if (bytesRead == 0) {
+			error = B_PARTIAL_READ;
+			break;
+		}
+
+		out += bytesRead;
+		bytesRemaining -= bytesRead;
+		position += bytesRead;
+	}
+
+	if (_bytesRead != NULL)
+		*_bytesRead = size - bytesRemaining;
+
+	return error;
+}
+
+
+status_t
+BPositionIO::WriteAtExactly(off_t position, const void* buffer, size_t size,
+	size_t* _bytesWritten)
+{
+	const uint8* in = (const uint8*)buffer;
+	size_t bytesRemaining = size;
+	status_t error = B_OK;
+
+	while (bytesRemaining > 0) {
+		ssize_t bytesWritten = WriteAt(position, in, bytesRemaining);
+		if (bytesWritten < 0) {
+			error = bytesWritten;
+			break;
+		}
+
+		if (bytesWritten == 0) {
+			error = B_PARTIAL_WRITE;
+			break;
+		}
+
+		in += bytesWritten;
+		bytesRemaining -= bytesWritten;
+		position += bytesWritten;
+	}
+
+	if (_bytesWritten != NULL)
+		*_bytesWritten = size - bytesRemaining;
+
+	return error;
+}
+
+
+status_t
 BPositionIO::SetSize(off_t size)
 {
 	return B_ERROR;

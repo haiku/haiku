@@ -60,6 +60,12 @@ public:
 	virtual	ssize_t				WriteAt(off_t position, const void* buffer,
 									size_t size) = 0;
 
+			status_t			ReadAtExactly(off_t position, void* buffer,
+									size_t size, size_t* _bytesRead = NULL);
+			status_t			WriteAtExactly(off_t position,
+									const void* buffer, size_t size,
+									size_t* _bytesWritten = NULL);
+
 	virtual	off_t				Seek(off_t position, uint32 seekMode) = 0;
 	virtual	off_t				Position() const = 0;
 
