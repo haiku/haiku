@@ -1356,8 +1356,10 @@ TeamWindow::_UpdateSourcePathState()
 	if (!truncatedText.IsEmpty() && truncatedText != sourceText) {
 		fSourcePathView->SetToolTip(sourceText);
 		fSourcePathView->SetText(truncatedText);
-	} else
+	} else {
 		fSourcePathView->SetText(sourceText);
+		fSourcePathView->SetToolTip(NULL);
+	}
 }
 
 
