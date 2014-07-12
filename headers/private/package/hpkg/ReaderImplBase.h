@@ -439,9 +439,16 @@ ReaderImplBase::Init(BPositionIO* file, bool keepFile, Header& header, uint32 fl
 	off_t fileSize;
 	error = fFile->GetSize(&fileSize);
 	if (error != B_OK) {
-		ErrorOutput()->PrintError("Error: Failed to get size of %s file: %s\n",
-			fFileType, strerror(error));
-		return errno;
+		if (error != B_NOT_SUPPORTED) {
+			ErrorOutput()->PrintError(
+				"Error: Failed to get size of %s file: %s\n",
+				fFileType, strerror(error));
+			return error;
+		}
+
+		// Might be a stream. We only use the file size for checking the total
+		// heap size, which we don't have to do.
+		fileSize = -1;
 	}
 
 	// read the header
@@ -480,7 +487,7 @@ ReaderImplBase::Init(BPositionIO* file, bool keepFile, Header& header, uint32 fl
 
 	// total size
 	uint64 totalSize = B_BENDIAN_TO_HOST_INT64(header.total_size);
-	if (totalSize != (uint64)fileSize) {
+	if (fileSize >= 0 && totalSize != (uint64)fileSize) {
 		ErrorOutput()->PrintError("Error: Invalid %s file: Total size in "
 			"header (%" B_PRIu64 ") doesn't agree with total file size (%"
 			B_PRIdOFF ")\n", fFileType, totalSize, fileSize);
