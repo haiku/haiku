@@ -27,6 +27,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Entry.cpp
 			EntryList.cpp
 			EntryOperationEngineBase.cpp
+			FdIO.cpp
 			File.cpp
 			FileDescriptorIO.cpp
 			FileIO.cpp

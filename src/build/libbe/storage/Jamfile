@@ -14,6 +14,7 @@ BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	DriverSettings.cpp
 	Entry.cpp
 	EntryList.cpp
+	FdIO.cpp
 	File.cpp
 	FileIO.cpp
 	FindDirectory.cpp
