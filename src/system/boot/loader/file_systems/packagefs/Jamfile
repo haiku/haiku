@@ -49,6 +49,6 @@ BootStaticLibrary boot_packagefs :
 	: -fno-pic
 ;
 
-Includes [ FGristFiles CompressionAlgorithm.cpp ZlibCompressionAlgorithm.cpp ]
+Includes [ FGristFiles ZlibCompressionAlgorithm.cpp ]
 	: [ BuildFeatureAttribute zlib : headers ] ;
 
