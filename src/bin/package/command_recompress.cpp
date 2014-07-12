@@ -16,6 +16,9 @@
 #include <package/hpkg/PackageReader.h>
 #include <package/hpkg/PackageWriter.h>
 
+#include <FdIO.h>
+#include <DataPositionIOWrapper.h>
+
 #include "package.h"
 #include "PackageWriterListener.h"
 
@@ -24,6 +27,14 @@ using BPackageKit::BHPKG::BPackageReader;
 using BPackageKit::BHPKG::BPackageWriter;
 using BPackageKit::BHPKG::BPackageWriterListener;
 using BPackageKit::BHPKG::BPackageWriterParameters;
+
+
+static BPositionIO*
+create_stdio(bool isInput)
+{
+	BFdIO* dataIO = new BFdIO(isInput ? 0 : 1, false);
+	return new BDataPositionIOWrapper(dataIO);
+}
 
 
 int
@@ -79,32 +90,23 @@ command_recompress(int argc, const char* const* argv)
 		}
 	}
 
-	// The remaining arguments are the input package file and optionally the
-	// output package file, i.e. one or two more arguments.
-	if (argc - optind < 1 || argc - optind > 2)
+	// The remaining arguments are the input package file and the output
+	// package file, i.e. two more arguments.
+	if (argc - optind != 2)
 		print_usage_and_exit(true);
 
 	const char* inputPackageFileName = argv[optind++];
-	const char* outputPackageFileName = optind < argc ? argv[optind++] : NULL;
-
-	// If compression is used, an output file is required.
-	if (compressionLevel != 0 && outputPackageFileName == NULL) {
-		fprintf(stderr, "Error: Writing to stdout is supported only with "
-			"compression level 0.\n");
-		return 1;
-	}
-
-	// TODO: Implement streaming support!
-	if (outputPackageFileName == NULL) {
-		fprintf(stderr, "Error: Writing to stdout is not supported yet.\n");
-		return 1;
-	}
+	const char* outputPackageFileName = argv[optind++];
 
 	// open the input package
 	PackageWriterListener listener(verbose, quiet);
 
 	BPackageReader packageReader(&listener);
-	status_t error = packageReader.Init(inputPackageFileName);
+	status_t error;
+	if (strcmp(inputPackageFileName, "-") == 0)
+		error = packageReader.Init(create_stdio(true), true);
+	else
+		error = packageReader.Init(inputPackageFileName);
 	if (error != B_OK)
 		return 1;
 
@@ -117,7 +119,17 @@ command_recompress(int argc, const char* const* argv)
 	}
 
 	BPackageWriter packageWriter(&listener);
-	error = packageWriter.Init(outputPackageFileName, &writerParameters);
+	if (strcmp(outputPackageFileName, "-") == 0) {
+		if (compressionLevel != 0) {
+			fprintf(stderr, "Error: Writing to stdout is supported only with "
+				"compression level 0.\n");
+			return 1;
+		}
+
+		error = packageWriter.Init(create_stdio(false), true,
+			&writerParameters);
+	} else
+		error = packageWriter.Init(outputPackageFileName, &writerParameters);
 	if (error != B_OK)
 		return 1;
 

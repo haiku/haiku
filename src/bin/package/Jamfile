@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin package ;
 
-UsePrivateHeaders kernel shared ;
+UsePrivateHeaders kernel shared storage support ;
 
 BinCommand package :
 	command_add.cpp

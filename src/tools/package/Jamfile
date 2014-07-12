@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src tools package ;
 
-UsePrivateBuildHeaders shared kernel ;
+UsePrivateBuildHeaders shared kernel storage support ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
 
