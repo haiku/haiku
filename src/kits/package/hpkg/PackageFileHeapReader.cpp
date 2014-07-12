@@ -61,6 +61,23 @@ PackageFileHeapReader::Init()
 	if (chunkCount == 0)
 		return B_OK;
 
+	// If no compression is used at all, the chunk size table is omitted. Handle
+	// this case.
+	if (fDecompressionAlgorithm == NULL) {
+		if (fUncompressedHeapSize != fCompressedHeapSize) {
+			fErrorOutput->PrintError(
+				"Compressed and uncompressed heap sizes (%" B_PRIu64 " vs. "
+				"%" B_PRIu64 ") don't match for uncompressed heap.\n",
+				fCompressedHeapSize, fUncompressedHeapSize);
+			return B_BAD_DATA;
+		}
+
+		if (!fOffsets.InitUncompressedChunksOffsets(chunkCount))
+			return B_NO_MEMORY;
+
+		return B_OK;
+	}
+
 	size_t chunkSizeTableSize = (chunkCount - 1) * 2; 
 	if (fCompressedHeapSize <= chunkSizeTableSize) {
 		fErrorOutput->PrintError(

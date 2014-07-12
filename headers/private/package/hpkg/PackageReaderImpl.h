@@ -22,6 +22,7 @@ class BPackageEntryAttribute;
 namespace BPrivate {
 
 
+struct hpkg_header;
 class PackageWriterImpl;
 
 
@@ -34,7 +35,7 @@ public:
 			status_t			Init(const char* fileName, uint32 flags);
 			status_t			Init(int fd, bool keepFD, uint32 flags);
 			status_t			Init(BPositionIO* file, bool keepFile,
-									uint32 flags);
+									uint32 flags, hpkg_header* _header = NULL);
 			status_t			ParseContent(
 									BPackageContentHandler* contentHandler);
 			status_t			ParseContent(BLowLevelPackageContentHandler*

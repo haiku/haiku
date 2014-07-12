@@ -443,6 +443,10 @@ PackageFileHeapWriter::Finish()
 
 	// write chunk sizes table 
 
+	// We don't need to do that, if we don't use any compression.
+	if (fCompressionAlgorithm == NULL)
+		return B_OK;
+
 	// We don't need to write the last chunk size, since it is implied by the
 	// total size minus the sum of all other chunk sizes.
 	ssize_t offsetCount = fOffsets.Count();

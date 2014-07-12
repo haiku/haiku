@@ -264,8 +264,11 @@ RepositoryWriterImpl::Finish()
 status_t
 RepositoryWriterImpl::_Init(const char* fileName)
 {
-	return inherited::Init(fileName, sizeof(hpkg_repo_header),
-		BPackageWriterParameters());
+	status_t error = inherited::Init(fileName, BPackageWriterParameters());
+	if (error != B_OK)
+		return error;
+
+	return InitHeapReader(sizeof(hpkg_repo_header));
 }
 
 
@@ -291,7 +294,8 @@ RepositoryWriterImpl::_Finish()
 	uint64 compressedHeapSize = fHeapWriter->CompressedHeapSize();
 	uint64 totalSize = fHeapWriter->HeapOffset() + compressedHeapSize;
 
-	header.heap_compression = B_HOST_TO_BENDIAN_INT16(B_HPKG_COMPRESSION_ZLIB);
+	header.heap_compression = B_HOST_TO_BENDIAN_INT16(
+		Parameters().Compression());
 	header.heap_chunk_size = B_HOST_TO_BENDIAN_INT32(fHeapWriter->ChunkSize());
 	header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(compressedHeapSize);
 	header.heap_size_uncompressed = B_HOST_TO_BENDIAN_INT64(

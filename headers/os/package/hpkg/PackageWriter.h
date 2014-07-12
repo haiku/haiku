@@ -52,11 +52,15 @@ public:
 			uint32				Flags() const;
 			void				SetFlags(uint32 flags);
 
+			uint32				Compression() const;
+			void				SetCompression(uint32 compression);
+
 			int32				CompressionLevel() const;
 			void				SetCompressionLevel(int32 compressionLevel);
 
 private:
 			uint32				fFlags;
+			uint32				fCompression;
 			int32				fCompressionLevel;
 };
 

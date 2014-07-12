@@ -92,10 +92,6 @@ public:
 			void				SetFile(BPositionIO* file)
 									{ fFile = file; }
 
-			uint64				HeapOverhead(uint64 uncompressedSize) const;
-									// additional bytes needed when storing
-									// the given amount of data
-
 	// BAbstractBufferedDataReader
 	virtual	status_t			ReadDataToOutput(off_t offset,
 									size_t size, BDataIO* output);
@@ -152,6 +148,8 @@ public:
 								OffsetArray();
 								~OffsetArray();
 
+			bool				InitUncompressedChunksOffsets(
+									size_t totalChunkCount);
 			bool				InitChunksOffsets(size_t totalChunkCount,
 									size_t baseIndex, const uint16* chunkSizes,
 									size_t chunkCount);
@@ -161,6 +159,10 @@ public:
 									// "copy" init
 
 			uint64				operator[](size_t index) const;
+
+private:
+	static	uint32*				_AllocateOffsetArray(size_t totalChunkCount,
+									size_t offset32BitChunkCount);
 
 private:
 			uint32*				fOffsets;

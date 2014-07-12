@@ -44,6 +44,45 @@ PackageFileHeapAccessorBase::OffsetArray::~OffsetArray()
 
 
 bool
+PackageFileHeapAccessorBase::OffsetArray::InitUncompressedChunksOffsets(
+	size_t totalChunkCount)
+{
+	if (totalChunkCount <= 1)
+		return true;
+
+	const size_t max32BitChunks = (uint64(1) << 32) / kChunkSize;
+	size_t actual32BitChunks = totalChunkCount;
+	if (totalChunkCount - 1 > max32BitChunks) {
+		actual32BitChunks = max32BitChunks;
+		fOffsets = _AllocateOffsetArray(totalChunkCount, max32BitChunks);
+	} else
+		fOffsets = _AllocateOffsetArray(totalChunkCount, 0);
+
+	if (fOffsets == NULL)
+		return false;
+
+	{
+		uint32 offset = kChunkSize;
+		for (size_t i = 1; i < actual32BitChunks; i++, offset += kChunkSize)
+			fOffsets[i] = offset;
+
+	}
+
+	if (actual32BitChunks < totalChunkCount) {
+		uint64 offset = actual32BitChunks * kChunkSize;
+		uint32* offsets = fOffsets + actual32BitChunks;
+		for (size_t i = actual32BitChunks; i < totalChunkCount;
+				i++, offset += kChunkSize) {
+			*offsets++ = (uint32)offset;
+			*offsets++ = uint32(offset >> 32);
+		}
+	}
+
+	return true;
+}
+
+
+bool
 PackageFileHeapAccessorBase::OffsetArray::InitChunksOffsets(
 	size_t totalChunkCount, size_t baseIndex, const uint16* chunkSizes,
 	size_t chunkCount)
@@ -52,12 +91,9 @@ PackageFileHeapAccessorBase::OffsetArray::InitChunksOffsets(
 		return true;
 
 	if (fOffsets == NULL) {
-		fOffsets = new(std::nothrow) uint32[totalChunkCount];
+		fOffsets = _AllocateOffsetArray(totalChunkCount, totalChunkCount);
 		if (fOffsets == NULL)
 			return false;
-		fOffsets[0] = 0;
-			// Value that serves as a marker that all offsets are 32 bit. We'll
-			// replace it, when necessary.
 	}
 
 	uint64 offset = (*this)[baseIndex];
@@ -74,14 +110,13 @@ PackageFileHeapAccessorBase::OffsetArray::InitChunksOffsets(
 		} else {
 			if (fOffsets[0] == 0) {
 				// Not scaled to allow for 64 bit offsets yet. Do that.
-				fOffsets[0] = index;
-				uint32* newOffsets = new(std::nothrow) uint32[
-					2 * totalChunkCount - fOffsets[0]];
+				uint32* newOffsets = _AllocateOffsetArray(totalChunkCount,
+					index);
 				if (newOffsets == NULL)
 					return false;
 
-				memcpy(newOffsets, fOffsets,
-					sizeof(newOffsets[0]) * fOffsets[0]);
+				fOffsets[0] = index;
+				memcpy(newOffsets, fOffsets, sizeof(newOffsets[0]) * index);
 
 				delete[] fOffsets;
 				fOffsets = newOffsets;
@@ -117,6 +152,24 @@ PackageFileHeapAccessorBase::OffsetArray::Init(size_t totalChunkCount,
 }
 
 
+/*static*/ uint32*
+PackageFileHeapAccessorBase::OffsetArray::_AllocateOffsetArray(
+	size_t totalChunkCount, size_t offset32BitChunkCount)
+{
+	uint32* offsets = new(std::nothrow) uint32[
+		2 * totalChunkCount - offset32BitChunkCount];
+
+	if (offsets != NULL) {
+		offsets[0] = offset32BitChunkCount == totalChunkCount
+			? 0 : offset32BitChunkCount;
+			// 0 means that all offsets are 32 bit. Otherwise it's the index of
+			// the first 64 bit offset.
+	}
+
+	return offsets;
+}
+
+
 // #pragma mark - PackageFileHeapAccessorBase
 
 
@@ -140,16 +193,6 @@ PackageFileHeapAccessorBase::~PackageFileHeapAccessorBase()
 {
 	if (fDecompressionAlgorithm != NULL)
 		fDecompressionAlgorithm->ReleaseReference();
-}
-
-
-uint64
-PackageFileHeapAccessorBase::HeapOverhead(uint64 uncompressedSize) const
-{
-	// Determine number of chunks and the size of the chunk size table. Note
-	// that the size of the last chunk is not saved, since its size is implied.
-	size_t chunkCount = (uncompressedSize + kChunkSize - 1) / kChunkSize;
-	return chunkCount > 1 ? (chunkCount - 1) * 2 : 0;
 }
 
 

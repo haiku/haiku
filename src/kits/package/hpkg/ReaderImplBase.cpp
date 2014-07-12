@@ -807,22 +807,26 @@ status_t
 ReaderImplBase::InitHeapReader(uint32 compression, uint32 chunkSize,
 	off_t offset, uint64 compressedSize, uint64 uncompressedSize)
 {
-	if (compression != B_HPKG_COMPRESSION_ZLIB) {
-		fErrorOutput->PrintError("Error: Invalid heap compression\n");
-		return B_BAD_DATA;
-	}
+	DecompressionAlgorithmOwner* decompressionAlgorithm = NULL;
+	BReference<DecompressionAlgorithmOwner> decompressionAlgorithmReference;
 
-	DecompressionAlgorithmOwner* decompressionAlgorithm
-		= DecompressionAlgorithmOwner::Create(
-			new(std::nothrow) BZlibCompressionAlgorithm,
-			new(std::nothrow) BZlibDecompressionParameters);
-	BReference<DecompressionAlgorithmOwner> decompressionAlgorithmReference(
-		decompressionAlgorithm, true);
-
-	if (decompressionAlgorithm == NULL
-		|| decompressionAlgorithm->algorithm == NULL
-		|| decompressionAlgorithm->parameters == NULL) {
-		return B_NO_MEMORY;
+	switch (compression) {
+		case B_HPKG_COMPRESSION_NONE:
+			break;
+		case B_HPKG_COMPRESSION_ZLIB:
+			decompressionAlgorithm = DecompressionAlgorithmOwner::Create(
+				new(std::nothrow) BZlibCompressionAlgorithm,
+				new(std::nothrow) BZlibDecompressionParameters);
+			decompressionAlgorithmReference.SetTo(decompressionAlgorithm, true);
+			if (decompressionAlgorithm == NULL
+				|| decompressionAlgorithm->algorithm == NULL
+				|| decompressionAlgorithm->parameters == NULL) {
+				return B_NO_MEMORY;
+			}
+			break;
+		default:
+			fErrorOutput->PrintError("Error: Invalid heap compression\n");
+			return B_BAD_DATA;
 	}
 
 	fRawHeapReader = new(std::nothrow) PackageFileHeapReader(fErrorOutput,

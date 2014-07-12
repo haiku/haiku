@@ -24,6 +24,7 @@ namespace BHPKG {
 BPackageWriterParameters::BPackageWriterParameters()
 	:
 	fFlags(0),
+	fCompression(B_HPKG_COMPRESSION_ZLIB),
 	fCompressionLevel(B_HPKG_COMPRESSION_LEVEL_BEST)
 {
 }
@@ -45,6 +46,20 @@ void
 BPackageWriterParameters::SetFlags(uint32 flags)
 {
 	fFlags = flags;
+}
+
+
+uint32
+BPackageWriterParameters::Compression() const
+{
+	return fCompression;
+}
+
+
+void
+BPackageWriterParameters::SetCompression(uint32 compression)
+{
+	fCompression = compression;
 }
 
 

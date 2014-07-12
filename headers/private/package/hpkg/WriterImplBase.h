@@ -101,8 +101,11 @@ protected:
 			typedef DoublyLinkedList<PackageAttribute> PackageAttributeList;
 
 protected:
-			status_t			Init(const char* fileName, size_t headerSize,
+			status_t			Init(const char* fileName,
 									const BPackageWriterParameters& parameters);
+			status_t			InitHeapReader(size_t headerSize);
+
+			void				SetCompression(uint32 compression);
 
 			void				RegisterPackageInfo(
 									PackageAttributeList& attributeList,

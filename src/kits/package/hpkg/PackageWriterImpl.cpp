@@ -627,8 +627,7 @@ status_t
 PackageWriterImpl::_Init(const char* fileName,
 	const BPackageWriterParameters& parameters)
 {
-	status_t result = inherited::Init(fileName, sizeof(hpkg_header),
-		parameters);
+	status_t result = inherited::Init(fileName, parameters);
 	if (result != B_OK)
 		return result;
 
@@ -648,7 +647,8 @@ PackageWriterImpl::_Init(const char* fileName,
 	// in update mode, parse the TOC
 	if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
 		PackageReaderImpl packageReader(fListener);
-		result = packageReader.Init(File(), false, 0);
+		hpkg_header header;
+		result = packageReader.Init(File(), false, 0, &header);
 		if (result != B_OK)
 			return result;
 
@@ -657,6 +657,14 @@ PackageWriterImpl::_Init(const char* fileName,
 		PackageContentHandler handler(fRootAttribute, fListener, fStringCache);
 
 		result = packageReader.ParseContent(&handler);
+		if (result != B_OK)
+			return result;
+
+		// While the compression level can change, we have to reuse the
+		// compression algorithm at least.
+		SetCompression(B_BENDIAN_TO_HOST_INT16(header.heap_compression));
+
+		result = InitHeapReader(fHeapOffset);
 		if (result != B_OK)
 			return result;
 
@@ -673,6 +681,10 @@ PackageWriterImpl::_Init(const char* fileName,
 				tocSection.uncompressedLength)) {
 			throw std::bad_alloc();
 		}
+	} else {
+		result = InitHeapReader(fHeapOffset);
+		if (result != B_OK)
+			return result;
 	}
 
 	return B_OK;
@@ -706,7 +718,8 @@ PackageWriterImpl::_Finish()
 
 	uint64 compressedHeapSize = fHeapWriter->CompressedHeapSize();
 
-	header.heap_compression = B_HOST_TO_BENDIAN_INT16(B_HPKG_COMPRESSION_ZLIB);
+	header.heap_compression = B_HOST_TO_BENDIAN_INT16(
+		Parameters().Compression());
 	header.heap_chunk_size = B_HOST_TO_BENDIAN_INT32(fHeapWriter->ChunkSize());
 	header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(compressedHeapSize);
 	header.heap_size_uncompressed = B_HOST_TO_BENDIAN_INT64(
@@ -763,20 +776,24 @@ PackageWriterImpl::_Recompress(PackageReaderImpl* reader)
 	// for streaming an uncompressed package.
 	uint64 uncompressedHeapSize
 		= reader->RawHeapReader()->UncompressedHeapSize();
-	uint64 compressedHeapSize = uncompressedHeapSize
-		+ fHeapWriter->HeapOverhead(uncompressedHeapSize);
+	uint64 compressedHeapSize = uncompressedHeapSize;
 
 	off_t totalSize = fHeapWriter->HeapOffset() + (off_t)compressedHeapSize;
 
-	header.heap_compression = B_HOST_TO_BENDIAN_INT16(B_HPKG_COMPRESSION_ZLIB);
+	header.heap_compression = B_HOST_TO_BENDIAN_INT16(
+		Parameters().Compression());
 	header.heap_chunk_size = B_HOST_TO_BENDIAN_INT32(fHeapWriter->ChunkSize());
-	header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(compressedHeapSize);
 	header.heap_size_uncompressed
 		= B_HOST_TO_BENDIAN_INT64(uncompressedHeapSize);
-	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
 
-	if (Parameters().CompressionLevel() == 0)
+	if (Parameters().Compression() == B_HPKG_COMPRESSION_NONE) {
+		header.heap_size_compressed
+			= B_HOST_TO_BENDIAN_INT64(compressedHeapSize);
+		header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
+
+		// write the header
 		RawWriteBuffer(&header, sizeof(hpkg_header), 0);
+	}
 
 	// copy the heap data
 	uint64 bytesCompressed;
@@ -791,7 +808,7 @@ PackageWriterImpl::_Recompress(PackageReaderImpl* reader)
 		return error;
 
 	// If compression is enabled, update and write the header.
-	if (Parameters().CompressionLevel() != 0) {
+	if (Parameters().Compression() != B_HPKG_COMPRESSION_NONE) {
 		compressedHeapSize = fHeapWriter->CompressedHeapSize();
 		totalSize = fHeapWriter->HeapOffset() + (off_t)compressedHeapSize;
 		header.heap_size_compressed = B_HOST_TO_BENDIAN_INT64(compressedHeapSize);

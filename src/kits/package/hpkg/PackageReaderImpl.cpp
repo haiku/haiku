@@ -346,7 +346,8 @@ PackageReaderImpl::Init(int fd, bool keepFD, uint32 flags)
 
 
 status_t
-PackageReaderImpl::Init(BPositionIO* file, bool keepFile, uint32 flags)
+PackageReaderImpl::Init(BPositionIO* file, bool keepFile, uint32 flags,
+	hpkg_header* _header)
 {
 	hpkg_header header;
 	status_t error = inherited::Init<hpkg_header, B_HPKG_MAGIC, B_HPKG_VERSION,
@@ -380,6 +381,9 @@ PackageReaderImpl::Init(BPositionIO* file, bool keepFile, uint32 flags)
 	error = PrepareSection(fPackageAttributesSection);
 	if (error != B_OK)
 		return error;
+
+	if (_header != NULL)
+		*_header = header;
 
 	return B_OK;
 }
