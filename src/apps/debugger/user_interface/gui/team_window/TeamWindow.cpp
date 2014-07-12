@@ -1358,7 +1358,7 @@ TeamWindow::_UpdateSourcePathState()
 		fSourcePathView->SetText(truncatedText);
 	} else {
 		fSourcePathView->SetText(sourceText);
-		fSourcePathView->SetToolTip(NULL);
+		fSourcePathView->SetToolTip((const char*)NULL);
 	}
 }
 
