@@ -114,6 +114,10 @@ command_add(int argc, const char* const* argv)
 	writerParameters.SetFlags(
 		B_HPKG_WRITER_UPDATE_PACKAGE | (force ? B_HPKG_WRITER_FORCE_ADD : 0));
 	writerParameters.SetCompressionLevel(compressionLevel);
+	if (compressionLevel == 0) {
+		writerParameters.SetCompression(
+			BPackageKit::BHPKG::B_HPKG_COMPRESSION_NONE);
+	}
 
 	PackageWriterListener listener(verbose, quiet);
 	BPackageWriter packageWriter(&listener);

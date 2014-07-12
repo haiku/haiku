@@ -118,6 +118,10 @@ command_create(int argc, const char* const* argv)
 	// create package
 	BPackageWriterParameters writerParameters;
 	writerParameters.SetCompressionLevel(compressionLevel);
+	if (compressionLevel == 0) {
+		writerParameters.SetCompression(
+			BPackageKit::BHPKG::B_HPKG_COMPRESSION_NONE);
+	}
 
 	PackageWriterListener listener(verbose, quiet);
 	BPackageWriter packageWriter(&listener);

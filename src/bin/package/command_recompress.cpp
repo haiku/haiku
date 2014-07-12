@@ -111,6 +111,10 @@ command_recompress(int argc, const char* const* argv)
 	// write the output package
 	BPackageWriterParameters writerParameters;
 	writerParameters.SetCompressionLevel(compressionLevel);
+	if (compressionLevel == 0) {
+		writerParameters.SetCompression(
+			BPackageKit::BHPKG::B_HPKG_COMPRESSION_NONE);
+	}
 
 	BPackageWriter packageWriter(&listener);
 	error = packageWriter.Init(outputPackageFileName, &writerParameters);
