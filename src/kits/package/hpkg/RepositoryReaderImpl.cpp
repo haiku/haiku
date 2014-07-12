@@ -18,6 +18,8 @@
 #include <ByteOrder.h>
 #include <Message.h>
 
+#include <FdIO.h>
+
 #include <package/hpkg/HPKGDefsPrivate.h>
 #include <package/hpkg/RepositoryContentHandler.h>
 
@@ -197,9 +199,24 @@ RepositoryReaderImpl::Init(const char* fileName)
 status_t
 RepositoryReaderImpl::Init(int fd, bool keepFD)
 {
+	BFdIO* file = new(std::nothrow) BFdIO(fd, keepFD);
+	if (file == NULL) {
+		if (keepFD && fd >= 0)
+			close(fd);
+		return B_NO_MEMORY;
+	}
+
+	return Init(file, true);
+}
+
+
+status_t
+RepositoryReaderImpl::Init(BPositionIO* file, bool keepFile)
+{
 	hpkg_repo_header header;
 	status_t error = inherited::Init<hpkg_repo_header, B_HPKG_REPO_MAGIC,
-		B_HPKG_REPO_VERSION, B_HPKG_REPO_MINOR_VERSION>(fd, keepFD, header, 0);
+		B_HPKG_REPO_VERSION, B_HPKG_REPO_MINOR_VERSION>(file, keepFile, header,
+		0);
 	if (error != B_OK)
 		return error;
 

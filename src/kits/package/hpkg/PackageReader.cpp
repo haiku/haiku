@@ -53,6 +53,16 @@ BPackageReader::Init(int fd, bool keepFD, uint32 flags)
 
 
 status_t
+BPackageReader::Init(BPositionIO* file, bool keepFile, uint32 flags)
+{
+	if (fImpl == NULL)
+		return B_NO_INIT;
+
+	return fImpl->Init(file, keepFile, flags);
+}
+
+
+status_t
 BPackageReader::ParseContent(BPackageContentHandler* contentHandler)
 {
 	if (fImpl == NULL)
@@ -72,13 +82,13 @@ BPackageReader::ParseContent(BLowLevelPackageContentHandler* contentHandler)
 }
 
 
-int
-BPackageReader::PackageFileFD()
+BPositionIO*
+BPackageReader::PackageFile() const
 {
 	if (fImpl == NULL)
-		return -1;
+		return NULL;
 
-	return fImpl->PackageFileFD();
+	return fImpl->PackageFile();
 }
 
 

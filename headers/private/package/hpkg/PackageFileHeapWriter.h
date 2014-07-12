@@ -35,7 +35,7 @@ class PackageFileHeapReader;
 class PackageFileHeapWriter : public PackageFileHeapAccessorBase {
 public:
 								PackageFileHeapWriter(BErrorOutput* errorOutput,
-									int fd, off_t heapOffset,
+									BPositionIO* file, off_t heapOffset,
 									CompressionAlgorithmOwner*
 										compressionAlgorithm,
 									DecompressionAlgorithmOwner*

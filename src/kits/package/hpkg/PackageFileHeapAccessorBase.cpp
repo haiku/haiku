@@ -6,7 +6,6 @@
 
 #include <package/hpkg/PackageFileHeapAccessorBase.h>
 
-#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -122,11 +121,11 @@ PackageFileHeapAccessorBase::OffsetArray::Init(size_t totalChunkCount,
 
 
 PackageFileHeapAccessorBase::PackageFileHeapAccessorBase(
-	BErrorOutput* errorOutput, int fd, off_t heapOffset,
+	BErrorOutput* errorOutput, BPositionIO* file, off_t heapOffset,
 	DecompressionAlgorithmOwner* decompressionAlgorithm)
 	:
 	fErrorOutput(errorOutput),
-	fFD(fd),
+	fFile(file),
 	fHeapOffset(heapOffset),
 	fCompressedHeapSize(0),
 	fUncompressedHeapSize(0),
@@ -252,16 +251,12 @@ status_t
 PackageFileHeapAccessorBase::ReadFileData(uint64 offset, void* buffer,
 	size_t size)
 {
-	ssize_t bytesRead = pread(fFD, buffer, size, fHeapOffset + (off_t)offset);
-	if (bytesRead < 0) {
+	status_t error = fFile->ReadAtExactly(fHeapOffset + (off_t)offset, buffer,
+		size);
+	if (error != B_OK) {
 		fErrorOutput->PrintError("ReadFileData(%" B_PRIu64 ", %p, %zu) failed "
-			"to read data: %s\n", offset, buffer, size, strerror(errno));
-		return errno;
-	}
-	if ((size_t)bytesRead != size) {
-		fErrorOutput->PrintError("ReadFileData(%" B_PRIu64 ", %p, %zu) could "
-			"read only %zd bytes\n", offset, buffer, size, bytesRead);
-		return B_ERROR;
+			"to read data: %s\n", offset, buffer, size, strerror(error));
+		return error;
 	}
 
 	return B_OK;

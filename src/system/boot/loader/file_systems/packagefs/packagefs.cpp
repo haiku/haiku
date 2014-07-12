@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,6 +18,7 @@
 #include <package/hpkg/PackageReaderImpl.h>
 
 #include <AutoDeleter.h>
+#include <FdIO.h>
 
 #include <util/DoublyLinkedList.h>
 
@@ -299,16 +300,14 @@ struct PackageVolume : BReferenceable, private PackageLoaderErrorOutput {
 		fNextNodeID(1),
 		fRootDirectory(this, S_IFDIR),
 		fHeapReader(NULL),
-		fFD(-1)
+		fFile(NULL)
 	{
 	}
 
 	~PackageVolume()
 	{
 		delete fHeapReader;
-
-		if (fFD >= 0)
-			close(fFD);
+		delete fFile;
 	}
 
 	status_t Init(int fd, const PackageFileHeapReader* heapReader)
@@ -318,9 +317,15 @@ struct PackageVolume : BReferenceable, private PackageLoaderErrorOutput {
 		if (error != B_OK)
 			return error;
 
-		fFD = dup(fd);
-		if (fFD < 0)
+		fd = dup(fd);
+		if (fd < 0)
 			return errno;
+
+		fFile = new(std::nothrow) BFdIO(fd, true);
+		if (fFile == NULL) {
+			close(fd);
+			return B_NO_MEMORY;
+		}
 
 		// clone a heap reader and adjust it for our use
 		fHeapReader = heapReader->Clone();
@@ -328,7 +333,7 @@ struct PackageVolume : BReferenceable, private PackageLoaderErrorOutput {
 			return B_NO_MEMORY;
 
 		fHeapReader->SetErrorOutput(this);
-		fHeapReader->SetFD(fFD);
+		fHeapReader->SetFile(fFile);
 
 		return B_OK;
 	}
@@ -354,7 +359,7 @@ private:
 	ino_t						fNextNodeID;
 	PackageDirectory			fRootDirectory;
 	PackageFileHeapReader*		fHeapReader;
-	int							fFD;
+	BPositionIO*				fFile;
 };
 
 

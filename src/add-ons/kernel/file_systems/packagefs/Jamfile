@@ -110,6 +110,10 @@ local libSharedSources =
 	NaturalCompare.cpp
 ;
 
+local storageKitSources =
+	FdIO.cpp
+;
+
 local supportKitSources =
 	CompressionAlgorithm.cpp
 	ZlibCompressionAlgorithm.cpp
@@ -122,6 +126,7 @@ KernelAddon packagefs
 	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
 	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1)
 	$(libSharedSources)
+	$(storageKitSources)
 	$(supportKitSources)
 
 	: $(TARGET_KERNEL_LIBSUPC++) kernel_libz.a
@@ -136,5 +141,7 @@ SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1) ]
 	+= [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
 SEARCH on [ FGristFiles $(libSharedSources) ]
 	+= [ FDirName $(HAIKU_TOP) src kits shared ] ;
+SEARCH on [ FGristFiles $(storageKitSources) ]
+	+= [ FDirName $(HAIKU_TOP) src kits storage ] ;
 SEARCH on [ FGristFiles $(supportKitSources) ]
 	+= [ FDirName $(HAIKU_TOP) src kits support ] ;

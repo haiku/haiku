@@ -648,7 +648,7 @@ PackageWriterImpl::_Init(const char* fileName,
 	// in update mode, parse the TOC
 	if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
 		PackageReaderImpl packageReader(fListener);
-		result = packageReader.Init(FD(), false, 0);
+		result = packageReader.Init(File(), false, 0);
 		if (result != B_OK)
 			return result;
 
@@ -716,7 +716,8 @@ PackageWriterImpl::_Finish()
 	// can be greater when one or more files are shrunk. In creation mode it
 	// should already have the correct size.
 	off_t totalSize = fHeapWriter->HeapOffset() + (off_t)compressedHeapSize;
-	if (ftruncate(FD(), totalSize) != 0) {
+	error = File()->SetSize(totalSize);
+	if (error != B_OK) {
 		fListener->PrintError("Failed to truncate package file to new "
 			"size: %s\n", strerror(errno));
 		return errno;

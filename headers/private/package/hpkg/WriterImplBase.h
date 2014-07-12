@@ -149,7 +149,7 @@ protected:
 									off_t offset);
 									// writes to the file directly
 
-	inline	int					FD() const;
+	inline	BPositionIO*		File() const;
 	inline	uint32				Flags() const;
 	inline	const BPackageWriterParameters& Parameters() const;
 
@@ -187,7 +187,7 @@ private:
 			BErrorOutput*		fErrorOutput;
 			const char*			fFileName;
 			BPackageWriterParameters fParameters;
-			int					fFD;
+			BPositionIO*		fFile;
 			bool				fFinished;
 
 			StringCache			fPackageStringCache;
@@ -217,10 +217,10 @@ WriterImplBase::WriteBuffer(const void* data, size_t size)
 }
 
 
-inline int
-WriterImplBase::FD() const
+inline BPositionIO*
+WriterImplBase::File() const
 {
-	return fFD;
+	return fFile;
 }
 
 

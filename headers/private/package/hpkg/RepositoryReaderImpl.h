@@ -30,6 +30,7 @@ public:
 
 			status_t			Init(const char* fileName);
 			status_t			Init(int fd, bool keepFD);
+			status_t			Init(BPositionIO* file, bool keepFile);
 
 			status_t			GetRepositoryInfo(
 									BRepositoryInfo* _repositoryInfo) const;

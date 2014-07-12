@@ -6,8 +6,6 @@
 
 #include <package/hpkg/PackageFileHeapWriter.h>
 
-#include <errno.h>
-
 #include <algorithm>
 #include <new>
 
@@ -196,11 +194,12 @@ private:
 };
 
 
-PackageFileHeapWriter::PackageFileHeapWriter(BErrorOutput* errorOutput, int fd,
-	off_t heapOffset, CompressionAlgorithmOwner* compressionAlgorithm,
+PackageFileHeapWriter::PackageFileHeapWriter(BErrorOutput* errorOutput,
+	BPositionIO* file, off_t heapOffset,
+	CompressionAlgorithmOwner* compressionAlgorithm,
 	DecompressionAlgorithmOwner* decompressionAlgorithm)
 	:
-	PackageFileHeapAccessorBase(errorOutput, fd, heapOffset,
+	PackageFileHeapAccessorBase(errorOutput, file, heapOffset,
 		decompressionAlgorithm),
 	fPendingDataBuffer(NULL),
 	fCompressedDataBuffer(NULL),
@@ -580,18 +579,14 @@ PackageFileHeapWriter::_WriteDataCompressed(const void* data, size_t size)
 status_t
 PackageFileHeapWriter::_WriteDataUncompressed(const void* data, size_t size)
 {
-	ssize_t bytesWritten = pwrite(fFD, data, size,
-		fHeapOffset + (off_t)fCompressedHeapSize);
-	if (bytesWritten < 0) {
-		fErrorOutput->PrintError("Failed to write data: %s\n", strerror(errno));
-		return errno;
-	}
-	if ((size_t)bytesWritten != size) {
-		fErrorOutput->PrintError("Failed to write all data\n");
-		return B_ERROR;
+	status_t error = fFile->WriteAtExactly(
+		fHeapOffset + (off_t)fCompressedHeapSize, data, size);
+	if (error != B_OK) {
+		fErrorOutput->PrintError("Failed to write data: %s\n", strerror(error));
+		return error;
 	}
 
-	fCompressedHeapSize += bytesWritten;
+	fCompressedHeapSize += size;
 
 	return B_OK;
 }

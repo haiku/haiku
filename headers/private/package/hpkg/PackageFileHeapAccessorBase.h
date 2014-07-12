@@ -71,8 +71,8 @@ public:
 
 public:
 								PackageFileHeapAccessorBase(
-									BErrorOutput* errorOutput, int fd,
-									off_t heapOffset,
+									BErrorOutput* errorOutput,
+									BPositionIO* file, off_t heapOffset,
 									DecompressionAlgorithmOwner*
 										decompressionAlgorithm);
 	virtual						~PackageFileHeapAccessorBase();
@@ -89,8 +89,8 @@ public:
 			// normally used after cloning a PackageFileHeapReader only
 			void				SetErrorOutput(BErrorOutput* errorOutput)
 									{ fErrorOutput = errorOutput; }
-			void				SetFD(int fd)
-									{ fFD = fd; }
+			void				SetFile(BPositionIO* file)
+									{ fFile = file; }
 
 			uint64				HeapOverhead(uint64 uncompressedSize) const;
 									// additional bytes needed when storing
@@ -122,7 +122,7 @@ protected:
 
 protected:
 			BErrorOutput*		fErrorOutput;
-			int					fFD;
+			BPositionIO*		fFile;
 			off_t				fHeapOffset;
 			uint64				fCompressedHeapSize;
 			uint64				fUncompressedHeapSize;

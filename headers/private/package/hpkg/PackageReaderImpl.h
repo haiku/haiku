@@ -33,12 +33,14 @@ public:
 
 			status_t			Init(const char* fileName, uint32 flags);
 			status_t			Init(int fd, bool keepFD, uint32 flags);
+			status_t			Init(BPositionIO* file, bool keepFile,
+									uint32 flags);
 			status_t			ParseContent(
 									BPackageContentHandler* contentHandler);
 			status_t			ParseContent(BLowLevelPackageContentHandler*
 										contentHandler);
 
-			int					PackageFileFD() const;
+			BPositionIO*		PackageFile() const;
 
 			uint64				HeapOffset() const;
 			uint64				HeapSize() const;
@@ -77,10 +79,10 @@ private:
 };
 
 
-inline int
-PackageReaderImpl::PackageFileFD() const
+inline BPositionIO*
+PackageReaderImpl::PackageFile() const
 {
-	return FD();
+	return File();
 }
 
 

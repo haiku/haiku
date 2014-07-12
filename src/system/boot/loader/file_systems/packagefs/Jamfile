@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src system boot loader file_systems packagefs ;
 
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
-UsePrivateHeaders kernel shared support ;
+UsePrivateHeaders kernel shared storage support ;
 UseBuildFeatureHeaders zlib ;
 
 DEFINES += _BOOT_MODE ;
@@ -13,14 +13,13 @@ SubDirC++Flags -fno-rtti -include $(kernelC++Header) ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits support ] ;
 
 
 BootStaticLibrary boot_packagefs :
 	packagefs.cpp
 	PackageSettingsItem.cpp
-
-	# package kit
 
 	# package kit/hpkg
 	BlockBufferPool.cpp
@@ -41,8 +40,10 @@ BootStaticLibrary boot_packagefs :
 	PackageReaderImpl.cpp
 	ReaderImplBase.cpp
 
-	# support kit
+	# storage kit
+	FdIO.cpp
 
+	# support kit
 	CompressionAlgorithm.cpp
 	ZlibCompressionAlgorithm.cpp
 

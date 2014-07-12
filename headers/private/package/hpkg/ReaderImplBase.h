@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -11,7 +11,7 @@
 #include <sys/stat.h>
 
 #include <ByteOrder.h>
-#include <SupportDefs.h>
+#include <DataIO.h>
 
 #include <Array.h>
 #include <util/SinglyLinkedList.h>
@@ -77,7 +77,7 @@ protected:
 									BErrorOutput* errorOutput);
 	virtual						~ReaderImplBase();
 
-			int					FD() const;
+			BPositionIO*		File() const;
 
 			BErrorOutput*		ErrorOutput() const;
 
@@ -93,14 +93,14 @@ protected:
 									// equals RawHeapReader(), if uncached
 
 			BAbstractBufferedDataReader* DetachHeapReader(
-									PackageFileHeapReader** _rawHeapReader
-										= NULL);
+									PackageFileHeapReader*& _rawHeapReader);
 									// Detaches both raw and (if applicable)
 									// cached heap reader. The called gains
-									// ownership. The FD may need to be set on
-									// the raw heap reader, if it shall be used
-									// after destroying this object and Init()
-									// has been called with keepFD == true.
+									// ownership of both. The file may need to
+									// be set on the raw heap reader, if it
+									// shall be used after destroying this
+									// object and Init() has been called with
+									// keepFile == true.
 
 protected:
 			class AttributeHandlerContext;
@@ -122,8 +122,8 @@ protected:
 protected:
 			template<typename Header, uint32 kMagic, uint16 kVersion,
 				uint16 kMinorVersion>
-			status_t			Init(int fd, bool keepFD, Header& header,
-									uint32 flags);
+			status_t			Init(BPositionIO* file, bool keepFile,
+									Header& header, uint32 flags);
 			status_t			InitHeapReader(uint32 compression,
 									uint32 chunkSize, off_t offset,
 									uint64 compressedSize,
@@ -169,7 +169,7 @@ protected:
 			PackageFileSection	fPackageAttributesSection;
 
 private:
-			status_t			_Init(int fd, bool keepFD);
+			status_t			_Init(BPositionIO* file, bool keepFile);
 
 			status_t			_ParseAttributeTree(
 									AttributeHandlerContext* context);
@@ -190,8 +190,8 @@ private:
 private:
 			const char*			fFileType;
 			BErrorOutput*		fErrorOutput;
-			int					fFD;
-			bool				fOwnsFD;
+			BPositionIO*		fFile;
+			bool				fOwnsFile;
 			uint16				fMinorFormatVersion;
 			uint16				fCurrentMinorFormatVersion;
 
@@ -429,17 +429,18 @@ private:
 
 template<typename Header, uint32 kMagic, uint16 kVersion, uint16 kMinorVersion>
 status_t
-ReaderImplBase::Init(int fd, bool keepFD, Header& header, uint32 flags)
+ReaderImplBase::Init(BPositionIO* file, bool keepFile, Header& header, uint32 flags)
 {
-	status_t error = _Init(fd, keepFD);
+	status_t error = _Init(file, keepFile);
 	if (error != B_OK)
 		return error;
 
-	// stat the file
-	struct stat st;
-	if (fstat(FD(), &st) < 0) {
-		ErrorOutput()->PrintError("Error: Failed to access %s file: %s\n",
-			fFileType, strerror(errno));
+	// get the file size
+	off_t fileSize;
+	error = fFile->GetSize(&fileSize);
+	if (error != B_OK) {
+		ErrorOutput()->PrintError("Error: Failed to get size of %s file: %s\n",
+			fFileType, strerror(error));
 		return errno;
 	}
 
@@ -479,10 +480,10 @@ ReaderImplBase::Init(int fd, bool keepFD, Header& header, uint32 flags)
 
 	// total size
 	uint64 totalSize = B_BENDIAN_TO_HOST_INT64(header.total_size);
-	if (totalSize != (uint64)st.st_size) {
+	if (totalSize != (uint64)fileSize) {
 		ErrorOutput()->PrintError("Error: Invalid %s file: Total size in "
 			"header (%" B_PRIu64 ") doesn't agree with total file size (%"
-			B_PRIdOFF ")\n", fFileType, totalSize, st.st_size);
+			B_PRIdOFF ")\n", fFileType, totalSize, fileSize);
 		return B_BAD_DATA;
 	}
 
@@ -510,10 +511,10 @@ ReaderImplBase::Init(int fd, bool keepFD, Header& header, uint32 flags)
 }
 
 
-inline int
-ReaderImplBase::FD() const
+inline BPositionIO*
+ReaderImplBase::File() const
 {
-	return fFD;
+	return fFile;
 }
 
 

@@ -25,7 +25,7 @@ namespace BPrivate {
 class PackageFileHeapReader : public PackageFileHeapAccessorBase {
 public:
 								PackageFileHeapReader(BErrorOutput* errorOutput,
-									int fd, off_t heapOffset,
+									BPositionIO* file, off_t heapOffset,
 									off_t compressedHeapSize,
 									uint64 uncompressedHeapSize,
 									DecompressionAlgorithmOwner*

@@ -764,8 +764,8 @@ ReaderImplBase::ReaderImplBase(const char* fileType, BErrorOutput* errorOutput)
 	fPackageAttributesSection("package attributes"),
 	fFileType(fileType),
 	fErrorOutput(errorOutput),
-	fFD(-1),
-	fOwnsFD(false),
+	fFile(NULL),
+	fOwnsFile(false),
 	fRawHeapReader(NULL),
 	fHeapReader(NULL),
 	fCurrentSection(NULL)
@@ -779,8 +779,8 @@ ReaderImplBase::~ReaderImplBase()
 	if (fRawHeapReader != fHeapReader)
 		delete fRawHeapReader;
 
-	if (fOwnsFD && fFD >= 0)
-		close(fFD);
+	if (fOwnsFile)
+		delete fFile;
 }
 
 
@@ -792,13 +792,11 @@ ReaderImplBase::UncompressedHeapSize() const
 
 
 BAbstractBufferedDataReader*
-ReaderImplBase::DetachHeapReader(PackageFileHeapReader** _rawHeapReader)
+ReaderImplBase::DetachHeapReader(PackageFileHeapReader*& _rawHeapReader)
 {
 	BAbstractBufferedDataReader* heapReader = fHeapReader;
+	_rawHeapReader = fRawHeapReader;
 	fHeapReader = NULL;
-
-	if (_rawHeapReader != NULL)
-		*_rawHeapReader = fRawHeapReader;
 	fRawHeapReader = NULL;
 
 	return heapReader;
@@ -827,8 +825,9 @@ ReaderImplBase::InitHeapReader(uint32 compression, uint32 chunkSize,
 		return B_NO_MEMORY;
 	}
 
-	fRawHeapReader = new(std::nothrow) PackageFileHeapReader(fErrorOutput, fFD,
-		offset, compressedSize, uncompressedSize, decompressionAlgorithm);
+	fRawHeapReader = new(std::nothrow) PackageFileHeapReader(fErrorOutput,
+		fFile, offset, compressedSize, uncompressedSize,
+		decompressionAlgorithm);
 	if (fRawHeapReader == NULL)
 		return B_NO_MEMORY;
 
@@ -1059,12 +1058,11 @@ ReaderImplBase::ParseAttributeTree(AttributeHandlerContext* context,
 
 
 status_t
-ReaderImplBase::_Init(int fd, bool keepFD)
+ReaderImplBase::_Init(BPositionIO* file, bool keepFile)
 {
-	fFD = fd;
-	fOwnsFD = keepFD;
-
-	return B_OK;
+	fFile = file;
+	fOwnsFile = keepFile;
+	return fFile != NULL ? B_OK : B_BAD_VALUE;
 }
 
 
@@ -1341,16 +1339,11 @@ ReaderImplBase::_ReadSectionBuffer(void* buffer, size_t size)
 status_t
 ReaderImplBase::ReadBuffer(off_t offset, void* buffer, size_t size)
 {
-	ssize_t bytesRead = pread(fFD, buffer, size, offset);
-	if (bytesRead < 0) {
+	status_t error = fFile->ReadAtExactly(offset, buffer, size);
+	if (error != B_OK) {
 		fErrorOutput->PrintError("_ReadBuffer(%p, %lu) failed to read data: "
-			"%s\n", buffer, size, strerror(errno));
-		return errno;
-	}
-	if ((size_t)bytesRead != size) {
-		fErrorOutput->PrintError("_ReadBuffer(%p, %lu) failed to read all "
-			"data\n", buffer, size);
-		return B_ERROR;
+			"%s\n", buffer, size, strerror(error));
+		return error;
 	}
 
 	return B_OK;

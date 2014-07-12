@@ -9,6 +9,9 @@
 #include <SupportDefs.h>
 
 
+class BPositionIO;
+
+
 namespace BPackageKit {
 
 namespace BHPKG {
@@ -34,12 +37,14 @@ public:
 
 			status_t			Init(const char* fileName, uint32 flags = 0);
 			status_t			Init(int fd, bool keepFD, uint32 flags = 0);
+			status_t			Init(BPositionIO* file, bool keepFile,
+									uint32 flags = 0);
 			status_t			ParseContent(
 									BPackageContentHandler* contentHandler);
 			status_t			ParseContent(BLowLevelPackageContentHandler*
 										contentHandler);
 
-			int					PackageFileFD();
+			BPositionIO*		PackageFile() const;
 
 			BAbstractBufferedDataReader* HeapReader() const;
 									// Only valid as long as the reader lives.

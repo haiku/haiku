@@ -23,11 +23,12 @@ namespace BHPKG {
 namespace BPrivate {
 
 
-PackageFileHeapReader::PackageFileHeapReader(BErrorOutput* errorOutput, int fd,
-	off_t heapOffset, off_t compressedHeapSize, uint64 uncompressedHeapSize,
+PackageFileHeapReader::PackageFileHeapReader(BErrorOutput* errorOutput,
+	BPositionIO* file, off_t heapOffset, off_t compressedHeapSize,
+	uint64 uncompressedHeapSize,
 	DecompressionAlgorithmOwner* decompressionAlgorithm)
 	:
-	PackageFileHeapAccessorBase(errorOutput, fd, heapOffset,
+	PackageFileHeapAccessorBase(errorOutput, file, heapOffset,
 		decompressionAlgorithm),
 	fOffsets()
 {
@@ -118,7 +119,7 @@ PackageFileHeapReader*
 PackageFileHeapReader::Clone() const
 {
 	PackageFileHeapReader* clone = new(std::nothrow) PackageFileHeapReader(
-		fErrorOutput, fFD, fHeapOffset, fCompressedHeapSize,
+		fErrorOutput, fFile, fHeapOffset, fCompressedHeapSize,
 		fUncompressedHeapSize, fDecompressionAlgorithm);
 	if (clone == NULL)
 		return NULL;
