@@ -57,6 +57,7 @@ class Descriptor {
 		ssize_t Write(const void *buffer, size_t bufferSize);
 
 		void Stat(struct stat &stat);
+		status_t Seek(off_t position, int mode);
 
 		off_t Offset() const { return fOffset; }
 		int32 RefCount() const { return fRefCount; }
@@ -388,6 +389,37 @@ void
 Descriptor::Stat(struct stat &stat)
 {
 	fNode->Stat(stat);
+}
+
+
+status_t
+Descriptor::Seek(off_t position, int mode)
+{
+	off_t newPosition;
+	switch (mode)
+	{
+		case SEEK_SET:
+			newPosition = position;
+			break;
+		case SEEK_CUR:
+			newPosition = fOffset + position;
+			break;
+		case SEEK_END:
+		{
+			struct stat st;
+			Stat(st);
+			newPosition = st.st_size + position;
+			break;
+		}
+		default:
+			return B_BAD_VALUE;
+	}
+
+	if (newPosition < 0)
+		return B_BAD_VALUE;
+
+	fOffset = newPosition;
+	return B_OK;
 }
 
 
@@ -866,6 +898,29 @@ dup(int fd)
 }
 
 
+off_t
+lseek(int fd, off_t offset, int whence)
+{
+	Descriptor* descriptor = get_descriptor(fd);
+	if (descriptor == NULL)
+		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
+
+	status_t error = descriptor->Seek(offset, whence);
+	if (error != B_OK)
+		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
+
+	return descriptor->Offset();
+}
+
+
+int
+ftruncate(int fd, off_t newSize)
+{
+	dprintf("ftruncate() not implemented!\n");
+	RETURN_AND_SET_ERRNO(B_FILE_ERROR);
+}
+
+
 ssize_t
 read_pos(int fd, off_t offset, void *buffer, size_t bufferSize)
 {
@@ -903,6 +958,13 @@ write_pos(int fd, off_t offset, const void *buffer, size_t bufferSize)
 		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
 	RETURN_AND_SET_ERRNO(descriptor->WriteAt(offset, buffer, bufferSize));
+}
+
+
+ssize_t
+pwrite(int fd, const void* buffer, size_t bufferSize, off_t offset)
+{
+	return write_pos(fd, offset, buffer, bufferSize);
 }
 
 
