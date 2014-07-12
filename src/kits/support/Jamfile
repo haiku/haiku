@@ -26,6 +26,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ByteOrder.cpp
 			CompressionAlgorithm.cpp
 			DataIO.cpp
+			DataPositionIOWrapper.cpp
 			DateTime.cpp
 			Flattenable.cpp
 			List.cpp

@@ -12,6 +12,7 @@ BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	ByteOrder.cpp
 	CompressionAlgorithm.cpp
 	DataIO.cpp
+	DataPositionIOWrapper.cpp
 	Flattenable.cpp
 	List.cpp
 	Locker.cpp
