@@ -18,8 +18,8 @@
 #include <package/hpkg/PackageReader.h>
 #include <package/hpkg/PackageWriter.h>
 
-#include <FdIO.h>
 #include <DataPositionIOWrapper.h>
+#include <FdIO.h>
 
 #include "package.h"
 #include "PackageWriterListener.h"
@@ -115,8 +115,6 @@ command_recompress(int argc, const char* const* argv)
 		}
 		inputFile = inputFileFile;
 	}
-	if (error != B_OK)
-		return 1;
 
 	// write the output package
 	BPackageWriterParameters writerParameters;
