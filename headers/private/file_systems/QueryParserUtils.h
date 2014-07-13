@@ -8,17 +8,16 @@
 #define _FILE_SYSTEMS_QUERY_PARSER_UTILS_H
 
 
+#include <sys/cdefs.h>
+
 #ifdef FS_SHELL
 #	include <new>
 
 #	include "fssh_api_wrapper.h"
 #	include "fssh_auto_deleter.h"
 #else
-#	include <sys/cdefs.h>
-
 #	include <SupportDefs.h>
 #endif	// !FS_SHELL
-
 
 
 namespace QueryParser {
