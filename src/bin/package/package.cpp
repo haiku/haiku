@@ -41,6 +41,16 @@ static const char* kUsage =
 	"    -q         - Be quiet (don't show any output except for errors).\n"
 	"    -v         - Be verbose (show more info about created package).\n"
 	"\n"
+	"  checksum [ <options> ] [ <package> ]\n"
+	"    Computes the checksum of package file <package>. If <package> is "
+		"omitted\n"
+	"    or \"-\", the file is read from stdin. This is only supported, if the "
+		"package\n"
+	"    is uncompressed.\n"
+	"\n"
+	"    -q         - Be quiet (don't show any output except for errors).\n"
+	"    -v         - Be verbose (show more info about created package).\n"
+	"\n"
 	"  create [ <options> ] <package>\n"
 	"    Creates package file <package> from contents of current directory.\n"
 	"\n"
@@ -133,6 +143,9 @@ main(int argc, const char* const* argv)
 	const char* command = argv[1];
 	if (strcmp(command, "add") == 0)
 		return command_add(argc - 1, argv + 1);
+
+	if (strcmp(command, "checksum") == 0)
+		return command_checksum(argc - 1, argv + 1);
 
 	if (strcmp(command, "create") == 0)
 		return command_create(argc - 1, argv + 1);

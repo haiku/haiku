@@ -4,6 +4,7 @@ UsePrivateHeaders kernel shared storage support ;
 
 BinCommand package :
 	command_add.cpp
+	command_checksum.cpp
 	command_create.cpp
 	command_dump.cpp
 	command_extract.cpp
