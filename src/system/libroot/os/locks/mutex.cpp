@@ -28,7 +28,7 @@ extern int32 __gCPUCount;
 
 
 void
-mutex_init(mutex *lock, const char *name)
+__mutex_init(mutex *lock, const char *name)
 {
 	lock->name = name;
 	lock->lock = 0;
@@ -37,7 +37,7 @@ mutex_init(mutex *lock, const char *name)
 
 
 void
-mutex_init_etc(mutex *lock, const char *name, uint32 flags)
+__mutex_init_etc(mutex *lock, const char *name, uint32 flags)
 {
 	lock->name = (flags & MUTEX_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
 	lock->lock = 0;
@@ -49,7 +49,7 @@ mutex_init_etc(mutex *lock, const char *name, uint32 flags)
 
 
 void
-mutex_destroy(mutex *lock)
+__mutex_destroy(mutex *lock)
 {
 	if ((lock->flags & MUTEX_FLAG_CLONE_NAME) != 0)
 		free(const_cast<char*>(lock->name));
@@ -57,7 +57,7 @@ mutex_destroy(mutex *lock)
 
 
 status_t
-mutex_lock(mutex *lock)
+__mutex_lock(mutex *lock)
 {
 	uint32 count = 0;
 	const uint32 kMaxCount
@@ -87,7 +87,7 @@ mutex_lock(mutex *lock)
 
 
 void
-mutex_unlock(mutex *lock)
+__mutex_unlock(mutex *lock)
 {
 	// clear the locked flag
 	int32 oldValue = atomic_and(&lock->lock, ~(int32)B_USER_MUTEX_LOCKED);

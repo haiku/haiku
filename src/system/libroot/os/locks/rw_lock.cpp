@@ -80,14 +80,14 @@ rw_lock_unblock(rw_lock *lock)
 
 
 void
-rw_lock_init(rw_lock *lock, const char *name)
+__rw_lock_init(rw_lock *lock, const char *name)
 {
 	rw_lock_init_etc(lock, name, 0);
 }
 
 
 void
-rw_lock_init_etc(rw_lock *lock, const char *name, uint32 flags)
+__rw_lock_init_etc(rw_lock *lock, const char *name, uint32 flags)
 {
 	lock->waiters = NULL;
 	lock->holder = -1;
@@ -99,7 +99,7 @@ rw_lock_init_etc(rw_lock *lock, const char *name, uint32 flags)
 
 
 void
-rw_lock_destroy(rw_lock *lock)
+__rw_lock_destroy(rw_lock *lock)
 {
 	mutex_lock(&lock->lock);
 
@@ -114,7 +114,7 @@ rw_lock_destroy(rw_lock *lock)
 
 
 status_t
-rw_lock_read_lock(rw_lock *lock)
+__rw_lock_read_lock(rw_lock *lock)
 {
 	MutexLocker locker(lock->lock);
 
@@ -133,7 +133,7 @@ rw_lock_read_lock(rw_lock *lock)
 
 
 status_t
-rw_lock_read_unlock(rw_lock *lock)
+__rw_lock_read_unlock(rw_lock *lock)
 {
 	MutexLocker locker(lock->lock);
 
@@ -161,7 +161,7 @@ rw_lock_read_unlock(rw_lock *lock)
 
 
 status_t
-rw_lock_write_lock(rw_lock *lock)
+__rw_lock_write_lock(rw_lock *lock)
 {
 	MutexLocker locker(lock->lock);
 
@@ -194,7 +194,7 @@ rw_lock_write_lock(rw_lock *lock)
 
 
 status_t
-rw_lock_write_unlock(rw_lock *lock)
+__rw_lock_write_unlock(rw_lock *lock)
 {
 	MutexLocker locker(lock->lock);
 
