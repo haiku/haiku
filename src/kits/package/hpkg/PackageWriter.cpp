@@ -8,8 +8,6 @@
 
 #include <new>
 
-#include <package/hpkg/PackageReader.h>
-
 #include <package/hpkg/PackageWriterImpl.h>
 
 
@@ -160,12 +158,12 @@ BPackageWriter::Finish()
 
 
 status_t
-BPackageWriter::Recompress(BPackageReader* reader)
+BPackageWriter::Recompress(BPositionIO* inputFile)
 {
 	if (fImpl == NULL)
 		return B_NO_INIT;
 
-	return fImpl->Recompress(reader->fImpl);
+	return fImpl->Recompress(inputFile);
 }
 
 

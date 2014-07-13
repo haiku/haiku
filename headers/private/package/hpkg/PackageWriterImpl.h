@@ -35,7 +35,6 @@ class BPackageWriterParameters;
 namespace BPrivate {
 
 
-class PackageReaderImpl;
 struct hpkg_header;
 
 
@@ -56,7 +55,7 @@ public:
 			status_t			AddEntry(const char* fileName, int fd = -1);
 			status_t			Finish();
 
-			status_t			Recompress(PackageReaderImpl* reader);
+			status_t			Recompress(BPositionIO* inputFile);
 									// to be called after Init(); no Finish()
 
 private:
@@ -74,7 +73,7 @@ private:
 									const BPackageWriterParameters& parameters);
 			status_t			_Finish();
 
-			status_t			_Recompress(PackageReaderImpl* reader);
+			status_t			_Recompress(BPositionIO* inputFile);
 
 			status_t			_RegisterEntry(const char* fileName, int fd);
 			Entry*				_RegisterEntry(Entry* parent,

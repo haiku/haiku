@@ -622,13 +622,13 @@ PackageWriterImpl::Finish()
 
 
 status_t
-PackageWriterImpl::Recompress(PackageReaderImpl* reader)
+PackageWriterImpl::Recompress(BPositionIO* inputFile)
 {
-	if (reader == NULL)
+	if (inputFile == NULL)
 		return B_BAD_VALUE;
 
 	try {
-		return _Recompress(reader);
+		return _Recompress(inputFile);
 	} catch (status_t error) {
 		return error;
 	} catch (std::bad_alloc) {
@@ -772,16 +772,17 @@ PackageWriterImpl::_Finish()
 
 
 status_t
-PackageWriterImpl::_Recompress(PackageReaderImpl* reader)
+PackageWriterImpl::_Recompress(BPositionIO* inputFile)
 {
-	if (reader == NULL)
+	if (inputFile == NULL)
 		return B_BAD_VALUE;
 
-	// read the header
+	// create a package reader for the input file
+	PackageReaderImpl reader(fListener);
 	hpkg_header header;
-	status_t error = reader->ReadBuffer(0, &header, sizeof(header));
+	status_t error = reader.Init(inputFile, false, 0, &header);
 	if (error != B_OK) {
-		fListener->PrintError("Failed to reader hpkg header: %s\n",
+		fListener->PrintError("Failed to open hpkg file: %s\n",
 			strerror(error));
 		return error;
 	}
@@ -790,7 +791,7 @@ PackageWriterImpl::_Recompress(PackageReaderImpl* reader)
 	// header later, should compression have been used. Doing it this way allows
 	// for streaming an uncompressed package.
 	uint64 uncompressedHeapSize
-		= reader->RawHeapReader()->UncompressedHeapSize();
+		= reader.RawHeapReader()->UncompressedHeapSize();
 	uint64 compressedHeapSize = uncompressedHeapSize;
 
 	off_t totalSize = fHeapWriter->HeapOffset() + (off_t)compressedHeapSize;
@@ -812,7 +813,7 @@ PackageWriterImpl::_Recompress(PackageReaderImpl* reader)
 
 	// copy the heap data
 	uint64 bytesCompressed;
-	error = fHeapWriter->AddData(*reader->RawHeapReader(), uncompressedHeapSize,
+	error = fHeapWriter->AddData(*reader.RawHeapReader(), uncompressedHeapSize,
 		bytesCompressed);
 	if (error != B_OK)
 		return error;

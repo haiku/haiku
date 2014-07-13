@@ -12,6 +12,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <File.h>
+
 #include <package/hpkg/HPKGDefs.h>
 #include <package/hpkg/PackageReader.h>
 #include <package/hpkg/PackageWriter.h>
@@ -99,14 +101,20 @@ command_recompress(int argc, const char* const* argv)
 	const char* outputPackageFileName = argv[optind++];
 
 	// open the input package
-	PackageWriterListener listener(verbose, quiet);
-
-	BPackageReader packageReader(&listener);
-	status_t error;
-	if (strcmp(inputPackageFileName, "-") == 0)
-		error = packageReader.Init(create_stdio(true), true);
-	else
-		error = packageReader.Init(inputPackageFileName);
+	status_t error = B_OK;
+	BPositionIO* inputFile;
+	if (strcmp(inputPackageFileName, "-") == 0) {
+		inputFile = create_stdio(true);
+	} else {
+		BFile* inputFileFile = new BFile;
+		error = inputFileFile->SetTo(inputPackageFileName, O_RDONLY);
+		if (error != B_OK) {
+			fprintf(stderr, "Error: Failed to open input file \"%s\": %s\n",
+				inputPackageFileName, strerror(error));
+			return 1;
+		}
+		inputFile = inputFileFile;
+	}
 	if (error != B_OK)
 		return 1;
 
@@ -118,6 +126,7 @@ command_recompress(int argc, const char* const* argv)
 			BPackageKit::BHPKG::B_HPKG_COMPRESSION_NONE);
 	}
 
+	PackageWriterListener listener(verbose, quiet);
 	BPackageWriter packageWriter(&listener);
 	if (strcmp(outputPackageFileName, "-") == 0) {
 		if (compressionLevel != 0) {
@@ -133,7 +142,7 @@ command_recompress(int argc, const char* const* argv)
 	if (error != B_OK)
 		return 1;
 
-	error = packageWriter.Recompress(&packageReader);
+	error = packageWriter.Recompress(inputFile);
 	if (error != B_OK)
 		return 1;
 

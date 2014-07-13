@@ -18,10 +18,6 @@ namespace BPackageKit {
 
 namespace BHPKG {
 
-
-class BPackageReader;
-
-
 namespace BPrivate {
 	class PackageWriterImpl;
 }
@@ -85,7 +81,7 @@ public:
 			status_t			AddEntry(const char* fileName, int fd = -1);
 			status_t			Finish();
 
-			status_t			Recompress(BPackageReader* reader);
+			status_t			Recompress(BPositionIO* inputFile);
 									// to be called after Init(); no Finish()
 
 private:
