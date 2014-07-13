@@ -373,15 +373,6 @@ PackageReaderImpl::Init(BPositionIO* file, bool keepFile, uint32 flags,
 	if (error != B_OK)
 		return error;
 
-	// prepare the sections for use
-	error = PrepareSection(fTOCSection);
-	if (error != B_OK)
-		return error;
-
-	error = PrepareSection(fPackageAttributesSection);
-	if (error != B_OK)
-		return error;
-
 	if (_header != NULL)
 		*_header = header;
 
@@ -392,13 +383,16 @@ PackageReaderImpl::Init(BPositionIO* file, bool keepFile, uint32 flags,
 status_t
 PackageReaderImpl::ParseContent(BPackageContentHandler* contentHandler)
 {
+	status_t error = _PrepareSections();
+	if (error != B_OK)
+		return error;
+
 	AttributeHandlerContext context(ErrorOutput(), contentHandler,
 		B_HPKG_SECTION_PACKAGE_ATTRIBUTES,
 		MinorFormatVersion() > B_HPKG_MINOR_VERSION);
 	RootAttributeHandler rootAttributeHandler;
 
-	status_t error
-		= ParsePackageAttributesSection(&context, &rootAttributeHandler);
+	error = ParsePackageAttributesSection(&context, &rootAttributeHandler);
 
 	if (error == B_OK) {
 		context.section = B_HPKG_SECTION_PACKAGE_TOC;
@@ -412,13 +406,16 @@ PackageReaderImpl::ParseContent(BPackageContentHandler* contentHandler)
 status_t
 PackageReaderImpl::ParseContent(BLowLevelPackageContentHandler* contentHandler)
 {
+	status_t error = _PrepareSections();
+	if (error != B_OK)
+		return error;
+
 	AttributeHandlerContext context(ErrorOutput(), contentHandler,
 		B_HPKG_SECTION_PACKAGE_ATTRIBUTES,
 		MinorFormatVersion() > B_HPKG_MINOR_VERSION);
 	LowLevelAttributeHandler rootAttributeHandler;
 
-	status_t error
-		= ParsePackageAttributesSection(&context, &rootAttributeHandler);
+	error = ParsePackageAttributesSection(&context, &rootAttributeHandler);
 
 	if (error == B_OK) {
 		context.section = B_HPKG_SECTION_PACKAGE_TOC;
@@ -426,6 +423,21 @@ PackageReaderImpl::ParseContent(BLowLevelPackageContentHandler* contentHandler)
 	}
 
 	return error;
+}
+
+
+status_t
+PackageReaderImpl::_PrepareSections()
+{
+	status_t error = PrepareSection(fTOCSection);
+	if (error != B_OK)
+		return error;
+
+	error = PrepareSection(fPackageAttributesSection);
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
 }
 
 

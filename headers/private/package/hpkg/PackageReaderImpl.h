@@ -67,6 +67,8 @@ private:
 			friend class PackageWriterImpl;
 
 private:
+			status_t			_PrepareSections();
+
 			status_t			_ParseTOC(AttributeHandlerContext* context,
 									AttributeHandler* rootAttributeHandler);
 
