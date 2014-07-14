@@ -1713,7 +1713,7 @@
 
 
 /*!
-	void BFont::GetGlyphShapes(const char charArray[], int32 numChars,
+	\fn void BFont::GetGlyphShapes(const char charArray[], int32 numChars,
 		BShape *glyphShapeArray[]) const
 	\brief Writes an array of BShape objects to \a glyphShapeArray
 		representing the glyph shapes of each character in
@@ -1730,7 +1730,7 @@
 
 
 /*!
-	void BFont::GetHasGlyphs(const char charArray[], int32 numChars,
+	\fn void BFont::GetHasGlyphs(const char charArray[], int32 numChars,
 		bool hasArray[]) const
 	\brief Fills out \a hasArray with whether or not each characters in
 		\a charArray has a glyph for the font.
@@ -1748,7 +1748,7 @@
 
 
 /*!
-	BFont& BFont::operator=(const BFont &font)
+	\fn BFont& BFont::operator=(const BFont &font)
 	\brief Assignment overload method.
 
 	\param font The BFont object to assign from.
@@ -1758,7 +1758,7 @@
 
 
 /*!
-	bool BFont::operator==(const BFont &font) const
+	\fn bool BFont::operator==(const BFont &font) const
 	\brief Equality comparison overload method.
 
 	\param font The BFont object to compare the current font to.
@@ -1770,7 +1770,7 @@
 
 
 /*!
-	bool BFont::operator!=(const BFont &font) const
+	\fn bool BFont::operator!=(const BFont &font) const
 	\brief Inequality comparison overload method.
 
 	\param font The BFont object to compare the current font to.
@@ -1783,7 +1783,7 @@
 
 
 /*!
-	void BFont::PrintToStream() const
+	\fn void BFont::PrintToStream() const
 	\brief Writes information about the font to \c stdout.
 
 	printf("BFont { %s (%d), %s (%d) 0x%x %f/%f %fpt (%f %f %f), %d }\n",
