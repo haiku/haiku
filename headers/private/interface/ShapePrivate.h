@@ -1,13 +1,14 @@
 /*
- * Copyright 2003-2010, Haiku.
+ * Copyright 2003-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Adrian Oanca <adioanca@cotty.iren.ro>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Adrian Oanca, adioanca@cotty.iren.ro
  */
 #ifndef SHAPE_PRIVATE_H
 #define SHAPE_PRIVATE_H
+
 
 #define OP_LINETO			0x10000000
 #define OP_BEZIERTO			0x20000000
@@ -20,12 +21,13 @@
 
 
 struct shape_data {
-	uint32	*opList;
+	uint32*	opList;
 	int32	opCount;
 	int32	opSize;
-	BPoint	*ptList;
+	BPoint*	ptList;
 	int32	ptCount;
 	int32	ptSize;
 };
 
-#endif
+
+#endif	// SHAPE_PRIVATE_H

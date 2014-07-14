@@ -1,15 +1,14 @@
 /*
- * Copyright (c) 2001-2010, Haiku, Inc.
+ * Copyright 2003-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Michael Lotz <mmlr@mlotz.ch>
- *		Marcus Overhagen <marcus@overhagen.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Marc Flerackers, mflerackers@androme.be
+ *		Michael Lotz, mmlr@mlotz.ch
+ *		Marcus Overhagen, marcus@overhagen.de
  */
 
-/*! BShape encapsulates a Postscript-style "path" */
 
 #include <Shape.h>
 
@@ -24,6 +23,7 @@
 #include <string.h>
 
 
+//	#pragma mark - BShapeIterator
 
 
 BShapeIterator::BShapeIterator()
@@ -45,25 +45,26 @@ BShapeIterator::Iterate(BShape* shape)
 	for (int32 i = 0; i < data->opCount; i++) {
 		int32 op = data->opList[i] & 0xFF000000;
 
-		if (op & OP_MOVETO) {
+		if ((op & OP_MOVETO) != 0) {
 			IterateMoveTo(points);
 			points++;
 		}
 
-		if (op & OP_LINETO) {
+		if ((op & OP_LINETO) != 0) {
 			int32 count = data->opList[i] & 0x00FFFFFF;
 			IterateLineTo(count, points);
 			points += count;
 		}
 
-		if (op & OP_BEZIERTO) {
+		if ((op & OP_BEZIERTO) != 0) {
 			int32 count = data->opList[i] & 0x00FFFFFF;
 			IterateBezierTo(count / 3, points);
 			points += count;
 		}
 
-		if ((op & OP_LARGE_ARC_TO_CW) || (op & OP_LARGE_ARC_TO_CCW)
-			|| (op & OP_SMALL_ARC_TO_CW) || (op & OP_SMALL_ARC_TO_CCW)) {
+		if ((op & OP_LARGE_ARC_TO_CW) != 0 || (op & OP_LARGE_ARC_TO_CCW) != 0
+			|| (op & OP_SMALL_ARC_TO_CW) != 0
+			|| (op & OP_SMALL_ARC_TO_CCW) != 0) {
 			int32 count = data->opList[i] & 0x00FFFFFF;
 			for (int32 i = 0; i < count / 3; i++) {
 				IterateArcTo(points[0].x, points[0].y, points[1].x,
@@ -74,9 +75,8 @@ BShapeIterator::Iterate(BShape* shape)
 			}
 		}
 
-		if (op & OP_CLOSE) {
+		if ((op & OP_CLOSE) != 0)
 			IterateClose();
-		}
 	}
 
 	return B_OK;
@@ -119,12 +119,15 @@ BShapeIterator::IterateArcTo(float& rx, float& ry, float& angle, bool largeArc,
 }
 
 
+// #pragma mark - BShapeIterator FBC padding
+
+
 void BShapeIterator::_ReservedShapeIterator2() {}
 void BShapeIterator::_ReservedShapeIterator3() {}
 void BShapeIterator::_ReservedShapeIterator4() {}
 
 
-// #pragma mark -
+// #pragma mark - BShape
 
 
 BShape::BShape()
@@ -133,15 +136,16 @@ BShape::BShape()
 }
 
 
-BShape::BShape(const BShape &copyFrom)
+BShape::BShape(const BShape& other)
 {
 	InitData();
-	AddShape(&copyFrom);
+	AddShape(&other);
 }
 
 
 BShape::BShape(BMessage* archive)
-	:	BArchivable(archive)
+	:
+	BArchivable(archive)
 {
 	InitData();
 
@@ -156,8 +160,10 @@ BShape::BShape(BMessage* archive)
 
 	int32 i = 0;
 	const uint32* opPtr;
-	while (archive->FindData("ops", B_INT32_TYPE, i++, (const void**)&opPtr, &size) == B_OK)
+	while (archive->FindData("ops", B_INT32_TYPE, i++,
+			(const void**)&opPtr, &size) == B_OK) {
 		data->opList[data->opCount++] = *opPtr;
+	}
 
 	archive->GetInfo("pts", &type, &count);
 	if (!AllocatePts(count)) {
@@ -167,8 +173,10 @@ BShape::BShape(BMessage* archive)
 
 	i = 0;
 	const BPoint* ptPtr;
-	while (archive->FindData("pts", B_POINT_TYPE, i++, (const void**)&ptPtr, &size) == B_OK)
+	while (archive->FindData("pts", B_POINT_TYPE, i++,
+			(const void**)&ptPtr, &size) == B_OK) {
 		data->ptList[data->ptCount++] = *ptPtr;
+	}
 }
 
 
@@ -186,35 +194,36 @@ BShape::~BShape()
 status_t
 BShape::Archive(BMessage* archive, bool deep) const
 {
-	status_t err = BArchivable::Archive(archive, deep);
+	status_t result = BArchivable::Archive(archive, deep);
 
-	if (err != B_OK)
-		return err;
+	if (result != B_OK)
+		return result;
 
 	shape_data* data = (shape_data*)fPrivateData;
 
 	// If no valid shape data, return
 	if (data->opCount == 0 || data->ptCount == 0)
-		return err;
+		return result;
 
 	// Avoids allocation for each point
-	err = archive->AddData("pts", B_POINT_TYPE, data->ptList, sizeof(BPoint), true,
-		data->ptCount);
-	if (err != B_OK)
-		return err;
+	result = archive->AddData("pts", B_POINT_TYPE, data->ptList,
+		sizeof(BPoint), true, data->ptCount);
+	if (result != B_OK)
+		return result;
 
-	for (int32 i = 1; i < data->ptCount && err == B_OK; i++)
-		err = archive->AddPoint("pts", data->ptList[i]);
+	for (int32 i = 1; i < data->ptCount && result == B_OK; i++)
+		result = archive->AddPoint("pts", data->ptList[i]);
 
 	// Avoids allocation for each op
-	if (err == B_OK)
-		err = archive->AddData("ops", B_INT32_TYPE, data->opList, sizeof(int32), true,
-			data->opCount);
+	if (result == B_OK) {
+		result = archive->AddData("ops", B_INT32_TYPE, data->opList,
+			sizeof(int32), true, data->opCount);
+	}
 
-	for (int32 i = 1; i < data->opCount && err == B_OK ; i++)
-		err = archive->AddInt32("ops", data->opList[i]);
+	for (int32 i = 1; i < data->opCount && result == B_OK; i++)
+		result = archive->AddInt32("ops", data->opList[i]);
 
-	return err;
+	return result;
 }
 
 
@@ -251,6 +260,7 @@ BShape::operator==(const BShape& other) const
 
 	if (data->opCount != otherData->opCount)
 		return false;
+
 	if (data->ptCount != otherData->ptCount)
 		return false;
 
@@ -310,10 +320,13 @@ BShape::Bounds() const
 	for (int32 i = 1; i < data->ptCount; i++) {
 		if (bounds.left > data->ptList[i].x)
 			bounds.left = data->ptList[i].x;
+
 		if (bounds.top > data->ptList[i].y)
 			bounds.top = data->ptList[i].y;
+
 		if (bounds.right < data->ptList[i].x)
 			bounds.right = data->ptList[i].x;
+
 		if (bounds.bottom < data->ptList[i].y)
 			bounds.bottom = data->ptList[i].y;
 	}
@@ -401,6 +414,7 @@ BShape::LineTo(BPoint point)
 	} else {
 		if (!AllocateOps(1))
 			return B_NO_MEMORY;
+
 		fBuildingOp = OP_LINETO + 1;
 		data->opList[data->opCount++] = fBuildingOp;
 	}
@@ -483,6 +497,7 @@ BShape::ArcTo(float rx, float ry, float angle, bool largeArc,
 	} else {
 		if (!AllocateOps(1))
 			return B_NO_MEMORY;
+
 		fBuildingOp = op + 3;
 		data->opList[data->opCount++] = fBuildingOp;
 	}
@@ -523,17 +538,26 @@ BShape::Close()
 }
 
 
+//	#pragma mark - BShape private methods
+
+
 status_t
-BShape::Perform(perform_code d, void* arg)
+BShape::Perform(perform_code code, void* data)
 {
-	return BArchivable::Perform(d, arg);
+	return BArchivable::Perform(code, data);
 }
+
+
+//	#pragma mark - BShape FBC methods
 
 
 void BShape::_ReservedShape1() {}
 void BShape::_ReservedShape2() {}
 void BShape::_ReservedShape3() {}
 void BShape::_ReservedShape4() {}
+
+
+//	#pragma mark - BShape private methods
 
 
 void
@@ -551,7 +575,7 @@ BShape::GetData(int32* opCount, int32* ptCount, uint32** opList,
 
 void
 BShape::SetData(int32 opCount, int32 ptCount, const uint32* opList,
-				const BPoint* ptList)
+	const BPoint* ptList)
 {
 	Clear();
 
@@ -572,8 +596,6 @@ BShape::SetData(int32 opCount, int32 ptCount, const uint32* opList,
 		data->ptCount = ptCount;
 	}
 }
-
-
 
 
 void
@@ -632,7 +654,7 @@ BShape::AllocatePts(int32 count)
 }
 
 
-//	#pragma mark - binary compatibility
+//	#pragma mark - BShape binary compatibility methods
 
 
 #if __GNUC__ < 3
