@@ -1,0 +1,459 @@
+/*
+ * Copyright 2003-2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers, mflerackers@androme.be
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Shape.h	 hrev47496
+ *		src/kits/interface/Shape.cpp	 hrev47496
+ */
+
+
+/*!
+	\file Shape.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BShape and BShapeIterator class definitions.
+*/
+
+
+/*!
+	\class BShapeIterator
+	\ingroup interface
+	\ingroup libbe
+	\brief Allows you to iterate through BShape operations.
+
+	You should override this class and implement the IterateMoveTo(),
+	IterateLineTo(), IterateBezierTo(), IterateClose(), and IterateArcTo()
+	methods which correspond to BShape::MoveTo(), BShape::LineTo(),
+	BShape::BezierTo(), BShape::Close() and BShape::ArcTo() respectively.
+
+	\sa BShape
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn BShapeIterator::BShapeIterator()
+	\brief Constructor, does nothing.
+
+	This method does nothing and should be implemented by derived classes.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn BShapeIterator::~BShapeIterator()
+	\brief Destructor, does nothing.
+
+	This method does nothing and should be implemented by derived classes.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BShapeIterator::Iterate(BShape* shape)
+	\brief Iterates over each operation that make up the BShape calling
+	       IterateMoveTo(), IterateLineTo(), IterateBezierTo(),
+	       IterateClose() or IterateArcTo() depending on the operation.
+
+	\brief shape The BShape object to iterate through.
+
+	\return Always returns \c B_OK. You should override this method
+	        to return an appropriate status code.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BShapeIterator::IterateMoveTo(BPoint* point)
+	\brief Called by Iterate() to act on \a point.
+
+	This method does nothing and should be implemented by derived classes.
+
+	\param point The point to act on.
+
+	\return Always returns \c B_OK. You should override this method
+	        to return an appropriate status code.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BShapeIterator::IterateLineTo(int32 lineCount,
+		BPoint* linePoints)
+	\brief Called by Iterate() to act on \a lineCount lines comprised of the
+	       points specified by \a linePoints.
+
+	This method does nothing and should be implemented by derived classes.
+
+	\param lineCount The number of points in \a linePoints.
+	\param linePoints The list of points of lines to act on.
+
+	\return Always returns \c B_OK. You should override this method
+	        to return an appropriate status code.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BShapeIterator::IterateBezierTo(int32 bezierCount,
+		BPoint* bezierPoints)
+	\brief Called by Iterate() to act on \a bezierCount Bézier curves
+	       comprised of the points specified by \a bezierPoints.
+
+	This method does nothing and should be implemented by derived classes.
+
+	\param bezierCount The number of points in \a bezierPoints.
+	\param bezierPoints The list of Bézier curve points to act on.
+
+	\return Always returns \c B_OK. You should override this method
+	        to return an appropriate status code.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BShapeIterator::IterateClose()
+	\brief Called by Iterate() to close the BShape.
+
+	This method does nothing and should be implemented by derived classes.
+
+	\return Always returns \c B_OK. You should override this method
+	        to return an appropriate status code.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BShapeIterator::IterateArcTo(float& rx, float& ry,
+		float& angle, bool largeArc, bool counterClockWise, BPoint& point)
+	\brief Called by Iterate() to act on an arc.
+
+	\param rx The horizontal radius of the arc to act on.
+	\param ry The vertical radius of the arc to act on.
+	\param angle The starting angle of the arc in degrees to act on.
+	\param largeArc Whether or not to draw a large arc.
+	\param counterClockWise \c true if the arc is drawn counter-clockwise, \c false
+	       if the arc is drawn clockwise.
+	\param point The center point of the arc to act on.
+
+	This method does nothing and should be implemented by derived classes.
+
+	\return Always returns \c B_OK. You should override this method
+	        to return an appropriate status code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BShape
+	\ingroup interface
+	\ingroup libbe
+	\brief Encapsulates a Postscript-style "path".
+
+	You can obtain the outlines of characters from a string as BShape objects
+	by calling BFont::GetGlyphShapes().
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn BShape::BShape()
+	\brief Creates an empty BShape object.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn BShape::BShape(const BShape& other)
+	\brief Creates a new BShape object as a copy of \a other.
+
+	\param other The BShape object to copy from.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn BShape::BShape(BMessage* archive)
+	\brief Creates a new BShape message from an \a archive message.
+
+	You should call Instantiate() instead as it will validate whether
+	or not the object was created successfully.
+
+	\param archive The BMessage object to construct the data from.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn BShape::~BShape()
+	\brief Destructor, deletes all associated data.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BShape::Archive(BMessage* archive, bool deep) const
+	\brief Archives the BShape object to a BMessage.
+
+	\param archive The BMessage object to archive the BShape data to.
+	\param deep Currently unused.
+
+	\return A status code, \c B_OK on scucess or an error code otherwise.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn BArchivable* BShape::Instantiate(BMessage* archive)
+	\brief Creates a new BShape object from an \a archive message.
+
+	\param archive The BMessage object to construct the BShape data from.
+
+	\return A new BShape object or \c NULL if \a archive was invalid.
+
+	\since BeOS R4
+*/
+
+
+//! @}
+
+
+/*!
+	\name Operators
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BShape& BShape::operator=(const BShape& other)
+	\brief Constructs a BShape object as a copy of \a other by overloading
+	       the = operator.
+
+	\param other The BShape object to copy from.
+
+	\brief Always returns *this.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BShape::operator==(const BShape& other) const
+	\brief Returns whether or not the contents of this BShape and \a other
+	       contain the same data.
+
+	\return \c true if the contents are equal, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BShape::operator!=(const BShape& other) const
+	\brief Returns whether or not the contents of this BShape and \a other
+	       do NOT contain the same data.
+
+	\return \c true if the contents are NOT equal, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BShape::Clear()
+	\brief Deletes all data returning the BShape to an empty state.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn BRect BShape::Bounds() const
+	\brief Returns a BRect that encloses all points in the BShape.
+
+	\warning This implementation doesn't take into account curves at all.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn BPoint BShape::CurrentPosition() const
+	\brief Returns the current end point of the path.
+
+	\return The current end point of the path or \c B_ORIGIN if no points have
+	        been added yet.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BShape::AddShape(const BShape* otherShape)
+	\brief Adds the lines and curves of \a otherShape to BShape.
+
+	\return Always returns \c B_OK.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\name Operations
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BShape::MoveTo(BPoint point)
+	\brief Adds a "move to" operation to the BShape.
+
+	The next LineTo() or BezierTo() will begin at \a point allowing you to
+	create noncontiguous shapes.
+
+	\param point The point to start the next LineTo() or BezierTo() at.
+
+	\return Returns a status code, \c B_OK on success or an error code
+	        otherwise.
+	\retval B_OK The operation was added successfully.
+	\retval B_NO_MEMORY Ran out of memory while trying to add the operation.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BShape::LineTo(BPoint point)
+	\brief Adds a "draw line" operation to the BShape.
+
+	A line will be drawn from the previous point to the \a point specified.
+
+	\param point The point to draw a line to starting at the previous location.
+
+	\return Returns a status code, \c B_OK on success or an error code
+	        otherwise.
+	\retval B_OK The operation was added successfully.
+	\retval B_NO_MEMORY Ran out of memory while trying to add the operation.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BShape::BezierTo(BPoint controlPoints[3])
+	\brief Adds a "draw Bézier curve" operation to the BShape.
+
+	A Bézier curve is drawn that begins at the current point and is made up
+	of the specified \a controlPoints.
+
+	\param controlPoints The points that make up the Bézier curve.
+
+	\return Returns a status code, \c B_OK on success or an error code
+	        otherwise.
+	\retval B_OK The operation was added successfully.
+	\retval B_NO_MEMORY Ran out of memory while trying to add the operation.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BShape::BezierTo(const BPoint& control1,
+		const BPoint& control2, const BPoint& endPoint)
+	\brief Adds a "draw Bézier curve" operation to the BShape.
+
+	A Bézier curve is drawn that begins at the current point and is made up
+	of the specified points.
+
+	\param control1 The first control point of the Bézier curve.
+	\param control2 The second control point of the Bézier curve.
+	\param endPoint The end point of the Bézier curve.
+
+	\return Returns a status code, \c B_OK on success or an error code
+	        otherwise.
+	\retval B_OK The operation was added successfully.
+	\retval B_NO_MEMORY Ran out of memory while trying to add the operation.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BShape::ArcTo(float rx, float ry, float angle, bool largeArc,
+		bool counterClockWise, const BPoint& point)
+	\brief Adds a "draw arc" operation to the BShape.
+
+	An arc is draw that begins at the current point and is specified by the
+	parameters to this method.
+
+	\param rx The horizontal radius of the arc.
+	\param ry The vertical radius of the arc.
+	\param angle The starting angle of the arc in degrees.
+	\param largeArc Whether or not to draw a large arc.
+	\param counterClockWise \c true to draw the arc counter-clockwise, \c false
+	       to draw the arc clockwise.
+	\param point The center point of the arc.
+
+	\return Returns a status code, \c B_OK on success or an error code
+	        otherwise.
+	\retval B_OK The operation was added successfully.
+	\retval B_NO_MEMORY Ran out of memory while trying to add the operation.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BShape::Close()
+	\brief Adds an operation to close the BShape once it is fully constructed.
+
+	\return Returns a status code, \c B_OK on success or an error code
+	       otherwise.
+	\retval B_OK The operation was added successfully.
+	\retval B_NO_MEMORY Ran out of memory while trying to add the operation.
+
+	\return Returns a status code, \c B_OK on success or an error code
+	        otherwise.
+	\retval B_OK The operation was added successfully.
+	\retval B_NO_MEMORY Ran out of memory while trying to add the operation.
+
+	\since BeOS R4
+*/
+
+
+//! @}
