@@ -97,10 +97,10 @@ private:
 	friend class BPrivate::ServerLink;
 
 			void				GetData(int32* opCount, int32* ptCount,
-									uint32** opList, BPoint** pointsList);
+									uint32** opList, BPoint** ptList);
 			void				SetData(int32 opCount, int32 ptCount,
 									const uint32* opList,
-									const BPoint* pointsList);
+									const BPoint* ptList);
 			void				InitData();
 			bool				AllocatePts(int32 count);
 			bool				AllocateOps(int32 count);
