@@ -178,7 +178,7 @@ void
 chop_file(int fdin, char *fname, off_t fsize)
 {
 	const off_t chunk_size = KBytesPerChunk * 1024;  // max bytes written to any output file
-	
+
 	bool open_next_file = true;  // when to open a new output file
 	char fnameN[256];            // name of the current output file (file01, file02, etc.)
 	int  index = 0;              // used to generate the next output file name
@@ -190,27 +190,27 @@ chop_file(int fdin, char *fname, off_t fsize)
 	ssize_t avail;               // how many bytes we can safely grab from the current data block
 	off_t   curr_written = 0;    // number of bytes written to the current output file
 	off_t   total_written = 0;   // total bytes written out to all output files
-		
+
 	char *beg = Block;  // pointer to the beginning of the block data to be written out
 	char *end = Block;  // end of the current block (init to beginning to force first block read)
-	
+
 	printf("Chopping up %s into %d kbyte chunks\n", fname, KBytesPerChunk);
-	
+
 	while (total_written < fsize) {
 		if (beg >= end) {
 			// read in another block
 			got = read(fdin, Block, BLOCKSIZE);
 			if (got <= 0)
 				break;
-			
+
 			beg = Block;
 			end = Block + got - 1;
 		}
-		
+
 		if (open_next_file) {
 			// start a new output file
 			sprintf(fnameN,  "%s%02d", fname, index++);
-			
+
 			fdout = open(fnameN, O_WRONLY|O_CREAT);
 			if (fdout < 0) {
 				fprintf(stderr, "unable to create chunk file '%s': %s\n", fnameN, strerror(errno));
@@ -219,7 +219,7 @@ chop_file(int fdin, char *fname, off_t fsize)
 			curr_written = 0;
 			open_next_file = false;
 		}
-		
+
 		needed = chunk_size - curr_written;
 		avail  = end - beg + 1;
 		if (needed > avail)
@@ -228,18 +228,19 @@ chop_file(int fdin, char *fname, off_t fsize)
 		if (needed > 0) {
 			put = write(fdout, beg, needed);
 			beg += put;
-			
+
 			curr_written  += put;
 			total_written += put;
 		}
-		
+
 		if (curr_written >= chunk_size) {
 			// the current output file is full
 			close(fdout);
 			open_next_file = true;
 		}
 	}
-	
-	// close up the last output file
-	close(fdout);
+
+	// close up the last output file if it's still open
+	if (!open_next_file)
+		close(fdout);
 }
