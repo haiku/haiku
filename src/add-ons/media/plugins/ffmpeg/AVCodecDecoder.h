@@ -64,6 +64,8 @@ private:
 									media_header* mediaHeader,
 									media_decode_info* info);
 
+			status_t			_DecodeNextVideoFrame();
+
 
 			media_header		fHeader;
 			media_format		fInputFormat;
@@ -75,8 +77,10 @@ private:
 			// FFmpeg related members
 			AVCodec*			fCodec;
 			AVCodecContext*		fContext;
-			AVFrame*			fInputPicture;
-			AVFrame*			fOutputPicture;
+			uint8_t*			fDecodedData;
+			size_t				fDecodedDataSizeInBytes;
+			AVFrame*			fPostProcessedDecodedPicture;
+			AVFrame*			fRawDecodedPicture;
 
 			bool 				fCodecInitDone;
 
