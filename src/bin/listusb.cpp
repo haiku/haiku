@@ -593,14 +593,14 @@ DumpMPEGFeatures(uint8 features)
 			printf("                         Not supported\n");
 			break;
 		case 1:
-			printf("                         Supported, not scaleable\n");
+			printf("                         Supported, not scalable\n");
 			break;
 		case 2:
-			printf("                         Scaleable, common boost, "
+			printf("                         Scalable, common boost, "
 				"cut scaling value\n");
 			break;
 		case 3:
-			printf("                         Scaleable, separate boost, "
+			printf("                         Scalable, separate boost, "
 				"cut scaling value\n");
 		default:
 			break;
@@ -648,13 +648,14 @@ DumpAC_3Features(uint8 features)
 			printf("                         Not supported\n");
 			break;
 		case 1:
-			printf("                         Supported, not scaleable\n");
+			printf("                         Supported, not scalable\n");
 			break;
 		case 2:
-			printf("                         Scaleable, common boost, "
+			printf("                         Scalable, common boost, "
 				"cut scaling value\n");
+			break;
 		case 3:
-			printf("                         Scaleable, separate boost, "
+			printf("                         Scalable, separate boost, "
 				"cut scaling value\n");
 		default:
 			break;
