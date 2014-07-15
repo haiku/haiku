@@ -65,6 +65,7 @@ private:
 									media_decode_info* info);
 
 			status_t			_DecodeNextVideoFrame();
+			void				_DeinterlaceAndColorConvertVideoFrame();
 
 
 			media_header		fHeader;
