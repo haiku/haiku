@@ -53,7 +53,7 @@ rule BootLd
 	# Remove any preset LINKLIBS, but link against libgcc.a. Linking against
 	# libsupc++ is opt-out.
 	local libs ;
-	if ! [ on $(1) return HAIKU_NO_LIBSUPC++ ] {
+	if ! [ on $(1) return $(HAIKU_NO_LIBSUPC++) ] {
 		libs += $(TARGET_BOOT_LIBSUPC++) ;
 	}
 	LINKLIBS on $(1) =  $(libs) $(TARGET_BOOT_LIBGCC) ;
