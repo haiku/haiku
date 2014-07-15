@@ -1175,7 +1175,7 @@ BContainerWindow::ViewModeChanged(uint32 oldMode, uint32 newMode)
 	if (fMenuBar != NULL) {
 		// make sure the draggable icon hides if it doesn't
 		// have space left anymore
-		BView *view = fMenuBar->FindView("ThisContainer");
+		BView* view = fMenuBar->FindView("ThisContainer");
 		if (view != NULL)
 			view->FrameMoved(view->Frame().LeftTop());
 	}
@@ -1585,7 +1585,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 
 					// Update draggable folder icon
 					if (fMenuBar != NULL) {
-						BView *view = fMenuBar->FindView("ThisContainer");
+						BView* view = fMenuBar->FindView("ThisContainer");
 						if (!TargetModel()->IsRoot() && !IsTrash()) {
 							// Folder icon should be visible, but in single
 							// window navigation, it might not be.
@@ -1977,7 +1977,7 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 
 		if (!TargetModel()->IsRoot()) {
 			menu->AddItem(cutItem = new(std::nothrow) BMenuItem(
-				B_TRANSLATE("Cut"),	new BMessage(B_CUT), 'X'));
+				B_TRANSLATE("Cut"), new BMessage(B_CUT), 'X'));
 			menu->AddItem(copyItem = new(std::nothrow) BMenuItem(
 				B_TRANSLATE("Copy"), new BMessage(B_COPY), 'C'));
 			menu->AddItem(pasteItem = new(std::nothrow) BMenuItem(
