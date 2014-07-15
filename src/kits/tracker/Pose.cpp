@@ -806,7 +806,7 @@ BPose::TestLargeIconPixel(BPoint point) const
 
 
 void
-BPose::DrawIcon(BPoint where, BView* view, icon_size kind, bool direct,
+BPose::DrawIcon(BPoint where, BView* view, icon_size which, bool direct,
 	bool drawUnselected)
 {
 	if (fClipboardMode == kMoveSelectionTo) {
@@ -818,16 +818,16 @@ BPose::DrawIcon(BPoint where, BView* view, icon_size kind, bool direct,
 		view->SetDrawingMode(B_OP_OVER);
 
 	IconCache::sIconCache->Draw(ResolvedModel(), view, where,
-		fIsSelected && !drawUnselected ? kSelectedIcon : kNormalIcon, kind,
+		fIsSelected && !drawUnselected ? kSelectedIcon : kNormalIcon, which,
 		true);
 
 	if (fPercent != -1)
-		DrawBar(where, view, kind);
+		DrawBar(where, view, which);
 }
 
 
 void
-BPose::DrawBar(BPoint where, BView* view, icon_size kind)
+BPose::DrawBar(BPoint where, BView* view, icon_size which)
 {
 	view->PushState();
 
@@ -835,9 +835,9 @@ BPose::DrawBar(BPoint where, BView* view, icon_size kind)
 	int32 barWidth;
 	int32 barHeight;
 	int32 yOffset;
-	if (kind >= B_LARGE_ICON) {
-		size = kind - 1;
-		barWidth = (int32)(7.0f / 32.0f * (float)kind);
+	if (which >= B_LARGE_ICON) {
+		size = which - 1;
+		barWidth = (int32)(7.0f / 32.0f * (float)which);
 		yOffset = 2;
 		barHeight = size - 4 - 2 * yOffset;
 	} else {

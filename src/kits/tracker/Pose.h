@@ -75,9 +75,9 @@ public:
 		// special purpose draw call for deselecting over a textured
 		// background
 
-	void DrawBar(BPoint where, BView* view, icon_size kind);
+	void DrawBar(BPoint where, BView* view, icon_size which);
 
-	void DrawIcon(BPoint where, BView* view, icon_size kind, bool direct,
+	void DrawIcon(BPoint where, BView* view, icon_size which, bool direct,
 		bool drawUnselected = false);
 	void DrawToggleSwitch(BRect, BPoseView*);
 	void MouseUp(BPoint poseLoc, BPoseView*, BPoint where, int32 index);
