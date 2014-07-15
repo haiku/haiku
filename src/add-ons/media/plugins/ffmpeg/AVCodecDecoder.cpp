@@ -430,6 +430,11 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	fContext->extradata = (uint8_t*)fExtraData;
 	fContext->extradata_size = fExtraDataSize;
 
+	if (fCodec->capabilities & CODEC_CAP_TRUNCATED)
+		// Expect and handle video frames to be splitted across consecutive
+		// data chunks.
+		fContext->flags |= CODEC_FLAG_TRUNCATED;
+
 	TRACE("  requested video format 0x%x\n",
 		inOutFormat->u.raw_video.display.format);
 
