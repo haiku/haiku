@@ -168,7 +168,7 @@ public:
 
 	// Node monitor update call
 	void UpdateEntryRef(const node_ref* dirRef, const char* name);
-	bool AttrChanged(const char*);
+	bool AttrChanged(const char* attrName);
 		// returns true if pose needs to update it's icon, etc.
 		// pass null to force full update
 	bool StatChanged();

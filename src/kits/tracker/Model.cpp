@@ -73,6 +73,10 @@ All rights reserved.
 #include "Utilities.h"
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Model"
+
+
 #ifdef CHECK_OPEN_MODEL_LEAKS
 BObjectList<Model>* writableOpenModelList = NULL;
 BObjectList<Model>* readOnlyOpenModelList = NULL;
@@ -88,11 +92,17 @@ bool CheckNodeIconHintPrivate(const BNode*, bool);
 }	// namespace BPrivate
 
 
+
+
+static bool
+HasVectorIconHint(BNode* node)
+{
+	attr_info info;
+	return node->GetAttrInfo(kAttrIcon, &info) == B_OK;
+}
+
+
 //	#pragma mark - Model()
-
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "Model"
 
 
 Model::Model()
@@ -190,7 +200,6 @@ Model::DeletePreferredAppVolumeNameLinkTo()
 			// deal with link to link to self
 		fLinkTo = NULL;
 		delete tmp;
-
 	} else if (IsVolume())
 		free(fVolumeName);
 	else
@@ -203,19 +212,21 @@ Model::DeletePreferredAppVolumeNameLinkTo()
 Model::~Model()
 {
 #ifdef CHECK_OPEN_MODEL_LEAKS
-	if (writableOpenModelList)
+	if (writableOpenModelList != NULL)
 		writableOpenModelList->RemoveItem(this);
-	if (readOnlyOpenModelList)
+
+	if (readOnlyOpenModelList != NULL)
 		readOnlyOpenModelList->RemoveItem(this);
 #endif
 
 	DeletePreferredAppVolumeNameLinkTo();
-	if (IconCache::NeedsDeletionNotification((IconSource)fIconFrom))
+	if (IconCache::NeedsDeletionNotification((IconSource)fIconFrom)) {
 		// this check allows us to use temporary Model in the IconCache
 		// without the danger of a deadlock
 		IconCache::sIconCache->Deleting(this);
+	}
 #if xDEBUG
-	if (fNode)
+	if (fNode != NULL)
 		PRINT(("destructor closing node for %s\n", Name()));
 #endif
 
@@ -423,9 +434,10 @@ Model::OpenNodeCommon(bool writable)
 #endif
 
 #ifdef CHECK_OPEN_MODEL_LEAKS
-	if (writableOpenModelList)
+	if (writableOpenModelList != NULL)
 		writableOpenModelList->RemoveItem(this);
-	if (readOnlyOpenModelList)
+
+	if (readOnlyOpenModelList != NULL)
 		readOnlyOpenModelList->RemoveItem(this);
 #endif
 
@@ -490,7 +502,7 @@ Model::OpenNodeCommon(bool writable)
 
 	fWritable = writable;
 
-	if (!fMimeType.Length())
+	if (fMimeType.Length() <= 0)
 		FinishSettingUpType();
 
 #ifdef CHECK_OPEN_MODEL_LEAKS
@@ -524,10 +536,10 @@ Model::CloseNode()
 #endif
 
 #ifdef CHECK_OPEN_MODEL_LEAKS
-	if (writableOpenModelList)
+	if (writableOpenModelList != NULL)
 		writableOpenModelList->RemoveItem(this);
 
-	if (readOnlyOpenModelList)
+	if (readOnlyOpenModelList != NULL)
 		readOnlyOpenModelList->RemoveItem(this);
 #endif
 
@@ -562,12 +574,13 @@ Model::SetupBaseType()
 
 		case S_IFREG:
 			// regular file
-			if (fStatBuf.st_mode & S_IXUSR)
+			if ((fStatBuf.st_mode & S_IXUSR) != 0) {
 				// executable
 				fBaseType = kExecutableNode;
-			else
+			} else {
 				// non-executable
 				fBaseType = kPlainNode;
+			}
 			break;
 
 		case S_IFLNK:
@@ -593,14 +606,6 @@ Model::CacheLocalizedName()
 		else
 			fHasLocalizedName = false;
 	}
-}
-
-
-static bool
-HasVectorIconHint(BNode* node)
-{
-	attr_info info;
-	return node->GetAttrInfo(kAttrIcon, &info) == B_OK;
 }
 
 
@@ -733,13 +738,13 @@ Model::FinishSettingUpType()
 						fPreferredAppName = strdup(signature);
 				}
 			}
-			if (!fMimeType.Length())
+			if (fMimeType.Length() <= 0)
 				fMimeType = B_APP_MIME_TYPE;
 					// should use a shared string here
 			break;
 
 		default:
-			if (!fMimeType.Length())
+			if (fMimeType.Length() <= 0)
 				fMimeType = B_FILE_MIMETYPE;
 			break;
 	}
@@ -756,7 +761,7 @@ Model::ResetIconFrom()
 
 	// mirror the logic from FinishSettingUpType
 	if ((fBaseType == kDirectoryNode || fBaseType == kVolumeNode
-		|| fBaseType == kTrashNode || fBaseType == kDesktopNode)
+			|| fBaseType == kTrashNode || fBaseType == kDesktopNode)
 		&& !CheckNodeIconHintPrivate(fNode,
 			dynamic_cast<TTracker*>(be_app) == NULL)) {
 		if (WellKnowEntryList::Match(NodeRef()) > (directory_which)-1) {
@@ -910,8 +915,9 @@ Model::AttrChanged(const char* attrName)
 	if (attrName != NULL
 		&& (strcmp(attrName, kAttrIcon) == 0
 			|| strcmp(attrName, kAttrMiniIcon) == 0
-			|| strcmp(attrName, kAttrLargeIcon) == 0))
+			|| strcmp(attrName, kAttrLargeIcon) == 0)) {
 		return true;
+	}
 
 	if (attrName == NULL
 		|| strcmp(attrName, kAttrMIMEType) == 0
@@ -953,6 +959,7 @@ Model::StatChanged()
 	ASSERT(IsNodeOpen());
 	mode_t oldMode = fStatBuf.st_mode;
 	fStatus = fNode->GetStat(&fStatBuf);
+
 	if (oldMode != fStatBuf.st_mode) {
 		bool forWriting = IsNodeOpenForWriting();
 		CloseNode();
@@ -961,11 +968,12 @@ Model::StatChanged()
 		OpenNodeCommon(forWriting);
 		return true;
 	}
+
 	return false;
 }
 
 
-// 	#pragma mark - Mime handling methods
+//	#pragma mark - Mime handling methods
 
 
 bool
@@ -1227,7 +1235,7 @@ Model::Mimeset(bool force)
 	update_mime_info(path.Path(), 0, 1, force ? 2 : 0);
 	ModelNodeLazyOpener opener(this);
 	opener.OpenNode();
-	AttrChanged(0);
+	AttrChanged(NULL);
 
 	return !oldType.ICompare(MimeType());
 }
