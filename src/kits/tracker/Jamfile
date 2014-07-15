@@ -98,7 +98,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			VirtualDirectoryManager.cpp
 			VirtualDirectoryPoseView.cpp
 			VirtualDirectoryWindow.cpp
-			VolumeWindow.cpp
 			WidgetAttributeText.cpp
 
 			:
@@ -143,7 +142,6 @@ DoCatalogs libtracker.so :
 	Tracker.cpp
 	TrackerInitialState.cpp
 	TrackerSettingsWindow.cpp
-	VolumeWindow.cpp
 	WidgetAttributeText.cpp
 ;
 

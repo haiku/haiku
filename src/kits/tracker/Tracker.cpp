@@ -88,7 +88,6 @@ All rights reserved.
 #include "Thread.h"
 #include "Utilities.h"
 #include "VirtualDirectoryWindow.h"
-#include "VolumeWindow.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -1005,9 +1004,6 @@ TTracker::OpenContainerWindow(Model* model, BMessage* originalRefsList,
 			refList = new BMessage(*originalRefsList);
 		}
 		window = new OpenWithContainerWindow(refList, &fWindowList);
-	} else if (model->IsRoot()) {
-		// window will adopt the model
-		window = new BVolumeWindow(&fWindowList, openFlags);
 	} else if (model->IsQuery()) {
 		// window will adopt the model
 		window = new BQueryContainerWindow(&fWindowList, openFlags);

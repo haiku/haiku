@@ -328,6 +328,7 @@ private:
 	friend class BackgroundView;
 
 	void _UpdateSelectionMIMEInfo();
+	void _AddFolderIcon();
 };
 
 

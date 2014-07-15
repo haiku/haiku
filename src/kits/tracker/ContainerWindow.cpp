@@ -934,19 +934,8 @@ BContainerWindow::Init(const BMessage* message)
 				-(KeyMenuBar()->Bounds().Height()));
 		}
 
-		// add folder icon to menu bar
-		if (!TargetModel()->IsRoot() && !IsTrash()) {
-			float iconSize = fMenuBar->Bounds().Height() - 2;
-			if (iconSize < 16)
-				iconSize = 16;
-			float iconPosY = 1 + (fMenuBar->Bounds().Height() - 2
-				- iconSize) / 2;
-			BView* icon = new DraggableContainerIcon(BRect(Bounds().Width()
-					- 4 - iconSize + 1, iconPosY, Bounds().Width() - 4,
-					iconPosY + iconSize - 1), "ThisContainer",
-				B_FOLLOW_RIGHT);
-			fMenuBar->AddChild(icon);
-		}
+		if (!TargetModel()->IsRoot() && !IsTrash())
+			_AddFolderIcon();
 	} else {
 		// add equivalents of the menu shortcuts to the menuless
 		// desktop window
@@ -1183,11 +1172,10 @@ BContainerWindow::WorkspacesChanged(uint32, uint32)
 void
 BContainerWindow::ViewModeChanged(uint32 oldMode, uint32 newMode)
 {
-	BView* view = FindView("MenuBar");
-	if (view != NULL) {
+	if (fMenuBar != NULL) {
 		// make sure the draggable icon hides if it doesn't
 		// have space left anymore
-		view = view->FindView("ThisContainer");
+		BView *view = fMenuBar->FindView("ThisContainer");
 		if (view != NULL)
 			view->FrameMoved(view->Frame().LeftTop());
 	}
@@ -1596,12 +1584,20 @@ BContainerWindow::MessageReceived(BMessage* message)
 						settings.SingleWindowBrowse());
 
 					// Update draggable folder icon
-					BView* view = FindView("MenuBar");
-					if (view != NULL) {
-						view = view->FindView("ThisContainer");
-						if (view != NULL) {
-							IconCache::sIconCache->IconChanged(TargetModel());
-							view->Invalidate();
+					if (fMenuBar != NULL) {
+						BView *view = fMenuBar->FindView("ThisContainer");
+						if (!TargetModel()->IsRoot() && !IsTrash()) {
+							// Folder icon should be visible, but in single
+							// window navigation, it might not be.
+							if (view != NULL) {
+								IconCache::sIconCache->IconChanged(
+									TargetModel());
+								view->Invalidate();
+							} else
+								_AddFolderIcon();
+						} else if (view != NULL) {
+							view->RemoveSelf();
+							fMenuBar->Invalidate();
 						}
 					}
 
@@ -1918,7 +1914,7 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 	}
 
 	if (!TargetModel()->IsQuery() && !TargetModel()->IsVirtualDirectory()
-		&& !IsTrash() && !IsPrintersDir()) {
+		&& !IsTrash() && !IsPrintersDir() && !TargetModel()->IsRoot()) {
 		if (!PoseView()->IsFilePanel()) {
 			TemplatesMenu* templateMenu = new TemplatesMenu(PoseView(),
 				B_TRANSLATE("New"));
@@ -1953,6 +1949,13 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 		menu->AddItem(new BSeparatorItem(), 1);
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Make active printer"),
 			new BMessage(kMakeActivePrinter)));
+	} else if (TargetModel()->IsRoot()) {
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("Unmount"),
+			new BMessage(kUnmountVolume), 'U');
+		item->SetEnabled(false);
+		menu->AddItem(item);
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Mount settings" B_UTF8_ELLIPSIS),
+			new BMessage(kRunAutomounterSettings)));
 	} else {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Duplicate"),
 			new BMessage(kDuplicateSelection), 'D'));
@@ -1972,17 +1975,19 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 	if (!IsPrintersDir()) {
 		menu->AddSeparatorItem();
 
-		menu->AddItem(cutItem = new BMenuItem(B_TRANSLATE("Cut"),
-			new BMessage(B_CUT), 'X'));
-		menu->AddItem(copyItem = new BMenuItem(B_TRANSLATE("Copy"),
-			new BMessage(B_COPY), 'C'));
-		menu->AddItem(pasteItem = new BMenuItem(B_TRANSLATE("Paste"),
-			new BMessage(B_PASTE), 'V'));
+		if (!TargetModel()->IsRoot()) {
+			menu->AddItem(cutItem = new(std::nothrow) BMenuItem(
+				B_TRANSLATE("Cut"),	new BMessage(B_CUT), 'X'));
+			menu->AddItem(copyItem = new(std::nothrow) BMenuItem(
+				B_TRANSLATE("Copy"), new BMessage(B_COPY), 'C'));
+			menu->AddItem(pasteItem = new(std::nothrow) BMenuItem(
+				B_TRANSLATE("Paste"), new BMessage(B_PASTE), 'V'));
 
-		menu->AddSeparatorItem();
+			menu->AddSeparatorItem();
 
-		menu->AddItem(new BMenuItem(B_TRANSLATE("Identify"),
-			new BMessage(kIdentifyEntry)));
+			menu->AddItem(new BMenuItem(B_TRANSLATE("Identify"),
+				new BMessage(kIdentifyEntry)));
+		}
 		BMenu* addOnMenuItem = new BMenu(B_TRANSLATE("Add-ons"));
 		addOnMenuItem->SetFont(be_plain_font);
 		menu->AddItem(addOnMenuItem);
@@ -2201,6 +2206,30 @@ BContainerWindow::MenusBeginning()
 	SetupMoveCopyMenus(selectCount
 		? PoseView()->SelectionList()->FirstItem()->TargetModel()->EntryRef()
 		: NULL, fFileMenu);
+
+	if (TargetModel()->IsRoot()) {
+		BVolume boot;
+		BVolumeRoster().GetBootVolume(&boot);
+
+		bool ejectableVolumeSelected = false;
+
+		int32 count = PoseView()->SelectionList()->CountItems();
+		for (int32 index = 0; index < count; index++) {
+			Model* model
+				= PoseView()->SelectionList()->ItemAt(index)->TargetModel();
+			if (model->IsVolume()) {
+				BVolume volume;
+				volume.SetTo(model->NodeRef()->device);
+				if (volume != boot) {
+					ejectableVolumeSelected = true;
+					break;
+				}
+			}
+		}
+		BMenuItem* item = fMenuBar->FindItem(kUnmountVolume);
+		if (item != NULL)
+			item->SetEnabled(ejectableVolumeSelected);
+	}
 
 	UpdateMenu(fMenuBar, kMenuBarContext);
 
@@ -2501,7 +2530,7 @@ void
 BContainerWindow::SetupMoveCopyMenus(const entry_ref* item_ref, BMenu* parent)
 {
 	if (IsTrash() || InTrash() || IsPrintersDir() || !fMoveToItem
-		|| !fCopyToItem || !fCreateLinkItem) {
+		|| !fCopyToItem || !fCreateLinkItem || TargetModel()->IsRoot()) {
 		return;
 	}
 
@@ -2879,7 +2908,7 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 	} else if (IsPrintersDir()) {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Add printer" B_UTF8_ELLIPSIS),
 			new BMessage(kAddPrinter), 'N'));
-	} else if (InTrash())
+	} else if (InTrash() || TargetModel()->IsRoot())
 		needSeparator = false;
 	else {
 		TemplatesMenu* templateMenu = new TemplatesMenu(PoseView(),
@@ -2909,6 +2938,11 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 	if (!IsTrash()) {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Open parent"),
 			new BMessage(kOpenParentDir), B_UP_ARROW));
+	}
+
+	if (TargetModel()->IsRoot()) {
+		menu->AddSeparatorItem();
+		menu->AddItem(new MountMenu(B_TRANSLATE("Mount")));
 	}
 
 	menu->AddSeparatorItem();
@@ -3260,6 +3294,26 @@ BContainerWindow::_UpdateSelectionMIMEInfo()
 		}
 	}
 }
+
+
+void
+BContainerWindow::_AddFolderIcon()
+{
+	if (fMenuBar == NULL)
+		return;
+	float iconSize = fMenuBar->Bounds().Height() - 2;
+	if (iconSize < 16)
+		iconSize = 16;
+	float iconPosY = 1 + (fMenuBar->Bounds().Height() - 2
+		- iconSize) / 2;
+	BView* icon = new(std::nothrow) DraggableContainerIcon(
+		BRect(Bounds().Width() - 4 - iconSize + 1, iconPosY,
+			Bounds().Width() - 4, iconPosY + iconSize - 1), "ThisContainer",
+		B_FOLLOW_RIGHT);
+	if (icon != NULL)
+		fMenuBar->AddChild(icon);
+}
+
 
 
 BMenuItem*
