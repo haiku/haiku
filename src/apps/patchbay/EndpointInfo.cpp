@@ -111,8 +111,10 @@ CreateIcon(const BMessage* msg, icon_size which)
 			bitmap) == B_OK) {
 			printf("Created vector icon bitmap\n");
 			return bitmap;
-		} else
+		} else {
 			delete bitmap;
+			bitmap = NULL;
+		}
 	}
 
 	// If not, look for BeOS style icon
@@ -128,9 +130,8 @@ CreateIcon(const BMessage* msg, icon_size which)
 		bmapSize = MINI_ICON_SIZE - 1;
 		iconType = MINI_ICON_TYPE;
 		iconName = MINI_ICON_NAME;
-	} else {
+	} else
 		return NULL;
-	}
 
 	if (msg->FindData(iconName, iconType, &data, &size) == B_OK) {
 		bitmap = new BBitmap(BRect(0, 0, bmapSize, bmapSize),
