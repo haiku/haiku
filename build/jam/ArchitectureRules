@@ -501,7 +501,7 @@ rule ArchitectureSetupWarnings architecture
 
 	rule EnableWerror dirTokens : scope {
 		# Clang gives way more warnings than GCC, so that code won't compile
-		# -Werror when using Clang.
+		# with -Werror when using Clang.
 		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
 			SetConfigVar WARNINGS : HAIKU_TOP $(dirTokens) : treatAsErrors
 				: $(scope) ;
