@@ -36,8 +36,9 @@ All rights reserved.
 #include <Message.h>
 #include <PropertyInfo.h>
 
-#include "Tracker.h"
+#include "ContainerWindow.h"
 #include "FSUtils.h"
+#include "Tracker.h"
 
 
 #define kPropertyTrash "Trash"
@@ -45,19 +46,20 @@ All rights reserved.
 #define kPropertyPreferences "Preferences"
 
 
-#if 0
+/*
+Available scripting commands:
+
 doo Tracker delete Trash
-doo Tracker create Folder to '/boot/home/Desktop/hello'
+doo Tracker create Folder to '/boot/home/Desktop/hello'		# mkdir
+doo Tracker get Folder to '/boot/home/Desktop/hello'		# get window for path
+doo Tracker execute Folder to '/boot/home/Desktop/hello'	# open window
 
 ToDo:
 Create file: on a "Tracker" "File" "B_CREATE_PROPERTY" "name"
 Create query: on a "Tracker" "Query" "B_CREATE_PROPERTY" "name"
-Open a folder: Tracker Execute "Folder" bla
-Find a window for a path
-#endif
+*/
 
 
-#if _SUPPORTS_FEATURE_SCRIPTING
 const property_info kTrackerPropertyList[] = {
 	{
 		kPropertyTrash,
@@ -71,9 +73,11 @@ const property_info kTrackerPropertyList[] = {
 	},
 	{
 		kPropertyFolder,
-		{ B_CREATE_PROPERTY },
+		{ B_CREATE_PROPERTY, B_GET_PROPERTY, B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER },
-		"create Folder to path # creates a new folder",
+		"create Folder to path # creates a new folder\n"
+		"get Folder to path # get Tracker window pointing to folder\n"
+		"execute Folder to path # opens Tracker window pointing to folder\n",
 		0,
 		{ B_REF_TYPE },
 		{},
@@ -168,7 +172,7 @@ TTracker::HandleScriptingMessage(BMessage* message)
 			break;
 
 		case B_GET_PROPERTY:
-			handled = GetProperty(&specifier, form, property, &reply);
+			handled = GetProperty(message, form, property, &reply);
 			break;
 
 		case B_SET_PROPERTY:
@@ -185,7 +189,7 @@ TTracker::HandleScriptingMessage(BMessage* message)
 			break;
 
 		case B_EXECUTE_PROPERTY:
-			handled = ExecuteProperty(&specifier, form, property, &reply);
+			handled = ExecuteProperty(message, form, property, &reply);
 			break;
 	}
 
@@ -255,46 +259,9 @@ TTracker::DeleteProperty(BMessage*, int32 form, const char* property, BMessage*)
 }
 
 
-#else	// _SUPPORTS_FEATURE_SCRIPTING
-status_t
-TTracker::GetSupportedSuites(BMessage*)
-{
-	return B_UNSUPPORTED;
-}
-
-
-BHandler*
-TTracker::ResolveSpecifier(BMessage*, int32, BMessage*, int32, const char*)
-{
-	return NULL;
-}
-
-
 bool
-TTracker::HandleScriptingMessage(BMessage*)
-{
-	return false;
-}
-
-
-bool
-TTracker::CreateProperty(BMessage*, BMessage*, int32, const char*, BMessage*)
-{
-	return false;
-}
-
-
-bool
-TTracker::DeleteProperty(BMessage*, int32, const char*, BMessage*)
-{
-	return false;
-}
-#endif	// _SUPPORTS_FEATURE_SCRIPTING
-
-
-bool
-TTracker::ExecuteProperty(BMessage*, int32 form, const char* property,
-	BMessage*)
+TTracker::ExecuteProperty(BMessage* message, int32 form, const char* property,
+	BMessage* reply)
 {
 	if (strcmp(property, kPropertyPreferences) == 0) {
 		if (form != B_DIRECT_SPECIFIER) {
@@ -302,6 +269,29 @@ TTracker::ExecuteProperty(BMessage*, int32 form, const char* property,
 			return false;
 		}
 		ShowSettingsWindow();
+
+		return true;
+	}
+
+	if (strcmp(property, kPropertyFolder) == 0) {
+		message->PrintToStream();
+		if (form != B_DIRECT_SPECIFIER)
+			return false;
+
+		// create new empty folders
+		entry_ref ref;
+		for (int32 index = 0;
+			message->FindRef("data", index, &ref) == B_OK; index++) {
+			status_t error = OpenRef(&ref, NULL, NULL, kOpen, NULL);
+
+			if (error == B_OK) {
+				reply->AddMessenger("window",
+					BMessenger(FindContainerWindow(&ref)));
+			} else {
+				reply->AddInt32("error", error);
+				break;
+			}
+		}
 
 		return true;
 	}
@@ -318,8 +308,31 @@ TTracker::CountProperty(BMessage*, int32, const char*, BMessage*)
 
 
 bool
-TTracker::GetProperty(BMessage*, int32, const char*, BMessage*)
+TTracker::GetProperty(BMessage* message, int32 form, const char* property,
+		BMessage* reply)
 {
+	if (strcmp(property, kPropertyFolder) == 0) {
+		message->PrintToStream();
+		if (form != B_DIRECT_SPECIFIER)
+			return false;
+
+		// create new empty folders
+		entry_ref ref;
+		for (int32 index = 0;
+			message->FindRef("data", index, &ref) == B_OK; index++) {
+			BHandler* window = FindContainerWindow(&ref);
+
+			if (window != NULL)
+				reply->AddMessenger("window", BMessenger(window));
+			else {
+				reply->AddInt32("error", B_NAME_NOT_FOUND);
+				break;
+			}
+		}
+
+		return true;
+	}
+
 	return false;
 }
 
