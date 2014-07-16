@@ -205,7 +205,7 @@ GIFLoad::ReadGIFControlBlock()
 	if (fInput->Read(data, 6) < 6)
 		return false;
 
-	if (data[1] & 0x01) {
+	if ((data[1] & 0x01) != 0) {
 		fPalette->usetransparent = true;
 		fPalette->transparentindex = data[4];
 		if (debug) {
