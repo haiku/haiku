@@ -505,51 +505,32 @@ DownloadProgressView::MessageReceived(BMessage* message)
 			break;
 		case OPEN_CONTAINING_FOLDER:
 			if (fPath.InitCheck() == B_OK) {
+				BEntry selected(fPath.Path());
+				if (!selected.Exists())
+					break;
+
 				BPath containingFolder;
 				if (fPath.GetParent(&containingFolder) != B_OK)
 					break;
-				BEntry entry(containingFolder.Path());
-				if (!entry.Exists())
-					break;
 				entry_ref ref;
-				if (entry.GetRef(&ref) != B_OK)
+				if (get_ref_for_path(containingFolder.Path(), &ref) != B_OK)
 					break;
-				be_roster->Launch(&ref);
 
-				// Use Tracker scripting and select the download pose
-				// in the window.
-				// TODO: We should somehow get the window that just openend.
-				// Using the name like this is broken when there are multiple
-				// windows open with this name. Also Tracker does not scroll
-				// to this entry.
-				BString windowName = ref.name;
-				BString fullWindowName = containingFolder.Path();
-
+				// Ask Tracker to open the containing folder and select the
+				// file inside it.
 				BMessenger trackerMessenger("application/x-vnd.Be-TRAK");
-				if (trackerMessenger.IsValid()
-					&& get_ref_for_path(fPath.Path(), &ref) == B_OK) {
-					// We need to wait a bit until the folder is open.
-					// TODO: This is also too fragile... we should be able
-					// to wait for the roster message.
-					snooze(250000);
-					int32 tries = 2;
-					while (tries > 0) {
-						BMessage selectionCommand(B_SET_PROPERTY);
-						selectionCommand.AddSpecifier("Selection");
-						selectionCommand.AddSpecifier("Poses");
-						selectionCommand.AddSpecifier("Window",
-							windowName.String());
-						selectionCommand.AddRef("data", &ref);
-						BMessage reply;
-						trackerMessenger.SendMessage(&selectionCommand, &reply);
-						int32 error;
-						if (reply.FindInt32("error", &error) != B_OK
-							|| error == B_OK) {
-							break;
-						}
-						windowName = fullWindowName;
-						tries--;
+
+				if (trackerMessenger.IsValid()) {
+					BMessage selectionCommand(B_REFS_RECEIVED);
+					selectionCommand.AddRef("refs", &ref);
+
+					node_ref selectedRef;
+					if (selected.GetNodeRef(&selectedRef) == B_OK) {
+						selectionCommand.AddData("nodeRefToSelect", B_RAW_TYPE,
+							(void*)&selectedRef, sizeof(node_ref));
 					}
+
+					trackerMessenger.SendMessage(&selectionCommand);
 				}
 			}
 			break;
