@@ -50,10 +50,6 @@ All rights reserved.
 
 #define kPropertyPath "Path"
 
-#ifndef _SCRIPTING_ONLY
-		#define _SCRIPTING_ONLY(x) x
-#endif
-
 // notes on PoseView scripting interface:
 // Indices and entry_refs are used to specify poses; In the case of indices
 // and previous/next specifiers the current PoseView sort order is used.
@@ -199,7 +195,7 @@ const property_info kPosesPropertyList[] = {
 
 
 status_t
-BPoseView::GetSupportedSuites(BMessage* _SCRIPTING_ONLY(data))
+BPoseView::GetSupportedSuites(BMessage* data)
 {
 	data->AddString("suites", kPosesSuites);
 	BPropertyInfo propertyInfo(
@@ -211,7 +207,7 @@ BPoseView::GetSupportedSuites(BMessage* _SCRIPTING_ONLY(data))
 
 
 bool
-BPoseView::HandleScriptingMessage(BMessage* _SCRIPTING_ONLY(message))
+BPoseView::HandleScriptingMessage(BMessage* message)
 {
 	if (message->what != B_GET_PROPERTY
 		&& message->what != B_SET_PROPERTY
@@ -276,9 +272,8 @@ BPoseView::HandleScriptingMessage(BMessage* _SCRIPTING_ONLY(message))
 
 
 bool
-BPoseView::ExecuteProperty(BMessage* _SCRIPTING_ONLY(specifier),
-	int32 _SCRIPTING_ONLY(form), const char* _SCRIPTING_ONLY(property),
-	BMessage* _SCRIPTING_ONLY(reply))
+BPoseView::ExecuteProperty(BMessage* specifier, int32 form,
+	const char* property, BMessage* reply)
 {
 	status_t result = B_OK;
 	bool handled = false;
@@ -327,9 +322,8 @@ BPoseView::ExecuteProperty(BMessage* _SCRIPTING_ONLY(specifier),
 
 
 bool
-BPoseView::CreateProperty(BMessage* _SCRIPTING_ONLY(specifier), BMessage*,
-	int32 _SCRIPTING_ONLY(form), const char* _SCRIPTING_ONLY(property),
-	BMessage* _SCRIPTING_ONLY(reply))
+BPoseView::CreateProperty(BMessage* specifier, BMessage*, int32 form,
+	const char* property, BMessage* reply)
 {
 	status_t result = B_OK;
 	bool handled = false;
@@ -384,9 +378,8 @@ BPoseView::CreateProperty(BMessage* _SCRIPTING_ONLY(specifier), BMessage*,
 
 
 bool
-BPoseView::DeleteProperty(BMessage* _SCRIPTING_ONLY(specifier),
-	int32 _SCRIPTING_ONLY(form), const char* _SCRIPTING_ONLY(property),
-	BMessage* _SCRIPTING_ONLY(reply))
+BPoseView::DeleteProperty(BMessage* specifier, int32 form,
+	const char* property, BMessage* reply)
 {
 	status_t result = B_OK;
 	bool handled = false;
@@ -483,9 +476,8 @@ BPoseView::DeleteProperty(BMessage* _SCRIPTING_ONLY(specifier),
 
 
 bool
-BPoseView::CountProperty(BMessage*, int32,
-	const char* _SCRIPTING_ONLY(property),
-	BMessage* _SCRIPTING_ONLY(reply))
+BPoseView::CountProperty(BMessage*, int32, const char* property,
+	BMessage* reply)
 {
 	bool handled = false;
 	//PRINT(("BPoseView::CountProperty, %s\n", property));
@@ -504,9 +496,8 @@ BPoseView::CountProperty(BMessage*, int32,
 
 
 bool
-BPoseView::GetProperty(BMessage* _SCRIPTING_ONLY(specifier),
-	int32 _SCRIPTING_ONLY(form), const char* _SCRIPTING_ONLY(property),
-	BMessage* _SCRIPTING_ONLY(reply))
+BPoseView::GetProperty(BMessage* specifier, int32 form,
+	const char* property, BMessage* reply)
 {
 //	PRINT(("GetProperty %s\n", property));
 	bool handled = false;
@@ -637,9 +628,8 @@ BPoseView::GetProperty(BMessage* _SCRIPTING_ONLY(specifier),
 
 
 bool
-BPoseView::SetProperty(BMessage* _SCRIPTING_ONLY(message), BMessage*,
-	int32 _SCRIPTING_ONLY(form), const char* _SCRIPTING_ONLY(property),
-	BMessage* _SCRIPTING_ONLY(reply))
+BPoseView::SetProperty(BMessage* message, BMessage*, int32 form,
+	const char* property, BMessage* reply)
 {
 	status_t result = B_OK;
 	bool handled = false;
@@ -706,9 +696,8 @@ BPoseView::SetProperty(BMessage* _SCRIPTING_ONLY(message), BMessage*,
 
 
 BHandler*
-BPoseView::ResolveSpecifier(BMessage* _SCRIPTING_ONLY(message),
-	int32 _SCRIPTING_ONLY(index), BMessage* _SCRIPTING_ONLY(specifier),
-	int32 _SCRIPTING_ONLY(form), const char* _SCRIPTING_ONLY(property))
+BPoseView::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 form, const char* property)
 {
 	BPropertyInfo propertyInfo(
 		const_cast<property_info*>(kPosesPropertyList));
@@ -726,8 +715,8 @@ BPoseView::ResolveSpecifier(BMessage* _SCRIPTING_ONLY(message),
 
 
 BPose*
-BPoseView::FindPose(const entry_ref* _SCRIPTING_ONLY(ref),
-	int32 _SCRIPTING_ONLY(specifierForm), int32* _SCRIPTING_ONLY(index)) const
+BPoseView::FindPose(const entry_ref* ref, int32 specifierForm,
+	int32* index) const
 {
 	// flavor of FindPose, used by previous/next specifiers
 

@@ -854,8 +854,7 @@ void
 BHttpRequest::_ParseHeaders()
 {
 	BString currentHeader;
-	while (_GetLine(currentHeader) != B_ERROR)
-	{
+	while (_GetLine(currentHeader) != B_ERROR) {
 		// An empty line means the end of the header section
 		if (currentHeader.Length() == 0) {
 			fRequestStatus = kRequestHeadersReceived;
