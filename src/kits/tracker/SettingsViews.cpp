@@ -189,10 +189,6 @@ DesktopSettingsView::DesktopSettingsView()
 		B_TRANSLATE("Show shared volumes on Desktop"),
 		new BMessage(kVolumesOnDesktopChanged));
 
-	fMountButton = new BButton("",
-		B_TRANSLATE("Mount settings" B_UTF8_ELLIPSIS),
-		new BMessage(kRunAutomounterSettings));
-
 	const float spacing = be_control_look->DefaultItemSpacing();
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
@@ -203,13 +199,7 @@ DesktopSettingsView::DesktopSettingsView()
 			.SetInsets(spacing * 2, 0, 0, 0)
 			.End()
 		.AddGlue()
-		.AddGroup(B_HORIZONTAL)
-			.Add(fMountButton)
-			.AddGlue()
-			.End()
 		.SetInsets(spacing);
-
-	fMountButton->SetTarget(be_app);
 }
 
 

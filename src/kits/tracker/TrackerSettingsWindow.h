@@ -54,6 +54,15 @@ public:
 	void MessageReceived(BMessage* message);
 	void Show();
 
+	enum SettingsPage {
+		kDesktopSettings,
+		kWindowsSettings,
+		kSpaceBarSettings,
+		kAutomountSettings
+	};
+
+	void ShowPage(SettingsPage page);
+
 private:
 	SettingsView* _ViewAt(int32 i);
 

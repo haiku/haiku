@@ -33,8 +33,6 @@ All rights reserved.
 */
 
 
-#include "AutoMounterSettings.h"
-
 #include <Alert.h>
 #include <Box.h>
 #include <Button.h>
@@ -52,6 +50,8 @@ All rights reserved.
 
 #include <MountServer.h>
 
+#include "SettingsViews.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "AutoMounterSettings"
@@ -62,50 +62,13 @@ const uint32 kBootMountSettingsChanged = 'bchg';
 const uint32 kEjectWhenUnmountingChanged = 'ejct';
 
 
-class AutomountSettingsPanel : public BBox {
-public:
-								AutomountSettingsPanel(BMessage* settings,
-									const BMessenger& target);
-	virtual						~AutomountSettingsPanel();
-
-protected:
-	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				AttachedToWindow();
-
-private:
-			void				_SendSettings(bool rescan);
-
-			BRadioButton*		fInitialDontMountCheck;
-			BRadioButton*		fInitialMountAllBFSCheck;
-			BRadioButton*		fInitialMountAllCheck;
-			BRadioButton*		fInitialMountRestoreCheck;
-
-			BRadioButton*		fScanningDisabledCheck;
-			BRadioButton*		fAutoMountAllBFSCheck;
-			BRadioButton*		fAutoMountAllCheck;
-
-			BCheckBox*			fEjectWhenUnmountingCheckBox;
-
-			BButton*			fDone;
-			BButton*			fMountAllNow;
-
-			BMessenger			fTarget;
-
-			typedef BBox _inherited;
-};
-
-
-AutomountSettingsDialog* AutomountSettingsDialog::sOneCopyOnly = NULL;
-
-
 //	#pragma mark - AutomountSettingsPanel
 
 
-AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
-	const BMessenger& target)
+AutomountSettingsPanel::AutomountSettingsPanel()
 	:
-	BBox("", B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_NO_BORDER),
-	fTarget(target)
+	SettingsView(""),
+	fTarget(kMountServerSignature)
 {
 	const float spacing = be_control_look->DefaultItemSpacing();
 
@@ -161,12 +124,8 @@ AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
 
 	// Buttons
 
-	fDone = new BButton(B_TRANSLATE("Done"), new BMessage(B_QUIT_REQUESTED));
-
 	fMountAllNow = new BButton("mountAll", B_TRANSLATE("Mount all disks now"),
 		new BMessage(kMountAllNow));
-
-	fDone->MakeDefault(true);
 
 	// Layout the controls
 
@@ -190,42 +149,58 @@ AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
 			.End()
 		.Add(new BSeparatorView(B_HORIZONTAL/*, B_FANCY_BORDER*/))
 		.AddGroup(B_HORIZONTAL, spacing)
-			.SetInsets(0, spacing, spacing, spacing)
-			.AddGlue()
+			.SetInsets(spacing, spacing, spacing, spacing)
 			.Add(fMountAllNow)
-			.Add(fDone);
+			.AddGlue();
 
-	// Apply the settings
-
-	bool result;
-	if (settings->FindBool("autoMountAll", &result) == B_OK && result)
-		fAutoMountAllCheck->SetValue(B_CONTROL_ON);
-	else if (settings->FindBool("autoMountAllBFS", &result) == B_OK && result)
-		fAutoMountAllBFSCheck->SetValue(B_CONTROL_ON);
-	else
-		fScanningDisabledCheck->SetValue(B_CONTROL_ON);
-
-	if (settings->FindBool("suspended", &result) == B_OK && result)
-		fScanningDisabledCheck->SetValue(B_CONTROL_ON);
-
-	if (settings->FindBool("initialMountAll", &result) == B_OK && result)
-		fInitialMountAllCheck->SetValue(B_CONTROL_ON);
-	else if (settings->FindBool("initialMountRestore", &result) == B_OK
-		&& result) {
-		fInitialMountRestoreCheck->SetValue(B_CONTROL_ON);
-	} else if (settings->FindBool("initialMountAllBFS", &result) == B_OK
-		&& result) {
-		fInitialMountAllBFSCheck->SetValue(B_CONTROL_ON);
-	} else
-		fInitialDontMountCheck->SetValue(B_CONTROL_ON);
-
-	if (settings->FindBool("ejectWhenUnmounting", &result) == B_OK && result)
-		fEjectWhenUnmountingCheckBox->SetValue(B_CONTROL_ON);
+	ShowCurrentSettings();
 }
 
 
 AutomountSettingsPanel::~AutomountSettingsPanel()
 {
+}
+
+
+bool
+AutomountSettingsPanel::IsDefaultable() const
+{
+	return false;
+}
+
+
+void
+AutomountSettingsPanel::Revert()
+{
+	_ParseSettings(fInitialSettings);
+	_SendSettings(false);
+}
+
+
+void
+AutomountSettingsPanel::ShowCurrentSettings()
+{
+	// Apply the settings
+	BMessage settings;
+	_GetSettings(&settings);
+	_ParseSettings(settings);
+}
+
+
+void
+AutomountSettingsPanel::RecordRevertSettings()
+{
+	_GetSettings(&fInitialSettings);
+}
+
+
+bool
+AutomountSettingsPanel::IsRevertable() const
+{
+	BMessage currentSettings;
+	_GetSettings(&currentSettings);
+
+	return !currentSettings.HasSameData(fInitialSettings);
 }
 
 
@@ -242,7 +217,6 @@ AutomountSettingsPanel::AttachedToWindow()
 	fScanningDisabledCheck->SetTarget(this);
 	fEjectWhenUnmountingCheckBox->SetTarget(this);
 
-	fDone->SetTarget(this);
 	fMountAllNow->SetTarget(fTarget);
 }
 
@@ -296,55 +270,53 @@ AutomountSettingsPanel::_SendSettings(bool rescan)
 		(bool)fEjectWhenUnmountingCheckBox->Value());
 
 	fTarget.SendMessage(&message);
-}
 
-
-//	#pragma mark - AutomountSettingsDialog
-
-
-AutomountSettingsDialog::AutomountSettingsDialog(BMessage* settings,
-	const BMessenger& target)
-	:
-	BWindow(BRect(100, 100, 320, 370), B_TRANSLATE("Disk mount settings"),
-		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
-{
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	BView* view = new AutomountSettingsPanel(settings, target);
-	AddChild(view);
-
-	ASSERT(!sOneCopyOnly);
-	sOneCopyOnly = this;
-}
-
-
-AutomountSettingsDialog::~AutomountSettingsDialog()
-{
-	ASSERT(sOneCopyOnly);
-	sOneCopyOnly = NULL;
+	// Tell the settings window the contents have changed:
+	Window()->PostMessage(kSettingsContentsModified);
 }
 
 
 void
-AutomountSettingsDialog::RunAutomountSettings(const BMessenger& target)
+AutomountSettingsPanel::_GetSettings(BMessage* reply) const
 {
-	// either activate an existing mount settings dialog or create a new one
-	if (sOneCopyOnly != NULL) {
-		sOneCopyOnly->Activate();
-		return;
-	}
-
 	BMessage message(kGetAutomounterParams);
-	BMessage reply;
-	if (target.SendMessage(&message, &reply, 2500000) != B_OK) {
+	if (fTarget.SendMessage(&message, reply, 2500000) != B_OK) {
 		BAlert* alert = new BAlert(B_TRANSLATE("Mount server error"),
 			B_TRANSLATE("The mount server could not be contacted."),
 			B_TRANSLATE("OK"),
 			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
-		return;
 	}
-
-	(new AutomountSettingsDialog(&reply, target))->Show();
 }
+
+
+void
+AutomountSettingsPanel::_ParseSettings(const BMessage& settings)
+{
+	bool result;
+	if (settings.FindBool("autoMountAll", &result) == B_OK && result)
+		fAutoMountAllCheck->SetValue(B_CONTROL_ON);
+	else if (settings.FindBool("autoMountAllBFS", &result) == B_OK && result)
+		fAutoMountAllBFSCheck->SetValue(B_CONTROL_ON);
+	else
+		fScanningDisabledCheck->SetValue(B_CONTROL_ON);
+
+	if (settings.FindBool("suspended", &result) == B_OK && result)
+		fScanningDisabledCheck->SetValue(B_CONTROL_ON);
+
+	if (settings.FindBool("initialMountAll", &result) == B_OK && result)
+		fInitialMountAllCheck->SetValue(B_CONTROL_ON);
+	else if (settings.FindBool("initialMountRestore", &result) == B_OK
+		&& result) {
+		fInitialMountRestoreCheck->SetValue(B_CONTROL_ON);
+	} else if (settings.FindBool("initialMountAllBFS", &result) == B_OK
+		&& result) {
+		fInitialMountAllBFSCheck->SetValue(B_CONTROL_ON);
+	} else
+		fInitialDontMountCheck->SetValue(B_CONTROL_ON);
+
+	if (settings.FindBool("ejectWhenUnmounting", &result) == B_OK && result)
+		fEjectWhenUnmountingCheckBox->SetValue(B_CONTROL_ON);
+}
+

@@ -63,7 +63,6 @@ All rights reserved.
 
 #include "Attributes.h"
 #include "AutoLock.h"
-#include "AutoMounterSettings.h"
 #include "BackgroundImage.h"
 #include "Bitmaps.h"
 #include "Commands.h"
@@ -512,9 +511,6 @@ TTracker::MessageReceived(BMessage* message)
 			MountServer().SendMessage(message);
 			break;
 
-		case kRunAutomounterSettings:
-			AutomountSettingsDialog::RunAutomountSettings(MountServer());
-			break;
 
 		case kRestoreBackgroundImage:
 		{
@@ -524,9 +520,14 @@ TTracker::MessageReceived(BMessage* message)
 			break;
 		}
 
- 		case kShowSettingsWindow:
- 			ShowSettingsWindow();
- 			break;
+		case kRunAutomounterSettings:
+			ShowSettingsWindow();
+			fSettingsWindow->ShowPage(TrackerSettingsWindow::kAutomountSettings);
+			break;
+
+		case kShowSettingsWindow:
+			ShowSettingsWindow();
+			break;
 
 		case kFavoriteCountChangedExternally:
 			SendNotices(kFavoriteCountChangedExternally, message);

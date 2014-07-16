@@ -114,11 +114,15 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 		.End();
 
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Desktop"),
-		new DesktopSettingsView()));
+		new DesktopSettingsView()), kDesktopSettings);
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Windows"),
-		new WindowsSettingsView()));
+		new WindowsSettingsView()), kWindowsSettings);
 	fSettingsTypeListView->AddItem(new SettingsItem(
-		B_TRANSLATE("Volume icons"), new SpaceBarSettingsView()));
+		B_TRANSLATE("Volume icons"), new SpaceBarSettingsView()),
+		kSpaceBarSettings);
+	fSettingsTypeListView->AddItem(new SettingsItem(
+		B_TRANSLATE("Disk mount"), new AutomountSettingsPanel()),
+		kAutomountSettings);
 
 	// constraint the listview width so that the longest item fits
 	float width = 0;
@@ -195,6 +199,13 @@ TrackerSettingsWindow::Show()
 	}
 
 	_inherited::Show();
+}
+
+
+void
+TrackerSettingsWindow::ShowPage(SettingsPage page)
+{
+	fSettingsTypeListView->Select(page);
 }
 
 
