@@ -85,13 +85,8 @@ KeyCommandMap::KeyCommandMap(const char* file)
 
 	BEntry fileEntry(fFileName);
 
-	BEntry parent;
-	BPath parentPath;
-	if (fileEntry.GetParent(&parent) == B_OK
-		&& parent.GetPath(&parentPath) == B_OK) {
-		BPrivate::BPathMonitor::StartWatching(parentPath.Path(),
-			B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
-	}
+	BPrivate::BPathMonitor::StartWatching(fFileName,
+		B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
 
 	if (fileEntry.InitCheck() == B_OK) {
 		BMessage message(FILE_UPDATED);
