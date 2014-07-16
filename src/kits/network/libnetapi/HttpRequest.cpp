@@ -653,7 +653,7 @@ BHttpRequest::_MakeRequest()
 				if (index != B_ERROR)
 					bytesTotal = atoi(fHeaders.HeaderAt(index).Value());
 				else
-					bytesTotal = 0;
+					bytesTotal = -1;
 			}
 		}
 
@@ -731,7 +731,7 @@ BHttpRequest::_MakeRequest()
 				}
 			}
 
-			if (bytesRead > 0) {
+			if (bytesRead >= 0) {
 				bytesReceived += bytesRead;
 
 				if (fListener != NULL) {
@@ -749,15 +749,15 @@ BHttpRequest::_MakeRequest()
 								size);
 							bytesUnpacked += size;
 						}
-					} else {
+					} else if (bytesRead > 0) {
 						fListener->DataReceived(this, inputTempBuffer,
 							bytesReceived - bytesRead, bytesRead);
 					}
 					fListener->DownloadProgress(this, bytesReceived,
-						bytesTotal);
+						std::max((ssize_t)0, bytesTotal));
 				}
 
-				if (bytesTotal > 0 && bytesReceived >= bytesTotal) {
+				if (bytesTotal >= 0 && bytesReceived >= bytesTotal) {
 					receiveEnd = true;
 
 					if (decompress) {
@@ -854,17 +854,18 @@ void
 BHttpRequest::_ParseHeaders()
 {
 	BString currentHeader;
-	if (_GetLine(currentHeader) == B_ERROR)
-		return;
+	while (_GetLine(currentHeader) != B_ERROR)
+	{
+		// An empty line means the end of the header section
+		if (currentHeader.Length() == 0) {
+			fRequestStatus = kRequestHeadersReceived;
+			return;
+		}
 
-	// An empty line means the end of the header section
-	if (currentHeader.Length() == 0) {
-		fRequestStatus = kRequestHeadersReceived;
-		return;
+		_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_IN, "%s",
+			currentHeader.String());
+		fHeaders.AddHeader(currentHeader.String());
 	}
-
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_IN, "%s", currentHeader.String());
-	fHeaders.AddHeader(currentHeader.String());
 }
 
 
