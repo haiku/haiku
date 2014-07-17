@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "application/x-lharc";
 
 resource(2, "META:S:DESC") #'MSDC' "LHarc archive";
 
-resource(2, "META:SNIFF_RULE") "0.50 (\"??-lh?-\" & 0x0000ffffff00ff) ([20] \"\\000" & 0xfc)";
+resource(2, "META:SNIFF_RULE") "0.50 (\"xx-lhx-\" & 0x0000ffffff00ff) ([20] \"\\000" & 0xfc)";
 
 resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-Expander";
 
