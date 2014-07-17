@@ -15,6 +15,7 @@
 
 #include <new>
 
+#include <assert.h>
 #include <string.h>
 
 #include <Bitmap.h>
@@ -251,8 +252,12 @@ AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 {
 	status_t ret = B_OK;
 	// Reset the FFmpeg codec to flush buffers, so we keep the sync
-	if (fCodecInitDone)
+	if (fCodecInitDone) {
 		avcodec_flush_buffers(fContext);
+		av_init_packet(&fTempPacket);
+		fTempPacket.size = 0;
+		fTempPacket.data = NULL;
+	}
 
 	// Flush internal buffers as well.
 	fChunkBuffer = NULL;
@@ -430,10 +435,11 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	fContext->extradata = (uint8_t*)fExtraData;
 	fContext->extradata_size = fExtraDataSize;
 
-	if (fCodec->capabilities & CODEC_CAP_TRUNCATED)
+	if (fCodec->capabilities & CODEC_CAP_TRUNCATED) {
 		// Expect and handle video frames to be splitted across consecutive
 		// data chunks.
 		fContext->flags |= CODEC_FLAG_TRUNCATED;
+	}
 
 	TRACE("  requested video format 0x%x\n",
 		inOutFormat->u.raw_video.display.format);
@@ -515,6 +521,10 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 
 	inOutFormat->require_flags = 0;
 	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
+
+	av_init_packet(&fTempPacket);
+	fTempPacket.size = 0;
+	fTempPacket.data = NULL;
 
 #ifdef TRACE_AV_CODEC
 	char buffer[1024];
@@ -700,24 +710,35 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 status_t
 AVCodecDecoder::_DecodeNextVideoFrame()
 {
+	assert(fTempPacket.size >= 0);
+
 	bool firstRun = true;
 	while (true) {
 		media_header chunkMediaHeader;
-		status_t err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize,
-			&chunkMediaHeader);
-		if (err != B_OK) {
-			TRACE("AVCodecDecoder::_DecodeVideo(): error from "
-				"GetNextChunk(): %s\n", strerror(err));
-			return err;
-		}
+
+		if (fTempPacket.size == 0) {
+			// Our packet buffer is empty, so fill it now.
+			status_t getNextChunkStatus	= GetNextChunk(&fChunkBuffer,
+				&fChunkBufferSize, &chunkMediaHeader);
+			if (getNextChunkStatus != B_OK) {
+				TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from "
+					"GetNextChunk(): %s\n", strerror(err));
+				return getNextChunkStatus;
+			}
+
+			fTempPacket.data = static_cast<uint8_t*>(const_cast<void*>(
+				fChunkBuffer));
+			fTempPacket.size = fChunkBufferSize;
+
 #ifdef LOG_STREAM_TO_FILE
-		if (sDumpedPackets < 100) {
-			sStreamLogFile.Write(fChunkBuffer, fChunkBufferSize);
-			printf("wrote %ld bytes\n", fChunkBufferSize);
-			sDumpedPackets++;
-		} else if (sDumpedPackets == 100)
-			sStreamLogFile.Unset();
+			if (sDumpedPackets < 100) {
+				sStreamLogFile.Write(fChunkBuffer, fChunkBufferSize);
+				printf("wrote %ld bytes\n", fChunkBufferSize);
+				sDumpedPackets++;
+			} else if (sDumpedPackets == 100)
+				sStreamLogFile.Unset();
 #endif
+		}
 
 		if (firstRun) {
 			firstRun = false;
@@ -746,24 +767,28 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		bigtime_t startTime = system_time();
 #endif
 
-		// NOTE: In the FFmpeg code example I've read, the length returned by
-		// avcodec_decode_video() is completely ignored. Furthermore, the
-		// packet buffers are supposed to contain complete frames only so we
-		// don't seem to be required to buffer any packets because not the
-		// complete packet has been read.
-		fTempPacket.data = (uint8_t*)fChunkBuffer;
-		fTempPacket.size = fChunkBufferSize;
+		// NOTE: In the FFMPEG 0.10.2 code example decoding_encoding.c, the
+		// length returned by avcodec_decode_video2() is used to update the
+		// packet buffer size (here it is fTempPacket.size). This way the
+		// packet buffer is allowed to contain incomplete frames so we are
+		// required to buffer the packets between different calls to
+		// _DecodeNextVideoFrame().
 		int gotPicture = 0;
-		int len = avcodec_decode_video2(fContext, fRawDecodedPicture,
-			&gotPicture, &fTempPacket);
-		if (len < 0) {
-			TRACE("[v] AVCodecDecoder: error in decoding frame %lld: %d\n",
-				fFrame, len);
-			// NOTE: An error from avcodec_decode_video() seems to be ignored
-			// in the ffplay sample code.
-//			return B_ERROR;
+		int decodedDataSizeInBytes = avcodec_decode_video2(fContext,
+			fRawDecodedPicture, &gotPicture, &fTempPacket);
+		if (decodedDataSizeInBytes < 0) {
+			TRACE("[v] AVCodecDecoder: ignoring error in decoding frame %lld:"
+				" %d\n", fFrame, len);
+			// NOTE: An error from avcodec_decode_video2() is ignored by the
+			// FFMPEG 0.10.2 example decoding_encoding.c. Only the packet
+			// buffers are flushed accordingly
+			fTempPacket.data = NULL;
+			fTempPacket.size = 0;
+			continue;
 		}
 
+		fTempPacket.size -= decodedDataSizeInBytes;
+		fTempPacket.data += decodedDataSizeInBytes;
 
 //TRACE("FFDEC: PTS = %d:%d:%d.%d - fContext->frame_number = %ld "
 //	"fContext->frame_rate = %ld\n", (int)(fContext->pts / (60*60*1000000)),
