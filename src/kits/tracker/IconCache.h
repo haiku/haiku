@@ -165,9 +165,9 @@ protected:
 
 	// list of most common icons
 	BBitmap* fLargeIcon;
-	BBitmap* fHilightedLargeIcon;
+	BBitmap* fHighlightedLargeIcon;
 	BBitmap* fMiniIcon;
-	BBitmap* fHilightedMiniIcon;
+	BBitmap* fHighlightedMiniIcon;
 	int32 fAliasForIndex;
 
 	// list of other icon kinds would be added here

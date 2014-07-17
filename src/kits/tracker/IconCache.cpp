@@ -104,9 +104,9 @@ All rights reserved.
 IconCacheEntry::IconCacheEntry()
 	:
 	fLargeIcon(NULL),
-	fHilightedLargeIcon(NULL),
+	fHighlightedLargeIcon(NULL),
 	fMiniIcon(NULL),
-	fHilightedMiniIcon(NULL),
+	fHighlightedMiniIcon(NULL),
 	fAliasForIndex(-1)
 {
 }
@@ -116,15 +116,15 @@ IconCacheEntry::~IconCacheEntry()
 {
 	if (fAliasForIndex < 0) {
 		delete fLargeIcon;
-		delete fHilightedLargeIcon;
+		delete fHighlightedLargeIcon;
 		delete fMiniIcon;
-		delete fHilightedMiniIcon;
+		delete fHighlightedMiniIcon;
 
 		// clean up a bit to leave the hash table entry in an initialized state
 		fLargeIcon = NULL;
-		fHilightedLargeIcon = NULL;
+		fHighlightedLargeIcon = NULL;
 		fMiniIcon = NULL;
-		fHilightedMiniIcon = NULL;
+		fHighlightedMiniIcon = NULL;
 	}
 	fAliasForIndex = -1;
 }
@@ -180,9 +180,9 @@ IconCacheEntry::HaveIconBitmap(IconDrawMode mode, icon_size size) const
 			: fLargeIcon != NULL
 				&& fLargeIcon->Bounds().IntegerWidth() + 1 == size;
 	} else if (mode == kSelected) {
-		return size == B_MINI_ICON ? fHilightedMiniIcon != NULL
-			: fHilightedLargeIcon != NULL
-				&& fHilightedLargeIcon->Bounds().IntegerWidth() + 1 == size;
+		return size == B_MINI_ICON ? fHighlightedMiniIcon != NULL
+			: fHighlightedLargeIcon != NULL
+				&& fHighlightedLargeIcon->Bounds().IntegerWidth() + 1 == size;
 	}
 
 	return false;
@@ -202,9 +202,9 @@ IconCacheEntry::IconForMode(IconDrawMode mode, icon_size size) const
 			return fLargeIcon;
 	} else if (mode == kSelected) {
 		if (size == B_MINI_ICON)
-			return fHilightedMiniIcon;
+			return fHighlightedMiniIcon;
 		else
-			return fHilightedLargeIcon;
+			return fHighlightedLargeIcon;
 	}
 
 	return NULL;
@@ -298,9 +298,9 @@ IconCacheEntry::SetIcon(BBitmap* bitmap, IconDrawMode mode, icon_size size,
 			fLargeIcon = bitmap;
 	} else if (mode == kSelectedIcon) {
 		if (size == B_MINI_ICON)
-			fHilightedMiniIcon = bitmap;
+			fHighlightedMiniIcon = bitmap;
 		else
-			fHilightedLargeIcon = bitmap;
+			fHighlightedLargeIcon = bitmap;
 	} else
 		TRESPASS();
 }
@@ -1376,17 +1376,17 @@ IconCacheEntry::RetireIcons(BObjectList<BBitmap>* retiredBitmapList)
 		retiredBitmapList->AddItem(fLargeIcon);
 		fLargeIcon = NULL;
 	}
-	if (fHilightedLargeIcon != NULL) {
-		retiredBitmapList->AddItem(fHilightedLargeIcon);
-		fHilightedLargeIcon = NULL;
+	if (fHighlightedLargeIcon != NULL) {
+		retiredBitmapList->AddItem(fHighlightedLargeIcon);
+		fHighlightedLargeIcon = NULL;
 	}
 	if (fMiniIcon != NULL) {
 		retiredBitmapList->AddItem(fMiniIcon);
 		fMiniIcon = NULL;
 	}
-	if (fHilightedMiniIcon != NULL) {
-		retiredBitmapList->AddItem(fHilightedMiniIcon);
-		fHilightedMiniIcon = NULL;
+	if (fHighlightedMiniIcon != NULL) {
+		retiredBitmapList->AddItem(fHighlightedMiniIcon);
+		fHighlightedMiniIcon = NULL;
 	}
 
 	int32 count = retiredBitmapList->CountItems();
