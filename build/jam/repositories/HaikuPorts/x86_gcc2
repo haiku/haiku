@@ -103,8 +103,8 @@ RemotePackageRepository HaikuPorts
 	libiconv_devel-1.13.1-6
 	liblayout-1.4.1-1
 	liblayout_devel-1.4.1-1
-	libmad-0.15.1b-1
-	libmad_devel-0.15.1b-1
+	libmad-0.15.1b-2
+	libmad_devel-0.15.1b-2
 	libmikmod-3.3.3-2
 	libmikmod_devel-3.3.3-2
 	libmodplug-0.8.8.4-1
@@ -314,8 +314,8 @@ RemotePackageRepository HaikuPorts
 	libffi_x86_devel-3.0.13-1
 	libiconv_x86-1.13.1-6
 	libiconv_x86_devel-1.13.1-6
-	libmad_x86-0.15.1b-1
-	libmad_x86_devel-0.15.1b-1
+	libmad_x86-0.15.1b-2
+	libmad_x86_devel-0.15.1b-2
 	libmikmod_x86-3.3.3-2
 	libmikmod_x86_devel-3.3.3-2
 	libmodplug_x86-0.8.8.4-1
