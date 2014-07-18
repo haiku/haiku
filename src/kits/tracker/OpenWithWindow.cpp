@@ -540,7 +540,7 @@ OpenWithContainerWindow::SetCanOpen(bool on)
 
 OpenWithPoseView::OpenWithPoseView(BRect frame, uint32 resizeMask)
 	:
-	BPoseView(0, frame, kListMode, resizeMask),
+	BPoseView(new Model(), frame, kListMode, resizeMask),
 	fHaveCommonPreferredApp(false),
 	fIterator(NULL)
 {

@@ -2906,6 +2906,9 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 	// since we check view mode before display, this should be a radio
 	// mode menu
 
+	Model* targetModel = TargetModel();
+	ASSERT(targetModel != NULL);
+
 	bool needSeparator = true;
 	if (IsTrash()) {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Empty Trash"),
@@ -2913,7 +2916,7 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 	} else if (IsPrintersDir()) {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Add printer" B_UTF8_ELLIPSIS),
 			new BMessage(kAddPrinter), 'N'));
-	} else if (InTrash() || TargetModel()->IsRoot()) {
+	} else if (InTrash() || targetModel->IsRoot()) {
 		needSeparator = false;
 	} else {
 		TemplatesMenu* templatesMenu = new TemplatesMenu(PoseView(),
@@ -2945,7 +2948,7 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 			new BMessage(kOpenParentDir), B_UP_ARROW));
 	}
 
-	if (TargetModel()->IsRoot()) {
+	if (targetModel->IsRoot()) {
 		menu->AddSeparatorItem();
 		menu->AddItem(new MountMenu(B_TRANSLATE("Mount")));
 	}
