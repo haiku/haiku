@@ -3474,9 +3474,12 @@ LoaderErrorDetails(const entry_ref* app, BString &details)
 
 
 static void
-_TrackerLaunchDocuments(const entry_ref* /*doNotUse*/, const BMessage* refs,
+_TrackerLaunchDocuments(const entry_ref*, const BMessage* refs,
 	bool openWithOK)
 {
+	if (refs == NULL)
+		return;
+
 	BMessage copyOfRefs(*refs);
 
 	entry_ref documentRef;
@@ -3700,7 +3703,7 @@ status_t
 TrackerLaunch(const entry_ref* appRef, bool async)
 {
 	if (!async)
-		_TrackerLaunchAppWithDocuments(appRef, 0, false);
+		_TrackerLaunchAppWithDocuments(appRef, NULL, false);
 	else
 		AsynchLaunchBinder(&_TrackerLaunchAppWithDocuments, appRef, 0, false);
 
@@ -3711,9 +3714,9 @@ status_t
 TrackerLaunch(const BMessage* refs, bool async, bool openWithOK)
 {
 	if (!async)
-		_TrackerLaunchDocuments(0, refs, openWithOK);
+		_TrackerLaunchDocuments(NULL, refs, openWithOK);
 	else
-		AsynchLaunchBinder(&_TrackerLaunchDocuments, 0, refs, openWithOK);
+		AsynchLaunchBinder(&_TrackerLaunchDocuments, NULL, refs, openWithOK);
 
 	return B_OK;
 }
@@ -3787,22 +3790,22 @@ FSLaunchUsing(const entry_ref* ref, BMessage* listOfRefs)
 
 
 status_t
-FSLaunchItem(const entry_ref* ref, BMessage* message, int32, bool async)
+FSLaunchItem(const entry_ref* appRef, BMessage* refs, int32, bool async)
 {
-	if (message != NULL)
-		message->what = B_REFS_RECEIVED;
+	if (refs != NULL)
+		refs->what = B_REFS_RECEIVED;
 
-	status_t result = TrackerLaunch(ref, message, async, true);
-	delete message;
+	status_t result = TrackerLaunch(appRef, refs, async, true);
+	delete refs;
 
 	return result;
 }
 
 
 void
-FSLaunchItem(const entry_ref* ref, BMessage* message, int32 workspace)
+FSLaunchItem(const entry_ref* appRef, BMessage* refs, int32 workspace)
 {
-	FSLaunchItem(ref, message, workspace, true);
+	FSLaunchItem(appRef, refs, workspace, true);
 }
 
 

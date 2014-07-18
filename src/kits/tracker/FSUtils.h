@@ -244,11 +244,11 @@ status_t FSGetParentVirtualDirectoryAware(const BEntry& entry, entry_ref& _ref);
 status_t FSGetParentVirtualDirectoryAware(const BEntry& entry, BEntry& _entry);
 status_t FSGetParentVirtualDirectoryAware(const BEntry& entry, BNode& _node);
 
-status_t TrackerLaunch(const entry_ref* app, bool async);
+status_t TrackerLaunch(const entry_ref* appRef, bool async);
 status_t TrackerLaunch(const BMessage* refs, bool async,
 	bool okToRunOpenWith = true);
-status_t TrackerLaunch(const entry_ref* app, const BMessage* refs, bool async,
-	bool okToRunOpenWith = true);
+status_t TrackerLaunch(const entry_ref* appRef, const BMessage* refs,
+	bool async, bool okToRunOpenWith = true);
 status_t LaunchBrokenLink(const char*, const BMessage*);
 
 status_t FSFindTrackerSettingsDir(BPath*, bool autoCreate = true);
@@ -266,10 +266,10 @@ bool ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
 bool CheckDevicesEqual(const entry_ref* entry, const Model* targetModel);
 
 // Deprecated calls use newer calls above instead
-_IMPEXP_TRACKER void FSLaunchItem(const entry_ref*, BMessage* = NULL,
-	int32 workspace = -1);
-_IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref*, BMessage*,
-	int32 workspace, bool asynch);
+_IMPEXP_TRACKER void FSLaunchItem(const entry_ref* appRef,
+	BMessage* refs = NULL, int32 workspace = -1);
+_IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref* appRef,
+	BMessage* refs, int32 workspace, bool asynch);
 _IMPEXP_TRACKER void FSOpenWithDocuments(const entry_ref* executableToLaunch,
 	BMessage* documentEntryRefs);
 _IMPEXP_TRACKER status_t FSLaunchUsing(const entry_ref* ref,
