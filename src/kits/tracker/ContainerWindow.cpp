@@ -1920,10 +1920,10 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 	if (!TargetModel()->IsQuery() && !TargetModel()->IsVirtualDirectory()
 		&& !IsTrash() && !IsPrintersDir() && !TargetModel()->IsRoot()) {
 		if (!PoseView()->IsFilePanel()) {
-			TemplatesMenu* templateMenu = new TemplatesMenu(PoseView(),
+			TemplatesMenu* templatesMenu = new TemplatesMenu(PoseView(),
 				B_TRANSLATE("New"));
-			menu->AddItem(templateMenu);
-			templateMenu->SetTargetForItems(PoseView());
+			menu->AddItem(templatesMenu);
+			templatesMenu->SetTargetForItems(PoseView());
 		} else {
 			menu->AddItem(new BMenuItem(B_TRANSLATE("New folder"),
 				new BMessage(kNewFolder), 'N'));
@@ -1958,16 +1958,15 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 			new BMessage(kUnmountVolume), 'U');
 		item->SetEnabled(false);
 		menu->AddItem(item);
-		menu->AddItem(new BMenuItem(B_TRANSLATE("Mount settings" B_UTF8_ELLIPSIS),
+		menu->AddItem(new BMenuItem(
+			B_TRANSLATE("Mount settings" B_UTF8_ELLIPSIS),
 			new BMessage(kRunAutomounterSettings)));
 	} else {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Duplicate"),
 			new BMessage(kDuplicateSelection), 'D'));
-
 		menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
-			? B_TRANSLATE("Delete")	: B_TRANSLATE("Move to Trash"),
+			? B_TRANSLATE("Delete") : B_TRANSLATE("Move to Trash"),
 			new BMessage(kMoveToTrash), 'T'));
-
 		menu->AddSeparatorItem();
 
 		// The "Move To", "Copy To", "Create Link" menus are inserted
@@ -1975,20 +1974,23 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 		// BContainerWindow::SetupMoveCopyMenus()
 	}
 
-	BMenuItem* cutItem = NULL,* copyItem = NULL,* pasteItem = NULL;
+	BMenuItem* cutItem = NULL;
+	BMenuItem* copyItem = NULL;
+	BMenuItem* pasteItem = NULL;
 	if (!IsPrintersDir()) {
 		menu->AddSeparatorItem();
 
 		if (!TargetModel()->IsRoot()) {
-			menu->AddItem(cutItem = new(std::nothrow) BMenuItem(
-				B_TRANSLATE("Cut"), new BMessage(B_CUT), 'X'));
-			menu->AddItem(copyItem = new(std::nothrow) BMenuItem(
-				B_TRANSLATE("Copy"), new BMessage(B_COPY), 'C'));
-			menu->AddItem(pasteItem = new(std::nothrow) BMenuItem(
-				B_TRANSLATE("Paste"), new BMessage(B_PASTE), 'V'));
-
+			cutItem = new(std::nothrow) BMenuItem(B_TRANSLATE("Cut"),
+				new BMessage(B_CUT), 'X');
+			menu->AddItem(cutItem);
+			copyItem = new(std::nothrow) BMenuItem(B_TRANSLATE("Copy"),
+				new BMessage(B_COPY), 'C');
+			menu->AddItem(copyItem);
+			pasteItem = new(std::nothrow) BMenuItem(B_TRANSLATE("Paste"),
+				new BMessage(B_PASTE), 'V');
+			menu->AddItem(pasteItem);
 			menu->AddSeparatorItem();
-
 			menu->AddItem(new BMenuItem(B_TRANSLATE("Identify"),
 				new BMessage(kIdentifyEntry)));
 		}
@@ -1998,13 +2000,13 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 	}
 
 	menu->SetTargetForItems(PoseView());
-	if (cutItem)
+	if (cutItem != NULL)
 		cutItem->SetTarget(this);
 
-	if (copyItem)
+	if (copyItem != NULL)
 		copyItem->SetTarget(this);
 
-	if (pasteItem)
+	if (pasteItem != NULL)
 		pasteItem->SetTarget(this);
 }
 
@@ -2849,11 +2851,12 @@ BContainerWindow::AddFileContextMenus(BMenu* menu)
 
 #ifdef CUT_COPY_PASTE_IN_CONTEXT_MENU
 	menu->AddSeparatorItem();
-	BMenuItem* cutItem,* copyItem;
-	menu->AddItem(cutItem = new BMenuItem(B_TRANSLATE("Cut"),
-		new BMessage(B_CUT), 'X'));
-	menu->AddItem(copyItem = new BMenuItem(B_TRANSLATE("Copy"),
-		new BMessage(B_COPY), 'C'));
+	BMenuItem* cutItem = new BMenuItem(B_TRANSLATE("Cut"),
+		new BMessage(B_CUT), 'X');
+	menu->AddItem(cutItem);
+	BMenuItem* copyItem = new BMenuItem(B_TRANSLATE("Copy"),
+		new BMessage(B_COPY), 'C');
+	menu->AddItem(copyItem);
 #endif
 
 	menu->AddSeparatorItem();
@@ -2912,14 +2915,14 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 	} else if (IsPrintersDir()) {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Add printer" B_UTF8_ELLIPSIS),
 			new BMessage(kAddPrinter), 'N'));
-	} else if (InTrash() || TargetModel()->IsRoot())
+	} else if (InTrash() || TargetModel()->IsRoot()) {
 		needSeparator = false;
-	else {
-		TemplatesMenu* templateMenu = new TemplatesMenu(PoseView(),
+	} else {
+		TemplatesMenu* templatesMenu = new TemplatesMenu(PoseView(),
 			B_TRANSLATE("New"));
-		menu->AddItem(templateMenu);
-		templateMenu->SetTargetForItems(PoseView());
-		templateMenu->SetFont(be_plain_font);
+		menu->AddItem(templatesMenu);
+		templatesMenu->SetTargetForItems(PoseView());
+		templatesMenu->SetFont(be_plain_font);
 	}
 
 	if (needSeparator)
@@ -2930,9 +2933,9 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 	menu->AddItem(pasteItem);
 	menu->AddSeparatorItem();
 #endif
+
 	BMenu* arrangeBy = new BMenu(B_TRANSLATE("Arrange by"));
 	PopulateArrangeByMenu(arrangeBy);
-
 	menu->AddItem(arrangeBy);
 
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Select" B_UTF8_ELLIPSIS),
@@ -2956,7 +2959,8 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 
 #if DEBUG
 	menu->AddSeparatorItem();
-	BMenuItem* testing = new BMenuItem("Test icon cache", new BMessage(kTestIconCache));
+	BMenuItem* testing = new BMenuItem("Test icon cache",
+		new BMessage(kTestIconCache));
 	menu->AddItem(testing);
 #endif
 
@@ -3153,9 +3157,10 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 	}
 
 	Model* selectedModel = NULL;
-	if (selectCount == 1)
+	if (selectCount == 1) {
 		selectedModel = PoseView()->SelectionList()->FirstItem()->
 			TargetModel();
+	}
 
 	if (context == kMenuBarContext || context == kPosePopUpContext) {
 		SetUpEditQueryItem(menu);
@@ -3227,10 +3232,10 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 
 		BMenuItem* item = menu->FindItem(B_TRANSLATE("New"));
 		if (item != NULL) {
-			TemplatesMenu* templateMenu = dynamic_cast<TemplatesMenu*>
-				(item->Submenu());
-			if (templateMenu != NULL)
-				templateMenu->UpdateMenuState();
+			TemplatesMenu* templatesMenu = dynamic_cast<TemplatesMenu*>(
+				item->Submenu());
+			if (templatesMenu != NULL)
+				templatesMenu->UpdateMenuState();
 		}
 	}
 
