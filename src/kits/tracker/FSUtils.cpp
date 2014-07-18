@@ -3344,15 +3344,16 @@ _TrackerLaunchAppWithDocuments(const entry_ref* appRef, const BMessage* refs,
 		// close possible parent window, if specified
 		const node_ref* nodeToClose = 0;
 		ssize_t numBytes;
-		refs->FindData("nodeRefsToClose", B_RAW_TYPE,
-			(const void**)&nodeToClose, &numBytes);
-		if (nodeToClose)
+		if (refs != NULL && refs->FindData("nodeRefsToClose", B_RAW_TYPE,
+				(const void**)&nodeToClose, &numBytes) == B_OK
+			&& nodeToClose != NULL) {
 			dynamic_cast<TTracker*>(be_app)->CloseParent(*nodeToClose);
+		}
 	} else {
 		alertString.SetTo(B_TRANSLATE("Could not open \"%name\" (%error). "));
 		alertString.ReplaceFirst("%name", appRef->name);
 		alertString.ReplaceFirst("%error", strerror(error));
-		if (refs && openWithOK && error != B_SHUTTING_DOWN) {
+		if (refs != NULL && openWithOK && error != B_SHUTTING_DOWN) {
 			alertString << B_TRANSLATE_NOCOLLECT(kFindAlternativeStr);
 			BAlert* alert = new BAlert("", alertString.String(),
 				B_TRANSLATE("Cancel"), B_TRANSLATE("Find"), 0,
