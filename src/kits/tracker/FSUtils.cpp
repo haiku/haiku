@@ -1453,7 +1453,7 @@ CopyFolder(BEntry* srcEntry, BDirectory* destDir,
 	srcEntry->GetRef(&ref);
 
 	char destName[B_FILE_NAME_LENGTH];
-	strcpy(destName, ref.name);
+	strlcpy(destName, ref.name, sizeof(destName));
 
 	loopControl->UpdateStatus(ref.name, ref, 1024, true);
 
@@ -1621,7 +1621,7 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 		if (moveMode == kCreateLink || moveMode == kCreateRelativeLink) {
 			PoseInfo poseInfo;
 			char name[B_FILE_NAME_LENGTH];
-			strcpy(name, ref.name);
+			strlcpy(name, ref.name, sizeof(name));
 
 			BSymLink link;
 			BString suffix(" ");
@@ -1955,7 +1955,7 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 
 	// make sure name doesn't conflict with anything in trash already
 	char name[B_FILE_NAME_LENGTH];
-	strcpy(name, ref.name);
+	strlcpy(name, ref.name, sizeof(name));
 	if (trash_dir.Contains(name)) {
 		BString suffix(" ");
 		suffix << B_TRANSLATE_COMMENT("copy", "filename copy"),
