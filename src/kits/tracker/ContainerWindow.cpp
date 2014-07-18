@@ -3058,7 +3058,7 @@ void
 BContainerWindow::BuildMimeTypeList(BObjectList<BString> &mimeTypes)
 {
 	int32 count = PoseView()->SelectionList()->CountItems();
-	if (!count) {
+	if (count > 0) {
 		// just add the type of the current directory
 		AddMimeTypeString(mimeTypes, TargetModel());
 	} else {
@@ -3127,7 +3127,7 @@ BContainerWindow::BuildAddOnMenu(BMenu* menu)
 	for (int32 index = 0; index < count; index++)
 		menu->AddItem(primaryList.ItemAt(index));
 
-	if (count != 0)
+	if (count > 0)
 		menu->AddSeparatorItem();
 
 	count = secondaryList.CountItems();
