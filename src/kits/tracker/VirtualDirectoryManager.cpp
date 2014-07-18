@@ -224,11 +224,13 @@ public:
 		if (error != B_OK)
 			return error;
 
-		bigtime_t fileTime = st.st_mtim.tv_sec * 1000000
-			+ st.st_mtim.tv_nsec / 1000;
+		bigtime_t fileTime = st.st_mtim.tv_sec;
+		fileTime *= 1000000;
+		fileTime += st.st_mtim.tv_nsec / 1000;
 		if (fileTime == fFileTime) {
 			if (_changed != NULL)
 				*_changed = false;
+
 			return B_OK;
 		}
 
