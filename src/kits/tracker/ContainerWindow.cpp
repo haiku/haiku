@@ -2928,7 +2928,7 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 	if (needSeparator)
 		menu->AddSeparatorItem();
 
-#if 0
+#ifdef CUT_COPY_PASTE_IN_CONTEXT_MENU
 	BMenuItem* pasteItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V');
 	menu->AddItem(pasteItem);
 	menu->AddSeparatorItem();
