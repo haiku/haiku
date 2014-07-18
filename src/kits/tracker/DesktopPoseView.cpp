@@ -199,22 +199,24 @@ DesktopPoseView::ShowVolumes(bool visible, bool showShared)
 void
 DesktopPoseView::StartSettingsWatch()
 {
-	be_app->LockLooper();
-	be_app->StartWatching(this, kShowDisksIconChanged);
-	be_app->StartWatching(this, kVolumesOnDesktopChanged);
-	be_app->StartWatching(this, kDesktopIntegrationChanged);
-	be_app->UnlockLooper();
+	if (be_app->LockLooper()) {
+		be_app->StartWatching(this, kShowDisksIconChanged);
+		be_app->StartWatching(this, kVolumesOnDesktopChanged);
+		be_app->StartWatching(this, kDesktopIntegrationChanged);
+		be_app->UnlockLooper();
+	}
 }
 
 
 void
 DesktopPoseView::StopSettingsWatch()
 {
-	be_app->LockLooper();
-	be_app->StopWatching(this, kShowDisksIconChanged);
-	be_app->StopWatching(this, kVolumesOnDesktopChanged);
-	be_app->StopWatching(this, kDesktopIntegrationChanged);
-	be_app->UnlockLooper();
+	if (be_app->LockLooper()) {
+		be_app->StopWatching(this, kShowDisksIconChanged);
+		be_app->StopWatching(this, kVolumesOnDesktopChanged);
+		be_app->StopWatching(this, kDesktopIntegrationChanged);
+		be_app->UnlockLooper();
+	}
 }
 
 
