@@ -320,6 +320,8 @@ RemotePackageRepository HaikuPorts
 	libmikmod_x86_devel-3.3.3-2
 	libmodplug_x86-0.8.8.4-1
 	libmodplug_x86_devel-0.8.8.4-1
+	libmpdclient_x86-2.10_git-1
+	libmpdclient_x86_devel-2.10_git-1
 	libogg_x86-1.3.0-2
 	libogg_x86_devel-1.3.0-2
 	libpaper_x86-1.1.24-1
@@ -477,6 +479,7 @@ RemotePackageRepository HaikuPorts
 	libmad
 	libmikmod
 	libmodplug
+	libmpdclient_x86
 	libogg
 	libpaper
 	libpcre
