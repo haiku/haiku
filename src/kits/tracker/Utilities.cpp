@@ -704,7 +704,7 @@ FlickerFreeStringView::Draw(BRect)
 	offscreen->SetLowColor(fLowColor);
 
 	BFont font;
-    GetFont(&font);
+	GetFont(&font);
 	offscreen->SetFont(&font);
 
 	offscreen->Sync();
