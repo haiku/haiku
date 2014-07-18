@@ -7600,14 +7600,13 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint,
 	BRect bounds(Bounds());
 
 	PoseList* poseList = CurrentPoseList();
-	BPose* pose = poseList->ItemAt(clickedPoseIndex);
 	if (ViewMode() == kListMode) {
 		int32 count = poseList->CountItems();
 		int32 startIndex = (int32)(bounds.top / fListElemHeight);
 		BPoint loc(0, startIndex * fListElemHeight);
 
 		for (int32 index = startIndex; index < count; index++) {
-			pose = poseList->ItemAt(index);
+			BPose* pose = poseList->ItemAt(index);
 			if (pose->IsSelected()) {
 				BRect poseRect(pose->CalcRect(loc, this, true));
 				if (poseRect.Intersects(inner)) {
@@ -7627,7 +7626,7 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint,
 		int32 count = fVSPoseList->CountItems();
 
 		for (int32 index = startIndex; index < count; index++) {
-			pose = fVSPoseList->ItemAt(index);
+			BPose* pose = fVSPoseList->ItemAt(index);
 			if (pose != NULL && pose->IsSelected()) {
 				BRect poseRect(pose->CalcRect(this));
 				if (!poseRect.Intersects(inner))
@@ -9487,13 +9486,12 @@ BPoseView::ResizeColumn(BColumn* column, float newSize,
 	column->SetWidth(newSize);
 
 	float offset = kColumnStart;
-	BColumn* last = fColumnList->FirstItem();
 
 	int32 count = fColumnList->CountItems();
 	for (int32 index = 0; index < count; index++) {
 		column = fColumnList->ItemAt(index);
 		column->SetOffset(offset);
-		last = column;
+		BColumn* last = column;
 		offset = last->Offset() + last->Width() + kTitleColumnExtraMargin;
 	}
 
@@ -9547,13 +9545,12 @@ BPoseView::MoveColumnTo(BColumn* src, BColumn* dest)
 	fColumnList->AddItem(src, index);
 
 	float offset = kColumnStart;
-	BColumn* last = fColumnList->FirstItem();
 	int32 count = fColumnList->CountItems();
 
 	for (int32 index = 0; index < count; index++) {
 		BColumn* column = fColumnList->ItemAt(index);
 		column->SetOffset(offset);
-		last = column;
+		BColumn* last = column;
 		offset = last->Offset() + last->Width() + kTitleColumnExtraMargin
 			- kRoomForLine / 2;
 	}
