@@ -6792,7 +6792,8 @@ BPoseView::FindNextMatch(int32* matchingIndex, bool reverse)
 			if (sMatchString.ICompare(pose->TargetModel()->Name()) > 0) {
 				if (strcasecmp(pose->TargetModel()->Name(), bestSoFar) >= 0
 					|| !bestSoFar[0]) {
-					strcpy(bestSoFar, pose->TargetModel()->Name());
+					strlcpy(bestSoFar, pose->TargetModel()->Name(),
+						sizeof(bestSoFar));
 					poseToSelect = pose;
 					*matchingIndex = index;
 				}
@@ -6800,7 +6801,8 @@ BPoseView::FindNextMatch(int32* matchingIndex, bool reverse)
 		} else if (sMatchString.ICompare(pose->TargetModel()->Name()) < 0) {
 			if (strcasecmp(pose->TargetModel()->Name(), bestSoFar) <= 0
 				|| !bestSoFar[0]) {
-				strcpy(bestSoFar, pose->TargetModel()->Name());
+				strlcpy(bestSoFar, pose->TargetModel()->Name(),
+					sizeof(bestSoFar));
 				poseToSelect = pose;
 				*matchingIndex = index;
 			}
