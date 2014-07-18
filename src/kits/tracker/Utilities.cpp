@@ -227,9 +227,8 @@ PeriodicUpdatePoses::DoPeriodicUpdate(bool forceRedraw)
 	int32 count = fPoseList.CountItems();
 	for (int32 index = 0; index < count; index++) {
 		periodic_pose* periodic = fPoseList.ItemAt(index);
-		if (periodic->callback(periodic->pose, periodic->cookie)
-			|| forceRedraw) {
-			periodic->pose_view->LockLooper();
+		if ((periodic->callback(periodic->pose, periodic->cookie)
+			|| forceRedraw) && periodic->pose_view->LockLooper()) {
 			periodic->pose_view->UpdateIcon(periodic->pose);
 			periodic->pose_view->UnlockLooper();
 		}
