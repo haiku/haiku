@@ -223,11 +223,11 @@ class FlickerFreeStringView : public BStringView {
 	// often this would be better implemented as an option of BStringView
 public:
 	FlickerFreeStringView(BRect bounds, const char* name,
-		const char* text, uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		const char* text, uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		uint32 flags = B_WILL_DRAW);
 	FlickerFreeStringView(BRect bounds, const char* name,
 		const char* text, BBitmap* existingOffscreen,
-		uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		uint32 flags = B_WILL_DRAW);
 	virtual ~FlickerFreeStringView();
 	virtual void Draw(BRect);
@@ -239,7 +239,7 @@ private:
 	OffscreenBitmap* fBitmap;
 	rgb_color fViewColor;
 	rgb_color fLowColor;
-	BBitmap* fOrigBitmap;
+	BBitmap* fOriginalBitmap;
 
 	typedef BStringView _inherited;
 };
@@ -248,13 +248,13 @@ private:
 class DraggableIcon : public BView {
 	// used to determine a save location for a file
 public:
-	DraggableIcon(BRect, const char*, const char* mimeType, icon_size,
-		const BMessage*, BMessenger,
-		uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	DraggableIcon(BRect rect, const char* name, const char* mimeType,
+		icon_size which, const BMessage* message, BMessenger target,
+		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		uint32 flags = B_WILL_DRAW);
 	virtual ~DraggableIcon();
 
-	static BRect PreferredRect(BPoint offset, icon_size);
+	static BRect PreferredRect(BPoint offset, icon_size which);
 	void SetTarget(BMessenger);
 
 protected:
@@ -420,8 +420,9 @@ int64 StringToScalar(const char* text);
 	// string to num, understands kB, MB, etc.
 
 // misc calls
-void EmbedUniqueVolumeInfo(BMessage*, const BVolume*);
-status_t MatchArchivedVolume(BVolume*, const BMessage*, int32 index = 0);
+void EmbedUniqueVolumeInfo(BMessage* message, const BVolume* volume);
+status_t MatchArchivedVolume(BVolume* volume, const BMessage* message,
+	int32 index = 0);
 void TruncateLeaf(BString* string);
 
 void StringFromStream(BString*, BMallocIO*, bool endianSwap = false);
@@ -464,22 +465,24 @@ template <class InitCheckable>
 void
 ThrowOnInitCheckError(InitCheckable* item)
 {
-	if (!item)
+	if (item == NULL)
 		throw (status_t)B_ERROR;
 
-	status_t error = item->InitCheck();
-	if (error != B_OK)
-		throw (status_t)error;
+	status_t result = item->InitCheck();
+	if (result != B_OK)
+		throw (status_t)result;
 }
 
 #if DEBUG
-#define ThrowOnError(error) _ThrowOnError(error, __FILE__, __LINE__)
-#define ThrowIfNotSize(error) _ThrowIfNotSize(error, __FILE__, __LINE__)
-#define ThrowOnErrorWithMessage(error, debugStr) _ThrowOnError(error, debugStr, __FILE__, __LINE__)
+#	define ThrowOnError(result) _ThrowOnError(result, __FILE__, __LINE__)
+#	define ThrowIfNotSize(result) _ThrowIfNotSize(result, __FILE__, __LINE__)
+#	define ThrowOnErrorWithMessage(result, debugStr) \
+		_ThrowOnError(result, debugStr, __FILE__, __LINE__)
 #else
-#define ThrowOnError(x) _ThrowOnError(x, 0, 0)
-#define ThrowIfNotSize(x) _ThrowIfNotSize(x, 0, 0)
-#define ThrowOnErrorWithMessage(error, debugStr) _ThrowOnError(error, debugStr, __FILE__, __LINE__)
+#	define ThrowOnError(x) _ThrowOnError(x, 0, 0)
+#	define ThrowIfNotSize(x) _ThrowIfNotSize(x, 0, 0)
+#	define ThrowOnErrorWithMessage(result, debugStr) \
+		_ThrowOnError(result, debugStr, __FILE__, __LINE__)
 #endif
 
 void _ThrowOnError(status_t, const char*, int32);

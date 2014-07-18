@@ -99,15 +99,15 @@ uint32
 HashString(const char* string, uint32 seed)
 {
 	char ch;
-	uint32 result = seed;
+	uint32 hash = seed;
 
 	while((ch = *string++) != 0) {
-		result = (result << 7) ^ (result >> 24);
-		result ^= ch;
+		hash = (hash << 7) ^ (hash >> 24);
+		hash ^= ch;
 	}
+	hash ^= hash << 12;
 
-	result ^= result << 12;
-	return result;
+	return hash;
 }
 
 
@@ -121,7 +121,6 @@ AttrHashString(const char* string, uint32 type)
 		hash = (hash << 7) ^ (hash >> 24);
 		hash ^= c;
 	}
-
 	hash ^= hash << 12;
 
 	hash &= ~0xff;
@@ -557,22 +556,22 @@ FadeRGBA32Vertical(uint32* bits, int32 width, int32 height, int32 from,
 
 
 DraggableIcon::DraggableIcon(BRect rect, const char* name,
-	const char* mimeType, icon_size size, const BMessage* message,
-	BMessenger target, uint32 resizeMask, uint32 flags)
+	const char* mimeType, icon_size which, const BMessage* message,
+	BMessenger target, uint32 resizingMode, uint32 flags)
 	:
-	BView(rect, name, resizeMask, flags),
+	BView(rect, name, resizingMode, flags),
 	fMessage(*message),
 	fTarget(target)
 {
 	fBitmap = new BBitmap(Bounds(), kDefaultIconDepth);
 	BMimeType mime(mimeType);
-	status_t error = mime.GetIcon(fBitmap, size);
+	status_t result = mime.GetIcon(fBitmap, which);
 	ASSERT(mime.IsValid());
-	if (error != B_OK) {
-		PRINT(("failed to get icon for %s, %s\n", mimeType, strerror(error)));
+	if (result != B_OK) {
+		PRINT(("failed to get icon for %s, %s\n", mimeType, strerror(result)));
 		BMimeType mime(B_FILE_MIMETYPE);
 		ASSERT(mime.IsInstalled());
-		mime.GetIcon(fBitmap, size);
+		mime.GetIcon(fBitmap, which);
 	}
 }
 
@@ -591,11 +590,11 @@ DraggableIcon::SetTarget(BMessenger target)
 
 
 BRect
-DraggableIcon::PreferredRect(BPoint offset, icon_size size)
+DraggableIcon::PreferredRect(BPoint offset, icon_size which)
 {
-	BRect result(0, 0, size - 1, size - 1);
-	result.OffsetTo(offset);
-	return result;
+	BRect rect(0, 0, which - 1, which - 1);
+	rect.OffsetTo(offset);
+	return rect;
 }
 
 
@@ -661,21 +660,21 @@ DraggableIcon::Draw(BRect)
 
 
 FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char* name,
-	const char* text, uint32 resizeFlags, uint32 flags)
+	const char* text, uint32 resizingMode, uint32 flags)
 	:
-	BStringView(bounds, name, text, resizeFlags, flags),
+	BStringView(bounds, name, text, resizingMode, flags),
 	fBitmap(NULL),
-	fOrigBitmap(NULL)
+	fOriginalBitmap(NULL)
 {
 }
 
 
 FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char* name,
-	const char* text, BBitmap* inBitmap, uint32 resizeFlags, uint32 flags)
+	const char* text, BBitmap* inBitmap, uint32 resizingMode, uint32 flags)
 	:
-	BStringView(bounds, name, text, resizeFlags, flags),
+	BStringView(bounds, name, text, resizingMode, flags),
 	fBitmap(NULL),
-	fOrigBitmap(inBitmap)
+	fOriginalBitmap(inBitmap)
 {
 }
 
@@ -690,7 +689,7 @@ void
 FlickerFreeStringView::Draw(BRect)
 {
 	BRect bounds(Bounds());
-	if (!fBitmap)
+	if (fBitmap == NULL)
 		fBitmap = new OffscreenBitmap(Bounds());
 
 	BView* offscreen = fBitmap->BeginUsing(bounds);
@@ -709,8 +708,8 @@ FlickerFreeStringView::Draw(BRect)
 	offscreen->SetFont(&font);
 
 	offscreen->Sync();
-	if (fOrigBitmap)
-		offscreen->DrawBitmap(fOrigBitmap, Frame(), bounds);
+	if (fOriginalBitmap != NULL)
+		offscreen->DrawBitmap(fOriginalBitmap, Frame(), bounds);
 	else
 		offscreen->FillRect(bounds, B_SOLID_LOW);
 
@@ -952,8 +951,9 @@ ShortcutFilter::Filter(BMessage* message, BHandler**)
 		if (message->FindInt32("modifiers", (int32*)&modifiers) != B_OK
 			|| message->FindInt32("raw_char", (int32*)&rawKeyChar) != B_OK
 			|| message->FindInt8("byte", (int8*)&byte) != B_OK
-			|| message->FindInt32("key", &key) != B_OK)
+			|| message->FindInt32("key", &key) != B_OK) {
 			return B_DISPATCH_MESSAGE;
+		}
 
 		modifiers &= B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY
 			| B_OPTION_KEY | B_MENU_KEY;
@@ -995,18 +995,21 @@ EmbedUniqueVolumeInfo(BMessage* message, const BVolume* volume)
 
 
 status_t
-MatchArchivedVolume(BVolume* result, const BMessage* message, int32 index)
+MatchArchivedVolume(BVolume* volume, const BMessage* message, int32 index)
 {
 	time_t created;
 	off_t capacity;
 
 	if (message->FindInt32("creationDate", index, &created) != B_OK
-		|| message->FindInt64("capacity", index, &capacity) != B_OK)
+		|| message->FindInt64("capacity", index, &capacity) != B_OK) {
 		return B_ERROR;
+	}
 
 	BVolumeRoster roster;
-	BVolume volume;
-	BString deviceName, volumeName, fshName;
+	BVolume tempVolume;
+	BString deviceName;
+	BString volumeName;
+	BString fshName;
 
 	if (message->FindString("deviceName", &deviceName) == B_OK
 		&& message->FindString("volumeName", &volumeName) == B_OK
@@ -1019,59 +1022,64 @@ MatchArchivedVolume(BVolume* result, const BMessage* message, int32 index)
 		dev_t foundDevice = -1;
 		int foundScore = -1;
 		roster.Rewind();
-		while (roster.GetNextVolume(&volume) == B_OK) {
-			if (volume.IsPersistent() && volume.KnowsQuery()) {
+		while (roster.GetNextVolume(&tempVolume) == B_OK) {
+			if (tempVolume.IsPersistent() && tempVolume.KnowsQuery()) {
 				// get creation time and fs_info
 				BDirectory root;
-				volume.GetRootDirectory(&root);
+				tempVolume.GetRootDirectory(&root);
 				time_t cmpCreated;
 				fs_info info;
 				if (root.GetCreationTime(&cmpCreated) == B_OK
-					&& fs_stat_dev(volume.Device(), &info) == 0) {
+					&& fs_stat_dev(tempVolume.Device(), &info) == 0) {
 					// compute the score
 					int score = 0;
 
 					// creation time
 					if (created == cmpCreated)
 						score += 5;
+
 					// capacity
-					if (capacity == volume.Capacity())
+					if (capacity == tempVolume.Capacity())
 						score += 4;
+
 					// device name
 					if (deviceName == info.device_name)
 						score += 3;
+
 					// volume name
 					if (volumeName == info.volume_name)
 						score += 2;
+
 					// fsh name
 					if (fshName == info.fsh_name)
 						score += 1;
 
 					// check score
 					if (score >= 9 && score > foundScore) {
-						foundDevice = volume.Device();
+						foundDevice = tempVolume.Device();
 						foundScore = score;
 					}
 				}
 			}
 		}
 		if (foundDevice >= 0)
-			return result->SetTo(foundDevice);
+			return volume->SetTo(foundDevice);
 	} else {
 		// Old style volume identifiers: We have only creation time and
 		// capacity. Both must match.
 		roster.Rewind();
-		while (roster.GetNextVolume(&volume) == B_OK)
-			if (volume.IsPersistent() && volume.KnowsQuery()) {
+		while (roster.GetNextVolume(&tempVolume) == B_OK) {
+			if (tempVolume.IsPersistent() && tempVolume.KnowsQuery()) {
 				BDirectory root;
-				volume.GetRootDirectory(&root);
+				tempVolume.GetRootDirectory(&root);
 				time_t cmpCreated;
 				root.GetCreationTime(&cmpCreated);
-				if (created == cmpCreated && capacity == volume.Capacity()) {
-					*result = volume;
+				if (created == cmpCreated && capacity == tempVolume.Capacity()) {
+					*volume = tempVolume;
 					return B_OK;
 				}
 			}
+		}
 	}
 
 	return B_DEV_BAD_DRIVE_NUM;
@@ -1140,9 +1148,9 @@ EachEntryRefCommon(BMessage* message, entry_ref *(*func)(entry_ref*, void*),
 	for (int32 index = 0; index < count; index++) {
 		entry_ref ref;
 		message->FindRef("refs", index, &ref);
-		entry_ref* result = (func)(&ref, passThru);
-		if (result)
-			return result;
+		entry_ref* newRef = (func)(&ref, passThru);
+		if (newRef != NULL)
+			return newRef;
 	}
 
 	return NULL;
@@ -1246,15 +1254,15 @@ StringToScalar(const char* text)
 static BRect
 LineBounds(BPoint where, float length, bool vertical)
 {
-	BRect result;
-	result.SetLeftTop(where);
-	result.SetRightBottom(where + BPoint(2, 2));
+	BRect rect;
+	rect.SetLeftTop(where);
+	rect.SetRightBottom(where + BPoint(2, 2));
 	if (vertical)
-		result.bottom = result.top + length;
+		rect.bottom = rect.top + length;
 	else
-		result.right = result.left + length;
+		rect.right = rect.left + length;
 
-	return result;
+	return rect;
 }
 
 
@@ -1332,7 +1340,7 @@ void
 EnableNamedMenuItem(BMenu* menu, const char* itemName, bool on)
 {
 	BMenuItem* item = menu->FindItem(itemName);
-	if (item)
+	if (item != NULL)
 		item->SetEnabled(on);
 }
 
@@ -1341,7 +1349,7 @@ void
 MarkNamedMenuItem(BMenu* menu, const char* itemName, bool on)
 {
 	BMenuItem* item = menu->FindItem(itemName);
-	if (item)
+	if (item != NULL)
 		item->SetMarked(on);
 }
 
@@ -1350,7 +1358,7 @@ void
 EnableNamedMenuItem(BMenu* menu, uint32 commandName, bool on)
 {
 	BMenuItem* item = menu->FindItem(commandName);
-	if (item)
+	if (item != NULL)
 		item->SetEnabled(on);
 }
 
@@ -1359,7 +1367,7 @@ void
 MarkNamedMenuItem(BMenu* menu, uint32 commandName, bool on)
 {
 	BMenuItem* item = menu->FindItem(commandName);
-	if (item)
+	if (item != NULL)
 		item->SetMarked(on);
 }
 
@@ -1367,16 +1375,16 @@ MarkNamedMenuItem(BMenu* menu, uint32 commandName, bool on)
 void
 DeleteSubmenu(BMenuItem* submenuItem)
 {
-	if (!submenuItem)
+	if (submenuItem == NULL)
 		return;
 
 	BMenu* menu = submenuItem->Submenu();
-	if (!menu)
+	if (menu == NULL)
 		return;
 
 	for (;;) {
 		BMenuItem* item = menu->RemoveItem((int32)0);
-		if (!item)
+		if (item == NULL)
 			return;
 
 		delete item;
@@ -1385,7 +1393,7 @@ DeleteSubmenu(BMenuItem* submenuItem)
 
 
 status_t
-GetAppSignatureFromAttr(BFile* file, char* result)
+GetAppSignatureFromAttr(BFile* file, char* attr)
 {
 	// This call is a performance improvement that
 	// avoids using the BAppFileInfo API when retrieving the
@@ -1394,10 +1402,10 @@ GetAppSignatureFromAttr(BFile* file, char* result)
 
 #ifdef B_APP_FILE_INFO_IS_FAST
 	BAppFileInfo appFileInfo(file);
-	return appFileInfo.GetSignature(result);
+	return appFileInfo.GetSignature(attr);
 #else
 	ssize_t readResult = file->ReadAttr(kAttrAppSignature, B_MIME_STRING_TYPE,
-		0, result, B_MIME_TYPE_LENGTH);
+		0, attr, B_MIME_TYPE_LENGTH);
 
 	if (readResult <= 0)
 		return (status_t)readResult;
@@ -1462,10 +1470,10 @@ GetAppIconFromAttr(BFile* file, BBitmap* icon, icon_size which)
 
 
 status_t
-GetFileIconFromAttr(BNode* node, BBitmap* icon, icon_size size)
+GetFileIconFromAttr(BNode* node, BBitmap* icon, icon_size which)
 {
 	BNodeInfo fileInfo(node);
-	return fileInfo.GetIcon(icon, size);
+	return fileInfo.GetIcon(icon, which);
 }
 
 
@@ -1483,13 +1491,13 @@ EachMenuItem(BMenu* menu, bool recursive, BMenuItem* (*func)(BMenuItem *))
 	int32 count = menu->CountItems();
 	for (int32 index = 0; index < count; index++) {
 		BMenuItem* item = menu->ItemAt(index);
-		BMenuItem* result = (func)(item);
-		if (result != NULL)
-			return result;
+		BMenuItem* newItem = (func)(item);
+		if (newItem != NULL)
+			return newItem;
 
 		if (recursive) {
 			BMenu* submenu = menu->SubmenuAt(index);
-			if (submenu)
+			if (submenu != NULL)
 				return EachMenuItem(submenu, true, func);
 		}
 	}
@@ -1505,13 +1513,13 @@ EachMenuItem(const BMenu* menu, bool recursive,
 	int32 count = menu->CountItems();
 	for (int32 index = 0; index < count; index++) {
 		BMenuItem* item = menu->ItemAt(index);
-		BMenuItem* result = (func)(item);
-		if (result)
-			return result;
+		BMenuItem* newItem = (func)(item);
+		if (newItem != NULL)
+			return newItem;
 
 		if (recursive) {
 			BMenu* submenu = menu->SubmenuAt(index);
-			if (submenu)
+			if (submenu != NULL)
 				return EachMenuItem(submenu, true, func);
 		}
 	}
@@ -1644,12 +1652,12 @@ ComputeTypeAheadScore(const char* text, const char* match, bool wordMode)
 
 
 void
-_ThrowOnError(status_t error, const char* DEBUG_ONLY(file),
+_ThrowOnError(status_t result, const char* DEBUG_ONLY(file),
 	int32 DEBUG_ONLY(line))
 {
-	if (error != B_OK) {
-		PRINT(("failing %s at %s:%d\n", strerror(error), file, (int)line));
-		throw error;
+	if (result != B_OK) {
+		PRINT(("failing %s at %s:%d\n", strerror(result), file, (int)line));
+		throw result;
 	}
 }
 
@@ -1666,13 +1674,13 @@ _ThrowIfNotSize(ssize_t size, const char* DEBUG_ONLY(file),
 
 
 void
-_ThrowOnError(status_t error, const char* DEBUG_ONLY(debugString),
+_ThrowOnError(status_t result, const char* DEBUG_ONLY(debugString),
 	const char* DEBUG_ONLY(file), int32 DEBUG_ONLY(line))
 {
-	if (error != B_OK) {
-		PRINT(("failing %s, %s at %s:%d\n", debugString, strerror(error), file,
+	if (result != B_OK) {
+		PRINT(("failing %s, %s at %s:%d\n", debugString, strerror(result), file,
 			(int)line));
-		throw error;
+		throw result;
 	}
 }
 
