@@ -1321,17 +1321,17 @@ BPoseView::AddPosesTask(void* castToParams)
 	thread_id threadID = find_thread(NULL);
 
 	BPoseView* view = dynamic_cast<BPoseView*>(lock.Handler());
-	ASSERT(view);
+	ASSERT(view != NULL);
 
 	//BWindow* window = dynamic_cast<BWindow*>(lock.Looper());
-	ASSERT(dynamic_cast<BWindow*>(lock.Looper()));
+	ASSERT(dynamic_cast<BWindow*>(lock.Looper()) != NULL);
 
 	// allocate the iterator we will use for adding poses; this
 	// can be a directory or any other collection of entry_refs, such
 	// as results of a query; subclasses override this to provide
 	// other than standard directory iterations
 	EntryListBase* container = view->InitDirentIterator(&ref);
-	if (!container) {
+	if (container == NULL) {
 		view->HideBarberPole();
 		return B_ERROR;
 	}
@@ -9596,7 +9596,7 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage* dragMessage,
 		targetModel = targetPose->TargetModel();
 
 	Model tmpTarget;
-	if (targetModel && targetModel->IsSymLink()
+	if (targetModel != NULL && targetModel->IsSymLink()
 		&& tmpTarget.SetTo(targetPose->TargetModel()->EntryRef(), true, true)
 			== B_OK) {
 		targetModel = &tmpTarget;
