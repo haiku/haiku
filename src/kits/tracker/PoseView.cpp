@@ -8752,9 +8752,10 @@ BPoseView::AddRemovePoseFromSelection(BPose* pose, int32 index, bool select)
 	if (select)
 		fSelectionList->AddItem(pose);
 	else {
-		fSelectionList->RemoveItem(pose);
+		fSelectionList->RemoveItem(pose, false);
 		if (fSelectionPivotPose == pose)
 			fSelectionPivotPose = NULL;
+
 		if (fRealPivotPose == pose)
 			fRealPivotPose = NULL;
 	}
