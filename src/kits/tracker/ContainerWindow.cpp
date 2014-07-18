@@ -2674,12 +2674,11 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref* ref, BView*)
 	PoseView()->ConvertToScreen(&global);
 	PoseView()->CommitActivePose();
 
-	if (ref) {
+	if (ref != NULL) {
 		// clicked on a pose, show file or volume context menu
 		Model model(ref);
 
 		if (model.IsTrash()) {
-
 			if (fTrashContextMenu->Window() || Dragging())
 				return;
 
@@ -2693,7 +2692,6 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref* ref, BView*)
 			SetupNavigationMenu(ref, fTrashContextMenu);
 			fTrashContextMenu->Go(global, true, true, true);
 		} else {
-
 			bool showAsVolume = false;
 			bool filePanel = PoseView()->IsFilePanel();
 
@@ -3072,9 +3070,9 @@ BContainerWindow::BuildMimeTypeList(BObjectList<BString> &mimeTypes)
 			if (pose->TargetModel()->IsSymLink()) {
 				Model* resolved = new Model(
 					pose->TargetModel()->EntryRef(), true, true);
-				if (resolved->InitCheck() == B_OK) {
+				if (resolved->InitCheck() == B_OK)
 					AddMimeTypeString(mimeTypes, resolved);
-				}
+
 				delete resolved;
 			}
 		}
@@ -3096,7 +3094,7 @@ BContainerWindow::BuildAddOnMenu(BMenu* menu)
 		return;
 
 	menu = item->Submenu();
-	if (!menu)
+	if (menu == NULL)
 		return;
 
 	menu->SetFont(be_plain_font);

@@ -1030,7 +1030,7 @@ TTracker::OpenContainerWindow(Model* model, BMessage* originalRefsList,
 		if (originalRefsList == NULL) {
 			// when passing just a single model, stuff it's entry in a single
 			// element list anyway
-			ASSERT(model);
+			ASSERT(model != NULL);
 			refList = new BMessage;
 			refList->AddRef("refs", model->EntryRef());
 			delete model;

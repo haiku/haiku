@@ -184,7 +184,7 @@ OpenWithContainerWindow::NewPoseView(Model*, BRect rect, uint32)
 OpenWithPoseView*
 OpenWithContainerWindow::PoseView() const
 {
-	ASSERT(dynamic_cast<OpenWithPoseView*>(fPoseView));
+	ASSERT(dynamic_cast<OpenWithPoseView*>(fPoseView) != NULL);
 
 	return static_cast<OpenWithPoseView*>(fPoseView);
 }
