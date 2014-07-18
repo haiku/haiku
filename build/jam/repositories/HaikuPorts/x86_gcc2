@@ -58,8 +58,8 @@ RemotePackageRepository HaikuPorts
 	friss-0.8beta-1
 	gawk-4.1.0-2
 	gcc-2.95.3_2013_08_15-4
-	gettext-0.18.1.1-5
-	gettext_libintl-0.18.1.1-5
+	gettext-0.18.1.1-6
+	gettext_libintl-0.18.1.1-6
 	giflib-5.0.5-2
 	giflib_devel-5.0.5-2
 	git-1.8.3.4-2
@@ -282,8 +282,8 @@ RemotePackageRepository HaikuPorts
 	freetype_x86-2.5.2-2
 	freetype_x86_devel-2.5.2-2
 	gcc_x86-4.8.3_2014_05_28-1
-	gettext_x86-0.18.1.1-5
-	gettext_x86_libintl-0.18.1.1-5
+	gettext_x86-0.18.1.1-6
+	gettext_x86_libintl-0.18.1.1-6
 	giflib_x86-5.0.5-2
 	giflib_x86_devel-5.0.5-2
 	glew_x86-1.10.0-4
@@ -447,6 +447,7 @@ RemotePackageRepository HaikuPorts
 	gcc
 	gcc_x86
 	gettext
+	gettext_x86
 	giflib
 	git
 	glew_x86
