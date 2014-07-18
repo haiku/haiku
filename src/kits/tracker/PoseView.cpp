@@ -4416,7 +4416,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 	if (srcWindow == NULL) {
 		// drag was from another app
 
-		if (targetModel == NULL)
+		if (targetModel == NULL && poseView != NULL)
 			targetModel = poseView->TargetModel();
 
 		// figure out if we dropped a file onto a directory and set
@@ -4425,7 +4425,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 		if (targetModel != NULL && targetModel->IsDirectory())
 			targetDirectory.SetTo(targetModel->EntryRef());
 
-		if (targetModel->IsRoot()) {
+		if (targetModel != NULL && targetModel->IsRoot()) {
 			// don't drop anything into the root disk
 			return false;
 		}
@@ -9604,7 +9604,8 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage* dragMessage,
 
 	bool ignoreTypes = (modifiers() & B_CONTROL_KEY) != 0;
 	if (targetPose != NULL) {
-		if (CanHandleDragSelection(targetModel, dragMessage, ignoreTypes)) {
+		if (targetModel != NULL
+			&& CanHandleDragSelection(targetModel, dragMessage, ignoreTypes)) {
 			// new target is valid, select it
 			HiliteDropTarget(true);
 		} else {
