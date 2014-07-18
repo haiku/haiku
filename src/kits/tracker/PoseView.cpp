@@ -2145,19 +2145,20 @@ BPoseView::MessageReceived(BMessage* message)
 		{
 			AddPosesResult* currentPoses;
 			entry_ref ref;
-			message->FindPointer("currentPoses",
-				reinterpret_cast<void**>(&currentPoses));
-			message->FindRef("ref", &ref);
-
-			// check if CreatePoses should be called (abort if dir has been
-			// switched under normal circumstances, ignore in several special
-			// cases
-			if (AddPosesThreadValid(&ref)) {
-				CreatePoses(currentPoses->fModels, currentPoses->fPoseInfos,
-					currentPoses->fCount, NULL, true, 0, 0, true);
-				currentPoses->ReleaseModels();
+			if (message->FindPointer("currentPoses",
+					reinterpret_cast<void**>(&currentPoses)) == B_OK
+				&& message->FindRef("ref", &ref) == B_OK) {
+				// check if CreatePoses should be called
+				// (abort if dir has been switched under normal
+				// circumstances, ignore in several special cases)
+				if (AddPosesThreadValid(&ref)) {
+					CreatePoses(currentPoses->fModels,
+						currentPoses->fPoseInfos,
+						currentPoses->fCount, NULL, true, 0, 0, true);
+					currentPoses->ReleaseModels();
+				}
+				delete currentPoses;
 			}
-			delete currentPoses;
 			break;
 		}
 
@@ -4047,7 +4048,8 @@ BPoseView::EachItemInDraggedSelection(const BMessage* message,
 	void* passThru)
 {
 	BContainerWindow* srcWindow;
-	message->FindPointer("src_window", (void**)&srcWindow);
+	if (message->FindPointer("src_window", (void**)&srcWindow) != B_OK)
+		return false;
 
 	AutoLock<BWindow> lock(srcWindow);
 	if (!lock)
@@ -10094,8 +10096,7 @@ BPoseView::StartWatchDateFormatChange()
 		BMessenger tracker(kTrackerSignature);
 		BHandler::StartWatching(tracker, kDateFormatChanged);
 #if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_DANO)
-	} else {
-		be_app->LockLooper();
+	} else if (be_app->LockLooper()) {
 		be_app->StartWatching(this, kDateFormatChanged);
 		be_app->UnlockLooper();
 	}
@@ -10111,8 +10112,7 @@ BPoseView::StopWatchDateFormatChange()
 	if (IsFilePanel()) {
 		BMessenger tracker(kTrackerSignature);
 		BHandler::StopWatching(tracker, kDateFormatChanged);
-	} else {
-		be_app->LockLooper();
+	} else if (be_app->LockLooper()) {
 		be_app->StopWatching(this, kDateFormatChanged);
 		be_app->UnlockLooper();
 	}
