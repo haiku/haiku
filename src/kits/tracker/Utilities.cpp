@@ -663,6 +663,8 @@ FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char* name,
 	:
 	BStringView(bounds, name, text, resizingMode, flags),
 	fBitmap(NULL),
+	fViewColor(ViewColor()),
+	fLowColor(LowColor()),
 	fOriginalBitmap(NULL)
 {
 }
@@ -673,6 +675,8 @@ FlickerFreeStringView::FlickerFreeStringView(BRect bounds, const char* name,
 	:
 	BStringView(bounds, name, text, resizingMode, flags),
 	fBitmap(NULL),
+	fViewColor(ViewColor()),
+	fLowColor(LowColor()),
 	fOriginalBitmap(inBitmap)
 {
 }
