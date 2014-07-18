@@ -4146,17 +4146,18 @@ BPoseView::CanCopyOrMoveForeignDrag(const Model* targetModel,
 
 
 bool
-BPoseView::CanHandleDragSelection(const Model* target, const BMessage* dragMessage,
-	bool ignoreTypes)
+BPoseView::CanHandleDragSelection(const Model* target,
+	const BMessage* dragMessage, bool ignoreTypes)
 {
 	if (ignoreTypes)
 		return target->IsDropTarget();
 
-	ASSERT(dragMessage);
+	ASSERT(dragMessage != NULL);
 
 	BContainerWindow* srcWindow;
-	dragMessage->FindPointer("src_window", (void**)&srcWindow);
-	if (!srcWindow) {
+	status_t result = dragMessage->FindPointer("src_window", (void**)&srcWindow);
+
+	if (result != B_OK || srcWindow == NULL) {
 		// handle a foreign drag
 		bool canCopy;
 		bool canMove;
@@ -4188,13 +4189,17 @@ BPoseView::CanHandleDragSelection(const Model* target, const BMessage* dragMessa
 		if (target->IsDirectory()
 			&& (dragMessage->HasData(kBitmapMimeType, B_MESSAGE_TYPE)
 				|| dragMessage->HasData(kLargeIconType, B_MESSAGE_TYPE)
-				|| dragMessage->HasData(kMiniIconType, B_MESSAGE_TYPE)))
+				|| dragMessage->HasData(kMiniIconType, B_MESSAGE_TYPE))) {
 			return true;
+		}
 
 		// TODO: check for a drag message full of refs, feed a list of their
 		// types to target->IsDropTargetForList(mimeTypeList);
 		return false;
 	}
+
+	if (result != B_OK)
+		return false;
 
 	AutoLock<BWindow> lock(srcWindow);
 	if (!lock)
@@ -4416,8 +4421,8 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 
 	// look for srcWindow to determine whether drag was initiated in tracker
 	BContainerWindow* srcWindow = NULL;
-	message->FindPointer("src_window", (void**)&srcWindow);
-	if (srcWindow == NULL) {
+	status_t result = message->FindPointer("src_window", (void**)&srcWindow);
+	if (result != B_OK || srcWindow == NULL) {
 		// drag was from another app
 
 		if (targetModel == NULL && poseView != NULL)
@@ -4780,17 +4785,19 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 		return false;
 	}
 
+	if (result != B_OK)
+		return false;
+
 	if (srcWindow == containerWindow) {
 		// drag started in this window
 		containerWindow->Activate();
 		containerWindow->UpdateIfNeeded();
 		poseView->ResetPosePlacementHint();
-	}
 
-	if (srcWindow == containerWindow
-		&& DragSelectionContains(targetPose, message)) {
-		// drop on self
-		targetModel = NULL;
+		if (DragSelectionContains(targetPose, message)) {
+			// drop on self
+			targetModel = NULL;
+		}
 	}
 
 	bool wasHandled = false;
@@ -4858,10 +4865,11 @@ BPoseView::LaunchAppWithSelection(Model* appModel, const BMessage* dragMessage,
 
 	// add Tracker token so that refs received recipients can script us
 	BContainerWindow* srcWindow;
-	dragMessage->FindPointer("src_window", (void**)&srcWindow);
-	if (srcWindow)
-		params.refsMessage->AddMessenger("TrackerViewToken", BMessenger(
-			srcWindow->PoseView()));
+	if (dragMessage->FindPointer("src_window", (void**)&srcWindow) == B_OK
+		&& srcWindow != NULL) {
+		params.refsMessage->AddMessenger("TrackerViewToken",
+			BMessenger(srcWindow->PoseView()));
+	}
 
 	EachItemInDraggedSelection(dragMessage, AddOneToLaunchMessage, 0, &params);
 	if (params.refsMessage->HasRef("refs"))
