@@ -5207,11 +5207,13 @@ public:
 
 	virtual bool CanAccumulate(const AccumulatingFunctionObject* functor) const
 	{
-		return dynamic_cast<const MetaMimeChangedAccumulator*>(functor)
-			&& dynamic_cast<const MetaMimeChangedAccumulator*>(functor)->
-				fType == fType
-			&& dynamic_cast<const MetaMimeChangedAccumulator*>(functor)->
-				fPreferredApp == fPreferredApp;
+		const MetaMimeChangedAccumulator* accumulator
+			= dynamic_cast<const MetaMimeChangedAccumulator*>(functor);
+		if (accumulator == NULL)
+			return false;
+
+		return accumulator && accumulator->fType == fType
+			&& accumulator->fPreferredApp == fPreferredApp;
 	}
 
 	virtual void Accumulate(AccumulatingFunctionObject* DEBUG_ONLY(functor))
@@ -8250,7 +8252,9 @@ BPoseView::UnmountSelectedVolumes()
 		if (model->IsVolume()) {
 			BVolume volume(model->NodeRef()->device);
 			if (volume != boot) {
-				dynamic_cast<TTracker*>(be_app)->SaveAllPoseLocations();
+				TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+				if (tracker != NULL)
+					tracker->SaveAllPoseLocations();
 
 				BMessage message(kUnmountVolume);
 				message.AddInt32("device_id", volume.Device());
