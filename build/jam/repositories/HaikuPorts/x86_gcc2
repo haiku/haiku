@@ -362,6 +362,7 @@ RemotePackageRepository HaikuPorts
 	ncurses_x86-5.9-9
 	ncurses_x86_devel-5.9-9
 	ninja_x86-1.4.0-1
+	ocp_x86-0.1.21_git-1
 	openal_x86-1.13.0-2
 	openal_x86_devel-1.13.0-2
 	openjdk_x86-1.7_2013_11_08-2
@@ -522,6 +523,7 @@ RemotePackageRepository HaikuPorts
 	netcat
 	netsurf
 	ninja_x86
+	ocp_x86
 	openal_x86
 	openssh
 	openssl
