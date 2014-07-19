@@ -41,6 +41,7 @@ RemotePackageRepository HaikuPorts
 	curl_devel-7.35.0-1
 	cvs-1.12.13.1-6
 	distcc-3.1-2
+	dmidecode-2.12-2
 	doxygen-1.6.3-3
 	expat-2.0.1-7
 	expat_devel-2.0.1-7
@@ -458,6 +459,7 @@ RemotePackageRepository HaikuPorts
 	dbus_x86
 	devil_x86
 	distcc
+	dmidecode
 	doxygen
 	dtc_x86
 	expat
