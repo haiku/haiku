@@ -102,13 +102,15 @@ RemotePackageRepository HaikuPorts
 	lcms_devel-2.5-1
 	less-451-4
 	lha-1.14i-1
-	libao-1.0.0-1
-	libao_devel-1.0.0-1
+	libao-1.1.0-1
+	libao_devel-1.1.0-1
 	libart_lgpl-2.3.21-1
 	libart_lgpl_devel-2.3.21-1
 	libedit-2012_06_01_3.0-1
 	libiconv-1.13.1-6
 	libiconv_devel-1.13.1-6
+	libid3tag-0.15.1b-1
+	libid3tag_devel-0.15.1b-1
 	liblayout-1.4.1-1
 	liblayout_devel-1.4.1-1
 	libmad-0.15.1b-2
@@ -146,6 +148,7 @@ RemotePackageRepository HaikuPorts
 	libxml2_python-2.8.0-6
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
+	links-2.8-1
 	lua-5.2.1-6
 	lua_devel-5.2.1-6
 	lz4-r117-1
@@ -174,6 +177,8 @@ RemotePackageRepository HaikuPorts
 	openssl-1.0.0m-2
 	openssl_devel-1.0.0m-2
 	p7zip-9.20.1-4
+	pciutils-3.2.1-1
+	pciutils_devel-3.2.1-1
 	pe-2.4.4_2014_05_29-1
 	perl-5.18.2-2
 	physfs-2.0.3-1
@@ -321,8 +326,8 @@ RemotePackageRepository HaikuPorts
 	jpeg_x86_devel-9-3
 	lcms_x86-2.5-1
 	lcms_x86_devel-2.5-1
-	libao_x86-1.0.0-1
-	libao_x86_devel-1.0.0-1
+	libao_x86-1.1.0-1
+	libao_x86_devel-1.1.0-1
 	libart_lgpl_x86-2.3.21-1
 	libart_lgpl_x86_devel-2.3.21-1
 	libattica_x86-0.4.2-1
@@ -335,6 +340,8 @@ RemotePackageRepository HaikuPorts
 	libffi_x86_devel-3.0.13-1
 	libiconv_x86-1.13.1-6
 	libiconv_x86_devel-1.13.1-6
+	libid3tag_x86-0.15.1b-1
+	libid3tag_x86_devel-0.15.1b-1
 	libmad_x86-0.15.1b-2
 	libmad_x86_devel-0.15.1b-2
 	libmikmod_x86-3.3.3-2
@@ -392,6 +399,8 @@ RemotePackageRepository HaikuPorts
 	openssl_x86-1.0.0m-2
 	openssl_x86_devel-1.0.0m-2
 	openttd_x86-1.3.3-1
+	pciutils_x86-3.2.1-1
+	pciutils_x86_devel-3.2.1-1
 	physfs_x86-2.0.3-1
 	physfs_x86_devel-2.0.3-1
 	pixman_x86-0.20.0-1
@@ -524,6 +533,7 @@ RemotePackageRepository HaikuPorts
 	libexecinfo_x86
 	libffi_x86
 	libiconv
+	libid3tag
 	libmad
 	libmikmod
 	libmodplug
@@ -547,6 +557,7 @@ RemotePackageRepository HaikuPorts
 	libxml2_x86
 	libxslt
 	libxslt_x86
+	links
 	lz4
 	llvm_x86
 	luajit_x86
@@ -576,6 +587,7 @@ RemotePackageRepository HaikuPorts
 	openssl
 	openttd_x86
 	p7zip
+	pciutils
 	pe
 	perl
 	physfs
