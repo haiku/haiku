@@ -17,6 +17,7 @@ RemotePackageRepository HaikuPorts
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
+	acr-0.9.9_git-1
 	ale-0.9.1-2
 	apr-1.4.6-7
 	apr_devel-1.4.6-7
@@ -42,6 +43,7 @@ RemotePackageRepository HaikuPorts
 	cvs-1.12.13.1-6
 	distcc-3.1-2
 	dmidecode-2.12-2
+	dos2unix-1.0.1-1
 	doxygen-1.6.3-3
 	expat-2.0.1-7
 	expat_devel-2.0.1-7
@@ -60,6 +62,8 @@ RemotePackageRepository HaikuPorts
 	friss-0.8beta-1
 	gawk-4.1.0-2
 	gcc-2.95.3_2013_08_15-4
+	getconf-r260000-1
+	getopt-1.1.5-1
 	gettext-0.18.1.1-6
 	gettext_libintl-0.18.1.1-6
 	giflib-5.0.5-2
@@ -85,6 +89,7 @@ RemotePackageRepository HaikuPorts
 	gyp-r1948-1
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
+	html_parser-3.71-1
 	icu-4.8.1.1-4
 	icu_devel-4.8.1.1-4
 	intltool-0.40.6-3
@@ -214,6 +219,7 @@ RemotePackageRepository HaikuPorts
 	speex_devel-1.2~rc1-2
 	sqlite-3.8.4.3-1
 	sqlite_devel-3.8.4.3-1
+	srm-1.2.12-1
 	subversion-1.6.18-6
 	subversion_devel-1.6.18-6
 	sum_it-0.2beta-3
@@ -400,6 +406,8 @@ RemotePackageRepository HaikuPorts
 	quassel_x86-0.10.0-2
 	quicklaunch-0.9.7-2
 	qupzilla_x86-1.7.x-4
+	readline_x86-6.3-2
+	readline_x86_devel-6.3-2
 	rocksndiamonds_x86-3.3.1.2-1
 	sdl_gfx_x86-2.0.24-1
 	sdl_gfx_x86_devel-2.0.24-1
@@ -436,6 +444,7 @@ RemotePackageRepository HaikuPorts
 	zlib_x86_devel-1.2.8-4
 	:
 	# source packages
+	acr
 	ale
 	apr
 	autoconf
@@ -461,6 +470,7 @@ RemotePackageRepository HaikuPorts
 	devil_x86
 	distcc
 	dmidecode
+	dos2unix
 	doxygen
 	dtc_x86
 	expat
@@ -476,6 +486,8 @@ RemotePackageRepository HaikuPorts
 	gawk
 	gcc
 	gcc_x86
+	getconf
+	getopt
 	gettext
 	gettext_x86
 	giflib
@@ -494,6 +506,7 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit_x86
 	help2man
 	htmldoc
+	html_parser
 	icu
 	intltool
 	jam
@@ -583,6 +596,7 @@ RemotePackageRepository HaikuPorts
 	quicklaunch
 	qupzilla_x86
 	readline
+	readline_x86
 	roadfighter
 	rocksndiamonds_x86
 	ruby
@@ -604,6 +618,7 @@ RemotePackageRepository HaikuPorts
 	speex
 	sqlite
 	sqlite_x86
+	srm
 	strigi_x86
 	subversion
 	sum_it
