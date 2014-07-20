@@ -252,8 +252,13 @@ if [ -n "$kernelCcFlags" ]; then
 	[ -f "$haikuMachine/32/libstdc++-v3/config.h" ] \
 		&& sed -i '/.*_GLIBCXX_HAS_GTHREADS.*/c\#undef _GLIBCXX_HAS_GTHREADS' \
 		"$haikuMachine/32/libstdc++-v3/config.h"
+	[ -f "$haikuMachine/32/libstdc++-v3/include/$haikuMachine/bits/c++config.h" ] \
+		&& sed -i '/.*_GLIBCXX_HAS_TLS.*/c\#undef _GLIBCXX_HAS_TLS' \
+		"$haikuMachine/32/libstdc++-v3/include/$haikuMachine/bits/c++config.h"
 	sed -i '/.*_GLIBCXX_HAS_GTHREADS.*/c\#undef _GLIBCXX_HAS_GTHREADS' \
 		"$haikuMachine/libstdc++-v3/config.h"
+	sed -i '/.*_GLIBCXX_HAVE_TLS.*/c\#undef _GLIBCXX_HAVE_TLS' \
+		"$haikuMachine/libstdc++-v3/include/$haikuMachine/bits/c++config.h"
 	$MAKE -C "$haikuMachine/libstdc++-v3/libsupc++" CFLAGS="-g -O2 $kernelCcFlags" \
 		CXXFLAGS="-g -O2 $kernelCcFlags" || {
 		echo "Error: Building kernel libsupc++ failed." >&2
