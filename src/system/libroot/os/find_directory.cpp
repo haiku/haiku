@@ -190,7 +190,7 @@ static const char *kUserDirectories[] = {
 	HOME CONFIG "/var",
 };
 
-
+#ifndef _LOADER_MODE
 /*! make dir and its parents if needed */
 static int
 create_path(const char *path, mode_t mode)
@@ -512,3 +512,164 @@ DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__find_directory_alpha4",
 
 DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__find_directory", "find_directory@@",
     "1_ALPHA5");
+#else
+status_t
+__find_directory(directory_which which, dev_t device, bool createIt,
+	char *returnedPath, int32 _pathLength)
+{
+	if (_pathLength <= 0)
+		return E2BIG;
+	size_t pathLength = _pathLength;
+
+	const char *templatePath = NULL;
+
+	/* as with the R5 version, no on-stack buffer */
+	char *buffer = (char*)malloc(pathLength);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter bufferDeleter(buffer);
+
+	memset(buffer, 0, pathLength);
+
+	strlcat(buffer, "/boot", pathLength);
+
+	switch ((int)which) {
+		/* Haiku system directories */
+		case B_SYSTEM_DIRECTORY:
+		case B_BEOS_SYSTEM_DIRECTORY:
+		case B_SYSTEM_ADDONS_DIRECTORY:
+		case B_SYSTEM_BOOT_DIRECTORY:
+		case B_SYSTEM_FONTS_DIRECTORY:
+		case B_SYSTEM_LIB_DIRECTORY:
+		case B_SYSTEM_SERVERS_DIRECTORY:
+		case B_SYSTEM_APPS_DIRECTORY:
+		case B_SYSTEM_BIN_DIRECTORY:
+		case B_BEOS_ETC_DIRECTORY:
+		case B_SYSTEM_DOCUMENTATION_DIRECTORY:
+		case B_SYSTEM_PREFERENCES_DIRECTORY:
+		case B_SYSTEM_TRANSLATORS_DIRECTORY:
+		case B_SYSTEM_MEDIA_NODES_DIRECTORY:
+		case B_SYSTEM_SOUNDS_DIRECTORY:
+		case B_SYSTEM_DATA_DIRECTORY:
+		case B_SYSTEM_DEVELOP_DIRECTORY:
+		case B_SYSTEM_PACKAGES_DIRECTORY:
+		case B_SYSTEM_HEADERS_DIRECTORY:
+			templatePath = kSystemDirectories[which - B_SYSTEM_DIRECTORY];
+			break;
+
+		/* Obsolete common directories and writable system directories */
+		case B_COMMON_DIRECTORY:
+		case B_COMMON_SYSTEM_DIRECTORY:
+		case B_COMMON_ADDONS_DIRECTORY:
+		case B_COMMON_BOOT_DIRECTORY:
+		case B_COMMON_FONTS_DIRECTORY:
+		case B_COMMON_LIB_DIRECTORY:
+		case B_COMMON_SERVERS_DIRECTORY:
+		case B_COMMON_BIN_DIRECTORY:
+		case B_SYSTEM_ETC_DIRECTORY:
+		case B_COMMON_DOCUMENTATION_DIRECTORY:
+		case B_SYSTEM_SETTINGS_DIRECTORY:
+		case B_COMMON_DEVELOP_DIRECTORY:
+		case B_SYSTEM_LOG_DIRECTORY:
+		case B_SYSTEM_SPOOL_DIRECTORY:
+		case B_SYSTEM_TEMP_DIRECTORY:
+		case B_SYSTEM_VAR_DIRECTORY:
+		case B_COMMON_TRANSLATORS_DIRECTORY:
+		case B_COMMON_MEDIA_NODES_DIRECTORY:
+		case B_COMMON_SOUNDS_DIRECTORY:
+		case B_COMMON_DATA_DIRECTORY:
+		case B_SYSTEM_CACHE_DIRECTORY:
+		case B_COMMON_PACKAGES_DIRECTORY:
+		case B_COMMON_HEADERS_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_TRANSLATORS_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_MEDIA_NODES_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_BIN_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_DATA_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_FONTS_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_SOUNDS_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_DOCUMENTATION_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_LIB_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_HEADERS_DIRECTORY:
+		case B_SYSTEM_NONPACKAGED_DEVELOP_DIRECTORY:
+			templatePath = kCommonDirectories[which - B_COMMON_DIRECTORY];
+			break;
+
+		/* User directories */
+		case B_USER_DIRECTORY:
+		case B_USER_CONFIG_DIRECTORY:
+		case B_USER_ADDONS_DIRECTORY:
+		case B_USER_BOOT_DIRECTORY:
+		case B_USER_FONTS_DIRECTORY:
+		case B_USER_LIB_DIRECTORY:
+		case B_USER_SETTINGS_DIRECTORY:
+		case B_USER_DESKBAR_DIRECTORY:
+		case B_USER_PRINTERS_DIRECTORY:
+		case B_USER_TRANSLATORS_DIRECTORY:
+		case B_USER_MEDIA_NODES_DIRECTORY:
+		case B_USER_SOUNDS_DIRECTORY:
+		case B_USER_DATA_DIRECTORY:
+		case B_USER_CACHE_DIRECTORY:
+		case B_USER_PACKAGES_DIRECTORY:
+		case B_USER_HEADERS_DIRECTORY:
+		case B_USER_DEVELOP_DIRECTORY:
+		case B_USER_DOCUMENTATION_DIRECTORY:
+		case B_USER_NONPACKAGED_DIRECTORY:
+		case B_USER_NONPACKAGED_ADDONS_DIRECTORY:
+		case B_USER_NONPACKAGED_TRANSLATORS_DIRECTORY:
+		case B_USER_NONPACKAGED_MEDIA_NODES_DIRECTORY:
+		case B_USER_NONPACKAGED_BIN_DIRECTORY:
+		case B_USER_NONPACKAGED_DATA_DIRECTORY:
+		case B_USER_NONPACKAGED_FONTS_DIRECTORY:
+		case B_USER_NONPACKAGED_SOUNDS_DIRECTORY:
+		case B_USER_NONPACKAGED_DOCUMENTATION_DIRECTORY:
+		case B_USER_NONPACKAGED_LIB_DIRECTORY:
+		case B_USER_NONPACKAGED_HEADERS_DIRECTORY:
+		case B_USER_NONPACKAGED_DEVELOP_DIRECTORY:
+		case B_USER_SERVERS_DIRECTORY:
+		case B_USER_APPS_DIRECTORY:
+		case B_USER_BIN_DIRECTORY:
+		case B_USER_PREFERENCES_DIRECTORY:
+		case B_USER_ETC_DIRECTORY:
+		case B_USER_LOG_DIRECTORY:
+		case B_USER_SPOOL_DIRECTORY:
+		case B_USER_VAR_DIRECTORY:
+			templatePath = kUserDirectories[which - B_USER_DIRECTORY];
+			break;
+
+		default:
+			return EINVAL;
+	}
+
+	if (templatePath == NULL)
+		return ENOENT;
+
+	PathBuffer pathBuffer(buffer, pathLength, strlen(buffer));
+
+	// resolve "$h" placeholder to the user's home directory
+	if (!strncmp(templatePath, "$h", 2)) {
+		pathBuffer.Append("/home");
+		templatePath += 2;
+	} else if (templatePath[0] != '\0')
+		pathBuffer.Append('/');
+
+	// resolve "$a" placeholder to the architecture subdirectory, if not
+	// primary
+	if (char* dollar = strchr(templatePath, '$')) {
+		if (dollar[1] == 'a') {
+			pathBuffer.Append(templatePath, dollar - templatePath);
+			templatePath = dollar + 2;
+		}
+	}
+
+	// append (remainder of) template path
+	pathBuffer.Append(templatePath);
+
+	if (pathBuffer.Length() >= pathLength)
+		return E2BIG;
+
+	strlcpy(returnedPath, buffer, pathLength);
+	return B_OK;
+}
+#endif

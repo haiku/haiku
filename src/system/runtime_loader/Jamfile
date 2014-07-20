@@ -5,7 +5,11 @@ local architecture = $(TARGET_PACKAGING_ARCH) ;
 UsePrivateHeaders libroot runtime_loader shared ;
 UsePrivateHeaders kernel ;
 	# for <util/KMessage.h>
+UsePrivateHeaders libroot os ;
+	# for "PathBuffer.h"
 UsePrivateSystemHeaders ;
+
+ObjectHdrs find_directory.cpp : $(HAIKU_TOP)/src/system/libroot/os ;
 
 # Don't let gcc inject built-in function code. This will cause dependencies
 # to libroot, which we don't link against.
@@ -25,6 +29,7 @@ StaticLibrary libruntime_loader.a :
 	kernel_vsprintf.cpp
 	kernel_cpp.cpp
 	KMessage.cpp
+	find_directory.cpp
 	:
 	<src!system!libroot!os!$(architecture)>mutex.o
 	<src!system!libroot!os!$(architecture)>recursive_lock.o
@@ -68,7 +73,8 @@ SEARCH on [ FGristFiles kernel_vsprintf.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel lib ] ;
 SEARCH on [ FGristFiles KMessage.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
-
+SEARCH on [ FGristFiles find_directory.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
 local sources =
 	add_ons.cpp

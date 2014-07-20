@@ -18,6 +18,7 @@
 #include <ByteOrder.h>
 
 #include <directories.h>
+#include <find_directory_private.h>
 #include <image_defs.h>
 #include <syscalls.h>
 #include <user_runtime.h>
@@ -32,6 +33,13 @@ void *__gCommPageAddress;
 void *__dso_handle;
 
 int32 __gCPUCount = 1;
+
+const directory_which kLibraryDirectories[] = {
+	B_SYSTEM_LIB_DIRECTORY,
+	B_SYSTEM_NONPACKAGED_LIB_DIRECTORY,
+	B_USER_LIB_DIRECTORY,
+	B_USER_NONPACKAGED_LIB_DIRECTORY
+};
 
 
 static const char *
@@ -175,7 +183,15 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 			// not been compiled with a compiler using the same ABI as the one
 			// the OS has been built with. Thus we only look in subdirs
 			// specific to that ABI.
-			subDirLen = strlen(abiSpecificSubDir) + 1;
+			// However, only if it's a known library location
+			for (int i = 0; i < 4; ++i) {
+				char buffer[PATH_MAX];
+				__find_directory(kLibraryDirectories[i], -1, false, buffer, PATH_MAX);
+				if (strncmp(dir, buffer, dirLength) == 0) {
+					subDirLen = strlen(abiSpecificSubDir) + 1;
+					break;
+				}
+			}
 		}
 
 		if (dirLength + 1 + subDirLen + nameLength >= pathLength)
