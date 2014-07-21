@@ -244,7 +244,7 @@ RemotePackageRepository HaikuPorts
 	fossil
 	freetype
 	gawk
-	gcc
+#	gcc
 	gcc_x86_gcc2
 	gettext
 	git
