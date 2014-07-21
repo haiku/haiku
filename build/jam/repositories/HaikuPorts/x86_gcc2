@@ -17,7 +17,9 @@ RemotePackageRepository HaikuPorts
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
+	a_book-1.1-3
 	acr-0.9.9_git-1
+	album-0.9.3-1
 	ale-0.9.1-2
 	apr-1.4.6-7
 	apr_devel-1.4.6-7
@@ -25,15 +27,19 @@ RemotePackageRepository HaikuPorts
 	apr_util_devel-1.4.1-3
 	autoconf-2.69-5
 	automake-1.13.1-4
+	beae-1.2-2
 	beam-1.2alpha-1
+	belife-1.0.0-2
 	bepdf-1.2.0-1
 	bescreencapture-1.9.4-1
 #	bezillabrowser-2.0.0.22pre_2010_05_02-1
 	binutils-2.17_2013_04_21-2
 	bison-2.4.3-6
+	blogpositive-0.4.0-2
 	buildbot_slave-0.8.8-2
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
+	capitalbe-1.0-2
 	caya-2013.07.31-3
 	cdrtools-3.01~a18-1
 	cdrtools_devel-3.01~a18-1
@@ -45,6 +51,7 @@ RemotePackageRepository HaikuPorts
 	dmidecode-2.12-2
 	dos2unix-1.0.1-1
 	doxygen-1.6.3-3
+	ducksaver-1.1.0-1
 	expat-2.0.1-7
 	expat_devel-2.0.1-7
 	f1spirit-0.rc9.1615-1
@@ -111,6 +118,8 @@ RemotePackageRepository HaikuPorts
 	libiconv_devel-1.13.1-6
 	libid3tag-0.15.1b-1
 	libid3tag_devel-0.15.1b-1
+	libiptcdata-1.0.4-1
+	libiptcdata_devel-1.0.4-1
 	liblayout-1.4.1-1
 	liblayout_devel-1.4.1-1
 	libmad-0.15.1b-2
@@ -454,21 +463,27 @@ RemotePackageRepository HaikuPorts
 	zlib_x86_devel-1.2.8-4
 	:
 	# source packages
+	a_book
 	acr
+	album
 	ale
 	apr
 	autoconf
 	automake
 	automoc_x86
+	beae
 	beam
+	belife
 	bepdf
 	bescreencapture
+	blogpositive
 	binutils
 	binutils_x86
 	bison
 	bison_x86
 	boost_x86
 	bzip2
+	capitalbe
 	caya
 	cdrtools
 	cmake_x86
@@ -483,6 +498,7 @@ RemotePackageRepository HaikuPorts
 	dos2unix
 	doxygen
 	dtc_x86
+	ducksaver
 	expat
 	f1spirit
 	findutils
@@ -535,6 +551,7 @@ RemotePackageRepository HaikuPorts
 	libffi_x86
 	libiconv
 	libid3tag
+	libiptcdata
 	libmad
 	libmikmod
 	libmodplug
