@@ -484,92 +484,7 @@ BHttpRequest::_MakeRequest()
 	fSocket->Write("\r\n", 2);
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Request sent.");
 
-	if (fRequestMethod == B_HTTP_POST && fOptPostFields != NULL) {
-		if (fOptPostFields->GetFormType() != B_HTTP_FORM_MULTIPART) {
-			BString outputBuffer = fOptPostFields->RawData();
-			_EmitDebug(B_URL_PROTOCOL_DEBUG_TRANSFER_OUT,
-				"%s", outputBuffer.String());
-			fSocket->Write(outputBuffer.String(), outputBuffer.Length());
-		} else {
-			for (BHttpForm::Iterator it = fOptPostFields->GetIterator();
-				const BHttpFormData* currentField = it.Next();
-				) {
-				_EmitDebug(B_URL_PROTOCOL_DEBUG_TRANSFER_OUT,
-					it.MultipartHeader().String());
-				fSocket->Write(it.MultipartHeader().String(),
-					it.MultipartHeader().Length());
-
-				switch (currentField->Type()) {
-					default:
-					case B_HTTPFORM_UNKNOWN:
-						ASSERT(0);
-						break;
-
-					case B_HTTPFORM_STRING:
-						fSocket->Write(currentField->String().String(),
-							currentField->String().Length());
-						break;
-
-					case B_HTTPFORM_FILE:
-						{
-							BFile upFile(currentField->File().Path(),
-								B_READ_ONLY);
-							char readBuffer[kHttpBufferSize];
-							ssize_t readSize;
-
-							readSize = upFile.Read(readBuffer,
-								sizeof(readBuffer));
-							while (readSize > 0) {
-								fSocket->Write(readBuffer, readSize);
-								readSize = upFile.Read(readBuffer,
-									sizeof(readBuffer));
-							}
-
-							break;
-						}
-					case B_HTTPFORM_BUFFER:
-						fSocket->Write(currentField->Buffer(),
-							currentField->BufferSize());
-						break;
-				}
-
-				fSocket->Write("\r\n", 2);
-			}
-
-			BString footer = fOptPostFields->GetMultipartFooter();
-			fSocket->Write(footer.String(), footer.Length());
-		}
-	} else if ((fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT)
-		&& fOptInputData != NULL) {
-
-		for (;;) {
-			char outputTempBuffer[kHttpBufferSize];
-			ssize_t read = fOptInputData->Read(outputTempBuffer,
-				sizeof(outputTempBuffer));
-
-			if (read <= 0)
-				break;
-
-			if (fOptInputDataSize < 0) {
-				// Chunked transfer
-				char hexSize[16];
-				size_t hexLength = sprintf(hexSize, "%ld", read);
-
-				fSocket->Write(hexSize, hexLength);
-				fSocket->Write("\r\n", 2);
-				fSocket->Write(outputTempBuffer, read);
-				fSocket->Write("\r\n", 2);
-			} else {
-				fSocket->Write(outputTempBuffer, read);
-			}
-		}
-
-		if (fOptInputDataSize < 0) {
-			// Chunked transfer terminating sequence
-			fSocket->Write("0\r\n\r\n", 5);
-		}
-	}
-
+	_SendPostData();
 	fRequestStatus = kRequestInitialState;
 
 	// Receive loop
@@ -757,22 +672,21 @@ BHttpRequest::_MakeRequest()
 						std::max((ssize_t)0, bytesTotal));
 				}
 
-				if (bytesTotal >= 0 && bytesReceived >= bytesTotal) {
+				if (bytesTotal >= 0 && bytesReceived >= bytesTotal)
 					receiveEnd = true;
 
-					if (decompress) {
-						readError = decompressingStream->Flush();
-						if (readError != B_OK)
-							break;
+				if (decompress && receiveEnd) {
+					readError = decompressingStream->Flush();
+					if (readError != B_OK && readError != B_BUFFER_OVERFLOW)
+						break;
 
-						ssize_t size = decompressorStorage.Size();
-						BStackOrHeapArray<char, 4096> buffer(size);
-						size = decompressorStorage.Read(buffer, size);
-						if (fListener != NULL && size > 0) {
-							fListener->DataReceived(this, buffer,
-								bytesUnpacked, size);
-							bytesUnpacked += size;
-						}
+					ssize_t size = decompressorStorage.Size();
+					BStackOrHeapArray<char, 4096> buffer(size);
+					size = decompressorStorage.Read(buffer, size);
+					if (fListener != NULL && size > 0) {
+						fListener->DataReceived(this, buffer,
+							bytesUnpacked, size);
+						bytesUnpacked += size;
 					}
 				}
 			}
@@ -1008,6 +922,98 @@ BHttpRequest::_SendHeaders()
 
 		_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_OUT, "%s", header);
 	}
+}
+
+
+void
+BHttpRequest::_SendPostData()
+{
+	if (fRequestMethod == B_HTTP_POST && fOptPostFields != NULL) {
+		if (fOptPostFields->GetFormType() != B_HTTP_FORM_MULTIPART) {
+			BString outputBuffer = fOptPostFields->RawData();
+			_EmitDebug(B_URL_PROTOCOL_DEBUG_TRANSFER_OUT,
+				"%s", outputBuffer.String());
+			fSocket->Write(outputBuffer.String(), outputBuffer.Length());
+		} else {
+			for (BHttpForm::Iterator it = fOptPostFields->GetIterator();
+				const BHttpFormData* currentField = it.Next();
+				) {
+				_EmitDebug(B_URL_PROTOCOL_DEBUG_TRANSFER_OUT,
+					it.MultipartHeader().String());
+				fSocket->Write(it.MultipartHeader().String(),
+					it.MultipartHeader().Length());
+
+				switch (currentField->Type()) {
+					default:
+					case B_HTTPFORM_UNKNOWN:
+						ASSERT(0);
+						break;
+
+					case B_HTTPFORM_STRING:
+						fSocket->Write(currentField->String().String(),
+							currentField->String().Length());
+						break;
+
+					case B_HTTPFORM_FILE:
+						{
+							BFile upFile(currentField->File().Path(),
+								B_READ_ONLY);
+							char readBuffer[kHttpBufferSize];
+							ssize_t readSize;
+
+							readSize = upFile.Read(readBuffer,
+								sizeof(readBuffer));
+							while (readSize > 0) {
+								fSocket->Write(readBuffer, readSize);
+								readSize = upFile.Read(readBuffer,
+									sizeof(readBuffer));
+							}
+
+							break;
+						}
+					case B_HTTPFORM_BUFFER:
+						fSocket->Write(currentField->Buffer(),
+							currentField->BufferSize());
+						break;
+				}
+
+				fSocket->Write("\r\n", 2);
+			}
+
+			BString footer = fOptPostFields->GetMultipartFooter();
+			fSocket->Write(footer.String(), footer.Length());
+		}
+	} else if ((fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT)
+		&& fOptInputData != NULL) {
+
+		for (;;) {
+			char outputTempBuffer[kHttpBufferSize];
+			ssize_t read = fOptInputData->Read(outputTempBuffer,
+				sizeof(outputTempBuffer));
+
+			if (read <= 0)
+				break;
+
+			if (fOptInputDataSize < 0) {
+				// Chunked transfer
+				char hexSize[16];
+				size_t hexLength = sprintf(hexSize, "%ld", read);
+
+				fSocket->Write(hexSize, hexLength);
+				fSocket->Write("\r\n", 2);
+				fSocket->Write(outputTempBuffer, read);
+				fSocket->Write("\r\n", 2);
+			} else {
+				fSocket->Write(outputTempBuffer, read);
+			}
+		}
+
+		if (fOptInputDataSize < 0) {
+			// Chunked transfer terminating sequence
+			fSocket->Write("0\r\n\r\n", 5);
+		}
+	}
+
 }
 
 

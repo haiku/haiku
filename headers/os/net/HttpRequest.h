@@ -68,6 +68,7 @@ private:
 
 			void				_SendRequest();
 			void				_SendHeaders();
+			void				_SendPostData();
 
 			status_t			_GetLine(BString& destString);
 
