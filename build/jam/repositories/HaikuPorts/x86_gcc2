@@ -304,8 +304,8 @@ RemotePackageRepository HaikuPorts
 	gcc_x86-4.8.3_2014_05_28-1
 	gettext_x86-0.18.1.1-6
 	gettext_x86_libintl-0.18.1.1-6
-	giflib_x86-5.0.5-2
-	giflib_x86_devel-5.0.5-2
+	giflib_x86-5.1.0-1
+	giflib_x86_devel-5.1.0-1
 	glew_x86-1.10.0-4
 	glew_x86_devel-1.10.0-4
 	glew_x86_util-1.10.0-4
@@ -420,8 +420,8 @@ RemotePackageRepository HaikuPorts
 	rocksndiamonds_x86-3.3.1.2-1
 	sdl_gfx_x86-2.0.24-1
 	sdl_gfx_x86_devel-2.0.24-1
-	sdl_image_x86-1.2.12-1
-	sdl_image_x86_devel-1.2.12-1
+	sdl_image_x86-1.2.12-3
+	sdl_image_x86_devel-1.2.12-3
 	sdl_net_x86-1.2.8-4
 	sdl_net_x86_devel-1.2.8-4
 	sdl_mixer_x86-1.2.12-3
@@ -447,6 +447,7 @@ RemotePackageRepository HaikuPorts
 	tiff_x86-3.9.6-2
 	tiff_x86_devel-3.9.6-2
 	vcmi_x86-0.94-1
+	wizznic_x86-0.9.9-2
 	xz_utils_x86-5.0.5-3
 	xz_utils_x86_devel-5.0.5-3
 	zlib_x86-1.2.8-4
@@ -647,6 +648,7 @@ RemotePackageRepository HaikuPorts
 	vision
 	wget
 	which
+	wizznic_x86
 	wpa_supplicant
 	yab
 	yasm

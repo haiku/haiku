@@ -25,7 +25,7 @@
 #include <AutoDeleter.h>
 
 
-//#define TRACE_XSI_SEM
+#define TRACE_XSI_SEM
 #ifdef TRACE_XSI_SEM
 #	define TRACE(x)			dprintf x
 #	define TRACE_ERROR(x)	dprintf x

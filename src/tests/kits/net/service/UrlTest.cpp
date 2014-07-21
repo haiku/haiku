@@ -185,16 +185,18 @@ const ExplodeTest	kTestExplode[] =
 			{ "http",   "",        "", "www.host.tld",0,   "/path",	  "query",   "fragment" } },
 		{ "",
 			{ "",       "",        "", "",            0,   "",        "",        ""} },
-		{ "HTTP://example.com.:80/%70a%74%68?a=%31#1%323",
-			{ "HTTP",   "",        "", "example.com.",80,  "/%70a%74%68","a=%31","1%323"} },
-		{ "ldap://[2001:db8::7]/c=GB?objectClass?one",
-			{ "ldap",   "",        "", "[2001:db8::7]",389,"/c=GB",   "objectClass?one", "" } },
 		{ "mailto:John.Doe@example.com",
 			{ "mailto", "",        "", "",            0,   "John.Doe@example.com", "", "" } },
 		{ "mailto:?to=addr1@an.example,addr2@an.example",
 			{ "mailto", "",        "", "",            0,   "",        "to=addr1@an.example,addr2@an.example", "" } },
 		{ "urn:oasis:names:specification:docbook:dtd:xml:4.1.2",
-			{ "urn",    "",        "", "",            0,   "oasis:names:specification:docbook:dtd:xml:4.1.2", "", "" } }
+			{ "urn",    "",        "", "",            0,   "oasis:names:specification:docbook:dtd:xml:4.1.2", "", "" } },
+		{ "http://www.goodsearch.com/login?return_path=/",
+			{ "http",   "",        "", "www.goodsearch.com", 0, "/login", "return_path=/", "" } },
+		{ "ldap://[2001:db8::7]/c=GB?objectClass?one",
+			{ "ldap",   "",        "", "[2001:db8::7]",389,"/c=GB",   "objectClass?one", "" } },
+		{ "HTTP://example.com.:80/%70a%74%68?a=%31#1%323",
+			{ "HTTP",   "",        "", "example.com.",80,  "/%70a%74%68","a=%31","1%323"} }
 	};
 
 void UrlTest::ExplodeImplodeTest()

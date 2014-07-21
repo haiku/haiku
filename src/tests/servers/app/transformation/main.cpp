@@ -492,6 +492,38 @@ public:
 };
 
 
+// #pragma mark - ClippingStates
+
+
+class ClippingStatesTest : public Test {
+public:
+	ClippingStatesTest()
+		:
+		Test("Clipping in nested state")
+	{
+	}
+
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BRect r (20, 20, 300, 300);
+		view->SetHighColor(ui_color(B_FAILURE_COLOR));
+		view->FillRect(r);
+
+		BAffineTransform transform;
+		transform.TranslateBy(20, 0);
+		view->SetTransform(transform);
+
+		// This should clip to exactly the area we filled red above.
+		r.OffsetBy(-20, 0);
+		BRegion clipping(r);
+		view->ConstrainClippingRegion(&clipping);
+
+		view->SetHighColor(ui_color(B_SUCCESS_COLOR));
+		view->FillRect(BRect(-1000, -1000, 1000, 1000));
+	}
+};
+
+
 // #pragma mark - Clipping
 
 
@@ -637,6 +669,7 @@ main(int argc, char** argv)
 
 	window->AddTest(new RectsTest());
 	window->AddTest(new BitmapClipTest());
+	window->AddTest(new ClippingStatesTest());
 	window->AddTest(new TextClippingTest());
 	window->AddTest(new AlphaMaskBitmapTest());
 	window->AddTest(new GradientTest());
