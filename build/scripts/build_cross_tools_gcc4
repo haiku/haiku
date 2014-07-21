@@ -44,8 +44,8 @@ arm-*)
 		--with-cpu=cortex-a8 --with-arch=armv7-a --with-fpu=vfpv3"
 
 	# TODO: Disable building with TLS support for ARM until implemented.
-	binutilsConfigureArgs+="--disable-tls"
-	gccConfigureArgs+="--disable-tls"
+	binutilsConfigureArgs="$binutilsConfigureArgs --disable-tls"
+	gccConfigureArgs="$gccConfigureArgs --disable-tls"
 	;;
 *)
 	binutilsConfigureArgs="--disable-multilib"
