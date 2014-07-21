@@ -914,14 +914,19 @@ BHttpRequest::_SendHeaders()
 	}
 
 	// Write output headers to output stream
+	BString headerData;
+
 	for (int32 headerIndex = 0; headerIndex < fOutputHeaders.CountHeaders();
 			headerIndex++) {
 		const char* header = fOutputHeaders.HeaderAt(headerIndex).Header();
-		fSocket->Write(header, strlen(header));
-		fSocket->Write("\r\n", 2);
+
+		headerData << header;
+		headerData << "\r\n";
 
 		_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_OUT, "%s", header);
 	}
+
+	fSocket->Write(headerData.String(), headerData.Length());
 }
 
 
