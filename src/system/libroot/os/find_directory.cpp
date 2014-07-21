@@ -512,7 +512,7 @@ DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__find_directory_alpha4",
 
 DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__find_directory", "find_directory@@",
     "1_ALPHA5");
-#else
+#else // _LOADER_MODE
 status_t
 __find_directory(directory_which which, dev_t device, bool createIt,
 	char *returnedPath, int32 _pathLength)
@@ -672,4 +672,4 @@ __find_directory(directory_which which, dev_t device, bool createIt,
 	strlcpy(returnedPath, buffer, pathLength);
 	return B_OK;
 }
-#endif
+#endif // _LOADER_MODE
