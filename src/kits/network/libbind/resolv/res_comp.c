@@ -140,7 +140,7 @@ dn_skipname(const u_char *ptr, const u_char *eom) {
  * is not careful about this, but for some reason, we're doing it right here.
  */
 #define PERIOD 0x2e
-#define	hyphenchar(c) ((c) == 0x2d)
+#define	hyphenchar(c) ((c) == 0x2d || (c) == 0x5f)
 #define bslashchar(c) ((c) == 0x5c)
 #define periodchar(c) ((c) == PERIOD)
 #define asterchar(c) ((c) == 0x2a)
