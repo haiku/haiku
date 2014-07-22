@@ -11,10 +11,12 @@
 #ifndef CREDITS_H
 #define CREDITS_H
 
+
 typedef struct {
 	const char* languageCode;
 	const char* names;
 } Translation;
+
 
 static const Translation kTranslations[] = {
 	{ "ar",
@@ -384,5 +386,6 @@ static const Translation kTranslations[] = {
 	"Joachim Seemer (Humdinger)\n" \
 	"Jonathan Yoder\n" \
 	"\n"
+
 
 #endif // CREDITS_H
