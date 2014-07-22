@@ -711,7 +711,7 @@ BContainerWindow::Quit()
 	if (fWindowList != NULL) {
 		AutoLock<LockingList<BWindow> > lock(fWindowList);
 		if (lock.IsLocked()) {
-			fWindowList->RemoveItem(this);
+			fWindowList->RemoveItem(this, false);
 			windowCount = fWindowList->CountItems();
 		}
 	}
