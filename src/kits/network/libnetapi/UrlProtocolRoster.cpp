@@ -18,7 +18,7 @@
 #include <UrlRequest.h>
 
 
-static BUrlContext gDefaultContext;
+static BReference<BUrlContext> gDefaultContext = new(std::nothrow) BUrlContext();
 
 
 /* static */ BUrlRequest*
@@ -26,7 +26,13 @@ BUrlProtocolRoster::MakeRequest(const BUrl& url,
 	BUrlProtocolListener* listener, BUrlContext* context)
 {
 	if (context == NULL)
-		context = &gDefaultContext;
+		context = gDefaultContext;
+
+	if (context == NULL) {
+		// Allocation of the gDefaultContext failed. Don't allow creating
+		// requests without a context.
+		return NULL;
+	}
 
 	// TODO: instanciate the correct BUrlProtocol using add-on interface
 	if (url.Protocol() == "http") {
