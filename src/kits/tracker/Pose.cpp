@@ -427,11 +427,18 @@ BPose::EditPreviousNextWidgetCommon(BPoseView* poseView, bool next)
 	for (int32 index = next ? 0 : poseView->CountColumns() - 1; ;
 			index += delta) {
 		BColumn* column = poseView->ColumnAt(index);
-		if (column == NULL)
+		if (column == NULL) {
+			// out of columns
 			break;
+		}
 
 		BTextWidget* widget = WidgetFor(column->AttrHash());
-		if (widget != NULL && widget->IsActive()) {
+		if (widget == NULL) {
+			// no widget for this column, next
+			continue;
+		}
+
+		if (widget->IsActive()) {
 			poseView->CommitActivePose();
 			found = true;
 			continue;
