@@ -1260,7 +1260,8 @@ BContainerWindow::GetLayoutState(BNode* node, BMessage* message)
 	char attrName[256];
 	while (node->GetNextAttrName(attrName) == B_OK) {
 		attr_info info;
-		node->GetAttrInfo(attrName, &info);
+		if (node->GetAttrInfo(attrName, &info) != B_OK)
+			continue;
 
 		// filter out attributes that are not related to window position
 		// and column resizing
