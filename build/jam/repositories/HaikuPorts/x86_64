@@ -40,7 +40,7 @@ RemotePackageRepository HaikuPorts
 	freetype-2.5.2-3
 	freetype_devel-2.5.2-3
 	gawk-4.1.0-2
-	gcc-4.8.3_2014_05_28-1
+	gcc-4.8.3_2014_05_28-3
 	gettext-0.18.1.1-5
 	gettext_libintl-0.18.1.1-5
 	git-1.8.3.4-3
@@ -60,8 +60,8 @@ RemotePackageRepository HaikuPorts
 	groff-1.20.1-3
 	gutenprint-5.2.9-1
 	gutenprint_devel-5.2.9-1
-	haikuwebkit-1.4.0-1
-	haikuwebkit_devel-1.4.0-1
+	haikuwebkit-1.4.1-3
+	haikuwebkit_devel-1.4.1-3
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
 	icu-4.8.1.1-4
@@ -182,7 +182,7 @@ RemotePackageRepository HaikuPorts
 	fossil
 	freetype
 	gawk
-	gcc
+#	gcc
 	gettext
 	git
 	glu
@@ -191,7 +191,7 @@ RemotePackageRepository HaikuPorts
 	grep
 	groff
 	gutenprint
-	haikuwebkit
+#	haikuwebkit
 	htmldoc
 	icu
 	jam
