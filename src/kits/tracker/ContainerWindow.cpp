@@ -291,21 +291,19 @@ OffsetFrameOne(const char* DEBUG_ONLY(name), uint32, off_t, void* castToRect,
 
 
 static void
-AddMimeTypeString(BObjectList<BString> &list, Model* model)
+AddMimeTypeString(BObjectList<BString>& list, Model* model)
 {
-	BString* mimeType = new BString(model->MimeType());
-
-	if (mimeType->Length()) {
+	const char* modelMimeType = model->MimeType();
+	if (modelMimeType != NULL && *modelMimeType != '\0') {
 		// only add the type if it's not already there
+		// ToDo: replace list with a hashmap
 		for (int32 i = list.CountItems(); i-- > 0;) {
 			BString* string = list.ItemAt(i);
-			if (string != NULL && !string->ICompare(*mimeType)) {
-				delete mimeType;
+			if (string != NULL && string->ICompare(modelMimeType) == 0)
 				return;
-			}
 		}
 
-		list.AddItem(mimeType);
+		list.AddItem(new BString(modelMimeType));
 	}
 }
 
