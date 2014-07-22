@@ -296,7 +296,6 @@ AddMimeTypeString(BObjectList<BString>& list, Model* model)
 	const char* modelMimeType = model->MimeType();
 	if (modelMimeType != NULL && *modelMimeType != '\0') {
 		// only add the type if it's not already there
-		// ToDo: replace list with a hashmap
 		for (int32 i = list.CountItems(); i-- > 0;) {
 			BString* string = list.ItemAt(i);
 			if (string != NULL && string->ICompare(modelMimeType) == 0)
@@ -1249,11 +1248,14 @@ BContainerWindow::StateNeedsSaving() const
 status_t
 BContainerWindow::GetLayoutState(BNode* node, BMessage* message)
 {
-	// ToDo: get rid of this, use AttrStream instead
+	if (node == NULL || message == NULL)
+		return B_BAD_VALUE;
+
 	status_t result = node->InitCheck();
 	if (result != B_OK)
 		return result;
 
+	// ToDo: get rid of this, use AttrStream instead
 	node->RewindAttrs();
 	char attrName[256];
 	while (node->GetNextAttrName(attrName) == B_OK) {
