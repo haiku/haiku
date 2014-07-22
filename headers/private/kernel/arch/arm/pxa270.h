@@ -72,12 +72,16 @@
 
 /* DMA controller */
 
+#ifndef _ASSEMBLER
+
 typedef struct pxa27x_dma_descriptor {
 	uint32 ddadr;
 	uint32 dsadr;
 	uint32 dtadr;
 	uint32 dcmd;
 } pxa27x_dma_descriptor __attribute__ ((aligned(16)));
+
+#endif	// !_ASSEMBLER
 
 /* LCD controller */
 
@@ -106,11 +110,15 @@ typedef struct pxa27x_dma_descriptor {
 #define FBR0		(LCC_BASE+0x020)
 #define FSADR0		(LCC_BASE+0x204)
 
+#ifndef _ASSEMBLER
+
 typedef struct pxa27x_lcd_dma_descriptor {
 	uint32 fdadr;
 	uint32 fsadr;
 	uint32 fidr;
 	uint32 ldcmd;
 } pxa27x_lcd_dma_descriptor __attribute__ ((aligned(16)));
+
+#endif	// !_ASSEMBLER
 
 #endif /* __PLATFORM_PXA270_H */
