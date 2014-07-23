@@ -67,6 +67,29 @@ public:
 };
 
 
+// Test for https://dev.haiku-os.org/ticket/2946
+// Gradients with an alpha channel are not drawn properly
+class AlphaGradientTest : public Test {
+public:
+	AlphaGradientTest()
+		:
+		Test("Alpha gradient")
+	{
+	}
+
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BPoint center(50, 50);
+		float radius = 50.0;
+		BGradientRadial g(center, radius);
+		g.AddColor((rgb_color){ 0, 0, 0, 255 }, 0.0);
+		g.AddColor((rgb_color){ 0, 0, 0, 0 }, 255.0);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->FillEllipse(center, radius, radius, g);
+	}
+};
+
+
 // #pragma mark -
 
 
@@ -78,6 +101,7 @@ main(int argc, char** argv)
 	TestWindow* window = new TestWindow("Gradient tests");
 
 	window->AddTest(new RadialGradientTest());
+	window->AddTest(new AlphaGradientTest());
 
 	window->SetToTest(0);
 	window->Show();
