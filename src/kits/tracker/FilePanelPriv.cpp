@@ -474,7 +474,7 @@ TFilePanel::SetRefFilter(BRefFilter* filter)
 void
 TFilePanel::SetTo(const entry_ref* ref)
 {
-	if (!ref)
+	if (ref == NULL)
 		return;
 
 	entry_ref setToRef(*ref);
