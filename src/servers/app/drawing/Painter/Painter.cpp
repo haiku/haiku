@@ -2901,7 +2901,8 @@ Painter::_RasterizePath(VertexSource& path, const BGradient& gradient) const
 			agg::gradient_radial gradientFunction;
 			_CalcRadialGradientTransform(radialGradient.Center(),
 				gradientTransform);
-			_RasterizePath(path, gradient, gradientFunction, gradientTransform);
+			_RasterizePath(path, gradient, gradientFunction, gradientTransform,
+				radialGradient.Radius());
 			break;
 		}
 		case BGradient::TYPE_RADIAL_FOCUS:
@@ -2912,7 +2913,8 @@ Painter::_RasterizePath(VertexSource& path, const BGradient& gradient) const
 			agg::gradient_radial_focus gradientFunction;
 			_CalcRadialGradientTransform(radialGradient.Center(),
 				gradientTransform);
-			_RasterizePath(path, gradient, gradientFunction, gradientTransform);
+			_RasterizePath(path, gradient, gradientFunction, gradientTransform,
+				radialGradient.Radius());
 			break;
 		}
 		case BGradient::TYPE_DIAMOND:
@@ -3087,7 +3089,8 @@ Painter::_MakeGradient(Array& array, const BGradient& gradient) const
 template<class VertexSource, typename GradientFunction>
 void
 Painter::_RasterizePath(VertexSource& path, const BGradient& gradient,
-	GradientFunction function, agg::trans_affine& gradientTransform) const
+	GradientFunction function, agg::trans_affine& gradientTransform,
+	int gradientStop) const
 {
 	GTRACE("Painter::_RasterizePath\n");
 
@@ -3106,7 +3109,7 @@ Painter::_RasterizePath(VertexSource& path, const BGradient& gradient,
 	_MakeGradient(colorArray, gradient);
 
 	span_gradient_type spanGradient(spanInterpolator, function, colorArray,
-		0, 100);
+		0, gradientStop);
 
 	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
 		spanGradient);

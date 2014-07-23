@@ -349,7 +349,8 @@ private:
 			void				_RasterizePath(VertexSource& path,
 									const BGradient& gradient,
 									GradientFunction function,
-									agg::trans_affine& gradientTransform) const;
+									agg::trans_affine& gradientTransform,
+									int gradientStop = 100) const;
 
 private:
 	mutable	agg::rendering_buffer fBuffer;
