@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include <Application.h>
+#include <GradientLinear.h>
 #include <GradientRadial.h>
 #include <LayoutBuilder.h>
 #include <List.h>
@@ -79,13 +80,41 @@ public:
 
 	virtual void Draw(BView* view, BRect updateRect)
 	{
+		view->SetDrawingMode(B_OP_ALPHA);
+
+		// These draw as almost transparent
+
+		// Radial gradient
 		BPoint center(50, 50);
 		float radius = 50.0;
 		BGradientRadial g(center, radius);
-		g.AddColor((rgb_color){ 0, 0, 0, 255 }, 0.0);
-		g.AddColor((rgb_color){ 0, 0, 0, 0 }, 255.0);
-		view->SetDrawingMode(B_OP_ALPHA);
+		g.AddColor((rgb_color){ 255, 0, 0, 255 }, 0.0);
+		g.AddColor((rgb_color){ 0, 255, 0, 0 }, 255.0);
 		view->FillEllipse(center, radius, radius, g);
+
+		// Linear gradient
+		BPoint from(100, 0);
+		BPoint to(200, 0);
+		BGradientLinear l(from, to);
+		l.AddColor((rgb_color){ 255, 0, 0, 0 }, 0.0);
+		l.AddColor((rgb_color){ 0, 255, 0, 255 }, 255.0);
+		view->FillRect(BRect(100, 0, 200, 100), l);
+
+		// These draw as opaque or almost opaque
+		
+		view->SetOrigin(BPoint(0, 100));
+
+		// Radial gradient
+		BGradientRadial go(center, radius);
+		go.AddColor((rgb_color){ 255, 0, 0, 0 }, 0.0);
+		go.AddColor((rgb_color){ 0, 255, 0, 255 }, 255.0);
+		view->FillEllipse(center, radius, radius, go);
+
+		// Linear gradient
+		BGradientLinear lo(from, to);
+		lo.AddColor((rgb_color){ 255, 0, 0, 255 }, 0.0);
+		lo.AddColor((rgb_color){ 0, 255, 0, 0 }, 255.0);
+		view->FillRect(BRect(100, 0, 200, 100), lo);
 	}
 };
 
