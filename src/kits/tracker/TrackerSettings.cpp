@@ -123,6 +123,28 @@ int32 ColorToValue(rgb_color color)
 TTrackerState::TTrackerState()
 	:
 	Settings("TrackerSettings", "Tracker"),
+	fShowDisksIcon(NULL),
+	fMountVolumesOntoDesktop(NULL),
+	fDesktopFilePanelRoot(NULL),
+	fMountSharedVolumesOntoDesktop(NULL),
+	fEjectWhenUnmounting(NULL),
+	fShowFullPathInTitleBar(NULL),
+	fSingleWindowBrowse(NULL),
+	fShowNavigator(NULL),
+	fShowSelectionWhenInactive(NULL),
+	fTransparentSelection(NULL),
+	fSortFolderNamesFirst(NULL),
+	fHideDotFiles(NULL),
+	fTypeAheadFiltering(NULL),
+	fRecentApplicationsCount(NULL),
+	fRecentDocumentsCount(NULL),
+	fRecentFoldersCount(NULL),
+	fShowVolumeSpaceBar(NULL),
+	fUsedSpaceColor(NULL),
+	fFreeSpaceColor(NULL),
+	fWarningSpaceColor(NULL),
+	fDontMoveFilesToTrash(NULL),
+	fAskBeforeDeleteFile(NULL),
 	fInited(false),
 	fSettingsLoaded(false)
 {
@@ -131,7 +153,31 @@ TTrackerState::TTrackerState()
 
 TTrackerState::TTrackerState(const TTrackerState&)
 	:
-	Settings("", "")
+	Settings("", ""),
+	fShowDisksIcon(NULL),
+	fMountVolumesOntoDesktop(NULL),
+	fDesktopFilePanelRoot(NULL),
+	fMountSharedVolumesOntoDesktop(NULL),
+	fEjectWhenUnmounting(NULL),
+	fShowFullPathInTitleBar(NULL),
+	fSingleWindowBrowse(NULL),
+	fShowNavigator(NULL),
+	fShowSelectionWhenInactive(NULL),
+	fTransparentSelection(NULL),
+	fSortFolderNamesFirst(NULL),
+	fHideDotFiles(NULL),
+	fTypeAheadFiltering(NULL),
+	fRecentApplicationsCount(NULL),
+	fRecentDocumentsCount(NULL),
+	fRecentFoldersCount(NULL),
+	fShowVolumeSpaceBar(NULL),
+	fUsedSpaceColor(NULL),
+	fFreeSpaceColor(NULL),
+	fWarningSpaceColor(NULL),
+	fDontMoveFilesToTrash(NULL),
+	fAskBeforeDeleteFile(NULL),
+	fInited(false),
+	fSettingsLoaded(false)
 {
 	// Placeholder copy constructor to prevent others from accidentally using
 	// the default copy constructor.  Note, the DEBUGGER call is for the off
