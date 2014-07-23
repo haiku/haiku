@@ -241,6 +241,11 @@ public:
 TTracker::TTracker()
 	:
 	BApplication(kTrackerSignature),
+	fMimeTypeList(NULL),
+	fClipboardRefsWatcher(NULL),
+	fTrashWatcher(NULL),
+	fTaskLoop(NULL),
+	fNodeMonitorCount(-1),
 	fWatchingInterface(new WatchingInterface),
 	fSettingsWindow(NULL)
 {
