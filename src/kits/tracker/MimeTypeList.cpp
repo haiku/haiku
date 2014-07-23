@@ -41,7 +41,7 @@ All rights reserved.
 #include "Thread.h"
 
 
-ShortMimeInfo::ShortMimeInfo(const BMimeType &mimeType)
+ShortMimeInfo::ShortMimeInfo(const BMimeType& mimeType)
 	:
 	fCommonMimeType(true)
 {
@@ -51,8 +51,9 @@ ShortMimeInfo::ShortMimeInfo(const BMimeType &mimeType)
 
 	// weed out apps - their preferred handler is themselves
 	if (mimeType.GetPreferredApp(buffer) == B_OK
-		&& fPrivateName.ICompare(buffer) == 0)
+		&& fPrivateName.ICompare(buffer) == 0) {
 		fCommonMimeType = false;
+	}
 
 	// weed out metamimes without a short description
 	if (mimeType.GetShortDescription(buffer) != B_OK || buffer[0] == 0)
@@ -64,7 +65,8 @@ ShortMimeInfo::ShortMimeInfo(const BMimeType &mimeType)
 
 ShortMimeInfo::ShortMimeInfo(const char* shortDescription)
 	:
-	fShortDescription(shortDescription)
+	fShortDescription(shortDescription),
+	fCommonMimeType(true)
 {
 }
 

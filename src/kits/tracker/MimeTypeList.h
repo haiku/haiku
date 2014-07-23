@@ -47,13 +47,13 @@ class MimeTypeList;
 
 class ShortMimeInfo {
 public:
-	ShortMimeInfo(const BMimeType &);
+	ShortMimeInfo(const BMimeType& mimeType);
 
 	const char* InternalName() const;
 	const char* ShortDescription() const;
 	bool IsCommonMimeType() const;
-	static int CompareShortDescription(const ShortMimeInfo*,
-		const ShortMimeInfo*);
+	static int CompareShortDescription(const ShortMimeInfo* a,
+		const ShortMimeInfo* b);
 
 private:
 	ShortMimeInfo(const char* shortDescription);
