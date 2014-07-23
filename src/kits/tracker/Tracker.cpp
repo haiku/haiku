@@ -485,9 +485,10 @@ TTracker::MessageReceived(BMessage* message)
 		{
 			const node_ref* itemNode;
 			ssize_t bytes;
-			message->FindData("node_ref", B_RAW_TYPE,
-				(const void**)&itemNode, &bytes);
-			CloseWindowAndChildren(itemNode);
+			if (message->FindData("node_ref", B_RAW_TYPE,
+					(const void**)&itemNode, &bytes) == B_OK) {
+				CloseWindowAndChildren(itemNode);
+			}
 			break;
 		}
 
