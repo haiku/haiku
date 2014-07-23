@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src tests servers app gradients ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src tests servers app harness ] ;
+
+SimpleTest Gradients :
+	harness.cpp
+	main.cpp
+	: be $(TARGET_LIBSUPC++)
+	: Gradients.rdef
+	;
+
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Gradients
+		: tests!apps ;
+}

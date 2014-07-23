@@ -1,0 +1,17 @@
+
+resource app_signature "application/x-vnd.Haiku-Gradients";
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_ALPHA,
+	internal = 1,
+
+	short_info = "Gradients",
+	long_info = "Gradients ©2014 Haiku"
+};
+
