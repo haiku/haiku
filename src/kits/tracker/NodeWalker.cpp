@@ -632,7 +632,8 @@ TVolWalker::Rewind()
 
 TQueryWalker::TQueryWalker(const char* predicate)
 	:
-	TWalker(), fQuery(), fVolRoster(), fVol()
+	TWalker(),
+	fTime(0),
 {
 	fPredicate = strdup(predicate);
 	NextVolume();
