@@ -432,8 +432,11 @@ BStatusWindow::WindowActivated(bool state)
 BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 	:
 	BView(bounds, "StatusView", B_FOLLOW_NONE, B_WILL_DRAW),
+	fStatusBar(NULL),
 	fType(type),
 	fBitmap(NULL),
+	fStopButton(NULL),
+	fPauseButton(NULL),
 	fThread(thread)
 {
 	Init();
@@ -549,23 +552,20 @@ BStatusView::~BStatusView()
 void
 BStatusView::Init()
 {
-	fDestDir = "";
+	fTotalSize = fItemSize = fSizeProcessed = fLastSpeedReferenceSize
+		= fEstimatedFinishReferenceSize = 0;
 	fCurItem = 0;
-	fPendingStatusString[0] = '\0';
-	fWasCanceled = false;
-	fIsPaused = false;
-	fLastUpdateTime = 0;
-	fBytesPerSecond = 0.0;
+	fLastUpdateTime = fLastSpeedReferenceTime = fProcessStartTime
+		= fLastSpeedUpdateTime = fEstimatedFinishReferenceTime
+		= system_time();
+	fCurrentBytesPerSecondSlot = 0;
 	for (size_t i = 0; i < kBytesPerSecondSlots; i++)
 		fBytesPerSecondSlot[i] = 0.0;
-	fCurrentBytesPerSecondSlot = 0;
-	fItemSize = 0;
-	fSizeProcessed = 0;
-	fLastSpeedReferenceSize = 0;
-	fEstimatedFinishReferenceSize = 0;
 
-	fProcessStartTime = fLastSpeedReferenceTime
-		= fEstimatedFinishReferenceTime = system_time();
+	fBytesPerSecond = 0.0;
+	fShowCount = fWasCanceled = fIsPaused = false;
+	fDestDir.SetTo("");
+	fPendingStatusString[0] = '\0';
 }
 
 
@@ -579,9 +579,9 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 
 	BEntry entry;
 	char name[B_FILE_NAME_LENGTH];
-	if (destDir && (entry.SetTo(destDir) == B_OK)) {
+	if (destDir != NULL && entry.SetTo(destDir) == B_OK) {
 		entry.GetName(name);
-		fDestDir = name;
+		fDestDir.SetTo(name);
 	}
 
 	BString buffer;
@@ -630,7 +630,7 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 void
 BStatusView::Draw(BRect updateRect)
 {
-	if (fBitmap) {
+	if (fBitmap != NULL) {
 		BPoint location;
 		location.x = (fStatusBar->Frame().left
 			- fBitmap->Bounds().Width()) / 2;
