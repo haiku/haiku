@@ -222,7 +222,7 @@ RegExp::RegExp(const char* pattern)
 }
 
 
-RegExp::RegExp(const BString &pattern)
+RegExp::RegExp(const BString& pattern)
 	:
 	fError(B_OK),
 	fRegExp(NULL)
@@ -255,7 +255,7 @@ RegExp::SetTo(const char* pattern)
 
 
 status_t
-RegExp::SetTo(const BString &pattern)
+RegExp::SetTo(const BString& pattern)
 {
 	fError = B_OK;
 	free(fRegExp);
@@ -275,7 +275,7 @@ RegExp::Matches(const char* string) const
 
 
 bool
-RegExp::Matches(const BString &string) const
+RegExp::Matches(const BString& string) const
 {
 	if (fRegExp == NULL)
 		return false;
