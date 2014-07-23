@@ -581,9 +581,10 @@ TTracker::MessageReceived(BMessage* message)
 		case kStopWatchClipboardRefs:
 		{
 			BMessenger messenger;
-			message->FindMessenger("target", &messenger);
-			if (messenger.IsValid())
+			if (message->FindMessenger("target", &messenger) == B_OK
+				&& messenger.IsValid()) {
 				fClipboardRefsWatcher->RemoveFromNotifyList(messenger);
+			}
 			break;
 		}
 
