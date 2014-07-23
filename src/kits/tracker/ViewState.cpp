@@ -132,16 +132,42 @@ BColumn::BColumn(BMallocIO* stream, int32 version, bool endianSwap)
 
 BColumn::BColumn(const BMessage &message, int32 index)
 {
-	message.FindString(kColumnTitleName, index, &fTitle);
-	message.FindFloat(kColumnOffsetName, index, &fOffset);
-	message.FindFloat(kColumnWidthName, index, &fWidth);
-	message.FindInt32(kColumnAlignmentName, index, (int32*)&fAlignment);
-	message.FindString(kColumnAttrName, index, &fAttrName);
-	message.FindInt32(kColumnAttrHashName, index, (int32*)&fAttrHash);
-	message.FindInt32(kColumnAttrTypeName, index, (int32*)&fAttrType);
-	message.FindString(kColumnDisplayAsName, index, &fDisplayAs);
-	message.FindBool(kColumnStatFieldName, index, &fStatField);
-	message.FindBool(kColumnEditableName, index, &fEditable);
+	if (message.FindString(kColumnTitleName, index, &fTitle) != B_OK)
+		fTitle.SetTo(B_EMPTY_STRING);
+
+	if (message.FindFloat(kColumnOffsetName, index, &fOffset) != B_OK)
+		fOffset = -1.0f;
+
+	if (message.FindFloat(kColumnWidthName, index, &fWidth) != B_OK)
+		fWidth = -1.0f;
+
+	if (message.FindInt32(kColumnAlignmentName, index, (int32*)&fAlignment)
+			!= B_OK) {
+		fAlignment = B_ALIGN_LEFT;
+	}
+
+	if (message.FindString(kColumnAttrName, index, &fAttrName) != B_OK)
+		fAttrName = BString(B_EMPTY_STRING);
+
+	if (message.FindInt32(kColumnAttrHashName, index, (int32*)&fAttrHash)
+			!= B_OK) {
+		fAttrHash = 0;
+	}
+
+	if (message.FindInt32(kColumnAttrTypeName, index, (int32*)&fAttrType)
+			!= B_OK) {
+		fAttrType = 0;
+	}
+
+	if (message.FindString(kColumnDisplayAsName, index, &fDisplayAs) != B_OK)
+		fDisplayAs.SetTo(B_EMPTY_STRING);
+
+	if (message.FindBool(kColumnStatFieldName, index, &fStatField) != B_OK)
+		fStatField = false;
+
+	if (message.FindBool(kColumnEditableName, index, &fEditable) != B_OK)
+		fEditable = false;
+
 }
 
 
