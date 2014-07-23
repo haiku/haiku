@@ -263,6 +263,7 @@ public:
 		int32 alignment, bool extra);
 
 	status_t InitCheck() const;
+
 public:
 	BMimeType fMimeType;
 	BMessage fExtraAttrs;
@@ -280,15 +281,19 @@ ExtraAttributeLazyInstaller::ExtraAttributeLazyInstaller(const char* type)
 	fMimeType(type),
 	fDirty(false)
 {
-	if (fMimeType.InitCheck() == B_OK)
-		fMimeType.GetAttrInfo(&fExtraAttrs);
+	if (fMimeType.InitCheck() != B_OK
+		|| fMimeType.GetAttrInfo(&fExtraAttrs) != B_OK) {
+		fExtraAttrs = BMessage();
+	}
 }
 
 
 ExtraAttributeLazyInstaller::~ExtraAttributeLazyInstaller()
 {
-	if (fMimeType.InitCheck() == B_OK && fDirty)
-		fMimeType.SetAttrInfo(&fExtraAttrs);
+	if (fMimeType.InitCheck() == B_OK && fDirty
+		&& fMimeType.SetAttrInfo(&fExtraAttrs) != B_OK) {
+		fExtraAttrs = BMessage();
+	}
 }
 
 
