@@ -175,7 +175,15 @@ SettingsView::IsRevertable() const
 
 DesktopSettingsView::DesktopSettingsView()
 	:
-	SettingsView("DesktopSettingsView")
+	SettingsView("DesktopSettingsView"),
+	fShowDisksIconRadioButton(NULL),
+	fMountVolumesOntoDesktopRadioButton(NULL),
+	fMountSharedVolumesOntoDesktopCheckBox(NULL),
+	fShowDisksIcon(false),
+	fMountVolumesOntoDesktop(false),
+	fMountSharedVolumesOntoDesktop(false),
+	fIntegrateNonBootBeOSDesktops(false),
+	fEjectWhenUnmounting(false)
 {
 	fShowDisksIconRadioButton = new BRadioButton("",
 		B_TRANSLATE("Show Disks icon"),

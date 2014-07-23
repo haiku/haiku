@@ -90,7 +90,6 @@ private:
 	BRadioButton*	fShowDisksIconRadioButton;
 	BRadioButton*	fMountVolumesOntoDesktopRadioButton;
 	BCheckBox*		fMountSharedVolumesOntoDesktopCheckBox;
-	BCheckBox*		fIntegrateNonBootBeOSDesktopsCheckBox;
 
 	bool fShowDisksIcon;
 	bool fMountVolumesOntoDesktop;
