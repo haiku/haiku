@@ -49,6 +49,7 @@ All rights reserved.
 template<class T> class BObjectList;
 class BMenuItem;
 
+
 namespace BPrivate {
 
 class Model;
@@ -57,94 +58,94 @@ class ModelMenuItem;
 class EntryListBase;
 
 
-class TrackingHookData {
-	public:
-		TrackingHookData()
-			:
-			fTrackingHook(NULL),
-			fDragMessage(NULL)
-		{
-		}
+struct TrackingHookData {
+	TrackingHookData()
+		:
+		fTrackingHook(NULL),
+		fDragMessage(NULL)
+	{
+	}
 
-		bool (*fTrackingHook)(BMenu *, void *);
-		BMessenger fTarget;
-		const BMessage *fDragMessage;
+	bool (*fTrackingHook)(BMenu*, void*);
+	BMessenger fTarget;
+	const BMessage* fDragMessage;
 };
 
 
 class BNavMenu : public BSlowMenu {
-	public:
-		BNavMenu(const char* title, uint32 message, const BHandler *,
-			BWindow *parentWindow = NULL, const BObjectList<BString> *list = NULL);
-		BNavMenu(const char* title, uint32 message, const BMessenger &,
-			BWindow *parentWindow = NULL, const BObjectList<BString> *list = NULL);
-			// parentWindow, if specified, will be closed if nav menu item invoked
-			// with option held down
+public:
+	BNavMenu(const char* title, uint32 message, const BHandler*,
+		BWindow* parentWindow = NULL, const BObjectList<BString>* list = NULL);
+	BNavMenu(const char* title, uint32 message, const BMessenger&,
+		BWindow* parentWindow = NULL, const BObjectList<BString>* list = NULL);
+		// parentWindow, if specified, will be closed if nav menu item invoked
+		// with option held down
 
-		virtual ~BNavMenu();
+	virtual ~BNavMenu();
 
-		virtual	void AttachedToWindow();
-		virtual	void DetachedFromWindow();
+	virtual void AttachedToWindow();
+	virtual void DetachedFromWindow();
 
-		void SetNavDir(const entry_ref *);
-		void ForceRebuild();
-		bool NeedsToRebuild() const;
-			// will cause menu to get rebuilt next time it is shown
+	void SetNavDir(const entry_ref*);
+	void ForceRebuild();
+	bool NeedsToRebuild() const;
+		// will cause menu to get rebuilt next time it is shown
 
-		virtual	void ResetTargets();
-		void SetTarget(const BMessenger &);
-		BMessenger Target();
+	virtual void ResetTargets();
+	void SetTarget(const BMessenger&);
+	BMessenger Target();
 
-		void SetTypesList(const BObjectList<BString> *list);
-		const BObjectList<BString> *TypesList() const;
+	void SetTypesList(const BObjectList<BString>* list);
+	const BObjectList<BString>* TypesList() const;
 
-		void AddNavDir(const Model *model, uint32 what, BHandler *target,
-			bool populateSubmenu);
+	void AddNavDir(const Model* model, uint32 what, BHandler* target,
+		bool populateSubmenu);
 
-		void AddNavParentDir(const char *name, const Model *model, uint32 what, BHandler *target);
-		void AddNavParentDir(const Model *model, uint32 what, BHandler *target);
-		void SetShowParent(bool show);
+	void AddNavParentDir(const char* name, const Model* model, uint32 what,
+		BHandler* target);
+	void AddNavParentDir(const Model* model, uint32 what, BHandler* target);
+	void SetShowParent(bool show);
 
-		static int32 GetMaxMenuWidth();
+	static int32 GetMaxMenuWidth();
 
-		static int CompareFolderNamesFirstOne(const BMenuItem *, const BMenuItem *);
-		static int CompareOne(const BMenuItem *, const BMenuItem *);
+	static int CompareFolderNamesFirstOne(const BMenuItem*, const BMenuItem*);
+	static int CompareOne(const BMenuItem*, const BMenuItem*);
 
-		static ModelMenuItem *NewModelItem(Model *, const BMessage *, const BMessenger &,
-			bool suppressFolderHierarchy=false, BContainerWindow * = NULL,
-			const BObjectList<BString> *typeslist = NULL,
-			TrackingHookData *hook = NULL);
+	static ModelMenuItem* NewModelItem(Model*, const BMessage*,
+		const BMessenger&, bool suppressFolderHierarchy = false,
+		BContainerWindow* = NULL, const BObjectList<BString>* typeslist = NULL,
+		TrackingHookData* hook = NULL);
 
-		TrackingHookData *InitTrackingHook(bool (*hookfunction)(BMenu *, void *),
-			const BMessenger *target, const BMessage *dragMessage);
+	TrackingHookData* InitTrackingHook(bool (*hookfunction)(BMenu*, void*),
+		const BMessenger* target, const BMessage* dragMessage);
 
-	protected:
-		virtual bool StartBuildingItemList();
-		virtual bool AddNextItem();
-		virtual void DoneBuildingItemList();
-		virtual void  ClearMenuBuildingState();
+protected:
+	virtual bool StartBuildingItemList();
+	virtual bool AddNextItem();
+	virtual void DoneBuildingItemList();
+	virtual void ClearMenuBuildingState();
 
-		void BuildVolumeMenu();
+	void BuildVolumeMenu();
 
-		void AddOneItem(Model *);
-		void AddRootItemsIfNeeded();
-		void AddTrashItem();
-		static void SetTrackingHookDeep(BMenu *, bool (*)(BMenu *, void *), void *);
+	void AddOneItem(Model*);
+	void AddRootItemsIfNeeded();
+	void AddTrashItem();
+	static void SetTrackingHookDeep(BMenu*, bool (*)(BMenu*, void*), void*);
 
-		entry_ref	fNavDir;
-		BMessage	fMessage;
-		BMessenger	fMessenger;
-		BWindow		*fParentWindow;
+	entry_ref fNavDir;
+	BMessage fMessage;
+	BMessenger fMessenger;
+	BWindow* fParentWindow;
 
-		// menu building state
-		uint8		fFlags;
-		BObjectList<BMenuItem> *fItemList;
-		EntryListBase *fContainer;
-		bool		fIteratingDesktop;
+	// menu building state
+	uint8 fFlags;
+	BObjectList<BMenuItem>* fItemList;
+	EntryListBase* fContainer;
+	bool fIteratingDesktop;
 
-		BObjectList<BString> *fTypesList;
+	BObjectList<BString>* fTypesList;
 
-		TrackingHookData fTrackingHook;
+	TrackingHookData fTrackingHook;
 };
 
 //	Spring Loaded Folder convenience routines
@@ -164,5 +165,6 @@ _IMPEXP_TRACKER void SpringLoadedFolderCacheDragData(const BMessage *incoming,
 } // namespace BPrivate
 
 using namespace BPrivate;
+
 
 #endif	// NAV_MENU_H
