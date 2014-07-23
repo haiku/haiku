@@ -46,6 +46,7 @@ namespace BPrivate {
 class BQueryContainerWindow;
 class QueryEntryListCollection;
 
+
 class BQueryPoseView : public BPoseView {
 public:
 	BQueryPoseView(Model*, BRect, uint32 resizeMask = B_FOLLOW_ALL);
@@ -103,24 +104,30 @@ class QueryEntryListCollection : public EntryListBase {
 	class QueryListRep {
 	public:
 		QueryListRep(BObjectList<BQuery>* queryList)
-			:	fQueryList(queryList),
-				fRefCount(0),
-				fShowResultsFromTrash(0),
-				fOldPoseList(NULL)
-			{}
+			:
+			fQueryList(queryList),
+			fRefCount(0),
+			fShowResultsFromTrash(false),
+			fQueryListIndex(-1),
+			fDynamicDateQuery(false),
+			fRefreshEveryHour(false),
+			fRefreshEveryMinute(false),
+			fOldPoseList(NULL)
+		{
+		}
 
 		~QueryListRep()
-			{
-				ASSERT(fRefCount <= 0);
-				delete fQueryList;
-				delete fOldPoseList;
-			}
+		{
+			ASSERT(fRefCount <= 0);
+			delete fQueryList;
+			delete fOldPoseList;
+		}
 
 		BObjectList<BQuery>* OpenQueryList()
-			{
-				fRefCount++;
-				return fQueryList;
-			}
+		{
+			fRefCount++;
+			return fQueryList;
+		}
 
 		bool CloseQueryList()
 		{
@@ -149,10 +156,14 @@ public:
 	QueryEntryListCollection* Clone();
 
 	BObjectList<BQuery>* QueryList() const
-		{ return fQueryListRep->fQueryList; }
+	{
+		return fQueryListRep->fQueryList;
+	}
 
 	PoseList* OldPoseList() const
-		{ return fQueryListRep->fOldPoseList; }
+	{
+		return fQueryListRep->fOldPoseList;
+	}
 	void ClearOldPoseList();
 
 	virtual status_t GetNextEntry(BEntry* entry, bool traverse = false);
