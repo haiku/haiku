@@ -557,7 +557,8 @@ TTracker::MessageReceived(BMessage* message)
 
 		case kRunAutomounterSettings:
 			ShowSettingsWindow();
-			fSettingsWindow->ShowPage(TrackerSettingsWindow::kAutomountSettings);
+			fSettingsWindow->ShowPage(
+				TrackerSettingsWindow::kAutomountSettings);
 			break;
 
 		case kShowSettingsWindow:
