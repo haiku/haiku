@@ -216,17 +216,20 @@ PeriodicDelayedTaskWithTimeout::RunIfNeeded(bigtime_t currentTime)
 }
 
 
+//	#pragma mark - RunWhenIdleTask
+
+
 RunWhenIdleTask::RunWhenIdleTask(FunctionObjectWithResult<bool>* functor,
 	bigtime_t initialDelay, bigtime_t idleFor, bigtime_t heartBeat)
 	:
 	PeriodicDelayedTask(functor, initialDelay, heartBeat),
 	fIdleFor(idleFor),
-	fState(kInitialDelay)
+	fState(kInitialDelay),
+	fActivityLevelStart(0),
+	fActivityLevel(0),
+	fLastCPUTooBusyTime(0)
 {
 }
-
-
-//	#pragma mark - RunWhenIdleTask
 
 
 RunWhenIdleTask::~RunWhenIdleTask()
