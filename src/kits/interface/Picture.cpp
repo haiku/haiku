@@ -226,7 +226,7 @@ BPicture::_InitData()
 BPicture::~BPicture()
 {
 	BAutolock _(sPictureListLock);
-	sPictureList.RemoveItem(this);
+	sPictureList.RemoveItem(this, false);
 	_DisposeData();
 }
 
