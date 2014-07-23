@@ -267,6 +267,7 @@ BNavMenu::BNavMenu(const char* title, uint32 message, const BHandler* target,
 	fFlags(0),
 	fItemList(NULL),
 	fContainer(NULL),
+	fIteratingDesktop(false),
 	fTypesList(new BObjectList<BString>(10, true))
 {
 	if (list != NULL)
@@ -301,6 +302,7 @@ BNavMenu::BNavMenu(const char* title, uint32 message,
 	fFlags(0),
 	fItemList(NULL),
 	fContainer(NULL),
+	fIteratingDesktop(false),
 	fTypesList(new BObjectList<BString>(10, true))
 {
 	if (list != NULL)
