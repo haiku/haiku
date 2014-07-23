@@ -329,10 +329,10 @@ ExtraAttributeLazyInstaller::AddExtraAttribute(const char* publicName,
 static void
 InstallTemporaryBackgroundImages(BNode* node, BMessage* message)
 {
-	int32 size = message->FlattenedSize();
-
+	ssize_t size = message->FlattenedSize();
 	try {
-		char* buffer = new char[size];
+		ThrowIfNotSize(size);
+		char* buffer = new char[(size_t)size];
 		message->Flatten(buffer, size);
 		node->WriteAttr(kBackgroundImageInfo, B_MESSAGE_TYPE, 0, buffer,
 			(size_t)size);
