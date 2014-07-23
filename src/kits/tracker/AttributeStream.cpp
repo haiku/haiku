@@ -48,10 +48,11 @@ All rights reserved.
 //	#pragma mark - AttributeInfo
 
 
-AttributeInfo::AttributeInfo(const AttributeInfo &cloneThis)
 	:
-	fName(cloneThis.fName),
-	fInfo(cloneThis.fInfo)
+AttributeInfo::AttributeInfo(const AttributeInfo& other)
+	:
+	fName(other.fName),
+	fInfo(other.fInfo)
 
 {
 }
@@ -96,10 +97,10 @@ AttributeInfo::Size() const
 
 
 void
-AttributeInfo::SetTo(const AttributeInfo &attr)
+AttributeInfo::SetTo(const AttributeInfo& other)
 {
-	fName = attr.fName;
-	fInfo = attr.fInfo;
+	fName = other.fName;
+	fInfo = other.fInfo;
 }
 
 
