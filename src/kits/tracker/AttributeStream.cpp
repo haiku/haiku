@@ -48,7 +48,15 @@ All rights reserved.
 //	#pragma mark - AttributeInfo
 
 
+AttributeInfo::AttributeInfo()
 	:
+	fName("")
+{
+	fInfo.type = B_RAW_TYPE;
+	fInfo.size = 0;
+}
+
+
 AttributeInfo::AttributeInfo(const AttributeInfo& other)
 	:
 	fName(other.fName),
@@ -70,8 +78,8 @@ AttributeInfo::AttributeInfo(const char* name, uint32 type, off_t size)
 	:
 	fName(name)
 {
-	fInfo.size = size;
 	fInfo.type = type;
+	fInfo.size = size;
 }
 
 

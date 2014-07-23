@@ -73,8 +73,7 @@ struct AttributeTemplate {
 class AttributeInfo {
 	// utility class for internal attribute description
 public:
-	AttributeInfo()
-		{}
+	AttributeInfo();
 	AttributeInfo(const AttributeInfo& other);
 	AttributeInfo(const char* name, attr_info info);
 	AttributeInfo(const char* name, uint32 type, off_t size);
