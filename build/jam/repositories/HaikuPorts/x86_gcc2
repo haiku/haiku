@@ -115,6 +115,8 @@ RemotePackageRepository HaikuPorts
 	libart_lgpl-2.3.21-1
 	libart_lgpl_devel-2.3.21-1
 	libedit-2012_06_01_3.0-1
+	libffi-3.0.13-1
+	libffi_devel-3.0.13-1
 	libiconv-1.13.1-6
 	libiconv_devel-1.13.1-6
 	libid3tag-0.15.1b-1
