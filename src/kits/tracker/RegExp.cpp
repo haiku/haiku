@@ -208,7 +208,16 @@ int32 regnarrate = 0;
 RegExp::RegExp()
 	:
 	fError(B_OK),
-	fRegExp(NULL)
+	fRegExp(NULL),
+	fInputScanPointer(NULL),
+	fParenthesisCount(0),
+	fDummy('\0'),
+	fCodeEmitPointer(NULL),
+	fCodeSize(0),
+	fStringInputPointer(NULL),
+	fRegBol(NULL),
+	fStartPArrayPointer(NULL),
+	fEndPArrayPointer(NULL)
 {
 }
 
