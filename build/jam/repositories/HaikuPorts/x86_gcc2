@@ -160,6 +160,7 @@ RemotePackageRepository HaikuPorts
 	links-2.8-1
 	lua-5.2.1-6
 	lua_devel-5.2.1-6
+	lynx-2.8.9dev.1-1
 	lz4-r117-1
 	lz4_devel-r117-1
 	m4-1.4.16-5
@@ -594,6 +595,7 @@ RemotePackageRepository HaikuPorts
 	llvm_x86
 	luajit_x86
 	lua
+	lynx
 	lzo_x86
 	m4
 	make
