@@ -186,8 +186,9 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 			// However, only if it's a known library location
 			for (int i = 0; i < 4; ++i) {
 				char buffer[PATH_MAX];
-				__find_directory(kLibraryDirectories[i], -1, false, buffer, PATH_MAX);
-				if (strncmp(dir, buffer, dirLength) == 0) {
+				status_t result = __find_directory(kLibraryDirectories[i], -1,
+					false, buffer, PATH_MAX);
+				if (result == B_OK && strncmp(dir, buffer, dirLength) == 0) {
 					subDirLen = strlen(abiSpecificSubDir) + 1;
 					break;
 				}
