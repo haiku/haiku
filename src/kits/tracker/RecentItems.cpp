@@ -50,14 +50,7 @@ All rights reserved.
 class RecentItemsMenu : public BSlowMenu {
 public:
 	RecentItemsMenu(const char* title, BMessage* openMessage,
-		BHandler* itemTarget, int32 maxItems)
-		:
-		BSlowMenu(title),
-		fTargetMesage(openMessage),
-		fItemTarget(itemTarget),
-		fMaxCount(maxItems)
-	{
-	}
+		BHandler* itemTarget, int32 maxItems);
 	virtual ~RecentItemsMenu();
 
 	virtual bool StartBuildingItemList();
@@ -67,9 +60,14 @@ public:
 
 protected:
 	virtual const BMessage* FileMessage()
-		{ return fTargetMesage; }
+	{
+		return fTargetMesage;
+	}
+
 	virtual const BMessage* ContainerMessage()
-		{ return fTargetMesage; }
+	{
+		return fTargetMesage;
+	}
 
 	BRecentItemsList* fIterator;
 	BMessage* fTargetMesage;
@@ -119,6 +117,20 @@ public:
 
 
 // #pragma mark - RecentItemsMenu
+
+
+RecentItemsMenu::RecentItemsMenu(const char* title, BMessage* openMessage,
+	BHandler* itemTarget, int32 maxItems)
+	:
+	BSlowMenu(title),
+	fIterator(NULL),
+	fTargetMesage(openMessage),
+	fItemTarget(itemTarget),
+	fCount(-1),
+	fSanityCount(-1),
+	fMaxCount(maxItems)
+{
+}
 
 
 RecentItemsMenu::~RecentItemsMenu()
