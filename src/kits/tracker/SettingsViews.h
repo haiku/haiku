@@ -119,7 +119,6 @@ private:
 	BCheckBox* fShowFullPathInTitleBarCheckBox;
 	BCheckBox* fSingleWindowBrowseCheckBox;
 	BCheckBox* fShowNavigatorCheckBox;
-	BCheckBox* fShowSelectionWhenInactiveCheckBox;
 	BCheckBox* fOutlineSelectionCheckBox;
 	BCheckBox* fSortFolderNamesFirstCheckBox;
 	BCheckBox* fTypeAheadFilteringCheckBox;

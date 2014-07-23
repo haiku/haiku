@@ -412,7 +412,19 @@ DesktopSettingsView::IsRevertable() const
 
 WindowsSettingsView::WindowsSettingsView()
 	:
-	SettingsView("WindowsSettingsView")
+	SettingsView("WindowsSettingsView"),
+	fShowFullPathInTitleBarCheckBox(NULL),
+	fSingleWindowBrowseCheckBox(NULL),
+	fShowNavigatorCheckBox(NULL),
+	fOutlineSelectionCheckBox(NULL),
+	fSortFolderNamesFirstCheckBox(NULL),
+	fTypeAheadFilteringCheckBox(NULL),
+	fShowFullPathInTitleBar(false),
+	fSingleWindowBrowse(false),
+	fShowNavigator(false),
+	fTransparentSelection(false),
+	fSortFolderNamesFirst(false),
+	fTypeAheadFiltering(false)
 {
 	fShowFullPathInTitleBarCheckBox = new BCheckBox("",
 		B_TRANSLATE("Show folder location in title tab"),
