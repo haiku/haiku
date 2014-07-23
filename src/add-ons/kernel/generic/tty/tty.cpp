@@ -1734,16 +1734,16 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			if (user_memcpy(&value, buffer, sizeof(value)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			bool result = false;
+			bool result = true;
 			bool dtr = (op == TCSETDTR  && value != 0)
 				|| (op == TIOCMSET && (value & TIOCM_DTR) != 0);
 			if (op == TCSETDTR || op == TIOCMSET)
-				result = tty->service_func(tty, TTYSETDTR, &dtr, sizeof(dtr));
+				result &= tty->service_func(tty, TTYSETDTR, &dtr, sizeof(dtr));
 
 			bool rts = (op == TCSETRTS && value != 0)
 				|| (op == TIOCMSET && (value & TIOCM_RTS) != 0);
 			if (op == TCSETRTS || op == TIOCMSET)
-				result = tty->service_func(tty, TTYSETRTS, &rts, sizeof(rts));
+				result &= tty->service_func(tty, TTYSETRTS, &rts, sizeof(rts));
 
 			return result ? B_OK : B_ERROR;
 		}
@@ -1764,14 +1764,14 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			if (user_memcpy(&value, buffer, sizeof(value)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			bool result = false;
+			bool result = true;
 			bool dtr = (op == TIOCMBIS);
 			if (value & TIOCM_DTR)
-				result = tty->service_func(tty, TTYSETDTR, &dtr, sizeof(dtr));
+				result &= tty->service_func(tty, TTYSETDTR, &dtr, sizeof(dtr));
 
 			bool rts = (op == TIOCMBIS);
 			if (value & TIOCM_RTS)
-				result = tty->service_func(tty, TTYSETRTS, &rts, sizeof(rts));
+				result &= tty->service_func(tty, TTYSETRTS, &rts, sizeof(rts));
 
 			return result ? B_OK : B_ERROR;
 		}
