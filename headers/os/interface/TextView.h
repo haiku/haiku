@@ -86,6 +86,7 @@ public:
 									int32 index, BMessage* specifier,
 									int32 form, const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* data);
+	virtual	status_t			Perform(perform_code code, void* data);
 
 			void				SetText(const char* text,
 									const text_run_array* runs = NULL);
@@ -210,19 +211,6 @@ public:
 	virtual	void				ResizeToPreferred();
 	virtual	void				GetPreferredSize(float* _width, float* _height);
 
-	virtual	BSize				MinSize();
-	virtual	BSize				MaxSize();
-	virtual	BSize				PreferredSize();
-
-	virtual	bool				HasHeightForWidth();
-	virtual	void				GetHeightForWidth(float width, float* min,
-									float* max, float* preferred);
-
-protected:
-	virtual	void				LayoutInvalidated(bool descendants);
-	virtual	void				DoLayout();
-
-public:
 	virtual	void				AllAttached();
 	virtual	void				AllDetached();
 
@@ -250,11 +238,20 @@ protected:
 									BBitmap** _bitmap, BPoint* point,
 									BHandler** _handler);
 
-	// FBC padding and forbidden methods
+	virtual	void				LayoutInvalidated(bool descendants);
+	virtual	void				DoLayout();
+
 public:
-	virtual	status_t			Perform(perform_code code, void* data);
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+	virtual	BSize				PreferredSize();
+
+	virtual	bool				HasHeightForWidth();
+	virtual	void				GetHeightForWidth(float width, float* min,
+									float* max, float* preferred);
 
 private:
+	// FBC padding and forbidden methods
 	virtual	void				_ReservedTextView3();
 	virtual	void				_ReservedTextView4();
 	virtual	void				_ReservedTextView5();
