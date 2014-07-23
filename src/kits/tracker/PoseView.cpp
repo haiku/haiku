@@ -4156,7 +4156,6 @@ BPoseView::CanHandleDragSelection(const Model* target,
 
 	BContainerWindow* srcWindow;
 	status_t result = dragMessage->FindPointer("src_window", (void**)&srcWindow);
-
 	if (result != B_OK || srcWindow == NULL) {
 		// handle a foreign drag
 		bool canCopy;
@@ -4198,8 +4197,7 @@ BPoseView::CanHandleDragSelection(const Model* target,
 		return false;
 	}
 
-	if (result != B_OK)
-		return false;
+	ASSERT(srcWindow != NULL);
 
 	AutoLock<BWindow> lock(srcWindow);
 	if (!lock)
@@ -4785,8 +4783,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 		return false;
 	}
 
-	if (result != B_OK)
-		return false;
+	ASSERT(srcWindow != NULL);
 
 	if (srcWindow == containerWindow) {
 		// drag started in this window
