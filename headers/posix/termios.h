@@ -185,6 +185,8 @@ struct termios {
 #define TIOCMSET			(TCGETA + 19)	/* does TCSETDTR/TCSETRTS */
 #define TIOCSBRK			(TCGETA + 20)	/* set txd pin */
 #define TIOCCBRK			(TCGETA + 21)	/* both are a frontend to TCSBRK */
+#define TIOCMBIS			(TCGETA + 22)	/* set bits in line state */
+#define TIOCMBIC			(TCGETA + 23)	/* clear bits in line state */
 
 /* Event codes.  Returned from TCWAITEVENT */
 #define EV_RING			0x0001

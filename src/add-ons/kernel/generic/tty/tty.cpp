@@ -1756,6 +1756,26 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			return user_memcpy(buffer, &bits, sizeof(bits));
 		}
 
+		case TIOCMBIS:
+		case TIOCMBIC:
+		{
+			// control line state setting, we only support DTR and RTS
+			int value;
+			if (user_memcpy(&value, buffer, sizeof(value)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			bool result = false;
+			bool dtr = (op == TIOCMBIS);
+			if (value & TIOCM_DTR)
+				result = tty->service_func(tty, TTYSETDTR, &dtr, sizeof(dtr));
+
+			bool rts = (op == TIOCMBIS);
+			if (value & TIOCM_RTS)
+				result = tty->service_func(tty, TTYSETRTS, &rts, sizeof(rts));
+
+			return result ? B_OK : B_ERROR;
+		}
+
 		case TIOCSBRK:
 		case TIOCCBRK:
 		case TCSBRK:
