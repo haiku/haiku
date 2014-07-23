@@ -76,8 +76,10 @@ BSlowContextMenu::BSlowContextMenu(const char* title)
 	fMenuBuilt(false),
 	fMessage(B_REFS_RECEIVED),
 	fParentWindow(NULL),
+	fVolsOnly(false),
 	fItemList(NULL),
 	fContainer(NULL),
+	fIteratingDesktop(false),
 	fTypesList(NULL),
 	fIsShowing(false)
 {
