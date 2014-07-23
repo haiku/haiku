@@ -448,16 +448,26 @@ TFilePanel::SetMessage(BMessage* message)
 void
 TFilePanel::SetRefFilter(BRefFilter* filter)
 {
-	if (!filter)
+	if (filter == NULL)
 		return;
 
 	fPoseView->SetRefFilter(filter);
 	fPoseView->CommitActivePose();
 	fPoseView->Refresh();
-	FavoritesMenu* menu = dynamic_cast<FavoritesMenu*>
-		(fMenuBar->FindItem(B_TRANSLATE("Favorites"))->Submenu());
-	if (menu)
-		menu->SetRefFilter(filter);
+
+	if (fMenuBar == NULL)
+		return;
+
+	BMenuItem* favoritesItem = fMenuBar->FindItem(B_TRANSLATE("Favorites"));
+	if (favoritesItem == NULL)
+		return;
+
+	FavoritesMenu* favoritesSubMenu
+		= dynamic_cast<FavoritesMenu*>(favoritesItem->Submenu());
+	if (favoritesSubMenu == NULL)
+		return;
+
+	favoritesSubMenu->SetRefFilter(filter);
 }
 
 
