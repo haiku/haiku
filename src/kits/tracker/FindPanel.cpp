@@ -3038,12 +3038,17 @@ DeleteTransientQueriesTask::StartUpTransientQueryCleaner()
 	// killing off old transient queries
 	DeleteTransientQueriesFunctor* worker
 		= new DeleteTransientQueriesFunctor(new DeleteTransientQueriesTask());
+
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	ASSERT(tracker);
-	tracker->MainTaskLoop()->RunWhenIdle(worker,
-		30 * 60 * 1000000,	// half an hour initial delay
-		5 * 60 * 1000000,	// idle for five minutes
-		10 * 1000000);
+
+	ASSERT(tracker != NULL);
+
+	if (tracker != NULL) {
+		tracker->MainTaskLoop()->RunWhenIdle(worker,
+			30 * 60 * 1000000,	// half an hour initial delay
+			5 * 60 * 1000000,	// idle for five minutes
+			10 * 1000000);
+	}
 }
 
 
