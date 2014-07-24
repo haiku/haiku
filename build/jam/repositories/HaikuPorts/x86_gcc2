@@ -319,7 +319,7 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_x86_devel-0.10.2-3
 	freetype_x86-2.5.2-2
 	freetype_x86_devel-2.5.2-2
-	gcc_x86-4.8.3_2014_05_28-1
+	gcc_x86-4.8.3_2014_05_28-3
 	gettext_x86-0.18.1.1-6
 	gettext_x86_libintl-0.18.1.1-6
 	giflib_x86-5.1.0-1
@@ -334,8 +334,8 @@ RemotePackageRepository HaikuPorts
 	goonies_x86-1.4.1528-1
 	guilib_x86-1.2.1-1
 	guilib_x86_devel-1.2.1-1
-	haikuwebkit_x86-1.4.1-1
-	haikuwebkit_x86_devel-1.4.1-1
+	haikuwebkit_x86-1.4.1-3
+	haikuwebkit_x86_devel-1.4.1-3
 	icu_x86-4.8.1.1-4
 	icu_x86_devel-4.8.1.1-4
 	jasper_x86-1.900.1-1
@@ -530,7 +530,7 @@ RemotePackageRepository HaikuPorts
 	friss
 	gawk
 	gcc
-	gcc_x86
+#	gcc_x86
 	getconf
 	getopt
 	gettext
@@ -549,7 +549,7 @@ RemotePackageRepository HaikuPorts
 	guilib
 	gutenprint
 	gyp
-	haikuwebkit_x86
+#	haikuwebkit_x86
 	help2man
 	htmldoc
 	html_parser
