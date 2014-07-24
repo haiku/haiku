@@ -17,6 +17,7 @@
 #include <LayoutBuilder.h>
 #include <List.h>
 #include <Message.h>
+#include <Picture.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
 #include <ScrollView.h>
@@ -74,7 +75,7 @@ class AlphaGradientTest : public Test {
 public:
 	AlphaGradientTest()
 		:
-		Test("Alpha gradient")
+		Test("Alpha gradients")
 	{
 	}
 
@@ -92,13 +93,22 @@ public:
 		g.AddColor((rgb_color){ 0, 255, 0, 0 }, 255.0);
 		view->FillEllipse(center, radius, radius, g);
 
-		// Linear gradient
+		// Linear gradient - Horizontal
 		BPoint from(100, 0);
 		BPoint to(200, 0);
 		BGradientLinear l(from, to);
 		l.AddColor((rgb_color){ 255, 0, 0, 0 }, 0.0);
 		l.AddColor((rgb_color){ 0, 255, 0, 255 }, 255.0);
 		view->FillRect(BRect(100, 0, 200, 100), l);
+
+		// Linear gradient - Vertical
+		// (this uses a different code path in app_server)
+		BPoint top(0, 0);
+		BPoint bot(0, 100);
+		BGradientLinear v(top, bot);
+		v.AddColor((rgb_color){ 255, 0, 0, 0 }, 0.0);
+		v.AddColor((rgb_color){ 0, 255, 0, 255 }, 255.0);
+		view->FillRect(BRect(200, 0, 300, 100), v);
 
 		// These draw as opaque or almost opaque
 		
@@ -110,11 +120,39 @@ public:
 		go.AddColor((rgb_color){ 0, 255, 0, 255 }, 255.0);
 		view->FillEllipse(center, radius, radius, go);
 
-		// Linear gradient
+		// Linear gradient - Horizontal
 		BGradientLinear lo(from, to);
 		lo.AddColor((rgb_color){ 255, 0, 0, 255 }, 0.0);
 		lo.AddColor((rgb_color){ 0, 255, 0, 0 }, 255.0);
 		view->FillRect(BRect(100, 0, 200, 100), lo);
+
+		// Linear gradient - Vertical
+		// (this uses a different code path in app_server)
+		BGradientLinear vo(top, bot);
+		vo.AddColor((rgb_color){ 255, 0, 0, 255 }, 0.0);
+		vo.AddColor((rgb_color){ 0, 255, 0, 0 }, 255.0);
+		view->FillRect(BRect(200, 0, 300, 100), vo);
+
+		// Finally, do the same using ClipToPicture. This forces using an
+		// unpacked scanline rasterizer, and it works.
+		view->SetOrigin(BPoint(0, 0));
+
+		view->SetDrawingMode(B_OP_COPY);
+
+		BPicture picture;
+		view->BeginPicture(&picture);
+		view->SetHighColor(make_color(0,0,0,255));
+		view->FillRect(BRect(0, 200, 300, 300));
+		view->EndPicture();
+		view->ClipToPicture(&picture);
+
+		view->SetOrigin(BPoint(0, 200));
+
+		view->SetDrawingMode(B_OP_ALPHA);
+
+		view->FillEllipse(center, radius, radius, g);
+		view->FillRect(BRect(100, 0, 200, 100), l);
+		view->FillRect(BRect(200, 0, 300, 100), v);
 	}
 };
 
