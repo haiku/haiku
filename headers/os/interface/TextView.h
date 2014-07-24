@@ -460,7 +460,7 @@ private:
 			bool				fInstalledSelectOptionLinewiseShortcuts;
 			bool				fInstalledSelectHomeEndDocwiseShortcuts;
 
-			uint32				_reserved[4];
+			uint32				_reserved[6];
 };
 
 #endif	// _TEXTVIEW_H
