@@ -22,9 +22,13 @@
 // Known Bugs:
 // - Double buffering doesn't work well (disabled by default)
 
+
+#include <TextView.h>
+
+#include <new>
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <new>
 
 #include <Application.h>
 #include <Beep.h>
@@ -42,7 +46,6 @@
 #include <Region.h>
 #include <ScrollBar.h>
 #include <SystemCatalog.h>
-#include <TextView.h>
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
@@ -588,7 +591,6 @@ BTextView::MouseDown(BPoint where)
 		fClickRunner = new (nothrow) BMessageRunner(messenger, &message,
 			clickSpeed, 1);
 	}
-
 
 	if (!fSelectable) {
 		_StopMouseTracking();
