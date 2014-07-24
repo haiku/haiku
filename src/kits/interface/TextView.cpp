@@ -3364,9 +3364,7 @@ BTextView::_HandlePageKey(uint32 pageKey, int32 modifiers)
 				fCaretOffset = 0;
 				_ScrollTo(0, 0);
 				break;
-			} else if (fSelStart != fSelEnd && !shiftKeyDown)
-				fCaretOffset = fSelEnd;
-			else {
+			} else {
 				if (commandKeyDown && !optionKeyDown && !controlKeyDown) {
 					_ScrollTo(0, 0);
 					fCaretOffset = 0;
@@ -3399,9 +3397,7 @@ BTextView::_HandlePageKey(uint32 pageKey, int32 modifiers)
 				fCaretOffset = fText->Length();
 				_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
 				break;
-			} else if (fSelStart != fSelEnd && !shiftKeyDown)
-				fCaretOffset = fSelEnd;
-			else {
+			} else {
 				if (commandKeyDown && !optionKeyDown && !controlKeyDown) {
 					_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
 					fCaretOffset = fText->Length();
