@@ -63,12 +63,15 @@ private:
 									int64* outFrameCount,
 									media_header* mediaHeader,
 									media_decode_info* info);
-
 			status_t			_DecodeNextVideoFrame();
+			void				_UpdateMediaHeaderForVideoFrame();
 			void				_DeinterlaceAndColorConvertVideoFrame();
 
 
 			media_header		fHeader;
+									// Contains the properties of the current
+									// decoded audio / video frame
+
 			media_format		fInputFormat;
 			media_raw_video_format fOutputVideoFormat;
 

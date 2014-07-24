@@ -661,7 +661,7 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 		frame to.
 	@param outFrameCount Pointer to the output variable to assign the number of
 		copied video frames (usually one video frame).
-	@param mediaHeader Pointer to the output media header that contains the 
+	@param mediaHeader Pointer to the output media header that contains the
 		decoded video frame properties.
 	@param info TODO (not used at the moment)
 
@@ -743,24 +743,8 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		if (firstRun) {
 			firstRun = false;
 
-			fHeader.type = B_MEDIA_RAW_VIDEO;
 			fHeader.start_time = chunkMediaHeader.start_time;
 			fStartTime = chunkMediaHeader.start_time;
-			fHeader.file_pos = 0;
-			fHeader.orig_size = 0;
-			fHeader.u.raw_video.field_gamma = 1.0;
-			fHeader.u.raw_video.field_sequence = fFrame;
-			fHeader.u.raw_video.field_number = 0;
-			fHeader.u.raw_video.pulldown_number = 0;
-			fHeader.u.raw_video.first_active_line = 1;
-			fHeader.u.raw_video.line_count
-				= fOutputVideoFormat.display.line_count;
-
-			TRACE("[v] start_time=%02d:%02d.%02d field_sequence=%lu\n",
-				int((fHeader.start_time / 60000000) % 60),
-				int((fHeader.start_time / 1000000) % 60),
-				int((fHeader.start_time / 10000) % 100),
-				fHeader.u.raw_video.field_sequence);
 		}
 
 #if DO_PROFILING
@@ -810,6 +794,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 //			TRACE("ONE FRAME OUT !! len=%d size=%ld (%s)\n", len, size,
 //				pixfmt_to_string(fContext->pix_fmt));
 
+			_UpdateMediaHeaderForVideoFrame();
 			_DeinterlaceAndColorConvertVideoFrame();
 
 #ifdef DEBUG
@@ -851,6 +836,42 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 }
 
 
+/*! Updates relevant fields of the class member fHeader with the properties of
+	the most recently decoded video frame.
+
+	It is assumed tat this function is called in _DecodeNextVideoFrame() only
+	when the following asserts hold true:
+		1. We actually got a new picture decoded by the video decoder.
+		2. fHeader wasn't updated for the new picture yet. You MUST call this
+		   method only once per decoded video frame.
+		3. This function MUST be called before
+		   _DeinterlaceAndColorConvertVideoFrame() as the later one relys on an
+		   updated fHeader.
+		4. There will be at maximumn only one decoded video frame in our cache
+		   at any single point in time. Otherwise you couldn't tell to which
+		   cached decoded video frame te properties in fHeader relate to.
+*/
+void
+AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
+{
+	fHeader.type = B_MEDIA_RAW_VIDEO;
+	fHeader.file_pos = 0;
+	fHeader.orig_size = 0;
+	fHeader.u.raw_video.field_gamma = 1.0;
+	fHeader.u.raw_video.field_sequence = fFrame;
+	fHeader.u.raw_video.field_number = 0;
+	fHeader.u.raw_video.pulldown_number = 0;
+	fHeader.u.raw_video.first_active_line = 1;
+	fHeader.u.raw_video.line_count = fContext->height;
+
+	TRACE("[v] start_time=%02d:%02d.%02d field_sequence=%lu\n",
+		int((fHeader.start_time / 60000000) % 60),
+		int((fHeader.start_time / 1000000) % 60),
+		int((fHeader.start_time / 10000) % 100),
+		fHeader.u.raw_video.field_sequence);
+}
+
+
 /*! This function applies deinterlacing (only if needed) and color conversion
     to the video frame in fRawDecodedPicture.
 
@@ -858,7 +879,8 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 	converted yet (otherwise this function behaves in unknown manners).
 
 	You should only call this function in _DecodeNextVideoFrame() when we
-	got a new picture decoded by the video decoder.
+	got a new picture decoded by the video decoder and the fHeader variable was
+	updated accordingly (@see _UpdateMediaHeaderForVideoFrame()).
 
 	When this function finishes the postprocessed video frame will be available
 	in fPostProcessedDecodedPicture and fDecodedData (fDecodedDataSizeInBytes
