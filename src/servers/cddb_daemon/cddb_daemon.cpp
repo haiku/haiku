@@ -233,16 +233,9 @@ CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
 		TrackData* data = (TrackData*)((readResponse->tracks).ItemAt(index));
 		
 		// Update name.
-		name = data->title;
-		name.ReplaceSet("/", " ");
-		
-		// Add track number to the beginning of the string.
 		int trackNum = index + 1; // index=0 is actually Track 1
-		char trackNumString[3]; // 2 digits + '\0'
-		snprintf(trackNumString, sizeof(trackNumString), "%02d", trackNum);
-		name.Prepend(" ");
-		name.Prepend(trackNumString, sizeof(trackNumString));
-		name.Append(".wav");
+		name.SetToFormat("%02d %s.wav", trackNum, data->title.String());
+		name.ReplaceSet("/", " ");
 
 		if ((result = entry.Rename(name.String())) != B_OK) {
 			printf("Failed renaming entry at index %d to \"%s\".\n", index,
