@@ -67,7 +67,7 @@ static const Translation kTranslations[] = {
 		"César Ortiz Pantoja (ccortiz)\n"
 	},
 	{ "fi",
-		"Jorma Karvonen (Karvjorm\n"
+		"Jorma Karvonen (Karvjorm)\n"
 		"Jaakko Leikas (Garjala)\n"
 		"Slavi Stefanov Sotirov\n"
 	},
