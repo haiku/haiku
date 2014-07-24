@@ -3067,10 +3067,11 @@ Painter::_MakeGradient(Array& array, const BGradient& gradient) const
 							 from->color.blue, from->color.alpha);
 		agg::rgba8 toColor(to->color.red, to->color.green,
 						   to->color.blue, to->color.alpha);
-		GTRACE("Painter::_MakeGradient> fromColor(%d, %d, %d) offset = %f\n",
-			   fromColor.r, fromColor.g, fromColor.b, from->offset);
-		GTRACE("Painter::_MakeGradient> toColor(%d, %d, %d) offset = %f\n",
-			   toColor.r, toColor.g, toColor.b, to->offset);
+		GTRACE("Painter::_MakeGradient> fromColor(%d, %d, %d, %d) offset = %f\n",
+			   fromColor.r, fromColor.g, fromColor.b, fromColor.a,
+			   from->offset);
+		GTRACE("Painter::_MakeGradient> toColor(%d, %d, %d %d) offset = %f\n",
+			   toColor.r, toColor.g, toColor.b, toColor.a, to->offset);
 		float dist = to->offset - from->offset;
 		GTRACE("Painter::_MakeGradient> dist = %f\n", dist);
 		// TODO: Review this... offset should better be on [0..1]
@@ -3078,8 +3079,8 @@ Painter::_MakeGradient(Array& array, const BGradient& gradient) const
 			for (int j = (int)from->offset; j <= (int)to->offset; j++) {
 				float f = (float)(to->offset - j) / (float)(dist + 1);
 				array[j] = toColor.gradient(fromColor, f);
-				GTRACE("Painter::_MakeGradient> array[%d](%d, %d, %d)\n",
-					   array[j].r, array[j].g, array[j].b);
+				GTRACE("Painter::_MakeGradient> array[%d](%d, %d, %d, %d)\n",
+					   j, array[j].r, array[j].g, array[j].b, array[j].a);
 			}
 		}
 	}
@@ -3117,7 +3118,7 @@ Painter::_RasterizePath(VertexSource& path, const BGradient& gradient,
 	fRasterizer.reset();
 	fRasterizer.add_path(path);
 	if (fMaskedUnpackedScanline == NULL)
-		agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+		agg::render_scanlines(fRasterizer, fUnpackedScanline, gradientRenderer);
 	else {
 		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
 			gradientRenderer);
