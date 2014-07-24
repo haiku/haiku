@@ -194,7 +194,7 @@ RemotePackageRepository HaikuPorts
 	p7zip-9.20.1-4
 	pciutils-3.2.1-1
 	pciutils_devel-3.2.1-1
-	pe-2.4.4_2014_05_29-1
+	pe-2.4.5-1
 	perl-5.18.2-2
 	physfs-2.0.3-1
 	physfs_devel-2.0.3-1
