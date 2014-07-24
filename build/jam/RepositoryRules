@@ -510,18 +510,31 @@ rule FSplitPackageName packageName
 }
 
 
-rule IsPackageAvailable package : flags
+rule IsPackageAvailable packageName : flags
 {
 	# for a secondary architecture adjust the package name
 	if $(TARGET_PACKAGING_ARCH) != $(TARGET_PACKAGING_ARCHS[1])
 		&& ! nameResolved in $(flags) {
-		local splitName = [ FSplitPackageName $(package) ] ;
-		splitName = $(splitName[1]) $(TARGET_PACKAGING_ARCH) $(splitName[2-]) ;
-		package = $(splitName:J=_) ;
+		# The position of the secondary architecture within the package name
+		# is not well defined, so we scan for it starting from the back.
+		local packageNameHead = $(packageName) ;
+		local packageNameTail = ;
+		while $(packageNameHead) {
+			local splitName = [ FSplitPackageName $(packageNameHead) ] ;
+			splitName = $(splitName[1]) $(TARGET_PACKAGING_ARCH) $(splitName[2])
+				$(packageNameTail) ;
+			packageName = $(splitName:J=_) ;
+			if $(packageName) in $(HAIKU_AVAILABLE_PACKAGES) {
+				return $(packageName) ;
+			}
+			local splitHead = [ Match "(.*)_([^_]*)" : $(packageNameHead) ] ;
+			packageNameHead = $(splitHead[1]) ;
+			packageNameTail = $(splitHead[2]) $(packageNameTail) ;
+		}
 	}
 
-	if $(package) in $(HAIKU_AVAILABLE_PACKAGES) {
-		return $(package) ;
+	if $(packageName) in $(HAIKU_AVAILABLE_PACKAGES) {
+		return $(packageName) ;
 	}
 
 	return ;
