@@ -2913,27 +2913,28 @@ FindPanel::AddMimeTypeAttrs(BMenu* menu)
 
 
 void
-FindPanel::GetDefaultAttrName(BString &result, int32 row) const
+FindPanel::GetDefaultAttrName(BString& attrName, int32 row) const
 {
 	BMenuItem* item = NULL;
 	BMenuField* menuField
 		= dynamic_cast<BMenuField*>(fAttrGrid->ItemAt(0, row)->View());
-	if (menuField->Menu() != NULL)
+	if (menuField != NULL && menuField->Menu() != NULL)
 		item = menuField->Menu()->FindMarked();
-	if (item != NULL)
-		result << item->Label();
-	else
-		result << B_TRANSLATE("Name");
 
-	if (item && item->Submenu() != NULL)
+	if (item != NULL)
+		attrName << item->Label();
+	else
+		attrName << B_TRANSLATE("Name");
+
+	if (item != NULL && item->Submenu() != NULL)
 		item = item->Submenu()->FindMarked();
 	else
 		item = NULL;
 
 	if (item != NULL)
-		result << " " << item->Label() << " ";
+		attrName << " " << item->Label() << " ";
 	else
-		result << " = ";
+		attrName << " = ";
 
 	BTextControl* textControl
 		= dynamic_cast<BTextControl*>(fAttrGrid->ItemAt(2, row)->View());
