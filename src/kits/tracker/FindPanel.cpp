@@ -510,8 +510,9 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
 		BString name(focusedItem->Name());
 		file->WriteAttrString("_trk/focusedView", &name);
 		BTextControl* textControl = dynamic_cast<BTextControl*>(focusedItem);
-		if (textControl) {
-			int32 selStart, selEnd;
+		if (textControl != NULL && textControl->TextView() != NULL) {
+			int32 selStart;
+			int32 selEnd;
 			textControl->TextView()->GetSelection(&selStart, &selEnd);
 			file->WriteAttr("_trk/focusedSelStart", B_INT32_TYPE, 0,
 				&selStart, sizeof(selStart));
@@ -920,10 +921,9 @@ FindPanel::AttachedToWindow()
 			// pick the last text control in the attribute view
 			BString title("TextEntry");
 			title << (fAttrGrid->CountRows() - 1);
-			textControl
-				= dynamic_cast<BTextControl*>(FindView(title.String()));
+			textControl = dynamic_cast<BTextControl*>(FindView(title.String()));
 		}
-		if (textControl)
+		if (textControl != NULL)
 			textControl->MakeFocus();
 	}
 
