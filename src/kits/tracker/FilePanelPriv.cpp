@@ -1075,13 +1075,16 @@ TFilePanel::SetButtonLabel(file_panel_button selector, const char* text)
 void
 TFilePanel::SetSaveText(const char* text)
 {
-	if (!text)
+	if (text == NULL)
 		return;
 
 	BTextControl* textControl
 		= dynamic_cast<BTextControl*>(FindView("text view"));
-	textControl->SetText(text);
-	textControl->TextView()->SelectAll();
+	if (textControl != NULL) {
+		textControl->SetText(text);
+		if (textControl->TextView() != NULL)
+			textControl->TextView()->SelectAll();
+	}
 }
 
 
