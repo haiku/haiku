@@ -129,11 +129,13 @@ key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 			filter->Looper()->PostMessage(B_CANCEL, *handler);
 		else
 			filter->Looper()->PostMessage(kCancelButton);
+
 		return B_SKIP_MESSAGE;
 	}
 
 	if (key == B_RETURN && view->ActivePose()) {
 		view->CommitActivePose();
+
 		return B_SKIP_MESSAGE;
 	}
 
@@ -141,14 +143,16 @@ key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - TFilePanel
 
 
 TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
-		const BEntry* startDir, uint32 nodeFlavors, bool multipleSelection,
-		BMessage* message, BRefFilter* filter, uint32 containerWindowFlags,
-		window_look look, window_feel feel, bool hideWhenDone)
-	: BContainerWindow(0, containerWindowFlags, look, feel, 0, B_CURRENT_WORKSPACE),
+	const BEntry* startDir, uint32 nodeFlavors, bool multipleSelection,
+	BMessage* message, BRefFilter* filter, uint32 containerWindowFlags,
+	window_look look, window_feel feel, bool hideWhenDone)
+	:
+	BContainerWindow(0, containerWindowFlags, look, feel, 0,
+		B_CURRENT_WORKSPACE),
 	fDirMenu(NULL),
 	fDirMenuField(NULL),
 	fTextControl(NULL),
@@ -228,7 +232,8 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
 	fPoseView->SetFlags(fPoseView->Flags() | B_NAVIGABLE);
 	fPoseView->SetPoseEditing(false);
 	AddCommonFilter(new BMessageFilter(B_KEY_DOWN, key_down_filter));
-	AddCommonFilter(new BMessageFilter(B_SIMPLE_DATA, TFilePanel::MessageDropFilter));
+	AddCommonFilter(new BMessageFilter(B_SIMPLE_DATA,
+		TFilePanel::MessageDropFilter));
 	AddCommonFilter(new BMessageFilter(B_NODE_MONITOR, TFilePanel::FSFilter));
 
 	// inter-application observing
@@ -249,7 +254,8 @@ TFilePanel::~TFilePanel()
 
 
 filter_result
-TFilePanel::MessageDropFilter(BMessage* message, BHandler**, BMessageFilter* filter)
+TFilePanel::MessageDropFilter(BMessage* message, BHandler**,
+	BMessageFilter* filter)
 {
 	TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
 	if (panel == NULL || !message->WasDropped())
@@ -305,7 +311,8 @@ TFilePanel::MessageDropFilter(BMessage* message, BHandler**, BMessageFilter* fil
 			(&TFilePanel::SelectChildInParent, panel,
 			const_cast<const entry_ref*>(&ref),
 			const_cast<const node_ref*>(&child)),
-			ref == *panel->TargetModel()->EntryRef() ? 0 : 100000, 200000, 5000000);
+			ref == *panel->TargetModel()->EntryRef() ? 0 : 100000, 200000,
+				5000000);
 				// if the target directory is already current, we won't
 				// delay the initial selection try
 
@@ -325,58 +332,60 @@ TFilePanel::FSFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 {
 	switch (message->FindInt32("opcode")) {
 		case B_ENTRY_MOVED:
-			{
-				node_ref itemNode;
-				node_ref dirNode;
-				TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
+		{
+			node_ref itemNode;
+			node_ref dirNode;
+			TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
 
-				message->FindInt32("device", &dirNode.device);
-				itemNode.device = dirNode.device;
-				message->FindInt64("to directory", (int64*)&dirNode.node);
-				message->FindInt64("node", (int64*)&itemNode.node);
-				const char* name;
-				if (message->FindString("name", &name) != B_OK)
-					break;
-
-				// if current directory moved, update entry ref and menu
-				// but not wind title
-				if (*(panel->TargetModel()->NodeRef()) == itemNode) {
-					panel->TargetModel()->UpdateEntryRef(&dirNode, name);
-					panel->SetTo(panel->TargetModel()->EntryRef());
-					return B_SKIP_MESSAGE;
-				}
+			message->FindInt32("device", &dirNode.device);
+			itemNode.device = dirNode.device;
+			message->FindInt64("to directory", (int64*)&dirNode.node);
+			message->FindInt64("node", (int64*)&itemNode.node);
+			const char* name;
+			if (message->FindString("name", &name) != B_OK)
 				break;
-			}
-		case B_ENTRY_REMOVED:
-			{
-				node_ref itemNode;
-				TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
-				message->FindInt32("device", &itemNode.device);
-				message->FindInt64("node", (int64*)&itemNode.node);
 
-				// if folder we're watching is deleted, switch to root
-				// or Desktop
-				if (*(panel->TargetModel()->NodeRef()) == itemNode) {
-					BVolumeRoster volumeRoster;
-					BVolume volume;
-					volumeRoster.GetBootVolume(&volume);
-
-					BDirectory root;
-					volume.GetRootDirectory(&root);
-
-					BEntry entry;
-					entry_ref ref;
-					root.GetEntry(&entry);
-					entry.GetRef(&ref);
-
-					panel->SwitchDirToDesktopIfNeeded(ref);
-
-					panel->SetTo(&ref);
-					return B_SKIP_MESSAGE;
-				}
+			// if current directory moved, update entry ref and menu
+			// but not wind title
+			if (*(panel->TargetModel()->NodeRef()) == itemNode) {
+				panel->TargetModel()->UpdateEntryRef(&dirNode, name);
+				panel->SetTo(panel->TargetModel()->EntryRef());
+				return B_SKIP_MESSAGE;
 			}
 			break;
+		}
+
+		case B_ENTRY_REMOVED:
+		{
+			node_ref itemNode;
+			TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
+			message->FindInt32("device", &itemNode.device);
+			message->FindInt64("node", (int64*)&itemNode.node);
+
+			// if folder we're watching is deleted, switch to root
+			// or Desktop
+			if (*(panel->TargetModel()->NodeRef()) == itemNode) {
+				BVolumeRoster volumeRoster;
+				BVolume volume;
+				volumeRoster.GetBootVolume(&volume);
+
+				BDirectory root;
+				volume.GetRootDirectory(&root);
+
+				BEntry entry;
+				entry_ref ref;
+				root.GetEntry(&entry);
+				entry.GetRef(&ref);
+
+				panel->SwitchDirToDesktopIfNeeded(ref);
+
+				panel->SetTo(&ref);
+				return B_SKIP_MESSAGE;
+			}
+			break;
+		}
 	}
+
 	return B_DISPATCH_MESSAGE;
 }
 
@@ -407,9 +416,9 @@ TFilePanel::QuitRequested()
 	// from the "easy" functions which simply instantiate a TFilePanel
 	// and expect it to go away by itself
 
-	if (fClientObject) {
+	if (fClientObject != NULL) {
 		Hide();
-		if (fClientObject)
+		if (fClientObject != NULL)
 			fClientObject->WasHidden();
 
 		BMessage message(*fMessage);
@@ -417,6 +426,7 @@ TFilePanel::QuitRequested()
 		message.AddInt32("old_what", (int32)fMessage->what);
 		message.AddPointer("source", fClientObject);
 		fTarget.SendMessage(&message);
+
 		return false;
 	}
 
