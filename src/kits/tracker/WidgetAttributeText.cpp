@@ -2047,7 +2047,7 @@ RatingAttributeText::SetUpEditing(BTextView* view)
 
 
 void
-RatingAttributeText::FitValue(BString* result, const BPoseView* view)
+RatingAttributeText::FitValue(BString* ratingString, const BPoseView* view)
 {
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
@@ -2055,8 +2055,7 @@ RatingAttributeText::FitValue(BString* result, const BPoseView* view)
 	fOldWidth = fColumn->Width();
 	fDirty = false;
 
-	int64 rating = 0;
-
+	int64 rating;
 	if (fValueIsDefined) {
 		switch (fColumn->AttrType()) {
 			case B_INT8_TYPE:
@@ -2070,11 +2069,17 @@ RatingAttributeText::FitValue(BString* result, const BPoseView* view)
 			case B_INT32_TYPE:
 				rating = fValue.int32t;
 				break;
+
+			default:
+				rating = 0;
+				break;
 		}
-	}
+	} else
+		rating = 0;
 
 	if (rating > fMax)
 		rating = fMax;
+
 	if (rating < 0)
 		rating = 0;
 
@@ -2082,13 +2087,14 @@ RatingAttributeText::FitValue(BString* result, const BPoseView* view)
 	fFullValueText = "";
 
 	for (int32 i = 0; i < fCount; i++) {
-		if (rating > i * steps)
+		int64 n = i * steps;
+		if (rating > n)
 			fFullValueText += "★";
 		else
 			fFullValueText += "☆";
 	}
 
-	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+	fTruncatedWidth = TruncString(ratingString, fFullValueText.String(),
 		fFullValueText.Length(), view, fOldWidth);
 }
 

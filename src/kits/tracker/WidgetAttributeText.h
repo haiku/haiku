@@ -285,7 +285,7 @@ public:
 
 protected:
 	virtual float PreferredWidth(const BPoseView*) const;
-	virtual void FitValue(BString* result, const BPoseView*);
+	virtual void FitValue(BString* ratingString, const BPoseView* view);
 	virtual bool CheckSettingsChanged();
 
 	TrackerSettings fSettings;
