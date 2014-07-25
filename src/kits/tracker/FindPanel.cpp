@@ -2638,8 +2638,11 @@ FindPanel::AddAttributeControls(int32 gridRow)
 
 	// target everything
 	menu->SetTargetForItems(this);
-	for (int32 index = menu->CountItems() - 1; index >= 0; index--)
-		menu->SubmenuAt(index)->SetTargetForItems(this);
+	for (int32 index = menu->CountItems() - 1; index >= 0; index--) {
+		BMenu* submenuAtIndex = menu->SubmenuAt(index);
+		if (submenuAtIndex != NULL)
+			submenuAtIndex->SetTargetForItems(this);
+	}
 
 	// populate mime popup
 	AddMimeTypeAttrs(menu);
