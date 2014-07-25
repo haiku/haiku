@@ -2429,6 +2429,12 @@ void
 FindPanel::AddByNameOrFormulaItems()
 {
 	BBox* box = dynamic_cast<BBox*>(FindView("Box"));
+
+	ASSERT(box != NULL);
+
+	if (box == NULL)
+		return;
+
 	// reset layout
 	BLayoutBuilder::Group<>(box, B_VERTICAL);
 
