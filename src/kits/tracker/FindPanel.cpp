@@ -2492,6 +2492,9 @@ FindPanel::ShowOrHideMimeTypeMenu()
 	BView* menuFieldSpacer = FindView("MimeTypeMenuSpacer");
 	BMenuField* menuField
 		= dynamic_cast<BMenuField*>(FindView("MimeTypeMenu"));
+	if (menuFieldSpacer == NULL || menuField == NULL)
+		return;
+
 	if (Mode() == (int32)kByFormulaItem && !menuField->IsHidden(this)) {
 		BSize size = menuField->ExplicitMinSize();
 		menuField->Hide();
