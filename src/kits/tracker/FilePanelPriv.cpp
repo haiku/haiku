@@ -110,9 +110,13 @@ static filter_result
 key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 {
 	TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
-	ASSERT(panel);
-	BPoseView* view = panel->PoseView();
 
+	ASSERT(panel != NULL);
+
+	if (panel == NULL)
+		return B_DISPATCH_MESSAGE;
+
+	BPoseView* view = panel->PoseView();
 	if (panel->TrackingMenu())
 		return B_DISPATCH_MESSAGE;
 
