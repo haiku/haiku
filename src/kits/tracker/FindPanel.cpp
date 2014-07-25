@@ -2060,6 +2060,12 @@ FindPanel::SetUpAddRemoveButtons()
 	addButton->SetTarget(this);
 
 	BGroupLayout* layout = dynamic_cast<BGroupLayout*>(box->GetLayout());
+
+	ASSERT(layout != NULL);
+
+	if (layout == NULL)
+		return;
+
 	BLayoutBuilder::Group<>(layout)
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
