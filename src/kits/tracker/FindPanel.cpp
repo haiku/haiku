@@ -186,12 +186,13 @@ MoreOptionsStruct::SetQueryTemporary(BNode* node, bool on)
 {
 	MoreOptionsStruct saveMoreOptions;
 
-	ReadAttr(node, kAttrQueryMoreOptions, kAttrQueryMoreOptionsForeign,
-		B_RAW_TYPE, 0, &saveMoreOptions, sizeof(MoreOptionsStruct),
-		&MoreOptionsStruct::EndianSwap);
-	saveMoreOptions.temporary = on;
-	node->WriteAttr(kAttrQueryMoreOptions, B_RAW_TYPE, 0, &saveMoreOptions,
-		sizeof(saveMoreOptions));
+	if (ReadAttr(node, kAttrQueryMoreOptions, kAttrQueryMoreOptionsForeign,
+			B_RAW_TYPE, 0, &saveMoreOptions, sizeof(MoreOptionsStruct),
+			&MoreOptionsStruct::EndianSwap) == B_OK) {
+		saveMoreOptions.temporary = on;
+		node->WriteAttr(kAttrQueryMoreOptions, B_RAW_TYPE, 0, &saveMoreOptions,
+			sizeof(saveMoreOptions));
+	}
 }
 
 
