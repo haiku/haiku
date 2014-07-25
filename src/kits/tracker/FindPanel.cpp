@@ -2382,11 +2382,13 @@ FindPanel::RestoreWindowState(const BNode* node)
 			BString buffer;
 			if (node->ReadAttrString(kAttrQueryInitialString, &buffer)
 					== B_OK) {
-				BTextControl* textControl = dynamic_cast<BTextControl*>
-					(FindView("TextControl"));
-				ASSERT(textControl);
+				BTextControl* textControl = dynamic_cast<BTextControl*>(
+					FindView("TextControl"));
 
-				textControl->TextView()->SetText(buffer.String());
+				ASSERT(textControl != NULL);
+
+				if (textControl != NULL)
+					textControl->TextView()->SetText(buffer.String());
 			}
 			break;
 		}
