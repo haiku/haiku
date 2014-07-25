@@ -1548,6 +1548,9 @@ FindPanel::GetByNamePredicate(BQuery* query) const
 
 	ASSERT(textControl != NULL);
 
+	if (textControl == NULL)
+		return;
+
 	query->PushAttr("name");
 	query->PushString(textControl->TextView()->Text(), true);
 
