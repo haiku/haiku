@@ -2981,7 +2981,8 @@ FindPanel::GetDefaultAttrName(BString& attrName, int32 row) const
 
 	BTextControl* textControl
 		= dynamic_cast<BTextControl*>(fAttrGrid->ItemAt(2, row)->View());
-	result << textControl->Text();
+	if (textControl != NULL)
+		attrName << textControl->Text();
 }
 
 
