@@ -1306,7 +1306,7 @@ class failToLock { /* exception in AddPoses */ };
 status_t
 BPoseView::AddPosesTask(void* castToParams)
 {
-	// AddPosesTask reeds a bunch of models and passes them off to
+	// AddPosesTask reads a bunch of models and passes them off to
 	// the pose placing and drawing routine.
 
 	AddPosesParams* params = (AddPosesParams*)castToParams;
@@ -1323,10 +1323,18 @@ BPoseView::AddPosesTask(void* castToParams)
 	thread_id threadID = find_thread(NULL);
 
 	BPoseView* view = dynamic_cast<BPoseView*>(lock.Handler());
+
 	ASSERT(view != NULL);
 
-	//BWindow* window = dynamic_cast<BWindow*>(lock.Looper());
-	ASSERT(dynamic_cast<BWindow*>(lock.Looper()) != NULL);
+	if (view == NULL)
+		return B_ERROR;
+
+	BWindow* window = dynamic_cast<BWindow*>(lock.Looper());
+
+	ASSERT(window != NULL);
+
+	if (window == NULL)
+		return B_ERROR;
 
 	// allocate the iterator we will use for adding poses; this
 	// can be a directory or any other collection of entry_refs, such
