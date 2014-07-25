@@ -24,9 +24,4 @@ if $(TARGET_PACKAGING_ARCH) != x86_gcc2 || $(secondaryArchs) {
 	packages += webpositive ;
 }
 
-HaikuRepository $(haikuRepository) : $(repoInfo) : $(packages:S=.hpkg)
-	: http://www.haiku-files.org/haiku/master/repo/$(TARGET_PACKAGING_ARCH)/$(HAIKU_VERSION)_$version
-	: [ DetermineEffectiveHaikuRevision ]
-		# TODO: Remove the URL and the version file argument once the repository
-		# is available on haiku-os.org as specified in the repository info.
-	;
+HaikuRepository $(haikuRepository) : $(repoInfo) : $(packages:S=.hpkg) ;

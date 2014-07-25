@@ -744,8 +744,7 @@ actions BuildRemoteHaikuPortsRepository1
 }
 
 
-rule HaikuRepository repository : repoInfoTemplate : packages : url
-	: versionFile
+rule HaikuRepository repository : repoInfoTemplate : packages
 {
 	# HaikuRepository <repository> : <repoInfoTemplate> : <packages>
 	#	[ : <url> [ : <versionFile> ] ] ;
@@ -757,10 +756,6 @@ rule HaikuRepository repository : repoInfoTemplate : packages : url
 	#	meta data files.
 	# <repoInfoTemplate> - The repository info template file to be used.
 	# <packages> - The packages to be added to the repository.
-	# <url> - Optional repository URL for the repository config file to be
-	#	created. If not specified the one from the repository info is used.
-	# <versionFile> - Optional file containing the version string that shall
-	#	replace the "$version" placeholder in <url> (if any).
 
 	local architecture = $(HAIKU_PACKAGING_ARCH) ;
 	local secondaryArchitecture ;
@@ -771,17 +766,26 @@ rule HaikuRepository repository : repoInfoTemplate : packages : url
 	local repositoriesDir = $(HAIKU_PACKAGE_REPOSITORIES_DIR_$(architecture)) ;
 
 	# build the repository info
-	local repoInfo = $(repository:G=repository-info)-info ;
-	MakeLocate $(repoInfo) : $(repositoriesDir) ;
-	PreprocessPackageOrRepositoryInfo $(repoInfo) : $(repoInfoTemplate)
+	local repositoryInfo = $(repository:G=repository-info)-info ;
+	MakeLocate $(repositoryInfo) : $(repositoriesDir) ;
+	PreprocessPackageOrRepositoryInfo $(repositoryInfo) : $(repoInfoTemplate)
 		: $(architecture) : $(secondaryArchitecture) ;
 
 	# build the respository config
 	local repositoryConfig = $(repository:G=repository-config)-config ;
 	MakeLocate $(repositoryConfig) : $(repositoriesDir) ;
-	RepositoryConfig $(repositoryConfig) : $(repoInfo) : $(url)
-		: $(versionFile) ;
+	RepositoryConfig $(repositoryConfig) : $(repositoryInfo) ;
 	HAIKU_REPOSITORY_CONFIG_FILE on $(repository) = $(repositoryConfig) ;
+
+	# setup the repository cache file
+	local repositoryCache = $(repository:B=repo:G=repository-cache) ;
+	MakeLocate $(repositoryCache)
+		: [ FDirName $(repositoriesDir) $(repository:G=) ] ;
+	Depends $(repositoryCache) : $(repository) ;
+	HAIKU_REPOSITORY_CACHE_FILE on $(repository) = $(repositoryCache) ;
+
+	# add the repository to the list of known package repositories
+	HAIKU_REPOSITORIES += $(repository) ;
 
 	# prepare the script that initializes the shell variables
 	local initVariablesScript = $(repository)-repository-init-vars ;
@@ -802,10 +806,10 @@ rule HaikuRepository repository : repoInfoTemplate : packages : url
 	local mainScript = build_haiku_repository ;
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
 
-	Depends $(repository) : $(mainScript) $(initVariablesScript) $(repoInfo)
-		$(packages) ;
+	Depends $(repository) : $(mainScript) $(initVariablesScript)
+		$(repositoryInfo) $(packages) ;
 	HaikuRepository1 $(repository) : $(mainScript) $(initVariablesScript)
-		$(repoInfo) $(packages) ;
+		$(repositoryInfo) $(packages) ;
 	Always $(repository) ;
 
 	RmTemps $(repository) : $(initVariablesScript) ;
