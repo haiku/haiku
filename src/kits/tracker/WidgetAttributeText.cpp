@@ -598,6 +598,7 @@ ScalarAttributeText::ScalarAttributeText(const Model* model,
 	const BColumn* column)
 	:
 	WidgetAttributeText(model, column),
+	fValue(0),
 	fValueDirty(true)
 {
 }
