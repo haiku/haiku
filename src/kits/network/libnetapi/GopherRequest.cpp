@@ -430,6 +430,26 @@ BGopherRequest::_ParseInput(bool last)
 						"<span class=\"text\">" << title << "</span></a>"
 						"<br/>\n";
 				break;
+			case GOPHER_TYPE_BINARY:
+			case GOPHER_TYPE_BINHEX:
+			case GOPHER_TYPE_BINARCHIVE:
+			case GOPHER_TYPE_UUENCODED:
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"binary\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_DIRECTORY:
+				/*
+				 * directory link
+				 */
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"dir\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_ERROR:
+				item << "<span class=\"error\">" << title << "</span>"
+						"<br/>\n";
+				break;
 			default:
 				item << "<div>" << fields.StringAt(FIELD_NAME) << "</div>";
 				break;
