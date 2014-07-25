@@ -2239,14 +2239,15 @@ FindPanel::SaveWindowState(BNode* node, bool editTemplate)
 				SaveAttrState(&message, index);
 
 			ssize_t size = message.FlattenedSize();
-			char* buffer = new char[size];
-			status_t result = message.Flatten(buffer, size);
-			if (result == B_OK) {
-				node->WriteAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
-					buffer, (size_t)size);
+			if (size > 0) {
+				char* buffer = new char[(size_t)size];
+				status_t result = message.Flatten(buffer, size);
+				if (result == B_OK) {
+					node->WriteAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
+						buffer, (size_t)size);
+				}
+				delete[] buffer;
 			}
-
-			delete[] buffer;
 			break;
 		}
 
