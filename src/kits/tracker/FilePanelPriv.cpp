@@ -81,6 +81,10 @@ All rights reserved.
 #include "tracker_private.h"
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FilePanelPriv"
+
+
 const char* kDefaultFilePanelTemplate = "FilePanelSettings";
 
 
@@ -139,9 +143,6 @@ key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 
 //	#pragma mark -
 
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "FilePanelPriv"
 
 TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
 		const BEntry* startDir, uint32 nodeFlavors, bool multipleSelection,
