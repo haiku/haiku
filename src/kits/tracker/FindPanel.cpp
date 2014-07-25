@@ -1499,32 +1499,38 @@ FindPanel::GetByAttrPredicate(BQuery* query, bool &dynamicDate) const
 
 
 void
-FindPanel::GetDefaultName(BString &result) const
+FindPanel::GetDefaultName(BString& name) const
 {
 	BTextControl* textControl
 		= dynamic_cast<BTextControl*>(FindView("TextControl"));
+
 	switch (Mode()) {
 		case kByNameItem:
-			result.SetTo(B_TRANSLATE_COMMENT("Name = %name",
-				"FindResultTitle"));
-			result.ReplaceFirst("%name", textControl->TextView()->Text());
+			if (textControl != NULL && textControl->TextView() != NULL) {
+				name.SetTo(B_TRANSLATE_COMMENT("Name = %name",
+					"FindResultTitle"));
+				name.ReplaceFirst("%name", textControl->TextView()->Text());
+			}
 			break;
 
 		case kByFormulaItem:
-			result.SetTo(B_TRANSLATE_COMMENT("Formula %formula",
-				"FindResultTitle"));
-			result.ReplaceFirst("%formula", textControl->TextView()->Text());
+			if (textControl != NULL && textControl->TextView() != NULL) {
+				name.SetTo(B_TRANSLATE_COMMENT("Formula %formula",
+					"FindResultTitle"));
+				name.ReplaceFirst("%formula", textControl->TextView()->Text());
+			}
 			break;
 
 		case kByAttributeItem:
 		{
 			BMenuItem* item = fMimeTypeMenu->FindMarked();
 			if (item != NULL)
-				result << item->Label() << ": ";
+				name << item->Label() << ": ";
+
 			for (int32 i = 0; i < fAttrGrid->CountRows(); i++) {
-				GetDefaultAttrName(result, i);
+				GetDefaultAttrName(name, i);
 				if (i + 1 < fAttrGrid->CountRows())
-					result << ", ";
+					name << ", ";
 			}
 			break;
 		}
