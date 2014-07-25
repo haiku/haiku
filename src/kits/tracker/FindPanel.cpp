@@ -2236,11 +2236,13 @@ FindPanel::SaveWindowState(BNode* node, bool editTemplate)
 		{
 			BTextControl* textControl = dynamic_cast<BTextControl*>
 				(FindView("TextControl"));
-			BString formula(textControl->TextView()->Text());
-			node->WriteAttrString(kAttrQueryInitialString, &formula);
 
 			ASSERT(textControl != NULL);
 
+			if (textControl != NULL) {
+				BString formula(textControl->TextView()->Text());
+				node->WriteAttrString(kAttrQueryInitialString, &formula);
+			}
 			break;
 		}
 	}
