@@ -354,9 +354,10 @@ MakeValidFilename(BString &string)
 	// replace slashes
 	int32 length = string.Length();
 	char* buf = string.LockBuffer(length);
-	for (int32 index = length; index-- > 0;)
+	for (int32 index = length; index-- > 0;) {
 		if (buf[index] == '/' /*|| buf[index] == ':'*/)
 			buf[index] = '_';
+	}
 	string.UnlockBuffer(length);
 
 	return string.String();
@@ -364,7 +365,7 @@ MakeValidFilename(BString &string)
 
 
 void
-FindWindow::GetPredicateString(BString &predicate, bool &dynamicDate)
+FindWindow::GetPredicateString(BString& predicate, bool& dynamicDate)
 {
 	BQuery query;
 	BTextControl* textControl
@@ -388,9 +389,9 @@ FindWindow::GetPredicateString(BString &predicate, bool &dynamicDate)
 
 
 void
-FindWindow::GetDefaultName(BString &result)
+FindWindow::GetDefaultName(BString& name)
 {
-	fBackground->GetDefaultName(result);
+	fBackground->GetDefaultName(name);
 
 	time_t timeValue = time(0);
 	char namebuf[B_FILE_NAME_LENGTH];
@@ -399,9 +400,9 @@ FindWindow::GetDefaultName(BString &result)
 	localtime_r(&timeValue, &timeData);
 
 	strftime(namebuf, 32, " - %b %d, %I:%M:%S %p", &timeData);
-	result << namebuf;
+	name << namebuf;
 
-	MakeValidFilename(result);
+	MakeValidFilename(name);
 }
 
 
@@ -595,7 +596,7 @@ FindWindow::FindSaveCommon(bool find)
 			// remove the current entry - need to do this to quit the
 			// running query and to close the corresponding window
 
-		if (userSpecifiedName && !fEditTemplateOnly) {
+		if (userSpecifiedName != NULL && !fEditTemplateOnly) {
 			// change the name of the old query per users request
 			fRef.set_name(userSpecifiedName);
 			entry.SetTo(&fRef);
@@ -1544,12 +1545,13 @@ FindPanel::GetByNamePredicate(BQuery* query) const
 	ASSERT(Mode() == (int32)kByNameItem);
 	BTextControl* textControl
 		= dynamic_cast<BTextControl*>(FindView("TextControl"));
-	ASSERT(textControl);
+
+	ASSERT(textControl != NULL);
 
 	query->PushAttr("name");
 	query->PushString(textControl->TextView()->Text(), true);
 
-	if (strstr(textControl->TextView()->Text(), "*")) {
+	if (strstr(textControl->TextView()->Text(), "*") != NULL) {
 		// assume pattern is a regular expression, try doing an exact match
 		query->PushOp(B_EQ);
 	} else
@@ -1582,7 +1584,8 @@ FindPanel::SwitchMode(uint32 mode)
 
 				query.GetPredicate(&buffer);
 			}
-		} // fall thru
+		}
+		// fall-through
 		case kByNameItem:
 		{
 			fMode = mode;
@@ -1605,7 +1608,7 @@ FindPanel::SwitchMode(uint32 mode)
 			fMode = mode;
 			BTextControl* textControl
 				= dynamic_cast<BTextControl*>(FindView("TextControl"));
-			if (textControl) {
+			if (textControl != NULL) {
 				textControl->RemoveSelf();
 				delete textControl;
 			}
@@ -2023,7 +2026,8 @@ FindPanel::SetUpAddRemoveButtons(BBox* box)
 			.AddGlue()
 			.Add(removeButton)
 			.Add(addButton)
-			.End();
+			.End()
+		.End();
 }
 
 
@@ -2232,9 +2236,11 @@ FindPanel::SaveWindowState(BNode* node, bool editTemplate)
 		{
 			BTextControl* textControl = dynamic_cast<BTextControl*>
 				(FindView("TextControl"));
-			ASSERT(textControl);
 			BString formula(textControl->TextView()->Text());
 			node->WriteAttrString(kAttrQueryInitialString, &formula);
+
+			ASSERT(textControl != NULL);
+
 			break;
 		}
 	}
@@ -2667,7 +2673,9 @@ FindPanel::SaveAttrState(BMessage* message, int32 index)
 	string << index;
 	BTextControl* textControl
 		= dynamic_cast<BTextControl*>(FindAttrView(string.String(), index));
-	ASSERT(textControl);
+
+	ASSERT(textControl != NULL);
+
 	message->AddString("attrViewText", textControl->TextView()->Text());
 
 	BMenuField* field = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
@@ -2883,8 +2891,9 @@ FindPanel::GetDefaultAttrName(BString &result, int32 row) const
 
 
 DeleteTransientQueriesTask::DeleteTransientQueriesTask()
-	:	state(kInitial),
-		fWalker(NULL)
+	:
+	state(kInitial),
+	fWalker(NULL)
 {
 }
 
@@ -3006,6 +3015,7 @@ DeleteTransientQueriesTask::ProcessOneRef(Model* model)
 
 	PRINT(("query %s, old, temporary, not shownig - deleting\n",
 		model->Name()));
+
 	BEntry entry(model->EntryRef());
 	entry.Remove();
 
@@ -3109,13 +3119,14 @@ DraggableQueryIcon::DragStarted(BMessage* dragMessage)
 	dragMessage->RemoveData("be:clip_name");
 
 	FindWindow* window = dynamic_cast<FindWindow*>(Window());
-	ASSERT(window);
 	dragMessage->AddString("be:clip_name",
 		window->BackgroundView()->UserSpecifiedName() ?
 			window->BackgroundView()->UserSpecifiedName()
 			: B_TRANSLATE("New Query"));
 
 	return true;
+	ASSERT(window != NULL);
+
 }
 
 
