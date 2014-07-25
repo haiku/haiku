@@ -194,7 +194,6 @@ BGopherRequest::BGopherRequest(const BUrl& url, BUrlProtocolListener* listener,
 		fItemType = fPath[1];
 		fPath.Remove(0, 2);
 	}
-	fprintf(stderr, "t: '%c' p:'%s'\n", fItemType, fPath.String());
 }
 
 
@@ -269,7 +268,6 @@ BGopherRequest::_ProtocolLoop()
 		fSocket->WaitForReadable();
 		BNetBuffer chunk(kGopherBufferSize);
 		bytesRead = fSocket->Read(chunk.Data(), kGopherBufferSize);
-		fprintf(stderr, "Read: %d\n", (int)bytesRead);
 
 		if (bytesRead < 0) {
 			readError = bytesRead;
@@ -292,22 +290,18 @@ BGopherRequest::_ProtocolLoop()
 				for (i = 0; i < fInputBuffer.Size(); i++) {
 					char c = fInputBuffer.Data()[i];
 					if (c == '\t') {
-						fprintf(stderr, "tab\n");
 						if (!crlf)
 							tabs++;
 					} else if (c == '\r' || c == '\n') {
-						fprintf(stderr, "crlf\n");
 						if (tabs < 3)
 							break;
 						crlf = true;
 					} else if (!isprint(fInputBuffer.Data()[i])) {
-						fprintf(stderr, "!isprint at %lu\n", i);
 						crlf = false;
 						break;
 					}
 				}
 				if (crlf && tabs > 2 && tabs < 5) {
-					fprintf(stderr, "error\n");
 					// TODO:
 					//if enough data
 					// else continue
@@ -332,7 +326,6 @@ BGopherRequest::_ProtocolLoop()
 			// now we can assign MIME type if we know it
 			for (i = 0; gopher_type_map[i].type != GOPHER_TYPE_NONE; i++) {
 				if (gopher_type_map[i].type == fItemType) {
-					fprintf(stderr, "MIME:'%s'\n", gopher_type_map[i].mime);
 					fResult.SetContentType(gopher_type_map[i].mime);
 					break;
 				}
@@ -459,9 +452,6 @@ BGopherRequest::_ParseInput(bool last)
 			_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT,
 				"Unterminated gopher item (type '%c')", type);
 
-		fprintf(stderr, "type: '%c' name: '%s'\n", type, fields.StringAt(FIELD_NAME).String());
-		//fields.PrintToStream();
-
 		BString pageTitle;
 		BString item;
 		BString title = fields.StringAt(FIELD_NAME);
@@ -476,7 +466,6 @@ BGopherRequest::_ParseInput(bool last)
 			//	link << "/";
 			link << fields.StringAt(FIELD_SELECTOR);
 		}
-		fprintf(stderr, "link: '%s'\n", link.String());
 		_HTMLEscapeString(title);
 		_HTMLEscapeString(link);
 
