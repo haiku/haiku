@@ -405,6 +405,7 @@ BGopherRequest::_ParseInput(bool last)
 		fprintf(stderr, "type: '%c' name: '%s'\n", type, fields.StringAt(FIELD_NAME).String());
 		//fields.PrintToStream();
 
+		BString pageTitle;
 		BString item;
 		BString title = fields.StringAt(FIELD_NAME);
 		BString link("gopher://");
@@ -449,6 +450,19 @@ BGopherRequest::_ParseInput(bool last)
 			case GOPHER_TYPE_ERROR:
 				item << "<span class=\"error\">" << title << "</span>"
 						"<br/>\n";
+				if (fPosition == 0 && pageTitle.Length() == 0)
+					pageTitle << "Error: " << title;
+				break;
+			case GOPHER_TYPE_INFO:
+				// TITLE resource, cf.
+				// gopher://gophernicus.org/0/doc/gopher/gopher-title-resource.txt
+				if (fPosition == 0 && pageTitle.Length() == 0
+					&& fields.StringAt(FIELD_SELECTOR) == "TITLE") {
+						pageTitle = title;
+						break;
+				}
+				item << "<span class=\"info\">" << title << "</span>"
+						"<br/>\n";
 				break;
 			default:
 				item << "<div>" << fields.StringAt(FIELD_NAME) << "</div>";
@@ -456,7 +470,9 @@ BGopherRequest::_ParseInput(bool last)
 		}
 
 		if (fPosition == 0) {
-			BString title = "TITLE";
+			if (pageTitle.Length() == 0)
+				pageTitle << "Index of " << Url();
+
 			const char *uplink = ".";
 			if (fPath.EndsWith("/"))
 				uplink = "..";
@@ -473,14 +489,14 @@ BGopherRequest::_ParseInput(bool last)
 					"type=\"text/css\" href=\"resource:internal.css\">\n"
 				"<link rel=\"icon\" type=\"image/png\""
 					" href=\"resource:icons/directory.png\">\n"
-				"<title>" << title << "</title>\n"
+				"<title>" << pageTitle << "</title>\n"
 				"</head>\n"
 				"<body id=\"gopher\">\n"
 				"<div class=\"uplink dontprint\">\n"
 				"<a href=" << uplink << ">[up]</a>\n"
 				"<a href=\"/\">[top]</a>\n"
 				"</div>\n"
-				"<h1>" << title << "</h1>\n";
+				"<h1>" << pageTitle << "</h1>\n";
 
 			fListener->DataReceived(this, header.String(), fPosition,
 				header.Length());
