@@ -381,7 +381,7 @@ FindWindow::GetPredicateString(BString& predicate, bool& dynamicDate)
 			BTextControl* textControl
 				= dynamic_cast<BTextControl*>(FindView("TextControl"));
 			if (textControl != NULL)
-				predicate.SetTo(textControl->TextView()->Text(), 1023);
+				predicate.SetTo(textControl->Text(), 1023);
 			break;
 		}
 
@@ -1366,35 +1366,35 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 
 			switch (type) {
 				case B_STRING_TYPE:
-					query->PushString(textControl->TextView()->Text(), true);
+					query->PushString(textControl->Text(), true);
 					break;
 
 				case B_TIME_TYPE:
 				{
 					int flags = 0;
 					DEBUG_ONLY(time_t result =)
-					parsedate_etc(textControl->TextView()->Text(), -1,
+					parsedate_etc(textControl->Text(), -1,
 						&flags);
 					dynamicDate = (flags & PARSEDATE_RELATIVE_TIME) != 0;
 					PRINT(("parsedate_etc - date is %srelative, %"
 						B_PRIdTIME "\n",
 						dynamicDate ? "" : "not ", result));
 
-					query->PushDate(textControl->TextView()->Text());
+					query->PushDate(textControl->Text());
 					break;
 				}
 
 				case B_BOOL_TYPE:
 				{
 					uint32 value;
-					if (strcasecmp(textControl->TextView()->Text(),
+					if (strcasecmp(textControl->Text(),
 							"true") == 0) {
 						value = 1;
-					} else if (strcasecmp(textControl->TextView()->Text(),
+					} else if (strcasecmp(textControl->Text(),
 							"true") == 0) {
 						value = 1;
 					} else
-						value = (uint32)atoi(textControl->TextView()->Text());
+						value = (uint32)atoi(textControl->Text());
 
 					value %= 2;
 					query->PushUInt32(value);
@@ -1405,31 +1405,31 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 				case B_UINT16_TYPE:
 				case B_UINT32_TYPE:
 					query->PushUInt32((uint32)StringToScalar(
-						textControl->TextView()->Text()));
+						textControl->Text()));
 					break;
 
 				case B_INT8_TYPE:
 				case B_INT16_TYPE:
 				case B_INT32_TYPE:
 					query->PushInt32((int32)StringToScalar(
-						textControl->TextView()->Text()));
+						textControl->Text()));
 					break;
 
 				case B_UINT64_TYPE:
 					query->PushUInt64((uint64)StringToScalar(
-						textControl->TextView()->Text()));
+						textControl->Text()));
 					break;
 
 				case B_OFF_T_TYPE:
 				case B_INT64_TYPE:
 					query->PushInt64(StringToScalar(
-						textControl->TextView()->Text()));
+						textControl->Text()));
 					break;
 
 				case B_FLOAT_TYPE:
 				{
 					float floatVal;
-					sscanf(textControl->TextView()->Text(), "%f",
+					sscanf(textControl->Text(), "%f",
 						&floatVal);
 					query->PushFloat(floatVal);
 					break;
@@ -1438,7 +1438,7 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 				case B_DOUBLE_TYPE:
 				{
 					double doubleVal;
-					sscanf(textControl->TextView()->Text(), "%lf",
+					sscanf(textControl->Text(), "%lf",
 						&doubleVal);
 					query->PushDouble(doubleVal);
 					break;
@@ -1514,18 +1514,18 @@ FindPanel::GetDefaultName(BString& name) const
 
 	switch (Mode()) {
 		case kByNameItem:
-			if (textControl != NULL && textControl->TextView() != NULL) {
+			if (textControl != NULL) {
 				name.SetTo(B_TRANSLATE_COMMENT("Name = %name",
 					"FindResultTitle"));
-				name.ReplaceFirst("%name", textControl->TextView()->Text());
+				name.ReplaceFirst("%name", textControl->Text());
 			}
 			break;
 
 		case kByFormulaItem:
-			if (textControl != NULL && textControl->TextView() != NULL) {
+			if (textControl != NULL) {
 				name.SetTo(B_TRANSLATE_COMMENT("Formula %formula",
 					"FindResultTitle"));
-				name.ReplaceFirst("%formula", textControl->TextView()->Text());
+				name.ReplaceFirst("%formula", textControl->Text());
 			}
 			break;
 
@@ -2267,13 +2267,13 @@ FindPanel::SaveWindowState(BNode* node, bool editTemplate)
 		case kByNameItem:
 		case kByFormulaItem:
 		{
-			BTextControl* textControl = dynamic_cast<BTextControl*>
-				(FindView("TextControl"));
+			BTextControl* textControl = dynamic_cast<BTextControl*>(
+				FindView("TextControl"));
 
 			ASSERT(textControl != NULL);
 
 			if (textControl != NULL) {
-				BString formula(textControl->TextView()->Text());
+				BString formula(textControl->Text());
 				node->WriteAttrString(kAttrQueryInitialString, &formula);
 			}
 			break;
@@ -2425,7 +2425,7 @@ FindPanel::RestoreWindowState(const BNode* node)
 				ASSERT(textControl != NULL);
 
 				if (textControl != NULL)
-					textControl->TextView()->SetText(buffer.String());
+					textControl->SetText(buffer.String());
 			}
 			break;
 		}
