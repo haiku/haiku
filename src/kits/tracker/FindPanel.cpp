@@ -342,7 +342,7 @@ FindWindow::QueryName() const
 
 
 static const char*
-MakeValidFilename(BString &string)
+MakeValidFilename(BString& string)
 {
 	// make a file name that is legal under bfs and hfs - possibly could
 	// add code here to accomodate FAT32 etc. too
@@ -368,8 +368,6 @@ void
 FindWindow::GetPredicateString(BString& predicate, bool& dynamicDate)
 {
 	BQuery query;
-	BTextControl* textControl
-		= dynamic_cast<BTextControl*>(FindView("TextControl"));
 	switch (fBackground->Mode()) {
 		case kByNameItem:
 			fBackground->GetByNamePredicate(&query);
@@ -377,8 +375,13 @@ FindWindow::GetPredicateString(BString& predicate, bool& dynamicDate)
 			break;
 
 		case kByFormulaItem:
-			predicate.SetTo(textControl->TextView()->Text(), 1023);
+		{
+			BTextControl* textControl
+				= dynamic_cast<BTextControl*>(FindView("TextControl"));
+			if (textControl != NULL)
+				predicate.SetTo(textControl->TextView()->Text(), 1023);
 			break;
+		}
 
 		case kByAttributeItem:
 			fBackground->GetByAttrPredicate(&query, dynamicDate);
