@@ -2024,15 +2024,16 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 
 
 void
-FindPanel::SetUpAddRemoveButtons(BBox* box)
+FindPanel::SetUpAddRemoveButtons()
 {
-	BButton* removeButton = dynamic_cast<BButton*>(box->FindView("remove button"));
-	if (removeButton != NULL) {
-		removeButton->SetEnabled(fAttrGrid->CountRows() > 1);
-		return;
-	}
+	BBox* box = dynamic_cast<BBox*>(FindView("Box"));
 
-	removeButton = new BButton("remove button", B_TRANSLATE("Remove"),
+	ASSERT(box != NULL);
+
+	if (box == NULL)
+		return;
+
+	BButton* removeButton = new BButton("remove button", B_TRANSLATE("Remove"),
 		new BMessage(kRemoveItem));
 	removeButton->SetEnabled(false);
 	removeButton->SetTarget(this);
@@ -2087,7 +2088,12 @@ FindPanel::AddAttrRow()
 	if (fAttrGrid->CountRows() > 1)
 		AddLogicMenu(fAttrGrid->CountRows() - 2);
 
-	SetUpAddRemoveButtons(box);
+	BButton* removeButton = dynamic_cast<BButton*>(
+		box->FindView("remove button"));
+	if (removeButton != NULL)
+		removeButton->SetEnabled(fAttrGrid->CountRows() > 1);
+	else
+		SetUpAddRemoveButtons();
 }
 
 

@@ -175,7 +175,6 @@ private:
 
 
 class FindPanel : public BView {
-		void SetUpAddRemoveButtons(BBox* box);
 public:
 	FindPanel(BFile*, FindWindow* parent, bool fromTemplate,
 		bool editTemplateOnly);
@@ -250,6 +249,7 @@ private:
 	static int32 InitialAttrCount(const BNode*);
 	void FillCurrentQueryName(BTextControl*, FindWindow*);
 	void AddByNameOrFormulaItems();
+	void SetUpAddRemoveButtons();
 
 	void SwitchMode(uint32);
 		// go from search by name to search by attribute, etc.
