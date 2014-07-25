@@ -463,6 +463,8 @@ Volume::GetIno(cluster_t cluster, uint32 offset, ino_t parent)
 	struct node_key key;
 	key.cluster = cluster;
 	key.offset = offset;
+
+	MutexLocker locker(fLock);
 	struct node* node = fNodeTree.Lookup(key);
 	if (node != NULL) {
 		TRACE("Volume::GetIno() cached cluster %" B_PRIu32 " offset %" B_PRIu32
@@ -484,6 +486,7 @@ Volume::GetIno(cluster_t cluster, uint32 offset, ino_t parent)
 struct node_key*
 Volume::GetNode(ino_t ino, ino_t &parent)
 {
+	MutexLocker locker(fLock);
 	struct node* node = fInoTree.Lookup(ino);
 	if (node != NULL) {
 		parent = node->parent;
