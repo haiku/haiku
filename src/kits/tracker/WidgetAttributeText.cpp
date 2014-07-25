@@ -301,6 +301,8 @@ WidgetAttributeText::WidgetAttributeText(const Model* model,
 	:
 	fModel(const_cast<Model*>(model)),
 	fColumn(column),
+	fOldWidth(-1.0f),
+	fTruncatedWidth(-1.0f),
 	fDirty(true),
 	fValueIsDefined(false)
 {
