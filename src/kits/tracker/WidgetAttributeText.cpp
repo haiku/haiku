@@ -305,6 +305,10 @@ WidgetAttributeText::WidgetAttributeText(const Model* model,
 	fValueIsDefined(false)
 {
 	ASSERT(fColumn != NULL);
+
+	if (fColumn == NULL)
+		return;
+
 	ASSERT(fColumn->Width() > 0);
 }
 
