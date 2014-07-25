@@ -1067,21 +1067,38 @@ FindPanel::Draw(BRect)
 		if (menuField == NULL)
 			continue;
 
-		BLayoutItem* stringView = fAttrGrid->ItemAt(1, index);
-		BMenuItem* item = menuField->Menu()->FindMarked();
+		BLayoutItem* stringViewLayoutItem = fAttrGrid->ItemAt(1, index);
+		if (stringViewLayoutItem == NULL)
+			continue;
+
+		BMenu* menuFieldMenu = menuField->Menu();
+		if (menuFieldMenu == NULL)
+			continue;
+
+		BMenuItem* item = menuFieldMenu->FindMarked();
 		if (item == NULL || item->Submenu() == NULL
 			|| item->Submenu()->FindMarked() == NULL) {
 			continue;
 		}
 
-		if (stringView == NULL) {
-			stringView = fAttrGrid->AddView(new BStringView("",
+		if (stringViewLayoutItem == NULL) {
+			stringViewLayoutItem = fAttrGrid->AddView(new BStringView("",
 				item->Submenu()->FindMarked()->Label()), 1, index);
-			stringView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+			stringViewLayoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 				B_ALIGN_VERTICAL_UNSET));
-		} else {
-			dynamic_cast<BStringView*>(stringView->View())->SetText(
-				item->Submenu()->FindMarked()->Label());
+		}
+
+		if (stringViewLayoutItem != NULL) {
+			BStringView* stringView
+				= dynamic_cast<BStringView*>(stringViewLayoutItem->View());
+			if (stringView != NULL) {
+				BMenu* submenu = item->Submenu();
+				if (submenu != NULL) {
+					BMenuItem* selected = submenu->FindMarked();
+					if (selected != NULL)
+						stringView->SetText(selected->Label());
+				}
+			}
 		}
 	}
 }
