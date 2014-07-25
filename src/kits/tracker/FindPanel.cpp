@@ -1357,8 +1357,8 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 		BString title;
 		title << "TextEntry" << index;
 
-		BTextControl* textControl = dynamic_cast<BTextControl*>
-			(FindAttrView(title, index));
+		BTextControl* textControl = dynamic_cast<BTextControl*>(
+			FindAttrView(title, index));
 		if (textControl == NULL)
 			return;
 
@@ -1586,9 +1586,9 @@ FindPanel::GetByNamePredicate(BQuery* query) const
 		return;
 
 	query->PushAttr("name");
-	query->PushString(textControl->TextView()->Text(), true);
+	query->PushString(textControl->Text(), true);
 
-	if (strstr(textControl->TextView()->Text(), "*") != NULL) {
+	if (strstr(textControl->Text(), "*") != NULL) {
 		// assume pattern is a regular expression, try doing an exact match
 		query->PushOp(B_EQ);
 	} else
@@ -2421,10 +2421,10 @@ FindPanel::RestoreWindowState(const BNode* node)
 			if (node->ReadAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
 					buffer, (size_t)info.size) == info.size) {
 				BMessage message;
-				if (message.Unflatten(buffer) == B_OK)
-					for (int32 index = 0; index < count; index++) {
+				if (message.Unflatten(buffer) == B_OK) {
+					for (int32 index = 0; index < count; index++)
 						RestoreAttrState(message, index);
-					}
+				}
 			}
 			delete[] buffer;
 			break;
@@ -2758,8 +2758,8 @@ FindPanel::SaveAttrState(BMessage* message, int32 index)
 	// encode attribute text
 	BString textEntryString = "TextEntry";
 	textEntryString << index;
-	BTextControl* textControl
-		= dynamic_cast<BTextControl*>(FindAttrView(textEntryString.String(), index));
+	BTextControl* textControl = dynamic_cast<BTextControl*>(FindAttrView(
+		textEntryString.String(), index));
 
 	ASSERT(textControl != NULL);
 
