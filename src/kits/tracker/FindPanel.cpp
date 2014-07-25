@@ -1599,12 +1599,13 @@ FindPanel::SwitchMode(uint32 mode)
 			ShowOrHideMimeTypeMenu();
 			AddByNameOrFormulaItems();
 
-			if (buffer.Length()) {
+			if (buffer.Length() > 0) {
 				ASSERT(mode == kByFormulaItem
 					|| oldMode == kByAttributeItem);
 				BTextControl* textControl
 					= dynamic_cast<BTextControl*>(FindView("TextControl"));
-				textControl->SetText(buffer.String());
+				if (textControl != NULL)
+					textControl->SetText(buffer.String());
 			}
 			break;
 		}
