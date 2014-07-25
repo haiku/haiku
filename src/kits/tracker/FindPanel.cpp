@@ -2774,10 +2774,13 @@ FindPanel::SaveAttrState(BMessage* message, int32 index)
 
 	BMenuField* field = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
 	if (field != NULL) {
-		BMenuItem* item = field->Menu()->FindMarked();
-		ASSERT(item);
-		message->AddInt32("logicalRelation",
-			item ? field->Menu()->IndexOf(item) : 0);
+		BMenu* fieldMenu = field->Menu();
+		if (fieldMenu != NULL) {
+			BMenuItem* item = fieldMenu->FindMarked();
+			ASSERT(item != NULL);
+			message->AddInt32("logicalRelation",
+				item != NULL ? field->Menu()->IndexOf(item) : 0);
+		}
 	}
 }
 
