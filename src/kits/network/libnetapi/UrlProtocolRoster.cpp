@@ -14,6 +14,7 @@
 #include <DataRequest.h>
 #include <Debug.h>
 #include <FileRequest.h>
+#include <GopherRequest.h>
 #include <HttpRequest.h>
 #include <UrlRequest.h>
 
@@ -45,6 +46,8 @@ BUrlProtocolRoster::MakeRequest(const BUrl& url,
 		return new(std::nothrow) BFileRequest(url, listener, context);
 	} else if (url.Protocol() == "data") {
 		return new(std::nothrow) BDataRequest(url, listener, context);
+	} else if (url.Protocol() == "gopher") {
+		return new(std::nothrow) BGopherRequest(url, listener, context);
 	}
 
 	return NULL;
