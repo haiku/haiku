@@ -95,8 +95,7 @@ FetchFileJob::Execute()
 	if (result != CURLE_OK)
 		return B_ERROR;
 
-	result = curl_easy_setopt(handle, CURLOPT_PROGRESSFUNCTION,
-		&_ProgressCallback);
+	result = curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1);
 	if (result != CURLE_OK)
 		return B_ERROR;
 
