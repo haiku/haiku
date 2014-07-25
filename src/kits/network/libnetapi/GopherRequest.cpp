@@ -23,6 +23,9 @@
 #include <StringList.h>
 
 /*
+ * TODO: add proper favicon
+ * TODO: add proper dir and document icons
+ * TODO: correctly eat the extraneous .\r\n at end of text files
  * TODO: move parsing stuff to a translator?
  *
  * docs:
