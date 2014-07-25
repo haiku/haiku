@@ -2326,7 +2326,9 @@ FindPanel::RestoreWindowState(const BNode* node)
 		fTemporaryCheck->SetValue(saveMoreOptions.temporary);
 
 		fQueryName->SetModificationMessage(NULL);
-		FillCurrentQueryName(fQueryName, dynamic_cast<FindWindow*>(Window()));
+		FindWindow* findWindow = dynamic_cast<FindWindow*>(Window());
+		if (findWindow != NULL)
+			FillCurrentQueryName(fQueryName, findWindow);
 
 		// set modification message after checking the temporary check box,
 		// and filling out the text control so that we do not always trigger
