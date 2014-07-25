@@ -2064,8 +2064,13 @@ void
 FindPanel::AddAttrRow()
 {
 	BBox* box = dynamic_cast<BBox*>(FindView("Box"));
-	BGridView* grid = dynamic_cast<BGridView*>(box->FindView("AttrFields"));
 
+	ASSERT(box != NULL);
+
+	if (box == NULL)
+		return;
+
+	BGridView* grid = dynamic_cast<BGridView*>(box->FindView("AttrFields"));
 	if (grid == NULL) {
 		// reset layout
 		BLayoutBuilder::Group<>(box, B_VERTICAL);
