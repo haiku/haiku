@@ -35,6 +35,13 @@ All rights reserved.
 
 #include "FindPanel.h"
 
+#include <utility>
+
+#include <fs_attr.h>
+#include <parsedate.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
@@ -46,7 +53,7 @@ All rights reserved.
 #include <FindDirectory.h>
 #include <File.h>
 #include <FilePanel.h>
-#include <GridLayoutBuilder.h>
+#include <GroupLayout.h>
 #include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
@@ -65,12 +72,6 @@ All rights reserved.
 #include <View.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
-
-#include <fs_attr.h>
-#include <parsedate.h>
-#include <stdlib.h>
-#include <strings.h>
-#include <utility>
 
 #include "Attributes.h"
 #include "AutoLock.h"
