@@ -563,8 +563,36 @@ BGopherRequest::_ParseInput(bool last)
 				item << "<span class=\"info\">" << title << "</span>"
 						"<br/>\n";
 				break;
+			case GOPHER_TYPE_AUDIO:
+			case GOPHER_TYPE_SOUND:
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"audio\">" << title << "</span></a>"
+						"<audio src=\"" << link << "\" "
+							"alt=\"" << title << "\"/>"
+						"<span>[player]</span></audio>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_PDF:
+			case GOPHER_TYPE_PDF_ALT:
+				/* generic case for known-to-work items */
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"other\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_MOVIE:
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"video\">" << title << "</span></a>"
+						"<video src=\"" << link << "\" "
+							"alt=\"" << title << "\"/>"
+						"<span>[player]</span></audio>"
+						"<br/>\n";
+				break;
 			default:
-				item << "<div>" << fields.StringAt(FIELD_NAME) << "</div>";
+				_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT,
+					"Unknown gopher item (type 0x%02x '%c')", type, type);
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"unknown\">" << title << "</span></a>"
+						"<br/>\n";
 				break;
 		}
 
