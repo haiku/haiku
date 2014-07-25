@@ -2667,23 +2667,35 @@ FindPanel::RestoreAttrState(const BMessage &message, int32 index)
 	}
 
 	// decode attribute text
-	BString bstring = "TextEntry";
-	bstring << index;
+	BString textEntryString = "TextEntry";
+	textEntryString << index;
 	BTextControl* textControl
-		= dynamic_cast<BTextControl*>(FindAttrView(bstring.String(), index));
-	ASSERT(textControl);
+		= dynamic_cast<BTextControl*>(FindAttrView(textEntryString.String(), index));
+
+	ASSERT(textControl != NULL);
+
 	const char* string;
-	if (message.FindString("attrViewText", index, &string) == B_OK)
+	if (textControl != NULL && textControl->TextView() != NULL
+		&& message.FindString("attrViewText", index, &string) == B_OK) {
 		textControl->TextView()->SetText(string);
+	}
 
 	int32 logicMenuSelectedIndex;
-	BMenuField* field = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
 	if (message.FindInt32("logicalRelation", index,
 			&logicMenuSelectedIndex) == B_OK) {
-		if (field)
-			field->Menu()->ItemAt(logicMenuSelectedIndex)->SetMarked(true);
-		else
-			AddLogicMenu(index, logicMenuSelectedIndex == 0);
+		BMenuField* field = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
+		if (field != NULL) {
+			BMenu* fieldMenu = field->Menu();
+			if (fieldMenu != NULL) {
+				BMenuItem* logicItem = fieldMenu->ItemAt(logicMenuSelectedIndex);
+				if (logicItem != NULL) {
+					logicItem->SetMarked(true);
+					return;
+				}
+			}
+		}
+
+		AddLogicMenu(index, logicMenuSelectedIndex == 0);
 	}
 }
 
@@ -2711,10 +2723,10 @@ FindPanel::SaveAttrState(BMessage* message, int32 index)
 	message->AddString("subMenuSelection", label);
 
 	// encode attribute text
-	BString string = "TextEntry";
-	string << index;
+	BString textEntryString = "TextEntry";
+	textEntryString << index;
 	BTextControl* textControl
-		= dynamic_cast<BTextControl*>(FindAttrView(string.String(), index));
+		= dynamic_cast<BTextControl*>(FindAttrView(textEntryString.String(), index));
 
 	ASSERT(textControl != NULL);
 
