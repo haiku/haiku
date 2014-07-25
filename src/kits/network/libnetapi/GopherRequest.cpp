@@ -112,7 +112,7 @@ static struct {
 
 static const int32 kGopherBufferSize = 4096;
 
-
+static const bool kInlineImages = true;
 
 
 BGopherRequest::BGopherRequest(const BUrl& url, BUrlProtocolListener* listener,
@@ -409,6 +409,7 @@ BGopherRequest::_ParseInput(bool last)
 		BString item;
 		BString title = fields.StringAt(FIELD_NAME);
 		BString link("gopher://");
+		BString user;
 		if (fields.CountStrings() > 3) {
 			link << fields.StringAt(FIELD_HOST);
 			if (fields.StringAt(FIELD_PORT).Length())
@@ -452,6 +453,104 @@ BGopherRequest::_ParseInput(bool last)
 						"<br/>\n";
 				if (fPosition == 0 && pageTitle.Length() == 0)
 					pageTitle << "Error: " << title;
+				break;
+			case GOPHER_TYPE_QUERY:
+				/* TODO: handle search better.
+				 * For now we use an unnamed input field and accept sending ?=foo
+				 * as it seems at least Veronica-2 ignores the = but it's unclean.
+				 */
+				item << "<form method=\"get\" action=\"" << link << "\">"
+						"<span class=\"query\">"
+						"<label>" << title << " "
+						"<input name=\"\" type=\"text\" align=\"right\" />"
+						"</label>"
+						"</span></form>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_TELNET:
+				/* telnet: links
+				 * cf. gopher://78.80.30.202/1/ps3
+				 * -> gopher://78.80.30.202:23/8/ps3/new -> new@78.80.30.202
+				 */
+				link = "telnet://";
+				user = fields.StringAt(FIELD_SELECTOR);
+				if (user.FindLast('/') > -1) {
+					user.Remove(0, user.FindLast('/'));
+					link << user << "@";
+				}
+				link << fields.StringAt(FIELD_HOST);
+				if (fields.StringAt(FIELD_PORT) != "23")
+					link << ":" << fields.StringAt(FIELD_PORT);
+
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"telnet\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_TN3270:
+				/* tn3270: URI scheme, cf. http://tools.ietf.org/html/rfc6270 */
+				link = "tn3270://";
+				user = fields.StringAt(FIELD_SELECTOR);
+				if (user.FindLast('/') > -1) {
+					user.Remove(0, user.FindLast('/'));
+					link << user << "@";
+				}
+				link << fields.StringAt(FIELD_HOST);
+				if (fields.StringAt(FIELD_PORT) != "23")
+					link << ":" << fields.StringAt(FIELD_PORT);
+
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"telnet\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_CSO_SEARCH:
+				/* CSO search.
+				 * At least Lynx supports a cso:// URI scheme:
+				 * http://lynx.isc.org/lynx2.8.5/lynx2-8-5/lynx_help/lynx_url_support.html
+				 */
+				link = "cso://";
+				user = fields.StringAt(FIELD_SELECTOR);
+				if (user.FindLast('/') > -1) {
+					user.Remove(0, user.FindLast('/'));
+					link << user << "@";
+				}
+				link << fields.StringAt(FIELD_HOST);
+				if (fields.StringAt(FIELD_PORT) != "105")
+					link << ":" << fields.StringAt(FIELD_PORT);
+
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"cso\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_GIF:
+			case GOPHER_TYPE_IMAGE:
+			case GOPHER_TYPE_PNG:
+			case GOPHER_TYPE_BITMAP:
+				/* quite dangerous, cf. gopher://namcub.accela-labs.com/1/pics */
+				if (kInlineImages) {
+					item << "<a href=\"" << link << "\">"
+							"<span class=\"img\">" << title << " "
+							"<img src=\"" << link << "\" "
+								"alt=\"" << title << "\"/>"
+							"</span></a>"
+							"<br/>\n";
+					break;
+				}
+				/* fallback to default, link them */
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"img\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_HTML:
+				/* cf. gopher://pineapple.vg/1 */
+				if (fields.StringAt(FIELD_SELECTOR).StartsWith("URL:")) {
+					link = fields.StringAt(FIELD_SELECTOR);
+					link.Remove(0, 4);
+				}
+				/* cf. gopher://sdf.org/1/sdf/classes/ */
+
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"html\">" << title << "</span></a>"
+						"<br/>\n";
 				break;
 			case GOPHER_TYPE_INFO:
 				// TITLE resource, cf.
