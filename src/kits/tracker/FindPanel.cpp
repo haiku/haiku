@@ -2652,45 +2652,52 @@ FindPanel::AddAttributeControls(int32 gridRow)
 void
 FindPanel::RestoreAttrState(const BMessage &message, int32 index)
 {
-	BMenu* menu = dynamic_cast<BMenuField*>(FindAttrView("MenuField", index))
-		->Menu();
-	// decode menu selections
+	BMenuField* menuField
+		= dynamic_cast<BMenuField*>(FindAttrView("MenuField", index));
+	if (menuField != NULL) {
+		// decode menu selections
+		BMenu* menu = menuField->Menu();
 
-	AddMimeTypeAttrs(menu);
+		ASSERT(menu != NULL);
 
-	const char* label;
-	if (message.FindString("menuSelection", index, &label) == B_OK) {
-		int32 itemIndex = SelectItemWithLabel(menu, label);
-		if (itemIndex >=0) {
-			menu = menu->SubmenuAt(itemIndex);
-			if (menu && message.FindString("subMenuSelection", index, &label)
-					== B_OK)
-				SelectItemWithLabel(menu, label);
+		AddMimeTypeAttrs(menu);
+		const char* label;
+		if (message.FindString("menuSelection", index, &label) == B_OK) {
+			int32 itemIndex = SelectItemWithLabel(menu, label);
+			if (itemIndex >= 0) {
+				menu = menu->SubmenuAt(itemIndex);
+				if (menu != NULL && message.FindString("subMenuSelection",
+						index, &label) == B_OK) {
+					SelectItemWithLabel(menu, label);
+				}
+			}
 		}
 	}
 
 	// decode attribute text
 	BString textEntryString = "TextEntry";
 	textEntryString << index;
-	BTextControl* textControl
-		= dynamic_cast<BTextControl*>(FindAttrView(textEntryString.String(), index));
+	BTextControl* textControl = dynamic_cast<BTextControl*>(
+		FindAttrView(textEntryString.String(), index));
 
 	ASSERT(textControl != NULL);
 
 	const char* string;
-	if (textControl != NULL && textControl->TextView() != NULL
+	if (textControl != NULL
 		&& message.FindString("attrViewText", index, &string) == B_OK) {
-		textControl->TextView()->SetText(string);
+		textControl->SetText(string);
 	}
 
 	int32 logicMenuSelectedIndex;
 	if (message.FindInt32("logicalRelation", index,
 			&logicMenuSelectedIndex) == B_OK) {
-		BMenuField* field = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
+		BMenuField* field = dynamic_cast<BMenuField*>(
+			FindAttrView("Logic", index));
 		if (field != NULL) {
 			BMenu* fieldMenu = field->Menu();
 			if (fieldMenu != NULL) {
-				BMenuItem* logicItem = fieldMenu->ItemAt(logicMenuSelectedIndex);
+				BMenuItem* logicItem
+					= fieldMenu->ItemAt(logicMenuSelectedIndex);
 				if (logicItem != NULL) {
 					logicItem->SetMarked(true);
 					return;
