@@ -3130,14 +3130,13 @@ DraggableQueryIcon::DragStarted(BMessage* dragMessage)
 	dragMessage->RemoveData("be:clip_name");
 
 	FindWindow* window = dynamic_cast<FindWindow*>(Window());
-	dragMessage->AddString("be:clip_name",
-		window->BackgroundView()->UserSpecifiedName() ?
-			window->BackgroundView()->UserSpecifiedName()
-			: B_TRANSLATE("New Query"));
 
-	return true;
 	ASSERT(window != NULL);
 
+	return window != NULL && dragMessage->AddString("be:clip_name",
+		window->BackgroundView()->UserSpecifiedName() != NULL
+			? window->BackgroundView()->UserSpecifiedName()
+			: B_TRANSLATE("New Query")) == B_OK;
 }
 
 
