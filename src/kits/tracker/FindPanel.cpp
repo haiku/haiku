@@ -2769,7 +2769,8 @@ FindPanel::SaveAttrState(BMessage* message, int32 index)
 
 	ASSERT(textControl != NULL);
 
-	message->AddString("attrViewText", textControl->TextView()->Text());
+	if (textControl != NULL)
+		message->AddString("attrViewText", textControl->Text());
 
 	BMenuField* field = dynamic_cast<BMenuField*>(FindAttrView("Logic", index));
 	if (field != NULL) {
