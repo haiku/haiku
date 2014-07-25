@@ -3252,11 +3252,11 @@ MostUsedNames::~MostUsedNames()
 	// write most used list to file
 
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK
+		|| path.Append(fDirectory) != B_OK || path.Append(fFileName) != B_OK) {
 		return;
+	}
 
-	path.Append(fDirectory);
-	path.Append(fFileName);
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	if (file.InitCheck() == B_OK) {
 		for (int32 i = 0; i < fList.CountItems(); i++) {
@@ -3393,11 +3393,10 @@ MostUsedNames::LoadList()
 	// load the most used names list
 
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK
+		|| path.Append(fDirectory) != B_OK || path.Append(fFileName) != B_OK) {
 		return;
-
-	path.Append(fDirectory);
-	path.Append(fFileName);
+	}
 
 	FILE* file = fopen(path.Path(), "r");
 	if (file == NULL)
