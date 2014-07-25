@@ -3033,11 +3033,12 @@ DeleteTransientQueriesTask::ProcessOneRef(Model* model)
 	if (!QueryOldEnough(model))
 		return false;
 
-	ASSERT(dynamic_cast<TTracker*>(be_app));
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+
+	ASSERT(tracker != NULL);
 
 	// check that it is not showing
-	if (dynamic_cast<TTracker*>(be_app)->EntryHasWindowOpen(
-			model->EntryRef())) {
+	if (tracker != NULL && tracker->EntryHasWindowOpen(model->EntryRef())) {
 		PRINT(("query %s, showing, can't delete\n", model->Name()));
 		return false;
 	}
