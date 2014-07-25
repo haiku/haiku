@@ -895,7 +895,12 @@ FindPanel::~FindPanel()
 void
 FindPanel::AttachedToWindow()
 {
-	BNode* node = dynamic_cast<FindWindow*>(Window())->QueryNode();
+	FindWindow* findWindow = dynamic_cast<FindWindow*>(Window());
+	ASSERT(findWindow != NULL);
+	if (findWindow == NULL)
+		return;
+
+	BNode* node = findWindow->QueryNode();
 	fSearchModeMenu->SetTargetForItems(this);
 	fQueryName->SetTarget(this);
 	fLatch->SetTarget(this);
@@ -905,7 +910,7 @@ FindPanel::AttachedToWindow()
 		// on which mime type is preselected
 	RestoreWindowState(node);
 
-	if (!Window()->CurrentFocus()) {
+	if (!findWindow->CurrentFocus()) {
 		// try to pick a good focus if we restore to one already
 		BTextControl* textControl
 			= dynamic_cast<BTextControl*>(FindView("TextControl"));
@@ -941,7 +946,7 @@ FindPanel::AttachedToWindow()
 	if (fDraggableIcon != NULL)
 		fDraggableIcon->SetTarget(BMessenger(this));
 
-	fRecentQueries->SetTargetForItems(Window());
+	fRecentQueries->SetTargetForItems(findWindow);
 }
 
 
