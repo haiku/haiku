@@ -1166,7 +1166,10 @@ SizeAttributeText::PreferredWidth(const BPoseView* pose) const
 TimeAttributeText::TimeAttributeText(const Model* model,
 	const BColumn* column)
 	:
-	ScalarAttributeText(model, column)
+	ScalarAttributeText(model, column),
+	fLastClockIs24(false),
+	fLastDateOrder(kDateFormatEnd),
+	fLastTimeFormatSeparator(kSeparatorsEnd)
 {
 }
 
@@ -1185,6 +1188,7 @@ TimeAttributeText::FitValue(BString* result, const BPoseView* view)
 {
 	if (fValueDirty)
 		fValue = ReadValue();
+
 	fOldWidth = fColumn->Width();
 	fTruncatedWidth = TruncTime(result, fValue, view, fOldWidth);
 	fDirty = false;
