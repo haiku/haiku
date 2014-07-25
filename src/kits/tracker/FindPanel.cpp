@@ -37,6 +37,7 @@ All rights reserved.
 
 #include <utility>
 
+#include <errno.h>
 #include <fs_attr.h>
 #include <parsedate.h>
 #include <stdlib.h>
@@ -286,15 +287,15 @@ FindWindow::TryOpening(const entry_ref* ref)
 
 
 void
-FindWindow::GetDefaultQuery(BEntry &entry)
+FindWindow::GetDefaultQuery(BEntry& entry)
 {
 	BPath path;
-	find_directory(B_USER_DIRECTORY, &path, true);
-	path.Append("queries");
-	mkdir(path.Path(), 0777);
-	BDirectory directory(path.Path());
-
-	entry.SetTo(&directory, "default");
+	if (find_directory(B_USER_DIRECTORY, &path, true) == B_OK
+		&& path.Append("queries") == B_OK
+		&& (mkdir(path.Path(), 0777) == 0 || errno == EEXIST)) {
+		BDirectory directory(path.Path());
+		entry.SetTo(&directory, "default");
+	}
 }
 
 
@@ -610,23 +611,24 @@ FindWindow::FindSaveCommon(bool find)
 	if (newFile) {
 		// create query file in the user's directory
 		BPath path;
-		find_directory(B_USER_DIRECTORY, &path, true);
-		path.Append("queries");
 		// there might be no queries folder yet, create one
-		mkdir(path.Path(), 0777);
+		if (find_directory(B_USER_DIRECTORY, &path, true) == B_OK
+			&& path.Append("queries") == B_OK
+			&& (mkdir(path.Path(), 0777) == 0 || errno == EEXIST)) {
+			// either use the user specified name, or go with the name
+			// generated from the predicate, etc.
+			BString name;
+			if (userSpecifiedName == NULL)
+				GetDefaultName(name);
+			else
+				name << userSpecifiedName;
 
-		// either use the user specified name, or go with the name
-		// generated from the predicate, etc.
-		if (!userSpecifiedName) {
-			BString text;
-			GetDefaultName(text);
-			path.Append(text.String());
-		} else
-			path.Append(userSpecifiedName);
-
-		entry.SetTo(path.Path());
-		entry.Remove();
-		entry.GetRef(&fRef);
+			if (path.Append(name.String()) == B_OK) {
+				entry.SetTo(path.Path());
+				entry.Remove();
+				entry.GetRef(&fRef);
+			}
+		}
 	}
 
 	fFile = new BFile(&entry, O_RDWR | O_CREAT);
