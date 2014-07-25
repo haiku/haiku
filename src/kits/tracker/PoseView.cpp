@@ -1127,11 +1127,17 @@ BPoseView::InitDirentIterator(const entry_ref* ref)
 	ASSERT(sourceModel.Node() != NULL);
 
 	BDirectory* directory = dynamic_cast<BDirectory*>(sourceModel.Node());
+
 	ASSERT(directory != NULL);
 
-	EntryListBase* result = new CachedDirectoryEntryList(*directory);
-	if (result->Rewind() != B_OK) {
-		delete result;
+	if (directory == NULL) {
+		HideBarberPole();
+		return NULL;
+	}
+
+	EntryListBase* entryList = new CachedDirectoryEntryList(*directory);
+	if (entryList->Rewind() != B_OK) {
+		delete entryList;
 		HideBarberPole();
 		return NULL;
 	}
@@ -1139,7 +1145,7 @@ BPoseView::InitDirentIterator(const entry_ref* ref)
 	TTracker::WatchNode(sourceModel.NodeRef(), B_WATCH_DIRECTORY
 		| B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR, this);
 
-	return result;
+	return entryList;
 }
 
 
