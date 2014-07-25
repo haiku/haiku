@@ -327,12 +327,14 @@ BGopherRequest::_ProtocolLoop()
 				fListener->HeadersReceived(this);
 
 			// now we can assign MIME type if we know it
+			const char *mime = "application/octet-stream";
 			for (i = 0; gopher_type_map[i].type != GOPHER_TYPE_NONE; i++) {
 				if (gopher_type_map[i].type == fItemType) {
-					fResult.SetContentType(gopher_type_map[i].mime);
+					mime = gopher_type_map[i].mime;
 					break;
 				}
 			}
+			fResult.SetContentType(mime);
 		}
 
 		if (_NeedsParsing())
