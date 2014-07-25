@@ -304,7 +304,7 @@ WidgetAttributeText::WidgetAttributeText(const Model* model,
 	fDirty(true),
 	fValueIsDefined(false)
 {
-	ASSERT(fColumn);
+	ASSERT(fColumn != NULL);
 	ASSERT(fColumn->Width() > 0);
 }
 
@@ -544,9 +544,9 @@ StringAttributeText::PreferredWidth(const BPoseView* pose) const
 int
 StringAttributeText::Compare(WidgetAttributeText& attr, BPoseView* view)
 {
-	StringAttributeText* compareTo
-		= dynamic_cast<StringAttributeText*>(&attr);
-	ASSERT(compareTo);
+	StringAttributeText* compareTo = dynamic_cast<StringAttributeText*>(&attr);
+
+	ASSERT(compareTo != NULL);
 
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
@@ -602,6 +602,7 @@ ScalarAttributeText::Value()
 {
 	if (fValueDirty)
 		fValue = ReadValue();
+
 	return fValue;
 }
 
@@ -616,6 +617,7 @@ ScalarAttributeText::CheckAttributeChanged()
 	fValue = newValue;
 	fDirty = true;
 		// have to redo fitted string
+
 	return true;
 }
 
@@ -632,10 +634,9 @@ ScalarAttributeText::PreferredWidth(const BPoseView* pose) const
 int
 ScalarAttributeText::Compare(WidgetAttributeText& attr, BPoseView*)
 {
-	ScalarAttributeText* compareTo
-		= dynamic_cast<ScalarAttributeText*>(&attr);
-	ASSERT(compareTo);
-		// make sure we're not comparing apples and oranges
+	ScalarAttributeText* compareTo = dynamic_cast<ScalarAttributeText*>(&attr);
+
+	ASSERT(compareTo != NULL);
 
 	if (fValueDirty)
 		fValue = ReadValue();
@@ -744,7 +745,7 @@ NameAttributeText::Compare(WidgetAttributeText& attr, BPoseView* view)
 {
 	NameAttributeText* compareTo = dynamic_cast<NameAttributeText*>(&attr);
 
-	ASSERT(compareTo);
+	ASSERT(compareTo != NULL);
 
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
@@ -880,7 +881,7 @@ RealNameAttributeText::Compare(WidgetAttributeText& attr, BPoseView* view)
 	RealNameAttributeText* compareTo
 		= dynamic_cast<RealNameAttributeText*>(&attr);
 
-	ASSERT(compareTo);
+	ASSERT(compareTo != NULL);
 
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
@@ -1547,10 +1548,12 @@ GenericAttributeText::Compare(WidgetAttributeText& attr, BPoseView*)
 {
 	GenericAttributeText* compareTo
 		= dynamic_cast<GenericAttributeText*>(&attr);
-	ASSERT(compareTo);
+
+	ASSERT(compareTo != NULL);
 
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
+
 	if (compareTo->fValueDirty)
 		compareTo->ReadValue(&compareTo->fFullValueText);
 
