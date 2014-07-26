@@ -652,22 +652,22 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 }
 
 
-/*! Fills the outBuffer with an already decoded video frame.
+/*! \brief Fills the outBuffer with an already decoded video frame.
 
 	Besides the main duty described above, this method also fills out the other
 	output parameters as documented below.
 
-	@param outBuffer Pointer to the output buffer to copy the decoded video
+	\param outBuffer Pointer to the output buffer to copy the decoded video
 		frame to.
-	@param outFrameCount Pointer to the output variable to assign the number of
+	\param outFrameCount Pointer to the output variable to assign the number of
 		copied video frames (usually one video frame).
-	@param mediaHeader Pointer to the output media header that contains the
+	\param mediaHeader Pointer to the output media header that contains the
 		decoded video frame properties.
-	@param info TODO (not used at the moment)
+	\param info TODO (not used at the moment)
 
-	@return B_OK Decoding a video frame succeeded.
-	@return B_LAST_BUFFER_ERROR There are no more video frames available.
-	@return other error codes
+	\returns B_OK Decoding a video frame succeeded.
+	\returns B_LAST_BUFFER_ERROR There are no more video frames available.
+	\returns other error codes
 */
 status_t
 AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
@@ -689,7 +689,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 }
 
 
-/*! Decode next video frame
+/*! \brief Decode next video frame
 
     We decode exactly one video frame into fDecodedData. To achieve this goal,
     we might need to request several chunks of encoded data resulting in a
@@ -872,10 +872,10 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 }
 
 
-/*! Updates relevant fields of the class member fHeader with the properties of
+/*! \brief Updates relevant fields of the class member fHeader with the properties of
 	the most recently decoded video frame.
 
-	It is assumed tat this function is called in _DecodeNextVideoFrame() only
+	It is assumed that this function is called in _DecodeNextVideoFrame() only
 	when the following asserts hold true:
 		1. We actually got a new picture decoded by the video decoder.
 		2. fHeader wasn't updated for the new picture yet. You MUST call this
@@ -909,7 +909,7 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 }
 
 
-/*! This function applies deinterlacing (only if needed) and color conversion
+/*! \brief This function applies deinterlacing (only if needed) and color conversion
     to the video frame in fRawDecodedPicture.
 
 	It is assumed that fRawDecodedPicture wasn't deinterlaced and color
