@@ -482,6 +482,12 @@ is_in_list()
 	return 1
 }
 
+# check for no params, --help or -h and show usage immediately
+if [ -z "$1" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+	usage; exit 0;
+fi
+
+
 # get cwd and the source directory
 currentDir=`pwd`
 cd `dirname "$0"`
@@ -670,7 +676,6 @@ while [ $# -gt 0 ] ; do
 			shift 2
 			;;
 		--enable-multiuser)	HAIKU_ENABLE_MULTIUSER=1; shift 1;;
-		--help | -h)	usage; exit 0;;
 		--host-only)	HAIKU_HOST_BUILD_ONLY=1; shift 1;;
 		--include-gpl-addons)	HAIKU_INCLUDE_GPL_ADDONS=1; shift 1;;
 		--include-patented-code)	HAIKU_INCLUDE_PATENTED_CODE=1; shift 1;;
