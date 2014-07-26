@@ -510,10 +510,12 @@ BGopherRequest::_ParseInput(bool last)
 				 * For now we use an unnamed input field and accept sending ?=foo
 				 * as it seems at least Veronica-2 ignores the = but it's unclean.
 				 */
-				item << "<form method=\"get\" action=\"" << link << "\">"
+				item << "<form method=\"get\" action=\"" << link << "\" "
+							"onsubmit=\"window.location = this.action + '?' + "
+								"this.elements['q'].value; return false;\">"
 						"<span class=\"query\">"
 						"<label>" << title << " "
-						"<input name=\"\" type=\"text\" align=\"right\" />"
+						"<input id=\"q\" name=\"\" type=\"text\" align=\"right\" />"
 						"</label>"
 						"</span></form>"
 						"<br/>\n";
