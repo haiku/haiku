@@ -213,23 +213,23 @@ rule ArchitectureSetup architecture
 		;
 	HAIKU_LIBRARY_BEGIN_GLUE_CODE_$(architecture) =
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
-		<$(architecture)>crtbegin.o
+		<$(architecture)>crtbeginS.o
 		<src!system!glue!$(architecture)>init_term_dyn.o
 		;
 	HAIKU_LIBRARY_END_GLUE_CODE_$(architecture) =
-		<$(architecture)>crtend.o
+		<$(architecture)>crtendS.o
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crtn.o
 		;
 	HAIKU_EXECUTABLE_BEGIN_GLUE_CODE_$(architecture) =
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
-		<$(architecture)>crtbegin.o
+		<$(architecture)>crtbeginS.o
 		<src!system!glue!$(architecture)>start_dyn.o
 		<src!system!glue!$(architecture)>init_term_dyn.o
 		;
 	HAIKU_EXECUTABLE_END_GLUE_CODE_$(architecture)
 		= $(HAIKU_LIBRARY_END_GLUE_CODE_$(architecture)) ;
 
-	SEARCH on <$(architecture)>crtbegin.o <$(architecture)>crtend.o
+	SEARCH on <$(architecture)>crtbeginS.o <$(architecture)>crtendS.o
 		= $(HAIKU_GCC_LIB_DIR_$(architecture)) ;
 
 	# init library name map
@@ -472,10 +472,10 @@ rule KernelArchitectureSetup architecture
 		# compiling (part of) the boot loader.
 
 	# kernel add-on glue code
-	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = <$(architecture)>crtbegin.o
+	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = <$(architecture)>crtbeginS.o
 		<src!system!glue!$(architecture)>haiku_version_glue.o ;
 	HAIKU_KERNEL_ADDON_END_GLUE_CODE
-		= $(HAIKU_GCC_LIBGCC_$(architecture)) <$(architecture)>crtend.o ;
+		= $(HAIKU_GCC_LIBGCC_$(architecture)) <$(architecture)>crtendS.o ;
 }
 
 
