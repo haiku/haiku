@@ -117,31 +117,31 @@ BFileRequest::_ProtocolLoop()
 	char name[B_FILE_NAME_LENGTH];
 	BEntry entry;
 	while (directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
-		// We read directories using the EPFL (Easily Parsed List Format)
+		// We read directories using the EPLF (Easily Parsed List Format)
 		// This happens to be one of the formats that WebKit can understand,
 		// and it is not too hard to parse or generate.
 		// http://tools.ietf.org/html/draft-bernstein-eplf-02
-		BString epfl("+");
+		BString eplf("+");
 		if (entry.IsFile() || entry.IsSymLink()) {
-			epfl += "r,";
+			eplf += "r,";
 			off_t fileSize;
 			if (entry.GetSize(&fileSize) == B_OK)
-				epfl << "s" << fileSize << ",";
+				eplf << "s" << fileSize << ",";
 
 		} else if (entry.IsDirectory())
-			epfl += "/,";
+			eplf += "/,";
 
 		time_t modification;
 		if (entry.GetModificationTime(&modification) == B_OK)
-			epfl << "m" << modification << ",";
+			eplf << "m" << modification << ",";
 
 		entry.GetName(name);
-		epfl << "\t" << name << "\r\n";
+		eplf << "\t" << name << "\r\n";
 		if (fListener != NULL) {
-			fListener->DataReceived(this, epfl.String(), transferredSize,
-				epfl.Length());
+			fListener->DataReceived(this, eplf.String(), transferredSize,
+				eplf.Length());
 		}
-		transferredSize += epfl.Length();
+		transferredSize += eplf.Length();
 	}
 
 	if (fListener != NULL)
