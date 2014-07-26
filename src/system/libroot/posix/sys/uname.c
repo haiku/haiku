@@ -58,6 +58,9 @@ uname(struct utsname *info)
 			case B_CPU_x86_64:
 				platform = "x86_64";
 				break;
+			default: //TODO:add others
+				platform = "unknown";
+				break;
 		}
 	}
 
