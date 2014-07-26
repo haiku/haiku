@@ -139,6 +139,10 @@ BFileRequest::_ProtocolLoop()
 		if (entry.GetPermissions(&permissions) == B_OK)
 			eplf << "up" << BString().SetToFormat("%03o", permissions) << ",";
 
+		node_ref ref;
+		if (entry.GetNodeRef(&ref) == B_OK)
+			eplf << "i" << ref.device << "." << ref.node << ",";
+
 		entry.GetName(name);
 		eplf << "\t" << name << "\r\n";
 		if (fListener != NULL) {
