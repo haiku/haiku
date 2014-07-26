@@ -705,14 +705,32 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
     To every decoded video frame there is a media_header populated in
     fHeader, containing the corresponding video frame properties.
 
-	@return B_OK, when we successfully decoded one video frame
+	Normally every decoded video frame has a start_time field populated in the
+	associated fHeader, that determines the presentation time of the frame.
+	This relationship will only hold true, when each data chunk that is
+	provided via GetNextChunk() contains data for exactly one encoded video
+	frame (one complete frame) - not more and not less.
+
+	We can decode data chunks that contain partial video frame data, too. In
+	that case, you cannot trust the value of the start_time field in fHeader.
+	We simply have no logic in place to establish a meaningful relationship
+	between an incomplete frame and the start time it should be presented.
+	Though this	might change in the future.
+
+	We can decode data chunks that contain more than one video frame, too. In
+	that case, you cannot trust the value of the start_time field in fHeader.
+	We simply have no logic in place to track the start_time across multiple
+	video frames. So a meaningful relationship between the 2nd, 3rd, ... frame
+	and the start time it should be presented isn't established at the moment.
+	Though this	might change in the future.
+
+	\return B_OK, when we successfully decoded one video frame
  */
 status_t
 AVCodecDecoder::_DecodeNextVideoFrame()
 {
 	assert(fTempPacket.size >= 0);
 
-	bool firstRun = true;
 	while (true) {
 		media_header chunkMediaHeader;
 
@@ -730,6 +748,31 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 				fChunkBuffer));
 			fTempPacket.size = fChunkBufferSize;
 
+			fContext->reordered_opaque = chunkMediaHeader.start_time;
+				// Let ffmpeg handle the relationship between start_time and
+				// decoded video frame.
+				//
+				// Explanation:
+				// The received chunk buffer may not contain the next video
+				// frame to be decoded, due to frame reordering (e.g. MPEG1/2
+				// provides encoded video frames in a different order than the
+				// decoded video frame).
+				//
+				// FIXME: Research how to establish a meaningful relationship
+				// between start_time and decoded video frame when the received
+				// chunk buffer contains partial video frames. Maybe some data
+				// formats contain time stamps (ake pts / dts fields) that can
+				// be evaluated by FFMPEG. But as long as I don't have such
+				// video data to test it, it makes no sense to implement it.
+				//
+				// FIXME: Implement tracking start_time of video frames
+				// originating in data chunks that encode more than one video
+				// frame at a time. In that case on would increment the
+				// start_time for each consecutive frame of such a data chunk
+				// (like it is done for audio frame decoding). But as long as
+				// I don't have such video data to test it, it makes no sense
+				// to implement it.
+
 #ifdef LOG_STREAM_TO_FILE
 			if (sDumpedPackets < 100) {
 				sStreamLogFile.Write(fChunkBuffer, fChunkBufferSize);
@@ -738,13 +781,6 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 			} else if (sDumpedPackets == 100)
 				sStreamLogFile.Unset();
 #endif
-		}
-
-		if (firstRun) {
-			firstRun = false;
-
-			fHeader.start_time = chunkMediaHeader.start_time;
-			fStartTime = chunkMediaHeader.start_time;
 		}
 
 #if DO_PROFILING
@@ -857,12 +893,13 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	fHeader.type = B_MEDIA_RAW_VIDEO;
 	fHeader.file_pos = 0;
 	fHeader.orig_size = 0;
+	fHeader.start_time = fRawDecodedPicture->reordered_opaque;
 	fHeader.u.raw_video.field_gamma = 1.0;
 	fHeader.u.raw_video.field_sequence = fFrame;
 	fHeader.u.raw_video.field_number = 0;
 	fHeader.u.raw_video.pulldown_number = 0;
 	fHeader.u.raw_video.first_active_line = 1;
-	fHeader.u.raw_video.line_count = fContext->height;
+	fHeader.u.raw_video.line_count = fRawDecodedPicture->height;
 
 	TRACE("[v] start_time=%02d:%02d.%02d field_sequence=%lu\n",
 		int((fHeader.start_time / 60000000) % 60),
