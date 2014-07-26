@@ -135,6 +135,10 @@ BFileRequest::_ProtocolLoop()
 		if (entry.GetModificationTime(&modification) == B_OK)
 			eplf << "m" << modification << ",";
 
+		mode_t permissions;
+		if (entry.GetPermissions(&permissions) == B_OK)
+			eplf << "up" << BString().SetToFormat("%03o", permissions) << ",";
+
 		entry.GetName(name);
 		eplf << "\t" << name << "\r\n";
 		if (fListener != NULL) {
