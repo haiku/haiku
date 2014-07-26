@@ -110,6 +110,7 @@ options:
                               less likely).
 
 environment variables:
+  CC                          The host compiler. Defaults to "gcc".
   HAIKU_AR_x86_gcc2           The static library archiver for x86_gcc2.
                               Defaults to "ar".
   HAIKU_CC_x86_gcc2           The x86_gcc2 compiler. Defaults to "gcc".
@@ -503,10 +504,14 @@ useGccGraphiteDefault=0
 unknownArchIndex=1
 haikuTargetArchs=
 
+if [ -z "$CC" ]; then
+	CC=gcc
+fi
+
 # exported (BuildSetup) default parameter values
 #
-HOST_GCC_RAW_VERSION=`gcc -dumpversion`
-HOST_GCC_MACHINE=`gcc -dumpmachine`
+HOST_GCC_RAW_VERSION=`$CC -dumpversion`
+HOST_GCC_MACHINE=`$CC -dumpmachine`
 HAIKU_INCLUDE_GPL_ADDONS=0
 HAIKU_INCLUDE_PATENTED_CODE=0
 HAIKU_INCLUDE_SOURCES=0
@@ -520,8 +525,8 @@ HAIKU_HOST_USE_XATTR=0
 HAIKU_HOST_USE_XATTR_REF=0
 HAIKU_HOST_BUILD_ONLY=0
 HOST_EXTENDED_REGEX_SED="sed -r"
-HOST_GCC_LD=`gcc -print-prog-name=ld`
-HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
+HOST_GCC_LD=`$CC -print-prog-name=ld`
+HOST_GCC_OBJCOPY=`$CC -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
 HOST_SFDISK=$SFDISK_BINARY
 HOST_SHA256=
