@@ -7,43 +7,43 @@ Add graph	ActivityWindow		Dodaj wykres
 Teams	DataSource		Zespoły
 Hide legend	ActivityView		Ukryj legendę
 MiB	DataSource		MiB
-Network send	DataSource		Wysłano
-CPU usage (combined)	DataSource		Użycie CPU (całkowite)
-CPU	DataSource		CPU
+Network send	DataSource		Wysłane
+CPU usage (combined)	DataSource		Użycie procesora (całkowite)
+CPU	DataSource		Procesor
 Used memory	DataSource		Użyta pamięć
 Cached memory	DataSource		Pamięć cache
 Apps	DataSource		Aplikacje
 Show legend	ActivityView		Pokaż legendę
 Text clipboard	DataSource		Schowek tekstowy
 Settings	ActivityWindow		Ustawienia
-Receiving	DataSource		Otrzymano
+Receiving	DataSource		Otrzymane
 Settings…	ActivityWindow		Ustawienia…
 Ports	DataSource		Porty
 Page faults	DataSource		Błędy stronicowania
-Sending	DataSource		Wysyłanie
+Sending	DataSource		Wysłane
 Cache	DataSource		Cache
 %.1f faults/s	DataSource		%.1f błędów/s
 Update time interval:	SettingsWindow		Częstotliwość odświeżania:
 TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Wyjdź
-Block cache memory	DataSource		Pamięć bloku cache
+Quit	ActivityWindow		Zakończ
+Block cache memory	DataSource		Blokowa pamięć cache
 %.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Usuń wykres
-%lld sec.	SettingsWindow		%lld sek.
+%lld sec.	SettingsWindow		%lld s
 %lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		Użycie CPU
-Raw clipboard	DataSource		Surowy schowek
+CPU usage	DataSource		Użycie procesora
+Raw clipboard	DataSource		Schowek binarny
 Sems	DataSource		Semy
 %.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		Monitor Aktywności
 Running applications	DataSource		Uruchomione aplikacje
 Semaphores	DataSource		Semafory
-Block cache	DataSource		Blok pamięci cache
+Block cache	DataSource		Blokowa pamięć cache
 Swap space	DataSource		Przestrzeń wymiany
-Swap	DataSource		Swap
+Swap	DataSource		Przestrzeń wymiany
 File	ActivityWindow		Plik
-usage	DataSource		zużycie
-Additional items	ActivityView		Dodatki
-Network receive	DataSource		Odebrano
+usage	DataSource		użycie
+Additional items	ActivityView		Dodatkowe elementy
+Network receive	DataSource		Otrzymane
 Memory	DataSource		Pamięć
 RX	DataSource	Shorter version for Receiving.	RX

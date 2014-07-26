@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Expander	3431738656
+1	polish	x-vnd.Haiku-Expander	2177073262
 Expand	ExpanderMenu		Rozpakuj
 Close window when done expanding	ExpanderPreferences		Zamknij okno po zakończeniu rozpakowywania
 Set destination…	ExpanderMenu		Wybierz miejsce docelowe…
@@ -34,6 +34,7 @@ Automatically show contents listing	ExpanderPreferences		Automatycznie pokaż li
 OK	ExpanderPreferences		OK
 Leave destination folder path empty	ExpanderPreferences		Pozostaw katalog docelowy pusty
 Failed to create the destination folder.	ExpanderWindow		Nie udało się utworzyć katalogu docelowego.
+Select '%s'…	DirectoryFilePanel		Wybierz „%s”…
 Create	ExpanderWindow		Utwórz
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Katalog został przeniesiony, przemianowany\nalbo nie jest wspierany.
 The file doesn't exist	ExpanderWindow		Plik nie istnieje

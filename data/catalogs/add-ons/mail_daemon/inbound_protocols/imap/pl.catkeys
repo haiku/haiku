@@ -1,5 +1,5 @@
 1	polish	x-vnd.Haiku-IMAP	3892875357
-Destination:	imap_config		Przeznaczenie:
+Destination:	imap_config		Katalog docelowy:
 status	IMAPFolderConfig		status
 Apply	IMAPFolderConfig		Zastosuj
 IMAP Folders	imap_config		Katalogi IMAP

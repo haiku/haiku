@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Expander	3431738656
+1	french	x-vnd.Haiku-Expander	2177073262
 Expand	ExpanderMenu		Décompresser
 Close window when done expanding	ExpanderPreferences		Fermer la fenêtre après l'extraction
 Set destination…	ExpanderMenu		Choisir la destination…
@@ -34,6 +34,7 @@ Automatically show contents listing	ExpanderPreferences		Montrer l'inventaire au
 OK	ExpanderPreferences		OK
 Leave destination folder path empty	ExpanderPreferences		Laissez vide le chemin du dossier de destination
 Failed to create the destination folder.	ExpanderWindow		Impossible de créer le dossier de destination.
+Select '%s'…	DirectoryFilePanel		Sélectionner « %s »…
 Create	ExpanderWindow		Créer
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Le dossier a été renommé, déplacé, ou\nn'est pas supporté.
 The file doesn't exist	ExpanderWindow		Le fichier n'existe pas

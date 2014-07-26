@@ -2,13 +2,13 @@
 SMTP server:	ConfigView		Serwer SMTP:
 STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Błąd podczas logowania do %serv
-Unencrypted	ConfigView		Niezaszyfrowane
+Unencrypted	ConfigView		Nieszyfrowane
 . The server says:\n	smtp		. Serwer mówi:\n
 ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		Łączenie ze serwerem…
+Connecting to server…	smtp		Łączenie z serwerem…
 Error while opening connection to %serv	smtp		Błąd podczas otwierania połączenia do %serv
 POP3 authentication failed. The server said:\n	smtp		Nieudane uwierzytelnianie POP3. Serwer odpowiedział:\n
-Destination:	ConfigView		Przeznaczenie:
+Destination:	ConfigView		Katalog docelowy:
 : Connection refused or host not found.	smtp		: Połączenie odrzucone lub nie znaleziono hosta.
 None	ConfigView		Brak
 POP3 before SMTP	ConfigView		POP3 przed SMTP
