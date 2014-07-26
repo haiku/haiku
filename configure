@@ -401,7 +401,6 @@ standard_gcc_settings()
 	set_variable HAIKU_GCC_MACHINE_$targetArch $gccMachine
 	set_variable HAIKU_GCC_LIB_DIR_$targetArch $gccdir
 	set_variable HAIKU_GCC_LIBGCC_$targetArch $libgcc
-	set_variable HAIKU_GCC_GLUE_CODE_$targetArch "crtbegin.o crtend.o"
 	set_variable HAIKU_GCC_HEADERS_DIR_$targetArch \
 		"${gccdir}/include ${gccdir}/include-fixed"
 	set_variable HAIKU_STATIC_LIBSTDCXX_$targetArch "$staticLibStdCxx"
