@@ -271,6 +271,7 @@ RemotePackageRepository HaikuPorts
 	# secondary architecture (x86)
 	automoc_x86-0.9.88-2
 	avrdude_x86-6.0.1-1
+	beshare_x86-4-1
 	binutils_x86-2.24_2014_03_19-4
 	bison_x86-2.5-1
 	boost_x86-1.55.0-3
@@ -496,6 +497,7 @@ RemotePackageRepository HaikuPorts
 	belife
 	bepdf
 	bescreencapture
+	beshare_x86
 	blogpositive
 	binutils
 	binutils_x86
