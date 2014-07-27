@@ -87,13 +87,14 @@ bool RealNameAttributeText::sSortFolderNamesFirst = false;
 
 template <class View>
 float
-TruncFileSizeBase(BString* result, int64 value, const View* view, float width)
+TruncFileSizeBase(BString* outString, int64 value, const View* view,
+	float width)
 {
-	// ToDo:
-	// if slow, replace float divisions with shifts
-	// if fast enough, try fitting more decimal places
+	// ToDo: If slow, replace float divisions with shifts
+	//       if fast enough, try fitting more decimal places.
 
-	// TODO: reuse libshared's string_for_size
+	// ToDo: Update string_for_size() in libshared to be able to
+	//       handle this case.
 
 	// format file size value
 	char buffer[1024];
@@ -123,7 +124,7 @@ TruncFileSizeBase(BString* result, int64 value, const View* view, float width)
 		}
 
 		for (int32 index = 0; ; index++) {
-			if (!kSizeFormats[index])
+			if (kSizeFormats[index] == 0)
 				break;
 
 			sprintf(buffer, kSizeFormats[index], floatValue, suffix);
@@ -142,20 +143,20 @@ TruncFileSizeBase(BString* result, int64 value, const View* view, float width)
 
 			float resultWidth = view->StringWidth(buffer);
 			if (resultWidth <= width) {
-				*result = buffer;
+				*outString = buffer.String();
 				return resultWidth;
 			}
 		}
 	}
 
-	return TruncStringBase(result, buffer, (ssize_t)strlen(buffer), view,
+	return TruncStringBase(outString, buffer, (ssize_t)strlen(buffer), view,
 		width, (uint32)B_TRUNCATE_END);
 }
 
 
 template <class View>
 float
-TruncStringBase(BString* result, const char* str, int32 length,
+TruncStringBase(BString* outString, const char* inString, int32 length,
 	const View* view, float width, uint32 truncMode = B_TRUNCATE_MIDDLE)
 {
 	// we are using a template version of this call to make sure
@@ -163,28 +164,29 @@ TruncStringBase(BString* result, const char* str, int32 length,
 	// for max speed and flexibility
 
 	// a standard ellipsis inserting fitting algorithm
-	if (view->StringWidth(str, length) <= width)
-		*result = str;
+	if (view->StringWidth(inString, length) <= width)
+		*outString = inString;
 	else {
-		const char* srcstr[1];
+		const char* source[1];
 		char* results[1];
 
-		srcstr[0] = str;
-		results[0] = result->LockBuffer(length + 3);
+		source[0] = inString;
+		results[0] = outString->LockBuffer(length + 3);
 
 		BFont font;
 		view->GetFont(&font);
 
-	    font.GetTruncatedStrings(srcstr, 1, truncMode, width, results);
-		result->UnlockBuffer();
+	    font.GetTruncatedStrings(source, 1, truncMode, width, results);
+		outString->UnlockBuffer();
 	}
-	return view->StringWidth(result->String(), result->Length());
+
+	return view->StringWidth(outString->String(), outString->Length());
 }
 
 
 template <class View>
 float
-TruncTimeBase(BString* result, int64 value, const View* view, float width)
+TruncTimeBase(BString* outString, int64 value, const View* view, float width)
 {
 	float resultWidth = width + 1;
 
@@ -217,10 +219,10 @@ TruncTimeBase(BString* result, int64 value, const View* view, float width)
 
 	if (resultWidth > width) {
 		// even the shortest format string didn't do it, insert ellipsis
-		resultWidth = TruncStringBase(result, date.String(),
+		resultWidth = TruncStringBase(outString, date.String(),
 			(ssize_t)date.Length(), view, width);
 	} else
-		*result = date;
+		*outString = date;
 
 	return resultWidth;
 }
@@ -354,26 +356,26 @@ WidgetAttributeText::CheckSettingsChanged()
 
 
 float
-WidgetAttributeText::TruncString(BString* result, const char* str,
+WidgetAttributeText::TruncString(BString* outString, const char* inString,
 	int32 length, const BPoseView* view, float width, uint32 truncMode)
 {
-	return TruncStringBase(result, str, length, view, width, truncMode);
+	return TruncStringBase(outString, inString, length, view, width, truncMode);
 }
 
 
 float
-WidgetAttributeText::TruncFileSize(BString* result, int64 value,
+WidgetAttributeText::TruncFileSize(BString* outString, int64 value,
 	const BPoseView* view, float width)
 {
-	return TruncFileSizeBase(result, value, view, width);
+	return TruncFileSizeBase(outString, value, view, width);
 }
 
 
 float
-WidgetAttributeText::TruncTime(BString* result, int64 value,
+WidgetAttributeText::TruncTime(BString* outString, int64 value,
 	const BPoseView* view, float width)
 {
-	return TruncTimeBase(result, value, view, width);
+	return TruncTimeBase(outString, value, view, width);
 }
 
 
@@ -409,7 +411,7 @@ WidgetAttributeText::CommitEditedText(BTextView*)
 
 
 status_t
-WidgetAttributeText::AttrAsString(const Model* model, BString* result,
+WidgetAttributeText::AttrAsString(const Model* model, BString* outString,
 	const char* attrName, int32 attrType, float width, BView* view,
 	int64* resultingValue)
 {
@@ -430,9 +432,10 @@ WidgetAttributeText::AttrAsString(const Model* model, BString* result,
 				// not yet supported
 				return B_ERROR;
 			}
-			TruncTimeBase(result, value, view, width);
+			TruncTimeBase(outString, value, view, width);
 			if (resultingValue)
 				*resultingValue = value;
+
 			return B_OK;
 
 		case B_STRING_TYPE:
@@ -449,17 +452,18 @@ WidgetAttributeText::AttrAsString(const Model* model, BString* result,
 					tmp = "-";
 
 				if (width > 0) {
-					TruncStringBase(result, tmp.String(), tmp.Length(), view,
+					TruncStringBase(outString, tmp.String(), tmp.Length(), view,
 						width);
 				} else
-					*result = tmp.String();
+					*outString = tmp.String();
 
 				return B_OK;
 			}
 			break;
 
 		case kSizeType:
-//			TruncFileSizeBase(result, model->StatBuf()->st_size, view, width);
+//			TruncFileSizeBase(outString, model->StatBuf()->st_size, view,
+//				width);
 			return B_OK;
 			break;
 
@@ -528,13 +532,13 @@ StringAttributeText::CheckAttributeChanged()
 
 
 void
-StringAttributeText::FitValue(BString* result, const BPoseView* view)
+StringAttributeText::FitValue(BString* outString, const BPoseView* view)
 {
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
 	fOldWidth = fColumn->Width();
 
-	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+	fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 		fFullValueText.Length(), view, fOldWidth);
 	fDirty = false;
 }
@@ -664,17 +668,17 @@ PathAttributeText::PathAttributeText(const Model* model, const BColumn* column)
 
 
 void
-PathAttributeText::ReadValue(BString* result)
+PathAttributeText::ReadValue(BString* outString)
 {
 	// get the path
 	BEntry entry(fModel->EntryRef());
 	BPath path;
 
 	if (entry.InitCheck() == B_OK && entry.GetPath(&path) == B_OK) {
-		*result = path.Path();
-		TruncateLeaf(result);
+		*outString = path.Path();
+		TruncateLeaf(outString);
 	} else
-		*result = "-";
+		*outString = "-";
 
 	fValueDirty = false;
 }
@@ -692,16 +696,16 @@ OriginalPathAttributeText::OriginalPathAttributeText(const Model* model,
 
 
 void
-OriginalPathAttributeText::ReadValue(BString* result)
+OriginalPathAttributeText::ReadValue(BString* outString)
 {
 	BEntry entry(fModel->EntryRef());
 	BPath path;
 
 	// get the original path
 	if (entry.InitCheck() == B_OK && FSGetOriginalPath(&entry, &path) == B_OK)
-		*result = path.Path();
+		*outString = path.Path();
 	else
-		*result = "-";
+		*outString = "-";
 
 	fValueDirty = false;
 }
@@ -718,19 +722,19 @@ KindAttributeText::KindAttributeText(const Model* model, const BColumn* column)
 
 
 void
-KindAttributeText::ReadValue(BString* result)
+KindAttributeText::ReadValue(BString* outString)
 {
 	BMimeType mime;
 	char desc[B_MIME_TYPE_LENGTH];
 
 	// get the mime type
 	if (mime.SetType(fModel->MimeType()) != B_OK)
-		*result = B_TRANSLATE("Unknown");
+		*outString = B_TRANSLATE("Unknown");
 	else if (mime.GetShortDescription(desc) == B_OK) {
 		// get the short mime type description
-		*result = desc;
+		*outString = desc;
 	} else
-		*result = fModel->MimeType();
+		*outString = fModel->MimeType();
 
 	fValueDirty = false;
 }
@@ -766,21 +770,21 @@ NameAttributeText::Compare(WidgetAttributeText& attr, BPoseView* view)
 
 
 void
-NameAttributeText::ReadValue(BString* result)
+NameAttributeText::ReadValue(BString* outString)
 {
-	*result = fModel->Name();
+	*outString = fModel->Name();
 
 	fValueDirty = false;
 }
 
 
 void
-NameAttributeText::FitValue(BString* result, const BPoseView* view)
+NameAttributeText::FitValue(BString* outString, const BPoseView* view)
 {
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
 	fOldWidth = fColumn->Width();
-	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+	fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 		fFullValueText.Length(), view, fOldWidth, B_TRUNCATE_END);
 	fDirty = false;
 }
@@ -902,21 +906,21 @@ RealNameAttributeText::Compare(WidgetAttributeText& attr, BPoseView* view)
 
 
 void
-RealNameAttributeText::ReadValue(BString* result)
+RealNameAttributeText::ReadValue(BString* outString)
 {
-	*result = fModel->EntryRef()->name;
+	*outString = fModel->EntryRef()->name;
 
 	fValueDirty = false;
 }
 
 
 void
-RealNameAttributeText::FitValue(BString* result, const BPoseView* view)
+RealNameAttributeText::FitValue(BString* outString, const BPoseView* view)
 {
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
 	fOldWidth = fColumn->Width();
-	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+	fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 		fFullValueText.Length(), view, fOldWidth, B_TRUNCATE_END);
 	fDirty = false;
 }
@@ -967,7 +971,7 @@ RealNameAttributeText::CommitEditedTextFlavor(BTextView* textView)
 	// renamings
 	status_t result;
 	if (fModel->IsVolume()) {
-		BVolume	volume(fModel->NodeRef()->device);
+		BVolume volume(fModel->NodeRef()->device);
 		result = volume.InitCheck();
 		if (result == B_OK) {
 			RenameVolumeUndo undo(volume, text);
@@ -1014,7 +1018,7 @@ OwnerAttributeText::OwnerAttributeText(const Model* model,
 
 
 void
-OwnerAttributeText::ReadValue(BString* result)
+OwnerAttributeText::ReadValue(BString* outString)
 {
 	uid_t nodeOwner = fModel->StatBuf()->st_uid;
 	BString user;
@@ -1026,7 +1030,7 @@ OwnerAttributeText::ReadValue(BString* result)
 			user << "root";
 	} else
 		user << nodeOwner;
-	*result = user.String();
+	*outString = user.String();
 
 	fValueDirty = false;
 }
@@ -1041,7 +1045,7 @@ GroupAttributeText::GroupAttributeText(const Model* model,
 
 
 void
-GroupAttributeText::ReadValue(BString* result)
+GroupAttributeText::ReadValue(BString* outString)
 {
 	gid_t nodeGroup = fModel->StatBuf()->st_gid;
 	BString group;
@@ -1053,7 +1057,7 @@ GroupAttributeText::ReadValue(BString* result)
 			group << "0";
 	} else
 		group << nodeGroup;
-	*result = group.String();
+	*outString = group.String();
 
 	fValueDirty = false;
 }
@@ -1072,7 +1076,7 @@ ModeAttributeText::ModeAttributeText(const Model* model,
 
 
 void
-ModeAttributeText::ReadValue(BString* result)
+ModeAttributeText::ReadValue(BString* outString)
 {
 	mode_t mode = fModel->StatBuf()->st_mode;
 	mode_t baseMask = 00400;
@@ -1097,7 +1101,7 @@ ModeAttributeText::ReadValue(BString* result)
 	}
 
 	*scanner = 0;
-	*result = buffer;
+	*outString = buffer;
 
 	fValueDirty = false;
 }
@@ -1128,8 +1132,9 @@ SizeAttributeText::ReadValue()
 
 	if (fModel->IsDirectory() || fModel->IsQuery()
 		|| fModel->IsQueryTemplate() || fModel->IsSymLink()
-		|| fModel->IsVirtualDirectory())
+		|| fModel->IsVirtualDirectory()) {
 		return kUnknownSize;
+	}
 
 	fValueIsDefined = true;
 
@@ -1138,12 +1143,13 @@ SizeAttributeText::ReadValue()
 
 
 void
-SizeAttributeText::FitValue(BString* result, const BPoseView* view)
+SizeAttributeText::FitValue(BString* outString, const BPoseView* view)
 {
 	if (fValueDirty)
 		fValue = ReadValue();
+
 	fOldWidth = fColumn->Width();
-	fTruncatedWidth = TruncFileSize(result, fValue, view, fOldWidth);
+	fTruncatedWidth = TruncFileSize(outString, fValue, view, fOldWidth);
 	fDirty = false;
 }
 
@@ -1156,6 +1162,7 @@ SizeAttributeText::PreferredWidth(const BPoseView* pose) const
 		TruncFileSize(&widthString, fValue, pose, 100000);
 		return pose->StringWidth(widthString.String());
 	}
+
 	return pose->StringWidth("-");
 }
 
@@ -1184,13 +1191,13 @@ TimeAttributeText::PreferredWidth(const BPoseView* pose) const
 
 
 void
-TimeAttributeText::FitValue(BString* result, const BPoseView* view)
+TimeAttributeText::FitValue(BString* outString, const BPoseView* view)
 {
 	if (fValueDirty)
 		fValue = ReadValue();
 
 	fOldWidth = fColumn->Width();
-	fTruncatedWidth = TruncTime(result, fValue, view, fOldWidth);
+	fTruncatedWidth = TruncTime(outString, fValue, view, fOldWidth);
 	fDirty = false;
 }
 
@@ -1280,7 +1287,7 @@ GenericAttributeText::PreferredWidth(const BPoseView* pose) const
 
 
 void
-GenericAttributeText::ReadValue(BString* result)
+GenericAttributeText::ReadValue(BString* outString)
 {
 	BModelOpener opener(const_cast<Model*>(fModel));
 
@@ -1306,7 +1313,7 @@ GenericAttributeText::ReadValue(BString* result)
 				// didn't read the whole attribute in or it wasn't to
 				// begin with
 
-				*result = buffer;
+				*outString = buffer;
 				fValueIsDefined = true;
 			}
 			break;
@@ -1401,7 +1408,7 @@ GenericAttributeText::ReadValue(BString* result)
 
 
 void
-GenericAttributeText::FitValue(BString* result, const BPoseView* view)
+GenericAttributeText::FitValue(BString* outString, const BPoseView* view)
 {
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
@@ -1409,8 +1416,8 @@ GenericAttributeText::FitValue(BString* result, const BPoseView* view)
 	fOldWidth = fColumn->Width();
 
 	if (!fValueIsDefined) {
-		*result = "-";
-		fTruncatedWidth = TruncString(result, fFullValueText.String(),
+		*outString = "-";
+		fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 			fFullValueText.Length(), view, fOldWidth);
 		fDirty = false;
 		return;
@@ -1420,12 +1427,12 @@ GenericAttributeText::FitValue(BString* result, const BPoseView* view)
 
 	switch (fColumn->AttrType()) {
 		case B_SIZE_T_TYPE:
-			TruncFileSizeBase(result, fValue.int32t, view, fOldWidth);
+			TruncFileSizeBase(outString, fValue.int32t, view, fOldWidth);
 			return;
 
 		case B_SSIZE_T_TYPE:
 			if (fValue.int32t > 0) {
-				TruncFileSizeBase(result, fValue.int32t, view, fOldWidth);
+				TruncFileSizeBase(outString, fValue.int32t, view, fOldWidth);
 				return;
 			}
 			sprintf(buffer, "%s", strerror(fValue.int32t));
@@ -1433,7 +1440,7 @@ GenericAttributeText::FitValue(BString* result, const BPoseView* view)
 			break;
 
 		case B_STRING_TYPE:
-			fTruncatedWidth = TruncString(result, fFullValueText.String(),
+			fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 				fFullValueText.Length(), view, fOldWidth);
 			fDirty = false;
 			return;
@@ -1442,7 +1449,7 @@ GenericAttributeText::FitValue(BString* result, const BPoseView* view)
 			// As a side effect update the fFullValueText to the string
 			// representation of value
 			TruncFileSize(&fFullValueText, fValue.off_tt, view, 100000);
-			fTruncatedWidth = TruncFileSize(result, fValue.off_tt, view,
+			fTruncatedWidth = TruncFileSize(outString, fValue.off_tt, view,
 				fOldWidth);
 			fDirty = false;
 			return;
@@ -1451,7 +1458,7 @@ GenericAttributeText::FitValue(BString* result, const BPoseView* view)
 			// As a side effect update the fFullValueText to the string
 			// representation of value
 			TruncTime(&fFullValueText, fValue.time_tt, view, 100000);
-			fTruncatedWidth = TruncTime(result, fValue.time_tt, view,
+			fTruncatedWidth = TruncTime(outString, fValue.time_tt, view,
 				fOldWidth);
 			fDirty = false;
 			return;
@@ -1467,8 +1474,8 @@ GenericAttributeText::FitValue(BString* result, const BPoseView* view)
 		case B_CHAR_TYPE:
 			// Make sure no non-printable characters are displayed:
 			if (!isprint(fValue.uint8t)) {
-				*result = "-";
-				fTruncatedWidth = TruncString(result, fFullValueText.String(),
+				*outString = "-";
+				fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 					fFullValueText.Length(), view, fOldWidth);
 				fDirty = false;
 				return;
@@ -1529,14 +1536,14 @@ GenericAttributeText::FitValue(BString* result, const BPoseView* view)
 			break;
 
 		default:
-			*result = "-";
-			fTruncatedWidth = TruncString(result, fFullValueText.String(),
+			*outString = "-";
+			fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 				fFullValueText.Length(), view, fOldWidth);
 			fDirty = false;
 			return;
 	}
-	fTruncatedWidth = TruncString(result, buffer, (ssize_t)strlen(buffer), view,
-		fOldWidth);
+	fTruncatedWidth = TruncString(outString, buffer, (ssize_t)strlen(buffer),
+		view, fOldWidth);
 	fDirty = false;
 }
 
@@ -1546,8 +1553,8 @@ GenericAttributeText::ValueAsText(const BPoseView* view)
 {
 	// TODO: redesign this - this is to make sure the value is valid
 	bool oldDirty = fDirty;
-	BString result;
-	FitValue(&result, view);
+	BString outString;
+	FitValue(&outString, view);
 	fDirty = oldDirty;
 
 	return fFullValueText.String();
@@ -1875,7 +1882,7 @@ DurationAttributeText::DurationAttributeText(const Model* model,
 
 
 void
-DurationAttributeText::FitValue(BString* result, const BPoseView* view)
+DurationAttributeText::FitValue(BString* outString, const BPoseView* view)
 {
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
@@ -1884,8 +1891,8 @@ DurationAttributeText::FitValue(BString* result, const BPoseView* view)
 	fDirty = false;
 
 	if (!fValueIsDefined) {
-		*result = "-";
-		fTruncatedWidth = TruncString(result, fFullValueText.String(),
+		*outString = "-";
+		fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 			fFullValueText.Length(), view, fOldWidth);
 		return;
 	}
@@ -1937,7 +1944,7 @@ DurationAttributeText::FitValue(BString* result, const BPoseView* view)
 
 	fFullValueText = buffer;
 
-	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+	fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 		fFullValueText.Length(), view, fOldWidth);
 }
 
@@ -1970,14 +1977,14 @@ void
 CheckboxAttributeText::SetUpEditing(BTextView* view)
 {
 	// TODO: support editing for real!
-	BString result;
-	GenericAttributeText::FitValue(&result, NULL);
+	BString outString;
+	GenericAttributeText::FitValue(&outString, NULL);
 	GenericAttributeText::SetUpEditing(view);
 }
 
 
 void
-CheckboxAttributeText::FitValue(BString* result, const BPoseView* view)
+CheckboxAttributeText::FitValue(BString* outString, const BPoseView* view)
 {
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
@@ -1986,8 +1993,8 @@ CheckboxAttributeText::FitValue(BString* result, const BPoseView* view)
 	fDirty = false;
 
 	if (!fValueIsDefined) {
-		*result = fOffChar;
-		fTruncatedWidth = TruncString(result, fFullValueText.String(),
+		*outString = fOffChar;
+		fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 			fFullValueText.Length(), view, fOldWidth);
 		return;
 	}
@@ -2017,7 +2024,7 @@ CheckboxAttributeText::FitValue(BString* result, const BPoseView* view)
 
 	fFullValueText = checked ? fOnChar : fOffChar;
 
-	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+	fTruncatedWidth = TruncString(outString, fFullValueText.String(),
 		fFullValueText.Length(), view, fOldWidth);
 }
 
@@ -2040,8 +2047,8 @@ void
 RatingAttributeText::SetUpEditing(BTextView* view)
 {
 	// TODO: support editing for real!
-	BString result;
-	GenericAttributeText::FitValue(&result, NULL);
+	BString outString;
+	GenericAttributeText::FitValue(&outString, NULL);
 	GenericAttributeText::SetUpEditing(view);
 }
 
@@ -2138,7 +2145,8 @@ OpenWithRelationAttributeText::PreferredWidth(const BPoseView* pose) const
 
 
 void
-OpenWithRelationAttributeText::FitValue(BString* result, const BPoseView* view)
+OpenWithRelationAttributeText::FitValue(BString* outString,
+	const BPoseView* view)
 {
 	if (fValueDirty)
 		ReadValue();
@@ -2151,7 +2159,7 @@ OpenWithRelationAttributeText::FitValue(BString* result, const BPoseView* view)
 		launchWithView->OpenWithRelationDescription(fModel, &fRelationText);
 
 	fOldWidth = fColumn->Width();
-	fTruncatedWidth = TruncString(result, fRelationText.String(),
+	fTruncatedWidth = TruncString(outString, fRelationText.String(),
 		fRelationText.Length(), view, fOldWidth, B_TRUNCATE_END);
 	fDirty = false;
 }
@@ -2170,7 +2178,7 @@ VersionAttributeText::VersionAttributeText(const Model* model,
 
 
 void
-VersionAttributeText::ReadValue(BString* result)
+VersionAttributeText::ReadValue(BString* outString)
 {
 	fValueDirty = false;
 
@@ -2182,9 +2190,9 @@ VersionAttributeText::ReadValue(BString* result)
 		if (info.InitCheck() == B_OK
 			&& info.GetVersionInfo(&version, fAppVersion
 					? B_APP_VERSION_KIND : B_SYSTEM_VERSION_KIND) == B_OK) {
-			*result = version.short_info;
+			*outString = version.short_info;
 			return;
 		}
 	}
-	*result = "-";
+	*outString = "-";
 }
