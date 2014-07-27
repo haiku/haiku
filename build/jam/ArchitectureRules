@@ -206,6 +206,18 @@ rule ArchitectureSetup architecture
 	}
 
 	# library and executable glue code
+	local crtBegin ;
+	local crtEnd ;
+	# TODO: use crtbeginS.o and crtendS.o unconditionally once we have
+	#       switched to new compiler packages
+	if [ Glob $(HAIKU_GCC_LIB_DIR_$(architecture)) : crtbeginS.o ] {
+		crtBegin = <$(architecture)>crtbeginS.o ;
+		crtEnd = <$(architecture)>crtendS.o ;
+	} else {
+		crtBegin = <$(architecture)>crtbegin.o ;
+		crtEnd = <$(architecture)>crtend.o ;
+	}
+
 	local commonGlueCode =
 		<src!system!glue!$(architecture)>init_term_dyn.o
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
@@ -213,24 +225,23 @@ rule ArchitectureSetup architecture
 		;
 	HAIKU_LIBRARY_BEGIN_GLUE_CODE_$(architecture) =
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
-		<$(architecture)>crtbeginS.o
+		$(crtBegin)
 		<src!system!glue!$(architecture)>init_term_dyn.o
 		;
 	HAIKU_LIBRARY_END_GLUE_CODE_$(architecture) =
-		<$(architecture)>crtendS.o
+		$(crtEnd)
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crtn.o
 		;
 	HAIKU_EXECUTABLE_BEGIN_GLUE_CODE_$(architecture) =
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
-		<$(architecture)>crtbeginS.o
+		$(crtBegin)
 		<src!system!glue!$(architecture)>start_dyn.o
 		<src!system!glue!$(architecture)>init_term_dyn.o
 		;
 	HAIKU_EXECUTABLE_END_GLUE_CODE_$(architecture)
 		= $(HAIKU_LIBRARY_END_GLUE_CODE_$(architecture)) ;
 
-	SEARCH on <$(architecture)>crtbeginS.o <$(architecture)>crtendS.o
-		= $(HAIKU_GCC_LIB_DIR_$(architecture)) ;
+	SEARCH on $(crtBegin) $(crtEnd) = $(HAIKU_GCC_LIB_DIR_$(architecture)) ;
 
 	# init library name map
 	local libraryGrist = "" ;
@@ -472,10 +483,21 @@ rule KernelArchitectureSetup architecture
 		# compiling (part of) the boot loader.
 
 	# kernel add-on glue code
-	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = <$(architecture)>crtbeginS.o
+	local crtBegin ;
+	local crtEnd ;
+	# TODO: use crtbeginS.o and crtendS.o unconditionally once we have
+	#       switched to new compiler packages
+	if [ Glob $(HAIKU_GCC_LIB_DIR_$(architecture)) : crtbeginS.o ] {
+		crtBegin = <$(architecture)>crtbeginS.o ;
+		crtEnd = <$(architecture)>crtendS.o ;
+	} else {
+		crtBegin = <$(architecture)>crtbegin.o ;
+		crtEnd = <$(architecture)>crtend.o ;
+	}
+	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = $(crtBegin)
 		<src!system!glue!$(architecture)>haiku_version_glue.o ;
 	HAIKU_KERNEL_ADDON_END_GLUE_CODE
-		= $(HAIKU_GCC_LIBGCC_$(architecture)) <$(architecture)>crtendS.o ;
+		= $(HAIKU_GCC_LIBGCC_$(architecture)) $(crtEnd) ;
 }
 
 
