@@ -96,43 +96,44 @@ TruncFileSizeBase(BString* outString, int64 value, const View* view,
 	// ToDo: Update string_for_size() in libshared to be able to
 	//       handle this case.
 
+	BString buffer;
+
 	// format file size value
-	char buffer[1024];
 	if (value == kUnknownSize) {
-		*result = "-";
+		*outString = "-";
 		return view->StringWidth("-");
 	} else if (value < kKBSize) {
-		sprintf(buffer, B_TRANSLATE("%Ld bytes"), value);
-		if (view->StringWidth(buffer) > width)
-			sprintf(buffer, B_TRANSLATE("%Ld B"), value);
+		buffer.SetToFormat(B_TRANSLATE("%Ld bytes"), value);
+		if (view->StringWidth(buffer.String()) > width)
+			buffer.SetToFormat(B_TRANSLATE("%Ld B"), value);
 	} else {
 		const char* suffix;
-		float floatValue;
+		float doubleValue;
 		if (value >= kTBSize) {
 			suffix = B_TRANSLATE("TiB");
-			floatValue = (float)value / kTBSize;
+			doubleValue = (double)value / kTBSize;
 		} else if (value >= kGBSize) {
 			suffix = B_TRANSLATE("GiB");
-			floatValue = (float)value / kGBSize;
+			doubleValue = (double)value / kGBSize;
 		} else if (value >= kMBSize) {
 			suffix = B_TRANSLATE("MiB");
-			floatValue = (float)value / kMBSize;
+			doubleValue = (double)value / kMBSize;
 		} else {
 			ASSERT(value >= kKBSize);
 			suffix = B_TRANSLATE("KiB");
-			floatValue = (float)value / kKBSize;
+			doubleValue = (double)value / kKBSize;
 		}
 
 		for (int32 index = 0; ; index++) {
 			if (kSizeFormats[index] == 0)
 				break;
 
-			sprintf(buffer, kSizeFormats[index], floatValue, suffix);
-
+			buffer.SetToFormat(kSizeFormats[index], doubleValue, suffix);
 			// strip off an insignificant zero so we don't get readings
 			// such as 1.00
 			char* period = 0;
-			for (char* tmp = buffer; *tmp; tmp++) {
+			for (char* tmp = const_cast<char*>(buffer.String()); *tmp != '\0';
+					tmp++) {
 				if (*tmp == '.')
 					period = tmp;
 			}
@@ -149,7 +150,7 @@ TruncFileSizeBase(BString* outString, int64 value, const View* view,
 		}
 	}
 
-	return TruncStringBase(outString, buffer, (ssize_t)strlen(buffer), view,
+	return TruncStringBase(outString, buffer.String(), buffer.Length(), view,
 		width, (uint32)B_TRUNCATE_END);
 }
 
