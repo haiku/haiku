@@ -23,9 +23,13 @@ usage(FILE* output)
 		"Usage: %s <options> <device|volume name>\n"
 		"\n"
 		"Options:\n"
-		"  -h, --help        - print this help text\n"
-		"  -c, --check-only  - do not make any changes to the file system\n",
-		kProgramName);
+		"  -h, --help\t\t- print this help text\n"
+		"  -c, --check-only\t- do not make any changes to the file system\n"
+		"\n"
+		"Examples:\n"
+		"  %s -c /Haiku\n"
+		"  %s /dev/disk/ata/0/master/raw\n",
+		kProgramName, kProgramName, kProgramName);
 }
 
 
