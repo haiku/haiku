@@ -317,7 +317,6 @@ BHttpRequest::_ProtocolLoop()
 		newRequest = false;
 
 		// Result reset
-		fOutputHeaders.Clear();
 		fHeaders.Clear();
 		_ResultHeaders().Clear();
 
@@ -487,6 +486,8 @@ BHttpRequest::_MakeRequest()
 	_SendPostData();
 	fRequestStatus = kRequestInitialState;
 
+
+
 	// Receive loop
 	bool receiveEnd = false;
 	bool parseEnd = false;
@@ -507,8 +508,8 @@ BHttpRequest::_MakeRequest()
 	while (!fQuit && !(receiveEnd && parseEnd)) {
 		if (!receiveEnd) {
 			fSocket->WaitForReadable();
-			BNetBuffer chunk(kHttpBufferSize);
-			bytesRead = fSocket->Read(chunk.Data(), kHttpBufferSize);
+			BStackOrHeapArray<char, 4096> chunk(kHttpBufferSize);
+			bytesRead = fSocket->Read(chunk, kHttpBufferSize);
 
 			if (bytesRead < 0) {
 				readError = bytesRead;
@@ -516,7 +517,7 @@ BHttpRequest::_MakeRequest()
 			} else if (bytesRead == 0)
 				receiveEnd = true;
 
-			fInputBuffer.AppendData(chunk.Data(), bytesRead);
+			fInputBuffer.AppendData(chunk, bytesRead);
 		} else
 			bytesRead = 0;
 
@@ -677,7 +678,11 @@ BHttpRequest::_MakeRequest()
 
 				if (decompress && receiveEnd) {
 					readError = decompressingStream->Flush();
-					if (readError != B_OK && readError != B_BUFFER_OVERFLOW)
+
+					if (readError == B_BUFFER_OVERFLOW)
+						readError = B_OK;
+
+					if (readError != B_OK)
 						break;
 
 					ssize_t size = decompressorStorage.Size();
@@ -813,31 +818,33 @@ BHttpRequest::_SendRequest()
 void
 BHttpRequest::_SendHeaders()
 {
+	BHttpHeaders outputHeaders;
+
 	// HTTP 1.1 additional headers
 	if (fHttpVersion == B_HTTP_11) {
 		BString host = Url().Host();
 		if (Url().HasPort() && !_IsDefaultPort())
 			host << ':' << Url().Port();
 		
-		fOutputHeaders.AddHeader("Host", host);
+		outputHeaders.AddHeader("Host", host);
 
-		fOutputHeaders.AddHeader("Accept", "*/*");
-		fOutputHeaders.AddHeader("Accept-Encoding", "gzip,deflate");
+		outputHeaders.AddHeader("Accept", "*/*");
+		outputHeaders.AddHeader("Accept-Encoding", "gzip,deflate");
 			// Allow the remote server to send dynamic content by chunks
 			// rather than waiting for the full content to be generated and
 			// sending us data.
 
-		fOutputHeaders.AddHeader("Connection", "close");
+		outputHeaders.AddHeader("Connection", "close");
 			// Let the remote server close the connection after response since
 			// we don't handle multiple request on a single connection
 	}
 
 	// Classic HTTP headers
 	if (fOptUserAgent.CountChars() > 0)
-		fOutputHeaders.AddHeader("User-Agent", fOptUserAgent.String());
+		outputHeaders.AddHeader("User-Agent", fOptUserAgent.String());
 
 	if (fOptReferer.CountChars() > 0)
-		fOutputHeaders.AddHeader("Referer", fOptReferer.String());
+		outputHeaders.AddHeader("Referer", fOptReferer.String());
 
 	// Authentication
 	if (fContext != NULL) {
@@ -849,7 +856,7 @@ BHttpRequest::_SendHeaders()
 			}
 
 			BString request(fRequestMethod);
-			fOutputHeaders.AddHeader("Authorization",
+			outputHeaders.AddHeader("Authorization",
 				authentication.Authorization(fUrl, request));
 		}
 	}
@@ -869,16 +876,16 @@ BHttpRequest::_SendHeaders()
 				break;
 		}
 
-		fOutputHeaders.AddHeader("Content-Type", contentType);
-		fOutputHeaders.AddHeader("Content-Length",
+		outputHeaders.AddHeader("Content-Type", contentType);
+		outputHeaders.AddHeader("Content-Length",
 			fOptPostFields->ContentLength());
 	} else if (fOptInputData != NULL
 			&& (fRequestMethod == B_HTTP_POST
 			|| fRequestMethod == B_HTTP_PUT)) {
 		if (fOptInputDataSize >= 0)
-			fOutputHeaders.AddHeader("Content-Length", fOptInputDataSize);
+			outputHeaders.AddHeader("Content-Length", fOptInputDataSize);
 		else
-			fOutputHeaders.AddHeader("Transfer-Encoding", "chunked");
+			outputHeaders.AddHeader("Transfer-Encoding", "chunked");
 	}
 
 	// Optional headers specified by the user
@@ -886,14 +893,14 @@ BHttpRequest::_SendHeaders()
 		for (int32 headerIndex = 0; headerIndex < fOptHeaders->CountHeaders();
 				headerIndex++) {
 			BHttpHeader& optHeader = (*fOptHeaders)[headerIndex];
-			int32 replaceIndex = fOutputHeaders.HasHeader(optHeader.Name());
+			int32 replaceIndex = outputHeaders.HasHeader(optHeader.Name());
 
 			// Add or replace the current option header to the
 			// output header list
 			if (replaceIndex == -1)
-				fOutputHeaders.AddHeader(optHeader.Name(), optHeader.Value());
+				outputHeaders.AddHeader(optHeader.Name(), optHeader.Value());
 			else
-				fOutputHeaders[replaceIndex].SetValue(optHeader.Value());
+				outputHeaders[replaceIndex].SetValue(optHeader.Value());
 		}
 	}
 
@@ -913,16 +920,16 @@ BHttpRequest::_SendHeaders()
 				cookieString << "; ";
 			}
 	
-			fOutputHeaders.AddHeader("Cookie", cookieString);
+			outputHeaders.AddHeader("Cookie", cookieString);
 		}
 	}
 
 	// Write output headers to output stream
 	BString headerData;
 
-	for (int32 headerIndex = 0; headerIndex < fOutputHeaders.CountHeaders();
+	for (int32 headerIndex = 0; headerIndex < outputHeaders.CountHeaders();
 			headerIndex++) {
-		const char* header = fOutputHeaders.HeaderAt(headerIndex).Header();
+		const char* header = outputHeaders.HeaderAt(headerIndex).Header();
 
 		headerData << header;
 		headerData << "\r\n";

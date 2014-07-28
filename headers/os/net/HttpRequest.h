@@ -98,7 +98,6 @@ private:
 
 	// Request status
 
-			BHttpHeaders		fOutputHeaders;
 			BHttpResult			fResult;
 
 			// Request state/events
