@@ -25,7 +25,7 @@ uname(struct utsname *info)
 	system_info systemInfo;
 	const char *platform;
 	const char *haikuRevision;
-	uint32_t count = 1;
+	uint32 count = 1;
 	status_t error;
 
 	if (!info) {
