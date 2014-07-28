@@ -22,6 +22,7 @@
 
 #include <Alert.h>
 #include <Deskbar.h>
+#include <InterfaceDefs.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <String.h>
@@ -32,9 +33,6 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "WatchView"
-
-
-const rgb_color COLOR_FOREGROUND = { 0, 0, 0 };
 
 
 WatchView::WatchView()
@@ -106,7 +104,7 @@ void WatchView::Draw(BRect updateRect)
 	FillRect(updateRect);
 
 	SetLowColor(Parent()->ViewColor());
-	SetHighColor(COLOR_FOREGROUND);
+	SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 	SetDrawingMode(B_OP_OVER);
 	DrawString(string, BPoint(x, y));
 }
