@@ -106,9 +106,7 @@ OverrideAlert::OverPosition(float width, float height)
 
 	BWindow* window
 		= dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
-	BRect screenFrame;
 	BRect desirableRect;
-	screenFrame = BScreen(window).Frame();
 
 	if (window != NULL) {
 		// If we found a window associated with this calling thread,
@@ -126,9 +124,9 @@ OverrideAlert::OverPosition(float width, float height)
 		desirableRect.top = midY - ceilf(height / 3.0f);
 		desirableRect.bottom = desirableRect.top + height;
 	} else {
-		// Otherwise, just place alert in center of screen.
+		// Otherwise, place alert in center of (main) screen.
 
-		desirableRect = screenFrame;
+		desirableRect = BScreen().Frame();
 		float midX = (desirableRect.left + desirableRect.right) / 2.0f;
 		float midY = (desirableRect.top * 3.0f + desirableRect.bottom) / 4.0f;
 
