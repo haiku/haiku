@@ -81,6 +81,9 @@ private:
 			void				_SetResultStatusCode(int32 statusCode);
 			BString&			_ResultStatusText();
 
+	// Utility methods
+			bool				_IsDefaultPort();
+
 private:
 			BAbstractSocket*	fSocket;
 			BNetworkAddress		fRemoteAddr;

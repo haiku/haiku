@@ -815,7 +815,11 @@ BHttpRequest::_SendHeaders()
 {
 	// HTTP 1.1 additional headers
 	if (fHttpVersion == B_HTTP_11) {
-		fOutputHeaders.AddHeader("Host", Url().Host());
+		BString host = Url().Host();
+		if (Url().HasPort() && !_IsDefaultPort())
+			host << ':' << Url().Port();
+		
+		fOutputHeaders.AddHeader("Host", host);
 
 		fOutputHeaders.AddHeader("Accept", "*/*");
 		fOutputHeaders.AddHeader("Accept-Encoding", "gzip,deflate");
@@ -1041,3 +1045,15 @@ BHttpRequest::_ResultStatusText()
 {
 	return fResult.fStatusString;
 }
+
+
+bool BHttpRequest::_IsDefaultPort()
+{
+	if (fSSL && Url().Port() == 443)
+		return true;
+	if (!fSSL && Url().Port() == 80)
+		return true;
+	return false;
+}
+
+
