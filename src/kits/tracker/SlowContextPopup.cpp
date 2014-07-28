@@ -357,11 +357,9 @@ void
 BSlowContextMenu::AddOneItem(Model* model)
 {
 	BMenuItem* item = NewModelItem(model, &fMessage, fMessenger, false,
-		dynamic_cast<BContainerWindow*>(fParentWindow) ?
-		dynamic_cast<BContainerWindow*>(fParentWindow) : 0,
-		fTypesList, &fTrackingHook);
-
-	if (item)
+		dynamic_cast<BContainerWindow*>(fParentWindow), fTypesList,
+		&fTrackingHook);
+	if (item != NULL)
 		fItemList->AddItem(item);
 }
 
