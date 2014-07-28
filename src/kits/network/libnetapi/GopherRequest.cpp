@@ -621,6 +621,9 @@ BGopherRequest::_ParseInput(bool last)
 				item << "<a href=\"" << link << "\">"
 						"<span class=\"audio\">" << title << "</span></a>"
 						"<audio src=\"" << link << "\" "
+							//TODO:Fix crash in WebPositive with these
+							//"controls=\"controls\" "
+							//"width=\"300\" height=\"50\" "
 							"alt=\"" << title << "\"/>"
 						"<span>[player]</span></audio>"
 						"<br/>\n";
@@ -636,6 +639,9 @@ BGopherRequest::_ParseInput(bool last)
 				item << "<a href=\"" << link << "\">"
 						"<span class=\"video\">" << title << "</span></a>"
 						"<video src=\"" << link << "\" "
+							//TODO:Fix crash in WebPositive with these
+							//"controls=\"controls\" "
+							//"width=\"300\" height=\"300\" "
 							"alt=\"" << title << "\"/>"
 						"<span>[player]</span></audio>"
 						"<br/>\n";
