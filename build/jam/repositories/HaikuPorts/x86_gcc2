@@ -109,6 +109,8 @@ RemotePackageRepository HaikuPorts
 	jpeg_devel-9-3
 	jpeg_tools-9-3
 	keymapswitcher-1.2.7.11-1
+	lame-3.99.5-3
+	lame_devel-3.99.5-3
 	lcms-2.5-1
 	lcms_devel-2.5-1
 	less-451-4
@@ -344,6 +346,8 @@ RemotePackageRepository HaikuPorts
 	jasper_x86_devel-1.900.1-1
 	jpeg_x86-9-3
 	jpeg_x86_devel-9-3
+	lame_x86-3.99.5-3
+	lame_x86_devel-3.99.5-3
 	lcms_x86-2.5-1
 	lcms_x86_devel-2.5-1
 	libao_x86-1.1.0-1
@@ -564,6 +568,8 @@ RemotePackageRepository HaikuPorts
 	jasper_x86
 	jpeg
 	keymapswitcher
+	lame
+	lame_x86
 	lcms
 	less
 	lha
