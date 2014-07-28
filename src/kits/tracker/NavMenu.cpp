@@ -533,7 +533,7 @@ BNavMenu::AddNextItem()
 
 	QueryEntryListCollection* queryContainer
 		= dynamic_cast<QueryEntryListCollection*>(fContainer);
-	if (queryContainer && !queryContainer->ShowResultsFromTrash()
+	if (queryContainer != NULL && !queryContainer->ShowResultsFromTrash()
 		&& FSInTrashDir(model.EntryRef())) {
 		// query entry is in trash and shall not be shown
 		return true;
@@ -688,7 +688,7 @@ BNavMenu::BuildVolumeMenu()
 
 			menu->SetNavDir(model->EntryRef());
 
-			ASSERT(menu->Name());
+			ASSERT(menu->Name() != NULL);
 
 			ModelMenuItem* item = new ModelMenuItem(model, menu);
 			BMessage* message = new BMessage(fMessage);

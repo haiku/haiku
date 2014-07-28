@@ -554,6 +554,7 @@ OpenWithContainerWindow*
 OpenWithPoseView::ContainerWindow() const
 {
 	ASSERT(dynamic_cast<OpenWithContainerWindow*>(Window()));
+
 	return static_cast<OpenWithContainerWindow*>(Window());
 }
 
@@ -562,6 +563,7 @@ void
 OpenWithPoseView::AttachedToWindow()
 {
 	_inherited::AttachedToWindow();
+
 	SetViewColor(kOpenWithDefaultColor);
 	SetLowColor(kOpenWithDefaultColor);
 }
@@ -686,7 +688,7 @@ OpenWithPoseView::OpenSelection(BPose* pose, int32*)
 	if (pose == NULL)
 		pose = fSelectionList->FirstItem();
 
-	ASSERT(pose);
+	ASSERT(pose != NULL);
 
 	BEntry entry(pose->TargetModel()->EntryRef());
 	if (entry.InitCheck() != B_OK) {
@@ -1572,31 +1574,31 @@ SearchForSignatureEntryList::CanOpenWithFilter(const Model* appModel,
 		return false;
 	}
 
-	ASSERT(dynamic_cast<BFile*>(appModel->Node()));
-	char signature[B_MIME_TYPE_LENGTH];
-	status_t result = GetAppSignatureFromAttr(
-		dynamic_cast<BFile*>(appModel->Node()), signature);
+	BFile* file = dynamic_cast<BFile*>(appModel->Node());
+	ASSERT(file != NULL);
 
-	if (result == B_OK && strcasecmp(signature, kTrackerSignature) == 0) {
+	char signature[B_MIME_TYPE_LENGTH];
+	if (GetAppSignatureFromAttr(file, signature) == B_OK
+		&& strcasecmp(signature, kTrackerSignature) == 0) {
 		// special case the Tracker - make sure only the running copy is
 		// in the list
 		app_info trackerInfo;
-		result = be_roster->GetActiveAppInfo(&trackerInfo);
 		if (*appModel->EntryRef() != trackerInfo.ref) {
 			// this is an inactive copy of the Tracker, remove it
 
 #if xDEBUG
-			BPath path, path2;
+			BPath path1;
+			BPath path2;
 			BEntry entry(appModel->EntryRef());
-			entry.GetPath(&path);
+			entry.GetPath(&path1);
 
 			BEntry entry2(&trackerInfo.ref);
 			entry2.GetPath(&path2);
 
-			PRINT(
-				("filtering out %s, sig %s, active Tracker at %s, "
-				 "result %s, refName %s\n",
-				path.Path(), signature, path2.Path(), strerror(result),
+			PRINT(("filtering out %s, sig %s, active Tracker at %s, "
+				   "result %s, refName %s\n",
+				path1.Path(), signature, path2.Path(),
+				strerror(be_roster->GetActiveAppInfo(&trackerInfo)),
 				trackerInfo.ref.name));
 #endif
 			return false;

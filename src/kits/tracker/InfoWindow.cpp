@@ -1544,7 +1544,7 @@ AttributeView::OpenLinkTarget()
 	if (entry.InitCheck() != B_OK || !entry.Exists()) {
 		// Open a file dialog panel to allow the user to relink.
 		BInfoWindow* window = dynamic_cast<BInfoWindow*>(Window());
-		if (window)
+		if (window != NULL)
 			window->OpenFilePanel(fModel->EntryRef());
 	} else {
 		entry_ref ref;

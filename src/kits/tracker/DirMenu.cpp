@@ -187,7 +187,7 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 
 		ModelMenuItem* item
 			= dynamic_cast<ModelMenuItem*>(ItemAt(CountItems() - 1));
-		if (item) {
+		if (item != NULL) {
 			item->SetMarked(true);
 			if (menu) {
 				entry.SetTo(item->TargetModel()->EntryRef());
@@ -220,9 +220,10 @@ BDirMenu::AddItemToDirMenu(const BEntry* entry, BWindow* originatingWindow,
 	// close the window if
 	BContainerWindow* window = originatingWindow ?
 		dynamic_cast<BContainerWindow*>(originatingWindow) : 0;
-	if (window)
+	if (window != NULL) {
 		message->AddData("nodeRefsToClose", B_RAW_TYPE,
 			window->TargetModel()->NodeRef(), sizeof (node_ref));
+	}
 	ModelMenuItem* item;
 	if (navMenuEntries) {
 		BNavMenu* subMenu = new BNavMenu(model.Name(), B_REFS_RECEIVED,
@@ -251,10 +252,10 @@ BDirMenu::AddItemToDirMenu(const BEntry* entry, BWindow* originatingWindow,
 
 	item->SetTarget(fTarget);
 
-	if (fMenuBar) {
+	if (fMenuBar != NULL) {
 		ModelMenuItem* menu
 			= dynamic_cast<ModelMenuItem*>(fMenuBar->ItemAt(0));
-		if (menu) {
+		if (menu != NULL) {
 			ThrowOnError(menu->SetEntry(entry));
 			item->SetMarked(true);
 		}

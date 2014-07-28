@@ -838,7 +838,7 @@ TitledSeparatorItem::Draw()
 	BRect frame(Frame());
 
 	BMenu* parent = Menu();
-	ASSERT(parent);
+	ASSERT(parent != NULL);
 
 	menu_info minfo;
 	get_menu_info(&minfo);

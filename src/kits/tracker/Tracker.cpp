@@ -1206,8 +1206,8 @@ TTracker::FindParentContainerWindow(const entry_ref* ref) const
 
 	int32 count = fWindowList.CountItems();
 	for (int32 index = 0; index < count; index++) {
-		BContainerWindow* window = dynamic_cast<BContainerWindow*>
-			(fWindowList.ItemAt(index));
+		BContainerWindow* window = dynamic_cast<BContainerWindow*>(
+			fWindowList.ItemAt(index));
 		if (window != NULL && window->IsShowing(&parentRef))
 			return window;
 	}
@@ -1223,8 +1223,8 @@ TTracker::FindInfoWindow(const node_ref* node) const
 
 	int32 count = fWindowList.CountItems();
 	for (int32 index = 0; index < count; index++) {
-		BInfoWindow* window = dynamic_cast<BInfoWindow*>
-			(fWindowList.ItemAt(index));
+		BInfoWindow* window = dynamic_cast<BInfoWindow*>(
+			fWindowList.ItemAt(index));
 		if (window != NULL && window->IsShowing(node))
 			return window;
 	}
@@ -1239,8 +1239,8 @@ TTracker::QueryActiveForDevice(dev_t device)
 	AutoLock<WindowList> lock(&fWindowList);
 	int32 count = fWindowList.CountItems();
 	for (int32 index = 0; index < count; index++) {
-		BQueryContainerWindow* window
-			= dynamic_cast<BQueryContainerWindow*>(fWindowList.ItemAt(index));
+		BQueryContainerWindow* window = dynamic_cast<BQueryContainerWindow*>(
+			fWindowList.ItemAt(index));
 		if (window != NULL) {
 			AutoLock<BWindow> lock(window);
 			if (window->ActiveOnDevice(device))
@@ -1292,11 +1292,9 @@ TTracker::SaveAllPoseLocations()
 	for (int32 windowIndex = 0; windowIndex < numWindows; windowIndex++) {
 		BContainerWindow* window = dynamic_cast<BContainerWindow*>(
 			fWindowList.ItemAt(windowIndex));
-
 		if (window != NULL) {
 			AutoLock<BWindow> lock(window);
 			BDeskWindow* deskWindow = dynamic_cast<BDeskWindow*>(window);
-
 			if (deskWindow != NULL)
 				deskWindow->SaveDesktopPoseLocations();
 			else
@@ -1319,8 +1317,8 @@ TTracker::CloseWindowAndChildren(const node_ref* node)
 	// make a list of all windows to be closed
 	// count from end to beginning so we can remove items safely
 	for (int32 index = fWindowList.CountItems() - 1; index >= 0; index--) {
-		BContainerWindow* window = dynamic_cast<BContainerWindow*>
-			(fWindowList.ItemAt(index));
+		BContainerWindow* window = dynamic_cast<BContainerWindow*>(
+			fWindowList.ItemAt(index));
 		if (window && window->TargetModel()) {
 			BEntry wind_entry;
 			wind_entry.SetTo(window->TargetModel()->EntryRef());

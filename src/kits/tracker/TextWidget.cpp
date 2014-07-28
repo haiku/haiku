@@ -447,18 +447,18 @@ BTextWidget::StopEdit(bool saveChanges, BPoint poseLoc, BPoseView* view,
 	// find the text editing view
 	BView* scrollView = view->FindView("BorderView");
 	ASSERT(scrollView);
-	if (!scrollView)
+	if (scrollView == NULL)
 		return;
 
 	BTextView* textView = dynamic_cast<BTextView*>(
 		scrollView->FindView("WidgetTextView"));
-	ASSERT(textView);
-	if (!textView)
+	ASSERT(textView != NULL);
+	if (textView == NULL)
 		return;
 
 	BColumn* column = view->ColumnFor(fAttrHash);
-	ASSERT(column);
-	if (!column)
+	ASSERT(column != NULL);
+	if (column == NULL)
 		return;
 
 	if (saveChanges && fText->CommitEditedText(textView)) {
@@ -505,7 +505,7 @@ BTextWidget::SelectAll(BPoseView* view)
 {
 	BTextView* text = dynamic_cast<BTextView*>(
 		view->FindView("WidgetTextView"));
-	if (text)
+	if (text != NULL)
 		text->SelectAll();
 }
 

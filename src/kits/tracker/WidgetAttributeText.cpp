@@ -2155,8 +2155,7 @@ OpenWithRelationAttributeText::FitValue(BString* outString,
 	ASSERT(view == fPoseView);
 	const OpenWithPoseView* launchWithView
 		= dynamic_cast<const OpenWithPoseView*>(view);
-
-	if (launchWithView)
+	if (launchWithView != NULL)
 		launchWithView->OpenWithRelationDescription(fModel, &fRelationText);
 
 	fOldWidth = fColumn->Width();
@@ -2185,15 +2184,16 @@ VersionAttributeText::ReadValue(BString* outString)
 
 	BModelOpener opener(fModel);
 	BFile* file = dynamic_cast<BFile*>(fModel->Node());
-	if (file) {
+	if (file != NULL) {
 		BAppFileInfo info(file);
 		version_info version;
 		if (info.InitCheck() == B_OK
 			&& info.GetVersionInfo(&version, fAppVersion
-					? B_APP_VERSION_KIND : B_SYSTEM_VERSION_KIND) == B_OK) {
+				? B_APP_VERSION_KIND : B_SYSTEM_VERSION_KIND) == B_OK) {
 			*outString = version.short_info;
 			return;
 		}
 	}
+
 	*outString = "-";
 }

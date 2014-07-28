@@ -54,13 +54,13 @@ static inline void MakeModeNameFromRefName(char* modeName, char* refName);
 static inline bool CompareModeAndRefName(const char* modeName,
 	const char* refName);
 
-/*
+#if 0
 static bool
 FSClipboardCheckIntegrity()
 {
 	return true;
 }
-*/
+#endif
 
 static void
 MakeNodeFromName(node_ref* node, char* name)

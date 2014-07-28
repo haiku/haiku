@@ -215,8 +215,8 @@ TrackerSettingsWindow::_ViewAt(int32 i)
 	if (!Lock())
 		return NULL;
 
-	SettingsItem* item = dynamic_cast<SettingsItem*>
-		(fSettingsTypeListView->ItemAt(i));
+	SettingsItem* item = dynamic_cast<SettingsItem*>(
+		fSettingsTypeListView->ItemAt(i));
 
 	Unlock();
 
@@ -292,10 +292,8 @@ TrackerSettingsWindow::_HandleChangedSettingsView()
 	if (oldView != NULL)
 		oldView->RemoveSelf();
 
-	SettingsItem* selectedItem =
-		dynamic_cast<SettingsItem*>
-			(fSettingsTypeListView->ItemAt(currentSelection));
-
+	SettingsItem* selectedItem = dynamic_cast<SettingsItem*>(
+		fSettingsTypeListView->ItemAt(currentSelection));
 	if (selectedItem != NULL) {
 		fSettingsContainerBox->SetLabel(selectedItem->Text());
 

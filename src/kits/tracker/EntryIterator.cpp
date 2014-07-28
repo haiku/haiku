@@ -168,8 +168,8 @@ CachedEntryIterator::~CachedEntryIterator()
 status_t
 CachedEntryIterator::GetNextEntry(BEntry* result, bool traverse)
 {
-	ASSERT(!fDirentBuffer);
-	ASSERT(!fEntryRefBuffer);
+	ASSERT(fDirentBuffer != NULL);
+	ASSERT(fEntryRefBuffer != NULL);
 
 	if (fEntryBuffer == NULL) {
 		fEntryBuffer = new BEntry [fCacheSize];
@@ -362,13 +362,13 @@ CachedEntryIterator::SetTo(BEntryList* iterator)
 //	#pragma mark - CachedDirectoryEntryList
 
 
-CachedDirectoryEntryList::CachedDirectoryEntryList(const BDirectory &dir)
+CachedDirectoryEntryList::CachedDirectoryEntryList(const BDirectory& directory)
 	:
 	CachedEntryIterator(0, 40, true),
-	fDir(dir)
+	fDirectory(directory)
 {
-	fStatus = fDir.InitCheck();
-	SetTo(&fDir);
+	fStatus = fDirectory.InitCheck();
+	SetTo(&fDirectory);
 }
 
 
@@ -380,18 +380,18 @@ CachedDirectoryEntryList::~CachedDirectoryEntryList()
 //	#pragma mark - DirectoryEntryList
 
 
-DirectoryEntryList::DirectoryEntryList(const BDirectory &dir)
+DirectoryEntryList::DirectoryEntryList(const BDirectory& directory)
 	:
-	fDir(dir)
+	fDirectory(directory)
 {
-	fStatus = fDir.InitCheck();
+	fStatus = fDirectory.InitCheck();
 }
 
 
 status_t
 DirectoryEntryList::GetNextEntry(BEntry* entry, bool traverse)
 {
-	fStatus = fDir.GetNextEntry(entry, traverse);
+	fStatus = fDirectory.GetNextEntry(entry, traverse);
 	return fStatus;
 }
 
@@ -399,7 +399,7 @@ DirectoryEntryList::GetNextEntry(BEntry* entry, bool traverse)
 status_t
 DirectoryEntryList::GetNextRef(entry_ref* ref)
 {
-	fStatus = fDir.GetNextRef(ref);
+	fStatus = fDirectory.GetNextRef(ref);
 	return fStatus;
 }
 
@@ -408,7 +408,7 @@ int32
 DirectoryEntryList::GetNextDirents(struct dirent* buffer, size_t length,
 	int32 count)
 {
-	fStatus = fDir.GetNextDirents(buffer, length, count);
+	fStatus = fDirectory.GetNextDirents(buffer, length, count);
 	return fStatus;
 }
 
@@ -416,7 +416,7 @@ DirectoryEntryList::GetNextDirents(struct dirent* buffer, size_t length,
 status_t
 DirectoryEntryList::Rewind()
 {
-	fStatus = fDir.Rewind();
+	fStatus = fDirectory.Rewind();
 	return fStatus;
 }
 
@@ -424,7 +424,7 @@ DirectoryEntryList::Rewind()
 int32
 DirectoryEntryList::CountEntries()
 {
-	return fDir.CountEntries();
+	return fDirectory.CountEntries();
 }
 
 
@@ -446,8 +446,7 @@ EntryIteratorList::~EntryIteratorList()
 		// workaround for BEntryList not having a proper destructor
 		BEntryList* entry = fList.RemoveItemAt(count - 1);
 		EntryListBase* fixedEntry = dynamic_cast<EntryListBase*>(entry);
-
-		if (fixedEntry)
+		if (fixedEntry != NULL)
 			delete fixedEntry;
 		else
 			delete entry;

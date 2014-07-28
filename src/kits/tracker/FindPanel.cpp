@@ -503,7 +503,7 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
 	if (focusedItem != NULL) {
 		// text controls never get the focus, their internal text views do
 		BView* parent = focusedItem->Parent();
-		if (dynamic_cast<BTextControl*>(parent))
+		if (dynamic_cast<BTextControl*>(parent) != NULL)
 			focusedItem = parent;
 
 		// write out the current focus and, if text control, selection
@@ -542,7 +542,8 @@ FindWindow::Find()
 		// have to wait for the node monitor to force old query to close
 		// to avoid a race condition
 		TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-		ASSERT(tracker);
+		ASSERT(tracker != NULL);
+
 		for (int32 timeOut = 0; ; timeOut++) {
 			if (!tracker->EntryHasWindowOpen(&fRef)) {
 				// window quit, we can post refs received to open a
@@ -900,6 +901,7 @@ FindPanel::AttachedToWindow()
 {
 	FindWindow* findWindow = dynamic_cast<FindWindow*>(Window());
 	ASSERT(findWindow != NULL);
+
 	if (findWindow == NULL)
 		return;
 
@@ -1362,8 +1364,8 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 		if (textControl == NULL)
 			return;
 
-		BMenuField* menuField
-			= dynamic_cast<BMenuField*>(FindAttrView("MenuField", index));
+		BMenuField* menuField = dynamic_cast<BMenuField*>(
+			FindAttrView("MenuField", index));
 		if (menuField == NULL)
 			return;
 
@@ -1474,8 +1476,8 @@ FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
 
 		// add logic based on selection in Logic menufield
 		if (index > 0) {
-			menuField
-				= dynamic_cast<BMenuField*>(FindAttrView("Logic", index - 1));
+			menuField = dynamic_cast<BMenuField*>(
+				FindAttrView("Logic", index - 1));
 			if (menuField) {
 				item = menuField->Menu()->FindMarked();
 				if (item) {
@@ -1526,8 +1528,8 @@ FindPanel::GetByAttrPredicate(BQuery* query, bool &dynamicDate) const
 void
 FindPanel::GetDefaultName(BString& name) const
 {
-	BTextControl* textControl
-		= dynamic_cast<BTextControl*>(FindView("TextControl"));
+	BTextControl* textControl = dynamic_cast<BTextControl*>(
+		FindView("TextControl"));
 
 	switch (Mode()) {
 		case kByNameItem:
@@ -1577,6 +1579,7 @@ void
 FindPanel::GetByNamePredicate(BQuery* query) const
 {
 	ASSERT(Mode() == (int32)kByNameItem);
+
 	BTextControl* textControl
 		= dynamic_cast<BTextControl*>(FindView("TextControl"));
 
@@ -1863,8 +1866,8 @@ FindPanel::AddMimeTypesToMenu()
 	}
 
 	if (tracker != NULL) {
-		tracker->MimeTypes()->EachCommonType(&FindPanel::AddOneMimeTypeToMenu,
-			MimeTypeMenu());
+		tracker->MimeTypes()->EachCommonType(
+			&FindPanel::AddOneMimeTypeToMenu, MimeTypeMenu());
 	}
 
 	// remove empty super type menus (and set target)
@@ -1889,7 +1892,7 @@ FindPanel::AddMimeTypesToMenu()
 void
 FindPanel::AddVolumes(BMenu* menu)
 {
-// ToDo: add calls to this to rebuild the menu when a volume gets mounted
+	// ToDo: add calls to this to rebuild the menu when a volume gets mounted
 
 	BMessage* message = new BMessage(kVolumeItem);
 	message->AddInt32("device", -1);
@@ -3104,7 +3107,6 @@ DeleteTransientQueriesTask::ProcessOneRef(Model* model)
 		return false;
 
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-
 	ASSERT(tracker != NULL);
 
 	// check that it is not showing
@@ -3151,7 +3153,6 @@ DeleteTransientQueriesTask::StartUpTransientQueryCleaner()
 		= new DeleteTransientQueriesFunctor(new DeleteTransientQueriesTask());
 
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-
 	ASSERT(tracker != NULL);
 
 	if (tracker != NULL) {
@@ -3194,8 +3195,8 @@ _IMPEXP_TRACKER
 BMenu*
 TrackerBuildRecentFindItemsMenu(const char* title)
 {
-	BMessenger tracker(kTrackerSignature);
-	return new RecentFindItemsMenu(title, &tracker, B_REFS_RECEIVED);
+	BMessenger trackerMessenger(kTrackerSignature);
+	return new RecentFindItemsMenu(title, &trackerMessenger, B_REFS_RECEIVED);
 }
 
 

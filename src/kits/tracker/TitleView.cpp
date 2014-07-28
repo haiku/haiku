@@ -384,7 +384,7 @@ BTitleView::MouseUp(BPoint where)
 
 
 void
-BTitleView::MouseMoved(BPoint where, uint32 code, const BMessage* message)
+BTitleView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
 	if (fTrackingState != NULL) {
 		int32 buttons = 0;
@@ -407,7 +407,7 @@ BTitleView::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			break;
 	}
 
-	_inherited::MouseMoved(where, code, message);
+	_inherited::MouseMoved(where, code, dragMessage);
 }
 
 

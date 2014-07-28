@@ -732,6 +732,7 @@ float
 BPoseView::StringWidth(const char* str, int32 len) const
 {
 	ASSERT(strlen(str) == (uint32)len);
+
 	return BPrivate::gWidthBuffer->StringWidth(str, 0, len, &sCurrentFont);
 }
 
@@ -883,13 +884,13 @@ BPoseView::DetachedFromWindow()
 	if (fTitleView && !fTitleView->Window())
 		delete fTitleView;
 
-	if (TTracker* app = dynamic_cast<TTracker*>(be_app)) {
-		app->Lock();
-		app->StopWatching(this, kShowSelectionWhenInactiveChanged);
-		app->StopWatching(this, kTransparentSelectionChanged);
-		app->StopWatching(this, kSortFolderNamesFirstChanged);
-		app->StopWatching(this, kTypeAheadFilteringChanged);
-		app->Unlock();
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+	if (tracker != NULL && tracker->Lock()) {
+		tracker->StopWatching(this, kShowSelectionWhenInactiveChanged);
+		tracker->StopWatching(this, kTransparentSelectionChanged);
+		tracker->StopWatching(this, kSortFolderNamesFirstChanged);
+		tracker->StopWatching(this, kTypeAheadFilteringChanged);
+		tracker->Unlock();
 	}
 
 	StopWatching();
@@ -947,11 +948,11 @@ BPoseView::MoveBy(float x, float y)
 
 
 void
-BPoseView::ScrollTo(BPoint point)
+BPoseView::ScrollTo(BPoint where)
 {
-	_inherited::ScrollTo(point);
+	_inherited::ScrollTo(where);
 
-	//keep the view state in sync.
+	// keep the view state in sync
 	if (ViewMode() == kListMode)
 		fViewState->SetListOrigin(LeftTop());
 	else
@@ -962,7 +963,7 @@ BPoseView::ScrollTo(BPoint point)
 void
 BPoseView::AttachedToWindow()
 {
-	fIsDesktopWindow = (dynamic_cast<BDeskWindow*>(Window()) != 0);
+	fIsDesktopWindow = dynamic_cast<BDeskWindow*>(Window()) != NULL;
 	if (fIsDesktopWindow)
 		AddFilter(new TPoseViewFilter(this));
 
@@ -1062,7 +1063,7 @@ BPoseView::MakeFocus(bool focused)
 
 	if (invalidate) {
 		BackgroundView* view = dynamic_cast<BackgroundView*>(Parent());
-		if (view)
+		if (view != NULL)
 			view->PoseViewFocused(focused);
 	}
 }
@@ -2446,8 +2447,8 @@ BPoseView::MessageReceived(BMessage* message)
 
 			BPose* pose = fSelectionList->FirstItem();
 			if (pose != NULL) {
-				BPoint where(0, CurrentPoseList()->IndexOf(pose)
-					* fListElemHeight);
+				BPoint where(0,
+					CurrentPoseList()->IndexOf(pose) * fListElemHeight);
 				pose->EditFirstWidget(where, this);
 			}
 			break;
@@ -2957,7 +2958,7 @@ BPoseView::ReadPoseInfo(Model* model, PoseInfo* poseInfo)
 	if (result == kReadAttrFailed) {
 		poseInfo->fInitedDirectory = -1LL;
 		poseInfo->fInvisible = false;
-	} else if (!TargetModel()
+	} else if (TargetModel() == NULL
 		|| (poseInfo->fInitedDirectory != model->EntryRef()->directory
 			&& (poseInfo->fInitedDirectory
 				!= TargetModel()->NodeRef()->node))) {
@@ -4397,7 +4398,7 @@ BPoseView::HandleMessageDropped(BMessage* message)
 
 	fDropTarget = NULL;
 
-	ASSERT(TargetModel());
+	ASSERT(TargetModel() != NULL);
 	BPoint offset;
 	BPoint dropPoint(message->DropPoint(&offset));
 	ConvertFromScreen(&dropPoint);
@@ -4477,7 +4478,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 						break;
 					}
 
-					ASSERT(string);
+					ASSERT(string != NULL);
 					actionSpecifiers.AddItem(new BString(string));
 				}
 
@@ -4491,7 +4492,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 						break;
 					}
 
-					ASSERT(string);
+					ASSERT(string != NULL);
 					types.AddItem(new BString(string));
 
 					const char* typeName = "";
@@ -5376,6 +5377,7 @@ BPoseView::FSNotification(const BMessage* message)
 			}
 			if (createPose)
 				EntryCreated(&dirNode, &itemNode, name);
+
 			TryUpdatingBrokenLinks();
 			break;
 		}
@@ -5396,8 +5398,7 @@ BPoseView::FSNotification(const BMessage* message)
 			// but it's a node monitor notification then that means our query
 			// file has been deleted so we close the window
 
-			if (message->what == B_NODE_MONITOR
-				&& targetModel != NULL
+			if (message->what == B_NODE_MONITOR && targetModel != NULL
 				&& *(targetModel->NodeRef()) == itemNode) {
 				if (!targetModel->IsRoot()) {
 					// it is impossible to watch for ENTRY_REMOVED in
@@ -6291,8 +6292,8 @@ BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool askUser)
 				&TTracker::SelectPoseAtLocationSoon, tracker,
 				*targetModel->NodeRef(), pointInPose));
 		}
-
 	}
+
 	// execute the two tasks in order
 	ThreadSequence::Launch(taskList, true);
 }
@@ -8189,8 +8190,6 @@ BPoseView::OpenSelectionCommon(BPose* clickedPose, int32* poseIndex,
 	if (count == 0)
 		return;
 
-	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-
 	BMessage message(B_REFS_RECEIVED);
 
 	for (int32 index = 0; index < count; index++) {
@@ -8199,7 +8198,7 @@ BPoseView::OpenSelectionCommon(BPose* clickedPose, int32* poseIndex,
 
 		// close parent window if option down and we're not the desktop
 		// and we're not in single window mode
-		if (tracker == NULL
+		if (dynamic_cast<TTracker*>(be_app) == NULL
 			|| (modifiers() & B_OPTION_KEY) == 0
 			|| IsFilePanel()
 			|| IsDesktopWindow()
@@ -8539,8 +8538,8 @@ BPoseView::OpenInfoWindows()
 void
 BPoseView::SetDefaultPrinter()
 {
-	BMessenger tracker(kTrackerSignature);
-	if (!tracker.IsValid()) {
+	BMessenger trackerMessenger(kTrackerSignature);
+	if (!trackerMessenger.IsValid()) {
 		BAlert* alert = new BAlert("",
 			B_TRANSLATE("The Tracker must be running to see set the default "
 			"printer."), B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
@@ -10121,8 +10120,8 @@ BPoseView::StartWatchDateFormatChange()
 #if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_DANO)
 	if (IsFilePanel()) {
 #endif
-		BMessenger tracker(kTrackerSignature);
-		BHandler::StartWatching(tracker, kDateFormatChanged);
+		BMessenger trackerMessenger(kTrackerSignature);
+		BHandler::StartWatching(trackerMessenger, kDateFormatChanged);
 #if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_DANO)
 	} else if (be_app->LockLooper()) {
 		be_app->StartWatching(this, kDateFormatChanged);
@@ -10138,8 +10137,8 @@ void
 BPoseView::StopWatchDateFormatChange()
 {
 	if (IsFilePanel()) {
-		BMessenger tracker(kTrackerSignature);
-		BHandler::StopWatching(tracker, kDateFormatChanged);
+		BMessenger trackerMessenger(kTrackerSignature);
+		BHandler::StopWatching(trackerMessenger, kDateFormatChanged);
 	} else if (be_app->LockLooper()) {
 		be_app->StopWatching(this, kDateFormatChanged);
 		be_app->UnlockLooper();

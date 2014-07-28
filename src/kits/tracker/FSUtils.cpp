@@ -3254,8 +3254,10 @@ static status_t
 TrackerOpenWith(const BMessage* refs)
 {
 	BMessage clone(*refs);
-	ASSERT(dynamic_cast<TTracker*>(be_app));
-	ASSERT(clone.what);
+
+	ASSERT(dynamic_cast<TTracker*>(be_app) != NULL);
+	ASSERT(clone.what != 0);
+
 	clone.AddInt32("launchUsingSelector", 0);
 	// runs the Open With window
 	be_app->PostMessage(&clone);

@@ -152,7 +152,7 @@ public:
 	virtual int32 CountEntries();
 
 private:
-	BDirectory fDir;
+	BDirectory fDirectory;
 };
 
 
@@ -165,7 +165,7 @@ public:
 	virtual ~CachedDirectoryEntryList();
 
 private:
-	BDirectory fDir;
+	BDirectory fDirectory;
 };
 
 

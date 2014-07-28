@@ -74,7 +74,7 @@ static void
 send_bool_notices(uint32 what, const char* name, bool value)
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!tracker)
+	if (tracker == NULL)
 		return;
 
 	BMessage message;
@@ -224,7 +224,7 @@ void
 DesktopSettingsView::MessageReceived(BMessage* message)
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!tracker)
+	if (tracker == NULL)
 		return;
 
 	TrackerSettings settings;
@@ -350,7 +350,7 @@ void
 DesktopSettingsView::_SendNotices()
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!tracker)
+	if (tracker == NULL)
 		return;
 
 	// Construct the notification message:
@@ -571,7 +571,7 @@ void
 WindowsSettingsView::SetDefaults()
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!tracker)
+	if (tracker == NULL)
 		return;
 
 	TrackerSettings settings;
@@ -631,7 +631,7 @@ void
 WindowsSettingsView::Revert()
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!tracker)
+	if (tracker == NULL)
 		return;
 
 	TrackerSettings settings;
@@ -785,8 +785,9 @@ void
 SpaceBarSettingsView::MessageReceived(BMessage* message)
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!tracker)
+	if (tracker == NULL)
 		return;
+
 	TrackerSettings settings;
 
 	switch (message->what) {

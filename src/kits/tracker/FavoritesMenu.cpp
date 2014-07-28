@@ -158,7 +158,7 @@ FavoritesMenu::AddNextItem()
 			}
 
 			ThrowOnInitCheckError(fContainer);
-			ThrowOnError( fContainer->Rewind() );
+			ThrowOnError(fContainer->Rewind());
 		} catch (...) {
 			delete fContainer;
 			fContainer = NULL;

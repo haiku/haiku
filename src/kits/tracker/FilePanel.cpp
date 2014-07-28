@@ -121,13 +121,14 @@ BFilePanel::Show()
 	// just pull it to us
 	uint32 workspace = 1UL << (uint32)current_workspace();
 	uint32 windowWorkspaces = fWindow->Workspaces();
-	if (!(windowWorkspaces & workspace))
+	if (!(windowWorkspaces & workspace)) {
 		// window in a different workspace, reopen in current
 		fWindow->SetWorkspaces(workspace);
+	}
 
 	// Position the file panel like an alert
-	BWindow* parent =
-		dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
+	BWindow* parent = dynamic_cast<BWindow*>(
+		BLooper::LooperForThread(find_thread(NULL)));
 	const BRect frame = parent != NULL ? parent->Frame()
 		: BScreen(fWindow).Frame();
 	fWindow->MoveTo(dynamic_cast<BWindow*>(fWindow)->AlertPosition(frame));

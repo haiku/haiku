@@ -338,13 +338,14 @@ TFilePanel::FSFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 		case B_ENTRY_MOVED:
 		{
 			node_ref itemNode;
-			node_ref dirNode;
 			TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
+			message->FindInt64("node", (int64*)&itemNode.node);
 
+			node_ref dirNode;
 			message->FindInt32("device", &dirNode.device);
 			itemNode.device = dirNode.device;
 			message->FindInt64("to directory", (int64*)&dirNode.node);
-			message->FindInt64("node", (int64*)&itemNode.node);
+
 			const char* name;
 			if (message->FindString("name", &name) != B_OK)
 				break;
@@ -406,7 +407,8 @@ TFilePanel::DispatchMessage(BMessage* message, BHandler* handler)
 BFilePanelPoseView*
 TFilePanel::PoseView() const
 {
-	ASSERT(dynamic_cast<BFilePanelPoseView*>(fPoseView));
+	ASSERT(dynamic_cast<BFilePanelPoseView*>(fPoseView) != NULL);
+
 	return static_cast<BFilePanelPoseView*>(fPoseView);
 }
 
@@ -479,10 +481,8 @@ TFilePanel::SetRefFilter(BRefFilter* filter)
 
 	FavoritesMenu* favoritesSubMenu
 		= dynamic_cast<FavoritesMenu*>(favoritesItem->Submenu());
-	if (favoritesSubMenu == NULL)
-		return;
-
-	favoritesSubMenu->SetRefFilter(filter);
+	if (favoritesSubMenu != NULL)
+		favoritesSubMenu->SetRefFilter(filter);
 }
 
 
@@ -531,7 +531,7 @@ TFilePanel::AdjustButton()
 {
 	// adjust button state
 	BButton* button = dynamic_cast<BButton*>(FindView("default button"));
-	if (!button)
+	if (button == NULL)
 		return;
 
 	BTextControl* textControl
@@ -540,7 +540,7 @@ TFilePanel::AdjustButton()
 	BString buttonText = fButtonText;
 	bool enabled = false;
 
-	if (fIsSavePanel && textControl) {
+	if (fIsSavePanel && textControl != NULL) {
 		enabled = textControl->Text()[0] != '\0';
 		if (fPoseView->IsFocus()) {
 			fPoseView->ShowSelection(true);
@@ -1048,7 +1048,7 @@ TFilePanel::SetButtonLabel(file_panel_button selector, const char* text)
 			{
 				BButton* button
 					= dynamic_cast<BButton*>(FindView("cancel button"));
-				if (!button)
+				if (button == NULL)
 					break;
 
 				float old_width = button->StringWidth(button->Label());
@@ -1067,7 +1067,7 @@ TFilePanel::SetButtonLabel(file_panel_button selector, const char* text)
 				float delta = 0;
 				BButton* button
 					= dynamic_cast<BButton*>(FindView("default button"));
-				if (button) {
+				if (button != NULL) {
 					float old_width = button->StringWidth(button->Label());
 					button->SetLabel(text);
 					delta = old_width - button->StringWidth(text);
@@ -1079,7 +1079,7 @@ TFilePanel::SetButtonLabel(file_panel_button selector, const char* text)
 
 				// now must move cancel button
 				button = dynamic_cast<BButton*>(FindView("cancel button"));
-				if (button)
+				if (button != NULL)
 					button->MoveBy(delta, 0);
 			}
 			break;
@@ -1131,7 +1131,7 @@ TFilePanel::MessageReceived(BMessage* message)
 						// all we have to do is see if the button is enabled.
 						BButton* button = dynamic_cast<BButton*>(
 							FindView("default button"));
-						if (!button)
+						if (button == NULL)
 							break;
 
 						if (IsSavePanel()) {
@@ -1607,8 +1607,9 @@ TFilePanel::SwitchDirMenuTo(const entry_ref* ref)
 
 	ModelMenuItem* item = dynamic_cast<ModelMenuItem*>(
 		fDirMenuField->MenuBar()->ItemAt(0));
-	ASSERT(item);
 	item->SetEntry(&entry);
+	ASSERT(item != NULL);
+
 }
 
 
@@ -1667,7 +1668,7 @@ BFilePanelPoseView::FSNotification(const BMessage* message)
 				if (message->FindInt32("new device", &device) != B_OK)
 					break;
 
-				ASSERT(TargetModel());
+				ASSERT(TargetModel() != NULL);
 				TrackerSettings settings;
 
 				BVolume volume(device);

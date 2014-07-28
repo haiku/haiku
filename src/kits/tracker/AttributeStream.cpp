@@ -287,7 +287,7 @@ AttributeStreamFileNode::AttributeStreamFileNode(BNode* node)
 	:
 	fNode(node)
 {
-	ASSERT(fNode);
+	ASSERT(fNode != NULL);
 }
 
 
@@ -477,8 +477,8 @@ AttributeStreamMemoryNode::Read(const char* name,
 	const char* DEBUG_ONLY(foreignName), uint32 type, off_t bufferSize,
 	void* buffer, void (*DEBUG_ONLY(swapFunc))(void*))
 {
-	ASSERT(!foreignName);
-	ASSERT(!swapFunc);
+	ASSERT(foreignName == NULL);
+	ASSERT(swapFunc == NULL);
 
 	AttrNode* attrNode = NULL;
 

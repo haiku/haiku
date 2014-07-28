@@ -168,8 +168,7 @@ public:
 
 	void SetTo(BNode*);
 
-	BNode* Node()
-		{ return fNode; }
+	BNode* Node() { return fNode; }
 
 protected:
 	virtual bool CanFeed() const { return true; }

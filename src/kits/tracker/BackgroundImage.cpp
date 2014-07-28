@@ -176,8 +176,9 @@ BackgroundImage::Show(BView* view, int32 workspace)
 	BackgroundImageInfo* info = ImageInfoForWorkspace(workspace);
 	if (info) {
 		BPoseView* poseView = dynamic_cast<BPoseView*>(fView);
-		if (poseView)
+		if (poseView != NULL)
 			poseView->SetWidgetTextOutline(info->fTextWidgetOutline);
+
 		Show(info, fView);
 	}
 }

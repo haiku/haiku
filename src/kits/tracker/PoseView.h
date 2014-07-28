@@ -175,7 +175,7 @@ public:
 	virtual void KeyDown(const char*, int32);
 	virtual void Pulse();
 	virtual void MoveBy(float, float);
-	virtual void ScrollTo(BPoint point);
+	virtual void ScrollTo(BPoint);
 
 	// misc. mode setters
 	void SetMultipleSelection(bool);

@@ -115,6 +115,7 @@ BStatusMouseFilter::Filter(BMessage* message, BHandler** target)
 		BView* view = dynamic_cast<BView*>(*target);
 		if (view != NULL)
 			view = view->Parent();
+
 		if (view != NULL)
 			*target = view;
 	}
@@ -254,8 +255,9 @@ BStatusWindow::CreateStatusItem(thread_id thread, StatusWindowState type)
 		AutoLock<BLooper> lock(be_app);
 		int32 count = be_app->CountWindows();
 		for (int32 index = 0; index < count; index++) {
-			if (dynamic_cast<BDeskWindow*>(be_app->WindowAt(index))
-				&& be_app->WindowAt(index)->IsActive()) {
+			BWindow* window = be_app->WindowAt(index);
+			if (dynamic_cast<BDeskWindow*>(window) != NULL
+				&& window->IsActive()) {
 				desktopActive = true;
 				break;
 			}
