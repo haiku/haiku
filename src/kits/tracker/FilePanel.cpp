@@ -131,8 +131,8 @@ BFilePanel::Show()
 		BLooper::LooperForThread(find_thread(NULL)));
 	const BRect frame = parent != NULL ? parent->Frame()
 		: BScreen(fWindow).Frame();
-	fWindow->MoveTo(dynamic_cast<BWindow*>(fWindow)->AlertPosition(frame));
 
+	fWindow->MoveTo(fWindow->AlertPosition(frame));
 	if (!IsShowing())
 		fWindow->Show();
 
