@@ -457,13 +457,22 @@ BNavMenu::StartBuildingItemList()
 			BDirectory trashDir;
 
 			if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
-				dynamic_cast<EntryIteratorList*>(fContainer)->
-					AddItem(new DirectoryEntryList(trashDir));
+				EntryIteratorList* iteratorList
+					= dynamic_cast<EntryIteratorList*>(fContainer);
+
+				ASSERT(iteratorList != NULL);
+
+				if (iteratorList != NULL)
+					iteratorList->AddItem(new DirectoryEntryList(trashDir));
 			}
 		}
 	} else {
-		fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory*>(
-			startModel.Node()));
+		BDirectory* directory = dynamic_cast<BDirectory*>(startModel.Node());
+
+		ASSERT(directory != NULL);
+
+		if (directory != NULL)
+			fContainer = new DirectoryEntryList(*directory);
 	}
 
 	if (fContainer == NULL || fContainer->InitCheck() != B_OK)

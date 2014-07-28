@@ -581,7 +581,9 @@ BInfoWindow::MessageReceived(BMessage* message)
 				BVolumeRoster().GetBootVolume(&boot);
 				BVolume volume(fModel->NodeRef()->device);
 				if (volume != boot) {
-					dynamic_cast<TTracker*>(be_app)->SaveAllPoseLocations();
+					TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+					if (tracker != NULL)
+						tracker->SaveAllPoseLocations();
 
 					BMessage unmountMessage(kUnmountVolume);
 					unmountMessage.AddInt32("device_id", volume.Device());
@@ -2117,7 +2119,9 @@ AttributeView::BuildContextMenu(BMenu* parent)
 		// setup a navigation menu item which will dynamically load items
 		// as menu items are traversed
 		BNavMenu* navMenu = dynamic_cast<BNavMenu*>(navigationItem->Submenu());
-		navMenu->SetNavDir(&ref);
+		if (navMenu != NULL)
+			navMenu->SetNavDir(&ref);
+
 		navigationItem->SetLabel(model.Name());
 		navigationItem->SetEntry(&entry);
 

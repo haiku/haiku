@@ -840,7 +840,10 @@ SpaceBarSettingsView::MessageReceived(BMessage* message)
 					break;
 			}
 
-			Window()->PostMessage(kSettingsContentsModified);
+			BWindow* window = Window();
+			if (window != NULL)
+				window->PostMessage(kSettingsContentsModified);
+
 			tracker->PostMessage(kSpaceBarColorChanged);
 			break;
 		}

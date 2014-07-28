@@ -863,8 +863,9 @@ BPoseView::StartWatching()
 	// watch volumes
 	TTracker::WatchNode(NULL, B_WATCH_MOUNT, this);
 
-	if (TargetModel() != NULL)
-		TTracker::WatchNode(TargetModel()->NodeRef(), B_WATCH_ATTR, this);
+	Model* targetModel = TargetModel();
+	if (targetModel != NULL)
+		TTracker::WatchNode(targetModel->NodeRef(), B_WATCH_ATTR, this);
 
 	BMimeType::StartWatching(BMessenger(this));
 }
@@ -994,13 +995,13 @@ BPoseView::AttachedToWindow()
 			+ sFontInfo.leading;
 	}
 
-	if (TTracker* app = dynamic_cast<TTracker*>(be_app)) {
-		app->Lock();
-		app->StartWatching(this, kShowSelectionWhenInactiveChanged);
-		app->StartWatching(this, kTransparentSelectionChanged);
-		app->StartWatching(this, kSortFolderNamesFirstChanged);
-		app->StartWatching(this, kTypeAheadFilteringChanged);
-		app->Unlock();
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+	if (tracker != NULL && tracker->Lock()) {
+		tracker->StartWatching(this, kShowSelectionWhenInactiveChanged);
+		tracker->StartWatching(this, kTransparentSelectionChanged);
+		tracker->StartWatching(this, kSortFolderNamesFirstChanged);
+		tracker->StartWatching(this, kTypeAheadFilteringChanged);
+		tracker->Unlock();
 	}
 
 	FSClipboardStartWatch(this);
@@ -2029,8 +2030,9 @@ BPoseView::RefreshMimeTypeList()
 		if (pose == NULL)
 			break;
 
-		if (pose->TargetModel())
-			AddMimeType(pose->TargetModel()->MimeType());
+		Model* targetModel = pose->TargetModel();
+		if (targetModel != NULL)
+			AddMimeType(targetModel->MimeType());
 	}
 }
 
@@ -2289,24 +2291,44 @@ BPoseView::MessageReceived(BMessage* message)
 		}
 
 		case B_CUT:
-			FSClipboardAddPoses(TargetModel()->NodeRef(), fSelectionList, 
-				kMoveSelectionTo, true);
+		{
+			Model* targetModel = TargetModel();
+			if (targetModel != NULL) {
+				FSClipboardAddPoses(targetModel->NodeRef(), fSelectionList,
+					kMoveSelectionTo, true);
+			}
 			break;
+		}
 
 		case kCutMoreSelectionToClipboard:
-			FSClipboardAddPoses(TargetModel()->NodeRef(), fSelectionList,
-				kMoveSelectionTo, false);
+		{
+			Model* targetModel = TargetModel();
+			if (targetModel != NULL) {
+				FSClipboardAddPoses(targetModel->NodeRef(), fSelectionList,
+					kMoveSelectionTo, false);
+			}
 			break;
+		}
 
 		case B_COPY:
-			FSClipboardAddPoses(TargetModel()->NodeRef(), fSelectionList,
-				kCopySelectionTo, true);
+		{
+			Model* targetModel = TargetModel();
+			if (targetModel != NULL) {
+				FSClipboardAddPoses(targetModel->NodeRef(), fSelectionList,
+					kCopySelectionTo, true);
+			}
 			break;
+		}
 
 		case kCopyMoreSelectionToClipboard:
-			FSClipboardAddPoses(TargetModel()->NodeRef(), fSelectionList,
-				kCopySelectionTo, false);
+		{
+			Model* targetModel = TargetModel();
+			if (targetModel != NULL) {
+				FSClipboardAddPoses(targetModel->NodeRef(), fSelectionList,
+					kCopySelectionTo, false);
+			}
 			break;
+		}
 
 		case B_PASTE:
 			FSClipboardPaste(TargetModel());
@@ -2324,10 +2346,15 @@ BPoseView::MessageReceived(BMessage* message)
 			break;
 
 		case kCancelSelectionToClipboard:
-			FSClipboardRemovePoses(TargetModel()->NodeRef(),
-				(fSelectionList->CountItems() > 0
-					? fSelectionList : fPoseList));
+		{
+			Model* targetModel = TargetModel();
+			if (targetModel != NULL) {
+				FSClipboardRemovePoses(targetModel->NodeRef(),
+					fSelectionList != NULL && fSelectionList->CountItems() > 0
+						? fSelectionList : fPoseList);
+			}
 			break;
+		}
 
 		case kFSClipboardChanges:
 		{
@@ -2335,7 +2362,8 @@ BPoseView::MessageReceived(BMessage* message)
 			message->FindInt32("device", &node.device);
 			message->FindInt64("directory", &node.node);
 
-			if (*TargetModel()->NodeRef() == node)
+			Model* targetModel = TargetModel();
+			if (targetModel != NULL && *targetModel->NodeRef() == node)
 				UpdatePosesClipboardModeFromClipboard(message);
 			else if (message->FindBool("clearClipboard")
 				&& HasPosesInClipboard()) {
@@ -3350,21 +3378,26 @@ BPoseView::PlaceFolder(const entry_ref* ref, const BMessage* message)
 			setPosition = true;
 	}
 
-	if (setPosition)
-		FSSetPoseLocation(TargetModel()->NodeRef()->node, &node,
-			location);
+	if (setPosition) {
+		Model* targetModel = TargetModel();
+		if (targetModel != NULL && targetModel->NodeRef() != NULL) {
+			FSSetPoseLocation(targetModel->NodeRef()->node, &node,
+				location);
+		}
+	}
 }
 
 
 void
 BPoseView::NewFileFromTemplate(const BMessage* message)
 {
-	ASSERT(TargetModel());
+	Model* targetModel = TargetModel();
+	ASSERT(targetModel != NULL);
 
 	entry_ref destEntryRef;
 	node_ref destNodeRef;
 
-	BDirectory destDir(TargetModel()->NodeRef());
+	BDirectory destDir(targetModel->NodeRef());
 	if (destDir.InitCheck() != B_OK)
 		return;
 
@@ -4267,9 +4300,15 @@ BPoseView::TrySettingPoseLocation(BNode* node, BPoint point)
 		point = PinToGrid(point, fGrid, fOffset);
 	}
 
-	if (FSSetPoseLocation(TargetModel()->NodeRef()->node, node, point) == B_OK)
+	Model* targetModel = TargetModel();
+	ASSERT(targetModel != NULL);
+
+	if (targetModel != NULL && targetModel->NodeRef() != NULL
+		&& FSSetPoseLocation(targetModel->NodeRef()->node, node, point)
+			== B_OK) {
 		// get rid of opposite endianness attribute
 		node->RemoveAttr(kAttrPoseInfoForeign);
+	}
 }
 
 
@@ -4382,13 +4421,10 @@ BPoseView::HandleMessageDropped(BMessage* message)
 	if (!fDropEnabled)
 		return false;
 
-	if (dynamic_cast<BContainerWindow*>(Window()) == NULL)
-		return false;
-
- 	if (message->HasData("RGBColor", 'RGBC')) {
+	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
+	if (window != NULL && message->HasData("RGBColor", 'RGBC')) {
  		// do not handle roColor-style drops here, pass them on to the desktop
- 		if (dynamic_cast<BDeskWindow*>(Window()))
- 			BMessenger((BHandler*)Window()).SendMessage(message);
+		BMessenger((BHandler*)window).SendMessage(message);
 
 		return true;
  	}
@@ -5327,7 +5363,7 @@ BPoseView::FSNotification(const BMessage* message)
 			// The Disks window can too
 			// So can the Desktop, as long as the integrate flag is on
 			TrackerSettings settings;
-			if (dirNode != *targetModel->NodeRef()
+			if (targetModel != NULL && dirNode != *targetModel->NodeRef()
 				&& !targetModel->IsQuery()
 				&& !targetModel->IsVirtualDirectory()
 				&& !targetModel->IsRoot()
@@ -5476,9 +5512,10 @@ BPoseView::FSNotification(const BMessage* message)
 					// close the window from a volume that is gone
 					DisableSaveLocation();
 					Window()->Close();
-				} else if (targetModel != NULL)
+				} else if (targetModel != NULL) {
 					EachPoseAndModel(fPoseList, &PoseHandleDeviceUnmounted,
 						this, device);
+				}
 			}
 			break;
 

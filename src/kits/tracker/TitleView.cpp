@@ -303,9 +303,13 @@ BTitleView::Draw(BRect /*updateRect*/, bool useOffscreen, bool updateOnly,
 void
 BTitleView::MouseDown(BPoint where)
 {
-	if (!Window()->IsActive()) {
-		// wasn't active, just activate and bail
-		Window()->Activate();
+	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
+	if (window == NULL)
+		return;
+
+	if (!window->IsActive()) {
+		// window wasn't active, activate it and bail
+		window->Activate();
 		return;
 	}
 
@@ -322,8 +326,6 @@ BTitleView::MouseDown(BPoint where)
 	// if so, display the attribute menu:
 
 	if (SecondaryMouseButtonDown(modifiers(), buttons)) {
-		BContainerWindow* window = dynamic_cast<BContainerWindow*>
-			(Window());
 		BPopUpMenu* menu = new BPopUpMenu("Attributes", false, false);
 		menu->SetFont(be_plain_font);
 		window->NewAttributeMenu(menu);
@@ -386,6 +388,10 @@ BTitleView::MouseUp(BPoint where)
 void
 BTitleView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
+	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
+	if (window == NULL)
+		return;
+
 	if (fTrackingState != NULL) {
 		int32 buttons = 0;
 		if (Looper() != NULL && Looper()->CurrentMessage() != NULL)
@@ -396,7 +402,7 @@ BTitleView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 
 	switch (code) {
 		default:
-			if (InColumnResizeArea(where) && Window()->IsActive())
+			if (InColumnResizeArea(where) && window->IsActive())
 				SetViewCursor(&fHorizontalResizeCursor);
 			else
 				SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);

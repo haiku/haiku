@@ -553,9 +553,11 @@ OpenWithPoseView::OpenWithPoseView(BRect frame, uint32 resizeMask)
 OpenWithContainerWindow*
 OpenWithPoseView::ContainerWindow() const
 {
-	ASSERT(dynamic_cast<OpenWithContainerWindow*>(Window()));
+	OpenWithContainerWindow* window
+		= dynamic_cast<OpenWithContainerWindow*>(Window());
+	ASSERT(window != NULL);
 
-	return static_cast<OpenWithContainerWindow*>(Window());
+	return window;
 }
 
 

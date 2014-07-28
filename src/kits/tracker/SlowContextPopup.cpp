@@ -265,8 +265,13 @@ BSlowContextMenu::StartBuildingItemList()
 			AddRootItemsIfNeeded();
 			AddTrashItem();
 		} else {
-			fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory*>
-				(startModel.Node()));
+			BDirectory* directory = dynamic_cast<BDirectory*>(
+				startModel.Node());
+
+			ASSERT(directory != NULL);
+
+			if (directory != NULL)
+				fContainer = new DirectoryEntryList(*directory);
 		}
 
 		if (fContainer->InitCheck() != B_OK)

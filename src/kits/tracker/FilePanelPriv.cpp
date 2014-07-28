@@ -109,8 +109,11 @@ GetLinkFlavor(const Model* model, bool resolve = true)
 static filter_result
 key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 {
-	TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
+	ASSERT(filter != NULL);
+	if (filter == NULL)
+		return B_DISPATCH_MESSAGE;
 
+	TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
 	ASSERT(panel != NULL);
 
 	if (panel == NULL)
@@ -261,9 +264,18 @@ filter_result
 TFilePanel::MessageDropFilter(BMessage* message, BHandler**,
 	BMessageFilter* filter)
 {
+	if (message == NULL || !message->WasDropped())
+		return B_DISPATCH_MESSAGE;
+
+	ASSERT(filter != NULL);
+	if (filter == NULL)
+		return B_DISPATCH_MESSAGE;
+
 	TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
-	if (panel == NULL || !message->WasDropped())
-		return B_SKIP_MESSAGE;
+	ASSERT(panel != NULL);
+
+	if (panel == NULL)
+		return B_DISPATCH_MESSAGE;
 
 	uint32 type;
 	int32 count;
@@ -334,11 +346,23 @@ TFilePanel::MessageDropFilter(BMessage* message, BHandler**,
 filter_result
 TFilePanel::FSFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 {
+	if (message == NULL)
+		return B_DISPATCH_MESSAGE;
+
+	ASSERT(filter != NULL);
+	if (filter == NULL)
+		return B_DISPATCH_MESSAGE;
+
+	TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
+	ASSERT(panel != NULL);
+
+	if (panel == NULL)
+		return B_DISPATCH_MESSAGE;
+
 	switch (message->FindInt32("opcode")) {
 		case B_ENTRY_MOVED:
 		{
 			node_ref itemNode;
-			TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
 			message->FindInt64("node", (int64*)&itemNode.node);
 
 			node_ref dirNode;
@@ -363,7 +387,6 @@ TFilePanel::FSFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 		case B_ENTRY_REMOVED:
 		{
 			node_ref itemNode;
-			TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
 			message->FindInt32("device", &itemNode.device);
 			message->FindInt64("node", (int64*)&itemNode.node);
 
@@ -465,6 +488,7 @@ TFilePanel::SetMessage(BMessage* message)
 void
 TFilePanel::SetRefFilter(BRefFilter* filter)
 {
+	ASSERT(filter != NULL);
 	if (filter == NULL)
 		return;
 
@@ -1607,9 +1631,10 @@ TFilePanel::SwitchDirMenuTo(const entry_ref* ref)
 
 	ModelMenuItem* item = dynamic_cast<ModelMenuItem*>(
 		fDirMenuField->MenuBar()->ItemAt(0));
-	item->SetEntry(&entry);
 	ASSERT(item != NULL);
 
+	if (item != NULL)
+		item->SetEntry(&entry);
 }
 
 
@@ -1753,9 +1778,8 @@ BFilePanelPoseView::ShowVolumes(bool visible, bool showShared)
 			AddRootPoses(true, showShared);
 	}
 
-
 	TFilePanel* filepanel = dynamic_cast<TFilePanel*>(Window());
-	if (filepanel)
+	if (filepanel != NULL && TargetModel() != NULL)
 		filepanel->SetTo(TargetModel()->EntryRef());
 }
 

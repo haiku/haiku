@@ -220,7 +220,7 @@ TrackerSettingsWindow::_ViewAt(int32 i)
 
 	Unlock();
 
-	return item->View();
+	return item != NULL ? item->View() : NULL;
 }
 
 

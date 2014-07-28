@@ -764,10 +764,11 @@ Model::ResetIconFrom()
 			|| fBaseType == kTrashNode || fBaseType == kDesktopNode)
 		&& !CheckNodeIconHintPrivate(fNode,
 			dynamic_cast<TTracker*>(be_app) == NULL)) {
+		BDirectory* directory = dynamic_cast<BDirectory*>(fNode);
 		if (WellKnowEntryList::Match(NodeRef()) > (directory_which)-1) {
 			fIconFrom = kTrackerSupplied;
 			return;
-		} else if (dynamic_cast<BDirectory*>(fNode)->IsRootDirectory()) {
+		} else if (directory != NULL && directory->IsRootDirectory()) {
 			fIconFrom = kVolume;
 			return;
 		}

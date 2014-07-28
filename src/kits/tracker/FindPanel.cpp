@@ -545,7 +545,7 @@ FindWindow::Find()
 		ASSERT(tracker != NULL);
 
 		for (int32 timeOut = 0; ; timeOut++) {
-			if (!tracker->EntryHasWindowOpen(&fRef)) {
+			if (tracker != NULL && !tracker->EntryHasWindowOpen(&fRef)) {
 				// window quit, we can post refs received to open a
 				// new copy
 				break;
@@ -1821,22 +1821,26 @@ FindPanel::AddMimeTypesToMenu()
 	// add recent MIME types
 
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+	ASSERT(tracker != NULL);
 
 	BList list;
-	if (gMostUsedMimeTypes.ObtainList(&list) && tracker) {
+	if (tracker != NULL && gMostUsedMimeTypes.ObtainList(&list)) {
 		int32 count = 0;
 		for (int32 index = 0; index < list.CountItems(); index++) {
 			const char* name = (const char*)list.ItemAt(index);
 
-			const ShortMimeInfo* info;
-			if ((info = tracker->MimeTypes()->FindMimeType(name)) == NULL)
-				continue;
+			MimeTypeList* mimeTypes = tracker->MimeTypes();
+			if (mimeTypes != NULL) {
+				const ShortMimeInfo* info = mimeTypes->FindMimeType(name);
+				if (info == NULL)
+					continue;
 
-			BMessage* message = new BMessage(kMIMETypeItem);
-			message->AddString("mimetype", info->InternalName());
+				BMessage* message = new BMessage(kMIMETypeItem);
+				message->AddString("mimetype", info->InternalName());
 
-			MimeTypeMenu()->AddItem(new BMenuItem(name, message));
-			count++;
+				MimeTypeMenu()->AddItem(new BMenuItem(name, message));
+				count++;
+			}
 		}
 		if (count != 0)
 			MimeTypeMenu()->AddSeparatorItem();

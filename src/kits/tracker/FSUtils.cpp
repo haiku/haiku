@@ -3349,7 +3349,9 @@ _TrackerLaunchAppWithDocuments(const entry_ref* appRef, const BMessage* refs,
 		if (refs != NULL && refs->FindData("nodeRefsToClose", B_RAW_TYPE,
 				(const void**)&nodeToClose, &numBytes) == B_OK
 			&& nodeToClose != NULL) {
-			dynamic_cast<TTracker*>(be_app)->CloseParent(*nodeToClose);
+			TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+			if (tracker != NULL)
+				tracker->CloseParent(*nodeToClose);
 		}
 	} else {
 		alertString.SetTo(B_TRANSLATE("Could not open \"%name\" (%error). "));

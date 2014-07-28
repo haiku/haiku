@@ -153,8 +153,10 @@ FavoritesMenu::AddNextItem()
 			else if (startModel.IsVirtualDirectory())
 				fContainer = new VirtualDirectoryEntryList(&startModel);
 			else {
-				fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory*>
-					(startModel.Node()));
+				BDirectory* directory
+					= dynamic_cast<BDirectory*>(startModel.Node());
+				if (directory != NULL)
+					fContainer = new DirectoryEntryList(*directory);
 			}
 
 			ThrowOnInitCheckError(fContainer);

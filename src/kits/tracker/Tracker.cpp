@@ -1352,7 +1352,7 @@ TTracker::CloseAllInWorkspace()
 	// count from end to beginning so we can remove items safely
 	for (int32 index = fWindowList.CountItems() - 1; index >= 0; index--) {
 		BWindow* window = fWindowList.ItemAt(index);
-		if ((window->Workspaces() & currentWorkspace) != 0) {
+		if (window != NULL && (window->Workspaces() & currentWorkspace) != 0) {
 			// avoid the desktop
 			if (dynamic_cast<BDeskWindow*>(window) == NULL
 				&& dynamic_cast<BStatusWindow*>(window) == NULL) {
