@@ -141,7 +141,8 @@ static const char* kHandledProtocols[] = {
 	"https",
 	"file",
 	"about",
-	"data"
+	"data",
+	"gopher"
 };
 
 
