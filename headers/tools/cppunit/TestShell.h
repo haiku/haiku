@@ -58,12 +58,10 @@ public:
 	status_t AddSuite(BTestSuite *kit);
 
 	// This function is used to add test suites to the list of available
-	// tests. A SuiteFunction is just a function that takes no parameters
-	// and returns a pointer to a CppUnit::Test object. Return NULL at
-	// your own risk :-). The name given is the name that will be presented
-	// when the program is run with "--list" as an argument. Usually the
-	// given suite would be a test suite for an entire class, but that's
-	// not a requirement.
+	// tests. The test pointer may not be NULL. The name given is the name that
+	// will be presented when the program is run with "--list" as an argument.
+	// Usually the given suite would be a test suite for an entire class, but
+	// that's not a requirement.
 	void AddTest(const std::string &name, CppUnit::Test* test);
 
 	// This function loads all the test addons it finds in the given
