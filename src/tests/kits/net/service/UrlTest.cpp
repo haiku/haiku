@@ -252,9 +252,15 @@ UrlTest::RelativeUriTest()
 	};
 
 	const RelativeUrl tests[] = {
+		// The port must be preserved
+		{"http://host:81/",		"/path",				"http://host:81/path"},
+
+		// Tests from http://skew.org/uri/uri_tests.html
 		{"http://example.com/path?query#frag", "",
 			"http://example.com/path?query"},
-		{"foo:a/b",			"../c",					"foo:/c"},
+			// The fragment must be dropped when changing the path, but the
+			// query must be preserved
+		{"foo:a/b",				"../c",					"foo:/c"},
 			// foo:c would be more intuitive, and is what skew.org tests.
 			// However, foo:/c is what the RFC says we should get.
 		{"foo:a",				"foo:.",				"foo:"},
@@ -533,7 +539,7 @@ void
 UrlTest::IDNTest()
 {
 	// http://www.w3.org/2004/04/uri-rel-test.html
-	// TODO these need to be manually UrlDecoded with ou API.
+	// TODO these need to be manually UrlDecoded with our API.
 	// We also need to decide wether to store them as UTF-8 or IDNA/punycode.
 	NextSubTest();
 	CPPUNIT_ASSERT_EQUAL(BUrl("http://www.w3.org").UrlString(),
