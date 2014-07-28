@@ -72,7 +72,7 @@ typedef enum {
 	GOPHER_TYPE_INFO	= 'i',	/**< information text */
 	GOPHER_TYPE_AUDIO	= 's',	/**< audio (wav?) */
 	/* not standardized, some servers use them */
-	GOPHER_TYPE_PDF_ALT	= 'd',	/**< seems to be only for PDF files */
+	GOPHER_TYPE_DOC		= 'd',	/**< gophernicus uses it for PS and PDF */
 	GOPHER_TYPE_PNG		= 'p',	/**< PNG image */
 		/* cf. gopher://namcub.accelera-labs.com/1/pics */
 	GOPHER_TYPE_MIME	= 'M',	/**< multipart/mixed MIME data */
@@ -110,7 +110,6 @@ static struct {
 	{ GOPHER_TYPE_GIF, "image/gif" },
 	{ GOPHER_TYPE_HTML, "text/html" },
 	/* those are not standardized */
-	{ GOPHER_TYPE_PDF_ALT, "application/pdf" },
 	{ GOPHER_TYPE_PDF, "application/pdf" },
 	{ GOPHER_TYPE_PNG, "image/png"},
 	{ GOPHER_TYPE_NONE, NULL }
@@ -642,10 +641,10 @@ BGopherRequest::_ParseInput(bool last)
 						"<br/>\n";
 				break;
 			case GOPHER_TYPE_PDF:
-			case GOPHER_TYPE_PDF_ALT:
+			case GOPHER_TYPE_DOC:
 				/* generic case for known-to-work items */
 				item << "<a href=\"" << link << "\">"
-						"<span class=\"other\">" << title << "</span></a>"
+						"<span class=\"document\">" << title << "</span></a>"
 						"<br/>\n";
 				break;
 			case GOPHER_TYPE_MOVIE:
