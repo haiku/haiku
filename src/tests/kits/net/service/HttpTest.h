@@ -11,31 +11,36 @@
 #include <TestCase.h>
 #include <TestSuite.h>
 
+#include <cppunit/TestSuite.h>
+
 
 class HttpTest: public BTestCase {
 public:
-					HttpTest();
-	virtual			~HttpTest();
+										HttpTest();
+	virtual								~HttpTest();
 
-			void	GetTest();
-			void	UploadTest();
-			void	AuthBasicTest();
-			void	AuthDigestTest();
-			void	ListenerTest();
+								void	GetTest();
+								void	PortTest();
+								void	UploadTest();
+								void	AuthBasicTest();
+								void	AuthDigestTest();
 
-	static	void	AddTests(BTestSuite& suite);
+	static						void	AddTests(BTestSuite& suite);
 
 private:
-			void	_AuthTest(BUrl& url);
+								void	_AuthTest(BUrl& url);
+
+	template<class T> static	void	_AddCommonTests(BString prefix,
+											CppUnit::TestSuite& suite);
 
 protected:
-	BUrl			fBaseUrl;
+								BUrl	fBaseUrl;
 };
 
 
 class HttpsTest: public HttpTest {
 public:
-					HttpsTest();
+								HttpsTest();
 };
 
 
