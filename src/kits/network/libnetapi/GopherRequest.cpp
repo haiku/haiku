@@ -42,6 +42,8 @@
  * gopher://jgw.mdns.org/1/MISC/	's' item (sound)
  * gopher://gopher.floodgap.com/1/gopher	broken link
  * gopher://sdf.org/1/maps/m	missing lines
+ * gopher://sdf.org/1/foo	gophernicus reports errors incorrectly
+ * gopher://gopher.floodgap.com/1/foo	correct error report
  */
 
 /** Type of Gopher items */
@@ -310,7 +312,7 @@ BGopherRequest::_ProtocolLoop()
 					//if enough data
 					// else continue
 					fItemType = GOPHER_TYPE_DIRECTORY;
-					//readError = B_RESOURCE_NOT_FOUND;
+					readError = B_RESOURCE_NOT_FOUND;
 					// continue parsing the error text anyway
 				}
 			}
