@@ -35,10 +35,13 @@ their respective holders. All rights reserved.
 //	NavMenu is a hierarchical menu of volumes, folders, files and queries
 //	displays icons, uses the SlowMenu API for full interruptability
 
-#include <stdlib.h>
-#include <strings.h>
 
 #include "NavMenu.h"
+
+#include <algorithm>
+
+#include <string.h>
+#include <stdlib.h>
 
 #include <Application.h>
 #include <Catalog.h>
@@ -768,8 +771,7 @@ BNavMenu::DoneBuildingItemList()
 int32
 BNavMenu::GetMaxMenuWidth(void)
 {
-	int32 width = (int32)(BScreen().Frame().Width() / 4);
-	return (width < kMinMenuWidth) ? kMinMenuWidth : width;
+	return std::max((int32)(BScreen().Frame().Width() / 4), kMinMenuWidth);
 }
 
 
