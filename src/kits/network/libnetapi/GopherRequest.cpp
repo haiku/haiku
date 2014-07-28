@@ -316,6 +316,16 @@ BGopherRequest::_ProtocolLoop()
 					// continue parsing the error text anyway
 				}
 			}
+			// special case for buggy(?) Gophernicus/1.5
+			static const char *buggy = "Error: File or directory not found!";
+			if (fInputBuffer.Size() > strlen(buggy)
+				&& !memcmp(fInputBuffer.Data(), buggy, strlen(buggy))) {
+				fItemType = GOPHER_TYPE_DIRECTORY;
+				readError = B_RESOURCE_NOT_FOUND;
+				// continue parsing the error text anyway
+				// but it won't look good
+			}
+			
 
 			// now we probably have correct data
 			dataValidated = true;
