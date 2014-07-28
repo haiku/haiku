@@ -19,6 +19,7 @@
 #include <NodeInfo.h>
 #include <Path.h>
 #include <Socket.h>
+#include <StackOrHeapArray.h>
 #include <String.h>
 #include <StringList.h>
 
@@ -266,11 +267,11 @@ BGopherRequest::_ProtocolLoop()
 	//ssize_t bytesReceived = 0;
 	//ssize_t bytesTotal = 0;
 	bool dataValidated = false;
+	BStackOrHeapArray<char, 4096> chunk(kGopherBufferSize);
 
 	while (!fQuit && !receiveEnd) {
 		fSocket->WaitForReadable();
-		BNetBuffer chunk(kGopherBufferSize);
-		bytesRead = fSocket->Read(chunk.Data(), kGopherBufferSize);
+		bytesRead = fSocket->Read(chunk, kGopherBufferSize);
 
 		if (bytesRead < 0) {
 			readError = bytesRead;
@@ -278,7 +279,7 @@ BGopherRequest::_ProtocolLoop()
 		} else if (bytesRead == 0)
 			receiveEnd = true;
 
-		fInputBuffer.AppendData(chunk.Data(), bytesRead);
+		fInputBuffer.AppendData(chunk, bytesRead);
 
 		if (!dataValidated) {
 			size_t i;
