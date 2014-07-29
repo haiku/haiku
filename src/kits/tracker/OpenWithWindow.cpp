@@ -1560,6 +1560,8 @@ bool
 SearchForSignatureEntryList::CanOpenWithFilter(const Model* appModel,
 	const BMessage* entriesToOpen, const entry_ref* preferredApp)
 {
+	ThrowOnAssert(appModel != NULL);
+
 	if (!appModel->IsExecutable() || !appModel->Node()) {
 		// weed out non-executable
 #if xDEBUG

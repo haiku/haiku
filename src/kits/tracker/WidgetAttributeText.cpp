@@ -556,8 +556,7 @@ int
 StringAttributeText::Compare(WidgetAttributeText& attr, BPoseView* view)
 {
 	StringAttributeText* compareTo = dynamic_cast<StringAttributeText*>(&attr);
-
-	ASSERT(compareTo != NULL);
+	ThrowOnAssert(compareTo != NULL);
 
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
@@ -647,8 +646,7 @@ int
 ScalarAttributeText::Compare(WidgetAttributeText& attr, BPoseView*)
 {
 	ScalarAttributeText* compareTo = dynamic_cast<ScalarAttributeText*>(&attr);
-
-	ASSERT(compareTo != NULL);
+	ThrowOnAssert(compareTo != NULL);
 
 	if (fValueDirty)
 		fValue = ReadValue();
@@ -756,8 +754,7 @@ int
 NameAttributeText::Compare(WidgetAttributeText& attr, BPoseView* view)
 {
 	NameAttributeText* compareTo = dynamic_cast<NameAttributeText*>(&attr);
-
-	ASSERT(compareTo != NULL);
+	ThrowOnAssert(compareTo != NULL);
 
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
@@ -892,8 +889,7 @@ RealNameAttributeText::Compare(WidgetAttributeText& attr, BPoseView* view)
 {
 	RealNameAttributeText* compareTo
 		= dynamic_cast<RealNameAttributeText*>(&attr);
-
-	ASSERT(compareTo != NULL);
+	ThrowOnAssert(compareTo != NULL);
 
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
@@ -1567,8 +1563,7 @@ GenericAttributeText::Compare(WidgetAttributeText& attr, BPoseView*)
 {
 	GenericAttributeText* compareTo
 		= dynamic_cast<GenericAttributeText*>(&attr);
-
-	ASSERT(compareTo != NULL);
+	ThrowOnAssert(compareTo != NULL);
 
 	if (fValueDirty)
 		ReadValue(&fFullValueText);

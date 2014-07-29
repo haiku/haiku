@@ -718,6 +718,8 @@ BNavMenu::BuildVolumeMenu()
 int
 BNavMenu::CompareFolderNamesFirstOne(const BMenuItem* i1, const BMenuItem* i2)
 {
+	ThrowOnAssert(i1 != NULL && i2 != NULL);
+
 	const ModelMenuItem* item1 = dynamic_cast<const ModelMenuItem*>(i1);
 	const ModelMenuItem* item2 = dynamic_cast<const ModelMenuItem*>(i2);
 
@@ -733,6 +735,8 @@ BNavMenu::CompareFolderNamesFirstOne(const BMenuItem* i1, const BMenuItem* i2)
 int
 BNavMenu::CompareOne(const BMenuItem* i1, const BMenuItem* i2)
 {
+	ThrowOnAssert(i1 != NULL && i2 != NULL);
+
 	return strcasecmp(i1->Label(), i2->Label());
 }
 

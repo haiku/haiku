@@ -334,8 +334,7 @@ DraggableContainerIcon::MouseDown(BPoint where)
 {
 	// we only like container windows
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
-	if (window == NULL)
-		return;
+	ThrowOnAssert(window != NULL);
 
 	// we don't like the Trash icon (because it cannot be moved)
 	if (window->IsTrash() || window->IsPrintersDir())
@@ -460,8 +459,7 @@ void
 DraggableContainerIcon::FrameMoved(BPoint)
 {
 	BMenuBar* bar = dynamic_cast<BMenuBar*>(Parent());
-	if (bar == NULL)
-		return;
+	ThrowOnAssert(bar != NULL);
 
 	// TODO: ugly hack following:
 	// This is a trick to get the actual width of all menu items
@@ -492,8 +490,7 @@ void
 DraggableContainerIcon::Draw(BRect updateRect)
 {
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
-	if (window == NULL)
-		return;
+	ThrowOnAssert(window != NULL);
 
 	if (be_control_look != NULL) {
 		BRect rect(Bounds());

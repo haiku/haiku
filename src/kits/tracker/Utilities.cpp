@@ -1654,12 +1654,15 @@ ComputeTypeAheadScore(const char* text, const char* match, bool wordMode)
 }
 
 
+//	#pragma mark - throw on error functions.
+
+
 void
 _ThrowOnError(status_t result, const char* DEBUG_ONLY(file),
 	int32 DEBUG_ONLY(line))
 {
 	if (result != B_OK) {
-		PRINT(("failing %s at %s:%d\n", strerror(result), file, (int)line));
+		PRINT(("%s at %s:%d\n", strerror(result), file, (int)line));
 		throw result;
 	}
 }
@@ -1670,20 +1673,19 @@ _ThrowIfNotSize(ssize_t size, const char* DEBUG_ONLY(file),
 	int32 DEBUG_ONLY(line))
 {
 	if (size < B_OK) {
-		PRINT(("failing %s at %s:%d\n", strerror(size), file, (int)line));
+		PRINT(("%s at %s:%d\n", strerror((status_t)size), file, (int)line));
 		throw (status_t)size;
 	}
 }
 
 
 void
-_ThrowOnError(status_t result, const char* DEBUG_ONLY(debugString),
-	const char* DEBUG_ONLY(file), int32 DEBUG_ONLY(line))
+_ThrowOnAssert(bool success, const char* DEBUG_ONLY(file),
+	int32 DEBUG_ONLY(line))
 {
-	if (result != B_OK) {
-		PRINT(("failing %s, %s at %s:%d\n", debugString, strerror(result), file,
-			(int)line));
-		throw result;
+	if (!success) {
+		PRINT(("Assert failed at %s:%d\n", file, (int)line));
+		throw B_ERROR;
 	}
 }
 

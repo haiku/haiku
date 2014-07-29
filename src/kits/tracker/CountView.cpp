@@ -311,8 +311,7 @@ void
 BCountView::MouseDown(BPoint)
 {
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
-	if (window == NULL)
-		return;
+	ThrowOnAssert(window != NULL);
 
 	window->Activate();
 	window->UpdateIfNeeded();

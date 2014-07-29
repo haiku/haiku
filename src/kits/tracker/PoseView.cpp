@@ -745,14 +745,16 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 	if (!fSavePoseLocations)
 		return;
 
-	ASSERT(TargetModel());
 	ASSERT(Window()->IsLocked());
+
+	Model* targetModel = TargetModel();
+	ThrowOnAssert(targetModel != NULL);
 
 	BVolume volume(TargetModel()->NodeRef()->device);
 	if (volume.InitCheck() != B_OK)
 		return;
 
-	if (!TargetModel()->IsRoot()
+	if (!targetModel->IsRoot()
 		&& (volume.IsReadOnly() || !volume.KnowsAttr())) {
 		// check that we can write out attrs; Root should always work
 		// because it gets saved on the boot disk but the above checks
@@ -770,7 +772,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 			poseInfo.fInvisible = false;
 
 			if (model->IsRoot())
-				poseInfo.fInitedDirectory = TargetModel()->NodeRef()->node;
+				poseInfo.fInitedDirectory = targetModel->NodeRef()->node;
 			else
 				poseInfo.fInitedDirectory = model->EntryRef()->directory;
 
@@ -1331,18 +1333,10 @@ BPoseView::AddPosesTask(void* castToParams)
 	thread_id threadID = find_thread(NULL);
 
 	BPoseView* view = dynamic_cast<BPoseView*>(lock.Handler());
-
-	ASSERT(view != NULL);
-
-	if (view == NULL)
-		return B_ERROR;
+	ThrowOnAssert(view != NULL);
 
 	BWindow* window = dynamic_cast<BWindow*>(lock.Looper());
-
-	ASSERT(window != NULL);
-
-	if (window == NULL)
-		return B_ERROR;
+	ThrowOnAssert(window != NULL);
 
 	// allocate the iterator we will use for adding poses; this
 	// can be a directory or any other collection of entry_refs, such
@@ -3392,7 +3386,7 @@ void
 BPoseView::NewFileFromTemplate(const BMessage* message)
 {
 	Model* targetModel = TargetModel();
-	ASSERT(targetModel != NULL);
+	ThrowOnAssert(targetModel != NULL);
 
 	entry_ref destEntryRef;
 	node_ref destNodeRef;
@@ -3413,7 +3407,7 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 
 	if (dir.InitCheck() == B_OK) {
 		// special handling of directories
-		if (FSCreateNewFolderIn(TargetModel()->NodeRef(), &destEntryRef,
+		if (FSCreateNewFolderIn(targetModel->NodeRef(), &destEntryRef,
 				&destNodeRef) == B_OK) {
 			BEntry destEntry(&destEntryRef);
 			destEntry.Rename(fileName);
@@ -3452,7 +3446,7 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 
 	// start renaming the entry
 	int32 index;
-	BPose* pose = EntryCreated(TargetModel()->NodeRef(), &destNodeRef,
+	BPose* pose = EntryCreated(targetModel->NodeRef(), &destNodeRef,
 		destEntryRef.name, &index);
 
 	if (fFiltering) {
@@ -3477,18 +3471,19 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 void
 BPoseView::NewFolder(const BMessage* message)
 {
-	ASSERT(TargetModel());
+	Model* targetModel = TargetModel();
+	ThrowOnAssert(targetModel != NULL);
 
 	entry_ref ref;
 	node_ref nodeRef;
 
-	if (FSCreateNewFolderIn(TargetModel()->NodeRef(), &ref, &nodeRef) == B_OK) {
+	if (FSCreateNewFolderIn(targetModel->NodeRef(), &ref, &nodeRef) == B_OK) {
 		// try to place new folder at click point or under mouse if possible
 
 		PlaceFolder(&ref, message);
 
 		int32 index;
-		BPose* pose = EntryCreated(TargetModel()->NodeRef(), &nodeRef, ref.name,
+		BPose* pose = EntryCreated(targetModel->NodeRef(), &nodeRef, ref.name,
 			&index);
 
 		if (fFiltering) {
@@ -4888,10 +4883,12 @@ static bool
 AddOneToLaunchMessage(BPose* pose, BPoseView*, void* castToParams)
 {
 	LaunchParams* params = (LaunchParams*)castToParams;
+	ThrowOnAssert(params != NULL);
+	ThrowOnAssert(pose != NULL);
+	ThrowOnAssert(pose->TargetModel() != NULL);
 
-	ASSERT(pose->TargetModel());
 	if (params->app->IsDropTarget(params->checkTypes
-			? pose->TargetModel() : 0, true)) {
+			? pose->TargetModel() : NULL, true)) {
 		params->refsMessage->AddRef("refs", pose->TargetModel()->EntryRef());
 	}
 
@@ -5637,7 +5634,7 @@ BPoseView::EntryMoved(const BMessage* message)
 	}
 
 	Model* targetModel = TargetModel();
-	ASSERT(targetModel != NULL);
+	ThrowOnAssert(targetModel != NULL);
 
 	node_ref thisDirNode;
 	if (ContainerWindow()->IsTrash()) {
@@ -6097,9 +6094,9 @@ BPoseView::MoveListToTrash(BObjectList<entry_ref>* list, bool selectNext,
 		pointInPose.y += fListElemHeight * index;
 
 		TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+		if (tracker != NULL) {
+			ThrowOnAssert(TargetModel() != NULL);
 
-		ASSERT(TargetModel());
-		if (tracker) {
 			// add a function object to the list of tasks to run
 			// that will select the next item after the one we just
 			// deleted
@@ -6320,6 +6317,8 @@ BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool askUser)
 
 		TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 		if (tracker != NULL) {
+			ThrowOnAssert(TargetModel() != NULL);
+
 			// add a function object to the list of tasks to run
 			// that will select the next item after the one we just
 			// deleted
@@ -6361,6 +6360,8 @@ BPoseView::RestoreItemsFromTrash(BObjectList<entry_ref>* list, bool selectNext)
 
 		TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 		if (tracker != NULL) {
+			ThrowOnAssert(TargetModel() != NULL);
+
 			// add a function object to the list of tasks to run
 			// that will select the next item after the one we just
 			// restored

@@ -474,20 +474,18 @@ ThrowOnInitCheckError(InitCheckable* item)
 }
 
 #if DEBUG
-#	define ThrowOnError(result) _ThrowOnError(result, __FILE__, __LINE__)
-#	define ThrowIfNotSize(result) _ThrowIfNotSize(result, __FILE__, __LINE__)
-#	define ThrowOnErrorWithMessage(result, debugStr) \
-		_ThrowOnError(result, debugStr, __FILE__, __LINE__)
+#	define ThrowOnError(x) _ThrowOnError(x, __FILE__, __LINE__)
+#	define ThrowIfNotSize(x) _ThrowIfNotSize(x, __FILE__, __LINE__)
+#	define ThrowOnAssert(x) _ThrowOnAssert(x, __FILE__, __LINE__)
 #else
-#	define ThrowOnError(x) _ThrowOnError(x, 0, 0)
-#	define ThrowIfNotSize(x) _ThrowIfNotSize(x, 0, 0)
-#	define ThrowOnErrorWithMessage(result, debugStr) \
-		_ThrowOnError(result, debugStr, __FILE__, __LINE__)
+#	define ThrowOnError(x) _ThrowOnError(x, NULL, 0)
+#	define ThrowIfNotSize(x) _ThrowIfNotSize(x, NULL, 0)
+#	define ThrowOnAssert(x) _ThrowOnAssert(x, NULL, 0)
 #endif
 
 void _ThrowOnError(status_t, const char*, int32);
 void _ThrowIfNotSize(ssize_t, const char*, int32);
-void _ThrowOnError(status_t, const char* debugStr, const char*, int32);
+void _ThrowOnAssert(bool, const char*, int32);
 
 // stub calls that work around BAppFile info inefficiency
 status_t GetAppSignatureFromAttr(BFile*, char*);

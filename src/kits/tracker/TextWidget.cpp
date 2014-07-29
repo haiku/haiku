@@ -297,8 +297,14 @@ TextViewFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 	if (message->FindInt8("byte", (int8*)&key) != B_OK)
 		return B_DISPATCH_MESSAGE;
 
-	BPoseView* poseView = dynamic_cast<BContainerWindow*>(
-		filter->Looper())->PoseView();
+	ThrowOnAssert(filter != NULL);
+
+	BContainerWindow* window = dynamic_cast<BContainerWindow*>(
+		filter->Looper());
+	ThrowOnAssert(window != NULL);
+
+	BPoseView* poseView = window->PoseView();
+	ThrowOnAssert(poseView != NULL);
 
 	if (key == B_RETURN || key == B_ESCAPE) {
 		poseView->CommitActivePose(key == B_RETURN);

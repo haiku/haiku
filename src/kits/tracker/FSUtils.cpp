@@ -1243,8 +1243,7 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 		char linkpath[MAXPATHLEN];
 
 		ThrowOnError(srcLink.SetTo(srcEntry));
-		ThrowIfNotSize(srcLink.ReadLink(linkpath, MAXPATHLEN-1));
-
+		ThrowOnError(srcLink.ReadLink(linkpath, MAXPATHLEN - 1));
 		ThrowOnError(destDir->CreateSymLink(destName, linkpath, &newLink));
 
 		node_ref destNodeRef;
@@ -1762,10 +1761,11 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 		return error.fError;
 	} catch (FailWithAlert error) {
 		BString buffer(error.fString);
-		if (error.fName)
+		if (error.fName != NULL)
 			buffer.ReplaceFirst("%name", error.fName);
 		else
-			buffer <<  error.fString;
+			buffer << error.fString;
+
 		BAlert* alert = new BAlert("", buffer.String(), B_TRANSLATE("OK"),
 			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

@@ -83,7 +83,7 @@ DesktopPoseView::InitDesktopDirentIterator(BPoseView* nodeMonitoringTarget,
 	ASSERT(sourceModel.Node() != NULL);
 
 	BDirectory* sourceDirectory = dynamic_cast<BDirectory*>(sourceModel.Node());
-	ASSERT(sourceDirectory != NULL);
+	ThrowOnAssert(sourceDirectory != NULL);
 
 	// build an iterator list, start with boot
 	EntryListBase* perDesktopIterator
@@ -224,8 +224,7 @@ void
 DesktopPoseView::AdaptToVolumeChange(BMessage* message)
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (tracker == NULL)
-		return;
+	ThrowOnAssert(tracker != NULL);
 
 	bool showDisksIcon = false;
 	bool mountVolumesOnDesktop = true;

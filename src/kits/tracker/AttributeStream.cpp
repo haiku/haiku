@@ -38,6 +38,8 @@ All rights reserved.
 #include <Debug.h>
 #include <Node.h>
 
+#include "Utilities.h"
+
 
 // ToDo:
 // lazy Rewind from Drive, only if data is available
@@ -309,7 +311,8 @@ AttributeStreamFileNode::SetTo(BNode* node)
 off_t
 AttributeStreamFileNode::Contains(const char* name, uint32 type)
 {
-	ASSERT(fNode);
+	ThrowOnAssert(fNode != NULL);
+
 	attr_info info;
 	if (fNode->GetAttrInfo(name, &info) != B_OK)
 		return 0;
@@ -348,8 +351,7 @@ off_t
 AttributeStreamFileNode::Write(const char* name, const char* foreignName,
 	uint32 type, off_t size, const void* buffer)
 {
-	ASSERT(fNode != NULL);
-	ASSERT(dynamic_cast<BNode*>(fNode) != NULL);
+	ThrowOnAssert(fNode != NULL);
 
 	off_t result = fNode->WriteAttr(name, type, 0, buffer, (size_t)size);
 	if (result == size && foreignName != NULL) {
@@ -365,9 +367,10 @@ AttributeStreamFileNode::Write(const char* name, const char* foreignName,
 bool
 AttributeStreamFileNode::Drive()
 {
-	ASSERT(fNode != NULL);
 	if (!_inherited::Drive())
 		return false;
+
+	ThrowOnAssert(fNode != NULL);
 
 	const AttributeInfo* attr;
 	while ((attr = fReadFrom->Next()) != 0) {
@@ -395,7 +398,7 @@ AttributeStreamFileNode::Get()
 bool
 AttributeStreamFileNode::Fill(char* buffer) const
 {
-	ASSERT(fNode != NULL);
+	ThrowOnAssert(fNode != NULL);
 
 	return fNode->ReadAttr(fCurrentAttr.Name(), fCurrentAttr.Type(), 0,
 		buffer, (size_t)fCurrentAttr.Size()) == (ssize_t)fCurrentAttr.Size();
@@ -405,8 +408,8 @@ AttributeStreamFileNode::Fill(char* buffer) const
 const AttributeInfo*
 AttributeStreamFileNode::Next()
 {
-	ASSERT(fNode != NULL);
 	ASSERT(fReadFrom == NULL);
+	ThrowOnAssert(fNode != NULL);
 
 	char attrName[256];
 	if (fNode->GetNextAttrName(attrName) != B_OK)

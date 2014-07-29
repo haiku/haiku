@@ -353,7 +353,8 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		delta *=  1000000;
 
 		TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-		ASSERT(tracker);
+		ThrowOnAssert(tracker != NULL);
+
 		tracker->MainTaskLoop()->RunLater(
 			NewLockingMemberFunctionObject(&BQueryPoseView::Refresh, this),
 			delta);
