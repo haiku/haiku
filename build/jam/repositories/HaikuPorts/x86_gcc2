@@ -144,6 +144,7 @@ RemotePackageRepository HaikuPorts
 	libpcre_devel-8.21-5
 	libpng-1.5.12-3
 	libpng_devel-1.5.12-3
+	libpthread_stubs-0.3-1
 	libsanta-3.0.0-3
 	libsanta_devel-3.0.0-3
 	libsdl-1.2.15-5
@@ -160,6 +161,8 @@ RemotePackageRepository HaikuPorts
 	libvpx_devel-1.0.0-2
 	libwebp-0.3.1-1
 	libwebp_devel-0.3.1-1
+	libxau-1.0.8-1
+	libxcb-1.6-1
 	libxml2-2.8.0-6
 	libxml2_devel-2.8.0-6
 	libxml2_python-2.8.0-6
@@ -260,6 +263,7 @@ RemotePackageRepository HaikuPorts
 	tiff_tools-3.9.6-2
 	ubertuber-0.9.10-1
 	unrar-5.1.5-1
+	util_macros-1.19.0-1
 	vim-7.4-1
 	virtualbox_guest_additions-4.3.53_svn-1
 	vision-0.9.7.r949-2
@@ -267,7 +271,9 @@ RemotePackageRepository HaikuPorts
 	which-2.20-1
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-3
+	xcb_proto-1.6-1
 	xml_parser-2.36-1
+	xproto-7.0.26-1
 	yab-1.7.02-2
 	yab_ide-2.2.1-2
 	yasm-1.2.0-3
@@ -598,6 +604,7 @@ RemotePackageRepository HaikuPorts
 	libpcre
 	libpcre_x86
 	libpng
+	libpthread_stubs
 	libqt4_x86
 	libsanta
 	libsolv
@@ -609,6 +616,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis
 	libvpx
 	libwebp
+	libxau
+	libxcb
 	libxml2
 	libxml2_x86
 	libxslt
@@ -705,6 +714,7 @@ RemotePackageRepository HaikuPorts
 	tig_x86
 	ubertuber
 	unrar
+	util_macros
 	vcmi_x86
 	vim
 	vision
@@ -715,7 +725,9 @@ RemotePackageRepository HaikuPorts
 	yab
 	yasm
 	youtube_dl
+	xcb_proto
 	xml_parser
+	xproto
 	xz_utils_x86
 	zlib
 	:
