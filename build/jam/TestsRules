@@ -59,7 +59,7 @@ rule UnitTest
 	SimpleTest $(target) : $(sources) : $(libraries) libcppunit.so
 		: $(resources) ;
 
-	Depends unittests : $(lib) ;
+	Depends unittests : $(target) ;
 }
 
 rule TestObjects
