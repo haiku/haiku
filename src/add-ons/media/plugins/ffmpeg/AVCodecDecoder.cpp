@@ -254,9 +254,7 @@ AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 	// Reset the FFmpeg codec to flush buffers, so we keep the sync
 	if (fCodecInitDone) {
 		avcodec_flush_buffers(fContext);
-		av_init_packet(&fTempPacket);
-		fTempPacket.size = 0;
-		fTempPacket.data = NULL;
+		_ResetTempPacket();
 	}
 
 	// Flush internal buffers as well.
@@ -316,6 +314,15 @@ AVCodecDecoder::Decode(void* outBuffer, int64* outFrameCount,
 
 
 // #pragma mark -
+
+
+void
+AVCodecDecoder::_ResetTempPacket()
+{
+	av_init_packet(&fTempPacket);
+	fTempPacket.size = 0;
+	fTempPacket.data = NULL;
+}
 
 
 status_t
@@ -404,7 +411,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fOutputBufferOffset = 0;
 	fOutputBufferSize = 0;
 
-	av_init_packet(&fTempPacket);
+	_ResetTempPacket();
 
 	inOutFormat->require_flags = 0;
 	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
@@ -435,7 +442,9 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	fContext->extradata = (uint8_t*)fExtraData;
 	fContext->extradata_size = fExtraDataSize;
 
-	if (fCodec->capabilities & CODEC_CAP_TRUNCATED) {
+	bool codecCanHandleIncompleteFrames
+		= (fCodec->capabilities & CODEC_CAP_TRUNCATED) != 0;
+	if (codecCanHandleIncompleteFrames) {
 		// Expect and handle video frames to be splitted across consecutive
 		// data chunks.
 		fContext->flags |= CODEC_FLAG_TRUNCATED;
@@ -522,9 +531,7 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	inOutFormat->require_flags = 0;
 	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 
-	av_init_packet(&fTempPacket);
-	fTempPacket.size = 0;
-	fTempPacket.data = NULL;
+	_ResetTempPacket();
 
 #ifdef TRACE_AV_CODEC
 	char buffer[1024];
@@ -736,7 +743,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 
 		if (fTempPacket.size == 0) {
 			// Our packet buffer is empty, so fill it now.
-			status_t getNextChunkStatus	= GetNextChunk(&fChunkBuffer,
+			status_t getNextChunkStatus = GetNextChunk(&fChunkBuffer,
 				&fChunkBufferSize, &chunkMediaHeader);
 			if (getNextChunkStatus != B_OK) {
 				TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from "
@@ -885,7 +892,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		   updated fHeader.
 		4. There will be at maximumn only one decoded video frame in our cache
 		   at any single point in time. Otherwise you couldn't tell to which
-		   cached decoded video frame te properties in fHeader relate to.
+		   cached decoded video frame the properties in fHeader relate to.
 */
 void
 AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
@@ -926,102 +933,102 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 void
 AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 {
-		int width = fOutputVideoFormat.display.line_width;
-		int height = fOutputVideoFormat.display.line_count;
-		AVPicture deinterlacedPicture;
-		bool useDeinterlacedPicture = false;
+	int width = fOutputVideoFormat.display.line_width;
+	int height = fOutputVideoFormat.display.line_count;
+	AVPicture deinterlacedPicture;
+	bool useDeinterlacedPicture = false;
 
-		if (fRawDecodedPicture->interlaced_frame) {
-			AVPicture rawPicture;
-			rawPicture.data[0] = fRawDecodedPicture->data[0];
-			rawPicture.data[1] = fRawDecodedPicture->data[1];
-			rawPicture.data[2] = fRawDecodedPicture->data[2];
-			rawPicture.data[3] = fRawDecodedPicture->data[3];
-			rawPicture.linesize[0] = fRawDecodedPicture->linesize[0];
-			rawPicture.linesize[1] = fRawDecodedPicture->linesize[1];
-			rawPicture.linesize[2] = fRawDecodedPicture->linesize[2];
-			rawPicture.linesize[3] = fRawDecodedPicture->linesize[3];
+	if (fRawDecodedPicture->interlaced_frame) {
+		AVPicture rawPicture;
+		rawPicture.data[0] = fRawDecodedPicture->data[0];
+		rawPicture.data[1] = fRawDecodedPicture->data[1];
+		rawPicture.data[2] = fRawDecodedPicture->data[2];
+		rawPicture.data[3] = fRawDecodedPicture->data[3];
+		rawPicture.linesize[0] = fRawDecodedPicture->linesize[0];
+		rawPicture.linesize[1] = fRawDecodedPicture->linesize[1];
+		rawPicture.linesize[2] = fRawDecodedPicture->linesize[2];
+		rawPicture.linesize[3] = fRawDecodedPicture->linesize[3];
 
-			avpicture_alloc(&deinterlacedPicture,
-				fContext->pix_fmt, width, height);
+		avpicture_alloc(&deinterlacedPicture,
+			fContext->pix_fmt, width, height);
 
-			if (avpicture_deinterlace(&deinterlacedPicture, &rawPicture,
-					fContext->pix_fmt, width, height) < 0) {
-				TRACE("[v] avpicture_deinterlace() - error\n");
-			} else
-				useDeinterlacedPicture = true;
-		}
+		if (avpicture_deinterlace(&deinterlacedPicture, &rawPicture,
+				fContext->pix_fmt, width, height) < 0) {
+			TRACE("[v] avpicture_deinterlace() - error\n");
+		} else
+			useDeinterlacedPicture = true;
+	}
 
-		// Some decoders do not set pix_fmt until they have decoded 1 frame
+	// Some decoders do not set pix_fmt until they have decoded 1 frame
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
-		if (fSwsContext == NULL) {
-			fSwsContext = sws_getContext(fContext->width, fContext->height,
-				fContext->pix_fmt, fContext->width, fContext->height,
-				colorspace_to_pixfmt(fOutputVideoFormat.display.format),
-				SWS_FAST_BILINEAR, NULL, NULL, NULL);
-		}
-#else
-		if (fFormatConversionFunc == NULL) {
-			fFormatConversionFunc = resolve_colorspace(
-				fOutputVideoFormat.display.format, fContext->pix_fmt,
-				fContext->width, fContext->height);
-		}
-#endif
-
-		fDecodedDataSizeInBytes = avpicture_get_size(
+	if (fSwsContext == NULL) {
+		fSwsContext = sws_getContext(fContext->width, fContext->height,
+			fContext->pix_fmt, fContext->width, fContext->height,
 			colorspace_to_pixfmt(fOutputVideoFormat.display.format),
+			SWS_FAST_BILINEAR, NULL, NULL, NULL);
+	}
+#else
+	if (fFormatConversionFunc == NULL) {
+		fFormatConversionFunc = resolve_colorspace(
+			fOutputVideoFormat.display.format, fContext->pix_fmt,
 			fContext->width, fContext->height);
+	}
+#endif
 
-		if (fDecodedData == NULL)
-			fDecodedData
-				= static_cast<uint8_t*>(malloc(fDecodedDataSizeInBytes));
+	fDecodedDataSizeInBytes = avpicture_get_size(
+		colorspace_to_pixfmt(fOutputVideoFormat.display.format),
+		fContext->width, fContext->height);
 
-		fPostProcessedDecodedPicture->data[0] = fDecodedData;
-		fPostProcessedDecodedPicture->linesize[0]
-			= fOutputVideoFormat.display.bytes_per_row;
+	if (fDecodedData == NULL)
+		fDecodedData
+			= static_cast<uint8_t*>(malloc(fDecodedDataSizeInBytes));
+
+	fPostProcessedDecodedPicture->data[0] = fDecodedData;
+	fPostProcessedDecodedPicture->linesize[0]
+		= fOutputVideoFormat.display.bytes_per_row;
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
-		if (fSwsContext != NULL) {
+	if (fSwsContext != NULL) {
 #else
-		if (fFormatConversionFunc != NULL) {
+	if (fFormatConversionFunc != NULL) {
 #endif
-			if (useDeinterlacedPicture) {
-				AVFrame deinterlacedFrame;
-				deinterlacedFrame.data[0] = deinterlacedPicture.data[0];
-				deinterlacedFrame.data[1] = deinterlacedPicture.data[1];
-				deinterlacedFrame.data[2] = deinterlacedPicture.data[2];
-				deinterlacedFrame.data[3] = deinterlacedPicture.data[3];
-				deinterlacedFrame.linesize[0]
-					= deinterlacedPicture.linesize[0];
-				deinterlacedFrame.linesize[1]
-					= deinterlacedPicture.linesize[1];
-				deinterlacedFrame.linesize[2]
-					= deinterlacedPicture.linesize[2];
-				deinterlacedFrame.linesize[3]
-					= deinterlacedPicture.linesize[3];
+		if (useDeinterlacedPicture) {
+			AVFrame deinterlacedFrame;
+			deinterlacedFrame.data[0] = deinterlacedPicture.data[0];
+			deinterlacedFrame.data[1] = deinterlacedPicture.data[1];
+			deinterlacedFrame.data[2] = deinterlacedPicture.data[2];
+			deinterlacedFrame.data[3] = deinterlacedPicture.data[3];
+			deinterlacedFrame.linesize[0]
+				= deinterlacedPicture.linesize[0];
+			deinterlacedFrame.linesize[1]
+				= deinterlacedPicture.linesize[1];
+			deinterlacedFrame.linesize[2]
+				= deinterlacedPicture.linesize[2];
+			deinterlacedFrame.linesize[3]
+				= deinterlacedPicture.linesize[3];
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
-				sws_scale(fSwsContext, deinterlacedFrame.data,
-					deinterlacedFrame.linesize, 0, fContext->height,
-					fPostProcessedDecodedPicture->data,
-					fPostProcessedDecodedPicture->linesize);
+			sws_scale(fSwsContext, deinterlacedFrame.data,
+				deinterlacedFrame.linesize, 0, fContext->height,
+				fPostProcessedDecodedPicture->data,
+				fPostProcessedDecodedPicture->linesize);
 #else
-				(*fFormatConversionFunc)(&deinterlacedFrame,
-					fPostProcessedDecodedPicture, width, height);
+			(*fFormatConversionFunc)(&deinterlacedFrame,
+				fPostProcessedDecodedPicture, width, height);
 #endif
-			} else {
+		} else {
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
-				sws_scale(fSwsContext, fRawDecodedPicture->data,
-					fRawDecodedPicture->linesize, 0, fContext->height,
-					fPostProcessedDecodedPicture->data,
-					fPostProcessedDecodedPicture->linesize);
+			sws_scale(fSwsContext, fRawDecodedPicture->data,
+				fRawDecodedPicture->linesize, 0, fContext->height,
+				fPostProcessedDecodedPicture->data,
+				fPostProcessedDecodedPicture->linesize);
 #else
-				(*fFormatConversionFunc)(fRawDecodedPicture,
-					fPostProcessedDecodedPicture, width, height);
+			(*fFormatConversionFunc)(fRawDecodedPicture,
+				fPostProcessedDecodedPicture, width, height);
 #endif
-			}
 		}
+	}
 
-		if (fRawDecodedPicture->interlaced_frame)
-			avpicture_free(&deinterlacedPicture);
+	if (fRawDecodedPicture->interlaced_frame)
+		avpicture_free(&deinterlacedPicture);
 }

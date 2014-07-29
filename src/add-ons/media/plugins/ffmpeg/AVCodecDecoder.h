@@ -48,6 +48,8 @@ public:
 
 
 private:
+			void				_ResetTempPacket();
+
 			status_t			_NegotiateAudioOutputFormat(
 									media_format* inOutFormat);
 
