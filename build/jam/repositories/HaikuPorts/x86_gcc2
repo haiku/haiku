@@ -204,6 +204,10 @@ RemotePackageRepository HaikuPorts
 	pipepanic-0.1.3-3
 	pkgconfig-0.27.1-1
 	python-2.6.9-2
+	python_dateutil-1.5-1
+	python_lxml-3.3.5-1
+	python_mechanize-0.2.5-1
+	python_requests-2.3.0-1
 	python_setuptools-5.3-1
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
@@ -650,6 +654,10 @@ RemotePackageRepository HaikuPorts
 	pkgconfig
 	protrekkr_x86
 	python
+	python_dateutil
+	python_lxml
+	python_mechanize
+	python_requests
 	python_setuptools
 	python_twisted
 	python_zope.interface
