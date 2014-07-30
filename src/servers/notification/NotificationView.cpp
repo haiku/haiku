@@ -29,6 +29,8 @@
 #include <Roster.h>
 #include <StatusBar.h>
 
+#include <Notifications.h>
+
 #include "AppGroupView.h"
 #include "NotificationWindow.h"
 
@@ -101,8 +103,6 @@ NotificationView::NotificationView(NotificationWindow* win,
 				B_DARKEN_1_TINT);
 			break;
 	}
-
-	SetText();
 }
 
 
@@ -121,6 +121,8 @@ NotificationView::~NotificationView()
 void
 NotificationView::AttachedToWindow()
 {
+	SetText();
+
 	BMessage msg(kRemoveView);
 	msg.AddPointer("view", this);
 
@@ -431,9 +433,10 @@ NotificationView::GetSupportedSuites(BMessage* msg)
 void
 NotificationView::SetText(float newMaxWidth)
 {
-	if (newMaxWidth < 0) {
-		newMaxWidth = 200;
-	}
+	if (newMaxWidth < 0 && Parent())
+		newMaxWidth = Parent()->Bounds().IntegerWidth();
+	if (newMaxWidth <= 0)
+		newMaxWidth = kDefaultWidth;
 
 	// Delete old lines
 	LineInfoList::iterator lIt;
