@@ -193,7 +193,7 @@ BGopherRequest::BGopherRequest(const BUrl& url, BUrlProtocolListener* listener,
 	// the first part of the path is actually the document type
 
 	fPath = Url().Path();
-	if (!Url().HasPath() || (fPath.Length() == 1 && fPath[0] == '/')) {
+	if (!Url().HasPath() || fPath.Length() == 0 || fPath == "/") {
 		// default entry
 		fItemType = GOPHER_TYPE_DIRECTORY;
 		fPath = "";
