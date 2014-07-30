@@ -1004,14 +1004,26 @@ BUrl::_DoUrlDecodeChunk(const BString& chunk, bool strict)
 	for (int32 i = 0; i < chunk.Length(); i++) {
 		if (chunk[i] == '+' && !strict)
 			result << ' ';
-		else if (chunk[i] != '%')
-			result << chunk[i];
 		else {
-			char hexString[] = { chunk[i + 1], chunk[i + 2], 0 };
-			result << (char)strtol(hexString, NULL, 16);
+			bool isEncoded = false;
+			char decoded = 0;
 
-			i += 2;
-		}
+			if (chunk[i] == '%' && i < chunk.Length() - 2)
+			{
+				char hexString[] = { chunk[i + 1], chunk[i + 2], 0 };
+				char* out = NULL;
+				decoded = (char)strtol(hexString, &out, 16);
+				if (out == hexString + 2) {
+					isEncoded = true;
+					i += 2;
+				}
+			}
+
+			if (isEncoded)
+				result << decoded;
+			else
+				result << chunk[i];
+		} 
 	}
 	return result;
 }
