@@ -127,6 +127,10 @@ error_description(int error)
 			return "Missing library";
 		case B_MISSING_SYMBOL:
 			return "Symbol not found";
+		case B_UNKNOWN_EXECUTABLE:
+			return "Unknown executable format";
+		case B_LEGACY_EXECUTABLE:
+			return "Unsupported legacy executable";
 
 		case B_DEBUGGER_ALREADY_INSTALLED:
 			return "Debugger already installed for this team";
