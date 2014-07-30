@@ -149,10 +149,11 @@ void
 RatePackageWindow::_SendRating()
 {
 	// TODO: Implement...
-	BAlert* alert = new BAlert("Not implemented",
-		"Sorry, the web application is not yet finished and "
-		"this functionality is not implemented.",
-		"Thanks for telling me after I typed all this!");
+	BAlert* alert = new BAlert(B_TRANSLATE("Not implemented"),
+		B_TRANSLATE("Sorry, while the web application would already support "
+		"storing your rating, HaikuDepot was not yet updated to use "
+		"this functionality."),
+		B_TRANSLATE("Thanks for telling me after I typed all this!"));
 	alert->Go(NULL);
 
 	PostMessage(B_QUIT_REQUESTED);
