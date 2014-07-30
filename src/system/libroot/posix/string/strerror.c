@@ -91,6 +91,8 @@ error_description(int error)
 			return "Operation not allowed";
 		case B_BAD_DATA:
 			return "Bad data";
+		case B_DONT_DO_THAT:
+			return "No, really, don't do that";
 
 		// Kernel Kit Errors
 
