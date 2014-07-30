@@ -500,6 +500,8 @@ error_description(int error)
 			return "Operation not supported";
 		case ENOTSOCK:
 			return "Socket operation on non-socket";
+		case EHOSTDOWN:
+			return "Host is down";
 		case EBADMSG:
 			return "Bad message";
 		case ECANCELED:
