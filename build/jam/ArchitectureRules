@@ -54,14 +54,6 @@ rule ArchitectureSetup architecture
 	}
 	HAIKU_GCC_BASE_FLAGS_$(architecture) = $(gccBaseFlags) ;
 
-	# override gcc 2.95.3's header directory -- strictly necessary only when
-	# using the BeOS native compiler (since its headers are incompatible), but
-	# it doesn't harm for the cross-compiler either.
-	if $(gccVersion[1]) = 2 {
-		HAIKU_GCC_HEADERS_DIR_$(architecture)
-			= [ FDirName $(HAIKU_TOP) headers build gcc-2.95.3 ] ;
-	}
-
 	# initial state for flags etc.
 	HAIKU_C++_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
 	HAIKU_LINK_$(architecture) = $(HAIKU_CC_$(architecture)) ;

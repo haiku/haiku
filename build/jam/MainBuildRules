@@ -274,7 +274,8 @@ rule CreateAsmStructOffsetsHeader header : source
 			}
 
 		} else {
-			sysHeaders += $(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
+			sysHeaders += [ FStandardHeaders $(TARGET_PACKAGING_ARCH) ]
+				$(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
 			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
 				$(TARGET_DEFINES) ;
 		}
@@ -491,6 +492,8 @@ rule LinkAgainst
 	local mapLibs = $(3:E=true) ;
 
 	on $(target) {
+		local i ;
+
 		# map libraries, if desired and target platform is Haiku
 		local map = $(TARGET_LIBRARY_NAME_MAP_$(TARGET_PACKAGING_ARCH)) ;
 		if $(PLATFORM) != host && $(mapLibs) = true && $(map) {

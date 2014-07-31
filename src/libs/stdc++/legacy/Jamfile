@@ -31,7 +31,7 @@ for architectureObject in [ MultiArchSubDirSetup x86_gcc2 ] {
 			[ FDirName $(HAIKU_TOP) headers os kernel ]
 			[ FDirName $(HAIKU_TOP) headers os storage ]
 			[ FDirName $(HAIKU_TOP) headers os support ]
-			$(HAIKU_GCC_HEADERS_DIR_x86_gcc2)
+			[ FDirName $(HAIKU_TOP) headers build gcc-2.95.3 ]
 				# so that include_next will work
 			;
 

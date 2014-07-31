@@ -71,6 +71,7 @@ RemotePackageRepository HaikuPorts
 	friss-0.8beta-1
 	gawk-4.1.0-2
 	gcc-2.95.3_2014_07_26-1
+	gcc_syslibs_devel-2.95.3_2014_07_26-1
 	getconf-r260000-1
 	getopt-1.1.5-1
 	gettext-0.18.1.1-6
@@ -333,7 +334,9 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_x86_devel-0.10.14-1
 	freetype_x86-2.5.2-2
 	freetype_x86_devel-2.5.2-2
-	gcc_x86-4.8.3_2014_05_28-3
+	gcc_x86-4.8.3_2014_07_26-1
+	gcc_x86_syslibs-4.8.3_2014_07_26-1
+	gcc_x86_syslibs_devel-4.8.3_2014_07_26-1
 	gettext_x86-0.18.1.1-6
 	gettext_x86_libintl-0.18.1.1-6
 	giflib_x86-5.1.0-1
@@ -549,7 +552,7 @@ RemotePackageRepository HaikuPorts
 	friss
 	gawk
 	gcc
-#	gcc_x86
+	gcc_x86
 	getconf
 	getopt
 	gettext

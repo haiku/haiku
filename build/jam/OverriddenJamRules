@@ -108,7 +108,8 @@ rule Object
 			}
 
 		} else {
-			sysHeaders += $(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
+			sysHeaders += [ FStandardHeaders $(TARGET_PACKAGING_ARCH) ]
+				$(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
 			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
 				$(TARGET_DEFINES) ;
 		}

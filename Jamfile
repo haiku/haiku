@@ -8,6 +8,15 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildFeatures ] ;
+
+		# Let the target platform depend on the external header directories such
+		# that those will be unpacked before anything is built for the target
+		# platform.
+		Depends $(TARGET_PLATFORM) : [
+			BuildFeatureAttribute gcc_syslibs_devel : c++-headers
+		] [
+			BuildFeatureAttribute gcc_syslibs_devel : gcc-headers
+		] ;
 	}
 }
 

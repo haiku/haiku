@@ -866,6 +866,9 @@ SUPPORTED_PLATFORMS = haiku ;
 # initializations that are required before anything is built for a specific
 # platform can be forced by depending the pseudo target for the platform on the
 # initializations.
+# This is currently used to unpack the external headers from the
+# gcc_syslibs_devel build feature before anything is built for the target
+# platform.
 NotFile $(TARGET_PLATFORM) ;
 NotFile host ;
 
