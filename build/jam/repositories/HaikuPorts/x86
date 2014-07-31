@@ -176,7 +176,7 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_x86_gcc2_devel-0.10.2-4
 	freetype_x86_gcc2-2.5.2-3
 	freetype_x86_gcc2_devel-2.5.2-3
-	gcc_x86_gcc2-2.95.3_2013_08_15-4
+	gcc_x86_gcc2-2.95.3_2014_07_26-1
 	gettext_x86_gcc2-0.18.1.1-5
 	gettext_x86_gcc2_libintl-0.18.1.1-5
 	glu_x86_gcc2-9.0.0-2
