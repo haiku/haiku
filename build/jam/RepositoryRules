@@ -184,6 +184,7 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 			on $(packageListFile) return $(HAIKU_REPOSITORY_PACKAGE_FILE_NAMES)
 		] ;
 		local packageFiles ;
+		local packageFile ;
 		for packageFile in $(packageFileNames) {
 			MakeLocate $(packageFile) : $(HAIKU_DOWNLOAD_DIR) ;
 			packageFiles += $(packageFile) ;

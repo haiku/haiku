@@ -584,6 +584,7 @@ rule Expr expression
 
 	# tokenize the expression
 	local tokens ;
+	local string ;
 	for string in $(expression) {
 		while $(string) {
 			local split = [ Match "[ \t]*(-|[()+*]|[0-9]*)(.*)" : $(string) ] ;
