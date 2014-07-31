@@ -41,6 +41,6 @@ Application Cortex :
 	cortex_support.a
 	be media tracker translation
 	libexpat.a
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 	: ../Resource.rdef
 ;

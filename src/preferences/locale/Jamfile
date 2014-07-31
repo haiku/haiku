@@ -11,7 +11,7 @@ local sources =
 
 Preference Locale
 	: $(sources)
-	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) libshared.a
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] libshared.a
 		localestub
 	: Locale.rdef
 ;

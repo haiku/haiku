@@ -14,11 +14,11 @@ SimpleTest dump_mime_types
 	: dump_mime_types.cpp : be ;
 
 SimpleTest NodeMonitorTest
-	: NodeMonitorTest.cpp : be $(TARGET_LIBSUPC++) ;
+	: NodeMonitorTest.cpp : be [ TargetLibsupc++ ] ;
 
 SimpleTest PathMonitorTest
 	: PathMonitorTest.cpp PathMonitor.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
-SimpleTest PathMonitorTest2 : PathMonitorTest2.cpp : be $(TARGET_LIBSTDC++) ;
+SimpleTest PathMonitorTest2 : PathMonitorTest2.cpp : be [ TargetLibstdc++ ] ;

@@ -25,7 +25,7 @@ AddResources GLife : GLife.rdef ;
 
 ScreenSaver GLife :
 	$(sources) : 
-	be screensaver localestub $(TARGET_LIBSUPC++)
+	be screensaver localestub [ TargetLibsupc++ ]
 	[ BuildFeatureAttribute glu : library ]
 	[ BuildFeatureAttribute mesa : library ]
 ;

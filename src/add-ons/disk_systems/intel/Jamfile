@@ -23,7 +23,7 @@ Addon <disk_system>intel :
 	# kernel sources
 	PartitionMap.cpp
 
-	: be libshared.a localestub $(TARGET_LIBSUPC++)
+	: be libshared.a localestub [ TargetLibsupc++ ]
 ;
 
 DoCatalogs <disk_system>intel :

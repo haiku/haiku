@@ -48,7 +48,7 @@ Application ResourceEdit
 		tracker
 		translation
 		libcolumnlistview.a
-		$(TARGET_LIBSTDC++)
+		[ TargetLibstdc++ ]
 	:
 		ResourceEdit.rdef
 ;

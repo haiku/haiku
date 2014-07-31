@@ -25,7 +25,7 @@ UnitTestLib libstoragetest.so
 		SymLinkTest.cpp
 		TestApp.cpp
 		VolumeTest.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 # To run the tests some test files must be around.

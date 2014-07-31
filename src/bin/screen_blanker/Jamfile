@@ -16,7 +16,7 @@ BinCommand screen_blanker :
 		# needed for some old/broken screen saver add-ons that do not
 		# link against libscreensaver.so
 
-	: be game localestub libscreensaver.so $(TARGET_LIBSUPC++)
+	: be game localestub libscreensaver.so [ TargetLibsupc++ ]
 	: screen_blanker.rdef
 ;
 

@@ -16,7 +16,7 @@ Preference Printers :
 	be
 	translation
 	libprintutils.a
-	$(TARGET_LIBSUPC++)
+	[ TargetLibsupc++ ]
 	localestub
 	:
 	Printers.rdef

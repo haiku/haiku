@@ -21,7 +21,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			package
 			[ BuildFeatureAttribute libsolv : libraries ]
-			be $(TARGET_LIBSTDC++)
+			be [ TargetLibstdc++ ]
 		;
 
 

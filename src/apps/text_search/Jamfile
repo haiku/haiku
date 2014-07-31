@@ -25,7 +25,7 @@ Application TextSearch :
 	$(additionalBeOSSources)
 
 	: be localestub tracker textencoding libshared.a
-		$(TARGET_LIBSUPC++)
+		[ TargetLibsupc++ ]
 	: TextSearch.rdef
 ;
 

@@ -466,8 +466,7 @@ rule KernelArchitectureSetup architecture
 	# kernel add-on glue code
 	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = <$(architecture)>crtbeginS.o
 		<src!system!glue!$(architecture)>haiku_version_glue.o ;
-	HAIKU_KERNEL_ADDON_END_GLUE_CODE
-		= $(HAIKU_GCC_LIBGCC_$(architecture)) <$(architecture)>crtendS.o ;
+	HAIKU_KERNEL_ADDON_END_GLUE_CODE = <$(architecture)>crtendS.o ;
 }
 
 

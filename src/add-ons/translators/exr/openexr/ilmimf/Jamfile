@@ -82,7 +82,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			[ MultiArchDefaultGristFiles libhalf.a libiex.a libimath.a
 				libilmthread.a ]
-			$(TARGET_LIBSTDC++)
+			[ TargetLibstdc++ ]
 			[ BuildFeatureAttribute zlib : library ]
 			;
 	}

@@ -6,7 +6,7 @@ Application BSnow :
 	Flakes.cpp
 	SnowView.cpp
 	SnowApp.cpp
-	: be $(TARGET_LIBSUPC++) localestub
+	: be [ TargetLibsupc++ ] localestub
 	: BSnow.rdef
 	;
 

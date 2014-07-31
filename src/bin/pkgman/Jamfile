@@ -20,5 +20,5 @@ BinCommand pkgman :
 	pkgman.cpp
 	:
 	libshared.a package be
-	$(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
+	[ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;

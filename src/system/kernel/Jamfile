@@ -132,8 +132,6 @@ KernelLd kernel_$(TARGET_ARCH) :
 	kernel_lib_posix_arch_$(TARGET_ARCH).o
 	kernel_misc.o
 
-	$(TARGET_KERNEL_LIBSUPC++)
-
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
 	: -Bdynamic -export-dynamic -dynamic-linker /foo/bar
 	  $(TARGET_KERNEL_PIC_LINKFLAGS)
@@ -173,8 +171,6 @@ if $(HAIKU_ARCH) in x86_64 arm {
 		kernel_lib_posix.o
 		kernel_lib_posix_arch_$(TARGET_ARCH).o
 		kernel_misc.o
-
-		$(TARGET_KERNEL_LIBSUPC++)
 
 		: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
 		: -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar

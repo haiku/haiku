@@ -16,7 +16,7 @@ Server media_addon_server :
 	AddOnMonitorHandler.cpp
 	NodeMonitorHandler.cpp
 	:
-	be libmedia.so game $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
+	be libmedia.so game [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;
 
 SEARCH on [ FGristFiles AddOnMonitorHandler.cpp NodeMonitorHandler.cpp ]

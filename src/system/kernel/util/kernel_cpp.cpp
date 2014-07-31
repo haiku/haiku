@@ -29,17 +29,6 @@
 // Always define the symbols needed when not linking against libgcc.a --
 // we simply override them.
 
-// ... it doesn't seem to work with this symbol at least.
-#ifndef USING_LIBGCC
-#	if __GNUC__ >= 3
-const std::nothrow_t std::nothrow = {};
-#	else
-const nothrow_t std::nothrow = {};
-#	endif
-#endif
-
-const mynothrow_t mynothrow = {};
-
 #if __GNUC__ == 2
 
 extern "C" void
@@ -169,6 +158,13 @@ void
 _Unwind_GetIP()
 {
 	panic("_Unwind_GetIP");
+}
+
+extern "C"
+void
+_Unwind_GetIPInfo()
+{
+	panic("_Unwind_GetIPInfo");
 }
 
 extern "C"

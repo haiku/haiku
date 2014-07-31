@@ -12,7 +12,7 @@ Addon asf_reader :
 	ASFIndex.cpp
 	:
 	libasfreader.a
-	be libmedia.so $(TARGET_LIBSTDC++)
+	be libmedia.so [ TargetLibstdc++ ]
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins asf_reader libasf ;

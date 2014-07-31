@@ -10,7 +10,7 @@ Application ActivityMonitor :
 	SettingsWindow.cpp
 	SystemInfo.cpp
 	SystemInfoHandler.cpp
-	: be tracker media libbnetapi.so libshared.a $(TARGET_LIBSTDC++)
+	: be tracker media libbnetapi.so libshared.a [ TargetLibstdc++ ]
 		$(TARGET_NETWORK_LIBS) localestub
 	: ActivityMonitor.rdef
 	;

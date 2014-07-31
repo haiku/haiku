@@ -31,7 +31,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) common ] ;
 #		MessageOpAssignTest.cpp
 #		MessageEasyFindTest.cpp
 #		MessageSpeedTest.cpp
-#	: be $(TARGET_LIBSTDC++)
+#	: be [ TargetLibstdc++ ]
 #;
 
 
@@ -157,12 +157,12 @@ UnitTestLib libapptest.so
 		AppRunner.cpp
 		PipedAppRunner.cpp
 
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 UnitTestLib libappteststub.so
 	: AppKitTestStub.cpp
-	: libapptest.so $(TARGET_LIBSTDC++)
+	: libapptest.so [ TargetLibstdc++ ]
 ;
 
 SimpleTest DanoMessageTest :

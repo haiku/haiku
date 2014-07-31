@@ -6,5 +6,5 @@ UsePrivateHeaders media ;
 
 Addon au_reader :
 	au_reader.cpp
-	: be libmedia.so $(TARGET_LIBSUPC++)
+	: be libmedia.so [ TargetLibsupc++ ]
 ;

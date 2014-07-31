@@ -59,7 +59,7 @@ SimpleTest sem_acquire_test1 : sem_acquire_test1.cpp : be ;
 SimpleTest spinlock_contention : spinlock_contention.cpp ;
 
 SimpleTest syscall_restart_test : syscall_restart_test.cpp
-	: network $(TARGET_LIBSUPC++) ;
+	: network [ TargetLibsupc++ ] ;
 
 SetSupportedPlatformsForTarget syscall_time
 	: $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;

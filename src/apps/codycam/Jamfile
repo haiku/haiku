@@ -14,7 +14,7 @@ Application CodyCam :
 	SettingsHandler.cpp
 	VideoConsumer.cpp
 	: be localestub media translation $(TARGET_NETAPI_LIB)
-		$(TARGET_LIBSTDC++)
+		[ TargetLibstdc++ ]
 	: CodyCam.rdef
 ;
 

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src tests misc ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-SimpleTest rtti-test : rtti-test.cpp : be $(TARGET_LIBSUPC++) ;
+SimpleTest rtti-test : rtti-test.cpp : be [ TargetLibsupc++ ] ;
 SimpleTest writev-test : writev-test.cpp : be ;
 
 SubInclude HAIKU_TOP src tests misc exception-test ;

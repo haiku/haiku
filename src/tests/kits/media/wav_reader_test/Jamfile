@@ -8,7 +8,7 @@ SimpleTest wav_reader_test
 	MediaPlugin.cpp
 	ReaderPlugin.cpp
 	WavReaderPlugin.cpp
-	: media be root $(TARGET_LIBSUPC++)
+	: media be root [ TargetLibsupc++ ]
 ;
 
 # Tell Jam where to find these sources

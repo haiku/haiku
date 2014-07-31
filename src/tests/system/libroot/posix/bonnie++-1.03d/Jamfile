@@ -10,12 +10,12 @@ SimpleTest bonnie++ :
 
 	bonnie++.cpp
 	:
-	$(TARGET_LIBSUPC++)
+	[ TargetLibsupc++ ]
 ;
 
 SimpleTest zcav :
 	bon_suid.cpp
 	zcav.cpp
 	:
-	$(TARGET_LIBSUPC++)
+	[ TargetLibsupc++ ]
 ;

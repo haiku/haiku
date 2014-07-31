@@ -16,7 +16,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			SGIView.cpp
 			: be translation 
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
-			$(TARGET_LIBSUPC++) localestub
+			[ TargetLibsupc++ ] localestub
 			: true
 		;
 	}

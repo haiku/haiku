@@ -33,7 +33,7 @@ SimpleTest WidgetLayoutTest :
 	TextControlTest.cpp
 	TextViewTest.cpp
 	:
-	be $(TARGET_LIBSUPC++)
+	be [ TargetLibsupc++ ]
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {

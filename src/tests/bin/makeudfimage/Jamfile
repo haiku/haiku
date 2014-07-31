@@ -24,7 +24,7 @@ UnitTestLib libmakeudfimagetest.so
 		UdfStructures.cpp
 		Utils.cpp
 
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 SEARCH on [ FGristFiles Allocator.cpp PhysicalPartitionAllocator.cpp ]

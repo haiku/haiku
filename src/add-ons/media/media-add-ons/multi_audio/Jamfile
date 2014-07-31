@@ -17,7 +17,7 @@ Addon hmulti_audio.media_addon :
 	MultiAudioUtility.cpp
 	Resampler.cpp
 	TimeComputer.cpp
-	: be media $(TARGET_LIBSUPC++) localestub
+	: be media [ TargetLibsupc++ ] localestub
 ;
 
 DoCatalogs hmulti_audio.media_addon

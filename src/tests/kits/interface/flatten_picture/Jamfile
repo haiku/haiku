@@ -11,5 +11,5 @@ SimpleTest FlattenPictureTest :
 LinkAgainst FlattenPictureTest :
 	be
 	root
-	$(TARGET_LIBSUPC++)
+	[ TargetLibsupc++ ]
 	;

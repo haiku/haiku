@@ -49,7 +49,7 @@ UnitTestLib libinterfacetest.so
 		RegionIntersect.cpp
 		RegionOffsetBy.cpp
 
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 ObjectDefines
@@ -59,31 +59,31 @@ ObjectDefines
 
 SimpleTest ScrollViewTest_r5 :
 	ScrollViewTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest ScrollViewTest :
 	ScrollViewTest.cpp
 	ScrollView.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest AlertTest :
 	SimpleAlertTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;
 
 SimpleTest ChannelSliderTest :
 	ChannelSliderTest.cpp
 	ChannelSlider.cpp
 	ChannelControl.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest CheckBoxTest :
 	CheckBoxTest.cpp
 	CheckBox.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest ScreenTest :
@@ -93,50 +93,50 @@ SimpleTest ScreenTest :
 
 SimpleTest StatusBarTest :
 	StatusBarTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest ToolTipTest :
 	ToolTipTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest GetMouseTest :
 	GetMouseTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest PulseTest :
 	PulseTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest SliderTest_r5 :
 	SliderTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest SliderTest :
 	SliderTest.cpp
 	Slider.cpp
 	Control.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest TruncateString :
 	TruncateString.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest MenuBeginningTest :
 	MenuBeginningTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 
 Application MenuTriggerTest :
 	MenuTriggerTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;
 
 
@@ -148,29 +148,29 @@ SimpleTest WidthBufferTest :
 
 SimpleTest ClippingPlusRedraw :
 	ClippingPlusRedraw.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;
 
 
 SimpleTest SetDiskModeTest :
 	SetDiskModeTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;
 
 SimpleTest SetBorderScrollViewTest :
 	ScrollViewSetBorderTest.cpp
 	ScrollView.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;
 
 SimpleTest TextViewTest :
 	TextViewTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest WindowStackTest :
 	WindowStackTest.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 SEARCH on [ FGristFiles

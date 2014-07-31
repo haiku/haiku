@@ -6,7 +6,7 @@ Application FontDemo :
 	ControlView.cpp
 	FontDemo.cpp
 	FontDemoView.cpp
-	: be localestub $(TARGET_LIBSUPC++)
+	: be localestub [ TargetLibsupc++ ]
 	: FontDemo.rdef
 	;
 

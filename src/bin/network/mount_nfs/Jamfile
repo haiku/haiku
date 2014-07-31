@@ -6,5 +6,5 @@ UsePrivateHeaders net ;
 
 BinCommand mount_nfs :
 	mount_nfs.cpp
-	: libnetwork.so $(TARGET_LIBSUPC++)
+	: libnetwork.so [ TargetLibsupc++ ]
 ;

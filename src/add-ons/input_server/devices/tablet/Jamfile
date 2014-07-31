@@ -6,4 +6,4 @@ UsePrivateHeaders input ;
 
 Addon <input>tablet :
 	TabletInputDevice.cpp
-	: be input_server $(TARGET_LIBSUPC++) ;
+	: be input_server [ TargetLibsupc++ ] ;

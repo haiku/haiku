@@ -18,5 +18,5 @@ KernelMergeObject kernel_util.o :
 	Random.cpp
 	StringHash.cpp
 
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -DUSING_LIBGCC
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

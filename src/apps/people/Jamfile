@@ -10,7 +10,7 @@ Application People :
 	PersonWindow.cpp
 	PictureView.cpp
 	: be tracker translation
-		$(TARGET_LIBSUPC++) localestub
+		[ TargetLibsupc++ ] localestub
 	: People.rdef
 ;
 

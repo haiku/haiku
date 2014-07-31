@@ -86,7 +86,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ReaderPlugin.cpp
 			WriterPlugin.cpp
 			:
-			be $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
+			be [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 			;
 	}
 }

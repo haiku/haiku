@@ -7,5 +7,5 @@ AddResources cddb_daemon : cddb_daemon.rdef ;
 Server cddb_daemon :
 	cddb_daemon.cpp
 	cddb_server.cpp
-	: be bnetapi $(TARGET_LIBSUPC++)
+	: be bnetapi [ TargetLibsupc++ ]
 	;

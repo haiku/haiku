@@ -8,7 +8,7 @@ UseHeaders [ FDirName os interface ] ;
 
 SimpleTest ArchivedView :
 	main.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	: ArchivedView.rdef
 	;
 

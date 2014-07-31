@@ -18,7 +18,7 @@ Application NetworkStatus :
 	WirelessNetworkMenuItem.cpp
 
 	: be libshared.a localestub $(icon_libs) $(TARGET_NETWORK_LIBS)
-		libbnetapi.so $(TARGET_LIBSTDC++)
+		libbnetapi.so [ TargetLibstdc++ ]
 	: NetworkStatus.rdef NetworkStatusIcons.rdef
 ;
 

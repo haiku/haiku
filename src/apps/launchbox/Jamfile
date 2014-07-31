@@ -11,7 +11,7 @@ Application LaunchBox :
 	PadView.cpp
 	Panel.cpp
 	support.cpp
-	: be translation libshared.a $(TARGET_LIBSUPC++) localestub
+	: be translation libshared.a [ TargetLibsupc++ ] localestub
 	: LaunchBox.rdef
 ;
 

@@ -20,7 +20,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			r5_compatibility.cpp
 			:
 			<libbind!$(architecture)>libbind.o
-			$(TARGET_LIBSUPC++)
+			[ TargetLibsupc++ ]
 			;
 
 		AddFileDataAttribute $(libnetwork) : services : string : $(services) ;

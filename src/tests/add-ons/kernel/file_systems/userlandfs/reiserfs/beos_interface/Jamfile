@@ -33,5 +33,5 @@ Addon <userland-beos>reiserfs
 	String.cpp
 	SuperBlock.cpp
 
-	: libuserlandfs_beos_kernel.so $(TARGET_LIBSUPC++)
+	: libuserlandfs_beos_kernel.so [ TargetLibsupc++ ]
 ;

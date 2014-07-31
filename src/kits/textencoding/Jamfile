@@ -19,7 +19,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			be
 			[ MultiArchDefaultGristFiles libiconv.a ]
-			$(TARGET_LIBSUPC++) localestub ;
+			[ TargetLibsupc++ ] localestub ;
 	}
 }
 

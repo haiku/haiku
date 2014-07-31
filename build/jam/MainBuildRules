@@ -8,7 +8,8 @@ rule AddSharedObjectGlueCode
 	on $(1) {
 		platform = $(PLATFORM) ;
 		if $(platform) = haiku {
-			local stdLibs = [ MultiArchDefaultGristFiles libroot.so ] ;
+			local stdLibs = [ MultiArchDefaultGristFiles libroot.so ]
+				[ TargetLibgcc ] ;
 			local type = EXECUTABLE ;
 			if $(2) != true {
 				type = LIBRARY ;

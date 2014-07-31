@@ -29,7 +29,7 @@ Addon <userland>checksumfs :
 	# from src/kits/shared
 	SHA256.cpp
 
-	: libuserlandfs_haiku_kernel.so $(TARGET_LIBSUPC++)
+	: libuserlandfs_haiku_kernel.so [ TargetLibsupc++ ]
 ;
 
 

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src bin playsound ;
 
 BinCommand playfile :
 	playfile.cpp
-	: be media $(TARGET_LIBSUPC++)
+	: be media [ TargetLibsupc++ ]
 ;
 
 BinCommand playsound :
@@ -12,5 +12,5 @@ BinCommand playsound :
 
 BinCommand playwav :
 	playwav.cpp
-	: be media $(TARGET_LIBSUPC++)
+	: be media [ TargetLibsupc++ ]
 ;

@@ -2,6 +2,6 @@ SubDir HAIKU_TOP src tests kits game direct_window_info_test ;
 
 SimpleTest dw_info
 	: dwinfo.cpp
-	: game be root $(TARGET_LIBSUPC++)
+	: game be root [ TargetLibsupc++ ]
 ;
 

@@ -10,7 +10,7 @@ SubDirC++Flags -D__STDC_CONSTANT_MACROS -Wno-deprecated-declarations ;
 
 SimpleTest mpeg2_decoder_test :
 	mpeg2_decoder_test.cpp
-	: be media translation $(TARGET_LIBSUPC++)
+	: be media translation [ TargetLibsupc++ ]
 ;
 
 Includes [ FGristFiles mpeg2_decoder_test.cpp ]

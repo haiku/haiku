@@ -12,7 +12,7 @@ if $(TARGET_PLATFORM) != haiku {
 
 SimpleTest ShelfTest :
         ShelfTest.cpp
-        : be $(TARGET_LIBSUPC++)
+        : be [ TargetLibsupc++ ]
         ;
 
 SEARCH on [ FGristFiles

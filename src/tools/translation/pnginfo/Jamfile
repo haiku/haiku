@@ -12,5 +12,5 @@ Includes [ FGristFiles pnginfo.cpp ]
 BinCommand pnginfo : pnginfo.cpp : be
 	[ BuildFeatureAttribute libpng : library ]
 	[ BuildFeatureAttribute zlib : library ]
-	$(TARGET_LIBSUPC++) ;
+	[ TargetLibsupc++ ] ;
 

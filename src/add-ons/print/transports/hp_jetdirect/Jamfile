@@ -8,5 +8,5 @@ Addon HP\ JetDirect :
 	print_transport.cpp
 	HPJetDirectTransport.cpp
 	SetupWindow.cpp
-	: be $(TARGET_NETWORK_LIBS) $(TARGET_NETAPI_LIB) $(TARGET_LIBSUPC++)
+	: be $(TARGET_NETWORK_LIBS) $(TARGET_NETAPI_LIB) [ TargetLibsupc++ ]
 ;

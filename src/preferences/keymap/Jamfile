@@ -21,7 +21,7 @@ Preference Keymap :
 	KeymapWindow.cpp
 	ModifierKeysWindow.cpp
 
-	: be tracker localestub libshared.a $(TARGET_LIBSTDC++)
+	: be tracker localestub libshared.a [ TargetLibstdc++ ]
 	: Keymap.rdef
 ;
 

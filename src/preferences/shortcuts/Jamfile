@@ -19,7 +19,7 @@ Preference Shortcuts :
 	PrefilledBitmap.cpp
 	ScrollViewCorner.cpp
 	
-	: be localestub tracker libshortcuts_shared.a $(TARGET_LIBSTDC++)
+	: be localestub tracker libshortcuts_shared.a [ TargetLibstdc++ ]
 	: Shortcuts.rdef
 ;
 

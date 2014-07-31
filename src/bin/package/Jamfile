@@ -16,5 +16,5 @@ BinCommand package :
 	PackageWritingUtils.cpp
 	:
 	package be
-	$(TARGET_LIBSUPC++)
+	[ TargetLibsupc++ ]
 ;

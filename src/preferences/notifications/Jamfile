@@ -12,7 +12,7 @@ Application Notifications :
 	GeneralView.cpp
 	DisplayView.cpp
 	NotificationsView.cpp
-	: be translation libcolumnlistview.a libnotification.a $(TARGET_LIBSTDC++) localestub
+	: be translation libcolumnlistview.a libnotification.a [ TargetLibstdc++ ] localestub
 	: Notifications.rdef
 ;
 

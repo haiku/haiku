@@ -3,5 +3,5 @@ SubDir HAIKU_TOP src add-ons media media-add-ons tone_producer_demo ;
 Addon tone_producer_demo.media_addon :
 	ToneProducerAddOn.cpp
 	ToneProducer.cpp
-	: be media $(TARGET_LIBSUPC++)
+	: be media [ TargetLibsupc++ ]
 ;

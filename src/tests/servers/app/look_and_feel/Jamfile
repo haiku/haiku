@@ -9,7 +9,7 @@ UsePrivateHeaders interface ;
 
 Application LookAndFeel :
 	LookAndFeel.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {

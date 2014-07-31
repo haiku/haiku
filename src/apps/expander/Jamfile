@@ -12,7 +12,7 @@ Application Expander :
 	DirectoryFilePanel.cpp
 	ExpanderRules.cpp
 	PasswordAlert.cpp
-	: be tracker localestub $(TARGET_LIBSUPC++)
+	: be tracker localestub [ TargetLibsupc++ ]
 	: Expander.rdef
 ;
 

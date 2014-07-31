@@ -27,7 +27,7 @@ Preference GLInfo :
 	:
 	be libglut.so
 	translation libcolumnlistview.a localestub
-	$(TARGET_LIBSUPC++)
+	[ TargetLibsupc++ ]
 	[ BuildFeatureAttribute mesa : library ]
 	[ BuildFeatureAttribute glu : library ]
 	:

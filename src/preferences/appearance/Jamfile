@@ -28,7 +28,7 @@ Preference Appearance :
 	#FontMenu.cpp
 	#MenuView.cpp
 
-	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) localestub
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
 	: Appearance.rdef
 	;
 

@@ -132,7 +132,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ MultiArchDefaultGristFiles libshared.a ]
 			be
 			[ BuildFeatureAttribute curl : library ]
-			$(TARGET_LIBSTDC++)
+			[ TargetLibstdc++ ]
 			;
 	}
 }

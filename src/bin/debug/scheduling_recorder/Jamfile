@@ -12,5 +12,5 @@ BinCommand scheduling_recorder
 	<bin>debug_utils.a
 	libdebug.so
 	be
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 ;

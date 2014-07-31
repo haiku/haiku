@@ -6,7 +6,7 @@ Application Pairs :
 	PairsView.cpp
 	PairsWindow.cpp
 
-	: be localestub $(TARGET_LIBSTDC++)
+	: be localestub [ TargetLibstdc++ ]
 	: Pairs.rdef
 ;
 

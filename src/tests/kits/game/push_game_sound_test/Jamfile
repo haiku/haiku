@@ -2,10 +2,10 @@ SubDir HAIKU_TOP src tests kits game push_game_sound_test ;
 
 SimpleTest push_game_sound_test
 	: push_game_sound_test.cpp
-	: game media be $(TARGET_LIBSUPC++)
+	: game media be [ TargetLibsupc++ ]
 ;
 
 SimpleTest push_game_sound_sine
 	: push_game_sound_sine.cpp
-	: game be $(TARGET_LIBSUPC++)
+	: game be [ TargetLibsupc++ ]
 ;

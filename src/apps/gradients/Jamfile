@@ -4,6 +4,6 @@ Application Gradients :
 	GradientsApp.cpp
 	GradientsWindow.cpp
 	GradientsView.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	: Gradients.rdef
 ;

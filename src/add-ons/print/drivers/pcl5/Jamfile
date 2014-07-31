@@ -10,5 +10,5 @@ Addon PCL5\ Compatible :
 	PCL5Entry.cpp
 	PCL5.cpp
 	PCL5Cap.cpp
-	: be libprint.a $(TARGET_LIBSTDC++)
+	: be libprint.a [ TargetLibstdc++ ]
 ;

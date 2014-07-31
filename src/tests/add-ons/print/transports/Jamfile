@@ -2,5 +2,5 @@ SubDir HAIKU_TOP src tests add-ons print transports ;
 
 UsePrivateHeaders shared print ;
 
-SimpleTest print_transport_loader : main.cpp : be $(TARGET_LIBSUPC++) ;
+SimpleTest print_transport_loader : main.cpp : be [ TargetLibsupc++ ] ;
 

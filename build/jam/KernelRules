@@ -48,9 +48,11 @@ rule KernelLd
 	# libsupc++ is opt-out.
 	local libs ;
 	if ! [ on $(1) return $(HAIKU_NO_LIBSUPC++) ] {
-		libs += $(TARGET_KERNEL_LIBSUPC++) ;
+		libs += [ TargetKernelLibsupc++ true ] ;
+		Depends $(1) : [ TargetKernelLibsupc++ ] ;
 	}
-	LINKLIBS on $(1) =  $(libs) $(TARGET_KERNEL_LIBGCC) ;
+	LINKLIBS on $(1) =  $(libs) [ TargetKernelLibgcc true ] ;
+	Depends $(1) : [ TargetKernelLibgcc ] ;
 
 	HAIKU_TARGET_IS_EXECUTABLE on $(1) = 1 ;
 
@@ -119,7 +121,8 @@ rule KernelAddon
 		if $(PLATFORM) = haiku {
 			kernel = <nogrist>kernel.so ;
 			beginGlue = $(HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE) ;
-			endGlue = $(HAIKU_KERNEL_ADDON_END_GLUE_CODE) ;
+			endGlue
+				= [ TargetKernelLibgcc ] $(HAIKU_KERNEL_ADDON_END_GLUE_CODE) ;
 		} else if $(PLATFORM) = haiku_host {
 			kernel = /boot/develop/lib/x86/kernel.so ;
 			beginGlue = $(HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE) ;

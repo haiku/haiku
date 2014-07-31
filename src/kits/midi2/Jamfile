@@ -21,7 +21,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			MidiRoster.cpp
 			MidiRosterLooper.cpp
 			:
-			be $(TARGET_LIBSUPC++)
+			be [ TargetLibsupc++ ]
 			;
 	}
 }

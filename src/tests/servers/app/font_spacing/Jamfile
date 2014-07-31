@@ -8,7 +8,7 @@ UseHeaders [ FDirName os interface ] ;
 
 SimpleTest FontSpacing :
 	main.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	:
 	;
 

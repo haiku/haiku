@@ -20,6 +20,6 @@ Application authentication_server
 	  AuthenticationPanel.cpp
 	  AuthenticationServer.cpp
 	  Panel.cpp
-	: be $(TARGET_LIBSUPC++) libshared.a
+	: be [ TargetLibsupc++ ] libshared.a
 	: authentication_server.rdef
 ;

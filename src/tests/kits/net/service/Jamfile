@@ -7,5 +7,5 @@ UnitTestLib servicekittest.so :
 	HttpTest.cpp
 	UrlTest.cpp
 
-	: be $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) $(TARGET_LIBSTDC++)
+	: be $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) [ TargetLibstdc++ ]
 	;

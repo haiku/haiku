@@ -27,5 +27,5 @@ SharedLibrary libuserlandfs_beos_kernel.so
 
 	:
 	<nogrist>userlandfs_server
-	$(TARGET_LIBSUPC++)
+	[ TargetLibsupc++ ]
 ;

@@ -11,7 +11,7 @@ Addon <disk_system>ntfs :
 	NTFSAddOn.cpp
 	InitializeParameterEditor.cpp
 
-	: be localestub $(TARGET_LIBSUPC++) libshared.a
+	: be localestub [ TargetLibsupc++ ] libshared.a
 ;
 
 DoCatalogs <disk_system>ntfs :

@@ -21,7 +21,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Translator.cpp
 			TranslatorRoster.cpp
 
-			: be textencoding $(TARGET_LIBSTDC++)
+			: be textencoding [ TargetLibstdc++ ]
 			;
 	}
 }

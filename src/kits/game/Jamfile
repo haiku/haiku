@@ -30,7 +30,7 @@ if $(TARGET_PLATFORM) = haiku {
 				GameSoundBuffer.cpp
 				GameSoundDevice.cpp
 				GSUtility.cpp
-				: be media $(TARGET_LIBSUPC++)
+				: be media [ TargetLibsupc++ ]
 				;
 		}
 	}

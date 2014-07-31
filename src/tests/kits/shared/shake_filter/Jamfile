@@ -4,5 +4,5 @@ UsePrivateHeaders shared ;
 
 Application ShakeFilterTest :
 	ShakeFilterTest.cpp	
-	: libshared.a be $(TARGET_LIBSUPC++)
+	: libshared.a be [ TargetLibsupc++ ]
 ;

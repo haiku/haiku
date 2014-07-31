@@ -13,7 +13,7 @@ ScreenSaver SlideShowSaver :
 	SlideShowSaver.cpp
 	SlideShowConfigView.cpp
 	:
-	be screensaver $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) tracker translation
+	be screensaver [ TargetLibstdc++ ] [ TargetLibsupc++ ] tracker translation
 ;
 
 DoCatalogs SlideShowSaver :

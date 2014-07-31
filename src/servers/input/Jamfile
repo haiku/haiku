@@ -61,7 +61,7 @@ Server input_server :
 	AddOnMonitorHandler.cpp
 	NodeMonitorHandler.cpp
 
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 Includes [ FGristFiles InputServer.cpp ] : [ FGristFiles SystemKeymap.h ] ;

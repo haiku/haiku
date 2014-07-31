@@ -8,7 +8,7 @@ Application Screenshot :
 	ScreenshotApp.cpp
 	ScreenshotWindow.cpp
 	Utility.cpp
-	: be localestub tracker translation $(TARGET_LIBSUPC++)
+	: be localestub tracker translation [ TargetLibsupc++ ]
 	: ScreenshotApp.rdef
 ;
 
@@ -22,7 +22,7 @@ DoCatalogs Screenshot :
 Application screenshot :
 	Screenshot.cpp
 	Utility.cpp
-	: be localestub translation $(TARGET_LIBSUPC++)
+	: be localestub translation [ TargetLibsupc++ ]
 	: Screenshot.rdef
 ;
 

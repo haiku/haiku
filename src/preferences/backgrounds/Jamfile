@@ -7,7 +7,7 @@ Preference Backgrounds :
 	Backgrounds.cpp
 	BackgroundsView.cpp
 	ImageFilePanel.cpp
-	: be tracker translation $(TARGET_LIBSUPC++) localestub
+	: be tracker translation [ TargetLibsupc++ ] localestub
 	: Backgrounds.rdef
 	;
 

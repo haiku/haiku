@@ -24,7 +24,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			: be translation
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
 			[ BuildFeatureAttribute jpeg : library ]
-			$(TARGET_LIBSTDC++) localestub
+			[ TargetLibstdc++ ] localestub
 			: true
 			;
 

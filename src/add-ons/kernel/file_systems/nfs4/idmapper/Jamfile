@@ -6,7 +6,7 @@ Application nfs4_idmapper_server
 
 	:
 	be
-	$(TARGET_LIBSUPC++)
+	[ TargetLibsupc++ ]
 
 	:
 	nfs4_idmapper_server.rdef

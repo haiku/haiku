@@ -5,7 +5,7 @@ Preference NetworkSetup :
 	NetworkSetupWindow.cpp
 	NetworkSetupProfile.cpp
 	NetworkSetupAddOn.cpp
-	: be root $(TARGET_LIBSTDC++) localestub
+	: be root [ TargetLibstdc++ ] localestub
 	: NetworkSetup.rdef
 ;
 

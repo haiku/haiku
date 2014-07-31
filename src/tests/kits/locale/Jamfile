@@ -23,7 +23,7 @@ rule LocaleTest
 	# LocaleTest <sources> ;
 	local sources = $(1) ;
 	local name = $(sources[1]:B) ;
-	Application $(name) : $(sources) : be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) ;
+	Application $(name) : $(sources) : be [ TargetLibstdc++ ] [ TargetLibsupc++ ] ;
 }
 
 LocaleTest catalogSpeed.cpp ;
@@ -40,7 +40,7 @@ Includes [ FGristFiles ICUTest.cpp ] : [ BuildFeatureAttribute icu : headers ] ;
 
 Application ICUTest :
 	ICUTest.cpp :
-	be $(TARGET_LIBSUPC++) [ BuildFeatureAttribute icu : libraries ] ;
+	be [ TargetLibsupc++ ] [ BuildFeatureAttribute icu : libraries ] ;
 
 Addon catalogTestAddOn
 	: catalogTestAddOn.cpp

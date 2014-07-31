@@ -10,6 +10,6 @@ Addon esound_sink.media_addon :
 	ESDEndpoint.cpp
 	ESDSinkAddOn.cpp
 	ESDSinkNode.cpp
-	: be media network $(TARGET_LIBSUPC++)
+	: be media network [ TargetLibsupc++ ]
 ;
 

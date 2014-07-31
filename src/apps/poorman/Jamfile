@@ -51,7 +51,7 @@ Application PoorMan : PoorMan.cpp
 	match.c
 	tdate_parse.c
 	
-	: be network tracker $(TARGET_LIBSTDC++) localestub
+	: be network tracker [ TargetLibstdc++ ] localestub
 	;
 
 

@@ -39,7 +39,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SharedLibrary $(grist)libroot-addon-icu.so
 			: $(sources)
 			:
-			$(grist)libreferenceable.a $(TARGET_LIBSTDC++_$(architecture))
+			$(grist)libreferenceable.a [ TargetLibstdc++ ]
 			[ BuildFeatureAttribute icu : libraries ]
 			;
 	}

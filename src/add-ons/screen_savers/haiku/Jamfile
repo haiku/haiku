@@ -9,7 +9,7 @@ AddResources Haiku : ScreenSaver.rdef ;
 
 Addon Haiku :
 	ScreenSaver.cpp
-	: be screensaver localestub $(TARGET_LIBSUPC++)
+	: be screensaver localestub [ TargetLibsupc++ ]
 ;
 
 DoCatalogs Haiku :

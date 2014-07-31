@@ -22,6 +22,6 @@ StdBinCommands
 
 StdBinCommands
 	spamdbm.cpp
-	: be tracker $(TARGET_LIBSTDC++) libmail.so
+	: be tracker [ TargetLibstdc++ ] libmail.so
 	: spamdbm.rdef
 	;

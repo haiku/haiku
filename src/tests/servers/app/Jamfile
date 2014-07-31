@@ -201,7 +201,7 @@ Server test_app_server :
 	[ BuildFeatureAttribute zlib : library ] libtestappserver.so be
 	libhwinterface.so libhwinterfaceimpl.so libtextencoding.so
 	[ BuildFeatureAttribute freetype : library ]
-	$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+	[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
 # install in the test dir

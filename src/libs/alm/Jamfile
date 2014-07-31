@@ -21,7 +21,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Tab.cpp
 			:
 			[ MultiArchDefaultGristFiles liblinprog.a ]
-			be $(TARGET_LIBSTDC++)
+			be [ TargetLibstdc++ ]
 			;
 	}
 }

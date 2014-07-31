@@ -9,5 +9,5 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits print ] ;
 Addon Serial\ Port :
 	SerialTransport.cpp
 	PrintTransportAddOn.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;

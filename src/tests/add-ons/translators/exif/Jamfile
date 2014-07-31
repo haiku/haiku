@@ -10,7 +10,7 @@ SimpleTest dump_exif :
 	dump_exif.cpp
 	exif_parser.cpp
 
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 SEARCH on [ FGristFiles 

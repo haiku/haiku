@@ -34,7 +34,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			: be translation
 			[ BuildFeatureAttribute zlib : library ]
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
-			$(TARGET_LIBSUPC++) localestub
+			[ TargetLibsupc++ ] localestub
 			: true
 		;
 	}

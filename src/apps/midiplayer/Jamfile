@@ -9,7 +9,7 @@ Application MidiPlayer :
 	MidiPlayerWindow.cpp 
 	ScopeView.cpp
 	SynthBridge.cpp
-	: be midi midi2 $(TARGET_LIBSUPC++) localestub
+	: be midi midi2 [ TargetLibsupc++ ] localestub
 	: MidiPlayer.rdef
 ;
 

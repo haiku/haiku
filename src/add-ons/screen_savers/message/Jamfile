@@ -11,7 +11,7 @@ AddResources Message : Message.rdef ;
 
 ScreenSaver Message :
 	Message.cpp : 
-	be libscreensaver.so localestub $(TARGET_LIBSUPC++) ;
+	be libscreensaver.so localestub [ TargetLibsupc++ ] ;
 
 DoCatalogs Message :
 	x-vnd.Haiku-MessageScreensaver

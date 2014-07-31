@@ -38,7 +38,7 @@ Includes [ FGristFiles $(sources) ] :
 Application Haiku3d :
 	$(sources)
 	:
-	be game media translation $(TARGET_LIBSTDC++)
+	be game media translation [ TargetLibstdc++ ]
 	[ BuildFeatureAttribute glu : library ]
 	[ BuildFeatureAttribute mesa : library ]
 	: Haiku3d.rdef

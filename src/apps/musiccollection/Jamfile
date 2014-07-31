@@ -12,8 +12,8 @@ Application MusicCollection :
 
 	NodeMonitorHandler.cpp
 	:
-	be libalm.so localestub $(TARGET_LIBSUPC++)
-	$(TARGET_LIBSTDC++) libshared.a
+	be libalm.so localestub [ TargetLibsupc++ ]
+	[ TargetLibstdc++ ] libshared.a
 	:
 	MusicCollection.rdef
 	;

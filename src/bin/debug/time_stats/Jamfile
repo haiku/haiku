@@ -13,5 +13,5 @@ BinCommand time_stats
 	time_stats.cpp
 	timing_analysis.cpp
 	:
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 ;

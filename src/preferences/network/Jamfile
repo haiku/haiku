@@ -13,7 +13,7 @@ Preference Network :
 	RadioView.cpp
 	WirelessNetworkMenuItem.cpp
 
-	: be $(HAIKU_NETWORK_LIBS) $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+	: be $(HAIKU_NETWORK_LIBS) [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 		localestub libbnetapi.so
 	: Network.rdef
 ;

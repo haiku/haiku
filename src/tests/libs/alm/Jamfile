@@ -7,67 +7,67 @@ UsePrivateHeaders shared ;
 Application ALMHelloWorld :
 	HelloWorld.cpp
 	:
-	be libalm.so $(TARGET_LIBSUPC++)
+	be libalm.so [ TargetLibsupc++ ]
 ;
 
 Application ALMViews :
 	Views.cpp
 	:
-	be libalm.so $(TARGET_LIBSUPC++)
+	be libalm.so [ TargetLibsupc++ ]
 ;
 
 Application ALMPinwheel :
 	Pinwheel.cpp
 	:
-	be libalm.so $(TARGET_LIBSUPC++)
+	be libalm.so [ TargetLibsupc++ ]
 ;
 
 Application ALMAreas :
 	Areas.cpp
 	:
-	be libalm.so $(TARGET_LIBSUPC++)
+	be libalm.so [ TargetLibsupc++ ]
 ;
 
 Application ALMTableDemo :
 	TableDemo.cpp
 	:
-	be libalm.so $(TARGET_LIBSUPC++)
+	be libalm.so [ TargetLibsupc++ ]
 ;
 
 Application ALMOperator :
 	OperatorLayout.cpp
 	:
-	be libalm.so $(TARGET_LIBSTDC++)
+	be libalm.so [ TargetLibstdc++ ]
 ;
 
 Application ALMThreeButtons :
 	ThreeButtons.cpp
 	:
-	be libalm.so $(TARGET_LIBSTDC++)
+	be libalm.so [ TargetLibstdc++ ]
 ;
 
 Application ALMComplexButtons :
 	ComplexButtons.cpp
 	:
-	be libalm.so $(TARGET_LIBSTDC++)
+	be libalm.so [ TargetLibstdc++ ]
 ;
 
 Application ALMBadLayout :
 	BadLayout.cpp
 	:
-	be libalm.so $(TARGET_LIBSTDC++)
+	be libalm.so [ TargetLibstdc++ ]
 ;
 
 
 Application ALMNestedLayout :
 	NestedLayout.cpp
 	:
-	be libalm.so $(TARGET_LIBSTDC++)
+	be libalm.so [ TargetLibstdc++ ]
 ;
 
 
 Application ALMFriendLayout :
 	FriendLayout.cpp
 	:
-	be libalm.so $(TARGET_LIBSTDC++)
+	be libalm.so [ TargetLibstdc++ ]
 ;

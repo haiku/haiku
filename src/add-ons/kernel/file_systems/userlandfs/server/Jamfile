@@ -43,7 +43,7 @@ Application userlandfs_server
 
 	:
 	be
-	$(TARGET_LIBSUPC++)
+	[ TargetLibsupc++ ]
 	:
 	userlandfs_server.rdef
 ;

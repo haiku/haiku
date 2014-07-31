@@ -19,7 +19,7 @@ Application StyledEdit :
 	StyledEditView.cpp
 	StyledEditWindow.cpp
 	: be translation tracker libtextencoding.so localestub
-		$(TARGET_LIBSUPC++)
+		[ TargetLibsupc++ ]
 	: $(styled_edit_rsrc)
 	;
 

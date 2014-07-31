@@ -26,5 +26,5 @@ SEARCH on [ FGristFiles Shape.cpp Region.cpp RegionSupport.cpp ]
 
 SimpleTest HandlerLooperMessageTest :
 	HandlerLooperMessageTest.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 	; 

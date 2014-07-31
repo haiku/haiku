@@ -10,7 +10,7 @@ UnitTestLib libsharedtest.so :
 
 	NaturalCompareTest.cpp
 
-	: be libshared.a $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+	: be libshared.a [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
 SubInclude HAIKU_TOP src tests kits shared shake_filter ;

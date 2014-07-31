@@ -16,7 +16,7 @@ SimpleTest mpc_reader_test :
 	MusePackReader.cpp
 	MusePackDecoder.cpp
 
-	: libmusepack.a media be $(TARGET_LIBSUPC++)
+	: libmusepack.a media be [ TargetLibsupc++ ]
 	;
 
 # Tell Jam where to find these sources

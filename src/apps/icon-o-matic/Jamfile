@@ -300,7 +300,7 @@ Application Icon-O-Matic :
 	Util.cpp
 
 	: be tracker translation libshared.a libagg.a libexpat.a 
-		$(TARGET_LIBSTDC++) localestub
+		[ TargetLibstdc++ ] localestub
 
 	: Icon-O-Matic.rdef
 ;

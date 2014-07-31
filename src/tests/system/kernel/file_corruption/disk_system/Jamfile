@@ -9,5 +9,5 @@ UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 Addon <disk_system>checksumfs :
 	checksumfs.cpp
 
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;

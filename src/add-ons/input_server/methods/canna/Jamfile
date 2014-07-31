@@ -17,7 +17,7 @@ Addon canna :
 	CannaMethod.cpp
 	KouhoWindow.cpp
 	PaletteWindow.cpp
-	: be textencoding input_server libcanna.a librk.a $(TARGET_LIBSUPC++) ;
+	: be textencoding input_server libcanna.a librk.a [ TargetLibsupc++ ] ;
 
 SubInclude HAIKU_TOP src add-ons input_server methods canna lib ;
 SubInclude HAIKU_TOP src add-ons input_server methods canna rk ;

@@ -12,7 +12,7 @@ SimpleTest ReplicantTest :
 	MethodReplicant.cpp
 	MethodMenuItem.cpp
 	main.cpp
-	: be tracker $(TARGET_LIBSUPC++) ;
+	: be tracker [ TargetLibsupc++ ] ;
 
 SEARCH on [ FGristFiles
 	MethodReplicant.cpp

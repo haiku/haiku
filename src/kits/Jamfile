@@ -45,7 +45,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ MultiArchDefaultGristFiles libicon.a ]
 			[ MultiArchDefaultGristFiles libagg.a ]
 
-			$(TARGET_LIBSTDC++)
+			[ TargetLibstdc++ ]
 			[ BuildFeatureAttribute icu : libraries ]
 			[ BuildFeatureAttribute zlib : library ]
 			;
@@ -73,7 +73,7 @@ SharedLibrary libbe_test.so :
 	[ MultiArchDefaultGristFiles libicon.a ]
 	[ MultiArchDefaultGristFiles libagg.a ]
 
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 	[ BuildFeatureAttribute icu : libraries ]
 	[ BuildFeatureAttribute zlib : library ]
 ;

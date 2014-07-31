@@ -7,7 +7,7 @@ UsePrivateHeaders interface ;
 
 Application WindowInvalidation :
 	WindowInvalidation.cpp
-	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {

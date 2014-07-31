@@ -9,10 +9,10 @@ AddResources Mark\ as\ Read : MarkAsRead.rdef ;
 
 Addon Mark\ as… :
 	MarkAs.cpp
-	: be tracker $(TARGET_LIBSUPC++) libmail.so
+	: be tracker [ TargetLibsupc++ ] libmail.so
 ;
 
 Addon Mark\ as\ Read :
 	MarkAsRead.cpp
-	: be tracker $(TARGET_LIBSUPC++) libmail.so
+	: be tracker [ TargetLibsupc++ ] libmail.so
 ;

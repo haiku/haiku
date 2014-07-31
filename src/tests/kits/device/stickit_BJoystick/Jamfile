@@ -4,4 +4,4 @@ SimpleTest stickit :
 	JoystickWindow.cpp
 	StickItApp.cpp
 	StickItWindow.cpp
-	: be libdevice.so $(TARGET_LIBSTDC++) ;
+	: be libdevice.so [ TargetLibstdc++ ] ;

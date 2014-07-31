@@ -8,7 +8,7 @@ UseHeaders [ FDirName os interface ] ;
 
 Application workspace_switcher :
 	workspace_switcher.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {

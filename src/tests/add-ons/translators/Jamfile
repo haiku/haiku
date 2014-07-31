@@ -24,7 +24,7 @@ UnitTestLib libtranslatorstest.so
 		STXTTranslatorTest.cpp
 		TGATranslatorTest.cpp
 		TIFFTranslatorTest.cpp
-	: $(libtranslation) be $(TARGET_LIBSTDC++)
+	: $(libtranslation) be [ TargetLibstdc++ ]
 ;
 
 SubInclude HAIKU_TOP src tests add-ons translators exif ;

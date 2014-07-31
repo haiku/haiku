@@ -8,6 +8,6 @@ UseHeaders [ FDirName os interface ] ;
 
 Application MenuCrash :
 	MenuCrash.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;
 
