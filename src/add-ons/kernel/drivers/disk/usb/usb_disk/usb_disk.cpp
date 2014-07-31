@@ -709,7 +709,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 		if (interface == NULL)
 			continue;
 
-		if (interface->descr->interface_class == 0x08 /* mass storage */
+		if (interface->descr->interface_class == USB_MASS_STORAGE_DEVICE_CLASS
 			&& (interface->descr->interface_subclass == 0x06 /* SCSI */
 				|| interface->descr->interface_subclass == 0x02 /* ATAPI */
 				|| interface->descr->interface_subclass == 0x05 /* ATAPI */)

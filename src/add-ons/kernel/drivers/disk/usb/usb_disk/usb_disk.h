@@ -5,26 +5,17 @@
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  */
-
 #ifndef _USB_DISK_H_
 #define _USB_DISK_H_
 
+
 #include <lock.h>
 #include <USB3.h>
+#include <usb/USB_massbulk.h>
 
-#define REQUEST_MASS_STORAGE_RESET	0xff
-#define REQUEST_GET_MAX_LUN			0xfe
+
 #define MAX_LOGICAL_UNIT_NUMBER		15
 #define ATAPI_COMMAND_LENGTH		12
-
-#define CBW_SIGNATURE				0x43425355
-#define CBW_DATA_OUTPUT				0x00
-#define CBW_DATA_INPUT				0x80
-
-#define CSW_SIGNATURE				0x53425355
-#define CSW_STATUS_COMMAND_PASSED	0x00
-#define CSW_STATUS_COMMAND_FAILED	0x01
-#define CSW_STATUS_PHASE_ERROR		0x02
 
 #define SYNC_SUPPORT_RELOAD			5
 
@@ -80,23 +71,5 @@ struct device_lun_s {
 	char		product_revision[4];
 };
 
-
-typedef struct command_block_wrapper_s {
-	uint32		signature;
-	uint32		tag;
-	uint32		data_transfer_length;
-	uint8		flags;
-	uint8		lun;
-	uint8		command_block_length;
-	uint8		command_block[16];
-} _PACKED command_block_wrapper;
-
-
-typedef struct command_status_wrapper_s {
-	uint32		signature;
-	uint32		tag;
-	uint32		data_residue;
-	uint8		status;
-} _PACKED command_status_wrapper;
 
 #endif // _USB_DISK_H_
