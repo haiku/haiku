@@ -35,7 +35,7 @@ rule PreprocessSyscalls preprocessedHeader : header : architecture
 {
 	# PreprocessSyscalls <preprocessedHeader> : <header> : <architecture> ;
 
-	Depends $(preprocessedHeader) : $(header) ;
+	Depends $(preprocessedHeader) : $(header) $(PLATFORM) ;
 
 	local headers = [ on $(preprocessedHeader)
 		return $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;

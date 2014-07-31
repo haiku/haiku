@@ -861,6 +861,15 @@ PLATFORM = $(TARGET_PLATFORM) ;
 SUPPORTED_PLATFORMS = haiku ;
 
 
+# Define two pseudo targets for the target and buildhost platform. The main
+# build rules (Cc, C++, As, ...) depend on these pseude targets such that global
+# initializations that are required before anything is built for a specific
+# platform can be forced by depending the pseudo target for the platform on the
+# initializations.
+NotFile $(TARGET_PLATFORM) ;
+NotFile host ;
+
+
 # Instructs the Library rule to not make its object files temporary.
 # This is needed as some objects are used in a static library and for an
 # executable.

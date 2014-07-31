@@ -168,7 +168,7 @@ rule StaticLibraryFromObjects
 
 rule AssembleNasm
 {
-	Depends $(<) : $(>) ;
+	Depends $(<) : $(>) [ on $(<) return $(PLATFORM) ] ;
 }
 
 actions AssembleNasm
@@ -343,7 +343,7 @@ rule CreateAsmStructOffsetsHeader header : source
 
 	# locate object, search for source, and set on target variables
 
-	Depends $(header) : $(source) ;
+	Depends $(header) : $(source) $(PLATFORM) ;
 	SEARCH on $(source) += $(SEARCH_SOURCE) ;
 	MakeLocateArch $(header) ;
 	LocalClean clean : $(header) ;

@@ -210,7 +210,7 @@ rule As
 			= $(TARGET_SYSTEM_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
 	}
 
-	Depends $(<) : $(>) ;
+	Depends $(<) : $(>) [ on $(1) return $(PLATFORM) ] ;
 	ASFLAGS on $(<) += $(flags) $(SUBDIRASFLAGS) ;
 	ASHDRS on $(<) = [ on $(<) FIncludes $(HDRS) : $(localIncludesOption) ]
 		$(includesSeparator)
@@ -227,7 +227,7 @@ actions As
 
 rule Lex
 {
-	Depends $(1) : $(2) ;
+	Depends $(1) : $(2) [ on $(1) return $(PLATFORM) ] ;
 	MakeLocateArch $(1) ;
 	LocalClean clean : $(1) ;
 }
@@ -245,7 +245,8 @@ rule Yacc
 
 	MakeLocateArch $(source) $(header) ;
 
-	Depends $(source) $(header) : $(yaccSource) ;
+	Depends $(source) $(header)
+		: $(yaccSource) [ on $(source) return $(PLATFORM) ] ;
 	Yacc1 $(source) $(header) : $(yaccSource) ;
 	LocalClean clean : $(source) $(header) ;
 
@@ -263,7 +264,7 @@ actions Yacc1
 
 rule Cc
 {
-	Depends $(<) : $(>) ;
+	Depends $(<) : $(>) [ on $(1) return $(PLATFORM) ] ;
 
 	on $(1) {
 		local flags ;
@@ -341,7 +342,7 @@ actions Cc
 
 rule C++
 {
-	Depends $(<) : $(>) ;
+	Depends $(<) : $(>) [ on $(1) return $(PLATFORM) ] ;
 
 	on $(1) {
 		local flags ;
