@@ -16,7 +16,6 @@ installDir=$4
 shift 4
 additionalMakeArgs=$*
 
-kernelCcFlags="-D_KERNEL_MODE"
 ccFlags="-O2"
 cxxFlags="-O2"
 case $haikuMachine in
@@ -25,7 +24,6 @@ x86_64-*)
 	# explicitly using --enable-multilib that causes a build
 	# failure
 	binutilsConfigureArgs=""
-	kernelCcFlags="$kernelCcFlags -mno-red-zone"
 	;;
 m68k-*)
 	binutilsConfigureArgs="--enable-multilib"
@@ -212,7 +210,7 @@ CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$gccSourceDir/configure" \
 	--prefix="$installDir" $buildHostSpec --target=$haikuMachine \
 	--disable-nls --disable-shared --with-system-zlib \
 	--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
-	--with-sysroot="$sysrootDir" --enable-threads=posix --enable-tls \
+	--with-sysroot="$sysrootDir" --disable-threads --disable-tls \
 	$gccConfigureArgs \
 	|| exit 1
 
@@ -228,46 +226,15 @@ $MAKE $additionalMakeArgs install || {
 	exit 1
 }
 
-# build libraries for the kernel if the target arch requires it
-if [ -n "$kernelCcFlags" ]; then
-	# switch threads config to single for libgcc
-	ln -sf "$gccSourceDir/libgcc/gthr-single.h" "$haikuMachine/libgcc/gthr-default.h"
-	$MAKE -C "$haikuMachine/libgcc" clean
-	$MAKE -C "$haikuMachine/libgcc" CFLAGS="-g -O2 $kernelCcFlags" || {
-		echo "Error: Building kernel libgcc failed." >&2
-		exit 1
-	}
-
-	cp "$haikuMachine/libgcc/libgcc.a" \
-		"$installDir/$haikuMachine/lib/libgcc-kernel.a" || exit 1
-
-	$MAKE -C "$haikuMachine/libstdc++-v3/libsupc++" clean
-
-	# switch threads config to single for libsupc++
-	[ -f "$haikuMachine/32/libstdc++-v3/include/$haikuMachine/bits/gthr-default.h" ] \
-		&& cp -f "$haikuMachine/32/libstdc++-v3/include/$haikuMachine/bits/gthr-single.h" \
-		"$haikuMachine/32/libstdc++-v3/include/$haikuMachine/bits/gthr-default.h"
-	cp -f "$haikuMachine/libstdc++-v3/include/$haikuMachine/bits/gthr-single.h" \
-		"$haikuMachine/libstdc++-v3/include/$haikuMachine/bits/gthr-default.h"
-	[ -f "$haikuMachine/32/libstdc++-v3/config.h" ] \
-		&& sed -i '/.*_GLIBCXX_HAS_GTHREADS.*/c\#undef _GLIBCXX_HAS_GTHREADS' \
-		"$haikuMachine/32/libstdc++-v3/config.h"
-	[ -f "$haikuMachine/32/libstdc++-v3/include/$haikuMachine/bits/c++config.h" ] \
-		&& sed -i '/.*_GLIBCXX_HAS_TLS.*/c\#undef _GLIBCXX_HAS_TLS' \
-		"$haikuMachine/32/libstdc++-v3/include/$haikuMachine/bits/c++config.h"
-	sed -i '/.*_GLIBCXX_HAS_GTHREADS.*/c\#undef _GLIBCXX_HAS_GTHREADS' \
-		"$haikuMachine/libstdc++-v3/config.h"
-	sed -i '/.*_GLIBCXX_HAVE_TLS.*/c\#undef _GLIBCXX_HAVE_TLS' \
-		"$haikuMachine/libstdc++-v3/include/$haikuMachine/bits/c++config.h"
-	$MAKE -C "$haikuMachine/libstdc++-v3/libsupc++" CFLAGS="-g -O2 $kernelCcFlags" \
-		CXXFLAGS="-g -O2 $kernelCcFlags" || {
-		echo "Error: Building kernel libsupc++ failed." >&2
-		exit 1
-	}
-
-	cp "$haikuMachine/libstdc++-v3/libsupc++/.libs/libsupc++.a" \
-		"$installDir/$haikuMachine/lib/libsupc++-kernel.a" || exit 1
-fi
+case $haikuMachine in
+x86_64-*)
+	# pick up the 32-bit libraries for the bootloader
+	bootLibgcc=`$installDir/bin/$haikuMachine-gcc -m32 -print-file-name=libgcc.a`
+	$installDir/bin/$haikuMachine-strip --strip-debug $bootLibgcc
+	bootLibsupcxx=`$installDir/bin/$haikuMachine-gcc -m32 -print-file-name=libsupc++.a`
+	$installDir/bin/$haikuMachine-strip --strip-debug $bootLibsupcxx
+	;;
+esac
 
 # cleanup
 
