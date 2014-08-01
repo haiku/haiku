@@ -280,8 +280,11 @@ struct media_raw_audio_format {
 
 
 struct media_audio_header {
-	// TODO: Define this structure, put actual data at the end
-	int32		_reserved_[16];
+	// TODO: Refine this structure and put actual data at the end
+	int32		_reserved_[14];
+	float       frame_rate;
+	uint32      channel_count;
+
 };
 
 
@@ -391,8 +394,16 @@ struct media_raw_video_format {
 
 
 struct media_video_header {
-	uint32		_reserved_[12];		// NOTE: Keep reserved data at the top!
+	uint32		_reserved_[8];		// NOTE: Keep reserved data at the top!
 
+	uint32      display_line_width; // Number of pixels per display_line
+	uint32      display_line_count;	// Sum of all interlace fields lines
+	uint32      bytes_per_row;		// Number of bytes in a display_line
+									// (padding bytes excluded)	
+	uint16      pixel_width_aspect;	// 1:1 has 1 here, 4:3 has 4 here
+									// 16:9 has 16 here!
+	uint16      pixel_height_aspect;// 1:1 has 1 here, 4:3 has 3 here
+									// 16:9 has 9 here!
 	float		field_gamma;
 	uint32		field_sequence;		// Sequence number since start of capture
 									// May roll over if machine is on for a
