@@ -4,7 +4,7 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
-	ca_root_certificates-2014_04_08-1
+	ca_root_certificates-2014_04_08-2
 	docbook_xml_dtd-4.5-1
 	docbook_xsl_stylesheets-1.78.1-1
 	openttd_gfx-0.4.7-1
@@ -46,8 +46,8 @@ RemotePackageRepository HaikuPorts
 	cdrtools-3.01~a18-1
 	cdrtools_devel-3.01~a18-1
 	ctags-5.8-3
-	curl-7.35.0-1
-	curl_devel-7.35.0-1
+	curl-7.37.0-2
+	curl_devel-7.37.0-2
 	cvs-1.12.13.1-6
 	distcc-3.1-2
 	dmidecode-2.12-2
