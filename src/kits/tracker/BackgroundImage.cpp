@@ -98,16 +98,13 @@ BackgroundImage::GetBackgroundImage(const BNode* node, bool isDesktop)
 		if (container.FindString(kBackgroundImageInfoPath, index, &path)
 				== B_OK) {
 			bitmap = BTranslationUtils::GetBitmap(path);
-			if (!bitmap) {
+			if (!bitmap)
 				PRINT(("failed to load background bitmap from path\n"));
-				continue;
-			}
 		} else
 			break;
 
-		if (be_control_look != NULL && isDesktop) {
+		if (be_control_look != NULL && isDesktop)
 			be_control_look->SetBackgroundInfo(container);
-		}
 
 		container.FindInt32(kBackgroundImageInfoWorkspaces, index,
 			(int32*)&workspaces);
