@@ -102,10 +102,8 @@ public:
 									usb_speed speed);
 			status_t			ConfigureEndpoint(uint8 slot, uint8 number,
 									uint8 type, uint64 ringAddr,
-									uint16 interval, uint8 maxPacketCount,
-									uint8 mult, uint8 fpsShift,
-									uint16 maxPacketSize, uint16 maxFrameSize,
-									usb_speed speed);
+									uint16 interval, uint16 maxPacketSize,
+									uint16 maxFrameSize, usb_speed speed);
 	virtual	void				FreeDevice(Device *device);
 
 			status_t			_InsertEndpointForPipe(Pipe *pipe);

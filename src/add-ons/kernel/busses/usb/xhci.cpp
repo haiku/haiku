@@ -509,7 +509,7 @@ XHCI::Start()
 	TRACE("setting CRCR addr = 0x%" B_PRIxPHYSADDR "\n", dmaAddress);
 	WriteOpReg(XHCI_CRCR_LO, (uint32)dmaAddress | CRCR_RCS);
 	WriteOpReg(XHCI_CRCR_HI, /*(uint32)(dmaAddress >> 32)*/0);
-	//link trb
+	// link trb
 	fCmdRing[XHCI_MAX_COMMANDS - 1].qwtrb0 = dmaAddress;
 
 	TRACE("setting interrupt rate\n");
@@ -1173,14 +1173,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		return NULL;
 	}
 
-	for (uint32 i = 0; i < XHCI_MAX_ENDPOINTS; i++) {
-		struct xhci_trb *linkTrb = device->trbs + (i + 1) * XHCI_MAX_TRANSFERS - 1;
-		linkTrb->qwtrb0 = device->trb_addr
-			+ i * XHCI_MAX_TRANSFERS * sizeof(xhci_trb);
-		linkTrb->dwtrb2 = TRB_2_IRQ(0);
-		linkTrb->dwtrb3 = TRB_3_CYCLE_BIT | TRB_3_TYPE(TRB_TYPE_LINK);
-	}
-
 	// set up slot pointer to device context
 	fDcba->baseAddress[slot] = device->device_ctx_addr;
 
@@ -1199,8 +1191,8 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	}
 
 	// configure the Control endpoint 0 (type 4)
-	if (ConfigureEndpoint(slot, 0, 4, device->trb_addr, 0, 1, 1, 0,
-		maxPacketSize, maxPacketSize, speed) != B_OK) {
+	if (ConfigureEndpoint(slot, 0, 4, device->trb_addr, 0,
+		maxPacketSize, maxPacketSize & 0x7ff, speed) != B_OK) {
 		TRACE_ERROR("unable to configure default control endpoint\n");
 		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
@@ -1239,7 +1231,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	// Create a temporary pipe with the new address
 	ControlPipe pipe(parent);
 	pipe.SetControllerCookie(&device->endpoints[0]);
-	pipe.InitCommon(device->address + 1, 0, speed, Pipe::Default, 8, 0,
+	pipe.InitCommon(device->address + 1, 0, speed, Pipe::Default, maxPacketSize, 0,
 		hubAddress, hubPort);
 
 	// Get the device descriptor
@@ -1375,7 +1367,7 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 	}
 
 	uint8 id = XHCI_ENDPOINT_ID(pipe) - 1;
-	if (id >= XHCI_MAX_ENDPOINTS)
+	if (id >= XHCI_MAX_ENDPOINTS - 1)
 		return B_BAD_VALUE;
 
 	if (id > 0) {
@@ -1427,7 +1419,7 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 
 		if (ConfigureEndpoint(device->slot, id, type,
 			device->endpoints[id].trb_addr, pipe->Interval(),
-			1, 1, 0, pipe->MaxPacketSize(), pipe->MaxPacketSize(),
+			pipe->MaxPacketSize(), pipe->MaxPacketSize() & 0x7ff,
 			usbDevice->Speed()) != B_OK) {
 			TRACE_ERROR("unable to configure endpoint\n");
 			return B_ERROR;
@@ -1468,7 +1460,7 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 {
 	TRACE("_LinkDescriptorForPipe\n");
 	MutexLocker endpointLocker(endpoint->lock);
-	if (endpoint->used >= XHCI_MAX_TRANSFERS) {
+	if (endpoint->used > XHCI_MAX_TRANSFERS) {
 		TRACE_ERROR("_LinkDescriptorForPipe max transfers count exceeded\n");
 		return B_BAD_VALUE;
 	}
@@ -1481,7 +1473,7 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	endpoint->td_head = descriptor;
 
 	uint8 current = endpoint->current;
-	uint8 next = (current + 1) % (XHCI_MAX_TRANSFERS - 1);
+	uint8 next = (current + 1) % (XHCI_MAX_TRANSFERS);
 
 	TRACE("_LinkDescriptorForPipe current %d, next %d\n", current, next);
 
@@ -1537,47 +1529,65 @@ XHCI::_UnlinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 
 
 status_t
-XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, uint64 ringAddr, uint16 interval,
-	uint8 maxPacketCount, uint8 mult, uint8 fpsShift, uint16 maxPacketSize,
-	uint16 maxFrameSize, usb_speed speed)
+XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, uint64 ringAddr,
+	uint16 interval, uint16 maxPacketSize, uint16 maxFrameSize, usb_speed speed)
 {
-	struct xhci_device *device = &fDevices[slot];
-	struct xhci_endpoint_ctx *endpoint = &device->input_ctx->endpoints[number];
+	struct xhci_device* device = &fDevices[slot];
+	struct xhci_endpoint_ctx* endpoint = &device->input_ctx->endpoints[number];
 
-	if (mult == 0 || maxPacketCount == 0)
-		return B_BAD_VALUE;
+	uint8 maxBurst = (maxPacketSize & 0x1800) >> 11;
+	maxPacketSize = (maxPacketSize & 0x7ff);
 
-	maxPacketCount--;
+	endpoint->dwendpoint0 = 0;
+	endpoint->dwendpoint1 = 0;
+	endpoint->qwendpoint2 = 0;
+	endpoint->dwendpoint4 = 0;
 
-	endpoint->dwendpoint0 = ENDPOINT_0_STATE(0) | ENDPOINT_0_MAXPSTREAMS(0);
-	// add mult for isochronous and interrupt types
-	switch (speed) {
-		case USB_SPEED_LOWSPEED:
-		case USB_SPEED_FULLSPEED:
-			fpsShift += 3;
-		break;
-		default:
-			break;
+	// Assigning Interval
+	uint16 calcInterval = 0;
+	if (speed == USB_SPEED_HIGHSPEED && (type == 4 || type == 2)) {
+		if (interval != 0) {
+			while ((1<<calcInterval) <= interval)
+				calcInterval++;
+			calcInterval--;
+		}
 	}
-	switch (type) {
-		case 1:
-		case 5:
-			if (fpsShift > 3)
-				fpsShift--;
-		case 3:
-		case 7:
-			endpoint->dwendpoint0 |= ENDPOINT_0_INTERVAL(fpsShift);
-			break;
-		default:
-			break;
+	if ((type & 0x3) == 3 &&
+		(speed == USB_SPEED_FULLSPEED || speed == USB_SPEED_LOWSPEED)) {
+		while ((1<<calcInterval) <= interval * 8)
+			calcInterval++;
+		calcInterval--;
 	}
-	// add interval
-	endpoint->dwendpoint1 = ENDPOINT_1_EPTYPE(type)
-		| ENDPOINT_1_MAXBURST(maxPacketCount)
-		| ENDPOINT_1_MAXPACKETSIZE(maxPacketSize)
-		| ENDPOINT_1_CERR(3);
-	endpoint->qwendpoint2 = ENDPOINT_2_DCS_BIT | ringAddr;
-	// 8 for Control endpoint
+	if ((type & 0x3) == 1 && speed == USB_SPEED_FULLSPEED) {
+		calcInterval = interval + 2;
+	}
+	if (((type & 0x3) == 1 || (type & 0x3) == 3) &&
+		(speed == USB_SPEED_HIGHSPEED || speed == USB_SPEED_SUPER)) {
+		calcInterval = interval - 1;
+	}
+
+	endpoint->dwendpoint0 |= ENDPOINT_0_INTERVAL(calcInterval);
+
+	// Assigning CERR for non-isoch endpoints
+	if ((type & 0x3) != 1) {
+		endpoint->dwendpoint1 |= ENDPOINT_1_CERR(3);
+	}
+
+	endpoint->dwendpoint1 |= ENDPOINT_1_EPTYPE(type);
+
+	// Assigning MaxBurst for HighSpeed
+	if (speed == USB_SPEED_HIGHSPEED &&
+		((type & 0x3) == 1 || (type & 0x3) == 3)) {
+		endpoint->dwendpoint1 |= ENDPOINT_1_MAXBURST(maxBurst);
+	}
+
+	// TODO Assign MaxBurst for SuperSpeed
+
+	endpoint->dwendpoint1 |= ENDPOINT_1_MAXPACKETSIZE(maxPacketSize);
+	endpoint->qwendpoint2 |= ENDPOINT_2_DCS_BIT | ringAddr;
+
+	// Assign MaxESITPayload
+	// Assign AvgTRBLength
 	switch (type) {
 		case 4:
 			endpoint->dwendpoint4 =	ENDPOINT_4_AVGTRBLENGTH(8);
@@ -1587,10 +1597,12 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, uint64 ringAddr, u
 		case 5:
 		case 7:
 			endpoint->dwendpoint4 =	ENDPOINT_4_AVGTRBLENGTH(min_c(maxFrameSize,
-				B_PAGE_SIZE)) | ENDPOINT_4_MAXESITPAYLOAD(maxFrameSize);
+				B_PAGE_SIZE)) | ENDPOINT_4_MAXESITPAYLOAD((
+					(maxBurst+1) * maxPacketSize));
 			break;
 		default:
 			endpoint->dwendpoint4 =	ENDPOINT_4_AVGTRBLENGTH(B_PAGE_SIZE);
+			break;
 	}
 
 	TRACE("endpoint 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 " 0x%"
@@ -1602,7 +1614,7 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, uint64 ringAddr, u
 
 
 status_t
-XHCI::GetPortSpeed(uint8 index, usb_speed *speed)
+XHCI::GetPortSpeed(uint8 index, usb_speed* speed)
 {
 	uint32 portStatus = ReadOpReg(XHCI_PORTSC(index));
 
@@ -1631,7 +1643,7 @@ XHCI::GetPortSpeed(uint8 index, usb_speed *speed)
 
 
 status_t
-XHCI::GetPortStatus(uint8 index, usb_port_status *status)
+XHCI::GetPortStatus(uint8 index, usb_port_status* status)
 {
 	if (index >= fPortCount)
 		return B_BAD_INDEX;
@@ -1819,9 +1831,9 @@ XHCI::ControllerReset()
 
 
 int32
-XHCI::InterruptHandler(void *data)
+XHCI::InterruptHandler(void* data)
 {
-	return ((XHCI *)data)->Interrupt();
+	return ((XHCI*)data)->Interrupt();
 }
 
 
@@ -1867,7 +1879,7 @@ XHCI::Ring(uint8 slot, uint8 endpoint)
 	TRACE("Ding Dong! slot:%d endpoint %d\n", slot, endpoint)
 	if ((slot == 0 && endpoint > 0) || (slot > 0 && endpoint == 0))
 		panic("Ring() invalid slot/endpoint combination\n");
-	if (slot > fSlotCount || endpoint > XHCI_MAX_ENDPOINTS)
+	if (slot > fSlotCount || endpoint >= XHCI_MAX_ENDPOINTS)
 		panic("Ring() invalid slot or endpoint\n");
 	WriteDoorReg32(XHCI_DOORBELL(slot), XHCI_DOORBELL_TARGET(endpoint)
 		| XHCI_DOORBELL_STREAMID(0));
@@ -1877,7 +1889,7 @@ XHCI::Ring(uint8 slot, uint8 endpoint)
 
 
 void
-XHCI::QueueCommand(xhci_trb *trb)
+XHCI::QueueCommand(xhci_trb* trb)
 {
 	uint8 i, j;
 	uint32 temp;
@@ -1920,7 +1932,7 @@ XHCI::QueueCommand(xhci_trb *trb)
 
 
 void
-XHCI::HandleCmdComplete(xhci_trb *trb)
+XHCI::HandleCmdComplete(xhci_trb* trb)
 {
 	if (fCmdAddr == trb->qwtrb0) {
 		TRACE("Received command event\n");
@@ -1933,7 +1945,7 @@ XHCI::HandleCmdComplete(xhci_trb *trb)
 
 
 void
-XHCI::HandleTransferComplete(xhci_trb *trb)
+XHCI::HandleTransferComplete(xhci_trb* trb)
 {
 	TRACE("HandleTransferComplete trb %p\n", trb);
 	addr_t source = trb->qwtrb0;
@@ -1944,7 +1956,7 @@ XHCI::HandleTransferComplete(xhci_trb *trb)
 
 	if (slot > fSlotCount)
 		TRACE_ERROR("invalid slot\n");
-	if (endpointNumber == 0 || endpointNumber > XHCI_MAX_ENDPOINTS)
+	if (endpointNumber == 0 || endpointNumber >= XHCI_MAX_ENDPOINTS)
 		TRACE_ERROR("invalid endpoint\n");
 
 	xhci_device *device = &fDevices[slot];
@@ -1969,7 +1981,7 @@ XHCI::HandleTransferComplete(xhci_trb *trb)
 
 
 status_t
-XHCI::DoCommand(xhci_trb *trb)
+XHCI::DoCommand(xhci_trb* trb)
 {
 	if (!Lock())
 		return B_ERROR;
@@ -2020,7 +2032,7 @@ XHCI::Noop()
 
 
 status_t
-XHCI::EnableSlot(uint8 *slot)
+XHCI::EnableSlot(uint8* slot)
 {
 	TRACE("Enable Slot\n");
 	xhci_trb trb;
@@ -2181,7 +2193,7 @@ XHCI::CompleteEvents()
 
 		while (1) {
 			uint32 temp = fEventRing[i].dwtrb3;
-			TRACE_ALWAYS("event[%u] = %u (0x%016" B_PRIx64 " 0x%08" B_PRIx32 " 0x%08"
+			TRACE("event[%u] = %u (0x%016" B_PRIx64 " 0x%08" B_PRIx32 " 0x%08"
 				B_PRIx32 ")\n", i, (uint8)TRB_3_TYPE_GET(temp), fEventRing[i].qwtrb0,
 				fEventRing[i].dwtrb2, fEventRing[i].dwtrb3);
 			uint8 k = (temp & TRB_3_CYCLE_BIT) ? 1 : 0;
@@ -2319,6 +2331,7 @@ XHCI::FinishTransfers()
 
 	}
 }
+
 
 inline void
 XHCI::WriteOpReg(uint32 reg, uint32 value)
