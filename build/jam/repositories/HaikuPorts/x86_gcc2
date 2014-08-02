@@ -430,6 +430,7 @@ RemotePackageRepository HaikuPorts
 	mpg123_x86-1.12.1-2
 	mpg123_x86_devel-1.12.1-2
 	muscle_x86-6.00-1
+	musicpc_x86-0.26-1
 	ncurses_x86-5.9-9
 	ncurses_x86_devel-5.9-9
 	ninja_x86-1.5.1-1
@@ -641,6 +642,7 @@ RemotePackageRepository HaikuPorts
 	mog
 	mpg123_x86
 	muscle_x86
+	musicpc_x86
 	nano
 	nasm
 	ncurses
