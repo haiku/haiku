@@ -49,7 +49,6 @@
 #include "Packet.h"
 #include "PacketQueue.h"
 #include "pes.h"
-#include "media_header_ex.h"
 #include "config.h"
 
 //#define DUMP_VIDEO
@@ -1563,12 +1562,12 @@ DVBMediaNode::raw_audio_thread()
 	// decode data and send buffers
 	
 	delete fBufferGroupRawAudio;
-	fBufferGroupRawAudio = new BBufferGroup(fOutputRawAudio.format.u.raw_audio.buffer_size * 3, 25);
+	fBufferGroupRawAudio = new BBufferGroup(
+		fOutputRawAudio.format.u.raw_audio.buffer_size * 3, 25);
 
 	while (!fTerminateThreads) {
 		int64 frameCount;
 		media_header mh;
-		media_header_ex *mhe = (media_header_ex *)&mh;
 		
 		if (!fOutputEnabledRawAudio) {
 			fRawAudioQueue->Flush(40000);
@@ -1576,7 +1575,9 @@ DVBMediaNode::raw_audio_thread()
 		}
 
 		BBuffer* buf;
-		buf = fBufferGroupRawAudio->RequestBuffer(fOutputRawAudio.format.u.raw_audio.buffer_size, AUDIO_BUFFER_REQUEST_TIMEOUT);
+		buf = fBufferGroupRawAudio->RequestBuffer(
+			fOutputRawAudio.format.u.raw_audio.buffer_size,
+			AUDIO_BUFFER_REQUEST_TIMEOUT);
 		if (!buf) {
 			TRACE("audio: request buffer timout\n");
 			continue;
@@ -1591,24 +1592,32 @@ DVBMediaNode::raw_audio_thread()
 
 #ifdef DUMP_RAW_AUDIO
 		lock.Lock();
-		write(fRawAudioFile, buf->Data(), mhe->size_used);
+		write(fRawAudioFile, buf->Data(), mh.size_used);
 		lock.Unlock();
 #endif
 
-		if (	fOutputRawAudio.format.u.raw_audio.buffer_size     != mhe->size_used
-		 	||	int(fOutputRawAudio.format.u.raw_audio.frame_rate) != mhe->u.raw_audio.frame_rate
-			||	fOutputRawAudio.format.u.raw_audio.channel_count   != mhe->u.raw_audio.channel_count
-		 ) {
-			TRACE("audio: decode format change: changed buffer_size from %ld to %ld\n", fOutputRawAudio.format.u.raw_audio.buffer_size, mhe->size_used);
-			TRACE("audio: decode format change: changed channel_count from %ld to %ld\n", fOutputRawAudio.format.u.raw_audio.channel_count, mhe->u.raw_audio.channel_count);
-			TRACE("audio: decode format change: changed frame_rate from %.0f to %.0f\n", fOutputRawAudio.format.u.raw_audio.frame_rate, mhe->u.raw_audio.frame_rate);
-			fOutputRawAudio.format.u.raw_audio.buffer_size   = mhe->size_used; 
-			fOutputRawAudio.format.u.raw_audio.frame_rate    = mhe->u.raw_audio.frame_rate;
-			fOutputRawAudio.format.u.raw_audio.channel_count = mhe->u.raw_audio.channel_count;
+		if (fOutputRawAudio.format.u.raw_audio.buffer_size != mh.size_used
+			|| int(fOutputRawAudio.format.u.raw_audio.frame_rate)
+				!= mh.u.raw_audio.frame_rate
+			|| fOutputRawAudio.format.u.raw_audio.channel_count
+				!= mh.u.raw_audio.channel_count) {
+			TRACE("audio: decode format change: changed buffer_size from %ld"
+				" to %ld\n", fOutputRawAudio.format.u.raw_audio.buffer_size,
+				mh.size_used);
+			TRACE("audio: decode format change: changed channel_count from %ld"
+				" to %ld\n", fOutputRawAudio.format.u.raw_audio.channel_count,
+				mh.u.raw_audio.channel_count);
+			TRACE("audio: decode format change: changed frame_rate from %.0f"
+				" to %.0f\n", fOutputRawAudio.format.u.raw_audio.frame_rate,
+				mh.u.raw_audio.frame_rate);
+			fOutputRawAudio.format.u.raw_audio.buffer_size = mh.size_used;
+			fOutputRawAudio.format.u.raw_audio.frame_rate
+				= mh.u.raw_audio.frame_rate;
+			fOutputRawAudio.format.u.raw_audio.channel_count
+				= mh.u.raw_audio.channel_count;
 			lock.Lock();
 			err = ChangeFormat(fOutputRawAudio.source,
-							   fOutputRawAudio.destination,
-							   &fOutputRawAudio.format);
+				fOutputRawAudio.destination, &fOutputRawAudio.format);
 			lock.Unlock();
 			printf("format change result %lx (%s)\n", err, strerror(err));
 			PrintFormat(fOutputRawAudio.format);
@@ -1628,7 +1637,7 @@ DVBMediaNode::raw_audio_thread()
 
 		fDemux->TimesourceInfo(&ts_perf_time, &ts_sys_time);
 		ts_offset = ts_sys_time - ts_perf_time;
-		aud_time = mhe->start_time;	// measured in PCR time base
+		aud_time = mh.start_time;	// measured in PCR time base
 		start_time = TimeSource()->PerformanceTimeFor(aud_time + ts_offset);
 
 		// calculate delay and wait
@@ -1637,42 +1646,45 @@ DVBMediaNode::raw_audio_thread()
 		delay = start_time - TimeSource()->Now();
 		TRACE_TIMING("audio delay is %Ld\n", delay);
 		if (delay < -AUDIO_MAX_LATE) {
-			printf("audio: decoded packet is %Ldms too late, dropped\n", -delay / 1000);
+			printf("audio: decoded packet is %Ldms too late, dropped\n",
+				-delay / 1000);
 			buf->Recycle();
 			continue;
 		}
-		if (delay < 0) {
+		if (delay < 0)
 //			printf("audio: decoded packet is %Ldms too late\n", -delay / 1000);
-		}
+
 		if (delay > AUDIO_MAX_EARLY) {
-			printf("audio: decoded packet is %Ldms too early, dropped\n", delay / 1000);
+			printf("audio: decoded packet is %Ldms too early, dropped\n",
+				delay / 1000);
 			buf->Recycle();
 			continue;
 		}
-		if (delay > 0) {
+		if (delay > 0)
 //			printf("audio: decoded packet is %Ldms too early\n", delay / 1000);
-		}
+
 		delay -= PROCESSING_LATENCY;
 		if (delay > 0) {
-			if (acquire_sem_etc(fAudioDelaySem, 1, B_RELATIVE_TIMEOUT, delay) != B_TIMED_OUT) {
+			if (acquire_sem_etc(fAudioDelaySem, 1, B_RELATIVE_TIMEOUT, delay)
+				!= B_TIMED_OUT) {
 				printf("audio: delay sem not timed out, dropped packet\n");
 				buf->Recycle();
 				continue;
 			}
 		}
 
-		TRACE_TIMING("audio playback delay %Ld\n", start_time - TimeSource()->Now());
+		TRACE_TIMING("audio playback delay %Ld\n",
+			start_time - TimeSource()->Now());
 
 		media_header* hdr;
 		hdr = buf->Header();
-//		*hdr = mh;								// copy header from decoded frame
 		hdr->type = B_MEDIA_RAW_AUDIO;
-		hdr->size_used = mhe->size_used;
-		hdr->time_source = TimeSource()->ID();	// set time source id
-		hdr->start_time = start_time;			// set start time
+		hdr->size_used = mh.size_used;
+		hdr->time_source = TimeSource()->ID();
+		hdr->start_time = start_time;
 		lock.Lock();
-		if (SendBuffer(buf, fOutputRawAudio.source, fOutputRawAudio.destination)
-				!= B_OK) {
+		if (SendBuffer(buf, fOutputRawAudio.source,
+			fOutputRawAudio.destination) != B_OK) {
 			TRACE("audio: sending buffer failed\n");
 			buf->Recycle();
 		} 
@@ -1751,14 +1763,13 @@ DVBMediaNode::raw_video_thread()
 	while (!fTerminateThreads) {
 		int64 frameCount;
 		media_header mh;
-		media_header_ex *mhe = (media_header_ex *)&mh;
 
 		if (!fOutputEnabledRawVideo) {
 			fRawVideoQueue->Flush(40000);
 			continue;
 		}
 
-		// fetch a new buffer (always of maximum size, as the stream may change)
+		// fetch a new buffer (always of maximum size as the stream may change)
 
 		BBuffer* buf;
 		buf = fBufferGroupRawVideo->RequestBuffer(video_buffer_size_max,
@@ -1779,38 +1790,61 @@ DVBMediaNode::raw_video_thread()
 
 		// check if the format of the stream has changed
 		
-		if (	mhe->u.raw_video.display_line_width  != fOutputRawVideo.format.u.raw_video.display.line_width
-			||	mhe->u.raw_video.display_line_count  != fOutputRawVideo.format.u.raw_video.display.line_count
-			||	mhe->u.raw_video.bytes_per_row       != fOutputRawVideo.format.u.raw_video.display.bytes_per_row
-			||	mhe->u.raw_video.pixel_width_aspect  != fOutputRawVideo.format.u.raw_video.pixel_width_aspect
-			||	mhe->u.raw_video.pixel_height_aspect != fOutputRawVideo.format.u.raw_video.pixel_height_aspect
-			||  mhe->size_used						 != video_buffer_size)
-		{
+		if (mh.u.raw_video.display_line_width
+			!= fOutputRawVideo.format.u.raw_video.display.line_width
+			|| mh.u.raw_video.display_line_count
+				!= fOutputRawVideo.format.u.raw_video.display.line_count
+			|| mh.u.raw_video.bytes_per_row
+				!= fOutputRawVideo.format.u.raw_video.display.bytes_per_row
+			|| mh.u.raw_video.pixel_width_aspect
+				!= fOutputRawVideo.format.u.raw_video.pixel_width_aspect
+			|| mh.u.raw_video.pixel_height_aspect
+				!= fOutputRawVideo.format.u.raw_video.pixel_height_aspect
+			|| mh.size_used != video_buffer_size) {
 			printf("video format changed:\n");
-			printf(" line_width %ld => %ld\n", fOutputRawVideo.format.u.raw_video.display.line_width, mhe->u.raw_video.display_line_width);
-			printf(" line_count %ld => %ld\n", fOutputRawVideo.format.u.raw_video.display.line_count, mhe->u.raw_video.display_line_count);
-			printf(" bytes_per_row %ld => %ld\n", fOutputRawVideo.format.u.raw_video.display.bytes_per_row, mhe->u.raw_video.bytes_per_row);
-			printf(" pixel_width_aspect %d => %d\n", fOutputRawVideo.format.u.raw_video.pixel_width_aspect, mhe->u.raw_video.pixel_width_aspect);
-			printf(" pixel_height_aspect %d => %d\n", fOutputRawVideo.format.u.raw_video.pixel_width_aspect, mhe->u.raw_video.pixel_height_aspect);
-			printf(" pixel_height_aspect %d => %d\n", fOutputRawVideo.format.u.raw_video.pixel_width_aspect, mhe->u.raw_video.pixel_height_aspect);
-			printf(" video_buffer_size %ld => %ld\n", video_buffer_size, mhe->size_used);
+			printf(" line_width %ld => %ld\n",
+				fOutputRawVideo.format.u.raw_video.display.line_width,
+				mh.u.raw_video.display_line_width);
+			printf(" line_count %ld => %ld\n",
+				fOutputRawVideo.format.u.raw_video.display.line_count,
+				mh.u.raw_video.display_line_count);
+			printf(" bytes_per_row %ld => %ld\n",
+				fOutputRawVideo.format.u.raw_video.display.bytes_per_row,
+				mh.u.raw_video.bytes_per_row);
+			printf(" pixel_width_aspect %d => %d\n",
+				fOutputRawVideo.format.u.raw_video.pixel_width_aspect,
+				mh.u.raw_video.pixel_width_aspect);
+			printf(" pixel_height_aspect %d => %d\n",
+				fOutputRawVideo.format.u.raw_video.pixel_width_aspect,
+				mh.u.raw_video.pixel_height_aspect);
+			printf(" pixel_height_aspect %d => %d\n",
+				fOutputRawVideo.format.u.raw_video.pixel_width_aspect,
+				mh.u.raw_video.pixel_height_aspect);
+			printf(" video_buffer_size %ld => %ld\n", video_buffer_size,
+				mh.size_used);
 
 			// recalculate video buffer size
-//			video_buffer_size = mhe->size_used;
-			video_buffer_size = fOutputRawVideo.format.u.raw_video.display.line_count * fOutputRawVideo.format.u.raw_video.display.bytes_per_row;
+			video_buffer_size
+				= fOutputRawVideo.format.u.raw_video.display.line_count
+					* fOutputRawVideo.format.u.raw_video.display.bytes_per_row;
 
 			// perform a video format change
 			
-			fOutputRawVideo.format.u.raw_video.display.line_width    = mhe->u.raw_video.display_line_width;
-			fOutputRawVideo.format.u.raw_video.display.line_count    = mhe->u.raw_video.display_line_count;
-			fOutputRawVideo.format.u.raw_video.display.bytes_per_row = mhe->u.raw_video.bytes_per_row;
-			fOutputRawVideo.format.u.raw_video.pixel_width_aspect    = mhe->u.raw_video.pixel_width_aspect;
-			fOutputRawVideo.format.u.raw_video.pixel_width_aspect    = mhe->u.raw_video.pixel_height_aspect;
-			fOutputRawVideo.format.u.raw_video.last_active           = mhe->u.raw_video.display_line_count - 1;
+			fOutputRawVideo.format.u.raw_video.display.line_width
+				= mh.u.raw_video.display_line_width;
+			fOutputRawVideo.format.u.raw_video.display.line_count
+				= mh.u.raw_video.display_line_count;
+			fOutputRawVideo.format.u.raw_video.display.bytes_per_row
+				= mh.u.raw_video.bytes_per_row;
+			fOutputRawVideo.format.u.raw_video.pixel_width_aspect
+				= mh.u.raw_video.pixel_width_aspect;
+			fOutputRawVideo.format.u.raw_video.pixel_width_aspect
+				= mh.u.raw_video.pixel_height_aspect;
+			fOutputRawVideo.format.u.raw_video.last_active
+				= mh.u.raw_video.display_line_count - 1;
 			lock.Lock();
 			err = ChangeFormat(fOutputRawVideo.source,
-							   fOutputRawVideo.destination,
-							   &fOutputRawVideo.format);
+				fOutputRawVideo.destination, &fOutputRawVideo.format);
 			lock.Unlock();
 			printf("format change result %lx (%s)\n", err, strerror(err));
 			PrintFormat(fOutputRawVideo.format);
@@ -1831,7 +1865,7 @@ DVBMediaNode::raw_video_thread()
 
 		fDemux->TimesourceInfo(&ts_perf_time, &ts_sys_time);
 		ts_offset = ts_sys_time - ts_perf_time;
-		pic_time = mhe->start_time;	// measured in PCR time base
+		pic_time = mh.start_time;	// measured in PCR time base
 		start_time = TimeSource()->PerformanceTimeFor(pic_time + ts_offset);
 
 		// calculate delay and wait
@@ -1840,41 +1874,43 @@ DVBMediaNode::raw_video_thread()
 		delay = start_time - TimeSource()->Now();
 		TRACE_TIMING("video delay %Ld\n", delay);
 		if (delay < -VIDEO_MAX_LATE) {
-			printf("video: decoded packet is %Ldms too late, dropped\n", -delay / 1000);
+			printf("video: decoded packet is %Ldms too late, dropped\n",
+				-delay / 1000);
 			buf->Recycle();
 			continue;
 		}
 		if (delay > VIDEO_MAX_EARLY) {
-			printf("video: decoded packet is %Ldms too early, dropped\n", delay / 1000);
+			printf("video: decoded packet is %Ldms too early, dropped\n",
+				delay / 1000);
 			buf->Recycle();
 			continue;
 		}
 		delay -= PROCESSING_LATENCY;
 		if (delay > 0) {
-			if (acquire_sem_etc(fVideoDelaySem, 1, B_RELATIVE_TIMEOUT, delay) != B_TIMED_OUT) {
+			if (acquire_sem_etc(fVideoDelaySem, 1, B_RELATIVE_TIMEOUT, delay)
+				!= B_TIMED_OUT) {
 				printf("video: delay sem not timed out, dropped packet\n");
 				buf->Recycle();
 				continue;
 			}
 		}
 
-		TRACE_TIMING("video playback delay %Ld\n", start_time - TimeSource()->Now());
+		TRACE_TIMING("video playback delay %Ld\n", start_time 
+			- TimeSource()->Now());
 
 		media_header* hdr;
 		hdr = buf->Header();
-//		*hdr = mh;								// copy header from decoded frame
 		hdr->type = B_MEDIA_RAW_VIDEO;
 		hdr->size_used = video_buffer_size;
-		hdr->time_source = TimeSource()->ID();	// set time source id
-		hdr->start_time = start_time;			// set start time
+		hdr->time_source = TimeSource()->ID();
+		hdr->start_time = start_time;
 		lock.Lock();
 		if (SendBuffer(buf, fOutputRawVideo.source, fOutputRawVideo.destination)
-				!= B_OK) {
+			!= B_OK) {
 			TRACE("video: sending buffer failed\n");
 			buf->Recycle();
 		} 
 		lock.Unlock();
-	
 	}
 
 	delete fCurrentVideoPacket;
