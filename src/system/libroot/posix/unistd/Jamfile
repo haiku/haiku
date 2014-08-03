@@ -28,7 +28,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			link.c
 			lockf.cpp
 			lseek.c
-			mknod.c
 			mount.c
 			pause.c
 			pipe.c

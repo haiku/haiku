@@ -19,6 +19,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			itimer.cpp
 			mkdir.c
 			mkfifo.c
+			mknod.c
 			mman.cpp
 			rlimit.c
 			select.c

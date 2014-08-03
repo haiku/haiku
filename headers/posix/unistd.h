@@ -196,9 +196,6 @@ extern int		lchown(const char *path, uid_t owner, gid_t group);
 extern int		fchownat(int fd, const char *path, uid_t owner, gid_t group,
 					int flag);
 
-extern int		mknod(const char *name, mode_t mode, dev_t dev);
-extern int		mknodat(int fd, const char *name, mode_t mode, dev_t dev);
-
 extern int		getpagesize(void);
 extern int      getdtablesize(void);
 extern long		sysconf(int name);

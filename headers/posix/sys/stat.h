@@ -120,6 +120,8 @@ extern int		mkdir(const char *path, mode_t mode);
 extern int		mkdirat(int fd, const char *path, mode_t mode);
 extern int		mkfifo(const char *path, mode_t mode);
 extern int		mkfifoat(int fd, const char *path, mode_t mode);
+extern int		mknod(const char *name, mode_t mode, dev_t dev);
+extern int		mknodat(int fd, const char *name, mode_t mode, dev_t dev);
 extern mode_t	umask(mode_t cmask);
 
 extern int		utimensat(int fd, const char *path,
