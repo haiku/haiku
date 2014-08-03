@@ -213,16 +213,6 @@ CreateMpeg2MediaFormat()
 		return kFailedToCreateMpeg2MediaFormat;
 	}
 
-	// TODO: The following code block can be removed, once the ffmpeg addon can
-	// determine the codec output parameters from the encoded data.
-	mpeg2MediaFormat->u.encoded_video.output.first_active = 0;
-	mpeg2MediaFormat->u.encoded_video.output.last_active = 575;
-	mpeg2MediaFormat->u.encoded_video.output.orientation
-		= B_VIDEO_TOP_LEFT_RIGHT;
-	mpeg2MediaFormat->u.encoded_video.output.display.format = B_YUV420;
-	mpeg2MediaFormat->u.encoded_video.output.display.line_width = 720;
-	mpeg2MediaFormat->u.encoded_video.output.display.line_count = 576;
-
 	return mpeg2MediaFormat;
 }
 
