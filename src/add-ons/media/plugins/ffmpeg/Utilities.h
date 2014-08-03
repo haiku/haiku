@@ -24,10 +24,6 @@ extern "C" {
 /*! \brief Converts FFmpeg notation of video aspect ratio into the Media Kits
 		notation.
 
-	\param pixelWidthAspectOut On return contains the Media Kits notation of
-		the video aspect ratio width. E.g. 16:9 -> 16 is returned here
-	\param pixelHeightAspectOut On return contains the Media Kits notation of
-		the video aspect ratio height. E.g. 16:9 -> 9 is returned here
 	\param contextIn An AVCodeContext structure of FFmpeg containing the values
 		needed to calculate the Media Kit video aspect ratio.
 		The following fields are used for the calculation:
@@ -35,6 +31,10 @@ extern "C" {
 			- AVCodecContext.sample_aspect_ratio.den (optional)
 			- AVCodecContext.width (must)
 			- AVCodecContext.height (must)
+	\param pixelWidthAspectOut On return contains Media Kits notation of the
+		video aspect ratio width. E.g. 16:9 -> 16 is returned here
+	\param pixelHeightAspectOut On return contains Media Kits notation of the
+		video aspect ratio height. E.g. 16:9 -> 9 is returned here
 */
 inline void
 ConvertAVCodecContextToVideoAspectWidthAndHeight(AVCodecContext& contextIn,
@@ -104,5 +104,34 @@ CalculateBytesPerRowWithColorSpaceAndVideoWidth(color_space colorSpace, int vide
 	return bytesPerRow;
 }
 
+
+/*! \brief Converts FFmpeg notation of video frame rate into the Media Kits
+		notation.
+
+	\param contextIn An AVCodeContext structure of FFmpeg containing the values
+		needed to calculate the Media Kit video frame rate.
+		The following fields are used for the calculation:
+			- AVCodecContext.time_base.num (must)
+			- AVCodecContext.time_base.den (must)
+			- AVCodecContext.ticks_per_frame (must)
+	\param frameRateOut On return contains Media Kits notation of the video
+		frame rate.
+*/
+inline void
+ConvertAVCodecContextToVideoFrameRate(AVCodecContext& contextIn, float& frameRateOut)
+{
+	// assert that av_q2d(contextIn.time_base) > 0 and computable
+	assert(contextIn.time_base.num > 0);
+	assert(contextIn.time_base.den > 0);
+
+	// The following code is based on private get_fps() function of FFmpeg's
+	// ratecontrol.c:
+	// https://lists.ffmpeg.org/pipermail/ffmpeg-cvslog/2012-April/049280.html
+	double possiblyInterlacedFrameRate = 1.0 / av_q2d(contextIn.time_base);
+	double numberOfInterlacedFramesPerFullFrame = FFMAX(contextIn.ticks_per_frame, 1);
+
+	frameRateOut
+		= possiblyInterlacedFrameRate / numberOfInterlacedFramesPerFullFrame;
+}
 
 #endif // UTILITIES_H
