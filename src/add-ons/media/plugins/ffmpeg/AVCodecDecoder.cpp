@@ -78,7 +78,6 @@ AVCodecDecoder::AVCodecDecoder()
 	:
 	fHeader(),
 	fInputFormat(),
-	fOutputVideoFormat(),
 	fFrame(0),
 	fIsAudio(false),
 	fCodec(NULL),
@@ -101,6 +100,7 @@ AVCodecDecoder::AVCodecDecoder()
 	fBlockAlign(0),
 
 	fStartTime(0),
+	fOutputColorSpace(B_NO_COLOR_SPACE),
 	fOutputFrameCount(0),
 	fOutputFrameRate(1.0),
 	fOutputFrameSize(0),
@@ -432,14 +432,24 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 {
 	TRACE("AVCodecDecoder::_NegotiateVideoOutputFormat()\n");
 
-	fOutputVideoFormat = fInputFormat.u.encoded_video.output;
+	TRACE("  requested video format 0x%x\n",
+		inOutFormat->u.raw_video.display.format);
 
-	fContext->width = fOutputVideoFormat.display.line_width;
-	fContext->height = fOutputVideoFormat.display.line_count;
-//	fContext->frame_rate = (int)(fOutputVideoFormat.field_rate
-//		* fContext->frame_rate_base);
+	// Make MediaPlayer happy (if not in rgb32 screen depth and no overlay,
+	// it will only ask for YCbCr, which DrawBitmap doesn't handle, so the
+	// default colordepth is RGB32).
+	if (inOutFormat->u.raw_video.display.format == B_YCbCr422)
+		fOutputColorSpace = B_YCbCr422;
+	else
+		fOutputColorSpace = B_RGB32;
 
-	fOutputFrameRate = fOutputVideoFormat.field_rate;
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+	if (fSwsContext != NULL)
+		sws_freeContext(fSwsContext);
+	fSwsContext = NULL;
+#else
+	fFormatConversionFunc = 0;
+#endif
 
 	fContext->extradata = (uint8_t*)fExtraData;
 	fContext->extradata_size = fExtraDataSize;
@@ -452,61 +462,29 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		fContext->flags |= CODEC_FLAG_TRUNCATED;
 	}
 
-	TRACE("  requested video format 0x%x\n",
-		inOutFormat->u.raw_video.display.format);
-
-	// Make MediaPlayer happy (if not in rgb32 screen depth and no overlay,
-	// it will only ask for YCbCr, which DrawBitmap doesn't handle, so the
-	// default colordepth is RGB32).
-	if (inOutFormat->u.raw_video.display.format == B_YCbCr422)
-		fOutputVideoFormat.display.format = B_YCbCr422;
-	else
-		fOutputVideoFormat.display.format = B_RGB32;
-
-	// Search for a pixel-format the codec handles
-	// TODO: We should try this a couple of times until it succeeds, each
-	// time using another pixel-format that is supported by the decoder.
-	// But libavcodec doesn't seem to offer any way to tell the decoder
-	// which format it should use.
-#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
-	if (fSwsContext != NULL)
-		sws_freeContext(fSwsContext);
-	fSwsContext = NULL;
-#else
-	fFormatConversionFunc = 0;
-#endif
-	// Iterate over supported codec formats
-	for (int i = 0; i < 1; i++) {
-		// close any previous instance
-		if (fCodecInitDone) {
-			fCodecInitDone = false;
-			avcodec_close(fContext);
-		}
-		// TODO: Set n-th fContext->pix_fmt here
-		if (avcodec_open2(fContext, fCodec, NULL) >= 0) {
-			fCodecInitDone = true;
-
-#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
-			fSwsContext = sws_getContext(fContext->width, fContext->height,
-				fContext->pix_fmt, fContext->width, fContext->height,
-				colorspace_to_pixfmt(fOutputVideoFormat.display.format),
-				SWS_FAST_BILINEAR, NULL, NULL, NULL);
-		}
-#else
-			fFormatConversionFunc = resolve_colorspace(
-				fOutputVideoFormat.display.format, fContext->pix_fmt,
-				fContext->width, fContext->height);
-		}
-		if (fFormatConversionFunc != NULL)
-			break;
-#endif
+	// close any previous instance
+	if (fCodecInitDone) {
+		fCodecInitDone = false;
+		avcodec_close(fContext);
 	}
 
-	if (!fCodecInitDone) {
+	if (avcodec_open2(fContext, fCodec, NULL) >= 0)
+		fCodecInitDone = true;
+	else {
 		TRACE("avcodec_open() failed to init codec!\n");
 		return B_ERROR;
 	}
 
+	_ResetTempPacket();
+
+	status_t statusOfDecodingFirstFrame = _DecodeNextVideoFrame();
+	if (statusOfDecodingFirstFrame != B_OK) {
+		TRACE("[v] decoding first video frame failed\n");
+		return B_ERROR;
+	}
+
+	// Note: fSwsContext / fFormatConversionFunc should have been initialized
+	// by first call to _DecodeNextVideoFrame() above.
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 	if (fSwsContext == NULL) {
 		TRACE("No SWS Scale context or decoder has not set the pixel format "
@@ -519,21 +497,25 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	}
 #endif
 
-	if (fOutputVideoFormat.display.format == B_YCbCr422) {
-		fOutputVideoFormat.display.bytes_per_row
-			= 2 * fOutputVideoFormat.display.line_width;
-	} else {
-		fOutputVideoFormat.display.bytes_per_row
-			= 4 * fOutputVideoFormat.display.line_width;
-	}
-
 	inOutFormat->type = B_MEDIA_RAW_VIDEO;
-	inOutFormat->u.raw_video = fOutputVideoFormat;
-
 	inOutFormat->require_flags = 0;
 	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 
-	_ResetTempPacket();
+	inOutFormat->u.raw_video = fInputFormat.u.encoded_video.output;
+
+	inOutFormat->u.raw_video.interlace = 1;
+		// Progressive (non-interlaced) video frames are delivered
+	inOutFormat->u.raw_video.first_active = fHeader.u.raw_video.first_active_line;
+	inOutFormat->u.raw_video.last_active = fHeader.u.raw_video.line_count;
+	inOutFormat->u.raw_video.pixel_width_aspect = fHeader.u.raw_video.pixel_width_aspect;
+	inOutFormat->u.raw_video.pixel_height_aspect = fHeader.u.raw_video.pixel_height_aspect;
+	inOutFormat->u.raw_video.field_rate = fOutputFrameRate;
+		// Was calculated by first call to _DecodeNextVideoFrame()
+
+	inOutFormat->u.raw_video.display.format = fOutputColorSpace;
+	inOutFormat->u.raw_video.display.line_width = fHeader.u.raw_video.display_line_width;
+	inOutFormat->u.raw_video.display.line_count = fHeader.u.raw_video.display_line_count;
+	inOutFormat->u.raw_video.display.bytes_per_row = fHeader.u.raw_video.bytes_per_row;
 
 #ifdef TRACE_AV_CODEC
 	char buffer[1024];
@@ -713,7 +695,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 
     To every decoded video frame there is a media_header populated in
     fHeader, containing the corresponding video frame properties.
-
+    
 	Normally every decoded video frame has a start_time field populated in the
 	associated fHeader, that determines the presentation time of the frame.
 	This relationship will only hold true, when each data chunk that is
@@ -732,6 +714,12 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 	video frames. So a meaningful relationship between the 2nd, 3rd, ... frame
 	and the start time it should be presented isn't established at the moment.
 	Though this	might change in the future.
+
+    More over the fOutputFrameRate variable is updated for every decoded video
+    frame.
+
+	On first call, the member variables 	fSwsContext / fFormatConversionFunc
+	are initialized.
 
 	\return B_OK, when we successfully decoded one video frame
  */
@@ -842,6 +830,8 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 			_UpdateMediaHeaderForVideoFrame();
 			_DeinterlaceAndColorConvertVideoFrame();
 
+			ConvertAVCodecContextToVideoFrameRate(*fContext, fOutputFrameRate);
+
 #ifdef DEBUG
 			dump_ffframe(fRawDecodedPicture, "ffpict");
 //			dump_ffframe(fPostProcessedDecodedPicture, "opict");
@@ -909,8 +899,8 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	fHeader.u.raw_video.display_line_width = fRawDecodedPicture->width;
 	fHeader.u.raw_video.display_line_count = fRawDecodedPicture->height;
 	fHeader.u.raw_video.bytes_per_row
-		= CalculateBytesPerRowWithColorSpaceAndVideoWidth(
-			fOutputVideoFormat.display.format, fRawDecodedPicture->width);
+		= CalculateBytesPerRowWithColorSpaceAndVideoWidth(fOutputColorSpace,
+			fRawDecodedPicture->width);
 	fHeader.u.raw_video.field_gamma = 1.0;
 	fHeader.u.raw_video.field_sequence = fFrame;
 	fHeader.u.raw_video.field_number = 0;
@@ -947,8 +937,8 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 void
 AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 {
-	int width = fOutputVideoFormat.display.line_width;
-	int height = fOutputVideoFormat.display.line_count;
+	int displayWidth = fHeader.u.raw_video.display_line_width;
+	int displayHeight = fHeader.u.raw_video.display_line_count;
 	AVPicture deinterlacedPicture;
 	bool useDeinterlacedPicture = false;
 
@@ -963,11 +953,11 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 		rawPicture.linesize[2] = fRawDecodedPicture->linesize[2];
 		rawPicture.linesize[3] = fRawDecodedPicture->linesize[3];
 
-		avpicture_alloc(&deinterlacedPicture,
-			fContext->pix_fmt, width, height);
+		avpicture_alloc(&deinterlacedPicture, fContext->pix_fmt, displayWidth,
+			displayHeight);
 
 		if (avpicture_deinterlace(&deinterlacedPicture, &rawPicture,
-				fContext->pix_fmt, width, height) < 0) {
+				fContext->pix_fmt, displayWidth, displayHeight) < 0) {
 			TRACE("[v] avpicture_deinterlace() - error\n");
 		} else
 			useDeinterlacedPicture = true;
@@ -976,22 +966,20 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 	// Some decoders do not set pix_fmt until they have decoded 1 frame
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 	if (fSwsContext == NULL) {
-		fSwsContext = sws_getContext(fContext->width, fContext->height,
-			fContext->pix_fmt, fContext->width, fContext->height,
-			colorspace_to_pixfmt(fOutputVideoFormat.display.format),
+		fSwsContext = sws_getContext(displayWidth, displayHeight,
+			fContext->pix_fmt, displayWidth, displayHeight,
+			colorspace_to_pixfmt(fOutputColorSpace),
 			SWS_FAST_BILINEAR, NULL, NULL, NULL);
 	}
 #else
 	if (fFormatConversionFunc == NULL) {
-		fFormatConversionFunc = resolve_colorspace(
-			fOutputVideoFormat.display.format, fContext->pix_fmt,
-			fContext->width, fContext->height);
+		fFormatConversionFunc = resolve_colorspace(fOutputColorSpace,
+			fContext->pix_fmt, displayWidth, displayHeight);
 	}
 #endif
 
 	fDecodedDataSizeInBytes = avpicture_get_size(
-		colorspace_to_pixfmt(fOutputVideoFormat.display.format),
-		fContext->width, fContext->height);
+		colorspace_to_pixfmt(fOutputColorSpace), displayWidth, displayHeight);
 
 	if (fDecodedData == NULL)
 		fDecodedData
@@ -999,7 +987,7 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 
 	fPostProcessedDecodedPicture->data[0] = fDecodedData;
 	fPostProcessedDecodedPicture->linesize[0]
-		= fOutputVideoFormat.display.bytes_per_row;
+		= fHeader.u.raw_video.bytes_per_row;
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 	if (fSwsContext != NULL) {
@@ -1023,22 +1011,22 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 			sws_scale(fSwsContext, deinterlacedFrame.data,
-				deinterlacedFrame.linesize, 0, fContext->height,
+				deinterlacedFrame.linesize, 0, displayHeight,
 				fPostProcessedDecodedPicture->data,
 				fPostProcessedDecodedPicture->linesize);
 #else
 			(*fFormatConversionFunc)(&deinterlacedFrame,
-				fPostProcessedDecodedPicture, width, height);
+				fPostProcessedDecodedPicture, displayWidth, displayHeight);
 #endif
 		} else {
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 			sws_scale(fSwsContext, fRawDecodedPicture->data,
-				fRawDecodedPicture->linesize, 0, fContext->height,
+				fRawDecodedPicture->linesize, 0, displayHeight,
 				fPostProcessedDecodedPicture->data,
 				fPostProcessedDecodedPicture->linesize);
 #else
 			(*fFormatConversionFunc)(fRawDecodedPicture,
-				fPostProcessedDecodedPicture, width, height);
+				fPostProcessedDecodedPicture, displayWidth, displayHeight);
 #endif
 		}
 	}

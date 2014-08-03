@@ -75,7 +75,6 @@ private:
 									// decoded audio / video frame
 
 			media_format		fInputFormat;
-			media_raw_video_format fOutputVideoFormat;
 
 			int64				fFrame;
 			bool				fIsAudio;
@@ -98,6 +97,7 @@ private:
 			int					fBlockAlign;
 
 			bigtime_t			fStartTime;
+			color_space			fOutputColorSpace;
 			int32				fOutputFrameCount;
 			float				fOutputFrameRate;
 			int					fOutputFrameSize;
