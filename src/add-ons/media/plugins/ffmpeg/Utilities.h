@@ -7,12 +7,14 @@
 #define UTILITIES_H
 
 
-/*! \brief This file contains functions to convert values from FFmpeg to Media
-		Kit and vice versa.
+/*! \brief This file contains functions to convert and calculate values from
+		FFmpeg to Media Kit and vice versa.
 */
 
 
 #include <assert.h>
+
+#include <GraphicsDefs.h>
 
 extern "C" {
 	#include "avcodec.h"
@@ -69,6 +71,38 @@ ConvertAVCodecContextToVideoAspectWidthAndHeight(AVCodecContext& contextIn,
 	pixelHeightAspectOut = static_cast<int16>(pixelAspectRatio.den);
 }
 
+
+/*! \brief Calculates bytes per row for a video frame.
+
+	\param colorSpace The Media Kit color space the video frame uses.
+	\param videoWidth The width of the video frame.
+
+	\returns bytes per video frame row
+	\returns Zero, when bytes per video frame cannot be calculated.
+*/
+inline uint32
+CalculateBytesPerRowWithColorSpaceAndVideoWidth(color_space colorSpace, int videoWidth)
+{
+	assert(videoWidth >= 0);
+
+	const uint32 kBytesPerRowUnknown = 0;
+	size_t bytesPerPixel;
+	size_t rowAlignment;
+
+	if (get_pixel_size_for(colorSpace, &bytesPerPixel, &rowAlignment, NULL) != B_OK)
+		return kBytesPerRowUnknown;
+
+	uint32 bytesPerRow = bytesPerPixel * videoWidth;
+	uint32 numberOfUnalignedBytes = bytesPerRow % rowAlignment;
+
+	if (numberOfUnalignedBytes == 0)
+		return bytesPerRow;
+
+	uint32 numberOfBytesNeededForAlignment = rowAlignment - numberOfUnalignedBytes;
+	bytesPerRow += numberOfBytesNeededForAlignment;
+
+	return bytesPerRow;
+}
 
 
 #endif // UTILITIES_H

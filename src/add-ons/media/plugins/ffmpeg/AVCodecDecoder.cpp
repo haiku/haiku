@@ -908,7 +908,9 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	fHeader.start_time = fRawDecodedPicture->reordered_opaque;
 	fHeader.u.raw_video.display_line_width = fRawDecodedPicture->width;
 	fHeader.u.raw_video.display_line_count = fRawDecodedPicture->height;
-	fHeader.u.raw_video.bytes_per_row = 0; // TODO: Implement calculation
+	fHeader.u.raw_video.bytes_per_row
+		= CalculateBytesPerRowWithColorSpaceAndVideoWidth(
+			fOutputVideoFormat.display.format, fRawDecodedPicture->width);
 	fHeader.u.raw_video.field_gamma = 1.0;
 	fHeader.u.raw_video.field_sequence = fFrame;
 	fHeader.u.raw_video.field_number = 0;
