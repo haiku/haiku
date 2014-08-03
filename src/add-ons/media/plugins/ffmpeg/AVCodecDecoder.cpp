@@ -21,6 +21,8 @@
 #include <Bitmap.h>
 #include <Debug.h>
 
+#include "Utilities.h"
+
 
 #undef TRACE
 //#define TRACE_AV_CODEC
@@ -879,8 +881,8 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 }
 
 
-/*! \brief Updates relevant fields of the class member fHeader with the properties of
-	the most recently decoded video frame.
+/*! \brief Updates relevant fields of the class member fHeader with the
+		properties of the most recently decoded video frame.
 
 	It is assumed that this function is called in _DecodeNextVideoFrame() only
 	when the following asserts hold true:
@@ -893,6 +895,9 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		4. There will be at maximumn only one decoded video frame in our cache
 		   at any single point in time. Otherwise you couldn't tell to which
 		   cached decoded video frame the properties in fHeader relate to.
+		5. AVCodecContext is still valid for this video frame (This is the case
+		   when this function is called immediately after
+		   avcodec_decode_video2().
 */
 void
 AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
@@ -901,12 +906,19 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	fHeader.file_pos = 0;
 	fHeader.orig_size = 0;
 	fHeader.start_time = fRawDecodedPicture->reordered_opaque;
+	fHeader.u.raw_video.display_line_width = fRawDecodedPicture->width;
+	fHeader.u.raw_video.display_line_count = fRawDecodedPicture->height;
+	fHeader.u.raw_video.bytes_per_row = 0; // TODO: Implement calculation
 	fHeader.u.raw_video.field_gamma = 1.0;
 	fHeader.u.raw_video.field_sequence = fFrame;
 	fHeader.u.raw_video.field_number = 0;
 	fHeader.u.raw_video.pulldown_number = 0;
 	fHeader.u.raw_video.first_active_line = 1;
 	fHeader.u.raw_video.line_count = fRawDecodedPicture->height;
+
+	ConvertAVCodecContextToVideoAspectWidthAndHeight(*fContext,
+		fHeader.u.raw_video.pixel_width_aspect,
+		fHeader.u.raw_video.pixel_height_aspect);
 
 	TRACE("[v] start_time=%02d:%02d.%02d field_sequence=%lu\n",
 		int((fHeader.start_time / 60000000) % 60),

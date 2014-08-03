@@ -25,6 +25,7 @@ extern "C" {
 
 #include "DemuxerTable.h"
 #include "gfx_util.h"
+#include "Utilities.h"
 
 
 //#define TRACE_AVFORMAT_READER
@@ -1151,30 +1152,9 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 			format->u.encoded_video.output.orientation
 				= B_VIDEO_TOP_LEFT_RIGHT;
 
-			// Calculate the display aspect ratio
-			AVRational displayAspectRatio;
-		    if (codecContext->sample_aspect_ratio.num != 0) {
-				av_reduce(&displayAspectRatio.num, &displayAspectRatio.den,
-					codecContext->width
-						* codecContext->sample_aspect_ratio.num,
-					codecContext->height
-						* codecContext->sample_aspect_ratio.den,
-					1024 * 1024);
-				TRACE("  pixel aspect ratio: %d/%d, "
-					"display aspect ratio: %d/%d\n",
-					codecContext->sample_aspect_ratio.num,
-					codecContext->sample_aspect_ratio.den,
-					displayAspectRatio.num, displayAspectRatio.den);
-		    } else {
-				av_reduce(&displayAspectRatio.num, &displayAspectRatio.den,
-					codecContext->width, codecContext->height, 1024 * 1024);
-				TRACE("  no display aspect ratio (%d/%d)\n",
-					displayAspectRatio.num, displayAspectRatio.den);
-		    }
-			format->u.encoded_video.output.pixel_width_aspect
-				= displayAspectRatio.num;
-			format->u.encoded_video.output.pixel_height_aspect
-				= displayAspectRatio.den;
+			ConvertAVCodecContextToVideoAspectWidthAndHeight(*codecContext,
+				format->u.encoded_video.output.pixel_width_aspect,
+				format->u.encoded_video.output.pixel_height_aspect);
 
 			format->u.encoded_video.output.display.format
 				= pixfmt_to_colorspace(codecContext->pix_fmt);
