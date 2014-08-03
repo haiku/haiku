@@ -133,7 +133,7 @@ void		usb_disk_reset_recovery(disk_device *device);
 status_t	usb_disk_transfer_data(disk_device *device, bool directionIn,
 				void *data, size_t dataLength);
 status_t	usb_disk_receive_csw(disk_device *device,
-				command_status_wrapper *status);
+				usb_massbulk_command_status_wrapper *status);
 status_t	usb_disk_operation(device_lun *lun, uint8 operation,
 				uint8 opLength, uint32 logicalBlockAddress,
 				uint16 transferLength, void *data, size_t *dataLength,
@@ -175,7 +175,7 @@ status_t
 usb_disk_mass_storage_reset(disk_device *device)
 {
 	return gUSBModule->send_request(device->device, USB_REQTYPE_INTERFACE_OUT
-		| USB_REQTYPE_CLASS, REQUEST_MASS_STORAGE_RESET, 0x0000,
+		| USB_REQTYPE_CLASS, USB_MASSBULK_REQUEST_MASS_STORAGE_RESET, 0x0000,
 		device->interface, 0, NULL, NULL);
 }
 
@@ -188,9 +188,11 @@ usb_disk_get_max_lun(disk_device *device)
 
 	// devices that do not support multiple LUNs may stall this request
 	if (gUSBModule->send_request(device->device, USB_REQTYPE_INTERFACE_IN
-		| USB_REQTYPE_CLASS, REQUEST_GET_MAX_LUN, 0x0000, device->interface,
-		1, &result, &actualLength) != B_OK || actualLength != 1)
+		| USB_REQTYPE_CLASS, USB_MASSBULK_REQUEST_GET_MAX_LUN, 0x0000,
+		device->interface, 1, &result, &actualLength) != B_OK
+			|| actualLength != 1) {
 		return 0;
+	}
 
 	if (result > MAX_LOGICAL_UNIT_NUMBER) {
 		// invalid max lun
@@ -246,15 +248,17 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, void *data,
 
 
 status_t
-usb_disk_receive_csw(disk_device *device, command_status_wrapper *status)
+usb_disk_receive_csw(disk_device *device,
+	usb_massbulk_command_status_wrapper *status)
 {
 	status_t result = usb_disk_transfer_data(device, true, status,
-		sizeof(command_status_wrapper));
+		sizeof(usb_massbulk_command_status_wrapper));
 	if (result != B_OK)
 		return result;
 
 	if (device->status != B_OK
-		|| device->actual_length != sizeof(command_status_wrapper)) {
+		|| device->actual_length
+			!= sizeof(usb_massbulk_command_status_wrapper)) {
 		// receiving the command status wrapper failed
 		return B_ERROR;
 	}
@@ -275,11 +279,12 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 		directionIn ? 'y' : 'n');
 
 	disk_device *device = lun->device;
-	command_block_wrapper command;
-	command.signature = CBW_SIGNATURE;
+	usb_massbulk_command_block_wrapper command;
+	command.signature = USB_MASSBULK_CBW_SIGNATURE;
 	command.tag = device->current_tag++;
 	command.data_transfer_length = (dataLength != NULL ? *dataLength : 0);
-	command.flags = (directionIn ? CBW_DATA_INPUT : CBW_DATA_OUTPUT);
+	command.flags = (directionIn ? USB_MASSBULK_CBW_DATA_INPUT
+		: USB_MASSBULK_CBW_DATA_OUTPUT);
 	command.lun = lun->logical_unit_number;
 	command.command_block_length
 		= device->is_atapi ? ATAPI_COMMAND_LENGTH : opLength;
@@ -317,12 +322,12 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	}
 
 	status_t result = usb_disk_transfer_data(device, false, &command,
-		sizeof(command_block_wrapper));
+		sizeof(usb_massbulk_command_block_wrapper));
 	if (result != B_OK)
 		return result;
 
 	if (device->status != B_OK ||
-		device->actual_length != sizeof(command_block_wrapper)) {
+		device->actual_length != sizeof(usb_massbulk_command_block_wrapper)) {
 		// sending the command block wrapper failed
 		TRACE_ALWAYS("sending the command block wrapper failed: %s\n",
 			strerror(device->status));
@@ -354,7 +359,7 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 		}
 	}
 
-	command_status_wrapper status;
+	usb_massbulk_command_status_wrapper status;
 	result =  usb_disk_receive_csw(device, &status);
 	if (result != B_OK) {
 		// in case of a stall or error clear the stall and try again
@@ -369,7 +374,8 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 		return result;
 	}
 
-	if (status.signature != CSW_SIGNATURE || status.tag != command.tag) {
+	if (status.signature != USB_MASSBULK_CSW_SIGNATURE
+		|| status.tag != command.tag) {
 		// the command status wrapper is not valid
 		TRACE_ALWAYS("command status wrapper is not valid: %#" B_PRIx32 "\n",
 			status.signature);
@@ -378,8 +384,8 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	}
 
 	switch (status.status) {
-		case CSW_STATUS_COMMAND_PASSED:
-		case CSW_STATUS_COMMAND_FAILED:
+		case USB_MASSBULK_CSW_STATUS_COMMAND_PASSED:
+		case USB_MASSBULK_CSW_STATUS_COMMAND_FAILED:
 		{
 			// The residue from "status.data_residue" is not maintained
 			// correctly by some devices, so calculate it instead.
@@ -395,7 +401,7 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 				}
 			}
 
-			if (status.status == CSW_STATUS_COMMAND_PASSED) {
+			if (status.status == USB_MASSBULK_CSW_STATUS_COMMAND_PASSED) {
 				// the operation is complete and has succeeded
 				return B_OK;
 			} else {
@@ -413,7 +419,7 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 			}
 		}
 
-		case CSW_STATUS_PHASE_ERROR:
+		case USB_MASSBULK_CSW_STATUS_PHASE_ERROR:
 		{
 			// a protocol or device error occured
 			TRACE_ALWAYS("phase error in operation %#" B_PRIx8 "\n", operation);
