@@ -385,6 +385,8 @@ TeamWindow::MessageReceived(BMessage* message)
 				break;
 
 			_HandleResolveMissingSourceFile(locatedPath);
+			delete fFilePanel;
+			fFilePanel = NULL;
 			break;
 		}
 		case MSG_LOCATE_SOURCE_IF_NEEDED:
@@ -395,10 +397,10 @@ TeamWindow::MessageReceived(BMessage* message)
 		case MSG_SOURCE_ENTRY_QUERY_COMPLETE:
 		{
 			BStringList* entries;
-			if (message->FindPointer("entries", (void**)&entries) != B_OK)
-				break;
-			ObjectDeleter<BStringList> entryDeleter(entries);
-			_HandleLocateSourceRequest(entries);
+			if (message->FindPointer("entries", (void**)&entries) == B_OK) {
+				ObjectDeleter<BStringList> entryDeleter(entries);
+				_HandleLocateSourceRequest(entries);
+			}
 			fActiveSourceWorker = -1;
 			break;
 		}
@@ -1568,14 +1570,13 @@ TeamWindow::_RetrieveMatchingSourceWorker(void* arg)
 	window->Unlock();
 
 	status_t error = window->_RetrieveMatchingSourceEntries(path, entries);
-	if (error != B_OK)
-		return error;
 
 	entries->Sort();
 	BMessenger messenger(window);
 	if (messenger.IsValid() && messenger.LockTarget()) {
 		if (window->fActiveSourceWorker == find_thread(NULL)) {
 			BMessage message(MSG_SOURCE_ENTRY_QUERY_COMPLETE);
+			message.AddInt32("error", error);
 			message.AddPointer("entries", entries);
 			if (messenger.SendMessage(&message) == B_OK)
 				stringListDeleter.Detach();
