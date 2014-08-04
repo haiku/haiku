@@ -553,6 +553,9 @@ BHttpRequest::_MakeRequest()
 					readByChunks = true;
 
 				BString contentEncoding(fHeaders["Content-Encoding"]);
+				// We don't advertise "deflate" support (see above), but we
+				// still try to decompress it, if a server ever sends a deflate
+				// stream despite it not being in our Accept-Encoding list.
 				if (contentEncoding == "gzip"
 						|| contentEncoding == "deflate") {
 					decompress = true;
@@ -829,10 +832,12 @@ BHttpRequest::_SendHeaders()
 		outputHeaders.AddHeader("Host", host);
 
 		outputHeaders.AddHeader("Accept", "*/*");
-		outputHeaders.AddHeader("Accept-Encoding", "gzip,deflate");
-			// Allow the remote server to send dynamic content by chunks
-			// rather than waiting for the full content to be generated and
-			// sending us data.
+		outputHeaders.AddHeader("Accept-Encoding", "gzip");
+			// Allows the server to compress data using the "gzip" format.
+			// "deflate" is not supported, because there are two interpretations
+			// of what it means (the RFC and Microsoft products), and we don't
+			// want to handle this. Very few websites support only deflate,
+			// and most of them will send gzip, or at worst, uncompressed data.
 
 		outputHeaders.AddHeader("Connection", "close");
 			// Let the remote server close the connection after response since
