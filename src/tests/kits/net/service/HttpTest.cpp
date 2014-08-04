@@ -37,10 +37,11 @@ void
 HttpTest::GetTest()
 {
 	BUrl testUrl(fBaseUrl, "/user-agent");
-	BUrlContext c;
+	BUrlContext* c = new BUrlContext();
+	c->AcquireReference();
 	BHttpRequest t(testUrl);
 
-	t.SetContext(&c);
+	t.SetContext(c);
 
 	CPPUNIT_ASSERT(t.Run());
 
@@ -56,8 +57,10 @@ HttpTest::GetTest()
 		r.Headers().CountHeaders());
 	CPPUNIT_ASSERT_EQUAL(42, r.Length());
 		// Fixed size as we know the response format.
-	CPPUNIT_ASSERT(!c.GetCookieJar().GetIterator().HasNext());
+	CPPUNIT_ASSERT(!c->GetCookieJar().GetIterator().HasNext());
 		// This page should not set cookies
+	
+	c->ReleaseReference();
 }
 
 
