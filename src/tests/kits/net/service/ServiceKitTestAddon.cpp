@@ -8,6 +8,7 @@
 #include <TestSuiteAddon.h>
 
 #include "CookieTest.h"
+#include "DataTest.h"
 #include "HttpTest.h"
 #include "UrlTest.h"
 
@@ -20,6 +21,7 @@ getTestSuite()
 	CookieTest::AddTests(*suite);
 	UrlTest::AddTests(*suite);
 	HttpTest::AddTests(*suite);
+	DataTest::AddTests(*suite);
 
 	return suite;
 }

@@ -4,6 +4,7 @@ UnitTestLib servicekittest.so :
 	ServiceKitTestAddon.cpp
 
 	CookieTest.cpp
+	DataTest.cpp
 	HttpTest.cpp
 	UrlTest.cpp
 
