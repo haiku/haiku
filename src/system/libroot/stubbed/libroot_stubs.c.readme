@@ -1,0 +1,19 @@
+The source file libroot_stubs.c contains empty stubs for all symbols exported by
+libroot.so, including definitions of all versioned symbols.
+
+From libroot_stubs.c, <stubbed>libroot.so can be built, which is a stubbed
+version of libroot.so (i.e. without any code). This stubbed library is used
+during stage 0 of the bootstrap process, in order to build the gcc-syslibs
+(libgcc, libsupc++ and libstdc++).
+
+The python script generate_stubs.py can be used to regenerate libroot_stubs.c
+from a built version of (the real) libroot.so. This may be necessary when new
+symbols have been added to libroot.so.
+
+The command for regenerating libroot_stubs.c is this:
+
+	nm <path-to-libroot.so> | generate_stubs.py >libroot.stubs.c
+
+There is a separate version of the stubs file for the legacy compiler (gcc2),
+which uses a different symbol mangling format and contains the symbols for
+libgcc, too.

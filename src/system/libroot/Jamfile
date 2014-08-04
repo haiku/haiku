@@ -125,3 +125,4 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 SubInclude HAIKU_TOP src system libroot add-ons ;
 SubInclude HAIKU_TOP src system libroot os ;
 SubInclude HAIKU_TOP src system libroot posix ;
+SubInclude HAIKU_TOP src system libroot stubbed ;
