@@ -66,6 +66,10 @@ private:
 									media_header* mediaHeader,
 									media_decode_info* info);
 			status_t			_DecodeNextVideoFrame();
+			status_t			_AddInputBufferPaddingToVideoChunkBuffer();
+									// TODO: Remove the "Video" word once
+									// the audio part is responsible for
+									// freeing the chunk buffer, too.
 			void				_HandleNewVideoFrameAndUpdateSystemState();
 			status_t			_FlushOneVideoFrameFromDecoderBuffer();
 			void				_UpdateMediaHeaderForVideoFrame();
@@ -106,6 +110,11 @@ private:
 									// sample size * channel count
 
 			const void*			fChunkBuffer;
+			uint8_t*			fVideoChunkBuffer;
+									// TODO: Remove and use fChunkBuffer again
+									// (with type uint8_t*) once the audio part is
+									// responsible for freeing the chunk buffer,
+									// too.
 			int32				fChunkBufferOffset;
 			size_t				fChunkBufferSize;
 			bool				fAudioDecodeError;

@@ -106,6 +106,7 @@ AVCodecDecoder::AVCodecDecoder()
 	fOutputFrameSize(0),
 
 	fChunkBuffer(NULL),
+	fVideoChunkBuffer(NULL),
 	fChunkBufferOffset(0),
 	fChunkBufferSize(0),
 	fAudioDecodeError(false),
@@ -140,6 +141,9 @@ AVCodecDecoder::~AVCodecDecoder()
 	if (fCodecInitDone)
 		avcodec_close(fContext);
 
+	free(fVideoChunkBuffer);
+		// TODO: Replace with fChunkBuffer, once audio part is
+		// responsible for freeing the chunk buffer, too.
 	free(fDecodedData);
 
 	av_free(fPostProcessedDecodedPicture);
@@ -260,6 +264,9 @@ AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 	}
 
 	// Flush internal buffers as well.
+	free(fVideoChunkBuffer);
+		// TODO: Replace with fChunkBuffer, once audio part is
+		// responsible for freeing the chunk buffer, too.
 	fChunkBuffer = NULL;
 	fChunkBufferOffset = 0;
 	fChunkBufferSize = 0;
@@ -721,7 +728,10 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 	On first call, the member variables 	fSwsContext / fFormatConversionFunc
 	are initialized.
 
-	\return B_OK, when we successfully decoded one video frame
+	\returns B_OK when we successfully decoded one video frame
+	\returns B_LAST_BUFFER_ERROR when there are no more video frames available.
+	\returns B_NO_MEMORY when we have no memory left for correct operation.
+	\returns Other Errors
  */
 status_t
 AVCodecDecoder::_DecodeNextVideoFrame()
@@ -733,7 +743,8 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 
 		if (fTempPacket.size == 0) {
 			// Our packet buffer is empty, so fill it now.
-			status_t getNextChunkStatus = GetNextChunk(&fChunkBuffer,
+			const void* chunkBuffer = NULL;
+			status_t getNextChunkStatus = GetNextChunk(&chunkBuffer,
 				&fChunkBufferSize, &chunkMediaHeader);
 			switch (getNextChunkStatus) {
 				case B_OK:
@@ -743,17 +754,31 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 					return _FlushOneVideoFrameFromDecoderBuffer();
 
 				default:
-					TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from "
-						"GetNextChunk(): %s\n", strerror(err));
+					TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from"
+						" GetNextChunk(): %s\n", strerror(err));
 					return getNextChunkStatus;
 			}
 
-			fTempPacket.data = static_cast<uint8_t*>(const_cast<void*>(
-				fChunkBuffer));
+			free(fVideoChunkBuffer);
+				// Free any previously used chunk buffer first
+				// TODO: Replace with fChunkBuffer, once audio part is
+				// responsible for freeing the chunk buffer, too.
+			fVideoChunkBuffer
+				= static_cast<uint8_t*>(const_cast<void*>(chunkBuffer));
+				// TODO: Replace fVideoChunkBuffer with fChunkBuffer, once
+				// audio part is responsible for freeing the chunk buffer, too.
+			status_t chunkBufferPaddingStatus
+				= _AddInputBufferPaddingToVideoChunkBuffer();
+			if (chunkBufferPaddingStatus != B_OK)
+				return chunkBufferPaddingStatus;
+
+			fTempPacket.data = fVideoChunkBuffer;
+				// TODO: Replace with fChunkBuffer, once audio part is
+				// responsible for freeing the chunk buffer, too.
 			fTempPacket.size = fChunkBufferSize;
 
 			fContext->reordered_opaque = chunkMediaHeader.start_time;
-				// Let ffmpeg handle the relationship between start_time and
+				// Let FFMPEG handle the relationship between start_time and
 				// decoded video frame.
 				//
 				// Explanation:
@@ -779,7 +804,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 
 #ifdef LOG_STREAM_TO_FILE
 			if (sDumpedPackets < 100) {
-				sStreamLogFile.Write(fChunkBuffer, fChunkBufferSize);
+				sStreamLogFile.Write(chunkBuffer, fChunkBufferSize);
 				printf("wrote %ld bytes\n", fChunkBufferSize);
 				sDumpedPackets++;
 			} else if (sDumpedPackets == 100)
@@ -854,6 +879,39 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 #endif
 		return B_OK;
 	}
+}
+
+
+/*! \brief Adds a "safety net" of additional memory to fVideoChunkBuffer as
+		required by FFMPEG for input buffers to video decoders.
+
+	This is needed so that some decoders can read safely a predefined number of
+	bytes at a time for performance optimization purposes.
+
+	The additonal memory has a size of FF_INPUT_BUFFER_PADDING_SIZE as defined
+	in avcodec.h.
+
+	\returns B_OK Padding was successful. You are responsible for releasing the
+		allocated memory.
+	\returns B_NO_MEMORY Padding failed. The memory in fVideoChunkBuffer is not
+		freed. NULL is assigned to fVideoChunkBuffer.
+*/
+status_t
+AVCodecDecoder::_AddInputBufferPaddingToVideoChunkBuffer()
+{
+	// TODO: Rename fVideoChunkBuffer to fChunkBuffer, once the audio part is
+	// responsible for releasing the chunk buffer, too.
+	fVideoChunkBuffer
+		= static_cast<uint8_t*>(realloc(static_cast<void*>(fVideoChunkBuffer),
+			fChunkBufferSize + FF_INPUT_BUFFER_PADDING_SIZE));
+	if (fVideoChunkBuffer == NULL)
+		return B_NO_MEMORY;
+
+	memset(fVideoChunkBuffer + fChunkBufferSize, 0,
+		FF_INPUT_BUFFER_PADDING_SIZE);
+		// Establish safety net, by zero'ing the padding area.
+
+	return B_OK;
 }
 
 
