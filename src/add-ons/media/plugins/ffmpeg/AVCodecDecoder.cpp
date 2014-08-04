@@ -735,10 +735,17 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 			// Our packet buffer is empty, so fill it now.
 			status_t getNextChunkStatus = GetNextChunk(&fChunkBuffer,
 				&fChunkBufferSize, &chunkMediaHeader);
-			if (getNextChunkStatus != B_OK) {
-				TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from "
-					"GetNextChunk(): %s\n", strerror(err));
-				return getNextChunkStatus;
+			switch (getNextChunkStatus) {
+				case B_OK:
+					break;
+
+				case B_LAST_BUFFER_ERROR:
+					return _FlushOneVideoFrameFromDecoderBuffer();
+
+				default:
+					TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from "
+						"GetNextChunk(): %s\n", strerror(err));
+					return getNextChunkStatus;
 			}
 
 			fTempPacket.data = static_cast<uint8_t*>(const_cast<void*>(
@@ -807,75 +814,117 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		fTempPacket.size -= decodedDataSizeInBytes;
 		fTempPacket.data += decodedDataSizeInBytes;
 
-//TRACE("FFDEC: PTS = %d:%d:%d.%d - fContext->frame_number = %ld "
-//	"fContext->frame_rate = %ld\n", (int)(fContext->pts / (60*60*1000000)),
-//	(int)(fContext->pts / (60*1000000)), (int)(fContext->pts / (1000000)),
-//	(int)(fContext->pts % 1000000), fContext->frame_number,
-//	fContext->frame_rate);
-//TRACE("FFDEC: PTS = %d:%d:%d.%d - fContext->frame_number = %ld "
-//	"fContext->frame_rate = %ld\n",
-//	(int)(fRawDecodedPicture->pts / (60*60*1000000)),
-//	(int)(fRawDecodedPicture->pts / (60*1000000)),
-//	(int)(fRawDecodedPicture->pts / (1000000)),
-//	(int)(fRawDecodedPicture->pts % 1000000), fContext->frame_number,
-//	fContext->frame_rate);
+		bool gotNoPictureYet = gotPicture == 0;
+		if (gotNoPictureYet) {
+			TRACE("frame %lld - no picture yet, decodedDataSizeInBytes: %d, "
+				"chunk size: %ld\n", fFrame, decodedDataSizeInBytes,
+				fChunkBufferSize);
+			continue;
+		}
 
-		if (gotPicture) {
 #if DO_PROFILING
-			bigtime_t formatConversionStart = system_time();
+		bigtime_t formatConversionStart = system_time();
 #endif
-//			TRACE("ONE FRAME OUT !! len=%d size=%ld (%s)\n", len, size,
-//				pixfmt_to_string(fContext->pix_fmt));
 
-			_UpdateMediaHeaderForVideoFrame();
-			_DeinterlaceAndColorConvertVideoFrame();
+		_HandleNewVideoFrameAndUpdateSystemState();
 
-			ConvertAVCodecContextToVideoFrameRate(*fContext, fOutputFrameRate);
+#if DO_PROFILING
+		bigtime_t doneTime = system_time();
+		decodingTime += formatConversionStart - startTime;
+		conversionTime += doneTime - formatConversionStart;
+		profileCounter++;
+		if (!(fFrame % 5)) {
+			if (info) {
+				printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required "
+					"%Ld\n",
+					decodingTime / profileCounter,
+					conversionTime / profileCounter,
+					fFrame, info->time_to_decode);
+			} else {
+				printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required "
+					"%Ld\n",
+					decodingTime / profileCounter,
+					conversionTime / profileCounter,
+					fFrame, bigtime_t(1000000LL / fOutputFrameRate));
+			}
+			decodingTime = 0;
+			conversionTime = 0;
+			profileCounter = 0;
+		}
+#endif
+		return B_OK;
+	}
+}
+
+
+/*! \brief Executes all steps needed for a freshly decoded video frame.
+
+	\see _UpdateMediaHeaderForVideoFrame() and
+	\see _DeinterlaceAndColorConvertVideoFrame() for when you are allowed to
+	call this method.
+*/
+void
+AVCodecDecoder::_HandleNewVideoFrameAndUpdateSystemState()
+{
+	_UpdateMediaHeaderForVideoFrame();
+	_DeinterlaceAndColorConvertVideoFrame();
+
+	ConvertAVCodecContextToVideoFrameRate(*fContext, fOutputFrameRate);
 
 #ifdef DEBUG
-			dump_ffframe(fRawDecodedPicture, "ffpict");
-//			dump_ffframe(fPostProcessedDecodedPicture, "opict");
+	dump_ffframe(fRawDecodedPicture, "ffpict");
+//	dump_ffframe(fPostProcessedDecodedPicture, "opict");
 #endif
-			fFrame++;
+	fFrame++;
+}
 
-#if DO_PROFILING
-			bigtime_t doneTime = system_time();
-			decodingTime += formatConversionStart - startTime;
-			conversionTime += doneTime - formatConversionStart;
-			profileCounter++;
-			if (!(fFrame % 5)) {
-				if (info) {
-					printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required "
-						"%Ld\n",
-						decodingTime / profileCounter,
-						conversionTime / profileCounter,
-						fFrame, info->time_to_decode);
-				} else {
-					printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required "
-						"%Ld\n",
-						decodingTime / profileCounter,
-						conversionTime / profileCounter,
-						fFrame, bigtime_t(1000000LL / fOutputFrameRate));
-				}
-				decodingTime = 0;
-				conversionTime = 0;
-				profileCounter = 0;
-			}
-#endif
-			return B_OK;
-		} else {
-			TRACE("frame %lld - no picture yet, len: %d, chunk size: %ld\n",
-				fFrame, len, size);
-		}
+
+/*! \brief Flushes one video frame - if any - still buffered by the decoder.
+
+	Some FFMPEG decoder are buffering video frames. To retrieve those buffered
+	frames the decoder needs to be told so.
+
+	The intended use of this method is to call it, once there are no more data
+	chunks for decoding left. Reframed in other words: Once GetNextChunk()
+	returns with status B_LAST_BUFFER_ERROR it is time to start flushing.
+
+	\returns B_OK Retrieved one video frame, handled it accordingly and updated
+		the system state accordingly.
+		There maybe more video frames left. So it is valid for the client of
+		AVCodecDecoder to call it one more time.
+
+	\returns B_LAST_BUFFER_ERROR No video frame left.
+		The client of the AVCodecDecoder should stop calling it now.
+*/
+status_t
+AVCodecDecoder::_FlushOneVideoFrameFromDecoderBuffer()
+{
+	// Create empty fTempPacket to tell the video decoder it is time to flush
+	fTempPacket.data = NULL;
+	fTempPacket.size = 0;
+
+	int gotPicture = 0;
+	avcodec_decode_video2(fContext,	fRawDecodedPicture, &gotPicture,
+		&fTempPacket);
+		// We are only interested in complete frames now, so ignore the return
+		// value.
+
+	if (gotPicture == 0) {
+		// video buffer is flushed successfully
+		return B_LAST_BUFFER_ERROR;
 	}
+
+	_HandleNewVideoFrameAndUpdateSystemState();
+
+	return B_OK;
 }
 
 
 /*! \brief Updates relevant fields of the class member fHeader with the
 		properties of the most recently decoded video frame.
 
-	It is assumed that this function is called in _DecodeNextVideoFrame() only
-	when the following asserts hold true:
+	It is assumed that this function is called only	when the following asserts
+	hold true:
 		1. We actually got a new picture decoded by the video decoder.
 		2. fHeader wasn't updated for the new picture yet. You MUST call this
 		   method only once per decoded video frame.
@@ -920,15 +969,15 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 }
 
 
-/*! \brief This function applies deinterlacing (only if needed) and color conversion
-    to the video frame in fRawDecodedPicture.
+/*! \brief This function applies deinterlacing (only if needed) and color
+	conversion to the video frame in fRawDecodedPicture.
 
 	It is assumed that fRawDecodedPicture wasn't deinterlaced and color
 	converted yet (otherwise this function behaves in unknown manners).
 
-	You should only call this function in _DecodeNextVideoFrame() when we
-	got a new picture decoded by the video decoder and the fHeader variable was
-	updated accordingly (@see _UpdateMediaHeaderForVideoFrame()).
+	You should only call this function when you	got a new picture decoded by
+	the video decoder and the fHeader variable was updated accordingly (\see
+	_UpdateMediaHeaderForVideoFrame()).
 
 	When this function finishes the postprocessed video frame will be available
 	in fPostProcessedDecodedPicture and fDecodedData (fDecodedDataSizeInBytes

@@ -19,7 +19,7 @@
 	Successful completion of this test results in a series of PNG image
 	files created at the same location you start the test from.
 
-	The originally included test file results in 84 PNG images,
+	The originally included test file results in 85 PNG images,
 	representing a movie sequence with the actress Anne Hathaway.
 	This test file has the following properties:
 		- The first frames cannot be decoded, due to missing I-Frames

@@ -66,6 +66,8 @@ private:
 									media_header* mediaHeader,
 									media_decode_info* info);
 			status_t			_DecodeNextVideoFrame();
+			void				_HandleNewVideoFrameAndUpdateSystemState();
+			status_t			_FlushOneVideoFrameFromDecoderBuffer();
 			void				_UpdateMediaHeaderForVideoFrame();
 			void				_DeinterlaceAndColorConvertVideoFrame();
 
