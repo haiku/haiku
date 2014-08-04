@@ -89,6 +89,12 @@ BDataRequest::_ProtocolLoop()
 	}
 
 	if (isBase64) {
+		// Check that the base64 data is properly padded (we process characters
+		// by groups of 4 and there must not be stray chars at the end as
+		// Base64 specifies padding.
+		if (data.Length() & 3)
+			return B_BAD_DATA;
+
 		char* buffer = new char[data.Length() * 3 / 4];
 		payload = buffer;
 			// payload must be a const char* so we can assign data.String() to
