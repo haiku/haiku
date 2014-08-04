@@ -360,7 +360,8 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	fZoomTextOnly(true),
 	fShowTabsIfSinglePageOpen(true),
 	fAutoHideInterfaceInFullscreenMode(false),
-	fAutoHidePointer(false)
+	fAutoHidePointer(false),
+	fBookmarkBar(NULL)
 {
 	// Begin listening to settings changes and read some current values.
 	fAppSettings->AddListener(BMessenger(this));
@@ -494,6 +495,14 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		BMenu* bookmarkMenu
 			= new BookmarkMenu(B_TRANSLATE("Bookmarks"), this, &bookmarkRef);
 		mainMenu->AddItem(bookmarkMenu);
+
+		BDirectory barDir(&bookmarkRef);
+		BEntry bookmarkBar(&barDir, "Bookmark bar");
+		entry_ref bookmarkBarRef;
+		if (bookmarkBar.GetRef(&bookmarkBarRef) != B_OK)
+			bookmarkBarRef = bookmarkRef;
+
+		fBookmarkBar = new BookmarkBar("Bookmarks", this, &bookmarkBarRef);
 	}
 
 	// Back, Forward, Stop & Home buttons
@@ -600,14 +609,15 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		.Add(toggleFullscreenButton, 0.0f)
 	;
 
-	fBookmarkBar = new BookmarkBar("Bookmarks", this, &bookmarkRef);
-	if (fAppSettings->GetValue(kSettingsShowBookmarkBar, true)) {
-		// We need to hide the bookmark bar and then show it again
-		// to save the setting and set the menu item label.
-		fBookmarkBar->Hide();
-		_ShowBookmarkBar(true);
-	} else
-		_ShowBookmarkBar(false);
+	if (fBookmarkBar) {
+		if (fAppSettings->GetValue(kSettingsShowBookmarkBar, true)) {
+			// We need to hide the bookmark bar and then show it again
+			// to save the setting and set the menu item label.
+			fBookmarkBar->Hide();
+			_ShowBookmarkBar(true);
+		} else
+			_ShowBookmarkBar(false);
+	}
 
 	fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0,
 		false);
@@ -815,7 +825,8 @@ BrowserWindow::MessageReceived(BMessage* message)
 			break;
 
 		case SHOW_HIDE_BOOKMARK_BAR:
-			_ShowBookmarkBar(fBookmarkBar->IsHidden());
+			if (fBookmarkBar)
+				_ShowBookmarkBar(fBookmarkBar->IsHidden());
 			break;
 
 		case GOTO_URL:
