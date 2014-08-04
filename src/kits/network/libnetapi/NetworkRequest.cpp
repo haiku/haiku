@@ -1,0 +1,80 @@
+/*
+ * Copyright 2010-2014 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Christophe Huriaux, c.huriaux@gmail.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ */
+
+
+#include <NetworkRequest.h>
+
+
+BNetworkRequest::BNetworkRequest(const BUrl& url, BUrlProtocolListener* listener,
+		BUrlContext* context, const char* threadName, const char* protocolName)
+	:
+	BUrlRequest(url, listener, context, threadName, protocolName),
+	fSocket(NULL)
+{
+}
+
+
+bool
+BNetworkRequest::_ResolveHostName(uint16_t port)
+{
+	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Resolving %s",
+		fUrl.UrlString().String());
+
+	if (fUrl.HasPort())
+		port = fUrl.Port();
+
+	// FIXME stop forcing AF_INET, when BNetworkAddress stops giving IPv6
+	// addresses when there isn't an IPv6 link available.
+	fRemoteAddr = BNetworkAddress(AF_INET, fUrl.Host(), port);
+
+	if (fRemoteAddr.InitCheck() != B_OK)
+		return false;
+
+	//! ProtocolHook:HostnameResolved
+	if (fListener != NULL)
+		fListener->HostnameResolved(this, fRemoteAddr.ToString().String());
+
+	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Hostname resolved to: %s",
+		fRemoteAddr.ToString().String());
+
+	return true;
+}
+
+
+status_t
+BNetworkRequest::_GetLine(BString& destString)
+{
+	// Find a complete line in inputBuffer
+	uint32 characterIndex = 0;
+
+	while ((characterIndex < fInputBuffer.Size())
+		&& ((fInputBuffer.Data())[characterIndex] != '\n'))
+		characterIndex++;
+
+	if (characterIndex == fInputBuffer.Size())
+		return B_ERROR;
+
+	char* temporaryBuffer = new(std::nothrow) char[characterIndex + 1];
+	if (temporaryBuffer == NULL)
+		return B_NO_MEMORY;
+
+	fInputBuffer.RemoveData(temporaryBuffer, characterIndex + 1);
+
+	// Strip end-of-line character(s)
+	if (temporaryBuffer[characterIndex - 1] == '\r')
+		destString.SetTo(temporaryBuffer, characterIndex - 1);
+	else
+		destString.SetTo(temporaryBuffer, characterIndex);
+
+	delete[] temporaryBuffer;
+	return B_OK;
+}
+
+

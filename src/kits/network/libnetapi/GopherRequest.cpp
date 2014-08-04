@@ -182,7 +182,7 @@ static const bool kInlineImages = true;
 BGopherRequest::BGopherRequest(const BUrl& url, BUrlProtocolListener* listener,
 	BUrlContext* context)
 	:
-	BUrlRequest(url, listener, context, "BUrlProtocol.Gopher", "gopher"),
+	BNetworkRequest(url, listener, context, "BUrlProtocol.Gopher", "gopher"),
 	fItemType(GOPHER_TYPE_NONE),
 	fPosition(0),
 	fResult()
@@ -236,7 +236,7 @@ BGopherRequest::_ProtocolLoop()
 	if (fSocket == NULL)
 		return B_NO_MEMORY;
 
-	if (!_ResolveHostName()) {
+	if (!_ResolveHostName(70)) {
 		_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR,
 			"Unable to resolve hostname (%s), aborting.",
 				fUrl.Host().String());
@@ -383,36 +383,6 @@ BGopherRequest::_ProtocolLoop()
 		return readError;
 
 	return fQuit ? B_INTERRUPTED : B_OK;
-}
-
-
-bool
-BGopherRequest::_ResolveHostName()
-{
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Resolving %s",
-		fUrl.UrlString().String());
-	
-	uint16_t port;
-	if (fUrl.HasPort())
-		port = fUrl.Port();
-	else
-		port = 70;
-
-	// FIXME stop forcing AF_INET, when BNetworkAddress stops giving IPv6
-	// addresses when there isn't an IPv6 link available.
-	fRemoteAddr = BNetworkAddress(AF_INET, fUrl.Host(), port);
-
-	if (fRemoteAddr.InitCheck() != B_OK)
-		return false;
-
-	//! ProtocolHook:HostnameResolved
-	if (fListener != NULL)
-		fListener->HostnameResolved(this, fRemoteAddr.ToString().String());
-
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Hostname resolved to: %s",
-		fRemoteAddr.ToString().String());
-
-	return true;
 }
 
 
@@ -723,36 +693,6 @@ BGopherRequest::_ParseInput(bool last)
 
 		fPosition += footer.Length();
 	}
-}
-
-
-status_t
-BGopherRequest::_GetLine(BString& destString)
-{
-	// Find a complete line in inputBuffer
-	uint32 characterIndex = 0;
-
-	while ((characterIndex < fInputBuffer.Size())
-		&& ((fInputBuffer.Data())[characterIndex] != '\n'))
-		characterIndex++;
-
-	if (characterIndex == fInputBuffer.Size())
-		return B_ERROR;
-
-	char* temporaryBuffer = new(std::nothrow) char[characterIndex + 1];
-	if (temporaryBuffer == NULL)
-		return B_NO_MEMORY;
-
-	fInputBuffer.RemoveData(temporaryBuffer, characterIndex + 1);
-
-	// Strip end-of-line character(s)
-	if (temporaryBuffer[characterIndex - 1] == '\r')
-		destString.SetTo(temporaryBuffer, characterIndex - 1);
-	else
-		destString.SetTo(temporaryBuffer, characterIndex);
-
-	delete[] temporaryBuffer;
-	return B_OK;
 }
 
 

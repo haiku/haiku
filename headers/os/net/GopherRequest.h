@@ -8,15 +8,10 @@
 
 #include <deque>
 
-#include <NetBuffer.h>
-#include <NetworkAddress.h>
-#include <UrlRequest.h>
+#include <NetworkRequest.h>
 
 
-class BAbstractSocket;
-
-
-class BGopherRequest : public BUrlRequest {
+class BGopherRequest : public BNetworkRequest {
 public:
 								BGopherRequest(const BUrl& url,
 									BUrlProtocolListener* listener = NULL,
@@ -29,21 +24,17 @@ public:
 
 private:
 			status_t			_ProtocolLoop();
-			bool 				_ResolveHostName();
 			void				_SendRequest();
 
 			bool				_NeedsParsing();
 			bool				_NeedsLastDotStrip();
 			void				_ParseInput(bool last);
 
-			status_t			_GetLine(BString& destString);
 			BString&			_HTMLEscapeString(BString &str);
 
 private:
 			char				fItemType;
 			BString				fPath;
-			BAbstractSocket*	fSocket;
-			BNetworkAddress		fRemoteAddr;
 
 			BNetBuffer			fInputBuffer;
 			ssize_t				fPosition;

@@ -30,11 +30,11 @@
 
 static const int32 kHttpBufferSize = 4096;
 
+
 BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
 	BUrlProtocolListener* listener, BUrlContext* context)
 	:
-	BUrlRequest(url, listener, context, "BUrlProtocol.HTTP", protocolName),
-	fSocket(NULL),
+	BNetworkRequest(url, listener, context, "BUrlProtocol.HTTP", protocolName),
 	fSSL(ssl),
 	fRequestMethod(B_HTTP_GET),
 	fHttpVersion(B_HTTP_11),
@@ -58,9 +58,8 @@ BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
 
 BHttpRequest::BHttpRequest(const BHttpRequest& other)
 	:
-	BUrlRequest(other.Url(), other.fListener, other.fContext,
+	BNetworkRequest(other.Url(), other.fListener, other.fContext,
 		"BUrlProtocol.HTTP", other.fSSL ? "HTTPS" : "HTTP"),
-	fSocket(NULL),
 	fSSL(other.fSSL),
 	fRequestMethod(other.fRequestMethod),
 	fHttpVersion(other.fHttpVersion),
@@ -320,7 +319,7 @@ BHttpRequest::_ProtocolLoop()
 		fHeaders.Clear();
 		_ResultHeaders().Clear();
 
-		if (!_ResolveHostName()) {
+		if (!_ResolveHostName(fSSL ? 443 : 80)) {
 			_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR,
 				"Unable to resolve hostname (%s), aborting.",
 					fUrl.Host().String());
@@ -422,36 +421,6 @@ BHttpRequest::_ProtocolLoop()
 		return B_RESOURCE_NOT_FOUND;
 
 	return B_OK;
-}
-
-
-bool
-BHttpRequest::_ResolveHostName()
-{
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Resolving %s",
-		fUrl.UrlString().String());
-
-	uint16_t port;
-	if (fUrl.HasPort())
-		port = fUrl.Port();
-	else
-		port = fSSL ? 443 : 80;
-
-	// FIXME stop forcing AF_INET, when BNetworkAddress stops giving IPv6
-	// addresses when there isn't an IPv6 link available.
-	fRemoteAddr = BNetworkAddress(AF_INET, fUrl.Host(), port);
-
-	if (fRemoteAddr.InitCheck() != B_OK)
-		return false;
-
-	//! ProtocolHook:HostnameResolved
-	if (fListener != NULL)
-		fListener->HostnameResolved(this, fRemoteAddr.ToString().String());
-
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Hostname resolved to: %s",
-		fRemoteAddr.ToString().String());
-
-	return true;
 }
 
 
@@ -710,36 +679,6 @@ BHttpRequest::_MakeRequest()
 		return readError;
 
 	return fQuit ? B_INTERRUPTED : B_OK;
-}
-
-
-status_t
-BHttpRequest::_GetLine(BString& destString)
-{
-	// Find a complete line in inputBuffer
-	uint32 characterIndex = 0;
-
-	while ((characterIndex < fInputBuffer.Size())
-		&& ((fInputBuffer.Data())[characterIndex] != '\n'))
-		characterIndex++;
-
-	if (characterIndex == fInputBuffer.Size())
-		return B_ERROR;
-
-	char* temporaryBuffer = new(std::nothrow) char[characterIndex + 1];
-	if (temporaryBuffer == NULL)
-		return B_NO_MEMORY;
-
-	fInputBuffer.RemoveData(temporaryBuffer, characterIndex + 1);
-
-	// Strip end-of-line character(s)
-	if (temporaryBuffer[characterIndex - 1] == '\r')
-		destString.SetTo(temporaryBuffer, characterIndex - 1);
-	else
-		destString.SetTo(temporaryBuffer, characterIndex);
-
-	delete[] temporaryBuffer;
-	return B_OK;
 }
 
 

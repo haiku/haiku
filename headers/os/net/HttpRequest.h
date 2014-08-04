@@ -11,15 +11,11 @@
 #include <HttpForm.h>
 #include <HttpHeaders.h>
 #include <HttpResult.h>
-#include <NetBuffer.h>
 #include <NetworkAddress.h>
-#include <UrlRequest.h>
+#include <NetworkRequest.h>
 
 
-class BAbstractSocket;
-
-
-class BHttpRequest : public BUrlRequest {
+class BHttpRequest : public BNetworkRequest {
 public:
 								BHttpRequest(const BUrl& url,
 									bool ssl = false,
@@ -63,14 +59,11 @@ public:
 private:
 			void				_ResetOptions();
 			status_t			_ProtocolLoop();
-			bool 				_ResolveHostName();
 			status_t			_MakeRequest();
 
 			void				_SendRequest();
 			void				_SendHeaders();
 			void				_SendPostData();
-
-			status_t			_GetLine(BString& destString);
 
 			void				_ParseStatus();
 			void				_ParseHeaders();
@@ -85,14 +78,10 @@ private:
 			bool				_IsDefaultPort();
 
 private:
-			BAbstractSocket*	fSocket;
-			BNetworkAddress		fRemoteAddr;
 			bool				fSSL;
 
 			BString				fRequestMethod;
 			int8				fHttpVersion;
-
-			BNetBuffer			fInputBuffer;
 
 			BHttpHeaders		fHeaders;
 
