@@ -22,9 +22,13 @@ public:
 									BUrlContext* context,
 									const char* threadName,
 									const char* protocolName);
+
+	virtual	status_t			Stop();
+
 protected:
 			bool 				_ResolveHostName(uint16_t port);
 
+			void				_ProtocolSetup();
 			status_t			_GetLine(BString& destString);
 
 protected:

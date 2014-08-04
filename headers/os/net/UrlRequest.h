@@ -48,6 +48,7 @@ public:
 
 protected:
 	static	int32					_ThreadEntry(void* arg);
+	virtual	void					_ProtocolSetup() {};
 	virtual	status_t				_ProtocolLoop() = 0;
 	virtual void					_EmitDebug(BUrlProtocolDebugMessage type,
 										const char* format, ...);

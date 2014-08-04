@@ -87,12 +87,8 @@ BUrlRequest::Stop()
 	if (!fRunning)
 		return B_ERROR;
 
-	status_t threadStatus = B_OK;
 	fQuit = true;
-
-	send_signal(fThreadId, SIGUSR1); // unblock blocking syscalls.
-	wait_for_thread(fThreadId, &threadStatus);
-	return threadStatus;
+	return B_OK;
 }
 
 
@@ -184,27 +180,12 @@ BUrlRequest::Status() const
 // #pragma mark Thread management
 
 
-static void
-empty(int)
-{
-}
-
-
 /*static*/ int32
 BUrlRequest::_ThreadEntry(void* arg)
 {
-	// Setup an (empty) signal handler so we can be stopped by a signal,
-	// without the whole process being killed.
-	// TODO make connect() properly unlock when close() is called on the
-	// socket, and remove this.
-	struct sigaction action;
-	action.sa_handler = empty;
-	action.sa_mask = 0;
-	action.sa_flags = 0;
-	sigaction(SIGUSR1, &action, NULL);
-
 	BUrlRequest* request = reinterpret_cast<BUrlRequest*>(arg);
 	request->fThreadStatus = B_BUSY;
+	request->_ProtocolSetup();
 
 	status_t protocolLoopExitStatus = request->_ProtocolLoop();
 

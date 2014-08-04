@@ -21,6 +21,20 @@ BNetworkRequest::BNetworkRequest(const BUrl& url, BUrlProtocolListener* listener
 }
 
 
+status_t
+BNetworkRequest::Stop()
+{
+	status_t threadStatus = BUrlRequest::Stop();
+
+	if (threadStatus != B_OK)
+		return threadStatus;
+
+	send_signal(fThreadId, SIGUSR1); // unblock blocking syscalls.
+	wait_for_thread(fThreadId, &threadStatus);
+	return threadStatus;
+}
+
+
 bool
 BNetworkRequest::_ResolveHostName(uint16_t port)
 {
@@ -45,6 +59,27 @@ BNetworkRequest::_ResolveHostName(uint16_t port)
 		fRemoteAddr.ToString().String());
 
 	return true;
+}
+
+
+static void
+empty(int)
+{
+}
+
+
+void
+BNetworkRequest::_ProtocolSetup()
+{
+	// Setup an (empty) signal handler so we can be stopped by a signal,
+	// without the whole process being killed.
+	// TODO make connect() properly unlock when close() is called on the
+	// socket, and remove this.
+	struct sigaction action;
+	action.sa_handler = empty;
+	action.sa_mask = 0;
+	action.sa_flags = 0;
+	sigaction(SIGUSR1, &action, NULL);
 }
 
 

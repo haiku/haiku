@@ -219,7 +219,7 @@ BGopherRequest::Stop()
 		fSocket->Disconnect();
 			// Unlock any pending connect, read or write operation.
 	}
-	return BUrlRequest::Stop();
+	return BNetworkRequest::Stop();
 }
 
 
