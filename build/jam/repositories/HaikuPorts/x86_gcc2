@@ -243,8 +243,8 @@ RemotePackageRepository HaikuPorts
 	sharutils-4.14-1
 	smjpeg-0.2.1-1
 	smjpeg_devel-0.2.1-1
-	smpeg-0.4.5-2
-	smpeg_devel-0.4.5-2
+	smpeg-0.4.5-3
+	smpeg_devel-0.4.5-3
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
 	sqlite-3.8.4.3-1
