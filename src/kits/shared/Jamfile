@@ -33,8 +33,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			HashString.cpp
 			IconButton.cpp
 			IconView.cpp
+			Json.cpp
 			Keymap.cpp
 			LongAndDragTrackingFilter.cpp
+			MessageBuilder.cpp
 			NaturalCompare.cpp
 			PromptWindow.cpp
 			QueryFile.cpp
