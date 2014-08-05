@@ -456,14 +456,11 @@ rule FStandardHeaders architecture
 
 	local headers = ;
 
-	# The C++ headers and gcc headers.
-	if $(architecture) != x86_gcc2 {
-		headers += [ C++HeaderDirectories $(architecture) ] ;
-		headers += [ GccHeaderDirectories $(architecture) ] ;
-	} else {
-		headers += [ FDirName $(HAIKU_TOP) headers cpp ] ;
-		headers += [ FDirName $(HAIKU_TOP) headers build gcc-2.95.3 ] ;
-	}
+	# The c++ headers.
+	headers += [ C++HeaderDirectories $(architecture) ] ;
+
+	# The gcc headers.
+	headers += [ GccHeaderDirectories $(architecture) ] ;
 
 	# Use headers directory, to allow to do things like include <posix/string.h>
 	headers += [ FDirName $(HAIKU_TOP) headers ] ;
