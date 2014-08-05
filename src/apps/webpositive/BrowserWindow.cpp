@@ -499,10 +499,9 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		BDirectory barDir(&bookmarkRef);
 		BEntry bookmarkBar(&barDir, "Bookmark bar");
 		entry_ref bookmarkBarRef;
-		if (bookmarkBar.GetRef(&bookmarkBarRef) != B_OK)
-			bookmarkBarRef = bookmarkRef;
-
-		fBookmarkBar = new BookmarkBar("Bookmarks", this, &bookmarkBarRef);
+		// TODO we could also check if the folder is empty here.
+		if (bookmarkBar.Exists() && bookmarkBar.GetRef(&bookmarkBarRef) == B_OK)
+			fBookmarkBar = new BookmarkBar("Bookmarks", this, &bookmarkBarRef);
 	}
 
 	// Back, Forward, Stop & Home buttons
@@ -609,7 +608,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		.Add(toggleFullscreenButton, 0.0f)
 	;
 
-	if (fBookmarkBar) {
+	if (fBookmarkBar != NULL) {
 		if (fAppSettings->GetValue(kSettingsShowBookmarkBar, true)) {
 			// We need to hide the bookmark bar and then show it again
 			// to save the setting and set the menu item label.
@@ -623,17 +622,20 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		false);
 
 	// Layout
-	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, 0.0)
+	BGroupView* topView = new BGroupView(B_VERTICAL, 0.0);
+
 #if !INTEGRATE_MENU_INTO_TAB_BAR
-		.Add(menuBarGroup)
+	topView->AddChild(menuBarGroup);
 #endif
-		.Add(fTabManager->TabGroup())
-		.Add(navigationGroup)
-		.Add(fBookmarkBar)
-		.Add(fTabManager->ContainerView())
-		.Add(findGroup)
-		.Add(statusGroup)
-	);
+	topView->AddChild(fTabManager->TabGroup());
+	topView->AddChild(navigationGroup);
+	if (fBookmarkBar != NULL)
+		topView->AddChild(fBookmarkBar);
+	topView->AddChild(fTabManager->ContainerView());
+	topView->AddChild(findGroup);
+	topView->AddChild(statusGroup);
+
+	AddChild(topView);
 
 	fURLInputGroup->MakeFocus(true);
 
@@ -825,7 +827,7 @@ BrowserWindow::MessageReceived(BMessage* message)
 			break;
 
 		case SHOW_HIDE_BOOKMARK_BAR:
-			if (fBookmarkBar)
+			if (fBookmarkBar != NULL)
 				_ShowBookmarkBar(fBookmarkBar->IsHidden());
 			break;
 
