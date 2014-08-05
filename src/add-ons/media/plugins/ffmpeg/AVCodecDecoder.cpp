@@ -142,7 +142,7 @@ AVCodecDecoder::~AVCodecDecoder()
 		avcodec_close(fContext);
 
 	free(fVideoChunkBuffer);
-		// TODO: Replace with fChunkBuffer, once audio part is
+		// TODO: Replace with fChunkBuffer, once audio path is
 		// responsible for freeing the chunk buffer, too.
 	free(fDecodedData);
 
@@ -265,7 +265,7 @@ AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 
 	// Flush internal buffers as well.
 	free(fVideoChunkBuffer);
-		// TODO: Replace with fChunkBuffer, once audio part is
+		// TODO: Replace with fChunkBuffer, once audio path is
 		// responsible for freeing the chunk buffer, too.
 	fChunkBuffer = NULL;
 	fChunkBufferOffset = 0;
@@ -687,7 +687,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 }
 
 
-/*! \brief Decode next video frame
+/*! \brief Decodes next video frame.
 
     We decode exactly one video frame into fDecodedData. To achieve this goal,
     we might need to request several chunks of encoded data resulting in a
@@ -702,7 +702,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 
     To every decoded video frame there is a media_header populated in
     fHeader, containing the corresponding video frame properties.
-    
+
 	Normally every decoded video frame has a start_time field populated in the
 	associated fHeader, that determines the presentation time of the frame.
 	This relationship will only hold true, when each data chunk that is
@@ -725,8 +725,8 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
     More over the fOutputFrameRate variable is updated for every decoded video
     frame.
 
-	On first call, the member variables 	fSwsContext / fFormatConversionFunc
-	are initialized.
+	On first call the member variables fSwsContext / fFormatConversionFunc	are
+	initialized.
 
 	\returns B_OK when we successfully decoded one video frame
 	\returns B_LAST_BUFFER_ERROR when there are no more video frames available.
@@ -739,77 +739,16 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 	assert(fTempPacket.size >= 0);
 
 	while (true) {
-		media_header chunkMediaHeader;
+		status_t loadingChunkStatus
+			= _LoadNextVideoChunkIfNeededAndUpdateStartTime();
 
-		if (fTempPacket.size == 0) {
-			// Our packet buffer is empty, so fill it now.
-			const void* chunkBuffer = NULL;
-			status_t getNextChunkStatus = GetNextChunk(&chunkBuffer,
-				&fChunkBufferSize, &chunkMediaHeader);
-			switch (getNextChunkStatus) {
-				case B_OK:
-					break;
+		if (loadingChunkStatus == B_LAST_BUFFER_ERROR)
+			return _FlushOneVideoFrameFromDecoderBuffer();
 
-				case B_LAST_BUFFER_ERROR:
-					return _FlushOneVideoFrameFromDecoderBuffer();
-
-				default:
-					TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from"
-						" GetNextChunk(): %s\n", strerror(err));
-					return getNextChunkStatus;
-			}
-
-			free(fVideoChunkBuffer);
-				// Free any previously used chunk buffer first
-				// TODO: Replace with fChunkBuffer, once audio part is
-				// responsible for freeing the chunk buffer, too.
-			fVideoChunkBuffer
-				= static_cast<uint8_t*>(const_cast<void*>(chunkBuffer));
-				// TODO: Replace fVideoChunkBuffer with fChunkBuffer, once
-				// audio part is responsible for freeing the chunk buffer, too.
-			status_t chunkBufferPaddingStatus
-				= _AddInputBufferPaddingToVideoChunkBuffer();
-			if (chunkBufferPaddingStatus != B_OK)
-				return chunkBufferPaddingStatus;
-
-			fTempPacket.data = fVideoChunkBuffer;
-				// TODO: Replace with fChunkBuffer, once audio part is
-				// responsible for freeing the chunk buffer, too.
-			fTempPacket.size = fChunkBufferSize;
-
-			fContext->reordered_opaque = chunkMediaHeader.start_time;
-				// Let FFMPEG handle the relationship between start_time and
-				// decoded video frame.
-				//
-				// Explanation:
-				// The received chunk buffer may not contain the next video
-				// frame to be decoded, due to frame reordering (e.g. MPEG1/2
-				// provides encoded video frames in a different order than the
-				// decoded video frame).
-				//
-				// FIXME: Research how to establish a meaningful relationship
-				// between start_time and decoded video frame when the received
-				// chunk buffer contains partial video frames. Maybe some data
-				// formats contain time stamps (ake pts / dts fields) that can
-				// be evaluated by FFMPEG. But as long as I don't have such
-				// video data to test it, it makes no sense to implement it.
-				//
-				// FIXME: Implement tracking start_time of video frames
-				// originating in data chunks that encode more than one video
-				// frame at a time. In that case on would increment the
-				// start_time for each consecutive frame of such a data chunk
-				// (like it is done for audio frame decoding). But as long as
-				// I don't have such video data to test it, it makes no sense
-				// to implement it.
-
-#ifdef LOG_STREAM_TO_FILE
-			if (sDumpedPackets < 100) {
-				sStreamLogFile.Write(chunkBuffer, fChunkBufferSize);
-				printf("wrote %ld bytes\n", fChunkBufferSize);
-				sDumpedPackets++;
-			} else if (sDumpedPackets == 100)
-				sStreamLogFile.Unset();
-#endif
+		if (loadingChunkStatus != B_OK) {
+			TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from "
+				"GetNextChunk(): %s\n", strerror(err));
+			return loadingChunkStatus;
 		}
 
 #if DO_PROFILING
@@ -822,9 +761,9 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		// packet buffer is allowed to contain incomplete frames so we are
 		// required to buffer the packets between different calls to
 		// _DecodeNextVideoFrame().
-		int gotPicture = 0;
+		int gotVideoFrame = 0;
 		int decodedDataSizeInBytes = avcodec_decode_video2(fContext,
-			fRawDecodedPicture, &gotPicture, &fTempPacket);
+			fRawDecodedPicture, &gotVideoFrame, &fTempPacket);
 		if (decodedDataSizeInBytes < 0) {
 			TRACE("[v] AVCodecDecoder: ignoring error in decoding frame %lld:"
 				" %d\n", fFrame, len);
@@ -839,8 +778,8 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		fTempPacket.size -= decodedDataSizeInBytes;
 		fTempPacket.data += decodedDataSizeInBytes;
 
-		bool gotNoPictureYet = gotPicture == 0;
-		if (gotNoPictureYet) {
+		bool gotNoVideoFrame = gotVideoFrame == 0;
+		if (gotNoVideoFrame) {
 			TRACE("frame %lld - no picture yet, decodedDataSizeInBytes: %d, "
 				"chunk size: %ld\n", fFrame, decodedDataSizeInBytes,
 				fChunkBufferSize);
@@ -882,6 +821,91 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 }
 
 
+/*! \brief Loads the next video chunk into fVideoChunkBuffer and assigns it to
+		fTempPacket accordingly only if fTempPacket is empty. Updates fContext
+		with the start time of the new data chunk.
+
+	\returns B_OK
+		1. meaning: Next video chunk is loaded and fContext is updated.
+		2. meaning: No need to load and update anything. Proceed as usual.
+	\returns B_LAST_BUFFER_ERROR No more video chunks available.
+		fVideoChunkBuffer, fTempPacket and fContext are left untouched.
+	\returns Other errors Caller should bail out because fVideoChunkBuffer,
+		fTempPacket and fContext are in unknown states. Normal operation cannot
+		be guaranteed.
+*/
+status_t
+AVCodecDecoder::_LoadNextVideoChunkIfNeededAndUpdateStartTime()
+{
+	// TODO: Rename fVideoChunkBuffer to fChunkBuffer, once the audio path is
+	// responsible for releasing the chunk buffer, too.
+
+	if (fTempPacket.size > 0)
+		return B_OK;
+
+	const void* chunkBuffer = NULL;
+	size_t chunkBufferSize = 0;
+		// In the case that GetNextChunk() returns an error fChunkBufferSize
+		// should be left untouched.
+	media_header chunkMediaHeader;
+
+	status_t getNextChunkStatus = GetNextChunk(&chunkBuffer,
+		&chunkBufferSize, &chunkMediaHeader);
+	if (getNextChunkStatus != B_OK)
+		return getNextChunkStatus;
+
+	fChunkBufferSize = chunkBufferSize;
+
+	free(fVideoChunkBuffer);
+		// Free any previously used chunk buffer first
+	fVideoChunkBuffer
+		= static_cast<uint8_t*>(const_cast<void*>(chunkBuffer));
+	status_t chunkBufferPaddingStatus
+		= _AddInputBufferPaddingToVideoChunkBuffer();
+	if (chunkBufferPaddingStatus != B_OK)
+		return chunkBufferPaddingStatus;
+
+	fTempPacket.data = fVideoChunkBuffer;
+	fTempPacket.size = fChunkBufferSize;
+
+	fContext->reordered_opaque = chunkMediaHeader.start_time;
+		// Let FFMPEG handle the relationship between start_time and
+		// decoded video frame.
+		//
+		// Explanation:
+		// The received chunk buffer may not contain the next video
+		// frame to be decoded, due to frame reordering (e.g. MPEG1/2
+		// provides encoded video frames in a different order than the
+		// decoded video frame).
+		//
+		// FIXME: Research how to establish a meaningful relationship
+		// between start_time and decoded video frame when the received
+		// chunk buffer contains partial video frames. Maybe some data
+		// formats contain time stamps (ake pts / dts fields) that can
+		// be evaluated by FFMPEG. But as long as I don't have such
+		// video data to test it, it makes no sense to implement it.
+		//
+		// FIXME: Implement tracking start_time of video frames
+		// originating in data chunks that encode more than one video
+		// frame at a time. In that case on would increment the
+		// start_time for each consecutive frame of such a data chunk
+		// (like it is done for audio frame decoding). But as long as
+		// I don't have such video data to test it, it makes no sense
+		// to implement it.
+
+#ifdef LOG_STREAM_TO_FILE
+	if (sDumpedPackets < 100) {
+		sStreamLogFile.Write(chunkBuffer, fChunkBufferSize);
+		printf("wrote %ld bytes\n", fChunkBufferSize);
+		sDumpedPackets++;
+	} else if (sDumpedPackets == 100)
+		sStreamLogFile.Unset();
+#endif
+
+	return B_OK;
+}
+
+
 /*! \brief Adds a "safety net" of additional memory to fVideoChunkBuffer as
 		required by FFMPEG for input buffers to video decoders.
 
@@ -899,7 +923,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 status_t
 AVCodecDecoder::_AddInputBufferPaddingToVideoChunkBuffer()
 {
-	// TODO: Rename fVideoChunkBuffer to fChunkBuffer, once the audio part is
+	// TODO: Rename fVideoChunkBuffer to fChunkBuffer, once the audio path is
 	// responsible for releasing the chunk buffer, too.
 	fVideoChunkBuffer
 		= static_cast<uint8_t*>(realloc(static_cast<void*>(fVideoChunkBuffer),
@@ -961,13 +985,14 @@ AVCodecDecoder::_FlushOneVideoFrameFromDecoderBuffer()
 	fTempPacket.data = NULL;
 	fTempPacket.size = 0;
 
-	int gotPicture = 0;
-	avcodec_decode_video2(fContext,	fRawDecodedPicture, &gotPicture,
+	int gotVideoFrame = 0;
+	avcodec_decode_video2(fContext,	fRawDecodedPicture, &gotVideoFrame,
 		&fTempPacket);
 		// We are only interested in complete frames now, so ignore the return
 		// value.
 
-	if (gotPicture == 0) {
+	bool gotNoVideoFrame = gotVideoFrame == 0;
+	if (gotNoVideoFrame) {
 		// video buffer is flushed successfully
 		return B_LAST_BUFFER_ERROR;
 	}

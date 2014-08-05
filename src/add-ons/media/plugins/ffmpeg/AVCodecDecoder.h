@@ -28,52 +28,51 @@ extern "C" {
 
 class AVCodecDecoder : public Decoder {
 public:
-								AVCodecDecoder();
+						AVCodecDecoder();
 
-	virtual						~AVCodecDecoder();
+	virtual				~AVCodecDecoder();
 
-	virtual	void				GetCodecInfo(media_codec_info* mci);
+	virtual	void		GetCodecInfo(media_codec_info* mci);
 
-	virtual	status_t			Setup(media_format* ioEncodedFormat,
-								   const void* infoBuffer, size_t infoSize);
+	virtual	status_t	Setup(media_format* ioEncodedFormat,
+							const void* infoBuffer, size_t infoSize);
 
-	virtual	status_t			NegotiateOutputFormat(
-									media_format* inOutFormat);
+	virtual	status_t	NegotiateOutputFormat(media_format* inOutFormat);
 
-	virtual	status_t			Decode(void* outBuffer, int64* outFrameCount,
-									media_header* mediaHeader,
-									media_decode_info* info);
+	virtual	status_t	Decode(void* outBuffer, int64* outFrameCount,
+							media_header* mediaHeader,
+							media_decode_info* info);
 
-	virtual	status_t			SeekedTo(int64 trame, bigtime_t time);
+	virtual	status_t	SeekedTo(int64 trame, bigtime_t time);
 
 
 private:
-			void				_ResetTempPacket();
+			void		_ResetTempPacket();
 
-			status_t			_NegotiateAudioOutputFormat(
-									media_format* inOutFormat);
+			status_t	_NegotiateAudioOutputFormat(media_format* inOutFormat);
 
-			status_t			_NegotiateVideoOutputFormat(
-									media_format* inOutFormat);
+			status_t	_NegotiateVideoOutputFormat(media_format* inOutFormat);
 
-			status_t			_DecodeAudio(void* outBuffer,
-									int64* outFrameCount,
-									media_header* mediaHeader,
-									media_decode_info* info);
+			status_t	_DecodeAudio(void* outBuffer, int64* outFrameCount,
+							media_header* mediaHeader,
+							media_decode_info* info);
 
-			status_t			_DecodeVideo(void* outBuffer,
-									int64* outFrameCount,
-									media_header* mediaHeader,
-									media_decode_info* info);
-			status_t			_DecodeNextVideoFrame();
-			status_t			_AddInputBufferPaddingToVideoChunkBuffer();
-									// TODO: Remove the "Video" word once
-									// the audio part is responsible for
-									// freeing the chunk buffer, too.
-			void				_HandleNewVideoFrameAndUpdateSystemState();
-			status_t			_FlushOneVideoFrameFromDecoderBuffer();
-			void				_UpdateMediaHeaderForVideoFrame();
-			void				_DeinterlaceAndColorConvertVideoFrame();
+			status_t	_DecodeVideo(void* outBuffer, int64* outFrameCount,
+							media_header* mediaHeader,
+							media_decode_info* info);
+			status_t	_DecodeNextVideoFrame();
+			status_t	_LoadNextVideoChunkIfNeededAndUpdateStartTime();
+							// TODO: Remove the "Video" word once
+							// the audio path is responsible for
+							// freeing the chunk buffer, too.
+			status_t	_AddInputBufferPaddingToVideoChunkBuffer();
+							// TODO: Remove the "Video" word once
+							// the audio path is responsible for
+							// freeing the chunk buffer, too.
+			void		_HandleNewVideoFrameAndUpdateSystemState();
+			status_t	_FlushOneVideoFrameFromDecoderBuffer();
+			void		_UpdateMediaHeaderForVideoFrame();
+			void		_DeinterlaceAndColorConvertVideoFrame();
 
 
 			media_header		fHeader;
@@ -112,7 +111,7 @@ private:
 			const void*			fChunkBuffer;
 			uint8_t*			fVideoChunkBuffer;
 									// TODO: Remove and use fChunkBuffer again
-									// (with type uint8_t*) once the audio part is
+									// (with type uint8_t*) once the audio path is
 									// responsible for freeing the chunk buffer,
 									// too.
 			int32				fChunkBufferOffset;
