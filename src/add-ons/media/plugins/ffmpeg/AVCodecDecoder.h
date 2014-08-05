@@ -65,7 +65,8 @@ private:
 							// TODO: Remove the "Video" word once
 							// the audio path is responsible for
 							// freeing the chunk buffer, too.
-			status_t	_AddInputBufferPaddingToVideoChunkBuffer();
+			status_t	_CopyChunkToVideoChunkBufferAndAddPadding(
+							const void* chunk, size_t chunkSize);
 							// TODO: Remove the "Video" word once
 							// the audio path is responsible for
 							// freeing the chunk buffer, too.

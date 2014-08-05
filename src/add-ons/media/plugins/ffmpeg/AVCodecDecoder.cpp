@@ -267,6 +267,7 @@ AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 	free(fVideoChunkBuffer);
 		// TODO: Replace with fChunkBuffer, once audio path is
 		// responsible for freeing the chunk buffer, too.
+	fVideoChunkBuffer = NULL;
 	fChunkBuffer = NULL;
 	fChunkBufferOffset = 0;
 	fChunkBufferSize = 0;
@@ -854,14 +855,9 @@ AVCodecDecoder::_LoadNextVideoChunkIfNeededAndUpdateStartTime()
 	if (getNextChunkStatus != B_OK)
 		return getNextChunkStatus;
 
-	fChunkBufferSize = chunkBufferSize;
-
-	free(fVideoChunkBuffer);
-		// Free any previously used chunk buffer first
-	fVideoChunkBuffer
-		= static_cast<uint8_t*>(const_cast<void*>(chunkBuffer));
 	status_t chunkBufferPaddingStatus
-		= _AddInputBufferPaddingToVideoChunkBuffer();
+		= _CopyChunkToVideoChunkBufferAndAddPadding(chunkBuffer,
+		chunkBufferSize);
 	if (chunkBufferPaddingStatus != B_OK)
 		return chunkBufferPaddingStatus;
 
@@ -906,34 +902,50 @@ AVCodecDecoder::_LoadNextVideoChunkIfNeededAndUpdateStartTime()
 }
 
 
-/*! \brief Adds a "safety net" of additional memory to fVideoChunkBuffer as
-		required by FFMPEG for input buffers to video decoders.
+/*! \brief Copies a chunk into fVideoChunkBuffer and adds a "safety net" of
+		additional memory as required by FFMPEG for input buffers to video
+		decoders.
 
 	This is needed so that some decoders can read safely a predefined number of
 	bytes at a time for performance optimization purposes.
 
-	The additonal memory has a size of FF_INPUT_BUFFER_PADDING_SIZE as defined
+	The additional memory has a size of FF_INPUT_BUFFER_PADDING_SIZE as defined
 	in avcodec.h.
 
+	Ownership of fVideoChunkBuffer memory is with the class so it needs to be
+	freed at the right times (on destruction, on seeking).
+
+	Also update fChunkBufferSize to reflect the size of the contained video
+	data (leaving out the padding).
+	
+	\param chunk The chunk to copy.
+	\param chunkSize Size of the chunk in bytes
+
 	\returns B_OK Padding was successful. You are responsible for releasing the
-		allocated memory.
-	\returns B_NO_MEMORY Padding failed. The memory in fVideoChunkBuffer is not
-		freed. NULL is assigned to fVideoChunkBuffer.
+		allocated memory. fChunkBufferSize is set to chunkSize.
+	\returns B_NO_MEMORY Padding failed.
+		fVideoChunkBuffer is set to NULL making it safe to call free() on it.
+		fChunkBufferSize is set to 0 to reflect the size of fVideoChunkBuffer.
 */
 status_t
-AVCodecDecoder::_AddInputBufferPaddingToVideoChunkBuffer()
+AVCodecDecoder::_CopyChunkToVideoChunkBufferAndAddPadding(const void* chunk,
+	size_t chunkSize)
 {
 	// TODO: Rename fVideoChunkBuffer to fChunkBuffer, once the audio path is
 	// responsible for releasing the chunk buffer, too.
-	fVideoChunkBuffer
-		= static_cast<uint8_t*>(realloc(static_cast<void*>(fVideoChunkBuffer),
-			fChunkBufferSize + FF_INPUT_BUFFER_PADDING_SIZE));
-	if (fVideoChunkBuffer == NULL)
-		return B_NO_MEMORY;
 
-	memset(fVideoChunkBuffer + fChunkBufferSize, 0,
-		FF_INPUT_BUFFER_PADDING_SIZE);
+	fVideoChunkBuffer = static_cast<uint8_t*>(realloc(fVideoChunkBuffer,
+		chunkSize + FF_INPUT_BUFFER_PADDING_SIZE));
+	if (fVideoChunkBuffer == NULL) {
+		fChunkBufferSize = 0;
+		return B_NO_MEMORY;
+	}
+
+	memcpy(fVideoChunkBuffer, chunk, chunkSize);
+	memset(fVideoChunkBuffer + chunkSize, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 		// Establish safety net, by zero'ing the padding area.
+
+	fChunkBufferSize = chunkSize;
 
 	return B_OK;
 }
