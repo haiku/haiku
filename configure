@@ -760,6 +760,18 @@ if [ $HOST_PLATFORM = "darwin" ]; then
 	HOST_EXTENDED_REGEX_SED="sed -E"
 fi
 
+# check if nasm can actually output ELF files
+# (the stock version in OSX can't)
+# XXX: should probably only test for x86* arch
+if [ "$("$HAIKU_NASM" -hf | grep -c ELF'[36][24]\s')" -ne "2" ]; then
+	echo "$HAIKU_NASM cannot generate ELF files. Please install a working version."
+	if [ $HOST_PLATFORM = "darwin" ]; then
+		echo "You can install it from Mac Ports."
+		echo "Mac Ports is available at: http://www.macports.org/"
+	fi
+	exit 1
+fi
+
 # create output directory
 mkdir -p "$buildOutputDir" || exit 1
 
