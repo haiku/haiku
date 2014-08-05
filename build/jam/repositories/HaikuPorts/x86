@@ -148,7 +148,7 @@ RemotePackageRepository HaikuPorts
 	sqlite_devel-3.8.4.3-1
 	subversion-1.6.18-6
 	subversion_devel-1.6.18-6
-	tar-1.26-6
+	tar-1.27.1-2
 	texinfo-4.13a-7
 	tiff-3.9.6-2
 	tiff_devel-3.9.6-2
