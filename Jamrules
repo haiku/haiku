@@ -1,5 +1,10 @@
 # Haiku Jamrules
 
+# Make sure we have an absolute HAIKU_TOP
+if $(HAIKU_TOP) = "." {
+	HAIKU_TOP = $(PWD) ;
+}
+
 # Main directories used by the build.
 HAIKU_OUTPUT_DIR					?= [ FDirName $(HAIKU_TOP) generated ] ;
 HAIKU_BUILD_OUTPUT_DIR				?= [ FDirName $(HAIKU_OUTPUT_DIR) build ] ;
