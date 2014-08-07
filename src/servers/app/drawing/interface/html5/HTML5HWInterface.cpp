@@ -64,6 +64,9 @@ HTML5HWInterface::HTML5HWInterface(const char* target)
 	fDisplayMode.virtual_width = 640;
 	fDisplayMode.virtual_height = 480;
 	fDisplayMode.space = B_RGB32;
+	fDisplayMode.h_display_start = 0;
+	fDisplayMode.v_display_start = 0;
+	fDisplayMode.flags = 0;
 
 	//TODO: Cleanup; parse host ??
 	fRemoteHost = strdup(fTarget);
