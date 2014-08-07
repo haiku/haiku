@@ -83,6 +83,7 @@ print_descriptor_chain(ehci_qtd *descriptor)
 	}
 }
 
+
 void
 print_queue(ehci_qh *queueHead)
 {
@@ -99,6 +100,7 @@ print_queue(ehci_qh *queueHead)
 		queueHead->overlay.buffer_phy[4]);
 	print_descriptor_chain(queueHead->element_log);
 }
+
 
 #endif // TRACE_USB
 
@@ -500,8 +502,8 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		for (uint32 insertIndex = interval / 2;
 			insertIndex < EHCI_VFRAMELIST_ENTRIES_COUNT;
 			insertIndex += interval) {
-			fSitdEntries[insertIndex]->next_phy =
-				fInterruptEntries[intervalIndex].queue_head.this_phy;
+			fSitdEntries[insertIndex]->next_phy
+				= fInterruptEntries[intervalIndex].queue_head.this_phy;
 		}
 
 		intervalIndex--;
@@ -523,8 +525,8 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	firstLogical->prev_log = NULL;
 
 	for (int32 i = 0; i < EHCI_FRAMELIST_ENTRIES_COUNT; i++) {
-		fPeriodicFrameList[i] =
-			fItdEntries[i & (EHCI_VFRAMELIST_ENTRIES_COUNT - 1)]->this_phy;
+		fPeriodicFrameList[i]
+			= fItdEntries[i & (EHCI_VFRAMELIST_ENTRIES_COUNT - 1)]->this_phy;
 		TRACE("periodic entry %" B_PRId32 " linked to 0x%" B_PRIx32 "\n", i,
 			fPeriodicFrameList[i]);
 	}
@@ -860,7 +862,8 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 				| (length << EHCI_ITD_TLENGTH_SHIFT) | (pg << EHCI_ITD_PG_SHIFT)
 				| (offset << EHCI_ITD_TOFFSET_SHIFT);
 			itd->last_token = i;
-			TRACE("isochronous filled slot %" B_PRId32 " 0x%" B_PRIx32 "\n", i, itd->token[i]);
+			TRACE("isochronous filled slot %" B_PRId32 " 0x%" B_PRIx32 "\n", i,
+				itd->token[i]);
 			dataLength -= length;
 			offset += length;
 			if (dataLength > 0 && offset > 0xfff) {
@@ -875,13 +878,15 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 
 		currentPhy += (offset & 0xfff) - (currentPhy & 0xfff);
 
-		itd->buffer_phy[0] |= (pipe->EndpointAddress() << EHCI_ITD_ENDPOINT_SHIFT)
-			| (pipe->DeviceAddress() << EHCI_ITD_ADDRESS_SHIFT);
-		itd->buffer_phy[1] |= (pipe->MaxPacketSize() & EHCI_ITD_MAXPACKETSIZE_MASK)
-			| (directionIn << EHCI_ITD_DIR_SHIFT);
-		itd->buffer_phy[2] |=
-			((((pipe->MaxPacketSize() >> EHCI_ITD_MAXPACKETSIZE_LENGTH) + 1)
-			& EHCI_ITD_MUL_MASK) << EHCI_ITD_MUL_SHIFT);
+		itd->buffer_phy[0]
+			|= (pipe->EndpointAddress() << EHCI_ITD_ENDPOINT_SHIFT)
+				| (pipe->DeviceAddress() << EHCI_ITD_ADDRESS_SHIFT);
+		itd->buffer_phy[1]
+			|= (pipe->MaxPacketSize() & EHCI_ITD_MAXPACKETSIZE_MASK)
+				| (directionIn << EHCI_ITD_DIR_SHIFT);
+		itd->buffer_phy[2]
+			|= ((((pipe->MaxPacketSize() >> EHCI_ITD_MAXPACKETSIZE_LENGTH) + 1)
+				& EHCI_ITD_MUL_MASK) << EHCI_ITD_MUL_SHIFT);
 
 		TRACE("isochronous filled itd buffer_phy[0,1,2] 0x%" B_PRIx32 ", 0x%"
 			B_PRIx32 " 0x%" B_PRIx32 "\n",
@@ -915,7 +920,8 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 	fNextStartingFrame = currentFrame + 1;
 
 	// Wake up the isochronous finisher thread
-	release_sem_etc(fFinishIsochronousTransfersSem, 1 /*frameCount*/, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(fFinishIsochronousTransfersSem, 1 /*frameCount*/,
+		B_DO_NOT_RESCHEDULE);
 
 	return B_OK;
 }
@@ -972,7 +978,8 @@ EHCI::AddTo(Stack *stack)
 #endif
 
 	if (!sPCIModule) {
-		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
+		status_t status = get_module(B_PCI_MODULE_NAME,
+			(module_info **)&sPCIModule);
 		if (status < B_OK) {
 			TRACE_MODULE_ERROR("getting pci module failed! 0x%08" B_PRIx32
 				"\n", status);
@@ -1002,7 +1009,8 @@ EHCI::AddTo(Stack *stack)
 			&& item->class_api == PCI_usb_ehci) {
 			if (item->u.h0.interrupt_line == 0
 				|| item->u.h0.interrupt_line == 0xFF) {
-				TRACE_MODULE_ERROR("found device with invalid IRQ - check IRQ assignement\n");
+				TRACE_MODULE_ERROR("found device with invalid IRQ - "
+					"check IRQ assignement\n");
 				continue;
 			}
 
@@ -1264,7 +1272,8 @@ EHCI::Interrupt()
 	uint32 status = ReadOpReg(EHCI_USBSTS) & EHCI_USBSTS_INTMASK;
 	if ((status & fEnabledInterrupts) == 0) {
 		if (status != 0) {
-			TRACE("discarding not enabled interrupts 0x%08" B_PRIx32 "\n", status);
+			TRACE("discarding not enabled interrupts 0x%08" B_PRIx32 "\n",
+				status);
 			WriteOpReg(EHCI_USBSTS, status);
 		}
 
@@ -1634,16 +1643,16 @@ EHCI::FinishTransfers()
 					break;
 				}
 
-				if (((status>>EHCI_QTD_PID_SHIFT) & EHCI_QTD_PID_MASK)
-						== EHCI_QTD_PID_IN 
-					&& ((status>>EHCI_QTD_BYTES_SHIFT) & EHCI_QTD_BYTES_MASK)
+				if (((status >> EHCI_QTD_PID_SHIFT) & EHCI_QTD_PID_MASK)
+						== EHCI_QTD_PID_IN
+					&& ((status >> EHCI_QTD_BYTES_SHIFT) & EHCI_QTD_BYTES_MASK)
 						!=0) {
 					// a short packet condition existed on this descriptor
 					if (transfer->transfer->TransferPipe()->Type()
-						& USB_OBJECT_CONTROL_PIPE) {
+						& USB_OBJECT_CONTROL_PIPE != 0) {
 						// for control pipes, the next descriptor
 						// executed is the Status descriptor
-						while(!(descriptor->next_phy & EHCI_ITEM_TERMINATE)) {
+						while (!(descriptor->next_phy & EHCI_ITEM_TERMINATE)) {
 							descriptor = descriptor->next_log;
 						}
 						continue;
@@ -1653,7 +1662,7 @@ EHCI::FinishTransfers()
 					transferDone = true;
 					break;
 				}
-				
+
 				descriptor = descriptor->next_log;
 			}
 
@@ -1796,8 +1805,8 @@ EHCI::Cleanup()
 int32
 EHCI::FinishIsochronousThread(void *data)
 {
-       ((EHCI *)data)->FinishIsochronousTransfers();
-       return B_OK;
+	((EHCI *)data)->FinishIsochronousTransfers();
+	return B_OK;
 }
 
 
@@ -1805,9 +1814,9 @@ void
 EHCI::FinishIsochronousTransfers()
 {
 	/* This thread stays one position behind the controller and processes every
-	 * isochronous descriptor. Once it finds the last isochronous descriptor
-	 * of a transfer, it processes the entire transfer.
-	 */
+	* isochronous descriptor. Once it finds the last isochronous descriptor
+	* of a transfer, it processes the entire transfer.
+	*/
 	while (!fStopThreads) {
 		// Go to sleep if there are not isochronous transfer to process
 		if (acquire_sem(fFinishIsochronousTransfersSem) < B_OK)
@@ -2423,6 +2432,7 @@ EHCI::LinkSITDescriptors(ehci_sitd *sitd, ehci_sitd **_last)
 	*_last = sitd;
 }
 
+
 void
 EHCI::UnlinkITDescriptors(ehci_itd *itd, ehci_itd **last)
 {
@@ -2621,8 +2631,8 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 				& EHCI_ITD_STATUS_MASK) != 0) {
 				bufferSize = 0;
 			}
-			isochronousData->packet_descriptors[packet].actual_length =
-				bufferSize;
+			isochronousData->packet_descriptors[packet].actual_length
+				= bufferSize;
 
 			if (bufferSize > 0)
 				isochronousData->packet_descriptors[packet].status = B_OK;
