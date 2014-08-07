@@ -36,7 +36,7 @@ All rights reserved.
 
 #include "TeamMenu.h"
 
-#include <string.h>
+#include <strings.h>
 
 #include <Application.h>
 #include <Debug.h>

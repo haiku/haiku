@@ -32,6 +32,7 @@
 #include <String.h>
 
 #include <stdio.h>
+#include <strings.h>
 
 #include "SystemKeymap.h"
 	// this is an automatically generated file

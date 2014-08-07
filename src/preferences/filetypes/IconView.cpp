@@ -8,7 +8,7 @@
 
 #include <new>
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>
 
 #include <Application.h>
 #include <AppFileInfo.h>

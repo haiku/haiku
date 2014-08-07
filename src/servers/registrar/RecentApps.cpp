@@ -24,7 +24,7 @@
 #include <Roster.h>
 #include <storage_support.h>
 
-#include <string.h>
+#include <strings.h>
 
 #include "Debug.h"
 

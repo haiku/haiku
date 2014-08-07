@@ -26,7 +26,7 @@
 #include <safemode_defs.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>
 #include <sys/ioctl.h>
 #include <syscalls.h>
 #include <syslog.h>

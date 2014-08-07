@@ -1,4 +1,5 @@
 #include <string.h>
+#include <strings.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include "character_sets.h"

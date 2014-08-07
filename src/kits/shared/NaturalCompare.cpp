@@ -11,6 +11,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <strings.h>
 
 #include <StorageDefs.h>
 #include <SupportDefs.h>

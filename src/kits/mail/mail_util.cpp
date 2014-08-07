@@ -7,7 +7,7 @@
 #include <mail_util.h>
 
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>
 #include <stdio.h>
 #define __USE_GNU
 #include <regex.h>

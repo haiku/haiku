@@ -6,6 +6,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <strings.h>
 
 #include <SupportDefs.h>
 

@@ -35,13 +35,13 @@ of their respective holders. All rights reserved.
 
 #include "MailWindow.h"
 
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include <strings.h>
 #include <sys/stat.h>
 #include <sys/utsname.h>
+#include <unistd.h>
 
 #include <Autolock.h>
 #include <Clipboard.h>

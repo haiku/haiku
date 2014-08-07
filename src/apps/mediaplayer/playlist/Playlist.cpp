@@ -26,6 +26,7 @@
 #include <debugger.h>
 #include <new>
 #include <stdio.h>
+#include <strings.h>
 
 #include <AppFileInfo.h>
 #include <Application.h>

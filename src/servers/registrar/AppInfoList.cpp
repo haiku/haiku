@@ -26,7 +26,7 @@
 
 #include <algorithm>
 
-#include <string.h>
+#include <strings.h>
 
 #include "AppInfoList.h"
 #include "RosterAppInfo.h"

@@ -10,6 +10,8 @@
 #include <Bitmap.h>
 #include <MessageRunner.h>
 
+#include <strings.h>
+
 
 // TODO: lazy type collecting (super types only at startup)
 

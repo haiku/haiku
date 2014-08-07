@@ -3,11 +3,15 @@
  * (c) 2002, Carlos Hasan, for OpenBeOS.
  */
 
-#include <string.h>
-#include <app/Application.h>
-#include <interface/InterfaceDefs.h>
 
-int main(int argc, char *argv[])
+#include <strings.h>
+
+#include <Application.h>
+#include <InterfaceDefs.h>
+
+
+int
+main(int argc, char *argv[])
 {
 	BApplication app("application/x-vnd.Haiku-ffm");
 	bool follow;
@@ -17,8 +21,7 @@ int main(int argc, char *argv[])
 			follow = true;
 		else
 			follow = false;
-	}
-	else {
+	} else {
 		follow = true;
 	}
 

@@ -5,12 +5,14 @@
  * Authors:
  *	JiSheng Zhang
  */
-
 #ifndef _FW_GLUE_H
 #define _FW_GLUE_H
 
-#include <stdint.h>
+
 #include <dpc.h>
+#include <stdint.h>
+#include <strings.h>
+
 
 #define device_printf(dev, a...) dprintf("firewire:" a)
 #define printf(a...) dprintf(a)

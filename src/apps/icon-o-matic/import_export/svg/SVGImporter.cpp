@@ -8,6 +8,8 @@
 
 #include "SVGImporter.h"
 
+#include <strings.h>
+
 #include <Alert.h>
 #include <Catalog.h>
 #include <Entry.h>

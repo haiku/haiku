@@ -8,6 +8,7 @@
 
 #include <new>
 #include <string.h>
+#include <strings.h>
 
 #include <Message.h>
 

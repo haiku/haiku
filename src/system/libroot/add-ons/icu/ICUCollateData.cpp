@@ -7,6 +7,7 @@
 #include "ICUCollateData.h"
 
 #include <string.h>
+#include <strings.h>
 #include <wchar.h>
 
 #include <unicode/unistr.h>

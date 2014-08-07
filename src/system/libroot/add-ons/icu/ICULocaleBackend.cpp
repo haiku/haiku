@@ -11,6 +11,7 @@
 #include <langinfo.h>
 #include <locale.h>
 #include <string.h>
+#include <strings.h>
 
 #include <ErrnoMaintainer.h>
 

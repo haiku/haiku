@@ -36,7 +36,7 @@ All rights reserved.
 
 #include "ExpandoMenuBar.h"
 
-#include <string.h>
+#include <strings.h>
 
 #include <Autolock.h>
 #include <Bitmap.h>

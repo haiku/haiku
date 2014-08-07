@@ -39,7 +39,7 @@ All rights reserved.
 #include <fs_info.h>
 #include <image.h>
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>
 #include <sys/resource.h>
 #include <unistd.h>
 

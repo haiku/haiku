@@ -37,7 +37,7 @@ All rights reserved.
 
 #include <ctype.h>
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>
 
 #include <fs_attr.h>
 #include <parsedate.h>

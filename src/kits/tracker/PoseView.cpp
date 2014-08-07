@@ -43,7 +43,7 @@ All rights reserved.
 #include <float.h>
 #include <map>
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>
 
 #include <compat/sys/stat.h>
 

@@ -9,7 +9,7 @@
 #include <Mime.h>
 
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>
 #include <unistd.h>
 
 class _EXPORT BMIMEMultipartMailContainer;

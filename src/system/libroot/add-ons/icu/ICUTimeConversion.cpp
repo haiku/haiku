@@ -7,6 +7,7 @@
 #include "ICUTimeConversion.h"
 
 #include <math.h>
+#include <string.h>
 #include <strings.h>
 
 #include <unicode/gregocal.h>

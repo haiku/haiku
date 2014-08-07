@@ -7,6 +7,7 @@
 #include "table/TableColumns.h"
 
 #include <stdio.h>
+#include <strings.h>
 
 #include "util/TimeUtils.h"
 

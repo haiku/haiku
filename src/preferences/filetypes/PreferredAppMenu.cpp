@@ -18,7 +18,7 @@
 #include <String.h>
 
 #include <stdio.h>
-#include <string.h>
+#include <strings.h>
 
 
 #undef B_TRANSLATION_CONTEXT

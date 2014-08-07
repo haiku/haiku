@@ -42,7 +42,7 @@ All rights reserved.
 #include "Model.h"
 
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>
 
 #include <fs_info.h>
 #include <fs_attr.h>

@@ -12,6 +12,7 @@
 
 #include <ctype.h>
 #include <stdio.h>
+#include <strings.h>
 
 #include <Application.h>
 #include <Catalog.h>

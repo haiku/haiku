@@ -20,7 +20,7 @@
 #include <String.h>
 #include <TextControl.h>
 
-#include <string.h>
+#include <strings.h>
 
 
 #undef B_TRANSLATION_CONTEXT

@@ -69,7 +69,7 @@ All rights reserved.
 #include <fs_attr.h>
 #include <parsedate.h>
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>
 #include <utility>
 
 #include "Attributes.h"

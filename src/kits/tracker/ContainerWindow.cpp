@@ -59,7 +59,7 @@ All rights reserved.
 
 #include <fs_attr.h>
 #include <image.h>
-#include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 
 #include <algorithm>

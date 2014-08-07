@@ -11,6 +11,7 @@
 
 #include <set>
 #include <string>
+#include <strings.h>
 
 #include <Alert.h>
 #include <Autolock.h>

@@ -9,6 +9,8 @@
 #include "pci.h"
 #include "pci_private.h"
 
+#include <strings.h>
+
 #include <arch/x86/msi.h>
 #include <debug.h>
 

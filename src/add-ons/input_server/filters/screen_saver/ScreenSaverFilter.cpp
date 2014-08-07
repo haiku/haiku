@@ -22,6 +22,7 @@
 #include <Screen.h>
 
 #include <new>
+#include <strings.h>
 #include <syslog.h>
 
 

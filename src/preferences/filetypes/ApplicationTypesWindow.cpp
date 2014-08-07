@@ -36,6 +36,7 @@
 #include <VolumeRoster.h>
 
 #include <stdio.h>
+#include <strings.h>
 
 
 // TODO: think about adopting Tracker's info window style here (pressable path)

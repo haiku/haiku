@@ -4,6 +4,7 @@
 #include <list>
 #include <algorithm>
 #include <cstring>
+#include <strings.h>
 
 #define stricmp	strcasecmp
 

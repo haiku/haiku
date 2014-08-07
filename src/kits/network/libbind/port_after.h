@@ -20,6 +20,11 @@
 #ifndef port_after_h
 #define port_after_h
 
+#ifdef __HAIKU__
+	#ifdef _STRING_H_
+		#include <strings.h>
+	#endif
+#endif
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>

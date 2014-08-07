@@ -35,8 +35,8 @@ their respective holders. All rights reserved.
 //	NavMenu is a hierarchical menu of volumes, folders, files and queries
 //	displays icons, uses the SlowMenu API for full interruptability
 
-#include <string.h>
 #include <stdlib.h>
+#include <strings.h>
 
 #include "NavMenu.h"
 

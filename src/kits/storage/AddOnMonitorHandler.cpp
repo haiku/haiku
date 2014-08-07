@@ -12,6 +12,7 @@
 #include "AddOnMonitorHandler.h"
 
 #include <string.h>
+#include <strings.h>
 
 #include <Autolock.h>
 #include <Directory.h>

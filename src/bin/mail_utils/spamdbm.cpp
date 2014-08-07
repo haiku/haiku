@@ -467,9 +467,10 @@
 
 /* Standard C Library. */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
+#include <strings.h>
 
 /* Standard C++ library. */
 

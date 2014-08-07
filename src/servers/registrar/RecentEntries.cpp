@@ -17,6 +17,8 @@
 #include <new>
 #include <map>
 
+#include <strings.h>
+
 #include <AppFileInfo.h>
 #include <Entry.h>
 #include <File.h>

@@ -9,6 +9,7 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <strings.h>
 
 class _EXPORT BMailComponent;
 class _EXPORT BTextMailComponent;

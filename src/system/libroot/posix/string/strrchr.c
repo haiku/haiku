@@ -3,8 +3,10 @@
  * Distributed under the terms of the NewOS License.
  */
 
-#include <sys/types.h>
+
 #include <string.h>
+#include <strings.h>
+#include <sys/types.h>
 
 
 char *

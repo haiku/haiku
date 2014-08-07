@@ -7,7 +7,7 @@
 
 #include "VirtioSCSIPrivate.h"
 
-#include <string.h>
+#include <strings.h>
 
 
 VirtioSCSIRequest::VirtioSCSIRequest(bool hasLock)

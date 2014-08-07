@@ -7,6 +7,7 @@
 #include "ICUTimeData.h"
 
 #include <langinfo.h>
+#include <string.h>
 #include <strings.h>
 
 #include <unicode/dtfmtsym.h>

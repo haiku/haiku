@@ -104,6 +104,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <AppKit.h>
 #include <Path.h>
 #include <SupportDefs.h>

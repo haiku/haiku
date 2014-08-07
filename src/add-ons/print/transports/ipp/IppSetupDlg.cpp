@@ -2,6 +2,7 @@
 // Y.Takagi
 
 #include <string.h>
+#include <strings.h>
 
 #include <Button.h>
 #include <Rect.h>

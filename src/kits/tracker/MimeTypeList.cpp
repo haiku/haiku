@@ -34,6 +34,8 @@ All rights reserved.
 
 #include <Mime.h>
 
+#include <strings.h>
+
 #include "AutoLock.h"
 #include "MimeTypeList.h"
 #include "Thread.h"

@@ -13,6 +13,7 @@
 #include "ScreenSaverWindow.h"
 
 #include <stdio.h>
+#include <strings.h>
 
 #include <Alignment.h>
 #include <Application.h>

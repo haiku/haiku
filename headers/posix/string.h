@@ -56,10 +56,6 @@ extern size_t	strxfrm(char *string1, const char *string2, size_t length);
 extern char		*strerror(int errorCode);
 extern int		strerror_r(int errorCode, char *buffer, size_t bufferSize);
 
-/* non-standard string functions */
-extern int		strcasecmp(const char *string1, const char *string2);
-extern int		strncasecmp(const char *string1, const char *string2, size_t length);
-
 extern char		*strcasestr(const char *string, const char *searchString);
 
 extern char		*strdup(const char *string);
@@ -77,15 +73,6 @@ extern char		*strupr(char *string);
 /* extern char		*strsep(char **stringPointer, const char *delimiter); */
 
 extern const char	*strsignal(int signum);
-
-/* legacy compatibility -- might be removed one day */
-#define bcmp(a, b, length) memcmp((a), (b), (length))
-#define bcopy(source, dest, length) memmove((dest), (source), (length))
-#define bzero(buffer, length) memset((buffer), 0, (length))
-
-extern int ffs(int i);
-extern char 		*index(const char *s, int c);
-extern char 		*rindex(char const *s, int c);
 
 #ifdef __cplusplus
 }

@@ -38,7 +38,7 @@ All rights reserved.
 
 #include <malloc.h>
 #include <stdio.h>
-#include <string.h>
+#include <strings.h>
 
 #include <Debug.h>
 #include <Roster.h>

@@ -8,6 +8,7 @@
 
 #include <langinfo.h>
 #include <limits.h>
+#include <string.h>
 #include <strings.h>
 
 

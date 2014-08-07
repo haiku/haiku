@@ -20,12 +20,12 @@
 #include <Messenger.h>
 #include <Path.h>
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/utsname.h>
 #include <ctype.h>
 #include <parsedate.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
+#include <sys/utsname.h>
 
 #include <MailMessage.h>
 #include <MailAttachment.h>

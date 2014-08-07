@@ -13,7 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <strings.h>
 
 #include <String.h>
 #include <Roster.h>

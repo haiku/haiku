@@ -36,9 +36,9 @@ All rights reserved.
 
 #include "Switcher.h"
 
-#include <string.h>
-#include <stdlib.h>
 #include <float.h>
+#include <stdlib.h>
+#include <strings.h>
 
 #include <Bitmap.h>
 #include <Debug.h>
