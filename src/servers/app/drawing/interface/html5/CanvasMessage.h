@@ -7,7 +7,7 @@
  *		François Revol <revol@free.fr>
  */
 #ifndef CANVAS_MESSAGE_H
-#define CANCAS_MESSAGE_H
+#define CANVAS_MESSAGE_H
 
 #include "PatternHandler.h"
 #include <ViewPrivate.h>
