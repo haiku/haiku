@@ -30,6 +30,7 @@ RemotePackageRepository HaikuPorts
 	automake-1.13.1-4
 	beae-1.2-2
 	beam-1.2alpha-1
+	becjk-1.0.1-1
 	belife-1.0.0-2
 	bepdf-1.2.0-1
 	bescreencapture-1.9.4-1
@@ -510,6 +511,7 @@ RemotePackageRepository HaikuPorts
 	avrdude_x86
 	beae
 	beam
+	becjk
 	belife
 	bepdf
 	bescreencapture
