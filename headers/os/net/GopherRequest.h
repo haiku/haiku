@@ -36,7 +36,6 @@ private:
 			char				fItemType;
 			BString				fPath;
 
-			BNetBuffer			fInputBuffer;
 			ssize_t				fPosition;
 
 			BUrlResult			fResult;
