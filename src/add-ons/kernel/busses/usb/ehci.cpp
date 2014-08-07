@@ -700,7 +700,7 @@ EHCI::SubmitTransfer(Transfer *transfer)
 		return fRootHub->ProcessTransfer(this, transfer);
 
 	Pipe *pipe = transfer->TransferPipe();
-	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
+	if ((pipe->Type() & USB_OBJECT_ISO_PIPE) != 0)
 		return SubmitIsochronous(transfer);
 
 	ehci_qh *queueHead = CreateQueueHead();
@@ -718,7 +718,7 @@ EHCI::SubmitTransfer(Transfer *transfer)
 
 	bool directionIn;
 	ehci_qtd *dataDescriptor;
-	if (pipe->Type() & USB_OBJECT_CONTROL_PIPE) {
+	if ((pipe->Type() & USB_OBJECT_CONTROL_PIPE) != 0) {
 		result = FillQueueWithRequest(transfer, queueHead, &dataDescriptor,
 			&directionIn);
 	} else {
@@ -745,7 +745,7 @@ EHCI::SubmitTransfer(Transfer *transfer)
 	print_queue(queueHead);
 #endif
 
-	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE)
+	if ((pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) != 0)
 		result = LinkInterruptQueueHead(queueHead, pipe);
 	else
 		result = LinkQueueHead(queueHead);
@@ -803,7 +803,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 		restSize);
 
 	// Find the entry where to start inserting the first Isochronous descriptor
-	if (isochronousData->flags & USB_ISO_ASAP ||
+	if ((isochronousData->flags & USB_ISO_ASAP) != 0 ||
 		isochronousData->starting_frame_number == NULL) {
 
 		if (fFirstIsochronousTransfer != NULL && fNextStartingFrame != -1)
@@ -1430,7 +1430,7 @@ EHCI::AddPendingIsochronousTransfer(Transfer *transfer, ehci_itd **isoRequest,
 status_t
 EHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
-	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
+	if ((pipe->Type() & USB_OBJECT_ISO_PIPE) != 0)
 		return CancelQueuedIsochronousTransfers(pipe, force);
 
 	if (!Lock())
@@ -1648,8 +1648,8 @@ EHCI::FinishTransfers()
 					&& ((status >> EHCI_QTD_BYTES_SHIFT) & EHCI_QTD_BYTES_MASK)
 						!=0) {
 					// a short packet condition existed on this descriptor
-					if (transfer->transfer->TransferPipe()->Type()
-						& USB_OBJECT_CONTROL_PIPE != 0) {
+					if ((transfer->transfer->TransferPipe()->Type()
+						& USB_OBJECT_CONTROL_PIPE) != 0) {
 						// for control pipes, the next descriptor
 						// executed is the Status descriptor
 						while (!(descriptor->next_phy & EHCI_ITEM_TERMINATE)) {
@@ -1996,7 +1996,7 @@ EHCI::InitQueueHead(ehci_qh *queueHead, Pipe *pipe)
 
 	queueHead->endpoint_caps = (1 << EHCI_QH_CAPS_MULT_SHIFT);
 	if (pipe->Speed() != USB_SPEED_HIGHSPEED) {
-		if (pipe->Type() & USB_OBJECT_CONTROL_PIPE)
+		if ((pipe->Type() & USB_OBJECT_CONTROL_PIPE) != 0)
 			queueHead->endpoint_chars |= EHCI_QH_CHARS_CONTROL;
 
 		queueHead->endpoint_caps |= (pipe->HubPort() << EHCI_QH_CAPS_PORT_SHIFT)
