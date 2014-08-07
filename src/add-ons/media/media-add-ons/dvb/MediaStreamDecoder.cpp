@@ -11,10 +11,6 @@ MediaStreamDecoder::MediaStreamDecoder(get_next_chunk_func next_chunk, void *coo
 status_t
 MediaStreamDecoder::SetInputFormat(const media_format &in_format)
 {
-	status_t err = BMediaDecoder::InitCheck();
-	if (err)
-		return err;
-
 	return BMediaDecoder::SetTo(&in_format);
 }
 
