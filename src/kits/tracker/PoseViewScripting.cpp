@@ -452,8 +452,10 @@ BPoseView::DeleteProperty(BMessage* specifier, int32 form,
 				entryList->AddItem(
 					new entry_ref(*pose->TargetModel()->EntryRef()));
 			}
-		} else
+		} else {
+			delete entryList;
 			return false;
+		}
 
 		if (result == B_OK) {
 			TrackerSettings settings;
@@ -463,6 +465,11 @@ BPoseView::DeleteProperty(BMessage* specifier, int32 form,
 				MoveListToTrash(entryList, false, false);
 			} else
 				Delete(entryList, false, settings.AskBeforeDeleteFile());
+		} else {
+			entry_ref* ref;
+			while (ref = entryList->RemoveItemAt(0))
+				delete ref;
+			delete entryList;
 		}
 
 		handled = true;
