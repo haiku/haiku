@@ -1815,10 +1815,7 @@ DVBMediaNode::raw_video_thread()
 				fOutputRawVideo.format.u.raw_video.pixel_width_aspect,
 				mh.u.raw_video.pixel_width_aspect);
 			printf(" pixel_height_aspect %d => %d\n",
-				fOutputRawVideo.format.u.raw_video.pixel_width_aspect,
-				mh.u.raw_video.pixel_height_aspect);
-			printf(" pixel_height_aspect %d => %d\n",
-				fOutputRawVideo.format.u.raw_video.pixel_width_aspect,
+				fOutputRawVideo.format.u.raw_video.pixel_height_aspect,
 				mh.u.raw_video.pixel_height_aspect);
 			printf(" video_buffer_size %ld => %ld\n", video_buffer_size,
 				mh.size_used);
@@ -1838,7 +1835,7 @@ DVBMediaNode::raw_video_thread()
 				= mh.u.raw_video.bytes_per_row;
 			fOutputRawVideo.format.u.raw_video.pixel_width_aspect
 				= mh.u.raw_video.pixel_width_aspect;
-			fOutputRawVideo.format.u.raw_video.pixel_width_aspect
+			fOutputRawVideo.format.u.raw_video.pixel_height_aspect
 				= mh.u.raw_video.pixel_height_aspect;
 			fOutputRawVideo.format.u.raw_video.last_active
 				= mh.u.raw_video.display_line_count - 1;
