@@ -346,7 +346,10 @@ const struct supported_device {
 	{0x9990, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7920"},
 	{0x9991, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7540"},
 	{0x9992, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7420"},
+#if 0
+	// Known not to work: https://dev.haiku-os.org/ticket/10606
 	{0x9993, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7480"},
+#endif
 	{0x9994, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7400"},
 	{0x9995, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8450"},
 	{0x9996, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8470"},
