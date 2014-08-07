@@ -41,6 +41,7 @@ RemotePackageRepository HaikuPorts
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
 	bzr-2.6.0-1
+	canna-1.0.1-1
 	capitalbe-1.0-2
 	caya-2013.07.31-3
 	cdrtools-3.01~a18-1
@@ -521,6 +522,7 @@ RemotePackageRepository HaikuPorts
 	boost_x86
 	bzip2
 	bzr
+	canna
 	capitalbe
 	caya
 	cdrtools
