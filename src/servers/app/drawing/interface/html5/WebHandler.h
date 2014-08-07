@@ -50,9 +50,6 @@ private:
 		BString					fType;	// MIME
 		BDataIO *				fData;
 		StreamingRingBuffer *	fTarget;
-
-		thread_id				fReceiverThread;
-		bool					fStopThread;
 };
 
 #endif // WEB_HANDLER_H
