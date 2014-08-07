@@ -680,7 +680,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 
 	*outFrameCount = 1;
 	*mediaHeader = fHeader;
-	memcpy(outBuffer, fDecodedData, fDecodedDataSizeInBytes);
+	memcpy(outBuffer, fDecodedData, mediaHeader->size_used);
 
 	fDecodedDataSizeInBytes = 0;
 
@@ -960,8 +960,8 @@ AVCodecDecoder::_CopyChunkToVideoChunkBufferAndAddPadding(const void* chunk,
 void
 AVCodecDecoder::_HandleNewVideoFrameAndUpdateSystemState()
 {
-	_UpdateMediaHeaderForVideoFrame();
 	_DeinterlaceAndColorConvertVideoFrame();
+	_UpdateMediaHeaderForVideoFrame();
 
 	ConvertAVCodecContextToVideoFrameRate(*fContext, fOutputFrameRate);
 
@@ -1023,15 +1023,15 @@ AVCodecDecoder::_FlushOneVideoFrameFromDecoderBuffer()
 		1. We actually got a new picture decoded by the video decoder.
 		2. fHeader wasn't updated for the new picture yet. You MUST call this
 		   method only once per decoded video frame.
-		3. This function MUST be called before
-		   _DeinterlaceAndColorConvertVideoFrame() as the later one relys on an
-		   updated fHeader.
+		3. This function MUST be called after
+		   _DeinterlaceAndColorConvertVideoFrame() as it relys on an updated
+		    fDecodedDataSizeInBytes.
 		4. There will be at maximumn only one decoded video frame in our cache
 		   at any single point in time. Otherwise you couldn't tell to which
 		   cached decoded video frame the properties in fHeader relate to.
 		5. AVCodecContext is still valid for this video frame (This is the case
-		   when this function is called immediately after
-		   avcodec_decode_video2().
+		   when this function is called after avcodec_decode_video2() and
+		   before the next call to avcodec_decode_video2().
 */
 void
 AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
@@ -1040,6 +1040,7 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	fHeader.file_pos = 0;
 	fHeader.orig_size = 0;
 	fHeader.start_time = fRawDecodedPicture->reordered_opaque;
+	fHeader.size_used = fDecodedDataSizeInBytes;
 	fHeader.u.raw_video.display_line_width = fRawDecodedPicture->width;
 	fHeader.u.raw_video.display_line_count = fRawDecodedPicture->height;
 	fHeader.u.raw_video.bytes_per_row
@@ -1071,8 +1072,7 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	converted yet (otherwise this function behaves in unknown manners).
 
 	You should only call this function when you	got a new picture decoded by
-	the video decoder and the fHeader variable was updated accordingly (\see
-	_UpdateMediaHeaderForVideoFrame()).
+	the video decoder..
 
 	When this function finishes the postprocessed video frame will be available
 	in fPostProcessedDecodedPicture and fDecodedData (fDecodedDataSizeInBytes
@@ -1081,8 +1081,8 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 void
 AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 {
-	int displayWidth = fHeader.u.raw_video.display_line_width;
-	int displayHeight = fHeader.u.raw_video.display_line_count;
+	int displayWidth = fRawDecodedPicture->width;
+	int displayHeight = fRawDecodedPicture->height;
 	AVPicture deinterlacedPicture;
 	bool useDeinterlacedPicture = false;
 
