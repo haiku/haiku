@@ -466,9 +466,8 @@ BPoseView::DeleteProperty(BMessage* specifier, int32 form,
 			} else
 				Delete(entryList, false, settings.AskBeforeDeleteFile());
 		} else {
-			entry_ref* ref;
-			while ((ref = entryList->RemoveItemAt(0)) != NULL)
-				delete ref;
+			for (int i = 0; i < entryList->CountItems(); i++)
+				delete entryList->ItemAt(i);
 			delete entryList;
 		}
 
