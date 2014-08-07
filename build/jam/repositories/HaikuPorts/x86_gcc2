@@ -195,6 +195,7 @@ RemotePackageRepository HaikuPorts
 	neon_devel-0.29.6-6
 	netcat-1.10-1
 	netsurf-3.1-1
+	opensound-4.2_git-2
 	openssh-6.0p1-8
 	# sync openssl with secondary architecture (x86)
 	openssl-1.0.0m-2
@@ -656,6 +657,7 @@ RemotePackageRepository HaikuPorts
 	ninja_x86
 	ocp_x86
 	openal_x86
+	opensound
 	openssh
 	openssl
 	openttd_x86
