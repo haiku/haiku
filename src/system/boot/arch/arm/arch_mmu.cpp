@@ -58,6 +58,12 @@ TODO:
 */
 
 
+// 8 MB for the kernel, kernel args, modules, driver settings, ...
+static const size_t kMaxKernelSize = 0x800000;
+
+// Base address for loader
+static const size_t kLoaderBaseAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
+
 /*
 *defines a block in memory
 */
@@ -81,33 +87,39 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		ARM_MMU_L2_FLAG_B,
 	},
 	{
+		"RAM_kernel", // 8MB space for kernel, drivers etc
+		KERNEL_LOAD_BASE,
+		KERNEL_LOAD_BASE + kMaxKernelSize - 1,
+		ARM_MMU_L2_FLAG_C,
+	},
+	{
 		"RAM_loader", // 1MB loader
-		SDRAM_BASE + 0,
-		SDRAM_BASE + 0x0fffff,
+		kLoaderBaseAddress + 0,
+		kLoaderBaseAddress + 0x0fffff,
 		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_pt", // Page Table 1MB
-		SDRAM_BASE + 0x100000,
-		SDRAM_BASE + 0x1FFFFF,
+		kLoaderBaseAddress + 0x100000,
+		kLoaderBaseAddress + 0x1FFFFF,
 		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_free", // 16MB free RAM (more but we don't map it automaticaly)
-		SDRAM_BASE + 0x0200000,
-		SDRAM_BASE + 0x11FFFFF,
+		kLoaderBaseAddress + 0x0200000,
+		kLoaderBaseAddress + 0x11FFFFF,
 		ARM_MMU_L2_FLAG_C,
 	},
 	{
 		"RAM_stack", // stack
-		SDRAM_BASE + 0x1200000,
-		SDRAM_BASE + 0x2000000,
+		HAIKU_BOARD_LOADER_STACK_BASE,
+		HAIKU_BOARD_LOADER_STACK_BASE + 0xe00000,
 		ARM_MMU_L2_FLAG_C,
 	},
 	{
-		"RAM_initrd", // stack
-		SDRAM_BASE + 0x2000000,
-		SDRAM_BASE + 0x2500000,
+		"RAM_initrd", // initrd
+		HAIKU_BOARD_LOADER_UIBASE,
+		HAIKU_BOARD_LOADER_UIBASE + 0x500000,
 		ARM_MMU_L2_FLAG_C,
 	},
 
@@ -124,10 +136,9 @@ static struct memblock LOADER_MEMORYMAP[] = {
 
 //static const uint32 kDefaultPageTableFlags = MMU_FLAG_READWRITE;
 	// not cached not buffered, R/W
-static const size_t kMaxKernelSize = 0x200000;		// 2 MB for the kernel
 
 static addr_t sNextPhysicalAddress = 0; //will be set by mmu_init
-static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
+static addr_t sNextVirtualAddress = LOADER_MEMORYMAP[4].start;
 
 static addr_t sNextPageTableAddress = 0;
 //the page directory is in front of the pagetable

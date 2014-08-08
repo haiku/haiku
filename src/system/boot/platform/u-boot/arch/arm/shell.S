@@ -62,7 +62,7 @@ SYMBOL(_start_common):
 
 
 
-	ldr	sp,=SDRAM_BASE + 0x2000000
+	ldr	sp,=SDRAM_BASE + KSTACK_TOP
 	ldrb	r4,gUBootOS
 	cmp	r4,#0
 	beq	start_raw
