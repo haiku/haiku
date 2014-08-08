@@ -145,7 +145,7 @@ bool
 arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 	uint32 protection)
 {
-	if(!gARMPagingMethod)
+	if (!gARMPagingMethod)
 		return true;
 
 	return gARMPagingMethod->IsKernelPageAccessible(virtualAddress, protection);
