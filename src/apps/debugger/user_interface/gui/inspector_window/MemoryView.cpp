@@ -624,7 +624,7 @@ MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
 		}
 		case HexMode64BitInt:
 		{
-			uint64 data = *((const uint16*)address);
+			uint64 data = *((const uint64*)address);
 			switch(fCurrentEndianMode)
 			{
 				case EndianModeBigEndian:
