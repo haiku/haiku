@@ -180,7 +180,6 @@ int iterate_double(double a, double b)
 	double	y;
 	double	xsq;
 	double	ysq;
-	double	ctwo = 2.0, cfour = 4.0;
 	int		i = 0, iter = niter;
 
 	x = 0.0;
@@ -189,11 +188,11 @@ int iterate_double(double a, double b)
 	while (i < iter) {
 		xsq = x * x;
 		ysq = y * y;
-		y = (ctwo * x * y) + b;
+		y = (2.0 * x * y) + b;
 		i++;
 		x = a + (xsq - ysq);
 	
-		if ((xsq + ysq) > cfour)
+		if ((xsq + ysq) > 4.0)
 			return(i);
 	}
 	return(i);
@@ -209,10 +208,6 @@ int iterate_float(float a, float b)
 	float	y;
 	float	xsq;
 	float	ysq;
-// These are variables, because the metaware compiler would reload the
-// constants from memory each time through the loop rather than leave them
-// in registers.  Lovely.
-	float	ctwo = 2.0, cfour = 4.0;
 	long	i;
 	int		iter = niter;
 
@@ -223,11 +218,11 @@ int iterate_float(float a, float b)
 	while (i < iter) {
 		xsq = x * x;
 		ysq = y * y;
-		y = (ctwo * x * y) + b;
+		y = (2.0f * x * y) + b;
 		i++;
 		x = a + (xsq - ysq);
 	
-		if ((xsq + ysq) > cfour)
+		if ((xsq + ysq) > 4.0f)
 			return(i);
 	}
 	return(i);
@@ -359,7 +354,7 @@ void	TShowBit::mandb(double vx, double vy, double sx, double sy)
 				v == pc[x12-2][y12]) {
 				for (x = bx; x < (bx+12); x++) {
 					cx += sx;
-					*b0++ = palette[v];
+					*b0++ = palette[v & 0xff];
 				}
 			}
 			else {
@@ -367,14 +362,14 @@ void	TShowBit::mandb(double vx, double vy, double sx, double sy)
 					for (x = bx; x < (bx+12); x++) {
 						cx += sx;
 						v = iterate_double(cx, cy);
-						*b0++ = palette[v];
+						*b0++ = palette[v & 0xff];
 					}
 				}
 				else
 				for (x = bx; x < (bx+12); x++) {
 					cx += sx;
 					v = iterate_float(cx, cy);
-					*b0++ = palette[v];
+					*b0++ = palette[v & 0xff];
 				}
 			}
 		}
@@ -421,7 +416,7 @@ void	TShowBit::manda(double vx, double vy, double sx, double sy)
 				v == pc[x12-2][y12]) {
 				for (x = bx; x < (bx+12); x++) {
 					cx += sx;
-					*b0++ = palette[v];
+					*b0++ = palette[v & 0xff];
 				}
 			}
 			else {
@@ -429,14 +424,14 @@ void	TShowBit::manda(double vx, double vy, double sx, double sy)
 					for (x = bx; x < (bx+12); x++) {
 						cx += sx;
 						v = iterate_double(cx, cy);
-						*b0++ = palette[v];
+						*b0++ = palette[v & 0xff];
 					}
 				}
 				else
 				for (x = bx; x < (bx+12); x++) {
 					cx += sx;
 					v = iterate_float(cx, cy);
-					*b0++ = palette[v];
+					*b0++ = palette[v & 0xff];
 				}
 			}
 		}
