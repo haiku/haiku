@@ -17,7 +17,6 @@
 #include <heap.h>
 #include <util/DoublyLinkedList.h>
 #include <util/KernelReferenceable.h>
-#include <sys/ucontext.h>
 
 
 namespace BKernel {

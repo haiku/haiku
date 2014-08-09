@@ -25,7 +25,6 @@
 #include <util/DoublyLinkedList.h>
 #include <util/KernelReferenceable.h>
 #include <util/list.h>
-#include <sys/ucontext.h>
 
 
 enum additional_thread_state {
