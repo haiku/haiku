@@ -24,7 +24,6 @@
 #include <StringList.h>
 
 /*
- * TODO: fix for URLs without path like gopher://gophernicus.org
  * TODO: fix '+' in selectors, cf. gopher://gophernicus.org/1/doc/gopher/
  * TODO: add proper favicon
  * TODO: add proper dir and document icons
