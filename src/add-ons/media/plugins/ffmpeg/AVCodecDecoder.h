@@ -61,7 +61,7 @@ private:
 							media_header* mediaHeader,
 							media_decode_info* info);
 			status_t	_DecodeNextVideoFrame();
-			status_t	_LoadNextVideoChunkIfNeededAndUpdateStartTime();
+			status_t	_LoadNextVideoChunkIfNeededAndAssignStartTime();
 							// TODO: Remove the "Video" word once
 							// the audio path is responsible for
 							// freeing the chunk buffer, too.

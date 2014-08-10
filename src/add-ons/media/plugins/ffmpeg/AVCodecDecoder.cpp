@@ -741,7 +741,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 
 	while (true) {
 		status_t loadingChunkStatus
-			= _LoadNextVideoChunkIfNeededAndUpdateStartTime();
+			= _LoadNextVideoChunkIfNeededAndAssignStartTime();
 
 		if (loadingChunkStatus == B_LAST_BUFFER_ERROR)
 			return _FlushOneVideoFrameFromDecoderBuffer();
@@ -822,21 +822,21 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 }
 
 
-/*! \brief Loads the next video chunk into fVideoChunkBuffer and assigns it to
-		fTempPacket accordingly only if fTempPacket is empty. Updates fContext
-		with the start time of the new data chunk.
+/*! \brief Loads the next video chunk into fVideoChunkBuffer and assigns it
+		(including the start time) to fTempPacket accordingly only if
+		fTempPacket is empty.
 
 	\returns B_OK
-		1. meaning: Next video chunk is loaded and fContext is updated.
-		2. meaning: No need to load and update anything. Proceed as usual.
+		1. meaning: Next video chunk is loaded.
+		2. meaning: No need to load and assign anything. Proceed as usual.
 	\returns B_LAST_BUFFER_ERROR No more video chunks available.
-		fVideoChunkBuffer, fTempPacket and fContext are left untouched.
-	\returns Other errors Caller should bail out because fVideoChunkBuffer,
-		fTempPacket and fContext are in unknown states. Normal operation cannot
-		be guaranteed.
+		fVideoChunkBuffer and fTempPacket are left untouched.
+	\returns Other errors Caller should bail out because fVideoChunkBuffer and
+		fTempPacket are in unknown states. Normal operation cannot be
+		guaranteed.
 */
 status_t
-AVCodecDecoder::_LoadNextVideoChunkIfNeededAndUpdateStartTime()
+AVCodecDecoder::_LoadNextVideoChunkIfNeededAndAssignStartTime()
 {
 	// TODO: Rename fVideoChunkBuffer to fChunkBuffer, once the audio path is
 	// responsible for releasing the chunk buffer, too.
@@ -863,16 +863,11 @@ AVCodecDecoder::_LoadNextVideoChunkIfNeededAndUpdateStartTime()
 
 	fTempPacket.data = fVideoChunkBuffer;
 	fTempPacket.size = fChunkBufferSize;
-
-	fContext->reordered_opaque = chunkMediaHeader.start_time;
-		// Let FFMPEG handle the relationship between start_time and
-		// decoded video frame.
-		//
-		// Explanation:
-		// The received chunk buffer may not contain the next video
-		// frame to be decoded, due to frame reordering (e.g. MPEG1/2
-		// provides encoded video frames in a different order than the
-		// decoded video frame).
+	fTempPacket.dts = chunkMediaHeader.start_time;
+		// Let FFMPEG handle the correct relationship between start_time and
+		// decoded video frame. By doing so we are simply copying the way how
+		// it is implemented in ffplay.c
+		// \see http://git.videolan.org/?p=ffmpeg.git;a=blob;f=ffplay.c;h=09623db374e5289ed20b7cc28c262c4375a8b2e4;hb=9153b33a742c4e2a85ff6230aea0e75f5a8b26c2#l1502
 		//
 		// FIXME: Research how to establish a meaningful relationship
 		// between start_time and decoded video frame when the received
@@ -1039,7 +1034,7 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	fHeader.type = B_MEDIA_RAW_VIDEO;
 	fHeader.file_pos = 0;
 	fHeader.orig_size = 0;
-	fHeader.start_time = fRawDecodedPicture->reordered_opaque;
+	fHeader.start_time = fRawDecodedPicture->pkt_dts;
 	fHeader.size_used = fDecodedDataSizeInBytes;
 	fHeader.u.raw_video.display_line_width = fRawDecodedPicture->width;
 	fHeader.u.raw_video.display_line_count = fRawDecodedPicture->height;
