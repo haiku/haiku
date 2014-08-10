@@ -40,8 +40,9 @@ their respective holders. All rights reserved.
 
 #include <algorithm>
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 
 #include <Application.h>
 #include <Catalog.h>
