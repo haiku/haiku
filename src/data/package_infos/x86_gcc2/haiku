@@ -167,6 +167,7 @@ provides {
 	cmd:zipsplit
 	cmd:zmore
 	cmd:znew
+	lib:libstdc++
 }
 
 requires {
