@@ -250,12 +250,12 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 		if $(destName) {
 			if computeName in $(flags) {
 				nameFunction = $(destName) ;
-				name = $(destName)/$(target:BS) ;
+				name = $(destName)/$(target:BSM) ;
 			} else {
 				name = $(destName) ;
 			}
 		} else {
-			name = $(target:BS) ;
+			name = $(target:BSM) ;
 		}
 
 		local installTarget = $(target) ;
@@ -367,7 +367,7 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 	}
 
 	if ! $(targetDirectoryName) {
-		targetDirectoryName = $(sourceDirectory[1]:BS) ;
+		targetDirectoryName = $(sourceDirectory[1]:BSM) ;
 	}
 
 	# If sourceDirectory is a path, not a target, make it a target, so we can
@@ -495,7 +495,7 @@ rule AddDriversToContainer container : relativeDirectoryTokens : targets
 
 	# add the symlinks
 	local name ;
-	for name in $(targets:BS) {
+	for name in $(targets:BSM) {
 		AddSymlinkToContainer $(container) : $(directoryTokens)
 			: [ FDirName $(linkPrefix) $(name) ] : $(name) ;
 	}
@@ -559,7 +559,7 @@ rule AddBootModuleSymlinksToContainer container : targets
 			installDir = $(installDir[2-]) ;
 		}
 
-		local name = $(target:BS) ;
+		local name = $(target:BSM) ;
 		local linkTarget = [ FDirName ../../.. $(installDir) $(name) ] ;
 
 		AddSymlinkToContainer $(container)
@@ -701,7 +701,7 @@ rule CreateContainerCopyFilesScript container : script
 		for destTarget in $(destTargets) {
 			local target = [ on $(destTarget) return $(TARGET) ] ;
 			local name = $(destTarget:G=) ;
-			if $(name) != $(target:BS) {
+			if $(name) != $(target:BSM) {
 				# use a unique dummy target for this file, on which we
 				# can define the TARGET_DIR variable
 				local dummyTarget = $(script)-dummy-$(dir:G=)-$(target) ;
