@@ -701,18 +701,22 @@ StreamBase::GetNextChunk(const void** chunkBuffer,
 		mediaHeader->destination = -1;
 		mediaHeader->time_source = -1;
 		mediaHeader->size_used = fPacket.size;
-		if (fPacket.pts != kNoPTSValue) {
-//TRACE("  PTS: %lld (time_base.num: %d, .den: %d), stream DTS: %lld\n",
-//fPacket.pts, fStream->time_base.num, fStream->time_base.den,
-//fStream->cur_dts);
-			mediaHeader->start_time = _ConvertFromStreamTimeBase(fPacket.pts);
-		} else {
-//TRACE("  PTS (stream): %lld (time_base.num: %d, .den: %d), stream DTS: %lld\n",
-//lastStreamDTS, fStream->time_base.num, fStream->time_base.den,
-//fStream->cur_dts);
-			mediaHeader->start_time
-				= _ConvertFromStreamTimeBase(lastStreamDTS);
-		}
+
+		// FFmpeg recommends to use the decoding time stamps as primary source
+		// for presentation time stamps, especially for video formats that are
+		// using frame reordering. More over this way it is ensured that the
+		// returned start times are ordered in a monotonically increasing time
+		// series (even for videos that contain B-frames).
+		// \see http://git.videolan.org/?p=ffmpeg.git;a=blob;f=libavformat/avformat.h;h=1e8a6294890d580cd9ebc684eaf4ce57c8413bd8;hb=9153b33a742c4e2a85ff6230aea0e75f5a8b26c2#l1623
+		bigtime_t presentationTimeStamp;
+		if (fPacket.dts != kNoPTSValue)
+			presentationTimeStamp = fPacket.dts;
+		else if (fPacket.pts != kNoPTSValue)
+			presentationTimeStamp = fPacket.pts;
+		else
+			presentationTimeStamp = lastStreamDTS;
+
+		mediaHeader->start_time	= _ConvertFromStreamTimeBase(presentationTimeStamp);
 		mediaHeader->file_pos = fPacket.pos;
 		mediaHeader->data_offset = 0;
 		switch (mediaHeader->type) {
