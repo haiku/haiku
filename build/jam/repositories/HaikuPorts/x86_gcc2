@@ -285,6 +285,8 @@ RemotePackageRepository HaikuPorts
 	zlib_devel-1.2.8-4
 
 	# secondary architecture (x86)
+	arm_none_eabi_binutils_x86-2.24_2014_03_19-5
+	arm_none_eabi_gcc_x86-4.8.2_2014_03_20-1
 	automoc_x86-0.9.88-2
 	avrdude_x86-6.0.1-1
 	beshare_x86-4-1
@@ -506,6 +508,8 @@ RemotePackageRepository HaikuPorts
 	album
 	ale
 	apr
+	arm_none_eabi_binutils_x86
+	arm_none_eabi_gcc_x86
 	asciidoc
 	autoconf
 	automake
