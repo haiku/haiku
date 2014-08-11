@@ -1,10 +1,8 @@
 #include "vterm_internal.h"
 
-#include <stdio.h>
-
 #define UNICODE_INVALID 0xFFFD
 
-#ifdef DEBUG
+#if defined(DEBUG) && DEBUG > 1
 # define DEBUG_PRINT_UTF8
 #endif
 
@@ -37,7 +35,7 @@ static void decode_utf8(VTermEncoding *enc, void *data_,
   printf("BEGIN UTF-8\n");
 #endif
 
-  for( ; *pos < bytelen; (*pos)++) {
+  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
     unsigned char c = bytes[*pos];
 
 #ifdef DEBUG_PRINT_UTF8
@@ -157,8 +155,10 @@ static void decode_usascii(VTermEncoding *enc, void *data,
                            uint32_t cp[], int *cpi, int cplen,
                            const char bytes[], size_t *pos, size_t bytelen)
 {
-  for(; *pos < bytelen; (*pos)++) {
-    unsigned char c = bytes[*pos];
+  int is_gr = bytes[*pos] & 0x80;
+
+  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    unsigned char c = bytes[*pos] ^ is_gr;
 
     if(c < 0x20 || c >= 0x80)
       return;
@@ -181,11 +181,12 @@ static void decode_table(VTermEncoding *enc, void *data,
                          const char bytes[], size_t *pos, size_t bytelen)
 {
   struct StaticTableEncoding *table = (struct StaticTableEncoding *)enc;
+  int is_gr = bytes[*pos] & 0x80;
 
-  for(; *pos < bytelen; (*pos)++) {
-    unsigned char c = (bytes[*pos]) & 0x7f;
+  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    unsigned char c = bytes[*pos] ^ is_gr;
 
-    if(c < 0x20)
+    if(c < 0x20 || c >= 0x80)
       return;
 
     if(table->chars[c])
@@ -208,13 +209,13 @@ encodings[] = {
   { ENC_SINGLE_94, '0', (VTermEncoding*)&encoding_DECdrawing },
   { ENC_SINGLE_94, 'A', (VTermEncoding*)&encoding_uk },
   { ENC_SINGLE_94, 'B', &encoding_usascii },
-  { 0, 0 },
+  { 0 },
 };
 
+/* This ought to be INTERNAL but isn't because it's used by unit testing */
 VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation)
 {
-  int i;
-  for(i = 0; encodings[i].designation; i++)
+  for(int i = 0; encodings[i].designation; i++)
     if(encodings[i].type == type && encodings[i].designation == designation)
       return encodings[i].enc;
   return NULL;

@@ -44,37 +44,6 @@ static inline void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta
   rect->start_col += col_delta; rect->end_col += col_delta;
 }
 
-/* Flag to indicate non-final subparameters in a single CSI parameter.
- * Consider
- *   CSI 1;2:3:4;5a
- * 1 4 and 5 are final.
- * 2 and 3 are non-final and will have this bit set
- *
- * Don't confuse this with the final byte of the CSI escape; 'a' in this case.
- */
-#define CSI_ARG_FLAG_MORE (1<<31)
-#define CSI_ARG_MASK      (~(1<<31))
-
-#define CSI_ARG_HAS_MORE(a) ((a) & CSI_ARG_FLAG_MORE)
-#define CSI_ARG(a)          ((a) & CSI_ARG_MASK)
-
-/* Can't use -1 to indicate a missing argument; use this instead */
-#define CSI_ARG_MISSING ((1UL<<31)-1)
-
-#define CSI_ARG_IS_MISSING(a) (CSI_ARG(a) == CSI_ARG_MISSING)
-#define CSI_ARG_OR(a,def)     (CSI_ARG(a) == CSI_ARG_MISSING ? (def) : CSI_ARG(a))
-#define CSI_ARG_COUNT(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
-
-typedef struct {
-  int (*text)(const char *bytes, size_t len, void *user);
-  int (*control)(unsigned char control, void *user);
-  int (*escape)(const char *bytes, size_t len, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(const char *command, size_t cmdlen, void *user);
-  int (*dcs)(const char *command, size_t cmdlen, void *user);
-  int (*resize)(int rows, int cols, void *user);
-} VTermParserCallbacks;
-
 typedef struct {
   uint8_t red, green, blue;
 } VTermColor;
@@ -121,33 +90,23 @@ typedef enum {
 enum {
   VTERM_PROP_CURSORSHAPE_BLOCK = 1,
   VTERM_PROP_CURSORSHAPE_UNDERLINE,
+  VTERM_PROP_CURSORSHAPE_BAR_LEFT,
 };
 
 typedef void (*VTermMouseFunc)(int x, int y, int button, int pressed, int modifiers, void *data);
 
 typedef struct {
-  int (*putglyph)(const uint32_t chars[], int width, VTermPos pos, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*scrollrect)(VTermRect rect, int downward, int rightward, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*erase)(VTermRect rect, void *user);
-  int (*initpen)(void *user);
-  int (*setpenattr)(VTermAttr attr, VTermValue *val, void *user);
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*setmousefunc)(VTermMouseFunc func, void *data, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, void *user);
-} VTermStateCallbacks;
+  const uint32_t *chars;
+  int             width;
+  unsigned int    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
+  unsigned int    dwl:1;             /* DECDWL or DECDHL double-width line */
+  unsigned int    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
+} VTermGlyphInfo;
 
 typedef struct {
-  int (*damage)(VTermRect rect, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*setmousefunc)(VTermMouseFunc func, void *data, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, void *user);
-} VTermScreenCallbacks;
+  unsigned int    doublewidth:1;     /* DECDWL or DECDHL line */
+  unsigned int    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
+} VTermLineInfo;
 
 typedef struct {
   /* libvterm relies on this memory to be zeroed out before it is returned
@@ -160,22 +119,127 @@ VTerm *vterm_new(int rows, int cols);
 VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata);
 void   vterm_free(VTerm* vt);
 
-void vterm_get_size(VTerm *vt, int *rowsp, int *colsp);
+void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp);
 void vterm_set_size(VTerm *vt, int rows, int cols);
 
+void vterm_push_bytes(VTerm *vt, const char *bytes, size_t len);
+
+void vterm_input_push_char(VTerm *vt, VTermModifier state, uint32_t c);
+void vterm_input_push_key(VTerm *vt, VTermModifier state, VTermKey key);
+
+size_t vterm_output_bufferlen(VTerm *vt); /* deprecated */
+
+size_t vterm_output_get_buffer_size(const VTerm *vt);
+size_t vterm_output_get_buffer_current(const VTerm *vt);
+size_t vterm_output_get_buffer_remaining(const VTerm *vt);
+
+size_t vterm_output_bufferread(VTerm *vt, char *buffer, size_t len);
+
+// ------------
+// Parser layer
+// ------------
+
+/* Flag to indicate non-final subparameters in a single CSI parameter.
+ * Consider
+ *   CSI 1;2:3:4;5a
+ * 1 4 and 5 are final.
+ * 2 and 3 are non-final and will have this bit set
+ *
+ * Don't confuse this with the final byte of the CSI escape; 'a' in this case.
+ */
+#define CSI_ARG_FLAG_MORE (1<<31)
+#define CSI_ARG_MASK      (~(1<<31))
+
+#define CSI_ARG_HAS_MORE(a) ((a) & CSI_ARG_FLAG_MORE)
+#define CSI_ARG(a)          ((a) & CSI_ARG_MASK)
+
+/* Can't use -1 to indicate a missing argument; use this instead */
+#define CSI_ARG_MISSING ((1UL<<31)-1)
+
+#define CSI_ARG_IS_MISSING(a) (CSI_ARG(a) == CSI_ARG_MISSING)
+#define CSI_ARG_OR(a,def)     (CSI_ARG(a) == CSI_ARG_MISSING ? (def) : CSI_ARG(a))
+#define CSI_ARG_COUNT(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
+
+typedef struct {
+  int (*text)(const char *bytes, size_t len, void *user);
+  int (*control)(unsigned char control, void *user);
+  int (*escape)(const char *bytes, size_t len, void *user);
+  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
+  int (*osc)(const char *command, size_t cmdlen, void *user);
+  int (*dcs)(const char *command, size_t cmdlen, void *user);
+  int (*resize)(int rows, int cols, void *user);
+} VTermParserCallbacks;
+
 void vterm_set_parser_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks, void *user);
+
+void vterm_parser_set_utf8(VTerm *vt, int is_utf8);
+
+// -----------
+// State layer
+// -----------
+
+typedef struct {
+  int (*putglyph)(VTermGlyphInfo *info, VTermPos pos, void *user);
+  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
+  int (*scrollrect)(VTermRect rect, int downward, int rightward, void *user);
+  int (*moverect)(VTermRect dest, VTermRect src, void *user);
+  int (*erase)(VTermRect rect, int selective, void *user);
+  int (*initpen)(void *user);
+  int (*setpenattr)(VTermAttr attr, VTermValue *val, void *user);
+  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
+  int (*setmousefunc)(VTermMouseFunc func, void *data, void *user);
+  int (*bell)(void *user);
+  int (*resize)(int rows, int cols, VTermPos *delta, void *user);
+  int (*setlineinfo)(int row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user);
+} VTermStateCallbacks;
 
 VTermState *vterm_obtain_state(VTerm *vt);
 
 void vterm_state_reset(VTermState *state, int hard);
 void vterm_state_set_callbacks(VTermState *state, const VTermStateCallbacks *callbacks, void *user);
-void vterm_state_get_cursorpos(VTermState *state, VTermPos *cursorpos);
-void vterm_state_set_default_colors(VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
+void vterm_state_get_cursorpos(const VTermState *state, VTermPos *cursorpos);
+void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
+void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col);
+void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg);
+void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col);
 void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright);
-int  vterm_state_get_penattr(VTermState *state, VTermAttr attr, VTermValue *val);
+int  vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val);
+int  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val);
+const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
 
-VTermValueType vterm_get_attr_type(VTermAttr attr);
-VTermValueType vterm_get_prop_type(VTermProp prop);
+// ------------
+// Screen layer
+// ------------
+
+typedef struct {
+#define VTERM_MAX_CHARS_PER_CELL 6
+  uint32_t chars[VTERM_MAX_CHARS_PER_CELL];
+  char     width;
+  struct {
+    unsigned int bold      : 1;
+    unsigned int underline : 2;
+    unsigned int italic    : 1;
+    unsigned int blink     : 1;
+    unsigned int reverse   : 1;
+    unsigned int strike    : 1;
+    unsigned int font      : 4; /* 0 to 9 */
+    unsigned int dwl       : 1; /* On a DECDWL or DECDHL line */
+    unsigned int dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
+  } attrs;
+  VTermColor fg, bg;
+} VTermScreenCell;
+
+typedef struct {
+  int (*damage)(VTermRect rect, void *user);
+  int (*moverect)(VTermRect dest, VTermRect src, void *user);
+  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
+  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
+  int (*setmousefunc)(VTermMouseFunc func, void *data, void *user);
+  int (*bell)(void *user);
+  int (*resize)(int rows, int cols, void *user);
+  int (*sb_pushline)(int cols, const VTermScreenCell *cells, void *user);
+  int (*sb_popline)(int cols, VTermScreenCell *cells, void *user);
+} VTermScreenCallbacks;
 
 VTermScreen *vterm_obtain_screen(VTerm *vt);
 
@@ -193,48 +257,41 @@ void vterm_screen_flush_damage(VTermScreen *screen);
 void vterm_screen_set_damage_merge(VTermScreen *screen, VTermDamageSize size);
 
 void   vterm_screen_reset(VTermScreen *screen, int hard);
-size_t vterm_screen_get_chars(VTermScreen *screen, uint32_t *chars, size_t len, const VTermRect rect);
-size_t vterm_screen_get_text(VTermScreen *screen, char *str, size_t len, const VTermRect rect);
 
-typedef struct {
-#define VTERM_MAX_CHARS_PER_CELL 6
-  uint32_t chars[VTERM_MAX_CHARS_PER_CELL];
-  char     width;
-  struct {
-    unsigned int bold      : 1;
-    unsigned int underline : 2;
-    unsigned int italic    : 1;
-    unsigned int blink     : 1;
-    unsigned int reverse   : 1;
-    unsigned int strike    : 1;
-    unsigned int font      : 4; /* 0 to 9 */
-  } attrs;
-  VTermColor fg, bg;
-} VTermScreenCell;
+/* Neither of these functions NUL-terminate the buffer */
+size_t vterm_screen_get_chars(const VTermScreen *screen, uint32_t *chars, size_t len, const VTermRect rect);
+size_t vterm_screen_get_text(const VTermScreen *screen, char *str, size_t len, const VTermRect rect);
 
-void vterm_screen_get_cell(VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
+typedef enum {
+  VTERM_ATTR_BOLD_MASK       = 1 << 0,
+  VTERM_ATTR_UNDERLINE_MASK  = 1 << 1,
+  VTERM_ATTR_ITALIC_MASK     = 1 << 2,
+  VTERM_ATTR_BLINK_MASK      = 1 << 3,
+  VTERM_ATTR_REVERSE_MASK    = 1 << 4,
+  VTERM_ATTR_STRIKE_MASK     = 1 << 5,
+  VTERM_ATTR_FONT_MASK       = 1 << 6,
+  VTERM_ATTR_FOREGROUND_MASK = 1 << 7,
+  VTERM_ATTR_BACKGROUND_MASK = 1 << 8,
+} VTermAttrMask;
 
-int vterm_screen_is_eol(VTermScreen *screen, VTermPos pos);
+int vterm_screen_get_attrs_extent(const VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs);
 
-void vterm_input_push_char(VTerm *vt, VTermModifier state, uint32_t c);
-void vterm_input_push_key(VTerm *vt, VTermModifier state, VTermKey key);
+int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
 
-void vterm_parser_set_utf8(VTerm *vt, int is_utf8);
-void vterm_push_bytes(VTerm *vt, const char *bytes, size_t len);
+int vterm_screen_is_eol(const VTermScreen *screen, VTermPos pos);
 
-size_t vterm_output_bufferlen(VTerm *vt); /* deprecated */
+// ---------
+// Utilities
+// ---------
 
-size_t vterm_output_get_buffer_size(VTerm *vt);
-size_t vterm_output_get_buffer_current(VTerm *vt);
-size_t vterm_output_get_buffer_remaining(VTerm *vt);
-
-size_t vterm_output_bufferread(VTerm *vt, char *buffer, size_t len);
+VTermValueType vterm_get_attr_type(VTermAttr attr);
+VTermValueType vterm_get_prop_type(VTermProp prop);
 
 void vterm_scroll_rect(VTermRect rect,
                        int downward,
                        int rightward,
                        int (*moverect)(VTermRect src, VTermRect dest, void *user),
-                       int (*eraserect)(VTermRect rect, void *user),
+                       int (*eraserect)(VTermRect rect, int selective, void *user),
                        void *user);
 
 void vterm_copy_cells(VTermRect dest,

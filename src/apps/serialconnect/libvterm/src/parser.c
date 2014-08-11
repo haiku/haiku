@@ -1,6 +1,5 @@
 #include "vterm_internal.h"
 
-#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -19,15 +18,10 @@ static void do_control(VTerm *vt, unsigned char control)
 
 static void do_string_csi(VTerm *vt, const char *args, size_t arglen, char command)
 {
-  size_t i = 0;
+  int i = 0;
 
   int leaderlen = 0;
   char leader[CSI_LEADER_MAX];
-  int argcount = 1; // Always at least 1 arg
-  long csi_args[CSI_ARGS_MAX];
-  int argi;
-  int intermedlen = 0;
-  char intermed[CSI_INTERMED_MAX];
 
   // Extract leader bytes 0x3c to 0x3f
   for( ; i < arglen; i++) {
@@ -39,14 +33,18 @@ static void do_string_csi(VTerm *vt, const char *args, size_t arglen, char comma
 
   leader[leaderlen] = 0;
 
+  int argcount = 1; // Always at least 1 arg
+
   for( ; i < arglen; i++)
     if(args[i] == 0x3b || args[i] == 0x3a) // ; or :
       argcount++;
 
   /* TODO: Consider if these buffers should live in the VTerm struct itself */
+  long csi_args[CSI_ARGS_MAX];
   if(argcount > CSI_ARGS_MAX)
     argcount = CSI_ARGS_MAX;
 
+  int argi;
   for(argi = 0; argi < argcount; argi++)
     csi_args[argi] = CSI_ARG_MISSING;
 
@@ -72,6 +70,8 @@ static void do_string_csi(VTerm *vt, const char *args, size_t arglen, char comma
   }
 done_leader: ;
 
+  int intermedlen = 0;
+  char intermed[CSI_INTERMED_MAX];
 
   for( ; i < arglen; i++) {
     if((args[i] & 0xf0) != 0x20)
@@ -118,8 +118,6 @@ static void append_strbuffer(VTerm *vt, const char *str, size_t len)
 
 static size_t do_string(VTerm *vt, const char *str_frag, size_t len)
 {
-  size_t eaten;
-
   if(vt->strbuffer_cur) {
     if(str_frag)
       append_strbuffer(vt, str_frag, len);
@@ -133,6 +131,8 @@ static size_t do_string(VTerm *vt, const char *str_frag, size_t len)
   }
 
   vt->strbuffer_cur = 0;
+
+  size_t eaten;
 
   switch(vt->parser_state) {
   case NORMAL:
@@ -190,7 +190,7 @@ static size_t do_string(VTerm *vt, const char *str_frag, size_t len)
 void vterm_push_bytes(VTerm *vt, const char *bytes, size_t len)
 {
   size_t pos = 0;
-  const char *string_start = NULL;
+  const char *string_start;
 
   switch(vt->parser_state) {
   case NORMAL:
@@ -299,14 +299,14 @@ void vterm_push_bytes(VTerm *vt, const char *bytes, size_t len)
 
     case OSC:
     case DCS:
-      if(c == 0x07 || (c == 0x9c && !vt->is_utf8)) {
+      if(c == 0x07 || (c == 0x9c && !vt->mode.utf8)) {
         do_string(vt, string_start, bytes + pos - string_start);
         ENTER_NORMAL_STATE();
       }
       break;
 
     case NORMAL:
-      if(c >= 0x80 && c < 0xa0 && !vt->is_utf8) {
+      if(c >= 0x80 && c < 0xa0 && !vt->mode.utf8) {
         switch(c) {
         case 0x90: // DCS
           ENTER_STRING_STATE(DCS);

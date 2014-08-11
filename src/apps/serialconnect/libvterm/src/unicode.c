@@ -213,7 +213,7 @@ static int mk_wcwidth(wchar_t ucs)
       (ucs >= 0x30000 && ucs <= 0x3fffd)));
 }
 
-#if 0
+
 static int mk_wcswidth(const wchar_t *pwcs, size_t n)
 {
   int w, width = 0;
@@ -226,6 +226,7 @@ static int mk_wcswidth(const wchar_t *pwcs, size_t n)
 
   return width;
 }
+
 
 /*
  * The following functions are the same as mk_wcwidth() and
@@ -316,17 +317,16 @@ static int mk_wcswidth_cjk(const wchar_t *pwcs, size_t n)
 
   return width;
 }
-#endif
 
 // ################################
 // ### The rest added by Paul Evans
 
-int vterm_unicode_width(int codepoint)
+INTERNAL int vterm_unicode_width(int codepoint)
 {
   return mk_wcwidth(codepoint);
 }
 
-int vterm_unicode_is_combining(int codepoint)
+INTERNAL int vterm_unicode_is_combining(int codepoint)
 {
   return bisearch(codepoint, combining, sizeof(combining) / sizeof(struct interval) - 1);
 }

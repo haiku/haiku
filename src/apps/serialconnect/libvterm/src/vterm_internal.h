@@ -5,6 +5,12 @@
 
 #include <stdarg.h>
 
+#if defined(__GNUC__)
+# define INTERNAL __attribute__((visibility("internal")))
+#else
+# define INTERNAL
+#endif
+
 typedef struct VTermEncoding VTermEncoding;
 
 typedef struct {
@@ -27,6 +33,11 @@ struct VTermPen
   unsigned int font:4; /* To store 0-9 */
 };
 
+static inline int vterm_color_equal(VTermColor a, VTermColor b)
+{
+  return a.red == b.red && a.green == b.green && a.blue == b.blue;
+}
+
 struct VTermState
 {
   VTerm *vt;
@@ -42,12 +53,20 @@ struct VTermState
 
   int at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
 
-  int scrollregion_start;
-  int scrollregion_end; /* -1 means unbounded */
-#define SCROLLREGION_END(state) ((state)->scrollregion_end > -1 ? (state)->scrollregion_end : (state)->rows)
+  int scrollregion_top;
+  int scrollregion_bottom; /* -1 means unbounded */
+#define SCROLLREGION_BOTTOM(state) ((state)->scrollregion_bottom > -1 ? (state)->scrollregion_bottom : (state)->rows)
+  int scrollregion_left;
+#define SCROLLREGION_LEFT(state)  ((state)->mode.leftrightmargin ? (state)->scrollregion_left : 0)
+  int scrollregion_right; /* -1 means unbounded */
+#define SCROLLREGION_RIGHT(state) ((state)->mode.leftrightmargin && (state)->scrollregion_right > -1 ? (state)->scrollregion_right : (state)->cols)
 
   /* Bitvector of tab stops */
   unsigned char *tabstops;
+
+  VTermLineInfo *lineinfo;
+#define ROWWIDTH(state,row) ((state)->lineinfo[(row)].doublewidth ? ((state)->cols / 2) : (state)->cols)
+#define THISROWWIDTH(state) ROWWIDTH(state, (state)->pos.row)
 
   /* Mouse state */
   int mouse_col, mouse_row;
@@ -72,17 +91,24 @@ struct VTermState
     unsigned int cursor_shape:2;
     int alt_screen:1;
     int origin:1;
+    int screen:1;
+    int leftrightmargin:1;
   } mode;
 
   VTermEncodingInstance encoding[4], encoding_utf8;
-  int gl_set, gr_set;
+  int gl_set, gr_set, gsingle_set;
 
   struct VTermPen pen;
 
   VTermColor default_fg;
   VTermColor default_bg;
-  int fg_ansi;
+  VTermColor colors[16]; // Store the 8 ANSI and the 8 ANSI high-brights only
+
+  int fg_index;
+  int bg_index;
   int bold_is_highbright;
+
+  unsigned int protected_cell : 1;
 
   /* Saved state under DEC mode 1048/1049 */
   struct {
@@ -105,7 +131,10 @@ struct VTerm
   int rows;
   int cols;
 
-  int is_utf8;
+  struct {
+    int utf8:1;
+    int ctrl8bit:1;
+  } mode;
 
   enum VTermParserState {
     NORMAL,
@@ -150,12 +179,25 @@ void  vterm_allocator_free(VTerm *vt, void *ptr);
 void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len);
 void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args);
 void vterm_push_output_sprintf(VTerm *vt, const char *format, ...);
+void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...);
+void vterm_push_output_sprintf_dcs(VTerm *vt, const char *fmt, ...);
 
 void vterm_state_free(VTermState *state);
 
+void vterm_state_newpen(VTermState *state);
 void vterm_state_resetpen(VTermState *state);
 void vterm_state_setpen(VTermState *state, const long args[], int argcount);
+int  vterm_state_getpen(VTermState *state, long args[], int argcount);
 void vterm_state_savepen(VTermState *state, int save);
+
+enum {
+  C1_SS3 = 0x8f,
+  C1_DCS = 0x90,
+  C1_CSI = 0x9b,
+  C1_ST  = 0x9c,
+};
+
+void vterm_state_push_output_sprintf_CSI(VTermState *vts, const char *format, ...);
 
 void vterm_screen_free(VTermScreen *screen);
 

@@ -12,15 +12,13 @@ static inline unsigned int utf8_seqlen(long codepoint)
   return 6;
 }
 
+/* Does NOT NUL-terminate the buffer */
 static int fill_utf8(long codepoint, char *str)
 {
-  int b;
   int nbytes = utf8_seqlen(codepoint);
 
-  str[nbytes] = 0;
-
   // This is easier done backwards
-  b = nbytes;
+  int b = nbytes;
   while(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);

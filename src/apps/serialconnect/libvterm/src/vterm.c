@@ -70,17 +70,17 @@ void vterm_free(VTerm *vt)
   vterm_allocator_free(vt, vt);
 }
 
-void *vterm_allocator_malloc(VTerm *vt, size_t size)
+INTERNAL void *vterm_allocator_malloc(VTerm *vt, size_t size)
 {
   return (*vt->allocator->malloc)(size, vt->allocdata);
 }
 
-void vterm_allocator_free(VTerm *vt, void *ptr)
+INTERNAL void vterm_allocator_free(VTerm *vt, void *ptr)
 {
   (*vt->allocator->free)(ptr, vt->allocdata);
 }
 
-void vterm_get_size(VTerm *vt, int *rowsp, int *colsp)
+void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp)
 {
   if(rowsp)
     *rowsp = vt->rows;
@@ -105,10 +105,10 @@ void vterm_set_parser_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks
 
 void vterm_parser_set_utf8(VTerm *vt, int is_utf8)
 {
-  vt->is_utf8 = is_utf8;
+  vt->mode.utf8 = is_utf8;
 }
 
-void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len)
+INTERNAL void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len)
 {
   if(len > vt->outbuffer_len - vt->outbuffer_cur) {
     fprintf(stderr, "vterm_push_output(): buffer overflow; truncating output\n");
@@ -119,7 +119,7 @@ void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len)
   vt->outbuffer_cur += len;
 }
 
-void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args)
+INTERNAL void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args)
 {
   int written = vsnprintf(vt->outbuffer + vt->outbuffer_cur,
       vt->outbuffer_len - vt->outbuffer_cur,
@@ -127,7 +127,7 @@ void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args)
   vt->outbuffer_cur += written;
 }
 
-void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
+INTERNAL void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
 {
   va_list args;
   va_start(args, format);
@@ -135,22 +135,50 @@ void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
   va_end(args);
 }
 
+INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...)
+{
+  if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+    vterm_push_output_sprintf(vt, "\e%c", ctrl - 0x40);
+  else
+    vterm_push_output_sprintf(vt, "%c", ctrl);
+
+  va_list args;
+  va_start(args, fmt);
+  vterm_push_output_vsprintf(vt, fmt, args);
+  va_end(args);
+}
+
+INTERNAL void vterm_push_output_sprintf_dcs(VTerm *vt, const char *fmt, ...)
+{
+  if(!vt->mode.ctrl8bit)
+    vterm_push_output_sprintf(vt, "\e%c", C1_DCS - 0x40);
+  else
+    vterm_push_output_sprintf(vt, "%c", C1_DCS);
+
+  va_list args;
+  va_start(args, fmt);
+  vterm_push_output_vsprintf(vt, fmt, args);
+  va_end(args);
+
+  vterm_push_output_sprintf_ctrl(vt, C1_ST, "");
+}
+
 size_t vterm_output_bufferlen(VTerm *vt)
 {
   return vterm_output_get_buffer_current(vt);
 }
 
-size_t vterm_output_get_buffer_size(VTerm *vt)
+size_t vterm_output_get_buffer_size(const VTerm *vt)
 {
   return vt->outbuffer_len;
 }
 
-size_t vterm_output_get_buffer_current(VTerm *vt)
+size_t vterm_output_get_buffer_current(const VTerm *vt)
 {
   return vt->outbuffer_cur;
 }
 
-size_t vterm_output_get_buffer_remaining(VTerm *vt)
+size_t vterm_output_get_buffer_remaining(const VTerm *vt)
 {
   return vt->outbuffer_len - vt->outbuffer_cur;
 }
@@ -204,7 +232,7 @@ void vterm_scroll_rect(VTermRect rect,
     int downward,
     int rightward,
     int (*moverect)(VTermRect src, VTermRect dest, void *user),
-    int (*eraserect)(VTermRect rect, void *user),
+    int (*eraserect)(VTermRect rect, int selective, void *user),
     void *user)
 {
   VTermRect src;
@@ -213,7 +241,7 @@ void vterm_scroll_rect(VTermRect rect,
   if(abs(downward)  >= rect.end_row - rect.start_row ||
      abs(rightward) >= rect.end_col - rect.start_col) {
     /* Scroll more than area; just erase the lot */
-    (*eraserect)(rect, user);
+    (*eraserect)(rect, 0, user);
     return;
   }
 
@@ -266,7 +294,7 @@ void vterm_scroll_rect(VTermRect rect,
   else if(rightward < 0)
     rect.end_col = rect.start_col - rightward;
 
-  (*eraserect)(rect, user);
+  (*eraserect)(rect, 0, user);
 }
 
 void vterm_copy_cells(VTermRect dest,
@@ -280,19 +308,12 @@ void vterm_copy_cells(VTermRect dest,
   int init_row, test_row, init_col, test_col;
   int inc_row, inc_col;
 
-  VTermPos pos;
-
   if(downward < 0) {
     init_row = dest.end_row - 1;
     test_row = dest.start_row - 1;
     inc_row = -1;
   }
-  else if(downward == 0) {
-    init_row = dest.start_row;
-    test_row = dest.end_row;
-    inc_row = +1;
-  }
-  else /* downward > 0 */ {
+  else /* downward >= 0 */ {
     init_row = dest.start_row;
     test_row = dest.end_row;
     inc_row = +1;
@@ -303,17 +324,13 @@ void vterm_copy_cells(VTermRect dest,
     test_col = dest.start_col - 1;
     inc_col = -1;
   }
-  else if(rightward == 0) {
-    init_col = dest.start_col;
-    test_col = dest.end_col;
-    inc_col = +1;
-  }
-  else /* rightward > 0 */ {
+  else /* rightward >= 0 */ {
     init_col = dest.start_col;
     test_col = dest.end_col;
     inc_col = +1;
   }
 
+  VTermPos pos;
   for(pos.row = init_row; pos.row != test_row; pos.row += inc_row)
     for(pos.col = init_col; pos.col != test_col; pos.col += inc_col) {
       VTermPos srcpos = { pos.row + downward, pos.col + rightward };
