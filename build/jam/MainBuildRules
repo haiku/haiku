@@ -760,3 +760,31 @@ rule BuildPlatformStaticLibraryPIC target : sources : otherObjects
 
 	BuildPlatformStaticLibrary $(target) : $(sources) : $(otherObjects) ;
 }
+
+rule BootstrapStage0PlatformObjects sources : separateFromStandardSiblings
+{
+	# BootstrapStage0PlatformObjects <sources> : <separateFromStandardSiblings>
+	# Builds objects from the given sources for stage0 of the bootstrap process.
+	# <sources> The sources from which objects should be created.
+	# <separateFromStandardSiblings> Pass 'true' if the same objects are built
+	# in a different context, too, so that a separate grist and target location
+	# is required. This defaults to ''.
+	local source ;
+	for source in $(sources) {
+		local objectGrist ;
+		if $(separateFromStandardSiblings) = true {
+			objectGrist = "bootstrap!$(SOURCE_GRIST)" ;
+		} else {
+			objectGrist = $(SOURCE_GRIST) ;
+		}
+		local object = $(source:S=$(SUFOBJ):G=$(objectGrist)) ;
+		PLATFORM on $(object) = bootstrap_stage0 ;
+		SUPPORTED_PLATFORMS on $(object) = bootstrap_stage0 ;
+		if $(separateFromStandardSiblings) = true {
+			MakeLocate $(object) : [
+				FDirName $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) bootstrap
+			] ;
+		}
+		Object $(object) : $(source) ;
+	}
+}

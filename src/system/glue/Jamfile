@@ -5,13 +5,20 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		UsePrivateSystemHeaders ;
 
-		Objects
+		local sources =
 			init_term_dyn.c
 			start_dyn.c
 			haiku_version_glue.c
 			;
+		Objects $(sources) ;
+
+		if $(HAIKU_BUILD_TYPE) = bootstrap {
+			# build a version for stage0 of the bootstrap process
+			BootstrapStage0PlatformObjects $(sources) : true ;
+		}
 	}
 }
+
 
 local arch ;
 for arch in $(TARGET_ARCHS) {

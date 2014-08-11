@@ -3,9 +3,17 @@ SubDir HAIKU_TOP src system glue arch arm ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup arm ] {
 	on $(architectureObject) {
-		Objects
+		UsePrivateSystemHeaders ;
+
+		local sources =
 			crti.S
 			crtn.S
 			;
+		Objects $(sources) ;
+
+		if $(HAIKU_BUILD_TYPE) = bootstrap {
+			# build a version for stage0 of the bootstrap process
+			BootstrapStage0PlatformObjects $(sources) : true ;
+		}
 	}
 }
