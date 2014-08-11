@@ -20,7 +20,7 @@ local additionalLibraries
 	= [ MultiArchDefaultGristFiles libbe.so libnetwork.so libpackage.so ] ;
 
 local stage ;
-for stage in _stage1 "" {
+for stage in _stage0 _stage1 "" {
 	# first create the actual cross development package
 
 	local haikuCrossDevelSysrootPackage
@@ -29,37 +29,53 @@ for stage in _stage1 "" {
 
 	local developCrossLibDirTokens = develop lib $(architectureSubDir) ;
 
-	# glue code
-	AddFilesToPackage $(developCrossLibDirTokens) :
-		<src!system!glue!arch!$(TARGET_ARCH)!$(architecture)>crti.o
-		<src!system!glue!arch!$(TARGET_ARCH)!$(architecture)>crtn.o
-		<src!system!glue!$(architecture)>init_term_dyn.o
-		<src!system!glue!$(architecture)>start_dyn.o
-		<src!system!glue!$(architecture)>haiku_version_glue.o
-		;
+	if $(stage) = _stage0 {
+		# glue code
+		AddFilesToPackage $(developCrossLibDirTokens) :
+			<bootstrap!src!system!glue!arch!$(TARGET_ARCH)!$(architecture)>crti.o
+			<bootstrap!src!system!glue!arch!$(TARGET_ARCH)!$(architecture)>crtn.o
+			<bootstrap!src!system!glue!$(architecture)>init_term_dyn.o
+			<bootstrap!src!system!glue!$(architecture)>start_dyn.o
+			<bootstrap!src!system!glue!$(architecture)>haiku_version_glue.o
+			;
 
-	# kernel
-	if $(isPrimaryArchitecture) {
-		AddFilesToPackage $(developCrossLibDirTokens) : kernel.so : _KERNEL_ ;
+		# libraries
+		AddLibrariesToPackage $(developCrossLibDirTokens) :
+			[ MultiArchDefaultGristFiles libroot.so : stubbed ]
+			;
+	} else {
+		# glue code
+		AddFilesToPackage $(developCrossLibDirTokens) :
+			<src!system!glue!arch!$(TARGET_ARCH)!$(architecture)>crti.o
+			<src!system!glue!arch!$(TARGET_ARCH)!$(architecture)>crtn.o
+			<src!system!glue!$(architecture)>init_term_dyn.o
+			<src!system!glue!$(architecture)>start_dyn.o
+			<src!system!glue!$(architecture)>haiku_version_glue.o
+			;
+
+		# kernel
+		if $(isPrimaryArchitecture) {
+			AddFilesToPackage $(developCrossLibDirTokens) : kernel.so : _KERNEL_ ;
+		}
+
+		# libraries
+		AddLibrariesToPackage $(developCrossLibDirTokens) :
+			[ MultiArchDefaultGristFiles libbsd.so ]
+			[ MultiArchDefaultGristFiles libroot.so : revisioned ]
+			[ MultiArchDefaultGristFiles libnetwork.so ]
+			[ TargetLibstdc++ ]
+			[ TargetLibsupc++ ]
+			$(additionalLibraries$(stage))
+			;
+
+		# static libraries
+		AddFilesToPackage $(developCrossLibDirTokens)
+			: <$(architecture)>liblocalestub.a ;
+
+		# the POSIX error code mapper library
+		AddFilesToPackage $(developCrossLibDirTokens)
+			: [ MultiArchDefaultGristFiles libposix_error_mapper.a ] ;
 	}
-
-	# libraries
-	AddLibrariesToPackage $(developCrossLibDirTokens) :
-		[ MultiArchDefaultGristFiles libbsd.so ]
-		[ MultiArchDefaultGristFiles libroot.so : revisioned ]
-		[ MultiArchDefaultGristFiles libnetwork.so ]
-		[ TargetLibstdc++ ]
-		[ TargetLibsupc++ ]
-		$(additionalLibraries$(stage))
-		;
-
-	# static libraries
-	AddFilesToPackage $(developCrossLibDirTokens)
-		: <$(architecture)>liblocalestub.a ;
-
-	# the POSIX error code mapper library
-	AddFilesToPackage $(developCrossLibDirTokens)
-		: [ MultiArchDefaultGristFiles libposix_error_mapper.a ] ;
 
 	# headers
 	local developCrossHeadersDirTokens = develop headers ;
@@ -75,11 +91,13 @@ for stage in _stage1 "" {
 			: [ FDirName $(HAIKU_TOP) headers compatibility $(headerDir) ] ;
 	}
 
-	# cpp headers
-	if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
-		# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
-		CopyDirectoryToPackage $(developCrossHeadersDirTokens) c++
-			: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;
+	if $(stage) != _stage0 {
+		# cpp headers
+		if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
+			# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
+			CopyDirectoryToPackage $(developCrossHeadersDirTokens) c++
+				: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;
+		}
 	}
 
 	BuildHaikuPackage $(haikuCrossDevelSysrootPackage)

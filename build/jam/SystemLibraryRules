@@ -310,6 +310,8 @@ rule C++HeaderDirectories architecture
 	local c++HeaderDirs ;
 	if $(architecture) = x86_gcc2 {
 		c++HeaderDirs = [ FDirName $(HAIKU_TOP) headers cpp ] ;
+	} else if $(PLATFORM) = bootstrap_stage0 {
+		# Currently, no c++-headers are needed for stage0 of the boostrap.
 	} else {
 		local baseDir = [
 			BuildFeatureAttribute gcc_syslibs_devel : c++-headers : path
@@ -336,6 +338,11 @@ rule GccHeaderDirectories architecture
 	local gccHeaderDirs ;
 	if $(architecture) = x86_gcc2 {
 		gccHeaderDirs = [ FDirName $(HAIKU_TOP) headers build gcc-2.95.3 ] ;
+	} else if $(PLATFORM) = bootstrap_stage0 {
+		gccHeaderDirs =
+			[ FDirName $(HAIKU_GCC_LIB_DIR_$(architecture)) include ]
+			[ FDirName $(HAIKU_GCC_LIB_DIR_$(architecture)) include-fixed ]
+			;
 	} else {
 		local baseDir = [
 			BuildFeatureAttribute gcc_syslibs_devel : gcc-headers : path

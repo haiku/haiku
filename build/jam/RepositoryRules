@@ -421,10 +421,11 @@ EOF
 
 
 rule BootstrapPackageRepository repository : architecture
-	: anyPackages : packagesStage1 : packagesStage2 : sourcePackages
-	: debugInfoPackages
+	: anyPackages : packagesStage0 : packagesStage1 : packagesStage2
+	: sourcePackages : debugInfoPackages
 {
 	repository = $(repository:G=repository) ;
+	packagesStage0 = [ FFilterByBuildFeatures $(packagesStage0) ] ;
 	packagesStage1 = [ FFilterByBuildFeatures $(packagesStage1) ] ;
 	packagesStage2 = [ FFilterByBuildFeatures $(packagesStage2) ] ;
 	sourcePackages = [ FFilterByBuildFeatures $(sourcePackages) ] ;
@@ -435,6 +436,18 @@ rule BootstrapPackageRepository repository : architecture
 	SetRepositoryMethod $(repository) : FetchPackage
 		: BootstrapRepositoryFetchPackage ;
 
+	# register repository with stage 0 packages
+	local stage0PackageTargets = [ PackageRepository $(repository)
+		: $(architecture) : $(anyPackages) : $(packagesStage0)
+		: $(sourcePackages) : $(debugInfoPackages) ] ;
+	if ! $(stage0PackageTargets) {
+		return ;
+	}
+	local crossDevelPackageSuffixes = $(architecture)
+		$(architecture)_$(HAIKU_PACKAGING_ARCHS[2-]) ;
+	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGES on $(stage0PackageTargets)
+		= haiku_cross_devel_sysroot_stage0_$(crossDevelPackageSuffixes).hpkg ;
+
 	# register repository with stage 1 packages
 	local stage1PackageTargets = [ PackageRepository $(repository)
 		: $(architecture) : $(anyPackages) : $(packagesStage1)
@@ -442,8 +455,6 @@ rule BootstrapPackageRepository repository : architecture
 	if ! $(stage1PackageTargets) {
 		return ;
 	}
-	local crossDevelPackageSuffixes = $(architecture)
-		$(architecture)_$(HAIKU_PACKAGING_ARCHS[2-]) ;
 	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGES on $(stage1PackageTargets)
 		= haiku_cross_devel_sysroot_stage1_$(crossDevelPackageSuffixes).hpkg ;
 
