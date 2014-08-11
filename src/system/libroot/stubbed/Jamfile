@@ -16,7 +16,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local stubsObject = $(stubsSource:S=$(SUFOBJ)) ;
 		CCFLAGS on $(stubsObject) = -Wno-missing-prototypes -fno-builtin ;
 		Depends $(stubsObject) : $(stubsSource) ;
-		Objects $(stubsSource) ;
+		BootstrapStage0PlatformObjects $(stubsSource) ;
 		local stubbedLibroot
 			= [ MultiArchDefaultGristFiles libroot.so : stubbed ] ;
 		local versionScript

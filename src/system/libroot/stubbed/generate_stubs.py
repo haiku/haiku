@@ -3,8 +3,10 @@
 import sys;
 
 dataSymbolsByAddress = {}
+dataSymbols = []
 versionedDataSymbolsByName = {}
 functionSymbolsByAddress = {}
+functionSymbols = []
 versionedFunctionSymbolsByName = {}
 
 for line in sys.stdin.readlines():
@@ -15,7 +17,7 @@ for line in sys.stdin.readlines():
 	(address, type, symbol) = line.split()
 
 	# select interesting types of symbols
-	if not type in 'BCDGRSTuVvWw':
+	if type not in 'BCDGRSTuVvWw':
 		continue
 
 	# drop symbols from legacy compiler that contain a dot (those produce
@@ -27,21 +29,25 @@ for line in sys.stdin.readlines():
 		if '@' in symbol:
 			versionedDataSymbolsByName[symbol] = address
 		else:
-			dataSymbolsByAddress[address] = symbol
+			if type not in 'VW':
+				dataSymbolsByAddress[address] = symbol
+			dataSymbols.append(symbol)
 	else:
 		if '@' in symbol:
 			versionedFunctionSymbolsByName[symbol] = address
 		else:
-			functionSymbolsByAddress[address] = symbol
+			if type not in 'VW':
+				functionSymbolsByAddress[address] = symbol
+			functionSymbols.append(symbol)
 
 # add data symbols
-for dataSymbol in sorted(dataSymbolsByAddress.values()):
+for dataSymbol in sorted(dataSymbols):
 	print 'int %s;' % dataSymbol
 
 print
 
 # add function symbols
-for functionSymbol in sorted(functionSymbolsByAddress.values()):
+for functionSymbol in sorted(functionSymbols):
 	print 'void %s() {}' % functionSymbol
 
 print
