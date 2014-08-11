@@ -214,6 +214,7 @@ static int mk_wcwidth(wchar_t ucs)
 }
 
 
+#if 0
 static int mk_wcswidth(const wchar_t *pwcs, size_t n)
 {
   int w, width = 0;
@@ -304,7 +305,6 @@ static int mk_wcwidth_cjk(wchar_t ucs)
   return mk_wcwidth(ucs);
 }
 
-
 static int mk_wcswidth_cjk(const wchar_t *pwcs, size_t n)
 {
   int w, width = 0;
@@ -317,6 +317,7 @@ static int mk_wcswidth_cjk(const wchar_t *pwcs, size_t n)
 
   return width;
 }
+#endif
 
 // ################################
 // ### The rest added by Paul Evans

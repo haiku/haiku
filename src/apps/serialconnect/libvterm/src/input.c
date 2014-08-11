@@ -6,6 +6,8 @@
 
 void vterm_input_push_char(VTerm *vt, VTermModifier mod, uint32_t c)
 {
+  int needs_CSIu;
+
   /* The shift modifier is never important for Unicode characters
    * apart from Space
    */
@@ -20,7 +22,6 @@ void vterm_input_push_char(VTerm *vt, VTermModifier mod, uint32_t c)
     return;
   }
 
-  int needs_CSIu;
   switch(c) {
     /* Special Ctrl- letters that can't be represented elsewise */
     case 'h': case 'i': case 'j': case 'm': case '[':
@@ -123,10 +124,10 @@ static keycodes_s keycodes_kp[] = {
 
 void vterm_input_push_key(VTerm *vt, VTermModifier mod, VTermKey key)
 {
+  keycodes_s k;
   if(key == VTERM_KEY_NONE)
     return;
 
-  keycodes_s k;
   if(key < VTERM_KEY_FUNCTION_0) {
     if(key >= sizeof(keycodes)/sizeof(keycodes[0]))
       return;

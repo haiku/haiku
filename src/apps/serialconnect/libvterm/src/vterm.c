@@ -137,12 +137,13 @@ INTERNAL void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
 
 INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...)
 {
+  va_list args;
+
   if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
     vterm_push_output_sprintf(vt, "\e%c", ctrl - 0x40);
   else
     vterm_push_output_sprintf(vt, "%c", ctrl);
 
-  va_list args;
   va_start(args, fmt);
   vterm_push_output_vsprintf(vt, fmt, args);
   va_end(args);
@@ -150,12 +151,13 @@ INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, cons
 
 INTERNAL void vterm_push_output_sprintf_dcs(VTerm *vt, const char *fmt, ...)
 {
+  va_list args;
+
   if(!vt->mode.ctrl8bit)
     vterm_push_output_sprintf(vt, "\e%c", C1_DCS - 0x40);
   else
     vterm_push_output_sprintf(vt, "%c", C1_DCS);
 
-  va_list args;
   va_start(args, fmt);
   vterm_push_output_vsprintf(vt, fmt, args);
   va_end(args);
@@ -308,6 +310,8 @@ void vterm_copy_cells(VTermRect dest,
   int init_row, test_row, init_col, test_col;
   int inc_row, inc_col;
 
+  VTermPos pos;
+
   if(downward < 0) {
     init_row = dest.end_row - 1;
     test_row = dest.start_row - 1;
@@ -330,7 +334,6 @@ void vterm_copy_cells(VTermRect dest,
     inc_col = +1;
   }
 
-  VTermPos pos;
   for(pos.row = init_row; pos.row != test_row; pos.row += inc_row)
     for(pos.col = init_col; pos.col != test_col; pos.col += inc_col) {
       VTermPos srcpos = { pos.row + downward, pos.col + rightward };

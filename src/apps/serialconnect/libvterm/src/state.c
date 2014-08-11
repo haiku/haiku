@@ -208,6 +208,7 @@ static int on_text(const char bytes[], size_t len, void *user)
   uint32_t codepoints[len];
   int npoints = 0;
   size_t eaten = 0;
+  int i = 0;
 
   VTermEncodingInstance *encoding =
     state->gsingle_set     ? &state->encoding[state->gsingle_set] :
@@ -221,8 +222,6 @@ static int on_text(const char bytes[], size_t len, void *user)
 
   if(state->gsingle_set && npoints)
     state->gsingle_set = 0;
-
-  int i = 0;
 
   /* This is a combining char. that needs to be merged with the previous
    * glyph output */
@@ -238,7 +237,7 @@ static int on_text(const char bytes[], size_t len, void *user)
 #endif
 
       /* Find where we need to append these combining chars */
-      int saved_i = 0;
+      unsigned saved_i = 0;
       while(state->combine_chars[saved_i])
         saved_i++;
 
@@ -270,13 +269,14 @@ static int on_text(const char bytes[], size_t len, void *user)
     // Try to find combining characters following this
     int glyph_starts = i;
     int glyph_ends;
+    int width = 0;
+	uint32_t* chars;
+
     for(glyph_ends = i + 1; glyph_ends < npoints; glyph_ends++)
       if(!vterm_unicode_is_combining(codepoints[glyph_ends]))
         break;
 
-    int width = 0;
-
-    uint32_t chars[glyph_ends - glyph_starts + 1];
+    chars = alloca(glyph_ends - glyph_starts + 1);
 
     for( ; i < glyph_ends; i++) {
       chars[i - glyph_starts] = codepoints[i];
@@ -319,7 +319,7 @@ static int on_text(const char bytes[], size_t len, void *user)
     if(i == npoints - 1) {
       /* End of the buffer. Save the chars in case we have to combine with
        * more on the next call */
-      int save_i;
+      unsigned save_i;
       for(save_i = 0; chars[save_i]; save_i++) {
         if(save_i >= state->combine_chars_size)
           grow_combine_buffer(state);
@@ -537,10 +537,11 @@ static int settermprop_int(VTermState *state, VTermProp prop, int v)
 static int settermprop_string(VTermState *state, VTermProp prop, const char *str, size_t len)
 {
   char strvalue[len+1];
+  VTermValue val = { .string = strvalue };
+
   strncpy(strvalue, str, len);
   strvalue[len] = 0;
 
-  VTermValue val = { .string = strvalue };
   return vterm_state_set_termprop(state, prop, &val);
 }
 
@@ -764,8 +765,9 @@ static void set_dec_mode(VTermState *state, int num, int val)
            // DECLRMM - left/right margin mode
     state->mode.leftrightmargin = val;
     if(val) {
+	  int row;
       // Setting DECVSSM must clear doublewidth/doubleheight state of every line
-      for(int row = 0; row < state->rows; row++)
+      for(row = 0; row < state->rows; row++)
         set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
     }
 
@@ -899,8 +901,15 @@ static void request_dec_mode(VTermState *state, int num)
 static int on_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user)
 {
   VTermState *state = user;
+  VTermPos oldpos;
   int leader_byte = 0;
   int intermed_byte = 0;
+
+  // Some temporaries for later code
+  int count, val;
+  int row, col;
+  VTermRect rect;
+  int selective;
 
   if(leader && leader[0]) {
     if(leader[1]) // longer than 1 char
@@ -932,13 +941,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     }
   }
 
-  VTermPos oldpos = state->pos;
-
-  // Some temporaries for later code
-  int count, val;
-  int row, col;
-  VTermRect rect;
-  int selective;
+  oldpos = state->pos;
 
 #define LBOUND(v,min) if((v) < (min)) (v) = (min)
 #define UBOUND(v,max) if((v) > (max)) (v) = (max)
@@ -1037,7 +1040,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
 
       rect.start_row = state->pos.row + 1; rect.end_row = state->rows;
       rect.start_col = 0;
-      for(int row = rect.start_row; row < rect.end_row; row++)
+      for(row = rect.start_row; row < rect.end_row; row++)
         set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
       if(rect.end_row > rect.start_row)
         erase(state, rect, selective);
@@ -1046,7 +1049,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     case 1:
       rect.start_row = 0; rect.end_row = state->pos.row;
       rect.start_col = 0; rect.end_col = state->cols;
-      for(int row = rect.start_row; row < rect.end_row; row++)
+      for(row = rect.start_row; row < rect.end_row; row++)
         set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
       if(rect.end_col > rect.start_col)
         erase(state, rect, selective);
@@ -1060,7 +1063,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     case 2:
       rect.start_row = 0; rect.end_row = state->rows;
       rect.start_col = 0; rect.end_col = state->cols;
-      for(int row = rect.start_row; row < rect.end_row; row++)
+      for(row = rect.start_row; row < rect.end_row; row++)
         set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
       erase(state, rect, selective);
       break;
@@ -1459,8 +1462,9 @@ static void request_status_string(VTermState *state, const char *command, size_t
         {
           long args[20];
           int argc = vterm_state_getpen(state, args, sizeof(args)/sizeof(args[0]));
+		  int argi;
           vterm_push_output_sprintf_ctrl(state->vt, C1_DCS, "1$r");
-          for(int argi = 0; argi < argc; argi++)
+          for(argi = 0; argi < argc; argi++)
             vterm_push_output_sprintf(state->vt,
                 argi == argc - 1             ? "%d" :
                 CSI_ARG_HAS_MORE(args[argi]) ? "%d:" :
@@ -1480,7 +1484,7 @@ static void request_status_string(VTermState *state, const char *command, size_t
 
   if(cmdlen == 2) {
     if(strneq(command, " q", 2)) {
-      int reply;
+      int reply = 0;
       switch(state->mode.cursor_shape) {
         case VTERM_PROP_CURSORSHAPE_BLOCK:     reply = 2; break;
         case VTERM_PROP_CURSORSHAPE_UNDERLINE: reply = 4; break;
@@ -1516,6 +1520,7 @@ static int on_resize(int rows, int cols, void *user)
 {
   VTermState *state = user;
   VTermPos oldpos = state->pos;
+  VTermPos delta = { 0, 0 };
 
   if(cols != state->cols) {
     unsigned char *newtabstops = vterm_allocator_malloc(state->vt, (cols + 7) / 8);
@@ -1563,8 +1568,6 @@ static int on_resize(int rows, int cols, void *user)
   state->rows = rows;
   state->cols = cols;
 
-  VTermPos delta = { 0, 0 };
-
   if(state->callbacks && state->callbacks->resize)
     (*state->callbacks->resize)(rows, cols, &delta, state->cbdata);
 
@@ -1598,10 +1601,11 @@ static const VTermParserCallbacks parser_callbacks = {
 
 VTermState *vterm_obtain_state(VTerm *vt)
 {
+  VTermState *state;
   if(vt->state)
     return vt->state;
 
-  VTermState *state = vterm_state_new(vt);
+  state = vterm_state_new(vt);
   vt->state = state;
 
   state->combine_chars_size = 16;
@@ -1622,6 +1626,9 @@ VTermState *vterm_obtain_state(VTerm *vt)
 
 void vterm_state_reset(VTermState *state, int hard)
 {
+  int col, i, row;
+  VTermEncoding *default_enc;
+
   state->scrollregion_top = 0;
   state->scrollregion_bottom = -1;
   state->scrollregion_left = 0;
@@ -1638,13 +1645,13 @@ void vterm_state_reset(VTermState *state, int hard)
 
   state->vt->mode.ctrl8bit   = 0;
 
-  for(int col = 0; col < state->cols; col++)
+  for(col = 0; col < state->cols; col++)
     if(col % 8 == 0)
       set_col_tabstop(state, col);
     else
       clear_col_tabstop(state, col);
 
-  for(int row = 0; row < state->rows; row++)
+  for(row = 0; row < state->rows; row++)
     set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
 
   if(state->callbacks && state->callbacks->initpen)
@@ -1652,11 +1659,11 @@ void vterm_state_reset(VTermState *state, int hard)
 
   vterm_state_resetpen(state);
 
-  VTermEncoding *default_enc = state->vt->mode.utf8 ?
+  default_enc = state->vt->mode.utf8 ?
       vterm_lookup_encoding(ENC_UTF8,      'u') :
       vterm_lookup_encoding(ENC_SINGLE_94, 'B');
 
-  for(int i = 0; i < 4; i++) {
+  for(i = 0; i < 4; i++) {
     state->encoding[i].enc = default_enc;
     if(default_enc->init)
       (*default_enc->init)(default_enc, state->encoding[i].data);
@@ -1674,11 +1681,11 @@ void vterm_state_reset(VTermState *state, int hard)
   settermprop_int (state, VTERM_PROP_CURSORSHAPE,   VTERM_PROP_CURSORSHAPE_BLOCK);
 
   if(hard) {
+    VTermRect rect = { 0, state->rows, 0, state->cols };
     state->pos.row = 0;
     state->pos.col = 0;
     state->at_phantom = 0;
 
-    VTermRect rect = { 0, state->rows, 0, state->cols };
     erase(state, rect, 0);
   }
 }

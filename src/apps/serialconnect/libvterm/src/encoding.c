@@ -215,7 +215,8 @@ encodings[] = {
 /* This ought to be INTERNAL but isn't because it's used by unit testing */
 VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation)
 {
-  for(int i = 0; encodings[i].designation; i++)
+  int i;
+  for(i = 0; encodings[i].designation; i++)
     if(encodings[i].type == type && encodings[i].designation == designation)
       return encodings[i].enc;
   return NULL;

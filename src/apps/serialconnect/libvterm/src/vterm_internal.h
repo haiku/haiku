@@ -5,7 +5,7 @@
 
 #include <stdarg.h>
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && __GNUC__ > 2
 # define INTERNAL __attribute__((visibility("internal")))
 #else
 # define INTERNAL
