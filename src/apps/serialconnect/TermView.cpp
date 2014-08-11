@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2012-2014, Adrien Destugues, pulkomandy@gmail.com
  * Distributed under the terms of the MIT licence.
  */
 
@@ -23,7 +23,7 @@ TermView::TermView()
 
 	font_height height;
 	GetFontHeight(&height);
-	fFontHeight = height.ascent + height.descent + height.leading;
+	fFontHeight = height.ascent + height.descent + height.leading + 1;
 	fFontWidth = be_fixed_font->StringWidth("X");
 	fTerm = vterm_new(kDefaultHeight, kDefaultWidth);
 
@@ -44,13 +44,27 @@ TermView::~TermView()
 void TermView::AttachedToWindow()
 {
 	MakeFocus();
+
+	VTermScreenCell cell;
+	VTermPos firstPos;
+	firstPos.row = 0;
+	firstPos.col = 0;
+	vterm_screen_get_cell(fTermScreen, firstPos, &cell);
+
+	rgb_color background;
+	background.red = cell.bg.red;
+	background.green = cell.bg.green;
+	background.blue = cell.bg.blue;
+	background.alpha = 255;
+
+	SetViewColor(background);
 }
 
 
 void TermView::Draw(BRect updateRect)
 {
 	VTermRect updatedChars = PixelsToGlyphs(updateRect);
-	
+
 	VTermPos pos;
 	font_height height;
 	GetFontHeight(&height);
@@ -61,14 +75,14 @@ void TermView::Draw(BRect updateRect)
 	for (pos.row = updatedChars.start_row; pos.row <= updatedChars.end_row;
 			pos.row++) {
 		float x = updatedChars.start_col * fFontWidth + kBorderSpacing;
-		float y = pos.row * fFontHeight + height.ascent + kBorderSpacing + 1;
+		float y = pos.row * fFontHeight + height.ascent + kBorderSpacing;
 		MovePenTo(x, y);
 
 		for (pos.col = updatedChars.start_col;
 				pos.col <= updatedChars.end_col;) {
 			VTermScreenCell cell;
 
-			if (pos.col < 0 || pos.row < 0 || pos.col >= availableCols 
+			if (pos.col < 0 || pos.row < 0 || pos.col >= availableCols
 					|| pos.row >= availableRows) {
 
 				// All cells outside the used terminal area are drawn with the
@@ -92,7 +106,7 @@ void TermView::Draw(BRect updateRect)
 			background.blue = cell.bg.blue;
 			background.alpha = 255;
 
-			if(cell.attrs.reverse) {
+			if (cell.attrs.reverse) {
 				SetLowColor(foreground);
 				SetViewColor(foreground);
 				SetHighColor(background);
@@ -104,7 +118,8 @@ void TermView::Draw(BRect updateRect)
 
 			BPoint penLocation = PenLocation();
 			FillRect(BRect(penLocation.x, penLocation.y - height.ascent,
-				penLocation.x + cell.width * fFontWidth, penLocation.y + 1),
+				penLocation.x + cell.width * fFontWidth - 1,
+				penLocation.y + height.descent + height.leading - 1),
 				B_SOLID_LOW);
 
 			if (cell.chars[0] == 0) {
@@ -155,7 +170,7 @@ void TermView::MessageReceived(BMessage* message)
 		case 'DATA':
 		{
 			entry_ref ref;
-			if(message->FindRef("refs", &ref) == B_OK)
+			if (message->FindRef("refs", &ref) == B_OK)
 			{
 				// The user just dropped a file on us
 				// TODO send it by XMODEM or so
@@ -174,7 +189,7 @@ void TermView::PushBytes(const char* bytes, size_t length)
 }
 
 
-//#pragma mark -
+// #pragma mark -
 
 
 VTermRect TermView::PixelsToGlyphs(BRect pixels) const
@@ -211,7 +226,7 @@ BRect TermView::GlyphsToPixels(const VTermRect& glyphs) const
 	rect.right = glyphs.end_col * fFontWidth;
 
 	rect.OffsetBy(kBorderSpacing, kBorderSpacing);
-/*
+#if 0
 	printf(
 		"TOP %d ch > %f px (%f)\n"
 		"BTM %d ch > %f px\n"
@@ -222,7 +237,7 @@ BRect TermView::GlyphsToPixels(const VTermRect& glyphs) const
 		glyphs.start_col, rect.left, fFontWidth,
 		glyphs.end_col, rect.right
 	);
-*/
+#endif
 	return rect;
 }
 
