@@ -25,11 +25,11 @@
 
 //#define TRACE_BUTTON
 #ifdef TRACE_BUTTON
-#	define TRACE(x...) dprintf("acpi_button: "x)
+#	define TRACE(x...) dprintf("acpi_button: " x)
 #else
 #	define TRACE(x...)
 #endif
-#define ERROR(x...)	dprintf("acpi_button: "x)
+#define ERROR(x...)	dprintf("acpi_button: " x)
 
 static device_manager_info *sDeviceManager;
 static struct acpi_module_info *sAcpi;
