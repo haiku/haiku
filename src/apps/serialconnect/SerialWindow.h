@@ -23,6 +23,7 @@ class SerialWindow: public BWindow
 
 	private:
 		TermView* fTermView;
+
 		BMenu* fConnectionMenu;
 		BMenu* fDatabitsMenu;
 		BMenu* fStopbitsMenu;

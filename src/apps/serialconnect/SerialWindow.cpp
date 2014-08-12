@@ -13,6 +13,7 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <ScrollView.h>
 #include <SerialPort.h>
 
 #include "SerialApp.h"
@@ -41,13 +42,30 @@ SerialWindow::SerialWindow()
 		B_DOCUMENT_WINDOW, B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS)
 	, fLogFilePanel(NULL)
 {
-	SetLayout(new BGroupLayout(B_VERTICAL, 0.0f));
+	BMenuBar* menuBar = new BMenuBar(Bounds(), "menuBar");
+	menuBar->ResizeToPreferred();
 
-	BMenuBar* menuBar = new BMenuBar("menuBar");
-	fTermView = new TermView();
+	BRect r = Bounds();
+	r.top = menuBar->Bounds().bottom + 1;
+	r.right -= B_V_SCROLL_BAR_WIDTH;
+	fTermView = new TermView(r);
+	fTermView->ResizeToPreferred();
+
+	r = fTermView->Frame();
+	r.left = r.right + 1;
+	r.right = r.left + B_V_SCROLL_BAR_WIDTH;
+	r.top -= 1;
+	r.bottom -= B_H_SCROLL_BAR_HEIGHT - 1;
+	BScrollBar* scrollBar = new BScrollBar(r, "scrollbar", NULL, 0, 0,
+		B_VERTICAL);
+
+	scrollBar->SetTarget(fTermView);
+
+	ResizeTo(r.right - 1, r.bottom + B_H_SCROLL_BAR_HEIGHT - 1);
 
 	AddChild(menuBar);
 	AddChild(fTermView);
+	AddChild(scrollBar);
 
 	fConnectionMenu = new BMenu("Connection");
 	BMenu* fileMenu = new BMenu("File");
@@ -62,7 +80,7 @@ SerialWindow::SerialWindow()
 	// TODO edit menu - what's in it ?
 	//BMenu* editMenu = new BMenu("Edit");
 	//menuBar->AddItem(editMenu);
-	
+
 	BMenuItem* logFile = new BMenuItem("Log to file" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgLogfile));
 	fileMenu->AddItem(logFile);
@@ -78,23 +96,23 @@ SerialWindow::SerialWindow()
 
 	// Configuring all this by menus may be a bit unhandy. Make a setting
 	// window instead ?
-	fBaudrateMenu = new BMenu("Baud rate"); 
+	fBaudrateMenu = new BMenu("Baud rate");
 	fBaudrateMenu->SetRadioMode(true);
 	settingsMenu->AddItem(fBaudrateMenu);
 
-	fParityMenu = new BMenu("Parity"); 
+	fParityMenu = new BMenu("Parity");
 	fParityMenu->SetRadioMode(true);
 	settingsMenu->AddItem(fParityMenu);
 
-	fStopbitsMenu = new BMenu("Stop bits"); 
+	fStopbitsMenu = new BMenu("Stop bits");
 	fStopbitsMenu->SetRadioMode(true);
 	settingsMenu->AddItem(fStopbitsMenu);
 
-	fFlowcontrolMenu = new BMenu("Flow control"); 
+	fFlowcontrolMenu = new BMenu("Flow control");
 	fFlowcontrolMenu->SetRadioMode(true);
 	settingsMenu->AddItem(fFlowcontrolMenu);
 
-	fDatabitsMenu = new BMenu("Data bits"); 
+	fDatabitsMenu = new BMenu("Data bits");
 	fDatabitsMenu->SetRadioMode(true);
 	settingsMenu->AddItem(fDatabitsMenu);
 
@@ -147,7 +165,7 @@ SerialWindow::SerialWindow()
 		message->AddInt32("baudrate", kBaudrateConstants[i]);
 
 		char buffer[7];
-		sprintf(buffer,"%d", kBaudrates[i]);
+		sprintf(buffer, "%d", kBaudrates[i]);
 		BMenuItem* item = new BMenuItem(buffer, message);
 
 		fBaudrateMenu->AddItem(item);
@@ -181,7 +199,6 @@ SerialWindow::SerialWindow()
 }
 
 
-
 SerialWindow::~SerialWindow()
 {
 	delete fLogFilePanel;
@@ -198,7 +215,7 @@ void SerialWindow::MenusBeginning()
 	int deviceCount = serialPort.CountDevices();
 	bool connected = false;
 
-	for(int i = 0; i < deviceCount; i++)
+	for (int i = 0; i < deviceCount; i++)
 	{
 		char buffer[256];
 		serialPort.GetDeviceName(i, buffer, 256);
@@ -210,7 +227,7 @@ void SerialWindow::MenusBeginning()
 
 		const BString& connectedPort = ((SerialApp*)be_app)->GetPort();
 
-		if(connectedPort == buffer) {
+		if (connectedPort == buffer) {
 			connected = true;
 			portItem->SetMarked(true);
 		}
@@ -223,7 +240,7 @@ void SerialWindow::MenusBeginning()
 
 		BMenuItem* disconnect = new BMenuItem("Disconnect",
 			new BMessage(kMsgOpenPort), 'Z', B_OPTION_KEY);
-		if(!connected)
+		if (!connected)
 			disconnect->SetEnabled(false);
 		fConnectionMenu->AddItem(disconnect);
 	} else {
@@ -233,6 +250,7 @@ void SerialWindow::MenusBeginning()
 	}
 }
 
+
 void SerialWindow::MessageReceived(BMessage* message)
 {
 	switch(message->what)
@@ -240,7 +258,7 @@ void SerialWindow::MessageReceived(BMessage* message)
 		case kMsgOpenPort:
 		{
 			BMenuItem* disconnectMenu;
-			if(message->FindPointer("source", (void**)&disconnectMenu) == B_OK)
+			if (message->FindPointer("source", (void**)&disconnectMenu) == B_OK)
 				disconnectMenu->SetMarked(false);
 			be_app->PostMessage(new BMessage(*message));
 			break;
@@ -257,7 +275,7 @@ void SerialWindow::MessageReceived(BMessage* message)
 		case kMsgLogfile:
 		{
 			// Let's lazy init the file panel
-			if(fLogFilePanel == NULL) {
+			if (fLogFilePanel == NULL) {
 				fLogFilePanel = new BFilePanel(B_SAVE_PANEL, &be_app_messenger,
 					NULL, B_FILE_NODE, false);
 				fLogFilePanel->SetMessage(message);
@@ -273,71 +291,63 @@ void SerialWindow::MessageReceived(BMessage* message)
 			parity_mode parity;
 			uint32 flowcontrol;
 
-			if(message->FindInt32("databits", (int32*)&dataBits) == B_OK)
-			{
-				for(int i = 0; i < fDatabitsMenu->CountItems(); i++)
-				{
+			if (message->FindInt32("databits", (int32*)&dataBits) == B_OK) {
+				for (int i = 0; i < fDatabitsMenu->CountItems(); i++) {
 					BMenuItem* item = fDatabitsMenu->ItemAt(i);
 					int32 code;
 					item->Message()->FindInt32("databits", &code);
 
-					if(code == dataBits)
+					if (code == dataBits)
 						item->SetMarked(true);
 				}
 			}
 
-			if(message->FindInt32("stopbits", (int32*)&stopBits) == B_OK)
-			{
-				for(int i = 0; i < fStopbitsMenu->CountItems(); i++)
-				{
+			if (message->FindInt32("stopbits", (int32*)&stopBits) == B_OK) {
+				for (int i = 0; i < fStopbitsMenu->CountItems(); i++) {
 					BMenuItem* item = fStopbitsMenu->ItemAt(i);
 					int32 code;
 					item->Message()->FindInt32("stopbits", &code);
 
-					if(code == stopBits)
+					if (code == stopBits)
 						item->SetMarked(true);
 				}
 			}
 
-			if(message->FindInt32("parity", (int32*)&parity) == B_OK)
+			if (message->FindInt32("parity", (int32*)&parity) == B_OK)
 			{
-				for(int i = 0; i < fParityMenu->CountItems(); i++)
-				{
+				for (int i = 0; i < fParityMenu->CountItems(); i++) {
 					BMenuItem* item = fParityMenu->ItemAt(i);
 					int32 code;
 					item->Message()->FindInt32("parity", &code);
 
-					if(code == parity)
+					if (code == parity)
 						item->SetMarked(true);
 				}
 			}
 
-			if(message->FindInt32("flowcontrol", (int32*)&flowcontrol) == B_OK)
-			{
-				for(int i = 0; i < fFlowcontrolMenu->CountItems(); i++)
-				{
+			if (message->FindInt32("flowcontrol", (int32*)&flowcontrol)
+					== B_OK) {
+				for (int i = 0; i < fFlowcontrolMenu->CountItems(); i++) {
 					BMenuItem* item = fFlowcontrolMenu->ItemAt(i);
 					int32 code;
 					item->Message()->FindInt32("flowcontrol", &code);
 
-					if(code == (int32)flowcontrol)
+					if (code == (int32)flowcontrol)
 						item->SetMarked(true);
 				}
 			}
 
-			if(message->FindInt32("baudrate", &baudrate) == B_OK)
-			{
-				for(int i = 0; i < fBaudrateMenu->CountItems(); i++)
-				{
+			if (message->FindInt32("baudrate", &baudrate) == B_OK) {
+				for (int i = 0; i < fBaudrateMenu->CountItems(); i++) {
 					BMenuItem* item = fBaudrateMenu->ItemAt(i);
 					int32 code;
 					item->Message()->FindInt32("baudrate", &code);
 
-					if(baudrate == code)
+					if (baudrate == code)
 						item->SetMarked(true);
 				}
 			}
-			
+
 			break;
 		}
 		default:

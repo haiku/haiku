@@ -11,27 +11,30 @@
 #include <Entry.h>
 #include <File.h>
 #include <Layout.h>
+#include <ScrollBar.h>
 
 #include "SerialApp.h"
+
+
+struct ScrollBufferItem {
+	int cols;
+	VTermScreenCell cells[];
+};
 
 
 TermView::TermView()
 	:
 	BView("TermView", B_WILL_DRAW | B_FRAME_EVENTS)
 {
-	SetFont(be_fixed_font);
+	_Init();
+}
 
-	font_height height;
-	GetFontHeight(&height);
-	fFontHeight = height.ascent + height.descent + height.leading + 1;
-	fFontWidth = be_fixed_font->StringWidth("X");
-	fTerm = vterm_new(kDefaultHeight, kDefaultWidth);
 
-	fTermScreen = vterm_obtain_screen(fTerm);
-	vterm_screen_set_callbacks(fTermScreen, &sScreenCallbacks, this);
-	vterm_screen_reset(fTermScreen, 1);
-
-	vterm_parser_set_utf8(fTerm, 1);
+TermView::TermView(BRect r)
+	:
+	BView(r, "TermView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
+{
+	_Init();
 }
 
 
@@ -41,7 +44,8 @@ TermView::~TermView()
 }
 
 
-void TermView::AttachedToWindow()
+void
+TermView::AttachedToWindow()
 {
 	MakeFocus();
 
@@ -49,7 +53,7 @@ void TermView::AttachedToWindow()
 	VTermPos firstPos;
 	firstPos.row = 0;
 	firstPos.col = 0;
-	vterm_screen_get_cell(fTermScreen, firstPos, &cell);
+	_GetCell(firstPos, cell);
 
 	rgb_color background;
 	background.red = cell.bg.red;
@@ -61,16 +65,14 @@ void TermView::AttachedToWindow()
 }
 
 
-void TermView::Draw(BRect updateRect)
+void
+TermView::Draw(BRect updateRect)
 {
-	VTermRect updatedChars = PixelsToGlyphs(updateRect);
+	VTermRect updatedChars = _PixelsToGlyphs(updateRect);
 
 	VTermPos pos;
 	font_height height;
 	GetFontHeight(&height);
-
-	int availableRows, availableCols;
-	vterm_get_size(fTerm, &availableRows, &availableCols);
 
 	for (pos.row = updatedChars.start_row; pos.row <= updatedChars.end_row;
 			pos.row++) {
@@ -82,19 +84,7 @@ void TermView::Draw(BRect updateRect)
 				pos.col <= updatedChars.end_col;) {
 			VTermScreenCell cell;
 
-			if (pos.col < 0 || pos.row < 0 || pos.col >= availableCols
-					|| pos.row >= availableRows) {
-
-				// All cells outside the used terminal area are drawn with the
-				// same background color as the top-left one.
-				VTermPos firstPos;
-				firstPos.row = 0;
-				firstPos.col = 0;
-				vterm_screen_get_cell(fTermScreen, firstPos, &cell);
-				cell.chars[0] = 0;
-				cell.width = 1;
-			} else
-				vterm_screen_get_cell(fTermScreen, pos, &cell);
+			_GetCell(pos, cell);
 
 			rgb_color foreground, background;
 			foreground.red = cell.fg.red;
@@ -119,7 +109,7 @@ void TermView::Draw(BRect updateRect)
 			BPoint penLocation = PenLocation();
 			FillRect(BRect(penLocation.x, penLocation.y - height.ascent,
 				penLocation.x + cell.width * fFontWidth - 1,
-				penLocation.y + height.descent + height.leading - 1),
+				penLocation.y + height.descent + height.leading),
 				B_SOLID_LOW);
 
 			if (cell.chars[0] == 0) {
@@ -138,15 +128,17 @@ void TermView::Draw(BRect updateRect)
 }
 
 
-void TermView::FrameResized(float width, float height)
+void
+TermView::FrameResized(float width, float height)
 {
-	VTermRect newSize = PixelsToGlyphs(BRect(0, 0, width - 2 * kBorderSpacing,
+	VTermRect newSize = _PixelsToGlyphs(BRect(0, 0, width - 2 * kBorderSpacing,
 				height - 2 * kBorderSpacing));
 	vterm_set_size(fTerm, newSize.end_row, newSize.end_col);
 }
 
 
-void TermView::GetPreferredSize(float* width, float* height)
+void
+TermView::GetPreferredSize(float* width, float* height)
 {
 	if (width != NULL)
 		*width = kDefaultWidth * fFontWidth + 2 * kBorderSpacing;
@@ -155,7 +147,8 @@ void TermView::GetPreferredSize(float* width, float* height)
 }
 
 
-void TermView::KeyDown(const char* bytes, int32 numBytes)
+void
+TermView::KeyDown(const char* bytes, int32 numBytes)
 {
 	BMessage* keyEvent = new BMessage(kMsgDataWrite);
 	keyEvent->AddData("data", B_RAW_TYPE, bytes, numBytes);
@@ -163,7 +156,8 @@ void TermView::KeyDown(const char* bytes, int32 numBytes)
 }
 
 
-void TermView::MessageReceived(BMessage* message)
+void
+TermView::MessageReceived(BMessage* message)
 {
 	switch(message->what)
 	{
@@ -183,7 +177,8 @@ void TermView::MessageReceived(BMessage* message)
 }
 
 
-void TermView::PushBytes(const char* bytes, size_t length)
+void
+TermView::PushBytes(const char* bytes, size_t length)
 {
 	vterm_push_bytes(fTerm, bytes, length);
 }
@@ -192,7 +187,27 @@ void TermView::PushBytes(const char* bytes, size_t length)
 // #pragma mark -
 
 
-VTermRect TermView::PixelsToGlyphs(BRect pixels) const
+void
+TermView::_Init()
+{
+	SetFont(be_fixed_font);
+
+	font_height height;
+	GetFontHeight(&height);
+	fFontHeight = height.ascent + height.descent + height.leading + 1;
+	fFontWidth = be_fixed_font->StringWidth("X");
+	fTerm = vterm_new(kDefaultHeight, kDefaultWidth);
+
+	fTermScreen = vterm_obtain_screen(fTerm);
+	vterm_screen_set_callbacks(fTermScreen, &sScreenCallbacks, this);
+	vterm_screen_reset(fTermScreen, 1);
+
+	vterm_parser_set_utf8(fTerm, 1);
+}
+
+
+VTermRect
+TermView::_PixelsToGlyphs(BRect pixels) const
 {
 	pixels.OffsetBy(-kBorderSpacing, -kBorderSpacing);
 
@@ -201,7 +216,7 @@ VTermRect TermView::PixelsToGlyphs(BRect pixels) const
 	rect.end_col = (int)ceil(pixels.right / fFontWidth);
 	rect.start_row = (int)floor(pixels.top / fFontHeight);
 	rect.end_row = (int)ceil(pixels.bottom / fFontHeight);
-/*
+#if 0
 	printf(
 		"TOP %d ch < %f px\n"
 		"BTM %d ch < %f px\n"
@@ -212,12 +227,12 @@ VTermRect TermView::PixelsToGlyphs(BRect pixels) const
 		rect.start_col, pixels.left,
 		rect.end_col, pixels.right
 	);
-*/
+#endif
 	return rect;
 }
 
 
-BRect TermView::GlyphsToPixels(const VTermRect& glyphs) const
+BRect TermView::_GlyphsToPixels(const VTermRect& glyphs) const
 {
 	BRect rect;
 	rect.top = glyphs.start_row * fFontHeight;
@@ -242,40 +257,128 @@ BRect TermView::GlyphsToPixels(const VTermRect& glyphs) const
 }
 
 
-BRect TermView::GlyphsToPixels(const int width, const int height) const
+BRect
+TermView::_GlyphsToPixels(const int width, const int height) const
 {
 	VTermRect rect;
 	rect.start_row = 0;
 	rect.start_col = 0;
 	rect.end_row = height;
 	rect.end_col = width;
-	return GlyphsToPixels(rect);
+	return _GlyphsToPixels(rect);
 }
 
 
-void TermView::Damage(VTermRect rect)
+void
+TermView::_GetCell(VTermPos pos, VTermScreenCell& cell)
 {
-	Invalidate();
-//	Invalidate(GlyphsToPixels(rect));
+	int availableRows, availableCols;
+	vterm_get_size(fTerm, &availableRows, &availableCols);
+
+	if (pos.col < 0 || pos.row < -kScrollBackSize || pos.col >= availableCols
+			|| pos.row >= availableRows) {
+		// All cells outside the used terminal area are drawn with the same
+		// background color as the top-left one.
+		// TODO should they use the attributes of the closest neighbor instead?
+		VTermPos firstPos;
+		firstPos.row = 0;
+		firstPos.col = 0;
+		vterm_screen_get_cell(fTermScreen, firstPos, &cell);
+		cell.chars[0] = 0;
+		cell.width = 1;
+	} else if (pos.row < 0) {
+		// This is a cell from the scroll-back buffer
+		int offset = - pos.row - 1;
+		ScrollBufferItem* line = (ScrollBufferItem*)fScrollBuffer.ItemAt(offset);
+		if (line == NULL || pos.col >= line->cols) {
+			VTermPos firstPos;
+			firstPos.row = 0;
+			firstPos.col = 0;
+			vterm_screen_get_cell(fTermScreen, firstPos, &cell);
+			cell.chars[0] = 0;
+			cell.width = 1;
+		} else
+			cell = line->cells[pos.col];
+	} else
+		vterm_screen_get_cell(fTermScreen, pos, &cell);
 }
 
 
-/* static */
-int TermView::Damage(VTermRect rect, void* user)
+void
+TermView::_Damage(VTermRect rect)
+{
+//	Invalidate();
+	Invalidate(_GlyphsToPixels(rect));
+}
+
+
+void
+TermView::_PushLine(int cols, const VTermScreenCell* cells)
+{
+	ScrollBufferItem* item = (ScrollBufferItem*)malloc(sizeof(int)
+		+ cols * sizeof(VTermScreenCell));
+	item->cols = cols;
+	memcpy(item->cells, cells, cols * sizeof(VTermScreenCell));
+
+	fScrollBuffer.AddItem(item, 0);
+
+	free(fScrollBuffer.RemoveItem(kScrollBackSize));
+
+	int availableRows, availableCols;
+	vterm_get_size(fTerm, &availableRows, &availableCols);
+
+	VTermRect dirty;
+	dirty.start_col = 0;
+	dirty.end_col = availableCols;
+	dirty.end_row = 0;
+	dirty.start_row = -fScrollBuffer.CountItems();
+	// FIXME we should rather use CopyRect if possible, and only invalidate the
+	// newly exposed area here.
+	Invalidate(_GlyphsToPixels(dirty));
+
+	BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
+	if (scrollBar != NULL) {
+		// FIXME this is not exactly right, it's off by a few pixels so one step
+		// isn't exactly equal to one line.
+		float range = (fScrollBuffer.CountItems() + availableRows) * fFontHeight;
+		scrollBar->SetRange(availableRows * fFontHeight - range, 0.0f);
+		// TODO we need to adjust this in FrameResized, as availableRows can
+		// change
+		scrollBar->SetProportion(availableRows * fFontHeight / range);
+		scrollBar->SetSteps(fFontHeight, fFontHeight * 3);
+	}
+}
+
+
+/* static */ int
+TermView::_Damage(VTermRect rect, void* user)
 {
 	TermView* view = (TermView*)user;
-	view->Damage(rect);
+	view->_Damage(rect);
 
 	return 0;
 }
 
 
-const VTermScreenCallbacks TermView::sScreenCallbacks = {
-	&TermView::Damage,
+/* static */ int
+TermView::_PushLine(int cols, const VTermScreenCell* cells, void* user)
+{
+	TermView* view = (TermView*)user;
+	view->_PushLine(cols, cells);
+
+	return 0;
+}
+
+
+const
+VTermScreenCallbacks TermView::sScreenCallbacks = {
+	&TermView::_Damage,
 	/*.moverect =*/ NULL,
 	/*.movecursor =*/ NULL,
 	/*.settermprop =*/ NULL,
 	/*.setmousefunc =*/ NULL,
 	/*.bell =*/ NULL,
 	/*.resize =*/ NULL,
+	&TermView::_PushLine,
+	/*.sb_popline =*/ NULL,
 };
