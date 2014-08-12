@@ -125,6 +125,10 @@ static keycodes_s keycodes_kp[] = {
 void vterm_input_push_key(VTerm *vt, VTermModifier mod, VTermKey key)
 {
   keycodes_s k;
+  k.csinum = 0;
+  k.literal = 0;
+  k.type = 0;
+
   if(key == VTERM_KEY_NONE)
     return;
 
