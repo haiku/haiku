@@ -140,8 +140,8 @@ endef
 OBJS = $(SRCS_LIST_TO_OBJS)
 DEPENDS = $(SRCS_LIST_TO_DEPENDS)
 
-# create a unique list of paths to our sourcefiles
-SRC_PATHS += $(sort $(foreach file, $(SRCS), $(dir $(file))))
+# create a unique list of paths to our sourcefiles and resources
+SRC_PATHS += $(sort $(foreach file, $(SRCS) $(RSRCS) $(RDEFS), $(dir $(file))))
 
 # add source paths to VPATH if not already present
 VPATH :=
@@ -351,8 +351,8 @@ rmapp ::
 	-rm -f $(TARGET)
 
 # make it easy to install drivers for testing
-USER_BIN_PATH = /boot/home/config/add-ons/kernel/drivers/bin
-USER_DEV_PATH = /boot/home/config/add-ons/kernel/drivers/dev
+USER_BIN_PATH := $(shell finddir B_USER_NONPACKAGED_ADDONS_DIRECTORY)/kernel/drivers/bin
+USER_DEV_PATH := $(shell finddir B_USER_NONPACKAGED_ADDONS_DIRECTORY)/kernel/drivers/dev
 
 driverinstall :: default
 ifeq ($(strip $(TYPE)), DRIVER)
@@ -369,10 +369,13 @@ else
 	cp $(TARGET) $(INSTALL_DIR)/$(NAME)
 endif
 
+# catalog installation directory
+CATALOG_INSTALL_DIR := $(shell finddir B_USER_NONPACKAGED_DATA_DIRECTORY)/locale/catalogs
+
 #	rule to install localization resources catalogs
 catalogsinstall :: catalogs
-	mkdir -p "/boot/home/config/data/locale/catalogs/$(APP_MIME_SIG)"
-	-cp $(CATALOGS_DIR)/*.catalog /boot/home/config/data/locale/catalogs/$(APP_MIME_SIG)
+	mkdir -p "$(CATALOG_INSTALL_DIR)/$(APP_MIME_SIG)"
+	-cp $(CATALOGS_DIR)/*.catalog "$(CATALOG_INSTALL_DIR)/$(APP_MIME_SIG)"
 
 # alternative way of storing localization catalogs - bind into program executable's resources
 bindcatalogs :
