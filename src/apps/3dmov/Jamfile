@@ -27,7 +27,7 @@ Application 3DMov :
 	:
 	be game
 	[ BuildFeatureAttribute mesa : library ]
-	localestub media translation $(TARGET_LIBSUPC++)
+	localestub media translation [ TargetLibsupc++ ]
 	: 3dmov.rdef
 ;
 

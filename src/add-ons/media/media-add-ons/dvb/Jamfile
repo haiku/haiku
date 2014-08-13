@@ -19,7 +19,7 @@ Addon dvb.media_addon :
 	PacketQueue.cpp
 	pes.cpp
 	TransportStreamDemux.cpp
-	: be media $(TARGET_LIBSUPC++)
+	: be media [ TargetLibsupc++ ]
 ;
 
 Includes [ FGristFiles MediaFormat.cpp ]

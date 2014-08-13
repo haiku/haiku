@@ -5,7 +5,7 @@ UsePrivateHeaders shared storage ;
 Application writembr :
 	writembr.cpp
 
-	: be $(TARGET_LIBSUPC+++) $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 # Assemble the MBR code, and convert it into a header file

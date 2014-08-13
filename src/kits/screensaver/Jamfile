@@ -16,7 +16,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ScreenSaverSettings.cpp
 			ScreenSaverRunner.cpp
 			:
-			be game $(TARGET_LIBSUPC++)
+			be game [ TargetLibsupc++ ]
 			;
 	}
 }

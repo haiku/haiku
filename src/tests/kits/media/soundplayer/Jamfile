@@ -2,5 +2,5 @@ SubDir HAIKU_TOP src tests kits media soundplayer ;
 
 SimpleTest <test>SimplePlayerTest
 	: SimplePlayerTest.cpp
-	: media be $(TARGET_LIBSUPC++)
+	: media be [ TargetLibsupc++ ]
 ;

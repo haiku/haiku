@@ -137,7 +137,7 @@ rule PublicHeaders
 
 	local list = $(1) ;
 	local dirs ;
-
+	local i ;
 	for i in $(list) {
 		dirs += [ FDirName $(HAIKU_TOP) headers os $(i) ] ;
 	}
@@ -154,6 +154,7 @@ rule PrivateHeaders
 
 	local list = $(1) ;
 	local dirs ;
+	local i ;
 	for i in $(list) {
 		dirs += [ FDirName $(HAIKU_TOP) headers private $(i) ] ;
 	}
@@ -170,6 +171,7 @@ rule PrivateBuildHeaders
 
 	local list = $(1) ;
 	local dirs ;
+	local i ;
 	for i in $(list) {
 		dirs += [ FDirName $(HAIKU_TOP) headers build private $(i) ] ;
 	}
@@ -186,6 +188,7 @@ rule LibraryHeaders
 
 	local list = $(1) ;
 	local dirs ;
+	local i ;
 	for i in $(list) {
 		dirs += [ FDirName $(HAIKU_TOP) headers libs $(i) ] ;
 	}
@@ -453,16 +456,11 @@ rule FStandardHeaders architecture
 
 	local headers = ;
 
-	# The C++ headers. If specified, we use the compiler headers, otherwise
-	# the ones that come with our libstdc++.
-	if $(HAIKU_C++_HEADERS_DIR_$(architecture)) {
-		headers += $(HAIKU_C++_HEADERS_DIR_$(architecture)) ;
-	} else {
-		headers += [ FDirName $(HAIKU_TOP) headers cpp ] ;
-	}
+	# The c++ headers.
+	headers += [ C++HeaderDirectories $(architecture) ] ;
 
-	# GCC headers
-	headers += $(HAIKU_GCC_HEADERS_DIR_$(architecture)) ;
+	# The gcc headers.
+	headers += [ GccHeaderDirectories $(architecture) ] ;
 
 	# Use headers directory, to allow to do things like include <posix/string.h>
 	headers += [ FDirName $(HAIKU_TOP) headers ] ;

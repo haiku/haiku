@@ -6,13 +6,13 @@ AddSubDirSupportedPlatforms libbe_test ;
 UnitTestLib libexampletest.so
 	: ExampleTestAddon.cpp
 		ExampleTest.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 	:
 ;
 
 UnitTest UnitTester
 	: UnitTester.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 	: UnitTester.rsrc
 ;
 

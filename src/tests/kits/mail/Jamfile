@@ -7,5 +7,5 @@ UsePrivateHeaders mail shared ;
 SimpleTest header_test :
 	header_test.cpp
 
-	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) mail
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] mail
 ;

@@ -6,7 +6,7 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders package shared storage support ;
 
 
-local subDirs = 
+local subDirs =
 	indices
 	nodes
 	package
@@ -129,7 +129,7 @@ KernelAddon packagefs
 	$(storageKitSources)
 	$(supportKitSources)
 
-	: $(TARGET_KERNEL_LIBSUPC++) kernel_libz.a
+	: kernel_libz.a
 ;
 
 

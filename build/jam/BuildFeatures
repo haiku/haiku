@@ -5,6 +5,7 @@
 
 local architecture = $(TARGET_PACKAGING_ARCH) ;
 local secondaryArchSubDir = [ MultiArchIfPrimary "" : /$(architecture) ] ;
+local libDir = lib$(secondaryArchSubDir) ;
 local developLibDir = develop/lib$(secondaryArchSubDir) ;
 local developHeadersDir = develop/headers$(secondaryArchSubDir) ;
 
@@ -36,9 +37,61 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 }
 
 
+# gcc_syslibs
+
+if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
+	if [ IsPackageAvailable gcc_syslibs ] {
+		ExtractBuildFeatureArchives gcc_syslibs :
+			file: base gcc_syslibs
+				libgcc_s.so: $(libDir)/libgcc_s.so
+				libstdc++.so: $(libDir)/libstdc++.so
+				libsupc++.so: $(libDir)/libsupc++.so
+			;
+
+		EnableBuildFeatures gcc_syslibs ;
+	} else  {
+		Echo "gcc_syslibs not available for $(TARGET_PACKAGING_ARCH)" ;
+	}
+}
+
+
+# gcc_syslibs_devel
+
+if [ IsPackageAvailable gcc_syslibs_devel ] {
+	if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+		ExtractBuildFeatureArchives gcc_syslibs_devel :
+			file: base gcc_syslibs_devel
+				libgcc.a: $(developLibDir)/libgcc.a
+				libgcc_eh.a:
+				libgcc-kernel.a: $(developLibDir)/libgcc.a
+				libgcc_eh-kernel.a:
+				libstdc++.a:
+				libsupc++.a:
+				libsupc++-kernel.a:
+			;
+	} else {
+		ExtractBuildFeatureArchives gcc_syslibs_devel :
+			file: base gcc_syslibs_devel
+				libgcc.a: $(developLibDir)/libgcc.a
+				libgcc_eh.a: $(developLibDir)/libgcc_eh.a
+				libgcc-kernel.a: $(developLibDir)/libgcc-kernel.a
+				libgcc_eh-kernel.a: $(developLibDir)/libgcc_eh.a
+				libstdc++.a: $(developLibDir)/libstdc++.a
+				libsupc++.a: $(developLibDir)/libsupc++.a
+				libsupc++-kernel.a: $(developLibDir)/libsupc++-kernel.a
+				c++-headers: $(developHeadersDir)/c++
+				gcc-headers: $(developHeadersDir)/gcc
+			;
+	}
+
+	EnableBuildFeatures gcc_syslibs_devel ;
+} else  {
+	Echo "gcc_syslibs_devel not available for $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # ICU
 
-# Note ICU isn't actually optional, but is still an external package
 if [ IsPackageAvailable icu_devel ] {
 	ExtractBuildFeatureArchives icu :
 		file: base icu

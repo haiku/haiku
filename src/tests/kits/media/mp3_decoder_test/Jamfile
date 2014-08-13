@@ -10,7 +10,7 @@ SubDirC++Flags -D__STDC_CONSTANT_MACROS -Wno-deprecated-declarations ;
 
 SimpleTest mp3_decoder_test :
 	mp3_decoder_test.cpp
-	: be media $(TARGET_LIBSUPC++)
+	: be media [ TargetLibsupc++ ]
 ;
 
 Includes [ FGristFiles mp3_decoder_test.cpp ]

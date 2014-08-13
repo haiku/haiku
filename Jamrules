@@ -62,6 +62,7 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) MiscRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OverriddenJamRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) PackageRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) RepositoryRules ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) SystemLibraryRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) TestsRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildSetup ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) DefaultBuildProfiles ] ;

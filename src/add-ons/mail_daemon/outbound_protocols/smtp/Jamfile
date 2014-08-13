@@ -29,7 +29,7 @@ AddResources SMTP : SMTP.rdef ;
 
 Addon SMTP
 	: $(sources)
-	: be libmail.so $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++)
+	: be libmail.so $(TARGET_NETWORK_LIBS) [ TargetLibstdc++ ]
 		localestub [ BuildFeatureAttribute openssl : libraries ]
 ;
 

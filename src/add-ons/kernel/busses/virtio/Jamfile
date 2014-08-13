@@ -6,6 +6,4 @@ UsePrivateHeaders kernel virtio ;
 
 KernelAddon virtio_pci :
 	virtio_pci.cpp
-
-	: $(TARGET_KERNEL_LIBSUPC++)
 ;

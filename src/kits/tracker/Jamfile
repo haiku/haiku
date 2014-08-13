@@ -100,7 +100,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			WidgetAttributeText.cpp
 
 			:
-			be translation $(vectorIconLibs) $(TARGET_LIBSTDC++) localestub
+			be translation $(vectorIconLibs) [ TargetLibstdc++ ] localestub
 			[ MultiArchDefaultGristFiles libshared.a ]
 			[ MultiArchDefaultGristFiles libshortcuts_shared.a ]
 			;

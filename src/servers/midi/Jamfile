@@ -12,7 +12,7 @@ Server midi_server :
 	# storage
 	NodeMonitorHandler.cpp
 
-	: be midi2 libshared.a libicon.a $(TARGET_LIBSTDC++)
+	: be midi2 libshared.a libicon.a [ TargetLibstdc++ ]
 	: midi_server.rdef
 ;
 

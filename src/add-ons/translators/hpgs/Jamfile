@@ -60,7 +60,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 				[ BuildFeatureAttribute libpng : library ]
 				[ BuildFeatureAttribute zlib : library ]
 				[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
-				$(TARGET_LIBSUPC++) localestub
+				[ TargetLibsupc++ ] localestub
 			: true
 		;
 	}

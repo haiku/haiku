@@ -14,5 +14,5 @@ Addon opensound.media_addon :
 	OpenSoundDeviceEngine.cpp
 	OpenSoundDeviceMixer.cpp
 	OpenSoundNode.cpp
-	: be media $(TARGET_LIBSUPC++)
+	: be media [ TargetLibsupc++ ]
 ;

@@ -171,6 +171,7 @@ provides {
 
 requires {
 	lib:libfreetype
+	lib:libgcc_s
 	lib:libicudata
 	lib:libicui18n
 	lib:libicuio
@@ -185,5 +186,7 @@ requires {
 #endif
 	lib:libsolv
 	lib:libsolvext
+	lib:libstdc++
+	lib:libsupc++
 	lib:libz
 }

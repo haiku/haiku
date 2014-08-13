@@ -21,7 +21,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			<libwebp>webpdecode.o
 			<libwebp>webpencode.o
 			be translation [ MultiArchDefaultGristFiles libtranslatorsutils.a ]
-			$(TARGET_LIBSUPC++)	localestub
+			[ TargetLibsupc++ ]	localestub
 			: true
 		;
 	}

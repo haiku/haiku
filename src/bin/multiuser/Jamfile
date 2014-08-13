@@ -21,7 +21,7 @@ BinCommand groupadd : groupadd.cpp ;
 
 BinCommand groupdel : groupdel.cpp ;
 
-BinCommand groupmod : groupmod.cpp : $(TARGET_LIBSTDC++) ;
+BinCommand groupmod : groupmod.cpp : [ TargetLibstdc++ ] ;
 
 # set set-uid bit on passwd
 MODE on passwd = 04755 ;

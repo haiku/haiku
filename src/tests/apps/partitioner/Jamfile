@@ -6,5 +6,5 @@ UsePrivateHeaders storage ;
 SimpleTest Partitioner :
 	Partitioner.cpp
 
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;

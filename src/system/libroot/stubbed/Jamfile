@@ -1,0 +1,28 @@
+SubDir HAIKU_TOP src system libroot stubbed ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+
+		UsePrivateSystemHeaders ;
+
+		# Build <stubbed>libroot.so, containing only empty symbols.
+		local stubsSource ;
+		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+			stubsSource = [ FGristFiles libroot_stubs_legacy.c ] ;
+		} else {
+			stubsSource = [ FGristFiles libroot_stubs.c ] ;
+		}
+		local stubsObject = $(stubsSource:S=$(SUFOBJ)) ;
+		CCFLAGS on $(stubsObject) = -Wno-missing-prototypes -fno-builtin ;
+		Depends $(stubsObject) : $(stubsSource) ;
+		BootstrapStage0PlatformObjects $(stubsSource) ;
+		local stubbedLibroot
+			= [ MultiArchDefaultGristFiles libroot.so : stubbed ] ;
+		local versionScript
+			= [ FDirName $(HAIKU_TOP) src system libroot libroot_versions ] ;
+		LINKFLAGS on $(stubbedLibroot)
+			= -shared -soname=libroot.so --version-script $(versionScript) ;
+		Ld $(stubbedLibroot) : $(stubsObject) ;
+	}
+}

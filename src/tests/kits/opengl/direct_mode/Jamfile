@@ -15,7 +15,7 @@ Includes [ FGristFiles $(sources) ]
 SimpleTest GLDirectMode :
 	$(sources)
 	:
-	be game $(TARGET_LIBSUPC++)
+	be game [ TargetLibsupc++ ]
 	[ BuildFeatureAttribute mesa : library ]
 	[ BuildFeatureAttribute glu : library ]
 	: GLDirectMode.rdef

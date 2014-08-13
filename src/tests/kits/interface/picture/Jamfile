@@ -23,7 +23,7 @@ UseLibraryHeaders agg expat ;
 SimpleTest PictureTest :
 	PictureTest.cpp
 	SVGViewView.cpp
-	: be translation libexpat.a $(TARGET_LIBSUPC++)
+	: be translation libexpat.a [ TargetLibsupc++ ]
 	;
 
 if $(TARGET_PLATFORM) = libbe_test {

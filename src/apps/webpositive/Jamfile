@@ -72,7 +72,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			$(sources)
 			:
 			[ BuildFeatureAttribute webkit : libraries ]
-			$(TARGET_LIBSTDC++) localestub
+			[ TargetLibstdc++ ] localestub
 			[ MultiArchDefaultGristFiles libshared.a ]
 			be network bnetapi tracker translation
 			:

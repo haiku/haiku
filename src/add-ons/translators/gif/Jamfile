@@ -21,7 +21,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			SavePalette.cpp
 			SFHash.cpp
 			:
-			be translation $(TARGET_LIBSUPC++) localestub
+			be translation [ TargetLibsupc++ ] localestub
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
 			: true
 		;

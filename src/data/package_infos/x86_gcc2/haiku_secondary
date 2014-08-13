@@ -23,6 +23,7 @@ provides {
 
 requires {
 	lib:libfreetype_%HAIKU_SECONDARY_PACKAGING_ARCH%
+	lib:libgcc_s_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libicudata_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libicui18n_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libicuio_%HAIKU_SECONDARY_PACKAGING_ARCH%
@@ -38,5 +39,7 @@ requires {
 #endif
 	lib:libsolv_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libsolvext_%HAIKU_SECONDARY_PACKAGING_ARCH%
+	lib:libstdc++_%HAIKU_SECONDARY_PACKAGING_ARCH%
+	lib:libsupc++_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libz_%HAIKU_SECONDARY_PACKAGING_ARCH%
 }

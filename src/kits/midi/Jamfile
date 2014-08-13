@@ -30,7 +30,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			midi2
 			media
 			[ MultiArchDefaultGristFiles libfluidsynth.so ]
-			$(TARGET_LIBSUPC++)
+			[ TargetLibsupc++ ]
 			;
 	}
 }

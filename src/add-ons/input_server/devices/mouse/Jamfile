@@ -6,4 +6,4 @@ UsePrivateHeaders input shared ;
 
 Addon <input>mouse :
 	MouseInputDevice.cpp
-	: be input_server $(TARGET_LIBSUPC++) ;
+	: be input_server [ TargetLibsupc++ ] ;

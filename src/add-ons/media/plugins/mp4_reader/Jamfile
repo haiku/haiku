@@ -11,7 +11,7 @@ Addon mp4_reader :
 	:
 	libmp4reader.a
 	[ BuildFeatureAttribute zlib : library ]
-	be libmedia.so $(TARGET_LIBSTDC++)
+	be libmedia.so [ TargetLibstdc++ ]
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins mp4_reader libMP4 ;

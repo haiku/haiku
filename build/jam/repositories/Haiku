@@ -20,8 +20,10 @@ local packages =
 	haiku_$(secondaryArchs)_devel
 	;
 
-if $(TARGET_PACKAGING_ARCH) != x86_gcc2 || $(secondaryArchs) {
-	packages += webpositive ;
+if [ FIsBuildFeatureEnabled webpositive ] {
+	if $(TARGET_PACKAGING_ARCH) != x86_gcc2 || $(secondaryArchs) {
+		packages += webpositive ;
+	}
 }
 
 HaikuRepository $(haikuRepository) : $(repoInfo) : $(packages:S=.hpkg) ;

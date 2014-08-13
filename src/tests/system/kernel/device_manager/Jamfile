@@ -14,7 +14,6 @@ UsePrivateKernelHeaders ;
 
 KernelAddon <test_driver>dma_resource_test :
 	dma_resource_test.cpp
-#: $(HAIKU_LIBSUPC++)
 ;
 
 SubInclude HAIKU_TOP src tests system kernel device_manager playground ;

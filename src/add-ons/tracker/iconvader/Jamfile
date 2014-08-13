@@ -19,5 +19,5 @@ AddResources IconVader : IconVader.rdef ;
 Addon IconVader :
 	IconVader.cpp
 
-	: be tracker $(TARGET_LIBSTDC++)
+	: be tracker [ TargetLibstdc++ ]
 ;

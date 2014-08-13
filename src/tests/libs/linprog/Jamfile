@@ -7,5 +7,5 @@ UseLibraryHeaders lp_solve linprog ;
 SimpleTest linprog_test :
 	Program.cpp
 	:
-	be liblpsolve55.so linprog.a $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
+	be liblpsolve55.so linprog.a [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;

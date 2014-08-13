@@ -8,7 +8,7 @@ UseHeaders [ FDirName os interface ] ;
 
 Application DrawAfterChildren :
 	DrawAfterChildren.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {

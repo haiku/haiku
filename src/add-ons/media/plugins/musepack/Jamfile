@@ -10,7 +10,7 @@ Addon musepack :
 	MusePack.cpp
 	MusePackReader.cpp
 	MusePackDecoder.cpp
-	: libmusepack.a be libmedia.so $(TARGET_LIBSUPC++)
+	: libmusepack.a be libmedia.so [ TargetLibsupc++ ]
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins musepack mpc ;

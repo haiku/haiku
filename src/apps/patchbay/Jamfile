@@ -11,7 +11,7 @@ SimpleTest PatchBay
 	EndpointInfo.cpp
 	MidiEventMeter.cpp
 	:
-	midi midi2 be libicon.a $(TARGET_LIBSTDC++)
+	midi midi2 be libicon.a [ TargetLibstdc++ ]
 	:
 	PatchBay.rdef
 ;

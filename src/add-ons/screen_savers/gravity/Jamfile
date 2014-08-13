@@ -28,7 +28,7 @@ Includes [ FGristFiles $(sources) ] :
 ScreenSaver Gravity :
 	$(sources)
 	:
-	be screensaver localestub $(TARGET_LIBSTDC++)
+	be screensaver localestub [ TargetLibstdc++ ]
 	[ BuildFeatureAttribute glu : library ]
 	[ BuildFeatureAttribute mesa : library ]
 ;

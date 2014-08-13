@@ -16,7 +16,7 @@ Preference DriveSetup :
 	Support.cpp
 
 	: be localestub libcolumnlistview.a libshared.a
-		$(TARGET_LIBSUPC++)
+		[ TargetLibsupc++ ]
 	: DriveSetup.rdef
 ;
 

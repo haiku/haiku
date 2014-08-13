@@ -171,11 +171,14 @@ provides {
 
 requires {
 	lib:libfreetype
+	lib:libgcc_s
 #ifdef HAIKU_REGULAR_BUILD
 	lib:libjpeg
 	lib:libpng
 #endif
 	lib:libsolv
 	lib:libsolvext
+	lib:libstdc++
+	lib:libsupc++
 	lib:libz
 }

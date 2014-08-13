@@ -14,7 +14,7 @@ Preference Keyboard :
 	KeyboardSettings.cpp 
 	KeyboardView.cpp 
 	KeyboardWindow.cpp
-	: translation be $(TARGET_LIBSUPC++) localestub
+	: translation be [ TargetLibsupc++ ] localestub
 	: Keyboard.rdef
 	;
 

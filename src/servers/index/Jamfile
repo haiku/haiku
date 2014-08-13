@@ -17,7 +17,7 @@ Server index_server :
 	NodeMonitorHandler.cpp
 	:
 	be
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 ;
 
 SEARCH on [ FGristFiles AddOnMonitorHandler.cpp NodeMonitorHandler.cpp ]

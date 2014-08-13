@@ -29,8 +29,8 @@ Addon Interfaces :
 	<nogrist>NetworkSetup
 	$(TARGET_NETWORK_LIBS)
 	libbnetapi.so
-	$(TARGET_LIBSUPC++)
-	$(TARGET_LIBSTDC++)
+	[ TargetLibsupc++ ]
+	[ TargetLibstdc++ ]
 	localestub
 	libicon.a libagg.a
 ;

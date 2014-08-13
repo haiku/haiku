@@ -5,11 +5,11 @@ UsePrivateHeaders shared ;
 SimpleTest generate_hashs :
 	generate_hashs.cpp
 	AdaptiveBuffering.cpp
-	: be $(TARGET_LIBSTDC++) libshared.a
+	: be [ TargetLibstdc++ ] libshared.a
 ;
 
 SimpleTest consistency_check :
 	consistency_check.cpp
 	AdaptiveBuffering.cpp
-	: be $(TARGET_LIBSTDC++) libshared.a
+	: be [ TargetLibstdc++ ] libshared.a
 ;

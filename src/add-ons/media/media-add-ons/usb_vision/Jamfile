@@ -8,5 +8,5 @@ Addon usb_vision.media_addon :
 	AddOn.cpp
 	Producer.cpp
 	TunerLocale.cpp
-	: be media $(TARGET_LIBSTDC++)
+	: be media [ TargetLibstdc++ ]
 ;

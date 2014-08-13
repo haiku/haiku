@@ -17,6 +17,6 @@ UnitTestLib libkernelutilstest.so
 	  VectorMapTest.cpp
 	  VectorSetTest.cpp
 	  VectorTest.cpp
-	: $(TARGET_LIBSTDC++)
+	: [ TargetLibstdc++ ]
 ;
 

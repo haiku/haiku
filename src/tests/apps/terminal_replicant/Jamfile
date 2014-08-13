@@ -6,7 +6,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src apps terminal ] ;
 
 Application RepliTerminal : 
 	main.cpp	
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 

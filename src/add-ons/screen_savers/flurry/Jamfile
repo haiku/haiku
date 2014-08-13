@@ -21,7 +21,7 @@ Includes [ FGristFiles $(sources) ] :
 
 ScreenSaver Flurry :
 	$(sources) :
-	be screensaver localestub $(TARGET_LIBSUPC++)
+	be screensaver localestub [ TargetLibsupc++ ]
 	[ BuildFeatureAttribute glu : library ]
 	[ BuildFeatureAttribute mesa : library ]
 ;

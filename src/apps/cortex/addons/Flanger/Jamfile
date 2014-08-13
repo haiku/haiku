@@ -10,6 +10,6 @@ Addon cortex_flanger.media_addon :
 	MediaNodeControlApp.cpp
 	RawBuffer.cpp
 	SoundUtils.cpp
-	: be media $(TARGET_LIBSUPC++)
+	: be media [ TargetLibsupc++ ]
 	: Resource.rsrc
 ;

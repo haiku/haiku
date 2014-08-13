@@ -18,5 +18,5 @@ Addon <disk_system>gpt :
 	crc32.cpp
 	utility.cpp
 
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;

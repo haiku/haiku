@@ -99,8 +99,9 @@ Ld runtime_loader :
 	[ FGristFiles $(sources:S=$(SUFOBJ)) ]
 	libruntime_loader.a
 	libruntime_loader_$(TARGET_ARCH).a
-	$(HAIKU_KERNEL_LIBSUPC++_$(TARGET_PACKAGING_ARCH))
-	$(HAIKU_GCC_LIBGCC_$(TARGET_PACKAGING_ARCH))
+	[ TargetKernelLibsupc++ ]
+	[ TargetKernelLibgcc ]
+	[ TargetKernelLibgcceh ]
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/runtime_loader.ld
 	: --no-undefined -shared -soname=runtime_loader
 ;

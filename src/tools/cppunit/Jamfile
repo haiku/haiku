@@ -49,7 +49,7 @@ SharedLibrary libcppunit.so :
 	TextTestResult.cpp
 	TypeInfoHelper.cpp
 	XmlOutputter.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 if  $(OS) = BEOS && $(OSPLAT) != PPC {

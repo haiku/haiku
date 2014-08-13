@@ -16,7 +16,7 @@ Application SerialConnect :
 	state.c
 	unicode.c
 	vterm.c
-	: be device tracker localestub $(TARGET_LIBSUPC++)
+	: be device tracker localestub [ TargetLibsupc++ ]
 	: SerialConnect.rdef
 ;
 

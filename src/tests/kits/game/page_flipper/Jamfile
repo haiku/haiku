@@ -2,6 +2,6 @@ SubDir HAIKU_TOP src tests kits game page_flipper ;
 
 SimpleTest PageFlipper
 	: page_flip.cpp
-	: game be root $(TARGET_LIBSUPC++)
+	: game be root [ TargetLibsupc++ ]
 ;
 

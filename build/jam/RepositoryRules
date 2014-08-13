@@ -184,6 +184,7 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 			on $(packageListFile) return $(HAIKU_REPOSITORY_PACKAGE_FILE_NAMES)
 		] ;
 		local packageFiles ;
+		local packageFile ;
 		for packageFile in $(packageFileNames) {
 			MakeLocate $(packageFile) : $(HAIKU_DOWNLOAD_DIR) ;
 			packageFiles += $(packageFile) ;
@@ -354,16 +355,8 @@ actions BootstrapRepositoryFetchPackage1
 		done
 	fi
 
-	# determine the portName
-	portName=`basename "$package" | sed 's@-.*@@'`
-	case $portName in
-		*_devel|*_doc|*_source|*_debuginfo)
-			portName=`echo $portName | sed 's@_[^_]*$@@'`
-			;;
-		*_source_rigged)
-			portName=`echo $portName | sed 's@_source_rigged$@@'`
-			;;
-	esac
+	# determine the port-specification from the package name
+	portSpec=`basename "$package" | sed 's@-.*@@'`
 
 	cd $(HAIKU_REPOSITORY_BUILD_DIRECTORY)
 
@@ -372,11 +365,11 @@ actions BootstrapRepositoryFetchPackage1
 		$(HOST_HAIKU_PORTER) -j$(HAIKU_PORTER_CONCURRENT_JOBS) \
 			$(HAIKU_PORTER_EXTRA_OPTIONS) \
 			--cross-devel-package "$haikuCrossDevelPackage" \
-			"$secondaryCrossDevelPackages" $portName
+			"$secondaryCrossDevelPackages" $portSpec
 	else
 		$(HOST_HAIKU_PORTER) -j$(HAIKU_PORTER_CONCURRENT_JOBS) \
 			$(HAIKU_PORTER_EXTRA_OPTIONS) \
-			--cross-devel-package "$haikuCrossDevelPackage" $portName
+			--cross-devel-package "$haikuCrossDevelPackage" $portSpec
 	fi
 }
 
@@ -428,10 +421,11 @@ EOF
 
 
 rule BootstrapPackageRepository repository : architecture
-	: anyPackages : packagesStage1 : packagesStage2 : sourcePackages
-	: debugInfoPackages
+	: anyPackages : packagesStage0 : packagesStage1 : packagesStage2
+	: sourcePackages : debugInfoPackages
 {
 	repository = $(repository:G=repository) ;
+	packagesStage0 = [ FFilterByBuildFeatures $(packagesStage0) ] ;
 	packagesStage1 = [ FFilterByBuildFeatures $(packagesStage1) ] ;
 	packagesStage2 = [ FFilterByBuildFeatures $(packagesStage2) ] ;
 	sourcePackages = [ FFilterByBuildFeatures $(sourcePackages) ] ;
@@ -442,6 +436,18 @@ rule BootstrapPackageRepository repository : architecture
 	SetRepositoryMethod $(repository) : FetchPackage
 		: BootstrapRepositoryFetchPackage ;
 
+	# register repository with stage 0 packages
+	local stage0PackageTargets = [ PackageRepository $(repository)
+		: $(architecture) : $(anyPackages) : $(packagesStage0)
+		: $(sourcePackages) : $(debugInfoPackages) ] ;
+	if ! $(stage0PackageTargets) {
+		return ;
+	}
+	local crossDevelPackageSuffixes = $(architecture)
+		$(architecture)_$(HAIKU_PACKAGING_ARCHS[2-]) ;
+	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGES on $(stage0PackageTargets)
+		= haiku_cross_devel_sysroot_stage0_$(crossDevelPackageSuffixes).hpkg ;
+
 	# register repository with stage 1 packages
 	local stage1PackageTargets = [ PackageRepository $(repository)
 		: $(architecture) : $(anyPackages) : $(packagesStage1)
@@ -449,8 +455,6 @@ rule BootstrapPackageRepository repository : architecture
 	if ! $(stage1PackageTargets) {
 		return ;
 	}
-	local crossDevelPackageSuffixes = $(architecture)
-		$(architecture)_$(HAIKU_PACKAGING_ARCHS[2-]) ;
 	HAIKU_REPOSITORY_HAIKU_CROSS_DEVEL_PACKAGES on $(stage1PackageTargets)
 		= haiku_cross_devel_sysroot_stage1_$(crossDevelPackageSuffixes).hpkg ;
 
@@ -510,18 +514,31 @@ rule FSplitPackageName packageName
 }
 
 
-rule IsPackageAvailable package : flags
+rule IsPackageAvailable packageName : flags
 {
 	# for a secondary architecture adjust the package name
 	if $(TARGET_PACKAGING_ARCH) != $(TARGET_PACKAGING_ARCHS[1])
 		&& ! nameResolved in $(flags) {
-		local splitName = [ FSplitPackageName $(package) ] ;
-		splitName = $(splitName[1]) $(TARGET_PACKAGING_ARCH) $(splitName[2-]) ;
-		package = $(splitName:J=_) ;
+		# The position of the secondary architecture within the package name
+		# is not well defined, so we scan for it starting from the back.
+		local packageNameHead = $(packageName) ;
+		local packageNameTail = ;
+		while $(packageNameHead) {
+			local splitName = [ FSplitPackageName $(packageNameHead) ] ;
+			splitName = $(splitName[1]) $(TARGET_PACKAGING_ARCH) $(splitName[2])
+				$(packageNameTail) ;
+			packageName = $(splitName:J=_) ;
+			if $(packageName) in $(HAIKU_AVAILABLE_PACKAGES) {
+				return $(packageName) ;
+			}
+			local splitHead = [ Match "(.*)_([^_]*)" : $(packageNameHead) ] ;
+			packageNameHead = $(splitHead[1]) ;
+			packageNameTail = $(splitHead[2]) $(packageNameTail) ;
+		}
 	}
 
-	if $(package) in $(HAIKU_AVAILABLE_PACKAGES) {
-		return $(package) ;
+	if $(packageName) in $(HAIKU_AVAILABLE_PACKAGES) {
+		return $(packageName) ;
 	}
 
 	return ;

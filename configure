@@ -248,8 +248,6 @@ standard_gcc_settings()
 	local gccRawVersion=`$gcc -dumpversion`
 	local gccMachine=`$gcc -dumpmachine`
 
-	local libgcc=${gccdir}/libgcc.a
-
 	# determine architecture from machine triple
 	case $gccMachine in
 		arm-*)		targetCpu=arm;;
@@ -264,75 +262,8 @@ standard_gcc_settings()
 	esac
 
 	local targetArch=$targetCpu
-	local staticLibStdCxx
-	local sharedLibStdCxx
-	local staticLibSupCxx
-	local sharedLibSupCxx
-	local kernelLibgcc
-	local cxxHeaders
 
 	case $gccRawVersion in
-		4.*)
-			# for gcc 4 we use the libstdc++ and libsupc++ that come with the
-			# compiler
-			staticLibStdCxx=`$gcc -print-file-name=libstdc++.a`
-			sharedLibStdCxx=`$gcc -print-file-name=libstdc++.so`
-			staticLibSupCxx=`$gcc -print-file-name=libsupc++.a`
-			sharedLibSupCxx=`$gcc -print-file-name=libsupc++.so`
-
-			# If the architecture has separate runtime libraries for the
-			# kernel, use them.
-			kernelLibgcc=`$gcc -print-file-name=libgcc-kernel.a`
-			if [ $kernelLibgcc = libgcc-kernel.a ]; then
-				kernelLibgcc=$libgcc
-			fi
-			kernelLibSupCxx=`$gcc -print-file-name=libsupc++-kernel.a`
-			if [ $kernelLibSupCxx = libsupc++-kernel.a ]; then
-				kernelLibSupCxx=$staticLibSupCxx
-			fi
-
-			local headersBase=$gccdir/../../../..
-			local headers=$headersBase/$gccMachine/include/c++/$gccRawVersion
-			if [ ! -d $headers ]; then
-				headers=$headersBase/include/c++/$gccRawVersion
-			fi
-
-			cxxHeaders=$headers
-			for d in $gccMachine backward ext; do
-				# Note: We need the line break, otherwise the line might become
-				# too long for jam (512 bytes max).
-				cxxHeaders="$cxxHeaders $headers/$d"
-			done
-
-			# Unset the HAIKU_{SHARED,STATIC}_LIB{STD,SUP}CXX variables, if the
-			# compiler didn't give us actual file names. Otherwise resolve
-			# symlinks to avoid problems when copying the libraries to the
-			# image.
-
-			if [ $staticLibStdCxx = libstdc++.a ]; then
-				staticLibStdCxx=
-			else
-				staticLibStdCxx=`$readlink $staticLibStdCxx`
-			fi
-
-			if [ $sharedLibStdCxx = libstdc++.so ]; then
-				sharedLibStdCxx=
-			else
-				sharedLibStdCxx=`$readlink $sharedLibStdCxx`
-			fi
-
-			if [ $staticLibSupCxx = libsupc++.a ]; then
-				staticLibSupCxx=
-			else
-				staticLibSupCxx=`$readlink $staticLibSupCxx`
-			fi
-
-			if [ $sharedLibSupCxx = libsupc++.so ]; then
-				sharedLibSupCxx=
-			else
-				sharedLibSupCxx=`$readlink $sharedLibSupCxx`
-			fi
-			;;
 		2.9*)
 			# check for correct (most up-to-date) legacy compiler and complain
 			# if an older one is installed
@@ -342,8 +273,6 @@ standard_gcc_settings()
 				exit 1;
 			fi
 
-			kernelLibgcc=$libgcc
-			kernelLibSupCxx=
 			targetArch=x86_gcc2
 			;;
 	esac
@@ -354,7 +283,7 @@ standard_gcc_settings()
 	case $gccMachine in
 		x86_64-*)
 			# Boot loader is 32-bit, need the 32-bit libs and c++ config
-			bootLibgcc=`$gcc -m32 -print-libgcc-file-name`
+			bootLibgcc=`$gcc -m32 -print-file-name=libgcc.a`
 			bootLibSupCxx=`$gcc -m32 -print-file-name=libsupc++.a`
 
 			local headersBase=$gccdir/../../../..
@@ -363,10 +292,6 @@ standard_gcc_settings()
 				headers=$headersBase/include/c++/$gccRawVersion
 			fi
 			bootCxxHeaders="$headers/$gccMachine/32"
-			;;
-		*)
-			bootLibgcc=$libgcc
-			bootLibSupCxx=$staticLibSupCxx
 			;;
 	esac
 
@@ -400,19 +325,9 @@ standard_gcc_settings()
 	set_variable HAIKU_GCC_RAW_VERSION_$targetArch $gccRawVersion
 	set_variable HAIKU_GCC_MACHINE_$targetArch $gccMachine
 	set_variable HAIKU_GCC_LIB_DIR_$targetArch $gccdir
-	set_variable HAIKU_GCC_LIBGCC_$targetArch $libgcc
-	set_variable HAIKU_GCC_HEADERS_DIR_$targetArch \
-		"${gccdir}/include ${gccdir}/include-fixed"
-	set_variable HAIKU_STATIC_LIBSTDCXX_$targetArch "$staticLibStdCxx"
-	set_variable HAIKU_SHARED_LIBSTDCXX_$targetArch "$sharedLibStdCxx"
-	set_variable HAIKU_STATIC_LIBSUPCXX_$targetArch "$staticLibSupCxx"
-	set_variable HAIKU_SHARED_LIBSUPCXX_$targetArch "$sharedLibSupCxx"
-	set_variable HAIKU_KERNEL_LIBSUPCXX_$targetArch "$kernelLibSupCxx"
-	set_variable HAIKU_BOOT_LIBSUPCXX_$targetArch "$bootLibSupCxx"
-	set_variable HAIKU_KERNEL_LIBGCC_$targetArch $kernelLibgcc
-	set_variable HAIKU_CXX_HEADERS_DIR_$targetArch "$cxxHeaders"
-	set_variable HAIKU_BOOT_LIBGCC_$targetArch $bootLibgcc
 	set_variable HAIKU_BOOT_CXX_HEADERS_DIR_$targetArch "$bootCxxHeaders"
+	set_variable HAIKU_BOOT_LIBSUPCXX_$targetArch "$bootLibSupCxx"
+	set_variable HAIKU_BOOT_LIBGCC_$targetArch $bootLibgcc
 	set_variable HAIKU_USE_GCC_GRAPHITE_$targetArch $useGraphite
 
 	standard_gcc_settings_targetArch=$targetArch
@@ -918,15 +833,6 @@ else
 			esac
 		fi
 
-		# Get the libgcc objects. We couldn't do that in standard_gcc_settings,
-		# since we need "ar", which may be set later.
-		ar=`get_variable HAIKU_AR_$targetArch`
-		libgcc=`get_variable HAIKU_GCC_LIBGCC_$targetArch`
-		set_variable HAIKU_GCC_LIBGCC_OBJECTS_$targetArch \
-			"`$ar t $libgcc | grep -v eabi.o`"
-			# Note: We filter out eabi.o. It's present in gcc's libgcc for PPC
-			# and neither needed nor wanted.
-
 		# check whether the Haiku compiler really targets Haiku
 		targetMachine=`get_variable HAIKU_GCC_MACHINE_$targetArch`
 		case "$targetMachine" in
@@ -994,14 +900,7 @@ for targetArch in $HAIKU_PACKAGING_ARCHS; do
 		HAIKU_GCC_RAW_VERSION		HAIKU_GCC_RAW_VERSION
 		HAIKU_GCC_MACHINE			HAIKU_GCC_MACHINE
 		HAIKU_GCC_LIB_DIR			HAIKU_GCC_LIB_DIR
-		HAIKU_GCC_LIBGCC			HAIKU_GCC_LIBGCC
 		HAIKU_CPU					HAIKU_CPU
-		HAIKU_STATIC_LIBSTDC++		HAIKU_STATIC_LIBSTDCXX
-		HAIKU_SHARED_LIBSTDC++		HAIKU_SHARED_LIBSTDCXX
-		HAIKU_STATIC_LIBSUPC++		HAIKU_STATIC_LIBSUPCXX
-		HAIKU_SHARED_LIBSUPC++		HAIKU_SHARED_LIBSUPCXX
-		HAIKU_KERNEL_LIBGCC			HAIKU_KERNEL_LIBGCC
-		HAIKU_KERNEL_LIBSUPC++		HAIKU_KERNEL_LIBSUPCXX
 		HAIKU_BOOT_LIBGCC			HAIKU_BOOT_LIBGCC
 		HAIKU_BOOT_LIBSUPC++		HAIKU_BOOT_LIBSUPCXX
 		HAIKU_AR					HAIKU_AR
@@ -1030,10 +929,7 @@ for targetArch in $HAIKU_PACKAGING_ARCHS; do
 	# For variables that may have long values, distribute them over multiple
 	# lines so that jam doesn't hit the maximum line length.
 	variables="
-		HAIKU_GCC_HEADERS_DIR		HAIKU_GCC_HEADERS_DIR
-		HAIKU_C++_HEADERS_DIR		HAIKU_CXX_HEADERS_DIR
 		HAIKU_BOOT_C++_HEADERS_DIR	HAIKU_BOOT_CXX_HEADERS_DIR
-		HAIKU_GCC_LIBGCC_OBJECTS	HAIKU_GCC_LIBGCC_OBJECTS
 		"
 	set -- $variables
 	while [ $# -ge 2 ]; do

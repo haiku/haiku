@@ -21,7 +21,7 @@ Includes [ FGristFiles $(sources) ] :
 Application GLTeapot :
 	$(sources)
 	:
-	be game localestub $(TARGET_LIBSUPC++)
+	be game localestub [ TargetLibsupc++ ]
 	[ BuildFeatureAttribute glu : library ]
 	[ BuildFeatureAttribute mesa : library ]
 	: GLTeapot.rdef

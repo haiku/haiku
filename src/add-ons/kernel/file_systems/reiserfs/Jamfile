@@ -27,6 +27,4 @@ KernelAddon reiserfs
 	Tree.cpp
 	VNode.cpp
 	Volume.cpp
-
-	: $(TARGET_KERNEL_LIBSUPC++)
 ;

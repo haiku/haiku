@@ -122,18 +122,18 @@ StdBinCommands
 	settype.cpp
 	spybmessage.cpp
 	urlwrapper.cpp
-	: be $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+	: be [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libsupc++.so, and libshared.a
 StdBinCommands
 	ramdisk.cpp
-	: libshared.a be $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+	: libshared.a be [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libbnetapi.solibsupc++.so
 StdBinCommands
 	open.cpp
 	urlwrapper.cpp
-	: be bnetapi $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+	: be bnetapi [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 # commands that need libbe.so and the stub catalog
 StdBinCommands
@@ -144,7 +144,7 @@ StdBinCommands
 # commands that need libbe.so, libsupc++.so and the stub catalog
 StdBinCommands
 	dstcheck.cpp
-	: be $(TARGET_LIBSUPC++) localestub : $(haiku-utils_rsrc) ;
+	: be [ TargetLibsupc++ ] localestub : $(haiku-utils_rsrc) ;
 
 # Haiku-specific apps which need libbe.so
 if $(TARGET_PLATFORM) = haiku {
@@ -159,30 +159,30 @@ StdBinCommands
 	copyattr.cpp
 	setmime.cpp
 	xres.cpp
-	: be $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
+	: be [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
 
 # Haiku-specific apps which need libbe.so, libstdc++.so
 if $(TARGET_PLATFORM) = haiku {
 StdBinCommands
 	mountvolume.cpp
-	: be $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
+	: be [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
 }
 
 # commands that need libstdc++ only
 StdBinCommands
 	diff_zip.cpp
 	sysinfo.cpp
-	: $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
+	: [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libtranslation.so, libsupc++.so
 StdBinCommands
 	translate.cpp
-	: be translation $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+	: be translation [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libtranslation.so, libicon.a, libstdc++.so
 StdBinCommands
 	notify.cpp
-	: be translation libicon.a $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
+	: be translation libicon.a [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libmedia.so
 StdBinCommands
@@ -192,7 +192,7 @@ StdBinCommands
 # standard commands that need libbe.so, libmedia.so, libsupc++.so
 StdBinCommands
 	setvolume.cpp
-	: be libmedia.so $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+	: be libmedia.so [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libmail.so
 StdBinCommands
@@ -202,7 +202,7 @@ StdBinCommands
 # standard commands that need libbe.so, libpackage.so, libsupc++.so
 StdBinCommands
 	findpaths.cpp
-	: be package $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+	: be package [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libdevice.so
 StdBinCommands
@@ -223,18 +223,18 @@ StdBinCommands
 
 StdBinCommands
 	bt_discovery.cpp
-	: be libbluetooth.so $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+	: be libbluetooth.so [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 
 # standard commands that need libbe.so, libbnetapi.so, libtracker.so
 StdBinCommands
 	checkitout.cpp
-	: be bnetapi tracker $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+	: be bnetapi tracker [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
 #standard commands that need libbe.so, libtracker.so and the stub catalog
 StdBinCommands
 	filepanel.cpp
-	: be tracker $(TARGET_LIBSUPC++) localestub : $(haiku-utils_rsrc) ;
+	: be tracker [ TargetLibsupc++ ] localestub : $(haiku-utils_rsrc) ;
 
 # standard commands that need libncurses.a
 StdBinCommands
@@ -244,7 +244,7 @@ StdBinCommands
 # mimeset needs libstorage_kit_mime.a
 StdBinCommands
 	mimeset.cpp
-	: be libstorage_kit_mime.a $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
+	: be libstorage_kit_mime.a [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
 
 # Localization of some applications
 DoCatalogs dstcheck

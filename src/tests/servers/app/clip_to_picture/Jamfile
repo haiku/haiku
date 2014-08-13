@@ -8,7 +8,7 @@ UseHeaders [ FDirName os interface ] ;
 
 SimpleTest ClipToPicture :
 	main.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;
 
 if ( $(TARGET_PLATFORM) = libbe_test ) {

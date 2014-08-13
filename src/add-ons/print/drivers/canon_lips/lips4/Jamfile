@@ -10,5 +10,5 @@ Addon Canon\ LIPS4\ Compatible :
 	Lips4Entry.cpp
 	Lips4.cpp
 	Lips4Cap.cpp
-	: be libprint.a $(TARGET_LIBSTDC++)
+	: be libprint.a [ TargetLibstdc++ ]
 ;

@@ -18,7 +18,7 @@ Application RemoteDesktop :
 	NetSender.cpp
 	StreamingRingBuffer.cpp
 
-	: be bnetapi $(TARGET_LIBSUPC++)
+	: be bnetapi [ TargetLibsupc++ ]
 	: RemoteDesktop.rdef
 ;
 

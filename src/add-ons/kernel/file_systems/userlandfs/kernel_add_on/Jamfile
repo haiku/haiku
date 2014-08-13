@@ -40,6 +40,4 @@ KernelAddon userlandfs
 	  Settings.cpp
 	  UserlandFS.cpp
 	  Volume.cpp
-
-	: $(TARGET_KERNEL_LIBSUPC++)
 ;

@@ -17,7 +17,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ICO.cpp
 			: be translation 
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
-			$(TARGET_LIBSUPC++)
+			[ TargetLibsupc++ ]
 			localestub
 			: true
 		;

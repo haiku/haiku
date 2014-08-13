@@ -4,6 +4,16 @@ BootstrapPackageRepository HaikuPortsCross
 	# architecture "any" packages
 	haikuporter-0-1
 	:
+	# repository architecture packages (stage 0)
+	gcc_bootstrap-4.8.3_2014_08_03-1
+	gcc_bootstrap_syslibs-4.8.3_2014_08_03-1
+	gcc_bootstrap_syslibs_devel-4.8.3_2014_08_03-1
+
+	secondary_x86_gcc2 @{
+		gcc_bootstrap_x86_gcc2-2.95.3_2014_08_03-1
+		gcc_bootstrap_x86_gcc2_syslibs_devel-2.95.3_2014_08_03-1
+	}@ # secondary_x86_gcc2
+	:
 	# repository architecture packages (stage 1)
 	autoconf_bootstrap-2.69-2
 	automake_bootstrap-1.13.1-1
@@ -14,7 +24,6 @@ BootstrapPackageRepository HaikuPortsCross
 	freetype_bootstrap-2.4.9-1
 	freetype_bootstrap_devel-2.4.9-1
 	gawk_bootstrap-3.1.8-2
-	gcc_bootstrap-4.8.3_2014_05_28-2
 	grep_bootstrap-2.14-1
 	icu_bootstrap-4.8.1.1-1
 	icu_bootstrap_devel-4.8.1.1-1
@@ -34,7 +43,6 @@ BootstrapPackageRepository HaikuPortsCross
 		binutils_bootstrap_x86_gcc2-2.17_2013_04_21-3
 		freetype_bootstrap_x86_gcc2-2.4.9-1
 		freetype_bootstrap_x86_gcc2_devel-2.4.9-1
-		gcc_bootstrap_x86_gcc2-2.95.3_2013_08_15-1
 		icu_bootstrap_x86_gcc2-4.8.1.1-1
 		icu_bootstrap_x86_gcc2_devel-4.8.1.1-1
 		ncurses_bootstrap_x86_gcc2-5.9-1

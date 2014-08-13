@@ -7,5 +7,5 @@ AddResources Open\ Terminal : OpenTerminal.rdef ;
 Addon Open\ Terminal :
 	OpenTerminal.cpp
 
-	: be tracker $(TARGET_LIBSTDC++)
+	: be tracker [ TargetLibstdc++ ]
 ;

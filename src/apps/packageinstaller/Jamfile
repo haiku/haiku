@@ -22,7 +22,7 @@ Application PackageInstaller :
 	InstalledPackageInfo.cpp
 	: be localestub tracker translation
 		[ BuildFeatureAttribute zlib : library ]
-		$(TARGET_LIBSUPC++)
+		[ TargetLibsupc++ ]
 	: PackageInstaller.rdef
 ;
 

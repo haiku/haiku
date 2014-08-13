@@ -5,5 +5,5 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 Application ResizeLimits :
 	ResizeLimits.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;

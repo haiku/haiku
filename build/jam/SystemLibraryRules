@@ -1,0 +1,359 @@
+rule Libstdc++ForImage
+{
+	# Libstdc++ForImage
+	#
+	# Returns the c++-standard-library to be put onto the image.
+
+	if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+		# the libstdc++.so for our legacy compiler (needs to be built)
+		return libstdc++.r4.so ;
+	}
+
+	# libstdc++.so for other architectures comes with the gcc_syslibs
+	# package, so there's no library to put onto the image directly.
+	return ;
+}
+
+
+rule TargetLibstdc++ asPath
+{
+	# TargetLibstdc++ [ <asPath> ]
+	#
+	# Returns the c++-standard-library for the target.
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+			# the libstdc++.so for our legacy compiler (needs to be built)
+			return libstdc++.r4.so ;
+		}
+		# return libstdc++.so from the gcc_syslibs build feature.
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		return [
+			BuildFeatureAttribute gcc_syslibs : libstdc++.so : $(flags)
+		] ;
+	} else {
+		# TODO: return libstdc++.so for non-Haiku target platform if needed
+	}
+}
+
+
+rule TargetLibsupc++ asPath
+{
+	# TargetLibsupc++ [ <asPath> ]
+	#
+	# Returns the c++-support-library for the target.
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+			# there is no libsupc++.so for the legacy compiler
+			return ;
+		}
+		# return libsupc++.so from the gcc_syslibs build feature.
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		return [
+			BuildFeatureAttribute gcc_syslibs : libsupc++.so : $(flags)
+		] ;
+	} else {
+		# TODO: return libsupc++.so for non-Haiku target platform if needed
+	}
+}
+
+
+rule TargetStaticLibsupc++ asPath
+{
+	# TargetStaticLibsupc++ [ <asPath> ]
+	#
+	# Returns the static c++-support-library for the target.
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		# return libsupc++.a from the gcc_syslibs_devel build feature.
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		return [
+			BuildFeatureAttribute gcc_syslibs_devel : libsupc++.a : $(flags)
+		] ;
+	} else {
+		# TODO: return libsupc++.a for non-Haiku target platform if needed
+	}
+}
+
+
+rule TargetKernelLibsupc++ asPath
+{
+	# TargetKernelLibsupc++ [ <asPath> ]
+	#
+	# Returns the static kernel c++-support-library for the target.
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		# return libsupc++-kernel.a from the gcc_syslibs_devel build feature.
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		return [
+			BuildFeatureAttribute gcc_syslibs_devel
+				: libsupc++-kernel.a : $(flags)
+		] ;
+	} else {
+		# There is no libsupc++-kernel.a for non-Haiku target platform
+	}
+}
+
+
+rule TargetBootLibsupc++ asPath
+{
+	# TargetBootLibsupc++ [ <asPath> ]
+	#
+	# Returns the static bootloader c++-support-library for the target.
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		if $(TARGET_PACKAGING_ARCH) = x86_64 {
+			# we need to use the 32-bit libsupc++.a built by the cross-compiler
+			return $(TARGET_BOOT_LIBSUPC++) ;
+
+			# TODO: ideally, we would build this as part of gcc_syslibs_devel,
+			#       but that isn't currently possible, as that would require
+			#       32-bit support (libraries and glue-code) on x86_64-Haiku.
+		}
+		# no special boot version of libsupc++.a needed, so we return
+		# libsupc++-kernel.a from the gcc_syslibs_devel build feature.
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		return [
+			BuildFeatureAttribute gcc_syslibs_devel
+				: libsupc++-kernel.a : $(flags)
+		] ;
+	} else {
+		# There is no libsupc++-boot.a for non-Haiku target platform
+	}
+}
+
+
+rule TargetLibgcc asPath
+{
+	# TargetLibgcc [ <asPath> ]
+	#
+	# Returns the default libgcc(s) for the target. On x86_gcc2, this is the
+	# static libgcc, on everything else this will return the shared libgcc_s
+	# followed by the static libgcc (both are needed as they do not contain
+	# the same set of symbols).
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+			# return libgcc.a from the gcc_syslibs_devel build feature.
+			return [
+				BuildFeatureAttribute gcc_syslibs_devel : libgcc.a : $(flags)
+			] ;
+		} else {
+			# return libgcc_s.so from the gcc_syslibs build feature and libgcc.a
+			# from the gcc_syslibs_devel build feature.
+			return [
+				BuildFeatureAttribute gcc_syslibs : libgcc_s.so : $(flags)
+			] [
+				BuildFeatureAttribute gcc_syslibs_devel : libgcc.a : $(flags)
+			] ;
+		}
+	} else {
+		# TODO: return libgcc for non-Haiku target platform if needed
+	}
+}
+
+
+rule TargetStaticLibgcc asPath
+{
+	# TargetStaticLibgcc [ <asPath> ]
+	#
+	# Returns the static libgcc for the target.
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		# return libgcc.a from the gcc_syslibs_devel build feature.
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		return [
+			BuildFeatureAttribute gcc_syslibs_devel : libgcc.a : $(flags)
+		] ;
+	} else {
+		# TODO: return libgcc.a for non-Haiku target platform if needed
+	}
+}
+
+
+rule TargetKernelLibgcc asPath
+{
+	# TargetKernelLibgcc [ <asPath> ]
+	#
+	# Returns the static kernel libgcc for the target.
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		# return libgcc-kernel.a from the gcc_syslibs_devel build feature.
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		return [
+			BuildFeatureAttribute gcc_syslibs_devel
+				: libgcc-kernel.a : $(flags)
+		] ;
+	} else {
+		# there is no libgcc-kernel.a for non-Haiku target platform
+	}
+}
+
+
+rule TargetBootLibgcc asPath
+{
+	# TargetBootLibgcc [ <asPath> ]
+	#
+	# Returns the static bootloader libgcc for the target.
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		if $(TARGET_PACKAGING_ARCH) = x86_64 {
+			# we need to use the 32-bit libgcc.a built by the cross-compiler
+			return $(TARGET_BOOT_LIBGCC) ;
+
+			# TODO: ideally, we would build this as part of gcc_syslibs_devel,
+			#       but that isn't currently possible, as that would require
+			#       32-bit support (libraries and glue-code) on x86_64-Haiku.
+		}
+		# no special boot version of libgcc needed, so we return
+		# libgcc-kernel.a from the gcc_syslibs_devel build feature.
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		return [
+			BuildFeatureAttribute gcc_syslibs_devel
+				: libgcc-kernel.a : $(flags)
+		] ;
+	} else {
+		# there is no libgcc-boot.a for non-Haiku target platform
+	}
+}
+
+
+rule TargetStaticLibgcceh asPath
+{
+	# TargetStaticLibgcceh [ <asPath> ]
+	#
+	# Returns the static libgcc_eh for the target.
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		# return libgcc.a from the gcc_syslibs_devel build feature.
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		return [
+			BuildFeatureAttribute gcc_syslibs_devel : libgcc_eh.a : $(flags)
+		] ;
+	} else {
+		# TODO: return libgcc_eh.a for non-Haiku target platform if needed
+	}
+}
+
+
+rule TargetKernelLibgcceh asPath
+{
+	# TargetKernelLibgcceh [ <asPath> ]
+	#
+	# Returns the static kernel libgcc_eh for the target.
+	# Invoking with <asPath> = true will return the full library path.
+
+	if $(TARGET_PLATFORM) = haiku {
+		# return libgcc_eh-kernel.a from the gcc_syslibs_devel build feature.
+		local flags ;
+		if $(asPath) = true {
+			flags += path ;
+		}
+		return [
+			BuildFeatureAttribute gcc_syslibs_devel
+				: libgcc_eh-kernel.a : $(flags)
+		] ;
+	} else {
+		# there is no libgcc_eh-kernel.a for non-Haiku target platform
+	}
+}
+
+
+rule C++HeaderDirectories architecture
+{
+	# C++HeaderDirectories
+	#
+	# Returns the c++ header directories to use for the given architecture.
+
+	local c++HeaderDirs ;
+	if $(architecture) = x86_gcc2 {
+		c++HeaderDirs = [ FDirName $(HAIKU_TOP) headers cpp ] ;
+	} else if $(PLATFORM) = bootstrap_stage0 {
+		# Currently, no c++-headers are needed for stage0 of the boostrap.
+	} else {
+		local baseDir = [
+			BuildFeatureAttribute gcc_syslibs_devel : c++-headers : path
+		] ;
+		if $(baseDir) {
+			c++HeaderDirs =
+				$(baseDir)
+				[ FDirName $(baseDir) $(HAIKU_GCC_MACHINE_$(architecture)) ]
+				[ FDirName $(baseDir) backward ]
+				[ FDirName $(baseDir) ext ]
+				;
+		}
+	}
+
+	return $(c++HeaderDirs) ;
+}
+
+rule GccHeaderDirectories architecture
+{
+	# GccHeaderDirectories
+	#
+	# Returns the gcc header directories to use for the given architecture.
+
+	local gccHeaderDirs ;
+	if $(architecture) = x86_gcc2 {
+		gccHeaderDirs = [ FDirName $(HAIKU_TOP) headers build gcc-2.95.3 ] ;
+	} else if $(PLATFORM) = bootstrap_stage0 {
+		gccHeaderDirs =
+			[ FDirName $(HAIKU_GCC_LIB_DIR_$(architecture)) include ]
+			[ FDirName $(HAIKU_GCC_LIB_DIR_$(architecture)) include-fixed ]
+			;
+	} else {
+		local baseDir = [
+			BuildFeatureAttribute gcc_syslibs_devel : gcc-headers : path
+		] ;
+		if $(baseDir) {
+			gccHeaderDirs =
+				[ FDirName $(baseDir) include ]
+				[ FDirName $(baseDir) include-fixed ]
+				;
+		}
+	}
+
+	return $(gccHeaderDirs) ;
+}

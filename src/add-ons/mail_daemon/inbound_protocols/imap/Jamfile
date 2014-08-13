@@ -43,7 +43,7 @@ Addon IMAP
 	$(sources)
 	:
 	be libmail.so localestub $(TARGET_NETWORK_LIBS) libalm.so
-		libshared.a $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
+		libshared.a [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;
 
 SEARCH on [ FGristFiles IMAPFolders.cpp IMAPHandler.cpp IMAPMailbox.cpp

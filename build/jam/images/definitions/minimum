@@ -89,8 +89,7 @@ rule HaikuImageGetSystemLibs
 	return
 		# libs with special grist
 		[ MultiArchDefaultGristFiles libroot.so : revisioned ]
-		$(HAIKU_SHARED_LIBSTDC++_$(TARGET_PACKAGING_ARCH))
-		$(HAIKU_SHARED_LIBSUPC++_$(TARGET_PACKAGING_ARCH))
+		[ Libstdc++ForImage ]
 		# libs with standard grist
 		[ MultiArchDefaultGristFiles [ FFilterByBuildFeatures
 			libbe.so libbsd.so libbnetapi.so

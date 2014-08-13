@@ -22,7 +22,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			: be translation 
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
 			[ BuildFeatureAttribute tiff : library ]
-			$(TARGET_LIBSUPC++) localestub
+			[ TargetLibsupc++ ] localestub
 			: true
 		;
 

@@ -15,5 +15,5 @@ BinCommand screenmode :
 	multimon.cpp
 	ScreenMode.cpp
 
-	: be $(TARGET_LIBSUPC++) libaccelerantscommon.a
+	: be [ TargetLibsupc++ ] libaccelerantscommon.a
 ;

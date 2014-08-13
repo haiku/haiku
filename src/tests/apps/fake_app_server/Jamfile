@@ -13,5 +13,5 @@ UseBuildFeatureHeaders freetype ;
 Server fake_app_server :
 	AppServer.cpp
 	ServerApp.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 	;

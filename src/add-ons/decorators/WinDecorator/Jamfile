@@ -17,5 +17,5 @@ Includes [ FGristFiles WinDecorator.cpp ]
 
 Addon WinDecorator :
 	WinDecorator.cpp
-	: be <nogrist>app_server $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+	: be <nogrist>app_server [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;

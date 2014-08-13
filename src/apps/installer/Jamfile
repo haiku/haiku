@@ -14,7 +14,7 @@ Application Installer :
 	ProgressReporter.cpp
 	UnzipEngine.cpp
 	WorkerThread.cpp
-	: be tracker translation libshared.a $(TARGET_LIBSTDC++) 
+	: be tracker translation libshared.a [ TargetLibstdc++ ] 
 		localestub
 	: Installer.rdef
 ;

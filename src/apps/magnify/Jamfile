@@ -8,7 +8,7 @@ UsePrivateHeaders shared ;
 
 Application Magnify : 
 	Magnify.cpp 
-	: be game localestub $(TARGET_LIBSUPC++) tracker
+	: be game localestub [ TargetLibsupc++ ] tracker
 	: Magnify.rdef
 ;
 

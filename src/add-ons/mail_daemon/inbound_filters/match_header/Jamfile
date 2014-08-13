@@ -13,7 +13,7 @@ Addon MatchHeader
 	RuleFilter.cpp
 	StringMatcher.cpp
 	:
-	be libmail.so $(TARGET_LIBSUPC++) localestub
+	be libmail.so [ TargetLibsupc++ ] localestub
 	;
 
 DoCatalogs MatchHeader

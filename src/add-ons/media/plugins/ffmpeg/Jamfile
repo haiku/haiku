@@ -57,7 +57,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			be
 			media
-			$(TARGET_LIBSUPC++)
+			[ TargetLibsupc++ ]
 		;
 	}
 }

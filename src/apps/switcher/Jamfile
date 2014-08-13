@@ -11,7 +11,7 @@ Application Switcher :
 	Switcher.cpp
 	WindowsView.cpp
 
-	: be translation $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+	: be translation [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 		localestub libshared.a
 	: Switcher.rdef
 ;

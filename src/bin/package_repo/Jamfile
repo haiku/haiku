@@ -14,6 +14,6 @@ BinCommand package_repo :
 	package_repo.cpp
 	:
 	package be
-	$(TARGET_LIBSUPC++)
-	$(TARGET_LIBSTDC++)
+	[ TargetLibsupc++ ]
+	[ TargetLibstdc++ ]
 ;

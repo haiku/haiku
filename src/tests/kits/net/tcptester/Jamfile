@@ -2,5 +2,5 @@ SubDir HAIKU_TOP src tests kits net tcptester ;
 
 BinCommand tcptester :
 	tcptester.cpp
-	: libnetwork.so $(TARGET_LIBSUPC++)
+	: libnetwork.so [ TargetLibsupc++ ]
 ;

@@ -4,6 +4,8 @@ BootstrapPackageRepository HaikuPortsCross
 	# architecture "any" packages
 	haikuporter-0-1
 	:
+	# repository architecture packages (stage 0)
+	:
 	# repository architecture packages (stage 1)
 	zlib_bootstrap-1.2.8-2
 	zlib_bootstrap_devel-1.2.8-2

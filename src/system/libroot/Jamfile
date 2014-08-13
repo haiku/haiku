@@ -2,33 +2,6 @@ SubDir HAIKU_TOP src system libroot ;
 
 UsePrivateHeaders libroot runtime_loader ;
 
-rule FilterArchive
-{
-	# FilterArchive <target> : <source> : <members to remove>
-
-	# set the tools according to the platform
-	AR on $(1) = $(TARGET_AR_$(TARGET_PACKAGING_ARCH)) d ;
-	# TODO: use $(TARGET_DELARFLAGS_$(TARGET_PACKAGING_ARCH))
-	RANLIB on $(1) = $(TARGET_RANLIB_$(TARGET_PACKAGING_ARCH)) ;
-	MEMBERS on $(1) = $(3) ;
-
-	MakeLocateArch $(1) ;
-	Depends $(1) : $(2) ;
-	File $(1) : $(2) ;
-
-	# delete the unwanted members
-	FilterArchive1 $(1) ;
-
-	if $(RANLIB) {
-		Ranlib $(1) ;
-	}
-}
-
-actions FilterArchive1
-{
-	$(AR) $(<) $(MEMBERS)
-}
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
@@ -36,24 +9,21 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		UsePrivateSystemHeaders ;
 
-		# Make a copy of libgcc without the objects we don't need
-		FilterArchive <$(architecture)>libroot_libgcc_$(TARGET_ARCH).a
-			: $(HAIKU_GCC_LIBGCC_$(architecture))
-			: $(HAIKU_GCC_LIBGCC_OBJECTS_EXCLUDES_$(architecture)) ;
-
-		# One object to link them all...
-		TARGET_LDFLAGS_$(TARGET_PACKAGING_ARCH) on
-			<$(architecture)>libroot_libgcc_$(TARGET_ARCH).o =
-			[ on <$(architecture)>libroot_libgcc_$(TARGET_ARCH).o
-				return $(TARGET_LDFLAGS_$(TARGET_PACKAGING_ARCH)) ]
-			--whole-archive ;
-
-		MergeObject <$(architecture)>libroot_libgcc_$(TARGET_ARCH).o
-			:
-			: <$(architecture)>libroot_libgcc_$(TARGET_ARCH).a ;
+		local libgccAsSingleObject ;
+		if $(architecture) = x86_gcc2 {
+			libgccAsSingleObject
+				= <$(architecture)>libroot_libgcc_$(TARGET_ARCH).o ;
+			# One object to link them all...
+			TARGET_LDFLAGS_$(TARGET_PACKAGING_ARCH) on
+				<$(architecture)>libroot_libgcc_$(TARGET_ARCH).o =
+				[ on <$(architecture)>libroot_libgcc_$(TARGET_ARCH).o
+					return $(TARGET_LDFLAGS_$(TARGET_PACKAGING_ARCH)) ]
+				--whole-archive ;
+			MergeObject $(libgccAsSingleObject) : : [ TargetLibgcc ] ;
+		}
 
 		local librootObjects =
-			libroot_libgcc_$(TARGET_ARCH).o
+			$(libgccAsSingleObject)
 
 			os_main.o
 			os_arch_$(TARGET_ARCH).o
@@ -112,7 +82,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			$(librootObjects)
 			$(librootNoDebugObjects)
-			$(HAIKU_STATIC_LIBSUPC++_$(architecture))
+			[ TargetStaticLibsupc++ ]
+			[ TargetLibgcc ]
 			;
 
 		# Use the standard libroot.so soname, so when the debug version is
@@ -125,7 +96,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			$(librootObjects)
 			$(librootDebugObjects)
-			$(HAIKU_STATIC_LIBSUPC++_$(architecture))
+			[ TargetStaticLibsupc++ ]
+			[ TargetLibgcc ]
 			;
 
 
@@ -153,3 +125,4 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 SubInclude HAIKU_TOP src system libroot add-ons ;
 SubInclude HAIKU_TOP src system libroot os ;
 SubInclude HAIKU_TOP src system libroot posix ;
+SubInclude HAIKU_TOP src system libroot stubbed ;

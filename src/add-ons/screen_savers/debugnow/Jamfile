@@ -9,7 +9,7 @@ AddResources DebugNow : DebugNow.rdef ;
 
 ScreenSaver DebugNow :
 	DebugNow.cpp : 
-	be libscreensaver.so localestub $(TARGET_LIBSUPC++)
+	be libscreensaver.so localestub [ TargetLibsupc++ ]
 ;
 
 DoCatalogs DebugNow :

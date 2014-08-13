@@ -6,7 +6,7 @@ Application AutoRaise :
 	AutoRaiseApp.cpp
 	AutoRaiseIcon.cpp
 	settings.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 	: AutoRaise.rdef
 ;
 

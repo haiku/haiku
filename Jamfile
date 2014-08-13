@@ -8,6 +8,15 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildFeatures ] ;
+
+		# Let the target platform depend on the external header directories such
+		# that those will be unpacked before anything is built for the target
+		# platform.
+		Depends $(TARGET_PLATFORM) : [
+			BuildFeatureAttribute gcc_syslibs_devel : c++-headers
+		] [
+			BuildFeatureAttribute gcc_syslibs_devel : gcc-headers
+		] ;
 	}
 }
 
@@ -21,18 +30,27 @@ AddHaikuImagePackages [ FFilterByBuildFeatures
 		mesa mesa_devel mesa_swrast sed sharutils tar tiff wget which
 	}@
 ] ;
-# secondary architectures
-local architectureObject ;
-for architectureObject
-		in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
-	on $(architectureObject) {
-		AddHaikuImagePackages [ FFilterByBuildFeatures
-			curl freetype icu libsolv zlib
+if $(HAIKU_PACKAGING_ARCHS[1]) != x86_gcc2 {
+	AddHaikuImagePackages [ FFilterByBuildFeatures gcc_syslibs ] ;
+}
 
-			regular_image @{
-				ffmpeg glu jpeg libpng mesa
-			}@
-		] ;
+if $(HAIKU_PACKAGING_ARCHS[2]) {
+	# secondary architectures
+	local architectureObject ;
+	for architectureObject
+			in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
+		on $(architectureObject) {
+			AddHaikuImagePackages [ FFilterByBuildFeatures
+				curl freetype icu libsolv zlib
+
+				regular_image @{
+					ffmpeg glu jpeg libpng mesa
+				}@
+			] ;
+			if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
+				AddHaikuImagePackages [ FFilterByBuildFeatures gcc_syslibs ] ;
+			}
+		}
 	}
 }
 

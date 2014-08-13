@@ -9,6 +9,6 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application CortexAddOnHost :
 	AddOnHostApp.cpp
-	: be media $(TARGET_LIBSTDC++) cortex_support.a
+	: be media [ TargetLibstdc++ ] cortex_support.a
 	: AddOnHost_Resource.rsrc
 ;

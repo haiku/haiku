@@ -15,5 +15,5 @@ LinkAgainst print_addon_server :
 	root
 	libprintutils.a
 	localestub
-	$(TARGET_LIBSUPC++)
+	[ TargetLibsupc++ ]
 ;

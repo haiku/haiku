@@ -8,6 +8,6 @@ UseHeaders [ FDirName os interface ] ;
 
 Application WindowCreation :
 	main.cpp
-	: $(TARGET_LIBSTDC++) be
+	: [ TargetLibstdc++ ] be
 ;
 

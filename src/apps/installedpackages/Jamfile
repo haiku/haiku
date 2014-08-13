@@ -11,7 +11,7 @@ Application InstalledPackages :
 	main.cpp
 	UninstallWindow.cpp
 	UninstallView.cpp
-	: be tracker translation $(TARGET_LIBSUPC++) localestub
+	: be tracker translation [ TargetLibsupc++ ] localestub
 ;
 
 DoCatalogs InstalledPackages :

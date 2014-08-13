@@ -8,6 +8,6 @@ Server keystore_server :
 	Keyring.cpp
 	KeyStoreServer.cpp
 
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 	: keystore_server.rdef
 ;

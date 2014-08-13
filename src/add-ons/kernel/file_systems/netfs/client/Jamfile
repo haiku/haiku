@@ -88,5 +88,5 @@ Addon netfs
 	  VolumeManager.cpp
 
 	: be libuserlandfs_beos_kernel.so
-	  $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++) libshared.a
+	  $(TARGET_NETWORK_LIBS) [ TargetLibsupc++ ] libshared.a
 ;

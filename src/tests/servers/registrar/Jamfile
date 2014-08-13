@@ -9,12 +9,12 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SimpleTest RegistrarTest1
 	: RegistrarTest1.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;
 
 SimpleTest RosterShell
 	: RosterShell.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 SimpleTest message_deliverer_test : message_deliverer_test.cpp : be ;
@@ -108,7 +108,7 @@ Server test_registrar
 	R5Compatibility.cpp
 	:
 	libstorage_kit_mime.a
-	be localestub $(TARGET_LIBSTDC++)
+	be localestub [ TargetLibstdc++ ]
 	:
 	registrar.rdef
 ;

@@ -6,4 +6,4 @@ UsePrivateHeaders screen_saver ;
 
 Addon screen_saver : 
 	ScreenSaverFilter.cpp 
-	: be libscreensaver.so input_server $(TARGET_LIBSUPC++) ;
+	: be libscreensaver.so input_server [ TargetLibsupc++ ] ;

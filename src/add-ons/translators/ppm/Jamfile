@@ -9,7 +9,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		Translator [ MultiArchDefaultGristFiles PPMTranslator ]
 			: PPMMain.cpp PPMTranslator.cpp colorspace.cpp
-			: be translation $(TARGET_LIBSUPC++) localestub
+			: be translation [ TargetLibsupc++ ] localestub
 			: true
 		;
 	}

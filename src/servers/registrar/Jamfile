@@ -48,7 +48,7 @@ Server registrar
 	:
 	libstorage_kit_mime.a
 	be
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 	localestub
 	:
 	registrar.rdef

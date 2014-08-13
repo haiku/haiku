@@ -19,7 +19,7 @@ SharedLibrary libkernelland_emu.so :
 	khash.cpp
 	list.cpp
 
-	: be $(TARGET_LIBSTDC++) ;
+	: be [ TargetLibstdc++ ] ;
 
 AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
 	: /boot/home/config/lib : false ;

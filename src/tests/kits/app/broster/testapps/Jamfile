@@ -31,7 +31,7 @@ rule SimpleBRosterTestApp2
 
 	UnitTest $(name)
 		: $(sources)
-		: be $(TARGET_LIBSTDC++) $(useObjects)
+		: be [ TargetLibstdc++ ] $(useObjects)
 		: $(resources)
 	;
 }

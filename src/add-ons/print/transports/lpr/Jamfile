@@ -18,7 +18,7 @@ Addon LPR :
 	be 
 	libprint.a
 	$(TARGET_NETWORK_LIBS) 
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 ;
 
 ObjectReferences

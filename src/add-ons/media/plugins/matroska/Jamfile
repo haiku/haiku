@@ -17,7 +17,7 @@ Addon matroska :
 #	libmatroska.a
 	libMatroskaParser.a
 	[ BuildFeatureAttribute zlib : library ]
-	libmedia.so be $(TARGET_LIBSTDC++)
+	libmedia.so be [ TargetLibstdc++ ]
 ;
 
 # SubInclude HAIKU_TOP src add-ons media plugins matroska libebml ;

@@ -32,7 +32,7 @@ Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute icu : headers ] ;
 
 Preference Time
 	: $(sources)
-	: be libshared.a $(TARGET_LIBSTDC++) localestub $(HAIKU_NETWORK_LIBS)
+	: be libshared.a [ TargetLibstdc++ ] localestub $(HAIKU_NETWORK_LIBS)
 	: Time.rdef
 	;
 

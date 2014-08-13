@@ -4,5 +4,5 @@ UseLibraryHeaders bluetooth ;
 
 SimpleTest L2capClient :
 	l2capClient.cpp
-	: be bluetooth network $(TARGET_LIBSUPC++)
+	: be bluetooth network [ TargetLibsupc++ ]
 	;

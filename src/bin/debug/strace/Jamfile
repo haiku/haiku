@@ -51,7 +51,7 @@ BinCommand strace : $(straceSources)
 	:
 	$(straceSyscallsObjects)
 	<bin>debug_utils.a
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 ;
 
 # We need to specify the dependency on the generated syscalls file explicitly.

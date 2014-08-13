@@ -22,7 +22,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			USBEndpoint.cpp
 			USBInterface.cpp
 			USBRoster.cpp
-			: be $(TARGET_LIBSUPC++)
+			: be [ TargetLibsupc++ ]
 			;
 	}
 }

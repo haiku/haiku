@@ -41,7 +41,7 @@ Application Terminal :
 	VTKeyTbl.c
 	VTPrsTbl.c
 	: be localestub tracker textencoding
-	$(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
+	[ TargetLibsupc++ ] [ TargetLibstdc++ ]
 	: Terminal.rdef XColors.rdef
 ;
 

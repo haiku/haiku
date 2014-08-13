@@ -17,7 +17,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			PCX.cpp
 			: be translation
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
-			$(TARGET_LIBSUPC++) localestub
+			[ TargetLibsupc++ ] localestub
 			: true
 		;
 	}

@@ -54,20 +54,11 @@ rule ArchitectureSetup architecture
 	}
 	HAIKU_GCC_BASE_FLAGS_$(architecture) = $(gccBaseFlags) ;
 
-	# override gcc 2.95.3's header directory -- strictly necessary only when
-	# using the BeOS native compiler (since its headers are incompatible), but
-	# it doesn't harm for the cross-compiler either.
-	if $(gccVersion[1]) = 2 {
-		HAIKU_GCC_HEADERS_DIR_$(architecture)
-			= [ FDirName $(HAIKU_TOP) headers build gcc-2.95.3 ] ;
-	}
-
 	# initial state for flags etc.
 	HAIKU_C++_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
 	HAIKU_LINK_$(architecture) = $(HAIKU_CC_$(architecture)) ;
 	HAIKU_LINKFLAGS_$(architecture) = $(gccBaseFlags) ;
 
-	HAIKU_HDRS_$(architecture) = [ FStandardHeaders $(architecture) ] ;
 	HAIKU_CCFLAGS_$(architecture) += $(gccBaseFlags) -nostdinc ;
 	HAIKU_C++FLAGS_$(architecture) += $(gccBaseFlags) -nostdinc ;
 
@@ -163,61 +154,7 @@ rule ArchitectureSetup architecture
 	HAIKU_PRIVATE_SYSTEM_HEADERS_$(architecture)
 		= [ PrivateHeaders $(DOT) system system/arch/$(cpu) ] ;
 
-	# Add some grist to the libgcc objects
-	HAIKU_GCC_LIBGCC_OBJECTS_$(architecture)
-		= $(HAIKU_GCC_LIBGCC_OBJECTS_$(architecture):G=libgcc!$(architecture)) ;
-
-	# List of libgcc objects we don't want to keep
-	HAIKU_GCC_LIBGCC_OBJECTS_EXCLUDES_$(architecture)
-		= eabi.o ;
-
-	# the C++ standard library
-	HAIKU_BUILD_SHARED_LIBSTDC++_$(architecture) = ;
-	if $(HAIKU_SHARED_LIBSTDC++_$(architecture)) {
-		HAIKU_LIBSTDC++_$(architecture)
-			= $(HAIKU_SHARED_LIBSTDC++_$(architecture)) ;
-	} else {
-		# no shared library available with the compiler -- build it
-		if $(gccVersion[1]) = 2 {
-			HAIKU_LIBSTDC++_$(architecture) = libstdc++.r4.so ;
-		} else {
-			HAIKU_LIBSTDC++_$(architecture) = <$(architecture)>libstdc++.so ;
-		}
-		HAIKU_SHARED_LIBSTDC++_$(architecture)
-			= $(HAIKU_LIBSTDC++_$(architecture)) ;
-		HAIKU_BUILD_SHARED_LIBSTDC++_$(architecture) = 1 ;
-	}
-
-	# the C++ support (runtime) library
-	HAIKU_BUILD_SHARED_LIBSUPC++_$(architecture) = ;
-	if $(HAIKU_SHARED_LIBSUPC++_$(architecture)) {
-		HAIKU_LIBSUPC++_$(architecture)
-			= $(HAIKU_SHARED_LIBSUPC++_$(architecture)) ;
-	} else {
-		# no shared library available with the compiler -- build it for gcc 4
-		if $(gccVersion[1]) != 2 {
-			HAIKU_SHARED_LIBSUPC++_$(architecture)
-				= <$(architecture)>libsupc++.so ;
-			HAIKU_BUILD_SHARED_LIBSUPC++_$(architecture) = 1 ;
-		}
-
-		HAIKU_LIBSUPC++_$(architecture)
-			= $(HAIKU_SHARED_LIBSUPC++_$(architecture)) ;
-	}
-
 	# library and executable glue code
-	local crtBegin ;
-	local crtEnd ;
-	# TODO: use crtbeginS.o and crtendS.o unconditionally once we have
-	#       switched to new compiler packages
-	if [ Glob $(HAIKU_GCC_LIB_DIR_$(architecture)) : crtbeginS.o ] {
-		crtBegin = <$(architecture)>crtbeginS.o ;
-		crtEnd = <$(architecture)>crtendS.o ;
-	} else {
-		crtBegin = <$(architecture)>crtbegin.o ;
-		crtEnd = <$(architecture)>crtend.o ;
-	}
-
 	local commonGlueCode =
 		<src!system!glue!$(architecture)>init_term_dyn.o
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
@@ -225,23 +162,24 @@ rule ArchitectureSetup architecture
 		;
 	HAIKU_LIBRARY_BEGIN_GLUE_CODE_$(architecture) =
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
-		$(crtBegin)
+		<$(architecture)>crtbeginS.o
 		<src!system!glue!$(architecture)>init_term_dyn.o
 		;
 	HAIKU_LIBRARY_END_GLUE_CODE_$(architecture) =
-		$(crtEnd)
+		<$(architecture)>crtendS.o
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crtn.o
 		;
 	HAIKU_EXECUTABLE_BEGIN_GLUE_CODE_$(architecture) =
 		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
-		$(crtBegin)
+		<$(architecture)>crtbeginS.o
 		<src!system!glue!$(architecture)>start_dyn.o
 		<src!system!glue!$(architecture)>init_term_dyn.o
 		;
 	HAIKU_EXECUTABLE_END_GLUE_CODE_$(architecture)
 		= $(HAIKU_LIBRARY_END_GLUE_CODE_$(architecture)) ;
 
-	SEARCH on $(crtBegin) $(crtEnd) = $(HAIKU_GCC_LIB_DIR_$(architecture)) ;
+	SEARCH on <$(architecture)>crtbeginS.o <$(architecture)>crtendS.o
+		= $(HAIKU_GCC_LIB_DIR_$(architecture)) ;
 
 	# init library name map
 	local libraryGrist = "" ;
@@ -256,10 +194,6 @@ rule ArchitectureSetup architecture
 		HAIKU_LIBRARY_NAME_MAP_$(architecture)_$(i)
 			= $(library:G=$(libraryGrist)) ;
 	}
-	HAIKU_LIBRARY_NAME_MAP_$(architecture)_libstdc++
-		= $(HAIKU_LIBSTDC++_$(architecture)) ;
-	HAIKU_LIBRARY_NAME_MAP_$(architecture)_libsupc++
-		= $(HAIKU_LIBSUPC++_$(architecture)) ;
 	HAIKU_LIBRARY_NAME_MAP_$(architecture)_localestub
 		= <$(architecture)>liblocalestub.a ;
 	if $(architecture) = $(HAIKU_PACKAGING_ARCHS[1]) {
@@ -483,21 +417,9 @@ rule KernelArchitectureSetup architecture
 		# compiling (part of) the boot loader.
 
 	# kernel add-on glue code
-	local crtBegin ;
-	local crtEnd ;
-	# TODO: use crtbeginS.o and crtendS.o unconditionally once we have
-	#       switched to new compiler packages
-	if [ Glob $(HAIKU_GCC_LIB_DIR_$(architecture)) : crtbeginS.o ] {
-		crtBegin = <$(architecture)>crtbeginS.o ;
-		crtEnd = <$(architecture)>crtendS.o ;
-	} else {
-		crtBegin = <$(architecture)>crtbegin.o ;
-		crtEnd = <$(architecture)>crtend.o ;
-	}
-	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = $(crtBegin)
+	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = <$(architecture)>crtbeginS.o
 		<src!system!glue!$(architecture)>haiku_version_glue.o ;
-	HAIKU_KERNEL_ADDON_END_GLUE_CODE
-		= $(HAIKU_GCC_LIBGCC_$(architecture)) $(crtEnd) ;
+	HAIKU_KERNEL_ADDON_END_GLUE_CODE = <$(architecture)>crtendS.o ;
 }
 
 
@@ -783,11 +705,11 @@ rule MultiArchSubDirSetup architectures
 	# packaging architectures, if <architectures> is empty) an object is
 	# prepared that can be used for an "on ... { ... }" block to set up subdir
 	# variables for the respective packaging architecture. Most notably
-	# TARGET_PACKAGING_ARCH, TARGET_ARCH, TARGET_LIBSUPC++, and TARGET_LIBSTDC++
-	# are set to the values for the respective packaging architecture. The
-	# per-subdir variables SOURCE_GRIST, LOCATE_TARGET, LOCATE_SOURCE,
-	# SEARCH_SOURCE, *_LOCATE_TARGET, are reset. All SUBDIR* and config
-	# variables are set to the values they had when this rule was invoked.
+	# TARGET_PACKAGING_ARCH, TARGET_ARCH are set to the values for the
+	# respective packaging architecture. The per-subdir variables SOURCE_GRIST,
+	# LOCATE_TARGET, LOCATE_SOURCE, SEARCH_SOURCE, *_LOCATE_TARGET, are reset.
+	# All SUBDIR* and config variables are set to the values they had when this
+	# rule was invoked.
 
 	local result ;
 	architectures ?= $(TARGET_PACKAGING_ARCHS) ;
@@ -805,7 +727,7 @@ rule MultiArchSubDirSetup architectures
 		TARGET_PACKAGING_ARCH on $(architectureObject) = $(architecture) ;
 
 		local var ;
-		for var in TARGET_ARCH TARGET_LIBSUPC++ TARGET_LIBSTDC++ {
+		for var in TARGET_ARCH {
 			$(var) on $(architectureObject) = $($(var)_$(architecture)) ;
 		}
 

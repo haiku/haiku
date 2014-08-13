@@ -8,7 +8,8 @@ rule AddSharedObjectGlueCode
 	on $(1) {
 		platform = $(PLATFORM) ;
 		if $(platform) = haiku {
-			local stdLibs = [ MultiArchDefaultGristFiles libroot.so ] ;
+			local stdLibs = [ MultiArchDefaultGristFiles libroot.so ]
+				[ TargetLibgcc ] ;
 			local type = EXECUTABLE ;
 			if $(2) != true {
 				type = LIBRARY ;
@@ -168,7 +169,7 @@ rule StaticLibraryFromObjects
 
 rule AssembleNasm
 {
-	Depends $(<) : $(>) ;
+	Depends $(<) : $(>) [ on $(<) return $(PLATFORM) ] ;
 }
 
 actions AssembleNasm
@@ -274,7 +275,8 @@ rule CreateAsmStructOffsetsHeader header : source
 			}
 
 		} else {
-			sysHeaders += $(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
+			sysHeaders += [ FStandardHeaders $(TARGET_PACKAGING_ARCH) ]
+				$(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
 			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
 				$(TARGET_DEFINES) ;
 		}
@@ -343,7 +345,7 @@ rule CreateAsmStructOffsetsHeader header : source
 
 	# locate object, search for source, and set on target variables
 
-	Depends $(header) : $(source) ;
+	Depends $(header) : $(source) $(PLATFORM) ;
 	SEARCH on $(source) += $(SEARCH_SOURCE) ;
 	MakeLocateArch $(header) ;
 	LocalClean clean : $(header) ;
@@ -491,6 +493,8 @@ rule LinkAgainst
 	local mapLibs = $(3:E=true) ;
 
 	on $(target) {
+		local i ;
+
 		# map libraries, if desired and target platform is Haiku
 		local map = $(TARGET_LIBRARY_NAME_MAP_$(TARGET_PACKAGING_ARCH)) ;
 		if $(PLATFORM) != host && $(mapLibs) = true && $(map) {
@@ -755,4 +759,32 @@ rule BuildPlatformStaticLibraryPIC target : sources : otherObjects
 	ObjectC++Flags $(sources) : $(HOST_PIC_C++FLAGS) ;
 
 	BuildPlatformStaticLibrary $(target) : $(sources) : $(otherObjects) ;
+}
+
+rule BootstrapStage0PlatformObjects sources : separateFromStandardSiblings
+{
+	# BootstrapStage0PlatformObjects <sources> : <separateFromStandardSiblings>
+	# Builds objects from the given sources for stage0 of the bootstrap process.
+	# <sources> The sources from which objects should be created.
+	# <separateFromStandardSiblings> Pass 'true' if the same objects are built
+	# in a different context, too, so that a separate grist and target location
+	# is required. This defaults to ''.
+	local source ;
+	for source in $(sources) {
+		local objectGrist ;
+		if $(separateFromStandardSiblings) = true {
+			objectGrist = "bootstrap!$(SOURCE_GRIST)" ;
+		} else {
+			objectGrist = $(SOURCE_GRIST) ;
+		}
+		local object = $(source:S=$(SUFOBJ):G=$(objectGrist)) ;
+		PLATFORM on $(object) = bootstrap_stage0 ;
+		SUPPORTED_PLATFORMS on $(object) = bootstrap_stage0 ;
+		if $(separateFromStandardSiblings) = true {
+			MakeLocate $(object) : [
+				FDirName $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) bootstrap
+			] ;
+		}
+		Object $(object) : $(source) ;
+	}
 }

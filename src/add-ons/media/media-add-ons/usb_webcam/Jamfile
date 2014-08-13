@@ -95,7 +95,7 @@ Addon usb_webcam.media_addon :
 	CamRoster.cpp
 	CamSensor.cpp
 	CamStreamingDeframer.cpp
-	: be media $(usbKitLibraryName) $(TARGET_LIBSUPC++)
+	: be media $(usbKitLibraryName) [ TargetLibsupc++ ]
 ;
 
 # force dependancies

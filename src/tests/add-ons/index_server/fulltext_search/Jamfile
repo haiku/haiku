@@ -16,5 +16,5 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_CLUCENE_HEADERS_DEPENDENCY) ;
 Application FullTextSearch :
 	$(sources)
 	:
-	be $(HAIKU_CLUCENE_LIBS) $(TARGET_LIBSTDC++)
+	be $(HAIKU_CLUCENE_LIBS) [ TargetLibstdc++ ]
 	;

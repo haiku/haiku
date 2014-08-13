@@ -10,7 +10,7 @@ Preference DataTranslations :
 	DataTranslationsSettings.cpp
 	TranslatorListView.cpp
 
-	: be translation $(TARGET_LIBSUPC++) localestub libshared.a
+	: be translation [ TargetLibsupc++ ] localestub libshared.a
 	: DataTranslations.rdef
 	;
 

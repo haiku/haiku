@@ -58,7 +58,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			$(sources)
 			:
 			be bnetapi textencoding tracker
-			$(TARGET_LIBSTDC++)
+			[ TargetLibstdc++ ]
 			$(TARGET_NETWORK_LIBS)
 			$(TARGET_SELECT_UNAME_ETC_LIB)
 			[ BuildFeatureAttribute openssl : libraries ]

@@ -9,7 +9,7 @@ SubDirHdrs [ FDirName $(SUBDIR) MAClib ] ;
 
 Addon ape_reader :
 	APEReader.cpp
-	: libMonkeysAudio.a MAClib.a be libmedia.so $(TARGET_LIBSUPC++)
+	: libMonkeysAudio.a MAClib.a be libmedia.so [ TargetLibsupc++ ]
 ;
 
 SubInclude HAIKU_TOP src add-ons media plugins ape_reader LibMonkeysAudio ;

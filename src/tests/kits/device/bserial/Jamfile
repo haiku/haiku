@@ -2,4 +2,4 @@ SubDir HAIKU_TOP src tests kits device bserial ;
 
 SimpleTest serial_io :
 	SerialIO.cpp
-	: libdevice.so $(TARGET_LIBSTDC++) ;
+	: libdevice.so [ TargetLibstdc++ ] ;

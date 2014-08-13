@@ -16,5 +16,5 @@ UnitTestLib libtranslationtest.so
 		BitmapStreamTest.cpp
 		TranslationUtilsTest.cpp
 		TranslatorTest.cpp
-	: $(libtranslation) be $(TARGET_LIBSTDC++)
+	: $(libtranslation) be [ TargetLibstdc++ ]
 ;

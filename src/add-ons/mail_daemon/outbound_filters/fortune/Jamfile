@@ -12,7 +12,7 @@ Addon Fortune :
 	ConfigView.cpp
 	filter.cpp
 	:
-	be libmail.so localestub $(TARGET_LIBSUPC++)
+	be libmail.so localestub [ TargetLibsupc++ ]
 ;
 
 DoCatalogs Fortune :

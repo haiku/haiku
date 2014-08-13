@@ -128,6 +128,7 @@ rule PrepareSubDirConfigVariables
 			: __inherited_config__ ] ;
 
 		on [ ConfigObject $(parentDir) : __inherited_config__ ] {
+			local var ;
 			for var in $(AUTO_SET_UP_CONFIG_VARIABLES) {
 				$(var) on $(config) ?= $($(var)) ;
 				$(var) on $(inheritedConfig) ?= $($(var)) ;
@@ -147,6 +148,7 @@ rule PrepareConfigVariables
 	local rootConfig = [ ConfigObject ] ; # the root config object
 	local inheritedRootConfig = [ ConfigObject : __inherited_config__ ] ;
 
+	local var ;
 	for var in $(AUTO_SET_UP_CONFIG_VARIABLES) {
 		$(var) on $(rootConfig) = $($(var)) ;
 		$(var) on $(inheritedRootConfig) = $($(var)) ;

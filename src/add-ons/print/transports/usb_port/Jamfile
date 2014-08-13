@@ -9,5 +9,5 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits print ] ;
 Addon USB\ Port :
 	USBTransport.cpp
 	PrintTransportAddOn.cpp
-	: libshared.a libdevice.so be $(TARGET_LIBSUPC++)
+	: libshared.a libdevice.so be [ TargetLibsupc++ ]
 ;

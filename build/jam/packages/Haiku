@@ -6,6 +6,7 @@ HaikuPackage $(haikuPackage) ;
 
 
 # wifi firmware
+local driver ;
 for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
 	local package = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGE) ] ;
 	local archive = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVE) ] ;
@@ -16,6 +17,7 @@ for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
 	}
 	local packages = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGES) ] ;
 	local archives = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVES) ] ;
+	local archive ;
 	for archive in $(archives) {
 		AddWifiFirmwareToPackage $(driver) : $(packages[1]) : $(archive)
 			: $(extract) ;

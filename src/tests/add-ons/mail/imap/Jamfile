@@ -18,7 +18,7 @@ SimpleTest imap_tester :
 	# from fs_shell
 	argv.c
 
-	: be $(TARGET_LIBSUPC++) mail
+	: be [ TargetLibsupc++ ] mail
 ;
 
 SEARCH on [ FGristFiles $(libSources) ]

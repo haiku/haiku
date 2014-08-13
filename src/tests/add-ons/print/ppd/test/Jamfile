@@ -11,7 +11,7 @@ SubDirHdrs $(HAIKU_TOP) src tests add-ons print ppd ui ;
 
 SimpleTest PPDConfig : 
 	PPDConfigApplication.cpp
-	: be root libppdtest.a $(TARGET_LIBSUPC++)
+	: be root libppdtest.a [ TargetLibsupc++ ]
 ;
 
 SimpleTest PPDTest : 
@@ -19,6 +19,6 @@ SimpleTest PPDTest :
 	TestParser.cpp
 	TestScanner.cpp
 	: 
-	be root libppdtest.a $(TARGET_LIBSUPC++)
+	be root libppdtest.a [ TargetLibsupc++ ]
 ;
 

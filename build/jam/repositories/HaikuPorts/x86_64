@@ -40,7 +40,9 @@ RemotePackageRepository HaikuPorts
 	freetype-2.5.2-3
 	freetype_devel-2.5.2-3
 	gawk-4.1.0-2
-	gcc-4.8.3_2014_05_28-3
+	gcc-4.8.3_2014_07_26-1
+	gcc_syslibs-4.8.3_2014_07_26-1
+	gcc_syslibs_devel-4.8.3_2014_07_26-1
 	gettext-0.18.1.1-5
 	gettext_libintl-0.18.1.1-5
 	git-1.8.3.4-3
@@ -182,7 +184,7 @@ RemotePackageRepository HaikuPorts
 	fossil
 	freetype
 	gawk
-#	gcc
+	gcc
 	gettext
 	git
 	glu

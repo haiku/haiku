@@ -18,7 +18,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			EXRGamma.cpp
 			EXRTranslator.cpp
 			IStreamWrapper.cpp
-			: be translation textencoding $(TARGET_LIBSTDC++) 
+			: be translation textencoding [ TargetLibstdc++ ] 
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a  libilmimf.so ]
 			localestub
 			: true

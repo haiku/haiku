@@ -8,7 +8,7 @@ UseHeaders [ FDirName os interface ] ;
 
 Application StressTest :
 	main.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be [ TargetLibstdc++ ]
 ;
 
 if ( $(TARGET_PLATFORM) = libbe_test ) {

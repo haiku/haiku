@@ -42,5 +42,5 @@ Addon <userland>bfs
 
 	kernel_interface.cpp
 
-	: libuserlandfs_haiku_kernel.so $(TARGET_LIBSUPC++)
+	: libuserlandfs_haiku_kernel.so [ TargetLibsupc++ ]
 ;

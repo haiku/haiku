@@ -12,5 +12,5 @@ Addon Preview :
 	Driver.cpp
 	PrinterDriver.cpp
 	PreviewDriver.cpp
-	: be libprint.a $(TARGET_LIBSTDC++)
+	: be libprint.a [ TargetLibstdc++ ]
 ;

@@ -19,7 +19,7 @@ Server mail_daemon :
 	MailDaemon.cpp
 	main.cpp
 	Notifier.cpp
-	: be libmail.so tracker localestub $(TARGET_LIBSTDC++)
+	: be libmail.so tracker localestub [ TargetLibstdc++ ]
 		$(TARGET_NETWORK_LIBS)
 ;
 

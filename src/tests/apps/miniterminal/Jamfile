@@ -14,5 +14,5 @@ Application MiniTerminal :
 	MiniView.cpp 
 	MiniWin.cpp
 	ViewBuffer.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be [ TargetLibsupc++ ]
 ;

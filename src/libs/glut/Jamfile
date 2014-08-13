@@ -67,7 +67,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			$(sourcesCpp)
 			$(sourcesCc)
 			:
-			game be $(TARGET_LIBSTDC++)
+			game be [ TargetLibstdc++ ]
 			[ BuildFeatureAttribute mesa : library ]
 			[ BuildFeatureAttribute glu : library ]
 			;

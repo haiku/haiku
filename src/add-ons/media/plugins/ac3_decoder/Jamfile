@@ -4,7 +4,7 @@ UsePrivateHeaders media ;
 
 Addon ac3_decoder :
 	ac3_decoder.cpp
-	: liba52.a be libmedia.so $(TARGET_LIBSUPC++)
+	: liba52.a be libmedia.so [ TargetLibsupc++ ]
 ;
 
 SubIncludeGPL HAIKU_TOP src add-ons media plugins ac3_decoder liba52 ;

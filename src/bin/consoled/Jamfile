@@ -5,5 +5,5 @@ UseHeaders [ FDirName $(HAIKU_TOP) src apps terminal ] ;
 
 Application consoled :
 	consoled.cpp
-	: be libshared.a $(TARGET_LIBSUPC++)
+	: be libshared.a [ TargetLibsupc++ ]
 ;

@@ -28,7 +28,7 @@ Application DebugAnalyzer
 	<nogrist>DebugAnalyzer_util.o
 
 	libcolumnlistview.a libshared.a libdebug.so be
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 	:
 	DebugAnalyzer.rdef
 ;

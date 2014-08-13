@@ -84,7 +84,7 @@ Application netfs_server
 	Volume.cpp
 	VolumeManager.cpp
 	:
-	be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++) libshared.a
+	be $(TARGET_NETWORK_LIBS) [ TargetLibsupc++ ] libshared.a
 	:
 	netfs_server.rdef
 ;

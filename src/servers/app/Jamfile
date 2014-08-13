@@ -101,7 +101,7 @@ Server app_server :
 	libasdrawing.a libpainter.a libagg.a
 	[ BuildFeatureAttribute freetype : library ]
 	libstackandtile.a liblinprog.a libtextencoding.so libshared.a
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 
 	: app_server.rdef
 ;

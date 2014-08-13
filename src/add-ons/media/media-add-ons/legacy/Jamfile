@@ -7,5 +7,5 @@ Addon legacy.media_addon :
 	LegacyAudioDevice.cpp
 	LegacyAudioProducer.cpp
 	LegacyMediaAddOn.cpp
-	: be media $(TARGET_LIBSUPC++)
+	: be media [ TargetLibsupc++ ]
 ;

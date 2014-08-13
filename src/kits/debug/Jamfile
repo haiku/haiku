@@ -33,7 +33,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# architecture specific
 			arch_debug_support.cpp
 
-			: be $(TARGET_LIBSUPC++)
+			: be [ TargetLibsupc++ ]
 			;
 	}
 }

@@ -80,12 +80,12 @@ UnitTestLib libsupporttest.so
 		BlockCacheExerciseTest.cpp
 		BlockCacheConcurrencyTest.cpp
 
-	: be $(TARGET_LIBSTDC++) libsupporttest_RemoteTestObject.so
+	: be [ TargetLibstdc++ ] libsupporttest_RemoteTestObject.so
 ;
 
 UsePrivateHeaders support ;
 
-SimpleTest compression_test : compression_test.cpp : be $(TARGET_LIBSUPC++) ;
+SimpleTest compression_test : compression_test.cpp : be [ TargetLibsupc++ ] ;
 SimpleTest string_utf8_tests : string_utf8_tests.cpp : be ;
 
 SubInclude HAIKU_TOP src tests kits support barchivable ;

@@ -19,7 +19,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			STXTView.cpp
 			: be translation textencoding
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
-			$(TARGET_LIBSUPC++) localestub
+			[ TargetLibsupc++ ] localestub
 			: true
 		;
 	}

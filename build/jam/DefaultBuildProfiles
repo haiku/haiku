@@ -4,6 +4,10 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_BUILD_TYPE = bootstrap ;
 		EnableBuildFeatures bootstrap_image ;
 
+		# Add a third pseudo target for the platform used when building anything
+		# for stage0 of the bootstrap process.
+		NotFile bootstrap_stage0 ;
+
 		HAIKU_DEFINES += HAIKU_BOOTSTRAP_BUILD ;
 		TARGET_DEFINES += HAIKU_BOOTSTRAP_BUILD ;
 	}

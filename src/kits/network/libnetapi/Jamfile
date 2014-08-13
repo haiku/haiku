@@ -89,7 +89,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			UrlSynchronousRequest.cpp
 
 			:
-			be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+			be $(TARGET_NETWORK_LIBS) [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 			[ BuildFeatureAttribute openssl : libraries ]
 			[ MultiArchDefaultGristFiles libshared.a ]
 			;

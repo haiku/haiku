@@ -44,6 +44,4 @@ KernelAddon ramfs
 	  SizeIndex.cpp
 	  SymLink.cpp
 	  Volume.cpp
-
-	: $(TARGET_KERNEL_LIBSUPC++)
 ;

@@ -10,5 +10,5 @@ Application reader.media_addon :
 	MediaReader.cpp
 	MediaReaderAddOn.cpp
 	misc.cpp
-	: be media $(TARGET_LIBSUPC++)
+	: be media [ TargetLibsupc++ ]
 ;

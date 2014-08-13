@@ -5,9 +5,15 @@ for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 	on $(architectureObject) {
 		UsePrivateSystemHeaders ;
 
-		Objects
+		local sources =
 			crti.S
 			crtn.S
 			;
+		Objects $(sources) ;
+
+		if $(HAIKU_BUILD_TYPE) = bootstrap {
+			# build a version for stage0 of the bootstrap process
+			BootstrapStage0PlatformObjects $(sources) : true ;
+		}
 	}
 }

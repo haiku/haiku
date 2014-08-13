@@ -4,5 +4,5 @@ UsePrivateHeaders media ;
 
 SimpleTest <test>playwav
 	: playwav.cpp
-	: media be root $(TARGET_LIBSUPC++)
+	: media be root [ TargetLibsupc++ ]
 ;

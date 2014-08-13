@@ -132,9 +132,6 @@ if $(HAIKU_PACKAGING_ARCH) {
 # define primary packaging architecture macro
 HAIKU_DEFINES = __HAIKU_PRIMARY_PACKAGING_ARCH=\\\"$(HAIKU_PACKAGING_ARCH)\\\" ;
 
-HAIKU_LIBSUPC++ = $(HAIKU_LIBSUPC++_$(HAIKU_PACKAGING_ARCH)) ;
-HAIKU_LIBSTDC++ = $(HAIKU_LIBSTDC++_$(HAIKU_PACKAGING_ARCH)) ;
-
 
 # distro compatibility level defines
 HAIKU_DISTRO_COMPATIBILITY ?= "default" ;
@@ -655,8 +652,6 @@ local buildVars =
 
 	PRIVATE_KERNEL_HEADERS
 
-	LIBSTDC++ LIBSUPC++
-
 	NETWORK_LIBS NETAPI_LIB SELECT_UNAME_ETC_LIB
 
 	EXECUTABLE_MIME_TYPE
@@ -680,8 +675,6 @@ local archDependentBuildVars =
 
 	PRIVATE_SYSTEM_HEADERS
 
-	LIBSTDC++ LIBSUPC++
-
 	ARCH_OBJECT_DIR COMMON_DEBUG_OBJECT_DIR
 	DEBUG_$(HAIKU_DEBUG_LEVELS)_OBJECT_DIR
 	;
@@ -696,17 +689,11 @@ if $(TARGET_PLATFORM) = haiku {
 		TARGET_$(var) = $(HAIKU_$(var)) ;
 	}
 
-	TARGET_KERNEL_LIBGCC
-		= $(HAIKU_KERNEL_LIBGCC_$(TARGET_PACKAGING_ARCH)) ;
-	TARGET_KERNEL_LIBSUPC++
-		= $(HAIKU_KERNEL_LIBSUPC++_$(TARGET_PACKAGING_ARCH)) ;
-	TARGET_BOOT_LIBGCC
-		= $(HAIKU_BOOT_LIBGCC_$(TARGET_PACKAGING_ARCH)) ;
-	TARGET_BOOT_LIBSUPC++
-		= $(HAIKU_BOOT_LIBSUPC++_$(TARGET_PACKAGING_ARCH)) ;
+	TARGET_BOOT_LIBGCC		= $(HAIKU_BOOT_LIBGCC_$(TARGET_PACKAGING_ARCH)) ;
+	TARGET_BOOT_LIBSUPC++	= $(HAIKU_BOOT_LIBSUPC++_$(TARGET_PACKAGING_ARCH)) ;
 
-	TARGET_BOOT_PLATFORM		?= $(HAIKU_BOOT_PLATFORM) ;
-	TARGET_BOOT_BOARD			?= $(HAIKU_BOOT_BOARD) ;
+	TARGET_BOOT_PLATFORM	?= $(HAIKU_BOOT_PLATFORM) ;
+	TARGET_BOOT_BOARD		?= $(HAIKU_BOOT_BOARD) ;
 
 	local architecture ;
 	for architecture in $(TARGET_PACKAGING_ARCHS) {
@@ -724,8 +711,6 @@ if $(TARGET_PLATFORM) = haiku {
 		TARGET_$(var)_$(TARGET_PACKAGING_ARCH) = $(HOST_$(var)) ;
 	}
 
-	TARGET_KERNEL_LIBGCC		= ;
-	TARGET_KERNEL_LIBSUPC++		= ;
 	TARGET_BOOT_LIBGCC			= ;
 	TARGET_BOOT_LIBSUPC++		= ;
 
@@ -854,11 +839,27 @@ OPTIM ?= -O2 ;
 DEBUG ?= 0 ;
 
 
+# Set a sane default for whether this is a CI build.
+HAIKU_CONTINUOUS_INTEGRATION_BUILD ?= 0 ;
+
+
 # Set the defaults for PLATFORM and SUPPORTED_PLATFORMS. PLATFORM is only
 # overridden for targets to be built for the host platform. SUPPORTED_PLATFORMS
 # can be overridden by the author of a component.
 PLATFORM = $(TARGET_PLATFORM) ;
 SUPPORTED_PLATFORMS = haiku ;
+
+
+# Define two pseudo targets for the target and buildhost platform. The main
+# build rules (Cc, C++, As, ...) depend on these pseude targets such that global
+# initializations that are required before anything is built for a specific
+# platform can be forced by depending the pseudo target for the platform on the
+# initializations.
+# This is currently used to unpack the external headers from the
+# gcc_syslibs_devel build feature before anything is built for the target
+# platform.
+NotFile $(TARGET_PLATFORM) ;
+NotFile host ;
 
 
 # Instructs the Library rule to not make its object files temporary.

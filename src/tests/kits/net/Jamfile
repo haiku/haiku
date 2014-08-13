@@ -28,7 +28,7 @@ SimpleTest NetAddressTest : NetAddressTest.cpp
 	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) ;
 
 SimpleTest NetEndpointTest : NetEndpointTest.cpp
-	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) be $(TARGET_LIBSUPC++) ;
+	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) be [ TargetLibsupc++ ] ;
 
 SimpleTest wlan_test : wlan_test.cpp : $(TARGET_NETWORK_LIBS) bnetapi be ;
 

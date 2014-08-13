@@ -8,7 +8,7 @@ Server mount_server
 # 	AutoMounterSettings.cpp
 	:
 	libbe.so localestub
-	$(TARGET_LIBSTDC++)
+	[ TargetLibstdc++ ]
 	:
 	mount_server.rdef
 ;

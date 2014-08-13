@@ -8,7 +8,7 @@ SimpleTest mp3_reader_test
 	MediaPlugin.cpp
 	ReaderPlugin.cpp
 	MP3ReaderPlugin.cpp
-	: media be root $(TARGET_LIBSUPC++)
+	: media be root [ TargetLibsupc++ ]
 ;
 
 # Tell Jam where to find these sources

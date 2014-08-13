@@ -488,6 +488,7 @@ rule AddDriversToContainer container : relativeDirectoryTokens : targets
 
 	# get the relative symlink path prefix
 	local linkPrefix = ;
+	local i ;
 	for i in $(relativeDirectoryTokens) {
 		linkPrefix += .. ;
 	}

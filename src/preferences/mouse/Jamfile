@@ -8,7 +8,7 @@ Preference Mouse :
 	MouseWindow.cpp
 	MouseView.cpp
 	SettingsView.cpp
-	: translation be $(TARGET_LIBSUPC++) localestub
+	: translation be [ TargetLibsupc++ ] localestub
 	: Mouse.rdef
 	;
 

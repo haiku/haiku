@@ -8,7 +8,7 @@ UseHeaders [ FDirName os interface ] ;
 
 Application WorkspaceActivated :
 	WorkspaceActivated.cpp
-	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {

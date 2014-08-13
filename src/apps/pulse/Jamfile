@@ -23,7 +23,7 @@ Application Pulse :
 	PulseView.cpp
 	PulseWindow.cpp
 
-	: be localestub $(TARGET_LIBSUPC++)
+	: be localestub [ TargetLibsupc++ ]
 	: Pulse.rdef
 ;
 

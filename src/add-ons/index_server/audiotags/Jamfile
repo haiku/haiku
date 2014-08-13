@@ -16,7 +16,7 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_TAGLIB_HEADERS_DEPENDENCY) ;
 Addon AudioTagAnalyser :
 	$(sources)
 	:
-	be $(HAIKU_TAGLIB_LIBS) $(TARGET_LIBSTDC++)
+	be $(HAIKU_TAGLIB_LIBS) [ TargetLibstdc++ ]
 	;
 
 SEARCH on [ FGristFiles IndexServerAddOn.cpp ]
