@@ -194,9 +194,9 @@ TermView::_Init()
 
 	font_height height;
 	GetFontHeight(&height);
-	fFontHeight = ceilf(height.ascent) + ceilf(height.descent)
-		+ ceilf(height.leading);
-	fFontWidth = be_fixed_font->StringWidth("X");
+	fFontHeight = (int)(ceilf(height.ascent) + ceilf(height.descent)
+		+ ceilf(height.leading));
+	fFontWidth = (int)be_fixed_font->StringWidth("X");
 	fTerm = vterm_new(kDefaultHeight, kDefaultWidth);
 
 	fTermScreen = vterm_obtain_screen(fTerm);
