@@ -66,8 +66,8 @@ TermView::Draw(BRect updateRect)
 
 	for (pos.row = updatedChars.start_row; pos.row <= updatedChars.end_row;
 			pos.row++) {
-		float x = updatedChars.start_col * fFontWidth + kBorderSpacing;
-		float y = pos.row * fFontHeight + height.ascent + kBorderSpacing;
+		int x = updatedChars.start_col * fFontWidth + kBorderSpacing;
+		int y = pos.row * fFontHeight + (int)ceil(height.ascent) + kBorderSpacing;
 		MovePenTo(x, y);
 
 		for (pos.col = updatedChars.start_col;
@@ -97,14 +97,14 @@ TermView::Draw(BRect updateRect)
 				SetHighColor(foreground);
 			}
 
-			FillRect(BRect(x,
-				y - ceil(height.ascent) + 1,
+			FillRect(BRect(x, y - ceil(height.ascent) + 1,
 				x + cell.width * fFontWidth - 1,
 				y + ceil(height.descent) + ceil(height.leading)),
 				B_SOLID_LOW);
 
 			if (cell.chars[0] == 0) {
 				x += fFontWidth;
+				MovePenTo(x, y);
 				pos.col ++;
 			} else {
 				char buffer[VTERM_MAX_CHARS_PER_CELL];
@@ -112,7 +112,7 @@ TermView::Draw(BRect updateRect)
 						VTERM_MAX_CHARS_PER_CELL);
 
 				DrawString(buffer);
-				x += StringWidth(buffer);
+				x += (int)ceil(StringWidth(buffer));
 				pos.col += cell.width;
 			}
 		}
@@ -279,35 +279,29 @@ TermView::_GlyphsToPixels(const int width, const int height) const
 void
 TermView::_GetCell(VTermPos pos, VTermScreenCell& cell)
 {
-	int availableRows, availableCols;
-	vterm_get_size(fTerm, &availableRows, &availableCols);
+	// First handle cells from the normal screen
+	if (vterm_screen_get_cell(fTermScreen, pos, &cell) != 0)
+		return;
 
-	if (pos.col < 0 || pos.row < -kScrollBackSize || pos.col >= availableCols
-			|| pos.row >= availableRows) {
-		// All cells outside the used terminal area are drawn with the same
-		// background color as the top-left one.
-		// TODO should they use the attributes of the closest neighbor instead?
-		VTermPos firstPos;
-		firstPos.row = 0;
-		firstPos.col = 0;
-		vterm_screen_get_cell(fTermScreen, firstPos, &cell);
-		cell.chars[0] = 0;
-		cell.width = 1;
-	} else if (pos.row < 0) {
-		// This is a cell from the scroll-back buffer
+	// Try the scroll-back buffer
+	if (pos.row < 0 && pos.col >= 0) {
 		int offset = - pos.row - 1;
 		ScrollBufferItem* line = (ScrollBufferItem*)fScrollBuffer.ItemAt(offset);
-		if (line == NULL || pos.col >= line->cols) {
-			VTermPos firstPos;
-			firstPos.row = 0;
-			firstPos.col = 0;
-			vterm_screen_get_cell(fTermScreen, firstPos, &cell);
-			cell.chars[0] = 0;
-			cell.width = 1;
-		} else
+		if (line != NULL && pos.col < line->cols) {
 			cell = line->cells[pos.col];
-	} else
-		vterm_screen_get_cell(fTermScreen, pos, &cell);
+			return;
+		}
+	}
+
+	// All cells outside the used terminal area are drawn with the same
+	// background color as the top-left one.
+	// TODO should they use the attributes of the closest neighbor instead?
+	VTermPos firstPos;
+	firstPos.row = 0;
+	firstPos.col = 0;
+	vterm_screen_get_cell(fTermScreen, firstPos, &cell);
+	cell.chars[0] = 0;
+	cell.width = 1;
 }
 
 
