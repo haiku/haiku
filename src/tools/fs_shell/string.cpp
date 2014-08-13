@@ -8,6 +8,7 @@
 #include "fssh_string.h"
 
 #include <string.h>
+#include <strings.h>
 
 
 void*
