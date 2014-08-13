@@ -47,21 +47,8 @@ TermView::~TermView()
 void
 TermView::AttachedToWindow()
 {
+	BView::AttachedToWindow();
 	MakeFocus();
-
-	VTermScreenCell cell;
-	VTermPos firstPos;
-	firstPos.row = 0;
-	firstPos.col = 0;
-	_GetCell(firstPos, cell);
-
-	rgb_color background;
-	background.red = cell.bg.red;
-	background.green = cell.bg.green;
-	background.blue = cell.bg.blue;
-	background.alpha = 255;
-
-	SetViewColor(background);
 }
 
 
@@ -110,15 +97,14 @@ TermView::Draw(BRect updateRect)
 				SetHighColor(foreground);
 			}
 
-			BPoint penLocation = PenLocation();
-			FillRect(BRect(penLocation.x,
-				penLocation.y - ceil(height.ascent) + 1,
-				penLocation.x + cell.width * fFontWidth - 1,
-				penLocation.y + ceil(height.descent) + ceil(height.leading)),
+			FillRect(BRect(x,
+				y - ceil(height.ascent) + 1,
+				x + cell.width * fFontWidth - 1,
+				y + ceil(height.descent) + ceil(height.leading)),
 				B_SOLID_LOW);
 
 			if (cell.chars[0] == 0) {
-				DrawString(" ");
+				x += fFontWidth;
 				pos.col ++;
 			} else {
 				char buffer[VTERM_MAX_CHARS_PER_CELL];
@@ -126,6 +112,7 @@ TermView::Draw(BRect updateRect)
 						VTERM_MAX_CHARS_PER_CELL);
 
 				DrawString(buffer);
+				x += StringWidth(buffer);
 				pos.col += cell.width;
 			}
 		}
@@ -209,6 +196,20 @@ TermView::_Init()
 	vterm_screen_reset(fTermScreen, 1);
 
 	vterm_parser_set_utf8(fTerm, 1);
+
+	VTermScreenCell cell;
+	VTermPos firstPos;
+	firstPos.row = 0;
+	firstPos.col = 0;
+	_GetCell(firstPos, cell);
+
+	rgb_color background;
+	background.red = cell.bg.red;
+	background.green = cell.bg.green;
+	background.blue = cell.bg.blue;
+	background.alpha = 255;
+
+	SetViewColor(background);
 }
 
 
