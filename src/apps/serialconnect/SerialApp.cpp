@@ -50,7 +50,7 @@ void SerialApp::MessageReceived(BMessage* message)
 	{
 		case kMsgOpenPort:
 		{
-			if(message->FindString("port name", &fPortPath) == B_OK)
+			if (message->FindString("port name", &fPortPath) == B_OK)
 			{
 				fSerialPort.Open(fPortPath);
 				release_sem(fSerialLock);
@@ -71,7 +71,7 @@ void SerialApp::MessageReceived(BMessage* message)
 				ssize_t length;
 				message->FindData("data", B_RAW_TYPE, (const void**)&bytes,
 					&length);
-				if(fLogFile->Write(bytes, length) != length)
+				if (fLogFile->Write(bytes, length) != length)
 				{
 					// TODO error handling
 				}
@@ -108,7 +108,7 @@ void SerialApp::MessageReceived(BMessage* message)
 				fLogFile = new BFile(&directory, filename,
 					B_WRITE_ONLY | B_CREATE_FILE | B_OPEN_AT_END);
 				status_t error = fLogFile->InitCheck();
-				if(error != B_OK)
+				if (error != B_OK)
 				{
 					puts(strerror(error));
 				}
@@ -125,19 +125,19 @@ void SerialApp::MessageReceived(BMessage* message)
 			parity_mode parity;
 			uint32 flowcontrol;
 
-			if(message->FindInt32("databits", (int32*)&dataBits) == B_OK)
+			if (message->FindInt32("databits", (int32*)&dataBits) == B_OK)
 				fSerialPort.SetDataBits(dataBits);
 
-			if(message->FindInt32("stopbits", (int32*)&stopBits) == B_OK)
+			if (message->FindInt32("stopbits", (int32*)&stopBits) == B_OK)
 				fSerialPort.SetStopBits(stopBits);
 
-			if(message->FindInt32("parity", (int32*)&parity) == B_OK)
+			if (message->FindInt32("parity", (int32*)&parity) == B_OK)
 				fSerialPort.SetParityMode(parity);
 
-			if(message->FindInt32("flowcontrol", (int32*)&flowcontrol) == B_OK)
+			if (message->FindInt32("flowcontrol", (int32*)&flowcontrol) == B_OK)
 				fSerialPort.SetFlowControl(flowcontrol);
 
-			if(message->FindInt32("baudrate", &baudrate) == B_OK) {
+			if (message->FindInt32("baudrate", &baudrate) == B_OK) {
 				data_rate rate = (data_rate)baudrate;
 				fSerialPort.SetDataRate(rate);
 			}
@@ -152,7 +152,7 @@ void SerialApp::MessageReceived(BMessage* message)
 
 bool SerialApp::QuitRequested()
 {
-	if(BApplication::QuitRequested()) {
+	if (BApplication::QuitRequested()) {
 		SaveSettings();
 		return true;
 	}
@@ -174,7 +174,7 @@ void SerialApp::LoadSettings()
 
 	BFile file(path.Path(), B_READ_ONLY);
 	BMessage message(kMsgSettings);
-	if(message.Unflatten(&file) != B_OK)
+	if (message.Unflatten(&file) != B_OK)
 	{
 		message.AddInt32("parity", fSerialPort.ParityMode());
 		message.AddInt32("databits", fSerialPort.DataBits());
@@ -212,7 +212,7 @@ status_t SerialApp::PollSerial(void*)
 	SerialApp* application = (SerialApp*)be_app;
 	char buffer[256];
 
-	for(;;)
+	for (;;)
 	{
 		ssize_t bytesRead;
 
@@ -228,10 +228,11 @@ status_t SerialApp::PollSerial(void*)
 			be_app_messenger.SendMessage(serialData);
 		}
 	}
-	
+
 	// Should not reach this line anyway...
 	return B_OK;
 }
+
 
 const char* SerialApp::kApplicationSignature
 	= "application/x-vnd.haiku.SerialConnect";
