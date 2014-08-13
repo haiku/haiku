@@ -355,16 +355,8 @@ actions BootstrapRepositoryFetchPackage1
 		done
 	fi
 
-	# determine the portName
-	portName=`basename "$package" | sed 's@-.*@@'`
-	case $portName in
-		*_devel|*_doc|*_source|*_debuginfo)
-			portName=`echo $portName | sed 's@_[^_]*$@@'`
-			;;
-		*_source_rigged)
-			portName=`echo $portName | sed 's@_source_rigged$@@'`
-			;;
-	esac
+	# determine the port-specification from the package name
+	portSpec=`basename "$package" | sed 's@-.*@@'`
 
 	cd $(HAIKU_REPOSITORY_BUILD_DIRECTORY)
 
@@ -373,11 +365,11 @@ actions BootstrapRepositoryFetchPackage1
 		$(HOST_HAIKU_PORTER) -j$(HAIKU_PORTER_CONCURRENT_JOBS) \
 			$(HAIKU_PORTER_EXTRA_OPTIONS) \
 			--cross-devel-package "$haikuCrossDevelPackage" \
-			"$secondaryCrossDevelPackages" $portName
+			"$secondaryCrossDevelPackages" $portSpec
 	else
 		$(HOST_HAIKU_PORTER) -j$(HAIKU_PORTER_CONCURRENT_JOBS) \
 			$(HAIKU_PORTER_EXTRA_OPTIONS) \
-			--cross-devel-package "$haikuCrossDevelPackage" $portName
+			--cross-devel-package "$haikuCrossDevelPackage" $portSpec
 	fi
 }
 
