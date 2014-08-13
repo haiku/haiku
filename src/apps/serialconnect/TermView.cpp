@@ -141,9 +141,9 @@ void
 TermView::GetPreferredSize(float* width, float* height)
 {
 	if (width != NULL)
-		*width = kDefaultWidth * fFontWidth + 2 * kBorderSpacing;
+		*width = kDefaultWidth * fFontWidth + 2 * kBorderSpacing - 1;
 	if (height != NULL)
-		*height = kDefaultHeight * fFontHeight + 2 * kBorderSpacing;
+		*height = kDefaultHeight * fFontHeight + 2 * kBorderSpacing - 1;
 }
 
 
@@ -194,7 +194,8 @@ TermView::_Init()
 
 	font_height height;
 	GetFontHeight(&height);
-	fFontHeight = height.ascent + height.descent + height.leading + 1;
+	fFontHeight = ceilf(height.ascent) + ceilf(height.descent)
+		+ ceilf(height.leading);
 	fFontWidth = be_fixed_font->StringWidth("X");
 	fTerm = vterm_new(kDefaultHeight, kDefaultWidth);
 
@@ -338,8 +339,6 @@ TermView::_PushLine(int cols, const VTermScreenCell* cells)
 
 	BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
 	if (scrollBar != NULL) {
-		// FIXME this is not exactly right, it's off by a few pixels so one step
-		// isn't exactly equal to one line.
 		float range = (fScrollBuffer.CountItems() + availableRows) * fFontHeight;
 		scrollBar->SetRange(availableRows * fFontHeight - range, 0.0f);
 		// TODO we need to adjust this in FrameResized, as availableRows can

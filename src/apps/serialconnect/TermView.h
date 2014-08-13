@@ -49,8 +49,8 @@ class TermView: public BView
 		VTerm* fTerm;
 		VTermScreen* fTermScreen;
 		BList fScrollBuffer;
-		float fFontWidth;
-		float fFontHeight;
+		int fFontWidth;
+		int fFontHeight;
 
 		static const VTermScreenCallbacks sScreenCallbacks;
 
