@@ -74,6 +74,9 @@ TermView::Draw(BRect updateRect)
 	font_height height;
 	GetFontHeight(&height);
 
+	VTermPos cursorPos;
+	vterm_state_get_cursorpos(vterm_obtain_state(fTerm), &cursorPos);
+
 	for (pos.row = updatedChars.start_row; pos.row <= updatedChars.end_row;
 			pos.row++) {
 		float x = updatedChars.start_col * fFontWidth + kBorderSpacing;
@@ -96,7 +99,8 @@ TermView::Draw(BRect updateRect)
 			background.blue = cell.bg.blue;
 			background.alpha = 255;
 
-			if (cell.attrs.reverse) {
+			if ((cell.attrs.reverse != 0) ^ (pos.col == cursorPos.col
+					&& pos.row == cursorPos.row)) {
 				SetLowColor(foreground);
 				SetViewColor(foreground);
 				SetHighColor(background);
@@ -107,9 +111,10 @@ TermView::Draw(BRect updateRect)
 			}
 
 			BPoint penLocation = PenLocation();
-			FillRect(BRect(penLocation.x, penLocation.y - height.ascent,
+			FillRect(BRect(penLocation.x,
+				penLocation.y - ceil(height.ascent) + 1,
 				penLocation.x + cell.width * fFontWidth - 1,
-				penLocation.y + height.descent + height.leading),
+				penLocation.y + ceil(height.descent) + ceil(height.leading)),
 				B_SOLID_LOW);
 
 			if (cell.chars[0] == 0) {
@@ -308,8 +313,25 @@ TermView::_GetCell(VTermPos pos, VTermScreenCell& cell)
 void
 TermView::_Damage(VTermRect rect)
 {
-//	Invalidate();
 	Invalidate(_GlyphsToPixels(rect));
+}
+
+
+void
+TermView::_MoveCursor(VTermPos pos, VTermPos oldPos, int visible)
+{
+	VTermRect r;
+	r.start_row = pos.row;
+	r.start_col = pos.col;
+	r.end_col = pos.col + 1;
+	r.end_row = pos.row + 1;
+	Invalidate(_GlyphsToPixels(r));
+
+	r.start_row = oldPos.row;
+	r.start_col = oldPos.col;
+	r.end_col = oldPos.col + 1;
+	r.end_row = oldPos.row + 1;
+	Invalidate(_GlyphsToPixels(r));
 }
 
 
@@ -360,6 +382,16 @@ TermView::_Damage(VTermRect rect, void* user)
 
 
 /* static */ int
+TermView::_MoveCursor(VTermPos pos, VTermPos oldPos, int visible, void* user)
+{
+	TermView* view = (TermView*)user;
+	view->_MoveCursor(pos, oldPos, visible);
+
+	return 0;
+}
+
+
+/* static */ int
 TermView::_PushLine(int cols, const VTermScreenCell* cells, void* user)
 {
 	TermView* view = (TermView*)user;
@@ -373,7 +405,7 @@ const
 VTermScreenCallbacks TermView::sScreenCallbacks = {
 	&TermView::_Damage,
 	/*.moverect =*/ NULL,
-	/*.movecursor =*/ NULL,
+	&TermView::_MoveCursor,
 	/*.settermprop =*/ NULL,
 	/*.setmousefunc =*/ NULL,
 	/*.bell =*/ NULL,

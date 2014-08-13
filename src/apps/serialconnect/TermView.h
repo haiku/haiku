@@ -37,9 +37,13 @@ class TermView: public BView
 				void		_GetCell(VTermPos pos, VTermScreenCell& cell);
 
 				void		_Damage(VTermRect rect);
+				void		_MoveCursor(VTermPos pos, VTermPos oldPos,
+								int visible);
 				void		_PushLine(int cols, const VTermScreenCell* cells);
 
 		static	int			_Damage(VTermRect rect, void* user);
+		static	int			_MoveCursor(VTermPos pos, VTermPos oldPos,
+								int visible, void* user);
 		static	int			_PushLine(int cols, const VTermScreenCell* cells,
 								void* user);
 		static	int			_PopLine(int cols, const VTermScreenCell* cells,
