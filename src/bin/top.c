@@ -361,7 +361,7 @@ gather(
 	team_info	tm;
 	thread_time_list_t times;
 	int i;
-	system_info info;
+	//system_info info;
 	bigtime_t	oldLastMeasure;
 
 	i = 0;
