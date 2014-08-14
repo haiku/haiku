@@ -12,6 +12,7 @@ resource(3, "META:S:DESC") #'MSDC' "Patch";
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "diff",
 	"extensions" = "patch",
+	"extensions" = "patchset",
 	"type" = "text/x-patch"
 };
 
