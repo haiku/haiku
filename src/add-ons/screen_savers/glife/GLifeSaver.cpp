@@ -111,7 +111,7 @@ GLifeSaver::DirectConnected(direct_buffer_info* pdbiInfo)
 // ------------------------------------------------------
 //  GLifeSaver Class DirectDraw Definition
 void
-GLifeSaver::DirectDraw(int32 iFrame)
+GLifeSaver::Draw(BView*, int32 iFrame)
 {
 	fGLifeViewport->Advance();
 }

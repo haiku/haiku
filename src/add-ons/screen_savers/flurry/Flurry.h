@@ -54,7 +54,7 @@ public:
 	virtual	status_t				StartSaver(BView* view, bool preview);
 	virtual	void					StopSaver();
 
-	virtual	void					DirectDraw(int32 frame);
+	virtual	void					Draw(BView*, int32 frame);
 	virtual	void					DirectConnected(direct_buffer_info* info);
 
 	virtual	void					StartConfig(BView* configView);

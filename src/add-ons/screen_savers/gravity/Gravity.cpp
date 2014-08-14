@@ -90,7 +90,7 @@ Gravity::DirectConnected(direct_buffer_info* info)
 
 
 void
-Gravity::DirectDraw(int32 frame)
+Gravity::Draw(BView*, int32 frame)
 {
 	fGravityView->DirectDraw();
 }

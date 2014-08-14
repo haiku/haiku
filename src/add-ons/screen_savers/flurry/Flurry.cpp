@@ -360,7 +360,7 @@ Flurry::StopSaver()
 
 
 void
-Flurry::DirectDraw(int32 frame)
+Flurry::Draw(BView*, int32 frame)
 {
 	fFlurryView->DrawFlurryScreenSaver();
 }

@@ -39,7 +39,7 @@ public:
 			void			StopSaver();
 
 			void			DirectConnected(direct_buffer_info* info);
-			void			DirectDraw(int32 frame);
+			void			Draw(BView*, int32 frame);
 
 private:
 			GravityView*	fGravityView;

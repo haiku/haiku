@@ -29,7 +29,7 @@ public:
 	// Constructor
 				GLifeSaver(BMessage*, image_id);
 
-	// State/Preferences Methods			
+	// State/Preferences Methods
 	status_t	SaveState(BMessage*) const;
 	void		RestoreState(BMessage*);
 	void		StartConfig(BView*);
@@ -40,7 +40,7 @@ public:
 
 	// Graphics Methods
 	void		DirectConnected(direct_buffer_info*);
-	void		DirectDraw(int32);
+	void		Draw(BView*, int32);
 
 private:
 	GLifeState	fGLifeState;
