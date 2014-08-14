@@ -56,19 +56,18 @@ already_visited(uint32 *visited, int32 *_last, int32 *_num, uint32 fp)
 static status_t
 get_next_frame(addr_t fp, addr_t *next, addr_t *ip)
 {
-	if (fp != 0) {
-	        addr_t _fp = *(((addr_t*)fp) -3);
-	        addr_t _sp = *(((addr_t*)fp) -2);
-	        addr_t _lr = *(((addr_t*)fp) -1);
-	        addr_t _pc = *(((addr_t*)fp) -0);
+	addr_t _fp = *(((addr_t*)fp) -3);
+	addr_t _sp = *(((addr_t*)fp) -2);
+	addr_t _lr = *(((addr_t*)fp) -1);
+	addr_t _pc = *(((addr_t*)fp) -0);
 
-		*ip = (_fp != 0) ? _lr : _pc;
-		*next = _fp;
-
-		return B_OK;
+	if (_lr > KERNEL_TOP) {
+		return B_BAD_ADDRESS;
 	}
+	*ip = (_fp != 0) ? _lr : _pc;
+	*next = _fp;
 
-	return B_BAD_VALUE;
+	return B_OK;
 }
 
 
