@@ -13,9 +13,11 @@
 #include <iostream>
 
 #include <Catalog.h>
+#include <GroupLayout.h>
 #include <Point.h>
 #include <Rect.h>
 #include <Size.h>
+#include <StringView.h>
 #include <TextView.h>
 
 #include "Utility.h"
@@ -53,18 +55,16 @@ scale2(int x1, int x2, int y1, int y2, BRect area)
 
 PreviewView::PreviewView(const char* name)
 	:
-	BView(name, B_WILL_DRAW),
+	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fSaverView(NULL),
 	fNoPreview(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	float aspectRatio = 4.0f / 3.0f;
-		// 4:3 monitor
-	float previewWidth = 160.0f;
-	float previewHeight = ceilf(previewWidth / aspectRatio);
-
-	SetExplicitSize(BSize(previewWidth, previewHeight));
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	// We draw the "monitor" around the preview, hence the strange insets.
+	layout->SetInsets(10, 8, 11, 16);
+	SetLayout(layout);
 }
 
 
@@ -107,28 +107,32 @@ PreviewView::Draw(BRect updateRect)
 BView*
 PreviewView::AddPreview()
 {
-	BRect rect(scale2(1, 8, 1, 2, Bounds()).InsetBySelf(1.0f, 1.0f));
-	fSaverView = new BView(rect, "preview", B_FOLLOW_NONE, B_WILL_DRAW);
+	fSaverView = new BView("preview", B_WILL_DRAW);
 	fSaverView->SetViewColor(0, 0, 0);
 	fSaverView->SetLowColor(0, 0, 0);
 	AddChild(fSaverView);
 
-	BRect textRect(rect);
-	textRect.OffsetTo(-7.0f, 0.0f);
-	textRect.InsetBy(15.0f, 20.0f);
-	fNoPreview = new BTextView(rect, "no preview", textRect, B_FOLLOW_NONE,
-		B_WILL_DRAW);
-	fNoPreview->SetViewColor(0, 0, 0);
-	fNoPreview->SetLowColor(0, 0, 0);
-	fNoPreview->SetFontAndColor(be_plain_font, B_FONT_ALL, &kWhite);
-	fNoPreview->SetText(B_TRANSLATE("No preview available"));
-	fNoPreview->SetAlignment(B_ALIGN_CENTER);
-	fNoPreview->MakeEditable(false);
-	fNoPreview->MakeResizable(false);
-	fNoPreview->MakeSelectable(false);
+	float aspectRatio = 4.0f / 3.0f;
+		// 4:3 monitor
+	float previewWidth = 160.0f;
+	float previewHeight = ceilf(previewWidth / aspectRatio);
+
+	fSaverView->SetExplicitSize(BSize(previewWidth, previewHeight));
+	fSaverView->ResizeTo(previewWidth, previewHeight);
+
+	fNoPreview = new BStringView("no preview",
+		B_TRANSLATE("No preview available"));
 
 	fNoPreview->Hide();
-	fSaverView->AddChild(fNoPreview);
+	fNoPreview->SetExplicitSize(BSize(previewWidth, previewHeight));
+	fNoPreview->ResizeTo(previewWidth, previewHeight);
+
+	AddChild(fNoPreview);
+
+	fNoPreview->SetViewColor(0, 0, 0);
+	fNoPreview->SetLowColor(0, 0, 0);
+	fNoPreview->SetHighColor(255, 255, 255);
+	fNoPreview->SetAlignment(B_ALIGN_CENTER);
 
 	return fSaverView;
 }
@@ -156,6 +160,7 @@ PreviewView::SaverView()
 void
 PreviewView::ShowNoPreview() const
 {
+	fSaverView->Hide();
 	fNoPreview->Show();
 }
 
@@ -164,4 +169,5 @@ void
 PreviewView::HideNoPreview() const
 {
 	fNoPreview->Hide();
+	fSaverView->Show();
 }

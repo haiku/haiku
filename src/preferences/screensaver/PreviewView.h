@@ -13,7 +13,7 @@
 #include <View.h>
 
 
-class BTextView;
+class BStringView;
 
 class PreviewView : public BView {
 public:
@@ -31,7 +31,7 @@ public:
 
 private:
 			BView*				fSaverView;
-			BTextView*			fNoPreview;
+			BStringView*		fNoPreview;
 };
 
 
