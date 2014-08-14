@@ -165,8 +165,12 @@ LocaleRosterData::Refresh()
 int
 LocaleRosterData::CompareInfos(const void* left, const void* right)
 {
-	return ((CatalogAddOnInfo*)right)->fPriority
-		- ((CatalogAddOnInfo*)left)->fPriority;
+	const CatalogAddOnInfo* leftInfo
+		= * static_cast<const CatalogAddOnInfo* const *>(left);
+	const CatalogAddOnInfo* rightInfo
+		= * static_cast<const CatalogAddOnInfo* const *>(right);
+
+	return leftInfo->fPriority - rightInfo->fPriority;
 }
 
 
