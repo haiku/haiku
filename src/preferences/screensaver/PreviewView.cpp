@@ -130,7 +130,7 @@ PreviewView::AddPreview()
 
 	float aspectRatio = 4.0f / 3.0f;
 		// 4:3 monitor
-	float previewWidth = 160.0f;
+	float previewWidth = 120.0f;
 	float previewHeight = ceilf(previewWidth / aspectRatio);
 
 	fSaverView->SetExplicitSize(BSize(previewWidth, previewHeight));
