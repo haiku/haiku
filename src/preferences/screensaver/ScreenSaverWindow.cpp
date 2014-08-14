@@ -887,7 +887,7 @@ TabView::MouseDown(BPoint where)
 
 ScreenSaverWindow::ScreenSaverWindow()
 	:
-	BDirectWindow(BRect(50, 50, 496, 375),
+	BWindow(BRect(50, 50, 496, 375),
 		B_TRANSLATE_SYSTEM_NAME("ScreenSaver"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -959,15 +959,6 @@ ScreenSaverWindow::~ScreenSaverWindow()
 
 
 void
-ScreenSaverWindow::DirectConnected(direct_buffer_info* info)
-{
-	BScreenSaver* saver = fModulesView->ScreenSaver();
-	if (saver != NULL)
-		saver->DirectConnected(info);
-}
-
-
-void
 ScreenSaverWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -982,7 +973,7 @@ ScreenSaverWindow::MessageReceived(BMessage* message)
 			break;
 
 		default:
-			BDirectWindow::MessageReceived(message);
+			BWindow::MessageReceived(message);
 	}
 }
 

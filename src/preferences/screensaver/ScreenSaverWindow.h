@@ -26,12 +26,10 @@ class ModulesView;
 class TabView;
 
 
-class ScreenSaverWindow : public BDirectWindow {
+class ScreenSaverWindow : public BWindow {
 public:
 								ScreenSaverWindow();
 	virtual						~ScreenSaverWindow();
-
-	virtual	void				DirectConnected(direct_buffer_info* info);
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				ScreenChanged(BRect frame, color_space space);
