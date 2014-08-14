@@ -828,11 +828,13 @@ ModulesView::_OpenSaver()
 	BScreenSaver* saver = ScreenSaver();
 	if (saver != NULL && fSettingsView != NULL) {
 		saver->StartConfig(fSettingsView);
-		if (saver->StartSaver(view, true) == B_OK)
+		if (saver->StartSaver(view, true) == B_OK) {
+			fPreviewView->HideNoPreview();
 			fSaverRunner->Run();
-		else
+		} else
 			fPreviewView->ShowNoPreview();
-	}
+	} else
+		fPreviewView->ShowNoPreview();
 
 	if (fSettingsView->ChildAt(0) == NULL) {
 		// There are no settings at all, we add the module name here to

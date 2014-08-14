@@ -12,6 +12,7 @@
 
 #include <iostream>
 
+#include <CardLayout.h>
 #include <Catalog.h>
 #include <GroupLayout.h>
 #include <Point.h>
@@ -65,6 +66,21 @@ PreviewView::PreviewView(const char* name)
 	// We draw the "monitor" around the preview, hence the strange insets.
 	layout->SetInsets(10, 8, 11, 16);
 	SetLayout(layout);
+
+	fNoPreview = new BStringView("no preview",
+		B_TRANSLATE("No preview available"));
+
+	fNoPreview->Hide();
+
+	BView* container = new BView("preview container", 0);
+	container->SetLayout(new BCardLayout());
+	AddChild(container);
+	container->SetViewColor(0, 0, 0);
+	container->SetLowColor(0, 0, 0);
+	container->AddChild(fNoPreview);
+
+	fNoPreview->SetHighColor(255, 255, 255);
+	fNoPreview->SetAlignment(B_ALIGN_CENTER);
 }
 
 
@@ -110,7 +126,7 @@ PreviewView::AddPreview()
 	fSaverView = new BView("preview", B_WILL_DRAW);
 	fSaverView->SetViewColor(0, 0, 0);
 	fSaverView->SetLowColor(0, 0, 0);
-	AddChild(fSaverView);
+	ChildAt(0)->AddChild(fSaverView);
 
 	float aspectRatio = 4.0f / 3.0f;
 		// 4:3 monitor
@@ -120,19 +136,8 @@ PreviewView::AddPreview()
 	fSaverView->SetExplicitSize(BSize(previewWidth, previewHeight));
 	fSaverView->ResizeTo(previewWidth, previewHeight);
 
-	fNoPreview = new BStringView("no preview",
-		B_TRANSLATE("No preview available"));
-
-	fNoPreview->Hide();
 	fNoPreview->SetExplicitSize(BSize(previewWidth, previewHeight));
 	fNoPreview->ResizeTo(previewWidth, previewHeight);
-
-	AddChild(fNoPreview);
-
-	fNoPreview->SetViewColor(0, 0, 0);
-	fNoPreview->SetLowColor(0, 0, 0);
-	fNoPreview->SetHighColor(255, 255, 255);
-	fNoPreview->SetAlignment(B_ALIGN_CENTER);
 
 	return fSaverView;
 }
@@ -142,7 +147,7 @@ BView*
 PreviewView::RemovePreview()
 {
 	if (fSaverView != NULL)
-		RemoveChild(fSaverView);
+		ChildAt(0)->RemoveChild(fSaverView);
 
 	BView* saverView = fSaverView;
 	fSaverView = NULL;
@@ -160,14 +165,12 @@ PreviewView::SaverView()
 void
 PreviewView::ShowNoPreview() const
 {
-	fSaverView->Hide();
-	fNoPreview->Show();
+	((BCardLayout*)ChildAt(0)->GetLayout())->SetVisibleItem((int32)0);
 }
 
 
 void
 PreviewView::HideNoPreview() const
 {
-	fNoPreview->Hide();
-	fSaverView->Show();
+	((BCardLayout*)ChildAt(0)->GetLayout())->SetVisibleItem(1);
 }
