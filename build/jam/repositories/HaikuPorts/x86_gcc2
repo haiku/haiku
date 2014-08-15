@@ -507,6 +507,8 @@ RemotePackageRepository HaikuPorts
 	sqlite_x86_devel-3.8.0.2-1
 	strigi_x86-0.7.5-2
 	strigi_x86_devel-0.7.5-2
+	taglib_x86-1.9.1-1
+	taglib_x86_devel-1.9.1-1
 	tiff_x86-3.9.6-2
 	tiff_x86_devel-3.9.6-2
 	tig_x86-2.0.2-1
@@ -742,6 +744,7 @@ RemotePackageRepository HaikuPorts
 	sum_it
 	super_transball
 	taglib
+	taglib_x86
 	tar
 	texi2html
 	texinfo
