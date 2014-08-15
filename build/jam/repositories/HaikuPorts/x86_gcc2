@@ -448,6 +448,7 @@ RemotePackageRepository HaikuPorts
 	mesa_x86_devel-10.1.0-2
 	mesa_x86_swrast-10.1.0-2
 	mesa_x86_swpipe-10.1.0-2
+	mpd_x86-0.18.12_git-1
 	mpg123_x86-1.12.1-2
 	mpg123_x86_devel-1.12.1-2
 	muscle_x86-6.00-1
@@ -674,6 +675,7 @@ RemotePackageRepository HaikuPorts
 	mkdepend
 	moe
 	mog
+	mpd_x86
 	mpg123_x86
 	muscle_x86
 	musicpc_x86
