@@ -67,8 +67,8 @@ RemotePackageRepository HaikuPorts
 	flac-1.3.0-1
 	flac_devel-1.3.0-1
 	flex-2.5.39-1
-	fluidsynth-1.1.6-1
-	fluidsynth_devel-1.1.6-1
+	fluidsynth-1.1.6-2
+	fluidsynth_devel-1.1.6-2
 	fossil-1.29-1
 	freetype-2.5.2-3
 	freetype_devel-2.5.2-3
@@ -342,8 +342,8 @@ RemotePackageRepository HaikuPorts
 	faad2_x86_devel-2.7-1
 	flac_x86-1.3.0-1
 	flac_x86_devel-1.3.0-1
-	fluidsynth_x86-1.1.6-1
-	fluidsynth_x86_devel-1.1.6-1
+	fluidsynth_x86-1.1.6-2
+	fluidsynth_x86_devel-1.1.6-2
 	fribidi_x86-0.19.5-1
 	fribidi_x86_devel-0.19.5-1
 	ffmpeg_x86-0.10.14-1
