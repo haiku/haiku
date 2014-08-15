@@ -1,6 +1,6 @@
 # Builds the Haiku packages repository.
 
-local haikuRepository = <repository>haiku ;
+local haikuRepository = <repository>Haiku ;
 MakeLocate $(haikuRepository)
 	: $(HAIKU_PACKAGE_REPOSITORIES_DIR_$(HAIKU_PACKAGING_ARCH)) ;
 
