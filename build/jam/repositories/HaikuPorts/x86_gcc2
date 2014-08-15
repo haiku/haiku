@@ -58,6 +58,8 @@ RemotePackageRepository HaikuPorts
 	ducksaver-1.1.0-1
 	expat-2.0.1-7
 	expat_devel-2.0.1-7
+	faad2-2.7-1
+	faad2_devel-2.7-1
 	f1spirit-0.rc9.1615-1
 	findutils-4.4.2-1
 	ffmpeg-0.10.14-1
@@ -336,6 +338,8 @@ RemotePackageRepository HaikuPorts
 	dtc_x86-1.4.0-1
 	expat_x86-2.0.1-7
 	expat_x86_devel-2.0.1-7
+	faad2_x86-2.7-1
+	faad2_x86_devel-2.7-1
 	flac_x86-1.3.0-1
 	flac_x86_devel-1.3.0-1
 	fluidsynth_x86-1.1.6-1
@@ -560,6 +564,8 @@ RemotePackageRepository HaikuPorts
 	dtc_x86
 	ducksaver
 	expat
+	faad2
+	faad2_x86
 	f1spirit
 	findutils
 	ffmpeg
