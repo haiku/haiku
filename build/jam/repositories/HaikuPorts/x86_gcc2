@@ -350,9 +350,9 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_x86_devel-0.10.14-1
 	freetype_x86-2.5.2-2
 	freetype_x86_devel-2.5.2-2
-	gcc_x86-4.8.3_2014_07_26-1
-	gcc_x86_syslibs-4.8.3_2014_07_26-1
-	gcc_x86_syslibs_devel-4.8.3_2014_07_26-1
+	gcc_x86-4.8.3_2014_07_26-2
+	gcc_x86_syslibs-4.8.3_2014_07_26-2
+	gcc_x86_syslibs_devel-4.8.3_2014_07_26-2
 	gettext_x86-0.18.1.1-6
 	gettext_x86_libintl-0.18.1.1-6
 	giflib_x86-5.1.0-1
