@@ -314,7 +314,7 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 		case TTYSETRTS:
 		{
 			bool set = *(bool *)buffer;
-			uint8 bit = TTYSETDTR ? MCR_DTR : MCR_RTS;
+			uint8 bit = op == TTYSETDTR ? MCR_DTR : MCR_RTS;
 			if (set)
 				OrReg8(MCR, bit);
 			else
