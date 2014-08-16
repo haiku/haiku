@@ -43,17 +43,10 @@ static	SerialDevice *			MakeDevice(struct serial_config_descriptor
 		char *					WriteBuffer() { return fWriteBuffer; };
 		size_t					WriteBufferSize() { return fWriteBufferSize; };
 
-#ifdef __BEOS__
-		void					SetModes();
-#endif
 		void					SetModes(struct termios *tios);
-#ifdef __HAIKU__
+
 		bool					Service(struct tty *tty, uint32 op,
 									void *buffer, size_t length);
-#else
-		bool					Service(struct tty *ptty, struct ddrover *ddr,
-									uint flags);
-#endif
 
 		int32					InterruptHandler();
 
@@ -147,16 +140,11 @@ static	void					InterruptCallbackFunction(void *cookie,
 
 		uint16					fControlOut;
 		bool					fInputStopped;
-#ifdef __HAIKU__
+
 		struct tty *			fMasterTTY;
 		struct tty *			fSlaveTTY;
 		struct tty_cookie *		fSystemTTYCookie;
 		struct tty_cookie *		fDeviceTTYCookie;
-#else
-		struct ttyfile			fTTYFile;
-		struct tty				fTTY;
-		struct ddrover			fRover;
-#endif
 
 		/* device thread management */
 		thread_id				fDeviceThread;

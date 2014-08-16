@@ -32,11 +32,4 @@ extern bool gLogFunctionResults;
 
 void trace_termios(struct termios *tios);
 
-#ifdef __BEOS__
-void trace_ddomain(struct ddomain *dd);
-void trace_str(struct str *str);
-void trace_winsize(struct winsize *ws);
-void trace_tty(struct tty *tty);
-#endif /* __BEOS__ */
-
 #endif //_PC_SERIAL_TRACING_H_

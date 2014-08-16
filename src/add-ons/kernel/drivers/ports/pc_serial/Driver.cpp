@@ -26,14 +26,7 @@ char *gDeviceNames[DEVICES_COUNT + 1];
 config_manager_for_driver_module_info *gConfigManagerModule = NULL;
 isa_module_info *gISAModule = NULL;
 pci_module_info *gPCIModule = NULL;
-#ifdef __HAIKU__
 tty_module_info *gTTYModule = NULL;
-#else
-tty_module_info_v1_bone *gTTYModule = NULL;
-#endif
-#ifdef __BEOS__
-struct ddomain gSerialDomain;
-#endif
 sem_id gDriverLock = -1;
 bool gHandleISA = false;
 
@@ -470,11 +463,8 @@ next_split:
 				supported->name);
 
 
-#ifdef __HAIKU__
 			device = new(std::nothrow) SerialDevice(supported, ioport, irq, master);
-#else
-			device = new SerialDevice(supported, ioport, irq, master);
-#endif
+
 			if (pc_serial_insert_device(device) < B_OK) {
 				TRACE_ALWAYS("can't insert device\n");
 				continue;
@@ -620,11 +610,8 @@ next_split_alt:
 
 			
 /**/
-#ifdef __HAIKU__
 			device = new(std::nothrow) SerialDevice(supported, ioport, irq, master);
-#else
-			device = new SerialDevice(supported, ioport, irq, master);
-#endif
+
 			if (pc_serial_insert_device(device) < B_OK) {
 				TRACE_ALWAYS("can't insert device\n");
 				continue;
@@ -670,52 +657,6 @@ init_driver()
 	if (status < B_OK)
 		goto err_tty;
 
-#ifndef __HAIKU__
-	// due to BONE having a different function count and ordering,
-	// but the same version, to avoid crashing we detect it at runtime.
-	{
-		static tty_module_info_v1_bone sTTYModuleBONE;
-		static tty_module_info_v1_r5 *ttyModuleR5 =
-			(tty_module_info_v1_r5 *)gTTYModule;
-		image_info info;
-		int32 cookie = 0;
-		while (get_next_image_info(/*B_KERNEL_TEAM*/1, &cookie, &info) == B_OK) {
-			//dprintf(DRIVER_NAME ": checking image %32s\n", info.name);
-			if ((char *)(gTTYModule->ttyopen) >= (char *)info.text
-				&& (char *)(gTTYModule->ttyopen) < ((char *)info.text + info.text_size)) {
-				void *symbol;
-				dprintf(DRIVER_NAME ": detected tty module %32s\n", info.name);
-				if (get_image_symbol(info.id, "ttydeselect",
-					B_SYMBOL_TYPE_ANY, &symbol) != B_OK) {
-					dprintf(DRIVER_NAME ": no ttydeselect() in tty module, assuming R5\n");
-					// let's fake a BONE module with NULL select hooks
-					memcpy(&sTTYModuleBONE.mi, &ttyModuleR5->mi, sizeof(ttyModuleR5->mi));
-					sTTYModuleBONE.ttyopen = ttyModuleR5->ttyopen;
-					sTTYModuleBONE.ttyclose = ttyModuleR5->ttyclose;
-					sTTYModuleBONE.ttyfree = ttyModuleR5->ttyfree;
-					sTTYModuleBONE.ttyread = ttyModuleR5->ttyread;
-					sTTYModuleBONE.ttywrite = ttyModuleR5->ttywrite;
-					sTTYModuleBONE.ttycontrol = ttyModuleR5->ttycontrol;
-					sTTYModuleBONE.ttyinit = ttyModuleR5->ttyinit;
-					sTTYModuleBONE.ttyilock = ttyModuleR5->ttyilock;
-					sTTYModuleBONE.ttyhwsignal = ttyModuleR5->ttyhwsignal;
-					sTTYModuleBONE.ttyin = ttyModuleR5->ttyin;
-					sTTYModuleBONE.ttyout = ttyModuleR5->ttyout;
-					sTTYModuleBONE.ddrstart = ttyModuleR5->ddrstart;
-					sTTYModuleBONE.ddrdone = ttyModuleR5->ddrdone;
-					sTTYModuleBONE.ddacquire = ttyModuleR5->ddacquire;
-					// no select hooks
-					sTTYModuleBONE.ttyselect = NULL;
-					sTTYModuleBONE.ttydeselect = NULL;
-
-					gTTYModule = &sTTYModuleBONE;
-				}
-				break;
-			}
-		}
-	}
-#endif
-
 	status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCIModule);
 	if (status < B_OK)
 		goto err_pci;
@@ -741,11 +682,6 @@ init_driver()
 	}
 
 	status = ENOENT;
-
-#ifdef __BEOS__
-	memset(&gSerialDomain, 0, sizeof(gSerialDomain));
-	ddbackground(&gSerialDomain);
-#endif
 
 	scan_bus(B_ISA_BUS);
 	//scan_bus(B_PCI_BUS);
@@ -808,7 +744,6 @@ uninit_driver()
 }
 
 
-#ifdef __HAIKU__
 bool
 pc_serial_service(struct tty *tty, uint32 op, void *buffer, size_t length)
 {
@@ -827,23 +762,6 @@ pc_serial_service(struct tty *tty, uint32 op, void *buffer, size_t length)
 	TRACE_FUNCRET("< pc_serial_service() returns: false\n");
 	return false;
 }
-#else /* __HAIKU__ */
-bool
-pc_serial_service(struct tty *ptty, struct ddrover *ddr, uint flags)
-{
-	TRACE_FUNCALLS("> pc_serial_service(0x%08x, 0x%08x, 0x%08x)\n", ptty, ddr, flags);
-
-	for (int32 i = 0; i < DEVICES_COUNT; i++) {
-		if (gSerialDevices[i] && gSerialDevices[i]->Service(ptty, ddr, flags)) {
-			TRACE_FUNCRET("< pc_serial_service() returns: true\n");
-			return true;
-		}
-	}
-
-	TRACE_FUNCRET("< pc_serial_service() returns: false\n");
-	return false;
-}
-#endif /* __HAIKU__ */
 
 
 int32
@@ -931,7 +849,6 @@ pc_serial_control(void *cookie, uint32 op, void *arg, size_t length)
 }
 
 
-#if defined(B_BEOS_VERSION_DANO) || defined(__HAIKU__)
 /* pc_serial_select - handle select start */
 status_t
 pc_serial_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
@@ -952,7 +869,6 @@ pc_serial_deselect(void *cookie, uint8 event, selectsync *sync)
 	SerialDevice *device = (SerialDevice *)cookie;
 	return device->DeSelect(event, sync);
 }
-#endif // DANO, HAIKU
 
 
 /* pc_serial_close - handle close() calls */
@@ -1028,10 +944,8 @@ find_device(const char *name)
 		pc_serial_control,			/* -> control entry point */
 		pc_serial_read,			/* -> read entry point */
 		pc_serial_write,			/* -> write entry point */
-#if defined(B_BEOS_VERSION_DANO) || defined(__HAIKU__)
 		pc_serial_select,			/* -> select entry point */
 		pc_serial_deselect			/* -> deselect entry point */
-#endif
 	};
 
 	TRACE_FUNCALLS("> find_device(%s)\n", name);

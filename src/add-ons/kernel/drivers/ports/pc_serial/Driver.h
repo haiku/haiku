@@ -20,29 +20,18 @@
 #include <config_manager.h>
 #include <string.h>
 
-#ifdef __HAIKU__
 #include <lock.h>
 #include <new>
-#else
-#include "BeOSCompatibility.h"
-#include "kernel_cpp.h"
-#endif
+
 #include "Tracing.h"
 
 extern "C" {
-#ifdef __HAIKU__
 #include <tty_module.h>
-#else
-#include <ttylayer.h>
-#endif
 }
 
 
 // whether we should handle default COM ports
-// not for BeOS, it has a "zz" driver for this.
-#ifdef __HAIKU__
 #define HANDLE_ISA_COM
-#endif
 
 #define DRIVER_NAME		"pc_serial"		// driver name for debug output
 #define DEVICES_COUNT	20				// max simultaneously open devices
@@ -139,67 +128,10 @@ typedef struct pc_serial_line_coding_s {
 #define CLS_LINE_RTS			0x0002
 
 
-
-#ifdef __BEOS__
-
-// All this mess is due to BeOS R5 and BONE having
-// an incompatible module API for the same version
-
-typedef bool (*beos_tty_service_func)(struct tty *tty, struct ddrover *rover, uint op);
-
-// this version is compatible with BeOS R5
-struct tty_module_info_v1_r5 {
-	// not a real bus manager... no rescan() !
-	module_info	mi;
-	status_t	(*ttyopen)(struct ttyfile *, struct ddrover *, beos_tty_service_func);
-	status_t	(*ttyclose)(struct ttyfile *, struct ddrover *);
-	status_t	(*ttyfree)(struct ttyfile *, struct ddrover *);
-	status_t	(*ttyread)(struct ttyfile *, struct ddrover *, char *, size_t *);
-	status_t	(*ttywrite)(struct ttyfile *, struct ddrover *, const char *, size_t *);
-	status_t	(*ttycontrol)(struct ttyfile *, struct ddrover *, ulong, void *, size_t);
-	void	(*ttyinit)(struct tty *, bool);
-	void	(*ttyilock)(struct tty *, struct ddrover *, bool );
-	void	(*ttyhwsignal)(struct tty *, struct ddrover *, int, bool);
-	int	(*ttyin)(struct tty *, struct ddrover *, int);
-	int	(*ttyout)(struct tty *, struct ddrover *);
-	struct ddrover	*(*ddrstart)(struct ddrover *);
-	void	(*ddrdone)(struct ddrover *);
-	void	(*ddacquire)(struct ddrover *, struct ddomain *);
-};
-
-// BeOS BONE has a different module with the same version...
-struct tty_module_info_v1_bone {
-	// not a real bus manager... no rescan() !
-	module_info	mi;
-	status_t	(*ttyopen)(struct ttyfile *, struct ddrover *, beos_tty_service_func);
-	status_t	(*ttyclose)(struct ttyfile *, struct ddrover *);
-	status_t	(*ttyfree)(struct ttyfile *, struct ddrover *);
-	status_t	(*ttyread)(struct ttyfile *, struct ddrover *, char *, size_t *);
-	status_t	(*ttywrite)(struct ttyfile *, struct ddrover *, const char *, size_t *);
-	status_t	(*ttycontrol)(struct ttyfile *, struct ddrover *, ulong, void *, size_t);
-	status_t	(*ttyselect)(struct ttyfile *, struct ddrover *, uint8, uint32, selectsync *);
-	status_t	(*ttydeselect)(struct ttyfile *, struct ddrover *, uint8, selectsync *);
-
-	void	(*ttyinit)(struct tty *, bool);
-	void	(*ttyilock)(struct tty *, struct ddrover *, bool );
-	void	(*ttyhwsignal)(struct tty *, struct ddrover *, int, bool);
-	int	(*ttyin)(struct tty *, struct ddrover *, int);
-	int	(*ttyout)(struct tty *, struct ddrover *);
-	struct ddrover	*(*ddrstart)(struct ddrover *);
-	void	(*ddrdone)(struct ddrover *);
-	void	(*ddacquire)(struct ddrover *, struct ddomain *);
-};
-#endif /* __BEOS__ */
-
-
 extern config_manager_for_driver_module_info *gConfigManagerModule;
 extern isa_module_info *gISAModule;
 extern pci_module_info *gPCIModule;
-#ifdef __HAIKU__
 extern tty_module_info *gTTYModule;
-#else
-extern tty_module_info_v1_bone *gTTYModule;
-#endif
 extern struct ddomain gSerialDomain;
 
 extern "C" {
@@ -207,12 +139,9 @@ extern "C" {
 status_t	init_hardware();
 void		uninit_driver();
 
-#ifdef __BEOS__
-bool		pc_serial_service(struct tty *ptty, struct ddrover *ddr, uint flags);
-#else
 bool		pc_serial_service(struct tty *tty, uint32 op, void *buffer,
 				size_t length);
-#endif /* __BEOS__ */
+
 int32		pc_serial_interrupt(void *arg);
 
 status_t	pc_serial_open(const char *name, uint32 flags, void **cookie);
