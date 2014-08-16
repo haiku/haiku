@@ -150,7 +150,8 @@ static	void					InterruptCallbackFunction(void *cookie,
 #ifdef __HAIKU__
 		struct tty *			fMasterTTY;
 		struct tty *			fSlaveTTY;
-		struct tty_cookie *		fTTYCookie;
+		struct tty_cookie *		fSystemTTYCookie;
+		struct tty_cookie *		fDeviceTTYCookie;
 #else
 		struct ttyfile			fTTYFile;
 		struct tty				fTTY;

@@ -41,7 +41,8 @@ SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
 #ifdef __HAIKU__
 		fMasterTTY(NULL),
 		fSlaveTTY(NULL),
-		fTTYCookie(NULL),
+		fSystemTTYCookie(NULL),
+		fDeviceTTYCookie(NULL),
 #endif /* __HAIKU__ */
 		fDeviceThread(-1),
 		fStopDeviceThread(false)
@@ -569,16 +570,27 @@ SerialDevice::Open(uint32 flags)
 		return B_NO_MEMORY;
 	}
 
-	fSlaveTTY = gTTYModule->tty_create(NULL, false);
+	fSlaveTTY = gTTYModule->tty_create(pc_serial_service, false);
 	if (fSlaveTTY == NULL) {
 		TRACE_ALWAYS("open: failed to init slave tty\n");
 		gTTYModule->tty_destroy(fMasterTTY);
 		return B_NO_MEMORY;
 	}
 
-	fTTYCookie = gTTYModule->tty_create_cookie(fMasterTTY, fSlaveTTY, flags);
-	if (fTTYCookie == NULL) {
-		TRACE_ALWAYS("open: failed to init tty cookie\n");
+	fSystemTTYCookie = gTTYModule->tty_create_cookie(fMasterTTY, fSlaveTTY,
+		O_RDWR);
+	if (fSystemTTYCookie == NULL) {
+		TRACE_ALWAYS("open: failed to init system tty cookie\n");
+		gTTYModule->tty_destroy(fMasterTTY);
+		gTTYModule->tty_destroy(fSlaveTTY);
+		return B_NO_MEMORY;
+	}
+
+	fDeviceTTYCookie = gTTYModule->tty_create_cookie(fSlaveTTY, fMasterTTY,
+		O_RDWR);
+	if (fDeviceTTYCookie == NULL) {
+		TRACE_ALWAYS("open: failed to init device tty cookie\n");
+		gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
 		gTTYModule->tty_destroy(fMasterTTY);
 		gTTYModule->tty_destroy(fSlaveTTY);
 		return B_NO_MEMORY;
@@ -654,7 +666,7 @@ SerialDevice::Read(char *buffer, size_t *numBytes)
 		return status;
 	}
 
-	status = gTTYModule->tty_read(fTTYCookie, buffer, numBytes);
+	status = gTTYModule->tty_read(fSystemTTYCookie, buffer, numBytes);
 
 	mutex_unlock(&fReadLock);
 
@@ -692,7 +704,7 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 	}
 
 	//XXX: WTF tty_write() is not for write() hook ?
-	//status = gTTYModule->tty_write(fTTYCookie, buffer, numBytes);
+	//status = gTTYModule->tty_write(fSystemTTYCookie, buffer, numBytes);
 	mutex_unlock(&fWriteLock);
 
 #else /* __HAIKU__ */
@@ -771,7 +783,7 @@ SerialDevice::Control(uint32 op, void *arg, size_t length)
 
 #ifdef __HAIKU__
 
-	status = gTTYModule->tty_control(fTTYCookie, op, arg, length);
+	status = gTTYModule->tty_control(fSystemTTYCookie, op, arg, length);
 
 #else /* __HAIKU__ */
 
@@ -796,7 +808,7 @@ SerialDevice::Select(uint8 event, uint32 ref, selectsync *sync)
 
 #ifdef __HAIKU__
 
-	return gTTYModule->tty_select(fTTYCookie, event, ref, sync);
+	return gTTYModule->tty_select(fSystemTTYCookie, event, ref, sync);
 
 #else /* __HAIKU__ */
 
@@ -821,7 +833,7 @@ SerialDevice::DeSelect(uint8 event, selectsync *sync)
 
 #ifdef __HAIKU__
 
-	return gTTYModule->tty_deselect(fTTYCookie, event, sync);
+	return gTTYModule->tty_deselect(fSystemTTYCookie, event, sync);
 
 #else /* __HAIKU__ */
 
@@ -854,7 +866,8 @@ SerialDevice::Close()
 	}
 
 #ifdef __HAIKU__
-	gTTYModule->tty_destroy_cookie(fTTYCookie);
+	gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
+	gTTYModule->tty_destroy_cookie(fDeviceTTYCookie);
 #else /* __HAIKU__ */
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr)
@@ -945,7 +958,7 @@ status_t
 SerialDevice::SignalControlLineState(int line, bool enable)
 {
 #ifdef __HAIKU__
-	gTTYModule->tty_hardware_signal(fTTYCookie, line, enable);
+	gTTYModule->tty_hardware_signal(fSystemTTYCookie, line, enable);
 #else
 	// XXX: only works for interrupt handler, Service func must pass the ddrover
 	gTTYModule->ttyhwsignal(&fTTY, &fRover, line, enable);
