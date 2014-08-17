@@ -29,6 +29,17 @@
 // Always define the symbols needed when not linking against libgcc.a --
 // we simply override them.
 
+// ... it doesn't seem to work with this symbol at least.
+#ifndef USING_LIBGCC
+#	if __GNUC__ >= 3
+const std::nothrow_t std::nothrow = {};
+#	else
+const nothrow_t std::nothrow = {};
+#	endif
+#endif
+
+const mynothrow_t mynothrow = {};
+
 #if __GNUC__ == 2
 
 extern "C" void
@@ -62,7 +73,9 @@ __cxa_finalize(void* dsoHandle)
 #endif
 
 // full C++ support in the kernel
-#if (defined(_KERNEL_MODE) || defined(_LOADER_MODE)) && !defined(_BOOT_MODE)
+#if (defined(_KERNEL_MODE) || defined(_LOADER_MODE))
+
+#ifndef _BOOT_MODE
 
 FILE *stderr = NULL;
 
@@ -74,8 +87,6 @@ fprintf(FILE *f, const char *format, ...)
 	dprintf("fprintf(`%s',...)\n", format);
 	return 0;
 }
-
-#if __GNUC__ >= 3
 
 extern "C"
 size_t
@@ -110,7 +121,7 @@ printf(const char *format, ...)
 	dprintf("printf(`%s',...)\n", format);
 	return 0;
 }
-#endif
+#endif // #ifndef _LOADER_MODE
 
 extern "C"
 int
@@ -119,10 +130,9 @@ puts(const char *string)
 	return fputs(string, NULL);
 }
 
+#endif	// #ifndef _BOOT_MODE
 
-#endif	// __GNUC__ >= 3
-
-#if __GNUC__ >= 4 && !defined(USING_LIBGCC)
+#if __GNUC__ >= 4
 
 extern "C"
 void
@@ -248,6 +258,8 @@ abort()
 }
 
 
+#ifndef _BOOT_MODE
+
 extern "C"
 void
 debugger(const char *message)
@@ -255,7 +267,9 @@ debugger(const char *message)
 	kernel_debugger(message);
 }
 
-#endif	// _#if KERNEL_MODE
+#endif	// #ifndef _BOOT_MODE
+
+#endif	// #if (defined(_KERNEL_MODE) || defined(_LOADER_MODE))
 
 
 extern "C"
