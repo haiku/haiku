@@ -447,8 +447,6 @@ HAIKU_HOST_BUILD_ONLY=0
 HOST_EXTENDED_REGEX_SED="sed -r"
 HOST_GCC_LD=`$CC -print-prog-name=ld`
 HOST_GCC_OBJCOPY=`$CC -print-prog-name=objcopy`
-SFDISK_BINARY=sfdisk
-HOST_SFDISK=$SFDISK_BINARY
 HOST_SHA256=
 HOST_HAIKU_PORTER=
 HAIKU_PORTS=
@@ -635,7 +633,6 @@ done
 case "${platform}" in
 	Darwin)	HOST_PLATFORM=darwin ;;
 	FreeBSD)	HOST_PLATFORM=freebsd
-				SFDISK_BINARY=sfdisk-linux
 				if [ "$HAIKU_HOST_USE_32BIT" = 1 ] ; then
 					echo Unsupported platform: FreeBSD ${platformMachine}
 					exit 1
@@ -648,13 +645,6 @@ case "${platform}" in
 	*)		echo Unsupported platform: ${platform}
 			exit 1 ;;
 esac
-
-# check common locations for sfdisk
-for sfdiskDir in /sbin /usr/sbin /usr/local/sbin ; do
-	if [ -e ${sfdiskDir}/${SFDISK_BINARY} ]; then
-		HOST_SFDISK=${sfdiskDir}/${SFDISK_BINARY}
-	fi
-done
 
 # check for case-sensitive filesystem
 mkdir haikuCaseTest 2>/dev/null
@@ -886,7 +876,6 @@ HOST_GCC_RAW_VERSION		?= ${HOST_GCC_RAW_VERSION} ;
 HOST_GCC_MACHINE			?= ${HOST_GCC_MACHINE} ;
 HOST_LD						?= ${HOST_GCC_LD} ;
 HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
-HOST_SFDISK					?= ${HOST_SFDISK} ;
 HOST_SHA256					?= ${HOST_SHA256} ;
 
 HOST_HAIKU_PORTER			?= ${HOST_HAIKU_PORTER} ;

@@ -149,7 +149,7 @@ actions BuildUImageScript1
 }
 
 # SD/mmc image rule
-# requires sfdisk and mtools packages on linux
+# requires mtools package on linux
 rule BuildUBootSDImage image : files
 {
 	Depends $(image) : $(files) ;

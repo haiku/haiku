@@ -62,7 +62,6 @@ The following tools are needed to compile Haiku for the ARM platform
 
  * mkimage (http://www.denx.de/wiki/UBoot)
  * Mtools (http://www.gnu.org/software/mtools/intro.html)
- * sfdisk
 
 Specific: Mac OS X
 ------------------
