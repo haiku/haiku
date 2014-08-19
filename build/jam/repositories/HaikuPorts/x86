@@ -126,8 +126,8 @@ RemotePackageRepository HaikuPorts
 	openjdk-1.7_2013_11_08-2
 	openssh-6.0p1-8
 	# sync openssl with secondary architecture (x86_gcc2)
-	openssl-1.0.0m-1
-	openssl_devel-1.0.0m-1
+	openssl-1.0.0n-1
+	openssl_devel-1.0.0n-1
 	p7zip-9.20.1-4
 	pe-2.4.4_2014_05_29-1
 	perl-5.18.2-2
@@ -209,8 +209,8 @@ RemotePackageRepository HaikuPorts
 	mesa_x86_gcc2_swrast-7.9.2-5
 	ncurses_x86_gcc2-5.9-10
 	ncurses_x86_gcc2_devel-5.9-10
-	openssl_x86_gcc2-1.0.0m-1
-	openssl_x86_gcc2_devel-1.0.0m-1
+	openssl_x86_gcc2-1.0.0n-1
+	openssl_x86_gcc2_devel-1.0.0n-1
 	speex_x86_gcc2-1.2~rc1-2
 	speex_x86_gcc2_devel-1.2~rc1-2
 	sqlite_x86_gcc2-3.7.13-4
