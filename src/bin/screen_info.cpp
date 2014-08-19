@@ -7,6 +7,7 @@
  */
 
 
+#include <Application.h>
 #include <Screen.h>
 #include <stdio.h>
 
@@ -19,6 +20,9 @@
 int
 main()
 {
+	// BScreen usage requires BApplication for AppServerLink
+	BApplication app("application/x-vnd.Haiku-screen_info");
+
 	for (int id = 0; id < MAX_SCREENS; id++) {
 		screen_id screenIndex = {id};
 		BScreen screen(screenIndex);
