@@ -1,0 +1,136 @@
+Posted by Rudolf Nov 22, 2005 to the haiku-appsever ML:
+http://www.freelists.org/post/haiku-appserver/new-drawing-bug-Rudolf-some-stuff-for-you,10
+
+More good info @ http://www.freelists.org/archive/haiku-appserver
+
+        Be Docs (file: R4_Graphics_Driver_Docs):
+        
+        Engine Synchronization
+
+        B_ACCELERANT_ENGINE_COUNT  -  No feature specific data required.
+        Return the number of acceleration engines that the device may operate in parallel.
+        It's not required for all engines to be equally capable (i.e. support the same
+        acceleration features).
+
+        B_ACQUIRE_ENGINE  -  No feature specific data required.
+        Request exclusive ownership of an acceleration engine with the capabilities mask specified.
+        The caller is willing to wait up to max_wait micro(milli?)-seconds. If the request can't be
+        fullfilled before that time expires, the accelerant should return B_WOULD_BLOCK immediatly.
+        If non-zero, sync_token points to a synchronization token retrieved from either
+        release_engine() or get_sync_token() to which the engine should be synchronized before
+        engine acquisition succeeds.  See B_SYNC_TO_TOKEN for more details.  The engine_token for
+        the successfully acquired engine is returned in engine_token **et.
+
+        B_RELEASE_ENGINE  -  No feature specific data required.
+        Relinquish exclusive ownership of the engine specified by engine_token et.  If
+        sync_token *st is non-zero, return a sync_token which can be utilized to ensure that the
+        specified engine has completed all acceleration operations issued up this point in time.
+
+        B_WAIT_ENGINE_IDLE  -  No feature specific data required.
+        Wait for the graphics device to be completely idle (i.e. no current running or pending
+        acceleration primitives, DMA transfers, etc.).
+
+        B_GET_SYNC_TOKEN  -  No feature specific data required.
+        Return a synchronization token for the specified engine.  sync_token *st must point at
+        a sync_token which will be updated with the information required to ensure that a call to
+        sync_to_token() will be able to ensure that the specified engine has completed all of the
+        acceleration primitives, DMA transfers, etc. that have been issued up to this point in time.
+
+        B_SYNC_TO_TOKEN  -  No feature specific data required.
+        Ensure that the engine specified in sync_token *st has completed the acceleration
+        primitives, DMA transfers, etc., issued up to the point in time specified in the sync_token.
+
+
+        Rudolf's notes.        
+        info on engine_token:
+
+        uint32 ACCELERANT_ENGINE_COUNT(void)
+        exists because in theory a single card can have multiple independant acceleration engines.
+        For instance one that can do 2D, and one that can do 3D (or combinations). See
+        'engine capabilities' flags in Accelerant.h.
+        (note: never seen multiple engines per card     yet though. Was this meant for some very old
+        hardware with seperate 2D and 3D 'blocks'? Although I guess it's thinkable that multiple
+        equally capable engines would exist as well..)
+
+        In order to distinquish between multiple engines all acceleration commands are given along
+        with an engine_token *et, aquired when
+        status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, sync_token *st, engine_token **et)
+        was called.
+        status_t SYNC_TO_TOKEN(sync_token *st)
+        is an exeption: here the engine is ID'd by member: (defined in Accelerant.h)
+        uint32  engine_id.
+        void WAIT_ENGINE_IDLE(void)
+        is an exeption also because this function returns only when *ALL* engines are completely
+        idle. Hence no need for distinction.
+        
+        Furthermore the absense of the use of engine_token in both SYNC_TO_TOKEN and WAIT_ENGINE_IDLE
+        would seem to indicate these hooks may be used *without having acquired the engine*. (?).
+
+
+        info on sync_token:
+
+--      How does the acceleration cmd interface work? There's a circular buffer that stores cmd's.
+        There's a hardware pointer that points 'at' the command currently being executed (think
+        of stacks: some architectures point to the first 'free' location, some to the 'last used'
+        location.)
+        There's also a second pointer which points at the first free location, i.e. where new cmd's
+        will be stored pending execution. This second pointer is a software maintained pointer (in
+        the driver).
+
+--      What's a sync_token? A Sync_token in nothing more than a extra pointer (one per token). This
+        pointer points at the first free location in the cmd buffer at that point in time the 
+        sync_token was 'filled'. In theory it doesn't change during the (rest of the) life-time of
+        the token, although the driver-implementation could (?) do that anyway for some internal
+        reason.
+        Driver users (i.e. app_server) are responsible for reserving memory for a sync_token. They
+        pass a pointer to it to the driver (if they want to use it). The driver in turns fills it
+        with the needed info. Driver users may never modify the content of the sync_token(s).
+        
+--      When would a user be interested in a sync_token? If multiple independant (so non-overlapping)
+        'regions' require multiple updates each alternatingly done by software and acceleration engine,
+        it might be interesting to use sync_tokens (for instance).
+        It would be possible to issue all engine commands concerning area #1, ask for a sync token,
+        issue all engine commands concerning area #2, and then do this:
+        - SYNC_TO_TOKEN (so waiting until all engine commands concerning area #1 are done);
+        - Draw in area #1 using software (while the acc engine is in the process of updating area #2:
+         (so some 'parallel processing' is done here).
+
+        If no sync token would be used, instead of syncing to token, wait_engine_idle would be used.
+        This of course would mean that no 'parallel processing' could be done...
+        Worse yet: if some seperate user is also using the engine (between RELEASE and AQUIRE engine
+        done by 'user #1' (i.e. app_server), the acc engine might *never* become fully idle.
+        A nice example here would be 3D acceleration: as long as no non-accelerated drawing has to be
+        done there, there's no reason the engine would need to be idle at all for this (apart from
+        processing 'user-input' like joystick controls).
+        You see: an acceleration engine automatically serializes it's cmd processing so update errors
+        because of out-of-order execution wouldn't happen.
+        
+--      Why didn't I implement sync_token stuff in the matrox, nvidia and neomagic drivers?
+        Lack of 'known specs' yet. You see, even if the pointers in the cmd buffer are known: that's 
+        not enough yet:
+        - The fact that an command is fetched from the buffer does *not* mean it's
+        execution is completely done.
+        - The implementation via just a pointer is not enough: if you wait too long, the current
+        free pointer might have cycled around the buffer. This means a simple compare to that
+        pointer is not conclusive. Much better would be actually inserting 'dummy commands' inside
+        the command buffer at the place a sync_token is generated. This dummy commands would be 
+        executed just once, when we reached our goal. If the dummy command clears a variable 
+        especially setup for the sync_token in question: we would have a conclusive result without
+        even the use of an actual pointer in the sync_token. AND: updating the tokens would have no
+        software overhead, as the acc engine would do it. (via 'pointers only' some invalidation
+        code has to be executed once the hardware pointer cycles around).
+
+        NOTE PLEASE:
+        This information is based upon my understanding of hardware inner workings. As this 
+        understanding grows and is corrected over time, I might contradict myself later on if
+        asked again. :-)         
+
+
+//actual hooks:
+        uint32 ACCELERANT_ENGINE_COUNT(void);
+        status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, 
+sync_token *st, engine_token **et);
+        status_t RELEASE_ENGINE(engine_token *et, sync_token *st);
+        status_t GET_SYNC_TOKEN(engine_token *et, sync_token *st);
+        status_t SYNC_TO_TOKEN(sync_token *st);
+        void WAIT_ENGINE_IDLE(void);
