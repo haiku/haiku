@@ -149,10 +149,6 @@ static	void					InterruptCallbackFunction(void *cookie,
 		/* device thread management */
 		thread_id				fDeviceThread;
 		bool					fStopDeviceThread;
-
-		/* device locks to ensure no concurent reads/writes */
-		mutex					fReadLock;
-		mutex					fWriteLock;
 };
 
 #endif // _SERIAL_DEVICE_H_

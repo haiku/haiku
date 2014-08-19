@@ -59,9 +59,6 @@ SerialDevice::~SerialDevice()
 
 	if (fBufferArea >= B_OK)
 		delete_area(fBufferArea);
-
-	mutex_destroy(&fReadLock);
-	mutex_destroy(&fWriteLock);
 }
 
 
@@ -70,8 +67,6 @@ SerialDevice::Init()
 {
 	fDoneRead = create_sem(0, "usb_serial:done_read");
 	fDoneWrite = create_sem(0, "usb_serial:done_write");
-	mutex_init(&fReadLock, "usb_serial:read_lock");
-	mutex_init(&fWriteLock, "usb_serial:write_lock");
 
 	size_t totalBuffers = fReadBufferSize + fWriteBufferSize + fInterruptBufferSize;
 	fBufferArea = create_area("usb_serial:buffers_area", (void **)&fReadBuffer,
@@ -493,16 +488,7 @@ SerialDevice::Read(char *buffer, size_t *numBytes)
 
 	status_t status;
 
-	status = mutex_lock(&fReadLock);
-	if (status != B_OK) {
-		TRACE_ALWAYS("read: failed to get read lock\n");
-		*numBytes = 0;
-		return status;
-	}
-
 	status = gTTYModule->tty_read(fSystemTTYCookie, buffer, numBytes);
-
-	mutex_unlock(&fReadLock);
 
 	return status;
 }
@@ -516,15 +502,8 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 
 	status_t status = EINVAL;
 
-	status = mutex_lock(&fWriteLock);
-	if (status != B_OK) {
-		TRACE_ALWAYS("write: failed to get write lock\n");
-		return status;
-	}
-
 	//XXX: WTF tty_write() is not for write() hook ?
 	//status = gTTYModule->tty_write(fSystemTTYCookie, buffer, numBytes);
-	mutex_unlock(&fWriteLock);
 
 #if 0
 	status_t status = mutex_lock(&fWriteLock);
@@ -669,9 +648,6 @@ SerialDevice::Removed()
 	//int32 result = B_OK;
 	//wait_for_thread(fDeviceThread, &result);
 	fDeviceThread = -1;
-
-	mutex_lock(&fWriteLock);
-	mutex_unlock(&fWriteLock);
 }
 
 
