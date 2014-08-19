@@ -117,6 +117,7 @@ StdBinCommands
 	hey.cpp
 	reindex.cpp
 	resattr.cpp
+	screen_info.cpp
 	setarch.cpp
 	setdecor.cpp
 	settype.cpp
