@@ -24,6 +24,9 @@ extern "C" {
 /*! \brief Converts FFmpeg notation of video aspect ratio into the Media Kits
 		notation.
 
+	\see ConvertVideoAspectWidthAndHeightToAVCodecContext() for converting in
+		the other direction.
+
 	\param contextIn An AVCodeContext structure of FFmpeg containing the values
 		needed to calculate the Media Kit video aspect ratio.
 		The following fields are used for the calculation:
@@ -72,6 +75,57 @@ ConvertAVCodecContextToVideoAspectWidthAndHeight(AVCodecContext& contextIn,
 }
 
 
+/*!	\brief Converts the Media Kits notation of video aspect ratio into FFmpegs
+		notation.
+
+	\see ConvertAVCodecContextToVideoAspectWidthAndHeight() for converting in
+		the other direction.
+
+	\param pixelWidthAspectIn Contains Media Kits notation of the video aspect
+		ratio width. E.g. 16:9 -> 16 is passed here.
+	\param pixelHeightAspectIn Contains Media Kits notation of the video aspect
+		ratio height. E.g. 16:9 -> 9 is passed here.
+	\param contextInOut	An AVCodecContext structure of FFmpeg.
+		On input must contain the following fields already initialized
+		otherwise the behaviour is undefined:
+			- AVCodecContext.width (must)
+			- AVCodecContext.height (must)
+		On output contains converted values in the following fields (other
+		fields stay as they were on input):
+			- AVCodecContext.sample_aspect_ratio.num
+			- AVCodecContext.sample_aspect_ratio.den
+*/
+inline void
+ConvertVideoAspectWidthAndHeightToAVCodecContext(uint16 pixelWidthAspectIn,
+	uint16 pixelHeightAspectIn, AVCodecContext& contextInOut)
+{
+	assert(pixelWidthAspectIn > 0);
+	assert(pixelHeightAspectIn > 0);
+	assert(contextInOut.width > 0);
+	assert(contextInOut.height > 0);
+
+	AVRational pureVideoDimensionAspectRatio;
+	av_reduce(&pureVideoDimensionAspectRatio.num,
+		&pureVideoDimensionAspectRatio.den, contextInOut.width,
+		contextInOut.height, 1024 * 1024);
+
+	if (pureVideoDimensionAspectRatio.num == pixelWidthAspectIn
+		&& pureVideoDimensionAspectRatio.den == pixelHeightAspectIn) {
+		// The passed Media Kit pixel aspect ratio equals the video dimension
+		// aspect ratio. Set sample_aspect_ratio to "ignore".
+		contextInOut.sample_aspect_ratio.num = 0;
+		contextInOut.sample_aspect_ratio.den = 1;
+		return;
+	}
+
+	av_reduce(&contextInOut.sample_aspect_ratio.num,
+		&contextInOut.sample_aspect_ratio.den,
+		contextInOut.height * pixelWidthAspectIn,
+		contextInOut.width * pixelHeightAspectIn,
+		1024 * 1024);
+}
+
+
 /*! \brief Calculates bytes per row for a video frame.
 
 	\param colorSpace The Media Kit color space the video frame uses.
@@ -108,6 +162,9 @@ CalculateBytesPerRowWithColorSpaceAndVideoWidth(color_space colorSpace, int vide
 /*! \brief Converts FFmpeg notation of video frame rate into the Media Kits
 		notation.
 
+	\see ConvertAVCodecContextToVideoFrameRate() for converting in the other
+		direction.
+
 	\param contextIn An AVCodeContext structure of FFmpeg containing the values
 		needed to calculate the Media Kit video frame rate.
 		The following fields are used for the calculation:
@@ -132,6 +189,33 @@ ConvertAVCodecContextToVideoFrameRate(AVCodecContext& contextIn, float& frameRat
 
 	frameRateOut
 		= possiblyInterlacedFrameRate / numberOfInterlacedFramesPerFullFrame;
+}
+
+
+/*!	\brief Converts the Media Kits notation of video frame rate to FFmpegs
+	notation.
+	
+	\see ConvertAVCodecContextToVideoFrameRate() for converting in the other
+		direction.
+
+	\param frameRateIn Contains Media Kits notation of the video frame rate
+		that will be converted into FFmpegs notation. Must be greater than
+		zero.
+	\param contextOut	An AVCodecContext structure of FFmpeg.
+		On output contains converted values in the following fields (other
+		fields stay as they were on input):
+			- AVCodecContext.time_base.num
+			- AVCodecContext.time_base.den
+			- AVCodecContext.ticks_per_frame is set to 1
+*/
+inline void
+ConvertVideoFrameRateToAVCodecContext(float frameRateIn,
+	AVCodecContext& contextOut)
+{
+	assert(frameRateIn > 0);
+
+	contextOut.ticks_per_frame = 1;
+	contextOut.time_base = av_d2q(1.0 / frameRateIn, 1024);
 }
 
 #endif // UTILITIES_H

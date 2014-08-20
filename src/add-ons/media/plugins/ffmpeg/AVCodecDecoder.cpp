@@ -443,6 +443,14 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	TRACE("  requested video format 0x%x\n",
 		inOutFormat->u.raw_video.display.format);
 
+	_ApplyEssentialVideoContainerPropertiesToContext();
+		// This makes video formats play that encode the video properties in
+		// the video container (e.g. WMV) and not in the video frames
+		// themself (e.g. MPEG2).
+		// Note: Doing this step everytime is OK, because the first call to
+		// _DecodeNextVideoFrame() will update the essential video format
+		// properties accordingly.
+
 	// Make MediaPlayer happy (if not in rgb32 screen depth and no overlay,
 	// it will only ask for YCbCr, which DrawBitmap doesn't handle, so the
 	// default colordepth is RGB32).
@@ -818,6 +826,44 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		}
 #endif
 		return B_OK;
+	}
+}
+
+
+/*!	\brief Applies all essential video input properties from fInputFormat to
+		fContext.
+
+	Note: This function must be called before the AVCodec is opened via
+	avcodec_open2(). Otherwise the behaviour of FFMPEG's video decoding
+	function avcodec_decode_video2() is undefined.
+
+	Essential properties applied:
+		- display.line_width copied to fContext->width
+		- display.line_count copied to fContext->height
+		- pixel_width_aspect and pixel_height_aspect converted to
+		  fContext->sample_aspect_ratio
+		- field_rate converted to fContext->time_base and
+		  fContext->ticks_per_frame
+*/
+void
+AVCodecDecoder::_ApplyEssentialVideoContainerPropertiesToContext()
+{
+	media_raw_video_format containerProperties
+		= fInputFormat.u.encoded_video.output;
+
+	fContext->width = containerProperties.display.line_width;
+	fContext->height = containerProperties.display.line_count;
+
+	if (containerProperties.pixel_width_aspect > 0
+		&& containerProperties.pixel_height_aspect > 0) {
+		ConvertVideoAspectWidthAndHeightToAVCodecContext(
+			containerProperties.pixel_width_aspect,
+			containerProperties.pixel_height_aspect, *fContext);
+	}
+
+	if (containerProperties.field_rate > 0.0) {
+		ConvertVideoFrameRateToAVCodecContext(containerProperties.field_rate,
+			*fContext);
 	}
 }
 

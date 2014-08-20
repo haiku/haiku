@@ -61,6 +61,7 @@ private:
 							media_header* mediaHeader,
 							media_decode_info* info);
 			status_t	_DecodeNextVideoFrame();
+			void		_ApplyEssentialVideoContainerPropertiesToContext();
 			status_t	_LoadNextVideoChunkIfNeededAndAssignStartTime();
 							// TODO: Remove the "Video" word once
 							// the audio path is responsible for
