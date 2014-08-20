@@ -142,6 +142,28 @@ TermView::GetPreferredSize(float* width, float* height)
 void
 TermView::KeyDown(const char* bytes, int32 numBytes)
 {
+	// Translate some keys to more usual VT100 escape codes
+	switch(bytes[0])
+	{
+		case B_UP_ARROW:
+			numBytes = 3;
+			bytes = "\x1B[A";
+			break;
+		case B_DOWN_ARROW:
+			numBytes = 3;
+			bytes = "\x1B[B";
+			break;
+		case B_RIGHT_ARROW:
+			numBytes = 3;
+			bytes = "\x1B[C";
+			break;
+		case B_LEFT_ARROW:
+			numBytes = 3;
+			bytes = "\x1B[D";
+			break;
+	}
+
+	// Send the bytes to the serial port
 	BMessage* keyEvent = new BMessage(kMsgDataWrite);
 	keyEvent->AddData("data", B_RAW_TYPE, bytes, numBytes);
 	be_app_messenger.SendMessage(keyEvent);
