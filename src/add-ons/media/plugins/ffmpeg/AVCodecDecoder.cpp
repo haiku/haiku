@@ -107,7 +107,6 @@ AVCodecDecoder::AVCodecDecoder()
 
 	fChunkBuffer(NULL),
 	fVideoChunkBuffer(NULL),
-	fChunkBufferOffset(0),
 	fChunkBufferSize(0),
 	fAudioDecodeError(false),
 
@@ -269,7 +268,6 @@ AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 		// responsible for freeing the chunk buffer, too.
 	fVideoChunkBuffer = NULL;
 	fChunkBuffer = NULL;
-	fChunkBufferOffset = 0;
 	fChunkBufferSize = 0;
 	fDecodedDataBufferOffset = 0;
 	fDecodedDataBufferSize = 0;
@@ -415,7 +413,6 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 		result, fOutputFrameSize, fOutputFrameCount, fOutputFrameRate);
 
 	fChunkBuffer = NULL;
-	fChunkBufferOffset = 0;
 	fChunkBufferSize = 0;
 	fAudioDecodeError = false;
 	fDecodedDataBufferOffset = 0;
@@ -665,7 +662,11 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 status_t
 AVCodecDecoder::_DecodeNextAudioFrame()
 {
-	fDecodedDataSizeInBytes = 0;
+	assert(fTempPacket.size >= 0);
+	assert(fDecodedDataSizeInBytes == 0);
+		// _DecodeNextAudioFrame needs to be called on empty fDecodedData only!
+		// If this assert holds wrong we have a bug somewhere.
+
 	size_t maximumSizeOfDecodedData = fOutputFrameCount * fOutputFrameSize;
 	if (fDecodedData == NULL)
 		fDecodedData
@@ -680,10 +681,10 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 				"buffer! %ld\n", fDecodedDataBufferSize);
 			fDecodedDataBufferSize = 0;
 		}
-		if (fChunkBufferSize < 0) {
-			fprintf(stderr, "Decoding read past the end of the chunk buffer! "
-				"%ld\n", fChunkBufferSize);
-			fChunkBufferSize = 0;
+		if (fTempPacket.size < 0) {
+			fprintf(stderr, "Decoding read past the end of the temp packet! "
+				"%d\n", fTempPacket.size);
+			fTempPacket.size = 0;
 		}
 
 		if (fDecodedDataBufferSize > 0) {
@@ -705,7 +706,7 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			fStartTime += (bigtime_t)((1000000LL * frames) / fOutputFrameRate);
 			continue;
 		}
-		if (fChunkBufferSize == 0) {
+		if (fTempPacket.size == 0) {
 			// Time to read the next chunk buffer. We use a separate
 			// media_header, since the chunk header may not belong to
 			// the start of the decoded audio frames we return. For
@@ -726,12 +727,11 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 				fChunkBufferSize = 0;
 				break;
 			}
-			fChunkBufferOffset = 0;
+			fTempPacket.data
+				= static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
+			fTempPacket.size = fChunkBufferSize;
 			fStartTime = chunkMediaHeader.start_time;
 		}
-
-		fTempPacket.data = (uint8_t*)fChunkBuffer + fChunkBufferOffset;
-		fTempPacket.size = fChunkBufferSize;
 
 		avcodec_get_frame_defaults(fDecodedDataBuffer);
 		int gotFrame = 0;
@@ -739,37 +739,41 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			fDecodedDataBuffer, &gotFrame, &fTempPacket);
 		if (usedBytes < 0 && !fAudioDecodeError) {
 			// Report failure if not done already
+			int32 chunkBufferOffset = fTempPacket.data
+				- static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
 			printf("########### audio decode error, "
-				"fChunkBufferSize %ld, fChunkBufferOffset %ld\n",
-				fChunkBufferSize, fChunkBufferOffset);
+				"fTempPacket.size %d, fChunkBuffer data offset %ld\n",
+				fTempPacket.size, chunkBufferOffset);
 			fAudioDecodeError = true;
 		}
 		if (usedBytes <= 0) {
 			// Error or failure to produce decompressed output.
-			// Skip the chunk buffer data entirely.
-			usedBytes = fChunkBufferSize;
-			fDecodedDataBufferSize = 0;
+			// Skip the temp packet data entirely.
+			fTempPacket.size = 0;
 			// Assume the audio decoded until now is broken.
 			memset(fDecodedData, 0, decodedData - fDecodedData);
-		} else {
-			// Success
-			fAudioDecodeError = false;
-			if (gotFrame == 1) {
-				fDecodedDataBufferSize = av_samples_get_buffer_size(NULL,
-					fContext->channels, fDecodedDataBuffer->nb_samples,
-					fContext->sample_fmt, 1);
-				if (fDecodedDataBufferSize < 0)
-					fDecodedDataBufferSize = 0;
-			} else
-				fDecodedDataBufferSize = 0;
+			fDecodedDataBufferOffset = 0;
+			continue;
 		}
-//printf("  chunk size: %d, decoded: %d, used: %d\n",
-//fTempPacket.size, decodedBytes, usedBytes);
 
-		fChunkBufferOffset += usedBytes;
-		fChunkBufferSize -= usedBytes;
+		fAudioDecodeError = false;
+		fDecodedDataBufferSize = 0;
 		fDecodedDataBufferOffset = 0;
+
+		fTempPacket.data += usedBytes;
+		fTempPacket.size -= usedBytes;
+
+		bool gotNoAudioFrame = gotFrame == 0;
+		if (gotNoAudioFrame)
+			continue;
+
+		fDecodedDataBufferSize = av_samples_get_buffer_size(NULL,
+			fContext->channels, fDecodedDataBuffer->nb_samples,
+			fContext->sample_fmt, 1);
+		if (fDecodedDataBufferSize < 0)
+			fDecodedDataBufferSize = 0;
 	}
+
 	fFrame += currentFrameCount;
 	fDecodedDataSizeInBytes = currentFrameCount * fOutputFrameSize;
 	TRACE_AUDIO("  frame count: %lld current: %lld\n", currentFrameCount, fFrame);

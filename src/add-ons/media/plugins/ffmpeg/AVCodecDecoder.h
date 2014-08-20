@@ -114,10 +114,9 @@ private:
 			const void*			fChunkBuffer;
 			uint8_t*			fVideoChunkBuffer;
 									// TODO: Remove and use fChunkBuffer again
-									// (with type uint8_t*) once the audio path is
-									// responsible for freeing the chunk buffer,
-									// too.
-			int32				fChunkBufferOffset;
+									// (with type uint8_t*) once the audio path
+									// is responsible for freeing the chunk
+									// buffer, too.
 			size_t				fChunkBufferSize;
 			bool				fAudioDecodeError;
 
