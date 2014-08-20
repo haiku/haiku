@@ -60,6 +60,7 @@ private:
 			status_t	_DecodeVideo(void* outBuffer, int64* outFrameCount,
 							media_header* mediaHeader,
 							media_decode_info* info);
+			status_t	_DecodeNextAudioFrame();
 			status_t	_DecodeNextVideoFrame();
 			void		_ApplyEssentialVideoContainerPropertiesToContext();
 			status_t	_LoadNextVideoChunkIfNeededAndAssignStartTime();

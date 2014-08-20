@@ -545,17 +545,135 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 }
 
 
+/*! \brief Fills the outBuffer with one or more already decoded audio frames.
+
+	Besides the main duty described above, this method also fills out the other
+	output parameters as documented below.
+
+	\param outBuffer Pointer to the output buffer to copy the decoded audio
+		frames to.
+	\param outFrameCount Pointer to the output variable to assign the number of
+		copied audio frames (usually several audio frames at once).
+	\param mediaHeader Pointer to the output media header that contains the
+		properties of the decoded audio frame being the first in the outBuffer.
+	\param info Specifies additional decoding parameters. (Note: unused).
+
+	\returns B_OK Decoding audio frames succeeded.
+	\returns B_LAST_BUFFER_ERROR There are no more audio frames available.
+	\returns Other error codes
+*/
 status_t
-AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
+AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
 	media_header* mediaHeader, media_decode_info* info)
 {
 	TRACE_AUDIO("AVCodecDecoder::_DecodeAudio(audio start_time %.6fs)\n",
 		mediaHeader->start_time / 1000000.0);
 
-	*outFrameCount = 0;
+	status_t audioDecodingStatus
+		= fDecodedDataSizeInBytes > 0 ? B_OK : _DecodeNextAudioFrame();
 
-	uint8* buffer = reinterpret_cast<uint8*>(_buffer);
-	while (*outFrameCount < fOutputFrameCount) {
+	if (audioDecodingStatus != B_OK)
+		return audioDecodingStatus;
+
+	*outFrameCount = fDecodedDataSizeInBytes / fOutputFrameSize;
+	memcpy(outBuffer, fDecodedData, fDecodedDataSizeInBytes);
+
+	fDecodedDataSizeInBytes = 0;
+
+	return B_OK;
+}
+
+
+/*! \brief Fills the outBuffer with an already decoded video frame.
+
+	Besides the main duty described above, this method also fills out the other
+	output parameters as documented below.
+
+	\param outBuffer Pointer to the output buffer to copy the decoded video
+		frame to.
+	\param outFrameCount Pointer to the output variable to assign the number of
+		copied video frames (usually one video frame).
+	\param mediaHeader Pointer to the output media header that contains the
+		decoded video frame properties.
+	\param info Specifies additional decoding parameters. (Note: unused).
+
+	\returns B_OK Decoding a video frame succeeded.
+	\returns B_LAST_BUFFER_ERROR There are no more video frames available.
+	\returns Other error codes
+*/
+status_t
+AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
+	media_header* mediaHeader, media_decode_info* info)
+{
+	status_t videoDecodingStatus
+		= fDecodedDataSizeInBytes > 0 ? B_OK : _DecodeNextVideoFrame();
+
+	if (videoDecodingStatus != B_OK)
+		return videoDecodingStatus;
+
+	*outFrameCount = 1;
+	*mediaHeader = fHeader;
+	memcpy(outBuffer, fDecodedData, mediaHeader->size_used);
+
+	fDecodedDataSizeInBytes = 0;
+
+	return B_OK;
+}
+
+
+/*!	\brief Decodes next audio frame.
+
+	We decode at least one audio frame into fDecodedData. To achieve this goal,
+    we might need to request several chunks of encoded data resulting in a
+    variable execution time of this function.
+
+    The length of the decoded audio frame(s) is stored in
+    fDecodedDataSizeInBytes. If this variable is greater than zero you can
+    assert that all audio frames in fDecodedData are valid.
+
+	It is assumed that the number of expected audio frames is stored in
+	fOutputFrameCount. So _DecodeNextAudioFrame() must be called only after
+	fOutputFrameCount has been set.
+
+	Note: fOutputFrameCount contains the maximum number of frames a caller
+	of BMediaDecoder::Decode() expects to receive. There is a direct
+	relationship between fOutputFrameCount and the buffer size a caller of
+	BMediaDecoder::Decode() will provide so we make sure to respect this limit
+	for fDecodedDataSizeInBytes.
+
+	On return with status code B_OK the following conditions hold true:
+		1. fDecodedData contains as much audio frames as the caller of
+		   BMediaDecoder::Decode() expects.
+		2. fDecodedData contains lesser audio frames as the caller of
+		   BMediaDecoder::Decode() expects only when there are no more audio
+		   frames left. Consecutive calls to _DecodeNextAudioFrame will then
+		   result in the return of status code B_LAST_BUFFER_ERROR.
+		3. TODO: make the following statement hold true, too:
+		   fHeader is populated with the audio frame properties of the first
+		   audio frame in fDecodedData. Especially the start_time field of
+		   fHeader relates to that first audio frame. Start times of
+		   consecutive audio frames in fDecodedData have to be calculated
+		   manually (using the frame rate and the frame duration) if the
+		   caller needs them.
+		   
+
+	\returns B_OK when we successfully decoded enough audio frames
+	\returns B_LAST_BUFFER_ERROR when there are no more audio frames available.
+	\returns B_NO_MEMORY when we have no memory left for correct operation.
+	\returns Other Errors
+*/
+status_t
+AVCodecDecoder::_DecodeNextAudioFrame()
+{
+	fDecodedDataSizeInBytes = 0;
+	size_t maximumSizeOfDecodedData = fOutputFrameCount * fOutputFrameSize;
+	if (fDecodedData == NULL)
+		fDecodedData
+			= static_cast<uint8_t*>(malloc(maximumSizeOfDecodedData));
+	uint8_t* decodedData = fDecodedData;
+
+	int64 currentFrameCount = 0;
+	while (currentFrameCount < fOutputFrameCount) {
 		// Check conditions which would hint at broken code below.
 		if (fOutputBufferSize < 0) {
 			fprintf(stderr, "Decoding read past the end of the output buffer! "
@@ -573,17 +691,17 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 			// invokation, which start at fOutputBufferOffset
 			// and are of fOutputBufferSize. Copy those into the buffer,
 			// but not more than it can hold.
-			int32 frames = min_c(fOutputFrameCount - *outFrameCount,
+			int32 frames = min_c(fOutputFrameCount - currentFrameCount,
 				fOutputBufferSize / fOutputFrameSize);
 			if (frames == 0)
 				debugger("fOutputBufferSize not multiple of frame size!");
 			size_t remainingSize = frames * fOutputFrameSize;
-			memcpy(buffer, fOutputFrame->data[0] + fOutputBufferOffset,
+			memcpy(decodedData, fOutputFrame->data[0] + fOutputBufferOffset,
 				remainingSize);
 			fOutputBufferOffset += remainingSize;
 			fOutputBufferSize -= remainingSize;
-			buffer += remainingSize;
-			*outFrameCount += frames;
+			decodedData += remainingSize;
+			currentFrameCount += frames;
 			fStartTime += (bigtime_t)((1000000LL * frames) / fOutputFrameRate);
 			continue;
 		}
@@ -632,7 +750,7 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 			usedBytes = fChunkBufferSize;
 			fOutputBufferSize = 0;
 			// Assume the audio decoded until now is broken.
-			memset(_buffer, 0, buffer - (uint8*)_buffer);
+			memset(fDecodedData, 0, decodedData - fDecodedData);
 		} else {
 			// Success
 			fAudioDecodeError = false;
@@ -652,45 +770,9 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 		fChunkBufferSize -= usedBytes;
 		fOutputBufferOffset = 0;
 	}
-	fFrame += *outFrameCount;
-	TRACE_AUDIO("  frame count: %lld current: %lld\n", *outFrameCount, fFrame);
-
-	return B_OK;
-}
-
-
-/*! \brief Fills the outBuffer with an already decoded video frame.
-
-	Besides the main duty described above, this method also fills out the other
-	output parameters as documented below.
-
-	\param outBuffer Pointer to the output buffer to copy the decoded video
-		frame to.
-	\param outFrameCount Pointer to the output variable to assign the number of
-		copied video frames (usually one video frame).
-	\param mediaHeader Pointer to the output media header that contains the
-		decoded video frame properties.
-	\param info TODO (not used at the moment)
-
-	\returns B_OK Decoding a video frame succeeded.
-	\returns B_LAST_BUFFER_ERROR There are no more video frames available.
-	\returns other error codes
-*/
-status_t
-AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
-	media_header* mediaHeader, media_decode_info* info)
-{
-	status_t videoDecodingStatus
-		= fDecodedDataSizeInBytes > 0 ? B_OK : _DecodeNextVideoFrame();
-
-	if (videoDecodingStatus != B_OK)
-		return videoDecodingStatus;
-
-	*outFrameCount = 1;
-	*mediaHeader = fHeader;
-	memcpy(outBuffer, fDecodedData, mediaHeader->size_used);
-
-	fDecodedDataSizeInBytes = 0;
+	fFrame += currentFrameCount;
+	fDecodedDataSizeInBytes = currentFrameCount * fOutputFrameSize;
+	TRACE_AUDIO("  frame count: %lld current: %lld\n", currentFrameCount, fFrame);
 
 	return B_OK;
 }
@@ -948,7 +1030,7 @@ AVCodecDecoder::_LoadNextVideoChunkIfNeededAndAssignStartTime()
 
 	Also update fChunkBufferSize to reflect the size of the contained video
 	data (leaving out the padding).
-	
+
 	\param chunk The chunk to copy.
 	\param chunkSize Size of the chunk in bytes
 
