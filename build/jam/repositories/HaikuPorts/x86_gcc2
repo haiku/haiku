@@ -275,6 +275,8 @@ RemotePackageRepository HaikuPorts
 	tiff-3.9.6-2
 	tiff_devel-3.9.6-2
 	tiff_tools-3.9.6-2
+	tinyxml-2.6.2-1
+	tinyxml_devel-2.6.2-1
 	ubertuber-0.9.10-1
 	unrar-5.1.5-1
 	util_macros-1.19.0-2
@@ -515,6 +517,8 @@ RemotePackageRepository HaikuPorts
 	taglib_x86_devel-1.9.1-1
 	tiff_x86-3.9.6-2
 	tiff_x86_devel-3.9.6-2
+	tinyxml_x86-2.6.2-1
+	tinyxml_x86_devel-2.6.2-1
 	tig_x86-2.0.2-1
 	vcmi_x86-0.94-1
 	wizznic_x86-0.9.9-2
@@ -755,6 +759,7 @@ RemotePackageRepository HaikuPorts
 	texinfo
 	tiff
 	tig_x86
+	tinyxml
 	ubertuber
 	unrar
 	util_macros

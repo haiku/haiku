@@ -158,6 +158,8 @@ RemotePackageRepository HaikuPorts
 	tiff-3.9.6-2
 	tiff_devel-3.9.6-2
 	tiff_tools-3.9.6-2
+	tinyxml-2.6.2-1
+	tinyxml_devel-2.6.2-1
 	unrar-5.1.5-1
 	vision-0.9.7.r949-1
 	vim-7.4-1
@@ -223,6 +225,8 @@ RemotePackageRepository HaikuPorts
 	sqlite_x86_gcc2_devel-3.7.13-4
 	tiff_x86_gcc2-3.9.6-2
 	tiff_x86_gcc2_devel-3.9.6-2
+	tinyxml_x86_gcc2-2.6.2-1
+	tinyxml_x86_gcc2_devel-2.6.2-1
 	wonderbrush_x86_gcc2-2.1.2-4
 	zlib_x86_gcc2-1.2.8-4
 	zlib_x86_gcc2_devel-1.2.8-4
@@ -318,6 +322,7 @@ RemotePackageRepository HaikuPorts
 	texi2html
 	texinfo
 	tiff
+	tinyxml
 	unrar
 	vim
 	vision
