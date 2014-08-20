@@ -771,9 +771,9 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		// required to buffer the packets between different calls to
 		// _DecodeNextVideoFrame().
 		int gotVideoFrame = 0;
-		int decodedDataSizeInBytes = avcodec_decode_video2(fContext,
+		int encodedDataSizeInBytes = avcodec_decode_video2(fContext,
 			fRawDecodedPicture, &gotVideoFrame, &fTempPacket);
-		if (decodedDataSizeInBytes < 0) {
+		if (encodedDataSizeInBytes < 0) {
 			TRACE("[v] AVCodecDecoder: ignoring error in decoding frame %lld:"
 				" %d\n", fFrame, len);
 			// NOTE: An error from avcodec_decode_video2() is ignored by the
@@ -784,13 +784,13 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 			continue;
 		}
 
-		fTempPacket.size -= decodedDataSizeInBytes;
-		fTempPacket.data += decodedDataSizeInBytes;
+		fTempPacket.size -= encodedDataSizeInBytes;
+		fTempPacket.data += encodedDataSizeInBytes;
 
 		bool gotNoVideoFrame = gotVideoFrame == 0;
 		if (gotNoVideoFrame) {
-			TRACE("frame %lld - no picture yet, decodedDataSizeInBytes: %d, "
-				"chunk size: %ld\n", fFrame, decodedDataSizeInBytes,
+			TRACE("frame %lld - no picture yet, encodedDataSizeInBytes: %d, "
+				"chunk size: %ld\n", fFrame, encodedDataSizeInBytes,
 				fChunkBufferSize);
 			continue;
 		}
@@ -807,19 +807,9 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		conversionTime += doneTime - formatConversionStart;
 		profileCounter++;
 		if (!(fFrame % 5)) {
-			if (info) {
-				printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required "
-					"%Ld\n",
-					decodingTime / profileCounter,
-					conversionTime / profileCounter,
-					fFrame, info->time_to_decode);
-			} else {
-				printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required "
-					"%Ld\n",
-					decodingTime / profileCounter,
-					conversionTime / profileCounter,
-					fFrame, bigtime_t(1000000LL / fOutputFrameRate));
-			}
+			printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required %Ld\n",
+				decodingTime / profileCounter, conversionTime / profileCounter,
+				fFrame, bigtime_t(1000000LL / fOutputFrameRate));
 			decodingTime = 0;
 			conversionTime = 0;
 			profileCounter = 0;
