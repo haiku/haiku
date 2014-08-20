@@ -208,7 +208,7 @@ VideoView::Draw(BRect updateRect)
 		fVideoNode->LockBitmap();
 		BBitmap *bmp = fVideoNode->Bitmap();
 		if (bmp)
-			DrawBitmap(bmp, Bounds());
+			DrawBitmap(bmp, bmp->Bounds(), Bounds(), B_FILTER_BITMAP_BILINEAR);
 		fVideoNode->UnlockBitmap();
 	}
 }
