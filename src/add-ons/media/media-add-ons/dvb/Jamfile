@@ -8,6 +8,7 @@ UseHeaders [ FDirName $(ffmpegHeaders) libavcodec ] ;
 UseHeaders [ FDirName $(ffmpegHeaders) libavformat ] ;
 UseHeaders [ FDirName $(ffmpegHeaders) libavutil ] ;
 
+SubDirC++Flags -D__STDC_CONSTANT_MACROS -Wno-deprecated-declarations ;
 
 Addon dvb.media_addon :
 	DVBCard.cpp

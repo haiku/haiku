@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include "MediaFormat.h"
 
-#define UINT64_C(c) (c ## ULL)
 extern "C" {
   #include "avcodec.h"
 
