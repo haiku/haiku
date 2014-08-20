@@ -38,10 +38,8 @@ static	SerialDevice *			MakeDevice(struct serial_config_descriptor
 		const SerialDevice *	Master() const { return fMaster ? fMaster : this; };
 
 		char *					ReadBuffer() { return fReadBuffer; };
-		size_t					ReadBufferSize() { return fReadBufferSize; };
 
 		char *					WriteBuffer() { return fWriteBuffer; };
-		size_t					WriteBufferSize() { return fWriteBufferSize; };
 
 		void					SetModes(struct termios *tios);
 
@@ -80,10 +78,6 @@ virtual	void					OnClose();
 		uint32					IOBase() const { return fIOBase; };
 		uint32					IRQ() const { return fIRQ; };
 
-protected:
-		void					SetReadBufferSize(size_t size) { fReadBufferSize = size; };
-		void					SetWriteBufferSize(size_t size) { fWriteBufferSize = size; };
-		void					SetInterruptBufferSize(size_t size) { fInterruptBufferSize = size; };
 private:
 static	int32					DeviceThread(void *data);
 
@@ -118,13 +112,14 @@ static	void					InterruptCallbackFunction(void *cookie,
 		//usb_serial_line_coding	fLineCoding;
 
 		/* data buffers */
-		area_id					fBufferArea;
-		char *					fReadBuffer;
-		size_t					fReadBufferSize;
-		char *					fWriteBuffer;
-		size_t					fWriteBufferSize;
-		char *					fInterruptBuffer;
-		size_t					fInterruptBufferSize;
+		char					fReadBuffer[DEF_BUFFER_SIZE];
+		uint32					fReadBufferAvail;
+		uint32					fReadBufferIn;
+		uint32					fReadBufferOut;
+		char					fWriteBuffer[DEF_BUFFER_SIZE];
+		uint32					fWriteBufferAvail;
+		uint32					fWriteBufferIn;
+		uint32					fWriteBufferOut;
 
 		/* variables used in callback functionality */
 		size_t					fActualLengthRead;

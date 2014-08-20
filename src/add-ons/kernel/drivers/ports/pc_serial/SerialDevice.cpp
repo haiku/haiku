@@ -27,13 +27,12 @@ SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
 		fIOBase(ioBase),
 		fIRQ(irq),
 		fMaster(master),
-		fBufferArea(-1),
-		fReadBuffer(NULL),
-		fReadBufferSize(ROUNDUP(DEF_BUFFER_SIZE, 16)),
-		fWriteBuffer(NULL),
-		fWriteBufferSize(ROUNDUP(DEF_BUFFER_SIZE, 16)),
-		fInterruptBuffer(NULL),
-		fInterruptBufferSize(16),
+		fReadBufferAvail(0),
+		fReadBufferIn(0),
+		fReadBufferOut(0),
+		fWriteBufferAvail(0),
+		fWriteBufferIn(0),
+		fWriteBufferOut(0),
 		fDoneRead(-1),
 		fDoneWrite(-1),
 		fControlOut(0),
@@ -56,9 +55,6 @@ SerialDevice::~SerialDevice()
 		delete_sem(fDoneRead);
 	if (fDoneWrite >= B_OK)
 		delete_sem(fDoneWrite);
-
-	if (fBufferArea >= B_OK)
-		delete_area(fBufferArea);
 }
 
 
@@ -67,14 +63,6 @@ SerialDevice::Init()
 {
 	fDoneRead = create_sem(0, "usb_serial:done_read");
 	fDoneWrite = create_sem(0, "usb_serial:done_write");
-
-	size_t totalBuffers = fReadBufferSize + fWriteBufferSize + fInterruptBufferSize;
-	fBufferArea = create_area("usb_serial:buffers_area", (void **)&fReadBuffer,
-		B_ANY_KERNEL_ADDRESS, ROUNDUP(totalBuffers, B_PAGE_SIZE), B_CONTIGUOUS,
-		B_READ_AREA | B_WRITE_AREA);
-
-	fWriteBuffer = fReadBuffer + fReadBufferSize;
-	fInterruptBuffer = fWriteBuffer + fWriteBufferSize;
 
 	// disable DLAB
 	WriteReg8(LCR, 0);
