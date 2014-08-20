@@ -248,6 +248,8 @@ dosfs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st,
 
 	if (mask & B_STAT_MODIFICATION_TIME) {
 		DPRINTF(0, ("setting modification time\n"));
+		if ((node->mode & FAT_SUBDIR) == 0)
+			node->mode |= FAT_ARCHIVE;
 		node->st_time = st->st_mtime;
 		dirty = true;
 	}
@@ -934,7 +936,7 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 	memset(buffer, ' ', 11);
 	memset(buffer+0x20, ' ', 11);
 	buffer[0] = buffer[0x20] = buffer[0x21] = '.';
-	buffer[0x0b] = buffer[0x2b] = 0x30;
+	buffer[0x0b] = buffer[0x2b] = FAT_SUBDIR;
 	i = time_t2dos(dummy.st_time);
 	buffer[0x16] = i & 0xff;
 	buffer[0x17] = (i >> 8) & 0xff;

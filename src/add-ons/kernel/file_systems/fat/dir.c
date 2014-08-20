@@ -900,6 +900,8 @@ create_dir_entry(nspace *vol, vnode *dir, vnode *node, const char *name,
 	DPRINTF(0, ("creating directory entry (%11.11s)\n", nshort));
 
 	info.mode = node->mode;
+	if ((node->mode & FAT_SUBDIR) == 0)
+		info.mode |= FAT_ARCHIVE;
 	info.cluster = node->cluster;
 	info.size = node->st_size;
 	info.time = node->st_time;
