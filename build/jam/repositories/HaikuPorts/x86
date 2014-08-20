@@ -56,6 +56,9 @@ RemotePackageRepository HaikuPorts
 	git_email-1.8.3.4-2
 	git_remote_helpers-1.8.3.4-2
 	git_svn-1.8.3.4-2
+	glew-1.11.0-1
+	glew_devel-1.11.0-1
+	glew_util-1.11.0-1
 	glu-9.0.0-3
 	glu_devel-9.0.0-3
 	gmp-6.0.0-1
@@ -182,6 +185,9 @@ RemotePackageRepository HaikuPorts
 	gcc_x86_gcc2_syslibs_devel-2.95.3_2014_07_26-1
 	gettext_x86_gcc2-0.18.1.1-5
 	gettext_x86_gcc2_libintl-0.18.1.1-5
+	glew_x86_gcc2-1.11.0-1
+	glew_x86_gcc2_devel-1.11.0-1
+	glew_x86_gcc2_util-1.11.0-1
 	glu_x86_gcc2-9.0.0-2
 	glu_x86_gcc2_devel-9.0.0-2
 	icu_x86_gcc2-4.8.1.1-4
@@ -251,6 +257,7 @@ RemotePackageRepository HaikuPorts
 	gcc_x86_gcc2
 	gettext
 	git
+	glew
 	glu
 	gmp
 	gperf
