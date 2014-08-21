@@ -70,8 +70,8 @@ RemotePackageRepository HaikuPorts
 	fluidsynth-1.1.6-2
 	fluidsynth_devel-1.1.6-2
 	fossil-1.29-1
-	freetype-2.5.2-3
-	freetype_devel-2.5.2-3
+	freetype-2.5.3-1
+	freetype_devel-2.5.3-1
 	fribidi-0.19.5-1
 	fribidi_devel-0.19.5-1
 	friss-0.8beta-1
@@ -353,8 +353,8 @@ RemotePackageRepository HaikuPorts
 	fribidi_x86_devel-0.19.5-1
 	ffmpeg_x86-0.10.14-1
 	ffmpeg_x86_devel-0.10.14-1
-	freetype_x86-2.5.2-2
-	freetype_x86_devel-2.5.2-2
+	freetype_x86-2.5.3-1
+	freetype_x86_devel-2.5.3-1
 	gcc_x86-4.8.3_2014_07_26-2
 	gcc_x86_syslibs-4.8.3_2014_07_26-2
 	gcc_x86_syslibs_devel-4.8.3_2014_07_26-2
