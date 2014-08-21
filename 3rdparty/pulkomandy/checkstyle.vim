@@ -20,7 +20,7 @@
 :fu FuncHaikuCheck()
 	call matchadd('Style', '\%>80v.\+', -1) " line over 80 char
 	call matchadd('Style', '^\s* \s*', -1)  " spaces instead of tabs
-	call matchadd('Style', '\(for\|if\|select\|while\)(', -1)
+	call matchadd('Style', '\(for\|if\|select\|switch\|while\)(', -1)
 		"missing space after control statement
 	call matchadd('Style', '^\(\(?!\/\/\|\/\*\).\)*//\S', -1)
 		" Missing space at comment start
