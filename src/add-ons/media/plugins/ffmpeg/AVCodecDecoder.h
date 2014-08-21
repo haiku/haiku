@@ -94,6 +94,7 @@ private:
 			size_t				fDecodedDataSizeInBytes;
 			AVFrame*			fPostProcessedDecodedPicture;
 			AVFrame*			fRawDecodedPicture;
+			AVFrame*			fRawDecodedAudio;
 
 			bool 				fCodecInitDone;
 
@@ -104,7 +105,6 @@ private:
 			int					fExtraDataSize;
 			int					fBlockAlign;
 
-			bigtime_t			fStartTime;
 			color_space			fOutputColorSpace;
 			int32				fOutputFrameCount;
 			float				fOutputFrameRate;

@@ -86,6 +86,7 @@ AVCodecDecoder::AVCodecDecoder()
 	fDecodedDataSizeInBytes(0),
 	fPostProcessedDecodedPicture(avcodec_alloc_frame()),
 	fRawDecodedPicture(avcodec_alloc_frame()),
+	fRawDecodedAudio(avcodec_alloc_frame()),
 
 	fCodecInitDone(false),
 
@@ -99,7 +100,6 @@ AVCodecDecoder::AVCodecDecoder()
 	fExtraDataSize(0),
 	fBlockAlign(0),
 
-	fStartTime(0),
 	fOutputColorSpace(B_NO_COLOR_SPACE),
 	fOutputFrameCount(0),
 	fOutputFrameRate(1.0),
@@ -147,6 +147,7 @@ AVCodecDecoder::~AVCodecDecoder()
 
 	av_free(fPostProcessedDecodedPicture);
 	av_free(fRawDecodedPicture);
+	av_free(fRawDecodedAudio);
 	av_free(fContext);
 	av_free(fDecodedDataBuffer);
 
@@ -274,7 +275,6 @@ AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 	fDecodedDataSizeInBytes = 0;
 
 	fFrame = frame;
-	fStartTime = time;
 
 	return ret;
 }
@@ -305,11 +305,6 @@ AVCodecDecoder::Decode(void* outBuffer, int64* outFrameCount,
 {
 	if (!fCodecInitDone)
 		return B_NO_INIT;
-
-//	TRACE("[%c] AVCodecDecoder::Decode() for time %Ld\n", fIsAudio?('a'):('v'),
-//		fStartTime);
-
-	mediaHeader->start_time = fStartTime;
 
 	status_t ret;
 	if (fIsAudio)
@@ -402,7 +397,6 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	int result = avcodec_open2(fContext, fCodec, NULL);
 	fCodecInitDone = (result >= 0);
 
-	fStartTime = 0;
 	fOutputFrameSize = sampleSize * outputAudioFormat.channel_count;
 	fOutputFrameCount = outputAudioFormat.buffer_size / fOutputFrameSize;
 	fOutputFrameRate = outputAudioFormat.frame_rate;
@@ -573,6 +567,7 @@ AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
 		return audioDecodingStatus;
 
 	*outFrameCount = fDecodedDataSizeInBytes / fOutputFrameSize;
+	*mediaHeader = fHeader;
 	memcpy(outBuffer, fDecodedData, fDecodedDataSizeInBytes);
 
 	fDecodedDataSizeInBytes = 0;
@@ -667,14 +662,17 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 		// _DecodeNextAudioFrame needs to be called on empty fDecodedData only!
 		// If this assert holds wrong we have a bug somewhere.
 
-	size_t maximumSizeOfDecodedData = fOutputFrameCount * fOutputFrameSize;
-	if (fDecodedData == NULL)
+	if (fDecodedData == NULL) {
+		size_t maximumSizeOfDecodedData = fOutputFrameCount * fOutputFrameSize;
 		fDecodedData
 			= static_cast<uint8_t*>(malloc(maximumSizeOfDecodedData));
-	uint8_t* decodedData = fDecodedData;
+	}
 
-	int64 currentFrameCount = 0;
-	while (currentFrameCount < fOutputFrameCount) {
+	bool firstAudioFramesCopiedToRawDecodedAudio = false;
+	avcodec_get_frame_defaults(fRawDecodedAudio);
+	fRawDecodedAudio->data[0] = fDecodedData;
+
+	while (fRawDecodedAudio->nb_samples < fOutputFrameCount) {
 		// Check conditions which would hint at broken code below.
 		if (fDecodedDataBufferSize < 0) {
 			fprintf(stderr, "Decoding read past the end of the decoded data "
@@ -692,20 +690,44 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			// invokation, which start at fDecodedDataBufferOffset
 			// and are of fDecodedDataBufferSize. Copy those into the buffer,
 			// but not more than it can hold.
-			int32 frames = min_c(fOutputFrameCount - currentFrameCount,
+			int32 frames
+				= min_c(fOutputFrameCount - fRawDecodedAudio->nb_samples,
 				fDecodedDataBufferSize / fOutputFrameSize);
 			if (frames == 0)
 				debugger("fDecodedDataBufferSize not multiple of frame size!");
 			size_t remainingSize = frames * fOutputFrameSize;
-			memcpy(decodedData, fDecodedDataBuffer->data[0]
+
+			memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
 				+ fDecodedDataBufferOffset, remainingSize);
+			if (!firstAudioFramesCopiedToRawDecodedAudio) {
+				fRawDecodedAudio->format = fDecodedDataBuffer->format;
+				fRawDecodedAudio->pkt_dts = fDecodedDataBuffer->pkt_dts;
+
+				// TODO: also store the following fContext fields in the
+				// opaque field of fRawDecodedAudio:
+				//     - fContext->channels
+				//     - fContext->sample_rate
+				// Those fields a are needed to allow the client of
+				// BMediaDecoder::Decode() to detect an audio format change.
+
+				firstAudioFramesCopiedToRawDecodedAudio = true;
+			}
+
 			fDecodedDataBufferOffset += remainingSize;
 			fDecodedDataBufferSize -= remainingSize;
-			decodedData += remainingSize;
-			currentFrameCount += frames;
-			fStartTime += (bigtime_t)((1000000LL * frames) / fOutputFrameRate);
+			fRawDecodedAudio->data[0] += remainingSize;
+			fRawDecodedAudio->nb_samples += frames;
+
+			// Update start times
+			bigtime_t framesTimeInterval = static_cast<bigtime_t>(
+				(1000000LL * frames) / fOutputFrameRate);
+			fDecodedDataBuffer->pkt_dts += framesTimeInterval;
+			fTempPacket.dts += framesTimeInterval;
+				// Note: Start time of fTempPacket is updated in case the 
+				// fTempPacket contains more audio frames to decode.
 			continue;
 		}
+
 		if (fTempPacket.size == 0) {
 			// Time to read the next chunk buffer. We use a separate
 			// media_header, since the chunk header may not belong to
@@ -730,7 +752,11 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			fTempPacket.data
 				= static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
 			fTempPacket.size = fChunkBufferSize;
-			fStartTime = chunkMediaHeader.start_time;
+			fTempPacket.dts = chunkMediaHeader.start_time;
+				// Let FFMPEG handle the correct relationship between
+				// start_time and decoded audio frames. By doing so we are
+				// merely following the way it is done for the video path
+				// see _LoadNextVideoChunkIfNeededAndAssignStartTime()
 		}
 
 		avcodec_get_frame_defaults(fDecodedDataBuffer);
@@ -750,8 +776,10 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			// Error or failure to produce decompressed output.
 			// Skip the temp packet data entirely.
 			fTempPacket.size = 0;
-			// Assume the audio decoded until now is broken.
-			memset(fDecodedData, 0, decodedData - fDecodedData);
+
+			// Assume the audio decoded until now is broken so replace it with
+			// some silence.
+			memset(fDecodedData, 0, fRawDecodedAudio->data[0] - fDecodedData);
 			fDecodedDataBufferOffset = 0;
 			continue;
 		}
@@ -772,15 +800,18 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			fContext->sample_fmt, 1);
 		if (fDecodedDataBufferSize < 0)
 			fDecodedDataBufferSize = 0;
-
-#ifdef DEBUG
-		dump_ffframe_audio(fDecodedDataBuffer, "ffaudio");
-#endif
 	}
 
-	fFrame += currentFrameCount;
-	fDecodedDataSizeInBytes = currentFrameCount * fOutputFrameSize;
-	TRACE_AUDIO("  frame count: %lld current: %lld\n", currentFrameCount, fFrame);
+	fFrame += fRawDecodedAudio->nb_samples;
+	fHeader.start_time = fRawDecodedAudio->pkt_dts;
+	fDecodedDataSizeInBytes = fRawDecodedAudio->nb_samples * fOutputFrameSize;
+
+#ifdef DEBUG
+	dump_ffframe_audio(fRawDecodedAudio, "ffaudi");
+#endif
+
+	TRACE_AUDIO("  frame count: %lld current: %lld\n",
+		fRawDecodedAudio->nb_samples, fFrame);
 
 	return B_OK;
 }
