@@ -18,8 +18,8 @@ RemotePackageRepository HaikuPorts
 	gawk-3.1.8-2
 	icu-4.8.1.1-1
 	icu_devel-4.8.1.1-1
-	#libsolv-0.3.0_haiku_2013_10_01-2
-	#libsolv_devel-0.3.0_haiku_2013_10_01-2
+	libsolv-0.3.0_haiku_2013_10_01-1
+	libsolv_devel-0.3.0_haiku_2013_10_01-1
 	zlib-1.2.8-2
 	zlib_devel-1.2.8-2
 	:
