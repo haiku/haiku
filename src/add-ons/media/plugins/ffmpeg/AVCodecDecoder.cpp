@@ -668,7 +668,6 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			= static_cast<uint8_t*>(malloc(maximumSizeOfDecodedData));
 	}
 
-	bool firstAudioFramesCopiedToRawDecodedAudio = false;
 	avcodec_get_frame_defaults(fRawDecodedAudio);
 	fRawDecodedAudio->data[0] = fDecodedData;
 
@@ -699,6 +698,9 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 
 			memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
 				+ fDecodedDataBufferOffset, remainingSize);
+
+			bool firstAudioFramesCopiedToRawDecodedAudio
+				= fRawDecodedAudio->data[0] != fDecodedData;
 			if (!firstAudioFramesCopiedToRawDecodedAudio) {
 				fRawDecodedAudio->format = fDecodedDataBuffer->format;
 				fRawDecodedAudio->pkt_dts = fDecodedDataBuffer->pkt_dts;
@@ -709,8 +711,6 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 				//     - fContext->sample_rate
 				// Those fields a are needed to allow the client of
 				// BMediaDecoder::Decode() to detect an audio format change.
-
-				firstAudioFramesCopiedToRawDecodedAudio = true;
 			}
 
 			fDecodedDataBufferOffset += remainingSize;
@@ -723,7 +723,7 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 				(1000000LL * frames) / fOutputFrameRate);
 			fDecodedDataBuffer->pkt_dts += framesTimeInterval;
 			fTempPacket.dts += framesTimeInterval;
-				// Note: Start time of fTempPacket is updated in case the 
+				// Note: Start time of fTempPacket is updated in case the
 				// fTempPacket contains more audio frames to decode.
 			continue;
 		}
@@ -759,47 +759,24 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 				// see _LoadNextVideoChunkIfNeededAndAssignStartTime()
 		}
 
-		avcodec_get_frame_defaults(fDecodedDataBuffer);
-		int gotFrame = 0;
-		int usedBytes = avcodec_decode_audio4(fContext,
-			fDecodedDataBuffer, &gotFrame, &fTempPacket);
-		if (usedBytes < 0 && !fAudioDecodeError) {
-			// Report failure if not done already
-			int32 chunkBufferOffset = fTempPacket.data
-				- static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
-			printf("########### audio decode error, "
-				"fTempPacket.size %d, fChunkBuffer data offset %ld\n",
-				fTempPacket.size, chunkBufferOffset);
-			fAudioDecodeError = true;
-		}
-		if (usedBytes <= 0) {
-			// Error or failure to produce decompressed output.
-			// Skip the temp packet data entirely.
-			fTempPacket.size = 0;
-
+		status_t decodingStatus
+			= _DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer();
+		if (decodingStatus != B_OK) {
 			// Assume the audio decoded until now is broken so replace it with
 			// some silence.
 			memset(fDecodedData, 0, fRawDecodedAudio->data[0] - fDecodedData);
-			fDecodedDataBufferOffset = 0;
-			continue;
-		}
 
-		fAudioDecodeError = false;
-		fDecodedDataBufferSize = 0;
-		fDecodedDataBufferOffset = 0;
-
-		fTempPacket.data += usedBytes;
-		fTempPacket.size -= usedBytes;
-
-		bool gotNoAudioFrame = gotFrame == 0;
-		if (gotNoAudioFrame)
-			continue;
-
-		fDecodedDataBufferSize = av_samples_get_buffer_size(NULL,
-			fContext->channels, fDecodedDataBuffer->nb_samples,
-			fContext->sample_fmt, 1);
-		if (fDecodedDataBufferSize < 0)
-			fDecodedDataBufferSize = 0;
+			if (!fAudioDecodeError) {
+				// Report failure if not done already
+				int32 chunkBufferOffset = fTempPacket.data
+					- static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
+				printf("########### audio decode error, "
+					"fTempPacket.size %d, fChunkBuffer data offset %ld\n",
+					fTempPacket.size, chunkBufferOffset);
+				fAudioDecodeError = true;
+			}
+		} else
+			fAudioDecodeError = false;
 	}
 
 	fFrame += fRawDecodedAudio->nb_samples;
@@ -812,6 +789,75 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 
 	TRACE_AUDIO("  frame count: %lld current: %lld\n",
 		fRawDecodedAudio->nb_samples, fFrame);
+
+	return B_OK;
+}
+
+
+/*!	\brief Tries to decode at least one audio frame and store it in the
+		fDecodedDataBuffer.
+
+	This function assumes to be called only when the following assumptions
+	hold true:
+		1. fDecodedDataBufferSize equals zero.
+		2. fTempPacket.size is greater than zero.
+
+	After this function returns successfully the caller can safely make the
+	following assumptions:
+		1. fDecodedDataBufferSize is greater than zero.
+		2. fTempPacket was updated to exclude the data chunk that was consumed
+		   by avcodec_decode_audio4().
+		3. fDecodedDataBufferOffset is set to zero.
+
+	When this function failed to decode at least one audio frame due to a
+	decoding error the caller can safely make the following assumptions:
+		1. fDecodedDataBufferSize equals zero.
+		2. fTempPacket.size equals zero.
+
+	Note: It is possible that there wasn't any audio frame decoded into
+	fDecodedDataBuffer after calling this function. This is normal and can
+	happen when there was either a decoding error or there is some decoding
+	delay in FFMPEGs audio decoder. Another call to this method is totally
+	safe and is even expected as long as the calling assumptions hold true.
+
+	\returns B_OK Decoding successful. fDecodedDataBuffer contains decoded
+		audio frames only when fDecodedDataBufferSize is greater than zero.
+		fDecodedDataBuffer is empty, when avcodec_decode_audio4() didn't return
+		audio frames due to delayed decoding.
+	\returns B_ERROR Decoding failed thus fDecodedDataBuffer contains no audio
+		frames.
+*/
+status_t
+AVCodecDecoder::_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer()
+{
+	assert(fDecodedDataBufferSize == 0);
+	assert(fTempPacket.size > 0);
+
+	avcodec_get_frame_defaults(fDecodedDataBuffer);
+	fDecodedDataBufferOffset = 0;
+	int gotAudioFrame = 0;
+
+	int encodedDataSizeInBytes = avcodec_decode_audio4(fContext,
+		fDecodedDataBuffer, &gotAudioFrame, &fTempPacket);
+	if (encodedDataSizeInBytes <= 0) {
+		// Error or failure to produce decompressed output.
+		// Skip the temp packet data entirely.
+		fTempPacket.size = 0;
+		return B_ERROR;
+	}
+
+	fTempPacket.data += encodedDataSizeInBytes;
+	fTempPacket.size -= encodedDataSizeInBytes;
+
+	bool gotNoAudioFrame = gotAudioFrame == 0;
+	if (gotNoAudioFrame)
+		return B_OK;
+
+	fDecodedDataBufferSize = av_samples_get_buffer_size(NULL,
+		fContext->channels, fDecodedDataBuffer->nb_samples,
+		fContext->sample_fmt, 1);
+	if (fDecodedDataBufferSize < 0)
+		fDecodedDataBufferSize = 0;
 
 	return B_OK;
 }
@@ -877,7 +923,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 
 		if (loadingChunkStatus != B_OK) {
 			TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from "
-				"GetNextChunk(): %s\n", strerror(err));
+				"GetNextChunk(): %s\n", strerror(loadingChunkStatus));
 			return loadingChunkStatus;
 		}
 

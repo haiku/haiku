@@ -61,6 +61,7 @@ private:
 							media_header* mediaHeader,
 							media_decode_info* info);
 			status_t	_DecodeNextAudioFrame();
+			status_t	_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer();
 			status_t	_DecodeNextVideoFrame();
 			void		_ApplyEssentialVideoContainerPropertiesToContext();
 			status_t	_LoadNextVideoChunkIfNeededAndAssignStartTime();
