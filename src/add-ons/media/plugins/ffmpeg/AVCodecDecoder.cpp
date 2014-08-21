@@ -772,6 +772,10 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			fContext->sample_fmt, 1);
 		if (fDecodedDataBufferSize < 0)
 			fDecodedDataBufferSize = 0;
+
+#ifdef DEBUG
+		dump_ffframe_audio(fDecodedDataBuffer, "ffaudio");
+#endif
 	}
 
 	fFrame += currentFrameCount;
@@ -1083,9 +1087,9 @@ AVCodecDecoder::_HandleNewVideoFrameAndUpdateSystemState()
 	ConvertAVCodecContextToVideoFrameRate(*fContext, fOutputFrameRate);
 
 #ifdef DEBUG
-	dump_ffframe(fRawDecodedPicture, "ffpict");
-//	dump_ffframe(fPostProcessedDecodedPicture, "opict");
+	dump_ffframe_video(fRawDecodedPicture, "ffpict");
 #endif
+
 	fFrame++;
 }
 

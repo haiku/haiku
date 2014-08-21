@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2014 Colin Günther <coling@gmx.de>.
+ *
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+
 /******************************************************************************
 /
 /	File:			gfx_util.h
@@ -39,6 +45,7 @@ const char *pixfmt_to_string(int format);
 color_space pixfmt_to_colorspace(int format);
 PixelFormat colorspace_to_pixfmt(color_space format);
 
-void dump_ffframe(AVFrame *frame, const char *name);
+void dump_ffframe_audio(AVFrame *frame, const char *name);
+void dump_ffframe_video(AVFrame *frame, const char *name);
 
 #endif
