@@ -46,10 +46,7 @@ extern "C" {
 #define ERROR(a...) fprintf(stderr, a)
 
 
-static const int64 kNoPTSValue = 0x8000000000000000LL;
-	// NOTE: For some reasons, I have trouble with the avcodec.h define:
-	// #define AV_NOPTS_VALUE          INT64_C(0x8000000000000000)
-	// INT64_C is not defined here.
+static const int64 kNoPTSValue = AV_NOPTS_VALUE;
 
 
 static uint32
