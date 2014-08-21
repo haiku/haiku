@@ -67,7 +67,8 @@ TermView::Draw(BRect updateRect)
 	for (pos.row = updatedChars.start_row; pos.row <= updatedChars.end_row;
 			pos.row++) {
 		int x = updatedChars.start_col * fFontWidth + kBorderSpacing;
-		int y = pos.row * fFontHeight + (int)ceil(height.ascent) + kBorderSpacing;
+		int y = pos.row * fFontHeight + (int)ceil(height.ascent)
+			+ kBorderSpacing;
 		MovePenTo(x, y);
 
 		for (pos.col = updatedChars.start_col;
@@ -143,8 +144,7 @@ void
 TermView::KeyDown(const char* bytes, int32 numBytes)
 {
 	// Translate some keys to more usual VT100 escape codes
-	switch(bytes[0])
-	{
+	switch (bytes[0]) {
 		case B_UP_ARROW:
 			numBytes = 3;
 			bytes = "\x1B[A";
@@ -308,7 +308,8 @@ TermView::_GetCell(VTermPos pos, VTermScreenCell& cell)
 	// Try the scroll-back buffer
 	if (pos.row < 0 && pos.col >= 0) {
 		int offset = - pos.row - 1;
-		ScrollBufferItem* line = (ScrollBufferItem*)fScrollBuffer.ItemAt(offset);
+		ScrollBufferItem* line
+			= (ScrollBufferItem*)fScrollBuffer.ItemAt(offset);
 		if (line != NULL && pos.col < line->cols) {
 			cell = line->cells[pos.col];
 			return;
@@ -378,7 +379,8 @@ TermView::_PushLine(int cols, const VTermScreenCell* cells)
 
 	BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
 	if (scrollBar != NULL) {
-		float range = (fScrollBuffer.CountItems() + availableRows) * fFontHeight;
+		float range = (fScrollBuffer.CountItems() + availableRows)
+			* fFontHeight;
 		scrollBar->SetRange(availableRows * fFontHeight - range, 0.0f);
 		// TODO we need to adjust this in FrameResized, as availableRows can
 		// change
