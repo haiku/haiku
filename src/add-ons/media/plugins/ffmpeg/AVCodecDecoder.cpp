@@ -672,17 +672,7 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 	fRawDecodedAudio->data[0] = fDecodedData;
 
 	while (fRawDecodedAudio->nb_samples < fOutputFrameCount) {
-		// Check conditions which would hint at broken code below.
-		if (fDecodedDataBufferSize < 0) {
-			fprintf(stderr, "Decoding read past the end of the decoded data "
-				"buffer! %ld\n", fDecodedDataBufferSize);
-			fDecodedDataBufferSize = 0;
-		}
-		if (fTempPacket.size < 0) {
-			fprintf(stderr, "Decoding read past the end of the temp packet! "
-				"%d\n", fTempPacket.size);
-			fTempPacket.size = 0;
-		}
+		_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow();
 
 		bool decodedDataBufferHasData = fDecodedDataBufferSize > 0;
 		if (decodedDataBufferHasData) {
@@ -700,7 +690,9 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 		if (decodingStatus != B_OK) {
 			// Assume the audio decoded until now is broken so replace it with
 			// some silence.
-			memset(fDecodedData, 0, fRawDecodedAudio->data[0] - fDecodedData);
+			size_t decodedDataSize
+				= fRawDecodedAudio->nb_samples * fOutputFrameSize;
+			memset(fDecodedData, 0, decodedDataSize);
 
 			if (!fAudioDecodeError) {
 				// Report failure if not done already
@@ -727,6 +719,28 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 		fRawDecodedAudio->nb_samples, fFrame);
 
 	return B_OK;
+}
+
+
+/*!	\brief Checks fDecodedDataBufferSize and fTempPacket for invalid values,
+		reports them and assigns valid values.
+
+	Note: This method is intended to be called before any code is executed that
+	deals with moving, loading or decoding any audio frames.
+*/
+void
+AVCodecDecoder::_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow()
+{
+	if (fDecodedDataBufferSize < 0) {
+		fprintf(stderr, "Decoding read past the end of the decoded data "
+			"buffer! %ld\n", fDecodedDataBufferSize);
+		fDecodedDataBufferSize = 0;
+	}
+	if (fTempPacket.size < 0) {
+		fprintf(stderr, "Decoding read past the end of the temp packet! %d\n",
+			fTempPacket.size);
+		fTempPacket.size = 0;
+	}
 }
 
 

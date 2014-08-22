@@ -61,6 +61,7 @@ private:
 							media_header* mediaHeader,
 							media_decode_info* info);
 			status_t	_DecodeNextAudioFrame();
+			void		_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow();
 			void		_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes();
 			status_t	_LoadNextAudioChunkIfNeededAndAssignStartTime();
 			status_t	_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer();
