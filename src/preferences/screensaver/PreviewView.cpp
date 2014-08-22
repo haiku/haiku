@@ -64,11 +64,18 @@ PreviewView::PreviewView(const char* name)
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	// We draw the "monitor" around the preview, hence the strange insets.
-	layout->SetInsets(10, 8, 11, 16);
+	layout->SetInsets(7, 6, 8, 12);
 	SetLayout(layout);
 
-	fNoPreview = new BStringView("no preview",
-		B_TRANSLATE("No preview available"));
+	// A BStringView would be enough, if only it handled word wrapping.
+	fNoPreview = new BTextView("no preview");
+	fNoPreview->SetText(B_TRANSLATE("No preview available"));
+	fNoPreview->SetFontAndColor(be_plain_font, B_FONT_ALL, &kWhite);
+	fNoPreview->MakeEditable(false);
+	fNoPreview->MakeResizable(false);
+	fNoPreview->MakeSelectable(false);
+	fNoPreview->SetViewColor(0, 0, 0);
+	fNoPreview->SetLowColor(0, 0, 0);
 
 	fNoPreview->Hide();
 
@@ -138,6 +145,7 @@ PreviewView::AddPreview()
 
 	fNoPreview->SetExplicitSize(BSize(previewWidth, previewHeight));
 	fNoPreview->ResizeTo(previewWidth, previewHeight);
+	fNoPreview->SetInsets(0, previewHeight / 3, 0 , 0);
 
 	return fSaverView;
 }
@@ -146,6 +154,8 @@ PreviewView::AddPreview()
 BView*
 PreviewView::RemovePreview()
 {
+	ShowNoPreview();
+
 	if (fSaverView != NULL)
 		ChildAt(0)->RemoveChild(fSaverView);
 

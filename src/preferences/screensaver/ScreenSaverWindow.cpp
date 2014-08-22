@@ -833,8 +833,12 @@ ModulesView::_OpenSaver()
 			fSaverRunner->Run();
 		} else
 			fPreviewView->ShowNoPreview();
-	} else
-		fPreviewView->ShowNoPreview();
+	} else {
+		// Failed to load OR this is the "Darkness" screensaver. Show a black
+		// preview (this is what will happen in both cases when screen_blanker
+		// runs).
+		fPreviewView->HideNoPreview();
+	}
 
 	if (fSettingsView->ChildAt(0) == NULL) {
 		// There are no settings at all, we add the module name here to
