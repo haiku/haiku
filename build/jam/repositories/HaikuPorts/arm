@@ -16,6 +16,8 @@ RemotePackageRepository HaikuPorts
 	freetype-2.4.9-1
 	freetype_devel-2.4.9-1
 	gawk-3.1.8-2
+	gcc_syslibs_devel-4.8.3_2014_08_03-1
+	gcc_syslibs-4.8.3_2014_08_03-1
 	icu-4.8.1.1-1
 	icu_devel-4.8.1.1-1
 	libsolv-0.3.0_haiku_2013_10_01-1
