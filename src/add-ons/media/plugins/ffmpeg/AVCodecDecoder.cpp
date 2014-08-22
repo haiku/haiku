@@ -684,47 +684,9 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			fTempPacket.size = 0;
 		}
 
-		if (fDecodedDataBufferSize > 0) {
-			// We still have decoded audio frames from the last
-			// invokation, which start at fDecodedDataBufferOffset
-			// and are of fDecodedDataBufferSize. Copy those into the buffer,
-			// but not more than it can hold.
-			int32 frames
-				= min_c(fOutputFrameCount - fRawDecodedAudio->nb_samples,
-				fDecodedDataBufferSize / fOutputFrameSize);
-			if (frames == 0)
-				debugger("fDecodedDataBufferSize not multiple of frame size!");
-			size_t remainingSize = frames * fOutputFrameSize;
-
-			memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
-				+ fDecodedDataBufferOffset, remainingSize);
-
-			bool firstAudioFramesCopiedToRawDecodedAudio
-				= fRawDecodedAudio->data[0] != fDecodedData;
-			if (!firstAudioFramesCopiedToRawDecodedAudio) {
-				fRawDecodedAudio->format = fDecodedDataBuffer->format;
-				fRawDecodedAudio->pkt_dts = fDecodedDataBuffer->pkt_dts;
-
-				// TODO: also store the following fContext fields in the
-				// opaque field of fRawDecodedAudio:
-				//     - fContext->channels
-				//     - fContext->sample_rate
-				// Those fields a are needed to allow the client of
-				// BMediaDecoder::Decode() to detect an audio format change.
-			}
-
-			fDecodedDataBufferOffset += remainingSize;
-			fDecodedDataBufferSize -= remainingSize;
-			fRawDecodedAudio->data[0] += remainingSize;
-			fRawDecodedAudio->nb_samples += frames;
-
-			// Update start times
-			bigtime_t framesTimeInterval = static_cast<bigtime_t>(
-				(1000000LL * frames) / fOutputFrameRate);
-			fDecodedDataBuffer->pkt_dts += framesTimeInterval;
-			fTempPacket.dts += framesTimeInterval;
-				// Note: Start time of fTempPacket is updated in case the
-				// fTempPacket contains more audio frames to decode.
+		bool decodedDataBufferHasData = fDecodedDataBufferSize > 0;
+		if (decodedDataBufferHasData) {
+			_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes();
 			continue;
 		}
 
@@ -765,6 +727,92 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 		fRawDecodedAudio->nb_samples, fFrame);
 
 	return B_OK;
+}
+
+
+/*!	\brief Moves audio frames from fDecodedDataBuffer to fRawDecodedAudio (and
+		thus to fDecodedData) and updates the start times of fRawDecodedAudio,
+		fDecodedDataBuffer and fTempPacket accordingly.
+
+	When moving audio frames to fRawDecodedAudio this method also makes sure
+	that the following important fields of fRawDecodedAudio are populated and
+	updated with correct values:
+		- fRawDecodedAudio->format: Format of first audio frame
+		- fRawDecodedAudio->pkt_dts: Start time of first audio frame
+		- fRawDecodedAudio->nb_samples: Number of audio frames
+		- fRawDecodedAudio->opaque: TODO: Will contain the following fields
+			from fContext for the first audio frame:
+				- fContext->channels: Channel count of first audio frame
+				- fContext->sample_rate: Frame rate of first audio frame
+
+	This function assumes to be called only when the following assumptions
+	hold true:
+		1. There are decoded audio frames available in fDecodedDataBuffer
+		   meaning that fDecodedDataBufferSize is greater than zero.
+		2. There is space left in fRawDecodedAudio to move some audio frames
+		   in. This means that fRawDecodedAudio has lesser audio frames than
+		   the maximum allowed (specified by fOutputFrameCount).
+		3. The audio frame rate is known so that we can calculate the time
+		   range (covered by the moved audio frames) to update the start times
+		   accordingly.
+
+	After this function returns the caller can safely make the following
+	assumptions:
+		1. The number of decoded audio frames in fDecodedDataBuffer is
+		   decreased though it may still be greater then zero.
+		2. The number of frames in fRawDecodedAudio has increased and all
+		   important fields are updated (see listing above).
+		3. Start times of fDecodedDataBuffer and fTempPacket were increased
+		   with the time range covered by the moved audio frames.
+
+	Note: This function raises an exception (by calling the debugger), when
+	fDecodedDataBufferSize is not a multiple of fOutputFrameSize.
+*/
+void
+AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
+{
+	assert(fDecodedDataBufferSize > 0);
+	assert(fRawDecodedAudio->nb_samples < fOutputFrameCount);
+	assert(fOutputFrameRate > 0);
+
+	int32 frames = min_c(fOutputFrameCount - fRawDecodedAudio->nb_samples,
+		fDecodedDataBufferSize / fOutputFrameSize);
+	if (frames == 0)
+		debugger("fDecodedDataBufferSize not multiple of frame size!");
+
+	size_t remainingSize = frames * fOutputFrameSize;
+	memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
+		+ fDecodedDataBufferOffset, remainingSize);
+
+	bool firstAudioFramesCopiedToRawDecodedAudio
+		= fRawDecodedAudio->data[0] != fDecodedData;
+	if (!firstAudioFramesCopiedToRawDecodedAudio) {
+		fRawDecodedAudio->format = fDecodedDataBuffer->format;
+		fRawDecodedAudio->pkt_dts = fDecodedDataBuffer->pkt_dts;
+
+		// TODO: also store the following fContext fields in the
+		// opaque field of fRawDecodedAudio:
+		//     - fContext->channels
+		//     - fContext->sample_rate
+		// Those fields a are needed to allow the client of
+		// BMediaDecoder::Decode() to detect an audio format change.
+	}
+
+	fRawDecodedAudio->data[0] += remainingSize;
+	fRawDecodedAudio->nb_samples += frames;
+
+	fDecodedDataBufferOffset += remainingSize;
+	fDecodedDataBufferSize -= remainingSize;
+
+	// Update start times accordingly
+	bigtime_t framesTimeInterval = static_cast<bigtime_t>(
+		(1000000LL * frames) / fOutputFrameRate);
+	fDecodedDataBuffer->pkt_dts += framesTimeInterval;
+		// Start time of buffer is updated in case that it contains
+		// more audio frames to move.
+	fTempPacket.dts += framesTimeInterval;
+		// Start time of fTempPacket is updated in case the fTempPacket
+		// contains more audio frames to decode.
 }
 
 
