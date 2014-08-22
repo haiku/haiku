@@ -728,36 +728,10 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			continue;
 		}
 
-		if (fTempPacket.size == 0) {
-			// Time to read the next chunk buffer. We use a separate
-			// media_header, since the chunk header may not belong to
-			// the start of the decoded audio frames we return. For
-			// example we may have used frames from a previous invokation,
-			// or we may have to read several chunks until we fill up the
-			// output buffer.
-			media_header chunkMediaHeader;
-			status_t err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize,
-				&chunkMediaHeader);
-			if (err == B_LAST_BUFFER_ERROR) {
-				TRACE_AUDIO("  Last Chunk with chunk size %ld\n",
-					fChunkBufferSize);
-				fChunkBufferSize = 0;
-				return err;
-			}
-			if (err != B_OK || fChunkBufferSize < 0) {
-				printf("GetNextChunk error %ld\n",fChunkBufferSize);
-				fChunkBufferSize = 0;
-				break;
-			}
-			fTempPacket.data
-				= static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
-			fTempPacket.size = fChunkBufferSize;
-			fTempPacket.dts = chunkMediaHeader.start_time;
-				// Let FFMPEG handle the correct relationship between
-				// start_time and decoded audio frames. By doing so we are
-				// merely following the way it is done for the video path
-				// see _LoadNextVideoChunkIfNeededAndAssignStartTime()
-		}
+		status_t loadingChunkStatus
+			= _LoadNextAudioChunkIfNeededAndAssignStartTime();
+		if (loadingChunkStatus != B_OK)
+			return loadingChunkStatus;
 
 		status_t decodingStatus
 			= _DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer();
@@ -789,6 +763,69 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 
 	TRACE_AUDIO("  frame count: %lld current: %lld\n",
 		fRawDecodedAudio->nb_samples, fFrame);
+
+	return B_OK;
+}
+
+
+/*! \brief Loads the next audio chunk into fChunkBuffer and assigns it
+		(including the start time) to fTempPacket accordingly only if
+		fTempPacket is empty.
+
+	\returns B_OK
+		1. meaning: Next audio chunk is loaded.
+		2. meaning: No need to load and assign anything. Proceed as usual.
+	\returns B_LAST_BUFFER_ERROR No more audio chunks available.
+		fChunkBuffer and fTempPacket are left untouched.
+	\returns Other errors Caller should bail out because fChunkBuffer and
+		fTempPacket are in unknown states. Normal operation cannot be
+		guaranteed.
+*/
+status_t
+AVCodecDecoder::_LoadNextAudioChunkIfNeededAndAssignStartTime()
+{
+	// TODO: Collapse _LoadNextAudioChunkIfNeededAndAssignStartTime() and
+	// _LoadNextVideoChunkIfNeededAndAssignStartTime() into one method called
+	// _LoadNextChunkIfNeededAndAssignStartTime() once the following conditions
+	// are met:
+	//     1. There is no longer a distinction between fVideoChunkBuffer and
+	//        fChunkBuffer.
+	//     2. _LoadNextAudioChunkIfNeededAndAssignStartTime() adds Padding to
+	//        the chunk buffer, too, like it is done in
+	//        _LoadNextVideoChunkIfNeededAndAssignStartTime() at the moment.
+
+	if (fTempPacket.size > 0)
+		return B_OK;
+
+	const void* chunkBuffer = NULL;
+	size_t chunkBufferSize = 0;
+		// In the case that GetNextChunk() returns an error fChunkBufferSize
+		// should be left untouched.
+	media_header chunkMediaHeader;
+
+	status_t getNextChunkStatus = GetNextChunk(&chunkBuffer, &chunkBufferSize,
+		&chunkMediaHeader);
+	if (getNextChunkStatus != B_OK)
+		return getNextChunkStatus;
+
+	fChunkBuffer = chunkBuffer;
+	fChunkBufferSize = chunkBufferSize;
+
+	fTempPacket.data
+		= static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
+	fTempPacket.size = fChunkBufferSize;
+	fTempPacket.dts = chunkMediaHeader.start_time;
+		// Let FFMPEG handle the correct relationship between start_time and
+		// decoded audio frames. By doing so we are merely following the way it
+		// is done for the video path.
+		// see _LoadNextVideoChunkIfNeededAndAssignStartTime()
+		//
+		// FIXME: Research how to establish a meaningful relationship
+		// between start_time and decoded audio frame when the received chunk
+		// buffer contains partial video frames. Maybe some data formats
+		// contain time stamps (ake pts / dts fields) that can be evaluated by
+		// FFMPEG. But as long as I don't have such audio data to test it, it
+		// makes no sense to implement it.
 
 	return B_OK;
 }
@@ -1053,8 +1090,8 @@ AVCodecDecoder::_LoadNextVideoChunkIfNeededAndAssignStartTime()
 		// should be left untouched.
 	media_header chunkMediaHeader;
 
-	status_t getNextChunkStatus = GetNextChunk(&chunkBuffer,
-		&chunkBufferSize, &chunkMediaHeader);
+	status_t getNextChunkStatus = GetNextChunk(&chunkBuffer, &chunkBufferSize,
+		&chunkMediaHeader);
 	if (getNextChunkStatus != B_OK)
 		return getNextChunkStatus;
 
@@ -1073,18 +1110,17 @@ AVCodecDecoder::_LoadNextVideoChunkIfNeededAndAssignStartTime()
 		// \see http://git.videolan.org/?p=ffmpeg.git;a=blob;f=ffplay.c;h=09623db374e5289ed20b7cc28c262c4375a8b2e4;hb=9153b33a742c4e2a85ff6230aea0e75f5a8b26c2#l1502
 		//
 		// FIXME: Research how to establish a meaningful relationship
-		// between start_time and decoded video frame when the received
-		// chunk buffer contains partial video frames. Maybe some data
-		// formats contain time stamps (ake pts / dts fields) that can
-		// be evaluated by FFMPEG. But as long as I don't have such
-		// video data to test it, it makes no sense to implement it.
+		// between start_time and decoded video frame when the received chunk
+		// buffer contains partial video frames. Maybe some data formats
+		// contain time stamps (ake pts / dts fields) that can be evaluated by
+		// FFMPEG. But as long as I don't have such video data to test it, it
+		// makes no sense to implement it.
 		//
-		// FIXME: Implement tracking start_time of video frames
-		// originating in data chunks that encode more than one video
-		// frame at a time. In that case on would increment the
-		// start_time for each consecutive frame of such a data chunk
-		// (like it is done for audio frame decoding). But as long as
-		// I don't have such video data to test it, it makes no sense
+		// FIXME: Implement tracking start_time of video frames originating in
+		// data chunks that encode more than one video frame at a time. In that
+		// case on would increment the start_time for each consecutive frame of
+		// such a data chunk (like it is done for audio frame decoding). But as
+		// long as I don't have such video data to test it, it makes no sense
 		// to implement it.
 
 #ifdef LOG_STREAM_TO_FILE
