@@ -668,7 +668,7 @@ fi
 # check if nasm can actually output ELF files
 # (the stock version in OSX can't)
 # XXX: should probably only test for x86* arch
-if [ "$("$HAIKU_NASM" -hf | grep -c ELF'[36][24]\s')" -ne "2" ]; then
+if [ "$("$HAIKU_NASM" -hf | grep -c elf'[36][24] ')" -ne "2" ]; then
 	echo "$HAIKU_NASM cannot generate ELF files. Please install a working version."
 	if [ $HOST_PLATFORM = "darwin" ]; then
 		echo "You can install it from Mac Ports."
