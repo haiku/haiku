@@ -161,6 +161,10 @@ TermView::KeyDown(const char* bytes, int32 numBytes)
 			numBytes = 3;
 			bytes = "\x1B[D";
 			break;
+		case B_BACKSPACE:
+			numBytes = 1;
+			bytes = "\x7F";
+			break;
 	}
 
 	// Send the bytes to the serial port

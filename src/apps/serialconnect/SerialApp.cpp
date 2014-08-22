@@ -46,7 +46,7 @@ void SerialApp::ReadyToRun()
 
 void SerialApp::MessageReceived(BMessage* message)
 {
-	switch(message->what)
+	switch (message->what)
 	{
 		case kMsgOpenPort:
 		{
@@ -88,10 +88,6 @@ void SerialApp::MessageReceived(BMessage* message)
 					&size) != B_OK)
 				break;
 
-			if (bytes[0] == '\n') {
-				size = 2;
-				bytes = "\r\n";
-			}
 			fSerialPort.Write(bytes, size);
 			break;
 		}
