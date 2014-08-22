@@ -46,12 +46,10 @@ void SerialApp::ReadyToRun()
 
 void SerialApp::MessageReceived(BMessage* message)
 {
-	switch (message->what)
-	{
+	switch (message->what) {
 		case kMsgOpenPort:
 		{
-			if (message->FindString("port name", &fPortPath) == B_OK)
-			{
+			if (message->FindString("port name", &fPortPath) == B_OK) {
 				fSerialPort.Open(fPortPath);
 				release_sem(fSerialLock);
 			} else {
@@ -65,8 +63,7 @@ void SerialApp::MessageReceived(BMessage* message)
 			// incoming data
 			fWindow->PostMessage(message);
 
-			if (fLogFile)
-			{
+			if (fLogFile) {
 				const char* bytes;
 				ssize_t length;
 				message->FindData("data", B_RAW_TYPE, (const void**)&bytes,
@@ -97,20 +94,16 @@ void SerialApp::MessageReceived(BMessage* message)
 			const char* filename;
 
 			if (message->FindRef("directory", &parent) == B_OK
-				&& message->FindString("name", &filename) == B_OK)
-			{
+				&& message->FindString("name", &filename) == B_OK) {
 				delete fLogFile;
 				BDirectory directory(&parent);
 				fLogFile = new BFile(&directory, filename,
 					B_WRITE_ONLY | B_CREATE_FILE | B_OPEN_AT_END);
 				status_t error = fLogFile->InitCheck();
 				if (error != B_OK)
-				{
 					puts(strerror(error));
-				}
-			} else {
+			} else
 				debugger("Invalid BMessage received");
-			}
 			break;
 		}
 		case kMsgSettings:
@@ -170,8 +163,7 @@ void SerialApp::LoadSettings()
 
 	BFile file(path.Path(), B_READ_ONLY);
 	BMessage message(kMsgSettings);
-	if (message.Unflatten(&file) != B_OK)
-	{
+	if (message.Unflatten(&file) != B_OK) {
 		message.AddInt32("parity", fSerialPort.ParityMode());
 		message.AddInt32("databits", fSerialPort.DataBits());
 		message.AddInt32("stopbits", fSerialPort.StopBits());
@@ -208,13 +200,11 @@ status_t SerialApp::PollSerial(void*)
 	SerialApp* application = (SerialApp*)be_app;
 	char buffer[256];
 
-	for (;;)
-	{
+	for (;;) {
 		ssize_t bytesRead;
 
 		bytesRead = application->fSerialPort.Read(buffer, sizeof(buffer));
-		if (bytesRead == B_FILE_ERROR)
-		{
+		if (bytesRead == B_FILE_ERROR) {
 			// Port is not open - wait for it and start over
 			acquire_sem(application->fSerialLock);
 		} else if (bytesRead > 0) {
