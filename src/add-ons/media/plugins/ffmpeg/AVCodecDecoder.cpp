@@ -65,6 +65,11 @@ struct wave_format_ex {
 	// extra_data[extra_size]
 } _PACKED;
 
+struct avformat_codec_context {
+	int sample_rate;
+	int channels;
+};
+
 
 // profiling related globals
 #define DO_PROFILING 0
@@ -147,6 +152,7 @@ AVCodecDecoder::~AVCodecDecoder()
 
 	av_free(fPostProcessedDecodedPicture);
 	av_free(fRawDecodedPicture);
+	av_free(fRawDecodedAudio->opaque);
 	av_free(fRawDecodedAudio);
 	av_free(fContext);
 	av_free(fDecodedDataBuffer);
@@ -412,6 +418,11 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fDecodedDataBufferOffset = 0;
 	fDecodedDataBufferSize = 0;
 
+	fRawDecodedAudio->opaque
+		= av_realloc(fRawDecodedAudio->opaque, sizeof(avformat_codec_context));
+	if (fRawDecodedAudio->opaque == NULL)
+		return B_NO_MEMORY;
+
 	_ResetTempPacket();
 
 	inOutFormat->require_flags = 0;
@@ -637,9 +648,12 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 		1. fDecodedData contains as much audio frames as the caller of
 		   BMediaDecoder::Decode() expects.
 		2. fDecodedData contains lesser audio frames as the caller of
-		   BMediaDecoder::Decode() expects only when there are no more audio
-		   frames left. Consecutive calls to _DecodeNextAudioFrame will then
-		   result in the return of status code B_LAST_BUFFER_ERROR.
+		   BMediaDecoder::Decode() expects only when one of the following
+		   conditions hold true:
+		       i  No more audio frames left. Consecutive calls to
+		          _DecodeNextAudioFrame() will then result in the return of
+		          status code B_LAST_BUFFER_ERROR.
+		       ii TODO: A change in the size of the audio frames.
 		3. TODO: make the following statement hold true, too:
 		   fHeader is populated with the audio frame properties of the first
 		   audio frame in fDecodedData. Especially the start_time field of
@@ -648,6 +662,13 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 		   manually (using the frame rate and the frame duration) if the
 		   caller needs them.
 
+	TODO: Handle change of channel_count. Such a change results in a change of
+	the audio frame size and thus has different buffer requirements.
+	The most sane approach for implementing this is to return the audio frames
+	that were still decoded with the previous channel_count and inform the
+	client of BMediaDecoder::Decode() about the change so that it can adapt to
+	it. Furthermore we need to adapt our fDecodedData to the new buffer size
+	requirements accordingly.
 
 	\returns B_OK when we successfully decoded enough audio frames
 	\returns B_LAST_BUFFER_ERROR when there are no more audio frames available.
@@ -668,8 +689,7 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			= static_cast<uint8_t*>(malloc(maximumSizeOfDecodedData));
 	}
 
-	avcodec_get_frame_defaults(fRawDecodedAudio);
-	fRawDecodedAudio->data[0] = fDecodedData;
+	_ResetRawDecodedAudio();
 
 	while (fRawDecodedAudio->nb_samples < fOutputFrameCount) {
 		_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow();
@@ -690,9 +710,7 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 		if (decodingStatus != B_OK) {
 			// Assume the audio decoded until now is broken so replace it with
 			// some silence.
-			size_t decodedDataSize
-				= fRawDecodedAudio->nb_samples * fOutputFrameSize;
-			memset(fDecodedData, 0, decodedDataSize);
+			memset(fDecodedData, 0, fRawDecodedAudio->linesize[0]);
 
 			if (!fAudioDecodeError) {
 				// Report failure if not done already
@@ -708,8 +726,9 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 	}
 
 	fFrame += fRawDecodedAudio->nb_samples;
-	fHeader.start_time = fRawDecodedAudio->pkt_dts;
-	fDecodedDataSizeInBytes = fRawDecodedAudio->nb_samples * fOutputFrameSize;
+	fDecodedDataSizeInBytes = fRawDecodedAudio->linesize[0];
+
+	_UpdateMediaHeaderForAudioFrame();
 
 #ifdef DEBUG
 	dump_ffframe_audio(fRawDecodedAudio, "ffaudi");
@@ -719,6 +738,20 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 		fRawDecodedAudio->nb_samples, fFrame);
 
 	return B_OK;
+}
+
+
+/*!	\brief Resets important fields in fRawDecodedVideo to their default values.
+*/
+void
+AVCodecDecoder::_ResetRawDecodedAudio()
+{
+	fRawDecodedAudio->data[0] = fDecodedData;
+	fRawDecodedAudio->linesize[0] = 0;
+	fRawDecodedAudio->format = AV_SAMPLE_FMT_NONE;
+	fRawDecodedAudio->pkt_dts = AV_NOPTS_VALUE;
+	fRawDecodedAudio->nb_samples = 0;
+	memset(fRawDecodedAudio->opaque, 0, sizeof(avformat_codec_context));
 }
 
 
@@ -751,13 +784,15 @@ AVCodecDecoder::_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow()
 	When moving audio frames to fRawDecodedAudio this method also makes sure
 	that the following important fields of fRawDecodedAudio are populated and
 	updated with correct values:
+		- fRawDecodedAudio->data[0]: Points to first free byte of fDecodedData
+		- fRawDecodedAudio->linesize[0]: Total size of frames in fDecodedData
 		- fRawDecodedAudio->format: Format of first audio frame
 		- fRawDecodedAudio->pkt_dts: Start time of first audio frame
 		- fRawDecodedAudio->nb_samples: Number of audio frames
-		- fRawDecodedAudio->opaque: TODO: Will contain the following fields
-			from fContext for the first audio frame:
-				- fContext->channels: Channel count of first audio frame
-				- fContext->sample_rate: Frame rate of first audio frame
+		- fRawDecodedAudio->opaque: Contains the following fields for the first
+		  audio frame:
+		      - channels: Channel count of first audio frame
+		      - sample_rate: Frame rate of first audio frame
 
 	This function assumes to be called only when the following assumptions
 	hold true:
@@ -769,6 +804,8 @@ AVCodecDecoder::_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow()
 		3. The audio frame rate is known so that we can calculate the time
 		   range (covered by the moved audio frames) to update the start times
 		   accordingly.
+		4. The field fRawDecodedAudio->opaque points to a memory block
+		   representing a structure of type avformat_codec_context.
 
 	After this function returns the caller can safely make the following
 	assumptions:
@@ -804,15 +841,14 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 		fRawDecodedAudio->format = fDecodedDataBuffer->format;
 		fRawDecodedAudio->pkt_dts = fDecodedDataBuffer->pkt_dts;
 
-		// TODO: also store the following fContext fields in the
-		// opaque field of fRawDecodedAudio:
-		//     - fContext->channels
-		//     - fContext->sample_rate
-		// Those fields a are needed to allow the client of
-		// BMediaDecoder::Decode() to detect an audio format change.
+		avformat_codec_context* codecContext
+			= static_cast<avformat_codec_context*>(fRawDecodedAudio->opaque);
+		codecContext->channels = fContext->channels;
+		codecContext->sample_rate = fContext->sample_rate;
 	}
 
 	fRawDecodedAudio->data[0] += remainingSize;
+	fRawDecodedAudio->linesize[0] += remainingSize;
 	fRawDecodedAudio->nb_samples += frames;
 
 	fDecodedDataBufferOffset += remainingSize;
@@ -959,6 +995,47 @@ AVCodecDecoder::_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer()
 		fDecodedDataBufferSize = 0;
 
 	return B_OK;
+}
+
+
+/*! \brief Updates relevant fields of the class member fHeader with the
+		properties of the most recently decoded audio frame.
+
+	The following fields of fHeader are updated:
+		- fHeader.type
+		- fHeader.file_pos
+		- fHeader.orig_size
+		- fHeader.start_time
+		- fHeader.size_used
+		- fHeader.u.raw_audio.frame_rate
+		- fHeader.u.raw_audio.channel_count
+
+	It is assumed that this function is called only	when the following asserts
+	hold true:
+		1. We actually got a new audio frame decoded by the audio decoder.
+		2. fHeader wasn't updated for the new audio frame yet. You MUST call
+		   this method only once per decoded audio frame.
+		3. fRawDecodedAudio's fields relate to the first audio frame contained
+		   in fDecodedData. Especially the following fields are of importance:
+		       - fRawDecodedAudio->pkt_dts: Start time of first audio frame
+		       - fRawDecodedAudio->opaque: Contains the following fields for
+		         the first audio frame:
+			         - channels: Channel count of first audio frame
+			         - sample_rate: Frame rate of first audio frame
+*/
+void
+AVCodecDecoder::_UpdateMediaHeaderForAudioFrame()
+{
+	fHeader.type = B_MEDIA_RAW_AUDIO;
+	fHeader.file_pos = 0;
+	fHeader.orig_size = 0;
+	fHeader.start_time = fRawDecodedAudio->pkt_dts;
+	fHeader.size_used = fRawDecodedAudio->linesize[0];
+
+	avformat_codec_context* codecContext
+		= static_cast<avformat_codec_context*>(fRawDecodedAudio->opaque);
+	fHeader.u.raw_audio.channel_count = codecContext->channels;
+	fHeader.u.raw_audio.frame_rate = codecContext->sample_rate;
 }
 
 
