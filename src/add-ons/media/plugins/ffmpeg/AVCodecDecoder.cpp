@@ -672,7 +672,6 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 
 	\returns B_OK when we successfully decoded enough audio frames
 	\returns B_LAST_BUFFER_ERROR when there are no more audio frames available.
-	\returns B_NO_MEMORY when we have no memory left for correct operation.
 	\returns Other Errors
 */
 status_t
@@ -700,29 +699,9 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 			continue;
 		}
 
-		status_t loadingChunkStatus
-			= _LoadNextAudioChunkIfNeededAndAssignStartTime();
-		if (loadingChunkStatus != B_OK)
-			return loadingChunkStatus;
-
-		status_t decodingStatus
-			= _DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer();
-		if (decodingStatus != B_OK) {
-			// Assume the audio decoded until now is broken so replace it with
-			// some silence.
-			memset(fDecodedData, 0, fRawDecodedAudio->linesize[0]);
-
-			if (!fAudioDecodeError) {
-				// Report failure if not done already
-				int32 chunkBufferOffset = fTempPacket.data
-					- static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
-				printf("########### audio decode error, "
-					"fTempPacket.size %d, fChunkBuffer data offset %ld\n",
-					fTempPacket.size, chunkBufferOffset);
-				fAudioDecodeError = true;
-			}
-		} else
-			fAudioDecodeError = false;
+		status_t decodeAudioChunkStatus = _DecodeNextAudioFrameChunk();
+		if (decodeAudioChunkStatus != B_OK)
+			return decodeAudioChunkStatus;
 	}
 
 	fFrame += fRawDecodedAudio->nb_samples;
@@ -866,6 +845,71 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 }
 
 
+/*!	\brief Decodes next chunk of audio frames.
+
+	This method handles all the details of loading the input buffer
+	(fChunkBuffer) at the right time and of calling FFMPEG often engouh until
+	some audio frames have been decoded.
+
+	FFMPEG decides how much audio frames belong to a chunk. Because of that
+	it is very likely that _DecodeNextAudioFrameChunk has to be called several
+	times to decode enough audio frames to please the caller of
+	BMediaDecoder::Decode().
+
+	This function assumes to be called only when the following assumptions
+	hold true:
+		1. fDecodedDataBufferSize equals zero.
+
+	After this function returns successfully the caller can safely make the
+	following assumptions:
+		1. fDecodedDataBufferSize is greater than zero.
+		2. fDecodedDataBufferOffset is set to zero.
+		3. fDecodedDataBuffer contains audio frames.
+
+	\returns B_OK on successfully decoding one audio frame chunk.
+	\returns B_LAST_BUFFER_ERROR No more audio frame chunks available. From
+		this point on further calls will return this same error.
+	\returns B_ERROR Decoding failed
+*/
+status_t
+AVCodecDecoder::_DecodeNextAudioFrameChunk()
+{
+	assert(fDecodedDataBufferSize == 0);
+
+	while(fDecodedDataBufferSize == 0) {
+		status_t loadingChunkStatus
+			= _LoadNextAudioChunkIfNeededAndAssignStartTime();
+		if (loadingChunkStatus != B_OK)
+			return loadingChunkStatus;
+
+		status_t decodingStatus
+			= _DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer();
+		if (decodingStatus != B_OK) {
+			// Assume the audio decoded until now is broken so replace it with
+			// some silence.
+			memset(fDecodedData, 0, fRawDecodedAudio->linesize[0]);
+
+			if (!fAudioDecodeError) {
+				// Report failure if not done already
+				int32 chunkBufferOffset = fTempPacket.data
+					- static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
+				printf("########### audio decode error, "
+					"fTempPacket.size %d, fChunkBuffer data offset %ld\n",
+					fTempPacket.size, chunkBufferOffset);
+				fAudioDecodeError = true;
+			}
+
+			// Assume that next audio chunk can be decoded so keep decoding.
+			continue;
+		}
+
+		fAudioDecodeError = false;
+	}
+
+	return B_OK;
+}
+
+
 /*! \brief Loads the next audio chunk into fChunkBuffer and assigns it
 		(including the start time) to fTempPacket accordingly only if
 		fTempPacket is empty.
@@ -939,7 +983,8 @@ AVCodecDecoder::_LoadNextAudioChunkIfNeededAndAssignStartTime()
 
 	After this function returns successfully the caller can safely make the
 	following assumptions:
-		1. fDecodedDataBufferSize is greater than zero.
+		1. fDecodedDataBufferSize is greater than zero in the common case.
+		   Also see "Note" below.
 		2. fTempPacket was updated to exclude the data chunk that was consumed
 		   by avcodec_decode_audio4().
 		3. fDecodedDataBufferOffset is set to zero.
@@ -958,7 +1003,7 @@ AVCodecDecoder::_LoadNextAudioChunkIfNeededAndAssignStartTime()
 	\returns B_OK Decoding successful. fDecodedDataBuffer contains decoded
 		audio frames only when fDecodedDataBufferSize is greater than zero.
 		fDecodedDataBuffer is empty, when avcodec_decode_audio4() didn't return
-		audio frames due to delayed decoding.
+		audio frames due to delayed decoding or incomplete audio frames.
 	\returns B_ERROR Decoding failed thus fDecodedDataBuffer contains no audio
 		frames.
 */

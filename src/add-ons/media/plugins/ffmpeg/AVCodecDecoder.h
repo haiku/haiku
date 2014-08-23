@@ -65,6 +65,7 @@ private:
 			void		_ResetRawDecodedAudio();
 			void		_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow();
 			void		_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes();
+			status_t	_DecodeNextAudioFrameChunk();
 			status_t	_LoadNextAudioChunkIfNeededAndAssignStartTime();
 			status_t	_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer();
 			void		_UpdateMediaHeaderForAudioFrame();
