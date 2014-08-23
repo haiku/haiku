@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -206,8 +206,8 @@ AcpiExResolveNodeToValue (
 
     if (!SourceDesc)
     {
-        ACPI_ERROR ((AE_INFO, "No object attached to node %p",
-            Node));
+        ACPI_ERROR ((AE_INFO, "No object attached to node [%4.4s] %p",
+            Node->Name.Ascii, Node));
         return_ACPI_STATUS (AE_AML_NO_OPERAND);
     }
 

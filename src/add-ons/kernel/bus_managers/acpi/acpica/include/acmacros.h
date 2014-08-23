@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -136,17 +136,21 @@
 #define ACPI_SET64(ptr, val)            (*ACPI_CAST64 (ptr) = (UINT64) (val))
 
 /*
- * printf() format helpers
+ * printf() format helpers. These macros are workarounds for the difficulties
+ * with emitting 64-bit integers and 64-bit pointers with the same code
+ * for both 32-bit and 64-bit hosts.
  */
-
-/* Split 64-bit integer into two 32-bit values. Use with %8.8X%8.8X */
-
 #define ACPI_FORMAT_UINT64(i)           ACPI_HIDWORD(i), ACPI_LODWORD(i)
 
 #if ACPI_MACHINE_WIDTH == 64
 #define ACPI_FORMAT_NATIVE_UINT(i)      ACPI_FORMAT_UINT64(i)
+#define ACPI_FORMAT_TO_UINT(i)          ACPI_FORMAT_UINT64(i)
+#define ACPI_PRINTF_UINT                 "0x%8.8X%8.8X"
+
 #else
-#define ACPI_FORMAT_NATIVE_UINT(i)      0, (i)
+#define ACPI_FORMAT_NATIVE_UINT(i)      0, (UINT32) (i)
+#define ACPI_FORMAT_TO_UINT(i)          (UINT32) (i)
+#define ACPI_PRINTF_UINT                 "0x%8.8X"
 #endif
 
 
@@ -484,32 +488,6 @@
 #else
 #define ACPI_DEBUGGER_EXEC(a)
 #endif
-
-
-/*
- * Memory allocation tracking (DEBUG ONLY)
- */
-#define ACPI_MEM_PARAMETERS         _COMPONENT, _AcpiModuleName, __LINE__
-
-#ifndef ACPI_DBG_TRACK_ALLOCATIONS
-
-/* Memory allocation */
-
-#define ACPI_ALLOCATE(a)            AcpiUtAllocate((ACPI_SIZE) (a), ACPI_MEM_PARAMETERS)
-#define ACPI_ALLOCATE_ZEROED(a)     AcpiUtAllocateZeroed((ACPI_SIZE) (a), ACPI_MEM_PARAMETERS)
-#define ACPI_FREE(a)                AcpiOsFree(a)
-#define ACPI_MEM_TRACKING(a)
-
-#else
-
-/* Memory allocation */
-
-#define ACPI_ALLOCATE(a)            AcpiUtAllocateAndTrack((ACPI_SIZE) (a), ACPI_MEM_PARAMETERS)
-#define ACPI_ALLOCATE_ZEROED(a)     AcpiUtAllocateZeroedAndTrack((ACPI_SIZE) (a), ACPI_MEM_PARAMETERS)
-#define ACPI_FREE(a)                AcpiUtFreeAndTrack(a, ACPI_MEM_PARAMETERS)
-#define ACPI_MEM_TRACKING(a)        a
-
-#endif /* ACPI_DBG_TRACK_ALLOCATIONS */
 
 
 /*

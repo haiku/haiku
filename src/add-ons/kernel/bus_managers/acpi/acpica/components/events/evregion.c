@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -405,6 +405,7 @@ AcpiEvDetachRegion(
 {
     ACPI_OPERAND_OBJECT     *HandlerObj;
     ACPI_OPERAND_OBJECT     *ObjDesc;
+    ACPI_OPERAND_OBJECT     *StartDesc;
     ACPI_OPERAND_OBJECT     **LastObjPtr;
     ACPI_ADR_SPACE_SETUP    RegionSetup;
     void                    **RegionContext;
@@ -435,6 +436,7 @@ AcpiEvDetachRegion(
     /* Find this region in the handler's list */
 
     ObjDesc = HandlerObj->AddressSpace.RegionList;
+    StartDesc = ObjDesc;
     LastObjPtr = &HandlerObj->AddressSpace.RegionList;
 
     while (ObjDesc)
@@ -529,6 +531,16 @@ AcpiEvDetachRegion(
 
         LastObjPtr = &ObjDesc->Region.Next;
         ObjDesc = ObjDesc->Region.Next;
+
+        /* Prevent infinite loop if list is corrupted */
+
+        if (ObjDesc == StartDesc)
+        {
+            ACPI_ERROR ((AE_INFO,
+                "Circular handler list in region object %p",
+                RegionObj));
+            return_VOID;
+        }
     }
 
     /* If we get here, the region was not in the handler's region list */

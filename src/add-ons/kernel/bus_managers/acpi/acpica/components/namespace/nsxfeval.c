@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -116,6 +116,7 @@
 
 
 #define __NSXFEVAL_C__
+#define EXPORT_ACPI_INTERFACES
 
 #include "acpi.h"
 #include "accommon.h"
@@ -163,7 +164,7 @@ AcpiEvaluateObjectTyped (
     ACPI_OBJECT_TYPE        ReturnType)
 {
     ACPI_STATUS             Status;
-    BOOLEAN                 MustFree = FALSE;
+    BOOLEAN                 FreeBufferOnError = FALSE;
 
 
     ACPI_FUNCTION_TRACE (AcpiEvaluateObjectTyped);
@@ -178,12 +179,13 @@ AcpiEvaluateObjectTyped (
 
     if (ReturnBuffer->Length == ACPI_ALLOCATE_BUFFER)
     {
-        MustFree = TRUE;
+        FreeBufferOnError = TRUE;
     }
 
     /* Evaluate the object */
 
-    Status = AcpiEvaluateObject (Handle, Pathname, ExternalParams, ReturnBuffer);
+    Status = AcpiEvaluateObject (Handle, Pathname,
+        ExternalParams, ReturnBuffer);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -218,10 +220,15 @@ AcpiEvaluateObjectTyped (
         AcpiUtGetTypeName (((ACPI_OBJECT *) ReturnBuffer->Pointer)->Type),
         AcpiUtGetTypeName (ReturnType)));
 
-    if (MustFree)
+    if (FreeBufferOnError)
     {
-        /* Caller used ACPI_ALLOCATE_BUFFER, free the return buffer */
-
+        /*
+         * Free a buffer created via ACPI_ALLOCATE_BUFFER.
+         * Note: We use AcpiOsFree here because AcpiOsAllocate was used
+         * to allocate the buffer. This purposefully bypasses the
+         * (optionally enabled) allocation tracking mechanism since we
+         * only want to track internal allocations.
+         */
         AcpiOsFree (ReturnBuffer->Pointer);
         ReturnBuffer->Pointer = NULL;
     }

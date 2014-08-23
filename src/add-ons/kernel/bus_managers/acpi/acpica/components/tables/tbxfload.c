@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -114,6 +114,7 @@
  *****************************************************************************/
 
 #define __TBXFLOAD_C__
+#define EXPORT_ACPI_INTERFACES
 
 #include "acpi.h"
 #include "accommon.h"
@@ -164,7 +165,7 @@ AcpiLoadTables (
     return_ACPI_STATUS (Status);
 }
 
-ACPI_EXPORT_SYMBOL (AcpiLoadTables)
+ACPI_EXPORT_SYMBOL_INIT (AcpiLoadTables)
 
 
 /*******************************************************************************
@@ -202,7 +203,7 @@ AcpiTbLoadNamespace (
         !ACPI_COMPARE_NAME (
             &(AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT].Signature),
             ACPI_SIG_DSDT) ||
-         ACPI_FAILURE (AcpiTbVerifyTable (
+         ACPI_FAILURE (AcpiTbValidateTable (
             &AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT])))
     {
         Status = AE_NO_ACPI_TABLES;
@@ -213,7 +214,7 @@ AcpiTbLoadNamespace (
      * Save the DSDT pointer for simple access. This is the mapped memory
      * address. We must take care here because the address of the .Tables
      * array can change dynamically as tables are loaded at run-time. Note:
-     * .Pointer field is not validated until after call to AcpiTbVerifyTable.
+     * .Pointer field is not validated until after call to AcpiTbValidateTable.
      */
     AcpiGbl_DSDT = AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT].Pointer;
 
@@ -258,21 +259,9 @@ AcpiTbLoadNamespace (
                     ACPI_SIG_SSDT) &&
              !ACPI_COMPARE_NAME (&(AcpiGbl_RootTableList.Tables[i].Signature),
                     ACPI_SIG_PSDT)) ||
-             ACPI_FAILURE (AcpiTbVerifyTable (
+             ACPI_FAILURE (AcpiTbValidateTable (
                 &AcpiGbl_RootTableList.Tables[i])))
         {
-            continue;
-        }
-
-        /*
-         * Optionally do not load any SSDTs from the RSDT/XSDT. This can
-         * be useful for debugging ACPI problems on some machines.
-         */
-        if (AcpiGbl_DisableSsdtTableLoad)
-        {
-            ACPI_INFO ((AE_INFO, "Ignoring %4.4s at %p",
-                AcpiGbl_RootTableList.Tables[i].Signature.Ascii,
-                ACPI_CAST_PTR (void, AcpiGbl_RootTableList.Tables[i].Address)));
             continue;
         }
 
@@ -289,6 +278,53 @@ UnlockAndExit:
     (void) AcpiUtReleaseMutex (ACPI_MTX_TABLES);
     return_ACPI_STATUS (Status);
 }
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiInstallTable
+ *
+ * PARAMETERS:  Address             - Address of the ACPI table to be installed.
+ *              Physical            - Whether the address is a physical table
+ *                                    address or not
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Dynamically install an ACPI table.
+ *              Note: This function should only be invoked after
+ *                    AcpiInitializeTables() and before AcpiLoadTables().
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiInstallTable (
+    ACPI_PHYSICAL_ADDRESS   Address,
+    BOOLEAN                 Physical)
+{
+    ACPI_STATUS             Status;
+    UINT8                   Flags;
+    UINT32                  TableIndex;
+
+
+    ACPI_FUNCTION_TRACE (AcpiInstallTable);
+
+
+    if (Physical)
+    {
+        Flags = ACPI_TABLE_ORIGIN_EXTERNAL_VIRTUAL;
+    }
+    else
+    {
+        Flags = ACPI_TABLE_ORIGIN_INTERNAL_PHYSICAL;
+    }
+
+    Status = AcpiTbInstallStandardTable (Address, Flags,
+        FALSE, FALSE, &TableIndex);
+
+    return_ACPI_STATUS (Status);
+}
+
+ACPI_EXPORT_SYMBOL_INIT (AcpiInstallTable)
 
 
 /*******************************************************************************
@@ -313,7 +349,6 @@ AcpiLoadTable (
     ACPI_TABLE_HEADER       *Table)
 {
     ACPI_STATUS             Status;
-    ACPI_TABLE_DESC         TableDesc;
     UINT32                  TableIndex;
 
 
@@ -327,14 +362,6 @@ AcpiLoadTable (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    /* Init local table descriptor */
-
-    ACPI_MEMSET (&TableDesc, 0, sizeof (ACPI_TABLE_DESC));
-    TableDesc.Address = ACPI_PTR_TO_PHYSADDR (Table);
-    TableDesc.Pointer = Table;
-    TableDesc.Length = Table->Length;
-    TableDesc.Flags = ACPI_TABLE_ORIGIN_UNKNOWN;
-
     /* Must acquire the interpreter lock during this operation */
 
     Status = AcpiUtAcquireMutex (ACPI_MTX_INTERPRETER);
@@ -346,7 +373,23 @@ AcpiLoadTable (
     /* Install the table and load it into the namespace */
 
     ACPI_INFO ((AE_INFO, "Host-directed Dynamic ACPI Table Load:"));
-    Status = AcpiTbAddTable (&TableDesc, &TableIndex);
+    (void) AcpiUtAcquireMutex (ACPI_MTX_TABLES);
+
+    Status = AcpiTbInstallStandardTable (ACPI_PTR_TO_PHYSADDR (Table),
+                ACPI_TABLE_ORIGIN_EXTERNAL_VIRTUAL, TRUE, FALSE,
+                &TableIndex);
+
+    (void) AcpiUtReleaseMutex (ACPI_MTX_TABLES);
+    if (ACPI_FAILURE (Status))
+    {
+        goto UnlockAndExit;
+    }
+
+    /*
+     * Note: Now table is "INSTALLED", it must be validated before
+     * using.
+     */
+    Status = AcpiTbValidateTable (&AcpiGbl_RootTableList.Tables[TableIndex]);
     if (ACPI_FAILURE (Status))
     {
         goto UnlockAndExit;

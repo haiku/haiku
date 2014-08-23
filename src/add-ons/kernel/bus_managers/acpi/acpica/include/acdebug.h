@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -236,6 +236,11 @@ void
 AcpiDbGenerateSci (
     void))
 
+void
+AcpiDbExecuteTest (
+    char                    *TypeArg);
+
+
 /*
  * dbconvert - miscellaneous conversion routines
  */
@@ -444,11 +449,6 @@ AcpiDbGetTableFromFile (
     char                    *Filename,
     ACPI_TABLE_HEADER       **Table);
 
-ACPI_STATUS
-AcpiDbReadTableFromFile (
-    char                    *Filename,
-    ACPI_TABLE_HEADER       **Table);
-
 
 /*
  * dbhistry - debugger HISTORY command
@@ -464,6 +464,10 @@ AcpiDbDisplayHistory (
 char *
 AcpiDbGetFromHistory (
     char                    *CommandNumArg);
+
+char *
+AcpiDbGetHistoryByIndex (
+    UINT32                  CommanddNum);
 
 
 /*

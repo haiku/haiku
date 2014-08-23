@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -160,30 +160,53 @@
 #define ACPI_DBG_TRACK_ALLOCATIONS
 #endif
 
-/* AcpiNames configuration. Single threaded with debugger output enabled. */
-
-#ifdef ACPI_NAMES_APP
-#define ACPI_DEBUGGER
-#define ACPI_APPLICATION
-#define ACPI_SINGLE_THREADED
-#endif
-
 /*
- * AcpiBin/AcpiDump/AcpiSrc/AcpiXtract configuration. All single
- * threaded, with no debug output.
+ * AcpiBin/AcpiDump/AcpiHelp/AcpiNames/AcpiSrc/AcpiXtract/Example configuration.
+ * All single threaded.
  */
-#if (defined ACPI_BIN_APP)   || \
-    (defined ACPI_DUMP_APP)  || \
-    (defined ACPI_SRC_APP)   || \
-    (defined ACPI_XTRACT_APP)
+#if (defined ACPI_BIN_APP)      || \
+    (defined ACPI_DUMP_APP)     || \
+    (defined ACPI_HELP_APP)     || \
+    (defined ACPI_NAMES_APP)    || \
+    (defined ACPI_SRC_APP)      || \
+    (defined ACPI_XTRACT_APP)   || \
+    (defined ACPI_EXAMPLE_APP)
 #define ACPI_APPLICATION
 #define ACPI_SINGLE_THREADED
 #endif
+
+/* AcpiHelp configuration. Error messages disabled. */
 
 #ifdef ACPI_HELP_APP
-#define ACPI_APPLICATION
-#define ACPI_SINGLE_THREADED
 #define ACPI_NO_ERROR_MESSAGES
+#endif
+
+/* AcpiNames configuration. Debug output enabled. */
+
+#ifdef ACPI_NAMES_APP
+#define ACPI_DEBUG_OUTPUT
+#endif
+
+/* AcpiExec/AcpiNames/Example configuration. Native RSDP used. */
+
+#if (defined ACPI_EXEC_APP)     || \
+    (defined ACPI_EXAMPLE_APP)  || \
+    (defined ACPI_NAMES_APP)
+#define ACPI_USE_NATIVE_RSDP_POINTER
+#endif
+
+/* AcpiDump configuration. Native mapping used if provied by OSPMs */
+
+#ifdef ACPI_DUMP_APP
+#define ACPI_USE_NATIVE_MEMORY_MAPPING
+#define USE_NATIVE_ALLOCATE_ZEROED
+#endif
+
+/* AcpiNames/Example configuration. Hardware disabled */
+
+#if (defined ACPI_EXAMPLE_APP)  || \
+    (defined ACPI_NAMES_APP)
+#define ACPI_REDUCED_HARDWARE 1
 #endif
 
 /* Linkable ACPICA library */
@@ -254,6 +277,9 @@
 #include "acos2.h"
 
 #elif defined(_AED_EFI)
+#include "acefi.h"
+
+#elif defined(_GNU_EFI)
 #include "acefi.h"
 
 #elif defined(__HAIKU__)
@@ -467,5 +493,18 @@ typedef char *va_list;
 #define ACPI_TOLOWER(c)         AcpiUtToLower ((int) (c))
 
 #endif /* ACPI_USE_SYSTEM_CLIBRARY */
+
+#ifndef ACPI_FILE
+#ifdef ACPI_APPLICATION
+#include <stdio.h>
+#define ACPI_FILE              FILE *
+#define ACPI_FILE_OUT          stdout
+#define ACPI_FILE_ERR          stderr
+#else
+#define ACPI_FILE              void *
+#define ACPI_FILE_OUT          NULL
+#define ACPI_FILE_ERR          NULL
+#endif /* ACPI_APPLICATION */
+#endif /* ACPI_FILE */
 
 #endif /* __ACENV_H__ */

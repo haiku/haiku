@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -151,10 +151,6 @@ NsSetupNamespaceListing (
 
 /* Local prototypes */
 
-static UINT32
-AdGetFileSize (
-    FILE                    *File);
-
 static void
 AdCreateTableHeader (
     char                    *Filename,
@@ -229,38 +225,6 @@ static ACPI_PARSE_OBJECT    *AcpiGbl_ParseOpRoot;
 
 /*******************************************************************************
  *
- * FUNCTION:    AdGetFileSize
- *
- * PARAMETERS:  File                - Open file handle
- *
- * RETURN:      File Size
- *
- * DESCRIPTION: Get current file size. Uses seek-to-EOF. File must be open.
- *
- ******************************************************************************/
-
-static UINT32
-AdGetFileSize (
-    FILE                    *File)
-{
-    UINT32                  FileSize;
-    long                    Offset;
-
-
-    Offset = ftell (File);
-
-    fseek (File, 0, SEEK_END);
-    FileSize = (UINT32) ftell (File);
-
-    /* Restore file pointer */
-
-    fseek (File, Offset, SEEK_SET);
-    return (FileSize);
-}
-
-
-/*******************************************************************************
- *
  * FUNCTION:    AdInitialize
  *
  * PARAMETERS:  None
@@ -278,7 +242,7 @@ AdInitialize (
     ACPI_STATUS             Status;
 
 
-    /* ACPI CA subsystem initialization */
+    /* ACPICA subsystem initialization */
 
     Status = AcpiOsInitialize ();
     if (ACPI_FAILURE (Status))
@@ -322,7 +286,6 @@ AdInitialize (
  *              OutToFile           - TRUE if output should go to a file
  *              Prefix              - Path prefix for output
  *              OutFilename         - where the filename is returned
- *              GetAllTables        - TRUE if all tables are desired
  *
  * RETURN:      Status
  *
@@ -335,8 +298,7 @@ AdAmlDisassemble (
     BOOLEAN                 OutToFile,
     char                    *Filename,
     char                    *Prefix,
-    char                    **OutFilename,
-    BOOLEAN                 GetAllTables)
+    char                    **OutFilename)
 {
     ACPI_STATUS             Status;
     char                    *DisasmFilename = NULL;
@@ -420,7 +382,7 @@ AdAmlDisassemble (
     }
     else
     {
-        Status = AdGetLocalTables (Filename, GetAllTables);
+        Status = AdGetLocalTables ();
         if (ACPI_FAILURE (Status))
         {
             AcpiOsPrintf ("Could not get ACPI tables, %s\n",
@@ -455,7 +417,7 @@ AdAmlDisassemble (
         /* Create/Open a disassembly output file */
 
         DisasmFilename = FlGenerateFilename (Prefix, FILE_SUFFIX_DISASSEMBLY);
-        if (!OutFilename)
+        if (!DisasmFilename)
         {
             fprintf (stderr, "Could not generate output filename\n");
             Status = AE_ERROR;
@@ -467,6 +429,7 @@ AdAmlDisassemble (
         {
             fprintf (stderr, "Could not open output file %s\n", DisasmFilename);
             Status = AE_ERROR;
+            ACPI_FREE (DisasmFilename);
             goto Cleanup;
         }
 
@@ -487,7 +450,7 @@ AdAmlDisassemble (
         fprintf (stderr, "Acpi Data Table [%4.4s] decoded\n",
             Table->Signature);
         fprintf (stderr, "Formatted output:  %s - %u bytes\n",
-            DisasmFilename, AdGetFileSize (File));
+            DisasmFilename, CmGetFileSize (File));
     }
     else
     {
@@ -543,9 +506,10 @@ AdAmlDisassemble (
                 "reparsing with new information\n",
                 AcpiDmGetExternalMethodCount ());
 
-            /* Reparse, rebuild namespace. no need to xref namespace */
+            /* Reparse, rebuild namespace */
 
             AcpiPsDeleteParseTree (AcpiGbl_ParseOpRoot);
+            AcpiGbl_ParseOpRoot = NULL;
             AcpiNsDeleteNamespaceSubtree (AcpiGbl_RootNode);
 
             AcpiGbl_RootNode                    = NULL;
@@ -559,6 +523,9 @@ AdAmlDisassemble (
             AcpiGbl_RootNodeStruct.Flags        = 0;
 
             Status = AcpiNsRootInitialize ();
+
+            /* New namespace, add the external definitions first */
+
             AcpiDmAddExternalsToNamespace ();
 
             /* Parse the table again. No need to reload it, however */
@@ -570,6 +537,14 @@ AdAmlDisassemble (
                     AcpiFormatException (Status));
                 goto Cleanup;
             }
+
+            /* Cross reference the namespace again */
+
+            AcpiDmFinishNamespaceLoad (AcpiGbl_ParseOpRoot,
+                AcpiGbl_RootNode, OwnerId);
+
+            AcpiDmCrossReferenceNamespace (AcpiGbl_ParseOpRoot,
+                AcpiGbl_RootNode, OwnerId);
 
             if (AslCompilerdebug)
             {
@@ -605,7 +580,7 @@ AdAmlDisassemble (
 
             fprintf (stderr, "Disassembly completed\n");
             fprintf (stderr, "ASL Output:    %s - %u bytes\n",
-                DisasmFilename, AdGetFileSize (File));
+                DisasmFilename, CmGetFileSize (File));
         }
     }
 
@@ -642,7 +617,7 @@ Cleanup:
  *
  * RETURN:      None
  *
- * DESCRIPTION: Create the disassembler header, including ACPI CA signon with
+ * DESCRIPTION: Create the disassembler header, including ACPICA signon with
  *              current time and date.
  *
  *****************************************************************************/
@@ -674,7 +649,7 @@ AdDisassemblerHeader (
  *
  * RETURN:      None
  *
- * DESCRIPTION: Create the ASL table header, including ACPI CA signon with
+ * DESCRIPTION: Create the ASL table header, including ACPICA signon with
  *              current time and date.
  *
  *****************************************************************************/
@@ -752,8 +727,17 @@ AdCreateTableHeader (
     else
     {
         NewFilename = ACPI_ALLOCATE_ZEROED (9);
-        strncat (NewFilename, Table->Signature, 4);
-        strcat (NewFilename, ".aml");
+        if (NewFilename)
+        {
+            strncat (NewFilename, Table->Signature, 4);
+            strcat (NewFilename, ".aml");
+        }
+    }
+
+    if (!NewFilename)
+    {
+        AcpiOsPrintf (" **** Could not generate AML output filename\n");
+        return;
     }
 
     /* Open the ASL definition block */
@@ -818,8 +802,7 @@ AdDisplayTables (
  *
  * FUNCTION:    AdGetLocalTables
  *
- * PARAMETERS:  Filename            - Not used
- *              GetAllTables        - TRUE if all tables are desired
+ * PARAMETERS:  None
  *
  * RETURN:      Status
  *
@@ -829,105 +812,36 @@ AdDisplayTables (
 
 ACPI_STATUS
 AdGetLocalTables (
-    char                    *Filename,
-    BOOLEAN                 GetAllTables)
+    void)
 {
     ACPI_STATUS             Status;
     ACPI_TABLE_HEADER       TableHeader;
     ACPI_TABLE_HEADER       *NewTable;
-    UINT32                  NumTables;
-    UINT32                  PointerSize;
     UINT32                  TableIndex;
 
 
-    if (GetAllTables)
-    {
-        ACPI_MOVE_32_TO_32 (TableHeader.Signature, ACPI_SIG_RSDT);
-        AcpiOsTableOverride (&TableHeader, &NewTable);
-        if (!NewTable)
-        {
-            fprintf (stderr, "Could not obtain RSDT\n");
-            return (AE_NO_ACPI_TABLES);
-        }
-        else
-        {
-            AdWriteTable (NewTable, NewTable->Length,
-                ACPI_SIG_RSDT, NewTable->OemTableId);
-        }
-
-        if (ACPI_COMPARE_NAME (NewTable->Signature, ACPI_SIG_RSDT))
-        {
-            PointerSize = sizeof (UINT32);
-        }
-        else
-        {
-            PointerSize = sizeof (UINT64);
-        }
-
-        /*
-         * Determine the number of tables pointed to by the RSDT/XSDT.
-         * This is defined by the ACPI Specification to be the number of
-         * pointers contained within the RSDT/XSDT. The size of the pointers
-         * is architecture-dependent.
-         */
-        NumTables = (NewTable->Length - sizeof (ACPI_TABLE_HEADER)) / PointerSize;
-        AcpiOsPrintf ("There are %u tables defined in the %4.4s\n\n",
-            NumTables, NewTable->Signature);
-
-        /* Get the FADT */
-
-        ACPI_MOVE_32_TO_32 (TableHeader.Signature, ACPI_SIG_FADT);
-        AcpiOsTableOverride (&TableHeader, &NewTable);
-        if (NewTable)
-        {
-            AdWriteTable (NewTable, NewTable->Length,
-                ACPI_SIG_FADT, NewTable->OemTableId);
-        }
-        AcpiOsPrintf ("\n");
-
-        /* Don't bother with FACS, it is usually all zeros */
-    }
-
-    /* Always get the DSDT */
+    /* Get the DSDT via table override */
 
     ACPI_MOVE_32_TO_32 (TableHeader.Signature, ACPI_SIG_DSDT);
     AcpiOsTableOverride (&TableHeader, &NewTable);
-    if (NewTable)
-    {
-        AdWriteTable (NewTable, NewTable->Length,
-            ACPI_SIG_DSDT, NewTable->OemTableId);
-
-        /* Store DSDT in the Table Manager */
-
-        Status = AcpiTbStoreTable (0, NewTable, NewTable->Length,
-                    0, &TableIndex);
-        if (ACPI_FAILURE (Status))
-        {
-            fprintf (stderr, "Could not store DSDT\n");
-            return (AE_NO_ACPI_TABLES);
-        }
-    }
-    else
+    if (!NewTable)
     {
         fprintf (stderr, "Could not obtain DSDT\n");
         return (AE_NO_ACPI_TABLES);
     }
 
-#if 0
-    /* TBD: Future implementation */
+    AdWriteTable (NewTable, NewTable->Length,
+        ACPI_SIG_DSDT, NewTable->OemTableId);
 
-    AcpiOsPrintf ("\n");
+    /* Store DSDT in the Table Manager */
 
-    /* Get all SSDTs */
-
-    ACPI_MOVE_32_TO_32 (TableHeader.Signature, ACPI_SIG_SSDT);
-    do
+    Status = AcpiTbStoreTable (0, NewTable, NewTable->Length,
+                0, &TableIndex);
+    if (ACPI_FAILURE (Status))
     {
-        NewTable = NULL;
-        Status = AcpiOsTableOverride (&TableHeader, &NewTable);
-
-    } while (NewTable);
-#endif
+        fprintf (stderr, "Could not store DSDT\n");
+        return (AE_NO_ACPI_TABLES);
+    }
 
     return (AE_OK);
 }
@@ -1016,7 +930,8 @@ AdParseTable (
     if (LoadTable)
     {
         Status = AcpiTbStoreTable ((ACPI_PHYSICAL_ADDRESS) Table, Table,
-                    Table->Length, ACPI_TABLE_ORIGIN_ALLOCATED, &TableIndex);
+                    Table->Length, ACPI_TABLE_ORIGIN_INTERNAL_VIRTUAL,
+                    &TableIndex);
         if (ACPI_FAILURE (Status))
         {
             return (Status);
@@ -1051,9 +966,12 @@ AdParseTable (
         return (AE_OK);
     }
 
-    /* Pass 3: Parse control methods and link their parse trees into the main parse tree */
-
-    fprintf (stderr, "Parsing Deferred Opcodes (Methods/Buffers/Packages/Regions)\n");
+    /*
+     * Pass 3: Parse control methods and link their parse trees
+     * into the main parse tree
+     */
+    fprintf (stderr,
+        "Parsing Deferred Opcodes (Methods/Buffers/Packages/Regions)\n");
     Status = AcpiDmParseDeferredOps (AcpiGbl_ParseOpRoot);
     fprintf (stderr, "\n");
 

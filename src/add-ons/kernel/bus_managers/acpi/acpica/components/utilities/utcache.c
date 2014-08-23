@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -358,13 +358,13 @@ AcpiOsAcquireObject (
 
     if (!Cache)
     {
-        return (NULL);
+        return_PTR (NULL);
     }
 
     Status = AcpiUtAcquireMutex (ACPI_MTX_CACHES);
     if (ACPI_FAILURE (Status))
     {
-        return (NULL);
+        return_PTR (NULL);
     }
 
     ACPI_MEM_TRACKING (Cache->Requests++);
@@ -387,7 +387,7 @@ AcpiOsAcquireObject (
         Status = AcpiUtReleaseMutex (ACPI_MTX_CACHES);
         if (ACPI_FAILURE (Status))
         {
-            return (NULL);
+            return_PTR (NULL);
         }
 
         /* Clear (zero) the previously used Object */
@@ -412,16 +412,16 @@ AcpiOsAcquireObject (
         Status = AcpiUtReleaseMutex (ACPI_MTX_CACHES);
         if (ACPI_FAILURE (Status))
         {
-            return (NULL);
+            return_PTR (NULL);
         }
 
         Object = ACPI_ALLOCATE_ZEROED (Cache->ObjectSize);
         if (!Object)
         {
-            return (NULL);
+            return_PTR (NULL);
         }
     }
 
-    return (Object);
+    return_PTR (Object);
 }
 #endif /* ACPI_USE_LOCAL_CACHE */

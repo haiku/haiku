@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -301,7 +301,10 @@ AcpiPsBuildNamedOp (
     Status = WalkState->DescendingCallback (WalkState, Op);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_EXCEPTION ((AE_INFO, Status, "During name lookup/catalog"));
+        if (Status != AE_CTRL_TERMINATE)
+        {
+            ACPI_EXCEPTION ((AE_INFO, Status, "During name lookup/catalog"));
+        }
         return_ACPI_STATUS (Status);
     }
 
@@ -315,7 +318,7 @@ AcpiPsBuildNamedOp (
     {
         if (Status == AE_CTRL_PENDING)
         {
-            return_ACPI_STATUS (AE_CTRL_PARSE_PENDING);
+            Status = AE_CTRL_PARSE_PENDING;
         }
         return_ACPI_STATUS (Status);
     }

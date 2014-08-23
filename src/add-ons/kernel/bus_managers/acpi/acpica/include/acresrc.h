@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -270,7 +270,7 @@ AcpiRsCreateResourceList (
 
 ACPI_STATUS
 AcpiRsCreateAmlResources (
-    ACPI_RESOURCE           *LinkedListBuffer,
+    ACPI_BUFFER             *ResourceList,
     ACPI_BUFFER             *OutputBuffer);
 
 ACPI_STATUS
@@ -324,7 +324,8 @@ AcpiRsGetListLength (
 
 ACPI_STATUS
 AcpiRsGetAmlLength (
-    ACPI_RESOURCE           *LinkedListBuffer,
+    ACPI_RESOURCE           *ResourceList,
+    ACPI_SIZE               ResourceListSize,
     ACPI_SIZE               *SizeNeeded);
 
 ACPI_STATUS

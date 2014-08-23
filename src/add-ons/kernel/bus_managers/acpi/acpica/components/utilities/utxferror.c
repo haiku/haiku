@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -114,6 +114,7 @@
  *****************************************************************************/
 
 #define __UTXFERROR_C__
+#define EXPORT_ACPI_INTERFACES
 
 #include "acpi.h"
 #include "accommon.h"
@@ -126,6 +127,8 @@
  * This module is used for the in-kernel ACPICA as well as the ACPICA
  * tools/applications.
  */
+
+#ifndef ACPI_NO_ERROR_MESSAGES /* Entire module */
 
 /*******************************************************************************
  *
@@ -361,3 +364,5 @@ AcpiBiosWarning (
 }
 
 ACPI_EXPORT_SYMBOL (AcpiBiosWarning)
+
+#endif /* ACPI_NO_ERROR_MESSAGES */

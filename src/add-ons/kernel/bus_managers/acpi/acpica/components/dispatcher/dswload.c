@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -152,7 +152,20 @@ AcpiDsInitCallbacks (
 
     switch (PassNumber)
     {
+    case 0:
+
+        /* Parse only - caller will setup callbacks */
+
+        WalkState->ParseFlags         = ACPI_PARSE_LOAD_PASS1 |
+                                        ACPI_PARSE_DELETE_TREE |
+                                        ACPI_PARSE_DISASSEMBLE;
+        WalkState->DescendingCallback = NULL;
+        WalkState->AscendingCallback  = NULL;
+        break;
+
     case 1:
+
+        /* Load pass 1 */
 
         WalkState->ParseFlags         = ACPI_PARSE_LOAD_PASS1 |
                                         ACPI_PARSE_DELETE_TREE;
@@ -162,6 +175,8 @@ AcpiDsInitCallbacks (
 
     case 2:
 
+        /* Load pass 2 */
+
         WalkState->ParseFlags         = ACPI_PARSE_LOAD_PASS1 |
                                         ACPI_PARSE_DELETE_TREE;
         WalkState->DescendingCallback = AcpiDsLoad2BeginOp;
@@ -169,6 +184,8 @@ AcpiDsInitCallbacks (
         break;
 
     case 3:
+
+        /* Execution pass */
 
 #ifndef ACPI_NO_METHOD_EXECUTION
         WalkState->ParseFlags        |= ACPI_PARSE_EXECUTE  |
@@ -265,7 +282,7 @@ AcpiDsLoad1BeginOp (
              * Target of Scope() not found. Generate an External for it, and
              * insert the name into the namespace.
              */
-            AcpiDmAddToExternalList (Op, Path, ACPI_TYPE_DEVICE, 0);
+            AcpiDmAddOpToExternalList (Op, Path, ACPI_TYPE_DEVICE, 0, 0);
             Status = AcpiNsLookup (WalkState->ScopeInfo, Path, ObjectType,
                        ACPI_IMODE_LOAD_PASS1, ACPI_NS_SEARCH_PARENT,
                        WalkState, &Node);

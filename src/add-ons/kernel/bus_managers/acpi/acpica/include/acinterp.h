@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -161,6 +161,10 @@ typedef const struct acpi_exdump_info
 #define ACPI_EXD_PACKAGE                11
 #define ACPI_EXD_FIELD                  12
 #define ACPI_EXD_REFERENCE              13
+#define ACPI_EXD_LIST                   14 /* Operand object list */
+#define ACPI_EXD_HDLR_LIST              15 /* Address Handler list */
+#define ACPI_EXD_RGN_LIST               16 /* Region list */
+#define ACPI_EXD_NODE                   17 /* Namespace Node */
 
 /* restore default alignment */
 
@@ -682,14 +686,6 @@ AcpiExEnterInterpreter (
 
 void
 AcpiExExitInterpreter (
-    void);
-
-void
-AcpiExReacquireInterpreter (
-    void);
-
-void
-AcpiExRelinquishInterpreter (
     void);
 
 BOOLEAN

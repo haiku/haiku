@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -271,20 +271,28 @@ FlGenerateFilename (
 {
     char                    *Position;
     char                    *NewFilename;
+    char                    *DirectoryPosition;
 
 
     /*
-     * Copy the original filename to a new buffer. Leave room for the worst case
-     * where we append the suffix, an added dot and the null terminator.
+     * Copy the original filename to a new buffer. Leave room for the worst
+     * case where we append the suffix, an added dot and the null terminator.
      */
     NewFilename = ACPI_ALLOCATE_ZEROED ((ACPI_SIZE)
         strlen (InputFilename) + strlen (Suffix) + 2);
+    if (!NewFilename)
+    {
+        return (NULL);
+    }
+
     strcpy (NewFilename, InputFilename);
 
     /* Try to find the last dot in the filename */
 
+    DirectoryPosition = strrchr (NewFilename, '/');
     Position = strrchr (NewFilename, '.');
-    if (Position)
+
+    if (Position && (Position > DirectoryPosition))
     {
         /* Tack on the new suffix */
 
@@ -360,7 +368,6 @@ FlSplitInputPathname (
 
 
     *OutDirectoryPath = NULL;
-    *OutFilename = NULL;
 
     if (!InputPath)
     {
@@ -402,10 +409,18 @@ FlSplitInputPathname (
 
     if (!Filename)
     {
+        ACPI_FREE (DirectoryPath);
         return (AE_NO_MEMORY);
     }
 
     *OutDirectoryPath = DirectoryPath;
-    *OutFilename = Filename;
+
+    if (OutFilename)
+    {
+        *OutFilename = Filename;
+        return (AE_OK);
+    }
+
+    ACPI_FREE (Filename);
     return (AE_OK);
 }

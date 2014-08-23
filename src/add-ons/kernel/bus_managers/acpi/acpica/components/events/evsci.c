@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -208,7 +208,7 @@ AcpiEvSciXruptHandler (
 
 
     /*
-     * We are guaranteed by the ACPI CA initialization/shutdown code that
+     * We are guaranteed by the ACPICA initialization/shutdown code that
      * if this interrupt handler is installed, ACPI is enabled.
      */
 

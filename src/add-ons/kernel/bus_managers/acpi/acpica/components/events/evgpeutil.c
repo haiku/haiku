@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -289,8 +289,9 @@ AcpiEvGetGpeDevice (
  * FUNCTION:    AcpiEvGetGpeXruptBlock
  *
  * PARAMETERS:  InterruptNumber             - Interrupt for a GPE block
+ *              GpeXruptBlock               - Where the block is returned
  *
- * RETURN:      A GPE interrupt block
+ * RETURN:      Status
  *
  * DESCRIPTION: Get or Create a GPE interrupt block. There is one interrupt
  *              block per unique interrupt level used for GPEs. Should be
@@ -299,9 +300,10 @@ AcpiEvGetGpeDevice (
  *
  ******************************************************************************/
 
-ACPI_GPE_XRUPT_INFO *
+ACPI_STATUS
 AcpiEvGetGpeXruptBlock (
-    UINT32                  InterruptNumber)
+    UINT32                  InterruptNumber,
+    ACPI_GPE_XRUPT_INFO     **GpeXruptBlock)
 {
     ACPI_GPE_XRUPT_INFO     *NextGpeXrupt;
     ACPI_GPE_XRUPT_INFO     *GpeXrupt;
@@ -319,7 +321,8 @@ AcpiEvGetGpeXruptBlock (
     {
         if (NextGpeXrupt->InterruptNumber == InterruptNumber)
         {
-            return_PTR (NextGpeXrupt);
+            *GpeXruptBlock = NextGpeXrupt;
+            return_ACPI_STATUS (AE_OK);
         }
 
         NextGpeXrupt = NextGpeXrupt->Next;
@@ -330,7 +333,7 @@ AcpiEvGetGpeXruptBlock (
     GpeXrupt = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_GPE_XRUPT_INFO));
     if (!GpeXrupt)
     {
-        return_PTR (NULL);
+        return_ACPI_STATUS (AE_NO_MEMORY);
     }
 
     GpeXrupt->InterruptNumber = InterruptNumber;
@@ -353,6 +356,7 @@ AcpiEvGetGpeXruptBlock (
     {
         AcpiGbl_GpeXruptListHead = GpeXrupt;
     }
+
     AcpiOsReleaseLock (AcpiGbl_GpeLock, Flags);
 
     /* Install new interrupt handler if not SCI_INT */
@@ -363,14 +367,15 @@ AcpiEvGetGpeXruptBlock (
                     AcpiEvGpeXruptHandler, GpeXrupt);
         if (ACPI_FAILURE (Status))
         {
-            ACPI_ERROR ((AE_INFO,
+            ACPI_EXCEPTION ((AE_INFO, Status,
                 "Could not install GPE interrupt handler at level 0x%X",
                 InterruptNumber));
-            return_PTR (NULL);
+            return_ACPI_STATUS (Status);
         }
     }
 
-    return_PTR (GpeXrupt);
+    *GpeXruptBlock = GpeXrupt;
+    return_ACPI_STATUS (AE_OK);
 }
 
 

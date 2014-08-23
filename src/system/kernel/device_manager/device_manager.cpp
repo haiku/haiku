@@ -35,7 +35,7 @@
 #include "IOSchedulerRoster.h"
 
 
-//#define TRACE_DEVICE_MANAGER
+#define TRACE_DEVICE_MANAGER
 #ifdef TRACE_DEVICE_MANAGER
 #	define TRACE(a) dprintf a
 #else

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -245,12 +245,14 @@ AcpiDsInitFieldObjects (
 
 
 /*
- * dsload - Parser/Interpreter interface, pass 1 namespace load callbacks
+ * dsload - Parser/Interpreter interface
  */
 ACPI_STATUS
 AcpiDsInitCallbacks (
     ACPI_WALK_STATE         *WalkState,
     UINT32                  PassNumber);
+
+/* dsload - pass 1 namespace load callbacks */
 
 ACPI_STATUS
 AcpiDsLoad1BeginOp (
@@ -262,9 +264,8 @@ AcpiDsLoad1EndOp (
     ACPI_WALK_STATE         *WalkState);
 
 
-/*
- * dsload - Parser/Interpreter interface, pass 2 namespace load callbacks
- */
+/* dsload - pass 2 namespace load callbacks */
+
 ACPI_STATUS
 AcpiDsLoad2BeginOp (
     ACPI_WALK_STATE         *WalkState,
@@ -329,8 +330,9 @@ AcpiDsMethodDataInit (
  * dsmethod - Parser/Interpreter interface - control method parsing
  */
 ACPI_STATUS
-AcpiDsParseMethod (
-    ACPI_NAMESPACE_NODE     *Node);
+AcpiDsAutoSerializeMethod (
+    ACPI_NAMESPACE_NODE     *Node,
+    ACPI_OPERAND_OBJECT     *ObjDesc);
 
 ACPI_STATUS
 AcpiDsCallControlMethod (

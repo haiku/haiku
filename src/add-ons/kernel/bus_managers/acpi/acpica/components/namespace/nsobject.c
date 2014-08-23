@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -319,16 +319,31 @@ AcpiNsDetachObject (
         }
     }
 
-    /* Clear the entry in all cases */
+    /* Clear the Node entry in all cases */
 
     Node->Object = NULL;
     if (ACPI_GET_DESCRIPTOR_TYPE (ObjDesc) == ACPI_DESC_TYPE_OPERAND)
     {
+        /* Unlink object from front of possible object list */
+
         Node->Object = ObjDesc->Common.NextObject;
+
+        /* Handle possible 2-descriptor object */
+
         if (Node->Object &&
-           ((Node->Object)->Common.Type != ACPI_TYPE_LOCAL_DATA))
+           (Node->Object->Common.Type != ACPI_TYPE_LOCAL_DATA))
         {
             Node->Object = Node->Object->Common.NextObject;
+        }
+
+        /*
+         * Detach the object from any data objects (which are still held by
+         * the namespace node)
+         */
+        if (ObjDesc->Common.NextObject &&
+           ((ObjDesc->Common.NextObject)->Common.Type == ACPI_TYPE_LOCAL_DATA))
+        {
+           ObjDesc->Common.NextObject = NULL;
         }
     }
 

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -124,7 +124,7 @@
 /* Common info for tool signons */
 
 #define ACPICA_NAME                 "Intel ACPI Component Architecture"
-#define ACPICA_COPYRIGHT            "Copyright (c) 2000 - 2013 Intel Corporation"
+#define ACPICA_COPYRIGHT            "Copyright (c) 2000 - 2014 Intel Corporation"
 
 #if ACPI_MACHINE_WIDTH == 64
 #define ACPI_WIDTH          "-64"
@@ -156,10 +156,13 @@
 /* Macros for usage messages */
 
 #define ACPI_USAGE_HEADER(Usage) \
-    printf ("Usage: %s\nOptions:\n", Usage);
+    AcpiOsPrintf ("Usage: %s\nOptions:\n", Usage);
+
+#define ACPI_USAGE_TEXT(Description) \
+    AcpiOsPrintf (Description);
 
 #define ACPI_OPTION(Name, Description) \
-    printf ("  %-18s%s\n", Name, Description);
+    AcpiOsPrintf ("  %-18s%s\n", Name, Description);
 
 
 #define FILE_SUFFIX_DISASSEMBLY     "dsl"
@@ -186,6 +189,14 @@ extern int                  AcpiGbl_SubOptChar;
 extern char                 *AcpiGbl_Optarg;
 
 
+/*
+ * cmfsize - Common get file size function
+ */
+UINT32
+CmGetFileSize (
+    ACPI_FILE               File);
+
+
 #ifndef ACPI_DUMP_APP
 /*
  * adisasm
@@ -195,8 +206,7 @@ AdAmlDisassemble (
     BOOLEAN                 OutToFile,
     char                    *Filename,
     char                    *Prefix,
-    char                    **OutFilename,
-    BOOLEAN                 GetAllTables);
+    char                    **OutFilename);
 
 void
 AdPrintStatistics (
@@ -213,8 +223,7 @@ AdDumpTables (
 
 ACPI_STATUS
 AdGetLocalTables (
-    char                    *Filename,
-    BOOLEAN                 GetAllTables);
+    void);
 
 ACPI_STATUS
 AdParseTable (

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -124,6 +124,7 @@
 #define _COMPONENT          ACPI_DISPATCHER
         ACPI_MODULE_NAME    ("dsinit")
 
+
 /* Local prototypes */
 
 static ACPI_STATUS
@@ -163,8 +164,8 @@ AcpiDsInitOneObject (
 {
     ACPI_INIT_WALK_INFO     *Info = (ACPI_INIT_WALK_INFO *) Context;
     ACPI_NAMESPACE_NODE     *Node = (ACPI_NAMESPACE_NODE *) ObjHandle;
-    ACPI_OBJECT_TYPE        Type;
     ACPI_STATUS             Status;
+    ACPI_OPERAND_OBJECT     *ObjDesc;
 
 
     ACPI_FUNCTION_ENTRY ();
@@ -183,9 +184,7 @@ AcpiDsInitOneObject (
 
     /* And even then, we are only interested in a few object types */
 
-    Type = AcpiNsGetType (ObjHandle);
-
-    switch (Type)
+    switch (AcpiNsGetType (ObjHandle))
     {
     case ACPI_TYPE_REGION:
 
@@ -201,8 +200,45 @@ AcpiDsInitOneObject (
         break;
 
     case ACPI_TYPE_METHOD:
-
+        /*
+         * Auto-serialization support. We will examine each method that is
+         * NotSerialized to determine if it creates any Named objects. If
+         * it does, it will be marked serialized to prevent problems if
+         * the method is entered by two or more threads and an attempt is
+         * made to create the same named object twice -- which results in
+         * an AE_ALREADY_EXISTS exception and method abort.
+         */
         Info->MethodCount++;
+        ObjDesc = AcpiNsGetAttachedObject (Node);
+        if (!ObjDesc)
+        {
+            break;
+        }
+
+        /* Ignore if already serialized */
+
+        if (ObjDesc->Method.InfoFlags & ACPI_METHOD_SERIALIZED)
+        {
+            Info->SerialMethodCount++;
+            break;
+        }
+
+        if (AcpiGbl_AutoSerializeMethods)
+        {
+            /* Parse/scan method and serialize it if necessary */
+
+            AcpiDsAutoSerializeMethod (Node, ObjDesc);
+            if (ObjDesc->Method.InfoFlags & ACPI_METHOD_SERIALIZED)
+            {
+                /* Method was just converted to Serialized */
+
+                Info->SerialMethodCount++;
+                Info->SerializedMethodCount++;
+                break;
+            }
+        }
+
+        Info->NonSerialMethodCount++;
         break;
 
     case ACPI_TYPE_DEVICE:
@@ -259,7 +295,6 @@ AcpiDsInitializeObjects (
 
     ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
         "**** Starting initialization of namespace objects ****\n"));
-    ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT, "Parsing all Control Methods:"));
 
     /* Set all init info to zero */
 
@@ -295,12 +330,14 @@ AcpiDsInitializeObjects (
     }
 
     ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
-        "\nTable [%4.4s](id %4.4X) - %u Objects with %u Devices %u Methods %u Regions\n",
-        Table->Signature, OwnerId, Info.ObjectCount,
-        Info.DeviceCount, Info.MethodCount, Info.OpRegionCount));
+        "Table [%4.4s] (id %4.4X) - %4u Objects with %3u Devices, "
+        "%3u Regions, %3u Methods (%u/%u/%u Serial/Non/Cvt)\n",
+        Table->Signature, OwnerId, Info.ObjectCount, Info.DeviceCount,
+        Info.OpRegionCount, Info.MethodCount, Info.SerialMethodCount,
+        Info.NonSerialMethodCount, Info.SerializedMethodCount));
 
-    ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
-        "%u Methods, %u Regions\n", Info.MethodCount, Info.OpRegionCount));
+    ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "%u Methods, %u Regions\n",
+        Info.MethodCount, Info.OpRegionCount));
 
     return_ACPI_STATUS (AE_OK);
 }

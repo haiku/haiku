@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -180,7 +180,7 @@ AcpiTbFindTable (
         {
             /* Table is not currently mapped, map it */
 
-            Status = AcpiTbVerifyTable (&AcpiGbl_RootTableList.Tables[i]);
+            Status = AcpiTbValidateTable (&AcpiGbl_RootTableList.Tables[i]);
             if (ACPI_FAILURE (Status))
             {
                 return_ACPI_STATUS (Status);

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -132,7 +132,8 @@ struct mutex;
 
 #define ACPI_USE_NATIVE_DIVIDE
 
-// #define ACPI_THREAD_ID               thread_id
+/* #define ACPI_THREAD_ID               thread_id */
+
 #define ACPI_SEMAPHORE              sem_id
 #define ACPI_SPINLOCK               spinlock *
 #define ACPI_CPU_FLAGS              cpu_status

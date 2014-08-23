@@ -6,3 +6,5 @@ build/user_config_headers
 *~
 # Vim swp files
 .*.swp
+
+conf.sh

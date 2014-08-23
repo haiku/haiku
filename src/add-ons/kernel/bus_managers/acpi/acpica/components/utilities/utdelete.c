@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -158,6 +158,7 @@ AcpiUtDeleteInternalObj (
     ACPI_OPERAND_OBJECT     *HandlerDesc;
     ACPI_OPERAND_OBJECT     *SecondDesc;
     ACPI_OPERAND_OBJECT     *NextDesc;
+    ACPI_OPERAND_OBJECT     *StartDesc;
     ACPI_OPERAND_OBJECT     **LastObjPtr;
 
 
@@ -322,9 +323,10 @@ AcpiUtDeleteInternalObj (
             if (HandlerDesc)
             {
                 NextDesc = HandlerDesc->AddressSpace.RegionList;
+                StartDesc = NextDesc;
                 LastObjPtr = &HandlerDesc->AddressSpace.RegionList;
 
-                /* Remove the region object from the handler's list */
+                /* Remove the region object from the handler list */
 
                 while (NextDesc)
                 {
@@ -334,10 +336,20 @@ AcpiUtDeleteInternalObj (
                         break;
                     }
 
-                    /* Walk the linked list of handler */
+                    /* Walk the linked list of handlers */
 
                     LastObjPtr = &NextDesc->Region.Next;
                     NextDesc = NextDesc->Region.Next;
+
+                    /* Prevent infinite loop if list is corrupted */
+
+                    if (NextDesc == StartDesc)
+                    {
+                        ACPI_ERROR ((AE_INFO,
+                            "Circular region list in address handler object %p",
+                            HandlerDesc));
+                        return_VOID;
+                    }
                 }
 
                 if (HandlerDesc->AddressSpace.HandlerFlags &
