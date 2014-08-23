@@ -370,8 +370,12 @@ BEntry entry("/boot/home/fido");
 
 
 /*!
-	void BEntry::Unset()
-	\brief Reinitializes the BEntry to an uninitialized BEntry object
+	\fn void BEntry::Unset()
+	\brief Reset the BEntry to the uninitialized state
+
+	The BEntry forgets any information about the entry it was referencing.
+	Any attempt to get information from it after this will return B_NO_INIT.
+	The BEntry can later be pointed to another entry using SetTo().
 
 	\since BeOS R3
 */
