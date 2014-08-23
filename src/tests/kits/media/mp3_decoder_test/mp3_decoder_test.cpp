@@ -247,14 +247,6 @@ CreateMp3MediaFormat()
 		return sNoMp3MediaFormat;
 	}
 
-	// TODO: The following code block can be removed, once the ffmpeg addon can
-	// determine the codec output parameters from the encoded data.
-	mp3MediaFormat->u.encoded_audio.output.frame_rate = 48000;
-	mp3MediaFormat->u.encoded_audio.output.channel_count = 2;
-	mp3MediaFormat->u.encoded_audio.output.buffer_size = 1024;
-	mp3MediaFormat->u.encoded_audio.output.format
-		= media_raw_audio_format::B_AUDIO_SHORT;
-
 	return mp3MediaFormat;
 }
 

@@ -339,43 +339,23 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 {
 	TRACE("AVCodecDecoder::_NegotiateAudioOutputFormat()\n");
 
-	media_multi_audio_format outputAudioFormat;
-	outputAudioFormat = media_raw_audio_format::wildcard;
-	outputAudioFormat.byte_order = B_MEDIA_HOST_ENDIAN;
-	outputAudioFormat.frame_rate
-		= fInputFormat.u.encoded_audio.output.frame_rate;
-	outputAudioFormat.channel_count
-		= fInputFormat.u.encoded_audio.output.channel_count;
-	outputAudioFormat.format = fInputFormat.u.encoded_audio.output.format;
-	outputAudioFormat.buffer_size
-		= inOutFormat->u.raw_audio.buffer_size;
-	// Check that format is not still a wild card!
-	if (outputAudioFormat.format == 0) {
-		TRACE("  format still a wild-card, assuming B_AUDIO_SHORT.\n");
-		outputAudioFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
-	}
-	size_t sampleSize = outputAudioFormat.format
-		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
-	// Check that channel count is not still a wild card!
-	if (outputAudioFormat.channel_count == 0) {
-		TRACE("  channel_count still a wild-card, assuming stereo.\n");
-		outputAudioFormat.channel_count = 2;
-	}
-
-	if (outputAudioFormat.buffer_size == 0) {
-		outputAudioFormat.buffer_size = 512
-			* sampleSize * outputAudioFormat.channel_count;
-	}
-	inOutFormat->type = B_MEDIA_RAW_AUDIO;
-	inOutFormat->u.raw_audio = outputAudioFormat;
-
-	fContext->bit_rate = (int)fInputFormat.u.encoded_audio.bit_rate;
-	fContext->frame_size = (int)fInputFormat.u.encoded_audio.frame_size;
+	ConvertRawAudioFormatToAVSampleFormat(
+		fInputFormat.u.encoded_audio.output.format, fContext->sample_fmt);
+	fContext->bit_rate
+		= static_cast<int>(fInputFormat.u.encoded_audio.bit_rate);
+	fContext->frame_size
+		= static_cast<int>(fInputFormat.u.encoded_audio.frame_size);
 	fContext->sample_rate
-		= (int)fInputFormat.u.encoded_audio.output.frame_rate;
-	fContext->channels = outputAudioFormat.channel_count;
+		= static_cast<int>(fInputFormat.u.encoded_audio.output.frame_rate);
+	fContext->channels
+		= static_cast<int>(fInputFormat.u.encoded_audio.output.channel_count);
+	// Check that channel count is not still a wild card!
+	if (fContext->channels == 0) {
+		TRACE("  channel_count still a wild-card, assuming stereo.\n");
+		fContext->channels = 2;
+	}
 	fContext->block_align = fBlockAlign;
-	fContext->extradata = (uint8_t*)fExtraData;
+	fContext->extradata = reinterpret_cast<uint8_t*>(fExtraData);
 	fContext->extradata_size = fExtraDataSize;
 
 	// TODO: This probably needs to go away, there is some misconception
@@ -385,7 +365,8 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	// the infoBuffer passed to GetStreamInfo(). I think this may be why
 	// the code below was added.
 	if (fInputFormat.MetaDataSize() > 0) {
-		fContext->extradata = (uint8_t*)fInputFormat.MetaData();
+		fContext->extradata = static_cast<uint8_t*>(
+			const_cast<void*>(fInputFormat.MetaData()));
 		fContext->extradata_size = fInputFormat.MetaDataSize();
 	}
 
@@ -399,18 +380,12 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 		avcodec_close(fContext);
 	}
 
-	// open new
-	int result = avcodec_open2(fContext, fCodec, NULL);
-	fCodecInitDone = (result >= 0);
-
-	fOutputFrameSize = sampleSize * outputAudioFormat.channel_count;
-	fOutputFrameCount = outputAudioFormat.buffer_size / fOutputFrameSize;
-	fOutputFrameRate = outputAudioFormat.frame_rate;
-
-	TRACE("  bit_rate = %d, sample_rate = %d, channels = %d, init = %d, "
-		"output frame size: %d, count: %ld, rate: %.2f\n",
-		fContext->bit_rate, fContext->sample_rate, fContext->channels,
-		result, fOutputFrameSize, fOutputFrameCount, fOutputFrameRate);
+	if (avcodec_open2(fContext, fCodec, NULL) >= 0)
+		fCodecInitDone = true;
+	else {
+		TRACE("avcodec_open() failed to init codec!\n");
+		return B_ERROR;
+	}
 
 	fChunkBuffer = NULL;
 	fChunkBufferSize = 0;
@@ -418,20 +393,54 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fDecodedDataBufferOffset = 0;
 	fDecodedDataBufferSize = 0;
 
+	_ResetTempPacket();
+
+	status_t statusOfDecodingFirstFrameChunk = _DecodeNextAudioFrameChunk();
+	if (statusOfDecodingFirstFrameChunk != B_OK) {
+		TRACE("[a] decoding first audio frame chunk failed\n");
+		return B_ERROR;
+	}
+
+	media_multi_audio_format outputAudioFormat;
+	outputAudioFormat = media_raw_audio_format::wildcard;
+	outputAudioFormat.byte_order = B_MEDIA_HOST_ENDIAN;
+	outputAudioFormat.frame_rate = fContext->sample_rate;
+	outputAudioFormat.channel_count = fContext->channels;
+	ConvertAVSampleFormatToRawAudioFormat(fContext->sample_fmt,
+		outputAudioFormat.format);
+	// Check that format is not still a wild card!
+	if (outputAudioFormat.format == 0) {
+		TRACE("  format still a wild-card, assuming B_AUDIO_SHORT.\n");
+		outputAudioFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
+	}
+	outputAudioFormat.buffer_size = inOutFormat->u.raw_audio.buffer_size;
+	// Check that buffer_size has a sane value
+	size_t sampleSize = outputAudioFormat.format
+		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
+	if (outputAudioFormat.buffer_size == 0) {
+		outputAudioFormat.buffer_size = 512 * sampleSize
+			* outputAudioFormat.channel_count;
+	}
+
+	inOutFormat->type = B_MEDIA_RAW_AUDIO;
+	inOutFormat->u.raw_audio = outputAudioFormat;
+	inOutFormat->require_flags = 0;
+	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
+
+	// Initialize variables needed to manage decoding as much audio frames as
+	// needed to fill the buffer_size.
+	fOutputFrameSize = sampleSize * outputAudioFormat.channel_count;
+	fOutputFrameCount = outputAudioFormat.buffer_size / fOutputFrameSize;
+	fOutputFrameRate = outputAudioFormat.frame_rate;
 	fRawDecodedAudio->opaque
 		= av_realloc(fRawDecodedAudio->opaque, sizeof(avformat_codec_context));
 	if (fRawDecodedAudio->opaque == NULL)
 		return B_NO_MEMORY;
 
-	_ResetTempPacket();
-
-	inOutFormat->require_flags = 0;
-	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
-
-	if (!fCodecInitDone) {
-		TRACE("avcodec_open() failed!\n");
-		return B_ERROR;
-	}
+	TRACE("  bit_rate = %d, sample_rate = %d, channels = %d, init = %d, "
+		"output frame size: %d, count: %ld, rate: %.2f\n",
+		fContext->bit_rate, fContext->sample_rate, fContext->channels,
+		result, fOutputFrameSize, fOutputFrameCount, fOutputFrameRate);
 
 	return B_OK;
 }
@@ -449,9 +458,17 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		// This makes video formats play that encode the video properties in
 		// the video container (e.g. WMV) and not in the video frames
 		// themself (e.g. MPEG2).
-		// Note: Doing this step everytime is OK, because the first call to
-		// _DecodeNextVideoFrame() will update the essential video format
+		// Note: Doing this step unconditionally is OK, because the first call
+		// to _DecodeNextVideoFrame() will update the essential video format
 		// properties accordingly.
+
+	bool codecCanHandleIncompleteFrames
+		= (fCodec->capabilities & CODEC_CAP_TRUNCATED) != 0;
+	if (codecCanHandleIncompleteFrames) {
+		// Expect and handle video frames to be splitted across consecutive
+		// data chunks.
+		fContext->flags |= CODEC_FLAG_TRUNCATED;
+	}
 
 	// Make MediaPlayer happy (if not in rgb32 screen depth and no overlay,
 	// it will only ask for YCbCr, which DrawBitmap doesn't handle, so the
@@ -468,17 +485,6 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 #else
 	fFormatConversionFunc = 0;
 #endif
-
-	fContext->extradata = (uint8_t*)fExtraData;
-	fContext->extradata_size = fExtraDataSize;
-
-	bool codecCanHandleIncompleteFrames
-		= (fCodec->capabilities & CODEC_CAP_TRUNCATED) != 0;
-	if (codecCanHandleIncompleteFrames) {
-		// Expect and handle video frames to be splitted across consecutive
-		// data chunks.
-		fContext->flags |= CODEC_FLAG_TRUNCATED;
-	}
 
 	// close any previous instance
 	if (fCodecInitDone) {
@@ -518,9 +524,7 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	inOutFormat->type = B_MEDIA_RAW_VIDEO;
 	inOutFormat->require_flags = 0;
 	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
-
 	inOutFormat->u.raw_video = fInputFormat.u.encoded_video.output;
-
 	inOutFormat->u.raw_video.interlace = 1;
 		// Progressive (non-interlaced) video frames are delivered
 	inOutFormat->u.raw_video.first_active = fHeader.u.raw_video.first_active_line;
@@ -529,7 +533,6 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	inOutFormat->u.raw_video.pixel_height_aspect = fHeader.u.raw_video.pixel_height_aspect;
 	inOutFormat->u.raw_video.field_rate = fOutputFrameRate;
 		// Was calculated by first call to _DecodeNextVideoFrame()
-
 	inOutFormat->u.raw_video.display.format = fOutputColorSpace;
 	inOutFormat->u.raw_video.display.line_width = fHeader.u.raw_video.display_line_width;
 	inOutFormat->u.raw_video.display.line_count = fHeader.u.raw_video.display_line_count;
@@ -654,8 +657,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 		          _DecodeNextAudioFrame() will then result in the return of
 		          status code B_LAST_BUFFER_ERROR.
 		       ii TODO: A change in the size of the audio frames.
-		3. TODO: make the following statement hold true, too:
-		   fHeader is populated with the audio frame properties of the first
+		3. fHeader is populated with the audio frame properties of the first
 		   audio frame in fDecodedData. Especially the start_time field of
 		   fHeader relates to that first audio frame. Start times of
 		   consecutive audio frames in fDecodedData have to be calculated
@@ -686,6 +688,8 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 		size_t maximumSizeOfDecodedData = fOutputFrameCount * fOutputFrameSize;
 		fDecodedData
 			= static_cast<uint8_t*>(malloc(maximumSizeOfDecodedData));
+		if (fDecodedData == NULL)
+			return B_NO_MEMORY;
 	}
 
 	_ResetRawDecodedAudio();
@@ -1243,6 +1247,9 @@ AVCodecDecoder::_ApplyEssentialVideoContainerPropertiesToContext()
 		ConvertVideoFrameRateToAVCodecContext(containerProperties.field_rate,
 			*fContext);
 	}
+
+	fContext->extradata = (uint8_t*)fExtraData;
+	fContext->extradata_size = fExtraDataSize;
 }
 
 

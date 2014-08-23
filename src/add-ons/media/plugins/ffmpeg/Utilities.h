@@ -201,7 +201,7 @@ ConvertAVCodecContextToVideoFrameRate(AVCodecContext& contextIn, float& frameRat
 	\param frameRateIn Contains Media Kits notation of the video frame rate
 		that will be converted into FFmpegs notation. Must be greater than
 		zero.
-	\param contextOut	An AVCodecContext structure of FFmpeg.
+	\param contextOut An AVCodecContext structure of FFmpeg.
 		On output contains converted values in the following fields (other
 		fields stay as they were on input):
 			- AVCodecContext.time_base.num
@@ -216,6 +216,99 @@ ConvertVideoFrameRateToAVCodecContext(float frameRateIn,
 
 	contextOut.ticks_per_frame = 1;
 	contextOut.time_base = av_d2q(1.0 / frameRateIn, 1024);
+}
+
+
+/*!	\brief Converts the Media Kits notation of an audio sample format to
+		FFmpegs notation.
+
+	\see ConvertAVSampleFormatToRawAudioFormat() for converting in the other
+		direction.
+
+	\param rawAudioFormatIn Contains Media Kits notation of an audio sample
+		format that will be converted into FFmpegs notation.
+	\param sampleFormatOut On output contains FFmpegs notation of the passed
+		audio sample format. Might return AV_SAMPLE_FMT_NONE if there is no
+		conversion path.
+*/
+inline void
+ConvertRawAudioFormatToAVSampleFormat(uint32 rawAudioFormatIn,
+	AVSampleFormat& sampleFormatOut)
+{
+	switch(rawAudioFormatIn) {
+		case media_raw_audio_format::B_AUDIO_FLOAT:
+			sampleFormatOut = AV_SAMPLE_FMT_FLT;
+			return;
+
+		case media_raw_audio_format::B_AUDIO_DOUBLE:
+			sampleFormatOut = AV_SAMPLE_FMT_DBL;
+			return;
+
+		case media_raw_audio_format::B_AUDIO_INT:
+			sampleFormatOut = AV_SAMPLE_FMT_S32;
+			return;
+
+		case media_raw_audio_format::B_AUDIO_SHORT:
+			sampleFormatOut = AV_SAMPLE_FMT_S16;
+			return;
+
+		case media_raw_audio_format::B_AUDIO_UCHAR:
+			sampleFormatOut = AV_SAMPLE_FMT_U8;
+			return;
+
+		default:
+			// Silence compiler warnings about unhandled enumeration values.
+			break;
+	}
+
+	sampleFormatOut = AV_SAMPLE_FMT_NONE;
+}
+
+
+/*!	\brief Converts FFmpegs notation of an audio sample format to the Media
+		Kits notation.
+
+	\see ConvertAVSampleFormatToRawAudioFormat() for converting in the other
+		direction.
+
+	\param sampleFormatIn Contains FFmpegs notation of an audio sample format
+		that will be converted into the Media Kits notation.
+	\param rawAudioFormatOut On output contains Media Kits notation of the
+		passed audio sample format. Might return 0 if there is no conversion
+		path.
+*/
+inline void
+ConvertAVSampleFormatToRawAudioFormat(AVSampleFormat sampleFormatIn,
+	uint32& rawAudioFormatOut)
+{
+	switch(sampleFormatIn) {
+		case AV_SAMPLE_FMT_FLT:
+			rawAudioFormatOut = media_raw_audio_format::B_AUDIO_FLOAT;
+			return;
+
+		case AV_SAMPLE_FMT_DBL:
+			rawAudioFormatOut = media_raw_audio_format::B_AUDIO_DOUBLE;
+			return;
+
+		case AV_SAMPLE_FMT_S32:
+			rawAudioFormatOut = media_raw_audio_format::B_AUDIO_INT;
+			return;
+
+		case AV_SAMPLE_FMT_S16:
+			rawAudioFormatOut = media_raw_audio_format::B_AUDIO_SHORT;
+			return;
+
+		case AV_SAMPLE_FMT_U8:
+			rawAudioFormatOut = media_raw_audio_format::B_AUDIO_UCHAR;
+			return;
+
+		default:
+			// Silence compiler warnings about unhandled enumeration values.
+			break;
+	}
+
+	const uint32 kBAudioNone = 0;
+	rawAudioFormatOut = kBAudioNone;
 }
 
 #endif // UTILITIES_H

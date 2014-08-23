@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2014, Colin Günther <coling@gmx.de>
  * All rights reserved. Distributed under the terms of the GNU L-GPL license.
  */
 
@@ -47,22 +48,6 @@ extern "C" {
 
 
 static const int64 kNoPTSValue = AV_NOPTS_VALUE;
-
-
-static uint32
-avformat_to_beos_format(SampleFormat format)
-{
-	switch (format) {
-		case SAMPLE_FMT_U8: return media_raw_audio_format::B_AUDIO_UCHAR;
-		case SAMPLE_FMT_S16: return media_raw_audio_format::B_AUDIO_SHORT;
-		case SAMPLE_FMT_S32: return media_raw_audio_format::B_AUDIO_INT;
-		case SAMPLE_FMT_FLT: return media_raw_audio_format::B_AUDIO_FLOAT;
-		case SAMPLE_FMT_DBL: return media_raw_audio_format::B_AUDIO_DOUBLE;
-		default:
-			break;
-	}
-	return 0;
-}
 
 
 static uint32
@@ -1087,8 +1072,8 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 			format->u.raw_audio.channel_mask = codecContext->channel_layout;
 			format->u.raw_audio.byte_order
 				= avformat_to_beos_byte_order(codecContext->sample_fmt);
-			format->u.raw_audio.format
-				= avformat_to_beos_format(codecContext->sample_fmt);
+			ConvertAVSampleFormatToRawAudioFormat(codecContext->sample_fmt,
+				format->u.raw_audio.format);
 			format->u.raw_audio.buffer_size = 0;
 
 			// Read one packet and mark it for later re-use. (So our first
@@ -1115,8 +1100,8 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 				= codecContext->channel_layout;
 			format->u.encoded_audio.output.byte_order
 				= avformat_to_beos_byte_order(codecContext->sample_fmt);
-			format->u.encoded_audio.output.format
-				= avformat_to_beos_format(codecContext->sample_fmt);
+			ConvertAVSampleFormatToRawAudioFormat(codecContext->sample_fmt,
+				format->u.encoded_audio.output.format);
 			if (codecContext->block_align > 0) {
 				format->u.encoded_audio.output.buffer_size
 					= codecContext->block_align;
