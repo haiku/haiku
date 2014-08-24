@@ -67,21 +67,14 @@ private:
 			void		_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow();
 			void		_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes();
 			status_t	_DecodeNextAudioFrameChunk();
-			status_t	_LoadNextAudioChunkIfNeededAndAssignStartTime();
 			status_t	_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer();
 			void		_UpdateMediaHeaderForAudioFrame();
 
 			status_t	_DecodeNextVideoFrame();
 			void		_ApplyEssentialVideoContainerPropertiesToContext();
-			status_t	_LoadNextVideoChunkIfNeededAndAssignStartTime();
-							// TODO: Remove the "Video" word once
-							// the audio path is responsible for
-							// freeing the chunk buffer, too.
-			status_t	_CopyChunkToVideoChunkBufferAndAddPadding(
-							const void* chunk, size_t chunkSize);
-							// TODO: Remove the "Video" word once
-							// the audio path is responsible for
-							// freeing the chunk buffer, too.
+			status_t	_LoadNextChunkIfNeededAndAssignStartTime();
+			status_t	_CopyChunkToChunkBufferAndAddPadding(const void* chunk,
+							size_t chunkSize);
 			void		_HandleNewVideoFrameAndUpdateSystemState();
 			status_t	_FlushOneVideoFrameFromDecoderBuffer();
 			void		_UpdateMediaHeaderForVideoFrame();
@@ -121,12 +114,7 @@ private:
 			int					fOutputFrameSize;
 									// sample size * channel count
 
-			const void*			fChunkBuffer;
-			uint8_t*			fVideoChunkBuffer;
-									// TODO: Remove and use fChunkBuffer again
-									// (with type uint8_t*) once the audio path
-									// is responsible for freeing the chunk
-									// buffer, too.
+			uint8_t*			fChunkBuffer;
 			size_t				fChunkBufferSize;
 			bool				fAudioDecodeError;
 

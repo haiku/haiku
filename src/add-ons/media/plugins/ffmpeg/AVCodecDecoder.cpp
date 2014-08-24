@@ -39,7 +39,11 @@
 //#define LOG_STREAM_TO_FILE
 #ifdef LOG_STREAM_TO_FILE
 #	include <File.h>
-	static BFile sStreamLogFile("/boot/home/Desktop/AVCodecDebugStream.raw",
+	static BFile sAudioStreamLogFile(
+		"/boot/home/Desktop/AVCodecDebugAudioStream.raw",
+		B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
+	static BFile sVideoStreamLogFile(
+		"/boot/home/Desktop/AVCodecDebugVideoStream.raw",
 		B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
 	static int sDumpedPackets = 0;
 #endif
@@ -111,7 +115,6 @@ AVCodecDecoder::AVCodecDecoder()
 	fOutputFrameSize(0),
 
 	fChunkBuffer(NULL),
-	fVideoChunkBuffer(NULL),
 	fChunkBufferSize(0),
 	fAudioDecodeError(false),
 
@@ -145,9 +148,7 @@ AVCodecDecoder::~AVCodecDecoder()
 	if (fCodecInitDone)
 		avcodec_close(fContext);
 
-	free(fVideoChunkBuffer);
-		// TODO: Replace with fChunkBuffer, once audio path is
-		// responsible for freeing the chunk buffer, too.
+	free(fChunkBuffer);
 	free(fDecodedData);
 
 	av_free(fPostProcessedDecodedPicture);
@@ -270,10 +271,7 @@ AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 	}
 
 	// Flush internal buffers as well.
-	free(fVideoChunkBuffer);
-		// TODO: Replace with fChunkBuffer, once audio path is
-		// responsible for freeing the chunk buffer, too.
-	fVideoChunkBuffer = NULL;
+	free(fChunkBuffer);
 	fChunkBuffer = NULL;
 	fChunkBufferSize = 0;
 	fDecodedDataBufferOffset = 0;
@@ -360,6 +358,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 		return B_ERROR;
 	}
 
+	free(fChunkBuffer);
 	fChunkBuffer = NULL;
 	fChunkBufferSize = 0;
 	fAudioDecodeError = false;
@@ -471,6 +470,10 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 #else
 	fFormatConversionFunc = 0;
 #endif
+
+	free(fChunkBuffer);
+	fChunkBuffer = NULL;
+	fChunkBufferSize = 0;
 
 	_ResetTempPacket();
 
@@ -926,7 +929,7 @@ AVCodecDecoder::_DecodeNextAudioFrameChunk()
 
 	while(fDecodedDataBufferSize == 0) {
 		status_t loadingChunkStatus
-			= _LoadNextAudioChunkIfNeededAndAssignStartTime();
+			= _LoadNextChunkIfNeededAndAssignStartTime();
 		if (loadingChunkStatus != B_OK)
 			return loadingChunkStatus;
 
@@ -939,8 +942,7 @@ AVCodecDecoder::_DecodeNextAudioFrameChunk()
 
 			if (!fAudioDecodeError) {
 				// Report failure if not done already
-				int32 chunkBufferOffset = fTempPacket.data
-					- static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
+				int32 chunkBufferOffset = fTempPacket.data - fChunkBuffer;
 				printf("########### audio decode error, "
 					"fTempPacket.size %d, fChunkBuffer data offset %ld\n",
 					fTempPacket.size, chunkBufferOffset);
@@ -953,69 +955,6 @@ AVCodecDecoder::_DecodeNextAudioFrameChunk()
 
 		fAudioDecodeError = false;
 	}
-
-	return B_OK;
-}
-
-
-/*! \brief Loads the next audio chunk into fChunkBuffer and assigns it
-		(including the start time) to fTempPacket accordingly only if
-		fTempPacket is empty.
-
-	\returns B_OK
-		1. meaning: Next audio chunk is loaded.
-		2. meaning: No need to load and assign anything. Proceed as usual.
-	\returns B_LAST_BUFFER_ERROR No more audio chunks available.
-		fChunkBuffer and fTempPacket are left untouched.
-	\returns Other errors Caller should bail out because fChunkBuffer and
-		fTempPacket are in unknown states. Normal operation cannot be
-		guaranteed.
-*/
-status_t
-AVCodecDecoder::_LoadNextAudioChunkIfNeededAndAssignStartTime()
-{
-	// TODO: Collapse _LoadNextAudioChunkIfNeededAndAssignStartTime() and
-	// _LoadNextVideoChunkIfNeededAndAssignStartTime() into one method called
-	// _LoadNextChunkIfNeededAndAssignStartTime() once the following conditions
-	// are met:
-	//     1. There is no longer a distinction between fVideoChunkBuffer and
-	//        fChunkBuffer.
-	//     2. _LoadNextAudioChunkIfNeededAndAssignStartTime() adds Padding to
-	//        the chunk buffer, too, like it is done in
-	//        _LoadNextVideoChunkIfNeededAndAssignStartTime() at the moment.
-
-	if (fTempPacket.size > 0)
-		return B_OK;
-
-	const void* chunkBuffer = NULL;
-	size_t chunkBufferSize = 0;
-		// In the case that GetNextChunk() returns an error fChunkBufferSize
-		// should be left untouched.
-	media_header chunkMediaHeader;
-
-	status_t getNextChunkStatus = GetNextChunk(&chunkBuffer, &chunkBufferSize,
-		&chunkMediaHeader);
-	if (getNextChunkStatus != B_OK)
-		return getNextChunkStatus;
-
-	fChunkBuffer = chunkBuffer;
-	fChunkBufferSize = chunkBufferSize;
-
-	fTempPacket.data
-		= static_cast<uint8_t*>(const_cast<void*>(fChunkBuffer));
-	fTempPacket.size = fChunkBufferSize;
-	fTempPacket.dts = chunkMediaHeader.start_time;
-		// Let FFMPEG handle the correct relationship between start_time and
-		// decoded audio frames. By doing so we are merely following the way it
-		// is done for the video path.
-		// see _LoadNextVideoChunkIfNeededAndAssignStartTime()
-		//
-		// FIXME: Research how to establish a meaningful relationship
-		// between start_time and decoded audio frame when the received chunk
-		// buffer contains partial video frames. Maybe some data formats
-		// contain time stamps (ake pts / dts fields) that can be evaluated by
-		// FFMPEG. But as long as I don't have such audio data to test it, it
-		// makes no sense to implement it.
 
 	return B_OK;
 }
@@ -1185,11 +1124,9 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 
 	while (true) {
 		status_t loadingChunkStatus
-			= _LoadNextVideoChunkIfNeededAndAssignStartTime();
-
+			= _LoadNextChunkIfNeededAndAssignStartTime();
 		if (loadingChunkStatus == B_LAST_BUFFER_ERROR)
 			return _FlushOneVideoFrameFromDecoderBuffer();
-
 		if (loadingChunkStatus != B_OK) {
 			TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from "
 				"GetNextChunk(): %s\n", strerror(loadingChunkStatus));
@@ -1301,25 +1238,21 @@ AVCodecDecoder::_ApplyEssentialVideoContainerPropertiesToContext()
 }
 
 
-/*! \brief Loads the next video chunk into fVideoChunkBuffer and assigns it
-		(including the start time) to fTempPacket accordingly only if
-		fTempPacket is empty.
+/*! \brief Loads the next  chunk into fChunkBuffer and assigns it (including
+		the start time) to fTempPacket but only if fTempPacket is empty.
 
 	\returns B_OK
-		1. meaning: Next video chunk is loaded.
+		1. meaning: Next chunk is loaded.
 		2. meaning: No need to load and assign anything. Proceed as usual.
-	\returns B_LAST_BUFFER_ERROR No more video chunks available.
-		fVideoChunkBuffer and fTempPacket are left untouched.
-	\returns Other errors Caller should bail out because fVideoChunkBuffer and
+	\returns B_LAST_BUFFER_ERROR No more chunks available. fChunkBuffer	and
+		fTempPacket are left untouched.
+	\returns Other errors Caller should bail out because fChunkBuffer and
 		fTempPacket are in unknown states. Normal operation cannot be
 		guaranteed.
 */
 status_t
-AVCodecDecoder::_LoadNextVideoChunkIfNeededAndAssignStartTime()
+AVCodecDecoder::_LoadNextChunkIfNeededAndAssignStartTime()
 {
-	// TODO: Rename fVideoChunkBuffer to fChunkBuffer, once the audio path is
-	// responsible for releasing the chunk buffer, too.
-
 	if (fTempPacket.size > 0)
 		return B_OK;
 
@@ -1335,25 +1268,25 @@ AVCodecDecoder::_LoadNextVideoChunkIfNeededAndAssignStartTime()
 		return getNextChunkStatus;
 
 	status_t chunkBufferPaddingStatus
-		= _CopyChunkToVideoChunkBufferAndAddPadding(chunkBuffer,
-		chunkBufferSize);
+		= _CopyChunkToChunkBufferAndAddPadding(chunkBuffer, chunkBufferSize);
 	if (chunkBufferPaddingStatus != B_OK)
 		return chunkBufferPaddingStatus;
 
-	fTempPacket.data = fVideoChunkBuffer;
+	fTempPacket.data = fChunkBuffer;
 	fTempPacket.size = fChunkBufferSize;
 	fTempPacket.dts = chunkMediaHeader.start_time;
 		// Let FFMPEG handle the correct relationship between start_time and
-		// decoded video frame. By doing so we are simply copying the way how
-		// it is implemented in ffplay.c
+		// decoded a/v frame. By doing so we are simply copying the way how it
+		// is implemented in ffplay.c for video frames (for audio frames it
+		// works, too, but isn't used by ffplay.c).
 		// \see http://git.videolan.org/?p=ffmpeg.git;a=blob;f=ffplay.c;h=09623db374e5289ed20b7cc28c262c4375a8b2e4;hb=9153b33a742c4e2a85ff6230aea0e75f5a8b26c2#l1502
 		//
-		// FIXME: Research how to establish a meaningful relationship
-		// between start_time and decoded video frame when the received chunk
-		// buffer contains partial video frames. Maybe some data formats
-		// contain time stamps (ake pts / dts fields) that can be evaluated by
-		// FFMPEG. But as long as I don't have such video data to test it, it
-		// makes no sense to implement it.
+		// FIXME: Research how to establish a meaningful relationship between
+		// start_time and decoded a/v frame when the received chunk buffer
+		// contains partial a/v frames. Maybe some data formats do contain time
+		// stamps (ake pts / dts fields) that can be evaluated by FFMPEG. But
+		// as long as I don't have such video data to test it, it makes no
+		// sense trying to implement it.
 		//
 		// FIXME: Implement tracking start_time of video frames originating in
 		// data chunks that encode more than one video frame at a time. In that
@@ -1363,19 +1296,20 @@ AVCodecDecoder::_LoadNextVideoChunkIfNeededAndAssignStartTime()
 		// to implement it.
 
 #ifdef LOG_STREAM_TO_FILE
+	BFile* logFile = fIsAudio ? &sAudioStreamLogFile : &sVideoStreamLogFile;
 	if (sDumpedPackets < 100) {
-		sStreamLogFile.Write(chunkBuffer, fChunkBufferSize);
+		logFile->Write(chunkBuffer, fChunkBufferSize);
 		printf("wrote %ld bytes\n", fChunkBufferSize);
 		sDumpedPackets++;
 	} else if (sDumpedPackets == 100)
-		sStreamLogFile.Unset();
+		logFile->Unset();
 #endif
 
 	return B_OK;
 }
 
 
-/*! \brief Copies a chunk into fVideoChunkBuffer and adds a "safety net" of
+/*! \brief Copies a chunk into fChunkBuffer and adds a "safety net" of
 		additional memory as required by FFMPEG for input buffers to video
 		decoders.
 
@@ -1385,11 +1319,11 @@ AVCodecDecoder::_LoadNextVideoChunkIfNeededAndAssignStartTime()
 	The additional memory has a size of FF_INPUT_BUFFER_PADDING_SIZE as defined
 	in avcodec.h.
 
-	Ownership of fVideoChunkBuffer memory is with the class so it needs to be
-	freed at the right times (on destruction, on seeking).
+	Ownership of fChunkBuffer memory is with the class so it needs to be freed
+	at the right times (on destruction, on seeking).
 
-	Also update fChunkBufferSize to reflect the size of the contained video
-	data (leaving out the padding).
+	Also update fChunkBufferSize to reflect the size of the contained data
+	(leaving out the padding).
 
 	\param chunk The chunk to copy.
 	\param chunkSize Size of the chunk in bytes
@@ -1397,25 +1331,22 @@ AVCodecDecoder::_LoadNextVideoChunkIfNeededAndAssignStartTime()
 	\returns B_OK Padding was successful. You are responsible for releasing the
 		allocated memory. fChunkBufferSize is set to chunkSize.
 	\returns B_NO_MEMORY Padding failed.
-		fVideoChunkBuffer is set to NULL making it safe to call free() on it.
-		fChunkBufferSize is set to 0 to reflect the size of fVideoChunkBuffer.
+		fChunkBuffer is set to NULL making it safe to call free() on it.
+		fChunkBufferSize is set to 0 to reflect the size of fChunkBuffer.
 */
 status_t
-AVCodecDecoder::_CopyChunkToVideoChunkBufferAndAddPadding(const void* chunk,
+AVCodecDecoder::_CopyChunkToChunkBufferAndAddPadding(const void* chunk,
 	size_t chunkSize)
 {
-	// TODO: Rename fVideoChunkBuffer to fChunkBuffer, once the audio path is
-	// responsible for releasing the chunk buffer, too.
-
-	fVideoChunkBuffer = static_cast<uint8_t*>(realloc(fVideoChunkBuffer,
+	fChunkBuffer = static_cast<uint8_t*>(realloc(fChunkBuffer,
 		chunkSize + FF_INPUT_BUFFER_PADDING_SIZE));
-	if (fVideoChunkBuffer == NULL) {
+	if (fChunkBuffer == NULL) {
 		fChunkBufferSize = 0;
 		return B_NO_MEMORY;
 	}
 
-	memcpy(fVideoChunkBuffer, chunk, chunkSize);
-	memset(fVideoChunkBuffer + chunkSize, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+	memcpy(fChunkBuffer, chunk, chunkSize);
+	memset(fChunkBuffer + chunkSize, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 		// Establish safety net, by zero'ing the padding area.
 
 	fChunkBufferSize = chunkSize;
