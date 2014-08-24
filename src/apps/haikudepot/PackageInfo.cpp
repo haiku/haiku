@@ -374,6 +374,62 @@ UserRating::operator!=(const UserRating& other) const
 }
 
 
+// #pragma mark - RatingSummary
+
+
+RatingSummary::RatingSummary()
+	:
+	averageRating(0.0f),
+	ratingCount(0)
+{
+	for (int i = 0; i < 5; i++)
+		ratingCountByStar[i] = 0;
+}
+
+
+RatingSummary::RatingSummary(const RatingSummary& other)
+{
+	*this = other;
+}
+
+
+RatingSummary&
+RatingSummary::operator=(const RatingSummary& other)
+{
+	averageRating = other.averageRating;
+	ratingCount = other.ratingCount;
+
+	for (int i = 0; i < 5; i++)
+		ratingCountByStar[i] = other.ratingCountByStar[i];
+
+	return *this;
+}
+
+
+bool
+RatingSummary::operator==(const RatingSummary& other) const
+{
+	if (averageRating != other.averageRating
+		|| ratingCount != other.ratingCount) {
+		return false;
+	}
+
+	for (int i = 0; i < 5; i++) {
+		if (ratingCountByStar[i] != other.ratingCountByStar[i])
+			return false;
+	}
+	
+	return true;
+}
+
+
+bool
+RatingSummary::operator!=(const RatingSummary& other) const
+{
+	return !(*this == other);
+}
+
+
 // #pragma mark - PublisherInfo
 
 
@@ -508,6 +564,7 @@ PackageInfo::PackageInfo()
 	fFullDescription(),
 	fChangelog(),
 	fUserRatings(),
+	fCachedRatingSummary(),
 	fScreenshots(),
 	fState(NONE),
 	fDownloadProgress(0.0),
@@ -531,6 +588,7 @@ PackageInfo::PackageInfo(const BString& title,
 	fChangelog(),
 	fCategories(),
 	fUserRatings(),
+	fCachedRatingSummary(),
 	fScreenshots(),
 	fState(NONE),
 	fDownloadProgress(0.0),
@@ -551,6 +609,7 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fChangelog(other.fChangelog),
 	fCategories(other.fCategories),
 	fUserRatings(other.fUserRatings),
+	fCachedRatingSummary(other.fCachedRatingSummary),
 	fScreenshots(other.fScreenshots),
 	fState(other.fState),
 	fInstallationLocations(other.fInstallationLocations),
@@ -573,6 +632,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fChangelog = other.fChangelog;
 	fCategories = other.fCategories;
 	fUserRatings = other.fUserRatings;
+	fCachedRatingSummary = other.fCachedRatingSummary;
 	fScreenshots = other.fScreenshots;
 	fState = other.fState;
 	fInstallationLocations = other.fInstallationLocations;
@@ -595,6 +655,7 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fChangelog == other.fChangelog
 		&& fCategories == other.fCategories
 		&& fUserRatings == other.fUserRatings
+		&& fCachedRatingSummary == other.fCachedRatingSummary
 		&& fScreenshots == other.fScreenshots
 		&& fState == other.fState
 		&& fFlags == other.fFlags
@@ -697,9 +758,24 @@ PackageInfo::AddUserRating(const UserRating& rating)
 }
 
 
+void
+PackageInfo::SetRatingSummary(const RatingSummary& summary)
+{
+	if (fCachedRatingSummary == summary)
+		return;
+
+	fCachedRatingSummary = summary;
+
+	_NotifyListeners(PKG_CHANGED_RATINGS);
+}
+
+
 RatingSummary
 PackageInfo::CalculateRatingSummary() const
 {
+	if (fUserRatings.CountItems() == 0)
+		return fCachedRatingSummary;
+	
 	RatingSummary summary;
 	summary.ratingCount = fUserRatings.CountItems();
 	summary.averageRating = 0.0f;

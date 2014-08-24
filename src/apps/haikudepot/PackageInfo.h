@@ -128,6 +128,14 @@ typedef List<UserRating, false> UserRatingList;
 
 class RatingSummary {
 public:
+								RatingSummary();
+								RatingSummary(const RatingSummary& other);
+
+			RatingSummary&		operator=(const RatingSummary& other);
+			bool				operator==(const RatingSummary& other) const;
+			bool				operator!=(const RatingSummary& other) const;
+
+public:
 			float				averageRating;
 			int					ratingCount;
 
@@ -269,6 +277,7 @@ public:
 			bool				AddUserRating(const UserRating& rating);
 			const UserRatingList& UserRatings() const
 									{ return fUserRatings; }
+			void				SetRatingSummary(const RatingSummary& summary);
 			RatingSummary		CalculateRatingSummary() const;
 
 			bool				AddScreenshot(const BitmapRef& screenshot);
@@ -293,6 +302,7 @@ private:
 			BString				fChangelog;
 			CategoryList		fCategories;
 			UserRatingList		fUserRatings;
+			RatingSummary		fCachedRatingSummary;
 			BitmapList			fScreenshots;
 			PackageState		fState;
 			PackageInstallationLocationSet
