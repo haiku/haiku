@@ -1,8 +1,9 @@
 /*
- * Copyright 2005-2013, Haiku, Inc.
+ * Copyright 2005-2014, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
+ *		Rene Gollent
  *		Nathan Whitehorn
  */
 #ifndef _POWER_BUTTON_MONITOR_H
@@ -17,11 +18,12 @@ public:
 								PowerButtonMonitor();
 	virtual	 					~PowerButtonMonitor();
 
-	virtual void				HandleEvent();
+	virtual void				HandleEvent(int fd);
 
-	virtual int					FD() const { return fFD; }
+	virtual const std::set<int>&
+								FDs() const { return fFDs; }
 private:
-			int					fFD;
+			std::set<int>		fFDs;
 };
 
 

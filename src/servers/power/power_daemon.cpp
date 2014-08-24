@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Copyright 2005, Nathan Whitehorn.
  *
  * Distributed under the terms of the MIT License.
@@ -10,6 +11,8 @@
 #include "power_button_monitor.h"
 
 #include <Application.h>
+
+#include <map>
 
 
 class PowerManagementDaemon : public BApplication {
@@ -45,13 +48,13 @@ PowerManagementDaemon::PowerManagementDaemon()
 	fQuitRequested(false)
 {
 	PowerMonitor* powerButtonMonitor = new PowerButtonMonitor;
-	if (powerButtonMonitor->FD() > 0)
+	if (powerButtonMonitor->FDs().size() > 0)
 		fPowerMonitors[fMonitorCount++] = powerButtonMonitor;
 	else
 		delete powerButtonMonitor;
 
 	PowerMonitor* lidMonitor = new LidMonitor;
-	if (lidMonitor->FD() > 0)
+	if (lidMonitor->FDs().size() > 0)
 		fPowerMonitors[fMonitorCount++] = lidMonitor;
 	else
 		delete lidMonitor;
@@ -92,19 +95,32 @@ PowerManagementDaemon::_EventLoop()
 {
 	if (fMonitorCount == 0)
 		return;
-	object_wait_info info[fMonitorCount];
+
+	std::map<int, PowerMonitor*> descriptorMap;
+
+	size_t fdCount = 0;
+	for (uint32 i = 0; i < fMonitorCount; i++)
+		fdCount += fPowerMonitors[i]->FDs().size();
+
+	object_wait_info info[fdCount];
+	uint32 index = 0;
 	for (uint32 i = 0; i < fMonitorCount; i++) {
-		info[i].object = fPowerMonitors[i]->FD();
-		info[i].type = B_OBJECT_TYPE_FD;
-		info[i].events = B_EVENT_READ;
+		const std::set<int>& fds = fPowerMonitors[i]->FDs();
+		for (std::set<int>::iterator it = fds.begin(); it != fds.end(); ++it) {
+			info[index].object = *it;
+			info[index].type = B_OBJECT_TYPE_FD;
+			info[index].events = B_EVENT_READ;
+			descriptorMap[*it] = fPowerMonitors[i];
+			++index;
+		}
 	}
 	while (!fQuitRequested) {
-		if (wait_for_objects(info, fMonitorCount) < B_OK)
+		if (wait_for_objects(info, fdCount) < B_OK)
 			continue;
 		// handle events and reset events
-		for (uint32 i = 0; i < fMonitorCount; i++) {
+		for (uint32 i = 0; i < fdCount; i++) {
 			if (info[i].events & B_EVENT_READ)
-				fPowerMonitors[i]->HandleEvent();
+				descriptorMap[info[i].object]->HandleEvent(info[i].object);
 			else
 				info[i].events = B_EVENT_READ;
 		}

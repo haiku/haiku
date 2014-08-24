@@ -10,4 +10,4 @@ Server power_daemon :
 	power_button_monitor.cpp
 	;
 
-LinkAgainst power_daemon : be [ TargetLibsupc++ ] ;
+LinkAgainst power_daemon : be [ TargetLibstdc++ TargetLibsupc++ ] ;

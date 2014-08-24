@@ -17,11 +17,12 @@ public:
 								LidMonitor();
 	virtual	 					~LidMonitor();
 
-	virtual	void				HandleEvent();
+	virtual	void				HandleEvent(int fd);
 
-	virtual	int					FD() const { return fFD; }
+	virtual	const std::set<int>&
+								FDs() const { return fFDs; }
 private:
-			int					fFD;
+			std::set<int>		fFDs;
 };
 
 
