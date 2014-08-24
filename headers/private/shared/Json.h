@@ -30,4 +30,6 @@ private:
 
 } // namespace BPrivate
 
+using BPrivate::BJson;
+
 #endif	// JSON_H
