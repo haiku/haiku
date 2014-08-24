@@ -609,7 +609,7 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 		if (package.Get() == NULL)
 			continue;
 	
-//		_PopulatePackageInfo(package, fromCacheOnly);
+		_PopulatePackageInfo(package, fromCacheOnly);
 		_PopulatePackageIcon(package, fromCacheOnly);
 		// TODO: Average user rating. It needs to be shown in the
 		// list view, so without the user clicking the package.
@@ -629,8 +629,42 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
 
 	status_t status = interface.RetrievePackageInfo(package->Title(), info);
 	if (status == B_OK) {
-		// TODO: Parse message...
+		// Parse message
 		info.PrintToStream();
+		BMessage result;
+		if (info.FindMessage("result", &result) == B_OK) {
+			BMessage categories;
+			if (result.FindMessage("pkgCategoryCodes", &categories) == B_OK) {
+				int32 index = 0;
+				while (true) {
+					BString name;
+					name << index++;
+					BString category;
+					if (categories.FindString(name, &category) != B_OK)
+						break;
+
+					if (category == "AUDIO")
+						package->AddCategory(CategoryAudio());
+					else if (category == "VIDEO")
+						package->AddCategory(CategoryVideo());
+					else if (category == "DEVELOPMENT")
+						package->AddCategory(CategoryDevelopment());
+					// TODO: ...
+				}
+			}
+			double derivedRating;
+			double derivedRatingSampleSize;
+			if (result.FindDouble("derivedRating", &derivedRating) == B_OK
+				&& result.FindDouble("derivedRatingSampleSize",
+					&derivedRatingSampleSize) == B_OK) {
+				if (derivedRatingSampleSize > 0) {
+					RatingSummary summary;
+					summary.averageRating = derivedRating;
+					summary.ratingCount = (int)derivedRatingSampleSize;
+					package->SetRatingSummary(summary);
+				}
+			}
+		}
 	}
 }
 
