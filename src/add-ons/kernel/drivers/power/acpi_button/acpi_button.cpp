@@ -106,6 +106,7 @@ acpi_button_init_device(void *_cookie, void **cookie)
 	sDeviceManager->put_node(parent);
 
 	device->fixed = strcmp(hid, "PNP0C0C") != 0 && strcmp(hid, "PNP0C0E") != 0;
+	TRACE("Device found, hid: %s, fixed: %d\n", hid, device->fixed);
 	if (strcmp(hid, "PNP0C0C") == 0 || strcmp(hid, "ACPI_FPB") == 0)
 		device->type = ACPI_EVENT_POWER_BUTTON;
 	else if (strcmp(hid, "PNP0C0E") == 0 || strcmp(hid, "ACPI_FSB") == 0)
@@ -117,11 +118,15 @@ acpi_button_init_device(void *_cookie, void **cookie)
 
 	if (device->fixed) {
 		sAcpi->reset_fixed_event(device->type);
+		TRACE("Installing fixed handler for type %" B_PRIu32 "\n",
+			device->type);
 		if (sAcpi->install_fixed_event_handler(device->type,
 			acpi_button_fixed_handler, device) != B_OK) {
-			ERROR("can't install notify handler\n");
+			ERROR("can't install fixed handler\n");
 		}
 	} else {
+		TRACE("Installing notify handler for type %" B_PRIu32 "\n",
+			device->type);
 		if (device->acpi->install_notify_handler(device->acpi_cookie,
 			ACPI_DEVICE_NOTIFY, acpi_button_notify_handler, device) != B_OK) {
 			ERROR("can't install notify handler\n");
@@ -154,7 +159,8 @@ acpi_button_open(void *_cookie, const char *path, int flags, void** cookie)
 {
 	acpi_button_device_info *device = (acpi_button_device_info *)_cookie;
 
-	sAcpi->enable_fixed_event(device->type);
+	if (device->fixed)
+		sAcpi->enable_fixed_event(device->type);
 
 	*cookie = device;
 	return B_OK;
@@ -271,7 +277,7 @@ acpi_button_support(device_node *parent)
 		return 0.0;
 	}
 
-	TRACE("acpi_button_support button device found\n");
+	TRACE("acpi_button_support button device found: %s\n", hid);
 
 	return 0.6;
 }
@@ -319,12 +325,18 @@ acpi_button_register_child_devices(void *_cookie)
 	sDeviceManager->put_node(parent);
 
 	status_t status = B_ERROR;
-	if (strcmp(hid, "PNP0C0C") == 0 || strcmp(hid, "ACPI_FPB") == 0) {
+	if (strcmp(hid, "PNP0C0C") == 0) {
 		status = sDeviceManager->publish_device(node,
 			"power/button/power", ACPI_BUTTON_DEVICE_MODULE_NAME);
-	} else if (strcmp(hid, "PNP0C0E") == 0 || strcmp(hid, "ACPI_FSB") == 0) {
+	} else if (strcmp(hid, "ACPI_FPB") == 0) {
+		status = sDeviceManager->publish_device(node,
+			"power/button/power_fixed", ACPI_BUTTON_DEVICE_MODULE_NAME);
+	} else if (strcmp(hid, "PNP0C0E") == 0) {
 		status = sDeviceManager->publish_device(node, "power/button/sleep",
 			ACPI_BUTTON_DEVICE_MODULE_NAME);
+	} else if ( strcmp(hid, "ACPI_FSB") == 0) {
+		status = sDeviceManager->publish_device(node,
+			"power/button/sleep_fixed", ACPI_BUTTON_DEVICE_MODULE_NAME);
 	}
 
 	return status;
