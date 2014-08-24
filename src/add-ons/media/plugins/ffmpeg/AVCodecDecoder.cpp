@@ -339,40 +339,13 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 {
 	TRACE("AVCodecDecoder::_NegotiateAudioOutputFormat()\n");
 
-	ConvertRawAudioFormatToAVSampleFormat(
-		fInputFormat.u.encoded_audio.output.format, fContext->sample_fmt);
-	fContext->bit_rate
-		= static_cast<int>(fInputFormat.u.encoded_audio.bit_rate);
-	fContext->frame_size
-		= static_cast<int>(fInputFormat.u.encoded_audio.frame_size);
-	fContext->sample_rate
-		= static_cast<int>(fInputFormat.u.encoded_audio.output.frame_rate);
-	fContext->channels
-		= static_cast<int>(fInputFormat.u.encoded_audio.output.channel_count);
-	// Check that channel count is not still a wild card!
-	if (fContext->channels == 0) {
-		TRACE("  channel_count still a wild-card, assuming stereo.\n");
-		fContext->channels = 2;
-	}
-	fContext->block_align = fBlockAlign;
-	fContext->extradata = reinterpret_cast<uint8_t*>(fExtraData);
-	fContext->extradata_size = fExtraDataSize;
-
-	// TODO: This probably needs to go away, there is some misconception
-	// about extra data / info buffer and meta data. See
-	// Reader::GetStreamInfo(). The AVFormatReader puts extradata and
-	// extradata_size into media_format::MetaData(), but used to ignore
-	// the infoBuffer passed to GetStreamInfo(). I think this may be why
-	// the code below was added.
-	if (fInputFormat.MetaDataSize() > 0) {
-		fContext->extradata = static_cast<uint8_t*>(
-			const_cast<void*>(fInputFormat.MetaData()));
-		fContext->extradata_size = fInputFormat.MetaDataSize();
-	}
-
-	TRACE("  bit_rate %d, sample_rate %d, channels %d, block_align %d, "
-		"extradata_size %d\n", fContext->bit_rate, fContext->sample_rate,
-		fContext->channels, fContext->block_align, fContext->extradata_size);
+	_ApplyEssentialAudioContainerPropertiesToContext();
+		// This makes audio formats play that encode the audio properties in
+		// the audio container (e.g. WMA) and not in the audio frames
+		// themself (e.g. MP3).
+		// Note: Doing this step unconditionally is OK, because the first call
+		// to _DecodeNextAudioFrameChunk() will update the essential audio
+		// format properties accordingly regardless of the settings here.
 
 	// close any previous instance
 	if (fCodecInitDone) {
@@ -460,7 +433,7 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		// themself (e.g. MPEG2).
 		// Note: Doing this step unconditionally is OK, because the first call
 		// to _DecodeNextVideoFrame() will update the essential video format
-		// properties accordingly.
+		// properties accordingly regardless of the settings here.
 
 	bool codecCanHandleIncompleteFrames
 		= (fCodec->capabilities & CODEC_CAP_TRUNCATED) != 0;
@@ -468,6 +441,19 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		// Expect and handle video frames to be splitted across consecutive
 		// data chunks.
 		fContext->flags |= CODEC_FLAG_TRUNCATED;
+	}
+
+	// close any previous instance
+	if (fCodecInitDone) {
+		fCodecInitDone = false;
+		avcodec_close(fContext);
+	}
+
+	if (avcodec_open2(fContext, fCodec, NULL) >= 0)
+		fCodecInitDone = true;
+	else {
+		TRACE("avcodec_open() failed to init codec!\n");
+		return B_ERROR;
 	}
 
 	// Make MediaPlayer happy (if not in rgb32 screen depth and no overlay,
@@ -485,19 +471,6 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 #else
 	fFormatConversionFunc = 0;
 #endif
-
-	// close any previous instance
-	if (fCodecInitDone) {
-		fCodecInitDone = false;
-		avcodec_close(fContext);
-	}
-
-	if (avcodec_open2(fContext, fCodec, NULL) >= 0)
-		fCodecInitDone = true;
-	else {
-		TRACE("avcodec_open() failed to init codec!\n");
-		return B_ERROR;
-	}
 
 	_ResetTempPacket();
 
@@ -721,6 +694,77 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 		fRawDecodedAudio->nb_samples, fFrame);
 
 	return B_OK;
+}
+
+
+/*!	\brief Applies all essential audio input properties to fContext that were
+		passed to AVCodecDecoder when Setup() was called.
+
+	Note: This function must be called before the AVCodec is opened via
+	avcodec_open2(). Otherwise the behaviour of FFMPEG's audio decoding
+	function avcodec_decode_audio4() is undefined.
+
+	Essential properties applied from fInputFormat.u.encoded_audio:
+		- bit_rate copied to fContext->bit_rate
+		- frame_size copied to fContext->frame_size
+		- output.format converted to fContext->sample_fmt
+		- output.frame_rate copied to fContext->sample_rate
+		- output.channel_count copied to fContext->channels
+
+	Other essential properties being applied:
+		- fBlockAlign to fContext->block_align
+		- fExtraData to fContext->extradata
+		- fExtraDataSize to fContext->extradata_size
+
+	TODO: Either the following documentation section should be removed or this
+	TODO when it is clear whether fInputFormat.MetaData() and
+	fInputFormat.MetaDataSize() have to be applied to fContext. See the related
+	TODO in the method implementation.
+	Only applied when fInputFormat.MetaDataSize() is greater than zero:
+		- fInputFormat.MetaData() to fContext->extradata
+		- fInputFormat.MetaDataSize() to fContext->extradata_size
+*/
+void
+AVCodecDecoder::_ApplyEssentialAudioContainerPropertiesToContext()
+{
+	media_encoded_audio_format containerProperties
+		= fInputFormat.u.encoded_audio;
+
+	fContext->bit_rate
+		= static_cast<int>(containerProperties.bit_rate);
+	fContext->frame_size
+		= static_cast<int>(containerProperties.frame_size);
+	ConvertRawAudioFormatToAVSampleFormat(
+		containerProperties.output.format, fContext->sample_fmt);
+	fContext->sample_rate
+		= static_cast<int>(containerProperties.output.frame_rate);
+	fContext->channels
+		= static_cast<int>(containerProperties.output.channel_count);
+	// Check that channel count is not still a wild card!
+	if (fContext->channels == 0) {
+		TRACE("  channel_count still a wild-card, assuming stereo.\n");
+		fContext->channels = 2;
+	}
+
+	fContext->block_align = fBlockAlign;
+	fContext->extradata = reinterpret_cast<uint8_t*>(fExtraData);
+	fContext->extradata_size = fExtraDataSize;
+
+	// TODO: This probably needs to go away, there is some misconception
+	// about extra data / info buffer and meta data. See
+	// Reader::GetStreamInfo(). The AVFormatReader puts extradata and
+	// extradata_size into media_format::MetaData(), but used to ignore
+	// the infoBuffer passed to GetStreamInfo(). I think this may be why
+	// the code below was added.
+	if (fInputFormat.MetaDataSize() > 0) {
+		fContext->extradata = static_cast<uint8_t*>(
+			const_cast<void*>(fInputFormat.MetaData()));
+		fContext->extradata_size = fInputFormat.MetaDataSize();
+	}
+
+	TRACE("  bit_rate %d, sample_rate %d, channels %d, block_align %d, "
+		"extradata_size %d\n", fContext->bit_rate, fContext->sample_rate,
+		fContext->channels, fContext->block_align, fContext->extradata_size);
 }
 
 
@@ -1212,20 +1256,24 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 }
 
 
-/*!	\brief Applies all essential video input properties from fInputFormat to
-		fContext.
+/*!	\brief Applies all essential video input properties to fContext that were
+		passed to AVCodecDecoder when Setup() was called.
 
 	Note: This function must be called before the AVCodec is opened via
 	avcodec_open2(). Otherwise the behaviour of FFMPEG's video decoding
 	function avcodec_decode_video2() is undefined.
 
-	Essential properties applied:
+	Essential properties applied from fInputFormat.u.encoded_video.output:
 		- display.line_width copied to fContext->width
 		- display.line_count copied to fContext->height
 		- pixel_width_aspect and pixel_height_aspect converted to
 		  fContext->sample_aspect_ratio
 		- field_rate converted to fContext->time_base and
 		  fContext->ticks_per_frame
+
+	Other essential properties being applied:
+		- fExtraData to fContext->extradata
+		- fExtraDataSize to fContext->extradata_size
 */
 void
 AVCodecDecoder::_ApplyEssentialVideoContainerPropertiesToContext()
@@ -1248,7 +1296,7 @@ AVCodecDecoder::_ApplyEssentialVideoContainerPropertiesToContext()
 			*fContext);
 	}
 
-	fContext->extradata = (uint8_t*)fExtraData;
+	fContext->extradata = reinterpret_cast<uint8_t*>(fExtraData);
 	fContext->extradata_size = fExtraDataSize;
 }
 

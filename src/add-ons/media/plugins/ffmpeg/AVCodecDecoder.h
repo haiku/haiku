@@ -62,6 +62,7 @@ private:
 							media_decode_info* info);
 
 			status_t	_DecodeNextAudioFrame();
+			void		_ApplyEssentialAudioContainerPropertiesToContext();
 			void		_ResetRawDecodedAudio();
 			void		_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow();
 			void		_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes();
