@@ -6,6 +6,7 @@
 
 #include <MessageBuilder.h>
 
+#include <AutoDeleter.h>
 #include <String.h>
 
 
@@ -30,14 +31,23 @@ BMessageBuilder::BMessageBuilder(BMessage& message)
 status_t
 BMessageBuilder::PushObject(const char* name)
 {
-	BMessage* newMessage = new BMessage;
+	BMessage* newMessage = new(std::nothrow) BMessage;
 	if (newMessage == NULL)
 		return B_NO_MEMORY;
+	ObjectDeleter<BMessage> messageDeleter(newMessage);
 	
-	if (!fNameStack.AddItem(new BString(name)))
-		return B_ERROR;
+	BString* nameString = new(std::nothrow) BString(name);
+	if (nameString == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<BString> stringDeleter(nameString);
+	
+	if (!fNameStack.AddItem(nameString))
+		return B_NO_MEMORY;
 	if (!fStack.AddItem(fCurrentMessage))
-		return B_ERROR;
+		return B_NO_MEMORY;
+
+	messageDeleter.Detach();
+	stringDeleter.Detach();
 
 	fCurrentMessage = newMessage;
 	return B_OK;
