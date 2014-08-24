@@ -43,11 +43,11 @@ BMessageBuilder::PushObject(const char* name)
 	
 	if (!fNameStack.AddItem(nameString))
 		return B_NO_MEMORY;
+	stringDeleter.Detach();
+
 	if (!fStack.AddItem(fCurrentMessage))
 		return B_NO_MEMORY;
-
 	messageDeleter.Detach();
-	stringDeleter.Detach();
 
 	fCurrentMessage = newMessage;
 	return B_OK;
