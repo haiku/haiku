@@ -10,6 +10,7 @@
 #include <File.h>
 #include <HttpHeaders.h>
 #include <HttpRequest.h>
+#include <Json.h>
 #include <Message.h>
 #include <Url.h>
 #include <UrlContext.h>
@@ -284,13 +285,18 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 		request.Result());
 
 	int32 statusCode = result.StatusCode();
-	
-	if (statusCode == 200)
-		return B_OK;
+	if (statusCode != 200) {
+		printf("Response code: %" B_PRId32 "\n", statusCode);
+		return B_ERROR;
+	}
 
-       printf("Response code: %" B_PRId32 "\n", statusCode);
+	jsonString.SetTo(static_cast<const char*>(replyData.Buffer()),
+		replyData.BufferLength());
+	if (jsonString.Length() == 0)
+		return B_ERROR;
 
-	return B_ERROR;
+	BJson parser;
+	return parser.Parse(message, jsonString);
 }
 
 
