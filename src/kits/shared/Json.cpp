@@ -99,7 +99,7 @@ BJson::Parse(BMessage& message, BString& JSON)
 			
 			if (_Parser_ParseConstant(JSON, pos, "true")) {
 				if (builder.What() == JSON_TYPE_ARRAY)
-					key.SetToFormat("%zu", builder.CountNames());
+					key.SetToFormat("%" B_PRIu32, builder.CountNames());
 				builder.AddBool(key.String(), true);
 				key = "";
 			} else
@@ -117,7 +117,7 @@ BJson::Parse(BMessage& message, BString& JSON)
 			
 			if (_Parser_ParseConstant(JSON, pos, "false")) {
 				if (builder.What() == JSON_TYPE_ARRAY)
-					key.SetToFormat("%zu", builder.CountNames());
+					key.SetToFormat("%" B_PRIu32, builder.CountNames());
 				builder.AddBool(key.String(), false);
 				key = "";
 			} else
@@ -135,7 +135,7 @@ BJson::Parse(BMessage& message, BString& JSON)
 			
 			if (_Parser_ParseConstant(JSON, pos, "null")) {
 				if (builder.What() == JSON_TYPE_ARRAY)
-					key.SetToFormat("%zu", builder.CountNames());
+					key.SetToFormat("%" B_PRIu32, builder.CountNames());
 				builder.AddPointer(key.String(), (void*)NULL);
 				key = "";
 			} else

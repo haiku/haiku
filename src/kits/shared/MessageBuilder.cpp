@@ -62,7 +62,7 @@ status_t
 BMessageBuilder::PushObject(uint32 name)
 {
 	BString nameString;
-	nameString.SetToFormat("%zu", name);
+	nameString.SetToFormat("%" B_PRIu32, name);
 	return PushObject(nameString.String());
 }
 
