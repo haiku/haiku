@@ -92,20 +92,19 @@
 
 // DVB data arrives early and with a timestamp, this is used to validate
 // that the timestamp is correct and we don't get stuck
-#define VIDEO_MAX_EARLY					3000000	// up to 3 seconds too early
-#define VIDEO_MAX_LATE					50000	// no more than 50 ms too late
-#define AUDIO_MAX_EARLY					3000000	// up to 3 seconds too early
-#define AUDIO_MAX_LATE					50000	// no more than 50 ms too late
+#define VIDEO_MAX_EARLY					3000000
+	// up to 3 seconds too early
+#define VIDEO_MAX_LATE					50000
+	// no more than 50 ms too late
+#define AUDIO_MAX_EARLY					3000000
+	// up to 3 seconds too early
+#define AUDIO_MAX_LATE					50000
+	// no more than 50 ms too late
 
-#define PROCESSING_LATENCY				1500	// assumed latency for sending the buffer
+#define PROCESSING_LATENCY				1500
+	// assumed latency for sending the buffer
 
 #define STOP_CAPTURE_WHILE_TUNING		1
-
-#define MPEG2_VIDEO_DECODER_PATH		"/boot/home/config/add-ons/media/dvb/video_decoder_addon"
-#define MPEG2_AUDIO_DECODER_PATH		"/boot/home/config/add-ons/media/dvb/audio_decoder_addon"
-#define AC3_AUDIO_DECODER_PATH			"/boot/home/config/add-ons/media/dvb/ac3_decoder_addon"
-#define DEINTERLACE_FILTER_PATH			"/boot/home/config/add-ons/media/dvb/deinterlace_filter_addon"
-
 
 #define M_REFRESH_PARAMETER_WEB 		(BTimedEventQueue::B_USER_EVENT + 1)
 
@@ -194,7 +193,8 @@ DVBMediaNode::DVBMediaNode(
 	fAudioFile = open("/boot/home/dvb-audio.mpg", O_RDWR | O_CREAT | O_TRUNC);
 #endif
 #ifdef DUMP_RAW_AUDIO
-	fRawAudioFile = open("/boot/home/dvb-audio.raw", O_RDWR | O_CREAT | O_TRUNC);
+	fRawAudioFile = open("/boot/home/dvb-audio.raw",
+		O_RDWR | O_CREAT | O_TRUNC);
 #endif
 #ifdef DUMP_MPEG_TS
 	fMpegTsFile = open("/boot/home/dvb-mpeg.ts", O_RDWR | O_CREAT | O_TRUNC);
@@ -303,35 +303,35 @@ DVBMediaNode::NodeRegistered()
 	fOutputRawVideo.source.id = ID_RAW_VIDEO;
 	fOutputRawVideo.destination = media_destination::null;
 	fOutputRawVideo.format = fDefaultFormatRawVideo;
-	strcpy(fOutputRawVideo.name, SourceDefaultName(fOutputRawVideo.source));	
+	strcpy(fOutputRawVideo.name, SourceDefaultName(fOutputRawVideo.source));
 
 	fOutputRawAudio.node = Node();
 	fOutputRawAudio.source.port = ControlPort();
 	fOutputRawAudio.source.id = ID_RAW_AUDIO;
 	fOutputRawAudio.destination = media_destination::null;
 	fOutputRawAudio.format = fDefaultFormatRawAudio;
-	strcpy(fOutputRawAudio.name, SourceDefaultName(fOutputRawAudio.source));	
+	strcpy(fOutputRawAudio.name, SourceDefaultName(fOutputRawAudio.source));
 
 	fOutputEncVideo.node = Node();
 	fOutputEncVideo.source.port = ControlPort();
 	fOutputEncVideo.source.id = ID_ENC_VIDEO;
 	fOutputEncVideo.destination = media_destination::null;
 	fOutputEncVideo.format = fDefaultFormatEncVideo;
-	strcpy(fOutputEncVideo.name, SourceDefaultName(fOutputEncVideo.source));	
+	strcpy(fOutputEncVideo.name, SourceDefaultName(fOutputEncVideo.source));
 
 	fOutputEncAudio.node = Node();
 	fOutputEncAudio.source.port = ControlPort();
 	fOutputEncAudio.source.id = ID_ENC_AUDIO;
 	fOutputEncAudio.destination = media_destination::null;
 	fOutputEncAudio.format = fDefaultFormatEncAudio;
-	strcpy(fOutputEncAudio.name, SourceDefaultName(fOutputEncAudio.source));	
+	strcpy(fOutputEncAudio.name, SourceDefaultName(fOutputEncAudio.source));
 
 	fOutputTS.node = Node();
 	fOutputTS.source.port = ControlPort();
 	fOutputTS.source.id = ID_TS;
 	fOutputTS.destination = media_destination::null;
 	fOutputTS.format = fDefaultFormatTS;
-	strcpy(fOutputTS.name, SourceDefaultName(fOutputTS.source));	
+	strcpy(fOutputTS.name, SourceDefaultName(fOutputTS.source));
 
 	fCard->GetCardType(&fInterfaceType);
 
@@ -342,9 +342,11 @@ DVBMediaNode::NodeRegistered()
 	
 	RefreshParameterWeb();
 
-	// this nodes operates in recording mode, so set it (will be done asynchronously)
+	// this nodes operates in recording mode, so set it (will be done
+	// asynchronously)
 	BMediaRoster::Roster()->SetRunModeNode(Node(), B_RECORDING);
-	// as it's a notification hook, calling this doesn't work: SetRunMode(B_RECORDING);
+		// as it's a notification hook, calling this doesn't work:
+		// SetRunMode(B_RECORDING);
 
 	//printf("RunMode = %d\n", RunMode());
 	//printf("_m_recordDelay = %Ld\n", _m_recordDelay);
@@ -387,7 +389,8 @@ DVBMediaNode::HandleEvent(const media_timed_event *event,
 		case BTimedEventQueue::B_DATA_STATUS:
 		case BTimedEventQueue::B_PARAMETER:
 		default:
-			TRACE("DVBMediaNode::HandleEvent: Unhandled event -- %lx\n", event->type);
+			TRACE("DVBMediaNode::HandleEvent: Unhandled event -- %lx\n",
+				event->type);
 			break;
 	}
 }
@@ -401,7 +404,8 @@ DVBMediaNode::FormatChangeRequested(const media_source &source,
 		const media_destination &destination, media_format *io_format,
 		int32 *_deprecated_)
 {
-	TRACE("DVBMediaNode::FormatChangeRequested denied: %s\n", SourceDefaultName(source));
+	TRACE("DVBMediaNode::FormatChangeRequested denied: %s\n",
+		SourceDefaultName(source));
 	return B_ERROR;	
 }
 
@@ -433,7 +437,8 @@ DVBMediaNode::DisposeOutputCookie(int32 cookie)
 status_t 
 DVBMediaNode::SetBufferGroup(const media_source &source, BBufferGroup *group)
 {
-	TRACE("DVBMediaNode::SetBufferGroup denied: %s\n", SourceDefaultName(source));
+	TRACE("DVBMediaNode::SetBufferGroup denied: %s\n",
+		SourceDefaultName(source));
 	return B_ERROR;
 }
 
@@ -466,12 +471,29 @@ DVBMediaNode::FormatSuggestionRequested(
 	TRACE("DVBMediaNode::FormatSuggestionRequested\n");
 	
 	switch (type) {
-		case B_MEDIA_RAW_VIDEO: 	*format = fDefaultFormatRawVideo; break;
-		case B_MEDIA_RAW_AUDIO: 	*format = fDefaultFormatRawAudio; break;
-		case B_MEDIA_ENCODED_VIDEO:	*format = fDefaultFormatEncVideo; break;
-		case B_MEDIA_ENCODED_AUDIO:	*format = fDefaultFormatEncAudio; break;
-		case B_MEDIA_MULTISTREAM:	*format = fDefaultFormatTS;		  break;
-		default: TRACE("Bad type!\n");								  return B_MEDIA_BAD_FORMAT;
+		case B_MEDIA_RAW_VIDEO:
+			*format = fDefaultFormatRawVideo;
+			break;
+
+		case B_MEDIA_RAW_AUDIO:
+			*format = fDefaultFormatRawAudio;
+			break;
+
+		case B_MEDIA_ENCODED_VIDEO:
+			*format = fDefaultFormatEncVideo;
+			break;
+
+		case B_MEDIA_ENCODED_AUDIO:
+			*format = fDefaultFormatEncAudio;
+			break;
+
+		case B_MEDIA_MULTISTREAM:
+			*format = fDefaultFormatTS;
+			break;
+
+		default:
+			TRACE("Bad type!\n");
+			return B_MEDIA_BAD_FORMAT;
 	}
 
 	#ifdef DEBUG
@@ -511,11 +533,25 @@ DVBMediaNode::FormatProposal(const media_source &source, media_format *format)
 		PrintFormat(*format);
 		TRACE("required format: ");
 		switch (source.id) {
-			case ID_RAW_VIDEO: PrintFormat(fRequiredFormatRawVideo); break;
-			case ID_RAW_AUDIO: PrintFormat(fRequiredFormatRawAudio); break;
-			case ID_ENC_VIDEO: PrintFormat(fRequiredFormatEncVideo); break;
-			case ID_ENC_AUDIO: PrintFormat(fRequiredFormatEncAudio); break;
-			case ID_TS:        PrintFormat(fRequiredFormatTS); break;
+			case ID_RAW_VIDEO:
+				PrintFormat(fRequiredFormatRawVideo);
+				break;
+
+			case ID_RAW_AUDIO:
+				PrintFormat(fRequiredFormatRawAudio);
+				break;
+
+			case ID_ENC_VIDEO:
+				PrintFormat(fRequiredFormatEncVideo);
+				break;
+
+			case ID_ENC_AUDIO:
+				PrintFormat(fRequiredFormatEncAudio);
+				break;
+
+			case ID_TS:
+				PrintFormat(fRequiredFormatTS);
+				break;
 		}
 	#endif
 
@@ -633,11 +669,25 @@ DVBMediaNode::PrepareToConnect(const media_source &source,
 		PrintFormat(*format);
 		TRACE("required format: ");
 		switch (source.id) {
-			case ID_RAW_VIDEO: PrintFormat(fRequiredFormatRawVideo); break;
-			case ID_RAW_AUDIO: PrintFormat(fRequiredFormatRawAudio); break;
-			case ID_ENC_VIDEO: PrintFormat(fRequiredFormatEncVideo); break;
-			case ID_ENC_AUDIO: PrintFormat(fRequiredFormatEncAudio); break;
-			case ID_TS:        PrintFormat(fRequiredFormatTS); break;
+			case ID_RAW_VIDEO:
+				PrintFormat(fRequiredFormatRawVideo);
+				break;
+
+			case ID_RAW_AUDIO:
+				PrintFormat(fRequiredFormatRawAudio);
+				break;
+
+			case ID_ENC_VIDEO:
+				PrintFormat(fRequiredFormatEncVideo);
+				break;
+
+			case ID_ENC_AUDIO:
+				PrintFormat(fRequiredFormatEncAudio);
+				break;
+
+			case ID_TS:
+				PrintFormat(fRequiredFormatTS);
+				break;
 		}
 	#endif
 	
@@ -762,12 +812,28 @@ DVBMediaNode::Connect(status_t error, const media_source &source,
 
 	// Set output as connected
 	switch (source.id) {
-		case ID_RAW_VIDEO:	fOutputEnabledRawVideo = true; break;
-		case ID_RAW_AUDIO:	fOutputEnabledRawAudio = true; break;
-		case ID_ENC_VIDEO:	fOutputEnabledEncVideo = true; break;
-		case ID_ENC_AUDIO:	fOutputEnabledEncAudio = true; break;
-		case ID_TS:			fOutputEnabledTS = true; break;
-		default:			break;
+		case ID_RAW_VIDEO:
+			fOutputEnabledRawVideo = true;
+			break;
+
+		case ID_RAW_AUDIO:
+			fOutputEnabledRawAudio = true;
+			break;
+
+		case ID_ENC_VIDEO:
+			fOutputEnabledEncVideo = true;
+			break;
+
+		case ID_ENC_AUDIO:
+			fOutputEnabledEncAudio = true;
+			break;
+
+		case ID_TS:
+			fOutputEnabledTS = true;
+			break;
+
+		default:
+			break;
 	}
 
 	// if the connection has no name, we set it now
@@ -796,12 +862,28 @@ DVBMediaNode::Disconnect(const media_source &source,
 
 	// Set output to disconnected
 	switch (source.id) {
-		case ID_RAW_VIDEO:	fOutputEnabledRawVideo = false; break;
-		case ID_RAW_AUDIO:	fOutputEnabledRawAudio = false; break;
-		case ID_ENC_VIDEO:	fOutputEnabledEncVideo = false; break;
-		case ID_ENC_AUDIO:	fOutputEnabledEncAudio = false; break;
-		case ID_TS:			fOutputEnabledTS = false; break;
-		default:			break;
+		case ID_RAW_VIDEO:
+			fOutputEnabledRawVideo = false;
+			break;
+
+		case ID_RAW_AUDIO:
+			fOutputEnabledRawAudio = false;
+			break;
+
+		case ID_ENC_VIDEO:
+			fOutputEnabledEncVideo = false;
+			break;
+
+		case ID_ENC_AUDIO:
+			fOutputEnabledEncAudio = false;
+			break;
+
+		case ID_TS:
+			fOutputEnabledTS = false;
+			break;
+
+		default:
+			break;
 	}
 }
 
@@ -810,7 +892,8 @@ void
 DVBMediaNode::LateNoticeReceived(const media_source &source,
 		bigtime_t how_much, bigtime_t performance_time)
 {
-	TRACE("DVBMediaNode::LateNoticeReceived %Ld late at %Ld\n", how_much, performance_time);
+	TRACE("DVBMediaNode::LateNoticeReceived %Ld late at %Ld\n", how_much,
+		performance_time);
 }
 
 
@@ -818,7 +901,8 @@ void
 DVBMediaNode::EnableOutput(const media_source &source, bool enabled,
 		int32 *_deprecated_)
 {
-	TRACE("DVBMediaNode::EnableOutput id = %ld, enabled = %d\n", source.id, enabled);
+	TRACE("DVBMediaNode::EnableOutput id = %ld, enabled = %d\n", source.id,
+		enabled);
 	/* not used yet
 	switch (source.id) {
 		case ID_RAW_VIDEO:	fOutputEnabledRawVideo = enabled; break;
@@ -845,7 +929,8 @@ DVBMediaNode::AdditionalBufferRequested(const media_source &source,
 		media_buffer_id prev_buffer, bigtime_t prev_time,
 		const media_seek_tag *prev_tag)
 {
-	TRACE("DVBMediaNode::AdditionalBufferRequested: %s\n", SourceDefaultName(source));
+	TRACE("DVBMediaNode::AdditionalBufferRequested: %s\n",
+		SourceDefaultName(source));
 }
 
 
@@ -882,9 +967,12 @@ DVBMediaNode::InitDefaultFormats()
 	fDefaultFormatRawVideo.u.raw_video.display.format = B_RGB32;
 	fDefaultFormatRawVideo.u.raw_video.display.line_width = 720;
 	fDefaultFormatRawVideo.u.raw_video.display.line_count = 576;
-	fDefaultFormatRawVideo.u.raw_video.last_active = fDefaultFormatRawVideo.u.raw_video.display.line_count - 1;
-	fDefaultFormatRawVideo.u.raw_video.display.bytes_per_row = fDefaultFormatRawVideo.u.raw_video.display.line_width * 4;
-	fDefaultFormatRawVideo.u.raw_video.field_rate = 0; // wildcard
+	fDefaultFormatRawVideo.u.raw_video.last_active
+		= fDefaultFormatRawVideo.u.raw_video.display.line_count - 1;
+	fDefaultFormatRawVideo.u.raw_video.display.bytes_per_row
+		= fDefaultFormatRawVideo.u.raw_video.display.line_width * 4;
+	fDefaultFormatRawVideo.u.raw_video.field_rate = 0;
+		// wildcard
 	fDefaultFormatRawVideo.u.raw_video.interlace = 1;
 	fDefaultFormatRawVideo.u.raw_video.first_active = 0;
 	fDefaultFormatRawVideo.u.raw_video.orientation = B_VIDEO_TOP_LEFT_RIGHT;
@@ -899,7 +987,8 @@ DVBMediaNode::InitDefaultFormats()
 	fDefaultFormatRawAudio.u.raw_audio.channel_count = 2;
 //  XXX broken in Haiku...
 //	fDefaultFormatRawAudio.u.raw_audio.format = 0; // wildcard
-	fDefaultFormatRawAudio.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
+	fDefaultFormatRawAudio.u.raw_audio.format
+		= media_raw_audio_format::B_AUDIO_SHORT;
 //  when set to 0, haiku mixer has problems when diung a format change
 //  set to short and debug the buffer_size problem first!
 	fDefaultFormatRawAudio.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
@@ -994,8 +1083,7 @@ DVBMediaNode::SpecializeFormatTS(media_multistream_format *format)
 
 status_t
 DVBMediaNode::SetOutput(const media_source &source, 
-						const media_destination &destination, 
-						const media_format &format)
+	const media_destination &destination, const media_format &format)
 {
 	switch (source.id) {
 		case ID_RAW_VIDEO:
@@ -1070,12 +1158,23 @@ const char *
 DVBMediaNode::SourceDefaultName(const media_source &source)
 {
 	switch (source.id) {
-		case ID_RAW_VIDEO:	return "raw video";
-		case ID_RAW_AUDIO:	return "raw audio";
-		case ID_ENC_VIDEO:	return "encoded video";
-		case ID_ENC_AUDIO:	return "encoded audio";
-		case ID_TS:			return "MPEG2 TS";
-		default:			return NULL;
+		case ID_RAW_VIDEO:
+			return "raw video";
+
+		case ID_RAW_AUDIO:
+			return "raw audio";
+
+		case ID_ENC_VIDEO:
+			return "encoded video";
+
+		case ID_ENC_AUDIO:
+			return "encoded audio";
+
+		case ID_TS:
+			return "MPEG2 TS";
+
+		default:
+			return NULL;
 	}
 }
 
@@ -1123,7 +1222,8 @@ DVBMediaNode::Tune()
 	int new_pcr_pid;
 
 	desc = fChannelList->ItemAt(fSelectedChannel);
-	err = ExtractTuningParams(desc, fSelectedAudio, &new_params, &new_video_pid, &new_audio_pid, &new_pcr_pid);
+	err = ExtractTuningParams(desc, fSelectedAudio, &new_params,
+		&new_video_pid, &new_audio_pid, &new_pcr_pid);
 
 	if (err != B_OK) {
 		printf("DVBMediaNode::Tune: getting tuning info failed\n");
@@ -1144,13 +1244,17 @@ DVBMediaNode::Tune()
 */	
 	switch (fInterfaceType) {
 		case DVB_TYPE_DVB_T:
-			needs_tuning = (fTuningParam.u.dvb_t.frequency != new_params.u.dvb_t.frequency) || !fTuningSuccess;
+			needs_tuning = (fTuningParam.u.dvb_t.frequency
+					!= new_params.u.dvb_t.frequency) || !fTuningSuccess;
 			needs_tuning = true;
 			break;
+
 		case DVB_TYPE_DVB_S:
-			printf("needs_tuning = %d, forcing tuning for DVB-S\n", needs_tuning);
+			printf("needs_tuning = %d, forcing tuning for DVB-S\n",
+				needs_tuning);
 			needs_tuning = true;
 			break;
+
 		default:
 			needs_tuning = true;
 			break;
@@ -1256,13 +1360,20 @@ DVBMediaNode::StartCaptureThreads()
 
 	fTerminateThreads = false;
 
-	fThreadIdCardReader = spawn_thread(_card_reader_thread_, "DVB card reader", 120, this);
-	fThreadIdMpegDemux = spawn_thread(_mpeg_demux_thread_, "DVB MPEG demux", 110, this);
-	fThreadIdEncAudio = spawn_thread(_enc_audio_thread_, "DVB audio streaming", 110, this);
-	fThreadIdEncVideo = spawn_thread(_enc_video_thread_, "DVB video streaming", 110, this);
-	fThreadIdMpegTS = spawn_thread(_mpeg_ts_thread_, "DVB MPEG TS streaming", 110, this);
-	fThreadIdRawAudio = spawn_thread(_raw_audio_thread_, "DVB audio decode", 100, this);
-	fThreadIdRawVideo = spawn_thread(_raw_video_thread_, "DVB video decode", 85, this);
+	fThreadIdCardReader = spawn_thread(_card_reader_thread_, "DVB card reader",
+		120, this);
+	fThreadIdMpegDemux = spawn_thread(_mpeg_demux_thread_, "DVB MPEG demux",
+		110, this);
+	fThreadIdEncAudio = spawn_thread(_enc_audio_thread_, "DVB audio streaming",
+		110, this);
+	fThreadIdEncVideo = spawn_thread(_enc_video_thread_, "DVB video streaming",
+		110, this);
+	fThreadIdMpegTS = spawn_thread(_mpeg_ts_thread_, "DVB MPEG TS streaming",
+		110, this);
+	fThreadIdRawAudio = spawn_thread(_raw_audio_thread_, "DVB audio decode",
+		100, this);
+	fThreadIdRawVideo = spawn_thread(_raw_video_thread_, "DVB video decode",
+		85, this);
 	resume_thread(fThreadIdCardReader);
 	resume_thread(fThreadIdMpegDemux);
 	resume_thread(fThreadIdEncAudio);
@@ -1380,7 +1491,8 @@ DVBMediaNode::card_reader_thread()
 		bigtime_t end_time;
 		err = fCard->Capture(&data, &size, &end_time);
 		if (err != B_OK) {
-			TRACE("fCard->Capture failed, error %lx (%s)\n", err, strerror(err));
+			TRACE("fCard->Capture failed, error %lx (%s)\n", err,
+				strerror(err));
 			continue;
 		}
 
@@ -1428,7 +1540,8 @@ DVBMediaNode::mpeg_ts_thread()
 			continue;
 		}
 
-//		TRACE("mpeg ts   packet, size %6ld, start_time %14Ld\n", packet->Size(), packet->TimeStamp());
+//		TRACE("mpeg ts   packet, size %6ld, start_time %14Ld\n",
+//			packet->Size(), packet->TimeStamp());
 
 #ifdef DUMP_MPEG_TS
 		lock.Lock();
@@ -1452,12 +1565,14 @@ DVBMediaNode::enc_audio_thread()
 			TRACE("fEncAudioQueue->Remove failed, error %lx\n", err);
 			continue;
 		}
-//		TRACE("enc audio packet, size %6ld, start_time %14Ld\n", packet->Size(), packet->TimeStamp());
+//		TRACE("enc audio packet, size %6ld, start_time %14Ld\n",
+//			packet->Size(), packet->TimeStamp());
 
 #ifdef DUMP_AUDIO
 		const uint8 *data;
 		size_t size;
-		if (B_OK != pes_extract(packet->Data(), packet->Size(), &data, &size)) {
+		if (B_OK != pes_extract(packet->Data(), packet->Size(), &data,
+				&size)) {
 			TRACE("audio pes_extract failed\n");
 			delete packet;
 			return;
@@ -1492,13 +1607,15 @@ DVBMediaNode::enc_video_thread()
 			continue;
 		}
 
-//		TRACE("enc video packet, size %6ld, start_time %14Ld\n", packet->Size(), packet->TimeStamp());
+//		TRACE("enc video packet, size %6ld, start_time %14Ld\n",
+//			packet->Size(), packet->TimeStamp());
 
 
 #ifdef DUMP_VIDEO
 		int8 *data;
 		size_t size;
-		if (B_OK != pes_extract(packet->Data(), packet->Size(), &data, &size)) {
+		if (B_OK != pes_extract(packet->Data(), packet->Size(), &data,
+				&size)) {
 			TRACE("video pes_extract failed\n");
 			delete packet;
 			return;
@@ -1783,7 +1900,6 @@ DVBMediaNode::raw_video_thread()
 		}
 
 		// fetch a new buffer (always of maximum size as the stream may change)
-
 		BBuffer* buf;
 		buf = fBufferGroupRawVideo->RequestBuffer(video_buffer_size_max,
 			VIDEO_BUFFER_REQUEST_TIMEOUT);
@@ -1793,7 +1909,6 @@ DVBMediaNode::raw_video_thread()
 		}
 		
 		// decode one video frame into buffer
-
 		err = fVideoDecoder->Decode(buf->Data(), &frameCount, &mh, NULL);
 		if (err) {
 			buf->Recycle();
@@ -1802,7 +1917,6 @@ DVBMediaNode::raw_video_thread()
 		}
 
 		// check if the format of the stream has changed
-		
 		if (mh.u.raw_video.display_line_width
 			!= fOutputRawVideo.format.u.raw_video.display.line_width
 			|| mh.u.raw_video.display_line_count
@@ -1839,7 +1953,6 @@ DVBMediaNode::raw_video_thread()
 					* fOutputRawVideo.format.u.raw_video.display.bytes_per_row;
 
 			// perform a video format change
-			
 			fOutputRawVideo.format.u.raw_video.display.line_width
 				= mh.u.raw_video.display_line_width;
 			fOutputRawVideo.format.u.raw_video.display.line_count
@@ -1866,7 +1979,6 @@ DVBMediaNode::raw_video_thread()
 		}
 		
 		// calculate start time for video
-
 		bigtime_t ts_perf_time;
 		bigtime_t ts_sys_time;
 		bigtime_t ts_offset;
@@ -1915,8 +2027,8 @@ DVBMediaNode::raw_video_thread()
 		hdr->time_source = TimeSource()->ID();
 		hdr->start_time = start_time;
 		lock.Lock();
-		if (SendBuffer(buf, fOutputRawVideo.source, fOutputRawVideo.destination)
-			!= B_OK) {
+		if (SendBuffer(buf, fOutputRawVideo.source,
+				fOutputRawVideo.destination) != B_OK) {
 			TRACE("video: sending buffer failed\n");
 			buf->Recycle();
 		} 
@@ -1929,7 +2041,8 @@ DVBMediaNode::raw_video_thread()
 
 
 inline status_t
-DVBMediaNode::GetNextVideoChunk(const void **chunkData, size_t *chunkLen, media_header *mh)
+DVBMediaNode::GetNextVideoChunk(const void **chunkData, size_t *chunkLen,
+	media_header *mh)
 {
 //	TRACE("DVBMediaNode::GetNextVideoChunk\n");
 
@@ -1946,7 +2059,8 @@ DVBMediaNode::GetNextVideoChunk(const void **chunkData, size_t *chunkLen, media_
 	const uint8 *data;
 	size_t size;
 			
-	if (B_OK != pes_extract(fCurrentVideoPacket->Data(), fCurrentVideoPacket->Size(), &data, &size)) {
+	if (B_OK != pes_extract(fCurrentVideoPacket->Data(),
+			fCurrentVideoPacket->Size(), &data, &size)) {
 		TRACE("video pes_extract failed\n");
 		return B_ERROR;
 	}
@@ -1961,7 +2075,8 @@ DVBMediaNode::GetNextVideoChunk(const void **chunkData, size_t *chunkLen, media_
 
 
 inline status_t
-DVBMediaNode::GetNextAudioChunk(const void **chunkData, size_t *chunkLen, media_header *mh)
+DVBMediaNode::GetNextAudioChunk(const void **chunkData, size_t *chunkLen,
+	media_header *mh)
 {
 //	TRACE("DVBMediaNode::GetNextAudioChunk\n");
 
@@ -1978,7 +2093,8 @@ DVBMediaNode::GetNextAudioChunk(const void **chunkData, size_t *chunkLen, media_
 	const uint8 *data;
 	size_t size;
 			
-	if (B_OK != pes_extract(fCurrentAudioPacket->Data(), fCurrentAudioPacket->Size(), &data, &size)) {
+	if (B_OK != pes_extract(fCurrentAudioPacket->Data(),
+			fCurrentAudioPacket->Size(), &data, &size)) {
 		TRACE("audio pes_extract failed\n");
 		return B_ERROR;
 	}
@@ -1995,16 +2111,20 @@ DVBMediaNode::GetNextAudioChunk(const void **chunkData, size_t *chunkLen, media_
 
 
 status_t
-DVBMediaNode::_GetNextVideoChunk(const void **chunkData, size_t *chunkLen, media_header *mh, void *cookie)
+DVBMediaNode::_GetNextVideoChunk(const void **chunkData, size_t *chunkLen,
+	media_header *mh, void *cookie)
 {
-	return static_cast<DVBMediaNode *>(cookie)->GetNextVideoChunk(chunkData, chunkLen, mh);
+	return static_cast<DVBMediaNode *>(cookie)->GetNextVideoChunk(chunkData,
+		chunkLen, mh);
 }
 
 
 status_t
-DVBMediaNode::_GetNextAudioChunk(const void **chunkData, size_t *chunkLen, media_header *mh, void *cookie)
+DVBMediaNode::_GetNextAudioChunk(const void **chunkData, size_t *chunkLen,
+	media_header *mh, void *cookie)
 {
-	return static_cast<DVBMediaNode *>(cookie)->GetNextAudioChunk(chunkData, chunkLen, mh);
+	return static_cast<DVBMediaNode *>(cookie)->GetNextAudioChunk(chunkData,
+		chunkLen, mh);
 }
 
 
@@ -2018,23 +2138,23 @@ DVBMediaNode::GetStreamFormat(PacketQueue *queue, media_format *format)
 	int stream_id;
 	
 	// get copy of the first packet from queue, and determine format
-
-	if ((status = queue->Peek(&packet)) != B_OK) {
+	status = queue->Peek(&packet);
+	if (status != B_OK) {
 		TRACE("queue->Peek failed, error %lx\n", status);
 		return status;
 	}
-
-	if ((status = pes_extract(packet->Data(), packet->Size(), &data, &size)) != B_OK) {
+	status = pes_extract(packet->Data(), packet->Size(), &data, &size);
+	if (status != B_OK) {
 		TRACE("pes_extract failed\n");
 		goto done;
 	}
-
-	if ((status = pes_stream_id(packet->Data(), packet->Size(), &stream_id)) != B_OK) {
+	status = pes_stream_id(packet->Data(), packet->Size(), &stream_id);
+	if (status != B_OK) {
 		TRACE("pes_stream_id failed\n");
 		goto done;
 	}
-
-	if ((status = GetHeaderFormat(format, data, size, stream_id)) != B_OK) {
+	status = GetHeaderFormat(format, data, size, stream_id);
+	if (status != B_OK) {
 		TRACE("GetHeaderFormat failed, error %lx\n", status);
 		goto done;
 	}
@@ -2066,9 +2186,12 @@ DVBMediaNode::RefreshParameterWeb()
 void
 DVBMediaNode::SetAboutInfo(BParameterGroup *about)
 {
-	about->MakeNullParameter(0, B_MEDIA_NO_TYPE, "DVB media_addon info:", B_GENERIC);
-	about->MakeNullParameter(0, B_MEDIA_NO_TYPE, "Version " VERSION, B_GENERIC);
-	about->MakeNullParameter(0, B_MEDIA_NO_TYPE, "Revision " REVISION, B_GENERIC);
+	about->MakeNullParameter(0, B_MEDIA_NO_TYPE, "DVB media_addon info:",
+		B_GENERIC);
+	about->MakeNullParameter(0, B_MEDIA_NO_TYPE, "Version " VERSION,
+		B_GENERIC);
+	about->MakeNullParameter(0, B_MEDIA_NO_TYPE, "Revision " REVISION,
+		B_GENERIC);
 	about->MakeNullParameter(0, B_MEDIA_NO_TYPE, "Build " BUILD, B_GENERIC);
 
 	about->MakeNullParameter(0, B_MEDIA_NO_TYPE, "", B_GENERIC);
@@ -2113,7 +2236,8 @@ DVBMediaNode::CreateParameterWeb()
 			ID_REGION, B_MEDIA_RAW_VIDEO, "Region", B_GENERIC);
 
 	BDiscreteParameter *chan = ctrl->MakeDiscreteParameter(
-			ID_CHANNEL, B_MEDIA_RAW_VIDEO, "Channel", /* B_TUNER_CHANNEL */ B_GENERIC);
+			ID_CHANNEL, B_MEDIA_RAW_VIDEO, "Channel",
+			/* B_TUNER_CHANNEL */ B_GENERIC);
 
 	BDiscreteParameter *aud = ctrl->MakeDiscreteParameter(
 			ID_AUDIO, B_MEDIA_RAW_VIDEO, "Audio", B_GENERIC);
@@ -2130,9 +2254,12 @@ DVBMediaNode::CreateParameterWeb()
 		BParameterGroup *about = main->MakeGroup("About");
 		about->MakeNullParameter(0, B_MEDIA_NO_TYPE, about->Name(), B_GENERIC);
 		SetAboutInfo(about);
-//		info->MakeNullParameter(0, B_MEDIA_NO_TYPE, fCaptureActive ? "Tuning failed" : "Node stopped", B_GENERIC);
-		info->MakeNullParameter(0, B_MEDIA_NO_TYPE, "Node is stopped", B_GENERIC);
-		info->MakeNullParameter(0, B_MEDIA_NO_TYPE, "or tuning failed.", B_GENERIC);
+//		info->MakeNullParameter(0, B_MEDIA_NO_TYPE,
+//			fCaptureActive ? "Tuning failed" : "Node stopped", B_GENERIC);
+		info->MakeNullParameter(0, B_MEDIA_NO_TYPE, "Node is stopped",
+			B_GENERIC);
+		info->MakeNullParameter(0, B_MEDIA_NO_TYPE, "or tuning failed.",
+			B_GENERIC);
 		return web;
 	}
 
@@ -2163,11 +2290,25 @@ DVBMediaNode::CreateParameterWeb()
 	BString sAgcInversion = "AGC Inversion: ";
 
 	switch (fInterfaceType) {
-		case DVB_TYPE_DVB_C: sInterfaceType << "DVB-C"; break;
-		case DVB_TYPE_DVB_H: sInterfaceType << "DVB-H"; break;
-		case DVB_TYPE_DVB_S: sInterfaceType << "DVB-S"; break;
-		case DVB_TYPE_DVB_T: sInterfaceType << "DVB-T"; break;
-		default: sInterfaceType << "unknown"; break;
+		case DVB_TYPE_DVB_C:
+			sInterfaceType << "DVB-C";
+			break;
+
+		case DVB_TYPE_DVB_H:
+			sInterfaceType << "DVB-H";
+			break;
+
+		case DVB_TYPE_DVB_S:
+			sInterfaceType << "DVB-S";
+			break;
+
+		case DVB_TYPE_DVB_T:
+			sInterfaceType << "DVB-T";
+			break;
+
+		default:
+			sInterfaceType << "unknown";
+			break;
 	}
 
 	sAudioPid << fAudioPid;
@@ -2179,99 +2320,272 @@ DVBMediaNode::CreateParameterWeb()
 		sFrequency << fTuningParam.u.dvb_t.frequency / 1000000 << " MHz";
 
 		switch (fTuningParam.u.dvb_t.inversion) {
-			case DVB_INVERSION_AUTO: sInversion << "auto"; break;
-			case DVB_INVERSION_ON: sInversion << "on"; break;
-			case DVB_INVERSION_OFF: sInversion << "off"; break;
-			default: sInversion << "unknown"; break;
+			case DVB_INVERSION_AUTO:
+				sInversion << "auto";
+				break;
+
+			case DVB_INVERSION_ON:
+				sInversion << "on";
+				break;
+
+			case DVB_INVERSION_OFF:
+				sInversion << "off";
+				break;
+
+			default:
+				sInversion << "unknown";
+				break;
 		}
 
 		switch (fTuningParam.u.dvb_t.bandwidth) {
-			case DVB_BANDWIDTH_AUTO: sBandwidth << "auto"; break;
-			case DVB_BANDWIDTH_6_MHZ: sBandwidth << "6 MHz"; break;
-			case DVB_BANDWIDTH_7_MHZ: sBandwidth << "7 MHz"; break;
-			case DVB_BANDWIDTH_8_MHZ: sBandwidth << "8 MHz"; break;
-			default: sBandwidth << "unknown"; break;
+			case DVB_BANDWIDTH_AUTO:
+				sBandwidth << "auto";
+				break;
+
+			case DVB_BANDWIDTH_6_MHZ:
+				sBandwidth << "6 MHz";
+				break;
+
+			case DVB_BANDWIDTH_7_MHZ:
+				sBandwidth << "7 MHz";
+				break;
+
+			case DVB_BANDWIDTH_8_MHZ:
+				sBandwidth << "8 MHz";
+				break;
+
+			default:
+				sBandwidth << "unknown";
+				break;
 		}
 
 		switch (fTuningParam.u.dvb_t.modulation) {
-			case DVB_MODULATION_AUTO: sModulation << "auto"; break;
-			case DVB_MODULATION_QPSK: sModulation << "QPSK"; break;
-			case DVB_MODULATION_16_QAM: sModulation << "16 QAM"; break;
-			case DVB_MODULATION_32_QAM: sModulation << "32 QAM"; break;
-			case DVB_MODULATION_64_QAM: sModulation << "64 QAM"; break;
-			case DVB_MODULATION_128_QAM: sModulation << "128 QAM"; break;
-			case DVB_MODULATION_256_QAM: sModulation << "256 QAM"; break;
-			default: sModulation << "unknown"; break;
+			case DVB_MODULATION_AUTO:
+				sModulation << "auto";
+				break;
+
+			case DVB_MODULATION_QPSK:
+				sModulation << "QPSK";
+				break;
+
+			case DVB_MODULATION_16_QAM:
+				sModulation << "16 QAM";
+				break;
+
+			case DVB_MODULATION_32_QAM:
+				sModulation << "32 QAM";
+				break;
+
+			case DVB_MODULATION_64_QAM:
+				sModulation << "64 QAM";
+				break;
+
+			case DVB_MODULATION_128_QAM:
+				sModulation << "128 QAM";
+				break;
+
+			case DVB_MODULATION_256_QAM:
+				sModulation << "256 QAM";
+				break;
+
+			default:
+				sModulation << "unknown";
+				break;
 		}
 		
 		switch (fTuningParam.u.dvb_t.hierarchy) {
-			case DVB_HIERARCHY_AUTO: sHierarchy << "auto"; break;
-			case DVB_HIERARCHY_NONE: sHierarchy << "none"; break;
-			case DVB_HIERARCHY_1: sHierarchy << "1"; break;
-			case DVB_HIERARCHY_2: sHierarchy << "2"; break;
-			case DVB_HIERARCHY_4: sHierarchy << "4"; break;
-			default: sHierarchy << "unknown"; break;
+			case DVB_HIERARCHY_AUTO:
+				sHierarchy << "auto";
+				break;
+
+			case DVB_HIERARCHY_NONE:
+				sHierarchy << "none";
+				break;
+
+			case DVB_HIERARCHY_1:
+				sHierarchy << "1";
+				break;
+
+			case DVB_HIERARCHY_2:
+				sHierarchy << "2";
+				break;
+
+			case DVB_HIERARCHY_4:
+				sHierarchy << "4";
+				break;
+
+			default:
+				sHierarchy << "unknown";
+				break;
 		}
 		
 		switch (fTuningParam.u.dvb_t.code_rate_hp) {
-			case DVB_FEC_AUTO: sCodeRateHP << "auto"; break;
-			case DVB_FEC_NONE: sCodeRateHP << "none"; break;
-			case DVB_FEC_1_2: sCodeRateHP << "FEC 1/2"; break;
-			case DVB_FEC_2_3: sCodeRateHP << "FEC 2/3"; break;
-			case DVB_FEC_3_4: sCodeRateHP << "FEC 3/4"; break;
-			case DVB_FEC_4_5: sCodeRateHP << "FEC 4/5"; break;
-			case DVB_FEC_5_6: sCodeRateHP << "FEC 5/6"; break;
-			case DVB_FEC_6_7: sCodeRateHP << "FEC 6/7"; break;
-			case DVB_FEC_7_8: sCodeRateHP << "FEC 7/8"; break;
-			case DVB_FEC_8_9: sCodeRateHP << "FEC 8/9"; break;
-			default: sCodeRateHP << "unknown"; break;
+			case DVB_FEC_AUTO:
+				sCodeRateHP << "auto";
+				break;
+
+			case DVB_FEC_NONE:
+				sCodeRateHP << "none";
+				break;
+
+			case DVB_FEC_1_2:
+				sCodeRateHP << "FEC 1/2";
+				break;
+
+			case DVB_FEC_2_3:
+				sCodeRateHP << "FEC 2/3";
+				break;
+
+			case DVB_FEC_3_4:
+				sCodeRateHP << "FEC 3/4";
+				break;
+
+			case DVB_FEC_4_5:
+				sCodeRateHP << "FEC 4/5";
+				break;
+
+			case DVB_FEC_5_6:
+				sCodeRateHP << "FEC 5/6";
+				break;
+
+			case DVB_FEC_6_7:
+				sCodeRateHP << "FEC 6/7";
+				break;
+
+			case DVB_FEC_7_8:
+				sCodeRateHP << "FEC 7/8";
+				break;
+
+			case DVB_FEC_8_9:
+				sCodeRateHP << "FEC 8/9";
+				break;
+
+			default:
+				sCodeRateHP << "unknown";
+				break;
 		}
 
 		switch (fTuningParam.u.dvb_t.code_rate_lp) {
-			case DVB_FEC_AUTO: sCodeRateLP << "auto"; break;
-			case DVB_FEC_NONE: sCodeRateLP << "none"; break;
-			case DVB_FEC_1_2: sCodeRateLP << "FEC 1/2"; break;
-			case DVB_FEC_2_3: sCodeRateLP << "FEC 2/3"; break;
-			case DVB_FEC_3_4: sCodeRateLP << "FEC 3/4"; break;
-			case DVB_FEC_4_5: sCodeRateLP << "FEC 4/5"; break;
-			case DVB_FEC_5_6: sCodeRateLP << "FEC 5/6"; break;
-			case DVB_FEC_6_7: sCodeRateLP << "FEC 6/7"; break;
-			case DVB_FEC_7_8: sCodeRateLP << "FEC 7/8"; break;
-			case DVB_FEC_8_9: sCodeRateLP << "FEC 8/9"; break;
-			default: sCodeRateLP << "unknown"; break;
+			case DVB_FEC_AUTO:
+				sCodeRateLP << "auto";
+				break;
+
+			case DVB_FEC_NONE:
+				sCodeRateLP << "none";
+				break;
+
+			case DVB_FEC_1_2:
+				sCodeRateLP << "FEC 1/2";
+				break;
+
+			case DVB_FEC_2_3:
+				sCodeRateLP << "FEC 2/3";
+				break;
+
+			case DVB_FEC_3_4:
+				sCodeRateLP << "FEC 3/4";
+				break;
+
+			case DVB_FEC_4_5:
+				sCodeRateLP << "FEC 4/5";
+				break;
+
+			case DVB_FEC_5_6:
+				sCodeRateLP << "FEC 5/6";
+				break;
+
+			case DVB_FEC_6_7:
+				sCodeRateLP << "FEC 6/7";
+				break;
+
+			case DVB_FEC_7_8:
+				sCodeRateLP << "FEC 7/8";
+				break;
+
+			case DVB_FEC_8_9:
+				sCodeRateLP << "FEC 8/9";
+				break;
+
+			default:
+				sCodeRateLP << "unknown";
+				break;
 		}
 
 		switch (fTuningParam.u.dvb_t.transmission_mode) {
-			case DVB_TRANSMISSION_MODE_AUTO: sTransmissionMode << "auto"; break;
-			case DVB_TRANSMISSION_MODE_2K: sTransmissionMode << "2K"; break;
-			case DVB_TRANSMISSION_MODE_4K: sTransmissionMode << "4K"; break;
-			case DVB_TRANSMISSION_MODE_8K: sTransmissionMode << "8K"; break;
-			default: sTransmissionMode << "unknown"; break;
+			case DVB_TRANSMISSION_MODE_AUTO:
+				sTransmissionMode << "auto";
+				break;
+
+			case DVB_TRANSMISSION_MODE_2K:
+				sTransmissionMode << "2K";
+				break;
+
+			case DVB_TRANSMISSION_MODE_4K:
+				sTransmissionMode << "4K";
+				break;
+
+			case DVB_TRANSMISSION_MODE_8K:
+				sTransmissionMode << "8K";
+				break;
+
+			default:
+				sTransmissionMode << "unknown";
+				break;
 		}
 
 		switch (fTuningParam.u.dvb_t.guard_interval) {
-			case DVB_GUARD_INTERVAL_AUTO: sGuardInterval << "auto"; break;
-			case DVB_GUARD_INTERVAL_1_4: sGuardInterval << "1/4"; break;
-			case DVB_GUARD_INTERVAL_1_8: sGuardInterval << "1/8"; break;
-			case DVB_GUARD_INTERVAL_1_16: sGuardInterval << "1/16"; break;
-			case DVB_GUARD_INTERVAL_1_32: sGuardInterval << "1/32"; break;
-			default: sGuardInterval << "unknown"; break;
+			case DVB_GUARD_INTERVAL_AUTO:
+				sGuardInterval << "auto";
+				break;
+
+			case DVB_GUARD_INTERVAL_1_4:
+				sGuardInterval << "1/4";
+				break;
+
+			case DVB_GUARD_INTERVAL_1_8:
+				sGuardInterval << "1/8";
+				break;
+
+			case DVB_GUARD_INTERVAL_1_16:
+				sGuardInterval << "1/16";
+				break;
+
+			case DVB_GUARD_INTERVAL_1_32:
+				sGuardInterval << "1/32";
+				break;
+
+			default:
+				sGuardInterval << "unknown";
+				break;
 		}
 
-		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sInterfaceType.String(), B_GENERIC);
-		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sFrequency.String(), B_GENERIC);
-		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sBandwidth.String(), B_GENERIC);
-		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sVideoPid.String(), B_GENERIC);
-		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sAudioPid.String(), B_GENERIC);
-		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sPcrPid.String(), B_GENERIC);
+		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sInterfaceType.String(),
+			B_GENERIC);
+		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sFrequency.String(),
+			B_GENERIC);
+		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sBandwidth.String(),
+			B_GENERIC);
+		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sVideoPid.String(),
+			B_GENERIC);
+		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sAudioPid.String(),
+			B_GENERIC);
+		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sPcrPid.String(),
+			B_GENERIC);
 
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sModulation.String(), B_GENERIC);
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sTransmissionMode.String(), B_GENERIC);
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sGuardInterval.String(), B_GENERIC);
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sCodeRateHP.String(), B_GENERIC);
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sCodeRateLP.String(), B_GENERIC);
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sInversion.String(), B_GENERIC);
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sHierarchy.String(), B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sModulation.String(),
+			B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE,
+			sTransmissionMode.String(), B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sGuardInterval.String(),
+			B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sCodeRateHP.String(),
+			B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sCodeRateLP.String(),
+			B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sInversion.String(),
+			B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sHierarchy.String(),
+			B_GENERIC);
 	}
 
 	if (fInterfaceType == DVB_TYPE_DVB_S) {
@@ -2280,28 +2594,56 @@ DVBMediaNode::CreateParameterWeb()
 		sSymbolRate << fTuningParam.u.dvb_s.symbolrate;
 
 		switch (fTuningParam.u.dvb_s.inversion) {
-			case DVB_INVERSION_AUTO: sInversion << "auto"; break;
-			case DVB_INVERSION_ON: sInversion << "on"; break;
-			case DVB_INVERSION_OFF: sInversion << "off"; break;
-			default: sInversion << "unknown"; break;
+			case DVB_INVERSION_AUTO:
+				sInversion << "auto";
+				break;
+
+			case DVB_INVERSION_ON:
+				sInversion << "on";
+				break;
+
+			case DVB_INVERSION_OFF:
+				sInversion << "off";
+				break;
+
+			default:
+				sInversion << "unknown";
+				break;
 		}
 	
 		switch (fTuningParam.u.dvb_s.polarity) {
-			case DVB_POLARITY_VERTICAL: sPolarity << "vertical"; break;
-			case DVB_POLARITY_HORIZONTAL: sPolarity << "horizontal"; break;
-			default: sPolarity << "unknown"; break;
+			case DVB_POLARITY_VERTICAL:
+				sPolarity << "vertical";
+				break;
+
+			case DVB_POLARITY_HORIZONTAL:
+				sPolarity << "horizontal";
+				break;
+
+			default:
+				sPolarity << "unknown";
+				break;
 		}
 
-		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sInterfaceType.String(), B_GENERIC);
-		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sVideoPid.String(), B_GENERIC);
-		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sAudioPid.String(), B_GENERIC);
-		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sPcrPid.String(), B_GENERIC);
+		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sInterfaceType.String(),
+			B_GENERIC);
+		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sVideoPid.String(),
+			B_GENERIC);
+		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sAudioPid.String(),
+			B_GENERIC);
+		info1->MakeNullParameter(0, B_MEDIA_NO_TYPE, sPcrPid.String(),
+			B_GENERIC);
 
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sFrequency.String(), B_GENERIC);
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sPolarity.String(), B_GENERIC);
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sSymbolRate.String(), B_GENERIC);
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sInversion.String(), B_GENERIC);
-		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sAgcInversion.String(), B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sFrequency.String(),
+			B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sPolarity.String(),
+			B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sSymbolRate.String(),
+			B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sInversion.String(),
+			B_GENERIC);
+		info2->MakeNullParameter(0, B_MEDIA_NO_TYPE, sAgcInversion.String(),
+			B_GENERIC);
 	}
 
 	return web;
@@ -2333,10 +2675,22 @@ DVBMediaNode::RefreshStateList()
 
 	const char *dir;
 	switch (fInterfaceType) {
-		case DVB_TYPE_DVB_C: dir = "/boot/home/config/settings/Media/dvb/dvb-c channels"; break;
-		case DVB_TYPE_DVB_H: dir = "/boot/home/config/settings/Media/dvb/dvb-h channels"; break;
-		case DVB_TYPE_DVB_S: dir = "/boot/home/config/settings/Media/dvb/dvb-s channels"; break;
-		case DVB_TYPE_DVB_T: dir = "/boot/home/config/settings/Media/dvb/dvb-t channels"; break;
+		case DVB_TYPE_DVB_C:
+			dir = "/boot/home/config/settings/Media/dvb/dvb-c channels";
+			break;
+
+		case DVB_TYPE_DVB_H:
+			dir = "/boot/home/config/settings/Media/dvb/dvb-h channels";
+			break;
+
+		case DVB_TYPE_DVB_S:
+			dir = "/boot/home/config/settings/Media/dvb/dvb-s channels";
+			break;
+
+		case DVB_TYPE_DVB_T:
+			dir = "/boot/home/config/settings/Media/dvb/dvb-t channels";
+			break;
+
 		default:
 			printf("DVBMediaNode::RefreshStateList unknown interface type\n");
 			return;
@@ -2498,25 +2852,45 @@ DVBMediaNode::AddAudioItems(BDiscreteParameter *param)
 
 
 status_t 
-DVBMediaNode::GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size)
+DVBMediaNode::GetParameterValue(int32 id, bigtime_t *last_change, void *value,
+	size_t *size)
 {
 //	TRACE("DVBMediaNode::GetParameterValue, id 0x%lx\n", id);
 	
 	switch (id) {
-		case ID_STATE:   *size = 4; *(int32 *)value = fSelectedState; break;
-		case ID_REGION:  *size = 4; *(int32 *)value = fSelectedRegion; break;
-		case ID_CHANNEL: *size = 4; *(int32 *)value = fSelectedChannel; break;
-		case ID_AUDIO:   *size = 4; *(int32 *)value = fSelectedAudio; break;
-		default: 		 return B_ERROR;
+		case ID_STATE:
+			*size = 4;
+			*(int32 *)value = fSelectedState;
+			break;
+
+		case ID_REGION:
+			*size = 4;
+			*(int32 *)value = fSelectedRegion;
+			break;
+
+		case ID_CHANNEL:
+			*size = 4;
+			*(int32 *)value = fSelectedChannel;
+			break;
+
+		case ID_AUDIO:
+			*size = 4;
+			*(int32 *)value = fSelectedAudio;
+			break;
+
+		default:
+			return B_ERROR;
 	}
 	return B_OK;
 }
 
 
 void
-DVBMediaNode::SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size)
+DVBMediaNode::SetParameterValue(int32 id, bigtime_t when, const void *value,
+	size_t size)
 {
-	TRACE("DVBMediaNode::SetParameterValue, id 0x%lx, size %ld, value 0x%lx\n", id, size, *(const int32 *)value);
+	TRACE("DVBMediaNode::SetParameterValue, id 0x%lx, size %ld, value 0x%lx\n",
+		id, size, *(const int32 *)value);
 	
 	switch (id) {
 		case ID_STATE:
@@ -2525,7 +2899,8 @@ DVBMediaNode::SetParameterValue(int32 id, bigtime_t when, const void *value, siz
 			RefreshRegionList();
 			RefreshChannelList();
 			RefreshAudioList();
-			EventQueue()->AddEvent(media_timed_event(0, M_REFRESH_PARAMETER_WEB));
+			EventQueue()->AddEvent(media_timed_event(0,
+				M_REFRESH_PARAMETER_WEB));
 //			Tune();
 			break;
 			
@@ -2534,14 +2909,16 @@ DVBMediaNode::SetParameterValue(int32 id, bigtime_t when, const void *value, siz
 			StopCapture();
 			RefreshChannelList();
 			RefreshAudioList();
-			EventQueue()->AddEvent(media_timed_event(0, M_REFRESH_PARAMETER_WEB));
+			EventQueue()->AddEvent(media_timed_event(0,
+				M_REFRESH_PARAMETER_WEB));
 //			Tune();
 			break;
 			
 		case ID_CHANNEL: 
 			fSelectedChannel = *(const int32 *)value;
 			RefreshAudioList();
-//			EventQueue()->AddEvent(media_timed_event(0, M_REFRESH_PARAMETER_WEB));
+//			EventQueue()->AddEvent(media_timed_event(0,
+//				M_REFRESH_PARAMETER_WEB));
 			Tune();
 			break;
 			
@@ -2559,8 +2936,8 @@ DVBMediaNode::SetParameterValue(int32 id, bigtime_t when, const void *value, siz
 
 status_t
 DVBMediaNode::ExtractTuningParams(const char *description, int audio_pid_index,
-								  dvb_tuning_parameters_t *tuning_param, 
-								  int *video_pid, int *audio_pid, int *pcr_pid)
+	dvb_tuning_parameters_t *tuning_param, int *video_pid, int *audio_pid,
+	int *pcr_pid)
 {
 	if (!description)
 		return B_ERROR;
@@ -2581,8 +2958,9 @@ DVBMediaNode::ExtractTuningParams(const char *description, int audio_pid_index,
 	char tid[50];
 	char rid[50];
 	
-	sscanf(description, " %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] ",
-		name, freq, para, src, srate, vpid, apid, tpid, ca, sid, nid, tid, rid);
+	sscanf(description, " %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:]"
+		" : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] : %[^:] ", name, freq, para,
+		src, srate, vpid, apid, tpid, ca, sid, nid, tid, rid);
 		
 	char *cpid = strchr(vpid, '+');
 	if (cpid) cpid++;
@@ -2597,7 +2975,8 @@ DVBMediaNode::ExtractTuningParams(const char *description, int audio_pid_index,
 		_freq *= 1000;
 
 	if (fInterfaceType == DVB_TYPE_DVB_S && _freq < 950000000) {
-		TRACE("workaround activated: type is DVB_S and frequency < 950 MHz, multiplying by 1000!\n");
+		TRACE("workaround activated: type is DVB_S and frequency < 950 MHz,"
+			" multiplying by 1000!\n");
 		_freq *= 1000;
 	}
 
@@ -2636,12 +3015,12 @@ DVBMediaNode::ExtractTuningParams(const char *description, int audio_pid_index,
 		TRACE("Interface is DVB-S\n");
 
 		const char *pInv = strchr(para, 'I');
-		if (!pInv)
+		if (pInv == NULL)
 			pInv = strchr(para, 'i');
-		if (pInv && pInv[1] == '0') {
+		if (pInv != NULL && pInv[1] == '0') {
 			TRACE("DVB_INVERSION_OFF\n");
 			param->inversion = DVB_INVERSION_OFF;
-		} else if (pInv && pInv[1] == '1') {
+		} else if (pInv != NULL && pInv[1] == '1') {
 			TRACE("DVB_INVERSION_ON\n");
 			param->inversion = DVB_INVERSION_ON;
 		} else {
@@ -2650,15 +3029,15 @@ DVBMediaNode::ExtractTuningParams(const char *description, int audio_pid_index,
 		}
 
 		const char *pPolH = strchr(para, 'H');
-		if (!pPolH)
+		if (pPolH == NULL)
 			pPolH = strchr(para, 'h');
 		const char *pPolV = strchr(para, 'V');
-		if (!pPolV)
+		if (pPolV == NULL)
 			pPolV = strchr(para, 'v');
-		if (pPolH && !pPolV) {
+		if (pPolH != NULL && pPolV == NULL) {
 			TRACE("DVB_POLARITY_HORIZONTAL\n");
 			param->polarity = DVB_POLARITY_HORIZONTAL;
-		} else if (!pPolH && pPolV) {
+		} else if (pPolH == NULL && pPolV != NULL) {
 			TRACE("DVB_POLARITY_VERTICAL\n");
 			param->polarity = DVB_POLARITY_VERTICAL;
 		} else {
