@@ -54,6 +54,7 @@
 //#define DUMP_VIDEO
 //#define DUMP_AUDIO
 //#define DUMP_RAW_AUDIO
+//#define DUMP_MPEG_TS
 
 
 #include "DVBMediaNode.h"
@@ -195,6 +196,9 @@ DVBMediaNode::DVBMediaNode(
 #ifdef DUMP_RAW_AUDIO
 	fRawAudioFile = open("/boot/home/dvb-audio.raw", O_RDWR | O_CREAT | O_TRUNC);
 #endif
+#ifdef DUMP_MPEG_TS
+	fMpegTsFile = open("/boot/home/dvb-mpeg.ts", O_RDWR | O_CREAT | O_TRUNC);
+#endif
 }
 
 
@@ -233,6 +237,9 @@ DVBMediaNode::~DVBMediaNode()
 #endif
 #ifdef DUMP_RAW_AUDIO
 	close(fRawAudioFile);
+#endif
+#ifdef DUMP_MPEG_TS
+	close(fMpegTsFile);
 #endif
 
 }
@@ -1423,6 +1430,12 @@ DVBMediaNode::mpeg_ts_thread()
 
 //		TRACE("mpeg ts   packet, size %6ld, start_time %14Ld\n", packet->Size(), packet->TimeStamp());
 
+#ifdef DUMP_MPEG_TS
+		lock.Lock();
+		write(fMpegTsFile, packet->Data(), packet->Size());
+		lock.Unlock();
+#endif
+
 		delete packet;
 	}
 }
@@ -1483,7 +1496,7 @@ DVBMediaNode::enc_video_thread()
 
 
 #ifdef DUMP_VIDEO
-		const uint8 *data;
+		int8 *data;
 		size_t size;
 		if (B_OK != pes_extract(packet->Data(), packet->Size(), &data, &size)) {
 			TRACE("video pes_extract failed\n");

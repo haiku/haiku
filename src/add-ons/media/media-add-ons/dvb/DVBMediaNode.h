@@ -284,6 +284,7 @@ private:
 		int					fVideoFile;
 		int					fAudioFile;
 		int					fRawAudioFile;
+		int					fMpegTsFile;
 };
 
 #endif	// __DVB_MEDIA_NODE_H
