@@ -13,5 +13,5 @@ rule PrepareTrackerNewTemplates source : mimeType
 
 PrepareTrackerNewTemplates "C++ header" : text/x-source-code ;
 PrepareTrackerNewTemplates "C++ source" : text/x-source-code ;
-PrepareTrackerNewTemplates "makefile" : text/x-makefile ;
+PrepareTrackerNewTemplates "Makefile" : text/x-makefile ;
 PrepareTrackerNewTemplates "text file" : text/plain ;
