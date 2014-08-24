@@ -68,7 +68,9 @@ BMessageBuilder::PopObject()
 
 	BMessage* previousMessage = fStack.LastItem();
 	previousMessage->AddMessage(fNameStack.LastItem()->String(),
-								fCurrentMessage);
+		fCurrentMessage);
+
+	delete fCurrentMessage;
 	fCurrentMessage = previousMessage;
 
 	fStack.RemoveItemAt(fStack.CountItems() - 1);
