@@ -184,6 +184,23 @@ if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 } # ! 1
 
 
+# Giflib
+if [ IsPackageAvailable giflib_devel ] {
+	ExtractBuildFeatureArchives giflib :
+		file: base giflib
+			runtime: lib
+		file: devel giflib_devel
+			depends: base
+			library: $(developLibDir)/libgif.so.7
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures giflib ;
+} else {
+	Echo "Giflib support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # GLU (GL Utilities)
 if [ IsPackageAvailable glu_devel ] {
 	ExtractBuildFeatureArchives glu :
@@ -358,6 +375,23 @@ if [ IsPackageAvailable libpng_devel ] {
 }
 
 
+# Jasper
+if [ IsPackageAvailable jasper_devel ] {
+	ExtractBuildFeatureArchives jasper :
+		file: base jasper
+			runtime: lib
+		file: devel jasper_devel
+			depends: base
+			library: $(developLibDir)/libjasper.so.1
+			headers: $(developHeadersDir) $(developHeadersDir)/jasper
+		;
+
+	EnableBuildFeatures jasper ;
+} else {
+	Echo "Jasper support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # jpeg
 if [ IsPackageAvailable jpeg_devel ] {
 	ExtractBuildFeatureArchives jpeg :
@@ -454,6 +488,22 @@ if [ IsPackageAvailable tiff_devel ] {
 	Echo "Tiff support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
+
+# libwebp
+if [ IsPackageAvailable libwebp_devel ] {
+	ExtractBuildFeatureArchives libwebp :
+		file: base libwebp
+			runtime: lib
+		file: devel libwebp_devel
+			depends: base
+			library: $(developLibDir)/libwebp.so.5
+			headers: $(developHeadersDir) $(developHeadersDir)/webp
+		;
+
+	EnableBuildFeatures libwebp ;
+} else {
+	Echo "Libwebp support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
 
 
 # GPL add-ons
