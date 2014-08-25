@@ -7,8 +7,6 @@
 #include <atomic>
 #include <sys/types.h>
 
-#ifndef ATOMIC_FUNCS_ARE_SYSCALLS
-
 
 extern "C" [[gnu::optimize("omit-frame-pointer")]] void
 atomic_set(int32_t* ptr, int32_t value)
@@ -123,5 +121,3 @@ atomic_get64(int64_t* ptr)
 	return obj.load(std::memory_order_acquire);
 }
 
-
-#endif /* ATOMIC64_FUNCS_ARE_SYSCALLS */
