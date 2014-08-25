@@ -11,9 +11,13 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) kernel lib ] ;
 
 UsePrivateHeaders [ FDirName libroot locale ] ;
 
+local extraSources = ;
+if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) = 2 {
+	extraSources += atomic.S ;
+}
+
 BootMergeObject boot_libroot.o :
 	abs.c
-	atomic.S
 	ctype.cpp
 	LocaleData.cpp
 	qsort.c
@@ -36,6 +40,7 @@ BootMergeObject boot_libroot.o :
 	strchr.c
 	strrchr.c
 	strtol.c
+	$(extraSources)
 	: -fno-pic
 ;
 

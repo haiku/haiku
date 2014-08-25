@@ -10,7 +10,6 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 StaticLibrary libruntime_loader_$(TARGET_ARCH).a :
 	arch_relocate.cpp
 	:
-	<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>atomic.o
 	<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
 	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>arch_string.o
 	;
