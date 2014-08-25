@@ -660,15 +660,9 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 		// _DecodeNextAudioFrame needs to be called on empty fDecodedData only!
 		// If this assert holds wrong we have a bug somewhere.
 
-	if (fDecodedData == NULL) {
-		size_t maximumSizeOfDecodedData = fOutputFrameCount * fOutputFrameSize;
-		fDecodedData
-			= static_cast<uint8_t*>(malloc(maximumSizeOfDecodedData));
-		if (fDecodedData == NULL)
-			return B_NO_MEMORY;
-	}
-
-	_ResetRawDecodedAudio();
+	status_t resetStatus = _ResetRawDecodedAudio();
+	if (resetStatus != B_OK)
+		return resetStatus;
 
 	while (fRawDecodedAudio->nb_samples < fOutputFrameCount) {
 		_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow();
@@ -772,16 +766,31 @@ AVCodecDecoder::_ApplyEssentialAudioContainerPropertiesToContext()
 
 
 /*!	\brief Resets important fields in fRawDecodedVideo to their default values.
+
+	Note: Also initializes fDecodedData if not done already.
+
+	\returns B_OK Resetting successfully completed.
+	\returns B_NO_MEMORY No memory left for correct operation.
 */
-void
+status_t
 AVCodecDecoder::_ResetRawDecodedAudio()
 {
+	if (fDecodedData == NULL) {
+		size_t maximumSizeOfDecodedData = fOutputFrameCount * fOutputFrameSize;
+		fDecodedData
+			= static_cast<uint8_t*>(malloc(maximumSizeOfDecodedData));
+	}
+	if (fDecodedData == NULL)
+		return B_NO_MEMORY;
+
 	fRawDecodedAudio->data[0] = fDecodedData;
 	fRawDecodedAudio->linesize[0] = 0;
 	fRawDecodedAudio->format = AV_SAMPLE_FMT_NONE;
 	fRawDecodedAudio->pkt_dts = AV_NOPTS_VALUE;
 	fRawDecodedAudio->nb_samples = 0;
 	memset(fRawDecodedAudio->opaque, 0, sizeof(avformat_codec_context));
+
+	return B_OK;
 }
 
 

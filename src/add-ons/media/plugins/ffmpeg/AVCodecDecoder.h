@@ -63,7 +63,7 @@ private:
 
 			status_t	_DecodeNextAudioFrame();
 			void		_ApplyEssentialAudioContainerPropertiesToContext();
-			void		_ResetRawDecodedAudio();
+			status_t	_ResetRawDecodedAudio();
 			void		_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow();
 			void		_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes();
 			status_t	_DecodeNextAudioFrameChunk();
