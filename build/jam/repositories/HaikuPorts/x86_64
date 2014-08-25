@@ -102,6 +102,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis_devel-1.3.4-1
 	libvpx-1.0.0-2
 	libvpx_devel-1.0.0-2
+	libwebp-0.4.1-1
+	libwebp_devel-0.4.1-1
 	libxml2-2.9.1-2
 	libxml2_devel-2.9.1-2
 	libxml2_python-2.9.1-2
@@ -222,6 +224,7 @@ RemotePackageRepository HaikuPorts
 	libtool
 	libvorbis
 	libvpx
+	libwebp
 	libxml2
 	libxslt
 	llvm
