@@ -75,10 +75,10 @@ private:
 			status_t	_LoadNextChunkIfNeededAndAssignStartTime();
 			status_t	_CopyChunkToChunkBufferAndAddPadding(const void* chunk,
 							size_t chunkSize);
-			void		_HandleNewVideoFrameAndUpdateSystemState();
+			status_t	_HandleNewVideoFrameAndUpdateSystemState();
 			status_t	_FlushOneVideoFrameFromDecoderBuffer();
 			void		_UpdateMediaHeaderForVideoFrame();
-			void		_DeinterlaceAndColorConvertVideoFrame();
+			status_t	_DeinterlaceAndColorConvertVideoFrame();
 
 
 			media_header		fHeader;

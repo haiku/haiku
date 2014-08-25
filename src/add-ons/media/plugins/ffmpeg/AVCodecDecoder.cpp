@@ -1172,7 +1172,9 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		bigtime_t formatConversionStart = system_time();
 #endif
 
-		_HandleNewVideoFrameAndUpdateSystemState();
+		status_t handleStatus = _HandleNewVideoFrameAndUpdateSystemState();
+		if (handleStatus != B_OK)
+			return handleStatus;
 
 #if DO_PROFILING
 		bigtime_t doneTime = system_time();
@@ -1360,12 +1362,17 @@ AVCodecDecoder::_CopyChunkToChunkBufferAndAddPadding(const void* chunk,
 	\see _UpdateMediaHeaderForVideoFrame() and
 	\see _DeinterlaceAndColorConvertVideoFrame() for when you are allowed to
 	call this method.
+
+	\returns B_OK when video frame was handled successfully
+	\returnb B_NO_MEMORY when no memory is left for correct operation.
 */
-void
+status_t
 AVCodecDecoder::_HandleNewVideoFrameAndUpdateSystemState()
 {
 	_UpdateMediaHeaderForVideoFrame();
-	_DeinterlaceAndColorConvertVideoFrame();
+	status_t postProcessStatus = _DeinterlaceAndColorConvertVideoFrame();
+	if (postProcessStatus != B_OK)
+		return postProcessStatus;
 
 	ConvertAVCodecContextToVideoFrameRate(*fContext, fOutputFrameRate);
 
@@ -1374,6 +1381,8 @@ AVCodecDecoder::_HandleNewVideoFrameAndUpdateSystemState()
 #endif
 
 	fFrame++;
+
+	return B_OK;
 }
 
 
@@ -1393,6 +1402,8 @@ AVCodecDecoder::_HandleNewVideoFrameAndUpdateSystemState()
 
 	\returns B_LAST_BUFFER_ERROR No video frame left.
 		The client of the AVCodecDecoder should stop calling it now.
+
+	\returns B_NO_MEMORY No memory left for correct operation.
 */
 status_t
 AVCodecDecoder::_FlushOneVideoFrameFromDecoderBuffer()
@@ -1413,9 +1424,7 @@ AVCodecDecoder::_FlushOneVideoFrameFromDecoderBuffer()
 		return B_LAST_BUFFER_ERROR;
 	}
 
-	_HandleNewVideoFrameAndUpdateSystemState();
-
-	return B_OK;
+	return _HandleNewVideoFrameAndUpdateSystemState();
 }
 
 
@@ -1487,8 +1496,11 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	When this function finishes the postprocessed video frame will be available
 	in fPostProcessedDecodedPicture and fDecodedData (fDecodedDataSizeInBytes
 	will be set accordingly).
+
+	\returns B_OK video frame successfully deinterlaced and color converted.
+	\returns B_NO_MEMORY Not enough memory available for correct operation.
 */
-void
+status_t
 AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 {
 	int displayWidth = fRawDecodedPicture->width;
@@ -1534,9 +1546,13 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 
 	fDecodedDataSizeInBytes = fHeader.size_used;
 
+	if (fDecodedData == NULL) {
+		const size_t kOptimalAlignmentForColorConversion = 32;
+		posix_memalign(reinterpret_cast<void**>(&fDecodedData),
+			kOptimalAlignmentForColorConversion, fDecodedDataSizeInBytes);
+	}
 	if (fDecodedData == NULL)
-		fDecodedData
-			= static_cast<uint8_t*>(malloc(fDecodedDataSizeInBytes));
+		return B_NO_MEMORY;
 
 	fPostProcessedDecodedPicture->data[0] = fDecodedData;
 	fPostProcessedDecodedPicture->linesize[0]
@@ -1586,4 +1602,6 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 
 	if (fRawDecodedPicture->interlaced_frame)
 		avpicture_free(&deinterlacedPicture);
+
+	return B_OK;
 }
