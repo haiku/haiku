@@ -1364,8 +1364,8 @@ AVCodecDecoder::_CopyChunkToChunkBufferAndAddPadding(const void* chunk,
 void
 AVCodecDecoder::_HandleNewVideoFrameAndUpdateSystemState()
 {
-	_DeinterlaceAndColorConvertVideoFrame();
 	_UpdateMediaHeaderForVideoFrame();
+	_DeinterlaceAndColorConvertVideoFrame();
 
 	ConvertAVCodecContextToVideoFrameRate(*fContext, fOutputFrameRate);
 
@@ -1444,7 +1444,9 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	fHeader.file_pos = 0;
 	fHeader.orig_size = 0;
 	fHeader.start_time = fRawDecodedPicture->pkt_dts;
-	fHeader.size_used = fDecodedDataSizeInBytes;
+	fHeader.size_used = avpicture_get_size(
+		colorspace_to_pixfmt(fOutputColorSpace), fRawDecodedPicture->width,
+		fRawDecodedPicture->height);
 	fHeader.u.raw_video.display_line_width = fRawDecodedPicture->width;
 	fHeader.u.raw_video.display_line_count = fRawDecodedPicture->height;
 	fHeader.u.raw_video.bytes_per_row
@@ -1475,8 +1477,12 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	It is assumed that fRawDecodedPicture wasn't deinterlaced and color
 	converted yet (otherwise this function behaves in unknown manners).
 
+	This function MUST be called after _UpdateMediaHeaderForVideoFrame() as it
+	relys on the fHeader.size_used and fHeader.u.raw_video.bytes_per_row fields
+	for correct operation
+
 	You should only call this function when you	got a new picture decoded by
-	the video decoder..
+	the video decoder. 
 
 	When this function finishes the postprocessed video frame will be available
 	in fPostProcessedDecodedPicture and fDecodedData (fDecodedDataSizeInBytes
@@ -1526,8 +1532,7 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 	}
 #endif
 
-	fDecodedDataSizeInBytes = avpicture_get_size(
-		colorspace_to_pixfmt(fOutputColorSpace), displayWidth, displayHeight);
+	fDecodedDataSizeInBytes = fHeader.size_used;
 
 	if (fDecodedData == NULL)
 		fDecodedData
