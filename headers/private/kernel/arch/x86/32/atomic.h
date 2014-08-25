@@ -32,6 +32,9 @@ memory_full_barrier_inline(void)
 #define memory_full_barrier		memory_full_barrier_inline
 
 
+#if __GNUC__ < 4
+
+
 static inline void
 atomic_set_inline(int32* value, int32 newValue)
 {
@@ -84,13 +87,12 @@ atomic_get_inline(int32* value)
 
 #define atomic_set				atomic_set_inline
 #define atomic_get_and_set		atomic_get_and_set_inline
-#ifndef atomic_test_and_set
-#	define atomic_test_and_set	atomic_test_and_set_inline
-#endif
-#ifndef atomic_add
-#	define atomic_add			atomic_add_inline
-#endif
+#define atomic_test_and_set		atomic_test_and_set_inline
+#define atomic_add				atomic_add_inline
 #define atomic_get				atomic_get_inline
+
+
+#endif	// dark ages
 
 
 #endif	// _KERNEL_ARCH_X86_32_ATOMIC_H

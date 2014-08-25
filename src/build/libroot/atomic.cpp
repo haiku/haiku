@@ -6,6 +6,9 @@
 #include <SupportDefs.h>
 
 
+#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 7)
+
+
 void
 atomic_set(int32 *value, int32 newValue)
 {
@@ -119,4 +122,7 @@ atomic_get64(int64 *value)
 {
 	return *value;
 }
+
+
+#endif	// __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 7)
 
