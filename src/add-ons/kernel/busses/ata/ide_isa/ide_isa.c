@@ -409,7 +409,7 @@ channel_removed(void *cookie)
 	TRACE("channel_removed()\n");
 
 	// disable access instantly
-	atomic_or(&channel->lost, 1);
+	atomic_or((int32*)&channel->lost, 1);
 }
 
 

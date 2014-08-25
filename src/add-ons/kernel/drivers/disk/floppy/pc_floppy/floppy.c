@@ -545,7 +545,7 @@ motor_off_daemon(void *t, int tim)
 	for (i = 0; i < MAX_FLOPPIES; i++) {
 		if (floppies[i].iobase && !floppies[i].pending_cmd && floppies[i].motor_timeout > 0) {
 			TRACE("floppies[%d].motor_timeout = %ld\n", i, floppies[i].motor_timeout);
-			if (atomic_add(&floppies[i].motor_timeout, -500000) <= 500000) {
+			if (atomic_add((int32*)&floppies[i].motor_timeout, -500000) <= 500000) {
 				dprintf("turning off motor for drive %d\n", floppies[i].drive_num);
 				turn_off_motor(&floppies[i]);
 				floppies[i].motor_timeout = 0;
