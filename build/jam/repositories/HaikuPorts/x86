@@ -77,6 +77,9 @@ RemotePackageRepository HaikuPorts
 	icu-4.8.1.1-4
 	icu_devel-4.8.1.1-4
 	jam-2.5_2012_10_12-1
+	jasper-1.900.1-3
+	jasper_devel-1.900.1-3
+	jasper_tools-1.900.1-3
 	jpeg-9-3
 	jpeg_devel-9-3
 	jpeg_tools-9-3
@@ -200,6 +203,8 @@ RemotePackageRepository HaikuPorts
 	glu_x86_gcc2_devel-9.0.0-2
 	icu_x86_gcc2-4.8.1.1-4
 	icu_x86_gcc2_devel-4.8.1.1-4
+	jasper_x86_gcc2-1.900.1-3
+	jasper_x86_gcc2_devel-1.900.1-3
 	jpeg_x86_gcc2-9-3
 	jpeg_x86_gcc2_devel-9-3
 	libiconv_x86_gcc2-1.13.1-6
@@ -280,6 +285,7 @@ RemotePackageRepository HaikuPorts
 	htmldoc
 	icu
 	jam
+	jasper
 	jpeg
 	help2man
 	keymapswitcher
