@@ -98,7 +98,8 @@ x86_set_tls_context(Thread* thread)
 static addr_t
 arch_randomize_stack_pointer(addr_t value)
 {
-	STATIC_ASSERT(MAX_RANDOM_VALUE >= B_PAGE_SIZE - 1);
+	static_assert(MAX_RANDOM_VALUE >= B_PAGE_SIZE - 1,
+		"randomization range is too big");
 	value -= random_value() & (B_PAGE_SIZE - 1);
 	return value & ~addr_t(0xf);
 }
