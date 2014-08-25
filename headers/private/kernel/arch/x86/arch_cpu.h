@@ -455,7 +455,6 @@ void __x86_setup_system_time(uint32 conversionFactor,
 
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
-void x86_swap_pgdir(addr_t newPageDir);
 void x86_fxsave(void* fpuState);
 void x86_fxrstor(const void* fpuState);
 void x86_noop_swap(void* oldFpuState, const void* newFpuState);
@@ -479,6 +478,8 @@ void x86_hardware_interrupt(iframe* frame);
 void x86_page_fault_exception(iframe* iframe);
 
 #ifndef __x86_64__
+
+void x86_swap_pgdir(addr_t newPageDir);
 
 uint64 x86_read_msr(uint32 registerNumber);
 void x86_write_msr(uint32 registerNumber, uint64 value);

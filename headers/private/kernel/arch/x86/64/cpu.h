@@ -45,4 +45,11 @@ x86_context_switch(arch_thread* oldState, arch_thread* newState)
 }
 
 
+static inline void
+x86_swap_pgdir(uintptr_t root)
+{
+	asm volatile("movq	%0, %%cr3" : : "r" (root));
+}
+
+
 #endif	// _KERNEL_ARCH_X86_64_CPU_H

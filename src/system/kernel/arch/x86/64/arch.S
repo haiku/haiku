@@ -69,13 +69,6 @@ FUNCTION(x86_64_thread_entry):
 FUNCTION_END(x86_64_thread_entry)
 
 
-/* void x86_swap_pgdir(uint64 newPageDir); */
-FUNCTION(x86_swap_pgdir):
-	movq	%rdi, %cr3
-	ret
-FUNCTION_END(x86_swap_pgdir)
-
-
 /* thread exit stub */
 .align 8
 FUNCTION(x86_userspace_thread_exit):
