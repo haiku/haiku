@@ -45,6 +45,8 @@ RemotePackageRepository HaikuPorts
 	gcc_syslibs_devel-4.8.3_2014_07_26-2
 	gettext-0.18.1.1-5
 	gettext_libintl-0.18.1.1-5
+	giflib-5.1.0-1
+	giflib_devel-5.1.0-1
 	git-1.8.3.4-3
 	git_arch-1.8.3.4-3
 	git_cvs-1.8.3.4-3
@@ -191,6 +193,7 @@ RemotePackageRepository HaikuPorts
 	gawk
 	gcc
 	gettext
+	giflib
 	git
 	glew
 	glu
