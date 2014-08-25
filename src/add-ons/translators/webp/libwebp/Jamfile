@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src add-ons translators webp libwebp ;
-
-SubInclude HAIKU_TOP src add-ons translators webp libwebp dec ;
-SubInclude HAIKU_TOP src add-ons translators webp libwebp enc ;

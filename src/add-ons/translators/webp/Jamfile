@@ -3,13 +3,14 @@ SubDir HAIKU_TOP src add-ons translators webp ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
-SubDirHdrs [ FDirName $(SUBDIR) libwebp ] ;
 
 AddResources WebPTranslator : WebPTranslator.rdef ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		UseBuildFeatureHeaders libwebp ;
+
 		Translator [ MultiArchDefaultGristFiles WebPTranslator ] :
 
 			main.cpp
@@ -18,9 +19,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ConfigView.cpp
 
 			:
-			<libwebp>webpdecode.o
-			<libwebp>webpencode.o
 			be translation [ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			[ BuildFeatureAttribute libwebp : library ]
 			[ TargetLibsupc++ ]	localestub
 			: true
 		;
@@ -35,4 +35,3 @@ DoCatalogs WebPTranslator :
 	WebPTranslator.cpp
 ;
 
-SubInclude HAIKU_TOP src add-ons translators webp libwebp ;
