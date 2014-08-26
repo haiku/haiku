@@ -375,6 +375,23 @@ if [ IsPackageAvailable libpng_devel ] {
 }
 
 
+# libicns
+if [ IsPackageAvailable libicns_devel ] {
+	ExtractBuildFeatureArchives libicns :
+		file: base libicns
+			runtime: lib
+		file: devel libicns_devel
+			depends: base
+			library: $(developLibDir)/libicns.so.1
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures libicns ;
+} else {
+	Echo "libicns support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # Jasper
 if [ IsPackageAvailable jasper_devel ] {
 	ExtractBuildFeatureArchives jasper :
