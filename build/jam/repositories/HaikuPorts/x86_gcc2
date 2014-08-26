@@ -115,9 +115,9 @@ RemotePackageRepository HaikuPorts
 	icu_devel-4.8.1.1-4
 	intltool-0.40.6-3
 	jam-2.5_2012_10_12-1
-	jasper-1.900.1-3
-	jasper_devel-1.900.1-3
-	jasper_tools-1.900.1-3
+	jasper-1.900.1-4
+	jasper_devel-1.900.1-4
+	jasper_tools-1.900.1-4
 	jpeg-9-3
 	jpeg_devel-9-3
 	jpeg_tools-9-3
@@ -381,8 +381,8 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit_x86_devel-1.4.1-3
 	icu_x86-4.8.1.1-4
 	icu_x86_devel-4.8.1.1-4
-	jasper_x86-1.900.1-3
-	jasper_x86_devel-1.900.1-3
+	jasper_x86-1.900.1-4
+	jasper_x86_devel-1.900.1-4
 	jpeg_x86-9-3
 	jpeg_x86_devel-9-3
 	lame_x86-3.99.5-3
