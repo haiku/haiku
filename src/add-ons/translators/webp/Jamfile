@@ -24,6 +24,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ TargetLibsupc++ ]	localestub
 			: true
 		;
+
+		Includes [ FGristFiles ConfigView.cpp WebPTranslator.cpp ]
+			: [ BuildFeatureAttribute libwebp : headers ] ;
 	}
 }
 
