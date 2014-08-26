@@ -14,8 +14,7 @@ SEARCH_SOURCE += [ FDirName $(librootSources) os arch generic ] ;
 
 KernelMergeObject kernel_os_arch_$(TARGET_ARCH).o :
 	byteorder.S
-	system_time_asm.S
-	system_time.c
+	system_time.cpp
 
 	generic_atomic.cpp
 	: $(TARGET_KERNEL_PIC_CCFLAGS)

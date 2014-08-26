@@ -18,7 +18,7 @@ for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 			byteorder.S
 			get_stack_frame.S
 			system_info.cpp
-			system_time_asm.S
+			system_time.cpp
 			thread.cpp
 			time.cpp
 			tls.cpp
