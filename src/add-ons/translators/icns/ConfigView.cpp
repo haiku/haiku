@@ -16,10 +16,6 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ICNSConfig"
 
-extern "C" {
-#include <openjpeg.h>
-};
-
 
 ConfigView::ConfigView(TranslatorSettings *settings)
 	: BGroupView("ICNSTranslator Settings", B_VERTICAL, 0)
@@ -71,10 +67,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 
 	BString copyrightText;
 	copyrightText << "libicns v0.8.1\n"
-		<< B_UTF8_COPYRIGHT "2001-2012 Mathew Eis <mathew@eisbox.net>\n\n"
-		<< "OpenJPEG " << opj_version() << "\n"
-		<< B_UTF8_COPYRIGHT "2002-2012, Communications and Remote Sensing "
-		<< "Laboratory, Universite catholique de Louvain (UCL), Belgium";
+		<< B_UTF8_COPYRIGHT "2001-2012 Mathew Eis <mathew@eisbox.net>";
 	
 	fCopyrightView = new BTextView("CopyrightLibs");
 	fCopyrightView->SetExplicitAlignment(leftAlignment);
