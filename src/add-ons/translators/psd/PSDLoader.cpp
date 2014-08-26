@@ -5,7 +5,13 @@
 
 
 #include "PSDLoader.h"
+
+#include <Catalog.h>
+
 #include "BaseTranslator.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PSDLoader"
 
 
 PSDLoader::PSDLoader(BPositionIO *src)
@@ -107,21 +113,21 @@ PSDLoader::ColorFormatName(void)
 {
 	switch (fColorFormat) {
 		case PSD_COLOR_MODE_BITS:
-			return "Bitmap";
+			return B_TRANSLATE("Bitmap");
 		case PSD_COLOR_MODE_GRAYSCALE:
-			return "Grayscale";
+			return B_TRANSLATE("Grayscale");
 		case PSD_COLOR_MODE_INDEXED:
-			return "Indexed";
+			return B_TRANSLATE("Indexed");
 		case PSD_COLOR_MODE_RGB:
-			return fChannels > 3 ? "RGBA" : "RGB";
+			return fChannels > 3 ? B_TRANSLATE("RGBA") : B_TRANSLATE("RGB");
 		case PSD_COLOR_MODE_CMYK:
-			return "CMYK";
+			return B_TRANSLATE("CMYK");
 		case PSD_COLOR_MODE_MULTICHANNEL:
-			return "Multichannel";
+			return B_TRANSLATE("Multichannel");
 		case PSD_COLOR_MODE_LAB:
-			return "Lab";
+			return B_TRANSLATE("Lab");
 		case PSD_COLOR_MODE_DUOTONE:
-			return "Duotone";
+			return B_TRANSLATE("Duotone");
 	}
 	return "";
 }

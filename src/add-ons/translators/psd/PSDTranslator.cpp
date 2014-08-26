@@ -4,14 +4,20 @@
  */
 
 
-#include <stdlib.h>
+#include "PSDTranslator.h"
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
+#include <Catalog.h>
+
 #include "ConfigView.h"
-#include "PSDTranslator.h"
 #include "PSDLoader.h"
 #include "PSDWriter.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PSDTranslator"
 
 const char *kDocumentCount = "/documentCount";
 const char *kDocumentIndex = "/documentIndex";
@@ -74,8 +80,8 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings)
 
 
 PSDTranslator::PSDTranslator()
-	: BaseTranslator(kPSDName,
-		"Photoshop image translator",
+	: BaseTranslator(B_TRANSLATE(kPSDName),
+		B_TRANSLATE("Photoshop image translator"),
 		PSD_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -109,9 +115,9 @@ PSDTranslator::DerivedIdentify(BPositionIO *stream,
 	info->group = B_TRANSLATOR_BITMAP;
 	info->quality = PSD_IN_QUALITY;
 	info->capability = PSD_IN_CAPABILITY;
-	BString name(kPSDName);
-	name << " (" << psdFile.ColorFormatName() << ")";
-	strcpy(info->name, name.String());
+	snprintf(info->name, sizeof(info->name),
+		B_TRANSLATE(kPSDName " (%s)"),
+		psdFile.ColorFormatName().String());
 	strcpy(info->MIME, kPSDMimeType);
 	
 	return B_OK;

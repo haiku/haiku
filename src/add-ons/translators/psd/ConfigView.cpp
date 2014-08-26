@@ -4,21 +4,25 @@
  */
 
 #include "ConfigView.h"
-#include "PSDTranslator.h"
 
-#include <StringView.h>
-#include <SpaceLayoutItem.h>
+#include <Catalog.h>
 #include <ControlLook.h>
-#include <PopUpMenu.h>
 #include <MenuItem.h>
+#include <PopUpMenu.h>
+#include <SpaceLayoutItem.h>
+#include <StringView.h>
 
 #include <stdio.h>
 
 #include "PSDLoader.h"
+#include "PSDTranslator.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PSDConfig"
 
 
 ConfigView::ConfigView(TranslatorSettings *settings)
-	: BGroupView("PSDTranslator Settings", B_VERTICAL, 0)
+	: BGroupView(B_TRANSLATE("PSDTranslator Settings"), B_VERTICAL, 0)
 {
 	fSettings = settings;
 
@@ -27,31 +31,33 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	uint32 currentCompression = 
 		fSettings->SetGetInt32(PSD_SETTING_COMPRESSION);
 
-	_AddItemToMenu(compressionPopupMenu, "Uncompressed",
+	_AddItemToMenu(compressionPopupMenu, B_TRANSLATE("Uncompressed"),
 		MSG_COMPRESSION_CHANGED, PSD_COMPRESSED_RAW, currentCompression);
-	_AddItemToMenu(compressionPopupMenu, "RLE",
+	_AddItemToMenu(compressionPopupMenu, B_TRANSLATE("RLE"),
 		MSG_COMPRESSION_CHANGED, PSD_COMPRESSED_RLE, currentCompression);
 
 	fCompressionField = new BMenuField("compression",
-		"Compression: ", compressionPopupMenu);
+		B_TRANSLATE("Compression: "), compressionPopupMenu);
 
 	BPopUpMenu* versionPopupMenu = new BPopUpMenu("popup_version");
 
 	uint32 currentVersion = 
 		fSettings->SetGetInt32(PSD_SETTING_VERSION);
 
-	_AddItemToMenu(versionPopupMenu, "Photoshop Document (PSD File)",
-		MSG_VERSION_CHANGED, PSD_FILE, currentVersion);
-	_AddItemToMenu(versionPopupMenu, "Photoshop Big Document (PSB File)",
-		MSG_VERSION_CHANGED, PSB_FILE, currentVersion);
+	_AddItemToMenu(versionPopupMenu,
+		B_TRANSLATE("Photoshop Document (PSD File)"), MSG_VERSION_CHANGED,
+		PSD_FILE, currentVersion);
+	_AddItemToMenu(versionPopupMenu,
+		B_TRANSLATE("Photoshop Big Document (PSB File)"), MSG_VERSION_CHANGED,
+		PSB_FILE, currentVersion);
 
 	fVersionField = new BMenuField("version",
-		"Format: ", versionPopupMenu);
+		B_TRANSLATE("Format: "), versionPopupMenu);
 
 	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
 
 	BStringView *stringView = new BStringView("title",
-		"Photoshop image translator");
+		B_TRANSLATE("Photoshop image translator"));
 	stringView->SetFont(be_bold_font);
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
@@ -60,7 +66,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
 
 	char version[256];
-	sprintf(version, "Version %d.%d.%d, %s",
+	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(PSD_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(PSD_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(PSD_TRANSLATOR_VERSION)),
