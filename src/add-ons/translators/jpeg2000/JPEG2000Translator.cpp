@@ -31,8 +31,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "JPEG2000Translator.h"
-#include "jp2_cod.h"
-#include "jpc_cs.h"
 #include "TranslatorWindow.h"
 
 #include <syslog.h>
@@ -97,17 +95,21 @@ const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_for
 const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
 
 
+#define	JP2_BOX_JP		0x6a502020
+#define	JPC_MS_SOC		0xff4f
+
+
 namespace conversion{
 //!	Make RGB32 scanline from *pixels[3]
 inline void
-read_rgb24_to_rgb32(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+read_rgb24_to_rgb32(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
 	while (x < width) {
-		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[2], x);
-		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[1], x);
-		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[0], x);
+		scanline[index++] = (uchar)jas_matrix_getv(pixels[2], x);
+		scanline[index++] = (uchar)jas_matrix_getv(pixels[1], x);
+		scanline[index++] = (uchar)jas_matrix_getv(pixels[0], x);
 		scanline[index++] = 255;
 		x++;
 	}
@@ -116,13 +118,13 @@ read_rgb24_to_rgb32(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 
 //!	Make gray scanline from *pixels[1]
 inline void
-read_gray_to_rgb32(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+read_gray_to_rgb32(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
-	jpr_uchar_t color = 0;
+	uchar color = 0;
 	while (x < width) {
-		color = (jpr_uchar_t)jas_matrix_getv(pixels[0], x++);
+		color = (uchar)jas_matrix_getv(pixels[0], x++);
 		scanline[index++] = color;
 		scanline[index++] = color;
 		scanline[index++] = color;
@@ -136,15 +138,15 @@ read_gray_to_rgb32(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	(just read data to scanline)
 */
 inline void
-read_rgba32(jas_matrix_t** pixels, jpr_uchar_t *scanline, int width)
+read_rgba32(jas_matrix_t** pixels, uchar *scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
 	while (x < width) {
-		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[2], x);
-		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[1], x);
-		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[0], x);
-		scanline[index++] = (jpr_uchar_t)jas_matrix_getv(pixels[3], x);
+		scanline[index++] = (uchar)jas_matrix_getv(pixels[2], x);
+		scanline[index++] = (uchar)jas_matrix_getv(pixels[1], x);
+		scanline[index++] = (uchar)jas_matrix_getv(pixels[0], x);
+		scanline[index++] = (uchar)jas_matrix_getv(pixels[3], x);
 		x++;
 	}
 }
@@ -155,11 +157,11 @@ read_rgba32(jas_matrix_t** pixels, jpr_uchar_t *scanline, int width)
 	(just read data to scanline)
 */
 inline void
-read_gray(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+read_gray(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 x = 0;
 	while (x < width) {
-		scanline[x] = (jpr_uchar_t)jas_matrix_getv(pixels[0], x);
+		scanline[x] = (uchar)jas_matrix_getv(pixels[0], x);
 		x++;
 	}
 }
@@ -167,7 +169,7 @@ read_gray(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 
 //!	Make *pixels[1] from gray1 scanline
 inline void
-write_gray1_to_gray(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_gray1_to_gray(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
@@ -185,7 +187,7 @@ write_gray1_to_gray(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 
 //!	Make *pixels[3] from gray1 scanline
 inline void
-write_gray1_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_gray1_to_rgb24(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
@@ -209,7 +211,7 @@ write_gray1_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 
 //!	Make *pixels[3] from cmap8 scanline
 inline void
-write_cmap8_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_cmap8_to_rgb24(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	const color_map* map = system_colors();
 	int32 x = 0;
@@ -229,7 +231,7 @@ write_cmap8_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_gray(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_gray(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 x = 0;
 	while (x < width) {
@@ -244,7 +246,7 @@ write_gray(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb15_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_rgb15_to_rgb24(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
@@ -269,7 +271,7 @@ write_rgb15_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb15b_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_rgb15b_to_rgb24(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
@@ -294,7 +296,7 @@ write_rgb15b_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb16_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_rgb16_to_rgb24(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
@@ -319,7 +321,7 @@ write_rgb16_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb16b_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_rgb16b_to_rgb24(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
@@ -344,7 +346,7 @@ write_rgb16b_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_rgb24(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -362,7 +364,7 @@ write_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb24b(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_rgb24b(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -380,7 +382,7 @@ write_rgb24b(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb32_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_rgb32_to_rgb24(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -399,7 +401,7 @@ write_rgb32_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb32b_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_rgb32b_to_rgb24(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -419,7 +421,7 @@ write_rgb32b_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	!!! UNTESTED !!!
 */
 inline void
-write_rgba32(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_rgba32(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -439,7 +441,7 @@ write_rgba32(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 	!!! UNTESTED !!!
 */
 inline void
-write_rgba32b(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
+write_rgba32b(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -905,11 +907,11 @@ JP2Translator::Compress(BPositionIO* in, BPositionIO* out)
 
 	// Function pointer to write function
 	// It MUST point to proper function
-	void (*converter)(jas_matrix_t** pixels, jpr_uchar_t* inscanline,
+	void (*converter)(jas_matrix_t** pixels, uchar* inscanline,
 		int width) = write_rgba32;
 
 	// Default color info
-	int out_color_space = JAS_IMAGE_CS_RGB;
+	int out_color_space = JAS_CLRSPC_SRGB;
 	int out_color_components = 3;
 
 	switch ((color_space)B_BENDIAN_TO_HOST_INT32(header.colors)) {
@@ -918,7 +920,7 @@ JP2Translator::Compress(BPositionIO* in, BPositionIO* out)
 				converter = write_gray1_to_rgb24;
 			} else {
 				out_color_components = 1;
-				out_color_space = JAS_IMAGE_CS_GRAY;
+				out_color_space = JAS_CLRSPC_SGRAY;
 				converter = write_gray1_to_gray;
 			}
 			break;
@@ -929,7 +931,7 @@ JP2Translator::Compress(BPositionIO* in, BPositionIO* out)
 
 		case B_GRAY8:
 			out_color_components = 1;
-			out_color_space = JAS_IMAGE_CS_GRAY;
+			out_color_space = JAS_CLRSPC_SGRAY;
 			converter = write_gray;
 			break;
 
@@ -1024,7 +1026,7 @@ JP2Translator::Compress(BPositionIO* in, BPositionIO* out)
 	if (image == (jas_image_t *)NULL)
 		return Error(outs, NULL, NULL, 0, NULL, B_ERROR);
 
-	jpr_uchar_t *in_scanline = (jpr_uchar_t*) malloc(in_row_bytes);
+	uchar *in_scanline = (uchar*) malloc(in_row_bytes);
 	if (in_scanline == NULL)
 		return Error(outs, image, NULL, 0, NULL, B_ERROR);
 
@@ -1102,11 +1104,11 @@ JP2Translator::Decompress(BPositionIO* in, BPositionIO* out)
 
 	// Function pointer to read function
 	// It MUST point to proper function
-	void (*converter)(jas_matrix_t** pixels, jpr_uchar_t* outscanline,
+	void (*converter)(jas_matrix_t** pixels, uchar* outscanline,
 		int width) = NULL;
 
-	switch (jas_image_colorspace(image)) {
-		case JAS_IMAGE_CS_RGB:
+	switch (jas_clrspc_fam(jas_image_clrspc(image))) {
+		case JAS_CLRSPC_FAM_RGB:
 			out_color_components = 4;
 			if (in_color_components == 3) {
 				out_color_space = B_RGB32;
@@ -1120,7 +1122,7 @@ JP2Translator::Decompress(BPositionIO* in, BPositionIO* out)
 				return Error(ins, image, NULL, 0, NULL, B_ERROR);
 			}
 			break;
-		case JAS_IMAGE_CS_GRAY:
+		case JAS_CLRSPC_FAM_GRAY:
 			if (fSettings->SetGetBool(JP2_SET_GRAY8_AS_B_RGB32)) {
 				out_color_space = B_RGB32;
 				out_color_components = 4;
@@ -1131,11 +1133,11 @@ JP2Translator::Decompress(BPositionIO* in, BPositionIO* out)
 				converter = read_gray;
 			}
 			break;
-		case JAS_IMAGE_CS_YCBCR:
+		case JAS_CLRSPC_FAM_YCBCR:
 			syslog(LOG_ERR, "Color space YCBCR not implemented yet.\n");
 			return Error(ins, image, NULL, 0, NULL, B_ERROR);
 			break;
-		case JAS_IMAGE_CS_UNKNOWN:
+		case JAS_CLRSPC_UNKNOWN:
 		default:
 			syslog(LOG_ERR, "Color space unknown. \n");
 			return Error(ins, image, NULL, 0, NULL, B_ERROR);
@@ -1171,7 +1173,7 @@ JP2Translator::Decompress(BPositionIO* in, BPositionIO* out)
 	if (err < (int)sizeof(TranslatorBitmap))
 		return Error(ins, image, NULL, 0, NULL, B_ERROR);
 
-	jpr_uchar_t *out_scanline = (jpr_uchar_t*) malloc(out_row_bytes);
+	uchar *out_scanline = (uchar*) malloc(out_row_bytes);
 	if (out_scanline == NULL)
 		return Error(ins, image, NULL, 0, NULL, B_ERROR);
 
@@ -1266,7 +1268,7 @@ JP2Translator::PopulateInfoFromFormat(translator_info* info,
 */
 status_t
 Error(jas_stream_t* stream, jas_image_t* image, jas_matrix_t** pixels,
-	int32 pixels_count, jpr_uchar_t* scanline, status_t error)
+	int32 pixels_count, uchar* scanline, status_t error)
 {
 	if (pixels) {
 		int32 i;

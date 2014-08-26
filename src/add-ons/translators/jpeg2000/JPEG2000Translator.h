@@ -50,7 +50,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 
 #include "BaseTranslator.h"
-#include "libjasper/jasper.h"
+#include "jasper/jasper.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -155,7 +155,8 @@ private:
 		int32 formatCount);
 };
 
+
 status_t Error(jas_stream_t* stream, jas_image_t* image, jas_matrix_t** pixels,
-	int32 pixels_count, jpr_uchar_t* scanline, status_t error = B_ERROR);
+	int32 pixels_count, uchar* scanline, status_t error = B_ERROR);
 
 #endif // _JP2TRANSLATOR_H_
