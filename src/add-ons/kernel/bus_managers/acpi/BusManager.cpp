@@ -86,6 +86,69 @@ get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, void* context,
 }
 
 
+static void
+globalGPEHandler(UINT32 eventType, ACPI_HANDLE device, UINT32 eventNumber,
+	void *context)
+{
+	ACPI_BUFFER path;
+	char deviceName[256];
+	path.Length = sizeof(deviceName);
+	path.Pointer = deviceName;
+
+	ACPI_STATUS status = AcpiNsHandleToPathname(device, &path);
+	if (ACPI_FAILURE(status)) {
+		deviceName[0] = '?';
+		deviceName[1] = '?';
+		deviceName[2] = '?';
+		deviceName[3] = 0;
+	}
+
+	switch (eventType) {
+		case ACPI_EVENT_TYPE_GPE:
+			dprintf("acpi: GPE Event %d for %s\n", eventNumber, deviceName);
+			break;
+
+		case ACPI_EVENT_TYPE_FIXED:
+		{
+			switch(eventNumber) {
+				case ACPI_EVENT_PMTIMER:
+					dprintf("acpi: PMTIMER(%d) event for %s\n", eventNumber,
+						deviceName);
+					break;
+
+				case ACPI_EVENT_GLOBAL:
+					dprintf("acpi: Global(%d) event for %s\n", eventNumber,
+						deviceName);
+					break;
+
+				case ACPI_EVENT_POWER_BUTTON:
+					dprintf("acpi: Powerbutton(%d) event for %s\n", eventNumber,
+						deviceName);
+					break;
+
+				case ACPI_EVENT_SLEEP_BUTTON:
+					dprintf("acpi: sleepbutton(%d) event for %s\n", eventNumber,
+						deviceName);
+					break;
+
+				case ACPI_EVENT_RTC:
+					dprintf("acpi: RTC(%d) event for %s\n", eventNumber,
+						deviceName);
+					break;
+
+				default:
+					dprintf("acpi: unknown fixed(%d) event for %s\n",
+						eventNumber, deviceName);
+			}
+		} break;
+
+		default:
+			dprintf("acpi: unknown event type (%d:%d)  event for %s\n",
+				eventType, eventNumber, deviceName);
+	}
+}
+
+
 //	#pragma mark - ACPI bus manager API
 
 
@@ -182,6 +245,17 @@ acpi_std_ops(int32 op,...)
 						ACPI_FULL_INITIALIZATION),
 					"AcpiInitializeObjects failed"))
 				goto err;
+
+
+			checkAndLogFailure(
+					AcpiInstallGlobalEventHandler(globalGPEHandler, NULL),
+					"Failed to install global GPE handler.");
+
+			checkAndLogFailure(AcpiEnableAllRuntimeGpes(),
+					"Failed to enable all runtime Gpes");
+
+			checkAndLogFailure(AcpiUpdateAllGpes(),
+					"Failed to update all Gpes");
 
 			/* Phew. Now in ACPI mode */
 			TRACE("ACPI initialized\n");
