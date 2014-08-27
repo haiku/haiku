@@ -182,8 +182,14 @@ requires {
 	lib:libicutu
 	lib:libicuuc
 #ifdef HAIKU_REGULAR_BUILD
+	lib:libgutenprint
+	lib:libicns
+	lib:libjasper
 	lib:libjpeg
 	lib:libpng
+	lib:libqrencode
+	lib:libtiff
+	lib:libwebp
 #endif
 	lib:libsolv
 	lib:libsolvext
