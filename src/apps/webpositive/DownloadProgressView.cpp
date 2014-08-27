@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include <Alert.h>
+#include <Application.h>
 #include <Bitmap.h>
 #include <Button.h>
 #include <Catalog.h>
@@ -28,6 +29,7 @@
 #include <StatusBar.h>
 #include <StringView.h>
 
+#include "BrowserWindow.h"
 #include "WebDownload.h"
 #include "WebPage.h"
 #include "StringForSize.h"
@@ -403,8 +405,20 @@ DownloadProgressView::MessageReceived(BMessage* message)
 			break;
 		}
 		case RESTART_DOWNLOAD:
-			BWebPage::RequestDownload(fURL);
+		{
+			// We can't create a download without a full web context (mainly
+			// because it needs to access the cookie jar), and when we get here
+			// the original context is long gone (possibly the browser was
+			// restarted). So we create a new window to restart the download
+			// in a fresh context.
+			// FIXME this has of course the huge downside of leaving the new
+			// window open with a blank page. I can't think of a better
+			// solution right now...
+			BMessage* request = new BMessage(NEW_WINDOW);
+			request->AddString("url", fURL);
+			be_app->PostMessage(request);
 			break;
+		}
 
 		case CANCEL_DOWNLOAD:
 			CancelDownload();
