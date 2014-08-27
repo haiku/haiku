@@ -52,7 +52,7 @@ get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, void* context,
 	ACPI_STATUS status;
 	ACPI_BUFFER buffer;
 
-	TRACE("get_device_by_hid_callback %p, %ld, %p\n", object, depth, context);
+	TRACE("get_device_by_hid_callback %p, %d, %p\n", object, depth, context);
 
 	*_returnValue = NULL;
 
