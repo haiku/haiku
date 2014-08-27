@@ -120,9 +120,6 @@ acpi_std_ops(int32 op,...)
 				return B_ERROR;
 			}
 
-			AcpiGbl_EnableInterpreterSlack = true;
-//			AcpiGbl_CreateOSIMethod = true;
-
 #ifdef ACPI_DEBUG_OUTPUT
 			AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;
 			AcpiDbgLayer = ACPI_ALL_COMPONENTS;
