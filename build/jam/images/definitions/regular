@@ -116,13 +116,13 @@ SYSTEM_ADD_ONS_TRANSLATORS += [ FFilterByBuildFeatures
 	EXRTranslator
 	GIFTranslator
 	HVIFTranslator
-	ICOTranslator ICNSTranslator
-	JPEGTranslator	JPEG2000Translator
-	PCXTranslator PNGTranslator PPMTranslator PSDTranslator
+	ICOTranslator ICNSTranslator@libicns
+	JPEGTranslator@jpeg	JPEG2000Translator@jasper
+	PCXTranslator PNGTranslator@libpng PPMTranslator PSDTranslator
 	RAWTranslator RTFTranslator
 	SGITranslator
 	TGATranslator TIFFTranslator@tiff
-	WebPTranslator WonderBrushTranslator
+	WebPTranslator@libwebp WonderBrushTranslator
 ] ;
 
 SYSTEM_ADD_ONS_MEDIA += [ FFilterByBuildFeatures
