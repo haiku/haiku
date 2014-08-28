@@ -117,6 +117,7 @@ static	void					InterruptCallbackFunction(void *cookie,
 
 		/* deferred interrupt */
 		uint8					fCachedIIR;	// cached IRQ condition
+		int32					fPendingDPC; // some IRQ still
 
 		/* data buffers */
 		char					fReadBuffer[DEF_BUFFER_SIZE];

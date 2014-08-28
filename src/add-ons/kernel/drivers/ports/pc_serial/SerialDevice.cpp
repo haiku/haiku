@@ -30,6 +30,7 @@ SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
 		fIRQ(irq),
 		fMaster(master),
 		fCachedIIR(0x1),
+		fPendingDPC(0),
 		fReadBufferAvail(0),
 		fReadBufferIn(0),
 		fReadBufferOut(0),
@@ -356,14 +357,19 @@ SerialDevice::InterruptHandler()
 	//XXX: what should we do here ? (certainly not use a mutex !)
 
 	uint8 iir, lsr, msr;
+	uint8 buffer[64];
 	TRACE(("InterruptHandler()\n"));
+
+	atomic_add(&fPendingDPC, 1);
 
 	// start with the first (cached) irq condition
 	iir = fCachedIIR;
 	while ((iir & IIR_PENDING) == 0) { // 0 means yes
-		int fifoavail = 1;
-		int avail;
-		int i;
+		status_t status;
+		size_t bytesLeft;
+		size_t readable = 0;
+		size_t fifoavail = 1;
+		size_t i;
 		
 		//DEBUG
 //		for (int count = 0; ReadReg8(LSR) & LSR_DR; count++)
@@ -378,16 +384,26 @@ SerialDevice::InterruptHandler()
 				fifoavail = 16;
 			if (iir & IIR_F64EN)
 				fifoavail = 64;
-			avail = atomic_get(&fWriteBufferAvail);
-			for (i = 0; i < fifoavail && i < avail; i++) {
-				uint8 chr = fWriteBuffer[fWriteBufferOut];
-				WriteReg8(THB, (uint8)chr);
-				fWriteBufferOut++;
-				fWriteBufferOut %= DEF_BUFFER_SIZE;
+			// we're not open... just discard the data
+			if (!IsOpen())
+				continue;
+			gTTYModule->tty_control(fDeviceTTYCookie, FIONREAD, &readable,
+				sizeof(readable));
+			TRACE("%s: FIONREAD: %d\n", __FUNCTION__, readable);
+
+			bytesLeft = MIN(fifoavail, sizeof(buffer));
+			bytesLeft = MIN(bytesLeft, readable);
+			TRACE("%s: left %d\n", __FUNCTION__, bytesLeft);
+			status = gTTYModule->tty_read(fDeviceTTYCookie, buffer, &bytesLeft);
+			TRACE("%s: tty_read: %d\n", __FUNCTION__, bytesLeft);
+			if (status != B_OK) {
+				dprintf(DRIVER_NAME ": irq: tty_read: %s\n", strerror(status));
+				continue;
 			}
-			atomic_add(&fWriteBufferAvail, -i);
-			release_sem_etc(fWriteBufferSem, 1,
-				B_DO_NOT_RESCHEDULE | B_RELEASE_IF_WAITING_ONLY);
+
+			for (i = 0; i < bytesLeft; i++) {
+				WriteReg8(THB, buffer[i]);
+			}
 
 			break;
 		case IIR_TO:
@@ -396,13 +412,19 @@ SerialDevice::InterruptHandler()
 		case IIR_RDA:
 			TRACE(("IIR_TO/RDA\n"));
 			// while data is ready... and we have room for it, get it
-			avail = DEF_BUFFER_SIZE - atomic_get(&fReadBufferAvail);
-			for (i = 0; i < avail && (ReadReg8(LSR) & LSR_DR); i++) {
-				fReadBuffer[fReadBufferIn] = ReadReg8(RBR);
-				fReadBufferIn++;
-				fReadBufferIn %= DEF_BUFFER_SIZE;
+			bytesLeft = sizeof(buffer);
+			for (i = 0; i < bytesLeft && (ReadReg8(LSR) & LSR_DR); i++) {
+				buffer[i] = ReadReg8(RBR);
 			}
-			atomic_add(&fReadBufferAvail, i);
+			// we're not open... just discard the data
+			if (!IsOpen())
+				continue;
+			// we shouldn't block here but it's < 256 bytes anyway
+			status = gTTYModule->tty_write(fDeviceTTYCookie, buffer, &i);
+			if (status != B_OK) {
+				dprintf(DRIVER_NAME ": irq: tty_write: %s\n", strerror(status));
+				continue;
+			}
 			break;
 		case IIR_RLS:
 			TRACE(("IIR_RLS\n"));
@@ -414,6 +436,8 @@ SerialDevice::InterruptHandler()
 			TRACE(("IIR_MS\n"));
 			// modem signals changed
 			msr = ReadReg8(MSR);
+			if (!IsOpen())
+				continue;
 			if (msr & MSR_DDCD)
 				SignalControlLineState(TTYHWDCD, msr & MSR_DCD);
 			if (msr & MSR_DCTS)
@@ -434,6 +458,8 @@ SerialDevice::InterruptHandler()
 		// check the next IRQ condition
 		iir = ReadReg8(IIR);
 	}
+
+	atomic_add(&fPendingDPC, -1);
 
 	TRACE_FUNCRET("< IRQ:%d\n", ret);
 	return ret;
@@ -565,22 +591,9 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 		*numBytes += length;
 		bytesLeft -= length;
 
-		while (true) {
-			// Write to the device as long as there's anything in the tty buffer
-			int readable = 0;
-			gTTYModule->tty_control(fDeviceTTYCookie, FIONREAD, &readable,
-				sizeof(readable));
-			TRACE("%s: FIONREAD: %d\n", __FUNCTION__, readable);
-			if (readable == 0)
-				break;
-
-			result = _WriteToDevice();
-			if (result != B_OK) {
-				TRACE_ALWAYS("failed to write to device: %s\n",
-					strerror(result));
-				return result;
-			}
-		}
+		// XXX: WTF: this ought to be done by the tty module calling service_func!
+		// enable irqs
+		Service(fMasterTTY, TTYOSTART, NULL, 0);
 	}
 
 	if (*numBytes > 0)
@@ -639,14 +652,22 @@ SerialDevice::Close()
 #endif
 	}
 
+	fDeviceOpen = false;
+
 	//XXX: we shouldn't have to do this!
 	bool en = false;
 	Service(fMasterTTY, TTYENABLE, &en, sizeof(en));
+	// XXX: shouldn't we tty_close_cookie() as well ??
+
+	// wait until currently executing DPC is done. In case another one
+	// is run beyond this point it will just bail out on !IsOpen().
+	while (atomic_get(&fPendingDPC))
+		snooze(1000);
 
 	gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
 	gTTYModule->tty_destroy_cookie(fDeviceTTYCookie);
+	fSystemTTYCookie = fDeviceTTYCookie = NULL;
 
-	fDeviceOpen = false;
 	return status;
 }
 
@@ -658,6 +679,7 @@ SerialDevice::Free()
 
 	gTTYModule->tty_destroy(fMasterTTY);
 	gTTYModule->tty_destroy(fSlaveTTY);
+	fMasterTTY = fSlaveTTY = NULL;
 
 	return status;
 }
