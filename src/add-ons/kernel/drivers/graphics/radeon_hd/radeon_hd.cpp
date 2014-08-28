@@ -517,6 +517,16 @@ radeon_hd_getbios_avivo(radeon_info &info)
 }
 
 
+static uint32
+radeon_hd_pci_bar_mmio(uint16 chipsetID)
+{
+	if (chipsetID < RADEON_BONAIRE)
+		return 2;
+	else
+		return 5;
+}
+
+
 status_t
 radeon_hd_init(radeon_info &info)
 {
@@ -542,9 +552,10 @@ radeon_hd_init(radeon_info &info)
 
 	// *** Map Memory mapped IO
 	AreaKeeper mmioMapper;
+	const uint32 pciBarMmio = radeon_hd_pci_bar_mmio(info.chipsetID);
 	info.registers_area = mmioMapper.Map("radeon hd mmio",
-		info.pci->u.h0.base_registers[PCI_BAR_MMIO],
-		info.pci->u.h0.base_register_sizes[PCI_BAR_MMIO],
+		info.pci->u.h0.base_registers[pciBarMmio],
+		info.pci->u.h0.base_register_sizes[pciBarMmio],
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {

@@ -21,7 +21,6 @@
 
 // PCI Base Address Registers
 #define PCI_BAR_FB      0
-#define PCI_BAR_MMIO    2
 
 #define RADEON_BIOS8(adr, v) 	(adr[v])
 #define RADEON_BIOS16(adr, v) 	((adr[v]) | (adr[(v) + 1] << 8))
