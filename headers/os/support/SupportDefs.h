@@ -217,6 +217,9 @@ extern void*	get_stack_frame(void);
 
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 static inline void
 atomic_set(int32* value, int32 newValue)
@@ -318,6 +321,10 @@ atomic_get64(int64* value)
 {
 	return __atomic_load_n(value, __ATOMIC_ACQUIRE);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #else	// __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
