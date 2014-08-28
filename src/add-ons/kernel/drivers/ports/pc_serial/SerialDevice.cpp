@@ -408,7 +408,7 @@ SerialDevice::InterruptHandler()
 				fifoavail = 64;
 			// we're not open... just discard the data
 			if (!IsOpen())
-				continue;
+				break;
 			gTTYModule->tty_control(fDeviceTTYCookie, FIONREAD, &readable,
 				sizeof(readable));
 			TRACE("%s: FIONREAD: %d\n", __FUNCTION__, readable);
@@ -420,7 +420,7 @@ SerialDevice::InterruptHandler()
 			TRACE("%s: tty_read: %d\n", __FUNCTION__, bytesLeft);
 			if (status != B_OK) {
 				dprintf(DRIVER_NAME ": irq: tty_read: %s\n", strerror(status));
-				continue;
+				break;
 			}
 
 			for (i = 0; i < bytesLeft; i++) {
@@ -440,12 +440,12 @@ SerialDevice::InterruptHandler()
 			}
 			// we're not open... just discard the data
 			if (!IsOpen())
-				continue;
+				break;
 			// we shouldn't block here but it's < 256 bytes anyway
 			status = gTTYModule->tty_write(fDeviceTTYCookie, buffer, &i);
 			if (status != B_OK) {
 				dprintf(DRIVER_NAME ": irq: tty_write: %s\n", strerror(status));
-				continue;
+				break;
 			}
 			break;
 		case IIR_RLS:
@@ -459,7 +459,7 @@ SerialDevice::InterruptHandler()
 			// modem signals changed
 			msr = ReadReg8(MSR);
 			if (!IsOpen())
-				continue;
+				break;
 			if (msr & MSR_DDCD)
 				SignalControlLineState(TTYHWDCD, msr & MSR_DCD);
 			if (msr & MSR_DCTS)
