@@ -50,6 +50,8 @@ SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
 		fDeviceThread(-1),
 		fStopDeviceThread(false)
 {
+	memset(&fTTYConfig, 0, sizeof(termios));
+	fTTYConfig.c_cflag = B9600 | CS8 | CREAD;
 	memset(fReadBuffer, 'z', DEF_BUFFER_SIZE);
 	memset(fWriteBuffer, 'z', DEF_BUFFER_SIZE);
 }
@@ -102,6 +104,21 @@ SerialDevice::SetModes(struct termios *tios)
 	uint32 baudIndex = tios->c_cflag & CBAUD;
 	if (baudIndex > BLAST)
 		baudIndex = BLAST;
+
+	// update our master config in full
+	memcpy(&fTTYConfig, tios, sizeof(termios));
+	fTTYConfig.c_cflag &= ~CBAUD;
+	fTTYConfig.c_cflag |= baudIndex;
+
+	// only apply the relevant parts to the device side
+	termios config;
+	memset(&config, 0, sizeof(termios));
+	config.c_cflag = tios->c_cflag;
+	config.c_cflag &= ~CBAUD;
+	config.c_cflag |= baudIndex;
+
+	// update the termios of the device side
+	gTTYModule->tty_control(fDeviceTTYCookie, TCSETA, &config, sizeof(termios));
 
 	uint8 lcr = 0;
 	uint16 divisor = SupportDescriptor()->bauds[baudIndex];
@@ -528,6 +545,10 @@ SerialDevice::Open(uint32 flags)
 		TRACE_ALWAYS("open: failed to open tty\n");
 		return status;
 	}
+
+	// set our config (will propagate to the slave config as well in SetModes()
+	gTTYModule->tty_control(fSystemTTYCookie, TCSETA, &fTTYConfig,
+		sizeof(termios));
 
 #if 0
 	fDeviceThread = spawn_kernel_thread(_DeviceThread, "usb_serial device thread",

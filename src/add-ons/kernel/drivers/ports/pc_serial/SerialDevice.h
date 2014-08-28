@@ -150,6 +150,7 @@ static	void					InterruptCallbackFunction(void *cookie,
 		struct tty *			fSlaveTTY;
 		struct tty_cookie *		fSystemTTYCookie;
 		struct tty_cookie *		fDeviceTTYCookie;
+		struct termios			fTTYConfig;
 
 		/* device thread management */
 		thread_id				fDeviceThread;
