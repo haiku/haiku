@@ -702,8 +702,8 @@ SerialDevice::Free()
 
 	// wait until currently executing DPC is done. In case another one
 	// is run beyond this point it will just bail out on !IsOpen().
-	while (atomic_get(&fPendingDPC))
-		snooze(1000);
+	//while (atomic_get(&fPendingDPC))
+	//	snooze(1000);
 
 	gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
 	gTTYModule->tty_destroy_cookie(fDeviceTTYCookie);
