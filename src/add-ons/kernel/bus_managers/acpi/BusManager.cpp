@@ -97,7 +97,7 @@ globalGPEHandler(UINT32 eventType, ACPI_HANDLE device, UINT32 eventNumber,
 
 	ACPI_STATUS status = AcpiNsHandleToPathname(device, &path);
 	if (ACPI_FAILURE(status))
-		strcpy("(missing)", deviceName);
+		strcpy(deviceName, "(missing)");
 
 	switch (eventType) {
 		case ACPI_EVENT_TYPE_GPE:
