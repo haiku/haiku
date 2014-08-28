@@ -151,6 +151,17 @@ static const struct serial_support_descriptor sSupportedDevices[] = {
 };
 
 
+// hardcoded ISA ports
+static struct isa_ports {
+	uint32 ioBase;
+	uint32 irq;
+} sHardcodedPorts[] = {
+	{ 0x3f8, 4 },
+	{ 0x2f8, 3 },
+	{ 0x3e8, 4 },
+	{ 0x2e8, 3 },
+};
+
 #if 0
 status_t
 pc_serial_device_added(pc_device device, void **cookie)
@@ -492,6 +503,30 @@ next_split:
 	return B_OK;
 }
 
+
+// until we support ISA device enumeration from PnP BIOS or ACPI,
+// we have to probe the 4 default COM ports...
+status_t
+scan_isa_hardcoded()
+{
+#ifdef HANDLE_ISA_COM
+	int i;
+
+	//TODO: check and filter out the kernel debug port
+	for (i = 0; i < 4; i++) {
+		SerialDevice *device;
+		device = new(std::nothrow) SerialDevice(&sSupportedDevices[0],
+			sHardcodedPorts[i].ioBase, sHardcodedPorts[i].irq);
+		if (device && device->Probe())
+			pc_serial_insert_device(device);
+		else
+			delete device;
+	}
+#endif
+	return B_OK;
+}
+
+
 // this version doesn't use config_manager, but can't probe the IRQ yet
 status_t
 scan_pci_alt()
@@ -695,14 +730,15 @@ init_driver()
 
 	status = ENOENT;
 
-	scan_bus(B_ISA_BUS);
+	(void)scan_bus;
+	//scan_bus(B_ISA_BUS);
 	//scan_bus(B_PCI_BUS);
+	scan_isa_hardcoded();
 	scan_pci_alt();
 
 	// XXX: ISA cards
 	// XXX: pcmcia
-	
-	
+
 	TRACE_FUNCRET("< init_driver() returns\n");
 	return B_OK;
 

@@ -22,6 +22,8 @@ public:
 									*device, uint32 ioBase, uint32 irq, const SerialDevice *master=NULL);
 virtual							~SerialDevice();
 
+		bool					Probe();
+
 static	SerialDevice *			MakeDevice(struct serial_config_descriptor 
 									*device);
 

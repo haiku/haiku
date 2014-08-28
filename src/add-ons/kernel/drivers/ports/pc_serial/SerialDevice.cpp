@@ -65,6 +65,21 @@ SerialDevice::~SerialDevice()
 }
 
 
+bool
+SerialDevice::Probe()
+{
+	uint8 msr;
+	msr = ReadReg8(MSR);
+	// just in case read twice to make sure the "delta" bits are 0
+	msr = ReadReg8(MSR);
+	// this should be enough to probe for the device for now
+	// we might want to check the scratch reg, and try identifying
+	// the model as in:
+	// http://en.wikibooks.org/wiki/Serial_Programming/8250_UART_Programming#Software_Identification_of_the_UART
+	return (msr != 0xff);
+}
+
+
 status_t
 SerialDevice::Init()
 {
