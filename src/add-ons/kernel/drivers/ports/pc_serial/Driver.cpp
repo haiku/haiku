@@ -12,6 +12,7 @@
 #include <KernelExport.h>
 #include <dpc.h>
 #include <Drivers.h>
+#include <driver_settings.h>
 #include <image.h>
 #include <malloc.h>
 #include <stdio.h>
@@ -32,6 +33,7 @@ dpc_module_info *gDPCModule = NULL;
 void* gDPCHandle = NULL;
 sem_id gDriverLock = -1;
 bool gHandleISA = false;
+uint32 gKernelDebugPort = 0x3f8;
 
 // 24 MHz clock
 static const uint32 sDefaultRates[] = {
@@ -512,8 +514,11 @@ scan_isa_hardcoded()
 #ifdef HANDLE_ISA_COM
 	int i;
 
-	//TODO: check and filter out the kernel debug port
 	for (i = 0; i < 4; i++) {
+		// skip the port used for kernel debugging...
+		if (sHardcodedPorts[i].ioBase == gKernelDebugPort)
+			continue;
+
 		SerialDevice *device;
 		device = new(std::nothrow) SerialDevice(&sSupportedDevices[0],
 			sHardcodedPorts[i].ioBase, sHardcodedPorts[i].irq);
@@ -669,6 +674,34 @@ next_split_alt:
 }
 
 
+static void
+check_kernel_debug_port()
+{
+	void *handle;
+	long int value;
+
+	handle = load_driver_settings("kernel");
+	const char *str = get_driver_parameter(handle, "serial_debug_port",
+		NULL, NULL);
+	if (str != NULL) {
+		value = strtol(str, NULL, 0);
+		if (value >= 4) // XXX: actually should be MAX_SERIAL_PORTS...
+			gKernelDebugPort = (uint32)value;
+		else if (value >= 0) // XXX: we should use the kernel_arg's table...
+			gKernelDebugPort = sHardcodedPorts[value].ioBase;
+	}
+
+	/* TODO: actually handle this in the kernel debugger too!
+	bool enabled = get_driver_boolean_parameter(handle, "serial_debug_output",
+		false, true);
+	if (!enabled)
+		gKernelDebugPort = 0;
+	*/
+
+	unload_driver_settings(handle);
+}
+
+
 //#pragma mark -
 
 
@@ -729,6 +762,8 @@ init_driver()
 	}
 
 	status = ENOENT;
+
+	check_kernel_debug_port();
 
 	(void)scan_bus;
 	//scan_bus(B_ISA_BUS);
