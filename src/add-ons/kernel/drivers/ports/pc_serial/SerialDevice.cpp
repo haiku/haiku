@@ -346,7 +346,13 @@ SerialDevice::IsInterruptPending()
 	// the next time we'll read we'll miss the IRQ condition
 	// so we just cache the value for the real handler
 	fCachedIIR = ReadReg8(IIR);
-	return ((fCachedIIR & IIR_PENDING) == 0); // 0 means yes
+
+	bool pending = (fCachedIIR & IIR_PENDING) == 0;
+
+	if (pending)
+		atomic_add(&fPendingDPC, 1);
+
+	return pending; // 0 means yes
 }
 
 
@@ -358,9 +364,8 @@ SerialDevice::InterruptHandler()
 
 	uint8 iir, lsr, msr;
 	uint8 buffer[64];
+	int tries = 8; // avoid busy looping
 	TRACE(("InterruptHandler()\n"));
-
-	atomic_add(&fPendingDPC, 1);
 
 	// start with the first (cached) irq condition
 	iir = fCachedIIR;
@@ -454,6 +459,10 @@ SerialDevice::InterruptHandler()
 		}
 		ret = B_HANDLED_INTERRUPT;
 		TRACE(("IRQ:h\n"));
+
+		// enough for now
+		if (tries-- == 0)
+			break;
 
 		// check the next IRQ condition
 		iir = ReadReg8(IIR);
@@ -654,19 +663,12 @@ SerialDevice::Close()
 
 	fDeviceOpen = false;
 
+	gTTYModule->tty_close_cookie(fSystemTTYCookie);
+	gTTYModule->tty_close_cookie(fDeviceTTYCookie);
+
 	//XXX: we shouldn't have to do this!
 	bool en = false;
 	Service(fMasterTTY, TTYENABLE, &en, sizeof(en));
-	// XXX: shouldn't we tty_close_cookie() as well ??
-
-	// wait until currently executing DPC is done. In case another one
-	// is run beyond this point it will just bail out on !IsOpen().
-	while (atomic_get(&fPendingDPC))
-		snooze(1000);
-
-	gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
-	gTTYModule->tty_destroy_cookie(fDeviceTTYCookie);
-	fSystemTTYCookie = fDeviceTTYCookie = NULL;
 
 	return status;
 }
@@ -676,6 +678,15 @@ status_t
 SerialDevice::Free()
 {
 	status_t status = B_OK;
+
+	// wait until currently executing DPC is done. In case another one
+	// is run beyond this point it will just bail out on !IsOpen().
+	while (atomic_get(&fPendingDPC))
+		snooze(1000);
+
+	gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
+	gTTYModule->tty_destroy_cookie(fDeviceTTYCookie);
+	fSystemTTYCookie = fDeviceTTYCookie = NULL;
 
 	gTTYModule->tty_destroy(fMasterTTY);
 	gTTYModule->tty_destroy(fSlaveTTY);
