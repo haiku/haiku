@@ -12,6 +12,8 @@
 #include "SerialDevice.h"
 #include "UART.h"
 
+#include <sys/ioctl.h>
+
 SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
 	uint32 ioBase, uint32 irq, const SerialDevice *master)
 	:	/*fSupportDescriptor(device->descriptor),
@@ -30,9 +32,11 @@ SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
 		fReadBufferAvail(0),
 		fReadBufferIn(0),
 		fReadBufferOut(0),
+		fReadBufferSem(-1),
 		fWriteBufferAvail(0),
 		fWriteBufferIn(0),
 		fWriteBufferOut(0),
+		fWriteBufferSem(-1),
 		fDoneRead(-1),
 		fDoneWrite(-1),
 		fControlOut(0),
@@ -44,6 +48,8 @@ SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
 		fDeviceThread(-1),
 		fStopDeviceThread(false)
 {
+	memset(fReadBuffer, 'z', DEF_BUFFER_SIZE);
+	memset(fWriteBuffer, 'z', DEF_BUFFER_SIZE);
 }
 
 
@@ -51,18 +57,18 @@ SerialDevice::~SerialDevice()
 {
 	Removed();
 
-	if (fDoneRead >= B_OK)
-		delete_sem(fDoneRead);
-	if (fDoneWrite >= B_OK)
-		delete_sem(fDoneWrite);
+	if (fReadBufferSem >= B_OK)
+		delete_sem(fReadBufferSem);
+	if (fWriteBufferSem >= B_OK)
+		delete_sem(fWriteBufferSem);
 }
 
 
 status_t
 SerialDevice::Init()
 {
-	fDoneRead = create_sem(0, "usb_serial:done_read");
-	fDoneWrite = create_sem(0, "usb_serial:done_write");
+	fReadBufferSem = create_sem(0, "pc_serial:done_read");
+	fWriteBufferSem = create_sem(0, "pc_serial:done_write");
 
 	// disable DLAB
 	WriteReg8(LCR, 0);
@@ -204,6 +210,7 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 	uint8 msr;
 	status_t err;
 
+	TRACE("%s(,0x%08lx,,%d)\n", __FUNCTION__, op, length);
 	if (tty != fMasterTTY)
 		return false;
 
@@ -320,9 +327,12 @@ SerialDevice::InterruptHandler()
 	//XXX: what should we do here ? (certainly not use a mutex !)
 
 	uint8 iir, lsr, msr;
+	TRACE(("InterruptHandler()\n"));
 
 	while (((iir = ReadReg8(IIR)) & IIR_PENDING) == 0) { // 0 means yes
 		int fifoavail = 1;
+		int avail;
+		int i;
 		
 		//DEBUG
 //		for (int count = 0; ReadReg8(LSR) & LSR_DR; count++)
@@ -337,24 +347,31 @@ SerialDevice::InterruptHandler()
 				fifoavail = 16;
 			if (iir & IIR_F64EN)
 				fifoavail = 64;
-			for (int i = 0; i < fifoavail; i++) {
-				int chr;
-				chr = 'H';//XXX: what should we do here ? (certainly not call tty_read() !)
-				if (chr < 0) {
-					//WriteReg8(THB, (uint8)chr);
-					break;
-				}
+			avail = atomic_get(&fWriteBufferAvail);
+			for (i = 0; i < fifoavail && i < avail; i++) {
+				uint8 chr = fWriteBuffer[fWriteBufferOut];
 				WriteReg8(THB, (uint8)chr);
+				fWriteBufferOut++;
+				fWriteBufferOut %= DEF_BUFFER_SIZE;
 			}
+			atomic_add(&fWriteBufferAvail, -i);
+			release_sem_etc(fWriteBufferSem, 1,
+				B_DO_NOT_RESCHEDULE | B_RELEASE_IF_WAITING_ONLY);
+
 			break;
 		case IIR_TO:
 		case IIR_TO | IIR_RDA:
 			// timeout: FALLTHROUGH
 		case IIR_RDA:
 			TRACE(("IIR_TO/RDA\n"));
-			// while data is ready... get it
-			while (ReadReg8(LSR) & LSR_DR)
-				ReadReg8(RBR);//XXX: what should we do here ? (certainly not call tty_write() !)
+			// while data is ready... and we have room for it, get it
+			avail = DEF_BUFFER_SIZE - atomic_get(&fReadBufferAvail);
+			for (i = 0; i < avail && (ReadReg8(LSR) & LSR_DR); i++) {
+				fReadBuffer[fReadBufferIn] = ReadReg8(RBR);
+				fReadBufferIn++;
+				fReadBufferIn %= DEF_BUFFER_SIZE;
+			}
+			atomic_add(&fReadBufferAvail, i);
 			break;
 		case IIR_RLS:
 			TRACE(("IIR_RLS\n"));
@@ -384,8 +401,6 @@ SerialDevice::InterruptHandler()
 		TRACE(("IRQ:h\n"));
 	}
 
-
-	//XXX: what should we do here ? (certainly not use a mutex !)
 	TRACE_FUNCRET("< IRQ:%d\n", ret);
 	return ret;
 }
@@ -436,13 +451,17 @@ SerialDevice::Open(uint32 flags)
 
 	ResetDevice();
 
+	//XXX: we shouldn't have to do this!
+	bool en = true;
+	Service(fMasterTTY, TTYENABLE, &en, sizeof(en));
+
 	if (status < B_OK) {
 		TRACE_ALWAYS("open: failed to open tty\n");
 		return status;
 	}
 
 #if 0
-	fDeviceThread = spawn_kernel_thread(DeviceThread, "usb_serial device thread",
+	fDeviceThread = spawn_kernel_thread(_DeviceThread, "usb_serial device thread",
 		B_NORMAL_PRIORITY, this);
 
 	if (fDeviceThread < B_OK) {
@@ -485,64 +504,55 @@ SerialDevice::Read(char *buffer, size_t *numBytes)
 status_t
 SerialDevice::Write(const char *buffer, size_t *numBytes)
 {
-	//size_t bytesLeft = *numBytes;
-	//*numBytes = 0;
-
-	status_t status = EINVAL;
-
-	//XXX: WTF tty_write() is not for write() hook ?
-	//status = gTTYModule->tty_write(fSystemTTYCookie, buffer, numBytes);
-
-#if 0
-	status_t status = mutex_lock(&fWriteLock);
-	if (status != B_OK) {
-		TRACE_ALWAYS("write: failed to get write lock\n");
-		return status;
-	}
-
+	TRACE("%s(,&%d)\n", __FUNCTION__, *numBytes);
 	if (fDeviceRemoved) {
-		mutex_unlock(&fWriteLock);
+		*numBytes = 0;
 		return B_DEV_NOT_READY;
 	}
 
+	size_t bytesLeft = *numBytes;
+	*numBytes = 0;
+
 	while (bytesLeft > 0) {
-		size_t length = MIN(bytesLeft, fWriteBufferSize);
-		size_t packetLength = length;
-		OnWrite(buffer, &length, &packetLength);
+		size_t length = MIN(bytesLeft, 256);
+			// TODO: This is an ugly hack; We use a small buffer size so that
+			// we don't overrun the tty line buffer and cause it to block. While
+			// that isn't a problem, we shouldn't just hardcode the value here.
 
-		status = gUSBModule->queue_bulk(fWritePipe, fWriteBuffer,
-			packetLength, WriteCallbackFunction, this);
-		if (status < B_OK) {
-			TRACE_ALWAYS("write: queueing failed with status 0x%08x\n", status);
-			break;
-		}
-
-		status = acquire_sem_etc(fDoneWrite, 1, B_CAN_INTERRUPT, 0);
-		if (status < B_OK) {
-			TRACE_ALWAYS("write: failed to get write done sem 0x%08x\n", status);
-			break;
-		}
-
-		if (fStatusWrite != B_OK) {
-			TRACE("write: device status error 0x%08x\n", fStatusWrite);
-			status = gUSBModule->clear_feature(fWritePipe,
-				USB_FEATURE_ENDPOINT_HALT);
-			if (status < B_OK) {
-				TRACE_ALWAYS("write: failed to clear device halt\n");
-				status = B_ERROR;
-				break;
-			}
-			continue;
+		TRACE("%s: tty_write(,&%d)\n", __FUNCTION__, length);
+		status_t result = gTTYModule->tty_write(fSystemTTYCookie, buffer,
+			&length);
+		if (result != B_OK) {
+			TRACE_ALWAYS("failed to write to tty: %s\n", strerror(result));
+			return result;
 		}
 
 		buffer += length;
 		*numBytes += length;
 		bytesLeft -= length;
+
+		while (true) {
+			// Write to the device as long as there's anything in the tty buffer
+			int readable = 0;
+			gTTYModule->tty_control(fDeviceTTYCookie, FIONREAD, &readable,
+				sizeof(readable));
+			TRACE("%s: FIONREAD: %d\n", __FUNCTION__, readable);
+			if (readable == 0)
+				break;
+
+			result = _WriteToDevice();
+			if (result != B_OK) {
+				TRACE_ALWAYS("failed to write to device: %s\n",
+					strerror(result));
+				return result;
+			}
+		}
 	}
 
-	mutex_unlock(&fWriteLock);
-#endif
-	return status;
+	if (*numBytes > 0)
+		return B_OK;
+
+	return B_ERROR;
 }
 
 
@@ -595,6 +605,10 @@ SerialDevice::Close()
 #endif
 	}
 
+	//XXX: we shouldn't have to do this!
+	bool en = false;
+	Service(fMasterTTY, TTYENABLE, &en, sizeof(en));
+
 	gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
 	gTTYModule->tty_destroy_cookie(fDeviceTTYCookie);
 
@@ -633,8 +647,8 @@ SerialDevice::Removed()
 	gUSBModule->cancel_queued_transfers(fControlPipe);
 #endif
 
-	//int32 result = B_OK;
-	//wait_for_thread(fDeviceThread, &result);
+	int32 result = B_OK;
+	wait_for_thread(fDeviceThread, &result);
 	fDeviceThread = -1;
 }
 
@@ -695,7 +709,7 @@ SerialDevice::OnClose()
 
 
 int32
-SerialDevice::DeviceThread(void *data)
+SerialDevice::_DeviceThread(void *data)
 {
 #if 0
 	SerialDevice *device = (SerialDevice *)data;
@@ -749,6 +763,39 @@ SerialDevice::DeviceThread(void *data)
 	}
 
 #endif
+	return B_OK;
+}
+
+
+status_t
+SerialDevice::_WriteToDevice()
+{
+	char *buffer = &fWriteBuffer[fWriteBufferIn];
+	size_t bytesLeft = DEF_BUFFER_SIZE - atomic_get(&fWriteBufferAvail);
+	bytesLeft = MIN(bytesLeft, DEF_BUFFER_SIZE - fWriteBufferIn);
+	TRACE("%s: in %d left %d\n", __FUNCTION__, fWriteBufferIn, bytesLeft);
+	status_t status = gTTYModule->tty_read(fDeviceTTYCookie, buffer,
+		&bytesLeft);
+	TRACE("%s: tty_read: %d\n", __FUNCTION__, bytesLeft);
+	if (status != B_OK) {
+		TRACE_ALWAYS("write to device: failed to read from TTY: %s\n",
+			strerror(status));
+		return status;
+	}
+	fWriteBufferIn += bytesLeft;
+	fWriteBufferIn %= DEF_BUFFER_SIZE;
+	atomic_add(&fWriteBufferAvail, bytesLeft);
+
+	// XXX: WTF: this ought to be done by the tty module calling service_func!
+	// enable irqs
+	Service(fMasterTTY, TTYOSTART, NULL, 0);
+
+	status = acquire_sem_etc(fWriteBufferSem, 1, B_CAN_INTERRUPT, 0);
+	if (status != B_OK) {
+		TRACE_ALWAYS("write to device: failed to acquire sem: %s\n",
+			strerror(status));
+		return status;
+	}
 	return B_OK;
 }
 

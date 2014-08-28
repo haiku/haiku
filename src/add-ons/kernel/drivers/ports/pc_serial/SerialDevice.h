@@ -79,7 +79,8 @@ virtual	void					OnClose();
 		uint32					IRQ() const { return fIRQ; };
 
 private:
-static	int32					DeviceThread(void *data);
+static	int32					_DeviceThread(void *data);
+		status_t				_WriteToDevice();
 
 static	void					ReadCallbackFunction(void *cookie,
 									int32 status, void *data,
@@ -113,13 +114,15 @@ static	void					InterruptCallbackFunction(void *cookie,
 
 		/* data buffers */
 		char					fReadBuffer[DEF_BUFFER_SIZE];
-		uint32					fReadBufferAvail;
+		int32					fReadBufferAvail;
 		uint32					fReadBufferIn;
 		uint32					fReadBufferOut;
+		sem_id					fReadBufferSem;
 		char					fWriteBuffer[DEF_BUFFER_SIZE];
-		uint32					fWriteBufferAvail;
+		int32					fWriteBufferAvail;
 		uint32					fWriteBufferIn;
 		uint32					fWriteBufferOut;
+		sem_id					fWriteBufferSem;
 
 		/* variables used in callback functionality */
 		size_t					fActualLengthRead;
