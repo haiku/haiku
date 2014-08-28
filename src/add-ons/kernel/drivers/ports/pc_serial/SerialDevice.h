@@ -46,6 +46,7 @@ static	SerialDevice *			MakeDevice(struct serial_config_descriptor
 		bool					Service(struct tty *tty, uint32 op,
 									void *buffer, size_t length);
 
+		bool					IsInterruptPending();
 		int32					InterruptHandler();
 
 		status_t				Open(uint32 flags);
@@ -111,6 +112,9 @@ static	void					InterruptCallbackFunction(void *cookie,
 
 		/* line coding */
 		//usb_serial_line_coding	fLineCoding;
+
+		/* deferred interrupt */
+		uint8					fCachedIIR;	// cached IRQ condition
 
 		/* data buffers */
 		char					fReadBuffer[DEF_BUFFER_SIZE];

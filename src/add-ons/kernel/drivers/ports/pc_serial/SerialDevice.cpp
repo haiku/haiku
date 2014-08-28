@@ -29,6 +29,7 @@ SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
 		fIOBase(ioBase),
 		fIRQ(irq),
 		fMaster(master),
+		fCachedIIR(0x1),
 		fReadBufferAvail(0),
 		fReadBufferIn(0),
 		fReadBufferOut(0),
@@ -320,6 +321,19 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 }
 
 
+bool
+SerialDevice::IsInterruptPending()
+{
+	TRACE(("IsInterruptPending()\n"));
+
+	// because reading the IIR acknowledges some IRQ conditions,
+	// the next time we'll read we'll miss the IRQ condition
+	// so we just cache the value for the real handler
+	fCachedIIR = ReadReg8(IIR);
+	return ((fCachedIIR & IIR_PENDING) == 0); // 0 means yes
+}
+
+
 int32
 SerialDevice::InterruptHandler()
 {
@@ -329,7 +343,9 @@ SerialDevice::InterruptHandler()
 	uint8 iir, lsr, msr;
 	TRACE(("InterruptHandler()\n"));
 
-	while (((iir = ReadReg8(IIR)) & IIR_PENDING) == 0) { // 0 means yes
+	// start with the first (cached) irq condition
+	iir = fCachedIIR;
+	while ((iir & IIR_PENDING) == 0) { // 0 means yes
 		int fifoavail = 1;
 		int avail;
 		int i;
@@ -399,6 +415,9 @@ SerialDevice::InterruptHandler()
 		}
 		ret = B_HANDLED_INTERRUPT;
 		TRACE(("IRQ:h\n"));
+
+		// check the next IRQ condition
+		iir = ReadReg8(IIR);
 	}
 
 	TRACE_FUNCRET("< IRQ:%d\n", ret);

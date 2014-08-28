@@ -10,6 +10,7 @@
  * Distributed under the terms of the MIT License.
  */
 #include <KernelExport.h>
+#include <dpc.h>
 #include <Drivers.h>
 #include <image.h>
 #include <malloc.h>
@@ -27,6 +28,8 @@ config_manager_for_driver_module_info *gConfigManagerModule = NULL;
 isa_module_info *gISAModule = NULL;
 pci_module_info *gPCIModule = NULL;
 tty_module_info *gTTYModule = NULL;
+dpc_module_info *gDPCModule = NULL;
+void* gDPCHandle = NULL;
 sem_id gDriverLock = -1;
 bool gHandleISA = false;
 
@@ -653,6 +656,10 @@ init_driver()
 
 	TRACE_FUNCALLS("> init_driver()\n");
 
+	status = get_module(B_DPC_MODULE_NAME, (module_info **)&gDPCModule);
+	if (status < B_OK)
+		goto err_dpc;
+
 	status = get_module(B_TTY_MODULE_NAME, (module_info **)&gTTYModule);
 	if (status < B_OK)
 		goto err_tty;
@@ -669,6 +676,11 @@ init_driver()
 		(module_info **)&gConfigManagerModule);
 	if (status < B_OK)
 		goto err_cm;
+
+	status = gDPCModule->new_dpc_queue(&gDPCHandle, "pc_serial irq",
+		B_REAL_TIME_PRIORITY);
+	if (status != B_OK)
+		goto err_dpcq;
 
 	for (int32 i = 0; i < DEVICES_COUNT; i++)
 		gSerialDevices[i] = NULL;
@@ -697,6 +709,9 @@ init_driver()
 //err_none:
 	delete_sem(gDriverLock);
 err_sem:
+	gDPCModule->delete_dpc_queue(gDPCHandle);
+	gDPCHandle = NULL;
+err_dpcq:
 	put_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME);
 err_cm:
 	put_module(B_ISA_MODULE_NAME);
@@ -705,6 +720,8 @@ err_isa:
 err_pci:
 	put_module(B_TTY_MODULE_NAME);
 err_tty:
+	put_module(B_DPC_MODULE_NAME);
+err_dpc:
 	TRACE_FUNCRET("< init_driver() returns %s\n", strerror(status));
 	return status;
 }
@@ -735,10 +752,13 @@ uninit_driver()
 		free(gDeviceNames[i]);
 
 	delete_sem(gDriverLock);
+	gDPCModule->delete_dpc_queue(gDPCHandle);
+	gDPCHandle = NULL;
 	put_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME);
 	put_module(B_ISA_MODULE_NAME);
 	put_module(B_PCI_MODULE_NAME);
 	put_module(B_TTY_MODULE_NAME);
+	put_module(B_DPC_MODULE_NAME);
 
 	TRACE_FUNCRET("< uninit_driver() returns\n");
 }
@@ -764,28 +784,32 @@ pc_serial_service(struct tty *tty, uint32 op, void *buffer, size_t length)
 }
 
 
+static void
+pc_serial_dpc(void *arg)
+{
+	SerialDevice *master = (SerialDevice *)arg;
+	TRACE_FUNCALLS("> pc_serial_dpc(%p)\n", arg);
+	master->InterruptHandler();
+}
+
+
 int32
 pc_serial_interrupt(void *arg)
 {
-	int32 ret;
-	SerialDevice *master = (SerialDevice *)arg;
+	SerialDevice *device = (SerialDevice *)arg;
 	TRACE_FUNCALLS("> pc_serial_interrupt(%p)\n", arg);
 
-	if (!master)
+	if (!device)
 		return B_UNHANDLED_INTERRUPT;
 
-	ret = master->InterruptHandler();
-	return ret;
-
-
-	for (int32 i = 0; i < DEVICES_COUNT; i++) {
-		if (gSerialDevices[i] && gSerialDevices[i]->Master() == master) {
-			ret = gSerialDevices[i]->InterruptHandler();
-			// XXX: handle more than 1 ?
-			if (ret != B_UNHANDLED_INTERRUPT) {
-				TRACE_FUNCRET("< pc_serial_interrupt() returns: true\n");
-				return ret;
-			}
+	if (device->IsInterruptPending()) {
+		status_t err;
+		err = gDPCModule->queue_dpc(gDPCHandle, pc_serial_dpc, device);
+		if (err != B_OK)
+			dprintf(DRIVER_NAME ": error queing irq: %s\n", strerror(err));
+		else {
+			TRACE_FUNCRET("< pc_serial_interrupt() returns: handled\n");
+			return B_HANDLED_INTERRUPT;
 		}
 	}
 
