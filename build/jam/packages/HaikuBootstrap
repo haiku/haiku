@@ -82,7 +82,7 @@ AddDriversToPackage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToPackage input			: ps2_hid usb_hid wacom ;
 AddDriversToPackage misc			: <driver>poke <driver>mem ;
 AddDriversToPackage net				: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
-AddDriversToPackage ports			: usb_serial ;
+AddDriversToPackage ports			: pc_serial usb_serial ;
 AddDriversToPackage power			: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 
 # kernel
