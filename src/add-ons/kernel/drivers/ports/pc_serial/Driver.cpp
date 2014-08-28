@@ -879,8 +879,8 @@ pc_serial_interrupt(void *arg)
 		if (err != B_OK)
 			dprintf(DRIVER_NAME ": error queing irq: %s\n", strerror(err));
 		else {
-			TRACE_FUNCRET("< pc_serial_interrupt() returns: handled\n");
-			return B_HANDLED_INTERRUPT;
+			TRACE_FUNCRET("< pc_serial_interrupt() returns: resched\n");
+			return B_INVOKE_SCHEDULER;
 		}
 	}
 
