@@ -88,7 +88,7 @@ get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, void* context,
 
 static void
 globalGPEHandler(UINT32 eventType, ACPI_HANDLE device, UINT32 eventNumber,
-	void *context)
+	void* context)
 {
 	ACPI_BUFFER path;
 	char deviceName[256];
@@ -96,12 +96,8 @@ globalGPEHandler(UINT32 eventType, ACPI_HANDLE device, UINT32 eventNumber,
 	path.Pointer = deviceName;
 
 	ACPI_STATUS status = AcpiNsHandleToPathname(device, &path);
-	if (ACPI_FAILURE(status)) {
-		deviceName[0] = '?';
-		deviceName[1] = '?';
-		deviceName[2] = '?';
-		deviceName[3] = 0;
-	}
+	if (ACPI_FAILURE(status))
+		strcpy("(missing)", deviceName);
 
 	switch (eventType) {
 		case ACPI_EVENT_TYPE_GPE:
@@ -110,7 +106,7 @@ globalGPEHandler(UINT32 eventType, ACPI_HANDLE device, UINT32 eventNumber,
 
 		case ACPI_EVENT_TYPE_FIXED:
 		{
-			switch(eventNumber) {
+			switch (eventNumber) {
 				case ACPI_EVENT_PMTIMER:
 					dprintf("acpi: PMTIMER(%d) event for %s\n", eventNumber,
 						deviceName);
@@ -140,7 +136,8 @@ globalGPEHandler(UINT32 eventType, ACPI_HANDLE device, UINT32 eventNumber,
 					dprintf("acpi: unknown fixed(%d) event for %s\n",
 						eventNumber, deviceName);
 			}
-		} break;
+			break;
+		}
 
 		default:
 			dprintf("acpi: unknown event type (%d:%d)  event for %s\n",
@@ -198,34 +195,34 @@ acpi_std_ops(int32 op,...)
 #endif
 
 			if (checkAndLogFailure(AcpiInitializeSubsystem(),
-					"AcpiInitializeSubsystem failed"))
+				"AcpiInitializeSubsystem failed"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiInitializeTables(NULL, 0, TRUE),
-					"AcpiInitializeTables failed"))
+				"AcpiInitializeTables failed"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiLoadTables(),
-					"AcpiLoadTables failed"))
+				"AcpiLoadTables failed"))
 				goto err;
 
 			/* Install the default address space handlers. */
 			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
-						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_MEMORY,
-						ACPI_DEFAULT_HANDLER, NULL, NULL),
-					"Could not initialise SystemMemory handler:"))
+					ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_MEMORY,
+					ACPI_DEFAULT_HANDLER, NULL, NULL),
+				"Could not initialise SystemMemory handler:"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
-						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_IO,
-						ACPI_DEFAULT_HANDLER, NULL, NULL),
-					"Could not initialise SystemIO handler:"))
+					ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_IO,
+					ACPI_DEFAULT_HANDLER, NULL, NULL),
+				"Could not initialise SystemIO handler:"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
-						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_PCI_CONFIG,
-						ACPI_DEFAULT_HANDLER, NULL, NULL),
-					"Could not initialise PciConfig handler:"))
+					ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_PCI_CONFIG,
+					ACPI_DEFAULT_HANDLER, NULL, NULL),
+				"Could not initialise PciConfig handler:"))
 				goto err;
 
 			arg.Integer.Type = ACPI_TYPE_INTEGER;
@@ -237,27 +234,25 @@ acpi_std_ops(int32 op,...)
 			AcpiEvaluateObject(NULL, "\\_PIC", &parameter, NULL);
 
 			if (checkAndLogFailure(AcpiEnableSubsystem(
-						ACPI_FULL_INITIALIZATION),
-					"AcpiEnableSubsystem failed"))
+					ACPI_FULL_INITIALIZATION),
+				"AcpiEnableSubsystem failed"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiInitializeObjects(
-						ACPI_FULL_INITIALIZATION),
-					"AcpiInitializeObjects failed"))
+					ACPI_FULL_INITIALIZATION),
+				"AcpiInitializeObjects failed"))
 				goto err;
 
-
 			checkAndLogFailure(
-					AcpiInstallGlobalEventHandler(globalGPEHandler, NULL),
-					"Failed to install global GPE handler.");
+				AcpiInstallGlobalEventHandler(globalGPEHandler, NULL),
+				"Failed to install global GPE handler.");
 
 			checkAndLogFailure(AcpiEnableAllRuntimeGpes(),
-					"Failed to enable all runtime Gpes");
+				"Failed to enable all runtime Gpes");
 
 			checkAndLogFailure(AcpiUpdateAllGpes(),
-					"Failed to update all Gpes");
+				"Failed to update all Gpes");
 
-			/* Phew. Now in ACPI mode */
 			TRACE("ACPI initialized\n");
 			return B_OK;
 
@@ -268,7 +263,7 @@ acpi_std_ops(int32 op,...)
 		case B_MODULE_UNINIT:
 		{
 			if (checkAndLogFailure(AcpiTerminate(),
-					"Could not bring system out of ACPI mode. Oh well."));
+				"Could not bring system out of ACPI mode. Oh well."));
 
 			gDPC->delete_dpc_queue(gDPCHandle);
 			gDPCHandle = NULL;
