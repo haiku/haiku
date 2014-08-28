@@ -119,20 +119,6 @@ struct media_node;
 extern "C" {
 #endif
 
-extern void		atomic_set(int32* value, int32 newValue);
-extern int32	atomic_get_and_set(int32* value, int32 newValue);
-extern int32	atomic_test_and_set(int32 *value, int32 newValue,
-					int32 testAgainst);
-extern int32	atomic_get(int32 *value);
-extern void		atomic_set64(int64* value, int64 newValue);
-extern int64	atomic_get_and_set64(int64* value, int64 newValue);
-extern int64	atomic_test_and_set64(int64 *value, int64 newValue,
-					int64 testAgainst);
-extern int64	atomic_get64(int64 *value);
-extern int64	atomic_add64(int64 *value, int64 addValue);
-extern int64	atomic_and64(int64 *value, int64 andValue);
-extern int64	atomic_or64(int64 *value, int64 orValue);
-
 extern size_t	strnlen(const char *string, size_t count);
 
 extern size_t	strlcat(char *dest, const char *source, size_t length);
