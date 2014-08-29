@@ -245,7 +245,7 @@ SerialMouse::DetectMouse()
 mouse_id
 SerialMouse::ParseID(char buffer[], uint8 length)
 {
-	LOG(("data length = $d\n", length));
+	LOG(("data length = %d\n", (int)length));
 
 	if ((length == 1) && (buffer[0] == 'M'))
 		return kMicrosoft;
