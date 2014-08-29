@@ -1,7 +1,7 @@
 #ifndef _SERIAL_MOUSE_
 #define _SERIAL_MOUSE_
 
-#include <kb_mouse_driver.h>
+#include <keyboard_mouse_driver.h>
 
 typedef enum mouse_id {
 	kNoDevice		= -2,

@@ -28,7 +28,7 @@
 
 #include "MouseInputDevice.h"
 #include "kb_mouse_settings.h"
-#include "kb_mouse_driver.h"
+#include "keyboard_mouse_driver.h"
 
 #include <stdlib.h>
 #include <unistd.h>
