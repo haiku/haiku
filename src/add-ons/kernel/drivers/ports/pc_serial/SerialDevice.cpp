@@ -62,6 +62,8 @@ SerialDevice::~SerialDevice()
 {
 	Removed();
 
+	if (fDoneWrite >= B_OK)
+		delete_sem(fDoneWrite);
 	if (fReadBufferSem >= B_OK)
 		delete_sem(fReadBufferSem);
 	if (fWriteBufferSem >= B_OK)
@@ -87,6 +89,7 @@ SerialDevice::Probe()
 status_t
 SerialDevice::Init()
 {
+	fDoneWrite = create_sem(0, "pc_serial:done_write");
 	fReadBufferSem = create_sem(0, "pc_serial:done_read");
 	fWriteBufferSem = create_sem(0, "pc_serial:done_write");
 
@@ -429,6 +432,11 @@ SerialDevice::InterruptHandler()
 				sizeof(readable));
 			TRACE("%s: FIONREAD: %d\n", __FUNCTION__, readable);
 
+			if (readable == 0) {
+				release_sem_etc(fDoneWrite, 1, B_DO_NOT_RESCHEDULE);
+				break;
+			}
+
 			bytesLeft = MIN(fifoavail, sizeof(buffer));
 			bytesLeft = MIN(bytesLeft, readable);
 			TRACE("%s: left %d\n", __FUNCTION__, bytesLeft);
@@ -619,6 +627,7 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 		return B_DEV_NOT_READY;
 	}
 
+	status_t status;
 	size_t bytesLeft = *numBytes;
 	*numBytes = 0;
 
@@ -629,11 +638,11 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 			// that isn't a problem, we shouldn't just hardcode the value here.
 
 		TRACE("%s: tty_write(,&%d)\n", __FUNCTION__, length);
-		status_t result = gTTYModule->tty_write(fSystemTTYCookie, buffer,
+		status = gTTYModule->tty_write(fSystemTTYCookie, buffer,
 			&length);
-		if (result != B_OK) {
-			TRACE_ALWAYS("failed to write to tty: %s\n", strerror(result));
-			return result;
+		if (status != B_OK) {
+			TRACE_ALWAYS("failed to write to tty: %s\n", strerror(status));
+			return status;
 		}
 
 		buffer += length;
@@ -644,6 +653,14 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 		// enable irqs
 		Service(fMasterTTY, TTYOSTART, NULL, 0);
 	}
+
+	status = acquire_sem_etc(fDoneWrite, 1, B_CAN_INTERRUPT, 0);
+	if (status != B_OK) {
+		TRACE_ALWAYS("write: failed to get write done sem "
+				"0x%08x\n", status);
+		return status;
+	}
+
 
 	if (*numBytes > 0)
 		return B_OK;
