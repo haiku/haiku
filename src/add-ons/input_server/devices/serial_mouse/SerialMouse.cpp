@@ -117,7 +117,8 @@ SerialMouse::IsMousePresent()
 
 		// Skip internal modem (pctel, lucent or trimodem drivers).
 		// previously I checked only for != "pctel", now for == "serial#"
-		if (strncmp(dev_name, "serial", 5) != 0)
+		if (strncmp(dev_name, "serial", 5) != 0
+			&& strncmp(dev_name, "pc_serial", 8) != 0)
 			continue;
 
 		if (fSerialPort->Open(dev_name) <= 0) {
