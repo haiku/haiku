@@ -480,6 +480,10 @@ next_split:
 
 
 			device = new(std::nothrow) SerialDevice(supported, ioport, irq, master);
+			if (device == NULL) {
+				TRACE_ALWAYS("can't allocate device\n");
+				continue;
+			}
 
 			if (pc_serial_insert_device(device) < B_OK) {
 				TRACE_ALWAYS("can't insert device\n");
@@ -522,7 +526,7 @@ scan_isa_hardcoded()
 		SerialDevice *device;
 		device = new(std::nothrow) SerialDevice(&sSupportedDevices[0],
 			sHardcodedPorts[i].ioBase, sHardcodedPorts[i].irq);
-		if (device && device->Probe())
+		if (device != NULL && device->Probe())
 			pc_serial_insert_device(device);
 		else
 			delete device;
@@ -654,6 +658,10 @@ next_split_alt:
 			
 /**/
 			device = new(std::nothrow) SerialDevice(supported, ioport, irq, master);
+			if (device == NULL) {
+				TRACE_ALWAYS("can't allocate device\n");
+				continue;
+			}
 
 			if (pc_serial_insert_device(device) < B_OK) {
 				TRACE_ALWAYS("can't insert device\n");
@@ -681,6 +689,9 @@ check_kernel_debug_port()
 	long int value;
 
 	handle = load_driver_settings("kernel");
+	if (handle == NULL)
+		return;
+
 	const char *str = get_driver_parameter(handle, "serial_debug_port",
 		NULL, NULL);
 	if (str != NULL) {
