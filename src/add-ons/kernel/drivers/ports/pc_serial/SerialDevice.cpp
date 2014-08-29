@@ -434,6 +434,8 @@ SerialDevice::InterruptHandler()
 
 			if (readable == 0) {
 				release_sem_etc(fDoneWrite, 1, B_DO_NOT_RESCHEDULE);
+				// mask it until there's data again
+				fCachedIER &= ~IER_THRE;
 				break;
 			}
 
