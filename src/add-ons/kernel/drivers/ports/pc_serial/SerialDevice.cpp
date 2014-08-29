@@ -155,7 +155,7 @@ SerialDevice::SetModes(struct termios *tios)
 	} else {
 		// set FCR now, 
 		// 16650 and later chips have another reg at 2 when DLAB=1
-		uint8 fcr = FCR_ENABLE | FCR_RX_RST | FCR_TX_RST | FCR_F_8;
+		uint8 fcr = FCR_ENABLE | FCR_RX_RST | FCR_TX_RST | FCR_F_8 | FCR_F64EN;
 		// enable fifo
 		//fcr = 0;
 		WriteReg8(FCR, fcr);
