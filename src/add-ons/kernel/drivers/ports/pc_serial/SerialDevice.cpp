@@ -338,6 +338,8 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 			TRACE("TTYOSTART\n");
 			// enable irqs
 			fCachedIER |= IER_THRE;
+			// XXX: toggle the bit to make VirtualBox happy !?
+			WriteReg8(IER, fCachedIER & ~IER_THRE);
 			WriteReg8(IER, fCachedIER);
 			return true;
 		case TTYOSYNC:
