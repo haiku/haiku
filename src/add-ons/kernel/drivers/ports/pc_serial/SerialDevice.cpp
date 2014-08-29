@@ -161,7 +161,7 @@ SerialDevice::SetModes(struct termios *tios)
 		WriteReg8(FCR, fcr);
 
 		// unmask the divisor latch regs
-		WriteReg8(LCR, LCR_DLAB);
+		WriteReg8(LCR, lcr | LCR_DLAB);
 		// set divisor
 		WriteReg8(DLLB, divisor & 0x00ff);
 		WriteReg8(DLHB, divisor >> 8);
