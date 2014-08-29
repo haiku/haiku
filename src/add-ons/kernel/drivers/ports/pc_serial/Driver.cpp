@@ -84,9 +84,15 @@ static const struct serial_support_descriptor sSupportedDevices[] = {
 /*
 	// vendor: OxfordSemi
 #define VN "OxfordSemi"
+	// http://www.softio.com/ox16pci954ds.pdf
 	{ B_PCI_BUS, "OxfordSemi 16950 Serial Port", sDefaultRates, NULL, { 32, 32, 8 },
 	  { PCI_simple_communications, PCI_serial, PCI_serial_16950,
 		0x1415, 0x9501, PCI_INVAL, PCI_INVAL } },
+
+	// http://www.softio.com/ox16pci952ds.pdf
+	{ B_PCI_BUS, "OxfordSemi 16950 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
+	  { PCI_simple_communications, PCI_serial, PCI_serial_16950,
+		0x1415, 0x9521, PCI_INVAL, PCI_INVAL } },
 */
 
 
