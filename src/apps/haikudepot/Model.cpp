@@ -266,24 +266,36 @@ Model::Model()
 	fCategoryAudio(new PackageCategory(
 		BitmapRef(),
 		B_TRANSLATE("Audio"), "audio"), true),
-	fCategoryVideo(new PackageCategory(
+	fCategoryBusiness(new PackageCategory(
 		BitmapRef(),
-		B_TRANSLATE("Video"), "video"), true),
-	fCategoryGraphics(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Graphics"), "graphics"), true),
-	fCategoryProductivity(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Productivity"), "productivity"), true),
+		B_TRANSLATE("Business"), "business"), true),
 	fCategoryDevelopment(new PackageCategory(
 		BitmapRef(),
 		B_TRANSLATE("Development"), "development"), true),
-	fCategoryCommandLine(new PackageCategory(
+	fCategoryEducation(new PackageCategory(
 		BitmapRef(),
-		B_TRANSLATE("Command line"), "command-line"), true),
+		B_TRANSLATE("Education"), "education"), true),
 	fCategoryGames(new PackageCategory(
 		BitmapRef(),
 		B_TRANSLATE("Games"), "games"), true),
+	fCategoryGraphics(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Graphics"), "graphics"), true),
+	fCategoryInternetAndNetwork(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Internet & Network"), "internetandnetwork"), true),
+	fCategoryProductivity(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Productivity"), "productivity"), true),
+	fCategoryScienceAndMathematics(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Science & Mathematics"), "scienceandmathematics"), true),
+	fCategorySystemAndUtilities(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("System & Utilities"), "systemandutilities"), true),
+	fCategoryVideo(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Video"), "video"), true),
 
 	fCategoryFilter(PackageFilterRef(new AnyFilter(), true)),
 	fDepotFilter(""),
@@ -296,13 +308,17 @@ Model::Model()
 	fStopPopulatingAllPackages(false)
 {
 	// Don't forget to add new categories to this list:
+	fCategories.Add(fCategoryGames);
+	fCategories.Add(fCategoryBusiness);
 	fCategories.Add(fCategoryAudio);
 	fCategories.Add(fCategoryVideo);
 	fCategories.Add(fCategoryGraphics);
+	fCategories.Add(fCategoryEducation);
 	fCategories.Add(fCategoryProductivity);
+	fCategories.Add(fCategorySystemAndUtilities);
+	fCategories.Add(fCategoryInternetAndNetwork);
 	fCategories.Add(fCategoryDevelopment);
-	fCategories.Add(fCategoryCommandLine);
-	fCategories.Add(fCategoryGames);
+	fCategories.Add(fCategoryScienceAndMathematics);
 
 	// A category for packages that the user installed.
 	fUserCategories.Add(CategoryRef(new PackageCategory(
@@ -645,11 +661,30 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
 
 					if (category == "AUDIO")
 						package->AddCategory(CategoryAudio());
-					else if (category == "VIDEO")
-						package->AddCategory(CategoryVideo());
+					else if (category == "BUSINESS")
+						package->AddCategory(CategoryBusiness());
 					else if (category == "DEVELOPMENT")
 						package->AddCategory(CategoryDevelopment());
-					// TODO: ...
+					else if (category == "EDUCATION")
+						package->AddCategory(CategoryEducation());
+					else if (category == "GAMES")
+						package->AddCategory(CategoryGames());
+					else if (category == "GRAPHICS")
+						package->AddCategory(CategoryGraphics());
+					else if (category == "INTERNETANDNETWORK")
+						package->AddCategory(CategoryInternetAndNetwork());
+					else if (category == "PRODUCTIVITY")
+						package->AddCategory(CategoryProductivity());
+					else if (category == "SCIENCEANDMATHEMATICS")
+						package->AddCategory(CategoryScienceAndMathematics());
+					else if (category == "SYSTEMANDUTILITIES")
+						package->AddCategory(CategorySystemAndUtilities());
+					else if (category == "VIDEO")
+						package->AddCategory(CategoryVideo());
+					// TODO: The server will eventually support an API to
+					// get the defined categories and their translated names.
+					// This should then be used instead of hard-coded
+					// categories and translations in the app.
 				}
 			}
 			double derivedRating;

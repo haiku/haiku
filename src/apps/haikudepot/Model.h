@@ -41,18 +41,26 @@ public:
 			// Access to global categories
 			const CategoryRef&	CategoryAudio() const
 									{ return fCategoryAudio; }
-			const CategoryRef&	CategoryVideo() const
-									{ return fCategoryVideo; }
+			const CategoryRef&	CategoryBusiness() const
+									{ return fCategoryBusiness; }
+			const CategoryRef&	CategoryDevelopment() const
+									{ return fCategoryDevelopment; }
+			const CategoryRef&	CategoryEducation() const
+									{ return fCategoryEducation; }
+			const CategoryRef&	CategoryInternetAndNetwork() const
+									{ return fCategoryInternetAndNetwork; }
+			const CategoryRef&	CategoryGames() const
+									{ return fCategoryGames; }
 			const CategoryRef&	CategoryGraphics() const
 									{ return fCategoryGraphics; }
 			const CategoryRef&	CategoryProductivity() const
 									{ return fCategoryProductivity; }
-			const CategoryRef&	CategoryDevelopment() const
-									{ return fCategoryDevelopment; }
-			const CategoryRef&	CategoryCommandLine() const
-									{ return fCategoryCommandLine; }
-			const CategoryRef&	CategoryGames() const
-									{ return fCategoryGames; }
+			const CategoryRef&	CategoryScienceAndMathematics() const
+									{ return fCategoryScienceAndMathematics; }
+			const CategoryRef&	CategorySystemAndUtilities() const
+									{ return fCategorySystemAndUtilities; }
+			const CategoryRef&	CategoryVideo() const
+									{ return fCategoryVideo; }
 
 			const CategoryList&	Categories() const
 									{ return fCategories; }
@@ -106,13 +114,17 @@ private:
 			DepotList			fDepots;
 
 			CategoryRef			fCategoryAudio;
-			CategoryRef			fCategoryVideo;
-			CategoryRef			fCategoryGraphics;
-			CategoryRef			fCategoryProductivity;
+			CategoryRef			fCategoryBusiness;
 			CategoryRef			fCategoryDevelopment;
-			CategoryRef			fCategoryCommandLine;
+			CategoryRef			fCategoryEducation;
 			CategoryRef			fCategoryGames;
-			// TODO: More categories
+			CategoryRef			fCategoryGraphics;
+			CategoryRef			fCategoryInternetAndNetwork;
+			CategoryRef			fCategoryProductivity;
+			CategoryRef			fCategoryScienceAndMathematics;
+			CategoryRef			fCategorySystemAndUtilities;
+			CategoryRef			fCategoryVideo;
+			// TODO: Dynamic categories retrieved from web-app
 
 			CategoryList		fCategories;
 			CategoryList		fUserCategories;
