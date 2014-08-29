@@ -1620,6 +1620,11 @@ TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
 				if (choice <= 0)
 					return;
 			}
+
+			LocatableFile* foundSourceFile = fActiveSourceCode
+				->GetSourceFile();
+			if (foundSourceFile != NULL)
+				fListener->SourceEntryInvalidateRequested(foundSourceFile);
 			fListener->SourceEntryLocateRequested(sourcePath,
 				targetFilePath.Path());
 			fListener->FunctionSourceCodeRequested(fActiveFunction);
@@ -1636,8 +1641,6 @@ TeamWindow::_HandleLocateSourceRequest(BStringList* entries)
 	else if (fActiveFunction->GetFunctionDebugInfo()->SourceFile() == NULL)
 		return;
 	else if (fActiveSourceCode == NULL)
-		return;
-	else if (fActiveSourceCode->GetSourceFile() != NULL)
 		return;
 	else if (fActiveFunction->GetFunction()->SourceCodeState()
 		== FUNCTION_SOURCE_NOT_LOADED) {

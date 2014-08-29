@@ -66,6 +66,8 @@ private:
 	virtual void				SourceEntryLocateRequested(
 									const char* sourcePath,
 									const char* locatedPath);
+	virtual void				SourceEntryInvalidateRequested(
+									LocatableFile* sourceFile);
 	virtual	void				ImageDebugInfoRequested(Image* image);
 	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
 									ValueNodeContainer* container,

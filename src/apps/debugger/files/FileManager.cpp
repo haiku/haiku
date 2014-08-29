@@ -646,6 +646,14 @@ FileManager::SourceEntryLocated(const BString& path,
 	const BString& locatedPath)
 {
 	AutoLocker<FileManager> locker(this);
+
+	// check if we already have this path mapped. If so,
+	// first clear the mapping, as the user may be attempting
+	// to correct an existing entry.
+	SourceFileEntry* entry = _LookupSourceFile(path);
+	if (entry != NULL)
+		_SourceFileUnused(entry);
+
 	fSourceDomain->EntryLocated(path, locatedPath);
 
 	try {

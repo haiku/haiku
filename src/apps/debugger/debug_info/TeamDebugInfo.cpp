@@ -546,6 +546,17 @@ TeamDebugInfo::LoadSourceCode(LocatableFile* file, FileSourceCode*& _sourceCode)
 }
 
 
+void
+TeamDebugInfo::ClearSourceCode(LocatableFile* sourceFile)
+{
+	AutoLocker<BLocker> locker(fLock);
+
+	SourceFileEntry* entry = fSourceFiles->Lookup(sourceFile);
+	if (entry != NULL)
+		entry->SetSourceCode(NULL);
+}
+
+
 status_t
 TeamDebugInfo::DisassembleFunction(FunctionInstance* functionInstance,
 	DisassembledCode*& _sourceCode)

@@ -20,6 +20,7 @@ class entry_ref;
 class CpuState;
 class FunctionInstance;
 class Image;
+class LocatableFile;
 class StackFrame;
 class Team;
 class TeamUiSettings;
@@ -92,6 +93,8 @@ public:
 	virtual void				SourceEntryLocateRequested(
 									const char* sourcePath,
 									const char* locatedPath) = 0;
+	virtual	void				SourceEntryInvalidateRequested(
+									LocatableFile* sourceFile) = 0;
 	virtual	void				ImageDebugInfoRequested(Image* image) = 0;
 	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
 									ValueNodeContainer* container,

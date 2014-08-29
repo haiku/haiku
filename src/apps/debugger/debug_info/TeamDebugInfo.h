@@ -62,6 +62,8 @@ public:
 			status_t			LoadSourceCode(LocatableFile* file,
 									FileSourceCode*& _sourceCode);
 										// returns reference
+			void				ClearSourceCode(LocatableFile* file);
+
 			status_t			DisassembleFunction(
 									FunctionInstance* functionInstance,
 									DisassembledCode*& _sourceCode);

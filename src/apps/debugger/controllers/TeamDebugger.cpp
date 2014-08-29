@@ -821,6 +821,15 @@ TeamDebugger::SourceEntryLocateRequested(const char* sourcePath,
 
 
 void
+TeamDebugger::SourceEntryInvalidateRequested(LocatableFile* sourceFile)
+{
+	AutoLocker< ::Team> locker(fTeam);
+
+	fTeam->DebugInfo()->ClearSourceCode(sourceFile);
+}
+
+
+void
 TeamDebugger::FunctionSourceCodeRequested(FunctionInstance* functionInstance,
 	bool forceDisassembly)
 {
