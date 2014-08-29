@@ -116,6 +116,7 @@ static	void					InterruptCallbackFunction(void *cookie,
 		//usb_serial_line_coding	fLineCoding;
 
 		/* deferred interrupt */
+		uint8					fCachedIER;	// last value written to IER
 		uint8					fCachedIIR;	// cached IRQ condition
 		int32					fPendingDPC; // some IRQ still
 

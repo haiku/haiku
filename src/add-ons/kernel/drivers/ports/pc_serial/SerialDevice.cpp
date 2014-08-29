@@ -29,6 +29,7 @@ SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
 		fIOBase(ioBase),
 		fIRQ(irq),
 		fMaster(master),
+		fCachedIER(0x0),
 		fCachedIIR(0x1),
 		fPendingDPC(0),
 		fReadBufferAvail(0),
@@ -88,6 +89,10 @@ SerialDevice::Init()
 {
 	fReadBufferSem = create_sem(0, "pc_serial:done_read");
 	fWriteBufferSem = create_sem(0, "pc_serial:done_write");
+
+	// disable IRQ
+	fCachedIER = 0;
+	WriteReg8(IER, fCachedIER);
 
 	// disable DLAB
 	WriteReg8(LCR, 0);
@@ -264,7 +269,8 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 				// remove the handler
 				remove_io_interrupt_handler(IRQ(), pc_serial_interrupt, this);
 				// disable IRQ
-				WriteReg8(IER, 0);
+				fCachedIER = 0;
+				WriteReg8(IER, fCachedIER);
 				WriteReg8(MCR, 0);
 			}
 
@@ -277,7 +283,8 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 				// 
 				WriteReg8(MCR, MCR_DTR | MCR_RTS | MCR_IRQ_EN /*| MCR_LOOP*//*XXXXXXX*/);
 				// enable irqs
-				WriteReg8(IER, IER_RLS | IER_MS | IER_RDA);
+				fCachedIER = IER_RLS | IER_MS | IER_RDA;
+				WriteReg8(IER, fCachedIER);
 				//WriteReg8(IER, IER_RDA);
 			}
 
@@ -330,7 +337,8 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 		case TTYOSTART:
 			TRACE("TTYOSTART\n");
 			// enable irqs
-			WriteReg8(IER, IER_RLS | IER_MS | IER_RDA | IER_THRE);
+			fCachedIER |= IER_THRE;
+			WriteReg8(IER, fCachedIER);
 			return true;
 		case TTYOSYNC:
 			TRACE("TTYOSYNC\n");
@@ -366,8 +374,14 @@ SerialDevice::IsInterruptPending()
 
 	bool pending = (fCachedIIR & IIR_PENDING) == 0;
 
-	if (pending)
+	if (pending) {
+		// temporarily mask the IRQ
+		// else VirtualBox triggers one per every written byte it seems
+		// not sure it's required on real hardware
+		WriteReg8(IER, fCachedIER & ~(IER_RLS | IER_MS | IER_RDA | IER_THRE));
+
 		atomic_add(&fPendingDPC, 1);
+	}
 
 	return pending; // 0 means yes
 }
@@ -486,6 +500,9 @@ SerialDevice::InterruptHandler()
 	}
 
 	atomic_add(&fPendingDPC, -1);
+
+	// unmask IRQ
+	WriteReg8(IER, fCachedIER);
 
 	TRACE_FUNCRET("< IRQ:%d\n", ret);
 	return ret;
