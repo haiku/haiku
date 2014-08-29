@@ -227,7 +227,7 @@ intel_extreme_init(intel_info &info)
 	info.aperture = gGART->map_aperture(info.pci->bus, info.pci->device,
 		info.pci->function, 0, &info.aperture_base);
 	if (info.aperture < B_OK) {
-		ERROR("error: could not map GART aperture!\n");
+		ERROR("error: could not map GART aperture! (%s)\n", strerror(info.aperture));
 		return info.aperture;
 	}
 
