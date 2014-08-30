@@ -11,6 +11,7 @@
 #include <driver_settings.h>
 #include <OS.h>
 #include <MediaDefs.h>
+#include <string.h>
 #include <strings.h>
 #include "hmulti_audio.h"
 #include "multi.h"

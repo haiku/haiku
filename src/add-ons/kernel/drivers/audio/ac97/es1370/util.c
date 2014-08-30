@@ -26,6 +26,7 @@
  *
  */
 #include <Errors.h>
+#include <KernelExport.h>
 #include <OS.h>
 #include <string.h>
 
@@ -34,7 +35,7 @@
 #include "debug.h"
 #include "util.h"
 
-spinlock slock = 0;
+spinlock slock = B_SPINLOCK_INITIALIZER;
 
 uint32 round_to_pagesize(uint32 size);
 
