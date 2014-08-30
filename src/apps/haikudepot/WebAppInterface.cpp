@@ -67,6 +67,26 @@ public:
 		return *this;
 	}
 
+	JsonBuilder& AddStrings(const StringList& strings)
+	{
+		for (int i = 0; i < strings.CountItems(); i++)
+			AddItem(strings.ItemAtFast(i));
+		return *this;
+	}
+
+	JsonBuilder& AddItem(const char* item)
+	{
+		if (fInList)
+			fString << ",\"";
+		else
+			fString << '"';
+		// TODO: Escape item
+		fString << item;
+		fString << "\"";
+		fInList = true;
+		return *this;
+	}
+
 	JsonBuilder& AddValue(const char* name, const char* value)
 	{
 		_StartName(name);
@@ -234,25 +254,6 @@ status_t
 WebAppInterface::RetrievePackageInfo(const BString& packageName,
 	BMessage& message)
 {
-	BUrl url("https://depot.haiku-os.org/api/v1/pkg");
-	
-	ProtocolListener listener;
-	BUrlContext context;
-	BHttpHeaders headers;	
-	// Content-Type
-	headers.AddHeader("Content-Type", "application/json");
-
-	BHttpRequest request(url, true, "HTTP", &listener, &context);
-
-	// Authentication
-	if (!fUsername.IsEmpty() && !fPassword.IsEmpty()) {
-		request.SetUserName(fUsername);
-		request.SetPassword(fPassword);
-	}
-
-	request.SetMethod(B_HTTP_POST);
-	request.SetHeaders(headers);
-
 	BString jsonString = JsonBuilder()
 		.AddValue("jsonrpc", "2.0")
 		.AddValue("id", ++fRequestIndex)
@@ -267,36 +268,41 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 		.EndArray()
 	.End();
 
-	printf("Sending JSON:\n%s\n", jsonString.String());
+//	printf("Sending JSON:\n%s\n", jsonString.String());
 	
-	BMemoryIO* data = new BMemoryIO(
-		jsonString.String(), jsonString.Length() - 1);
+	return _SendJsonRequest(jsonString, message);
+}
 
-	request.AdoptInputData(data, jsonString.Length() - 1);
 
-	BMallocIO replyData;
-	listener.SetDownloadIO(&replyData);
-//	listener.SetDebug(true);
+status_t
+WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
+	BMessage& message)
+{
+	BString jsonString = JsonBuilder()
+		.AddValue("jsonrpc", "2.0")
+		.AddValue("id", ++fRequestIndex)
+		.AddValue("method", "getBulkPkg")
+		.AddArray("params")
+			.AddObject()
+				.AddArray("pkgNames")
+					.AddStrings(packageNames)
+				.EndArray()
+				.AddValue("architectureCode", "x86_gcc2")
+				.AddValue("naturalLanguageCode", "en")
+				.AddValue("versionType", "LATEST")
+				.AddArray("filter")
+					.AddItem("PKGCATEGORIES")
+					.AddItem("PKGSCREENSHOTS")
+					.AddItem("PKGICONS")
+					.AddItem("PKGVERSIONLOCALIZATIONDESCRIPTIONS")
+				.EndArray()
+			.EndObject()
+		.EndArray()
+	.End();
 
-	thread_id thread = request.Run();
-	wait_for_thread(thread, NULL);
-
-	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
-		request.Result());
-
-	int32 statusCode = result.StatusCode();
-	if (statusCode != 200) {
-		printf("Response code: %" B_PRId32 "\n", statusCode);
-		return B_ERROR;
-	}
-
-	jsonString.SetTo(static_cast<const char*>(replyData.Buffer()),
-		replyData.BufferLength());
-	if (jsonString.Length() == 0)
-		return B_ERROR;
-
-	BJson parser;
-	return parser.Parse(message, jsonString);
+//	printf("Sending JSON:\n%s\n", jsonString.String());
+	
+	return _SendJsonRequest(jsonString, message);
 }
 
 
@@ -328,3 +334,62 @@ WebAppInterface::RetrievePackageIcon(const BString& packageName,
 
 	return B_ERROR;
 }
+
+
+status_t
+WebAppInterface::_SendJsonRequest(BString jsonString, BMessage& reply) const
+{
+	BUrl url("https://depot.haiku-os.org/api/v1/pkg");
+	
+	ProtocolListener listener;
+	BUrlContext context;
+	BHttpHeaders headers;	
+	// Content-Type
+	headers.AddHeader("Content-Type", "application/json");
+
+	BHttpRequest request(url, true, "HTTP", &listener, &context);
+
+	// Authentication
+	if (!fUsername.IsEmpty() && !fPassword.IsEmpty()) {
+		request.SetUserName(fUsername);
+		request.SetPassword(fPassword);
+	}
+
+	request.SetMethod(B_HTTP_POST);
+	request.SetHeaders(headers);
+
+	BMemoryIO* data = new BMemoryIO(
+		jsonString.String(), jsonString.Length() - 1);
+
+	request.AdoptInputData(data, jsonString.Length() - 1);
+
+	BMallocIO replyData;
+	listener.SetDownloadIO(&replyData);
+//	listener.SetDebug(true);
+
+	thread_id thread = request.Run();
+	wait_for_thread(thread, NULL);
+
+	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
+		request.Result());
+
+	int32 statusCode = result.StatusCode();
+	if (statusCode != 200) {
+		printf("Response code: %" B_PRId32 "\n", statusCode);
+		return B_ERROR;
+	}
+
+	jsonString.SetTo(static_cast<const char*>(replyData.Buffer()),
+		replyData.BufferLength());
+	if (jsonString.Length() == 0)
+		return B_ERROR;
+
+	BJson parser;
+	status_t status = parser.Parse(reply, jsonString);
+	if (status == B_BAD_DATA) {
+//		printf("Parser choked on JSON:\n%s\n", jsonString.String());
+	}
+	return status;
+}
+
+

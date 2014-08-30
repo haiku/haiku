@@ -9,9 +9,13 @@
 #include <Application.h>
 #include <String.h>
 
+#include "List.h"
+
 
 class BDataIO;
 class BMessage;
+
+typedef List<BString, false>	StringList;
 
 
 class WebAppInterface {
@@ -26,9 +30,17 @@ public:
 									const BString& packageName,
 									BMessage& message);
 
+			status_t			RetrieveBulkPackageInfo(
+									const StringList& packageNames,
+									BMessage& message);
+
 			status_t			RetrievePackageIcon(
 									const BString& packageName,
 									BDataIO* stream);
+
+private:
+			status_t			_SendJsonRequest(BString jsonString,
+									BMessage& reply) const;
 
 private:
 			BString				fUsername;
