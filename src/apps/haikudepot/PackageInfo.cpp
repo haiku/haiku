@@ -569,7 +569,8 @@ PackageInfo::PackageInfo()
 	fState(NONE),
 	fDownloadProgress(0.0),
 	fFlags(0),
-	fSystemDependency(false)
+	fSystemDependency(false),
+	fArchitecture()
 {
 }
 
@@ -577,7 +578,7 @@ PackageInfo::PackageInfo()
 PackageInfo::PackageInfo(const BString& title,
 		const BString& version, const PublisherInfo& publisher,
 		const BString& shortDescription, const BString& fullDescription,
-		int32 flags)
+		int32 flags, const char* architecture)
 	:
 	fIcon(),
 	fTitle(title),
@@ -593,7 +594,8 @@ PackageInfo::PackageInfo(const BString& title,
 	fState(NONE),
 	fDownloadProgress(0.0),
 	fFlags(flags),
-	fSystemDependency(false)
+	fSystemDependency(false),
+	fArchitecture(architecture)
 {
 }
 
@@ -615,7 +617,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fInstallationLocations(other.fInstallationLocations),
 	fDownloadProgress(other.fDownloadProgress),
 	fFlags(other.fFlags),
-	fSystemDependency(other.fSystemDependency)
+	fSystemDependency(other.fSystemDependency),
+	fArchitecture(other.fArchitecture)
 {
 }
 
@@ -639,6 +642,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fDownloadProgress = other.fDownloadProgress;
 	fFlags = other.fFlags;
 	fSystemDependency = other.fSystemDependency;
+	fArchitecture = other.fArchitecture;
 	return *this;
 }
 
@@ -660,7 +664,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fState == other.fState
 		&& fFlags == other.fFlags
 		&& fDownloadProgress == other.fDownloadProgress
-		&& fSystemDependency == other.fSystemDependency;
+		&& fSystemDependency == other.fSystemDependency
+		&& fArchitecture == other.fArchitecture;
 }
 
 
@@ -668,6 +673,26 @@ bool
 PackageInfo::operator!=(const PackageInfo& other) const
 {
 	return !(*this == other);
+}
+
+
+void
+PackageInfo::SetShortDescription(const BString& description)
+{
+	if (fShortDescription != description) {
+		fShortDescription = description;
+		_NotifyListeners(PKG_CHANGED_SUMMARY);
+	}
+}
+
+
+void
+PackageInfo::SetFullDescription(const BString& description)
+{
+	if (fFullDescription != description) {
+		fFullDescription = description;
+		_NotifyListeners(PKG_CHANGED_DESCRIPTION);
+	}
 }
 
 

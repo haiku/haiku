@@ -17,6 +17,7 @@
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <File.h>
+#include <LocaleRoster.h>
 #include <Message.h>
 #include <Path.h>
 
@@ -588,6 +589,18 @@ int32
 Model::_PopulateAllPackagesEntry(void* cookie)
 {
 	Model* model = static_cast<Model*>(cookie);
+
+	model->fPreferredLanguage = "en";
+	BLocaleRoster* localeRoster = BLocaleRoster::Default();
+	if (localeRoster != NULL) {
+		BMessage preferredLanguages;
+		if (localeRoster->GetPreferredLanguages(&preferredLanguages) == B_OK) {
+			BString language;
+			if (preferredLanguages.FindString("language", 0, &language) == B_OK)
+				language.CopyInto(model->fPreferredLanguage, 0, 2);
+		}
+	}
+
 	model->_PopulateAllPackagesThread(true);
 	model->_PopulateAllPackagesThread(false);
 	return 0;
@@ -641,7 +654,7 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 		// list view, so without the user clicking the package.
 	}
 
-	if (!fStopPopulatingAllPackages && bulkPackageList.CountItems() > 0) {
+	if (bulkPackageList.CountItems() > 0) {
 		_PopulatePackageInfos(bulkPackageList, fromCacheOnly,
 			packagesWithIconsList);
 	}
@@ -663,11 +676,15 @@ void
 Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 	PackageList& packagesWithIcons)
 {
+	if (fStopPopulatingAllPackages)
+		return;
+	
 	if (fromCacheOnly)
 		return;
 	
 	// Retrieve info from web-app
 	WebAppInterface interface;
+	interface.SetPreferredLanguage(fPreferredLanguage);
 	BMessage info;
 
 	StringList packageNames;
@@ -686,6 +703,8 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 			&& result.FindMessage("pkgs", &pkgs) == B_OK) {
 			int32 index = 0;
 			while (true) {
+				if (fStopPopulatingAllPackages)
+					return;
 				BString name;
 				name << index++;
 				BMessage pkgInfo;
@@ -753,9 +772,11 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
 	
 	// Retrieve info from web-app
 	WebAppInterface interface;
+	interface.SetPreferredLanguage(fPreferredLanguage);
 	BMessage info;
 
-	status_t status = interface.RetrievePackageInfo(package->Title(), info);
+	status_t status = interface.RetrievePackageInfo(package->Title(),
+		package->Architecture(), info);
 	if (status == B_OK) {
 		// Parse message
 //		info.PrintToStream();
@@ -766,15 +787,46 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
 }
 
 
-void
-Model::_PopulatePackageInfo(const PackageInfoRef& package,
-	const BMessage& data)
+static void
+append_word_list(BString& words, const char* word)
 {
-	const char* categoriesDebug = "";
-	const char* ratingDebug = "";
+	if (words.Length() > 0)
+		words << ", ";
+	words << word;
+} 
+
+
+void
+Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
+{
+	BAutolock locker(&fLock);
+
+	BString foundInfo;
+
+	BMessage versions;
+	BMessage version;
+	if (data.FindMessage("versions", &versions) == B_OK
+		&& versions.FindMessage("0", &version)) {
+		BString languageCode;
+		if (version.FindString("naturalLanguageCode", &languageCode) == B_OK) {
+			if (languageCode == fPreferredLanguage) {
+				BString summary;
+				if (version.FindString("summary", &summary) == B_OK) {
+					package->SetShortDescription(summary);
+					append_word_list(foundInfo, "summary");
+				}
+				BString description;
+				if (version.FindString("description", &description) == B_OK) {
+					package->SetFullDescription(description);
+					append_word_list(foundInfo, "description");
+				}
+			}
+		}
+	}
 
 	BMessage categories;
 	if (data.FindMessage("pkgCategoryCodes", &categories) == B_OK) {
+		bool foundCategory = false;
 		int32 index = 0;
 		while (true) {
 			BString name;
@@ -810,8 +862,10 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package,
 			// This should then be used instead of hard-coded
 			// categories and translations in the app.
 		
-			categoriesDebug = "categories";
+			foundCategory = true;
 		}
+		if (foundCategory)
+			append_word_list(foundInfo, "categories");
 	}
 	double derivedRating;
 	double derivedRatingSampleSize;
@@ -824,14 +878,13 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package,
 			summary.ratingCount = (int)derivedRatingSampleSize;
 			package->SetRatingSummary(summary);
 
-			if (strlen(categoriesDebug) > 0)
-				ratingDebug = ", rating";
-			else
-				ratingDebug = "rating";
+			append_word_list(foundInfo, "rating");
 		}
 	}
-	printf("Populated package info for %s: %s%s\n",
-		package->Title().String(), categoriesDebug, ratingDebug);
+	if (foundInfo.Length() > 0) {
+		printf("Populated package info for %s: %s\n",
+			package->Title().String(), foundInfo.String());
+	}
 }
 
 
@@ -862,6 +915,7 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 		if (fromCacheOnly || now - modifiedTime < 60 * 60) {
 			// Cache file is recent enough, just use it and return.
 			BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(iconFile), true);
+			BAutolock locker(&fLock);
 			package->SetIcon(bitmapRef);
 			return;
 		}
@@ -877,7 +931,9 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 	status_t status = interface.RetrievePackageIcon(package->Title(), &buffer);
 	if (status == B_OK) {
 		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
+		BAutolock locker(&fLock);
 		package->SetIcon(bitmapRef);
+		locker.Unlock();
 		if (iconFile.SetTo(iconCachePath.Path(),
 				B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) == B_OK) {
 			iconFile.Write(buffer.Buffer(), buffer.BufferLength());
@@ -892,9 +948,6 @@ Model::_HasNativeIcon(const BMessage& message) const
 	BMessage pkgIcons;
 	if (message.FindMessage("pkgIcons", &pkgIcons) != B_OK)
 		return false;
-
-	if (!pkgIcons.IsEmpty())
-		pkgIcons.PrintToStream();
 
 	int32 index = 0;
 	while (true) {

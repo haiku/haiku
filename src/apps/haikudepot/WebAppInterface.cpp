@@ -232,6 +232,8 @@ WebAppInterface::fRequestIndex = 0;
 
 
 WebAppInterface::WebAppInterface()
+	:
+	fLanguage("en")
 {
 }
 
@@ -250,9 +252,16 @@ WebAppInterface::SetAuthorization(const BString& username,
 }
 
 
+void
+WebAppInterface::SetPreferredLanguage(const BString& language)
+{
+	fLanguage = language;
+}
+
+
 status_t
 WebAppInterface::RetrievePackageInfo(const BString& packageName,
-	BMessage& message)
+	const BString& architecture, BMessage& message)
 {
 	BString jsonString = JsonBuilder()
 		.AddValue("jsonrpc", "2.0")
@@ -261,8 +270,8 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 		.AddArray("params")
 			.AddObject()
 				.AddValue("name", packageName)
-				.AddValue("architectureCode", "x86_gcc2")
-				.AddValue("naturalLanguageCode", "en")
+				.AddValue("architectureCode", architecture)
+				.AddValue("naturalLanguageCode", fLanguage)
 				.AddValue("versionType", "NONE")
 			.EndObject()
 		.EndArray()
@@ -288,7 +297,7 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 					.AddStrings(packageNames)
 				.EndArray()
 				.AddValue("architectureCode", "x86_gcc2")
-				.AddValue("naturalLanguageCode", "en")
+				.AddValue("naturalLanguageCode", fLanguage)
 				.AddValue("versionType", "LATEST")
 				.AddArray("filter")
 					.AddItem("PKGCATEGORIES")

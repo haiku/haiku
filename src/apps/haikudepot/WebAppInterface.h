@@ -25,9 +25,12 @@ public:
 
 			void				SetAuthorization(const BString& username,
 									const BString& password);
+			void				SetPreferredLanguage(const BString& language);
+			void				SetArchitecture(const BString& architecture);
 
 			status_t			RetrievePackageInfo(
 									const BString& packageName,
+									const BString& architecture,
 									BMessage& message);
 
 			status_t			RetrieveBulkPackageInfo(
@@ -45,6 +48,8 @@ private:
 private:
 			BString				fUsername;
 			BString				fPassword;
+			BString				fLanguage;
+			BString				fArchitecture;
 	static	int					fRequestIndex;
 };
 

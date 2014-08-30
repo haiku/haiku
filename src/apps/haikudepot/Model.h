@@ -156,6 +156,7 @@ private:
 
 			thread_id			fPopulateAllPackagesThread;
 	volatile bool				fStopPopulatingAllPackages;
+			BString				fPreferredLanguage;
 };
 
 

@@ -224,7 +224,8 @@ public:
 									const PublisherInfo& publisher,
 									const BString& shortDescription,
 									const BString& fullDescription,
-									int32 packageFlags);
+									int32 packageFlags,
+									const char* architecture);
 								PackageInfo(const PackageInfo& other);
 
 			PackageInfo&		operator=(const PackageInfo& other);
@@ -235,8 +236,10 @@ public:
 									{ return fTitle; }
 			const BString&		Version() const
 									{ return fVersion; }
+			void				SetShortDescription(const BString& description);
 			const BString&		ShortDescription() const
 									{ return fShortDescription; }
+			void				SetFullDescription(const BString& description);
 			const BString&		FullDescription() const
 									{ return fFullDescription; }
 			const PublisherInfo& Publisher() const
@@ -256,6 +259,9 @@ public:
 			bool				IsSystemDependency() const
 									{ return fSystemDependency; }
 			void				SetSystemDependency(bool isDependency);
+
+			const BString		Architecture() const
+									{ return fArchitecture; }
 
 			PackageState		State() const
 									{ return fState; }
@@ -311,6 +317,7 @@ private:
 			PackageListenerList	fListeners;
 			int32				fFlags;
 			bool				fSystemDependency;
+			BString				fArchitecture;
 };
 
 

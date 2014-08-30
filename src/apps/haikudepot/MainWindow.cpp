@@ -475,7 +475,10 @@ MainWindow::_RefreshPackageList()
 			| BSolver::B_FIND_IN_PROVIDES,
 		packages);
 	if (result != B_OK) {
-		// TODO: notify user
+		BString message(B_TRANSLATE("An error occurred while "
+			"obtaining the package list: %message%"));
+		message.ReplaceFirst("%message%", strerror(result));
+		_NotifyUser("Error", message.String());
 		return;
 	}
 
@@ -532,7 +535,8 @@ MainWindow::_RefreshPackageList()
 					PublisherInfo(BitmapRef(), publisherName,
 					"", publisherURL), repoPackageInfo.Summary(),
 					repoPackageInfo.Description(),
-					repoPackageInfo.Flags()),
+					repoPackageInfo.Flags(),
+					repoPackageInfo.ArchitectureName()),
 				true);
 
 			if (modelInfo.Get() == NULL)

@@ -124,6 +124,7 @@ public:
 									{ return fPackage; }
 
 			void				UpdateTitle();
+			void				UpdateSummary();
 			void				UpdateState();
 			void				UpdateRating();
 
@@ -472,8 +473,8 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	// Rating
 	UpdateRating();
 
-	// Description
-	SetField(new BStringField(package.ShortDescription()), kDescriptionColumn);
+	// Summary
+	UpdateSummary();
 
 	// Size
 	// TODO: Store package size
@@ -515,6 +516,17 @@ PackageRow::UpdateState()
 
 	SetField(new BStringField(package_state_to_string(fPackage)),
 		kStatusColumn);
+}
+
+
+void
+PackageRow::UpdateSummary()
+{
+	if (fPackage.Get() == NULL)
+		return;
+
+	SetField(new BStringField(fPackage->ShortDescription()),
+		kDescriptionColumn);
 }
 
 
@@ -676,6 +688,8 @@ PackageListView::MessageReceived(BMessage* message)
 			BAutolock _(fModelLock);
 			PackageRow* row = _FindRow(title);
 			if (row != NULL) {
+				if ((changes & PKG_CHANGED_SUMMARY) != 0)
+					row->UpdateSummary();
 				if ((changes & PKG_CHANGED_RATINGS) != 0)
 					row->UpdateRating();
 				if ((changes & PKG_CHANGED_STATE) != 0)
