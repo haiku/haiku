@@ -17,6 +17,7 @@
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <File.h>
+#include <Message.h>
 #include <Path.h>
 
 #include "WebAppInterface.h"
@@ -598,6 +599,8 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 {
 	int32 depotIndex = 0;
 	int32 packageIndex = 0;
+	PackageList bulkPackageList;
+	PackageList packagesWithIconsList;
 
 	while (!fStopPopulatingAllPackages) {
 		// Obtain PackageInfoRef while keeping the depot and package lists
@@ -625,10 +628,119 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 		if (package.Get() == NULL)
 			continue;
 	
-		_PopulatePackageInfo(package, fromCacheOnly);
-		_PopulatePackageIcon(package, fromCacheOnly);
+		//_PopulatePackageInfo(package, fromCacheOnly);
+		bulkPackageList.Add(package);
+		if (bulkPackageList.CountItems() == 50) {
+			_PopulatePackageInfos(bulkPackageList, fromCacheOnly,
+				packagesWithIconsList);
+			bulkPackageList.Clear();
+		}
+		if (fromCacheOnly)
+			_PopulatePackageIcon(package, fromCacheOnly);
 		// TODO: Average user rating. It needs to be shown in the
 		// list view, so without the user clicking the package.
+	}
+
+	if (!fStopPopulatingAllPackages && bulkPackageList.CountItems() > 0) {
+		_PopulatePackageInfos(bulkPackageList, fromCacheOnly,
+			packagesWithIconsList);
+	}
+
+	if (!fromCacheOnly) {
+		for (int i = packagesWithIconsList.CountItems() - 1; i >= 0; i--) {
+			if (fStopPopulatingAllPackages)
+				break;
+			const PackageInfoRef& package = packagesWithIconsList.ItemAtFast(i);
+			printf("Getting/Updating native icon for %s\n",
+				package->Title().String());
+			_PopulatePackageIcon(package, fromCacheOnly);
+		}
+	}
+}
+
+
+void
+Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
+	PackageList& packagesWithIcons)
+{
+	if (fromCacheOnly)
+		return;
+	
+	// Retrieve info from web-app
+	WebAppInterface interface;
+	BMessage info;
+
+	StringList packageNames;
+	for (int i = 0; i < packages.CountItems(); i++) {
+		const PackageInfoRef& package = packages.ItemAtFast(i);
+		packageNames.Add(package->Title());
+	}
+
+	status_t status = interface.RetrieveBulkPackageInfo(packageNames, info);
+	if (status == B_OK) {
+		// Parse message
+//		info.PrintToStream();
+		BMessage result;
+		BMessage pkgs;
+		if (info.FindMessage("result", &result) == B_OK
+			&& result.FindMessage("pkgs", &pkgs) == B_OK) {
+			int32 index = 0;
+			while (true) {
+				BString name;
+				name << index++;
+				BMessage pkgInfo;
+				if (pkgs.FindMessage(name, &pkgInfo) != B_OK)
+					break;
+			
+				BString pkgName;
+				if (pkgInfo.FindString("name", &pkgName) != B_OK)
+					continue;
+			
+				// Find the PackageInfoRef
+				bool found = false;
+				for (int i = 0; i < packages.CountItems(); i++) {
+					const PackageInfoRef& package = packages.ItemAtFast(i);
+					if (pkgName == package->Title()) {
+						_PopulatePackageInfo(package, pkgInfo);
+						if (_HasNativeIcon(pkgInfo))
+							packagesWithIcons.Add(package);
+						packages.Remove(i);
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					printf("No matching package for %s\n", pkgName.String());
+			}
+		}
+	} else {
+		printf("Error sending request: %s\n", strerror(status));
+		int count = packages.CountItems();
+		if (count >= 4) {
+			// Retry in smaller chunks
+			PackageList firstHalf;
+			PackageList secondHalf;
+			for (int i = 0; i < count / 2; i++)
+				firstHalf.Add(packages.ItemAtFast(i));
+			for (int i = count / 2; i < count; i++)
+				secondHalf.Add(packages.ItemAtFast(i));
+			packages.Clear();
+			_PopulatePackageInfos(firstHalf, fromCacheOnly, packagesWithIcons);
+			_PopulatePackageInfos(secondHalf, fromCacheOnly, packagesWithIcons);
+		} else {
+			while (packages.CountItems() > 0) {
+				const PackageInfoRef& package = packages.ItemAtFast(0);
+				_PopulatePackageInfo(package, fromCacheOnly);
+				packages.Remove(0);
+			}
+		}
+	}
+
+	if (packages.CountItems() > 0) {
+		for (int i = 0; i < packages.CountItems(); i++) {
+			const PackageInfoRef& package = packages.ItemAtFast(i);
+			printf("No package info for %s\n", package->Title().String());
+		}
 	}
 }
 
@@ -646,61 +758,80 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
 	status_t status = interface.RetrievePackageInfo(package->Title(), info);
 	if (status == B_OK) {
 		// Parse message
-		info.PrintToStream();
+//		info.PrintToStream();
 		BMessage result;
-		if (info.FindMessage("result", &result) == B_OK) {
-			BMessage categories;
-			if (result.FindMessage("pkgCategoryCodes", &categories) == B_OK) {
-				int32 index = 0;
-				while (true) {
-					BString name;
-					name << index++;
-					BString category;
-					if (categories.FindString(name, &category) != B_OK)
-						break;
+		if (info.FindMessage("result", &result) == B_OK)
+			_PopulatePackageInfo(package, result);
+	}
+}
 
-					if (category == "AUDIO")
-						package->AddCategory(CategoryAudio());
-					else if (category == "BUSINESS")
-						package->AddCategory(CategoryBusiness());
-					else if (category == "DEVELOPMENT")
-						package->AddCategory(CategoryDevelopment());
-					else if (category == "EDUCATION")
-						package->AddCategory(CategoryEducation());
-					else if (category == "GAMES")
-						package->AddCategory(CategoryGames());
-					else if (category == "GRAPHICS")
-						package->AddCategory(CategoryGraphics());
-					else if (category == "INTERNETANDNETWORK")
-						package->AddCategory(CategoryInternetAndNetwork());
-					else if (category == "PRODUCTIVITY")
-						package->AddCategory(CategoryProductivity());
-					else if (category == "SCIENCEANDMATHEMATICS")
-						package->AddCategory(CategoryScienceAndMathematics());
-					else if (category == "SYSTEMANDUTILITIES")
-						package->AddCategory(CategorySystemAndUtilities());
-					else if (category == "VIDEO")
-						package->AddCategory(CategoryVideo());
-					// TODO: The server will eventually support an API to
-					// get the defined categories and their translated names.
-					// This should then be used instead of hard-coded
-					// categories and translations in the app.
-				}
-			}
-			double derivedRating;
-			double derivedRatingSampleSize;
-			if (result.FindDouble("derivedRating", &derivedRating) == B_OK
-				&& result.FindDouble("derivedRatingSampleSize",
-					&derivedRatingSampleSize) == B_OK) {
-				if (derivedRatingSampleSize > 0) {
-					RatingSummary summary;
-					summary.averageRating = derivedRating;
-					summary.ratingCount = (int)derivedRatingSampleSize;
-					package->SetRatingSummary(summary);
-				}
-			}
+
+void
+Model::_PopulatePackageInfo(const PackageInfoRef& package,
+	const BMessage& data)
+{
+	const char* categoriesDebug = "";
+	const char* ratingDebug = "";
+
+	BMessage categories;
+	if (data.FindMessage("pkgCategoryCodes", &categories) == B_OK) {
+		int32 index = 0;
+		while (true) {
+			BString name;
+			name << index++;
+			BString category;
+			if (categories.FindString(name, &category) != B_OK)
+				break;
+
+			if (category == "AUDIO")
+				package->AddCategory(CategoryAudio());
+			else if (category == "BUSINESS")
+				package->AddCategory(CategoryBusiness());
+			else if (category == "DEVELOPMENT")
+				package->AddCategory(CategoryDevelopment());
+			else if (category == "EDUCATION")
+				package->AddCategory(CategoryEducation());
+			else if (category == "GAMES")
+				package->AddCategory(CategoryGames());
+			else if (category == "GRAPHICS")
+				package->AddCategory(CategoryGraphics());
+			else if (category == "INTERNETANDNETWORK")
+				package->AddCategory(CategoryInternetAndNetwork());
+			else if (category == "PRODUCTIVITY")
+				package->AddCategory(CategoryProductivity());
+			else if (category == "SCIENCEANDMATHEMATICS")
+				package->AddCategory(CategoryScienceAndMathematics());
+			else if (category == "SYSTEMANDUTILITIES")
+				package->AddCategory(CategorySystemAndUtilities());
+			else if (category == "VIDEO")
+				package->AddCategory(CategoryVideo());
+			// TODO: The server will eventually support an API to
+			// get the defined categories and their translated names.
+			// This should then be used instead of hard-coded
+			// categories and translations in the app.
+		
+			categoriesDebug = "categories";
 		}
 	}
+	double derivedRating;
+	double derivedRatingSampleSize;
+	if (data.FindDouble("derivedRating", &derivedRating) == B_OK
+		&& data.FindDouble("derivedRatingSampleSize",
+			&derivedRatingSampleSize) == B_OK) {
+		if (derivedRatingSampleSize > 0) {
+			RatingSummary summary;
+			summary.averageRating = derivedRating;
+			summary.ratingCount = (int)derivedRatingSampleSize;
+			package->SetRatingSummary(summary);
+
+			if (strlen(categoriesDebug) > 0)
+				ratingDebug = ", rating";
+			else
+				ratingDebug = "rating";
+		}
+	}
+	printf("Populated package info for %s: %s%s\n",
+		package->Title().String(), categoriesDebug, ratingDebug);
 }
 
 
@@ -752,4 +883,33 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 			iconFile.Write(buffer.Buffer(), buffer.BufferLength());
 		}
 	}
+}
+
+
+bool
+Model::_HasNativeIcon(const BMessage& message) const
+{
+	BMessage pkgIcons;
+	if (message.FindMessage("pkgIcons", &pkgIcons) != B_OK)
+		return false;
+
+	if (!pkgIcons.IsEmpty())
+		pkgIcons.PrintToStream();
+
+	int32 index = 0;
+	while (true) {
+		BString name;
+		name << index++;
+		
+		BMessage typeCodeInfo;
+		if (pkgIcons.FindMessage(name, &typeCodeInfo) != B_OK)
+			break;
+	
+		BString mediaTypeCode;
+		if (typeCodeInfo.FindString("mediaTypeCode", &mediaTypeCode) == B_OK
+			&& mediaTypeCode == "application/x-vnd.haiku-icon") {
+			return true;
+		}
+	}
+	return false;
 }

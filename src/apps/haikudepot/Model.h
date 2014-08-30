@@ -9,6 +9,8 @@
 
 #include "PackageInfo.h"
 
+class BMessage;
+
 
 class PackageFilter : public BReferenceable {
 public:
@@ -101,12 +103,20 @@ private:
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
 			void				_PopulateAllPackagesThread(bool fromCacheOnly);
 
+			void				_PopulatePackageInfos(
+									PackageList& packages,
+									bool fromCacheOnly,
+									PackageList& packagesWithIcons);
 			void				_PopulatePackageInfo(
 									const PackageInfoRef& package,
 									bool fromCacheOnly);
+			void				_PopulatePackageInfo(
+									const PackageInfoRef& package,
+									const BMessage& data);
 			void				_PopulatePackageIcon(
 									const PackageInfoRef& package,
 									bool fromCacheOnly);
+			bool				_HasNativeIcon(const BMessage& message) const;
 
 private:
 			BLocker				fLock;
