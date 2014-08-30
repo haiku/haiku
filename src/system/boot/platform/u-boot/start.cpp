@@ -87,14 +87,6 @@ call_ctors(void)
 }
 
 
-/* needed for libgcc unwind XXX */
-extern "C" void
-abort(void)
-{
-	panic("abort");
-}
-
-
 extern "C" void
 platform_start_kernel(void)
 {
