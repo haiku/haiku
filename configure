@@ -396,8 +396,8 @@ is_in_list()
 	return 1
 }
 
-# check for no params, --help or -h and show usage immediately
-if [ -z "$1" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+# check for --help or -h and show usage immediately
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
 	usage; exit 0;
 fi
 
@@ -702,6 +702,7 @@ else
 			echo "Please specify the build tools to use or build (via" \
 				"--cross-tools-prefix or --build-cross-tools) or specify a" \
 				"host-only build (--host-only)." >&2
+			echo "For more info, invoke $0 --help"
 			exit 1
 		fi
 
