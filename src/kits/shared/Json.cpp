@@ -99,6 +99,12 @@ BJson::_Parse(BMessage& message, BString& JSON)
 	// in the case that we are parsing a map.
 	BString key("");
 	
+	// TODO: Check builder return codes and throw exception, or
+	// change builder implementation/interface to throw exceptions
+	// instead of returning errors.
+	// TODO: Elimitate more duplicated code, for example by moving
+	// more code into _ParseConstant().
+	
 	while (pos < length) {
 		switch (JSON[pos]) {
 		case '{':
