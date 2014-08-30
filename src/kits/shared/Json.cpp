@@ -1,5 +1,6 @@
 /*
  * Copyright 2014, Augustin Cavalier (waddlesplash)
+ * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,6 +18,46 @@
 
 namespace BPrivate {
 
+
+class ParseException {
+public:
+	ParseException(int32 position, BString error)
+		:
+		fPosition(position),
+		fError(error),
+		fReturnCode(B_BAD_DATA)
+	{
+	}
+
+	ParseException(int32 position, status_t returnCode)
+		:
+		fPosition(position),
+		fError(""),
+		fReturnCode(returnCode)
+	{
+	}
+
+	void PrintToStream() const {
+		const char* error;
+		if (fError.Length() > 0)
+			error = fError.String();
+		else
+			error = strerror(fReturnCode);
+		printf("Parse error at %ld: %s\n", fPosition, error);
+	}
+	
+	status_t ReturnCode() const
+	{
+		return fReturnCode;
+	}
+
+private:
+	int32		fPosition;
+	BString		fError;
+	status_t	fReturnCode;
+};
+
+
 status_t
 BJson::Parse(BMessage& message, const char* JSON)
 {
@@ -27,6 +68,23 @@ BJson::Parse(BMessage& message, const char* JSON)
 
 status_t
 BJson::Parse(BMessage& message, BString& JSON)
+{
+	try {
+		_Parse(message, JSON);
+		return B_OK;
+	} catch (ParseException e) {
+		e.PrintToStream();
+		return e.ReturnCode();
+	}
+	return B_ERROR;
+}
+
+
+// #pragma mark - Private methods
+
+
+void
+BJson::_Parse(BMessage& message, BString& JSON)
 {
 	BMessageBuilder builder(message);
 	int32 pos = 0;
@@ -59,13 +117,13 @@ BJson::Parse(BMessage& message, BString& JSON)
 			break;
 
 		case '}':
-			if (hierarchy.EndsWith("{") && (hierarchy.Length() != 1)) {
+			if (hierarchy.EndsWith("{") && hierarchy.Length() != 1) {
 				hierarchy.Truncate(hierarchy.Length() - 1);
 				builder.PopObject();
 			} else if (hierarchy.Length() == 1)
-				return B_OK; // End of the JSON data
+				return; // End of the JSON data
 			else
-				return B_BAD_DATA; // Unmatched closebrace
+				throw ParseException(pos, "Unmatched closebrace }");
 
             break;
 
@@ -86,78 +144,80 @@ BJson::Parse(BMessage& message, BString& JSON)
 			if (hierarchy.EndsWith("[")) {
 				hierarchy.Truncate(hierarchy.Length() - 1);
 				builder.PopObject();
-			} else
-				return B_BAD_DATA; // Unmatched closebracket
+			} else {
+				BString error("Unmatched closebrace ] hierarchy: ");
+				error << hierarchy;
+				throw ParseException(pos, error);
+			}
 
 			break;
 
 		case 't':
 		{
-			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0)
-				return B_BAD_DATA;
-				// 'true' cannot be a key, it can only be a value
+			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0) {
+				throw ParseException(pos,
+					"'true' cannot be a key, it can only be a value");
+			}
 			
-			if (_Parser_ParseConstant(JSON, pos, "true")) {
+			if (_ParseConstant(JSON, pos, "true")) {
 				if (builder.What() == JSON_TYPE_ARRAY)
 					key.SetToFormat("%" B_PRIu32, builder.CountNames());
 				builder.AddBool(key.String(), true);
 				key = "";
 			} else
-				return B_BAD_DATA;
-				// "t" out in the middle of nowhere!?
+				throw ParseException(pos, "Unexpected 't'");
 
 			break;
 		}
 
 		case 'f':
 		{
-			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0)
-				return B_BAD_DATA;
-				// 'false' cannot be a key, it can only be a value
+			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0) {
+				throw ParseException(pos,
+					"'false' cannot be a key, it can only be a value");
+			}
 			
-			if (_Parser_ParseConstant(JSON, pos, "false")) {
+			if (_ParseConstant(JSON, pos, "false")) {
 				if (builder.What() == JSON_TYPE_ARRAY)
 					key.SetToFormat("%" B_PRIu32, builder.CountNames());
 				builder.AddBool(key.String(), false);
 				key = "";
 			} else
-				return B_BAD_DATA;
-				// "f" out in the middle of nowhere!?
+				throw ParseException(pos, "Unexpected 'f'");
 
 			break;
 		}
 
         case 'n':
         {
-			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0)
-				return B_BAD_DATA;
-				// 'null' cannot be a key, it can only be a value
+			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0) {
+				throw ParseException(pos,
+					"'null' cannot be a key, it can only be a value");
+			}
 			
-			if (_Parser_ParseConstant(JSON, pos, "null")) {
+			if (_ParseConstant(JSON, pos, "null")) {
 				if (builder.What() == JSON_TYPE_ARRAY)
 					key.SetToFormat("%" B_PRIu32, builder.CountNames());
 				builder.AddPointer(key.String(), (void*)NULL);
 				key = "";
 			} else
-				return B_BAD_DATA;
-				// "n" out in the middle of nowhere!?
+				throw ParseException(pos, "Unexpected 'n'");
 
 			break;
 		}
 
 		case '"':
 			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0)
-				key = _Parser_ParseString(JSON, pos);
+				key = _ParseString(JSON, pos);
 			else if (builder.What() != JSON_TYPE_ARRAY && key.Length() > 0) {
-				builder.AddString(key, _Parser_ParseString(JSON, pos));
+				builder.AddString(key, _ParseString(JSON, pos));
 				key = "";
 			} else if (builder.What() == JSON_TYPE_ARRAY) {
 				key << builder.CountNames();
-				builder.AddString(key, _Parser_ParseString(JSON, pos));
+				builder.AddString(key, _ParseString(JSON, pos));
 				key = "";
 			} else
-				return B_BAD_DATA;
-				// Pretty sure it's impossible to get here, but you never know
+				throw ParseException(pos, "Internal error at encountering \"");
 
 			break;
 
@@ -174,14 +234,15 @@ BJson::Parse(BMessage& message, BString& JSON)
 		case '8':
 		case '9':
 		{
-			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0)
-				return B_BAD_DATA;
-				// Numbers cannot be keys, they can only be values
+			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0) {
+				throw ParseException(pos,
+					"Numbers cannot be keys, they can only be values");
+			}
 			
 			if (builder.What() == JSON_TYPE_ARRAY)
 				key << builder.CountNames();
 
-			double number = _Parser_ParseNumber(JSON, pos);
+			double number = _ParseNumber(JSON, pos);
 			builder.AddDouble(key.String(), number);
 
 			key = "";
@@ -197,16 +258,12 @@ BJson::Parse(BMessage& message, BString& JSON)
 		pos++;
 	}
 
-	// Reached the end of the BString without reaching the end of the document
-	return B_BAD_DATA;
+	throw ParseException(pos, "Unexpected end of document");
 }
 
 
-// #pragma mark - Private methods
-
-
 BString
-BJson::_Parser_ParseString(BString& JSON, int32& pos)
+BJson::_ParseString(BString& JSON, int32& pos)
 {
 	if (JSON[pos] != '"') // Verify we're at the start of a string.
 		return BString("");
@@ -270,7 +327,7 @@ BJson::_Parser_ParseString(BString& JSON, int32& pos)
 
 
 double
-BJson::_Parser_ParseNumber(BString& JSON, int32& pos)
+BJson::_ParseNumber(BString& JSON, int32& pos)
 {
 	BString value;
 
@@ -309,7 +366,7 @@ BJson::_Parser_ParseNumber(BString& JSON, int32& pos)
 
 
 bool
-BJson::_Parser_ParseConstant(BString& JSON, int32& pos, const char* constant)
+BJson::_ParseConstant(BString& JSON, int32& pos, const char* constant)
 {
 	BString value;
 	JSON.CopyInto(value, pos, strlen(constant));

@@ -22,10 +22,11 @@ public:
 	static	status_t			Parse(BMessage& message, BString& JSON);
 
 private:
-	static	BString				_Parser_ParseString(BString& JSON, int32& pos);
-	static	double				_Parser_ParseNumber(BString& JSON, int32& pos);
-	static	bool				_Parser_ParseConstant(BString& JSON, int32& pos,
-													  const char* constant);
+	static	void				_Parse(BMessage& message, BString& JSON);
+	static	BString				_ParseString(BString& JSON, int32& pos);
+	static	double				_ParseNumber(BString& JSON, int32& pos);
+	static	bool				_ParseConstant(BString& JSON, int32& pos,
+									 const char* constant);
 };
 
 } // namespace BPrivate
