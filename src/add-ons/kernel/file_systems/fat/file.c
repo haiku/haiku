@@ -95,6 +95,11 @@ status_t write_vnode_entry(nspace *vol, vnode *node)
 	buffer[0x0b] = node->mode; // file attributes
 
 	memset(buffer+0xc, 0, 0x16-0xc);
+	i = time_t2dos(node->st_ctim);
+	buffer[0x0e] = i & 0xff;
+	buffer[0x0f] = (i >> 8) & 0xff;
+	buffer[0x10] = (i >> 16) & 0xff;
+	buffer[0x11] = (i >> 24) & 0xff;
 	i = time_t2dos(node->st_time);
 	buffer[0x16] = i & 0xff;
 	buffer[0x17] = (i >> 8) & 0xff;
@@ -182,9 +187,10 @@ dosfs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 	st->st_blocks = (node->st_size + 511) / 512;
 	st->st_blksize = 0x10000; /* this value was chosen arbitrarily */
 	st->st_atim.tv_sec = st->st_mtim.tv_sec = st->st_ctim.tv_sec
-		= st->st_crtim.tv_sec = node->st_time;
+		= node->st_time;
 	st->st_atim.tv_nsec = st->st_mtim.tv_nsec = st->st_ctim.tv_nsec
 		= st->st_crtim.tv_nsec = 0;
+	st->st_crtim.tv_sec = node->st_ctim;
 
 	UNLOCK_VOL(vol);
 
@@ -255,6 +261,14 @@ dosfs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st,
 		if ((node->mode & FAT_SUBDIR) == 0)
 			node->mode |= FAT_ARCHIVE;
 		node->st_time = st->st_mtime;
+		dirty = true;
+	}
+
+	if (mask & B_STAT_CREATION_TIME) {
+		DPRINTF(0, ("setting creation time\n"));
+		// As a file's modification time is also set when it is created,
+		// the archive bit should be set automatically.
+		node->st_ctim = st->st_crtime;
 		dirty = true;
 	}
 
@@ -818,6 +832,7 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 		dummy.mode = 0;
 		dummy.st_size = 0;
 		time(&(dummy.st_time));
+		dummy.st_ctim = dummy.st_time;
 
 		if ((result = create_dir_entry(vol, dir, &dummy, name, &(dummy.sindex), &(dummy.eindex))) != B_OK) {
 			dprintf("dosfs_create: error creating directory entry for %s (%s)\n", name, strerror(result));
@@ -920,6 +935,7 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 	}
 	dummy.st_size = vol->bytes_per_sector*vol->sectors_per_cluster;
 	time(&(dummy.st_time));
+	dummy.st_ctim = dummy.st_time;
 
 	dummy.vnid = GENERATE_DIR_CLUSTER_VNID(dummy.dir_vnid, dummy.cluster);
 	// XXX: dangerous construct
@@ -952,10 +968,19 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 	buffer[0] = buffer[0x20] = buffer[0x21] = '.';
 	buffer[0x0b] = buffer[0x2b] = FAT_SUBDIR;
 	i = time_t2dos(dummy.st_time);
+	buffer[0x0e] = i & 0xff;
+	buffer[0x0f] = (i >> 8) & 0xff;
+	buffer[0x10] = (i >> 16) & 0xff;
+	buffer[0x11] = (i >> 24) & 0xff;
 	buffer[0x16] = i & 0xff;
 	buffer[0x17] = (i >> 8) & 0xff;
 	buffer[0x18] = (i >> 16) & 0xff;
 	buffer[0x19] = (i >> 24) & 0xff;
+	i = time_t2dos(dir->st_ctim);
+	buffer[0x2e] = i & 0xff;
+	buffer[0x2f] = (i >> 8) & 0xff;
+	buffer[0x30] = (i >> 16) & 0xff;
+	buffer[0x31] = (i >> 24) & 0xff;
 	i = time_t2dos(dir->st_time);
 	buffer[0x36] = i & 0xff;
 	buffer[0x37] = (i >> 8) & 0xff;

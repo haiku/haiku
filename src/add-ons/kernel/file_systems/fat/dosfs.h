@@ -86,6 +86,7 @@ typedef struct vnode {
 	uint32		mode;			// dos-style attributes
 	off_t		st_size;		// in bytes
 	time_t		st_time;
+	time_t		st_ctim;
 
 	uint32		end_cluster;	// last cluster of the data
 

@@ -117,7 +117,8 @@ debug_dvnode(int argc, char **argv)
 			", cluster=%" B_PRIu32 "\n", n->iteration, n->sindex, n->eindex,
 			n->cluster);
 		kprintf("mode %#" B_PRIx32 ", size %" B_PRIdOFF ", time %" B_PRIdTIME
-			"\n", n->mode, n->st_size, n->st_time);
+			", crtime %" B_PRIdTIME "\n", n->mode, n->st_size, n->st_time,
+			n->st_ctim);
 		kprintf("end cluster = %" B_PRIu32 "\n", n->end_cluster);
 		if (n->mime) kprintf("mime type %s\n", n->mime);
 	}
@@ -663,6 +664,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	vol->root_vnode.sindex = vol->root_vnode.eindex = 0xffffffff;
 	vol->root_vnode.mode = FAT_SUBDIR;
 	time(&(vol->root_vnode.st_time));
+	vol->root_vnode.st_ctim = vol->root_vnode.st_time;
 	vol->root_vnode.mime = NULL;
 	vol->root_vnode.dirty = false;
 	dlist_add(vol, vol->root_vnode.vnid);
@@ -1163,7 +1165,7 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 
 	switch (code) {
 		case 10002 : /* return real creation time */
-				if (buf) *(bigtime_t *)buf = node->st_time;
+				if (buf) *(bigtime_t *)buf = node->st_ctim;
 				break;
 		case 10003 : /* return real last modification time */
 				if (buf) *(bigtime_t *)buf = node->st_time;
