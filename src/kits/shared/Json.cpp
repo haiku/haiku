@@ -371,7 +371,9 @@ BJson::_ParseConstant(BString& JSON, int32& pos, const char* constant)
 	BString value;
 	JSON.CopyInto(value, pos, strlen(constant));
 	if (value == constant) {
-		pos += strlen(constant);
+		// Increase pos by the remainder of the constant, pos will be
+		// increased for the first letter in the main parse loop.
+		pos += strlen(constant) - 1;
 		return true;
 	} else
 		return false;
