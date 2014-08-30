@@ -69,6 +69,41 @@ __cxa_finalize(void* dsoHandle)
 {
 }
 
+/* ARM */
+extern "C" void
+__aeabi_unwind_cpp_pr0(void)
+{
+}
+
+extern "C" void
+__aeabi_unwind_cpp_pr1(void)
+{
+}
+
+extern "C" void
+__aeabi_unwind_cpp_pr2(void)
+{
+}
+
+extern "C" void
+_Unwind_Complete(void)
+{
+}
+
+extern "C" void
+_Unwind_VRS_Set(void)
+{
+}
+
+extern "C" void
+_Unwind_VRS_Get(void)
+{
+}
+
+extern "C" void
+__gnu_unwind_frame(void)
+{
+}
 
 #endif
 
