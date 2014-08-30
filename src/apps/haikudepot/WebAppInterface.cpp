@@ -346,6 +346,7 @@ WebAppInterface::_SendJsonRequest(BString jsonString, BMessage& reply) const
 	BHttpHeaders headers;	
 	// Content-Type
 	headers.AddHeader("Content-Type", "application/json");
+	headers.AddHeader("User-Agent", "X-HDS-Client");
 
 	BHttpRequest request(url, true, "HTTP", &listener, &context);
 
