@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Expander	3431738656
+1	finnish	x-vnd.Haiku-Expander	2177073262
 Expand	ExpanderMenu		Laajenna
 Close window when done expanding	ExpanderPreferences		Sulje ikkuna kun laajentaminen on tehty
 Set destination…	ExpanderMenu		Aseta kohde…
@@ -34,6 +34,7 @@ Automatically show contents listing	ExpanderPreferences		Näytä sisältöluette
 OK	ExpanderPreferences		Valmis
 Leave destination folder path empty	ExpanderPreferences		Jätä kohdekansiopolku tyhjäksi
 Failed to create the destination folder.	ExpanderWindow		Kohdekansion luominen epäonnistui.
+Select '%s'…	DirectoryFilePanel		Valitse ’%s’...
 Create	ExpanderWindow		Luo
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Kansio on joko siirretty, nimetty uudelleen tai sitä\nei tueta.
 The file doesn't exist	ExpanderWindow		Tiedostoa ei ole olemassa
