@@ -98,6 +98,7 @@ const struct supported_device {
 	{0x016a, INTEL_TYPE_IVBGS, "IvyBridge Server GT2"},
 
 	{0x0412, INTEL_TYPE_IVBG, "Haswell Desktop"},
+	{0x0416, INTEL_TYPE_IVBGM, "Haswell Mobile"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
