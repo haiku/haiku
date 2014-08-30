@@ -275,7 +275,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	// inbetween.
 	totalSize = secondRegion->start + secondRegion->size - firstRegion->start;
 	if (totalSize > image->text_region.size + image->data_region.size
-		+ 8 * 1024) {
+		+ 16 * 1024) {
 		status = B_BAD_DATA;
 		goto error1;
 	}
