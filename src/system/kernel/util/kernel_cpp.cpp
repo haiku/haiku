@@ -69,42 +69,6 @@ __cxa_finalize(void* dsoHandle)
 {
 }
 
-/* ARM */
-extern "C" void
-__aeabi_unwind_cpp_pr0(void)
-{
-}
-
-extern "C" void
-__aeabi_unwind_cpp_pr1(void)
-{
-}
-
-extern "C" void
-__aeabi_unwind_cpp_pr2(void)
-{
-}
-
-extern "C" void
-_Unwind_Complete(void)
-{
-}
-
-extern "C" void
-_Unwind_VRS_Set(void)
-{
-}
-
-extern "C" void
-_Unwind_VRS_Get(void)
-{
-}
-
-extern "C" void
-__gnu_unwind_frame(void)
-{
-}
-
 #endif
 
 // full C++ support in the kernel
@@ -282,6 +246,48 @@ __register_frame_info()
 	panic("__register_frame_info");
 }
 
+/* ARM */
+extern "C" void
+__aeabi_unwind_cpp_pr0(void)
+{
+	panic("__aeabi_unwind_cpp_pr0");
+}
+
+extern "C" void
+__aeabi_unwind_cpp_pr1(void)
+{
+	panic("__aeabi_unwind_cpp_pr1");
+}
+
+extern "C" void
+__aeabi_unwind_cpp_pr2(void)
+{
+	panic("__aeabi_unwind_cpp_pr2");
+}
+
+extern "C" void
+_Unwind_Complete(void)
+{
+	panic("_Unwind_Complete");
+}
+
+extern "C" void
+_Unwind_VRS_Set(void)
+{
+	panic("_Unwind_VRS_Set");
+}
+
+extern "C" void
+_Unwind_VRS_Get(void)
+{
+	panic("_Unwind_VRS_Get");
+}
+
+extern "C" void
+__gnu_unwind_frame(void)
+{
+	panic("__gnu_unwind_frame");
+}
 
 #endif	// __GNUC__ >= 4
 
