@@ -265,6 +265,29 @@ BusManager::Stop()
 
 
 status_t
+BusManager::StartDebugTransfer(Transfer *transfer)
+{
+	// virtual function to be overridden
+	return B_UNSUPPORTED;
+}
+
+
+status_t
+BusManager::CheckDebugTransfer(Transfer *transfer)
+{
+	// virtual function to be overridden
+	return B_UNSUPPORTED;
+}
+
+
+void
+BusManager::CancelDebugTransfer(Transfer *transfer)
+{
+	// virtual function to be overridden
+}
+
+
+status_t
 BusManager::SubmitTransfer(Transfer *transfer)
 {
 	// virtual function to be overridden

@@ -21,86 +21,6 @@
 pci_module_info *UHCI::sPCIModule = NULL;
 pci_x86_module_info *UHCI::sPCIx86Module = NULL;
 
-static int32 sDebuggerCommandAdded = 0;
-
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-
-
-class DebugTransfer : public Transfer {
-public:
-	DebugTransfer(Pipe *pipe)
-		:
-		Transfer(pipe)
-	{
-	}
-
-	uhci_td	*firstDescriptor;
-	uhci_qh	*transferQueue;
-};
-
-
-/*!	The function is an evil hack to allow <tt> <kdebug>usb_keyboard </tt> to
-	execute transfers.
-	When invoked the first time, a new transfer is started, each time the
-	function is called afterwards, it is checked whether the transfer is already
-	completed. If called with argv[1] == "cancel" the function cancels a
-	possibly pending transfer.
-*/
-static int
-debug_process_transfer(int argc, char **argv)
-{
-	Pipe *pipe = (Pipe *)get_debug_variable("_usbPipe", 0);
-	if (pipe == NULL)
-		return 2;
-
-	// check if we have a UHCI bus at all
-	if (pipe->GetBusManager()->TypeName()[0] != 'u')
-		return 3;
-
-	uint8 *data = (uint8 *)get_debug_variable("_usbTransferData", 0);
-	if (data == NULL)
-		return 4;
-
-	size_t length = (size_t)get_debug_variable("_usbTransferLength", 0);
-	if (length == 0)
-		return 5;
-
-	static uint8 transferBuffer[sizeof(DebugTransfer)]
-		__attribute__((aligned(16)));
-	static DebugTransfer* transfer;
-
-	UHCI *bus = (UHCI *)pipe->GetBusManager();
-
-	if (argc > 1 && strcmp(argv[1], "cancel") == 0) {
-		if (transfer != NULL) {
-			bus->CancelDebugTransfer(transfer);
-			transfer = NULL;
-		}
-		return 0;
-	}
-
-	if (transfer != NULL) {
-		bool stillPending;
-		status_t error = bus->CheckDebugTransfer(transfer, stillPending);
-		if (!stillPending)
-			transfer = NULL;
-
-		return error == B_OK ? 0 : 6;
-	}
-
-	transfer = new(transferBuffer) DebugTransfer(pipe);
-	transfer->SetData(data, length);
-
-	if (bus->StartDebugTransfer(transfer) != B_OK) {
-		transfer = NULL;
-		return 7;
-	}
-
-	return 0;
-}
-#endif
-
 
 static int32
 uhci_std_ops(int32 op, ...)
@@ -586,14 +506,6 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	WriteReg16(UHCI_USBINTR, UHCI_USBINTR_CRC | UHCI_USBINTR_IOC
 		| UHCI_USBINTR_SHORT);
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	if (atomic_add(&sDebuggerCommandAdded, 1) == 0) {
-		add_debugger_command("uhci_process_transfer",
-			&debug_process_transfer,
-			"Processes a USB transfer with the given variables");
-	}
-#endif
-
 	TRACE("UHCI host controller driver constructed\n");
 	fInitOK = true;
 }
@@ -601,13 +513,6 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 
 UHCI::~UHCI()
 {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	if (atomic_add(&sDebuggerCommandAdded, -1) == 1) {
-		remove_debugger_command("uhci_process_transfer",
-			&debug_process_transfer);
-	}
-#endif
-
 	int32 result = 0;
 	fStopThreads = true;
 	delete_sem(fFinishTransfersSem);
@@ -760,27 +665,32 @@ UHCI::SubmitTransfer(Transfer *transfer)
 
 
 status_t
-UHCI::StartDebugTransfer(DebugTransfer *transfer)
+UHCI::StartDebugTransfer(Transfer *transfer)
 {
-	transfer->firstDescriptor = NULL;
-	transfer->transferQueue = NULL;
-	status_t result = CreateFilledTransfer(transfer, &transfer->firstDescriptor,
-		&transfer->transferQueue);
+	static transfer_data transferData;
+	transferData.first_descriptor = NULL;
+	transferData.transfer_queue = NULL;
+	status_t result = CreateFilledTransfer(transfer,
+		&transferData.first_descriptor, &transferData.transfer_queue);
 	if (result < B_OK)
 		return result;
 
-	fQueues[UHCI_DEBUG_QUEUE]->AppendTransfer(transfer->transferQueue, false);
+	fQueues[UHCI_DEBUG_QUEUE]->AppendTransfer(transferData.transfer_queue,
+		false);
 
+	// we abuse the callback cookie to hold our transfer data
+	transfer->SetCallback(NULL, &transferData);
 	return B_OK;
 }
 
 
 status_t
-UHCI::CheckDebugTransfer(DebugTransfer *transfer, bool &_stillPending)
+UHCI::CheckDebugTransfer(Transfer *transfer)
 {
 	bool transferOK = false;
 	bool transferError = false;
-	uhci_td *descriptor = transfer->firstDescriptor;
+	transfer_data *transferData = (transfer_data *)transfer->CallbackCookie();
+	uhci_td *descriptor = transferData->first_descriptor;
 
 	while (descriptor) {
 		uint32 status = descriptor->status;
@@ -804,8 +714,7 @@ UHCI::CheckDebugTransfer(DebugTransfer *transfer, bool &_stillPending)
 
 	if (!transferOK && !transferError) {
 		spin(200);
-		_stillPending = true;
-		return B_OK;
+		return B_DEV_PENDING;
 	}
 
 	if (transferOK) {
@@ -815,29 +724,31 @@ UHCI::CheckDebugTransfer(DebugTransfer *transfer, bool &_stillPending)
 			iovec *vector = transfer->Vector();
 			size_t vectorCount = transfer->VectorCount();
 
-			ReadDescriptorChain(transfer->firstDescriptor,
+			ReadDescriptorChain(transferData->first_descriptor,
 				vector, vectorCount, &lastDataToggle);
 		} else {
 			// read the actual length that was sent
-			ReadActualLength(transfer->firstDescriptor, &lastDataToggle);
+			ReadActualLength(transferData->first_descriptor, &lastDataToggle);
 		}
 
 		transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
 	}
 
-	fQueues[UHCI_DEBUG_QUEUE]->RemoveTransfer(transfer->transferQueue, false);
-	FreeDescriptorChain(transfer->firstDescriptor);
-	FreeTransferQueue(transfer->transferQueue);
-	_stillPending = false;
+	fQueues[UHCI_DEBUG_QUEUE]->RemoveTransfer(transferData->transfer_queue,
+		false);
+	FreeDescriptorChain(transferData->first_descriptor);
+	FreeTransferQueue(transferData->transfer_queue);
 	return transferOK ? B_OK : B_IO_ERROR;
 }
 
 
 void
-UHCI::CancelDebugTransfer(DebugTransfer *transfer)
+UHCI::CancelDebugTransfer(Transfer *transfer)
 {
+	transfer_data *transferData = (transfer_data *)transfer->CallbackCookie();
+
 	// clear the active bit so the descriptors are canceled
-	uhci_td *descriptor = transfer->firstDescriptor;
+	uhci_td *descriptor = transferData->first_descriptor;
 	while (descriptor) {
 		descriptor->status &= ~TD_STATUS_ACTIVE;
 		descriptor = (uhci_td *)descriptor->link_log;
@@ -846,9 +757,10 @@ UHCI::CancelDebugTransfer(DebugTransfer *transfer)
 	transfer->Finished(B_CANCELED, 0);
 
 	// dequeue and free resources
-	fQueues[UHCI_DEBUG_QUEUE]->RemoveTransfer(transfer->transferQueue, false);
-	FreeDescriptorChain(transfer->firstDescriptor);
-	FreeTransferQueue(transfer->transferQueue);
+	fQueues[UHCI_DEBUG_QUEUE]->RemoveTransfer(transferData->transfer_queue,
+		false);
+	FreeDescriptorChain(transferData->first_descriptor);
+	FreeTransferQueue(transferData->transfer_queue);
 	// TODO: [bonefish] The Free*() calls cause "PMA: provided address resulted
 	// in invalid index" to be printed, so apparently something is not right.
 	// Though I have not clue what. This is the same cleanup code as in

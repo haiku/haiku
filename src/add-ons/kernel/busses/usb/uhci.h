@@ -24,8 +24,8 @@
 struct pci_info;
 struct pci_module_info;
 struct pci_x86_module_info;
+
 class UHCIRootHub;
-class DebugTransfer;
 
 
 class Queue {
@@ -99,11 +99,11 @@ public:
 
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
-		status_t					StartDebugTransfer(DebugTransfer *transfer);
-		status_t					CheckDebugTransfer(DebugTransfer *transfer,
-										bool &_stillPending);
-		void						CancelDebugTransfer(
-										DebugTransfer *transfer);
+
+virtual	status_t					StartDebugTransfer(Transfer *transfer);
+virtual	status_t					CheckDebugTransfer(Transfer *transfer);
+virtual	void						CancelDebugTransfer(Transfer *transfer);
+
 virtual	status_t					CancelQueuedTransfers(Pipe *pipe, bool force);
 		status_t					CancelQueuedIsochronousTransfers(Pipe *pipe, bool force);
 		status_t					SubmitRequest(Transfer *transfer);

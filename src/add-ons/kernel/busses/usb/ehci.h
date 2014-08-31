@@ -16,7 +16,6 @@ struct pci_info;
 struct pci_module_info;
 struct pci_x86_module_info;
 
-class DebugTransfer;
 class EHCIRootHub;
 
 
@@ -57,16 +56,13 @@ public:
 
 		status_t					Start();
 
-		status_t					StartDebugTransfer(DebugTransfer *transfer);
-		status_t					CheckDebugTransfer(DebugTransfer *transfer,
-										bool &_stillPending);
+virtual	status_t					StartDebugTransfer(Transfer *transfer);
+virtual	status_t					CheckDebugTransfer(Transfer *transfer);
 		void						LinkAsyncDebugQueueHead(ehci_qh *queueHead);
 		void						LinkPeriodicDebugQueueHead(
 										ehci_qh *queueHead, Pipe *pipe);
-		void						CancelDebugTransfer(
-										DebugTransfer *transfer);
-		void						CleanupDebugTransfer(
-										DebugTransfer *transfer);
+virtual	void						CancelDebugTransfer(Transfer *transfer);
+		void						CleanupDebugTransfer(Transfer *transfer);
 
 virtual	status_t					SubmitTransfer(Transfer *transfer);
 		status_t					SubmitIsochronous(Transfer *transfer);

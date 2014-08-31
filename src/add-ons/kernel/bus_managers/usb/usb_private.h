@@ -211,6 +211,10 @@ virtual void							FreeDevice(Device *device);
 virtual	status_t						Start();
 virtual	status_t						Stop();
 
+virtual	status_t						StartDebugTransfer(Transfer *transfer);
+virtual	status_t						CheckDebugTransfer(Transfer *transfer);
+virtual	void							CancelDebugTransfer(Transfer *transfer);
+
 virtual	status_t						SubmitTransfer(Transfer *transfer);
 virtual	status_t						CancelQueuedTransfers(Pipe *pipe,
 											bool force);
@@ -680,6 +684,10 @@ public:
 
 		void						SetCallback(usb_callback_func callback,
 										void *cookie);
+		usb_callback_func			Callback() const
+										{ return fCallback; }
+		void *						CallbackCookie() const
+										{ return fCallbackCookie; }
 
 		void						Finished(uint32 status,
 										size_t actualLength);
