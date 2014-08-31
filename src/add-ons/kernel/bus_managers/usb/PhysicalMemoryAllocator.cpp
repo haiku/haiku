@@ -141,7 +141,7 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 			return B_NO_MEMORY;
 		}
 
-		for (int32 i = 0; i < 64; i++) {
+		for (size_t i = 0; i < sizeof(fDebugUseMap) * 8; i++) {
 			uint64 mask = 1LL << i;
 			if ((fDebugUseMap & mask) == 0) {
 				fDebugUseMap |= mask;
