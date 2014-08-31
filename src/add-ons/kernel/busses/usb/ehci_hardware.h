@@ -207,7 +207,7 @@ typedef struct ehci_qtd {
 	// Software Part
 	uint32		this_phy;
 	struct ehci_qtd	*next_log;
-	void		*alt_next_log;
+	struct ehci_qtd	*alt_next_log;
 	size_t		buffer_size;
 	void		*buffer_log;
 } _PACKED ehci_qtd;

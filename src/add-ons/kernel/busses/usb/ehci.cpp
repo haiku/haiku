@@ -1646,19 +1646,16 @@ EHCI::FinishTransfers()
 				if (((status >> EHCI_QTD_PID_SHIFT) & EHCI_QTD_PID_MASK)
 						== EHCI_QTD_PID_IN
 					&& ((status >> EHCI_QTD_BYTES_SHIFT) & EHCI_QTD_BYTES_MASK)
-						!=0) {
-					// a short packet condition existed on this descriptor
-					if ((transfer->transfer->TransferPipe()->Type()
-						& USB_OBJECT_CONTROL_PIPE) != 0) {
-						// for control pipes, the next descriptor
-						// executed is the Status descriptor
-						while (!(descriptor->next_phy & EHCI_ITEM_TERMINATE)) {
-							descriptor = descriptor->next_log;
-						}
+						!= 0) {
+					// a short packet condition existed on this descriptor,
+					// follow the alternate next pointer if set
+					if (descriptor->alt_next_log != NULL) {
+						descriptor = descriptor->alt_next_log;
 						continue;
 					}
-					// for bulk/interrupt pipes, no other descriptors are
-					// executed
+
+					// no alternate next, transfer is done
+					callbackStatus = B_OK;
 					transferDone = true;
 					break;
 				}
