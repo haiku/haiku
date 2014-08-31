@@ -69,7 +69,7 @@ PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
 	size_t roundedSize = biggestSize * minCountPerBlock;
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	fDebugBase = roundedSize;
-	fDebugChunkSize = 64;
+	fDebugChunkSize = 128;
 	fDebugUseMap = 0;
 	roundedSize += sizeof(fDebugUseMap) * 8 * fDebugChunkSize;
 #endif
