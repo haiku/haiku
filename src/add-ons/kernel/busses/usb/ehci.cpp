@@ -2039,9 +2039,6 @@ EHCI::LinkQueueHead(ehci_qh *queueHead)
 status_t
 EHCI::LinkInterruptQueueHead(ehci_qh *queueHead, Pipe *pipe)
 {
-	if (!Lock())
-		return B_ERROR;
-
 	uint8 interval = pipe->Interval();
 	if (pipe->Speed() == USB_SPEED_HIGHSPEED) {
 		// Allow interrupts to be scheduled on each possible micro frame.
@@ -2069,6 +2066,9 @@ EHCI::LinkInterruptQueueHead(ehci_qh *queueHead, Pipe *pipe)
 	// that with a frame list of just EHCI_VFRAMELIST_ENTRIES_COUNT entries...
 	if (interval > EHCI_INTERRUPT_ENTRIES_COUNT)
 		interval = EHCI_INTERRUPT_ENTRIES_COUNT;
+
+	if (!Lock())
+		return B_ERROR;
 
 	ehci_qh *interruptQueue = &fInterruptEntries[interval - 1].queue_head;
 	queueHead->next_phy = interruptQueue->next_phy;
