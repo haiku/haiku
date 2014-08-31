@@ -206,8 +206,14 @@ debugger_getchar(void)
 		set_debug_variable("_usbTransferLength", (uint64)sUSBTransferLength);
 
 		status_t status = evaluate_debug_command("usb_process_transfer");
-		if (status != B_OK)
+		if (status == B_DEV_PENDING)
 			return -1;
+
+		if (status != B_OK) {
+			// try clearing a possibly set halt due to toggle mismatches
+			evaluate_debug_command("usb_clear_stall");
+			return -1;
+		}
 
 		bool phantomState = true;
 		for (size_t i = 2; i < sUSBTransferLength; i++) {
