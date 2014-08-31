@@ -667,6 +667,9 @@ UHCI::SubmitTransfer(Transfer *transfer)
 status_t
 UHCI::StartDebugTransfer(Transfer *transfer)
 {
+	if ((transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE) != 0)
+		return B_UNSUPPORTED;
+
 	static transfer_data transferData;
 	transferData.first_descriptor = NULL;
 	transferData.transfer_queue = NULL;
