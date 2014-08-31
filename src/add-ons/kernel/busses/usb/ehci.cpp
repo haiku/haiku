@@ -22,6 +22,8 @@
 pci_module_info *EHCI::sPCIModule = NULL;
 pci_x86_module_info *EHCI::sPCIx86Module = NULL;
 
+static int32 sDebuggerCommandAdded = 0;
+
 
 static int32
 ehci_std_ops(int32 op, ...)
@@ -103,6 +105,83 @@ print_queue(ehci_qh *queueHead)
 
 
 #endif // TRACE_USB
+
+
+class DebugTransfer : public Transfer {
+public:
+	DebugTransfer(Pipe *pipe)
+		:
+		Transfer(pipe)
+	{
+	}
+
+	ehci_qh *	queue_head;
+	ehci_qtd *	data_descriptor;
+	bool		direction_in;
+};
+
+
+/*!	The function is an evil hack to allow <tt> <kdebug>usb_keyboard </tt> to
+	execute transfers.
+	When invoked the first time, a new transfer is started, each time the
+	function is called afterwards, it is checked whether the transfer is already
+	completed. If called with argv[1] == "cancel" the function cancels a
+	possibly pending transfer.
+*/
+static int
+debug_process_transfer(int argc, char **argv)
+{
+	Pipe *pipe = (Pipe *)get_debug_variable("_usbPipe", 0);
+	if (pipe == NULL)
+		return 2;
+
+	// check if we have a EHCI bus at all
+	if (pipe->GetBusManager()->TypeName()[0] != 'e')
+		return 3;
+
+	uint8 *data = (uint8 *)get_debug_variable("_usbTransferData", 0);
+	if (data == NULL)
+		return 4;
+
+	size_t length = (size_t)get_debug_variable("_usbTransferLength", 0);
+	if (length == 0)
+		return 5;
+
+	static uint8 transferBuffer[sizeof(DebugTransfer)]
+		__attribute__((aligned(16)));
+	static DebugTransfer *transfer = NULL;
+
+	EHCI *bus = (EHCI *)pipe->GetBusManager();
+
+	if (argc > 1 && strcmp(argv[1], "cancel") == 0) {
+		if (transfer != NULL) {
+			bus->CancelDebugTransfer(transfer);
+			transfer = NULL;
+		}
+
+		return 0;
+	}
+
+	if (transfer != NULL) {
+		bool stillPending;
+		status_t error = bus->CheckDebugTransfer(transfer, stillPending);
+		if (stillPending)
+			return 6;
+
+		transfer = NULL;
+		return error == B_OK ? 0 : 7;
+	}
+
+	transfer = new(transferBuffer) DebugTransfer(pipe);
+	transfer->SetData(data, length);
+
+	if (bus->StartDebugTransfer(transfer) != B_OK) {
+		transfer = NULL;
+		return 7;
+	}
+
+	return 8;
+}
 
 
 //
@@ -557,6 +636,12 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	TRACE("set the async list addr to 0x%08" B_PRIx32 "\n",
 		ReadOpReg(EHCI_ASYNCLISTADDR));
 
+	if (atomic_add(&sDebuggerCommandAdded, 1) == 0) {
+		add_debugger_command("ehci_process_transfer",
+			&debug_process_transfer,
+			"Processes a USB transfer with the given variables");
+	}
+
 	fInitOK = true;
 	TRACE("EHCI host controller driver constructed\n");
 }
@@ -565,6 +650,11 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 EHCI::~EHCI()
 {
 	TRACE("tear down EHCI host controller driver\n");
+
+	if (atomic_add(&sDebuggerCommandAdded, -1) == 1) {
+		remove_debugger_command("ehci_process_transfer",
+			&debug_process_transfer);
+	}
 
 	WriteOpReg(EHCI_USBCMD, 0);
 	WriteOpReg(EHCI_CONFIGFLAG, 0);
@@ -689,6 +779,185 @@ EHCI::Start()
 
 	TRACE_ALWAYS("successfully started the controller\n");
 	return BusManager::Start();
+}
+
+
+status_t
+EHCI::StartDebugTransfer(DebugTransfer *transfer)
+{
+	Pipe *pipe = transfer->TransferPipe();
+	transfer->queue_head = CreateQueueHead();
+	if (transfer->queue_head == NULL)
+		return B_NO_MEMORY;
+
+	status_t result = InitQueueHead(transfer->queue_head, pipe);
+	if (result != B_OK) {
+		FreeQueueHead(transfer->queue_head);
+		return result;
+	}
+
+	if ((pipe->Type() & USB_OBJECT_CONTROL_PIPE) != 0) {
+		result = FillQueueWithRequest(transfer, transfer->queue_head,
+			&transfer->data_descriptor, &transfer->direction_in);
+	} else {
+		result = FillQueueWithData(transfer, transfer->queue_head,
+			&transfer->data_descriptor, &transfer->direction_in);
+	}
+
+	if (result != B_OK) {
+		FreeQueueHead(transfer->queue_head);
+		return result;
+	}
+
+	if ((pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) != 0)
+		LinkPeriodicDebugQueueHead(transfer->queue_head, pipe);
+	else
+		LinkAsyncDebugQueueHead(transfer->queue_head);
+
+	return B_OK;
+}
+
+
+void
+EHCI::LinkAsyncDebugQueueHead(ehci_qh *queueHead)
+{
+	ehci_qh *prevHead = fAsyncQueueHead->prev_log;
+	queueHead->next_phy = fAsyncQueueHead->this_phy;
+	queueHead->next_log = fAsyncQueueHead;
+	queueHead->prev_log = prevHead;
+	fAsyncQueueHead->prev_log = queueHead;
+	prevHead->next_log = queueHead;
+	prevHead->next_phy = queueHead->this_phy;
+}
+
+
+void
+EHCI::LinkPeriodicDebugQueueHead(ehci_qh *queueHead, Pipe *pipe)
+{
+	if (pipe->Speed() == USB_SPEED_HIGHSPEED)
+		queueHead->endpoint_caps |= (0xff << EHCI_QH_CAPS_ISM_SHIFT);
+	else {
+		queueHead->endpoint_caps |= (0x01 << EHCI_QH_CAPS_ISM_SHIFT);
+		queueHead->endpoint_caps |= (0x1c << EHCI_QH_CAPS_SCM_SHIFT);
+	}
+
+	ehci_qh *interruptQueue = &fInterruptEntries[0].queue_head;
+	queueHead->next_phy = interruptQueue->next_phy;
+	queueHead->next_log = interruptQueue->next_log;
+	queueHead->prev_log = interruptQueue;
+	if (interruptQueue->next_log)
+		interruptQueue->next_log->prev_log = queueHead;
+	interruptQueue->next_log = queueHead;
+	interruptQueue->next_phy = queueHead->this_phy;
+}
+
+
+status_t
+EHCI::CheckDebugTransfer(DebugTransfer *transfer, bool &_stillPending)
+{
+	bool transferOK = false;
+	bool transferError = false;
+	ehci_qtd *descriptor = transfer->queue_head->element_log;
+
+	while (descriptor) {
+		uint32 status = descriptor->token;
+		if ((status & EHCI_QTD_STATUS_ACTIVE) != 0) {
+			// still in progress
+			break;
+		}
+
+		if ((status & EHCI_QTD_STATUS_ERRMASK) != 0) {
+			transferError = true;
+			break;
+		}
+
+		if ((descriptor->next_phy & EHCI_ITEM_TERMINATE) != 0) {
+			// we arrived at the last (stray) descriptor, we're done
+			transferOK = true;
+			break;
+		}
+
+		if (((status >> EHCI_QTD_PID_SHIFT) & EHCI_QTD_PID_MASK)
+				== EHCI_QTD_PID_IN
+			&& ((status >> EHCI_QTD_BYTES_SHIFT) & EHCI_QTD_BYTES_MASK) != 0) {
+			// a short packet condition existed on this descriptor
+			if (descriptor->alt_next_log != NULL) {
+				descriptor = descriptor->alt_next_log;
+				continue;
+			}
+
+			transferOK = true;
+			break;
+		}
+
+		descriptor = descriptor->next_log;
+	}
+
+	if (!transferOK && !transferError) {
+		spin(75);
+		_stillPending = true;
+		return B_OK;
+	}
+
+	if (transferOK) {
+		bool nextDataToggle = false;
+		if (transfer->data_descriptor != NULL && transfer->direction_in) {
+			// data to read out
+			iovec *vector = transfer->Vector();
+			size_t vectorCount = transfer->VectorCount();
+
+			ReadDescriptorChain(transfer->data_descriptor,
+				vector, vectorCount, &nextDataToggle);
+		} else if (transfer->data_descriptor != NULL)
+			ReadActualLength(transfer->data_descriptor, &nextDataToggle);
+
+		transfer->TransferPipe()->SetDataToggle(nextDataToggle);
+	}
+
+	CleanupDebugTransfer(transfer);
+	_stillPending = false;
+	return transferOK ? B_OK : B_IO_ERROR;
+}
+
+
+void
+EHCI::CancelDebugTransfer(DebugTransfer *transfer)
+{
+	// clear the active bit so the descriptors are canceled
+	ehci_qtd *descriptor = transfer->queue_head->element_log;
+	while (descriptor != NULL) {
+		descriptor->token &= ~EHCI_QTD_STATUS_ACTIVE;
+		descriptor = descriptor->next_log;
+	}
+
+	transfer->Finished(B_CANCELED, 0);
+	CleanupDebugTransfer(transfer);
+}
+
+
+void
+EHCI::CleanupDebugTransfer(DebugTransfer *transfer)
+{
+	ehci_qh *queueHead = transfer->queue_head;
+	ehci_qh *prevHead = queueHead->prev_log;
+	if (prevHead != NULL) {
+		prevHead->next_phy = queueHead->next_phy;
+		prevHead->next_log = queueHead->next_log;
+	}
+
+	ehci_qh *nextHead = queueHead->next_log;
+	if (nextHead != NULL)
+		nextHead->prev_log = queueHead->prev_log;
+
+	queueHead->next_phy = fAsyncQueueHead->this_phy;
+	queueHead->prev_log = NULL;
+	queueHead->next_log = NULL;
+
+	// wait for async advance to ensure the controller does not access this
+	// queue head anymore.
+	spin(125);
+
+	FreeQueueHead(queueHead);
 }
 
 
