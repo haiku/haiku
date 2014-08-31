@@ -103,6 +103,7 @@ const struct supported_device {
 
 	{0x0c00, 0x0412, INTEL_TYPE_IVBG, "Haswell Desktop"},
 	{0x0c04, 0x0416, INTEL_TYPE_IVBGM, "Haswell Mobile"},
+	{0x0d04, 0x0d26, INTEL_TYPE_IVBGM, "Haswell Mobile"},
 };
 
 struct intel_info {
