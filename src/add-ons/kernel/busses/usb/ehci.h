@@ -69,9 +69,10 @@ public:
 										DebugTransfer *transfer);
 
 virtual	status_t					SubmitTransfer(Transfer *transfer);
+		status_t					SubmitIsochronous(Transfer *transfer);
+
 virtual	status_t					CancelQueuedTransfers(Pipe *pipe, bool force);
 		status_t					CancelQueuedIsochronousTransfers(Pipe *pipe, bool force);
-		status_t					SubmitIsochronous(Transfer *transfer);
 
 virtual	status_t					NotifyPipeChange(Pipe *pipe,
 										usb_change change);
