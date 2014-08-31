@@ -99,6 +99,44 @@ debug_process_transfer(int argc, char **argv)
 	return debug_run_transfer(pipe, data, length, requestData,
 		argc > 1 && strcmp(argv[1], "cancel") == 0);
 }
+
+
+static int
+debug_clear_stall(int argc, char *argv[])
+{
+	Pipe *pipe = (Pipe *)get_debug_variable("_usbPipe", 0);
+	if (pipe == NULL)
+		return B_BAD_VALUE;
+
+	static usb_request_data requestData;
+
+	requestData.RequestType = USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT;
+	requestData.Request = USB_REQUEST_CLEAR_FEATURE;
+	requestData.Value = USB_FEATURE_ENDPOINT_HALT;
+	requestData.Index = pipe->EndpointAddress()
+		| (pipe->Direction() == Pipe::In ? USB_ENDPOINT_ADDR_DIR_IN
+			: USB_ENDPOINT_ADDR_DIR_OUT);
+	requestData.Length = 0;
+
+	Pipe *parentPipe = ((Device *)pipe->Parent())->DefaultPipe();
+	for (int tries = 0; tries < 100; tries++) {
+		status_t result
+			= debug_run_transfer(parentPipe, NULL, 0, &requestData, false);
+
+		if (result == B_DEV_PENDING)
+			continue;
+
+		if (result == B_OK) {
+			// clearing a stalled condition resets the data toggle
+			pipe->SetDataToggle(false);
+			return B_OK;
+		}
+
+		return result;
+	}
+
+	return B_TIMED_OUT;
+}
 #endif
 
 
@@ -153,6 +191,10 @@ bus_std_ops(int32 op, ...)
 				&debug_process_transfer,
 				"Transfers _usbTransferData with _usbTransferLength"
 				" (and/or _usbRequestData) to pipe _usbPipe");
+			add_debugger_command("usb_clear_stall",
+				&debug_clear_stall,
+				"Tries to issue a clear feature request for the endpoint halt"
+				" feature on pipe _usbPipe");
 #elif HAIKU_TARGET_PLATFORM_BEOS
 			// Plain R5 workaround, see comment above.
 			shared = create_area("shared usb stack", &address,
