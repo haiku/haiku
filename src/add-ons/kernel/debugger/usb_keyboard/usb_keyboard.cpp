@@ -15,6 +15,11 @@ static uint8 sLastTransferData[64];
 static size_t sUSBTransferLength = 0;
 static void *sUSBPipe = NULL;
 
+static bool sUseUHCI = false;
+static bool sUseOHCI = false;
+static bool sUseEHCI = false;
+static bool sUseXHCI = false;
+
 // simple ring buffer
 static int sBufferedChars[32];
 static uint8 sBufferSize = sizeof(sBufferedChars) / sizeof(sBufferedChars[0]);
@@ -150,11 +155,16 @@ static size_t sKeyTableSize = sizeof(sKeyTable) / sizeof(sKeyTable[0]);
 static void
 enter_debugger(void)
 {
+	sUseUHCI = has_debugger_command("uhci_process_transfer");
+	sUseOHCI = has_debugger_command("ohci_process_transfer");
+	sUseEHCI = has_debugger_command("ehci_process_transfer");
+	sUseXHCI = has_debugger_command("xhci_process_transfer");
+
 	if (!has_debugger_command("get_usb_keyboard_config")
 		|| !has_debugger_command("get_usb_pipe_for_id")
-		|| (!has_debugger_command("uhci_process_transfer")
-			&& !has_debugger_command("ohci_process_transfer")))
+		|| (!sUseUHCI && !sUseOHCI && !sUseEHCI && !sUseXHCI)) {
 		return;
+	}
 
 	unset_debug_variable("_usbPipe");
 	unset_debug_variable("_usbReportSize");
@@ -179,7 +189,14 @@ exit_debugger(void)
 	if (sUseUSBKeyboard) {
 		// make sure a possibly pending transfer is canceled
 		set_debug_variable("_usbPipe", (uint64)sUSBPipe);
-		evaluate_debug_command("uhci_process_transfer cancel");
+		if (sUseUHCI)
+			evaluate_debug_command("uhci_process_transfer cancel");
+		if (sUseOHCI)
+			evaluate_debug_command("ohci_process_transfer cancel");
+		if (sUseEHCI)
+			evaluate_debug_command("ehci_process_transfer cancel");
+		if (sUseXHCI)
+			evaluate_debug_command("xhci_process_transfer cancel");
 
 		sUseUSBKeyboard = false;
 	}
@@ -205,8 +222,16 @@ debugger_getchar(void)
 		set_debug_variable("_usbPipe", (uint64)sUSBPipe);
 		set_debug_variable("_usbTransferData", (uint64)sUSBTransferData);
 		set_debug_variable("_usbTransferLength", (uint64)sUSBTransferLength);
-		if (evaluate_debug_command("uhci_process_transfer") != 0)
+		if ((!sUseUHCI
+				|| evaluate_debug_command("uhci_process_transfer") != 0)
+			&& (!sUseOHCI
+				|| evaluate_debug_command("ohci_process_transfer") != 0)
+			&& (!sUseEHCI
+				|| evaluate_debug_command("ehci_process_transfer") != 0)
+			&& (!sUseXHCI
+				|| evaluate_debug_command("xhci_process_transfer") != 0)) {
 			return -1;
+		}
 
 		bool phantomState = true;
 		for (size_t i = 2; i < sUSBTransferLength; i++) {
