@@ -438,7 +438,7 @@ if [ IsPackageAvailable zlib_devel ] {
 		# sources are required for the primary architecture only
 		primary @{
 			file: source zlib_source
-				sources: develop/sources/%portRevisionedName%/sources
+				sources: develop/sources/%portRevisionedName%/source
 		}@
 		;
 
