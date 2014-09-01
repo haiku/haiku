@@ -43,7 +43,7 @@ public:
 			error = fError.String();
 		else
 			error = strerror(fReturnCode);
-		printf("Parse error at %ld: %s\n", fPosition, error);
+		printf("Parse error at %" B_PRIi32 ": %s\n", fPosition, error);
 	}
 	
 	status_t ReturnCode() const
