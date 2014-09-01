@@ -326,8 +326,7 @@ PartitionMapParser::_ReadPartitionTable(off_t offset, partition_table* table)
 		return bytesRead < 0 ? errno : B_IO_ERROR;
 	}
 	if (memcmp(gptSignature, kGPTSignature, kGPTSignatureSize) == 0) {
-		ERROR(("Error: Disk is GPT-formatted: "
-			"GPT disks are currently unsupported.\n"));
+		ERROR(("intel: Found GPT signature, ignoring.\n"));
 		return B_BAD_DATA;
 	}
 
