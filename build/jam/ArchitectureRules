@@ -45,9 +45,6 @@ rule ArchitectureSetup architecture
 	if $(cpu) = arm {
 		# For stackcrawls
 		gccBaseFlags += -mapcs-frame ;
-
-		# C++11 is used to implement atomics.
-		HAIKU_C++FLAGS_$(architecture) += -std=c++11 ;
 	}
 
 	# activating graphite optimizations
