@@ -31,6 +31,7 @@
 #define GLOBAL_CONTROL_RESET			(1 << 0)
 
 #define HDAC_WAKE_ENABLE				0x0c	// 16bits, WAKEEN
+#define HDAC_WAKE_ENABLE_MASK			0x7fff
 #define HDAC_STATE_STATUS				0x0e	// 16bits, STATESTS
 
 #define HDAC_INTR_CONTROL				0x20	// 32bits, INTCTL
@@ -45,11 +46,13 @@
 #define HDAC_CORB_BASE_LOWER			0x40	// 32bits, CORBLBASE
 #define HDAC_CORB_BASE_UPPER			0x44	// 32bits, CORBUBASE
 #define HDAC_CORB_WRITE_POS				0x48	// 16bits, CORBWP
+#define HDAC_CORB_WRITE_POS_MASK		0xff
 
 #define HDAC_CORB_READ_POS				0x4a	// 16bits, CORBRP
 #define CORB_READ_POS_RESET				(1 << 15)
 
 #define HDAC_CORB_CONTROL				0x4c	// 8bits, CORBCTL
+#define HDAC_CORB_CONTROL_MASK			0x3
 #define CORB_CONTROL_RUN				(1 << 1)
 #define CORB_CONTROL_MEMORY_ERROR_INTR	(1 << 0)
 
@@ -57,6 +60,7 @@
 #define CORB_STATUS_MEMORY_ERROR		(1 << 0)
 
 #define HDAC_CORB_SIZE					0x4e	// 8bits, CORBSIZE
+#define HDAC_CORB_SIZE_MASK				0x3
 #define CORB_SIZE_CAP_2_ENTRIES			(1 << 4)
 #define CORB_SIZE_CAP_16_ENTRIES		(1 << 5)
 #define CORB_SIZE_CAP_256_ENTRIES		(1 << 6)
@@ -71,8 +75,10 @@
 #define RIRB_WRITE_POS_RESET			(1 << 15)
 
 #define HDAC_RESPONSE_INTR_COUNT		0x5a	// 16bits, RINTCNT
+#define HDAC_RESPONSE_INTR_COUNT_MASK	0xff
 
 #define HDAC_RIRB_CONTROL				0x5c	// 8bits, RIRBCTL
+#define HDAC_RIRB_CONTROL_MASK			0x7
 #define RIRB_CONTROL_OVERRUN_INTR		(1 << 2)
 #define RIRB_CONTROL_DMA_ENABLE			(1 << 1)
 #define RIRB_CONTROL_RESPONSE_INTR		(1 << 0)
@@ -82,6 +88,7 @@
 #define RIRB_STATUS_RESPONSE			(1 << 0)
 
 #define HDAC_RIRB_SIZE					0x5e	// 8bits, RIRBSIZE
+#define HDAC_RIRB_SIZE_MASK				0x3
 #define RIRB_SIZE_CAP_2_ENTRIES			(1 << 4)
 #define RIRB_SIZE_CAP_16_ENTRIES		(1 << 5)
 #define RIRB_SIZE_CAP_256_ENTRIES		(1 << 6)

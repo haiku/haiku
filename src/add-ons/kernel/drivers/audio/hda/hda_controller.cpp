@@ -346,8 +346,8 @@ reset_controller(hda_controller* controller)
 	}
 
 	// stop DMA
-	controller->Write8(HDAC_CORB_CONTROL, 0);
-	controller->Write8(HDAC_RIRB_CONTROL, 0);
+	controller->ReadModifyWrite8(HDAC_CORB_CONTROL, HDAC_CORB_CONTROL_MASK, 0);
+	controller->ReadModifyWrite8(HDAC_RIRB_CONTROL, HDAC_RIRB_CONTROL_MASK, 0);
 
 	uint8 corbControl = 0;
 	uint8 rirbControl = 0;
@@ -429,26 +429,38 @@ init_corb_rirb_pos(hda_controller* controller)
 	uint8 corbSize = controller->Read8(HDAC_CORB_SIZE);
 	if ((corbSize & CORB_SIZE_CAP_256_ENTRIES) != 0) {
 		controller->corb_length = 256;
-		controller->Write8(HDAC_CORB_SIZE, CORB_SIZE_256_ENTRIES);
+		controller->ReadModifyWrite8(
+			HDAC_CORB_SIZE, HDAC_CORB_SIZE_MASK,
+			CORB_SIZE_256_ENTRIES);
 	} else if (corbSize & CORB_SIZE_CAP_16_ENTRIES) {
 		controller->corb_length = 16;
-		controller->Write8(HDAC_CORB_SIZE, CORB_SIZE_16_ENTRIES);
+		controller->ReadModifyWrite8(
+			HDAC_CORB_SIZE, HDAC_CORB_SIZE_MASK,
+			CORB_SIZE_16_ENTRIES);
 	} else if (corbSize & CORB_SIZE_CAP_2_ENTRIES) {
 		controller->corb_length = 2;
-		controller->Write8(HDAC_CORB_SIZE, CORB_SIZE_2_ENTRIES);
+		controller->ReadModifyWrite8(
+			HDAC_CORB_SIZE, HDAC_CORB_SIZE_MASK,
+			CORB_SIZE_2_ENTRIES);
 	}
 
 	// Determine and set size of RIRB
 	uint8 rirbSize = controller->Read8(HDAC_RIRB_SIZE);
 	if (rirbSize & RIRB_SIZE_CAP_256_ENTRIES) {
 		controller->rirb_length = 256;
-		controller->Write8(HDAC_RIRB_SIZE, RIRB_SIZE_256_ENTRIES);
+		controller->ReadModifyWrite8(
+			HDAC_RIRB_SIZE, HDAC_RIRB_SIZE_MASK,
+			RIRB_SIZE_256_ENTRIES);
 	} else if (rirbSize & RIRB_SIZE_CAP_16_ENTRIES) {
 		controller->rirb_length = 16;
-		controller->Write8(HDAC_RIRB_SIZE, RIRB_SIZE_16_ENTRIES);
+		controller->ReadModifyWrite8(
+			HDAC_RIRB_SIZE, HDAC_RIRB_SIZE_MASK,
+			RIRB_SIZE_16_ENTRIES);
 	} else if (rirbSize & RIRB_SIZE_CAP_2_ENTRIES) {
 		controller->rirb_length = 2;
-		controller->Write8(HDAC_RIRB_SIZE, RIRB_SIZE_2_ENTRIES);
+		controller->ReadModifyWrite8(
+			HDAC_RIRB_SIZE, HDAC_RIRB_SIZE_MASK,
+			RIRB_SIZE_2_ENTRIES);
 	}
 
 	// Determine rirb offset in memory and total size of corb+alignment+rirb
@@ -494,7 +506,8 @@ init_corb_rirb_pos(hda_controller* controller)
 	controller->stream_positions = (uint32*)
 		((uint8*)controller->corb + posOffset);
 
-	controller->Write16(HDAC_CORB_WRITE_POS, 0);
+	controller->ReadModifyWrite16(HDAC_CORB_WRITE_POS,
+		HDAC_CORB_WRITE_POS_MASK, 0);
 
 	// Reset CORB read pointer. Preseve bits marked as RsvdP.
 	// After setting the reset bit, we must wait for the hardware
@@ -529,20 +542,25 @@ init_corb_rirb_pos(hda_controller* controller)
 	}
 
 	// Reset RIRB write pointer
-	controller->Write16(HDAC_RIRB_WRITE_POS, RIRB_WRITE_POS_RESET);
+	controller->ReadModifyWrite16(HDAC_RIRB_WRITE_POS,
+		RIRB_WRITE_POS_RESET, RIRB_WRITE_POS_RESET);
 
 	// Generate interrupt for every response
-	controller->Write16(HDAC_RESPONSE_INTR_COUNT, 1);
+	controller->ReadModifyWrite16(HDAC_RESPONSE_INTR_COUNT,
+		HDAC_RESPONSE_INTR_COUNT_MASK, 1);
 
 	// Setup cached read/write indices
 	controller->rirb_read_pos = 1;
 	controller->corb_write_pos = 0;
 
 	// Gentlemen, start your engines...
-	controller->Write8(HDAC_CORB_CONTROL,
+	controller->ReadModifyWrite8(HDAC_CORB_CONTROL,
+		HDAC_CORB_CONTROL_MASK,
 		CORB_CONTROL_RUN | CORB_CONTROL_MEMORY_ERROR_INTR);
-	controller->Write8(HDAC_RIRB_CONTROL, RIRB_CONTROL_DMA_ENABLE
-		| RIRB_CONTROL_OVERRUN_INTR | RIRB_CONTROL_RESPONSE_INTR);
+	controller->ReadModifyWrite8(HDAC_RIRB_CONTROL,
+		HDAC_RIRB_CONTROL_MASK,
+		RIRB_CONTROL_DMA_ENABLE | RIRB_CONTROL_OVERRUN_INTR
+		| RIRB_CONTROL_RESPONSE_INTR);
 
 	return B_OK;
 }
@@ -1016,7 +1034,7 @@ hda_hw_init(hda_controller* controller)
 	// them, as we want to use the STATE_STATUS register to identify
 	// available codecs. We'd have to clear that register in the interrupt
 	// handler to 'ack' the codec change.
-	controller->Write16(HDAC_WAKE_ENABLE, 0x0);
+	controller->ReadModifyWrite16(HDAC_WAKE_ENABLE, HDAC_WAKE_ENABLE_MASK, 0);
 
 	// Enable controller interrupts
 	controller->Write32(HDAC_INTR_CONTROL, INTR_CONTROL_GLOBAL_ENABLE
