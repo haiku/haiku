@@ -349,6 +349,21 @@ reset_controller(hda_controller* controller)
 	controller->Write8(HDAC_CORB_CONTROL, 0);
 	controller->Write8(HDAC_RIRB_CONTROL, 0);
 
+	uint8 corbControl = 0;
+	uint8 rirbControl = 0;
+	for (int timeout = 0; timeout < 10; timeout++) {
+		snooze(100);
+
+		corbControl = controller->Read8(HDAC_CORB_CONTROL);
+		rirbControl = controller->Read8(HDAC_RIRB_CONTROL);
+		if (corbControl == 0 && rirbControl == 0)
+			break;
+	}
+	if (corbControl != 0 || rirbControl != 0) {
+		dprintf("hda: unable to stop dma\n");
+		return B_BUSY;
+	}
+
 	// reset DMA position buffer
 	controller->Write32(HDAC_DMA_POSITION_BASE_LOWER, 0);
 	controller->Write32(HDAC_DMA_POSITION_BASE_UPPER, 0);
