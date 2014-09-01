@@ -495,11 +495,38 @@ init_corb_rirb_pos(hda_controller* controller)
 		((uint8*)controller->corb + posOffset);
 
 	controller->Write16(HDAC_CORB_WRITE_POS, 0);
-	// Reset CORB read pointer
-	controller->Write16(HDAC_CORB_READ_POS, CORB_READ_POS_RESET);
-	// Reading CORB_READ_POS_RESET as zero fails on some chips.
-	// We reset the bit here.
-	controller->Write16(HDAC_CORB_READ_POS, 0);
+
+	// Reset CORB read pointer. Preseve bits marked as RsvdP.
+	// After setting the reset bit, we must wait for the hardware
+	// to acknowledge it, then manually unset it and wait for that
+	// to be acknowledged as well.
+	uint16 corbReadPointer = controller->Read16(HDAC_CORB_READ_POS);
+
+	corbReadPointer |= CORB_READ_POS_RESET;
+	controller->Write16(HDAC_CORB_READ_POS, corbReadPointer);
+	for (int timeout = 0; timeout < 10; timeout++) {
+		snooze(100);
+		corbReadPointer = controller->Read16(HDAC_CORB_READ_POS);
+		if ((corbReadPointer & CORB_READ_POS_RESET) != 0)
+			break;
+	}
+	if ((corbReadPointer & CORB_READ_POS_RESET) == 0) {
+		dprintf("hda: CORB read pointer reset failed\n");
+		return B_BUSY;
+	}
+
+	corbReadPointer &= ~CORB_READ_POS_RESET;
+	controller->Write16(HDAC_CORB_READ_POS, corbReadPointer);
+	for (int timeout = 0; timeout < 10; timeout++) {
+		snooze(100);
+		corbReadPointer = controller->Read16(HDAC_CORB_READ_POS);
+		if ((corbReadPointer & CORB_READ_POS_RESET) == 0)
+			break;
+	}
+	if ((corbReadPointer & CORB_READ_POS_RESET) != 0) {
+		dprintf("hda: CORB read pointer reset failed\n");
+		return B_BUSY;
+	}
 
 	// Reset RIRB write pointer
 	controller->Write16(HDAC_RIRB_WRITE_POS, RIRB_WRITE_POS_RESET);
