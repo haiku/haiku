@@ -19,7 +19,9 @@ typedef struct pattern {
 inline bool
 operator==(const pattern& a, const pattern& b)
 {
-	return (*(uint64*)a.data == *(uint64*)b.data);
+	uint64* pa = (uint64*)a.data;
+	uint64* pb = (uint64*)b.data;
+	return (*pa == *pb);
 }
 
 

@@ -114,8 +114,8 @@ SHA256::Digest()
 		}
 
 		// write the (big-endian) message size in bits
-		*(uint64*)((uint8*)fBuffer + kChunkSize - 8)
-			= B_HOST_TO_BENDIAN_INT64((uint64)fMessageSize * 8);
+		uint64* target = (uint64*)((uint8*)fBuffer + kChunkSize - 8);
+		*target = B_HOST_TO_BENDIAN_INT64((uint64)fMessageSize * 8);
 
 		_ProcessChunk();
 
