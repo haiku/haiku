@@ -9,6 +9,8 @@
 
 #include "SVGViewView.h"
 
+#include <strings.h>
+
 
 named_color colors[] = {
 	{ "aliceblue",			{ 240, 248, 255, 255 } },
