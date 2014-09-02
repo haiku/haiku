@@ -136,7 +136,7 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 	if (debug_debugger_running()) {
 		if (size > fDebugChunkSize) {
 			kprintf("usb allocation of %" B_PRIuSIZE
-				" does not fit debug chunk size %" B_PRIuSIZE "!\n",
+				" does not fit debug chunk size %" B_PRIu32 "!\n",
 				size, fDebugChunkSize);
 			return B_NO_MEMORY;
 		}
