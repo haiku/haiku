@@ -17,9 +17,11 @@
 #include <map>
 #include <string>
 
+
 using std::map;
 using std::string;
 using namespace BPrivate;
+
 
 /*!
 	\class ClipboardHandler
@@ -27,6 +29,7 @@ using namespace BPrivate;
 */
 
 struct ClipboardHandler::ClipboardMap : map<string, Clipboard*> {};
+
 
 // constructor
 /*!	\brief Creates and initializes a ClipboardHandler.
@@ -37,17 +40,18 @@ ClipboardHandler::ClipboardHandler()
 {
 }
 
+
 // destructor
 /*!	\brief Frees all resources associate with this object.
 */
 ClipboardHandler::~ClipboardHandler()
 {
 	for (ClipboardMap::iterator it = fClipboards->begin();
-		 it != fClipboards->end();
-		 ++it) {
+		it != fClipboards->end();
+		++it)
 		delete it->second;
-	}
 }
+
 
 // MessageReceived
 /*!	\brief Overrides the super class version to handle the clipboard specific
@@ -64,32 +68,32 @@ ClipboardHandler::MessageReceived(BMessage *message)
 		{
 			status_t result = B_BAD_VALUE;
 
-	  		if (message->FindString("name", &name) == B_OK) {
-	  			if (_GetClipboard(name))
-	  				result = B_OK;
-	  		}
+			if (message->FindString("name", &name) == B_OK) {
+				if (_GetClipboard(name))
+					result = B_OK;
+			}
 
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", result);
 			message->SendReply(&reply);
-		  	break;
+			break;
 		}
 
 		case B_REG_GET_CLIPBOARD_COUNT:
 		{
 			status_t result = B_BAD_VALUE;
 
-	  		if (message->FindString("name", &name) == B_OK) {
-	  			if (Clipboard *clipboard = _GetClipboard(name)) {
+			if (message->FindString("name", &name) == B_OK) {
+				if (Clipboard *clipboard = _GetClipboard(name)) {
 					reply.AddInt32("count", clipboard->Count());
-	  				result = B_OK;
-	  			}
-	  		}
+					result = B_OK;
+				}
+			}
 
 			reply.AddInt32("result", result);
 			reply.what = B_REG_RESULT;
 			message->SendReply(&reply);
-		  	break;
+			break;
 		}
 
 		case B_REG_CLIPBOARD_START_WATCHING:
@@ -97,17 +101,17 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			status_t result = B_BAD_VALUE;
 
 			BMessenger target;
-	  		if (message->FindString("name", &name) == B_OK
-	  			&& message->FindMessenger("target", &target) == B_OK) {
-	  			Clipboard *clipboard = _GetClipboard(name);
-	  			if (clipboard && clipboard->AddWatcher(target))
-	  				result = B_OK;
-	  		}
+			if (message->FindString("name", &name) == B_OK
+				&& message->FindMessenger("target", &target) == B_OK) {
+				Clipboard *clipboard = _GetClipboard(name);
+				if (clipboard && clipboard->AddWatcher(target))
+					result = B_OK;
+			}
 
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", result);
 			message->SendReply(&reply);
-		  	break;
+			break;
 		}
 
 		case B_REG_CLIPBOARD_STOP_WATCHING:
@@ -115,37 +119,37 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			status_t result = B_BAD_VALUE;
 
 			BMessenger target;
-	  		if (message->FindString("name", &name) == B_OK
-	  			&& message->FindMessenger("target", &target) == B_OK) {
-	  			Clipboard *clipboard = _GetClipboard(name);
-	  			if (clipboard && clipboard->RemoveWatcher(target))
-	  				result = B_OK;
-	  		}
+			if (message->FindString("name", &name) == B_OK
+				&& message->FindMessenger("target", &target) == B_OK) {
+				Clipboard *clipboard = _GetClipboard(name);
+				if (clipboard && clipboard->RemoveWatcher(target))
+					result = B_OK;
+			}
 
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", result);
 			message->SendReply(&reply);
-		  	break;
+			break;
 		}
 
 		case B_REG_DOWNLOAD_CLIPBOARD:
 		{
 			status_t result = B_BAD_VALUE;
 
-	  		if (message->FindString("name", &name) == B_OK) {
-	  			Clipboard *clipboard = _GetClipboard(name);
-	  			if (clipboard) {
+			if (message->FindString("name", &name) == B_OK) {
+				Clipboard *clipboard = _GetClipboard(name);
+				if (clipboard) {
 					reply.AddMessage("data", clipboard->Data());
 					reply.AddMessenger("data source", clipboard->DataSource());
 					reply.AddInt32("count", clipboard->Count());
-	  				result = B_OK;
-	  			}
-	  		}
+					result = B_OK;
+				}
+			}
 
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", result);
 			message->SendReply(&reply);
-		  	break;
+			break;
 		}
 
 		case B_REG_UPLOAD_CLIPBOARD:
@@ -154,31 +158,32 @@ ClipboardHandler::MessageReceived(BMessage *message)
 
 			BMessage data;
 			BMessenger source;
-	  		if (message->FindString("name", &name) == B_OK
-	  			&& message->FindMessenger("data source", &source) == B_OK
-	  			&& message->FindMessage("data", &data) == B_OK) {
-	  			Clipboard *clipboard = _GetClipboard(name);
-	  			if (clipboard) {
-	  				int32 localCount;
-	  				bool failIfChanged;
-	  				if (message->FindInt32("count", &localCount) == B_OK
-	  					&& message->FindBool("fail if changed", &failIfChanged) == B_OK
-	  					&& failIfChanged
-	  					&& localCount != clipboard->Count()) {
-	  					// atomic support
-	  					result = B_ERROR;
-	  				} else {
-		  				clipboard->SetData(&data, source);
+			if (message->FindString("name", &name) == B_OK
+				&& message->FindMessenger("data source", &source) == B_OK
+				&& message->FindMessage("data", &data) == B_OK) {
+				Clipboard *clipboard = _GetClipboard(name);
+				if (clipboard) {
+					int32 localCount;
+					bool failIfChanged;
+					if (message->FindInt32("count", &localCount) == B_OK
+						&& message->FindBool("fail if changed", &failIfChanged)
+							== B_OK
+						&& failIfChanged
+						&& localCount != clipboard->Count()) {
+						// atomic support
+						result = B_ERROR;
+					} else {
+						clipboard->SetData(&data, source);
 						result = reply.AddInt32("count", clipboard->Count());
-	  					result = B_OK;
-	  				}
-	  			}
-	  		}
+						result = B_OK;
+					}
+				}
+			}
 
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", result);
 			message->SendReply(&reply);
-		  	break;
+			break;
 		}
 
 		default:
@@ -186,6 +191,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			break;
 	}
 }
+
 
 /*!	\brief Gets the clipboard with the specified name, or adds it, if not yet
 		   existent.
