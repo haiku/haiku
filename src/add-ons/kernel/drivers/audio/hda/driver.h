@@ -72,6 +72,7 @@ struct hda_controller {
 	vuint8*			regs;
 	uint32			irq;
 	bool			msi;
+	bool			dma_snooping;
 
 	uint16			codec_status;
 	uint32			num_input_streams;

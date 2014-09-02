@@ -12,6 +12,8 @@
 
 #include <algorithm>
 
+#include <vm/vm.h>
+
 #include "driver.h"
 #include "hda_codec_defs.h"
 
@@ -30,7 +32,6 @@
 		+ (index)) * HDAC_STREAM_SIZE)
 
 #define ALIGN(size, align)	(((size) + align - 1) & ~(align - 1))
-#define PAGE_ALIGN(size)	(((size) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1))
 
 
 #define PCI_VENDOR_AMD			0x1002
@@ -106,15 +107,22 @@ get_controller_quirks(pci_info& info)
 }
 
 
-static inline void
+static inline bool
 update_pci_register(hda_controller* controller, uint8 reg, uint32 mask,
-	uint32 value, uint8 size)
+	uint32 value, uint8 size, bool check = false)
 {
 	uint32 originalValue = (gPci->read_pci_config)(controller->pci_info.bus,
 		controller->pci_info.device, controller->pci_info.function, reg, size);
 	(gPci->write_pci_config)(controller->pci_info.bus,
 		controller->pci_info.device, controller->pci_info.function,
 		reg, size, (originalValue & mask) | value);
+
+	if (!check)
+		return true;
+
+	uint32 newValue = (gPci->read_pci_config)(controller->pci_info.bus,
+		controller->pci_info.device, controller->pci_info.function, reg, size);
+	return (newValue & ~mask) == value;
 }
 
 
@@ -489,6 +497,11 @@ init_corb_rirb_pos(hda_controller* controller)
 		return status;
 	}
 
+	if (!controller->dma_snooping) {
+		vm_set_area_memory_type(controller->corb_rirb_pos_area,
+			pe.address, B_MTR_UC);
+	}
+
 	// Program CORB/RIRB for these locations
 	controller->Write32(HDAC_CORB_BASE_LOWER, (uint32)pe.address);
 	controller->Write32(HDAC_CORB_BASE_UPPER,
@@ -748,6 +761,11 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 
 	phys_addr_t bufferPhysicalAddress = pe.address;
 
+	if (!stream->controller->dma_snooping) {
+		vm_set_area_memory_type(stream->buffer_area,
+			bufferPhysicalAddress, B_MTR_UC);
+	}
+
 	dprintf("%s(%s): Allocated %lu bytes for %ld buffers\n", __func__, desc,
 		alloc, stream->num_buffers);
 
@@ -781,6 +799,11 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	}
 
 	stream->physical_buffer_descriptors = pe.address;
+
+	if (!stream->controller->dma_snooping) {
+		vm_set_area_memory_type(stream->buffer_descriptors_area,
+			stream->physical_buffer_descriptors, B_MTR_UC);
+	}
 
 	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
 		alloc, bdlCount);
@@ -981,26 +1004,47 @@ hda_hw_init(hda_controller* controller)
 	// TCSEL is reset to TC0 (clear 0-2 bits)
 	update_pci_register(controller, PCI_HDA_TCSEL, PCI_HDA_TCSEL_MASK, 0, 1);
 
+	controller->dma_snooping = false;
+
 	if ((quirks & HDA_QUIRK_SNOOP) != 0) {
 		switch (controller->pci_info.vendor_id) {
 			case PCI_VENDOR_NVIDIA:
-				update_pci_register(controller, NVIDIA_HDA_TRANSREG,
-					NVIDIA_HDA_TRANSREG_MASK, NVIDIA_HDA_ENABLE_COHBITS, 1);
-				update_pci_register(controller, NVIDIA_HDA_ISTRM_COH,
-					~NVIDIA_HDA_ENABLE_COHBIT, NVIDIA_HDA_ENABLE_COHBIT, 1);
-				update_pci_register(controller, NVIDIA_HDA_OSTRM_COH,
-					~NVIDIA_HDA_ENABLE_COHBIT, NVIDIA_HDA_ENABLE_COHBIT, 1);
+			{
+				controller->dma_snooping = update_pci_register(controller,
+					NVIDIA_HDA_TRANSREG, NVIDIA_HDA_TRANSREG_MASK,
+					NVIDIA_HDA_ENABLE_COHBITS, 1, true);
+				if (!controller->dma_snooping)
+					break;
+
+				controller->dma_snooping = update_pci_register(controller,
+					NVIDIA_HDA_ISTRM_COH, ~NVIDIA_HDA_ENABLE_COHBIT,
+					NVIDIA_HDA_ENABLE_COHBIT, 1, true);
+				if (!controller->dma_snooping)
+					break;
+
+				controller->dma_snooping = update_pci_register(controller,
+					NVIDIA_HDA_OSTRM_COH, ~NVIDIA_HDA_ENABLE_COHBIT,
+					NVIDIA_HDA_ENABLE_COHBIT, 1, true);
+
 				break;
+			}
+
 			case PCI_VENDOR_AMD:
-				update_pci_register(controller, ATI_HDA_MISC_CNTR2,
-					ATI_HDA_MISC_CNTR2_MASK, ATI_HDA_ENABLE_SNOOP, 1);
+			{
+				controller->dma_snooping = update_pci_register(controller,
+					ATI_HDA_MISC_CNTR2, ATI_HDA_MISC_CNTR2_MASK,
+					ATI_HDA_ENABLE_SNOOP, 1, true);
 				break;
+			}
+
 			case PCI_VENDOR_INTEL:
-				update_pci_register(controller, INTEL_SCH_HDA_DEVC,
-					~INTEL_SCH_HDA_DEVC_SNOOP, 0, 2);
+				controller->dma_snooping = update_pci_register(controller,
+					INTEL_SCH_HDA_DEVC, ~INTEL_SCH_HDA_DEVC_SNOOP, 0, 2, true);
 				break;
 		}
 	}
+
+	dprintf("hda: DMA snooping: %s\n", controller->dma_snooping ? "yes" : "no");
 
 	capabilities = controller->Read16(HDAC_GLOBAL_CAP);
 	controller->num_input_streams = GLOBAL_CAP_INPUT_STREAMS(capabilities);
