@@ -13,6 +13,7 @@
 #include <driver_settings.h>
 #include <elf32.h>
 #include <kernel.h>
+#include <SupportDefs.h>
 
 #include <errno.h>
 #include <unistd.h>
@@ -220,6 +221,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 				continue;
 			case PT_INTERP:
 			case PT_PHDR:
+			case PT_ARM_UNWIND:
 				// known but unused type
 				continue;
 			default:
@@ -275,7 +277,8 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	// inbetween.
 	totalSize = secondRegion->start + secondRegion->size - firstRegion->start;
 	if (totalSize > image->text_region.size + image->data_region.size
-		+ 16 * 1024) {
+		+ 32 * 1024) {
+		dprintf("Too much space between segments %" B_PRIuSIZE "!\n", totalSize);
 		status = B_BAD_DATA;
 		goto error1;
 	}
