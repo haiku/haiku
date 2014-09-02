@@ -36,6 +36,10 @@ rule TargetLibstdc++ asPath
 			BuildFeatureAttribute gcc_syslibs : libstdc++.so : $(flags)
 		] ;
 	} else {
+		if $(TARGET_PLATFORM) = libbe_test {
+			# Use the existing host library
+			return stdc++.r4 ;
+		}
 		# TODO: return libstdc++.so for non-Haiku target platform if needed
 	}
 }
