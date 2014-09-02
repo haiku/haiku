@@ -25,7 +25,7 @@
 
 #define SDRAM_BASE 0x80000000
 // Offset of stack top defined with respect to SDRAM_BASE
-#define KSTACK_TOP 0x27fffff
+#define KSTACK_TOP 0x2800000
 
 #define VECT_BASE 0x00000000
 #define VECT_SIZE 0x1000
