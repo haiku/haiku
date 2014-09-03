@@ -285,7 +285,7 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 
 status_t
 WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
-	BMessage& message)
+	const StringList& packageArchitectures, BMessage& message)
 {
 	BString jsonString = JsonBuilder()
 		.AddValue("jsonrpc", "2.0")
@@ -296,7 +296,9 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 				.AddArray("pkgNames")
 					.AddStrings(packageNames)
 				.EndArray()
-				.AddValue("architectureCode", "x86_gcc2")
+				.AddArray("architectureCodes")
+					.AddStrings(packageArchitectures)
+				.EndArray()
 				.AddValue("naturalLanguageCode", fLanguage)
 				.AddValue("versionType", "LATEST")
 				.AddArray("filter")

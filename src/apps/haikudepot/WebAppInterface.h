@@ -35,6 +35,7 @@ public:
 
 			status_t			RetrieveBulkPackageInfo(
 									const StringList& packageNames,
+									const StringList& packageArchitectures,
 									BMessage& message);
 
 			status_t			RetrievePackageIcon(

@@ -321,6 +321,10 @@ Model::Model()
 	fCategories.Add(fCategoryInternetAndNetwork);
 	fCategories.Add(fCategoryDevelopment);
 	fCategories.Add(fCategoryScienceAndMathematics);
+	// TODO: The server will eventually support an API to
+	// get the defined categories and their translated names.
+	// This should then be used instead of hard-coded
+	// categories and translations in the app.
 
 	// A category for packages that the user installed.
 	fUserCategories.Add(CategoryRef(new PackageCategory(
@@ -688,12 +692,15 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 	BMessage info;
 
 	StringList packageNames;
+	StringList packageArchitectures;
 	for (int i = 0; i < packages.CountItems(); i++) {
 		const PackageInfoRef& package = packages.ItemAtFast(i);
 		packageNames.Add(package->Title());
+		packageArchitectures.Add(package->Architecture());
 	}
 
-	status_t status = interface.RetrieveBulkPackageInfo(packageNames, info);
+	status_t status = interface.RetrieveBulkPackageInfo(packageNames,
+		packageArchitectures, info);
 	if (status == B_OK) {
 		// Parse message
 //		info.PrintToStream();
@@ -835,34 +842,14 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 			if (categories.FindString(name, &category) != B_OK)
 				break;
 
-			if (category == "AUDIO")
-				package->AddCategory(CategoryAudio());
-			else if (category == "BUSINESS")
-				package->AddCategory(CategoryBusiness());
-			else if (category == "DEVELOPMENT")
-				package->AddCategory(CategoryDevelopment());
-			else if (category == "EDUCATION")
-				package->AddCategory(CategoryEducation());
-			else if (category == "GAMES")
-				package->AddCategory(CategoryGames());
-			else if (category == "GRAPHICS")
-				package->AddCategory(CategoryGraphics());
-			else if (category == "INTERNETANDNETWORK")
-				package->AddCategory(CategoryInternetAndNetwork());
-			else if (category == "PRODUCTIVITY")
-				package->AddCategory(CategoryProductivity());
-			else if (category == "SCIENCEANDMATHEMATICS")
-				package->AddCategory(CategoryScienceAndMathematics());
-			else if (category == "SYSTEMANDUTILITIES")
-				package->AddCategory(CategorySystemAndUtilities());
-			else if (category == "VIDEO")
-				package->AddCategory(CategoryVideo());
-			// TODO: The server will eventually support an API to
-			// get the defined categories and their translated names.
-			// This should then be used instead of hard-coded
-			// categories and translations in the app.
-		
-			foundCategory = true;
+			for (int i = fCategories.CountItems() - 1; i >= 0; i--) {
+				const CategoryRef& categoryRef = fCategories.ItemAtFast(i);
+				if (categoryRef->Name() == category) {
+					package->AddCategory(categoryRef);
+					foundCategory = true;
+					break;
+				}
+			}
 		}
 		if (foundCategory)
 			append_word_list(foundInfo, "categories");
