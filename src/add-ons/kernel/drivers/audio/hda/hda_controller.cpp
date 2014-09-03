@@ -537,8 +537,14 @@ init_corb_rirb_pos(hda_controller* controller)
 			break;
 	}
 	if ((corbReadPointer & CORB_READ_POS_RESET) == 0) {
-		dprintf("hda: CORB read pointer reset failed\n");
-		return B_BUSY;
+		dprintf("hda: CORB read pointer reset not acknowledged\n");
+
+		// According to HDA spec v1.0a ch3.3.21, software must read the
+		// bit as 1 to verify that the reset completed. However, at least
+		// some nVidia HDA controllers do not update the bit after reset.
+		// Thus don't fail here on nVidia controllers.
+		if (controller->pci_info.vendor_id != PCI_VENDOR_NVIDIA)
+			return B_BUSY;
 	}
 
 	corbReadPointer &= ~CORB_READ_POS_RESET;
