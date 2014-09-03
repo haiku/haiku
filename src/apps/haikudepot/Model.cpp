@@ -611,15 +611,6 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 				result.PrintToStream();
 			}
 		}
-		
-//		package->AddUserRating(
-//			UserRating(UserInfo("binky"), 4.5f,
-//			"Awesome!", "en", "2.1.2", 0, 0)
-//		);
-//		package->AddUserRating(
-//			UserRating(UserInfo("twinky"), 5.0f,
-//			"The best!", "en", "2.1.2", 3, 1)
-//		);
 	}
 }
 
