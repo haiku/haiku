@@ -1050,7 +1050,8 @@ hda_hw_init(hda_controller* controller)
 		}
 	}
 
-	dprintf("hda: DMA snooping: %s\n", controller->dma_snooping ? "yes" : "no");
+	dprintf("hda: DMA snooping: %s\n",
+		controller->dma_snooping ? "yes" : "no");
 
 	capabilities = controller->Read16(HDAC_GLOBAL_CAP);
 	controller->num_input_streams = GLOBAL_CAP_INPUT_STREAMS(capabilities);
