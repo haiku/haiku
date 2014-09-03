@@ -541,24 +541,85 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 
 	fPopulatedPackages.Add(package);
 
-	if (package->Title() == "wonderbrush") {
+	if ((flags & POPULATE_USER_RATINGS) != 0) {
+		// Retrieve info from web-app
+		WebAppInterface interface;
+		interface.SetPreferredLanguage(fPreferredLanguage);
+		BMessage info;
+	
+		status_t status = interface.RetrieveUserRatings(package->Title(),
+			package->Architecture(), 0, 50, info);
+		if (status == B_OK) {
+			// Parse message
+			BMessage result;
+			BMessage items;
+			if (info.FindMessage("result", &result) == B_OK
+				&& result.FindMessage("items", &items) == B_OK) {
+				int index = 0;
+				while (true) {
+					BString name;
+					name << index++;
+					
+					BMessage item;
+					if (items.FindMessage(name, &item) != B_OK)
+						break;
+//					item.PrintToStream();
 
-		if ((flags & POPULATE_CATEGORIES) != 0) {
-			package->AddCategory(CategoryGraphics());
-			package->AddCategory(CategoryProductivity());
+					BString user;
+					BMessage userInfo;
+					if (item.FindMessage("user", &userInfo) != B_OK
+						|| userInfo.FindString("nickname", &user) != B_OK) {
+						// Ignore, we need the user name
+						continue;
+					}
+
+					// Extract basic info
+					BString languageCode;
+					BString comment;
+					double rating;
+					if (item.FindString("naturalLanguageCode",
+							&languageCode) != B_OK
+						|| item.FindString("comment", &comment) != B_OK
+						|| item.FindDouble("rating", &rating) != B_OK) {
+						// Ignore this entry, we need the basics
+						continue;
+					}
+					// For which version of the package was the rating?
+					BString major = "?";
+					BString minor = "?";
+					BString micro = "";
+					BMessage version;
+					if (item.FindMessage("pkgVersion", &version) == B_OK) {
+						version.FindString("major", &major);
+						version.FindString("minor", &minor);
+						version.FindString("micro", &micro);
+					}
+					BString versionString = major;
+					versionString << ".";
+					versionString << minor;
+					if (micro.Length() > 0) {
+						versionString << ".";
+						versionString << micro;
+					}
+					// Add the rating to the PackageInfo
+					package->AddUserRating(
+						UserRating(UserInfo(user), rating,
+							comment, languageCode, versionString, 0, 0)
+					);
+				}
+			} else if (info.FindMessage("error", &result) == B_OK) {
+				result.PrintToStream();
+			}
 		}
-
-		if ((flags & POPULATE_USER_RATINGS) != 0) {
-			package->AddUserRating(
-				UserRating(UserInfo("binky"), 4.5f,
-				"Awesome!", "en", "2.1.2", 0, 0)
-			);
-			package->AddUserRating(
-				UserRating(UserInfo("twinky"), 5.0f,
-				"The best!", "en", "2.1.2", 3, 1)
-			);
-		}
-
+		
+//		package->AddUserRating(
+//			UserRating(UserInfo("binky"), 4.5f,
+//			"Awesome!", "en", "2.1.2", 0, 0)
+//		);
+//		package->AddUserRating(
+//			UserRating(UserInfo("twinky"), 5.0f,
+//			"The best!", "en", "2.1.2", 3, 1)
+//		);
 	}
 }
 

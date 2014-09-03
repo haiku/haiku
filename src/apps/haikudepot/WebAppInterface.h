@@ -42,9 +42,15 @@ public:
 									const BString& packageName,
 									BDataIO* stream);
 
+			status_t			RetrieveUserRatings(
+									const BString& packageName,
+									const BString& architecture,
+									int resultOffset, int maxResults,
+									BMessage& message);
+
 private:
-			status_t			_SendJsonRequest(BString jsonString,
-									BMessage& reply) const;
+			status_t			_SendJsonRequest(const char* domain,
+									BString jsonString, BMessage& reply) const;
 
 private:
 			BString				fUsername;

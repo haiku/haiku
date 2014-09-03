@@ -279,7 +279,7 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 
 //	printf("Sending JSON:\n%s\n", jsonString.String());
 	
-	return _SendJsonRequest(jsonString, message);
+	return _SendJsonRequest("pkg", jsonString, message);
 }
 
 
@@ -313,7 +313,7 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 
 //	printf("Sending JSON:\n%s\n", jsonString.String());
 	
-	return _SendJsonRequest(jsonString, message);
+	return _SendJsonRequest("pkg", jsonString, message);
 }
 
 
@@ -348,9 +348,37 @@ WebAppInterface::RetrievePackageIcon(const BString& packageName,
 
 
 status_t
-WebAppInterface::_SendJsonRequest(BString jsonString, BMessage& reply) const
+WebAppInterface::RetrieveUserRatings(const BString& packageName,
+	const BString& architecture, int resultOffset, int maxResults,
+	BMessage& message)
 {
-	BUrl url("https://depot.haiku-os.org/api/v1/pkg");
+	BString jsonString = JsonBuilder()
+		.AddValue("jsonrpc", "2.0")
+		.AddValue("id", ++fRequestIndex)
+		.AddValue("method", "searchUserRatings")
+		.AddArray("params")
+			.AddObject()
+				.AddValue("pkgName", packageName)
+				.AddValue("pkgVersionArchitectureCode", architecture)
+				.AddValue("offset", resultOffset)
+				.AddValue("limit", maxResults)
+			.EndObject()
+		.EndArray()
+	.End();
+
+//	printf("Sending JSON:\n%s\n", jsonString.String());
+	
+	return _SendJsonRequest("userrating", jsonString, message);
+}
+
+
+status_t
+WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
+	BMessage& reply) const
+{
+	BString urlString("https://depot.haiku-os.org/api/v1/");
+	urlString << domain;
+	BUrl url(urlString);
 	
 	ProtocolListener listener;
 	BUrlContext context;
