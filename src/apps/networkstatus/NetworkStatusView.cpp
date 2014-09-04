@@ -12,7 +12,9 @@
 
 #include "NetworkStatusView.h"
 
+#include <algorithm>
 #include <set>
+#include <vector>
 
 #include <arpa/inet.h>
 #include <net/if.h>
@@ -71,6 +73,19 @@ const uint32 kMsgJoinNetwork = 'join';
 
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
+
+
+//	#pragma mark -
+
+
+static bool
+signal_strength_compare(const wireless_network &a,
+	const wireless_network &b)
+{
+	if (a.signal_strength == b.signal_strength)
+		return strcmp(a.name, b.name) > 0;
+	return a.signal_strength > b.signal_strength;
+}
 
 
 //	#pragma mark -
@@ -404,10 +419,21 @@ NetworkStatusView::MouseDown(BPoint point)
 		while (wifiDevice.GetNextAssociatedNetwork(cookie, address) == B_OK)
 			associated.insert(address);
 
-		wireless_network network;
-		int32 count = 0;
 		cookie = 0;
-		while (wifiDevice.GetNextNetwork(cookie, network) == B_OK) {
+		wireless_network network;
+		typedef std::vector<wireless_network> WirelessNetworkVector;
+		WirelessNetworkVector wirelessNetworks;
+		while (wifiDevice.GetNextNetwork(cookie, network) == B_OK)
+			wirelessNetworks.push_back(network);
+
+		std::sort(wirelessNetworks.begin(), wirelessNetworks.end(),
+			signal_strength_compare);
+
+		int32 count = 0;
+		for (WirelessNetworkVector::iterator it = wirelessNetworks.begin();
+				it != wirelessNetworks.end(); it++) {
+			wireless_network &network = *it;
+
 			BMessage* message = new BMessage(kMsgJoinNetwork);
 			message->AddString("device", wifiInterface);
 			message->AddString("name", network.name);
