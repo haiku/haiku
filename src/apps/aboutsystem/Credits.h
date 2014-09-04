@@ -213,6 +213,7 @@ static const Translation kTranslations[] = {
 	"Bryce Groff\n" \
 	"Colin Günther\n" \
 	"Jessica Hamilton\n" \
+	"Julian Harnath\n" \
 	"Fredrik Holmqvist\n" \
 	"Philippe Houdoin\n" \
 	"Ryan Leavengood\n" \
