@@ -216,6 +216,7 @@ static const Translation kTranslations[] = {
 	"Fredrik Holmqvist\n" \
 	"Philippe Houdoin\n" \
 	"Ryan Leavengood\n" \
+	"Andrew Lindsay\n" \
 	"Michael Lotz\n" \
 	"Matt Madia\n" \
 	"Scott McCreary\n" \
