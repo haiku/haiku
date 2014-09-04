@@ -138,6 +138,14 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 		if (fPendingActionsWorker >= 0)
 			resume_thread(fPendingActionsWorker);
 	}
+
+	fPackageToPopulateSem = create_sem(0, "PopulatePackage");
+	if (fPackageToPopulateSem >= 0) {
+		fPopulatePackageWorker = spawn_thread(&_PopulatePackageWorker,
+			"Package Populator", B_NORMAL_PRIORITY, this);
+		if (fPopulatePackageWorker >= 0)
+			resume_thread(fPopulatePackageWorker);
+	}
 }
 
 
@@ -151,6 +159,9 @@ MainWindow::~MainWindow()
 
 	delete_sem(fPendingActionsSem);
 	wait_for_thread(fPendingActionsWorker, NULL);
+
+	delete_sem(fPackageToPopulateSem);
+	wait_for_thread(fPopulatePackageWorker, NULL);
 }
 
 
@@ -381,9 +392,13 @@ void
 MainWindow::_AdoptPackage(const PackageInfoRef& package)
 {
 	fPackageInfoView->SetPackage(package);
-	fModel.PopulatePackage(package,
-		Model::POPULATE_USER_RATINGS | Model::POPULATE_SCREEN_SHOTS
-			| Model::POPULATE_CHANGELOG | Model::POPULATE_CATEGORIES);
+
+	// Trigger asynchronous package population from the web-app
+	{
+		AutoLocker<BLocker> lock(&fPackageToPopulateLock);
+		fPackageToPopulate = package;
+	}
+	release_sem_etc(fPackageToPopulateSem, 1, 0);
 }
 
 
@@ -745,6 +760,29 @@ MainWindow::_PackageActionWorker(void* arg)
 		}
 
 		ref->Perform();
+	}
+
+	return 0;
+}
+
+
+status_t
+MainWindow::_PopulatePackageWorker(void* arg)
+{
+	MainWindow* window = reinterpret_cast<MainWindow*>(arg);
+
+	while (acquire_sem(window->fPackageToPopulateSem) == B_OK) {
+		PackageInfoRef package;
+		{
+			AutoLocker<BLocker> lock(&window->fPackageToPopulateLock);
+			package = window->fPackageToPopulate;
+		}
+
+		if (package.Get() != NULL) {
+			window->fModel.PopulatePackage(package,
+				Model::POPULATE_USER_RATINGS | Model::POPULATE_SCREEN_SHOTS
+					| Model::POPULATE_CHANGELOG);
+		}
 	}
 
 	return 0;

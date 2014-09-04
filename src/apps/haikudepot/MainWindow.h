@@ -66,6 +66,7 @@ private:
 
 	static	status_t			_PackageActionWorker(void* arg);
 
+	static	status_t			_PopulatePackageWorker(void* arg);
 
 			void				_NotifyUser(const char* title,
 									const char* message);
@@ -88,6 +89,11 @@ private:
 			PackageActionList	fPendingActions;
 			BLocker				fPendingActionsLock;
 			sem_id				fPendingActionsSem;
+
+			thread_id			fPopulatePackageWorker;
+			PackageInfoRef		fPackageToPopulate;
+			BLocker				fPackageToPopulateLock;
+			sem_id				fPackageToPopulateSem;
 };
 
 #endif // MAIN_WINDOW_H
