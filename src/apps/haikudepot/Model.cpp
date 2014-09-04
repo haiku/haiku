@@ -521,40 +521,44 @@ Model::SetShowDevelopPackages(bool show)
 void
 Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 {
-	if (fPopulatedPackages.Contains(package))
-		return;
-
-	BAutolock _(&fLock);
-
-	// TODO: Replace with actual backend that retrieves package extra
-	// information and user-contributed package information.
-
 	// TODO: There should probably also be a way to "unpopulate" the
 	// package information. Maybe a cache of populated packages, so that
 	// packages loose their extra information after a certain amount of
 	// time when they have not been accessed/displayed in the UI. Otherwise
 	// HaikuDepot will consume more and more resources in the packages.
 	// Especially screen-shots will be a problem eventually.
-
-	// TODO: Simulate a delay in retrieving this info, and do that on
-	// a separate thread.
-
-	fPopulatedPackages.Add(package);
+	{
+		BAutolock locker(&fLock);
+		if (fPopulatedPackages.Contains(package))
+			return;
+		fPopulatedPackages.Add(package);
+	}
 
 	if ((flags & POPULATE_USER_RATINGS) != 0) {
 		// Retrieve info from web-app
 		WebAppInterface interface;
 		interface.SetPreferredLanguage(fPreferredLanguage);
 		BMessage info;
+
+		BString packageName;
+		BString architecture;	
+		{
+			BAutolock locker(&fLock);
+			packageName = package->Title();
+			architecture = package->Architecture();
+		}
 	
-		status_t status = interface.RetrieveUserRatings(package->Title(),
-			package->Architecture(), 0, 50, info);
+		status_t status = interface.RetrieveUserRatings(packageName,
+			architecture, 0, 50, info);
 		if (status == B_OK) {
 			// Parse message
 			BMessage result;
 			BMessage items;
 			if (info.FindMessage("result", &result) == B_OK
 				&& result.FindMessage("items", &items) == B_OK) {
+
+				BAutolock locker(&fLock);
+
 				int index = 0;
 				while (true) {
 					BString name;
