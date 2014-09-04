@@ -29,6 +29,9 @@ BFileRequest::BFileRequest(const BUrl& url, BUrlProtocolListener* listener,
 
 BFileRequest::~BFileRequest()
 {
+	status_t status = Stop();
+	if (status == B_OK)
+		wait_for_thread(fThreadId, &status);
 }
 
 
