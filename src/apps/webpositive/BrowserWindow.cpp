@@ -1520,6 +1520,8 @@ BrowserWindow::LoadFinished(const BString& url, BWebView* view)
 	if (view != CurrentWebView())
 		return;
 
+	fURLInputGroup->SetText(url.String());
+
 	BString status(B_TRANSLATE_COMMENT("%url finished", "Loading URL "
 		"finished. Don't translate variable %url."));
 	status.ReplaceFirst("%url", url);
