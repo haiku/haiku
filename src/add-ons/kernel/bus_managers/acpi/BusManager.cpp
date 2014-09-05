@@ -184,7 +184,7 @@ acpi_std_ops(int32 op,...)
 			}
 
 			if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
-				B_NORMAL_PRIORITY) != B_OK) {
+					B_NORMAL_PRIORITY) != B_OK) {
 				ERROR("failed to create os execution queue\n");
 				return B_ERROR;
 			}
@@ -195,34 +195,34 @@ acpi_std_ops(int32 op,...)
 #endif
 
 			if (checkAndLogFailure(AcpiInitializeSubsystem(),
-				"AcpiInitializeSubsystem failed"))
+					"AcpiInitializeSubsystem failed"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiInitializeTables(NULL, 0, TRUE),
-				"AcpiInitializeTables failed"))
+					"AcpiInitializeTables failed"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiLoadTables(),
-				"AcpiLoadTables failed"))
+					"AcpiLoadTables failed"))
 				goto err;
 
 			/* Install the default address space handlers. */
 			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
-					ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_MEMORY,
-					ACPI_DEFAULT_HANDLER, NULL, NULL),
-				"Could not initialise SystemMemory handler:"))
+						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_MEMORY,
+						ACPI_DEFAULT_HANDLER, NULL, NULL),
+					"Could not initialise SystemMemory handler:"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
-					ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_IO,
-					ACPI_DEFAULT_HANDLER, NULL, NULL),
-				"Could not initialise SystemIO handler:"))
+						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_IO,
+						ACPI_DEFAULT_HANDLER, NULL, NULL),
+					"Could not initialise SystemIO handler:"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
-					ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_PCI_CONFIG,
-					ACPI_DEFAULT_HANDLER, NULL, NULL),
-				"Could not initialise PciConfig handler:"))
+						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_PCI_CONFIG,
+						ACPI_DEFAULT_HANDLER, NULL, NULL),
+					"Could not initialise PciConfig handler:"))
 				goto err;
 
 			arg.Integer.Type = ACPI_TYPE_INTEGER;
@@ -234,13 +234,13 @@ acpi_std_ops(int32 op,...)
 			AcpiEvaluateObject(NULL, "\\_PIC", &parameter, NULL);
 
 			if (checkAndLogFailure(AcpiEnableSubsystem(
-					ACPI_FULL_INITIALIZATION),
-				"AcpiEnableSubsystem failed"))
+						ACPI_FULL_INITIALIZATION),
+					"AcpiEnableSubsystem failed"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiInitializeObjects(
-					ACPI_FULL_INITIALIZATION),
-				"AcpiInitializeObjects failed"))
+						ACPI_FULL_INITIALIZATION),
+					"AcpiInitializeObjects failed"))
 				goto err;
 
 			checkAndLogFailure(
