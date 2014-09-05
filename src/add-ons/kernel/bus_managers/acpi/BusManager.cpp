@@ -13,8 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <apic.h>
 #include <ACPI.h>
+#include <apic.h>
 #include <dpc.h>
 #include <KernelExport.h>
 #include <PCI.h>
