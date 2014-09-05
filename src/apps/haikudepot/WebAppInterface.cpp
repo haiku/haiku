@@ -373,6 +373,46 @@ WebAppInterface::RetrieveUserRatings(const BString& packageName,
 
 
 status_t
+WebAppInterface::RetrieveScreenshot(const BString& code,
+	int32 width, int32 height, BDataIO* stream)
+{
+	BString urlString = "https://depot.haiku-os.org/pkgscreenshot/";
+	urlString << code << ".png"
+		<< "?tw=" << width << "&th=" << height;
+	
+	BUrl url(urlString);
+	
+	ProtocolListener listener;
+	listener.SetDownloadIO(stream);
+
+	BHttpHeaders headers;	
+	headers.AddHeader("User-Agent", "X-HDS-Client");
+	
+	BHttpRequest request(url, true, "HTTP", &listener);
+	request.SetMethod(B_HTTP_GET);
+	request.SetHeaders(headers);
+
+	thread_id thread = request.Run();
+	wait_for_thread(thread, NULL);
+
+	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
+		request.Result());
+
+	int32 statusCode = result.StatusCode();
+	
+	if (statusCode == 200)
+		return B_OK;
+
+	fprintf(stderr, "failed to get screenshot from '%s': %" B_PRIi32 "\n",
+		urlString.String(), statusCode);
+	return B_ERROR;
+}
+
+
+// #pragma mark - private
+
+
+status_t
 WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	BMessage& reply) const
 {

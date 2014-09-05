@@ -48,6 +48,10 @@ public:
 									int resultOffset, int maxResults,
 									BMessage& message);
 
+			status_t			RetrieveScreenshot(
+									const BString& code,
+									int32 width, int32 height,
+									BDataIO* stream);
 private:
 			status_t			_SendJsonRequest(const char* domain,
 									BString jsonString, BMessage& reply) const;
