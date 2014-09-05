@@ -616,6 +616,18 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 			}
 		}
 	}
+
+	if ((flags & POPULATE_SCREEN_SHOTS) != 0) {
+		ScreenshotInfoList screenshotInfos;
+		{
+			BAutolock locker(&fLock);
+			screenshotInfos = package->ScreenshotInfos();
+		}
+		for (int i = 0; i < screenshotInfos.CountItems(); i++) {
+			const ScreenshotInfo& info = screenshotInfos.ItemAtFast(i);
+			_PopulatePackageScreenshot(package, info, 400, false);
+		}
+	}
 }
 
 
@@ -959,6 +971,12 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 		printf("Populated package info for %s: %s\n",
 			package->Title().String(), foundInfo.String());
 	}
+
+	// If the user already clicked this package, remove it from the
+	// list of populated packages, so that clicking it again will
+	// populate any additional information.
+	// TODO: Trigger re-populating if the package is currently showing.
+	fPopulatedPackages.Remove(package);
 }
 
 
@@ -1011,6 +1029,67 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 		if (iconFile.SetTo(iconCachePath.Path(),
 				B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) == B_OK) {
 			iconFile.Write(buffer.Buffer(), buffer.BufferLength());
+		}
+	}
+}
+
+
+void
+Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
+	const ScreenshotInfo& info, int32 scaledWidth, bool fromCacheOnly)
+{
+	// See if there is a cached screenshot
+	BFile screenshotFile;
+	BPath screenshotCachePath;
+	bool fileExists = false;
+	BString screenshotName(info.Code());
+	screenshotName << "@" << scaledWidth;
+	screenshotName << ".png";
+	time_t modifiedTime;
+	if (find_directory(B_USER_CACHE_DIRECTORY, &screenshotCachePath) == B_OK
+		&& screenshotCachePath.Append("HaikuDepot/Screenshots") == B_OK
+		&& create_directory(screenshotCachePath.Path(), 0777) == B_OK
+		&& screenshotCachePath.Append(screenshotName) == B_OK) {
+		// Try opening the file in read-only mode, which will fail if its
+		// not a file or does not exist.
+		fileExists = screenshotFile.SetTo(screenshotCachePath.Path(),
+			B_READ_ONLY) == B_OK;
+		if (fileExists)
+			screenshotFile.GetModificationTime(&modifiedTime);
+	}
+
+	if (fileExists) {
+		time_t now;
+		time(&now);
+		if (fromCacheOnly || now - modifiedTime < 60 * 60) {
+			// Cache file is recent enough, just use it and return.
+			BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(screenshotFile),
+				true);
+			BAutolock locker(&fLock);
+			package->AddScreenshot(bitmapRef);
+			return;
+		}
+	}
+
+	if (fromCacheOnly)
+		return;
+
+	// Retrieve screenshot from web-app
+	WebAppInterface interface;
+	BMallocIO buffer;
+
+	int32 scaledHeight = scaledWidth * info.Height() / info.Width();
+
+	status_t status = interface.RetrieveScreenshot(info.Code(),
+		scaledWidth, scaledHeight, &buffer);
+	if (status == B_OK) {
+		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
+		BAutolock locker(&fLock);
+		package->AddScreenshot(bitmapRef);
+		locker.Unlock();
+		if (screenshotFile.SetTo(screenshotCachePath.Path(),
+				B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) == B_OK) {
+			screenshotFile.Write(buffer.Buffer(), buffer.BufferLength());
 		}
 	}
 }

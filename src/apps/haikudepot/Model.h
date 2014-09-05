@@ -117,6 +117,11 @@ private:
 									const PackageInfoRef& package,
 									bool fromCacheOnly);
 			bool				_HasNativeIcon(const BMessage& message) const;
+			void				_PopulatePackageScreenshot(
+									const PackageInfoRef& package,
+									const ScreenshotInfo& info,
+									int32 scaledWidth,
+									bool fromCacheOnly);
 
 private:
 			BLocker				fLock;
