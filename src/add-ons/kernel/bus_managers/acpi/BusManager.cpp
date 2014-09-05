@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <apic.h>
 #include <ACPI.h>
 #include <dpc.h>
 #include <KernelExport.h>
@@ -36,6 +37,9 @@ extern "C" {
 #endif
 
 #define ERROR(x...) dprintf("acpi: " x)
+
+#define PIC_MODE 0;
+#define APIC_MODE 1;
 
 #define ACPI_DEVICE_ID_LENGTH	0x08
 
@@ -241,7 +245,7 @@ acpi_std_ops(int32 op,...)
 				goto err;
 
 			arg.Integer.Type = ACPI_TYPE_INTEGER;
-			arg.Integer.Value = 0;
+			arg.Integer.Value = apic_available() ? APIC_MODE : PIC_MODE;
 
 			parameter.Count = 1;
 			parameter.Pointer = &arg;
