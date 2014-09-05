@@ -43,6 +43,10 @@ private:
 
 			BBitmap*			_LoadBitmapFromBuffer(const void* buffer,
 									size_t dataSize) const;
+			BBitmap*			_LoadArchivedBitmapFromStream(
+									BPositionIO& stream) const;
+			BBitmap*			_LoadTranslatorBitmapFromStream(
+									BPositionIO& stream) const;
 			BBitmap*			_LoadIconFromBuffer(const void* buffer,
 									size_t dataSize, int32 size) const;
 

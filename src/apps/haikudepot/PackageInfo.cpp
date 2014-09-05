@@ -15,6 +15,7 @@
 #include <MimeType.h>
 #include <package/PackageFlags.h>
 #include <Resources.h>
+#include <TranslationUtils.h>
 
 #include "support.h"
 
@@ -199,20 +200,42 @@ SharedBitmap::_LoadBitmapFromBuffer(const void* buffer, size_t size) const
 	BMemoryIO stream(buffer, size);
 
 	// Try to read as an archived bitmap.
+	BBitmap* bitmap = _LoadArchivedBitmapFromStream(stream);
+	
+	if (bitmap == NULL) {
+		// Try to read as a translator bitmap
+		stream.Seek(0, SEEK_SET);
+		bitmap = _LoadTranslatorBitmapFromStream(stream);
+	}
+
+	if (bitmap != NULL) {
+		status_t status = bitmap->InitCheck();
+		if (status != B_OK) {
+			delete bitmap;
+			bitmap = NULL;
+		}
+	}
+
+	return bitmap;
+}
+
+
+BBitmap*
+SharedBitmap::_LoadArchivedBitmapFromStream(BPositionIO& stream) const
+{
 	BMessage archive;
 	status_t status = archive.Unflatten(&stream);
 	if (status != B_OK)
 		return NULL;
 
-	BBitmap* bitmap = new BBitmap(&archive);
+	return new BBitmap(&archive);
+}
 
-	status = bitmap->InitCheck();
-	if (status != B_OK) {
-		delete bitmap;
-		bitmap = NULL;
-	}
 
-	return bitmap;
+BBitmap*
+SharedBitmap::_LoadTranslatorBitmapFromStream(BPositionIO& stream) const
+{
+	return BTranslationUtils::GetBitmap(&stream);
 }
 
 
