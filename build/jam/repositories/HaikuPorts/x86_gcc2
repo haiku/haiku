@@ -45,6 +45,7 @@ RemotePackageRepository HaikuPorts
 	canna-1.0.1-1
 	capitalbe-1.0-2
 	caya-2013.07.31-3
+	ccache-3.1.9-1
 	cdrtools-3.01~a18-1
 	cdrtools_devel-3.01~a18-1
 	ctags-5.8-3
@@ -577,6 +578,7 @@ RemotePackageRepository HaikuPorts
 	canna
 	capitalbe
 	caya
+	ccache
 	cdrtools
 	cmake_x86
 	confuse_x86
