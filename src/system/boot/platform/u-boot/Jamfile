@@ -195,7 +195,7 @@ actions BuildUBootSDImage1
 	$(RM) $(1).mtools
 	$(RM) uEnv.txt
 	# Add haiku bootstrap partition to MMC image
-	dd if=$(2[0]) of=$(1) conv=notrunc oflag=append bs=1M
+	cat $(2[0]) >> $(1)
 }
 
 # uimage targets
