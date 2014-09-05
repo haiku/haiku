@@ -112,6 +112,8 @@ RemotePackageRepository HaikuPorts
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
 	html_parser-3.71-1
+	hubbub-0.3.0-1
+	hubbub_devel-0.3.0-1
 	icu-4.8.1.1-4
 	icu_devel-4.8.1.1-4
 	intltool-0.40.6-3
@@ -212,7 +214,7 @@ RemotePackageRepository HaikuPorts
 	neon-0.29.6-6
 	neon_devel-0.29.6-6
 	netcat-1.10-1
-	netsurf-3.1-1
+	netsurf-3.2-1
 	opensound-4.2_git-2
 	openssh-6.0p1-8
 	# sync openssl with secondary architecture (x86)
@@ -630,6 +632,7 @@ RemotePackageRepository HaikuPorts
 	help2man
 	htmldoc
 	html_parser
+	hubbub
 	icu
 	ilmbase_x86
 	intltool
