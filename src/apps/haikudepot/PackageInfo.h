@@ -312,20 +312,24 @@ public:
 									{ return fDownloadProgress; }
 			void				SetDownloadProgress(float progress);
 
+			void				ClearCategories();
 			bool				AddCategory(const CategoryRef& category);
 			const CategoryList&	Categories() const
 									{ return fCategories; }
 
+			void				ClearUserRatings();
 			bool				AddUserRating(const UserRating& rating);
 			const UserRatingList& UserRatings() const
 									{ return fUserRatings; }
 			void				SetRatingSummary(const RatingSummary& summary);
 			RatingSummary		CalculateRatingSummary() const;
 
+			void				ClearScreenshotInfos();
 			bool				AddScreenshotInfo(const ScreenshotInfo& info);
 			const ScreenshotInfoList& ScreenshotInfos() const
 									{ return fScreenshotInfos; }
 
+			void				ClearScreenshots();
 			bool				AddScreenshot(const BitmapRef& screenshot);
 			const BitmapList&	Screenshots() const
 									{ return fScreenshots; }

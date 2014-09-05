@@ -813,6 +813,16 @@ PackageInfo::IsSystemPackage() const
 }
 
 
+void
+PackageInfo::ClearCategories()
+{
+	if (!fCategories.IsEmpty()) {
+		fCategories.Clear();
+		_NotifyListeners(PKG_CHANGED_CATEGORIES);
+	}
+}
+
+
 bool
 PackageInfo::AddCategory(const CategoryRef& category)
 {
@@ -858,6 +868,16 @@ PackageInfo::SetDownloadProgress(float progress)
 	fState = DOWNLOADING;
 	fDownloadProgress = progress;
 	_NotifyListeners(PKG_CHANGED_STATE);
+}
+
+
+void
+PackageInfo::ClearUserRatings()
+{
+	if (!fUserRatings.IsEmpty()) {
+		fUserRatings.Clear();
+		_NotifyListeners(PKG_CHANGED_RATINGS);
+	}
 }
 
 
@@ -930,10 +950,27 @@ PackageInfo::CalculateRatingSummary() const
 }
 
 
+void
+PackageInfo::ClearScreenshotInfos()
+{
+	fScreenshotInfos.Clear();
+}
+
+
 bool
 PackageInfo::AddScreenshotInfo(const ScreenshotInfo& info)
 {
 	return fScreenshotInfos.Add(info);
+}
+
+
+void
+PackageInfo::ClearScreenshots()
+{
+	if (!fScreenshots.IsEmpty()) {
+		fScreenshots.Clear();
+		_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
+	}
 }
 
 

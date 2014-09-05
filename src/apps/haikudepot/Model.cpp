@@ -558,6 +558,7 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 				&& result.FindMessage("items", &items) == B_OK) {
 
 				BAutolock locker(&fLock);
+				package->ClearUserRatings();
 
 				int index = 0;
 				while (true) {
@@ -622,6 +623,7 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 		{
 			BAutolock locker(&fLock);
 			screenshotInfos = package->ScreenshotInfos();
+			package->ClearScreenshots();
 		}
 		for (int i = 0; i < screenshotInfos.CountItems(); i++) {
 			const ScreenshotInfo& info = screenshotInfos.ItemAtFast(i);
@@ -910,6 +912,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 			if (categories.FindString(name, &category) != B_OK)
 				break;
 
+			package->ClearCategories();
 			for (int i = fCategories.CountItems() - 1; i >= 0; i--) {
 				const CategoryRef& categoryRef = fCategories.ItemAtFast(i);
 				if (categoryRef->Name() == category) {
@@ -940,6 +943,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 	
 	BMessage screenshots;
 	if (data.FindMessage("pkgScreenshots", &screenshots) == B_OK) {
+		package->ClearScreenshotInfos();
 		bool foundScreenshot = false;
 		int32 index = 0;
 		while (true) {
