@@ -258,6 +258,8 @@ acpi_std_ops(int32 op,...)
 					"AcpiInitializeObjects failed"))
 				goto err;
 
+			//TODO: Walk namespace init ALL _PRW's
+
 			checkAndLogFailure(
 				AcpiInstallGlobalEventHandler(globalGPEHandler, NULL),
 				"Failed to install global GPE-handler.");
