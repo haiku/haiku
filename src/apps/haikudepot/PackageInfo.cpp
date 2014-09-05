@@ -1011,7 +1011,7 @@ PackageInfo::_NotifyListeners(uint32 changes)
 	// to screw up the list while iterating it.
 	PackageListenerList listeners(fListeners);
 	// Check if it worked:
-	if (listeners.CountItems () != count)
+	if (listeners.CountItems() != count)
 		return;
 
 	PackageInfoEvent event(PackageInfoRef(this), changes);
