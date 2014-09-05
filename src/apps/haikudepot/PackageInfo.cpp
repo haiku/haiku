@@ -551,6 +551,68 @@ PackageCategory::operator!=(const PackageCategory& other) const
 }
 
 
+// #pragma mark - ScreenshotInfo
+
+
+ScreenshotInfo::ScreenshotInfo()
+	:
+	fCode(),
+	fWidth(),
+	fHeight(),
+	fDataSize()
+{
+}
+
+
+ScreenshotInfo::ScreenshotInfo(const BString& code,
+		int32 width, int32 height, int32 dataSize)
+	:
+	fCode(code),
+	fWidth(width),
+	fHeight(height),
+	fDataSize(dataSize)
+{
+}
+
+
+ScreenshotInfo::ScreenshotInfo(const ScreenshotInfo& other)
+	:
+	fCode(other.fCode),
+	fWidth(other.fWidth),
+	fHeight(other.fHeight),
+	fDataSize(other.fDataSize)
+{
+}
+
+
+ScreenshotInfo&
+ScreenshotInfo::operator=(const ScreenshotInfo& other)
+{
+	fCode = other.fCode;
+	fWidth = other.fWidth;
+	fHeight = other.fHeight;
+	fDataSize = other.fDataSize;
+	return *this;
+}
+
+
+bool
+ScreenshotInfo::operator==(const ScreenshotInfo& other) const
+{
+	return fCode == other.fCode
+		&& fWidth == other.fWidth
+		&& fHeight == other.fHeight
+		&& fDataSize == other.fDataSize;
+}
+
+
+bool
+ScreenshotInfo::operator!=(const ScreenshotInfo& other) const
+{
+	return !(*this == other);
+}
+
+
 // #pragma mark - PackageInfo
 
 
@@ -565,6 +627,7 @@ PackageInfo::PackageInfo()
 	fChangelog(),
 	fUserRatings(),
 	fCachedRatingSummary(),
+	fScreenshotInfos(),
 	fScreenshots(),
 	fState(NONE),
 	fDownloadProgress(0.0),
@@ -590,6 +653,7 @@ PackageInfo::PackageInfo(const BString& title,
 	fCategories(),
 	fUserRatings(),
 	fCachedRatingSummary(),
+	fScreenshotInfos(),
 	fScreenshots(),
 	fState(NONE),
 	fDownloadProgress(0.0),
@@ -612,6 +676,7 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fCategories(other.fCategories),
 	fUserRatings(other.fUserRatings),
 	fCachedRatingSummary(other.fCachedRatingSummary),
+	fScreenshotInfos(other.fScreenshotInfos),
 	fScreenshots(other.fScreenshots),
 	fState(other.fState),
 	fInstallationLocations(other.fInstallationLocations),
@@ -636,6 +701,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fCategories = other.fCategories;
 	fUserRatings = other.fUserRatings;
 	fCachedRatingSummary = other.fCachedRatingSummary;
+	fScreenshotInfos = other.fScreenshotInfos;
 	fScreenshots = other.fScreenshots;
 	fState = other.fState;
 	fInstallationLocations = other.fInstallationLocations;
@@ -660,6 +726,7 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fCategories == other.fCategories
 		&& fUserRatings == other.fUserRatings
 		&& fCachedRatingSummary == other.fCachedRatingSummary
+		&& fScreenshotInfos == other.fScreenshotInfos
 		&& fScreenshots == other.fScreenshots
 		&& fState == other.fState
 		&& fFlags == other.fFlags
@@ -837,6 +904,13 @@ PackageInfo::CalculateRatingSummary() const
 
 	summary.averageRating = ratingSum / summary.ratingCount;
 	return summary;
+}
+
+
+bool
+PackageInfo::AddScreenshotInfo(const ScreenshotInfo& info)
+{
+	return fScreenshotInfos.Add(info);
 }
 
 

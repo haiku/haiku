@@ -202,8 +202,40 @@ typedef BReference<PackageCategory> CategoryRef;
 typedef List<CategoryRef, false> CategoryList;
 
 
+class ScreenshotInfo {
+public:
+								ScreenshotInfo();
+								ScreenshotInfo(const BString& code,
+									int32 width, int32 height, int32 dataSize);
+								ScreenshotInfo(const ScreenshotInfo& other);
+
+			ScreenshotInfo&		operator=(const ScreenshotInfo& other);
+			bool				operator==(const ScreenshotInfo& other) const;
+			bool				operator!=(const ScreenshotInfo& other) const;
+
+			const BString&		Code() const
+									{ return fCode; }
+			int32				Width() const
+									{ return fWidth; }
+			int32				Height() const
+									{ return fHeight; }
+			int32				DataSize() const
+									{ return fDataSize; }
+
+private:
+			BString				fCode;
+			int32				fWidth;
+			int32				fHeight;
+			int32				fDataSize;
+};
+
+
+typedef List<ScreenshotInfo, false, 2> ScreenshotInfoList;
+
+
 typedef List<PackageInfoListenerRef, false, 2> PackageListenerList;
 typedef std::set<int32> PackageInstallationLocationSet;
+
 
 enum PackageState {
 	NONE		= 0,
@@ -286,6 +318,10 @@ public:
 			void				SetRatingSummary(const RatingSummary& summary);
 			RatingSummary		CalculateRatingSummary() const;
 
+			bool				AddScreenshotInfo(const ScreenshotInfo& info);
+			const ScreenshotInfoList& ScreenshotInfos() const
+									{ return fScreenshotInfos; }
+
 			bool				AddScreenshot(const BitmapRef& screenshot);
 			const BitmapList&	Screenshots() const
 									{ return fScreenshots; }
@@ -309,6 +345,7 @@ private:
 			CategoryList		fCategories;
 			UserRatingList		fUserRatings;
 			RatingSummary		fCachedRatingSummary;
+			ScreenshotInfoList	fScreenshotInfos;
 			BitmapList			fScreenshots;
 			PackageState		fState;
 			PackageInstallationLocationSet

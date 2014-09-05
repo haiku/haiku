@@ -910,6 +910,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 		if (foundCategory)
 			append_word_list(foundInfo, "categories");
 	}
+	
 	double derivedRating;
 	double derivedRatingSampleSize;
 	if (data.FindDouble("derivedRating", &derivedRating) == B_OK
@@ -924,6 +925,36 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 			append_word_list(foundInfo, "rating");
 		}
 	}
+	
+	BMessage screenshots;
+	if (data.FindMessage("pkgScreenshots", &screenshots) == B_OK) {
+		bool foundScreenshot = false;
+		int32 index = 0;
+		while (true) {
+			BString name;
+			name << index++;
+			
+			BMessage screenshot;
+			if (screenshots.FindMessage(name, &screenshot) != B_OK)
+				break;
+
+			BString code;
+			double width;
+			double height;
+			double dataSize;
+			if (screenshot.FindString("code", &code) == B_OK
+				&& screenshot.FindDouble("width", &width) == B_OK
+				&& screenshot.FindDouble("height", &height) == B_OK
+				&& screenshot.FindDouble("length", &dataSize) == B_OK) {
+				package->AddScreenshotInfo(ScreenshotInfo(code, (int32)width,
+					(int32)height, (int32)dataSize));
+				foundScreenshot = true;
+			}
+		}
+		if (foundScreenshot)
+			append_word_list(foundInfo, "screenshots");
+	}
+	
 	if (foundInfo.Length() > 0) {
 		printf("Populated package info for %s: %s\n",
 			package->Title().String(), foundInfo.String());
