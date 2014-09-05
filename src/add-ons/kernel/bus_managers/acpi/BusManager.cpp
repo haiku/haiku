@@ -38,8 +38,8 @@ extern "C" {
 
 #define ERROR(x...) dprintf("acpi: " x)
 
-#define PIC_MODE 0;
-#define APIC_MODE 1;
+#define PIC_MODE 0
+#define APIC_MODE 1
 
 #define ACPI_DEVICE_ID_LENGTH	0x08
 
