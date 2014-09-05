@@ -146,6 +146,21 @@ globalGPEHandler(UINT32 eventType, ACPI_HANDLE device, UINT32 eventNumber,
 }
 
 
+static void globalNotifyHandler(ACPI_HANDLE device, UINT32 value, void* context)
+{
+	ACPI_BUFFER path;
+	char deviceName[256];
+	path.Length = sizeof(deviceName);
+	path.Pointer = deviceName;
+
+	ACPI_STATUS status = AcpiNsHandleToPathname(device, &path);
+	if (ACPI_FAILURE(status))
+		strcpy(deviceName, "(missing)");
+
+	dprintf("acpi: Notify event %d for %s\n", value, deviceName);
+}
+
+
 //	#pragma mark - ACPI bus manager API
 
 
@@ -245,7 +260,11 @@ acpi_std_ops(int32 op,...)
 
 			checkAndLogFailure(
 				AcpiInstallGlobalEventHandler(globalGPEHandler, NULL),
-				"Failed to install global GPE handler.");
+				"Failed to install global GPE-handler.");
+
+			checkAndLogFailure(AcpiInstallNotifyHandler(ACPI_ROOT_OBJECT,
+					ACPI_ALL_NOTIFY, globalNotifyHandler, NULL),
+				"Failed to install global Notify-handler.");
 
 			checkAndLogFailure(AcpiEnableAllRuntimeGpes(),
 				"Failed to enable all runtime Gpes");
