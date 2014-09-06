@@ -38,6 +38,9 @@ protected:
 
 private:
 				void			_GatherInterfaces();
+				void			_BuildInterfacesMenu();
+				void			_InterfaceAdded(const char* name);
+				void			_InterfaceRemoved(const char* name);
 				void 			_ShowConfiguration(Settings* settings);
 				void			_EnableTextControls(bool enable);
 				void			_SaveConfiguration();
@@ -53,7 +56,6 @@ private:
 				BButton*		fApplyButton;
 				BButton*		fRevertButton;
 					// TODO: buttons should be moved to window instead
-
 				BMenuField*		fDeviceMenuField;
 				BMenuField*		fNetworkMenuField;
 				BMenuField*		fTypeMenuField;

@@ -37,6 +37,7 @@
 #include <MenuItem.h>
 #include <NetworkDevice.h>
 #include <NetworkInterface.h>
+#include <NetworkNotifications.h>
 #include <NetworkRoster.h>
 #include <Path.h>
 #include <PopUpMenu.h>
@@ -115,15 +116,7 @@ EthernetSettingsView::EthernetSettingsView()
 	rootLayout->SetSpacing(inset);
 	layout->SetSpacing(inset, inset);
 
-	BPopUpMenu* deviceMenu = new BPopUpMenu(B_TRANSLATE("<no adapter>"));
-	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
-		BString& name = *fInterfaces.ItemAt(i);
-		BString label = name;
-		BMessage* info = new BMessage(kMsgInfo);
-		info->AddString("interface", name.String());
-		BMenuItem* item = new BMenuItem(label.String(), info);
-		deviceMenu->AddItem(item);
-	}
+
 
 	BPopUpMenu* modeMenu = new BPopUpMenu("modes");
 	modeMenu->AddItem(new BMenuItem(B_TRANSLATE("Static"),
@@ -136,7 +129,10 @@ EthernetSettingsView::EthernetSettingsView()
 
 	BPopUpMenu* networkMenu = new BPopUpMenu("networks");
 
+	BPopUpMenu* deviceMenu = new BPopUpMenu(B_TRANSLATE("<no adapter>"));
 	fDeviceMenuField = new BMenuField(B_TRANSLATE("Adapter:"), deviceMenu);
+	_BuildInterfacesMenu();
+
 	layout->AddItem(fDeviceMenuField->CreateLabelLayoutItem(), 0, 0);
 	layout->AddItem(fDeviceMenuField->CreateMenuBarLayoutItem(), 1, 0);
 
@@ -237,12 +233,16 @@ EthernetSettingsView::AttachedToWindow()
 
 	// Display settigs of first adapter on startup, if any
 	_ShowConfiguration(fSettings.ItemAt(0));
+
+	int flags = B_WATCH_NETWORK_INTERFACE_CHANGES;
+	start_watching_network(flags, this);
 }
 
 
 void
 EthernetSettingsView::DetachedFromWindow()
 {
+	stop_watching_network(this);
 }
 
 
@@ -250,6 +250,27 @@ void
 EthernetSettingsView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_NETWORK_MONITOR:
+		{
+			int32 opcode;
+			message->FindInt32("opcode", &opcode);
+			const char* interfaceName;
+			message->FindString("interface", &interfaceName);
+			switch (opcode) {
+				case B_NETWORK_INTERFACE_ADDED:
+					_InterfaceAdded(interfaceName);
+					break;
+				case B_NETWORK_INTERFACE_REMOVED:
+					_InterfaceRemoved(interfaceName);
+					break;
+				default:
+					// TODO: Support interface changed, etc.
+					break;
+
+			}
+			_BuildInterfacesMenu();
+			break;
+		}
 		case kMsgStaticMode:
 		case kMsgDHCPMode:
 		case kMsgDisabledMode:
@@ -310,8 +331,63 @@ EthernetSettingsView::_GatherInterfaces()
 
 	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
 		if (strncmp(interface.Name(), "loop", 4) && interface.Name()[0]) {
-			fInterfaces.AddItem(new BString(interface.Name()));
-			fSettings.AddItem(new Settings(interface.Name()));
+			_InterfaceAdded(interface.Name());
+		}
+	}
+}
+
+
+void
+EthernetSettingsView::_BuildInterfacesMenu()
+{
+	BMenu* menu = fDeviceMenuField->Menu();
+	menu->RemoveItems(0, menu->CountItems(), true);
+
+	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
+		BString& name = *fInterfaces.ItemAt(i);
+		BString label = name;
+		BMessage* info = new BMessage(kMsgInfo);
+		info->AddString("interface", name.String());
+		BMenuItem* item = new BMenuItem(label.String(), info);
+		menu->AddItem(item);
+	}
+
+	int32 numItems = menu->CountItems();
+	if (numItems > 0) {
+		fDeviceMenuField->Menu()->SetEnabled(true);
+	} else {
+		fDeviceMenuField->Menu()->SetEnabled(false);
+	}
+
+}
+
+
+void
+EthernetSettingsView::_InterfaceAdded(const char* name)
+{
+	fInterfaces.AddItem(new BString(name));
+	fSettings.AddItem(new Settings(name));
+}
+
+
+void
+EthernetSettingsView::_InterfaceRemoved(const char* name)
+{
+	BString s;
+	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
+		if (fInterfaces.ItemAt(i)->Compare(name) == 0) {
+			delete fInterfaces.RemoveItemAt(i);
+			break;
+		}
+	}
+
+	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
+		if (strcmp(fSettings.ItemAt(i)->Name(), name) == 0) {
+			Settings* settings = fSettings.RemoveItemAt(i);
+			if (strcmp(settings->Name(), fCurrentSettings->Name()) == 0)
+				_ShowConfiguration((Settings*)NULL);
+			delete settings;
+			break;
 		}
 	}
 }
