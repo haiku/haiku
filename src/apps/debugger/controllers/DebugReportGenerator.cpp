@@ -82,6 +82,9 @@ DebugReportGenerator::~DebugReportGenerator()
 
 	if (fCurrentBlock != NULL)
 		fCurrentBlock->ReleaseReference();
+
+	if (fTeamDataSem >= 0)
+		delete_sem(fTeamDataSem);
 }
 
 
@@ -494,11 +497,12 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BFile& _output,
 
 		locker.Unlock();
 		fTraceWaitingThread = thread;
-		error = acquire_sem(fTeamDataSem);
-		if (error == B_INTERRUPTED)
-			continue;
-		else if (error != B_OK)
-			return error;
+		do {
+			error = acquire_sem(fTeamDataSem);
+		} while (error == B_INTERRUPTED);
+
+		if (error != B_OK)
+			break;
 
 		locker.Lock();
 	}
@@ -630,8 +634,10 @@ DebugReportGenerator::_DumpFunctionDisassembly(BFile& _output,
 				do {
 					error = acquire_sem(fTeamDataSem);
 				} while (error == B_INTERRUPTED);
+
 				if (error != B_OK)
 					return error;
+
 				teamLocker.Lock();
 				break;
 			}
@@ -687,6 +693,9 @@ DebugReportGenerator::_DumpStackFrameMemory(BFile& _output,
 		do {
 			error = acquire_sem(fTeamDataSem);
 		} while (error == B_INTERRUPTED);
+
+		if (error != B_OK)
+			return error;
 	}
 
 	BString data("\t\t\tFrame memory:\n");
