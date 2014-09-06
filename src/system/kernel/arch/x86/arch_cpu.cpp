@@ -59,14 +59,6 @@ static const struct cpu_vendor_info vendor_info[VENDOR_NUM] = {
 	{ "NSC", { "Geode by NSC" } },
 };
 
-#define CR0_CACHE_DISABLE		(1UL << 30)
-#define CR0_NOT_WRITE_THROUGH	(1UL << 29)
-#define CR0_FPU_EMULATION		(1UL << 2)
-#define CR0_MONITOR_FPU			(1UL << 1)
-
-#define CR4_OS_FXSR				(1UL << 9)
-#define CR4_OS_XMM_EXCEPTION	(1UL << 10)
-
 #define K8_SMIONCMPHALT			(1ULL << 27)
 #define K8_C1EONCMPHALT			(1ULL << 28)
 
