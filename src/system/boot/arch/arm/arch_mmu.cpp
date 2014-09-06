@@ -110,12 +110,6 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		kLoaderBaseAddress + 0x11FFFFF,
 		ARM_MMU_L2_FLAG_C,
 	},
-	{
-		"RAM_initrd", // initrd
-		HAIKU_BOARD_LOADER_UIBASE,
-		HAIKU_BOARD_LOADER_UIBASE + 0x500000,
-		ARM_MMU_L2_FLAG_C,
-	},
 
 #ifdef FB_BASE
 	{
@@ -548,8 +542,10 @@ mmu_init_for_kernel(void)
 	TRACE(("mmu_init_for_kernel\n"));
 
 	// save the memory we've physically allocated
-	gKernelArgs.physical_allocated_range[0].size
-		= sNextPhysicalAddress - gKernelArgs.physical_allocated_range[0].start;
+	int index = gKernelArgs.num_physical_allocated_ranges;
+	gKernelArgs.physical_allocated_range[index].start = SDRAM_BASE;
+	gKernelArgs.physical_allocated_range[index].size = sNextPhysicalAddress - SDRAM_BASE;
+	gKernelArgs.num_physical_allocated_ranges++;
 
 	// Save the memory we've virtually allocated (for the kernel and other
 	// stuff)
@@ -618,11 +614,6 @@ mmu_init(void)
 	gKernelArgs.physical_memory_range[0].start = SDRAM_BASE;
 	gKernelArgs.physical_memory_range[0].size = highestRAMAddress - SDRAM_BASE;
 	gKernelArgs.num_physical_memory_ranges = 1;
-
-	gKernelArgs.physical_allocated_range[0].start = SDRAM_BASE;
-	gKernelArgs.physical_allocated_range[0].size = 0;
-	gKernelArgs.num_physical_allocated_ranges = 1;
-		// remember the start of the allocated physical pages
 
 	init_page_directory();
 

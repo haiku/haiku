@@ -134,6 +134,9 @@ _start(void)
 	// Flick on "OK" led, use pre-mmu firmware base
 	gpio_write(gPeripheralBase + GPIO_BASE, 16, 0);
 
+	// Reserve memory for boot archive before switching on MMU
+	insert_physical_allocated_range(BOOT_ARCHIVE_BASE, BOOT_ARCHIVE_SIZE);
+
 	// To debug mmu, enable serial_init above me!
 	mmu_init();
 

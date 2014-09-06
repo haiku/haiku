@@ -267,7 +267,19 @@ start_raw(int argc, const char **argv)
 			dump_fdt(gFDT);
 	}
 	
+	if (args.platform.boot_tgz_size > 0) {
+		insert_physical_allocated_range((addr_t)args.platform.boot_tgz_data,
+			args.platform.boot_tgz_size);
+	}
+
 	mmu_init();
+
+	// Handle our tarFS post-mmu
+	if (args.platform.boot_tgz_size > 0) {
+		args.platform.boot_tgz_data = (void*)mmu_map_physical_memory((addr_t)
+			args.platform.boot_tgz_data, args.platform.boot_tgz_size,
+			kDefaultPageFlags);
+	}
 
 	// wait a bit to give the user the opportunity to press a key
 //	spin(750000);
