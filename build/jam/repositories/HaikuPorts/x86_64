@@ -4,7 +4,7 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
-	ca_root_certificates-2014_04_08-1
+	ca_root_certificates-2014_04_08-2
 	texi2html-1.82-2
 	timgmsoundfont-2004_01_24-4
 	wqy_microhei-0.2.0~beta-3
@@ -30,6 +30,7 @@ RemotePackageRepository HaikuPorts
 	curl_devel-7.37.0-1
 	cvs-1.12.13.1-6
 	doxygen-1.6.3-4
+	dtc-1.4.0-1
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
 	findutils-4.4.2-1
@@ -43,8 +44,8 @@ RemotePackageRepository HaikuPorts
 	gcc-4.8.3_2014_07_26-2
 	gcc_syslibs-4.8.3_2014_07_26-2
 	gcc_syslibs_devel-4.8.3_2014_07_26-2
-	gettext-0.18.1.1-5
-	gettext_libintl-0.18.1.1-5
+	gettext-0.18.1.1-6
+	gettext_libintl-0.18.1.1-6
 	giflib-5.1.0-1
 	giflib_devel-5.1.0-1
 	git-1.8.3.4-3
@@ -57,6 +58,8 @@ RemotePackageRepository HaikuPorts
 	glew-1.11.0-1
 	glew_devel-1.11.0-1
 	glew_util-1.11.0-1
+	glib2-2.38.1-3
+	glib2_devel-2.38.1-3
 	glu-9.0.0-2
 	glu_devel-9.0.0-2
 	gmp-6.0.0-1
@@ -97,6 +100,8 @@ RemotePackageRepository HaikuPorts
 	libpcre_devel-8.21-5
 	libpng-1.5.12-3
 	libpng_devel-1.5.12-3
+	libsdl-1.2.15-6
+	libsdl_devel-1.2.15-6
 	libsolv-0.3.0_haiku_2013_10_01-1
 	libsolv_devel-0.3.0_haiku_2013_10_01-1
 	libtheora-1.1.1-2
@@ -138,10 +143,13 @@ RemotePackageRepository HaikuPorts
 	p7zip-9.20.1-5
 	pe-2.4.4_2014_05_29-1
 	perl-5.18.2-2
+	pixman-0.32.6-1
+	pixman_devel-0.32.6-1
 	pkgconfig-0.27.1-2
 	python-2.7.6-2
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
+	qemu-2.1.0-1
 	qrencode-3.3.0-1
 	qrencode_devel-3.3.0-1
 	readline-6.3-2
@@ -191,6 +199,7 @@ RemotePackageRepository HaikuPorts
 	curl
 	cvs
 	doxygen
+	dtc
 	expat
 	findutils
 	ffmpeg
@@ -203,6 +212,7 @@ RemotePackageRepository HaikuPorts
 	giflib
 	git
 	glew
+	glib2
 	glu
 	gmp
 	gperf
@@ -226,6 +236,7 @@ RemotePackageRepository HaikuPorts
 	libogg
 	libpcre
 	libpng
+	libsdl
 	libsolv
 	libtheora
 	libtool
@@ -251,10 +262,12 @@ RemotePackageRepository HaikuPorts
 	p7zip
 	pe
 	perl
+	pixman
 	pkgconfig
 	python
 	python_twisted
 	python_zope.interface
+	qemu
 	qrencode
 	readline
 	ruby
