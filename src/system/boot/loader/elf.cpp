@@ -273,19 +273,10 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 		secondRegion = &image->text_region;
 	}
 
-	// Check whether the segments have an unreasonable amount of unused space
-	// inbetween.
-	totalSize = secondRegion->start + secondRegion->size - firstRegion->start;
-	if (totalSize > image->text_region.size + image->data_region.size
-		+ 32 * 1024) {
-		dprintf("Too much space between segments %" B_PRIuSIZE "!\n", totalSize);
-		status = B_BAD_DATA;
-		goto error1;
-	}
-
 	// The kernel and the modules are relocatable, thus AllocateRegion()
 	// can automatically allocate an address, but shall prefer the specified
 	// base address.
+	totalSize = secondRegion->start + secondRegion->size - firstRegion->start;
 	if (Class::AllocateRegion(&firstRegion->start, totalSize,
 			B_READ_AREA | B_WRITE_AREA, &mappedRegion) != B_OK) {
 		status = B_NO_MEMORY;
