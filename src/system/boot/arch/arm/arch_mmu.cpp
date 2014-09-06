@@ -273,10 +273,6 @@ get_next_page_table(uint32 type)
 			size = ARM_MMU_L2_FINE_TABLE_SIZE;
 			entryCount = ARM_MMU_L2_FINE_ENTRY_COUNT;
 			break;
-		case ARM_MMU_L1_TYPE_SECTION:
-			// TODO: Figure out parameters for section types.
-			size = 16384;
-			break;
 		default:
 			panic("asked for unknown page table type: %#" B_PRIx32 "\n", type);
 			return NULL;
