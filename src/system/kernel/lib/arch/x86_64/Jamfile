@@ -21,6 +21,7 @@ KernelMergeObject kernel_os_arch_$(TARGET_ARCH).o :
 ;
 
 SEARCH_SOURCE += [ FDirName $(posixSources) arch $(TARGET_ARCH) ] ;
+SEARCH_SOURCE += [ FDirName $(posixSources) string arch $(TARGET_ARCH) ] ;
 
 KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
 	siglongjmp.S
@@ -28,12 +29,8 @@ KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
 	kernel_longjmp_return.c
 	kernel_setjmp_save_sigs.c
 
-	arch_string.S
+	arch_string.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
-# Explicitly tell the build system that arch_string.S includes the generated
-# asm_offsets.h.
-Includes [ FGristFiles arch_string.S ]
-	: <src!system!kernel!arch!x86>asm_offsets.h ;

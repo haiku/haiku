@@ -105,9 +105,6 @@ static const size_t kDoubleFaultStackSize = 4096;	// size per CPU
 static x86_cpu_module_info* sCpuModule;
 
 
-extern int memcpy_end;
-extern int memset_end;
-
 /* CPU topology information */
 static uint32 (*sGetCPUTopologyID)(int currentCPU);
 static uint32 sHierarchyMask[CPU_TOPOLOGY_LEVELS];
@@ -1154,13 +1151,6 @@ arch_cpu_init_post_modules(kernel_args* args)
 		call_all_cpus(&init_mtrrs, NULL);
 	}
 
-	// put the optimized functions into the commpage
-	size_t memcpyLen = (addr_t)&memcpy_end - (addr_t)memcpy;
-	addr_t memcpyPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY,
-		(const void*)memcpy, memcpyLen);
-	size_t memsetLen = (addr_t)&memset_end - (addr_t)memset;
-	addr_t memsetPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMSET,
-		(const void*)memset, memsetLen);
 	size_t threadExitLen = (addr_t)x86_end_userspace_thread_exit
 		- (addr_t)x86_userspace_thread_exit;
 	addr_t threadExitPosition = fill_commpage_entry(
@@ -1169,10 +1159,7 @@ arch_cpu_init_post_modules(kernel_args* args)
 
 	// add the functions to the commpage image
 	image_id image = get_commpage_image();
-	elf_add_memory_image_symbol(image, "commpage_memcpy", memcpyPosition,
-		memcpyLen, B_SYMBOL_TYPE_TEXT);
-	elf_add_memory_image_symbol(image, "commpage_memset", memsetPosition,
-		memsetLen, B_SYMBOL_TYPE_TEXT);
+
 	elf_add_memory_image_symbol(image, "commpage_thread_exit",
 		threadExitPosition, threadExitLen, B_SYMBOL_TYPE_TEXT);
 
