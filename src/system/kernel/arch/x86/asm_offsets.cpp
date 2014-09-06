@@ -79,12 +79,6 @@ dummy()
 	DEFINE_OFFSET_MACRO(SYSCALL_INFO, syscall_info, function);
 	DEFINE_OFFSET_MACRO(SYSCALL_INFO, syscall_info, parameter_size);
 
-	// struct x86_optimized_functions
-	DEFINE_OFFSET_MACRO(X86_OPTIMIZED_FUNCTIONS, x86_optimized_functions,
-		memcpy);
-	DEFINE_OFFSET_MACRO(X86_OPTIMIZED_FUNCTIONS, x86_optimized_functions,
-		memset);
-
 	// struct signal_frame_data
 	DEFINE_SIZEOF_MACRO(SIGNAL_FRAME_DATA, signal_frame_data);
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, info);

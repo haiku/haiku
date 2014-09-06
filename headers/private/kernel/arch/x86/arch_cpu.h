@@ -262,13 +262,6 @@ typedef struct x86_mtrr_info {
 	uint8	type;
 } x86_mtrr_info;
 
-typedef struct x86_optimized_functions {
-	void 	(*memcpy)(void* dest, const void* source, size_t count);
-	void*	memcpy_end;
-	void 	(*memset)(void* dest, int value, size_t count);
-	void*	memset_end;
-} x86_optimized_functions;
-
 typedef struct x86_cpu_module_info {
 	module_info	info;
 	uint32		(*count_mtrrs)(void);
@@ -280,8 +273,6 @@ typedef struct x86_cpu_module_info {
 					uint8* _type);
 	void		(*set_mtrrs)(uint8 defaultType, const x86_mtrr_info* infos,
 					uint32 count);
-
-	void		(*get_optimized_functions)(x86_optimized_functions* functions);
 } x86_cpu_module_info;
 
 // features

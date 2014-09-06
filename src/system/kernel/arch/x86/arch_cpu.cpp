@@ -105,17 +105,8 @@ static const size_t kDoubleFaultStackSize = 4096;	// size per CPU
 static x86_cpu_module_info* sCpuModule;
 
 
-extern "C" void memcpy_generic(void* dest, const void* source, size_t count);
-extern int memcpy_generic_end;
-extern "C" void memset_generic(void* dest, int value, size_t count);
-extern int memset_generic_end;
-
-x86_optimized_functions gOptimizedFunctions = {
-	memcpy_generic,
-	&memcpy_generic_end,
-	memset_generic,
-	&memset_generic_end
-};
+extern int memcpy_end;
+extern int memset_end;
 
 /* CPU topology information */
 static uint32 (*sGetCPUTopologyID)(int currentCPU);
@@ -1163,33 +1154,13 @@ arch_cpu_init_post_modules(kernel_args* args)
 		call_all_cpus(&init_mtrrs, NULL);
 	}
 
-	// get optimized functions from the CPU module
-	if (sCpuModule != NULL && sCpuModule->get_optimized_functions != NULL) {
-		x86_optimized_functions functions;
-		memset(&functions, 0, sizeof(functions));
-
-		sCpuModule->get_optimized_functions(&functions);
-
-		if (functions.memcpy != NULL) {
-			gOptimizedFunctions.memcpy = functions.memcpy;
-			gOptimizedFunctions.memcpy_end = functions.memcpy_end;
-		}
-
-		if (functions.memset != NULL) {
-			gOptimizedFunctions.memset = functions.memset;
-			gOptimizedFunctions.memset_end = functions.memset_end;
-		}
-	}
-
 	// put the optimized functions into the commpage
-	size_t memcpyLen = (addr_t)gOptimizedFunctions.memcpy_end
-		- (addr_t)gOptimizedFunctions.memcpy;
+	size_t memcpyLen = (addr_t)&memcpy_end - (addr_t)memcpy;
 	addr_t memcpyPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY,
-		(const void*)gOptimizedFunctions.memcpy, memcpyLen);
-	size_t memsetLen = (addr_t)gOptimizedFunctions.memset_end
-		- (addr_t)gOptimizedFunctions.memset;
+		(const void*)memcpy, memcpyLen);
+	size_t memsetLen = (addr_t)&memset_end - (addr_t)memset;
 	addr_t memsetPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMSET,
-		(const void*)gOptimizedFunctions.memset, memsetLen);
+		(const void*)memset, memsetLen);
 	size_t threadExitLen = (addr_t)x86_end_userspace_thread_exit
 		- (addr_t)x86_userspace_thread_exit;
 	addr_t threadExitPosition = fill_commpage_entry(

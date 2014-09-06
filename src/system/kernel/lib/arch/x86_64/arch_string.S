@@ -6,11 +6,9 @@
 
 #include <asm_defs.h>
 
-#include "asm_offsets.h"
-
 
 .align 8
-FUNCTION(memcpy_generic):
+FUNCTION(memcpy):
 	push	%rbp
 	movq	%rsp, %rbp
 
@@ -59,12 +57,12 @@ FUNCTION(memcpy_generic):
 
 	pop		%rbp
 	ret
-FUNCTION_END(memcpy_generic)
-SYMBOL(memcpy_generic_end):
+FUNCTION_END(memcpy)
+SYMBOL(memcpy_end):
 
 
 .align 8
-FUNCTION(memset_generic):
+FUNCTION(memset):
 	push	%rbp
 	movq	%rsp, %rbp
 
@@ -82,15 +80,6 @@ FUNCTION(memset_generic):
 	movq	%r8, %rax
 	pop		%rbp
 	ret
-FUNCTION_END(memset_generic)
-SYMBOL(memset_generic_end):
-
-
-FUNCTION(memcpy):
-	jmp		*(gOptimizedFunctions + X86_OPTIMIZED_FUNCTIONS_memcpy)
-FUNCTION_END(memcpy)
-
-FUNCTION(memset):
-	jmp		*(gOptimizedFunctions + X86_OPTIMIZED_FUNCTIONS_memset)
 FUNCTION_END(memset)
+SYMBOL(memset_end):
 
