@@ -111,12 +111,6 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		ARM_MMU_L2_FLAG_C,
 	},
 	{
-		"RAM_stack", // stack
-		HAIKU_BOARD_LOADER_STACK_BASE,
-		HAIKU_BOARD_LOADER_STACK_BASE + 0xe00000,
-		ARM_MMU_L2_FLAG_C,
-	},
-	{
 		"RAM_initrd", // initrd
 		HAIKU_BOARD_LOADER_UIBASE,
 		HAIKU_BOARD_LOADER_UIBASE + 0x500000,

@@ -20,9 +20,6 @@ HAIKU_BOARD_LOADER_FAKE_OS = netbsd ;
 # (must be different than real load address)
 HAIKU_BOARD_LOADER_UIBASE = 0x84000000 ;
 
-HAIKU_BOARD_LOADER_STACK_BASE = 0x84000000 ;
-
-
 #
 # mmc/SD image
 #

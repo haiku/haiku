@@ -2,8 +2,6 @@
 
 #include <asm_defs.h>
 
-#include <board_config.h>
-
 	.text
 
 /*
@@ -59,10 +57,7 @@ SYMBOL(_start_common):
 	mov	r4, r4
 	mov	r4, r4
 
-
-
-
-	ldr	sp,=SDRAM_BASE + KSTACK_TOP
+	ldr	sp,=__stack_top
 	ldrb	r4,gUBootOS
 	cmp	r4,#0
 	beq	start_raw
@@ -75,6 +70,7 @@ SYMBOL_END(_start_common)
 //XXX: doesn't seem to work
 //.data
 
+.global __stack_end, __stack_start
 
 SYMBOL(gUBootGlobalData):
 	.long   0

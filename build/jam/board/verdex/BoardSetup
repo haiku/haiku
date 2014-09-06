@@ -19,8 +19,6 @@ HAIKU_BOARD_LOADER_FAKE_OS = netbsd ;
 # (must be different than real load address)
 HAIKU_BOARD_LOADER_UIBASE = 0xa4000000 ;
 
-HAIKU_BOARD_LOADER_STACK_BASE = 0xa4000000 ;
-
 #
 # Flash image
 #

@@ -20,8 +20,6 @@ HAIKU_BOARD_LOADER_FAKE_OS = netbsd ;
 # (must be different than real load address)
 HAIKU_BOARD_LOADER_UIBASE = 0x82800000 ;
 
-HAIKU_BOARD_LOADER_STACK_BASE = 0x81a00000 ;
-
 #
 # Flash image
 #
@@ -64,7 +62,6 @@ HAIKU_BOARD_SDIMAGE_FILES =
 # gcc flags for the specific cpu
 
 local flags = -mcpu=cortex-a8 -mfpu=vfpv3 -mfloat-abi=hard
-	   -DHAIKU_BOARD_LOADER_STACK_BASE=$(HAIKU_BOARD_LOADER_STACK_BASE)
 	   -DHAIKU_BOARD_LOADER_UIBASE=$(HAIKU_BOARD_LOADER_UIBASE) ;
 
 HAIKU_ASFLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;

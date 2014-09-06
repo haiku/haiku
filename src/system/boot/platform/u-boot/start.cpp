@@ -50,7 +50,7 @@ typedef struct uboot_gd {
 // GCC defined globals
 extern void (*__ctor_list)(void);
 extern void (*__ctor_end)(void);
-extern uint8 __bss_start;
+extern uint8 __bss_start, __bss_end;
 extern uint8 _end;
 
 extern "C" int main(stage2_args *args);
@@ -72,7 +72,7 @@ static uint32 sBootOptions;
 static void
 clear_bss(void)
 {
-	memset(&__bss_start, 0, &_end - &__bss_start);
+	memset(&__bss_start, 0, &__bss_end - &__bss_start);
 }
 
 
