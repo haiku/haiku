@@ -34,7 +34,8 @@ show_memory_totals(void)
 		used = info.used_pages * 4;
 	}
 
-	printf("memory: total: %4ldKB, used: %4ldKB, left: %4ldKB\n", max, used, max - used);
+	printf("memory: total: %4" B_PRId32 "KB, used: %4" B_PRId32 "KB, left: %4"
+		B_PRId32 "KB\n", max, used, max - used);
 }
 
 
@@ -46,21 +47,23 @@ list_areas_for_id(team_id id)
 	area_info areaInfo;
 
 	if (id != 1 && get_team_info(id, &teamInfo) == B_BAD_TEAM_ID) {
-		printf("\nteam %ld unknown\n", id);
+		printf("\nteam %" B_PRId32 " unknown\n", id);
 		return;
 	} else if (id == 1)
 		strcpy(teamInfo.args, "KERNEL SPACE");
 
-	printf("\n%s (team %ld)\n", teamInfo.args, id);
-	printf("   ID                             name   address     size   alloc. #-cow  #-in #-out\n");
-	printf("------------------------------------------------------------------------------------\n");
+	printf("\n%s (team %" B_PRId32 ")\n", teamInfo.args, id);
+	printf("   ID                             name   address     size   alloc."
+		" #-cow  #-in #-out\n");
+	printf("------------------------------------------------------------------"
+		"------------------\n");
 
 	while (get_next_area_info(id, &cookie, &areaInfo) == B_OK) {
-		printf("%5ld %32s  %08lx %8lx %8lx %5ld %5ld %5ld\n",
+		printf("%5" B_PRId32 " %32s  %p %8" B_PRIxSIZE " %8" B_PRIx32 " %5"
+			B_PRId32 " %5" B_PRId32 " %5" B_PRId32 "\n",
 			areaInfo.area,
 			areaInfo.name,
-//			(addr_t)areaInfo.address,
-			(uint32)areaInfo.address,
+			areaInfo.address,
 			areaInfo.size,
 			areaInfo.ram_size,
 			areaInfo.copy_count,
