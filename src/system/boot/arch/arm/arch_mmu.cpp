@@ -59,7 +59,7 @@ TODO:
 
 
 // 8 MB for the kernel, kernel args, modules, driver settings, ...
-static const size_t kMaxKernelSize = KERNEL_SIZE;
+static const size_t kMaxKernelSize = 0x800000;
 
 // Base address for loader
 static const size_t kLoaderBaseAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
