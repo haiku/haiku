@@ -358,7 +358,6 @@ EthernetSettingsView::_BuildInterfacesMenu()
 	} else {
 		fDeviceMenuField->Menu()->SetEnabled(false);
 	}
-
 }
 
 
@@ -381,7 +380,7 @@ EthernetSettingsView::_InterfaceRemoved(const char* name)
 		}
 	}
 
-	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
+	for (int32 i = 0; i < fSettings.CountItems(); i++) {
 		if (strcmp(fSettings.ItemAt(i)->Name(), name) == 0) {
 			Settings* settings = fSettings.RemoveItemAt(i);
 			if (strcmp(settings->Name(), fCurrentSettings->Name()) == 0)
