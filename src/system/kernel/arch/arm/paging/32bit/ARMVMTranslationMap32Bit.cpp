@@ -262,6 +262,62 @@ ARMVMTranslationMap32Bit::Unmap(addr_t start, addr_t end)
 }
 
 
+status_t
+ARMVMTranslationMap32Bit::DebugMarkRangePresent(addr_t start, addr_t end,
+	bool markPresent)
+{
+#if 0
+	start = ROUNDDOWN(start, B_PAGE_SIZE);
+	if (start >= end)
+		return B_OK;
+
+	page_directory_entry *pd = fPagingStructures->pgdir_virt;
+
+	do {
+		int index = VADDR_TO_PDENT(start);
+		if ((pd[index] & X86_PDE_PRESENT) == 0) {
+			// no page table here, move the start up to access the next page
+			// table
+			start = ROUNDUP(start + 1, kPageTableAlignment);
+			continue;
+		}
+
+		Thread* thread = thread_get_current_thread();
+		ThreadCPUPinner pinner(thread);
+
+		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
+			pd[index] & X86_PDE_ADDRESS_MASK);
+
+		for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
+				index++, start += B_PAGE_SIZE) {
+			if ((pt[index] & X86_PTE_PRESENT) == 0) {
+				if (!markPresent)
+					continue;
+
+				X86PagingMethod32Bit::SetPageTableEntryFlags(&pt[index],
+					X86_PTE_PRESENT);
+			} else {
+				if (markPresent)
+					continue;
+
+				page_table_entry oldEntry
+					= X86PagingMethod32Bit::ClearPageTableEntryFlags(&pt[index],
+						X86_PTE_PRESENT);
+
+				if ((oldEntry & X86_PTE_ACCESSED) != 0) {
+					// Note, that we only need to invalidate the address, if the
+					// accessed flags was set, since only then the entry could
+					// have been in any TLB.
+					InvalidatePage(start);
+				}
+			}
+		}
+	} while (start != 0 && start < end);
+#endif
+	return B_OK;
+}
+
+
 /*!	Caller must have locked the cache of the page to be unmapped.
 	This object shouldn't be locked.
 */
@@ -579,12 +635,12 @@ ARMVMTranslationMap32Bit::Query(addr_t va, phys_addr_t *_physical,
 
 #if 0 //IRA
 	// read in the page state flags
-	if ((entry & ARM_PTE_USER) != 0) {
-		*_flags |= ((entry & ARM_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
+	if ((entry & X86_PTE_USER) != 0) {
+		*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
 			| B_READ_AREA;
 	}
 
-	*_flags |= ((entry & ARM_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
+	*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
 		| B_KERNEL_READ_AREA
 		| ((entry & ARM_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
 		| ((entry & ARM_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
@@ -627,16 +683,16 @@ ARMVMTranslationMap32Bit::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 
 #if 0
 	// read in the page state flags
-	if ((entry & ARM_PTE_USER) != 0) {
-		*_flags |= ((entry & ARM_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
+	if ((entry & X86_PTE_USER) != 0) {
+		*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
 			| B_READ_AREA;
 	}
 
-	*_flags |= ((entry & ARM_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
+	*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
 		| B_KERNEL_READ_AREA
-		| ((entry & ARM_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
-		| ((entry & ARM_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
-		| ((entry & ARM_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
+		| ((entry & X86_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
+		| ((entry & X86_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
+		| ((entry & X86_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 #else
 	*_flags = B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA;
 	if (*_physical != 0)
@@ -733,8 +789,8 @@ ARMVMTranslationMap32Bit::ClearFlags(addr_t va, uint32 flags)
 		return B_OK;
 	}
 #if 0 //IRA
-	uint32 flagsToClear = ((flags & PAGE_MODIFIED) ? ARM_PTE_DIRTY : 0)
-		| ((flags & PAGE_ACCESSED) ? ARM_PTE_ACCESSED : 0);
+	uint32 flagsToClear = ((flags & PAGE_MODIFIED) ? X86_PTE_DIRTY : 0)
+		| ((flags & PAGE_ACCESSED) ? X86_PTE_ACCESSED : 0);
 #else
 	uint32 flagsToClear = 0;
 #endif
@@ -820,7 +876,7 @@ ARMVMTranslationMap32Bit::ClearAccessedAndModified(VMArea* area, addr_t address,
 
 	pinner.Unlock();
 
-	_modified = true /* (oldEntry & ARM_PTE_DIRTY) != 0 */; // XXX IRA
+	_modified = true /* (oldEntry & X86_PTE_DIRTY) != 0 */; // XXX IRA
 
 	if (true /*(oldEntry & ARM_PTE_ACCESSED) != 0*/) {
 		// Note, that we only need to invalidate the address, if the

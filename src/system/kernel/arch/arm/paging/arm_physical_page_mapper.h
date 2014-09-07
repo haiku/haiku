@@ -10,12 +10,11 @@
 
 
 struct kernel_args;
-struct vm_translation_map_ops;
 
 
 class TranslationMapPhysicalPageMapper {
 public:
-	virtual						~TranslationMapPhysicalPageMapper();
+	virtual						~TranslationMapPhysicalPageMapper() { }
 
 	virtual	void				Delete() = 0;
 
@@ -26,8 +25,6 @@ public:
 
 class ARMPhysicalPageMapper : public VMPhysicalPageMapper {
 public:
-	virtual						~ARMPhysicalPageMapper();
-
 	virtual	status_t			CreateTranslationMapPhysicalPageMapper(
 									TranslationMapPhysicalPageMapper** _mapper)
 										= 0;

@@ -32,7 +32,7 @@ public:
 									addr_t virtualAddress,
 									phys_addr_t physicalAddress,
 									uint8 attributes,
-									phys_addr_t (*get_free_page)(kernel_args*));
+									page_num_t (*get_free_page)(kernel_args*));
 
 	virtual	bool				IsKernelPageAccessible(addr_t virtualAddress,
 									uint32 protection);
@@ -77,6 +77,8 @@ private:
 			friend struct PhysicalPageSlotPool;
 
 private:
+	inline	int32				_GetInitialPoolCount();
+
 	static	void				_EarlyPreparePageTables(
 									page_table_entry* pageTables,
 									addr_t address, size_t size);
@@ -150,7 +152,7 @@ ARMPagingMethod32Bit::MemoryTypeToPageTableEntryFlags(uint32 memoryType)
 	// (usually only write-combining for the frame buffer).
 	switch (memoryType) {
 		case B_MTR_UC:
-			return ARM_PTE_CACHING_DISABLED | ARM_PTE_WRITE_THROUGH;
+			return X86_PTE_CACHING_DISABLED | X86_PTE_WRITE_THROUGH;
 
 		case B_MTR_WC:
 			// ARM_PTE_WRITE_THROUGH would be closer, but the combination with
@@ -158,7 +160,7 @@ ARMPagingMethod32Bit::MemoryTypeToPageTableEntryFlags(uint32 memoryType)
 			return 0;
 
 		case B_MTR_WT:
-			return ARM_PTE_WRITE_THROUGH;
+			return X86_PTE_WRITE_THROUGH;
 
 		case B_MTR_WP:
 		case B_MTR_WB:

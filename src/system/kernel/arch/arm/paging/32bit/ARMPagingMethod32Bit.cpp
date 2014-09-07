@@ -16,6 +16,7 @@
 
 #include <AutoDeleter.h>
 
+#include <arch/smp.h>
 #include <arch_system_info.h>
 #include <boot/kernel_args.h>
 #include <int.h>
@@ -37,11 +38,14 @@
 #endif
 
 
+#define MAX_INITIAL_POOLS	\
+	(ROUNDUP(SMP_MAX_CPUS * TOTAL_SLOTS_PER_CPU + EXTRA_SLOTS, 1024) / 1024)
+
+
 using ARMLargePhysicalPageMapper::PhysicalPageSlot;
 
 
-// #pragma mark - ARMPagingMethod32Bit::PhysicalPageSlotPool
-
+// #pragma mark - X86PagingMethod32Bit::PhysicalPageSlotPool
 
 struct ARMPagingMethod32Bit::PhysicalPageSlotPool
 	: ARMLargePhysicalPageMapper::PhysicalPageSlotPool {
@@ -61,7 +65,7 @@ public:
 									addr_t virtualAddress);
 
 public:
-	static	PhysicalPageSlotPool sInitialPhysicalPagePool;
+	static	PhysicalPageSlotPool sInitialPhysicalPagePool[MAX_INITIAL_POOLS];
 
 private:
 	area_id					fDataArea;
@@ -72,7 +76,8 @@ private:
 
 
 ARMPagingMethod32Bit::PhysicalPageSlotPool
-	ARMPagingMethod32Bit::PhysicalPageSlotPool::sInitialPhysicalPagePool;
+	ARMPagingMethod32Bit::PhysicalPageSlotPool::sInitialPhysicalPagePool[
+		MAX_INITIAL_POOLS];
 
 
 ARMPagingMethod32Bit::PhysicalPageSlotPool::~PhysicalPageSlotPool()
@@ -96,6 +101,11 @@ ARMPagingMethod32Bit::PhysicalPageSlotPool::InitInitial(kernel_args* args)
 	size_t areaSize = B_PAGE_SIZE + sizeof(PhysicalPageSlot[1024]);
 	page_table_entry* pageTable = (page_table_entry*)vm_allocate_early(args,
 		areaSize, ~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
+	if (pageTable == 0) {
+		panic("ARMPagingMethod32Bit::PhysicalPageSlotPool::InitInitial(): "
+			"Failed to allocate memory for page table!");
+		return B_ERROR;
+	}
 
 	// prepare the page table
 	_EarlyPreparePageTables(pageTable, virtualBase, 1024 * B_PAGE_SIZE);
@@ -263,31 +273,36 @@ status_t
 ARMPagingMethod32Bit::Init(kernel_args* args,
 	VMPhysicalPageMapper** _physicalPageMapper)
 {
-	TRACE("vm_translation_map_init: entry\n");
+	TRACE("X86PagingMethod32Bit::Init(): entry\n");
 
 	fKernelPhysicalPageDirectory = args->arch_args.phys_pgdir;
 	fKernelVirtualPageDirectory = (page_directory_entry*)
 		args->arch_args.vir_pgdir;
 
+#ifdef TRACE_X86_PAGING_METHOD_32_BIT
 	TRACE("page dir: %p (physical: %#" B_PRIx32 ")\n",
 		fKernelVirtualPageDirectory, fKernelPhysicalPageDirectory);
+#endif
 
 	ARMPagingStructures32Bit::StaticInit();
 
-	// create the initial pool for the physical page mapper
-	PhysicalPageSlotPool* pool
-		= new(&PhysicalPageSlotPool::sInitialPhysicalPagePool)
-			PhysicalPageSlotPool;
-	status_t error = pool->InitInitial(args);
-	if (error != B_OK) {
-		panic("ARMPagingMethod32Bit::Init(): Failed to create initial pool "
-			"for physical page mapper!");
-		return error;
+	// create the initial pools for the physical page mapper
+	int32 poolCount = _GetInitialPoolCount();
+	PhysicalPageSlotPool* pool = PhysicalPageSlotPool::sInitialPhysicalPagePool;
+
+	for (int32 i = 0; i < poolCount; i++) {
+		new(&pool[i]) PhysicalPageSlotPool;
+		status_t error = pool[i].InitInitial(args);
+		if (error != B_OK) {
+			panic("ARMPagingMethod32Bit::Init(): Failed to create initial pool "
+				"for physical page mapper!");
+			return error;
+		}
 	}
 
 	// create physical page mapper
-	large_memory_physical_page_ops_init(args, pool, fPhysicalPageMapper,
-		fKernelPhysicalPageMapper);
+	large_memory_physical_page_ops_init(args, pool, poolCount, sizeof(*pool),
+		fPhysicalPageMapper, fKernelPhysicalPageMapper);
 		// TODO: Select the best page mapper!
 
 	// enable global page feature if available
@@ -309,20 +324,21 @@ status_t
 ARMPagingMethod32Bit::InitPostArea(kernel_args* args)
 {
 	void *temp;
-	status_t error;
 	area_id area;
 
 	temp = (void*)fKernelVirtualPageDirectory;
-	area = create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS,
-		ARM_MMU_L1_TABLE_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA
-			| B_KERNEL_WRITE_AREA);
+	area = create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS, ARM_MMU_L1_TABLE_SIZE,
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (area < B_OK)
 		return area;
 
-	error = PhysicalPageSlotPool::sInitialPhysicalPagePool
-		.InitInitialPostArea(args);
-	if (error != B_OK)
-		return error;
+	int32 poolCount = _GetInitialPoolCount();
+	for (int32 i = 0; i < poolCount; i++) {
+		status_t error = PhysicalPageSlotPool::sInitialPhysicalPagePool[i]
+			.InitInitialPostArea(args);
+		if (error != B_OK)
+			return error;
+	}
 
 	return B_OK;
 }
@@ -358,7 +374,7 @@ get_free_pgtable(kernel_args* args)
 status_t
 ARMPagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 	phys_addr_t physicalAddress, uint8 attributes,
-	phys_addr_t (*get_free_page)(kernel_args*))
+	page_num_t (*get_free_page)(kernel_args*))
 {
 	// check to see if a page table exists for this range
 	int index = VADDR_TO_PDENT(virtualAddress);
@@ -404,9 +420,8 @@ ARMPagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 #if 0
 	// We only trust the kernel team's page directory. So switch to it first.
 	// Always set it to make sure the TLBs don't contain obsolete data.
-	uint32 physicalPageDirectory;
-	read_cr3(physicalPageDirectory);
-	write_cr3(fKernelPhysicalPageDirectory);
+	uint32 physicalPageDirectory = x86_read_cr3();
+	x86_write_cr3(fKernelPhysicalPageDirectory);
 
 	// get the page directory entry for the address
 	page_directory_entry pageDirectoryEntry;
@@ -433,12 +448,12 @@ ARMPagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 	page_table_entry pageTableEntry;
 	index = VADDR_TO_PTENT(virtualAddress);
 
-	if ((pageDirectoryEntry & ARM_PDE_PRESENT) != 0
+	if ((pageDirectoryEntry & X86_PDE_PRESENT) != 0
 			&& fPhysicalPageMapper != NULL) {
 		void* handle;
 		addr_t virtualPageTable;
 		status_t error = fPhysicalPageMapper->GetPageDebug(
-			pageDirectoryEntry & ARM_PDE_ADDRESS_MASK, &virtualPageTable,
+			pageDirectoryEntry & X86_PDE_ADDRESS_MASK, &virtualPageTable,
 			&handle);
 		if (error == B_OK) {
 			pageTableEntry = ((page_table_entry*)virtualPageTable)[index];
@@ -450,14 +465,14 @@ ARMPagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 
 	// switch back to the original page directory
 	if (physicalPageDirectory != fKernelPhysicalPageDirectory)
-		write_cr3(physicalPageDirectory);
+		x86_write_cr3(physicalPageDirectory);
 
-	if ((pageTableEntry & ARM_PTE_PRESENT) == 0)
+	if ((pageTableEntry & X86_PTE_PRESENT) == 0)
 		return false;
 
 	// present means kernel-readable, so check for writable
 	return (protection & B_KERNEL_WRITE_AREA) == 0
-		|| (pageTableEntry & ARM_PTE_WRITABLE) != 0;
+		|| (pageTableEntry & X86_PTE_WRITABLE) != 0;
 #endif
 	//IRA: fix the above!
 	return true;
@@ -487,21 +502,30 @@ ARMPagingMethod32Bit::PutPageTableEntryInTable(page_table_entry* entry,
 	page_table_entry page = (physicalAddress & ARM_PTE_ADDRESS_MASK)
 		| ARM_MMU_L2_TYPE_SMALLEXT;
 #if 0 //IRA
-		| ARM_PTE_PRESENT | (globalPage ? ARM_PTE_GLOBAL : 0)
+		| X86_PTE_PRESENT | (globalPage ? X86_PTE_GLOBAL : 0)
 		| MemoryTypeToPageTableEntryFlags(memoryType);
 
 	// if the page is user accessible, it's automatically
 	// accessible in kernel space, too (but with the same
 	// protection)
 	if ((attributes & B_USER_PROTECTION) != 0) {
-		page |= ARM_PTE_USER;
+		page |= X86_PTE_USER;
 		if ((attributes & B_WRITE_AREA) != 0)
-			page |= ARM_PTE_WRITABLE;
+			page |= X86_PTE_WRITABLE;
 	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
-		page |= ARM_PTE_WRITABLE;
+		page |= X86_PTE_WRITABLE;
 #endif
 	// put it in the page table
 	*(volatile page_table_entry*)entry = page;
+}
+
+
+inline int32
+ARMPagingMethod32Bit::_GetInitialPoolCount()
+{
+	int32 requiredSlots = smp_get_num_cpus() * TOTAL_SLOTS_PER_CPU
+			+ EXTRA_SLOTS;
+	return (requiredSlots + 1023) / 1024;
 }
 
 

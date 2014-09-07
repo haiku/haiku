@@ -35,7 +35,6 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_atomic32.cpp
 
 	# paging
-	arm_physical_page_mapper.cpp
 	arm_physical_page_mapper_large_memory.cpp
 	ARMPagingMethod.cpp
 	ARMPagingStructures.cpp

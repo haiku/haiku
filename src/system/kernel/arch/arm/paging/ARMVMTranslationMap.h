@@ -9,6 +9,11 @@
 #include <vm/VMTranslationMap.h>
 
 
+#if __GNUC__ < 4
+#define final
+#endif
+
+
 #define PAGE_INVALIDATE_CACHE_SIZE 64
 
 
@@ -22,12 +27,12 @@ struct ARMVMTranslationMap : VMTranslationMap {
 
 			status_t			Init(bool kernel);
 
-	virtual	bool 				Lock();
-	virtual	void				Unlock();
+	virtual	bool 				Lock() final;
+	virtual	void				Unlock() final;
 
-	virtual	addr_t				MappedSize() const;
+	virtual	addr_t				MappedSize() const final;
 
-	virtual	void				Flush();
+	virtual	void				Flush() final;
 
 	virtual	ARMPagingStructures* PagingStructures() const = 0;
 

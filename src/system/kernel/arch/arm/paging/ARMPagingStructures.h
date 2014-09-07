@@ -18,7 +18,7 @@
 
 
 struct ARMPagingStructures : DeferredDeletable {
-	uint32						pgdir_phys;
+	phys_addr_t					pgdir_phys;
 	int32						ref_count;
 	CPUSet						active_on_cpus;
 		// mask indicating on which CPUs the map is currently used
