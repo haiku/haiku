@@ -19,6 +19,7 @@
 #include <arch/cpu.h>
 #include <platform_arch.h>
 #include <platform/openfirmware/openfirmware.h>
+#include <board_config.h>
 
 #include <string.h>
 
@@ -271,6 +272,10 @@ start_raw(int argc, const char **argv)
 		insert_physical_allocated_range((addr_t)args.platform.boot_tgz_data,
 			args.platform.boot_tgz_size);
 	}
+
+	// specify available physical memory, using 32MB for now, since our
+	// ARMv5 targets have very little by default. TODO get from FDT!
+	insert_physical_memory_range(SDRAM_BASE, 32 * 1024 * 1024);
 
 	mmu_init();
 

@@ -20,6 +20,7 @@ typedef struct {
 	// architecture specific
         uint32  	phys_pgdir;
         uint32  	vir_pgdir;
+	uint32		next_pagetable;
 } arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_ARM_KERNEL_ARGS_H */

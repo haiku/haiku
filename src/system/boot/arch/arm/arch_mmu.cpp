@@ -61,10 +61,7 @@ TODO:
 // 8 MB for the kernel, kernel args, modules, driver settings, ...
 static const size_t kMaxKernelSize = 0x800000;
 
-// Base address for loader
-static const size_t kLoaderBaseAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
-
-// Start and end of ourselfs
+// Start and end of ourselfs (from ld script)
 extern int _start, _end;
 
 /*
@@ -95,18 +92,6 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		KERNEL_LOAD_BASE + kMaxKernelSize - 1,
 		ARM_MMU_L2_FLAG_C,
 	},
-	{
-		"RAM_pt", // Page Table 1MB
-		kLoaderBaseAddress + 0x100000,
-		kLoaderBaseAddress + 0x1FFFFF,
-		ARM_MMU_L2_FLAG_C,
-	},
-	{
-		"RAM_free", // 16MB free RAM (more but we don't map it automaticaly)
-		kLoaderBaseAddress + 0x0200000,
-		kLoaderBaseAddress + 0x11FFFFF,
-		ARM_MMU_L2_FLAG_C,
-	},
 
 #ifdef FB_BASE
 	{
@@ -127,7 +112,7 @@ static addr_t sNextVirtualAddress = 0;
 
 static addr_t sNextPageTableAddress = 0;
 //the page directory is in front of the pagetable
-static uint32 kPageTableRegionEnd = 0;
+static uint32 sPageTableRegionEnd = 0;
 
 static uint32 sSmallPageType = ARM_MMU_L2_TYPE_SMALLEXT;
 
@@ -138,30 +123,10 @@ static uint32 *sPageDirectory = 0 ;
 
 
 static addr_t
-get_next_virtual_address(size_t size)
-{
-	addr_t address = sNextVirtualAddress;
-	sNextVirtualAddress += size;
-
-	return address;
-}
-
-
-static addr_t
 get_next_virtual_address_aligned(size_t size, uint32 mask)
 {
 	addr_t address = (sNextVirtualAddress) & mask;
 	sNextVirtualAddress = address + size;
-
-	return address;
-}
-
-
-static addr_t
-get_next_physical_address(size_t size)
-{
-	addr_t address = sNextPhysicalAddress;
-	sNextPhysicalAddress += size;
 
 	return address;
 }
@@ -246,8 +211,8 @@ static uint32 *
 get_next_page_table(uint32 type)
 {
 	TRACE(("get_next_page_table, sNextPageTableAddress 0x%" B_PRIxADDR
-		", kPageTableRegionEnd 0x%" B_PRIxADDR ", type 0x%" B_PRIx32 "\n",
-		sNextPageTableAddress, kPageTableRegionEnd, type));
+		", sPageTableRegionEnd 0x%" B_PRIxADDR ", type 0x%" B_PRIx32 "\n",
+		sNextPageTableAddress, sPageTableRegionEnd, type));
 
 	size_t size = 0;
 	size_t entryCount = 0;
@@ -266,7 +231,7 @@ get_next_page_table(uint32 type)
 	}
 
 	addr_t address = sNextPageTableAddress;
-	if (address < kPageTableRegionEnd)
+	if (address < sPageTableRegionEnd)
 		sNextPageTableAddress += size;
 	else {
 		TRACE(("page table allocation outside of pagetable region!\n"));
@@ -337,7 +302,8 @@ init_page_directory()
 {
 	TRACE(("init_page_directory\n"));
 
-	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
+	gKernelArgs.arch_args.phys_pgdir =
+	gKernelArgs.arch_args.vir_pgdir = (uint32)sPageDirectory;
 
 	// clear out the page directory
 	for (uint32 i = 0; i < ARM_MMU_L1_TABLE_ENTRY_COUNT; i++)
@@ -345,6 +311,9 @@ init_page_directory()
 
 	// map ourselfs first... just to make sure
 	mmu_map_identity((addr_t)&_start, (addr_t)&_end, ARM_MMU_L2_FLAG_C);
+
+	// map our page directory region (TODO should not be identity mapped)
+	mmu_map_identity((addr_t)sPageDirectory, sPageTableRegionEnd, ARM_MMU_L2_FLAG_C);
 
 	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
 
@@ -358,10 +327,6 @@ init_page_directory()
 			LOADER_MEMORYMAP[i].flags);
 	}
 
-	// Map the page directory itself.
-	addr_t virtualPageDirectory = mmu_map_physical_memory(
-		(addr_t)sPageDirectory, ARM_MMU_L1_TABLE_SIZE, kDefaultPageFlags);
-
 	mmu_flush_TLB();
 
 	/* set up the translation table base */
@@ -374,10 +339,6 @@ init_page_directory()
 
 	/* turn on the mmu */
 	mmu_write_C1(mmu_read_C1() | 0x1);
-
-	// Use the mapped page directory from now on.
-	sPageDirectory = (uint32 *)virtualPageDirectory;
-	gKernelArgs.arch_args.vir_pgdir = virtualPageDirectory;
 }
 
 
@@ -547,18 +508,16 @@ mmu_init_for_kernel(void)
 {
 	TRACE(("mmu_init_for_kernel\n"));
 
+	// store next available pagetable in our pagedir mapping, for
+	// the kernel to use in early vm setup
+	gKernelArgs.arch_args.next_pagetable = sNextPageTableAddress - (addr_t)sPageDirectory;
+
 	// save the memory we've physically allocated
-	int index = gKernelArgs.num_physical_allocated_ranges;
-	gKernelArgs.physical_allocated_range[index].start = SDRAM_BASE;
-	gKernelArgs.physical_allocated_range[index].size = sNextPhysicalAddress - SDRAM_BASE;
-	gKernelArgs.num_physical_allocated_ranges++;
+	insert_physical_allocated_range((addr_t)sPageDirectory, sNextPhysicalAddress - (addr_t)sPageDirectory);
 
 	// Save the memory we've virtually allocated (for the kernel and other
 	// stuff)
-	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE;
-	gKernelArgs.virtual_allocated_range[0].size
-		= sNextVirtualAddress - KERNEL_LOAD_BASE;
-	gKernelArgs.num_virtual_allocated_ranges = 1;
+	insert_virtual_allocated_range(KERNEL_LOAD_BASE, sNextVirtualAddress - KERNEL_LOAD_BASE);
 
 #ifdef TRACE_MEMORY_MAP
 	{
@@ -601,32 +560,18 @@ mmu_init(void)
 	mmu_write_C1(mmu_read_C1() & ~((1 << 29) | (1 << 28) | (1 << 0)));
 		// access flag disabled, TEX remap disabled, mmu disabled
 
-	uint32 highestRAMAddress = SDRAM_BASE;
+	// allocate page directory in memory after loader
+	sPageDirectory = (uint32 *)ROUNDUP((addr_t)&_end, 0x100000);
+	sNextPageTableAddress = (addr_t)sPageDirectory + ARM_MMU_L1_TABLE_SIZE;
+	sPageTableRegionEnd = (addr_t)sPageDirectory + 0x200000;
 
-	// calculate lowest RAM adress from MEMORYMAP
-	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
-		if (strcmp("RAM_free", LOADER_MEMORYMAP[i].name) == 0) {
-			sNextPhysicalAddress = LOADER_MEMORYMAP[i].start;
-			sNextVirtualAddress = LOADER_MEMORYMAP[i].start;
-		}
+	// Mark start for dynamic allocation
+	sNextPhysicalAddress =
+	sNextVirtualAddress = sPageTableRegionEnd;
 
-		if (strcmp("RAM_pt", LOADER_MEMORYMAP[i].name) == 0) {
-			sNextPageTableAddress = LOADER_MEMORYMAP[i].start
-				+ ARM_MMU_L1_TABLE_SIZE;
-			kPageTableRegionEnd = LOADER_MEMORYMAP[i].end;
-			sPageDirectory = (uint32 *)LOADER_MEMORYMAP[i].start;
-		}
-
-		if (strncmp("RAM_", LOADER_MEMORYMAP[i].name, 4) == 0) {
-			if (LOADER_MEMORYMAP[i].end > highestRAMAddress)
-				highestRAMAddress = LOADER_MEMORYMAP[i].end;
-		}
-	}
-
-	insert_physical_memory_range(SDRAM_BASE, highestRAMAddress - SDRAM_BASE);
-
-	// mark ourselfs as allocated, so init_page_directory doesn't overwrite us
+	// mark allocated ranges, so they don't get overwritten
 	insert_physical_allocated_range((addr_t)&_start, (addr_t)&_end - (addr_t)&_start);
+	insert_physical_allocated_range((addr_t)sPageDirectory, 0x200000);
 
 	init_page_directory();
 
@@ -678,7 +623,7 @@ platform_release_heap(struct stage2_args *args, void *base)
 status_t
 platform_init_heap(struct stage2_args *args, void **_base, void **_top)
 {
-	void *heap = (void *)get_next_physical_address(args->heap_size);
+	void *heap = mmu_allocate(NULL, args->heap_size);
 	if (heap == NULL)
 		return B_NO_MEMORY;
 

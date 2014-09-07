@@ -346,6 +346,15 @@ ARMPagingMethod32Bit::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 }
 
 
+static phys_addr_t
+get_free_pgtable(kernel_args* args)
+{
+	phys_addr_t phys = args->arch_args.phys_pgdir + args->arch_args.next_pagetable;
+	//addr_t virt = args->arch_args.vir_pgdir + args->arch_args.next_pagetable;
+	args->arch_args.next_pagetable += ARM_MMU_L2_COARSE_TABLE_SIZE;
+	return phys;
+}
+
 status_t
 ARMPagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 	phys_addr_t physicalAddress, uint8 attributes,
@@ -357,9 +366,7 @@ ARMPagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 		phys_addr_t pgtable;
 		page_directory_entry *e;
 		// we need to allocate a pgtable
-		pgtable = get_free_page(args);
-		// pgtable is in pages, convert to physical address
-		pgtable *= B_PAGE_SIZE;
+		pgtable = get_free_pgtable(args);
 
 		TRACE("ARMPagingMethod32Bit::MapEarly(): asked for free page for "
 			"pgtable. %#" B_PRIxPHYSADDR "\n", pgtable);

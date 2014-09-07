@@ -134,6 +134,10 @@ _start(void)
 	// Flick on "OK" led, use pre-mmu firmware base
 	gpio_write(gPeripheralBase + GPIO_BASE, 16, 0);
 
+	// specify available physical memory, using 128MB for now
+	// TODO: support CPU/GPU memory split options
+	insert_physical_memory_range(SDRAM_BASE, 128 * 1024 * 1024);
+
 	// Reserve memory for boot archive before switching on MMU
 	insert_physical_allocated_range(BOOT_ARCHIVE_BASE, BOOT_ARCHIVE_SIZE);
 
