@@ -364,11 +364,16 @@ EthernetSettingsView::_BuildInterfacesMenu()
 	int32 numItems = menu->CountItems();
 	if (numItems > 0) {
 		fDeviceMenuField->Menu()->SetEnabled(true);
-		BMenuItem* item = menu->FindItem(markedName.String());
+		BMenuItem* item = NULL;
+		if (numItems == 1)
+			item = menu->ItemAt(0);
+		else
+			item = menu->FindItem(markedName.String());
 		if (item != NULL)
 			item->SetMarked(true);
 	} else {
 		fDeviceMenuField->Menu()->SetEnabled(false);
+		_ShowConfiguration((Settings*)NULL);
 	}
 }
 
