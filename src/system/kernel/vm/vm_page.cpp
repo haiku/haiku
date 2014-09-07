@@ -977,7 +977,7 @@ dump_page_queue(int argc, char **argv)
 
 	if (strlen(argv[1]) >= 2 && argv[1][0] == '0' && argv[1][1] == 'x')
 		queue = (VMPageQueue*)strtoul(argv[1], NULL, 16);
-	if (!strcmp(argv[1], "free"))
+	else if (!strcmp(argv[1], "free"))
 		queue = &sFreePageQueue;
 	else if (!strcmp(argv[1], "clear"))
 		queue = &sClearPageQueue;
