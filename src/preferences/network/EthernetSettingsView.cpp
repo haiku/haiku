@@ -341,6 +341,12 @@ void
 EthernetSettingsView::_BuildInterfacesMenu()
 {
 	BMenu* menu = fDeviceMenuField->Menu();
+	BMenuItem* marked = menu->FindMarked();
+	BString markedName;
+	if (marked != NULL) {
+		markedName = marked->Label();
+		marked->SetMarked(false);
+	}
 	menu->RemoveItems(0, menu->CountItems(), true);
 
 	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
@@ -352,9 +358,15 @@ EthernetSettingsView::_BuildInterfacesMenu()
 		menu->AddItem(item);
 	}
 
+	if (Window() != NULL)
+		menu->SetTargetForItems(this);
+
 	int32 numItems = menu->CountItems();
 	if (numItems > 0) {
 		fDeviceMenuField->Menu()->SetEnabled(true);
+		BMenuItem* item = menu->FindItem(markedName.String());
+		if (item != NULL)
+			item->SetMarked(true);
 	} else {
 		fDeviceMenuField->Menu()->SetEnabled(false);
 	}
@@ -405,7 +417,6 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 	fSecondaryDNSTextControl->SetText("");
 	fDomainTextControl->SetText("");
 
-	fDeviceMenuField->SetEnabled(settings != NULL);
 	fTypeMenuField->SetEnabled(settings != NULL);
 
 	bool enableControls = false;
