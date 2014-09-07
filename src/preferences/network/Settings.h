@@ -35,6 +35,9 @@ public:
 			void				SetDisabled(bool disabled)
 									{ fDisabled = disabled; }
 
+			const char*			HardwareAddress() {
+									return fHardwareAddress.String();
+								}
 			const char*			IP()  { return fIP.String(); }
 			const char*			Gateway()  { return fGateway.String(); }
 			const char*			Netmask()  { return fNetmask.String(); }
@@ -50,6 +53,7 @@ public:
 			void				ReadConfiguration();
 
 private:
+			BString				fHardwareAddress;
 			BString				fIP;
 			BString				fGateway;
 			BString				fNetmask;

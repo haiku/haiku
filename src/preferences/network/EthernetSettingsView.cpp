@@ -140,13 +140,19 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fDeviceMenuField->CreateLabelLayoutItem(), 0, 0);
 	layout->AddItem(fDeviceMenuField->CreateMenuBarLayoutItem(), 1, 0);
 
+	BStringView* hardwareAddressLabel = new BStringView(
+			"HardwareAddressLabel", B_TRANSLATE("Hardware Address:"));
+	fHardwareAddress = new BStringView("HardwareAddress", "");
+	layout->AddView(hardwareAddressLabel, 0, 1);
+	layout->AddView(fHardwareAddress, 1, 1);
+
 	fNetworkMenuField = new BMenuField(B_TRANSLATE("Network:"), networkMenu);
-	layout->AddItem(fNetworkMenuField->CreateLabelLayoutItem(), 0, 1);
-	layout->AddItem(fNetworkMenuField->CreateMenuBarLayoutItem(), 1, 1);
+	layout->AddItem(fNetworkMenuField->CreateLabelLayoutItem(), 0, 2);
+	layout->AddItem(fNetworkMenuField->CreateMenuBarLayoutItem(), 1, 2);
 
 	fTypeMenuField = new BMenuField(B_TRANSLATE("Mode:"), modeMenu);
-	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 2);
-	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 2);
+	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 3);
+	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 3);
 
 	fIPTextControl = new IPV4AddressTextControl(
 			B_TRANSLATE("IP address:"), "", NULL);
@@ -157,46 +163,46 @@ EthernetSettingsView::EthernetSettingsView()
 		fIPTextControl->StringWidth("XXX.XXX.XXX.XXX") + inset,
 		B_SIZE_UNSET));
 
-	layout->AddItem(fIPTextControl->CreateLabelLayoutItem(), 0, 3);
-	layout->AddItem(layoutItem, 1, 3);
+	layout->AddItem(fIPTextControl->CreateLabelLayoutItem(), 0, 4);
+	layout->AddItem(layoutItem, 1, 4);
 
 	fNetMaskTextControl = new IPV4AddressTextControl(
 			B_TRANSLATE("Netmask:"), "", NULL);
 	SetupTextControl(fNetMaskTextControl);
-	layout->AddItem(fNetMaskTextControl->CreateLabelLayoutItem(), 0, 4);
-	layout->AddItem(fNetMaskTextControl->CreateTextViewLayoutItem(), 1, 4);
+	layout->AddItem(fNetMaskTextControl->CreateLabelLayoutItem(), 0, 5);
+	layout->AddItem(fNetMaskTextControl->CreateTextViewLayoutItem(), 1, 5);
 
 	fGatewayTextControl = new IPV4AddressTextControl(
 			B_TRANSLATE("Gateway:"), "", NULL);
 	SetupTextControl(fGatewayTextControl);
-	layout->AddItem(fGatewayTextControl->CreateLabelLayoutItem(), 0, 5);
-	layout->AddItem(fGatewayTextControl->CreateTextViewLayoutItem(), 1, 5);
+	layout->AddItem(fGatewayTextControl->CreateLabelLayoutItem(), 0, 6);
+	layout->AddItem(fGatewayTextControl->CreateTextViewLayoutItem(), 1, 6);
 
 	// TODO: Replace the DNS text controls by a BListView with add/remove
 	// functionality and so on...
 	fPrimaryDNSTextControl = new IPV4AddressTextControl(
 			B_TRANSLATE("DNS #1:"), "", NULL);
 	SetupTextControl(fPrimaryDNSTextControl);
-	layout->AddItem(fPrimaryDNSTextControl->CreateLabelLayoutItem(), 0, 6);
-	layout->AddItem(fPrimaryDNSTextControl->CreateTextViewLayoutItem(), 1, 6);
+	layout->AddItem(fPrimaryDNSTextControl->CreateLabelLayoutItem(), 0, 7);
+	layout->AddItem(fPrimaryDNSTextControl->CreateTextViewLayoutItem(), 1, 7);
 
 	fSecondaryDNSTextControl = new IPV4AddressTextControl(
 			B_TRANSLATE("DNS #2:"), "", NULL);
 	SetupTextControl(fSecondaryDNSTextControl);
-	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 7);
-	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 7);
+	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 8);
+	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 8);
 
 	fDomainTextControl = new BTextControl(B_TRANSLATE("Domain:"), "", NULL);
 	SetupTextControl(fDomainTextControl);
-	layout->AddItem(fDomainTextControl->CreateLabelLayoutItem(), 0, 8);
-	layout->AddItem(fDomainTextControl->CreateTextViewLayoutItem(), 1, 8);
+	layout->AddItem(fDomainTextControl->CreateLabelLayoutItem(), 0, 9);
+	layout->AddItem(fDomainTextControl->CreateTextViewLayoutItem(), 1, 9);
 
 	fErrorMessage = new BStringView("error", "");
 	fErrorMessage->SetAlignment(B_ALIGN_LEFT);
 	fErrorMessage->SetFont(be_bold_font);
 	fErrorMessage->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	layout->AddView(fErrorMessage, 1, 9);
+	layout->AddView(fErrorMessage, 1, 10);
 
 	// button group (TODO: move to window, but take care of
 	// enabling/disabling)
@@ -434,6 +440,10 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 	bool enableControls = false;
 	BMenuItem* item;
 
+	if (settings != NULL)
+		fHardwareAddress->SetText(settings->HardwareAddress());
+	else
+		fHardwareAddress->SetText("");
 	if (settings == NULL || settings->IsDisabled())
 		item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Disabled"));
 	else if (settings->AutoConfigure())

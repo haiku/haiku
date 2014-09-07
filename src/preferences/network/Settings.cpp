@@ -78,6 +78,11 @@ void
 Settings::ReadConfiguration()
 {
 	BNetworkInterface interface(fName);
+	BNetworkAddress hardwareAddress;
+	if (interface.GetHardwareAddress(hardwareAddress) != B_OK)
+		return;
+
+	fHardwareAddress = hardwareAddress.ToString();
 	BNetworkInterfaceAddress address;
 
 	// TODO: We only get the first address

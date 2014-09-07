@@ -57,6 +57,7 @@ private:
 				BButton*		fRevertButton;
 					// TODO: buttons should be moved to window instead
 				BMenuField*		fDeviceMenuField;
+				BStringView*	fHardwareAddress;
 				BMenuField*		fNetworkMenuField;
 				BMenuField*		fTypeMenuField;
 				BTextControl*	fIPTextControl;
