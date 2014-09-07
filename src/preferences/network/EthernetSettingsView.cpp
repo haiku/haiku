@@ -68,9 +68,6 @@ static const uint32 kMsgNetwork = 'netw';
 static void
 SetupTextControl(BTextControl *control)
 {
-	// TODO: Disallow characters, etc.
-	// Would be nice to have a real
-	// formatted input control
 	control->SetModificationMessage(new BMessage(kMsgChange));
 }
 
@@ -94,6 +91,15 @@ MatchPattern(const char* string, const char* pattern)
 #define B_TRANSLATION_CONTEXT "EthernetSettingsView"
 
 
+class IPV4AddressTextControl : public BTextControl {
+	public:
+	IPV4AddressTextControl(const char* label,
+			const char* initialText,
+			BMessage* message);
+virtual	~IPV4AddressTextControl();
+};
+
+
 EthernetSettingsView::EthernetSettingsView()
 	:
 	BView("EthernetSettingsView", 0, NULL),
@@ -115,8 +121,6 @@ EthernetSettingsView::EthernetSettingsView()
 	rootLayout->SetInsets(inset, inset, inset, inset);
 	rootLayout->SetSpacing(inset);
 	layout->SetSpacing(inset, inset);
-
-
 
 	BPopUpMenu* modeMenu = new BPopUpMenu("modes");
 	modeMenu->AddItem(new BMenuItem(B_TRANSLATE("Static"),
@@ -144,7 +148,8 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 2);
 	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 2);
 
-	fIPTextControl = new BTextControl(B_TRANSLATE("IP address:"), "", NULL);
+	fIPTextControl = new IPV4AddressTextControl(
+			B_TRANSLATE("IP address:"), "", NULL);
 	SetupTextControl(fIPTextControl);
 
 	BLayoutItem* layoutItem = fIPTextControl->CreateTextViewLayoutItem();
@@ -155,26 +160,28 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fIPTextControl->CreateLabelLayoutItem(), 0, 3);
 	layout->AddItem(layoutItem, 1, 3);
 
-	fNetMaskTextControl = new BTextControl(B_TRANSLATE("Netmask:"), "", NULL);
+	fNetMaskTextControl = new IPV4AddressTextControl(
+			B_TRANSLATE("Netmask:"), "", NULL);
 	SetupTextControl(fNetMaskTextControl);
 	layout->AddItem(fNetMaskTextControl->CreateLabelLayoutItem(), 0, 4);
 	layout->AddItem(fNetMaskTextControl->CreateTextViewLayoutItem(), 1, 4);
 
-	fGatewayTextControl = new BTextControl(B_TRANSLATE("Gateway:"), "", NULL);
+	fGatewayTextControl = new IPV4AddressTextControl(
+			B_TRANSLATE("Gateway:"), "", NULL);
 	SetupTextControl(fGatewayTextControl);
 	layout->AddItem(fGatewayTextControl->CreateLabelLayoutItem(), 0, 5);
 	layout->AddItem(fGatewayTextControl->CreateTextViewLayoutItem(), 1, 5);
 
 	// TODO: Replace the DNS text controls by a BListView with add/remove
 	// functionality and so on...
-	fPrimaryDNSTextControl = new BTextControl(B_TRANSLATE("DNS #1:"), "",
-		NULL);
+	fPrimaryDNSTextControl = new IPV4AddressTextControl(
+			B_TRANSLATE("DNS #1:"), "", NULL);
 	SetupTextControl(fPrimaryDNSTextControl);
 	layout->AddItem(fPrimaryDNSTextControl->CreateLabelLayoutItem(), 0, 6);
 	layout->AddItem(fPrimaryDNSTextControl->CreateTextViewLayoutItem(), 1, 6);
 
-	fSecondaryDNSTextControl = new BTextControl(B_TRANSLATE("DNS #2:"), "",
-		NULL);
+	fSecondaryDNSTextControl = new IPV4AddressTextControl(
+			B_TRANSLATE("DNS #2:"), "", NULL);
 	SetupTextControl(fSecondaryDNSTextControl);
 	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 7);
 	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 7);
@@ -740,4 +747,30 @@ EthernetSettingsView::_ValidateControl(BTextControl* control)
 		return false;
 	}
 	return true;
+}
+
+
+// IPV4AddressTextControl
+IPV4AddressTextControl::IPV4AddressTextControl(const char* label,
+			const char* initialText, BMessage* message)
+	:
+	BTextControl(label, initialText, message)
+{
+	// TODO: Would be nice to have a formatted input control
+	// TODO: Would be nice to have a "DisallowAllExcept" method
+	// TODO: This doesn't block multi-byte characters
+	for (uint32 i = (uint32)0; i <= 255; i++)
+		TextView()->DisallowChar(i);
+
+	for (uint32 i = (uint32)'0'; i <= (uint32)'9'; i++)
+		TextView()->AllowChar(i);
+
+	TextView()->AllowChar((uint32)'.');
+}
+
+
+/* virtual */
+IPV4AddressTextControl::~IPV4AddressTextControl()
+{
+
 }
