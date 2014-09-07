@@ -231,7 +231,7 @@ FUNCTION_END(arch_cpu_user_strlcpy)
 	\param parameter The parameter to be passed to the function to be called.
 */
 FUNCTION(arch_debug_call_with_fault_handler):
-	stmfd   sp!, { r4, lr }
+	stmfd   sp!, { r1, r4, lr }
 
 	// Set fault handler address, and fault handler stack pointer address. We
 	// don't need to save the previous values, since that's done by the caller.
@@ -245,11 +245,11 @@ FUNCTION(arch_debug_call_with_fault_handler):
 	blx	r2
 
 	// regular return
-	ldmfd   sp!, { r4, pc }
+	ldmfd   sp!, { r1, r4, pc }
 
 	// fault -- return via longjmp(jumpBuffer, 1)
 1:
-	mov	r0, r1
+	ldmfd   sp!, { r0, r4, lr } // restore jumpBuffer in r0 (was r1)
 	mov	r1, #1
-	bl	longjmp
+	b	longjmp
 FUNCTION_END(arch_debug_call_with_fault_handler)
