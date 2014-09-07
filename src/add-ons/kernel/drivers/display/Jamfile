@@ -2,9 +2,9 @@ SubDir HAIKU_TOP src add-ons kernel drivers display ;
 
 UsePrivateHeaders kernel ;
 
-KernelAddon display_controls :
-	display_controls.cpp
+KernelAddon display_adapter :
+	display_adapter.cpp
 	;
 
-Depends display_controls : acpi ;
+Depends display_adapter : acpi ;
 

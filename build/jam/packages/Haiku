@@ -65,7 +65,7 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ;
 AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
-#AddNewDriversToPackage display		: display_controls@x86 ;
+#AddNewDriversToPackage display		: display_adapter@x86 ;
 
 # legacy drivers
 AddDriversToPackage					: console dprintf null <driver>tty zero ;

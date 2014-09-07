@@ -9,15 +9,15 @@
 #include <ACPI.h>
 
 
-#define DISPLAYCONTROLS_MODULE_NAME "drivers/display/display_controls/driver_v1"
+#define DISPLAYADAPTER_MODULE_NAME "drivers/display/display_adapter/driver_v1"
 
-#define DISPLAYCONTROLS_DEVICE_MODULE_NAME "drivers/display/display_controls/device_v1"
+#define DISPLAYADAPTER_DEVICE_MODULE_NAME "drivers/display/display_adapter/device_v1"
 
 /* Base Namespace devices are published to */
-#define DISPLAYCONTROLS_BASENAME "display/display_controls/%d"
+#define DISPLAYADAPTER_BASENAME "display/display_adapter/%d"
 
 // name of pnp generator of path ids
-#define DISPLAYCONTROLS_PATHID_GENERATOR "displaycontrols/path_id"
+#define DISPLAYADAPTER_PATHID_GENERATOR "display_adapter/path_id"
 
 
 #define OS_DISPLAY_SWITCH 0
@@ -35,17 +35,17 @@ static acpi_module_info *sAcpi;
 typedef struct acpi_ns_device_info {
 	device_node *node;
 	acpi_handle acpi_device;
-} displaycontrols_device_info;
+} displayadapter_device_info;
 
 
 //	#pragma mark - device module API
 
 
 static status_t
-displaycontrols_init_device(void *_cookie, void **cookie)
+displayadapter_init_device(void *_cookie, void **cookie)
 {
 	device_node *node = (device_node *)_cookie;
-	displaycontrols_device_info *device;
+	displayadapter_device_info *device;
 //	device_node *parent;
 
 	acpi_objects arguments;
@@ -55,7 +55,7 @@ displaycontrols_init_device(void *_cookie, void **cookie)
 	dprintf("%s: start.\n", __func__);
 
 
-	device = (displaycontrols_device_info *)calloc(1, sizeof(*device));
+	device = (displayadapter_device_info *)calloc(1, sizeof(*device));
 	if (device == NULL)
 		return B_NO_MEMORY;
 
@@ -81,54 +81,54 @@ displaycontrols_init_device(void *_cookie, void **cookie)
 
 
 static void
-displaycontrols_uninit_device(void *_cookie)
+displayadapter_uninit_device(void *_cookie)
 {
-	displaycontrols_device_info *device = (displaycontrols_device_info *)_cookie;
+	displayadapter_device_info *device = (displayadapter_device_info *)_cookie;
 	free(device);
 }
 
 
 static status_t
-displaycontrols_open(void *_cookie, const char *path, int flags, void** cookie)
+displayadapter_open(void *_cookie, const char *path, int flags, void** cookie)
 {
-	displaycontrols_device_info *device = (displaycontrols_device_info *)_cookie;
+	displayadapter_device_info *device = (displayadapter_device_info *)_cookie;
 	*cookie = device;
 	return B_OK;
 }
 
 
 static status_t
-displaycontrols_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
+displayadapter_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-displaycontrols_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
+displayadapter_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-displaycontrols_control(void* _cookie, uint32 op, void* arg, size_t len)
+displayadapter_control(void* _cookie, uint32 op, void* arg, size_t len)
 {
-//	displaycontrols_device_info* device = (displaycontrols_device_info*)_cookie;
+//	displayadapter_device_info* device = (displayadapter_device_info*)_cookie;
 
 	return B_ERROR;
 }
 
 
 static status_t
-displaycontrols_close(void* cookie)
+displayadapter_close(void* cookie)
 {
 	return B_OK;
 }
 
 
 static status_t
-displaycontrols_free(void* cookie)
+displayadapter_free(void* cookie)
 {
 	return B_OK;
 }
@@ -138,7 +138,7 @@ displaycontrols_free(void* cookie)
 
 
 static float
-displaycontrols_support(device_node *parent)
+displayadapter_support(device_node *parent)
 {
 	acpi_handle handle, method;
 //	acpi_object_type dosType;
@@ -180,7 +180,7 @@ displaycontrols_support(device_node *parent)
 
 
 static status_t
-displaycontrols_register_device(device_node *node)
+displayadapter_register_device(device_node *node)
 {
 	device_attr attrs[] = {
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "Display Controls" }},
@@ -188,12 +188,12 @@ displaycontrols_register_device(device_node *node)
 		{ NULL }
 	};
 
-	return sDeviceManager->register_node(node, DISPLAYCONTROLS_MODULE_NAME, attrs, NULL, NULL);
+	return sDeviceManager->register_node(node, DISPLAYADAPTER_MODULE_NAME, attrs, NULL, NULL);
 }
 
 
 static status_t
-displaycontrols_init_driver(device_node *node, void **_driverCookie)
+displayadapter_init_driver(device_node *node, void **_driverCookie)
 {
 	*_driverCookie = node;
 	return B_OK;
@@ -201,27 +201,27 @@ displaycontrols_init_driver(device_node *node, void **_driverCookie)
 
 
 static void
-displaycontrols_uninit_driver(void *driverCookie)
+displayadapter_uninit_driver(void *driverCookie)
 {
 }
 
 
 static status_t
-displaycontrols_register_child_devices(void *_cookie)
+displayadapter_register_child_devices(void *_cookie)
 {
 	device_node *node = (device_node*)_cookie;
 	int path_id;
 	char name[128];
 
-	path_id = sDeviceManager->create_id(DISPLAYCONTROLS_PATHID_GENERATOR);
+	path_id = sDeviceManager->create_id(DISPLAYADAPTER_PATHID_GENERATOR);
 	if (path_id < 0) {
-		dprintf("displaycontrols_register_child_devices: couldn't create a path_id\n");
+		dprintf("displayadapter_register_child_devices: couldn't create a path_id\n");
 		return B_ERROR;
 	}
 
-	snprintf(name, sizeof(name), DISPLAYCONTROLS_BASENAME, path_id);
+	snprintf(name, sizeof(name), DISPLAYADAPTER_BASENAME, path_id);
 
-	return sDeviceManager->publish_device(node, name, DISPLAYCONTROLS_DEVICE_MODULE_NAME);
+	return sDeviceManager->publish_device(node, name, DISPLAYADAPTER_DEVICE_MODULE_NAME);
 }
 
 
@@ -232,48 +232,48 @@ module_dependency module_dependencies[] = {
 };
 
 
-driver_module_info displaycontrols_driver_module = {
+driver_module_info displayadapter_driver_module = {
 	{
-		DISPLAYCONTROLS_MODULE_NAME,
+		DISPLAYADAPTER_MODULE_NAME,
 		0,
 		NULL
 	},
 
-	displaycontrols_support,
-	displaycontrols_register_device,
-	displaycontrols_init_driver,
-	displaycontrols_uninit_driver,
-	displaycontrols_register_child_devices,
+	displayadapter_support,
+	displayadapter_register_device,
+	displayadapter_init_driver,
+	displayadapter_uninit_driver,
+	displayadapter_register_child_devices,
 	NULL,	// rescan
 	NULL,	// removed
 };
 
 
-struct device_module_info displaycontrols_device_module = {
+struct device_module_info displayadapter_device_module = {
 	{
-		DISPLAYCONTROLS_DEVICE_MODULE_NAME,
+		DISPLAYADAPTER_DEVICE_MODULE_NAME,
 		0,
 		NULL
 	},
 
-	displaycontrols_init_device,
-	displaycontrols_uninit_device,
+	displayadapter_init_device,
+	displayadapter_uninit_device,
 	NULL,
 
-	displaycontrols_open,
-	displaycontrols_close,
-	displaycontrols_free,
-	displaycontrols_read,
-	displaycontrols_write,
+	displayadapter_open,
+	displayadapter_close,
+	displayadapter_free,
+	displayadapter_read,
+	displayadapter_write,
 	NULL,
-	displaycontrols_control,
+	displayadapter_control,
 
 	NULL,
 	NULL
 };
 
 module_info *modules[] = {
-	(module_info *)&displaycontrols_driver_module,
-	(module_info *)&displaycontrols_device_module,
+	(module_info *)&displayadapter_driver_module,
+	(module_info *)&displayadapter_device_module,
 	NULL
 };
