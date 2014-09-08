@@ -1030,7 +1030,8 @@ public:
 		fRatingView->SetRating(rating.Rating());
 
 		BString ratingLabel;
-		ratingLabel.SetToFormat("%.1f", rating.Rating());
+		if (rating.Rating() >= 0.0f)
+			ratingLabel.SetToFormat("%.1f", rating.Rating());
 		fRatingLabelView = new BStringView("rating label", ratingLabel);
 
 		BString versionLabel(B_TRANSLATE("for %Version%"));

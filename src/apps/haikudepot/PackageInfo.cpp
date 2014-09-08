@@ -923,17 +923,21 @@ PackageInfo::CalculateRatingSummary() const
 
 	float ratingSum = 0.0f;
 
+	int ratingsSpecified = summary.ratingCount;
 	for (int i = 0; i < summary.ratingCount; i++) {
 		float rating = fUserRatings.ItemAtFast(i).Rating();
 
 		if (rating < 0.0f)
-			rating = 0.0f;
+			rating = -1.0f;
 		else if (rating > 5.0f)
 			rating = 5.0f;
 
-		ratingSum += rating;
+		if (rating >= 0.0f)
+			ratingSum += rating;
 
-		if (rating <= 1.0f)
+		if (rating <= 0.0f)
+			ratingsSpecified--; // No rating specified by user
+		else if (rating <= 1.0f)
 			summary.ratingCountByStar[0]++;
 		else if (rating <= 2.0f)
 			summary.ratingCountByStar[1]++;
@@ -945,7 +949,12 @@ PackageInfo::CalculateRatingSummary() const
 			summary.ratingCountByStar[4]++;
 	}
 
-	summary.averageRating = ratingSum / summary.ratingCount;
+	if (ratingsSpecified > 1)
+		ratingSum /= ratingsSpecified;
+
+	summary.averageRating = ratingSum;
+	summary.ratingCount = ratingsSpecified;
+
 	return summary;
 }
 

@@ -578,17 +578,19 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 						continue;
 					}
 
-					// Extract basic info
+					// Extract basic info, all items are optional
 					BString languageCode;
 					BString comment;
 					double rating;
-					if (item.FindString("naturalLanguageCode",
-							&languageCode) != B_OK
-						|| item.FindString("comment", &comment) != B_OK
-						|| item.FindDouble("rating", &rating) != B_OK) {
-						// Ignore this entry, we need the basics
+					item.FindString("naturalLanguageCode", &languageCode);
+					item.FindString("comment", &comment);
+					if (item.FindDouble("rating", &rating) != B_OK)
+						rating = -1;
+					if (comment.Length() == 0 && rating == -1) {
+						// No useful information given.
 						continue;
 					}
+
 					// For which version of the package was the rating?
 					BString major = "?";
 					BString minor = "?";
@@ -927,18 +929,12 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 	}
 	
 	double derivedRating;
-	double derivedRatingSampleSize;
-	if (data.FindDouble("derivedRating", &derivedRating) == B_OK
-		&& data.FindDouble("derivedRatingSampleSize",
-			&derivedRatingSampleSize) == B_OK) {
-		if (derivedRatingSampleSize > 0) {
-			RatingSummary summary;
-			summary.averageRating = derivedRating;
-			summary.ratingCount = (int)derivedRatingSampleSize;
-			package->SetRatingSummary(summary);
+	if (data.FindDouble("derivedRating", &derivedRating) == B_OK) {
+		RatingSummary summary;
+		summary.averageRating = derivedRating;
+		package->SetRatingSummary(summary);
 
-			append_word_list(foundInfo, "rating");
-		}
+		append_word_list(foundInfo, "rating");
 	}
 	
 	BMessage screenshots;
