@@ -1243,7 +1243,9 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 		char linkpath[MAXPATHLEN];
 
 		ThrowOnError(srcLink.SetTo(srcEntry));
-		ThrowOnError(srcLink.ReadLink(linkpath, MAXPATHLEN - 1));
+		ssize_t size = srcLink.ReadLink(linkpath, MAXPATHLEN - 1);
+		if (size < 0)
+			ThrowOnError(size);
 		ThrowOnError(destDir->CreateSymLink(destName, linkpath, &newLink));
 
 		node_ref destNodeRef;
