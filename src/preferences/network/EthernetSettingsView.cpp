@@ -85,8 +85,9 @@ MatchPattern(const char* string, const char* pattern)
 
 
 static int32
-GetDNSListFromString(BString string, BObjectList<BString>& list)
+GetDNSListFromString(const char* text, BObjectList<BString>& list)
 {
+	BString string = text;
 	for (size_t startPos = 0;
 		(startPos = strcspn(string.String(), "1234567890"))
 			!= (size_t)string.Length();) {
@@ -97,6 +98,7 @@ GetDNSListFromString(BString string, BObjectList<BString>& list)
 		if (!list.AddItem(dns))
 			break;
 	}
+	return list.CountItems();
 }
 
 //	#pragma mark -
@@ -324,14 +326,14 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 			fRevertButton->SetEnabled(false);
 			break;
 		case kMsgApply:
+		{
 			if (_ValidateControl(fIPTextControl)
 				&& _ValidateControl(fNetMaskTextControl)
 				&& (strlen(fGatewayTextControl->Text()) == 0
-					|| _ValidateControl(fGatewayTextControl))
-				/*&& (strlen(fDNSTextControl->Text()) == 0
-					|| _ValidateControl(fDNSTextControl)*/)
+					|| _ValidateControl(fGatewayTextControl)))
 				_SaveConfiguration();
 			break;
+		}
 		case kMsgChange:
 			fErrorMessage->SetText("");
 			fApplyButton->SetEnabled(true);
@@ -581,8 +583,8 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 
 	fCurrentSettings->NameServers().MakeEmpty();
 
-	BString dnsList = fDNSTextControl->Text();
-	GetDNSListFromString(dnsList, fCurrentSettings->NameServers());
+	GetDNSListFromString(fDNSTextControl->Text(),
+			fCurrentSettings->NameServers());
 
 	fCurrentSettings->SetDomain(fDomainTextControl->Text());
 
