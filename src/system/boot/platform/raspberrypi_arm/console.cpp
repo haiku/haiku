@@ -105,9 +105,9 @@ VTConsole::ClearScreen()
 void
 VTConsole::SetCursor(int32 x, int32 y)
 {
-	char buffer[8];
-	x = MIN(79, MAX(0, x));
-	y = MIN(24, MAX(0, y));
+	char buffer[9];
+	x = MIN(80, MAX(1, x));
+	y = MIN(25, MAX(1, y));
 	int len = snprintf(buffer, sizeof(buffer),
 		"\033[%" B_PRId32 ";%" B_PRId32 "H", y, x);
 	WriteAt(NULL, 0LL, buffer, len);
@@ -117,20 +117,19 @@ VTConsole::SetCursor(int32 x, int32 y)
 void
 VTConsole::SetColor(int32 foreground, int32 background)
 {
-	return;
 	static const char cmap[] = {
 		0, 4, 2, 6, 1, 5, 3, 7 };
 	char buffer[12];
 
-	if (foreground < 0 && foreground >= 8)
+	if (foreground < 0 || foreground >= 8)
 		return;
-	if (background < 0 && background >= 8)
+	if (background < 0 || background >= 8)
 		return;
 
 	// We assume normal display attributes here
 	int len = snprintf(buffer, sizeof(buffer),
-		"\033[#0;3%" B_PRId32 ";4%" B_PRId32 "m",
-		cmap[foreground], cmap[background]);
+		"\033[%" B_PRId32 ";%" B_PRId32 "m",
+		cmap[foreground] + 30, cmap[background] + 40);
 
 	WriteAt(NULL, 0LL, buffer, len);
 }
