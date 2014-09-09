@@ -1,9 +1,9 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
-#ifndef CONSOLE_H
-#define CONSOLE_H
+ * Copyright 2009 Jonas Sundström, jonas@kirilla.com
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+#ifndef _SYSTEM_BOOT_PLATFORM_STUB_CONSOLE_H
+#define _SYSTEM_BOOT_PLATFORM_STUB_CONSOLE_H
 
 #include <boot/platform/generic/text_console.h>
 
@@ -17,4 +17,4 @@ extern status_t console_init(void);
 }
 #endif
 
-#endif	/* CONSOLE_H */
+#endif /* _SYSTEM_BOOT_PLATFORM_STUB_CONSOLE_H */

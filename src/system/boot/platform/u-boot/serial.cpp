@@ -40,6 +40,13 @@ serial_putc(char c)
 }
 
 
+extern "C" int
+serial_getc(bool wait)
+{
+	return gUART->GetChar(wait);
+}
+
+
 extern "C" void
 serial_puts(const char* string, size_t size)
 {

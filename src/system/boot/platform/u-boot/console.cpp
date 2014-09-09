@@ -1,6 +1,9 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2004-2005, Axel D?rfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Copyright 2009 Jonas Sundström, jonas@kirilla.com
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
@@ -16,54 +19,57 @@
 
 
 class Console : public ConsoleNode {
-	public:
-		Console();
+public:
+							Console();
 
-		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
-		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
+	virtual	ssize_t			ReadAt(void* cookie, off_t pos, void* buffer,
+								size_t bufferSize);
+	virtual	ssize_t			WriteAt(void* cookie, off_t pos,
+								const void* buffer, size_t bufferSize);
 };
+
 
 class VTConsole : public ConsoleNode {
-	public:
-		VTConsole();
-		void	ClearScreen();
-		void	SetCursor(int32 x, int32 y);
-		void	SetColor(int32 foreground, int32 background);
+public:
+							VTConsole();
+			void			ClearScreen();
+			void			SetCursor(int32 x, int32 y);
+			void			SetColor(int32 foreground, int32 background);
 };
+
 
 class SerialConsole : public VTConsole {
-	public:
-		SerialConsole();
+public:
+							SerialConsole();
 
-		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
-		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
+	virtual ssize_t			ReadAt(void *cookie, off_t pos, void *buffer,
+								size_t bufferSize);
+	virtual ssize_t			WriteAt(void *cookie, off_t pos, const void *buffer,
+								size_t bufferSize);
 };
 
 
-static Console sInput, sOutput;
+static Console sInput;
+static Console sOutput;
 static SerialConsole sSerial;
-FILE *stdin, *stdout, *stderr;
 
-
-/*
-static void
-scroll_up()
-{
-}
-*/
+FILE* stdin;
+FILE* stdout;
+FILE* stderr;
 
 
 //	#pragma mark -
 
 
 Console::Console()
-	: ConsoleNode()
+	:
+	ConsoleNode()
 {
 }
 
 
 ssize_t
-Console::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+Console::ReadAt(void* cookie, off_t pos, void* buffer, size_t bufferSize)
 {
 	// don't seek in character devices
 	// not implemented (and not yet? needed)
@@ -72,7 +78,8 @@ Console::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 
 
 ssize_t
-Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer, size_t bufferSize)
+Console::WriteAt(void* cookie, off_t /*pos*/, const void* buffer,
+	size_t bufferSize)
 {
 	return 0;
 }
@@ -82,26 +89,28 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer, size_t bufferS
 
 
 VTConsole::VTConsole()
-	: ConsoleNode()
+	:
+	ConsoleNode()
 {
 }
+
 
 void
 VTConsole::ClearScreen()
 {
-	WriteAt(NULL, 0LL, "\033E", 2);
+	WriteAt(NULL, 0LL, "\033[2J", 4);
 }
 
 
 void
 VTConsole::SetCursor(int32 x, int32 y)
 {
-	char buff[] = "\033Y  ";
-	x = MIN(79,MAX(0,x));
-	y = MIN(24,MAX(0,y));
-	buff[3] += (char)x;
-	buff[2] += (char)y;
-	WriteAt(NULL, 0LL, buff, 4);
+	char buffer[9];
+	x = MIN(80, MAX(1, x));
+	y = MIN(25, MAX(1, y));
+	int len = snprintf(buffer, sizeof(buffer),
+		"\033[%" B_PRId32 ";%" B_PRId32 "H", y, x);
+	WriteAt(NULL, 0LL, buffer, len);
 }
 
 
@@ -109,22 +118,24 @@ void
 VTConsole::SetColor(int32 foreground, int32 background)
 {
 	static const char cmap[] = {
-		15, 4, 2, 6, 1, 5, 3, 7,
-		8, 12, 10, 14, 9, 13, 11, 0 };
-	char buff[] = "\033b \033c ";
+		0, 4, 2, 6, 1, 5, 3, 7 };
+	char buffer[12];
 
-	if (foreground < 0 && foreground >= 16)
+	if (foreground < 0 || foreground >= 8)
 		return;
-	if (background < 0 && background >= 16)
+	if (background < 0 || background >= 8)
 		return;
 
-	buff[2] += cmap[foreground];
-	buff[5] += cmap[background];
-	WriteAt(NULL, 0LL, buff, 6);
+	// We assume normal display attributes here
+	int len = snprintf(buffer, sizeof(buffer),
+		"\033[%" B_PRId32 ";%" B_PRId32 "m",
+		cmap[foreground] + 30, cmap[background] + 40);
+
+	WriteAt(NULL, 0LL, buffer, len);
 }
 
 
-//	#pragma mark -
+//     #pragma mark -
 
 
 SerialConsole::SerialConsole()
@@ -143,14 +154,15 @@ SerialConsole::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 
 
 ssize_t
-SerialConsole::WriteAt(void *cookie, off_t /*pos*/, const void *buffer, size_t bufferSize)
+SerialConsole::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
+	size_t bufferSize)
 {
 	serial_puts((const char *)buffer, bufferSize);
 	return bufferSize;
 }
 
 
-//	#pragma mark -
+//     #pragma mark -
 
 
 void
@@ -193,6 +205,15 @@ console_hide_cursor(void)
 }
 
 
+int
+console_wait_for_key(void)
+{
+	union key key;
+	key.ax = serial_getc(true);
+	return key.code.ascii;
+}
+
+
 void
 console_set_color(int32 foreground, int32 background)
 {
@@ -200,18 +221,12 @@ console_set_color(int32 foreground, int32 background)
 }
 
 
-int
-console_wait_for_key(void)
-{
-    return 0;
-}
-
-
 status_t
 console_init(void)
 {
 	stdin = (FILE *)&sSerial;
-	stdout = stderr = (FILE *)&sSerial;
+	stdout = (FILE *)&sSerial;
+	stderr = (FILE *)&sSerial;
 	return B_OK;
 }
 
