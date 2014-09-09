@@ -1781,7 +1781,7 @@
 /*!
 	\fn int32 BString::FindFirstChars(const char* string,
 		int32 fromCharOffset) const
-	\brief UTF-8 aware version of FindChars(const char*, int32).
+	\brief UTF-8 aware version of FindFirst(const char*, int32).
 
 	\param string The \a string to search for.
 	\param fromCharOffset The offset in UTF-8 characters to start the search.
