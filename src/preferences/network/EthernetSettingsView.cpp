@@ -88,9 +88,10 @@ static int32
 GetDNSListFromString(const char* text, BObjectList<BString>& list)
 {
 	BString string = text;
-	for (size_t startPos = 0;
-		(startPos = strcspn(string.String(), "1234567890"))
-			!= (size_t)string.Length();) {
+	for (;;) {
+		size_t startPos = strcspn(string.String(), "1234567890");
+		if (startPos == (size_t)string.Length())
+			break;
 		string.Remove(0, startPos);
 		size_t endPos = strcspn(string.String(), ",; ");
 		BString *dns = new BString();
