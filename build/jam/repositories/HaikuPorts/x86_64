@@ -149,7 +149,7 @@ RemotePackageRepository HaikuPorts
 	python-2.7.6-2
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
-	qemu-2.1.0-1
+	qemu-2.1.0-2
 	qrencode-3.3.0-1
 	qrencode_devel-3.3.0-1
 	readline-6.3-2
