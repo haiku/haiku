@@ -204,6 +204,7 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fDNSTextControl->CreateLabelLayoutItem(), 0, 7);
 	layout->AddItem(fDNSTextControl->CreateTextViewLayoutItem(), 1, 7);
 	((RestrictedTextControl*)fDNSTextControl)->AllowChars("0123456789.;, ");
+	fDNSTextControl->SetToolTip(B_TRANSLATE("DNS Servers, comma-separated"));
 
 	fDomainTextControl = new BTextControl(B_TRANSLATE("Domain:"), "", NULL);
 	SetupTextControl(fDomainTextControl);
