@@ -84,6 +84,24 @@ MatchPattern(const char* string, const char* pattern)
 }
 
 
+static int32
+GetDNSListFromString(BString string, BObjectList<BString>& list)
+{
+	for (size_t startPos = 0;
+		(startPos = strcspn(string.String(), "1234567890"))
+			!= (size_t)string.Length();) {
+		/*size_t startPos = strcspn(string.String(), "1234567890");
+		if (startPos == (size_t)string.Length())
+			break;*/
+		string.Remove(0, startPos);
+		size_t endPos = strcspn(string.String(), ",; ");
+		BString *dns = new BString();
+		string.MoveInto(*dns, 0, endPos);
+		if (!list.AddItem(dns))
+			break;
+	}
+}
+
 //	#pragma mark -
 
 
@@ -91,12 +109,14 @@ MatchPattern(const char* string, const char* pattern)
 #define B_TRANSLATION_CONTEXT "EthernetSettingsView"
 
 
-class IPV4AddressTextControl : public BTextControl {
-	public:
-	IPV4AddressTextControl(const char* label,
-			const char* initialText,
-			BMessage* message);
-virtual	~IPV4AddressTextControl();
+// A TextControl which doesn't accept any charachter on creation
+class CustomTextControl : public BTextControl {
+public:
+					CustomTextControl(const char* label,
+						const char* initialText,
+						BMessage* message);
+	virtual			~CustomTextControl();
+			void	AllowChars(const char* chars);
 };
 
 
@@ -154,9 +174,10 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 3);
 	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 3);
 
-	fIPTextControl = new IPV4AddressTextControl(
+	fIPTextControl = new CustomTextControl(
 			B_TRANSLATE("IP address:"), "", NULL);
 	SetupTextControl(fIPTextControl);
+	((CustomTextControl*)fIPTextControl)->AllowChars("0123456789.");
 
 	BLayoutItem* layoutItem = fIPTextControl->CreateTextViewLayoutItem();
 	layoutItem->SetExplicitMinSize(BSize(
@@ -166,43 +187,38 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fIPTextControl->CreateLabelLayoutItem(), 0, 4);
 	layout->AddItem(layoutItem, 1, 4);
 
-	fNetMaskTextControl = new IPV4AddressTextControl(
+	fNetMaskTextControl = new CustomTextControl(
 			B_TRANSLATE("Netmask:"), "", NULL);
 	SetupTextControl(fNetMaskTextControl);
 	layout->AddItem(fNetMaskTextControl->CreateLabelLayoutItem(), 0, 5);
 	layout->AddItem(fNetMaskTextControl->CreateTextViewLayoutItem(), 1, 5);
+	((CustomTextControl*)fNetMaskTextControl)->AllowChars("0123456789.");
 
-	fGatewayTextControl = new IPV4AddressTextControl(
+	fGatewayTextControl = new CustomTextControl(
 			B_TRANSLATE("Gateway:"), "", NULL);
 	SetupTextControl(fGatewayTextControl);
 	layout->AddItem(fGatewayTextControl->CreateLabelLayoutItem(), 0, 6);
 	layout->AddItem(fGatewayTextControl->CreateTextViewLayoutItem(), 1, 6);
+	((CustomTextControl*)fGatewayTextControl)->AllowChars("0123456789.");
 
-	// TODO: Replace the DNS text controls by a BListView with add/remove
-	// functionality and so on...
-	fPrimaryDNSTextControl = new IPV4AddressTextControl(
-			B_TRANSLATE("DNS #1:"), "", NULL);
-	SetupTextControl(fPrimaryDNSTextControl);
-	layout->AddItem(fPrimaryDNSTextControl->CreateLabelLayoutItem(), 0, 7);
-	layout->AddItem(fPrimaryDNSTextControl->CreateTextViewLayoutItem(), 1, 7);
-
-	fSecondaryDNSTextControl = new IPV4AddressTextControl(
-			B_TRANSLATE("DNS #2:"), "", NULL);
-	SetupTextControl(fSecondaryDNSTextControl);
-	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 8);
-	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 8);
+	fDNSTextControl = new BTextControl(
+			B_TRANSLATE("DNS:"), "", NULL);
+	SetupTextControl(fDNSTextControl);
+	layout->AddItem(fDNSTextControl->CreateLabelLayoutItem(), 0, 7);
+	layout->AddItem(fDNSTextControl->CreateTextViewLayoutItem(), 1, 7);
+	((CustomTextControl*)fDNSTextControl)->AllowChars("0123456789.;, ");
 
 	fDomainTextControl = new BTextControl(B_TRANSLATE("Domain:"), "", NULL);
 	SetupTextControl(fDomainTextControl);
-	layout->AddItem(fDomainTextControl->CreateLabelLayoutItem(), 0, 9);
-	layout->AddItem(fDomainTextControl->CreateTextViewLayoutItem(), 1, 9);
+	layout->AddItem(fDomainTextControl->CreateLabelLayoutItem(), 0, 8);
+	layout->AddItem(fDomainTextControl->CreateTextViewLayoutItem(), 1, 8);
 
 	fErrorMessage = new BStringView("error", "");
 	fErrorMessage->SetAlignment(B_ALIGN_LEFT);
 	fErrorMessage->SetFont(be_bold_font);
 	fErrorMessage->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	layout->AddView(fErrorMessage, 1, 10);
+	layout->AddView(fErrorMessage, 1, 9);
 
 	// button group (TODO: move to window, but take care of
 	// enabling/disabling)
@@ -237,8 +253,7 @@ EthernetSettingsView::AttachedToWindow()
 	fIPTextControl->SetTarget(this);
 	fNetMaskTextControl->SetTarget(this);
 	fGatewayTextControl->SetTarget(this);
-	fPrimaryDNSTextControl->SetTarget(this);
-	fSecondaryDNSTextControl->SetTarget(this);
+	fDNSTextControl->SetTarget(this);
 	fDomainTextControl->SetTarget(this);
 	fDeviceMenuField->Menu()->SetTargetForItems(this);
 	fNetworkMenuField->Menu()->SetTargetForItems(this);
@@ -315,10 +330,8 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 				&& _ValidateControl(fNetMaskTextControl)
 				&& (strlen(fGatewayTextControl->Text()) == 0
 					|| _ValidateControl(fGatewayTextControl))
-				&& (strlen(fPrimaryDNSTextControl->Text()) == 0
-					|| _ValidateControl(fPrimaryDNSTextControl))
-				&& (strlen(fSecondaryDNSTextControl->Text()) == 0
-					|| _ValidateControl(fSecondaryDNSTextControl)))
+				/*&& (strlen(fDNSTextControl->Text()) == 0
+					|| _ValidateControl(fDNSTextControl)*/)
 				_SaveConfiguration();
 			break;
 		case kMsgChange:
@@ -431,8 +444,7 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 	fIPTextControl->SetText("");
 	fGatewayTextControl->SetText("");
 	fNetMaskTextControl->SetText("");
-	fPrimaryDNSTextControl->SetText("");
-	fSecondaryDNSTextControl->SetText("");
+	fDNSTextControl->SetText("");
 	fDomainTextControl->SetText("");
 
 	fTypeMenuField->SetEnabled(settings != NULL);
@@ -525,15 +537,15 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 	fGatewayTextControl->SetText(settings->Gateway());
 	fNetMaskTextControl->SetText(settings->Netmask());
 
-	if (settings->NameServers().CountItems() >= 2) {
-		fSecondaryDNSTextControl->SetText(
-			settings->NameServers().ItemAt(1)->String());
+	BString dns;
+	for (int32 n = 0; n < settings->NameServers().CountItems(); n++) {
+		if (n != 0)
+			dns.Append(", ");
+		dns.Append(settings->NameServers().ItemAt(n)->String());
 	}
 
-	if (settings->NameServers().CountItems() >= 1) {
-		fPrimaryDNSTextControl->SetText(
-			settings->NameServers().ItemAt(0)->String());
-	}
+	fDNSTextControl->SetText(dns.String());
+
 	fDomainTextControl->SetText(settings->Domain());
 
 	_EnableTextControls(enableControls);
@@ -546,8 +558,7 @@ EthernetSettingsView::_EnableTextControls(bool enable)
 	fIPTextControl->SetEnabled(enable);
 	fGatewayTextControl->SetEnabled(enable);
 	fNetMaskTextControl->SetEnabled(enable);
-	fPrimaryDNSTextControl->SetEnabled(enable);
-	fSecondaryDNSTextControl->SetEnabled(enable);
+	fDNSTextControl->SetEnabled(enable);
 	fDomainTextControl->SetEnabled(enable);
 }
 
@@ -571,10 +582,10 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 			B_TRANSLATE("Disabled")) == 0);
 
 	fCurrentSettings->NameServers().MakeEmpty();
-	fCurrentSettings->NameServers().AddItem(new BString(
-		fPrimaryDNSTextControl->Text()));
-	fCurrentSettings->NameServers().AddItem(new BString(
-		fSecondaryDNSTextControl->Text()));
+
+	BString dnsList = fDNSTextControl->Text();
+	GetDNSListFromString(dnsList, fCurrentSettings->NameServers());
+
 	fCurrentSettings->SetDomain(fDomainTextControl->Text());
 
 	fApplyButton->SetEnabled(false);
@@ -746,10 +757,8 @@ EthernetSettingsView::_ValidateControl(BTextControl* control)
 			errorMessage << B_TRANSLATE("Netmask is invalid");
 		} else if (control == fGatewayTextControl) {
 			errorMessage << B_TRANSLATE("Gateway is invalid");
-		} else if (control == fPrimaryDNSTextControl) {
-			errorMessage << B_TRANSLATE("DNS #1 is invalid");
-		} else if (control == fSecondaryDNSTextControl) {
-			errorMessage << B_TRANSLATE("DNS #2 is invalid");
+		} else if (control == fDNSTextControl) {
+			errorMessage << B_TRANSLATE("DNS list is invalid");
 		}
 
 		fErrorMessage->SetText(errorMessage.String());
@@ -761,26 +770,28 @@ EthernetSettingsView::_ValidateControl(BTextControl* control)
 
 
 // IPV4AddressTextControl
-IPV4AddressTextControl::IPV4AddressTextControl(const char* label,
+CustomTextControl::CustomTextControl(const char* label,
 			const char* initialText, BMessage* message)
 	:
 	BTextControl(label, initialText, message)
 {
 	// TODO: Would be nice to have a formatted input control
-	// TODO: Would be nice to have a "DisallowAllExcept" method
 	// TODO: This doesn't block multi-byte characters
 	for (uint32 i = (uint32)0; i <= 255; i++)
 		TextView()->DisallowChar(i);
-
-	for (uint32 i = (uint32)'0'; i <= (uint32)'9'; i++)
-		TextView()->AllowChar(i);
-
-	TextView()->AllowChar((uint32)'.');
 }
 
 
 /* virtual */
-IPV4AddressTextControl::~IPV4AddressTextControl()
+CustomTextControl::~CustomTextControl()
 {
+}
 
+
+void
+CustomTextControl::AllowChars(const char* chars)
+{
+	int numChars = strlen(chars);
+	for (int i = 0; i < numChars; i++)
+		TextView()->AllowChar((uint32)chars[i]);
 }

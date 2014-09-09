@@ -64,8 +64,7 @@ private:
 				BTextControl*	fNetMaskTextControl;
 				BTextControl*	fGatewayTextControl;
 
-				BTextControl*	fPrimaryDNSTextControl;
-				BTextControl*	fSecondaryDNSTextControl;
+				BTextControl*	fDNSTextControl;
 				BTextControl*	fDomainTextControl;
 
 				BStringView*	fErrorMessage;
