@@ -90,9 +90,6 @@ GetDNSListFromString(BString string, BObjectList<BString>& list)
 	for (size_t startPos = 0;
 		(startPos = strcspn(string.String(), "1234567890"))
 			!= (size_t)string.Length();) {
-		/*size_t startPos = strcspn(string.String(), "1234567890");
-		if (startPos == (size_t)string.Length())
-			break;*/
 		string.Remove(0, startPos);
 		size_t endPos = strcspn(string.String(), ",; ");
 		BString *dns = new BString();
@@ -110,12 +107,12 @@ GetDNSListFromString(BString string, BObjectList<BString>& list)
 
 
 // A TextControl which doesn't accept any charachter on creation
-class CustomTextControl : public BTextControl {
+class RestrictedTextControl : public BTextControl {
 public:
-					CustomTextControl(const char* label,
+					RestrictedTextControl(const char* label,
 						const char* initialText,
 						BMessage* message);
-	virtual			~CustomTextControl();
+	virtual			~RestrictedTextControl();
 			void	AllowChars(const char* chars);
 };
 
@@ -174,10 +171,10 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 3);
 	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 3);
 
-	fIPTextControl = new CustomTextControl(
+	fIPTextControl = new RestrictedTextControl(
 			B_TRANSLATE("IP address:"), "", NULL);
 	SetupTextControl(fIPTextControl);
-	((CustomTextControl*)fIPTextControl)->AllowChars("0123456789.");
+	((RestrictedTextControl*)fIPTextControl)->AllowChars("0123456789.");
 
 	BLayoutItem* layoutItem = fIPTextControl->CreateTextViewLayoutItem();
 	layoutItem->SetExplicitMinSize(BSize(
@@ -187,26 +184,26 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fIPTextControl->CreateLabelLayoutItem(), 0, 4);
 	layout->AddItem(layoutItem, 1, 4);
 
-	fNetMaskTextControl = new CustomTextControl(
+	fNetMaskTextControl = new RestrictedTextControl(
 			B_TRANSLATE("Netmask:"), "", NULL);
 	SetupTextControl(fNetMaskTextControl);
 	layout->AddItem(fNetMaskTextControl->CreateLabelLayoutItem(), 0, 5);
 	layout->AddItem(fNetMaskTextControl->CreateTextViewLayoutItem(), 1, 5);
-	((CustomTextControl*)fNetMaskTextControl)->AllowChars("0123456789.");
+	((RestrictedTextControl*)fNetMaskTextControl)->AllowChars("0123456789.");
 
-	fGatewayTextControl = new CustomTextControl(
+	fGatewayTextControl = new RestrictedTextControl(
 			B_TRANSLATE("Gateway:"), "", NULL);
 	SetupTextControl(fGatewayTextControl);
 	layout->AddItem(fGatewayTextControl->CreateLabelLayoutItem(), 0, 6);
 	layout->AddItem(fGatewayTextControl->CreateTextViewLayoutItem(), 1, 6);
-	((CustomTextControl*)fGatewayTextControl)->AllowChars("0123456789.");
+	((RestrictedTextControl*)fGatewayTextControl)->AllowChars("0123456789.");
 
 	fDNSTextControl = new BTextControl(
 			B_TRANSLATE("DNS:"), "", NULL);
 	SetupTextControl(fDNSTextControl);
 	layout->AddItem(fDNSTextControl->CreateLabelLayoutItem(), 0, 7);
 	layout->AddItem(fDNSTextControl->CreateTextViewLayoutItem(), 1, 7);
-	((CustomTextControl*)fDNSTextControl)->AllowChars("0123456789.;, ");
+	((RestrictedTextControl*)fDNSTextControl)->AllowChars("0123456789.;, ");
 
 	fDomainTextControl = new BTextControl(B_TRANSLATE("Domain:"), "", NULL);
 	SetupTextControl(fDomainTextControl);
@@ -770,7 +767,7 @@ EthernetSettingsView::_ValidateControl(BTextControl* control)
 
 
 // IPV4AddressTextControl
-CustomTextControl::CustomTextControl(const char* label,
+RestrictedTextControl::RestrictedTextControl(const char* label,
 			const char* initialText, BMessage* message)
 	:
 	BTextControl(label, initialText, message)
@@ -783,13 +780,13 @@ CustomTextControl::CustomTextControl(const char* label,
 
 
 /* virtual */
-CustomTextControl::~CustomTextControl()
+RestrictedTextControl::~RestrictedTextControl()
 {
 }
 
 
 void
-CustomTextControl::AllowChars(const char* chars)
+RestrictedTextControl::AllowChars(const char* chars)
 {
 	int numChars = strlen(chars);
 	for (int i = 0; i < numChars; i++)
