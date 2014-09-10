@@ -63,10 +63,11 @@ main(int argc, const char* const* argv)
 	unsigned char buffer[kBufferSize];
 	char lineBuffer[128];
 
-	sprintf(lineBuffer, "unsigned char %s[] = {\n", dataVarName);
+	sprintf(lineBuffer, "#include <stddef.h>\n");
+	write_string(outFD, lineBuffer);
+	sprintf(lineBuffer, "const unsigned char %s[] = {\n", dataVarName);
 	write_string(outFD, lineBuffer);
 
-	off_t dataSize = 0;
 	off_t offset = 0;
 	char* lineBufferEnd = lineBuffer;
 	*lineBufferEnd = '\0';
@@ -80,8 +81,6 @@ main(int argc, const char* const* argv)
 		}
 		if (bytesRead == 0)
 			break;
-
-		dataSize += bytesRead;
 
 		// write lines
 		for (int i = 0; i < bytesRead; i++, offset++) {
@@ -109,8 +108,8 @@ main(int argc, const char* const* argv)
 	}
 
 	// close the braces and write the size variable
-	sprintf(lineBuffer, "};\nlong long %s = %lldLL;\n", sizeVarName,
-		(long long)dataSize);
+	sprintf(lineBuffer, "};\nconst size_t %s = sizeof(%s);\n", sizeVarName,
+		dataVarName);
 	write_string(outFD, lineBuffer);
 
 	close(inFD);
