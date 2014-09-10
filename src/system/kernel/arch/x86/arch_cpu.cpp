@@ -82,8 +82,10 @@ extern "C" void x86_reboot(void);
 	// from arch.S
 
 void (*gCpuIdleFunc)(void);
+#ifndef __x86_64__
 void (*gX86SwapFPUFunc)(void* oldState, const void* newState) = x86_noop_swap;
 bool gHasSSE = false;
+#endif
 
 static uint32 sCpuRendezvous;
 static uint32 sCpuRendezvous2;
@@ -318,13 +320,14 @@ x86_init_fpu(void)
 #endif
 
 	dprintf("%s: CPU has SSE... enabling FXSR and XMM.\n", __func__);
-
+#ifndef __x86_64__
 	// enable OS support for SSE
 	x86_write_cr4(x86_read_cr4() | CR4_OS_FXSR | CR4_OS_XMM_EXCEPTION);
 	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
 
 	gX86SwapFPUFunc = x86_fxsave_swap;
 	gHasSSE = true;
+#endif
 }
 
 

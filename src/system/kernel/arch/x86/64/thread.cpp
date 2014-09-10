@@ -134,9 +134,12 @@ arch_thread_init(kernel_args* args)
 {
 	// Save one global valid FPU state; it will be copied in the arch dependent
 	// part of each new thread.
-	asm volatile ("clts; fninit; fnclex;");
-	x86_fxsave(sInitialState.fpu_state);
-
+	asm volatile (
+		"clts;"		\
+		"fninit;"	\
+		"fnclex;"	\
+		"fxsave %0;"
+		: "=m" (sInitialState.fpu_state));
 	return B_OK;
 }
 
@@ -296,15 +299,14 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	signalFrameData->context.uc_mcontext.rip = frame->ip;
 	signalFrameData->context.uc_mcontext.rflags = frame->flags;
 
-	// Store the FPU state. There appears to be a bug in GCC where the aligned
-	// attribute on a structure is being ignored when the structure is allocated
-	// on the stack, so even if the fpu_state struct has aligned(16) it may not
-	// get aligned correctly. Instead, use the current thread's FPU save area
-	// and then memcpy() to the frame structure.
-	x86_fxsave(thread->arch_info.fpu_state);
-	memcpy((void*)&signalFrameData->context.uc_mcontext.fpu,
-		thread->arch_info.fpu_state,
-		sizeof(signalFrameData->context.uc_mcontext.fpu));
+	if (frame->fpu != nullptr) {
+		memcpy((void*)&signalFrameData->context.uc_mcontext.fpu, frame->fpu,
+			sizeof(signalFrameData->context.uc_mcontext.fpu));
+	} else {
+		memcpy((void*)&signalFrameData->context.uc_mcontext.fpu,
+			sInitialState.fpu_state,
+			sizeof(signalFrameData->context.uc_mcontext.fpu));
+	}
 
 	// Fill in signalFrameData->context.uc_stack.
 	signal_get_user_stack(frame->user_sp, &signalFrameData->context.uc_stack);
@@ -370,13 +372,12 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 	frame->flags = (frame->flags & ~(uint64)X86_EFLAGS_USER_FLAGS)
 		| (signalFrameData->context.uc_mcontext.rflags & X86_EFLAGS_USER_FLAGS);
 
-	// Same as above, alignment may not be correct. Copy to thread and restore
-	// from there.
 	Thread* thread = thread_get_current_thread();
+
 	memcpy(thread->arch_info.fpu_state,
 		(void*)&signalFrameData->context.uc_mcontext.fpu,
 		sizeof(thread->arch_info.fpu_state));
-	x86_fxrstor(thread->arch_info.fpu_state);
+	frame->fpu = &thread->arch_info.fpu_state;
 
 	// The syscall return code overwrites frame->ax with the return value of
 	// the syscall, need to return it here to ensure the correct value is

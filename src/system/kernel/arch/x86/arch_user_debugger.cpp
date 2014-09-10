@@ -33,7 +33,9 @@
 	// TODO: Make those real error codes.
 
 
+#ifndef __x86_64__
 extern bool gHasSSE;
+#endif
 
 // The software breakpoint instruction (int3).
 const uint8 kX86SoftwareBreakpoint[1] = { 0xcc };
@@ -688,6 +690,12 @@ arch_set_debug_cpu_state(const debug_cpu_state* cpuState)
 	if (iframe* frame = x86_get_user_iframe()) {
 		// For the floating point state to be correct the calling function must
 		// not use these registers (not even indirectly).
+#ifdef __x86_64__
+		Thread* thread = thread_get_current_thread();
+		memcpy(thread->arch_info.fpu_state, &cpuState->extended_registers,
+			sizeof(cpuState->extended_registers));
+		frame->fpu = &thread->arch_info.fpu_state;
+#else
 		if (gHasSSE) {
 			// Since fxrstor requires 16-byte alignment and this isn't
 			// guaranteed passed buffer, we use our thread's fpu_state field as
@@ -698,12 +706,11 @@ arch_set_debug_cpu_state(const debug_cpu_state* cpuState)
 			memcpy(thread->arch_info.fpu_state, &cpuState->extended_registers,
 				sizeof(cpuState->extended_registers));
 			x86_fxrstor(thread->arch_info.fpu_state);
-#ifndef __x86_64__
 		} else {
 			// TODO: Implement! We need to convert the format first.
 //			x86_frstor(&cpuState->extended_registers);
-#endif
 		}
+#endif
 		set_iframe_registers(frame, cpuState);
 	}
 }
@@ -715,6 +722,15 @@ arch_get_debug_cpu_state(debug_cpu_state* cpuState)
 	if (iframe* frame = x86_get_user_iframe()) {
 		// For the floating point state to be correct the calling function must
 		// not use these registers (not even indirectly).
+#ifdef __x86_64__
+		if (frame->fpu != nullptr) {
+			memcpy(&cpuState->extended_registers, frame->fpu,
+				sizeof(cpuState->extended_registers));
+		} else {
+			memset(&cpuState->extended_registers, 0,
+				sizeof(cpuState->extended_registers));
+		}
+#else
 		if (gHasSSE) {
 			// Since fxsave requires 16-byte alignment and this isn't guaranteed
 			// passed buffer, we use our thread's fpu_state field as temporary
@@ -725,15 +741,14 @@ arch_get_debug_cpu_state(debug_cpu_state* cpuState)
 				// unlike fnsave, fxsave doesn't reinit the FPU state
 			memcpy(&cpuState->extended_registers, thread->arch_info.fpu_state,
 				sizeof(cpuState->extended_registers));
-#ifndef __x86_64__
 		} else {
 			x86_fnsave(&cpuState->extended_registers);
 			x86_frstor(&cpuState->extended_registers);
 				// fnsave reinits the FPU state after saving, so we need to
 				// load it again
 			// TODO: Convert to fxsave format!
-#endif
 		}
+#endif
 		get_iframe_registers(frame, cpuState);
 	}
 }

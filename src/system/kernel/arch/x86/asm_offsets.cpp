@@ -70,6 +70,7 @@ dummy()
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, r8);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, r9);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, r10);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, fpu);
 #else
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, orig_eax);
 #endif

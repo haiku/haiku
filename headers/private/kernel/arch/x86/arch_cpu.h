@@ -454,10 +454,7 @@ void __x86_setup_system_time(uint32 conversionFactor,
 
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
-void x86_fxsave(void* fpuState);
-void x86_fxrstor(const void* fpuState);
-void x86_noop_swap(void* oldFpuState, const void* newFpuState);
-void x86_fxsave_swap(void* oldFpuState, const void* newFpuState);
+
 addr_t x86_get_stack_frame();
 uint32 x86_count_mtrrs(void);
 void x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type);
@@ -488,7 +485,13 @@ void x86_context_switch(struct arch_thread* oldState,
 
 void x86_fnsave(void* fpuState);
 void x86_frstor(const void* fpuState);
+
+void x86_fxsave(void* fpuState);
+void x86_fxrstor(const void* fpuState);
+
+void x86_noop_swap(void* oldFpuState, const void* newFpuState);
 void x86_fnsave_swap(void* oldFpuState, const void* newFpuState);
+void x86_fxsave_swap(void* oldFpuState, const void* newFpuState);
 
 #endif
 
