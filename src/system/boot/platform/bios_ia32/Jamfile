@@ -51,6 +51,6 @@ BootMergeObject boot_platform_bios_ia32.o :
 	: boot_platform_generic.a
 ;
 
-# Tell the build system to where stage1.bin can be found, so it can be used
-# elsewhere.
-SEARCH on stage1.bin = $(SUBDIR) ;
+NASMFLAGS on stage1.bin = -f bin -O5 ;
+
+Object stage1.bin : stage1.nasm ;

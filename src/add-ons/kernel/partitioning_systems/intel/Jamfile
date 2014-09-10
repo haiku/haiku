@@ -2,6 +2,10 @@ SubDir HAIKU_TOP src add-ons kernel partitioning_systems intel ;
 
 UsePrivateHeaders kernel shared storage ;
 UsePrivateSystemHeaders ;
+UseHeaders [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) bin writembr ] ;
+
+Includes [ FGristFiles PartitionMapWriter.cpp ]
+	: <src!bin!writembr>MBR.h ;
 
 KernelAddon intel :
 	intel.cpp

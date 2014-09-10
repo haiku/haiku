@@ -169,15 +169,19 @@ rule StaticLibraryFromObjects
 
 rule AssembleNasm
 {
-	Depends $(<) : $(>) [ on $(<) return $(PLATFORM) ] ;
+	if ! [ on $(1) return $(NASMFLAGS) ] {
+		NASMFLAGS on $(1) = -f elf32 ;
+	}
+
+	Depends $(1) : $(2) [ on $(2) return $(PLATFORM) ] ;
 }
 
 actions AssembleNasm
 {
 	if test $(ASFLAGS) ; then
-		$(HAIKU_NASM) -d $(ASFLAGS) -f elf32 -o $(1) $(2);
+		$(HAIKU_NASM) -d $(ASFLAGS) $(NASMFLAGS) -o $(1) $(2);
 	else
-		$(HAIKU_NASM) -f elf32 -o $(1) $(2);
+		$(HAIKU_NASM) $(NASMFLAGS) -o $(1) $(2);
 	fi
 }
 
