@@ -506,6 +506,16 @@ get_next_entry(uint32 objectType, const char *base, char *result,
 
 
 status_t
+get_next_object(uint32 objectType, acpi_handle parent,
+	acpi_handle* currentChild)
+{
+	acpi_handle child = *currentChild;
+	return AcpiGetNextObject(objectType, parent, child, currentChild) == AE_OK ?
+		B_OK : B_ERROR;
+}
+
+
+status_t
 get_device(const char* hid, uint32 index, char* result, size_t resultLength)
 {
 	ACPI_STATUS status;
@@ -829,6 +839,7 @@ struct acpi_module_info gACPIModule = {
 	install_fixed_event_handler,
 	remove_fixed_event_handler,
 	get_next_entry,
+	get_next_object,
 	get_device,
 	get_device_hid,
 	get_object_type,

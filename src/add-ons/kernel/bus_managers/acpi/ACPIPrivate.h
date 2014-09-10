@@ -202,6 +202,8 @@ status_t remove_fixed_event_handler(uint32 event, acpi_event_handler handler);
 
 status_t get_next_entry(uint32 object_type, const char* base, char* result,
 	size_t length, void** _counter);
+status_t get_next_object(uint32 object_type, acpi_handle parent,
+	acpi_handle* currentChild);
 status_t get_device(const char* hid, uint32 index, char* result,
 	size_t resultLength);
 
