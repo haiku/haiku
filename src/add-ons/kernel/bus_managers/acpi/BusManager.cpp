@@ -510,8 +510,8 @@ get_next_object(uint32 objectType, acpi_handle parent,
 	acpi_handle* currentChild)
 {
 	acpi_handle child = *currentChild;
-	return AcpiGetNextObject(objectType, parent, child, currentChild) == AE_OK ?
-		B_OK : B_ERROR;
+	return AcpiGetNextObject(objectType, parent, child, currentChild) == AE_OK
+		? B_OK : B_ERROR;
 }
 
 
