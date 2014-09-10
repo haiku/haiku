@@ -33,7 +33,7 @@ actions BuildAnybootImage1 {
 }
 
 local baseMBR = base_mbr.bin ;
-local mbrSource = [ FDirName $(HAIKU_TOP) src bin writembr mbr.S ] ;
+local mbrSource = [ FDirName $(HAIKU_TOP) src bin writembr mbr.nasm ] ;
 BuildAnybootMBR $(baseMBR) : $(mbrSource) ;
 MakeLocate $(baseMBR) : $(HAIKU_OUTPUT_DIR) ;
 MakeLocate $(HAIKU_ANYBOOT) : $(HAIKU_ANYBOOT_DIR) ;
