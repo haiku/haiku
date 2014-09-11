@@ -313,8 +313,8 @@ long_start_kernel()
 	smp_init_other_cpus();
 
 	long_gdt_init();
-	long_mmu_init();
 	debug_cleanup();
+	long_mmu_init();
 	convert_kernel_args();
 
 	// Save the kernel entry point address.
