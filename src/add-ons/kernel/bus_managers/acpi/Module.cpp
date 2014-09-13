@@ -229,6 +229,7 @@ static struct acpi_root_info sACPIRootModule = {
 	},
 
 	get_handle,
+	get_name,
 	acquire_global_lock,
 	release_global_lock,
 	install_notify_handler,
@@ -250,6 +251,7 @@ static struct acpi_root_info sACPIRootModule = {
 	install_fixed_event_handler,
 	remove_fixed_event_handler,
 	get_next_entry,
+	get_next_object,
 	get_device,
 	get_device_hid,
 	get_object_type,

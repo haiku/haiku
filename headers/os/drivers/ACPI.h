@@ -180,6 +180,8 @@ struct acpi_module_info {
 
 	status_t	(*get_handle)(acpi_handle parent, const char *pathname,
 					acpi_handle *retHandle);
+	status_t 	(*get_name)(acpi_handle handle, uint32 nameType,
+					char* returnedName, size_t bufferLength);
 
 	/* Global Lock */
 

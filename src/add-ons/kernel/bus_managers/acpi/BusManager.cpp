@@ -311,6 +311,15 @@ get_handle(acpi_handle parent, const char *pathname, acpi_handle *retHandle)
 
 
 status_t
+get_name(acpi_handle handle, uint32 nameType, char* returnedName,
+	size_t bufferLength)
+{
+	ACPI_BUFFER buffer = {bufferLength, (void*)returnedName};
+	return AcpiGetName(handle, nameType, &buffer) == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
 acquire_global_lock(uint16 timeout, uint32 *handle)
 {
 	return AcpiAcquireGlobalLock(timeout, (UINT32*)handle) == AE_OK
@@ -818,6 +827,7 @@ struct acpi_module_info gACPIModule = {
 	},
 
 	get_handle,
+	get_name,
 	acquire_global_lock,
 	release_global_lock,
 	install_notify_handler,
