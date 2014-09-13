@@ -74,16 +74,32 @@ SharedBitmap::SharedBitmap(BPositionIO& data)
 	fMimeType()
 {
 	status_t status = data.GetSize(&fSize);
-	if (status == B_OK && fSize > 0 && fSize <= 64 * 1024) {
+	const off_t kMaxSize = 128 * 1024;
+	if (status == B_OK && fSize > 0 && fSize <= kMaxSize) {
 		fBuffer = new(std::nothrow) uint8[fSize];
-
-		data.Seek(0, SEEK_SET);
-		ssize_t read = data.Read(fBuffer, fSize);
-		if (read != fSize) {
-			delete[] fBuffer;
-			fBuffer = NULL;
+		if (fBuffer != NULL) {
+			data.Seek(0, SEEK_SET);
+			
+			size_t bytesRead = 0;
+			size_t chunkSize = std::min((off_t)4096, fSize);
+			while (bytesRead < fSize) {
+				ssize_t read = data.Read(fBuffer + bytesRead, chunkSize);
+				if (read > 0)
+					bytesRead += read;
+				else
+					break;
+			}
+	
+			if (bytesRead != fSize) {
+				delete[] fBuffer;
+				fBuffer = NULL;
+				fSize = 0;
+			}
+		} else
 			fSize = 0;
-		}
+	} else {
+		fprintf(stderr, "SharedBitmap(): Stream too large: %" B_PRIi64
+			", max: %" B_PRIi64 "\n", fSize, kMaxSize);
 	}
 
 	fBitmap[0] = NULL;

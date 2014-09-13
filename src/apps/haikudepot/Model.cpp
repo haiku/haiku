@@ -598,7 +598,7 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 		}
 		for (int i = 0; i < screenshotInfos.CountItems(); i++) {
 			const ScreenshotInfo& info = screenshotInfos.ItemAtFast(i);
-			_PopulatePackageScreenshot(package, info, 400, false);
+			_PopulatePackageScreenshot(package, info, 320, false);
 		}
 	}
 }
@@ -1070,6 +1070,10 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 				B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) == B_OK) {
 			screenshotFile.Write(buffer.Buffer(), buffer.BufferLength());
 		}
+	} else {
+		fprintf(stderr, "Failed to retrieve screenshot for code '%s' "
+			"at %" B_PRIi32 "x%" B_PRIi32 ".\n", info.Code().String(),
+			scaledWidth, scaledHeight);
 	}
 }
 
