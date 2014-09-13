@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include <Catalog.h>
+#include <CheckBox.h>
 #include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -36,15 +37,27 @@ add_categories_to_menu(const CategoryList& categories, BMenu* menu)
 }
 
 
+static BCheckBox*
+create_check_box(const char* label, const char* name)
+{
+	BMessage* message = new BMessage(MSG_FILTER_SELECTED);
+	message->AddString("name", name);
+	BCheckBox* checkBox = new BCheckBox(label, message);
+	BFont font;
+	checkBox->GetFont(&font);
+	font.SetSize(ceilf(font.Size() * 0.75));
+	checkBox->SetFont(&font);
+	return checkBox;
+}
+
+
 FilterView::FilterView()
 	:
-	BGroupView("filter view")
+	BGroupView("filter view", B_VERTICAL)
 {
 	// Contruct category popup
-	BPopUpMenu* categoryMenu = new BPopUpMenu(B_TRANSLATE("Show"));
-
-	fShowField = new BMenuField("category", B_TRANSLATE("Show:"),
-		categoryMenu);
+	BPopUpMenu* showMenu = new BPopUpMenu(B_TRANSLATE("Category"));
+	fShowField = new BMenuField("category", B_TRANSLATE("Category:"), showMenu);
 
 	// Construct repository popup
 	BPopUpMenu* repositoryMenu = new BPopUpMenu(B_TRANSLATE("Depot"));
@@ -67,15 +80,34 @@ FilterView::FilterView()
 	float maxSearchWidth = minSearchWidth * 2;
 	fSearchTermsText->SetExplicitMaxSize(BSize(maxSearchWidth, B_SIZE_UNSET));
 
+	// Construct check boxen
+	fAvailableCheckBox = create_check_box(
+		B_TRANSLATE("Available"), "available");
+	fInstalledCheckBox = create_check_box(
+		B_TRANSLATE("Installed"), "installed");
+	fDevelopmentCheckBox = create_check_box(
+		B_TRANSLATE("Development"), "development");
+	fSourceCodeCheckBox = create_check_box(
+		B_TRANSLATE("Source code"), "source code");
+
 	// Build layout
 	BLayoutBuilder::Group<>(this)
-		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1.2f)
-			.Add(fShowField, 0.0f)
-			.Add(fRepositoryField, 0.0f)
-			.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
+		.AddGroup(B_HORIZONTAL)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1.2f)
+				.Add(fShowField, 0.0f)
+				.Add(fRepositoryField, 0.0f)
+				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
+			.End()
+			.AddGlue(0.5f)
+			.Add(fSearchTermsText, 1.0f)
 		.End()
-		.AddGlue(0.5f)
-		.Add(fSearchTermsText, 1.0f)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fAvailableCheckBox)
+			.Add(fInstalledCheckBox)
+			.Add(fDevelopmentCheckBox)
+			.Add(fSourceCodeCheckBox)
+			.AddGlue(0.5f)
+		.End()
 
 		.SetInsets(B_USE_DEFAULT_SPACING)
 	;
@@ -95,6 +127,11 @@ FilterView::AttachedToWindow()
 	fSearchTermsText->SetTarget(this);
 
 	fSearchTermsText->MakeFocus();
+
+	fAvailableCheckBox->SetTarget(Window());
+	fInstalledCheckBox->SetTarget(Window());
+	fDevelopmentCheckBox->SetTarget(Window());
+	fSourceCodeCheckBox->SetTarget(Window());
 }
 
 
@@ -138,17 +175,28 @@ FilterView::AdoptModel(const Model& model)
 		repositoryMenu->AddItem(item);
 	}
 
-	BMenu* categoryMenu = fShowField->Menu();
-	categoryMenu->RemoveItems(0, categoryMenu->CountItems(), true);
+	BMenu* showMenu = fShowField->Menu();
+	showMenu->RemoveItems(0, showMenu->CountItems(), true);
 
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All packages"),
+	showMenu->AddItem(new BMenuItem(B_TRANSLATE("All categories"),
 		new BMessage(MSG_CATEGORY_SELECTED)));
-	categoryMenu->AddItem(new BSeparatorItem());
-	add_categories_to_menu(model.Categories(), categoryMenu);
-	categoryMenu->AddItem(new BSeparatorItem());
-	add_categories_to_menu(model.UserCategories(), categoryMenu);
-	categoryMenu->AddItem(new BSeparatorItem());
-	add_categories_to_menu(model.ProgressCategories(), categoryMenu);
 
-	categoryMenu->ItemAt(0)->SetMarked(true);
+	showMenu->AddItem(new BSeparatorItem());
+
+	add_categories_to_menu(model.Categories(), showMenu);
+
+	showMenu->ItemAt(0)->SetMarked(true);
+
+	AdoptCheckmarks(model);
 }
+
+
+void
+FilterView::AdoptCheckmarks(const Model& model)
+{
+	fAvailableCheckBox->SetValue(model.ShowAvailablePackages());
+	fInstalledCheckBox->SetValue(model.ShowInstalledPackages());
+	fDevelopmentCheckBox->SetValue(model.ShowDevelopPackages());
+	fSourceCodeCheckBox->SetValue(model.ShowSourcePackages());
+}
+

@@ -246,7 +246,40 @@ MainWindow::MessageReceived(BMessage* message)
 			BString name;
 			if (message->FindString("name", &name) != B_OK)
 				name = "";
-			fModel.SetCategory(name);
+			{
+				BAutolock locker(fModel.Lock());
+				fModel.SetCategory(name);
+			}
+			_AdoptModel();
+			break;
+		}
+
+		case MSG_FILTER_SELECTED:
+		{
+			BString name;
+			int32 value;
+			if (message->FindString("name", &name) != B_OK
+				|| message->FindInt32("be:value", &value) != B_OK) {
+				break;
+			}
+			{
+				BAutolock locker(fModel.Lock());
+				if (name == "available") {
+					fModel.SetShowAvailablePackages(
+						value == B_CONTROL_ON);
+				} else if (name == "installed") {
+					fModel.SetShowInstalledPackages(
+						value == B_CONTROL_ON);
+				} else if (name == "development") {
+					fModel.SetShowDevelopPackages(
+						value == B_CONTROL_ON);
+				} else if (name == "source code") {
+					fModel.SetShowSourcePackages(
+						value == B_CONTROL_ON);
+				} else {
+					break;
+				}
+			}
 			_AdoptModel();
 			break;
 		}
@@ -256,7 +289,10 @@ MainWindow::MessageReceived(BMessage* message)
 			BString name;
 			if (message->FindString("name", &name) != B_OK)
 				name = "";
-			fModel.SetDepot(name);
+			{
+				BAutolock locker(fModel.Lock());
+				fModel.SetDepot(name);
+			}
 			_AdoptModel();
 			break;
 		}
@@ -267,7 +303,10 @@ MainWindow::MessageReceived(BMessage* message)
 			BString searchTerms;
 			if (message->FindString("search terms", &searchTerms) != B_OK)
 				searchTerms = "";
-			fModel.SetSearchTerms(searchTerms);
+			{
+				BAutolock locker(fModel.Lock());
+				fModel.SetSearchTerms(searchTerms);
+			}
 			_AdoptModel();
 			break;
 		}
@@ -277,6 +316,7 @@ MainWindow::MessageReceived(BMessage* message)
 			PackageInfo* info;
 			if (message->FindPointer("package", (void**)&info) == B_OK) {
 				PackageInfoRef ref(info, true);
+				BAutolock locker(fModel.Lock());
 				fModel.SetPackageState(ref, ref->State());
 			}
 			break;
@@ -356,18 +396,18 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 			new BMessage(MSG_REFRESH_DEPOTS)));
 	menuBar->AddItem(menu);
 
-	menu = new BMenu(B_TRANSLATE("Options"));
-
-	fShowDevelopPackagesItem = new BMenuItem(
-		B_TRANSLATE("Show develop packages"),
-		new BMessage(MSG_SHOW_DEVELOP_PACKAGES));
-	menu->AddItem(fShowDevelopPackagesItem);
-
-	fShowSourcePackagesItem = new BMenuItem(B_TRANSLATE("Show source packages"),
-		new BMessage(MSG_SHOW_SOURCE_PACKAGES));
-	menu->AddItem(fShowSourcePackagesItem);
-
-	menuBar->AddItem(menu);
+//	menu = new BMenu(B_TRANSLATE("Options"));
+//
+//	fShowDevelopPackagesItem = new BMenuItem(
+//		B_TRANSLATE("Show develop packages"),
+//		new BMessage(MSG_SHOW_DEVELOP_PACKAGES));
+//	menu->AddItem(fShowDevelopPackagesItem);
+//
+//	fShowSourcePackagesItem = new BMenuItem(B_TRANSLATE("Show source packages"),
+//		new BMessage(MSG_SHOW_SOURCE_PACKAGES));
+//	menu->AddItem(fShowSourcePackagesItem);
+//
+//	menuBar->AddItem(menu);
 }
 
 
@@ -383,8 +423,9 @@ MainWindow::_AdoptModel()
 	}
 
 	BAutolock locker(fModel.Lock());
-	fShowSourcePackagesItem->SetMarked(fModel.ShowSourcePackages());
-	fShowDevelopPackagesItem->SetMarked(fModel.ShowDevelopPackages());
+//	fShowSourcePackagesItem->SetMarked(fModel.ShowSourcePackages());
+//	fShowDevelopPackagesItem->SetMarked(fModel.ShowDevelopPackages());
+	fFilterView->AdoptCheckmarks(fModel);
 }
 
 

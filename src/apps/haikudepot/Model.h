@@ -66,10 +66,6 @@ public:
 
 			const CategoryList&	Categories() const
 									{ return fCategories; }
-			const CategoryList&	UserCategories() const
-									{ return fUserCategories; }
-			const CategoryList&	ProgressCategories() const
-									{ return fProgressCategories; }
 
 			void				SetPackageState(
 									const PackageInfoRef& package,
@@ -79,6 +75,13 @@ public:
 			void				SetCategory(const BString& category);
 			void				SetDepot(const BString& depot);
 			void				SetSearchTerms(const BString& searchTerms);
+
+			void				SetShowAvailablePackages(bool show);
+			bool				ShowAvailablePackages() const
+									{ return fShowAvailablePackages; }
+			void				SetShowInstalledPackages(bool show);
+			bool				ShowInstalledPackages() const
+									{ return fShowInstalledPackages; }
 			void				SetShowSourcePackages(bool show);
 			bool				ShowSourcePackages() const
 									{ return fShowSourcePackages; }
@@ -142,8 +145,6 @@ private:
 			// TODO: Dynamic categories retrieved from web-app
 
 			CategoryList		fCategories;
-			CategoryList		fUserCategories;
-			CategoryList		fProgressCategories;
 
 			PackageList			fInstalledPackages;
 			PackageList			fActivatedPackages;
@@ -156,6 +157,8 @@ private:
 			BString				fDepotFilter;
 			PackageFilterRef	fSearchTermsFilter;
 
+			bool				fShowAvailablePackages;
+			bool				fShowInstalledPackages;
 			bool				fShowSourcePackages;
 			bool				fShowDevelopPackages;
 

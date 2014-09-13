@@ -8,6 +8,7 @@
 #include <GroupView.h>
 
 
+class BCheckBox;
 class BMenuField;
 class BTextControl;
 class Model;
@@ -15,6 +16,7 @@ class Model;
 
 enum {
 	MSG_CATEGORY_SELECTED		= 'ctsl',
+	MSG_FILTER_SELECTED			= 'ftsl',
 	MSG_DEPOT_SELECTED			= 'dpsl',
 	MSG_SEARCH_TERMS_MODIFIED	= 'stmd',
 };
@@ -29,11 +31,17 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 	virtual void				AdoptModel(const Model& model);
+	virtual void				AdoptCheckmarks(const Model& model);
 
 private:
 			BMenuField*			fShowField;
 			BMenuField*			fRepositoryField;
 			BTextControl*		fSearchTermsText;
+
+			BCheckBox*			fAvailableCheckBox;
+			BCheckBox*			fInstalledCheckBox;
+			BCheckBox*			fDevelopmentCheckBox;
+			BCheckBox*			fSourceCodeCheckBox;
 };
 
 #endif // FILTER_VIEW_H

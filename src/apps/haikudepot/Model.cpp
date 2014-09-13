@@ -303,6 +303,8 @@ Model::Model()
 	fDepotFilter(""),
 	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
 
+	fShowAvailablePackages(true),
+	fShowInstalledPackages(false),
 	fShowSourcePackages(false),
 	fShowDevelopPackages(false),
 
@@ -325,39 +327,6 @@ Model::Model()
 	// get the defined categories and their translated names.
 	// This should then be used instead of hard-coded
 	// categories and translations in the app.
-
-	// A category for packages that the user installed.
-	fUserCategories.Add(CategoryRef(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Installed packages"), "installed"), true));
-
-	// A category for packages that not yet installed.
-	fUserCategories.Add(CategoryRef(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Available packages"), "available"), true));
-
-	// A category for packages that the user specifically uninstalled.
-	// For example, a user may have removed packages from a default
-	// Haiku installation
-	fUserCategories.Add(CategoryRef(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Uninstalled packages"), "uninstalled"), true));
-
-	// A category for all packages that the user has installed or uninstalled.
-	// Those packages resemble what makes their system different from a
-	// fresh Haiku installation.
-	fUserCategories.Add(CategoryRef(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("User modified packages"), "modified"), true));
-
-	// Two categories to see just the packages which are downloading or
-	// have updates available
-	fProgressCategories.Add(CategoryRef(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Downloading"), "downloading"), true));
-	fProgressCategories.Add(CategoryRef(new PackageCategory(
-		BitmapRef(),
-		B_TRANSLATE("Update available"), "updates"), true));
 }
 
 
@@ -370,9 +339,8 @@ Model::~Model()
 PackageList
 Model::CreatePackageList() const
 {
-	// TODO: Allow to restrict depot, filter by search terms, ...
-
-	// Return all packages from all depots.
+	// Iterate all packages from all depots.
+	// If configured, restrict depot, filter by search terms, status, name ...
 	PackageList resultList;
 
 	for (int32 i = 0; i < fDepots.CountItems(); i++) {
@@ -387,6 +355,8 @@ Model::CreatePackageList() const
 			const PackageInfoRef& package = packages.ItemAtFast(j);
 			if (fCategoryFilter->AcceptsPackage(package)
 				&& fSearchTermsFilter->AcceptsPackage(package)
+				&& (fShowAvailablePackages || package->State() != NONE)
+				&& (fShowInstalledPackages || package->State() != ACTIVATED)
 				&& (fShowSourcePackages || !is_source_package(package))
 				&& (fShowDevelopPackages || !is_develop_package(package))) {
 				resultList.Add(package);
@@ -439,7 +409,8 @@ Model::SetPackageState(const PackageInfoRef& package, PackageState state)
 		case UNINSTALLED:
 			fInstalledPackages.Remove(package);
 			fActivatedPackages.Remove(package);
-			fUninstalledPackages.Add(package);
+			if (!fUninstalledPackages.Contains(package))
+				fUninstalledPackages.Add(package);
 			break;
 	}
 
@@ -457,22 +428,6 @@ Model::SetCategory(const BString& category)
 
 	if (category.Length() == 0)
 		filter = new AnyFilter();
-	else if (category == "installed")
-		filter = new ContainedInFilter(fInstalledPackages);
-	else if (category == "uninstalled")
-		filter = new ContainedInFilter(fUninstalledPackages);
-	else if (category == "available") {
-		filter = new StateFilter(NONE);
-//		filter = new NotContainedInFilter(&fInstalledPackages,
-//			&fUninstalledPackages, &fDownloadingPackages, &fUpdateablePackages,
-//			NULL);
-	} else if (category == "modified") {
-		filter = new ContainedInEitherFilter(fInstalledPackages,
-			fUninstalledPackages);
-	} else if (category == "downloading")
-		filter = new ContainedInFilter(fDownloadingPackages);
-	else if (category == "updates")
-		filter = new ContainedInFilter(fUpdateablePackages);
 	else
 		filter = new CategoryFilter(category);
 
@@ -498,6 +453,20 @@ Model::SetSearchTerms(const BString& searchTerms)
 		filter = new SearchTermsFilter(searchTerms);
 
 	fSearchTermsFilter.SetTo(filter, true);
+}
+
+
+void
+Model::SetShowAvailablePackages(bool show)
+{
+	fShowAvailablePackages = show;
+}
+
+
+void
+Model::SetShowInstalledPackages(bool show)
+{
+	fShowInstalledPackages = show;
 }
 
 
@@ -883,23 +852,33 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 	BString foundInfo;
 
 	BMessage versions;
-	BMessage version;
-	if (data.FindMessage("versions", &versions) == B_OK
-		&& versions.FindMessage("0", &version)) {
-		BString languageCode;
-		if (version.FindString("naturalLanguageCode", &languageCode) == B_OK) {
-			if (languageCode == fPreferredLanguage) {
-				BString summary;
-				if (version.FindString("summary", &summary) == B_OK) {
-					package->SetShortDescription(summary);
-					append_word_list(foundInfo, "summary");
-				}
-				BString description;
-				if (version.FindString("description", &description) == B_OK) {
-					package->SetFullDescription(description);
-					append_word_list(foundInfo, "description");
-				}
+	if (data.FindMessage("versions", &versions) == B_OK) {
+		// Search a summary and description in the preferred language
+		int32 index = 0;
+		while (true) {
+			BString name;
+			name << index++;
+			BMessage version;
+			if (versions.FindMessage(name, &version) != B_OK)
+				break;
+			BString languageCode;
+			if (version.FindString("naturalLanguageCode",
+					&languageCode) != B_OK 
+				|| languageCode != fPreferredLanguage) {
+				continue;
 			}
+
+			BString summary;
+			if (version.FindString("summary", &summary) == B_OK) {
+				package->SetShortDescription(summary);
+				append_word_list(foundInfo, "summary");
+			}
+			BString description;
+			if (version.FindString("description", &description) == B_OK) {
+				package->SetFullDescription(description);
+				append_word_list(foundInfo, "description");
+			}
+			break;
 		}
 	}
 
