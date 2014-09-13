@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2014, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -46,6 +46,7 @@ sethostname(const char *hostName, size_t nameSize)
 		return -1;
 
 	nameSize = min_c(nameSize, MAXHOSTNAMELEN);
+	ftruncate(file, nameSize + 1);
 
 	if (write(file, hostName, nameSize) != (ssize_t)nameSize
 		|| write(file, "\n", 1) != 1) {
