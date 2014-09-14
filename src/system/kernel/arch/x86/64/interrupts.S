@@ -118,6 +118,23 @@
 	call	x86_exit_user_debug_at_kernel_entry;				\
   1:
 
+#define CLEAR_FPU_STATE() \
+	pxor %xmm0, %xmm0; \
+	pxor %xmm1, %xmm1; \
+	pxor %xmm2, %xmm2; \
+	pxor %xmm3, %xmm3; \
+	pxor %xmm4, %xmm4; \
+	pxor %xmm5, %xmm5; \
+	pxor %xmm6, %xmm6; \
+	pxor %xmm7, %xmm7; \
+	pxor %xmm8, %xmm8; \
+	pxor %xmm9, %xmm9; \
+	pxor %xmm10, %xmm10; \
+	pxor %xmm11, %xmm11; \
+	pxor %xmm12, %xmm12; \
+	pxor %xmm13, %xmm13; \
+	pxor %xmm14, %xmm14; \
+	pxor %xmm15, %xmm15
 
 // The following code defines the interrupt service routines for all 256
 // interrupts. It creates a block of handlers, each 16 bytes, that the IDT
@@ -416,6 +433,8 @@ FUNCTION(x86_64_syscall_entry):
 	cmpq	$SYSCALL_RESTORE_SIGNAL_FRAME, %r14
 	je		.Lrestore_fpu
 
+	CLEAR_FPU_STATE()
+
 	// Restore the iframe and RCX/R11 for SYSRET.
 	RESTORE_IFRAME()
 	pop		%rcx
@@ -478,13 +497,14 @@ FUNCTION(x86_64_syscall_entry):
 1:
 	// Install breakpoints, if defined.
 	testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%r12)
-	jz		.Liret
+	jz		1f
 	movq	%rbp, %rdi
 	call	x86_init_user_debug_at_kernel_exit
-
+1:
 	// On this return path it is possible that the frame has been modified,
 	// for example to execute a signal handler. In this case it is safer to
 	// return via IRET.
+	CLEAR_FPU_STATE()
 	jmp .Liret
 
 .Lrestore_fpu:
