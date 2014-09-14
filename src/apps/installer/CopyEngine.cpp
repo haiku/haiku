@@ -1,7 +1,9 @@
 /*
  * Copyright 2008-2009, Stephan Aßmus <superstippi@gmx.de>
- *  All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2014, Axel Dörfler, axeld@pinc-software.de
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 
 #include "CopyEngine.h"
 

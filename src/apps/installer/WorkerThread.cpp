@@ -132,19 +132,22 @@ public:
 	virtual bool ShouldClobberFolder(const BEntry& entry, const char* path,
 		const struct stat& statInfo, int32 level) const
 	{
-		if (level == 1 && S_ISDIR(statInfo.st_mode)) {
-			if (strcmp("system", path) == 0) {
-				printf("clobbering '%s'.\n", path);
-				return true;
-			}
+		if (level == 2 && S_ISDIR(statInfo.st_mode)
+				&& strncmp("system/", path, 7) == 0
+				&& strcmp("system/settings", path) != 0) {
+			// Replace everything in "system" besides "settings"
+			printf("clobbering '%s'.\n", path);
+			return true;
 		}
 		return false;
 	}
 
 private:
-	std::set<std::string>	fIgnorePaths;
-	std::set<std::string>	fPackageFSRootPaths;
-	dev_t					fSourceDevice;
+	typedef std::set<std::string> StringSet;
+
+			StringSet			fIgnorePaths;
+			StringSet			fPackageFSRootPaths;
+			dev_t				fSourceDevice;
 };
 
 
@@ -455,10 +458,11 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 	if (entries != 0) {
 		BAlert* alert = new BAlert("", B_TRANSLATE("The target volume is not "
 			"empty. Are you sure you want to install anyway?\n\nNote: The "
-			"'system' folder will be a clean copy from the source volume, all "
-			"other folders will be merged, whereas files and links that exist "
-			"on both the source and target volume will be overwritten with "
-			"the source volume version."),
+			"'system' folder will be a clean copy from the source volume but "
+			"will retain its settings folder, all other folders will be "
+			"merged, whereas files and links that exist on both the source "
+			"and target volume will be overwritten with the source volume "
+			"version."),
 			B_TRANSLATE("Install anyway"), B_TRANSLATE("Cancel"), 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetShortcut(1, B_ESCAPE);
