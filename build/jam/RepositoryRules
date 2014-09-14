@@ -43,7 +43,7 @@ rule AddRepositoryPackage repository : architecture : baseName : version
 		: $(baseName) ] ;
 	baseName = $(packageFamily:G=) ;
 
-	if $(HAIKU_NO_DOWNLOADS) = 1 {
+	if $(HAIKU_NO_DOWNLOADS) = 1 && $(HAIKU_BUILD_TYPE) != bootstrap {
 		# Only add packages to repository that already exist in download
 		# directory.
 		if ! [ Glob $(HAIKU_DOWNLOAD_DIR) : $(packageFileName) ] {
