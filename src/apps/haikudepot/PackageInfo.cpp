@@ -80,7 +80,7 @@ SharedBitmap::SharedBitmap(BPositionIO& data)
 		if (fBuffer != NULL) {
 			data.Seek(0, SEEK_SET);
 			
-			size_t bytesRead = 0;
+			off_t bytesRead = 0;
 			size_t chunkSize = std::min((off_t)4096, fSize);
 			while (bytesRead < fSize) {
 				ssize_t read = data.Read(fBuffer + bytesRead, chunkSize);
