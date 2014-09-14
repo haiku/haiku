@@ -31,7 +31,9 @@
 extern "C" void x86_return_to_userland(iframe* frame);
 
 // from arch_cpu.cpp
+#ifndef __x86_64__
 extern void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
+#endif
 
 
 static struct iframe*
@@ -245,7 +247,9 @@ arch_thread_context_switch(Thread* from, Thread* to)
 		activePagingStructures->RemoveReference();
 	}
 
+#ifndef __x86_64__
 	gX86SwapFPUFunc(from->arch_info.fpu_state, to->arch_info.fpu_state);
+#endif
 	x86_context_switch(&from->arch_info, &to->arch_info);
 }
 

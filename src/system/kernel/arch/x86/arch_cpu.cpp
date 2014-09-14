@@ -59,14 +59,6 @@ static const struct cpu_vendor_info vendor_info[VENDOR_NUM] = {
 	{ "NSC", { "Geode by NSC" } },
 };
 
-#define CR0_CACHE_DISABLE		(1UL << 30)
-#define CR0_NOT_WRITE_THROUGH	(1UL << 29)
-#define CR0_FPU_EMULATION		(1UL << 2)
-#define CR0_MONITOR_FPU			(1UL << 1)
-
-#define CR4_OS_FXSR				(1UL << 9)
-#define CR4_OS_XMM_EXCEPTION	(1UL << 10)
-
 #define K8_SMIONCMPHALT			(1ULL << 27)
 #define K8_C1EONCMPHALT			(1ULL << 28)
 
@@ -90,8 +82,10 @@ extern "C" void x86_reboot(void);
 	// from arch.S
 
 void (*gCpuIdleFunc)(void);
+#ifndef __x86_64__
 void (*gX86SwapFPUFunc)(void* oldState, const void* newState) = x86_noop_swap;
 bool gHasSSE = false;
+#endif
 
 static uint32 sCpuRendezvous;
 static uint32 sCpuRendezvous2;
@@ -104,18 +98,6 @@ static const size_t kDoubleFaultStackSize = 4096;	// size per CPU
 
 static x86_cpu_module_info* sCpuModule;
 
-
-extern "C" void memcpy_generic(void* dest, const void* source, size_t count);
-extern int memcpy_generic_end;
-extern "C" void memset_generic(void* dest, int value, size_t count);
-extern int memset_generic_end;
-
-x86_optimized_functions gOptimizedFunctions = {
-	memcpy_generic,
-	&memcpy_generic_end,
-	memset_generic,
-	&memset_generic_end
-};
 
 /* CPU topology information */
 static uint32 (*sGetCPUTopologyID)(int currentCPU);
@@ -338,13 +320,14 @@ x86_init_fpu(void)
 #endif
 
 	dprintf("%s: CPU has SSE... enabling FXSR and XMM.\n", __func__);
-
+#ifndef __x86_64__
 	// enable OS support for SSE
 	x86_write_cr4(x86_read_cr4() | CR4_OS_FXSR | CR4_OS_XMM_EXCEPTION);
 	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
 
 	gX86SwapFPUFunc = x86_fxsave_swap;
 	gHasSSE = true;
+#endif
 }
 
 
@@ -1163,33 +1146,6 @@ arch_cpu_init_post_modules(kernel_args* args)
 		call_all_cpus(&init_mtrrs, NULL);
 	}
 
-	// get optimized functions from the CPU module
-	if (sCpuModule != NULL && sCpuModule->get_optimized_functions != NULL) {
-		x86_optimized_functions functions;
-		memset(&functions, 0, sizeof(functions));
-
-		sCpuModule->get_optimized_functions(&functions);
-
-		if (functions.memcpy != NULL) {
-			gOptimizedFunctions.memcpy = functions.memcpy;
-			gOptimizedFunctions.memcpy_end = functions.memcpy_end;
-		}
-
-		if (functions.memset != NULL) {
-			gOptimizedFunctions.memset = functions.memset;
-			gOptimizedFunctions.memset_end = functions.memset_end;
-		}
-	}
-
-	// put the optimized functions into the commpage
-	size_t memcpyLen = (addr_t)gOptimizedFunctions.memcpy_end
-		- (addr_t)gOptimizedFunctions.memcpy;
-	addr_t memcpyPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY,
-		(const void*)gOptimizedFunctions.memcpy, memcpyLen);
-	size_t memsetLen = (addr_t)gOptimizedFunctions.memset_end
-		- (addr_t)gOptimizedFunctions.memset;
-	addr_t memsetPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMSET,
-		(const void*)gOptimizedFunctions.memset, memsetLen);
 	size_t threadExitLen = (addr_t)x86_end_userspace_thread_exit
 		- (addr_t)x86_userspace_thread_exit;
 	addr_t threadExitPosition = fill_commpage_entry(
@@ -1198,10 +1154,7 @@ arch_cpu_init_post_modules(kernel_args* args)
 
 	// add the functions to the commpage image
 	image_id image = get_commpage_image();
-	elf_add_memory_image_symbol(image, "commpage_memcpy", memcpyPosition,
-		memcpyLen, B_SYMBOL_TYPE_TEXT);
-	elf_add_memory_image_symbol(image, "commpage_memset", memsetPosition,
-		memsetLen, B_SYMBOL_TYPE_TEXT);
+
 	elf_add_memory_image_symbol(image, "commpage_thread_exit",
 		threadExitPosition, threadExitLen, B_SYMBOL_TYPE_TEXT);
 

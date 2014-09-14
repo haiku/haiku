@@ -19,35 +19,6 @@
 .text
 
 
-/* void x86_fxsave(void* fpuState); */
-FUNCTION(x86_fxsave):
-	fxsave	(%rdi)
-	ret
-FUNCTION_END(x86_fxsave)
-
-
-/* void x86_fxrstor(const void* fpuState); */
-FUNCTION(x86_fxrstor):
-	fxrstor	(%rdi)
-	ret
-FUNCTION_END(x86_fxrstor)
-
-
-/* void x86_noop_swap(void *oldFpuState, const void *newFpuState); */
-FUNCTION(x86_noop_swap):
-	nop
-	ret
-FUNCTION_END(x86_noop_swap)
-
-
-/* void x86_fxsave_swap(void* oldFpuState, const void* newFpuState); */
-FUNCTION(x86_fxsave_swap):
-	fxsave	(%rdi)
-	fxrstor	(%rsi)
-	ret
-FUNCTION_END(x86_fxsave_swap)
-
-
 /* addr_t x86_get_stack_frame(); */
 FUNCTION(x86_get_stack_frame):
 	mov		%rbp, %rax

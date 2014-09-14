@@ -279,6 +279,14 @@ convert_kernel_args()
 
 
 static void
+enable_sse()
+{
+	x86_write_cr4(x86_read_cr4() | CR4_OS_FXSR | CR4_OS_XMM_EXCEPTION);
+	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
+}
+
+
+static void
 long_smp_start_kernel(void)
 {
 	uint32 cpu = smp_get_current_cpu();
@@ -287,6 +295,7 @@ long_smp_start_kernel(void)
 	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
 	asm("cld");
 	asm("fninit");
+	enable_sse();
 
 	// Fix our kernel stack address.
 	gKernelArgs.cpu_kstack[cpu].start
@@ -307,6 +316,8 @@ long_start_kernel()
 	get_current_cpuid(&info, 0x80000001, 0);
 	if ((info.regs.edx & (1 << 29)) == 0)
 		panic("64-bit kernel requires a 64-bit CPU");
+
+	enable_sse();
 
 	preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
 		gKernelArgs.kernel_image.Pointer());

@@ -6,22 +6,12 @@
  * Distributed under the terms of the NewOS License.
 */
 
-#if !_BOOT_MODE
-#	include "asm_offsets.h"
-#endif
 
 #include <asm_defs.h>
 
 
-// We don't need the indirection in the boot loader.
-#if _BOOT_MODE
-#	define memcpy_generic	memcpy
-#	define memset_generic	memset
-#endif
-
-
 .align 4
-FUNCTION(memcpy_generic):
+FUNCTION(memcpy):
 	pushl	%esi
 	pushl	%edi
 	movl	12(%esp),%edi	/* dest */
@@ -45,13 +35,13 @@ FUNCTION(memcpy_generic):
 	popl	%edi
 	popl	%esi
 	ret
-FUNCTION_END(memcpy_generic)
-SYMBOL(memcpy_generic_end):
+FUNCTION_END(memcpy)
+SYMBOL(memcpy_end):
 
 
 /* void *memset(void *dest, int value, size_t length); */
 .align 4
-FUNCTION(memset_generic):
+FUNCTION(memset):
 	push	%ebp
 	mov		%esp, %ebp
 
@@ -111,19 +101,6 @@ FUNCTION(memset_generic):
 	mov		%ebp, %esp
 	pop		%ebp
 	ret
-FUNCTION_END(memset_generic)
-SYMBOL(memset_generic_end):
-
-
-#if !_BOOT_MODE
-
-.align 4
-FUNCTION(memcpy):
-	jmp		*(gOptimizedFunctions + X86_OPTIMIZED_FUNCTIONS_memcpy)
-FUNCTION_END(memcpy)
-
-FUNCTION(memset):
-	jmp		*(gOptimizedFunctions + X86_OPTIMIZED_FUNCTIONS_memset)
 FUNCTION_END(memset)
+SYMBOL(memset_end):
 
-#endif	// !_BOOT_MODE

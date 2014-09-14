@@ -35,11 +35,13 @@
 	push	%r13;						\
 	push	%r14;						\
 	push	%r15;						\
+	pushq	$0;							\
 	push	$iframeType;
+
 
 // Restore the interrupt frame.
 #define RESTORE_IFRAME()				\
-	add		$8, %rsp;					\
+	add		$16, %rsp;					\
 	pop		%r15;						\
 	pop		%r14;						\
 	pop		%r13;						\
@@ -116,6 +118,23 @@
 	call	x86_exit_user_debug_at_kernel_entry;				\
   1:
 
+#define CLEAR_FPU_STATE() \
+	pxor %xmm0, %xmm0; \
+	pxor %xmm1, %xmm1; \
+	pxor %xmm2, %xmm2; \
+	pxor %xmm3, %xmm3; \
+	pxor %xmm4, %xmm4; \
+	pxor %xmm5, %xmm5; \
+	pxor %xmm6, %xmm6; \
+	pxor %xmm7, %xmm7; \
+	pxor %xmm8, %xmm8; \
+	pxor %xmm9, %xmm9; \
+	pxor %xmm10, %xmm10; \
+	pxor %xmm11, %xmm11; \
+	pxor %xmm12, %xmm12; \
+	pxor %xmm13, %xmm13; \
+	pxor %xmm14, %xmm14; \
+	pxor %xmm15, %xmm15
 
 // The following code defines the interrupt service routines for all 256
 // interrupts. It creates a block of handlers, each 16 bytes, that the IDT
@@ -198,10 +217,17 @@ STATIC_FUNCTION(int_bottom):
 	// exception.
 	orq		$X86_EFLAGS_RESUME, IFRAME_flags(%rbp)
 
+	subq	$512, %rsp
+	andq	$~15, %rsp
+	fxsaveq	(%rsp)
+
 	// Call the interrupt handler.
-	movq	%rsp, %rdi
-	movq	IFRAME_vector(%rsp), %rax
+	movq	%rbp, %rdi
+	movq	IFRAME_vector(%rbp), %rax
 	call	*gInterruptHandlerTable(, %rax, 8)
+
+	fxrstorq	(%rsp)
+	movq	%rbp, %rsp
 
 	// Restore the saved registers.
 	RESTORE_IFRAME()
@@ -217,11 +243,15 @@ STATIC_FUNCTION(int_bottom_user):
 
 	// Push the rest of the interrupt frame to the stack.
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
-
 	cld
 
 	// Frame pointer is the iframe.
 	movq	%rsp, %rbp
+
+	subq	$512, %rsp
+	andq	$~15, %rsp
+	fxsaveq	(%rsp)
+	movq	%rsp, IFRAME_fpu(%rbp)
 
 	// Set the RF (resume flag) in RFLAGS. This prevents an instruction
 	// breakpoint on the instruction we're returning to to trigger a debug
@@ -235,8 +265,8 @@ STATIC_FUNCTION(int_bottom_user):
 	UPDATE_THREAD_USER_TIME()
 
 	// Call the interrupt handler.
-	movq	%rsp, %rdi
-	movq	IFRAME_vector(%rsp), %rax
+	movq	%rbp, %rdi
+	movq	IFRAME_vector(%rbp), %rax
 	call	*gInterruptHandlerTable(, %rax, 8)
 
 	// If there are no signals pending or we're not debugging, we can avoid
@@ -249,6 +279,9 @@ STATIC_FUNCTION(int_bottom_user):
 	cli
 
 	UPDATE_THREAD_KERNEL_TIME()
+
+	fxrstorq	(%rsp)
+	movq	%rbp, %rsp
 
 	// Restore the saved registers.
 	RESTORE_IFRAME()
@@ -274,6 +307,9 @@ STATIC_FUNCTION(int_bottom_user):
 	movq	%rbp, %rdi
 	call	x86_init_user_debug_at_kernel_exit
 1:
+	fxrstorq	(%rsp)
+	movq	%rbp, %rsp
+
 	// Restore the saved registers.
 	RESTORE_IFRAME()
 
@@ -315,6 +351,7 @@ FUNCTION(x86_64_syscall_entry):
 
 	// Frame pointer is the iframe.
 	movq	%rsp, %rbp
+	andq	$~15, %rsp
 
 	// Preserve call number (R14 is callee-save), get thread pointer.
 	movq	%rax, %r14
@@ -367,10 +404,10 @@ FUNCTION(x86_64_syscall_entry):
 
 	// TODO: post-syscall tracing
 
+.Lsyscall_return:
 	// Restore the original stack pointer and return.
 	movq	%rbp, %rsp
 
-.Lsyscall_return:
 	// Clear the restarted flag.
 	testl	$THREAD_FLAGS_SYSCALL_RESTARTED, THREAD_flags(%r12)
 	jz		2f
@@ -394,7 +431,9 @@ FUNCTION(x86_64_syscall_entry):
 
 	// If we've just restored a signal frame, use the IRET path.
 	cmpq	$SYSCALL_RESTORE_SIGNAL_FRAME, %r14
-	je		.Liret
+	je		.Lrestore_fpu
+
+	CLEAR_FPU_STATE()
 
 	// Restore the iframe and RCX/R11 for SYSRET.
 	RESTORE_IFRAME()
@@ -458,14 +497,19 @@ FUNCTION(x86_64_syscall_entry):
 1:
 	// Install breakpoints, if defined.
 	testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%r12)
-	jz		.Liret
+	jz		1f
 	movq	%rbp, %rdi
 	call	x86_init_user_debug_at_kernel_exit
-
+1:
 	// On this return path it is possible that the frame has been modified,
 	// for example to execute a signal handler. In this case it is safer to
 	// return via IRET.
+	CLEAR_FPU_STATE()
+	jmp .Liret
 
+.Lrestore_fpu:
+	movq	IFRAME_fpu(%rbp), %rax
+	fxrstorq	(%rax)
 .Liret:
 	// Restore the saved registers.
 	RESTORE_IFRAME()
@@ -493,6 +537,7 @@ FUNCTION(x86_64_syscall_entry):
 
 	// Make space on the stack.
 	subq	%rcx, %rsp
+	andq	$~15, %rsp
 	movq	%rsp, %rdi
 
 	// Set a fault handler.
@@ -535,7 +580,7 @@ FUNCTION(x86_return_to_userland):
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
 			, THREAD_flags(%r12)
-	jnz		.Lkernel_exit_work
+	jnz		.Luserland_return_work
 
 	// update the thread's kernel time and return
 	UPDATE_THREAD_KERNEL_TIME()
@@ -544,4 +589,33 @@ FUNCTION(x86_return_to_userland):
 	RESTORE_IFRAME()
 	swapgs
 	iretq
+.Luserland_return_work:
+	// Slow path for return to userland.
+
+	// Do we need to handle signals?
+	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD) \
+			, THREAD_flags(%r12)
+	jnz		.Luserland_return_handle_signals
+	cli
+	call	thread_at_kernel_exit_no_signals
+
+.Luserland_return_work_done:
+	// Install breakpoints, if defined.
+	testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%r12)
+	jz		1f
+	movq	%rbp, %rdi
+	call	x86_init_user_debug_at_kernel_exit
+1:
+	// Restore the saved registers.
+	RESTORE_IFRAME()
+
+	// Restore the previous GS base and return.
+	swapgs
+	iretq
+.Luserland_return_handle_signals:
+	// thread_at_kernel_exit requires interrupts to be enabled, it will disable
+	// them after.
+	sti
+	call	thread_at_kernel_exit
+	jmp		.Luserland_return_work_done
 FUNCTION_END(x86_return_to_userland)

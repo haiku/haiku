@@ -8,6 +8,7 @@
 
 struct iframe {
 	uint64 type;
+	void* fpu;
 	uint64 r15;
 	uint64 r14;
 	uint64 r13;

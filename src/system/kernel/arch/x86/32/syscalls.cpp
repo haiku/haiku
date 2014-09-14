@@ -30,6 +30,10 @@ extern "C" void x86_sysenter();
 void (*gX86SetSyscallStack)(addr_t stackTop) = NULL;
 
 
+extern int memcpy_end;
+extern int memset_end;
+
+
 static bool
 all_cpus_have_feature(enum x86_feature_type type, int feature)
 {
@@ -109,8 +113,20 @@ x86_initialize_syscall(void)
 	addr_t position = fill_commpage_entry(COMMPAGE_ENTRY_X86_SYSCALL,
 		syscallCode, len);
 
+	// put the optimized functions into the commpage
+	size_t memcpyLen = (addr_t)&memcpy_end - (addr_t)memcpy;
+	addr_t memcpyPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY,
+		(const void*)memcpy, memcpyLen);
+	size_t memsetLen = (addr_t)&memset_end - (addr_t)memset;
+	addr_t memsetPosition = fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMSET,
+		(const void*)memset, memsetLen);
+
 	// add syscall to the commpage image
 	image_id image = get_commpage_image();
+	elf_add_memory_image_symbol(image, "commpage_memcpy", memcpyPosition,
+		memcpyLen, B_SYMBOL_TYPE_TEXT);
+	elf_add_memory_image_symbol(image, "commpage_memset", memsetPosition,
+		memsetLen, B_SYMBOL_TYPE_TEXT);
 	elf_add_memory_image_symbol(image, "commpage_syscall", position, len,
 		B_SYMBOL_TYPE_TEXT);
 }
