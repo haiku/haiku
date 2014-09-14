@@ -479,7 +479,8 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 	} msg;	// write_sem/read_sem are protected by fLock when accessed by
 			// others, the other fields are protected by write_sem/read_sem
 
-	addr_t			fault_handler;
+	void			(*fault_handler)(void);
+	jmp_buf			fault_handler_state;
 	int32			page_faults_allowed;
 		/* this field may only stay in debug builds in the future */
 

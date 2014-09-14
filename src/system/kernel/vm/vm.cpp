@@ -27,6 +27,7 @@
 
 #include <arch/cpu.h>
 #include <arch/vm.h>
+#include <arch/user_memory.h>
 #include <boot/elf.h>
 #include <boot/stage2.h>
 #include <condition_variable.h>
@@ -4219,7 +4220,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isExecute,
 				// this will cause the arch dependant page fault handler to
 				// modify the IP on the interrupt frame or whatever to return
 				// to this address
-				*newIP = thread->fault_handler;
+				*newIP = reinterpret_cast<uintptr_t>(thread->fault_handler);
 			} else {
 				// unhandled page fault in the kernel
 				panic("vm_page_fault: unhandled page fault in kernel space at "
@@ -5255,8 +5256,7 @@ user_memcpy(void* to, const void* from, size_t size)
 	if ((addr_t)from + size < (addr_t)from || (addr_t)to + size < (addr_t)to)
 		return B_BAD_ADDRESS;
 
-	if (arch_cpu_user_memcpy(to, from, size,
-			&thread_get_current_thread()->fault_handler) < B_OK)
+	if (arch_cpu_user_memcpy(to, from, size) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return B_OK;
@@ -5286,8 +5286,7 @@ user_strlcpy(char* to, const char* from, size_t size)
 		// NOTE: Since arch_cpu_user_strlcpy() determines the length of \a from,
 		// the source address might still overflow.
 
-	ssize_t result = arch_cpu_user_strlcpy(to, from, maxSize,
-		&thread_get_current_thread()->fault_handler);
+	ssize_t result = arch_cpu_user_strlcpy(to, from, maxSize);
 
 	// If we hit the address overflow boundary, fail.
 	if (result < 0 || (result >= 0 && (size_t)result >= maxSize
@@ -5305,9 +5304,7 @@ user_memset(void* s, char c, size_t count)
 	// don't allow address overflows
 	if ((addr_t)s + count < (addr_t)s)
 		return B_BAD_ADDRESS;
-
-	if (arch_cpu_user_memset(s, c, count,
-			&thread_get_current_thread()->fault_handler) < B_OK)
+	if (arch_cpu_user_memset(s, c, count) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return B_OK;

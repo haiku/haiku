@@ -105,7 +105,7 @@ FUNCTION_END(arm_get_fp);
 
 
 /* status_t arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
-FUNCTION(arch_cpu_user_memcpy):
+FUNCTION(_arch_cpu_user_memcpy):
 	stmfd   sp!, { r4-r6, lr }
 
 	ldr	r6, [r3]
@@ -140,10 +140,10 @@ FUNCTION(arch_cpu_user_memcpy):
 	mov	r0, #-1
 
 	ldmfd   sp!, { r4-r6, pc }
-FUNCTION_END(arch_cpu_user_memcpy)
+FUNCTION_END(_arch_cpu_user_memcpy)
 
 /* status_t arch_cpu_user_memset(void *to, char c, size_t count, addr_t *faultHandler) */
-FUNCTION(arch_cpu_user_memset):
+FUNCTION(_arch_cpu_user_memset):
 	stmfd   sp!, { r4-r5, lr }
 
 	ldr	r5, [r3]
@@ -179,10 +179,10 @@ FUNCTION(arch_cpu_user_memset):
 	str	r5, [r3]
 
 	ldmfd   sp!, { r4-r5, pc }
-FUNCTION_END(arch_cpu_user_memset)
+FUNCTION_END(_arch_cpu_user_memset)
 
 /* ssize_t arch_cpu_user_strlcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
-FUNCTION(arch_cpu_user_strlcpy):
+FUNCTION(_arch_cpu_user_strlcpy):
 	stmfd   sp!, { r4-r6, lr }
 	ldr	r5, [r3]
 	ldr	r4, =.L_user_strlcpy_error
@@ -210,7 +210,7 @@ FUNCTION(arch_cpu_user_strlcpy):
 	str	r5, [r3]
 
 	ldmfd   sp!, { r4-r6, pc }
-FUNCTION_END(arch_cpu_user_strlcpy)
+FUNCTION_END(_arch_cpu_user_strlcpy)
 
 
 /*!	\fn void arch_debug_call_with_fault_handler(cpu_ent* cpu,

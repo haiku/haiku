@@ -279,7 +279,7 @@ x86_page_fault_exception(struct iframe* frame)
 				debug_set_page_fault_info(cr2, frame->ip,
 					(frame->error_code & 0x2) != 0
 						? DEBUG_PAGE_FAULT_WRITE : 0);
-				frame->ip = thread->fault_handler;
+				frame->ip = reinterpret_cast<uintptr_t>(thread->fault_handler);
 				return;
 			}
 		}
@@ -295,9 +295,10 @@ x86_page_fault_exception(struct iframe* frame)
 		// TODO: Now we are generally allowing user_memcpy() with interrupts
 		// disabled, which in most cases is a bug. We should add some thread
 		// flag allowing to explicitly indicate that this handling is desired.
+		uintptr_t handler = reinterpret_cast<uintptr_t>(thread->fault_handler);
 		if (thread && thread->fault_handler != 0) {
-			if (frame->ip != thread->fault_handler) {
-				frame->ip = thread->fault_handler;
+			if (frame->ip != handler) {
+				frame->ip = handler;
 				return;
 			}
 

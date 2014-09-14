@@ -270,7 +270,7 @@ arch_arm_data_abort(struct iframe *frame)
 					"debugger!\n");
 				debug_set_page_fault_info(far, frame->pc,
 						isWrite ? DEBUG_PAGE_FAULT_WRITE : 0);
-				frame->pc = thread->fault_handler;
+				frame->pc = reinterpret_cast<uintptr_t>(thread->fault_handler);
 				return;
 			}
 		}
@@ -286,9 +286,10 @@ arch_arm_data_abort(struct iframe *frame)
 		// TODO: Now we are generally allowing user_memcpy() with interrupts
 		// disabled, which in most cases is a bug. We should add some thread
 		// flag allowing to explicitly indicate that this handling is desired.
+		uintptr_t handler = reinterpret_cast<uintptr_t>(thread->fault_handler);
 		if (thread && thread->fault_handler != 0) {
-			if (frame->pc != thread->fault_handler) {
-				frame->pc = thread->fault_handler;
+			if (frame->pc != handler) {
+				frame->pc = handler;
 				return;
 			}
 

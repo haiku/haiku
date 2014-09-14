@@ -142,7 +142,7 @@ FUNCTION_END(x86_reboot)
 
 
 /* status_t arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
-FUNCTION(arch_cpu_user_memcpy):
+FUNCTION(_arch_cpu_user_memcpy):
 	pushl	%esi
 	pushl	%edi
 	movl	12(%esp),%edi	/* dest */
@@ -182,11 +182,11 @@ FUNCTION(arch_cpu_user_memcpy):
 	popl	%edi
 	popl	%esi
 	ret
-FUNCTION_END(arch_cpu_user_memcpy)
+FUNCTION_END(_arch_cpu_user_memcpy)
 
 
 /* status_t arch_cpu_user_memset(void *to, char c, size_t count, addr_t *faultHandler) */
-FUNCTION(arch_cpu_user_memset):
+FUNCTION(_arch_cpu_user_memset):
 	pushl	%esi
 	pushl	%edi
 	movl	12(%esp),%edi	/* dest */
@@ -217,11 +217,11 @@ FUNCTION(arch_cpu_user_memset):
 	popl	%edi
 	popl	%esi
 	ret
-FUNCTION_END(arch_cpu_user_memset)
+FUNCTION_END(_arch_cpu_user_memset)
 
 
 /* ssize_t arch_cpu_user_strlcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
-FUNCTION(arch_cpu_user_strlcpy):
+FUNCTION(_arch_cpu_user_strlcpy):
 	pushl	%esi
 	pushl	%edi
 	pushl	%ebx
@@ -292,7 +292,7 @@ FUNCTION(arch_cpu_user_strlcpy):
 	popl	%edi
 	popl	%esi
 	ret
-FUNCTION_END(arch_cpu_user_strlcpy)
+FUNCTION_END(_arch_cpu_user_strlcpy)
 
 
 /*!	\fn void arch_debug_call_with_fault_handler(cpu_ent* cpu,
