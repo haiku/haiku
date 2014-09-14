@@ -315,6 +315,7 @@ FUNCTION(x86_64_syscall_entry):
 
 	// Frame pointer is the iframe.
 	movq	%rsp, %rbp
+	andq	$~15, %rsp
 
 	// Preserve call number (R14 is callee-save), get thread pointer.
 	movq	%rax, %r14
@@ -367,10 +368,10 @@ FUNCTION(x86_64_syscall_entry):
 
 	// TODO: post-syscall tracing
 
+.Lsyscall_return:
 	// Restore the original stack pointer and return.
 	movq	%rbp, %rsp
 
-.Lsyscall_return:
 	// Clear the restarted flag.
 	testl	$THREAD_FLAGS_SYSCALL_RESTARTED, THREAD_flags(%r12)
 	jz		2f
@@ -493,6 +494,7 @@ FUNCTION(x86_64_syscall_entry):
 
 	// Make space on the stack.
 	subq	%rcx, %rsp
+	andq	$~15, %rsp
 	movq	%rsp, %rdi
 
 	// Set a fault handler.
