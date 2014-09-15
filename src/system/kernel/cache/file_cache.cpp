@@ -434,7 +434,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 			vm_memcpy_from_physical((void*)buffer,
 				pages[i]->physical_page_number * B_PAGE_SIZE + pageOffset,
-				bytes, true);
+				bytes, IS_USER_ADDRESS(buffer));
 
 			buffer += bytes;
 			bufferSize -= bytes;
@@ -588,7 +588,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		if (useBuffer) {
 			// copy data from user buffer
 			vm_memcpy_to_physical(base + pageOffset, (void*)buffer, bytes,
-				true);
+				IS_USER_ADDRESS(buffer));
 		} else {
 			// clear buffer instead
 			vm_memset_physical(base + pageOffset, 0, bytes);
@@ -808,16 +808,17 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 				phys_addr_t pageAddress
 					= (phys_addr_t)page->physical_page_number * B_PAGE_SIZE
 						+ pageOffset;
+				bool userBuffer = IS_USER_ADDRESS(buffer);
 				if (doWrite) {
 					if (useBuffer) {
 						vm_memcpy_to_physical(pageAddress, (void*)buffer,
-							bytesInPage, true);
+							bytesInPage, userBuffer);
 					} else {
 						vm_memset_physical(pageAddress, 0, bytesInPage);
 					}
 				} else if (useBuffer) {
 					vm_memcpy_from_physical((void*)buffer, pageAddress,
-						bytesInPage, true);
+						bytesInPage, userBuffer);
 				}
 
 				locker.Lock();
