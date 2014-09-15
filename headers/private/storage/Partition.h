@@ -70,8 +70,7 @@ public:
 
 			status_t			Mount(const char* mountPoint = NULL,
 									uint32 mountFlags = 0,
-									const char* parameters = NULL,
-									dev_t* devicePointer = NULL);
+									const char* parameters = NULL);
 			status_t			Unmount(uint32 unmountFlags = 0);
 
 	// Hierarchy Info
