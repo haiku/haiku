@@ -522,7 +522,7 @@ BPartition::GetMountPoint(BPath* mountPoint) const
 */
 status_t
 BPartition::Mount(const char* mountPoint, uint32 mountFlags,
-	const char* parameters, dev_t* devicePointer)
+	const char* parameters)
 {
 	if (IsMounted() || !ContainsFileSystem())
 		return B_BAD_VALUE;
