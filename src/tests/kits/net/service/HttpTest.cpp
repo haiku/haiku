@@ -45,7 +45,7 @@ HttpTest::GetTest()
 
 	CPPUNIT_ASSERT(t.Run());
 
-	while(t.IsRunning())
+	while (t.IsRunning())
 		snooze(1000);
 
 	CPPUNIT_ASSERT_EQUAL(B_OK, t.Status());
@@ -59,7 +59,44 @@ HttpTest::GetTest()
 		// Fixed size as we know the response format.
 	CPPUNIT_ASSERT(!c->GetCookieJar().GetIterator().HasNext());
 		// This page should not set cookies
-	
+
+	c->ReleaseReference();
+}
+
+
+void
+HttpTest::ProxyTest()
+{
+	BUrl testUrl(fBaseUrl, "/user-agent");
+
+	BUrlContext* c = new BUrlContext();
+	c->AcquireReference();
+	c->SetProxy("120.203.214.182", 83);
+
+	BHttpRequest t(testUrl);
+	t.SetContext(c);
+
+	BUrlProtocolListener l;
+	t.SetListener(&l);
+
+	CPPUNIT_ASSERT(t.Run());
+
+	while (t.IsRunning())
+		snooze(1000);
+
+	CPPUNIT_ASSERT_EQUAL(B_OK, t.Status());
+
+	const BHttpResult& r = dynamic_cast<const BHttpResult&>(t.Result());
+
+printf("%s\n", r.StatusText().String());
+
+	CPPUNIT_ASSERT_EQUAL(200, r.StatusCode());
+	CPPUNIT_ASSERT_EQUAL(BString("OK"), r.StatusText());
+	CPPUNIT_ASSERT_EQUAL(42, r.Length());
+		// Fixed size as we know the response format.
+	CPPUNIT_ASSERT(!c->GetCookieJar().GetIterator().HasNext());
+		// This page should not set cookies
+
 	c->ReleaseReference();
 }
 
@@ -93,7 +130,7 @@ HttpTest::PortTest()
 
 	CPPUNIT_ASSERT(t.Run());
 
-	while(t.IsRunning())
+	while (t.IsRunning())
 		snooze(1000);
 
 	CPPUNIT_ASSERT_EQUAL(B_OK, t.Status());
@@ -123,7 +160,7 @@ HttpTest::UploadTest()
 
 	CPPUNIT_ASSERT(t.Run());
 
-	while(t.IsRunning())
+	while (t.IsRunning())
 		snooze(1000);
 
 	CPPUNIT_ASSERT_EQUAL(B_OK, t.Status());
@@ -131,7 +168,7 @@ HttpTest::UploadTest()
 	const BHttpResult& r = dynamic_cast<const BHttpResult&>(t.Result());
 	CPPUNIT_ASSERT_EQUAL(200, r.StatusCode());
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), r.StatusText());
-	CPPUNIT_ASSERT_EQUAL(474, r.Length());
+	CPPUNIT_ASSERT_EQUAL(466, r.Length());
 		// Fixed size as we know the response format.
 }
 
@@ -165,7 +202,7 @@ HttpTest::_AuthTest(BUrl& testUrl)
 
 	CPPUNIT_ASSERT(t.Run());
 
-	while(t.IsRunning())
+	while (t.IsRunning())
 		snooze(1000);
 
 	CPPUNIT_ASSERT_EQUAL(B_OK, t.Status());
@@ -215,6 +252,9 @@ HttpTest::AddTests(BTestSuite& parent)
 		// HTTP-only
 		suite.addTest(new CppUnit::TestCaller<HttpTest>(
 			"HttpTest::PortTest", &HttpTest::PortTest));
+
+		suite.addTest(new CppUnit::TestCaller<HttpTest>("HttpTest::ProxyTest",
+			&HttpTest::ProxyTest));
 
 		parent.addTest("HttpTest", &suite);
 	}

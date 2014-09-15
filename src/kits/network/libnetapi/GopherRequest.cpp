@@ -235,7 +235,7 @@ BGopherRequest::_ProtocolLoop()
 	if (fSocket == NULL)
 		return B_NO_MEMORY;
 
-	if (!_ResolveHostName(70)) {
+	if (!_ResolveHostName(fUrl.Host(), fUrl.HasPort() ? fUrl.Port() : 70)) {
 		_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR,
 			"Unable to resolve hostname (%s), aborting.",
 				fUrl.Host().String());

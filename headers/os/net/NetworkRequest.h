@@ -26,7 +26,7 @@ public:
 	virtual	status_t			Stop();
 
 protected:
-			bool 				_ResolveHostName(uint16_t port);
+			bool 				_ResolveHostName(BString host, uint16_t port);
 
 			void				_ProtocolSetup();
 			status_t			_GetLine(BString& destString);

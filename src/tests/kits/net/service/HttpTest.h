@@ -24,6 +24,7 @@ public:
 								void	UploadTest();
 								void	AuthBasicTest();
 								void	AuthDigestTest();
+								void	ProxyTest();
 
 	static						void	AddTests(BTestSuite& suite);
 

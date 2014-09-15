@@ -12,6 +12,9 @@
 #include <stdio.h>
 
 
+static BReference<BUrlContext> gDefaultContext = new(std::nothrow) BUrlContext();
+
+
 BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener,
 	BUrlContext* context, const char* threadName, const char* protocolName)
 	:
@@ -25,6 +28,8 @@ BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener,
 	fThreadName(threadName),
 	fProtocol(protocolName)
 {
+	if (fContext == NULL)
+		fContext = gDefaultContext;
 }
 
 

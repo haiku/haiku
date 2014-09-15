@@ -18,7 +18,9 @@
 BUrlContext::BUrlContext()
 	:
 	fCookieJar(),
-	fAuthenticationMap(NULL)
+	fAuthenticationMap(NULL),
+	fProxyHost(),
+	fProxyPort(0)
 {
 	fAuthenticationMap = new(std::nothrow) BHttpAuthenticationMap();
 
@@ -31,8 +33,8 @@ BUrlContext::BUrlContext()
 
 BUrlContext::~BUrlContext()
 {
-	BHttpAuthenticationMap::Iterator iterator =
-		fAuthenticationMap->GetIterator();
+	BHttpAuthenticationMap::Iterator iterator
+		= fAuthenticationMap->GetIterator();
 	while (iterator.HasNext())
 		delete *iterator.NextValue();
 
@@ -74,6 +76,14 @@ BUrlContext::AddAuthentication(const BUrl& url,
 }
 
 
+void
+BUrlContext::SetProxy(BString host, uint16 port)
+{
+	fProxyHost = host;
+	fProxyPort = port;
+}
+
+
 // #pragma mark Context accessors
 
 
@@ -101,4 +111,25 @@ BUrlContext::GetAuthentication(const BUrl& url)
 	} while (authentication == NULL);
 
 	return *authentication;
+}
+
+
+bool
+BUrlContext::UseProxy()
+{
+	return !fProxyHost.IsEmpty();
+}
+
+
+BString
+BUrlContext::GetProxyHost()
+{
+	return fProxyHost;
+}
+
+
+uint16
+BUrlContext::GetProxyPort()
+{
+	return fProxyPort;
 }

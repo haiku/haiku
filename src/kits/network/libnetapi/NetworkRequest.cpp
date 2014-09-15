@@ -36,17 +36,14 @@ BNetworkRequest::Stop()
 
 
 bool
-BNetworkRequest::_ResolveHostName(uint16_t port)
+BNetworkRequest::_ResolveHostName(BString host, uint16_t port)
 {
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Resolving %s",
 		fUrl.UrlString().String());
 
-	if (fUrl.HasPort())
-		port = fUrl.Port();
-
 	// FIXME stop forcing AF_INET, when BNetworkAddress stops giving IPv6
 	// addresses when there isn't an IPv6 link available.
-	fRemoteAddr = BNetworkAddress(AF_INET, fUrl.Host(), port);
+	fRemoteAddr = BNetworkAddress(AF_INET, host, port);
 
 	if (fRemoteAddr.InitCheck() != B_OK)
 		return false;

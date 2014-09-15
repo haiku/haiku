@@ -319,7 +319,18 @@ BHttpRequest::_ProtocolLoop()
 		fHeaders.Clear();
 		_ResultHeaders().Clear();
 
-		if (!_ResolveHostName(fSSL ? 443 : 80)) {
+		BString host = fUrl.Host();
+		int port = fSSL ? 443 : 80;
+
+		if (fUrl.HasPort())
+			port = fUrl.Port();
+
+		if (fContext->UseProxy()) {
+			host = fContext->GetProxyHost();
+			port = fContext->GetProxyPort();
+		}
+
+		if (!_ResolveHostName(host, port)) {
 			_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR,
 				"Unable to resolve hostname (%s), aborting.",
 					fUrl.Host().String());
@@ -733,11 +744,20 @@ void
 BHttpRequest::_SendRequest()
 {
 	BString request(fRequestMethod);
+	request << ' ';
+
+	if (fContext->UseProxy()) {
+		// When there is a proxy, the request must include the host and port so
+		// the proxy knows where to send the request.
+		request << Url().Protocol() << "://" << Url().Host();
+		if (Url().HasPort())
+			request << ':' << Url().Port();
+	}
 
 	if (Url().HasPath())
-		request << ' ' << Url().Path();
+		request << Url().Path();
 	else
-		request << " /";
+		request << '/';
 
 	if (Url().HasRequest())
 		request << '?' << Url().Request();
