@@ -87,13 +87,13 @@ BUrl::BUrl(const BUrl& other)
 	fHasFragment(other.fHasFragment)
 {
 	if (fUrlStringValid)
-		fUrlString			= other.fUrlString;
+		fUrlString = other.fUrlString;
 
 	if (fAuthorityValid)
-		fAuthority			= other.fAuthority;
+		fAuthority = other.fAuthority;
 
 	if (fUserInfoValid)
-		fUserInfo			= other.fUserInfo;
+		fUserInfo = other.fUserInfo;
 
 }
 
@@ -731,35 +731,35 @@ BUrl::operator!=(BUrl& other) const
 const BUrl&
 BUrl::operator=(const BUrl& other)
 {
-	fUrlStringValid		= other.fUrlStringValid;
+	fUrlStringValid = other.fUrlStringValid;
 	if (fUrlStringValid)
-		fUrlString			= other.fUrlString;
+		fUrlString = other.fUrlString;
 
-	fAuthorityValid		= other.fAuthorityValid;
+	fAuthorityValid = other.fAuthorityValid;
 	if (fAuthorityValid)
-		fAuthority			= other.fAuthority;
+		fAuthority = other.fAuthority;
 
-	fUserInfoValid		= other.fUserInfoValid;
+	fUserInfoValid = other.fUserInfoValid;
 	if (fUserInfoValid)
-		fUserInfo			= other.fUserInfo;
+		fUserInfo = other.fUserInfo;
 
-	fProtocol			= other.fProtocol;
-	fUser				= other.fUser;
-	fPassword			= other.fPassword;
-	fHost				= other.fHost;
-	fPort				= other.fPort;
-	fPath				= other.fPath;
-	fRequest			= other.fRequest;
-	fFragment			= other.fFragment;
+	fProtocol = other.fProtocol;
+	fUser = other.fUser;
+	fPassword = other.fPassword;
+	fHost = other.fHost;
+	fPort = other.fPort;
+	fPath = other.fPath;
+	fRequest = other.fRequest;
+	fFragment = other.fFragment;
 
-	fHasProtocol		= other.fHasProtocol;
-	fHasUserName		= other.fHasUserName;
-	fHasPassword		= other.fHasPassword;
-	fHasHost			= other.fHasHost;
-	fHasPort			= other.fHasPort;
-	fHasPath			= other.fHasPath;
-	fHasRequest			= other.fHasRequest;
-	fHasFragment		= other.fHasFragment;
+	fHasProtocol = other.fHasProtocol;
+	fHasUserName = other.fHasUserName;
+	fHasPassword = other.fHasPassword;
+	fHasHost = other.fHasHost;
+	fHasPort = other.fHasPort;
+	fHasPath = other.fHasPath;
+	fHasRequest = other.fHasRequest;
+	fHasFragment = other.fHasFragment;
 
 	return *this;
 }
