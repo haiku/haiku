@@ -66,17 +66,35 @@ BUrl::BUrl(const BUrl& other)
 	:
 	BArchivable(),
 	fUrlString(),
-	fProtocol(),
-	fUser(),
-	fPassword(),
-	fHost(),
-	fPort(0),
-	fPath(),
-	fRequest(),
-	fHasHost(false),
-	fHasFragment(false)
+	fProtocol(other.fProtocol),
+	fUser(other.fUser),
+	fPassword(other.fPassword),
+	fHost(other.fHost),
+	fPort(other.fPort),
+	fPath(other.fPath),
+	fRequest(other.fRequest),
+	fFragment(other.fFragment),
+	fUrlStringValid(other.fUrlStringValid),
+	fAuthorityValid(other.fAuthorityValid),
+	fUserInfoValid(other.fUserInfoValid),
+	fHasProtocol(other.fHasProtocol),
+	fHasUserName(other.fHasUserName),
+	fHasPassword(other.fHasPassword),
+	fHasHost(other.fHasHost),
+	fHasPort(other.fHasPort),
+	fHasPath(other.fHasPath),
+	fHasRequest(other.fHasRequest),
+	fHasFragment(other.fHasFragment)
 {
-	*this = other;
+	if (fUrlStringValid)
+		fUrlString			= other.fUrlString;
+
+	if (fAuthorityValid)
+		fAuthority			= other.fAuthority;
+
+	if (fUserInfoValid)
+		fUserInfo			= other.fUserInfo;
+
 }
 
 
