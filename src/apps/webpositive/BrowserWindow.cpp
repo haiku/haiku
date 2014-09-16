@@ -1993,8 +1993,8 @@ BrowserWindow::_ShowBookmarks()
 
 	if (status != B_OK && status != B_ALREADY_RUNNING) {
 		BString message(B_TRANSLATE_COMMENT("There was an error trying to "
-			"show the Bookmarks folder.\n\nError: %error", "Don't translate variable "
-			"%error"));
+			"show the Bookmarks folder.\n\nError: %error",
+			"Don't translate variable %error"));
 		message.ReplaceFirst("%error", strerror(status));
 		BAlert* alert = new BAlert(B_TRANSLATE("Bookmark error"),
 			message.String(), B_TRANSLATE("OK"), NULL, NULL,
@@ -2408,6 +2408,7 @@ BrowserWindow::_NewTabURL(bool isNewWindow) const
 	return url;
 }
 
+
 BString
 BrowserWindow::_EncodeURIComponent(const BString& search)
 {
@@ -2443,9 +2444,8 @@ void
 BrowserWindow::_VisitSearchEngine(const BString& search)
 {
 	BString engine = "";
-	engine.SetToFormat(fSearchPageURL, 
-		_EncodeURIComponent(search).String());
-	
+	engine.SetToFormat(fSearchPageURL, _EncodeURIComponent(search).String());
+
 	_VisitURL(engine);
 }
 
@@ -2499,7 +2499,7 @@ BrowserWindow::_SmartURLHandler(const BString& url)
 	else {
 		const char* localhostPrefix = "localhost/";
 
-		if(url.Compare(localhostPrefix, strlen(localhostPrefix)) == 0)
+		if (url.Compare(localhostPrefix, strlen(localhostPrefix)) == 0)
 			_VisitURL(url);
 		else {
 			bool isURL = false;
@@ -2610,9 +2610,8 @@ BrowserWindow::_ShowBookmarkBar(bool show)
 
 	fAppSettings->SetValue(kSettingsShowBookmarkBar, show);
 
-	if (show) {
+	if (show)
 		fBookmarkBar->Show();
-	} else {
+	else
 		fBookmarkBar->Hide();
-	}
 }
