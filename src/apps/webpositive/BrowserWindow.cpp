@@ -455,7 +455,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Reload"), new BMessage(RELOAD),
 		'R'));
 	// the label will be replaced with the appropriate text later on
-	fBookmarkBarMenuItem = new BMenuItem("Show/Hide bookmark bar",
+	fBookmarkBarMenuItem = new BMenuItem(B_TRANSLATE("Show bookmark bar"),
 		new BMessage(SHOW_HIDE_BOOKMARK_BAR));
 	menu->AddItem(fBookmarkBarMenuItem);
 	menu->AddSeparatorItem();
@@ -500,8 +500,11 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		BEntry bookmarkBar(&barDir, "Bookmark bar");
 		entry_ref bookmarkBarRef;
 		// TODO we could also check if the folder is empty here.
-		if (bookmarkBar.Exists() && bookmarkBar.GetRef(&bookmarkBarRef) == B_OK)
+		if (bookmarkBar.Exists() && bookmarkBar.GetRef(&bookmarkBarRef) == B_OK) {
 			fBookmarkBar = new BookmarkBar("Bookmarks", this, &bookmarkBarRef);
+			fBookmarkBarMenuItem->SetEnabled(true);
+		} else
+			fBookmarkBarMenuItem->SetEnabled(false);
 	}
 
 	// Back, Forward, Stop & Home buttons
@@ -608,15 +611,10 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		.Add(toggleFullscreenButton, 0.0f)
 	;
 
-	if (fBookmarkBar != NULL) {
-		if (fAppSettings->GetValue(kSettingsShowBookmarkBar, true)) {
-			// We need to hide the bookmark bar and then show it again
-			// to save the setting and set the menu item label.
-			fBookmarkBar->Hide();
-			_ShowBookmarkBar(true);
-		} else
-			_ShowBookmarkBar(false);
-	}
+	if (fAppSettings->GetValue(kSettingsShowBookmarkBar, true))
+		_ShowBookmarkBar(true);
+	else
+		_ShowBookmarkBar(false);
 
 	fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0,
 		false);
@@ -827,8 +825,7 @@ BrowserWindow::MessageReceived(BMessage* message)
 			break;
 
 		case SHOW_HIDE_BOOKMARK_BAR:
-			if (fBookmarkBar != NULL)
-				_ShowBookmarkBar(fBookmarkBar->IsHidden());
+			_ShowBookmarkBar(fBookmarkBar->IsHidden());
 			break;
 
 		case GOTO_URL:
@@ -2606,16 +2603,16 @@ BrowserWindow::_HandlePageSourceResult(const BMessage* message)
 void
 BrowserWindow::_ShowBookmarkBar(bool show)
 {
+	fBookmarkBarMenuItem->SetMarked(show);
+
 	if (fBookmarkBar == NULL || fBookmarkBar->IsHidden() != show)
 		return;
 
 	fAppSettings->SetValue(kSettingsShowBookmarkBar, show);
 
-	fBookmarkBarMenuItem->SetLabel(show
-		? B_TRANSLATE("Hide bookmark bar")
-		: B_TRANSLATE("Show bookmark bar"));
-	if (show)
+	if (show) {
 		fBookmarkBar->Show();
-	else
+	} else {
 		fBookmarkBar->Hide();
+	}
 }
