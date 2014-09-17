@@ -538,6 +538,7 @@ PackageCategory::PackageCategory()
 	:
 	BReferenceable(),
 	fIcon(),
+	fLabel(),
 	fName()
 {
 }
@@ -568,8 +569,8 @@ PackageCategory&
 PackageCategory::operator=(const PackageCategory& other)
 {
 	fIcon = other.fIcon;
-	fName = other.fName;
 	fLabel = other.fLabel;
+	fName = other.fName;
 	return *this;
 }
 
