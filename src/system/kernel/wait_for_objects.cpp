@@ -1072,8 +1072,7 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 			false);
 
 		if (result >= 0 && user_memcpy(userInfos, infos, bytes) != B_OK) {
-			if (result >= 0)
-				result = B_BAD_ADDRESS;
+			result = B_BAD_ADDRESS;
 		} else
 			syscall_restart_handle_timeout_post(result, timeout);
 	} else
@@ -1083,3 +1082,4 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 
 	return result;
 }
+
