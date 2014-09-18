@@ -486,8 +486,6 @@ public:
 		font.SetFamilyAndStyle(family, "Italic");
 		fPublisherView->SetFont(&font);
 		fPublisherView->SetHighColor(kLightBlack);
-		fPublisherView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
-			B_ALIGN_VERTICAL_UNSET));
 
 		// slightly bigger font
 		GetFont(&font);
