@@ -45,6 +45,7 @@
 #include "PackageListView.h"
 #include "PackageManager.h"
 #include "RatePackageWindow.h"
+#include "UserLoginWindow.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -54,6 +55,7 @@
 enum {
 	MSG_MODEL_WORKER_DONE = 'mmwd',
 	MSG_REFRESH_DEPOTS = 'mrdp',
+	MSG_LOG_IN = 'lgin',
 	MSG_PACKAGE_STATE_CHANGED = 'mpsc',
 	MSG_SHOW_SOURCE_PACKAGES = 'ssrc',
 	MSG_SHOW_DEVELOP_PACKAGES = 'sdvl'
@@ -204,6 +206,10 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_REFRESH_DEPOTS:
 			_StartRefreshWorker(true);
+			break;
+
+		case MSG_LOG_IN:
+			_OpenLoginWindow();
 			break;
 
 		case MSG_SHOW_SOURCE_PACKAGES:
@@ -394,6 +400,8 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 	BMenu* menu = new BMenu(B_TRANSLATE("Tools"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh depots"),
 			new BMessage(MSG_REFRESH_DEPOTS)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Log in"),
+			new BMessage(MSG_LOG_IN)));
 	menuBar->AddItem(menu);
 
 //	menu = new BMenu(B_TRANSLATE("Options"));
@@ -839,3 +847,13 @@ MainWindow::_NotifyUser(const char* title, const char* message)
 	if (alert != NULL)
 		alert->Go();
 }
+
+
+void
+MainWindow::_OpenLoginWindow()
+{
+	UserLoginWindow* window = new UserLoginWindow(this,
+		BRect(0, 0, 500, 400));
+	window->Show();
+}
+

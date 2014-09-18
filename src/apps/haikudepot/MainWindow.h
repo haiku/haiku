@@ -71,6 +71,8 @@ private:
 			void				_NotifyUser(const char* title,
 									const char* message);
 
+			void				_OpenLoginWindow();
+
 private:
 			FilterView*			fFilterView;
 			PackageListView*	fPackageListView;
