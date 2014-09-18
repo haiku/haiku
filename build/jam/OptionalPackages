@@ -184,7 +184,7 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 	# available on gcc2-only builds.
 	if $(TARGET_PACKAGING_ARCHS) != x86_gcc2 {
 		AddHaikuImagePackages git_cvs ;
-	;
+	}
 }
 
 
