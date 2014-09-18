@@ -15,6 +15,7 @@
 #include <Path.h>
 #include <ScrollView.h>
 #include <TextView.h>
+#include <Bitmap.h>
 
 #include <StringForSize.h>
 
@@ -49,6 +50,7 @@ protected:
 
 private:
 			BootDrive*			fDrive;
+			BBitmap*			fIcon;
 			BString				fName;
 			BPath				fPath;
 			BString				fSize;
@@ -73,6 +75,11 @@ DriveItem::DriveItem(const BDiskDevice& device, const BootMenuList& menus)
 	else
 		fName = B_TRANSLATE_COMMENT("Hard Drive", "Default disk name");
 
+	fIcon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1),
+		B_RGBA32);
+	if (device.GetIcon(fIcon, B_LARGE_ICON) != B_OK)
+		memset(fIcon->Bits(), 0, fIcon->BitsLength());
+
 	fDrive = new BootDrive(fPath.Path());
 
 	fIsInstalled = fDrive->InstalledMenu(menus) != NULL;
@@ -85,6 +92,8 @@ DriveItem::DriveItem(const BDiskDevice& device, const BootMenuList& menus)
 
 DriveItem::~DriveItem()
 {
+	delete fDrive;
+	delete fIcon;
 }
 
 
@@ -113,7 +122,7 @@ void
 DriveItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
 	owner->PushState();
-
+	owner->SetDrawingMode(B_OP_ALPHA);
 	if (IsSelected() || complete) {
 		if (IsSelected()) {
 			owner->SetHighColor(tint_color(owner->LowColor(), B_DARKEN_2_TINT));
@@ -131,8 +140,12 @@ DriveItem::DrawItem(BView* owner, BRect frame, bool complete)
 	else
 		owner->SetHighColor(black);
 
+	// icon
+	owner->MovePenTo(frame.left + 4, frame.top + 1);
+	owner->DrawBitmap(fIcon);
+
 	// device
-	owner->MovePenTo(frame.left + 4, frame.top + fSecondBaselineOffset);
+	owner->MovePenTo(frame.left + 8 + fIcon->Bounds().Width(), frame.top + fSecondBaselineOffset);
 	owner->DrawString(fPath.Path());
 
 	// size
@@ -145,7 +158,7 @@ DriveItem::DrawItem(BView* owner, BRect frame, bool complete)
 	boldFont.SetFace(B_BOLD_FACE);
 	owner->SetFont(&boldFont);
 
-	owner->MovePenTo(frame.left + 4, frame.top + fBaselineOffset);
+	owner->MovePenTo(frame.left + 8 + fIcon->Bounds().Width(), frame.top + fBaselineOffset);
 	owner->DrawString(fName.String());
 
 	if (fCanBeInstalled != B_OK) {
