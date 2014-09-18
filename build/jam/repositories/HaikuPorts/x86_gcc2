@@ -13,7 +13,7 @@ RemotePackageRepository HaikuPorts
 	texi2html-1.82-2
 	timgmsoundfont-2004_01_24-3
 	wqy_microhei-0.2.0~beta-3
-	youtube_dl-2014.06.19-1
+	youtube_dl-2014.06.19-2
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
@@ -21,11 +21,11 @@ RemotePackageRepository HaikuPorts
 	acr-0.9.9_git-1
 	album-0.9.3-1
 	ale-0.9.1-2
-	apr-1.4.6-7
-	apr_devel-1.4.6-7
-	apr_util-1.4.1-3
-	apr_util_devel-1.4.1-3
-	asciidoc-8.6.8-1
+	apr-1.5.0-1
+	apr_devel-1.5.0-1
+	apr_util-1.5.3-1
+	apr_util_devel-1.5.3-1
+	asciidoc-8.6.8-2
 	autoconf-2.69-5
 	automake-1.13.1-4
 	beae-1.2-2
@@ -38,10 +38,10 @@ RemotePackageRepository HaikuPorts
 	binutils-2.17_2013_04_21-2
 	bison-2.4.3-6
 	blogpositive-0.4.0-2
-	buildbot_slave-0.8.8-2
+	buildbot_slave-0.8.8-3
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
-	bzr-2.6.0-1
+	bzr-2.6.0-2
 	canna-1.0.1-1
 	capitalbe-1.0-2
 	caya-2013.07.31-3
@@ -49,17 +49,17 @@ RemotePackageRepository HaikuPorts
 	cdrtools-3.01~a18-1
 	cdrtools_devel-3.01~a18-1
 	ctags-5.8-3
-	curl-7.37.0-3
-	curl_devel-7.37.0-3
+	curl-7.37.1-1
+	curl_devel-7.37.1-1
 	cvs-1.12.13.1-6
 	dfu_util-0.7-1
-	distcc-3.1-2
+	distcc-3.1-3
 	dmidecode-2.12-2
 	dos2unix-1.0.1-1
 	doxygen-1.6.3-3
 	ducksaver-1.1.0-1
-	expat-2.0.1-7
-	expat_devel-2.0.1-7
+	expat-2.1.0-1
+	expat_devel-2.1.0-1
 	faad2-2.7-1
 	faad2_devel-2.7-1
 	f1spirit-0.rc9.1615-1
@@ -86,13 +86,13 @@ RemotePackageRepository HaikuPorts
 	gettext_libintl-0.18.1.1-6
 	giflib-5.0.5-2
 	giflib_devel-5.0.5-2
-	git-1.8.3.4-2
-	git_arch-1.8.3.4-2
-	git_cvs-1.8.3.4-2
-	git_daemon-1.8.3.4-2
-	git_email-1.8.3.4-2
-	git_remote_helpers-1.8.3.4-2
-	git_svn-1.8.3.4-2
+	git-1.8.3.4-4
+	git_arch-1.8.3.4-4
+	git_cvs-1.8.3.4-4
+	git_daemon-1.8.3.4-4
+	git_email-1.8.3.4-4
+	git_remote_helpers-1.8.3.4-4
+	git_svn-1.8.3.4-4
 	glew-1.11.0-1
 	glew_devel-1.11.0-1
 	glew_util-1.11.0-1
@@ -109,7 +109,7 @@ RemotePackageRepository HaikuPorts
 	guilib_devel-1.2.1-1
 	gutenprint-5.2.9-1
 	gutenprint_devel-5.2.9-1
-	gyp-r1948-1
+	gyp-r1948-2
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
 	html_parser-3.71-1
@@ -185,9 +185,9 @@ RemotePackageRepository HaikuPorts
 	libwebp_devel-0.4.1-1
 	libxau-1.0.8-2
 	libxcb-1.6-2
-	libxml2-2.8.0-6
-	libxml2_devel-2.8.0-6
-	libxml2_python-2.8.0-6
+	libxml2-2.8.0-9
+	libxml2_devel-2.8.0-9
+	libxml2_python-2.8.0-9
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
 	links-2.8-1
@@ -199,7 +199,7 @@ RemotePackageRepository HaikuPorts
 	m4-1.4.16-5
 	make-3.82-5
 	man-1.6g-4
-	mercurial-2.2.2-5
+	mercurial-2.9.2-1
 	mesa-7.9.2-6
 	mesa_devel-7.9.2-6
 	mesa_swrast-7.9.2-6
@@ -230,14 +230,14 @@ RemotePackageRepository HaikuPorts
 	physfs_devel-2.0.3-1
 	pipepanic-0.1.3-3
 	pkgconfig-0.27.1-1
-	python-2.6.9-2
-	python_dateutil-1.5-1
-	python_lxml-3.3.5-1
-	python_mechanize-0.2.5-1
-	python_requests-2.3.0-1
-	python_setuptools-5.3-1
-	python_twisted-13.2.0-1
-	python_zope.interface-4.1.1-2
+	python-2.7.6-3
+	python_dateutil-1.5-2
+	python_lxml-3.3.5-2
+	python_mechanize-0.2.5-2
+	python_requests-2.3.0-2
+	python_setuptools-5.3-2
+	python_twisted-13.2.0-2
+	python_zope.interface-4.1.1-3
 	qemacs-0.4.0dev-1
 	qrencode-3.3.0-1
 	qrencode_devel-3.3.0-1
@@ -247,7 +247,7 @@ RemotePackageRepository HaikuPorts
 	rsync-3.1.0-1
 	ruby-1.9.1-2
 	ruby_devel-1.9.1-2
-	scons-2.2.0-3
+	scons-2.3.1-4
 	sdl_gfx-2.0.24-1
 	sdl_gfx_devel-2.0.24-1
 	sdl_image-1.2.12-2
@@ -262,6 +262,8 @@ RemotePackageRepository HaikuPorts
 	sdl_ttf_devel-2.0.11-1
 	sdllopan-10-2
 	sed-4.2.1-6
+	serf-1.3.7-1
+	serf_devel-1.3.7-1
 	sge-030809-2
 	sge_devel-030809-2
 	sharutils-4.14-1
@@ -274,8 +276,8 @@ RemotePackageRepository HaikuPorts
 	sqlite-3.8.4.3-1
 	sqlite_devel-3.8.4.3-1
 	srm-1.2.12-1
-	subversion-1.6.18-6
-	subversion_devel-1.6.18-6
+	subversion-1.8.10-1
+	subversion_devel-1.8.10-1
 	sum_it-0.2beta-3
 	super_transball-2.1.5-1
 	taglib-1.7.2-1
@@ -287,7 +289,7 @@ RemotePackageRepository HaikuPorts
 	tiff_tools-3.9.6-2
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
-	ubertuber-0.9.10-1
+	ubertuber-0.9.10-2
 	unrar-5.1.5-1
 	util_macros-1.19.0-2
 	vim-7.4-1
@@ -477,7 +479,7 @@ RemotePackageRepository HaikuPorts
 	musicpc_x86-0.26-1
 	ncurses_x86-5.9-9
 	ncurses_x86_devel-5.9-9
-	ninja_x86-1.5.1-1
+	ninja_x86-1.5.1-2
 	ocp_x86-0.1.21_git-1
 	openal_x86-1.13.0-2
 	openal_x86_devel-1.13.0-2
@@ -495,7 +497,7 @@ RemotePackageRepository HaikuPorts
 	pixman_x86_devel-0.20.0-1
 	pkgconfig_x86-0.27.1-2
 	protrekkr_x86-2.5.4-2
-	qemu_x86-1.7.0-1
+	qemu_x86-2.1.0-3
 	qca2_x86-2.0.3-1
 	qca2_x86_devel-2.0.3-1
 	qjson_x86-0.8.1-1
@@ -552,6 +554,7 @@ RemotePackageRepository HaikuPorts
 	album
 	ale
 	apr
+	apr_util
 	arm_none_eabi_binutils_x86
 	arm_none_eabi_gcc_x86
 	arm_none_eabi_newlib_x86
@@ -573,6 +576,7 @@ RemotePackageRepository HaikuPorts
 	bison
 	bison_x86
 	boost_x86
+	buildbot_slave
 	bzip2
 	bzr
 	canna
@@ -766,6 +770,7 @@ RemotePackageRepository HaikuPorts
 	sdl_ttf
 	sdllopan
 	sed
+	serf
 	sge
 	shared_mime_info_x86
 	sharutils
