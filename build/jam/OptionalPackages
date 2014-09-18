@@ -178,7 +178,13 @@ if [ IsOptionalHaikuImagePackageAdded FFMpeg-devel ] {
 
 # Git
 if [ IsOptionalHaikuImagePackageAdded Git ] {
-	AddHaikuImagePackages git git_arch git_cvs git_daemon git_email git_svn ;
+	AddHaikuImagePackages git git_arch git_daemon git_email git_svn ;
+
+	# git_cvs depends on cvsps, which does not build with gcc2. So it is not
+	# available on gcc2-only builds.
+	if $(TARGET_PACKAGING_ARCHS) != x86_gcc2 {
+		AddHaikuImagePackages git_cvs ;
+	;
 }
 
 
