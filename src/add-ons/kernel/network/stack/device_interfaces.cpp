@@ -171,7 +171,7 @@ allocate_device_interface(net_device* device, net_device_module_info* module)
 		return NULL;
 
 	recursive_lock_init(&interface->receive_lock, "device interface receive");
-	mutex_init(&interface->monitor_lock, "device interface monitors");
+	recursive_lock_init(&interface->monitor_lock, "device interface monitors");
 
 	char name[128];
 	snprintf(name, sizeof(name), "%s receive queue", device->name);
@@ -206,7 +206,7 @@ error2:
 	uninit_fifo(&interface->receive_queue);
 error1:
 	recursive_lock_destroy(&interface->receive_lock);
-	mutex_destroy(&interface->monitor_lock);
+	recursive_lock_destroy(&interface->monitor_lock);
 	delete interface;
 
 	return NULL;
@@ -216,7 +216,7 @@ error1:
 static void
 notify_device_monitors(net_device_interface* interface, int32 event)
 {
-	MutexLocker locker(interface->monitor_lock);
+	RecursiveLocker locker(interface->monitor_lock);
 
 	DeviceMonitorList::Iterator iterator
 		= interface->monitor_funcs.GetIterator();
@@ -392,7 +392,7 @@ put_device_interface(struct net_device_interface* interface)
 	device->module->uninit_device(device);
 	put_module(moduleName);
 
-	mutex_destroy(&interface->monitor_lock);
+	recursive_lock_destroy(&interface->monitor_lock);
 	recursive_lock_destroy(&interface->receive_lock);
 	delete interface;
 }
@@ -478,7 +478,7 @@ void
 device_interface_monitor_receive(net_device_interface* interface,
 	net_buffer* buffer)
 {
-	MutexLocker locker(interface->monitor_lock);
+	RecursiveLocker locker(interface->monitor_lock);
 
 	DeviceMonitorList::Iterator iterator
 		= interface->monitor_funcs.GetIterator();
@@ -706,7 +706,7 @@ register_device_monitor(net_device* device, net_device_monitor* monitor)
 	if (interface == NULL)
 		return B_DEVICE_NOT_FOUND;
 
-	MutexLocker monitorLocker(interface->monitor_lock);
+	RecursiveLocker monitorLocker(interface->monitor_lock);
 	interface->monitor_funcs.Add(monitor);
 	atomic_add(&interface->monitor_count, 1);
 
@@ -725,7 +725,7 @@ unregister_device_monitor(net_device* device, net_device_monitor* monitor)
 	if (interface == NULL)
 		return B_DEVICE_NOT_FOUND;
 
-	MutexLocker monitorLocker(interface->monitor_lock);
+	RecursiveLocker monitorLocker(interface->monitor_lock);
 
 	// search for the monitor
 
@@ -776,7 +776,7 @@ device_removed(net_device* device)
 
 	// By now all of the monitors must have removed themselves. If they
 	// didn't, they'll probably wait forever to be callback'ed again.
-	mutex_lock(&interface->monitor_lock);
+	recursive_lock_lock(&interface->monitor_lock);
 	interface->monitor_funcs.RemoveAll();
 
 	// All of the readers should be gone as well since we are out of

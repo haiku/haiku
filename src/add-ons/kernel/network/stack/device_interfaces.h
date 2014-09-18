@@ -37,7 +37,7 @@ struct net_device_interface : DoublyLinkedListLinkImpl<net_device_interface> {
 	int32				deframe_ref_count;
 
 	int32				monitor_count;
-	mutex				monitor_lock;
+	recursive_lock			monitor_lock;
 	DeviceMonitorList	monitor_funcs;
 
 	DeviceHandlerList	receive_funcs;
