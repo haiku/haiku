@@ -50,6 +50,7 @@ InterfacesAddOn::InterfacesAddOn(image_id image)
 	NetworkSetupAddOn(image),
 	BBox(NULL, B_NAVIGABLE_JUMP, B_NO_BORDER)
 {
+	fSettingsView = NULL;
 }
 
 
@@ -111,11 +112,24 @@ InterfacesAddOn::AttachedToWindow()
 }
 
 
+// FIXME with this scheme the apply and revert button will only take effect for
+// the currently shown interface. This can be confusing, it would be better to
+// keep the state of all interfaces and allow reverting and saving all of them.
 status_t
 InterfacesAddOn::Save()
 {
 	// TODO : Profile?
+	
+	fSettingsView->Apply();
 	return fListView->SaveItems();
+}
+
+
+status_t
+InterfacesAddOn::Revert()
+{
+	fSettingsView->Revert();
+	return B_OK;
 }
 
 
@@ -139,11 +153,12 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 
 			// TODO it would be better to reuse the view instead of recreating
 			// one.
-			InterfaceView* sw = new InterfaceView(item->GetSettings());
-			BView* old = ChildAt(1);
-			RemoveChild(old);
-			delete old;
-			AddChild(sw);
+			if (fSettingsView != NULL) {
+				fSettingsView->RemoveSelf();
+				delete fSettingsView;
+			}
+			fSettingsView = new InterfaceView(item->GetSettings());
+			AddChild(fSettingsView);
 			break;
 		}
 

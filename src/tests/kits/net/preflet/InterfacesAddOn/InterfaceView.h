@@ -16,6 +16,7 @@
 
 #include <map>
 
+#include <TabView.h>
 #include <Window.h>
 
 
@@ -31,24 +32,20 @@ typedef std::map<int, InterfaceAddressView*> IPViewMap;
 class BButton;
 class BTabView;
 
-class InterfaceView : public BView {
+class InterfaceView : public BTabView {
 public:
 									InterfaceView(NetworkSettings* settings);
 	virtual							~InterfaceView();
 
-	virtual void					AttachedToWindow();
-	virtual	void					MessageReceived(BMessage* mesage);
 	virtual	bool					QuitRequested();
+
+			void					Apply();
+			void					Revert();
 
 private:
 			status_t				_PopulateTabs();
 
 			NetworkSettings*		fNetworkSettings;
-
-			BButton*				fRevertButton;
-			BButton*				fApplyButton;
-
-			BTabView*				fTabView;
 
 			IPViewMap				fTabIPView;
 			InterfaceHardwareView*	fTabHardwareView;

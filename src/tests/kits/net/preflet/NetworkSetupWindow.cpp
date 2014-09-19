@@ -38,6 +38,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	fAddonCount(0)
 {
 	// ---- Profiles section
+#if 0
 	BMenu *profilesPopup = new BPopUpMenu("<none>");
 	_BuildProfilesMenu(profilesPopup, kMsgProfileSelected);
 
@@ -46,10 +47,11 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	profilesMenuField->SetFont(be_bold_font);
 	profilesMenuField->SetEnabled(false);
+#endif
 
 	// ---- Settings section
 
-	fPanel = new BTabView("showview_box");
+	fPanel = new BGroupView(B_VERTICAL);
 
 	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
 		new BMessage(kMsgApply));
@@ -59,17 +61,16 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 		new BMessage(kMsgRevert));
 	// fRevertButton->SetEnabled(false);
 
-	// Enable boxes resizing modes
-	//fPanel->SetResizingMode(B_FOLLOW_ALL);
-
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_SMALL_SPACING)
+#if 0
 		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.Add(profilesMenuField)
 			.AddGlue()
 		.End()
+#endif
 		.Add(fPanel)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)
@@ -154,8 +155,6 @@ NetworkSetupWindow::MessageReceived(BMessage*	msg)
 				break;
 
 			fPanel->AddChild(fAddonView);
-			fAddonView->ResizeTo(fPanel->Bounds().Width(),
-				fPanel->Bounds().Height());
 			break;
 		}
 
@@ -301,9 +300,10 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 				msg->AddPointer("addon", fNetworkAddOnMap[fAddonCount]);
 				msg->AddPointer("addon_view", addon_view);
 
-				BTab* tab = new BTab;
-				fPanel->AddTab(addon_view, tab);
-				tab->SetLabel(fNetworkAddOnMap[fAddonCount]->Name());
+				// FIXME rework this: we don't want to use a tab view here,
+				// instead add-ons should populate the "interfaces" list with
+				// interfaces, services, etc.
+				fPanel->AddChild(addon_view);
 				fAddonCount++;
 					// Number of tab addons total
 				tabCount++;

@@ -53,7 +53,7 @@ class NetworkSetupWindow : public BWindow
 
 			NetworkAddOnMap		fNetworkAddOnMap;
 
-			BTabView*			fPanel;
+			BView*				fPanel;
 			BView*				fAddonView;
 			int					fAddonCount;
 };

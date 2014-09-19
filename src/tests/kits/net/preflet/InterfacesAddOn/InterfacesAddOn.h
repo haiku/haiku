@@ -26,6 +26,8 @@ static const uint32 kMsgInterfaceRenegotiate = 'redo';
 class BButton;
 class BView;
 
+class InterfaceView;
+
 class InterfacesAddOn : public NetworkSetupAddOn, public BBox
 {
 public:
@@ -34,6 +36,7 @@ public:
 
 			const char* 		Name();
 			status_t			Save();
+			status_t			Revert();
 
 			BView*				CreateView();
 
@@ -42,6 +45,7 @@ public:
 
 private:
 			InterfacesListView*	fListView;
+			InterfaceView*		fSettingsView;
 			BButton*			fOnOff;
 			BButton*			fRenegotiate;
 };

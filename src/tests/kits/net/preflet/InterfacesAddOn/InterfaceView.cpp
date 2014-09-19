@@ -24,33 +24,11 @@
 
 InterfaceView::InterfaceView(NetworkSettings* settings)
 	:
-	BView("Interface Settings", 0, 0)
+	BTabView("settings_tabs")
 {
 	fNetworkSettings = settings;
-
-	fTabView = new BTabView("settings_tabs");
-	fTabView->SetTabWidth(B_WIDTH_FROM_LABEL);
-
-	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
-		new BMessage(MSG_IP_REVERT));
-
-	fApplyButton = new BButton("save", B_TRANSLATE("Save"),
-		new BMessage(MSG_IP_SAVE));
-
+	SetTabWidth(B_WIDTH_FROM_LABEL);
 	_PopulateTabs();
-
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_SMALL_SPACING)
-		.Add(fTabView)
-		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
-			.Add(fRevertButton)
-			.AddGlue()
-			.Add(fApplyButton)
-		.End()
-		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
-			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
-	);
 }
 
 
@@ -60,38 +38,30 @@ InterfaceView::~InterfaceView()
 
 
 void
-InterfaceView::AttachedToWindow()
+InterfaceView::Revert()
 {
-	Window()->SetDefaultButton(fApplyButton);
+	protocols* supportedFamilies = fNetworkSettings->ProtocolVersions();
+
+	for (int index = 0; index < MAX_PROTOCOLS; index++) {
+		if (supportedFamilies[index].present) {
+			int inet_id = supportedFamilies[index].inet_id;
+			fTabIPView[inet_id]->Revert();
+		}
+	}
 }
 
 
 void
-InterfaceView::MessageReceived(BMessage* message)
+InterfaceView::Apply()
 {
 	protocols* supportedFamilies = fNetworkSettings->ProtocolVersions();
 
-	switch (message->what) {
-		case MSG_IP_REVERT:
-			for (int index = 0; index < MAX_PROTOCOLS; index++) {
-				if (supportedFamilies[index].present) {
-					int inet_id = supportedFamilies[index].inet_id;
-					fTabIPView[inet_id]->Revert();
-				}
-			}
-			break;
-		case MSG_IP_SAVE:
-			for (int index = 0; index < MAX_PROTOCOLS; index++) {
-				if (supportedFamilies[index].present) {
-					int inet_id = supportedFamilies[index].inet_id;
-					fTabIPView[inet_id]->Save();
-				}
-			}
-			break;
-		default:
-			BView::MessageReceived(message);
+	for (int index = 0; index < MAX_PROTOCOLS; index++) {
+		if (supportedFamilies[index].present) {
+			int inet_id = supportedFamilies[index].inet_id;
+			fTabIPView[inet_id]->Save();
+		}
 	}
-
 }
 
 
@@ -102,7 +72,7 @@ InterfaceView::_PopulateTabs()
 
 	BTab* hardwareTab = new BTab;
 	fTabHardwareView = new InterfaceHardwareView(fNetworkSettings);
-	fTabView->AddTab(fTabHardwareView, hardwareTab);
+	AddTab(fTabHardwareView, hardwareTab);
 	hardwareTab->SetLabel(B_TRANSLATE("Interface"));
 
 	for (int index = 0; index < MAX_PROTOCOLS; index++) {
@@ -111,7 +81,7 @@ InterfaceView::_PopulateTabs()
 			fTabIPView[inet_id] = new InterfaceAddressView(inet_id,
 				fNetworkSettings);
 			BTab* tab = new BTab;
-			fTabView->AddTab(fTabIPView[inet_id], tab);
+			AddTab(fTabIPView[inet_id], tab);
 			tab->SetLabel(supportedFamilies[index].name);
 		}
 	}
