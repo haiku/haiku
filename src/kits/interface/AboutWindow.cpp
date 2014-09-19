@@ -185,7 +185,7 @@ AboutView::AboutView(const char* appName, const char* signature)
 
 	fStripeView = new StripeView(_GetIconFromSignature(signature));
 
-	const char* ok = B_TRANSLATE_MARK("Ok");
+	const char* ok = B_TRANSLATE_MARK("OK");
 	BButton* closeButton = new BButton("ok",
 		gSystemCatalog.GetString(ok, "AboutWindow"),
 		new BMessage(B_QUIT_REQUESTED));
