@@ -280,7 +280,7 @@ TextGapBuffer::GetString(int32 offset, int32 length, char* buffer)
 		int32 afterLen = length - beforeLen;
 
 		memcpy(buffer, fBuffer + offset, beforeLen);
-		memcpy(buffer + beforeLen, fBuffer + fGapIndex, afterLen);
+		memcpy(buffer + beforeLen, fBuffer + fGapIndex + fGapCount, afterLen);
 
 	}
 
