@@ -277,8 +277,6 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 		.EndArray()
 	.End();
 
-//	printf("Sending JSON:\n%s\n", jsonString.String());
-	
 	return _SendJsonRequest("pkg", jsonString, message);
 }
 
@@ -311,8 +309,6 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 		.EndArray()
 	.End();
 
-//	printf("Sending JSON:\n%s\n", jsonString.String());
-	
 	return _SendJsonRequest("pkg", jsonString, message);
 }
 
@@ -366,9 +362,24 @@ WebAppInterface::RetrieveUserRatings(const BString& packageName,
 		.EndArray()
 	.End();
 
-//	printf("Sending JSON:\n%s\n", jsonString.String());
-	
 	return _SendJsonRequest("userrating", jsonString, message);
+}
+
+
+status_t
+WebAppInterface::RequestCaptcha(BMessage& message)
+{
+	BString jsonString = JsonBuilder()
+		.AddValue("jsonrpc", "2.0")
+		.AddValue("id", ++fRequestIndex)
+		.AddValue("method", "generateCaptcha")
+		.AddArray("params")
+			.AddObject()
+			.EndObject()
+		.EndArray()
+	.End();
+
+	return _SendJsonRequest("captcha", jsonString, message);
 }
 
 

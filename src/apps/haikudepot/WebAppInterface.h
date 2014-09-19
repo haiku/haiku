@@ -52,6 +52,9 @@ public:
 									const BString& code,
 									int32 width, int32 height,
 									BDataIO* stream);
+
+			status_t			RequestCaptcha(BMessage& message);
+
 private:
 			status_t			_SendJsonRequest(const char* domain,
 									BString jsonString, BMessage& reply) const;
