@@ -853,7 +853,7 @@ void
 MainWindow::_OpenLoginWindow()
 {
 	UserLoginWindow* window = new UserLoginWindow(this,
-		BRect(0, 0, 500, 400));
+		BRect(0, 0, 500, 400), fModel);
 	window->Show();
 }
 

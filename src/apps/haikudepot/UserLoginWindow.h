@@ -5,6 +5,7 @@
 #ifndef USER_LOGIN_WINDOW_H
 #define USER_LOGIN_WINDOW_H
 
+#include <Locker.h>
 #include <Window.h>
 
 #include "PackageInfo.h"
@@ -14,11 +15,13 @@ class BButton;
 class BTabView;
 class BTextControl;
 class BitmapView;
+class Model;
 
 
 class UserLoginWindow : public BWindow {
 public:
-								UserLoginWindow(BWindow* parent, BRect frame);
+								UserLoginWindow(BWindow* parent, BRect frame,
+									Model& model);
 	virtual						~UserLoginWindow();
 
 	virtual	void				MessageReceived(BMessage* message);
@@ -36,6 +39,7 @@ private:
 			void				_RequestCaptcha();
 
 	static	int32				_RequestCaptchaThreadEntry(void* data);
+			void				_RequestCaptchaThread();
 
 private:
 			BTabView*			fTabView;
@@ -46,6 +50,7 @@ private:
 			BTextControl*		fNewUsernameField;
 			BTextControl*		fNewPasswordField;
 			BTextControl*		fRepeatPasswordField;
+			BTextControl*		fEmailField;
 			BTextControl*		fLanguageCodeField;
 			BitmapView*			fCaptchaView;
 			BTextControl*		fCaptchaResultField;
@@ -57,6 +62,9 @@ private:
 			BitmapRef			fCaptchaImage;
 
 			Mode				fMode;
+
+			BLocker				fLock;
+			thread_id			fRequestCaptchaThread;
 };
 
 

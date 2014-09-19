@@ -8,7 +8,10 @@
 #include <algorithm>
 #include <stdio.h>
 
+#include <mail_encoding.h>
+
 #include <Alert.h>
+#include <Autolock.h>
 #include <Catalog.h>
 #include <Button.h>
 #include <LayoutBuilder.h>
@@ -16,6 +19,8 @@
 #include <TextControl.h>
 
 #include "BitmapView.h"
+#include "Model.h"
+#include "WebAppInterface.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -24,7 +29,8 @@
 
 enum {
 	MSG_SEND					= 'send',
-	MSG_TAB_SELECTED			= 'tbsl'
+	MSG_TAB_SELECTED			= 'tbsl',
+	MSG_CAPTCHA_OBTAINED		= 'cpob',
 };
 
 
@@ -53,13 +59,14 @@ private:
 };
 
 
-UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame)
+UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Log in"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
-			| B_NOT_RESIZABLE),
-	fMode(NONE)
+			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+	fMode(NONE),
+	fRequestCaptchaThread(-1)
 {
 	AddToSubset(parent);
 
@@ -71,8 +78,9 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame)
 		NULL);
 	fRepeatPasswordField = new BTextControl(B_TRANSLATE("Repeat pass phrase:"),
 		"", NULL);
-	fLanguageCodeField = new BTextControl(B_TRANSLATE("Language code:"), "",
-		NULL);
+	fLanguageCodeField = new BTextControl(B_TRANSLATE("Language code:"),
+		model.PreferredLanguage(), NULL);
+	fEmailField = new BTextControl(B_TRANSLATE("Email address:"), "", NULL);
 	fCaptchaView = new BitmapView("captcha view");
 	fCaptchaResultField = new BTextControl("", "", NULL);
 
@@ -94,9 +102,10 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame)
 		.AddTextControl(fNewUsernameField, 0, 0)
 		.AddTextControl(fNewPasswordField, 0, 1)
 		.AddTextControl(fRepeatPasswordField, 0, 2)
-		.AddTextControl(fLanguageCodeField, 0, 3)
-		.Add(fCaptchaView, 0, 4)
-		.Add(fCaptchaResultField, 1, 4)
+		.AddTextControl(fEmailField, 0, 3)
+		.AddTextControl(fLanguageCodeField, 0, 4)
+		.Add(fCaptchaView, 0, 5)
+		.Add(fCaptchaResultField, 1, 5)
 
 		.SetInsets(B_USE_DEFAULT_SPACING)
 	;
@@ -129,6 +138,10 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame)
 
 UserLoginWindow::~UserLoginWindow()
 {
+	BAutolock locker(&fLock);
+	
+	if (fRequestCaptchaThread >= 0)
+		wait_for_thread(fRequestCaptchaThread, NULL);
 }
 
 
@@ -167,6 +180,13 @@ UserLoginWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_CAPTCHA_OBTAINED:
+			if (fCaptchaImage.Get() != NULL) {
+				fCaptchaView->SetBitmap(
+					fCaptchaImage->Bitmap(SharedBitmap::SIZE_ANY));
+			}
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -190,6 +210,8 @@ UserLoginWindow::_SetMode(Mode mode)
 		case CREATE_ACCOUNT:
 			fTabView->Select(1);
 			fSendButton->SetLabel(B_TRANSLATE("Create account"));
+			if (fCaptchaToken.IsEmpty())
+				_RequestCaptcha();
 			break;
 		default:
 			break;
@@ -230,13 +252,66 @@ UserLoginWindow::_CreateAccount()
 void
 UserLoginWindow::_RequestCaptcha()
 {
+	BAutolock locker(&fLock);
+	
+	if (fRequestCaptchaThread >= 0)
+		return;
+
+	fRequestCaptchaThread = spawn_thread(&_RequestCaptchaThreadEntry,
+		"Captcha requester", B_NORMAL_PRIORITY, this);
+	if (fRequestCaptchaThread >= 0)
+		resume_thread(fRequestCaptchaThread);
+
 }
 
 
 int32
 UserLoginWindow::_RequestCaptchaThreadEntry(void* data)
 {
-	// TODO: Use WebInterface to 
+	UserLoginWindow* window = reinterpret_cast<UserLoginWindow*>(data);
+	window->_RequestCaptchaThread();
 	return 0;
 }
+
+
+void
+UserLoginWindow::_RequestCaptchaThread()
+{
+	WebAppInterface interface;
+	BMessage info;
+
+	status_t status = interface.RequestCaptcha(info);
+
+	BAutolock locker(&fLock);
+
+	BMessage result;
+	if (status == B_OK && info.FindMessage("result", &result) == B_OK) {
+		result.FindString("token", &fCaptchaToken);
+		BString imageDataBase64;
+		if (result.FindString("pngImageDataBase64", &imageDataBase64) == B_OK) {
+			ssize_t encodedSize = imageDataBase64.Length();
+			ssize_t decodedSize = (encodedSize * 3 + 3) / 4;
+			if (decodedSize > 0) {
+				char* buffer = new char[decodedSize];
+				decodedSize = decode_base64(buffer, imageDataBase64.String(),
+					encodedSize);
+				if (decodedSize > 0) {
+					BMemoryIO memoryIO(buffer, (size_t)decodedSize);
+					fCaptchaImage.SetTo(new(std::nothrow) SharedBitmap(
+						memoryIO), true);
+					BMessenger(this).SendMessage(MSG_CAPTCHA_OBTAINED);
+				} else {
+					fprintf(stderr, "Failed to decode captcha: %s\n",
+						strerror(decodedSize));
+				}
+				delete[] buffer;
+			}
+		}			
+	} else {
+		fprintf(stderr, "Failed to obtain captcha: %s\n", strerror(status));
+	}
+
+	fRequestCaptchaThread = -1;
+}
+
 
