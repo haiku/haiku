@@ -38,8 +38,17 @@ private:
 			void				_CreateAccount();
 			void				_RequestCaptcha();
 
+			void				_SetWorkerThread(thread_id thread);
+
 	static	int32				_RequestCaptchaThreadEntry(void* data);
 			void				_RequestCaptchaThread();
+
+	static	int32				_CreateAccountThreadEntry(void* data);
+			void				_CreateAccountThread();
+
+			void				_CollectValidationFailures(
+									const BMessage& result,
+									BString& error) const;
 
 private:
 			BTabView*			fTabView;
@@ -61,10 +70,12 @@ private:
 			BString				fCaptchaToken;
 			BitmapRef			fCaptchaImage;
 
+			Model&				fModel;
+
 			Mode				fMode;
 
 			BLocker				fLock;
-			thread_id			fRequestCaptchaThread;
+			thread_id			fWorkerThread;
 };
 
 

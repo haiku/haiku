@@ -65,8 +65,9 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+	fModel(model),
 	fMode(NONE),
-	fRequestCaptchaThread(-1)
+	fWorkerThread(-1)
 {
 	AddToSubset(parent);
 
@@ -140,8 +141,8 @@ UserLoginWindow::~UserLoginWindow()
 {
 	BAutolock locker(&fLock);
 	
-	if (fRequestCaptchaThread >= 0)
-		wait_for_thread(fRequestCaptchaThread, NULL);
+	if (fWorkerThread >= 0)
+		wait_for_thread(fWorkerThread, NULL);
 }
 
 
@@ -184,6 +185,8 @@ UserLoginWindow::MessageReceived(BMessage* message)
 			if (fCaptchaImage.Get() != NULL) {
 				fCaptchaView->SetBitmap(
 					fCaptchaImage->Bitmap(SharedBitmap::SIZE_ANY));
+			} else {
+				fCaptchaView->SetBitmap(NULL);
 			}
 			break;
 
@@ -237,31 +240,66 @@ UserLoginWindow::_Login()
 void
 UserLoginWindow::_CreateAccount()
 {
-	// TODO: Implement...
-	BAlert* alert = new BAlert(B_TRANSLATE("Not implemented"),
-		B_TRANSLATE("Sorry, while the web application would already support "
-		"creating accounts remotely, HaikuDepot was not yet updated to use "
-		"this functionality."),
-		B_TRANSLATE("Bummer"));
-	alert->Go(NULL);
+	BAutolock locker(&fLock);
+	
+	if (fWorkerThread >= 0)
+		return;
 
-	PostMessage(B_QUIT_REQUESTED);
+	thread_id thread = spawn_thread(&_CreateAccountThreadEntry,
+		"Account creator", B_NORMAL_PRIORITY, this);
+	if (thread >= 0)
+		_SetWorkerThread(thread);
 }
 
 
 void
 UserLoginWindow::_RequestCaptcha()
 {
+	if (Lock()) {
+		fCaptchaToken = "";
+		fCaptchaView->SetBitmap(NULL);
+		fCaptchaImage.Unset();
+		Unlock();
+	}
+
 	BAutolock locker(&fLock);
 	
-	if (fRequestCaptchaThread >= 0)
+	if (fWorkerThread >= 0)
 		return;
 
-	fRequestCaptchaThread = spawn_thread(&_RequestCaptchaThreadEntry,
+	thread_id thread = spawn_thread(&_RequestCaptchaThreadEntry,
 		"Captcha requester", B_NORMAL_PRIORITY, this);
-	if (fRequestCaptchaThread >= 0)
-		resume_thread(fRequestCaptchaThread);
+	if (thread >= 0)
+		_SetWorkerThread(thread);
+}
 
+
+void
+UserLoginWindow::_SetWorkerThread(thread_id thread)
+{
+	if (!Lock())
+		return;
+	
+	bool enabled = thread < 0;
+
+	fUsernameField->SetEnabled(enabled);
+	fPasswordField->SetEnabled(enabled);
+	fNewUsernameField->SetEnabled(enabled);
+	fNewPasswordField->SetEnabled(enabled);
+	fRepeatPasswordField->SetEnabled(enabled);
+	fEmailField->SetEnabled(enabled);
+	fLanguageCodeField->SetEnabled(enabled);
+	fCaptchaResultField->SetEnabled(enabled);
+	fSendButton->SetEnabled(enabled);
+	
+	if (thread >= 0) {
+		fWorkerThread = thread;
+		resume_thread(fWorkerThread);
+	} else {
+		fWorkerThread = -1;
+	}
+
+	Unlock();
 }
 
 
@@ -311,7 +349,152 @@ UserLoginWindow::_RequestCaptchaThread()
 		fprintf(stderr, "Failed to obtain captcha: %s\n", strerror(status));
 	}
 
-	fRequestCaptchaThread = -1;
+	_SetWorkerThread(-1);
 }
 
 
+int32
+UserLoginWindow::_CreateAccountThreadEntry(void* data)
+{
+	UserLoginWindow* window = reinterpret_cast<UserLoginWindow*>(data);
+	window->_CreateAccountThread();
+	return 0;
+}
+
+
+void
+UserLoginWindow::_CreateAccountThread()
+{
+	if (!Lock())
+		return;
+
+	BString nickName(fNewUsernameField->Text());
+	BString passwordClear(fNewPasswordField->Text());
+	BString email(fEmailField->Text());
+	BString captchaToken(fCaptchaToken);
+	BString captchaResponse(fCaptchaResultField->Text());
+	BString languageCode(fLanguageCodeField->Text());
+
+	Unlock();
+
+	WebAppInterface interface;
+	BMessage info;
+
+	status_t status = interface.CreateUser(
+		nickName, passwordClear, email, captchaToken, captchaResponse,
+		languageCode, info);
+
+	BAutolock locker(&fLock);
+
+	BString error = B_TRANSLATE(
+		"There was a puzzling response from the web service.");
+
+	BMessage result;
+	if (status == B_OK) {
+		if (info.FindMessage("result", &result) == B_OK) {
+			error = "";
+		} else if (info.FindMessage("error", &result) == B_OK) {
+			result.PrintToStream();
+			BString message;
+			if (result.FindString("message", &message) == B_OK) {
+				if (message == "captchabadresponse") {
+					error = B_TRANSLATE("You have not solved the captcha "
+						"puzzle correctly.");
+				} else if (message == "validationerror") {
+					_CollectValidationFailures(result, error);
+				} else {
+					error << B_TRANSLATE("The web service responded with: ");
+					error << message;
+				}
+			}
+		}
+	} else {
+		error = B_TRANSLATE(
+			"It was not possible to contact the web service.");
+	}
+
+	locker.Unlock();
+
+	if (!error.IsEmpty()) {
+		BAlert* alert = new(std::nothrow) BAlert(
+			B_TRANSLATE("Failed to create account"),
+			error,
+			B_TRANSLATE("Close"));
+
+		if (alert != NULL)
+			alert->Go();
+
+		fprintf(stderr,
+			B_TRANSLATE("Failed to create account: %s\n"), error.String());
+
+		_SetWorkerThread(-1);
+
+		// We need a new captcha, it can be used only once
+		fCaptchaToken = "";
+		_RequestCaptcha();
+	} else {
+		_SetWorkerThread(-1);
+		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
+
+		BAlert* alert = new(std::nothrow) BAlert(
+			B_TRANSLATE("Success"),
+			B_TRANSLATE("Account created successfully. "
+				"You can now rate packages and do other useful things."),
+			B_TRANSLATE("Close"));
+
+		if (alert != NULL)
+			alert->Go();
+	}
+}
+
+
+void
+UserLoginWindow::_CollectValidationFailures(const BMessage& result,
+	BString& error) const
+{
+	error = B_TRANSLATE("There are problems with the data you entered:\n\n");
+
+	bool found = false;
+
+	BMessage data;
+	BMessage failures;
+	if (result.FindMessage("data", &data) == B_OK
+		&& data.FindMessage("validationfailures", &failures) == B_OK) {
+		int32 index = 0;
+		while (true) {
+			BString name;
+			name << index++;
+			BMessage failure;
+			if (failures.FindMessage(name, &failure) != B_OK)
+				break;
+	
+			BString property;
+			BString message;
+			if (failure.FindString("property", &property) == B_OK
+				&& failure.FindString("message", &message) == B_OK) {
+				found = true;
+				if (property == "nickname" && message == "notunique") {
+					error << B_TRANSLATE(
+						"The username is already taken. "
+						"Please choose another.");
+				} else if (property == "passwordClear"
+					&& message == "invalid") {
+					error << B_TRANSLATE(
+						"The password is too weak or invalid. "
+						"Please use at least 8 characters with "
+						"at least 2 numbers and 2 upper-case "
+						"letters.");
+				} else if (property == "email" && message == "malformed") {
+					error << B_TRANSLATE(
+						"The email address appears to be malformed.");
+				} else {
+					error << property << ": " << message;
+				}
+			}
+		}
+	}
+	
+	if (!found) {
+		error << B_TRANSLATE("But none could be listed here, sorry.");
+	}
+}
