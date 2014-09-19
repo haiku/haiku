@@ -102,6 +102,9 @@ public:
 			void				PopulateAllPackages();
 			void				StopPopulatingAllPackages();
 
+			const BString&		PreferredLanguage() const
+									{ return fPreferredLanguage; }
+
 private:
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
 			void				_PopulateAllPackagesThread(bool fromCacheOnly);

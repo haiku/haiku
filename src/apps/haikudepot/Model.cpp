@@ -327,6 +327,17 @@ Model::Model()
 	// get the defined categories and their translated names.
 	// This should then be used instead of hard-coded
 	// categories and translations in the app.
+
+	fPreferredLanguage = "en";
+	BLocaleRoster* localeRoster = BLocaleRoster::Default();
+	if (localeRoster != NULL) {
+		BMessage preferredLanguages;
+		if (localeRoster->GetPreferredLanguages(&preferredLanguages) == B_OK) {
+			BString language;
+			if (preferredLanguages.FindString("language", 0, &language) == B_OK)
+				language.CopyInto(fPreferredLanguage, 0, 2);
+		}
+	}
 }
 
 
@@ -634,18 +645,6 @@ int32
 Model::_PopulateAllPackagesEntry(void* cookie)
 {
 	Model* model = static_cast<Model*>(cookie);
-
-	model->fPreferredLanguage = "en";
-	BLocaleRoster* localeRoster = BLocaleRoster::Default();
-	if (localeRoster != NULL) {
-		BMessage preferredLanguages;
-		if (localeRoster->GetPreferredLanguages(&preferredLanguages) == B_OK) {
-			BString language;
-			if (preferredLanguages.FindString("language", 0, &language) == B_OK)
-				language.CopyInto(model->fPreferredLanguage, 0, 2);
-		}
-	}
-
 	model->_PopulateAllPackagesThread(true);
 	model->_PopulateAllPackagesThread(false);
 	return 0;
