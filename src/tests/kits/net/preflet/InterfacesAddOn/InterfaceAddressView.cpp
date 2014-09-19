@@ -30,7 +30,7 @@
 // #pragma mark - InterfaceAddressView
 
 
-InterfaceAddressView::InterfaceAddressView(BRect frame, int family,
+InterfaceAddressView::InterfaceAddressView(int family,
 	NetworkSettings* settings)
 	:
 	BGroupView(B_VERTICAL),

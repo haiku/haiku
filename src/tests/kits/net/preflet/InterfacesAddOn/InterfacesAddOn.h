@@ -19,7 +19,6 @@
 
 
 static const uint32 kMsgInterfaceSelected = 'ifce';
-static const uint32 kMsgInterfaceConfigure = 'ifcf';
 static const uint32 kMsgInterfaceToggle = 'onof';
 static const uint32 kMsgInterfaceRenegotiate = 'redo';
 
@@ -36,14 +35,13 @@ public:
 			const char* 		Name();
 			status_t			Save();
 
-			BView*				CreateView(BRect *bounds);
+			BView*				CreateView();
 
 			void				AttachedToWindow();
 			void				MessageReceived(BMessage* msg);
 
 private:
 			InterfacesListView*	fListView;
-			BButton*			fConfigure;
 			BButton*			fOnOff;
 			BButton*			fRenegotiate;
 };

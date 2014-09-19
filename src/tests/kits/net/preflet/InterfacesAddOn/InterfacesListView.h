@@ -76,7 +76,6 @@ public:
 protected:
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
-	virtual	void				FrameResized(float width, float height);
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				MouseDown(BPoint where);

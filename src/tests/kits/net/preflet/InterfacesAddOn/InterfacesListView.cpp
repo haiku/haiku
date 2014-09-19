@@ -42,7 +42,7 @@
 #include <AutoDeleter.h>
 
 #include "InterfacesAddOn.h"
-#include "InterfaceWindow.h"
+#include "InterfaceView.h"
 
 
 #define ICON_SIZE 37
@@ -121,19 +121,19 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	BBitmap* stateIcon(NULL);
 
 	if (fSettings->IsDisabled()) {
-		interfaceState << "disabled";
+		interfaceState = "disabled";
 		stateIcon = fIconOffline;
 	} else if (!fInterface.HasLink()) {
-		interfaceState << "no link";
+		interfaceState = "no link";
 		stateIcon = fIconOffline;
 	} else if ((fSettings->IPAddr(AF_INET).IsEmpty()
 		&& fSettings->IPAddr(AF_INET6).IsEmpty())
 		&& (fSettings->AutoConfigure(AF_INET)
 		|| fSettings->AutoConfigure(AF_INET6))) {
-		interfaceState << "connecting" B_UTF8_ELLIPSIS;
+		interfaceState = "connecting" B_UTF8_ELLIPSIS;
 		stateIcon = fIconPending;
 	} else {
-		interfaceState << "connected";
+		interfaceState = "connected";
 		stateIcon = fIconOnline;
 	}
 
@@ -185,7 +185,7 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	list->DrawString(Name(), namePt);
 	list->SetFont(be_plain_font);
 	list->DrawString(interfaceState, statePt);
-	
+
 	if (!fSettings->IsDisabled()) {
 		// Render IPv4 Address
 		BString ipv4Str(B_TRANSLATE_COMMENT("IP:", "IPv4 address label"));
@@ -196,7 +196,7 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 		list->DrawString(ipv4Str, line2Pt);
 	}
-	
+
 	// Render IPv6 Address (if present)
 	if (!fSettings->IsDisabled()
 		&& !fSettings->IPAddr(AF_INET6).IsEmpty()) {
@@ -337,7 +337,8 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType) {
 
 InterfacesListView::InterfacesListView(const char* name)
 	:
-	BListView(name)
+	BListView(name, B_SINGLE_SELECTION_LIST,
+		B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE)
 {
 	fContextMenu = new BPopUpMenu("context menu", false, false);
 }
@@ -363,14 +364,6 @@ InterfacesListView::AttachedToWindow()
 
 	Select(0);
 		// Select the first item in the list
-}
-
-
-void
-InterfacesListView::FrameResized(float width, float height)
-{
-	BListView::FrameResized(width, height);
-	Invalidate();
 }
 
 
@@ -430,9 +423,6 @@ InterfacesListView::MouseDown(BPoint where)
 		fContextMenu->AddItem(new BMenuItem(B_TRANSLATE("Enable"),
 			new BMessage(kMsgInterfaceToggle)));
 	} else {
-		fContextMenu->AddItem(new BMenuItem(
-			B_TRANSLATE("Configure" B_UTF8_ELLIPSIS),
-				new BMessage(kMsgInterfaceConfigure)));
 		if (item->GetSettings()->AutoConfigure(AF_INET)
 			|| item->GetSettings()->AutoConfigure(AF_INET6)) {
 			fContextMenu->AddItem(new BMenuItem(
@@ -450,14 +440,6 @@ InterfacesListView::MouseDown(BPoint where)
 		return;
 
 	switch (selected->Message()->what) {
-		case kMsgInterfaceConfigure:
-		{
-			InterfaceWindow* win = new InterfaceWindow(item->GetSettings());
-			win->MoveTo(ConvertToScreen(where));
-			win->Show();
-			break;
-		}
-
 		case kMsgInterfaceToggle:
 			item->SetDisabled(!item->IsDisabled());
 			Invalidate();
@@ -541,6 +523,10 @@ InterfacesListView::_InitList()
 			AddItem(new InterfaceListItem(interface.Name()));
 	}
 
+	// FIXME compute this according to the actual size of the largest item
+	// instead.
+	SetExplicitMinSize(BSize(10 + B_LARGE_ICON
+		+ StringWidth("/dev/net/MMMMMMMMMMM xxxxxxxxxx"), B_SIZE_UNSET));
 	return B_OK;
 }
 

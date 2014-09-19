@@ -17,7 +17,7 @@ Addon Interfaces :
 	InterfacesAddOn.cpp
 	InterfacesListView.cpp
 	NetworkSettings.cpp
-	InterfaceWindow.cpp
+	InterfaceView.cpp
 	InterfaceAddressView.cpp
 	InterfaceHardwareView.cpp
 
@@ -40,7 +40,7 @@ DoCatalogs Interfaces :
 	:
 	InterfacesAddOn.cpp
 	InterfacesListView.cpp
-	InterfaceWindow.cpp
+	InterfaceView.cpp
 	InterfaceAddressView.cpp
 	InterfaceHardwareView.cpp
 ;

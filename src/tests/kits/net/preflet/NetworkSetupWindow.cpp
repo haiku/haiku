@@ -82,9 +82,6 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	_BuildShowTabView(kMsgAddonShow);
 
-	fPanel->SetExplicitMinSize(BSize(fMinAddonViewRect.Width(),
-		fMinAddonViewRect.Height()));
-
 	fAddonView = NULL;
 
 	CenterOnScreen();
@@ -241,12 +238,6 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 	if (!search_paths)
 		return;
 
-	float minimumWidth = be_control_look->DefaultItemSpacing() * 37;
-	float minimumHight = be_control_look->DefaultItemSpacing() * 25;
-
-	fMinAddonViewRect.Set(0, 0, minimumWidth, minimumHight);
-		// Minimum size
-
 	search_paths = strdup(search_paths);
 	char* next_path_token;
 	char* search_path = strtok_r(search_paths, ":", &next_path_token);
@@ -302,10 +293,8 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 				printf("Adding Tab: %d\n", fAddonCount);
 				BMessage* msg = new BMessage(msg_what);
 
-				BRect r(0, 0, 0, 0);
 				BView* addon_view
-					= fNetworkAddOnMap[fAddonCount]->CreateView(&r);
-				fMinAddonViewRect = fMinAddonViewRect | r;
+					= fNetworkAddOnMap[fAddonCount]->CreateView();
 
 				msg->AddInt32("image_id", addon_id);
 				msg->AddString("addon_path", addon_path.Path());

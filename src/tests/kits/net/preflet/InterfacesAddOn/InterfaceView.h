@@ -31,11 +31,12 @@ typedef std::map<int, InterfaceAddressView*> IPViewMap;
 class BButton;
 class BTabView;
 
-class InterfaceWindow : public BWindow {
+class InterfaceView : public BView {
 public:
-									InterfaceWindow(NetworkSettings* settings);
-	virtual							~InterfaceWindow();
+									InterfaceView(NetworkSettings* settings);
+	virtual							~InterfaceView();
 
+	virtual void					AttachedToWindow();
 	virtual	void					MessageReceived(BMessage* mesage);
 	virtual	bool					QuitRequested();
 

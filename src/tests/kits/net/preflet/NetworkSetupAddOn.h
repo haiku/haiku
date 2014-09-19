@@ -19,7 +19,7 @@ class NetworkSetupAddOn {
 		NetworkSetupAddOn(image_id addon_image);
 		virtual ~NetworkSetupAddOn();
 
-		virtual BView *			CreateView(BRect* bounds);
+		virtual BView *			CreateView() = 0;
 		virtual status_t		Save();
 		virtual status_t		Revert();
 

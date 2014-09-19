@@ -32,8 +32,7 @@
 // #pragma mark - InterfaceHardwareView
 
 
-InterfaceHardwareView::InterfaceHardwareView(BRect frame,
-	NetworkSettings* settings)
+InterfaceHardwareView::InterfaceHardwareView(NetworkSettings* settings)
 	:
 	BGroupView(B_VERTICAL),
 	fSettings(settings)

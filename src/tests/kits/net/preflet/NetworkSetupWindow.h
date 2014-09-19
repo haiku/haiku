@@ -56,7 +56,6 @@ class NetworkSetupWindow : public BWindow
 			BTabView*			fPanel;
 			BView*				fAddonView;
 			int					fAddonCount;
-			BRect				fMinAddonViewRect;
 };
 
 

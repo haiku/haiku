@@ -16,7 +16,7 @@
 
 
 #include "InterfacesAddOn.h"
-#include "InterfaceWindow.h"
+#include "InterfaceView.h"
 
 #include <Alert.h>
 #include <Button.h>
@@ -48,7 +48,7 @@ get_nth_addon(image_id image, int index)
 InterfacesAddOn::InterfacesAddOn(image_id image)
 	:
 	NetworkSetupAddOn(image),
-	BBox(BRect(0, 0, 0, 0), NULL, B_FOLLOW_ALL, B_NAVIGABLE_JUMP, B_NO_BORDER)
+	BBox(NULL, B_NAVIGABLE_JUMP, B_NO_BORDER)
 {
 }
 
@@ -66,21 +66,16 @@ InterfacesAddOn::Name()
 
 
 BView*
-InterfacesAddOn::CreateView(BRect *bounds)
+InterfacesAddOn::CreateView()
 {
 	// Construct the ListView
 	fListView = new InterfacesListView("interfaces");
 	fListView->SetSelectionMessage(new BMessage(kMsgInterfaceSelected));
-	fListView->SetInvocationMessage(new BMessage(kMsgInterfaceConfigure));
 
 	BScrollView* scrollView = new BScrollView("scrollView", fListView,
 		B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
 	// Construct the BButtons
-	fConfigure = new BButton("configure", B_TRANSLATE("Configure" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgInterfaceConfigure));
-	fConfigure->SetEnabled(false);
-
 	fOnOff = new BButton("onoff", B_TRANSLATE("Disable"),
 		new BMessage(kMsgInterfaceToggle));
 	fOnOff->SetEnabled(false);
@@ -90,12 +85,11 @@ InterfacesAddOn::CreateView(BRect *bounds)
 	fRenegotiate->SetEnabled(false);
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.Add(scrollView)
 		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
-			.Add(fConfigure)
 			.Add(fOnOff)
 			.AddGlue()
 			.Add(fRenegotiate)
@@ -104,7 +98,6 @@ InterfacesAddOn::CreateView(BRect *bounds)
 			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	);
 
-	*bounds = Bounds();
 	return this;
 }
 
@@ -113,7 +106,6 @@ void
 InterfacesAddOn::AttachedToWindow()
 {
 	fListView->SetTarget(this);
-	fConfigure->SetTarget(this);
 	fOnOff->SetTarget(this);
 	fRenegotiate->SetTarget(this);
 }
@@ -138,24 +130,20 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 	switch (msg->what) {
 		case kMsgInterfaceSelected:
 		{
-			fConfigure->SetEnabled(item != NULL);
 			fOnOff->SetEnabled(item != NULL);
 			fRenegotiate->SetEnabled(item != NULL);
 			if (item == NULL)
 				break;
-			fConfigure->SetEnabled(!item->IsDisabled());
 			fRenegotiate->SetEnabled(!item->IsDisabled());
 			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
-			break;
-		}
 
-		case kMsgInterfaceConfigure:
-		{
-			if (item == NULL)
-				break;
-
-			InterfaceWindow* sw = new InterfaceWindow(item->GetSettings());
-			sw->Show();
+			// TODO it would be better to reuse the view instead of recreating
+			// one.
+			InterfaceView* sw = new InterfaceView(item->GetSettings());
+			BView* old = ChildAt(1);
+			RemoveChild(old);
+			delete old;
+			AddChild(sw);
 			break;
 		}
 
@@ -165,7 +153,6 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 				break;
 
 			item->SetDisabled(!item->IsDisabled());
-			fConfigure->SetEnabled(!item->IsDisabled());
 			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
 			fRenegotiate->SetEnabled(!item->IsDisabled());
 			fListView->Invalidate();

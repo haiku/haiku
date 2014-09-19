@@ -30,8 +30,8 @@ class BTextControl;
 
 class InterfaceAddressView : public BGroupView {
 public:
-								InterfaceAddressView(BRect frame,
-									int family, NetworkSettings* settings);
+								InterfaceAddressView(int family,
+									NetworkSettings* settings);
 	virtual						~InterfaceAddressView();
 
 	virtual void				AttachedToWindow();

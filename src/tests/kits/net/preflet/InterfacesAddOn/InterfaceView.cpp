@@ -8,7 +8,7 @@
  */
 
 
-#include "InterfaceWindow.h"
+#include "InterfaceView.h"
 
 #include <Application.h>
 #include <Button.h>
@@ -22,12 +22,9 @@
 #define B_TRANSLATION_CONTEXT "InterfaceWindow"
 
 
-InterfaceWindow::InterfaceWindow(NetworkSettings* settings)
+InterfaceView::InterfaceView(NetworkSettings* settings)
 	:
-	BWindow(BRect(50, 50, 370, 350), "Interface Settings",
-		B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS, B_CURRENT_WORKSPACE)
+	BView("Interface Settings", 0, 0)
 {
 	fNetworkSettings = settings;
 
@@ -39,7 +36,6 @@ InterfaceWindow::InterfaceWindow(NetworkSettings* settings)
 
 	fApplyButton = new BButton("save", B_TRANSLATE("Save"),
 		new BMessage(MSG_IP_SAVE));
-	SetDefaultButton(fApplyButton);
 
 	_PopulateTabs();
 
@@ -58,18 +54,24 @@ InterfaceWindow::InterfaceWindow(NetworkSettings* settings)
 }
 
 
-InterfaceWindow::~InterfaceWindow()
+InterfaceView::~InterfaceView()
 {
 }
 
 
 void
-InterfaceWindow::MessageReceived(BMessage* message)
+InterfaceView::AttachedToWindow()
+{
+	Window()->SetDefaultButton(fApplyButton);
+}
+
+
+void
+InterfaceView::MessageReceived(BMessage* message)
 {
 	protocols* supportedFamilies = fNetworkSettings->ProtocolVersions();
 
 	switch (message->what) {
-		
 		case MSG_IP_REVERT:
 			for (int index = 0; index < MAX_PROTOCOLS; index++) {
 				if (supportedFamilies[index].present) {
@@ -85,32 +87,29 @@ InterfaceWindow::MessageReceived(BMessage* message)
 					fTabIPView[inet_id]->Save();
 				}
 			}
-			this->Quit();
 			break;
 		default:
-			BWindow::MessageReceived(message);
+			BView::MessageReceived(message);
 	}
 
 }
 
 
 status_t
-InterfaceWindow::_PopulateTabs()
+InterfaceView::_PopulateTabs()
 {
-	BRect frame = fTabView->Bounds();
 	protocols* supportedFamilies = fNetworkSettings->ProtocolVersions();
 
 	BTab* hardwareTab = new BTab;
-	fTabHardwareView = new InterfaceHardwareView(frame,
-		fNetworkSettings);
+	fTabHardwareView = new InterfaceHardwareView(fNetworkSettings);
 	fTabView->AddTab(fTabHardwareView, hardwareTab);
 	hardwareTab->SetLabel(B_TRANSLATE("Interface"));
 
 	for (int index = 0; index < MAX_PROTOCOLS; index++) {
 		if (supportedFamilies[index].present) {
 			int inet_id = supportedFamilies[index].inet_id;
-			fTabIPView[inet_id] = new InterfaceAddressView(frame,
-				inet_id, fNetworkSettings);
+			fTabIPView[inet_id] = new InterfaceAddressView(inet_id,
+				fNetworkSettings);
 			BTab* tab = new BTab;
 			fTabView->AddTab(fTabIPView[inet_id], tab);
 			tab->SetLabel(supportedFamilies[index].name);
@@ -122,7 +121,7 @@ InterfaceWindow::_PopulateTabs()
 
 
 bool
-InterfaceWindow::QuitRequested()
+InterfaceView::QuitRequested()
 {
 	return true;
 }

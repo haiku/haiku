@@ -21,7 +21,7 @@ class BStringView;
 
 class InterfaceHardwareView : public BGroupView {
 public:
-								InterfaceHardwareView(BRect frame,
+								InterfaceHardwareView(
 									NetworkSettings* settings);
 	virtual						~InterfaceHardwareView();
 
