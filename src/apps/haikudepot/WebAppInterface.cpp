@@ -367,23 +367,6 @@ WebAppInterface::RetrieveUserRatings(const BString& packageName,
 
 
 status_t
-WebAppInterface::RequestCaptcha(BMessage& message)
-{
-	BString jsonString = JsonBuilder()
-		.AddValue("jsonrpc", "2.0")
-		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "generateCaptcha")
-		.AddArray("params")
-			.AddObject()
-			.EndObject()
-		.EndArray()
-	.End();
-
-	return _SendJsonRequest("captcha", jsonString, message);
-}
-
-
-status_t
 WebAppInterface::RetrieveScreenshot(const BString& code,
 	int32 width, int32 height, BDataIO* stream)
 {
@@ -417,6 +400,55 @@ WebAppInterface::RetrieveScreenshot(const BString& code,
 	fprintf(stderr, "failed to get screenshot from '%s': %" B_PRIi32 "\n",
 		urlString.String(), statusCode);
 	return B_ERROR;
+}
+
+
+status_t
+WebAppInterface::RequestCaptcha(BMessage& message)
+{
+	BString jsonString = JsonBuilder()
+		.AddValue("jsonrpc", "2.0")
+		.AddValue("id", ++fRequestIndex)
+		.AddValue("method", "generateCaptcha")
+		.AddArray("params")
+			.AddObject()
+			.EndObject()
+		.EndArray()
+	.End();
+
+	return _SendJsonRequest("captcha", jsonString, message);
+}
+
+
+status_t
+WebAppInterface::CreateUser(const BString& nickName,
+	const BString& passwordClear, const BString& email,
+	const BString& captchaToken, const BString& captchaResponse,
+	const BString& languageCode, BMessage& message)
+{
+	JsonBuilder builder;
+	builder
+		.AddValue("jsonrpc", "2.0")
+		.AddValue("id", ++fRequestIndex)
+		.AddValue("method", "createUser")
+		.AddArray("params")
+			.AddObject()
+				.AddValue("nickname", nickName)
+				.AddValue("passwordClear", passwordClear);
+
+				if (!email.IsEmpty())
+					builder.AddValue("email", email);
+	
+				builder.AddValue("captchaToken", captchaToken)
+				.AddValue("captchaResponse", captchaResponse)
+				.AddValue("naturalLanguageCode", languageCode)
+			.EndObject()
+		.EndArray()
+	;
+
+	BString jsonString = builder.End();
+
+	return _SendJsonRequest("user", jsonString, message);
 }
 
 

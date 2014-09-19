@@ -55,6 +55,14 @@ public:
 
 			status_t			RequestCaptcha(BMessage& message);
 
+			status_t			CreateUser(const BString& nickName,
+									const BString& passwordClear,
+									const BString& email,
+									const BString& captchaToken,
+									const BString& captchaResponse,
+									const BString& languageCode,
+									BMessage& message);
+
 private:
 			status_t			_SendJsonRequest(const char* domain,
 									BString jsonString, BMessage& reply) const;
