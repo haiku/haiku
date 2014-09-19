@@ -45,6 +45,7 @@ AddFilesToPackage develop lib : libposix_error_mapper.a ;
 # headers
 AddHeaderDirectoryToPackage config ;
 AddHeaderDirectoryToPackage glibc ;
+AddHeaderDirectoryToPackage libs alm ;
 AddHeaderDirectoryToPackage os ;
 AddHeaderDirectoryToPackage posix ;
 
