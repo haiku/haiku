@@ -112,8 +112,8 @@ TextGapBuffer::InsertText(BFile* file, int32 fileOffset, int32 inNumItems,
 void
 TextGapBuffer::RemoveRange(int32 start, int32 end)
 {
-	long inAtIndex = start;
-	long inNumItems = end - start;
+	int32 inAtIndex = start;
+	int32 inNumItems = end - start;
 
 	if (inNumItems < 1)
 		return;
@@ -142,8 +142,8 @@ TextGapBuffer::GetString(int32 fromOffset, int32* _numBytes)
 	if (numBytes < 1)
 		return result;
 
-	bool isStartBeforeGap = (fromOffset < fGapIndex);
-	bool isEndBeforeGap = ((fromOffset + numBytes - 1) < fGapIndex);
+	bool isStartBeforeGap = fromOffset < fGapIndex;
+	bool isEndBeforeGap = (fromOffset + numBytes - 1) < fGapIndex;
 
 	if (isStartBeforeGap == isEndBeforeGap) {
 		result = fBuffer + fromOffset;
@@ -155,7 +155,7 @@ TextGapBuffer::GetString(int32 fromOffset, int32* _numBytes)
 			fScratchSize = numBytes;
 		}
 
-		for (long i = 0; i < numBytes; i++)
+		for (int32 i = 0; i < numBytes; i++)
 			fScratchBuffer[i] = RealCharAt(fromOffset + i);
 
 		result = fScratchBuffer;
@@ -190,8 +190,8 @@ TextGapBuffer::GetString(int32 fromOffset, int32* _numBytes)
 bool
 TextGapBuffer::FindChar(char inChar, int32 fromIndex, int32* ioDelta)
 {
-	long numChars = *ioDelta;
-	for (long i = 0; i < numChars; i++) {
+	int32 numChars = *ioDelta;
+	for (int32 i = 0; i < numChars; i++) {
 		char realChar = RealCharAt(fromIndex + i);
 		if ((realChar & 0xc0) == 0x80)
 			continue;
