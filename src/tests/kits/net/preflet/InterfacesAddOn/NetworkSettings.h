@@ -61,8 +61,8 @@ public:
 			void				SetDisabled(bool disabled)
 									{ fDisabled = disabled; }
 
-//			void				SetWirelessNetwork(const char* name)
-//									{ fWirelessNetwork.SetTo(name); }
+			void				SetWirelessNetwork(const char* name)
+									{ fWirelessNetwork.SetTo(name); }
 //			void				SetDomain(const BString& domain)
 //									{ fDomain = domain; }
 
@@ -98,6 +98,10 @@ public:
 			const char*			HardwareAddress();
 
 			const BString&		WirelessNetwork() { return fWirelessNetwork; }
+			status_t			GetNextAssociatedNetwork(uint32& cookie,
+									BNetworkAddress& address);
+			status_t			GetNextNetwork(uint32& cookie,
+									wireless_network& network);
 
 			BObjectList<BString>& NameServers() { return fNameServers; }
 

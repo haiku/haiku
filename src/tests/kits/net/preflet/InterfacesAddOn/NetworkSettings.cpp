@@ -286,6 +286,9 @@ void
 NetworkSettings::SetConfiguration()
 {
 	printf("Setting %s\n", Name());
+
+	fNetworkDevice->JoinNetwork(WirelessNetwork());
+
 	for (int index = 0; index < MAX_PROTOCOLS; index++) {
 		int inet_id = fProtocols[index].inet_id;
 		if (fProtocols[index].present) {
@@ -362,3 +365,19 @@ NetworkSettings::HardwareAddress()
 
 	return NULL;
 }
+
+
+status_t
+NetworkSettings::GetNextAssociatedNetwork(uint32& cookie,
+	BNetworkAddress& address)
+{
+	return fNetworkDevice->GetNextAssociatedNetwork(cookie, address);
+}
+
+
+status_t
+NetworkSettings::GetNextNetwork(uint32& cookie, wireless_network& network)
+{
+	return fNetworkDevice->GetNextNetwork(cookie, network);
+}
+

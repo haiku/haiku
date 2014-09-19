@@ -9,7 +9,10 @@
 
 
 #include "InterfaceHardwareView.h"
+
+#include "InterfaceView.h"
 #include "NetworkSettings.h"
+#include "WirelessNetworkMenuItem.h"
 
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -22,6 +25,7 @@
 #include <StringView.h>
 #include <TextControl.h>
 
+#include <set>
 #include <stdio.h>
 
 
@@ -70,21 +74,25 @@ InterfaceHardwareView::InterfaceHardwareView(NetworkSettings* settings)
 	fLinkRxField = new BStringView("rx field", "");
 	fLinkRxField ->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
 
-	Update();
-		// Populate the fields
+	fNetworkMenuField = new BMenuField(B_TRANSLATE("Network:"), new BMenu(
+		B_TRANSLATE("Choose automatically")));
+	fNetworkMenuField->SetAlignment(B_ALIGN_RIGHT);
+	fNetworkMenuField->Menu()->SetLabelFromMarked(true);
 
 	BLayoutBuilder::Group<>(this)
 		.AddGrid()
 			.Add(status, 0, 0)
 			.Add(fStatusField, 1, 0)
-			.Add(macAddress, 0, 1)
-			.Add(fMacAddressField, 1, 1)
-			.Add(linkSpeed, 0, 2)
-			.Add(fLinkSpeedField, 1, 2)
-			.Add(linkTx, 0, 3)
-			.Add(fLinkTxField, 1, 3)
-			.Add(linkRx, 0, 4)
-			.Add(fLinkRxField, 1, 4)
+			.Add(fNetworkMenuField->CreateLabelLayoutItem(), 0, 1)
+			.Add(fNetworkMenuField->CreateMenuBarLayoutItem(), 1, 1)
+			.Add(macAddress, 0, 2)
+			.Add(fMacAddressField, 1, 2)
+			.Add(linkSpeed, 0, 3)
+			.Add(fLinkSpeedField, 1, 3)
+			.Add(linkTx, 0, 4)
+			.Add(fLinkTxField, 1, 4)
+			.Add(linkRx, 0, 5)
+			.Add(fLinkRxField, 1, 5)
 		.End()
 		.AddGlue()
 		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
@@ -104,7 +112,8 @@ InterfaceHardwareView::~InterfaceHardwareView()
 void
 InterfaceHardwareView::AttachedToWindow()
 {
-
+	Update();
+		// Populate the fields
 }
 
 
@@ -112,6 +121,11 @@ void
 InterfaceHardwareView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kMsgNetwork:
+		{
+			fSettings->SetWirelessNetwork(message->FindString("name"));
+			break;
+		}
 		default:
 			BView::MessageReceived(message);
 	}
@@ -162,6 +176,62 @@ InterfaceHardwareView::Update()
 	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%" B_PRIu64 " KBytes"),
 		stats.receive.bytes / 1024);
 	fLinkRxField->SetText(buffer);
+
+	// TODO move the wireless info to a separate tab. We should have a
+	// BListView of available networks, rather than a menu, to make them more
+	// readable and easier to browse and select.
+	if (fNetworkMenuField->IsHidden(fNetworkMenuField)
+		&& fSettings->IsWireless()) {
+		fNetworkMenuField->Show();
+	} else if (!fNetworkMenuField->IsHidden(fNetworkMenuField)
+		&& !fSettings->IsWireless()) {
+		fNetworkMenuField->Hide();
+	}
+
+	if (fSettings->IsWireless()) {
+		// Rebuild network menu
+		BMenu* menu = fNetworkMenuField->Menu();
+		menu->RemoveItems(0, menu->CountItems(), true);
+
+		std::set<BNetworkAddress> associated;
+		BNetworkAddress address;
+		uint32 cookie = 0;
+		while (fSettings->GetNextAssociatedNetwork(cookie, address) == B_OK)
+			associated.insert(address);
+
+		wireless_network network;
+		int32 count = 0;
+		cookie = 0;
+		while (fSettings->GetNextNetwork(cookie, network) == B_OK) {
+			BMessage* message = new BMessage(kMsgNetwork);
+
+			message->AddString("device", fSettings->Name());
+			message->AddString("name", network.name);
+
+			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
+				network.signal_strength,
+				network.authentication_mode, message);
+			if (associated.find(network.address) != associated.end())
+				item->SetMarked(true);
+			menu->AddItem(item);
+
+			count++;
+		}
+		if (count == 0) {
+			BMenuItem* item = new BMenuItem(
+				B_TRANSLATE("<no wireless networks found>"), NULL);
+			item->SetEnabled(false);
+			menu->AddItem(item);
+		} else {
+			BMenuItem* item = new BMenuItem(
+				B_TRANSLATE("Choose automatically"), NULL);
+			if (menu->FindMarked() == NULL)
+				item->SetMarked(true);
+			menu->AddItem(item, 0);
+			menu->AddItem(new BSeparatorItem(), 1);
+		}
+		menu->SetTargetForItems(this);
+	}
 
 	return B_OK;
 }

@@ -1,10 +1,16 @@
 SubDir HAIKU_TOP src tests kits net preflet ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps networkstatus ] ;
 
 Preference NetworkSetup :
 	NetworkSetup.cpp
 	NetworkSetupWindow.cpp
 	NetworkSetupProfile.cpp
 	NetworkSetupAddOn.cpp
+
+	# from NetworkStatus
+	RadioView.cpp
+	WirelessNetworkMenuItem.cpp
+
 	: be root [ TargetLibstdc++ ] localestub
 	: NetworkSetup.rdef
 ;

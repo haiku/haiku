@@ -15,6 +15,7 @@
 #include <GroupView.h>
 
 
+class BMenuField;
 class BMessage;
 class BRect;
 class BStringView;
@@ -42,6 +43,8 @@ private:
 			BStringView*		fLinkSpeedField;
 			BStringView*		fLinkTxField;
 			BStringView*		fLinkRxField;
+
+			BMenuField*			fNetworkMenuField;
 };
 
 

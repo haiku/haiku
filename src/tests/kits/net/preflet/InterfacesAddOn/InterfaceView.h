@@ -21,8 +21,7 @@
 
 
 enum {
-	MSG_IP_SAVE = 'ipap',
-	MSG_IP_REVERT = 'iprv'
+	kMsgNetwork = 'netw'
 };
 
 

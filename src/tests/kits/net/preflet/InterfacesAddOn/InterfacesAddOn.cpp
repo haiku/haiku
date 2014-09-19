@@ -95,8 +95,6 @@ InterfacesAddOn::CreateView()
 			.AddGlue()
 			.Add(fRenegotiate)
 		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	);
 
 	return this;
