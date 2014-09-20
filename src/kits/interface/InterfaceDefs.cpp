@@ -103,8 +103,8 @@ static const rgb_color _kDefaultColors[kColorWhichCount] = {
 	{0, 0, 0, 255},			// B_LIST_SELECTED_ITEM_TEXT_COLOR
 	{216, 216, 216, 255},	// B_SCROLL_BAR_THUMB_COLOR
 	// 100...
-	{0, 255, 0, 255},		// B_SUCCESS_COLOR
-	{255, 0, 0, 255},		// B_FAILURE_COLOR
+	{46, 204, 64, 255},		// B_SUCCESS_COLOR
+	{255, 65, 54, 255},		// B_FAILURE_COLOR
 	{}
 };
 const rgb_color* BPrivate::kDefaultColors = &_kDefaultColors[0];
