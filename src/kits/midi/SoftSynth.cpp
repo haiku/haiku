@@ -88,6 +88,7 @@ BSoftSynth::SetDefaultInstrumentsFile()
 	// in the user settings directory
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, false, NULL) == B_OK) {
+		path.Append("/synth/");
 		path.Append(kSynthFileName);
 		if (BEntry(path.Path()).Exists())
 			return SetInstrumentsFile(path.Path());
