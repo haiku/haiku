@@ -21,7 +21,10 @@ typedef List<BString, false>	StringList;
 class WebAppInterface {
 public:
 								WebAppInterface();
+								WebAppInterface(const WebAppInterface& other);
 	virtual						~WebAppInterface();
+
+			WebAppInterface&	operator=(const WebAppInterface& other);
 
 			void				SetAuthorization(const BString& username,
 									const BString& password);
@@ -63,6 +66,10 @@ public:
 									const BString& languageCode,
 									BMessage& message);
 
+			status_t			AuthenticateUser(const BString& nickName,
+									const BString& passwordClear,
+									BMessage& message);
+
 private:
 			status_t			_SendJsonRequest(const char* domain,
 									BString jsonString, BMessage& reply) const;
@@ -71,7 +78,6 @@ private:
 			BString				fUsername;
 			BString				fPassword;
 			BString				fLanguage;
-			BString				fArchitecture;
 	static	int					fRequestIndex;
 };
 

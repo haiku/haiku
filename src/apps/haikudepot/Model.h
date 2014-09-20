@@ -8,6 +8,8 @@
 #include <Locker.h>
 
 #include "PackageInfo.h"
+#include "WebAppInterface.h"
+
 
 class BMessage;
 
@@ -105,6 +107,9 @@ public:
 			const BString&		PreferredLanguage() const
 									{ return fPreferredLanguage; }
 
+			void				SetAuthorization(const BString& username,
+									const BString& password);
+
 private:
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
 			void				_PopulateAllPackagesThread(bool fromCacheOnly);
@@ -168,6 +173,8 @@ private:
 			thread_id			fPopulateAllPackagesThread;
 	volatile bool				fStopPopulatingAllPackages;
 			BString				fPreferredLanguage;
+
+			WebAppInterface		fWebAppInterface;
 };
 
 

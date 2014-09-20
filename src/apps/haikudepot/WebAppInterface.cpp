@@ -238,8 +238,31 @@ WebAppInterface::WebAppInterface()
 }
 
 
+WebAppInterface::WebAppInterface(const WebAppInterface& other)
+	:
+	fUsername(other.fUsername),
+	fPassword(other.fPassword),
+	fLanguage(other.fLanguage)
+{
+}
+
+
 WebAppInterface::~WebAppInterface()
 {
+}
+
+
+WebAppInterface&
+WebAppInterface::operator=(const WebAppInterface& other)
+{
+	if (this == &other)
+		return *this;
+	
+	fUsername = other.fUsername;
+	fPassword = other.fPassword;
+	fLanguage = other.fLanguage;
+	
+	return *this;
 }
 
 
@@ -447,6 +470,26 @@ WebAppInterface::CreateUser(const BString& nickName,
 	;
 
 	BString jsonString = builder.End();
+
+	return _SendJsonRequest("user", jsonString, message);
+}
+
+
+status_t
+WebAppInterface::AuthenticateUser(const BString& nickName,
+	const BString& passwordClear, BMessage& message)
+{
+	BString jsonString = JsonBuilder()
+		.AddValue("jsonrpc", "2.0")
+		.AddValue("id", ++fRequestIndex)
+		.AddValue("method", "authenticateUser")
+		.AddArray("params")
+			.AddObject()
+				.AddValue("nickname", nickName)
+				.AddValue("passwordClear", passwordClear)
+			.EndObject()
+		.EndArray()
+	.End();
 
 	return _SendJsonRequest("user", jsonString, message);
 }

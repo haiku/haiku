@@ -21,8 +21,6 @@
 #include <Message.h>
 #include <Path.h>
 
-#include "WebAppInterface.h"
-
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Model"
@@ -338,6 +336,7 @@ Model::Model()
 				language.CopyInto(fPreferredLanguage, 0, 2);
 		}
 	}
+	fWebAppInterface.SetPreferredLanguage(fPreferredLanguage);
 }
 
 
@@ -516,8 +515,6 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 
 	if ((flags & POPULATE_USER_RATINGS) != 0) {
 		// Retrieve info from web-app
-		WebAppInterface interface;
-		interface.SetPreferredLanguage(fPreferredLanguage);
 		BMessage info;
 
 		BString packageName;
@@ -528,7 +525,7 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 			architecture = package->Architecture();
 		}
 	
-		status_t status = interface.RetrieveUserRatings(packageName,
+		status_t status = fWebAppInterface.RetrieveUserRatings(packageName,
 			architecture, 0, 50, info);
 		if (status == B_OK) {
 			// Parse message
@@ -641,6 +638,17 @@ Model::StopPopulatingAllPackages()
 }
 
 
+void
+Model::SetAuthorization(const BString& username, const BString& password)
+{
+	BAutolock locker(&fLock);
+	fWebAppInterface.SetAuthorization(username, password);
+}
+
+
+// #pragma mark - private
+
+
 int32
 Model::_PopulateAllPackagesEntry(void* cookie)
 {
@@ -727,8 +735,6 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 		return;
 	
 	// Retrieve info from web-app
-	WebAppInterface interface;
-	interface.SetPreferredLanguage(fPreferredLanguage);
 	BMessage info;
 
 	StringList packageNames;
@@ -739,7 +745,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 		packageArchitectures.Add(package->Architecture());
 	}
 
-	status_t status = interface.RetrieveBulkPackageInfo(packageNames,
+	status_t status = fWebAppInterface.RetrieveBulkPackageInfo(packageNames,
 		packageArchitectures, info);
 	if (status == B_OK) {
 		// Parse message
@@ -818,11 +824,9 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
 		return;
 	
 	// Retrieve info from web-app
-	WebAppInterface interface;
-	interface.SetPreferredLanguage(fPreferredLanguage);
 	BMessage info;
 
-	status_t status = interface.RetrievePackageInfo(package->Title(),
+	status_t status = fWebAppInterface.RetrievePackageInfo(package->Title(),
 		package->Architecture(), info);
 	if (status == B_OK) {
 		// Parse message
@@ -995,10 +999,10 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 		return;
 
 	// Retrieve icon from web-app
-	WebAppInterface interface;
 	BMallocIO buffer;
 
-	status_t status = interface.RetrievePackageIcon(package->Title(), &buffer);
+	status_t status = fWebAppInterface.RetrievePackageIcon(package->Title(),
+		&buffer);
 	if (status == B_OK) {
 		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
 		BAutolock locker(&fLock);
@@ -1053,12 +1057,11 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 		return;
 
 	// Retrieve screenshot from web-app
-	WebAppInterface interface;
 	BMallocIO buffer;
 
 	int32 scaledHeight = scaledWidth * info.Height() / info.Width();
 
-	status_t status = interface.RetrieveScreenshot(info.Code(),
+	status_t status = fWebAppInterface.RetrieveScreenshot(info.Code(),
 		scaledWidth, scaledHeight, &buffer);
 	if (status == B_OK) {
 		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(buffer), true);

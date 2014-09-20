@@ -209,12 +209,14 @@ UserLoginWindow::_SetMode(Mode mode)
 		case LOGIN:
 			fTabView->Select((int32)0);
 			fSendButton->SetLabel(B_TRANSLATE("Log in"));
+			fUsernameField->MakeFocus();
 			break;
 		case CREATE_ACCOUNT:
 			fTabView->Select(1);
 			fSendButton->SetLabel(B_TRANSLATE("Create account"));
 			if (fCaptchaToken.IsEmpty())
 				_RequestCaptcha();
+			fNewUsernameField->MakeFocus();
 			break;
 		default:
 			break;
@@ -225,15 +227,15 @@ UserLoginWindow::_SetMode(Mode mode)
 void
 UserLoginWindow::_Login()
 {
-	// TODO: Implement...
-	BAlert* alert = new BAlert(B_TRANSLATE("Not implemented"),
-		B_TRANSLATE("Sorry, while the web application would already support "
-		"logging in, HaikuDepot was not yet updated to use "
-		"this functionality."),
-		B_TRANSLATE("Bummer"));
-	alert->Go(NULL);
+	BAutolock locker(&fLock);
+	
+	if (fWorkerThread >= 0)
+		return;
 
-	PostMessage(B_QUIT_REQUESTED);
+	thread_id thread = spawn_thread(&_AuthenticateThreadEntry,
+		"Authenticator", B_NORMAL_PRIORITY, this);
+	if (thread >= 0)
+		_SetWorkerThread(thread);
 }
 
 
@@ -300,6 +302,79 @@ UserLoginWindow::_SetWorkerThread(thread_id thread)
 	}
 
 	Unlock();
+}
+
+
+int32
+UserLoginWindow::_AuthenticateThreadEntry(void* data)
+{
+	UserLoginWindow* window = reinterpret_cast<UserLoginWindow*>(data);
+	window->_AuthenticateThread();
+	return 0;
+}
+
+
+void
+UserLoginWindow::_AuthenticateThread()
+{
+	if (!Lock())
+		return;
+
+	BString nickName(fUsernameField->Text());
+	BString passwordClear(fPasswordField->Text());
+
+	Unlock();
+
+	WebAppInterface interface;
+	BMessage info;
+
+	status_t status = interface.AuthenticateUser(
+		nickName, passwordClear, info);
+
+	BString error = B_TRANSLATE("Authentication failed. "
+		"Connection to the service failed.");
+
+	BMessage result;
+	if (status == B_OK && info.FindMessage("result", &result) == B_OK) {
+		BString token;
+		if (result.FindString("token", &token) == B_OK && !token.IsEmpty()) {
+			// We don't care for or store the token for now. The web-service
+			// supports two methods of authorizing requests. One is via
+			// Basic Authentication in the HTTP header, the other is via
+			// Token Bearer. Since the connection is encrypted, it is hopefully
+			// ok to send the password with each request instead of implementing
+			// the Token Bearer. See section 5.1.2 in the haiku-depot-web
+			// documentation.
+			error = "";
+			fModel.SetAuthorization(nickName, passwordClear);
+		} else {
+			error = B_TRANSLATE("Authentication failed. The user does "
+				"not exist or the wrong password was supplied.");
+		}
+	}
+
+	if (!error.IsEmpty()) {
+		BAlert* alert = new(std::nothrow) BAlert(
+			B_TRANSLATE("Authentication failed"),
+			error,
+			B_TRANSLATE("Close"));
+
+		if (alert != NULL)
+			alert->Go();
+
+		_SetWorkerThread(-1);
+	} else {
+		_SetWorkerThread(-1);
+		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
+
+		BAlert* alert = new(std::nothrow) BAlert(
+			B_TRANSLATE("Success"),
+			B_TRANSLATE("The authentication was successful."),
+			B_TRANSLATE("Close"));
+
+		if (alert != NULL)
+			alert->Go();
+	}
 }
 
 
@@ -433,6 +508,8 @@ UserLoginWindow::_CreateAccountThread()
 		fCaptchaToken = "";
 		_RequestCaptcha();
 	} else {
+		fModel.SetAuthorization(nickName, passwordClear);
+
 		_SetWorkerThread(-1);
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 

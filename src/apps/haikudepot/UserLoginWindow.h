@@ -40,6 +40,9 @@ private:
 
 			void				_SetWorkerThread(thread_id thread);
 
+	static	int32				_AuthenticateThreadEntry(void* data);
+			void				_AuthenticateThread();
+
 	static	int32				_RequestCaptchaThreadEntry(void* data);
 			void				_RequestCaptchaThread();
 
