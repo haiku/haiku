@@ -24,6 +24,7 @@
 
 using namespace BPrivate;
 
+const static char* kSynthFileName = "synth.sf2";
 
 BSoftSynth::BSoftSynth()
 : 	fInitCheck(false),
@@ -83,8 +84,18 @@ BSoftSynth::IsLoaded(void) const
 status_t 
 BSoftSynth::SetDefaultInstrumentsFile()
 {
+	// We first search for a softsynth file (or symlink to it)
+	// in the user settings directory
 	BPath path;
-	if (B_OK == find_directory(B_SYNTH_DIRECTORY, &path, false, NULL)) {
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, false, NULL) == B_OK) {
+		path.Append(kSynthFileName);
+		if (BEntry(path.Path()).Exists())
+			return SetInstrumentsFile(path.Path());
+	}
+
+	// If no link is present, fall back to the default
+	// softsynth (big_synth.sy)
+	if (find_directory(B_SYNTH_DIRECTORY, &path, false, NULL) == B_OK) {
 		path.Append(B_BIG_SYNTH_FILE);
 		return SetInstrumentsFile(path.Path());
 	}
@@ -102,6 +113,7 @@ BSoftSynth::SetInstrumentsFile(const char* path)
 	if (IsLoaded())
 		Unload();
 	
+	// TODO: Check for file existence ?
 	fInstrumentsFile = strdup(path);
 	return B_OK;
 }
