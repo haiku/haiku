@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2014, Haiku.
  *
  * Copyright (c) 2004-2005 Matthijs Hollemans
  * Copyright (c) 2003 Jerome Leveque
@@ -9,6 +9,7 @@
  * 		Jérôme Duval
  *		Jérôme Leveque
  *		Matthijs Hollemans
+ *		Pete Goodeve
  */
 
 #include <MidiRoster.h>
@@ -25,6 +26,18 @@
 using namespace BPrivate;
 
 const static char* kSynthFileName = "synth.sf2";
+
+struct ReverbSettings {
+	double room, damp, width, level;
+ } gReverbSettings[] = {
+		 {0.0, 0.0, 0.0, 0.0},   //  B_REVERB_NONE
+		 {0.2, 0.0, 0.5, 0.9},   //  B_REVERB_CLOSET
+		 {0.5, 0.0, 0.9, 0.9},   //  B_REVERB_GARAGE
+		 {0.7, 0.25, 0.9, 0.95}, //  B_REVERB_BALLROOM
+		 {0.99, 0.3, 1.0, 1.0},  //  B_REVERB_CAVERN
+		 {1.03, 0.6, 1.0, 1.0}   //  B_REVERB_DUNGEON
+ };
+
 
 BSoftSynth::BSoftSynth()
 : 	fInitCheck(false),
@@ -232,9 +245,15 @@ BSoftSynth::IsReverbEnabled() const
 void 
 BSoftSynth::SetReverb(reverb_mode mode)
 {
-	// TODO: this function could change depending on the synth back-end.
+	if (mode < B_REVERB_NONE || mode > B_REVERB_DUNGEON)
+		return;
 
 	fReverbMode = mode;
+	if (fSynth) {
+		// We access the table using "mode - 1" because B_REVERB_NONE == 1
+		ReverbSettings *rvb = &gReverbSettings[mode - 1];
+		fluid_synth_set_reverb(fSynth, rvb->room, rvb->damp, rvb->width, rvb->level);
+	}
 }
 
 
@@ -457,6 +476,8 @@ BSoftSynth::_Init()
 		fprintf(stderr, "error in fluid_synth_sfload\n");
 		return;
 	}
+
+	SetReverb(fReverbMode);
 
 	media_raw_audio_format format = media_raw_audio_format::wildcard;
 	format.channel_count = 2;
