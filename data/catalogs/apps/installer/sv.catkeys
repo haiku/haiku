@@ -55,7 +55,7 @@ The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk
 ?? of ??	InstallerWindow	Unknown progress	?? av ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Starta DiskHanteringsverktyget för att partitionera\ntillgängliga hårddiskar och annan media.\nPartitioner can formateras med Be-filsystemet\nsom krävs för en Haiku boot-partition.
-Show optional packages	InstallerWindow		Visa valfria paket
+Show optional packages	InstallerWindow		Visa valbara paket
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Inga partitioner har hittats som är dugliga för installation. Var god ställ in partitioner och initialisera minst en partition med Be-filsystemet.
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Eventuellt så måste du redigera en annan fil för att se startmenyn:\n\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj den disk du vill installera till. Klicka sedan på Starta.
@@ -73,7 +73,7 @@ You can't install the contents of a disk onto itself. Please choose a different 
 Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Starta med os-prober v1.44 (e.g. i Ubuntu 11.04 eller senare), Haiku borde kännas igen utan ändringar. För att lägga till Haiku till GRUB menyn, öppna ett terminalfönster och skriv:\n \n
 Quit DriveSetup	InstallerWindow		Avsluta DiskHantering
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" är hårddiskens nummer, som startar med \"0\".\n
-Hide optional packages	InstallerWindow		Göm valfria paket
+Hide optional packages	InstallerWindow		Göm valbara paket
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
 Restart system	InstallerWindow		Starta om systemet
 OK	InstallerWindow		OK
@@ -91,7 +91,7 @@ Please choose target	InstallerWindow		Välj mål
 ???	InstallerWindow	Unknown partition name	???
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Om du vill installera Haiku på riktig hårdvara (inte i en emulator) är det rekomenderat att du skapar och förebereder en hårdisk partion. Installations och DriveSetup programmen kan initiera den existerande partitionen med Haiku egna fil system, men att ändra partitions layouten kanske inte har testats på tillräckligt många olika systemkonfigureringar så vi rekomenderar inte att man använder den.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   Installationen kommer att göra Haiku partitionen bootningsbar, men kommer inte att integrera Haiku till någon existerande boot meny. Om du redan använder GRUB , kan du lägga till Haiku till dess boot meny. Beroende på vilken version av GRUB du använder så görs det på olika sätt.\n\n\n
-Begin	InstallerWindow		Början
+Begin	InstallerWindow		Börja
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Äntligen, dumåste updatera boot menyn genom att skriva:\n\n
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Om du inte har skapat en partition än, bara bota om, skapa en partition med en ditt favorit partitions program, boota up i Haiku igen och fortsätt med installationen. Du skulle tex kunna använda GParted Live-CD, den kan också användas för att ändra storlekar på partitioner.\n\n\n
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Med GRUB 2 har den första logiska partitionen alltid nummer \"5\", oavsätt antalet primära partitioner.\n\n
@@ -111,7 +111,7 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Try installing anyway	InstallProgress		Försök installera iallafall
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Under rubriken ska inte ändras. Lägg till något liknande till dessa rader:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
-Onto:	InstallerWindow		På:
+Onto:	InstallerWindow		Till:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Stäng Boot Manager fönstret före du stänger installatione fönstret.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   När du har startat Haiku första gången. Läs gärna våra dokument \"Välkommen\" och \"Användarguid\". Det finns länkar på skrivbordet och i WebPositive's bokmärken.\n\n
 Tools	InstallerWindow		Verktyg
