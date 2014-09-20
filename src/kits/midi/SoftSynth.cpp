@@ -29,14 +29,14 @@ const static char* kSynthFileName = "synth.sf2";
 
 struct ReverbSettings {
 	double room, damp, width, level;
- } gReverbSettings[] = {
+} gReverbSettings[] = {
 		 {0.0, 0.0, 0.0, 0.0},   //  B_REVERB_NONE
 		 {0.2, 0.0, 0.5, 0.9},   //  B_REVERB_CLOSET
 		 {0.5, 0.0, 0.9, 0.9},   //  B_REVERB_GARAGE
 		 {0.7, 0.25, 0.9, 0.95}, //  B_REVERB_BALLROOM
 		 {0.99, 0.3, 1.0, 1.0},  //  B_REVERB_CAVERN
 		 {1.03, 0.6, 1.0, 1.0}   //  B_REVERB_DUNGEON
- };
+};
 
 
 BSoftSynth::BSoftSynth()
