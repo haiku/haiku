@@ -300,7 +300,7 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("pkg", jsonString, message);
+	return _SendJsonRequest("pkg", jsonString, false, message);
 }
 
 
@@ -332,7 +332,7 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("pkg", jsonString, message);
+	return _SendJsonRequest("pkg", jsonString, false, message);
 }
 
 
@@ -385,7 +385,7 @@ WebAppInterface::RetrieveUserRatings(const BString& packageName,
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("userrating", jsonString, message);
+	return _SendJsonRequest("userrating", jsonString, false, message);
 }
 
 
@@ -439,7 +439,7 @@ WebAppInterface::RequestCaptcha(BMessage& message)
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("captcha", jsonString, message);
+	return _SendJsonRequest("captcha", jsonString, false, message);
 }
 
 
@@ -471,7 +471,7 @@ WebAppInterface::CreateUser(const BString& nickName,
 
 	BString jsonString = builder.End();
 
-	return _SendJsonRequest("user", jsonString, message);
+	return _SendJsonRequest("user", jsonString, false, message);
 }
 
 
@@ -491,7 +491,7 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("user", jsonString, message);
+	return _SendJsonRequest("user", jsonString, false, message);
 }
 
 
@@ -500,7 +500,7 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 
 status_t
 WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
-	BMessage& reply) const
+	bool needsAuthorization, BMessage& reply) const
 {
 	BString urlString("https://depot.haiku-os.org/api/v1/");
 	urlString << domain;
@@ -515,8 +515,10 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 
 	BHttpRequest request(url, true, "HTTP", &listener, &context);
 
-	// Authentication
-	if (!fUsername.IsEmpty() && !fPassword.IsEmpty()) {
+	// Authentication via Basic Authentication
+	// The other way would be to obtain a token and then use the Token Bearer
+	// header.
+	if (needsAuthorization && !fUsername.IsEmpty() && !fPassword.IsEmpty()) {
 		request.SetUserName(fUsername);
 		request.SetPassword(fPassword);
 	}

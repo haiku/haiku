@@ -72,7 +72,8 @@ public:
 
 private:
 			status_t			_SendJsonRequest(const char* domain,
-									BString jsonString, BMessage& reply) const;
+									BString jsonString, bool needsAuthorization,
+									BMessage& reply) const;
 
 private:
 			BString				fUsername;
