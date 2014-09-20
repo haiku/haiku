@@ -124,10 +124,12 @@ BSoftSynth::SetInstrumentsFile(const char* path)
 	if (path == NULL)
 		return B_BAD_VALUE;
 	
+	if (!BEntry(path).Exists())
+		return B_FILE_NOT_FOUND;
+
 	if (IsLoaded())
 		Unload();
 	
-	// TODO: Check for file existence ?
 	fInstrumentsFile = strdup(path);
 	return B_OK;
 }
