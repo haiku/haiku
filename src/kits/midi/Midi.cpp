@@ -27,7 +27,7 @@ using namespace BPrivate;
 status_t 
 _run_thread(void* data)
 {
-	BMidi* midi = (BMidi*) data;
+	BMidi* midi = (BMidi*)data;
 	midi->Run();
 	midi->fIsRunning = false;
 	return 0;

@@ -21,8 +21,7 @@
 
 namespace BPrivate {
 
-class BMidiGlue: public BMidiLocalConsumer
-{
+class BMidiGlue: public BMidiLocalConsumer {
 public:
 
 	BMidiGlue(BMidi* midiObject, const char* name = NULL);
@@ -60,12 +59,11 @@ public:
 	virtual void TempoChange(int32 beatsPerMinute, bigtime_t time);
 
 private:
-
 	BMidi* fMidiObject;
 };
 
-class BMidiPortGlue: public BMidiLocalConsumer
-{
+
+class BMidiPortGlue: public BMidiLocalConsumer {
 public:
 
 	BMidiPortGlue(BMidiPort* midiObject, const char* name = NULL);
@@ -103,7 +101,6 @@ public:
 	virtual void TempoChange(int32 beatsPerMinute, bigtime_t time);
 
 private:
-
 	BMidiPort* fMidiObject;
 };
 

@@ -72,17 +72,17 @@ BMidiPort::Open(const char* name)
 		Close();
 
 		for (int32 t = 0; t < fDevices->CountItems(); ++t) {
-			BMidiEndpoint* endp = (BMidiEndpoint*) fDevices->ItemAt(t);
+			BMidiEndpoint* endp = (BMidiEndpoint*)fDevices->ItemAt(t);
 			if (strcmp(name, endp->Name()) != 0)
 				continue;
 			if (!endp->IsValid())  // still exists?
 				continue;
 			if (endp->IsProducer()) {
 				if (fRemoteSource == NULL)
-					fRemoteSource = (BMidiProducer*) endp;
+					fRemoteSource = (BMidiProducer*)endp;
 			} else {
 				if (fRemoteSink == NULL) {
-					fRemoteSink = (BMidiConsumer*) endp;
+					fRemoteSink = (BMidiConsumer*)endp;
 					fLocalSource->Connect(fRemoteSink);
 				}
 			}
@@ -242,7 +242,7 @@ BMidiPort::CountDevices()
 status_t 
 BMidiPort::GetDeviceName(int32 n, char* name, size_t bufSize)
 {
-	BMidiEndpoint* endp = (BMidiEndpoint*) fDevices->ItemAt(n);
+	BMidiEndpoint* endp = (BMidiEndpoint*)fDevices->ItemAt(n);
 	if (endp == NULL)
 		return B_BAD_VALUE;
 
@@ -282,7 +282,7 @@ BMidiPort::ScanDevices()
 
 		bool addItem = true;
 		for (int32 t = 0; t < fDevices->CountItems(); ++t) {
-			BMidiEndpoint* other = (BMidiEndpoint*) fDevices->ItemAt(t);
+			BMidiEndpoint* other = (BMidiEndpoint*)fDevices->ItemAt(t);
 			if (strcmp(endp->Name(), other->Name()) == 0) {
 				addItem = false;
 				break;
@@ -302,7 +302,7 @@ void
 BMidiPort::EmptyDeviceList()
 {
 	for (int32 t = 0; t < fDevices->CountItems(); ++t) 
-		((BMidiEndpoint*) fDevices->ItemAt(t))->Release();
+		((BMidiEndpoint*)fDevices->ItemAt(t))->Release();
 
 	fDevices->MakeEmpty();
 }
