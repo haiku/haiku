@@ -137,8 +137,8 @@ RemotePackageRepository HaikuPorts
 	libart_lgpl-2.3.21-1
 	libart_lgpl_devel-2.3.21-1
 	libedit-2012_06_01_3.0-1
-	libffi-3.0.13-1
-	libffi_devel-3.0.13-1
+	libffi-3.0.13-2
+	libffi_devel-3.0.13-2
 	libicns-0.8.1-1
 	libicns_devel-0.8.1-1
 	libiconv-1.13.1-6
@@ -230,7 +230,7 @@ RemotePackageRepository HaikuPorts
 	physfs_devel-2.0.3-1
 	pipepanic-0.1.3-3
 	pkgconfig-0.27.1-1
-	python-2.7.6-3
+	python-2.7.6-4
 	python_dateutil-1.5-2
 	python_lxml-3.3.5-2
 	python_mechanize-0.2.5-2
@@ -658,6 +658,7 @@ RemotePackageRepository HaikuPorts
 	libedit
 	libelf_x86
 	libexecinfo_x86
+	libffi
 	libffi_x86
 	libftdi_x86
 	libicns
