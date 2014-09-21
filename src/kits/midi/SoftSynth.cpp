@@ -254,7 +254,8 @@ BSoftSynth::SetReverb(reverb_mode mode)
 	if (fSynth) {
 		// We access the table using "mode - 1" because B_REVERB_NONE == 1
 		ReverbSettings *rvb = &gReverbSettings[mode - 1];
-		fluid_synth_set_reverb(fSynth, rvb->room, rvb->damp, rvb->width, rvb->level);
+		fluid_synth_set_reverb(fSynth, rvb->room, rvb->damp, rvb->width,
+				rvb->level);
 	}
 }
 
@@ -521,15 +522,18 @@ BSoftSynth::_Done()
 
 
 void
-BSoftSynth::PlayBuffer(void * cookie, void * data, size_t size, const media_raw_audio_format & format)
+BSoftSynth::PlayBuffer(void* cookie, void* data, size_t size,
+		const media_raw_audio_format& format)
 {
-	BSoftSynth *synth = (BSoftSynth *)cookie;
+	BSoftSynth* synth = (BSoftSynth*)cookie;
 
 	// we use float samples
 	
-	if (synth->fSynth)
-		fluid_synth_write_float(synth->fSynth, size / sizeof(float) / format.channel_count, 
+	if (synth->fSynth) {
+		fluid_synth_write_float(
+			synth->fSynth, size / sizeof(float) / format.channel_count,
 			data, 0, format.channel_count,
 			data, 1, format.channel_count);
+	}
 }
 

@@ -29,10 +29,8 @@ class BSynth;
 
 namespace BPrivate {
 
-class BSoftSynth
-{
+class BSoftSynth {
 public:
-
 	bool InitCheck();
 
 	void Unload();
@@ -93,7 +91,8 @@ private:
 
 	void _Init();
 	void _Done();
-	static void PlayBuffer(void * cookie, void * data, size_t size, const media_raw_audio_format & format);
+	static void PlayBuffer(void* cookie, void* data, size_t size,
+			const media_raw_audio_format& format);
 	
 	bool fInitCheck;
 	char* fInstrumentsFile;
@@ -104,10 +103,10 @@ private:
 	reverb_mode fReverbMode;
 	bool fReverbEnabled;
 
-	fluid_synth_t *fSynth;
+	fluid_synth_t* fSynth;
 	fluid_settings_t* fSettings;
 
-	BSoundPlayer *fSoundPlayer;
+	BSoundPlayer* fSoundPlayer;
 };
 
 } // namespace BPrivate
