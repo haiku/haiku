@@ -43,7 +43,10 @@ BSoftSynth::BSoftSynth()
 : 	fInitCheck(false),
 	fSynth(NULL),
 	fSettings(NULL),
-	fSoundPlayer(NULL)
+	fSoundPlayer(NULL),
+	fMonitor(NULL),
+	fMonitorSize(0),
+	fMonitorChans(-1)
 {
 	fInstrumentsFile = NULL;
 	SetDefaultInstrumentsFile();
@@ -65,6 +68,7 @@ BSoftSynth::~BSoftSynth()
 	// a big deal, but the Midi Kit will complain (on stdout) that we 
 	// didn't release our endpoints.
 
+	delete[] fMonitor;
 	Unload();
 }
 
@@ -527,13 +531,23 @@ BSoftSynth::PlayBuffer(void* cookie, void* data, size_t size,
 {
 	BSoftSynth* synth = (BSoftSynth*)cookie;
 
+	if (synth->fMonitor != NULL) {
+		delete[] synth->fMonitor;
+		synth->fMonitor = NULL;
+	}
 	// we use float samples
-	
 	if (synth->fSynth) {
 		fluid_synth_write_float(
 			synth->fSynth, size / sizeof(float) / format.channel_count,
 			data, 0, format.channel_count,
 			data, 1, format.channel_count);
+
+		synth->fMonitor = new float[size];
+		synth->fMonitorSize = size;
+		synth->fMonitorChans = format.channel_count;
+		memcpy(synth->fMonitor, data, size);
 	}
+
+
 }
 

@@ -220,11 +220,23 @@ BSynth::GetAudio(int16* pLeft, int16* pRight, int32 max_samples) const
 {
 	// We don't print a "not supported" message here. That would cause
 	// significant slowdowns because applications ask for this many times.
+
+	if (fSynth->fMonitorSize <= 0) {
+		memset(pLeft, 0, max_samples * sizeof(int16));
+		memset(pRight, 0, max_samples * sizeof(int16));
+		return max_samples;
+	}
 	
-	memset(pLeft, 0, max_samples * sizeof(int16));
-	memset(pRight, 0, max_samples * sizeof(int16));
-	
-	return max_samples;
+	int32 nSamples = fSynth->fMonitorSize / sizeof(float)
+			/ fSynth->fMonitorChans;
+	if (nSamples > max_samples)
+		nSamples = max_samples;
+	float* sPtr = fSynth->fMonitor;
+	for (int32 i = 0; i < nSamples; i++, sPtr += fSynth->fMonitorChans) {
+		*pLeft++ = (int16)(*sPtr * 32768);
+		*pRight++ = (int16)(*(sPtr + 1) * 32768);
+	}
+	return nSamples;
 }
 
 

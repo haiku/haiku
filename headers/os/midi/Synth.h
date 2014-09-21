@@ -34,8 +34,7 @@ class BMidiSynthFile;
 
 namespace BPrivate { class BSoftSynth; }
 
-class BSynth 
-{
+class BSynth {
 public:
 
 	BSynth();
