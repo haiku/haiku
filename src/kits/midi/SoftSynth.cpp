@@ -531,10 +531,12 @@ BSoftSynth::PlayBuffer(void* cookie, void* data, size_t size,
 {
 	BSoftSynth* synth = (BSoftSynth*)cookie;
 
-	if (synth->fMonitor != NULL) {
-		delete[] synth->fMonitor;
-		synth->fMonitor = NULL;
+	if (synth->fMonitorSize == 0) {
+		synth->fMonitor = (float*)new void*[size];
+		synth->fMonitorSize = size;
+		synth->fMonitorChans = format.channel_count;
 	}
+
 	// we use float samples
 	if (synth->fSynth) {
 		fluid_synth_write_float(
@@ -542,12 +544,7 @@ BSoftSynth::PlayBuffer(void* cookie, void* data, size_t size,
 			data, 0, format.channel_count,
 			data, 1, format.channel_count);
 
-		synth->fMonitor = new float[size];
-		synth->fMonitorSize = size;
-		synth->fMonitorChans = format.channel_count;
 		memcpy(synth->fMonitor, data, size);
 	}
-
-
 }
 
