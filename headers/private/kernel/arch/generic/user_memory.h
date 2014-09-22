@@ -53,7 +53,6 @@ bool user_access(Function function)
 		function();
 		return true;
 	}
-	dprintf("Hi! This is fault handler speaking.\n");
 	return false;
 }
 
