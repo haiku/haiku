@@ -507,7 +507,7 @@ RemotePackageRepository HaikuPorts
 	qupzilla_x86-1.7.x-4
 	readline_x86-6.3-2
 	readline_x86_devel-6.3-2
-	rocksndiamonds_x86-3.3.1.2-1
+	rocksndiamonds_x86-3.3.1.2-2
 	sdl_gfx_x86-2.0.24-1
 	sdl_gfx_x86_devel-2.0.24-1
 	sdl_image_x86-1.2.12-3
