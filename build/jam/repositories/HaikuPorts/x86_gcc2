@@ -510,8 +510,8 @@ RemotePackageRepository HaikuPorts
 	rocksndiamonds_x86-3.3.1.2-2
 	sdl_gfx_x86-2.0.24-1
 	sdl_gfx_x86_devel-2.0.24-1
-	sdl_image_x86-1.2.12-3
-	sdl_image_x86_devel-1.2.12-3
+	sdl_image_x86-1.2.12-4
+	sdl_image_x86_devel-1.2.12-4
 	sdl_net_x86-1.2.8-4
 	sdl_net_x86_devel-1.2.8-4
 	sdl_mixer_x86-1.2.12-3
@@ -526,8 +526,8 @@ RemotePackageRepository HaikuPorts
 	simh_x86-4.0.0_git-1
 	smjpeg_x86-0.2.1-1
 	smjpeg_x86_devel-0.2.1-1
-	smpeg_x86-0.4.5-2
-	smpeg_x86_devel-0.4.5-2
+	smpeg_x86-0.4.5-3
+	smpeg_x86_devel-0.4.5-3
 	speex_x86-1.2~rc1-2
 	speex_x86_devel-1.2~rc1-2
 	sqlite_x86-3.8.0.2-1
