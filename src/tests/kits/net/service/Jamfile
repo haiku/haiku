@@ -1,10 +1,13 @@
 SubDir HAIKU_TOP src tests kits net service ;
 
+UsePrivateHeaders private shared ;
+
 UnitTestLib servicekittest.so :
 	ServiceKitTestAddon.cpp
 
 	CookieTest.cpp
 	DataTest.cpp
+	GeolocationTest.cpp
 	HttpTest.cpp
 	UrlTest.cpp
 

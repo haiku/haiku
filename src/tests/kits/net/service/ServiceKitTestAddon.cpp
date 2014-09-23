@@ -9,6 +9,7 @@
 
 #include "CookieTest.h"
 #include "DataTest.h"
+#include "GeolocationTest.h"
 #include "HttpTest.h"
 #include "UrlTest.h"
 
@@ -22,6 +23,7 @@ getTestSuite()
 	UrlTest::AddTests(*suite);
 	HttpTest::AddTests(*suite);
 	DataTest::AddTests(*suite);
+	GeolocationTest::AddTests(*suite);
 
 	return suite;
 }

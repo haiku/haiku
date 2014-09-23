@@ -56,6 +56,14 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Socket.cpp
 			SecureSocket.cpp
 
+			# TODO: another add-on for file:// (a much simpler one)
+			FileRequest.cpp
+
+			Geolocation.cpp
+
+			# TODO: another add-on for gopher://
+			GopherRequest.cpp
+
 			# TODO: The HTTP stuff should all go into an add-on. It needs
 			# linking against libcrypto.so and only the add-on should link
 			# against it.
@@ -66,12 +74,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			HttpRequest.cpp
 			HttpResult.cpp
 			HttpTime.cpp
-
-			# TODO: another add-on for file:// (a much simpler one)
-			FileRequest.cpp
-
-			# TODO: another add-on for gopher://
-			GopherRequest.cpp
 
 			notifications.cpp
 
