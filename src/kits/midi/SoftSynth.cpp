@@ -25,7 +25,7 @@
 
 using namespace BPrivate;
 
-const static char* kSynthFileName = "synth.sf2";
+const static char* kSynthFileName = "synth/synth.sf2";
 
 struct ReverbSettings {
 	double room, damp, width, level;
@@ -105,7 +105,19 @@ BSoftSynth::SetDefaultInstrumentsFile()
 	// in the user settings directory
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, false, NULL) == B_OK) {
-		path.Append("/synth/");
+		path.Append(kSynthFileName);
+		if (BEntry(path.Path()).Exists())
+			return SetInstrumentsFile(path.Path());
+	}
+
+	// Then in the system settings directory
+	if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path, false, NULL) == B_OK) {
+		path.Append(kSynthFileName);
+		if (BEntry(path.Path()).Exists())
+			return SetInstrumentsFile(path.Path());
+	}
+
+	if (find_directory(B_SYNTH_DIRECTORY, &path, false, NULL) == B_OK) {
 		path.Append(kSynthFileName);
 		if (BEntry(path.Path()).Exists())
 			return SetInstrumentsFile(path.Path());
