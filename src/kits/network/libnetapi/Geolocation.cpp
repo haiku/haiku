@@ -36,7 +36,7 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 	uint32 interfaceCookie = 0;
 	BNetworkInterface interface;
 
-	BString query("{\"wifiAccessPoints\":[");
+	BString query("{\n\t\"wifiAccessPoints\": [");
 	int32 count = 0;
 
 	while (roster.GetNextInterface(&interfaceCookie, interface) == B_OK) {
@@ -48,22 +48,22 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 
 		while (device.GetNextNetwork(networkCookie, network) == B_OK) {
 			if (count != 0)
-				query += ';';
+				query += ',';
 
 			count++;
 
-			query += "\n{\"macAddress\":\"";
+			query += "\n\t\t{ \"macAddress\": \"";
 			query += network.address.ToString().ToUpper();
-			query += "\", \"signalStrength\":";
+			query += "\", \"signalStrength\": ";
 			query << (int)network.signal_strength;
-			query += ", \"signalToNoiseRatio\":";
+			query += ", \"signalToNoiseRatio\": ";
 			query << (int)network.noise_level;
-			query += '}';
+			query += " }";
 		}
 
 	}
 
-	query += "]}";
+	query += "\n\t]\n}\n";
 
 	// Check that we have enough data (we need at least 2 networks)
 	if (count < 2)
@@ -94,6 +94,7 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 		return B_BAD_DATA;
 	}
 
+	http->SetMethod(B_HTTP_POST);
 	BMemoryIO* io = new BMemoryIO(query.String(), query.Length());
 	http->AdoptInputData(io, query.Length());
 
@@ -122,18 +123,23 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 
 	BMessage location;
 	result = data.FindMessage("location", &location);
-	if(result != B_OK)
+	if (result != B_OK)
 		return result;
 
-	BString lat = location.FindString("latitude");
-	BString lon = location.FindString("longitude");
+	location.PrintToStream();
+	double lat, lon;
+	result = location.FindDouble("lat", &lat);
+	if (result == B_OK)
+		result = location.FindDouble("lng", &lon);
 
-	latitude = strtof(lat.String(), NULL);
-	longitude = strtof(lon.String(), NULL);
+	latitude = lat;
+	longitude = lon;
 
-	return B_OK;
+	return result;
 }
 
 
+// FIXME switch to an openly available service that will actually work with the
+// "standard" geolocation API. Openbmap has a few variations.
 const BUrl BGeolocation::kDefaultService = BUrl(
 	"http://openbmap.org/api/json.php5");
