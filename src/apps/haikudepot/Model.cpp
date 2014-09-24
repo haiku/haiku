@@ -340,6 +340,14 @@ Model::Model()
 				language.CopyInto(fPreferredLanguage, 0, 2);
 		}
 	}
+	if (fPreferredLanguage != "en" && fPreferredLanguage != "de"
+		&& fPreferredLanguage != "fr" && fPreferredLanguage != "ja"
+		&& fPreferredLanguage != "es" && fPreferredLanguage != "zh"
+		&& fPreferredLanguage != "pt" && fPreferredLanguage != "ru") {
+		// Force the preferred language to one of the currently supported
+		// ones, until the web application supports all ISO language codes.
+		fPreferredLanguage = "en";
+	}
 	fWebAppInterface.SetPreferredLanguage(fPreferredLanguage);
 }
 
