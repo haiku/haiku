@@ -126,7 +126,6 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 	if (result != B_OK)
 		return result;
 
-	location.PrintToStream();
 	double lat, lon;
 	result = location.FindDouble("lat", &lat);
 	if (result == B_OK)
