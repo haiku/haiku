@@ -24,6 +24,7 @@ public:
 									const char* protocolName);
 
 	virtual	status_t			Stop();
+	virtual status_t			SetTimeout(bigtime_t timeout);
 
 protected:
 			bool 				_ResolveHostName(BString host, uint16_t port);

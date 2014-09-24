@@ -35,6 +35,14 @@ BNetworkRequest::Stop()
 }
 
 
+void
+BNetworkRequest::SetTimeout(bigtime_t timeout)
+{
+	if (fSocket)
+		fSocket->SetTimeout(timeout);
+}
+
+
 bool
 BNetworkRequest::_ResolveHostName(BString host, uint16_t port)
 {
