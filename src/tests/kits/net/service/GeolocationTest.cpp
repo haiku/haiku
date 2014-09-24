@@ -20,7 +20,8 @@ GeolocationTest::GeolocationTest()
 void
 GeolocationTest::TestLocateSelf()
 {
-	BGeolocation locator;
+	BGeolocation locator(BUrl(
+		"https://location.services.mozilla.com/v1/geolocate?key=test"));
 	float latitude, longitude;
 	status_t result = locator.LocateSelf(latitude, longitude);
 
