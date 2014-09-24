@@ -17,6 +17,7 @@
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <File.h>
+#include <KeyStore.h>
 #include <LocaleRoster.h>
 #include <Message.h>
 #include <Path.h>
@@ -24,6 +25,9 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Model"
+
+
+static const char* kHaikuDepotKeyring = "HaikuDepot";
 
 
 // #pragma mark - PackageFilters
@@ -639,8 +643,28 @@ Model::StopPopulatingAllPackages()
 
 
 void
-Model::SetAuthorization(const BString& username, const BString& password)
+Model::SetUser(const BString& username)
 {
+	BPasswordKey key;
+	BKeyStore keyStore;
+	if (keyStore.GetKey(kHaikuDepotKeyring, B_KEY_TYPE_PASSWORD, username,
+			key) == B_OK) {
+		SetAuthorization(username, key.Password(), false);
+	}
+}
+
+
+void
+Model::SetAuthorization(const BString& username, const BString& password,
+	bool storePassword)
+{
+	if (storePassword) {
+		BPasswordKey key(password, B_KEY_PURPOSE_WEB, username);
+		BKeyStore keyStore;
+		keyStore.AddKeyring(kHaikuDepotKeyring);
+		keyStore.AddKey(kHaikuDepotKeyring, key);
+	}
+
 	BAutolock locker(&fLock);
 	fWebAppInterface.SetAuthorization(username, password);
 }

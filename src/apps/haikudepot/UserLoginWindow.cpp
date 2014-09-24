@@ -346,7 +346,7 @@ UserLoginWindow::_AuthenticateThread()
 			// the Token Bearer. See section 5.1.2 in the haiku-depot-web
 			// documentation.
 			error = "";
-			fModel.SetAuthorization(nickName, passwordClear);
+			fModel.SetAuthorization(nickName, passwordClear, true);
 		} else {
 			error = B_TRANSLATE("Authentication failed. The user does "
 				"not exist or the wrong password was supplied.");
@@ -508,7 +508,7 @@ UserLoginWindow::_CreateAccountThread()
 		fCaptchaToken = "";
 		_RequestCaptcha();
 	} else {
-		fModel.SetAuthorization(nickName, passwordClear);
+		fModel.SetAuthorization(nickName, passwordClear, true);
 
 		_SetWorkerThread(-1);
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);

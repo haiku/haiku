@@ -107,8 +107,10 @@ public:
 			const BString&		PreferredLanguage() const
 									{ return fPreferredLanguage; }
 
+			void				SetUser(const BString& username);
 			void				SetAuthorization(const BString& username,
-									const BString& password);
+									const BString& password,
+									bool storePassword);
 
 private:
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
@@ -172,6 +174,7 @@ private:
 
 			thread_id			fPopulateAllPackagesThread;
 	volatile bool				fStopPopulatingAllPackages;
+
 			BString				fPreferredLanguage;
 
 			WebAppInterface		fWebAppInterface;
