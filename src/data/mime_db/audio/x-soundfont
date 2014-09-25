@@ -10,4 +10,4 @@ resource(3, "META:EXTENS") message(234) {
 	"type" = "audio/x-soundfont"
 };
 
-resource(5, "META:SNIFF_RULE") "0.50 ('RIFF') ([7] 'sfbkLIST')";
+resource(5, "META:SNIFF_RULE") "0.50 ('RIFF') ([8] 'sfbkLIST')";
