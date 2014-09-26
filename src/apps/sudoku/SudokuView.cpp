@@ -168,7 +168,7 @@ SudokuView::_FilterString(const char* data, size_t dataLength, char* buffer,
 {
 	uint32 maxOut = fField->Size() * fField->Size();
 
-	for (uint32 i = 0; data[i] && i < dataLength; i++) {
+	for (uint32 i = 0; i < dataLength && data[i]; i++) {
 		if (data[i] == '#')
 			ignore = true;
 		else if (data[i] == '\n')
