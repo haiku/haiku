@@ -11,6 +11,8 @@
 
 #include <NetworkRequest.h>
 
+#include <AbstractSocket.h>
+
 
 BNetworkRequest::BNetworkRequest(const BUrl& url, BUrlProtocolListener* listener,
 		BUrlContext* context, const char* threadName, const char* protocolName)

@@ -28,7 +28,7 @@ public:
 	virtual status_t				Pause();
 	virtual status_t				Resume();
 	virtual	status_t				Stop();
-	virtual status_t				SetTimeout(bigtime_t timeout) {}
+	virtual void					SetTimeout(bigtime_t timeout) {}
 
 	// URL protocol parameters modification
 			status_t				SetUrl(const BUrl& url);
