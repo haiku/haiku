@@ -146,7 +146,10 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 	fStability = stabilities.ItemAt(0).Name();
 	stabilityMenu->ItemAt(0)->SetMarked(true);
 
-	fSendButton = new BButton("send", B_TRANSLATE("Send"),
+	BButton* cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
+		new BMessage(B_QUIT_REQUESTED));
+
+	BButton* sendButton = new BButton("send", B_TRANSLATE("Send"),
 		new BMessage(MSG_SEND));
 
 	// Build layout
@@ -155,10 +158,14 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 		.Add(stabilityRatingField)
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
-			.Add(fSendButton)
+			.Add(cancelButton)
+			.Add(sendButton)
 		.End()
 		.SetInsets(B_USE_DEFAULT_SPACING)
 	;
+
+	// NOTE: Do not make Send the default button. The user might want
+	// to type line-breaks instead of sending when hitting RETURN.
 }
 
 

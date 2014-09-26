@@ -11,10 +11,6 @@
 #include "TextDocument.h"
 
 
-class BButton;
-class BMenuField;
-
-
 class RatePackageWindow : public BWindow {
 public:
 								RatePackageWindow(BWindow* parent, BRect frame);
@@ -30,7 +26,6 @@ private:
 private:
 			TextDocumentRef		fRatingText;
 			BString				fStability;
-			BButton*			fSendButton;
 			PackageInfoRef		fPackage;
 };
 
