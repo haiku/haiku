@@ -71,11 +71,11 @@ check_cpu_features()
 		fpu = 68060;
 	else if (fpu_type & 0x8)
 		fpu = 68040;
-	else if (fpu_type & 0x6 == 0x6)
+	else if ((fpu_type & 0x6) == 0x6)
 		fpu = 68882;
-	else if (fpu_type & 0x6 == 0x4)
+	else if ((fpu_type & 0x6) == 0x4)
 		fpu = 68881;
-	else if (fpu_type & 0x6 == 0x2)
+	else if ((fpu_type & 0x6) == 0x2)
 		fpu = 68881; // not certain
 	else if (fpu_type & 0x4) {
 		panic("bad fpu");

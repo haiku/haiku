@@ -77,9 +77,9 @@ VTConsole::SetColor(int32 foreground, int32 background)
 		8, 12, 10, 14, 9, 13, 11, 0 };
 	char buff[] = "\033b \033c ";
 
-	if (foreground < 0 && foreground >= 16)
+	if (foreground < 0 || foreground >= 16)
 		return;
-	if (background < 0 && background >= 16)
+	if (background < 0 || background >= 16)
 		return;
 
 	buff[2] += cmap[foreground];

@@ -283,7 +283,7 @@ translate_color(int32 color)
 		15, 4, 2, 6, 1, 5, 3, 7,
 		8, 12, 10, 14, 9, 13, 11, 0 };
 
-	if (color < 0 && color >= 16)
+	if (color < 0 || color >= 16)
 		return 0;
 	return cmap[color];
 	//return color;
