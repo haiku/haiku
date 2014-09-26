@@ -12,7 +12,7 @@
 
 
 class BButton;
-class TextDocumentView;
+class BMenuField;
 
 
 class RatePackageWindow : public BWindow {
@@ -29,6 +29,7 @@ private:
 
 private:
 			TextDocumentRef		fRatingText;
+			BString				fStability;
 			BButton*			fSendButton;
 			PackageInfoRef		fPackage;
 };

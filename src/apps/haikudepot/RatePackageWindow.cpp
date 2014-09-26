@@ -12,6 +12,9 @@
 #include <Catalog.h>
 #include <Button.h>
 #include <LayoutBuilder.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
 #include <ScrollView.h>
 
 #include "MarkupParser.h"
@@ -23,7 +26,8 @@
 
 
 enum {
-	MSG_SEND			= 'send'
+	MSG_SEND				= 'send',
+	MSG_STABILITY_SELECTED	= 'stbl'
 };
 
 //! Layouts the scrollbar so it looks nice with no border and the document
@@ -80,6 +84,19 @@ public:
 };
 
 
+static void
+add_stabilities_to_menu(const StabilityRatingList& stabilities, BMenu* menu)
+{
+	for (int i = 0; i < stabilities.CountItems(); i++) {
+		const StabilityRating& stability = stabilities.ItemAtFast(i);
+		BMessage* message = new BMessage(MSG_STABILITY_SELECTED);
+		message->AddString("name", stability.Name());
+		BMenuItem* item = new BMenuItem(stability.Label(), message);
+		menu->AddItem(item);
+	}
+}
+
+
 RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Your rating"),
@@ -103,12 +120,39 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 	textView->SetTextDocument(fRatingText);
 	textView->SetTextEditor(TextEditorRef(new TextEditor(), true));
 
+	// Construct stability rating popup
+	// Construct repository popup
+	BPopUpMenu* stabilityMenu = new BPopUpMenu(B_TRANSLATE("Stability"));
+	BMenuField* stabilityRatingField = new BMenuField("stability",
+		B_TRANSLATE("Stability:"), stabilityMenu);
+	
+	StabilityRatingList stabilities;
+	stabilities.Add(StabilityRating(
+		B_TRANSLATE("Not specified"), "UNSPECIFIED"));
+	stabilities.Add(StabilityRating(
+		B_TRANSLATE("Mostly stable"), "MOSTLY_STABLE"));
+	stabilities.Add(StabilityRating(
+		B_TRANSLATE("Stable"), "STABLE"));
+	stabilities.Add(StabilityRating(
+		B_TRANSLATE("Not stable, but usable"), "USABLE"));
+	stabilities.Add(StabilityRating(
+		B_TRANSLATE("Unstable"), "UNSTABLE"));
+	stabilities.Add(StabilityRating(
+		B_TRANSLATE("Does not start"), "DOES_NOT_START"));
+	
+	add_stabilities_to_menu(stabilities, stabilityMenu);
+	stabilityMenu->SetTargetForItems(this);
+	
+	fStability = stabilities.ItemAt(0).Name();
+	stabilityMenu->ItemAt(0)->SetMarked(true);
+
 	fSendButton = new BButton("send", B_TRANSLATE("Send"),
 		new BMessage(MSG_SEND));
 
 	// Build layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(textScrollView)
+		.Add(stabilityRatingField)
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
 			.Add(fSendButton)
@@ -130,6 +174,9 @@ RatePackageWindow::MessageReceived(BMessage* message)
 		case MSG_SEND:
 			_SendRating();
 			break;
+		case MSG_STABILITY_SELECTED:
+			message->FindString("name", &fStability);
+			break;
 
 		default:
 			BWindow::MessageReceived(message);
@@ -141,7 +188,10 @@ RatePackageWindow::MessageReceived(BMessage* message)
 void
 RatePackageWindow::SetPackage(const PackageInfoRef& package)
 {
-	// TODO: Just remember which package the rating is for.
+	fPackage = package;
+	// TODO: See if the user already made a rating for this package,
+	// pre-fill the UI with that rating. When sending the rating, replace
+	// the old one.
 }
 
 
