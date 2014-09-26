@@ -66,6 +66,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 		localState);
 	if (fRootCollection == NULL) {
 		TRACE_ALWAYS("no memory to allocate root collection\n");
+		free(usageStack);
 		return B_NO_MEMORY;
 	}
 
