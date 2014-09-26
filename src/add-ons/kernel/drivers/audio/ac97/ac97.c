@@ -898,7 +898,6 @@ ad1981b_init(ac97_dev *dev)
 {
 	LOG(("ad1981b_init\n"));
 	if (dev->subsystem == 0x0e11005a
-		|| dev->subsystem == 0x103c0934
 		|| dev->subsystem == 0x103c006d
 		|| dev->subsystem == 0x103c088c
 		|| dev->subsystem == 0x103c0890
