@@ -469,6 +469,58 @@ RatingSummary::operator!=(const RatingSummary& other) const
 }
 
 
+// #pragma mark - StabilityRating
+
+
+StabilityRating::StabilityRating()
+	:
+	fLabel(),
+	fName()
+{
+}
+
+
+StabilityRating::StabilityRating(const BString& label,
+		const BString& name)
+	:
+	fLabel(label),
+	fName(name)
+{
+}
+
+
+StabilityRating::StabilityRating(const StabilityRating& other)
+	:
+	fLabel(other.fLabel),
+	fName(other.fName)
+{
+}
+
+
+StabilityRating&
+StabilityRating::operator=(const StabilityRating& other)
+{
+	fLabel = other.fLabel;
+	fName = other.fName;
+	return *this;
+}
+
+
+bool
+StabilityRating::operator==(const StabilityRating& other) const
+{
+	return fLabel == other.fLabel
+		&& fName == other.fName;
+}
+
+
+bool
+StabilityRating::operator!=(const StabilityRating& other) const
+{
+	return !(*this == other);
+}
+
+
 // #pragma mark - PublisherInfo
 
 

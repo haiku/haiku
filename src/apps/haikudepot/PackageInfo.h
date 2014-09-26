@@ -147,6 +147,31 @@ public:
 };
 
 
+class StabilityRating {
+public:
+								StabilityRating();
+								StabilityRating(
+									const BString& label,
+									const BString& name);
+								StabilityRating(const StabilityRating& other);
+
+			StabilityRating&	operator=(const StabilityRating& other);
+			bool				operator==(const StabilityRating& other) const;
+			bool				operator!=(const StabilityRating& other) const;
+
+			const BString&		Label() const
+									{ return fLabel; }
+			const BString&		Name() const
+									{ return fName; }
+private:
+			BString				fLabel;
+			BString				fName;
+};
+
+
+typedef List<StabilityRating, false> StabilityRatingList;
+
+
 class PublisherInfo {
 public:
 								PublisherInfo();
