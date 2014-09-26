@@ -51,7 +51,7 @@ SYSTEM_PREFERENCES += [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_DEMOS += [ FFilterByBuildFeatures
-	BSnow Chart Clock Cortex FontDemo GLTeapot@mesa
+	Chart Clock Cortex FontDemo GLTeapot@mesa
 	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d@mesa Mandelbrot OverlayImage Pairs
 	PatchBay Playground Pulse Sudoku
 ] ;
