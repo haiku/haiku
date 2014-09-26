@@ -16,6 +16,7 @@ class BBitmap;
 class BCatalog;
 class BCollator;
 class BCountry;
+class BDateFormat;
 class BFormattingConventions;
 class BLanguage;
 class BLocale;
@@ -78,6 +79,7 @@ public:
 									// (that needs to link with liblocalestub.a)
 
 			const BLocale*		GetDefaultLocale() const;
+			const BDateFormat*	GetDefaultDateFormat() const;
 
 			bool				IsFilesystemTranslationPreferred() const;
 

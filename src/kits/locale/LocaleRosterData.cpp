@@ -126,6 +126,7 @@ LocaleRosterData::LocaleRosterData(const BLanguage& language,
 	:
 	fLock("LocaleRosterData"),
 	fDefaultLocale(&language, &conventions),
+	fDefaultDateFormat(&language, &conventions),
 	fIsFilesystemTranslationPreferred(false),
 	fAreResourcesLoaded(false)
 {

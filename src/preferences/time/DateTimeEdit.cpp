@@ -16,6 +16,7 @@
 
 #include <stdlib.h>
 
+#include <DateFormat.h>
 #include <List.h>
 #include <Locale.h>
 #include <String.h>
@@ -622,14 +623,14 @@ TDateEdit::_UpdateFields()
 		free(fFieldPositions);
 		fFieldPositions = NULL;
 	}
-	BLocale::Default()->FormatDate(&fText, fFieldPositions, fFieldPosCount,
+	BDateFormat::Default()->Format(&fText, fFieldPositions, fFieldPosCount,
 		time, B_SHORT_DATE_FORMAT);
 
 	if (fFields != NULL) {
 		free(fFields);
 		fFields = NULL;
 	}
-	BLocale::Default()->GetDateFields(fFields, fFieldCount,
+	BDateFormat::Default()->GetFields(fFields, fFieldCount,
 		B_SHORT_DATE_FORMAT);
 }
 

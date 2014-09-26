@@ -13,6 +13,7 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
+#include <DateFormat.h>
 #include <GridLayout.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
@@ -360,16 +361,16 @@ FormatSettingsView::_UpdateExamples()
 	time_t timeValue = (time_t)time(NULL);
 	BString result;
 
-	BLocale::Default()->FormatDate(&result, timeValue, B_FULL_DATE_FORMAT);
+	BDateFormat::Default()->Format(&result, timeValue, B_FULL_DATE_FORMAT);
 	fFullDateExampleView->SetText(result);
 
-	BLocale::Default()->FormatDate(&result, timeValue, B_LONG_DATE_FORMAT);
+	BDateFormat::Default()->Format(&result, timeValue, B_LONG_DATE_FORMAT);
 	fLongDateExampleView->SetText(result);
 
-	BLocale::Default()->FormatDate(&result, timeValue, B_MEDIUM_DATE_FORMAT);
+	BDateFormat::Default()->Format(&result, timeValue, B_MEDIUM_DATE_FORMAT);
 	fMediumDateExampleView->SetText(result);
 
-	BLocale::Default()->FormatDate(&result, timeValue, B_SHORT_DATE_FORMAT);
+	BDateFormat::Default()->Format(&result, timeValue, B_SHORT_DATE_FORMAT);
 	fShortDateExampleView->SetText(result);
 
 	BLocale::Default()->FormatTime(&result, timeValue, B_FULL_TIME_FORMAT);

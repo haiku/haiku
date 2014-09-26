@@ -654,7 +654,7 @@ BCalendarView::_InitObject()
 {
 	fDate = BDate::CurrentDate(B_LOCAL_TIME);
 
-	BLocale::Default()->GetStartOfWeek((BWeekday*)&fStartOfWeek);
+	BDateFormat::Default()->GetStartOfWeek((BWeekday*)&fStartOfWeek);
 
 	_SetupDayNames();
 	_SetupDayNumbers();

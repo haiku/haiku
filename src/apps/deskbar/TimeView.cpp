@@ -40,6 +40,7 @@ All rights reserved.
 
 #include <Application.h>
 #include <Catalog.h>
+#include <DateFormat.h>
 #include <Debug.h>
 #include <Locale.h>
 #include <MenuItem.h>
@@ -421,7 +422,7 @@ TTimeView::GetCurrentDate()
 {
 	char tmp[sizeof(fCurrentDateStr)];
 
-	fLocale.FormatDate(tmp, sizeof(fCurrentDateStr), fCurrentTime,
+	BDateFormat::Default()->Format(tmp, sizeof(fCurrentDateStr), fCurrentTime,
 		B_FULL_DATE_FORMAT);
 
 	// remove leading 0 from date when month is less than 10 (MM/DD/YY)

@@ -45,6 +45,7 @@ All rights reserved.
 #include <Alert.h>
 #include <AppFileInfo.h>
 #include <Catalog.h>
+#include <DateFormat.h>
 #include <Debug.h>
 #include <Locale.h>
 #include <NodeInfo.h>
@@ -213,7 +214,7 @@ TruncTimeBase(BString* outString, int64 value, const View* view, float width)
 	}
 
 	if (resultWidth > width
-		&& BLocale::Default()->FormatDate(&date, timeValue,
+		&& BDateFormat::Default()->Format(&date, timeValue,
 			B_SHORT_DATE_FORMAT) == B_OK) {
 		resultWidth = view->StringWidth(date.String(), date.Length());
 	}

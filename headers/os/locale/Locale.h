@@ -7,6 +7,7 @@
 
 
 #include <Collator.h>
+#include <DateTimeFormat.h>
 #include <FormattingConventions.h>
 #include <Language.h>
 #include <Locker.h>
@@ -18,38 +19,16 @@ namespace icu {
 
 
 class BCatalog;
+class BDateFormat;
 class BString;
 class BTimeZone;
 
-
-enum BDateElement {
-	B_DATE_ELEMENT_INVALID = B_BAD_DATA,
-	B_DATE_ELEMENT_YEAR = 0,
-	B_DATE_ELEMENT_MONTH,
-	B_DATE_ELEMENT_DAY,
-	B_DATE_ELEMENT_AM_PM,
-	B_DATE_ELEMENT_HOUR,
-	B_DATE_ELEMENT_MINUTE,
-	B_DATE_ELEMENT_SECOND
-};
 
 enum BNumberElement {
 	B_NUMBER_ELEMENT_INVALID = B_BAD_DATA,
 	B_NUMBER_ELEMENT_INTEGER = 0,
 	B_NUMBER_ELEMENT_FRACTIONAL,
 	B_NUMBER_ELEMENT_CURRENCY
-};
-
-
-// TODO: move this to BCalendar (should we ever have that) or BDate
-enum BWeekday {
-	B_WEEKDAY_MONDAY = 1,
-	B_WEEKDAY_TUESDAY,
-	B_WEEKDAY_WEDNESDAY,
-	B_WEEKDAY_THURSDAY,
-	B_WEEKDAY_FRIDAY,
-	B_WEEKDAY_SATURDAY,
-	B_WEEKDAY_SUNDAY,
 };
 
 
@@ -78,11 +57,6 @@ public:
 			// see definitions in LocaleStrings.h
 			const char*			GetString(uint32 id) const;
 
-			void				FormatString(char* target, size_t maxSize,
-									char* fmt, ...) const;
-			void				FormatString(BString* buffer, char* fmt,
-									...) const;
-
 								// DateTime
 
 								// TODO: drop some of these once BDateTimeFormat
@@ -94,24 +68,6 @@ public:
 									BDateFormatStyle dateStyle,
 									BTimeFormatStyle timeStyle,
 									const BTimeZone* timeZone = NULL) const;
-
-								// Date
-
-								// TODO: drop some of these once BDateFormat
-								//       has been implemented!
-			ssize_t				FormatDate(char* string, size_t maxSize,
-									time_t time, BDateFormatStyle style) const;
-			status_t			FormatDate(BString* string, time_t time,
-									BDateFormatStyle style,
-									const BTimeZone* timeZone = NULL) const;
-			status_t			FormatDate(BString* string,
-									int*& fieldPositions, int& fieldCount,
-									time_t time, BDateFormatStyle style) const;
-			status_t			GetDateFields(BDateElement*& fields,
-									int& fieldCount, BDateFormatStyle style
-									) const;
-
-			status_t			GetStartOfWeek(BWeekday* weekday) const;
 
 								// Time
 
