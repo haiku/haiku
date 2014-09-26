@@ -368,7 +368,7 @@ status_t MediaWriter::Connected(
 			bytesWritten = GetCurrentFile()->Write(data,input.format.u.multistream.max_chunk_size);
 			end = TimeSource()->RealTime();
 		}
-		delete data;
+		delete[] data;
 		GetCurrentFile()->Seek(-bytesWritten,SEEK_CUR); // put it back where we found it
 	
 		fInternalLatency = end - start;
