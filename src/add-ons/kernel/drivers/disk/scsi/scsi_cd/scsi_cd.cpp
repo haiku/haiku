@@ -369,7 +369,7 @@ get_set_volume(cd_driver_info *info, scsi_volume *volume, bool set)
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	memset(buffer, -1, sizeof(buffer));
+	memset(buffer, -1, len);
 
 	cmd.allocation_length = len;
 
