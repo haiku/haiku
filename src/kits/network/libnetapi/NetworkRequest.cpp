@@ -40,7 +40,7 @@ BNetworkRequest::Stop()
 void
 BNetworkRequest::SetTimeout(bigtime_t timeout)
 {
-	if (fSocket)
+	if (fSocket != NULL)
 		fSocket->SetTimeout(timeout);
 }
 
