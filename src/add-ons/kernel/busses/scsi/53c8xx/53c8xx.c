@@ -464,8 +464,8 @@ scsi_int_dispatch(void *data)
 
 			case status_syncin:
 				setparams(s->active,
-						  s->active->priv->_syncmsg[1]*4,
-						  s->active->priv->_syncmsg[2],
+						  s->active->priv->_syncmsg[0]*4,
+						  s->active->priv->_syncmsg[1],
 						  s->active->wide);
 				break;
 
