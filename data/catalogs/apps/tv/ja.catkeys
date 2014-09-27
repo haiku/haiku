@@ -8,8 +8,8 @@ Previous channel	MainWin		前のチャンネル
 Settings	MainWin		設定
 TV	System name		TV
 No border	MainWin		枠を消す
-Always on top	MainWin		常に最前面にする
-OK	MainWin		Ok
+Always on top	MainWin		常に最前面へ
+OK	MainWin		OK
 Quit	MainWin		終了
 Full screen	MainWin		全画面表示
 Debug	MainWin		Debug

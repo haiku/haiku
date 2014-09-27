@@ -249,7 +249,7 @@ TiB	WidgetAttributeText		TiB
 40 x 40	ContainerWindow		40 x 40
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Die Datei \"%name\" existiert bereits in diesem Ordner. Soll sie ersetzt werden?
 Cancel	ContainerWindow		Abbrechen
-Only the boot disk	AutoMounterSettings		Nur das Boot-Laufwerk
+Only the boot disk	AutoMounterSettings		Nur den Boot-Datenträger
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Wird der Konfiguration-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten!
 Unmount	ContainerWindow		Aushängen
 Copy layout	ContainerWindow		Anordnung kopieren

@@ -6,7 +6,7 @@ DHCP	EthernetSettingsView		自動 (DHCP)
 DNS #2:	EthernetSettingsView		セカンダリ DNS サーバー:
 Apply	EthernetSettingsView		適用
 Netmask is invalid	EthernetSettingsView		ネットマスクが正しくありません
-OK	EthernetSettingsView		Ok
+OK	EthernetSettingsView		OK
 DNS #1:	EthernetSettingsView		プライマリ DNS サーバー:
 IP address:	EthernetSettingsView		IP アドレス:
 Adapter:	EthernetSettingsView		ネットワークアダプター:

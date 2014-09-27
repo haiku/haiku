@@ -7,7 +7,7 @@ Close window	WebPositive Window		ウィンドウを閉じる
 Quit	WebPositive		終了
 The download could not be opened.	Download Window		ダウンロードを開けませんでした。
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	ダウンロードフォルダーを開けませんでした。\n\nエラー: %error
-Open location	WebPositive Window		url を開く
+Open location	WebPositive Window		場所を開く
 Clear history	WebPositive Window		履歴をクリア
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		昨日
@@ -22,7 +22,7 @@ Settings	Settings Window		設定
 %seconds seconds left	Download Window		残り %seconds 秒
 Confirmation	WebPositive Window		確認
 Window	WebPositive Window		ウィンドウ
-Decrease size	WebPositive Window		サイズを小さく
+Decrease size	WebPositive Window		縮小
 Serif font:	Settings Window		セリフフォント:
 Loading %url	WebPositive Window		読み込み中 %url
 Download aborted	Download Window		ダウンロードを中止しました
@@ -35,10 +35,10 @@ Over %hours hours left	Download Window		残り %hours 時間超
 Cancel	Authentication Panel		中止
 Match case	WebPositive Window		大文字と小文字を区別する
 Search page:	Settings Window		検索ページ:
-Zoom text only	WebPositive Window		テキストのみ拡大
+Zoom text only	WebPositive Window		テキストのみ変更
 Default fixed font size:	Settings Window		規定の固定フォントサイズ:
 Close tab	WebPositive Window		タブを閉じる
-Auto-hide mouse pointer	Settings Window		自動的にマウスポインターを隠す。
+Auto-hide mouse pointer	Settings Window		自動的にマウスポインターを隠す
 Over 1 hour left	Download Window		残り 1 時間超
 Quit	WebPositive Window		終了
 Full screen	WebPositive Window		全画面表示
@@ -47,7 +47,7 @@ Standard font:	Settings Window		標準フォント:
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	文字列を前方へ検索
 Restart	Download Window		再開
 Proxy server	Settings Window		プロキシサーバー
-Open containing folder	Download Window		ファイルのフォルダーを開く
+Open containing folder	Download Window		保存先のフォルダーを開く
 New window	WebPositive Window		新規ウィンドウ
 Open	Download Window		開く
 Reload	WebPositive Window		再読み込み
@@ -62,12 +62,12 @@ Cut	WebPositive Window		切り取り
 Bookmark this page	WebPositive Window		このページをブックマーク
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークフォルダーを表示しようとした時にエラーが発生しました。\n\nエラー: %error
 Open downloads folder	Download Window		ダウンロードフォルダーを開く
-Proxy password:	Settings Window		パスワード:
+Proxy password:	Settings Window		プロキシパスワード:
 Number of days to keep links in History menu:	Settings Window		履歴メニューにリンクを残す日数:
 Hide	Download Window		隠す
-Reset size	WebPositive Window		サイズをリセット
+Reset size	WebPositive Window		リセット
 Find:	WebPositive Window		検索:
-Increase size	WebPositive Window		サイズを大きく
+Increase size	WebPositive Window		拡大
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	ブックマークフォルダーの取得時にエラーが発生しました。\n\nエラー: %error
 Over 1 day left	Download Window		残り 1 日超
 Downloads	WebPositive Window		ダウンロード
@@ -81,13 +81,13 @@ About	WebPositive Window		WebPositive について
 Finish: 	Download Window	Finishing time	完了:
 Fonts	Settings Window		フォント
 OK	Download Window		OK
-Page source error	WebPositive Window		ページソースのエラー
+Page source error	WebPositive Window		ページソースエラー
 Open blank page	Settings Window		空白のページを開く
 New tabs:	Settings Window		新しいタブ:
 Cancel	WebPositive Window		中止
 Open all	WebPositive Window		すべて開く
 Hide bookmark bar	WebPositive Window		ブックマークバーを隠す
-Proxy server requires authentication	Settings Window		プロキシサーバーは認証を必要
+Proxy server requires authentication	Settings Window		プロキシサーバーは認証が必要
 Clear	URL Bar		クリア
 Cut	URL Bar		切り取り
 Clear	WebPositive Window		クリア
@@ -97,7 +97,7 @@ Find	WebPositive Window		検索
 Find previous	WebPositive Window		前を検索
 Settings	WebPositive Window		設定
 Script console	WebPositive Window		スクリプトコンソール
-Proxy server address:	Settings Window		プロキシサーバーのアドレス:
+Proxy server address:	Settings Window		プロキシサーバーアドレス:
 Proxy server port:	Settings Window		プロキシサーバーポート:
 Bookmarks	WebPositive Window		ブックマーク
 %minutes minutes	Download Window		%minutes 分
