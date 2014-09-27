@@ -340,12 +340,22 @@ Model::Model()
 				language.CopyInto(fPreferredLanguage, 0, 2);
 		}
 	}
-	if (fPreferredLanguage != "en" && fPreferredLanguage != "de"
-		&& fPreferredLanguage != "fr" && fPreferredLanguage != "ja"
-		&& fPreferredLanguage != "es" && fPreferredLanguage != "zh"
-		&& fPreferredLanguage != "pt" && fPreferredLanguage != "ru") {
+
+	// TODO: Fetch this from the web-app.
+	fSupportedLanguages.Add("en");
+	fSupportedLanguages.Add("de");
+	fSupportedLanguages.Add("fr");
+	fSupportedLanguages.Add("ja");
+	fSupportedLanguages.Add("es");
+	fSupportedLanguages.Add("zh");
+	fSupportedLanguages.Add("pt");
+	fSupportedLanguages.Add("ru");
+
+	if (!fSupportedLanguages.Contains(fPreferredLanguage)) {
 		// Force the preferred language to one of the currently supported
 		// ones, until the web application supports all ISO language codes.
+		printf("User preferred language '%s' not currently supported, "
+			"defaulting to 'en'.", fPreferredLanguage.String());
 		fPreferredLanguage = "en";
 	}
 	fWebAppInterface.SetPreferredLanguage(fPreferredLanguage);

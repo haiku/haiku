@@ -104,6 +104,9 @@ public:
 			void				PopulateAllPackages();
 			void				StopPopulatingAllPackages();
 
+			const StringList&	SupportedLanguages() const
+									{ return fSupportedLanguages; }
+
 			const BString&		PreferredLanguage() const
 									{ return fPreferredLanguage; }
 
@@ -175,6 +178,7 @@ private:
 			thread_id			fPopulateAllPackagesThread;
 	volatile bool				fStopPopulatingAllPackages;
 
+			StringList			fSupportedLanguages;
 			BString				fPreferredLanguage;
 
 			WebAppInterface		fWebAppInterface;
