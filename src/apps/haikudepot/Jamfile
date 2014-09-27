@@ -4,7 +4,7 @@ UsePrivateHeaders interface shared package ;
 
 # source directories
 local sourceDirs =
-	textview
+	model textview ui
 ;
 
 local sourceDir ;
