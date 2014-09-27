@@ -22,7 +22,7 @@ public:
 
 private:
 					BUrl	fService;
-	static const	BUrl	kDefaultService;
+	static const	char*	kDefaultService;
 };
 
 

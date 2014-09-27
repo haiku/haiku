@@ -140,5 +140,4 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 
 // FIXME switch to an openly available service that will actually work with the
 // "standard" geolocation API. Openbmap has a few variations.
-const BUrl BGeolocation::kDefaultService = BUrl(
-	"http://openbmap.org/api/json.php5");
+const char* BGeolocation::kDefaultService = "http://openbmap.org/api/json.php5";
