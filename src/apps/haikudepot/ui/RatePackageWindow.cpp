@@ -275,6 +275,10 @@ RatePackageWindow::MessageReceived(BMessage* message)
 			message->FindString("name", &fStability);
 			break;
 
+		case MSG_LANGUAGE_SELECTED:
+			message->FindString("code", &fCommentLanguage);
+			break;
+
 		case MSG_SEND:
 			_SendRating();
 			break;
