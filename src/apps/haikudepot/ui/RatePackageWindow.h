@@ -13,7 +13,9 @@
 
 class RatePackageWindow : public BWindow {
 public:
-								RatePackageWindow(BWindow* parent, BRect frame);
+								RatePackageWindow(BWindow* parent, BRect frame,
+									const BString& preferredLanguage,
+									const StringList& supportedLanguages);
 	virtual						~RatePackageWindow();
 
 	virtual	void				MessageReceived(BMessage* message);
@@ -27,6 +29,7 @@ private:
 			TextDocumentRef		fRatingText;
 			float				fRating;
 			BString				fStability;
+			BString				fCommentLanguage;
 			PackageInfoRef		fPackage;
 };
 

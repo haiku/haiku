@@ -30,7 +30,8 @@
 enum {
 	MSG_SEND				= 'send',
 	MSG_PACKAGE_RATED		= 'rpkg',
-	MSG_STABILITY_SELECTED	= 'stbl'
+	MSG_STABILITY_SELECTED	= 'stbl',
+	MSG_LANGUAGE_SELECTED	= 'lngs'
 };
 
 //! Layouts the scrollbar so it looks nice with no border and the document
@@ -145,13 +146,28 @@ add_stabilities_to_menu(const StabilityRatingList& stabilities, BMenu* menu)
 }
 
 
-RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
+static void
+add_languages_to_menu(const StringList& languages, BMenu* menu)
+{
+	for (int i = 0; i < languages.CountItems(); i++) {
+		const BString& language = languages.ItemAtFast(i);
+		BMessage* message = new BMessage(MSG_LANGUAGE_SELECTED);
+		message->AddString("code", language);
+		BMenuItem* item = new BMenuItem(language, message);
+		menu->AddItem(item);
+	}
+}
+
+
+RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
+	const BString& preferredLanguage, const StringList& supportedLanguages)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Your rating"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fRatingText(),
-	fRating(-1.0f)
+	fRating(-1.0f),
+	fCommentLanguage(preferredLanguage)
 {
 	AddToSubset(parent);
 
@@ -174,11 +190,10 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 	textView->SetTextEditor(TextEditorRef(new TextEditor(), true));
 
 	// Construct stability rating popup
-	// Construct repository popup
 	BPopUpMenu* stabilityMenu = new BPopUpMenu(B_TRANSLATE("Stability"));
 	BMenuField* stabilityRatingField = new BMenuField("stability",
 		B_TRANSLATE("Stability:"), stabilityMenu);
-	
+
 	StabilityRatingList stabilities;
 	stabilities.Add(StabilityRating(
 		B_TRANSLATE("Not specified"), "UNSPECIFIED"));
@@ -199,6 +214,20 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 	fStability = stabilities.ItemAt(0).Name();
 	stabilityMenu->ItemAt(0)->SetMarked(true);
 
+	// Construct languages popup
+	BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
+	BMenuField* languageField = new BMenuField("language",
+		B_TRANSLATE("Comment language:"), languagesMenu);
+
+	add_languages_to_menu(supportedLanguages, languagesMenu);
+	languagesMenu->SetTargetForItems(this);
+
+	BMenuItem* defaultItem = languagesMenu->ItemAt(
+		supportedLanguages.IndexOf(fCommentLanguage));
+	if (defaultItem != NULL)
+		defaultItem->SetMarked(true);
+	
+	// Construct buttons
 	BButton* cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
@@ -211,6 +240,7 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 			.Add(ratingLabel, 0, 0)
 			.Add(setRatingView, 1, 0)
 			.AddMenuField(stabilityRatingField, 0, 1)
+			.AddMenuField(languageField, 0, 2)
 		.End()
 		.Add(textScrollView)
 		.AddGroup(B_HORIZONTAL)

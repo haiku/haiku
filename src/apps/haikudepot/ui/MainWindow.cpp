@@ -330,10 +330,11 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_RATE_PACKAGE:
 		{
-			// TODO: Allow only one RatingWindow
+			// TODO: Allow only one RatePackageWindow
 			// TODO: Mechanism for remembering the window frame
 			RatePackageWindow* window = new RatePackageWindow(this,
-				BRect(0, 0, 500, 400));
+				BRect(0, 0, 500, 400), fModel.PreferredLanguage(),
+				fModel.SupportedLanguages());
 			window->Show();
 			break;
 		}
