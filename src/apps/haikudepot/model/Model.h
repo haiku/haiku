@@ -25,6 +25,17 @@ public:
 typedef BReference<PackageFilter> PackageFilterRef;
 
 
+class ModelListener : public BReferenceable {
+public:
+	virtual						~ModelListener();
+
+	virtual	void				AuthorizationChanged() = 0;
+};
+
+typedef BReference<ModelListener> ModelListenerRef;
+typedef List<ModelListenerRef, false> ModelListenerList;
+
+
 class Model {
 public:
 								Model();
@@ -32,6 +43,8 @@ public:
 
 			BLocker*			Lock()
 									{ return &fLock; }
+
+			bool				AddListener(const ModelListenerRef& listener);
 
 			// !Returns new PackageInfoList from current parameters
 			PackageList			CreatePackageList() const;
@@ -110,7 +123,8 @@ public:
 			const BString&		PreferredLanguage() const
 									{ return fPreferredLanguage; }
 
-			void				SetUser(const BString& username);
+			void				SetUsername(BString username);
+			const BString&		Username() const;
 			void				SetAuthorization(const BString& username,
 									const BString& password,
 									bool storePassword);
@@ -138,6 +152,8 @@ private:
 									const ScreenshotInfo& info,
 									int32 scaledWidth,
 									bool fromCacheOnly);
+
+			void				_NotifyAuthorizationChanged();
 
 private:
 			BLocker				fLock;
@@ -182,6 +198,8 @@ private:
 			BString				fPreferredLanguage;
 
 			WebAppInterface		fWebAppInterface;
+
+			ModelListenerList	fListeners;
 };
 
 

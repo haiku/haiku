@@ -30,12 +30,17 @@
 static const char* kHaikuDepotKeyring = "HaikuDepot";
 
 
-// #pragma mark - PackageFilters
-
-
 PackageFilter::~PackageFilter()
 {
 }
+
+
+ModelListener::~ModelListener()
+{
+}
+
+
+// #pragma mark - PackageFilters
 
 
 class AnyFilter : public PackageFilter {
@@ -368,6 +373,13 @@ Model::~Model()
 }
 
 
+bool
+Model::AddListener(const ModelListenerRef& listener)
+{
+	return fListeners.Add(listener);
+}
+
+
 PackageList
 Model::CreatePackageList() const
 {
@@ -661,14 +673,27 @@ Model::StopPopulatingAllPackages()
 
 
 void
-Model::SetUser(const BString& username)
+Model::SetUsername(BString username)
 {
-	BPasswordKey key;
-	BKeyStore keyStore;
-	if (keyStore.GetKey(kHaikuDepotKeyring, B_KEY_TYPE_PASSWORD, username,
-			key) == B_OK) {
-		SetAuthorization(username, key.Password(), false);
+	BString password;
+	if (username.Length() > 0) {
+		BPasswordKey key;
+		BKeyStore keyStore;
+		if (keyStore.GetKey(kHaikuDepotKeyring, B_KEY_TYPE_PASSWORD, username,
+				key) == B_OK) {
+			password = key.Password();
+		} else {
+			username = "";
+		}
 	}
+	SetAuthorization(username, password, false);
+}
+
+
+const BString&
+Model::Username() const
+{
+	return fWebAppInterface.Username();
 }
 
 
@@ -676,7 +701,7 @@ void
 Model::SetAuthorization(const BString& username, const BString& password,
 	bool storePassword)
 {
-	if (storePassword) {
+	if (storePassword && username.Length() > 0 && password.Length() > 0) {
 		BPasswordKey key(password, B_KEY_PURPOSE_WEB, username);
 		BKeyStore keyStore;
 		keyStore.AddKeyring(kHaikuDepotKeyring);
@@ -685,6 +710,8 @@ Model::SetAuthorization(const BString& username, const BString& password,
 
 	BAutolock locker(&fLock);
 	fWebAppInterface.SetAuthorization(username, password);
+
+	_NotifyAuthorizationChanged();
 }
 
 
@@ -1146,3 +1173,18 @@ Model::_HasNativeIcon(const BMessage& message) const
 	}
 	return false;
 }
+
+
+// #pragma mark - listener notification methods
+
+
+void
+Model::_NotifyAuthorizationChanged()
+{
+	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--) {
+		const ModelListenerRef& listener = fListeners.ItemAtFast(i);
+		if (listener.Get() != NULL)
+			listener->AuthorizationChanged();
+	}
+}
+

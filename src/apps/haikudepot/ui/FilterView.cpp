@@ -15,6 +15,7 @@
 #include <MenuItem.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
+#include <StringView.h>
 #include <TextControl.h>
 
 #include "Model.h"
@@ -37,16 +38,23 @@ add_categories_to_menu(const CategoryList& categories, BMenu* menu)
 }
 
 
+static void
+set_small_font(BView* view)
+{
+	BFont font;
+	view->GetFont(&font);
+	font.SetSize(ceilf(font.Size() * 0.8));
+	view->SetFont(&font);
+}
+
+
 static BCheckBox*
 create_check_box(const char* label, const char* name)
 {
 	BMessage* message = new BMessage(MSG_FILTER_SELECTED);
 	message->AddString("name", name);
 	BCheckBox* checkBox = new BCheckBox(label, message);
-	BFont font;
-	checkBox->GetFont(&font);
-	font.SetSize(ceilf(font.Size() * 0.75));
-	checkBox->SetFont(&font);
+	set_small_font(checkBox);
 	return checkBox;
 }
 
@@ -90,6 +98,11 @@ FilterView::FilterView()
 	fSourceCodeCheckBox = create_check_box(
 		B_TRANSLATE("Source code"), "source code");
 
+	// Logged in user label
+	fUsername = new BStringView("logged in user", "");
+	set_small_font(fUsername);
+	fUsername->SetHighColor(80, 80, 80);
+	
 	// Build layout
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_HORIZONTAL)
@@ -107,6 +120,7 @@ FilterView::FilterView()
 			.Add(fDevelopmentCheckBox)
 			.Add(fSourceCodeCheckBox)
 			.AddGlue(0.5f)
+			.Add(fUsername)
 		.End()
 
 		.SetInsets(B_USE_DEFAULT_SPACING)
@@ -198,5 +212,19 @@ FilterView::AdoptCheckmarks(const Model& model)
 	fInstalledCheckBox->SetValue(model.ShowInstalledPackages());
 	fDevelopmentCheckBox->SetValue(model.ShowDevelopPackages());
 	fSourceCodeCheckBox->SetValue(model.ShowSourcePackages());
+}
+
+
+void
+FilterView::SetUsername(const BString& username)
+{
+	BString label;
+	if (username.Length() == 0) {
+		label = B_TRANSLATE("Not logged in");
+	} else {
+		label = B_TRANSLATE("Logged in as %User%");
+		label.ReplaceAll("%User%", username);
+	}
+	fUsername->SetText(label);
 }
 

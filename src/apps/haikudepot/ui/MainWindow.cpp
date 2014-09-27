@@ -53,12 +53,14 @@
 
 
 enum {
-	MSG_MODEL_WORKER_DONE = 'mmwd',
-	MSG_REFRESH_DEPOTS = 'mrdp',
-	MSG_LOG_IN = 'lgin',
-	MSG_PACKAGE_STATE_CHANGED = 'mpsc',
-	MSG_SHOW_SOURCE_PACKAGES = 'ssrc',
-	MSG_SHOW_DEVELOP_PACKAGES = 'sdvl'
+	MSG_MODEL_WORKER_DONE		= 'mmwd',
+	MSG_REFRESH_DEPOTS			= 'mrdp',
+	MSG_LOG_IN					= 'lgin',
+	MSG_LOG_OUT					= 'lgot',
+	MSG_AUTHORIZATION_CHANGED	= 'athc',
+	MSG_PACKAGE_STATE_CHANGED	= 'mpsc',
+	MSG_SHOW_SOURCE_PACKAGES	= 'ssrc',
+	MSG_SHOW_DEVELOP_PACKAGES	= 'sdvl'
 };
 
 
@@ -83,11 +85,31 @@ struct RefreshWorkerParameters {
 };
 
 
+class MessageModelListener : public ModelListener {
+public:
+	MessageModelListener(const BMessenger& messenger)
+		:
+		fMessenger(messenger)
+	{
+	}
+	
+	virtual void AuthorizationChanged()
+	{
+		if (fMessenger.IsValid())
+			fMessenger.SendMessage(MSG_AUTHORIZATION_CHANGED);
+	}
+
+private:
+	BMessenger	fMessenger;
+};
+
+
 MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fModelListener(new MessageModelListener(BMessenger(this)), true),
 	fTerminating(false),
 	fModelWorker(B_BAD_THREAD_ID)
 {
@@ -117,6 +139,8 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	fSplitView->SetCollapsible(0, false);
 	fSplitView->SetCollapsible(1, false);
 
+	fModel.AddListener(fModelListener);
+
 	// Restore settings
 	BMessage columnSettings;
 	if (settings.FindMessage("column settings", &columnSettings) == B_OK)
@@ -128,6 +152,13 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	if (settings.FindBool("show source packages", &showOption) == B_OK)
 		fModel.SetShowSourcePackages(showOption);
 
+	BString username;
+	if (settings.FindString("username", &username) == B_OK
+		&& username.Length() > 0) {
+		fModel.SetUsername(username);
+	}
+
+	// start worker threads
 	BPackageRoster().StartWatching(this,
 		B_WATCH_PACKAGE_INSTALLATION_LOCATIONS);
 
@@ -210,6 +241,14 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_LOG_IN:
 			_OpenLoginWindow();
+			break;
+
+		case MSG_LOG_OUT:
+			fModel.SetUsername("");
+			break;
+
+		case MSG_AUTHORIZATION_CHANGED:
+			_UpdateAuthorization();
 			break;
 
 		case MSG_SHOW_SOURCE_PACKAGES:
@@ -358,6 +397,8 @@ MainWindow::StoreSettings(BMessage& settings) const
 
 	settings.AddBool("show develop packages", fModel.ShowDevelopPackages());
 	settings.AddBool("show source packages", fModel.ShowSourcePackages());
+
+	settings.AddString("username", fModel.Username());
 }
 
 
@@ -401,8 +442,12 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 	BMenu* menu = new BMenu(B_TRANSLATE("Tools"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh depots"),
 			new BMessage(MSG_REFRESH_DEPOTS)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Log in"),
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Log in" B_UTF8_ELLIPSIS),
 			new BMessage(MSG_LOG_IN)));
+	fLogOutItem = new BMenuItem(B_TRANSLATE("Log out"),
+		new BMessage(MSG_LOG_OUT));
+	menu->AddItem(fLogOutItem);
 	menuBar->AddItem(menu);
 
 //	menu = new BMenu(B_TRANSLATE("Options"));
@@ -858,3 +903,11 @@ MainWindow::_OpenLoginWindow()
 	window->Show();
 }
 
+
+void
+MainWindow::_UpdateAuthorization()
+{
+	BString username(fModel.Username());
+	fLogOutItem->SetEnabled(username.Length() > 0);
+	fFilterView->SetUsername(username);
+}

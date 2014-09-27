@@ -28,6 +28,9 @@ public:
 
 			void				SetAuthorization(const BString& username,
 									const BString& password);
+			const BString&		Username() const
+									{ return fUsername; }
+
 			void				SetPreferredLanguage(const BString& language);
 			void				SetArchitecture(const BString& architecture);
 

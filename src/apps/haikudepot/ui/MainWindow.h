@@ -72,16 +72,19 @@ private:
 									const char* message);
 
 			void				_OpenLoginWindow();
+			void				_UpdateAuthorization();
 
 private:
 			FilterView*			fFilterView;
 			PackageListView*	fPackageListView;
 			PackageInfoView*	fPackageInfoView;
 			BSplitView*			fSplitView;
+			BMenuItem*			fLogOutItem;
 			BMenuItem*			fShowDevelopPackagesItem;
 			BMenuItem*			fShowSourcePackagesItem;
 
 			Model				fModel;
+			ModelListenerRef	fModelListener;
 			PackageList			fVisiblePackages;
 
 			bool				fTerminating;
