@@ -50,7 +50,7 @@ IRQDMAItem::IRQDMAItem(int32 number, const char* name)
 
 IRQDMAItem::~IRQDMAItem()
 {
-	delete fName;
+	free(fName);
 }
 
 /***********************************************************
@@ -120,7 +120,7 @@ RangeItem::RangeItem(uint32 lowAddress, uint32 highAddress, const char* name)
 
 RangeItem::~RangeItem()
 {
-	delete fName;
+	free(fName);
 }
 
 /***********************************************************
