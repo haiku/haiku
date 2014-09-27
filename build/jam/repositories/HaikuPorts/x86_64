@@ -11,14 +11,14 @@ RemotePackageRepository HaikuPorts
 	:
 	# repository architecture packages
 	# primary architecture (x86_64)
-	apr-1.4.6-7
-	apr_devel-1.4.6-7
-	apr_util-1.4.1-4
-	apr_util_devel-1.4.1-4
+	apr-1.5.0-1
+	apr_devel-1.5.0-1
+	apr_util-1.5.4-1
+	apr_util_devel-1.5.4-1
 	autoconf-2.69-6
 	automake-1.13.1-4
 #	bepdf-1.1.1~beta5_2013_04_28-1
-	binutils-2.23.2_2013_04_09-2
+	binutils-2.24_2014_03_19-7
 	bison-2.6.5-1
 	buildbot_slave-0.8.8-2
 	bzip2-1.0.6-5
@@ -26,8 +26,8 @@ RemotePackageRepository HaikuPorts
 	cdrtools-3.01~a07-3
 	cmake-3.0.0_rc6-1
 	ctags-5.8-3
-	curl-7.37.0-1
-	curl_devel-7.37.0-1
+	curl-7.38.0-1
+	curl_devel-7.38.0-1
 	cvs-1.12.13.1-6
 	doxygen-1.6.3-4
 	dtc-1.4.0-1
@@ -38,7 +38,7 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_devel-0.10.2-5
 	flex-2.5.39-1
 	fossil-1.29-1
-	freetype-2.5.3-1
+	freetype-2.5.3-3
 	freetype_devel-2.5.3-1
 	gawk-4.1.0-2
 	gcc-4.8.3_2014_07_26-2
@@ -68,8 +68,8 @@ RemotePackageRepository HaikuPorts
 	grep-2.20-1
 	grep_debuginfo-2.20-1
 	groff-1.20.1-3
-	gutenprint-5.2.9-1
-	gutenprint_devel-5.2.9-1
+	gutenprint-5.2.10-1
+	gutenprint_devel-5.2.10-1
 	haikuwebkit-1.4.1-3
 	haikuwebkit_devel-1.4.1-3
 	help2man-1.44.1-1
@@ -88,8 +88,8 @@ RemotePackageRepository HaikuPorts
 	libedit-2012_06_01_3.0-1
 	libexecinfo-1.1-2
 	libexecinfo_devel-1.1-2
-	libffi-3.0.13-1
-	libffi_devel-3.0.13-1
+	libffi-3.0.13-2
+	libffi_devel-3.0.13-2
 	libicns-0.8.1-1
 	libicns_devel-0.8.1-1
 	libiconv-1.13.1-6
@@ -137,11 +137,11 @@ RemotePackageRepository HaikuPorts
 	ncurses_devel-5.9-10
 	neon-0.29.6-7
 	neon_devel-0.29.6-7
-	openssh-6.0p1-7
+	openssh-6.6p1-1
 	openssl-1.0.0n-1
 	openssl_devel-1.0.0n-1
 	p7zip-9.20.1-5
-	pe-2.4.4_2014_05_29-1
+	pe-2.4.5-1
 	perl-5.18.2-2
 	pixman-0.32.6-1
 	pixman_devel-0.32.6-1
@@ -150,8 +150,8 @@ RemotePackageRepository HaikuPorts
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
 	qemu-2.1.0-2
-	qrencode-3.3.0-1
-	qrencode_devel-3.3.0-1
+	qrencode-3.3.0-2
+	qrencode_devel-3.3.0-2
 	readline-6.3-2
 	readline_devel-6.3-2
 	ruby-1.9.1-2
@@ -161,8 +161,8 @@ RemotePackageRepository HaikuPorts
 	sharutils-4.14-1
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.4.3-1
-	sqlite_devel-3.8.4.3-1
+	sqlite-3.8.6-1
+	sqlite_devel-3.8.6-1
 	subversion-1.6.18-6
 	subversion_devel-1.6.18-6
 	tar-1.27.1-2
@@ -178,7 +178,7 @@ RemotePackageRepository HaikuPorts
 	wget-1.15-1
 	which-2.20-2
 	wpa_supplicant-2.0-3
-	xz_utils-5.0.4-2
+	xz_utils-5.0.6-1
 	yasm-1.2.0-3
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
