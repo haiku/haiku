@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 
+#include <LayoutUtils.h>
+
 
 RatingView::RatingView(const char* name)
 	:
@@ -62,6 +64,7 @@ RatingView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_OVER);
 
 	BRect rect(Bounds());
+	rect.right = x - 2;
 	rect.left = ceilf(rect.left + (fRating / 5.0f) * rect.Width());
 
 	rgb_color color = LowColor();
@@ -76,21 +79,22 @@ RatingView::Draw(BRect updateRect)
 BSize
 RatingView::MinSize()
 {
-	return BSize(16 * 5 + 2 * 4, 16 + 2);
+	BSize size(16 * 5 + 2 * 4, 16 + 2);
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
 
 BSize
 RatingView::PreferredSize()
 {
-	return MinSize();
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), MinSize());
 }
 
 
 BSize
 RatingView::MaxSize()
 {
-	return MinSize();
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), MinSize());
 }
 
 
