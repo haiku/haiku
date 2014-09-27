@@ -8,7 +8,7 @@
 
 #include <View.h>
 
-#include "PackageInfo.h"
+#include "SharedBitmap.h"
 
 
 class RatingView : public BView {

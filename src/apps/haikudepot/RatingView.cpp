@@ -6,6 +6,8 @@
 
 #include "RatingView.h"
 
+#include <stdio.h>
+
 
 RatingView::RatingView(const char* name)
 	:
