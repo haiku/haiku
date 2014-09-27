@@ -12,6 +12,7 @@
 
 
 class BButton;
+class BMenuField;
 class BTabView;
 class BTextControl;
 class BitmapView;
@@ -63,7 +64,7 @@ private:
 			BTextControl*		fNewPasswordField;
 			BTextControl*		fRepeatPasswordField;
 			BTextControl*		fEmailField;
-			BTextControl*		fLanguageCodeField;
+			BMenuField*			fLanguageCodeField;
 			BitmapView*			fCaptchaView;
 			BTextControl*		fCaptchaResultField;
 
@@ -72,6 +73,7 @@ private:
 
 			BString				fCaptchaToken;
 			BitmapRef			fCaptchaImage;
+			BString				fPreferredLanguage;
 
 			Model&				fModel;
 

@@ -15,6 +15,8 @@
 #include <Catalog.h>
 #include <Button.h>
 #include <LayoutBuilder.h>
+#include <MenuField.h>
+#include <PopUpMenu.h>
 #include <TabView.h>
 #include <TextControl.h>
 
@@ -31,6 +33,7 @@ enum {
 	MSG_SEND					= 'send',
 	MSG_TAB_SELECTED			= 'tbsl',
 	MSG_CAPTCHA_OBTAINED		= 'cpob',
+	MSG_LANGUAGE_SELECTED		= 'lngs',
 };
 
 
@@ -59,12 +62,26 @@ private:
 };
 
 
+static void
+add_languages_to_menu(const StringList& languages, BMenu* menu)
+{
+	for (int i = 0; i < languages.CountItems(); i++) {
+		const BString& language = languages.ItemAtFast(i);
+		BMessage* message = new BMessage(MSG_LANGUAGE_SELECTED);
+		message->AddString("code", language);
+		BMenuItem* item = new BMenuItem(language, message);
+		menu->AddItem(item);
+	}
+}
+
+
 UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Log in"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+	fPreferredLanguage(model.PreferredLanguage()),
 	fModel(model),
 	fMode(NONE),
 	fWorkerThread(-1)
@@ -73,14 +90,30 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 
 	fUsernameField = new BTextControl(B_TRANSLATE("User name:"), "", NULL);
 	fPasswordField = new BTextControl(B_TRANSLATE("Pass phrase:"), "", NULL);
+	fPasswordField->TextView()->HideTyping(true);
 
 	fNewUsernameField = new BTextControl(B_TRANSLATE("User name:"), "", NULL);
 	fNewPasswordField = new BTextControl(B_TRANSLATE("Pass phrase:"), "",
 		NULL);
+	fNewPasswordField->TextView()->HideTyping(true);
 	fRepeatPasswordField = new BTextControl(B_TRANSLATE("Repeat pass phrase:"),
 		"", NULL);
-	fLanguageCodeField = new BTextControl(B_TRANSLATE("Language code:"),
-		model.PreferredLanguage(), NULL);
+	fRepeatPasswordField->TextView()->HideTyping(true);
+	
+	// Construct languages popup
+	BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
+	fLanguageCodeField = new BMenuField("language",
+		B_TRANSLATE("Preferred language:"), languagesMenu);
+
+	add_languages_to_menu(fModel.SupportedLanguages(), languagesMenu);
+	languagesMenu->SetTargetForItems(this);
+
+	BMenuItem* defaultItem = languagesMenu->ItemAt(
+		fModel.SupportedLanguages().IndexOf(fPreferredLanguage));
+	if (defaultItem != NULL)
+		defaultItem->SetMarked(true);
+	
+	
 	fEmailField = new BTextControl(B_TRANSLATE("Email address:"), "", NULL);
 	fCaptchaView = new BitmapView("captcha view");
 	fCaptchaResultField = new BTextControl("", "", NULL);
@@ -104,7 +137,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 		.AddTextControl(fNewPasswordField, 0, 1)
 		.AddTextControl(fRepeatPasswordField, 0, 2)
 		.AddTextControl(fEmailField, 0, 3)
-		.AddTextControl(fLanguageCodeField, 0, 4)
+		.AddMenuField(fLanguageCodeField, 0, 4)
 		.Add(fCaptchaView, 0, 5)
 		.Add(fCaptchaResultField, 1, 5)
 
@@ -188,6 +221,10 @@ UserLoginWindow::MessageReceived(BMessage* message)
 			} else {
 				fCaptchaView->SetBitmap(NULL);
 			}
+			break;
+
+		case MSG_LANGUAGE_SELECTED:
+			message->FindString("code", &fPreferredLanguage);
 			break;
 
 		default:
@@ -448,7 +485,7 @@ UserLoginWindow::_CreateAccountThread()
 	BString email(fEmailField->Text());
 	BString captchaToken(fCaptchaToken);
 	BString captchaResponse(fCaptchaResultField->Text());
-	BString languageCode(fLanguageCodeField->Text());
+	BString languageCode(fPreferredLanguage);
 
 	Unlock();
 
