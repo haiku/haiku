@@ -25,6 +25,7 @@ private:
 
 private:
 			TextDocumentRef		fRatingText;
+			float				fRating;
 			BString				fStability;
 			PackageInfoRef		fPackage;
 };

@@ -16,8 +16,10 @@
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
+#include <StringView.h>
 
 #include "MarkupParser.h"
+#include "RatingView.h"
 #include "TextDocumentView.h"
 
 
@@ -27,6 +29,7 @@
 
 enum {
 	MSG_SEND				= 'send',
+	MSG_PACKAGE_RATED		= 'rpkg',
 	MSG_STABILITY_SELECTED	= 'stbl'
 };
 
@@ -84,6 +87,51 @@ public:
 };
 
 
+class SetRatingView : public RatingView {
+public:
+	SetRatingView()
+		:
+		RatingView("rate package view"),
+		fPermanentRating(0.0f)
+	{
+		SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+		SetRating(fPermanentRating);
+	}
+
+	virtual void MouseMoved(BPoint where, uint32 transit,
+		const BMessage* dragMessage)
+	{
+		if (dragMessage != NULL)
+			return;
+	
+		if ((transit != B_INSIDE_VIEW && transit != B_ENTERED_VIEW)
+			|| where.x > MinSize().width) {
+			SetRating(fPermanentRating);
+			return;
+		}
+	
+		float hoverRating = _RatingForMousePos(where);
+		SetRating(hoverRating);
+	}
+
+	virtual void MouseDown(BPoint where)
+	{
+		fPermanentRating = _RatingForMousePos(where);
+		BMessage message(MSG_PACKAGE_RATED);
+		message.AddFloat("rating", fPermanentRating);
+		Window()->PostMessage(&message, Window());
+	}
+
+private:
+	float _RatingForMousePos(BPoint where)
+	{
+		return std::min(5.0f, ceilf(5.0f * where.x / MinSize().width));
+	}
+
+	float		fPermanentRating;
+};
+
+
 static void
 add_stabilities_to_menu(const StabilityRatingList& stabilities, BMenu* menu)
 {
@@ -102,10 +150,15 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Your rating"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
-	fRatingText()
+	fRatingText(),
+	fRating(-1.0f)
 {
 	AddToSubset(parent);
-	CenterIn(parent->Frame());
+
+	BStringView* ratingLabel = new BStringView("rating label",
+		B_TRANSLATE("Your rating:"));
+
+	SetRatingView* setRatingView = new SetRatingView();	
 
 	TextDocumentView* textView = new TextDocumentView();
 	ScrollView* textScrollView = new ScrollView(
@@ -154,8 +207,12 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 
 	// Build layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.AddGrid()
+			.Add(ratingLabel, 0, 0)
+			.Add(setRatingView, 1, 0)
+			.AddMenuField(stabilityRatingField, 0, 1)
+		.End()
 		.Add(textScrollView)
-		.Add(stabilityRatingField)
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
 			.Add(cancelButton)
@@ -166,6 +223,8 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 
 	// NOTE: Do not make Send the default button. The user might want
 	// to type line-breaks instead of sending when hitting RETURN.
+
+	CenterIn(parent->Frame());
 }
 
 
@@ -178,11 +237,16 @@ void
 RatePackageWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_SEND:
-			_SendRating();
+		case MSG_PACKAGE_RATED:
+			message->FindFloat("rating", &fRating);
 			break;
+
 		case MSG_STABILITY_SELECTED:
 			message->FindString("name", &fStability);
+			break;
+
+		case MSG_SEND:
+			_SendRating();
 			break;
 
 		default:
