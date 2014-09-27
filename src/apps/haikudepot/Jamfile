@@ -52,6 +52,7 @@ Application HaikuDepot :
 	PackageListView.cpp
 	PackageManager.cpp
 	RatePackageWindow.cpp
+	RatingView.cpp
 	support.cpp
 	UserLoginWindow.cpp
 	WebAppInterface.cpp

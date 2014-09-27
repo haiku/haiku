@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-214, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -31,6 +31,7 @@
 #include "MarkupParser.h"
 #include "PackageActionHandler.h"
 #include "PackageManager.h"
+#include "RatingView.h"
 #include "TextDocumentView.h"
 #include "TextView.h"
 
@@ -232,93 +233,6 @@ private:
 // #pragma mark - rating stats
 
 
-class RatingView : public BView {
-public:
-	RatingView()
-		:
-		BView("package rating view", B_WILL_DRAW),
-		fStarBitmap(501),
-		fRating(-1.0f)
-	{
-		SetViewColor(B_TRANSPARENT_COLOR);
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	}
-
-	virtual ~RatingView()
-	{
-	}
-
-	virtual void AttachedToWindow()
-	{
-		BView* parent = Parent();
-		if (parent != NULL)
-			SetLowColor(parent->ViewColor());
-	}
-
-	virtual void Draw(BRect updateRect)
-	{
-		FillRect(updateRect, B_SOLID_LOW);
-
-		if (fRating < 0.0f)
-			return;
-
-		const BBitmap* star = fStarBitmap.Bitmap(SharedBitmap::SIZE_16);
-		if (star == NULL) {
-			fprintf(stderr, "No star icon found in application resources.\n");
-			return;
-		}
-
-		SetDrawingMode(B_OP_OVER);
-
-		float x = 0;
-		for (int i = 0; i < 5; i++) {
-			DrawBitmap(star, BPoint(x, 0));
-			x += 16 + 2;
-		}
-
-		if (fRating >= 5.0f)
-			return;
-
-		SetDrawingMode(B_OP_OVER);
-
-		BRect rect(Bounds());
-		rect.left = ceilf(rect.left + (fRating / 5.0f) * rect.Width());
-
-		rgb_color color = LowColor();
-		color.alpha = 190;
-		SetHighColor(color);
-
-		SetDrawingMode(B_OP_ALPHA);
-		FillRect(rect, B_SOLID_HIGH);
-	}
-
-	virtual BSize MinSize()
-	{
-		return BSize(16 * 5 + 2 * 4, 16 + 2);
-	}
-
-	virtual BSize PreferredSize()
-	{
-		return MinSize();
-	}
-
-	virtual BSize MaxSize()
-	{
-		return MinSize();
-	}
-
-	void SetRating(float rating)
-	{
-		fRating = rating;
-		Invalidate();
-	}
-
-private:
-	SharedBitmap	fStarBitmap;
-	float			fRating;
-};
-
-
 class DiagramBarView : public BView {
 public:
 	DiagramBarView()
@@ -436,7 +350,7 @@ class TransitReportingRatingView : public RatingView, public BInvoker {
 public:
 	TransitReportingRatingView(BMessage* transitMessage)
 		:
-		RatingView(),
+		RatingView("package rating view"),
 		fTransitMessage(transitMessage)
 	{
 	}
@@ -1024,7 +938,7 @@ public:
 		fNameView->SetExplicitMaxSize(
 			BSize(nameFont.StringWidth("xxxxxxxxxxxxxxxxxxxxxx"), B_SIZE_UNSET));
 
-		fRatingView = new RatingView();
+		fRatingView = new RatingView("package rating view");
 		fRatingView->SetRating(rating.Rating());
 
 		BString ratingLabel;
