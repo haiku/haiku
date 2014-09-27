@@ -377,4 +377,7 @@ private:
 typedef List<DepotInfo, false> DepotList;
 
 
+typedef List<BString, false> StringList;
+
+
 #endif // PACKAGE_INFO_H
