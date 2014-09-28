@@ -14,6 +14,7 @@
 
 #include <MidiRoster.h>
 #include <MidiConsumer.h>
+#include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
 #include <string.h>
@@ -24,8 +25,6 @@
 #include "SoftSynth.h"
 
 using namespace BPrivate;
-
-const static char* kSynthFileName = "synth/synth.sf2";
 
 struct ReverbSettings {
 	double room, damp, width, level;
@@ -101,34 +100,38 @@ BSoftSynth::IsLoaded(void) const
 status_t 
 BSoftSynth::SetDefaultInstrumentsFile()
 {
-	// We first search for a softsynth file (or symlink to it)
+	// We first search for a setting file (or symlink to it)
 	// in the user settings directory
+	char buffer[512];
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, false, NULL) == B_OK) {
-		path.Append(kSynthFileName);
-		if (BEntry(path.Path()).Exists())
-			return SetInstrumentsFile(path.Path());
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		path.Append("midi");
+		BFile file(path.Path(), B_READ_ONLY);
+		if (file.InitCheck() == B_OK
+				&& file.Read(buffer, sizeof(buffer)) > 0) {
+			char soundFont[512];
+			sscanf(buffer, "# Midi Settings\n soundfont = %s\n",
+				soundFont);
+			return SetInstrumentsFile(soundFont);
+		}
 	}
 
-	// Then in the system settings directory
-	if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path, false, NULL) == B_OK) {
-		path.Append(kSynthFileName);
-		if (BEntry(path.Path()).Exists())
-			return SetInstrumentsFile(path.Path());
-	}
-
-	if (find_directory(B_SYNTH_DIRECTORY, &path, false, NULL) == B_OK) {
-		path.Append(kSynthFileName);
-		if (BEntry(path.Path()).Exists())
-			return SetInstrumentsFile(path.Path());
-	}
-
-	// If no link is present, fall back to the default
+	// fall back to the old default
 	// softsynth (big_synth.sy)
+	// TODO: Remove this
 	if (find_directory(B_SYNTH_DIRECTORY, &path, false, NULL) == B_OK) {
 		path.Append(B_BIG_SYNTH_FILE);
 		return SetInstrumentsFile(path.Path());
 	}
+
+	// TODO: Use the first soundfont found in the synth directory
+	// instead of hardcoding
+	if (find_directory(B_SYNTH_DIRECTORY, &path, false, NULL) == B_OK) {
+		path.Append("TimGM6mb.sf2");
+		return SetInstrumentsFile(path.Path());
+	}
+
+	// TODO: Write the settings file
 	
 	return B_ERROR;
 }
