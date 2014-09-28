@@ -1529,6 +1529,8 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 {
 	BAutolock _(fModelLock);
 
+	fPackage = packageRef;
+
 	const PackageInfo& package = *packageRef.Get();
 
 	fTitleView->SetPackage(package);
@@ -1544,6 +1546,8 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 void
 PackageInfoView::Clear()
 {
+	fPackage = PackageInfoRef(NULL);
+	
 	fTitleView->Clear();
 	fPackageActionView->Clear();
 	fPagesView->Clear();
@@ -1552,6 +1556,6 @@ PackageInfoView::Clear()
 
 	BAutolock _(fModelLock);
 
-	fPackageListener->SetPackage(PackageInfoRef(NULL));
+	fPackageListener->SetPackage(fPackage);
 }
 

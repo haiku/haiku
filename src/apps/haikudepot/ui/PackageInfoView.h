@@ -35,6 +35,8 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 			void				SetPackage(const PackageInfoRef& package);
+			const PackageInfoRef& Package() const
+									{ return fPackage; }
 			void				Clear();
 
 private:
@@ -48,6 +50,7 @@ private:
 			PackageActionView*	fPackageActionView;
 			PagesView*			fPagesView;
 
+			PackageInfoRef		fPackage;
 			Listener*			fPackageListener;
 };
 
