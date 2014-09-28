@@ -372,8 +372,8 @@ MainWindow::MessageReceived(BMessage* message)
 			// TODO: Allow only one RatePackageWindow
 			// TODO: Mechanism for remembering the window frame
 			RatePackageWindow* window = new RatePackageWindow(this,
-				BRect(0, 0, 500, 400), fModel.PreferredLanguage(),
-				fModel.SupportedLanguages());
+				BRect(0, 0, 500, 400), fModel);
+			window->SetPackage(fPackageInfoView->Package());
 			window->Show();
 			break;
 		}

@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include <Alert.h>
+#include <Autolock.h>
 #include <Catalog.h>
 #include <Button.h>
 #include <LayoutBuilder.h>
@@ -21,6 +22,7 @@
 #include "MarkupParser.h"
 #include "RatingView.h"
 #include "TextDocumentView.h"
+#include "WebAppInterface.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -117,10 +119,16 @@ public:
 
 	virtual void MouseDown(BPoint where)
 	{
-		fPermanentRating = _RatingForMousePos(where);
+		SetPermanentRating(_RatingForMousePos(where));
 		BMessage message(MSG_PACKAGE_RATED);
 		message.AddFloat("rating", fPermanentRating);
 		Window()->PostMessage(&message, Window());
+	}
+	
+	void SetPermanentRating(float rating)
+	{
+		fPermanentRating = rating;
+		SetRating(rating);
 	}
 
 private:
@@ -160,93 +168,95 @@ add_languages_to_menu(const StringList& languages, BMenu* menu)
 
 
 RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
-	const BString& preferredLanguage, const StringList& supportedLanguages)
+	Model& model)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Your rating"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fModel(model),
 	fRatingText(),
+	fTextEditor(new TextEditor(), true),
 	fRating(-1.0f),
-	fCommentLanguage(preferredLanguage)
+	fCommentLanguage(fModel.PreferredLanguage()),
+	fWorkerThread(-1)
 {
 	AddToSubset(parent);
 
 	BStringView* ratingLabel = new BStringView("rating label",
 		B_TRANSLATE("Your rating:"));
 
-	SetRatingView* setRatingView = new SetRatingView();	
+	fSetRatingView = new SetRatingView();	
 
-	TextDocumentView* textView = new TextDocumentView();
+	fTextView = new TextDocumentView();
 	ScrollView* textScrollView = new ScrollView(
-		"rating scroll view", textView);
+		"rating scroll view", fTextView);
 
 	MarkupParser parser;
 	fRatingText = parser.CreateDocumentFromMarkup(
 		"Here is where you ''could'' type your awesome rating comment, "
 		"if only this were already implemented.");
 
-	textView->SetInsets(10.0f);
-	textView->SetTextDocument(fRatingText);
-	textView->SetTextEditor(TextEditorRef(new TextEditor(), true));
+	fTextView->SetInsets(10.0f);
+	fTextView->SetTextDocument(fRatingText);
+	fTextView->SetTextEditor(fTextEditor);
 
 	// Construct stability rating popup
 	BPopUpMenu* stabilityMenu = new BPopUpMenu(B_TRANSLATE("Stability"));
-	BMenuField* stabilityRatingField = new BMenuField("stability",
+	fStabilityField = new BMenuField("stability",
 		B_TRANSLATE("Stability:"), stabilityMenu);
 
-	StabilityRatingList stabilities;
-	stabilities.Add(StabilityRating(
-		B_TRANSLATE("Not specified"), "UNSPECIFIED"));
-	stabilities.Add(StabilityRating(
-		B_TRANSLATE("Mostly stable"), "MOSTLY_STABLE"));
-	stabilities.Add(StabilityRating(
-		B_TRANSLATE("Stable"), "STABLE"));
-	stabilities.Add(StabilityRating(
-		B_TRANSLATE("Not stable, but usable"), "USABLE"));
-	stabilities.Add(StabilityRating(
-		B_TRANSLATE("Unstable"), "UNSTABLE"));
-	stabilities.Add(StabilityRating(
-		B_TRANSLATE("Does not start"), "DOES_NOT_START"));
+	fStabilityCodes.Add(StabilityRating(
+		B_TRANSLATE("Not specified"), "unspecified"));
+	fStabilityCodes.Add(StabilityRating(
+		B_TRANSLATE("Mostly stable"), "mostly_stable"));
+	fStabilityCodes.Add(StabilityRating(
+		B_TRANSLATE("Stable"), "stable"));
+	fStabilityCodes.Add(StabilityRating(
+		B_TRANSLATE("Not stable, but usable"), "usable"));
+	fStabilityCodes.Add(StabilityRating(
+		B_TRANSLATE("Unstable"), "unstable"));
+	fStabilityCodes.Add(StabilityRating(
+		B_TRANSLATE("Does not start"), "does_not_start"));
 	
-	add_stabilities_to_menu(stabilities, stabilityMenu);
+	add_stabilities_to_menu(fStabilityCodes, stabilityMenu);
 	stabilityMenu->SetTargetForItems(this);
 	
-	fStability = stabilities.ItemAt(0).Name();
+	fStability = fStabilityCodes.ItemAt(0).Name();
 	stabilityMenu->ItemAt(0)->SetMarked(true);
 
 	// Construct languages popup
 	BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
-	BMenuField* languageField = new BMenuField("language",
+	fCommentLanguageField = new BMenuField("language",
 		B_TRANSLATE("Comment language:"), languagesMenu);
 
-	add_languages_to_menu(supportedLanguages, languagesMenu);
+	add_languages_to_menu(fModel.SupportedLanguages(), languagesMenu);
 	languagesMenu->SetTargetForItems(this);
 
 	BMenuItem* defaultItem = languagesMenu->ItemAt(
-		supportedLanguages.IndexOf(fCommentLanguage));
+		fModel.SupportedLanguages().IndexOf(fCommentLanguage));
 	if (defaultItem != NULL)
 		defaultItem->SetMarked(true);
 	
 	// Construct buttons
-	BButton* cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
+	fCancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
-	BButton* sendButton = new BButton("send", B_TRANSLATE("Send"),
+	fSendButton = new BButton("send", B_TRANSLATE("Send"),
 		new BMessage(MSG_SEND));
 
 	// Build layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGrid()
 			.Add(ratingLabel, 0, 0)
-			.Add(setRatingView, 1, 0)
-			.AddMenuField(stabilityRatingField, 0, 1)
-			.AddMenuField(languageField, 0, 2)
+			.Add(fSetRatingView, 1, 0)
+			.AddMenuField(fStabilityField, 0, 1)
+			.AddMenuField(fCommentLanguageField, 0, 2)
 		.End()
 		.Add(textScrollView)
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
-			.Add(cancelButton)
-			.Add(sendButton)
+			.Add(fCancelButton)
+			.Add(fSendButton)
 		.End()
 		.SetInsets(B_USE_DEFAULT_SPACING)
 	;
@@ -293,10 +303,19 @@ RatePackageWindow::MessageReceived(BMessage* message)
 void
 RatePackageWindow::SetPackage(const PackageInfoRef& package)
 {
+	BAutolock locker(this);
+	if (!locker.IsLocked() || fWorkerThread >= 0)
+		return;
+
 	fPackage = package;
-	// TODO: See if the user already made a rating for this package,
-	// pre-fill the UI with that rating. When sending the rating, replace
-	// the old one.
+
+	// See if the user already made a rating for this package,
+	// pre-fill the UI with that rating. (When sending the rating, the
+	// old one will be replaced.)
+	thread_id thread = spawn_thread(&_QueryRatingThreadEntry,
+		"Query rating", B_NORMAL_PRIORITY, this);
+	if (thread >= 0)
+		_SetWorkerThread(thread);
 }
 
 
@@ -313,3 +332,117 @@ RatePackageWindow::_SendRating()
 
 	PostMessage(B_QUIT_REQUESTED);
 }
+
+
+void
+RatePackageWindow::_SetWorkerThread(thread_id thread)
+{
+	if (!Lock())
+		return;
+	
+	bool enabled = thread < 0;
+
+//	fTextEditor->SetEnabled(enabled);
+//	fSetRatingView->SetEnabled(enabled);
+	fStabilityField->SetEnabled(enabled);
+	fCommentLanguageField->SetEnabled(enabled);
+	fSendButton->SetEnabled(enabled);
+	
+	if (thread >= 0) {
+		fWorkerThread = thread;
+		resume_thread(fWorkerThread);
+	} else {
+		fWorkerThread = -1;
+	}
+
+	Unlock();
+}
+
+
+int32
+RatePackageWindow::_QueryRatingThreadEntry(void* data)
+{
+	RatePackageWindow* window = reinterpret_cast<RatePackageWindow*>(data);
+	window->_QueryRatingThread();
+	return 0;
+}
+
+
+void
+RatePackageWindow::_QueryRatingThread()
+{
+	if (!Lock())
+		return;
+
+	PackageInfoRef package(fPackage);
+
+	Unlock();
+
+	BAutolock locker(fModel.Lock());
+	BString username = fModel.Username();
+	locker.Unlock();
+
+	if (package.Get() == NULL) {
+		_SetWorkerThread(-1);
+		return;
+	}
+
+	WebAppInterface interface;
+	BMessage info;
+
+	status_t status = interface.RetrieveUserRating(
+		package->Title(), package->Architecture(), username, info);
+
+//	info.PrintToStream();
+
+	BMessage result;
+	BMessage items;
+	BMessage rating;
+	if (status == B_OK && info.FindMessage("result", &result) == B_OK
+		&& result.FindMessage("items", &items) == B_OK
+		&& items.FindMessage("0", &rating) == B_OK
+		&& Lock()) {
+		
+		rating.FindString("code", &fRatingID);
+		rating.FindBool("active", &fRatingActive);
+		BString comment;
+		if (rating.FindString("comment", &comment) == B_OK) {
+			MarkupParser parser;
+			fRatingText = parser.CreateDocumentFromMarkup(comment);
+			fTextView->SetTextDocument(fRatingText);
+		}
+		if (rating.FindString("userRatingStabilityCode",
+			&fStability) == B_OK) {
+			int32 index = -1;
+			for (int32 i = fStabilityCodes.CountItems() - 1; i >= 0; i--) {
+				const StabilityRating& stability
+					= fStabilityCodes.ItemAtFast(i);
+				if (stability.Name() == fStability) {
+					index = i;
+					break;
+				}
+			}
+			BMenuItem* item = fStabilityField->Menu()->ItemAt(index);
+			if (item != NULL)
+				item->SetMarked(true);
+		}
+		if (rating.FindString("naturalLanguageCode",
+			&fCommentLanguage) == B_OK) {
+			BMenuItem* item = fCommentLanguageField->Menu()->ItemAt(
+				fModel.SupportedLanguages().IndexOf(fCommentLanguage));
+			if (item != NULL)
+				item->SetMarked(true);
+		}
+		double ratingValue;
+		if (rating.FindDouble("rating", &ratingValue) == B_OK) {
+			fRating = (float)ratingValue;
+			fSetRatingView->SetPermanentRating(fRating);
+		}
+
+		Unlock();
+	}
+
+	_SetWorkerThread(-1);
+}
+
+

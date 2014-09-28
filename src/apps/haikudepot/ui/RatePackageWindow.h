@@ -7,15 +7,22 @@
 
 #include <Window.h>
 
+#include "Model.h"
 #include "PackageInfo.h"
 #include "TextDocument.h"
+#include "TextEditor.h"
+
+
+class BButton;
+class BMenuField;
+class SetRatingView;
+class TextDocumentView;
 
 
 class RatePackageWindow : public BWindow {
 public:
 								RatePackageWindow(BWindow* parent, BRect frame,
-									const BString& preferredLanguage,
-									const StringList& supportedLanguages);
+									Model& model);
 	virtual						~RatePackageWindow();
 
 	virtual	void				MessageReceived(BMessage* message);
@@ -25,12 +32,31 @@ public:
 private:
 			void				_SendRating();
 
+			void				_SetWorkerThread(thread_id thread);
+
+	static	int32				_QueryRatingThreadEntry(void* data);
+			void				_QueryRatingThread();
+
 private:
+			Model&				fModel;
 			TextDocumentRef		fRatingText;
+			TextEditorRef		fTextEditor;
 			float				fRating;
 			BString				fStability;
+			StabilityRatingList	fStabilityCodes;
 			BString				fCommentLanguage;
+			BString				fRatingID;
+			bool				fRatingActive;
 			PackageInfoRef		fPackage;
+
+			SetRatingView*		fSetRatingView;
+			BMenuField*			fStabilityField;
+			BMenuField*			fCommentLanguageField;
+			TextDocumentView*	fTextView;
+			BButton*			fCancelButton;
+			BButton*			fSendButton;
+
+			thread_id			fWorkerThread;
 };
 
 
