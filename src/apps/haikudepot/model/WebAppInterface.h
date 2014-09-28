@@ -54,6 +54,12 @@ public:
 									int resultOffset, int maxResults,
 									BMessage& message);
 
+			status_t			RetrieveUserRating(
+									const BString& packageName,
+									const BString& architecture,
+									const BString& username,
+									BMessage& message);
+
 			status_t			RetrieveScreenshot(
 									const BString& code,
 									int32 width, int32 height,

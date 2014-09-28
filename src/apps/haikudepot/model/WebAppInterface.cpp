@@ -390,6 +390,30 @@ WebAppInterface::RetrieveUserRatings(const BString& packageName,
 
 
 status_t
+WebAppInterface::RetrieveUserRating(const BString& packageName,
+	const BString& architecture, const BString& username,
+	BMessage& message)
+{
+	BString jsonString = JsonBuilder()
+		.AddValue("jsonrpc", "2.0")
+		.AddValue("id", ++fRequestIndex)
+		.AddValue("method", "searchUserRatings")
+		.AddArray("params")
+			.AddObject()
+				.AddValue("userNickname", username)
+				.AddValue("pkgName", packageName)
+				.AddValue("pkgVersionArchitectureCode", architecture)
+				.AddValue("offset", 0)
+				.AddValue("limit", 1)
+			.EndObject()
+		.EndArray()
+	.End();
+
+	return _SendJsonRequest("userrating", jsonString, false, message);
+}
+
+
+status_t
 WebAppInterface::RetrieveScreenshot(const BString& code,
 	int32 width, int32 height, BDataIO* stream)
 {
