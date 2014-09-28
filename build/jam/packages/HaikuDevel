@@ -35,7 +35,8 @@ for lib in [ HaikuImageGetSystemLibs ] $(developmentLibs) {
 }
 
 # static libraries
-AddFilesToPackage develop lib : <$(architecture)>liblocalestub.a libshared.a ;
+AddFilesToPackage develop lib : libcolumnlistview.a
+	<$(architecture)>liblocalestub.a libshared.a ;
 
 # the POSIX error code mapper library
 AddFilesToPackage develop lib : libposix_error_mapper.a ;

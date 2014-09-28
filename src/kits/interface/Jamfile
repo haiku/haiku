@@ -154,10 +154,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			: [ MultiArchDefaultGristFiles libshared.a ]
 			;
+
+		StaticLibrary [ MultiArchDefaultGristFiles libcolumnlistview.a ] :
+			ColumnListView.cpp
+			ColumnTypes.cpp
+		;
 	}
 }
 
-StaticLibrary libcolumnlistview.a :
-	ColumnListView.cpp
-	ColumnTypes.cpp
-;
