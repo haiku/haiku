@@ -386,18 +386,32 @@ TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
 					pressure = 0.0;
 					eraser = 0;
 				} else {
-//					eraser = (data[1] & 0x20); // eraser is een tool-id
-//					firstButton = (pressureData > 0) && data[9] <= 0x68;// > 180);
-//					firstButton = (pressureData > 180);
-					firstButton = (data[6] > 0);
+					firstButton = (data[6] > 2);
+						// For Intuos it MUST be >1,
+						// but '>1' still gets false actuations (shaking)
 					secondButton = (data[1] & 0x02);
 					thirdButton = (data[1] & 0x04);
 					hasContact = (data[1] & 0x40);
-					// convert tilt (-128 ... 127)
-//					int8 tiltDataX = ((data[7] & 0x3f) << 2) | ((data[8] & 0x80) >> 6);
+						// TODO: is this meaningful? (always true on Intuos)
+					if (fDeviceMode == DEVICE_INTUOS) {	// TODO: test perhaps superfluous?
+						// Original Intuos protocol:
+						//  data[6] is used to signal use of the eraser,
+						//  as well as being the high bits of pressure.
+						//  While not in contact:
+						//	 If the pen end is lowermost data[6] = 1;
+						//	 If the eraser end is down data[6] = 0, and pressure is strictly 0
+						//   data[9] (top 5 bits: 0x70..0xd0) indicates height above the tablet.
+						eraser = fEraser;
+							// keep established value unless not touching pad
+						// Eraser state only valid when away from surface
+						if (data[6] <= 1 && data[9] > 0x80) { 	// not touching tablet
+							if (pressureData == 0) eraser = 1;	// strictly 0 means eraser
+							else if (pressureData > 6) eraser = 0;	// avoid slop
+						}
+					}
+					// Get raw tilt values (0..54..127)
 					int8 tiltDataX = ((data[7] & 0x3f) << 1) | ((data[8] & 0x80) >> 7);
 					int8 tiltDataY = data[8] & 0x7f;
-//					int8 tiltDataY = 0;
 					// convert to floats
 					tiltX = (float)(tiltDataX - 64) / 64.0;
 					tiltY = (float)(tiltDataY - 64) / 64.0;
