@@ -163,7 +163,6 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 
 	SetDefaultButton(fSendButton);
 	
-	// TODO: Set initial mode based on whether there is account info
 	_SetMode(LOGIN);
 
 	CenterIn(parent->Frame());
