@@ -123,6 +123,6 @@ APP_VERSION :=
 DRIVER_PATH = 
 
 ## Include the Makefile-Engine
-DEVEL_DIRECTORY := \\
+DEVEL_DIRECTORY := \
 	$(shell findpaths -r "makefile_engine" B_FIND_PATH_DEVELOP_DIRECTORY)
 include $(DEVEL_DIRECTORY)/etc/makefile-engine
