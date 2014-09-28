@@ -21,6 +21,7 @@
 
 #include "MediaIcons.h"
 #include "MediaWindow.h"
+#include "MidiSettingsView.h"
 
 
 #define kITEM_MARGIN	1
@@ -307,6 +308,13 @@ NodeListItem::Comparator::Visit(AudioMixerListItem* item)
 }
 
 
+void
+NodeListItem::Comparator::Visit(MidiListItem* item)
+{
+	result = GREATER_THAN;
+}
+
+
 // #pragma mark - DeviceListItem
 
 
@@ -368,6 +376,13 @@ DeviceListItem::Comparator::Visit(AudioMixerListItem* item)
 	result = LESS_THAN;
 	if (fTarget->Type() == AUDIO_TYPE)
 		result = GREATER_THAN;
+}
+
+
+void
+DeviceListItem::Comparator::Visit(MidiListItem* item)
+{
+	result = LESS_THAN;
 }
 
 
@@ -455,7 +470,100 @@ AudioMixerListItem::Comparator::Visit(AudioMixerListItem* item)
 
 
 void
+AudioMixerListItem::Comparator::Visit(MidiListItem* item)
+{
+	result = GREATER_THAN;
+}
+
+
+void
 AudioMixerListItem::SetRenderParameters(Renderer& renderer)
 {
+	renderer.AddIcon(&Icons()->mixerIcon);
+}
+
+
+// #pragma mark - MidiListItem
+
+MidiListItem::MidiListItem(const char* title)
+	:
+	MediaListItem(),
+	fTitle(title)
+{
+}
+
+
+void
+MidiListItem::AlterWindow(MediaWindow* window)
+{
+	window->SelectMidiSettings(fTitle);
+}
+
+
+const char*
+MidiListItem::Label()
+{
+	return "MIDI";
+}
+
+
+void
+MidiListItem::Accept(MediaListItem::Visitor& visitor)
+{
+	visitor.Visit(this);
+}
+
+
+int
+MidiListItem::CompareWith(MediaListItem* item)
+{
+	Comparator comparator(this);
+	item->Accept(comparator);
+	return comparator.result;
+}
+
+
+MidiListItem::Comparator::Comparator(MidiListItem* compareOthersTo)
+	:
+	result(0),
+	fTarget(compareOthersTo)
+{
+}
+
+
+void
+MidiListItem::Comparator::Visit(NodeListItem* item)
+{
+	result = GREATER_THAN;
+}
+
+
+void
+MidiListItem::Comparator::Visit(DeviceListItem* item)
+{
+	result = GREATER_THAN;
+	if (item->Type() == AUDIO_TYPE)
+		result = LESS_THAN;
+}
+
+
+void
+MidiListItem::Comparator::Visit(AudioMixerListItem* item)
+{
+	result = LESS_THAN;
+}
+
+
+void
+MidiListItem::Comparator::Visit(MidiListItem* item)
+{
+	result = 0;
+}
+
+
+void
+MidiListItem::SetRenderParameters(Renderer& renderer)
+{
+	// TODO: Create a nice icon
 	renderer.AddIcon(&Icons()->mixerIcon);
 }

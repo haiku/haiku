@@ -29,7 +29,7 @@
 
 class BCardLayout;
 class BSeparatorView;
-
+class MidiSettingsView;
 
 class MediaWindow : public BWindow {
 public:
@@ -43,6 +43,7 @@ public:
 			void				SelectAudioSettings(const char* title);
 			void				SelectVideoSettings(const char* title);
 			void				SelectAudioMixer(const char* title);
+			void				SelectMidiSettings(const char* title);
 
 	// methods to be called by SettingsViews...
 			void				UpdateInputListItem(
@@ -99,6 +100,7 @@ private:
 			BCardLayout*		fContentLayout;
 			AudioSettingsView*	fAudioView;
 			VideoSettingsView*	fVideoView;
+			MidiSettingsView*	fMidiView;
 
 			SmartNode			fCurrentNode;
 			BParameterWeb*		fParamWeb;

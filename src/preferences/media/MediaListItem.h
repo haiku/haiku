@@ -27,6 +27,7 @@ class MediaWindow;
 
 class AudioMixerListItem;
 class DeviceListItem;
+class MidiListItem;
 class NodeListItem;
 
 
@@ -55,6 +56,7 @@ public:
 		virtual	void			Visit(AudioMixerListItem* item) = 0;
 		virtual	void			Visit(DeviceListItem* item) = 0;
 		virtual	void			Visit(NodeListItem* item) = 0;
+		virtual void			Visit(MidiListItem* item) = 0;
 	};
 
 	virtual	void				Accept(Visitor& visitor) = 0;
@@ -100,6 +102,7 @@ public:
 		virtual	void			Visit(NodeListItem* item);
 		virtual	void			Visit(DeviceListItem* item);
 		virtual	void			Visit(AudioMixerListItem* item);
+		virtual void			Visit(MidiListItem* item);
 
 				int				result;
 					// -1 : < item; 0 : == item; 1 : > item
@@ -137,6 +140,7 @@ public:
 		virtual	void			Visit(NodeListItem* item);
 		virtual	void			Visit(DeviceListItem* item);
 		virtual	void			Visit(AudioMixerListItem* item);
+		virtual void			Visit(MidiListItem* item);
 
 				int				result;
 					// -1 : < item; 0 : == item; 1 : > item
@@ -169,6 +173,7 @@ public:
 		virtual	void			Visit(NodeListItem* item);
 		virtual	void			Visit(DeviceListItem* item);
 		virtual	void			Visit(AudioMixerListItem* item);
+		virtual void			Visit(MidiListItem* item);
 
 				int				result;
 					// -1 : < item; 0 : == item; 1 : > item
@@ -185,4 +190,37 @@ private:
 			const char*			fTitle;
 };
 
+
+class MidiListItem : public MediaListItem {
+public:
+								MidiListItem(const char* title);
+
+	virtual	void				AlterWindow(MediaWindow* window);
+
+	virtual	const char*			Label();
+
+	virtual	void				Accept(MediaListItem::Visitor& visitor);
+
+	struct Comparator : public MediaListItem::Visitor {
+								Comparator(MidiListItem* compareOthersTo);
+		virtual	void			Visit(NodeListItem* item);
+		virtual	void			Visit(DeviceListItem* item);
+		virtual	void			Visit(AudioMixerListItem* item);
+		virtual void			Visit(MidiListItem* item);
+
+				int				result;
+					// -1 : < item; 0 : == item; 1 : > item
+	private:
+				MidiListItem*	fTarget;
+	};
+
+	// -1 : < item; 0 : == item; 1 : > item
+	virtual	int					CompareWith(MediaListItem* item);
+
+private:
+
+	virtual void				SetRenderParameters(Renderer& renderer);
+
+			const char*			fTitle;
+};
 #endif	/* __MEDIALISTITEM_H__ */

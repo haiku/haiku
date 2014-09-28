@@ -15,6 +15,7 @@ Preference Media :
 	MediaListItem.cpp
 	MediaViews.cpp
 	MediaWindow.cpp
+	MidiSettingsView.cpp
 	: media be localestub [ TargetLibsupc++ ]
 	: media.rdef
 	;

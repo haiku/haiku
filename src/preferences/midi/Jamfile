@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src preferences midi ;
-
-Preference Midi :
-	MidiApp.cpp
-	MidiView.cpp
-	MidiWindow.cpp
-	: midi be localestub [ TargetLibsupc++ ]
-	;

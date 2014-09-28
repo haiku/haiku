@@ -36,7 +36,7 @@
 #include <TextView.h>
 
 #include "MediaIcons.h"
-
+#include "MidiSettingsView.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Media Window"
@@ -60,7 +60,7 @@ public:
 
 	virtual	void	Visit(AudioMixerListItem*){}
 	virtual	void	Visit(DeviceListItem*){}
-
+	virtual	void	Visit(MidiListItem*){}
 	virtual void	Visit(NodeListItem* item)
 	{
 		item->Accept(fComparator);
@@ -234,6 +234,14 @@ MediaWindow::SelectAudioMixer(const char* title)
 
 
 void
+MediaWindow::SelectMidiSettings(const char* title)
+{
+	fContentLayout->SetVisibleItem(fContentLayout->IndexOfView(fMidiView));
+	fTitleView->SetLabel(title);
+}
+
+
+void
 MediaWindow::UpdateInputListItem(MediaListItem::media_type type,
 	const dormant_node_info* node)
 {
@@ -371,6 +379,9 @@ MediaWindow::_InitWindow()
 	fVideoView = new VideoSettingsView();
 	fContentLayout->AddView(fVideoView);
 
+	fMidiView = new MidiSettingsView();
+	fContentLayout->AddView(fMidiView);
+
 	// Layout all views
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
 		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
@@ -454,6 +465,9 @@ MediaWindow::_InitMedia(bool first)
 	DeviceListItem* audio = new DeviceListItem(B_TRANSLATE("Audio settings"),
 		MediaListItem::AUDIO_TYPE);
 	fListView->AddItem(audio);
+
+	MidiListItem* midi = new MidiListItem(B_TRANSLATE("MIDI Settings"));
+	fListView->AddItem(midi);
 
 	MediaListItem* video = new DeviceListItem(B_TRANSLATE("Video settings"),
 		MediaListItem::VIDEO_TYPE);

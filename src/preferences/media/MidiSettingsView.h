@@ -7,20 +7,21 @@
 #define MIDIVIEW_H_
 
 
-#include <GroupView.h>
+#include "MediaViews.h"
 
 class BButton;
 class BListView;
-class MidiView : public BGroupView {
+class MidiSettingsView : public SettingsView {
 public:
-	MidiView();
+	MidiSettingsView();
 	virtual void AttachedToWindow();
 	virtual void MessageReceived(BMessage* message);
 
 private:
 	void _RetrieveSoftSynthList();
+	void _LoadSettings();
+	void _SaveSettings();
 
-	BButton* fImportButton;
 	BListView* fListView;
 };
 
