@@ -14,6 +14,7 @@
 
 
 class BButton;
+class BCheckBox;
 class BMenuField;
 class SetRatingView;
 class TextDocumentView;
@@ -53,6 +54,7 @@ private:
 			BMenuField*			fStabilityField;
 			BMenuField*			fCommentLanguageField;
 			TextDocumentView*	fTextView;
+			BCheckBox*			fRatingActiveCheckBox;
 			BButton*			fCancelButton;
 			BButton*			fSendButton;
 

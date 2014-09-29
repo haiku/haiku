@@ -12,6 +12,7 @@
 #include <Autolock.h>
 #include <Catalog.h>
 #include <Button.h>
+#include <CheckBox.h>
 #include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -30,10 +31,11 @@
 
 
 enum {
-	MSG_SEND				= 'send',
-	MSG_PACKAGE_RATED		= 'rpkg',
-	MSG_STABILITY_SELECTED	= 'stbl',
-	MSG_LANGUAGE_SELECTED	= 'lngs'
+	MSG_SEND					= 'send',
+	MSG_PACKAGE_RATED			= 'rpkg',
+	MSG_STABILITY_SELECTED		= 'stbl',
+	MSG_LANGUAGE_SELECTED		= 'lngs',
+	MSG_RATING_ACTIVE_CHANGED	= 'rtac'
 };
 
 //! Layouts the scrollbar so it looks nice with no border and the document
@@ -237,6 +239,13 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	if (defaultItem != NULL)
 		defaultItem->SetMarked(true);
 	
+	fRatingActiveCheckBox = new BCheckBox("rating active",
+		B_TRANSLATE("Other users can see this rating"),
+		new BMessage(MSG_RATING_ACTIVE_CHANGED));
+	// Hide the check mark by default, it will be made visible when
+	// the user already made a rating and it is loaded
+	fRatingActiveCheckBox->Hide();
+	
 	// Construct buttons
 	fCancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
@@ -254,11 +263,12 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 		.End()
 		.Add(textScrollView)
 		.AddGroup(B_HORIZONTAL)
+			.Add(fRatingActiveCheckBox)
 			.AddGlue()
 			.Add(fCancelButton)
 			.Add(fSendButton)
 		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_INSETS)
 	;
 
 	// NOTE: Do not make Send the default button. The user might want
@@ -288,6 +298,14 @@ RatePackageWindow::MessageReceived(BMessage* message)
 		case MSG_LANGUAGE_SELECTED:
 			message->FindString("code", &fCommentLanguage);
 			break;
+			
+		case MSG_RATING_ACTIVE_CHANGED:
+		{
+			int32 value;
+			if (message->FindInt32("be:value", &value) == B_OK)
+				fRatingActive = value == B_CONTROL_ON;
+			break;
+		}
 
 		case MSG_SEND:
 			_SendRating();
@@ -435,6 +453,9 @@ RatePackageWindow::_QueryRatingThread()
 			fRating = (float)rating;
 			fSetRatingView->SetPermanentRating(fRating);
 		}
+		
+		fRatingActiveCheckBox->SetValue(fRatingActive);
+		fRatingActiveCheckBox->Show();
 
 		Unlock();
 	}
