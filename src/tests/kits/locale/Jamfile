@@ -13,7 +13,6 @@ Depends LocaleKitTests
 	catalogTestAddOn
 	collatorSpeed
 	collatorTest
-	localeTest
 	ICUTest
 #	libNumberFormatTests.so
 	localekittest.so
@@ -32,7 +31,6 @@ LocaleTest catalogTest.cpp ;
 LocaleTest collatorSpeed.cpp ;
 LocaleTest collatorTest.cpp ;
 LocaleTest genericNumberFormatTest.cpp ;
-LocaleTest localeTest.cpp ;
 LocaleTest formatTest.cpp ;
 
 Includes [ FGristFiles ICUTest.cpp ] : [ BuildFeatureAttribute icu : headers ] ;
@@ -52,6 +50,7 @@ UnitTestLib localekittest.so :
 	LocaleKitTestAddon.cpp
 
 	CollatorTest.cpp
+	LanguageTest.cpp
 	UnicodeCharTest.cpp
 
 	: be [ TargetLibstdc++ ]

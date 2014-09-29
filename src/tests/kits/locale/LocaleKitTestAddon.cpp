@@ -8,6 +8,7 @@
 #include <TestSuiteAddon.h>
 
 #include "CollatorTest.h"
+#include "LanguageTest.h"
 #include "UnicodeCharTest.h"
 
 
@@ -17,6 +18,7 @@ getTestSuite()
 	BTestSuite* suite = new BTestSuite("LocaleKit");
 
 	CollatorTest::AddTests(*suite);
+	LanguageTest::AddTests(*suite);
 	UnicodeCharTest::AddTests(*suite);
 
 	return suite;
