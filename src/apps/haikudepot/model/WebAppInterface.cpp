@@ -76,24 +76,46 @@ public:
 
 	JsonBuilder& AddItem(const char* item)
 	{
-		if (fInList)
-			fString << ",\"";
-		else
+		return AddItem(item, false);
+	}
+
+	JsonBuilder& AddItem(const char* item, bool nullIfEmpty)
+	{
+		if (item == NULL || (nullIfEmpty && strlen(item) == 0)) {
+			if (fInList)
+				fString << ",null";
+			else
+				fString << "null";
+		} else {
+			if (fInList)
+				fString << ",\"";
+			else
+				fString << '"';
+			// TODO: Escape item
+			fString << item;
 			fString << '"';
-		// TODO: Escape item
-		fString << item;
-		fString << "\"";
+		}
 		fInList = true;
 		return *this;
 	}
 
 	JsonBuilder& AddValue(const char* name, const char* value)
 	{
+		return AddValue(name, value, false);
+	}
+
+	JsonBuilder& AddValue(const char* name, const char* value,
+		bool nullIfEmpty)
+	{
 		_StartName(name);
-		fString << '\"';
-		// TODO: Escape value
-		fString << value;
-		fString << '\"';
+		if (value == NULL || (nullIfEmpty && strlen(value) == 0)) {
+			fString << "null";
+		} else {
+			fString << '"';
+			// TODO: Escape value
+			fString << value;
+			fString << '"';
+		}
 		fInList = true;
 		return *this;
 	}
@@ -391,20 +413,23 @@ WebAppInterface::RetrieveUserRatings(const BString& packageName,
 
 status_t
 WebAppInterface::RetrieveUserRating(const BString& packageName,
-	const BString& architecture, const BString& username,
-	BMessage& message)
+	const BPackageVersion& version, const BString& architecture,
+	const BString& username, BMessage& message)
 {
 	BString jsonString = JsonBuilder()
 		.AddValue("jsonrpc", "2.0")
 		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "searchUserRatings")
+		.AddValue("method", "getUserRatingByUserAndPkgVersion")
 		.AddArray("params")
 			.AddObject()
 				.AddValue("userNickname", username)
 				.AddValue("pkgName", packageName)
 				.AddValue("pkgVersionArchitectureCode", architecture)
-				.AddValue("offset", 0)
-				.AddValue("limit", 1)
+				.AddValue("pkgVersionMajor", version.Major(), true)
+				.AddValue("pkgVersionMinor", version.Minor(), true)
+				.AddValue("pkgVersionMicro", version.Micro(), true)
+				.AddValue("pkgVersionPreRelease", version.PreRelease(), true)
+				.AddValue("pkgVersionRevision", (int)version.Revision())
 			.EndObject()
 		.EndArray()
 	.End();

@@ -8,12 +8,14 @@
 
 #include <Application.h>
 #include <String.h>
+#include <package/PackageVersion.h>
 
 #include "List.h"
 
 
 class BDataIO;
 class BMessage;
+using BPackageKit::BPackageVersion;
 
 typedef List<BString, false>	StringList;
 
@@ -56,6 +58,7 @@ public:
 
 			status_t			RetrieveUserRating(
 									const BString& packageName,
+									const BPackageVersion& version,
 									const BString& architecture,
 									const BString& username,
 									BMessage& message);

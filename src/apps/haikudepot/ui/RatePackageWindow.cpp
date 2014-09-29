@@ -391,27 +391,24 @@ RatePackageWindow::_QueryRatingThread()
 	BMessage info;
 
 	status_t status = interface.RetrieveUserRating(
-		package->Title(), package->Architecture(), username, info);
+		package->Title(), package->Version(), package->Architecture(),
+		username, info);
 
 //	info.PrintToStream();
 
 	BMessage result;
-	BMessage items;
-	BMessage rating;
 	if (status == B_OK && info.FindMessage("result", &result) == B_OK
-		&& result.FindMessage("items", &items) == B_OK
-		&& items.FindMessage("0", &rating) == B_OK
 		&& Lock()) {
 		
-		rating.FindString("code", &fRatingID);
-		rating.FindBool("active", &fRatingActive);
+		result.FindString("code", &fRatingID);
+		result.FindBool("active", &fRatingActive);
 		BString comment;
-		if (rating.FindString("comment", &comment) == B_OK) {
+		if (result.FindString("comment", &comment) == B_OK) {
 			MarkupParser parser;
 			fRatingText = parser.CreateDocumentFromMarkup(comment);
 			fTextView->SetTextDocument(fRatingText);
 		}
-		if (rating.FindString("userRatingStabilityCode",
+		if (result.FindString("userRatingStabilityCode",
 			&fStability) == B_OK) {
 			int32 index = -1;
 			for (int32 i = fStabilityCodes.CountItems() - 1; i >= 0; i--) {
@@ -426,16 +423,16 @@ RatePackageWindow::_QueryRatingThread()
 			if (item != NULL)
 				item->SetMarked(true);
 		}
-		if (rating.FindString("naturalLanguageCode",
+		if (result.FindString("naturalLanguageCode",
 			&fCommentLanguage) == B_OK) {
 			BMenuItem* item = fCommentLanguageField->Menu()->ItemAt(
 				fModel.SupportedLanguages().IndexOf(fCommentLanguage));
 			if (item != NULL)
 				item->SetMarked(true);
 		}
-		double ratingValue;
-		if (rating.FindDouble("rating", &ratingValue) == B_OK) {
-			fRating = (float)ratingValue;
+		double rating;
+		if (result.FindDouble("rating", &rating) == B_OK) {
+			fRating = (float)rating;
 			fSetRatingView->SetPermanentRating(fRating);
 		}
 
