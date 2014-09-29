@@ -12,29 +12,6 @@
 int
 main()
 {
-	// Test BCollator class
-
-	BCollator collator;
-	BLocaleRoster::Default()->GetDefaultLocale()->GetCollator(&collator);
-	const char *strings[] = {"gehen", "géhen", "aus", "äUß", "auss", "äUß",
-		"WO", "wÖ", "SO", "so", "açñ", "acn", NULL};
-	const char *strengths[] = {"primary:  ", "secondary:", "tertiary: "};
-	for (int32 i = 0; strings[i]; i += 2) {
-		for (int32 strength = B_COLLATE_PRIMARY; strength < 4; strength++) {
-			BString a, b;
-			collator.GetSortKey(strings[i], &a, strength);
-			collator.GetSortKey(strings[i + 1], &b, strength);
-
-			printf("%s sort keys: \"%s\" -> \"%s\", \"%s\" -> \"%s\"\n",
-				strengths[strength-1], strings[i], a.String(), strings[i+1],
-				b.String());
-			printf("\tcmp = %d (key compare = %d)\n",
-				collator.Compare(strings[i], strings[i + 1], strength),
-				strcmp(a.String(), b.String()));
-		}
-		putchar('\n');
-	}
-
 	// Tests the BLanguage class
 
 	BLanguage language;

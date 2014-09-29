@@ -51,6 +51,7 @@ Addon catalogTestAddOn
 UnitTestLib localekittest.so :
 	LocaleKitTestAddon.cpp
 
+	CollatorTest.cpp
 	UnicodeCharTest.cpp
 
 	: be [ TargetLibstdc++ ]

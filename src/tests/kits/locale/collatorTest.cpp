@@ -6,6 +6,7 @@
 
 #include <Collator.h>
 #include <Locale.h>
+#include <LocaleRoster.h>
 #include <Message.h>
 
 #include <stdio.h>
@@ -126,6 +127,9 @@ main(int argc, char **argv)
 	bool ignorePunctuation = false;
 	char *addon = NULL;
 
+	BCollator defaultCollator;
+	BLocaleRoster::Default()->GetDefaultLocale()->GetCollator(&defaultCollator);
+
 	while ((++argv)[0]) {
 		if (argv[0][0] == '-' && argv[0][1] != '-') {
 			char *arg = argv[0] + 1;
@@ -155,13 +159,12 @@ main(int argc, char **argv)
 
 	// load the collator add-on if necessary
 
-	if (addon != NULL) {
+	if (addon != NULL)
 		gCollator = new BCollator(addon, strength, true);
-	}
 
 	if (gCollator == NULL) {
 		printf("--------- Use standard collator! -----------\n");
-		gCollator = be_locale->Collator();
+		gCollator = &defaultCollator;
 	}
 
 	printf("test archiving/unarchiving collator\n");
@@ -176,7 +179,7 @@ main(int argc, char **argv)
 			fprintf(stderr, "Unarchiving failed!\n");
 
 			delete unarchived;
-			gCollator = be_locale->Collator();
+			gCollator = &defaultCollator;
 		}
 	}
 
