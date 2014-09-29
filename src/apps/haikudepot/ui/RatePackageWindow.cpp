@@ -208,9 +208,9 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	fStabilityCodes.Add(StabilityRating(
 		B_TRANSLATE("Not specified"), "unspecified"));
 	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Mostly stable"), "mostlystable"));
-	fStabilityCodes.Add(StabilityRating(
 		B_TRANSLATE("Stable"), "stable"));
+	fStabilityCodes.Add(StabilityRating(
+		B_TRANSLATE("Mostly stable"), "mostlystable"));
 	fStabilityCodes.Add(StabilityRating(
 		B_TRANSLATE("Unstable but usable"), "unstablebutusable"));
 	fStabilityCodes.Add(StabilityRating(
