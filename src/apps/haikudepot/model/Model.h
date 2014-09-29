@@ -129,6 +129,10 @@ public:
 									const BString& password,
 									bool storePassword);
 
+			const WebAppInterface& GetWebAppInterface() const
+									{ return fWebAppInterface; }
+
+
 private:
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
 			void				_PopulateAllPackagesThread(bool fromCacheOnly);
