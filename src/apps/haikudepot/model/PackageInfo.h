@@ -9,7 +9,7 @@
 #include <set>
 
 #include <Referenceable.h>
-#include <String.h>
+#include <package/PackageVersion.h>
 
 #include "List.h"
 #include "PackageInfoListener.h"
@@ -229,12 +229,15 @@ enum PackageState {
 };
 
 
+using BPackageKit::BPackageVersion;
+
+
 class PackageInfo : public BReferenceable {
 public:
 								PackageInfo();
 								PackageInfo(
 									const BString& title,
-									const BString& version,
+									const BPackageVersion& version,
 									const PublisherInfo& publisher,
 									const BString& shortDescription,
 									const BString& fullDescription,
@@ -248,7 +251,7 @@ public:
 
 			const BString&		Title() const
 									{ return fTitle; }
-			const BString&		Version() const
+			const BPackageVersion& Version() const
 									{ return fVersion; }
 			void				SetShortDescription(const BString& description);
 			const BString&		ShortDescription() const
@@ -323,7 +326,7 @@ private:
 private:
 			BitmapRef			fIcon;
 			BString				fTitle;
-			BString				fVersion;
+			BPackageVersion		fVersion;
 			PublisherInfo		fPublisher;
 			BString				fShortDescription;
 			BString				fFullDescription;

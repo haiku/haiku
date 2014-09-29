@@ -11,6 +11,7 @@
 #include <package/PackageFlags.h>
 
 
+
 // #pragma mark - UserInfo
 
 
@@ -466,7 +467,7 @@ PackageInfo::PackageInfo()
 
 
 PackageInfo::PackageInfo(const BString& title,
-		const BString& version, const PublisherInfo& publisher,
+		const BPackageVersion& version, const PublisherInfo& publisher,
 		const BString& shortDescription, const BString& fullDescription,
 		int32 flags, const char* architecture)
 	:

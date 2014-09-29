@@ -641,7 +641,7 @@ MainWindow::_RefreshPackageList()
 
 			modelInfo.SetTo(new(std::nothrow) PackageInfo(
 					repoPackageInfo.Name(),
-					repoPackageInfo.Version().ToString(),
+					repoPackageInfo.Version(),
 					PublisherInfo(BitmapRef(), publisherName,
 					"", publisherURL), repoPackageInfo.Summary(),
 					repoPackageInfo.Description(),

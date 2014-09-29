@@ -514,7 +514,7 @@ public:
 		fPublisherView->SetText(publisher);
 
 		BString version = B_TRANSLATE("%Version%");
-		version.ReplaceAll("%Version%", package.Version());
+		version.ReplaceAll("%Version%", package.Version().ToString());
 		fVersionInfo->SetText(version);
 
 		RatingSummary ratingSummary = package.CalculateRatingSummary();
