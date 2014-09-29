@@ -63,6 +63,23 @@ public:
 									const BString& username,
 									BMessage& message);
 
+			status_t			CreateUserRating(
+									const BString& packageName,
+									const BString& architecture,
+									const BString& languageCode,
+									const BString& comment,
+									const BString& stability,
+									int rating,
+									BMessage& message);
+
+			status_t			UpdateUserRating(
+									const BString& ratingID,
+									const BString& languageCode,
+									const BString& comment,
+									const BString& stability,
+									int rating, bool active,
+									BMessage& message);
+
 			status_t			RetrieveScreenshot(
 									const BString& code,
 									int32 width, int32 height,

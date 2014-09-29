@@ -439,6 +439,59 @@ WebAppInterface::RetrieveUserRating(const BString& packageName,
 
 
 status_t
+WebAppInterface::CreateUserRating(const BString& packageName,
+	const BString& architecture, const BString& languageCode,
+	const BString& comment, const BString& stability, int rating,
+	BMessage& message)
+{
+	BString jsonString = JsonBuilder()
+		.AddValue("jsonrpc", "2.0")
+		.AddValue("id", ++fRequestIndex)
+		.AddValue("method", "createUserRating")
+		.AddArray("params")
+			.AddObject()
+				.AddValue("pkgName", packageName)
+				.AddValue("pkgVersionArchitectureCode", architecture)
+				.AddValue("pkgVersionType", "LATEST")
+				.AddValue("userNickname", fUsername)
+				.AddValue("rating", rating)
+				.AddValue("userRatingStabilityCode", stability)
+				.AddValue("comment", comment)
+				.AddValue("naturalLanguageCode", languageCode)
+			.EndObject()
+		.EndArray()
+	.End();
+
+	return _SendJsonRequest("userrating", jsonString, true, message);
+}
+
+
+status_t
+WebAppInterface::UpdateUserRating(const BString& ratingID,
+	const BString& languageCode, const BString& comment,
+	const BString& stability, int rating, bool active, BMessage& message)
+{
+	BString jsonString = JsonBuilder()
+		.AddValue("jsonrpc", "2.0")
+		.AddValue("id", ++fRequestIndex)
+		.AddValue("method", "updateUserRating")
+		.AddArray("params")
+			.AddObject()
+				.AddValue("code", ratingID)
+				.AddValue("rating", rating)
+				.AddValue("userRatingStabilityCode", stability)
+				.AddValue("comment", comment)
+				.AddValue("naturalLanguageCode", languageCode)
+				.AddValue("active", active)
+			.EndObject()
+		.EndArray()
+	.End();
+
+	return _SendJsonRequest("userrating", jsonString, true, message);
+}
+
+
+status_t
 WebAppInterface::RetrieveScreenshot(const BString& code,
 	int32 width, int32 height, BDataIO* stream)
 {
