@@ -158,7 +158,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 			.Add(fCancelButton)
 			.Add(fSendButton)
 		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_INSETS)
 	;
 
 	SetDefaultButton(fSendButton);
