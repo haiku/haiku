@@ -514,7 +514,7 @@ UserLoginWindow::_CreateAccountThread()
 				} else if (message == "validationerror") {
 					_CollectValidationFailures(result, error);
 				} else {
-					error << B_TRANSLATE("The web service responded with: ");
+					error << B_TRANSLATE(" It responded with: ");
 					error << message;
 				}
 			}
