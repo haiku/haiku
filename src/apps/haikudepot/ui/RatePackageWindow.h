@@ -38,6 +38,9 @@ private:
 	static	int32				_QueryRatingThreadEntry(void* data);
 			void				_QueryRatingThread();
 
+	static	int32				_SendRatingThreadEntry(void* data);
+			void				_SendRatingThread();
+
 private:
 			Model&				fModel;
 			TextDocumentRef		fRatingText;

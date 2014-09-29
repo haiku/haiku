@@ -344,15 +344,10 @@ RatePackageWindow::SetPackage(const PackageInfoRef& package)
 void
 RatePackageWindow::_SendRating()
 {
-	// TODO: Implement...
-	BAlert* alert = new BAlert(B_TRANSLATE("Not implemented"),
-		B_TRANSLATE("Sorry, while the web application would already support "
-		"storing your rating, HaikuDepot was not yet updated to use "
-		"this functionality."),
-		B_TRANSLATE("Thanks for telling me after I typed all this!"));
-	alert->Go(NULL);
-
-	PostMessage(B_QUIT_REQUESTED);
+	thread_id thread = spawn_thread(&_SendRatingThreadEntry,
+		"Send rating", B_NORMAL_PRIORITY, this);
+	if (thread >= 0)
+		_SetWorkerThread(thread);
 }
 
 
@@ -470,3 +465,96 @@ RatePackageWindow::_QueryRatingThread()
 }
 
 
+int32
+RatePackageWindow::_SendRatingThreadEntry(void* data)
+{
+	RatePackageWindow* window = reinterpret_cast<RatePackageWindow*>(data);
+	window->_SendRatingThread();
+	return 0;
+}
+
+
+void
+RatePackageWindow::_SendRatingThread()
+{
+	if (!Lock())
+		return;
+
+	BString package = fPackage->Title();
+	BString architecture = fPackage->Architecture();
+	int rating = (int)fRating;
+	BString stability = fStability;
+	BString comment = fRatingText->Text();
+	BString languageCode = fCommentLanguage;
+	BString ratingID = fRatingID;
+	bool active = fRatingActive;
+
+	WebAppInterface interface = fModel.GetWebAppInterface();
+
+	Unlock();
+
+	status_t status;
+	BMessage info;
+	if (ratingID.Length() > 0) {
+		status = interface.UpdateUserRating(ratingID,
+		languageCode, comment, stability, rating, active, info);
+	} else {
+		status = interface.CreateUserRating(package, architecture,
+		languageCode, comment, stability, rating, info);
+	}
+
+	info.PrintToStream();
+
+	BString error = B_TRANSLATE(
+		"There was a puzzling response from the web service.");
+
+	BMessage result;
+	if (status == B_OK) {
+		if (info.FindMessage("result", &result) == B_OK) {
+			error = "";
+		} else if (info.FindMessage("error", &result) == B_OK) {
+			result.PrintToStream();
+			BString message;
+			if (result.FindString("message", &message) == B_OK) {
+				error << B_TRANSLATE(" It responded with: ");
+				error << message;
+			}
+		}
+	} else {
+		error = B_TRANSLATE(
+			"It was not possible to contact the web service.");
+	}
+	
+	if (!error.IsEmpty()) {
+		BString failedTitle;
+		if (ratingID.Length() > 0)
+			failedTitle = B_TRANSLATE("Failed to update rating");
+		else
+			failedTitle = B_TRANSLATE("Failed to rate package");
+
+		BAlert* alert = new(std::nothrow) BAlert(
+			failedTitle,
+			error,
+			B_TRANSLATE("Close"));
+
+		if (alert != NULL)
+			alert->Go();
+
+		fprintf(stderr,
+			B_TRANSLATE("Failed to create account: %s\n"), error.String());
+
+		_SetWorkerThread(-1);
+	} else {
+		_SetWorkerThread(-1);
+		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
+
+		BAlert* alert = new(std::nothrow) BAlert(
+			B_TRANSLATE("Success"),
+			B_TRANSLATE("Your rating was uploaded successfully. "
+				"You can update it at any time."),
+			B_TRANSLATE("Close"));
+
+		if (alert != NULL)
+			alert->Go();
+	}
+}
