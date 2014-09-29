@@ -77,7 +77,7 @@ add_languages_to_menu(const StringList& languages, BMenu* menu)
 
 UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	:
-	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Log in"),
+	BWindow(frame, B_TRANSLATE("Log in"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),

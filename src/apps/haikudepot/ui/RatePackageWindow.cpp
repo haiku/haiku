@@ -172,7 +172,7 @@ add_languages_to_menu(const StringList& languages, BMenu* menu)
 RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	Model& model)
 	:
-	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Your rating"),
+	BWindow(frame, B_TRANSLATE("Rate package"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fModel(model),
@@ -327,6 +327,10 @@ RatePackageWindow::SetPackage(const PackageInfoRef& package)
 
 	fPackage = package;
 
+	BString windowTitle(B_TRANSLATE("Rate %Package%"));
+	windowTitle.ReplaceAll("%Package%", package->Title());
+	SetTitle(windowTitle);
+
 	// See if the user already made a rating for this package,
 	// pre-fill the UI with that rating. (When sending the rating, the
 	// old one will be replaced.)
@@ -456,6 +460,8 @@ RatePackageWindow::_QueryRatingThread()
 		
 		fRatingActiveCheckBox->SetValue(fRatingActive);
 		fRatingActiveCheckBox->Show();
+
+		fSendButton->SetLabel(B_TRANSLATE("Update"));
 
 		Unlock();
 	}
