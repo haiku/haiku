@@ -208,15 +208,15 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	fStabilityCodes.Add(StabilityRating(
 		B_TRANSLATE("Not specified"), "unspecified"));
 	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Mostly stable"), "mostly_stable"));
+		B_TRANSLATE("Mostly stable"), "mostlystable"));
 	fStabilityCodes.Add(StabilityRating(
 		B_TRANSLATE("Stable"), "stable"));
 	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Not stable, but usable"), "usable"));
+		B_TRANSLATE("Unstable but usable"), "unstablebutusable"));
 	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Unstable"), "unstable"));
+		B_TRANSLATE("Very unstable"), "veryunstable"));
 	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Does not start"), "does_not_start"));
+		B_TRANSLATE("Does not start"), "nostart"));
 	
 	add_stabilities_to_menu(fStabilityCodes, stabilityMenu);
 	stabilityMenu->SetTargetForItems(this);
