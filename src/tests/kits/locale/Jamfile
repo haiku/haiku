@@ -15,7 +15,8 @@ Depends LocaleKitTests
 	collatorTest
 	localeTest
 	ICUTest
-	libNumberFormatTests.so
+#	libNumberFormatTests.so
+	localekittest.so
 	;
 
 rule LocaleTest
@@ -45,6 +46,14 @@ Application ICUTest :
 Addon catalogTestAddOn
 	: catalogTestAddOn.cpp
 	: be
+	;
+
+UnitTestLib localekittest.so :
+	LocaleKitTestAddon.cpp
+
+	UnicodeCharTest.cpp
+
+	: be [ TargetLibstdc++ ]
 	;
 
 # SubInclude HAIKU_TOP src tests kits locale number_format ;

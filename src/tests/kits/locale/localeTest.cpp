@@ -9,63 +9,9 @@
 #include <stdio.h>
 
 
-void
-unicode_char_to_string(uint32 c, char *text)
-{
-	BUnicodeChar::ToUTF8(c, &text);
-	text[0] = '\0';
-}
-
-
 int
 main()
 {
-	// Test BUnicodeChar class
-
-	char text[16];
-
-	for (int32 i = 30; i < 70; i++) {
-		unicode_char_to_string(i, text);
-		printf("%s: alpha == %d, alNum == %d, lower == %d, upper == %d, "
-			"defined == %d, charType == %d\n", text,
-			BUnicodeChar::IsAlpha(i), BUnicodeChar::IsAlNum(i),
-			BUnicodeChar::IsLower(i), BUnicodeChar::IsUpper(i),
-			BUnicodeChar::IsDefined(i), BUnicodeChar::Type(i));
-	}
-
-	uint32 chars[] = {(uint8)'\xe4', (uint8)'\xd6', (uint8)'\xdf',
-		(uint8)'\xe8', (uint8)'\xe1', (uint8)'\xe9', 0};
-	for (int32 j = 0, i; (i = chars[j]) != 0; j++) {
-		unicode_char_to_string(i, text);
-		printf("%s: alpha == %d, alNum == %d, lower == %d, upper == %d, "
-			"defined == %d, charType == %d\n", text,
-			BUnicodeChar::IsAlpha(i), BUnicodeChar::IsAlNum(i),
-			BUnicodeChar::IsLower(i), BUnicodeChar::IsUpper(i),
-			BUnicodeChar::IsDefined(i), BUnicodeChar::Type(i));
-
-		unicode_char_to_string(BUnicodeChar::ToUpper(i), text);
-		printf("toUpper == %s, ", text);
-		unicode_char_to_string(BUnicodeChar::ToLower(i), text);
-		printf("toLower == %s\n", text);
-	}
-
-	const char *utf8chars[] = {"à", "ß", "ñ", "é", "ç", "ä", NULL};
-	for (int32 j = 0; utf8chars[j] != 0; j++) {
-		int32 i = BUnicodeChar::FromUTF8(utf8chars[j]);
-		unicode_char_to_string(i, text);
-		printf("%s: alpha == %d, alNum == %d, lower == %d, upper == %d, "
-			"defined == %d, charType == %d\n", text,
-			BUnicodeChar::IsAlpha(i), BUnicodeChar::IsAlNum(i),
-			BUnicodeChar::IsLower(i), BUnicodeChar::IsUpper(i),
-			BUnicodeChar::IsDefined(i), BUnicodeChar::Type(i));
-
-		unicode_char_to_string(BUnicodeChar::ToUpper(i), text);
-		printf("toUpper == %s, ", text);
-		unicode_char_to_string(BUnicodeChar::ToLower(i), text);
-		printf("toLower == %s\n", text);
-	}
-	printf("%c: digitValue == %ld\n", '8', BUnicodeChar::DigitValue('8'));
-
 	// Test BCollator class
 
 	BCollator collator;
