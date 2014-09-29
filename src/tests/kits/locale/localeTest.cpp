@@ -1,9 +1,10 @@
 
-#include <UnicodeChar.h>
 #include <Collator.h>
 #include <Language.h>
 #include <Locale.h>
+#include <LocaleRoster.h>
 #include <String.h>
+#include <UnicodeChar.h>
 
 #include <stdio.h>
 
@@ -46,7 +47,8 @@ main()
 	}
 
 	const char *utf8chars[] = {"à", "ß", "ñ", "é", "ç", "ä", NULL};
-	for (int32 j = 0, i; (i = BUnicodeChar::FromUTF8(utf8chars[j])) != 0; j++) {
+	for (int32 j = 0; utf8chars[j] != 0; j++) {
+		int32 i = BUnicodeChar::FromUTF8(utf8chars[j]);
 		unicode_char_to_string(i, text);
 		printf("%s: alpha == %d, alNum == %d, lower == %d, upper == %d, defined == %d, charType == %d\n",
 			text,
@@ -62,20 +64,21 @@ main()
 
 	// Test BCollator class
 
-	BCollator *collator = be_locale->Collator();
+	BCollator collator;
+	BLocaleRoster::Default()->GetDefaultLocale()->GetCollator(&collator);
 	const char *strings[] = {"gehen", "géhen", "aus", "äUß", "auss", "äUß", "WO",
 		"wÖ", "SO", "so", "açñ", "acn", NULL};
 	const char *strengths[] = {"primary:  ", "secondary:", "tertiary: "};
 	for (int32 i = 0; strings[i]; i += 2) {
 		for (int32 strength = B_COLLATE_PRIMARY; strength < 4; strength++) {
 			BString a, b;
-			collator->GetSortKey(strings[i], &a, strength);
-			collator->GetSortKey(strings[i + 1], &b, strength);
+			collator.GetSortKey(strings[i], &a, strength);
+			collator.GetSortKey(strings[i + 1], &b, strength);
 
 			printf("%s sort keys: \"%s\" -> \"%s\", \"%s\" -> \"%s\"\n",
 				strengths[strength-1], strings[i], a.String(), strings[i+1], b.String());
 			printf("\tcmp = %d (key compare = %d)\n",
-				collator->Compare(strings[i], strings[i + 1], -1, strength),
+				collator.Compare(strings[i], strings[i + 1], strength),
 				strcmp(a.String(), b.String()));
 		}
 		putchar('\n');
@@ -83,12 +86,15 @@ main()
 
 	// Tests the BLanguage class
 
-	BLanguage *language = be_locale->Language();
-	printf("Language name = \"%s\", code = \"%s\", family = \"%s\"\n", language->Name(),
-		language->Code(), language->Family());
+	BLanguage language;
+	BLocaleRoster::Default()->GetDefaultLocale()->GetLanguage(&language);
+	BString name;
+	language.GetName(name);
+	printf("Language name = \"%s\", code = \"%s\"\n", name.String(),
+		language.Code());
 	printf("\tdirection = %s\n",
-		language->Direction() == B_LEFT_TO_RIGHT ? "left-to-right" :
-		language->Direction() == B_RIGHT_TO_LEFT ? "right-to-left" :
+		language.Direction() == B_LEFT_TO_RIGHT ? "left-to-right" :
+		language.Direction() == B_RIGHT_TO_LEFT ? "right-to-left" :
 		"top-to-bottom");
 
 	//for (int32 i = 0; i < 200; i++) {
@@ -98,7 +104,7 @@ main()
 	//}
 
 	printf("First month = %s (%s)\n",
-		language->GetString(B_MON_1),
-		language->GetString(B_AB_MON_1));
+		language.GetString(B_MON_1),
+		language.GetString(B_AB_MON_1));
 }
 
