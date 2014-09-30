@@ -51,7 +51,7 @@ TimeZoneListView::GetToolTipAt(BPoint point, BToolTip** _tip)
 		&item->TimeZone());
 
 	BString dateInTimeZone;
-	BDateFormat::Default()->Format(&dateInTimeZone, now, B_SHORT_DATE_FORMAT,
+	BDateFormat::Default()->Format(dateInTimeZone, now, B_SHORT_DATE_FORMAT,
 		&item->TimeZone());
 
 	BString toolTip = item->Text();

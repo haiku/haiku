@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,6 @@
 #include <vector>
 
 
-// default constructor
 BDateFormat::BDateFormat(const BLanguage* const language,
 	const BFormattingConventions* const conventions)
 {
@@ -39,12 +38,13 @@ BDateFormat::BDateFormat(const BLanguage* const language,
 		BLocale::Default()->GetLanguage(&fLanguage);
 }
 
-// copy constructor
+
 BDateFormat::BDateFormat(const BDateFormat &other)
 	: fConventions(other.fConventions),
 	fLanguage(other.fLanguage)
 {
 }
+
 
 /*static*/ const BDateFormat*
 BDateFormat::Default()
@@ -53,15 +53,14 @@ BDateFormat::Default()
 }
 
 
-// destructor
 BDateFormat::~BDateFormat()
 {
 }
 
-// Format
+
 ssize_t
-BDateFormat::Format(char* string, size_t maxSize, time_t time,
-	BDateFormatStyle style) const
+BDateFormat::Format(char* string, const size_t maxSize, const time_t time,
+	const BDateFormatStyle style) const
 {
 	BAutolock lock(fLock);
 	if (!lock.IsLocked())
@@ -87,8 +86,8 @@ BDateFormat::Format(char* string, size_t maxSize, time_t time,
 
 
 status_t
-BDateFormat::Format(BString *string, time_t time, BDateFormatStyle style,
-	const BTimeZone* timeZone) const
+BDateFormat::Format(BString& string, const time_t time,
+	const BDateFormatStyle style, const BTimeZone* timeZone) const
 {
 	BAutolock lock(fLock);
 	if (!lock.IsLocked())
@@ -111,8 +110,8 @@ BDateFormat::Format(BString *string, time_t time, BDateFormatStyle style,
 	UnicodeString icuString;
 	dateFormatter->format((UDate)time * 1000, icuString);
 
-	string->Truncate(0);
-	BStringByteSink stringConverter(string);
+	string.Truncate(0);
+	BStringByteSink stringConverter(&string);
 	icuString.toUTF8(stringConverter);
 
 	return B_OK;
@@ -120,8 +119,55 @@ BDateFormat::Format(BString *string, time_t time, BDateFormatStyle style,
 
 
 status_t
-BDateFormat::Format(BString* string, int*& fieldPositions, int& fieldCount,
-	time_t time, BDateFormatStyle style) const
+BDateFormat::Format(BString& string, const BDate& time,
+	const BDateFormatStyle style, const BTimeZone* timeZone) const
+{
+	if (!time.IsValid())
+		return B_BAD_DATA;
+
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	BString format;
+	fConventions.GetDateFormat(style, format);
+	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(format));
+	if (dateFormatter.Get() == NULL)
+		return B_NO_MEMORY;
+
+	UErrorCode err = U_ZERO_ERROR;
+	ObjectDeleter<Calendar> calendar(Calendar::createInstance(err));
+	if (!U_SUCCESS(err))
+		return B_NO_MEMORY;
+
+	if (timeZone != NULL) {
+		ObjectDeleter<TimeZone> icuTimeZone(
+			TimeZone::createTimeZone(timeZone->ID().String()));
+		if (icuTimeZone.Get() == NULL)
+			return B_NO_MEMORY;
+		dateFormatter->setTimeZone(*icuTimeZone.Get());
+		calendar->setTimeZone(*icuTimeZone.Get());
+	}
+
+	// Note ICU calendar uses months in range 0..11, while we use the more
+	// natural 1..12 in BDate.
+	calendar->set(time.Year(), time.Month() - 1, time.Day());
+
+	UnicodeString icuString;
+	FieldPosition p;
+	dateFormatter->format(*calendar.Get(), icuString, p);
+
+	string.Truncate(0);
+	BStringByteSink stringConverter(&string);
+	icuString.toUTF8(stringConverter);
+
+	return B_OK;
+}
+
+
+status_t
+BDateFormat::Format(BString& string, int*& fieldPositions, int& fieldCount,
+	const time_t time, const BDateFormatStyle style) const
 {
 	BAutolock lock(fLock);
 	if (!lock.IsLocked())
@@ -157,8 +203,8 @@ BDateFormat::Format(BString* string, int*& fieldPositions, int& fieldCount,
 	for (int i = 0 ; i < fieldCount ; i++ )
 		fieldPositions[i] = fieldPosStorage[i];
 
-	string->Truncate(0);
-	BStringByteSink stringConverter(string);
+	string.Truncate(0);
+	BStringByteSink stringConverter(&string);
 
 	icuString.toUTF8(stringConverter);
 

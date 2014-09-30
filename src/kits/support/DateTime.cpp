@@ -202,7 +202,6 @@ BTime::SetTime(int32 hour, int32 minute, int32 second, int32 microsecond)
 }
 
 
-
 /*!
 	Adds \c hours to the current time. If the passed value is negative it
 	will become earlier. Note: The time will wrap if it passes midnight.

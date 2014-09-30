@@ -6,6 +6,7 @@
 #define _B_DATE_FORMAT_H_
 
 
+#include <DateTime.h>
 #include <DateTimeFormat.h>
 #include <FormattingConventions.h>
 #include <Language.h>
@@ -38,14 +39,19 @@ public:
 
 								// formatting
 
-			ssize_t				Format(char* string, size_t maxSize,
-									time_t time, BDateFormatStyle style) const;
-			status_t			Format(BString* string, time_t time,
-									BDateFormatStyle style,
+			ssize_t				Format(char* string, const size_t maxSize,
+									const time_t time,
+									const BDateFormatStyle style) const;
+			status_t			Format(BString& string, const time_t time,
+									const BDateFormatStyle style,
 									const BTimeZone* timeZone = NULL) const;
-			status_t			Format(BString* string,
+			status_t			Format(BString& string, const BDate& time,
+									const BDateFormatStyle style,
+									const BTimeZone* timeZone = NULL) const;
+			status_t			Format(BString& string,
 									int*& fieldPositions, int& fieldCount,
-									time_t time, BDateFormatStyle style) const;
+									const time_t time,
+									const BDateFormatStyle style) const;
 
 			status_t			GetFields(BDateElement*& fields,
 									int& fieldCount, BDateFormatStyle style

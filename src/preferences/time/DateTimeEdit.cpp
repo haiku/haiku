@@ -623,7 +623,7 @@ TDateEdit::_UpdateFields()
 		free(fFieldPositions);
 		fFieldPositions = NULL;
 	}
-	BDateFormat::Default()->Format(&fText, fFieldPositions, fFieldPosCount,
+	BDateFormat::Default()->Format(fText, fFieldPositions, fFieldPosCount,
 		time, B_SHORT_DATE_FORMAT);
 
 	if (fFields != NULL) {

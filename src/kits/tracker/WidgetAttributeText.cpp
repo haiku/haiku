@@ -214,7 +214,7 @@ TruncTimeBase(BString* outString, int64 value, const View* view, float width)
 	}
 
 	if (resultWidth > width
-		&& BDateFormat::Default()->Format(&date, timeValue,
+		&& BDateFormat::Default()->Format(date, timeValue,
 			B_SHORT_DATE_FORMAT) == B_OK) {
 		resultWidth = view->StringWidth(date.String(), date.Length());
 	}

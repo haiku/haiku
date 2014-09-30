@@ -361,16 +361,16 @@ FormatSettingsView::_UpdateExamples()
 	time_t timeValue = (time_t)time(NULL);
 	BString result;
 
-	BDateFormat::Default()->Format(&result, timeValue, B_FULL_DATE_FORMAT);
+	BDateFormat::Default()->Format(result, timeValue, B_FULL_DATE_FORMAT);
 	fFullDateExampleView->SetText(result);
 
-	BDateFormat::Default()->Format(&result, timeValue, B_LONG_DATE_FORMAT);
+	BDateFormat::Default()->Format(result, timeValue, B_LONG_DATE_FORMAT);
 	fLongDateExampleView->SetText(result);
 
-	BDateFormat::Default()->Format(&result, timeValue, B_MEDIUM_DATE_FORMAT);
+	BDateFormat::Default()->Format(result, timeValue, B_MEDIUM_DATE_FORMAT);
 	fMediumDateExampleView->SetText(result);
 
-	BDateFormat::Default()->Format(&result, timeValue, B_SHORT_DATE_FORMAT);
+	BDateFormat::Default()->Format(result, timeValue, B_SHORT_DATE_FORMAT);
 	fShortDateExampleView->SetText(result);
 
 	BLocale::Default()->FormatTime(&result, timeValue, B_FULL_TIME_FORMAT);
