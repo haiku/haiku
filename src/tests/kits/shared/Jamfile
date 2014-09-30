@@ -8,6 +8,7 @@ UsePrivateHeaders shared ;
 UnitTestLib libsharedtest.so :
 	SharedTestAddon.cpp
 
+	CalendarViewTest.cpp
 	NaturalCompareTest.cpp
 
 	: be libshared.a [ TargetLibstdc++ ] [ TargetLibsupc++ ]
