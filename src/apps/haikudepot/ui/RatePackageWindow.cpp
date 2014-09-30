@@ -554,7 +554,8 @@ RatePackageWindow::_SendRatingThread()
 			message = B_TRANSLATE("Your rating was updated successfully.");
 		} else {
 			message = B_TRANSLATE("Your rating was uploaded successfully. "
-				"You can update it at any time.");
+				"You can update or remove it at any time by rating the "
+				"package again.");
 		}
 
 		BAlert* alert = new(std::nothrow) BAlert(
