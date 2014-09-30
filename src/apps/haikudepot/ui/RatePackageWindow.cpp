@@ -541,17 +541,25 @@ RatePackageWindow::_SendRatingThread()
 			alert->Go();
 
 		fprintf(stderr,
-			B_TRANSLATE("Failed to create account: %s\n"), error.String());
+			B_TRANSLATE("Failed to create or update rating: %s\n"),
+			error.String());
 
 		_SetWorkerThread(-1);
 	} else {
 		_SetWorkerThread(-1);
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 
+		BString message;
+		if (ratingID.Length() > 0) {
+			message = B_TRANSLATE("Your rating was updated successfully.");
+		} else {
+			message = B_TRANSLATE("Your rating was uploaded successfully. "
+				"You can update it at any time.");
+		}
+
 		BAlert* alert = new(std::nothrow) BAlert(
 			B_TRANSLATE("Success"),
-			B_TRANSLATE("Your rating was uploaded successfully. "
-				"You can update it at any time."),
+			message,
 			B_TRANSLATE("Close"));
 
 		if (alert != NULL)
