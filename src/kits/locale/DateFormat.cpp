@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Oliver Tappe <zooey@hirschkaefer.de>
+ *		Adrien Desutugues <pulkomandy@pulkomandy.tk>
  */
 
 #include <DateFormat.h>
@@ -55,6 +56,44 @@ BDateFormat::Default()
 
 BDateFormat::~BDateFormat()
 {
+}
+
+
+void
+BDateFormat::SetFormattingConventions(const BFormattingConventions& conventions)
+{
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return;
+
+	fConventions = conventions;
+}
+
+
+void
+BDateFormat::SetLanguage(const BLanguage& newLanguage)
+{
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return;
+
+	fLanguage = newLanguage;
+}
+
+
+status_t
+BDateFormat::GetDateFormat(BDateFormatStyle style,
+	BString& outFormat) const
+{
+	return fConventions.GetDateFormat(style, outFormat);
+}
+
+
+void
+BDateFormat::SetDateFormat(BDateFormatStyle style,
+	const BString& format)
+{
+	fConventions.SetExplicitDateFormat(style, format);
 }
 
 

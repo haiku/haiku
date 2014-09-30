@@ -37,6 +37,14 @@ public:
 
 	static	const BDateFormat*	Default();
 
+			void				SetLanguage(const BLanguage& newLanguage);
+			void				SetFormattingConventions(
+									const BFormattingConventions& conventions);
+			status_t			GetDateFormat(BDateFormatStyle style,
+									BString& outFormat) const;
+			void				SetDateFormat(BDateFormatStyle style,
+									const BString& format);
+
 								// formatting
 
 			ssize_t				Format(char* string, const size_t maxSize,
