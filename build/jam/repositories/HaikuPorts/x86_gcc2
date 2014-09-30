@@ -29,6 +29,7 @@ RemotePackageRepository HaikuPorts
 	asciidoc-8.6.8-2
 	autoconf-2.69-5
 	automake-1.13.1-4
+	bash-4.3.27-2
 	beae-1.2-2
 	beam-1.2alpha-1
 	becjk-1.0.1-1
@@ -577,6 +578,7 @@ RemotePackageRepository HaikuPorts
 	automake
 	automoc_x86
 	avrdude_x86
+	bash
 	beae
 	beam
 	becjk
