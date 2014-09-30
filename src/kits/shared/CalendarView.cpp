@@ -530,6 +530,57 @@ BCalendarView::Month() const
 }
 
 
+bool
+BCalendarView::SetDay(int32 day)
+{
+	BDate date = Date();
+	date.SetDay(day);
+	if (!date.IsValid())
+		return false;
+	SetDate(date);
+	return true;
+}
+
+
+bool
+BCalendarView::SetMonth(int32 month)
+{
+	if (month < 1 || month > 12)
+		return false;
+	BDate date = Date();
+	int32 oldDay = date.Day();
+
+	date.SetMonth(month);
+	date.SetDay(1); // make sure the date is valid
+
+	// We must make sure that the day in month fits inside the new month.
+	if (oldDay > date.DaysInMonth())
+		date.SetDay(date.DaysInMonth());
+	else
+		date.SetDay(oldDay);
+	SetDate(date);
+	return true;
+}
+
+
+bool
+BCalendarView::SetYear(int32 year)
+{
+	BDate date = Date();
+
+	// This can fail when going from 29 feb. on a leap year to a non-leap year.
+	if (date.Month() == 2 && date.Day() == 29 && !date.IsLeapYear(year))
+		date.SetDay(28);
+
+	// TODO we should also handle the "hole" at the switch between Julian and
+	// Gregorian calendars, which will result in an invalid date.
+
+	date.SetYear(year);
+	SetDate(date);
+	return true;
+}
+
+
 BDate
 BCalendarView::Date() const
 {

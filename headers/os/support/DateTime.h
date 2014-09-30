@@ -119,6 +119,10 @@ public:
 			int32				Month() const;
 			int32				Difference(const BDate& date) const;
 
+			void				SetDay(int32 day);
+			void				SetMonth(int32 month);
+			void				SetYear(int32 year);
+
 			int32				DayOfWeek() const;
 			int32				DayOfYear() const;
 

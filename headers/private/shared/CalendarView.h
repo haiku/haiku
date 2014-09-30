@@ -79,8 +79,12 @@ public:
 	virtual	BSize				PreferredSize();
 
 			int32				Day() const;
-			int32				Year() const;
 			int32				Month() const;
+			int32				Year() const;
+
+			bool				SetDay(int32 day);
+			bool				SetMonth(int32 month);
+			bool				SetYear(int32 year);
 
 			BDate				Date() const;
 			bool				SetDate(const BDate& date);

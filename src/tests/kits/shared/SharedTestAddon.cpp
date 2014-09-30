@@ -7,6 +7,7 @@
 #include <TestSuite.h>
 #include <TestSuiteAddon.h>
 
+#include "CalendarViewTest.h"
 #include "NaturalCompareTest.h"
 
 
@@ -15,6 +16,7 @@ getTestSuite()
 {
 	BTestSuite* suite = new BTestSuite("Shared");
 
+	CalendarViewTest::AddTests(*suite);
 	NaturalCompareTest::AddTests(*suite);
 
 	return suite;

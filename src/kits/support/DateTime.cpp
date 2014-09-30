@@ -769,6 +769,27 @@ BDate::Difference(const BDate& date) const
 }
 
 
+void
+BDate::SetDay(int32 day)
+{
+	fDay = day;
+}
+
+
+void
+BDate::SetMonth(int32 month)
+{
+	fMonth = month;
+}
+
+
+void
+BDate::SetYear(int32 year)
+{
+	fYear = year;
+}
+
+
 /*!
 	Returns the week number of the date, if the date is invalid it will return
 	B_ERROR. Please note that this function does only work within the Gregorian
