@@ -6,6 +6,7 @@
 #define USER_LOGIN_WINDOW_H
 
 #include <Locker.h>
+#include <Messenger.h>
 #include <Window.h>
 
 #include "PackageInfo.h"
@@ -27,6 +28,10 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 
+			void				SetOnSuccessMessage(
+									const BMessenger& messenger,
+									const BMessage& message);
+
 private:
 			enum Mode {
 				NONE = 0,
@@ -38,6 +43,7 @@ private:
 			void				_Login();
 			void				_CreateAccount();
 			void				_RequestCaptcha();
+			void				_LoginSuccessful(const BString& message);
 
 			void				_SetWorkerThread(thread_id thread);
 
@@ -55,6 +61,9 @@ private:
 									BString& error) const;
 
 private:
+			BMessenger			fOnSuccessTarget;
+			BMessage			fOnSuccessMessage;
+
 			BTabView*			fTabView;
 
 			BTextControl*		fUsernameField;

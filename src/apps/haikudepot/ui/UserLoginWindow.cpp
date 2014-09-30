@@ -234,6 +234,15 @@ UserLoginWindow::MessageReceived(BMessage* message)
 
 
 void
+UserLoginWindow::SetOnSuccessMessage(
+	const BMessenger& messenger, const BMessage& message)
+{
+	fOnSuccessTarget = messenger;
+	fOnSuccessMessage = message;
+}
+
+
+void
 UserLoginWindow::_SetMode(Mode mode)
 {
 	if (fMode == mode)
@@ -309,6 +318,31 @@ UserLoginWindow::_RequestCaptcha()
 		"Captcha requester", B_NORMAL_PRIORITY, this);
 	if (thread >= 0)
 		_SetWorkerThread(thread);
+}
+
+
+void
+UserLoginWindow::_LoginSuccessful(const BString& message)
+{
+	// Clone these fields before the window goes away.
+	// (This method is executd from another thread.)
+	BMessenger onSuccessTarget(fOnSuccessTarget);
+	BMessage onSuccessMessage(fOnSuccessMessage);
+	
+	BMessenger(this).SendMessage(B_QUIT_REQUESTED);
+
+	BAlert* alert = new(std::nothrow) BAlert(
+		B_TRANSLATE("Success"),
+		message,
+		B_TRANSLATE("Close"));
+
+	if (alert != NULL)
+		alert->Go();
+
+	// Send the success message after the alert has been closed,
+	// otherwise more windows will popup alongside the alert.
+	if (onSuccessTarget.IsValid() && onSuccessMessage.what != 0)
+		onSuccessTarget.SendMessage(&onSuccessMessage);
 }
 
 
@@ -401,15 +435,7 @@ UserLoginWindow::_AuthenticateThread()
 		_SetWorkerThread(-1);
 	} else {
 		_SetWorkerThread(-1);
-		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
-
-		BAlert* alert = new(std::nothrow) BAlert(
-			B_TRANSLATE("Success"),
-			B_TRANSLATE("The authentication was successful."),
-			B_TRANSLATE("Close"));
-
-		if (alert != NULL)
-			alert->Go();
+		_LoginSuccessful(B_TRANSLATE("The authentication was successful."));
 	}
 }
 
@@ -547,16 +573,8 @@ UserLoginWindow::_CreateAccountThread()
 		fModel.SetAuthorization(nickName, passwordClear, true);
 
 		_SetWorkerThread(-1);
-		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
-
-		BAlert* alert = new(std::nothrow) BAlert(
-			B_TRANSLATE("Success"),
-			B_TRANSLATE("Account created successfully. "
-				"You can now rate packages and do other useful things."),
-			B_TRANSLATE("Close"));
-
-		if (alert != NULL)
-			alert->Go();
+		_LoginSuccessful(B_TRANSLATE("Account created successfully. "
+			"You can now rate packages and do other useful things."));
 	}
 }
 

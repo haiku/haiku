@@ -71,8 +71,10 @@ private:
 			void				_NotifyUser(const char* title,
 									const char* message);
 
-			void				_OpenLoginWindow();
+			void				_OpenLoginWindow(
+									const BMessage& onSuccessMessage);
 			void				_UpdateAuthorization();
+			void				_RatePackage();
 
 private:
 			FilterView*			fFilterView;

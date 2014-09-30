@@ -240,7 +240,7 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_LOG_IN:
-			_OpenLoginWindow();
+			_OpenLoginWindow(BMessage());
 			break;
 
 		case MSG_LOG_OUT:
@@ -368,15 +368,8 @@ MainWindow::MessageReceived(BMessage* message)
 		}
 
 		case MSG_RATE_PACKAGE:
-		{
-			// TODO: Allow only one RatePackageWindow
-			// TODO: Mechanism for remembering the window frame
-			RatePackageWindow* window = new RatePackageWindow(this,
-				BRect(0, 0, 500, 400), fModel);
-			window->SetPackage(fPackageInfoView->Package());
-			window->Show();
+			_RatePackage();
 			break;
-		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -896,10 +889,14 @@ MainWindow::_NotifyUser(const char* title, const char* message)
 
 
 void
-MainWindow::_OpenLoginWindow()
+MainWindow::_OpenLoginWindow(const BMessage& onSuccessMessage)
 {
 	UserLoginWindow* window = new UserLoginWindow(this,
 		BRect(0, 0, 500, 400), fModel);
+
+	if (onSuccessMessage.what != 0)
+		window->SetOnSuccessMessage(BMessenger(this), onSuccessMessage);
+
 	window->Show();
 }
 
@@ -910,4 +907,33 @@ MainWindow::_UpdateAuthorization()
 	BString username(fModel.Username());
 	fLogOutItem->SetEnabled(username.Length() > 0);
 	fFilterView->SetUsername(username);
+}
+
+
+void
+MainWindow::_RatePackage()
+{
+	if (fModel.Username().IsEmpty()) {
+		BAlert* alert = new(std::nothrow) BAlert(
+			B_TRANSLATE("Not logged in"),
+			B_TRANSLATE("You need to be logged into an account before you "
+				"can rate packages."),
+			B_TRANSLATE("Cancel"),
+			B_TRANSLATE("Login or Create account"));
+
+		if (alert == NULL)
+			return;
+		
+		int32 choice = alert->Go();
+		if (choice == 1)
+			_OpenLoginWindow(BMessage(MSG_RATE_PACKAGE));
+		return;
+	}
+	
+	// TODO: Allow only one RatePackageWindow
+	// TODO: Mechanism for remembering the window frame
+	RatePackageWindow* window = new RatePackageWindow(this,
+		BRect(0, 0, 500, 400), fModel);
+	window->SetPackage(fPackageInfoView->Package());
+	window->Show();
 }
