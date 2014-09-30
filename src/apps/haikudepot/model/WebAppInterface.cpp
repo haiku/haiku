@@ -252,6 +252,11 @@ int
 WebAppInterface::fRequestIndex = 0;
 
 
+enum {
+	NEEDS_AUTHORIZATION = 1 << 0,
+	DEBUG				= 1 << 1,
+};
+
 
 WebAppInterface::WebAppInterface()
 	:
@@ -322,7 +327,7 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("pkg", jsonString, false, message);
+	return _SendJsonRequest("pkg", jsonString, 0, message);
 }
 
 
@@ -354,7 +359,7 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("pkg", jsonString, false, message);
+	return _SendJsonRequest("pkg", jsonString, 0, message);
 }
 
 
@@ -407,7 +412,7 @@ WebAppInterface::RetrieveUserRatings(const BString& packageName,
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("userrating", jsonString, false, message);
+	return _SendJsonRequest("userrating", jsonString, 0, message);
 }
 
 
@@ -434,7 +439,7 @@ WebAppInterface::RetrieveUserRating(const BString& packageName,
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("userrating", jsonString, false, message);
+	return _SendJsonRequest("userrating", jsonString, 0, message);
 }
 
 
@@ -462,7 +467,8 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("userrating", jsonString, true, message);
+	return _SendJsonRequest("userrating", jsonString, NEEDS_AUTHORIZATION,
+		message);
 }
 
 
@@ -483,11 +489,19 @@ WebAppInterface::UpdateUserRating(const BString& ratingID,
 				.AddValue("comment", comment)
 				.AddValue("naturalLanguageCode", languageCode)
 				.AddValue("active", active)
+				.AddArray("filter")
+					.AddItem("ACTIVE")
+					.AddItem("NATURALLANGUAGE")
+					.AddItem("USERRATINGSTABILITY")
+					.AddItem("COMMENT")
+					.AddItem("RATING")
+				.EndArray()
 			.EndObject()
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("userrating", jsonString, true, message);
+	return _SendJsonRequest("userrating", jsonString, NEEDS_AUTHORIZATION,
+		message);
 }
 
 
@@ -541,7 +555,7 @@ WebAppInterface::RequestCaptcha(BMessage& message)
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("captcha", jsonString, false, message);
+	return _SendJsonRequest("captcha", jsonString, 0, message);
 }
 
 
@@ -573,7 +587,7 @@ WebAppInterface::CreateUser(const BString& nickName,
 
 	BString jsonString = builder.End();
 
-	return _SendJsonRequest("user", jsonString, false, message);
+	return _SendJsonRequest("user", jsonString, 0, message);
 }
 
 
@@ -593,7 +607,7 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 		.EndArray()
 	.End();
 
-	return _SendJsonRequest("user", jsonString, false, message);
+	return _SendJsonRequest("user", jsonString, 0, message);
 }
 
 
@@ -602,31 +616,35 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 
 status_t
 WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
-	bool needsAuthorization, BMessage& reply) const
+	uint32 flags, BMessage& reply) const
 {
+	if ((flags & DEBUG) != 0)
+		printf("_SendJsonRequest(%s)\n", jsonString.String());
+	
 	BString urlString("https://depot.haiku-os.org/api/v1/");
 	urlString << domain;
 	BUrl url(urlString);
 	
 	ProtocolListener listener;
 	BUrlContext context;
+
 	BHttpHeaders headers;	
-	// Content-Type
 	headers.AddHeader("Content-Type", "application/json");
 	headers.AddHeader("User-Agent", "X-HDS-Client");
 
 	BHttpRequest request(url, true, "HTTP", &listener, &context);
+	request.SetMethod(B_HTTP_POST);
+	request.SetHeaders(headers);
 
 	// Authentication via Basic Authentication
 	// The other way would be to obtain a token and then use the Token Bearer
 	// header.
-	if (needsAuthorization && !fUsername.IsEmpty() && !fPassword.IsEmpty()) {
-		request.SetUserName(fUsername);
-		request.SetPassword(fPassword);
+	if ((flags & NEEDS_AUTHORIZATION) != 0
+		&& !fUsername.IsEmpty() && !fPassword.IsEmpty()) {
+		BHttpAuthentication authentication(fUsername, fPassword);
+		authentication.SetMethod(B_HTTP_AUTHENTICATION_BASIC);
+		context.AddAuthentication(url, authentication);
 	}
-
-	request.SetMethod(B_HTTP_POST);
-	request.SetHeaders(headers);
 
 	BMemoryIO* data = new BMemoryIO(
 		jsonString.String(), jsonString.Length() - 1);
@@ -635,7 +653,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 
 	BMallocIO replyData;
 	listener.SetDownloadIO(&replyData);
-//	listener.SetDebug(true);
+	listener.SetDebug((flags & DEBUG) != 0);
 
 	thread_id thread = request.Run();
 	wait_for_thread(thread, NULL);
@@ -656,8 +674,8 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 
 	BJson parser;
 	status_t status = parser.Parse(reply, jsonString);
-	if (status == B_BAD_DATA) {
-//		printf("Parser choked on JSON:\n%s\n", jsonString.String());
+	if ((flags & DEBUG) != 0 && status == B_BAD_DATA) {
+		printf("Parser choked on JSON:\n%s\n", jsonString.String());
 	}
 	return status;
 }

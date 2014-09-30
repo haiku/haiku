@@ -101,7 +101,7 @@ public:
 
 private:
 			status_t			_SendJsonRequest(const char* domain,
-									BString jsonString, bool needsAuthorization,
+									BString jsonString, uint32 flags,
 									BMessage& reply) const;
 
 private:
