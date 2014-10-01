@@ -35,8 +35,9 @@ public:
 	virtual	status_t			SetLanguage(const BLanguage& language);
 			status_t			SetTimeZone(const BTimeZone* timeZone);
 
-			status_t			Format(bigtime_t startValue,
-									bigtime_t stopValue, BString* buffer,
+			status_t			Format(BString& buffer,
+									const bigtime_t startValue,
+									const bigtime_t stopValue,
 									time_unit_style style = B_TIME_UNIT_FULL
 									) const;
 

@@ -11,6 +11,7 @@
 
 #include <DateFormat.h>
 #include <OutlineListView.h>
+#include <TimeFormat.h>
 
 
 class TimeZoneListView : public BOutlineListView {
@@ -23,6 +24,7 @@ protected:
 
 private:
 	BDateFormat					fDateFormat;
+	BTimeFormat					fTimeFormat;
 };
 
 

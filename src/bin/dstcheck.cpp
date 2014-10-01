@@ -13,6 +13,7 @@
 #include <Roster.h>
 #include <String.h>
 #include <TextView.h>
+#include <TimeFormat.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,7 +80,8 @@ TimedAlert::GetLabel(BString &string)
 {
 	string = B_TRANSLATE("Attention!\n\nBecause of the switch from daylight "
 		"saving time, your computer's clock may be an hour off.\n"
-		"Your computer thinks it is");
+		"Your computer thinks it is %current time%.\n\nIs this the correct "
+		"time?");
 
 	time_t t;
 	struct tm tm;
@@ -87,12 +89,9 @@ TimedAlert::GetLabel(BString &string)
 	time(&t);
 	localtime_r(&t, &tm);
 
-	BLocale::Default()->FormatTime(timestring, 15, t, B_SHORT_TIME_FORMAT);
+	BTimeFormat().Format(timestring, 15, t, B_SHORT_TIME_FORMAT);
 
-	string += " ";
-	string += timestring;
-
-	string += B_TRANSLATE(".\n\nIs this the correct time?");
+	string.ReplaceFirst("%current time%", timestring);
 }
 
 

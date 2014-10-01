@@ -256,7 +256,7 @@ void
 TimeSlider::_TimeToString(bigtime_t useconds, BString& string)
 {
 	BDurationFormat formatter;
-	formatter.Format(0, useconds, &string);
+	formatter.Format(string, 0, useconds);
 }
 
 

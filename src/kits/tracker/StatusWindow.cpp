@@ -47,6 +47,7 @@ All rights reserved.
 #include <MessageFilter.h>
 #include <StringView.h>
 #include <String.h>
+#include <TimeFormat.h>
 
 #include <string.h>
 
@@ -800,7 +801,7 @@ BStatusView::_TimeStatusString(float availableSpace, float* _width)
 		locale->FormatDateTime(timeText, sizeof(timeText), finishTime,
 			B_MEDIUM_DATE_FORMAT, B_MEDIUM_TIME_FORMAT);
 	} else {
-		locale->FormatTime(timeText, sizeof(timeText), finishTime,
+		BTimeFormat().Format(timeText, sizeof(timeText), finishTime,
 			B_MEDIUM_TIME_FORMAT);
 	}
 
@@ -840,10 +841,10 @@ BStatusView::_FullTimeRemainingString(time_t now, time_t finishTime,
 	BString finishStr;
 	if (finishTime - now > 60 * 60) {
 		buffer.SetTo(B_TRANSLATE("Finish: %time - Over %finishtime left"));
-		formatter.Format(now * 1000000LL, finishTime * 1000000LL, &finishStr);
+		formatter.Format(finishStr, now * 1000000LL, finishTime * 1000000LL);
 	} else {
 		buffer.SetTo(B_TRANSLATE("Finish: %time - %finishtime left"));
-		formatter.Format(now * 1000000LL, finishTime * 1000000LL, &finishStr);
+		formatter.Format(finishStr, now * 1000000LL, finishTime * 1000000LL);
 	}
 
 	buffer.ReplaceFirst("%time", timeText);

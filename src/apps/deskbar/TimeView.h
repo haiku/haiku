@@ -40,6 +40,7 @@ All rights reserved.
 #include <Locale.h>
 #include <Messenger.h>
 #include <OS.h>
+#include <TimeFormat.h>
 #include <View.h>
 
 
@@ -150,6 +151,7 @@ private:
 				// For date and time localization purposes
 				BLocale			fLocale;
 				BDateFormat		fDateFormat;
+				BTimeFormat		fTimeFormat;
 };
 
 

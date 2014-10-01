@@ -34,6 +34,7 @@
 #include <String.h>
 #include <StringView.h>
 #include <TextControl.h>
+#include <TimeFormat.h>
 #include <Window.h>
 
 #include "LocalePreflet.h"
@@ -361,9 +362,10 @@ FormatSettingsView::_UpdateExamples()
 	time_t timeValue = (time_t)time(NULL);
 	BString result;
 
-	// Do NOT make this a class member. We do want to recreate it everytime, as
+	// Do NOT make these class members. We do want to recreate it everytime, as
 	// to get the updated settings from the locale roster.
 	BDateFormat dateFormat;
+	BTimeFormat timeFormat;
 
 	dateFormat.Format(result, timeValue, B_FULL_DATE_FORMAT);
 	fFullDateExampleView->SetText(result);
@@ -377,16 +379,16 @@ FormatSettingsView::_UpdateExamples()
 	dateFormat.Format(result, timeValue, B_SHORT_DATE_FORMAT);
 	fShortDateExampleView->SetText(result);
 
-	BLocale::Default()->FormatTime(&result, timeValue, B_FULL_TIME_FORMAT);
+	timeFormat.Format(result, timeValue, B_FULL_TIME_FORMAT);
 	fFullTimeExampleView->SetText(result);
 
-	BLocale::Default()->FormatTime(&result, timeValue, B_LONG_TIME_FORMAT);
+	timeFormat.Format(result, timeValue, B_LONG_TIME_FORMAT);
 	fLongTimeExampleView->SetText(result);
 
-	BLocale::Default()->FormatTime(&result, timeValue, B_MEDIUM_TIME_FORMAT);
+	timeFormat.Format(result, timeValue, B_MEDIUM_TIME_FORMAT);
 	fMediumTimeExampleView->SetText(result);
 
-	BLocale::Default()->FormatTime(&result, timeValue, B_SHORT_TIME_FORMAT);
+	timeFormat.Format(result, timeValue, B_SHORT_TIME_FORMAT);
 	fShortTimeExampleView->SetText(result);
 
 	status_t status = BLocale::Default()->FormatNumber(&result, 1234.5678);

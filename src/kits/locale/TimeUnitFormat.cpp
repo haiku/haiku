@@ -101,10 +101,10 @@ BTimeUnitFormat::SetLanguage(const BLanguage& language)
 
 
 status_t
-BTimeUnitFormat::Format(int32 value, time_unit_element unit,
-	BString* buffer, time_unit_style style) const
+BTimeUnitFormat::Format(BString& buffer, const int32 value,
+	const time_unit_element unit, time_unit_style style) const
 {
-	if (buffer == NULL || unit < 0 || unit > B_TIME_UNIT_LAST
+	if (unit < 0 || unit > B_TIME_UNIT_LAST
 		|| (style != B_TIME_UNIT_ABBREVIATED && style != B_TIME_UNIT_FULL))
 		return B_BAD_VALUE;
 
@@ -127,7 +127,7 @@ BTimeUnitFormat::Format(int32 value, time_unit_element unit,
 	if (!U_SUCCESS(icuStatus))
 		return B_ERROR;
 
-	BStringByteSink byteSink(buffer);
+	BStringByteSink byteSink(&buffer);
 	unicodeResult.toUTF8(byteSink);
 
 	return B_OK;

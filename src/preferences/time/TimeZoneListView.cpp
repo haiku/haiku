@@ -47,7 +47,7 @@ TimeZoneListView::GetToolTipAt(BPoint point, BToolTip** _tip)
 
 	BString nowInTimeZone;
 	time_t now = time(NULL);
-	BLocale::Default()->FormatTime(&nowInTimeZone, now, B_SHORT_TIME_FORMAT,
+	fTimeFormat.Format(nowInTimeZone, now, B_SHORT_TIME_FORMAT,
 		&item->TimeZone());
 
 	BString dateInTimeZone;

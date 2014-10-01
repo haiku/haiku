@@ -40,7 +40,6 @@ All rights reserved.
 
 #include <Application.h>
 #include <Catalog.h>
-#include <DateFormat.h>
 #include <Debug.h>
 #include <Locale.h>
 #include <MenuItem.h>
@@ -391,27 +390,27 @@ TTimeView::GetCurrentTime()
 
 	if (fShowDayOfWeek) {
 		BString timeFormat("eee ");
-		offset_dow = fLocale.FormatTime(fCurrentTimeStr,
+		offset_dow = fTimeFormat.Format(fCurrentTimeStr,
 			sizeof(fCurrentTimeStr), fCurrentTime, timeFormat);
 
 		if (offset_dow < 0) {
 			// error occured, attempt to overwrite with current time
 			// (this should not ever happen)
-			fLocale.FormatTime(fCurrentTimeStr, sizeof(fCurrentTimeStr),
+			fTimeFormat.Format(fCurrentTimeStr, sizeof(fCurrentTimeStr),
 				fCurrentTime,
 				fShowSeconds ? B_MEDIUM_TIME_FORMAT : B_SHORT_TIME_FORMAT);
 			return;
 		}
 	}
 
-	offset_time = fLocale.FormatTime(fCurrentTimeStr + offset_dow,
+	offset_time = fTimeFormat.Format(fCurrentTimeStr + offset_dow,
 		sizeof(fCurrentTimeStr) - offset_dow, fCurrentTime,
 		fShowSeconds ? B_MEDIUM_TIME_FORMAT : B_SHORT_TIME_FORMAT);
 
 	if (fShowTimeZone) {
 		BString timeFormat(" V");
 		ssize_t offset = offset_dow + offset_time;
-		fLocale.FormatTime(fCurrentTimeStr + offset,
+		fTimeFormat.Format(fCurrentTimeStr + offset,
 			sizeof(fCurrentTimeStr) - offset, fCurrentTime, timeFormat);
 	}
 }
@@ -490,6 +489,7 @@ TTimeView::Update()
 {
 	fLocale = *BLocale::Default();
 	fDateFormat.SetLocale(fLocale);
+	fTimeFormat.SetLocale(fLocale);
 
 	GetCurrentTime();
 	GetCurrentDate();

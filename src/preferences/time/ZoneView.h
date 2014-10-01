@@ -12,6 +12,7 @@
 
 
 #include <LayoutBuilder.h>
+#include <TimeFormat.h>
 #include <TimeZone.h>
 
 
@@ -71,6 +72,8 @@ private:
 			TimeZoneListItem*	fCurrentZoneItem;
 			TimeZoneListItem*	fOldZoneItem;
 			bool				fInitialized;
+
+			BTimeFormat			fTimeFormat;
 };
 
 

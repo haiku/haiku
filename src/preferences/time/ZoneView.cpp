@@ -567,8 +567,7 @@ TimeZoneView::_FormatTime(const BTimeZone& timeZone)
 				: 0;
 		now -= timeZone.OffsetFromGMT() - currentOffset;
 	}
-	BLocale::Default()->FormatTime(&result, now, B_SHORT_TIME_FORMAT,
-		&timeZone);
+	fTimeFormat.Format(result, now, B_SHORT_TIME_FORMAT, &timeZone);
 
 	return result;
 }

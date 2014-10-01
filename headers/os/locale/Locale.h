@@ -69,27 +69,6 @@ public:
 									BTimeFormatStyle timeStyle,
 									const BTimeZone* timeZone = NULL) const;
 
-								// Time
-
-								// TODO: drop some of these once BTimeFormat
-								//       has been implemented!
-			ssize_t				FormatTime(char* string, size_t maxSize,
-									time_t time, BTimeFormatStyle style) const;
-			ssize_t				FormatTime(char* string, size_t maxSize,
-									time_t time, BString format) const;
-			status_t			FormatTime(BString* string, time_t time,
-									BTimeFormatStyle style,
-									const BTimeZone* timeZone = NULL) const;
-			status_t			FormatTime(BString* string, time_t time,
-									BString format,
-									const BTimeZone* timeZone) const;
-			status_t			FormatTime(BString* string,
-									int*& fieldPositions, int& fieldCount,
-									time_t time, BTimeFormatStyle style) const;
-			status_t			GetTimeFields(BDateElement*& fields,
-									int& fieldCount, BTimeFormatStyle style
-									) const;
-
 								// numbers
 
 			ssize_t				FormatNumber(char* string, size_t maxSize,

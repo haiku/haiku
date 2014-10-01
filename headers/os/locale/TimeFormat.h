@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc.
+ * Copyright 2010-2014, Haiku, Inc.
  * Distributed under the terms of the MIT Licence.
  */
 #ifndef _B_TIME_FORMAT_H_
@@ -9,20 +9,41 @@
 
 
 class BString;
+class BTimeZone;
 
-class BTimeFormat : public BDateTimeFormat {
+class BTimeFormat : public BFormat {
 public:
+								BTimeFormat(
+									const BLanguage* const language = NULL,
+									const BFormattingConventions* const
+										format = NULL);
 								BTimeFormat(const BTimeFormat &other);
 	virtual						~BTimeFormat();
 
 								// formatting
 
-								// no-frills version: Simply appends the
-								// formatted date to the string buffer.
-								// Can fail only with B_NO_MEMORY or B_BAD_VALUE.
-	virtual	status_t 			Format(bigtime_t value, BString* buffer) const;
+			ssize_t				Format(char* string, size_t maxSize,
+									time_t time, BTimeFormatStyle style) const;
+			ssize_t				Format(char* string, size_t maxSize,
+									time_t time, BString format) const;
+			status_t			Format(BString& string, const time_t time,
+									const BTimeFormatStyle style,
+									const BTimeZone* timeZone = NULL) const;
+			status_t			Format(BString& string, const time_t time,
+									const BString format,
+									const BTimeZone* timeZone) const;
+			status_t			Format(BString& string,
+									int*& fieldPositions, int& fieldCount,
+									time_t time, BTimeFormatStyle style) const;
 
-								// TODO: ... basically, all of it!
+			status_t			GetTimeFields(BDateElement*& fields,
+									int& fieldCount, BTimeFormatStyle style
+									) const;
+
+								// TODO parsing
+private:
+			icu::DateFormat*	_CreateTimeFormatter(
+									const BString& format) const;
 };
 
 

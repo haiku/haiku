@@ -1612,7 +1612,7 @@ UptimeToString(char string[], size_t size)
 
 	bigtime_t uptime = system_time();
 	bigtime_t now = (bigtime_t)time(NULL) * 1000000;
-	formatter.Format(now - uptime, now, &str);
+	formatter.Format(str, now - uptime, now);
 	str.CopyInto(string, 0, size);
 	string[std::min((size_t)str.Length(), size)] = '\0';
 

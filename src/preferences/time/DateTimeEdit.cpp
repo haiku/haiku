@@ -248,15 +248,14 @@ TTimeEdit::_UpdateFields()
 		free(fFieldPositions);
 		fFieldPositions = NULL;
 	}
-	BLocale::Default()->FormatTime(&fText, fFieldPositions,
-		fFieldPosCount, time, B_MEDIUM_TIME_FORMAT);
+	fTimeFormat.Format(fText, fFieldPositions, fFieldPosCount, time,
+		B_MEDIUM_TIME_FORMAT);
 
 	if (fFields != NULL) {
 		free(fFields);
 		fFields = NULL;
 	}
-	BLocale::Default()->GetTimeFields(fFields, fFieldCount,
-		B_MEDIUM_TIME_FORMAT);
+	fTimeFormat.GetTimeFields(fFields, fFieldCount, B_MEDIUM_TIME_FORMAT);
 }
 
 
