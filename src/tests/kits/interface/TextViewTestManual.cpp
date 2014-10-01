@@ -6,6 +6,7 @@
 
 #include <Application.h>
 #include <Button.h>
+#include <ControlLook.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <ScrollView.h>
@@ -44,6 +45,14 @@ Window::Window()
 {
 	fTextControl = new BTextControl("text-contr-O",
 		"a single line of text - (c) Conglom-O", NULL);
+
+	BTextControl* disabled = new BTextControl("disabled",
+		"I'm disabled: you can't edit me", NULL);
+	disabled->SetEnabled(false);
+	BTextControl* invalid = new BTextControl("invalid",
+		"I'm invalid: my border is red", NULL);
+	invalid->MarkAsInvalid(true);
+
 	fTextView = new BTextView("text-O");
 	BScrollView* scrollView = new BScrollView("scroll-O", fTextView, 0, true,
 		true, B_FANCY_BORDER);
@@ -51,6 +60,8 @@ Window::Window()
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
 		.Add(fTextControl)
+		.Add(disabled)
+		.Add(invalid)
 		.Add(scrollView)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 			.Add(new BButton("Align Left", new BMessage(kMsgAlignLeft)))

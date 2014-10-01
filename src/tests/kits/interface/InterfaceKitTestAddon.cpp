@@ -7,6 +7,7 @@
 #include "bdeskbar/DeskbarTest.h"
 #include "bpolygon/PolygonTest.h"
 #include "bregion/RegionTest.h"
+#include "btextcontrol/TextControlTest.h"
 #include "btextview/TextViewTest.h"
 //#include "bwidthbuffer/WidthBufferTest.h"
 #include "GraphicsDefsTest.h"
@@ -23,6 +24,7 @@ getTestSuite()
 	suite->addTest("BDeskbar", DeskbarTestSuite());
 	suite->addTest("BPolygon", PolygonTestSuite());
 	suite->addTest("BRegion", RegionTestSuite());
+	suite->addTest("BTextControl", TextControlTestSuite());
 	suite->addTest("BTextView", TextViewTestSuite());
 	//suite->addTest("_BWidthBuffer_", WidthBufferTestSuite());
 	suite->addTest("GraphicsDefs", GraphicsDefsTestSuite());
