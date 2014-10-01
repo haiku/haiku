@@ -6,6 +6,10 @@ AddSubDirSupportedPlatforms libbe_test ;
 UseLibraryHeaders agg ;
 UsePrivateHeaders shared locale ;
 
+if [ Glob $(SUBDIR) : DefaultGeolocationServiceKey.h ] {
+	SubDirC++Flags [ FDefines HAVE_DEFAULT_GEOLOCATION_SERVICE_KEY ] ;
+}
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {

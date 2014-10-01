@@ -141,9 +141,19 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 }
 
 
-// FIXME switch to an openly available service that will actually work with the
-// "standard" geolocation API. Openbmap has a few variations.
-const char* BGeolocation::kDefaultService = "http://openbmap.org/api/json.php5";
+#ifdef HAVE_DEFAULT_GEOLOCATION_SERVICE_KEY
+
+#include "DefaultGeolocationServiceKey.h"
+
+const char* BGeolocation::kDefaultService
+	= "https://location.services.mozilla.com/v1/geolocate?key="
+		DEFAULT_GEOLOCATION_SERVICE_KEY;
+
+#else
+
+const char* BGeolocation::kDefaultService = "";
+
+#endif
 
 
 }	// namespace BPrivate
