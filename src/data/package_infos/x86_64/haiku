@@ -22,9 +22,6 @@ provides {
 	cmd:arp
 	cmd:base64
 	cmd:basename
-#ifdef HAIKU_BOOTSTRAP_BUILD
-	cmd:bash
-#endif
 	cmd:bc
 	cmd:cat
 	cmd:chgrp
@@ -171,9 +168,7 @@ provides {
 }
 
 requires {
-#ifndef HAIKU_BOOTSTRAP_BUILD
 	cmd:bash
-#endif
 	lib:libcurl
 	lib:libgcc_s
 	lib:libfreetype

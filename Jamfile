@@ -25,12 +25,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 AddHaikuImagePackages [ FFilterByBuildFeatures
 	curl freetype icu libsolv zlib
 
-	minimum_image @{
-		bash
-	}@
-
 	regular_image @{
-		bash bzip2 ctags ffmpeg findutils gawk glu grep gutenprint jasper jpeg
+		bzip2 ctags ffmpeg findutils gawk glu grep gutenprint jasper jpeg
 		less libicns libpng libwebp mesa mesa_devel mesa_swrast sed sharutils
 		tar tiff wget which
 	}@

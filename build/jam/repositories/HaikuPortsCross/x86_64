@@ -12,6 +12,7 @@ BootstrapPackageRepository HaikuPortsCross
 	# repository architecture packages (stage 1)
 	autoconf_bootstrap-2.69-2
 	automake_bootstrap-1.13.1-1
+	bash_bootstrap-4.3.27-1	
 	binutils_bootstrap-2.24_2014_03_19-1
 	bison_bootstrap-2.4.3-1
 	curl_bootstrap-7.26.0-1
@@ -44,6 +45,7 @@ BootstrapPackageRepository HaikuPortsCross
 	# source packages
 	autoconf_bootstrap
 	automake_bootstrap
+	bash_bootstrap
 	binutils_bootstrap
 	bison_bootstrap
 	curl_bootstrap
