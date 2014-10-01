@@ -17,6 +17,7 @@ BThreadedTestCase::BThreadedTestCase(string name, string progressSeparator)
 {
 }
 
+
 _EXPORT
 BThreadedTestCase::~BThreadedTestCase() {
 	// Kill our locker
@@ -24,12 +25,12 @@ BThreadedTestCase::~BThreadedTestCase() {
 
 	// Clean up
 	for (map<thread_id, ThreadSubTestInfo*>::iterator i = fNumberMap.begin();
-		   i != fNumberMap.end();
-		     i++)
+		i != fNumberMap.end(); i++)
 	{
 		delete i->second;
 	}
 }
+
 
 _EXPORT
 void
@@ -45,8 +46,9 @@ BThreadedTestCase::NextSubTest() {
 			// Handle multi-threaded case
 			ThreadSubTestInfo *info = i->second;
 			char num[32];
-			sprintf(num, "%ld", info->subTestNum++);
-			string str = string("[") + info->name + fProgressSeparator + num + "]";
+			sprintf(num, "%" B_PRId32 "", info->subTestNum++);
+			string str = string("[") + info->name + fProgressSeparator + num
+				+ "]";
 			fUpdateList.push_back(str);
 			return;
 		}
@@ -55,6 +57,7 @@ BThreadedTestCase::NextSubTest() {
 	// Handle single-threaded case
 	BTestCase::NextSubTest();
 }
+
 
 _EXPORT
 void
@@ -76,7 +79,9 @@ BThreadedTestCase::Outputf(const char *str, ...) {
 		} else {
 			va_list args;
 			va_start(args, str);
-			char msg[1024];	// Need a longer string? Change the constant or change the function. :-)
+			char msg[1024];
+				// FIXME Need a longer string? Change the constant or change the
+				// function. :-)
 			vsprintf(msg, str, args);
 			va_end(args);
 			{
@@ -87,6 +92,7 @@ BThreadedTestCase::Outputf(const char *str, ...) {
 		}
 	}
 }
+
 
 _EXPORT
 void
@@ -105,6 +111,7 @@ BThreadedTestCase::InitThreadInfo(thread_id id, string threadName) {
 	}
 }
 
+
 _EXPORT
 bool
 BThreadedTestCase::RegisterForUse() {
@@ -115,11 +122,13 @@ BThreadedTestCase::RegisterForUse() {
 		return false;
 }
 
+
 _EXPORT
 void
 BThreadedTestCase::UnregisterForUse() {
 	fInUse = false;
 }
+
 
 _EXPORT
 vector<string>&
@@ -127,6 +136,7 @@ BThreadedTestCase::AcquireUpdateList() {
 	fUpdateLock->Lock();
 	return fUpdateList;
 }
+
 
 _EXPORT
 void

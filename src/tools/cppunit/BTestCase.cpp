@@ -25,7 +25,7 @@ _EXPORT
 void
 BTestCase::NextSubTest() {
 	if (BTestShell::GlobalBeVerbose()) {
-		printf("[%ld]", fSubTestNum++);
+		printf("[%" B_PRId32 "]", fSubTestNum++);
 		fflush(stdout);
 	}
 }
