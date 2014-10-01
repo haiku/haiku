@@ -450,7 +450,7 @@ BNotification::Icon() const
 /*! \brief Sets notification's icon.
 
 	Sets notification's icon.
-	This method takes ownership of @icon.
+	This method does not assume ownership of @icon.
 
 	\param icon Icon
 	\return
