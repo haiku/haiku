@@ -9,6 +9,9 @@
 #include <Url.h>
 
 
+namespace BPrivate {
+
+
 class BGeolocation {
 public:
 				BGeolocation();
@@ -24,6 +27,9 @@ private:
 					BUrl	fService;
 	static const	char*	kDefaultService;
 };
+
+
+}	// namespace BPrivate
 
 
 #endif

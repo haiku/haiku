@@ -50,7 +50,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			NetworkInterface.cpp
 			NetworkRoster.cpp
 			RouteSupport.cpp
-			
+
 			AbstractSocket.cpp
 			DatagramSocket.cpp
 			Socket.cpp
@@ -58,8 +58,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			# TODO: another add-on for file:// (a much simpler one)
 			FileRequest.cpp
-
-			Geolocation.cpp
 
 			# TODO: another add-on for gopher://
 			GopherRequest.cpp

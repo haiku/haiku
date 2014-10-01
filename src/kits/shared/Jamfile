@@ -30,6 +30,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			CommandPipe.cpp
 			DragTrackingFilter.cpp
 			DriverSettingsMessageAdapter.cpp
+			Geolocation.cpp
 			HashString.cpp
 			IconButton.cpp
 			IconView.cpp
