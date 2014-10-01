@@ -126,7 +126,6 @@ LocaleRosterData::LocaleRosterData(const BLanguage& language,
 	:
 	fLock("LocaleRosterData"),
 	fDefaultLocale(&language, &conventions),
-	fDefaultDateFormat(&language, &conventions),
 	fIsFilesystemTranslationPreferred(false),
 	fAreResourcesLoaded(false)
 {
@@ -467,7 +466,6 @@ LocaleRosterData::_LoadLocaleSettings()
 	if (status == B_OK) {
 		BFormattingConventions conventions(&settings);
 		fDefaultLocale.SetFormattingConventions(conventions);
-		fDefaultDateFormat.SetFormattingConventions(conventions);
 
 		_SetPreferredLanguages(&settings);
 
@@ -486,10 +484,8 @@ LocaleRosterData::_LoadLocaleSettings()
 	fPreferredLanguages.AddString(kLanguageField, "en");
 	BLanguage defaultLanguage("en_US");
 	fDefaultLocale.SetLanguage(defaultLanguage);
-	fDefaultDateFormat.SetLanguage(defaultLanguage);
 	BFormattingConventions conventions("en_US");
 	fDefaultLocale.SetFormattingConventions(conventions);
-	fDefaultDateFormat.SetFormattingConventions(conventions);
 
 	return status;
 }
@@ -585,7 +581,6 @@ LocaleRosterData::_SetDefaultFormattingConventions(
 	const BFormattingConventions& newFormattingConventions)
 {
 	fDefaultLocale.SetFormattingConventions(newFormattingConventions);
-	fDefaultDateFormat.SetFormattingConventions(newFormattingConventions);
 
 	UErrorCode icuError = U_ZERO_ERROR;
 	Locale icuLocale = Locale::createCanonical(newFormattingConventions.ID());
@@ -622,7 +617,6 @@ LocaleRosterData::_SetPreferredLanguages(const BMessage* languages)
 		&& languages->FindString(kLanguageField, &langName) == B_OK) {
 		fDefaultLocale.SetCollator(BCollator(langName.String()));
 		fDefaultLocale.SetLanguage(BLanguage(langName.String()));
-		fDefaultDateFormat.SetLanguage(BLanguage(langName.String()));
 
 		fPreferredLanguages.RemoveName(kLanguageField);
 		for (int i = 0; languages->FindString(kLanguageField, i, &langName)

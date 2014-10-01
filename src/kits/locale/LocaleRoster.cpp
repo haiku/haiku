@@ -175,13 +175,6 @@ BLocaleRoster::GetDefaultLocale() const
 }
 
 
-const BDateFormat*
-BLocaleRoster::GetDefaultDateFormat() const
-{
-	return &fData->fDefaultDateFormat;
-}
-
-
 status_t
 BLocaleRoster::GetLanguage(const char* languageCode,
 	BLanguage** _language) const

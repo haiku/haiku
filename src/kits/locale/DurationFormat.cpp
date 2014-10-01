@@ -45,8 +45,6 @@ BDurationFormat::BDurationFormat(const BString& separator)
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
-
-	fInitStatus = SetLocale(fLocale);
 }
 
 
@@ -96,13 +94,13 @@ BDurationFormat::SetSeparator(const BString& separator)
 
 
 status_t
-BDurationFormat::SetLocale(const BLocale* locale)
+BDurationFormat::SetLanguage(const BLanguage& language)
 {
-	status_t result = Inherited::SetLocale(locale);
+	status_t result = Inherited::SetLanguage(language);
 	if (result != B_OK)
 		return result;
 
-	return fTimeUnitFormat.SetLocale(locale);
+	return fTimeUnitFormat.SetLanguage(language);
 }
 
 

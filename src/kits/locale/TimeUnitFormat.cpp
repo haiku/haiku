@@ -39,7 +39,6 @@ BTimeUnitFormat::BTimeUnitFormat()
 	Inherited(),
 	fFormatter(NULL)
 {
-	fInitStatus = SetLocale(fLocale);
 }
 
 
@@ -80,19 +79,13 @@ BTimeUnitFormat::operator=(const BTimeUnitFormat& other)
 
 
 status_t
-BTimeUnitFormat::SetLocale(const BLocale* locale)
+BTimeUnitFormat::SetLanguage(const BLanguage& language)
 {
-	status_t result = Inherited::SetLocale(locale);
+	status_t result = Inherited::SetLanguage(language);
 	if (result != B_OK)
 		return result;
 
-	BLanguage language;
-	if (fLocale != NULL)
-		fLocale->GetLanguage(&language);
-	else
-		BLocale::Default()->GetLanguage(&language);
-
-	Locale icuLocale(language.Code());
+	Locale icuLocale(fLanguage.Code());
 	UErrorCode icuStatus = U_ZERO_ERROR;
 	if (fFormatter == NULL) {
 		fFormatter = new TimeUnitFormat(icuLocale, icuStatus);

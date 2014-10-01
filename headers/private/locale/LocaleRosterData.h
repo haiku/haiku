@@ -38,7 +38,6 @@ struct LocaleRosterData {
 
 			BLocale				fDefaultLocale;
 			BTimeZone			fDefaultTimeZone;
-			BDateFormat			fDefaultDateFormat;
 
 			bool				fIsFilesystemTranslationPreferred;
 

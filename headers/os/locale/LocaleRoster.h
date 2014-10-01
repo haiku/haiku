@@ -79,7 +79,6 @@ public:
 									// (that needs to link with liblocalestub.a)
 
 			const BLocale*		GetDefaultLocale() const;
-			const BDateFormat*	GetDefaultDateFormat() const;
 
 			bool				IsFilesystemTranslationPreferred() const;
 

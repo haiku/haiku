@@ -7,6 +7,7 @@
 
 
 #include <Format.h>
+#include <Locale.h>
 #include <String.h>
 #include <TimeUnitFormat.h>
 
@@ -31,7 +32,7 @@ public:
 
 			void				SetSeparator(const BString& separator);
 
-	virtual	status_t			SetLocale(const BLocale* locale);
+	virtual	status_t			SetLanguage(const BLanguage& language);
 			status_t			SetTimeZone(const BTimeZone* timeZone);
 
 			status_t			Format(bigtime_t startValue,

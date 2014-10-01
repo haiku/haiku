@@ -28,18 +28,15 @@ enum BWeekday {
 };
 
 
-class BDateFormat {
+class BDateFormat: public BFormat {
 public:
-								BDateFormat(const BLanguage* const,
-									const BFormattingConventions* const);
+								BDateFormat(
+									const BLanguage* const language = NULL,
+									const BFormattingConventions* const
+										format = NULL);
 								BDateFormat(const BDateFormat &other);
 	virtual						~BDateFormat();
 
-	static	const BDateFormat*	Default();
-
-			void				SetLanguage(const BLanguage& newLanguage);
-			void				SetFormattingConventions(
-									const BFormattingConventions& conventions);
 			status_t			GetDateFormat(BDateFormatStyle style,
 									BString& outFormat) const;
 			void				SetDateFormat(BDateFormatStyle style,
@@ -73,9 +70,6 @@ private:
 			icu::DateFormat*	_CreateDateFormatter(
 									const BString& format) const;
 
-	mutable	BLocker				fLock;
-			BFormattingConventions	fConventions;
-			BLanguage			fLanguage;
 };
 
 

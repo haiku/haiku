@@ -46,7 +46,7 @@ public:
 
 			BTimeUnitFormat&	operator=(const BTimeUnitFormat& other);
 
-	virtual	status_t			SetLocale(const BLocale* locale);
+	virtual	status_t			SetLanguage(const BLanguage& locale);
 			status_t			Format(int32 value, time_unit_element unit,
 									BString* buffer,
 									time_unit_style style = B_TIME_UNIT_FULL

@@ -6,6 +6,9 @@
 #define _B_FORMAT_H_
 
 #include <FormatParameters.h>
+#include <FormattingConventions.h>
+#include <Locker.h>
+#include <Language.h>
 #include <SupportDefs.h>
 
 
@@ -40,18 +43,25 @@ class BLocale;
 
 class BFormat {
 public:
-			status_t			InitCheck() const;
+			status_t				SetLocale(const BLocale& locale);
+	virtual	status_t				SetLanguage(const BLanguage& newLanguage);
+	virtual	status_t				SetFormattingConventions(
+										const BFormattingConventions&
+											conventions);
 
-	virtual	status_t			SetLocale(const BLocale* locale);
+			status_t				InitCheck() const;
 protected:
-								BFormat();
-								BFormat(const BFormat& other);
-	virtual 					~BFormat();
+									BFormat();
+									BFormat(const BFormat& other);
+	virtual 						~BFormat();
 
-			BFormat&			operator=(const BFormat& other);
+			BFormat&				operator=(const BFormat& other);
 
-			status_t			fInitStatus;
-			BLocale*			fLocale;
+protected:
+	mutable	BLocker					fLock;
+			BFormattingConventions	fConventions;
+			BLanguage				fLanguage;
+			status_t				fInitStatus;
 };
 
 

@@ -30,54 +30,20 @@ BDateFormat::BDateFormat(const BLanguage* const language,
 {
 	if (conventions != NULL)
 		fConventions = *conventions;
-	else
-		BLocale::Default()->GetFormattingConventions(&fConventions);
 
 	if (language != NULL)
 		fLanguage = *language;
-	else
-		BLocale::Default()->GetLanguage(&fLanguage);
 }
 
 
 BDateFormat::BDateFormat(const BDateFormat &other)
-	: fConventions(other.fConventions),
-	fLanguage(other.fLanguage)
+	: BFormat(other)
 {
-}
-
-
-/*static*/ const BDateFormat*
-BDateFormat::Default()
-{
-	return BLocaleRoster::Default()->GetDefaultDateFormat();
 }
 
 
 BDateFormat::~BDateFormat()
 {
-}
-
-
-void
-BDateFormat::SetFormattingConventions(const BFormattingConventions& conventions)
-{
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return;
-
-	fConventions = conventions;
-}
-
-
-void
-BDateFormat::SetLanguage(const BLanguage& newLanguage)
-{
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return;
-
-	fLanguage = newLanguage;
 }
 
 
