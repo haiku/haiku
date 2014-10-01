@@ -3,6 +3,10 @@
 # import everything from the minimum image
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
 
+SYSTEM_BIN += [ FFilterByBuildFeatures
+	bash
+] ;
+
 # build and add the source package directory and a haikuports.config file
 CopyDirectoryToHaikuImage home haikuports
 	: [ BuildHaikuPortsSourcePackageDirectory ]

@@ -22,7 +22,9 @@ provides {
 	cmd:arp
 	cmd:base64
 	cmd:basename
+#ifdef HAIKU_BOOTSTRAP_BUILD
 	cmd:bash
+#endif
 	cmd:bc
 	cmd:cat
 	cmd:chgrp

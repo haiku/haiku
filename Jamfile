@@ -25,10 +25,14 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 AddHaikuImagePackages [ FFilterByBuildFeatures
 	curl freetype icu libsolv zlib
 
+	minimum_image @{
+		bash
+	}@
+
 	regular_image @{
-		bzip2 ctags ffmpeg findutils gawk glu grep gutenprint jasper jpeg less
-		libicns libpng libwebp mesa mesa_devel mesa_swrast sed sharutils tar
-		tiff wget which
+		bash bzip2 ctags ffmpeg findutils gawk glu grep gutenprint jasper jpeg
+		less libicns libpng libwebp mesa mesa_devel mesa_swrast sed sharutils
+		tar tiff wget which
 	}@
 ] ;
 if $(HAIKU_PACKAGING_ARCHS[1]) != x86_gcc2 {

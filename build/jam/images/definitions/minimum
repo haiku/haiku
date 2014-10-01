@@ -3,7 +3,7 @@
 SYSTEM_BIN = [ FFilterByBuildFeatures
 	"["
 	addattr alert arp
-	base64 basename bash bc beep bfsinfo
+	base64 basename bc beep bfsinfo
 	cal cat catattr checkfs checkitout chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp collectcatkeys comm compress copyattr cp csplit cut
 	date dc dd desklink df diff diff3 dircolors dirname diskimage draggers
