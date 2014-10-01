@@ -31,7 +31,6 @@ LocaleTest catalogTest.cpp ;
 LocaleTest collatorSpeed.cpp ;
 LocaleTest collatorTest.cpp ;
 LocaleTest genericNumberFormatTest.cpp ;
-LocaleTest formatTest.cpp ;
 
 Includes [ FGristFiles ICUTest.cpp ] : [ BuildFeatureAttribute icu : headers ] ;
 	# Dependency needed to trigger downloading/unzipping the package before

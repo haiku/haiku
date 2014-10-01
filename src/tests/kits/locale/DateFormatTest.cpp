@@ -9,6 +9,7 @@
 #include <DateFormat.h>
 #include <FormattingConventions.h>
 #include <Language.h>
+#include <TimeFormat.h>
 
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
@@ -33,12 +34,17 @@ DateFormatTest::TestFormat()
 		time_t time;
 		char* shortDate;
 		char* longDate;
+		char* shortTime;
+		char* longTime;
 	};
 
 	static const Value values[] = {
-		{"en", "en_US", 12345, "1/1/70", "January 1, 1970"},
-		{"fr", "fr_FR", 12345, "01/01/70", "1 janvier 1970"},
-		{"fr", "fr_FR", 12345678, "23/05/70", "23 mai 1970"},
+		{"en", "en_US", 12345, "1/1/70", "January 1, 1970",
+			"4:25 AM", "4:25:45 AM CET"},
+		{"fr", "fr_FR", 12345, "01/01/70", "1 janvier 1970",
+			"04:25", "04:25:45 HNEC"},
+		{"fr", "fr_FR", 12345678, "23/05/70", "23 mai 1970",
+			"22:21", "22:21:18 HNEC"},
 		{NULL}
 	};
 
@@ -50,15 +56,24 @@ DateFormatTest::TestFormat()
 
 		BLanguage language(values[i].language);
 		BFormattingConventions formatting(values[i].convention);
-		BDateFormat format(&language, &formatting);
+		BDateFormat dateFormat(&language, &formatting);
+		BTimeFormat timeFormat(&language, &formatting);
 
-		result = format.Format(output, values[i].time, B_SHORT_DATE_FORMAT);
+		result = dateFormat.Format(output, values[i].time, B_SHORT_DATE_FORMAT);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(values[i].shortDate), output);
 
-		result = format.Format(output, values[i].time, B_LONG_DATE_FORMAT);
+		result = dateFormat.Format(output, values[i].time, B_LONG_DATE_FORMAT);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(values[i].longDate), output);
+
+		result = timeFormat.Format(output, values[i].time, B_SHORT_TIME_FORMAT);
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(BString(values[i].shortTime), output);
+
+		result = timeFormat.Format(output, values[i].time, B_LONG_TIME_FORMAT);
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(BString(values[i].longTime), output);
 	}
 }
 
