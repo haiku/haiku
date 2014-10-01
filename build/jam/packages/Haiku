@@ -120,7 +120,6 @@ AddFilesToPackage demos			: $(SYSTEM_DEMOS) ;
 SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : install-wifi-firmwares.sh ;
 
-AddSymlinkToPackage bin : bash : sh ;
 AddSymlinkToPackage bin : trash : untrash ;
 AddSymlinkToPackage bin : less : more ;
 AddSymlinkToPackage bin : gzip : gunzip ;

@@ -108,7 +108,6 @@ provides {
 	cmd:rmdir
 	cmd:sdiff
 	cmd:seq
-	cmd:sh
 	cmd:sha1sum
 	cmd:sha256sum
 	cmd:shred
@@ -170,7 +169,7 @@ provides {
 }
 
 requires {
-	cmd:bash
+	cmd:sh
 	lib:libcurl
 	lib:libfreetype
 	lib:libicudata
