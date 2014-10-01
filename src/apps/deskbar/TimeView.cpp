@@ -422,7 +422,7 @@ TTimeView::GetCurrentDate()
 {
 	char tmp[sizeof(fCurrentDateStr)];
 
-	BDateFormat::Default()->Format(tmp, sizeof(fCurrentDateStr), fCurrentTime,
+	fDateFormat.Format(tmp, sizeof(fCurrentDateStr), fCurrentTime,
 		B_FULL_DATE_FORMAT);
 
 	// remove leading 0 from date when month is less than 10 (MM/DD/YY)
@@ -489,6 +489,7 @@ void
 TTimeView::Update()
 {
 	fLocale = *BLocale::Default();
+	fDateFormat.SetLocale(fLocale);
 
 	GetCurrentTime();
 	GetCurrentDate();

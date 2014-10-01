@@ -705,7 +705,7 @@ BCalendarView::_InitObject()
 {
 	fDate = BDate::CurrentDate(B_LOCAL_TIME);
 
-	BDateFormat::Default()->GetStartOfWeek((BWeekday*)&fStartOfWeek);
+	BDateFormat().GetStartOfWeek((BWeekday*)&fStartOfWeek);
 
 	_SetupDayNames();
 	_SetupDayNumbers();

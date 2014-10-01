@@ -623,15 +623,15 @@ TDateEdit::_UpdateFields()
 		free(fFieldPositions);
 		fFieldPositions = NULL;
 	}
-	BDateFormat::Default()->Format(fText, fFieldPositions, fFieldPosCount,
-		time, B_SHORT_DATE_FORMAT);
+
+	fDateFormat.Format(fText, fFieldPositions, fFieldPosCount, time,
+		B_SHORT_DATE_FORMAT);
 
 	if (fFields != NULL) {
 		free(fFields);
 		fFields = NULL;
 	}
-	BDateFormat::Default()->GetFields(fFields, fFieldCount,
-		B_SHORT_DATE_FORMAT);
+	fDateFormat.GetFields(fFields, fFieldCount, B_SHORT_DATE_FORMAT);
 }
 
 

@@ -35,6 +35,7 @@ All rights reserved.
 #define _TEXT_WIDGET_ATTRIBUTE_H
 
 
+#include <DateFormat.h>
 #include <String.h>
 
 #include "TrackerSettings.h"
@@ -129,8 +130,8 @@ protected:
 	float fTruncatedWidth;
 	bool fDirty;
 		// if true, need to recalculate text next time we try to use it
- 	bool fValueIsDefined;
- 	BString fText;
+	bool fValueIsDefined;
+	BString fText;
 		// holds the truncated text, fit to the parameters passed in
 		// in the last FittingText call
 };

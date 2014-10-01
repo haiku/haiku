@@ -36,9 +36,10 @@ All rights reserved.
 #define TIME_VIEW_H
 
 
-#include <OS.h>
+#include <DateFormat.h>
 #include <Locale.h>
 #include <Messenger.h>
+#include <OS.h>
 #include <View.h>
 
 
@@ -148,6 +149,7 @@ private:
 
 				// For date and time localization purposes
 				BLocale			fLocale;
+				BDateFormat		fDateFormat;
 };
 
 

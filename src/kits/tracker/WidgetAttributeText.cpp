@@ -178,7 +178,7 @@ TruncStringBase(BString* outString, const char* inString, int32 length,
 		BFont font;
 		view->GetFont(&font);
 
-	    font.GetTruncatedStrings(source, 1, truncMode, width, results);
+		font.GetTruncatedStrings(source, 1, truncMode, width, results);
 		outString->UnlockBuffer();
 	}
 
@@ -214,7 +214,7 @@ TruncTimeBase(BString* outString, int64 value, const View* view, float width)
 	}
 
 	if (resultWidth > width
-		&& BDateFormat::Default()->Format(date, timeValue,
+		&& BDateFormat().Format(date, timeValue,
 			B_SHORT_DATE_FORMAT) == B_OK) {
 		resultWidth = view->StringWidth(date.String(), date.Length());
 	}
