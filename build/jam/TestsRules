@@ -20,7 +20,7 @@ rule UnitTestLib
 
 		# make the target depend on the installed libbe libraries
 		Depends $(lib) :
-			 <tests!unittests>libbe_test.so ;
+			<tests!unittests>libbe_test.so ;
 	} else {
 		ObjectDefines $(2) : TEST_HAIKU TEST_OBOS ;
 	}
@@ -32,6 +32,7 @@ rule UnitTestLib
 
 	Depends unittests : $(lib) ;
 }
+
 
 rule UnitTest
 {
@@ -48,7 +49,7 @@ rule UnitTest
 
 		# make the target depend on the installed libbe libraries
 		Depends $(target) :
-			 <tests!unittests>libbe_test.so ;
+			<tests!unittests>libbe_test.so ;
 	} else {
 		ObjectDefines $(2) : TEST_HAIKU TEST_OBOS ;
 	}
@@ -61,6 +62,7 @@ rule UnitTest
 
 	Depends unittests : $(target) ;
 }
+
 
 rule TestObjects
 {
@@ -80,6 +82,7 @@ rule TestObjects
 	Objects $(sources) ;
 }
 
+
 rule SimpleTest
 {
 	# SimpleTest <target> : <sources> : [ <libraries> ] : [ <resources> ] ;
@@ -91,6 +94,7 @@ rule SimpleTest
 
 	Executable $(1) : $(2) : $(3) : $(4) ;
 }
+
 
 rule BuildPlatformTest
 {
