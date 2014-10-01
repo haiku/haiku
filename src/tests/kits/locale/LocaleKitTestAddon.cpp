@@ -9,6 +9,7 @@
 
 #include "CollatorTest.h"
 #include "DateFormatTest.h"
+#include "DurationFormatTest.h"
 #include "LanguageTest.h"
 #include "UnicodeCharTest.h"
 
@@ -20,6 +21,7 @@ getTestSuite()
 
 	CollatorTest::AddTests(*suite);
 	DateFormatTest::AddTests(*suite);
+	DurationFormatTest::AddTests(*suite);
 	LanguageTest::AddTests(*suite);
 	UnicodeCharTest::AddTests(*suite);
 

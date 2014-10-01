@@ -51,6 +51,7 @@ UnitTestLib localekittest.so :
 
 	CollatorTest.cpp
 	DateFormatTest.cpp
+	DurationFormatTest.cpp
 	LanguageTest.cpp
 	UnicodeCharTest.cpp
 
