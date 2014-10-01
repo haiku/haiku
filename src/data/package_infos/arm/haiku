@@ -172,6 +172,9 @@ provides {
 }
 
 requires {
+#ifndef HAIKU_BOOTSTRAP_BUILD
+	cmd:bash
+#endif
 	lib:libfreetype
 	lib:libgcc_s
 	lib:libicudata
