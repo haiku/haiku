@@ -84,8 +84,9 @@ public:
 		B_IGNORE_OUTLINE		= 1 << 6,
 		B_PARTIALLY_ACTIVATED	= 1 << 7, // like B_ACTIVATED, but for tri-state
 		B_FLAT					= 1 << 8, // flat look (e.g. button background)
+		B_INVALID				= 1 << 9, // invalid value, use B_FAILURE_COLOR
 
-		B_BLEND_FRAME		= 1 << 16
+		B_BLEND_FRAME			= 1 << 16,
 	};
 
 	virtual BAlignment			DefaultLabelAlignment() const;

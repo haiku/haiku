@@ -334,6 +334,16 @@ BTextControl::Text() const
 
 
 void
+BTextControl::MarkAsInvalid(bool invalid)
+{
+	if (invalid)
+		fLook |= BControlLook::B_INVALID;
+	else
+		fLook &= ~BControlLook::B_INVALID;
+}
+
+
+void
 BTextControl::SetValue(int32 value)
 {
 	BControl::SetValue(value);
@@ -425,7 +435,7 @@ BTextControl::Draw(BRect updateRect)
 
 	if (be_control_look != NULL) {
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 flags = 0;
+		uint32 flags = fLook;
 		if (!enabled)
 			flags |= BControlLook::B_DISABLED;
 		if (active)
@@ -1122,6 +1132,8 @@ BTextControl::_InitData(const char* label, const BMessage* archive)
 
 	if (label)
 		fDivider = floorf(bounds.Width() / 2.0f);
+
+	fLook = 0;
 }
 
 

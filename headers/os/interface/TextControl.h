@@ -40,6 +40,7 @@ public:
 
 	virtual	void				SetText(const char* text);
 			const char*			Text() const;
+			void				MarkAsInvalid(bool invalid);
 
 	virtual	void				SetValue(int32 value);
 	virtual	status_t			Invoke(BMessage* message = NULL);
@@ -139,8 +140,9 @@ private:
 			float				fDivider;
 
 			LayoutData*			fLayoutData;
+			uint32				fLook;
 
-			uint32				_reserved[9];
+			uint32				_reserved[8];
 };
 
 #endif	// _TEXT_CONTROL_H
