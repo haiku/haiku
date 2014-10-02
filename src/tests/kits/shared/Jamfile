@@ -9,9 +9,10 @@ UnitTestLib libsharedtest.so :
 	SharedTestAddon.cpp
 
 	CalendarViewTest.cpp
+	GeolocationTest.cpp
 	NaturalCompareTest.cpp
 
-	: be libshared.a [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	: be libshared.a bnetapi [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
 SubInclude HAIKU_TOP src tests kits shared shake_filter ;

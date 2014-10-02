@@ -7,7 +7,6 @@ UnitTestLib servicekittest.so :
 
 	CookieTest.cpp
 	DataTest.cpp
-	GeolocationTest.cpp
 	HttpTest.cpp
 	UrlTest.cpp
 
