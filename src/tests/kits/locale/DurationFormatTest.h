@@ -15,6 +15,7 @@ public:
 					DurationFormatTest();
 	virtual			~DurationFormatTest();
 
+			void	TestDefault();
 			void	TestDuration();
 			void	TestTimeUnit();
 

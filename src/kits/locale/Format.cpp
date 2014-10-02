@@ -10,9 +10,7 @@
 BFormat::BFormat()
 {
 	const BLocale* locale = BLocaleRoster::Default()->GetDefaultLocale();
-	fInitStatus = locale->GetFormattingConventions(&fConventions);
-	if (fInitStatus == B_OK)
-		fInitStatus = locale->GetLanguage(&fLanguage);
+	SetLocale(*locale);
 }
 
 

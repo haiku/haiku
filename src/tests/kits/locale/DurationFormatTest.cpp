@@ -24,6 +24,22 @@ DurationFormatTest::~DurationFormatTest()
 
 
 void
+DurationFormatTest::TestDefault()
+{
+	BDurationFormat format;
+	BString buffer;
+	BString expected;
+
+	status_t result = format.Format(buffer, 0, 800000000000ll);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+	// The exact format and language used depends on the locale settings, but
+	// we can assume that whatever they are, it should put something in the
+	// string.
+	CPPUNIT_ASSERT(buffer.Length() > 0);
+}
+
+
+void
 DurationFormatTest::TestDuration()
 {
 	BDurationFormat format;
@@ -90,6 +106,8 @@ DurationFormatTest::AddTests(BTestSuite& parent)
 {
 	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("DurationFormatTest");
 
+	suite.addTest(new CppUnit::TestCaller<DurationFormatTest>(
+		"DurationFormatTest::TestDefault", &DurationFormatTest::TestDefault));
 	suite.addTest(new CppUnit::TestCaller<DurationFormatTest>(
 		"DurationFormatTest::TestDuration", &DurationFormatTest::TestDuration));
 	suite.addTest(new CppUnit::TestCaller<DurationFormatTest>(

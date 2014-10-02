@@ -39,6 +39,7 @@ BTimeUnitFormat::BTimeUnitFormat()
 	Inherited(),
 	fFormatter(NULL)
 {
+	SetLanguage(fLanguage);
 }
 
 
