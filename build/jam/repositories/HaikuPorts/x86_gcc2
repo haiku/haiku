@@ -29,7 +29,7 @@ RemotePackageRepository HaikuPorts
 	asciidoc-8.6.8-2
 	autoconf-2.69-5
 	automake-1.13.1-4
-	bash-4.3.27-3
+	bash-4.3.28-1
 	beae-1.2-2
 	beam-1.2alpha-1
 	becjk-1.0.1-1
@@ -110,8 +110,8 @@ RemotePackageRepository HaikuPorts
 	gtk_doc-1.20-1
 	guilib-1.2.1-1
 	guilib_devel-1.2.1-1
-	gutenprint-5.2.9-1
-	gutenprint_devel-5.2.9-1
+	gutenprint-5.2.10-1
+	gutenprint_devel-5.2.10-1
 	gyp-r1948-2
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
