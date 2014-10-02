@@ -20,6 +20,7 @@
 #include <ScrollView.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Midi View"
@@ -120,6 +121,8 @@ MidiSettingsView::_RetrieveSoftSynthList()
 			}
 		}
 	}
+
+	free(paths);
 }
 
 
