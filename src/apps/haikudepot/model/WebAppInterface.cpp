@@ -91,8 +91,7 @@ public:
 				fString << ",\"";
 			else
 				fString << '"';
-			// TODO: Escape item
-			fString << item;
+			fString << _EscapeString(item);
 			fString << '"';
 		}
 		fInList = true;
@@ -112,8 +111,7 @@ public:
 			fString << "null";
 		} else {
 			fString << '"';
-			// TODO: Escape value
-			fString << value;
+			fString << _EscapeString(value);
 			fString << '"';
 		}
 		fInList = true;
@@ -152,9 +150,22 @@ private:
 			fString << ",\"";
 		else
 			fString << '"';
-		// TODO: Escape name
-		fString << name;
+		fString << _EscapeString(name);
 		fString << "\":";
+	}
+
+	BString _EscapeString(const char* original) const
+	{
+		BString string(original);
+		string.ReplaceAll("\\", "\\\\");
+		string.ReplaceAll("\"", "\\\"");
+		string.ReplaceAll("/", "\\/");
+		string.ReplaceAll("\b", "\\b");
+		string.ReplaceAll("\f", "\\f");
+		string.ReplaceAll("\n", "\\n");
+		string.ReplaceAll("\r", "\\r");
+		string.ReplaceAll("\t", "\\t");
+		return string;
 	}
 
 private:
