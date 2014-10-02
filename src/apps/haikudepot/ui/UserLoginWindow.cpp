@@ -427,7 +427,8 @@ UserLoginWindow::_AuthenticateThread()
 		BAlert* alert = new(std::nothrow) BAlert(
 			B_TRANSLATE("Authentication failed"),
 			error,
-			B_TRANSLATE("Close"));
+			B_TRANSLATE("Close"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
 		if (alert != NULL)
 			alert->Go();
@@ -556,7 +557,8 @@ UserLoginWindow::_CreateAccountThread()
 		BAlert* alert = new(std::nothrow) BAlert(
 			B_TRANSLATE("Failed to create account"),
 			error,
-			B_TRANSLATE("Close"));
+			B_TRANSLATE("Close"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
 		if (alert != NULL)
 			alert->Go();

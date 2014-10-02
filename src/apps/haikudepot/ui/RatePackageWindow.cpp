@@ -503,8 +503,6 @@ RatePackageWindow::_SendRatingThread()
 		languageCode, comment, stability, rating, info);
 	}
 
-	info.PrintToStream();
-
 	BString error = B_TRANSLATE(
 		"There was a puzzling response from the web service.");
 
@@ -516,8 +514,15 @@ RatePackageWindow::_SendRatingThread()
 			result.PrintToStream();
 			BString message;
 			if (result.FindString("message", &message) == B_OK) {
-				error << B_TRANSLATE(" It responded with: ");
-				error << message;
+				if (message == "objectnotfound") {
+					error = B_TRANSLATE("The package was not found by the "
+						"web service. This probably means that it comes "
+						"from a depot which is not tracked there. Rating "
+						"such packages is unfortunately not supported.");
+				} else {
+					error << B_TRANSLATE(" It responded with: ");
+					error << message;
+				}
 			}
 		}
 	} else {
@@ -535,7 +540,8 @@ RatePackageWindow::_SendRatingThread()
 		BAlert* alert = new(std::nothrow) BAlert(
 			failedTitle,
 			error,
-			B_TRANSLATE("Close"));
+			B_TRANSLATE("Close"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
 		if (alert != NULL)
 			alert->Go();
