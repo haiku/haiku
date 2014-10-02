@@ -46,6 +46,7 @@ All rights reserved.
 #include <AppFileInfo.h>
 #include <Catalog.h>
 #include <DateFormat.h>
+#include <DateTimeFormat.h>
 #include <Debug.h>
 #include <Locale.h>
 #include <NodeInfo.h>
@@ -206,9 +207,10 @@ TruncTimeBase(BString* outString, int64 value, const View* view, float width)
 	};
 
 	BString date;
+	BDateTimeFormat formatter;
 	for (int i = 0; resultWidth > width && i < 5; ++i) {
-		if (BLocale::Default()->FormatDateTime(&date, timeValue,
-				formats[i].dateStyle, formats[i].timeStyle) == B_OK) {
+		if (formatter.Format(date, timeValue, formats[i].dateStyle,
+				formats[i].timeStyle) == B_OK) {
 			resultWidth = view->StringWidth(date.String(), date.Length());
 		}
 	}

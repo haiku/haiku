@@ -14,6 +14,7 @@
 #include <Alert.h>
 #include <Box.h>
 #include <Catalog.h>
+#include <DateTimeFormat.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -239,8 +240,8 @@ PoorManWindow::MessageReceived(BMessage* message)
 		
 			if (time != -1) {
 				BString timeString;
-				if (BLocale::Default()->FormatDateTime(&timeString, time, 
-						DATE_FORMAT, TIME_FORMAT) == B_OK) {
+				if (BDateTimeFormat().Format(timeString, time, DATE_FORMAT,
+						TIME_FORMAT) == B_OK) {
 					line << '[' << timeString << "]: ";
 				}
 			}
@@ -316,8 +317,7 @@ PoorManWindow::QuitRequested()
 	if (fStatus) {
 		time_t now = time(NULL);
 		BString timeString;
-		BLocale::Default()->FormatDateTime(&timeString, now, 
-			DATE_FORMAT, TIME_FORMAT);
+		BDateTimeFormat().Format(timeString, now, DATE_FORMAT, TIME_FORMAT);
 		
 		BString line;
 		line << "[" << timeString << "]: " << B_TRANSLATE("Shutting down.") 

@@ -6,23 +6,13 @@
 #define _B_DATE_TIME_FORMAT_H_
 
 
+#include <DateFormat.h>
 #include <Format.h>
 #include <FormatParameters.h>
+#include <TimeFormat.h>
 
 
 class BString;
-
-
-enum BDateElement {
-	B_DATE_ELEMENT_INVALID = B_BAD_DATA,
-	B_DATE_ELEMENT_YEAR = 0,
-	B_DATE_ELEMENT_MONTH,
-	B_DATE_ELEMENT_DAY,
-	B_DATE_ELEMENT_AM_PM,
-	B_DATE_ELEMENT_HOUR,
-	B_DATE_ELEMENT_MINUTE,
-	B_DATE_ELEMENT_SECOND
-};
 
 
 class BDateTimeFormat : public BFormat {
@@ -33,13 +23,20 @@ public:
 
 								// formatting
 
-								// no-frills version: Simply appends the
-								// formatted date to the string buffer.
-								// Can fail only with B_NO_MEMORY or
-								// B_BAD_VALUE.
-	virtual	status_t 			Format(bigtime_t value, BString* buffer) const;
+			ssize_t				Format(char* target, const size_t maxSize,
+									const time_t time,
+									BDateFormatStyle dateStyle,
+									BTimeFormatStyle timeStyle) const;
+			status_t			Format(BString& buffer, const time_t time,
+									BDateFormatStyle dateStyle,
+									BTimeFormatStyle timeStyle,
+									const BTimeZone* timeZone = NULL) const;
 
-								// TODO: ... basically, all of it!
+private:
+			icu::DateFormat*	_CreateDateFormatter(
+									const BString& format) const;
+			icu::DateFormat*	_CreateTimeFormatter(
+									const BString& format) const;
 };
 
 

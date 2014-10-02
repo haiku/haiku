@@ -22,6 +22,7 @@
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <Bitmap.h>
+#include <DateTimeFormat.h>
 #include <DurationFormat.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -514,11 +515,10 @@ AboutView::AboutView()
 	kernelTimeDate << systemInfo.kernel_build_date
 		<< " " << systemInfo.kernel_build_time;
 	BString buildTimeDate;
-	const BLocale* locale = BLocale::Default();
 
 	time_t buildTimeDateStamp = parsedate(kernelTimeDate, -1);
 	if (buildTimeDateStamp > 0) {
-		if (locale->FormatDateTime(&buildTimeDate, buildTimeDateStamp,
+		if (BDateTimeFormat().Format(buildTimeDate, buildTimeDateStamp,
 			B_LONG_DATE_FORMAT, B_MEDIUM_TIME_FORMAT) != B_OK)
 			buildTimeDate.SetTo(kernelTimeDate);
 	} else

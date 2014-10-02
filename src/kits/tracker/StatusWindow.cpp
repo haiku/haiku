@@ -796,9 +796,8 @@ BStatusView::_TimeStatusString(float availableSpace, float* _width)
 	time_t finishTime = (time_t)(now + secondsRemaining);
 
 	char timeText[32];
-	const BLocale* locale = BLocale::Default();
 	if (finishTime - now > kSecondsPerDay) {
-		locale->FormatDateTime(timeText, sizeof(timeText), finishTime,
+		BDateTimeFormat().Format(timeText, sizeof(timeText), finishTime,
 			B_MEDIUM_DATE_FORMAT, B_MEDIUM_TIME_FORMAT);
 	} else {
 		BTimeFormat().Format(timeText, sizeof(timeText), finishTime,

@@ -27,6 +27,7 @@ local sources =
 	DateFormat.cpp
 	DateTimeFormat.cpp
 	DurationFormat.cpp
+	NumberFormat.cpp
 	TimeFormat.cpp
 	TimeUnitFormat.cpp
 	Format.cpp # Used by some of the above.
@@ -43,8 +44,6 @@ local sources =
 	# IntegerFormat.cpp
 	# IntegerFormatImpl.cpp
 	# IntegerFormatParameters.cpp
-	# NumberFormat.cpp
-	# NumberFormatImpl.cpp
 	# NumberFormatParameters.cpp
 	;
 

@@ -25,6 +25,7 @@
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <NumberFormat.h>
 #include <PopUpMenu.h>
 #include <RadioButton.h>
 #include <ScrollView.h>
@@ -366,6 +367,7 @@ FormatSettingsView::_UpdateExamples()
 	// to get the updated settings from the locale roster.
 	BDateFormat dateFormat;
 	BTimeFormat timeFormat;
+	BNumberFormat numberFormat;
 
 	dateFormat.Format(result, timeValue, B_FULL_DATE_FORMAT);
 	fFullDateExampleView->SetText(result);
@@ -391,25 +393,25 @@ FormatSettingsView::_UpdateExamples()
 	timeFormat.Format(result, timeValue, B_SHORT_TIME_FORMAT);
 	fShortTimeExampleView->SetText(result);
 
-	status_t status = BLocale::Default()->FormatNumber(&result, 1234.5678);
+	status_t status = numberFormat.Format(result, 1234.5678);
 	if (status == B_OK)
 		fPositiveNumberExampleView->SetText(result);
 	else
 		fPositiveNumberExampleView->SetText("ERROR");
 
-	status = BLocale::Default()->FormatNumber(&result, -1234.5678);
+	status = numberFormat.Format(result, -1234.5678);
 	if (status == B_OK)
 		fNegativeNumberExampleView->SetText(result);
 	else
 		fNegativeNumberExampleView->SetText("ERROR");
 
-	status = BLocale::Default()->FormatMonetary(&result, 1234.56);
+	status = numberFormat.FormatMonetary(result, 1234.56);
 	if (status == B_OK)
 		fPositiveMonetaryExampleView->SetText(result);
 	else
 		fPositiveMonetaryExampleView->SetText("ERROR");
 
-	status = BLocale::Default()->FormatMonetary(&result, -1234.56);
+	status = numberFormat.FormatMonetary(result, -1234.56);
 	if (status == B_OK)
 		fNegativeMonetaryExampleView->SetText(result);
 	else
