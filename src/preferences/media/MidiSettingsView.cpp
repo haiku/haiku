@@ -17,10 +17,12 @@
 #include <Node.h>
 #include <NodeInfo.h>
 #include <Path.h>
+#include <PathFinder.h>
 #include <ScrollView.h>
+#include <StringList.h>
 
 #include <stdio.h>
-#include <stdlib.h>
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Midi View"
@@ -89,17 +91,16 @@ MidiSettingsView::MessageReceived(BMessage* message)
 void
 MidiSettingsView::_RetrieveSoftSynthList()
 {
-	char **paths = NULL;
-	size_t pathCount = 0;
-	status_t status = find_paths(B_FIND_PATH_DATA_DIRECTORY, "synth",
-			&paths, &pathCount);
+	BStringList paths;
+	status_t status = BPathFinder::FindPaths(B_FIND_PATH_DATA_DIRECTORY,
+			"synth", paths);
 	if (status != B_OK)
 		return;
 
 	fListView->MakeEmpty();
 
-	for (size_t i = 0; i < pathCount; i++) {
-		BDirectory directory(paths[i]);
+	for (int32 i = 0; i < paths.CountStrings(); i++) {
+		BDirectory directory(paths.StringAt(i).String());
 		BEntry entry;
 		if (directory.InitCheck() != B_OK)
 			continue;
@@ -115,14 +116,12 @@ MidiSettingsView::_RetrieveSoftSynthList()
 			// TODO: For some reason this doesn't work
 			if (nodeInfo.GetType(mimeType) == B_OK
 					/*&& !strcmp(mimeType, "audio/x-soundfont")*/) {
-				BPath fullPath = paths[i];
+				BPath fullPath = paths.StringAt(i).String();
 				fullPath.Append(entry.Name());
 				fListView->AddItem(new BStringItem(fullPath.Path()));
 			}
 		}
 	}
-
-	free(paths);
 }
 
 
