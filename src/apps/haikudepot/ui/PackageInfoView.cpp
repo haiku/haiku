@@ -18,6 +18,7 @@
 #include <GridView.h>
 #include <LayoutBuilder.h>
 #include <LayoutUtils.h>
+#include <LocaleRoster.h>
 #include <Message.h>
 #include <TabView.h>
 #include <ScrollView.h>
@@ -1171,6 +1172,8 @@ public:
 			.Add(scrollView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
+	
+		_InitPreferredLanguages();
 	}
 
 	virtual ~UserRatingsView()
@@ -1200,10 +1203,12 @@ public:
 		}
 
 		// TODO: Sort by age or usefullness rating
-		// TODO: Optionally hide ratings that are not in the system language
-
 		for (int i = count - 1; i >= 0; i--) {
 			const UserRating& rating = userRatings.ItemAtFast(i);
+			if (fPreferredLanguages.CountItems() > 0
+				&& !fPreferredLanguages.Contains(rating.Language())) {
+				continue;
+			}
 			RatingItemView* view = new RatingItemView(rating, fThumbsUpIcon,
 				fThumbsDownIcon);
 			fRatingContainerLayout->AddView(0, view);
@@ -1231,10 +1236,34 @@ public:
 	}
 
 private:
+	void _InitPreferredLanguages()
+	{
+		fPreferredLanguages.Clear();
+
+		BLocaleRoster* localeRoster = BLocaleRoster::Default();
+		if (localeRoster == NULL)
+			return;
+
+		BMessage preferredLanguages;
+		if (localeRoster->GetPreferredLanguages(&preferredLanguages) != B_OK) 
+			return;
+
+		BString language;
+		int32 index = 0;
+		while (preferredLanguages.FindString("language", index++,
+				&language) == B_OK) {
+			BString languageCode;
+			language.CopyInto(languageCode, 0, 2);
+				fPreferredLanguages.Add(languageCode);
+		}
+	}
+
+private:
 	BGroupLayout*			fRatingContainerLayout;
 	RatingSummaryView*		fRatingSummaryView;
 	BitmapRef				fThumbsUpIcon;
 	BitmapRef				fThumbsDownIcon;
+	StringList				fPreferredLanguages;
 };
 
 
