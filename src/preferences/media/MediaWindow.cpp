@@ -708,7 +708,7 @@ MediaWindow::_ClearParamView()
 		return;
 
 	BView* view = item->View();
-	if (view != fVideoView && view != fAudioView) {
+	if (view != fVideoView && view != fAudioView && view != fMidiView) {
 		fContentLayout->RemoveItem(item);
 		delete item;
 		delete view;
