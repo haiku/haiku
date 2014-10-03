@@ -193,10 +193,9 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	ScrollView* textScrollView = new ScrollView(
 		"rating scroll view", fTextView);
 
+	// Get a TextDocument with default paragraph and character style
 	MarkupParser parser;
-	fRatingText = parser.CreateDocumentFromMarkup(
-		"Here is where you ''could'' type your awesome rating comment, "
-		"if only this were already implemented.");
+	fRatingText = parser.CreateDocumentFromMarkup("");
 
 	fTextView->SetInsets(10.0f);
 	fTextView->SetTextDocument(fRatingText);
