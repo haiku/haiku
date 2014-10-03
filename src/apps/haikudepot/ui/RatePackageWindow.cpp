@@ -427,7 +427,7 @@ RatePackageWindow::_QueryRatingThread()
 		}
 		if (result.FindString("userRatingStabilityCode",
 			&fStability) == B_OK) {
-			int32 index = -1;
+			int32 index = 0;
 			for (int32 i = fStabilityCodes.CountItems() - 1; i >= 0; i--) {
 				const StabilityRating& stability
 					= fStabilityCodes.ItemAtFast(i);
@@ -492,6 +492,9 @@ RatePackageWindow::_SendRatingThread()
 	WebAppInterface interface = fModel.GetWebAppInterface();
 
 	Unlock();
+
+	if (stability == "unspecified")
+		stability = "";
 
 	status_t status;
 	BMessage info;
