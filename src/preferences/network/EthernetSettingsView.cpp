@@ -161,7 +161,7 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fDeviceMenuField->CreateMenuBarLayoutItem(), 1, 0);
 
 	BStringView* hardwareAddressLabel = new BStringView(
-			"HardwareAddressLabel", B_TRANSLATE("Hardware Address:"));
+			"HardwareAddressLabel", B_TRANSLATE("Hardware address:"));
 	fHardwareAddress = new BStringView("HardwareAddress", "");
 	layout->AddView(hardwareAddressLabel, 0, 1);
 	layout->AddView(fHardwareAddress, 1, 1);
