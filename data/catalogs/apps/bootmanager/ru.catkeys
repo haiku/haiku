@@ -1,7 +1,7 @@
 1	russian	x-vnd.Haiku-BootManager	3014946856
 The boot manager has been successfully installed on your system.	BootManagerController		Менеджер загрузки был успешно установлен.
 After two seconds	DefaultPartitionPage		2 секунды
-Uninstall Boot Manager	UninstallPage	Title	Удаление Менеджер Загрузки
+Uninstall Boot Manager	UninstallPage	Title	Удалить Менеджер Загрузки
 At least one partition must be selected!	BootManagerController		Как минимум один раздел должен быть выбран!
 The old Master Boot Record could not be saved to %s	BootManagerController		Предыдущая загрузочная запись (MBR) не может быть сохранена в %s
 Restore MBR	BootManagerController	Button	Восстановить загрузочную запись (MBR)
