@@ -40,6 +40,8 @@ private:
 			};
 
 			void				_SetMode(Mode mode);
+			bool				_ValidateCreateAccountFields(
+									bool alertProblems = false);
 			void				_Login();
 			void				_CreateAccount();
 			void				_RequestCaptcha();

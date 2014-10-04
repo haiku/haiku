@@ -336,10 +336,15 @@ BTextControl::Text() const
 void
 BTextControl::MarkAsInvalid(bool invalid)
 {
+	uint32 look = fLook;
+
 	if (invalid)
 		fLook |= BControlLook::B_INVALID;
 	else
 		fLook &= ~BControlLook::B_INVALID;
+
+	if (look != fLook)
+		Invalidate();
 }
 
 

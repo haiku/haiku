@@ -19,6 +19,7 @@
 #include <PopUpMenu.h>
 #include <TabView.h>
 #include <TextControl.h>
+#include <UnicodeChar.h>
 
 #include "BitmapView.h"
 #include "Model.h"
@@ -33,6 +34,7 @@ enum {
 	MSG_SEND					= 'send',
 	MSG_TAB_SELECTED			= 'tbsl',
 	MSG_CAPTCHA_OBTAINED		= 'cpob',
+	MSG_VALIDATE_FIELDS			= 'vldt',
 	MSG_LANGUAGE_SELECTED		= 'lngs',
 };
 
@@ -92,12 +94,13 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	fPasswordField = new BTextControl(B_TRANSLATE("Pass phrase:"), "", NULL);
 	fPasswordField->TextView()->HideTyping(true);
 
-	fNewUsernameField = new BTextControl(B_TRANSLATE("User name:"), "", NULL);
-	fNewPasswordField = new BTextControl(B_TRANSLATE("Pass phrase:"), "",
+	fNewUsernameField = new BTextControl(B_TRANSLATE("User name:"), "",
 		NULL);
+	fNewPasswordField = new BTextControl(B_TRANSLATE("Pass phrase:"), "",
+		new BMessage(MSG_VALIDATE_FIELDS));
 	fNewPasswordField->TextView()->HideTyping(true);
 	fRepeatPasswordField = new BTextControl(B_TRANSLATE("Repeat pass phrase:"),
-		"", NULL);
+		"", new BMessage(MSG_VALIDATE_FIELDS));
 	fRepeatPasswordField->TextView()->HideTyping(true);
 	
 	// Construct languages popup
@@ -118,6 +121,19 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	fCaptchaView = new BitmapView("captcha view");
 	fCaptchaResultField = new BTextControl("", "", NULL);
 
+	// Setup modification messages on all text fields to trigger validation
+	// of input
+	fNewUsernameField->SetModificationMessage(
+		new BMessage(MSG_VALIDATE_FIELDS));
+	fNewPasswordField->SetModificationMessage(
+		new BMessage(MSG_VALIDATE_FIELDS));
+	fRepeatPasswordField->SetModificationMessage(
+		new BMessage(MSG_VALIDATE_FIELDS));
+	fEmailField->SetModificationMessage(
+		new BMessage(MSG_VALIDATE_FIELDS));
+	fCaptchaResultField->SetModificationMessage(
+		new BMessage(MSG_VALIDATE_FIELDS));
+	
 	fTabView = new TabView(BMessenger(this),
 		BMessage(MSG_TAB_SELECTED));
 
@@ -182,6 +198,10 @@ void
 UserLoginWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_VALIDATE_FIELDS:
+			_ValidateCreateAccountFields();
+			break;
+
 		case MSG_SEND:
 			switch (fMode) {
 				case LOGIN:
@@ -220,6 +240,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 			} else {
 				fCaptchaView->SetBitmap(NULL);
 			}
+			fCaptchaResultField->SetText("");
 			break;
 
 		case MSG_LANGUAGE_SELECTED:
@@ -262,10 +283,124 @@ UserLoginWindow::_SetMode(Mode mode)
 			if (fCaptchaToken.IsEmpty())
 				_RequestCaptcha();
 			fNewUsernameField->MakeFocus();
+			_ValidateCreateAccountFields();
 			break;
 		default:
 			break;
 	}
+}
+
+
+static int32
+count_digits(const BString& string)
+{
+	int32 digits = 0;
+	const char* c = string.String();
+	for (int32 i = 0; i < string.CountChars(); i++) {
+		uint32 unicodeChar = BUnicodeChar::FromUTF8(&c);
+		if (BUnicodeChar::IsDigit(unicodeChar))
+			digits++;
+	}
+	return digits;
+}
+
+
+static int32
+count_upper_case_letters(const BString& string)
+{
+	int32 upperCaseLetters = 0;
+	const char* c = string.String();
+	for (int32 i = 0; i < string.CountChars(); i++) {
+		uint32 unicodeChar = BUnicodeChar::FromUTF8(&c);
+		if (BUnicodeChar::IsUpper(unicodeChar))
+			upperCaseLetters++;
+	}
+	return upperCaseLetters;
+}
+
+
+bool
+UserLoginWindow::_ValidateCreateAccountFields(bool alertProblems)
+{
+	BString nickName(fNewUsernameField->Text());
+	BString password1(fNewPasswordField->Text());
+	BString password2(fRepeatPasswordField->Text());
+	BString email(fEmailField->Text());
+	BString captcha(fCaptchaResultField->Text());
+
+	// TODO: Use the same validation as the web-serivce
+	bool validUserName = nickName.Length() >= 3;
+	fNewUsernameField->MarkAsInvalid(validUserName);
+	
+	bool validPassword = password1.Length() >= 8
+		&& count_digits(password1) >= 2
+		&& count_upper_case_letters(password1) >= 2;
+	fNewPasswordField->MarkAsInvalid(!validPassword);
+	fRepeatPasswordField->MarkAsInvalid(password1 != password2);
+	
+	bool validCaptcha = captcha.Length() > 0;
+	fCaptchaResultField->MarkAsInvalid(!validCaptcha);
+
+	bool valid = validUserName && validPassword && password1 == password2
+		&& validCaptcha;
+	if (valid && email.Length() > 0)
+		return true;
+
+	if (alertProblems) {
+		BString message;
+		alert_type alertType;
+		const char* okLabel = B_TRANSLATE("OK");
+		const char* cancelLabel = NULL;
+		if (!valid) {
+			message = B_TRANSLATE("There are problems in the form:\n\n");
+			alertType = B_WARNING_ALERT;
+		} else {
+			alertType = B_IDEA_ALERT;
+			okLabel = B_TRANSLATE("Ignore");
+			cancelLabel = B_TRANSLATE("Cancel");
+		}
+
+		if (!validUserName) {
+			message << B_TRANSLATE(
+				"The user name needs to be at least "
+				"3 letters long.") << "\n\n";
+		}
+		if (!validPassword) {
+			message << B_TRANSLATE(
+				"The password is too weak or invalid. "
+				"Please use at least 8 characters with "
+				"at least 2 numbers and 2 upper-case "
+				"letters.") << "\n\n";
+		}
+		if (password1 != password2) {
+			message << B_TRANSLATE(
+				"The passwords do not match.") << "\n\n";
+		}
+		if (email.Length() == 0) {
+			message << B_TRANSLATE(
+				"If you do not provide an email address, "
+				"you will not be able to reset your password "
+				"if you forget it.") << "\n\n";
+		}
+		if (!validCaptcha) {
+			message << B_TRANSLATE(
+				"The captcha puzzle needs to be solved.") << "\n\n";
+		}
+
+		BAlert* alert = new(std::nothrow) BAlert(
+			B_TRANSLATE("Input validation"),
+			message,
+			okLabel, cancelLabel, NULL,
+			B_WIDTH_AS_USUAL, alertType);
+
+		if (alert != NULL) {
+			int32 choice = alert->Go();
+			if (choice == 1)
+				return false;
+		}
+	}
+	
+	return valid;
 }
 
 
@@ -287,6 +422,9 @@ UserLoginWindow::_Login()
 void
 UserLoginWindow::_CreateAccount()
 {
+	if (!_ValidateCreateAccountFields(true))
+		return;
+	
 	BAutolock locker(&fLock);
 	
 	if (fWorkerThread >= 0)
