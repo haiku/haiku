@@ -387,8 +387,10 @@ RatePackageWindow::_QueryRatingThreadEntry(void* data)
 void
 RatePackageWindow::_QueryRatingThread()
 {
-	if (!Lock())
+	if (!Lock()) {
+		fprintf(stderr, "rating query: Failed to lock window\n");
 		return;
+	}
 
 	PackageInfoRef package(fPackage);
 
@@ -399,6 +401,7 @@ RatePackageWindow::_QueryRatingThread()
 	locker.Unlock();
 
 	if (package.Get() == NULL) {
+		fprintf(stderr, "rating query: No package\n");
 		_SetWorkerThread(-1);
 		return;
 	}
@@ -458,6 +461,11 @@ RatePackageWindow::_QueryRatingThread()
 		fSendButton->SetLabel(B_TRANSLATE("Update"));
 
 		Unlock();
+	} else {
+		fprintf(stderr, "rating query: Failed response: %s\n",
+			strerror(status));
+		if (!info.IsEmpty())
+			info.PrintToStream();
 	}
 
 	_SetWorkerThread(-1);
@@ -476,8 +484,10 @@ RatePackageWindow::_SendRatingThreadEntry(void* data)
 void
 RatePackageWindow::_SendRatingThread()
 {
-	if (!Lock())
+	if (!Lock()) {
+		fprintf(stderr, "upload rating: Failed to lock window\n");
 		return;
+	}
 
 	BString package = fPackage->Title();
 	BString architecture = fPackage->Architecture();
@@ -551,6 +561,8 @@ RatePackageWindow::_SendRatingThread()
 		fprintf(stderr,
 			B_TRANSLATE("Failed to create or update rating: %s\n"),
 			error.String());
+		if (!info.IsEmpty())
+			info.PrintToStream();
 
 		_SetWorkerThread(-1);
 	} else {
