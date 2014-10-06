@@ -265,7 +265,7 @@ WebAppInterface::fRequestIndex = 0;
 
 enum {
 	NEEDS_AUTHORIZATION = 1 << 0,
-	DEBUG				= 1 << 1,
+	ENABLE_DEBUG		= 1 << 1,
 };
 
 
@@ -629,17 +629,17 @@ status_t
 WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	uint32 flags, BMessage& reply) const
 {
-	if ((flags & DEBUG) != 0)
+	if ((flags & ENABLE_DEBUG) != 0)
 		printf("_SendJsonRequest(%s)\n", jsonString.String());
-	
+
 	BString urlString("https://depot.haiku-os.org/api/v1/");
 	urlString << domain;
 	BUrl url(urlString);
-	
+
 	ProtocolListener listener;
 	BUrlContext context;
 
-	BHttpHeaders headers;	
+	BHttpHeaders headers;
 	headers.AddHeader("Content-Type", "application/json");
 	headers.AddHeader("User-Agent", "X-HDS-Client");
 
@@ -664,7 +664,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 
 	BMallocIO replyData;
 	listener.SetDownloadIO(&replyData);
-	listener.SetDebug((flags & DEBUG) != 0);
+	listener.SetDebug((flags & ENABLE_DEBUG) != 0);
 
 	thread_id thread = request.Run();
 	wait_for_thread(thread, NULL);
@@ -685,7 +685,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 
 	BJson parser;
 	status_t status = parser.Parse(reply, jsonString);
-	if ((flags & DEBUG) != 0 && status == B_BAD_DATA) {
+	if ((flags & ENABLE_DEBUG) != 0 && status == B_BAD_DATA) {
 		printf("Parser choked on JSON:\n%s\n", jsonString.String());
 	}
 	return status;
