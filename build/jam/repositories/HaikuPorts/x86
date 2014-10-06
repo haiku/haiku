@@ -6,7 +6,7 @@ RemotePackageRepository HaikuPorts
 	be_book-2008_10_26-1
 	ca_root_certificates-2014_04_08-2
 	texi2html-1.82-2
-	timgmsoundfont-2004_01_24-3
+	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-3
 	:
 	# repository architecture packages

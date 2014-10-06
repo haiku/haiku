@@ -12,7 +12,7 @@ RemotePackageRepository HaikuPorts
 	openttd_msx-0.3.1-1
 	openttd_sfx-0.2.3-1
 	texi2html-1.82-2
-	timgmsoundfont-2004_01_24-3
+	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-3
 	youtube_dl-2014.06.19-2
 	:
