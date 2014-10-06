@@ -1660,6 +1660,7 @@ BControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	rgb_color dark1BorderColor;
 	rgb_color dark2BorderColor;
 	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+	rgb_color invalidColor = ui_color(B_FAILURE_COLOR);
 
 	if ((flags & B_DISABLED) != 0) {
 		_DrawOuterResessedFrame(view, rect, base, 0.0, 1.0, flags, borders);
@@ -1694,6 +1695,11 @@ BControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	if ((flags & B_DISABLED) == 0 && (flags & B_FOCUSED) != 0) {
 		dark1BorderColor = navigationColor;
 		dark2BorderColor = navigationColor;
+	}
+
+	if ((flags & B_DISABLED) == 0 && (flags & B_INVALID) != 0) {
+		dark1BorderColor = invalidColor;
+		dark2BorderColor = invalidColor;
 	}
 
 	if ((flags & B_BLEND_FRAME) != 0) {
