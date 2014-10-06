@@ -47,7 +47,6 @@ SEARCH_SOURCE += [ FDirName $(appServerDir) decorator ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing Painter ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) font ] ;
-SEARCH_SOURCE += [ FDirName $(appServerDir) stackandtile ] ;
 
 SharedLibrary libhwinterface.so :
 	BBitmapBuffer.cpp
@@ -168,22 +167,16 @@ SharedLibrary libtestappserver.so :
 	Workspace.cpp
 	WorkspacesView.cpp
 
-	# stack and tile
-	SATDecorator.cpp
-	SATGroup.cpp
-	SATWindow.cpp
-	StackAndTile.cpp
-	Stacking.cpp
-	Tiling.cpp
 	# libraries
 	: be libpainter.a libagg.a liblinprog.a libtextencoding.so libshared.a
+	libstackandtile.a
 	[ BuildFeatureAttribute freetype : library ]
 ;
 
 Includes [ FGristFiles AppServer.cpp BitmapManager.cpp
 	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp
-	DrawState.cpp DrawingContext.cpp DrawingEngine.cpp ServerApp.cpp 
-	ServerBitmap.cpp ServerCursor.cpp ServerFont.cpp ServerPicture.cpp 
+	DrawState.cpp DrawingContext.cpp DrawingEngine.cpp ServerApp.cpp
+	ServerBitmap.cpp ServerCursor.cpp ServerFont.cpp ServerPicture.cpp
 	ServerWindow.cpp View.cpp Window.cpp WorkspacesView.cpp
 	$(decorator_src) $(font_src) ]
 	: [ BuildFeatureAttribute freetype : headers ] ;
@@ -207,7 +200,7 @@ Server test_app_server :
 # install in the test dir
 HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR)
 	: libtestappserver.so libbe_test.so
-	  libhwinterface.so libhwinterfaceimpl.so libtextencoding.so
+	libhwinterface.so libhwinterfaceimpl.so libtextencoding.so
 	: tests!apps ;
 
 HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : test_app_server
