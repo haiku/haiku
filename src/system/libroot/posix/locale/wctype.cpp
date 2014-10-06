@@ -24,132 +24,99 @@ using BPrivate::Libroot::gLocaleBackend;
  */
 
 int
+iswctype(wint_t wc, wctype_t charClass)
+{
+	if (gLocaleBackend == NULL) {
+		if (wc < 0 || wc > 127)
+			return 0;
+		return __isctype(wc, charClass);
+	}
+
+	return gLocaleBackend->IsWCType(wc, charClass);
+}
+
+
+int
 iswalnum(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISalnum);
-
-	return gLocaleBackend->IsWCType(wc, _ISalnum);
+	return iswctype(wc, _ISalnum);
 }
 
 
 int
 iswalpha(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISalpha);
-
-	return gLocaleBackend->IsWCType(wc, _ISalpha);
+	return iswctype(wc, _ISalpha);
 }
 
 
 int
 iswblank(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISblank);
-
-	return gLocaleBackend->IsWCType(wc, _ISblank);
+	return iswctype(wc, _ISblank);
 }
 
 
 int
 iswcntrl(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _IScntrl);
-
-	return gLocaleBackend->IsWCType(wc, _IScntrl);
+	return iswctype(wc, _IScntrl);
 }
 
 
 int
 iswdigit(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISdigit);
-
-	return gLocaleBackend->IsWCType(wc, _ISdigit);
+	return iswctype(wc, _ISdigit);
 }
 
 
 int
 iswgraph(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISgraph);
-
-	return gLocaleBackend->IsWCType(wc, _ISgraph);
+	return iswctype(wc, _ISgraph);
 }
 
 
 int
 iswlower(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISlower);
-
-	return gLocaleBackend->IsWCType(wc, _ISlower);
+	return iswctype(wc, _ISlower);
 }
 
 
 int
 iswprint(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISprint);
-
-	return gLocaleBackend->IsWCType(wc, _ISprint);
+	return iswctype(wc, _ISprint);
 }
 
 
 int
 iswpunct(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISpunct);
-
-	return gLocaleBackend->IsWCType(wc, _ISpunct);
+	return iswctype(wc, _ISpunct);
 }
 
 
 int
 iswspace(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISspace);
-
-	return gLocaleBackend->IsWCType(wc, _ISspace);
+	return iswctype(wc, _ISspace);
 }
 
 
 int
 iswupper(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISupper);
-
-	return gLocaleBackend->IsWCType(wc, _ISupper);
+	return iswctype(wc, _ISupper);
 }
 
 
 int
 iswxdigit(wint_t wc)
 {
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, _ISxdigit);
-
-	return gLocaleBackend->IsWCType(wc, _ISxdigit);
-}
-
-
-int
-iswctype(wint_t wc, wctype_t charClass)
-{
-	if (gLocaleBackend == NULL)
-		return __isctype(wc, charClass);
-
-	return gLocaleBackend->IsWCType(wc, charClass);
+	return iswctype(wc, _ISxdigit);
 }
 
 
