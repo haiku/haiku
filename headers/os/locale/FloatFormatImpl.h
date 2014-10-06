@@ -1,13 +1,11 @@
 #ifndef _B_FLOAT_FORMAT_IMPL_H_
 #define _B_FLOAT_FORMAT_IMPL_H_
 
-#include <NumberFormatImpl.h>
-
 struct format_field_position;
 class BFloatFormatParameters;
 class BString;
 
-class BFloatFormatImpl : public BNumberFormatImpl {
+class BFloatFormatImpl {
 	public:
 		BFloatFormatImpl();
 		virtual ~BFloatFormatImpl();

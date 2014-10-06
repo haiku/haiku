@@ -1,13 +1,11 @@
 #ifndef _B_INTEGER_FORMAT_IMPL_H_
 #define _B_INTEGER_FORMAT_IMPL_H_
 
-#include <NumberFormatImpl.h>
-
 struct format_field_position;
 class BIntegerFormatParameters;
 class BString;
 
-class BIntegerFormatImpl : public BNumberFormatImpl {
+class BIntegerFormatImpl {
 	public:
 		BIntegerFormatImpl();
 		virtual ~BIntegerFormatImpl();

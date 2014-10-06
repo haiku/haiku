@@ -21,7 +21,6 @@
 #include <Language.h>
 #include <Locale.h>
 #include <NumberFormat.h>
-#include <NumberFormatImpl.h>
 #include <NumberFormatParameters.h>
 #include <TimeFormat.h>
 #include <UnicodeChar.h>
