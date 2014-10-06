@@ -168,8 +168,8 @@ SharedLibrary libtestappserver.so :
 	WorkspacesView.cpp
 
 	# libraries
-	: be libpainter.a libagg.a liblinprog.a libtextencoding.so libshared.a
-	libstackandtile.a
+	: be libpainter.a libagg.a libtextencoding.so libshared.a libstackandtile.a
+	liblinprog.a
 	[ BuildFeatureAttribute freetype : library ]
 ;
 
