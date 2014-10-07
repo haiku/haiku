@@ -445,7 +445,7 @@ AboutView::AboutView()
 	// CPU count, type and clock speed
 	BString processorLabel;
 	BMessageFormat().Format(processorLabel, B_TRANSLATE_COMMENT(
-		"{0, plural, one{Processors:} other{# Processors:}}",
+		"{0, plural, one{Processor:} other{# Processors:}}",
 		"\"Processor:\" or \"2 Processors:\""), systemInfo.cpu_count);
 
 	uint32 topologyNodeCount = 0;
