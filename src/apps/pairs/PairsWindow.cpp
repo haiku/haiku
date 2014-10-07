@@ -22,6 +22,7 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <MessageFormat.h>
 #include <MessageRunner.h>
 #include <String.h>
 #include <TextView.h>
@@ -294,17 +295,20 @@ PairsWindow::MessageReceived(BMessage* message)
 
 			// game end and results
 			if (fFinishPairs == pairsButtonList->CountItems() / 2) {
-				BString score;
-				score << fButtonClicks;
 				BString strAbout = B_TRANSLATE("%app%\n"
 					"\twritten by Ralf Schülke\n"
 					"\tCopyright 2008-2010, Haiku Inc.\n"
-					"\n"
-					"You completed the game in %num% clicks.\n");
+					"\n");
 
 				strAbout.ReplaceFirst("%app%",
 					B_TRANSLATE_SYSTEM_NAME("Pairs"));
-				strAbout.ReplaceFirst("%num%", score);
+
+				// Note: in english the singular form is never used, but other
+				// languages behave differently.
+				BMessageFormat().Format(strAbout, B_TRANSLATE(
+					"You completed the game in "
+					"{0, plural, one{# click} other{# clicks}}.\n"),
+					fButtonClicks);
 
 				BAlert* alert = new BAlert("about",
 					strAbout.String(),

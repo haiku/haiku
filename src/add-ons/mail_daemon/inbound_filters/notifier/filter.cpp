@@ -10,6 +10,7 @@
 #include <Beep.h>
 #include <Catalog.h>
 #include <Message.h>
+#include <MessageFormat.h>
 #include <Path.h>
 #include <String.h>
 
@@ -67,15 +68,12 @@ NotifyFilter::MailboxSynced(status_t status)
 		system_beep("New E-mail");
 
 	if (fStrategy & alert) {
-		BString text, numString;
-		if (fNNewMessages != 1)
-			text << B_TRANSLATE("You have %num new messages for %name.");
-		else
-			text << B_TRANSLATE("You have %num new message for %name.");
+		BString text;
+		BMessageFormat().Format(text, B_TRANSLATE(
+			"You have {0, plural, one{# new message} other{# new messages}} "
+			"for %account."), fNNewMessages);
 
-		numString << fNNewMessages;
-		text.ReplaceFirst("%num", numString);
-		text.ReplaceFirst("%name", fMailProtocol.AccountSettings().Name());
+		text.ReplaceFirst("%account", fMailProtocol.AccountSettings().Name());
 
 		BAlert *alert = new BAlert(B_TRANSLATE("New messages"), text.String(),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL);
@@ -99,14 +97,10 @@ NotifyFilter::MailboxSynced(status_t status)
 	}
 
 	if (fStrategy & log_window) {
-		BString message, numString;
-		if (fNNewMessages != 1)
-			message << B_TRANSLATE("%num new messages");
-		else
-			message << B_TRANSLATE("%num new message");
-
-		numString << fNNewMessages;
-		message.ReplaceFirst("%num", numString);
+		BString message;
+		BMessageFormat().Format(message, B_TRANSLATE(
+			"{0, plural, one{# new message} other{# new messages}}"),
+			fNNewMessages);
 
 		fMailProtocol.ShowMessage(message.String());
 	}

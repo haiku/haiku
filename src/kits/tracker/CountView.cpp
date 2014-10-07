@@ -41,6 +41,7 @@ All rights reserved.
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <Locale.h>
+#include <MessageFormat.h>
 
 #include "AutoLock.h"
 #include "Bitmaps.h"
@@ -230,13 +231,11 @@ BCountView::Draw(BRect updateRect)
 	} else {
 		if (fLastCount == 0)
 			itemString << B_TRANSLATE("no items");
-		else if (fLastCount == 1)
-			itemString << B_TRANSLATE("1 item");
 		else {
-			itemString.SetTo(B_TRANSLATE("%num items"));
-			char numString[256];
-			snprintf(numString, sizeof(numString), "%" B_PRId32, fLastCount);
-			itemString.ReplaceFirst("%num", numString);
+			BMessageFormat().Format(itemString, B_TRANSLATE_COMMENT(
+				"{0, plural, one{# item} other{# items}}",
+				"Number of selected items: \"1 item\" or \"2 items\""),
+				fLastCount);
 		}
 	}
 

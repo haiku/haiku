@@ -47,6 +47,7 @@ All rights reserved.
 #include <Font.h>
 #include <Locale.h>
 #include <MenuField.h>
+#include <MessageFormat.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
@@ -675,43 +676,22 @@ void
 BInfoWindow::GetSizeString(BString &result, off_t size, int32 fileCount)
 {
 	char sizeBuffer[128];
+	BMessageFormat messageFormat;
+
 	result << string_for_size((double)size, sizeBuffer, sizeof(sizeBuffer));
 
-	// when we show the byte size, format it with a thousands delimiter
-	// TODO: use BCountry::FormatNumber
 	if (size >= kKBSize) {
-		char numStr[128];
-		snprintf(numStr, sizeof(numStr), "%" B_PRIdOFF, size);
-		BString bytes;
-
-		uint32 length = strlen(numStr);
-		if (length >= 4) {
-			uint32 charsTillComma = length % 3;
-			if (charsTillComma == 0)
-				charsTillComma = 3;
-
-			uint32 numberIndex = 0;
-
-			while (numStr[numberIndex]) {
-				bytes += numStr[numberIndex++];
-				if (--charsTillComma == 0 && numStr[numberIndex]) {
-					bytes += ',';
-					charsTillComma = 3;
-				}
-			}
-		}
-
-		result << " " << B_TRANSLATE("(%bytes bytes)");
+		result << " ";
+		messageFormat.Format(result, B_TRANSLATE(
+			"{0, plural, one{(# byte)} other{(# bytes)}}"), size);
 			// "bytes" translation could come from string_for_size
 			// which could be part of the localekit itself
-		result.ReplaceFirst("%bytes", bytes);
 	}
 
 	if (fileCount != 0) {
-		result << " " << B_TRANSLATE("for %num files");
-		BString countString;
-		countString << fileCount;
-		result.ReplaceFirst("%num", countString);
+		result << " ";
+		messageFormat.Format(result, B_TRANSLATE(
+			"{0, plural, one{for # file} other{for # files}}"), fileCount);
 	}
 }
 

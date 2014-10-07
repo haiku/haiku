@@ -29,6 +29,7 @@
 #include <Font.h>
 #include <fs_attr.h>
 #include <LayoutBuilder.h>
+#include <MessageFormat.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
 #include <OS.h>
@@ -442,13 +443,10 @@ AboutView::AboutView()
 		B_ALIGN_VERTICAL_UNSET));
 
 	// CPU count, type and clock speed
-	char processorLabel[256];
-	if (systemInfo.cpu_count > 1) {
-		snprintf(processorLabel, sizeof(processorLabel),
-			B_TRANSLATE("%ld Processors:"), systemInfo.cpu_count);
-	} else
-		strlcpy(processorLabel, B_TRANSLATE("Processor:"),
-			sizeof(processorLabel));
+	BString processorLabel;
+	BMessageFormat().Format(processorLabel, B_TRANSLATE_COMMENT(
+		"{0, plural, one{Processors:} other{# Processors:}}",
+		"\"Processor:\" or \"2 Processors:\""), systemInfo.cpu_count);
 
 	uint32 topologyNodeCount = 0;
 	cpu_topology_node_info* topology = NULL;
@@ -550,7 +548,7 @@ AboutView::AboutView()
 				.Add(versionView)
 				.Add(abiView)
 				.AddStrut(offset)
-				.Add(_CreateLabel("cpulabel", processorLabel))
+				.Add(_CreateLabel("cpulabel", processorLabel.String()))
 				.Add(cpuView)
 				.Add(frequencyView)
 				.AddStrut(offset)
