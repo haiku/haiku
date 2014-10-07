@@ -143,6 +143,48 @@ DateFormatTest::TestMonthNames()
 	CPPUNIT_ASSERT_EQUAL(B_OK, result);
 }
 
+std::ostream& operator<<(std::ostream& stream, const BDate& date)
+{
+	 stream << date.Year();
+	 stream << '-';
+	 stream << date.Month();
+	 stream << '-';
+	 stream << date.Day();
+
+	 return stream;
+}
+
+
+void
+DateFormatTest::TestParseDate()
+{
+	BLanguage language("en");
+	BFormattingConventions formatting("en_US");
+	BDateFormat format(&language, &formatting);
+	BDate date;
+	status_t result;
+
+	struct Test {
+		const char* input;
+		BDate output;
+	};
+
+	static const Test tests[] = {
+		{"01/01/1970", BDate(1970, 1, 1)},
+		{"05/07/1988", BDate(1988, 5, 7)},
+		{"07/31/2345", BDate(2345, 7, 31)},
+		{NULL}
+	};
+
+	for (int i = 0; tests[i].input != NULL; i++) {
+		NextSubTest();
+		result = format.Parse(tests[i].input, B_SHORT_DATE_FORMAT, date);
+
+		CPPUNIT_ASSERT_EQUAL(tests[i].output, date);
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+	}
+}
+
 
 /*static*/ void
 DateFormatTest::AddTests(BTestSuite& parent)
@@ -157,6 +199,8 @@ DateFormatTest::AddTests(BTestSuite& parent)
 		"DateFormatTest::TestFormatDate", &DateFormatTest::TestFormatDate));
 	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
 		"DateFormatTest::TestMonthNames", &DateFormatTest::TestMonthNames));
+	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
+		"DateFormatTest::TestParseDate", &DateFormatTest::TestParseDate));
 
 	parent.addTest("DateFormatTest", &suite);
 }

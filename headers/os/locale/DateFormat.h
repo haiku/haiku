@@ -71,11 +71,14 @@ public:
 			status_t			GetStartOfWeek(BWeekday* weekday) const;
 			status_t			GetMonthName(int month, BString& outName);
 
-								// TODO parsing
+								// parsing
+
+			status_t			Parse(BString source, BDateFormatStyle style,
+									BDate& output);
 
 private:
 			icu::DateFormat*	_CreateDateFormatter(
-									const BString& format) const;
+									const BDateFormatStyle style) const;
 
 };
 

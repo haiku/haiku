@@ -72,9 +72,7 @@ BDateFormat::Format(char* string, const size_t maxSize, const time_t time,
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BString format;
-	fConventions.GetDateFormat(style, format);
-	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(format));
+	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
@@ -99,9 +97,7 @@ BDateFormat::Format(BString& string, const time_t time,
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BString format;
-	fConventions.GetDateFormat(style, format);
-	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(format));
+	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
@@ -135,9 +131,7 @@ BDateFormat::Format(BString& string, const BDate& time,
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BString format;
-	fConventions.GetDateFormat(style, format);
-	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(format));
+	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
@@ -179,9 +173,7 @@ BDateFormat::Format(BString& string, int*& fieldPositions, int& fieldCount,
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BString format;
-	fConventions.GetDateFormat(style, format);
-	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(format));
+	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
@@ -226,9 +218,7 @@ BDateFormat::GetFields(BDateElement*& fields, int& fieldCount,
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BString format;
-	fConventions.GetDateFormat(style, format);
-	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(format));
+	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
@@ -332,9 +322,7 @@ BDateFormat::GetMonthName(int month, BString& outName)
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BString pattern;
-	fConventions.GetDateFormat(B_LONG_DATE_FORMAT, pattern);
-	DateFormat* format = _CreateDateFormatter(pattern);
+	DateFormat* format = _CreateDateFormatter(B_LONG_DATE_FORMAT);
 
 	SimpleDateFormat* simpleFormat = dynamic_cast<SimpleDateFormat*>(format);
 	if (simpleFormat == NULL) {
@@ -360,8 +348,36 @@ BDateFormat::GetMonthName(int month, BString& outName)
 }
 
 
+status_t
+BDateFormat::Parse(BString source, BDateFormatStyle style, BDate& output)
+{
+	// FIXME currently this parses a date in any timezone (or the local one if
+	// none is specified) to a BDate in UTC. This may not be a good idea, we
+	// may want to parse to a "local" date instead. But BDate should be made
+	// timezone aware so things like BDate::Difference can work for dates in
+	// different timezones.
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
+	if (dateFormatter.Get() == NULL)
+		return B_NO_MEMORY;
+
+
+	ParsePosition p(0);
+	UDate date = dateFormatter->parse(UnicodeString::fromUTF8(source.String()),
+		p);
+
+	output.SetDate(1970, 1, 1);
+	output.AddDays(date / U_MILLIS_PER_DAY + 0.5);
+
+	return B_OK;
+}
+
+
 DateFormat*
-BDateFormat::_CreateDateFormatter(const BString& format) const
+BDateFormat::_CreateDateFormatter(const BDateFormatStyle style) const
 {
 	Locale* icuLocale
 		= fConventions.UseStringsFromPreferredLanguage()
@@ -375,6 +391,9 @@ BDateFormat::_CreateDateFormatter(const BString& format) const
 
 	SimpleDateFormat* dateFormatterImpl
 		= static_cast<SimpleDateFormat*>(dateFormatter);
+
+	BString format;
+	fConventions.GetDateFormat(style, format);
 
 	UnicodeString pattern(format.String());
 	dateFormatterImpl->applyPattern(pattern);
