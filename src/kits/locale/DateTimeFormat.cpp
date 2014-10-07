@@ -68,7 +68,7 @@ BDateTimeFormat::SetDateTimeFormat(BDateFormatStyle dateStyle,
 	if (elements & B_DATE_ELEMENT_SECOND)
 		skeleton << "ss";
 	if (elements & B_DATE_ELEMENT_TIMEZONE)
-		skeleton << "V";
+		skeleton << "z";
 
 	UnicodeString pattern = generator->getBestPattern(
 		UnicodeString::fromUTF8(skeleton.String()), error);
