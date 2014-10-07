@@ -26,6 +26,21 @@ DateFormatTest::~DateFormatTest()
 
 
 void
+DateFormatTest::TestCustomFormat()
+{
+	int32 fields = B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE;
+	BDateTimeFormat format;
+	BString buffer;
+	format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, fields);
+	status_t result = format.Format(buffer, 12345, B_SHORT_DATE_FORMAT,
+		B_SHORT_TIME_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+	CPPUNIT_ASSERT_EQUAL(BString("04:25"), buffer);
+}
+
+
+void
 DateFormatTest::TestFormat()
 {
 	struct Value {
@@ -113,6 +128,8 @@ DateFormatTest::AddTests(BTestSuite& parent)
 {
 	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("DateFormatTest");
 
+	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
+		"DateFormatTest::TestCustomFormat", &DateFormatTest::TestCustomFormat));
 	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
 		"DateFormatTest::TestFormat", &DateFormatTest::TestFormat));
 	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(

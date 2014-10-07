@@ -15,6 +15,7 @@ public:
 					DateFormatTest();
 	virtual			~DateFormatTest();
 
+			void	TestCustomFormat();
 			void	TestFormat();
 			void	TestFormatDate();
 
