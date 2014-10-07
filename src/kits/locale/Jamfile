@@ -27,6 +27,7 @@ local sources =
 	DateFormat.cpp
 	DateTimeFormat.cpp
 	DurationFormat.cpp
+	MessageFormat.cpp
 	NumberFormat.cpp
 	TimeFormat.cpp
 	TimeUnitFormat.cpp
