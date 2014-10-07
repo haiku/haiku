@@ -40,11 +40,11 @@ DateFormatTest::TestFormat()
 
 	static const Value values[] = {
 		{"en", "en_US", 12345, "1/1/70", "January 1, 1970",
-			"4:25 AM", "4:25:45 AM CET"},
-		{"fr", "fr_FR", 12345, "01/01/70", "1 janvier 1970",
-			"04:25", "04:25:45 HNEC"},
-		{"fr", "fr_FR", 12345678, "23/05/70", "23 mai 1970",
-			"22:21", "22:21:18 HNEC"},
+			"4:25 AM", "4:25:45 AM"},
+		{"fr", "fr_FR", 12345, "01/01/1970", "1 janvier 1970",
+			"04:25", "04:25:45"},
+		{"fr", "fr_FR", 12345678, "23/05/1970", "23 mai 1970",
+			"22:21", "22:21:18"},
 		{NULL}
 	};
 
@@ -71,7 +71,7 @@ DateFormatTest::TestFormat()
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(values[i].shortTime), output);
 
-		result = timeFormat.Format(output, values[i].time, B_LONG_TIME_FORMAT);
+		result = timeFormat.Format(output, values[i].time, B_MEDIUM_TIME_FORMAT);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(values[i].longTime), output);
 	}
