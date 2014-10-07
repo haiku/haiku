@@ -9,7 +9,7 @@
 
 
 class BString;
-class BTimeZone;
+
 
 class BTimeFormat : public BFormat {
 public:

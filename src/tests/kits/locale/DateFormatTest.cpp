@@ -29,22 +29,23 @@ void
 DateFormatTest::TestFormat()
 {
 	struct Value {
-		char* language;
-		char* convention;
+		const char* language;
+		const char* convention;
 		time_t time;
-		char* shortDate;
-		char* longDate;
-		char* shortTime;
-		char* longTime;
+		const char* shortDate;
+		const char* longDate;
+		const char* shortTime;
+		const char* longTime;
+		const char* shortDateTime;
 	};
 
 	static const Value values[] = {
 		{"en", "en_US", 12345, "1/1/70", "January 1, 1970",
-			"4:25 AM", "4:25:45 AM"},
+			"4:25 AM", "4:25:45 AM", "1/1/70, 4:25 AM"},
 		{"fr", "fr_FR", 12345, "01/01/1970", "1 janvier 1970",
-			"04:25", "04:25:45"},
+			"04:25", "04:25:45", "01/01/1970 04:25"},
 		{"fr", "fr_FR", 12345678, "23/05/1970", "23 mai 1970",
-			"22:21", "22:21:18"},
+			"22:21", "22:21:18", "23/05/1970 22:21"},
 		{NULL}
 	};
 
@@ -58,6 +59,7 @@ DateFormatTest::TestFormat()
 		BFormattingConventions formatting(values[i].convention);
 		BDateFormat dateFormat(&language, &formatting);
 		BTimeFormat timeFormat(&language, &formatting);
+		BDateTimeFormat dateTimeFormat(&language, &formatting);
 
 		result = dateFormat.Format(output, values[i].time, B_SHORT_DATE_FORMAT);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
@@ -74,6 +76,11 @@ DateFormatTest::TestFormat()
 		result = timeFormat.Format(output, values[i].time, B_MEDIUM_TIME_FORMAT);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(values[i].longTime), output);
+
+		result = dateTimeFormat.Format(output, values[i].time,
+			B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT);
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(BString(values[i].shortDateTime), output);
 	}
 }
 

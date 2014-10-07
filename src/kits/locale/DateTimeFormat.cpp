@@ -17,12 +17,18 @@
 #include <ICUWrapper.h>
 
 #include <unicode/datefmt.h>
+#include <unicode/dtptngen.h>
 #include <unicode/smpdtfmt.h>
 
 
-BDateTimeFormat::BDateTimeFormat()
-	: BFormat()
+BDateTimeFormat::BDateTimeFormat(const BLanguage* const language,
+		const BFormattingConventions* const conventions)
 {
+	if (conventions != NULL)
+		fConventions = *conventions;
+
+	if (language != NULL)
+		fLanguage = *language;
 }
 
 
@@ -34,6 +40,45 @@ BDateTimeFormat::BDateTimeFormat(const BDateTimeFormat &other)
 
 BDateTimeFormat::~BDateTimeFormat()
 {
+}
+
+
+void
+BDateTimeFormat::SetDateTimeFormat(BDateFormatStyle dateStyle,
+	BTimeFormatStyle timeStyle, int32 elements) {
+	UErrorCode error = U_ZERO_ERROR;
+	DateTimePatternGenerator* generator
+		= DateTimePatternGenerator::createInstance(error);
+
+	BString skeleton;
+	if (elements & B_DATE_ELEMENT_YEAR)
+		skeleton << "yyyy";
+	if (elements & B_DATE_ELEMENT_MONTH)
+		skeleton << "MM";
+	if (elements & B_DATE_ELEMENT_WEEKDAY)
+		skeleton << "eee";
+	if (elements & B_DATE_ELEMENT_DAY)
+		skeleton << "dd";
+	if (elements & B_DATE_ELEMENT_AM_PM)
+		skeleton << "a";
+	if (elements & B_DATE_ELEMENT_HOUR)
+		skeleton << "jj";
+	if (elements & B_DATE_ELEMENT_MINUTE)
+		skeleton << "mm";
+	if (elements & B_DATE_ELEMENT_SECOND)
+		skeleton << "ss";
+	if (elements & B_DATE_ELEMENT_TIMEZONE)
+		skeleton << "V";
+
+	UnicodeString pattern = generator->getBestPattern(
+		UnicodeString::fromUTF8(skeleton.String()), error);
+
+	BString buffer;
+	BStringByteSink stringConverter(&buffer);
+	pattern.toUTF8(stringConverter);
+	fConventions.SetExplicitDateTimeFormat(dateStyle, timeStyle, buffer);
+
+	delete generator;
 }
 
 
@@ -49,22 +94,13 @@ BDateTimeFormat::Format(char* target, size_t maxSize, time_t time,
 		return B_ERROR;
 
 	BString format;
-	fConventions.GetDateFormat(dateStyle, format);
-	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(format));
+	fConventions.GetDateTimeFormat(dateStyle, timeStyle, format);
+	ObjectDeleter<DateFormat> dateFormatter(_CreateDateTimeFormatter(format));
 	if (dateFormatter.Get() == NULL)
-		return B_NO_MEMORY;
-
-	fConventions.GetTimeFormat(timeStyle, format);
-	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
-	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
 	UnicodeString icuString;
 	dateFormatter->format((UDate)time * 1000, icuString);
-
-	icuString.append(UnicodeString::fromUTF8(", "));
-
-	timeFormatter->format((UDate)time * 1000, icuString);
 
 	CheckedArrayByteSink stringConverter(target, maxSize);
 	icuString.toUTF8(stringConverter);
@@ -86,14 +122,9 @@ BDateTimeFormat::Format(BString& target, const time_t time,
 		return B_ERROR;
 
 	BString format;
-	fConventions.GetDateFormat(dateStyle, format);
-	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(format));
+	fConventions.GetDateTimeFormat(dateStyle, timeStyle, format);
+	ObjectDeleter<DateFormat> dateFormatter(_CreateDateTimeFormatter(format));
 	if (dateFormatter.Get() == NULL)
-		return B_NO_MEMORY;
-
-	fConventions.GetTimeFormat(timeStyle, format);
-	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
-	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
 	if (timeZone != NULL) {
@@ -101,13 +132,11 @@ BDateTimeFormat::Format(BString& target, const time_t time,
 			TimeZone::createTimeZone(timeZone->ID().String()));
 		if (icuTimeZone.Get() == NULL)
 			return B_NO_MEMORY;
-		timeFormatter->setTimeZone(*icuTimeZone.Get());
+		dateFormatter->setTimeZone(*icuTimeZone.Get());
 	}
 
 	UnicodeString icuString;
 	dateFormatter->format((UDate)time * 1000, icuString);
-	icuString.append(UnicodeString::fromUTF8(", "));
-	timeFormatter->format((UDate)time * 1000, icuString);
 
 	target.Truncate(0);
 	BStringByteSink stringConverter(&target);
@@ -118,15 +147,15 @@ BDateTimeFormat::Format(BString& target, const time_t time,
 
 
 DateFormat*
-BDateTimeFormat::_CreateDateFormatter(const BString& format) const
+BDateTimeFormat::_CreateDateTimeFormatter(const BString& format) const
 {
 	Locale* icuLocale
 		= fConventions.UseStringsFromPreferredLanguage()
 			? BLanguage::Private(&fLanguage).ICULocale()
 			: BFormattingConventions::Private(&fConventions).ICULocale();
 
-	icu::DateFormat* dateFormatter
-		= icu::DateFormat::createDateInstance(DateFormat::kShort, *icuLocale);
+	icu::DateFormat* dateFormatter = icu::DateFormat::createDateTimeInstance(
+		DateFormat::kDefault, DateFormat::kDefault, *icuLocale);
 	if (dateFormatter == NULL)
 		return NULL;
 
@@ -137,27 +166,4 @@ BDateTimeFormat::_CreateDateFormatter(const BString& format) const
 	dateFormatterImpl->applyPattern(pattern);
 
 	return dateFormatter;
-}
-
-
-DateFormat*
-BDateTimeFormat::_CreateTimeFormatter(const BString& format) const
-{
-	Locale* icuLocale
-		= fConventions.UseStringsFromPreferredLanguage()
-			? BLanguage::Private(&fLanguage).ICULocale()
-			: BFormattingConventions::Private(&fConventions).ICULocale();
-
-	icu::DateFormat* timeFormatter
-		= icu::DateFormat::createTimeInstance(DateFormat::kShort, *icuLocale);
-	if (timeFormatter == NULL)
-		return NULL;
-
-	SimpleDateFormat* timeFormatterImpl
-		= static_cast<SimpleDateFormat*>(timeFormatter);
-
-	UnicodeString pattern(format.String());
-	timeFormatterImpl->applyPattern(pattern);
-
-	return timeFormatter;
 }

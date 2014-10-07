@@ -83,12 +83,19 @@ public:
 									BString& outFormat) const;
 			status_t			GetTimeFormat(BTimeFormatStyle style,
 									BString& outFormat) const;
+			status_t			GetDateTimeFormat(BDateFormatStyle dateStyle,
+									BTimeFormatStyle timeStyle,
+									BString& outFormat) const;
 			status_t			GetNumericFormat(BString& outFormat) const;
 			status_t			GetMonetaryFormat(BString& outFormat) const;
 
 			void				SetExplicitDateFormat(BDateFormatStyle style,
 									const BString& format);
 			void				SetExplicitTimeFormat(BTimeFormatStyle style,
+									const BString& format);
+			void				SetExplicitDateTimeFormat(
+									BDateFormatStyle dateStyle,
+									BTimeFormatStyle timeStyle,
 									const BString& format);
 			void				SetExplicitNumericFormat(const BString& format);
 			void				SetExplicitMonetaryFormat(
@@ -112,12 +119,18 @@ private:
 
 	mutable	BString				fCachedDateFormats[B_DATE_FORMAT_STYLE_COUNT];
 	mutable	BString				fCachedTimeFormats[B_TIME_FORMAT_STYLE_COUNT];
+	mutable	BString				fCachedDateTimeFormats
+									[B_DATE_FORMAT_STYLE_COUNT]
+									[B_TIME_FORMAT_STYLE_COUNT];
 	mutable	BString				fCachedNumericFormat;
 	mutable	BString				fCachedMonetaryFormat;
 	mutable	int8				fCachedUse24HourClock;
 
 			BString				fExplicitDateFormats[B_DATE_FORMAT_STYLE_COUNT];
 			BString				fExplicitTimeFormats[B_TIME_FORMAT_STYLE_COUNT];
+			BString				fExplicitDateTimeFormats
+									[B_DATE_FORMAT_STYLE_COUNT]
+									[B_TIME_FORMAT_STYLE_COUNT];
 			BString				fExplicitNumericFormat;
 			BString				fExplicitMonetaryFormat;
 			int8				fExplicitUse24HourClock;

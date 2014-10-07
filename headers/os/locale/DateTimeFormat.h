@@ -6,20 +6,41 @@
 #define _B_DATE_TIME_FORMAT_H_
 
 
-#include <DateFormat.h>
 #include <Format.h>
 #include <FormatParameters.h>
-#include <TimeFormat.h>
 
 
 class BString;
+class BTimeZone;
+
+
+enum BDateElement {
+	B_DATE_ELEMENT_INVALID = 0,
+	B_DATE_ELEMENT_YEAR = 1 << 0,
+	B_DATE_ELEMENT_MONTH = 1 << 1,
+	B_DATE_ELEMENT_WEEKDAY = 1 << 2,
+	B_DATE_ELEMENT_DAY = 1 << 3,
+	B_DATE_ELEMENT_AM_PM = 1 << 4,
+	B_DATE_ELEMENT_HOUR = 1 << 5,
+	B_DATE_ELEMENT_MINUTE = 1 << 6,
+	B_DATE_ELEMENT_SECOND = 1 << 7,
+	B_DATE_ELEMENT_TIMEZONE = 1 << 8
+};
+
 
 
 class BDateTimeFormat : public BFormat {
 public:
-								BDateTimeFormat();
+								BDateTimeFormat(
+									const BLanguage* const language = NULL,
+									const BFormattingConventions* const format
+										= NULL);
 								BDateTimeFormat(const BDateTimeFormat &other);
 	virtual						~BDateTimeFormat();
+
+			void				SetDateTimeFormat(BDateFormatStyle dateStyle,
+									BTimeFormatStyle timeStyle,
+									int32 elements);
 
 								// formatting
 
@@ -33,9 +54,7 @@ public:
 									const BTimeZone* timeZone = NULL) const;
 
 private:
-			icu::DateFormat*	_CreateDateFormatter(
-									const BString& format) const;
-			icu::DateFormat*	_CreateTimeFormatter(
+			icu::DateFormat*	_CreateDateTimeFormatter(
 									const BString& format) const;
 };
 
