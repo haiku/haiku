@@ -330,7 +330,7 @@ UserLoginWindow::_ValidateCreateAccountFields(bool alertProblems)
 
 	// TODO: Use the same validation as the web-serivce
 	bool validUserName = nickName.Length() >= 3;
-	fNewUsernameField->MarkAsInvalid(validUserName);
+	fNewUsernameField->MarkAsInvalid(!validUserName);
 	
 	bool validPassword = password1.Length() >= 8
 		&& count_digits(password1) >= 2
