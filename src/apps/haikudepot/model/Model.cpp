@@ -15,7 +15,6 @@
 #include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
-#include <FindDirectory.h>
 #include <File.h>
 #include <KeyStore.h>
 #include <LocaleRoster.h>
@@ -793,6 +792,43 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 }
 
 
+bool
+Model::_GetCacheFile(BPath& path, BFile& file, directory_which directory,
+	const char* relativeLocation, const char* fileName, uint32 openMode) const
+{
+	if (find_directory(directory, &path) == B_OK
+		&& path.Append(relativeLocation) == B_OK
+		&& create_directory(path.Path(), 0777) == B_OK
+		&& path.Append(fileName) == B_OK) {
+		// Try opening the file which will fail if its
+		// not a file or does not exist.
+		return file.SetTo(path.Path(), openMode) == B_OK;
+	}
+	return false;
+}
+
+
+bool
+Model::_GetCacheFile(BPath& path, BFile& file, directory_which directory,
+	const char* relativeLocation, const char* fileName,
+	bool ignoreAge, time_t maxAge) const
+{
+	if (!_GetCacheFile(path, file, directory, relativeLocation, fileName,
+			B_READ_ONLY)) {
+		return false;
+	}
+
+	if (ignoreAge)
+		return true;
+
+	time_t modifiedTime;
+	file.GetModificationTime(&modifiedTime);
+	time_t now;
+	time(&now);
+	return now - modifiedTime < maxAge;
+}
+
+
 void
 Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 	PackageList& packagesWithIcons)
@@ -800,7 +836,31 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 	if (fStopPopulatingAllPackages)
 		return;
 	
-	if (fromCacheOnly)
+	// See if there are cached info files
+	for (int i = packages.CountItems() - 1; i >= 0; i--) {
+		if (fStopPopulatingAllPackages)
+			return;
+
+		const PackageInfoRef& package = packages.ItemAtFast(i);
+
+		BFile file;
+		BPath path;
+		BString name(package->Title());
+		name << ".info";
+		if (_GetCacheFile(path, file, B_USER_CACHE_DIRECTORY,
+			"HaikuDepot", name, fromCacheOnly, 60 * 60)) {
+			// Cache file is recent enough, just use it and return.
+			BMessage pkgInfo;
+			if (pkgInfo.Unflatten(&file) == B_OK) {
+				_PopulatePackageInfo(package, pkgInfo);
+				if (_HasNativeIcon(pkgInfo))
+					packagesWithIcons.Add(package);
+				packages.Remove(i);
+			}
+		}
+	}
+	
+	if (fromCacheOnly || packages.IsEmpty())
 		return;
 	
 	// Retrieve info from web-app
@@ -845,6 +905,18 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 						_PopulatePackageInfo(package, pkgInfo);
 						if (_HasNativeIcon(pkgInfo))
 							packagesWithIcons.Add(package);
+
+						// Store in cache
+						BFile file;
+						BPath path;
+						BString fileName(package->Title());
+						fileName << ".info";
+						if (_GetCacheFile(path, file, B_USER_CACHE_DIRECTORY,
+								"HaikuDepot", fileName,
+								B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE)) {
+							pkgInfo.Flatten(&file);
+						}
+
 						packages.Remove(i);
 						found = true;
 						break;
@@ -1037,31 +1109,15 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 	// See if there is a cached icon file
 	BFile iconFile;
 	BPath iconCachePath;
-	bool fileExists = false;
 	BString iconName(package->Title());
 	iconName << ".hvif";
-	time_t modifiedTime;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &iconCachePath) == B_OK
-		&& iconCachePath.Append("HaikuDepot/IconCache") == B_OK
-		&& create_directory(iconCachePath.Path(), 0777) == B_OK
-		&& iconCachePath.Append(iconName) == B_OK) {
-		// Try opening the file in read-only mode, which will fail if its
-		// not a file or does not exist.
-		fileExists = iconFile.SetTo(iconCachePath.Path(), B_READ_ONLY) == B_OK;
-		if (fileExists)
-			iconFile.GetModificationTime(&modifiedTime);
-	}
-
-	if (fileExists) {
-		time_t now;
-		time(&now);
-		if (fromCacheOnly || now - modifiedTime < 60 * 60) {
-			// Cache file is recent enough, just use it and return.
-			BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(iconFile), true);
-			BAutolock locker(&fLock);
-			package->SetIcon(bitmapRef);
-			return;
-		}
+	if (_GetCacheFile(iconCachePath, iconFile, B_USER_CACHE_DIRECTORY,
+		"HaikuDepot", iconName, fromCacheOnly, 60 * 60)) {
+		// Cache file is recent enough, just use it and return.
+		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(iconFile), true);
+		BAutolock locker(&fLock);
+		package->SetIcon(bitmapRef);
+		return;
 	}
 
 	if (fromCacheOnly)

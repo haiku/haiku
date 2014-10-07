@@ -5,13 +5,16 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <FindDirectory.h>
 #include <Locker.h>
 
 #include "PackageInfo.h"
 #include "WebAppInterface.h"
 
 
+class BFile;
 class BMessage;
+class BPath;
 
 
 class PackageFilter : public BReferenceable {
@@ -136,6 +139,17 @@ public:
 private:
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
 			void				_PopulateAllPackagesThread(bool fromCacheOnly);
+
+			bool				_GetCacheFile(BPath& path, BFile& file,
+									directory_which directory,
+									const char* relativeLocation,
+									const char* fileName,
+									uint32 openMode) const;
+			bool				_GetCacheFile(BPath& path, BFile& file,
+									directory_which directory,
+									const char* relativeLocation,
+									const char* fileName,
+									bool ignoreAge, time_t maxAge) const;
 
 			void				_PopulatePackageInfos(
 									PackageList& packages,
