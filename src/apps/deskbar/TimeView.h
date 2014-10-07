@@ -37,10 +37,10 @@ All rights reserved.
 
 
 #include <DateFormat.h>
+#include <DateTimeFormat.h>
 #include <Locale.h>
 #include <Messenger.h>
 #include <OS.h>
-#include <TimeFormat.h>
 #include <View.h>
 
 
@@ -151,7 +151,7 @@ private:
 				// For date and time localization purposes
 				BLocale			fLocale;
 				BDateFormat		fDateFormat;
-				BTimeFormat		fTimeFormat;
+				BDateTimeFormat	fTimeFormat;
 };
 
 

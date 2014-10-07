@@ -383,36 +383,20 @@ TTimeView::ShowCalendar(BPoint where)
 void
 TTimeView::GetCurrentTime()
 {
-	ssize_t offset_dow = 0;
-	ssize_t offset_time = 0;
+	int32 fields = B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE;
+	if (fShowSeconds)
+		fields |= B_DATE_ELEMENT_SECOND;
+	if (fShowDayOfWeek)
+		fields |= B_DATE_ELEMENT_WEEKDAY;
+	if (fShowTimeZone)
+		fields |= B_DATE_ELEMENT_TIMEZONE;
 
-	// ToDo: Check to see if we should write day of week after time for locale
+	fTimeFormat.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
+		fields);
 
-	if (fShowDayOfWeek) {
-		BString timeFormat("eee ");
-		offset_dow = fTimeFormat.Format(fCurrentTimeStr,
-			sizeof(fCurrentTimeStr), fCurrentTime, timeFormat);
-
-		if (offset_dow < 0) {
-			// error occured, attempt to overwrite with current time
-			// (this should not ever happen)
-			fTimeFormat.Format(fCurrentTimeStr, sizeof(fCurrentTimeStr),
-				fCurrentTime,
-				fShowSeconds ? B_MEDIUM_TIME_FORMAT : B_SHORT_TIME_FORMAT);
-			return;
-		}
-	}
-
-	offset_time = fTimeFormat.Format(fCurrentTimeStr + offset_dow,
-		sizeof(fCurrentTimeStr) - offset_dow, fCurrentTime,
-		fShowSeconds ? B_MEDIUM_TIME_FORMAT : B_SHORT_TIME_FORMAT);
-
-	if (fShowTimeZone) {
-		BString timeFormat(" V");
-		ssize_t offset = offset_dow + offset_time;
-		fTimeFormat.Format(fCurrentTimeStr + offset,
-			sizeof(fCurrentTimeStr) - offset, fCurrentTime, timeFormat);
-	}
+	fTimeFormat.Format(fCurrentTimeStr,
+		sizeof(fCurrentTimeStr), fCurrentTime,
+		B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT);
 }
 
 
