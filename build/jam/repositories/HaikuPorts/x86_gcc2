@@ -212,6 +212,7 @@ RemotePackageRepository HaikuPorts
 	mkdepend-1.7-3
 	moe-1.1.2-1
 	mog-0.63.1548-1
+	multitalk-1.4-1
 	nano-2.2.6-3
 	nasm-2.11.02-1
 	ncurses-5.9-9
@@ -740,6 +741,7 @@ RemotePackageRepository HaikuPorts
 	mog
 	mpd_x86
 	mpg123_x86
+	multitalk
 	muscle_x86
 	musicpc_x86
 	nano
