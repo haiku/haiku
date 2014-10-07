@@ -123,6 +123,27 @@ DateFormatTest::TestFormatDate()
 }
 
 
+void
+DateFormatTest::TestMonthNames()
+{
+	BLanguage language("en");
+	BFormattingConventions formatting("en_US");
+	BDateFormat format(&language, &formatting);
+
+	BString buffer;
+	status_t result = format.GetMonthName(1, buffer);
+
+	CPPUNIT_ASSERT_EQUAL(BString("January"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetMonthName(12, buffer);
+
+	CPPUNIT_ASSERT_EQUAL(BString("December"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+}
+
+
 /*static*/ void
 DateFormatTest::AddTests(BTestSuite& parent)
 {
@@ -134,6 +155,8 @@ DateFormatTest::AddTests(BTestSuite& parent)
 		"DateFormatTest::TestFormat", &DateFormatTest::TestFormat));
 	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
 		"DateFormatTest::TestFormatDate", &DateFormatTest::TestFormatDate));
+	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
+		"DateFormatTest::TestMonthNames", &DateFormatTest::TestMonthNames));
 
 	parent.addTest("DateFormatTest", &suite);
 }

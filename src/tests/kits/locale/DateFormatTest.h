@@ -18,6 +18,7 @@ public:
 			void	TestCustomFormat();
 			void	TestFormat();
 			void	TestFormatDate();
+			void	TestMonthNames();
 
 	static	void	AddTests(BTestSuite& suite);
 };

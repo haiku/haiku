@@ -69,6 +69,7 @@ public:
 									) const;
 
 			status_t			GetStartOfWeek(BWeekday* weekday) const;
+			status_t			GetMonthName(int month, BString& outName);
 
 								// TODO parsing
 

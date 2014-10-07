@@ -20,6 +20,7 @@
 #include <ICUWrapper.h>
 
 #include <unicode/datefmt.h>
+#include <unicode/dtfmtsym.h>
 #include <unicode/smpdtfmt.h>
 
 #include <vector>
@@ -320,6 +321,41 @@ BDateFormat::GetStartOfWeek(BWeekday* startOfWeek) const
 			return B_ERROR;
 	}
 
+	return B_OK;
+}
+
+
+status_t
+BDateFormat::GetMonthName(int month, BString& outName)
+{
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	BString pattern;
+	fConventions.GetDateFormat(B_LONG_DATE_FORMAT, pattern);
+	DateFormat* format = _CreateDateFormatter(pattern);
+
+	SimpleDateFormat* simpleFormat = dynamic_cast<SimpleDateFormat*>(format);
+	if (simpleFormat == NULL) {
+		delete format;
+		return B_ERROR;
+	}
+
+	const DateFormatSymbols* symbols = simpleFormat->getDateFormatSymbols();
+
+	int32_t count;
+	const UnicodeString* names = symbols->getMonths(count);
+
+	if (month > count || month <= 0) {
+		delete simpleFormat;
+		return B_BAD_DATA;
+	}
+
+	BStringByteSink stringConverter(&outName);
+	names[month - 1].toUTF8(stringConverter);
+
+	delete simpleFormat;
 	return B_OK;
 }
 
