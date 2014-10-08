@@ -124,7 +124,7 @@ TTimeWindow::_InitWindow()
 	fBaseView->StartWatchingAll(fDateTimeView);
 	fBaseView->StartWatchingAll(fTimeZoneView);
 
-	fTabView = new BTabView("tabView");
+	fTabView = new BTabView("tabView", B_WIDTH_FROM_WIDEST);
 	fTabView->AddTab(fDateTimeView);
 	fTabView->AddTab(fTimeZoneView);
 	fTabView->AddTab(fNetworkTimeView);
