@@ -28,15 +28,34 @@ DateFormatTest::~DateFormatTest()
 void
 DateFormatTest::TestCustomFormat()
 {
-	int32 fields = B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE;
-	BDateTimeFormat format;
 	BString buffer;
+	BLanguage language("en");
+	BFormattingConventions formatting("en_US");
+	int32 fields = B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE;
+
+	BDateTimeFormat format(&language, &formatting);
+
+	NextSubTest();
+
+	formatting.SetExplicitUse24HourClock(true);
+	format.SetFormattingConventions(formatting);
 	format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, fields);
-	status_t result = format.Format(buffer, 12345, B_SHORT_DATE_FORMAT,
+	status_t result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
 		B_SHORT_TIME_FORMAT);
 
 	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-	CPPUNIT_ASSERT_EQUAL(BString("04:25"), buffer);
+	CPPUNIT_ASSERT_EQUAL(BString("22:21"), buffer);
+
+	NextSubTest();
+
+	formatting.SetExplicitUse24HourClock(false);
+	format.SetFormattingConventions(formatting);
+	format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, fields);
+	result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
+		B_SHORT_TIME_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+	CPPUNIT_ASSERT_EQUAL(BString("10:21 PM"), buffer);
 }
 
 

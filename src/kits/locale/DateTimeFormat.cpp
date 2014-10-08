@@ -61,8 +61,12 @@ BDateTimeFormat::SetDateTimeFormat(BDateFormatStyle dateStyle,
 		skeleton << "dd";
 	if (elements & B_DATE_ELEMENT_AM_PM)
 		skeleton << "a";
-	if (elements & B_DATE_ELEMENT_HOUR)
-		skeleton << "jj";
+	if (elements & B_DATE_ELEMENT_HOUR) {
+		if (fConventions.Use24HourClock())
+			skeleton << "HH";
+		else
+			skeleton << "KK";
+	}
 	if (elements & B_DATE_ELEMENT_MINUTE)
 		skeleton << "mm";
 	if (elements & B_DATE_ELEMENT_SECOND)
