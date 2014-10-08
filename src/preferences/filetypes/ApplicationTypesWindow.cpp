@@ -21,6 +21,7 @@
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <MessageFormat.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -353,11 +354,12 @@ ApplicationTypesWindow::_RemoveUninstalled()
 
 	progressWindow->PostMessage(B_QUIT_REQUESTED);
 
-	char message[512];
-	// TODO: Use ICU to properly format this.
-	snprintf(message, sizeof(message),
-		B_TRANSLATE("%ld Application type%s could be removed."),
-		removed, removed == 1 ? "" : "s");
+	static BMessageFormat format(B_TRANSLATE("{0, plural, "
+		"one{# Application type could be removed} "
+		"other{# Application types could be removed}}"));
+	BString message;
+	format.Format(message, removed);
+
 	error_alert(message, B_OK, B_INFO_ALERT);
 }
 

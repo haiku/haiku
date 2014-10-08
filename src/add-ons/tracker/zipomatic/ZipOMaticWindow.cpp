@@ -21,6 +21,7 @@
 #include <GroupLayout.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
+#include <MessageFormat.h>
 #include <Path.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -151,17 +152,12 @@ ZippoWindow::MessageReceived(BMessage* message)
 					// being created (added to) or if we're updating an
 					// already existing archive.
 
+					static BMessageFormat format(B_TRANSLATE("{0, plural, "
+						"one{# file added.} other{# files added.}}"));
 					BString output;
-					fFileCount++;
-					BString count;
-					count << fFileCount;
+					format.Format(output, fFileCount);
 
-					if (fFileCount == 1) {
-						output << B_TRANSLATE("1 file added.");
-					} else {
-						output << B_TRANSLATE("%ld files added.");
-						output.ReplaceFirst("%ld", count.String());
-					}
+					fFileCount++;
 
 					fZipOutputView->SetText(output.String());
 				} else {
