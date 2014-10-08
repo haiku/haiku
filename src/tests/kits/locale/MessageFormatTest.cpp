@@ -27,7 +27,6 @@ void
 MessageFormatTest::TestFormat()
 {
 	BString output;
-	BMessageFormat formatter;
 
 	struct Test {
 		const char* locale;
@@ -55,9 +54,10 @@ MessageFormatTest::TestFormat()
 		NextSubTest();
 		output.Truncate(0);
 		BLanguage language(tests[i].locale);
+		BMessageFormat formatter(tests[i].pattern);
 		formatter.SetLanguage(language);
 
-		result = formatter.Format(output, tests[i].pattern, tests[i].number);
+		result = formatter.Format(output, tests[i].number);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(tests[i].expected), output);
 	}

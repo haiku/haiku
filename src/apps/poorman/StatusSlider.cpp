@@ -15,7 +15,7 @@ StatusSlider::StatusSlider(const char* name, const char* label,
 	const char* statusPrefix, BMessage* message, int32 minValue, int32 maxValue)
 	:
 	BSlider(name, label, message, minValue, maxValue, B_HORIZONTAL),
-	fStatusPrefix(statusPrefix)
+	fFormat(statusPrefix)
 {
 }
 
@@ -23,6 +23,7 @@ StatusSlider::StatusSlider(const char* name, const char* label,
 const char*
 StatusSlider::UpdateText() const
 {
-	BMessageFormat().Format(fStr, fStatusPrefix, Value());
+	fStr.Truncate(0);
+	fFormat.Format(fStr, Value());
 	return fStr.String();
 }

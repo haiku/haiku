@@ -178,9 +178,10 @@ MailDaemonApp::ReadyToRun()
 
 	BString string;
 	if (fNewMessages > 0) {
-		BMessageFormat().Format(string, B_TRANSLATE(
-			"{0, plural, one{# new message} other{# new messages}}"),
-			fNewMessages);
+		static BMessageFormat format(B_TRANSLATE(
+			"{0, plural, one{# new message} other{# new messages}}"));
+
+		format.Format(string, fNewMessages);
 	} else
 		string = B_TRANSLATE("No new messages");
 
@@ -344,11 +345,12 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 
 		case 'numg':
 		{
-			int32 numMessages = msg->FindInt32("num_messages");
-			BMessageFormat().Format(fAlertString, B_TRANSLATE(
-				"{0, plural, one{# new message} other{# new messages}} "
-				"for %name\n"), numMessages);
+			static BMessageFormat format(B_TRANSLATE("{0, plural, "
+				"one{# new message} other{# new messages}} for %name\n"));
 
+			int32 numMessages = msg->FindInt32("num_messages");
+			fAlertString.Truncate(0);
+			format.Format(fAlertString, numMessages);
 			fAlertString.ReplaceFirst("%name", msg->FindString("name"));
 			break;
 		}
@@ -369,9 +371,9 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 			BString string;
 
 			if (fNewMessages > 0) {
-				BMessageFormat().Format(string, B_TRANSLATE(
-					"{0, plural, one{# new message.} other{# new messages.}}"),
-					fNewMessages);
+				static BMessageFormat format(B_TRANSLATE(
+					"{0, plural, one{# new message.} other{# new messages.}}"));
+				format.Format(string, fNewMessages);
 			} else
 				string << B_TRANSLATE("No new messages.");
 

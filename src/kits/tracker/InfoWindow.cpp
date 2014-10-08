@@ -675,23 +675,25 @@ BInfoWindow::MessageReceived(BMessage* message)
 void
 BInfoWindow::GetSizeString(BString &result, off_t size, int32 fileCount)
 {
-	char sizeBuffer[128];
-	BMessageFormat messageFormat;
+	static BMessageFormat sizeFormat(B_TRANSLATE(
+		"{0, plural, one{(# byte)} other{(# bytes)}}"));
+	static BMessageFormat countFormat(B_TRANSLATE(
+		"{0, plural, one{for # file} other{for # files}}"));
 
+	char sizeBuffer[128];
 	result << string_for_size((double)size, sizeBuffer, sizeof(sizeBuffer));
 
 	if (size >= kKBSize) {
 		result << " ";
-		messageFormat.Format(result, B_TRANSLATE(
-			"{0, plural, one{(# byte)} other{(# bytes)}}"), size);
+				
+		sizeFormat.Format(result, size);
 			// "bytes" translation could come from string_for_size
 			// which could be part of the localekit itself
 	}
 
 	if (fileCount != 0) {
 		result << " ";
-		messageFormat.Format(result, B_TRANSLATE(
-			"{0, plural, one{for # file} other{for # files}}"), fileCount);
+		countFormat.Format(result, fileCount);
 	}
 }
 

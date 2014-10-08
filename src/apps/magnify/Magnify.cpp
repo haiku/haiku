@@ -829,16 +829,19 @@ TInfoView::Draw(BRect updateRect)
 
 	MovePenTo(10, fFontHeight + 5);
 
+	static BMessageFormat format(B_TRANSLATE("%width x %height  @ {0, plural, "
+		"one{# pixel/pixel} other{# pixels/pixel}}"));
+
 	BString dimensionsInfo;
-	BMessageFormat().Format(dimensionsInfo,
-		B_TRANSLATE("%width x %height  @ {0, plural, one{# pixel/pixel} "
-			"other{# pixels/pixel}}"), pixelSize);
+	format.Format(dimensionsInfo, pixelSize);
+
 	BString rep;
 	rep << hPixelCount;
 	dimensionsInfo.ReplaceAll("%width", rep);
 	rep = "";
 	rep << vPixelCount;
 	dimensionsInfo.ReplaceAll("%height", rep);
+
 	invalRect.Set(10, 5, 10 + StringWidth(fInfoStr), fFontHeight+7);
 	SetHighColor(ViewColor());
 	FillRect(invalRect);

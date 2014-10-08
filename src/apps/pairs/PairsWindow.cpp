@@ -305,10 +305,10 @@ PairsWindow::MessageReceived(BMessage* message)
 
 				// Note: in english the singular form is never used, but other
 				// languages behave differently.
-				BMessageFormat().Format(strAbout, B_TRANSLATE(
+				static BMessageFormat format(B_TRANSLATE(
 					"You completed the game in "
-					"{0, plural, one{# click} other{# clicks}}.\n"),
-					fButtonClicks);
+					"{0, plural, one{# click} other{# clicks}}.\n"));
+				format.Format(strAbout, fButtonClicks);
 
 				BAlert* alert = new BAlert("about",
 					strAbout.String(),

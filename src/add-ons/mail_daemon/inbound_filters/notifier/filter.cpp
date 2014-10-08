@@ -68,11 +68,12 @@ NotifyFilter::MailboxSynced(status_t status)
 		system_beep("New E-mail");
 
 	if (fStrategy & alert) {
-		BString text;
-		BMessageFormat().Format(text, B_TRANSLATE(
+		static BMessageFormat format(B_TRANSLATE(
 			"You have {0, plural, one{# new message} other{# new messages}} "
-			"for %account."), fNNewMessages);
+			"for %account."));
 
+		BString text;
+		format.Format(text, fNNewMessages);
 		text.ReplaceFirst("%account", fMailProtocol.AccountSettings().Name());
 
 		BAlert *alert = new BAlert(B_TRANSLATE("New messages"), text.String(),
@@ -97,11 +98,11 @@ NotifyFilter::MailboxSynced(status_t status)
 	}
 
 	if (fStrategy & log_window) {
-		BString message;
-		BMessageFormat().Format(message, B_TRANSLATE(
-			"{0, plural, one{# new message} other{# new messages}}"),
-			fNNewMessages);
+		static BMessageFormat format(B_TRANSLATE("{0, plural, "
+			"one{# new message} other{# new messages}}"));
 
+		BString message;
+		format.Format(message, fNNewMessages);
 		fMailProtocol.ShowMessage(message.String());
 	}
 

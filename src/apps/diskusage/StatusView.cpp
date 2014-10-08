@@ -151,9 +151,10 @@ StatusView::ShowInfo(const FileInfo* info)
 	fSizeView->SetText(label);
 
 	if (info->count > 0) {
+		static BMessageFormat format(B_TRANSLATE("{0, plural, "
+			"one{# file}, other{# files}}"));
 		BString label;
-		BMessageFormat().Format(label, B_TRANSLATE("{0, plural, one{# file}, "
-			"other{# files}}"), info->count);
+		format.Format(label, info->count);
 		fCountView->SetText(label);
 	} else {
 		fCountView->SetText(kEmptyStr);

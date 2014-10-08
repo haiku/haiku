@@ -609,9 +609,11 @@ public:
 private:
 	BString _GetLabel() const
 	{
+		static BMessageFormat format(B_TRANSLATE("{0, plural, "
+			"one{# item} other{# items}}"));
+
 		BString label;
-		BMessageFormat().Format(label, B_TRANSLATE("{0, plural, one{# item} "
-			"other{# items}}"), fItemCount);
+		format.Format(label, fItemCount);
 		return label;
 	}
 

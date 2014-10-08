@@ -232,10 +232,10 @@ BCountView::Draw(BRect updateRect)
 		if (fLastCount == 0)
 			itemString << B_TRANSLATE("no items");
 		else {
-			BMessageFormat().Format(itemString, B_TRANSLATE_COMMENT(
+			static BMessageFormat format(B_TRANSLATE_COMMENT(
 				"{0, plural, one{# item} other{# items}}",
-				"Number of selected items: \"1 item\" or \"2 items\""),
-				fLastCount);
+				"Number of selected items: \"1 item\" or \"2 items\""));
+			format.Format(itemString, fLastCount);
 		}
 	}
 

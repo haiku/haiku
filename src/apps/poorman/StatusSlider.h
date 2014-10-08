@@ -10,6 +10,7 @@
 
 //#define BEOS_R5_COMPATIBLE
 
+#include <MessageFormat.h>
 #include <Slider.h>
 #include <String.h>
 
@@ -26,7 +27,7 @@ public:
 	virtual const char*	UpdateText() const;
 
 private:
-	const	char*			fStatusPrefix;
+	BMessageFormat			fFormat;
 	mutable	BString			fStr;
 };
 

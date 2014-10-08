@@ -542,10 +542,10 @@ DeskbarView::_BuildMenu()
 	// The New E-mail query
 
 	if (fNewMessages > 0) {
+		static BMessageFormat format(B_TRANSLATE(
+			"{0, plural, one{# new message} other{# new messages}}"));
 		BString string;
-		BMessageFormat().Format(string, B_TRANSLATE(
-			"{0, plural, one{# new message} other{# new messages}}"),
-			fNewMessages);
+		format.Format(string, fNewMessages);
 
 		_GetNewQueryRef(ref);
 
