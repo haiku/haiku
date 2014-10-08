@@ -21,6 +21,7 @@
 #include <Locale.h>
 #include <MenuItem.h>
 #include <MenuField.h>
+#include <MessageFormat.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Screen.h>
@@ -828,17 +829,16 @@ TInfoView::Draw(BRect updateRect)
 
 	MovePenTo(10, fFontHeight + 5);
 
-	BString dimensionsInfo(
-		B_TRANSLATE("%width x %height  @ %pixelSize pixels/pixel"));
+	BString dimensionsInfo;
+	BMessageFormat().Format(dimensionsInfo,
+		B_TRANSLATE("%width x %height  @ {0, plural, one{# pixel/pixel} "
+			"other{# pixels/pixel}}"), pixelSize);
 	BString rep;
 	rep << hPixelCount;
 	dimensionsInfo.ReplaceAll("%width", rep);
 	rep = "";
 	rep << vPixelCount;
 	dimensionsInfo.ReplaceAll("%height", rep);
-	rep = "";
-	rep << pixelSize;
-	dimensionsInfo.ReplaceAll("%pixelSize", rep);
 	invalRect.Set(10, 5, 10 + StringWidth(fInfoStr), fFontHeight+7);
 	SetHighColor(ViewColor());
 	FillRect(invalRect);

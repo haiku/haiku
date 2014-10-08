@@ -17,6 +17,7 @@
 #include <Catalog.h>
 #include <Box.h>
 #include <Button.h>
+#include <MessageFormat.h>
 #include <Node.h>
 #include <String.h>
 #include <StringForSize.h>
@@ -83,7 +84,7 @@ StatusView::StatusView()
 				.Add(fCountView)
 				.Add(divider2)
 				.Add(fSizeView)
-				.End()			
+				.End()
 			.End()
 		.AddStrut(kSmallHMargin)
 		.Add(fRefreshBtn)
@@ -150,9 +151,9 @@ StatusView::ShowInfo(const FileInfo* info)
 	fSizeView->SetText(label);
 
 	if (info->count > 0) {
-		char label[256];
-		snprintf(label, sizeof(label), (info->count == 1) ?
-			B_TRANSLATE("%d file") : B_TRANSLATE("%d files"), info->count);
+		BString label;
+		BMessageFormat().Format(label, B_TRANSLATE("{0, plural, one{# file}, "
+			"other{# files}}"), info->count);
 		fCountView->SetText(label);
 	} else {
 		fCountView->SetText(kEmptyStr);
