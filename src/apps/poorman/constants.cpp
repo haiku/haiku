@@ -115,8 +115,8 @@ const char* STR_BBX_CONNECTION
 	= B_TRANSLATE("Connections");
 const char* STR_SLD_LABEL
 	= B_TRANSLATE("Max. simultaneous connections:");
-char* STR_SLD_STATUS_LABEL
-	= (char*)B_TRANSLATE("connections");
+const char* STR_SLD_STATUS_LABEL
+	= B_TRANSLATE("{0, plural, one{# connection} other{# connections}}");
 
 const char CMD_FILE_SAVE_AS
 	= 'S';

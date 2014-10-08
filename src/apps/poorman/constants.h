@@ -94,7 +94,7 @@ extern const char* STR_FILEPANEL_CREATE_LOG_FILE;
 extern const char* STR_TAB_ADVANCED;
 extern const char* STR_BBX_CONNECTION;
 extern const char* STR_SLD_LABEL;
-extern 		 char* STR_SLD_STATUS_LABEL;
+extern const char* STR_SLD_STATUS_LABEL;
 
 extern const char CMD_FILE_SAVE_AS;
 extern const char CMD_FILE_QUIT;
