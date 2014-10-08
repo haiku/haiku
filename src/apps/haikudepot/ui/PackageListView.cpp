@@ -11,6 +11,7 @@
 
 #include <Autolock.h>
 #include <Catalog.h>
+#include <MessageFormat.h>
 #include <ScrollBar.h>
 #include <Window.h>
 
@@ -396,7 +397,6 @@ PackageColumn::CompareFields(BField* field1, BField* field2)
 }
 
 
-
 float
 PackageColumn::GetPreferredWidth(BField *_field, BView* parent) const
 {
@@ -610,10 +610,8 @@ private:
 	BString _GetLabel() const
 	{
 		BString label;
-		if (fItemCount == 1)
-			label = B_TRANSLATE("1 item");
-		else
-			label.SetToFormat(B_TRANSLATE("%ld items"), fItemCount);
+		BMessageFormat().Format(label, B_TRANSLATE("{0, plural, one{# item} "
+			"other{# items}}"), fItemCount);
 		return label;
 	}
 
