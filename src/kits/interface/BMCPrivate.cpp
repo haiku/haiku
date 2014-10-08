@@ -25,6 +25,38 @@
 static const float kPopUpIndicatorWidth = 13.0f;
 
 
+#if __GNUC__ == 2
+
+
+// This is kept only for binary compatibility with BeOS R5. This class was
+// used in their BMenuField implementation and we may come across some archived
+// BMenuField that needs it.
+class _BMCItem_: public BMenuItem {
+public:
+	_BMCItem_(BMessage* data);
+	static BArchivable* Instantiate(BMessage *data);
+};
+
+
+_BMCItem_::_BMCItem_(BMessage* data)
+	: BMenuItem(data)
+{
+
+}
+
+
+/*static*/ BArchivable*
+_BMCItem_::Instantiate(BMessage *data) {
+	if (validate_instantiation(data, "_BMCItem_"))
+		return new _BMCItem_(data);
+
+	return NULL;
+}
+
+
+#endif
+
+
 //	#pragma mark - _BMCFilter_
 
 
