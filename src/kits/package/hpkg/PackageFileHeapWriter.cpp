@@ -642,13 +642,17 @@ PackageFileHeapWriter::_UnwriteLastPartialChunk()
 	// If the last chunk is partial, read it in and remove it from the offsets.
 	size_t lastChunkSize = fUncompressedHeapSize % kChunkSize;
 	if (lastChunkSize != 0) {
-		status_t error = ReadData(fUncompressedHeapSize - lastChunkSize,
-			fPendingDataBuffer, lastChunkSize);
+		uint64 lastChunkOffset = fOffsets[fOffsets.Count() - 1];
+		size_t compressedSize = fCompressedHeapSize - lastChunkOffset;
+
+		status_t error = ReadAndDecompressChunkData(lastChunkOffset,
+			compressedSize, lastChunkSize, fCompressedDataBuffer,
+			fPendingDataBuffer);;
 		if (error != B_OK)
 			throw error;
 
 		fPendingDataSize = lastChunkSize;
-		fCompressedHeapSize = fOffsets[fOffsets.Count() - 1];
+		fCompressedHeapSize = lastChunkOffset;
 		fOffsets.Remove(fOffsets.Count() - 1);
 	}
 }
