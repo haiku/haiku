@@ -27,6 +27,7 @@ public:
 	virtual const char*	UpdateText() const;
 
 private:
+	mutable char			fPattern[256];
 	BMessageFormat			fFormat;
 	mutable	BString			fStr;
 };
