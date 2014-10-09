@@ -162,15 +162,28 @@ DateFormatTest::TestMonthNames()
 	CPPUNIT_ASSERT_EQUAL(B_OK, result);
 }
 
+
 std::ostream& operator<<(std::ostream& stream, const BDate& date)
 {
-	 stream << date.Year();
-	 stream << '-';
-	 stream << date.Month();
-	 stream << '-';
-	 stream << date.Day();
+	stream << date.Year();
+	stream << '-';
+	stream << date.Month();
+	stream << '-';
+	stream << date.Day();
 
-	 return stream;
+	return stream;
+}
+
+
+std::ostream& operator<<(std::ostream& stream, const BTime& date)
+{
+	stream << date.Hour();
+	stream << ':';
+	stream << date.Minute();
+	stream << ':';
+	stream << date.Second();
+
+	return stream;
 }
 
 
@@ -205,6 +218,37 @@ DateFormatTest::TestParseDate()
 }
 
 
+void
+DateFormatTest::TestParseTime()
+{
+	BLanguage language("fr");
+	BFormattingConventions formatting("fr_FR");
+	BTimeFormat format(&language, &formatting);
+	BTime date;
+	status_t result;
+
+	struct Test {
+		const char* input;
+		BTime output;
+	};
+
+	static const Test tests[] = {
+		{"03:25", BTime(3, 25, 0)},
+		{"16:18", BTime(16, 18, 0)},
+		{"23:59", BTime(23, 59, 0)},
+		{NULL}
+	};
+
+	for (int i = 0; tests[i].input != NULL; i++) {
+		NextSubTest();
+		result = format.Parse(tests[i].input, B_SHORT_TIME_FORMAT, date);
+
+		CPPUNIT_ASSERT_EQUAL(tests[i].output, date);
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+	}
+}
+
+
 /*static*/ void
 DateFormatTest::AddTests(BTestSuite& parent)
 {
@@ -220,6 +264,8 @@ DateFormatTest::AddTests(BTestSuite& parent)
 		"DateFormatTest::TestMonthNames", &DateFormatTest::TestMonthNames));
 	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
 		"DateFormatTest::TestParseDate", &DateFormatTest::TestParseDate));
+	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
+		"DateFormatTest::TestParseTime", &DateFormatTest::TestParseTime));
 
 	parent.addTest("DateFormatTest", &suite);
 }

@@ -10,6 +10,7 @@
 
 #include <AutoDeleter.h>
 #include <Autolock.h>
+#include <DateTime.h>
 #include <FormattingConventionsPrivate.h>
 #include <LanguagePrivate.h>
 #include <TimeZone.h>
@@ -44,6 +45,14 @@ BTimeFormat::~BTimeFormat()
 }
 
 
+void
+BTimeFormat::SetTimeFormat(BTimeFormatStyle style,
+	const BString& format)
+{
+	fConventions.SetExplicitTimeFormat(style, format);
+}
+
+
 // #pragma mark - Formatting
 
 
@@ -55,37 +64,7 @@ BTimeFormat::Format(char* string, size_t maxSize, time_t time,
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BString format;
-	fConventions.GetTimeFormat(style, format);
-	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
-	if (timeFormatter.Get() == NULL)
-		return B_NO_MEMORY;
-
-	UnicodeString icuString;
-	timeFormatter->format((UDate)time * 1000, icuString);
-
-	CheckedArrayByteSink stringConverter(string, maxSize);
-	icuString.toUTF8(stringConverter);
-
-	if (stringConverter.Overflowed())
-		return B_BAD_VALUE;
-
-	return stringConverter.NumberOfBytesWritten();
-}
-
-
-ssize_t
-BTimeFormat::Format(char* string, size_t maxSize, time_t time,
-	BString format) const
-{
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
-	if (format == NULL || format.CountChars() <= 0)
-		return B_BAD_VALUE;
-
-	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
+	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
@@ -110,43 +89,7 @@ BTimeFormat::Format(BString& string, const time_t time,
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BString format;
-	fConventions.GetTimeFormat(style, format);
-	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
-	if (timeFormatter.Get() == NULL)
-		return B_NO_MEMORY;
-
-	if (timeZone != NULL) {
-		ObjectDeleter<TimeZone> icuTimeZone(
-			TimeZone::createTimeZone(timeZone->ID().String()));
-		if (icuTimeZone.Get() == NULL)
-			return B_NO_MEMORY;
-		timeFormatter->setTimeZone(*icuTimeZone.Get());
-	}
-
-	UnicodeString icuString;
-	timeFormatter->format((UDate)time * 1000, icuString);
-
-	string.Truncate(0);
-	BStringByteSink stringConverter(&string);
-	icuString.toUTF8(stringConverter);
-
-	return B_OK;
-}
-
-
-status_t
-BTimeFormat::Format(BString& string, const time_t time,
-	const BString format, const BTimeZone* timeZone) const
-{
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
-	if (format == NULL || format.CountChars() <= 0)
-		return B_BAD_VALUE;
-
-	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
+	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
@@ -177,9 +120,7 @@ BTimeFormat::Format(BString& string, int*& fieldPositions, int& fieldCount,
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BString format;
-	fConventions.GetTimeFormat(style, format);
-	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
+	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
@@ -223,9 +164,7 @@ BTimeFormat::GetTimeFields(BDateElement*& fields, int& fieldCount,
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	BString format;
-	fConventions.GetTimeFormat(style, format);
-	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(format));
+	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
@@ -277,8 +216,35 @@ BTimeFormat::GetTimeFields(BDateElement*& fields, int& fieldCount,
 }
 
 
+status_t
+BTimeFormat::Parse(BString source, BTimeFormatStyle style, BTime& output)
+{
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
+	if (timeFormatter.Get() == NULL)
+		return B_NO_MEMORY;
+
+	// If no timezone is specified in the time string, assume GMT
+	timeFormatter->setTimeZone(*icu::TimeZone::getGMT());
+
+	ParsePosition p(0);
+	UDate date = timeFormatter->parse(UnicodeString::fromUTF8(source.String()),
+		p);
+
+	printf("T %f\n", date);
+
+	output.SetTime(0, 0, 0);
+	output.AddMilliseconds(date);
+
+	return B_OK;
+}
+
+
 DateFormat*
-BTimeFormat::_CreateTimeFormatter(const BString& format) const
+BTimeFormat::_CreateTimeFormatter(const BTimeFormatStyle style) const
 {
 	Locale* icuLocale
 		= fConventions.UseStringsFromPreferredLanguage()
@@ -292,6 +258,9 @@ BTimeFormat::_CreateTimeFormatter(const BString& format) const
 
 	SimpleDateFormat* timeFormatterImpl
 		= static_cast<SimpleDateFormat*>(timeFormatter);
+
+	BString format;
+	fConventions.GetTimeFormat(style, format);
 
 	UnicodeString pattern(format.String());
 	timeFormatterImpl->applyPattern(pattern);

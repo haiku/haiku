@@ -5,10 +5,15 @@
 #ifndef _B_TIME_FORMAT_H_
 #define _B_TIME_FORMAT_H_
 
+
 #include <DateTimeFormat.h>
 
 
 class BString;
+
+namespace BPrivate {
+	class BTime;
+}
 
 
 class BTimeFormat : public BFormat {
@@ -20,18 +25,16 @@ public:
 								BTimeFormat(const BTimeFormat &other);
 	virtual						~BTimeFormat();
 
+			void				SetTimeFormat(BTimeFormatStyle style,
+									const BString& format);
+
 								// formatting
 
 			ssize_t				Format(char* string, size_t maxSize,
 									time_t time, BTimeFormatStyle style) const;
-			ssize_t				Format(char* string, size_t maxSize,
-									time_t time, BString format) const;
 			status_t			Format(BString& string, const time_t time,
 									const BTimeFormatStyle style,
 									const BTimeZone* timeZone = NULL) const;
-			status_t			Format(BString& string, const time_t time,
-									const BString format,
-									const BTimeZone* timeZone) const;
 			status_t			Format(BString& string,
 									int*& fieldPositions, int& fieldCount,
 									time_t time, BTimeFormatStyle style) const;
@@ -40,10 +43,14 @@ public:
 									int& fieldCount, BTimeFormatStyle style
 									) const;
 
-								// TODO parsing
+								// parsing
+
+			status_t			Parse(BString source, BTimeFormatStyle style,
+									BPrivate::BTime& output);
+
 private:
 			icu::DateFormat*	_CreateTimeFormatter(
-									const BString& format) const;
+									const BTimeFormatStyle style) const;
 };
 
 
