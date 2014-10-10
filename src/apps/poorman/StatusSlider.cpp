@@ -25,6 +25,6 @@ StatusSlider::UpdateText() const
 {
 	fStr.Truncate(0);
 	fFormat.Format(fStr, Value());
-	strcpy(fPattern, fStr.String());
+	strlcpy(fPattern, fStr.String(), sizeof(fPattern));
 	return fPattern;
 }
