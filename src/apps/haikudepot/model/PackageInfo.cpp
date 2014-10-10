@@ -495,11 +495,9 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 		publisherURL = info.URLList().StringAt(0);
 
 	BString publisherName = info.Vendor();
-	if (publisherName.IsEmpty()) {
-		const BStringList& rightsList = info.CopyrightList();
-		if (rightsList.CountStrings() > 0)
-			publisherName = rightsList.StringAt(0);
-	}
+	const BStringList& rightsList = info.CopyrightList();
+	if (rightsList.CountStrings() > 0)
+		publisherName = rightsList.StringAt(0);
 
 	fPublisher = PublisherInfo(BitmapRef(), publisherName, "", publisherURL);
 }
