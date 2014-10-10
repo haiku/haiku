@@ -31,6 +31,9 @@ class MainWindow : public BWindow, private PackageInfoListener,
 public:
 								MainWindow(BRect frame,
 									const BMessage& settings);
+								MainWindow(BRect frame,
+									const BMessage& settings,
+									const PackageInfoRef& package);
 	virtual						~MainWindow();
 
 	// BWindow interface
@@ -90,6 +93,7 @@ private:
 			PackageList			fVisiblePackages;
 
 			bool				fTerminating;
+			bool				fSinglePackageMode;
 			thread_id			fModelWorker;
 
 			thread_id			fPendingActionsWorker;

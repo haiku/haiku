@@ -444,9 +444,14 @@ ScreenshotInfo::operator!=(const ScreenshotInfo& other) const
 // #pragma mark - PackageInfo
 
 
+BitmapRef
+PackageInfo::sDefaultIcon(new(std::nothrow) SharedBitmap(
+	"application/x-vnd.haiku-package"), true);
+
+
 PackageInfo::PackageInfo()
 	:
-	fIcon(),
+	fIcon(sDefaultIcon),
 	fTitle(),
 	fVersion(),
 	fPublisher(),
@@ -466,12 +471,46 @@ PackageInfo::PackageInfo()
 }
 
 
+PackageInfo::PackageInfo(const BPackageInfo& info)
+	:
+	fIcon(sDefaultIcon),
+	fTitle(info.Name()),
+	fVersion(info.Version()),
+	fPublisher(),
+	fShortDescription(info.Summary()),
+	fFullDescription(info.Description()),
+	fChangelog(),
+	fUserRatings(),
+	fCachedRatingSummary(),
+	fScreenshotInfos(),
+	fScreenshots(),
+	fState(NONE),
+	fDownloadProgress(0.0),
+	fFlags(info.Flags()),
+	fSystemDependency(false),
+	fArchitecture(info.ArchitectureName())
+{
+	BString publisherURL;
+	if (info.URLList().CountStrings() > 0)
+		publisherURL = info.URLList().StringAt(0);
+
+	BString publisherName = info.Vendor();
+	if (publisherName.IsEmpty()) {
+		const BStringList& rightsList = info.CopyrightList();
+		if (rightsList.CountStrings() > 0)
+			publisherName = rightsList.StringAt(0);
+	}
+
+	fPublisher = PublisherInfo(BitmapRef(), publisherName, "", publisherURL);
+}
+
+
 PackageInfo::PackageInfo(const BString& title,
 		const BPackageVersion& version, const PublisherInfo& publisher,
 		const BString& shortDescription, const BString& fullDescription,
 		int32 flags, const char* architecture)
 	:
-	fIcon(),
+	fIcon(sDefaultIcon),
 	fTitle(title),
 	fVersion(version),
 	fPublisher(publisher),
@@ -811,6 +850,13 @@ void
 PackageInfo::RemoveListener(const PackageInfoListenerRef& listener)
 {
 	fListeners.Remove(listener);
+}
+
+
+void
+PackageInfo::CleanupDefaultIcon()
+{
+	sDefaultIcon.Unset();
 }
 
 

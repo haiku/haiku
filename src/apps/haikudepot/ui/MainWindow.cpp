@@ -111,6 +111,7 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fModelListener(new MessageModelListener(BMessenger(this)), true),
 	fTerminating(false),
+	fSinglePackageMode(false),
 	fModelWorker(B_BAD_THREAD_ID)
 {
 	BMenuBar* menuBar = new BMenuBar(B_TRANSLATE("Main Menu"));
@@ -179,6 +180,40 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 		if (fPopulatePackageWorker >= 0)
 			resume_thread(fPopulatePackageWorker);
 	}
+}
+
+
+MainWindow::MainWindow(BRect frame, const BMessage& settings,
+	const PackageInfoRef& package)
+	:
+	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
+		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fLogOutItem(NULL),
+	fModelListener(new MessageModelListener(BMessenger(this)), true),
+	fTerminating(false),
+	fSinglePackageMode(true),
+	fModelWorker(B_BAD_THREAD_ID)
+{
+	fFilterView = new FilterView();
+	fPackageListView = new PackageListView(fModel.Lock());
+	fPackageInfoView = new PackageInfoView(fModel.Lock(), this);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(fPackageInfoView)
+		.SetInsets(0, B_USE_WINDOW_INSETS, 0, 0)
+	;
+
+	fModel.AddListener(fModelListener);
+
+	// Restore settings
+	BString username;
+	if (settings.FindString("username", &username) == B_OK
+		&& username.Length() > 0) {
+		fModel.SetUsername(username);
+	}
+
+	fPackageInfoView->SetPackage(package);
 }
 
 
@@ -381,15 +416,19 @@ MainWindow::MessageReceived(BMessage* message)
 void
 MainWindow::StoreSettings(BMessage& settings) const
 {
-	settings.AddRect("window frame", Frame());
+	if (fSinglePackageMode)
+		settings.AddRect("small window frame", Frame());
+	else {
+		settings.AddRect("window frame", Frame());
 
-	BMessage columnSettings;
-	fPackageListView->SaveState(&columnSettings);
-
-	settings.AddMessage("column settings", &columnSettings);
-
-	settings.AddBool("show develop packages", fModel.ShowDevelopPackages());
-	settings.AddBool("show source packages", fModel.ShowSourcePackages());
+		BMessage columnSettings;
+		fPackageListView->SaveState(&columnSettings);
+	
+		settings.AddMessage("column settings", &columnSettings);
+	
+		settings.AddBool("show develop packages", fModel.ShowDevelopPackages());
+		settings.AddBool("show source packages", fModel.ShowSourcePackages());
+	}
 
 	settings.AddString("username", fModel.Username());
 }
@@ -610,9 +649,6 @@ MainWindow::_RefreshPackageList()
 		// system packages in order to compute the list of protected
 		// dependencies indicated above.
 
-	BitmapRef defaultIcon(new(std::nothrow) SharedBitmap(
-		"application/x-vnd.haiku-package"), true);
-
 	for (int32 i = 0; i < packages.CountItems(); i++) {
 		BSolverPackage* package = packages.ItemAt(i);
 		const BPackageInfo& repoPackageInfo = package->Info();
@@ -623,23 +659,7 @@ MainWindow::_RefreshPackageList()
 			modelInfo.SetTo(it->second);
 		else {
 			// Add new package info
-			BString publisherURL;
-			if (repoPackageInfo.URLList().CountStrings() > 0)
-				publisherURL = repoPackageInfo.URLList().StringAt(0);
-
-			BString publisherName = repoPackageInfo.Vendor();
-			const BStringList& rightsList = repoPackageInfo.CopyrightList();
-			if (rightsList.CountStrings() > 0)
-				publisherName = rightsList.StringAt(0);
-
-			modelInfo.SetTo(new(std::nothrow) PackageInfo(
-					repoPackageInfo.Name(),
-					repoPackageInfo.Version(),
-					PublisherInfo(BitmapRef(), publisherName,
-					"", publisherURL), repoPackageInfo.Summary(),
-					repoPackageInfo.Description(),
-					repoPackageInfo.Flags(),
-					repoPackageInfo.ArchitectureName()),
+			modelInfo.SetTo(new(std::nothrow) PackageInfo(repoPackageInfo),
 				true);
 
 			if (modelInfo.Get() == NULL)
@@ -648,7 +668,6 @@ MainWindow::_RefreshPackageList()
 			foundPackages[repoPackageInfo.Name()] = modelInfo;
 		}
 
-		modelInfo->SetIcon(defaultIcon);
 		modelInfo->AddListener(this);
 
 		BSolverRepository* repository = package->Repository();
@@ -905,7 +924,8 @@ void
 MainWindow::_UpdateAuthorization()
 {
 	BString username(fModel.Username());
-	fLogOutItem->SetEnabled(username.Length() > 0);
+	if (fLogOutItem != NULL)
+		fLogOutItem->SetEnabled(username.Length() > 0);
 	fFilterView->SetUsername(username);
 }
 

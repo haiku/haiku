@@ -9,6 +9,7 @@
 #include <Application.h>
 
 
+class BEntry;
 class MainWindow;
 
 
@@ -20,11 +21,23 @@ public:
 	virtual	bool				QuitRequested();
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
+	virtual void				RefsReceived(BMessage* message);
+	virtual void				ArgvReceived(int32 argc, char* argv[]);
 
 private:
-			void				_StoreSettings(const BMessage& windowSettings);
+			void				_Open(const BEntry& entry);
+			void				_ShowWindow(MainWindow* window);
 
+			bool				_LoadSettings(BMessage& settings);
+			void				_StoreSettings(const BMessage& windowSettings);
+			BRect				_GetNextWindowFrame(bool singlePackageMode);
+
+private:
 			MainWindow*			fMainWindow;
+			int32				fWindowCount;
+
+			BMessage			fSettings;
+			bool				fSettingsRead;
 };
 
 

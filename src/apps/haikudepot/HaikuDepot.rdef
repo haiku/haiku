@@ -14,7 +14,11 @@ resource app_version {
 	internal = 1,
 
 	short_info = "HaikuDepot",
-	long_info = "HaikuDepot ©2013 Haiku"
+	long_info = "HaikuDepot ©2013-2014 Haiku"
+};
+
+resource file_types message {
+	"types" = "application/x-vnd.haiku-package"
 };
 
 resource vector_icon {
