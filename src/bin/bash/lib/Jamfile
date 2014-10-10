@@ -1,6 +1,0 @@
-SubDir HAIKU_TOP src bin bash lib ;
-
-SubInclude HAIKU_TOP src bin bash lib glob ;
-SubInclude HAIKU_TOP src bin bash lib readline ;
-SubInclude HAIKU_TOP src bin bash lib sh ;
-SubInclude HAIKU_TOP src bin bash lib tilde ;
