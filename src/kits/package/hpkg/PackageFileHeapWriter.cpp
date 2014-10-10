@@ -441,7 +441,7 @@ PackageFileHeapWriter::Finish()
 	if (error != B_OK)
 		return error;
 
-	// write chunk sizes table 
+	// write chunk sizes table
 
 	// We don't need to do that, if we don't use any compression.
 	if (fCompressionAlgorithm == NULL)
@@ -647,7 +647,7 @@ PackageFileHeapWriter::_UnwriteLastPartialChunk()
 
 		status_t error = ReadAndDecompressChunkData(lastChunkOffset,
 			compressedSize, lastChunkSize, fCompressedDataBuffer,
-			fPendingDataBuffer);;
+			fPendingDataBuffer);
 		if (error != B_OK)
 			throw error;
 
