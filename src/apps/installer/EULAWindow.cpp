@@ -69,53 +69,16 @@ EULAWindow::EULAWindow()
 	infoText << B_TRANSLATE(
 		"\tsudo update-grub\n\n\n");
 	infoText << B_TRANSLATE(
-		"2.2) GRUB 1\n");
+		"2.2) GRUB 2\n");
 	infoText << B_TRANSLATE(
-		"Configure your /boot/grub/menu.lst by launching your favorite "
-		"editor from a Terminal like this:\n\n");
-	infoText << B_TRANSLATE(
-		"\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n");
-	infoText << B_TRANSLATE(
-		"You'll note that GRUB uses a different naming strategy for hard "
-		"drives than Linux.\n\n");
-	infoText << B_TRANSLATE(
-		"With GRUB it's: (hdN,n)\n\n");
-	infoText << B_TRANSLATE(
-		"All hard disks start with \"hd\".\n");
-	infoText << B_TRANSLATE(
-		"\"N\" is the hard disk number, starting with \"0\".\n");
-	infoText << B_TRANSLATE(
-		"\"n\" is the partition number, also starting with \"0\".\n");
-	infoText << B_TRANSLATE(
-		"The first logical partition always has the number \"4\", regardless "
-		"of the number of primary partitions.\n\n");
-	infoText << B_TRANSLATE(
-		"So behind the other menu entries towards the bottom of the file, add "
-		"something similar to these lines:\n\n");
-	infoText << B_TRANSLATE(
-		"\t# Haiku on /dev/sda7\n");
-	infoText << B_TRANSLATE(
-		"\ttitle\t\t\t\tHaiku\n");
-	infoText << B_TRANSLATE(
-		"\trootnoverify\t\t(hd0,6)\n");
-	infoText << B_TRANSLATE(
-		"\tchainloader\t\t+1\n\n");
-	infoText << B_TRANSLATE(
-		"You can see the correct partition in GParted for example.\n\n\n");
-	infoText << B_TRANSLATE(
-		"2.3) GRUB 2\n");
-	infoText << B_TRANSLATE(
-		"Newer versions of GRUB use an extra configuration file to add "
-		"custom entries to the boot menu. To add them to the top, you have "
-		"to create/edit a file by launching your favorite editor from a "
-		"Terminal like this:\n\n");
+		"If the os-prober approach doesn't work for you, GRUB 2 uses an extra "
+		"configuration file to add custom entries to the boot menu. To add "
+		"them to the top, you have to create/edit a file by launching your "
+		"favorite editor from a Terminal like this:\n\n");
 	infoText << B_TRANSLATE(
 		"\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n");
 	infoText << B_TRANSLATE(
-		"NOTE: While the naming strategy for hard disks is still as described "
-		"under 2.1) the naming scheme for partitions has changed.\n\n");
-	infoText << B_TRANSLATE(
-		"GRUB's naming scheme is still: (hdN,n)\n\n");
+		"GRUB's naming scheme for partitions is: (hdN,n)\n\n");
 	infoText << B_TRANSLATE(
 		"All hard disks start with \"hd\".\n");
 	infoText << B_TRANSLATE(
