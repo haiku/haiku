@@ -130,6 +130,22 @@ BDragger::BDragger(BRect frame, BView* target, uint32 resizingMode,
 }
 
 
+BDragger::BDragger(BView* target, uint32 flags)
+	:
+	BView("_dragger_", flags),
+	fTarget(target),
+	fRelation(TARGET_UNKNOWN),
+	fShelf(NULL),
+	fTransition(false),
+	fIsZombie(false),
+	fErrCount(0),
+	fPopUpIsCustom(false),
+	fPopUp(NULL)
+{
+	_InitData();
+}
+
+
 BDragger::BDragger(BMessage* data)
 	:
 	BView(data),

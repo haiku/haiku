@@ -26,6 +26,8 @@ public:
 								BDragger(BRect frame, BView* target,
 									uint32 resizingMode = B_FOLLOW_NONE,
 									uint32 flags = B_WILL_DRAW);
+								BDragger(BView* target,
+									uint32 flags = B_WILL_DRAW);
 								BDragger(BMessage* data);
 	virtual						~BDragger();
 
