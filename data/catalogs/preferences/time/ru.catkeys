@@ -44,5 +44,5 @@ Time zone	Time		Часовой пояс
 Could not create socket	Time		Не удалось создать сокет
 Synchronize again	Time		Синхронизировать снова
 Clock	Time		Часы
-Network time	Time		Синхронизация времени
+Network time	Time		Синхронизация
 Atlantic	Time		Атлантика

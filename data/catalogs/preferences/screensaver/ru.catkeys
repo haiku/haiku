@@ -11,7 +11,7 @@ ScreenSaver	System name		Хранитель экрана
 Test	ScreenSaver		Просмотр
 General	ScreenSaver		Общие
 Fade now when mouse is here	ScreenSaver		Включать заставку, когда мышь находится здесь
-Enable screensaver	ScreenSaver		Включать заставку, когда мышь находится здесь
+Enable screensaver	ScreenSaver		Включить звставку
 Don't fade when mouse is here	ScreenSaver		Не включать заставку, когда мышь находится здесь
 Cancel	ScreenSaver		Отмена
 Turn off screen	ScreenSaver		Выключать экран через

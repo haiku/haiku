@@ -43,7 +43,7 @@ Swap space	DataSource		Przestrzeń wymiany
 Swap	DataSource		Przestrzeń wymiany
 File	ActivityWindow		Plik
 usage	DataSource		użycie
-Additional items	ActivityView		Dodatkowe elementy
+Additional items	ActivityView		Dodatkowe informacje
 Network receive	DataSource		Otrzymane
 Memory	DataSource		Pamięć
 RX	DataSource	Shorter version for Receiving.	RX

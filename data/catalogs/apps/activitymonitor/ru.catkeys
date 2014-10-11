@@ -10,7 +10,7 @@ MiB	DataSource		МиБ
 Network send	DataSource		Исходящий трафик
 CPU usage (combined)	DataSource		Использование ЦПУ (всего)
 CPU	DataSource		ЦПУ
-Used memory	DataSource		Использованная память
+Used memory	DataSource		Используемая память
 Cached memory	DataSource		Кэшируемая память
 Apps	DataSource		Приложения
 Show legend	ActivityView		Показать легенду
