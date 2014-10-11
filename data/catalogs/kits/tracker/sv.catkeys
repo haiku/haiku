@@ -1,21 +1,17 @@
-1	swedish	x-vnd.Haiku-libtracker	2212190051
+1	swedish	x-vnd.Haiku-libtracker	2070021838
 OK	WidgetAttributeText		OK
-Icon view	VolumeWindow		Ikonvy
 Add-ons	FilePanelPriv		Tillägg
 Desktop	Model		Skrivbord
 Identify	ContainerWindow		Identifiera
 Warning space color	SettingsView		Färg för utrymmesvarning
-Close	VolumeWindow		Stäng
 Open	OpenWithWindow		Öppna
 Tracker status	StatusWindow		Trackerstatus
 Eject when unmounting	AutoMounterSettings		Mata ut vid avmontering
 Window	ContainerWindow		Fönster
 Decrease size	ContainerWindow		Minska storleken
-Mini icon view	VolumeWindow		Mini ikonvy
 You must have at least one attribute showing.	PoseView		Du måste ha minst ett attribut synligt.
 Permissions	InfoWindow		Behörigheter
 128 x 128	DeskWindow		128 x 128
-Invert selection	VolumeWindow		Invertera markering
 128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Senaste dokumenten
 Modified	QueryPoseView		Modifierad
@@ -35,7 +31,6 @@ Delete	ContainerWindow		Ta bort
 Cannot unmount the boot volume \"%name\".	FSUtils		Kan inte avmontera startvolymen "%name".
 Open with…	ContainerWindow		Öppna med...
 Write	FilePermissionsView		Skriv
-for %num files	InfoWindow		för %num filer
 Modified	PoseView		Modifierad
 Make active printer	ContainerWindow		Gör till aktiv skrivare
 Create link here	ContainerWindow		Skapa länk här
@@ -90,7 +85,6 @@ Windows	TrackerSettingsWindow		Fönster
 Tracker preferences	TrackerSettingsWindow		Trackerinställningar
 Cut	FilePanelPriv		Klipp ut
 Replace	FilePanelPriv		Ersätt
-Select all	VolumeWindow		Markera allt
 Opens with:	InfoWindow		Öppnas med:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Om du %ifYouDoAction mime inställningarna, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?
 Open	ContainerWindow		Öppna
@@ -99,10 +93,8 @@ Error calculating folder size.	InfoWindow		Ett fel uppstod vid beräkningen av m
 New folder	FilePanelPriv		Ny mapp
 %name info	InfoWindow	InfoWindow Title	%name information
 Favorites	FavoritesMenu		Favoriter
-Add-ons	VolumeWindow		Tillägg
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" är en osupporterad körbarfil
 Sorry, you can't copy items to the Trash.	PoseView		Du kan inte kopiera filer till Papperskorgen.
-List view	VolumeWindow		Listvy
 matches wildcard expression	SelectionWindow		matchar jokeruttryck
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	byt namn
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Du kan inte ersätta en mapp eller en mjuk länk med en fil.
@@ -112,7 +104,6 @@ Increase size	DeskWindow		Öka storleken
 Resize to fit	ContainerWindow		Anpassa storleken
 %Ld bytes	WidgetAttributeText		%Ld byte
 Add printer…	ContainerWindow		Lägg till skrivare...
-Open	VolumeWindow		Öppna
 New folder	ContainerWindow		Ny mapp
 Kind	ContainerWindow		Sort
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	byt namn
@@ -133,9 +124,7 @@ Show volumes on Desktop	SettingsView		Visa volymer på Skrivbordet
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Fel %error vid laddning av Tillägg %name.
 Defaults	TrackerSettingsWindow		Förval
-%num items	CountView		%num objekt
 Mini icon view	ContainerWindow		Mini ikonvy
-Clean up	VolumeWindow		Rada upp
 OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Kunde inte öppna "%name". Filen är av misstag markerad som exekverbar.
 Add-ons	ContainerWindow		Tillägg
@@ -165,14 +154,11 @@ That name is already taken. Please type another one.	InfoWindow		Namnet är reda
 Sorry, you can't create links in the Trash.	PoseView		Du kan inte skapa länkar i Papperskorgen.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ett objekt "%name" finns redan i katalogen och kan innehålla\nobjekt med samma namn. Vill du byta dem med de objekt i katalogen du %verb?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Länka "%namn" till:
-Mount settings…	VolumeWindow		Monteringsinställningar...
-Select…	VolumeWindow		Välj...
 All disks	FindPanel		Alla diskar
 Revert	TrackerSettingsWindow		Återställ
 Invert selection	QueryContainerWindow		Invertera markering
 Execute	FilePermissionsView		Kör
 Size	FindPanel		Storlek
-1 item	CountView		1 objekt
 Open parent	ContainerWindow		Öppna förälder
 Location:	InfoWindow		Plats:
 Edit favorites…	FilePanelPriv		Redigera favoriter...
@@ -192,8 +178,6 @@ Mini icon view	DeskWindow		Mini ikonvy
 Error in regular expression:\n\n'%errstring'	PoseView		Fel i reguljärt uttryck:\n\n'%errstring'
 Mount all	MountMenu		Montera alla
 calculating…	InfoWindow		beräknar...
-Unmount	VolumeWindow		Avmontera
-Edit name	VolumeWindow		Redigera namn
 Mount all disks now	AutoMounterSettings		Montera alla diskar nu
 Untitled bitmap	PoseView		Odöpt bitmapp
 of %items	StatusWindow		av %items
@@ -207,7 +191,6 @@ Replace other file	WidgetAttributeText		Ersätt annan fil
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Vissa av de markerade objekten kan inte flyttas till Papperskorgen. Vill du ta bort dem istället? (Denna operation kan inte ångras.)
 You cannot create a link to the root directory.	FSUtils		Du kan inte skapa en länk till rotkatalogen.
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		Skala till passform
 Could not find application \"%appname\"	OpenWithWindow		Kunde inte hitta programmet "%appname"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Det markerade objektet kan inte flyttas till Papperskorgen. Vill du ta bort den istället? (Denna operation kan inte ångras.)
 Invert	SelectionWindow		Invertera
@@ -244,7 +227,6 @@ Error deleting items	FSUtils		Fel vid borttagning av objekt
 Create relative link here	ContainerWindow		Skapa relativ länk här
 trash	B_TRASH_DIRECTORY		papperskorg
 matches regular expression	SelectionWindow		matchar reguljärt uttryck
-Mount settings…	SettingsView		Monterings inställningar...
 Edit name	InfoWindow		Redigera namn
 Could not open \"%name\" (%error). 	FSUtils		Kunde inte öppna "%name" (%error).
 Paste	ContainerWindow		Klistra in
@@ -263,7 +245,6 @@ Finish: %time	StatusWindow		Slutförd: %time
 Cancel	Tracker		Avbryt
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Du kan inte redigera det attributet.
 Name	ContainerWindow		Namn
-Disk mount settings	AutoMounterSettings		Diskmonteringsinställningar
 Reverse order	ContainerWindow		Omvänd ordning
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		OK
@@ -305,7 +286,6 @@ copying	FSUtils		kopierar
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av katalogen "%name":\n\t%error\n\nVill du fortsätta?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	flytta
 Show Disks icon	SettingsView		Visa ikonen Volymer
-Mount	VolumeWindow		Montera
 Cancel	PoseView		Avbryt
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld byte,
 You can't move or copy items to read-only volumes.	FSUtils		Du kan inte flytta eller kopiera saker till skrivskyddade volymer.
@@ -350,24 +330,20 @@ All BeOS disks	AutoMounterSettings		Alla BeOS volymer
 Used space color	SettingsView		Färg för diskanvändning
 Sorry, could not create a new folder.	FSUtils		Kan inte skapa en ny mapp.
 multiple disks	FindPanel		flera diskar
-Done	AutoMounterSettings		Klar
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Du måste släppa objekt(en) på en av diskikonerna i "Volymer"-fönstret.
 Untitled clipping	PoseView		Namnlöst urklipp
 Don't automount	AutoMounterSettings		Automontera inte
 Save	FilePanelPriv		Spara
 To: %dir	StatusWindow		Till: %dir
 Window	FilePanelPriv		Fönster
-Find…	VolumeWindow		Sök...
 Edit name	FilePanelPriv		Ändra namn
 Size:	InfoWindow		Storlek:
 Empty folder	SlowContextPopup		Tom mapp
 Open selection with:	OpenWithWindow		Öppna markering med:
-(%bytes bytes)	InfoWindow		(%bytes byte)
 Preparing to create links…	StatusWindow		Förbereder skapande av länkar...
 Show navigator	SettingsView		Visa navigerare
 Desktop	B_DESKTOP_DIRECTORY		Skrivbord
 List folders first	SettingsView		Visa mappar först
-Get info	VolumeWindow		Visa info
 Name	SelectionWindow		Namn
 Trash	Model		Papperskorg
 Favorites	FilePanelPriv		Favoriter

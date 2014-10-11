@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Magnify	907580139
+1	belarusian	x-vnd.Haiku-Magnify	233476436
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		буфер пусты\n
 Make square	Magnify-Main		Зрабіць квадратным
 Copy image	Magnify-Main		Капіяваць выяву
@@ -8,7 +8,6 @@ Hide/Show grid	Magnify-Main		Схаваць/Паказаць сетку
 magnify: size must be a multiple of 4\n	Console		magnify: памер павінен быць кратны 4\n
 Decrease pixel size	Magnify-Main		Паменшыць памер пікселяў
 Magnify	System name		Лупа
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height  @ %pixelSize пікселяў на піксель
 Info	Magnify-Main		Інфармацыя
 Remove a crosshair	Magnify-Main		Выдаліць перакрыжаванне
 Freeze/Unfreeze image	Magnify-Main		Замарозіць/Размарозіць выяву

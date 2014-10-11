@@ -1,18 +1,14 @@
-1	belarusian	x-vnd.Haiku-Installer	3488795908
-So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Дадайце ў канец кожнага з ніжэйшых запісаў меню нешта падобнае да гэтага:\n\n
+1	belarusian	x-vnd.Haiku-Installer	3930183175
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Сапраўды спыніць усталёўку і перазагрузіць сістэму?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tАўтары: Jérôme Duval, Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
-Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Новыя версіі GRUB карыстуюць дадатковы канфігурацыйны файл для дадання запісаў у меню загрузкі. Каб дадаць іх даверху, вы павінны стварыць/паправіць файл праз кансольную каманду:\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Тут вам трэба закаменціраваць страку \"GRUB_HIDDEN_TIMEOUT=0\" з дапамогай \"#\" у яе пачатку, каб убачыць меню запуску.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'. Націсніце Выйсці, каб пакінуць усталёўшчык ці абраць іншы том для новай усталёўкі.
 Quit	InstallerApp		Выйсці
 Additional disk space required: 0.0 KiB	InstallerWindow		Патрэбна яшчэ 0.0 KiB месца на дыску
-With GRUB it's: (hdN,n)\n\n	InstallerApp		У GRUB гэта: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Стоп
 Install progress:  	InstallerWindow		Прагрэс усталёўкі:  
-2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Пачынаецца Ўсталёўка.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Гэта праграма знаходзіцца ў альфа-версіі! Гэта значыць, вы рызыкуеце згубіць важныя даныя. Часцей рабіце рэзервовыя копіі! Мы вас папярэдзілі.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Вы насамрэч жадаеце перарваць усталёўку?
@@ -20,7 +16,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		Выйсці з Менеджэра Запуску
 Stop	InstallerWindow		Стоп
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-\tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
 OK	InstallerApp		ОК
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Выберыце зыходны дыск і дыск прызначэння з усплывальнага меню. Потым націсніце \"Пачаць\".
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku на /dev/sda7\n
@@ -39,9 +34,6 @@ Performing installation.	InstallProgress		Выконваецца ўсталёў�
 scanning…	InstallerWindow		сканіраванне…
 Set up boot menu	InstallerWindow		Наладзіць меню запуску
 2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (пачынаючы з os-prober v1.44)\n
-The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Першы лагічны падзел заўсёды пад нумарам \"4\", нягледзячы на нумары асноўных падзелаў.\n\n
-GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Для GRUB схема імёнаў тая ж: (hdN,n)\n\n
-\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <пажаданы рэдактар> /boot/grub/menu.lst\n\n
 Abort	InstallerWindow		Перарваць
 Finishing Installation.	InstallProgress		Завяршэнне ўсталёўкі.
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <пажаданы рэдактар> /etc/default/grub\n\n
@@ -50,7 +42,6 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Дыск прызначэння, пэўна, не мае патрэбнага месца. Паспрабуйце выбраць іншы дыск або адмяніце ўсталёўку дадатковых пунктаў.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Калі ласка, закрыйце Boot Manager і DriveSetup перад закрыццём Усталёўшчыка.
 Scanning for disks…	InstallerWindow		Сканіраванне дыскаў…
-2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Немагчыма замантаваць дыск. Калі ласка, выберыце іншы.
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -62,8 +53,6 @@ Choose the disk you want to install onto from the pop-up menu. Then click \"Begi
 Unknown Type	InstallProgress	Partition content type	Невядомы тып
 <none>	InstallerWindow	No partition available	<няма>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
-You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Вы прыкмеціце, што GRUB выкарыстоўвае схема наймавання дыскаў не такую, як Linux.\n\n
-\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" - нумар падзелу, таксама пачынаецца з \"0\".\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'. Націсніце Перазапусціць, каб перазапусціць кампутар ці абрярыце іншы том для яшчэ адной усталёўкі.
 Installation canceled.	InstallProgress		Усталёўка адмененая.
 Installer	System name		Усталёўшчык
@@ -82,7 +71,6 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Працуе Boot Manager…\n\nЗакрыйце Boot Manager для працягу ўсталёўкі.
 Install anyway	InstallProgress		Усталяваць усё роўна
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Адбылася памылка і ўсталёўка абарвалася:\n\nError:  %s
-\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Націсніце кнопку Пачаць, каб усталяваць з '%1s' на '%2s'.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Працуе DriveSetup…\n\nЗакрыйце DriveSetup для працягу ўсталёўкі.
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Поспехаў вам і вялікі дзякуй за пробу Haiku! Спадзяемся, яна вам падабаецца!
@@ -102,10 +90,8 @@ No optional packages available.	PackagesView		Дадатковыя пакунк�
 All hard disks start with \"hd\".\n	InstallerApp		Імёны дыскаў пачынаюцца з \"hd\".\n
 Continue	InstallerApp		Працягваць
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Мэнэджэр загрузкі, праграма якая канфігуруе загрузачнае меню Haiku, ня можа быць запушчана.
-Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Папраўце /boot/grub/menu.lst вашым пажаданым рэдактарам з дапамогай гэтай каманды:\n\n
 Boot sector not written because of an internal error.	InstallProgress		Загрузачны сектар не запісаны з-за ўнутранай памылкі.
 Additional disk space required: %s	InstallerWindow		Патрэбна месца дадаткова: %s
-NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		ЗАМЕТКА: Прынцыпы наймавання дыскаў усё тыя ж, як у 2.1), але схема наймавання падзелаў ужо іншая.\n\n
 Cancel	InstallProgress		Адмена
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Працуюць Boot Manager і DriveSetup...\n\nЗакрыйце абедзве праграмы для працягу.
 Try installing anyway	InstallProgress		Ўсё роўна паспрабаваць усталёўку
@@ -116,7 +102,4 @@ Please close the Boot Manager window before closing the Installer window.	Instal
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)  Пасля першай паспяховай загрузкі Haiku, азнаёмцеся, калі ласка з дакументацыей ў \"Welcome\" і \"Userguide\" файлах. Спасылі на іх знаходзяцца на рабочым стале і ў закладках WebPositive.\n\n
 Tools	InstallerWindow		Прылады
 The mount point could not be retrieved.	InstallProgress		Не ўдалося атрымаць пункт мантавання.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Дыск прызначэння не пусты. Сапраўды жадаеце усталяваць туды?\n\nЗаметка: каталог 'system' будзе поўнай копіяй каталога з крыніцы, усе іншыя каталогі будуць сумешчаны, існуючыя файлы будуць замененыя на версіі з крыніцы.
-You can see the correct partition in GParted for example.\n\n\n	InstallerApp		Напрыклад, вы можаце ўбачыць правільны падзел у GParted.\n\n\n
-\ttitle\t\t\t\tHaiku\n	InstallerApp		\ttitle\t\t\t\tHaiku\n
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <пажаданы рэдактар> /etc/grub.d/40_custom\n\n

@@ -1,8 +1,5 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	3398060443
+1	belarusian	x-vnd.Haiku-HaikuDepot	443107378
 Name	PackageListView		Імя
-Installed packages	Model		Усталяваныя пакункі
-User modified packages	Model		Пакункі мадыфікаваныя карыстальнікам
-Update available	Model		Ёсьць абноўленыя пакункі
 Changelog	PackageInfoView		Гісторыя зменаў
 Click a package to view information	PackageInfoView		Клікніце пакет каб пабачыць інфарамацыю пра яго
 for %Version%	PackageInfoView		для %Version%
@@ -18,37 +15,27 @@ Uninstall	PackageManager		Выдаліць
 An error occurred while initializing the package manager: %message%	MainWindow		Падчас ініцыялізацыі пакункавага мэнэджэра здарылася памылка: %message%
 Close	PackageManager		Закрыць
 Status	PackageListView		Стан
-Available packages	Model		Наяўныя пакункі
-Your rating	System name		Рэйтынг
 Development	Model		Распрацоўка
 Fatal error	PackageManager		Фатальная памылка
 Ratings	PackageInfoView		Рэйтынг
-1 item	PackageListView		1 элемент
 Inactive	PackageListView		Неактыўны
 Refresh depots	MainWindow		Перачытаць сховішчы
 Main Menu	MainWindow		Галоўнае меню
-Command line	Model		Загадны радок
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Спампоўваецца:
 Search terms:	FilterView		Умовы пошуку:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Рэйтынг карыстальнікаў не існуе
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Падчас аднаўлення інфармацыі сховішчаў адбылася памылка: %error% (%details%)
-Show source packages	MainWindow		Паказваць пакеты з зыходным кодам
 Productivity	Model		Прадукцыйнасць
-Show:	FilterView		Паказаць:
 Size	PackageListView		Памер
-Options	MainWindow		Параметры
 Games	Model		Гульні
 Rating	PackageListView		Рэйтынг
-Downloading	Model		Спампоўваецца
-%ld items	PackageListView		%ld элементаў
 Graphics	Model		Графіка
 Local	MainWindow		Лакальныя
 Close	MainWindow		Закрыць
 Video	Model		Відэа
 An error occurred while refreshing the repository: %error%	MainWindow		Падчас аднаўлення інфармацыі сховішчаў адбылася памылка: %error%
-All packages	FilterView		Усе пакункі
 Pending…	PackageListView		Чакае…
 Depot	FilterView		Сховішча
 Uninstalled	PackageListView		Выдаленныя
@@ -57,9 +44,6 @@ All depots	FilterView		Усе сховішчы
 Available	PackageListView		Даступна
 n/a	PackageInfoView		н/н
 Send	RatePackageWindow		Даслаць
-Show develop packages	MainWindow		Паказаць пакункі для распрацоўшчыкаў
-Show	FilterView		Паказаць
-Uninstalled packages	Model		Выдаленыя пакункі
 Audio	Model		Аўдыё
 About	PackageInfoView		Пра Праграму
 Active	PackageListView		Актыўны

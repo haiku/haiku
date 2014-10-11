@@ -1,8 +1,5 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	3398060443
+1	ukrainian	x-vnd.Haiku-HaikuDepot	443107378
 Name	PackageListView		Ім'я
-Installed packages	Model		Встановлені пакунки
-User modified packages	Model		Пакети, котрі змінив користувач
-Update available	Model		Доступне оновлення
 Changelog	PackageInfoView		Журнал змін
 Click a package to view information	PackageInfoView		Натисніть на пакунок, щоб побачити інформацію про нього
 for %Version%	PackageInfoView		для %Version%
@@ -18,37 +15,27 @@ Uninstall	PackageManager		Видалити
 An error occurred while initializing the package manager: %message%	MainWindow		Виникла помилка при ініціалізації менеджера пакетів: %message%
 Close	PackageManager		Закрити
 Status	PackageListView		Стан
-Available packages	Model		Доступні пакутки
-Your rating	System name		Ваш рейтинг
 Development	Model		Розробка
 Fatal error	PackageManager		Критична помилка
 Ratings	PackageInfoView		Оцінки
-1 item	PackageListView		1 об’єкт
 Inactive	PackageListView		Неактивний
 Refresh depots	MainWindow		Оновити сховища
 Main Menu	MainWindow		Головне меню
-Command line	Model		Командний рядок
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Завантаження:
 Search terms:	FilterView		Умови пошуку:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Рейтинг користувачів недоступний.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Виникла помилка при оновленні репозиторія: %error% (%details%)
-Show source packages	MainWindow		Показати пакунки з вихідним кодом
 Productivity	Model		Офіс
-Show:	FilterView		Показати:
 Size	PackageListView		Розмір
-Options	MainWindow		Налаштування
 Games	Model		Ігри
 Rating	PackageListView		Оцінка
-Downloading	Model		Завантаження
-%ld items	PackageListView		%ld об'єктів
 Graphics	Model		Зображення
 Local	MainWindow		Локальний
 Close	MainWindow		Закрити
 Video	Model		Відео
 An error occurred while refreshing the repository: %error%	MainWindow		Сталася помилка при оновленні репозиторія: %error%
-All packages	FilterView		Всі пакунки
 Pending…	PackageListView		Очікування…
 Depot	FilterView		Всі сховища
 Uninstalled	PackageListView		Видалені
@@ -57,9 +44,6 @@ All depots	FilterView		Всі сховища
 Available	PackageListView		Доступні
 n/a	PackageInfoView		немає
 Send	RatePackageWindow		Надіслати
-Show develop packages	MainWindow		Показувати пакунки розробників
-Show	FilterView		Показати
-Uninstalled packages	Model		Видалені пакунки
 Audio	Model		Звук
 About	PackageInfoView		Про програму
 Active	PackageListView		Активний

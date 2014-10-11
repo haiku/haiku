@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-FileTypes	133192727
+1	ukrainian	x-vnd.Haiku-FileTypes	3116280330
 Application types…	FileTypes Window		Типи додатків…
 Description:	Application Types Window		Опис:
 Args only	Application Type Window		Тільки аргументи
@@ -130,7 +130,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Тип файлу повністю присутній
 Same as…	FileTypes Window		Такий як…
 Exclusive launch	Application Type Window		Виключний запуск
-%ld Application type%s could be removed.	Application Types Window		%ld Додаток type%s Неможливо видалити.
 FileTypes	System name		Типи файлів
 Application types	Application Types Window		Типи додатків
 Could not remove file type: %s\n	FileTypes Window		Неможливо видалити тип файлу: %s\n

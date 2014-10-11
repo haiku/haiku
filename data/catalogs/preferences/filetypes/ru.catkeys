@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-FileTypes	133192727
+1	russian	x-vnd.Haiku-FileTypes	3116280330
 Application types…	FileTypes Window		Типы приложений…
 Description:	Application Types Window		Описание:
 Args only	Application Type Window		Только аргументы
@@ -130,7 +130,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Этот тип файла уже существует
 Same as…	FileTypes Window		Такое же как…
 Exclusive launch	Application Type Window		Единственный запуск
-%ld Application type%s could be removed.	Application Types Window		Удалось очистить типов приложений: %ld.
 FileTypes	System name		Типы файлов
 Application types	Application Types Window		Типы приложений
 Could not remove file type: %s\n	FileTypes Window		Невозможно удалить тип файла: %s\n

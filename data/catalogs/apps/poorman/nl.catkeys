@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PoorMan	1267330937
+1	dutch; flemish	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		Website-locatie
 Error Server	PoorMan		Serverfout
 Settings…	PoorMan		Instellingen...
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		Loggen naar console
 Connections	PoorMan		Verbindingen
 Status: Running	PoorMan		Status: Actief
-connections	PoorMan		verbindingen
 Controls	PoorMan		Controle-elementen
 Send file listing if there's no start page	PoorMan		Stuur een bestandslijst als er geen startpagina is
 Error Dir	PoorMan		Fout Map

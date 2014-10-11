@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Magnify	907580139
+1	swedish	x-vnd.Haiku-Magnify	233476436
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		inga urklipp\n
 Make square	Magnify-Main		Skapa rektangel
 Copy image	Magnify-Main		Kopiera bild
@@ -8,7 +8,6 @@ Hide/Show grid	Magnify-Main		Göm/visa rutmönster
 magnify: size must be a multiple of 4\n	Console		förstoraren: storleken måste vara en multipel av 4\n
 Decrease pixel size	Magnify-Main		Minska pixelstorlek
 Magnify	System name		FörstoringsGlas
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixlar/pixel
 Info	Magnify-Main		Information
 Remove a crosshair	Magnify-Main		Ta bort korshår
 Freeze/Unfreeze image	Magnify-Main		Frys/avfrys bild

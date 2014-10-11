@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	951661576
+1	polish	x-vnd.Haiku-WebPositive	3528881455
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -86,7 +86,6 @@ Open blank page	Settings Window		Otwórz pustą stronę
 New tabs:	Settings Window		Nowa karta:
 Cancel	WebPositive Window		Anuluj
 Open all	WebPositive Window		Otwórz wszystko
-Hide bookmark bar	WebPositive Window		Ukryj pasek zakładek
 Proxy server requires authentication	Settings Window		Serwer proxy wymaga uwierzytelnienia
 Clear	URL Bar		Wyczyść
 Cut	URL Bar		Wytnij

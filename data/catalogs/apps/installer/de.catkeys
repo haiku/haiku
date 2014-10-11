@@ -1,18 +1,14 @@
-1	german	x-vnd.Haiku-Installer	3488795908
-So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Gegen Ende der Datei fügt man unter den anderen Menüeinträgen etwas in dieser Art an:\n\n
+1	german	x-vnd.Haiku-Installer	3930183175
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Soll die Installation tatsächlich abgebrochen und der Rechner neu gestartet werden?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tvon Jérôme Duval und Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
-Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Neuere Versionen von GRUB benutzen eine spezielle Konfigurationsdatei, um zusätzliche Einträge zum Bootmenü hinzuzufügen. Um diese an oberster Stelle einzufügen, muss eine Datei erstellt/bearbeitet werden:\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Hier muss die Zeile \"GRUB_HIDDEN_TIMEOUT=0\" auskommentiert werden, indem ein \"#\" davor gesetzt wird, um das Boot-Menü überhaupt anzuzeigen.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. 'Beenden' klicken, um das Installationsprogramm zu verlassen, oder ein anderes Ziellaufwerk für eine weitere Installation auswählen.
 Quit	InstallerApp		Beenden
 Additional disk space required: 0.0 KiB	InstallerWindow		Zusätzlich benötigter Speicherplatz: 0.0 KiB
-With GRUB it's: (hdN,n)\n\n	InstallerApp		Bei GRUB ist es: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Installation abbrechen
 Install progress:  	InstallerWindow		Installationsverlauf: 
-2.2) GRUB 1\n	InstallerApp		2.2) GRUB 1\n
 Starting Installation.	InstallProgress		Installation wird vorbereitet.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dies ist eine Alpha-Version! Es besteht ein hohes Risiko, dass wichtige Daten verloren gehen können. Man sollte seine Daten unbedingt regelmäßig sichern!\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Soll die Installation wirklich abgebrochen werden?
@@ -20,7 +16,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		BootManager beenden
 Stop	InstallerWindow		Anhalten
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-\tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Bitte Quell- und Ziellaufwerk aus den Menüs wählen. Danach auf \"Start\" klicken.
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku auf /dev/sda7\n
@@ -39,9 +34,6 @@ Performing installation.	InstallProgress		Installation läuft.
 scanning…	InstallerWindow		Untersuchung läuft…
 Set up boot menu	InstallerWindow		Bootmenü einrichten
 2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (seit os-prober v1.44)\n
-The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Die erste logische Partition trägt immer die Nummer \"4\", unabhängig von der Anzahl primärer Partitionen.\n\n
-GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Das Benennungsschema von GRUB ist immer noch: (hdN,n)\n\n
-\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <Lieblings-Texteditor> /boot/grub/menu.lst\n\n
 Abort	InstallerWindow		Abbrechen
 Finishing Installation.	InstallProgress		Installation wird abgeschlossen.
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <Lieblings-Texteditor> /etc/default/grub\n\n
@@ -50,7 +42,6 @@ README	InstallerApp		LIESMICH
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Auf dem Ziellaufwerk ist anscheinend nicht genügend Platz. Entweder ein anderes Laufwerk wählen oder einige optionale Pakete deaktivieren.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Bitte BootManger und DriveSetup vor dem Installer-Fenster schließen.
 Scanning for disks…	InstallerWindow		Es wird nach Laufwerken gesucht…
-2.3) GRUB 2\n	InstallerApp		2.3) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Das Laufwerk konnte nicht eingehängt werden. Bitte ein anderes Laufwerk wählen.
 ?? of ??	InstallerWindow	Unknown progress	?? von ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -62,8 +53,6 @@ Choose the disk you want to install onto from the pop-up menu. Then click \"Begi
 Unknown Type	InstallProgress	Partition content type	Unbekannter Typ
 <none>	InstallerWindow	No partition available	<kein>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
-You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Wie man sieht, besitzt GRUB ein zu Linux unterschiedliches Benennungsschema für Festplatten.\n\n
-\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" ist die Partitionsnummer, ebenfalls mit \"0\" beginnend.\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. 'Neustarten' klicken, um den Rechner neu zu starten, oder ein anderes Ziellaufwerk für eine weitere Installation wählen.
 Installation canceled.	InstallProgress		Installation abgebrochen.
 Installer	System name		Installer
@@ -82,7 +71,6 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		BootManager läuft...\n\nBootManager muss beendet werden, um mit der Installation fortzufahren.
 Install anyway	InstallProgress		Trotzdem installieren
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Es trat ein Fehler auf und die Installation konnte nicht abgeschlossen werden:\n\nFehler:  %s
-\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'Start' klicken, um die Installation von '%1s' nach '%2s' durchzuführen.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup läuft…\n\nDriveSetup schließen, um mit der Installation fortzufahren.
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Viel Spaß und vielen Dank für das Interesse an Haiku!
@@ -102,10 +90,8 @@ No optional packages available.	PackagesView		Keine optionalen Pakete verfügbar
 All hard disks start with \"hd\".\n	InstallerApp		Alle Festplatten beginnen mit \"hd\".\n
 Continue	InstallerApp		Weiter
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		BootManager, die Anwendung um das Haiku Bootmenü zu konfigurieren, konnte nicht gestartet werden.
-Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Um /boot/grub/menu.lst anzupassen, wird der bevorzugte Texteditor aus einem Terminal heraus gestartet:\n\n
 Boot sector not written because of an internal error.	InstallProgress		Der Bootsektor konnte aufgrund eines internen Fehlers nicht geschrieben werden.
 Additional disk space required: %s	InstallerWindow		Zusätzlich benötigter Speicherplatz: %s
-NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		Achtung: Während das Benennungsschema für Festplatten immer noch so ist, wie unter 2.1) beschrieben, hat sich die Benennung von Partitionen geändert.\n\n
 Cancel	InstallProgress		Abbrechen
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		BootManager und DriveSetup laufen...\n\nBeide Anwendungen müssen beendet werden, um mit der Installation fortzufahren.
 Try installing anyway	InstallProgress		Trotzdem eine Installation probieren
@@ -116,7 +102,4 @@ Please close the Boot Manager window before closing the Installer window.	Instal
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Wurde Haiku das erste Mal erfolgreich gestartet, sollte man sich die  \"Welcome\" und \"Userguide\" Dokumentation ansehen. Verknüpfungen darauf befinden sich auf dem Desktop und in WebPositives Bookmarks.\n\n
 Tools	InstallerWindow		Werkzeuge
 The mount point could not be retrieved.	InstallProgress		Der Einhängeort wurde nicht gefunden.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Das Ziellaufwerk ist nicht leer. Soll trotzdem hierher installiert werden?\n\nHinweis: Der 'system'-Ordner wird mit einer sauberen Kopie aus dem Quelllaufwerk überschrieben; alle anderen Ordner werden zusammengeführt, wobei Dateien und Verknüpfungen, die auf beiden Laufwerken existieren, mit der Version des Quelllaufwerks überschrieben werden.
-You can see the correct partition in GParted for example.\n\n\n	InstallerApp		Die richtige Partition findet man beispielweise mit GParted.\n\n\n
-\ttitle\t\t\t\tHaiku\n	InstallerApp		\ttitle\t\t\t\tHaiku\n
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <Lieblings-Texteditor> /etc/grub.d/40_custom\n\n

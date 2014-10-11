@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PoorMan	1108606987
+1	greek, modern (1453-)	x-vnd.Haiku-PoorMan	3849521821
 Website location	PoorMan		Τοποθεσία ιστοσελίδας
 Error Server	PoorMan		Σφάλμα Εξυπηρετητή
 Settings…	PoorMan		Ρυθμίσεις...
@@ -32,7 +32,6 @@ Directory: (none)	PoorMan		Κατάλογος: (κανένα)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Παρακαλώ επιλέξτε το φάκελο για να δημοσιεύσετε στον παγκόσμιο ιστό.\n\nΜπορείτε στο PoorMan να δημιουργήσετε ένα προεπιλεγμένο \"public_html \" στο προσωπικό σας φάκελο. \n Ή να επιλέξετε έναν από τους δικούς σας φακέλους αντ΄ αυτού.
 Log To Console	PoorMan		Καταγραφή στη Κονσόλα
 Status: Running	PoorMan		Κατάσταση: Εκτελείται
-connections	PoorMan		συνδέσεις
 Controls	PoorMan		Έλεγχοι
 Send file listing if there's no start page	PoorMan		Αποστολή παρουσίασης αρχείων αν δεν υπάρχει αρχική σελίδα.
 Error Dir	PoorMan		Σφάλμα Καταλόγου

@@ -1,12 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-About	2441795911
+1	dutch; flemish	x-vnd.Haiku-About	843957219
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 door de auteurs van Gutenprint. Alle rechten voorbehouden
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (en zijn NewOS kernel)\n
-%ld Processors:	AboutView		%ld Processors:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL en Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Alle rechten voorbehouden.
 %d MiB total	AboutView		%d MiB totaal
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projectstichter)\n\n
-The Haiku-Ports team\n	AboutView		Het Haiku-Ports-team\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. Alle rechten voorbehouden.
 %d MiB used (%d%%)	AboutView		%d MiB gebruikt (%d%%)
 Website, marketing & documentation:\n	AboutView		Website, marketing & documentatie:\n
@@ -18,7 +16,6 @@ Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. en zijn ontwikkelteam, voor het ontwerpen van BeOS!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Alle rechten voorbehouden.
 Source Code: 	AboutView		Broncode: 
-Processor:	AboutView		Processor:
 Kernel:	AboutView		Kernel:
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman en Daniel Veillard. Alle rechten voorbehouden.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Delen van deze software zijn beschermd door auteursrechten.\nCopyright © 1996-2006 The FreeType Project. Alle rechten voorbehouden.

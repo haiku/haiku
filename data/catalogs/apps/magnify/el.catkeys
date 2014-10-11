@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Magnify	3914403817
+1	greek, modern (1453-)	x-vnd.Haiku-Magnify	3240300114
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		κανένα μήνυμα κλιπ\n
 Make square	Magnify-Main		Δημιουργία τετραγώνου
 Copy image	Magnify-Main		Αντιγραφή εικόνας
@@ -8,7 +8,6 @@ Hide/Show grid	Magnify-Main		Απόκρυψη/Εμφάνιση πλέγματο�
 magnify: size must be a multiple of 4\n	Console		Μεγέθυνση: το μέγεθος πρέπει να είναι πολλαπλάσιο του 4\n
 Decrease pixel size	Magnify-Main		Μείωση μεγέθους εικονοστοιχείου
 Magnify	System name		Magnify
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize εικονοστοιχεία/εικονοστοιχείο
 Info	Magnify-Main		Πληροφορίες
 Remove a crosshair	Magnify-Main		Αφαίρεση ενός σταυρονήματος
 Freeze/Unfreeze image	Magnify-Main		Πάγωμα/Ξεπάγωμα εικόνας

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PoorMan	995747556
+1	romanian	x-vnd.Haiku-PoorMan	3736662390
 Website location	PoorMan		Locația site-ului web
 Error Server	PoorMan		Server de erori
 Settings…	PoorMan		Configurări
@@ -32,7 +32,6 @@ Directory: (none)	PoorMan		Dosar: (nimic)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Alege dosarul de publicat pe web.\n\nPoorMan poate crea unul implicit „public_html” în dosarul personal.\nSau poți selecta unul din dosarele tale.
 Log To Console	PoorMan		Înregistrare la consolă
 Status: Running	PoorMan		Stare: pornit
-connections	PoorMan		conexiuni
 Controls	PoorMan		Controale
 Send file listing if there's no start page	PoorMan		Trimite lista de fișiere dacă nu există o pagină de pornire
 Error Dir	PoorMan		Dosar de eroare

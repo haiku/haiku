@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	3504008668
+1	finnish	x-vnd.Haiku-libbe	84010340
 gamma	AboutWindow		gamma
 beta	AboutWindow		beeta
 %3.2f GiB	StringForSize		%3.2f gibitavua
@@ -18,7 +18,6 @@ About %app%	AboutWindow		Ohjelmasta %app%
 OK	Dragger		Valmis
 OK	PrintJob		Valmis
 Green:	ColorControl		Vihreä:
-Ok	AboutWindow		Valmis
 Version history:	AboutWindow		Versiohistoria:
 Remove replicant	Dragger		Poista replikantti
 OK	ZombieReplicantView		Valmis

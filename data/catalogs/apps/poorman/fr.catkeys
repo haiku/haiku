@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PoorMan	1267330937
+1	french	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		Emplacement du site Web
 Error Server	PoorMan		Erreur du serveur
 Settings…	PoorMan		Réglages…
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		Consigner vers la console
 Connections	PoorMan		Connexions
 Status: Running	PoorMan		État : En fonction
-connections	PoorMan		connexions
 Controls	PoorMan		Contrôles
 Send file listing if there's no start page	PoorMan		Envoyer la liste des fichiers s'il n'y a pas de page d'accueil.
 Error Dir	PoorMan		Répertoire d'erreurs

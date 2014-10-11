@@ -1,21 +1,17 @@
-1	lithuanian	x-vnd.Haiku-libtracker	2212190051
+1	lithuanian	x-vnd.Haiku-libtracker	2070021838
 OK	WidgetAttributeText		Gerai
-Icon view	VolumeWindow		Rodyti piktogramas
 Add-ons	FilePanelPriv		Priedai
 Desktop	Model		Darbalaukis
 Identify	ContainerWindow		Atpažinti
 Warning space color	SettingsView		Užpildytos vietos spalva (įspėjant)
-Close	VolumeWindow		Užverti
 Open	OpenWithWindow		Atverti
 Tracker status	StatusWindow		Pėdsekio būsena
 Eject when unmounting	AutoMounterSettings		Išimti atjungiant
 Window	ContainerWindow		Langas
 Decrease size	ContainerWindow		Sumažinti
-Mini icon view	VolumeWindow		Rodyti mažas piktogramas
 You must have at least one attribute showing.	PoseView		Bent vienas požymis turi likti matomas.
 Permissions	InfoWindow		Leidimai
 128 x 128	DeskWindow		128×128
-Invert selection	VolumeWindow		Invertuoti žymėjimą
 128 x 128	ContainerWindow		128×128
 Recent documents	FavoritesMenu		Paskiausi dokumentai
 Modified	QueryPoseView		Modifikavimo data
@@ -35,7 +31,6 @@ Delete	ContainerWindow		Šalinti
 Cannot unmount the boot volume \"%name\".	FSUtils		Paleidimo tomo „%name“ atjungti negalima.
 Open with…	ContainerWindow		Atverti naudojant…
 Write	FilePermissionsView		Rašyti
-for %num files	InfoWindow		%num failuose (-ų)
 Modified	PoseView		Modifikavimo data
 Make active printer	ContainerWindow		Laikyti numatytuoju spausdintuvu
 Create link here	ContainerWindow		Sukurti nuorodą čia
@@ -90,7 +85,6 @@ Windows	TrackerSettingsWindow		Langai
 Tracker preferences	TrackerSettingsWindow		Pėdsekio nuostatos
 Cut	FilePanelPriv		Iškirpti
 Replace	FilePanelPriv		Pakeisti
-Select all	VolumeWindow		Pažymėti visus
 Opens with:	InfoWindow		Atveriamas naudojant:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeigu %ifYouDoAction MIME nuostatas, „%osName“ sistemos elgesys taps nenuspėjamas!\n\nAr tikrai norite tai atlikti?
 Open	ContainerWindow		Atverti
@@ -99,10 +93,8 @@ Error calculating folder size.	InfoWindow		Skaičiuojant aplanko dydį, įvyko k
 New folder	FilePanelPriv		Naujas aplankas
 %name info	InfoWindow	InfoWindow Title	Informacija apie „%name“
 Favorites	FavoritesMenu		Parankiniai
-Add-ons	VolumeWindow		Priedai
 \"%name\" is an unsupported executable.	FSUtils		„%name%“ yra nepalaikomo tipo vykdomasis failas.
 Sorry, you can't copy items to the Trash.	PoseView		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
-List view	VolumeWindow		Rodyti sąrašą
 matches wildcard expression	SelectionWindow		atitinka šabloną
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	pervardinsite
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Aplanko arba simbolinės nuorodos pakeisti failu negalima.
@@ -112,7 +104,6 @@ Increase size	DeskWindow		Padidinti
 Resize to fit	ContainerWindow		Pritaikyti dydį prie turinio
 %Ld bytes	WidgetAttributeText		%Ld B
 Add printer…	ContainerWindow		Pridėti spausdintuvą…
-Open	VolumeWindow		Atverti
 New folder	ContainerWindow		Naujas aplankas
 Kind	ContainerWindow		Tipas
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	pervardinti
@@ -133,9 +124,7 @@ Show volumes on Desktop	SettingsView		Rodyti atskirus tomus
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Klaida %error įkeliant priedą „%name“.
 Defaults	TrackerSettingsWindow		Numatytai
-%num items	CountView		Objektų: %num
 Mini icon view	ContainerWindow		Rodyti mažas piktogramas
-Clean up	VolumeWindow		Sutvarkyti
 OK	TrackerInitialState		Gerai
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Failo „%name“ nepavyko atverti. Jis klaidingai pažymėtas kaip vykdomasis.
 Add-ons	ContainerWindow		Priedai
@@ -165,14 +154,11 @@ That name is already taken. Please type another one.	InfoWindow		Toks vardas jau
 Sorry, you can't create links in the Trash.	PoseView		Deja, šiukšlinėje kurti nuorodų neleidžiama.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Aplankas vardu „%name“ jau egzistuoja šiame aplanke ir gali būti, jog jame yra kitų objektų sutampančiais vardais. Ar norite šiuos konfliktinius objektus pakeisti esančiais aplanke, kurį %verb?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Nukreipti „%name“ į:
-Mount settings…	VolumeWindow		Tomų prijungimo nuostatos…
-Select…	VolumeWindow		Pažymėti…
 All disks	FindPanel		Visuose tomuose
 Revert	TrackerSettingsWindow		Atšaukti pakeitimus
 Invert selection	QueryContainerWindow		Invertuoti žymėjimą
 Execute	FilePermissionsView		Vykdyti
 Size	FindPanel		Dydis
-1 item	CountView		Objektų: 1
 Open parent	ContainerWindow		Atverti viršaplankį
 Location:	InfoWindow		Vieta:
 Edit favorites…	FilePanelPriv		Tvarkyti parankinius…
@@ -192,8 +178,6 @@ Mini icon view	DeskWindow		Rodyti mažas piktogramas
 Error in regular expression:\n\n'%errstring'	PoseView		Klaida reguliariąjame reiškinyje:\n\n„%errstring“
 Mount all	MountMenu		Prijungti visus
 calculating…	InfoWindow		skaičiuojamas…
-Unmount	VolumeWindow		Atjungti
-Edit name	VolumeWindow		Pervardinti
 Mount all disks now	AutoMounterSettings		Prijungti visus tomus dabar
 Untitled bitmap	PoseView		Bevardis paveikslas
 of %items	StatusWindow		iš %items
@@ -207,7 +191,6 @@ Replace other file	WidgetAttributeText		Pakeisti kitą failą
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Kai kurių pažymėtų elementų išmesti Šiukšlinėn negalima. Ar norite vietoje to juos pašalinti? Neužmirškite, jog šis veiksmas negrįžtamas!
 You cannot create a link to the root directory.	FSUtils		Šakniniame aplanke nuorodų kurti neleidžiama.
 48 x 48	ContainerWindow		48×48
-Resize to fit	VolumeWindow		Pritaikyti dydį prie turinio
 Could not find application \"%appname\"	OpenWithWindow		Programos „%appname“ rasti nepavyko
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Pažymėto elemento išmesti Šiukšlinėn negalima. Ar norite vietoje to jį pašalinti? Neužmirškite, jog šis veiksmas negrįžtamas!
 Invert	SelectionWindow		Invertuoti
@@ -244,7 +227,6 @@ Error deleting items	FSUtils		Klaida šalinant objektus
 Create relative link here	ContainerWindow		Sukurti santykinę nuorodą čia
 trash	B_TRASH_DIRECTORY		Šiukšlinė
 matches regular expression	SelectionWindow		atitinka reguliarųjį reiškinį
-Mount settings…	SettingsView		Tomų prijungimo nuostatos…
 Edit name	InfoWindow		Pervardinti
 Could not open \"%name\" (%error). 	FSUtils		Nepavyko atverti „%name“ (%error).
 Paste	ContainerWindow		Įdėti
@@ -263,7 +245,6 @@ Finish: %time	StatusWindow		Pabaiga: %time
 Cancel	Tracker		Atsisakyti
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Deja, šio atributo keisti negalite.
 Name	ContainerWindow		Vardas
-Disk mount settings	AutoMounterSettings		Tomų prijungimo nuostatos
 Reverse order	ContainerWindow		Rikiuoti atvirkščiai
 48 x 48	DeskWindow		48×48
 OK	OpenWithWindow		Gerai
@@ -305,7 +286,6 @@ copying	FSUtils		kopijuojate
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Klaida kopijuojant aplanką „%name“:\n\t%error\nAr norite tęsti?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	perkelsite
 Show Disks icon	SettingsView		Rodyti Tomų piktogramą
-Mount	VolumeWindow		Prijungti
 Cancel	PoseView		Atsisakyti
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld B, 
 You can't move or copy items to read-only volumes.	FSUtils		Perkelti ar kopijuoti objektų į tomus, prijungtus tik skaitymui, negalima.
@@ -350,24 +330,20 @@ All BeOS disks	AutoMounterSettings		Visus „BeOS“ tomus
 Used space color	SettingsView		Užpildytos vietos spalva
 Sorry, could not create a new folder.	FSUtils		Deja, naujo aplanko sukurti nepavyko.
 multiple disks	FindPanel		keliuose diskuose
-Done	AutoMounterSettings		Užverti
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Objektus turėtumėte numesti ant vieno iš tomų piktogramos Tomų lange.
 Untitled clipping	PoseView		Bevardė iškarpa
 Don't automount	AutoMounterSettings		Automatiškai neprijungti
 Save	FilePanelPriv		Įrašyti
 To: %dir	StatusWindow		Į: %dir
 Window	FilePanelPriv		Langas
-Find…	VolumeWindow		Ieškoti…
 Edit name	FilePanelPriv		Pervardinti
 Size:	InfoWindow		Dydis:
 Empty folder	SlowContextPopup		Tuščias aplankas
 Open selection with:	OpenWithWindow		Atverti pažymėtus naudojant:
-(%bytes bytes)	InfoWindow		(%bytes B)
 Preparing to create links…	StatusWindow		Rengiamasi kurti nuorodas…
 Show navigator	SettingsView		Rodyti naršymo juostą
 Desktop	B_DESKTOP_DIRECTORY		Darbalaukis
 List folders first	SettingsView		Aplankus rikiuoti pirmiau
-Get info	VolumeWindow		Savybės
 Name	SelectionWindow		Vardas
 Trash	Model		Šiukšlinė
 Favorites	FilePanelPriv		Parankiniai

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	951661576
+1	finnish	x-vnd.Haiku-WebPositive	3528881455
 Show home button	Settings Window		Näytä aloitussivupainike
 Username:	Authentication Panel		Käyttäjätunnus:
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
@@ -86,7 +86,6 @@ Open blank page	Settings Window		Avaa tyhjä sivu
 New tabs:	Settings Window		Uudet välilehdet:
 Cancel	WebPositive Window		Peru
 Open all	WebPositive Window		Avaa kaikki
-Hide bookmark bar	WebPositive Window		Piilota kirjanmerkkipalkki
 Proxy server requires authentication	Settings Window		Välityspalvelin vaatii tunnistautumista
 Clear	URL Bar		Tyhjennä
 Cut	URL Bar		Leikkaa

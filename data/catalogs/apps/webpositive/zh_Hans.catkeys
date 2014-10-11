@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-WebPositive	951661576
+1	english	x-vnd.Haiku-WebPositive	3528881455
 Show home button	Settings Window		显示 home 按钮
 Username:	Authentication Panel		用户名：
 Copy URL to clipboard	Download Window		复制 URL 到剪贴板
@@ -86,7 +86,6 @@ Open blank page	Settings Window		打开空白页
 New tabs:	Settings Window		新建标签页：
 Cancel	WebPositive Window		取消
 Open all	WebPositive Window		打开所有
-Hide bookmark bar	WebPositive Window		隐藏书签栏
 Proxy server requires authentication	Settings Window		代理服务器需要认证
 Clear	URL Bar		清除
 Cut	URL Bar		剪切

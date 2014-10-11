@@ -1,8 +1,5 @@
-1	german	x-vnd.Haiku-HaikuDepot	3398060443
+1	german	x-vnd.Haiku-HaikuDepot	443107378
 Name	PackageListView		Name
-Installed packages	Model		Installierte Pakete
-User modified packages	Model		Veränderte Pakete
-Update available	Model		Update verfügbar
 Changelog	PackageInfoView		Änderungsprotokoll
 Click a package to view information	PackageInfoView		Paket anklicken, um Infos anzuzeigen
 for %Version%	PackageInfoView		für %Version%
@@ -18,37 +15,27 @@ Uninstall	PackageManager		Deinstallieren
 An error occurred while initializing the package manager: %message%	MainWindow		Bei der Initialisierung des Paketmanagers trat ein Fehler auf: %message%
 Close	PackageManager		Schließen
 Status	PackageListView		Status
-Available packages	Model		Verfügbare Pakete
-Your rating	System name		Eigene Bewertung
 Development	Model		Programmierung
 Fatal error	PackageManager		Schwerwiegender Fehler
 Ratings	PackageInfoView		Bewertungen
-1 item	PackageListView		1 Objekt
 Inactive	PackageListView		Deaktiviert
 Refresh depots	MainWindow		Depots aktualisieren
 Main Menu	MainWindow		Hauptmenü
-Command line	Model		Kommandozeile
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Aktueller Download:
 Search terms:	FilterView		Suchbegriffe:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Bei der Aktualisierung des Depots trat ein Fehler auf: %error% (%details%)
-Show source packages	MainWindow		Quellcode-Pakete anzeigen
 Productivity	Model		Büro
-Show:	FilterView		Zeige:
 Size	PackageListView		Größe
-Options	MainWindow		Einstellungen
 Games	Model		Spiele
 Rating	PackageListView		Bewertung
-Downloading	Model		Aktuelle Downloads
-%ld items	PackageListView		%ld Objekte
 Graphics	Model		Grafik
 Local	MainWindow		Lokal
 Close	MainWindow		Schließen
 Video	Model		Video
 An error occurred while refreshing the repository: %error%	MainWindow		Bei der Aktualisierung des Depots trat ein Fehler auf: %error%
-All packages	FilterView		Alle Pakete
 Pending…	PackageListView		Ausstehend…
 Depot	FilterView		Depot
 Uninstalled	PackageListView		Deinstalliert
@@ -57,9 +44,6 @@ All depots	FilterView		Alle Depots
 Available	PackageListView		Verfügbar
 n/a	PackageInfoView		n.v.
 Send	RatePackageWindow		Senden
-Show develop packages	MainWindow		Entwicklungs-Pakete anzeigen
-Show	FilterView		Zeige
-Uninstalled packages	Model		Deinstallierte Pakete
 Audio	Model		Audio
 About	PackageInfoView		Über
 Active	PackageListView		Aktiviert

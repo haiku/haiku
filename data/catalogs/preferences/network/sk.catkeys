@@ -1,12 +1,10 @@
-1	slovak	x-vnd.Haiku-Network	365183238
+1	slovak	x-vnd.Haiku-Network	2106277099
 Choose automatically	EthernetSettingsView		Zvoliť automaticky
 Gateway:	EthernetSettingsView		Brána:
 Netmask:	EthernetSettingsView		Maska siete:
 DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS č.2:
 Apply	EthernetSettingsView		Použiť
 OK	EthernetSettingsView		OK
-DNS #1:	EthernetSettingsView		DNS č.1:
 IP address:	EthernetSettingsView		IP adresa:
 Adapter:	EthernetSettingsView		Adaptér:
 Domain:	EthernetSettingsView		Doména:

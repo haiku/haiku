@@ -1,12 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-Network	365183238
+1	dutch; flemish	x-vnd.Haiku-Network	2106277099
 Choose automatically	EthernetSettingsView		Automatisch kiezen
 Gateway:	EthernetSettingsView		Netwerkpunt:
 Netmask:	EthernetSettingsView		Subnet:
 DHCP	EthernetSettingsView		DHCP:
-DNS #2:	EthernetSettingsView		DNS nr. 2:
 Apply	EthernetSettingsView		Toepassen
 OK	EthernetSettingsView		Oké
-DNS #1:	EthernetSettingsView		DNS nr. 1:
 IP address:	EthernetSettingsView		IP-adres:
 Adapter:	EthernetSettingsView		Adapter:
 Domain:	EthernetSettingsView		Domein:

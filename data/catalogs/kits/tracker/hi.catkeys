@@ -1,20 +1,16 @@
-1	hindi	x-vnd.Haiku-libtracker	3225742905
+1	hindi	x-vnd.Haiku-libtracker	3083574692
 OK	WidgetAttributeText		ठीक है
-Icon view	VolumeWindow		चिह्न दृश्य
 Add-ons	FilePanelPriv		अतिरिक्त जोड़ सकते हैं
 Desktop	Model		डेस्कटॉप
 Identify	ContainerWindow		पहचानें
 Warning space color	SettingsView		चेतावनी स्पॆस रंग
-Close	VolumeWindow		बंद करे
 Open	OpenWithWindow		खोले
 Tracker status	StatusWindow		ट्रैकर स्थिति
 Eject when unmounting	AutoMounterSettings		बेदखल जब विरोहण हो रहा हो
 Window	ContainerWindow		विंडो
 Decrease size	ContainerWindow		आकार घटाएँ
-Mini icon view	VolumeWindow		मिनी आइकन देखें
 You must have at least one attribute showing.	PoseView		आपको कम से कम एक गुण दिखा रहा होना चाहिए.
 Permissions	InfoWindow		अनुमतियाँ
-Invert selection	VolumeWindow		चुनाव उलटो
 Recent documents	FavoritesMenu		हाल ही में उपयोग किये गये दस्तावेज
 Modified	QueryPoseView		संशोधित
 Created	ContainerWindow		बनाया गया
@@ -31,7 +27,6 @@ Delete	ContainerWindow		हटाएँ
 Cannot unmount the boot volume \"%name\".	FSUtils		\"%name\" बूट मात्रा अंमाँऊंट नहीं कर सकते 
 Open with…	ContainerWindow		के साथ खोलें...
 Write	FilePermissionsView		लिखे
-for %num files	InfoWindow		%num फाइलों के लिए
 Modified	PoseView		संशोधित
 Make active printer	ContainerWindow		मुद्रक सक्रिय करें
 Create link here	ContainerWindow		यहाँ लिंक बनाएँ
@@ -82,16 +77,13 @@ Windows	TrackerSettingsWindow		विंडोज
 Tracker preferences	TrackerSettingsWindow		ट्रैकर प्राथमिकताएं
 Cut	FilePanelPriv		काटे
 Replace	FilePanelPriv		बदलें
-Select all	VolumeWindow		सभी चुनें
 Opens with:	InfoWindow		के साथ खुलता है:
 Open	ContainerWindow		खोलें
 Error calculating folder size.	InfoWindow		फ़ोल्डर आकार की गणना त्रुटि
 New folder	FilePanelPriv		नया फ़ोल्डर
 %name info	InfoWindow	InfoWindow Title	%name जानकारी
 Favorites	FavoritesMenu		पसंदीदा
-Add-ons	VolumeWindow		अतिरिक्त जोड़ सकते हैं
 Sorry, you can't copy items to the Trash.	PoseView		क्षमा करें, आप आइटम्स रद्दी में प्रतिलिपि नहीं कर सकते है.
-List view	VolumeWindow		सूची दृश्य
 matches wildcard expression	SelectionWindow		वाइल्डकार्ड अभिव्यक्ति से मेल खाता है
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	फिर से नाम दें 
 You cannot replace a folder or a symbolic link with a file.	FSUtils		तुम एक फ़ोल्डर या एक फ़ाइल के साथ एक प्रतीकात्मक कड़ी को बदल नहीं सकते
@@ -101,7 +93,6 @@ Increase size	DeskWindow		आकार बढ़ाएँ
 Resize to fit	ContainerWindow		फिट के अनुसार आकार बदलें
 %Ld bytes	WidgetAttributeText		%Ld बाइट्स
 Add printer…	ContainerWindow		प्रिंटर जोड़ें ...
-Open	VolumeWindow		खोलें
 New folder	ContainerWindow		नया फ़ोल्डर
 Kind	ContainerWindow		प्रकार
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	फिर से नाम दें
@@ -121,9 +112,7 @@ Show volumes on Desktop	SettingsView		आवाज़ की मात्रा 
 KiB	WidgetAttributeText		कीबी बाइट
 Error %error loading Add-On %name.	ContainerWindow		त्रुटि %error अतिरिक्त चीज़ें लोड हो रही है %name.
 Defaults	TrackerSettingsWindow		डिफॉल्टस
-%num items	CountView		%num आइटम्स
 Mini icon view	ContainerWindow		मिनी प्रतीक दृश्य
-Clean up	VolumeWindow		साफ़ करो
 OK	TrackerInitialState		ठीक है
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		खुल नहीं सका \"%name\". फ़ाइल गलती से निष्पादन योग्य के रूप में चिह्नित है.
 Add-ons	ContainerWindow		अतिरिक्त चीज़ें
@@ -150,13 +139,10 @@ no supporting apps	OpenWithWindow		कोई समर्थन क्षुध�
 That name is already taken. Please type another one.	InfoWindow		वह नाम पहले ही ले लिया गया है. कोई दूसरा टाइप करें.
 Sorry, you can't create links in the Trash.	PoseView		क्षमा करें, आप रद्दी में लिंक नहीं बना सकते.
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	सम्बन्ध \"%name\" के लिए:
-Mount settings…	VolumeWindow		माउंट सेटिंगस...
-Select…	VolumeWindow		चुनें...
 All disks	FindPanel		सभी डिस्क
 Invert selection	QueryContainerWindow		चुनाव उलटो
 Execute	FilePermissionsView		चलाएँ
 Size	FindPanel		आकार
-1 item	CountView		एक वस्तु
 Open parent	ContainerWindow		खुला मूल
 Location:	InfoWindow		स्थान:
 Edit favorites…	FilePanelPriv		फेवरिट संपादित करें ...
@@ -176,8 +162,6 @@ Mini icon view	DeskWindow		मिनी प्रतीक दृश्य
 Error in regular expression:\n\n'%errstring'	PoseView		नियमित अभिव्यक्ति में त्रुटि:\n\n'%errstring'
 Mount all	MountMenu		सभी माउंट करें
 calculating…	InfoWindow		गणना कर रहा है...
-Unmount	VolumeWindow		अनमाउंट
-Edit name	VolumeWindow		नाम संपादित करें
 Mount all disks now	AutoMounterSettings		सब डिस्क माउंट करें
 Untitled bitmap	PoseView		शीर्षकहीन बिटमेप
 of %items	StatusWindow		की %items
@@ -191,7 +175,6 @@ Replace other file	WidgetAttributeText		अन्य फ़ाइल बदल�
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		चयनित आइटम में से कुछ रद्दी में स्थानांतरित नहीं किया जा सकता है. क्या आप के बजाय उन्हें मिटाना चाहते हैं? (यह आपरेशन किया जाना है. नहीं लौट सकते हैं)
 You cannot create a link to the root directory.	FSUtils		आप रूट निर्देशिका के लिए एक लिंक नहीं बना सकते
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		आकार बदलने के फिट करें
 Could not find application \"%appname\"	OpenWithWindow		आवेदन नहीं मिला \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		चयनित आइटम को कचरा पेटी में स्थानांतरित नहीं किया जा सकता है. क्या आप इसे इसकी बजाय मिटाना चाहते हैं? (यह आपरेशन किया जाना है. नहीं लौट सकते हैं)
 Invert	SelectionWindow		पलटे
@@ -227,7 +210,6 @@ Error deleting items	FSUtils		वस्तुओं को हटाने म�
 Create relative link here	ContainerWindow		यहाँ संबंधित लिंक बनाएँ
 trash	B_TRASH_DIRECTORY		रद्दी
 matches regular expression	SelectionWindow		नियमित अभिव्यक्ति से मेल खाता है
-Mount settings…	SettingsView		माउंट सेटिंग ...
 Edit name	InfoWindow		नाम संपादित करें
 Could not open \"%name\" (%error). 	FSUtils		खुल नहीं सका \"%name\". (%error). 
 Paste	ContainerWindow		चिपकाना
@@ -244,7 +226,6 @@ label too long	PoseView		लेबल बहुत लंबा हैं
 Cancel	Tracker		रद्द करें
 Sorry, you cannot edit that attribute.	WidgetAttributeText		क्षमा करें, आप उस गुण को संपादित नहीं कर सकते
 Name	ContainerWindow		नाम
-Disk mount settings	AutoMounterSettings		डिस्क माउंट सेटिंग्स
 Reverse order	ContainerWindow		उलटा क्रम
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		ठीक है
@@ -286,7 +267,6 @@ copying	FSUtils		प्रतिलिपि बन रहे हैं
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		फ़ोल्डर प्रतिलिपि में त्रुटि \"%name\":\n\t%error\n\nक्या आप जारी रखना चाहेंगे?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	मूव
 Show Disks icon	SettingsView		डिस्क चिह्न दिखाएँ
-Mount	VolumeWindow		माउन्ट
 Cancel	PoseView		रद्द करें
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld बाइट्स,
 You can't move or copy items to read-only volumes.	FSUtils		आप केवल पढ़ने के लिए संस्करणों कॉपी या स्थानांतरित नहीं कर सकते हैं.
@@ -328,24 +308,20 @@ All BeOS disks	AutoMounterSettings		सभी BeOS डिस्क
 Used space color	SettingsView		स्पैस रंग उपयोग किये गये
 Sorry, could not create a new folder.	FSUtils		क्षमा करें, कोई नया फ़ोल्डर नहीं बना सकते हैं.
 multiple disks	FindPanel		अनेक डिस्क
-Done	AutoMounterSettings		संपन्न हो गया
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		\"Disks\विंडो.
 Untitled clipping	PoseView		शीर्षकहीन क्लिपिंग
 Don't automount	AutoMounterSettings		ऑटोमाउंट नहीं करें
 Save	FilePanelPriv		सहेजें
 To: %dir	StatusWindow		करने के लिए: %dir
 Window	FilePanelPriv		विंडों
-Find…	VolumeWindow		खोजें ...
 Edit name	FilePanelPriv		नाम संपादित करें
 Size:	InfoWindow		आकार:
 Empty folder	SlowContextPopup		खाली फ़ोल्डर
 Open selection with:	OpenWithWindow		के साथ चयन खोलें:
-(%bytes bytes)	InfoWindow		(%बाइट्स बाइट्स)
 Preparing to create links…	StatusWindow		लिंक बनाने के लिए की तैयारी ...
 Show navigator	SettingsView		दिशा दिखानेवाला दिखाएँ
 Desktop	B_DESKTOP_DIRECTORY		डेस्कटॉप
 List folders first	SettingsView		पहले फ़ोल्डर्स की सूची दिखाएँ
-Get info	VolumeWindow		सूचना प्राप्त करें
 Name	SelectionWindow		नाम
 Trash	Model		रद्दी
 Favorites	FilePanelPriv		पसंदीदा

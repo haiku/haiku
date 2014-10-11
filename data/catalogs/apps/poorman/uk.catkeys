@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PoorMan	1267330937
+1	ukrainian	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		Розташування сайту
 Error Server	PoorMan		Помилка сервера
 Settings…	PoorMan		Налаштування…
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		Лог в консоль
 Connections	PoorMan		Підє'днання
 Status: Running	PoorMan		Стан: Запущений
-connections	PoorMan		підє'днання
 Controls	PoorMan		Органи управління
 Send file listing if there's no start page	PoorMan		Відправити список файлів, якщо немає домашньої сторінки
 Error Dir	PoorMan		Помилка директорії

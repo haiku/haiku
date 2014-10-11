@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	951661576
+1	french	x-vnd.Haiku-WebPositive	3528881455
 Show home button	Settings Window		Afficher le bouton de la page d'accueil
 Username:	Authentication Panel		Utilisateur :
 Copy URL to clipboard	Download Window		Copier l'URL dans le presse-papiers
@@ -86,7 +86,6 @@ Open blank page	Settings Window		Ouvrir une page blanche
 New tabs:	Settings Window		Nouvel onglet :
 Cancel	WebPositive Window		Annuler
 Open all	WebPositive Window		Tout ouvrir
-Hide bookmark bar	WebPositive Window		Cacher la barre de signets
 Proxy server requires authentication	Settings Window		Le serveur mandataire requiert une authentification
 Clear	URL Bar		Vider
 Cut	URL Bar		Couper

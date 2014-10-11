@@ -1,9 +1,5 @@
-1	swedish	x-vnd.Haiku-NewMailNotification	3624191291
-%num new message	filter		%num nytt meddelande
-%num new messages	filter		%num nya meddelanden
+1	swedish	x-vnd.Haiku-NewMailNotification	583443025
 Keyboard LEDs	ConfigView		Tangentbords LEDs
-You have %num new messages for %name.	filter		Du har %num nya meddelanden för %name.
-You have %num new message for %name.	filter		Du har %num nytt meddelande för %name.
 Log window	ConfigView		Loggfönster
 Central beep	ConfigView		Centralt pip
 Beep	ConfigView		Pip

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-FileTypes	133192727
+1	english	x-vnd.Haiku-FileTypes	3116280330
 Application types…	FileTypes Window		应用程序类型...
 Description:	Application Types Window		描述：
 Args only	Application Type Window		仅含参数
@@ -130,7 +130,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		该文件类型已存在
 Same as…	FileTypes Window		相同于...
 Exclusive launch	Application Type Window		单独启动
-%ld Application type%s could be removed.	Application Types Window		%ld Application type%s 无法删除。
 FileTypes	System name		文件类型
 Application types	Application Types Window		应用类型
 Could not remove file type: %s\n	FileTypes Window		无法删除文件类型：%s\n

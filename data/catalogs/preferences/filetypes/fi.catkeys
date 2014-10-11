@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-FileTypes	133192727
+1	finnish	x-vnd.Haiku-FileTypes	3116280330
 Application types…	FileTypes Window		Sovellustyypit…
 Description:	Application Types Window		Kuvaus:
 Args only	Application Type Window		Vain argumentit
@@ -130,7 +130,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Tämä tiedostotyyppi on jo olemassa
 Same as…	FileTypes Window		Sama kuin…
 Exclusive launch	Application Type Window		Yksinomainen käynnistys
-%ld Application type%s could be removed.	Application Types Window		%ld sovellustyyppiä %s ei voitu poistaa.
 FileTypes	System name		Tiedostotyyppiasetukset
 Application types	Application Types Window		Sovellustyypit
 Could not remove file type: %s\n	FileTypes Window		Ei voitu poistaa tiedostotyyppiä: %s\n

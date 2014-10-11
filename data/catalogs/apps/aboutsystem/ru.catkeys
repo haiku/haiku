@@ -1,12 +1,10 @@
-1	russian	x-vnd.Haiku-About	2441795911
+1	russian	x-vnd.Haiku-About	843957219
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 Авторы Gutenprint.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
-%ld Processors:	AboutView		Процессоров: %ld
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Все права защищены © 2000 Jean-Pierre ervbefeL и Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Все права защищены © 1996-2005 Julian R Seward.
 %d MiB total	AboutView		Всего %d МБ
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
-The Haiku-Ports team\n	AboutView		Команде Haiku-Ports\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Все права защищены © 1998-2003 Daniel Veillard.
 %d MiB used (%d%%)	AboutView		%d МБ использовано (%d%%)
 Website, marketing & documentation:\n	AboutView		Веб-сайт, маркетинг и документация:\n
@@ -18,7 +16,6 @@ Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Корпорации Be и ее команде разработчиков, за создание BeOS!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Все права защищены © 1999-2000 Y.Takagi.
 Source Code: 	AboutView		Исходный код: 
-Processor:	AboutView		Процессор:
 Kernel:	AboutView		Ядро:
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Все права защищены © 2001-2002 Thomas Broyer, Charlie Bozeman и Daniel Veillard.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Отдельные части этого программного обеспечения находятся под авторским правом.\nВсе права защищены © 1996-2006 Проект FreeType.

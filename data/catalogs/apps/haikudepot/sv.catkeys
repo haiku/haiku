@@ -1,8 +1,5 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3398060443
+1	swedish	x-vnd.Haiku-HaikuDepot	443107378
 Name	PackageListView		Namn
-Installed packages	Model		Installerade paket
-User modified packages	Model		Användarmodifierade paket
-Update available	Model		Uppdateringar tillgängliga
 Changelog	PackageInfoView		Ändringslogg
 Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
 for %Version%	PackageInfoView		för %Version%
@@ -18,37 +15,27 @@ Uninstall	PackageManager		Avinstallera
 An error occurred while initializing the package manager: %message%	MainWindow		Ett fel inträffade när packet manager startade: %message%
 Close	PackageManager		Stäng
 Status	PackageListView		Status
-Available packages	Model		Tillgängliga paket
-Your rating	System name		Dina användarbetyg
 Development	Model		Utveckling
 Fatal error	PackageManager		Allvarligt fel
 Ratings	PackageInfoView		Betyg
-1 item	PackageListView		ett objekt
 Inactive	PackageListView		Inaktiv
 Refresh depots	MainWindow		Uppdatera depå
 Main Menu	MainWindow		Huvudmeny
-Command line	Model		Kommandoraden
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Hämtar:
 Search terms:	FilterView		Sökvillkor
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error% (%details%)
-Show source packages	MainWindow		Visa källkodspaket
 Productivity	Model		Produktivitet
-Show:	FilterView		Visa:
 Size	PackageListView		Storlek
-Options	MainWindow		Alternativ
 Games	Model		Spel
 Rating	PackageListView		Betyg
-Downloading	Model		Hämtar
-%ld items	PackageListView		%d objekt
 Graphics	Model		Grafik
 Local	MainWindow		Lokal
 Close	MainWindow		Stäng
 Video	Model		Video
 An error occurred while refreshing the repository: %error%	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error%
-All packages	FilterView		Alla paket
 Pending…	PackageListView		Väntar...
 Depot	FilterView		Depot
 Uninstalled	PackageListView		Avinstallera
@@ -57,9 +44,6 @@ All depots	FilterView		All depots
 Available	PackageListView		Tillgänglig
 n/a	PackageInfoView		oviktigt
 Send	RatePackageWindow		Skicka
-Show develop packages	MainWindow		Visa utvecklingspaket
-Show	FilterView		Visa
-Uninstalled packages	Model		Avinstallera paket
 Audio	Model		Ljud
 About	PackageInfoView		Om
 Active	PackageListView		Aktiv

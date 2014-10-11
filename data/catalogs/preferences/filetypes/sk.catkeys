@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-FileTypes	1059171929
+1	slovak	x-vnd.Haiku-FileTypes	4042259532
 Application types…	FileTypes Window		Typy aplikácií…
 Description:	Application Types Window		Popis:
 Args only	Application Type Window		Iba argumenty
@@ -128,7 +128,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Tento typ súboru už existuje
 Same as…	FileTypes Window		Rovnaký ako…
 Exclusive launch	Application Type Window		Exkluzívne spustenie
-%ld Application type%s could be removed.	Application Types Window		%ld Typ aplikácie %s možno ostrániť.
 FileTypes	System name		Typy súborov
 Application types	Application Types Window		Typy aplikácie
 Could not remove file type: %s\n	FileTypes Window		Nepodarilo sa odstrániť typ súboru: %s\n

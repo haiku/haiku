@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PoorMan	1267330937
+1	german	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		Website-Adresse
 Error Server	PoorMan		Serverfehler
 Settings…	PoorMan		Einstellungen…
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		In Konsole loggen
 Connections	PoorMan		Verbindungen
 Status: Running	PoorMan		Status: Läuft
-connections	PoorMan		Verbindungen
 Controls	PoorMan		Aktionen
 Send file listing if there's no start page	PoorMan		Dateiaufzählung senden, wenn keine Startseite vorhanden ist
 Error Dir	PoorMan		Fehlerverzeichnis

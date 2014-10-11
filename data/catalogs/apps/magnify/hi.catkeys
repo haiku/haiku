@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Magnify	3914403817
+1	hindi	x-vnd.Haiku-Magnify	3240300114
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		कोई क्लिप नहीं msg\n
 Make square	Magnify-Main		चौकोर बनाओ
 Copy image	Magnify-Main		छवि की प्रतिलिपि बनाएँ 
@@ -8,7 +8,6 @@ Hide/Show grid	Magnify-Main		ग्रिड को छिपाएँ/दिख
 magnify: size must be a multiple of 4\n	Console		आवर्धन: आकार 4 की एक बहु\n 
 Decrease pixel size	Magnify-Main		पिक्सेल आकार घटाएँ
 Magnify	System name		मग्निफ्य 
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize पिक्सलस/पिक्सेल
 Info	Magnify-Main		जानकारी
 Remove a crosshair	Magnify-Main		क्रोसहैर हटायें
 Freeze/Unfreeze image	Magnify-Main		छवि को फ्रीज/अन्फ्रीज़ कर देना 

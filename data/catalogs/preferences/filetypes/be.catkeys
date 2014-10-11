@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-FileTypes	133192727
+1	belarusian	x-vnd.Haiku-FileTypes	3116280330
 Application types…	FileTypes Window		Тыпы праграм…
 Description:	Application Types Window		Апісанне:
 Args only	Application Type Window		Толькі аргументы
@@ -130,7 +130,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Гэты тып файла ўжо існуе
 Same as…	FileTypes Window		Такая ж, як…
 Exclusive launch	Application Type Window		Выбарны запуск
-%ld Application type%s could be removed.	Application Types Window		%ld тыпаў праграм%s можна выдаліць.
 FileTypes	System name		Тыпы файлаў
 Application types	Application Types Window		Тыпы праграм
 Could not remove file type: %s\n	FileTypes Window		Не ўдалося выдаліць тып файла: %s\n

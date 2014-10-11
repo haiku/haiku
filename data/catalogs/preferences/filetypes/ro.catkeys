@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-FileTypes	599989122
+1	romanian	x-vnd.Haiku-FileTypes	3583076725
 Application types…	FileTypes Window		Tipuri de aplicații...
 Description:	Application Types Window		Descriere:
 Args only	Application Type Window		Doar arg
@@ -127,7 +127,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Acest tip de fișier există deja
 Same as…	FileTypes Window		La fel ca...
 Exclusive launch	Application Type Window		Pornire exclusivă
-%ld Application type%s could be removed.	Application Types Window		Tipurile%s a %ld aplicații nu au putut fi eliminate.
 FileTypes	System name		TipuriFișier
 Application types	Application Types Window		Tipuri de aplicație
 Could not remove file type: %s\n	FileTypes Window		Nu s-a putut elimina tipul de fișier: %s\n

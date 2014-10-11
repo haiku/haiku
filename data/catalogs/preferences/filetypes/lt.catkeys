@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-FileTypes	133192727
+1	lithuanian	x-vnd.Haiku-FileTypes	3116280330
 Application types…	FileTypes Window		Programų tipai…
 Description:	Application Types Window		Aprašas:
 Args only	Application Type Window		Tik argumentai
@@ -130,7 +130,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Toks failų tipas jau yra
 Same as…	FileTypes Window		Ta pati, kaip…
 Exclusive launch	Application Type Window		Išskirtinė paleistis
-%ld Application type%s could be removed.	Application Types Window		Pavyko pašalinti programų tipų: %ld.
 FileTypes	System name		Failų tipai
 Application types	Application Types Window		Programų tipai
 Could not remove file type: %s\n	FileTypes Window		Nepavyko pašalinti failų tipo: %s\n

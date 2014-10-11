@@ -1,21 +1,17 @@
-1	hungarian	x-vnd.Haiku-libtracker	2212190051
+1	hungarian	x-vnd.Haiku-libtracker	2070021838
 OK	WidgetAttributeText		Rendben
-Icon view	VolumeWindow		Ikon nézet
 Add-ons	FilePanelPriv		Kiegészítők
 Desktop	Model		Asztal
 Identify	ContainerWindow		Azonosítás
 Warning space color	SettingsView		Veszély jelzőszíne
-Close	VolumeWindow		Bezárás
 Open	OpenWithWindow		Megnyitás
 Tracker status	StatusWindow		Nyomkövető állapota
 Eject when unmounting	AutoMounterSettings		Kiadás leválasztáskor
 Window	ContainerWindow		Ablak
 Decrease size	ContainerWindow		Méret csökkentése
-Mini icon view	VolumeWindow		Mini ikon nézet
 You must have at least one attribute showing.	PoseView		Legalább egy jellemző meg kell, hogy legyen jelenítve.
 Permissions	InfoWindow		Engedélyek
 128 x 128	DeskWindow		128 × 128
-Invert selection	VolumeWindow		Kijelölés megfordítása
 128 x 128	ContainerWindow		128 × 128
 Recent documents	FavoritesMenu		Legutóbbi dokumentumok
 Modified	QueryPoseView		Módosítva
@@ -35,7 +31,6 @@ Delete	ContainerWindow		Törlés
 Cannot unmount the boot volume \"%name\".	FSUtils		Nem sikerült a lemez (%name) leválasztása.
 Open with…	ContainerWindow		Megnyitás…
 Write	FilePermissionsView		Írás
-for %num files	InfoWindow		%num fájlra
 Modified	PoseView		Módosítva
 Make active printer	ContainerWindow		Beállítás aktív nyomtatónak
 Create link here	ContainerWindow		Hivatkozás készítése ide
@@ -90,7 +85,6 @@ Windows	TrackerSettingsWindow		Ablakok
 Tracker preferences	TrackerSettingsWindow		Nyomkövető beállítása
 Cut	FilePanelPriv		Kivágás
 Replace	FilePanelPriv		Csere
-Select all	VolumeWindow		Mind kijelölése
 Opens with:	InfoWindow		Megnyitás ezzel:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ha %ifYouDoAction a mime beállításokat, akkor lehet, hogy a %osName nem fog megfelelően működni.\n\nBiztosan folytatni akarja?
 Open	ContainerWindow		Megnyitás
@@ -99,10 +93,8 @@ Error calculating folder size.	InfoWindow		Hiba történt a mappa méretének sz
 New folder	FilePanelPriv		Új mappa
 %name info	InfoWindow	InfoWindow Title	%name
 Favorites	FavoritesMenu		Kedvencek
-Add-ons	VolumeWindow		Kiegészítők
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" egy nem támogatott futtatható fájl.
 Sorry, you can't copy items to the Trash.	PoseView		Sajnáljuk, de nem lehet a Szemetesbe másolni.
-List view	VolumeWindow		Lista nézet
 matches wildcard expression	SelectionWindow		megfelel a helyettesítő kifejezésnek
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	átnevezi
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nem lehet mappát vagy szimbolikus linket fájllal felülírni.
@@ -112,7 +104,6 @@ Increase size	DeskWindow		Méret növelése
 Resize to fit	ContainerWindow		Átméretezés hogy elférjen
 %Ld bytes	WidgetAttributeText		%Ld bájt
 Add printer…	ContainerWindow		Nyomtató hozzáadása…
-Open	VolumeWindow		Megnyitás
 New folder	ContainerWindow		Új mappa
 Kind	ContainerWindow		Típus
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	átnevezze
@@ -133,9 +124,7 @@ Show volumes on Desktop	SettingsView		Lemezek megjelenítése az Asztalon
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Hiba történt a bővítmény (%name) betöltése közben: %error.
 Defaults	TrackerSettingsWindow		Eredeti
-%num items	CountView		%num elem
 Mini icon view	ContainerWindow		Mini ikon nézet
-Clean up	VolumeWindow		Rendrakás
 OK	TrackerInitialState		Rendben
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Nem sikerült megnyitni: %name. A fájl tévesen futtathatónak lett jelölve.
 Add-ons	ContainerWindow		Kiegészítők
@@ -165,14 +154,11 @@ That name is already taken. Please type another one.	InfoWindow		Ez a név már 
 Sorry, you can't create links in the Trash.	PoseView		Sajnáljuk, de nem lehet hivatkozást létrehozni a Szemetesbe.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Már van a mappában egy ilyen nevű elem: %name, és lehet, hogy\nugyanilyen nevű elemeket tartalmaz. Szeretné felülírni őket azzal a mappával amit Ön akar %verb?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	%name hivatkozása:
-Mount settings…	VolumeWindow		Csatolási beállítások…
-Select…	VolumeWindow		Kijelölés…
 All disks	FindPanel		Mindenhol
 Revert	TrackerSettingsWindow		Visszaállít
 Invert selection	QueryContainerWindow		Kijelölés megfordítása
 Execute	FilePermissionsView		Futtatás
 Size	FindPanel		Méret
-1 item	CountView		1 elem
 Open parent	ContainerWindow		Szülő megnyitása
 Location:	InfoWindow		Útvonal:
 Edit favorites…	FilePanelPriv		Kedvencek szerkesztése…
@@ -192,8 +178,6 @@ Mini icon view	DeskWindow		Mini ikon nézet
 Error in regular expression:\n\n'%errstring'	PoseView		Hiba az általános kifejezésben:\n\n'%errstring'
 Mount all	MountMenu		Összes csatolása
 calculating…	InfoWindow		számolás…
-Unmount	VolumeWindow		Leválasztás
-Edit name	VolumeWindow		Név szerkesztése
 Mount all disks now	AutoMounterSettings		Összes lemez csatolása most
 Untitled bitmap	PoseView		Névtelen bittérkép
 of %items	StatusWindow		/ %items
@@ -207,7 +191,6 @@ Replace other file	WidgetAttributeText		Másik fájl felülírása
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Néhányat a kiválasztott elem közül nem lehet a Szemetesbe mozgatni. Szeretné inkább törölni? (Nem vonható vissza.)
 You cannot create a link to the root directory.	FSUtils		Nem lehet hivatkozást létrehozni a gyökérmappához.
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		Átméretezés hogy elférjen
 Could not find application \"%appname\"	OpenWithWindow		A program (%appname) nem található
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		A kiválasztott elemet nem lehet a Szemetesbe mozgatni. Szeretné inkább törölni? (Nem vonható vissza.)
 Invert	SelectionWindow		Megfordítás
@@ -244,7 +227,6 @@ Error deleting items	FSUtils		Hiba történt az elemek törlése közben
 Create relative link here	ContainerWindow		Relatív hivatkozás létrehozása ide
 trash	B_TRASH_DIRECTORY		Szemetes
 matches regular expression	SelectionWindow		illeszkedik az általános kifejezésre
-Mount settings…	SettingsView		Csatolási beállítások…
 Edit name	InfoWindow		Név szerkesztése
 Could not open \"%name\" (%error). 	FSUtils		Nem sikerült megnyitni: %name\n\t%error
 Paste	ContainerWindow		Beillesztés
@@ -263,7 +245,6 @@ Finish: %time	StatusWindow		Befejezés: %time
 Cancel	Tracker		Mégse
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Sajnáljuk, de ezt a jellemzőt nem lehet szerkeszteni.
 Name	ContainerWindow		Név
-Disk mount settings	AutoMounterSettings		Lemezcsatolási beállítások
 Reverse order	ContainerWindow		Fordított sorrend
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		Rendben
@@ -305,7 +286,6 @@ copying	FSUtils		másolni
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hiba történt a mappa másolása közben: %name\n\t%error\n\nSzeretné folytatni?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	átmozgatja
 Show Disks icon	SettingsView		„Lemezek” ikon megjelenítése
-Mount	VolumeWindow		Csatolás
 Cancel	PoseView		Mégse
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld bájt,
 You can't move or copy items to read-only volumes.	FSUtils		Írásvédett lemezre nem lehet mozgatni vagy átmásolni elemeket.
@@ -350,24 +330,20 @@ All BeOS disks	AutoMounterSettings		Összes BeOS lemez
 Used space color	SettingsView		Használt terület színe
 Sorry, could not create a new folder.	FSUtils		Nem sikerült az új mappát létrehozni.
 multiple disks	FindPanel		több lemez
-Done	AutoMounterSettings		Kész
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Húzzon elemeket a „Lemezek” ablakban az egyik lemez ikonjára.
 Untitled clipping	PoseView		Névtelen kivágás
 Don't automount	AutoMounterSettings		Ne csatoljon automatikusan
 Save	FilePanelPriv		Mentés
 To: %dir	StatusWindow		Ide: %dir
 Window	FilePanelPriv		Ablak
-Find…	VolumeWindow		Keresés…
 Edit name	FilePanelPriv		Név szerkesztése
 Size:	InfoWindow		Méret:
 Empty folder	SlowContextPopup		Üres mappa
 Open selection with:	OpenWithWindow		Kijelölés megnyitása ezzel:
-(%bytes bytes)	InfoWindow		(%bytes bájt)
 Preparing to create links…	StatusWindow		Felkészülés a hivatkozások létrehozására…
 Show navigator	SettingsView		A navigátor megjelenítése
 Desktop	B_DESKTOP_DIRECTORY		Asztal
 List folders first	SettingsView		A mappákat listázza elsőként
-Get info	VolumeWindow		Információ
 Name	SelectionWindow		A név
 Trash	Model		Szemetes
 Favorites	FilePanelPriv		Kedvencek

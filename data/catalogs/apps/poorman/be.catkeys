@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-PoorMan	1267330937
+1	belarusian	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		Месцазнаходжанне вэб-сайта
 Error Server	PoorMan		Сервер Памылак
 Settings…	PoorMan		Наладкі…
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		Лог у Кансоль
 Connections	PoorMan		Далучэньні
 Status: Running	PoorMan		Стан: Працуе
-connections	PoorMan		спалучэнні
 Controls	PoorMan		Элементы кіравання
 Send file listing if there's no start page	PoorMan		Адпраўляць спісы файлаў, калі стартавая старонка не існуе
 Error Dir	PoorMan		Каталог Памылак

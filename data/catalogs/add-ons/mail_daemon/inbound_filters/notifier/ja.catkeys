@@ -1,9 +1,5 @@
-1	japanese	x-vnd.Haiku-NewMailNotification	3624191291
-%num new message	filter		%num 通の新着メッセージ
-%num new messages	filter		%num 通の新着メッセージ
+1	japanese	x-vnd.Haiku-NewMailNotification	583443025
 Keyboard LEDs	ConfigView		キーボードLED
-You have %num new messages for %name.	filter		%name より\n%num 通のメッセージが届きました。
-You have %num new message for %name.	filter		%name より\n%num 通のメッセージが届きました。
 Log window	ConfigView		ログウィンドウ
 Central beep	ConfigView		ビープ音 (すべてのアカウント)
 Beep	ConfigView		ビープ音

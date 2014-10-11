@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-FileTypes	133192727
+1	french	x-vnd.Haiku-FileTypes	3116280330
 Application types…	FileTypes Window		Types d'applications…
 Description:	Application Types Window		Description :
 Args only	Application Type Window		Arguments seuls
@@ -130,7 +130,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Ce type de fichier existe déjà
 Same as…	FileTypes Window		Identique à…
 Exclusive launch	Application Type Window		Instance exclusive
-%ld Application type%s could be removed.	Application Types Window		%ld Type%2$s d'application%2$s supprimé%2$s.
 FileTypes	System name		Types de Fichiers
 Application types	Application Types Window		Types d'application
 Could not remove file type: %s\n	FileTypes Window		Impossible de supprimer le type de fichier : %s\n

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libbe	3504008668
+1	belarusian	x-vnd.Haiku-libbe	84010340
 gamma	AboutWindow		гамма
 beta	AboutWindow		бэта
 %3.2f GiB	StringForSize		%3.2f ГіБ
@@ -18,7 +18,6 @@ About %app%	AboutWindow		Пра %app%
 OK	Dragger		ОК
 OK	PrintJob		ОК
 Green:	ColorControl		Зялёны:
-Ok	AboutWindow		Добра
 Version history:	AboutWindow		Гісторыя версій:
 Remove replicant	Dragger		Выдаліць рэпліканта
 OK	ZombieReplicantView		ОК

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Magnify	907580139
+1	russian	x-vnd.Haiku-Magnify	233476436
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		буфер обмена пуст\n
 Make square	Magnify-Main		Сделать квадрат
 Copy image	Magnify-Main		Копировать изображение
@@ -8,7 +8,6 @@ Hide/Show grid	Magnify-Main		Скрыть/показать сетку
 magnify: size must be a multiple of 4\n	Console		увеличитель: размер должен кратным 4\n
 Decrease pixel size	Magnify-Main		Уменьшить размер пикселя
 Magnify	System name		Увеличитель
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize пикселей на пиксель
 Info	Magnify-Main		Информация
 Remove a crosshair	Magnify-Main		Удалить перекрестье
 Freeze/Unfreeze image	Magnify-Main		Заморозить/разморозить изображение

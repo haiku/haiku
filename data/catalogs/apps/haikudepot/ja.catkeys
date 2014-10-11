@@ -1,8 +1,5 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	59499578
+1	japanese	x-vnd.Haiku-HaikuDepot	1399513809
 Name	PackageListView		名前
-Installed packages	Model		インストール済パッケージ
-User modified packages	Model		ユーザーが変更したパッケージ
-Update available	Model		更新があります
 Changelog	PackageInfoView		変更履歴
 Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
 No changelog available.	PackageInfoView		変更記録はありません。
@@ -17,37 +14,27 @@ Uninstall	PackageManager		アンインストール
 An error occurred while initializing the package manager: %message%	MainWindow		パッケージマネジャーの初期化中にエラーが発生しました: %message%
 Close	PackageManager		閉じる
 Status	PackageListView		状態
-Available packages	Model		使用可能なパッケージ
-Your rating	System name		あなたの評価
 Development	Model		開発
 Fatal error	PackageManager		致命的なエラー
 Ratings	PackageInfoView		評価
-1 item	PackageListView		1 個のアイテム
 Inactive	PackageListView		無効
 Refresh depots	MainWindow		Depot を更新
 Main Menu	MainWindow		メインメニュー
-Command line	Model		コマンドライン
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		ダウンロード中:
 Search terms:	FilterView		検索語句:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		ユーザー格付けがありません。
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		リポジトリの更新中にエラーが発生しました: %error% (%details%)
-Show source packages	MainWindow		ソースパッケージを表示する
 Productivity	Model		ビジネス
-Show:	FilterView		表示:
 Size	PackageListView		サイズ
-Options	MainWindow		オプション
 Games	Model		ゲーム
 Rating	PackageListView		評価
-Downloading	Model		ダウンロード中
-%ld items	PackageListView		%ld 個のアイテム
 Graphics	Model		グラフィック
 Local	MainWindow		ローカル
 Close	MainWindow		閉じる
 Video	Model		ビデオ
 An error occurred while refreshing the repository: %error%	MainWindow		リポジトリの更新中にエラーが発生しました: %error%
-All packages	FilterView		すべてのパッケージ
 Pending…	PackageListView		保留中…
 Depot	FilterView		Depot
 Uninstalled	PackageListView		アンインストール済み
@@ -56,9 +43,6 @@ All depots	FilterView		すべて
 Available	PackageListView		利用可能
 n/a	PackageInfoView		利用不可
 Send	RatePackageWindow		送信する
-Show develop packages	MainWindow		開発用パッケージを表示する
-Show	FilterView		表示
-Uninstalled packages	Model		アンインストール済みパッケージ
 Audio	Model		オーディオ
 About	PackageInfoView		パッケージについて
 Active	PackageListView		有効

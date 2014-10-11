@@ -1,6 +1,5 @@
-1	swedish	x-vnd.Haiku-Pairs	1196284538
+1	swedish	x-vnd.Haiku-Pairs	2193803529
 Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs hittade inte tillräckligt många vektor ikoner; det behövs %zu st, hittade %zu st.\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tskrivet av Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nDu klarade spelet på %num% klick.\n
 Expert (8x8)	PairsWindow		Expert (8x8)
 Beginner (4x4)	PairsWindow		Nybörjare (4x4)
 Quit game	PairsWindow		Avsluta spel

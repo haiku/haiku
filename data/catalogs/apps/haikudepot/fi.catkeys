@@ -1,8 +1,5 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3398060443
+1	finnish	x-vnd.Haiku-HaikuDepot	443107378
 Name	PackageListView		Nimi
-Installed packages	Model		Asennetut paketit
-User modified packages	Model		Käyttäjän muokkaamat paketit
-Update available	Model		Päivitys saatavilla
 Changelog	PackageInfoView		Muutosloki
 Click a package to view information	PackageInfoView		Napsauta pakkausta tietojen katsomiseksi
 for %Version%	PackageInfoView		%Version%
@@ -18,37 +15,27 @@ Uninstall	PackageManager		Poista asennus
 An error occurred while initializing the package manager: %message%	MainWindow		Pakkaushallintaa alustettaessa tapahtui virhe: %message%
 Close	PackageManager		Sulje
 Status	PackageListView		Tila
-Available packages	Model		Käytettävissä olevat pakkaukset
-Your rating	System name		Arvosanasi
 Development	Model		Ohjelmakehitys
 Fatal error	PackageManager		Kriittinen virhe
 Ratings	PackageInfoView		Arvosanat
-1 item	PackageListView		1 kohde
 Inactive	PackageListView		Ei käytössä
 Refresh depots	MainWindow		Päivitä varastot
 Main Menu	MainWindow		Päävalikko
-Command line	Model		Komentorivi
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Ladataan:
 Search terms:	FilterView		Hakusanat:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error% (%details%)
-Show source packages	MainWindow		Näytä lähdekoodipakkaukset
 Productivity	Model		Tuottavuus
-Show:	FilterView		Näytä:
 Size	PackageListView		Koko
-Options	MainWindow		Valitsimet
 Games	Model		Pelit
 Rating	PackageListView		Arvosana
-Downloading	Model		Ladataan
-%ld items	PackageListView		%ld kohdetta
 Graphics	Model		Grafiikka
 Local	MainWindow		Paikallinen
 Close	MainWindow		Sulje
 Video	Model		Video
 An error occurred while refreshing the repository: %error%	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error%
-All packages	FilterView		Kaikki pakkaukset
 Pending…	PackageListView		Odottaa...
 Depot	FilterView		Varasto
 Uninstalled	PackageListView		Poistetut asennukset
@@ -57,9 +44,6 @@ All depots	FilterView		Kaikki varastot
 Available	PackageListView		Käytettävissä
 n/a	PackageInfoView		–
 Send	RatePackageWindow		Lähetä
-Show develop packages	MainWindow		Näytä kehityspakkaukset
-Show	FilterView		Näytä
-Uninstalled packages	Model		Pakkaukset, joiden asennus on poistettu
 Audio	Model		Ääni
 About	PackageInfoView		Ohjelmasta
 Active	PackageListView		Käytössä

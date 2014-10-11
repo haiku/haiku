@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-FileTypes	133192727
+1	hungarian	x-vnd.Haiku-FileTypes	3116280330
 Application types…	FileTypes Window		Programtípusok…
 Description:	Application Types Window		Leírás:
 Args only	Application Type Window		Csak paraméterek
@@ -130,7 +130,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Ez a fájltípus már létezik
 Same as…	FileTypes Window		Ugyanaz, mint…
 Exclusive launch	Application Type Window		Kivételes indítás
-%ld Application type%s could be removed.	Application Types Window		%ld programtípus%s eltávolítható.
 FileTypes	System name		Fájltípusok
 Application types	Application Types Window		Programtípusok
 Could not remove file type: %s\n	FileTypes Window		Nem sikerült eltávolítani ezt a fájltípust: %s\n

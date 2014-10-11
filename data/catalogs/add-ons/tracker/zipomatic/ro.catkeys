@@ -1,5 +1,4 @@
-1	romanian	x-vnd.haiku.zip-o-matic	2207848100
-1 file added.	file:ZipOMaticWindow.cpp		1 fișier adăugat.
+1	romanian	x-vnd.haiku.zip-o-matic	2241557251
 Stop	file:ZipOMaticWindow.cpp		Oprește
 Creating archive: %s	file:ZipOMaticWindow.cpp		Se creează arhiva: %s
 Continue	file:ZipOMaticWindow.cpp		Continuă
@@ -9,7 +8,6 @@ Filename: %s	file:ZipOMaticWindow.cpp		Nume fișier: %s
 Let them continue	file:ZipOMatic.cpp		Lasă-le să continue
 Do you want to stop them?	file:ZipOMatic.cpp		Dorești să le oprești?
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Dorești să oprești crearea acestei arhive?
-%ld files added.	file:ZipOMaticWindow.cpp		%ld fișiere adăugate.
 Stopped	file:ZipOMaticWindow.cpp		Oprit
 Archive	file:ZipperThread.cpp		Arhivă
 Error creating archive	file:ZipOMaticWindow.cpp		Eroare la crearea arhivei

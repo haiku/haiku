@@ -1,18 +1,15 @@
-1	ukrainian	x-vnd.Haiku-Network	1341378870
+1	ukrainian	x-vnd.Haiku-Network	3992214214
 Choose automatically	EthernetSettingsView		Вибрати автоматично
 Gateway:	EthernetSettingsView		Шлюз:
 Netmask:	EthernetSettingsView		Маска:
 DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS #2:
 Apply	EthernetSettingsView		Застосовувати
 Netmask is invalid	EthernetSettingsView		Некоректна маска підмережі.
 OK	EthernetSettingsView		Гаразд
-DNS #1:	EthernetSettingsView		DNS #1:
 IP address:	EthernetSettingsView		IP адреса:
 Adapter:	EthernetSettingsView		Адаптер:
 Domain:	EthernetSettingsView		Домен:
 Gateway is invalid	EthernetSettingsView		Невірно вказаний шлюз
-DNS #1 is invalid	EthernetSettingsView		Невірно вказаний DNS #1
 Revert	EthernetSettingsView		Повернутися
 <no wireless networks found>	EthernetSettingsView		<немає жодної бездротової мережі>
 Network	System name		Мережа
@@ -23,5 +20,4 @@ The net_server needs to run for the auto configuration!	EthernetSettingsView		Ne
 Disabled	EthernetSettingsView		Недоступний
 Auto-configuring failed: 	EthernetSettingsView		Автоматична настройка не вдалася:
 Static	EthernetSettingsView		Невірно вказаний DNS #2
-DNS #2 is invalid	EthernetSettingsView		Невірно вказаний DNS #2
 <no adapter>	EthernetSettingsView		<адаптери відсутні >

@@ -1,6 +1,5 @@
-1	finnish	x-vnd.Haiku-Pairs	1196284538
+1	finnish	x-vnd.Haiku-Pairs	2193803529
 Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Parit-ohjelmalla ei ole tarpeeksi vektorikuvakkeita aloittamista varten; se tarvitsee vähintään %zu, löytyi %zu.\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\ttekijä: Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nSait pelin valmiiksi %num% napsautuksella.\n
 Expert (8x8)	PairsWindow		Guru (8x8)
 Beginner (4x4)	PairsWindow		Aloittelija (4x4)
 Quit game	PairsWindow		Lopeta peli

@@ -1,9 +1,5 @@
-1	lithuanian	x-vnd.Haiku-NewMailNotification	3624191291
-%num new message	filter		Naujų laiškų: %num
-%num new messages	filter		Naujų laiškų: %num
+1	lithuanian	x-vnd.Haiku-NewMailNotification	583443025
 Keyboard LEDs	ConfigView		klaviatūros diodais
-You have %num new messages for %name.	filter		Naujų laiškų, skirtų %name: %num.
-You have %num new message for %name.	filter		Naujų laiškų, skirtų %name: %num.
 Log window	ConfigView		žurnalo lange
 Central beep	ConfigView		centriniu pyptelėjimu
 Beep	ConfigView		pyptelėjimu

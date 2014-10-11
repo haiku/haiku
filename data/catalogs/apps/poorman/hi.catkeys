@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-PoorMan	995747556
+1	hindi	x-vnd.Haiku-PoorMan	3736662390
 Website location	PoorMan		वेबसाइट का स्थान
 Error Server	PoorMan		सर्वर त्रुटि
 Settings…	PoorMan		सेटिंग्स...
@@ -32,7 +32,6 @@ Directory: (none)	PoorMan		निर्देशिका: (कोई नही�
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		वेब पर प्रकाशित करने के लिए फ़ोल्डर चुनें.\n\nआप गरीब आदमी (PoorMan) से अपने घर के फ़ोल्डर में एक डिफ़ाल्ट \"public_html\" बना सकते हैं. या आप अपने खुद के फ़ोल्डर्स का चयन करें.
 Log To Console	PoorMan		कंसोल मे लॉग करें
 Status: Running	PoorMan		स्थिति: रनिंग
-connections	PoorMan		कनेक्शंस
 Controls	PoorMan		नियंत्रण
 Send file listing if there's no start page	PoorMan		फ़ाइल लिस्टिंग भेजें अगर कोई आरम्भ पृष्ठ नहीं है
 Error Dir	PoorMan		त्रुटि डाइरेक्टोरी

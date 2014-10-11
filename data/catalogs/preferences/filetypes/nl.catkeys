@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-FileTypes	1059171929
+1	dutch; flemish	x-vnd.Haiku-FileTypes	4042259532
 Application types…	FileTypes Window		Toepassingstypes...
 Description:	Application Types Window		Beschrijving:
 Args only	Application Type Window		Alleen argumenten
@@ -128,7 +128,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Dit bestandstype bestaat al
 Same as…	FileTypes Window		Zelfde als...
 Exclusive launch	Application Type Window		Exclusieve lancering
-%ld Application type%s could be removed.	Application Types Window		%ld Applicatietype%s konden verwijderd worden.
 FileTypes	System name		BestandsTypen
 Application types	Application Types Window		Applicatietypes...
 Could not remove file type: %s\n	FileTypes Window		Kon bestandstype %s\n niet verwijderen.

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PoorMan	1267330937
+1	japanese	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		ウェブサイトの場所
 Error Server	PoorMan		サーバーエラー
 Settings…	PoorMan		設定…
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		コンソールにログを出力
 Connections	PoorMan		接続
 Status: Running	PoorMan		状況: 実行中
-connections	PoorMan		接続
 Controls	PoorMan		コントロール
 Send file listing if there's no start page	PoorMan		スタートページがない場合、ファイルリストを送信します
 Error Dir	PoorMan		ディレクトリエラー

@@ -1,21 +1,17 @@
-1	japanese	x-vnd.Haiku-libtracker	1108469663
+1	japanese	x-vnd.Haiku-libtracker	966301450
 OK	WidgetAttributeText		OK
-Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
 Desktop	Model		デスクトップ
 Identify	ContainerWindow		ファイル形式を判別
 Warning space color	SettingsView		空き容量警告の色
-Close	VolumeWindow		閉じる
 Open	OpenWithWindow		開く
 Tracker status	StatusWindow		Tracker の動作状況
 Eject when unmounting	AutoMounterSettings		マウント解除時メディアを取り出す
 Window	ContainerWindow		ウィンドウ
 Decrease size	ContainerWindow		サイズを小さく
-Mini icon view	VolumeWindow		ミニアイコン表示
 You must have at least one attribute showing.	PoseView		最低一つの属性を表示する必要があります。
 Permissions	InfoWindow		アクセス権
 128 x 128	DeskWindow		128 x 128
-Invert selection	VolumeWindow		選択範囲を反転
 128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		最近開いたドキュメント
 Modified	QueryPoseView		更新日時
@@ -35,7 +31,6 @@ Delete	ContainerWindow		削除
 Cannot unmount the boot volume \"%name\".	FSUtils		起動ボリューム \"%name\" をマウント解除できません。
 Open with…	ContainerWindow		指定アプリケーションで開く…
 Write	FilePermissionsView		書き込み
-for %num files	InfoWindow		合計 %num 項目
 Modified	PoseView		更新日時
 Make active printer	ContainerWindow		プリンターを有効にする
 Create link here	ContainerWindow		ここにリンクを作成
@@ -89,7 +84,6 @@ Windows	TrackerSettingsWindow		ウィンドウ
 Tracker preferences	TrackerSettingsWindow		Tracker の設定
 Cut	FilePanelPriv		切り取り
 Replace	FilePanelPriv		置換
-Select all	VolumeWindow		すべて選択
 Opens with:	InfoWindow		アプリケーション:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		MIME 設定を%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります。\n\n続けますか?
 Open	ContainerWindow		開く
@@ -98,10 +92,8 @@ Error calculating folder size.	InfoWindow		フォルダーサイズの計算中�
 New folder	FilePanelPriv		新規フォルダー
 %name info	InfoWindow	InfoWindow Title	%name の情報
 Favorites	FavoritesMenu		お気に入り
-Add-ons	VolumeWindow		アドオン
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" はサポートされていない実行形式です。
 Sorry, you can't copy items to the Trash.	PoseView		ごみ箱にコピーすることはできません。
-List view	VolumeWindow		一覧表示
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	名前の変更
 You cannot replace a folder or a symbolic link with a file.	FSUtils		フォルダーをリンクまたはファイルと置き換えることはできません。
@@ -111,7 +103,6 @@ Increase size	DeskWindow		サイズを大きく
 Resize to fit	ContainerWindow		最適な表示サイズに変更
 %Ld bytes	WidgetAttributeText		%Ld バイト
 Add printer…	ContainerWindow		プリンターの追加…
-Open	VolumeWindow		開く
 New folder	ContainerWindow		新規フォルダー
 Kind	ContainerWindow		種類
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	名前の変更
@@ -132,9 +123,7 @@ Show volumes on Desktop	SettingsView		ディスクをデスクトップに表示
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		%nameアドオンの読み込み中に%errorエラーが発生
 Defaults	TrackerSettingsWindow		デフォルト
-%num items	CountView		%num 個
 Mini icon view	ContainerWindow		ミニアイコン表示
-Clean up	VolumeWindow		アイコンを整列
 OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		ファイルが誤って実行可能に設定されているため、\"%name\" を開けませんでした。
 Add-ons	ContainerWindow		アドオン
@@ -164,14 +153,11 @@ That name is already taken. Please type another one.	InfoWindow		指定された
 Sorry, you can't create links in the Trash.	PoseView		ごみ箱にリンクを作ることはできません。
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		このフォルダーに \"%name\" という項目がすでに存在して、中に同じ名前の項目が入っている可能性もあります。%verbしようとしている項目と置き換えますか?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	\"%name\" のリンク先:
-Mount settings…	VolumeWindow		マウント設定…
-Select…	VolumeWindow		選択…
 All disks	FindPanel		全パーティション
 Revert	TrackerSettingsWindow		元に戻す
 Invert selection	QueryContainerWindow		選択範囲を反転
 Execute	FilePermissionsView		実行
 Size	FindPanel		サイズ
-1 item	CountView		1 項目
 Open parent	ContainerWindow		親フォルダーを開く
 Location:	InfoWindow		場所:
 Edit favorites…	FilePanelPriv		お気に入りの編集…
@@ -191,8 +177,6 @@ Mini icon view	DeskWindow		ミニアイコン表示
 Error in regular expression:\n\n'%errstring'	PoseView		正規表現にエラーがあります:\n\n'%errstring'
 Mount all	MountMenu		すべてマウント
 calculating…	InfoWindow		計算中…
-Unmount	VolumeWindow		マウント解除
-Edit name	VolumeWindow		名前を編集
 Mount all disks now	AutoMounterSettings		すべてのディスクをただちにマウント
 Untitled bitmap	PoseView		無名ビットマップ
 of %items	StatusWindow		/ %items
@@ -206,7 +190,6 @@ Replace other file	WidgetAttributeText		既存の項目を置き換える
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		いくつかの選択項目はごみ箱に移動できません。完全に削除してもよろしいですか？元に戻せませんので、ご注意ください。
 You cannot create a link to the root directory.	FSUtils		ルートフォルダーにはリンクを作成できません。
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		最適な表示サイズに変更
 Could not find application \"%appname\"	OpenWithWindow		アプリケーション \"%appname\" が見つかりませんでした
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に移動できません。完全に削除しても良いでしょうか? 元には戻せませんので、ご注意ください。
 Invert	SelectionWindow		反転
@@ -243,7 +226,6 @@ Error deleting items	FSUtils		ファイル削除中にエラーが発生しま�
 Create relative link here	ContainerWindow		ここに相対リンクを作成
 trash	B_TRASH_DIRECTORY		ごみ箱
 matches regular expression	SelectionWindow		正規表現と一致
-Mount settings…	SettingsView		マウント設定…
 Edit name	InfoWindow		名前を編集
 Could not open \"%name\" (%error). 	FSUtils		\"%name\"を開けませんでした (%error)。
 Paste	ContainerWindow		貼り付け
@@ -262,7 +244,6 @@ Finish: %time	StatusWindow		完了: %time
 Cancel	Tracker		中止
 Sorry, you cannot edit that attribute.	WidgetAttributeText		この属性は編集できません。
 Name	ContainerWindow		名前
-Disk mount settings	AutoMounterSettings		ディスクマウント設定
 Reverse order	ContainerWindow		逆順にする
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		OK
@@ -304,7 +285,6 @@ copying	FSUtils		コピー中
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" フォルダーの移動中にエラーが発生:\n\t%error\n\nそれでも続けますか？
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	移動
 Show Disks icon	SettingsView		ディスクアイコンを表示
-Mount	VolumeWindow		マウント
 Cancel	PoseView		中止
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld バイト、
 You can't move or copy items to read-only volumes.	FSUtils		読み取り専用パーティションへファイルまたはフォルダーを移動やコピーはできません。
@@ -349,24 +329,20 @@ All BeOS disks	AutoMounterSettings		全 BFS パーティション
 Used space color	SettingsView		使用済容量の色
 Sorry, could not create a new folder.	FSUtils		新規フォルダーを作成できませんでした。
 multiple disks	FindPanel		複数ディスク
-Done	AutoMounterSettings		完了
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
 Untitled clipping	PoseView		無名クリッピング
 Don't automount	AutoMounterSettings		自動マウントを使わない
 Save	FilePanelPriv		保存
 To: %dir	StatusWindow		%dir
 Window	FilePanelPriv		ウィンドウ
-Find…	VolumeWindow		検索…
 Edit name	FilePanelPriv		名前の編集
 Size:	InfoWindow		サイズ:
 Empty folder	SlowContextPopup		空フォルダー
 Open selection with:	OpenWithWindow		選択ファイルをアプリケーションで開く:
-(%bytes bytes)	InfoWindow		(%bytes バイト)
 Preparing to create links…	StatusWindow		リンク作成の準備をしています…
 Show navigator	SettingsView		ツールバーを表示
 Desktop	B_DESKTOP_DIRECTORY		デスクトップ
 List folders first	SettingsView		フォルダーを先頭に表示
-Get info	VolumeWindow		詳細情報…
 Name	SelectionWindow		名前
 Trash	Model		ごみ箱
 Favorites	FilePanelPriv		お気に入り

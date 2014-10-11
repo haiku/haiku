@@ -1,21 +1,17 @@
-1	belarusian	x-vnd.Haiku-libtracker	2212190051
+1	belarusian	x-vnd.Haiku-libtracker	2070021838
 OK	WidgetAttributeText		ОК
-Icon view	VolumeWindow		Від іконак
 Add-ons	FilePanelPriv		Дапаўненні
 Desktop	Model		Дэсктоп
 Identify	ContainerWindow		Ідэнтыфікаваць
 Warning space color	SettingsView		Колер вобласці паведамленняў
-Close	VolumeWindow		Закрыць
 Open	OpenWithWindow		Адкрыць
 Tracker status	StatusWindow		Статус трэкеру
 Eject when unmounting	AutoMounterSettings		Даставаць носьбіт пры размантаванні
 Window	ContainerWindow		Вакно
 Decrease size	ContainerWindow		Паменшыць памер
-Mini icon view	VolumeWindow		Від міні-іконак
 You must have at least one attribute showing.	PoseView		Патрэбна, каб быў паказаны хаця б адзін атрыбут.
 Permissions	InfoWindow		Дазволы
 128 x 128	DeskWindow		128 x 128
-Invert selection	VolumeWindow		Інвертаваць выдзяленне
 128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Нядаўнія дакменты
 Modified	QueryPoseView		Зменены
@@ -35,7 +31,6 @@ Delete	ContainerWindow		Выдаліць
 Cannot unmount the boot volume \"%name\".	FSUtils		Немагчыма размантаваць загрузачны том \"%name\".
 Open with…	ContainerWindow		Адкрыць з дапамогай…
 Write	FilePermissionsView		Запісаць
-for %num files	InfoWindow		для %num файлаў
 Modified	PoseView		Зменены
 Make active printer	ContainerWindow		Зрабіць актыўным прынтэрам
 Create link here	ContainerWindow		Стварыць спасылку тут
@@ -90,7 +85,6 @@ Windows	TrackerSettingsWindow		Вокны
 Tracker preferences	TrackerSettingsWindow		Наладкі Трэкера
 Cut	FilePanelPriv		Выразаць
 Replace	FilePanelPriv		Замяніць
-Select all	VolumeWindow		Выбраць усё
 Opens with:	InfoWindow		Адкрыць з:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Калi вы %ifYouDoAction наладкі mime, %osName можа паводзіць сябе неадэкватна!\n\nВы ўпэўнены што жадаеце зрабіць гэта?
 Open	ContainerWindow		Адкрыць
@@ -99,10 +93,8 @@ Error calculating folder size.	InfoWindow		Памылка пры падліку 
 New folder	FilePanelPriv		Новы каталог
 %name info	InfoWindow	InfoWindow Title	%name інфа
 Favorites	FavoritesMenu		Выбранае
-Add-ons	VolumeWindow		Дапаўненні
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" непадтрымліваемы тып праграмы.
 Sorry, you can't copy items to the Trash.	PoseView		Прабачце, вы не можаце капіяваць элементы ў Сметніцу.
-List view	VolumeWindow		Від спісу
 matches wildcard expression	SelectionWindow		супадае з падстановачнымі выразамі
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	перейменуеце
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Вы не можаце замяніць каталог або спасылку рэальным файлам.
@@ -112,7 +104,6 @@ Increase size	DeskWindow		Павялічыць памер
 Resize to fit	ContainerWindow		Расцягнуць каб умясціць
 %Ld bytes	WidgetAttributeText		%Ld байтаў
 Add printer…	ContainerWindow		Дадаць прынтэр…
-Open	VolumeWindow		Адкрыць
 New folder	ContainerWindow		Новы каталог
 Kind	ContainerWindow		Род
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	перайменаваць
@@ -133,9 +124,7 @@ Show volumes on Desktop	SettingsView		Паказваць тамы на Дэск�
 KiB	WidgetAttributeText		КіБ
 Error %error loading Add-On %name.	ContainerWindow		Памылка %error пры запуску дапаўнення %name.
 Defaults	TrackerSettingsWindow		Прадвызначаныя
-%num items	CountView		%num элементаў
 Mini icon view	ContainerWindow		Від міні-іконак
-Clean up	VolumeWindow		Прыбрацца
 OK	TrackerInitialState		ОК
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Немагчыма адкрыць \"%name\". Файл памылкова пазначаны як выканальны. 
 Add-ons	ContainerWindow		Дапаўненні
@@ -165,14 +154,11 @@ That name is already taken. Please type another one.	InfoWindow		Імя ўжо �
 Sorry, you can't create links in the Trash.	PoseView		Прабачце, вы не можаце свараце спасылкі ў Сметніцы.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Элемент \"%name\" ужо ёсць у каталозе, і можа мясціць\nэлементы з такімі ж імёнамі. Жадаеце замяніць іх файламі з каталога, які вы %verb?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Спасылка \"%name\" на:
-Mount settings…	VolumeWindow		Наладкі мантавання…
-Select…	VolumeWindow		Выбраць…
 All disks	FindPanel		Усе дыскі
 Revert	TrackerSettingsWindow		Вярнуць
 Invert selection	QueryContainerWindow		Інвертаваць выдзяленне
 Execute	FilePermissionsView		Выканаць
 Size	FindPanel		Памер
-1 item	CountView		1 элемент
 Open parent	ContainerWindow		Адкрыць бацькоўскі
 Location:	InfoWindow		Месцазнаходжанне:
 Edit favorites…	FilePanelPriv		Правіць Выбранае…
@@ -192,8 +178,6 @@ Mini icon view	DeskWindow		Від міні-іконак
 Error in regular expression:\n\n'%errstring'	PoseView		Памылка ў рэгулярным выразе:\n\n'%errstring'
 Mount all	MountMenu		Мантаваць усё
 calculating…	InfoWindow		падлік…
-Unmount	VolumeWindow		Размантаваць
-Edit name	VolumeWindow		Правіць імя
 Mount all disks now	AutoMounterSettings		Мантаваць усе дыскі зараз
 Untitled bitmap	PoseView		Неназваны бітмап
 of %items	StatusWindow		з %items
@@ -207,7 +191,6 @@ Replace other file	WidgetAttributeText		Замяніць іншы файл
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Некаторыя з выбраных элементаў нельга адправіць у Сметніцу. Жадаеце выдаліць іх беззваротна?
 You cannot create a link to the root directory.	FSUtils		Вы не можаце стварыць спасылку на карнявы каталог.
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		Расцягнуць
 Could not find application \"%appname\"	OpenWithWindow		Не ўдалося знайсці праграму \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Выбраны элемент нельга адправіць у Сметніцу. Жадаеце выдаліць іх беззваротна?
 Invert	SelectionWindow		Інвертаваць
@@ -244,7 +227,6 @@ Error deleting items	FSUtils		Памылка пры выдаленні элем�
 Create relative link here	ContainerWindow		Стварыць адносную ссылку сюды
 trash	B_TRASH_DIRECTORY		сметнік
 matches regular expression	SelectionWindow		супадае з рэгулярным выразам
-Mount settings…	SettingsView		Наладкі мантавання…
 Edit name	InfoWindow		Правіць імя
 Could not open \"%name\" (%error). 	FSUtils		Нельга адкрыць \"%name\" (%error). 
 Paste	ContainerWindow		Уставіць
@@ -263,7 +245,6 @@ Finish: %time	StatusWindow		Завяршэнне: %time
 Cancel	Tracker		Адмена
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Прабачце, вы не можаце правіць гэты атрыбут.
 Name	ContainerWindow		Імя
-Disk mount settings	AutoMounterSettings		Наладкі мантавання дыскаў
 Reverse order	ContainerWindow		Адваротны парадак
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		OK
@@ -305,7 +286,6 @@ copying	FSUtils		капіруеце
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Памылка пры капіяванні каталога \"%name\":\n\t %error\n\nЖадаеце працягваць?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	перасунеце
 Show Disks icon	SettingsView		Паказваць іконку Дыскі
-Mount	VolumeWindow		Мантаваць
 Cancel	PoseView		Адмена
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld байтаў, 
 You can't move or copy items to read-only volumes.	FSUtils		Нельга перамяшчаць ці капіяваць элементы на тамы толькі для чытання.
@@ -350,24 +330,20 @@ All BeOS disks	AutoMounterSettings		Усе дыскі BeOS
 Used space color	SettingsView		Колер выкарыстанага месца
 Sorry, could not create a new folder.	FSUtils		Прабачце, не ўдалося стварыць новы каталог.
 multiple disks	FindPanel		множныя дыскі
-Done	AutoMounterSettings		Гатова
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Трэба перацягнуць элементы на іконку аднаго з дыскаў у вакне \"Дыскі\".
 Untitled clipping	PoseView		Неназваная выразка
 Don't automount	AutoMounterSettings		Не мантаваць аўтаматычна
 Save	FilePanelPriv		Захаваць
 To: %dir	StatusWindow		Да: %dir
 Window	FilePanelPriv		Вакно
-Find…	VolumeWindow		Знайсці…
 Edit name	FilePanelPriv		Правіць імя
 Size:	InfoWindow		Памер:
 Empty folder	SlowContextPopup		Пусты каталог
 Open selection with:	OpenWithWindow		Адкрыць выдзеленае за дапамогай:
-(%bytes bytes)	InfoWindow		(%bytes байтаў)
 Preparing to create links…	StatusWindow		Падрыхтоўка да стварэння спасылак…
 Show navigator	SettingsView		Паказваць навігатар
 Desktop	B_DESKTOP_DIRECTORY		Працоўны стол
 List folders first	SettingsView		Спачатку паказваць спіс каталогаў
-Get info	VolumeWindow		Атрымаць інфармацыю
 Name	SelectionWindow		Імя
 Trash	Model		Сметніца
 Favorites	FilePanelPriv		Выбранае

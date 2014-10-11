@@ -1,8 +1,5 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3398060443
+1	hungarian	x-vnd.Haiku-HaikuDepot	443107378
 Name	PackageListView		Név
-Installed packages	Model		Telepített csomagok
-User modified packages	Model		Módosított csomagok
-Update available	Model		Frissítés érhető el
 Changelog	PackageInfoView		Változásnapló
 Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
 for %Version%	PackageInfoView		%Version% verzióhoz
@@ -18,37 +15,27 @@ Uninstall	PackageManager		Eltávolítás
 An error occurred while initializing the package manager: %message%	MainWindow		Hiba történt a csomagkezelő indításakor: %message%
 Close	PackageManager		Bezárás
 Status	PackageListView		Állapot
-Available packages	Model		Elérhető csomagok
-Your rating	System name		Saját értékelés
 Development	Model		Fejlesztés
 Fatal error	PackageManager		Végzetes hiba
 Ratings	PackageInfoView		Értékelés
-1 item	PackageListView		1 elem
 Inactive	PackageListView		Inaktív
 Refresh depots	MainWindow		Raktárak frissítése
 Main Menu	MainWindow		Főmenü
-Command line	Model		Parancssor
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Letöltés:
 Search terms:	FilterView		Keresési feltétel:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Hiba történt a raktár frissítésekor: %error% (%details%)
-Show source packages	MainWindow		Forráskód csomagok megjelenítése
 Productivity	Model		Alkalmazások
-Show:	FilterView		Megjelenítés:
 Size	PackageListView		Méret
-Options	MainWindow		Beállítások
 Games	Model		Játékok
 Rating	PackageListView		Értékelés
-Downloading	Model		Letöltés
-%ld items	PackageListView		%ld elem
 Graphics	Model		Grafika
 Local	MainWindow		Helyi
 Close	MainWindow		Bezárás
 Video	Model		Videó
 An error occurred while refreshing the repository: %error%	MainWindow		Hiba történt a raktár frissítése közben: %error%
-All packages	FilterView		Összes csomag
 Pending…	PackageListView		Folyamatban…
 Depot	FilterView		Raktár
 Uninstalled	PackageListView		Eltávolítva
@@ -57,9 +44,6 @@ All depots	FilterView		Összes raktár
 Available	PackageListView		Elérhető
 n/a	PackageInfoView		nincs értékelve
 Send	RatePackageWindow		Küldés
-Show develop packages	MainWindow		Fejlesztői csomagok megjelenítése
-Show	FilterView		Megjelenítés
-Uninstalled packages	Model		Eltávolított csomagok
 Audio	Model		Audió
 About	PackageInfoView		Névjegy
 Active	PackageListView		Aktív

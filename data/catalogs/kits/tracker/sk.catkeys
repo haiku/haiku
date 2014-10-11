@@ -1,21 +1,17 @@
-1	slovak	x-vnd.Haiku-libtracker	1544781407
+1	slovak	x-vnd.Haiku-libtracker	1402613194
 OK	WidgetAttributeText		OK
-Icon view	VolumeWindow		Zobrazenie ikon
 Add-ons	FilePanelPriv		Doplnky
 Desktop	Model		Plocha
 Identify	ContainerWindow		Identifikovať
 Warning space color	SettingsView		Farba priestoru upozornenia
-Close	VolumeWindow		Zatvoriť
 Open	OpenWithWindow		Otvoriť
 Tracker status	StatusWindow		Stav Trackera
 Eject when unmounting	AutoMounterSettings		Vysunúť pri odpájaní
 Window	ContainerWindow		Okno
 Decrease size	ContainerWindow		Zmenšiť veľkosť
-Mini icon view	VolumeWindow		Zobrazenie mini ikon
 You must have at least one attribute showing.	PoseView		Musí sa zobrazovať aspoň jeden atribút.
 Permissions	InfoWindow		Oprávnenia
 128 x 128	DeskWindow		128 x 128
-Invert selection	VolumeWindow		Invertovať výber
 128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Nedávne dokumenty
 Modified	QueryPoseView		Zmenené
@@ -35,7 +31,6 @@ Delete	ContainerWindow		Zmazať
 Cannot unmount the boot volume \"%name\".	FSUtils		Nie je možné odpojiť zavádzací zväzok „%name“.
 Open with…	ContainerWindow		Otvoriť pomocou…
 Write	FilePermissionsView		Zapísať
-for %num files	InfoWindow		pre %num súborov
 Modified	PoseView		Zmenené
 Make active printer	ContainerWindow		Urobiť tlačiareň aktívnou
 Create link here	ContainerWindow		Vytvoriť odkaz tu
@@ -88,7 +83,6 @@ Windows	TrackerSettingsWindow		Okná
 Tracker preferences	TrackerSettingsWindow		Nastavenia Trackera
 Cut	FilePanelPriv		Vystrihnúť
 Replace	FilePanelPriv		Nahradiť
-Select all	VolumeWindow		Vybrať všetko
 Opens with:	InfoWindow		Otvára sa pomocou:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ak %ifYouDoAction nastavenia MIME, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?
 Open	ContainerWindow		Otvoriť
@@ -97,9 +91,7 @@ Error calculating folder size.	InfoWindow		Chyba pri výpočte veľkosti prieči
 New folder	FilePanelPriv		Nový priečinok
 %name info	InfoWindow	InfoWindow Title	Info o %name
 Favorites	FavoritesMenu		Obľúbené
-Add-ons	VolumeWindow		Doplnky
 Sorry, you can't copy items to the Trash.	PoseView		Ľutujeme, nemôžete kopírovať položky do Koša.
-List view	VolumeWindow		Zobrazenie zoznamu
 matches wildcard expression	SelectionWindow		zodpovedá výrazu so zástupnými znakmi
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	premenujete
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nemôžete nahradiť priečinok alebo symbolický odkaz súborom.
@@ -109,7 +101,6 @@ Increase size	DeskWindow		Zväčšiť veľkosť
 Resize to fit	ContainerWindow		Prispôsobiť veľkosť
 %Ld bytes	WidgetAttributeText		%Ld bajtov
 Add printer…	ContainerWindow		Pridať tlačiareň…
-Open	VolumeWindow		Otvoriť
 New folder	ContainerWindow		Nový priečinok
 Kind	ContainerWindow		Druh
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	premenovať
@@ -130,9 +121,7 @@ Show volumes on Desktop	SettingsView		Zobraziť zväzky na ploche
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Chyba %error pri načítaní doplnku %name.
 Defaults	TrackerSettingsWindow		Predvolené
-%num items	CountView		%num položiek
 Mini icon view	ContainerWindow		Zobrazenie mini ikon
-Clean up	VolumeWindow		Vyčistiť
 OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Nebolo možné otvoriť „%name“. Súbor je chybne označený ako spustiteľný. 
 Add-ons	ContainerWindow		Doplnky
@@ -161,14 +150,11 @@ That name is already taken. Please type another one.	InfoWindow		Tento názov u�
 Sorry, you can't create links in the Trash.	PoseView		Ľutujeme, nemôžete vytvárať symbolické odkazy v Koši.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Položka s názvom „%name“ už v tomto priečinku existuje a môže obsahovať\npoložky s rovnakým názvom. Chcete ich nahradiť položkami z priečinka, ktorý sa pokúšate %verb?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Vytvoriť odkaz „%name“ v:
-Mount settings…	VolumeWindow		Nastavenia pripojenia…
-Select…	VolumeWindow		Vybrať…
 All disks	FindPanel		Všetky disky
 Revert	TrackerSettingsWindow		Vrátiť
 Invert selection	QueryContainerWindow		Invertovať výber
 Execute	FilePermissionsView		Vykonať
 Size	FindPanel		Veľkosť
-1 item	CountView		1 položka
 Open parent	ContainerWindow		Otvoriť nadradený
 Location:	InfoWindow		Umiestnenie:
 Edit favorites…	FilePanelPriv		Upraviť obľúbené…
@@ -188,8 +174,6 @@ Mini icon view	DeskWindow		Zobrazenie mini ikon
 Error in regular expression:\n\n'%errstring'	PoseView		Chyba v regulárnom výraze:\n\n '%errstring'
 Mount all	MountMenu		Pripojiť všetky
 calculating…	InfoWindow		prebieha výpočet…
-Unmount	VolumeWindow		Odpojiť
-Edit name	VolumeWindow		Upraviť názov
 Mount all disks now	AutoMounterSettings		Pripojiť všetky disky teraz
 Untitled bitmap	PoseView		Bitmapa bez názvu
 of %items	StatusWindow		z %items
@@ -203,7 +187,6 @@ Replace other file	WidgetAttributeText		Nahradiť iný súbor
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Niektoré z vybraných položiek nemožno presunúť do Koša. Chcete ich namiesto toho zmazať? (Túto operáciu nemožno vrátiť.)
 You cannot create a link to the root directory.	FSUtils		Nemôžete vytvoriť odkaz na koreňový adresár.
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		Prispôsobiť veľkosť
 Could not find application \"%appname\"	OpenWithWindow		Nepodarilo sa nájsť aplikáciu „%appname“
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Vybranú položka nemožno presunúť do Koša. Chcete ju namiesto toho zmazať? (Túto operáciu nemožno vrátiť.)
 Invert	SelectionWindow		Invertovať
@@ -239,7 +222,6 @@ Error deleting items	FSUtils		Chyba pri mazaní položiek
 Create relative link here	ContainerWindow		Vytvoriť relatívny odkaz tu
 trash	B_TRASH_DIRECTORY		kôš
 matches regular expression	SelectionWindow		zodpovedá regulárnemu výrazu
-Mount settings…	SettingsView		Nastavenia pripojenia…
 Edit name	InfoWindow		Upraviť názov
 Could not open \"%name\" (%error). 	FSUtils		Nebolo možné otvoriť \"%name\" (%error). 
 Paste	ContainerWindow		Vložiť
@@ -258,7 +240,6 @@ Finish: %time	StatusWindow		Dokončenie: %time
 Cancel	Tracker		Zrušiť
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Ľutujeme, tento atribút nemôžete upravovať.
 Name	ContainerWindow		Názov
-Disk mount settings	AutoMounterSettings		Nastavenia pripojenia disku
 Reverse order	ContainerWindow		Opačné poradie
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		OK
@@ -300,7 +281,6 @@ copying	FSUtils		kopírovanie
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Chyba pri kopírovaní „%name“:\n\t%error\n\nChcete pokračovať?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	presuniete
 Show Disks icon	SettingsView		Zobraziť ikonu Disky
-Mount	VolumeWindow		Pripojiť
 Cancel	PoseView		Zrušiť
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld bajtov, 
 You can't move or copy items to read-only volumes.	FSUtils		Nemôžete presúvať alebo kopírovať položky na zväzky, ktoré sú len na čítanie.
@@ -344,24 +324,20 @@ All BeOS disks	AutoMounterSettings		Všetky disky BeOS
 Used space color	SettingsView		Farba využitého miesta
 Sorry, could not create a new folder.	FSUtils		Ľutujeme, nie je možné vytvoriť nový pričinok.
 multiple disks	FindPanel		viaceré disky
-Done	AutoMounterSettings		Hotovo
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Musíte pretiahnuť položky na jednu z ikon diskov v okne „Disky“.
 Untitled clipping	PoseView		Orezávanie nepomenovaných
 Don't automount	AutoMounterSettings		Nepoužívať automount
 Save	FilePanelPriv		Uložiť
 To: %dir	StatusWindow		Do: %dir
 Window	FilePanelPriv		Okno
-Find…	VolumeWindow		Nájsť…
 Edit name	FilePanelPriv		Upraviť názov
 Size:	InfoWindow		Veľkosť:
 Empty folder	SlowContextPopup		Prázdny priečinok
 Open selection with:	OpenWithWindow		Otvoriť výber pomocou:
-(%bytes bytes)	InfoWindow		(%bytes bajtov)
 Preparing to create links…	StatusWindow		Pripravuje sa vytvorenie odkazov…
 Show navigator	SettingsView		Zobraziť navigáciu
 Desktop	B_DESKTOP_DIRECTORY		Plocha
 List folders first	SettingsView		Uviesť priečinky na začiatku
-Get info	VolumeWindow		Získať info
 Name	SelectionWindow		Názov
 Trash	Model		Kôš
 Favorites	FilePanelPriv		Obľúbené

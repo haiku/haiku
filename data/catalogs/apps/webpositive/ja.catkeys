@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	951661576
+1	japanese	x-vnd.Haiku-WebPositive	3528881455
 Show home button	Settings Window		ホームボタンを表示する
 Username:	Authentication Panel		ユーザー名:
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
@@ -86,7 +86,6 @@ Open blank page	Settings Window		空白のページを開く
 New tabs:	Settings Window		新しいタブ:
 Cancel	WebPositive Window		中止
 Open all	WebPositive Window		すべて開く
-Hide bookmark bar	WebPositive Window		ブックマークバーを隠す
 Proxy server requires authentication	Settings Window		プロキシサーバーは認証が必要
 Clear	URL Bar		クリア
 Cut	URL Bar		切り取り

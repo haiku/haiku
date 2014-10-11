@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	951661576
+1	russian	x-vnd.Haiku-WebPositive	3528881455
 Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
@@ -86,7 +86,6 @@ Open blank page	Settings Window		Открыть пустую страницу
 New tabs:	Settings Window		Новые вкладки:
 Cancel	WebPositive Window		Отмена
 Open all	WebPositive Window		Открыть все
-Hide bookmark bar	WebPositive Window		Скрыть панель закладок
 Proxy server requires authentication	Settings Window		Прокси требует проверки подлинности
 Clear	URL Bar		Очистить
 Cut	URL Bar		Вырезать

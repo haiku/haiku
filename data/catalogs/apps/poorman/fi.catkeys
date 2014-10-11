@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PoorMan	1267330937
+1	finnish	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		Webbisivusijainti
 Error Server	PoorMan		Virhepalvelin
 Settings…	PoorMan		Asetukset...
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		Kirjaa konsoliin
 Connections	PoorMan		Yhteydet
 Status: Running	PoorMan		Tila: Suoritetaan
-connections	PoorMan		yhteydet
 Controls	PoorMan		Ohjaimet
 Send file listing if there's no start page	PoorMan		Lähetä tiedostoluettelo, jos aloitussivua ei ole
 Error Dir	PoorMan		Virhehakemisto

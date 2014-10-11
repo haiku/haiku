@@ -1,21 +1,17 @@
-1	english	x-vnd.Haiku-libtracker	2212190051
+1	english	x-vnd.Haiku-libtracker	2070021838
 OK	WidgetAttributeText		确定
-Icon view	VolumeWindow		图标视图
 Add-ons	FilePanelPriv		附加组件
 Desktop	Model		桌面
 Identify	ContainerWindow		标识
 Warning space color	SettingsView		空白颜色警告
-Close	VolumeWindow		关闭
 Open	OpenWithWindow		打开
 Tracker status	StatusWindow		文件浏览器状态
 Eject when unmounting	AutoMounterSettings		卸载并弹出
 Window	ContainerWindow		窗口
 Decrease size	ContainerWindow		缩小尺寸
-Mini icon view	VolumeWindow		迷你图标
 You must have at least one attribute showing.	PoseView		您必须至少显示一个属性。
 Permissions	InfoWindow		权限
 128 x 128	DeskWindow		128 x 128
-Invert selection	VolumeWindow		反向选择
 128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		最近文本
 Modified	QueryPoseView		修改
@@ -35,7 +31,6 @@ Delete	ContainerWindow		删除
 Cannot unmount the boot volume \"%name\".	FSUtils		无法卸载引导卷 \"%name\"。
 Open with…	ContainerWindow		打开方式...
 Write	FilePermissionsView		编辑
-for %num files	InfoWindow		给 %num 文件 
 Modified	PoseView		修改
 Make active printer	ContainerWindow		创建活动打印机
 Create link here	ContainerWindow		创建链接
@@ -90,7 +85,6 @@ Windows	TrackerSettingsWindow		窗口
 Tracker preferences	TrackerSettingsWindow		文件浏览器首选项
 Cut	FilePanelPriv		剪切
 Replace	FilePanelPriv		替换
-Select all	VolumeWindow		全选
 Opens with:	InfoWindow		打开方式：
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		如果您 %ifYouDoAction mime 目录, %osName 可能无法正常工作！\n\n您是否确认执行此操作？
 Open	ContainerWindow		打开
@@ -99,10 +93,8 @@ Error calculating folder size.	InfoWindow		文件夹大小计算错误。
 New folder	FilePanelPriv		新建文件夹
 %name info	InfoWindow	InfoWindow Title	%name 信息
 Favorites	FavoritesMenu		选择
-Add-ons	VolumeWindow		附加组件
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" 是不支持的可执行文件。
 Sorry, you can't copy items to the Trash.	PoseView		对不起，您无法复制项目至垃圾箱。
-List view	VolumeWindow		列表视图
 matches wildcard expression	SelectionWindow		匹配通配符表达式
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	重命名
 You cannot replace a folder or a symbolic link with a file.	FSUtils		您不能够使用文件夹或符号链接替代文件。
@@ -112,7 +104,6 @@ Increase size	DeskWindow		增大尺寸
 Resize to fit	ContainerWindow		合适大小
 %Ld bytes	WidgetAttributeText		%Ld 字节
 Add printer…	ContainerWindow		添加打印机...
-Open	VolumeWindow		打开
 New folder	ContainerWindow		新建文件夹
 Kind	ContainerWindow		种类
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	重命名
@@ -133,9 +124,7 @@ Show volumes on Desktop	SettingsView		在桌面显示卷
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		载入附加组件 %name 出错：%error 。
 Defaults	TrackerSettingsWindow		默认
-%num items	CountView		%num 个项目
 Mini icon view	ContainerWindow		迷你视图
-Clean up	VolumeWindow		清空
 OK	TrackerInitialState		确定
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		无法打开 \"%name\"。  该文件被错误标识为可执行文件。
 Add-ons	ContainerWindow		附加组件
@@ -165,14 +154,11 @@ That name is already taken. Please type another one.	InfoWindow		该名称已使
 Sorry, you can't create links in the Trash.	PoseView		对不起，您无法在垃圾箱中创建链接。
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		一个条目名称 \"%name\"已经在这个文件夹中存在, 可能包括 \nitems 用同样的名称,你愿意用在该文件夹包中含由 %verb替代它吗?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	链接 \"%name\" 到：
-Mount settings…	VolumeWindow		挂载设置...
-Select…	VolumeWindow		选择...
 All disks	FindPanel		所有磁盘
 Revert	TrackerSettingsWindow		恢复
 Invert selection	QueryContainerWindow		反向选择
 Execute	FilePermissionsView		执行
 Size	FindPanel		尺寸
-1 item	CountView		1 个项目
 Open parent	ContainerWindow		上级目录
 Location:	InfoWindow		位置：
 Edit favorites…	FilePanelPriv		编辑收藏夹...
@@ -192,8 +178,6 @@ Mini icon view	DeskWindow		迷你视图
 Error in regular expression:\n\n'%errstring'	PoseView		正则表达式错误：\n\n'%errstring'
 Mount all	MountMenu		挂载所有
 calculating…	InfoWindow		计算...
-Unmount	VolumeWindow		卸载
-Edit name	VolumeWindow		编辑名称
 Mount all disks now	AutoMounterSettings		挂载所有磁盘
 Untitled bitmap	PoseView		未命名位图
 of %items	StatusWindow		of %items
@@ -207,7 +191,6 @@ Replace other file	WidgetAttributeText		替换其他文件
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		某些选中项目无法移动到垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
 You cannot create a link to the root directory.	FSUtils		您无法创建至根目录的链接。
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		合适大小
 Could not find application \"%appname\"	OpenWithWindow		未找到 \"%appname\" 程序。
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		选中项目无法移动至垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
 Invert	SelectionWindow		恢复
@@ -244,7 +227,6 @@ Error deleting items	FSUtils		删除项目错误
 Create relative link here	ContainerWindow		创建相对链接
 trash	B_TRASH_DIRECTORY		垃圾箱
 matches regular expression	SelectionWindow		匹配正则表达式
-Mount settings…	SettingsView		挂载设置...
 Edit name	InfoWindow		编辑名称
 Could not open \"%name\" (%error). 	FSUtils		无法打开 \"%name\"（%error）。
 Paste	ContainerWindow		粘贴
@@ -263,7 +245,6 @@ Finish: %time	StatusWindow		完成：%time
 Cancel	Tracker		取消
 Sorry, you cannot edit that attribute.	WidgetAttributeText		对不起，您无法编辑该属性。
 Name	ContainerWindow		名称
-Disk mount settings	AutoMounterSettings		磁盘挂载设置
 Reverse order	ContainerWindow		倒序排列
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		确定
@@ -305,7 +286,6 @@ copying	FSUtils		复制中
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		复制目录 \"%name\" 出错：\n\t%error\n\n是否继续？
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	移动
 Show Disks icon	SettingsView		显示磁盘图标
-Mount	VolumeWindow		装载
 Cancel	PoseView		取消
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld 字节， 
 You can't move or copy items to read-only volumes.	FSUtils		您无法移动或复制项目到只读卷。
@@ -350,24 +330,20 @@ All BeOS disks	AutoMounterSettings		所有 BeOS 磁盘
 Used space color	SettingsView		已用空间颜色
 Sorry, could not create a new folder.	FSUtils		对不起，无法新建目录。
 multiple disks	FindPanel		多轴磁盘
-Done	AutoMounterSettings		完成
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		您必须放置项目到 \"Disks\" 窗口中的磁盘图标。
 Untitled clipping	PoseView		未命名片段
 Don't automount	AutoMounterSettings		手动挂载
 Save	FilePanelPriv		保存
 To: %dir	StatusWindow		到：%dir
 Window	FilePanelPriv		窗口
-Find…	VolumeWindow		搜索...
 Edit name	FilePanelPriv		编辑名称
 Size:	InfoWindow		大小：
 Empty folder	SlowContextPopup		清空目录
 Open selection with:	OpenWithWindow		打开选中：
-(%bytes bytes)	InfoWindow		（%bytes 字节）
 Preparing to create links…	StatusWindow		准备创建链接...
 Show navigator	SettingsView		显示导航
 Desktop	B_DESKTOP_DIRECTORY		桌面
 List folders first	SettingsView		首先列出目录
-Get info	VolumeWindow		获取信息
 Name	SelectionWindow		名称
 Trash	Model		垃圾箱
 Favorites	FilePanelPriv		选择

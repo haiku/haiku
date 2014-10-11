@@ -1,21 +1,17 @@
-1	german	x-vnd.Haiku-libtracker	1995236298
+1	german	x-vnd.Haiku-libtracker	1853068085
 OK	WidgetAttributeText		OK
-Icon view	VolumeWindow		Icon-Ansicht
 Add-ons	FilePanelPriv		Add-ons
 Desktop	Model		Desktop
 Identify	ContainerWindow		Identifizieren
 Warning space color	SettingsView		Farbe für geringen Speicher
-Close	VolumeWindow		Schließen
 Open	OpenWithWindow		Öffnen
 Tracker status	StatusWindow		Trackerstatus
 Eject when unmounting	AutoMounterSettings		Auswerfen beim Aushängen
 Window	ContainerWindow		Fenster
 Decrease size	ContainerWindow		Verkleinern
-Mini icon view	VolumeWindow		Mini-Icon-Ansicht
 You must have at least one attribute showing.	PoseView		Es muss mindestens ein Attribut angezeigt werden.
 Permissions	InfoWindow		Berechtigungen
 128 x 128	DeskWindow		128 x 128
-Invert selection	VolumeWindow		Auswahl umkehren
 128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Letzte Dokumente
 Modified	QueryPoseView		Geändert
@@ -35,7 +31,6 @@ Delete	ContainerWindow		Löschen
 Cannot unmount the boot volume \"%name\".	FSUtils		Das Boot-Laufwerk \"%name\" kann nicht ausgehängt werden.
 Open with…	ContainerWindow		Öffnen mit...
 Write	FilePermissionsView		Schreiben
-for %num files	InfoWindow		für %num Dateien
 Modified	PoseView		Geändert
 Make active printer	ContainerWindow		Zum aktiven Drucker machen
 Create link here	ContainerWindow		Verknüpfung hier erstellen
@@ -87,7 +82,6 @@ Windows	TrackerSettingsWindow		Fenster
 Tracker preferences	TrackerSettingsWindow		Tracker-Einstellungen
 Cut	FilePanelPriv		Ausschneiden
 Replace	FilePanelPriv		Ersetzen
-Select all	VolumeWindow		Alles auswählen
 Opens with:	InfoWindow		Wird geöffnet mit:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Wird der MIME-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten!
 Open	ContainerWindow		Öffnen
@@ -96,10 +90,8 @@ Error calculating folder size.	InfoWindow		Fehler beim Ermitteln der Ordnergrö�
 New folder	FilePanelPriv		Neuer Ordner
 %name info	InfoWindow	InfoWindow Title	%name Info
 Favorites	FavoritesMenu		Favoriten
-Add-ons	VolumeWindow		Add-ons
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" hat ein nicht-unterstütztes Programmformat.
 Sorry, you can't copy items to the Trash.	PoseView		Objekte können leider nicht in den Papierkorb kopiert werden.
-List view	VolumeWindow		Listenansicht
 matches wildcard expression	SelectionWindow		entspricht Platzhalter-Ausdruck
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	umbenannt
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Ordner oder Verknüpfungen können nicht mit einer Datei ersetzt werden.
@@ -109,7 +101,6 @@ Increase size	DeskWindow		Vergrößern
 Resize to fit	ContainerWindow		Optimale Größe
 %Ld bytes	WidgetAttributeText		%Ld Bytes
 Add printer…	ContainerWindow		Drucker hinzufügen…
-Open	VolumeWindow		Öffnen
 New folder	ContainerWindow		Neuer Ordner
 Kind	ContainerWindow		Art
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	umzubenennen
@@ -128,9 +119,7 @@ Show volumes on Desktop	SettingsView		Datenträger auf dem Desktop zeigen
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Fehler %error beim Laden des Add-ons %name
 Defaults	TrackerSettingsWindow		Vorgabewerte
-%num items	CountView		%num Objekte
 Mini icon view	ContainerWindow		Mini-Icon-Ansicht
-Clean up	VolumeWindow		Aufräumen
 OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" konnte nicht geöffnet werden. Die Datei ist fälschlicherweise als ausführbar gekennzeichnet.
 Add-ons	ContainerWindow		Add-ons
@@ -160,14 +149,11 @@ That name is already taken. Please type another one.	InfoWindow		Dieser Name wir
 Sorry, you can't create links in the Trash.	PoseView		Im Papierkorb können leider keine Verknüpfungen erstellt werden.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ein Objekt mit dem Namen \"%name\" existiert bereits in diesem Ordner und könnte\nObjekte mit gleichen Namen enthalten. Sollen sie mit denen des Ordners ersetzt werden, der %verb werden soll?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Verknüpfe \"%name\" mit:
-Mount settings…	VolumeWindow		Einhänge-Einstellungen…
-Select…	VolumeWindow		Auswählen…
 All disks	FindPanel		Alle Datenträger
 Revert	TrackerSettingsWindow		Rückgängig
 Invert selection	QueryContainerWindow		Auswahl umkehren
 Execute	FilePermissionsView		Ausführen
 Size	FindPanel		Größe
-1 item	CountView		1 Objekt
 Open parent	ContainerWindow		Eine Ebene höher
 Location:	InfoWindow		Ort:
 Edit favorites…	FilePanelPriv		Favoriten bearbeiten…
@@ -187,8 +173,6 @@ Mini icon view	DeskWindow		Mini-Icon-Ansicht
 Error in regular expression:\n\n'%errstring'	PoseView		Fehler im regulären Ausdruck:\n\n'%errstring'
 Mount all	MountMenu		Alle einhängen
 calculating…	InfoWindow		Berechnung läuft…
-Unmount	VolumeWindow		Aushängen
-Edit name	VolumeWindow		Umbenennen
 Mount all disks now	AutoMounterSettings		Alle Datenträger einhängen
 Untitled bitmap	PoseView		Unbenannte Bitmap
 of %items	StatusWindow		von %items
@@ -202,7 +186,6 @@ Replace other file	WidgetAttributeText		Andere Datei ersetzen
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Einige der ausgewählten Objekte können nicht in den Papierkorb verschoben werden. Sollen sie stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
 You cannot create a link to the root directory.	FSUtils		Auf das Root-Verzeichnis des Laufwerks kann keine Verknüpfung erstellt werden.
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		Optimale Größe
 Could not find application \"%appname\"	OpenWithWindow		Die Anwendung \"%appname\" wurde nicht gefunden.
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Das ausgewählte Objekt kann nicht in den Papierkorb verschoben werden. Soll es stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
 Invert	SelectionWindow		Umkehren
@@ -239,7 +222,6 @@ Error deleting items	FSUtils		Fehler beim Entfernen von Objekten
 Create relative link here	ContainerWindow		Relative Verknüpfung hier erstellen
 trash	B_TRASH_DIRECTORY		Papierkorb
 matches regular expression	SelectionWindow		entspricht regulärem Ausdruck
-Mount settings…	SettingsView		Einhänge-Einstellungen…
 Edit name	InfoWindow		Umbenennen
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" konnte nicht geöffnet werden (%error).
 Paste	ContainerWindow		Einfügen
@@ -258,7 +240,6 @@ Finish: %time	StatusWindow		Fertig: %time
 Cancel	Tracker		Abbrechen
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Dieses Attribut kann leider nicht bearbeitet werden.
 Name	ContainerWindow		Name
-Disk mount settings	AutoMounterSettings		Einhänge-Einstellungen
 Reverse order	ContainerWindow		Reihenfolge umkehren
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		OK
@@ -300,7 +281,6 @@ copying	FSUtils		kopiert
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fehler beim Kopieren des Ordners \"%name\":\n\t%error\n\nSoll fortgefahren werden?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	verschoben
 Show Disks icon	SettingsView		Datenträger-Icon anzeigen
-Mount	VolumeWindow		Einhängen
 Cancel	PoseView		Abbrechen
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld Bytes,
 You can't move or copy items to read-only volumes.	FSUtils		Auf schreibgeschützte Datenträger können keine Objekte kopiert oder verschoben werden.
@@ -345,24 +325,20 @@ All BeOS disks	AutoMounterSettings		Alle BeOS-Datenträger
 Used space color	SettingsView		Farbe für benutzten Speicher
 Sorry, could not create a new folder.	FSUtils		Der neue Ordner konnte leider nicht erstellt werden.
 multiple disks	FindPanel		mehrere Datenträger
-Done	AutoMounterSettings		Fertig
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Objekte müssen auf eines der Icons im \"Datenträger\" Fenster fallengelassen werden.
 Untitled clipping	PoseView		Unbenannter Ausschnitt
 Don't automount	AutoMounterSettings		Nicht automatisch einhängen
 Save	FilePanelPriv		Speichern
 To: %dir	StatusWindow		Nach: %dir
 Window	FilePanelPriv		Fenster
-Find…	VolumeWindow		Suchen…
 Edit name	FilePanelPriv		Umbenennen
 Size:	InfoWindow		Größe:
 Empty folder	SlowContextPopup		Leerer Ordner
 Open selection with:	OpenWithWindow		Auswahl öffnen mit:
-(%bytes bytes)	InfoWindow		(%bytes Bytes)
 Preparing to create links…	StatusWindow		Erstellen von Verknüpfungen wird vorbereitet…
 Show navigator	SettingsView		Navigator zeigen
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 List folders first	SettingsView		Ordner zuerst listen
-Get info	VolumeWindow		Infos
 Name	SelectionWindow		Name:
 Trash	Model		Papierkorb
 Favorites	FilePanelPriv		Favoriten

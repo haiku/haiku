@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PoorMan	1267330937
+1	english	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		网址
 Error Server	PoorMan		服务器出错
 Settings…	PoorMan		设置...
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		控制台日志
 Connections	PoorMan		连接
 Status: Running	PoorMan		状态：运行
-connections	PoorMan		连接
 Controls	PoorMan		控制
 Send file listing if there's no start page	PoorMan		如果没有起始页，则发送文件列表。
 Error Dir	PoorMan		目录错误

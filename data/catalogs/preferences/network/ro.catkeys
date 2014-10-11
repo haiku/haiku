@@ -1,12 +1,10 @@
-1	romanian	x-vnd.Haiku-Network	2324385456
+1	romanian	x-vnd.Haiku-Network	4065479317
 Choose automatically	EthernetSettingsView		Alege automat
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Mască rețea:
 DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS #2:
 Apply	EthernetSettingsView		Aplică
 OK	EthernetSettingsView		OK
-DNS #1:	EthernetSettingsView		DNS #1:
 IP address:	EthernetSettingsView		Adresă IP:
 Adapter:	EthernetSettingsView		Adaptor:
 Domain:	EthernetSettingsView		Domeniu:

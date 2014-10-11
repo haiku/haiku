@@ -1,18 +1,15 @@
-1	english	x-vnd.Haiku-Network	1341378870
+1	english	x-vnd.Haiku-Network	3992214214
 Choose automatically	EthernetSettingsView		自动选择
 Gateway:	EthernetSettingsView		网关：
 Netmask:	EthernetSettingsView		子网掩码：
 DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS #2：
 Apply	EthernetSettingsView		应用
 Netmask is invalid	EthernetSettingsView		子网掩码无效
 OK	EthernetSettingsView		确定
-DNS #1:	EthernetSettingsView		DNS #1：
 IP address:	EthernetSettingsView		IP 地址：
 Adapter:	EthernetSettingsView		适配器：
 Domain:	EthernetSettingsView		域名：
 Gateway is invalid	EthernetSettingsView		网关无效
-DNS #1 is invalid	EthernetSettingsView		DNS #1 无效
 Revert	EthernetSettingsView		恢复
 <no wireless networks found>	EthernetSettingsView		<未发现无线网络>
 Network	System name		网络
@@ -23,5 +20,4 @@ The net_server needs to run for the auto configuration!	EthernetSettingsView		�
 Disabled	EthernetSettingsView		禁用
 Auto-configuring failed: 	EthernetSettingsView		自动配置失败：
 Static	EthernetSettingsView		静态
-DNS #2 is invalid	EthernetSettingsView		DNS #2 无效
 <no adapter>	EthernetSettingsView		<无适配器>

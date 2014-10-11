@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-FileTypes	599989122
+1	hindi	x-vnd.Haiku-FileTypes	3583076725
 Application types…	FileTypes Window		आवेदन के प्रकार...
 Description:	Application Types Window		विवरण
 Args only	Application Type Window		केवल अर्ग्स
@@ -127,7 +127,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		यह फाइल पहले से ही प्रस्तुत है
 Same as…	FileTypes Window		के रूप में ही...
 Exclusive launch	Application Type Window		अनन्य शुभारंभ
-%ld Application type%s could be removed.	Application Types Window		%Id आवेदन के प्रकार%s हटाएँ जा सकते हैं.
 FileTypes	System name		फ़ाइल के प्रकार
 Application types	Application Types Window		आवेदन के प्रकार
 Could not remove file type: %s\n	FileTypes Window		फाइल टाइप को हटाया नही जा सकता: %s\n

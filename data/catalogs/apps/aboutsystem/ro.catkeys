@@ -1,12 +1,10 @@
-1	romanian	x-vnd.Haiku-About	769480990
+1	romanian	x-vnd.Haiku-About	3466609594
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Drepturi de autor © 1999-2010 de autorii pentru Gutenprint. Toate drepturile rezervate.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (și nucleul său NewOS)\n
-%ld Processors:	AboutView		%ld procesoare:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Drepturi de autor © 2000 Jean-Pierre ervbefeL și Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Drepturi de autor © 1996-2005 Julian R Seward. Toate drepturile rezervate.
 %d MiB total	AboutView		%d MiB total
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondator proiect)\n\n
-The Haiku-Ports team\n	AboutView		Echipa Haiku-Ports\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Drepturi de autor © 1998-2003 Daniel Veillard. Toate drepturile rezervate.
 %d MiB used (%d%%)	AboutView		%d MiB utilizați (%d%%)
 Website, marketing & documentation:\n	AboutView		Site web, marketing & documentație:\n
@@ -18,7 +16,6 @@ Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. și echipei sale de dezvoltatori, pentru că au creat BeOS!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Drepturi de autor © 1999-2000 Y.Takagi. Toate drepturile rezervate.
 Source Code: 	AboutView		Cod sursă:
-Processor:	AboutView		Procesor:
 Kernel:	AboutView		Nucleu:
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Drepturi de autor © 2001-2002 Thomas Broyer, Charlie Bozeman și Daniel Veillard. Toate drepturile rezervate.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku reprezintă proprietatea a Haiku, Inc. sau a respectivilor autori, atunci când este notat explicit în sursă. Haiku® şi logo-ul HAIKU® sunt mărci înregistrate ale Haiku, Inc.\n\n

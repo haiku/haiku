@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libbe	3504008668
+1	polish	x-vnd.Haiku-libbe	84010340
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -18,7 +18,6 @@ About %app%	AboutWindow		O %app%
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Zielony:
-Ok	AboutWindow		Ok
 Version history:	AboutWindow		Historia zmian:
 Remove replicant	Dragger		Usuń replikant
 OK	ZombieReplicantView		OK

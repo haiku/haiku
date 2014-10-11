@@ -1,7 +1,6 @@
-1	portuguese (brazil)	x-vnd.Haiku-MidiPlayer	1227982606
+1	portuguese (brazil)	x-vnd.Haiku-MidiPlayer	471142057
 None	Main Window		Nenhum
 Live input:	Main Window		Entrada ao vivo:
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nAplicativo\nque sabe como tocar\ncentenas de sons bregas
 Stop	Main Window		Parar
 Cavern	Main Window		Caverna
 Volume:	Main Window		Volume:
@@ -13,7 +12,6 @@ Play	Main Window		Tocar
 Garage	Main Window		Garagem
 Closet	Main Window		Closet
 MidiPlayer	System name		MidiPlayer
-OK	Main Application		OK
 Drop MIDI file here	Scope View		Jogue aqui o arquivo MIDI
 Igor's lab	Main Window		Laboratório do Igor
 Scope	Main Window		Espectro

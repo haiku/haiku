@@ -1,11 +1,10 @@
-1	finnish	x-vnd.Haiku-DiskUsage	3631077986
+1	finnish	x-vnd.Haiku-DiskUsage	755008487
 Scanning %refName%	Scanner		Tutkitaan %refName%
 Size	Info Window		Koko
 Rescan	Pie View		Tutki uudelleen
 Kind	Info Window		Tyyppi
 file unavailable	Pie View		tiedosto ei ole saatavilla
 no supporting apps	Pie View		ei tukevia sovelluksia
-%d file	Status View		%d tiedosto
 Path	Info Window		Polku
 Scan	Status View		Tutki
 9999.99 GB	Status View		9999.99 gibitavua

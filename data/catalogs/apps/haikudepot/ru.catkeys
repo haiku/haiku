@@ -1,8 +1,5 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3398060443
+1	russian	x-vnd.Haiku-HaikuDepot	443107378
 Name	PackageListView		Имя
-Installed packages	Model		Установленные пакеты
-User modified packages	Model		Измененные пользователем
-Update available	Model		Доступны обновления
 Changelog	PackageInfoView		История изменений
 Click a package to view information	PackageInfoView		Нажмите на пакет, чтобы увидеть информацию о нем
 for %Version%	PackageInfoView		для %Version%
@@ -18,37 +15,27 @@ Uninstall	PackageManager		Удалить
 An error occurred while initializing the package manager: %message%	MainWindow		Возникла ошибка при инициализации менеджера пакетов: %message%
 Close	PackageManager		Закрыть
 Status	PackageListView		Статус
-Available packages	Model		Доступные пакеты
-Your rating	System name		Ваш рейтинг
 Development	Model		Разработка
 Fatal error	PackageManager		Неисправимая ошибка
 Ratings	PackageInfoView		Оценки
-1 item	PackageListView		1 объект
 Inactive	PackageListView		Неактивный
 Refresh depots	MainWindow		Обновить склады
 Main Menu	MainWindow		Главное меню
-Command line	Model		Командная строка
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Загружается:
 Search terms:	FilterView		Условия поиска:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
-Show source packages	MainWindow		Отображать пакеты с исходным кодом
 Productivity	Model		Офис
-Show:	FilterView		Показать:
 Size	PackageListView		Размер
-Options	MainWindow		Настройки
 Games	Model		Игры
 Rating	PackageListView		Оценка
-Downloading	Model		Загружаемые
-%ld items	PackageListView		объектов: %ld
 Graphics	Model		Графика
 Local	MainWindow		Локальный
 Close	MainWindow		Закрыть
 Video	Model		Видео
 An error occurred while refreshing the repository: %error%	MainWindow		Возникла ошибка при обновлении репозитория: %error%
-All packages	FilterView		Все пакеты
 Pending…	PackageListView		Ожидание…
 Depot	FilterView		Все склады
 Uninstalled	PackageListView		Удаленные
@@ -57,9 +44,6 @@ All depots	FilterView		Все склады
 Available	PackageListView		Доступен
 n/a	PackageInfoView		н/д
 Send	RatePackageWindow		Отправить
-Show develop packages	MainWindow		Отображать пакеты для разработчиков
-Show	FilterView		Все пакеты
-Uninstalled packages	Model		Удаленные пакеты
 Audio	Model		Аудио
 About	PackageInfoView		О программе
 Active	PackageListView		Активирован

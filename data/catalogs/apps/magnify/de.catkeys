@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Magnify	907580139
+1	german	x-vnd.Haiku-Magnify	233476436
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		no clip msg\n
 Make square	Magnify-Main		Quadratisches Fenster
 Copy image	Magnify-Main		Bild kopieren
@@ -8,7 +8,6 @@ Hide/Show grid	Magnify-Main		Gitter aus-/einblenden
 magnify: size must be a multiple of 4\n	Console		magnify: Größe muss ein Vielfaches von 4 sein\n
 Decrease pixel size	Magnify-Main		Pixel verkleinern
 Magnify	System name		Lupe
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize Pixel/Pixel
 Info	Magnify-Main		Info
 Remove a crosshair	Magnify-Main		Fadenkreuz entfernen
 Freeze/Unfreeze image	Magnify-Main		Bild einfrieren/freigeben

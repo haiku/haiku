@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PoorMan	1267330937
+1	hungarian	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		Oldal helye
 Error Server	PoorMan		Hibakiszolgáló
 Settings…	PoorMan		Beállítások…
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		Naplózás konzolba
 Connections	PoorMan		Kapcsolatok
 Status: Running	PoorMan		Állapot: Fut
-connections	PoorMan		kapcsolat
 Controls	PoorMan		Vezérlők
 Send file listing if there's no start page	PoorMan		Fájllista küldése ha nincs kezdőlap
 Error Dir	PoorMan		Hiba mappa

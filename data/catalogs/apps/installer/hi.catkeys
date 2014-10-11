@@ -1,14 +1,11 @@
-1	hindi	x-vnd.Haiku-Installer	1583043680
-So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		तो फिर फाइल के नीचे की ओर अन्य मेनू प्रविष्टियों के पीछे, इन पंक्तियों के समान कुछ जोड़ें:\n\n
+1	hindi	x-vnd.Haiku-Installer	3364952365
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		आप सुनिश्चित हैं कि आप स्थापना रद्द करके सिस्टम को पुनः आरंभ करना चाहते हैं?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		इंस्टॉलर\n\tजेरोम डुवाल और स्टेपहान एब्मस द्वारा लिखा गया है\n\t२००५-२०१० कॉपीराइट, हाइकू|\n\n
 \t}\n\n	InstallerApp		\t}\n\n
-Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		ग्रब के नए संस्करण में एक अतिरिक्त विन्यास फाइल का प्रयोग बूट मेनू में कस्टम प्रविष्टियों को जोड़ने के लिए किया जाता है| उन्हें ऊपर जमा करने के लिए, आपको इस तरह अपने पसंदीदा टर्मिनल को शुरू करके एक फाइल बनानी/संपादित करनी पड़ती है:\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		यहाँ वास्तव में बूट मेनू प्रदर्शित करने के लिए आपको लाइन के सामने एक \"#\" डालकर इस लाइन को कॉमेंट आउट करना है - \"GRUB_HIDDEN_TIMEOUT=0\"
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		स्थापना पूरी हो गयी| बूट क्षेत्र '%s' में लिखा दिया गया है| इंस्टॉलर छोड़ने के लिए छोड़ने का बटन दबाएँ या एक नया लक्ष्य के लिए एक और अधिष्ठापन के निष्पादन की मात्रा का चयन करें|
 Quit	InstallerApp		छोडें
 Additional disk space required: 0.0 KiB	InstallerWindow		अतिरिक्त डिस्क स्थान की आवश्यकता: ०.० KiB
-With GRUB it's: (hdN,n)\n\n	InstallerApp		ग्रब का साथ ये है: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	रोको
 Install progress:  	InstallerWindow		स्थापित प्रगति:
@@ -18,7 +15,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		बूट प्रबंधक छोडो
 Stop	InstallerWindow		रोको
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-\tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
 OK	InstallerApp		ठीक है
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		पॉप अप मेनू से स्रोत और गंतव्य डिस्क चुनें. फिर \"शुरू\" क्लिक करें|
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# हाइकू यहाँ पर है /dev/sda7\n
@@ -36,9 +32,6 @@ Boot sector successfully written.	InstallProgress		बूट क्षेत्�
 Performing installation.	InstallProgress		अधिष्ठापन हो रहा है|
 scanning…	InstallerWindow		स्कैनिंग...
 Set up boot menu	InstallerWindow		बूट मेनू सेट अप करें
-The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		पहले तार्किक विभाजन की संख्या हमेशा \"४\" होगी, प्राथमिक विभाजन की संख्या की परवाह बिना|\n\n
-GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		ग्रब नामकरण योजना अभी भी यह है: (hdN,n)\n\n
-\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <आपका पसंदीदा पाठ संपादक> /boot/grub/menu.lst\n\n
 Finishing Installation.	InstallProgress		स्थापना समाप्त हो रही है.
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <आपका पसंदीदा पाठ संपादक> /etc/default/grub\n\n
 README	InstallerApp		README
@@ -56,8 +49,6 @@ Choose the disk you want to install onto from the pop-up menu. Then click \"Begi
 Unknown Type	InstallProgress	Partition content type	अज्ञात प्रकार
 <none>	InstallerWindow	No partition available	<कोई भी नहीं>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
-You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		आप ध्यान दें कि ग्रब हार्ड ड्राइव नामकरण के लिए एक अलग रणनीति का उपयोग करता है, जो लिनक्स से अलग है|\n\n
-\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" विभाजन संख्या है, जो की \"०\" के साथ शुरू होती है|
 Installation canceled.	InstallProgress		स्थापना रद्द कर दी गयी है|
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		आप एक डिस्क की सामग्री को उसके ऊपर ही स्थापित नहीं कर सकते| एक अलग डिस्क चुनें|
 ???	InstallerWindow	Unknown currently copied item	???
@@ -73,7 +64,6 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		बूट प्रबंधक चल रहा है...\n\nअधिष्ठापन जारी रखने के लिए बूट प्रबंधक को बंद करें|
 Install anyway	InstallProgress		कैसे भी स्थापित करें
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		एक त्रुटि का सामना करना पड़ा और स्थापना पूर्ण नहीं हुई:\n\nत्रुटि: %s
-\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s' से '%2s' पर स्थापित करने के लिए शुरू बटन प्रेस करें|
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		ड्राइव सेटअप चला रहे हैं...\n\nअधिष्ठापन जारी रखने के लिए ड्राइव सेटअप बंद करें|
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		मज़ा लें और हाइकू का प्रयोग करने के लिए बहुत बहुत धन्यवाद! हमें उम्मीद है कि आपको यह पसंद आए!
@@ -92,10 +82,8 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		कोई वैकल्पिक संकुल उपलब्ध नहीं हैं|
 All hard disks start with \"hd\".\n	InstallerApp		सभी हार्ड डिस्क \"hd\" के साथ शुरू होती हैं|\n
 Continue	InstallerApp		जारी रखें
-Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		अपनी /boot/grub/menu.lst को एक टर्मिनल से पसंदीदा संपादक शुरू करके इस तरह से कॉन्फ़िगर करें:\n\n
 Boot sector not written because of an internal error.	InstallProgress		एक आंतरिक त्रुटि के कारण बूट क्षेत्र नहीं लिखा जा सका|
 Additional disk space required: %s	InstallerWindow		अतिरिक्त डिस्क स्थान की आवश्यकता: %s
-NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		नोट: जबकि हार्ड डिस्क नामकरण रणनीति अभी भी २.१) के अंतर्गत वर्णित ही है, विभाजनों के लिए नामकरण योजना बदल गयी है|\n\n
 Cancel	InstallProgress		रद्द करें
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		बूट प्रबंधक और ड्राइव सेटअप चला रहे हैं...\n\nअधिष्ठापन जारी रखने के लिए दोनों अनुप्रयोगों को बंद करें|
 Try installing anyway	InstallProgress		कैसे भी स्थापित करने की कोशिश करें
@@ -105,7 +93,4 @@ Onto:	InstallerWindow		इस पर:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		इंस्टॉलर खिड़की बंद करने से पहले बूट प्रबंधक विंडो बंद करें|
 Tools	InstallerWindow		उपकरण
 The mount point could not be retrieved.	InstallProgress		आरोह बिंदु को पुनः प्राप्त नहीं किया जा सका|
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		लक्ष्य मात्रा खाली नहीं है| क्या आप वैसे भी स्थापित करना चाहते हैं?\n\n ध्यान दें: 'सिस्टम' फ़ोल्डर स्रोत मात्रा से एक स्वच्छ प्रतिलिपि होगा, अन्य सभी फ़ोल्डर्स का विलय कर दिया जाएगा, जबकि फ़ाइलें और लिंक जो दोनों स्रोत और लक्ष्य मात्रा पर मौजूद हैं, स्रोत मात्रा संस्करण से अधिलेखित हो जाएँगे|
-You can see the correct partition in GParted for example.\n\n\n	InstallerApp		उदाहरण के लिए, आप सही विभाजन जीपार्टेड में देख सकते हैं
-\ttitle\t\t\t\tHaiku\n	InstallerApp		\tशीर्षक\t\t\t\tहाइकू\n
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsud <आपका पसंदीदा पाठ संपादक> /etc/grub.d/40_custom\n\n

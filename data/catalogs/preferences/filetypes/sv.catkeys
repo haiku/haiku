@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-FileTypes	133192727
+1	swedish	x-vnd.Haiku-FileTypes	3116280330
 Application types…	FileTypes Window		Programtyper...
 Description:	Application Types Window		Beskrivning:
 Args only	Application Type Window		Endast argument
@@ -130,7 +130,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Filtypen finns redan
 Same as…	FileTypes Window		Samma som...
 Exclusive launch	Application Type Window		Exklusiv start
-%ld Application type%s could be removed.	Application Types Window		%ld Programtypen %s kan inte tas bort.
 FileTypes	System name		FilTyper
 Application types	Application Types Window		Programtyper
 Could not remove file type: %s\n	FileTypes Window		Kunde inte ta bort filtypen: %s\n

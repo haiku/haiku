@@ -1,20 +1,16 @@
-1	romanian	x-vnd.Haiku-libtracker	302476273
+1	romanian	x-vnd.Haiku-libtracker	2536080235
 OK	WidgetAttributeText		OK
-Icon view	VolumeWindow		Vizualizare pictogramă
 Add-ons	FilePanelPriv		Module
 Desktop	Model		Desktop
 Identify	ContainerWindow		Identifică
 Warning space color	SettingsView		Avertisment despre spațiul de culoare
-Close	VolumeWindow		Închide
 Open	OpenWithWindow		Deschide
 Tracker status	StatusWindow		Stare tracker
 Eject when unmounting	AutoMounterSettings		Scoate la demontare
 Window	ContainerWindow		Fereastră
 Decrease size	ContainerWindow		Micșorează dimensiune
-Mini icon view	VolumeWindow		Vizualizare pictogramă mini
 You must have at least one attribute showing.	PoseView		Trebuie să aveți cel puțin un atribut afișat.
 Permissions	InfoWindow		Permisiuni
-Invert selection	VolumeWindow		Inversează selecția
 Recent documents	FavoritesMenu		Documente recente
 Modified	QueryPoseView		Modificat
 Created	ContainerWindow		Creat
@@ -70,15 +66,12 @@ Windows	TrackerSettingsWindow		Ferestre
 Tracker preferences	TrackerSettingsWindow		Preferințe tracker
 Cut	FilePanelPriv		Taie
 Replace	FilePanelPriv		Înlocuiește
-Select all	VolumeWindow		Selectează tot
 Opens with:	InfoWindow		Se deschide cu:
 Open	ContainerWindow		Deschide
 Error calculating folder size.	InfoWindow		Eroare la calcularea dimensiunii dosarului.
 New folder	FilePanelPriv		Dosar nou
 Favorites	FavoritesMenu		Favorite
-Add-ons	VolumeWindow		Module
 Sorry, you can't copy items to the Trash.	PoseView		Îmi pare rău, nu puteți să copiați elemente la gunoi.
-List view	VolumeWindow		Vizualizare listă
 matches wildcard expression	SelectionWindow		se potrivește expresiei metacaracter
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nu puteți înlocui un dosar sau o legătură simbolică printr-un fișier.
 Show space bars on volumes	SettingsView		Afișează bara de spațiu pe volume
@@ -86,7 +79,6 @@ Invert selection	ContainerWindow		Inversează selecție
 Increase size	DeskWindow		Mărește dimensiunea
 Resize to fit	ContainerWindow		Redimensionează pentru a potrivi
 Add printer…	ContainerWindow		Adaugă imprimantă...
-Open	VolumeWindow		Deschide
 New folder	ContainerWindow		Dosar nou
 Kind	ContainerWindow		Fel
 Select…	ContainerWindow		Selectează...
@@ -101,7 +93,6 @@ Show volumes on Desktop	SettingsView		Afișează volumele pe desktop
 KiB	WidgetAttributeText		KiB
 Defaults	TrackerSettingsWindow		Implicite
 Mini icon view	ContainerWindow		Vizualizare mini pictogramă
-Clean up	VolumeWindow		Curăță
 OK	TrackerInitialState		OK
 Add-ons	ContainerWindow		Module
 Edit templates…	TemplatesMenu		Editează șabloane...
@@ -124,14 +115,11 @@ Unmount	InfoWindow		Demontează
 no supporting apps	OpenWithWindow		fără aplicații de suport
 That name is already taken. Please type another one.	InfoWindow		Numele este luat deja. Tastați altul.
 Sorry, you can't create links in the Trash.	PoseView		Îmi pare rău, nu puteți crea legături în gunoi.
-Mount settings…	VolumeWindow		Configurări montare...
-Select…	VolumeWindow		Selectează...
 All disks	FindPanel		Toate discurile
 Revert	TrackerSettingsWindow		Revenire
 Invert selection	QueryContainerWindow		Inversează selecție
 Execute	FilePermissionsView		Execută
 Size	FindPanel		Dimensiune
-1 item	CountView		1 element
 Open parent	ContainerWindow		Deschide superiorul
 Location:	InfoWindow		Locație:
 Edit favorites…	FilePanelPriv		Editează favorite...
@@ -148,8 +136,6 @@ Replace	FSUtils		Înlocuiește
 Mini icon view	DeskWindow		Vizualizare mini pictogramă
 Mount all	MountMenu		Montează tot
 calculating…	InfoWindow		se calculează...
-Unmount	VolumeWindow		Demontează
-Edit name	VolumeWindow		Editează nume
 Mount all disks now	AutoMounterSettings		Montează toate discurile acum
 Untitled bitmap	PoseView		Imagine fără nume
 Description:	InfoWindow		Descriere:
@@ -162,7 +148,6 @@ Replace other file	WidgetAttributeText		Înlocuiește alt fișier
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Câteva din elementele selectate nu pot fi mutate la gunoi. Doriți să le ștergeți în schimb? (Această operație nu poate fi inversată.)
 You cannot create a link to the root directory.	FSUtils		Nu puteți crea o legătură către dosarul administrator.
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		Redimensionează pentru a potrivi
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Elementul selectat nu poate fi mutat la gunoi. Doriți să îl ștergeți în schimb? (Această operație nu poate fi inversată.)
 Invert	SelectionWindow		Inversează
 Find	FindPanel		Găsește
@@ -193,7 +178,6 @@ The mount server could not be contacted.	AutoMounterSettings		Serverul de montar
 Error deleting items	FSUtils		Eroare la ștergerea elementelor
 Create relative link here	ContainerWindow		Creează legătură relativă aici
 matches regular expression	SelectionWindow		se potrivește cu expresia obișnuită
-Mount settings…	SettingsView		Configurări de montare...
 Edit name	InfoWindow		Editează nume
 Paste	ContainerWindow		Lipește
 Modified:	InfoWindow		Modificat:
@@ -207,7 +191,6 @@ label too long	PoseView		etichetă prea lungă
 Cancel	Tracker		Anulează
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Îmi pare rău, nu puteți edita acel atribut.
 Name	ContainerWindow		Nume
-Disk mount settings	AutoMounterSettings		Configurări montare disc
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Adaugă dosar curent
@@ -237,7 +220,6 @@ Create a Query template	FindPanel		Creează un șablon interogare
 Previously mounted disks	AutoMounterSettings		Discuri montate anterior
 copying	FSUtils		se copiază
 Show Disks icon	SettingsView		Afișează pictogramă Discuri
-Mount	VolumeWindow		Montează
 Cancel	PoseView		Anulează
 You can't move or copy items to read-only volumes.	FSUtils		Nu puteți să mutați sau să copiați elemente la volume protejate la scriere.
 Unknown	FilePermissionsView		Necunoscut
@@ -273,13 +255,11 @@ All BeOS disks	AutoMounterSettings		Toate discurile BeOS
 Used space color	SettingsView		Culoare spațiu utilizat
 Sorry, could not create a new folder.	FSUtils		Îmi pare rău, nu s-a putut crea un dosar nou.
 multiple disks	FindPanel		discuri multiple
-Done	AutoMounterSettings		Gata
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Trebuie să plasați elementele pe una din pictogramele de disc în fereastra „Discuri”.
 Untitled clipping	PoseView		Tăietură fără nume
 Don't automount	AutoMounterSettings		Nu automonta
 Save	FilePanelPriv		Salvează
 Window	FilePanelPriv		Fereastră
-Find…	VolumeWindow		Găsește...
 Edit name	FilePanelPriv		Editează nume
 Size:	InfoWindow		Dimensiune:
 Empty folder	SlowContextPopup		Dosar liber
@@ -288,7 +268,6 @@ Preparing to create links…	StatusWindow		Se pregătește crearea legăturilor.
 Show navigator	SettingsView		Afișează navigator
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 List folders first	SettingsView		Enumeră dosarele întâi
-Get info	VolumeWindow		Obține info
 Name	SelectionWindow		Nume
 Trash	Model		Gunoi
 Favorites	FilePanelPriv		Favorite

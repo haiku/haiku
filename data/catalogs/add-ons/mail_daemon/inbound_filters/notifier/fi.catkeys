@@ -1,9 +1,5 @@
-1	finnish	x-vnd.Haiku-NewMailNotification	3624191291
-%num new message	filter		%num uusi viesti
-%num new messages	filter		%num uutta viestiä
+1	finnish	x-vnd.Haiku-NewMailNotification	583443025
 Keyboard LEDs	ConfigView		Näppäimistön ledit
-You have %num new messages for %name.	filter		Sinulle on %num uusi viesti käyttäjälle %name.
-You have %num new message for %name.	filter		Sinulle on %num uutta viestiä käyttäjälle %name.
 Log window	ConfigView		Loki-ikkuna
 Central beep	ConfigView		Keskeinen piip
 Beep	ConfigView		Piip

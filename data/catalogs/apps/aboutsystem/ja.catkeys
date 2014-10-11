@@ -1,12 +1,10 @@
-1	japanese	x-vnd.Haiku-About	2441795911
+1	japanese	x-vnd.Haiku-About	843957219
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint の著者たち. All rights reserved.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n
-%ld Processors:	AboutView		%ld プロセッサ:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. All rights reserved.
 %d MiB total	AboutView		合計 %d MiB
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (プロジェクト創立者)\n\n
-The Haiku-Ports team\n	AboutView		Haiku-Ports チーム\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. All rights reserved.
 %d MiB used (%d%%)	AboutView		%d MiB 使用中 (%d%%)
 Website, marketing & documentation:\n	AboutView		ウェブサイト、広報 & ドキュメント:\n
@@ -18,7 +16,6 @@ Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. およびその開発チーム: 彼らは BeOS を創造してくれました!
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. All rights reserved.
 Source Code: 	AboutView		ソースコード:
-Processor:	AboutView		プロセッサ:
 Kernel:	AboutView		カーネル:
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		このソフトウェアの一部は著作権下にあります。 \nCopyright © 1996-2006 The FreeType Project. All rights reserved.

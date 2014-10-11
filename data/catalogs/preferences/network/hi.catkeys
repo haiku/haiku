@@ -1,12 +1,10 @@
-1	hindi	x-vnd.Haiku-Network	2324385456
+1	hindi	x-vnd.Haiku-Network	4065479317
 Choose automatically	EthernetSettingsView		अपनेआप बंद कर दें
 Gateway:	EthernetSettingsView		गेटवे:
 Netmask:	EthernetSettingsView		नेटमास्क:
 DHCP	EthernetSettingsView		डीअचसीपी
-DNS #2:	EthernetSettingsView		डीअनअस #2:
 Apply	EthernetSettingsView		लागू
 OK	EthernetSettingsView		ठीक है
-DNS #1:	EthernetSettingsView		डीअनअस #1:
 IP address:	EthernetSettingsView		आईपी एड्रेस:
 Adapter:	EthernetSettingsView		अडैप्टर:
 Domain:	EthernetSettingsView		डोमेन

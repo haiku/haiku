@@ -1,7 +1,6 @@
-1	slovak	x-vnd.Haiku-MidiPlayer	1227982606
+1	slovak	x-vnd.Haiku-MidiPlayer	471142057
 None	Main Window		Žiadna
 Live input:	Main Window		Živý vstup:
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku Prehrávač MIDI 1.0.0 beta\n\nTento malý program\nvie prehrávať tisíce\npodradne znejúcich piesní
 Stop	Main Window		Zastaviť
 Cavern	Main Window		Jaskyňa
 Volume:	Main Window		Hlasitosť:
@@ -13,7 +12,6 @@ Play	Main Window		Prehrať
 Garage	Main Window		Garáž
 Closet	Main Window		Skriňa
 MidiPlayer	System name		Prehrávač MIDI
-OK	Main Application		OK
 Drop MIDI file here	Scope View		Sem pretiahnite súbor MIDI
 Igor's lab	Main Window		Igorovo laboratórium
 Scope	Main Window		Rozsah

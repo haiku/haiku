@@ -1,18 +1,15 @@
-1	russian	x-vnd.Haiku-Network	1341378870
+1	russian	x-vnd.Haiku-Network	3992214214
 Choose automatically	EthernetSettingsView		Выбрать автоматически
 Gateway:	EthernetSettingsView		Шлюз:
 Netmask:	EthernetSettingsView		Маска:
 DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS #2:
 Apply	EthernetSettingsView		Применить
 Netmask is invalid	EthernetSettingsView		Маска указана в неверном формате
 OK	EthernetSettingsView		ОК
-DNS #1:	EthernetSettingsView		DNS #1:
 IP address:	EthernetSettingsView		IP-адрес:
 Adapter:	EthernetSettingsView		Адаптер:
 Domain:	EthernetSettingsView		Домен:
 Gateway is invalid	EthernetSettingsView		Шлюз указан в неверном формате
-DNS #1 is invalid	EthernetSettingsView		DNS #1 указан в неверном формате
 Revert	EthernetSettingsView		Вернуть
 <no wireless networks found>	EthernetSettingsView		<беспроводные сети не найдены>
 Network	System name		Сеть
@@ -23,5 +20,4 @@ The net_server needs to run for the auto configuration!	EthernetSettingsView		ne
 Disabled	EthernetSettingsView		Отключен
 Auto-configuring failed: 	EthernetSettingsView		Не удалось выполнить автонастройку: 
 Static	EthernetSettingsView		Статический IP-адрес
-DNS #2 is invalid	EthernetSettingsView		DNS #2 указан в неверном формате
 <no adapter>	EthernetSettingsView		<адаптеры не найдены>

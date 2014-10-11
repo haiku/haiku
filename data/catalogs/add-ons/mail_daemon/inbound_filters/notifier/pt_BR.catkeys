@@ -1,9 +1,5 @@
-1	portuguese (brazil)	x-vnd.Haiku-NewMailNotification	3624191291
-%num new message	filter		%num nova mensagem
-%num new messages	filter		%num novas mensagens
+1	portuguese (brazil)	x-vnd.Haiku-NewMailNotification	583443025
 Keyboard LEDs	ConfigView		LEDs do teclado
-You have %num new messages for %name.	filter		Você tem %num novas mensagens para %name.
-You have %num new message for %name.	filter		Você tem %num nova mensagem para %name.
 Log window	ConfigView		Janela de registro
 Central beep	ConfigView		Alarme sonoro central
 Beep	ConfigView		Alarme sonoro

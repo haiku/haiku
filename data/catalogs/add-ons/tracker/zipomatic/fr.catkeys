@@ -1,5 +1,4 @@
-1	french	x-vnd.haiku.zip-o-matic	2207848100
-1 file added.	file:ZipOMaticWindow.cpp		1 fichier ajouté.
+1	french	x-vnd.haiku.zip-o-matic	2241557251
 Stop	file:ZipOMaticWindow.cpp		Arrêt
 Creating archive: %s	file:ZipOMaticWindow.cpp		Création de l'archive : %s
 Continue	file:ZipOMaticWindow.cpp		Continuer
@@ -9,7 +8,6 @@ Filename: %s	file:ZipOMaticWindow.cpp		Nom de fichier : %s
 Let them continue	file:ZipOMatic.cpp		Les laisser continuer
 Do you want to stop them?	file:ZipOMatic.cpp		Voulez-vous les arrêter ?
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Êtes-vous sur de vouloir interrompre la création de cette archive ?
-%ld files added.	file:ZipOMaticWindow.cpp		%ld fichiers ajoutés.
 Stopped	file:ZipOMaticWindow.cpp		Arrêté
 Archive	file:ZipperThread.cpp		Archive
 Error creating archive	file:ZipOMaticWindow.cpp		Impossible de créer l'archive

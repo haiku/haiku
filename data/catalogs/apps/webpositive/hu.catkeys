@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	951661576
+1	hungarian	x-vnd.Haiku-WebPositive	3528881455
 Show home button	Settings Window		Kezdőlap-gomb megjelenítése
 Username:	Authentication Panel		Felhasználónév:
 Copy URL to clipboard	Download Window		Cím másolása a vágólapra
@@ -86,7 +86,6 @@ Open blank page	Settings Window		Üres oldal megnyitása
 New tabs:	Settings Window		Új fülek:
 Cancel	WebPositive Window		Mégse
 Open all	WebPositive Window		Az összes megnyitása
-Hide bookmark bar	WebPositive Window		Könyvjelzősáv elrejtése
 Proxy server requires authentication	Settings Window		A proxy hitelesítést kér
 Clear	URL Bar		Törlés
 Cut	URL Bar		Kivágás

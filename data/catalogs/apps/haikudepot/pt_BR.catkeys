@@ -1,8 +1,5 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	3398060443
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	443107378
 Name	PackageListView		Nome
-Installed packages	Model		Pacotes instalados
-User modified packages	Model		Pacotes modificados pelo usuário
-Update available	Model		Atualização disponível
 Changelog	PackageInfoView		Registro de alterações
 Click a package to view information	PackageInfoView		Clique em um pacote para visualizar a informação
 for %Version%	PackageInfoView		para %Version%
@@ -18,37 +15,27 @@ Uninstall	PackageManager		Desinstalar
 An error occurred while initializing the package manager: %message%	MainWindow		Um erro ocorreu ao inicializar o gerenciador de pacotes: %message%
 Close	PackageManager		Fechar
 Status	PackageListView		Estado
-Available packages	Model		Pacotes disponíveis
-Your rating	System name		Sua avaliação
 Development	Model		Desenvolvimento
 Fatal error	PackageManager		Erro fatal
 Ratings	PackageInfoView		Classificações
-1 item	PackageListView		1 item
 Inactive	PackageListView		Inativo
 Refresh depots	MainWindow		Atualizar depósitos
 Main Menu	MainWindow		Menu Principal
-Command line	Model		Linha de comando
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Baixando:
 Search terms:	FilterView		Termos para pesquisa:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Nenhuma avaliação de usuário disponível.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Um erro ocorreu ao atualizar o repositório: %error% (%details%)
-Show source packages	MainWindow		Exibir pacotes fonte
 Productivity	Model		Produtividade
-Show:	FilterView		Mostrar:
 Size	PackageListView		Tamanho
-Options	MainWindow		Opções
 Games	Model		Jogos
 Rating	PackageListView		Avaliação
-Downloading	Model		Baixando
-%ld items	PackageListView		%ld itens
 Graphics	Model		Gráficos
 Local	MainWindow		Local
 Close	MainWindow		Fechar
 Video	Model		Vídeo
 An error occurred while refreshing the repository: %error%	MainWindow		Ocorreu um erro ao atualizar o repositório: %error%
-All packages	FilterView		Todos os pacotes
 Pending…	PackageListView		Pendente…
 Depot	FilterView		Depósito
 Uninstalled	PackageListView		Não instalado
@@ -57,9 +44,6 @@ All depots	FilterView		Todos os depósitos
 Available	PackageListView		Disponível
 n/a	PackageInfoView		n/a
 Send	RatePackageWindow		Enviar
-Show develop packages	MainWindow		Exibir pacotes de desenvolvimento
-Show	FilterView		Mostrar
-Uninstalled packages	Model		Pacotes não instalados
 Audio	Model		Áudio
 About	PackageInfoView		Sobre
 Active	PackageListView		Ativo

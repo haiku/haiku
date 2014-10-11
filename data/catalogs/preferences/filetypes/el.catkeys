@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	599989122
+1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	3583076725
 Application types…	FileTypes Window		Τύποι εφαρμογής...
 Description:	Application Types Window		Περιγραφή:
 Args only	Application Type Window		Μόνο παράμετροι
@@ -127,7 +127,6 @@ Display as:	Attribute Window	Tracker offers different display modes for attribut
 This file type already exists	New File Type Window		Αυτός ο τύπος αρχείου υπάρχει ήδη
 Same as…	FileTypes Window		Ίδιο με...
 Exclusive launch	Application Type Window		Αποκλειστή εκκίνηση
-%ld Application type%s could be removed.	Application Types Window		%ld Ο τύπος εφαρμογής%s μπορεί να αφαιρεθεί.
 FileTypes	System name		Τύποι αρχείων
 Application types	Application Types Window		Τύποι εφαρμογής
 Could not remove file type: %s\n	FileTypes Window		Δεν μπορείτε να διαγράψετε το τύπο αρχείου: %s\n

@@ -1,5 +1,4 @@
-1	romanian	x-vnd.Haiku-Pairs	1649564846
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tscris de Ralf Schülke\n\tDrepturi de autor 2008-2010, Haiku Inc.\n\nAți completat jocul în %num% clicuri.\n
+1	romanian	x-vnd.Haiku-Pairs	2647083837
 Expert (8x8)	PairsWindow		Avansat (8x8)
 Beginner (4x4)	PairsWindow		Începător (4x4)
 Quit game	PairsWindow		Închide jocul

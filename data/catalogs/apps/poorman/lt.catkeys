@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-PoorMan	1267330937
+1	lithuanian	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		Svetainės adresas
 Error Server	PoorMan		Serverio klaida
 Settings…	PoorMan		Nuostatos…
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		Rodyti žurnalą pulte
 Connections	PoorMan		Ryšiai
 Status: Running	PoorMan		Būsena: veikia
-connections	PoorMan		ryšiai (-ių)
 Controls	PoorMan		Valdymas
 Send file listing if there's no start page	PoorMan		Neradus pradžios tinklapio, siųsti failų sąrašą
 Error Dir	PoorMan		Aplanko klaida

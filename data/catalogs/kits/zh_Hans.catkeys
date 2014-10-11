@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libbe	3504008668
+1	english	x-vnd.Haiku-libbe	84010340
 gamma	AboutWindow		伽马
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -18,7 +18,6 @@ About %app%	AboutWindow		关于 %app%
 OK	Dragger		确定
 OK	PrintJob		确定
 Green:	ColorControl		绿色:
-Ok	AboutWindow		确定
 Version history:	AboutWindow		版本历史：
 Remove replicant	Dragger		删除克隆控件
 OK	ZombieReplicantView		确定

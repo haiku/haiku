@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PoorMan	1267330937
+1	russian	x-vnd.Haiku-PoorMan	4008245771
 Website location	PoorMan		Расположение сайта
 Error Server	PoorMan		Ошибка сервера
 Settings…	PoorMan		Настройки…
@@ -36,7 +36,6 @@ Please choose the folder to publish on the web.\n\nYou can have PoorMan create a
 Log To Console	PoorMan		Выводить лог в консоль
 Connections	PoorMan		Соединения
 Status: Running	PoorMan		Статус: работает
-connections	PoorMan		соединения
 Controls	PoorMan		Управление
 Send file listing if there's no start page	PoorMan		Отобразить список файлов, если нет стартовой страницы
 Error Dir	PoorMan		Ошибка директории

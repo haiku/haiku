@@ -1,21 +1,17 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	2912038353
+1	dutch; flemish	x-vnd.Haiku-libtracker	2769870140
 OK	WidgetAttributeText		OK
-Icon view	VolumeWindow		Icoonweergave
 Add-ons	FilePanelPriv		Invoegtoepassingen
 Desktop	Model		Bureaublad
 Identify	ContainerWindow		Identificeren
 Warning space color	SettingsView		Waarschuwende ruimte-kleur
-Close	VolumeWindow		Sluiten
 Open	OpenWithWindow		Openen
 Tracker status	StatusWindow		Trackerstatus
 Eject when unmounting	AutoMounterSettings		Uitwerpen bij het ontkoppelen
 Window	ContainerWindow		Venster
 Decrease size	ContainerWindow		Grootte verminderen
-Mini icon view	VolumeWindow		Mini-icoonweergave
 You must have at least one attribute showing.	PoseView		Er moet minstens één eigenschap weergegeven worden.
 Permissions	InfoWindow		Machtigingen
 128 x 128	DeskWindow		128 x 128
-Invert selection	VolumeWindow		Selectie omkeren
 128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Recente documenten
 Modified	QueryPoseView		Gewijzigd
@@ -35,7 +31,6 @@ Delete	ContainerWindow		Verwijderen
 Cannot unmount the boot volume \"%name\".	FSUtils		Kan het opstartvolume \"%name\" niet ontkoppelen.
 Open with…	ContainerWindow		Openen met...
 Write	FilePermissionsView		Schrijven
-for %num files	InfoWindow		voor %num bestanden
 Modified	PoseView		Gewijzigd
 Make active printer	ContainerWindow		Actieve printer maken
 Create link here	ContainerWindow		Maak hier een koppeling
@@ -89,7 +84,6 @@ Windows	TrackerSettingsWindow		Vensters
 Tracker preferences	TrackerSettingsWindow		Tracker voorkeuren
 Cut	FilePanelPriv		Knippen
 Replace	FilePanelPriv		Vervangen
-Select all	VolumeWindow		Alles selecteren
 Opens with:	InfoWindow		Wordt geopend met:
 If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Als u %ifYouDoAction op de mime-instellingen, kan het zijn dat %osName niet goed  kan functioneren!\n\nWeet u zeker dat u dit wilt doen?
 Open	ContainerWindow		Openen
@@ -98,9 +92,7 @@ Error calculating folder size.	InfoWindow		Fout bij het berekenen van de mapgroo
 New folder	FilePanelPriv		Nieuwe map
 %name info	InfoWindow	InfoWindow Title	%name info
 Favorites	FavoritesMenu		Favorieten
-Add-ons	VolumeWindow		Invoegtoepassingen
 Sorry, you can't copy items to the Trash.	PoseView		Sorry, u kunt geen items naar de prullenbak kopiëren.
-List view	VolumeWindow		Lijstweergave
 matches wildcard expression	SelectionWindow		komt overeen met wildcardtekens
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	hernoemen
 You cannot replace a folder or a symbolic link with a file.	FSUtils		U kunt geen map of gelinkt bestand vervangen door een bestand.
@@ -110,7 +102,6 @@ Increase size	DeskWindow		Vermeerder grootte
 Resize to fit	ContainerWindow		Grootte passend maken
 %Ld bytes	WidgetAttributeText		%Ld bytes
 Add printer…	ContainerWindow		Printer toevoegen...
-Open	VolumeWindow		Openen
 New folder	ContainerWindow		Nieuwe map
 Kind	ContainerWindow		Soort
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	hernoemen
@@ -131,9 +122,7 @@ Show volumes on Desktop	SettingsView		Toon gegevensdragers op het bureaublad
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Fout %error bij het laden van invoegtoepassing %name.
 Defaults	TrackerSettingsWindow		Standaardwaarden
-%num items	CountView		%num items
 Mini icon view	ContainerWindow		Mini-icoonweergave
-Clean up	VolumeWindow		Opruimen
 OK	TrackerInitialState		Oké
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" kon niet geopend worden. Het bestand is ten onrechte aangeduid als uitvoerbaar.
 Add-ons	ContainerWindow		Invoegtoepassingen
@@ -162,14 +151,11 @@ That name is already taken. Please type another one.	InfoWindow		Deze naam is al
 Sorry, you can't create links in the Trash.	PoseView		Sorry, in de prullenbak kunt u geen links maken.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Er bestaat al een item met de naam \"%name\" in deze map, en deze kan items bevatten met dezelfde namen. Wilt u die vervangen door de items in de map die u %verb?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Link \"%name\" naar:
-Mount settings…	VolumeWindow		Instellingen voor betrekken...
-Select…	VolumeWindow		Selecteren...
 All disks	FindPanel		Alle schijven
 Revert	TrackerSettingsWindow		Herstellen
 Invert selection	QueryContainerWindow		Selectie omkeren
 Execute	FilePermissionsView		Uitvoeren
 Size	FindPanel		Grootte
-1 item	CountView		1 item
 Open parent	ContainerWindow		Open bovenliggende map
 Location:	InfoWindow		Locatie:
 Edit favorites…	FilePanelPriv		Favorieten bewerken...
@@ -189,8 +175,6 @@ Mini icon view	DeskWindow		Mini-icoonweergave
 Error in regular expression:\n\n'%errstring'	PoseView		Fout in de reguliere expressie:\n\n'%errstring'
 Mount all	MountMenu		Betrek alles
 calculating…	InfoWindow		Aan het berekenen...
-Unmount	VolumeWindow		Onttrekken
-Edit name	VolumeWindow		Naam wijzigen
 Mount all disks now	AutoMounterSettings		Betrek alle schijven nu
 Untitled bitmap	PoseView		Naamloze bitmap
 of %items	StatusWindow		van %items
@@ -204,7 +188,6 @@ Replace other file	WidgetAttributeText		Ander bestand vervangen
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Sommige van de geselecteerde items kunnen niet naar de prullenbak verplaatst worden. Wilt u ze in plaats daarvan verwijderen? (Deze actie kan niet ongedaan gemaakt worden.)
 You cannot create a link to the root directory.	FSUtils		U kunt geen link naar de rootmap maken.
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		Grootte passend maken
 Could not find application \"%appname\"	OpenWithWindow		Kon de toepassing \"%appname\" niet vinden
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Het geselecteerde item kon niet naar de prullenbak verplaatst worden. Wilt u het in plaats daarvan verwijderen? (Deze actie kan niet ongedaan gemaakt worden.)
 Invert	SelectionWindow		Omkeren
@@ -240,7 +223,6 @@ Error deleting items	FSUtils		Fout bij het verwijderen van items
 Create relative link here	ContainerWindow		Maak een hier relatieve koppeling
 trash	B_TRASH_DIRECTORY		prullenbak
 matches regular expression	SelectionWindow		komt overeen met de reguliere expressie
-Mount settings…	SettingsView		Betrek-instellingen...
 Edit name	InfoWindow		Naam aanpassen
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" kon niet geopend worden (%error).
 Paste	ContainerWindow		Plakken
@@ -259,7 +241,6 @@ Finish: %time	StatusWindow		Voltooid: %time
 Cancel	Tracker		Annuleren
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Sorry, je kunt dit attribuut niet wijzigen.
 Name	ContainerWindow		Naam
-Disk mount settings	AutoMounterSettings		Schijfbetrek-instellingen
 Reverse order	ContainerWindow		Omgekeerde volgorde
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		Oké
@@ -301,7 +282,6 @@ copying	FSUtils		bezig met kopiëren
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fout bij het kopiëren van \"%name\":\n\t%error\n\nWilt u doorgaan?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	verplaatsen
 Show Disks icon	SettingsView		Toon schijf-iconen
-Mount	VolumeWindow		Betrekken
 Cancel	PoseView		Annuleren
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld bytes,
 You can't move or copy items to read-only volumes.	FSUtils		U kunt items niet naar alleen-lezen-gegevensdragers verplaatsen of kopiëren.
@@ -345,24 +325,20 @@ All BeOS disks	AutoMounterSettings		Alle BeOS-schijven
 Used space color	SettingsView		Kleur voor gebruikte ruimte
 Sorry, could not create a new folder.	FSUtils		Sorry, kon geen nieuwe map aanmaken.
 multiple disks	FindPanel		meerdere schijven
-Done	AutoMounterSettings		Klaar
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		U moet de items verslepen naar een van de schijf-iconen in het \"Schijven\"-venster.
 Untitled clipping	PoseView		Naamloze clipping
 Don't automount	AutoMounterSettings		Niet automatisch betrekken
 Save	FilePanelPriv		Opslaan
 To: %dir	StatusWindow		Naar: %dir
 Window	FilePanelPriv		Venster
-Find…	VolumeWindow		Zoeken...
 Edit name	FilePanelPriv		Naam aanpassen
 Size:	InfoWindow		Grootte:
 Empty folder	SlowContextPopup		Lege map
 Open selection with:	OpenWithWindow		Selectie openen met:
-(%bytes bytes)	InfoWindow		(%bytes bytes)
 Preparing to create links…	StatusWindow		Voorbereiden om koppelingen te maken...
 Show navigator	SettingsView		Toon de navigator
 Desktop	B_DESKTOP_DIRECTORY		Bureaublad
 List folders first	SettingsView		Toon mappen eerst
-Get info	VolumeWindow		Info ophalen
 Name	SelectionWindow		Naam
 Trash	Model		Prullenbak
 Favorites	FilePanelPriv		Favorieten
