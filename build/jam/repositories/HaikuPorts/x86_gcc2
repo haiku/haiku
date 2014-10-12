@@ -78,7 +78,7 @@ RemotePackageRepository HaikuPorts
 	freetype_devel-2.5.3-1
 	fribidi-0.19.5-1
 	fribidi_devel-0.19.5-1
-	friss-0.8beta-1
+	friss-0.8.0-1
 	gawk-4.1.0-2
 	gcc-2.95.3_2014_07_26-1
 	gcc_syslibs_devel-2.95.3_2014_07_26-1
@@ -220,6 +220,7 @@ RemotePackageRepository HaikuPorts
 	neon-0.29.6-6
 	neon_devel-0.29.6-6
 	netcat-1.10-1
+	netpulse-0.2.3-2
 	netsurf-3.2-1
 	opensound-4.2_git-2
 	openssh-6.0p1-8
@@ -750,6 +751,7 @@ RemotePackageRepository HaikuPorts
 	ncurses
 	neon
 	netcat
+	netpulse
 	netsurf
 	ninja_x86
 	ocp_x86
