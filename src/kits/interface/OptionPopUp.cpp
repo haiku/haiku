@@ -255,6 +255,8 @@ void
 BOptionPopUp::SetEnabled(bool state)
 {
 	BOptionControl::SetEnabled(state);
+	if (fMenuField)
+		fMenuField->SetEnabled(state);
 }
 
 
