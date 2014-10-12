@@ -307,6 +307,7 @@ RemotePackageRepository HaikuPorts
 	xcb_proto-1.6-2
 	xml_parser-2.36-1
 	xproto-7.0.26-2
+	xrick-021212-2
 	yab-1.7.02-2
 	yab_ide-2.2.2-1
 	yasm-1.2.0-3
@@ -837,6 +838,7 @@ RemotePackageRepository HaikuPorts
 	xcb_proto
 	xml_parser
 	xproto
+	xrick
 	xz_utils_x86
 	zlib
 	:
