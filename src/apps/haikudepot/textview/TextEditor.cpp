@@ -120,6 +120,16 @@ TextEditor::SetCaret(BPoint location, bool extendSelection)
 
 
 void
+TextEditor::SelectAll()
+{
+	if (fDocument.Get() == NULL)
+		return;
+
+	SetSelection(TextSelection(0, fDocument->Length()));
+}
+
+
+void
 TextEditor::SetSelection(TextSelection selection)
 {
 	_SetSelection(selection.Caret(), selection.Anchor(), true, true);

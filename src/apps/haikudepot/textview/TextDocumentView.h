@@ -63,6 +63,7 @@ public:
 
 			void				SetCaret(BPoint where, bool extendSelection);
 
+			void				SelectAll();
 			bool				HasSelection() const;
 			void				GetSelection(int32& start, int32& end) const;
 

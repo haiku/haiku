@@ -48,6 +48,7 @@ public:
 									{ return fEditingEnabled; }
 
 			void				SetCaret(BPoint location, bool extendSelection);
+			void				SelectAll();
 			void				SetSelection(TextSelection selection);
 	inline	TextSelection		Selection() const
 									{ return fSelection; }

@@ -52,6 +52,9 @@ TextDocumentView::MessageReceived(BMessage* message)
 		case B_COPY:
 			Copy(be_clipboard);
 			break;
+		case B_SELECT_ALL:
+			SelectAll();
+			break;
 
 		default:
 			BView::MessageReceived(message);
@@ -334,6 +337,18 @@ TextDocumentView::SetCaret(BPoint location, bool extendSelection)
 }
 
 
+void
+TextDocumentView::SelectAll()
+{
+	if (fTextEditor.Get() == NULL)
+		return;
+
+	fTextEditor->SelectAll();
+	fShowCaret = false;
+	Invalidate();
+}
+
+
 bool
 TextDocumentView::HasSelection() const
 {
@@ -344,7 +359,7 @@ TextDocumentView::HasSelection() const
 void
 TextDocumentView::GetSelection(int32& start, int32& end) const
 {
-	if (fTextEditor.Get()) {
+	if (fTextEditor.Get() != NULL) {
 		start = fTextEditor->SelectionStart();
 		end = fTextEditor->SelectionEnd();
 	}
