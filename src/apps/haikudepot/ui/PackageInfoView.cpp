@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Button.h>
@@ -612,8 +613,18 @@ public:
 							->SchedulePackageActions(actions);
 						if (result != B_OK) {
 							fprintf(stderr, "Failed to schedule action: "
-								"%s '%s'\n", action->Label(),
-								action->Package()->Title().String());
+								"%s '%s': %s\n", action->Label(),
+								action->Package()->Title().String(),
+								strerror(result));
+							BString message(B_TRANSLATE("The package action "
+								"could not be scheduled: %Error%"));
+							message.ReplaceAll("%Error%", strerror(result));
+							BAlert* alert = new(std::nothrow) BAlert(
+								B_TRANSLATE("Package action failed"),
+								message, B_TRANSLATE("OK"), NULL, NULL,
+								B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+							if (alert != NULL)
+								alert->Go();
 						}
 					}
 				}
