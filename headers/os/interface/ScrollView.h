@@ -34,6 +34,7 @@ public:
 
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* archive, bool deep = true) const;
+	virtual status_t			AllUnarchived(const BMessage* archive);
 
 	// Hook methods
 	virtual	void				AllAttached();

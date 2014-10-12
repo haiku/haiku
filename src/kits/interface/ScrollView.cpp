@@ -70,6 +70,9 @@ BScrollView::BScrollView(BMessage* archive)
 		fTarget = NULL;
 
 	// search for our scroll bars
+	// This will not work for managed archives (when the layout kit is used).
+	// In that case the children are attached later, and we perform the search
+	// again in the AllUnarchived method.
 
 	fHorizontalScrollBar = NULL;
 	fVerticalScrollBar = NULL;
@@ -88,6 +91,7 @@ BScrollView::BScrollView(BMessage* archive)
 
 	fPreviousWidth = uint16(Bounds().Width());
 	fPreviousHeight = uint16(Bounds().Height());
+
 }
 
 
@@ -127,8 +131,55 @@ BScrollView::Archive(BMessage* archive, bool deep) const
 	// The highlighted state is not archived, but since it is
 	// usually (or should be) used to indicate focus, this
 	// is probably the right thing to do.
-
+	
 	return status;
+}
+
+
+status_t
+BScrollView::AllUnarchived(const BMessage* archive)
+{
+	status_t result = BView::AllUnarchived(archive);
+	if (result != B_OK)
+		return result;
+
+	// search for our scroll bars and target
+	int32 firstBar = 0;
+	BView* view;
+	while ((view = ChildAt(firstBar++)) != NULL) {
+		printf("scaning %s\n", view->Name());
+		BScrollBar *bar = dynamic_cast<BScrollBar *>(view);
+		// We assume that the first non-scrollbar child view is the target.
+		// So the target view can't be a BScrollBar, but who would do that?
+		if (bar == NULL) {
+			// in a shallow archive, we may not have a target anymore. We must
+			// be prepared for this case
+			if (fTarget == NULL && !archive->FindBool("_no_target_"))
+				fTarget = view;
+			continue;
+		}
+
+		if (bar->Orientation() == B_HORIZONTAL)
+			fHorizontalScrollBar = bar;
+		else if (bar->Orientation() == B_VERTICAL)
+			fVerticalScrollBar = bar;
+	}
+
+	printf("UA %p %p %p\n", fTarget, fHorizontalScrollBar, fVerticalScrollBar);
+
+	// Now connect the bars to the target, and make the target aware of them
+	if (fHorizontalScrollBar)
+		fHorizontalScrollBar->SetTarget(fTarget);
+	if (fVerticalScrollBar)
+		fVerticalScrollBar->SetTarget(fTarget);
+
+	if (fTarget)
+		fTarget->TargetedByScrollView(this);
+
+	fPreviousWidth = uint16(Bounds().Width());
+	fPreviousHeight = uint16(Bounds().Height());
+
+	return B_OK;
 }
 
 
@@ -682,7 +733,7 @@ BScrollView::_Init(bool horizontal, bool vertical)
 			fTarget, 0, 1000, B_VERTICAL);
 		AddChild(fVerticalScrollBar);
 	}
-	
+
 	BRect targetFrame;
 	if (fTarget) {
 		// layout target and add it
