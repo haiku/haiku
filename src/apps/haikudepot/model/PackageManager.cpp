@@ -127,9 +127,13 @@ public:
 				alert->Go(NULL);
 			return ex.Error();
 		} catch (BAbortedByUserException ex) {
+			fprintf(stderr, "Installation of package "
+				"%s aborted by user: %s\n", packageName, ex.Message().String());
 			_SetDownloadedPackagesState(NONE);
 			return B_OK;
 		} catch (BNothingToDoException ex) {
+			fprintf(stderr, "Nothing to do while installing package "
+				"%s: %s\n", packageName, ex.Message().String());
 			return B_OK;
 		} catch (BException ex) {
 			fprintf(stderr, "Exception occurred while installing package "
