@@ -147,7 +147,6 @@ BScrollView::AllUnarchived(const BMessage* archive)
 	int32 firstBar = 0;
 	BView* view;
 	while ((view = ChildAt(firstBar++)) != NULL) {
-		printf("scaning %s\n", view->Name());
 		BScrollBar *bar = dynamic_cast<BScrollBar *>(view);
 		// We assume that the first non-scrollbar child view is the target.
 		// So the target view can't be a BScrollBar, but who would do that?
@@ -164,8 +163,6 @@ BScrollView::AllUnarchived(const BMessage* archive)
 		else if (bar->Orientation() == B_VERTICAL)
 			fVerticalScrollBar = bar;
 	}
-
-	printf("UA %p %p %p\n", fTarget, fHorizontalScrollBar, fVerticalScrollBar);
 
 	// Now connect the bars to the target, and make the target aware of them
 	if (fHorizontalScrollBar)
