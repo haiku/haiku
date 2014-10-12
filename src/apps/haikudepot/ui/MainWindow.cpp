@@ -165,21 +165,7 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 
 	_StartRefreshWorker();
 
-	fPendingActionsSem = create_sem(0, "PendingPackageActions");
-	if (fPendingActionsSem >= 0) {
-		fPendingActionsWorker = spawn_thread(&_PackageActionWorker,
-			"Planet Express", B_NORMAL_PRIORITY, this);
-		if (fPendingActionsWorker >= 0)
-			resume_thread(fPendingActionsWorker);
-	}
-
-	fPackageToPopulateSem = create_sem(0, "PopulatePackage");
-	if (fPackageToPopulateSem >= 0) {
-		fPopulatePackageWorker = spawn_thread(&_PopulatePackageWorker,
-			"Package Populator", B_NORMAL_PRIORITY, this);
-		if (fPopulatePackageWorker >= 0)
-			resume_thread(fPopulatePackageWorker);
-	}
+	_InitWorkerThreads();
 }
 
 
@@ -214,6 +200,8 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings,
 	}
 
 	fPackageInfoView->SetPackage(package);
+
+	_InitWorkerThreads();
 }
 
 
@@ -494,6 +482,27 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 //	menu->AddItem(fShowSourcePackagesItem);
 //
 //	menuBar->AddItem(menu);
+}
+
+
+void
+MainWindow::_InitWorkerThreads()
+{
+	fPendingActionsSem = create_sem(0, "PendingPackageActions");
+	if (fPendingActionsSem >= 0) {
+		fPendingActionsWorker = spawn_thread(&_PackageActionWorker,
+			"Planet Express", B_NORMAL_PRIORITY, this);
+		if (fPendingActionsWorker >= 0)
+			resume_thread(fPendingActionsWorker);
+	}
+
+	fPackageToPopulateSem = create_sem(0, "PopulatePackage");
+	if (fPackageToPopulateSem >= 0) {
+		fPopulatePackageWorker = spawn_thread(&_PopulatePackageWorker,
+			"Package Populator", B_NORMAL_PRIORITY, this);
+		if (fPopulatePackageWorker >= 0)
+			resume_thread(fPopulatePackageWorker);
+	}
 }
 
 
@@ -899,7 +908,7 @@ MainWindow::_PopulatePackageWorker(void* arg)
 void
 MainWindow::_NotifyUser(const char* title, const char* message)
 {
-	BAlert *alert = new(std::nothrow) BAlert(title, message,
+	BAlert* alert = new(std::nothrow) BAlert(title, message,
 		B_TRANSLATE("Close"));
 
 	if (alert != NULL)

@@ -55,6 +55,7 @@ private:
 
 private:
 			void				_BuildMenu(BMenuBar* menuBar);
+			void				_InitWorkerThreads();
 			void				_AdoptModel();
 
 			void				_AdoptPackage(const PackageInfoRef& package);
