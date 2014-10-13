@@ -119,6 +119,7 @@ void
 IconsSaver::StopSaver()
 {
 	delete[] fIcons;
+	fIcons = NULL;
 }
 
 
