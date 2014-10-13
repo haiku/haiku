@@ -29,25 +29,6 @@ GravityView::GravityView(BRect frame, Gravity* parent)
 	fShade(parent->Config.ShadeID)
 {
 	Particle::Initialize(fSize, fShade);
-
-	LockGL();
-
-	glClearDepth(1.0f);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f, frame.Width() / frame.Height(), 2.0f, 20000.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glTranslatef(0.0f, 0.0f, -30.0f);
-
-	glDepthMask(GL_FALSE);
-
-	UnlockGL();
 }
 
 
@@ -63,6 +44,22 @@ GravityView::AttachedToWindow()
 {
 	LockGL();
 	BGLView::AttachedToWindow();
+
+	glClearDepth(1.0f);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0f, Bounds().Width() / Bounds().Height(), 2.0f, 20000.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glTranslatef(0.0f, 0.0f, -30.0f);
+
+	glDepthMask(GL_FALSE);
+
 	UnlockGL();
 }
 

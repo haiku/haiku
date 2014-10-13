@@ -24,32 +24,11 @@
 GLifeView::GLifeView(BRect rect, const char* name, ulong resizingMode,
 	ulong options, GLifeState* pglsState)
 	:
-	BGLView(rect, name, resizingMode, 0, options),
+	BGLView(rect, name, resizingMode, B_FRAME_EVENTS | B_WILL_DRAW, options),
 	m_pglsState(pglsState)
 {
 	// Setup the grid
 	m_pglgGrid = new GLifeGrid(pglsState->GridWidth(), pglsState->GridHeight());
-
-	LockGL();
-	
-	glClearDepth(1.0);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_DEPTH_TEST);
-	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-#if 0	
-	glShadeModel(GL_SMOOTH);
-#endif
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0, rect.Width() / rect.Height(), 2.0, 20000.0);
-	glTranslatef(0.0, 0.0, -50.0);
-	glMatrixMode(GL_MODELVIEW);
-	
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	
-	UnlockGL();
 }
 
 
@@ -68,6 +47,24 @@ GLifeView::AttachedToWindow(void)
 {
 	LockGL();
 	BGLView::AttachedToWindow();
+	
+	glClearDepth(1.0);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+#if 0	
+	glShadeModel(GL_SMOOTH);
+#endif
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0, Bounds().Width() / Bounds().Height(), 2.0, 20000.0);
+	glTranslatef(0.0, 0.0, -50.0);
+	glMatrixMode(GL_MODELVIEW);
+	
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	
 	UnlockGL();
 }
 
