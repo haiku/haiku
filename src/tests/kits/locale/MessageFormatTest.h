@@ -16,6 +16,7 @@ public:
 	virtual			~MessageFormatTest();
 
 			void	TestFormat();
+			void	TestBogus();
 
 	static	void	AddTests(BTestSuite& suite);
 };

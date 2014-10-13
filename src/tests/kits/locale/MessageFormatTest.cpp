@@ -34,7 +34,7 @@ MessageFormatTest::TestFormat()
 		int32 number;
 		const char* expected;
 	};
-	
+
 	static const char* polishTemplate = "{0, plural, one{Wybrano # obiekt} "
 		"few{Wybrano # obiekty} many{Wybrano # obiektów} "
 		"other{Wybrano # obyektu}}";
@@ -64,6 +64,40 @@ MessageFormatTest::TestFormat()
 }
 
 
+void
+MessageFormatTest::TestBogus()
+{
+	struct Test {
+		const char* pattern;
+	};
+
+	static const Test tests[] = {
+		{ "{0, plural, one{# dog} other{# dogs}" }, // Missing closing brace
+		{ "{0, plural, one{# dog}, other{# dogs}}" }, // Extra comma
+		{ "{0, plural, one{# dog}" }, // Missing "other"
+		{ "{4099, plural, one{# dog} other{# dogs}}" }, // Out of bounds arg
+		{ "{0, invalid, one{# dog} other{# dogs}}" }, // Invalid rule
+		{ NULL }
+	};
+
+	for (int i = 0; tests[i].pattern != NULL; i++) {
+		NextSubTest();
+
+		status_t result;
+		BString output;
+
+		BMessageFormat formatter(tests[i].pattern);
+		CPPUNIT_ASSERT(formatter.InitCheck() != B_OK);
+
+		result = formatter.Format(output, 1);
+		CPPUNIT_ASSERT(result != B_OK);
+
+		result = formatter.Format(output, 2);
+		CPPUNIT_ASSERT(result != B_OK);
+	}
+}
+
+
 /*static*/ void
 MessageFormatTest::AddTests(BTestSuite& parent)
 {
@@ -71,6 +105,8 @@ MessageFormatTest::AddTests(BTestSuite& parent)
 
 	suite.addTest(new CppUnit::TestCaller<MessageFormatTest>(
 		"MessageFormatTest::TestFormat", &MessageFormatTest::TestFormat));
+	suite.addTest(new CppUnit::TestCaller<MessageFormatTest>(
+		"MessageFormatTest::TestBogus", &MessageFormatTest::TestBogus));
 
 	parent.addTest("MessageFormatTest", &suite);
 }

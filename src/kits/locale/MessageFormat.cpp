@@ -77,6 +77,9 @@ BMessageFormat::SetFormattingConventions(
 status_t
 BMessageFormat::Format(BString& output, const int32 arg) const
 {
+	if (fInitStatus != B_OK)
+		return fInitStatus;
+
 	BAutolock lock(fLock);
 	if (!lock.IsLocked())
 		return B_ERROR;
