@@ -204,9 +204,9 @@ RemotePackageRepository HaikuPorts
 	make-3.82-5
 	man-1.6g-4
 	mercurial-2.9.2-1
-	mesa-7.9.2-6
-	mesa_devel-7.9.2-6
-	mesa_swrast-7.9.2-6
+	mesa-7.9.2-9
+	mesa_devel-7.9.2-9
+	mesa_swrast-7.9.2-9
 	milkytracker-0.90.86-1
 	mirrormagic-2.0.2-1
 	mkdepend-1.7-3
