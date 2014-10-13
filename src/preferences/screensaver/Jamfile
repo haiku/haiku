@@ -8,7 +8,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons screen_saver ] : true ;
 UsePrivateHeaders screen_saver ;
 SubDirSysHdrs $(SUBDIR) ;
 
-Preference ScreenSaver : 
+Preference ScreenSaver :
 	ScreenSaverApp.cpp
 	ScreenSaverWindow.cpp
 	PasswordWindow.cpp
@@ -19,7 +19,8 @@ Preference ScreenSaver :
 		# needed for some old/broken screen saver add-ons that do not
 		# link against libscreensaver.so
 	: be game libscreensaver.so localestub tracker [ TargetLibstdc++ ]
-	: ScreenSaver.rdef 
+	[ BuildFeatureAttribute mesa : library ]
+	: ScreenSaver.rdef
 	;
 
 SEARCH on [ FGristFiles
