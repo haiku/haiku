@@ -1,0 +1,3 @@
+// C++ doesn't handle hex floats properly...
+long double LDBL_MAX = 0xfffffffffffffffp16320l;
+long double LDBL_MIN = 0x1p-16382l;
