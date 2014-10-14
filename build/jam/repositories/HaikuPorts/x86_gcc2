@@ -515,7 +515,7 @@ RemotePackageRepository HaikuPorts
 	pixman_x86_devel-0.32.6-1
 	pkgconfig_x86-0.27.1-2
 	protrekkr_x86-2.5.4-2
-	qemu_x86-2.1.0-3
+	qemu_x86-2.1.2-1
 	qca2_x86-2.0.3-1
 	qca2_x86_devel-2.0.3-1
 	qjson_x86-0.8.1-1
