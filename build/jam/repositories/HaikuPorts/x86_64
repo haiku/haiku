@@ -71,8 +71,8 @@ RemotePackageRepository HaikuPorts
 	groff-1.20.1-3
 	gutenprint-5.2.10-1
 	gutenprint_devel-5.2.10-1
-	haikuwebkit-1.4.5-1
-	haikuwebkit_devel-1.4.5-1
+	haikuwebkit-1.4.5-2
+	haikuwebkit_devel-1.4.5-2                                             
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
 	icu-54.1-3
