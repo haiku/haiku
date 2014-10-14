@@ -46,7 +46,6 @@ USBDevsHeaderGen [ FGristFiles usbdevs.h usbdevs_data.h ] : usbdevs
 
 rule PCIHeaderGen
 {
-	SEARCH on $(2) = $(SEARCH_SOURCE) ;
 	SEARCH on $(3) = $(SEARCH_SOURCE) ;
 
 	Depends $(1) : $(2) $(3) ;
@@ -60,14 +59,13 @@ actions PCIHeaderGen1
 	gawk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
 }
 
-local pciidsFile = [ DownloadFile pci.ids
-			: http://www.haiku-files.org/files/pci.ids ] ;
+local pciidsFile = pci.ids ;
+SEARCH on $(pciidsFile) = [ FDirName $(HAIKU_TOP) src data ids ] ;
 
 PCIHeaderGen [ FGristFiles pcihdr.h ] : $(pciidsFile) : pci-header.awk ;
 
 rule USBHeaderGen
 {
-	SEARCH on $(2) = $(SEARCH_SOURCE) ;
 	SEARCH on $(3) = $(SEARCH_SOURCE) ;
 
 	Depends $(1) : $(2) $(3) ;
@@ -81,8 +79,8 @@ actions USBHeaderGen1
 	gawk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
 }
 
-local usbidsFile = [ DownloadFile usb.ids
-			: http://www.haiku-files.org/files/usb.ids ] ;
+local usbidsFile = usb.ids ;
+SEARCH on $(usbidsFile) = [ FDirName $(HAIKU_TOP) src data ids ] ;
 
 USBHeaderGen [ FGristFiles usbhdr.h ] : $(usbidsFile) : usb-header.awk ;
 
@@ -97,7 +95,7 @@ Application Devices :
 	PropertyList.cpp
 	PropertyListPlain.cpp
 	: be libcolumnlistview.a tracker [ TargetLibsupc++ ]
-		[ TargetLibstdc++ ]	localestub 
+		[ TargetLibstdc++ ]	localestub
 	: Devices.rdef
 ;
 
