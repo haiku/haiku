@@ -4,7 +4,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 resource(1, "META:TYPE") "text/xml";
 
 resource(2, "META:SNIFF_RULE") #'CSTR' array {
-	"0.2 (\"<?xml\")"
+	"0.251 [0:15] (\"<?xml\" | \"<\\000x\\000m\\000l\")"
 };
 
 resource(2, "META:S:DESC") #'MSDC' "XML file";
