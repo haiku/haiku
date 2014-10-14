@@ -4,7 +4,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 resource(1, "META:TYPE") "multipart/related";
 
 resource(2, "META:SNIFF_RULE") #'CSTR' array {
-	"0.50  [0:256]( -i \"Content-Type: multipart-related;\")"
+	"0.50  [0:256]( -i \"Content-Type: multipart/related;\")"
 };
 
 resource(3, "META:S:DESC") #'MSDC' "MHTML file";
