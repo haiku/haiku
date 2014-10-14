@@ -7,18 +7,20 @@ resource app_version {
 	variety    = B_APPV_ALPHA,
 	internal   = 0,
 	short_info = "WebPositive",
-	long_info  = "WebPositive ©2007-2012 The WebKit Haiku Project"
+	long_info  = "WebPositive ©2007-2014 The WebKit Haiku Project"
 };
 
 resource app_flags B_SINGLE_LAUNCH;
 
 resource file_types message {
 	"types" = "text/html",
+	"types" = "text/xml",
 	"types" = "multipart/related",
 	"types" = "image/gif",
 	"types" = "image/jpeg",
 	"types" = "image/png",
 	"types" = "image/svg+xml",
+	"types" = "image/webp",
 	"types" = "application/xhtml+xml",
 	"types" = "application/x-vnd.Be.URL.file",
 	"types" = "application/x-vnd.Be.URL.ftp",
