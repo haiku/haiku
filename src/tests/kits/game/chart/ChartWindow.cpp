@@ -1504,6 +1504,13 @@ ChartWindow::ChangeSetting(setting new_set)
 			/* this need to be atomic in regard of DirectConnected */
 			while (acquire_sem(fDrawingLock) == B_INTERRUPTED)
 				;
+
+			// Clear the non-direct view, which may still be drawn
+			fChartView->LockLooper();
+			fChartView->SetHighColor(fCurrentSettings.back_color);
+			fChartView->FillRect(fChartView->Bounds());
+			fChartView->UnlockLooper();
+
 			/* synchronise the camera geometry and the direct buffer geometry */
 			SetGeometry(fDirectBuffer.buffer_width, fDirectBuffer.buffer_height);
 			/* cancel erasing of stars not in visible part of the direct window */
