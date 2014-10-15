@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -34,7 +34,6 @@ public:
 
 	virtual	void			MessageReceived(BMessage* message);
 	virtual	void			Draw(BRect updateRect);
-	virtual	void			GetPreferredSize(float *width, float *height);
 
 
 protected:
@@ -67,8 +66,6 @@ protected:
 			time_t			fTimeLeft;
 			bool			fOnline;
 			bool			fHasBattery;
-
-			BSize			fPreferredSize;
 };
 
 
