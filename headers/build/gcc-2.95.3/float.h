@@ -74,7 +74,7 @@
 #define LDBL_DIG 18
    /* Difference between 1.0 and the minimum long double greater than 1.0 */
 #undef LDBL_EPSILON
-#define LDBL_EPSILON 0x1p-63l
+#define LDBL_EPSILON 1.0842021724855044340075E-19L
    /* Minimum int x such that FLT_RADIX**(x-1) is a normalised long double */
 #undef LDBL_MIN_EXP
 #define LDBL_MIN_EXP (-16381)
@@ -89,7 +89,7 @@
 #define LDBL_MAX_EXP 16384
    /* Maximum long double */
 #undef LDBL_MAX
-#define LDBL_MAX 0xfffffffffffffffp16320l
+#define LDBL_MAX 1.1897314953572317650213E+4932L
    /* Maximum int x such that 10**x is a representable long double */
 #undef LDBL_MAX_10_EXP
 #define LDBL_MAX_10_EXP 4932
