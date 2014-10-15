@@ -19,7 +19,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ImathRandom.cpp
 			ImathShear.cpp
 			ImathVec.cpp
-			gcc2fix.c
 			;
 	}
 }

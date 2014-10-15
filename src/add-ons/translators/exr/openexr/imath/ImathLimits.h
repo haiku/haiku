@@ -46,10 +46,6 @@
 #include <float.h>
 #undef LDBL_EPSILON
 #define LDBL_EPSILON 2.2204460492503131e-16L
-#undef LDBL_MAX
-#undef LDBL_MIN
-extern "C" long double LDBL_MAX;
-extern "C" long double LDBL_MIN;
 #include <limits.h>
 
 //------------------------------------------
