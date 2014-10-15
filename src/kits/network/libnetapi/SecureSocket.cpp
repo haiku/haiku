@@ -95,6 +95,9 @@ BSecureSocket::Private::CreateContext()
 {
 	sContext = SSL_CTX_new(SSLv23_method());
 
+	// Disable legacy protocols. They have known vulnerabilities.
+	SSL_CTX_set_options(sContext, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
+
 	// Setup certificate verification
 	BPath certificateStore;
 	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
