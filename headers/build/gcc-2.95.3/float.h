@@ -80,7 +80,7 @@
 #define LDBL_MIN_EXP (-16381)
    /* Minimum normalised long double */
 #undef LDBL_MIN
-#define LDBL_MIN 0x1p-16382l
+#define LDBL_MIN 3.3621031431120935062627E-4932L
    /* Minimum int x such that 10**x is a normalised long double */
 #undef LDBL_MIN_10_EXP
 #define LDBL_MIN_10_EXP (-4931)
