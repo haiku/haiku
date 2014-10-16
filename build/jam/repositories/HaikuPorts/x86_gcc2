@@ -457,8 +457,8 @@ RemotePackageRepository HaikuPorts
 	libpcre_x86_devel-8.33-2
 	libpng_x86-1.5.12-3
 	libpng_x86_devel-1.5.12-3
-	libqt4_x86-4.8.6.2-1
-	libqt4_x86_devel-4.8.6.2-1
+	libqt4_x86-4.8.6.4-1
+	libqt4_x86_devel-4.8.6.4-1
 	libsdl_x86-1.2.15-5
 	libsdl_x86_devel-1.2.15-5
 	libsdl2_x86-2.0.1-3
