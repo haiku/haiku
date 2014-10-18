@@ -286,12 +286,6 @@ for linkTarget in $(SYSTEM_DEMOS) {
 AddFilesToPackage data deskbar : <deskbar>menu_entries ;
 
 
-# optional
-# TODO: We should probably build another package (including the data files
-# above) that can be installed, if desired.
-AddFilesToPackage optional add-ons input_server methods : canna ;
-
-
 # PDF Writer enconding files
 CopyDirectoryToPackage data
 	: [ FDirName $(HAIKU_TOP) src add-ons print drivers pdf encoding ]
