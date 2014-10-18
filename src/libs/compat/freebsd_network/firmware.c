@@ -53,6 +53,11 @@ firmware_get(const char* fbsdFirmwareName)
 	char*				firmwarePath = NULL;
 	const char*			haikuFirmwareName = NULL;
 	ssize_t				readCount = 0;
+	directory_which		checkDirs[] = { B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
+							B_SYSTEM_DATA_DIRECTORY };
+	size_t				numCheckDirs
+							= sizeof(checkDirs) / sizeof(checkDirs[0]);
+	size_t				i = 0;
 
 	haikuFirmwareName = getHaikuFirmwareName(fbsdFirmwareName,
 		fbsdFirmwareName);
@@ -61,17 +66,24 @@ firmware_get(const char* fbsdFirmwareName)
 	if (firmwarePath == NULL)
 		goto cleanup;
 
-	if (find_directory(B_SYSTEM_DATA_DIRECTORY, -1, false,
-		firmwarePath, B_PATH_NAME_LENGTH) != B_OK)
-		goto cleanup;
 
-	strlcat(firmwarePath, "/firmware/", B_PATH_NAME_LENGTH);
-	strlcat(firmwarePath, gDriverName, B_PATH_NAME_LENGTH);
-	strlcat(firmwarePath, "/", B_PATH_NAME_LENGTH);
-	strlcat(firmwarePath, haikuFirmwareName, B_PATH_NAME_LENGTH);
+	for (; i < numCheckDirs; i++) {
+		if (find_directory(checkDirs[i], -1, false, firmwarePath,
+				B_PATH_NAME_LENGTH) != B_OK) {
+			continue;
+		}
 
-	fileDescriptor = open(firmwarePath, B_READ_ONLY);
-	if (fileDescriptor == -1)
+		strlcat(firmwarePath, "/firmware/", B_PATH_NAME_LENGTH);
+		strlcat(firmwarePath, gDriverName, B_PATH_NAME_LENGTH);
+		strlcat(firmwarePath, "/", B_PATH_NAME_LENGTH);
+		strlcat(firmwarePath, haikuFirmwareName, B_PATH_NAME_LENGTH);
+
+		fileDescriptor = open(firmwarePath, B_READ_ONLY);
+		if (fileDescriptor >= 0)
+			break;
+	}
+
+	if (fileDescriptor < 0)
 		goto cleanup;
 
 	firmwareFileSize = lseek(fileDescriptor, 0, SEEK_END);
