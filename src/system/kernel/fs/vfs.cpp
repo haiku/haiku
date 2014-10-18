@@ -882,7 +882,7 @@ lookup_vnode(dev_t mountID, ino_t vnodeID)
 	If the node already exists, it is returned instead and no new node is
 	created. In either case -- but not, if an error occurs -- the function write
 	locks \c sVnodeLock and keeps it locked for the caller when returning. On
-	error the lock is not not held on return.
+	error the lock is not held on return.
 
 	\param mountID The mount ID.
 	\param vnodeID The vnode ID.
