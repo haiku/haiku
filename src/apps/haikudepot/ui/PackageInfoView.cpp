@@ -179,6 +179,8 @@ public:
 		fEnabled(true),
 		fMouseInside(false)
 	{
+		SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+		SetExplicitMinSize(BSize(120, B_SIZE_UNSET));
 		_UpdateLinkColor();
 	}
 
@@ -198,6 +200,27 @@ public:
 	{
 		if (fEnabled)
 			Invoke(Message());
+	}
+
+	virtual void Draw(BRect updateRect)
+	{
+		if (Text() == NULL)
+			return;
+
+		SetLowColor(ViewColor());
+
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+	
+		BRect bounds = Bounds();
+	
+		float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
+			- ceilf(fontHeight.descent)) / 2.0 + ceilf(fontHeight.ascent);
+		float x = 0.0f;
+		
+		BString text(Text());
+		TruncateString(&text, B_TRUNCATE_END, bounds.Width());
+		DrawString(text, BPoint(x, y));
 	}
 
 	void SetEnabled(bool enabled)
@@ -817,7 +840,6 @@ public:
 						.Add(fWebsiteIconView, 0, 1)
 						.Add(fWebsiteLinkView, 1, 1)
 					.End()
-					.AddGlue()
 				.End()
 				.SetInsets(B_USE_DEFAULT_SPACING)
 				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
