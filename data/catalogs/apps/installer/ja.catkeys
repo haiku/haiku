@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	3930183175
+1	japanese	x-vnd.Haiku-Installer	1426425234
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		インストールを中止して、システムを再起動しますか?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Haiku インストーラー\n\tJérôme Duval および Stephan Aßmus 作\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -16,12 +16,14 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		ブートマネージャーを終了
 Stop	InstallerWindow		中断
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		os-proberのアプローチがうまくいかない場合、GRUB 2 は、ブートメニューにカスタム項目を追加するために特別な設定ファイルを使用します。項目をメニューの先頭に表示するには、次のようにターミナルから好みのエディターを起動してファイルを作成/編集する必要があります:\n\n
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		メニューからインストール元とインストール先を選択してから\"開始\"ボタンをクリックしてください。
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
 Install from:	InstallerWindow		インストール元:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		Haikuをインストールする前の注意\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		GRUBの命名規則は' (hdN,n) です。\n\n
 Continue	InstallerWindow	In alert after pressing Stop	続ける
 Write boot sector to '%s'	InstallerWindow		ブートセクターを '%s' に書き込む
 Collecting copy information.	InstallProgress		コピー元の情報を集めています…
@@ -42,6 +44,7 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		インストール先ディスクの空き容量が不足している可能性があります。他のディスクを選択するか、インストールするオプションを減らしてください。
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Haiku インストーラーを閉じる前に Boot Manager と DriveSetup を終了してください。
 Scanning for disks…	InstallerWindow		ディスクを検出しています…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		このディスクをマウントできません。他のディスクを選択してください。
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -86,6 +89,7 @@ With GRUB 2 the first logical partition always has the number \"5\", regardless 
 Write boot sector	InstallerWindow		ブートセクターを書き込む
 Cancel	InstallerWindow		中止
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		パーティションを設定するDriveSetupアプリケーションが起動できません。
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先ボリュームにはデータがあります。それでもインストールしますか?\n\n注意: システムフォルダーはインストール元からそのままクリーンコピーされますが、その他のフォルダーはマージされ、両方のボリュームに存在するファイルやリンクはインストール元のバージョンで上書きされます。
 No optional packages available.	PackagesView		オプショナルパッケージはありません。
 All hard disks start with \"hd\".\n	InstallerApp		すべてのディスクは \"hd\" で始まります。\n
 Continue	InstallerApp		続ける

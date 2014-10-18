@@ -1,0 +1,22 @@
+1	german	x-vnd.Haiku-PSDTranslator	489719358
+Lab	PSDLoader		Lab
+Uncompressed	PSDConfig		Nicht komprimiert
+Indexed	PSDLoader		Indiziert
+Grayscale	PSDLoader		Graustufen
+Photoshop image translator	PSDConfig		Photoshop-Bild-Translator
+Photoshop image translator	PSDTranslator		Photoshop-Bild-Translator
+Version %d.%d.%d, %s	PSDConfig		Version %d.%d.%d, %s
+Photoshop image	PSDTranslator		Photoshop-Bilder
+RLE	PSDConfig		RLE
+Photoshop Document (PSD File)	PSDConfig		Photoshop Dokument (PSD Datei)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Photoshop Bild (%s)
+Photoshop Big Document (PSB File)	PSDConfig		Photoshop Big Dokument (PSB Datei)
+PSDTranslator Settings	PSDConfig		PSDTranslator Eigenschaften
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitmap
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Komprimierung: 
+Format: 	PSDConfig		Format: 
+Multichannel	PSDLoader		Mehrkanal
+Duotone	PSDLoader		Duotone

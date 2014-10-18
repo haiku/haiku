@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MidiPlayer	471142057
+1	russian	x-vnd.Haiku-MidiPlayer	3558603571
 None	Main Window		Нет
 Live input:	Main Window		Прямой ввод:
 Stop	Main Window		Остановить
@@ -6,6 +6,7 @@ Cavern	Main Window		Пещера
 Volume:	Main Window		Громкость:
 Reverb:	Main Window		Реверберация:
 OK	Main Window		ОК
+Loading instruments…	Scope View		Загрузка инструментов…
 Off	Main Window		Выключить
 Dungeon	Main Window		Подземелье
 Play	Main Window		Проиграть

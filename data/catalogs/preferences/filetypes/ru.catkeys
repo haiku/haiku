@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-FileTypes	3116280330
+1	russian	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		Типы приложений…
 Description:	Application Types Window		Описание:
 Args only	Application Type Window		Только аргументы
@@ -52,6 +52,7 @@ Set preferred application	Preferred App Menu		Установить предпо�
 Don't save	Application Type Window		Не сохранять
 Save changes before closing?	Application Type Window		Сохранить изменения перед выходом?
 File	Application Type Window		Файл
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# типов приложений было удалено} few{# типа приложений было удалено} other{# типов приложений было удалено}}
 Version:	Application Type Window		Версия:
 Select…	FileTypes Window		Выбрать…
 FileTypes request	FileTypes		Запрос типа файла

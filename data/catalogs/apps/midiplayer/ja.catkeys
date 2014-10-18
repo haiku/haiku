@@ -1,11 +1,13 @@
-1	japanese	x-vnd.Haiku-MidiPlayer	471142057
+1	japanese	x-vnd.Haiku-MidiPlayer	1046133011
 None	Main Window		無し
 Live input:	Main Window		ライブ入力:
 Stop	Main Window		中止
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	This tiny program\nKnows how to play thousands of\nCheesy sounding songs
 Cavern	Main Window		Cavern (洞くつ)
 Volume:	Main Window		音量:
 Reverb:	Main Window		リバーブ:
 OK	Main Window		OK
+Loading instruments…	Scope View		インストゥルメントを読み込んでいます…
 Off	Main Window		無効
 Dungeon	Main Window		Dungeon (地下牢)
 Play	Main Window		再生

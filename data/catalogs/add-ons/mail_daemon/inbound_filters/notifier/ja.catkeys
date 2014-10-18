@@ -1,4 +1,5 @@
-1	japanese	x-vnd.Haiku-NewMailNotification	583443025
+1	japanese	x-vnd.Haiku-NewMailNotification	4243490201
+{0, plural, one{# new message} other{# new messages}}	filter		{0, plural, one{# 件の新着メッセージ} other{# 件の新着メッセージ}}
 Keyboard LEDs	ConfigView		キーボードLED
 Log window	ConfigView		ログウィンドウ
 Central beep	ConfigView		ビープ音 (すべてのアカウント)
@@ -7,6 +8,7 @@ Method:	ConfigView		方法:
 Central alert	ConfigView		警告ウィンドウ (すべてのアカウント)
 Alert	ConfigView		警告ウィンドウ
 none	ConfigView		無し
+You have {0, plural, one{# new message} other{# new messages}} for %account.	filter		%account 宛に {0, plural, one{# 件の新着メッセージ} other{# 件の新着メッセージ}} 。
 New messages	filter		新着メッセージ
 New mails notification	ConfigView		新着メール通知
 OK	filter		OK

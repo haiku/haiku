@@ -1,49 +1,133 @@
-1	german	x-vnd.Haiku-HaikuDepot	443107378
+1	german	x-vnd.Haiku-HaikuDepot	3819510430
 Name	PackageListView		Name
+Source code	FilterView		Quellcode
+Close	RatePackageWindow		Schließen
+The captcha puzzle needs to be solved.	UserLoginWindow		Die Captcha-Frage muss beantwortet werden.
 Changelog	PackageInfoView		Änderungsprotokoll
+Your rating:	RatePackageWindow		Eigene Bewertung:
+The passwords do not match.	UserLoginWindow		Die Passwörter stimmen nicht überein.
+Log in…	MainWindow		Anmelden…
+Rate %Package%	RatePackageWindow		%Package% bewerten
+Stability:	RatePackageWindow		Stabilität:
 Click a package to view information	PackageInfoView		Paket anklicken, um Infos anzuzeigen
+Other users can see this rating	RatePackageWindow		Diese Bewertung ist für andere Anwender sichtbar
+Stability	RatePackageWindow		Stabilität
 for %Version%	PackageInfoView		für %Version%
 No changelog available.	PackageInfoView		Änderungsprotokoll nicht vorhanden.
 Depot:	FilterView		Depot:
 Description	PackageListView		Beschreibung
 Install	PackageManager		Installieren
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Anmeldung fehlgeschlagen. Entweder dieses Benutzerkonto existiert nicht oder es wurde ein falsches Kennwort eingegeben.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Benutzerkonto erfolgreich angelegt. Jetzt können Pakete bewertet werden, etc.
 Tools	MainWindow		Werkzeuge
 HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		Schließen
 Rate package…	PackageInfoView		Paket bewerten…
+Category	FilterView		Kategorie
 Uninstall	PackageManager		Deinstallieren
+An error occurred while obtaining the package list: %message%	MainWindow		Beim Anfordern der Paketliste trat ein Fehler auf: %message%
+Your rating was updated successfully.	RatePackageWindow		Die Bewertung wurde erfolgreich aktualisiert.
 <no info>	PackageInfoView		<keine Info>
 An error occurred while initializing the package manager: %message%	MainWindow		Bei der Initialisierung des Paketmanagers trat ein Fehler auf: %message%
+Email address:	UserLoginWindow		E-Mail-Adresse:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Die Bewertung wurde erfolgreich hochgeladen. Sie kann jederzeit durch eine erneute Bewertung aktualisiert oder gelöscht werden.
+Very unstable	RatePackageWindow		Sehr instabil
+The username is already taken. Please choose another.	UserLoginWindow		Dieser Benutzername ist bereits vergeben. Bitte einen anderen versuchen.
 Close	PackageManager		Schließen
+Not logged in	MainWindow		Nicht angemeldet
+The authentication was successful.	UserLoginWindow		Anmeldung erfolgreich.
 Status	PackageListView		Status
+Ignore	UserLoginWindow		Ignorieren
+Language	UserLoginWindow		Sprache
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Das Kennwort ist zu schwach oder ungültig. Es muss mindestens 8 Zeichen lang sein und mindestens 2 Zahlen und 2 Großbuchstaben enthalten.
+Rate package	RatePackageWindow		Paket bewerten
 Development	Model		Programmierung
 Fatal error	PackageManager		Schwerwiegender Fehler
+The user name needs to be at least 3 letters long.	UserLoginWindow		Der Benutzername muss mindestens 3 Zeichen lang sein.
+Log in	UserLoginWindow		Anmelden
+Repeat pass phrase:	UserLoginWindow		Zugangsphrase wiederholen:
 Ratings	PackageInfoView		Bewertungen
+But none could be listed here, sorry.	UserLoginWindow		Leider können sie hier nicht aufgeführt werden.
+System & Utilities	Model		Tools & System
 Inactive	PackageListView		Deaktiviert
 Refresh depots	MainWindow		Depots aktualisieren
+Science & Mathematics	Model		Wissenschaft
+Not logged in	FilterView		Nicht angemeldet
 Main Menu	MainWindow		Hauptmenü
 (%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Die Captcha-Frage wurde nicht richtig beantwortet.
+Success	UserLoginWindow		Erfolg
 Downloading:	PackageInfoView		Aktueller Download:
+Mostly stable	RatePackageWindow		#document
+There was a puzzling response from the web service.	RatePackageWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
+Log out	MainWindow		Abmelden
+Education	Model		Bildung
 Search terms:	FilterView		Suchbegriffe:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
+Failed to update rating	RatePackageWindow		Die Bewertung konnte nicht aktualisiert werden.
+Development	FilterView		Programmierung
+Does not start	RatePackageWindow		#document
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Bei der Aktualisierung des Depots trat ein Fehler auf: %error% (%details%)
+It was not possible to contact the web service.	RatePackageWindow		Der Web-Dienst konnte nicht erreicht werden.
+There are problems in the form:\n\n	UserLoginWindow		Es gibt Probleme mit dem Format:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Das Paket konnte nicht vom Web-Dienst gefunden werden. Wahrscheinlich stammt das Paket aus einem Depot, das nicht vom Web-Dienst verwaltet wird. Solche Pakete können leider nicht bewertet werden.
+Create account	UserLoginWindow		Benutzerkonto erstellen
 Productivity	Model		Büro
+Authentication failed	UserLoginWindow		Anmeldung fehlgeschlagen
+Language	RatePackageWindow		Sprache
 Size	PackageListView		Größe
+Failed to create or update rating: %s\n	RatePackageWindow		Anlegen oder Aktualisieren der Bewertung fehlgeschlagen: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
+ It responded with: 	RatePackageWindow		 Es hat geantwortet: 
+User name:	UserLoginWindow		Benutzername:
+Unstable but usable	RatePackageWindow		Instabil aber brauchbar
+The email address appears to be malformed.	UserLoginWindow		Das Format der angegebenen E-Mail-Adresse ist fehlerhaft.
 Games	Model		Spiele
 Rating	PackageListView		Bewertung
+Logged in as %User%	FilterView		Angemeldet als %User%
+There was a puzzling response from the web service.	UserLoginWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
 Graphics	Model		Grafik
 Local	MainWindow		Lokal
 Close	MainWindow		Schließen
+Preferred language:	UserLoginWindow		Bevorzugte Sprache:
+Failed to rate package	RatePackageWindow		Paket konnte nicht bewertet werden
+Internet & Network	Model		Internet & Netzwerk
+Available	FilterView		Verfügbar
+Cancel	MainWindow		Abbrechen
+Input validation	UserLoginWindow		Eingabeprüfung
+Update	RatePackageWindow		Aktualisieren
 Video	Model		Video
+All categories	FilterView		Alle Kategorien
 An error occurred while refreshing the repository: %error%	MainWindow		Bei der Aktualisierung des Depots trat ein Fehler auf: %error%
+Login or Create account	MainWindow		Anmelden oder Benutzerkonto anlegen
 Pending…	PackageListView		Ausstehend…
 Depot	FilterView		Depot
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# Objekt} other{# Objekte}}
 Uninstalled	PackageListView		Deinstalliert
+Stable	RatePackageWindow		Stabil
 Unknown	PackageListView		Unbekannt
 All depots	FilterView		Alle Depots
+Comment language:	RatePackageWindow		Kommentar-Sprache:
+Pass phrase:	UserLoginWindow		Zugangsphrase:
+Not specified	RatePackageWindow		Keine Angaben
 Available	PackageListView		Verfügbar
 n/a	PackageInfoView		n.v.
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Wird keine E-Mail-Adresse hinterlegt, kann das Kennwort nicht zurückgesetzt werden, wenn es mal vergessen wird.
+ It responded with: 	UserLoginWindow		 Es antwortete mit: 
+Authentication failed. Connection to the service failed.	UserLoginWindow		Anmeldung fehlgeschlagen. Verbindung zum Dienst nicht möglich.
+Cancel	RatePackageWindow		Abbrechen
+OK	UserLoginWindow		OK
+Installed	FilterView		Installiert
 Send	RatePackageWindow		Senden
+Category:	FilterView		Kategorie:
+Failed to create account	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden
+There are problems with the data you entered:\n\n	UserLoginWindow		Mit den eingegebenen Daten gab es Probleme:\n\n
+Success	RatePackageWindow		Erfolg
+Business	Model		Geschäft
 Audio	Model		Audio
 About	PackageInfoView		Über
 Active	PackageListView		Aktiviert
+It was not possible to contact the web service.	UserLoginWindow		Der Web-Dienst konnte nicht erreicht werden.
+Failed to create account: %s\n	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden: %s\n
+Cancel	UserLoginWindow		Abbrechen

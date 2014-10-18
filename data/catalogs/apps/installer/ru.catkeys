@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Installer	3930183175
+1	russian	x-vnd.Haiku-Installer	3997693180
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Вы уверены, что хотите прервать установку и перезагрузить компьютер?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\n\tразработал Jérôme Duval и Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -42,6 +42,7 @@ README	InstallerApp		Cопроводительная инструкция
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		На выбранном диске недостаточно места. Попробуйте выбрать другой диск или не устанавливайте опциональные пакеты.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Пожалуйста, закройте Менеджер загрузки и Разметки диска перед закрытием окна установщика.
 Scanning for disks…	InstallerWindow		Сканирование дисков…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Диск не может быть подключен. Пожалуйста, выберите другой диск.
 ?? of ??	InstallerWindow	Unknown progress	?? из ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n

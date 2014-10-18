@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-icon_o_matic	3825638410
+1	japanese	x-vnd.haiku-icon_o_matic	28048799
 Select All	Icon-O-Matic-PathManipulator		すべて選択
 Add Style	Icon-O-Matic-AddStylesCmd		スタイルを追加
 Color (#%02x%02x%02x)	Style name after dropping a color		カラー (#%02x%02x%02x)
@@ -118,6 +118,7 @@ Gradient	Icon-O-Matic-StyleTypes		グラデーション
 Min LOD	Icon-O-Matic-PropertyNames		Min LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON 属性
 Invert selection	Icon-O-Matic-Properties		選択範囲を反転
+Drop shapes	Icon-O-Matic-ShapesList		シェイプをドロップ
 Export as…	Icon-O-Matic-Menu-File		別形式でエクスポート…
 Transformation	Transformation		変形
 Click on an object in	Empty property list - 1st line		ここでプロパティを編集するために

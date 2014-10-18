@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PoorMan	4008245771
+1	german	x-vnd.Haiku-PoorMan	2059301223
 Website location	PoorMan		Website-Adresse
 Error Server	PoorMan		Serverfehler
 Settings…	PoorMan		Einstellungen…
@@ -34,6 +34,7 @@ Log to console	PoorMan		In Konsole loggen
 Directory: (none)	PoorMan		Ordner: (keiner)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Bitte den Ordner auswählen, der im Web veröffentlicht werden soll.\n\nDer Webserver kann den standardmäßigen \"public_html\" Ordner im home-Ordner erstellen oder einen frei zu wählenden Ordner benutzen.
 Log To Console	PoorMan		In Konsole loggen
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# Verbindung} other{# Verbindungen}}
 Connections	PoorMan		Verbindungen
 Status: Running	PoorMan		Status: Läuft
 Controls	PoorMan		Aktionen

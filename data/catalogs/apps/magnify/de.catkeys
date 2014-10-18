@@ -1,9 +1,10 @@
-1	german	x-vnd.Haiku-Magnify	233476436
+1	german	x-vnd.Haiku-Magnify	2046693978
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		no clip msg\n
 Make square	Magnify-Main		Quadratisches Fenster
 Copy image	Magnify-Main		Bild kopieren
 usage: magnify [size] (magnify size * size pixels)\n	Console		Gebrauch: Magnify [Größe] (Fenstergröße * Pixelgröße)\n
 Stick coordinates	Magnify-Main		Koordinaten einfrieren
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# Pixel/Pixel} other{# Pixel/Pixel}}
 Hide/Show grid	Magnify-Main		Gitter aus-/einblenden
 magnify: size must be a multiple of 4\n	Console		magnify: Größe muss ein Vielfaches von 4 sein\n
 Decrease pixel size	Magnify-Main		Pixel verkleinern

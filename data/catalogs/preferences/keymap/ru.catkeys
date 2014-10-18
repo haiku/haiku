@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Keymap	13775349
+1	russian	x-vnd.Haiku-Keymap	1257201884
 Dvorak	Keyboard Layout View		Дворак
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Вернуть
@@ -18,6 +18,7 @@ Spanish	Keyboard Layout View		Испанская
 Ukrainian (Mac)	Keyboard Layout View		Украинская (Mac)
 Belarusian	Keyboard Layout View		Белорусская
 Italian	Keyboard Layout View		Итальянская
+Polish (Typewriter)	Keyboard Layout View		Польская (печатная машинка)
 Tilde trigger	Keymap window		Тильда
 Grave trigger	Keymap window		Апостроф
 Role	Modifier keys window	As in the role of a modifier key	Роль
@@ -34,24 +35,33 @@ French	Keyboard Layout View		Французская
 Faeroese	Keyboard Layout View		Фарерская
 Japanese	Keyboard Layout View		Японская
 Bulgarian (Phonetic)	Keyboard Layout View		Болгарская (фонетическая)
+Dvorak (programmer's)	Keyboard Layout View		Дворак (программистская)
 Estonian	Keyboard Layout View		Эстонская
+Russian (Mac)	Keyboard Layout View		Русская (Mac)
 Defaults	Keymap window		По умолчанию
 Quit	Keymap window		Выйти
+Dutch	Keyboard Layout View		Голландская
 Switch shortcut keys to Haiku mode	Keymap window		Переключить раскладку в режим Haiku
 Circumflex trigger	Keymap window		Циркумфлекс
+Hebrew	Keyboard Layout View		Иврит
+ISO-9995	Keyboard Layout View		ISO-9995
 Diaeresis trigger	Keymap window		Диерезис
 Disabled	Modifier keys window	Do nothing	Отключено
 Belarusian (Latin)	Keyboard Layout View		Белорусская (латиница)
 Danish	Keyboard Layout View		Датская
 Open…	Keymap window		Открыть…
+Russian (Typewriter)	Keyboard Layout View		Русская (печатная машинка)
 Error: duplicate keys	Modifier keys window		Ошибка: дублирующиеся клавиши
 System:	Keymap window		Системные:
 Lithuanian	Keyboard Layout View		Литовская
 Finnish	Keyboard Layout View		Финская
 Svorak	Keyboard Layout View		Дворак
+Romanian	Keyboard Layout View		Румынская
 Set modifier keys…	Keymap window		Назначить клавиши-модификаторы…
 Option:	Modifier keys window	Option key role name	Option:
+Czech (Mac)	Keyboard Layout View		Чешская (Mac)
 Control	Keyboard Layout View	Control key	Control
+Portuguese	Keyboard Layout View		Португальская
 Switch shortcut keys	Keymap window		Переключение горячих клавиш
 Norwegian	Keyboard Layout View		Норвежская
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавиша Shift

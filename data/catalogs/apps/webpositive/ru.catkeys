@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	3528881455
+1	russian	x-vnd.Haiku-WebPositive	1130172675
 Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
@@ -18,6 +18,7 @@ Error opening downloads folder	Download Window		Ошибка открытия к
 Paste	WebPositive Window		Вставить
 Double-click or middle-click to open new tab.	Tab Manager		Нажатие средней кнопки или двойной клик откроет новую вкладку.
 Proxy username:	Settings Window		Имя пользователя прокси:
+Save page as…	WebPositive Window		Сохранить страницу как…
 Settings	Settings Window		Настройки
 %seconds seconds left	Download Window		осталось %seconds секунд
 Confirmation	WebPositive Window		Подтверждение

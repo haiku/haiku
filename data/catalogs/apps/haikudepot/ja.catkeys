@@ -1,48 +1,133 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	1399513809
+1	japanese	x-vnd.Haiku-HaikuDepot	3819510430
 Name	PackageListView		名前
+Source code	FilterView		ソースコード
+Close	RatePackageWindow		閉じる
+The captcha puzzle needs to be solved.	UserLoginWindow		Captcha パズルを解く必要があります。
 Changelog	PackageInfoView		変更履歴
+Your rating:	RatePackageWindow		評価:
+The passwords do not match.	UserLoginWindow		パスワードが一致しません。
+Log in…	MainWindow		ログイン…
+Rate %Package%	RatePackageWindow		%Package% を評価
+Stability:	RatePackageWindow		安定度:
 Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
+Other users can see this rating	RatePackageWindow		ほかのユーザーがこの評価を見ることができます
+Stability	RatePackageWindow		安定度
+for %Version%	PackageInfoView		%Version% に対して
 No changelog available.	PackageInfoView		変更記録はありません。
 Depot:	FilterView		Depot:
 Description	PackageListView		説明
 Install	PackageManager		インストール
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		認証に失敗しました。ユーザーが存在しないか、不正なパスワードが入力されました。
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		アカウントが正常に作成されました。これからパッケージの評価やほかの便利なことができます。
 Tools	MainWindow		ツール
 HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		閉じる
 Rate package…	PackageInfoView		パッケージを評価…
+Category	FilterView		分類
 Uninstall	PackageManager		アンインストール
+An error occurred while obtaining the package list: %message%	MainWindow		次のパッケージリストの取得中にエラーが発生しました: %message%
+Your rating was updated successfully.	RatePackageWindow		評価の更新に成功しました。
 <no info>	PackageInfoView		<情報無し>
 An error occurred while initializing the package manager: %message%	MainWindow		パッケージマネジャーの初期化中にエラーが発生しました: %message%
+Email address:	UserLoginWindow		メールアドレス:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		評価の更新に成功しました。もう一度パッケージを評価すれば、いつでも評価を更新または削除できます。
+Very unstable	RatePackageWindow		非常に不安定
+The username is already taken. Please choose another.	UserLoginWindow		ユーザー名はすでに使われています。他の名前を選んでください。
 Close	PackageManager		閉じる
+Not logged in	MainWindow		ログインしていません
+The authentication was successful.	UserLoginWindow		認証に成功しました。
 Status	PackageListView		状態
+Ignore	UserLoginWindow		無視
+Language	UserLoginWindow		言語
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		パスワードが弱すぎるか不正です。8 文字以上で、数字が 2 文字以上、大文字が 2 文字以上のパスワードを使用してください。
+Rate package	RatePackageWindow		パッケージを評価
 Development	Model		開発
 Fatal error	PackageManager		致命的なエラー
+The user name needs to be at least 3 letters long.	UserLoginWindow		ユーザー名は少なくとも 3 文字は必要です。
+Log in	UserLoginWindow		ログイン
+Repeat pass phrase:	UserLoginWindow		パスフレーズの再入力:
 Ratings	PackageInfoView		評価
+But none could be listed here, sorry.	UserLoginWindow		すみません。しかし、ここにはなにもリストされていません。
+System & Utilities	Model		システム & ユーティリティ
 Inactive	PackageListView		無効
 Refresh depots	MainWindow		Depot を更新
+Science & Mathematics	Model		科学 & 数学
+Not logged in	FilterView		ログインしていません
 Main Menu	MainWindow		メインメニュー
 (%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha パズルを正しく解いていません。
+Success	UserLoginWindow		成功
 Downloading:	PackageInfoView		ダウンロード中:
+Mostly stable	RatePackageWindow		ほとんど安定
+There was a puzzling response from the web service.	RatePackageWindow		ウェブサービスから不可解なレスポンスがあった。
+Log out	MainWindow		ログアウト
+Education	Model		教育
 Search terms:	FilterView		検索語句:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		ユーザー格付けがありません。
+Failed to update rating	RatePackageWindow		評価の更新に失敗しました
+Development	FilterView		開発
+Does not start	RatePackageWindow		開始しない
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		リポジトリの更新中にエラーが発生しました: %error% (%details%)
+It was not possible to contact the web service.	RatePackageWindow		ウェブサービスにコンタクトできなかった。
+There are problems in the form:\n\n	UserLoginWindow		次のフォームに問題があります:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		ウェブサービスはパッケージを見つけられませんでした。これは、おそらくここで追跡されていないデポからのパッケージであることを意味します。残念ながら、このようなパッケージの評価はサポートされていません。
+Create account	UserLoginWindow		アカウントの作成
 Productivity	Model		ビジネス
+Authentication failed	UserLoginWindow		認証に失敗しました
+Language	RatePackageWindow		言語
 Size	PackageListView		サイズ
+Failed to create or update rating: %s\n	RatePackageWindow		次の評価の作成または更新に失敗しました: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。
+ It responded with: 	RatePackageWindow		 反応する: 
+User name:	UserLoginWindow		ユーザー名:
+Unstable but usable	RatePackageWindow		不安定であるが有用
+The email address appears to be malformed.	UserLoginWindow		メールアドレスが不正なようです。
 Games	Model		ゲーム
 Rating	PackageListView		評価
+Logged in as %User%	FilterView		%User% としてログイン
+There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
 Graphics	Model		グラフィック
 Local	MainWindow		ローカル
 Close	MainWindow		閉じる
+Preferred language:	UserLoginWindow		優先言語:
+Failed to rate package	RatePackageWindow		パッケージの評価に失敗しました
+Internet & Network	Model		インターネット & ネットワーク
+Available	FilterView		利用可能
+Cancel	MainWindow		キャンセル
+Input validation	UserLoginWindow		入力検証
+Update	RatePackageWindow		更新
 Video	Model		ビデオ
+All categories	FilterView		すべての分類
 An error occurred while refreshing the repository: %error%	MainWindow		リポジトリの更新中にエラーが発生しました: %error%
+Login or Create account	MainWindow		ログインまたはアカウントの作成
 Pending…	PackageListView		保留中…
 Depot	FilterView		Depot
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# アイテム} other{# アイテム}}
 Uninstalled	PackageListView		アンインストール済み
+Stable	RatePackageWindow		安定
 Unknown	PackageListView		不明
 All depots	FilterView		すべて
+Comment language:	RatePackageWindow		コメント言語:
+Pass phrase:	UserLoginWindow		パスフレーズ:
+Not specified	RatePackageWindow		指定なし
 Available	PackageListView		利用可能
 n/a	PackageInfoView		利用不可
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		メールアドレスを入力しない場合、パスワードを忘れた時にリセットできないでしょう。
+ It responded with: 	UserLoginWindow		 次に反応する: 
+Authentication failed. Connection to the service failed.	UserLoginWindow		認証が失敗しました。サービスへの接続が失敗しました。
+Cancel	RatePackageWindow		キャンセル
+OK	UserLoginWindow		OK
+Installed	FilterView		インストール済
 Send	RatePackageWindow		送信する
+Category:	FilterView		分類:
+Failed to create account	UserLoginWindow		アカウントの作成に失敗しました
+There are problems with the data you entered:\n\n	UserLoginWindow		入力したデーターに問題があります:\n\n
+Success	RatePackageWindow		成功
+Business	Model		ビジネス
 Audio	Model		オーディオ
 About	PackageInfoView		パッケージについて
 Active	PackageListView		有効
+It was not possible to contact the web service.	UserLoginWindow		ウェブサービスにコンタクトできませんでした。
+Failed to create account: %s\n	UserLoginWindow		次のアカウントの作成に失敗しました: %s\n
+Cancel	UserLoginWindow		キャンセル

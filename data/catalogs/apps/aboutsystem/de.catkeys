@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-About	843957219
+1	german	x-vnd.Haiku-About	1763787961
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 durch die Autoren von Gutenprint. Alle Rechte vorbehalten.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (und seinen NewOS-Kernel)\n
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL und Remi Lefebvre.
@@ -16,11 +16,13 @@ Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. und dessen Programmier-Team für die Entwicklung von BeOS!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y. Takagi. Alle Rechte vorbehalten.
 Source Code: 	AboutView		Quellcode: 
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Prozessor:} other{# Prozessoren:}}
 Kernel:	AboutView		Kernel:
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman und Daniel Veillard. Alle Rechte vorbehalten.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Teile dieser Software sind urheberrechtlich geschützt.\nCopyright © 1996-2006 The FreeType Project. Alle Rechte vorbehalten.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Die Urheberrechte am Haiku-Code liegen bei Haiku, Inc., beziehungsweise bei den entsprechenden Autoren, die explizit im Quelltext aufgeführt sind. Haiku® und das HAIKU Logo® sind registrierte Marken von Haiku, Inc.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAlle Rechte vorbehalten.
+The HaikuPorts team\n	AboutView		Das HaikuPorts-Team\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB gesamt, %inaccessible MiB nicht verfügbar
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard, et al.
 Contributors:\n	AboutView		Mitwirkende:\n

@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	443107378
+1	hungarian	x-vnd.Haiku-HaikuDepot	1127371629
 Name	PackageListView		Név
+Close	RatePackageWindow		Bezárás
 Changelog	PackageInfoView		Változásnapló
 Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
 for %Version%	PackageInfoView		%Version% verzióhoz
@@ -9,6 +10,7 @@ Description	PackageListView		Leírás
 Install	PackageManager		Telepítés
 Tools	MainWindow		Eszközök
 HaikuDepot	System name		Raktár
+Close	UserLoginWindow		Bezárás
 Rate package…	PackageInfoView		Csomag értékelése…
 Uninstall	PackageManager		Eltávolítás
 <no info>	PackageInfoView		<nincs információ>
@@ -23,17 +25,27 @@ Refresh depots	MainWindow		Raktárak frissítése
 Main Menu	MainWindow		Főmenü
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Letöltés:
+There was a puzzling response from the web service.	RatePackageWindow		A webes szolgáltatás rejtélyes választ adott.
+Log out	MainWindow		Kijelentkezés
+Education	Model		Oktatás
 Search terms:	FilterView		Keresési feltétel:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
+Failed to update rating	RatePackageWindow		Az értékelés frissítése meghiúsult
+Development	FilterView		Fejlesztés
+Does not start	RatePackageWindow		Nem indul el
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Hiba történt a raktár frissítésekor: %error% (%details%)
+It was not possible to contact the web service.	RatePackageWindow		Nem sikerült elérni a webes szolgáltatást.
 Productivity	Model		Alkalmazások
 Size	PackageListView		Méret
+Failed to create or update rating: %s\n	RatePackageWindow		Az értékelés létrehozása vagy frissítése nem sikerült: %s\n
+ It responded with: 	RatePackageWindow		Ezt válaszolta:
 Games	Model		Játékok
 Rating	PackageListView		Értékelés
 Graphics	Model		Grafika
 Local	MainWindow		Helyi
 Close	MainWindow		Bezárás
+Available	FilterView		Elérhető
 Video	Model		Videó
 An error occurred while refreshing the repository: %error%	MainWindow		Hiba történt a raktár frissítése közben: %error%
 Pending…	PackageListView		Folyamatban…

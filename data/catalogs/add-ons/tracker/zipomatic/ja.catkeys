@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku.zip-o-matic	2241557251
+1	japanese	x-vnd.haiku.zip-o-matic	2924152822
 Stop	file:ZipOMaticWindow.cpp		中止
 Creating archive: %s	file:ZipOMaticWindow.cpp		アーカイブ %s を作成中
 Continue	file:ZipOMaticWindow.cpp		続ける
@@ -12,5 +12,6 @@ Stopped	file:ZipOMaticWindow.cpp		一時停止中
 Archive	file:ZipperThread.cpp		アーカイブ
 Error creating archive	file:ZipOMaticWindow.cpp		アーカイブの作成中にエラーが発生しました。
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		%ld 個の Zip-O-Matic が動作中です。\n\n
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# 個のファイルが追加されました。} other{# 個のファイルが追加されました。}}
 Archive created OK	file:ZipOMaticWindow.cpp		アーカイブを正常に作成しました。
 Stop them	file:ZipOMatic.cpp		これらを中止

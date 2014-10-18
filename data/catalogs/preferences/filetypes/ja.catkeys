@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-FileTypes	3116280330
+1	japanese	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		アプリケーションタイプ…
 Description:	Application Types Window		説明:
 Args only	Application Type Window		引数のみ
@@ -52,6 +52,7 @@ Set preferred application	Preferred App Menu		優先アプリケーションを�
 Don't save	Application Type Window		保存しない
 Save changes before closing?	Application Type Window		閉じる前に変更を保存しますか?
 File	Application Type Window		ファイル
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# 個のアプリケーションタイプが削除される可能性があります} other{# 個のアプリケーションタイプが削除される可能性があります}}
 Version:	Application Type Window		バージョン:
 Select…	FileTypes Window		選択…
 FileTypes request	FileTypes		ファイルタイプの登録

@@ -1,7 +1,16 @@
-1	russian	x-vnd.Haiku-HaikuDepot	443107378
+1	russian	x-vnd.Haiku-HaikuDepot	3227315095
 Name	PackageListView		Имя
+Source code	FilterView		Исходный код
+Close	RatePackageWindow		Закрыть
 Changelog	PackageInfoView		История изменений
+Your rating:	RatePackageWindow		Ваш рейтинг:
+The passwords do not match.	UserLoginWindow		Пароли не совпадают.
+Log in…	MainWindow		Войти…
+Rate %Package%	RatePackageWindow		Оценить %Package%
+Stability:	RatePackageWindow		Стабильность:
 Click a package to view information	PackageInfoView		Нажмите на пакет, чтобы увидеть информацию о нем
+Other users can see this rating	RatePackageWindow		Другие пользователи могут видеть этот рейтинг
+Stability	RatePackageWindow		Стабильность
 for %Version%	PackageInfoView		для %Version%
 No changelog available.	PackageInfoView		История изменений недоступна.
 Depot:	FilterView		Склад:
@@ -9,41 +18,89 @@ Description	PackageListView		Описание
 Install	PackageManager		Установить
 Tools	MainWindow		Инструменты
 HaikuDepot	System name		Склад
+Close	UserLoginWindow		Закрыть
 Rate package…	PackageInfoView		Оценить пакет…
+Category	FilterView		Категория
 Uninstall	PackageManager		Удалить
+An error occurred while obtaining the package list: %message%	MainWindow		Возникла ошибка при получении списка пакетов: %message%
+Your rating was updated successfully.	RatePackageWindow		Ваш рейтинг был успешно отправлен.
 <no info>	PackageInfoView		<нет информации>
 An error occurred while initializing the package manager: %message%	MainWindow		Возникла ошибка при инициализации менеджера пакетов: %message%
+Email address:	UserLoginWindow		Email адрес:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Ваш рейтинг был успешно отправлен. Вы можете изменить или удалить его в любой момент оценив пакет еще раз.
+Very unstable	RatePackageWindow		Очень нестабилен 
+The username is already taken. Please choose another.	UserLoginWindow		Такой логин уже занят, выберите другой.
 Close	PackageManager		Закрыть
+Not logged in	MainWindow		Вход не выполнен
+The authentication was successful.	UserLoginWindow		Авторизация прошла успешно.
 Status	PackageListView		Статус
+Ignore	UserLoginWindow		Игнорировать
+Language	UserLoginWindow		Язык
+Rate package	RatePackageWindow		Оценить пакет
 Development	Model		Разработка
 Fatal error	PackageManager		Неисправимая ошибка
 Ratings	PackageInfoView		Оценки
+System & Utilities	Model		Система и утилиты
 Inactive	PackageListView		Неактивный
 Refresh depots	MainWindow		Обновить склады
+Science & Mathematics	Model		Наука и математика
+Not logged in	FilterView		Вход не выполнен
 Main Menu	MainWindow		Главное меню
 (%Votes%)	PackageInfoView		(%Votes%)
+Success	UserLoginWindow		Выполнено успешно
 Downloading:	PackageInfoView		Загружается:
+Mostly stable	RatePackageWindow		В основном стабилен
+There was a puzzling response from the web service.	RatePackageWindow		Был получен странный ответ от веб сервера.
+Log out	MainWindow		Выход из системы
+Education	Model		Образование
 Search terms:	FilterView		Условия поиска:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.
+Failed to update rating	RatePackageWindow		Не удалось обновить рейтинг
+Development	FilterView		Разработчикам
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
+It was not possible to contact the web service.	RatePackageWindow		Не удалось связаться с веб сервером.
+Create account	UserLoginWindow		Создать учётную запись
 Productivity	Model		Офис
+Authentication failed	UserLoginWindow		Авторизация завершилась неудачно
+Language	RatePackageWindow		Язык
 Size	PackageListView		Размер
+Failed to create or update rating: %s\n	RatePackageWindow		Не удалось создать или изменить рейтинг: %s\n
+User name:	UserLoginWindow		Имя пользователя:
 Games	Model		Игры
 Rating	PackageListView		Оценка
+Logged in as %User%	FilterView		Выполнен вход под пользователем %User%
+There was a puzzling response from the web service.	UserLoginWindow		Был получен странный ответ от веб сервера.
 Graphics	Model		Графика
 Local	MainWindow		Локальный
 Close	MainWindow		Закрыть
+Preferred language:	UserLoginWindow		Предпочитаемый язык:
+Failed to rate package	RatePackageWindow		Не удалось оценить пакет
+Internet & Network	Model		Интернет и сеть
+Available	FilterView		Доступные
+Cancel	MainWindow		Отменить
+Update	RatePackageWindow		Обновить
 Video	Model		Видео
+All categories	FilterView		Все категории
 An error occurred while refreshing the repository: %error%	MainWindow		Возникла ошибка при обновлении репозитория: %error%
 Pending…	PackageListView		Ожидание…
 Depot	FilterView		Все склады
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# объект} few{# объекта} other{# объектов}}
 Uninstalled	PackageListView		Удаленные
+Stable	RatePackageWindow		Стабильный
 Unknown	PackageListView		Неизвестно
 All depots	FilterView		Все склады
+Not specified	RatePackageWindow		Не указана
 Available	PackageListView		Доступен
 n/a	PackageInfoView		н/д
+Cancel	RatePackageWindow		Отмена
+OK	UserLoginWindow		OK
+Installed	FilterView		Установлен
 Send	RatePackageWindow		Отправить
+Category:	FilterView		Категория:
+Failed to create account	UserLoginWindow		Не удалось создать учётную запись
+Business	Model		Бизнес
 Audio	Model		Аудио
 About	PackageInfoView		О программе
 Active	PackageListView		Активирован
+Cancel	UserLoginWindow		Отмена

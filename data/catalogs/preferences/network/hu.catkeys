@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-Network	3992214214
+1	hungarian	x-vnd.Haiku-Network	1167831177
 Choose automatically	EthernetSettingsView		Automatikus választás
+DNS:	EthernetSettingsView		DNS:
 Gateway:	EthernetSettingsView		Átjáró:
 Netmask:	EthernetSettingsView		Hálózati maszk:
 DHCP	EthernetSettingsView		DHCP (automatikus)
@@ -9,12 +10,15 @@ OK	EthernetSettingsView		Rendben
 IP address:	EthernetSettingsView		IP-cím:
 Adapter:	EthernetSettingsView		Hálózati kártya:
 Domain:	EthernetSettingsView		Tartomány:
+DNS list is invalid	EthernetSettingsView		A DNS lista érvénytelen
 Gateway is invalid	EthernetSettingsView		Az átjáró érvénytelen
 Revert	EthernetSettingsView		Visszaállít
+DNS Servers, comma-separated	EthernetSettingsView		DNS kiszolgálók, vesszővel elválasztva
 <no wireless networks found>	EthernetSettingsView		<nem található vezeték nélküli hálózat>
 Network	System name		Hálózat
 Mode:	EthernetSettingsView		Beállítás:
 IP address is invalid	EthernetSettingsView		Az IP-cím érvénytelen
+Hardware address:	EthernetSettingsView		Eszköz azonosítója:
 Network:	EthernetSettingsView		Hálózat:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		A net_servernek futnia kell az automatikus beállításokhoz!
 Disabled	EthernetSettingsView		Letiltva

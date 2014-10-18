@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-Pairs	2193803529
+1	russian	x-vnd.Haiku-Pairs	3324688924
 Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Не найдено достаточно векторных значков для начала игры; требуется как минимум %zu, найдено %zu.\n
 Expert (8x8)	PairsWindow		Эксперт (8x8)
 Beginner (4x4)	PairsWindow		Новичок (4x4)
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Вы завершили игру в {0, plural, one{# клик} few{# клика} other{# кликов}}.\n
 Quit game	PairsWindow		Выход
 Large	PairsWindow		Большая
 Small	PairsWindow		Маленькая

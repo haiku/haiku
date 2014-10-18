@@ -1,6 +1,7 @@
-1	polish	x-vnd.Haiku-libtracker	2070021838
+1	polish	x-vnd.Haiku-libtracker	137546976
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Wtyczki
+Mount settings…	ContainerWindow		Ustawienia montowania…
 Desktop	Model		Pulpit
 Identify	ContainerWindow		Rozpoznaj
 Warning space color	SettingsView		Błąd przestrzeni kolorów
@@ -212,6 +213,7 @@ Created:	InfoWindow		Stworzono:
 Copying: 	StatusWindow		Kopiowanie: 
 Capacity:	InfoWindow		Pojemność:
 Delete	FilePanelPriv		Kasuj
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# bajt)} few{(# bajty)} many{(# bajtów)} other{(# bajta)}}
 Save	FindPanel		Zapisz
 copy	FSUtils	filename copy	Kopiuj
 Temporary	FindPanel		Tymczasowy
@@ -247,6 +249,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		Nie możesz edytowa�
 Name	ContainerWindow		Nazwa
 Reverse order	ContainerWindow		Odwrócony porządek
 48 x 48	DeskWindow		48 x 48
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# element} few{# elementy} many{# elementów} other{# elementu}}
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Dodaj obecny folder
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nie można otworzyć \"%document\" przy użyciu aplikacji \"%app\" (Brakujący symbol: %symbol). \n
@@ -291,6 +294,7 @@ Cancel	PoseView		Anuluj
 You can't move or copy items to read-only volumes.	FSUtils		Nie możesz kopiować ani przenosić plików do woluminów tylko do odczytu.
 Unknown	FilePermissionsView		Nieznany
 All files and folders	FindPanel		Wszystkie pliki i foldery
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{dla # pliku} few{dla # plików} many{dla # plików} other{dla # pliku}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Nie można otworzyć \"%document\" (Brakujące biblioteki: %library). \n
 The Tracker must be running to see Info windows.	PoseView		Tracker musi być włączony by móc zobaczyć okno Informacje.
 Other	FilePermissionsView		Inne
@@ -329,6 +333,7 @@ New folder %ld	FSUtils		Nowy folder %ld
 All BeOS disks	AutoMounterSettings		Wszystkie dyski BeOS
 Used space color	SettingsView		Kolor zajętego miejsca
 Sorry, could not create a new folder.	FSUtils		Nie można utworzyć nowego folderu.
+Disk mount	TrackerSettingsWindow		Montowanie dysków
 multiple disks	FindPanel		wiele dysków
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Musisz upuścić obiekty na jednej z ikon dysków w oknie \"Disks\".
 Untitled clipping	PoseView		Wycinanie bez nazwy

@@ -1,5 +1,6 @@
-1	german	x-vnd.Haiku-Network	3992214214
+1	german	x-vnd.Haiku-Network	1167831177
 Choose automatically	EthernetSettingsView		Automatisch auswählen
+DNS:	EthernetSettingsView		DNS:
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Netzmaske:
 DHCP	EthernetSettingsView		DHCP
@@ -9,12 +10,15 @@ OK	EthernetSettingsView		OK
 IP address:	EthernetSettingsView		IP-Adresse:
 Adapter:	EthernetSettingsView		Adapter:
 Domain:	EthernetSettingsView		Domäne:
+DNS list is invalid	EthernetSettingsView		DNS-Liste ungültig
 Gateway is invalid	EthernetSettingsView		Ungültiges Gateway
 Revert	EthernetSettingsView		Anfangswerte
+DNS Servers, comma-separated	EthernetSettingsView		DNS-Server (durch Komma getrennt)
 <no wireless networks found>	EthernetSettingsView		<keine Funknetzwerke gefunden>
 Network	System name		Netzwerk
 Mode:	EthernetSettingsView		Modus:
 IP address is invalid	EthernetSettingsView		Ungültige IP-Adresse
+Hardware address:	EthernetSettingsView		Hardware-Adresse:
 Network:	EthernetSettingsView		Netzwerk:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Zur Auto-Konfiguration muss der net_server laufen!
 Disabled	EthernetSettingsView		Deaktiviert

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	3528881455
+1	japanese	x-vnd.Haiku-WebPositive	1130172675
 Show home button	Settings Window		ホームボタンを表示する
 Username:	Authentication Panel		ユーザー名:
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
@@ -18,6 +18,7 @@ Error opening downloads folder	Download Window		ダウンロードフォルダ�
 Paste	WebPositive Window		貼り付け
 Double-click or middle-click to open new tab.	Tab Manager		ダブルクリックまたは中央ボタンクリックで新しいタブを開く
 Proxy username:	Settings Window		ユーザー名:
+Save page as…	WebPositive Window		名前を付けてページを保存…
 Settings	Settings Window		設定
 %seconds seconds left	Download Window		残り %seconds 秒
 Confirmation	WebPositive Window		確認

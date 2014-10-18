@@ -1,49 +1,133 @@
-1	polish	x-vnd.Haiku-HaikuDepot	443107378
+1	polish	x-vnd.Haiku-HaikuDepot	3819510430
 Name	PackageListView		Nazwa
+Source code	FilterView		Kod źródłowy
+Close	RatePackageWindow		Zamknij
+The captcha puzzle needs to be solved.	UserLoginWindow		Musisz rozwiązać test CAPTCHA.
 Changelog	PackageInfoView		Dziennik zmian
-Click a package to view information	PackageInfoView		Kliknij na bambetel, aby zobaczyć informacje
+Your rating:	RatePackageWindow		Twoja ocena:
+The passwords do not match.	UserLoginWindow		Hasła nie zgadzają się.
+Log in…	MainWindow		Zaloguj
+Rate %Package%	RatePackageWindow		Oceń %Package%
+Stability:	RatePackageWindow		Stabilność:
+Click a package to view information	PackageInfoView		Kliknij na pakiet, aby zobaczyć informacje
+Other users can see this rating	RatePackageWindow		Inni użytkownicy będą mogli zobaczyć tę ocenę
+Stability	RatePackageWindow		Stabilność
 for %Version%	PackageInfoView		dla %Version%
 No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
-Depot:	FilterView		Składzik:
+Depot:	FilterView		Repozytorium:
 Description	PackageListView		Opis
 Install	PackageManager		Zainstaluj
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autoryzacja nie powiodła się. Użytkownik nie istnieje lub podano złe hasło.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Konto zostało utworzone. Możesz teraz oceniać pakiety oraz robić inne przydatne rzeczy.
 Tools	MainWindow		Narzędzia
-HaikuDepot	System name		SkładzikBambetli
-Rate package…	PackageInfoView		Oceń bambetel…
-Uninstall	PackageManager		Odinstaluj
+HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		Zamknij
+Rate package…	PackageInfoView		Oceń pakiet…
+Category	FilterView		Kategoria
+Uninstall	PackageManager		Usuń
+An error occurred while obtaining the package list: %message%	MainWindow		Wystąpił błąd podczas próby uzyskania listy pakietów: %message%
+Your rating was updated successfully.	RatePackageWindow		Twoja ocena została zapisana.
 <no info>	PackageInfoView		<brak informacji>
-An error occurred while initializing the package manager: %message%	MainWindow		Wystąpił błąd podczas inicjalizacji menedżera bambetli: %message%
+An error occurred while initializing the package manager: %message%	MainWindow		Wystąpił błąd podczas inicjalizacji menedżera pakietów: %message%
+Email address:	UserLoginWindow		Adres e-mail:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Twoja ocena została zapisana. Możesz ją zaktualizować lub usunąć w każdej chwili przez ponowną ocenę pakietu.
+Very unstable	RatePackageWindow		Bardzo niestabilny
+The username is already taken. Please choose another.	UserLoginWindow		Ta nazwa użytkownika jest już zajęta. Wybierz inną.
 Close	PackageManager		Zamknij
+Not logged in	MainWindow		Niezalogowany
+The authentication was successful.	UserLoginWindow		Autoryzacja powiodła się.
 Status	PackageListView		Status
-Development	Model		Narzędzia programistów
+Ignore	UserLoginWindow		Ignoruj
+Language	UserLoginWindow		Język
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Hasło jest zbyt słabe lub niepoprawne. Użyj minimum 8 znaków, w tym co najmniej 2 cyfr i 2 wielkich liter.
+Rate package	RatePackageWindow		Oceń pakiet
+Development	Model		Programowanie
 Fatal error	PackageManager		Błąd krytyczny
+The user name needs to be at least 3 letters long.	UserLoginWindow		Nazwa użytkownika powinna składać się z co najmniej 3 znaków.
+Log in	UserLoginWindow		Zaloguj
+Repeat pass phrase:	UserLoginWindow		Powtórz hasło:
 Ratings	PackageInfoView		Oceny
+But none could be listed here, sorry.	UserLoginWindow		Ale żaden nie mógł zostać tutaj wyświetlony.
+System & Utilities	Model		System & narzędzia
 Inactive	PackageListView		Nieaktywny
-Refresh depots	MainWindow		Odśwież listy bambetli
+Refresh depots	MainWindow		Odśwież listy pakietów
+Science & Mathematics	Model		Nauka & matematyka
+Not logged in	FilterView		Niezalogowany
 Main Menu	MainWindow		Menu główne
 (%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Nie udało ci się przejść testu CAPTCHA.
+Success	UserLoginWindow		Powodzenie
 Downloading:	PackageInfoView		Pobieranie:
+Mostly stable	RatePackageWindow		Całkiem stabilny
+There was a puzzling response from the web service.	RatePackageWindow		Odebrano dziwną odpowiedź od usługi sieciowej.
+Log out	MainWindow		Wyloguj
+Education	Model		Edukacja
 Search terms:	FilterView		Szukana fraza:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Brak ocen użytkowników.
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Wystąpił błąd podczas odświeżania składziku: %error% (%details%)
+Failed to update rating	RatePackageWindow		Nie udało się zaktualizować oceny
+Development	FilterView		Programowanie
+Does not start	RatePackageWindow		Nie uruchamia się
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error% (%details%)
+It was not possible to contact the web service.	RatePackageWindow		Nie udało się połączyć z usługą sieciową.
+There are problems in the form:\n\n	UserLoginWindow		W formularzu występują problemy:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Usługa sieciowa nie odnalazła pakietu. To prawdopodobnie oznacza, że pochodzi z repozytorium, które nie jest tutaj obsługiwane. Ocenianie takich pakietów jest niestety niewspierane.
+Create account	UserLoginWindow		Utwórz konto
 Productivity	Model		Programy użytkowe
+Authentication failed	UserLoginWindow		Autoryzacja nie powiodła się
+Language	RatePackageWindow		Język
 Size	PackageListView		Rozmiar
+Failed to create or update rating: %s\n	RatePackageWindow		Nie udało się utworzyć lub zaktualizować oceny: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		Musisz być zalogowany, aby móc oceniać pakiety.
+ It responded with: 	RatePackageWindow		Odpowiedź:
+User name:	UserLoginWindow		Nazwa użytkownika:
+Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
+The email address appears to be malformed.	UserLoginWindow		Adres e-mail wygląda na zniekształcony.
 Games	Model		Gry
 Rating	PackageListView		Ocena
+Logged in as %User%	FilterView		Zalogowano jako %User%
+There was a puzzling response from the web service.	UserLoginWindow		Odebrano dziwną odpowiedź od usługi sieciowej.
 Graphics	Model		Grafika
 Local	MainWindow		Lokalne
 Close	MainWindow		Zamknij
+Preferred language:	UserLoginWindow		Preferowany język:
+Failed to rate package	RatePackageWindow		Nie udało się ocenić pakietu
+Internet & Network	Model		Internet i sieć
+Available	FilterView		Dostępny
+Cancel	MainWindow		Anuluj
+Input validation	UserLoginWindow		Walidacja wejścia
+Update	RatePackageWindow		Zaktualizuj
 Video	Model		Wideo
-An error occurred while refreshing the repository: %error%	MainWindow		Wystąpił błąd podczas odświeżania składziku: %error%
+All categories	FilterView		Wszystkie kategorie
+An error occurred while refreshing the repository: %error%	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error%
+Login or Create account	MainWindow		Zaloguj lub utwórz konto
 Pending…	PackageListView		Oczekiwanie…
-Depot	FilterView		Magazyn
+Depot	FilterView		Repozytorium
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} few{# elementy} many{# elementów} other{# elementu}}
 Uninstalled	PackageListView		Niezainstalowany
+Stable	RatePackageWindow		Stabilny
 Unknown	PackageListView		Nieznany
-All depots	FilterView		Wszystkie składziki
+All depots	FilterView		Wszystkie repozytoria
+Comment language:	RatePackageWindow		Język komentarza:
+Pass phrase:	UserLoginWindow		Hasło:
+Not specified	RatePackageWindow		Nieokreślony
 Available	PackageListView		Dostępny
 n/a	PackageInfoView		Nie dotyczy
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jeśli nie podasz adresu e-mail, nie będziesz mógł zresetować hasła, jeśli go zapomnisz.
+ It responded with: 	UserLoginWindow		Odpowiedź:
+Authentication failed. Connection to the service failed.	UserLoginWindow		Autoryzacja nie powiodła się. Nie udało się połączyć z usługą sieciową.
+Cancel	RatePackageWindow		Anuluj
+OK	UserLoginWindow		OK
+Installed	FilterView		Zainstalowane
 Send	RatePackageWindow		Wyślij
+Category:	FilterView		Kategoria:
+Failed to create account	UserLoginWindow		Nie udało się utworzyć konta
+There are problems with the data you entered:\n\n	UserLoginWindow		We wprowadzonych danych występują problemy:\n\n
+Success	RatePackageWindow		Sukces
+Business	Model		Firma
 Audio	Model		Dźwięk
-About	PackageInfoView		O bambetlu
+About	PackageInfoView		O pakiecie
 Active	PackageListView		Aktywny
+It was not possible to contact the web service.	UserLoginWindow		Nie udało się połączyć z usługą sieciową.
+Failed to create account: %s\n	UserLoginWindow		Nie udało się utworzyć konta: %s\n
+Cancel	UserLoginWindow		Anuluj

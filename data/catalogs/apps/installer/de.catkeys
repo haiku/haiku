@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	3930183175
+1	german	x-vnd.Haiku-Installer	1426425234
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Soll die Installation tatsächlich abgebrochen und der Rechner neu gestartet werden?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tvon Jérôme Duval und Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -16,12 +16,14 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		BootManager beenden
 Stop	InstallerWindow		Anhalten
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Sollte es mit os-prober nicht funktionieren, gibt es für GRUB 2 noch eine spezielle Konfigurationsdatei, um zusätzliche Einträge zum Bootmenü hinzuzufügen. Um diese an oberster Stelle einzufügen, muss eine Datei erstellt/bearbeitet werden. Dazu wird der bevorzugte Texteditor von der Kommandozeile gestartet:\n\n
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Bitte Quell- und Ziellaufwerk aus den Menüs wählen. Danach auf \"Start\" klicken.
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku auf /dev/sda7\n
 Install from:	InstallerWindow		Installieren von:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld von %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		WICHTIGE INFORMATION VOR DER INSTALLATION VON HAIKU\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		Das Benennungsschema von GRUB für Partitionen ist: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Fortsetzen
 Write boot sector to '%s'	InstallerWindow		Bootsektor auf '%s' schreiben
 Collecting copy information.	InstallProgress		Es werden Infos über zu kopierende Dateien gesammelt.
@@ -42,6 +44,7 @@ README	InstallerApp		LIESMICH
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Auf dem Ziellaufwerk ist anscheinend nicht genügend Platz. Entweder ein anderes Laufwerk wählen oder einige optionale Pakete deaktivieren.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Bitte BootManger und DriveSetup vor dem Installer-Fenster schließen.
 Scanning for disks…	InstallerWindow		Es wird nach Laufwerken gesucht…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Das Laufwerk konnte nicht eingehängt werden. Bitte ein anderes Laufwerk wählen.
 ?? of ??	InstallerWindow	Unknown progress	?? von ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -86,6 +89,7 @@ With GRUB 2 the first logical partition always has the number \"5\", regardless 
 Write boot sector	InstallerWindow		Bootsektor schreiben
 Cancel	InstallerWindow		Abbrechen
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, die Anwendung zur Konfiguration von Partitionen, konnte nicht gestartet werden.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Das Ziellaufwerk ist nicht leer. Soll trotzdem hierher installiert werden?\n\nHinweis: Der 'system'-Ordner wird mit einer sauberen Kopie aus dem Quelllaufwerk überschrieben, jedoch bleibt der darin enthaltene 'settings'-Unterordner unverändert; alle anderen Ordner werden zusammengeführt, wobei Dateien und Verknüpfungen, die auf beiden Laufwerken existieren, mit der Version des Quelllaufwerks überschrieben werden.
 No optional packages available.	PackagesView		Keine optionalen Pakete verfügbar.
 All hard disks start with \"hd\".\n	InstallerApp		Alle Festplatten beginnen mit \"hd\".\n
 Continue	InstallerApp		Weiter

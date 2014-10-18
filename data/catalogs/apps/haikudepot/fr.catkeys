@@ -1,5 +1,6 @@
-1	french	x-vnd.Haiku-HaikuDepot	443107378
+1	french	x-vnd.Haiku-HaikuDepot	988211504
 Name	PackageListView		Nom
+Close	RatePackageWindow		Fermer
 Changelog	PackageInfoView		Journal des modifications
 Click a package to view information	PackageInfoView		Cliquez sur un paquet pour afficher ses informations
 for %Version%	PackageInfoView		pour %Version%
@@ -9,6 +10,7 @@ Description	PackageListView		Description
 Install	PackageManager		Installer
 Tools	MainWindow		Outils
 HaikuDepot	System name		Dépôt Haiku
+Close	UserLoginWindow		Fermer
 Rate package…	PackageInfoView		Évaluer le paquet…
 Uninstall	PackageManager		Désinstaller
 <no info>	PackageInfoView		<pas d'info>
@@ -26,6 +28,7 @@ Downloading:	PackageInfoView		Téléchargement en cours :
 Search terms:	FilterView		Termes à rechercher :
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Aucun avis d'utilisateurs.
+Development	FilterView		Développement
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error% (%details%)
 Productivity	Model		Bureautique
 Size	PackageListView		Taille
@@ -34,6 +37,7 @@ Rating	PackageListView		Évaluation
 Graphics	Model		Graphisme
 Local	MainWindow		Local
 Close	MainWindow		Fermer
+Available	FilterView		Disponible
 Video	Model		Vidéo
 An error occurred while refreshing the repository: %error%	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error%
 Pending…	PackageListView		En attente…

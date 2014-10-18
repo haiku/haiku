@@ -1,13 +1,17 @@
-1	german	x-vnd.Be-POST	3583868911
+1	german	x-vnd.Be-POST	3641225974
 Fetching mail for %name	Notifier		E-Mails für %name abrufen
 Check for mails only	DeskbarView		E-Mails nur abrufen für
 Send pending mails	DeskbarView		E-Mails senden
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# neue Nachricht} other{# neue Nachrichten}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# neue Nachricht} other{# neue Nachrichten}} für %name\n
 New Messages	MailDaemon		Neue Nachrichten
 <no accounts>	DeskbarView		<keine Konten>
 Mail status	MailDaemon		E-Mail-Status
 Shutdown mail services	DeskbarView		E-Mail-Dienst ausschalten
 Sending mail for %name	Notifier		E-Mails von %name senden
+{0, plural, one{# new message.} other{# new messages.}}	MailDaemon		{0, plural, one{# neue Nachricht.} other{# neue Nachrichten.}}
 Create new message…	DeskbarView		Nachricht verfassen…
+{0, plural, one{# new message} other{# new messages}}	MailDaemon		{0, plural, one{# neue Nachricht} other{# neue Nachrichten}}
 No new messages	MailDaemon		Keine neuen Nachrichten
 Check for mail now	DeskbarView		E-Mails jetzt abrufen
 No new messages	DeskbarView		Keine neuen Nachrichten

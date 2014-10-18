@@ -1,7 +1,9 @@
-1	japanese	x-vnd.Haiku-Pairs	2193803529
+1	japanese	x-vnd.Haiku-Pairs	818003250
 Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs は開始するための十分なベクターアイコンを見つけられなかった。少なくとも %zu 個必要とするが、見つかったのは %zu です。\n
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tRalf Schülke 作\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Expert (8x8)	PairsWindow		上級 (8x8)
 Beginner (4x4)	PairsWindow		初級 (4x4)
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		ゲームを {0, plural, one{# クリック} other{# クリック}}で終了しました。\n
 Quit game	PairsWindow		ゲームを終了
 Large	PairsWindow		大
 Small	PairsWindow		小
