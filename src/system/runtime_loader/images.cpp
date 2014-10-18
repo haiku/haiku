@@ -23,6 +23,8 @@
 #include "elf_tls.h"
 #include "runtime_loader_private.h"
 
+#include <util/kernel_cpp.h>
+
 
 // keep in sync with app ldscript
 #ifdef __x86_64__

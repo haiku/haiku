@@ -12,6 +12,8 @@
 
 #include <tls.h>
 
+#include <util/kernel_cpp.h>
+
 
 class TLSBlock {
 public:	
@@ -284,8 +286,12 @@ DynamicThreadVector::_ResizeVector(unsigned minimumSize)
 
 	*fVector = (TLSBlock*)newVector;
 	memset(*fVector + oldSize + 1, 0, (size - oldSize) * sizeof(TLSBlock));
-	if (fGeneration == NULL)
+	if (fGeneration == NULL) {
 		fGeneration = new Generation;
+		if (fGeneration == NULL)
+			return B_NO_MEMORY;
+	}
+
 	*(Generation**)*fVector = fGeneration;
 	fGeneration->SetSize(size);
 
