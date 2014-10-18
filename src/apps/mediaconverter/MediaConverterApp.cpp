@@ -143,10 +143,10 @@ MediaConverterApp::RefsReceived(BMessage* msg)
 		}
 
 		alertText << "\n" << errorFiles;
-		BAlert* alert = new BAlert((errors > 1) ? 
-			B_TRANSLATE("Error loading files") : 
-			B_TRANSLATE("Error loading a file"), 
-			alertText.String(),	B_TRANSLATE("Continue"), NULL, NULL, 
+		BAlert* alert = new BAlert((errors > 1) ?
+			B_TRANSLATE("Error loading files") :
+			B_TRANSLATE("Error loading a file"),
+			alertText.String(),	B_TRANSLATE("Continue"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->Go();
 	}
@@ -271,7 +271,8 @@ MediaConverterApp::_RunConvert()
 				media_codec_info* audioCodec;
 				media_codec_info* videoCodec;
 				media_file_format* fileFormat;
-				fWin->GetSelectedFormatInfo(&fileFormat, &audioCodec, &videoCodec);
+				fWin->GetSelectedFormatInfo(&fileFormat, &audioCodec,
+					&videoCodec);
 				BDirectory directory = fWin->OutputDirectory();
 				fWin->Unlock();
 				outEntry = _CreateOutputFile(directory, &inRef, fileFormat);
@@ -315,7 +316,7 @@ MediaConverterApp::_RunConvert()
 						srcIndex++;
 						BString error(
 							B_TRANSLATE("Error converting '%filename'"));
-  						error.ReplaceAll("%filename", inRef.name);
+						error.ReplaceAll("%filename", inRef.name);
 						fWin->SetStatusMessage(error.String());
 					}
 					fWin->Unlock();
@@ -445,21 +446,23 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 						// blocks until the window is quit
 
 					// The quality setting is ignored by the 3ivx encoder if the
-					// view was displayed, but this method is the trigger to read
-					// all the parameter settings
+					// view was displayed, but this method is the trigger to
+					// read all the parameter settings
 					outVidTrack->SetQuality(videoQuality / 100.0f);
 
-					// We can now delete the encoderView created for us by the encoder
+					// We can now delete the encoderView created for us by the
+					// encoder
 					delete encoderView;
 					encoderView = NULL;
 
-					videoQualitySupport = 
-						B_TRANSLATE("Video using parameters form settings");
-				} else {
-					if (outVidTrack->SetQuality(videoQuality / 100.0f) >= B_OK)
-						videoQualitySupport = 
-							B_TRANSLATE("Video quality not supported");
+					videoQualitySupport
+						= B_TRANSLATE("Video using parameters form settings");
+				} else if (outVidTrack->SetQuality(videoQuality / 100.0f)
+					>= B_OK) {
+					videoQualitySupport
+						= B_TRANSLATE("Video quality not supported");
 				}
+
 				if (videoQualitySupport && fWin->Lock()) {
 					fWin->SetVideoQualityLabel(videoQualitySupport);
 					fWin->Unlock();
@@ -525,8 +528,8 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 		for (int64 i = start; (i <= end) && !fCancel; i += framesRead) {
 			if ((ret = inVidTrack->ReadFrames(videoBuffer, &framesRead,
 					&mh)) != B_OK) {
-				fprintf(stderr, "Error reading video frame %" B_PRId64 ": %s\n", i,
-						strerror(ret));
+				fprintf(stderr, "Error reading video frame %" B_PRId64 ": %s\n",
+					i, strerror(ret));
 				snprintf(status.LockBuffer(128), 128,
 						B_TRANSLATE("Error read video frame %" B_PRId64), i);
 				status.UnlockBuffer();
@@ -537,8 +540,8 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 
 			if ((ret = outVidTrack->WriteFrames(videoBuffer, framesRead,
 					mh.u.encoded_video.field_flags)) != B_OK) {
-				fprintf(stderr, "Error writing video frame %" B_PRId64 ": %s\n", i,
-						strerror(ret));
+				fprintf(stderr, "Error writing video frame %" B_PRId64 ": %s\n",
+					i, strerror(ret));
 				snprintf(status.LockBuffer(128), 128,
 						B_TRANSLATE("Error writing video frame %" B_PRId64), i);
 				status.UnlockBuffer();
