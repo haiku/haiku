@@ -8,6 +8,7 @@
 
 
 const EncoderDescription gEncoderTable[] = {
+	// Video codecs
 	{
 		{
 			"MPEG-4 video",
@@ -86,6 +87,127 @@ const EncoderDescription gEncoderTable[] = {
 		B_MEDIA_ENCODED_VIDEO,
 		5
 	},
+
+	// Audio codecs
+	{
+		{
+			"Free Lossless Audio Codec (FLAC)",
+			"flac",
+			0,
+			CODEC_ID_FLAC,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
+	// All of those crash ffmpeg in one way or another...
+#if 0
+	{
+		{
+			"Advanced Audio Coding (AAC)",
+			"aac",
+			0,
+			CODEC_ID_AAC,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
+	{
+		{
+			"Dolby AC-3",
+			"ac3",
+			0,
+			CODEC_ID_AC3,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
+	{
+		{
+			"Apple Lossless Audio Codec",
+			"alac",
+			0,
+			CODEC_ID_ALAC,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
+	{
+		{
+			"Adaptive Transform Acoustic Coding",
+			"atrac",
+			0,
+			CODEC_ID_ATRAC3,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
+	{
+		{
+			"MPEG Layer III (MP3)",
+			"mp3",
+			0,
+			CODEC_ID_MP3,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
+	{
+		{
+			"Monkey's Audio",
+			"ape",
+			0,
+			CODEC_ID_APE,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
+	{
+		{
+			"Musepack",
+			"mpc",
+			0,
+			CODEC_ID_MUSEPACK8,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
+	{
+		{
+			"Windows Media Audio (WMA)",
+			"wma",
+			0,
+			CODEC_ID_WMAV2,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
 	{
 		{
 			"Raw audio",
@@ -125,6 +247,7 @@ const EncoderDescription gEncoderTable[] = {
 		B_MEDIA_ENCODED_AUDIO,
 		10
 	}
+#endif
 };
 
 const size_t gEncoderCount = sizeof(gEncoderTable) / sizeof(EncoderDescription);
