@@ -2592,7 +2592,6 @@ BMenu::_ItemMarked(BMenuItem* item)
 			if (ItemAt(i) != item)
 				ItemAt(i)->SetMarked(false);
 		}
-		InvalidateLayout();
 	}
 
 	if (IsLabelFromMarked() && Superitem())
