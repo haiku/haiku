@@ -165,18 +165,6 @@ local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
 AddFilesToPackage data fonts psfonts : $(psFonts) ;
 AddFilesToPackage data fonts ttfonts : $(ttFonts) ;
 
-local cannaDir = [ FDirName $(HAIKU_TOP) data system data Canna ] ;
-local cannaDefault = [ Glob $(cannaDir)/default : *.canna *.gz ] ;
-local cannaDic = [ Glob $(cannaDir)/dic : *.cbp ] ;
-local cannaDicCanna = [ Glob $(cannaDir)/dic/canna
-	: *.cld *.ctd *.cbd *.dir ] ;
-AddFilesToPackage data Canna default	: $(cannaDefault) ;
-AddFilesToPackage data Canna dic		: $(cannaDic) ;
-AddFilesToPackage data Canna dic canna	: $(cannaDicCanna) ;
-#AddDirectoryToPackage data Canna dic group ;
-#AddDirectoryToPackage data Canna dic user ;
-	# TODO: If those serve any purpose, they should probably live in a writable
-	# subtree.
 
 # keymaps
 AddFilesToPackage data Keymaps : $(HAIKU_KEYMAP_FILES) ;
@@ -185,6 +173,7 @@ for keymapAlias in $(HAIKU_KEYMAP_ALIASES) {
 	local aliasedTo = [ on $(keymapAlias) return $(HAIKU_KEYMAP_FILE) ] ;
 	AddSymlinkToPackage data Keymaps : $(aliasedTo:BSM) : $(keymapAlias:BSM) ;
 }
+
 
 # keyboard layouts
 AddFilesToPackage data KeyboardLayouts
