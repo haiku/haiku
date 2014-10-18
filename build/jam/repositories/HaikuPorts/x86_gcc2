@@ -14,7 +14,7 @@ RemotePackageRepository HaikuPorts
 	texi2html-1.82-2
 	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-3
-	youtube_dl-2014.06.19-2
+	youtube_dl-2014.10.15-1
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
@@ -295,7 +295,7 @@ RemotePackageRepository HaikuPorts
 	tiff_tools-3.9.6-2
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
-	ubertuber-0.9.10-2
+	ubertuber-0.9.10-3
 	unrar-5.1.5-1
 	util_macros-1.19.0-2
 	vim-7.4-1
@@ -521,7 +521,7 @@ RemotePackageRepository HaikuPorts
 	qjson_x86-0.8.1-1
 	qjson_x86_devel-0.8.1-1
 	quassel_x86-0.10.0-2
-	quicklaunch-0.9.7-2
+	quicklaunch-0.9.7-3
 	qupzilla_x86-1.7.x-4
 	readline_x86-6.3-2
 	readline_x86_devel-6.3-2
