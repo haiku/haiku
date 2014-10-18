@@ -185,6 +185,9 @@ BNetBuffer::AppendString(const char* data)
 status_t
 BNetBuffer::AppendData(const void* data, size_t size)
 {
+	if (fInit != B_OK)
+		return B_NO_INIT;
+
 	ssize_t bytesWritten = fImpl->Write(data, size);
 	if (bytesWritten < 0)
 		return (status_t)bytesWritten;
@@ -335,6 +338,9 @@ BNetBuffer::RemoveString(char* data, size_t size)
 status_t
 BNetBuffer::RemoveData(void* data, size_t size)
 {
+	if (fInit != B_OK)
+		return B_NO_INIT;
+
 	ssize_t bytesRead = fImpl->Read(data, size);
 	if (bytesRead < 0)
 		return (status_t)bytesRead;
@@ -345,6 +351,9 @@ BNetBuffer::RemoveData(void* data, size_t size)
 status_t
 BNetBuffer::RemoveMessage(BMessage& data)
 {
+	if (fInit != B_OK)
+		return B_NO_INIT;
+
 	unsigned char* bufferPtr = fImpl->Data();
 
 	if (*(int32*)bufferPtr != B_MESSAGE_TYPE)
@@ -398,6 +407,9 @@ BNetBuffer::RemoveUint64(uint64& data)
 unsigned char*
 BNetBuffer::Data() const
 {
+	if (fInit != B_OK)
+		return NULL;
+
 	return fImpl->Data();
 }
 
@@ -405,6 +417,9 @@ BNetBuffer::Data() const
 size_t
 BNetBuffer::Size() const
 {
+	if (fInit != B_OK)
+		return 0;
+
 	return fImpl->Size();
 }
 
@@ -412,6 +427,9 @@ BNetBuffer::Size() const
 size_t
 BNetBuffer::BytesRemaining() const
 {
+	if (fInit != B_OK)
+		return 0;
+
 	return fImpl->BytesRemaining();
 }
 

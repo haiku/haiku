@@ -330,6 +330,10 @@ BHttpRequest::_ProtocolLoop()
 			port = fContext->GetProxyPort();
 		}
 
+		status_t result = fInputBuffer.InitCheck();
+		if (result != B_OK)
+			return result;
+
 		if (!_ResolveHostName(host, port)) {
 			_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR,
 				"Unable to resolve hostname (%s), aborting.",
