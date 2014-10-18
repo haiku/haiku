@@ -36,7 +36,7 @@
 	// only on exit
 
 static const float kMinSize = 8.0;
-static const float kMaxSize = 18.0;
+static const float kMaxSize = 24.0;
 
 
 // private font API
@@ -251,7 +251,7 @@ FontSelectionView::CreateFontsMenuBarLayoutItem()
 void
 FontSelectionView::_BuildSizesMenu()
 {
-	const int32 sizes[] = {7, 8, 9, 10, 11, 12, 13, 14, 18, 21, 24, 0};
+	const int32 sizes[] = {7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 21, 24, 0};
 
 	// build size menu
 	for (int32 i = 0; sizes[i]; i++) {
