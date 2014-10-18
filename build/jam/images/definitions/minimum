@@ -197,7 +197,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		rtl8139 rtl81xx
 		sis19x syskonnect
 		via_rhine vt612x
-	}@ # x86_64
+	}@ # x86,x86_64
 
 	etherpci
 	pegasus
@@ -206,14 +206,14 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	wb840
 
 	# WLAN drivers
-	x86 @{
+	x86,x86_64 @{
 		aironetwifi atheroswifi
 		broadcom43xx
 		iprowifi2100 iprowifi2200 iprowifi3945 iprowifi4965
 		marvell88w8363 marvell88w8335
 		ralinkwifi
 		wavelanwifi
-	}@ # x86
+	}@ # x86,x86_64
 
 	# WWAN drivers
 	#usb_beceemwmx@gpl
