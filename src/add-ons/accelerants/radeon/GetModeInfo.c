@@ -12,6 +12,8 @@
 
 #include <GraphicsDefs.h>
 
+#include <string.h>
+
 
 status_t
 GET_DISPLAY_MODE(display_mode *mode)

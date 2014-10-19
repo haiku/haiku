@@ -53,8 +53,8 @@ typedef struct accelerator_info {
 	// only mt_pci and mt_agp are filled directly, mt_nonlocal contains
 	// a copy of either mt_pci or mt_agp, mt_local a copy of si->local_mem
 	struct {
-		area_id 	area;		// area of clone
-		char 		*data;		// CPU address of area
+		area_id 		area;		// area of clone
+		unsigned char 	*data;		// CPU address of area
 	} mapped_memory[mt_last+1];
 	
 	int accelerant_is_clone;	// true, if this is a cloned accelerant

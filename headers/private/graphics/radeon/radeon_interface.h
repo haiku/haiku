@@ -131,29 +131,26 @@ typedef enum
 
 typedef enum
 {
-    connector_none,
-    connector_proprietary,
-    connector_crt,
-    connector_dvi_i,
-    connector_dvi_d,
-    connector_ctv,
-    connector_stv,
-    connector_unsupported
-} radeon_connector_type;
+	connector_none,
+	connector_proprietary,
+	connector_crt,
+	connector_dvi_i,
+	connector_dvi_d,
+	connector_ctv,
+	connector_stv,
+	connector_unsupported,
 
-typedef enum
-{
-    connector_none_atom,
-    connector_vga_atom,
-    connector_dvi_i_atom,
-    connector_dvi_d_atom,
-    connector_dvi_a_atom,
-    connector_stv_atom,
-    connector_ctv_atom,
-    connector_lvds_atom,
-    connector_digital_atom,
-    connector_unsupported_atom
-} radeon_connector_type_atom;
+	connector_none_atom = 0,
+	connector_vga_atom,
+	connector_dvi_i_atom,
+	connector_dvi_d_atom,
+	connector_dvi_a_atom,
+	connector_stv_atom,
+	connector_ctv_atom,
+	connector_lvds_atom,
+	connector_digital_atom,
+	connector_unsupported_atom
+} radeon_connector_type;
 
 typedef enum
 {
@@ -431,7 +428,7 @@ typedef struct {
 typedef struct {
 	int32	inuse;				// one, if someone allocated overlay head
 								// (this doesn't necessarily mean that an overlay is shown)
-	uint32	token;				// arbitrarily chosen token to identify overlay owner
+	uintptr_t	token;			// arbitrarily chosen token to identify overlay owner
 								// (increased by 1 whenever there is a new owner)
 	uint32	auto_flip_reg;		// content of auto_flip_reg
 } overlay_mgr_info;

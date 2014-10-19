@@ -336,29 +336,29 @@ status_t RELEASE_OVERLAY(overlay_token ot)
 
 
 // public function: show/hide overlay
-status_t CONFIGURE_OVERLAY( overlay_token ot, const overlay_buffer *ob, 
+status_t CONFIGURE_OVERLAY( overlay_token ot, const overlay_buffer *ob,
 	const overlay_window *ow, const overlay_view *ov )
 {
 	shared_info *si = ai->si;
 	status_t result;
-	
+
 	SHOW_FLOW0( 4, "" );
-	
-	if( (uint32)ot != si->overlay_mgr.token )
+
+	if ( (uintptr_t)ot != si->overlay_mgr.token )
 		return B_BAD_VALUE;
-		
-	if( !si->overlay_mgr.inuse )
+
+	if ( !si->overlay_mgr.inuse )
 		return B_BAD_VALUE;
-		
-	if( ow == NULL || ov == NULL ) {
+
+	if ( ow == NULL || ov == NULL ) {
 		SHOW_FLOW0( 3, "hide only" );
 		Radeon_HideOverlay( ai );
 		return B_OK;
 	}
 
-	if( ob == NULL )
+	if ( ob == NULL )
 		return B_ERROR;
-		
+
 	ACQUIRE_BEN( si->engine.lock );
 
 	// store whished values
