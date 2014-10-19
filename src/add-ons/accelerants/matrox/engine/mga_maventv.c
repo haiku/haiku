@@ -20,9 +20,11 @@ typedef struct {
 	float chroma_subcarrier;
 } gx50_maven_timing;
 
-//fixme: try to implement 'fast' and 'slow' settings for all modes,
-//       so buffer duplication or skipping won't be neccesary for realtime video.
-//fixme: try to setup the CRTC2 in interlaced mode for the video modes on <= G400MAX cards.
+
+// FIXME: try to implement 'fast' and 'slow' settings for all modes, so buffer
+// duplication or skipping won't be neccesary for realtime video.
+// FIXME: try to setup the CRTC2 in interlaced mode for the video modes
+// on <= G400MAX cards.
 
 /* find 'exact' valid video PLL setting */
 status_t g100_g400max_maventv_vid_pll_find(
@@ -30,8 +32,9 @@ status_t g100_g400max_maventv_vid_pll_find(
 	uint8 * m_result, uint8 * n_result, uint8 * p_result)
 {
 	int m = 0, n = 0, p = 0, m_max;
-	float diff, diff_smallest = 999999999;
-	int best[5], h_total_mod; 
+	float diff, diff_smallest = INFINITY;
+	int best[5] = {0, 0, 0, 0, 0};
+	int h_total_mod;
 	float fields_sec, f_vco;
 	/* We need to be exact, so work with clockperiods per field instead of with frequency.
 	 * Make sure however we truncate these clocks to be integers!
@@ -42,22 +45,22 @@ status_t g100_g400max_maventv_vid_pll_find(
 	 * represents a whole number of clocks per field later on! */
 	float calc_pclks_field;
 
-	LOG(2,("MAVENTV: searching for EXACT videoclock match\n"));
+	LOG(2, ("MAVENTV: searching for EXACT videoclock match\n"));
 
 	/* determine the max. reference-frequency postscaler setting for the current card */
 	//fixme: check G100 and G200 m_max if exist and possible...
-	switch(si->ps.card_type)
+	switch (si->ps.card_type)
 	{
 	case G100:
-		LOG(2,("MAVENTV: G100 restrictions apply\n"));
+		LOG(2, ("MAVENTV: G100 restrictions apply\n"));
 		m_max = 32;
 		break;
 	case G200:
-		LOG(2,("MAVENTV: G200 restrictions apply\n"));
+		LOG(2, ("MAVENTV: G200 restrictions apply\n"));
 		m_max = 32;
 		break;
 	default:
-		LOG(2,("MAVENTV: G400/G400MAX restrictions apply\n"));
+		LOG(2, ("MAVENTV: G400/G400MAX restrictions apply\n"));
 		m_max = 32;
 		break;
 	}
@@ -91,7 +94,7 @@ status_t g100_g400max_maventv_vid_pll_find(
 	 * (The MAVEN apparantly has a granularity of 1 pixel, while CRTC2 has 8 pixels) */
 	for (h_total_mod = 0; h_total_mod < 8; h_total_mod++)
 	{
-		LOG(2,("MAVENTV: trying h_total modification of +%d...\n", h_total_mod));
+		LOG(2, ("MAVENTV: trying h_total modification of +%d...\n", h_total_mod));
 
 		/* Calculate videoclock to be a bit to high so we can compensate for an exact
 		 * match via h_total_lastline.. */
@@ -103,13 +106,13 @@ status_t g100_g400max_maventv_vid_pll_find(
 		if (req_pclks_field < (((si->ps.min_video_vco * 1000000) / fields_sec) / 8.0))
 		{
 			req_pclks_field = (((si->ps.min_video_vco * 1000000) / fields_sec) / 8.0);
-			LOG(4,("MAVENTV: WARNING, clamping at lowest possible videoclock\n"));
+			LOG(4, ("MAVENTV: WARNING, clamping at lowest possible videoclock\n"));
 		}
 		/* upper limit is given by pins in combination with current active mode */
 		if (req_pclks_field > max_pclks_field)
 		{
 			req_pclks_field = max_pclks_field;
-			LOG(4,("MAVENTV: WARNING, clamping at highest possible videoclock\n"));
+			LOG(4, ("MAVENTV: WARNING, clamping at highest possible videoclock\n"));
 		}
 
 		/* iterate through all valid PLL postscaler settings */
@@ -147,7 +150,7 @@ status_t g100_g400max_maventv_vid_pll_find(
 
 					/* check if we haven't got too much clocks in the last field line for a sync lock */
 					if (*ht_last_line > *ht_new) continue;
-			
+
 					/* we have a match! */
 					/* calculate the difference between a full line and the last line */
 					diff = *ht_new - *ht_last_line;
@@ -157,14 +160,14 @@ status_t g100_g400max_maventv_vid_pll_find(
 					{
 						/* log results */
 						if (diff_smallest == 999999999)
-							LOG(2,("MAVENTV: MATCH, "));
+							LOG(2, ("MAVENTV: MATCH, "));
 						else
-							LOG(2,("MAVENTV: better MATCH,"));
+							LOG(2, ("MAVENTV: better MATCH,"));
 						f_vco = (si->ps.f_ref / m) * n;
-						LOG(2,("found vid VCO freq %fMhz, pixclk %fMhz\n", f_vco, (f_vco / p)));
-						LOG(2,("MAVENTV: mnp(ex. filter) 0x%02x 0x%02x 0x%02x, h_total %d, ht_lastline %d\n",
+						LOG(2, ("found vid VCO freq %fMhz, pixclk %fMhz\n", f_vco, (f_vco / p)));
+						LOG(2, ("MAVENTV: mnp(ex. filter) 0x%02x 0x%02x 0x%02x, h_total %d, ht_lastline %d\n",
 							(m - 1), (n - 1), (p - 1), (*ht_new - 2), (*ht_last_line - 2)));
-						
+
 						/* remember this best match */
 						diff_smallest = diff;
 						best[0] = m;
@@ -181,7 +184,7 @@ status_t g100_g400max_maventv_vid_pll_find(
 			}
 		}
 	}
-	LOG(2,("MAVENTV: search completed.\n"));
+	LOG(2, ("MAVENTV: search completed.\n"));
 
 	/* setup the scalers programming values for found optimum setting */
 	m = best[0] - 1;
@@ -191,7 +194,7 @@ status_t g100_g400max_maventv_vid_pll_find(
 	/* if no match was found set fixed PLL frequency so we have something valid at least */
 	if (diff_smallest == 999999999)
 	{
-		LOG(4,("MAVENTV: WARNING, no MATCH found!\n"));
+		LOG(4, ("MAVENTV: WARNING, no MATCH found!\n"));
 
 		if (si->ps.f_ref == 27.000)
 		{
@@ -199,9 +202,7 @@ status_t g100_g400max_maventv_vid_pll_find(
 			m = 0x03;
 			n = 0x07;
 			p = 0x03;
-		}
-		else
-		{
+		} else {
 			/* set 14.31818Mhz */
 			m = 0x01;
 			n = 0x07;
@@ -213,13 +214,13 @@ status_t g100_g400max_maventv_vid_pll_find(
 
 	/* calc the needed PLL loopbackfilter setting belonging to current VCO speed */
 	f_vco = (si->ps.f_ref / (m + 1)) * (n + 1);
-	LOG(2,("MAVENTV: using vid VCO frequency %fMhz\n", f_vco));
+	LOG(2, ("MAVENTV: using vid VCO frequency %fMhz\n", f_vco));
 
-	switch(si->ps.card_type)
+	switch (si->ps.card_type)
 	{
 	case G100:
 	case G200:
-		for(;;)
+		for (;;)
 		{
 			if (f_vco >= 180) {p |= (0x03 << 3); break;};
 			if (f_vco >= 140) {p |= (0x02 << 3); break;};
@@ -228,7 +229,7 @@ status_t g100_g400max_maventv_vid_pll_find(
 		}
 		break;
 	default:
-		for(;;)
+		for (;;)
 		{
 			if (f_vco >= 240) {p |= (0x03 << 3); break;};
 			if (f_vco >= 170) {p |= (0x02 << 3); break;};
@@ -246,9 +247,9 @@ status_t g100_g400max_maventv_vid_pll_find(
 	*ht_last_line = best[4];
 
 	/* display the found pixelclock values */
-	LOG(2,("MAVENTV: vid PLL check: got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
+	LOG(2, ("MAVENTV: vid PLL check: got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
 		(f_vco / ((p & 0x07) + 1)), m, n, p));
-	LOG(2,("MAVENTV: new h_total %d, ht_lastline %d\n", *ht_new, *ht_last_line));
+	LOG(2, ("MAVENTV: new h_total %d, ht_lastline %d\n", *ht_new, *ht_last_line));
 
 	/* return status */
 	if (diff_smallest == 999999999) return B_ERROR;

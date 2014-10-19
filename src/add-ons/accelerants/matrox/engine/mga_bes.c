@@ -14,7 +14,7 @@ struct move_overlay_info
 	uint32 hsrcstv;		/* horizontal source start in source buffer (clipping) */
 	uint32 hsrcendv;	/* horizontal source end in source buffer (clipping) */
 	uint32 v1srcstv;	/* vertical source start in source buffer (clipping) */
-	uint32 a1orgv;		/* alternate source clipping via startadress of source buffer */
+	uintptr_t a1orgv;	/* alternate source clipping via startadress of source buffer */
 };
 
 static void gx00_bes_calc_move_overlay(move_overlay_info *moi);
@@ -270,9 +270,9 @@ static void gx00_bes_calc_move_overlay(move_overlay_info *moi)
 	/* calculate relative base_adress and 'vertical weight fractional part' */
 	moi->v1srcstv = 0;
 	/* calculate origin adress */
-	moi->a1orgv = (uint32)((vuint32 *)si->overlay.ob.buffer);
-	moi->a1orgv -= (uint32)((vuint32 *)si->framebuffer);
-	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n", moi->a1orgv));
+	moi->a1orgv = (uintptr_t)((vuint32 *)si->overlay.ob.buffer);
+	moi->a1orgv -= (uintptr_t)((vuint32 *)si->framebuffer);
+	LOG(4, ("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n", moi->a1orgv));
 	/* check for destination vertical clipping at top side */
 	if (si->overlay.ow.v_start < crtc_vstart)
 	{
@@ -285,9 +285,7 @@ static void gx00_bes_calc_move_overlay(move_overlay_info *moi)
 			 * bytes per row source picture */
 			moi->v1srcstv = (si->overlay.ow.height - 2) * si->overlay.v_ifactor;
 			moi->a1orgv += ((moi->v1srcstv >> 16) * si->overlay.ob.bytes_per_row);
-		}
-		else
-		{
+		} else {
 			/* increase source buffer origin with:
 			 * (integer part of (number of destination picture clipping pixels * inverse scaling factor)) *
 			 * bytes per row source picture */

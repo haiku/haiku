@@ -337,17 +337,19 @@ status_t gx00_dac_pix_pll_find
 	return B_ERROR;
 }
 
+
 /* find nearest valid pixel PLL setting: rewritten by rudolf */
 static status_t milx_dac_pix_pll_find(
-	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result)
+	display_mode target, float* calc_pclk, uint8* m_result, uint8* n_result,
+	uint8* p_result)
 {
 	int m = 0, n = 0, p = 0;
-	float error, error_best = 999999999;
-	int best[3]; 
+	float error, error_best = INFINITY;
+	int best[3] = {0, 0, 0};
 	float f_vco, max_pclk;
-	float req_pclk = target.timing.pixel_clock/1000.0;
+	float req_pclk = target.timing.pixel_clock / 1000.0;
 
-	LOG(4,("DAC: MIL1/MIL2 TVP restrictions apply\n"));
+	LOG(4, ("DAC: MIL1/MIL2 TVP restrictions apply\n"));
 
 	/* determine the max. pixelclock for the current videomode */
 	switch (target.space)
@@ -375,15 +377,15 @@ static status_t milx_dac_pix_pll_find(
 	/* lower limit is min_pixel_vco divided by highest postscaler-factor */
 	if (req_pclk < (si->ps.min_pixel_vco / 8.0))
 	{
-		LOG(4,("DAC: TVP clamping pixclock: requested %fMHz, set to %fMHz\n",
-										req_pclk, (float)(si->ps.min_pixel_vco / 8.0)));
+		LOG(4, ("DAC: TVP clamping pixclock: requested %fMHz, set to %fMHz\n",
+			req_pclk, (float)(si->ps.min_pixel_vco / 8.0)));
 		req_pclk = (si->ps.min_pixel_vco / 8.0);
 	}
 	/* upper limit is given by pins in combination with current active mode */
 	if (req_pclk > max_pclk)
 	{
-		LOG(4,("DAC: TVP clamping pixclock: requested %fMHz, set to %fMHz\n",
-														req_pclk, (float)max_pclk));
+		LOG(4, ("DAC: TVP clamping pixclock: requested %fMHz, set to %fMHz\n",
+			req_pclk, (float)max_pclk));
 		req_pclk = max_pclk;
 	}
 
@@ -424,14 +426,14 @@ static status_t milx_dac_pix_pll_find(
 	p = best[2];
 
 	f_vco = (((8 * si->ps.f_ref) / n) * m);
-	LOG(2,("DAC: TVP pix VCO frequency found %fMhz\n", f_vco));
+	LOG(2, ("DAC: TVP pix VCO frequency found %fMhz\n", f_vco));
 
 	/* setup the scalers programming values for found optimum setting */
 	*calc_pclk = (f_vco / p);
 	*m_result = (65 - m);
 	*n_result = (65 - n);
 
-	switch(p)
+	switch (p)
 	{
 	case 1:
 		p = 0x00;
@@ -449,36 +451,38 @@ static status_t milx_dac_pix_pll_find(
 	*p_result = p;
 
 	/* display the found pixelclock values */
-	LOG(2,("DAC: TVP pix PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
+	LOG(2, ("DAC: TVP pix PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
 		req_pclk, *calc_pclk, *m_result, *n_result, *p_result));
 
 	return B_OK;
 }
 
+
 /* find nearest valid pixel PLL setting: rewritten by rudolf */
 static status_t g100_g400max_dac_pix_pll_find(
-	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
+	display_mode target, float* calc_pclk, uint8* m_result, uint8* n_result,
+	uint8* p_result, uint8 test)
 {
 	int m = 0, n = 0, p = 0, m_max;
-	float error, error_best = 999999999;
-	int best[3]; 
+	float error, error_best = INFINITY;
+	int best[3] = {0, 0, 0};
 	float f_vco, max_pclk;
 	float req_pclk = target.timing.pixel_clock/1000.0;
 
-	/* determine the max. reference-frequency postscaler setting for the 
+	/* determine the max. reference-frequency postscaler setting for the
 	 * current card (see G100, G200 and G400 specs). */
-	switch(si->ps.card_type)
+	switch (si->ps.card_type)
 	{
 	case G100:
-		LOG(4,("DAC: G100 restrictions apply\n"));
+		LOG(4, ("DAC: G100 restrictions apply\n"));
 		m_max = 7;
 		break;
 	case G200:
-		LOG(4,("DAC: G200 restrictions apply\n"));
+		LOG(4, ("DAC: G200 restrictions apply\n"));
 		m_max = 7;
 		break;
 	default:
-		LOG(4,("DAC: G400/G400MAX restrictions apply\n"));
+		LOG(4, ("DAC: G400/G400MAX restrictions apply\n"));
 		m_max = 32;
 		break;
 	}
@@ -490,7 +494,7 @@ static status_t g100_g400max_dac_pix_pll_find(
 	 * only modify the clock if we are actually going to set the mode */
 	if ((target.flags & DUALHEAD_BITS) && test)
 	{
-		LOG(4,("DAC: dualhead mode active: modified requested pixelclock +1.5%%\n"));
+		LOG(4, ("DAC: dualhead mode active: modified requested pixelclock +1.5%%\n"));
 		req_pclk *= 1.015;
 	}
 
@@ -523,15 +527,15 @@ static status_t g100_g400max_dac_pix_pll_find(
 	/* lower limit is min_pixel_vco divided by highest postscaler-factor */
 	if (req_pclk < (si->ps.min_pixel_vco / 8.0))
 	{
-		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
-										req_pclk, (float)(si->ps.min_pixel_vco / 8.0)));
+		LOG(4, ("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
+			req_pclk, (float)(si->ps.min_pixel_vco / 8.0)));
 		req_pclk = (si->ps.min_pixel_vco / 8.0);
 	}
 	/* upper limit is given by pins in combination with current active mode */
 	if (req_pclk > max_pclk)
 	{
-		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
-														req_pclk, (float)max_pclk));
+		LOG(4, ("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
+			req_pclk, (float)max_pclk));
 		req_pclk = max_pclk;
 	}
 
@@ -575,13 +579,13 @@ static status_t g100_g400max_dac_pix_pll_find(
 	/* calc the needed PLL loopbackfilter setting belonging to current VCO speed, 
 	 * for the current card (see G100, G200 and G400 specs). */
 	f_vco = (si->ps.f_ref / (m + 1)) * (n + 1);
-	LOG(2,("DAC: pix VCO frequency found %fMhz\n", f_vco));
+	LOG(2, ("DAC: pix VCO frequency found %fMhz\n", f_vco));
 
-	switch(si->ps.card_type)
+	switch (si->ps.card_type)
 	{
 	case G100:
 	case G200:
-		for(;;)
+		for (;;)
 		{
 			if (f_vco >= 180) {p |= (0x03 << 3); break;};
 			if (f_vco >= 140) {p |= (0x02 << 3); break;};
@@ -590,7 +594,7 @@ static status_t g100_g400max_dac_pix_pll_find(
 		}
 		break;
 	default:
-		for(;;)
+		for (;;)
 		{
 			if (f_vco >= 240) {p |= (0x03 << 3); break;};
 			if (f_vco >= 170) {p |= (0x02 << 3); break;};
@@ -607,24 +611,26 @@ static status_t g100_g400max_dac_pix_pll_find(
 	*p_result = p;
 
 	/* display the found pixelclock values */
-	LOG(2,("DAC: pix PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
+	LOG(2, ("DAC: pix PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
 		req_pclk, *calc_pclk, *m_result, *n_result, *p_result));
 
 	return B_OK;
 }
 
+
 /* find nearest valid pixel PLL setting: rewritten by rudolf */
 static status_t g450_g550_dac_pix_pll_find
-	(display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
+	(display_mode target, float* calc_pclk, uint8* m_result, uint8* n_result,
+	uint8* p_result, uint8 test)
 {
 	int m = 0, n = 0;
 	uint8 p = 0, q = 0;
-	float error, error_best = 999999999;
-	int best[3]; 
+	float error, error_best = INFINITY;
+	int best[3] = {0, 0, 0};
 	float f_vco, max_pclk;
-	float req_pclk = target.timing.pixel_clock/1000.0;
+	float req_pclk = target.timing.pixel_clock / 1000.0;
 
-	LOG(4,("DAC: G450/G550 restrictions apply\n"));
+	LOG(4, ("DAC: G450/G550 restrictions apply\n"));
 
 	/* determine the max. pixelclock for the current videomode */
 	switch (target.space)
@@ -655,15 +661,15 @@ static status_t g450_g550_dac_pix_pll_find
 	/* lower limit is min_pixel_vco divided by highest postscaler-factor */
 	if (req_pclk < (si->ps.min_pixel_vco / 16.0))
 	{
-		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
-										req_pclk, (float)(si->ps.min_pixel_vco / 16.0)));
+		LOG(4, ("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
+			req_pclk, (float)(si->ps.min_pixel_vco / 16.0)));
 		req_pclk = (si->ps.min_pixel_vco / 16.0);
 	}
 	/* upper limit is given by pins in combination with current active mode */
 	if (req_pclk > max_pclk)
 	{
-		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
-														req_pclk, (float)max_pclk));
+		LOG(4, ("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
+			req_pclk, (float)max_pclk));
 		req_pclk = max_pclk;
 	}
 
@@ -703,7 +709,7 @@ static status_t g450_g550_dac_pix_pll_find
 	/* setup the scalers programming values for found optimum setting */
 	m=best[0] - 1;
 	n=best[1] - 2;
-	switch(best[2])
+	switch (best[2])
 	{
 	case 1:
 		p = 0x40;
@@ -724,14 +730,14 @@ static status_t g450_g550_dac_pix_pll_find
 
 	/* log the closest VCO speed found */
 	f_vco = ((si->ps.f_ref * 2) / (m + 1)) * (n + 2);
-	LOG(2,("DAC: pix VCO frequency found %fMhz\n", f_vco));
+	LOG(2, ("DAC: pix VCO frequency found %fMhz\n", f_vco));
 
 	/* now find the filtersetting that matches best with this frequency by testing.
 	 * for now we assume this routine succeeds to get us a stable setting */
 	if (test)
 		gx50_dac_check_pix_pll_range(m, n, &p, &q);
-	else 
-		LOG(2,("DAC: Not testing G450/G550 VCO feedback filters\n"));
+	else
+		LOG(2, ("DAC: Not testing G450/G550 VCO feedback filters\n"));
 
 	/* return the results */
 	*calc_pclk = f_vco / best[2];
@@ -740,35 +746,37 @@ static status_t g450_g550_dac_pix_pll_find
 	*p_result = p;
 
 	/* display the found pixelclock values */
-	LOG(2,("DAC: pix PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
+	LOG(2, ("DAC: pix PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
 		req_pclk, *calc_pclk, *m_result, *n_result, *p_result));
 
 	return B_OK;
 }
 
+
 /* find nearest valid system PLL setting */
 static status_t g100_g400max_dac_sys_pll_find(
-	float req_sclk,float * calc_sclk,uint8 * m_result,uint8 * n_result,uint8 * p_result)
+	float req_sclk, float* calc_sclk, uint8* m_result, uint8* n_result,
+	uint8 * p_result)
 {
 	int m = 0, n = 0, p = 0, m_max;
-	float error, error_best = 999999999;
-	int best[3]; 
+	float error, error_best = INFINITY;
+	int best[3] = {0, 0, 0};
 	float f_vco;
 
-	/* determine the max. reference-frequency postscaler setting for the 
+	/* determine the max. reference-frequency postscaler setting for the
 	 * current card (see G100, G200 and G400 specs). */
-	switch(si->ps.card_type)
+	switch (si->ps.card_type)
 	{
 	case G100:
-		LOG(4,("DAC: G100 restrictions apply\n"));
+		LOG(4, ("DAC: G100 restrictions apply\n"));
 		m_max = 7;
 		break;
 	case G200:
-		LOG(4,("DAC: G200 restrictions apply\n"));
+		LOG(4, ("DAC: G200 restrictions apply\n"));
 		m_max = 7;
 		break;
 	default:
-		LOG(4,("DAC: G400/G400MAX restrictions apply\n"));
+		LOG(4, ("DAC: G400/G400MAX restrictions apply\n"));
 		m_max = 32;
 		break;
 	}
@@ -777,15 +785,15 @@ static status_t g100_g400max_dac_sys_pll_find(
 	/* lower limit is min_system_vco divided by highest postscaler-factor */
 	if (req_sclk < (si->ps.min_system_vco / 8.0))
 	{
-		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
-										req_sclk, (float)(si->ps.min_system_vco / 8.0)));
+		LOG(4, ("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
+			req_sclk, (float)(si->ps.min_system_vco / 8.0)));
 		req_sclk = (si->ps.min_system_vco / 8.0);
 	}
 	/* upper limit is max_system_vco */
 	if (req_sclk > si->ps.max_system_vco)
 	{
-		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
-										req_sclk, (float)si->ps.max_system_vco));
+		LOG(4, ("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
+			req_sclk, (float)si->ps.max_system_vco));
 		req_sclk = si->ps.max_system_vco;
 	}
 
@@ -829,13 +837,13 @@ static status_t g100_g400max_dac_sys_pll_find(
 	/* calc the needed PLL loopbackfilter setting belonging to current VCO speed, 
 	 * for the current card (see G100, G200 and G400 specs). */
 	f_vco = (si->ps.f_ref / (m + 1)) * (n + 1);
-	LOG(2,("DAC: sys VCO frequency found %fMhz\n", f_vco));
+	LOG(2, ("DAC: sys VCO frequency found %fMhz\n", f_vco));
 
-	switch(si->ps.card_type)
+	switch (si->ps.card_type)
 	{
 	case G100:
 	case G200:
-		for(;;)
+		for (;;)
 		{
 			if (f_vco >= 180) {p |= (0x03 << 3); break;};
 			if (f_vco >= 140) {p |= (0x02 << 3); break;};
@@ -844,7 +852,7 @@ static status_t g100_g400max_dac_sys_pll_find(
 		}
 		break;
 	default:
-		for(;;)
+		for (;;)
 		{
 			if (f_vco >= 240) {p |= (0x03 << 3); break;};
 			if (f_vco >= 170) {p |= (0x02 << 3); break;};
@@ -861,11 +869,12 @@ static status_t g100_g400max_dac_sys_pll_find(
 	*p_result = p;
 
 	/* display the found pixelclock values */
-	LOG(2,("DAC: sys PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
+	LOG(2, ("DAC: sys PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
 		req_sclk, *calc_sclk, *m_result, *n_result, *p_result));
 
 	return B_OK;
 }
+
 
 static status_t gx50_dac_check_sys_pll(uint8 m, uint8 n, uint8 p)
 {
@@ -948,35 +957,37 @@ static status_t gx50_dac_check_sys_pll_range(uint8 m, uint8 n, uint8 *p, uint8 *
 	if (*q == 2) return B_OK;
 
 	/* nothing worked at all */
-	LOG(2,("DAC: no working VCO filter found!\n"));
+	LOG(2, ("DAC: no working VCO filter found!\n"));
 	return B_ERROR;
 }
 
+
 /* find nearest valid system PLL setting */
 static status_t g450_g550_dac_sys_pll_find(
-	float req_sclk,float * calc_sclk,uint8 * m_result,uint8 * n_result,uint8 * p_result)
+	float req_sclk, float* calc_sclk, uint8* m_result, uint8* n_result,
+	uint8* p_result)
 {
 	int m = 0, n = 0;
 	uint8 p = 0, q = 0;
-	float error, error_best = 999999999;
-	int best[3]; 
+	float error, error_best = INFINITY;
+	int best[3] = {0, 0, 0};
 	float f_vco;
 
-	LOG(4,("DAC: G450/G550 restrictions apply\n"));
+	LOG(4, ("DAC: G450/G550 restrictions apply\n"));
 
 	/* Make sure the requested pixelclock is within the PLL's operational limits */
 	/* lower limit is min_system_vco divided by highest postscaler-factor */
 	if (req_sclk < (si->ps.min_system_vco / 16.0))
 	{
-		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
-										req_sclk, (float)(si->ps.min_system_vco / 16.0)));
+		LOG(4, ("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
+			req_sclk, (float)(si->ps.min_system_vco / 16.0)));
 		req_sclk = (si->ps.min_system_vco / 16.0);
 	}
 	/* upper limit is max_system_vco */
 	if (req_sclk > si->ps.max_system_vco)
 	{
-		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
-										req_sclk, (float)si->ps.max_system_vco));
+		LOG(4, ("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
+			req_sclk, (float)si->ps.max_system_vco));
 		req_sclk = si->ps.max_system_vco;
 	}
 
