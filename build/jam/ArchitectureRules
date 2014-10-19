@@ -470,27 +470,12 @@ rule ArchitectureSetupWarnings architecture
 			-integrated-as -fgnu89-inline -fheinous-gnu-extensions : global ;
 	}
 
-	EnableWerror src add-ons accelerants 3dfx ;
-	EnableWerror src add-ons accelerants ati ;
-	EnableWerror src add-ons accelerants common ;
-	EnableWerror src add-ons accelerants et6x00 ;
-#	EnableWerror src add-ons accelerants intel_extreme ;
-#	EnableWerror src add-ons accelerants matrox ;
-	EnableWerror src add-ons accelerants neomagic ;
-#	EnableWerror src add-ons accelerants nvidia ;
-	EnableWerror src add-ons accelerants nvidia_gpgpu ;
-#	EnableWerror src add-ons accelerants radeon ;
-#	EnableWerror src add-ons accelerants radeon_hd ;
-	EnableWerror src add-ons accelerants s3 ;
-	EnableWerror src add-ons accelerants skeleton ;
-	EnableWerror src add-ons accelerants vesa ;
-	EnableWerror src add-ons accelerants via ;
-	EnableWerror src add-ons accelerants vmware ;
+	EnableWerror src add-ons accelerants ;
 	EnableWerror src add-ons bluetooth ;
 	EnableWerror src add-ons decorators ;
 	EnableWerror src add-ons disk_systems ;
 	EnableWerror src add-ons input_server devices ;
-#	EnableWerror src add-ons input_server filters ;
+	EnableWerror src add-ons input_server filters ;
 #	EnableWerror src add-ons input_server methods ;
 	EnableWerror src add-ons kernel bluetooth ;
 #	EnableWerror src add-ons kernel bus_managers acpi ;
