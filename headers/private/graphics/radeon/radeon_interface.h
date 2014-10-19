@@ -429,7 +429,7 @@ typedef struct {
 
 // status of overlay
 typedef struct {
-	vint32	inuse;				// one, if someone allocated overlay head
+	int32	inuse;				// one, if someone allocated overlay head
 								// (this doesn't necessarily mean that an overlay is shown)
 	uint32	token;				// arbitrarily chosen token to identify overlay owner
 								// (increased by 1 whenever there is a new owner)
