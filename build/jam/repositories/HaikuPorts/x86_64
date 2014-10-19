@@ -91,6 +91,7 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher-1.2.7.10-1
 	less-451-4
 	libedit-2012_06_01_3.0-1
+	libedit_devel-2012_06_01_3.0-1
 	libexecinfo-1.1-2
 	libexecinfo_devel-1.1-2
 	libffi-3.0.13-2
@@ -186,6 +187,7 @@ RemotePackageRepository HaikuPorts
 	which-2.20-2
 	wpa_supplicant-2.0-3
 	xz_utils-5.0.6-1
+	xz_utils_devel-5.0.6-1
 	yasm-1.2.0-3
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
