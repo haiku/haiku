@@ -42,7 +42,7 @@ RemotePackageRepository HaikuPorts
 	flex-2.5.39-1
 	fossil-1.29-1
 	freetype-2.5.3-3
-	freetype_devel-2.5.3-1
+	freetype_devel-2.5.3-3
 	fribidi-0.19.6-2
 	fribidi_devel-0.19.6-2
 	gawk-4.1.0-2
