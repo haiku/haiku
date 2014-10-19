@@ -248,7 +248,7 @@ RemotePackageRepository HaikuPorts
 	qrencode-3.3.0-1
 	qrencode_devel-3.3.0-1
 	# the non-devel package isn't useful
-	qrencode_kdl_devel-3.3.0-1
+	qrencode_kdl_devel-3.3.0-2
 	readline-6.3-2
 	readline_devel-6.3-2
 	roadfighter-1.0.1269-1
