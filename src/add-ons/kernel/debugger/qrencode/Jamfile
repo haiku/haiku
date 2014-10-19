@@ -2,11 +2,11 @@ SubDir HAIKU_TOP src add-ons kernel debugger qrencode ;
 
 UsePrivateHeaders kernel ;
 
-UseBuildFeatureHeaders libqrencode ;
+UseBuildFeatureHeaders libqrencode_kdl ;
 Includes [ FGristFiles module.cpp ]
-	: [ BuildFeatureAttribute libqrencode : headers ] ;
+	: [ BuildFeatureAttribute libqrencode_kdl : headers ] ;
 
 KernelAddon <kdebug>qrencode :
 	module.cpp
-	: [ BuildFeatureAttribute libqrencode : library ]
+	: [ BuildFeatureAttribute libqrencode_kdl : library ]
 	;

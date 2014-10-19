@@ -473,17 +473,14 @@ if [ IsPackageAvailable libsolv_devel ] {
 
 
 # qrencode
-if [ IsPackageAvailable qrencode_devel ] {
-	ExtractBuildFeatureArchives libqrencode :
-		file: base qrencode
-			runtime: lib
-		file: devel qrencode_devel
-			depends: base
-			library: $(developLibDir)/libqrencode.a
+if [ IsPackageAvailable qrencode_kdl_devel ] {
+	ExtractBuildFeatureArchives libqrencode_kdl :
+		file: devel qrencode_kdl_devel
+			library: $(developLibDir)/libqrencode_kdl.a
 			headers: $(developHeadersDir)
 		;
 
-	EnableBuildFeatures libqrencode ;
+	EnableBuildFeatures libqrencode_kdl ;
 } else {
 	Echo "qrencode support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
