@@ -7,11 +7,13 @@ UsePrivateHeaders interface ;
 SubDirSysHdrs $(SUBDIR) ;
 SubDirHdrs [ FDirName $(SUBDIR) t9 ] ;
 
+
 if $(TARGET_PLATFORM) != haiku {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-Addon t9 : 
+
+Addon t9 :
 	T9InputServerMethod.cpp
-	: be textencoding input_server ;
+	: be textencoding input_server [ TargetLibsupc++ ] ;
 
