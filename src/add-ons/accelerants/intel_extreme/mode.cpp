@@ -190,14 +190,14 @@ get_pll_limits(pll_limits &limits)
 		limits = kLimits;
 	}
 
-	TRACE("PLL limits, min: p %lu (p1 %lu, p2 %lu), n %lu, m %lu "
-		"(m1 %lu, m2 %lu)\n", limits.min.post, limits.min.post1,
-		limits.min.post2, limits.min.n, limits.min.m, limits.min.m1,
-		limits.min.m2);
-	TRACE("PLL limits, max: p %lu (p1 %lu, p2 %lu), n %lu, m %lu "
-		"(m1 %lu, m2 %lu)\n", limits.max.post, limits.max.post1,
-		limits.max.post2, limits.max.n, limits.max.m, limits.max.m1,
-		limits.max.m2);
+	TRACE("PLL limits, min: p %" B_PRIu32 " (p1 %" B_PRIu32 ", p2 %" B_PRIu32
+		"), n %" B_PRIu32 ", m %" B_PRIu32 " (m1 %" B_PRIu32 ", m2 %" B_PRIu32
+		")\n", limits.min.post, limits.min.post1, limits.min.post2,
+		limits.min.n, limits.min.m, limits.min.m1, limits.min.m2);
+	TRACE("PLL limits, max: p %" B_PRIu32 " (p1 %" B_PRIu32 ", p2 %" B_PRIu32
+		"), n %" B_PRIu32 ", m %" B_PRIu32 " (m1 %" B_PRIu32 ", m2 %" B_PRIu32
+		")\n", limits.max.post, limits.max.post1, limits.max.post2,
+		limits.max.n, limits.max.m, limits.max.m1, limits.max.m2);
 }
 
 
@@ -283,8 +283,9 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 
 	divisors = bestDivisors;
 
-	TRACE("%s: found: %g MHz, p = %lu (p1 = %lu, p2 = %lu), n = %lu, m = %lu "
-		"(m1 = %lu, m2 = %lu)\n", __func__,
+	TRACE("%s: found: %g MHz, p = %" B_PRIu32 " (p1 = %" B_PRIu32 ", p2 = %"
+		B_PRIu32 "), n = %" B_PRIu32 ", m = %" B_PRIu32 " (m1 = %" B_PRIu32
+		", m2 = %" B_PRIu32 ")\n", __func__,
 		((referenceClock * divisors.m) / divisors.n) / divisors.post,
 		divisors.post, divisors.post1, divisors.post2, divisors.n,
 		divisors.m, divisors.m1, divisors.m2);
@@ -600,7 +601,7 @@ create_mode_list(void)
 	// vs the HEAD_MODE_ in head_mode
 	for (uint32 i = 0; i < sizeof(gpioPinMap) / sizeof(gpioPinMap[0]); i++) {
 		i2c_bus bus;
-		bus.cookie = (void*)gpioPinMap[i].pin;
+		bus.cookie = (void*)(uintptr_t)gpioPinMap[i].pin;
 		bus.set_signals = &set_i2c_signals;
 		bus.get_signals = &get_i2c_signals;
 		ddc2_init_timing(&bus);

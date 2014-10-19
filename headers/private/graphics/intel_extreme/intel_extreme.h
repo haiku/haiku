@@ -185,7 +185,7 @@ struct intel_shared_info {
 
 	int32			overlay_channel_used;
 	bool			overlay_active;
-	uint32			overlay_token;
+	uintptr_t		overlay_token;
 	phys_addr_t		physical_overlay_registers;
 	uint32			overlay_offset;
 

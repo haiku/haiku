@@ -223,7 +223,8 @@ intel_init_accelerant(int device)
 	}
 
 	TRACE("head detected: %#x\n", gInfo->head_mode);
-	TRACE("adpa: %08lx, dova: %08lx, dovb: %08lx, lvds: %08lx\n",
+	TRACE("adpa: %08" B_PRIx32 ", dova: %08" B_PRIx32 ", dovb: %08" B_PRIx32
+		", lvds: %08" B_PRIx32 "\n",
 		read32(INTEL_DISPLAY_A_ANALOG_PORT),
 		read32(INTEL_DISPLAY_A_DIGITAL_PORT),
 		read32(INTEL_DISPLAY_B_DIGITAL_PORT),

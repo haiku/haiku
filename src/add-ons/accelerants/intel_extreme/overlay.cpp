@@ -635,9 +635,10 @@ intel_configure_overlay(overlay_token overlayToken,
 				+ (view->width << 1) + 0x1f) >> 5)
 				- (overlay->buffer_offset >> 5) - 1) << 2;
 		} else {
-			registers->source_bytes_per_row_rgb = ((((overlay->buffer_offset
-				+ (view->width << 1) + 0x3f) >> 6)
-				- (overlay->buffer_offset >> 6) << 1) - 1) << 2;
+			int yaddress = overlay->buffer_offset;
+			int yswidth = view->width << 1;
+			registers->source_bytes_per_row_rgb = (((((yaddress
+				+ yswidth + 0x3f) >> 6) - (yaddress >> 6)) << 1) - 1) << 2;
 		}
 
 		// horizontal scaling

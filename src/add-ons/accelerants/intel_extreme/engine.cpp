@@ -129,7 +129,7 @@ QueueCommands::MakeSpace(uint32 size)
 
 		if (fRingBuffer.space_left < size) {
 			if (system_time() > start + 1000000LL) {
-				ERROR("engine stalled, head %lx\n", head);
+				ERROR("engine stalled, head %" B_PRIx32 "\n", head);
 				break;
 			}
 			spin(10);
@@ -256,7 +256,7 @@ intel_wait_engine_idle(void)
 
 		if (system_time() > start + 1000000LL) {
 			// the engine seems to be locked up!
-			ERROR("engine locked up, head %lx!\n", head);
+			ERROR("engine locked up, head %" B_PRIx32 "!\n", head);
 			break;
 		}
 
