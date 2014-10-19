@@ -108,9 +108,7 @@ BMessageFormat::_Initialize(const UnicodeString& pattern)
 {
 	UErrorCode error = U_ZERO_ERROR;
 	Locale* icuLocale
-		= fConventions.UseStringsFromPreferredLanguage()
-			? BLanguage::Private(&fLanguage).ICULocale()
-			: BFormattingConventions::Private(&fConventions).ICULocale();
+		= BLanguage::Private(&fLanguage).ICULocale();
 
 	fFormatter = new MessageFormat(pattern, *icuLocale, error);
 
