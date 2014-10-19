@@ -35,7 +35,7 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 	fDoneButton = new BButton("Done Button", B_TRANSLATE("Done"),
 		new BMessage(MSG_PREF_BTN_DONE));
 
-	fPrefTabView = new BTabView("Pref Tab View");
+	fPrefTabView = new BTabView("Pref Tab View", B_WIDTH_FROM_WIDEST);
 
 	// Site Tab
 	fSiteTab = new BTab();
