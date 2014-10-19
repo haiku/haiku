@@ -39,13 +39,23 @@ MessageFormatTest::TestFormat()
 		"few{Wybrano # obiekty} many{Wybrano # obiektów} "
 		"other{Wybrano # obyektu}}";
 
+	// There are 4 rules in russian: one (1, 21, ...), few (2-4, 22-24, ...),
+	// many (anything else), and other (non-integer numbers). When formatting
+	// integers only, either both many and other must be there (with other
+	// not being used), or one/few/other must be used.
+	static const char* russianTemplate = "{0, plural, one{# объект} "
+		"few{# объекта} other{# объектов}}";
+
 	static const Test tests[] = {
 		{"en_US", "{0, plural, one{# dog} other{# dogs}}", 1, "1 dog"},
 		{"en_US", "{0, plural, one{# dog} other{# dogs}}", 2, "2 dogs"},
 		{"pl_PL", polishTemplate, 1, "Wybrano 1 obiekt"},
-		{"pl_PL", polishTemplate, 3, "Wybrano 3 obyektu"},
-		{"pl_PL", polishTemplate, 5, "Wybrano 5 obyektu"},
-		{"pl_PL", polishTemplate, 23, "Wybrano 23 obyektu"},
+		{"pl_PL", polishTemplate, 3, "Wybrano 3 obiekty"},
+		{"pl_PL", polishTemplate, 5, "Wybrano 5 obiektów"},
+		{"pl_PL", polishTemplate, 23, "Wybrano 23 obiekty"},
+		{"ru_RU", russianTemplate, 1, "1 объект"},
+		{"ru_RU", russianTemplate, 2, "2 объекта"},
+		{"ru_RU", russianTemplate, 5, "5 объектов"},
 		{NULL, NULL, 0, NULL}
 	};
 
