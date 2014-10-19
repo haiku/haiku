@@ -10,3 +10,5 @@
 set meta-flag on
 set output-meta on
 set convert-meta off
+
+set mark-symlinked-directories On
