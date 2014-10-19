@@ -60,7 +60,7 @@ uint32 OVERLAY_SUPPORTED_FEATURES(uint32 a_color_space)
 	switch (a_color_space)
 	{
 	default:
-			return 
+			return
 				( B_OVERLAY_KEYING_USES_ALPHA 	 |
 				  B_OVERLAY_COLOR_KEY 			 |
 				  B_OVERLAY_HORIZONTAL_FILTERING |
@@ -68,19 +68,21 @@ uint32 OVERLAY_SUPPORTED_FEATURES(uint32 a_color_space)
 	}
 }
 
-const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint16 height)
+
+const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width,
+	uint16 height)
 {
 	int offset = 0;					/* used to determine next buffer to create */
-	uint32 adress, adress2, temp32;	/* used to calculate buffer adresses */
+	uintptr_t adress, adress2, temp32;	/* used to calculate buffer adresses */
 	uint32 oldsize = 0;				/* used to 'squeeze' new buffers between already existing ones */
 	int cnt;						/* loopcounter */
 
 	/* acquire the shared benaphore */
 	AQUIRE_BEN(si->overlay.lock)
 
-	LOG(4,("Overlay: cardRAM_start = $%08x\n",(uint32)((uint8*)si->framebuffer)));
-	LOG(4,("Overlay: cardRAM_start_DMA = $%08x\n",(uint32)((uint8*)si->framebuffer_pci)));
-	LOG(4,("Overlay: cardRAM_size = %3.3fMb\n",(si->ps.memory_size / (1024.0 * 1024.0))));
+	LOG(4, ("Overlay: cardRAM_start = $%p\n", (uint8*)si->framebuffer));
+	LOG(4, ("Overlay: cardRAM_start_DMA = $%p\n", (uint8*)si->framebuffer_pci));
+	LOG(4, ("Overlay: cardRAM_size = %3.3fMb\n", (si->ps.memory_size / (1024.0 * 1024.0))));
 
 	/* find first empty slot (room for another buffer?) */
 	for (offset = 0; offset < MAXBUFFERS; offset++)
@@ -88,7 +90,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		if (si->overlay.myBuffer[offset].buffer == NULL) break;
 	}
 
-	LOG(4,("Overlay: Allocate_buffer offset = %d\n",offset));
+	LOG(4, ("Overlay: Allocate_buffer offset = %d\n", offset));
 
 	if (offset < MAXBUFFERS)
 	/* setup new scaler input buffer */
@@ -100,9 +102,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 					{
 						/* check if slopspace is needed: RIVA128 and TNT need ~0x000f. */
 						si->overlay.myBuffer[offset].width = ((width + 0x000f) & ~0x000f);
-					}
-					else
-					{
+					} else {
 						/* check if slopspace is needed: GeForce need ~0x001f. */
 						/* fixme:
 						 * update needed for GF DVDmax support to adhere to CRTC2 constraints?? */
@@ -114,7 +114,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 					//fixme: tune for GF and TNT...
 					if (si->overlay.myBuffer[offset].width > 4088)
 					{
-						LOG(4,("Overlay: Sorry, requested buffer pitch not supported, aborted\n"));
+						LOG(4, ("Overlay: Sorry, requested buffer pitch not supported, aborted\n"));
 
 						/* release the shared benaphore */
 						RELEASE_BEN(si->overlay.lock)
@@ -124,7 +124,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 					break;
 			default:
 					/* unsupported colorspace! */
-					LOG(4,("Overlay: Sorry, colorspace $%08x not supported, aborted\n",cs));
+					LOG(4, ("Overlay: Sorry, colorspace $%08x not supported, aborted\n",cs));
 
 					/* release the shared benaphore */
 					RELEASE_BEN(si->overlay.lock)
@@ -141,7 +141,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 
 			/* check if the requested buffer width is supported */
 			if (si->overlay.myBuffer[offset].width > 1024) {
-				LOG(4,("Overlay: Sorry, requested buffer width not supported, aborted\n"));
+				LOG(4, ("Overlay: Sorry, requested buffer width not supported, aborted\n"));
 
 				/* release the shared benaphore */
 				RELEASE_BEN(si->overlay.lock)
@@ -149,7 +149,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 			}
 			/* check if the requested buffer height is supported */
 			if (height > 1024) {
-				LOG(4,("Overlay: Sorry, requested buffer height not supported, aborted\n"));
+				LOG(4, ("Overlay: Sorry, requested buffer height not supported, aborted\n"));
 
 				/* release the shared benaphore */
 				RELEASE_BEN(si->overlay.lock)
@@ -161,7 +161,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 
 			/* check if the requested buffer width is supported */
 			if (si->overlay.myBuffer[offset].width > 1920) {
-				LOG(4,("Overlay: Sorry, requested buffer width not supported, aborted\n"));
+				LOG(4, ("Overlay: Sorry, requested buffer width not supported, aborted\n"));
 
 				/* release the shared benaphore */
 				RELEASE_BEN(si->overlay.lock)
@@ -169,7 +169,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 			}
 			/* check if the requested buffer height is supported */
 			if (height > 1080) {
-				LOG(4,("Overlay: Sorry, requested buffer height not supported, aborted\n"));
+				LOG(4, ("Overlay: Sorry, requested buffer height not supported, aborted\n"));
 
 				/* release the shared benaphore */
 				RELEASE_BEN(si->overlay.lock)
@@ -183,7 +183,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 
 		si->overlay.myBuffer[offset].space = cs;
 		si->overlay.myBuffer[offset].height = height;
-	
+
 		/* we define the overlay buffers to reside 'in the back' of the cards RAM */
 		/* NOTE to app programmers:
 		 * Beware that an app using overlay needs to track workspace switches and screenprefs
@@ -200,22 +200,22 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		/* Another NOTE for app programmers:
 		 * A *positive* side-effect of assigning the first overlay buffer exactly at the end of the
 		 * cardRAM is that apps that try to write beyond the buffer's space get a segfault immediately.
-		 * This *greatly* simplifies tracking such errors! 
+		 * This *greatly* simplifies tracking such errors!
 		 * Of course such errors may lead to strange effects in the app or driver behaviour if they are
 		 * not hunted down and removed.. */
 
 		/* calculate first free RAM adress in card:
-		 * Driver setup is as follows: 
+		 * Driver setup is as follows:
 		 * card base: 		- hardware cursor bitmap (if used),
 		 * directly above	- screen memory for both heads */
-		adress2 = (((uint32)((uint8*)si->fbc.frame_buffer)) +	/* cursor already included here */
+		adress2 = (((uintptr_t)((uint8*)si->fbc.frame_buffer)) +	/* cursor already included here */
 			(si->fbc.bytes_per_row * si->dm.virtual_height));	/* size in bytes of screen(s) */
-		LOG(4,("Overlay: first free cardRAM virtual adress $%08x\n", adress2));
+		LOG(4, ("Overlay: first free cardRAM virtual adress $%08x\n", adress2));
 
 		/* calculate 'preliminary' buffer size including slopspace */
 		oldsize = si->overlay.myBufInfo[offset].size;
-		si->overlay.myBufInfo[offset].size = 
-			si->overlay.myBuffer[offset].bytes_per_row * si->overlay.myBuffer[offset].height;
+		si->overlay.myBufInfo[offset].size
+			= si->overlay.myBuffer[offset].bytes_per_row * si->overlay.myBuffer[offset].height;
 
 		/* calculate virtual memory adress that would be needed for a new bitmap */
 		/* NOTE to app programmers:
@@ -228,7 +228,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		 * If you switch now to settings: 1600x1200x32bit (single head) the app needs to fallback to
 		 * bitmap output or maybe single buffered overlay output if small bitmaps are used. */ 
 
-		adress = (((uint32)((uint8*)si->framebuffer)) + si->ps.memory_size);
+		adress = (((uintptr_t)((uint8*)si->framebuffer)) + si->ps.memory_size);
 		/* Keep some extra distance as a workaround for certain bugs (see
 		 * DriverInterface.h for an explanation). */
 		if (si->ps.card_arch < NV40A)
@@ -246,7 +246,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 
 		/* Check if we need to modify the buffers starting adress and thus the size */
 		/* calculate 'would be' cardRAM offset */
-		temp32 = (adress - ((uint32)((vuint32 *)si->framebuffer)));
+		temp32 = (adress - ((uintptr_t)((vuint32 *)si->framebuffer)));
 		/* check if it is aligned */
 		if (temp32 != (temp32 & 0xfffffff0))
 		{
@@ -255,19 +255,19 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 			/* update the (already calculated) adress to get it aligned */
 			adress -= (temp32 - (temp32 & 0xfffffff0));
 		}
-		LOG(4,("Overlay: new buffer needs virtual adress $%08x\n", adress));
+		LOG(4, ("Overlay: new buffer needs virtual adress $%08x\n", adress));
 
 		/* First check now if buffer to be defined is 'last one' in memory (speaking backwards):
 		 * this is done to prevent a large buffer getting created in the space a small buffer 
 		 * occupied earlier, if not all buffers created were deleted.
 		 * Note also that the app can delete the buffers in any order desired. */
 
-		/* NOTE to app programmers: 
+		/* NOTE to app programmers:
 		 * If you are going to delete a overlay buffer you created, you should delete them *all* and
 		 * then re-create only the new ones needed. This way you are sure not to get unused memory-
 		 * space in between your overlay buffers for instance, so cardRAM is used 'to the max'. 
 		 * If you don't, you might not get a buffer at all if you are trying to set up a larger one
-		 * than before. 
+		 * than before.
 		 * (Indeed: not all buffers *have* to be of the same type and size...) */
 
 		for (cnt = offset; cnt < MAXBUFFERS; cnt++)
@@ -285,12 +285,10 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 						   "Overlay: resetting it to virtual adress $%08x and size $%08x\n", adress,oldsize));
 					/* force exiting the FOR loop */
 					cnt = MAXBUFFERS;
-				}
-				else
-				{
+				} else {
 					/* nogo, sorry */
-					LOG(4,("Overlay: Other buffer(s) exist after this one:\n"
-						   "Overlay: not enough space to 'squeeze' this one in, aborted\n"));
+					LOG(4, ("Overlay: Other buffer(s) exist after this one:\n"
+						"Overlay: not enough space to 'squeeze' this one in, aborted\n"));
 
 					/* Reset to the old size to prevent the space from 'growing' if we get here again... */
 					si->overlay.myBufInfo[offset].size = oldsize;
@@ -303,23 +301,23 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 			}
 		}
 
-		/* check if we have enough space to setup this new bitmap 
+		/* check if we have enough space to setup this new bitmap
 		 * (preventing overlap of desktop RAMspace & overlay bitmap RAMspace here) */
 		if (adress < adress2)
 		/* nope, sorry */
 		{
-			LOG(4,("Overlay: Sorry, no more space for buffers: aborted\n"));
+			LOG(4, ("Overlay: Sorry, no more space for buffers: aborted\n"));
 
 			/* release the shared benaphore */
 			RELEASE_BEN(si->overlay.lock)
 
 			return NULL;
 		}
-		/* continue buffer setup */		
+		/* continue buffer setup */
 		si->overlay.myBuffer[offset].buffer = (void *) adress;
 
 		/* calculate physical memory adress (for dma use) */
-		adress = (((uint32)((uint8*)si->framebuffer_pci)) + si->ps.memory_size);
+		adress = (((uintptr_t)((uint8*)si->framebuffer_pci)) + si->ps.memory_size);
 		/* Keep some extra distance as a workaround for certain bugs (see
 		 * DriverInterface.h for an explanation). */
 		if (si->ps.card_arch < NV40A)
@@ -334,20 +332,18 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		/* this adress is already aligned to the scaler's requirements (via the already modified sizes) */
 		si->overlay.myBuffer[offset].buffer_dma = (void *) adress;
 
-		LOG(4,("Overlay: New buffer: addr $%08x, dma_addr $%08x, color space $%08x\n",
-			(uint32)((uint8*)si->overlay.myBuffer[offset].buffer),
-			(uint32)((uint8*)si->overlay.myBuffer[offset].buffer_dma), cs));
-		LOG(4,("Overlay: New buffer's size is $%08x\n", si->overlay.myBufInfo[offset].size));
-			
+		LOG(4, ("Overlay: New buffer: addr $%p, dma_addr $%p, color space $%08x\n",
+			(uint8*)si->overlay.myBuffer[offset].buffer,
+			(uint8*)si->overlay.myBuffer[offset].buffer_dma, cs));
+		LOG(4, ("Overlay: New buffer's size is $%08x\n", si->overlay.myBufInfo[offset].size));
+
 		/* release the shared benaphore */
 		RELEASE_BEN(si->overlay.lock)
 
 		return &si->overlay.myBuffer[offset];
-	}
-	else
-	/* sorry, no more room for buffers */
-	{	
-		LOG(4,("Overlay: Sorry, no more space for buffers: aborted\n"));
+	} else {
+		/* sorry, no more room for buffers */
+		LOG(4, ("Overlay: Sorry, no more space for buffers: aborted\n"));
 
 		/* release the shared benaphore */
 		RELEASE_BEN(si->overlay.lock)
@@ -355,6 +351,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		return NULL;
 	}
 }
+
 
 status_t RELEASE_OVERLAY_BUFFER(const overlay_buffer *ob)
 /* Note that the user can delete the buffers in any order desired! */

@@ -312,6 +312,7 @@ static void nv_dac_dump_pix_pll(void)
 		DACW(PLLSEL, 0x10000700);
 }
 
+
 /* find nearest valid pix pll */
 status_t nv_dac_pix_pll_find
 	(display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
@@ -322,17 +323,19 @@ status_t nv_dac_pix_pll_find
 	return B_ERROR;
 }
 
+
 /* find nearest valid pixel PLL setting */
 static status_t nv4_nv10_nv20_dac_pix_pll_find(
-	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
+	display_mode target, float* calc_pclk, uint8* m_result, uint8* n_result,
+	uint8* p_result, uint8 test)
 {
 	int m = 0, n = 0, p = 0/*, m_max*/;
-	float error, error_best = 999999999;
-	int best[3]; 
+	float error, error_best = INFINITY;
+	int best[3] = {0, 0, 0};
 	float f_vco, max_pclk;
 	float req_pclk = target.timing.pixel_clock/1000.0;
 
-	LOG(4,("DAC: NV4/NV10/NV20 restrictions apply\n"));
+	LOG(4, ("DAC: NV4/NV10/NV20 restrictions apply\n"));
 
 	/* determine the max. pixelclock for the current videomode */
 	switch (target.space)
@@ -473,19 +476,20 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 
 /* find nearest valid system PLL setting */
 status_t nv_dac_sys_pll_find(
-	float req_sclk, float* calc_sclk, uint8* m_result, uint8* n_result, uint8* p_result, uint8 test)
+	float req_sclk, float* calc_sclk, uint8* m_result, uint8* n_result,
+	uint8* p_result, uint8 test)
 {
 	int m = 0, n = 0, p = 0, m_max, p_max;
-	float error, error_best = 999999999;
-	int best[3];
+	float error, error_best = INFINITY;
+	int best[3] = {0, 0, 0};
 	float f_vco, discr_low, discr_high;
 
-	/* determine the max. reference-frequency postscaler setting for the 
+	/* determine the max. reference-frequency postscaler setting for the
 	 * current requested clock */
 	switch (si->ps.card_arch)
 	{
 	case NV04A:
-		LOG(4,("DAC: NV04 restrictions apply\n"));
+		LOG(4, ("DAC: NV04 restrictions apply\n"));
 		/* set phase-discriminator frequency range (Mhz) (verified) */
 		discr_low = 1.0;
 		discr_high = 2.0;
@@ -499,7 +503,7 @@ status_t nv_dac_sys_pll_find(
 		{
 		case NV28:
 			//fixme: how about some other cards???
-			LOG(4,("DAC: NV28 restrictions apply\n"));
+			LOG(4, ("DAC: NV28 restrictions apply\n"));
 			/* set max. useable reference frequency postscaler divider factor;
 			 * apparantly we would get distortions on high PLL output frequencies if
 			 * we use the phase-discriminator at low frequencies */
@@ -515,7 +519,7 @@ status_t nv_dac_sys_pll_find(
 			discr_high = 27.0;
 			break;
 		default:
-			LOG(4,("DAC: NV10/NV20/NV30 restrictions apply\n"));
+			LOG(4, ("DAC: NV10/NV20/NV30 restrictions apply\n"));
 			/* set max. useable reference frequency postscaler divider factor;
 			 * apparantly we would get distortions on high PLL output frequencies if
 			 * we use the phase-discriminator at low frequencies */
@@ -535,23 +539,23 @@ status_t nv_dac_sys_pll_find(
 		break;
 	}
 
-	LOG(4,("DAC: PLL reference frequency postscaler divider range is 1 - %d\n", m_max));
-	LOG(4,("DAC: PLL VCO output postscaler divider range is 1 - %d\n", p_max));
-	LOG(4,("DAC: PLL discriminator input frequency range is %2.2fMhz - %2.2fMhz\n",
+	LOG(4, ("DAC: PLL reference frequency postscaler divider range is 1 - %d\n", m_max));
+	LOG(4, ("DAC: PLL VCO output postscaler divider range is 1 - %d\n", p_max));
+	LOG(4, ("DAC: PLL discriminator input frequency range is %2.2fMhz - %2.2fMhz\n",
 		discr_low, discr_high));
 
 	/* Make sure the requested clock is within the PLL's operational limits */
 	/* lower limit is min_system_vco divided by highest postscaler-factor */
 	if (req_sclk < (si->ps.min_system_vco / ((float)p_max)))
 	{
-		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
+		LOG(4, ("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
 			req_sclk, (si->ps.min_system_vco / ((float)p_max))));
 		req_sclk = (si->ps.min_system_vco / ((float)p_max));
 	}
 	/* upper limit is given by pins */
 	if (req_sclk > si->ps.max_system_vco)
 	{
-		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
+		LOG(4, ("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
 			req_sclk, (float)si->ps.max_system_vco));
 		req_sclk = si->ps.max_system_vco;
 	}

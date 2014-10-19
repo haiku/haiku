@@ -17,7 +17,7 @@ nv_agp_setup(bool enable_agp)
 	nv_nth_agp_info nai;
 	nv_cmd_agp nca;
 	uint8 index;
-	agp_info nv_ai;
+	agp_info nv_ai = {0};
 	bool agp = false;
 
 	/* preset we are running in PCI mode: so acc engine may not use AGP transfers */

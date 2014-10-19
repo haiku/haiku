@@ -13,7 +13,7 @@ struct move_overlay_info
 	uint32 vcoordv;		/* top and bottom edges of video output window */
 	uint32 hsrcstv;		/* horizontal source start in source buffer (clipping) */
 	uint32 v1srcstv;	/* vertical source start in source buffer (clipping) */
-	uint32 a1orgv;		/* alternate source clipping via startadress of source buffer */
+	uintptr_t a1orgv;		/* alternate source clipping via startadress of source buffer */
 };
 
 static void nv_bes_calc_move_overlay(move_overlay_info *moi);
@@ -235,9 +235,9 @@ static void nv_bes_calc_move_overlay(move_overlay_info *moi)
 	 *******************************/
 
 	/* calculate inputbitmap origin adress */
-	moi->a1orgv = (uint32)((vuint32 *)si->overlay.ob.buffer);
-	moi->a1orgv -= (uint32)((vuint32 *)si->framebuffer);
-	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n", moi->a1orgv));
+	moi->a1orgv = (uintptr_t)((vuint32 *)si->overlay.ob.buffer);
+	moi->a1orgv -= (uintptr_t)((vuint32 *)si->framebuffer);
+	LOG(4, ("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n", moi->a1orgv));
 
 	/* Setup vertical source start: first (sub)pixel contributing to output picture. */
 	/* Note:

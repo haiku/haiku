@@ -513,7 +513,7 @@ status_t nv_acc_init_dma()
 			ACCW(PR_CTX0_C, 0x00023002);
 		}
 		ACCW(PR_CTX1_C, 0x000fffff); /* DMA limit: tablesize is 1M bytes */
-		ACCW(PR_CTX2_C, (((uint32)((uint8 *)(si->dma_buffer_pci))) | 0x00000002));
+		ACCW(PR_CTX2_C, (((uintptr_t)((uint8 *)(si->dma_buffer_pci))) | 0x00000002));
 									 /* DMA access type is READ_AND_WRITE;
 									  * table is located in main system RAM (b12-31):
 									  * It's adress needs to be at a 4kb boundary! */
@@ -1042,18 +1042,17 @@ status_t nv_acc_init_dma()
 	 * b0-1 aren't used as adressbits. Using b0 to indicate a valid pointer. */
 	for (cnt = 0; cnt < 0x08; cnt++)
 	{
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[cnt])] =
-												(0x00000001 + (cnt * 0x00002000));
+		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[cnt])]
+			= (0x00000001 + (cnt * 0x00002000));
 	}
 
 	/*** init DMA command buffer info ***/
 	if (si->ps.card_arch >= NV40A) //main mem DMA buf on pre-NV40
 	{
-		si->dma_buffer = (void *)((char *)si->framebuffer +
-			((si->ps.memory_size - 1) & 0xffff8000));
+		si->dma_buffer = (void *)((char *)si->framebuffer
+			+ ((si->ps.memory_size - 1) & 0xffff8000));
 	}
-	LOG(4,("ACC_DMA: command buffer is at adress $%08x\n",
-		((uint32)(si->dma_buffer))));
+	LOG(4, ("ACC_DMA: command buffer is at adress $%p\n", si->dma_buffer));
 	/* we have issued no DMA cmd's to the engine yet */
 	si->engine.dma.put = 0;
 	/* the current first free adress in the DMA buffer is at offset 0 */
@@ -1076,9 +1075,7 @@ status_t nv_acc_init_dma()
 	if (si->ps.card_arch >= NV40A)
 	{
 		if (nv_acc_fifofree_dma(12) != B_OK) return B_ERROR;
-	}
-	else
-	{
+	} else {
 		if (nv_acc_fifofree_dma(16) != B_OK) return B_ERROR;
 	}
 
@@ -1888,9 +1885,10 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 	si->engine.threeD.reload = 0xffffffff;
 }
 
+
 /* scaled and filtered screen to screen blit - i.e. video playback without overlay */
 /* note: source and destination may not overlap. */
-//fixme? checkout NV5 and NV10 version of cmd: faster?? (or is 0x77 a 'autoselect' version?)
+// FIXME? checkout NV5 and NV10 version of cmd: faster?? (or is 0x77 a 'autoselect' version?)
 void OFFSCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(
 	engine_token *et, offscreen_buffer_config *config, clipped_scaled_blit_params *list, uint32 count)
 {
@@ -1898,11 +1896,12 @@ void OFFSCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(
 	uint32 cmd_depth;
 	uint8 bpp;
 
-	LOG(4,("ACC_DMA: offscreen src buffer location $%08x\n", (uint32)((uint8*)(config->buffer))));
+	LOG(4, ("ACC_DMA: offscreen src buffer location $%p\n",
+		(uint8*)(config->buffer)));
 
 	/*** init acc engine for scaled filtered blit function ***/
 	/* Set pixel width */
-	switch(config->space)
+	switch (config->space)
 	{
 	case B_RGB15_LITTLE:
 		cmd_depth = 0x00000002;

@@ -280,17 +280,19 @@ status_t nv_dac2_pix_pll_find
 	return B_ERROR;
 }
 
+
 /* find nearest valid pixel PLL setting */
 static status_t nv10_nv20_dac2_pix_pll_find(
-	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
+	display_mode target, float* calc_pclk, uint8* m_result, uint8* n_result,
+	uint8* p_result, uint8 test)
 {
 	int m = 0, n = 0, p = 0/*, m_max*/;
-	float error, error_best = 999999999;
-	int best[3]; 
+	float error, error_best = INFINITY;
+	int best[3] = {0, 0, 0};
 	float f_vco, max_pclk;
 	float req_pclk = target.timing.pixel_clock/1000.0;
 
-	LOG(4,("DAC2: NV10/NV20 restrictions apply\n"));
+	LOG(4, ("DAC2: NV10/NV20 restrictions apply\n"));
 
 	/* determine the max. pixelclock for the current videomode */
 	switch (target.space)

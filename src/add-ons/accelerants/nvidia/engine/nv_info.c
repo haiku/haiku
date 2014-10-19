@@ -133,6 +133,7 @@ status_t parse_pins ()
 	return B_OK;
 }
 
+
 static status_t pins2_read(uint8 *rom, uint32 offset)
 {
 	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
@@ -141,19 +142,25 @@ static status_t pins2_read(uint8 *rom, uint32 offset)
 	/* confirmed by comparing cards */
 	uint16 ram_tab = init1 - 0x0010;
 	/* fixme: PPC BIOSes (might) return NULL pointers for messages here */
-	char* signon_msg   = &(rom[(rom[offset + 24] + (rom[offset + 25] * 256))]);
-	char* vendor_name  = &(rom[(rom[offset + 40] + (rom[offset + 41] * 256))]);
-	char* product_name = &(rom[(rom[offset + 42] + (rom[offset + 43] * 256))]);
-	char* product_rev  = &(rom[(rom[offset + 44] + (rom[offset + 45] * 256))]);
+	unsigned char* signon_msg
+		= &(rom[(rom[offset + 24] + (rom[offset + 25] * 256))]);
+	unsigned char* vendor_name
+		= &(rom[(rom[offset + 40] + (rom[offset + 41] * 256))]);
+	unsigned char* product_name
+		= &(rom[(rom[offset + 42] + (rom[offset + 43] * 256))]);
+	unsigned char* product_rev
+		= &(rom[(rom[offset + 44] + (rom[offset + 45] * 256))]);
 
-	LOG(8,("INFO: cmdlist 1: $%04x, 2: $%04x, max. size $%04x\n", init1, init2, init_size));
-	LOG(8,("INFO: signon msg:\n%s\n", signon_msg));
-	LOG(8,("INFO: vendor name: %s\n", vendor_name));
-	LOG(8,("INFO: product name: %s\n", product_name));
-	LOG(8,("INFO: product rev: %s\n", product_rev));
+	LOG(8, ("INFO: cmdlist 1: $%04x, 2: $%04x, max. size $%04x\n", init1, init2,
+		init_size));
+	LOG(8, ("INFO: signon msg:\n%s\n", signon_msg));
+	LOG(8, ("INFO: vendor name: %s\n", vendor_name));
+	LOG(8, ("INFO: product name: %s\n", product_name));
+	LOG(8, ("INFO: product rev: %s\n", product_rev));
 
 	return coldstart_card(rom, init1, init2, init_size, ram_tab);
 }
+
 
 static status_t pins3_5_read(uint8 *rom, uint32 offset)
 {
@@ -163,16 +170,21 @@ static status_t pins3_5_read(uint8 *rom, uint32 offset)
 	/* confirmed on a TNT2-M64 with pins V5.1 */
 	uint16 ram_tab = rom[offset + 24] + (rom[offset + 25] * 256);
 	/* fixme: PPC BIOSes (might) return NULL pointers for messages here */
-	char* signon_msg   = &(rom[(rom[offset + 30] + (rom[offset + 31] * 256))]);
-	char* vendor_name  = &(rom[(rom[offset + 46] + (rom[offset + 47] * 256))]);
-	char* product_name = &(rom[(rom[offset + 48] + (rom[offset + 49] * 256))]);
-	char* product_rev  = &(rom[(rom[offset + 50] + (rom[offset + 51] * 256))]);
+	unsigned char* signon_msg
+		= &(rom[(rom[offset + 30] + (rom[offset + 31] * 256))]);
+	unsigned char* vendor_name
+		= &(rom[(rom[offset + 46] + (rom[offset + 47] * 256))]);
+	unsigned char* product_name
+		= &(rom[(rom[offset + 48] + (rom[offset + 49] * 256))]);
+	unsigned char* product_rev
+		= &(rom[(rom[offset + 50] + (rom[offset + 51] * 256))]);
 
-	LOG(8,("INFO: pre PINS 5.16 cmdlist 1: $%04x, 2: $%04x, max. size $%04x\n", init1, init2, init_size));
-	LOG(8,("INFO: signon msg:\n%s\n", signon_msg));
-	LOG(8,("INFO: vendor name: %s\n", vendor_name));
-	LOG(8,("INFO: product name: %s\n", product_name));
-	LOG(8,("INFO: product rev: %s\n", product_rev));
+	LOG(8, ("INFO: pre PINS 5.16 cmdlist 1: $%04x, 2: $%04x, max. size $%04x\n",
+		init1, init2, init_size));
+	LOG(8, ("INFO: signon msg:\n%s\n", signon_msg));
+	LOG(8, ("INFO: vendor name: %s\n", vendor_name));
+	LOG(8, ("INFO: product name: %s\n", product_name));
+	LOG(8, ("INFO: product rev: %s\n", product_rev));
 
 	/* pins 5.06 and higher has VCO range info */
 	if (((rom[offset + 5]) == 5) && ((rom[offset + 6]) >= 0x06))
