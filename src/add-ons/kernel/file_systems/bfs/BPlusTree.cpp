@@ -2367,7 +2367,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 		if (largestKey != NULL) {
 			int result = _CompareKeys(key, keyLength, largestKey,
 				largestKeyLength);
-			if (result >= 0) {
+			if (result > 0 || (result == 0 && i != count - 1)) {
 				dprintf("inode %" B_PRIdOFF ": node %" B_PRIdOFF " key %"
 					B_PRIu32 " larger than it should!\n",
 					fStream->ID(), offset, i);
