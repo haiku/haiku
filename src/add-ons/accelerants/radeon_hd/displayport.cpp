@@ -215,8 +215,10 @@ void
 dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 {
 	status_t result = dp_aux_write(connectorIndex, address, &value, 1, 0);
-	if (result != B_OK)
-		ERROR("%s: error on DisplayPort aux write (0x%lX)\n", __func__, result);
+	if (result != B_OK) {
+		ERROR("%s: error on DisplayPort aux write (0x%" B_PRIx32 ")\n",
+			__func__, result);
+	}
 }
 
 
@@ -225,8 +227,10 @@ dpcd_reg_read(uint32 connectorIndex, uint16 address)
 {
 	uint8 value = 0;
 	status_t result = dp_aux_read(connectorIndex, address, &value, 1, 0);
-	if (result != B_OK)
-		ERROR("%s: error on DisplayPort aux read (0x%lX)\n", __func__, result);
+	if (result != B_OK) {
+		ERROR("%s: error on DisplayPort aux read (0x%" B_PRIx32 ")\n",
+			__func__, result);
+	}
 
 	return value;
 }
@@ -266,7 +270,7 @@ dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 		if (result == B_BUSY)
 			continue;
 		else if (result != B_OK) {
-			ERROR("%s: aux_ch speak failed 0x%lX\n", __func__, result);
+			ERROR("%s: aux_ch speak failed 0x%" B_PRIx32 "\n", __func__, result);
 			return B_ERROR;
 		}
 
@@ -345,7 +349,7 @@ dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 		if (result == B_BUSY)
 			continue;
 		else if (result != B_OK) {
-			ERROR("%s: aux_ch speak failed 0x%lX\n", __func__, result);
+			ERROR("%s: aux_ch speak failed 0x%" B_PRIx32 "\n", __func__, result);
 			return B_ERROR;
 		}
 
@@ -986,7 +990,7 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 			rdata++, false, false);
 		if (result != B_OK) {
 			TRACE("%s: error reading EDID data at index %" B_PRIu32 ", "
-				"result = 0x%lX\n", __func__, i, result);
+				"result = 0x%" B_PRIx32 "\n", __func__, i, result);
 			dp_aux_get_i2c_byte(connectorIndex, 0x50, &sdata, false, true);
 			return false;
 		}
