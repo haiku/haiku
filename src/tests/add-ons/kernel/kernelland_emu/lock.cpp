@@ -43,6 +43,9 @@ struct rw_lock_waiter {
 #define RW_LOCK_FLAG_OWNS_NAME	RW_LOCK_FLAG_CLONE_NAME
 
 
+static void _rw_lock_read_unlock_threads_locked(rw_lock* lock);
+static void _rw_lock_write_unlock_threads_locked(rw_lock* lock);
+
 static status_t _mutex_lock_threads_locked(mutex* lock);
 static void _mutex_unlock_threads_locked(mutex* lock);
 
@@ -456,10 +459,16 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 
 
 void
-_rw_lock_read_unlock(rw_lock* lock, bool threadsLocked)
+_rw_lock_read_unlock(rw_lock* lock)
 {
-	AutoLocker<ThreadSpinlock> locker(sThreadSpinlock, false, !threadsLocked);
+	AutoLocker<ThreadSpinlock> locker(sThreadSpinlock);
+	_rw_lock_read_unlock_threads_locked(lock);
+}
 
+
+static void
+_rw_lock_read_unlock_threads_locked(rw_lock* lock)
+{
 	// If we're still holding the write lock or if there are other readers,
 	// no-one can be woken up.
 	if (lock->holder == find_thread(NULL)) {
@@ -521,10 +530,16 @@ rw_lock_write_lock(rw_lock* lock)
 
 
 void
-_rw_lock_write_unlock(rw_lock* lock, bool threadsLocked)
+_rw_lock_write_unlock(rw_lock* lock)
 {
-	AutoLocker<ThreadSpinlock> locker(sThreadSpinlock, false, !threadsLocked);
+	AutoLocker<ThreadSpinlock> locker(sThreadSpinlock);
+	_rw_lock_write_unlock_threads_locked(lock);
+}
 
+
+static void
+_rw_lock_write_unlock_threads_locked(rw_lock* lock)
+{
 	if (find_thread(NULL) != lock->holder) {
 		panic("rw_lock_write_unlock(): lock %p not write-locked by this thread",
 			lock);
@@ -650,11 +665,11 @@ mutex_switch_from_read_lock(rw_lock* from, mutex* to)
 	AutoLocker<ThreadSpinlock> locker(sThreadSpinlock);
 
 #if KDEBUG_RW_LOCK_DEBUG
-	_rw_lock_write_unlock(from, true);
+	_rw_lock_write_unlock_threads_locked(from);
 #else
 	int32 oldCount = atomic_add(&from->count, -1);
 	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
-		_rw_lock_read_unlock(from, true);
+		_rw_lock_read_unlock_threads_locked(from);
 #endif
 
 	return _mutex_lock_threads_locked(to);
