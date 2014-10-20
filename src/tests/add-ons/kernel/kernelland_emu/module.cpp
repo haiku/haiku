@@ -29,6 +29,9 @@
 //#define TRACE(x) printf x
 
 
+using namespace std;
+
+
 static const char *gModuleDirs[] = {
 	"generated/objects/haiku/x86/release/add-ons/userland",
 	"generated/objects/haiku/x86/release/tests/add-ons/kernel",
