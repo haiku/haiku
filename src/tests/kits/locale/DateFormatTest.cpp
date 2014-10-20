@@ -28,34 +28,77 @@ DateFormatTest::~DateFormatTest()
 void
 DateFormatTest::TestCustomFormat()
 {
+	struct Test {
+		const char* language;
+		const char* formatting;
+		int32 fields;
+
+		BString expected;
+		BString force24;
+		BString force12;
+	};
+
 	BString buffer;
-	BLanguage language("en");
-	BFormattingConventions formatting("en_US");
-	int32 fields = B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE;
 
-	BDateTimeFormat format(&language, &formatting);
+	const Test tests[] = {
+		{ "en", "en_US", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE,
+			"10:21 PM", "22:21", "10:21 PM" },
+		{ "en", "en_US",
+			B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE | B_DATE_ELEMENT_SECOND,
+			"10:21:18 PM", "22:21:18", "10:21:18 PM" },
+		// FIXME we need a way to set the timezone for this test to work
+		// reliably.
+		{ "en", "en_US", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE
+			| B_DATE_ELEMENT_TIMEZONE,
+			"10:21 PM GMT+1", "22:21 GMT+1", "10:21 PM GMT+1" },
+		{ "en", "en_US", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE
+			| B_DATE_ELEMENT_SECOND | B_DATE_ELEMENT_TIMEZONE,
+			"10:21:18 PM GMT+1", "22:21:18 GMT+1", "10:21:18 PM GMT+1" },
+		{ "fr", "fr_FR", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE,
+			"22:21", "22:21", "10:21 PM" },
+		{ NULL }
+	};
 
-	NextSubTest();
+	for (int i = 0; tests[i].language != NULL; i++)
+	{
+		NextSubTest();
 
-	formatting.SetExplicitUse24HourClock(true);
-	format.SetFormattingConventions(formatting);
-	format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, fields);
-	status_t result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-		B_SHORT_TIME_FORMAT);
+		BLanguage language(tests[i].language);
+		BFormattingConventions formatting(tests[i].formatting);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-	CPPUNIT_ASSERT_EQUAL(BString("22:21"), buffer);
+		BDateTimeFormat format(&language, &formatting);
+		format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
+			tests[i].fields);
 
-	NextSubTest();
+		// Test default for language/formatting
+		status_t result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
+			B_SHORT_TIME_FORMAT);
 
-	formatting.SetExplicitUse24HourClock(false);
-	format.SetFormattingConventions(formatting);
-	format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, fields);
-	result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-		B_SHORT_TIME_FORMAT);
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(tests[i].expected, buffer);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-	CPPUNIT_ASSERT_EQUAL(BString("10:21 PM"), buffer);
+		// Test forced 24 hours
+		formatting.SetExplicitUse24HourClock(true);
+		format.SetFormattingConventions(formatting);
+		format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
+			tests[i].fields);
+		result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
+			B_SHORT_TIME_FORMAT);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(tests[i].force24, buffer);
+
+		// Test forced 12 hours
+		formatting.SetExplicitUse24HourClock(false);
+		format.SetFormattingConventions(formatting);
+		format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
+			tests[i].fields);
+		result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
+			B_SHORT_TIME_FORMAT);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(tests[i].force12, buffer);
+	}
 }
 
 
