@@ -165,12 +165,15 @@ namespace agg
         case path_cmd_curve3:
             m_source->vertex(&end_x, &end_y);
 
-            m_curve3.init(m_last_x, m_last_y, 
-                          *x,       *y, 
-                          end_x,     end_y);
+			if (!isnan(m_last_x) && !isnan(m_last_y) && !isnan(*x) && !isnan(*y)
+				&& !isnan(end_x) && !isnan(end_y)) {
+				m_curve3.init(m_last_x, m_last_y,
+						*x,       *y,
+						end_x,     end_y);
 
-            m_curve3.vertex(x, y);    // First call returns path_cmd_move_to
-            m_curve3.vertex(x, y);    // This is the first vertex of the curve
+				m_curve3.vertex(x, y);    // First call returns path_cmd_move_to
+				m_curve3.vertex(x, y);    // This is the first vertex of the curve
+			}
             cmd = path_cmd_line_to;
             break;
 
@@ -178,13 +181,16 @@ namespace agg
             m_source->vertex(&ct2_x, &ct2_y);
             m_source->vertex(&end_x, &end_y);
 
-            m_curve4.init(m_last_x, m_last_y, 
-                          *x,       *y, 
-                          ct2_x,    ct2_y, 
-                          end_x,    end_y);
+			if (!isnan(m_last_x) && !isnan(m_last_y) && !isnan(*x) && !isnan(*y)
+				&& !isnan(end_x) && !isnan(end_y)) {
+				m_curve4.init(m_last_x, m_last_y,
+						*x,       *y,
+						ct2_x,    ct2_y,
+						end_x,    end_y);
 
-            m_curve4.vertex(x, y);    // First call returns path_cmd_move_to
-            m_curve4.vertex(x, y);    // This is the first vertex of the curve
+				m_curve4.vertex(x, y);    // First call returns path_cmd_move_to
+				m_curve4.vertex(x, y);    // This is the first vertex of the curve
+			}
             cmd = path_cmd_line_to;
             break;
         }
