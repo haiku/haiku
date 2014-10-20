@@ -48,7 +48,8 @@ BDateTimeFormat::SetDateTimeFormat(BDateFormatStyle dateStyle,
 	BTimeFormatStyle timeStyle, int32 elements) {
 	UErrorCode error = U_ZERO_ERROR;
 	DateTimePatternGenerator* generator
-		= DateTimePatternGenerator::createInstance(error);
+		= DateTimePatternGenerator::createInstance(
+			*BLanguage::Private(&fLanguage).ICULocale(), error);
 
 	BString skeleton;
 	if (elements & B_DATE_ELEMENT_YEAR)
@@ -63,9 +64,9 @@ BDateTimeFormat::SetDateTimeFormat(BDateFormatStyle dateStyle,
 		skeleton << "a";
 	if (elements & B_DATE_ELEMENT_HOUR) {
 		if (fConventions.Use24HourClock())
-			skeleton << "HH";
+			skeleton << "k";
 		else
-			skeleton << "KK";
+			skeleton << "K";
 	}
 	if (elements & B_DATE_ELEMENT_MINUTE)
 		skeleton << "mm";
@@ -80,6 +81,7 @@ BDateTimeFormat::SetDateTimeFormat(BDateFormatStyle dateStyle,
 	BString buffer;
 	BStringByteSink stringConverter(&buffer);
 	pattern.toUTF8(stringConverter);
+
 	fConventions.SetExplicitDateTimeFormat(dateStyle, timeStyle, buffer);
 
 	delete generator;

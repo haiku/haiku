@@ -234,8 +234,6 @@ BTimeFormat::Parse(BString source, BTimeFormatStyle style, BTime& output)
 	UDate date = timeFormatter->parse(UnicodeString::fromUTF8(source.String()),
 		p);
 
-	printf("T %f\n", date);
-
 	output.SetTime(0, 0, 0);
 	output.AddMilliseconds(date);
 
