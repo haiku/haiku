@@ -364,7 +364,7 @@ ModuleList::AddModule(Module *module)
 	bool result = false;
 	if (module && !FindModule(module->Info()->name))
 		result = fModules.AddItem(module);
-	return module;
+	return result;
 }
 
 // RemoveModule
