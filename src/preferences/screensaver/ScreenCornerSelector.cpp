@@ -199,12 +199,15 @@ ScreenCornerSelector::_DrawStop(BRect innerFrame)
 
 	SetHighColor(255, 0, 0);
 	SetPenSize(2);
+	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
+
 	StrokeEllipse(rect);
 
-	size -= ceilf(sin(M_PI / 4) * size + 2);
+	size -= sin(M_PI / 4) * size + 2;
 	rect.InsetBy(size, size);
 	StrokeLine(rect.RightTop(), rect.LeftBottom());
 
+	SetFlags(Flags() & ~B_SUBPIXEL_PRECISE);
 	SetPenSize(1);
 }
 
