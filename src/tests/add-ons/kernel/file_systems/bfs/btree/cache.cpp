@@ -21,86 +21,143 @@
  */
 
 
+#define TRACE(x)	/*printf x*/
+
+
+static size_t sBlockSize;
+
+
 BList gBlocks;
 
 
 void
-init_cache(BFile */*file*/,int32 /*blockSize*/)
+init_cache(BFile* /*file*/, int32 blockSize)
 {
+	sBlockSize = blockSize;
 }
 
 
 void
-shutdown_cache(BFile *file,int32 blockSize)
+shutdown_cache(BFile* file, int32 blockSize)
 {
-	for (int32 i = 0;i < gBlocks.CountItems();i++) {
-		void *buffer = gBlocks.ItemAt(i);
+	for (int32 i = 0; i < gBlocks.CountItems(); i++) {
+		void* buffer = gBlocks.ItemAt(i);
 		if (buffer == NULL) {
-			printf("cache is corrupt!\n");
+			debugger("cache is corrupt!");
 			exit(-1);
 		}
-		file->WriteAt(i * blockSize,buffer,blockSize);
+
+		file->WriteAt(i * blockSize, buffer, blockSize);
 		free(buffer);
 	}
 }
 
 
-static status_t
-readBlocks(BFile *file,uint32 num,uint32 size)
+status_t
+cached_write(void* cache, off_t num, const void* _data, off_t numBlocks)
 {
+	if (num + numBlocks > gBlocks.CountItems()) {
+		debugger("cached write beyond loaded blocks");
+		exit(1);
+	}
+
+	for (off_t i = 0; i < numBlocks; i++) {
+		void* buffer = gBlocks.ItemAt(num + i);
+		const void* data = (uint8*)_data + i * sBlockSize;
+		if (buffer != data)
+			memcpy(buffer, data, sBlockSize);
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+read_blocks(void* cache, off_t num)
+{
+	BFile* file = (BFile*)cache;
 	for (uint32 i = gBlocks.CountItems(); i <= num; i++) {
-		void *buffer = malloc(size);
+		void* buffer = malloc(sBlockSize);
 		if (buffer == NULL)
 			return B_NO_MEMORY;
 
 		gBlocks.AddItem(buffer);
-		if (file->ReadAt(i * size,buffer,size) < B_OK)
+		if (file->ReadAt(i * sBlockSize, buffer, sBlockSize) < 0)
 			return B_IO_ERROR;
 	}
-	return B_OK;
-}
-
-
-int
-cached_write(BFile *file, off_t num,const void *data,off_t numBlocks, int blockSize)
-{
-	//printf("cached_write(num = %Ld,data = %p,numBlocks = %Ld,blockSize = %ld)\n",num,data,numBlocks,blockSize);
-	if (file == NULL)
-		return B_BAD_VALUE;
-
-	if (num >= gBlocks.CountItems())
-		puts("Oh no!");
-
-	void *buffer = gBlocks.ItemAt(num);
-	if (buffer == NULL)
-		return B_BAD_VALUE;
-
-	if (buffer != data && numBlocks == 1)
-		memcpy(buffer,data,blockSize);
 
 	return B_OK;
 }
 
 
-void *
-get_block(BFile *file, off_t num, int blockSize)
+static void*
+get_block(void* cache, off_t num)
 {
-	//printf("get_block(num = %Ld,blockSize = %ld)\n",num,blockSize);
-	if (file == NULL)
-		return NULL;
-
+	//TRACE(("get_block(num = %" B_PRIdOFF ")\n", num);
 	if (num >= gBlocks.CountItems())
-		readBlocks(file,num,blockSize);
+		read_blocks(cache, num);
 
 	return gBlocks.ItemAt(num);
 }
 
 
-int 
-release_block(BFile *file, off_t num)
+static void
+release_block(void* cache, off_t num)
 {
-	//printf("release_block(num = %Ld)\n",num);
-	return 0;
+	//TRACE(("release_block(num = %" B_PRIdOFF ")\n", num));
 }
 
 
+// #pragma mark - Block Cache API
+
+
+const void*
+block_cache_get(void* _cache, off_t blockNumber)
+{
+	TRACE(("block_cache_get(block = %" B_PRIdOFF ")\n", blockNumber));
+	return get_block(_cache, blockNumber);
+}
+
+
+status_t
+block_cache_make_writable(void* _cache, off_t blockNumber, int32 transaction)
+{
+	TRACE(("block_cache_make_writable(block = %" B_PRIdOFF ", transaction = %"
+		B_PRId32 ")\n", blockNumber, transaction));
+
+	// We're always writable...
+	return B_OK;
+}
+
+
+void*
+block_cache_get_writable(void* _cache, off_t blockNumber, int32 transaction)
+{
+	TRACE(("block_cache_get_writable(block = %" B_PRIdOFF
+		", transaction = %" B_PRId32 ")\n", blockNumber, transaction));
+	return get_block(_cache, blockNumber);
+}
+
+
+
+status_t
+block_cache_set_dirty(void* _cache, off_t blockNumber, bool dirty,
+	int32 transaction)
+{
+	TRACE(("block_cache_set_dirty(block = %" B_PRIdOFF
+		", dirty = %s, transaction = %" B_PRId32 ")\n", blockNumber,
+		dirty ? "yes" : "no", transaction));
+
+	if (dirty)
+		debugger("setting to dirty not implemented\n");
+
+	return B_OK;
+}
+
+
+void
+block_cache_put(void* _cache, off_t blockNumber)
+{
+	TRACE(("block_cache_put(block = %" B_PRIdOFF ")\n", blockNumber));
+	release_block(_cache, blockNumber);
+}

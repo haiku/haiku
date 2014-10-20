@@ -12,11 +12,24 @@
 class BFile;
 
 
-extern void init_cache(BFile *file, int32 blockSize);
-extern void shutdown_cache(BFile *file, int32 blockSize);
+extern void init_cache(BFile* file, int32 blockSize);
+extern void shutdown_cache(BFile* file, int32 blockSize);
 
-extern int cached_write(BFile *file, off_t bnum, const void *data,off_t num_blocks, int bsize);
-extern void *get_block(BFile *file, off_t bnum, int bsize);
-extern int release_block(BFile *file, off_t bnum);
+extern status_t cached_write(void* cache, off_t num, const void* _data,
+	off_t numBlocks);
+
+
+// Block Cache API
+
+extern const void* block_cache_get(void* _cache, off_t blockNumber);
+
+extern status_t block_cache_make_writable(void* _cache, off_t blockNumber,
+	int32 transaction);
+extern void* block_cache_get_writable(void* _cache, off_t blockNumber,
+	int32 transaction);
+
+extern status_t block_cache_set_dirty(void* _cache, off_t blockNumber,
+	bool dirty, int32 transaction);
+extern void block_cache_put(void* _cache, off_t blockNumber);
 
 #endif	/* CACHE_H */

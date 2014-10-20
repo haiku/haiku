@@ -16,3 +16,10 @@ Volume::Panic()
 	printf("PANIC!\n");
 }
 
+
+int32
+Volume::GenerateTransactionID()
+{
+	static int32 sTransactionID = 1;
+	return sTransactionID++;
+}

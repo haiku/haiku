@@ -134,7 +134,7 @@ dumpKey(void *key, int32 length)
 void
 dumpKeys()
 {
-	char *type;
+	const char *type;
 	switch (gType) {
 		case S_STR_INDEX:
 			type = "string";
@@ -157,6 +157,9 @@ dumpKeys()
 		case S_DOUBLE_INDEX:
 			type = "double";
 			break;
+		default:
+			debugger("unknown type in gType");
+			return;
 	}
 	printf("Dumping %ld keys of type %s\n",gNum,type);
 	
@@ -373,6 +376,7 @@ checkTreeContents(BPlusTree *tree)
 			printf("Key ");
 			dumpKey(gKeys[i].data,gKeys[i].length);
 			printf(" found only %ld from %ld\n",gKeys[i].count,gKeys[i].in);
+			bailOut();
 		}
 	}
 }
@@ -381,16 +385,18 @@ checkTreeContents(BPlusTree *tree)
 void
 checkTreeIntegrity(BPlusTree *tree)
 {
-	// simple test, just seeks down to every key - if it couldn't
-	// be found, something must be wrong
+	// simple test, just seeks down to every key - if it's in and couldn't
+	// be found or it's not in and can be found, something must be wrong
 
 	TreeIterator iterator(tree);
 	for (int32 i = 0;i < gNum;i++) {
-		if (gKeys[i].in == 0)
-			continue;
-		
 		status_t status = iterator.Find((uint8 *)gKeys[i].data,gKeys[i].length);
-		if (status != B_OK) {
+		if (gKeys[i].in == 0) {
+			if (status == B_OK) {
+				printf("found key %" B_PRId32 " even though it's not in!\n", i);
+				bailOutWithKey(gKeys[i].data, gKeys[i].length);
+			}
+		} else if (status != B_OK) {
 			printf("TreeIterator::Find() returned: %s\n",strerror(status));
 			bailOutWithKey(gKeys[i].data,gKeys[i].length);
 		}
@@ -406,6 +412,13 @@ checkTree(BPlusTree *tree)
 
 	checkTreeContents(tree);
 	checkTreeIntegrity(tree);
+
+	bool errorsFound = false;
+	tree->Validate(false, errorsFound);
+	if (errorsFound) {
+		printf("BPlusTree::Validate() found errors\n");
+		bailOut();
+	}
 }
 
 
@@ -416,7 +429,7 @@ checkTree(BPlusTree *tree)
 
 
 void
-addAllKeys(Transaction *transaction, BPlusTree *tree)
+addAllKeys(Transaction &transaction, BPlusTree *tree)
 {
 	printf("*** Adding all keys to the tree...\n");
 	for (int32 i = 0;i < gNum;i++) {
@@ -437,7 +450,7 @@ addAllKeys(Transaction *transaction, BPlusTree *tree)
 
 
 void
-removeAllKeys(Transaction *transaction, BPlusTree *tree)
+removeAllKeys(Transaction &transaction, BPlusTree *tree)
 {
 	printf("*** Removing all keys from the tree...\n");
 	for (int32 i = 0;i < gNum;i++) {
@@ -462,7 +475,7 @@ removeAllKeys(Transaction *transaction, BPlusTree *tree)
 
 
 void
-duplicateTest(Transaction *transaction,BPlusTree *tree)
+duplicateTest(Transaction &transaction,BPlusTree *tree)
 {
 	int32 index = int32(1.0 * gNum * rand() / RAND_MAX);
 	if (index == gNum)
@@ -481,14 +494,15 @@ duplicateTest(Transaction *transaction,BPlusTree *tree)
 			printf("* insert %ld to %ld old entries...\n",insertCount,insertTotal + gKeys[index].in);
 
 		for (int32 j = 0;j < insertCount;j++) {
-			status = tree->Insert(transaction,(uint8 *)gKeys[index].data,gKeys[index].length,insertTotal);
+			status = tree->Insert(transaction,(uint8 *)gKeys[index].data,gKeys[index].length,gKeys[index].value);
 			if (status < B_OK) {
 				printf("BPlusTree::Insert() returned: %s\n",strerror(status));
 				bailOutWithKey(gKeys[index].data,gKeys[index].length);
 			}
 			insertTotal++;
 			gTreeCount++;
-	
+			gKeys[index].in++;
+
 			if (gExcessive)
 				checkTree(tree);
 		}
@@ -505,26 +519,27 @@ duplicateTest(Transaction *transaction,BPlusTree *tree)
 			printf("* remove %ld from %ld entries...\n",count,insertTotal + gKeys[index].in);
 
 		for (int32 j = 0;j < count;j++) {
-			status_t status = tree->Remove(transaction,(uint8 *)gKeys[index].data,gKeys[index].length,insertTotal - 1);
+			status_t status = tree->Remove(transaction,(uint8 *)gKeys[index].data,gKeys[index].length,gKeys[index].value);
 			if (status < B_OK) {
 				printf("BPlusTree::Remove() returned: %s\n",strerror(status));
 				bailOutWithKey(gKeys[index].data,gKeys[index].length);
 			}
 			insertTotal--;
 			gTreeCount--;
+			gKeys[index].in--;
 
 			if (gExcessive)
 				checkTree(tree);
 		}
 	}
 
-	if (!gExcessive)
+	if (gExcessive)
 		checkTree(tree);
 }
 
 
 void
-addRandomSet(Transaction *transaction,BPlusTree *tree,int32 num)
+addRandomSet(Transaction &transaction,BPlusTree *tree,int32 num)
 {
 	printf("*** Add random set to tree (%ld to %ld old entries)...\n",num,gTreeCount);
 
@@ -553,7 +568,7 @@ addRandomSet(Transaction *transaction,BPlusTree *tree,int32 num)
 
 
 void
-removeRandomSet(Transaction *transaction,BPlusTree *tree,int32 num)
+removeRandomSet(Transaction &transaction,BPlusTree *tree,int32 num)
 {
 	printf("*** Remove random set from tree (%ld from %ld entries)...\n",num,gTreeCount);
 
@@ -708,6 +723,7 @@ main(int argc,char **argv)
 	srand(gSeed);
 	
 	Inode inode("tree.data",gType | S_ALLOW_DUPS);
+	rw_lock_write_lock(&inode.Lock());
 	gVolume = inode.GetVolume();
 	Transaction transaction(gVolume,0);
 
@@ -717,7 +733,7 @@ main(int argc,char **argv)
 	// Create the tree, the keys, and add all keys to the tree initially
 	//
 
-	BPlusTree tree(&transaction,&inode);
+	BPlusTree tree(transaction,&inode);
 	status_t status;
 	if ((status = tree.InitCheck()) < B_OK) {
 		fprintf(stderr,"creating tree failed: %s\n",strerror(status));
@@ -733,7 +749,7 @@ main(int argc,char **argv)
 		dumpKeys();
 
 	for (int32 j = 0; j < gHard; j++ ) {
-		addAllKeys(&transaction, &tree);
+		addAllKeys(transaction, &tree);
 
 		//
 		// Run the tests (they will exit the app, if an error occurs)
@@ -742,13 +758,15 @@ main(int argc,char **argv)
 		for (int32 i = 0;i < gIterations;i++) {
 			printf("---------- Test iteration %ld ---------------------------------\n",i+1);
 	
-			addRandomSet(&transaction,&tree,int32(1.0 * gNum * rand() / RAND_MAX));
-			removeRandomSet(&transaction,&tree,int32(1.0 * gNum * rand() / RAND_MAX));
-			duplicateTest(&transaction,&tree);
+			addRandomSet(transaction,&tree,int32(1.0 * gNum * rand() / RAND_MAX));
+			removeRandomSet(transaction,&tree,int32(1.0 * gNum * rand() / RAND_MAX));
+			duplicateTest(transaction,&tree);
 		}
 	
-		removeAllKeys(&transaction, &tree);
+		removeAllKeys(transaction, &tree);
 	}
+
+	transaction.Done();
 
 	// of course, we would have to free all our memory in a real application here...
 

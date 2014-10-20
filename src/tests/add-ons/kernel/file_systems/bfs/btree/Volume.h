@@ -19,13 +19,25 @@ class Volume {
 	public:
 		Volume(BFile *file) : fFile(file) {}
 
-		BFile *Device() { return fFile; }
+		bool IsInitializing() const { return false; }
+		bool IsValidInodeBlock(off_t) const { return true; }
 
-		int32 BlockSize() const { return 1024; }
+		BFile *Device() { return fFile; }
+		void *BlockCache() { return fFile; }
+		fs_volume *FSVolume() { return NULL; }
+
+		uint32 BlockSize() const { return 1024; }
+		uint32 BlockShift() const { return 10; /* 2^BlockShift == BlockSize */ }
+
 		off_t ToBlock(block_run run) const { return run.start; }
-		block_run ToBlockRun(off_t block) const { return block_run::Run(0,0,block); }
+		block_run ToBlockRun(off_t block) const
+		{
+			return block_run::Run(0, 0, block);
+		}
 
 		static void Panic();
+
+		int32 GenerateTransactionID();
 
 	private:
 		BFile	*fFile;

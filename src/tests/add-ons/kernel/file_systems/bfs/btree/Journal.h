@@ -19,8 +19,13 @@
 class TransactionListener
 	: public DoublyLinkedListLinkImpl<TransactionListener> {
 public:
-								TransactionListener();
-	virtual						~TransactionListener();
+								TransactionListener()
+								{
+								}
+
+	virtual						~TransactionListener()
+								{
+								}
 
 	virtual void				TransactionDone(bool success) = 0;
 	virtual void				RemovedFromTransaction() = 0;
@@ -31,9 +36,10 @@ typedef DoublyLinkedList<TransactionListener> TransactionListeners;
 
 class Transaction {
 	public:
-		Transaction(Volume *volume,off_t refBlock)
+		Transaction(Volume *volume, off_t refBlock)
 			:
-			fVolume(volume)
+			fVolume(volume),
+			fID(volume->GenerateTransactionID())
 		{
 		}
 
@@ -41,17 +47,62 @@ class Transaction {
 		{
 		}
 
-		status_t WriteBlocks(off_t blockNumber,const uint8 *buffer,size_t numBlocks = 1)
+		int32 ID() const
 		{
-			return cached_write(fVolume->Device(),blockNumber,buffer,numBlocks,fVolume->BlockSize());
+			return fID;
 		}
 
-		void Done()
+		Volume* GetVolume()
 		{
+			return fVolume;
+		}
+
+		status_t WriteBlocks(off_t blockNumber, const uint8* buffer,
+			size_t numBlocks = 1)
+		{
+			return cached_write(fVolume->Device(), blockNumber, buffer,
+				numBlocks);
+		}
+
+
+		status_t Start(Volume* volume, off_t refBlock)
+		{
+			return B_OK;
+		}
+
+
+		status_t Done()
+		{
+			NotifyListeners(true);
+			return B_OK;
+		}
+
+		void
+		AddListener(TransactionListener* listener)
+		{
+			fListeners.Add(listener);
+		}
+
+		void
+		RemoveListener(TransactionListener* listener)
+		{
+			fListeners.Remove(listener);
+			listener->RemovedFromTransaction();
+		}
+
+		void
+		NotifyListeners(bool success)
+		{
+			while (TransactionListener* listener = fListeners.RemoveHead()) {
+				listener->TransactionDone(success);
+				listener->RemovedFromTransaction();
+			}
 		}
 
 	protected:
-		Volume	*fVolume;
+		Volume*	fVolume;
+		int32	fID;
+		TransactionListeners	fListeners;
 };
 
 

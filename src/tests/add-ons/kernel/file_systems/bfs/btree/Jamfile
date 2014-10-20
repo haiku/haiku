@@ -9,20 +9,23 @@ rule FPreIncludes { return -include\ $(1:D=$(SUBDIR)) ; }
 
 {
 	local defines = [ FDefines USER DEBUG ] ; # _NO_INLINE_ASM
-	local preIncludes = [ FPreIncludes Journal.h Inode.h ] ;
+	local preIncludes = [ FPreIncludes Inode.h Journal.h Volume.h ] ;
 	SubDirC++Flags $(defines) $(preIncludes) -fno-exceptions ; #-fcheck-memory-usage
 }
 
 SimpleTest btreeTest
-	: #test.cpp
+	: test.cpp
 	  Volume.cpp
 	  Inode.cpp
 	  cache.cpp
 	  BPlusTree.cpp
-	  Utility.cpp
 	  Debug.cpp
-	: be ;
+	  QueryParserUtils.cpp
+	  stubs.cpp
+	: be [ TargetLibstdc++ ] libkernelland_emu.so ;
 
 # Tell Jam where to find these sources
-SEARCH on [ FGristFiles BPlusTree.cpp Utility.cpp Debug.cpp ]
+SEARCH on [ FGristFiles BPlusTree.cpp Debug.cpp ]
 	= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
+SEARCH on [ FGristFiles QueryParserUtils.cpp ]
+	= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
