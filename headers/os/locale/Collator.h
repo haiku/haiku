@@ -12,9 +12,7 @@
 
 namespace icu {
 	class Collator;
-	class RuleBasedCollator;
 };
-
 
 class BString;
 class BCollatorAddOn;

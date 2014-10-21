@@ -19,7 +19,9 @@
 #include <HttpTime.h>
 #include <NetworkCookie.h>
 
+
 using BPrivate::BHttpTime;
+
 
 static const char* kArchivedCookieName = "be:cookie.name";
 static const char* kArchivedCookieValue = "be:cookie.value";
@@ -159,7 +161,7 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 			long maxAge = strtol(value.String(), &end, 10);
 			if (*end == '\0')
 				SetMaxAge((int)maxAge);
-			else if(errno == ERANGE && maxAge == LONG_MAX)
+			else if (errno == ERANGE && maxAge == LONG_MAX)
 				SetMaxAge(INT_MAX);
 			else
 				SetMaxAge(-1); // cookie will expire immediately

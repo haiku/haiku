@@ -316,7 +316,7 @@ public:
 	}
 
 private:
- 	const Transformable& fTransform;
+	const Transformable& fTransform;
 	const BPoint&		fTransformOffset;
 	const IntRect&		fClippingFrame;
 	bool				fDryRun;

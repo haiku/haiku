@@ -44,7 +44,7 @@ public:
 			void				AdoptPostFields(BHttpForm* const fields);
 			void				AdoptInputData(BDataIO* const data,
 									const ssize_t size = -1);
-            void                AdoptHeaders(BHttpHeaders* const headers);
+			void				AdoptHeaders(BHttpHeaders* const headers);
 
 			status_t			Stop();
 			const BUrlResult&	Result() const;

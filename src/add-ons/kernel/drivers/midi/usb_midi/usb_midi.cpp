@@ -170,9 +170,9 @@ typedef struct driver_cookie
 
 _EXPORT int32	api_version = B_CUR_DRIVER_API_VERSION;
 
-const char* usb_midi_driver_name = "usb_midi";
+static const char* usb_midi_driver_name = "usb_midi";
 
-const int CINbytes[] = {	/* See USB-MIDI Spec */
+static const int CINbytes[] = {	/* See USB-MIDI Spec */
 	0,	/* 0x0 -- undefined Misc -- Reserved */
 	0,	/* 0x1 -- undefined  Cable -- Reserved */
 	2,	/* 0x2 -- 2-byte system common */
@@ -199,13 +199,15 @@ interpret_midi_buffer(usbmidi_device_info* midiDevice)
 {
 	usb_midi_event_packet* packet = midiDevice->buffer;
 	size_t bytes_left = midiDevice->actual_length;
-	while (bytes_left) {	/* buffer may have several packets */
-		int pktlen = CINbytes[packet->cin];
-		usbmidi_port_info* port = midiDevice->ports[packet->cn];
 
+	/* buffer may have several packets */
+	while (bytes_left >= sizeof(usb_midi_event_packet)) {
 		DPRINTF_DEBUG((MY_ID "received packet %x:%d %x %x %x\n",
 			packet->cin, packet->cn,
 			packet->midi[0], packet->midi[1], packet->midi[2]));
+
+		int pktlen = CINbytes[packet->cin];
+		usbmidi_port_info* port = midiDevice->ports[packet->cn];
 
 		/* port matching 'cable number' */
 		if (port == NULL) {

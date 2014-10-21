@@ -483,11 +483,15 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel bus_managers ata ;
 	EnableWerror src add-ons kernel bus_managers config_manager ;
 #	EnableWerror src add-ons kernel bus_managers firewire ;
+#	EnableWerror src add-ons kernel bus_managers ide ;
 	EnableWerror src add-ons kernel bus_managers isa ;
 	EnableWerror src add-ons kernel bus_managers pci ;
 #	EnableWerror src add-ons kernel bus_managers ps2 ; # gcc2
+#	EnableWerror src add-ons kernel bus_managers random ;
 	EnableWerror src add-ons kernel bus_managers scsi ;
+#	EnableWerror src add-ons kernel bus_managers tty ;
 	EnableWerror src add-ons kernel bus_managers usb ;
+#	EnableWerror src add-ons kernel bus_managers virtio ;
 	EnableWerror src add-ons kernel busses agp_gart ;
 	EnableWerror src add-ons kernel busses ata ;
 	EnableWerror src add-ons kernel busses scsi ;

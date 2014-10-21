@@ -26,8 +26,7 @@ BUrlProtocolAsynchronousListener::BUrlProtocolAsynchronousListener(
 	if (be_app->Lock()) {
 		be_app->AddHandler(this);
 		be_app->Unlock();
-	}
-	else
+	} else
 		PRINT(("Cannot lock be_app\n"));
 
 	if (transparent) {

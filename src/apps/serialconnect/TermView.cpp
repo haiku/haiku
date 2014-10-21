@@ -10,6 +10,7 @@
 
 #include <Entry.h>
 #include <File.h>
+#include <Font.h>
 #include <Layout.h>
 #include <ScrollBar.h>
 
@@ -87,8 +88,8 @@ TermView::Draw(BRect updateRect)
 			background.blue = cell.bg.blue;
 			background.alpha = 255;
 
-			if ((cell.attrs.reverse != 0) ^ (pos.col == cursorPos.col
-					&& pos.row == cursorPos.row)) {
+			// Draw the cursor by swapping foreground and background colors
+			if ((pos.col == cursorPos.col && pos.row == cursorPos.row)) {
 				SetLowColor(foreground);
 				SetViewColor(foreground);
 				SetHighColor(background);
@@ -103,10 +104,28 @@ TermView::Draw(BRect updateRect)
 				y + ceil(height.descent) + ceil(height.leading)),
 				B_SOLID_LOW);
 
+			BFont font = be_fixed_font;
+			if (cell.attrs.bold)
+				font.SetFace(B_BOLD_FACE);
+			if (cell.attrs.underline)
+				font.SetFace(B_UNDERSCORE_FACE);
+			if (cell.attrs.italic)
+				font.SetFace(B_ITALIC_FACE);
+			if (cell.attrs.blink) // FIXME make it actually blink
+				font.SetFace(B_OUTLINED_FACE);
+			if (cell.attrs.reverse)
+				font.SetFace(B_NEGATIVE_FACE);
+			if (cell.attrs.strike)
+				font.SetFace(B_STRIKEOUT_FACE);
+
+			// TODO handle "font" (alternate fonts), dwl and dhl (double size)
+
+			SetFont(&font);
+
 			if (cell.chars[0] == 0) {
-				x += fFontWidth;
-				MovePenTo(x, y);
+				DrawString(" ");
 				pos.col ++;
+				x += fFontWidth;
 			} else {
 				char buffer[VTERM_MAX_CHARS_PER_CELL];
 				wcstombs(buffer, (wchar_t*)cell.chars,
