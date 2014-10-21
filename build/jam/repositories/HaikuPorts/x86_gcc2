@@ -118,8 +118,8 @@ RemotePackageRepository HaikuPorts
 	html_parser-3.71-1
 	hubbub-0.3.0-1
 	hubbub_devel-0.3.0-1
-	icu-54.1-3
-	icu_devel-54.1-3
+	icu-54.1-4
+	icu_devel-54.1-4
 	intltool-0.40.6-3
 	itstool-2.0.2-1
 	jam-2.5_2012_10_12-1
@@ -403,8 +403,8 @@ RemotePackageRepository HaikuPorts
 	guilib_x86_devel-1.2.1-1
 	haikuwebkit_x86-1.4.5-2
 	haikuwebkit_x86_devel-1.4.5-2
-	icu_x86-54.1-3
-	icu_x86_devel-54.1-3
+	icu_x86-54.1-4
+	icu_x86_devel-54.1-4
 	ilmbase_x86-2.2.0-1
 	ilmbase_x86_devel-2.2.0-1
 	jasper_x86-1.900.1-4
