@@ -2106,9 +2106,9 @@ ChartWindow::SetColorSpace(buffer *buf, color_space depth)
 	if (swap_needed) {
 		col = buf->colors[0];
 		for (i = 0; i < 7*8; i++) {
-			B_SWAP_INT32(col[i]);
+			col[i] = B_SWAP_INT32(col[i]);
 		}
-		B_SWAP_INT32(buf->back_color);
+		buf->back_color = B_SWAP_INT32(buf->back_color);
 	}
 }
 
