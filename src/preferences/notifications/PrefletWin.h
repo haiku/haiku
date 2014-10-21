@@ -22,6 +22,7 @@ public:
 	virtual	void			MessageReceived(BMessage* msg);
 
 	virtual	void			SettingChanged();
+			void			ReloadSettings();
 
 private:
 			PrefletView*	fMainView;

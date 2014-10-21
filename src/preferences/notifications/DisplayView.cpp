@@ -52,9 +52,6 @@ DisplayView::DisplayView(SettingsHost* host)
 	fIconSize->SetLabelFromMarked(true);
 	fIconSizeField = new BMenuField(B_TRANSLATE("Icon size:"), fIconSize);
 
-	// Load settings
-	Load();
-
 	// Calculate inset
 	float inset = ceilf(be_plain_font->Size() * 0.7f);
 
@@ -92,30 +89,20 @@ DisplayView::MessageReceived(BMessage* msg)
 
 
 status_t
-DisplayView::Load()
+DisplayView::Load(BMessage& settings)
 {
+#if 0
 	BPath path;
 
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return B_ERROR;
 
-	path.Append(kSettingsDirectory);
-
-	if (create_directory(path.Path(), 0755) != B_OK) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("There was a problem saving the preferences.\n"
-				"It's possible you don't have write access to the "
-				"settings directory."), B_TRANSLATE("OK"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		(void)alert->Go();
-	}
-
-	path.Append(kDisplaySettings);
+	path.Append(kSettingsFile);
 
 	BFile file(path.Path(), B_READ_ONLY);
 	BMessage settings;
 	settings.Unflatten(&file);
+#endif
 
 	char buffer[255];
 	int32 setting;
@@ -144,18 +131,8 @@ DisplayView::Load()
 
 
 status_t
-DisplayView::Save()
+DisplayView::Save(BMessage& settings)
 {
-	BPath path;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return B_ERROR;
-
-	path.Append(kSettingsDirectory);
-	path.Append(kDisplaySettings);
-
-	BMessage settings;
-
 	float width = atof(fWindowWidth->Text());
 	settings.AddFloat(kWidthName, width);
 
@@ -168,19 +145,6 @@ DisplayView::Save()
 			iconSize = B_LARGE_ICON;
 	}
 	settings.AddInt32(kIconSizeName, (int32)iconSize);
-
-	// Save settings file
-	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	status_t ret = settings.Flatten(&file);
-	if (ret != B_OK) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("Can't save preferenes, you probably don't have "
-				"write access to the settings directory or the disk is full."),
-				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		(void)alert->Go();
-		return ret;
-	}
 
 	return B_OK;
 }

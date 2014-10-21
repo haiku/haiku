@@ -65,9 +65,6 @@ GeneralView::GeneralView(SettingsHost* host)
 	// TODO: Here will come a screen representation with the four corners 
 	// clickable
 
-	// Load settings
-	Load();
-
 	// Calculate inset
 	float inset = ceilf(be_plain_font->Size() * 0.7f);
 
@@ -180,31 +177,8 @@ GeneralView::MessageReceived(BMessage* msg)
 
 
 status_t
-GeneralView::Load()
+GeneralView::Load(BMessage& settings)
 {
-	BPath path;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return B_ERROR;
-
-	path.Append(kSettingsDirectory);
-
-	if (create_directory(path.Path(), 0755) != B_OK) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("There was a problem saving the preferences.\n"
-				"It's possible you don't have write access to the "
-				"settings directory."), B_TRANSLATE("OK"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		(void)alert->Go();
-	}
-
-	path.Append(kGeneralSettings);
-
-	BMessage settings;
-	BFile file(path.Path(), B_READ_ONLY);
-	settings.Unflatten(&file);
-
 	char buffer[255];
 
 	fNotificationBox->SetValue(_IsServerRunning() ? B_CONTROL_ON : B_CONTROL_OFF);
@@ -225,38 +199,13 @@ GeneralView::Load()
 
 
 status_t
-GeneralView::Save()
+GeneralView::Save(BMessage& settings)
 {
-	BPath path;
-
-	status_t ret = B_OK;
-	ret = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (ret != B_OK)
-		return ret;
-
-	path.Append(kSettingsDirectory);
-	path.Append(kGeneralSettings);
-
-	BMessage settings;
-
 	bool autoStart = (fAutoStart->Value() == B_CONTROL_ON);
 	settings.AddBool(kAutoStartName, autoStart);
 
 	int32 timeout = atol(fTimeout->Text());
 	settings.AddInt32(kTimeoutName, timeout);
-
-	// Save settings file
-	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	ret = settings.Flatten(&file);
-	if (ret != B_OK) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("An error occurred saving the preferences.\n"
-				"It's possible you are running out of disk space."),
-			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		(void)alert->Go();
-		return ret;
-	}
 
 	// Find server path
 	entry_ref ref;
@@ -273,7 +222,8 @@ GeneralView::Save()
 	BPath serverPath(&ref);
 
 	// Start server at boot time
-	ret = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
+	BPath path;
+	status_t ret = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
 	if (ret != B_OK) {
 		BAlert* alert = new BAlert("",
 			B_TRANSLATE("Can't save preferences, you probably don't have "

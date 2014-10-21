@@ -65,7 +65,6 @@ NotificationWindow::NotificationWindow()
 	SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
 	_LoadSettings(true);
-	_LoadAppFilters(true);
 
 	// Start the message loop
 	Hide();
@@ -125,7 +124,6 @@ NotificationWindow::MessageReceived(BMessage* message)
 		case B_NODE_MONITOR:
 		{
 			_LoadSettings();
-			_LoadAppFilters();
 			break;
 		}
 		case B_COUNT_PROPERTIES:
@@ -408,107 +406,20 @@ NotificationWindow::SetPosition()
 void
 NotificationWindow::_LoadSettings(bool startMonitor)
 {
-	_LoadGeneralSettings(startMonitor);
-	_LoadDisplaySettings(startMonitor);
-}
-
-
-void
-NotificationWindow::_LoadAppFilters(bool startMonitor)
-{
 	BPath path;
+	BMessage settings;
 
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
 
-	path.Append(kSettingsDirectory);
-
-	if (create_directory(path.Path(), 0755) != B_OK)
-		return;
-
-	path.Append(kFiltersSettings);
+	path.Append(kSettingsFile);
 
 	BFile file(path.Path(), B_READ_ONLY);
-	BMessage settings;
-	if (settings.Unflatten(&file) != B_OK)
-		return;
+	settings.Unflatten(&file);
 
-	type_code type;
-	int32 count = 0;
-
-	if (settings.GetInfo("app_usage", &type, &count) != B_OK)
-		return;
-
-	for (int32 i = 0; i < count; i++) {
-		AppUsage* app = new AppUsage();
-		settings.FindFlat("app_usage", i, app);
-		fAppFilters[app->Name()] = app;
-	}
-
-	if (startMonitor) {
-		node_ref nref;
-		BEntry entry(path.Path());
-		entry.GetNodeRef(&nref);
-
-		if (watch_node(&nref, B_WATCH_ALL, BMessenger(this)) != B_OK) {
-			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
-					B_TRANSLATE("Couldn't start filter monitor."
-						" Live filter changes disabled."), B_TRANSLATE("Darn."));
-			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-			alert->Go();
-		}
-	}
-}
-
-
-void
-NotificationWindow::_SaveAppFilters()
-{
-	BPath path;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return;
-
-	path.Append(kSettingsDirectory);
-	path.Append(kFiltersSettings);
-
-	BMessage settings;
-	BFile file(path.Path(), B_WRITE_ONLY);
-
-	appfilter_t::iterator fIt;
-	for (fIt = fAppFilters.begin(); fIt != fAppFilters.end(); fIt++)
-		settings.AddFlat("app_usage", fIt->second);
-
-	settings.Flatten(&file);
-}
-
-
-void
-NotificationWindow::_LoadGeneralSettings(bool startMonitor)
-{
-	BPath path;
-	BMessage settings;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return;
-
-	path.Append(kSettingsDirectory);
-	if (create_directory(path.Path(), 0755) == B_OK) {
-		path.Append(kGeneralSettings);
-
-		BFile file(path.Path(), B_READ_ONLY);
-		settings.Unflatten(&file);
-	}
-
-	if (settings.FindInt32(kTimeoutName, &fTimeout) != B_OK)
-		fTimeout = kDefaultTimeout;
-
-	// Notify the view about the change
-	views_t::iterator it;
-	for (it = fViews.begin(); it != fViews.end(); ++it) {
-		NotificationView* view = (*it);
-		view->Invalidate();
-	}
+	_LoadGeneralSettings(settings);
+	_LoadDisplaySettings(settings);
+	_LoadAppFilters(settings);
 
 	if (startMonitor) {
 		node_ref nref;
@@ -527,22 +438,40 @@ NotificationWindow::_LoadGeneralSettings(bool startMonitor)
 
 
 void
-NotificationWindow::_LoadDisplaySettings(bool startMonitor)
+NotificationWindow::_LoadAppFilters(BMessage& settings)
 {
-	BPath path;
-	BMessage settings;
+	type_code type;
+	int32 count = 0;
 
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+	if (settings.GetInfo("app_usage", &type, &count) != B_OK)
 		return;
 
-	path.Append(kSettingsDirectory);
-	if (create_directory(path.Path(), 0755) == B_OK) {
-		path.Append(kDisplaySettings);
-
-		BFile file(path.Path(), B_READ_ONLY);
-		settings.Unflatten(&file);
+	for (int32 i = 0; i < count; i++) {
+		AppUsage* app = new AppUsage();
+		settings.FindFlat("app_usage", i, app);
+		fAppFilters[app->Name()] = app;
 	}
+}
 
+
+void
+NotificationWindow::_LoadGeneralSettings(BMessage& settings)
+{
+	if (settings.FindInt32(kTimeoutName, &fTimeout) != B_OK)
+		fTimeout = kDefaultTimeout;
+
+	// Notify the view about the change
+	views_t::iterator it;
+	for (it = fViews.begin(); it != fViews.end(); ++it) {
+		NotificationView* view = (*it);
+		view->Invalidate();
+	}
+}
+
+
+void
+NotificationWindow::_LoadDisplaySettings(BMessage& settings)
+{
 	int32 setting;
 
 	if (settings.FindFloat(kWidthName, &fWidth) != B_OK)
@@ -560,19 +489,5 @@ NotificationWindow::_LoadDisplaySettings(bool startMonitor)
 	for (it = fViews.begin(); it != fViews.end(); ++it) {
 		NotificationView* view = (*it);
 		view->Invalidate();
-	}
-
-	if (startMonitor) {
-		node_ref nref;
-		BEntry entry(path.Path());
-		entry.GetNodeRef(&nref);
-
-		if (watch_node(&nref, B_WATCH_ALL, BMessenger(this)) != B_OK) {
-			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
-				B_TRANSLATE("Couldn't start display settings monitor.\n"
-					"Live filter changes disabled."), B_TRANSLATE("OK"));
-			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-			alert->Go();
-		}
 	}
 }

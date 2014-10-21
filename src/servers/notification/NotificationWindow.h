@@ -65,10 +65,9 @@ private:
 
 			void					SetPosition();
 			void					_LoadSettings(bool startMonitor = false);
-			void					_LoadAppFilters(bool startMonitor = false);
-			void					_SaveAppFilters();
-			void					_LoadGeneralSettings(bool startMonitor);
-			void					_LoadDisplaySettings(bool startMonitor);
+			void					_LoadAppFilters(BMessage& settings);
+			void					_LoadGeneralSettings(BMessage& settings);
+			void					_LoadDisplaySettings(BMessage& settings);
 
 			views_t					fViews;
 			appview_t				fAppViews;

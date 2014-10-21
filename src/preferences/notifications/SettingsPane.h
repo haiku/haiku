@@ -20,8 +20,8 @@ public:
 
 	virtual	void			MessageReceived(BMessage* msg);
 
-	virtual status_t		Load() = 0;
-	virtual	status_t		Save() = 0;
+	virtual status_t		Load(BMessage&) = 0;
+	virtual	status_t		Save(BMessage&) = 0;
 	virtual	status_t		Revert() = 0;
 
 protected:

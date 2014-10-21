@@ -35,7 +35,7 @@ PrefletView::PrefletView(SettingsHost* host)
 	// Pages
 	GeneralView* general = new GeneralView(host);
 	DisplayView* display = new DisplayView(host);
-	NotificationsView* apps = new NotificationsView();
+	NotificationsView* apps = new NotificationsView(host);
 
 	// Page selector
 	BTab* tab = new BTab();

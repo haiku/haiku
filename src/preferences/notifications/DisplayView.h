@@ -20,8 +20,8 @@ public:
 	virtual	void			MessageReceived(BMessage* msg);
 
 			// SettingsPane hooks
-			status_t		Load();
-			status_t		Save();
+			status_t		Load(BMessage&);
+			status_t		Save(BMessage&);
 			status_t		Revert();
 
 private:

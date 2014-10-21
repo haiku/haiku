@@ -13,10 +13,7 @@
 const uint32 kNotificationMessage		= 'nssm';
 
 // Settings constants
-extern const char* kSettingsDirectory;
-extern const char* kFiltersSettings;
-extern const char* kGeneralSettings;
-extern const char* kDisplaySettings;
+extern const char* kSettingsFile;
 
 // General settings
 extern const char* kAutoStartName;

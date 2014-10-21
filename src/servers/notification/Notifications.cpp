@@ -8,10 +8,7 @@
 
 
 // Settings constants
-const char* kSettingsDirectory = "system/notifications";
-const char* kFiltersSettings = "filters";
-const char* kGeneralSettings = "general";
-const char* kDisplaySettings = "display";
+const char* kSettingsFile = "system/notifications";
 
 // General settings
 const char* kAutoStartName = "auto-start";

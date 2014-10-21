@@ -8,10 +8,6 @@
  */
 
 #include <Message.h>
-#include <Node.h>
-#include <Path.h>
-#include <FindDirectory.h>
-#include <Directory.h>
 
 #include "SettingsPane.h"
 #include "SettingsHost.h"

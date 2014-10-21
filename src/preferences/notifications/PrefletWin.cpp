@@ -7,13 +7,19 @@
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
  */
 
+#include "PrefletWin.h"
+
+#include <Alert.h>
 #include <Application.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <FindDirectory.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <Path.h>
 
-#include "PrefletWin.h"
+#include <notification/Notifications.h>
+
 #include "PrefletView.h"
 
 
@@ -60,6 +66,8 @@ PrefletWin::PrefletWin()
 		.SetInsets(inset, inset, inset, inset)
 	);
 
+	ReloadSettings();
+
 	// Center this window on screen and show it
 	CenterOnScreen();
 	Show();
@@ -71,18 +79,44 @@ PrefletWin::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case kApply:
+		{
+			BPath path;
+
+			status_t ret = B_OK;
+			ret = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+			if (ret != B_OK)
+				return;
+
+			path.Append(kSettingsFile);
+
+			BMessage settingsStore;
 			for (int32 i = 0; i < fMainView->CountPages(); i++) {
 				SettingsPane* pane =
 					dynamic_cast<SettingsPane*>(fMainView->PageAt(i));
 				if (pane) {
-					if (pane->Save() == B_OK) {
+					if (pane->Save(settingsStore) == B_OK) {
 						fApply->SetEnabled(false);
 						fRevert->SetEnabled(true);
 					} else
 						break;
 				}
 			}
+
+			// Save settings file
+			BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+			ret = settingsStore.Flatten(&file);
+			if (ret != B_OK) {
+				BAlert* alert = new BAlert("",
+					B_TRANSLATE("An error occurred saving the preferences.\n"
+						"It's possible you are running out of disk space."),
+					B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
+					B_STOP_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				(void)alert->Go();
+			}
+
 			break;
+		}
 		case kRevert:
 			for (int32 i = 0; i < fMainView->CountPages(); i++) {
 				SettingsPane* pane =
@@ -111,4 +145,28 @@ void
 PrefletWin::SettingChanged()
 {
 	fApply->SetEnabled(true);
+}
+
+
+void
+PrefletWin::ReloadSettings()
+{
+	BPath path;
+
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
+
+	// FIXME don't load this again here, share with other tabs!
+	path.Append(kSettingsFile);
+
+	BMessage settings;
+	BFile file(path.Path(), B_READ_ONLY);
+	settings.Unflatten(&file);
+
+	for (int32 i = 0; i < fMainView->CountPages(); i++) {
+		SettingsPane* pane =
+			dynamic_cast<SettingsPane*>(fMainView->PageAt(i));
+		if (pane)
+			pane->Load(settings);
+	}
 }

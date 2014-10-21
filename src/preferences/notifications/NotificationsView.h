@@ -10,6 +10,8 @@
 
 #include <notification/AppUsage.h>
 
+#include "SettingsPane.h"
+
 typedef std::map<BString, AppUsage *> appusage_t;
 
 class BCheckBox;
@@ -18,15 +20,17 @@ class BColumnListView;
 class BStringColumn;
 class BDateColumn;
 
-class NotificationsView : public BView {
+class NotificationsView : public SettingsPane {
 public:
-								NotificationsView();
+								NotificationsView(SettingsHost* host);
 
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* msg);
 
 private:
-			status_t			_LoadAppUsage();
+			status_t			Load(BMessage&);
+			status_t			Save(BMessage&);
+			status_t			Revert() {return B_OK;} // FIXME implement this
 			void				_PopulateApplications();
 			void				_Populate(AppUsage* usage);
 

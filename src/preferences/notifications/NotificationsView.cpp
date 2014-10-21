@@ -47,12 +47,10 @@ const int32 kDateIndex = 1;
 const int32 kTypeIndex = 2;
 const int32 kAllowIndex = 3;
 
-const int32 kSettingChanged = '_STC';
 
-
-NotificationsView::NotificationsView()
+NotificationsView::NotificationsView(SettingsHost* host)
 	:
-	BView("apps", B_WILL_DRAW)
+	SettingsPane("apps", host)
 {
 	BRect rect(0, 0, 100, 100);
 
@@ -99,10 +97,6 @@ NotificationsView::NotificationsView()
 		be_plain_font->StringWidth(B_TRANSLATE("Allowed")) +
 		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fNotifications->AddColumn(fAllowCol, kAllowIndex);
-
-	// Load the applications list
-	_LoadAppUsage();
-	_PopulateApplications();
 
 	// Calculate inset
 	float inset = ceilf(be_plain_font->Size() * 0.7f);
@@ -169,33 +163,8 @@ NotificationsView::MessageReceived(BMessage* msg)
 
 
 status_t
-NotificationsView::_LoadAppUsage()
+NotificationsView::Load(BMessage& settings)
 {
-	BPath path;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return B_ERROR;
-
-	path.Append(kSettingsDirectory);
-
-	if (create_directory(path.Path(), 0755) != B_OK) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("There was a problem saving the preferences.\n"
-				"It's possible you don't have write access to the "
-				"settings directory."), B_TRANSLATE("OK"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		(void)alert->Go();
-		return B_ERROR;
-	}
-
-	path.Append(kFiltersSettings);
-
-	BFile file(path.Path(), B_READ_ONLY);
-	BMessage settings;
-	if (settings.Unflatten(&file) != B_OK)
-		return B_ERROR;
-
 	type_code type;
 	int32 count = 0;
 
@@ -214,6 +183,20 @@ NotificationsView::_LoadAppUsage()
 		settings.FindFlat("app_usage", i, app);
 		fAppFilters[app->Name()] = app;
 	}
+
+	// Load the applications list
+	_PopulateApplications();
+
+	return B_OK;
+}
+
+
+status_t
+NotificationsView::Save(BMessage& storage)
+{
+	appusage_t::iterator fIt;
+	for (fIt = fAppFilters.begin(); fIt != fAppFilters.end(); fIt++)
+		storage.AddFlat("app_usage", fIt->second);
 
 	return B_OK;
 }
