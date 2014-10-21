@@ -26,7 +26,3 @@ StaticLibrary libpcap.a :
 	scanner.l
 	version.c
 ;
-
-# scanner.l includes the generated grammar.h, but we need to
-# declare the dependency from .o to .c
-Depends [ FGristFiles scanner.o ] : [ FGristFiles grammar.c ] ;
