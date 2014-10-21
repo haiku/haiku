@@ -51,6 +51,10 @@ UsePrivateHeaders shared storage ;
 				DEFINES +=
 					BOOT_SUPPORT_ELF32
 				;
+			} else {
+				DEFINES +=
+					_BOOT_PLATFORM_EFI
+				;
 			}
 		}
 	}

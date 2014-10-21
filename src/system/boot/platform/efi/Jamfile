@@ -8,7 +8,7 @@ UseBuildFeatureHeaders gnuefi : headersProtocol ;
 UseBuildFeatureHeaders gnuefi : headersArch ;
 
 {
-	local defines = _BOOT_MODE GNU_EFI_USE_MS_ABI _BOOT_PLATFORM=efi ;
+	local defines = _BOOT_MODE GNU_EFI_USE_MS_ABI _BOOT_PLATFORM_EFI ;
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) -fno-rtti ;
@@ -24,6 +24,7 @@ local platform_src =
 	console.cpp
 	video.cpp
 	debug.cpp
+	entry.S
 	mmu.cpp
 	heap.cpp
 	menu.cpp
