@@ -534,41 +534,33 @@ UrlTest::RelativeUriTest()
 }
 
 
-
 void
 UrlTest::IDNTest()
 {
 	// http://www.w3.org/2004/04/uri-rel-test.html
-	// TODO these need to be manually UrlDecoded with our API.
-	// We also need to decide wether to store them as UTF-8 or IDNA/punycode.
-	NextSubTest();
-	CPPUNIT_ASSERT_EQUAL(BUrl("http://www.w3.org").UrlString(),
-		BUrl("http://www.w%33.org").UrlString());
-	NextSubTest();
-	CPPUNIT_ASSERT_EQUAL(
-		BUrl("http://xn--rksmrgs-5wao1o.josefsson.org").UrlString(),
-		BUrl("http://r%C3%A4ksm%C3%B6rg%C3%A5s.josefsson.org").UrlString());
-	NextSubTest();
-	CPPUNIT_ASSERT_EQUAL(
-		BUrl("http://xn--rksmrgs-5wao1o.josefsson.org").UrlString(),
-		BUrl("http://%E7%B4%8D%E8%B1%86.w3.mag.keio.ac.jp").UrlString());
-	NextSubTest();
-	CPPUNIT_ASSERT_EQUAL(
-		BUrl("http://www.xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9b"
-			"ya3kc6lra.w3.mag.keio.ac.jp/").UrlString(),
-		BUrl("http://www.%E3%81%BB%E3%82%93%E3%81%A8%E3%81%86%E3%81%AB%E3%81%AA"
+	// TODO We need to decide wether to store them as UTF-8 or IDNA/punycode.
+
+	struct Test {
+		const char* escaped;
+		const char* decoded;
+	};
+
+	Test tests[] = {
+		{ "http://www.w%33.org", "http://www.w3.org" },
+		{ "http://r%C3%A4ksm%C3%B6rg%C3%A5s.josefsson.org",
+			"http://xn--rksmrgs-5wao1o.josefsson.org" },
+		{ "http://%E7%B4%8D%E8%B1%86.w3.mag.keio.ac.jp",
+			"http://xn--99zt52a.w3.mag.keio.ac.jp" },
+		{ "http://www.%E3%81%BB%E3%82%93%E3%81%A8%E3%81%86%E3%81%AB%E3%81%AA"
 			"%E3%81%8C%E3%81%84%E3%82%8F%E3%81%91%E3%81%AE%E3%82%8F%E3%81%8B%E3"
 			"%82%89%E3%81%AA%E3%81%84%E3%81%A9%E3%82%81%E3%81%84%E3%82%93%E3%82"
 			"%81%E3%81%84%E3%81%AE%E3%82%89%E3%81%B9%E3%82%8B%E3%81%BE%E3%81%A0"
 			"%E3%81%AA%E3%81%8C%E3%81%8F%E3%81%97%E3%81%AA%E3%81%84%E3%81%A8%E3"
-			"%81%9F%E3%82%8A%E3%81%AA%E3%81%84.w3.mag.keio.ac.jp/").UrlString());
-	NextSubTest();
-	CPPUNIT_ASSERT_EQUAL(
-		BUrl("http://xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9bya3k"
-			"c6lra.xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9bya3kc6"
-			"lra.xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9bya3kc6lr"
-			"a.w3.mag.keio.ac.jp/").UrlString(),
-		BUrl("http://%E3%81%BB%E3%82%93%E3%81%A8%E3%81%86%E3%81%AB%E3%81%AA%E3"
+			"%81%9F%E3%82%8A%E3%81%AA%E3%81%84.w3.mag.keio.ac.jp/",
+			"http://www.xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9b"
+			"ya3kc6lra.w3.mag.keio.ac.jp/" },
+
+		{ "http://%E3%81%BB%E3%82%93%E3%81%A8%E3%81%86%E3%81%AB%E3%81%AA%E3"
 			"%81%8C%E3%81%84%E3%82%8F%E3%81%91%E3%81%AE%E3%82%8F%E3%81%8B%E3%82"
 			"%89%E3%81%AA%E3%81%84%E3%81%A9%E3%82%81%E3%81%84%E3%82%93%E3%82%81"
 			"%E3%81%84%E3%81%AE%E3%82%89%E3%81%B9%E3%82%8B%E3%81%BE%E3%81%A0%E3"
@@ -584,7 +576,22 @@ UrlTest::IDNTest()
 			"%84%E3%81%A9%E3%82%81%E3%81%84%E3%82%93%E3%82%81%E3%81%84%E3%81%AE"
 			"%E3%82%89%E3%81%B9%E3%82%8B%E3%81%BE%E3%81%A0%E3%81%AA%E3%81%8C%E3"
 			"%81%8F%E3%81%97%E3%81%AA%E3%81%84%E3%81%A8%E3%81%9F%E3%82%8A%E3%81"
-			"%AA%E3%81%84.w3.mag.keio.ac.jp/").UrlString());
+			"%AA%E3%81%84.w3.mag.keio.ac.jp/",
+			"http://xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9bya3k"
+			"c6lra.xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9bya3kc6"
+			"lra.xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9bya3kc6lr"
+			"a.w3.mag.keio.ac.jp/" },
+		{ NULL, NULL }
+	};
+
+	for (int i = 0; tests[i].escaped != NULL; i++)
+	{
+		NextSubTest();
+		BUrl url(tests[i].escaped);
+		url.UrlDecode();
+		CPPUNIT_ASSERT_EQUAL(BUrl(tests[i].decoded).UrlString(),
+			url.UrlString());
+	}
 }
 
 
