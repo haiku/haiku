@@ -243,7 +243,8 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	if (fPCIInfo->vendor_id == PCI_VENDOR_INTEL 
 		&& (fPCIInfo->device_id == PCI_DEVICE_INTEL_PANTHER_POINT_XHCI
 			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_XHCI
-			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_LP_XHCI)) {
+			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_LP_XHCI
+			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_BAYTRAIL_XHCI)) {
 		
 		TRACE("Intel xHC Controller\n");
 		TRACE("Looking for EHCI owned ports\n");
@@ -506,7 +507,8 @@ XHCI::Start()
 	if (fPCIInfo->vendor_id == PCI_VENDOR_INTEL 
 		&& (fPCIInfo->device_id == PCI_DEVICE_INTEL_PANTHER_POINT_XHCI
 			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_XHCI
-			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_LP_XHCI)) {
+			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_LP_XHCI
+			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_BAYTRAIL_XHCI)) {
 		WriteRunReg32(XHCI_IMOD(0), 0x000003f8); // 4000 irq/s
 	} else {
 		WriteRunReg32(XHCI_IMOD(0), 0x000001f4); // 8000 irq/s

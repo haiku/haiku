@@ -15,6 +15,7 @@
 #define	PCI_DEVICE_INTEL_PANTHER_POINT_XHCI		0x1e31
 #define	PCI_DEVICE_INTEL_LYNX_POINT_XHCI		0x8c31
 #define	PCI_DEVICE_INTEL_LYNX_POINT_LP_XHCI		0x9c31
+#define	PCI_DEVICE_INTEL_BAYTRAIL_XHCI			0x0f35
 
 // Intel quirks registers in PCI config
 #define	XHCI_INTEL_USB3PRM				0xdc	// USB 3.0 Port Routing Mask
