@@ -64,6 +64,9 @@ public:
 			void				UrlEncode(bool strict = false);
 			void				UrlDecode(bool strict = false);
 
+			status_t			IDNAToAscii();
+			status_t			IDNAToUnicode();
+
 	// Url encoding/decoding of strings
 	static	BString				UrlEncode(const BString& url, 
 									bool strict = false, 

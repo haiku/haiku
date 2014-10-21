@@ -17,7 +17,11 @@
 #include <MimeType.h>
 #include <Roster.h>
 
+#include <ICUWrapper.h>
 #include <RegExp.h>
+
+#include <unicode/idna.h>
+#include <unicode/stringpiece.h>
 
 
 static const char* kArchivedUrl = "be:url string";
@@ -591,6 +595,50 @@ BUrl::UrlDecode(bool strict)
 	fHost = _DoUrlDecodeChunk(fHost, strict);
 	fFragment = _DoUrlDecodeChunk(fFragment, strict);
 	fPath = _DoUrlDecodeChunk(fPath, strict);
+}
+
+
+status_t
+BUrl::IDNAToAscii()
+{
+	UErrorCode err = U_ZERO_ERROR;
+	icu::IDNA* converter = icu::IDNA::createUTS46Instance(0, err);
+	icu::IDNAInfo info;
+
+	BString result;
+	BStringByteSink sink(&result);
+	converter->nameToASCII_UTF8(icu::StringPiece(fHost.String()), sink, info,
+		err);
+
+	delete converter;
+
+	if (U_FAILURE(err))
+		return B_ERROR;
+
+	fHost = result;
+	return B_OK;
+}
+
+
+status_t
+BUrl::IDNAToUnicode()
+{
+	UErrorCode err = U_ZERO_ERROR;
+	icu::IDNA* converter = icu::IDNA::createUTS46Instance(0, err);
+	icu::IDNAInfo info;
+
+	BString result;
+	BStringByteSink sink(&result);
+	converter->nameToUnicodeUTF8(icu::StringPiece(fHost.String()), sink, info,
+		err);
+
+	delete converter;
+
+	if (U_FAILURE(err))
+		return B_ERROR;
+
+	fHost = result;
+	return B_OK;
 }
 
 

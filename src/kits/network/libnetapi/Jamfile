@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src kits network libnetapi ;
 
 UsePrivateHeaders app net shared support ;
+UsePrivateHeaders locale shared ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
@@ -30,6 +31,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			md5Sources = md5.c ;
 			SetupFeatureObjectsDir no-ssl ;
 		}
+
+		# BUrl uses ICU to perform IDNA conversions (unicode domain names)
+		UseBuildFeatureHeaders icu ;
+		Includes [ FGristFiles Url.cpp ]
+			: [ BuildFeatureAttribute icu : headers ] ;
 
 		SharedLibrary [ MultiArchDefaultGristFiles libbnetapi.so ] :
 			init.cpp
@@ -91,6 +97,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			be $(TARGET_NETWORK_LIBS) [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 			[ BuildFeatureAttribute openssl : libraries ]
+			[ BuildFeatureAttribute icu : libraries ]
 			[ MultiArchDefaultGristFiles libshared.a ]
 			;
 	}

@@ -587,10 +587,15 @@ UrlTest::IDNTest()
 	for (int i = 0; tests[i].escaped != NULL; i++)
 	{
 		NextSubTest();
+
 		BUrl url(tests[i].escaped);
 		url.UrlDecode();
-		CPPUNIT_ASSERT_EQUAL(BUrl(tests[i].decoded).UrlString(),
-			url.UrlString());
+
+		BUrl idn(tests[i].decoded);
+		status_t success = idn.IDNAToUnicode();
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, success);
+		CPPUNIT_ASSERT_EQUAL(url.UrlString(), idn.UrlString());
 	}
 }
 
