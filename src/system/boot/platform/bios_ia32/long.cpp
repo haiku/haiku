@@ -62,6 +62,11 @@ fix_address(FixedWidthPointer<Type>& p)
 static void
 long_gdt_init()
 {
+	STATIC_ASSERT(BOOT_GDT_SEGMENT_COUNT > KERNEL_CODE_SEGMENT
+		&& BOOT_GDT_SEGMENT_COUNT > KERNEL_DATA_SEGMENT
+		&& BOOT_GDT_SEGMENT_COUNT > USER_CODE_SEGMENT
+		&& BOOT_GDT_SEGMENT_COUNT > USER_DATA_SEGMENT);
+
 	clear_segment_descriptor(&gBootGDT[0]);
 
 	// Set up code/data segments (TSS segments set up later in the kernel).

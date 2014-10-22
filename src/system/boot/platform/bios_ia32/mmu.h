@@ -9,9 +9,6 @@
 #include <arch/x86/descriptors.h>
 
 
-#define BOOT_GDT_SEGMENT_COUNT	(USER_DATA_SEGMENT + 1)
-
-
 #ifndef _ASSEMBLER
 
 

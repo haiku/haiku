@@ -538,6 +538,11 @@ mmu_init_for_kernel(void)
 {
 	TRACE("mmu_init_for_kernel\n");
 
+	STATIC_ASSERT(BOOT_GDT_SEGMENT_COUNT > KERNEL_CODE_SEGMENT
+		&& BOOT_GDT_SEGMENT_COUNT > KERNEL_DATA_SEGMENT
+		&& BOOT_GDT_SEGMENT_COUNT > USER_CODE_SEGMENT
+		&& BOOT_GDT_SEGMENT_COUNT > USER_DATA_SEGMENT);
+
 	// set up a new gdt
 
 	// put standard segment descriptors in GDT
