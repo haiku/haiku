@@ -8,6 +8,7 @@
 #include <TestSuiteAddon.h>
 
 #include "AreaTest.h"
+#include "BufferTest.h"
 
 
 BTestSuite*
@@ -16,6 +17,7 @@ getTestSuite()
 	BTestSuite* suite = new BTestSuite("MediaKit");
 
 	AreaTest::AddTests(*suite);
+	BufferTest::AddTests(*suite);
 
 	return suite;
 }

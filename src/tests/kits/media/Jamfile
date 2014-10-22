@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests kits media ;
 
-SimpleTest BufferTest : BufferTest.cpp : libmedia.so be [ TargetLibsupc++ ] ;
-
 SimpleTest SizeofTest : SizeofTest.cpp : be ;
 
 SimpleTest TimedEventQueueTest : TimedEventQueueTest.cpp
@@ -19,8 +17,9 @@ UnitTestLib libmediatest.so :
 	MediaKitTestAddon.cpp
 
 	AreaTest.cpp
+	BufferTest.cpp
 
-	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	: be media [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
 SubInclude HAIKU_TOP src tests kits media media_decoder ;
