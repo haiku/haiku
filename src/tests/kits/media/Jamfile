@@ -7,15 +7,12 @@ SimpleTest mediaFormats :
 	mediaFormats.cpp
 	: media ;
 
-SimpleTest mediaDescriptions :
-	mediaDescriptions.cpp
-	: media ;
-
 UnitTestLib libmediatest.so :
 	MediaKitTestAddon.cpp
 
 	AreaTest.cpp
 	BufferTest.cpp
+	FormatDescriptions.cpp
 	SizeofTest.cpp
 
 	: be media [ TargetLibstdc++ ] [ TargetLibsupc++ ]

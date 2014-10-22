@@ -9,6 +9,7 @@
 
 #include "AreaTest.h"
 #include "BufferTest.h"
+#include "FormatDescriptions.h"
 #include "SizeofTest.h"
 
 
@@ -19,6 +20,7 @@ getTestSuite()
 
 	AreaTest::AddTests(*suite);
 	BufferTest::AddTests(*suite);
+	FormatDescriptionsTest::AddTests(*suite);
 	SizeofTest::AddTests(*suite);
 
 	return suite;

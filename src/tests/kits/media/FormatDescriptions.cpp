@@ -4,22 +4,36 @@
 */
 
 
+#include "FormatDescriptions.h"
+
 #include <MediaFormats.h>
-#include <stdio.h>
+
+#include <cppunit/TestCaller.h>
+#include <cppunit/TestSuite.h>
 
 
-int 
-main(int argc, char **argv)
+FormatDescriptionsTest::FormatDescriptionsTest()
+{
+}
+
+
+FormatDescriptionsTest::~FormatDescriptionsTest()
+{
+}
+
+
+void
+FormatDescriptionsTest::TestCompare()
 {
 	media_format_description a;
 	a.family = B_AVI_FORMAT_FAMILY;
 	a.u.avi.codec = 'DIVX';
 
 	media_format_description b;
-	printf("avi/divx == empty? %s\n", a == b ? "yes" : "no");
+	CPPUNIT_ASSERT(a != b);
 
 	b.family = a.family;
-	printf("avi/divx == same family, no codec? %s\n", a == b ? "yes" : "no");
+	CPPUNIT_ASSERT(a != b);
 
 	a.family = B_QUICKTIME_FORMAT_FAMILY;
 	a.u.quicktime.vendor = 5;
@@ -28,17 +42,17 @@ main(int argc, char **argv)
 	b.family = B_QUICKTIME_FORMAT_FAMILY;
 	b.u.quicktime.vendor = 6;
 	b.u.quicktime.codec = 5;
-	printf("qt(5,5) < qt(6, 5)? %s\n", a < b ? "yes" : "no");
+	CPPUNIT_ASSERT(a < b);
 
 	b.u.quicktime.vendor = 4;
-	printf("qt(5,5) < qt(4, 5)? %s\n", a < b ? "yes" : "no");
+	CPPUNIT_ASSERT(a > b);
 
 	b.u.quicktime.vendor = 5;
 	b.u.quicktime.codec = 6;
-	printf("qt(5,5) < qt(5, 6)? %s\n", a < b ? "yes" : "no");
+	CPPUNIT_ASSERT(a < b);
 
 	b.u.quicktime.codec = 4;
-	printf("qt(5,5) < qt(5, 4)? %s\n", a < b ? "yes" : "no");
+	CPPUNIT_ASSERT(a > b);
 
 	a.family = B_MISC_FORMAT_FAMILY;
 	a.u.misc.file_format = 5;
@@ -47,17 +61,29 @@ main(int argc, char **argv)
 	b.family = B_MISC_FORMAT_FAMILY;
 	b.u.misc.file_format = 6;
 	b.u.misc.codec = 5;
-	printf("misc(5,5) < misc(6, 5)? %s\n", a < b ? "yes" : "no");
+	CPPUNIT_ASSERT(a < b);
 
 	b.u.misc.file_format = 4;
-	printf("misc(5,5) < qt(4, 5)? %s\n", a < b ? "yes" : "no");
+	CPPUNIT_ASSERT(a > b);
+
 
 	b.u.misc.file_format = 5;
 	b.u.misc.codec = 6;
-	printf("misc(5,5) < misc(5, 6)? %s\n", a < b ? "yes" : "no");
+	CPPUNIT_ASSERT(a < b);
 
 	b.u.misc.codec = 4;
-	printf("misc(5,5) < misc(5, 4)? %s\n", a < b ? "yes" : "no");
+	CPPUNIT_ASSERT(a > b);
+}
 
-	return 0;
+
+/*static*/ void
+FormatDescriptionsTest::AddTests(BTestSuite& parent)
+{
+	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("FormatDescriptionsTest");
+
+	suite.addTest(new CppUnit::TestCaller<FormatDescriptionsTest>(
+		"FormatDescriptionsTest::TestCompare",
+		&FormatDescriptionsTest::TestCompare));
+
+	parent.addTest("FormatDescriptionsTest", &suite);
 }
