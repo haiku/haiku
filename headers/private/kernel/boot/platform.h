@@ -28,6 +28,8 @@ extern status_t platform_init_heap(struct stage2_args *args, void **_base, void 
 extern status_t platform_allocate_region(void **_virtualAddress, size_t size,
 	uint8 protection, bool exactAddress);
 extern status_t platform_free_region(void *address, size_t size);
+extern status_t platform_bootloader_address_to_kernel_address(void *address, uint64_t *_result);
+extern status_t platform_kernel_address_to_bootloader_address(uint64_t address, void **_result);
 
 /* boot options */
 #define BOOT_OPTION_MENU			1

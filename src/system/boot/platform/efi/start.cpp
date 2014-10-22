@@ -122,16 +122,6 @@ convert_kernel_args()
 		image = next;
 	}
 
-	// Set correct kernel args range addresses.
-	dprintf("kernel args ranges:\n");
-	for (uint32 i = 0; i < gKernelArgs.num_kernel_args_ranges; i++) {
-		gKernelArgs.kernel_args_range[i].start = fix_address(
-			gKernelArgs.kernel_args_range[i].start);
-		dprintf("    base %#018" B_PRIx64 ", length %#018" B_PRIx64 "\n",
-			gKernelArgs.kernel_args_range[i].start,
-			gKernelArgs.kernel_args_range[i].size);
-	}
-
 	// Fix driver settings files.
 	driver_settings_file* file = gKernelArgs.driver_settings;
 	fix_address(gKernelArgs.driver_settings);
