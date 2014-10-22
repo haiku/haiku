@@ -77,7 +77,7 @@ long_gdt_init()
 		DPL_USER);
 
 	// Used by long_enter_kernel().
-	gLongGDT = fix_address((addr_t)gBootGDT);
+	gLongGDT = (addr_t)gBootGDT + 0xFFFFFF0000000000;
 	dprintf("GDT at 0x%lx\n", gLongGDT);
 }
 

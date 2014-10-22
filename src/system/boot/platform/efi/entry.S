@@ -27,9 +27,12 @@ FUNCTION(efi_enter_kernel):
 
 	// Load 64-bit enabled GDT
 	lgdtq	long_gdtr(%rip)
-/*
+
 	// Jump into the 64-bit code segment.
-	ljmp	$KERNEL_CODE_SELECTOR, $.Llmode
+        push    $KERNEL_CODE_SELECTOR
+        lea     .Llmode(%rip), %rax
+        push    %rax
+        lretq
 .align 8
 .code64
 .Llmode:
@@ -41,7 +44,7 @@ FUNCTION(efi_enter_kernel):
 	mov		%ax, %es
 	mov		%ax, %fs
 	mov		%ax, %gs
-*/
+
 	// Set the stack pointer.
 	movq	%rdx, %rsp
 
