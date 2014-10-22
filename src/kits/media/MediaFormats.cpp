@@ -364,6 +364,10 @@ update_media_formats()
 	if (!sLock.IsLocked())
 		return B_NOT_ALLOWED;
 
+	// We want the add-ons to register themselves with the format manager, so
+	// the list is up to date.
+	AddOnManager::GetInstance()->RegisterAddOns();
+
 	BMessage reply;
 	FormatManager::GetInstance()->GetFormats(sLastFormatsUpdate, reply);
 

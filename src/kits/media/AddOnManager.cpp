@@ -95,7 +95,7 @@ AddOnManager::GetDecoderForFormat(entry_ref* _decoderRef,
 		return B_MEDIA_BAD_FORMAT;
 
 	BAutolock locker(fLock);
-	_RegisterAddOns();
+	RegisterAddOns();
 
 	// Since the list of decoders is unsorted, we need to search for
 	// a decoder by add-on directory, in order to maintain the shadowing
@@ -128,7 +128,7 @@ AddOnManager::GetReaders(entry_ref* outRefs, int32* outCount,
 	int32 maxCount)
 {
 	BAutolock locker(fLock);
-	_RegisterAddOns();
+	RegisterAddOns();
 
 	*outCount = 0;
 
@@ -158,7 +158,7 @@ status_t
 AddOnManager::GetEncoder(entry_ref* _encoderRef, int32 id)
 {
 	BAutolock locker(fLock);
-	_RegisterAddOns();
+	RegisterAddOns();
 
 	encoder_info* info;
 	for (fEncoderList.Rewind(); fEncoderList.GetNext(&info);) {
@@ -177,7 +177,7 @@ status_t
 AddOnManager::GetWriter(entry_ref* _ref, uint32 internalID)
 {
 	BAutolock locker(fLock);
-	_RegisterAddOns();
+	RegisterAddOns();
 
 	writer_info* info;
 	for (fWriterList.Rewind(); fWriterList.GetNext(&info);) {
@@ -195,7 +195,7 @@ status_t
 AddOnManager::GetFileFormat(media_file_format* _fileFormat, int32 cookie)
 {
 	BAutolock locker(fLock);
-	_RegisterAddOns();
+	RegisterAddOns();
 
 	media_file_format* fileFormat;
 	if (fWriterFileFormats.Get(cookie, &fileFormat)) {
@@ -213,7 +213,7 @@ AddOnManager::GetCodecInfo(media_codec_info* _codecInfo,
 	media_format* _inputFormat, media_format* _outputFormat, int32 cookie)
 {
 	BAutolock locker(fLock);
-	_RegisterAddOns();
+	RegisterAddOns();
 
 	encoder_info* info;
 	if (fEncoderList.Get(cookie, &info)) {
@@ -232,7 +232,7 @@ AddOnManager::GetCodecInfo(media_codec_info* _codecInfo,
 
 
 void
-AddOnManager::_RegisterAddOns()
+AddOnManager::RegisterAddOns()
 {
 	// Check if add-ons are already registered.
 	if (!fReaderList.IsEmpty() || !fWriterList.IsEmpty()

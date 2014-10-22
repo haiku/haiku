@@ -50,8 +50,9 @@ public:
 									media_format* _inputFormat,
 									media_format* _outputFormat, int32 cookie);
 
+			void				RegisterAddOns();
+
 private:
-			void				_RegisterAddOns();
 
 			status_t			_RegisterAddOn(const entry_ref& ref);
 			status_t			_UnregisterAddOn(const entry_ref& ref);
