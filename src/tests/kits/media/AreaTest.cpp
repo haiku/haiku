@@ -1,8 +1,29 @@
+/*
+ * Copyright 2014 Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "AreaTest.h"
+
 #include <OS.h>
-#include <stdio.h>
+
+#include <cppunit/TestCaller.h>
+#include <cppunit/TestSuite.h>
 
 
-int main()
+AreaTest::AreaTest()
+{
+}
+
+
+AreaTest::~AreaTest()
+{
+}
+
+
+void
+AreaTest::TestAreas()
 {
 	int * ptr = new int[1];
 	char *adr;
@@ -31,22 +52,34 @@ int main()
 	ptrclone1 = (int *)(adrclone1 + offset);
 	ptrclone2 = (int *)(adrclone2 + offset);
 
-	printf("offset      = 0x%08x\n", (int)offset);
-	printf("id          = 0x%08x\n", (int)id);
-	printf("id  clone 1 = 0x%08x\n", (int)idclone1);
-	printf("id  clone 2 = 0x%08x\n", (int)idclone2);
-	printf("adr         = 0x%08x\n", (int)adr);
-	printf("adr clone 1 = 0x%08x\n", (int)adrclone1);
-	printf("adr clone 2 = 0x%08x\n", (int)adrclone2);
-	printf("ptr         = 0x%08x\n", (int)ptr);
-	printf("ptr clone 1 = 0x%08x\n", (int)ptrclone1);
-	printf("ptr clone 2 = 0x%08x\n", (int)ptrclone2);
+	// Check that he pointer is inside the area returned by area_for...
+	CPPUNIT_ASSERT(offset >= 0);
 
+	// Chech that the clones have different IDs
+	CPPUNIT_ASSERT(id != idclone1);
+	CPPUNIT_ASSERT(id != idclone2);
+	CPPUNIT_ASSERT(idclone1 != idclone2);
+
+	// Check that the clones have different addresses
+	CPPUNIT_ASSERT(adr != adrclone1);
+	CPPUNIT_ASSERT(adr != adrclone2);
+	CPPUNIT_ASSERT(adrclone1 != adrclone2);
+
+	// Check that changes on one view of the area are visible in others.
 	ptr[0] = 0x12345678;
+	CPPUNIT_ASSERT(ptr[0] == ptrclone1[0]);
+	CPPUNIT_ASSERT(ptrclone2[0] == ptrclone1[0]);
+	CPPUNIT_ASSERT_EQUAL(0x12345678, ptrclone2[0]);
+}
 
-	printf("ptr[0]         = 0x%08x\n", (int)ptr[0]);
-	printf("ptr clone 1[0] = 0x%08x\n", (int)ptrclone1[0]);
-	printf("ptr clone 2[0] = 0x%08x\n", (int)ptrclone2[0]);
 
-	return 0;
+/*static*/ void
+AreaTest::AddTests(BTestSuite& parent)
+{
+	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("AreaTest");
+
+	suite.addTest(new CppUnit::TestCaller<AreaTest>(
+		"AreaTest::TestAreas", &AreaTest::TestAreas));
+
+	parent.addTest("AreaTest", &suite);
 }
