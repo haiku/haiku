@@ -12,4 +12,4 @@ resource(3, "META:EXTENS") message(234) {
 	"type" = "audio/x-aiff"
 };
 
-resource(5, "META:SNIFF_RULE") "0.50 (\"AIFF\" | \"AIFC\")";
+resource(5, "META:SNIFF_RULE") "0.50 (\"FORM\") [8](\"AIFF\" | \"AIFC\") ";
