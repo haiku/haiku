@@ -3916,6 +3916,26 @@ vm_allocate_early_physical_page(kernel_args* args)
 		}
 	}
 
+	// Expanding upwards didn't work, try going downwards.
+	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
+		phys_addr_t nextPage;
+
+		nextPage = args->physical_allocated_range[i].start - B_PAGE_SIZE;
+		// see if the page after the prev allocated paddr run can be allocated
+		if (i > 0 && args->physical_allocated_range[i - 1].size != 0) {
+			// see if the next page will collide with the next allocated range
+			if (nextPage < args->physical_allocated_range[i-1].start + args->physical_allocated_range[i-1].size)
+				continue;
+		}
+		// see if the next physical page fits in the memory block
+		if (is_page_in_physical_memory_range(args, nextPage)) {
+			// we got one!
+			args->physical_allocated_range[i].start -= B_PAGE_SIZE;
+			args->physical_allocated_range[i].size += B_PAGE_SIZE;
+			return nextPage / B_PAGE_SIZE;
+		}
+	}
+
 	return 0;
 		// could not allocate a block
 }
