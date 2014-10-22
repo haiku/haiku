@@ -1070,8 +1070,6 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 			format->u.raw_audio.frame_rate = (float)codecContext->sample_rate;
 			format->u.raw_audio.channel_count = codecContext->channels;
 			format->u.raw_audio.channel_mask = codecContext->channel_layout;
-			format->u.raw_audio.byte_order
-				= avformat_to_beos_byte_order(codecContext->sample_fmt);
 			ConvertAVSampleFormatToRawAudioFormat(codecContext->sample_fmt,
 				format->u.raw_audio.format);
 			format->u.raw_audio.buffer_size = 0;
