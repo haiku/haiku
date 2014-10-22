@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests kits media ;
 
-SimpleTest SizeofTest : SizeofTest.cpp : be ;
-
 SimpleTest TimedEventQueueTest : TimedEventQueueTest.cpp
 	: libmedia.so be ;
 
@@ -18,6 +16,7 @@ UnitTestLib libmediatest.so :
 
 	AreaTest.cpp
 	BufferTest.cpp
+	SizeofTest.cpp
 
 	: be media [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;

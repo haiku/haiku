@@ -1,51 +1,83 @@
-//#include "../source/headers/BufferGroup.h"
-#include <MediaKit.h>
-#include <stdio.h>
+/*
+ * Copyright 2014 Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ */
 
-int main()
+
+#include "SizeofTest.h"
+
+#include <MediaKit.h>
+
+#include <cppunit/TestCaller.h>
+#include <cppunit/TestSuite.h>
+
+
+SizeofTest::SizeofTest()
 {
-	printf("BBuffer sizeof = %ld\n",sizeof(BBuffer));
-	printf("BBufferConsumer sizeof = %ld\n",sizeof(BBufferConsumer));
-	printf("BBufferGroup sizeof = %ld\n",sizeof(BBufferGroup));
-	printf("BBufferProducer sizeof = %ld\n",sizeof(BBufferProducer));
-	printf("BContinuousParameter sizeof = %ld\n",sizeof(BContinuousParameter));
-	printf("BControllable  sizeof = %ld\n",sizeof(BControllable ));
-	printf("BDiscreteParameter  sizeof = %ld\n",sizeof(BDiscreteParameter ));
-	printf("BFileInterface sizeof = %ld\n",sizeof(BFileInterface));
-	printf("BMediaAddOn sizeof = %ld\n",sizeof(BMediaAddOn));
+}
+
+
+SizeofTest::~SizeofTest()
+{
+}
+
+
+void
+SizeofTest::TestSize()
+{
+	CPPUNIT_ASSERT_EQUAL(264, sizeof(BBuffer));
+	CPPUNIT_ASSERT_EQUAL(240, sizeof(BBufferConsumer));
+	CPPUNIT_ASSERT_EQUAL(56, sizeof(BBufferGroup));
+	CPPUNIT_ASSERT_EQUAL(244, sizeof(BBufferProducer));
+	CPPUNIT_ASSERT_EQUAL(140, sizeof(BContinuousParameter));
+	CPPUNIT_ASSERT_EQUAL(240, sizeof(BControllable));
+	CPPUNIT_ASSERT_EQUAL(124, sizeof(BDiscreteParameter));
+	CPPUNIT_ASSERT_EQUAL(236, sizeof(BFileInterface));
+	CPPUNIT_ASSERT_EQUAL(40, sizeof(BMediaAddOn));
+	CPPUNIT_ASSERT_EQUAL(340, sizeof(BMediaEventLooper));
+	CPPUNIT_ASSERT_EQUAL(560, sizeof(BMediaFile));
+	CPPUNIT_ASSERT_EQUAL(72, sizeof(BMediaFiles));
+	CPPUNIT_ASSERT_EQUAL(128, sizeof(BMediaFormats));
+	CPPUNIT_ASSERT_EQUAL(164, sizeof(BMediaNode));
+	CPPUNIT_ASSERT_EQUAL(440, sizeof(BMediaRoster));
+	CPPUNIT_ASSERT_EQUAL(68, sizeof(BMediaTheme));
+	CPPUNIT_ASSERT_EQUAL(760, sizeof(BMediaTrack));
+	CPPUNIT_ASSERT_EQUAL(116, sizeof(BNullParameter));
+	CPPUNIT_ASSERT_EQUAL(84, sizeof(BParameter));
+	CPPUNIT_ASSERT_EQUAL(52, sizeof(BParameterGroup));
+	CPPUNIT_ASSERT_EQUAL(124, sizeof(BSound));
+	CPPUNIT_ASSERT_EQUAL(164, sizeof(BTimeCode));
+	CPPUNIT_ASSERT_EQUAL(72, sizeof(BParameterWeb));
+	CPPUNIT_ASSERT_EQUAL(264, sizeof(BSmallBuffer));
+	CPPUNIT_ASSERT_EQUAL(808, sizeof(BSoundPlayer));
+	CPPUNIT_ASSERT_EQUAL(32, sizeof(BTimedEventQueue));
+	CPPUNIT_ASSERT_EQUAL(236, sizeof(BTimeSource));
+	CPPUNIT_ASSERT_EQUAL(24, sizeof(media_node));
+	CPPUNIT_ASSERT_EQUAL(328, sizeof(media_input));
+	CPPUNIT_ASSERT_EQUAL(328, sizeof(media_output));
+	CPPUNIT_ASSERT_EQUAL(256, sizeof(live_node_info));
+	CPPUNIT_ASSERT_EQUAL(372, sizeof(media_request_info));
+	CPPUNIT_ASSERT_EQUAL(16, sizeof(media_destination));
+	CPPUNIT_ASSERT_EQUAL(16, sizeof(media_source));
+	CPPUNIT_ASSERT_EQUAL(200, sizeof(dormant_node_info));
+	CPPUNIT_ASSERT_EQUAL(116, sizeof(flavor_info));
+	CPPUNIT_ASSERT_EQUAL(320, sizeof(dormant_flavor_info));
+	CPPUNIT_ASSERT_EQUAL(192, sizeof(media_format));
+
 //	printf("BMediaBufferDecoder sizeof = %ld\n",sizeof(BMediaBufferDecoder));
 //	printf("MediaBufferEncoder sizeof = %ld\n",sizeof(MediaBufferEncoder));
 //	printf("BMediaDecoder sizeof = %ld\n",sizeof(BMediaDecoder));
 //	printf("BMediaEncoder  sizeof = %ld\n",sizeof(BMediaEncoder));
-	printf("BMediaEventLooper sizeof = %ld\n",sizeof(BMediaEventLooper));
-	printf("BMediaFile sizeof = %ld\n",sizeof(BMediaFile));
-	printf("BMediaFiles sizeof = %ld\n",sizeof(BMediaFiles));
-	printf("BMediaFiles sizeof = %ld\n",sizeof(BMediaFiles));
-	printf("BMediaFormats sizeof = %ld\n",sizeof(BMediaFormats));
-	printf("BMediaNode sizeof = %ld\n",sizeof(BMediaNode));
-	printf("BMediaRoster sizeof = %ld\n",sizeof(BMediaRoster));
-	printf("BMediaTheme sizeof = %ld\n",sizeof(BMediaTheme));
-	printf("BMediaTrack sizeof = %ld\n",sizeof(BMediaTrack));
-	printf("BNullParameter sizeof = %ld\n",sizeof(BNullParameter));
-	printf("BParameter sizeof = %ld\n",sizeof(BParameter));
-	printf("BParameterGroup sizeof = %ld\n",sizeof(BParameterGroup));
-	printf("BSound sizeof = %ld\n",sizeof(BSound));
-	printf("BTimeCode sizeof = %ld\n",sizeof(BTimeCode));
-	printf("BParameterWeb sizeof = %ld\n",sizeof(BParameterWeb));
-	printf("BSmallBuffer sizeof = %ld\n",sizeof(BSmallBuffer));
-	printf("BSoundPlayer sizeof = %ld\n",sizeof(BSoundPlayer ));
-	printf("BTimedEventQueue sizeof = %ld\n",sizeof(BTimedEventQueue));
-	printf("BTimeSource sizeof = %ld\n",sizeof(BTimeSource));
-	printf("media_node sizeof = %ld\n",sizeof(media_node));
-	printf("media_input sizeof = %ld\n",sizeof(media_input));
-	printf("media_output sizeof = %ld\n",sizeof(media_output));
-	printf("live_node_info sizeof = %ld\n",sizeof(live_node_info));
-	printf("media_request_info sizeof = %ld\n",sizeof(media_request_info));
-	printf("media_destination sizeof = %ld\n",sizeof(media_destination));
-	printf("media_source sizeof = %ld\n",sizeof(media_source));
-	printf("dormant_node_info sizeof = %ld\n",sizeof(dormant_node_info));
-	printf("flavor_info sizeof = %ld\n",sizeof(flavor_info));
-	printf("dormant_flavor_info sizeof = %ld\n",sizeof(dormant_flavor_info));
-	printf("media_format sizeof = %ld\n",sizeof(media_format));
-	return 0;
+}
+
+
+/*static*/ void
+SizeofTest::AddTests(BTestSuite& parent)
+{
+	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("AreaTest");
+
+	suite.addTest(new CppUnit::TestCaller<SizeofTest>(
+		"SizeofTest::TestSize", &SizeofTest::TestSize));
+
+	parent.addTest("SizeofTest", &suite);
 }
