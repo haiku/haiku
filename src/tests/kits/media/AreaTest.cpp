@@ -28,13 +28,13 @@ AreaTest::TestAreas()
 	int * ptr = new int[1];
 	char *adr;
 	area_id id;
-	int offset;
+	ptrdiff_t offset;
 
 	area_info info;
 	id = area_for(ptr);
 	get_area_info(id, &info);
 	adr = (char *)info.address;
-	offset = (uint32)ptr - (uint32)adr;
+	offset = (ptrdiff_t)ptr - (ptrdiff_t)adr;
 
 
 	char * adrclone1;
