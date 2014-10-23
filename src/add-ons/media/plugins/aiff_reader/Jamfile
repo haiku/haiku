@@ -4,6 +4,11 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders media ;
 
-Addon aiff_reader :
-	aiff_reader.cpp
-	: be libmedia.so [ TargetLibsupc++ ] ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Addon [ MultiArchDefaultGristFiles aiff_reader ] :
+			aiff_reader.cpp
+			: be media [ TargetLibsupc++ ] ;
+	}
+}
