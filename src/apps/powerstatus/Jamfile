@@ -13,7 +13,7 @@ Application PowerStatus :
 	PowerStatusWindow.cpp
 	PowerStatusView.cpp
 	PowerStatus.cpp
-	: be libshared.a [ TargetLibsupc++ ] localestub
+	: be translation libshared.a [ TargetLibsupc++ ] localestub
 	: PowerStatus.rdef
 ;
 DoCatalogs PowerStatus :

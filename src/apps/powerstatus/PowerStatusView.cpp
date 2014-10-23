@@ -18,8 +18,10 @@
 
 #include <AboutWindow.h>
 #include <Application.h>
+#include <Bitmap.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <DataIO.h>
 #include <Deskbar.h>
 #include <Dragger.h>
 #include <Drivers.h>
@@ -27,9 +29,12 @@
 #include <FindDirectory.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
+#include <Notification.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <Resources.h>
 #include <TextView.h>
+#include <TranslationUtils.h>
 
 #include "ACPIDriverInterface.h"
 #include "APMDriverInterface.h"
@@ -51,6 +56,8 @@ const uint32 kMsgToggleExtInfo = 'texi';
 
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
+
+const int32 kLowBatteryPercentage = 15;
 
 
 PowerStatusView::PowerStatusView(PowerStatusDriverInterface* interface,
@@ -196,7 +203,7 @@ PowerStatusView::_DrawBattery(BRect rect)
 		}
 
 		if (fHasBattery) {
-			if (percent <= 15)
+			if (percent <= kLowBatteryPercentage)
 				base.set_to(180, 0, 0);
 			else
 				base.set_to(20, 180, 0);
@@ -328,6 +335,7 @@ PowerStatusView::Update(bool force)
 	int32 previousPercent = fPercent;
 	time_t previousTimeLeft = fTimeLeft;
 	bool wasOnline = fOnline;
+	bool hadBattery = fHasBattery;
 
 	_GetBatteryInfo(&fBatteryInfo, fBatteryID);
 
@@ -342,7 +350,6 @@ PowerStatusView::Update(bool force)
 		fOnline = false;
 		fTimeLeft = -1;
 	}
-
 
 	if (fInDeskbar) {
 		// make sure the tray icon is large enough
@@ -396,8 +403,46 @@ PowerStatusView::Update(bool force)
 
 	if (force || wasOnline != fOnline
 		|| (fShowTime && fTimeLeft != previousTimeLeft)
-		|| (!fShowTime && fPercent != previousPercent))
+		|| (!fShowTime && fPercent != previousPercent)) {
 		Invalidate();
+	}
+
+	if ((hadBattery && !fHasBattery)
+		|| (previousPercent > kLowBatteryPercentage
+			&& fPercent <= kLowBatteryPercentage)) {
+
+		BBitmap* bitmap = NULL;
+		BResources resources;
+		resources.SetToImage((void*)&instantiate_deskbar_item);
+		if (resources.InitCheck() == B_OK) {
+			size_t resourceSize = 0;
+			const void* resourceData = resources.LoadResource(
+				B_VECTOR_ICON_TYPE, fHasBattery
+					? "battery_low" : "battery_critical", &resourceSize);
+			if (resourceData != NULL) {
+				BMemoryIO memoryIO(resourceData, resourceSize);
+				bitmap = BTranslationUtils::GetBitmap(&memoryIO);
+			}
+		}
+
+		BNotification notification(fHasBattery ? B_INFORMATION_NOTIFICATION
+			: B_ERROR_NOTIFICATION);
+
+		if (fHasBattery) {
+			notification.SetTitle(B_TRANSLATE("Battery low"));
+			notification.SetContent(B_TRANSLATE(
+				"The battery level is getting low, please plug the device in."));
+		} else {
+			notification.SetTitle(B_TRANSLATE("Battery critical"));
+			notification.SetContent(B_TRANSLATE(
+				"The battery level is critical, please plug the device in"
+				" immediately."));
+		}
+
+		notification.SetIcon(bitmap);
+		notification.Send();
+		delete bitmap;
+	}
 }
 
 
