@@ -45,7 +45,7 @@ struct device_info
 };
 
 
-extern "C" BMediaAddOn * 
+extern "C" BMediaAddOn *
 make_media_addon(image_id id)
 {
 	return new DVBMediaAddon(id);
@@ -53,22 +53,8 @@ make_media_addon(image_id id)
 
 
 DVBMediaAddon::DVBMediaAddon(image_id id)
- :	BMediaAddOn(id)
+	: BMediaAddOn(id)
 {
-	// TODO: The following code block is a workaround for the bug #11018
-	// (https://dev.haiku-os.org/ticket/11018). Please remove this code block,
-	// once the bug is being resolved.
-	// The workaround triggers the loading of all media plugins prior to using
-	// methods of class BMediaFormats. Using the function get_next_encoder()
-	// is used because of two facts
-	//     1. It is publicly available and thus can be used by 3rd party apps,
-	//        too.
-	//     2. It is already available by including BMediaFormats.h, so there is
-	//        no need to include another header for this workaround.
-	int32 workaroundCookie = 0;
-	media_codec_info workaroundMediaCodecInfo;
-	get_next_encoder(&workaroundCookie, &workaroundMediaCodecInfo);
-
 	ScanFolder("/dev/dvb");
 }
 
