@@ -66,8 +66,8 @@ RemotePackageRepository HaikuPorts
 	faad2_devel-2.7-1
 	f1spirit-0.rc9.1615-1
 	findutils-4.4.2-1
-	ffmpeg-0.10.14-1
-	ffmpeg_devel-0.10.14-1
+	ffmpeg-0.11.5-1
+	ffmpeg_devel-0.11.5-1
 	flac-1.3.0-1
 	flac_devel-1.3.0-1
 	flex-2.5.39-1
@@ -389,6 +389,7 @@ RemotePackageRepository HaikuPorts
 	gcc_x86-4.8.3_2014_07_26-2
 	gcc_x86_syslibs-4.8.3_2014_07_26-2
 	gcc_x86_syslibs_devel-4.8.3_2014_07_26-2
+	gcc6809_x86-4.6.1-1
 	gettext_x86-0.18.1.1-6
 	gettext_x86_libintl-0.18.1.1-6
 	giflib_x86-5.1.0-1
@@ -400,6 +401,8 @@ RemotePackageRepository HaikuPorts
 	glib2_x86_devel-2.38.1-4
 	glu_x86-9.0.0-4
 	glu_x86_devel-9.0.0-4
+	gmp_x86-6.0.0-1
+	gmp_x86_devel-6.0.0-1
 	goonies_x86-1.4.1528-1
 	guilib_x86-1.2.1-1
 	guilib_x86_devel-1.2.1-1
@@ -488,13 +491,18 @@ RemotePackageRepository HaikuPorts
 	llvm_x86-3.4-1
 	luajit_x86-2.0.2-2
 	luajit_x86_devel-2.0.2-2
+	lwtools_x86-4.10-1
 	lzo_x86-2.06-1
 	lzo_x86_devel-2.06-1
 	mesa_x86-10.1.0-2
 	mesa_x86_devel-10.1.0-2
 	mesa_x86_swrast-10.1.0-2
 	mesa_x86_swpipe-10.1.0-2
+	mpc_x86-1.0.2-2
+	mpc_x86_devel-1.0.2-2
 	mpd_x86-0.18.12_git-1
+	mpfr_x86-3.1.2-2
+	mpfr_x86_devel-3.1.2-2
 	mpg123_x86-1.12.1-2
 	mpg123_x86_devel-1.12.1-2
 	muscle_x86-6.00-1
@@ -647,6 +655,7 @@ RemotePackageRepository HaikuPorts
 	gawk
 	gcc
 	gcc_x86
+	gcc6809_x86
 	getconf
 	getopt
 	gettext
@@ -737,6 +746,7 @@ RemotePackageRepository HaikuPorts
 	llvm_x86
 	luajit_x86
 	lua
+	lwtools_x86
 	lynx
 	lzo_x86
 	m4
@@ -750,7 +760,9 @@ RemotePackageRepository HaikuPorts
 	mkdepend
 	moe
 	mog
+	mpc_x86
 	mpd_x86
+	mpfr_x86
 	mpg123_x86
 	multitalk
 	muscle_x86
