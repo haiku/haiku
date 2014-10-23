@@ -532,6 +532,7 @@ RemotePackageRepository HaikuPorts
 	readline_x86-6.3-2
 	readline_x86_devel-6.3-2
 	rocksndiamonds_x86-3.3.1.2-2
+	sdcc_x86-3.4.0-1
 	sdl_gfx_x86-2.0.24-1
 	sdl_gfx_x86_devel-2.0.24-1
 	sdl_image_x86-1.2.12-4
@@ -801,6 +802,7 @@ RemotePackageRepository HaikuPorts
 	rocksndiamonds_x86
 	ruby
 	scons
+	sdcc_x86
 	sdl_gfx
 	sdl_image
 	sdl_mixer
