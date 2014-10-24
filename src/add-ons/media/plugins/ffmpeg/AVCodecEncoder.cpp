@@ -368,19 +368,19 @@ AVCodecEncoder::_Setup()
 		// sample format
 		switch (fInputFormat.u.raw_audio.format) {
 			case media_raw_audio_format::B_AUDIO_FLOAT:
-				fContext->sample_fmt = SAMPLE_FMT_FLT;
+				fContext->sample_fmt = AV_SAMPLE_FMT_FLT;
 				break;
 			case media_raw_audio_format::B_AUDIO_DOUBLE:
-				fContext->sample_fmt = SAMPLE_FMT_DBL;
+				fContext->sample_fmt = AV_SAMPLE_FMT_DBL;
 				break;
 			case media_raw_audio_format::B_AUDIO_INT:
-				fContext->sample_fmt = SAMPLE_FMT_S32;
+				fContext->sample_fmt = AV_SAMPLE_FMT_S32;
 				break;
 			case media_raw_audio_format::B_AUDIO_SHORT:
-				fContext->sample_fmt = SAMPLE_FMT_S16;
+				fContext->sample_fmt = AV_SAMPLE_FMT_S16;
 				break;
 			case media_raw_audio_format::B_AUDIO_UCHAR:
-				fContext->sample_fmt = SAMPLE_FMT_U8;
+				fContext->sample_fmt = AV_SAMPLE_FMT_U8;
 				break;
 
 			case media_raw_audio_format::B_AUDIO_CHAR:
@@ -393,28 +393,28 @@ AVCodecEncoder::_Setup()
 			switch (fInputFormat.u.raw_audio.channel_count) {
 				default:
 				case 2:
-					fContext->channel_layout = CH_LAYOUT_STEREO;
+					fContext->channel_layout = AV_CH_LAYOUT_STEREO;
 					break;
 				case 1:
-					fContext->channel_layout = CH_LAYOUT_MONO;
+					fContext->channel_layout = AV_CH_LAYOUT_MONO;
 					break;
 				case 3:
-					fContext->channel_layout = CH_LAYOUT_SURROUND;
+					fContext->channel_layout = AV_CH_LAYOUT_SURROUND;
 					break;
 				case 4:
-					fContext->channel_layout = CH_LAYOUT_QUAD;
+					fContext->channel_layout = AV_CH_LAYOUT_QUAD;
 					break;
 				case 5:
-					fContext->channel_layout = CH_LAYOUT_5POINT0;
+					fContext->channel_layout = AV_CH_LAYOUT_5POINT0;
 					break;
 				case 6:
-					fContext->channel_layout = CH_LAYOUT_5POINT1;
+					fContext->channel_layout = AV_CH_LAYOUT_5POINT1;
 					break;
 				case 8:
-					fContext->channel_layout = CH_LAYOUT_7POINT1;
+					fContext->channel_layout = AV_CH_LAYOUT_7POINT1;
 					break;
 				case 10:
-					fContext->channel_layout = CH_LAYOUT_7POINT1_WIDE;
+					fContext->channel_layout = AV_CH_LAYOUT_7POINT1_WIDE;
 					break;
 			}
 		} else {
@@ -444,7 +444,7 @@ AVCodecEncoder::_Setup()
 			576000, 640000
 		};
 		int diff = wantedBitRate;
-		for (int i = 0; i < sizeof(kBitRates) / sizeof(int); i++) {
+		for (unsigned int i = 0; i < sizeof(kBitRates) / sizeof(int); i++) {
 			int currentDiff = abs(wantedBitRate - kBitRates[i]);
 			if (currentDiff < diff) {
 				fContext->bit_rate = kBitRates[i];

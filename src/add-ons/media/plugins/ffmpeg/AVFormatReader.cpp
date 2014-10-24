@@ -51,7 +51,7 @@ static const int64 kNoPTSValue = AV_NOPTS_VALUE;
 
 
 static uint32
-avformat_to_beos_byte_order(SampleFormat format)
+avformat_to_beos_byte_order(AVSampleFormat format)
 {
 	// TODO: Huh?
 	return B_MEDIA_HOST_ENDIAN;
@@ -66,7 +66,7 @@ avdictionary_to_message(AVDictionary* dictionary, BMessage* message)
 
 	AVDictionaryEntry* entry = NULL;
 	while ((entry = av_dict_get(dictionary, "", entry,
-		AV_METADATA_IGNORE_SUFFIX))) {
+		AV_DICT_IGNORE_SUFFIX))) {
 		// convert entry keys into something more meaningful using the names from
 		// id3v2.c
 		if (strcmp(entry->key, "TALB") == 0 || strcmp(entry->key, "TAL") == 0)

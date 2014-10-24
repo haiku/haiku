@@ -181,7 +181,7 @@ gfx_conv_YCbCr422_RGB32_c(AVFrame *in, AVFrame *out, int width, int height)
 
 	int uv_index;
 
-	for (uint32 i = 0; i < height; i++) {
+	for (int32 i = 0; i < height; i++) {
 
 		uv_index = 0;
 
