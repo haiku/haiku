@@ -515,7 +515,7 @@ RemotePackageRepository HaikuPorts
 	openal_x86_devel-1.13.0-2
 	openexr_x86-2.2.0-1
 	openexr_x86_devel-2.2.0-1
-	openjdk_x86-1.7_2013_11_08-2
+	openjdk_x86-1.7_u80_b02-1
 	openjpeg_x86-1.5.0-1
 	openjpeg_x86_devel-1.5.0-1
 	openssl_x86-1.0.0o-1
