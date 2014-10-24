@@ -66,8 +66,8 @@ RemotePackageRepository HaikuPorts
 	faad2_devel-2.7-1
 	f1spirit-0.rc9.1615-1
 	findutils-4.4.2-1
-	ffmpeg-0.11.5-2
-	ffmpeg_devel-0.11.5-2
+	ffmpeg-0.10.14-1
+	ffmpeg_devel-0.10.14-1
 	flac-1.3.0-1
 	flac_devel-1.3.0-1
 	flex-2.5.39-1
