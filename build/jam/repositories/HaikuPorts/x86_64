@@ -35,8 +35,8 @@ RemotePackageRepository HaikuPorts
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
 	findutils-4.4.2-1
-	ffmpeg-0.10.2-5
-	ffmpeg_devel-0.10.2-5
+	ffmpeg-0.11.5-2
+	ffmpeg_devel-0.11.5-2
 	flac-1.3.0-3
 	flac_devel-1.3.0-3
 	flex-2.5.39-1
