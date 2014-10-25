@@ -548,6 +548,9 @@ MainWindow::_ClearPackage()
 void
 MainWindow::_RefreshRepositories(bool force)
 {
+	if (fSinglePackageMode)
+		return;
+
 	BPackageRoster roster;
 	BStringList repositoryNames;
 
@@ -594,6 +597,9 @@ MainWindow::_RefreshRepositories(bool force)
 void
 MainWindow::_RefreshPackageList()
 {
+	if (fSinglePackageMode)
+		return;
+
 	BPackageRoster roster;
 	BStringList repositoryNames;
 
