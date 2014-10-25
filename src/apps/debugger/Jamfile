@@ -6,6 +6,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
 	system kernel ] ;
 
+UseLibraryHeaders mapm ;
 UsePrivateHeaders app debug interface kernel package shared libroot ;
 UsePrivateSystemHeaders ;
 
@@ -27,6 +28,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings generic ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language expression_evaluators ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
@@ -211,6 +213,9 @@ Application Debugger :
 	SyntaxHighlighter.cpp
 	UnsupportedLanguage.cpp
 	X86AssemblyLanguage.cpp
+
+	# source_language/expression_evaluators
+	CLanguageExpressionEvaluator.cpp
 
 	# types
 	ArrayIndexPath.cpp
