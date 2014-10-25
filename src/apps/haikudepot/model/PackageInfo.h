@@ -16,6 +16,9 @@
 #include "SharedBitmap.h"
 
 
+class BPath;
+
+
 class UserInfo {
 public:
 								UserInfo();
@@ -298,8 +301,9 @@ public:
 			void				SetLocalFilePath(const char* path);
 			const BString&		LocalFilePath() const
 									{ return fLocalFilePath; }
-			bool				IsLocalFile() const
-									{ return !fLocalFilePath.IsEmpty(); }
+			bool				IsLocalFile() const;
+			
+			BPath				FindAppToLaunch() const;
 
 			void				ClearCategories();
 			bool				AddCategory(const CategoryRef& category);

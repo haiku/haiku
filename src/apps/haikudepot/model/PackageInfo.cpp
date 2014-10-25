@@ -8,7 +8,10 @@
 
 #include <stdio.h>
 
+#include <FindDirectory.h>
+#include <package/PackageDefs.h>
 #include <package/PackageFlags.h>
+#include <Path.h>
 
 
 
@@ -724,6 +727,43 @@ void
 PackageInfo::SetLocalFilePath(const char* path)
 {
 	fLocalFilePath = path;
+}
+
+
+bool
+PackageInfo::IsLocalFile() const
+{
+	return !fLocalFilePath.IsEmpty() && fInstallationLocations.empty();
+}
+
+
+BPath
+PackageInfo::FindAppToLaunch() const
+{
+	BPath path;
+	if (fLocalFilePath.IsEmpty() || fInstallationLocations.empty())
+		return path;
+
+	BPath packagePath;
+	if (fInstallationLocations.find(
+			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_SYSTEM)
+		!= fInstallationLocations.end()) {
+		if (find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &packagePath) != B_OK)
+			return path;
+	} else if (fInstallationLocations.find(
+			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME)
+		!= fInstallationLocations.end()) {
+		if (find_directory(B_USER_PACKAGES_DIRECTORY, &packagePath) != B_OK)
+			return path;
+	} else {
+		return path;
+	}
+
+	packagePath.Append(fLocalFilePath);
+	
+	// TODO: Scan package contents for Deskbar links
+	
+	return path;
 }
 
 
