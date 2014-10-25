@@ -523,6 +523,8 @@ Inode::CheckPermissions(int accessMode) const
 		// X bits must be set for execute permission
 		permissions = userPermissions | groupPermissions | otherPermissions
 			| R_OK | W_OK;
+		if (IsDirectory())
+			permissions |= X_OK;
 	} else if (uid == (uid_t)fNode.UserID()) {
 		// user is node owner
 		permissions = userPermissions;
