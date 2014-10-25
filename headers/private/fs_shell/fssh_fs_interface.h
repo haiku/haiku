@@ -361,7 +361,9 @@ extern fssh_status_t fssh_unremove_vnode(fssh_fs_volume *volume,
 extern fssh_status_t fssh_get_vnode_removed(fssh_fs_volume *volume,
 				fssh_vnode_id vnodeID, bool* removed);
 extern fssh_fs_volume* fssh_volume_for_vnode(fssh_fs_vnode *vnode);
-
+extern fssh_status_t fssh_check_access_permissions(int accessMode,
+				fssh_mode_t mode, fssh_gid_t nodeGroupID,
+				fssh_uid_t nodeUserID);
 
 extern fssh_status_t fssh_read_pages(int fd, fssh_off_t pos,
 				const struct fssh_iovec *vecs, fssh_size_t count,

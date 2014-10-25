@@ -2128,6 +2128,42 @@ fssh_volume_for_vnode(fssh_fs_vnode *_vnode)
 }
 
 
+extern "C" fssh_status_t
+fssh_check_access_permissions(int accessMode, fssh_mode_t mode,
+	fssh_gid_t nodeGroupID, fssh_uid_t nodeUserID)
+{
+	// get node permissions
+	int userPermissions = (mode & FSSH_S_IRWXU) >> 6;
+	int groupPermissions = (mode & FSSH_S_IRWXG) >> 3;
+	int otherPermissions = mode & FSSH_S_IRWXO;
+
+	// get the node permissions for this uid/gid
+	int permissions = 0;
+	fssh_uid_t uid = fssh_geteuid();
+
+	if (uid == 0) {
+		// user is root
+		// root has always read/write permission, but at least one of the
+		// X bits must be set for execute permission
+		permissions = userPermissions | groupPermissions | otherPermissions
+			| FSSH_S_IROTH | FSSH_S_IWOTH;
+		if (FSSH_S_ISDIR(mode))
+			permissions |= FSSH_S_IXOTH;
+	} else if (uid == nodeUserID) {
+		// user is node owner
+		permissions = userPermissions;
+	} else if (fssh_getegid() == nodeGroupID) {
+		// user is in owning group
+		permissions = groupPermissions;
+	} else {
+		// user is one of the others
+		permissions = otherPermissions;
+	}
+
+	return (accessMode & ~permissions) == 0 ? FSSH_B_OK : FSSH_B_NOT_ALLOWED;
+}
+
+
 //! Works directly on the host's file system
 extern "C" fssh_status_t
 fssh_read_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,

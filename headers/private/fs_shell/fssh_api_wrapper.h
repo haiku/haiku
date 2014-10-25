@@ -938,6 +938,7 @@
 #define unremove_vnode				fssh_unremove_vnode
 #define get_vnode_removed			fssh_get_vnode_removed
 #define volume_for_vnode			fssh_volume_for_vnode
+#define check_access_permissions	fssh_check_access_permissions
 #define read_pages					fssh_read_pages
 #define write_pages					fssh_write_pages
 #define read_file_io_vec_pages		fssh_read_file_io_vec_pages
