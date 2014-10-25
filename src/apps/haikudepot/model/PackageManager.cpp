@@ -109,17 +109,25 @@ public:
 			| BPackageManager::B_REFRESH_REPOSITORIES);
 		PackageInfoRef ref(Package());
 		ref->SetState(PENDING);
+
 		fPackageManager->SetCurrentActionPackage(ref, true);
 		fPackageManager->AddProgressListener(this);
-		const char* packageName = ref->Title().String();
+
+		BString packageName;
+		if (ref->IsLocalFile())
+			packageName = ref->LocalFilePath();
+		else
+			packageName = ref->Title();
+
+		const char* packageNameString = packageName.String();
 		try {
-			fPackageManager->Install(&packageName, 1);
+			fPackageManager->Install(&packageNameString, 1);
 		} catch (BFatalErrorException ex) {
 			_SetDownloadedPackagesState(NONE);
 			BString errorString;
 			errorString.SetToFormat(
 				"Fatal error occurred while installing package %s: "
-				"%s (%s)\n", packageName, ex.Message().String(),
+				"%s (%s)\n", packageNameString, ex.Message().String(),
 				ex.Details().String());
 			BAlert* alert(new(std::nothrow) BAlert(B_TRANSLATE("Fatal error"),
 				errorString, B_TRANSLATE("Close")));
@@ -128,16 +136,17 @@ public:
 			return ex.Error();
 		} catch (BAbortedByUserException ex) {
 			fprintf(stderr, "Installation of package "
-				"%s aborted by user: %s\n", packageName, ex.Message().String());
+				"%s aborted by user: %s\n", packageNameString,
+				ex.Message().String());
 			_SetDownloadedPackagesState(NONE);
 			return B_OK;
 		} catch (BNothingToDoException ex) {
 			fprintf(stderr, "Nothing to do while installing package "
-				"%s: %s\n", packageName, ex.Message().String());
+				"%s: %s\n", packageNameString, ex.Message().String());
 			return B_OK;
 		} catch (BException ex) {
 			fprintf(stderr, "Exception occurred while installing package "
-				"%s: %s\n", packageName, ex.Message().String());
+				"%s: %s\n", packageNameString, ex.Message().String());
 			_SetDownloadedPackagesState(NONE);
 			return B_ERROR;;
 		}
@@ -440,7 +449,17 @@ PackageManager::ConfirmChanges(bool fromMostSpecific)
 void
 PackageManager::Warn(status_t error, const char* format, ...)
 {
-	// TODO: implement
+	// TODO: Show alert to user
+
+	va_list args;
+	va_start(args, format);
+	vfprintf(stderr, format, args);
+	va_end(args);
+
+	if (error == B_OK)
+		printf("\n");
+	else
+		printf(": %s\n", strerror(error));
 }
 
 
