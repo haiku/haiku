@@ -26,6 +26,7 @@ compare_commands_by_name(const Command* a, const Command* b)
 Command::Command(const BString& name, const BString& shortUsage,
 	const BString& longUsage, const BString& category)
 	:
+	fCommonOptions(),
 	fName(name),
 	fShortUsage(shortUsage),
 	fLongUsage(longUsage),

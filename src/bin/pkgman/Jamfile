@@ -14,6 +14,7 @@ BinCommand pkgman :
 	command_resolve_dependencies.cpp
 	command_search.cpp
 	command_uninstall.cpp
+	CommonOptions.cpp
 	DecisionProvider.cpp
 	JobStateListener.cpp
 	PackageManager.cpp

@@ -12,6 +12,8 @@
 #include <ObjectList.h>
 #include <String.h>
 
+#include "CommonOptions.h"
+
 
 class Command {
 public:
@@ -32,6 +34,9 @@ public:
 			void				PrintUsageAndExit(bool error) const;
 
 	virtual	int					Execute(int argc, const char* const* argv) = 0;
+
+protected:
+			CommonOptions		fCommonOptions;
 
 private:
 			BString				fName;

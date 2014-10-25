@@ -36,6 +36,9 @@ static const char* const kLongUsage =
 	"package file. In the latter case the file is copied.\n"
 	"\n"
 	"Options:\n"
+	"  --debug <level>\n"
+	"    Print debug output. <level> should be between 0 (no debug output,\n"
+	"    the default) and 10 (most debug output).\n"
 	"  -H, --home\n"
 	"    Update the packages in the user's home directory. Default is to\n"
 	"    update in the system directory.\n"
@@ -58,6 +61,7 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 
 	while (true) {
 		static struct option sLongOptions[] = {
+			{ "debug", required_argument, 0, OPTION_DEBUG },
 			{ "help", no_argument, 0, 'h' },
 			{ "home", no_argument, 0, 'H' },
 			{ 0, 0, 0, 0 }
@@ -67,6 +71,9 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 		int c = getopt_long(argc, (char**)argv, "hHy", sLongOptions, NULL);
 		if (c == -1)
 			break;
+
+		if (fCommonOptions.HandleOption(c))
+			continue;
 
 		switch (c) {
 			case 'h':
@@ -93,6 +100,7 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 
 	// perform the update
 	PackageManager packageManager(location, interactive);
+	packageManager.SetDebugLevel(fCommonOptions.DebugLevel());
 	packageManager.Update(packages, packageCount);
 
 	return 0;

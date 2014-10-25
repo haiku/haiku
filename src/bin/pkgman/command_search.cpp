@@ -43,6 +43,9 @@ static const char* const kLongUsage =
 	"Options:\n"
 	"  -a, --all\n"
 	"    List all packages. Specified instead of <search-string>.\n"
+	"  --debug <level>\n"
+	"    Print debug output. <level> should be between 0 (no debug output,\n"
+	"    the default) and 10 (most debug output).\n"
 	"  -D, --details\n"
 	"    Print more details. Matches in each installation location and each\n"
 	"    repository will be listed individually with their version.\n"
@@ -133,6 +136,7 @@ SearchCommand::Execute(int argc, const char* const* argv)
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "all", no_argument, 0, 'a' },
+			{ "debug", required_argument, 0, OPTION_DEBUG },
 			{ "details", no_argument, 0, 'D' },
 			{ "help", no_argument, 0, 'h' },
 			{ "installed-only", no_argument, 0, 'i' },
@@ -144,6 +148,9 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		int c = getopt_long(argc, (char**)argv, "aDhiu", sLongOptions, NULL);
 		if (c == -1)
 			break;
+
+		if (fCommonOptions.HandleOption(c))
+			continue;
 
 		switch (c) {
 			case 'a':
@@ -183,6 +190,7 @@ SearchCommand::Execute(int argc, const char* const* argv)
 
 	// create the solver
 	PackageManager packageManager(B_PACKAGE_INSTALLATION_LOCATION_HOME);
+	packageManager.SetDebugLevel(fCommonOptions.DebugLevel());
 	packageManager.Init(
 		(!uninstalledOnly ? PackageManager::B_ADD_INSTALLED_REPOSITORIES : 0)
 			| (!installedOnly ? PackageManager::B_ADD_REMOTE_REPOSITORIES : 0));

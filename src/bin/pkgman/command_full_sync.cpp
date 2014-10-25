@@ -34,6 +34,9 @@ static const char* const kLongUsage =
 	"downgrades or removes packages, if necessary.\n"
 	"\n"
 	"Options:\n"
+	"  --debug <level>\n"
+	"    Print debug output. <level> should be between 0 (no debug output,\n"
+	"    the default) and 10 (most debug output).\n"
 	"  -H, --home\n"
 	"    Synchronizes the packages in the user's home directory. Default is\n"
 	"    to synchronize the packages in the system directory.\n"
@@ -56,6 +59,7 @@ FullSyncCommand::Execute(int argc, const char* const* argv)
 
 	while (true) {
 		static struct option sLongOptions[] = {
+			{ "debug", required_argument, 0, OPTION_DEBUG },
 			{ "help", no_argument, 0, 'h' },
 			{ "home", no_argument, 0, 'H' },
 			{ 0, 0, 0, 0 }
@@ -65,6 +69,9 @@ FullSyncCommand::Execute(int argc, const char* const* argv)
 		int c = getopt_long(argc, (char**)argv, "hHy", sLongOptions, NULL);
 		if (c == -1)
 			break;
+
+		if (fCommonOptions.HandleOption(c))
+			continue;
 
 		switch (c) {
 			case 'h':
@@ -91,6 +98,7 @@ FullSyncCommand::Execute(int argc, const char* const* argv)
 
 	// perform the sync
 	PackageManager packageManager(location, interactive);
+	packageManager.SetDebugLevel(fCommonOptions.DebugLevel());
 	packageManager.FullSync();
 
 	return 0;

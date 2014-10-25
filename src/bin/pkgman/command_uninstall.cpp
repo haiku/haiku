@@ -32,6 +32,9 @@ static const char* const kLongUsage =
 	"Uninstalls the specified packages.\n"
 	"\n"
 	"Options:\n"
+	"  --debug <level>\n"
+	"    Print debug output. <level> should be between 0 (no debug output,\n"
+	"    the default) and 10 (most debug output).\n"
 	"  -H, --home\n"
 	"    Uninstall the packages from the user's home directory. Default is to\n"
 	"    uninstall from the system directory.\n"
@@ -54,6 +57,7 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 
 	while (true) {
 		static struct option sLongOptions[] = {
+			{ "debug", required_argument, 0, OPTION_DEBUG },
 			{ "help", no_argument, 0, 'h' },
 			{ "home", no_argument, 0, 'H' },
 			{ 0, 0, 0, 0 }
@@ -63,6 +67,9 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 		int c = getopt_long(argc, (char**)argv, "hHy", sLongOptions, NULL);
 		if (c == -1)
 			break;
+
+		if (fCommonOptions.HandleOption(c))
+			continue;
 
 		switch (c) {
 			case 'h':
@@ -92,6 +99,7 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 
 	// perform the installation
 	PackageManager packageManager(location, interactive);
+	packageManager.SetDebugLevel(fCommonOptions.DebugLevel());
 	packageManager.Uninstall(packages, packageCount);
 
 	return 0;
