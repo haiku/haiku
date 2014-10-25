@@ -1,6 +1,6 @@
 /*
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2014, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2005-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * This file may be used under the terms of the MIT License.
  */
@@ -104,35 +104,8 @@ Inode::CheckPermissions(int accessMode) const
 	if ((accessMode & W_OK) != 0 && fVolume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	// get node permissions
-	mode_t mode = Mode();
-	int userPermissions = (mode & S_IRWXU) >> 6;
-	int groupPermissions = (mode & S_IRWXG) >> 3;
-	int otherPermissions = mode & S_IRWXO;
-
-	// get the node permissions for this uid/gid
-	int permissions = 0;
-	uid_t uid = geteuid();
-	gid_t gid = getegid();
-
-	if (uid == 0) {
-		// user is root
-		// root has always read/write permission, but at least one of the
-		// X bits must be set for execute permission
-		permissions = userPermissions | groupPermissions | otherPermissions
-			| R_OK | W_OK;
-	} else if (uid == (uid_t)fNode.UserID()) {
-		// user is node owner
-		permissions = userPermissions;
-	} else if (gid == (gid_t)fNode.GroupID()) {
-		// user is in owning group
-		permissions = groupPermissions;
-	} else {
-		// user is one of the others
-		permissions = otherPermissions;
-	}
-
-	return (accessMode & ~permissions) == 0 ? B_OK : B_NOT_ALLOWED;
+	return check_access_permissions(accessMode, Mode(), (gid_t)fNode.GroupID(),
+		(uid_t)fNode.UserID());
 }
 
 
@@ -162,12 +135,12 @@ Inode::FindBlock(off_t pos, off_t& physical, off_t *_length)
 		logical = diff + extent_data->disk_offset;
 	else
 		panic("unknown extent type; %d\n", extent_data->Type());
-	status = fVolume->FindBlock(logical, physical);	
+	status = fVolume->FindBlock(logical, physical);
 	if (_length != NULL)
 		*_length = extent_data->Size() - diff;
 	TRACE("Inode::FindBlock(%" B_PRIdINO ") %" B_PRIdOFF " physical %"
 		B_PRIdOFF "\n", ID(), pos, physical);
-	
+
 	free(extent_data);
 	return status;
 }
@@ -180,7 +153,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 
 	// set/check boundaries for pos/length
 	if (pos < 0) {
-		ERROR("inode %" B_PRIdINO ": ReadAt failed(pos %" B_PRIdOFF 
+		ERROR("inode %" B_PRIdINO ": ReadAt failed(pos %" B_PRIdOFF
 			", length %lu)\n", ID(), pos, length);
 		return B_BAD_VALUE;
 	}
@@ -212,7 +185,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 	uint8 compression = extent_data->Compression();
 	if (FileCache() != NULL
 		&& extent_data->Type() == BTRFS_EXTENT_DATA_REGULAR) {
-		TRACE("inode %" B_PRIdINO ": ReadAt cache (pos %" B_PRIdOFF ", length %lu)\n", 
+		TRACE("inode %" B_PRIdINO ": ReadAt cache (pos %" B_PRIdOFF ", length %lu)\n",
 			ID(), pos, length);
 		free(extent_data);
 		if (compression == BTRFS_EXTENT_COMPRESS_NONE)
@@ -313,7 +286,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 		panic("unknown extent compression; %d\n", compression);
 	free(extent_data);
 	return B_OK;
-	
+
 }
 
 
@@ -336,7 +309,7 @@ Inode::FindParent(ino_t *id)
 	*id = search_key.Offset();
 	TRACE("Inode::FindParent() for %" B_PRIdINO ": %" B_PRIdINO "\n", fID,
 		*id);
-	
+
 	return B_OK;
 }
 

@@ -54,9 +54,6 @@ extern fs_volume_ops gReiserFSVolumeOps;
 extern fs_vnode_ops gReiserFSVnodeOps;
 
 
-inline static bool is_user_in_group(gid_t gid);
-
-
 // #pragma mark - FS
 
 
@@ -307,41 +304,19 @@ static status_t
 reiserfs_access(fs_volume *fs, fs_vnode *_node, int mode)
 {
 	TOUCH(fs);
-//	FUNCTION_START();
-//	Volume *volume = (Volume*)fs->private_volume;
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
+	FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
+
 	// write access requested?
 	if (mode & W_OK)
 		return B_READ_ONLY_DEVICE;
+
 	// get node permissions
 	StatData *statData = node->GetStatData();
-	int userPermissions = (statData->GetMode() & S_IRWXU) >> 6;
-	int groupPermissions = (statData->GetMode() & S_IRWXG) >> 3;
-	int otherPermissions = statData->GetMode() & S_IRWXO;
-	// get the permissions for this uid/gid
-	int permissions = 0;
-	uid_t uid = geteuid();
-	// user is root
-	if (uid == 0) {
-		// root has always read/write permission, but at least one of the
-		// X bits must be set for execute permission
-		permissions = userPermissions | groupPermissions | otherPermissions
-			| S_IROTH | S_IWOTH;
-	// user is node owner
-	} else if (uid == statData->GetUID())
-		permissions = userPermissions;
-	// user is in owning group
-	else if (is_user_in_group(statData->GetGID()))
-		permissions = groupPermissions;
-	// user is one of the others
-	else
-		permissions = otherPermissions;
-	// do the check
-	if (mode & ~permissions)
-		return B_NOT_ALLOWED;
-	return B_OK;
+
+	return check_access_permissions(mode, statData->GetMode(),
+		statData->GetGID(), statData->GetUID());
 }
 
 // reiserfs_read_stat
@@ -465,23 +440,7 @@ reiserfs_read(fs_volume *fs, fs_vnode *_node, void *cookie, off_t pos,
 	RETURN_ERROR(error);
 }
 
-// is_user_in_group
-inline static bool
-is_user_in_group(gid_t gid)
-{
-// Either I miss something, or we don't have getgroups() in the kernel. :-(
-/*
-	gid_t groups[NGROUPS_MAX];
-	int groupCount = getgroups(NGROUPS_MAX, groups);
-	for (int i = 0; i < groupCount; i++) {
-		if (gid == groups[i])
-			return true;
-	}
-*/
-	return (gid == getegid());
-}
 
-// DirectoryCookie
 class DirectoryCookie : public DirEntryIterator {
 public:
 	DirectoryCookie(Tree *tree, uint32 dirID, uint32 objectID,

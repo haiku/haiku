@@ -1,6 +1,6 @@
 /*
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2014, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -186,35 +186,8 @@ Inode::CheckPermissions(int accessMode) const
 	if ((accessMode & W_OK) != 0 && fVolume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	// get node permissions
-	mode_t mode = Mode();
-	int userPermissions = (mode & S_IRWXU) >> 6;
-	int groupPermissions = (mode & S_IRWXG) >> 3;
-	int otherPermissions = mode & S_IRWXO;
-
-	// get the node permissions for this uid/gid
-	int permissions = 0;
-	uid_t uid = geteuid();
-	gid_t gid = getegid();
-
-	if (uid == 0) {
-		// user is root
-		// root has always read/write permission, but at least one of the
-		// X bits must be set for execute permission
-		permissions = userPermissions | groupPermissions | otherPermissions
-			| R_OK | W_OK;
-	} else if (uid == (uid_t)fNode.UserID()) {
-		// user is node owner
-		permissions = userPermissions;
-	} else if (gid == (gid_t)fNode.GroupID()) {
-		// user is in owning group
-		permissions = groupPermissions;
-	} else {
-		// user is one of the others
-		permissions = otherPermissions;
-	}
-
-	return (accessMode & ~permissions) == 0 ? B_OK : B_NOT_ALLOWED;
+	return check_access_permissions(accessMode, Mode(), (gid_t)fNode.GroupID(),
+		(uid_t)fNode.UserID());
 }
 
 

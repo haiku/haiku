@@ -1,6 +1,6 @@
 /*
  * Copyright 2005-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2014, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -3591,6 +3591,23 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 }
 
 
+static bool
+is_user_in_group(gid_t gid)
+{
+	if (gid == getegid())
+		return true;
+
+	gid_t groups[NGROUPS_MAX];
+	int groupCount = getgroups(NGROUPS_MAX, groups);
+	for (int i = 0; i < groupCount; i++) {
+		if (gid == groups[i])
+			return true;
+	}
+
+	return false;
+}
+
+
 //	#pragma mark - public API for file systems
 
 
@@ -3873,6 +3890,42 @@ volume_for_vnode(fs_vnode* _vnode)
 
 	struct vnode* vnode = static_cast<struct vnode*>(_vnode);
 	return vnode->mount->volume;
+}
+
+
+extern "C" status_t
+check_access_permissions(int accessMode, mode_t mode, gid_t nodeGroupID,
+	uid_t nodeUserID)
+{
+	// get node permissions
+	int userPermissions = (mode & S_IRWXU) >> 6;
+	int groupPermissions = (mode & S_IRWXG) >> 3;
+	int otherPermissions = mode & S_IRWXO;
+
+	// get the node permissions for this uid/gid
+	int permissions = 0;
+	uid_t uid = geteuid();
+
+	if (uid == 0) {
+		// user is root
+		// root has always read/write permission, but at least one of the
+		// X bits must be set for execute permission
+		permissions = userPermissions | groupPermissions | otherPermissions
+			| S_IROTH | S_IWOTH;
+		if (S_ISDIR(mode))
+			permissions |= S_IXOTH;
+	} else if (uid == nodeUserID) {
+		// user is node owner
+		permissions = userPermissions;
+	} else if (is_user_in_group(nodeGroupID)) {
+		// user is in owning group
+		permissions = groupPermissions;
+	} else {
+		// user is one of the others
+		permissions = otherPermissions;
+	}
+
+	return (accessMode & ~permissions) == 0 ? B_OK : B_NOT_ALLOWED;
 }
 
 

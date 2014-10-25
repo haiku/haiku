@@ -36,20 +36,6 @@ static const uint32 kOptimalIOSize = 64 * 1024;
 // #pragma mark - helper functions
 
 
-static bool
-is_user_in_group(gid_t gid)
-{
-	gid_t groups[NGROUPS_MAX];
-	int groupCount = getgroups(NGROUPS_MAX, groups);
-	for (int i = 0; i < groupCount; i++) {
-		if (gid == groups[i])
-			return true;
-	}
-
-	return (gid == getegid());
-}
-
-
 static status_t
 check_access(Node* node, int mode)
 {
@@ -57,33 +43,8 @@ check_access(Node* node, int mode)
 	if (mode & W_OK)
 		return B_READ_ONLY_DEVICE;
 
-	// get node permissions
-	int userPermissions = (node->Mode() & S_IRWXU) >> 6;
-	int groupPermissions = (node->Mode() & S_IRWXG) >> 3;
-	int otherPermissions = node->Mode() & S_IRWXO;
-
-	// get the permissions for this uid/gid
-	int permissions = 0;
-	uid_t uid = geteuid();
-
-	if (uid == 0) {
-		// user is root
-		// root has always read/write permission, but at least one of the
-		// X bits must be set for execute permission
-		permissions = userPermissions | groupPermissions | otherPermissions
-			| S_IROTH | S_IWOTH;
-	} else if (uid == node->UserID()) {
-		// user is node owner
-		permissions = userPermissions;
-	} else if (is_user_in_group(node->GroupID())) {
-		// user is in owning group
-		permissions = groupPermissions;
-	} else {
-		// user is one of the others
-		permissions = otherPermissions;
-	}
-
-	return (mode & ~permissions) == 0 ? B_OK : B_NOT_ALLOWED;
+	return check_access_permissions(mode, node->Mode(), node->GroupID(),
+		node->UserID());
 }
 
 
