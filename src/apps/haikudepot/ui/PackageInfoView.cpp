@@ -624,35 +624,8 @@ public:
 	{
 		switch (message->what) {
 			case MSG_PACKAGE_ACTION:
-			{
-				int32 index;
-				if (message->FindInt32("index", &index) == B_OK) {
-					const PackageActionRef& action
-						= fPackageActions.ItemAt(index);
-					if (action.Get() != NULL) {
-						PackageActionList actions;
-						actions.Add(action);
-						status_t result = fPackageActionHandler
-							->SchedulePackageActions(actions);
-						if (result != B_OK) {
-							fprintf(stderr, "Failed to schedule action: "
-								"%s '%s': %s\n", action->Label(),
-								action->Package()->Title().String(),
-								strerror(result));
-							BString message(B_TRANSLATE("The package action "
-								"could not be scheduled: %Error%"));
-							message.ReplaceAll("%Error%", strerror(result));
-							BAlert* alert = new(std::nothrow) BAlert(
-								B_TRANSLATE("Package action failed"),
-								message, B_TRANSLATE("OK"), NULL, NULL,
-								B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-							if (alert != NULL)
-								alert->Go();
-						}
-					}
-				}
+				_RunPackageAction(message);
 				break;
-			}
 
 			default:
 				BView::MessageReceived(message);
@@ -757,6 +730,60 @@ public:
 			fStatusLabel->RemoveSelf();
 			delete fStatusLabel;
 			fStatusLabel = NULL;
+		}
+	}
+
+private:
+	void _RunPackageAction(BMessage* message)
+	{
+		int32 index;
+		if (message->FindInt32("index", &index) != B_OK)
+			return;
+
+		const PackageActionRef& action = fPackageActions.ItemAt(index);
+		if (action.Get() == NULL)
+			return;
+
+		PackageActionList actions;
+		actions.Add(action);
+		status_t result
+			= fPackageActionHandler->SchedulePackageActions(actions);
+
+		if (result != B_OK) {
+			fprintf(stderr, "Failed to schedule action: "
+				"%s '%s': %s\n", action->Label(),
+				action->Package()->Title().String(),
+				strerror(result));
+			BString message(B_TRANSLATE("The package action "
+				"could not be scheduled: %Error%"));
+			message.ReplaceAll("%Error%", strerror(result));
+			BAlert* alert = new(std::nothrow) BAlert(
+				B_TRANSLATE("Package action failed"),
+				message, B_TRANSLATE("OK"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			if (alert != NULL)
+				alert->Go();
+		} else {
+			// Find the button for this action and disable it.
+			// Actually search the matching button instead of just using
+			// fButtons.ItemAt((fButtons.CountItems() - 1) - index) to
+			// make this robust against for example changing the order of
+			// buttons from right -> left to left -> right...
+			for (int32 i = 0; i < fButtons.CountItems(); i++) {
+				BButton* button = (BButton*)fButtons.ItemAt(index);
+				if (button == NULL)
+					continue;
+				BMessage* buttonMessage = button->Message();
+				if (buttonMessage == NULL)
+					continue;
+				int32 buttonIndex;
+				if (buttonMessage->FindInt32("index", &buttonIndex) != B_OK)
+					continue;
+				if (buttonIndex == index) {
+					button->SetEnabled(false);
+					break;
+				}
+			}
 		}
 	}
 
