@@ -144,6 +144,8 @@ App::_Open(const BEntry& entry)
 		fprintf(stderr, "Could not allocate PackageInfo\n");
 		return;
 	}
+	
+	package->SetLocalFilePath(path.Path());
 
 	BMessage settings;
 	_LoadSettings(settings);

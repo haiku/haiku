@@ -466,7 +466,8 @@ PackageInfo::PackageInfo()
 	fDownloadProgress(0.0),
 	fFlags(0),
 	fSystemDependency(false),
-	fArchitecture()
+	fArchitecture(),
+	fLocalFilePath()
 {
 }
 
@@ -488,7 +489,8 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fDownloadProgress(0.0),
 	fFlags(info.Flags()),
 	fSystemDependency(false),
-	fArchitecture(info.ArchitectureName())
+	fArchitecture(info.ArchitectureName()),
+	fLocalFilePath()
 {
 	BString publisherURL;
 	if (info.URLList().CountStrings() > 0)
@@ -524,7 +526,8 @@ PackageInfo::PackageInfo(const BString& title,
 	fDownloadProgress(0.0),
 	fFlags(flags),
 	fSystemDependency(false),
-	fArchitecture(architecture)
+	fArchitecture(architecture),
+	fLocalFilePath()
 {
 }
 
@@ -548,7 +551,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fDownloadProgress(other.fDownloadProgress),
 	fFlags(other.fFlags),
 	fSystemDependency(other.fSystemDependency),
-	fArchitecture(other.fArchitecture)
+	fArchitecture(other.fArchitecture),
+	fLocalFilePath(other.fLocalFilePath)
 {
 }
 
@@ -574,6 +578,8 @@ PackageInfo::operator=(const PackageInfo& other)
 	fFlags = other.fFlags;
 	fSystemDependency = other.fSystemDependency;
 	fArchitecture = other.fArchitecture;
+	fLocalFilePath = other.fLocalFilePath;
+
 	return *this;
 }
 
@@ -597,7 +603,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fFlags == other.fFlags
 		&& fDownloadProgress == other.fDownloadProgress
 		&& fSystemDependency == other.fSystemDependency
-		&& fArchitecture == other.fArchitecture;
+		&& fArchitecture == other.fArchitecture
+		&& fLocalFilePath == other.fLocalFilePath;
 }
 
 
@@ -710,6 +717,13 @@ PackageInfo::SetDownloadProgress(float progress)
 	fState = DOWNLOADING;
 	fDownloadProgress = progress;
 	_NotifyListeners(PKG_CHANGED_STATE);
+}
+
+
+void
+PackageInfo::SetLocalFilePath(const char* path)
+{
+	fLocalFilePath = path;
 }
 
 

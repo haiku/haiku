@@ -295,6 +295,12 @@ public:
 									{ return fDownloadProgress; }
 			void				SetDownloadProgress(float progress);
 
+			void				SetLocalFilePath(const char* path);
+			const BString&		LocalFilePath() const
+									{ return fLocalFilePath; }
+			bool				IsLocalFile() const
+									{ return !fLocalFilePath.IsEmpty(); }
+
 			void				ClearCategories();
 			bool				AddCategory(const CategoryRef& category);
 			const CategoryList&	Categories() const
@@ -348,6 +354,7 @@ private:
 			int32				fFlags;
 			bool				fSystemDependency;
 			BString				fArchitecture;
+			BString				fLocalFilePath;
 
 	static	BitmapRef			sDefaultIcon;
 };
