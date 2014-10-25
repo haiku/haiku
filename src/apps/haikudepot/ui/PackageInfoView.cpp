@@ -1265,7 +1265,10 @@ public:
 		// TODO: Sort by age or usefullness rating
 		for (int i = count - 1; i >= 0; i--) {
 			const UserRating& rating = userRatings.ItemAtFast(i);
-			if (fPreferredLanguages.CountItems() > 0
+			// Prevent ratings from showing that have a comment which
+			// is in another language
+			if (!rating.Comment().IsEmpty()
+				&& fPreferredLanguages.CountItems() > 0
 				&& !fPreferredLanguages.Contains(rating.Language())) {
 				continue;
 			}
