@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	3930183175
+1	french	x-vnd.Haiku-Installer	1426425234
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l'installation et redémarrer le système ?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installeur\n\técrit par Jérôme Duval et Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -16,12 +16,14 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		Quitter le gestionnaire de démarrage
 Stop	InstallerWindow		Arrêter
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Si os-prober ne fonctionne pas pour vous, GRUB 2 utilise un fichier de configuration supplémentaire pour ajouter des entrées personalisées dans le menu de démarrage. Pour les ajouter en haut du menu, vous devez créer ou modifier ce fichier en lançant votre éditeur préféré depuis un terminal, comme ceci :\n\n
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Sélectionner la source et la destination dans les listes déroulantes. Puis cliquer sur « Commencer ».
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku sur /dev/sda7\n
 Install from:	InstallerWindow		Installer depuis :
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld sur %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMATIONS IMPORTANTES AVANT D'INSTALLER HAIKU\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		La convention de nommage des partitions de GRUB est : (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Continuer
 Write boot sector to '%s'	InstallerWindow		Écrire le secteur d'amorce sur « %s »
 Collecting copy information.	InstallProgress		Récupération des informations de copie.
@@ -42,6 +44,7 @@ README	InstallerApp		LISEZ-MOI
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Le disque de destination pourrait ne pas avoir assez de place. Sélectionnez un autre disque ou retirez certains objets optionnels.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Veuillez fermer les fenêtres du gestionnaire de démarrage et du gestionnaire de disques avant de quitter l'Installeur.
 Scanning for disks…	InstallerWindow		Recherche des disques…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Impossible de monter ce disque. Veuillez en choisir un autre.
 ?? of ??	InstallerWindow	Unknown progress	?? sur ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -86,6 +89,7 @@ With GRUB 2 the first logical partition always has the number \"5\", regardless 
 Write boot sector	InstallerWindow		Écrire le secteur d'amorce
 Cancel	InstallerWindow		Annuler
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Le gestionnaire de disques, qui permet de configurer les partitions sur le disque, n'a pas pu être lancé.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Le volume cible n'est pas vide. Êtes-vous sûr de vouloir poursuivre l'installation ?\n\nNote : Le dossier « system » sera une copie propre depuis le volume source, à l'exception du dossier de réglages. Tous les autres dossiers seront fusionnés, et les fichiers qui existent à la fois sur les volumes source et destinations seront écrasés par la version de la source.
 No optional packages available.	PackagesView		Pas de paquets optionnels disponibles.
 All hard disks start with \"hd\".\n	InstallerApp		Tout les disques durs commencent par « hd ».\n
 Continue	InstallerApp		Continuer

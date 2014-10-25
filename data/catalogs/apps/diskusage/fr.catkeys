@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-DiskUsage	755008487
+1	french	x-vnd.Haiku-DiskUsage	2770162254
 Scanning %refName%	Scanner		Examen de %refName%
 Size	Info Window		Taille
 Rescan	Pie View		Réexaminer
@@ -19,5 +19,6 @@ Modified	Info Window		Modifié
 Abort	Status View		Abandonner
 Open with	Pie View		Ouvrir avec
 Open	Pie View		Ouvrir
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# fichier} other{# fichiers}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %R
 Free on %refName%	Scanner		Libre sur %refName%

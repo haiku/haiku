@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PoorMan	4008245771
+1	french	x-vnd.Haiku-PoorMan	2059301223
 Website location	PoorMan		Emplacement du site Web
 Error Server	PoorMan		Erreur du serveur
 Settings…	PoorMan		Réglages…
@@ -34,6 +34,7 @@ Log to console	PoorMan		Consigner vers la console
 Directory: (none)	PoorMan		Répertoire : (aucun)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Veuillez choisir le dossier à publier sur le Web.\n\nVous pouvez sélectionnez le dossier de votre choix, ou laisser PoorMan\ncréer le dossier par défaut « public_html » dans votre dossier personnel.
 Log To Console	PoorMan		Consigner vers la console
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connexion} other{# connexions}}
 Connections	PoorMan		Connexions
 Status: Running	PoorMan		État : En fonction
 Controls	PoorMan		Contrôles

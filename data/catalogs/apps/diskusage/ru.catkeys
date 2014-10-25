@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DiskUsage	755008487
+1	russian	x-vnd.Haiku-DiskUsage	2770162254
 Scanning %refName%	Scanner		Сканируется раздел %refName%
 Size	Info Window		Размер
 Rescan	Pie View		Пересканировать
@@ -19,5 +19,6 @@ Modified	Info Window		Изменен
 Abort	Status View		Прервать
 Open with	Pie View		Открыть в
 Open	Pie View		Открыть
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# файл}, few{# файла}, other{# файлов}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Свободно на разделе %refName%

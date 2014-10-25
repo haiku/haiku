@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3227315095
+1	russian	x-vnd.Haiku-HaikuDepot	4148520337
 Name	PackageListView		Имя
 Source code	FilterView		Исходный код
 Close	RatePackageWindow		Закрыть
@@ -39,6 +39,7 @@ Language	UserLoginWindow		Язык
 Rate package	RatePackageWindow		Оценить пакет
 Development	Model		Разработка
 Fatal error	PackageManager		Неисправимая ошибка
+Repeat pass phrase:	UserLoginWindow		Повторить пароль:
 Ratings	PackageInfoView		Оценки
 System & Utilities	Model		Система и утилиты
 Inactive	PackageListView		Неактивный
@@ -58,6 +59,7 @@ Search terms:	FilterView		Условия поиска:
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.
 Failed to update rating	RatePackageWindow		Не удалось обновить рейтинг
 Development	FilterView		Разработчикам
+Does not start	RatePackageWindow		Не запускается
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Не удалось связаться с веб сервером.
 Create account	UserLoginWindow		Создать учётную запись
@@ -67,6 +69,7 @@ Language	RatePackageWindow		Язык
 Size	PackageListView		Размер
 Failed to create or update rating: %s\n	RatePackageWindow		Не удалось создать или изменить рейтинг: %s\n
 User name:	UserLoginWindow		Имя пользователя:
+Unstable but usable	RatePackageWindow		Нестабилен, но пригодный для использования
 Games	Model		Игры
 Rating	PackageListView		Оценка
 Logged in as %User%	FilterView		Выполнен вход под пользователем %User%
@@ -86,10 +89,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		Возн�
 Pending…	PackageListView		Ожидание…
 Depot	FilterView		Все склады
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# объект} few{# объекта} other{# объектов}}
+OK	PackageInfoView		OK
 Uninstalled	PackageListView		Удаленные
-Stable	RatePackageWindow		Стабильный
+Stable	RatePackageWindow		Стабилен
 Unknown	PackageListView		Неизвестно
 All depots	FilterView		Все склады
+Pass phrase:	UserLoginWindow		Пароль:
 Not specified	RatePackageWindow		Не указана
 Available	PackageListView		Доступен
 n/a	PackageInfoView		н/д
@@ -99,8 +104,10 @@ Installed	FilterView		Установлен
 Send	RatePackageWindow		Отправить
 Category:	FilterView		Категория:
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
+Success	RatePackageWindow		Выполнено успешно
 Business	Model		Бизнес
 Audio	Model		Аудио
 About	PackageInfoView		О программе
 Active	PackageListView		Активирован
+It was not possible to contact the web service.	UserLoginWindow		Не удалось связаться с веб сервером.
 Cancel	UserLoginWindow		Отмена

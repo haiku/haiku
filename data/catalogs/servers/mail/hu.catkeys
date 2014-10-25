@@ -1,13 +1,17 @@
-1	hungarian	x-vnd.Be-POST	3583868911
+1	hungarian	x-vnd.Be-POST	3641225974
 Fetching mail for %name	Notifier		%name leveleinek fogadása
 Check for mails only	DeskbarView		Csak a levelek lekérdezése
 Send pending mails	DeskbarView		Függőben lévő levelek küldése
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# új levél} other{# új levél}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# új levél} other{# új levél}} %name részére\n
 New Messages	MailDaemon		Új levelek
 <no accounts>	DeskbarView		<nincs fiók>
 Mail status	MailDaemon		Levelezés állapota
 Shutdown mail services	DeskbarView		Levelezés szolgáltatásainak leállítása
 Sending mail for %name	Notifier		%name leveleinek küldése
+{0, plural, one{# new message.} other{# new messages.}}	MailDaemon		{0, plural, one{# új levél.} other{# új levél.}}
 Create new message…	DeskbarView		Új levél írása…
+{0, plural, one{# new message} other{# new messages}}	MailDaemon		{0, plural, one{# új levél} other{# új levél}}
 No new messages	MailDaemon		Nincs új levél
 Check for mail now	DeskbarView		Levelek ellenőrzése most
 No new messages	DeskbarView		Nincs új levél

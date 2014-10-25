@@ -1,35 +1,35 @@
 1	polish	x-vnd.Be-TSKB	2335730970
-Power off	DeskbarMenu		Wyłącz komputer
-Sort applications by name	PreferencesWindow		Sortuj programy po nazwie
-Suspend	DeskbarMenu		Wstrzymaj
+Power off	DeskbarMenu		Wyłącz
+Sort applications by name	PreferencesWindow		Sortuj aplikacje po nazwie
+Suspend	DeskbarMenu		Uśpij
 Hide clock	TimeView		Ukryj zegar
 Applications	PreferencesWindow		Aplikacje
 Time preferences…	TimeView		Ustawienia czasu...
-About Haiku	DeskbarMenu		O Haiku
+About Haiku	DeskbarMenu		Informacje o Haiku
 Edit in Tracker…	PreferencesWindow		Edytuj w Trakerze…
-Recent documents:	PreferencesWindow		Ostatnio przeglądane dokumenty:
-Recent applications	DeskbarMenu		Ostatnio uruchomione aplikacje
+Recent documents:	PreferencesWindow		Ostatnio używane dokumenty:
+Recent applications	DeskbarMenu		Ostatnio uruchamiane aplikacje
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikacje
-Find…	DeskbarMenu		Wyszukaj…
+Find…	DeskbarMenu		Znajdź…
 Show clock	Tray		Pokaż zegar
 Window	PreferencesWindow		Położenie
-Defaults	PreferencesWindow		Ustawienia domyślne
+Defaults	PreferencesWindow		Przywróć domyślne
 Menu	PreferencesWindow		Menu
-Recent documents	DeskbarMenu		Ostatnio otwarte dokumenty
+Recent documents	DeskbarMenu		Ostatnio używane dokumenty
 Auto-hide	PreferencesWindow		Autoukrywanie
 Always on top	PreferencesWindow		Zawsze na wierzchu
-<Deskbar folder is empty>	DeskbarMenu		Folder Paska Pulpitu jest pusty
-Show all	WindowMenu		Pokaż wszystkie okna
+<Deskbar folder is empty>	DeskbarMenu		<Katalog Deskbara jest pusty>
+Show all	WindowMenu		Pokaż wszystkie
 No windows	WindowMenu		Brak okien aplikacji
-Deskbar	System name		Pasek Pulpitu
+Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Uruchom ponownie
 Large	PreferencesWindow		Duże
-Auto-raise	PreferencesWindow		Automatyczne rozszerzanie
+Auto-raise	PreferencesWindow		Autorozszerzanie
 Recent folders:	PreferencesWindow		Ostatnio przeglądane foldery:
 Show application expander	PreferencesWindow		Aplikacje jako lista rozwijalna
 Restart Tracker	DeskbarMenu		Uruchom ponownie Trackera
-Close all	WindowMenu		Zamknij wszystkie okna
-Deskbar preferences	PreferencesWindow		Ustawienia Panelu Pulpitu
+Close all	WindowMenu		Zamknij wszystkie
+Deskbar preferences	PreferencesWindow		Ustawienia Deskbara
 Mount	DeskbarMenu		Zamontuj
 Revert	PreferencesWindow		Przywróć
 Small	PreferencesWindow		Małe
@@ -39,13 +39,13 @@ Tracker always first	PreferencesWindow		Tracker zawsze na początku
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Ustawienia
 Recent folders	DeskbarMenu		Ostatnio przeglądane foldery
 About this system	DeskbarMenu		Informacje o systemie
-Show calendar…	TimeView		Wyświetl kalendarz…
-Deskbar preferences…	DeskbarMenu		Preferencje Deskbara…
-Expand new applications	PreferencesWindow		Uruchamiaj aplikacje rozwinięte
+Show calendar…	TimeView		Pokaż kalendarz…
+Deskbar preferences…	DeskbarMenu		Ustawienia Deskbara…
+Expand new applications	PreferencesWindow		Rozwijaj uruchamiane aplikacje
 Show replicants	DeskbarMenu		Pokaż replikanty
 Hide application names	PreferencesWindow		Ukryj nazwy aplikacji
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dema
 Icon size	PreferencesWindow		Rozmiar ikon
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Aplety pulpitu
-Hide all	WindowMenu		Ukryj wszystkie okna
-Quit application	WindowMenu		Zakończ pracę aplikacji
+Hide all	WindowMenu		Ukryj wszystkie
+Quit application	WindowMenu		Zakończ aplikację

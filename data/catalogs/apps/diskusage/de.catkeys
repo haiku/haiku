@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DiskUsage	755008487
+1	german	x-vnd.Haiku-DiskUsage	2770162254
 Scanning %refName%	Scanner		Analysiere %refName%
 Size	Info Window		Größe
 Rescan	Pie View		Erneut analysieren
@@ -19,5 +19,6 @@ Modified	Info Window		Geändert
 Abort	Status View		Abbrechen
 Open with	Pie View		Öffnen mit
 Open	Pie View		Öffnen
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# Datei}, other{# Dateien}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Frei auf %refName%

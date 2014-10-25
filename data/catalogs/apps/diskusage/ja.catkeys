@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskUsage	755008487
+1	japanese	x-vnd.Haiku-DiskUsage	2770162254
 Scanning %refName%	Scanner		%refName%をスキャン中
 Size	Info Window		サイズ
 Rescan	Pie View		再スキャン
@@ -19,5 +19,6 @@ Modified	Info Window		更新日時
 Abort	Status View		中断
 Open with	Pie View		アプリケーションで開く
 Open	Pie View		開く
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# ファイル}, other{# ファイル}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		%refName%の空き領域

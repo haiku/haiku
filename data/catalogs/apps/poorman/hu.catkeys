@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PoorMan	4008245771
+1	hungarian	x-vnd.Haiku-PoorMan	2059301223
 Website location	PoorMan		Oldal helye
 Error Server	PoorMan		Hibakiszolgáló
 Settings…	PoorMan		Beállítások…
@@ -34,6 +34,7 @@ Log to console	PoorMan		Naplózás konzolba
 Directory: (none)	PoorMan		Mappa: (nincs)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kérem, válassza ki azt a mappát, ahol az oldal fájljai találhatóak.\n\nA SzegényEmber létre tud hozni egy alapértelmezett „public_html” mappát a saját mappán belül,\nvagy pedig választhat egyet ehelyett.
 Log To Console	PoorMan		Naplózás konzolba
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# kapcsolat} other{# kapcsolat}}
 Connections	PoorMan		Kapcsolatok
 Status: Running	PoorMan		Állapot: Fut
 Controls	PoorMan		Vezérlők

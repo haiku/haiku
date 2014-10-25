@@ -4,7 +4,7 @@ OK	Time		ОК
 Asia	Time		Азия
 \nNow: 	Time		\nСейчас: 
 Africa	Time		Африка
-Reset to default server list	Time		Вернуться к исходному списку серверов
+Reset to default server list	Time		Восстановить список серверов по умолчанию
 Stop	Time		Остановить
 Could not contact server	Time		Ну удалось связаться с сервером
 Australia	Time		Австралия
@@ -35,7 +35,7 @@ Synchronize at boot	Time		Синхронизировать при загрузк
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата & Время, разработан:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсе права защищены 2004-2012, Haiku.
 Received invalid time	Time		Получено неверное время
 Antarctica	Time		Антарктида
-Show time zone	Time		Установить часовой пояс
+Show time zone	Time		Показывать часовой пояс
 Show clock in Deskbar	Time		Отображать часы в Deskbar
 The following error occured while synchronizing:r\n%s: %s	Time		При синхронизации произошла следующая ошибка:r\n%s: %s
 <Other>	Time		<Другой>

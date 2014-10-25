@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	843957219
+1	french	x-vnd.Haiku-About	1763787961
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 par les auteurs de Gutenprint. Tous droits réservés.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (et son noyau, NewOS)\n
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL et Remi Lefebvre.
@@ -16,11 +16,13 @@ Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. et son équipe de développement, pour avoir créé BeOS !\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y. Takagi. Tous droits réservés.
 Source Code: 	AboutView		Code Source : 
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processeur :} other{# Processeurs :}}
 Kernel:	AboutView		Noyau :
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman et Daniel Veillard. Tous droits réservés.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Des portions de ce logiciel sont protégés par des droits d'auteurs.\nCopyright © 1996-2006 le projet FreeType. Tous droits réservés.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Le code source d'Haiku et les droits d'auteurs afférents sont la propriété de Haiku, Inc. ou de ses auteurs respectifs lorsque cela est expressément indiqué dans les sources. Haiku® et le logo® de HAIKU sont des marques déposées de Haiku, Inc.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTous droits réservés.
+The HaikuPorts team\n	AboutView		L'équipe de HaikuPorts\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total Mio au total, %inaccessible Mio inaccessibles
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard, et al.
 Contributors:\n	AboutView		Contributeurs :\n

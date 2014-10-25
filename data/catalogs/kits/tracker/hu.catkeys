@@ -1,6 +1,7 @@
-1	hungarian	x-vnd.Haiku-libtracker	2070021838
+1	hungarian	x-vnd.Haiku-libtracker	137546976
 OK	WidgetAttributeText		Rendben
 Add-ons	FilePanelPriv		Kiegészítők
+Mount settings…	ContainerWindow		Csatolási beállítások…
 Desktop	Model		Asztal
 Identify	ContainerWindow		Azonosítás
 Warning space color	SettingsView		Veszély jelzőszíne
@@ -212,6 +213,7 @@ Created:	InfoWindow		Létrehozva:
 Copying: 	StatusWindow		Másolás:
 Capacity:	InfoWindow		Kapacitás:
 Delete	FilePanelPriv		Törlés
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# bájt)} other{(# bájt)}}
 Save	FindPanel		Mentés
 copy	FSUtils	filename copy	másolata
 Temporary	FindPanel		Ideiglenes megőrzés
@@ -247,6 +249,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		Sajnáljuk, de ezt a
 Name	ContainerWindow		Név
 Reverse order	ContainerWindow		Fordított sorrend
 48 x 48	DeskWindow		48 x 48
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# elem} other{# elem}}
 OK	OpenWithWindow		Rendben
 Add current folder	FilePanelPriv		Jelenlegi mappa hozzáadása
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nem sikerült megnyitni a dokumentumot (%document) a programmal (%app):\n\tHiányzik egy szimbólum: %symbol\n
@@ -291,6 +294,7 @@ Cancel	PoseView		Mégse
 You can't move or copy items to read-only volumes.	FSUtils		Írásvédett lemezre nem lehet mozgatni vagy átmásolni elemeket.
 Unknown	FilePermissionsView		Ismeretlen
 All files and folders	FindPanel		Minden fájl és mappa
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# fájl} other{# fájl}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Nem sikerült megnyitni: %document\n\tHiányzó funkciótár: %library.\n
 The Tracker must be running to see Info windows.	PoseView		Az információs ablakok megtekintéséhez futnia kell a Nyomkövetőnek.
 Other	FilePermissionsView		Egyéb
@@ -329,6 +333,7 @@ New folder %ld	FSUtils		Új mappa %ld
 All BeOS disks	AutoMounterSettings		Összes BeOS lemez
 Used space color	SettingsView		Használt terület színe
 Sorry, could not create a new folder.	FSUtils		Nem sikerült az új mappát létrehozni.
+Disk mount	TrackerSettingsWindow		Csatolás
 multiple disks	FindPanel		több lemez
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Húzzon elemeket a „Lemezek” ablakban az egyik lemez ikonjára.
 Untitled clipping	PoseView		Névtelen kivágás

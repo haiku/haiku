@@ -9,7 +9,7 @@ Getting UniqueIDs…	pop3		Obtention des identifiants…
 : No reply.\n	pop3		: Pas de réponse.\n
 : Connection refused or host not found	pop3		: Connexion refusée ou hôte introuvable
 Error while connecting to server %serv	pop3		Impossible d'ouvrir une connexion avec le serveur %serv
-Error while authenticating user %user	pop3		L'utilisateur %user n'a pas pu être authentifié
+Error while authenticating user %user	pop3		Erreur lors de authentification de l'utilisateur %user
 Destination:	ConfigView		Destination :
 APOP	ConfigView		APOP
 Sending password…	pop3		Envoi du mot de passe…

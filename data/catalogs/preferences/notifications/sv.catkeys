@@ -1,5 +1,4 @@
-1	swedish	x-vnd.Haiku-Notifications	68793008
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Ett fel uppstod när inställningarna skulle sparas.\nDet är möjligt att hårddiskutrymmet håller på att ta slut.
+1	swedish	x-vnd.Haiku-Notifications	164019665
 Notifications	GeneralView		Aviseringar
 seconds of inactivity	GeneralView		sekunder av inaktivitet
 Revert	PrefletWin		Återgå
@@ -10,7 +9,6 @@ OK	GeneralView		OK
 Type	NotificationView		Typ
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Aviseringarna kunde inte stoppas eftersom servern inte kunde nås.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Kan inte aktivera aviseringar eftersom servern inte kunde hittas.\Det betyder att din InfoPopper-installation inte avslutades korrekt.
-OK	NotificationView		OK
 Important	NotificationView		Viktigt
 Cannot disable notifications because the server can't be reached.	GeneralView		Kan inte inaktivera aviseringarna eftersom servern inte kan nås.
 Progress	NotificationView		Progress
@@ -22,8 +20,6 @@ Can't enable notifications at startup time, you probably don't have write permis
 Search:	NotificationView		Sök:
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Aviseringsservern hittas inte.\nDet kan bero på att installationen inte är korrekt.
 Allowed	NotificationView		Tillåten
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Kan inte spara inställningarna. Du saknar förmodligen behörighet att skriva till inställningsmappen eller så är disken full.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Ett fel uppstod vid sparning av inställningarna.\nDet är möjligt att du saknar behörighet att skriva till inställningsmappen.
 Yes	NotificationView		Ja
 Large icon	DisplayView		Stor ikon
 Icon size:	DisplayView		Ikonstorlek:
@@ -36,10 +32,7 @@ Information	NotificationView		Information
 Window width:	DisplayView		Fönsterbredd:
 Application	NotificationView		Applikation
 Enabled	NotificationView		Aktiverad
-OK	DisplayView		OK
 Unknown	NotificationView		Okänd
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Ett fel uppstod när inställningarna skulle sparas.\nDet är möjligt att du saknar behörighet att skriva till inställningsmappen.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Ett fel uppstod när inställningarna skulle sparas.\nDet är möjligt att du saknar behörighet att skriva till inställningsmappen.
 Enable notifications at startup	GeneralView		Aktivera aviseringar vid start
 Notifications	PrefletView		Aviseringar
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Aviseringsservern hittas ej. Det betyder att din InfoPopper installation inte avslutades korrekt.

@@ -1,8 +1,15 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1127371629
+1	hungarian	x-vnd.Haiku-HaikuDepot	1985556565
 Name	PackageListView		Név
+Source code	FilterView		Forráskód
 Close	RatePackageWindow		Bezárás
 Changelog	PackageInfoView		Változásnapló
+Your rating:	RatePackageWindow		Saját értékelés:
+The passwords do not match.	UserLoginWindow		A jelszavak nem egyeznek.
+Log in…	MainWindow		Bejelentkezés…
+Rate %Package%	RatePackageWindow		%Package% értékelése
+Stability:	RatePackageWindow		Stabilitás:
 Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
+Stability	RatePackageWindow		Stabilitás
 for %Version%	PackageInfoView		%Version% verzióhoz
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 Depot:	FilterView		Raktár:
@@ -12,18 +19,31 @@ Tools	MainWindow		Eszközök
 HaikuDepot	System name		Raktár
 Close	UserLoginWindow		Bezárás
 Rate package…	PackageInfoView		Csomag értékelése…
+Category	FilterView		Kategória
 Uninstall	PackageManager		Eltávolítás
+An error occurred while obtaining the package list: %message%	MainWindow		Hiba történt a csomagok letöltésekor %message%
+Your rating was updated successfully.	RatePackageWindow		Az értékelés elküldése megtörtént.
 <no info>	PackageInfoView		<nincs információ>
 An error occurred while initializing the package manager: %message%	MainWindow		Hiba történt a csomagkezelő indításakor: %message%
+Email address:	UserLoginWindow		E-mail cím:
+The username is already taken. Please choose another.	UserLoginWindow		Ez a felhasználónév már foglalt. Válasszon másikat.
 Close	PackageManager		Bezárás
+Not logged in	MainWindow		Nincs bejelentkezve
+The authentication was successful.	UserLoginWindow		A felhasználóazonosítás sikeres volt
 Status	PackageListView		Állapot
+Ignore	UserLoginWindow		Mellőzés
+Language	UserLoginWindow		Nyelv
+Rate package	RatePackageWindow		Csomag értékelése
 Development	Model		Fejlesztés
 Fatal error	PackageManager		Végzetes hiba
+Log in	UserLoginWindow		Bejelentkezés
 Ratings	PackageInfoView		Értékelés
 Inactive	PackageListView		Inaktív
 Refresh depots	MainWindow		Raktárak frissítése
+Not logged in	FilterView		Nincs bejelentkezve
 Main Menu	MainWindow		Főmenü
 (%Votes%)	PackageInfoView		(%Votes%)
+Success	UserLoginWindow		Sikeres
 Downloading:	PackageInfoView		Letöltés:
 There was a puzzling response from the web service.	RatePackageWindow		A webes szolgáltatás rejtélyes választ adott.
 Log out	MainWindow		Kijelentkezés
@@ -36,26 +56,54 @@ Development	FilterView		Fejlesztés
 Does not start	RatePackageWindow		Nem indul el
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Hiba történt a raktár frissítésekor: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Nem sikerült elérni a webes szolgáltatást.
+Create account	UserLoginWindow		Felhasználói fiók létrehozása
 Productivity	Model		Alkalmazások
+Authentication failed	UserLoginWindow		A hitelesítés sikertelen
+Language	RatePackageWindow		Nyelv
 Size	PackageListView		Méret
 Failed to create or update rating: %s\n	RatePackageWindow		Az értékelés létrehozása vagy frissítése nem sikerült: %s\n
  It responded with: 	RatePackageWindow		Ezt válaszolta:
+User name:	UserLoginWindow		Felhasználónév:
 Games	Model		Játékok
 Rating	PackageListView		Értékelés
+Logged in as %User%	FilterView		Bejelentkezett mint %User%
+There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
 Graphics	Model		Grafika
 Local	MainWindow		Helyi
 Close	MainWindow		Bezárás
+Preferred language:	UserLoginWindow		Előnyben részesített nyelv:
+Failed to rate package	RatePackageWindow		A csomag értékelése sikertelen
+Internet & Network	Model		Internet és hálózat
 Available	FilterView		Elérhető
+Cancel	MainWindow		Mégse
+Update	RatePackageWindow		Frissítés
 Video	Model		Videó
+All categories	FilterView		Minden kategória
 An error occurred while refreshing the repository: %error%	MainWindow		Hiba történt a raktár frissítése közben: %error%
 Pending…	PackageListView		Folyamatban…
 Depot	FilterView		Raktár
+OK	PackageInfoView		Rendben
 Uninstalled	PackageListView		Eltávolítva
+Stable	RatePackageWindow		Stabil
 Unknown	PackageListView		Ismeretlen
 All depots	FilterView		Összes raktár
+Comment language:	RatePackageWindow		Hozzászólás nyelve:
+Pass phrase:	UserLoginWindow		Jelszó:
+Not specified	RatePackageWindow		Nincs megadva
 Available	PackageListView		Elérhető
 n/a	PackageInfoView		nincs értékelve
+ It responded with: 	UserLoginWindow		Ezt válaszolta:
+Cancel	RatePackageWindow		Mégse
+OK	UserLoginWindow		Rendben
+Installed	FilterView		Telepítve
 Send	RatePackageWindow		Küldés
+Category:	FilterView		Kategória:
+Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
+Success	RatePackageWindow		Sikeres
+Business	Model		Üzleti
 Audio	Model		Audió
 About	PackageInfoView		Névjegy
 Active	PackageListView		Aktív
+It was not possible to contact the web service.	UserLoginWindow		Nem sikerült elérni a webes szolgáltatást.
+Failed to create account: %s\n	UserLoginWindow		%s létrehozása sikertelen\n
+Cancel	UserLoginWindow		Mégse

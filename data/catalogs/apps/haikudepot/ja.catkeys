@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3819510430
+1	japanese	x-vnd.Haiku-HaikuDepot	1278451458
 Name	PackageListView		名前
 Source code	FilterView		ソースコード
 Close	RatePackageWindow		閉じる
@@ -51,6 +51,7 @@ But none could be listed here, sorry.	UserLoginWindow		すみません。しか�
 System & Utilities	Model		システム & ユーティリティ
 Inactive	PackageListView		無効
 Refresh depots	MainWindow		Depot を更新
+The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
 Science & Mathematics	Model		科学 & 数学
 Not logged in	FilterView		ログインしていません
 Main Menu	MainWindow		メインメニュー
@@ -104,6 +105,7 @@ Login or Create account	MainWindow		ログインまたはアカウントの作�
 Pending…	PackageListView		保留中…
 Depot	FilterView		Depot
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# アイテム} other{# アイテム}}
+OK	PackageInfoView		OK
 Uninstalled	PackageListView		アンインストール済み
 Stable	RatePackageWindow		安定
 Unknown	PackageListView		不明
@@ -117,6 +119,7 @@ If you do not provide an email address, you will not be able to reset your passw
  It responded with: 	UserLoginWindow		 次に反応する: 
 Authentication failed. Connection to the service failed.	UserLoginWindow		認証が失敗しました。サービスへの接続が失敗しました。
 Cancel	RatePackageWindow		キャンセル
+Package action failed	PackageInfoView		パッケージアクションに失敗しました
 OK	UserLoginWindow		OK
 Installed	FilterView		インストール済
 Send	RatePackageWindow		送信する

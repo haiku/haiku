@@ -1,11 +1,13 @@
-1	hungarian	x-vnd.Haiku-MidiPlayer	471142057
+1	hungarian	x-vnd.Haiku-MidiPlayer	1046133011
 None	Main Window		Semmi
 Live input:	Main Window		Élő bemenet:
 Stop	Main Window		Megállít
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	This tiny program\nKnows how to play thousands of\nCheesy sounding songs
 Cavern	Main Window		Barlang
 Volume:	Main Window		Hangerő:
 Reverb:	Main Window		Visszhang:
 OK	Main Window		Rendben
+Loading instruments…	Scope View		Hangszerek betöltése…
 Off	Main Window		Nincs
 Dungeon	Main Window		Cella
 Play	Main Window		Lejátszás

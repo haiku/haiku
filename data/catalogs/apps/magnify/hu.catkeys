@@ -1,9 +1,10 @@
-1	hungarian	x-vnd.Haiku-Magnify	233476436
+1	hungarian	x-vnd.Haiku-Magnify	2046693978
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		nincs semmi a vágólapon
 Make square	Magnify-Main		Négyzetté alakítás
 Copy image	Magnify-Main		Kép másolása
 usage: magnify [size] (magnify size * size pixels)\n	Console		használat: magnify [méret] (nagyítási méret * méret képpontban)\n
 Stick coordinates	Magnify-Main		Koordináták rögzítése
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# képpont/képpont} other{# képpont/képpont}}
 Hide/Show grid	Magnify-Main		Rácsvonalak elrejtése/megjelenítése
 magnify: size must be a multiple of 4\n	Console		nagyítás: a méret 4-gyel osztható kell, hogy legyen\n
 Decrease pixel size	Magnify-Main		Képpontméret csökkentése

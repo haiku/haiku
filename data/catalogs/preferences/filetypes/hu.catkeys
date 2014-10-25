@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-FileTypes	3116280330
+1	hungarian	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		Programtípusok…
 Description:	Application Types Window		Leírás:
 Args only	Application Type Window		Csak paraméterek
@@ -52,6 +52,7 @@ Set preferred application	Preferred App Menu		Előnyben részesített program me
 Don't save	Application Type Window		Ne mentse
 Save changes before closing?	Application Type Window		Menti a változtatásokat kilépés előtt?
 File	Application Type Window		Fájl
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# alkalmazás típus eltávolítható} other{# alkalmazás típus eltávolítható}}
 Version:	Application Type Window		Verzió:
 Select…	FileTypes Window		Kiválasztás…
 FileTypes request	FileTypes		Fájltípusok-kérés

@@ -1,10 +1,11 @@
-1	french	x-vnd.Haiku-Media	1376555819
+1	french	x-vnd.Haiku-Media	3929254170
 Couldn't add volume control in Deskbar: %s\n	Media views		Impossible d'insérer le contrôle du volume dans la Deskbar : %s\n
 Ready for use…	Media Window		Prêt à servir…
 Video input:	Media views		Entrée vidéo :
 Waiting for media_server to quit.	Media Window		Attente de la fin du serveur de médias.
 Cleaning up.	Media Window		Nettoyage.
 Defaults	Media views		Par défaut
+MIDI Settings	Media Window		Réglages MIDI
 Stopping media server…	Media Window		Arrêt du serveur de médias…
 Quit	Media Window		Quitter
 Starting media server…	Media Window		Démarrage du serveur de médias…

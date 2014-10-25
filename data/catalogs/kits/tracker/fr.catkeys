@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3235278936
+1	french	x-vnd.Haiku-libtracker	137546976
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Extensions
 Mount settings…	ContainerWindow		Réglages du montage…
@@ -213,6 +213,7 @@ Created:	InfoWindow		Créé :
 Copying: 	StatusWindow		Copie : 
 Capacity:	InfoWindow		Capacité :
 Delete	FilePanelPriv		Supprimer
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# octet)} other{(# octets)}}
 Save	FindPanel		Sauvegarder
 copy	FSUtils	filename copy	copie
 Temporary	FindPanel		Temporaire
@@ -248,6 +249,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		Désolé, vous ne po
 Name	ContainerWindow		Nom
 Reverse order	ContainerWindow		Ordre inverse
 48 x 48	DeskWindow		48 x 48
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# objet} other{# objets}}
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Ajouter le dossier courant
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Impossible d'ouvrir « %document » avec l'application « %app » (Il manque le symbole : %symbol).\n
@@ -292,6 +294,7 @@ Cancel	PoseView		Annuler
 You can't move or copy items to read-only volumes.	FSUtils		Vous ne pouvez pas déplacer ou copiez des éléments dans un volume en lecture-seule.
 Unknown	FilePermissionsView		Inconnu
 All files and folders	FindPanel		Tout les fichiers et dossiers
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{pour # fichier} other{pour # fichiers}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Impossible d'ouvrir « %document » (Il manque la bibliothèque : %library).\n
 The Tracker must be running to see Info windows.	PoseView		Le Tracker doit être en fonction pour voir les fenêtres d'informations.
 Other	FilePermissionsView		Autre
@@ -330,6 +333,7 @@ New folder %ld	FSUtils		Nouveau dossier %ld
 All BeOS disks	AutoMounterSettings		Tous les disques BeOS
 Used space color	SettingsView		Couleur de l'espace utilisé
 Sorry, could not create a new folder.	FSUtils		Désolé, impossible de créer un nouveau dossier.
+Disk mount	TrackerSettingsWindow		Montage des disques
 multiple disks	FindPanel		disques multiples
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Vous devez déposer les éléments sur une des icônes disques de la fenêtre « Disques ».
 Untitled clipping	PoseView		Extrait sans titre

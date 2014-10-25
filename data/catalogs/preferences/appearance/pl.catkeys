@@ -8,7 +8,7 @@ On	AntialiasingSettingsView		Włącz
 Defaults	APRWindow		Ustaw domyślne
 Grayscale	AntialiasingSettingsView		Skala odcieni szarości
 Shine	Colors tab		Połysk
-About	DecorSettingsView		O
+About	DecorSettingsView		Informacje
 About decorator	DecorSettingsView		O dekoratorze
 Off	AntialiasingSettingsView		Wyłącz
 Choose Decorator	DecorSettingsView		Wybierz Dekorator
@@ -63,7 +63,7 @@ Strong	AntialiasingSettingsView		Silny
 Panel text	Colors tab		Tekst panelu
 Arrow style	DecorSettingsView		Wygląd strzałek
 Monospaced fonts only	AntialiasingSettingsView		Tylko czcionki o stałej szerokości
-Look and feel	APRWindow		Look and feel
+Look and feel	APRWindow		Wygląd i styl
 Antialiasing menu	AntialiasingSettingsView		Menu antyaliasingu
 Fonts	APRWindow		Czcionki
 Glyph hinting:	AntialiasingSettingsView		Hintowanie czcionek:

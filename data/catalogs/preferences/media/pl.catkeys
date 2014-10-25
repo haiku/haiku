@@ -12,7 +12,7 @@ Starting media server…	Media Window		Uruchamianie serwera multimediów…
 Done shutting down.	Media Window		Skończono zamykanie.
 Video settings	Media Window		Ustawienia wideo
 Video output:	Media views		Wyjście wideo:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nie można połączyć się z serwerem multimediów.\nUruchomić go ponownie ?
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nie można połączyć się z serwerem multimediów.\nUruchomić go ponownie?
 Restart media services	Media views		Ponowne uruchomienie usług multimedialnych
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nie można usunąć sterowania głośnością w Deskbarze: %s\n
 Media	System name		Nośnik

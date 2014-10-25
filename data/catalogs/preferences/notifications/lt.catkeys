@@ -1,5 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Notifications	68793008
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog diske nepakanka laisvos vietos.
+1	lithuanian	x-vnd.Haiku-Notifications	164019665
 Notifications	GeneralView		Pranešimai
 seconds of inactivity	GeneralView		sek. pasyvumo
 Revert	PrefletWin		Atšaukti pakeitimus
@@ -10,7 +9,6 @@ OK	GeneralView		Gerai
 Type	NotificationView		Tipas
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Pranešimų tarnybos sustabdyti nepavyko, nes ji nepasiekiama.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nepavyko įgalinti pranešimų, nes pranešimų tarnyba nerasta.\nTai reiškia, jog pranešimų tarnyba nebuvo sėkmingai įdiegta.
-OK	NotificationView		Gerai
 Important	NotificationView		Svarbu
 Cannot disable notifications because the server can't be reached.	GeneralView		Pranešimų išjungti nepavyko, nes pranešimų tarnyba nepasiekiama.
 Progress	NotificationView		Eiga
@@ -22,8 +20,6 @@ Can't enable notifications at startup time, you probably don't have write permis
 Search:	NotificationView		Ieškoti:
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Pranešimų tarnyba nerasta.\nGali būti, jog ji nebuvo sėkmingai įdiegta.
 Allowed	NotificationView		Leidžiama
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Nuostatų įrašyti nepavyko. Gali būti, jog Jums trūksta rašymo į nuostatų aplanką teisių arba diske nepakanka laisvos vietos.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog Jums trūksta rašymo į nuostatų aplanką teisių.
 Yes	NotificationView		Taip
 Large icon	DisplayView		didelės piktogramos
 Icon size:	DisplayView		Piktogramų dydis:
@@ -36,10 +32,7 @@ Information	NotificationView		Informacija
 Window width:	DisplayView		Lango plotis:
 Application	NotificationView		Programa
 Enabled	NotificationView		Įjungta
-OK	DisplayView		Gerai
 Unknown	NotificationView		Nežinoma
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog Jums trūksta rašymo į nuostatų aplanką teisių.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog Jums trūksta rašymo į nuostatų aplanką teisių.
 Enable notifications at startup	GeneralView		Įjungti pranešimus sistemos paleisties metu
 Notifications	PrefletView		Pranešimai
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Pranešimų tarnyba nerasta. Tai reiškia, jog ji nebuvo sėkmingai įdiegta.

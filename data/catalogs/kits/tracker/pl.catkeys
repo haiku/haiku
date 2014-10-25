@@ -7,7 +7,7 @@ Identify	ContainerWindow		Rozpoznaj
 Warning space color	SettingsView		Błąd przestrzeni kolorów
 Open	OpenWithWindow		Otwórz
 Tracker status	StatusWindow		Status Trackera
-Eject when unmounting	AutoMounterSettings		Wysuń kiedy odmontowujesz
+Eject when unmounting	AutoMounterSettings		Wysuń podczas odmontowywania
 Window	ContainerWindow		Okno
 Decrease size	ContainerWindow		Zmniejsz rozmiar
 You must have at least one attribute showing.	PoseView		Musisz mieć co najmniej jeden pokazany atrybut.
@@ -34,14 +34,14 @@ Open with…	ContainerWindow		Otwórz za pomocą…
 Write	FilePermissionsView		Napisz
 Modified	PoseView		Zmodyfikowano
 Make active printer	ContainerWindow		Ustaw jako aktywną drukarkę
-Create link here	ContainerWindow		Stwórz link tutaj
+Create link here	ContainerWindow		Utwórz tutaj dowiązanie
 Moving: 	StatusWindow		Przenoszenie: 
 before	FindPanel		przed
 Error emptying Trash	FSUtils		Błąd przy opróżnianiu kosza!
 On	FindPanel		Na
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		większy niż
-Delete	PoseView		Skasuj
+Delete	PoseView		Usuń
 Select all	ContainerWindow		Zaznacz wszystko
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Przepraszamy, atrybut 'Character' nie może przechowywać wielobajtowych znaków.
 Clean up	DeskWindow		Uprzątnij
@@ -99,7 +99,7 @@ Sorry, you can't copy items to the Trash.	PoseView		Przepraszamy, nie możesz sk
 matches wildcard expression	SelectionWindow		Odpowiada wieloznacznikowemu wyrażeniu
 rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	zmienisz nazwę
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nie możesz podmienić folderu lub skrótu z użyciem pliku.
-Show space bars on volumes	SettingsView		Pokaż pasek zajętości miejsca na woluminie
+Show space bars on volumes	SettingsView		Pokaż wskaźnik zajętości na woluminie
 Invert selection	ContainerWindow		Odwróc zaznaczenie
 Increase size	DeskWindow		Zwiększ rozmiar
 Resize to fit	ContainerWindow		Dopasuj do zawartości
@@ -221,7 +221,7 @@ Version	OpenWithWindow		Wersja
 Default application	InfoWindow		Domyślna aplikacja
 Preparing to copy items…	StatusWindow		Przygotowanie do kopiowania elementów…
 Save query as template…	FindPanel		Zapisz zapytanie jako szablon…
-Show folder location in title tab	SettingsView		Pokaż lokacje folderu na pasku
+Show folder location in title tab	SettingsView		Pokaż lokację katalogu na zakładce
 Proceed	FSUtils		Kontynuuj
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Niektóre obiekty już istnieją w tym folderze o nazwach identycznych co te które probujesz %verb.\n \nCzy chcesz je zamienić z tymi które próbujesz %verb czy wolisz być pytany o każdy z nich?
 The mount server could not be contacted.	AutoMounterSettings		Serwer montujący przestał odpowiadać.
@@ -422,7 +422,7 @@ Automatic disk mounting	AutoMounterSettings		Automatyczne montowanie dysku
 Original name	ContainerWindow		Nazwa orygialna
 Find	FSUtils		Znajdź
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Błąd przy kopiowaniu pliku \"%name\":\n\t%error\n\nCzy chcesz kontynuować?
-Single window navigation	SettingsView		Nawigacja pojedyńczym oknem
+Single window navigation	SettingsView		Nawigacja pojedynczym oknem
 parent folder	NavMenu		folder główny
 contains	FindPanel		zawiera
 Relation	OpenWithWindow		Relacje

@@ -1,5 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	68793008
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Une erreur est survenue lors de la sauvegarde des préférences.\nVous n'avez peut-être plus suffisamment d'espace libre sur votre disque.
+1	french	x-vnd.Haiku-Notifications	164019665
 Notifications	GeneralView		Notifications
 seconds of inactivity	GeneralView		secondes d'inactivités
 Revert	PrefletWin		Rétablir
@@ -10,7 +9,6 @@ OK	GeneralView		OK
 Type	NotificationView		Type
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Les notifications ne peuvent pas être arrêtées, parce qu'il est impossible d'atteindre le serveur.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Impossible d'activer les notifications, car le serveur est introuvable.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.
-OK	NotificationView		OK
 Important	NotificationView		Important
 Cannot disable notifications because the server can't be reached.	GeneralView		Impossible de désactiver les notifications car le serveur ne peut pas être atteint.
 Progress	NotificationView		Progression
@@ -22,8 +20,6 @@ Can't enable notifications at startup time, you probably don't have write permis
 Search:	NotificationView		Rechercher :
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Impossible de trouver le serveur de notifications.\nIl est possible que l'installation ait été mal faite.
 Allowed	NotificationView		Autorisé
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Impossible d'enregistrer les préférences. Vous n'avez probablement pas le droit d'écrire dans le répertoire des paramètres ou alors le disque est plein.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
 Yes	NotificationView		Oui
 Large icon	DisplayView		Grande icône
 Icon size:	DisplayView		Taille de l'icône :
@@ -36,10 +32,7 @@ Information	NotificationView		Information
 Window width:	DisplayView		Largeur de la fenêtre :
 Application	NotificationView		Application
 Enabled	NotificationView		Activer
-OK	DisplayView		OK
 Unknown	NotificationView		Inconnu
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
 Enable notifications at startup	GeneralView		Activer les notifications au démarrage
 Notifications	PrefletView		Notifications
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Impossible de trouver le serveur de notifications.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.

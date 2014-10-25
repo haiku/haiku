@@ -1,5 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Notifications	1032629100
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Ένα σφάλμα παρουσιάστικε κατά την διαδικάσια αποθήκευσεις των προτιμήσεων.\nΠιθανα να μην υπάρχει αρκετός αποθηκευτικός χώρος στο δίσκο. 
+1	greek, modern (1453-)	x-vnd.Haiku-Notifications	1127855757
 Notifications	GeneralView		Κοινοποιήσεις
 seconds of inactivity	GeneralView		δευτερόλεπτα αδράνειας
 Revert	PrefletWin		Επαναφορά
@@ -10,7 +9,6 @@ OK	GeneralView		Εντάξει
 Type	NotificationView		Τύπος
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Αδύνατη η επικοινωνία με το σέρβερ. Οι ειδοποιήσεις δεν μπορούν να σταματήσουν.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.
-OK	NotificationView		Εντάξει
 Important	NotificationView		Συμαντικό
 Cannot disable notifications because the server can't be reached.	GeneralView		Cannot disable notifications because the server can't be reached.
 Progress	NotificationView		Πρόοδος
@@ -21,8 +19,6 @@ Can't enable notifications at startup time, you probably don't have write permis
 Search:	NotificationView		Αναζήτιση
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		The notifications server cannot be found.\nA possible cause is an installation not done correctly
 Allowed	NotificationView		Επιτρεπτό
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Αδυναμία αποθήκευσης των ρυθμίσεων, δεν έχετε πιθανόν δικαιώματα εγγραφής στον κατάλογο ρυθμίσεων ή ο δίσκος είναι γεμάτος.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Υπήρξε ένα πρόβλημα κατά την αποθήκευση των προτιμήσεων σας.\nΕίναι πιθανό να μην έχετε δικαιώματα εγγραφής στον κατάλογο ρυθμίσεων.
 Yes	NotificationView		Ναί
 Large icon	DisplayView		Μεγάλο εικονίδιο
 Icon size:	DisplayView		Μέγεθος εικονίδιου
@@ -35,10 +31,7 @@ Information	NotificationView		Πληροφορίες
 Window width:	DisplayView		Πλάτος παράθυρου:
 Application	NotificationView		Εφαρμογή
 Enabled	NotificationView		Ενεργό
-OK	DisplayView		Εντάξει
 Unknown	NotificationView		Άγνωστο
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Υπήρξε ένα πρόβλημα κατά την αποθήκευση των προτιμήσεων σας.\nΕίναι πιθανό να μην έχετε δικαιώματα εγγραφής στον κατάλογο ρυθμίσεων.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Υπήρξε ένα πρόβλημα κατά την αποθήκευση των προτιμήσεων σας.\nΕίναι πιθανό να μην έχετε δικαιώματα εγγραφής στον κατάλογο ρυθμίσεων.
 Enable notifications at startup	GeneralView		Ενεργοποίηση ειδοποιήσεων κατά την εκκίνηση
 Notifications	PrefletView		Ειδοποιήσεις
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Ο εξυπηρετητής ειδοποιήσεων δε μπόρεσε να βρεθεί, αυτο σημαίνει οτι η εγκατάσταση του InfoPopper δεν ολοκληρώθηκε με επιτυχία.
