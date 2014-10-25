@@ -9,7 +9,6 @@
 #include <stdio.h>
 
 #include <Catalog.h>
-#include <CheckBox.h>
 #include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -35,17 +34,6 @@ add_categories_to_menu(const CategoryList& categories, BMenu* menu)
 		BMenuItem* item = new BMenuItem(category->Label(), message);
 		menu->AddItem(item);
 	}
-}
-
-
-static BCheckBox*
-create_check_box(const char* label, const char* name)
-{
-	BMessage* message = new BMessage(MSG_FILTER_SELECTED);
-	message->AddString("name", name);
-	BCheckBox* checkBox = new BCheckBox(label, message);
-	set_small_font(checkBox);
-	return checkBox;
 }
 
 
@@ -78,16 +66,6 @@ FilterView::FilterView()
 	float maxSearchWidth = minSearchWidth * 2;
 	fSearchTermsText->SetExplicitMaxSize(BSize(maxSearchWidth, B_SIZE_UNSET));
 
-	// Construct check boxen
-	fAvailableCheckBox = create_check_box(
-		B_TRANSLATE("Available"), "available");
-	fInstalledCheckBox = create_check_box(
-		B_TRANSLATE("Installed"), "installed");
-	fDevelopmentCheckBox = create_check_box(
-		B_TRANSLATE("Development"), "development");
-	fSourceCodeCheckBox = create_check_box(
-		B_TRANSLATE("Source code"), "source code");
-
 	// Build layout
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_HORIZONTAL)
@@ -98,13 +76,6 @@ FilterView::FilterView()
 			.End()
 			.AddGlue(0.5f)
 			.Add(fSearchTermsText, 1.0f)
-		.End()
-		.AddGroup(B_HORIZONTAL)
-			.Add(fAvailableCheckBox)
-			.Add(fInstalledCheckBox)
-			.Add(fDevelopmentCheckBox)
-			.Add(fSourceCodeCheckBox)
-			.AddGlue()
 		.End()
 
 		.SetInsets(B_USE_DEFAULT_SPACING)
@@ -125,11 +96,6 @@ FilterView::AttachedToWindow()
 	fSearchTermsText->SetTarget(this);
 
 	fSearchTermsText->MakeFocus();
-
-	fAvailableCheckBox->SetTarget(Window());
-	fInstalledCheckBox->SetTarget(Window());
-	fDevelopmentCheckBox->SetTarget(Window());
-	fSourceCodeCheckBox->SetTarget(Window());
 }
 
 
@@ -184,17 +150,5 @@ FilterView::AdoptModel(const Model& model)
 	add_categories_to_menu(model.Categories(), showMenu);
 
 	showMenu->ItemAt(0)->SetMarked(true);
-
-	AdoptCheckmarks(model);
-}
-
-
-void
-FilterView::AdoptCheckmarks(const Model& model)
-{
-	fAvailableCheckBox->SetValue(model.ShowAvailablePackages());
-	fInstalledCheckBox->SetValue(model.ShowInstalledPackages());
-	fDevelopmentCheckBox->SetValue(model.ShowDevelopPackages());
-	fSourceCodeCheckBox->SetValue(model.ShowSourcePackages());
 }
 
