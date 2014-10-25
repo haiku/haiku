@@ -383,10 +383,13 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 extern "C" addr_t
 mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
 {
+	TRACE(("mmu_map_physical_memory(phAddr=%lx, %lx, %lu)\n", physicalAddress, size, flags));
 	addr_t address = sNextVirtualAddress;
 	addr_t pageOffset = physicalAddress & (B_PAGE_SIZE - 1);
 
 	physicalAddress -= pageOffset;
+	if (pageOffset)
+		size += B_PAGE_SIZE;
 
 	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
 		map_page(get_next_virtual_page(B_PAGE_SIZE), physicalAddress + offset,
