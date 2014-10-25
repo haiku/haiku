@@ -466,7 +466,7 @@ PackageManager::Warn(status_t error, const char* format, ...)
 void
 PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 {
-	// TODO: implement
+	ProgressPackageDownloadActive(packageName, 0.0f);
 }
 
 
