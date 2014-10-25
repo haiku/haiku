@@ -13,10 +13,12 @@
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Font.h>
 #include <Path.h>
 #include <Resources.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <View.h>
 
 
 status_t
@@ -144,4 +146,17 @@ get_app_resources(BResources& resources)
 
 	return resources.SetTo(&info.ref);
 }
+
+
+void
+set_small_font(BView* view)
+{
+	BFont font;
+	view->GetFont(&font);
+	font.SetSize(ceilf(font.Size() * 0.8));
+	view->SetFont(&font);
+}
+
+
+
 

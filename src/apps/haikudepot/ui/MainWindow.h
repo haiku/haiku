@@ -14,6 +14,8 @@
 #include "PackageInfoListener.h"
 
 
+class BMenu;
+class BMenuItem;
 class BSplitView;
 class FilterView;
 class PackageActionsView;
@@ -55,6 +57,8 @@ private:
 
 private:
 			void				_BuildMenu(BMenuBar* menuBar);
+			void				_BuildUserMenu(BMenuBar* menuBar);
+
 			void				_InitWorkerThreads();
 			void				_AdoptModel();
 
@@ -65,11 +69,8 @@ private:
 			void				_RefreshPackageList();
 
 			void				_StartRefreshWorker(bool force = false);
-
 	static	status_t			_RefreshModelThreadWorker(void* arg);
-
 	static	status_t			_PackageActionWorker(void* arg);
-
 	static	status_t			_PopulatePackageWorker(void* arg);
 
 			void				_NotifyUser(const char* title,
@@ -85,7 +86,13 @@ private:
 			PackageListView*	fPackageListView;
 			PackageInfoView*	fPackageInfoView;
 			BSplitView*			fSplitView;
+
+			BMenu*				fUserMenu;
+			BMenuItem*			fLogInItem;
 			BMenuItem*			fLogOutItem;
+
+			BMenuItem*			fShowAvailablePackagesItem;
+			BMenuItem*			fShowInstalledPackagesItem;
 			BMenuItem*			fShowDevelopPackagesItem;
 			BMenuItem*			fShowSourcePackagesItem;
 

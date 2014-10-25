@@ -11,6 +11,7 @@
 
 class BMessage;
 class BResources;
+class BView;
 class BWindow;
 
 
@@ -25,5 +26,6 @@ bool make_sure_frame_is_on_screen(BRect& frame, float borderWidth = 5.0f,
 
 status_t get_app_resources(BResources& resources);
 
+void set_small_font(BView* view);
 
 #endif // SUPPORT_H

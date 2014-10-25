@@ -45,6 +45,7 @@
 #include "PackageListView.h"
 #include "PackageManager.h"
 #include "RatePackageWindow.h"
+#include "support.h"
 #include "UserLoginWindow.h"
 
 
@@ -109,6 +110,9 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fUserMenu(NULL),
+	fLogInItem(NULL),
+	fLogOutItem(NULL),
 	fModelListener(new MessageModelListener(BMessenger(this)), true),
 	fTerminating(false),
 	fSinglePackageMode(false),
@@ -117,6 +121,12 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	BMenuBar* menuBar = new BMenuBar(B_TRANSLATE("Main Menu"));
 	_BuildMenu(menuBar);
 
+	BMenuBar* userMenuBar = new BMenuBar(B_TRANSLATE("User Menu"));
+	_BuildUserMenu(userMenuBar);
+	set_small_font(userMenuBar);
+	userMenuBar->SetExplicitMaxSize(BSize(B_SIZE_UNSET,
+		menuBar->MaxSize().height));
+
 	fFilterView = new FilterView();
 	fPackageListView = new PackageListView(fModel.Lock());
 	fPackageInfoView = new PackageInfoView(fModel.Lock(), this);
@@ -124,7 +134,10 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
-		.Add(menuBar)
+		.AddGroup(B_HORIZONTAL, 0.0f)
+			.Add(menuBar, 1.0f)
+			.Add(userMenuBar, 0.0f)
+		.End()
 		.Add(fFilterView)
 		.AddSplit(fSplitView)
 			.AddGroup(B_VERTICAL)
@@ -175,6 +188,8 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings,
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fUserMenu(NULL),
+	fLogInItem(NULL),
 	fLogOutItem(NULL),
 	fModelListener(new MessageModelListener(BMessenger(this)), true),
 	fTerminating(false),
@@ -463,11 +478,7 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh depots"),
 			new BMessage(MSG_REFRESH_DEPOTS)));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Log in" B_UTF8_ELLIPSIS),
-			new BMessage(MSG_LOG_IN)));
-	fLogOutItem = new BMenuItem(B_TRANSLATE("Log out"),
-		new BMessage(MSG_LOG_OUT));
-	menu->AddItem(fLogOutItem);
+
 	menuBar->AddItem(menu);
 
 //	menu = new BMenu(B_TRANSLATE("Options"));
@@ -482,6 +493,23 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 //	menu->AddItem(fShowSourcePackagesItem);
 //
 //	menuBar->AddItem(menu);
+}
+
+
+void
+MainWindow::_BuildUserMenu(BMenuBar* menuBar)
+{
+	fUserMenu = new BMenu(B_TRANSLATE("Not logged in"));
+
+	fLogInItem = new BMenuItem(B_TRANSLATE("Log in" B_UTF8_ELLIPSIS),
+		new BMessage(MSG_LOG_IN));
+	fUserMenu->AddItem(fLogInItem);
+
+	fLogOutItem = new BMenuItem(B_TRANSLATE("Log out"),
+		new BMessage(MSG_LOG_OUT));
+	fUserMenu->AddItem(fLogOutItem);
+
+	menuBar->AddItem(fUserMenu);
 }
 
 
@@ -939,9 +967,27 @@ void
 MainWindow::_UpdateAuthorization()
 {
 	BString username(fModel.Username());
+	bool hasUser = !username.IsEmpty();
+
 	if (fLogOutItem != NULL)
-		fLogOutItem->SetEnabled(username.Length() > 0);
-	fFilterView->SetUsername(username);
+		fLogOutItem->SetEnabled(hasUser);
+	if (fLogInItem != NULL) {
+		if (hasUser)
+			fLogInItem->SetLabel(B_TRANSLATE("Switch account" B_UTF8_ELLIPSIS));
+		else
+			fLogInItem->SetLabel(B_TRANSLATE("Log in" B_UTF8_ELLIPSIS));
+	}
+
+	if (fUserMenu != NULL) {
+		BString label;
+		if (username.Length() == 0) {
+			label = B_TRANSLATE("Not logged in");
+		} else {
+			label = B_TRANSLATE("Logged in as %User%");
+			label.ReplaceAll("%User%", username);
+		}
+		fUserMenu->Superitem()->SetLabel(label);
+	}
 }
 
 

@@ -15,10 +15,10 @@
 #include <MenuItem.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
-#include <StringView.h>
 #include <TextControl.h>
 
 #include "Model.h"
+#include "support.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -35,16 +35,6 @@ add_categories_to_menu(const CategoryList& categories, BMenu* menu)
 		BMenuItem* item = new BMenuItem(category->Label(), message);
 		menu->AddItem(item);
 	}
-}
-
-
-static void
-set_small_font(BView* view)
-{
-	BFont font;
-	view->GetFont(&font);
-	font.SetSize(ceilf(font.Size() * 0.8));
-	view->SetFont(&font);
 }
 
 
@@ -98,11 +88,6 @@ FilterView::FilterView()
 	fSourceCodeCheckBox = create_check_box(
 		B_TRANSLATE("Source code"), "source code");
 
-	// Logged in user label
-	fUsername = new BStringView("logged in user", "");
-	set_small_font(fUsername);
-	fUsername->SetHighColor(80, 80, 80);
-	
 	// Build layout
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_HORIZONTAL)
@@ -119,8 +104,7 @@ FilterView::FilterView()
 			.Add(fInstalledCheckBox)
 			.Add(fDevelopmentCheckBox)
 			.Add(fSourceCodeCheckBox)
-			.AddGlue(0.5f)
-			.Add(fUsername)
+			.AddGlue()
 		.End()
 
 		.SetInsets(B_USE_DEFAULT_SPACING)
@@ -212,19 +196,5 @@ FilterView::AdoptCheckmarks(const Model& model)
 	fInstalledCheckBox->SetValue(model.ShowInstalledPackages());
 	fDevelopmentCheckBox->SetValue(model.ShowDevelopPackages());
 	fSourceCodeCheckBox->SetValue(model.ShowSourcePackages());
-}
-
-
-void
-FilterView::SetUsername(const BString& username)
-{
-	BString label;
-	if (username.Length() == 0) {
-		label = B_TRANSLATE("Not logged in");
-	} else {
-		label = B_TRANSLATE("Logged in as %User%");
-		label.ReplaceAll("%User%", username);
-	}
-	fUsername->SetText(label);
 }
 

@@ -10,7 +10,6 @@
 
 class BCheckBox;
 class BMenuField;
-class BStringView;
 class BTextControl;
 class Model;
 
@@ -34,8 +33,6 @@ public:
 			void				AdoptModel(const Model& model);
 			void				AdoptCheckmarks(const Model& model);
 
-			void				SetUsername(const BString& username);
-
 private:
 			BMenuField*			fShowField;
 			BMenuField*			fRepositoryField;
@@ -45,8 +42,6 @@ private:
 			BCheckBox*			fInstalledCheckBox;
 			BCheckBox*			fDevelopmentCheckBox;
 			BCheckBox*			fSourceCodeCheckBox;
-
-			BStringView*		fUsername;
 };
 
 #endif // FILTER_VIEW_H
