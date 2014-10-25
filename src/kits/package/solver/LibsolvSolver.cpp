@@ -182,7 +182,8 @@ LibsolvSolver::LibsolvSolver()
 	fInstalledRepository(NULL),
 	fSolvablePackages(),
 	fPackageSolvables(),
-	fProblems(10, true)
+	fProblems(10, true),
+	fDebugLevel(0)
 {
 }
 
@@ -200,6 +201,16 @@ LibsolvSolver::Init()
 
 	// We do all initialization lazily.
 	return B_OK;
+}
+
+
+void
+LibsolvSolver::SetDebugLevel(int32 level)
+{
+	fDebugLevel = level;
+
+	if (fPool != NULL)
+		pool_setdebuglevel(fPool, fDebugLevel);
 }
 
 
@@ -584,6 +595,8 @@ LibsolvSolver::_InitPool()
 	_CleanupPool();
 
 	fPool = pool_create();
+
+	pool_setdebuglevel(fPool, fDebugLevel);
 
 	// Set the system architecture. We use what uname() returns unless we're on
 	// x86 gcc2.

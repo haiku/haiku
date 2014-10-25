@@ -32,6 +32,8 @@ public:
 
 	virtual	status_t			Init();
 
+	virtual	void				SetDebugLevel(int32 level);
+
 	virtual	status_t			AddRepository(BSolverRepository* repository);
 
 	virtual	status_t			FindPackages(const char* searchString,
@@ -133,6 +135,7 @@ private:
 			SolvableMap			fSolvablePackages;
 			PackageMap			fPackageSolvables;
 			ProblemList			fProblems;
+			int32				fDebugLevel;
 };
 
 

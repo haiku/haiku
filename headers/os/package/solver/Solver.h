@@ -46,6 +46,8 @@ public:
 
 	virtual	status_t			Init() = 0;
 
+	virtual	void				SetDebugLevel(int32 level) = 0;
+
 	virtual	status_t			AddRepository(
 									BSolverRepository* repository) = 0;
 
