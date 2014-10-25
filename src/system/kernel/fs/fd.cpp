@@ -41,7 +41,7 @@ static struct file_descriptor* get_fd_locked(struct io_context* context,
 	int fd);
 static struct file_descriptor* remove_fd(struct io_context* context, int fd);
 static void deselect_select_infos(file_descriptor* descriptor,
-	select_info* infos);
+	select_info* infos, bool putSyncObjects);
 
 
 struct FDGetterLocking {
@@ -367,7 +367,7 @@ remove_fd(struct io_context* context, int fd)
 	mutex_unlock(&context->io_mutex);
 
 	if (selectInfos != NULL)
-		deselect_select_infos(descriptor, selectInfos);
+		deselect_select_infos(descriptor, selectInfos, true);
 
 	return disconnected ? NULL : descriptor;
 }
@@ -457,7 +457,7 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 
 	// Say bye bye to the evicted fd
 	if (evicted) {
-		deselect_select_infos(evicted, selectInfos);
+		deselect_select_infos(evicted, selectInfos, true);
 		close_fd(evicted);
 		put_fd(evicted);
 	}
@@ -525,7 +525,8 @@ fd_ioctl(bool kernelFD, int fd, uint32 op, void* buffer, size_t length)
 
 
 static void
-deselect_select_infos(file_descriptor* descriptor, select_info* infos)
+deselect_select_infos(file_descriptor* descriptor, select_info* infos,
+	bool putSyncObjects)
 {
 	TRACE(("deselect_select_infos(%p, %p)\n", descriptor, infos));
 
@@ -546,7 +547,9 @@ deselect_select_infos(file_descriptor* descriptor, select_info* infos)
 
 		notify_select_events(info, B_EVENT_INVALID);
 		info = info->next;
-		put_select_sync(sync);
+
+		if (putSyncObjects)
+			put_select_sync(sync);
 	}
 }
 
@@ -601,7 +604,7 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 		// Someone close()d the index in the meantime. deselect() all
 		// events.
 		info->next = NULL;
-		deselect_select_infos(descriptor, info);
+		deselect_select_infos(descriptor, info, false);
 
 		// Release our open reference of the descriptor.
 		close_fd(descriptor);
