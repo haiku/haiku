@@ -110,11 +110,7 @@ platform_init_video(void)
 		gFramebuffer = arch_get_fb_arm_920(0x88000000);
 	#elif defined(BOARD_CPU_OMAP3)
 		extern ArchFramebuffer *arch_get_fb_arm_omap3(addr_t base);
-		//FIXME: This is disabled because writing to CM_CLKSEL_DSS during the initialisation
-		//of the framebuffer driver on OMAP3 triggers a floating point exception
-		//(tested in qemu-linaro from git at commit ac0bfdb9c310276521e5b089d7f36c1f610ca60b)
-		//gFramebuffer = arch_get_fb_arm_omap3(FB_BASE);
-		gFramebuffer = NULL;
+		gFramebuffer = arch_get_fb_arm_omap3(FB_BASE);
 	#elif defined(BOARD_CPU_PXA270)
 		ArchFramebuffer *arch_get_fb_arm_pxa270(addr_t base);
 		gFramebuffer = arch_get_fb_arm_pxa270(0xA3000000);

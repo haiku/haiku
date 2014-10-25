@@ -262,7 +262,7 @@ found:
 	setreg(DISPC, DISPC_TIMING_V, m->dispc_timing_v);
 
 	modreg(DISPC, DISPC_DIVISOR, 0xffff, m->dispc_divisor);
-	modaddr(CM_CLKSEL_DSS, 0xffff, m->dss_divisor);
+	modaddr(CM_CLKSEL_DSS, 0x3f, m->dss_divisor);
 
 	// Tell hardware to update, and wait for it
 	modreg(DISPC, DISPC_CONTROL,
