@@ -24,8 +24,8 @@ BootstrapPackageRepository HaikuPortsCross
 	freetype_bootstrap_devel-2.4.9-1
 	gawk_bootstrap-3.1.8-2
 	grep_bootstrap-2.14-1
-	icu_bootstrap-4.8.1.1-1
-	icu_bootstrap_devel-4.8.1.1-1
+	icu_bootstrap-54.1-1
+	icu_bootstrap_devel-54.1-1
 	libtool_bootstrap-2.4-8
 	libtool_bootstrap_libltdl-2.4-8
 	m4_bootstrap-1.4.16-1
