@@ -7883,6 +7883,13 @@ set_cwd(int fd, char* path, bool kernel)
 		goto err;
 	}
 
+	// We need to have the permission to enter the directory, too
+	if (HAS_FS_CALL(vnode, access)) {
+		status = FS_CALL(vnode, access, X_OK);
+		if (status != B_OK)
+			goto err;
+	}
+
 	// Get current io context and lock
 	context = get_current_io_context(kernel);
 	mutex_lock(&context->io_mutex);
