@@ -2237,59 +2237,55 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 
 
 status_t
-FSDeleteFolder(BEntry* dir_entry, CopyLoopControl* loopControl,
-	bool update_status, bool delete_top_dir, bool upateFileNameInStatus)
+FSDeleteFolder(BEntry* dirEntry, CopyLoopControl* loopControl,
+	bool updateStatus, bool deleteTopDir, bool upateFileNameInStatus)
 {
-	entry_ref	ref;
-	BEntry		entry;
-	BDirectory	dir;
-	status_t	err;
+	BDirectory dir(dirEntry);
 
-	dir.SetTo(dir_entry);
-	dir.Rewind();
 	// loop through everything in folder and delete it, skipping trouble files
-	for (;;) {
-		if (dir.GetNextEntry(&entry) != B_OK)
-			break;
-
+	BEntry entry;
+	while (dir.GetNextEntry(&entry) == B_OK) {
+		entry_ref ref;
 		entry.GetRef(&ref);
 
 		if (loopControl->CheckUserCanceled())
 			return kTrashCanceled;
 
+		status_t status;
+
 		if (entry.IsDirectory())
-			err = FSDeleteFolder(&entry, loopControl, update_status, true,
+			status = FSDeleteFolder(&entry, loopControl, updateStatus, true,
 				upateFileNameInStatus);
 		else {
-			err = entry.Remove();
-			if (update_status) {
+			status = entry.Remove();
+			if (updateStatus) {
 				loopControl->UpdateStatus(upateFileNameInStatus ? ref.name
 					: "", ref, 1, true);
 			}
 		}
 
-		if (err == kTrashCanceled)
+		if (status == kTrashCanceled)
 			return kTrashCanceled;
-		else if (err == B_OK)
-			dir.Rewind();
-		else {
+
+		if (status != B_OK) {
 			loopControl->FileError(B_TRANSLATE_NOCOLLECT(
-					kFileDeleteErrorString), ref.name, err, false);
+					kFileDeleteErrorString), ref.name, status, false);
 		}
 	}
 
 	if (loopControl->CheckUserCanceled())
 		return kTrashCanceled;
 
-	dir_entry->GetRef(&ref);
+	entry_ref ref;
+	dirEntry->GetRef(&ref);
 
-	if (update_status && delete_top_dir)
+	if (updateStatus && deleteTopDir)
 		loopControl->UpdateStatus(NULL, ref, 1);
 
-	if (delete_top_dir)
-		return dir_entry->Remove();
-	else
-		return B_OK;
+	if (deleteTopDir)
+		return dirEntry->Remove();
+
+	return B_OK;
 }
 
 
@@ -2810,7 +2806,7 @@ status_t
 empty_trash(void*)
 {
 	// empty trash on all mounted volumes
-	status_t err = B_OK;
+	status_t status = B_OK;
 
 	TrackerCopyLoopControl loopControl(kTrashState);
 
@@ -2835,9 +2831,9 @@ empty_trash(void*)
 		entry_ref ref;
 		entry.GetRef(&ref);
 		srcList.AddItem(&ref);
-		err = CalcItemsAndSize(&loopControl, &srcList, volume.BlockSize(),
+		status = CalcItemsAndSize(&loopControl, &srcList, volume.BlockSize(),
 			&totalCount, &totalSize);
-		if (err != B_OK)
+		if (status != B_OK)
 			break;
 
 		srcList.MakeEmpty();
@@ -2846,7 +2842,7 @@ empty_trash(void*)
 		totalCount--;
 	}
 
-	if (err == B_OK) {
+	if (status == B_OK) {
 		loopControl.Init(totalCount, totalCount);
 
 		volumeRoster.Rewind();
@@ -2860,11 +2856,11 @@ empty_trash(void*)
 
 			BEntry entry;
 			trashDirectory.GetEntry(&entry);
-			err = FSDeleteFolder(&entry, &loopControl, true, false);
+			status = FSDeleteFolder(&entry, &loopControl, true, false);
 		}
 	}
 
-	if (err != B_OK && err != kTrashCanceled && err != kUserCanceled) {
+	if (status != B_OK && status != kTrashCanceled && status != kUserCanceled) {
 		BAlert* alert = new BAlert("", B_TRANSLATE("Error emptying Trash"),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -2922,9 +2918,9 @@ _DeleteTask(BObjectList<entry_ref>* list, bool confirm)
 	int32 totalItems = 0;
 	int64 totalSize = 0;
 
-	status_t err = CalcItemsAndSize(&loopControl, list, 0, &totalItems,
+	status_t status = CalcItemsAndSize(&loopControl, list, 0, &totalItems,
 		&totalSize);
-	if (err == B_OK) {
+	if (status == B_OK) {
 		loopControl.Init(totalItems, totalItems);
 
 		int32 count = list->CountItems();
@@ -2933,14 +2929,16 @@ _DeleteTask(BObjectList<entry_ref>* list, bool confirm)
 			BEntry entry(&ref);
 			loopControl.UpdateStatus(ref.name, ref, 1, true);
 			if (entry.IsDirectory())
-				err = FSDeleteFolder(&entry, &loopControl, true, true, true);
+				status = FSDeleteFolder(&entry, &loopControl, true, true, true);
 			else
-				err = entry.Remove();
+				status = entry.Remove();
 		}
 
-		if (err != kTrashCanceled && err != kUserCanceled && err != B_OK) {
+		if (status != kTrashCanceled && status != kUserCanceled
+			&& status != B_OK) {
 			BAlert* alert = new BAlert("", B_TRANSLATE("Error deleting items"),
-				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
+				B_WARNING_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}
