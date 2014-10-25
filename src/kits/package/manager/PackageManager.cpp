@@ -51,6 +51,7 @@ BPackageManager::BPackageManager(BPackageInstallationLocation location,
 	InstallationInterface* installationInterface,
 	UserInteractionHandler* userInteractionHandler)
 	:
+	fDebugLevel(0),
 	fLocation(location),
 	fSolver(NULL),
 	fSystemRepository(new (std::nothrow) InstalledRepository("system",
@@ -92,6 +93,8 @@ BPackageManager::Init(uint32 flags)
 		throw std::bad_alloc();
 	}
 
+	fSolver->SetDebugLevel(fDebugLevel);
+
 	BRepositoryBuilder(*fLocalRepository).AddToSolver(fSolver, false);
 
 	// add installation location repositories
@@ -127,6 +130,16 @@ BPackageManager::Init(uint32 flags)
 				(flags & B_REFRESH_REPOSITORIES) != 0);
 		}
 	}
+}
+
+
+void
+BPackageManager::SetDebugLevel(int32 level)
+{
+	fDebugLevel = level;
+
+	if (fSolver != NULL)
+		fSolver->SetDebugLevel(fDebugLevel);
 }
 
 

@@ -75,6 +75,9 @@ public:
 
 			void				Init(uint32 flags);
 
+			void				SetDebugLevel(int32 level);
+									// 0 - 10 (passed to libsolv)
+
 			BSolver*			Solver() const
 									{ return fSolver; }
 
@@ -155,6 +158,7 @@ private:
 			bool				_NextSpecificInstallationLocation();
 
 protected:
+			int32				fDebugLevel;
 			BPackageInstallationLocation fLocation;
 			BSolver*			fSolver;
 			InstalledRepository* fSystemRepository;
