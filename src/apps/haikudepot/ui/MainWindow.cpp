@@ -743,8 +743,9 @@ MainWindow::_RefreshPackageList()
 			systemFlaggedPackages.Add(repoPackageInfo.FileName());
 	}
 
-	BAutolock lock(fModel.Lock());
+	fModel.StopPopulatingAllPackages();
 
+	BAutolock lock(fModel.Lock());
 	fModel.Clear();
 
 	// filter remote packages from the found list

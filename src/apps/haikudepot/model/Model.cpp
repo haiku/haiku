@@ -421,7 +421,6 @@ Model::AddDepot(const DepotInfo& depot)
 void
 Model::Clear()
 {
-	StopPopulatingAllPackages();
 	fDepots.Clear();
 }
 
