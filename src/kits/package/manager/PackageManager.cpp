@@ -59,7 +59,7 @@ BPackageManager::BPackageManager(BPackageInstallationLocation location,
 		B_PACKAGE_INSTALLATION_LOCATION_HOME, -3)),
 	fInstalledRepositories(10),
 	fOtherRepositories(10, true),
-	fLocalRepository(NULL),
+	fLocalRepository(new (std::nothrow) MiscLocalRepository),
 	fTransactions(5, true),
 	fInstallationInterface(installationInterface),
 	fUserInteractionHandler(userInteractionHandler)
@@ -87,11 +87,12 @@ BPackageManager::Init(uint32 flags)
 	if (error != B_OK)
 		DIE(error, "failed to create solver");
 
-	if (fSystemRepository == NULL || fHomeRepository == NULL)
+	if (fSystemRepository == NULL || fHomeRepository == NULL
+		|| fLocalRepository == NULL) {
 		throw std::bad_alloc();
+	}
 
-	if (fLocalRepository != NULL)
-		BRepositoryBuilder(*fLocalRepository).AddToSolver(fSolver, false);
+	BRepositoryBuilder(*fLocalRepository).AddToSolver(fSolver, false);
 
 	// add installation location repositories
 	if ((flags & B_ADD_INSTALLED_REPOSITORIES) != 0) {
@@ -763,10 +764,8 @@ BPackageManager::_IsLocalPackage(const char* fileName)
 BSolverPackage*
 BPackageManager::_AddLocalPackage(const char* fileName)
 {
-	// We need a local repository.
 	if (fLocalRepository == NULL)
-		fLocalRepository = new MiscLocalRepository;
-
+		throw std::bad_alloc();
 	return fLocalRepository->AddLocalPackage(fileName);
 }
 
