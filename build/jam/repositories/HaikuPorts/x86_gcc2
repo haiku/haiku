@@ -86,6 +86,7 @@ RemotePackageRepository HaikuPorts
 	getopt-1.1.5-1
 	gettext-0.18.1.1-6
 	gettext_libintl-0.18.1.1-6
+	giddy3-1.4-1
 	giflib-5.0.5-2
 	giflib_devel-5.0.5-2
 	git-1.8.3.4-4
@@ -120,6 +121,8 @@ RemotePackageRepository HaikuPorts
 	hubbub_devel-0.3.0-1
 	icu-54.1-4
 	icu_devel-54.1-4
+	imagemagick-6.8.9_8-1
+	imagemagick_devel-6.8.9_8-1
 	intltool-0.40.6-3
 	itstool-2.0.2-1
 	jam-2.5_2012_10_12-2
@@ -170,8 +173,8 @@ RemotePackageRepository HaikuPorts
 	libpthread_stubs-0.3-2
 	libsanta-3.0.0-3
 	libsanta_devel-3.0.0-3
-	libsdl-1.2.15-5
-	libsdl_devel-1.2.15-5
+	libsdl-1.2.15-6
+	libsdl_devel-1.2.15-6
 	libsndfile-1.0.25-2
 	libsndfile_devel-1.0.25-2
 	libsolv-0.3.0_haiku_2013_10_01-1
@@ -682,6 +685,7 @@ RemotePackageRepository HaikuPorts
 	hubbub
 	icu
 	ilmbase_x86
+	imagemagick
 	intltool
 	itstool
 	jam
