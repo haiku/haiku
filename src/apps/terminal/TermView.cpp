@@ -1686,9 +1686,7 @@ TermView::MessageReceived(BMessage *msg)
 				// pressed
 				int32 steps;
 				const char* stepString;
-				if ((modifiers()
-						& (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY))
-						!= 0) {
+				if ((modifiers() & B_SHIFT_KEY) != 0) {
 					// pagewise
 					stepString = deltaY > 0
 						? PAGE_DOWN_KEY_CODE : PAGE_UP_KEY_CODE;
