@@ -2,8 +2,8 @@
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#ifndef FEATURED_PACKAGE_VIEW_H
-#define FEATURED_PACKAGE_VIEW_H
+#ifndef FEATURED_PACKAGES_VIEW_H
+#define FEATURED_PACKAGES_VIEW_H
 
 
 #include <View.h>
@@ -15,10 +15,10 @@
 class BGroupLayout;
 
 
-class FeaturedPackageView : public BView {
+class FeaturedPackagesView : public BView {
 public:
-								FeaturedPackageView();
-	virtual						~FeaturedPackageView();
+								FeaturedPackagesView();
+	virtual						~FeaturedPackagesView();
 
 			void				AddPackage(const PackageInfoRef& package);
 			void				Clear();
@@ -29,4 +29,4 @@ private:
 };
 
 
-#endif // FEATURED_PACKAGE_VIEW_H
+#endif // FEATURED_PACKAGES_VIEW_H

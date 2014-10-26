@@ -3,7 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "FeaturedPackageView.h"
+#include "FeaturedPackagesView.h"
 
 #include <stdio.h>
 
@@ -22,7 +22,7 @@
 
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "FeaturedPackageView"
+#define B_TRANSLATION_CONTEXT "FeaturedPackagesView"
 
 
 static const rgb_color kLightBlack = (rgb_color){ 60, 60, 60, 255 };
@@ -148,10 +148,10 @@ private:
 };
 
 
-// #pragma mark - FeaturedPackageView
+// #pragma mark - FeaturedPackagesView
 
 
-FeaturedPackageView::FeaturedPackageView()
+FeaturedPackagesView::FeaturedPackagesView()
 	:
 	BView("featured package view", 0)
 {
@@ -171,13 +171,13 @@ FeaturedPackageView::FeaturedPackageView()
 }
 
 
-FeaturedPackageView::~FeaturedPackageView()
+FeaturedPackagesView::~FeaturedPackagesView()
 {
 }
 
 
 void
-FeaturedPackageView::AddPackage(const PackageInfoRef& package)
+FeaturedPackagesView::AddPackage(const PackageInfoRef& package)
 {
 	PackageView* view = new PackageView();
 	view->SetPackage(package);
@@ -186,7 +186,7 @@ FeaturedPackageView::AddPackage(const PackageInfoRef& package)
 
 
 void
-FeaturedPackageView::Clear()
+FeaturedPackagesView::Clear()
 {
 	for (int32 i = fPackageListLayout->CountItems() - 1;
 			BLayoutItem* item = fPackageListLayout->ItemAt(i); i--) {

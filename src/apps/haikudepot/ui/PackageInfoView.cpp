@@ -30,13 +30,12 @@
 #include "BitmapButton.h"
 #include "BitmapView.h"
 #include "LinkView.h"
-#include "MarkupParser.h"
+#include "MarkupTextView.h"
 #include "MessagePackageListener.h"
 #include "PackageActionHandler.h"
 #include "PackageManager.h"
 #include "RatingView.h"
 #include "ScrollableGroupView.h"
-#include "TextDocumentView.h"
 #include "TextView.h"
 
 
@@ -106,66 +105,6 @@ public:
 			}
 		}
 	}
-};
-
-
-class MarkupTextView : public TextDocumentView {
-public:
-	MarkupTextView(const char* name)
-		:
-		TextDocumentView(name)
-	{
-		SetEditingEnabled(false);
-		CharacterStyle regularStyle;
-
-		float fontSize = regularStyle.Font().Size();
-
-		ParagraphStyle paragraphStyle;
-		paragraphStyle.SetJustify(true);
-		paragraphStyle.SetSpacingTop(ceilf(fontSize * 0.3f));
-		paragraphStyle.SetLineSpacing(ceilf(fontSize * 0.2f));
-
-		fMarkupParser.SetStyles(regularStyle, paragraphStyle);
-	}
-
-	void SetText(const BString& markupText)
-	{
-		SetTextDocument(fMarkupParser.CreateDocumentFromMarkup(markupText));
-	}
-
-	void SetText(const BString heading, const BString& markupText)
-	{
-		TextDocumentRef document(new(std::nothrow) TextDocument(), true);
-
-		Paragraph paragraph(fMarkupParser.HeadingParagraphStyle());
-		paragraph.Append(TextSpan(heading,
-			fMarkupParser.HeadingCharacterStyle()));
-		document->Append(paragraph);
-
-		fMarkupParser.AppendMarkup(document, markupText);
-
-		SetTextDocument(document);
-	}
-
-	void SetDisabledText(const BString& text)
-	{
-		TextDocumentRef document(new(std::nothrow) TextDocument(), true);
-
-		ParagraphStyle paragraphStyle;
-		paragraphStyle.SetAlignment(ALIGN_CENTER);
-
-		CharacterStyle disabledStyle(fMarkupParser.NormalCharacterStyle());
-		disabledStyle.SetForegroundColor(kLightBlack);
-
-		Paragraph paragraph(paragraphStyle);
-		paragraph.Append(TextSpan(text, disabledStyle));
-		document->Append(paragraph);
-
-		SetTextDocument(document);
-	}
-
-private:
-	MarkupParser	fMarkupParser;
 };
 
 
