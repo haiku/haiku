@@ -23,9 +23,7 @@ struct arm_debug_cpu_state {
         ulong r14;      /* link register */
         ulong r15;      /* program counter */
         ulong cpsr;
-#if __ARM__
-#warning ARM: missing members!
-#endif
+	// TODO missing members!
 	uint32	dummy;
 } __attribute__((aligned(8)));
 
