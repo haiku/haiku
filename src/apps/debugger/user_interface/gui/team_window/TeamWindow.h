@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_WINDOW_H
@@ -33,10 +33,12 @@ class BStringView;
 class BTabView;
 class ConsoleOutputView;
 class BreakConditionConfigWindow;
+class ExpressionEvaluationWindow;
 class Image;
 class InspectorWindow;
 class RegistersView;
 class SourceCode;
+class SourceLanguage;
 class StackFrame;
 class UserBreakpoint;
 class UserInterfaceListener;
@@ -180,6 +182,9 @@ private:
 
 			status_t			_SaveInspectorSettings(
 									const BMessage* settings);
+
+			status_t			_GetActiveSourceLanguage(
+									SourceLanguage*& language);
 private:
 			::Team*				fTeam;
 			::Thread*			fActiveThread;
@@ -216,6 +221,7 @@ private:
 			BSplitView*			fConsoleSplitView;
 			BreakConditionConfigWindow* fBreakConditionConfigWindow;
 			InspectorWindow*	fInspectorWindow;
+			ExpressionEvaluationWindow* fExpressionWindow;
 			GuiTeamUiSettings	fUiSettings;
 			BFilePanel*			fFilePanel;
 			thread_id			fActiveSourceWorker;

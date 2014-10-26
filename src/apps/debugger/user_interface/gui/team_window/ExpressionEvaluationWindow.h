@@ -23,19 +23,22 @@ class ExpressionEvaluationWindow : public BWindow
 public:
 								ExpressionEvaluationWindow(
 									SourceLanguage* language,
-									UserInterfaceListener* listener);
+									UserInterfaceListener* listener,
+									BHandler* target);
 
 								~ExpressionEvaluationWindow();
 
 	static	ExpressionEvaluationWindow* Create(
 									SourceLanguage* language,
-									UserInterfaceListener* listener);
+									UserInterfaceListener* listener,
+									BHandler* target);
 									// throws
 
 
 	virtual	void				MessageReceived(BMessage* message);
 
 	virtual	void				Show();
+	virtual	bool				QuitRequested();
 
 private:
 			void	 			_Init();
@@ -47,6 +50,7 @@ private:
 			BStringView*		fExpressionOutput;
 			BButton*			fEvaluateButton;
 			UserInterfaceListener* fListener;
+			BHandler*			fCloseTarget;
 };
 
 #endif // EXPRESSION_EVALUATION_WINDOW_H

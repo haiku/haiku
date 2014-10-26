@@ -65,6 +65,8 @@ enum {
 	MSG_DEBUG_THIS_TEAM							= 'dbtt',
 	MSG_SHOW_INSPECTOR_WINDOW					= 'sirw',
 	MSG_INSPECTOR_WINDOW_CLOSED					= 'irwc',
+	MSG_SHOW_EXPRESSION_WINDOW					= 'seww',
+	MSG_EXPRESSION_WINDOW_CLOSED				= 'ewwc',
 	MSG_INSPECT_ADDRESS							= 'isad',
 	MSG_SHOW_TYPECAST_NODE_PROMPT				= 'stnp',
 	MSG_TYPECAST_TO_ARRAY						= 'stta',

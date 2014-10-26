@@ -35,9 +35,11 @@
 
 #include "Breakpoint.h"
 #include "ConsoleOutputView.h"
+#include "CppLanguage.h"
 #include "CpuState.h"
 #include "DisassembledCode.h"
 #include "BreakConditionConfigWindow.h"
+#include "ExpressionEvaluationWindow.h"
 #include "FileSourceCode.h"
 #include "GuiSettingsUtils.h"
 #include "GuiTeamUiSettings.h"
@@ -135,6 +137,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fConsoleSplitView(NULL),
 	fBreakConditionConfigWindow(NULL),
 	fInspectorWindow(NULL),
+	fExpressionWindow(NULL),
 	fFilePanel(NULL),
 	fActiveSourceWorker(-1)
 {
@@ -161,6 +164,11 @@ TeamWindow::~TeamWindow()
 		BMessenger messenger(fInspectorWindow);
 		if (messenger.LockTarget())
 			fInspectorWindow->Quit();
+	}
+	if (fExpressionWindow != NULL) {
+		BMessenger messenger(fExpressionWindow);
+		if (messenger.LockTarget())
+			fExpressionWindow->Quit();
 	}
 
 	fTeam->RemoveListener(this);
@@ -333,6 +341,33 @@ TeamWindow::MessageReceived(BMessage* message)
 			fInspectorWindow = NULL;
 			break;
 
+		}
+		case MSG_SHOW_EXPRESSION_WINDOW:
+		{
+			if (fExpressionWindow != NULL)
+				fExpressionWindow->Activate(true);
+			else {
+				try {
+					SourceLanguage* language = NULL;
+					if (_GetActiveSourceLanguage(language) != B_OK)
+						break;
+
+					BReference<SourceLanguage> languageReference(language,
+						true);
+					fExpressionWindow = ExpressionEvaluationWindow::Create(
+						language, fListener, this);
+					if (fExpressionWindow != NULL)
+						fExpressionWindow->Show();
+	           	} catch (...) {
+	           		// TODO: notify user
+	           	}
+			}
+			break;
+		}
+		case MSG_EXPRESSION_WINDOW_CLOSED:
+		{
+			fExpressionWindow = NULL;
+			break;
 		}
 		case MSG_SHOW_BREAK_CONDITION_CONFIG_WINDOW:
 		{
@@ -998,6 +1033,10 @@ TeamWindow::_Init()
 	item->SetTarget(this);
 	item = new BMenuItem("Inspect memory",
 		new BMessage(MSG_SHOW_INSPECTOR_WINDOW), 'I');
+	menu->AddItem(item);
+	item->SetTarget(this);
+	item = new BMenuItem("Evaluate expression",
+		new BMessage(MSG_SHOW_EXPRESSION_WINDOW), 'E');
 	menu->AddItem(item);
 	item->SetTarget(this);
 
@@ -1767,6 +1806,30 @@ status_t
 TeamWindow::_SaveInspectorSettings(const BMessage* settings)
 {
 	if (fUiSettings.AddSettings("inspectorWindow", *settings) != B_OK)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+status_t
+TeamWindow::_GetActiveSourceLanguage(SourceLanguage*& _language)
+{
+	AutoLocker< ::Team> locker(fTeam);
+
+	if (!locker.IsLocked())
+		return B_ERROR;
+
+	if (fActiveSourceCode != NULL) {
+		_language = fActiveSourceCode->GetSourceLanguage();
+		return B_OK;
+	}
+
+	// if we made it this far, we were unable to acquire a source
+	// language corresponding to the active function. As such,
+	// try to fall back to the C++-style parser.
+	_language = new(std::nothrow) CppLanguage();
+	if (_language == NULL)
 		return B_NO_MEMORY;
 
 	return B_OK;

@@ -23,12 +23,14 @@ enum {
 
 
 ExpressionEvaluationWindow::ExpressionEvaluationWindow(
-	SourceLanguage* language, UserInterfaceListener* listener)
+	SourceLanguage* language, UserInterfaceListener* listener,
+	BHandler* target)
 	:
 	BWindow(BRect(), "Evaluate Expression", B_FLOATING_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fLanguage(language),
-	fListener(listener)
+	fListener(listener),
+	fCloseTarget(target)
 {
 	fLanguage->AcquireReference();
 }
@@ -42,10 +44,10 @@ ExpressionEvaluationWindow::~ExpressionEvaluationWindow()
 
 ExpressionEvaluationWindow*
 ExpressionEvaluationWindow::Create(SourceLanguage* language,
-	UserInterfaceListener* listener)
+	UserInterfaceListener* listener, BHandler* target)
 {
 	ExpressionEvaluationWindow* self = new ExpressionEvaluationWindow(
-		language, listener);
+		language, listener, target);
 
 	try {
 		self->_Init();
@@ -92,6 +94,16 @@ ExpressionEvaluationWindow::Show()
 {
 	CenterOnScreen();
 	BWindow::Show();
+}
+
+
+bool
+ExpressionEvaluationWindow::QuitRequested()
+{
+	BMessenger messenger(fCloseTarget);
+	messenger.SendMessage(MSG_EXPRESSION_WINDOW_CLOSED);
+
+	return BWindow::QuitRequested();
 }
 
 
