@@ -41,6 +41,7 @@ Application HaikuDepot :
 	DecisionProvider.cpp
 	FilterView.cpp
 	JobStateListener.cpp
+	LinkView.cpp
 	main.cpp
 	MainWindow.cpp
 	Model.cpp
@@ -54,6 +55,7 @@ Application HaikuDepot :
 	RatePackageWindow.cpp
 	RatingView.cpp
 	support.cpp
+	ScrollableGroupView.cpp
 	SharedBitmap.cpp
 	UserLoginWindow.cpp
 	WebAppInterface.cpp

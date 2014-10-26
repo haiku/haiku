@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-214, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -14,7 +14,6 @@
 #include <Button.h>
 #include <CardLayout.h>
 #include <Catalog.h>
-#include <Cursor.h>
 #include <Font.h>
 #include <GridView.h>
 #include <LayoutBuilder.h>
@@ -30,10 +29,12 @@
 
 #include "BitmapButton.h"
 #include "BitmapView.h"
+#include "LinkView.h"
 #include "MarkupParser.h"
 #include "PackageActionHandler.h"
 #include "PackageManager.h"
 #include "RatingView.h"
+#include "ScrollableGroupView.h"
 #include "TextDocumentView.h"
 #include "TextView.h"
 
@@ -164,94 +165,6 @@ public:
 
 private:
 	MarkupParser	fMarkupParser;
-};
-
-
-class LinkView : public BStringView, public BInvoker {
-public:
-	LinkView(const char* name, const char* string, BMessage* message,
-		rgb_color color)
-		:
-		BStringView(name, string),
-		BInvoker(message, NULL),
-		fNormalColor(color),
-		fHoverColor(make_color(1, 141, 211)),
-		fEnabled(true),
-		fMouseInside(false)
-	{
-		SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-		SetExplicitMinSize(BSize(120, B_SIZE_UNSET));
-		_UpdateLinkColor();
-	}
-
-	virtual void MouseMoved(BPoint where, uint32 transit,
-		const BMessage* dragMessage)
-	{
-		if (transit == B_ENTERED_VIEW) {
-			fMouseInside = true;
-			_UpdateLinkColor();
-		} else if (transit == B_EXITED_VIEW) {
-			fMouseInside = false;
-			_UpdateLinkColor();
-		}
-	}
-
-	virtual void MouseDown(BPoint where)
-	{
-		if (fEnabled)
-			Invoke(Message());
-	}
-
-	virtual void Draw(BRect updateRect)
-	{
-		if (Text() == NULL)
-			return;
-
-		SetLowColor(ViewColor());
-
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
-	
-		BRect bounds = Bounds();
-	
-		float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
-			- ceilf(fontHeight.descent)) / 2.0 + ceilf(fontHeight.ascent);
-		float x = 0.0f;
-		
-		BString text(Text());
-		TruncateString(&text, B_TRUNCATE_END, bounds.Width());
-		DrawString(text, BPoint(x, y));
-	}
-
-	void SetEnabled(bool enabled)
-	{
-		if (fEnabled != enabled) {
-			fEnabled = enabled;
-			_UpdateLinkColor();
-		}
-	}
-
-private:
-	void _UpdateLinkColor()
-	{
-		if (fEnabled && fMouseInside) {
-			SetHighColor(fHoverColor);
-			BCursor cursor(B_CURSOR_ID_FOLLOW_LINK);
-			SetViewCursor(&cursor, true);
-			Invalidate();
-		} else {
-			SetHighColor(fNormalColor);
-			SetViewCursor(NULL);
-			Invalidate();
-		}
-	}
-
-private:
-	rgb_color	fNormalColor;
-	rgb_color	fHoverColor;
-
-	bool		fEnabled;
-	bool		fMouseInside;
 };
 
 
@@ -1098,53 +1011,6 @@ private:
 };
 
 
-class RatingContainerView : public BGroupView {
-public:
-	RatingContainerView()
-		:
-		BGroupView(B_VERTICAL, 0.0)
-	{
-		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			kContentTint));
-		AddChild(BSpaceLayoutItem::CreateGlue());
-	}
-
-	virtual BSize MinSize()
-	{
-		BSize minSize = BGroupView::MinSize();
-		return BSize(minSize.width, 80);
-	}
-
-protected:
-	virtual void DoLayout()
-	{
-		BGroupView::DoLayout();
-		if (BScrollBar* scrollBar = ScrollBar(B_VERTICAL)) {
-			BRect layoutArea = GroupLayout()->LayoutArea();
-			float layoutHeight = layoutArea.Height();
-			// Min size is not reliable with HasHeightForWidth() children,
-			// since it does not reflect how thos children are currently
-			// laid out, but what their theoretical minimum size would be.
-
-			BLayoutItem* lastItem = GroupLayout()->ItemAt(
-				GroupLayout()->CountItems() - 1);
-			if (lastItem != NULL) {
-				layoutHeight = lastItem->Frame().bottom;
-			}
-
-			float viewHeight = Bounds().Height();
-
-			float max = layoutHeight- viewHeight;
-			scrollBar->SetRange(0, max);
-			if (layoutHeight > 0)
-				scrollBar->SetProportion(viewHeight / layoutHeight);
-			else
-				scrollBar->SetProportion(1);
-		}
-	}
-};
-
-
 class RatingSummaryView : public BGridView {
 public:
 	RatingSummaryView()
@@ -1224,7 +1090,9 @@ public:
 
 		fRatingSummaryView = new RatingSummaryView();
 
-		RatingContainerView* ratingsContainerView = new RatingContainerView();
+		ScrollableGroupView* ratingsContainerView = new ScrollableGroupView();
+		ratingsContainerView->SetViewColor(
+			tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), kContentTint));
 		fRatingContainerLayout = ratingsContainerView->GroupLayout();
 
 		BScrollView* scrollView = new RatingsScrollView(
