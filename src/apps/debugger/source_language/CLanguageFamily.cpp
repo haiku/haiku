@@ -1,13 +1,18 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
 #include "CLanguageFamily.h"
 
+#include <new>
+
 #include <stdlib.h>
 
+#include "CLanguageExpressionEvaluator.h"
+#include "IntegerValue.h"
+#include "StringValue.h"
 #include "TeamTypeInformation.h"
 #include "Type.h"
 #include "TypeLookupConstraints.h"
@@ -156,4 +161,31 @@ CLanguageFamily::ParseTypeExpression(const BString& expression,
 	typeRef.Detach();
 
 	return result;
+}
+
+
+status_t
+CLanguageFamily::EvaluateExpression(const BString& expression, Value*& _output)
+{
+	_output = NULL;
+	CLanguageExpressionEvaluator evaluator;
+	evaluator.SetSupportHexInput(true);
+	int64 resultValue;
+	try {
+		resultValue = evaluator.EvaluateToInt64(expression);
+		BVariant variantValue(resultValue);
+		_output = new(std::nothrow) IntegerValue(variantValue);
+		if (_output == NULL)
+			return B_NO_MEMORY;
+
+		return B_OK;
+	} catch (ParseException ex) {
+		BString stringValue;
+		stringValue.SetToFormat("Parse error at position %" B_PRId32 ": %s",
+			ex.position, ex.message.String());
+		_output = new(std::nothrow) StringValue(stringValue);
+		return B_BAD_DATA;
+	}
+
+	return B_OK;
 }

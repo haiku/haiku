@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef C_LANGUAGE_FAMILY_H
@@ -19,6 +20,9 @@ public:
 	virtual status_t 			ParseTypeExpression(const BString& expression,
 									TeamTypeInformation* lookup,
 									Type*& _resultType) const;
+
+	virtual	status_t			EvaluateExpression(const BString& expression,
+									Value*& _output);
 
 protected:
 	virtual	bool				IsModifierValid(char modifier) const = 0;
