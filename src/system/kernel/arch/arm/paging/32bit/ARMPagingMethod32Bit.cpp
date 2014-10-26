@@ -327,10 +327,9 @@ ARMPagingMethod32Bit::InitPostArea(kernel_args* args)
 	area_id area;
 
 	temp = (void*)fKernelVirtualPageDirectory;
-	area = create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS, ARM_MMU_L1_TABLE_SIZE,
+	area = create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS, args->arch_args.next_pagetable,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < B_OK)
-		return area;
+	ASSERT_PRINT(area >= 0, "Failed mapping the kernel page directory: 0x%08lx!", area);
 
 	int32 poolCount = _GetInitialPoolCount();
 	for (int32 i = 0; i < poolCount; i++) {
