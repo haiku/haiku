@@ -27,7 +27,7 @@ public:
 									// returns a reference,
 									// may return NULL, if not available
 
-	virtual status_t			ParseTypeExpression(const BString &expression,
+	virtual status_t			ParseTypeExpression(const BString& expression,
 									TeamTypeInformation* info,
 									Type*& _resultType) const;
 
