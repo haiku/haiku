@@ -302,9 +302,9 @@ public:
 			const BString&		LocalFilePath() const
 									{ return fLocalFilePath; }
 			bool				IsLocalFile() const;
+			const BString&		FileName() const
+									{ return fFileName; }
 			
-			BPath				FindAppToLaunch() const;
-
 			void				ClearCategories();
 			bool				AddCategory(const CategoryRef& category);
 			const CategoryList&	Categories() const
@@ -359,6 +359,7 @@ private:
 			bool				fSystemDependency;
 			BString				fArchitecture;
 			BString				fLocalFilePath;
+			BString				fFileName;
 
 	static	BitmapRef			sDefaultIcon;
 };

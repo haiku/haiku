@@ -470,7 +470,8 @@ PackageInfo::PackageInfo()
 	fFlags(0),
 	fSystemDependency(false),
 	fArchitecture(),
-	fLocalFilePath()
+	fLocalFilePath(),
+	fFileName()
 {
 }
 
@@ -493,7 +494,8 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fFlags(info.Flags()),
 	fSystemDependency(false),
 	fArchitecture(info.ArchitectureName()),
-	fLocalFilePath()
+	fLocalFilePath(),
+	fFileName(info.FileName())
 {
 	BString publisherURL;
 	if (info.URLList().CountStrings() > 0)
@@ -530,7 +532,8 @@ PackageInfo::PackageInfo(const BString& title,
 	fFlags(flags),
 	fSystemDependency(false),
 	fArchitecture(architecture),
-	fLocalFilePath()
+	fLocalFilePath(),
+	fFileName()
 {
 }
 
@@ -555,7 +558,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fFlags(other.fFlags),
 	fSystemDependency(other.fSystemDependency),
 	fArchitecture(other.fArchitecture),
-	fLocalFilePath(other.fLocalFilePath)
+	fLocalFilePath(other.fLocalFilePath),
+	fFileName(other.fFileName)
 {
 }
 
@@ -582,6 +586,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fSystemDependency = other.fSystemDependency;
 	fArchitecture = other.fArchitecture;
 	fLocalFilePath = other.fLocalFilePath;
+	fFileName = other.fFileName;
 
 	return *this;
 }
@@ -607,7 +612,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fDownloadProgress == other.fDownloadProgress
 		&& fSystemDependency == other.fSystemDependency
 		&& fArchitecture == other.fArchitecture
-		&& fLocalFilePath == other.fLocalFilePath;
+		&& fLocalFilePath == other.fLocalFilePath
+		&& fFileName == other.fFileName;
 }
 
 
@@ -734,36 +740,6 @@ bool
 PackageInfo::IsLocalFile() const
 {
 	return !fLocalFilePath.IsEmpty() && fInstallationLocations.empty();
-}
-
-
-BPath
-PackageInfo::FindAppToLaunch() const
-{
-	BPath path;
-	if (fLocalFilePath.IsEmpty() || fInstallationLocations.empty())
-		return path;
-
-	BPath packagePath;
-	if (fInstallationLocations.find(
-			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_SYSTEM)
-		!= fInstallationLocations.end()) {
-		if (find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &packagePath) != B_OK)
-			return path;
-	} else if (fInstallationLocations.find(
-			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME)
-		!= fInstallationLocations.end()) {
-		if (find_directory(B_USER_PACKAGES_DIRECTORY, &packagePath) != B_OK)
-			return path;
-	} else {
-		return path;
-	}
-
-	packagePath.Append(fLocalFilePath);
-	
-	// TODO: Scan package contents for Deskbar links
-	
-	return path;
 }
 
 
