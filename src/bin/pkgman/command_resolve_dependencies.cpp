@@ -42,6 +42,11 @@ static const char* const kLongUsage =
 	"Resolves and lists all packages the given packages depend on. Fails, if\n"
 	"not all dependencies could be resolved.\n"
 	"\n"
+	"Options:\n"
+	"  --debug <level>\n"
+	"    Print debug output. <level> should be between 0 (no debug output,\n"
+	"    the default) and 10 (most debug output).\n"
+	"\n"
 	"Arguments:\n"
 	"  <package>\n"
 	"    The HPKG or package info file of the package for which the\n"
@@ -114,6 +119,7 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 {
 	while (true) {
 		static struct option sLongOptions[] = {
+			{ "debug", required_argument, 0, OPTION_DEBUG },
 			{ "help", no_argument, 0, 'h' },
 			{ 0, 0, 0, 0 }
 		};
@@ -122,6 +128,9 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 		int c = getopt_long(argc, (char**)argv, "h", sLongOptions, NULL);
 		if (c == -1)
 			break;
+
+		if (fCommonOptions.HandleOption(c))
+			continue;
 
 		switch (c) {
 			case 'h':
@@ -160,6 +169,8 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 	status_t error = BSolver::Create(solver);
 	if (error != B_OK)
 		DIE(error, "failed to create solver");
+
+	solver->SetDebugLevel(fCommonOptions.DebugLevel());
 
 	// add repositories
 	BPackagePathMap packagePaths;
