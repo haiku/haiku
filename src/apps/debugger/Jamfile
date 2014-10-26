@@ -264,6 +264,7 @@ Application Debugger :
 	BreakpointListView.cpp
 	BreakpointsView.cpp
 	ConsoleOutputView.cpp
+	ExpressionEvaluationWindow.cpp
 	ImageFunctionsView.cpp
 	ImageListView.cpp
 	RegistersView.cpp
