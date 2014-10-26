@@ -15,10 +15,20 @@
 
 #include <Alert.h>
 #include <Catalog.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <Path.h>
+#include <Roster.h>
 
 #include <package/DownloadFileRequest.h>
 #include <package/manager/Exceptions.h>
 #include <package/RefreshRepositoryRequest.h>
+#include <package/hpkg/NoErrorOutput.h>
+#include <package/hpkg/PackageContentHandler.h>
+#include <package/hpkg/PackageEntry.h>
+#include <package/hpkg/PackageEntryAttribute.h>
+#include <package/hpkg/PackageInfoAttributeValue.h>
+#include <package/hpkg/PackageReader.h>
 #include <package/solver/SolverPackage.h>
 #include <package/solver/SolverProblem.h>
 #include <package/solver/SolverProblemSolution.h>
@@ -35,6 +45,7 @@
 #define B_TRANSLATION_CONTEXT "PackageManager"
 
 
+using namespace BPackageKit;
 using namespace BPackageKit::BPrivate;
 using namespace BPackageKit::BManager::BPrivate;
 
@@ -43,6 +54,12 @@ using BPackageKit::DownloadFileRequest;
 using BPackageKit::BSolver;
 using BPackageKit::BSolverPackage;
 using BPackageKit::BSolverRepository;
+using BPackageKit::BHPKG::BNoErrorOutput;
+using BPackageKit::BHPKG::BPackageContentHandler;
+using BPackageKit::BHPKG::BPackageEntry;
+using BPackageKit::BHPKG::BPackageEntryAttribute;
+using BPackageKit::BHPKG::BPackageInfoAttributeValue;
+using BPackageKit::BHPKG::BPackageReader;
 
 
 typedef std::set<PackageInfoRef> PackageInfoSet;
@@ -282,6 +299,232 @@ private:
 };
 
 
+// #pragma mark - OpenPackageAction
+
+
+struct DeskbarLink {
+	DeskbarLink()
+	{
+	}
+
+	DeskbarLink(const BString& path, const BString& link)
+		:
+		path(path),
+		link(link)
+	{
+	}
+	
+	DeskbarLink(const DeskbarLink& other)
+		:
+		path(other.path),
+		link(other.link)
+	{
+	}
+	
+	DeskbarLink& operator=(const DeskbarLink& other)
+	{
+		if (this == &other)
+			return *this;
+		path = other.path;
+		link = other.link;
+		return *this;
+	}
+	
+	bool operator==(const DeskbarLink& other)
+	{
+		return path == other.path && link == other.link;
+	}
+	
+	bool operator!=(const DeskbarLink& other)
+	{
+		return !(*this == other);
+	}
+	
+	BString	path;
+	BString	link;
+};
+
+
+typedef List<DeskbarLink, false> DeskbarLinkList;
+
+
+class DeskbarLinkFinder : public BPackageContentHandler {
+public:
+	DeskbarLinkFinder(DeskbarLinkList& foundLinks)
+		:
+		fDeskbarLinks(foundLinks)
+	{
+	}
+
+	virtual status_t HandleEntry(BPackageEntry* entry)
+	{
+		BString path = MakePath(entry);
+		if (path.FindFirst("data/deskbar/menu") == 0
+			&& entry->SymlinkPath() != NULL) {
+			printf("found deskbar entry: %s -> %s\n", path.String(),
+				entry->SymlinkPath());
+			fDeskbarLinks.Add(DeskbarLink(path, entry->SymlinkPath()));
+		}
+		return B_OK;
+	}
+	
+	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
+		BPackageEntryAttribute* attribute)
+	{
+		return B_OK;
+	}
+	
+	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	{
+		return B_OK;
+	}
+	
+	virtual status_t HandlePackageAttribute(
+		const BPackageInfoAttributeValue& value)
+	{
+		return B_OK;
+	}
+	
+	virtual void HandleErrorOccurred()
+	{
+	}
+
+	BString MakePath(const BPackageEntry* entry)
+	{
+		BString path;
+		while (entry != NULL) {
+			if (!path.IsEmpty())
+				path.Prepend('/', 1);
+			path.Prepend(entry->Name());
+			entry = entry->Parent();
+		}
+		return path;
+	}
+
+private:
+	DeskbarLinkList&	fDeskbarLinks;
+};
+
+
+class OpenPackageAction : public PackageAction {
+public:
+	OpenPackageAction(PackageInfoRef package, Model* model,
+		const DeskbarLink& link)
+		:
+		PackageAction(PACKAGE_ACTION_OPEN, package, model),
+		fDeskbarLink(link),
+		fLabel(B_TRANSLATE("Open %DeskbarLink%"))
+	{
+		BString target = fDeskbarLink.link;
+		int32 lastPathSeparator = target.FindLast('/');
+		if (lastPathSeparator > 0 && lastPathSeparator + 1 < target.Length())
+			target.Remove(0, lastPathSeparator + 1);
+		
+		fLabel.ReplaceAll("%DeskbarLink%", target);
+	}
+
+	virtual const char* Label() const
+	{
+		return fLabel;
+	}
+
+	virtual status_t Perform()
+	{
+		status_t status;
+		BPath path;
+		if (fDeskbarLink.link.FindFirst('/') == 0) {
+			status = path.SetTo(fDeskbarLink.link);
+			printf("trying to launch (absolute link): %s\n", path.Path());
+		} else {
+			int32 location = InstallLocation();
+			if (location == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
+				status = find_directory(B_SYSTEM_DIRECTORY, &path);
+				if (status != B_OK)
+					return status;
+			} else if (location == B_PACKAGE_INSTALLATION_LOCATION_HOME) {
+				status = find_directory(B_USER_DIRECTORY, &path);
+				if (status != B_OK)
+					return status;
+			} else {
+				return B_ERROR;
+			}
+			
+			status = path.Append(fDeskbarLink.path);
+			if (status == B_OK)
+				status = path.GetParent(&path);
+			if (status == B_OK) {
+				status = path.Append(fDeskbarLink.link, true);
+				printf("trying to launch: %s\n", path.Path());
+			}
+		}
+		
+		entry_ref ref;
+		if (status == B_OK)
+			status = get_ref_for_path(path.Path(), &ref);
+		
+		if (status == B_OK)
+			status = be_roster->Launch(&ref);
+		
+		return status;
+	}
+
+	static bool FindAppToLaunch(const PackageInfoRef& package,
+		DeskbarLinkList& foundLinks)
+	{
+		if (package.Get() == NULL)
+			return false;
+
+		int32 installLocation = InstallLocation(package);
+
+		BPath packagePath;
+		if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
+			if (find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &packagePath)
+				!= B_OK) {
+				return false;
+			}
+		} else if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_HOME) {
+			if (find_directory(B_USER_PACKAGES_DIRECTORY, &packagePath)
+				!= B_OK) {
+				return false;
+			}
+		} else {
+			printf("OpenPackageAction::FindAppToLaunch(): "
+				"unknown install location");
+			return false;
+		}
+
+		packagePath.Append(package->FileName());
+		
+		BNoErrorOutput errorOutput;
+		BPackageReader reader(&errorOutput);
+
+		status_t status = reader.Init(packagePath.Path());
+		if (status != B_OK) {
+			printf("OpenPackageAction::FindAppToLaunch(): "
+				"failed to init BPackageReader(%s): %s\n",
+				packagePath.Path(), strerror(status));
+			return false;
+		}
+		
+		// Scan package contents for Deskbar links
+		DeskbarLinkFinder contentHandler(foundLinks);
+		status = reader.ParseContent(&contentHandler);
+		if (status != B_OK) {
+			printf("OpenPackageAction::FindAppToLaunch(): "
+				"failed parse package contents (%s): %s\n",
+				packagePath.Path(), strerror(status));
+			return false;
+		}
+		
+		return foundLinks.CountItems() > 0;
+	}
+
+private:
+	DeskbarLink		fDeskbarLink;
+	BString			fLabel;
+};
+
+
 // #pragma mark - PackageManager
 
 
@@ -324,6 +567,18 @@ PackageManager::GetPackageActions(PackageInfoRef package, Model* model)
 	if (state == ACTIVATED || state == INSTALLED) {
 		actionList.Add(PackageActionRef(new UninstallPackageAction(
 			package, model), true));
+		
+		// Add OpenPackageActions for each deskbar link found in the
+		// package
+		DeskbarLinkList foundLinks;
+		if (OpenPackageAction::FindAppToLaunch(package, foundLinks)
+			&& foundLinks.CountItems() < 4) {
+			for (int32 i = 0; i < foundLinks.CountItems(); i++) {
+				const DeskbarLink& link = foundLinks.ItemAtFast(i);
+				actionList.Add(PackageActionRef(new OpenPackageAction(
+					package, model, link), true));
+			}
+		}
 	} else if (state == NONE || state == UNINSTALLED) {
 		actionList.Add(PackageActionRef(new InstallPackageAction(package,
 				model),	true));

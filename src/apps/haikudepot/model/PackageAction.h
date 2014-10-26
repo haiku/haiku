@@ -17,6 +17,7 @@ class PackageManager;
 enum {
 	PACKAGE_ACTION_INSTALL = 0,
 	PACKAGE_ACTION_UNINSTALL,
+	PACKAGE_ACTION_OPEN,
 	PACKAGE_ACTION_MAX
 };
 
@@ -43,6 +44,11 @@ public:
 			PackageInfoRef		Package() const
 									{ return fPackage; }
 
+			int32				InstallLocation() const
+									{ return fInstallLocation; }
+
+	static	int32				InstallLocation(const PackageInfoRef& package);
+
 protected:
 			PackageInfoRef		FindPackageByName(const BString& name);
 
@@ -53,6 +59,7 @@ private:
 			PackageInfoRef		fPackage;
 			int32				fType;
 			Model*				fModel;
+			int32				fInstallLocation;
 };
 
 
