@@ -16,6 +16,7 @@
 #include <Application.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <CardLayout.h>
 #include <LayoutBuilder.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -39,6 +40,7 @@
 #include "AutoDeleter.h"
 #include "AutoLocker.h"
 #include "DecisionProvider.h"
+#include "FeaturedPackagesView.h"
 #include "FilterView.h"
 #include "JobStateListener.h"
 #include "PackageInfoView.h"
@@ -131,10 +133,21 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 		menuBar->MaxSize().height));
 
 	fFilterView = new FilterView();
+	fFeaturedPackagesView = new FeaturedPackagesView();
 	fPackageListView = new PackageListView(fModel.Lock());
 	fPackageInfoView = new PackageInfoView(fModel.Lock(), this);
 
 	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
+
+	BView* listArea = new BView("list area", 0);
+
+	fListLayout = new BCardLayout();
+	listArea->SetLayout(fListLayout);
+
+	listArea->AddChild(fFeaturedPackagesView);
+	listArea->AddChild(fPackageListView);
+
+	fListLayout->SetVisibleItem((int32)1);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.AddGroup(B_HORIZONTAL, 0.0f)
@@ -144,7 +157,7 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 		.Add(fFilterView)
 		.AddSplit(fSplitView)
 			.AddGroup(B_VERTICAL)
-				.Add(fPackageListView)
+				.Add(listArea)
 				.SetInsets(
 					B_USE_DEFAULT_SPACING, 0.0f,
 					B_USE_DEFAULT_SPACING, 0.0f)
@@ -543,10 +556,16 @@ MainWindow::_AdoptModel()
 {
 	fVisiblePackages = fModel.CreatePackageList();
 
+	fFeaturedPackagesView->Clear();
 	fPackageListView->Clear();
 	for (int32 i = 0; i < fVisiblePackages.CountItems(); i++) {
 		BAutolock locker(fModel.Lock());
-		fPackageListView->AddPackage(fVisiblePackages.ItemAtFast(i));
+		
+		const PackageInfoRef& package = fVisiblePackages.ItemAtFast(i);
+		fPackageListView->AddPackage(package);
+	
+		if (package->Title() == "beam" || package->Title() == "caya")
+			fFeaturedPackagesView->AddPackage(package);
 	}
 
 	BAutolock locker(fModel.Lock());

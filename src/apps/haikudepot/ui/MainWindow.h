@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -14,9 +14,11 @@
 #include "PackageInfoListener.h"
 
 
+class BCardLayout;
 class BMenu;
 class BMenuItem;
 class BSplitView;
+class FeaturedPackagesView;
 class FilterView;
 class PackageActionsView;
 class PackageInfoView;
@@ -83,6 +85,8 @@ private:
 
 private:
 			FilterView*			fFilterView;
+			BCardLayout*		fListLayout;
+			FeaturedPackagesView* fFeaturedPackagesView;
 			PackageListView*	fPackageListView;
 			PackageInfoView*	fPackageInfoView;
 			BSplitView*			fSplitView;

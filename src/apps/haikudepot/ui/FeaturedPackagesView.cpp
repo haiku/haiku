@@ -38,6 +38,8 @@ public:
 		BGroupView("package view", B_HORIZONTAL),
 		fPackageListener(new(std::nothrow) MessagePackageListener(this))
 	{
+		SetViewColor(255, 255, 255);
+		
 		fIconView = new BitmapView("package icon view");
 		fTitleView = new BStringView("package title view", "");
 		fPublisherView = new BStringView("package publisher view", "");
@@ -47,7 +49,7 @@ public:
 		GetFont(&font);
 		font_family family;
 		font_style style;
-		font.SetSize(ceilf(font.Size() * 1.5f));
+		font.SetSize(ceilf(font.Size() * 1.8f));
 		font.GetFamilyAndStyle(&family, &style);
 		font.SetFamilyAndStyle(family, "Bold");
 		fTitleView->SetFont(&font);
@@ -81,6 +83,7 @@ public:
 				.AddGlue()
 				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 			.End()
+			.SetInsets(B_USE_WINDOW_INSETS)
 		;
 
 		Clear();
@@ -109,7 +112,7 @@ public:
 
 		if (package->Icon().Get() != NULL) {
 			fIconView->SetBitmap(
-				package->Icon()->Bitmap(SharedBitmap::SIZE_32));
+				package->Icon()->Bitmap(SharedBitmap::SIZE_64));
 		} else
 			fIconView->SetBitmap(NULL);
 
@@ -134,6 +137,11 @@ public:
 		fTitleView->SetText("");
 		fPublisherView->SetText("");
 		fVersionInfo->SetText("");
+	}
+
+	const char* PackageTitle() const
+	{
+		return fTitleView->Text();
 	}
 
 private:
@@ -163,7 +171,8 @@ FeaturedPackagesView::FeaturedPackagesView()
 	fPackageListLayout = containerView->GroupLayout();
 
 	BScrollView* scrollView = new BScrollView(
-		"packages scroll view", containerView);
+		"featured packages scroll view", containerView,
+		0, false, true, B_FANCY_BORDER);
 
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollView, 1.0f)
@@ -181,7 +190,22 @@ FeaturedPackagesView::AddPackage(const PackageInfoRef& package)
 {
 	PackageView* view = new PackageView();
 	view->SetPackage(package);
-	fPackageListLayout->AddView(view);
+
+	// Find insertion index (alphabetical)
+	int32 index = 0;
+	for (int32 i = 0; BLayoutItem* item = fPackageListLayout->ItemAt(i); i++) {
+		PackageView* view = dynamic_cast<PackageView*>(item->View());
+		if (view == NULL)
+			break;
+
+		BString title = view->PackageTitle();
+		if (title.Compare(package->Title()) >= 0)
+			break;
+
+		index++;
+	}
+
+	fPackageListLayout->AddView(index, view);
 }
 
 
