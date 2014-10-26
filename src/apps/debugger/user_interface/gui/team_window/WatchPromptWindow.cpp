@@ -64,6 +64,7 @@ WatchPromptWindow::Create(Architecture* architecture, target_addr_t address,
 
 }
 
+
 void
 WatchPromptWindow::_Init()
 {
@@ -125,12 +126,14 @@ WatchPromptWindow::_Init()
 	fTypeField->Menu()->ItemAt(fInitialType)->SetMarked(true);
 }
 
+
 void
 WatchPromptWindow::Show()
 {
 	CenterOnScreen();
 	BWindow::Show();
 }
+
 
 void
 WatchPromptWindow::MessageReceived(BMessage* message)
