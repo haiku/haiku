@@ -451,6 +451,7 @@ HOST_SHA256=
 HOST_HAIKU_PORTER=
 HAIKU_PORTS=
 HAIKU_PORTS_CROSS=
+HAIKU_IS_BOOTSTRAP=0
 HAIKU_BOOT_BOARD=
 HAIKU_NO_DOWNLOADS=0
 
@@ -524,6 +525,8 @@ while [ $# -gt 0 ] ; do
 			HOST_HAIKU_PORTER="`absolute_path $2`"
 			HAIKU_PORTS_CROSS="`absolute_path $3`"
 			HAIKU_PORTS="`absolute_path $4`"
+			HAIKU_IS_BOOTSTRAP=1
+			HAIKU_NO_DOWNLOADS=1
 			check_file_exists "$HOST_HAIKU_PORTER" || (
 				echo "Invalid path to haikuporter: $HOST_HAIKU_PORTER" >&2
 				exit 1
@@ -882,6 +885,7 @@ HOST_SHA256					?= ${HOST_SHA256} ;
 HOST_HAIKU_PORTER			?= ${HOST_HAIKU_PORTER} ;
 HAIKU_PORTS					?= ${HAIKU_PORTS} ;
 HAIKU_PORTS_CROSS			?= ${HAIKU_PORTS_CROSS} ;
+HAIKU_IS_BOOTSTRAP			?= ${HAIKU_IS_BOOTSTRAP} ;
 
 EOF
 
