@@ -31,6 +31,7 @@
 #include "BitmapView.h"
 #include "LinkView.h"
 #include "MarkupParser.h"
+#include "MessagePackageListener.h"
 #include "PackageActionHandler.h"
 #include "PackageManager.h"
 #include "RatingView.h"
@@ -1318,68 +1319,6 @@ private:
 };
 
 
-// #pragma mark - PackageInfoViewListener
-
-
-enum {
-	MSG_UPDATE_PACKAGE		= 'updp'
-};
-
-
-class PackageInfoView::Listener : public PackageInfoListener {
-public:
-	Listener(PackageInfoView* view)
-		:
-		fView(view)
-	{
-	}
-
-	virtual ~Listener()
-	{
-	}
-
-	virtual void PackageChanged(const PackageInfoEvent& event)
-	{
-		BMessenger messenger(fView);
-		if (!messenger.IsValid())
-			return;
-
-		const PackageInfo& package = *event.Package().Get();
-
-		BMessage message(MSG_UPDATE_PACKAGE);
-		message.AddString("title", package.Title());
-		message.AddUInt32("changes", event.Changes());
-
-		messenger.SendMessage(&message);
-	}
-
-	void SetPackage(const PackageInfoRef& package)
-	{
-		if (fPackage == package)
-			return;
-
-		PackageInfoListenerRef listener(this);
-
-		if (fPackage.Get() != NULL)
-			fPackage->RemoveListener(listener);
-
-		fPackage = package;
-
-		if (fPackage.Get() != NULL)
-			fPackage->AddListener(listener);
-	}
-
-	const PackageInfoRef& Package() const
-	{
-		return fPackage;
-	}
-
-private:
-	PackageInfoView*	fView;
-	PackageInfoRef		fPackage;
-};
-
-
 // #pragma mark - PackageInfoView
 
 
@@ -1388,7 +1327,7 @@ PackageInfoView::PackageInfoView(BLocker* modelLock,
 	:
 	BView("package info view", 0),
 	fModelLock(modelLock),
-	fPackageListener(new(std::nothrow) Listener(this))
+	fPackageListener(new(std::nothrow) MessagePackageListener(this))
 {
 	fCardLayout = new BCardLayout();
 	SetLayout(fCardLayout);

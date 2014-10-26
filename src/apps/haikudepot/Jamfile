@@ -39,11 +39,13 @@ Application HaikuDepot :
 	BitmapButton.cpp
 	BitmapView.cpp
 	DecisionProvider.cpp
+	FeaturedPackageView.cpp
 	FilterView.cpp
 	JobStateListener.cpp
 	LinkView.cpp
 	main.cpp
 	MainWindow.cpp
+	MessagePackageListener.cpp
 	Model.cpp
 	PackageAction.cpp
 	PackageActionHandler.cpp

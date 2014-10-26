@@ -13,6 +13,7 @@
 
 class BCardLayout;
 class BLocker;
+class MessagePackageListener;
 class TitleView;
 class PackageActionHandler;
 class PackageActionView;
@@ -40,9 +41,6 @@ public:
 			void				Clear();
 
 private:
-			class Listener;
-
-private:
 			BLocker*			fModelLock;
 
 			BCardLayout*		fCardLayout;
@@ -51,7 +49,7 @@ private:
 			PagesView*			fPagesView;
 
 			PackageInfoRef		fPackage;
-			Listener*			fPackageListener;
+			MessagePackageListener* fPackageListener;
 };
 
 #endif // PACKAGE_INFO_VIEW_H
