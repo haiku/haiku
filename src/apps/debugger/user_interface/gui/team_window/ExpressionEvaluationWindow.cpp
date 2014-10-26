@@ -64,19 +64,26 @@ ExpressionEvaluationWindow::Create(SourceLanguage* language,
 void
 ExpressionEvaluationWindow::_Init()
 {
-	fExpressionInput = new BTextControl("Expression:", NULL, NULL);
+	fExpressionInput = new BTextControl("Expression:", NULL,
+		new BMessage(MSG_EVALUATE_EXPRESSION));
 	BLayoutItem* labelItem = fExpressionInput->CreateLabelLayoutItem();
+	BLayoutItem* inputItem = fExpressionInput->CreateTextViewLayoutItem();
+	inputItem->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	labelItem->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	fExpressionOutput = new BStringView("ExpressionOutputView", NULL);
+	fExpressionOutput->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
+			B_SIZE_UNSET));
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.AddGroup(B_HORIZONTAL, 4.0f)
 			.Add(labelItem)
-			.Add(fExpressionInput->CreateTextViewLayoutItem())
+			.Add(inputItem)
 		.End()
 		.AddGroup(B_HORIZONTAL, 4.0f)
 			.Add(new BStringView("OutputLabelView", "Result:"))
-			.Add((fExpressionOutput = new BStringView("ExpressionOutputView",
-					NULL)))
+			.Add(fExpressionOutput)
 		.End()
 		.AddGroup(B_HORIZONTAL, 4.0f)
 			.AddGlue()
@@ -84,8 +91,8 @@ ExpressionEvaluationWindow::_Init()
 					new BMessage(MSG_EVALUATE_EXPRESSION))))
 		.End();
 
+	fExpressionInput->SetTarget(this);
 	fEvaluateButton->SetTarget(this);
-
 }
 
 
