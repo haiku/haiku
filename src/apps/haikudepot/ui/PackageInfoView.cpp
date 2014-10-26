@@ -671,8 +671,15 @@ public:
 		}
 
 		fPackageActions = actions;
-		if (!clearNeeded)
+		if (!clearNeeded) {
+			int32 index = 0;
+			for (int32 i = fPackageActions.CountItems() - 1; i >= 0; i--) {
+				const PackageActionRef& action = fPackageActions.ItemAtFast(i);
+				BButton* button = (BButton*)fButtons.ItemAtFast(index++);
+				button->SetLabel(action->Label());
+			}
 			return;
+		}
 
 		Clear();
 
