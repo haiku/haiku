@@ -31,6 +31,8 @@
 #ifndef __SGI_STL_INTERNAL_VECTOR_H
 #define __SGI_STL_INTERNAL_VECTOR_H
 
+#include <stdexcept>
+
 __STL_BEGIN_NAMESPACE 
 
 #if defined(__sgi) && !defined(__GNUC__) && (_MIPS_SIM != _MIPS_SIM_ABI32)
@@ -217,6 +219,18 @@ public:
 
   reference operator[](size_type __n) { return *(begin() + __n); }
   const_reference operator[](size_type __n) const { return *(begin() + __n); }
+
+  reference at(size_type __n) {
+	  if (__n >= size())
+		  throw std::out_of_range("vector::at() out_of_range");
+	  return *(begin() + __n);
+  }
+
+  const_reference at(size_type __n) const {
+	  if (__n >= size())
+		  throw std::out_of_range("vector::at() out_of_range");
+	  return *(begin() + __n);
+  }
 
   explicit vector(const allocator_type& __a = allocator_type())
     : _Base(__a) {}
