@@ -161,6 +161,11 @@ get_next_page_table()
 static uint32*
 add_page_table(addr_t base)
 {
+	if (gKernelArgs.arch_args.num_pgtables == MAX_BOOT_PTABLES) {
+		panic("gKernelArgs.arch_args.pgtables overflow");
+		return NULL;
+	}
+
 	base = ROUNDDOWN(base, B_PAGE_SIZE * 1024);
 
 	// Get new page table and clear it out
