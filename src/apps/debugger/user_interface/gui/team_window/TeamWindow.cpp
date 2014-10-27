@@ -161,13 +161,11 @@ TeamWindow::~TeamWindow()
 	if (fSourceView != NULL)
 		fSourceView->UnsetListener();
 	if (fInspectorWindow != NULL) {
-		BMessenger messenger(fInspectorWindow);
-		if (messenger.LockTarget())
+		if (fInspectorWindow->Lock())
 			fInspectorWindow->Quit();
 	}
 	if (fExpressionWindow != NULL) {
-		BMessenger messenger(fExpressionWindow);
-		if (messenger.LockTarget())
+		if (fExpressionWindow->Lock())
 			fExpressionWindow->Quit();
 	}
 
@@ -312,13 +310,14 @@ TeamWindow::MessageReceived(BMessage* message)
 		case MSG_SHOW_INSPECTOR_WINDOW:
 		{
 			if (fInspectorWindow) {
-				fInspectorWindow->Activate(true);
+				AutoLocker<BWindow> lock(fInspectorWindow);
+				if (lock.IsLocked())
+					fInspectorWindow->Activate(true);
 			} else {
 				try {
 					fInspectorWindow = InspectorWindow::Create(fTeam,
 						fListener, this);
 					if (fInspectorWindow != NULL) {
-						BMessage settings;
 						fInspectorWindow->LoadSettings(fUiSettings);
 						fInspectorWindow->Show();
 					}
@@ -344,9 +343,11 @@ TeamWindow::MessageReceived(BMessage* message)
 		}
 		case MSG_SHOW_EXPRESSION_WINDOW:
 		{
-			if (fExpressionWindow != NULL)
-				fExpressionWindow->Activate(true);
-			else {
+			if (fExpressionWindow != NULL) {
+				AutoLocker<BWindow> lock(fExpressionWindow);
+				if (lock.IsLocked())
+					fExpressionWindow->Activate(true);
+			} else {
 				try {
 					SourceLanguage* language = NULL;
 					if (_GetActiveSourceLanguage(language) != B_OK)
@@ -371,8 +372,10 @@ TeamWindow::MessageReceived(BMessage* message)
 		}
 		case MSG_SHOW_BREAK_CONDITION_CONFIG_WINDOW:
 		{
-			if (fBreakConditionConfigWindow) {
-				fBreakConditionConfigWindow->Activate(true);
+			if (fBreakConditionConfigWindow != NULL) {
+				AutoLocker<BWindow> lock(fBreakConditionConfigWindow);
+				if (lock.IsLocked())
+					fBreakConditionConfigWindow->Activate(true);
 			} else {
 				try {
 					fBreakConditionConfigWindow
@@ -1822,6 +1825,7 @@ TeamWindow::_GetActiveSourceLanguage(SourceLanguage*& _language)
 
 	if (fActiveSourceCode != NULL) {
 		_language = fActiveSourceCode->GetSourceLanguage();
+		_language->AcquireReference();
 		return B_OK;
 	}
 
