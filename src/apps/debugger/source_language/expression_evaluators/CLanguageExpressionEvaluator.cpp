@@ -673,20 +673,55 @@ CLanguageExpressionEvaluator::_ParseProduct()
 			case TOKEN_STAR:
 				value = value * _ParsePower();
 				break;
-			case TOKEN_SLASH: {
+			case TOKEN_SLASH:
+			{
 				MAPM rhs = _ParsePower();
 				if (rhs == MAPM(0))
 					throw ParseException("division by zero", token.position);
 				value = value / rhs;
 				break;
 			}
-			case TOKEN_MODULO: {
+
+			case TOKEN_MODULO:
+			{
 				MAPM rhs = _ParsePower();
 				if (rhs == MAPM(0))
 					throw ParseException("modulo by zero", token.position);
 				value = value % rhs;
 				break;
 			}
+
+			case TOKEN_LOGICAL_AND:
+				value = (value != MAPM(0) && _ParsePower() != MAPM(0));
+				break;
+
+			case TOKEN_LOGICAL_OR:
+				value = (value != MAPM(0) || _ParsePower() != MAPM(0));
+				break;
+
+			case TOKEN_EQ:
+				value = (value == _ParsePower());
+				break;
+
+			case TOKEN_NE:
+				value = (value != _ParsePower());
+				break;
+
+			case TOKEN_GT:
+				value = (value > _ParsePower());
+				break;
+
+			case TOKEN_GE:
+				value = (value >= _ParsePower());
+				break;
+
+			case TOKEN_LT:
+				value = (value < _ParsePower());
+				break;
+
+			case TOKEN_LE:
+				value = (value <= _ParsePower());
+				break;
 
 			default:
 				fTokenizer->RewindToken();
@@ -722,11 +757,17 @@ CLanguageExpressionEvaluator::_ParseUnary()
 	switch (token.type) {
 		case TOKEN_PLUS:
 			return _ParseUnary();
+
 		case TOKEN_MINUS:
 			return -_ParseUnary();
-// TODO: Implement !
-//		case TOKEN_NOT:
-//			return ~(uint64)_ParseUnary();
+
+		case TOKEN_BITWISE_AND:
+		case TOKEN_BITWISE_OR:
+		case TOKEN_BITWISE_NOT:
+			throw ParseException("Unimplemented bitwise operator", token.position);
+
+		case TOKEN_LOGICAL_NOT:
+			return MAPM(_ParseUnary() == 0);
 
 		case TOKEN_IDENTIFIER:
 			return _ParseIdentifier();
