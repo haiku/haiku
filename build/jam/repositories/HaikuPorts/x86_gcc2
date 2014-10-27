@@ -241,6 +241,8 @@ RemotePackageRepository HaikuPorts
 	physfs_devel-2.0.3-1
 	pipepanic-0.1.3-3
 	pkgconfig-0.27.1-1
+	popt-1.16-1
+	popt_devel-1.16-1
 	python-2.7.6-4
 	python_dateutil-1.5-2
 	python_lxml-3.3.5-2
@@ -502,6 +504,7 @@ RemotePackageRepository HaikuPorts
 	mesa_x86_devel-10.1.0-2
 	mesa_x86_swrast-10.1.0-2
 	mesa_x86_swpipe-10.1.0-2
+	mosh_x86-1.2.4-1
 	mpc_x86-1.0.2-2
 	mpc_x86_devel-1.0.2-2
 	mpd_x86-0.18.12_git-1
@@ -532,6 +535,8 @@ RemotePackageRepository HaikuPorts
 	pixman_x86-0.32.6-1
 	pixman_x86_devel-0.32.6-1
 	pkgconfig_x86-0.27.1-2
+	protobuf_x86-2.4.1-1
+	protobuf_x86_devel-2.4.1-1
 	protrekkr_x86-2.5.4-2
 	qemu_x86-2.1.2-1
 	qca2_x86-2.0.3-1
@@ -767,6 +772,7 @@ RemotePackageRepository HaikuPorts
 	moe
 	mog
 	mpc_x86
+	mosh_x86
 	mpd_x86
 	mpfr_x86
 	mpg123_x86
@@ -797,6 +803,8 @@ RemotePackageRepository HaikuPorts
 	pipepanic
 	pixman_x86
 	pkgconfig
+	popt
+	protobuf_x86
 	protrekkr_x86
 	python
 	python_dateutil
