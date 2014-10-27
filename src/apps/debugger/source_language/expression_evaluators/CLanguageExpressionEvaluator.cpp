@@ -527,8 +527,11 @@ CLanguageExpressionEvaluator::~CLanguageExpressionEvaluator()
 
 
 Number
-CLanguageExpressionEvaluator::Evaluate(const char* expressionString, type_code type)
+CLanguageExpressionEvaluator::Evaluate(const char* expressionString,
+	type_code type)
 {
+	fCurrentType = type;
+
 	fTokenizer->SetType(type);
 	fTokenizer->SetTo(expressionString);
 
@@ -696,8 +699,25 @@ CLanguageExpressionEvaluator::_ParsePower()
 
 		Number power = _ParseUnary();
 		Number temp = value;
-		for (int32 powerValue = power.GetValue().ToInt32(); powerValue > 1; powerValue--)
-			value *= temp;
+		int32 powerValue = power.GetValue().ToInt32();
+		bool handleNegativePower = false;
+		if (powerValue < 0) {
+			powerValue = abs(powerValue);
+			handleNegativePower = true;
+		}
+
+		if (powerValue == 0)
+			value.SetTo(fCurrentType, "1");
+		else {
+			for (; powerValue > 1; powerValue--)
+				value *= temp;
+		}
+
+		if (handleNegativePower) {
+			temp.SetTo(fCurrentType, "1");
+			temp /= value;
+			value = temp;
+		}
 	}
 }
 
