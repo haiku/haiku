@@ -68,6 +68,7 @@ ExpressionEvaluationWindow::_Init()
 		new BMessage(MSG_EVALUATE_EXPRESSION));
 	BLayoutItem* labelItem = fExpressionInput->CreateLabelLayoutItem();
 	BLayoutItem* inputItem = fExpressionInput->CreateTextViewLayoutItem();
+	inputItem->SetExplicitMinSize(BSize(200.0, B_SIZE_UNSET));
 	inputItem->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	labelItem->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -121,22 +122,20 @@ ExpressionEvaluationWindow::MessageReceived(BMessage* message)
 		case MSG_EVALUATE_EXPRESSION:
 		{
 			Value* value = NULL;
+			BString outputText;
 			status_t error = fLanguage->EvaluateExpression(
 				fExpressionInput->TextView()->Text(), value);
 			if (error != B_OK) {
-				BString errorText;
-				errorText.SetToFormat("Failed to evaluate expression: %s",
-					strerror(error));
-				BAlert* alert = new(std::nothrow) BAlert("Evaluate Expression",
-					errorText.String(), "Close");
-				if (alert != NULL)
-					alert->Go();
-				break;
-			}
+				if (value != NULL)
+					value->ToString(outputText);
+				else {
+					outputText.SetToFormat("Failed to evaluate expression: %s",
+						strerror(error));
+				}
+			} else
+				value->ToString(outputText);
 
-			BString valueText;
-			value->ToString(valueText);
-			fExpressionOutput->SetText(valueText);
+			fExpressionOutput->SetText(outputText);
 			break;
 		}
 		default:
