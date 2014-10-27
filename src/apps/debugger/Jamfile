@@ -219,6 +219,7 @@ Application Debugger :
 
 	# types
 	ArrayIndexPath.cpp
+	Number.cpp
 	TargetAddressRangeList.cpp
 	ValueLocation.cpp
 
