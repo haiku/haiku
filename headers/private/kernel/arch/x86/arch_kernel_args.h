@@ -13,7 +13,7 @@
 #include <util/FixedWidthPointer.h>
 
 
-#define MAX_BOOT_PTABLES 4
+#define MAX_BOOT_PTABLES 8
 
 #define _PACKED __attribute__((packed))
 
