@@ -16,12 +16,12 @@
 #include <ScrollView.h>
 #include <TextControl.h>
 
-#include <ExpressionParser.h>
-
 #include "Architecture.h"
+#include "CLanguageExpressionEvaluator.h"
 #include "GuiTeamUiSettings.h"
 #include "MemoryView.h"
 #include "MessageCodes.h"
+#include "Number.h"
 #include "Team.h"
 #include "UserInterface.h"
 
@@ -199,12 +199,14 @@ InspectorWindow::MessageReceived(BMessage* message)
 			target_addr_t address = 0;
 			bool addressValid = false;
 			if (message->FindUInt64("address", &address) != B_OK) {
-				ExpressionParser parser;
-				parser.SetSupportHexInput(true);
+				CLanguageExpressionEvaluator evaluator;
 				const char* addressExpression = fAddressInput->Text();
 				BString errorMessage;
 				try {
-					address = parser.EvaluateToInt64(addressExpression);
+					Number value;
+					value = evaluator.Evaluate(addressExpression,
+						B_INT64_TYPE);
+					address = value.GetValue().ToUInt64();
 				} catch(ParseException parseError) {
 					errorMessage.SetToFormat("Failed to parse address: %s",
 						parseError.message.String());

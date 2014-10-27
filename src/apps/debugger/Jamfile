@@ -6,7 +6,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
 	system kernel ] ;
 
-UseLibraryHeaders mapm ;
 UsePrivateHeaders app debug interface kernel package shared libroot ;
 UsePrivateSystemHeaders ;
 
@@ -358,8 +357,6 @@ Application Debugger :
 	<bin>debug_utils.a
 	libcolumnlistview.a
 	libshared.a
-	libexpression_parser.a
-	libmapm.a
 	libedit.a
 	libncurses.a
 

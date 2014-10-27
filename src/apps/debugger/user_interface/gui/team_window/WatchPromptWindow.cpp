@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "WatchPromptWindow.h"
@@ -13,10 +13,10 @@
 #include <String.h>
 #include <TextControl.h>
 
-#include <ExpressionParser.h>
-
 #include "Architecture.h"
+#include "CLanguageExpressionEvaluator.h"
 #include "MessageCodes.h"
+#include "Number.h"
 #include "UserInterface.h"
 #include "Watchpoint.h"
 
@@ -143,12 +143,15 @@ WatchPromptWindow::MessageReceived(BMessage* message)
 		{
 			target_addr_t address = 0;
 			int32 length = 0;
-			ExpressionParser parser;
-			parser.SetSupportHexInput(true);
+			CLanguageExpressionEvaluator evaluator;
 			BString errorMessage;
 			try {
-				address = parser.EvaluateToInt64(fAddressInput->Text());
-				length = (int32)parser.EvaluateToInt64(fLengthInput->Text());
+				Number value = evaluator.Evaluate(fAddressInput->Text(),
+					B_UINT64_TYPE);
+				address = value.GetValue().ToUInt64();
+				value = evaluator.Evaluate(fLengthInput->Text(),
+					B_INT32_TYPE);
+				length = value.GetValue().ToInt32();
 			} catch(ParseException parseError) {
 				errorMessage.SetToFormat("Failed to parse data: %s",
 					parseError.message.String());

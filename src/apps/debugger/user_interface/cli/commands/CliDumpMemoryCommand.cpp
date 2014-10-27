@@ -1,7 +1,7 @@
 /*
  * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -15,9 +15,10 @@
 #include <stdio.h>
 
 #include <AutoLocker.h>
-#include <ExpressionParser.h>
 
+#include "CLanguageExpressionEvaluator.h"
 #include "CliContext.h"
+#include "Number.h"
 #include "Team.h"
 #include "TeamMemoryBlock.h"
 #include "UiUtils.h"
@@ -42,12 +43,11 @@ CliDumpMemoryCommand::Execute(int argc, const char* const* argv,
 		return;
 	}
 
+	CLanguageExpressionEvaluator evaluator;
 	target_addr_t address;
-	ExpressionParser parser;
-	parser.SetSupportHexInput(true);
-
 	try {
-		address = parser.EvaluateToInt64(argv[1]);
+		Number value = evaluator.Evaluate(argv[1], B_UINT64_TYPE);
+		address = value.GetValue().ToUInt64();
 	} catch(...) {
 		printf("Error parsing address/expression.\n");
 		return;
