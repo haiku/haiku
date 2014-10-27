@@ -11,16 +11,12 @@
 
 #include "CLanguageExpressionEvaluator.h"
 
+#include "Number.h"
+
 #include <ctype.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
-
-#include <m_apm.h>
-
-
-static const int32 kMaxDecimalPlaces = 32;
 
 
 enum {
@@ -47,6 +43,7 @@ enum {
 	TOKEN_BITWISE_AND,
 	TOKEN_BITWISE_OR,
 	TOKEN_BITWISE_NOT,
+	TOKEN_BITWISE_XOR,
 	TOKEN_EQ,
 	TOKEN_NE,
 	TOKEN_GT,
@@ -81,7 +78,7 @@ static BString TokenTypeToString(int32 type)
 			break;
 
 		case TOKEN_POWER:
-			token = "^";
+			token = "**";
 			break;
 
 		case TOKEN_OPENING_BRACKET:
@@ -114,6 +111,10 @@ static BString TokenTypeToString(int32 type)
 
 		case TOKEN_BITWISE_NOT:
 			token = "~";
+			break;
+
+		case TOKEN_BITWISE_XOR:
+			token = "^";
 			break;
 
 		case TOKEN_EQ:
@@ -153,7 +154,7 @@ struct CLanguageExpressionEvaluator::Token {
 	Token()
 		: string(""),
 		  type(TOKEN_NONE),
-		  value(0),
+		  value(0L),
 		  position(0)
 	{
 	}
@@ -169,7 +170,7 @@ struct CLanguageExpressionEvaluator::Token {
 	Token(const char* string, int32 length, int32 position, int32 type)
 		: string(string, length),
 		  type(type),
-		  value(0),
+		  value(),
 		  position(position)
 	{
 	}
@@ -185,7 +186,7 @@ struct CLanguageExpressionEvaluator::Token {
 
 	BString		string;
 	int32		type;
-	MAPM		value;
+	Number		value;
 
 	int32		position;
 };
@@ -198,13 +199,8 @@ class CLanguageExpressionEvaluator::Tokenizer {
 		  fCurrentChar(NULL),
 		  fCurrentToken(),
 		  fReuseToken(false),
-		  fHexSupport(false)
+		  fType(B_INT32_TYPE)
 	{
-	}
-
-	void SetSupportHexInput(bool enabled)
-	{
-		fHexSupport = enabled;
 	}
 
 	void SetTo(const char* string)
@@ -213,6 +209,11 @@ class CLanguageExpressionEvaluator::Tokenizer {
 		fCurrentChar = fString.String();
 		fCurrentToken = Token();
 		fReuseToken = false;
+	}
+
+	void SetType(type_code type)
+	{
+		fType = type;
 	}
 
 	const Token& NextToken()
@@ -235,7 +236,7 @@ class CLanguageExpressionEvaluator::Tokenizer {
 		bool decimal = *fCurrentChar == '.' || *fCurrentChar == ',';
 
 		if (decimal || isdigit(*fCurrentChar)) {
-			if (fHexSupport && *fCurrentChar == '0' && fCurrentChar[1] == 'x')
+			if (*fCurrentChar == '0' && fCurrentChar[1] == 'x')
 				return _ParseHexNumber();
 
 			BString temp;
@@ -297,7 +298,7 @@ class CLanguageExpressionEvaluator::Tokenizer {
 
 			fCurrentToken = Token(begin, length, _CurrentPos() - length,
 				TOKEN_CONSTANT);
-			fCurrentToken.value = temp.String();
+			fCurrentToken.value.SetTo(fType, temp.String());
 		} else if (isalpha(*fCurrentChar) && *fCurrentChar != 'x') {
 			const char* begin = fCurrentChar;
 			while (*fCurrentChar != 0 && (isalpha(*fCurrentChar)
@@ -331,13 +332,6 @@ class CLanguageExpressionEvaluator::Tokenizer {
 						type = TOKEN_SLASH;
 						break;
 
-					case 'x':
-						if (!fHexSupport) {
-							type = TOKEN_STAR;
-							break;
-						}
-						// fall through
-
 					default:
 						throw ParseException("unexpected character",
 							_CurrentPos());
@@ -367,8 +361,14 @@ class CLanguageExpressionEvaluator::Tokenizer {
 				break;
 
 			case '*':
-				type = TOKEN_STAR;
-				length = 1;
+				if (Peek() == '*')  {
+					type = TOKEN_POWER;
+					length = 2;
+				}
+				else {
+					type = TOKEN_STAR;
+					length = 1;
+				}
 				break;
 
 			case '/':
@@ -382,7 +382,7 @@ class CLanguageExpressionEvaluator::Tokenizer {
 				break;
 
 			case '^':
-				type = TOKEN_POWER;
+				type = TOKEN_BITWISE_XOR;
 				length = 1;
 				break;
 
@@ -497,18 +497,7 @@ class CLanguageExpressionEvaluator::Tokenizer {
 		fCurrentToken = Token(begin, length, _CurrentPos() - length,
 			TOKEN_CONSTANT);
 
-		// MAPM has no conversion from long long, so we need to improvise.
-		uint64 value = strtoll(fCurrentToken.string.String(), NULL, 0);
-		if (value <= 0x7fffffff) {
-			fCurrentToken.value = (long)value;
-		} else {
-			fCurrentToken.value = (int)(value >> 60);
-			fCurrentToken.value *= 1 << 30;
-			fCurrentToken.value += (int)((value >> 30) & 0x3fffffff);
-			fCurrentToken.value *= 1 << 30;
-			fCurrentToken.value += (int)(value& 0x3fffffff);
-		}
-
+		fCurrentToken.value.SetTo(fType, fCurrentToken.string.String(), 16);
 		return fCurrentToken;
 	}
 
@@ -521,7 +510,7 @@ class CLanguageExpressionEvaluator::Tokenizer {
 	const char*	fCurrentChar;
 	Token		fCurrentToken;
 	bool		fReuseToken;
-	bool		fHexSupport;
+	type_code	fType;
 };
 
 
@@ -537,80 +526,22 @@ CLanguageExpressionEvaluator::~CLanguageExpressionEvaluator()
 }
 
 
-void
-CLanguageExpressionEvaluator::SetSupportHexInput(bool enabled)
+Number
+CLanguageExpressionEvaluator::Evaluate(const char* expressionString, type_code type)
 {
-	fTokenizer->SetSupportHexInput(enabled);
-}
-
-
-BString
-CLanguageExpressionEvaluator::Evaluate(const char* expressionString)
-{
+	fTokenizer->SetType(type);
 	fTokenizer->SetTo(expressionString);
 
-	MAPM value = _ParseBinary();
+	Number value = _ParseBinary();
 	Token token = fTokenizer->NextToken();
 	if (token.type != TOKEN_END_OF_LINE)
 		throw ParseException("parse error", token.position);
 
-	if (value == 0)
-		return BString("0");
-
-	char* buffer = value.toFixPtStringExp(kMaxDecimalPlaces, '.', 0, 0);
-	if (buffer == NULL)
-		throw ParseException("out of memory", 0);
-
-	// remove surplus zeros
-	int32 lastChar = strlen(buffer) - 1;
-	if (strchr(buffer, '.')) {
-		while (buffer[lastChar] == '0')
-			lastChar--;
-		if (buffer[lastChar] == '.')
-			lastChar--;
-	}
-
-	BString result(buffer, lastChar + 1);
-	free(buffer);
-	return result;
+	return value;
 }
 
 
-int64
-CLanguageExpressionEvaluator::EvaluateToInt64(const char* expressionString)
-{
-	fTokenizer->SetTo(expressionString);
-
-	MAPM value = _ParseBinary();
-	Token token = fTokenizer->NextToken();
-	if (token.type != TOKEN_END_OF_LINE)
-		throw ParseException("parse error", token.position);
-
-	char buffer[128];
-	value.toIntegerString(buffer);
-
-	return strtoll(buffer, NULL, 0);
-}
-
-
-double
-CLanguageExpressionEvaluator::EvaluateToDouble(const char* expressionString)
-{
-	fTokenizer->SetTo(expressionString);
-
-	MAPM value = _ParseBinary();
-	Token token = fTokenizer->NextToken();
-	if (token.type != TOKEN_END_OF_LINE)
-		throw ParseException("parse error", token.position);
-
-	char buffer[1024];
-	value.toString(buffer, sizeof(buffer) - 4);
-
-	return strtod(buffer, NULL);
-}
-
-
-MAPM
+Number
 CLanguageExpressionEvaluator::_ParseBinary()
 {
 	return _ParseSum();
@@ -637,20 +568,20 @@ CLanguageExpressionEvaluator::_ParseBinary()
 }
 
 
-MAPM
+Number
 CLanguageExpressionEvaluator::_ParseSum()
 {
 	// TODO: check isnan()...
-	MAPM value = _ParseProduct();
+	Number value = _ParseProduct();
 
 	while (true) {
 		Token token = fTokenizer->NextToken();
 		switch (token.type) {
 			case TOKEN_PLUS:
-				value = value + _ParseProduct();
+				value += _ParseProduct();
 				break;
 			case TOKEN_MINUS:
-				value = value - _ParseProduct();
+				value -= _ParseProduct();
 				break;
 
 			default:
@@ -661,66 +592,86 @@ CLanguageExpressionEvaluator::_ParseSum()
 }
 
 
-MAPM
+Number
 CLanguageExpressionEvaluator::_ParseProduct()
 {
-	// TODO: check isnan()...
-	MAPM value = _ParsePower();
+	Number value = _ParsePower();
 
 	while (true) {
 		Token token = fTokenizer->NextToken();
 		switch (token.type) {
 			case TOKEN_STAR:
-				value = value * _ParsePower();
+				value *= _ParsePower();
 				break;
 			case TOKEN_SLASH:
 			{
-				MAPM rhs = _ParsePower();
-				if (rhs == MAPM(0))
+				Number rhs = _ParsePower();
+				if (rhs == Number(fCurrentType, 0))
 					throw ParseException("division by zero", token.position);
-				value = value / rhs;
+				value /= rhs;
 				break;
 			}
 
 			case TOKEN_MODULO:
 			{
-				MAPM rhs = _ParsePower();
-				if (rhs == MAPM(0))
+				Number rhs = _ParsePower();
+				if (rhs == Number())
 					throw ParseException("modulo by zero", token.position);
-				value = value % rhs;
+				value %= rhs;
 				break;
 			}
 
 			case TOKEN_LOGICAL_AND:
-				value = (value != MAPM(0) && _ParsePower() != MAPM(0));
+			{
+				Number zero(BVariant(0L));
+				value.SetTo(BVariant((int32)((value != zero)
+					&& (_ParsePower() != zero))));
+
 				break;
+			}
 
 			case TOKEN_LOGICAL_OR:
-				value = (value != MAPM(0) || _ParsePower() != MAPM(0));
+			{
+				Number zero(BVariant(0L));
+				value.SetTo(BVariant((int32)((value != zero)
+					|| (_ParsePower() != zero))));
+				break;
+			}
+
+			case TOKEN_BITWISE_AND:
+				value &= _ParsePower();
+				break;
+
+			case TOKEN_BITWISE_OR:
+				value |= _ParsePower();
+				break;
+
+			case TOKEN_BITWISE_XOR:
+				value ^= _ParsePower();
 				break;
 
 			case TOKEN_EQ:
-				value = (value == _ParsePower());
+				value.SetTo(BVariant((int32)(value == _ParsePower())));
 				break;
 
 			case TOKEN_NE:
-				value = (value != _ParsePower());
+				value.SetTo(BVariant((int32)(value != _ParsePower())));
 				break;
 
 			case TOKEN_GT:
-				value = (value > _ParsePower());
+				value.SetTo(BVariant((int32)(value > _ParsePower())));
 				break;
 
 			case TOKEN_GE:
-				value = (value >= _ParsePower());
+				value.SetTo(BVariant((int32)(value >= _ParsePower())));
 				break;
 
 			case TOKEN_LT:
-				value = (value < _ParsePower());
+				value.SetTo(BVariant((int32)(value < _ParsePower())));
 				break;
 
 			case TOKEN_LE:
-				value = (value <= _ParsePower());
+				value.SetTo(BVariant((int32)(value <= _ParsePower())));
 				break;
 
 			default:
@@ -731,10 +682,10 @@ CLanguageExpressionEvaluator::_ParseProduct()
 }
 
 
-MAPM
+Number
 CLanguageExpressionEvaluator::_ParsePower()
 {
-	MAPM value = _ParseUnary();
+	Number value = _ParseUnary();
 
 	while (true) {
 		Token token = fTokenizer->NextToken();
@@ -742,12 +693,16 @@ CLanguageExpressionEvaluator::_ParsePower()
 			fTokenizer->RewindToken();
 			return value;
 		}
-		value = value.pow(_ParseUnary());
+
+		Number power = _ParseUnary();
+		Number temp = value;
+		for (int32 powerValue = power.GetValue().ToInt32(); powerValue > 1; powerValue--)
+			value *= temp;
 	}
 }
 
 
-MAPM
+Number
 CLanguageExpressionEvaluator::_ParseUnary()
 {
 	Token token = fTokenizer->NextToken();
@@ -761,13 +716,11 @@ CLanguageExpressionEvaluator::_ParseUnary()
 		case TOKEN_MINUS:
 			return -_ParseUnary();
 
-		case TOKEN_BITWISE_AND:
-		case TOKEN_BITWISE_OR:
 		case TOKEN_BITWISE_NOT:
-			throw ParseException("Unimplemented bitwise operator", token.position);
+			return ~_ParseUnary();
 
 		case TOKEN_LOGICAL_NOT:
-			return MAPM(_ParseUnary() == 0);
+			return Number((int32)(_ParseUnary() == Number(BVariant(0L))));
 
 		case TOKEN_IDENTIFIER:
 			return _ParseIdentifier();
@@ -777,7 +730,7 @@ CLanguageExpressionEvaluator::_ParseUnary()
 			return _ParseAtom();
 	}
 
-	return MAPM(0);
+	return Number();
 }
 
 
@@ -785,21 +738,21 @@ struct Function {
 	const char*	name;
 	int			argumentCount;
 	void*		function;
-	MAPM		value;
+	Number		value;
 };
 
 
-MAPM
+Number
 CLanguageExpressionEvaluator::_ParseIdentifier()
 {
 	throw ParseException("Identifiers not implemented", 0);
 
-	return MAPM(0);
+	return Number();
 }
 
 
 void
-CLanguageExpressionEvaluator::_InitArguments(MAPM values[], int32 argumentCount)
+CLanguageExpressionEvaluator::_InitArguments(Number values[], int32 argumentCount)
 {
 	_EatToken(TOKEN_OPENING_BRACKET);
 
@@ -810,7 +763,7 @@ CLanguageExpressionEvaluator::_InitArguments(MAPM values[], int32 argumentCount)
 }
 
 
-MAPM
+Number
 CLanguageExpressionEvaluator::_ParseAtom()
 {
 	Token token = fTokenizer->NextToken();
@@ -824,7 +777,7 @@ CLanguageExpressionEvaluator::_ParseAtom()
 
 	_EatToken(TOKEN_OPENING_BRACKET);
 
-	MAPM value = _ParseBinary();
+	Number value = _ParseBinary();
 
 	_EatToken(TOKEN_CLOSING_BRACKET);
 

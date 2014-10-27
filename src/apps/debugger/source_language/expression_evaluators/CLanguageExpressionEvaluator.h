@@ -34,7 +34,7 @@ class ParseException {
 };
 
 struct Function;
-class MAPM;
+class Number;
 
 class CLanguageExpressionEvaluator {
 
@@ -42,30 +42,28 @@ class CLanguageExpressionEvaluator {
 								CLanguageExpressionEvaluator();
 								~CLanguageExpressionEvaluator();
 
-			void				SetSupportHexInput(bool enabled);
-
-			BString				Evaluate(const char* expressionString);
-			int64				EvaluateToInt64(const char* expressionString);
-			double				EvaluateToDouble(const char* expressionString);
+			Number				Evaluate(const char* expressionString,
+									type_code type);
 
  private:
 			struct Token;
 			class Tokenizer;
 
  private:
-			MAPM				_ParseBinary();
-			MAPM				_ParseSum();
-			MAPM				_ParseProduct();
-			MAPM				_ParsePower();
-			MAPM				_ParseUnary();
-			MAPM				_ParseIdentifier();
-			void				_InitArguments(MAPM values[],
+			Number				_ParseBinary();
+			Number				_ParseSum();
+			Number				_ParseProduct();
+			Number				_ParsePower();
+			Number				_ParseUnary();
+			Number				_ParseIdentifier();
+			void				_InitArguments(Number values[],
 									int32 argumentCount);
-			MAPM				_ParseAtom();
+			Number				_ParseAtom();
 
 			void				_EatToken(int32 type);
 
 			Tokenizer*			fTokenizer;
+			type_code			fCurrentType;
 };
 
 #endif // C_LANGUAGE_EXPRESSION_EVALUATOR_H

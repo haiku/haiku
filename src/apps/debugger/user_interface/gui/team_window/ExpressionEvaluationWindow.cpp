@@ -124,7 +124,7 @@ ExpressionEvaluationWindow::MessageReceived(BMessage* message)
 			Value* value = NULL;
 			BString outputText;
 			status_t error = fLanguage->EvaluateExpression(
-				fExpressionInput->TextView()->Text(), value);
+				fExpressionInput->TextView()->Text(), B_INT64_TYPE, value);
 			if (error != B_OK) {
 				if (value != NULL)
 					value->ToString(outputText);

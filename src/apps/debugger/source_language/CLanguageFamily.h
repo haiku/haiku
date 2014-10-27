@@ -22,7 +22,7 @@ public:
 									Type*& _resultType) const;
 
 	virtual	status_t			EvaluateExpression(const BString& expression,
-									Value*& _output);
+									type_code type, Value*& _output);
 
 protected:
 	virtual	bool				IsModifierValid(char modifier) const = 0;

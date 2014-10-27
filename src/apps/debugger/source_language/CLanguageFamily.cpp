@@ -11,7 +11,9 @@
 #include <stdlib.h>
 
 #include "CLanguageExpressionEvaluator.h"
+#include "FloatValue.h"
 #include "IntegerValue.h"
+#include "Number.h"
 #include "StringValue.h"
 #include "TeamTypeInformation.h"
 #include "Type.h"
@@ -165,16 +167,36 @@ CLanguageFamily::ParseTypeExpression(const BString& expression,
 
 
 status_t
-CLanguageFamily::EvaluateExpression(const BString& expression, Value*& _output)
+CLanguageFamily::EvaluateExpression(const BString& expression,
+	type_code type, Value*& _output)
 {
 	_output = NULL;
 	CLanguageExpressionEvaluator evaluator;
-	evaluator.SetSupportHexInput(true);
-	int64 resultValue;
+	Number result;
 	try {
-		resultValue = evaluator.EvaluateToInt64(expression);
-		BVariant variantValue(resultValue);
-		_output = new(std::nothrow) IntegerValue(variantValue);
+		result = evaluator.Evaluate(expression, type);
+		BVariant resultValue = result.GetValue();
+		switch (type) {
+			case B_INT8_TYPE:
+			case B_UINT8_TYPE:
+			case B_INT16_TYPE:
+			case B_UINT16_TYPE:
+			case B_INT32_TYPE:
+			case B_UINT32_TYPE:
+			case B_INT64_TYPE:
+			case B_UINT64_TYPE:
+				_output = new(std::nothrow) IntegerValue(resultValue);
+				break;
+
+			case B_FLOAT_TYPE:
+				_output = new(std::nothrow) FloatValue(resultValue.ToFloat());
+				break;
+
+			case B_DOUBLE_TYPE:
+				_output = new(std::nothrow) FloatValue(resultValue.ToDouble());
+				break;
+		}
+
 		if (_output == NULL)
 			return B_NO_MEMORY;
 
