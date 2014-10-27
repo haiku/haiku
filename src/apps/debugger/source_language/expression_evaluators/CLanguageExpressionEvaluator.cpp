@@ -27,28 +27,126 @@ enum {
 	TOKEN_NONE					= 0,
 	TOKEN_IDENTIFIER,
 	TOKEN_CONSTANT,
+	TOKEN_END_OF_LINE,
 
-	TOKEN_END_OF_LINE			= '\n',
+	TOKEN_PLUS,
+	TOKEN_MINUS,
 
-	TOKEN_PLUS					= '+',
-	TOKEN_MINUS					= '-',
+	TOKEN_STAR,
+	TOKEN_SLASH,
+	TOKEN_MODULO,
 
-	TOKEN_STAR					= '*',
-	TOKEN_SLASH					= '/',
-	TOKEN_MODULO				= '%',
+	TOKEN_POWER,
 
-	TOKEN_POWER					= '^',
+	TOKEN_OPENING_BRACKET,
+	TOKEN_CLOSING_BRACKET,
 
-	TOKEN_OPENING_BRACKET		= '(',
-	TOKEN_CLOSING_BRACKET		= ')',
-
-	TOKEN_AND					= '&',
-	TOKEN_OR					= '|',
-	TOKEN_NOT					= '~',
-	TOKEN_EQ					= '=',
-	TOKEN_GE					= '>',
-	TOKEN_LE					= '<'
+	TOKEN_LOGICAL_AND,
+	TOKEN_LOGICAL_OR,
+	TOKEN_LOGICAL_NOT,
+	TOKEN_BITWISE_AND,
+	TOKEN_BITWISE_OR,
+	TOKEN_BITWISE_NOT,
+	TOKEN_EQ,
+	TOKEN_NE,
+	TOKEN_GT,
+	TOKEN_GE,
+	TOKEN_LT,
+	TOKEN_LE
 };
+
+static BString TokenTypeToString(int32 type)
+{
+	BString token;
+
+	switch (type) {
+		case TOKEN_PLUS:
+			token = "+";
+			break;
+
+		case TOKEN_MINUS:
+			token = "-";
+			break;
+
+		case TOKEN_STAR:
+			token = "*";
+			break;
+
+		case TOKEN_SLASH:
+			token = "/";
+			break;
+
+		case TOKEN_MODULO:
+			token = "%";
+			break;
+
+		case TOKEN_POWER:
+			token = "^";
+			break;
+
+		case TOKEN_OPENING_BRACKET:
+			token = "(";
+			break;
+
+		case TOKEN_CLOSING_BRACKET:
+			token = ")";
+			break;
+
+		case TOKEN_LOGICAL_AND:
+			token = "&&";
+			break;
+
+		case TOKEN_LOGICAL_OR:
+			token = "||";
+			break;
+
+		case TOKEN_LOGICAL_NOT:
+			token = "!";
+			break;
+
+		case TOKEN_BITWISE_AND:
+			token = "&";
+			break;
+
+		case TOKEN_BITWISE_OR:
+			token = "|";
+			break;
+
+		case TOKEN_BITWISE_NOT:
+			token = "~";
+			break;
+
+		case TOKEN_EQ:
+			token = "==";
+			break;
+
+		case TOKEN_NE:
+			token = "!=";
+			break;
+
+		case TOKEN_GT:
+			token = ">";
+			break;
+
+		case TOKEN_GE:
+			token = ">=";
+			break;
+
+		case TOKEN_LT:
+			token = "<";
+			break;
+
+		case TOKEN_LE:
+			token = "<=";
+			break;
+
+		default:
+			token.SetToFormat("Unknown token type %" B_PRId32, type);
+			break;
+	}
+
+	return token;
+}
 
 
 struct CLanguageExpressionEvaluator::Token {
@@ -214,48 +312,153 @@ class CLanguageExpressionEvaluator::Tokenizer {
 				TOKEN_IDENTIFIER);
 			fCurrentChar += 2;
 		} else {
-			int32 type = TOKEN_NONE;
-
-			switch (*fCurrentChar) {
-				case TOKEN_PLUS:
-				case TOKEN_MINUS:
-				case TOKEN_STAR:
-				case TOKEN_SLASH:
-				case TOKEN_MODULO:
-				case TOKEN_POWER:
-				case TOKEN_OPENING_BRACKET:
-				case TOKEN_CLOSING_BRACKET:
-				case TOKEN_AND:
-				case TOKEN_OR:
-				case TOKEN_NOT:
-				case TOKEN_EQ:
-				case TOKEN_GE:
-				case TOKEN_LE:
-				case TOKEN_END_OF_LINE:
-					type = *fCurrentChar;
-					break;
-
-				case '\\':
-				case ':':
-				type = TOKEN_SLASH;
-					break;
-
-				case 'x':
-					if (!fHexSupport) {
-						type = TOKEN_STAR;
+			if (!_ParseOperator()) {
+				int32 type = TOKEN_NONE;
+				switch (*fCurrentChar) {
+					case '\n':
+						type = TOKEN_END_OF_LINE;
 						break;
-					}
-					// fall through
 
-				default:
-					throw ParseException("unexpected character", _CurrentPos());
+					case '(':
+						type = TOKEN_OPENING_BRACKET;
+						break;
+					case ')':
+						type = TOKEN_CLOSING_BRACKET;
+						break;
+
+					case '\\':
+					case ':':
+						type = TOKEN_SLASH;
+						break;
+
+					case 'x':
+						if (!fHexSupport) {
+							type = TOKEN_STAR;
+							break;
+						}
+						// fall through
+
+					default:
+						throw ParseException("unexpected character",
+							_CurrentPos());
+				}
+				fCurrentToken = Token(fCurrentChar, 1, _CurrentPos(), type);
+				fCurrentChar++;
 			}
-			fCurrentToken = Token(fCurrentChar, 1, _CurrentPos(), type);
-			fCurrentChar++;
 		}
 
 //printf("next token: '%s'\n", fCurrentToken.string.String());
 		return fCurrentToken;
+	}
+
+	bool _ParseOperator()
+	{
+		int32 type = TOKEN_NONE;
+		int32 length = 0;
+		switch (*fCurrentChar) {
+			case '+':
+				type = TOKEN_PLUS;
+				length = 1;
+				break;
+
+			case '-':
+				type = TOKEN_MINUS;
+				length = 1;
+				break;
+
+			case '*':
+				type = TOKEN_STAR;
+				length = 1;
+				break;
+
+			case '/':
+				type = TOKEN_SLASH;
+				length = 1;
+				break;
+
+			case '%':
+				type = TOKEN_MODULO;
+				length = 1;
+				break;
+
+			case '^':
+				type = TOKEN_POWER;
+				length = 1;
+				break;
+
+			case '&':
+				if (Peek() == '&') {
+				 	type = TOKEN_LOGICAL_AND;
+				 	length = 2;
+				} else {
+					type = TOKEN_BITWISE_AND;
+					length = 1;
+				}
+				break;
+
+			case '|':
+				if (Peek() == '|') {
+					type = TOKEN_LOGICAL_OR;
+					length = 2;
+				} else {
+					type = TOKEN_BITWISE_OR;
+					length = 1;
+				}
+				break;
+
+			case '!':
+				if (Peek() == '=') {
+					type = TOKEN_NE;
+					length = 2;
+				} else {
+					type = TOKEN_LOGICAL_NOT;
+					length = 1;
+				}
+				break;
+
+			case '=':
+				if (Peek() == '=') {
+					type = TOKEN_EQ;
+					length = 2;
+				}
+				break;
+
+			case '>':
+				if (Peek() == '=') {
+					type = TOKEN_GE;
+					length = 2;
+				} else {
+					type = TOKEN_GT;
+					length = 1;
+				}
+				break;
+
+			case '<':
+				if (Peek() == '=') {
+					type = TOKEN_LE;
+					length = 2;
+				} else {
+					type = TOKEN_LT;
+					length = 1;
+				}
+				break;
+
+			case '~':
+				type = TOKEN_BITWISE_NOT;
+				length = 1;
+				break;
+
+			default:
+				break;
+		}
+
+		if (length == 0)
+			return false;
+
+		fCurrentToken = Token(fCurrentChar, length, _CurrentPos(), type);
+		fCurrentChar += length;
+
+		return true;
 	}
 
 	void RewindToken()
@@ -264,6 +467,14 @@ class CLanguageExpressionEvaluator::Tokenizer {
 	}
 
  private:
+ 	char Peek() const
+ 	{
+ 		if (_CurrentPos() < fString.Length())
+ 			return *(fCurrentChar + 1);
+
+ 		return '\0';
+ 	}
+
 	static bool _IsHexDigit(char c)
 	{
 		return isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
@@ -602,13 +813,19 @@ CLanguageExpressionEvaluator::_EatToken(int32 type)
 			case TOKEN_POWER:
 			case TOKEN_OPENING_BRACKET:
 			case TOKEN_CLOSING_BRACKET:
-			case TOKEN_AND:
-			case TOKEN_OR:
-			case TOKEN_NOT:
+			case TOKEN_LOGICAL_AND:
+			case TOKEN_BITWISE_AND:
+			case TOKEN_LOGICAL_OR:
+			case TOKEN_BITWISE_OR:
+			case TOKEN_LOGICAL_NOT:
+			case TOKEN_BITWISE_NOT:
 			case TOKEN_EQ:
+			case TOKEN_NE:
+			case TOKEN_GT:
 			case TOKEN_GE:
+			case TOKEN_LT:
 			case TOKEN_LE:
-				expected << "'" << (char)type << "'";
+				expected << "'" << TokenTypeToString(type) << "'";
 				break;
 
 			case TOKEN_SLASH:
