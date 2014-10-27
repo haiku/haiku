@@ -23,8 +23,6 @@ public:
 		BNumberFormat(const BNumberFormat &other);
 		~BNumberFormat();
 
-			BNumberFormat&		operator=(const BNumberFormat &other);
-
 								// formatting
 
 			ssize_t				Format(char* string, size_t maxSize,

@@ -150,8 +150,6 @@ private:
 
 				// For date and time localization purposes
 				BLocale			fLocale;
-				BDateFormat		fDateFormat;
-				BDateTimeFormat	fTimeFormat;
 };
 
 

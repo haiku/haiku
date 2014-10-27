@@ -18,10 +18,9 @@ namespace BPrivate {
 
 class BTimeFormat : public BFormat {
 public:
-								BTimeFormat(
-									const BLanguage* const language = NULL,
-									const BFormattingConventions* const
-										format = NULL);
+								BTimeFormat();
+								BTimeFormat(const BLanguage& language,
+									const BFormattingConventions& conventions);
 								BTimeFormat(const BTimeFormat &other);
 	virtual						~BTimeFormat();
 

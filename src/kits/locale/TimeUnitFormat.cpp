@@ -35,11 +35,35 @@ static const TimeUnit::UTimeUnitFields skUnitMap[] = {
 
 
 BTimeUnitFormat::BTimeUnitFormat()
-	:
-	Inherited(),
-	fFormatter(NULL)
+	: Inherited()
 {
-	SetLanguage(fLanguage);
+	Locale icuLocale(fLanguage.Code());
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	fFormatter = new TimeUnitFormat(icuLocale, icuStatus);
+	if (fFormatter == NULL) {
+		fInitStatus = B_NO_MEMORY;
+		return;
+	}
+
+	if (!U_SUCCESS(icuStatus))
+		fInitStatus = B_ERROR;
+}
+
+
+BTimeUnitFormat::BTimeUnitFormat(const BLanguage& language,
+	const BFormattingConventions& conventions)
+	: Inherited(language, conventions)
+{
+	Locale icuLocale(fLanguage.Code());
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	fFormatter = new TimeUnitFormat(icuLocale, icuStatus);
+	if (fFormatter == NULL) {
+		fInitStatus = B_NO_MEMORY;
+		return;
+	}
+
+	if (!U_SUCCESS(icuStatus))
+		fInitStatus = B_ERROR;
 }
 
 
@@ -57,47 +81,6 @@ BTimeUnitFormat::BTimeUnitFormat(const BTimeUnitFormat& other)
 BTimeUnitFormat::~BTimeUnitFormat()
 {
 	delete fFormatter;
-}
-
-
-BTimeUnitFormat&
-BTimeUnitFormat::operator=(const BTimeUnitFormat& other)
-{
-	if (this == &other)
-		return *this;
-
-	Inherited::operator=(other);
-
-	delete fFormatter;
-	fFormatter = other.fFormatter != NULL
-		? new TimeUnitFormat(*other.fFormatter) : NULL;
-
-	if (fFormatter == NULL && other.fFormatter != NULL)
-		fInitStatus = B_NO_MEMORY;
-
-	return *this;
-}
-
-
-status_t
-BTimeUnitFormat::SetLanguage(const BLanguage& language)
-{
-	status_t result = Inherited::SetLanguage(language);
-	if (result != B_OK)
-		return result;
-
-	Locale icuLocale(fLanguage.Code());
-	UErrorCode icuStatus = U_ZERO_ERROR;
-	if (fFormatter == NULL) {
-		fFormatter = new TimeUnitFormat(icuLocale, icuStatus);
-		if (fFormatter == NULL)
-			return B_NO_MEMORY;
-	} else
-		fFormatter->setLocale(icuLocale, icuStatus);
-	if (!U_SUCCESS(icuStatus))
-		return B_ERROR;
-
-	return B_OK;
 }
 
 

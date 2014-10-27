@@ -36,10 +36,9 @@ enum BWeekday {
 
 class BDateFormat: public BFormat {
 public:
-								BDateFormat(
-									const BLanguage* const language = NULL,
-									const BFormattingConventions* const
-										format = NULL);
+								BDateFormat(const BLocale* locale = NULL);
+								BDateFormat(const BLanguage& language,
+									const BFormattingConventions& format);
 								BDateFormat(const BDateFormat &other);
 	virtual						~BDateFormat();
 

@@ -23,16 +23,15 @@ class BDurationFormat : public BFormat {
 	typedef	BFormat				Inherited;
 
 public:
+								BDurationFormat(const BLanguage& language,
+									const BFormattingConventions& conventions,
+									const BString& separator = ", ");
 								BDurationFormat(
 									const BString& separator = ", ");
 								BDurationFormat(const BDurationFormat& other);
 	virtual						~BDurationFormat();
 
-			BDurationFormat&	operator=(const BDurationFormat& other);
-
 			void				SetSeparator(const BString& separator);
-
-	virtual	status_t			SetLanguage(const BLanguage& language);
 			status_t			SetTimeZone(const BTimeZone* timeZone);
 
 			status_t			Format(BString& buffer,

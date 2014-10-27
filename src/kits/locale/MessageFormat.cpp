@@ -13,6 +13,13 @@
 #include <unicode/msgfmt.h>
 
 
+BMessageFormat::BMessageFormat(const BLanguage& language, const BString pattern)
+	: BFormat(language, BFormattingConventions())
+{
+	_Initialize(UnicodeString::fromUTF8(pattern.String()));
+}
+
+
 BMessageFormat::BMessageFormat(const BString pattern)
 	: BFormat()
 {
@@ -34,55 +41,10 @@ BMessageFormat::InitCheck()
 
 
 status_t
-BMessageFormat::SetLanguage(const BLanguage& newLanguage)
-{
-	if (!fFormatter)
-		return B_NO_INIT;
-
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
-	fInitStatus = BFormat::SetLanguage(newLanguage);
-
-	if (fInitStatus == B_OK) {
-		UnicodeString storage;
-		_Initialize(fFormatter->toPattern(storage));
-	}
-	return fInitStatus;
-}
-
-
-status_t
-BMessageFormat::SetFormattingConventions(
-	const BFormattingConventions& conventions)
-{
-	if (!fFormatter)
-		return B_NO_INIT;
-
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
-	fInitStatus = BFormat::SetFormattingConventions(conventions);
-
-	if (fInitStatus == B_OK) {
-		UnicodeString storage;
-		_Initialize(fFormatter->toPattern(storage));
-	}
-	return fInitStatus;
-}
-
-
-status_t
 BMessageFormat::Format(BString& output, const int32 arg) const
 {
 	if (fInitStatus != B_OK)
 		return fInitStatus;
-
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
 
 	UnicodeString buffer;
 	UErrorCode error = U_ZERO_ERROR;
@@ -106,6 +68,7 @@ BMessageFormat::Format(BString& output, const int32 arg) const
 status_t
 BMessageFormat::_Initialize(const UnicodeString& pattern)
 {
+	fInitStatus = B_OK;
 	UErrorCode error = U_ZERO_ERROR;
 	Locale* icuLocale
 		= BLanguage::Private(&fLanguage).ICULocale();

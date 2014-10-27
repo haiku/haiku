@@ -26,14 +26,16 @@
 #include <vector>
 
 
-BDateFormat::BDateFormat(const BLanguage* const language,
-	const BFormattingConventions* const conventions)
+BDateFormat::BDateFormat(const BLocale* locale)
+	: BFormat(locale)
 {
-	if (conventions != NULL)
-		fConventions = *conventions;
+}
 
-	if (language != NULL)
-		fLanguage = *language;
+
+BDateFormat::BDateFormat(const BLanguage& language,
+	const BFormattingConventions& conventions)
+	: BFormat(language, conventions)
+{
 }
 
 
@@ -68,10 +70,6 @@ ssize_t
 BDateFormat::Format(char* string, const size_t maxSize, const time_t time,
 	const BDateFormatStyle style) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
@@ -93,10 +91,6 @@ status_t
 BDateFormat::Format(BString& string, const time_t time,
 	const BDateFormatStyle style, const BTimeZone* timeZone) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
@@ -126,10 +120,6 @@ BDateFormat::Format(BString& string, const BDate& time,
 {
 	if (!time.IsValid())
 		return B_BAD_DATA;
-
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
 
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
@@ -169,10 +159,6 @@ status_t
 BDateFormat::Format(BString& string, int*& fieldPositions, int& fieldCount,
 	const time_t time, const BDateFormatStyle style) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
@@ -214,10 +200,6 @@ status_t
 BDateFormat::GetFields(BDateElement*& fields, int& fieldCount,
 	BDateFormatStyle style) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
@@ -270,10 +252,6 @@ BDateFormat::GetStartOfWeek(BWeekday* startOfWeek) const
 	if (startOfWeek == NULL)
 		return B_BAD_VALUE;
 
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	UErrorCode err = U_ZERO_ERROR;
 	ObjectDeleter<Calendar> calendar = Calendar::createInstance(
 		*BFormattingConventions::Private(&fConventions).ICULocale(), err);
@@ -318,10 +296,6 @@ BDateFormat::GetStartOfWeek(BWeekday* startOfWeek) const
 status_t
 BDateFormat::GetMonthName(int month, BString& outName)
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	DateFormat* format = _CreateDateFormatter(B_LONG_DATE_FORMAT);
 
 	SimpleDateFormat* simpleFormat = dynamic_cast<SimpleDateFormat*>(format);
@@ -356,14 +330,9 @@ BDateFormat::Parse(BString source, BDateFormatStyle style, BDate& output)
 	// may want to parse to a "local" date instead. But BDate should be made
 	// timezone aware so things like BDate::Difference can work for dates in
 	// different timezones.
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
-
 
 	ParsePosition p(0);
 	UDate date = dateFormatter->parse(UnicodeString::fromUTF8(source.String()),
@@ -400,5 +369,4 @@ BDateFormat::_CreateDateFormatter(const BDateFormatStyle style) const
 
 	return dateFormatter;
 }
-
 

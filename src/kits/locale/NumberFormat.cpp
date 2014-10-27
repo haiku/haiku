@@ -34,14 +34,6 @@ BNumberFormat::~BNumberFormat()
 }
 
 
-BNumberFormat &
-BNumberFormat::operator=(const BNumberFormat &other)
-{
-	BFormat::operator=(other);
-	return *this;
-}
-
-
 // #pragma mark - Formatting
 
 
@@ -60,10 +52,6 @@ BNumberFormat::Format(char* string, size_t maxSize, const double value) const
 status_t
 BNumberFormat::Format(BString& string, const double value) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	UErrorCode err = U_ZERO_ERROR;
 	ObjectDeleter<NumberFormat> numberFormatter(NumberFormat::createInstance(
 		*BFormattingConventions::Private(&fConventions).ICULocale(),
@@ -100,10 +88,6 @@ BNumberFormat::Format(char* string, size_t maxSize, const int32 value) const
 status_t
 BNumberFormat::Format(BString& string, const int32 value) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	UErrorCode err = U_ZERO_ERROR;
 	ObjectDeleter<NumberFormat> numberFormatter(NumberFormat::createInstance(
 		*BFormattingConventions::Private(&fConventions).ICULocale(),
@@ -143,10 +127,6 @@ BNumberFormat::FormatMonetary(BString& string, const double value) const
 {
 	if (string == NULL)
 		return B_BAD_VALUE;
-
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
 
 	UErrorCode err = U_ZERO_ERROR;
 	ObjectDeleter<NumberFormat> numberFormatter(

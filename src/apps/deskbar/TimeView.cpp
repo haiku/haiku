@@ -391,11 +391,10 @@ TTimeView::GetCurrentTime()
 	if (fShowTimeZone)
 		fields |= B_DATE_ELEMENT_TIMEZONE;
 
-	fTimeFormat.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
-		fields);
+	BDateTimeFormat format(&fLocale);
+	format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, fields);
 
-	fTimeFormat.Format(fCurrentTimeStr,
-		sizeof(fCurrentTimeStr), fCurrentTime,
+	format.Format(fCurrentTimeStr, sizeof(fCurrentTimeStr), fCurrentTime,
 		B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT);
 }
 
@@ -405,7 +404,8 @@ TTimeView::GetCurrentDate()
 {
 	char tmp[sizeof(fCurrentDateStr)];
 
-	fDateFormat.Format(tmp, sizeof(fCurrentDateStr), fCurrentTime,
+	BDateFormat format(&fLocale);
+	format.Format(tmp, sizeof(fCurrentDateStr), fCurrentTime,
 		B_FULL_DATE_FORMAT);
 
 	// remove leading 0 from date when month is less than 10 (MM/DD/YY)
@@ -472,8 +472,6 @@ void
 TTimeView::Update()
 {
 	fLocale = *BLocale::Default();
-	fDateFormat.SetLocale(fLocale);
-	fTimeFormat.SetLocale(fLocale);
 
 	GetCurrentTime();
 	GetCurrentDate();

@@ -43,25 +43,26 @@ class BLocale;
 
 class BFormat {
 public:
-			status_t				SetLocale(const BLocale& locale);
-	virtual	status_t				SetLanguage(const BLanguage& newLanguage);
-	virtual	status_t				SetFormattingConventions(
-										const BFormattingConventions&
-											conventions);
-
-			status_t				InitCheck() const;
+			status_t			InitCheck() const;
 protected:
-									BFormat();
-									BFormat(const BFormat& other);
-	virtual 						~BFormat();
+								BFormat(const BLocale* locale = NULL);
+								BFormat(const BLanguage& language,
+									const BFormattingConventions& conventions);
 
-			BFormat&				operator=(const BFormat& other);
+								BFormat(const BFormat& other);
+	virtual 					~BFormat();
+
+private:
+			BFormat&			operator=(const BFormat& other);
+
+			status_t			_Initialize(const BLocale& locale);
+			status_t			_Initialize(const BLanguage& language,
+									const BFormattingConventions& conventions);
 
 protected:
-	mutable	BLocker					fLock;
 			BFormattingConventions	fConventions;
-			BLanguage				fLanguage;
-			status_t				fInitStatus;
+			BLanguage			fLanguage;
+			status_t			fInitStatus;
 };
 
 

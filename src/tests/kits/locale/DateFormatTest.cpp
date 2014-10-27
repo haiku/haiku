@@ -65,39 +65,46 @@ DateFormatTest::TestCustomFormat()
 
 		BLanguage language(tests[i].language);
 		BFormattingConventions formatting(tests[i].formatting);
-
-		BDateTimeFormat format(&language, &formatting);
-		format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
-			tests[i].fields);
+		status_t result;
 
 		// Test default for language/formatting
-		status_t result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-			B_SHORT_TIME_FORMAT);
+		{
+			BDateTimeFormat format(language, formatting);
+			format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
+				tests[i].fields);
 
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
-		CPPUNIT_ASSERT_EQUAL(tests[i].expected, buffer);
+			result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
+				B_SHORT_TIME_FORMAT);
+
+			CPPUNIT_ASSERT_EQUAL(B_OK, result);
+			CPPUNIT_ASSERT_EQUAL(tests[i].expected, buffer);
+		}
 
 		// Test forced 24 hours
-		formatting.SetExplicitUse24HourClock(true);
-		format.SetFormattingConventions(formatting);
-		format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
-			tests[i].fields);
-		result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-			B_SHORT_TIME_FORMAT);
+		{
+			formatting.SetExplicitUse24HourClock(true);
+			BDateTimeFormat format(language, formatting);
+			format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
+				tests[i].fields);
+			result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
+				B_SHORT_TIME_FORMAT);
 
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
-		CPPUNIT_ASSERT_EQUAL(tests[i].force24, buffer);
+			CPPUNIT_ASSERT_EQUAL(B_OK, result);
+			CPPUNIT_ASSERT_EQUAL(tests[i].force24, buffer);
+		}
 
 		// Test forced 12 hours
-		formatting.SetExplicitUse24HourClock(false);
-		format.SetFormattingConventions(formatting);
-		format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
-			tests[i].fields);
-		result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-			B_SHORT_TIME_FORMAT);
+		{
+			formatting.SetExplicitUse24HourClock(false);
+			BDateTimeFormat format(language, formatting);
+			format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
+				tests[i].fields);
+			result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
+				B_SHORT_TIME_FORMAT);
 
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
-		CPPUNIT_ASSERT_EQUAL(tests[i].force12, buffer);
+			CPPUNIT_ASSERT_EQUAL(B_OK, result);
+			CPPUNIT_ASSERT_EQUAL(tests[i].force12, buffer);
+		}
 	}
 }
 
@@ -134,9 +141,9 @@ DateFormatTest::TestFormat()
 
 		BLanguage language(values[i].language);
 		BFormattingConventions formatting(values[i].convention);
-		BDateFormat dateFormat(&language, &formatting);
-		BTimeFormat timeFormat(&language, &formatting);
-		BDateTimeFormat dateTimeFormat(&language, &formatting);
+		BDateFormat dateFormat(language, formatting);
+		BTimeFormat timeFormat(language, formatting);
+		BDateTimeFormat dateTimeFormat(language, formatting);
 
 		result = dateFormat.Format(output, values[i].time, B_SHORT_DATE_FORMAT);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
@@ -167,7 +174,7 @@ DateFormatTest::TestFormatDate()
 {
 		BLanguage language("en");
 		BFormattingConventions formatting("en_US");
-		BDateFormat format(&language, &formatting);
+		BDateFormat format(language, formatting);
 
 		BString output;
 		status_t result;
@@ -190,7 +197,7 @@ DateFormatTest::TestMonthNames()
 {
 	BLanguage language("en");
 	BFormattingConventions formatting("en_US");
-	BDateFormat format(&language, &formatting);
+	BDateFormat format(language, formatting);
 
 	BString buffer;
 	status_t result = format.GetMonthName(1, buffer);
@@ -235,7 +242,7 @@ DateFormatTest::TestParseDate()
 {
 	BLanguage language("en");
 	BFormattingConventions formatting("en_US");
-	BDateFormat format(&language, &formatting);
+	BDateFormat format(language, formatting);
 	BDate date;
 	status_t result;
 
@@ -266,7 +273,7 @@ DateFormatTest::TestParseTime()
 {
 	BLanguage language("fr");
 	BFormattingConventions formatting("fr_FR");
-	BTimeFormat format(&language, &formatting);
+	BTimeFormat format(language, formatting);
 	BTime date;
 	status_t result;
 

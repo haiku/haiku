@@ -21,14 +21,16 @@
 #include <unicode/smpdtfmt.h>
 
 
-BDateTimeFormat::BDateTimeFormat(const BLanguage* const language,
-		const BFormattingConventions* const conventions)
+BDateTimeFormat::BDateTimeFormat(const BLocale* locale)
+	: BFormat(locale)
 {
-	if (conventions != NULL)
-		fConventions = *conventions;
+}
 
-	if (language != NULL)
-		fLanguage = *language;
+
+BDateTimeFormat::BDateTimeFormat(const BLanguage& language,
+	const BFormattingConventions& conventions)
+	: BFormat(language, conventions)
+{
 }
 
 
@@ -95,10 +97,6 @@ ssize_t
 BDateTimeFormat::Format(char* target, size_t maxSize, time_t time,
 	BDateFormatStyle dateStyle, BTimeFormatStyle timeStyle) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	BString format;
 	fConventions.GetDateTimeFormat(dateStyle, timeStyle, format);
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateTimeFormatter(format));
@@ -123,10 +121,6 @@ BDateTimeFormat::Format(BString& target, const time_t time,
 	BDateFormatStyle dateStyle, BTimeFormatStyle timeStyle,
 	const BTimeZone* timeZone) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	BString format;
 	fConventions.GetDateTimeFormat(dateStyle, timeStyle, format);
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateTimeFormatter(format));

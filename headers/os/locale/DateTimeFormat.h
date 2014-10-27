@@ -31,10 +31,9 @@ enum BDateElement {
 
 class BDateTimeFormat : public BFormat {
 public:
-								BDateTimeFormat(
-									const BLanguage* const language = NULL,
-									const BFormattingConventions* const format
-										= NULL);
+								BDateTimeFormat(const BLocale* locale = NULL);
+								BDateTimeFormat(const BLanguage& language,
+									const BFormattingConventions& conventions);
 								BDateTimeFormat(const BDateTimeFormat &other);
 	virtual						~BDateTimeFormat();
 

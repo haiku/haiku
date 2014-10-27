@@ -41,12 +41,11 @@ class BTimeUnitFormat : public BFormat {
 
 public:
 								BTimeUnitFormat();
+								BTimeUnitFormat(const BLanguage& language,
+									const BFormattingConventions& conventions);
 								BTimeUnitFormat(const BTimeUnitFormat& other);
 	virtual						~BTimeUnitFormat();
 
-			BTimeUnitFormat&	operator=(const BTimeUnitFormat& other);
-
-	virtual	status_t			SetLanguage(const BLanguage& locale);
 			status_t			Format(BString& buffer,
 									const int32 value,
 									const time_unit_element unit,

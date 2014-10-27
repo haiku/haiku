@@ -17,15 +17,12 @@ namespace icu {
 
 class BMessageFormat: public BFormat {
 public:
+								BMessageFormat(const BLanguage& language,
+									const BString pattern);
 								BMessageFormat(const BString pattern);
 								~BMessageFormat();
 
 			status_t			InitCheck();
-
-			status_t			SetLanguage(const BLanguage& newLanguage);
-			status_t			SetFormattingConventions(
-									const BFormattingConventions&
-										conventions);
 
 			status_t			Format(BString& buffer, const int32 arg) const;
 
@@ -33,7 +30,6 @@ private:
 			status_t			_Initialize(const icu::UnicodeString&);
 
 private:
-			status_t			fInitStatus;
 			icu::MessageFormat*	fFormatter;
 };
 

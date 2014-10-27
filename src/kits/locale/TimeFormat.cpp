@@ -23,14 +23,16 @@
 #include <vector>
 
 
-BTimeFormat::BTimeFormat(const BLanguage* const language,
-	const BFormattingConventions* const conventions)
+BTimeFormat::BTimeFormat()
+	: BFormat()
 {
-	if (conventions != NULL)
-		fConventions = *conventions;
+}
 
-	if (language != NULL)
-		fLanguage = *language;
+
+BTimeFormat::BTimeFormat(const BLanguage& language,
+	const BFormattingConventions& conventions)
+	: BFormat(language, conventions)
+{
 }
 
 
@@ -60,10 +62,6 @@ ssize_t
 BTimeFormat::Format(char* string, size_t maxSize, time_t time,
 	BTimeFormatStyle style) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
@@ -85,10 +83,6 @@ status_t
 BTimeFormat::Format(BString& string, const time_t time,
 	const BTimeFormatStyle style, const BTimeZone* timeZone) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
@@ -116,10 +110,6 @@ status_t
 BTimeFormat::Format(BString& string, int*& fieldPositions, int& fieldCount,
 	time_t time, BTimeFormatStyle style) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
@@ -160,10 +150,6 @@ status_t
 BTimeFormat::GetTimeFields(BDateElement*& fields, int& fieldCount,
 	BTimeFormatStyle style) const
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
@@ -219,10 +205,6 @@ BTimeFormat::GetTimeFields(BDateElement*& fields, int& fieldCount,
 status_t
 BTimeFormat::Parse(BString source, BTimeFormatStyle style, BTime& output)
 {
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;

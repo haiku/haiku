@@ -33,6 +33,22 @@ static const UCalendarDateFields skUnitMap[] = {
 };
 
 
+BDurationFormat::BDurationFormat(const BLanguage& language,
+	const BFormattingConventions& conventions, const BString& separator)
+	:
+	Inherited(language, conventions),
+	fSeparator(separator),
+	fTimeUnitFormat(language, conventions)
+{
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	fCalendar = new GregorianCalendar(icuStatus);
+	if (fCalendar == NULL) {
+		fInitStatus = B_NO_MEMORY;
+		return;
+	}
+}
+
+
 BDurationFormat::BDurationFormat(const BString& separator)
 	:
 	Inherited(),
@@ -67,40 +83,10 @@ BDurationFormat::~BDurationFormat()
 }
 
 
-BDurationFormat&
-BDurationFormat::operator=(const BDurationFormat& other)
-{
-	if (this == &other)
-		return *this;
-
-	fSeparator = other.fSeparator;
-	fTimeUnitFormat = other.fTimeUnitFormat;
-	delete fCalendar;
-	fCalendar = other.fCalendar != NULL
-		? new GregorianCalendar(*other.fCalendar) : NULL;
-
-	if (fCalendar == NULL && other.fCalendar != NULL)
-		fInitStatus = B_NO_MEMORY;
-
-	return *this;
-}
-
-
 void
 BDurationFormat::SetSeparator(const BString& separator)
 {
 	fSeparator = separator;
-}
-
-
-status_t
-BDurationFormat::SetLanguage(const BLanguage& language)
-{
-	status_t result = Inherited::SetLanguage(language);
-	if (result != B_OK)
-		return result;
-
-	return fTimeUnitFormat.SetLanguage(language);
 }
 
 

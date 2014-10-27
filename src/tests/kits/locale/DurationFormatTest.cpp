@@ -42,9 +42,9 @@ DurationFormatTest::TestDefault()
 void
 DurationFormatTest::TestDuration()
 {
-	BDurationFormat format;
 	BString buffer;
 	BString expected;
+	status_t result;
 
 	BFormattingConventions englishFormat("en_US");
 	BLanguage englishLanguage("en");
@@ -52,30 +52,32 @@ DurationFormatTest::TestDuration()
 	BFormattingConventions frenchFormat("fr_FR");
 	BLanguage frenchLanguage("fr");
 
-	format.SetFormattingConventions(englishFormat);
-	format.SetLanguage(englishLanguage);
-	status_t result = format.Format(buffer, 0, 800000000000ll);
+	{
+		BDurationFormat format(englishLanguage, englishFormat);
+		status_t result = format.Format(buffer, 0, 800000000000ll);
 
-	expected << "1 week, 2 days, 6 hours, 13 minutes, 20 seconds";
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-	CPPUNIT_ASSERT_EQUAL(expected, buffer);
+		expected << "1 week, 2 days, 6 hours, 13 minutes, 20 seconds";
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(expected, buffer);
+	}
 
-	format.SetFormattingConventions(frenchFormat);
-	format.SetLanguage(frenchLanguage);
-	result = format.Format(buffer, 0, 800000000000ll);
+	{
+		BDurationFormat format(frenchLanguage, frenchFormat);
+		result = format.Format(buffer, 0, 800000000000ll);
 
-	// We check that the passed BString is not truncated.
-	expected << "1 semaine, 2 jours, 6 heures, 13 minutes, 20 secondes";
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-	CPPUNIT_ASSERT_EQUAL(expected, buffer);
+		// We check that the passed BString is not truncated.
+		expected << "1 semaine, 2 jours, 6 heures, 13 minutes, 20 secondes";
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(expected, buffer);
+	}
 }
 
 
 void
 DurationFormatTest::TestTimeUnit()
 {
-	BTimeUnitFormat format;
 	BString buffer;
+	status_t result;
 
 	BFormattingConventions englishFormat("en_US");
 	BLanguage englishLanguage("en");
@@ -83,21 +85,23 @@ DurationFormatTest::TestTimeUnit()
 	BFormattingConventions frenchFormat("fr_FR");
 	BLanguage frenchLanguage("fr");
 
-	format.SetFormattingConventions(englishFormat);
-	format.SetLanguage(englishLanguage);
-	status_t result = format.Format(buffer, 5, B_TIME_UNIT_HOUR);
+	{
+		BTimeUnitFormat format(englishLanguage, englishFormat);
+		result = format.Format(buffer, 5, B_TIME_UNIT_HOUR);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-	CPPUNIT_ASSERT_EQUAL(BString("5 hours"), buffer);
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(BString("5 hours"), buffer);
+	}
 
-	format.SetFormattingConventions(frenchFormat);
-	format.SetLanguage(frenchLanguage);
-	result = format.Format(buffer, 5, B_TIME_UNIT_HOUR);
+	{
+		BTimeUnitFormat format(frenchLanguage, frenchFormat);
+		result = format.Format(buffer, 5, B_TIME_UNIT_HOUR);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-	// We check that the passed BString is not truncated. This makes it easy
-	// to append several units to the same string, as BDurationFormat does.
-	CPPUNIT_ASSERT_EQUAL(BString("5 hours5 heures"), buffer);
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		// We check that the passed BString is not truncated. This makes it easy
+		// to append several units to the same string, as BDurationFormat does.
+		CPPUNIT_ASSERT_EQUAL(BString("5 hours5 heures"), buffer);
+	}
 }
 
 

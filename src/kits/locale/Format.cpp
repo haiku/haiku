@@ -7,37 +7,38 @@
 #include <LocaleRoster.h>
 
 
-BFormat::BFormat()
+BFormat::BFormat(const BLocale* locale)
 {
-	const BLocale* locale = BLocaleRoster::Default()->GetDefaultLocale();
-	SetLocale(*locale);
+	if (locale == NULL)
+		locale = BLocaleRoster::Default()->GetDefaultLocale();
+
+	if (locale == NULL) {
+		fInitStatus = B_BAD_DATA;
+		return;
+	}
+
+	_Initialize(*locale);
+}
+
+
+BFormat::BFormat(const BLanguage& language,
+	const BFormattingConventions& conventions)
+{
+	_Initialize(language, conventions);
 }
 
 
 BFormat::BFormat(const BFormat &other)
+	:
+	fConventions(other.fConventions),
+	fLanguage(other.fLanguage),
+	fInitStatus(other.fInitStatus)
 {
-	fInitStatus = other.fInitStatus;
-	fConventions = other.fConventions;
-	fLanguage = other.fLanguage;
 }
 
 
 BFormat::~BFormat()
 {
-}
-
-
-BFormat &
-BFormat::operator=(const BFormat& other)
-{
-	if (this == &other)
-		return *this;
-
-	fInitStatus = other.fInitStatus;
-	fLanguage = other.fLanguage;
-	fInitStatus = other.fInitStatus;
-
-	return *this;
 }
 
 
@@ -49,7 +50,7 @@ BFormat::InitCheck() const
 
 
 status_t
-BFormat::SetLocale(const BLocale& locale)
+BFormat::_Initialize(const BLocale& locale)
 {
 	BFormattingConventions conventions;
 	BLanguage language;
@@ -57,39 +58,21 @@ BFormat::SetLocale(const BLocale& locale)
 	fInitStatus = locale.GetFormattingConventions(&conventions);
 	if (fInitStatus != B_OK)
 		return fInitStatus;
-	fInitStatus = SetFormattingConventions(conventions);
-	if (fInitStatus != B_OK)
-		return fInitStatus;
 
 	fInitStatus = locale.GetLanguage(&language);
 	if (fInitStatus != B_OK)
 		return fInitStatus;
-	fInitStatus = SetLanguage(language);
+
+	return _Initialize(language, conventions);
+}
+
+
+status_t
+BFormat::_Initialize(const BLanguage& language,
+	const BFormattingConventions& conventions)
+{
+	fConventions = conventions;
+	fLanguage = language;
+	fInitStatus = B_OK;
 	return fInitStatus;
 }
-
-
-status_t
-BFormat::SetFormattingConventions(const BFormattingConventions& conventions)
-{
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_WOULD_BLOCK;
-
-	fConventions = conventions;
-	return B_OK;
-}
-
-
-status_t
-BFormat::SetLanguage(const BLanguage& newLanguage)
-{
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_WOULD_BLOCK;
-
-	fLanguage = newLanguage;
-	return B_OK;
-}
-
-

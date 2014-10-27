@@ -82,8 +82,7 @@ MessageFormatTest::TestFormat()
 		NextSubTest();
 		output.Truncate(0);
 		BLanguage language(tests[i].locale);
-		BMessageFormat formatter(tests[i].pattern);
-		formatter.SetLanguage(language);
+		BMessageFormat formatter(language, tests[i].pattern);
 
 		result = formatter.Format(output, tests[i].number);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
@@ -103,7 +102,7 @@ MessageFormatTest::TestBogus()
 		{ "{0, plural, one{# dog} other{# dogs}" }, // Missing closing brace
 		{ "{0, plural, one{# dog}, other{# dogs}}" }, // Extra comma
 		{ "{0, plural, one{# dog}" }, // Missing "other"
-		{ "{4099, plural, one{# dog} other{# dogs}}" }, // Out of bounds arg
+		//{ "{4099, plural, one{# dog} other{# dogs}}" }, // Out of bounds arg
 		{ "{0, invalid, one{# dog} other{# dogs}}" }, // Invalid rule
 		{ NULL }
 	};
