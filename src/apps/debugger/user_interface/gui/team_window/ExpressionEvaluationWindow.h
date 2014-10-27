@@ -11,6 +11,7 @@
 #include "types/Types.h"
 
 
+class BMenu;
 class BButton;
 class BStringView;
 class BTextControl;
@@ -42,6 +43,7 @@ public:
 
 private:
 			void	 			_Init();
+			BMenu*				_BuildTypesMenu();
 
 
 private:
@@ -51,6 +53,7 @@ private:
 			BButton*			fEvaluateButton;
 			UserInterfaceListener* fListener;
 			BHandler*			fCloseTarget;
+			type_code			fCurrentEvaluationType;
 };
 
 #endif // EXPRESSION_EVALUATION_WINDOW_H
