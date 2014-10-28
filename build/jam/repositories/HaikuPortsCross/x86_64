@@ -31,7 +31,7 @@ BootstrapPackageRepository HaikuPortsCross
 	make_bootstrap-3.82-1
 	ncurses_bootstrap-5.9-1
 	ncurses_bootstrap_devel-5.9-1
-	python_bootstrap-2.6.8-1
+	python_bootstrap-2.7.6-1
 	sed_bootstrap-4.2.1-1
 	texinfo_bootstrap-4.13a-1
 	zlib_bootstrap-1.2.8-2
