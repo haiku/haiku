@@ -371,7 +371,7 @@ RemotePackageRepository HaikuPorts
 	devil_x86_devel-1.7.8-2
 	djvulibre_x86-3.5.25-1
 	djvulibre_x86_devel-3.5.25-1
-	documentviewer_x86-0.3_git-1
+	documentviewer_x86-0.3_git-3
 	dtc_x86-1.4.0-1
 	expat_x86-2.0.1-7
 	expat_x86_devel-2.0.1-7
@@ -379,7 +379,6 @@ RemotePackageRepository HaikuPorts
 	faad2_x86_devel-2.7-1
 	ffmpeg_x86-0.11.5-2
 	ffmpeg_x86_devel-0.11.5-2
-	fitz_x86-1.1-1
 	flac_x86-1.3.0-1
 	flac_x86_devel-1.3.0-1
 	fluidsynth_x86-1.1.6-2
@@ -512,6 +511,7 @@ RemotePackageRepository HaikuPorts
 	mpfr_x86_devel-3.1.2-2
 	mpg123_x86-1.12.1-2
 	mpg123_x86_devel-1.12.1-2
+	mupdf_x86-1.6-1
 	muscle_x86-6.00-1
 	musicpc_x86-0.26-1
 	ncurses_x86-5.9-9
@@ -523,8 +523,8 @@ RemotePackageRepository HaikuPorts
 	openexr_x86-2.2.0-1
 	openexr_x86_devel-2.2.0-1
 	openjdk_x86-1.7_u80_b02-1
-	openjpeg_x86-1.5.0-1
-	openjpeg_x86_devel-1.5.0-1
+	openjpeg_x86-2.1.0-2
+	openjpeg_x86_devel-2.1.0-2
 	openssl_x86-1.0.0o-1
 	openssl_x86_devel-1.0.0o-1
 	openttd_x86-1.3.3-1
@@ -649,7 +649,6 @@ RemotePackageRepository HaikuPorts
 	faad2_x86
 	f1spirit
 	findutils
-	fitz_x86
 	ffmpeg
 	flac
 	flex
@@ -777,6 +776,7 @@ RemotePackageRepository HaikuPorts
 	mpfr_x86
 	mpg123_x86
 	multitalk
+	mupdf_x86
 	muscle_x86
 	musicpc_x86
 	nano
