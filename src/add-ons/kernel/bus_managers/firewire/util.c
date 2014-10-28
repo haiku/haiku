@@ -65,7 +65,7 @@ alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
 		*virt = virtadr;
 	if (phy)
 		*phy = (void*)(addr_t)pe.address;
-	TRACE("area = %ld, size = %ld, virt = %p, phy = %" B_PRIxPHYSADDR "\n", area, size, virtadr,
+	TRACE("area = %" B_PRId32 ", size = %ld, virt = %p, phy = %" B_PRIxPHYSADDR "\n", area, size, virtadr,
 		pe.address);
 	return area;
 }
@@ -83,22 +83,22 @@ map_mem(void **virt, void *phy, size_t size, uint32 protection,
 	TRACE("mapping physical address %p with %ld bytes for %s\n", phy, size,
 		name);
 
-	offset = (uint32)phy & (B_PAGE_SIZE - 1);
+	offset = (intptr_t)phy & (B_PAGE_SIZE - 1);
 	phyadr = (char *)phy - offset;
 	size = round_to_pagesize(size + offset);
 	area = map_physical_memory(name, (addr_t)phyadr, size,
 		B_ANY_KERNEL_BLOCK_ADDRESS, protection, &mapadr);
 	if (area < B_OK) {
-		ERROR("mapping '%s' failed, error 0x%lx (%s)\n", name, area,
+		ERROR("mapping '%s' failed, error 0x%" B_PRIx32 " (%s)\n", name, area,
 			strerror(area));
 		return area;
 	}
 
 	*virt = (char *)mapadr + offset;
 
-	TRACE("physical = %p, virtual = %p, offset = %ld, phyadr = %p, mapadr = "
-		"%p, size = %ld, area = 0x%08lx\n", phy, *virt, offset, phyadr, mapadr,
-		size, area);
+	TRACE("physical = %p, virtual = %p, offset = %" B_PRId32 ", phyadr = %p, "
+		"mapadr = %p, size = %ld, area = 0x%08" B_PRIx32 "\n", phy, *virt,
+		offset, phyadr, mapadr, size, area);
 
 	return area;
 }

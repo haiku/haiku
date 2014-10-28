@@ -2102,7 +2102,7 @@ fw_rcv(struct fw_rcv_buf *rb)
 		if(bind == NULL){
 			device_printf(rb->fc->bdev, "%s: "
 				"Unknown service addr 0x%04x:0x%08x %s(%x)"
-			    " src=0x%x data=%lx\n",
+			    " src=0x%x data=%" B_PRIu32 "\n",
 				__func__,
 				fp->mode.wreqq.dest_hi,
 				fp->mode.wreqq.dest_lo,
