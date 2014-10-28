@@ -47,6 +47,7 @@ __FBSDID("$FreeBSD: src/usr.sbin/fwcontrol/fwcontrol.c$");
 #include "fwphyreg.h"
 #include "iec68113.h"
 #include <errno.h>
+#include <strings.h>
 #define EX_SOFTWARE 1
 #define EX_IOERR 1
 #else
