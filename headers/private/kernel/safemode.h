@@ -24,10 +24,10 @@ status_t	get_safemode_option(const char* parameter, char* buffer,
 bool		get_safemode_boolean(const char* parameter, bool defaultValue);
 
 // before driver_settings_init() has been called (limited parsing support)
-status_t	get_safemode_option_early(kernel_args* args, const char* parameter,
-				char* buffer, size_t* _bufferSize);
-bool		get_safemode_boolean_early(kernel_args* args, const char* parameter,
-				bool defaultValue);
+status_t	get_safemode_option_early(struct kernel_args* args,
+				const char* parameter, char* buffer, size_t* _bufferSize);
+bool		get_safemode_boolean_early(struct kernel_args* args,
+				const char* parameter, bool defaultValue);
 
 status_t	_user_get_safemode_option(const char* parameter, char* buffer,
 				size_t* _bufferSize);
