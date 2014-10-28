@@ -16,6 +16,7 @@
 
 #include <AutoDeleter.h>
 #include <OS.h>
+#include <SupportDefs.h>
 
 #include <zlib.h>
 
@@ -272,8 +273,8 @@ TarFS::File::~File()
 ssize_t
 TarFS::File::ReadAt(void* cookie, off_t pos, void* buffer, size_t bufferSize)
 {
-	TRACE(("tarfs: read at %Ld, %lu bytes, fSize = %Ld\n", pos, bufferSize,
-		fSize));
+	TRACE(("tarfs: read at %" B_PRIdOFF ", %" B_PRIuSIZE " bytes, fSize = %" 
+		B_PRIdOFF "\n", pos, bufferSize, fSize));
 
 	if (pos < 0 || !buffer)
 		return B_BAD_VALUE;
@@ -703,7 +704,7 @@ TarFS::Volume::Init(boot::Partition* partition)
 
 		off_t size = strtol(header->size, NULL, 8);
 
-		TRACE(("tarfs: \"%s\", %Ld bytes\n", header->name, size));
+		TRACE(("tarfs: \"%s\", %" B_PRIdOFF " bytes\n", header->name, size));
 
 		// TODO: this is old-style GNU tar which probably won't work with newer
 		// ones...
