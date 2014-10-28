@@ -102,6 +102,12 @@ private:
 	virtual void				InspectRequested(target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
 
+	virtual	void				ExpressionEvaluationRequested(
+									SourceLanguage* language,
+									const char* expression,
+									type_code resultType,
+									StackFrame* frame = NULL);
+
 	virtual void				DebugReportRequested(entry_ref* targetPath);
 
 	virtual	void				TeamRestartRequested();
@@ -182,6 +188,13 @@ private:
 			void				_HandleInspectAddress(
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
+
+			void				_HandleEvaluateExpression(
+									SourceLanguage* language,
+									const char* expression,
+									type_code resultType,
+									StackFrame* frame);
+
 			status_t			_HandleSetArguments(int argc,
 									const char* const* argv);
 

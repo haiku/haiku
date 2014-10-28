@@ -150,6 +150,7 @@ Application Debugger :
 	ReturnValueID.cpp
 
 	# jobs
+	ExpressionEvaluationJob.cpp
 	GetCPUStateJob.cpp
 	GetStackTraceJob.cpp
 	GetThreadStateJob.cpp

@@ -19,7 +19,6 @@
 
 
 enum {
-	MSG_EVALUATE_EXPRESSION = 'evex',
 	MSG_CHANGE_EVALUATION_TYPE = 'chet'
 };
 

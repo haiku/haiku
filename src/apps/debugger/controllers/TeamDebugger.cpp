@@ -40,6 +40,7 @@
 #include "MessageCodes.h"
 #include "SettingsManager.h"
 #include "SourceCode.h"
+#include "SourceLanguage.h"
 #include "SpecificImageDebugInfo.h"
 #include "SpecificImageDebugInfoLoadingState.h"
 #include "StackFrame.h"
@@ -701,6 +702,40 @@ TeamDebugger::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_EVALUATE_EXPRESSION:
+		{
+			SourceLanguage* language;
+			if (message->FindPointer("language",
+				reinterpret_cast<void**>(&language)) != B_OK) {
+				break;
+			}
+
+			// ExpressionEvaluationRequested() acquires a reference
+			// on our behalf.
+			BReference<SourceLanguage> reference(language, true);
+
+			const char* expression;
+			if (message->FindString("expression", &expression) != B_OK)
+				break;
+
+			type_code resultType;
+			if (message->FindInt32("type",
+				reinterpret_cast<int32*>(&resultType)) != B_OK) {
+				break;
+			}
+
+			StackFrame* frame;
+			if (message->FindPointer("frame",
+				reinterpret_cast<void**>(&frame)) != B_OK) {
+				// the stack frame isn't needed, unless variable
+				// evaluation is desired.
+				frame = NULL;
+			}
+
+			_HandleEvaluateExpression(language, expression, resultType, frame);
+			break;
+		}
+
 		case MSG_GENERATE_DEBUG_REPORT:
 		{
 			fReportGenerator->PostMessage(message);
@@ -1047,6 +1082,23 @@ TeamDebugger::InspectRequested(target_addr_t address,
 	message.AddUInt64("address", address);
 	message.AddPointer("listener", listener);
 	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::ExpressionEvaluationRequested(SourceLanguage* language,
+	const char* expression, type_code resultType, StackFrame* frame)
+{
+	BMessage message(MSG_EVALUATE_EXPRESSION);
+	message.AddPointer("language", language);
+	message.AddString("expression", expression);
+	message.AddInt32("type", resultType);
+	if (frame != NULL)
+		message.AddPointer("frame", frame);
+
+	BReference<SourceLanguage> reference(language);
+	if (PostMessage(&message) == B_OK)
+		reference.Detach();
 }
 
 
@@ -1925,6 +1977,20 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 	} else
 		memoryBlock->NotifyDataRetrieved();
 
+}
+
+
+void
+TeamDebugger::_HandleEvaluateExpression(SourceLanguage* language,
+	const char* expression, type_code resultType, StackFrame* frame)
+{
+	status_t result = fWorker->ScheduleJob(
+		new(std::nothrow) ExpressionEvaluationJob(fTeam, language,
+			expression, resultType, frame));
+	if (result != B_OK) {
+		_NotifyUser("Evaluate Expression", "Failed to evaluate expression: %s",
+			strerror(result));
+	}
 }
 
 

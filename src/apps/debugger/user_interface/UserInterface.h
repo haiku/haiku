@@ -21,6 +21,7 @@ class CpuState;
 class FunctionInstance;
 class Image;
 class LocatableFile;
+class SourceLanguage;
 class StackFrame;
 class Team;
 class TeamUiSettings;
@@ -135,6 +136,12 @@ public:
 	virtual void				InspectRequested(
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener) = 0;
+
+	virtual	void				ExpressionEvaluationRequested(
+									SourceLanguage* language,
+									const char* expression,
+									type_code resultType,
+									StackFrame* frame = NULL) = 0;
 
 	virtual void				DebugReportRequested(entry_ref* path) = 0;
 
