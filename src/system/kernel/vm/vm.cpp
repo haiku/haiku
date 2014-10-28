@@ -4682,6 +4682,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 			if (area->AddWaiterIfWired(&waiter, address, B_PAGE_SIZE,
 					wiredRange)) {
 				// unlock everything and wait
+				DEBUG_PAGE_ACCESS_END(context.page);
 				context.UnlockAll();
 				waiter.waitEntry.Wait();
 				continue;
