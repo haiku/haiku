@@ -560,6 +560,20 @@ KPartition::IsMounted() const
 
 
 bool
+KPartition::IsChildMounted()
+{
+	struct IsMountedVisitor : KPartitionVisitor {
+		virtual bool VisitPre(KPartition* partition)
+		{
+			return partition->IsMounted();
+		}
+	} checkVisitor;
+
+	return VisitEachDescendant(&checkVisitor) != NULL;
+}
+
+
+bool
 KPartition::IsDevice() const
 {
 	return (fPartitionData.flags & B_PARTITION_IS_DEVICE) != 0;

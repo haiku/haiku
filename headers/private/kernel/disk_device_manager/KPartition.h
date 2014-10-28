@@ -85,6 +85,7 @@ public:
 	bool ContainsPartitioningSystem() const;
 	bool IsReadOnly() const;
 	bool IsMounted() const;
+	bool IsChildMounted();
 
 	bool IsDevice() const;
 

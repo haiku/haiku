@@ -1249,7 +1249,8 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 	if (!partition->CheckAndMarkBusy(true))
 		return B_BUSY;
 
-	// TODO: We should also check, if any partition is mounted!
+	if (partition->IsMounted() || partition->IsChildMounted())
+		return B_BAD_DATA;
 
 	KDiskSystem* diskSystem = partition->DiskSystem();
 
