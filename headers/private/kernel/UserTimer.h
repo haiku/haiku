@@ -117,14 +117,16 @@ struct TeamTimeUserTimer : public UserTimer {
 
 			void				Deactivate();
 
-			void				Update(Thread* unscheduledThread);
+			void				Update(Thread* unscheduledThread,
+									Thread* lockedThread = NULL);
 			void				TimeWarped(bigtime_t changedBy);
 
 protected:
 	virtual	void				HandleTimer();
 
 private:
-			void				_Update(bool unscheduling);
+			void				_Update(bool unscheduling,
+									Thread* lockedThread = NULL);
 
 private:
 			team_id				fTeamID;

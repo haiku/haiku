@@ -625,7 +625,7 @@ TeamTimeUserTimer::Deactivate()
 		currently running and which is in the process of being unscheduled.
 */
 void
-TeamTimeUserTimer::Update(Thread* unscheduledThread)
+TeamTimeUserTimer::Update(Thread* unscheduledThread, Thread* lockedThread)
 {
 	if (fTeam == NULL)
 		return;
@@ -639,7 +639,7 @@ TeamTimeUserTimer::Update(Thread* unscheduledThread)
 			fRunningThreads++;
 	}
 
-	_Update(unscheduledThread != NULL);
+	_Update(unscheduledThread != NULL, lockedThread);
 }
 
 
@@ -695,7 +695,7 @@ TeamTimeUserTimer::HandleTimer()
 		being unscheduled.
 */
 void
-TeamTimeUserTimer::_Update(bool unscheduling)
+TeamTimeUserTimer::_Update(bool unscheduling, Thread* lockedThread)
 {
 	// unschedule the kernel timer, if scheduled
 	if (fScheduled)
@@ -708,7 +708,7 @@ TeamTimeUserTimer::_Update(bool unscheduling)
 	}
 
 	// There are still threads running. Reschedule the kernel timer.
-	bigtime_t now = fTeam->CPUTime(unscheduling);
+	bigtime_t now = fTeam->CPUTime(unscheduling, lockedThread);
 
 	// If periodic, check whether the start time is too far in the past.
 	if (fInterval > 0)
@@ -1560,7 +1560,7 @@ user_timer_stop_cpu_timers(Thread* thread, Thread* nextThread)
 		for (TeamTimeUserTimerList::ConstIterator it
 					= thread->team->CPUTimeUserTimerIterator();
 				TeamTimeUserTimer* timer = it.Next();) {
-			timer->Update(thread);
+			timer->Update(thread, thread);
 		}
 	}
 }
@@ -1574,7 +1574,7 @@ user_timer_continue_cpu_timers(Thread* thread, Thread* previousThread)
 		for (TeamTimeUserTimerList::ConstIterator it
 					= thread->team->CPUTimeUserTimerIterator();
 				TeamTimeUserTimer* timer = it.Next();) {
-			timer->Update(NULL);
+			timer->Update(NULL, thread);
 		}
 	}
 

@@ -388,7 +388,8 @@ public:
 	inline	TeamUserTimeUserTimerList::ConstIterator
 									UserTimeUserTimerIterator() const;
 
-			bigtime_t			CPUTime(bool ignoreCurrentRun) const;
+			bigtime_t			CPUTime(bool ignoreCurrentRun,
+									Thread* lockedThread = NULL) const;
 			bigtime_t			UserCPUTime() const;
 
 private:
