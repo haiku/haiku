@@ -25,6 +25,7 @@ BootstrapPackageRepository HaikuPortsCross
 	grep_bootstrap-2.14-1
 	icu_bootstrap-54.1-1
 	icu_bootstrap_devel-54.1-1
+	less_bootstrap-451-1
 	libtool_bootstrap-2.4-8
 	libtool_bootstrap_libltdl-2.4-8
 	m4_bootstrap-1.4.16-1
@@ -55,6 +56,7 @@ BootstrapPackageRepository HaikuPortsCross
 	gawk_bootstrap
 	gcc_bootstrap
 	grep_bootstrap
+	less_bootstrap
 	libsolv_bootstrap
 	libtool_bootstrap
 	m4_bootstrap

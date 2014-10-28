@@ -164,6 +164,7 @@ rule DefineDefaultBuildProfiles
 				gcc
 				grep
 				haikuporter
+				less
 				libtool
 				libtool_libltdl
 				m4
