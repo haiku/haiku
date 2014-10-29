@@ -16,13 +16,14 @@
 
 #include <AutoLocker.h>
 
-#include "CLanguageExpressionEvaluator.h"
 #include "CliContext.h"
+#include "CppLanguage.h"
 #include "Number.h"
 #include "Team.h"
 #include "TeamMemoryBlock.h"
 #include "UiUtils.h"
 #include "UserInterface.h"
+#include "Value.h"
 
 
 CliDumpMemoryCommand::CliDumpMemoryCommand()
@@ -31,6 +32,14 @@ CliDumpMemoryCommand::CliDumpMemoryCommand()
 		"%s [\"]address|expression[\"] [num]\n"
 		"Reads and displays the contents of memory at the target address.")
 {
+	fLanguage = new(std::nothrow) CppLanguage();
+}
+
+
+CliDumpMemoryCommand::~CliDumpMemoryCommand()
+{
+	if (fLanguage != NULL)
+		fLanguage->ReleaseReference();
 }
 
 
@@ -43,13 +52,34 @@ CliDumpMemoryCommand::Execute(int argc, const char* const* argv,
 		return;
 	}
 
-	CLanguageExpressionEvaluator evaluator;
-	target_addr_t address;
-	try {
-		Number value = evaluator.Evaluate(argv[1], B_UINT64_TYPE);
-		address = value.GetValue().ToUInt64();
-	} catch(...) {
-		printf("Error parsing address/expression.\n");
+	if (fLanguage == NULL) {
+		printf("Unable to evaluate expression: %s\n", strerror(B_NO_MEMORY));
+		return;
+	}
+
+	target_addr_t address = 0;
+	context.SetCurrentExpression(argv[1]);
+	context.GetUserInterfaceListener()->ExpressionEvaluationRequested(
+		fLanguage, argv[1], B_UINT64_TYPE);
+	context.WaitForEvents(CliContext::EVENT_EXPRESSION_EVALUATED);
+	if (context.IsTerminating())
+		return;
+
+	BString errorMessage;
+	Value* value = context.GetExpressionValue();
+	if (value != NULL) {
+		BVariant variantValue;
+		value->ToVariant(variantValue);
+		if (variantValue.Type() == B_UINT64_TYPE)
+			address = variantValue.ToUInt64();
+		else
+			value->ToString(errorMessage);
+	} else
+		errorMessage = strerror(context.GetExpressionResult());
+
+	if (!errorMessage.IsEmpty()) {
+		printf("Unable to evaluate expression: %s\n",
+			errorMessage.String());
 		return;
 	}
 
