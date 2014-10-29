@@ -1065,6 +1065,9 @@ VMAnonymousCache::_MergePagesSmallerConsumer(VMAnonymousCache* source)
 		if (sourcePage != NULL) {
 			DEBUG_PAGE_ACCESS_START(sourcePage);
 			ASSERT_PRINT(!sourcePage->busy, "page: %p", sourcePage);
+			ASSERT_PRINT(sourcePage->WiredCount() == 0
+					&& sourcePage->mappings.IsEmpty(),
+				"sourcePage: %p, page: %p", sourcePage, page);
 			source->RemovePage(sourcePage);
 			vm_page_free(source, sourcePage);
 		}
