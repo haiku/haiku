@@ -244,6 +244,7 @@ SubInclude HAIKU_TOP src tests servers app resize_limits ;
 SubInclude HAIKU_TOP src tests servers app scrollbar ;
 SubInclude HAIKU_TOP src tests servers app scrolling ;
 SubInclude HAIKU_TOP src tests servers app shape_test ;
+SubInclude HAIKU_TOP src tests servers app stacktile ;
 SubInclude HAIKU_TOP src tests servers app statusbar ;
 SubInclude HAIKU_TOP src tests servers app stress_test ;
 SubInclude HAIKU_TOP src tests servers app textview ;
