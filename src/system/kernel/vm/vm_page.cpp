@@ -1524,8 +1524,6 @@ free_page(vm_page* page, bool clear)
 	}
 
 	locker.Unlock();
-
-	unreserve_pages(1);
 }
 
 
@@ -2013,6 +2011,7 @@ PageWriteWrapper::Done(status_t result)
 // TODO: Unmapping should already happen when resizing the cache!
 			fCache->RemovePage(fPage);
 			free_page(fPage, false);
+			unreserve_pages(1);
 		} else {
 			// Writing the page failed -- mark the page modified and move it to
 			// an appropriate queue other than the modified queue, so we don't
@@ -3938,9 +3937,18 @@ vm_page_is_dummy(struct vm_page *page)
 /*!	Free the page that belonged to a certain cache.
 	You can use vm_page_set_state() manually if you prefer, but only
 	if the page does not equal PAGE_STATE_MODIFIED.
+
+	\param cache The cache the page was previously owned by or NULL. The page
+		must have been removed from its cache before calling this method in
+		either case.
+	\param page The page to free.
+	\param reservation If not NULL, the page count of the reservation will be
+		incremented, thus allowing to allocate another page for the freed one at
+		a later time.
 */
 void
-vm_page_free(VMCache *cache, vm_page *page)
+vm_page_free_etc(VMCache* cache, vm_page* page,
+	vm_page_reservation* reservation)
 {
 	PAGE_ASSERT(page, page->State() != PAGE_STATE_FREE
 		&& page->State() != PAGE_STATE_CLEAR);
@@ -3949,6 +3957,8 @@ vm_page_free(VMCache *cache, vm_page *page)
 		atomic_add(&sModifiedTemporaryPages, -1);
 
 	free_page(page, false);
+	if (reservation == NULL)
+		unreserve_pages(1);
 }
 
 
@@ -3958,9 +3968,10 @@ vm_page_set_state(vm_page *page, int pageState)
 	PAGE_ASSERT(page, page->State() != PAGE_STATE_FREE
 		&& page->State() != PAGE_STATE_CLEAR);
 
-	if (pageState == PAGE_STATE_FREE || pageState == PAGE_STATE_CLEAR)
+	if (pageState == PAGE_STATE_FREE || pageState == PAGE_STATE_CLEAR) {
 		free_page(page, pageState == PAGE_STATE_CLEAR);
-	else
+		unreserve_pages(1);
+	} else
 		set_page_state(page, pageState);
 }
 

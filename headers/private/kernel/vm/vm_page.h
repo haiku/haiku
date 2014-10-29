@@ -34,7 +34,9 @@ status_t vm_page_init_post_thread(struct kernel_args *args);
 
 status_t vm_mark_page_inuse(page_num_t page);
 status_t vm_mark_page_range_inuse(page_num_t startPage, page_num_t length);
-void vm_page_free(struct VMCache *cache, struct vm_page *page);
+void vm_page_free_etc(VMCache* cache, vm_page* page,
+	vm_page_reservation* reservation);
+
 void vm_page_set_state(struct vm_page *page, int state);
 void vm_page_requeue(struct vm_page *page, bool tail);
 
@@ -70,5 +72,13 @@ bool vm_page_is_dummy(struct vm_page *page);
 #ifdef __cplusplus
 }
 #endif
+
+
+static inline void
+vm_page_free(struct VMCache *cache, struct vm_page *page)
+{
+	vm_page_free_etc(cache, page, NULL);
+}
+
 
 #endif	/* _KERNEL_VM_VM_PAGE_H */
