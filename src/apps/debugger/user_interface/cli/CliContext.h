@@ -1,5 +1,6 @@
 /*
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CLI_CONTEXT_H
@@ -37,7 +38,8 @@ public:
 				EVENT_THREAD_STOPPED				= 0x10,
 				EVENT_THREAD_STACK_TRACE_CHANGED	= 0x20,
 				EVENT_VALUE_NODE_CHANGED			= 0x40,
-				EVENT_TEAM_MEMORY_BLOCK_RETRIEVED	= 0x80
+				EVENT_TEAM_MEMORY_BLOCK_RETRIEVED	= 0x80,
+				EVENT_EXPRESSION_EVALUATED			= 0x100
 			};
 
 public:
@@ -73,6 +75,13 @@ public:
 
 			TeamMemoryBlock*	CurrentBlock() const { return fCurrentBlock; }
 
+			void				SetCurrentExpression(const char* expression);
+
+			status_t			GetExpressionResult() const
+									{ return fExpressionResult; }
+			Value*				GetExpressionValue() const
+									{ return fExpressionValue; }
+
 			const char*			PromptUser(const char* prompt);
 			void				AddLineToInputHistory(const char* line);
 
@@ -96,6 +105,10 @@ private:
 									const Team::ThreadEvent& event);
 	virtual	void				ThreadStackTraceChanged(
 									const Team::ThreadEvent& event);
+
+	virtual	void				ExpressionEvaluated(
+									const Team::ExpressionEvaluationEvent&
+										event);
 
 	// TeamMemoryBlock::Listener
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
@@ -134,6 +147,10 @@ private:
 			StackTrace*			fCurrentStackTrace;
 			int32				fCurrentStackFrameIndex;
 			TeamMemoryBlock*	fCurrentBlock;
+
+			const char*			fCurrentExpression;
+			status_t			fExpressionResult;
+			Value*				fExpressionValue;
 
 			EventList			fPendingEvents;
 };

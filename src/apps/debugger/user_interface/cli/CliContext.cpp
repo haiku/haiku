@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -12,6 +12,7 @@
 
 #include "StackTrace.h"
 #include "UserInterface.h"
+#include "Value.h"
 #include "ValueNodeManager.h"
 
 // NOTE: This is a simple work-around for EditLine not having any kind of user
@@ -26,11 +27,16 @@ static CliContext* sCurrentContext;
 
 
 struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
-	Event(int type, Thread* thread = NULL, TeamMemoryBlock* block = NULL)
+	Event(int type, Thread* thread = NULL, TeamMemoryBlock* block = NULL,
+		const char* expression = NULL, status_t expressionResult = B_OK,
+		Value* expressionValue = NULL)
 		:
 		fType(type),
 		fThreadReference(thread),
-		fMemoryBlockReference(block)
+		fMemoryBlockReference(block),
+		fExpression(expression),
+		fExpressionResult(expressionResult),
+		fExpressionValue(expressionValue)
 	{
 	}
 
@@ -49,10 +55,29 @@ struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
 		return fMemoryBlockReference.Get();
 	}
 
+	const BString& GetExpression() const
+	{
+		return fExpression;
+	}
+
+	status_t GetExpressionResult() const
+	{
+		return fExpressionResult;
+	}
+
+	Value* GetExpressionValue() const
+	{
+		return fExpressionValue.Get();
+	}
+
+
 private:
 	int					fType;
 	BReference<Thread>	fThreadReference;
 	BReference<TeamMemoryBlock> fMemoryBlockReference;
+	BString				fExpression;
+	status_t			fExpressionResult;
+	BReference<Value>	fExpressionValue;
 };
 
 
@@ -76,7 +101,10 @@ CliContext::CliContext()
 	fCurrentThread(NULL),
 	fCurrentStackTrace(NULL),
 	fCurrentStackFrameIndex(-1),
-	fCurrentBlock(NULL)
+	fCurrentBlock(NULL),
+	fCurrentExpression(NULL),
+	fExpressionResult(B_OK),
+	fExpressionValue(NULL)
 {
 	sCurrentContext = this;
 }
@@ -249,6 +277,13 @@ CliContext::SetCurrentStackFrameIndex(int32 index)
 }
 
 
+void
+CliContext::SetCurrentExpression(const char* expression)
+{
+	fCurrentExpression = expression;
+}
+
+
 const char*
 CliContext::PromptUser(const char* prompt)
 {
@@ -396,6 +431,19 @@ CliContext::ProcessPendingEvents()
 				}
 				fCurrentBlock = event->GetMemoryBlock();
 				break;
+			case EVENT_EXPRESSION_EVALUATED:
+				if (event->GetExpression() == fCurrentExpression) {
+					fCurrentExpression = NULL;
+					fExpressionResult = event->GetExpressionResult();
+					if (fExpressionValue != NULL) {
+						fExpressionValue->ReleaseReference();
+						fExpressionValue = NULL;
+					}
+					fExpressionValue = event->GetExpressionValue();
+					if (fExpressionValue != NULL)
+						fExpressionValue->AcquireReference();
+				}
+				break;
 		}
 	}
 }
@@ -441,6 +489,17 @@ CliContext::ThreadStackTraceChanged(const Team::ThreadEvent& threadEvent)
 		new(std::nothrow) Event(EVENT_THREAD_STACK_TRACE_CHANGED,
 			threadEvent.GetThread()));
 	_SignalInputLoop(EVENT_THREAD_STACK_TRACE_CHANGED);
+}
+
+
+void
+CliContext::ExpressionEvaluated(const Team::ExpressionEvaluationEvent& event)
+{
+	_QueueEvent(
+		new(std::nothrow) Event(EVENT_EXPRESSION_EVALUATED,
+			NULL, NULL, event.GetExpression(), event.GetResult(),
+			event.GetValue()));
+	_SignalInputLoop(EVENT_EXPRESSION_EVALUATED);
 }
 
 
