@@ -93,6 +93,8 @@ HEventList::SetType(const char* type)
 		else
 			AddRow(new HEventRow(name.String(), path.Path()));
 	}
+
+	ResizeAllColumnsToPreferred();
 }
 
 

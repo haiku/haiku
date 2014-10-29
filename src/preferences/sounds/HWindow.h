@@ -47,6 +47,7 @@ private:
 			void				_InitGUI();
 			void				_Pulse();
 			void				_SetupMenuField();
+			void				_UpdateZoomLimits();
 
 private:
 			HEventList*			fEventList;

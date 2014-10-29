@@ -224,6 +224,21 @@ HWindow::MessageReceived(BMessage* message)
 					if (item != NULL)
 						item->SetMarked(true);
 				}
+
+				HEventRow* row = (HEventRow*)fEventList->CurrentSelection();
+				BButton* button = dynamic_cast<BButton*>(FindView("play"));
+				if (row != NULL) {
+					menufield->SetEnabled(true);
+
+					const char* path = row->Path();
+					if (path != NULL && strcmp(path, ""))
+						button->SetEnabled(true);
+					else
+						button->SetEnabled(false);
+				} else {
+					menufield->SetEnabled(false);
+					button->SetEnabled(false);
+				}
 			}
 			break;
 		}
@@ -231,8 +246,10 @@ HWindow::MessageReceived(BMessage* message)
 		case M_ITEM_MESSAGE:
 		{
 			entry_ref ref;
-			if (message->FindRef("refs", &ref) == B_OK)
+			if (message->FindRef("refs", &ref) == B_OK) {
 				fEventList->SetPath(BPath(&ref).Path());
+				_UpdateZoomLimits();
+			}
 			break;
 		}
 
@@ -316,32 +333,18 @@ HWindow::_InitGUI()
 	BMenuItem* noneItem = menu->FindItem(B_TRANSLATE("<none>"));
 	if (noneItem != NULL)
 		noneItem->SetMarked(true);
+
+	_UpdateZoomLimits();
 }
 
 
 void
 HWindow::_Pulse()
 {
-	HEventRow* row = (HEventRow*)fEventList->CurrentSelection();
-	BMenuField* menufield = dynamic_cast<BMenuField*>(FindView("filemenu"));
-	BButton* button = dynamic_cast<BButton*>(FindView("play"));
 	BButton* stop = dynamic_cast<BButton*>(FindView("stop"));
 
-	if (menufield == NULL || button == NULL || stop == NULL)
+	if (stop == NULL)
 		return;
-
-	if (row != NULL) {
-		menufield->SetEnabled(true);
-
-		const char* path = row->Path();
-		if (path != NULL && strcmp(path, ""))
-			button->SetEnabled(true);
-		else
-			button->SetEnabled(false);
-	} else {
-		menufield->SetEnabled(false);
-		button->SetEnabled(false);
-	}
 
 	if (fPlayer != NULL) {
 		if (fPlayer->IsPlaying())
@@ -413,4 +416,16 @@ HWindow::_SetupMenuField()
 			menu->AddItem(new BMenuItem(item_path.Leaf(), msg), 0);
 		}
 	}
+}
+
+
+void
+HWindow::_UpdateZoomLimits()
+{
+	const float kInset = be_control_look->DefaultItemSpacing();
+
+	BSize size = fEventList->PreferredSize();
+	SetZoomLimits(size.width + 2 * kInset + B_V_SCROLL_BAR_WIDTH,
+		size.height + 5 * kInset + 2 * B_H_SCROLL_BAR_HEIGHT
+			+ 2 * be_plain_font->Size() * 2.5);
 }
