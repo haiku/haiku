@@ -515,7 +515,9 @@ class CLanguageExpressionEvaluator::Tokenizer {
 
 
 CLanguageExpressionEvaluator::CLanguageExpressionEvaluator()
-	:	fTokenizer(new Tokenizer())
+	:
+	fTokenizer(new Tokenizer()),
+	fCurrentType(B_INT64_TYPE)
 {
 }
 
