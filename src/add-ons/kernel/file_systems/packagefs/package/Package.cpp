@@ -945,14 +945,16 @@ Package::Open()
 	// open the file
 	fFD = openat(fPackagesDirectory->DirectoryFD(), fFileName, O_RDONLY);
 	if (fFD < 0) {
-		ERROR("Failed to open package file \"%s\"\n", fFileName.Data());
+		ERROR("Failed to open package file \"%s\": %s\n", fFileName.Data(),
+			strerror(errno));
 		return errno;
 	}
 
 	// stat it to verify that it's still the same file
 	struct stat st;
 	if (fstat(fFD, &st) < 0) {
-		ERROR("Failed to stat package file \"%s\"\n", fFileName.Data());
+		ERROR("Failed to stat package file \"%s\": %s\n", fFileName.Data(),
+			strerror(errno));
 		close(fFD);
 		fFD = -1;
 		return errno;
