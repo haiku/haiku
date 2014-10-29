@@ -340,7 +340,7 @@ kStage1UnusedSpace	equ	440 - ($-$$)
 	; Fill the missing space to reach byte 440
 	times kStage1UnusedSpace db 'B'
 
-kDiskSignatue:
+kDiskSignature:
 	dw		0, 0
 kReserved
 	dw		0
