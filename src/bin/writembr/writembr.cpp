@@ -9,6 +9,7 @@
 #include <string.h>
 #include <string>
 
+#include <Debug.h>
 #include <DiskDevice.h>
 #include <DiskDeviceRoster.h>
 #include <Path.h>
@@ -72,6 +73,8 @@ main(int argc, char** argv)
 		cerr << "Can't open " << device.Path() << endl;
 		return B_ERROR;
 	}
+
+	STATIC_ASSERT(kMBRSize == 512);
 
 	unsigned char MBR[kMBRSize];
 	fs.read((char*)MBR, kMBRSize);

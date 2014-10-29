@@ -218,7 +218,7 @@ found_active:								; active partition (pointed by si)
 		mov [address_packet+AddressPacket.sector],eax
 
 		; if LBA_adress equals 0 then it's not a valid PBR (it is the MBR)
-		; this can append when we only have a CHS adress in the partition entry
+		; this can happen when we only have a CHS adress in the partition entry
 		test	eax,		eax				;if ( LBA_adress == 0 )
 		jz		no_disk_extentions			;then no_disk_extentions()
 
