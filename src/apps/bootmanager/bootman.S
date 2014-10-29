@@ -204,7 +204,7 @@ cursorPosition		equ cursorX
 	push	dx
 	xor		bh, bh								; write on page 0
 	jmp		.loop_condition
-.loop
+.loop:
 	mov		dx, [bp + cursorPosition]
 	mov		ah, SET_CURSOR
 	int		BIOS_VIDEO_SERVICES
@@ -214,7 +214,7 @@ cursorPosition		equ cursorX
 	mov		cx, 1
 	mov		ah, WRITE_CHAR
 	int		BIOS_VIDEO_SERVICES
-.loop_condition
+.loop_condition:
 	lodsb
 	cmp		al, 0
 	jnz		.loop
@@ -342,9 +342,9 @@ kStage1UnusedSpace	equ	440 - ($-$$)
 
 kDiskSignature:
 	dw		0, 0
-kReserved
+kReserved:
 	dw		0
-kPartitionTable
+kPartitionTable:
 	times	64 db 0
 
 kMBRSignature:
@@ -506,7 +506,7 @@ updateMarker:
 	cmp		cx, [bp + selection]
 	je		.print
 	mov		al, ' '								; Clear marker
-.print
+.print:
 	mov		bl, WHITE
 	jmp		printChar							; return from subroutine
 
@@ -523,7 +523,7 @@ bootSelectedPartition:
 
 	mov		di, bootSectorDAP+AddressPacket.offset	; Copy start sector
 	mov		cx, 4								; It is stored in a quad word
-.copy_start_sector
+.copy_start_sector:
 	lodsw
 	stosw
 	loop .copy_start_sector
