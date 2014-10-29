@@ -6,6 +6,7 @@
 #ifndef JOBS_H
 #define JOBS_H
 
+#include <String.h>
 
 #include "ImageDebugInfoLoadingState.h"
 #include "ImageDebugInfoProvider.h"
@@ -20,6 +21,7 @@ class DebuggerInterface;
 class Function;
 class FunctionInstance;
 class Image;
+class SourceLanguage;
 class StackFrame;
 class StackFrameValues;
 class Team;
@@ -29,6 +31,7 @@ class TeamTypeInformation;
 class Thread;
 class Type;
 class TypeComponentPath;
+class Value;
 class ValueLocation;
 class ValueNode;
 class ValueNodeChild;
@@ -45,7 +48,8 @@ enum {
 	JOB_TYPE_LOAD_SOURCE_CODE,
 	JOB_TYPE_GET_STACK_FRAME_VALUE,
 	JOB_TYPE_RESOLVE_VALUE_NODE_VALUE,
-	JOB_TYPE_GET_MEMORY_BLOCK
+	JOB_TYPE_GET_MEMORY_BLOCK,
+	JOB_TYPE_EVALUATE_EXPRESSION
 };
 
 
@@ -223,6 +227,28 @@ private:
 			Team*				fTeam;
 			TeamMemory*			fTeamMemory;
 			TeamMemoryBlock*	fMemoryBlock;
+};
+
+
+class ExpressionEvaluationJob : public Job {
+public:
+								ExpressionEvaluationJob(Team* team,
+									SourceLanguage* language,
+									const char* expression,
+									type_code resultType,
+									StackFrame* frame);
+	virtual						~ExpressionEvaluationJob();
+
+	virtual	const JobKey&		Key() const;
+	virtual	status_t			Do();
+
+private:
+			SimpleJobKey		fKey;
+			Team*				fTeam;
+			SourceLanguage*		fLanguage;
+			BString				fExpression;
+			type_code			fResultType;
+			StackFrame*			fFrame;
 };
 
 
