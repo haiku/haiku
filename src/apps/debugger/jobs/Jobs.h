@@ -36,6 +36,7 @@ class ValueLocation;
 class ValueNode;
 class ValueNodeChild;
 class ValueNodeContainer;
+class ValueNodeManager;
 class Variable;
 
 
@@ -233,22 +234,32 @@ private:
 class ExpressionEvaluationJob : public Job {
 public:
 								ExpressionEvaluationJob(Team* team,
+									DebuggerInterface* debuggerInterface,
 									SourceLanguage* language,
 									const char* expression,
 									type_code resultType,
-									StackFrame* frame);
+									StackFrame* frame,
+									Thread* thread);
 	virtual						~ExpressionEvaluationJob();
 
 	virtual	const JobKey&		Key() const;
 	virtual	status_t			Do();
 
 private:
+			status_t			ResolveNodeValue(ValueNode* node);
+
+private:
 			SimpleJobKey		fKey;
 			Team*				fTeam;
+			DebuggerInterface*	fDebuggerInterface;
+			Architecture*		fArchitecture;
+			TeamTypeInformation* fTypeInformation;
 			SourceLanguage*		fLanguage;
 			BString				fExpression;
 			type_code			fResultType;
 			StackFrame*			fFrame;
+			Thread*				fThread;
+			ValueNodeManager*	fManager;
 };
 
 

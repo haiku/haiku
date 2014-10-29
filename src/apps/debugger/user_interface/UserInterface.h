@@ -141,7 +141,8 @@ public:
 									SourceLanguage* language,
 									const char* expression,
 									type_code resultType,
-									StackFrame* frame = NULL) = 0;
+									StackFrame* frame = NULL,
+									Thread* thread = NULL) = 0;
 
 	virtual void				DebugReportRequested(entry_ref* path) = 0;
 

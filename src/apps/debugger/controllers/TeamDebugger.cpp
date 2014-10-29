@@ -732,7 +732,16 @@ TeamDebugger::MessageReceived(BMessage* message)
 				frame = NULL;
 			}
 
-			_HandleEvaluateExpression(language, expression, resultType, frame);
+			::Thread* thread;
+			if (message->FindPointer("thread",
+				reinterpret_cast<void**>(&thread)) != B_OK) {
+				// the thread isn't needed, unless variable
+				// evaluation is desired.
+				thread = NULL;
+			}
+
+			_HandleEvaluateExpression(language, expression, resultType,
+				frame, thread);
 			break;
 		}
 
@@ -1087,7 +1096,8 @@ TeamDebugger::InspectRequested(target_addr_t address,
 
 void
 TeamDebugger::ExpressionEvaluationRequested(SourceLanguage* language,
-	const char* expression, type_code resultType, StackFrame* frame)
+	const char* expression, type_code resultType, StackFrame* frame,
+	::Thread* thread)
 {
 	BMessage message(MSG_EVALUATE_EXPRESSION);
 	message.AddPointer("language", language);
@@ -1095,6 +1105,8 @@ TeamDebugger::ExpressionEvaluationRequested(SourceLanguage* language,
 	message.AddInt32("type", resultType);
 	if (frame != NULL)
 		message.AddPointer("frame", frame);
+	if (thread != NULL)
+		message.AddPointer("thread", thread);
 
 	BReference<SourceLanguage> reference(language);
 	if (PostMessage(&message) == B_OK)
@@ -1982,11 +1994,12 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 
 void
 TeamDebugger::_HandleEvaluateExpression(SourceLanguage* language,
-	const char* expression, type_code resultType, StackFrame* frame)
+	const char* expression, type_code resultType, StackFrame* frame,
+	::Thread* thread)
 {
 	status_t result = fWorker->ScheduleJob(
-		new(std::nothrow) ExpressionEvaluationJob(fTeam, language,
-			expression, resultType, frame));
+		new(std::nothrow) ExpressionEvaluationJob(fTeam, fDebuggerInterface,
+			language, expression, resultType, frame, thread));
 	if (result != B_OK) {
 		_NotifyUser("Evaluate Expression", "Failed to evaluate expression: %s",
 			strerror(result));

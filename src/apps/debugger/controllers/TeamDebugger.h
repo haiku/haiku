@@ -27,6 +27,7 @@ class FileManager;
 class SettingsManager;
 class TeamDebugInfo;
 class TeamMemoryBlockManager;
+class Thread;
 class WatchpointManager;
 
 
@@ -106,7 +107,8 @@ private:
 									SourceLanguage* language,
 									const char* expression,
 									type_code resultType,
-									StackFrame* frame = NULL);
+									StackFrame* frame = NULL,
+									::Thread* thread = NULL);
 
 	virtual void				DebugReportRequested(entry_ref* targetPath);
 
@@ -193,7 +195,8 @@ private:
 									SourceLanguage* language,
 									const char* expression,
 									type_code resultType,
-									StackFrame* frame);
+									StackFrame* frame,
+									::Thread* thread);
 
 			status_t			_HandleSetArguments(int argc,
 									const char* const* argv);

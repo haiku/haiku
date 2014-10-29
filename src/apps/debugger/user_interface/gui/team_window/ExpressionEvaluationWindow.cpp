@@ -16,6 +16,8 @@
 
 #include "MessageCodes.h"
 #include "SourceLanguage.h"
+#include "StackFrame.h"
+#include "Thread.h"
 #include "UserInterface.h"
 #include "Value.h"
 
@@ -26,8 +28,8 @@ enum {
 
 
 ExpressionEvaluationWindow::ExpressionEvaluationWindow(
-	::Team* team, SourceLanguage* language, UserInterfaceListener* listener,
-	BHandler* target)
+	::Team* team, SourceLanguage* language, StackFrame* frame,
+	::Thread* thread, UserInterfaceListener* listener, BHandler* target)
 	:
 	BWindow(BRect(), "Evaluate Expression", B_FLOATING_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
@@ -37,10 +39,18 @@ ExpressionEvaluationWindow::ExpressionEvaluationWindow(
 	fExpressionOutput(NULL),
 	fEvaluateButton(NULL),
 	fListener(listener),
+	fStackFrame(frame),
+	fThread(thread),
 	fCloseTarget(target),
 	fCurrentEvaluationType(B_INT64_TYPE)
 {
 	fLanguage->AcquireReference();
+
+	if (fStackFrame != NULL)
+		fStackFrame->AcquireReference();
+
+	if (fThread != NULL)
+		fThread->AcquireReference();
 
 	AutoLocker< ::Team> teamLocker(fTeam);
 	fTeam->AddListener(this);
@@ -51,6 +61,12 @@ ExpressionEvaluationWindow::~ExpressionEvaluationWindow()
 {
 	fLanguage->ReleaseReference();
 
+	if (fStackFrame != NULL)
+		fStackFrame->ReleaseReference();
+
+	if (fThread != NULL)
+		fThread->ReleaseReference();
+
 	AutoLocker< ::Team> teamLocker(fTeam);
 	fTeam->RemoveListener(this);
 }
@@ -58,10 +74,11 @@ ExpressionEvaluationWindow::~ExpressionEvaluationWindow()
 
 ExpressionEvaluationWindow*
 ExpressionEvaluationWindow::Create(::Team* team, SourceLanguage* language,
-	UserInterfaceListener* listener, BHandler* target)
+	StackFrame* frame, ::Thread* thread, UserInterfaceListener* listener,
+	BHandler* target)
 {
 	ExpressionEvaluationWindow* self = new ExpressionEvaluationWindow(team,
-		language, listener, target);
+		language, frame, thread, listener, target);
 
 	try {
 		self->_Init();
@@ -216,7 +233,8 @@ ExpressionEvaluationWindow::MessageReceived(BMessage* message)
 				break;
 
 			fListener->ExpressionEvaluationRequested(fLanguage,
-				fExpressionInput->Text(), fCurrentEvaluationType);
+				fExpressionInput->Text(), fCurrentEvaluationType, fStackFrame,
+				fThread);
 			break;
 		}
 

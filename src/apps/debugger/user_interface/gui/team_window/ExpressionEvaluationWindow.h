@@ -16,7 +16,9 @@ class BButton;
 class BStringView;
 class BTextControl;
 class Team;
+class Thread;
 class SourceLanguage;
+class StackFrame;
 class UserInterfaceListener;
 
 
@@ -26,6 +28,8 @@ public:
 								ExpressionEvaluationWindow(
 									::Team* team,
 									SourceLanguage* language,
+									StackFrame* frame,
+									::Thread* thread,
 									UserInterfaceListener* listener,
 									BHandler* target);
 
@@ -34,6 +38,8 @@ public:
 	static	ExpressionEvaluationWindow* Create(
 									::Team* team,
 									SourceLanguage* language,
+									StackFrame* frame,
+									::Thread* thread,
 									UserInterfaceListener* listener,
 									BHandler* target);
 									// throws
@@ -60,6 +66,8 @@ private:
 			BStringView*		fExpressionOutput;
 			BButton*			fEvaluateButton;
 			UserInterfaceListener* fListener;
+			StackFrame*			fStackFrame;
+			::Thread*			fThread;
 			BHandler*			fCloseTarget;
 			type_code			fCurrentEvaluationType;
 };

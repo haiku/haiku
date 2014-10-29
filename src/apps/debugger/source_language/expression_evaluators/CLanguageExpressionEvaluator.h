@@ -15,6 +15,10 @@
 #include <String.h>
 
 
+class ValueNode;
+class ValueNodeManager;
+
+
 class ParseException {
  public:
 	ParseException(const char* message, int32 position)
@@ -33,8 +37,20 @@ class ParseException {
 	int32	position;
 };
 
-struct Function;
+class ValueNeededException {
+public:
+	ValueNeededException(ValueNode* node)
+		:
+		value(node)
+	{
+	}
+
+	ValueNode* value;
+};
+
+
 class Number;
+
 
 class CLanguageExpressionEvaluator {
 
@@ -43,7 +59,7 @@ class CLanguageExpressionEvaluator {
 								~CLanguageExpressionEvaluator();
 
 			Number				Evaluate(const char* expressionString,
-									type_code type);
+									type_code type, ValueNodeManager* manager);
 
  private:
 			struct Token;
@@ -56,14 +72,13 @@ class CLanguageExpressionEvaluator {
 			Number				_ParsePower();
 			Number				_ParseUnary();
 			Number				_ParseIdentifier();
-			void				_InitArguments(Number values[],
-									int32 argumentCount);
 			Number				_ParseAtom();
 
 			void				_EatToken(int32 type);
 
 			Tokenizer*			fTokenizer;
 			type_code			fCurrentType;
+			ValueNodeManager*	fNodeManager;
 };
 
 #endif // C_LANGUAGE_EXPRESSION_EVALUATOR_H

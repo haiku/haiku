@@ -356,7 +356,8 @@ TeamWindow::MessageReceived(BMessage* message)
 					BReference<SourceLanguage> languageReference(language,
 						true);
 					fExpressionWindow = ExpressionEvaluationWindow::Create(
-						fTeam, language, fListener, this);
+						fTeam, language, fActiveStackFrame, fActiveThread,
+						fListener, this);
 					if (fExpressionWindow != NULL)
 						fExpressionWindow->Show();
 	           	} catch (...) {

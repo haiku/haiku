@@ -22,7 +22,8 @@ public:
 									Type*& _resultType) const;
 
 	virtual	status_t			EvaluateExpression(const BString& expression,
-									type_code type, Value*& _output);
+									type_code type, ValueNodeManager* manager,
+									Value*& _output, ValueNode*& _neededNode);
 
 protected:
 	virtual	bool				IsModifierValid(char modifier) const = 0;

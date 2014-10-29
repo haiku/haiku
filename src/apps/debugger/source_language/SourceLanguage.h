@@ -15,6 +15,8 @@ class SyntaxHighlighter;
 class TeamTypeInformation;
 class Type;
 class Value;
+class ValueNode;
+class ValueNodeManager;
 
 
 class SourceLanguage : public BReferenceable {
@@ -32,7 +34,8 @@ public:
 									Type*& _resultType) const;
 
 	virtual	status_t			EvaluateExpression(const BString& expression,
-									type_code type, Value*& _output);
+									type_code type, ValueNodeManager* manager,
+									Value*& _output, ValueNode*& _neededNode);
 };
 
 

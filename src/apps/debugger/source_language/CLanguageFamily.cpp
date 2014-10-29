@@ -167,14 +167,15 @@ CLanguageFamily::ParseTypeExpression(const BString& expression,
 
 
 status_t
-CLanguageFamily::EvaluateExpression(const BString& expression,
-	type_code type, Value*& _output)
+CLanguageFamily::EvaluateExpression(const BString& expression, type_code type,
+	ValueNodeManager* manager, Value*& _output, ValueNode*& _neededNode)
 {
 	_output = NULL;
+	_neededNode = NULL;
 	CLanguageExpressionEvaluator evaluator;
 	Number result;
 	try {
-		result = evaluator.Evaluate(expression, type);
+		result = evaluator.Evaluate(expression, type, manager);
 		BVariant resultValue = result.GetValue();
 		switch (type) {
 			case B_INT8_TYPE:
@@ -207,6 +208,8 @@ CLanguageFamily::EvaluateExpression(const BString& expression,
 			ex.position, ex.message.String());
 		_output = new(std::nothrow) StringValue(stringValue);
 		return B_BAD_DATA;
+	} catch (ValueNeededException ex) {
+		_neededNode = ex.value;
 	}
 
 	return B_OK;

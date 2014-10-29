@@ -11,12 +11,20 @@
 
 #include "CLanguageExpressionEvaluator.h"
 
-#include "Number.h"
-
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
+
+#include "AutoLocker.h"
+
+#include "Number.h"
+#include "StackFrame.h"
+#include "Thread.h"
+#include "Value.h"
+#include "ValueNode.h"
+#include "ValueNodeManager.h"
+#include "Variable.h"
 
 
 enum {
@@ -299,7 +307,7 @@ class CLanguageExpressionEvaluator::Tokenizer {
 			fCurrentToken = Token(begin, length, _CurrentPos() - length,
 				TOKEN_CONSTANT);
 			fCurrentToken.value.SetTo(fType, temp.String());
-		} else if (isalpha(*fCurrentChar) && *fCurrentChar != 'x') {
+		} else if (isalpha(*fCurrentChar)) {
 			const char* begin = fCurrentChar;
 			while (*fCurrentChar != 0 && (isalpha(*fCurrentChar)
 				|| isdigit(*fCurrentChar))) {
@@ -308,10 +316,6 @@ class CLanguageExpressionEvaluator::Tokenizer {
 			int32 length = fCurrentChar - begin;
 			fCurrentToken = Token(begin, length, _CurrentPos() - length,
 				TOKEN_IDENTIFIER);
-		} else if (strncmp(fCurrentChar, "π", 2) == 0) {
-			fCurrentToken = Token(fCurrentChar, 2, _CurrentPos() - 1,
-				TOKEN_IDENTIFIER);
-			fCurrentChar += 2;
 		} else {
 			if (!_ParseOperator()) {
 				int32 type = TOKEN_NONE;
@@ -517,7 +521,8 @@ class CLanguageExpressionEvaluator::Tokenizer {
 CLanguageExpressionEvaluator::CLanguageExpressionEvaluator()
 	:
 	fTokenizer(new Tokenizer()),
-	fCurrentType(B_INT64_TYPE)
+	fCurrentType(B_INT64_TYPE),
+	fNodeManager(NULL)
 {
 }
 
@@ -530,10 +535,10 @@ CLanguageExpressionEvaluator::~CLanguageExpressionEvaluator()
 
 Number
 CLanguageExpressionEvaluator::Evaluate(const char* expressionString,
-	type_code type)
+	type_code type, ValueNodeManager* manager)
 {
 	fCurrentType = type;
-
+	fNodeManager = manager;
 	fTokenizer->SetType(type);
 	fTokenizer->SetTo(expressionString);
 
@@ -745,6 +750,7 @@ CLanguageExpressionEvaluator::_ParseUnary()
 			return Number((int32)(_ParseUnary() == Number(BVariant(0L))));
 
 		case TOKEN_IDENTIFIER:
+			fTokenizer->RewindToken();
 			return _ParseIdentifier();
 
 		default:
@@ -756,32 +762,63 @@ CLanguageExpressionEvaluator::_ParseUnary()
 }
 
 
-struct Function {
-	const char*	name;
-	int			argumentCount;
-	void*		function;
-	Number		value;
-};
-
-
 Number
 CLanguageExpressionEvaluator::_ParseIdentifier()
 {
-	throw ParseException("Identifiers not implemented", 0);
+	Token token = fTokenizer->NextToken();
+	Number value;
 
-	return Number();
-}
+	if (fNodeManager == NULL) {
+		throw ParseException("Identifiers not resolvable without manager.",
+			token.position);
+	}
 
+	const BString& identifierName = token.string;
 
-void
-CLanguageExpressionEvaluator::_InitArguments(Number values[], int32 argumentCount)
-{
-	_EatToken(TOKEN_OPENING_BRACKET);
+	ValueNodeContainer* container = fNodeManager->GetContainer();
+	AutoLocker<ValueNodeContainer> containerLocker(container);
 
-	for (int32 i = 0; i < argumentCount; i++)
-		values[i] = _ParseBinary();
+	ValueNodeChild* child = NULL;
+	for (int32 i = 0; i < container->CountChildren(); i++) {
+		ValueNodeChild* current = container->ChildAt(i);
+		if (current->Name() == identifierName) {
+			child = current;
+			break;
+		}
+	}
 
-	_EatToken(TOKEN_CLOSING_BRACKET);
+	BString errorMessage;
+	if (child == NULL) {
+		errorMessage.SetToFormat("Unable to resolve variable name: '%s'",
+			identifierName.String());
+		throw ParseException(errorMessage, token.position);
+	}
+
+	status_t state = child->LocationResolutionState();
+	if (state != B_OK) {
+		errorMessage.SetToFormat("Unable to resolve variable value for '%s': "
+			"%s", identifierName.String(),
+			strerror(state));
+		throw ParseException(errorMessage, token.position);
+	}
+
+	ValueNode* node = child->Node();
+	state = node->LocationAndValueResolutionState();
+	if (state == VALUE_NODE_UNRESOLVED) {
+		throw ValueNeededException(node);
+	} else if (state != B_OK) {
+		errorMessage.SetToFormat("Unable to resolve variable value for '%s': "
+			"%s", identifierName.String(),
+			strerror(state));
+		throw ParseException(errorMessage, token.position);
+	}
+
+	BVariant variant;
+	Value* nodeValue = node->GetValue();
+	nodeValue->ToVariant(variant);
+	value.SetTo(variant);
+
+	return value;
 }
 
 
