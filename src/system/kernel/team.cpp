@@ -2793,6 +2793,9 @@ team_init(kernel_args* args)
 	if (sKernelTeam->io_context == NULL)
 		panic("could not create io_context for kernel team!\n");
 
+	if (vfs_resize_fd_table(sKernelTeam->io_context, 4096) != B_OK)
+		dprintf("Failed to resize FD table for kernel team!\n");
+
 	// stick it in the team hash
 	sTeamHash.Insert(sKernelTeam);
 
