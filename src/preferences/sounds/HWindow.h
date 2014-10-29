@@ -38,13 +38,15 @@ public:
 								HWindow(BRect rect, const char* name);
 	virtual						~HWindow();
 
-	virtual	void				MessageReceived(BMessage* message);
-	virtual	bool				QuitRequested();
 	virtual	void				DispatchMessage(BMessage* message,
 									BHandler* handler);
-			void				InitGUI();
-			void				SetupMenuField();
-			void				Pulse();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
+
+private:
+			void				_InitGUI();
+			void				_Pulse();
+			void				_SetupMenuField();
 
 private:
 			HEventList*			fEventList;
