@@ -268,8 +268,7 @@ static cache_info* sCacheInfoTable;
 static void delete_area(VMAddressSpace* addressSpace, VMArea* area,
 	bool addressSpaceCleanup);
 static status_t vm_soft_fault(VMAddressSpace* addressSpace, addr_t address,
-	bool isWrite, bool isExecute, bool isUser, vm_page** wirePage,
-	VMAreaWiredRange* wiredRange = NULL);
+	bool isWrite, bool isExecute, bool isUser, vm_page** wirePage);
 static status_t map_backing_store(VMAddressSpace* addressSpace,
 	VMCache* cache, off_t offset, const char* areaName, addr_t size, int wiring,
 	int protection, int mapping, uint32 flags,
@@ -4529,14 +4528,11 @@ fault_get_page(PageFaultContext& context)
 	\param wirePage On success, if non \c NULL, the wired count of the page
 		mapped at the given address is incremented and the page is returned
 		via this parameter.
-	\param wiredRange If given, this wiredRange is ignored when checking whether
-		an already mapped page at the virtual address can be unmapped.
 	\return \c B_OK on success, another error code otherwise.
 */
 static status_t
 vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
-	bool isWrite, bool isExecute, bool isUser, vm_page** wirePage,
-	VMAreaWiredRange* wiredRange)
+	bool isWrite, bool isExecute, bool isUser, vm_page** wirePage)
 {
 	FTRACE(("vm_soft_fault: thid 0x%" B_PRIx32 " address 0x%" B_PRIxADDR ", "
 		"isWrite %d, isUser %d\n", thread_get_current_thread_id(),
@@ -5415,7 +5411,7 @@ vm_wire_page(team_id team, addr_t address, bool writable,
 		addressSpaceLocker.Unlock();
 
 		error = vm_soft_fault(addressSpace, pageAddress, writable, false,
-			isUser, &page, &info->range);
+			isUser, &page);
 
 		if (error != B_OK) {
 			// The page could not be mapped -- clean up.
@@ -5595,7 +5591,7 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 				addressSpaceLocker.Unlock();
 
 				error = vm_soft_fault(addressSpace, nextAddress, writable,
-					false, isUser, &page, range);
+					false, isUser, &page);
 
 				addressSpaceLocker.Lock();
 				cacheChainLocker.SetTo(vm_area_get_locked_cache(area));
