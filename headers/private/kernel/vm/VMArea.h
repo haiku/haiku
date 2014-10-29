@@ -89,6 +89,14 @@ struct VMPageWiringInfo {
 
 
 struct VMArea {
+public:
+	enum {
+		// AddWaiterIfWired() flags
+		IGNORE_WRITE_WIRED_RANGES	= 0x01,	// ignore existing ranges that
+											// wire for writing
+	};
+
+public:
 	char*					name;
 	area_id					id;
 	uint32					protection;
@@ -130,8 +138,7 @@ public:
 
 			bool				AddWaiterIfWired(VMAreaUnwiredWaiter* waiter);
 			bool				AddWaiterIfWired(VMAreaUnwiredWaiter* waiter,
-									addr_t base, size_t size,
-									VMAreaWiredRange* ignoreRange = NULL);
+									addr_t base, size_t size, uint32 flags = 0);
 
 protected:
 								VMArea(VMAddressSpace* addressSpace,

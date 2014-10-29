@@ -4681,10 +4681,14 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 
 		if (unmapPage) {
 			// If the page is wired, we can't unmap it. Wait until it is unwired
-			// again and restart.
+			// again and restart. Note that the page cannot be wired for
+			// writing, since it it isn't in the topmost cache. So we can safely
+			// ignore ranges wired for writing (our own and other concurrent
+			// wiring attempts in progress) and in fact have to do that to avoid
+			// a deadlock.
 			VMAreaUnwiredWaiter waiter;
 			if (area->AddWaiterIfWired(&waiter, address, B_PAGE_SIZE,
-					wiredRange)) {
+					VMArea::IGNORE_WRITE_WIRED_RANGES)) {
 				// unlock everything and wait
 				if (context.pageAllocated) {
 					// ... but since we allocated a page and inserted it into

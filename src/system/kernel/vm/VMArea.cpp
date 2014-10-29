@@ -185,19 +185,20 @@ VMArea::AddWaiterIfWired(VMAreaUnwiredWaiter* waiter)
 		that intersects with the given address range.
 	\param base The base of the address range to check.
 	\param size The size of the address range to check.
-	\param ignoreRange If given, this wired range of the area is not checked
-		whether it intersects with the given address range. Useful when the
-		caller has added the range and only wants to check intersection with
-		other ranges.
+	\param flags
+		- \c IGNORE_WRITE_WIRED_RANGES: Ignore ranges wired for writing.
 	\return \c true, if the waiter has been added, \c false otherwise.
 */
 bool
 VMArea::AddWaiterIfWired(VMAreaUnwiredWaiter* waiter, addr_t base, size_t size,
-	VMAreaWiredRange* ignoreRange)
+	uint32 flags)
 {
 	for (VMAreaWiredRangeList::Iterator it = fWiredRanges.GetIterator();
 			VMAreaWiredRange* range = it.Next();) {
-		if (range != ignoreRange && range->IntersectsWith(base, size)) {
+		if ((flags & IGNORE_WRITE_WIRED_RANGES) != 0 && range->writable)
+			continue;
+
+		if (range->IntersectsWith(base, size)) {
 			waiter->area = this;
 			waiter->base = base;
 			waiter->size = size;
