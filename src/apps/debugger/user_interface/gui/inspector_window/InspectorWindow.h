@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef INSPECTOR_WINDOW_H
@@ -9,6 +9,7 @@
 #include <Window.h>
 
 #include "MemoryView.h"
+#include "Team.h"
 #include "TeamMemoryBlock.h"
 #include "Types.h"
 
@@ -18,13 +19,14 @@ class BMenuField;
 class BMessenger;
 class BTextControl;
 class GuiTeamUiSettings;
-class Team;
+class SourceLanguage;
 class UserInterfaceListener;
 
 
 class InspectorWindow : public BWindow,
 	public TeamMemoryBlock::Listener,
-	public MemoryView::Listener {
+	public MemoryView::Listener,
+	private Team::Listener {
 public:
 								InspectorWindow(::Team* team,
 									UserInterfaceListener* listener,
@@ -47,10 +49,16 @@ public:
 	// MemoryView::Listener
 	virtual	void				TargetAddressChanged(target_addr_t address);
 
+	// Team::Listener
+	virtual	void				ExpressionEvaluated(
+									const Team::ExpressionEvaluationEvent&
+										event);
+
 			status_t			LoadSettings(
 									const GuiTeamUiSettings& settings);
 			status_t			SaveSettings(
 									BMessage& settings);
+
 private:
 	void						_Init();
 
@@ -60,6 +68,8 @@ private:
 	status_t					_SaveMenuFieldMode(BMenuField* field,
 									const char* name,
 									BMessage& settings);
+
+	void						_SetToAddress(target_addr_t address);
 
 private:
 	UserInterfaceListener*		fListener;
@@ -73,6 +83,7 @@ private:
 	TeamMemoryBlock*			fCurrentBlock;
 	target_addr_t				fCurrentAddress;
 	::Team*						fTeam;
+	SourceLanguage*				fLanguage;
 	BHandler*					fTarget;
 };
 

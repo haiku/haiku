@@ -69,6 +69,7 @@ enum {
 	MSG_EXPRESSION_WINDOW_CLOSED				= 'ewwc',
 	MSG_INSPECT_ADDRESS							= 'isad',
 	MSG_EVALUATE_EXPRESSION						= 'evex',
+	MSG_EXPRESSION_EVALUATED					= 'exev',
 	MSG_SHOW_TYPECAST_NODE_PROMPT				= 'stnp',
 	MSG_TYPECAST_TO_ARRAY						= 'stta',
 	MSG_TYPECAST_NODE							= 'tyno',

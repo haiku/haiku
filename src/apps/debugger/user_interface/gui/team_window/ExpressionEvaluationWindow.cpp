@@ -21,8 +21,7 @@
 
 
 enum {
-	MSG_CHANGE_EVALUATION_TYPE = 'chet',
-	MSG_EXPRESSION_EVALUATED = 'exev'
+	MSG_CHANGE_EVALUATION_TYPE = 'chet'
 };
 
 
@@ -164,9 +163,16 @@ ExpressionEvaluationWindow::ExpressionEvaluated(
 	const Team::ExpressionEvaluationEvent& event)
 {
 	BMessage message(MSG_EXPRESSION_EVALUATED);
-	message.AddString("expression", event.GetExpression());
-	message.AddInt32("result", event.GetResult());
 
+	AutoLocker<BLooper> lock(this);
+	if (!lock.IsLocked())
+		return;
+
+	if (event.GetExpression() != fExpressionInput->Text())
+		return;
+
+	lock.Unlock();
+	message.AddInt32("result", event.GetResult());
 	BReference<Value> reference;
 	Value* value = event.GetValue();
 	if (value != NULL) {
@@ -207,7 +213,7 @@ ExpressionEvaluationWindow::MessageReceived(BMessage* message)
 				break;
 
 			fListener->ExpressionEvaluationRequested(fLanguage,
-				fExpressionInput->TextView()->Text(), fCurrentEvaluationType);
+				fExpressionInput->Text(), fCurrentEvaluationType);
 			break;
 		}
 
@@ -219,13 +225,6 @@ ExpressionEvaluationWindow::MessageReceived(BMessage* message)
 
 		case MSG_EXPRESSION_EVALUATED:
 		{
-			BString expression;
-			if (message->FindString("expression", &expression) != B_OK)
-				break;
-
-			if (expression != fExpressionInput->TextView()->Text())
-				break;
-
 			Value* value = NULL;
 			BReference<Value> reference;
 			if (message->FindPointer("value",

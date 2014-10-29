@@ -408,7 +408,7 @@ TeamWindow::MessageReceived(BMessage* message)
 
 			try {
 				WatchPromptWindow* window = WatchPromptWindow::Create(
-					fTeam->GetArchitecture(), address, type, length,
+					fTeam, address, type, length,
 					fListener);
 				window->Show();
 			} catch (...) {
