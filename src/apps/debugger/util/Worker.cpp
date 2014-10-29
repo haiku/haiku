@@ -21,7 +21,7 @@ JobKey::~JobKey()
 // pragma mark - SimpleJobKey
 
 
-SimpleJobKey::SimpleJobKey(void* object, uint32 type)
+SimpleJobKey::SimpleJobKey(const void* object, uint32 type)
 	:
 	object(object),
 	type(type)
