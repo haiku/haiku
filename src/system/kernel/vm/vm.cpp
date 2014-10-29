@@ -4342,6 +4342,7 @@ struct PageFaultContext {
 	// return values
 	vm_page*				page;
 	bool					restart;
+	bool					pageAllocated;
 
 
 	PageFaultContext(VMAddressSpace* addressSpace, bool isWrite)
@@ -4364,6 +4365,7 @@ struct PageFaultContext {
 		this->cacheOffset = cacheOffset;
 		page = NULL;
 		restart = false;
+		pageAllocated = false;
 
 		cacheChainLocker.SetTo(topCache);
 	}
@@ -4483,6 +4485,7 @@ fault_get_page(PageFaultContext& context)
 
 		// insert the new page into our cache
 		cache->InsertPage(page, context.cacheOffset);
+		context.pageAllocated = true;
 	} else if (page->Cache() != context.topCache && context.isWrite) {
 		// We have a page that has the data we want, but in the wrong cache
 		// object so we need to copy it and stick it into the top cache.
@@ -4508,6 +4511,7 @@ fault_get_page(PageFaultContext& context)
 
 		// insert the new page into our cache
 		context.topCache->InsertPage(page, context.cacheOffset);
+		context.pageAllocated = true;
 	} else
 		DEBUG_PAGE_ACCESS_START(page);
 
@@ -4682,7 +4686,17 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 			if (area->AddWaiterIfWired(&waiter, address, B_PAGE_SIZE,
 					wiredRange)) {
 				// unlock everything and wait
-				DEBUG_PAGE_ACCESS_END(context.page);
+				if (context.pageAllocated) {
+					// ... but since we allocated a page and inserted it into
+					// the top cache, remove and free it first. Otherwise we'd
+					// have a page from a lower cache mapped while an upper
+					// cache has a page that would shadow it.
+					context.topCache->RemovePage(context.page);
+					vm_page_free_etc(context.topCache, context.page,
+						&context.reservation);
+				} else
+					DEBUG_PAGE_ACCESS_END(context.page);
+
 				context.UnlockAll();
 				waiter.waitEntry.Wait();
 				continue;
