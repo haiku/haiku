@@ -73,6 +73,7 @@ io_context*	vfs_new_io_context(io_context* parentContext,
 				bool purgeCloseOnExec);
 void		vfs_get_io_context(io_context *context);
 void		vfs_put_io_context(io_context *context);
+status_t	vfs_resize_fd_table(struct io_context* context, uint32 newSize);
 
 int			vfs_getrlimit(int resource, struct rlimit *rlp);
 int			vfs_setrlimit(int resource, const struct rlimit *rlp);

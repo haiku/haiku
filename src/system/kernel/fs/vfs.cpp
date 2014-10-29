@@ -4941,23 +4941,23 @@ vfs_put_io_context(io_context* context)
 }
 
 
-static status_t
-vfs_resize_fd_table(struct io_context* context, const int newSize)
+status_t
+vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 {
-	if (newSize <= 0 || newSize > MAX_FD_TABLE_SIZE)
+	if (newSize == 0 || newSize > MAX_FD_TABLE_SIZE)
 		return B_BAD_VALUE;
 
 	TIOC(ResizeIOContext(context, newSize));
 
 	MutexLocker _(context->io_mutex);
 
-	int oldSize = context->table_size;
+	uint32 oldSize = context->table_size;
 	int oldCloseOnExitBitmapSize = (oldSize + 7) / 8;
 	int newCloseOnExitBitmapSize = (newSize + 7) / 8;
 
 	// If the tables shrink, make sure none of the fds being dropped are in use.
 	if (newSize < oldSize) {
-		for (int i = oldSize; i-- > newSize;) {
+		for (uint32 i = oldSize; i-- > newSize;) {
 			if (context->fds[i])
 				return B_BUSY;
 		}
@@ -4982,7 +4982,7 @@ vfs_resize_fd_table(struct io_context* context, const int newSize)
 	context->table_size = newSize;
 
 	// copy entries from old tables
-	int toCopy = min_c(oldSize, newSize);
+	uint32 toCopy = min_c(oldSize, newSize);
 
 	memcpy(context->fds, oldFDs, sizeof(void*) * toCopy);
 	memcpy(context->select_infos, oldSelectInfos, sizeof(void*) * toCopy);
