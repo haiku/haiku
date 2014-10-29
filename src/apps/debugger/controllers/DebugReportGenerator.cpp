@@ -155,6 +155,7 @@ DebugReportGenerator::_GenerateReport(const entry_ref& outputPath)
 
 	BPath path(&outputPath);
 
+	AutoLocker< ::Team> teamLocker(fTeam);
 	fTeam->NotifyDebugReportChanged(path.Path());
 
 	return B_OK;
