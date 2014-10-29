@@ -102,6 +102,19 @@ const EncoderDescription gEncoderTable[] = {
 		B_MEDIA_ENCODED_AUDIO,
 		10
 	},
+	{
+		{
+			"Raw audio",
+			"pcm",
+			0,
+			0,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		1
+	},
 	// All of those crash ffmpeg in one way or another...
 #if 0
 	{
@@ -207,19 +220,6 @@ const EncoderDescription gEncoderTable[] = {
 		B_MEDIA_RAW_AUDIO,
 		B_MEDIA_ENCODED_AUDIO,
 		10
-	},
-	{
-		{
-			"Raw audio",
-			"pcm",
-			0,
-			0,
-			{ 0 }
-		},
-		B_ANY_FORMAT_FAMILY,
-		B_MEDIA_RAW_AUDIO,
-		B_MEDIA_ENCODED_AUDIO,
-		1
 	},
 	{
 		{
