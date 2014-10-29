@@ -21,6 +21,8 @@ extern status_t cached_write(void* cache, off_t num, const void* _data,
 
 // Block Cache API
 
+extern "C" {
+
 extern const void* block_cache_get(void* _cache, off_t blockNumber);
 
 extern status_t block_cache_make_writable(void* _cache, off_t blockNumber,
@@ -31,5 +33,7 @@ extern void* block_cache_get_writable(void* _cache, off_t blockNumber,
 extern status_t block_cache_set_dirty(void* _cache, off_t blockNumber,
 	bool dirty, int32 transaction);
 extern void block_cache_put(void* _cache, off_t blockNumber);
+
+} // extern "C"
 
 #endif	/* CACHE_H */

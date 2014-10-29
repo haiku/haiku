@@ -7,6 +7,7 @@
 
 #include "cache.h"
 
+#include <Debug.h>
 #include <File.h>
 #include <List.h>
 
