@@ -74,6 +74,10 @@ extern char		*strupr(char *string);
 
 extern const char	*strsignal(int signum);
 
+/* for compatibility, pull in functions declared in strings.h */
+#include <strings.h>
+
+
 #ifdef __cplusplus
 }
 #endif
