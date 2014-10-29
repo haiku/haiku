@@ -33,6 +33,9 @@ ExpressionEvaluationWindow::ExpressionEvaluationWindow(
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fTeam(team),
 	fLanguage(language),
+	fExpressionInput(NULL),
+	fExpressionOutput(NULL),
+	fEvaluateButton(NULL),
 	fListener(listener),
 	fCloseTarget(target),
 	fCurrentEvaluationType(B_INT64_TYPE)
