@@ -14,6 +14,7 @@
 #include "NetworkSettings.h"
 #include "WirelessNetworkMenuItem.h"
 
+#include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
@@ -79,6 +80,14 @@ InterfaceHardwareView::InterfaceHardwareView(NetworkSettings* settings)
 	fNetworkMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fNetworkMenuField->Menu()->SetLabelFromMarked(true);
 
+	// Construct the BButtons
+	fOnOff = new BButton("onoff", B_TRANSLATE("Disable"),
+		new BMessage(kMsgInterfaceToggle));
+
+	fRenegotiate = new BButton("heal", B_TRANSLATE("Renegotiate"),
+		new BMessage(kMsgInterfaceRenegotiate));
+	fRenegotiate->SetEnabled(false);
+
 	BLayoutBuilder::Group<>(this)
 		.AddGrid()
 			.Add(status, 0, 0)
@@ -95,6 +104,11 @@ InterfaceHardwareView::InterfaceHardwareView(NetworkSettings* settings)
 			.Add(fLinkRxField, 1, 5)
 		.End()
 		.AddGlue()
+		.AddGroup(B_HORIZONTAL)
+			.Add(fOnOff)
+			.AddGlue()
+			.Add(fRenegotiate)
+		.End()
 		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 }
@@ -114,6 +128,9 @@ InterfaceHardwareView::AttachedToWindow()
 {
 	Update();
 		// Populate the fields
+
+	fOnOff->SetTarget(this);
+	fRenegotiate->SetTarget(this);
 }
 
 
@@ -126,6 +143,20 @@ InterfaceHardwareView::MessageReceived(BMessage* message)
 			fSettings->SetWirelessNetwork(message->FindString("name"));
 			break;
 		}
+		case kMsgInterfaceToggle:
+		{
+			fSettings->SetDisabled(!fSettings->IsDisabled());
+			Update();
+			Window()->FindView("interfaces")->Invalidate();
+			break;
+		}
+
+		case kMsgInterfaceRenegotiate:
+		{
+			fSettings->RenegotiateAddresses();
+			break;
+		}
+
 		default:
 			BView::MessageReceived(message);
 	}
@@ -232,6 +263,9 @@ InterfaceHardwareView::Update()
 		}
 		menu->SetTargetForItems(this);
 	}
+
+	fRenegotiate->SetEnabled(!fSettings->IsDisabled());
+	fOnOff->SetLabel(fSettings->IsDisabled() ? "Enable" : "Disable");
 
 	return B_OK;
 }

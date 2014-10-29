@@ -76,25 +76,11 @@ InterfacesAddOn::CreateView()
 	BScrollView* scrollView = new BScrollView("scrollView", fListView,
 		B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
-	// Construct the BButtons
-	fOnOff = new BButton("onoff", B_TRANSLATE("Disable"),
-		new BMessage(kMsgInterfaceToggle));
-	fOnOff->SetEnabled(false);
-
-	fRenegotiate = new BButton("heal", B_TRANSLATE("Renegotiate"),
-		new BMessage(kMsgInterfaceRenegotiate));
-	fRenegotiate->SetEnabled(false);
-
 	// Build the layout
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.Add(scrollView)
-		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
-			.Add(fOnOff)
-			.AddGlue()
-			.Add(fRenegotiate)
-		.End()
 	);
 
 	return this;
@@ -105,8 +91,6 @@ void
 InterfacesAddOn::AttachedToWindow()
 {
 	fListView->SetTarget(this);
-	fOnOff->SetTarget(this);
-	fRenegotiate->SetTarget(this);
 }
 
 
@@ -142,12 +126,8 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 	switch (msg->what) {
 		case kMsgInterfaceSelected:
 		{
-			fOnOff->SetEnabled(item != NULL);
-			fRenegotiate->SetEnabled(item != NULL);
 			if (item == NULL)
 				break;
-			fRenegotiate->SetEnabled(!item->IsDisabled());
-			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
 
 			// TODO it would be better to reuse the view instead of recreating
 			// one.
@@ -160,27 +140,9 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 			break;
 		}
 
-		case kMsgInterfaceToggle:
-		{
-			if (item == NULL)
-				break;
-
-			item->SetDisabled(!item->IsDisabled());
-			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
-			fRenegotiate->SetEnabled(!item->IsDisabled());
+		case B_OBSERVER_NOTICE_CHANGE:
 			fListView->Invalidate();
 			break;
-		}
-
-		case kMsgInterfaceRenegotiate:
-		{
-			if (item == NULL)
-				break;
-
-			NetworkSettings* ns = item->GetSettings();
-			ns->RenegotiateAddresses();
-			break;
-		}
 
 		default:
 			BBox::MessageReceived(msg);

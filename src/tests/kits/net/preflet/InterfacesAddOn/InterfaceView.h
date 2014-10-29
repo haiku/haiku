@@ -41,6 +41,8 @@ public:
 			void					Apply();
 			void					Revert();
 
+			NetworkSettings*		Settings() { return fNetworkSettings; }
+
 private:
 			status_t				_PopulateTabs();
 

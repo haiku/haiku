@@ -19,8 +19,6 @@
 
 
 static const uint32 kMsgInterfaceSelected = 'ifce';
-static const uint32 kMsgInterfaceToggle = 'onof';
-static const uint32 kMsgInterfaceRenegotiate = 'redo';
 
 
 class BButton;
@@ -46,8 +44,6 @@ public:
 private:
 			InterfacesListView*	fListView;
 			InterfaceView*		fSettingsView;
-			BButton*			fOnOff;
-			BButton*			fRenegotiate;
 };
 
 

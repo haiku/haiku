@@ -15,6 +15,11 @@
 #include <GroupView.h>
 
 
+static const uint32 kMsgInterfaceToggle = 'onof';
+static const uint32 kMsgInterfaceRenegotiate = 'redo';
+
+
+class BButton;
 class BMenuField;
 class BMessage;
 class BRect;
@@ -45,6 +50,9 @@ private:
 			BStringView*		fLinkRxField;
 
 			BMenuField*			fNetworkMenuField;
+
+			BButton*			fOnOff;
+			BButton*			fRenegotiate;
 };
 
 
