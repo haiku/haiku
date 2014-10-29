@@ -5,7 +5,7 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems bfs ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 
-rule FPreIncludes { return -include\ $(1:D=$(SUBDIR)) ; }
+rule FPreIncludes { return -include=$(1:D=$(SUBDIR)) ; }
 
 {
 	local defines = [ FDefines USER DEBUG ] ; # _NO_INLINE_ASM
