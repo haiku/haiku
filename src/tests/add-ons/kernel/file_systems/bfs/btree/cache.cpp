@@ -7,7 +7,9 @@
 
 #include "cache.h"
 
-#include <Debug.h>
+#include "BPlusTree.h"
+	// To get at the right debug helpers
+
 #include <File.h>
 #include <List.h>
 
