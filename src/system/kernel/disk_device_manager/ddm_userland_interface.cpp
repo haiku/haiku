@@ -1250,7 +1250,7 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 		return B_BUSY;
 
 	if (partition->IsMounted() || partition->IsChildMounted())
-		return B_BAD_DATA;
+		return B_BAD_VALUE;
 
 	KDiskSystem* diskSystem = partition->DiskSystem();
 
