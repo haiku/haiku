@@ -8,21 +8,23 @@
 
 #include <Window.h>
 
+#include "Team.h"
 #include "types/Types.h"
-
 
 class BMenu;
 class BButton;
 class BStringView;
 class BTextControl;
+class Team;
 class SourceLanguage;
 class UserInterfaceListener;
 
 
-class ExpressionEvaluationWindow : public BWindow
+class ExpressionEvaluationWindow : public BWindow, private Team::Listener
 {
 public:
 								ExpressionEvaluationWindow(
+									::Team* team,
 									SourceLanguage* language,
 									UserInterfaceListener* listener,
 									BHandler* target);
@@ -30,6 +32,7 @@ public:
 								~ExpressionEvaluationWindow();
 
 	static	ExpressionEvaluationWindow* Create(
+									::Team* team,
 									SourceLanguage* language,
 									UserInterfaceListener* listener,
 									BHandler* target);
@@ -45,8 +48,13 @@ private:
 			void	 			_Init();
 			BMenu*				_BuildTypesMenu();
 
+	// Team::Listener
+	virtual	void				ExpressionEvaluated(
+									const Team::ExpressionEvaluationEvent&
+										event);
 
 private:
+			::Team*				fTeam;
 			SourceLanguage*		fLanguage;
 			BTextControl*		fExpressionInput;
 			BStringView*		fExpressionOutput;

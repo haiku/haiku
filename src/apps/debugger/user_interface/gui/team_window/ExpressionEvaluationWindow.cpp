@@ -12,6 +12,8 @@
 #include <StringView.h>
 #include <TextControl.h>
 
+#include "AutoLocker.h"
+
 #include "MessageCodes.h"
 #include "SourceLanguage.h"
 #include "UserInterface.h"
@@ -19,36 +21,44 @@
 
 
 enum {
-	MSG_CHANGE_EVALUATION_TYPE = 'chet'
+	MSG_CHANGE_EVALUATION_TYPE = 'chet',
+	MSG_EXPRESSION_EVALUATED = 'exev'
 };
 
 
 ExpressionEvaluationWindow::ExpressionEvaluationWindow(
-	SourceLanguage* language, UserInterfaceListener* listener,
+	::Team* team, SourceLanguage* language, UserInterfaceListener* listener,
 	BHandler* target)
 	:
 	BWindow(BRect(), "Evaluate Expression", B_FLOATING_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
+	fTeam(team),
 	fLanguage(language),
 	fListener(listener),
 	fCloseTarget(target),
 	fCurrentEvaluationType(B_INT64_TYPE)
 {
 	fLanguage->AcquireReference();
+
+	AutoLocker< ::Team> teamLocker(fTeam);
+	fTeam->AddListener(this);
 }
 
 
 ExpressionEvaluationWindow::~ExpressionEvaluationWindow()
 {
 	fLanguage->ReleaseReference();
+
+	AutoLocker< ::Team> teamLocker(fTeam);
+	fTeam->RemoveListener(this);
 }
 
 
 ExpressionEvaluationWindow*
-ExpressionEvaluationWindow::Create(SourceLanguage* language,
+ExpressionEvaluationWindow::Create(::Team* team, SourceLanguage* language,
 	UserInterfaceListener* listener, BHandler* target)
 {
-	ExpressionEvaluationWindow* self = new ExpressionEvaluationWindow(
+	ExpressionEvaluationWindow* self = new ExpressionEvaluationWindow(team,
 		language, listener, target);
 
 	try {
@@ -150,6 +160,26 @@ ExpressionEvaluationWindow::_BuildTypesMenu()
 
 
 void
+ExpressionEvaluationWindow::ExpressionEvaluated(
+	const Team::ExpressionEvaluationEvent& event)
+{
+	BMessage message(MSG_EXPRESSION_EVALUATED);
+	message.AddString("expression", event.GetExpression());
+	message.AddInt32("result", event.GetResult());
+
+	BReference<Value> reference;
+	Value* value = event.GetValue();
+	if (value != NULL) {
+		message.AddPointer("value", value);
+		reference.SetTo(value);
+	}
+
+	if (PostMessage(&message) == B_OK)
+		reference.Detach();
+}
+
+
+void
 ExpressionEvaluationWindow::Show()
 {
 	CenterOnScreen();
@@ -176,22 +206,8 @@ ExpressionEvaluationWindow::MessageReceived(BMessage* message)
 			if (fExpressionInput->TextView()->TextLength() == 0)
 				break;
 
-			Value* value = NULL;
-			BString outputText;
-			status_t error = fLanguage->EvaluateExpression(
-				fExpressionInput->TextView()->Text(), fCurrentEvaluationType,
-				value);
-			if (error != B_OK) {
-				if (value != NULL)
-					value->ToString(outputText);
-				else {
-					outputText.SetToFormat("Failed to evaluate expression: %s",
-						strerror(error));
-				}
-			} else
-				value->ToString(outputText);
-
-			fExpressionOutput->SetText(outputText);
+			fListener->ExpressionEvaluationRequested(fLanguage,
+				fExpressionInput->TextView()->Text(), fCurrentEvaluationType);
 			break;
 		}
 
@@ -200,6 +216,39 @@ ExpressionEvaluationWindow::MessageReceived(BMessage* message)
 			fCurrentEvaluationType = message->FindInt32("type");
 			break;
 		}
+
+		case MSG_EXPRESSION_EVALUATED:
+		{
+			BString expression;
+			if (message->FindString("expression", &expression) != B_OK)
+				break;
+
+			if (expression != fExpressionInput->TextView()->Text())
+				break;
+
+			Value* value = NULL;
+			BReference<Value> reference;
+			if (message->FindPointer("value",
+				reinterpret_cast<void**>(&value)) == B_OK) {
+				reference.SetTo(value, true);
+			}
+
+			BString outputText;
+			if (value != NULL)
+				value->ToString(outputText);
+			else {
+				status_t result;
+				if (message->FindInt32("result", &result) != B_OK)
+					result = B_ERROR;
+
+				outputText.SetToFormat("Failed to evaluate expression: %s",
+					strerror(result));
+			}
+
+			fExpressionOutput->SetText(outputText);
+			break;
+		}
+
 
 		default:
 			BWindow::MessageReceived(message);
