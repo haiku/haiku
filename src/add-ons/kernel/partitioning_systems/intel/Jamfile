@@ -2,10 +2,17 @@ SubDir HAIKU_TOP src add-ons kernel partitioning_systems intel ;
 
 UsePrivateHeaders kernel shared storage ;
 UsePrivateSystemHeaders ;
-UseHeaders [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) bin writembr ] ;
 
-Includes [ FGristFiles PartitionMapWriter.cpp ]
-	: <src!bin!writembr>MBR.h ;
+# Assemble the MBR code, and convert it into a header file
+
+NASMFLAGS on [ FGristFiles mbr.bin ] = -f bin -O5 -dMBR_CODE_ONLY=1 ;
+
+SEARCH on mbr.nasm = [ FDirName $(HAIKU_TOP) src bin writembr ] ;
+
+Object [ FGristFiles mbr.bin ] : mbr.nasm ;
+
+DataFileToSourceFile [ FGristFiles MBR.h ] : [ FGristFiles mbr.bin ]
+	: kMBR : kMBRSize ;
 
 KernelAddon intel :
 	intel.cpp
