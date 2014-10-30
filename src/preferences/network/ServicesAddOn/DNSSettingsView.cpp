@@ -34,6 +34,7 @@ static const int32 kEditServer = 'edit';
 
 
 DNSSettingsView::DNSSettingsView()
+	: BGroupView(B_VERTICAL)
 {
 	fServerListView = new BListView("nameservers");
 	fTextControl = new BTextControl("", "", NULL);
@@ -54,6 +55,7 @@ DNSSettingsView::DNSSettingsView()
 			.Add(fDownButton, 1, 2)
 			.Add(fRemoveButton, 1, 3)
 		.End()
+		.Add(fDomain = new BTextControl("Domain", "", NULL))
 	.End();
 
 	_LoadDNSConfiguration();
@@ -159,6 +161,8 @@ DNSSettingsView::_LoadDNSConfiguration()
 			fServerListView->AddItem(new BStringItem(address));
 			fRevertList.Add(address);
 		}
+
+		fDomain->SetText(state->dnsrch[0]);
 		return B_OK;
 	}
 
@@ -192,13 +196,9 @@ DNSSettingsView::_SaveDNSConfiguration()
 			content << "nameserver\t" << item.String() << "\n";
 		}
 	}
-#if 0
-	if (strlen(settings->Domain()) > 0) {
-		content << "domain\t"
-			<< settings->Domain()
-			<< "\n";
-	}
-#endif
+
+	if (strlen(fDomain->Text()) > 0)
+		content << "domain\t" << fDomain->Text() << "\n";
 
 	return file.Write(content.String(), content.Length());
 }

@@ -34,6 +34,7 @@ private:
 		BListView*			fServerListView;
 		BStringList			fRevertList;
 		BTextControl*		fTextControl;
+		BTextControl*		fDomain;
 
 		BButton*			fAddButton;
 		BButton*			fRemoveButton;
