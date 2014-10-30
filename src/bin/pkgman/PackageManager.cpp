@@ -30,7 +30,6 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 	BPackageManager::UserInteractionHandler(),
 	fDecisionProvider(interactive),
 	fClientInstallationInterface(),
-	fPreviousDownloadPercentage(0),
 	fInteractive(interactive)
 {
 }
@@ -172,7 +171,6 @@ void
 PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 {
 	printf("Downloading %s...\n", packageName);
-	fPreviousDownloadPercentage = 0;
 }
 
 
@@ -180,16 +178,42 @@ void
 PackageManager::ProgressPackageDownloadActive(const char* packageName,
 	float completionPercentage)
 {
-	int32 currentPercentage = int32(completionPercentage * 100);
-	int32 difference = currentPercentage - fPreviousDownloadPercentage;
+	static const char* progressChars[] = {
+		"\xE2\x96\x8F",
+		"\xE2\x96\x8E",
+		"\xE2\x96\x8D",
+		"\xE2\x96\x8C",
+		"\xE2\x96\x8B",
+		"\xE2\x96\x8A",
+		"\xE2\x96\x89",
+		"\xE2\x96\x88",
+	};
 
-	while (difference >= 2) {
-		printf("#");
-		difference -= 2;
+	const int width = 70;
+
+	int position;
+	int ipart = (int)(completionPercentage * width);
+	int fpart = (int)(((completionPercentage * width) - ipart) * 8);
+
+	printf("\r"); // erase the line
+
+	for (position = 0; position < width; position++) {
+		if (position < ipart) {
+			// This part is fully downloaded, show a full block
+			printf(progressChars[7]);
+		} else if (position > ipart) {
+			// This part is not downloaded, show a space
+			printf(" ");
+		} else {
+			// This part is partially downloaded
+			printf(progressChars[fpart]);
+		}
 	}
-	fflush(stdout);
 
-	fPreviousDownloadPercentage = currentPercentage - difference;
+	// Also print the progress percentage
+	printf(" %d%%", (int)(completionPercentage * 100));
+
+	fflush(stdout);
 }
 
 
