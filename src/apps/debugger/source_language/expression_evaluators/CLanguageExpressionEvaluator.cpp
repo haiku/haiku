@@ -21,6 +21,7 @@
 #include "Number.h"
 #include "StackFrame.h"
 #include "Thread.h"
+#include "Type.h"
 #include "Value.h"
 #include "ValueNode.h"
 #include "ValueNodeManager.h"
@@ -779,11 +780,39 @@ CLanguageExpressionEvaluator::_ParseIdentifier()
 	AutoLocker<ValueNodeContainer> containerLocker(container);
 
 	ValueNodeChild* child = NULL;
+	ValueNodeChild* thisChild = NULL;
 	for (int32 i = 0; i < container->CountChildren(); i++) {
 		ValueNodeChild* current = container->ChildAt(i);
-		if (current->Name() == identifierName) {
+		const BString& nodeName = current->Name();
+		if (nodeName == identifierName) {
 			child = current;
 			break;
+		} else if (nodeName == "this")
+			thisChild = current;
+	}
+
+	if (child == NULL && thisChild != NULL) {
+		// the name was not found in the variables or parameters,
+		// but we have a class pointer. Try to find the name in the
+		// list of members.
+		_RequestValueIfNeeded(token, thisChild);
+		ValueNode* thisNode = thisChild->Node();
+		// skip the intermediate pointer
+		if (thisNode->GetType()->Kind() == TYPE_ADDRESS
+			&& thisNode->CountChildren() == 1) {
+			thisChild = thisNode->ChildAt(0);
+
+			_RequestValueIfNeeded(token, thisChild);
+			thisNode = thisChild->Node();
+		}
+
+		for (int32 i = 0; i < thisNode->CountChildren(); i++) {
+			ValueNodeChild* current = thisNode->ChildAt(i);
+			const BString& nodeName = current->Name();
+			if (nodeName == identifierName) {
+				child = current;
+				break;
+			}
 		}
 	}
 
@@ -794,25 +823,9 @@ CLanguageExpressionEvaluator::_ParseIdentifier()
 		throw ParseException(errorMessage, token.position);
 	}
 
-	status_t state = child->LocationResolutionState();
-	if (state != B_OK) {
-		errorMessage.SetToFormat("Unable to resolve variable value for '%s': "
-			"%s", identifierName.String(),
-			strerror(state));
-		throw ParseException(errorMessage, token.position);
-	}
+	_RequestValueIfNeeded(token, child);
 
 	ValueNode* node = child->Node();
-	state = node->LocationAndValueResolutionState();
-	if (state == VALUE_NODE_UNRESOLVED) {
-		throw ValueNeededException(node);
-	} else if (state != B_OK) {
-		errorMessage.SetToFormat("Unable to resolve variable value for '%s': "
-			"%s", identifierName.String(),
-			strerror(state));
-		throw ParseException(errorMessage, token.position);
-	}
-
 	BVariant variant;
 	Value* nodeValue = node->GetValue();
 	nodeValue->ToVariant(variant);
@@ -892,5 +905,41 @@ CLanguageExpressionEvaluator::_EatToken(int32 type)
 		BString temp;
 		temp << "Expected " << expected.String() << " got '" << token.string << "'";
 		throw ParseException(temp.String(), token.position);
+	}
+}
+
+
+void
+CLanguageExpressionEvaluator::_RequestValueIfNeeded(const Token& token,
+	ValueNodeChild* child)
+{
+	status_t state;
+	BString errorMessage;
+	if (child->Node() == NULL) {
+		state = fNodeManager->AddChildNodes(child);
+		if (state != B_OK) {
+			errorMessage.SetToFormat("Unable to add children for node '%s': "
+				"%s", child->Name().String(), strerror(state));
+			throw ParseException(errorMessage, token.position);
+		}
+	}
+
+	state = child->LocationResolutionState();
+	if (state == VALUE_NODE_UNRESOLVED)
+		throw ValueNeededException(child->Node());
+	else if (state != B_OK) {
+		errorMessage.SetToFormat("Unable to resolve variable value for '%s': "
+			"%s", child->Name().String(), strerror(state));
+		throw ParseException(errorMessage, token.position);
+	}
+
+	ValueNode* node = child->Node();
+	state = node->LocationAndValueResolutionState();
+	if (state == VALUE_NODE_UNRESOLVED)
+		throw ValueNeededException(child->Node());
+	else if (state != B_OK) {
+		errorMessage.SetToFormat("Unable to resolve variable value for '%s': "
+			"%s", child->Name().String(), strerror(state));
+		throw ParseException(errorMessage, token.position);
 	}
 }

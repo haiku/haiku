@@ -16,6 +16,7 @@
 
 
 class ValueNode;
+class ValueNodeChild;
 class ValueNodeManager;
 
 
@@ -75,6 +76,9 @@ class CLanguageExpressionEvaluator {
 			Number				_ParseAtom();
 
 			void				_EatToken(int32 type);
+
+			void				_RequestValueIfNeeded(const Token& token,
+									ValueNodeChild* child);
 
 			Tokenizer*			fTokenizer;
 			type_code			fCurrentType;
