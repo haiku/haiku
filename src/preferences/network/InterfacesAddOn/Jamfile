@@ -1,8 +1,8 @@
-SubDir HAIKU_TOP src tests kits net preflet InterfacesAddOn ;
+SubDir HAIKU_TOP src preferences network InterfacesAddOn ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps networkstatus ] ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers net ] : true ;
 
 UsePrivateHeaders net shared ;
@@ -26,7 +26,7 @@ Addon Interfaces :
 	WirelessNetworkMenuItem.cpp
 	:
 	be
-	<nogrist>NetworkSetup
+	<nogrist>Network
 	$(TARGET_NETWORK_LIBS)
 	libbnetapi.so
 	[ TargetLibsupc++ ]

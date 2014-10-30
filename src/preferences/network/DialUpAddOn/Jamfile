@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src tests kits net preflet DialUpAddOn ;
+SubDir HAIKU_TOP src preferences network DialUpAddOn ;
 
 # set some additional defines
 {
@@ -15,7 +15,7 @@ SubDir HAIKU_TOP src tests kits net preflet DialUpAddOn ;
 
 UsePrivateHeaders net ;
 # For NetworkSetupAddOn.h, to be moved to private once...
-UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;

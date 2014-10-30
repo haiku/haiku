@@ -1,9 +1,9 @@
-SubDir HAIKU_TOP src tests kits net preflet DummyAddOn ;
+SubDir HAIKU_TOP src preferences network DummyAddOn ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] ;
 
 Addon Dummy : 
 	DummyAddOn.cpp
-	: be <nogrist>NetworkSetup  [ TargetLibstdc++ ] # $(HAIKU_NETWORK_LIBS)
+	: be <nogrist>Network  [ TargetLibstdc++ ] # $(HAIKU_NETWORK_LIBS)
 ;
 

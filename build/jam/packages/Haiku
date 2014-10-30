@@ -214,6 +214,8 @@ AddFilesToPackage add-ons mail_daemon outbound_filters		: Fortune ;
 AddFilesToPackage add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 
+AddFilesToPackage add-ons Network\ Setup : Interfaces Services ;
+
 AddFilesToPackage add-ons Tracker
 	: FileType Mark\ as… Mark\ as\ Read Open\ Target\ Folder
 		Open\ Terminal ZipOMatic ;

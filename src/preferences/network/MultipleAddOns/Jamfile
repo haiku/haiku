@@ -1,9 +1,9 @@
-SubDir HAIKU_TOP src tests kits net preflet MultipleAddOns ;
+SubDir HAIKU_TOP src preferences network MultipleAddOns ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] ;
 
 Addon Multiple : 
 	MultipleAddOn.cpp
-	: be <nogrist>NetworkSetup  [ TargetLibstdc++ ] # $(HAIKU_NETWORK_LIBS)
+	: be <nogrist>Network  [ TargetLibstdc++ ] # $(HAIKU_NETWORK_LIBS)
 ;
 
