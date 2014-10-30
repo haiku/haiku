@@ -2,8 +2,8 @@
  * Copyright 2011 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#ifndef TOOL_BAR_VIEW_H
-#define TOOL_BAR_VIEW_H
+#ifndef _TOOLBAR_H
+#define _TOOLBAR_H
 
 #include <GroupView.h>
 
@@ -11,10 +11,10 @@
 class BButton;
 
 
-class ToolBarView : public BGroupView {
+class BToolbar : public BGroupView {
 public:
-								ToolBarView(BRect frame);
-	virtual						~ToolBarView();
+								BToolbar(BRect frame);
+	virtual						~BToolbar();
 
 	virtual	void				Hide();
 
@@ -42,4 +42,4 @@ private:
 			void				_HideToolTips() const;
 };
 
-#endif // TOOL_BAR_VIEW_H
+#endif // _TOOLBAR_H

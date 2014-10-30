@@ -27,7 +27,7 @@ class BScrollView;
 class ProgressWindow;
 class ShowImageView;
 class ShowImageStatusView;
-class ToolBarView;
+class BToolbar;
 
 
 // public message constants
@@ -114,7 +114,7 @@ private:
 			BMenu*				fGoToPageMenu;
 			BMenu*				fSlideShowDelayMenu;
 			BMenu*				fRatingMenu;
-			ToolBarView*		fToolBarView;
+			BToolbar*			fToolbar;
 			bool				fToolBarVisible;
 			BScrollView*		fScrollView;
 			BScrollBar*			fVerticalScrollBar;

@@ -2,7 +2,7 @@
  * Copyright 2011 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#include "ToolBarView.h"
+#include "Toolbar.h"
 
 #include <Button.h>
 #include <ControlLook.h>
@@ -40,7 +40,7 @@ LockableButton::MouseDown(BPoint point)
 }
 
 
-ToolBarView::ToolBarView(BRect frame)
+BToolbar::BToolbar(BRect frame)
 	:
 	BGroupView(B_HORIZONTAL)
 {
@@ -56,13 +56,13 @@ ToolBarView::ToolBarView(BRect frame)
 }
 
 
-ToolBarView::~ToolBarView()
+BToolbar::~BToolbar()
 {
 }
 
 
 void
-ToolBarView::Hide()
+BToolbar::Hide()
 {
 	BView::Hide();
 	// TODO: This could be fixed in BView instead. Looking from the 
@@ -72,7 +72,7 @@ ToolBarView::Hide()
 
 
 void
-ToolBarView::AddAction(uint32 command, BHandler* target, const BBitmap* icon,
+BToolbar::AddAction(uint32 command, BHandler* target, const BBitmap* icon,
 	const char* toolTipText, bool lockable)
 {
 	AddAction(new BMessage(command), target, icon, toolTipText, lockable);
@@ -80,7 +80,7 @@ ToolBarView::AddAction(uint32 command, BHandler* target, const BBitmap* icon,
 
 
 void
-ToolBarView::AddAction(BMessage* message, BHandler* target,
+BToolbar::AddAction(BMessage* message, BHandler* target,
 	const BBitmap* icon, const char* toolTipText, bool lockable)
 {
 
@@ -99,21 +99,21 @@ ToolBarView::AddAction(BMessage* message, BHandler* target,
 
 
 void
-ToolBarView::AddSeparator()
+BToolbar::AddSeparator()
 {
 	_AddView(new BSeparatorView(B_VERTICAL, B_PLAIN_BORDER));
 }
 
 
 void
-ToolBarView::AddGlue()
+BToolbar::AddGlue()
 {
 	GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 }
 
 
 void
-ToolBarView::SetActionEnabled(uint32 command, bool enabled)
+BToolbar::SetActionEnabled(uint32 command, bool enabled)
 {
 	if (BButton* button = _FindButton(command))
 		button->SetEnabled(enabled);
@@ -121,7 +121,7 @@ ToolBarView::SetActionEnabled(uint32 command, bool enabled)
 
 
 void
-ToolBarView::SetActionPressed(uint32 command, bool pressed)
+BToolbar::SetActionPressed(uint32 command, bool pressed)
 {
 	if (BButton* button = _FindButton(command))
 		button->SetValue(pressed);
@@ -129,7 +129,7 @@ ToolBarView::SetActionPressed(uint32 command, bool pressed)
 
 
 void
-ToolBarView::SetActionVisible(uint32 command, bool visible)
+BToolbar::SetActionVisible(uint32 command, bool visible)
 {
 	BButton* button = _FindButton(command);
 	if (button == NULL)
@@ -144,7 +144,7 @@ ToolBarView::SetActionVisible(uint32 command, bool visible)
 
 
 void
-ToolBarView::Pulse()
+BToolbar::Pulse()
 {
 	// TODO: Perhaps this could/should be addressed in BView instead.
 	if (IsHidden())
@@ -153,7 +153,7 @@ ToolBarView::Pulse()
 
 
 void
-ToolBarView::FrameResized(float width, float height)
+BToolbar::FrameResized(float width, float height)
 {
 	// TODO: There seems to be a bug in app_server which does not
 	// correctly trigger invalidation of views which are shown, when
@@ -163,14 +163,14 @@ ToolBarView::FrameResized(float width, float height)
 
 
 void
-ToolBarView::_AddView(BView* view)
+BToolbar::_AddView(BView* view)
 {
 	GroupLayout()->AddView(view);
 }
 
 
 BButton*
-ToolBarView::_FindButton(uint32 command) const
+BToolbar::_FindButton(uint32 command) const
 {
 	for (int32 i = 0; BView* view = ChildAt(i); i++) {
 		BButton* button = dynamic_cast<BButton*>(view);
@@ -190,7 +190,7 @@ ToolBarView::_FindButton(uint32 command) const
 
 
 void
-ToolBarView::_HideToolTips() const
+BToolbar::_HideToolTips() const
 {
 	for (int32 i = 0; BView* view = ChildAt(i); i++)
 		view->HideToolTip();
