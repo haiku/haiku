@@ -2122,6 +2122,7 @@ TeamDebugger::_LoadSettings()
 		BReference<UserBreakpoint> breakpointReference(breakpoint, true);
 
 		breakpoint->SetHidden(breakpointSetting->IsHidden());
+		breakpoint->SetCondition(breakpointSetting->Condition());
 
 		// install it
 		fBreakpointManager->InstallUserBreakpoint(breakpoint,

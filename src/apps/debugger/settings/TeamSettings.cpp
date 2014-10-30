@@ -64,7 +64,8 @@ TeamSettings::SetTo(Team* team)
 			return B_NO_MEMORY;
 
 		status_t error = breakpointSetting->SetTo(breakpoint->Location(),
-			breakpoint->IsEnabled(), breakpoint->IsHidden());
+			breakpoint->IsEnabled(), breakpoint->IsHidden(),
+			breakpoint->Condition());
 		if (error == B_OK && !fBreakpoints.AddItem(breakpointSetting))
 			error = B_NO_MEMORY;
 		if (error != B_OK) {

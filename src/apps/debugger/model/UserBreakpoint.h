@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef USER_BREAKPOINT_H
@@ -12,6 +12,7 @@
 #include <util/DoublyLinkedList.h>
 
 #include "SourceLocation.h"
+#include "String.h"
 #include "Types.h"
 
 
@@ -104,6 +105,13 @@ public:
 			bool				IsHidden() const	{ return fHidden; }
 			void				SetHidden(bool hidden);
 
+			bool				HasCondition() const
+									{ return !fConditionExpression.IsEmpty(); }
+			const BString&		Condition() const
+									{ return fConditionExpression; }
+			void				SetCondition(
+									const BString& conditionExpression);
+
 private:
 			typedef BObjectList<UserBreakpointInstance> InstanceList;
 
@@ -113,6 +121,7 @@ private:
 			bool				fValid;
 			bool				fEnabled;
 			bool				fHidden;
+			BString				fConditionExpression;
 };
 
 

@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -101,7 +101,8 @@ UserBreakpoint::UserBreakpoint(const UserBreakpointLocation& location)
 	fLocation(location),
 	fValid(false),
 	fEnabled(false),
-	fHidden(false)
+	fHidden(false),
+	fConditionExpression()
 {
 }
 
@@ -168,4 +169,11 @@ void
 UserBreakpoint::SetHidden(bool hidden)
 {
 	fHidden = hidden;
+}
+
+
+void
+UserBreakpoint::SetCondition(const BString& conditionExpression)
+{
+	fConditionExpression = conditionExpression;
 }

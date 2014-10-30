@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,7 +22,8 @@ BreakpointSetting::BreakpointSetting()
 	fSourceLocation(),
 	fRelativeAddress(0),
 	fEnabled(false),
-	fHidden(false)
+	fHidden(false),
+	fConditionExpression()
 {
 }
 
@@ -34,7 +35,8 @@ BreakpointSetting::BreakpointSetting(const BreakpointSetting& other)
 	fSourceLocation(other.fSourceLocation),
 	fRelativeAddress(other.fRelativeAddress),
 	fEnabled(other.fEnabled),
-	fHidden(other.fHidden)
+	fHidden(other.fHidden),
+	fConditionExpression(other.fConditionExpression)
 {
 	if (fFunctionID != NULL)
 		fFunctionID->AcquireReference();
@@ -49,7 +51,7 @@ BreakpointSetting::~BreakpointSetting()
 
 status_t
 BreakpointSetting::SetTo(const UserBreakpointLocation& location, bool enabled,
-	bool hidden)
+	bool hidden, const BString& conditionExpression)
 {
 	_Unset();
 
@@ -64,6 +66,7 @@ BreakpointSetting::SetTo(const UserBreakpointLocation& location, bool enabled,
 	fRelativeAddress = location.RelativeAddress();
 	fEnabled = enabled;
 	fHidden = hidden;
+	fConditionExpression = conditionExpression;
 
 	return B_OK;
 }
@@ -100,6 +103,9 @@ BreakpointSetting::SetTo(const BMessage& archive)
 	if (archive.FindBool("hidden", &fHidden) != B_OK)
 		fHidden = false;
 
+	if (archive.FindString("condition", &fConditionExpression) != B_OK)
+		fConditionExpression.Truncate(0);
+
 	return B_OK;
 }
 
@@ -122,7 +128,9 @@ BreakpointSetting::WriteTo(BMessage& archive) const
 		|| (error = archive.AddUInt64("relativeAddress", fRelativeAddress))
 			!= B_OK
 		|| (error = archive.AddBool("enabled", fEnabled)) != B_OK
-		|| (error = archive.AddBool("hidden", fHidden)) != B_OK) {
+		|| (error = archive.AddBool("hidden", fHidden)) != B_OK
+		|| (error = archive.AddString("condition", fConditionExpression))
+			!= B_OK) {
 		return error;
 	}
 
@@ -147,6 +155,7 @@ BreakpointSetting::operator=(const BreakpointSetting& other)
 	fRelativeAddress = other.fRelativeAddress;
 	fEnabled = other.fEnabled;
 	fHidden = other.fHidden;
+	fConditionExpression = other.fConditionExpression;
 
 	return *this;
 }
@@ -164,4 +173,5 @@ BreakpointSetting::_Unset()
 	fSourceLocation = SourceLocation();
 	fRelativeAddress = 0;
 	fEnabled = false;
+	fConditionExpression.Truncate(0);
 }
