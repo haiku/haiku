@@ -217,7 +217,7 @@ public:
 
 	virtual int32 CountColumns() const
 	{
-		return 3;
+		return 4;
 	}
 
 	virtual int32 CountRows() const
@@ -275,6 +275,12 @@ private:
 					}
 				}
 				value.SetTo(data);
+				return true;
+			}
+			case 3:
+			{
+				value.SetTo(breakpoint->Condition(),
+					B_VARIANT_DONT_COPY_DATA);
 				return true;
 			}
 			default:
@@ -455,6 +461,8 @@ BreakpointListView::_Init(BView* filterTarget)
 	fBreakpointsTable->AddColumn(new StringTableColumn(1, "Location", 250, 40,
 		1000, B_TRUNCATE_END, B_ALIGN_LEFT));
 	fBreakpointsTable->AddColumn(new StringTableColumn(2, "File:Line/Address",
+		250, 40, 1000, B_TRUNCATE_END, B_ALIGN_LEFT));
+	fBreakpointsTable->AddColumn(new StringTableColumn(3, "Condition",
 		250, 40, 1000, B_TRUNCATE_END, B_ALIGN_LEFT));
 
 	fBreakpointsTable->SetSelectionMode(B_MULTIPLE_SELECTION_LIST);
