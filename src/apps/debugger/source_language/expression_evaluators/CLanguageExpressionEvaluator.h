@@ -72,7 +72,7 @@ class CLanguageExpressionEvaluator {
 			Number				_ParseProduct();
 			Number				_ParsePower();
 			Number				_ParseUnary();
-			Number				_ParseIdentifier();
+			Number				_ParseIdentifier(ValueNode* parentNode = NULL);
 			Number				_ParseAtom();
 
 			void				_EatToken(int32 type);

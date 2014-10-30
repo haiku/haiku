@@ -58,7 +58,9 @@ enum {
 	TOKEN_GT,
 	TOKEN_GE,
 	TOKEN_LT,
-	TOKEN_LE
+	TOKEN_LE,
+
+	TOKEN_MEMBER_PTR
 };
 
 static BString TokenTypeToString(int32 type)
@@ -148,6 +150,10 @@ static BString TokenTypeToString(int32 type)
 
 		case TOKEN_LE:
 			token = "<=";
+			break;
+
+		case TOKEN_MEMBER_PTR:
+			token = "->";
 			break;
 
 		default:
@@ -295,6 +301,17 @@ class CLanguageExpressionEvaluator::Tokenizer {
 			}
 
 			int32 length = fCurrentChar - begin;
+			if (length == 1 && decimal) {
+				// check for . operator
+				fCurrentChar = begin;
+				if (!_ParseOperator()) {
+					throw ParseException("unexpected character",
+						_CurrentPos());
+				}
+
+				return fCurrentToken;
+			}
+
 			BString test = temp;
 			test << "&_";
 			double value;
@@ -361,16 +378,20 @@ class CLanguageExpressionEvaluator::Tokenizer {
 				break;
 
 			case '-':
-				type = TOKEN_MINUS;
-				length = 1;
+				 if (Peek() == '>') {
+				 	type = TOKEN_MEMBER_PTR;
+				 	length = 2;
+				 } else {
+					type = TOKEN_MINUS;
+					length = 1;
+				 }
 				break;
 
 			case '*':
 				if (Peek() == '*')  {
 					type = TOKEN_POWER;
 					length = 2;
-				}
-				else {
+				} else {
 					type = TOKEN_STAR;
 					length = 1;
 				}
@@ -450,6 +471,11 @@ class CLanguageExpressionEvaluator::Tokenizer {
 
 			case '~':
 				type = TOKEN_BITWISE_NOT;
+				length = 1;
+				break;
+
+			case '.':
+				type = TOKEN_MEMBER_PTR;
 				length = 1;
 				break;
 
@@ -764,7 +790,7 @@ CLanguageExpressionEvaluator::_ParseUnary()
 
 
 Number
-CLanguageExpressionEvaluator::_ParseIdentifier()
+CLanguageExpressionEvaluator::_ParseIdentifier(ValueNode* parentNode)
 {
 	Token token = fTokenizer->NextToken();
 	Number value;
@@ -780,34 +806,41 @@ CLanguageExpressionEvaluator::_ParseIdentifier()
 	AutoLocker<ValueNodeContainer> containerLocker(container);
 
 	ValueNodeChild* child = NULL;
-	ValueNodeChild* thisChild = NULL;
-	for (int32 i = 0; i < container->CountChildren(); i++) {
-		ValueNodeChild* current = container->ChildAt(i);
-		const BString& nodeName = current->Name();
-		if (nodeName == identifierName) {
-			child = current;
-			break;
-		} else if (nodeName == "this")
-			thisChild = current;
-	}
-
-	if (child == NULL && thisChild != NULL) {
-		// the name was not found in the variables or parameters,
-		// but we have a class pointer. Try to find the name in the
-		// list of members.
-		_RequestValueIfNeeded(token, thisChild);
-		ValueNode* thisNode = thisChild->Node();
-		// skip the intermediate pointer
-		if (thisNode->GetType()->Kind() == TYPE_ADDRESS
-			&& thisNode->CountChildren() == 1) {
-			thisChild = thisNode->ChildAt(0);
-
-			_RequestValueIfNeeded(token, thisChild);
-			thisNode = thisChild->Node();
+	if (parentNode == NULL) {
+		ValueNodeChild* thisChild = NULL;
+		for (int32 i = 0; i < container->CountChildren(); i++) {
+			ValueNodeChild* current = container->ChildAt(i);
+			const BString& nodeName = current->Name();
+			if (nodeName == identifierName) {
+				child = current;
+				break;
+			} else if (nodeName == "this")
+				thisChild = current;
 		}
 
-		for (int32 i = 0; i < thisNode->CountChildren(); i++) {
-			ValueNodeChild* current = thisNode->ChildAt(i);
+		if (child == NULL && thisChild != NULL) {
+			// the name was not found in the variables or parameters,
+			// but we have a class pointer. Try to find the name in the
+			// list of members.
+			_RequestValueIfNeeded(token, thisChild);
+			ValueNode* thisNode = thisChild->Node();
+			fTokenizer->RewindToken();
+			return _ParseIdentifier(thisNode);
+		}
+	} else {
+		// skip intermediate address nodes
+		if (parentNode->GetType()->Kind() == TYPE_ADDRESS
+			&& parentNode->CountChildren() == 1) {
+			child = parentNode->ChildAt(0);
+
+			_RequestValueIfNeeded(token, child);
+			parentNode = child->Node();
+			fTokenizer->RewindToken();
+			return _ParseIdentifier(parentNode);
+		}
+
+		for (int32 i = 0; i < parentNode->CountChildren(); i++) {
+			ValueNodeChild* current = parentNode->ChildAt(i);
 			const BString& nodeName = current->Name();
 			if (nodeName == identifierName) {
 				child = current;
@@ -824,8 +857,21 @@ CLanguageExpressionEvaluator::_ParseIdentifier()
 	}
 
 	_RequestValueIfNeeded(token, child);
-
 	ValueNode* node = child->Node();
+
+	token = fTokenizer->NextToken();
+	if (token.type == TOKEN_MEMBER_PTR) {
+		token = fTokenizer->NextToken();
+		if (token.type == TOKEN_IDENTIFIER) {
+			fTokenizer->RewindToken();
+			return _ParseIdentifier(node);
+		} else {
+			throw ParseException("Expected identifier after member "
+				"dereference.", token.position);
+		}
+	} else
+		fTokenizer->RewindToken();
+
 	BVariant variant;
 	Value* nodeValue = node->GetValue();
 	nodeValue->ToVariant(variant);
