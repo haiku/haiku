@@ -11,7 +11,9 @@
 
 #include <new>
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
+#include <Variant.h>
 
 #include "Architecture.h"
 #include "BreakpointManager.h"
@@ -24,11 +26,13 @@
 #include "MessageCodes.h"
 #include "Register.h"
 #include "SourceCode.h"
+#include "SourceLanguage.h"
 #include "SpecificImageDebugInfo.h"
 #include "StackTrace.h"
 #include "Statement.h"
 #include "Team.h"
 #include "Tracing.h"
+#include "Value.h"
 #include "Worker.h"
 
 
@@ -39,6 +43,43 @@ enum {
 	STEP_INTO,
 	STEP_OUT,
 	STEP_UNTIL
+};
+
+
+class ExpressionJobListener : public JobListener {
+public:
+	ExpressionJobListener(ThreadHandler* handler)
+	:
+	JobListener(),
+	fHandler(handler)
+	{
+		fHandler->AcquireReference();
+	}
+
+	~ExpressionJobListener()
+	{
+		fHandler->ReleaseReference();
+	}
+
+	virtual void JobDone(Job* job)
+	{
+		Value* resultValue = dynamic_cast<ExpressionEvaluationJob*>(job)
+			->GetResultValue();
+
+		fHandler->_HandleBreakpointConditionEvaluated(resultValue);
+	}
+
+	virtual void JobFailed(Job* job)
+	{
+		fHandler->_HandleBreakpointConditionEvaluated(NULL);
+	}
+
+	virtual void JobAborted(Job* job)
+	{
+		fHandler->_HandleBreakpointConditionEvaluated(NULL);
+	}
+private:
+	ThreadHandler* fHandler;
 };
 
 
@@ -58,7 +99,10 @@ ThreadHandler::ThreadHandler(Thread* thread, Worker* worker,
 	fSteppedOverFunctionAddress(0),
 	fPreviousInstructionPointer(0),
 	fPreviousFrameAddress(0),
-	fSingleStepping(false)
+	fSingleStepping(false),
+	fHasPendingConditionEvaluation(false),
+	fConditionWaitSem(-1),
+	fConditionResult(NULL)
 {
 	fDebuggerInterface->AcquireReference();
 }
@@ -68,6 +112,9 @@ ThreadHandler::~ThreadHandler()
 {
 	_ClearContinuationState();
 	fDebuggerInterface->ReleaseReference();
+
+	if (fConditionWaitSem > 0)
+		delete_sem(fConditionWaitSem);
 }
 
 
@@ -76,6 +123,7 @@ ThreadHandler::Init()
 {
 	fWorker->ScheduleJob(new(std::nothrow) GetThreadStateJob(fDebuggerInterface,
 		fThread));
+	fConditionWaitSem = create_sem(0, "breakpoint condition waiter");
 }
 
 
@@ -164,6 +212,12 @@ ThreadHandler::HandleBreakpointHit(BreakpointHitEvent* event)
 			}
 
 			return false;
+		} else {
+			locker.Unlock();
+			if (_HandleBreakpointConditionIfNeeded(cpuState))
+				return true;
+
+			locker.Lock();
 		}
 	}
 
@@ -387,6 +441,13 @@ ThreadHandler::HandleCpuStateChanged()
 void
 ThreadHandler::HandleStackTraceChanged()
 {
+	AutoLocker< ::Team> teamLocker(fThread->GetTeam());
+	if (fHasPendingConditionEvaluation && fThread->GetStackTrace() != NULL) {
+		fHasPendingConditionEvaluation = false;
+		teamLocker.Unlock();
+
+		_HandleBreakpointConditionIfNeeded(fThread->GetCpuState());
+	}
 }
 
 
@@ -785,6 +846,111 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 		default:
 			return false;
 	}
+}
+
+
+bool
+ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
+{
+	AutoLocker< ::Team> teamLocker(fThread->GetTeam());
+	Breakpoint* breakpoint = fThread->GetTeam()->BreakpointAtAddress(
+		cpuState->InstructionPointer());
+
+	if (breakpoint == NULL)
+		return false;
+
+	if (!breakpoint->HasEnabledUserBreakpoint())
+		return false;
+
+	const UserBreakpointInstanceList& breakpoints
+		= breakpoint->UserBreakpoints();
+
+	for (UserBreakpointInstanceList::ConstIterator it
+			= breakpoints.GetIterator(); it.HasNext();) {
+		UserBreakpoint* userBreakpoint = it.Next()->GetUserBreakpoint();
+		if (!userBreakpoint->IsValid())
+			continue;
+		if (!userBreakpoint->IsEnabled())
+			continue;
+		if (!userBreakpoint->HasCondition())
+			continue;
+
+		StackTrace* stackTrace = fThread->GetStackTrace();
+		if (stackTrace == NULL) {
+			fThread->SetCpuState(cpuState);
+			fHasPendingConditionEvaluation = true;
+			return true;
+		}
+
+		StackFrame* frame = stackTrace->FrameAt(0);
+		FunctionDebugInfo* info = frame->Function()->GetFunctionDebugInfo();
+		if (info == NULL)
+			return false;
+
+		SpecificImageDebugInfo* specificInfo
+			= info->GetSpecificImageDebugInfo();
+		if (specificInfo == NULL)
+			return false;
+
+		SourceLanguage* language;
+		if (specificInfo->GetSourceLanguage(info, language) != B_OK)
+			return false;
+
+		BReference<SourceLanguage> reference(language, true);
+		ExpressionJobListener* listener
+			= new(std::nothrow) ExpressionJobListener(this);
+		if (listener == NULL)
+			return false;
+
+		status_t error = fWorker->ScheduleJob(
+			new(std::nothrow) ExpressionEvaluationJob(fThread->GetTeam(),
+				fDebuggerInterface, language, userBreakpoint->Condition(),
+				B_UINT64_TYPE, frame, fThread), listener);
+
+		BPrivate::ObjectDeleter<ExpressionJobListener> deleter(listener);
+		if (error == B_OK) {
+			teamLocker.Unlock();
+
+			do {
+				error = acquire_sem(fConditionWaitSem);
+			} while (error == B_INTERRUPTED);
+
+			teamLocker.Lock();
+
+			bool stop = false;
+			if (fConditionResult == NULL)
+				stop = true;
+			else {
+				BVariant value;
+				if (!fConditionResult->ToVariant(value))
+					stop = true;
+				if (!value.TypeIsInteger(value.Type()))
+					stop = true;
+				stop = value.ToBool();
+				fConditionResult->ReleaseReference();
+				fConditionResult = NULL;
+			}
+
+			if (stop)
+				return false;
+			else {
+				fDebuggerInterface->ContinueThread(fThread->ID());
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+void
+ThreadHandler::_HandleBreakpointConditionEvaluated(Value* value)
+{
+	fConditionResult = value;
+	if (fConditionResult != NULL)
+		fConditionResult->AcquireReference();
+	release_sem(fConditionWaitSem);
 }
 
 
