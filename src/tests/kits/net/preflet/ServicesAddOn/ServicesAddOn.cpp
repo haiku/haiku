@@ -79,7 +79,7 @@ ServicesAddOn::AttachedToWindow()
 void
 ServicesAddOn::MessageReceived(BMessage* message)
 {
-	switch(message->what) {
+	switch (message->what) {
 		case kSelectionChanged:
 		{
 			BStringItem* item = static_cast<BStringItem*>(
@@ -108,6 +108,36 @@ ServicesAddOn::MessageReceived(BMessage* message)
 		default:
 			BGroupView::MessageReceived(message);
 	}
+}
+
+
+status_t
+ServicesAddOn::Save()
+{
+	BView* panel = Window()->FindView("panel");
+	DNSSettingsView* settingsView = dynamic_cast<DNSSettingsView*>(
+		panel->ChildAt(0));
+
+	// View not active - nothing to save
+	if (settingsView == NULL)
+		return B_OK;
+
+	return settingsView->Apply();
+}
+
+
+status_t
+ServicesAddOn::Revert()
+{
+	BView* panel = Window()->FindView("panel");
+	DNSSettingsView* settingsView = dynamic_cast<DNSSettingsView*>(
+		panel->ChildAt(0));
+
+	// View not active - nothing to revert
+	if (settingsView == NULL)
+		return B_OK;
+
+	return settingsView->Revert();
 }
 
 

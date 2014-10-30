@@ -8,6 +8,7 @@
 
 
 #include <GroupView.h>
+#include <StringList.h>
 
 
 class BButton;
@@ -22,11 +23,16 @@ public:
 		void				AttachedToWindow();
 		void				MessageReceived(BMessage* message);
 
+		status_t			Apply();
+		status_t			Revert();
+
 private:
-		status_t			_ParseResolvConf();
+		status_t			_LoadDNSConfiguration();
+		status_t			_SaveDNSConfiguration();
 
 private:
 		BListView*			fServerListView;
+		BStringList			fRevertList;
 		BTextControl*		fTextControl;
 
 		BButton*			fAddButton;

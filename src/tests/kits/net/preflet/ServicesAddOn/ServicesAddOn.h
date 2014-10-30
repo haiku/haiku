@@ -23,6 +23,9 @@ class ServicesAddOn : public NetworkSetupAddOn, public BGroupView {
 		void				AttachedToWindow();
 		void				MessageReceived(BMessage*);
 
+		status_t			Save();
+		status_t			Revert();
+
 	private:
 		status_t			_ParseInetd();
 		status_t			_ParseXinetd();
