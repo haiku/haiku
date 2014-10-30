@@ -34,7 +34,8 @@ ExpressionEvaluationJob::ExpressionEvaluationJob(Team* team,
 	fResultType(resultType),
 	fFrame(frame),
 	fThread(thread),
-	fManager(NULL)
+	fManager(NULL),
+	fResultValue(NULL)
 {
 	fLanguage->AcquireReference();
 	if (fFrame != NULL)
@@ -53,6 +54,8 @@ ExpressionEvaluationJob::~ExpressionEvaluationJob()
 		fThread->ReleaseReference();
 	if (fManager != NULL)
 		fManager->ReleaseReference();
+	if (fResultValue != NULL)
+		fResultValue->ReleaseReference();
 }
 
 
@@ -66,8 +69,6 @@ ExpressionEvaluationJob::Key() const
 status_t
 ExpressionEvaluationJob::Do()
 {
-
-	Value* value = NULL;
 	BReference<Value> reference;
 	status_t result = B_OK;
 	if (fFrame != NULL && fManager == NULL) {
@@ -85,18 +86,17 @@ ExpressionEvaluationJob::Do()
 
 	ValueNode* neededNode = NULL;
 	result = fLanguage->EvaluateExpression(fExpression,
-		fResultType, fManager, value, neededNode);
+		fResultType, fManager, fResultValue, neededNode);
 	if (neededNode != NULL) {
 		result = ResolveNodeValue(neededNode);
 		if (State() == JOB_STATE_WAITING)
 			return B_OK;
-		else if (value != NULL)
-			reference.SetTo(value, true);
 		// if result != B_OK, fall through
 	}
 
 	AutoLocker<Team> teamLocker(fTeam);
-	fTeam->NotifyExpressionEvaluated(fExpression.String(), result, value);
+	fTeam->NotifyExpressionEvaluated(fExpression.String(), result,
+		fResultValue);
 
 	return B_OK;
 }

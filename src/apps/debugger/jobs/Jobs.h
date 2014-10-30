@@ -245,6 +245,8 @@ public:
 	virtual	const JobKey&		Key() const;
 	virtual	status_t			Do();
 
+			Value*				GetResultValue() const { return fResultValue; }
+
 private:
 			status_t			ResolveNodeValue(ValueNode* node);
 
@@ -260,6 +262,7 @@ private:
 			StackFrame*			fFrame;
 			Thread*				fThread;
 			ValueNodeManager*	fManager;
+			Value*				fResultValue;
 };
 
 
