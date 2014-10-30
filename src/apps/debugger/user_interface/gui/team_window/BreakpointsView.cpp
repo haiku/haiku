@@ -31,6 +31,7 @@ BreakpointsView::BreakpointsView(Team* team, Listener* listener)
 	fListView(NULL),
 	fConfigureExceptionsButton(NULL),
 	fToggleBreakpointButton(NULL),
+	fEditBreakpointButton(NULL),
 	fRemoveBreakpointButton(NULL),
 	fListener(listener)
 {
@@ -96,6 +97,12 @@ BreakpointsView::MessageReceived(BMessage* message)
 			_HandleBreakpointAction(message->what);
 			break;
 
+		case MSG_SHOW_BREAKPOINT_EDIT_WINDOW:
+			message->AddPointer("breakpoint",
+				fSelectedBreakpoints.ItemAt(0)->GetBreakpoint());
+			Window()->PostMessage(message);
+			break;
+
 		default:
 			BGroupView::MessageReceived(message);
 			break;
@@ -107,6 +114,7 @@ void
 BreakpointsView::AttachedToWindow()
 {
 	fConfigureExceptionsButton->SetTarget(Window());
+	fEditBreakpointButton->SetTarget(this);
 	fToggleBreakpointButton->SetTarget(this);
 	fRemoveBreakpointButton->SetTarget(this);
 }
@@ -157,6 +165,7 @@ BreakpointsView::_Init()
 			.Add(fConfigureExceptionsButton = new BButton(
 				"Configure break conditions" B_UTF8_ELLIPSIS))
 			.Add(fRemoveBreakpointButton = new BButton("Remove"))
+			.Add(fEditBreakpointButton = new BButton("Edit" B_UTF8_ELLIPSIS))
 			.Add(fToggleBreakpointButton = new BButton("Toggle"))
 		.End();
 
@@ -164,6 +173,8 @@ BreakpointsView::_Init()
 		new BMessage(MSG_SHOW_BREAK_CONDITION_CONFIG_WINDOW));
 	fToggleBreakpointButton->SetMessage(new BMessage(MSG_ENABLE_BREAKPOINT));
 	fRemoveBreakpointButton->SetMessage(new BMessage(MSG_CLEAR_BREAKPOINT));
+	fEditBreakpointButton->SetMessage(
+		new BMessage(MSG_SHOW_BREAKPOINT_EDIT_WINDOW));
 
 	_UpdateButtons();
 }
@@ -190,6 +201,7 @@ BreakpointsView::_UpdateButtons()
 						hasEnabled = true;
 					else
 						hasDisabled = true;
+
 				}
 				break;
 			}
@@ -209,6 +221,17 @@ BreakpointsView::_UpdateButtons()
 	}
 
 	if (valid) {
+		// only allow condition editing if we have a single
+		// actual breakpoint selected.
+		// TODO: allow using this to modify watchpoints as
+		// well.
+		if (fSelectedBreakpoints.CountItems() == 1
+			&& fSelectedBreakpoints.ItemAt(0)->Type()
+				== BREAKPOINT_PROXY_TYPE_BREAKPOINT) {
+			fEditBreakpointButton->SetEnabled(true);
+		} else
+			fEditBreakpointButton->SetEnabled(false);
+
 		// if we have at least one disabled breakpoint in the
 		// selection, we leave the button as an Enable button
 		if (hasEnabled && !hasDisabled) {
@@ -226,6 +249,7 @@ BreakpointsView::_UpdateButtons()
 	} else {
 		fToggleBreakpointButton->SetLabel("Enable");
 		fToggleBreakpointButton->SetEnabled(false);
+		fEditBreakpointButton->SetEnabled(false);
 		fRemoveBreakpointButton->SetEnabled(false);
 	}
 }

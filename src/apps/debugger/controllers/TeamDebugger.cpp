@@ -582,9 +582,10 @@ TeamDebugger::MessageReceived(BMessage* message)
 			BReference<UserBreakpoint> breakpointReference;
 			uint64 address = 0;
 
-			if (message->FindPointer("breakpoint", (void**)&breakpoint) == B_OK)
+			if (message->FindPointer("breakpoint", (void**)&breakpoint)
+				== B_OK) {
 				breakpointReference.SetTo(breakpoint, true);
-			else if (message->FindUInt64("address", &address) != B_OK)
+			} else if (message->FindUInt64("address", &address) != B_OK)
 				break;
 
 			if (message->what == MSG_SET_BREAKPOINT) {
@@ -606,6 +607,45 @@ TeamDebugger::MessageReceived(BMessage* message)
 				else
 					_HandleClearUserBreakpoint(address);
 			}
+
+			break;
+		}
+
+		case MSG_SET_BREAKPOINT_CONDITION:
+		{
+			UserBreakpoint* breakpoint = NULL;
+			BReference<UserBreakpoint> breakpointReference;
+			if (message->FindPointer("breakpoint", (void**)&breakpoint)
+				!= B_OK) {
+				break;
+			}
+
+			breakpointReference.SetTo(breakpoint, true);
+
+			const char* condition;
+			if (message->FindString("condition", &condition) != B_OK)
+				break;
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			breakpoint->SetCondition(condition);
+			fTeam->NotifyUserBreakpointChanged(breakpoint);
+
+			break;
+		}
+
+		case MSG_CLEAR_BREAKPOINT_CONDITION:
+		{
+			UserBreakpoint* breakpoint = NULL;
+			BReference<UserBreakpoint> breakpointReference;
+			if (message->FindPointer("breakpoint", (void**)&breakpoint)
+				!= B_OK)
+				break;
+
+			breakpointReference.SetTo(breakpoint, true);
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			breakpoint->SetCondition(NULL);
+			fTeam->NotifyUserBreakpointChanged(breakpoint);
 
 			break;
 		}
@@ -980,6 +1020,32 @@ TeamDebugger::SetBreakpointEnabledRequested(UserBreakpoint* breakpoint,
 	BReference<UserBreakpoint> breakpointReference(breakpoint);
 	if (message.AddPointer("breakpoint", breakpoint) == B_OK
 		&& message.AddBool("enabled", enabled) == B_OK
+		&& PostMessage(&message) == B_OK) {
+		breakpointReference.Detach();
+	}
+}
+
+
+void
+TeamDebugger::SetBreakpointConditionRequested(UserBreakpoint* breakpoint,
+	const char* condition)
+{
+	BMessage message(MSG_SET_BREAKPOINT_CONDITION);
+	BReference<UserBreakpoint> breakpointReference(breakpoint);
+	if (message.AddPointer("breakpoint", breakpoint) == B_OK
+		&& message.AddString("condition", condition) == B_OK
+		&& PostMessage(&message) == B_OK) {
+		breakpointReference.Detach();
+	}
+}
+
+
+void
+TeamDebugger::ClearBreakpointConditionRequested(UserBreakpoint* breakpoint)
+{
+	BMessage message(MSG_CLEAR_BREAKPOINT_CONDITION);
+	BReference<UserBreakpoint> breakpointReference(breakpoint);
+	if (message.AddPointer("breakpoint", breakpoint) == B_OK
 		&& PostMessage(&message) == B_OK) {
 		breakpointReference.Detach();
 	}

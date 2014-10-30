@@ -262,6 +262,7 @@ Application Debugger :
 
 	# user_interface/gui/team_window
 	BreakConditionConfigWindow.cpp
+	BreakpointEditWindow.cpp
 	BreakpointListView.cpp
 	BreakpointsView.cpp
 	ConsoleOutputView.cpp

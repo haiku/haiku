@@ -33,6 +33,7 @@ class BStringView;
 class BTabView;
 class ConsoleOutputView;
 class BreakConditionConfigWindow;
+class BreakpointEditWindow;
 class ExpressionEvaluationWindow;
 class Image;
 class InspectorWindow;
@@ -220,6 +221,7 @@ private:
 			BSplitView*			fThreadSplitView;
 			BSplitView*			fConsoleSplitView;
 			BreakConditionConfigWindow* fBreakConditionConfigWindow;
+			BreakpointEditWindow* fBreakpointEditWindow;
 			InspectorWindow*	fInspectorWindow;
 			ExpressionEvaluationWindow* fExpressionWindow;
 			GuiTeamUiSettings	fUiSettings;

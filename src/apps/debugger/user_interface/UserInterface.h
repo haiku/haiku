@@ -109,6 +109,11 @@ public:
 	virtual	void				SetBreakpointEnabledRequested(
 									UserBreakpoint* breakpoint,
 									bool enabled) = 0;
+	virtual	void				SetBreakpointConditionRequested(
+									UserBreakpoint* breakpoint,
+									const char* condition) = 0;
+	virtual	void				ClearBreakpointConditionRequested(
+									UserBreakpoint* breakpoint) = 0;
 	virtual	void				ClearBreakpointRequested(
 									target_addr_t address) = 0;
 	virtual	void				ClearBreakpointRequested(

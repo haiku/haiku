@@ -33,12 +33,14 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
+#include "BreakConditionConfigWindow.h"
 #include "Breakpoint.h"
+#include "BreakpointEditWindow.h"
 #include "ConsoleOutputView.h"
 #include "CppLanguage.h"
 #include "CpuState.h"
 #include "DisassembledCode.h"
-#include "BreakConditionConfigWindow.h"
+#include "BreakpointEditWindow.h"
 #include "ExpressionEvaluationWindow.h"
 #include "FileSourceCode.h"
 #include "GuiSettingsUtils.h"
@@ -136,6 +138,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fThreadSplitView(NULL),
 	fConsoleSplitView(NULL),
 	fBreakConditionConfigWindow(NULL),
+	fBreakpointEditWindow(NULL),
 	fInspectorWindow(NULL),
 	fExpressionWindow(NULL),
 	fFilePanel(NULL),
@@ -393,6 +396,36 @@ TeamWindow::MessageReceived(BMessage* message)
 		case MSG_BREAK_CONDITION_CONFIG_WINDOW_CLOSED:
 		{
 			fBreakConditionConfigWindow = NULL;
+			break;
+		}
+		case MSG_SHOW_BREAKPOINT_EDIT_WINDOW:
+		{
+			if (fBreakpointEditWindow != NULL) {
+				AutoLocker<BWindow> lock(fBreakpointEditWindow);
+				if (lock.IsLocked())
+					fBreakpointEditWindow->Activate(true);
+			} else {
+				UserBreakpoint* breakpoint;
+				if (message->FindPointer("breakpoint",
+					reinterpret_cast<void**>(&breakpoint)) != B_OK) {
+					break;
+				}
+
+				try {
+					fBreakpointEditWindow
+						= BreakpointEditWindow::Create(
+						fTeam, breakpoint, fListener, this);
+					if (fBreakpointEditWindow != NULL)
+						fBreakpointEditWindow->Show();
+	           	} catch (...) {
+	           		// TODO: notify user
+	           	}
+			}
+			break;
+		}
+		case MSG_BREAKPOINT_EDIT_WINDOW_CLOSED:
+		{
+			fBreakpointEditWindow = NULL;
 			break;
 		}
 		case MSG_SHOW_WATCH_VARIABLE_PROMPT:

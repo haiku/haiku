@@ -81,6 +81,11 @@ private:
 	virtual	void				SetBreakpointEnabledRequested(
 									UserBreakpoint* breakpoint,
 									bool enabled);
+	virtual	void				SetBreakpointConditionRequested(
+									UserBreakpoint* breakpoint,
+									const char* condition);
+	virtual	void				ClearBreakpointConditionRequested(
+									UserBreakpoint* breakpoint);
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint);
