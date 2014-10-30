@@ -2,8 +2,10 @@ SubDir HAIKU_TOP src tests kits net preflet ServicesAddOn ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
 
-Addon Services : 
+Addon Services :
 	ServicesAddOn.cpp
-	: be <nogrist>NetworkSetup  [ TargetLibstdc++ ] # $(HAIKU_NETWORK_LIBS)
+
+	DNSSettingsView.cpp
+	: be <nogrist>NetworkSetup network [ TargetLibstdc++ ]
 ;
 

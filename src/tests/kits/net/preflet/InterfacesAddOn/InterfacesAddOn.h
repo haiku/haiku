@@ -32,7 +32,6 @@ public:
 								InterfacesAddOn(image_id addon_image);
 								~InterfacesAddOn();
 
-			const char* 		Name();
 			status_t			Save();
 			status_t			Revert();
 
@@ -42,8 +41,9 @@ public:
 			void				MessageReceived(BMessage* msg);
 
 private:
+			InterfaceView*		_SettingsView();
+private:
 			InterfacesListView*	fListView;
-			InterfaceView*		fSettingsView;
 };
 
 

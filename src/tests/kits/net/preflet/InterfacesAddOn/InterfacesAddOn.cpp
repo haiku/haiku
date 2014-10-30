@@ -50,19 +50,12 @@ InterfacesAddOn::InterfacesAddOn(image_id image)
 	NetworkSetupAddOn(image),
 	BBox(NULL, B_NAVIGABLE_JUMP, B_NO_BORDER)
 {
-	fSettingsView = NULL;
+	SetName("Interfaces");
 }
 
 
 InterfacesAddOn::~InterfacesAddOn()
 {
-}
-
-
-const char*
-InterfacesAddOn::Name()
-{
-	return "Interfaces";
 }
 
 
@@ -101,8 +94,10 @@ status_t
 InterfacesAddOn::Save()
 {
 	// TODO : Profile?
-	
-	fSettingsView->Apply();
+
+	InterfaceView* settingsView = _SettingsView();
+	if (settingsView != NULL)
+		settingsView->Apply();
 	return fListView->SaveItems();
 }
 
@@ -110,7 +105,9 @@ InterfacesAddOn::Save()
 status_t
 InterfacesAddOn::Revert()
 {
-	fSettingsView->Revert();
+	InterfaceView* settingsView = _SettingsView();
+	if (settingsView != NULL)
+		settingsView->Revert();
 	return B_OK;
 }
 
@@ -129,14 +126,17 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 			if (item == NULL)
 				break;
 
-			// TODO it would be better to reuse the view instead of recreating
-			// one.
-			if (fSettingsView != NULL) {
-				fSettingsView->RemoveSelf();
-				delete fSettingsView;
+			BView* panel = Window()->FindView("panel");
+			BView* settingsView = panel->ChildAt(0);
+
+			// Remove currently displayed settings view
+			if (settingsView != NULL) {
+				settingsView->RemoveSelf();
+				delete settingsView;
 			}
-			fSettingsView = new InterfaceView(item->GetSettings());
-			AddChild(fSettingsView);
+
+			settingsView = new InterfaceView(item->GetSettings());
+			Window()->FindView("panel")->AddChild(settingsView);
 			break;
 		}
 
@@ -147,4 +147,12 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 		default:
 			BBox::MessageReceived(msg);
 	}
+}
+
+
+InterfaceView*
+InterfacesAddOn::_SettingsView()
+{
+	BView* view = Window()->FindView("panel")->ChildAt(0);
+	return dynamic_cast<InterfaceView*>(view);
 }

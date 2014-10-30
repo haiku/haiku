@@ -6,6 +6,9 @@
  *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
+
+#include "ServicesAddOn.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,8 +16,12 @@
 #include <ListView.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <Window.h>
 
-#include "ServicesAddOn.h"
+#include "DNSSettingsView.h"
+
+
+static const int32 kSelectionChanged = 'ssrv';
 
 
 NetworkSetupAddOn*
@@ -32,37 +39,80 @@ get_nth_addon(image_id image, int index)
 
 ServicesAddOn::ServicesAddOn(image_id image)
 	:
-	NetworkSetupAddOn(image)
+	NetworkSetupAddOn(image),
+	BGroupView("Services")
 {
 }
 
 
 BView*
-ServicesAddOn::CreateView(BRect* bounds)
+ServicesAddOn::CreateView()
 {
-	BRect r = *bounds;
-	if (r.Width() < 100 || r.Height() < 100)
-		r.Set(0, 0, 100, 100);
+	fServicesListView = new BListView("system_services",
+		B_SINGLE_SELECTION_LIST);
+	fServicesListView->SetSelectionMessage(new BMessage(kSelectionChanged));
 
-	BRect rlv = r.InsetByCopy(2, 2);
-	rlv.right -= B_V_SCROLL_BAR_WIDTH;
-	fServicesListView = new BListView(rlv, "system_services",
-		B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
+	BScrollView* sv = new BScrollView( "ScrollView",
+		fServicesListView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
-	BScrollView* sv = new BScrollView( "system_services_scrollview",
-		fServicesListView, B_FOLLOW_ALL_SIDES,
-		B_WILL_DRAW | B_FRAME_EVENTS, false, true);
+	fServicesListView->AddItem(new BStringItem("DNS"));
 
-	if (ParseInetd() != B_OK)
-		ParseXinetd();
+#if 0
+	// Enable this when the inetd view is ready
+	if (_ParseInetd() != B_OK)
+		_ParseXinetd();
+#endif
 
-	*bounds = r;
-	return sv;
+	AddChild(sv);
+
+	return this;
+}
+
+
+void
+ServicesAddOn::AttachedToWindow()
+{
+	fServicesListView->SetTarget(this);
+}
+
+
+void
+ServicesAddOn::MessageReceived(BMessage* message)
+{
+	switch(message->what) {
+		case kSelectionChanged:
+		{
+			BStringItem* item = static_cast<BStringItem*>(
+				fServicesListView->ItemAt(message->FindInt32("index")));
+
+			if (item == NULL)
+				return;
+
+			BView* panel = Window()->FindView("panel");
+			BView* settingsView = panel->ChildAt(0);
+
+			// Remove currently displayed settings view
+			if (settingsView != NULL) {
+				settingsView->RemoveSelf();
+				delete settingsView;
+			}
+
+			if (strcmp(item->Text(), "DNS") == 0) {
+				settingsView = new DNSSettingsView();
+				panel->AddChild(settingsView);
+			} else {
+				// TODO show a standard "inetd service" view
+			}
+			break;
+		}
+		default:
+			BGroupView::MessageReceived(message);
+	}
 }
 
 
 status_t
-ServicesAddOn::ParseInetd()
+ServicesAddOn::_ParseInetd()
 {
 	FILE *f = fopen("/etc/inetd.conf", "r");
 	if (f) {
@@ -102,7 +152,7 @@ ServicesAddOn::ParseInetd()
 
 
 status_t
-ServicesAddOn::ParseXinetd()
+ServicesAddOn::_ParseXinetd()
 {
 	FILE *f = fopen("/boot/system/settings/network/services", "r");
 	if (f) {

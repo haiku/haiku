@@ -9,13 +9,24 @@
 
 #include "NetworkSetupAddOn.h"
 
-class ServicesAddOn : public NetworkSetupAddOn {
-	protected:
-		BListView*			fServicesListView;
+#include <GroupView.h>
+
+
+class BListView;
+
+
+class ServicesAddOn : public NetworkSetupAddOn, public BGroupView {
 	public:
 							ServicesAddOn(image_id addon_image);
-		BView*				CreateView(BRect* bounds);
-		const char*			Name() { return "Services"; };
-		status_t			ParseInetd();
-		status_t			ParseXinetd();
+		BView*				CreateView();
+
+		void				AttachedToWindow();
+		void				MessageReceived(BMessage*);
+
+	private:
+		status_t			_ParseInetd();
+		status_t			_ParseXinetd();
+
+	private:
+		BListView*			fServicesListView;
 };

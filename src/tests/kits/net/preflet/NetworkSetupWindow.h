@@ -33,7 +33,6 @@ class NetworkSetupWindow : public BWindow
 
 	typedef	BWindow				inherited;
 
-	static	const uint32		kMsgAddonShow = 'show';
 	static	const uint32		kMsgProfileSelected = 'prof';
 	static	const uint32		kMsgProfileManage = 'mngp';
 	static	const uint32		kMsgProfileNew = 'newp';
@@ -45,7 +44,7 @@ class NetworkSetupWindow : public BWindow
 
 	private:
 			void				_BuildProfilesMenu(BMenu* menu, int32 msg);
-			void				_BuildShowTabView(int32 msg);
+			void				_BuildShowTabView();
 
 			BButton*			fHelpButton;
 			BButton*			fRevertButton;
@@ -53,7 +52,7 @@ class NetworkSetupWindow : public BWindow
 
 			NetworkAddOnMap		fNetworkAddOnMap;
 
-			BView*				fPanel;
+			BTabView*			fPanel;
 			BView*				fAddonView;
 			int					fAddonCount;
 };

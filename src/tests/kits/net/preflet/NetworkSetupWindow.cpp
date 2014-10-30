@@ -51,7 +51,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	// ---- Settings section
 
-	fPanel = new BGroupView(B_VERTICAL);
+	fPanel = new BTabView("tabs", B_WIDTH_FROM_LABEL);
 
 	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
 		new BMessage(kMsgApply));
@@ -71,7 +71,10 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 			.AddGlue()
 		.End()
 #endif
-		.Add(fPanel)
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+			.Add(fPanel)
+			.Add(new BGroupView("panel"))
+		.End()
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)
 			.AddGlue()
@@ -81,7 +84,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 	);
 
-	_BuildShowTabView(kMsgAddonShow);
+	_BuildShowTabView();
 
 	fAddonView = NULL;
 
@@ -143,18 +146,6 @@ NetworkSetupWindow::MessageReceived(BMessage*	msg)
 					= fNetworkAddOnMap[addonIndex];
 				addon->Save();
 			}
-			break;
-		}
-
-		case kMsgAddonShow: {
-			if (fAddonView)
-				fAddonView->RemoveSelf();
-
-			fAddonView = NULL;
-			if (msg->FindPointer("addon_view", (void **) &fAddonView) != B_OK)
-				break;
-
-			fPanel->AddChild(fAddonView);
 			break;
 		}
 
@@ -226,7 +217,7 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 
 
 void
-NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
+NetworkSetupWindow::_BuildShowTabView()
 {
 	BPath path;
 	BPath addon_path;
@@ -290,20 +281,13 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 			while ((fNetworkAddOnMap[fAddonCount]
 					= get_nth_addon(addon_id, tabCount)) != NULL) {
 				printf("Adding Tab: %d\n", fAddonCount);
-				BMessage* msg = new BMessage(msg_what);
-
 				BView* addon_view
 					= fNetworkAddOnMap[fAddonCount]->CreateView();
-
-				msg->AddInt32("image_id", addon_id);
-				msg->AddString("addon_path", addon_path.Path());
-				msg->AddPointer("addon", fNetworkAddOnMap[fAddonCount]);
-				msg->AddPointer("addon_view", addon_view);
 
 				// FIXME rework this: we don't want to use a tab view here,
 				// instead add-ons should populate the "interfaces" list with
 				// interfaces, services, etc.
-				fPanel->AddChild(addon_view);
+				fPanel->AddTab(addon_view);
 				fAddonCount++;
 					// Number of tab addons total
 				tabCount++;
