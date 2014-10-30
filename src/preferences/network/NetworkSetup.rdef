@@ -1,5 +1,5 @@
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-NetworkSetup";
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-Network";
 
 resource app_flags B_SINGLE_LAUNCH;
 
@@ -11,8 +11,8 @@ resource app_version {
 	variety = B_APPV_DEVELOPMENT,
 	internal = 0,
 
-	short_info = "NetworkSetup",
-	long_info = "NetworkSetup ©2007-2011 Haiku"
+	short_info = "Network Preferences",
+	long_info = "Network Preferences ©2007-2014 Haiku"
 };
 
 resource vector_icon {

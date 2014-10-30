@@ -14,8 +14,8 @@
 
 
 #define SOFTWARE_EDITOR			"Haiku"
-#define NAME					"NetworkSetup"
-#define SOFTWARE_VERSION_LABEL	"0.1.0 alpha"
+#define NAME					"Network"
+#define SOFTWARE_VERSION_LABEL	"1.0.0 alpha"
 
 #define APPLICATION_SIGNATURE	"application/x-vnd." SOFTWARE_EDITOR "-" NAME
 
