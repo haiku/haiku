@@ -254,9 +254,16 @@ ExpressionEvaluationWindow::MessageReceived(BMessage* message)
 			}
 
 			BString outputText;
-			if (value != NULL)
-				value->ToString(outputText);
-			else {
+			if (value != NULL) {
+				BVariant variantValue;
+				value->ToVariant(variantValue);
+				if (variantValue.TypeIsInteger(variantValue.Type())) {
+					value->ToString(outputText);
+					outputText.SetToFormat("%#" B_PRIx64 " (%s)",
+						variantValue.ToUInt64(), outputText.String());
+				} else
+					value->ToString(outputText);
+			} else {
 				status_t result;
 				if (message->FindInt32("result", &result) != B_OK)
 					result = B_ERROR;
