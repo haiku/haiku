@@ -303,7 +303,7 @@ NetworkSettings::SetConfiguration()
 				fNetworkInterface->SetTo(zeroAddr);
 			} else {
 				// TODO : test this case (no address set for this protocol)
-				printf("no zeroAddr found for %s(%d), found %lu\n",
+				printf("no zeroAddr found for %s(%d), found %" B_PRIu32 "\n",
 					fProtocols[index].name, inet_id, zeroAddr);
 				BNetworkInterfaceAddress interfaceConfig;
 				interfaceConfig.SetAddress(fAddress[inet_id]);
