@@ -61,7 +61,7 @@ AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
 
 if $(USB_BOOT) = 1 {
 	AddFilesToFloppyBootArchive system add-ons kernel busses usb
-		: <usb>uhci <usb>ohci <usb>ehci <usb>xhci ;
+		: <usb>uhci <usb>ohci <usb>ehci ;
 }
 
 if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
@@ -117,7 +117,7 @@ AddBootModuleSymlinksToFloppyBootArchive [ FFilterByBuildFeatures
 	generic_x86@x86
 	ahci generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
 	it8211
-	$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci $(USB_ONLY)<usb>xhci
+	$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci
 	scsi_cd scsi_disk $(USB_ONLY)usb_disk norflash@arm
 	intel session
 	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
