@@ -53,8 +53,6 @@
 #define mutex_unlock UNLOCK
 #endif
 
-#define DEBUG 1
-
 #include "nbd.h"
 
 #define DRV "nbd"

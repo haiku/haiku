@@ -3,6 +3,7 @@
 #define UNICODE_INVALID 0xFFFD
 
 #if defined(DEBUG) && DEBUG > 1
+# include <stdio.h>
 # define DEBUG_PRINT_UTF8
 #endif
 

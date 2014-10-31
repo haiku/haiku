@@ -11,8 +11,6 @@
 #include <Accelerant.h>
 #include <video_overlay.h>
 
-#define DEBUG 1
-
 status_t INIT_ACCELERANT(int fd);
 ssize_t ACCELERANT_CLONE_INFO_SIZE(void);
 void GET_ACCELERANT_CLONE_INFO(void *data);

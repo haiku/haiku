@@ -9,7 +9,6 @@
 #define TOUCHPAD_PREF_H
 
 
-#define DEBUG 1
 #include <Debug.h>
 
 #include "touchpad_settings.h"

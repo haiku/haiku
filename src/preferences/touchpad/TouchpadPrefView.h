@@ -21,7 +21,6 @@
 #include "TouchpadPref.h"
 #include "touchpad_settings.h"
 
-#define DEBUG 1
 #include <Debug.h>
 
 #if DEBUG

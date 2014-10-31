@@ -27,7 +27,6 @@ THE SOFTWARE.
 
 */
 
-#define DEBUG 1
 #include <Debug.h>
 #include <ctype.h>
 #include "Link.h"

@@ -14,8 +14,6 @@
 
 #include "Selectable.h"
 
-#define DEBUG 1
-
 // constructor
 Selection::Selection()
 	: fSelected(20)

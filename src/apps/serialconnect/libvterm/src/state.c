@@ -228,6 +228,7 @@ static int on_text(const char bytes[], size_t len, void *user)
   if(vterm_unicode_is_combining(codepoints[i])) {
     /* See if the cursor has moved since */
     if(state->pos.row == state->combine_pos.row && state->pos.col == state->combine_pos.col + state->combine_width) {
+      unsigned saved_i = 0;
 #ifdef DEBUG_GLYPH_COMBINE
       int printpos;
       printf("DEBUG: COMBINING SPLIT GLYPH of chars {");
@@ -237,7 +238,6 @@ static int on_text(const char bytes[], size_t len, void *user)
 #endif
 
       /* Find where we need to append these combining chars */
-      unsigned saved_i = 0;
       while(state->combine_chars[saved_i])
         saved_i++;
 
@@ -287,11 +287,13 @@ static int on_text(const char bytes[], size_t len, void *user)
     i--;
 
 #ifdef DEBUG_GLYPH_COMBINE
+	{
     int printpos;
     printf("DEBUG: COMBINED GLYPH of %d chars {", glyph_ends - glyph_starts);
     for(printpos = 0; printpos < glyph_ends - glyph_starts; printpos++)
       printf("U+%04x ", chars[printpos]);
     printf("}, onscreen width %d\n", width);
+	}
 #endif
 
     if(state->at_phantom || state->pos.col + width > THISROWWIDTH(state)) {
