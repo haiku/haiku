@@ -4,11 +4,16 @@ UsePrivateHeaders media ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media media-add-ons ] ;
 
-Application reader.media_addon :
-	AbstractFileInterfaceNode.cpp
-	AbstractFileInterfaceAddOn.cpp
-	MediaReader.cpp
-	MediaReaderAddOn.cpp
-	misc.cpp
-	: be media [ TargetLibsupc++ ]
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Application [ MultiArchDefaultGristFiles reader.media_addon ] :
+			AbstractFileInterfaceNode.cpp
+			AbstractFileInterfaceAddOn.cpp
+			MediaReader.cpp
+			MediaReaderAddOn.cpp
+			misc.cpp
+			: be media [ TargetLibsupc++ ]
+		;
+	}
+}

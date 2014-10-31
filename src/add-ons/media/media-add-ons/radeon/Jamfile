@@ -4,20 +4,24 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 
-Addon radeon.media_addon :
-	RadeonAddOn.cpp
-	RadeonProducer.cpp
-	CC.cpp
-	Capture.cpp
-	I2CPort.cpp
-	MSP3430.cpp
-	Radeon.cpp
-	Theater.cpp
-	Tuner.cpp
-	VIPPort.cpp
-	VideoIn.cpp
-	Theater100.cpp
-	Theater200.cpp
-;
-
-LinkAgainst radeon.media_addon : be media ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Addon [ MultiArchDefaultGristFiles radeon.media_addon ] :
+			RadeonAddOn.cpp
+			RadeonProducer.cpp
+			CC.cpp
+			Capture.cpp
+			I2CPort.cpp
+			MSP3430.cpp
+			Radeon.cpp
+			Theater.cpp
+			Tuner.cpp
+			VIPPort.cpp
+			VideoIn.cpp
+			Theater100.cpp
+			Theater200.cpp
+			: be media
+		;
+	}
+}

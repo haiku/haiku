@@ -31,7 +31,7 @@ AddFilesToPackage $(addOnsDir) Translators
 # AddFilesToPackage $(addOnsDir) locale catalogs
 # 	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 #
-#AddFilesToPackage $(addOnsDir) media : $(SYSTEM_ADD_ONS_MEDIA) ;
+AddFilesToPackage $(addOnsDir) media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToPackage $(addOnsDir) media plugins
 	: [ MultiArchDefaultGristFiles $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ] ;
 #

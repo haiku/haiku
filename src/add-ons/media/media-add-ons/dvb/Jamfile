@@ -2,26 +2,35 @@ SubDir HAIKU_TOP src add-ons media media-add-ons dvb ;
 
 UsePrivateHeaders drivers ;
 
-local ffmpegHeaders = [ BuildFeatureAttribute ffmpeg : headers : path ] ;
-UseHeaders $(ffmpegHeaders) ;
-UseHeaders [ FDirName $(ffmpegHeaders) libavcodec ] ;
-UseHeaders [ FDirName $(ffmpegHeaders) libavformat ] ;
-UseHeaders [ FDirName $(ffmpegHeaders) libavutil ] ;
-
 SubDirC++Flags -D__STDC_CONSTANT_MACROS -Wno-deprecated-declarations ;
 
-Addon dvb.media_addon :
-	DVBCard.cpp
-	DVBMediaAddon.cpp
-	DVBMediaNode.cpp
-	MediaFormat.cpp
-	MediaStreamDecoder.cpp
-	Packet.cpp
-	PacketQueue.cpp
-	pes.cpp
-	TransportStreamDemux.cpp
-	: be media [ TargetLibsupc++ ]
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		UseBuildFeatureHeaders ffmpeg ;
+		Includes [ FGristFiles $(sources) ]
+			: [ BuildFeatureAttribute ffmpeg : headers ] ;
 
-Includes [ FGristFiles MediaFormat.cpp ]
-	: [ BuildFeatureAttribute ffmpeg : headers ] ;
+		local ffmpegHeaders = [ BuildFeatureAttribute ffmpeg : headers : path ] ;
+		UseHeaders $(ffmpegHeaders) ;
+		UseHeaders [ FDirName $(ffmpegHeaders) libavcodec ] ;
+		UseHeaders [ FDirName $(ffmpegHeaders) libavformat ] ;
+		UseHeaders [ FDirName $(ffmpegHeaders) libavutil ] ;
+
+		Addon [ MultiArchDefaultGristFiles dvb.media_addon ] :
+			DVBCard.cpp
+			DVBMediaAddon.cpp
+			DVBMediaNode.cpp
+			MediaFormat.cpp
+			MediaStreamDecoder.cpp
+			Packet.cpp
+			PacketQueue.cpp
+			pes.cpp
+			TransportStreamDemux.cpp
+			: be media [ TargetLibsupc++ ]
+		;
+
+		Includes [ FGristFiles MediaFormat.cpp ]
+			: [ BuildFeatureAttribute ffmpeg : headers ] ;
+	}
+}

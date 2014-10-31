@@ -6,10 +6,15 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-Addon esound_sink.media_addon :
-	ESDEndpoint.cpp
-	ESDSinkAddOn.cpp
-	ESDSinkNode.cpp
-	: be media network [ TargetLibsupc++ ]
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Addon [ MultiArchDefaultGristFiles esound_sink.media_addon ] :
+			ESDEndpoint.cpp
+			ESDSinkAddOn.cpp
+			ESDSinkNode.cpp
+			: be media network [ TargetLibsupc++ ]
+		;
+	}
+}
 

@@ -4,19 +4,24 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddResources mixer.media_addon : AudioMixer.rdef ;
 
-Addon mixer.media_addon :
-	AudioMixer.cpp
-	ByteSwap.cpp
-	Interpolate.cpp
-	MixerAddOn.cpp
-	MixerCore.cpp
-	MixerInput.cpp
-	MixerOutput.cpp
-	MixerSettings.cpp
-	MixerUtils.cpp
-	Resampler.cpp
-	: be media [ TargetLibsupc++ ] localestub
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Addon [ MultiArchDefaultGristFiles mixer.media_addon ] :
+			AudioMixer.cpp
+			ByteSwap.cpp
+			Interpolate.cpp
+			MixerAddOn.cpp
+			MixerCore.cpp
+			MixerInput.cpp
+			MixerOutput.cpp
+			MixerSettings.cpp
+			MixerUtils.cpp
+			Resampler.cpp
+			: be media [ TargetLibsupc++ ] localestub
+		;
+	}
+}
 
 DoCatalogs mixer.media_addon
 	:

@@ -2,12 +2,17 @@ SubDir HAIKU_TOP src add-ons media media-add-ons writer ;
 
 UsePrivateHeaders media ;
 
-Addon writer.media_addon :
-	../AbstractFileInterfaceNode.cpp
-	../AbstractFileInterfaceAddOn.cpp
-	MediaWriter.cpp
-	MediaWriterAddOn.cpp
-	misc.cpp
-	: be media
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Addon [ MultiArchDefaultGristFiles writer.media_addon ] :
+			../AbstractFileInterfaceNode.cpp
+			../AbstractFileInterfaceAddOn.cpp
+			MediaWriter.cpp
+			MediaWriterAddOn.cpp
+			misc.cpp
+			: be media
+			: true
+		;
+	}
+}

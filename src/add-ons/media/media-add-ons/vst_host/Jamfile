@@ -1,10 +1,16 @@
 SubDir HAIKU_TOP src add-ons media media-add-ons vst_host ;
 
-AddResources vst_host.media_addon : VSTHost.rdef ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		AddResources [ MultiArchDefaultGristFiles vst_host.media_addon ]
+			: VSTHost.rdef ;
 
-Addon vst_host.media_addon :
-	VSTHost.cpp
-	VSTAddOn.cpp
-	VSTNode.cpp
-	: be media [ TargetLibstdc++ ]
-;
+		Addon [ MultiArchDefaultGristFiles vst_host.media_addon ] :
+			VSTHost.cpp
+			VSTAddOn.cpp
+			VSTNode.cpp
+			: be media [ TargetLibstdc++ ]
+		;
+	}
+}

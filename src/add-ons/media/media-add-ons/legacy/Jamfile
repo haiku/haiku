@@ -2,10 +2,15 @@ SubDir HAIKU_TOP src add-ons media media-add-ons legacy ;
 
 UsePrivateHeaders media ;
 
-Addon legacy.media_addon : 
-	LegacyAudioConsumer.cpp
-	LegacyAudioDevice.cpp
-	LegacyAudioProducer.cpp
-	LegacyMediaAddOn.cpp
-	: be media [ TargetLibsupc++ ]
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Addon [ MultiArchDefaultGristFiles legacy.media_addon ] :
+			LegacyAudioConsumer.cpp
+			LegacyAudioDevice.cpp
+			LegacyAudioProducer.cpp
+			LegacyMediaAddOn.cpp
+			: be media [ TargetLibsupc++ ]
+		;
+	}
+}

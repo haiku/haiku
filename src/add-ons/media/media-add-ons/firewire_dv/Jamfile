@@ -6,9 +6,14 @@ UsePrivateHeaders firewire ;
 UsePrivateHeaders media ;
 UsePrivateHeaders shared ;
 
-Addon firewire_dv.media_addon :
-	FireWireCard.cpp
-	FireWireDVAddOn.cpp
-	FireWireDVNode.cpp
-	: be media [ TargetLibsupc++ ]
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Addon [ MultiArchDefaultGristFiles firewire_dv.media_addon ] :
+			FireWireCard.cpp
+			FireWireDVAddOn.cpp
+			FireWireDVNode.cpp
+			: be media [ TargetLibsupc++ ]
+		;
+	}
+}

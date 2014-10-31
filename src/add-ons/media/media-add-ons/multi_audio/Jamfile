@@ -8,17 +8,23 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-AddResources hmulti_audio.media_addon : MultiAudio.rdef ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		AddResources [ MultiArchDefaultGristFiles hmulti_audio.media_addon ] :
+			MultiAudio.rdef ;
 
-Addon hmulti_audio.media_addon :
-	MultiAudioAddOn.cpp
-	MultiAudioDevice.cpp
-	MultiAudioNode.cpp
-	MultiAudioUtility.cpp
-	Resampler.cpp
-	TimeComputer.cpp
-	: be media [ TargetLibsupc++ ] localestub
-;
+		Addon [ MultiArchDefaultGristFiles hmulti_audio.media_addon ] :
+			MultiAudioAddOn.cpp
+			MultiAudioDevice.cpp
+			MultiAudioNode.cpp
+			MultiAudioUtility.cpp
+			Resampler.cpp
+			TimeComputer.cpp
+			: be media [ TargetLibsupc++ ] localestub
+		;
+	}
+}
 
 DoCatalogs hmulti_audio.media_addon
 	:
