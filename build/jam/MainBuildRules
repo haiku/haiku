@@ -192,7 +192,7 @@ rule CompileDTS
 
 actions CompileDTS
 {
-	dtc -O dtb -o $(1) $(2);
+	cpp -P -xassembler-with-cpp -I$(HAIKU_TOP)/src/data/dts/ $(2) | dtc -O dtb -o $(1) -i $(HAIKU_TOP)/src/data/dts ;
 }
 
 rule Ld
