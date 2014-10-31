@@ -211,7 +211,7 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 	}
 
 	// Also print the progress percentage
-	printf(" %d%%", (int)(completionPercentage * 100));
+	printf(" %3d%%", (int)(completionPercentage * 100));
 
 	fflush(stdout);
 }
