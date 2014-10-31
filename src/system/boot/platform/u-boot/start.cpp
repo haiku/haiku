@@ -98,10 +98,11 @@ platform_start_kernel(void)
 	addr_t stackTop
 		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
+	// clone the Flattened Device Tree blob into the kernel args if we've got it
 	if (gFDT) {
-		// clone the Flattened Device Tree blob
-		gKernelArgs.platform_args.fdt = kernel_args_malloc(fdt_totalsize(gFDT));
-		memcpy(gKernelArgs.platform_args.fdt, gFDT, fdt_totalsize(gFDT));
+		size_t fdtSize = fdt_totalsize(gFDT);
+		gKernelArgs.platform_args.fdt = kernel_args_malloc(fdtSize);
+		memcpy(gKernelArgs.platform_args.fdt, gFDT, fdtSize);
 	}
 
 //	smp_init_other_cpus();
@@ -203,15 +204,6 @@ start_raw(int argc, const char **argv)
 
 	cpu_init();
 
-	if (args.platform.fdt_data) {
-		dprintf("Found FDT from uimage @ %p, %" B_PRIu32 " bytes\n",
-			args.platform.fdt_data, args.platform.fdt_size);
-	} else if (gFDT) {
-		/* Fixup args so we can pass the gFDT on to the kernel */
-		args.platform.fdt_data = gFDT;
-		args.platform.fdt_size = fdt_totalsize(gFDT);
-	}
-
 	// if we get passed an FDT, check /chosen for initrd and bootargs
 	if (gFDT != NULL) {
 		int node = fdt_path_offset(gFDT, "/chosen");
@@ -277,6 +269,9 @@ start_raw(int argc, const char **argv)
 	// ARMv5 targets have very little by default. TODO get from FDT!
 	insert_physical_memory_range(SDRAM_BASE, 32 * 1024 * 1024);
 
+	// save the size of the FDT so we can map it easily after mmu_init
+	size_t fdtSize = gFDT ? fdt_totalsize(gFDT) : 0;
+
 	mmu_init();
 
 	// Handle our tarFS post-mmu
@@ -285,6 +280,9 @@ start_raw(int argc, const char **argv)
 			args.platform.boot_tgz_data, args.platform.boot_tgz_size,
 			kDefaultPageFlags);
 	}
+	// .. and our FDT
+	if (gFDT != NULL)
+		gFDT = (void*)mmu_map_physical_memory((addr_t)gFDT, fdtSize, kDefaultPageFlags);
 
 	// wait a bit to give the user the opportunity to press a key
 //	spin(750000);
