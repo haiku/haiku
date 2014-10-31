@@ -212,7 +212,7 @@ BuildUImage haiku_loader_linux.ub : haiku_loader :
 		-n 'haiku_loader $(TARGET_BOOT_BOARD)' ;
 
 local fdtBinary = [ FDirName $(HAIKU_OUTPUT_DIR) $(HAIKU_BOARD_FDT_NAME).dtb ] ;
-CompileDTS $(fdtBinary) : [ FDirName $(HAIKU_TOP) src data dts $(HAIKU_BOARD_FDT_NAME).dts ] ;
+CompileDTS $(fdtBinary) : [ FDirName $(HAIKU_TOP) src data dts arch $(TARGET_ARCH) $(HAIKU_BOARD_FDT_NAME).dts ] ;
 
 BuildUImage haiku_loader_nbsd.ub : haiku_loader $(tgzArchive) $(fdtBinary) :
 	-A $(TARGET_ARCH) -O $(uImageFakeOS) -T multi -C none
