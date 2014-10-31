@@ -30,6 +30,11 @@
 #include <vm/VMAddressSpace.h>
 #include <string.h>
 
+#include <drivers/bus/FDT.h>
+#include "soc.h"
+
+#include "soc_pxa.h"
+#include "soc_omap3.h"
 
 #define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
@@ -42,17 +47,6 @@
 #define USER_VECTOR_ADDR_LOW	0x00000000
 #define USER_VECTOR_ADDR_HIGH	0xffff0000
 
-#define PXA_INTERRUPT_PHYS_BASE	0x40D00000
-#define PXA_INTERRUPT_SIZE	0x00000034
-
-#define PXA_ICIP	0x00
-#define PXA_ICMR	0x01
-#define PXA_ICFP	0x03
-#define PXA_ICMR2	0x28
-
-static area_id sPxaInterruptArea;
-static uint32 *sPxaInterruptBase;
-
 extern int _vectors_start;
 extern int _vectors_end;
 
@@ -60,6 +54,7 @@ static area_id sVectorPageArea;
 static void *sVectorPageAddress;
 static area_id sUserVectorPageArea;
 static void *sUserVectorPageAddress;
+static fdt_module_info *sFdtModule;
 
 // An iframe stack used in the early boot process when we don't have
 // threads yet.
@@ -70,13 +65,9 @@ void
 arch_int_enable_io_interrupt(int irq)
 {
 	TRACE(("arch_int_enable_io_interrupt(%d)\n", irq));
-
-	if (irq <= 31) {
-		sPxaInterruptBase[PXA_ICMR] |= 1 << irq;
-		return;
-	}
-
-	sPxaInterruptBase[PXA_ICMR2] |= 1 << (irq - 32);
+	InterruptController *ic = InterruptController::Get();
+	if (ic != NULL)
+		ic->EnableInterrupt(irq);
 }
 
 
@@ -84,13 +75,9 @@ void
 arch_int_disable_io_interrupt(int irq)
 {
 	TRACE(("arch_int_disable_io_interrupt(%d)\n", irq));
-
-	if (irq <= 31) {
-		sPxaInterruptBase[PXA_ICMR] &= ~(1 << irq);
-		return;
-	}
-
-	sPxaInterruptBase[PXA_ICMR2] &= ~(1 << (irq - 32));
+	InterruptController *ic = InterruptController::Get();
+	if (ic != NULL)
+		ic->DisableInterrupt(irq);
 }
 
 
@@ -129,6 +116,18 @@ arch_int_init(kernel_args *args)
 extern "C" void arm_vector_init(void);
 
 
+static struct fdt_device_info intc_table[] = {
+	{
+		.compatible = "marvell,pxa-intc",
+		.init = PXAInterruptController::Init,
+	}, {
+		.compatible = "ti,omap3-intc",
+		.init = OMAP3InterruptController::Init,
+	}
+};
+static int intc_count = sizeof(intc_table) / sizeof(struct fdt_device_info);
+
+
 status_t
 arch_int_init_post_vm(kernel_args *args)
 {
@@ -136,7 +135,6 @@ arch_int_init_post_vm(kernel_args *args)
 	sVectorPageArea = create_area("vectorpage", (void **)&sVectorPageAddress,
 		B_ANY_ADDRESS, VECTORPAGE_SIZE, B_FULL_LOCK,
 		B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA);
-
 	if (sVectorPageArea < 0)
 		panic("vector page could not be created!");
 
@@ -166,14 +164,13 @@ arch_int_init_post_vm(kernel_args *args)
 			dprintf("Enabled high vectors\n");
 	}
 
-	sPxaInterruptArea = map_physical_memory("pxa_intc", PXA_INTERRUPT_PHYS_BASE,
-		PXA_INTERRUPT_SIZE, 0, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&sPxaInterruptBase);
+	status_t rc = get_module(B_FDT_MODULE_NAME, (module_info**)&sFdtModule);
+	if (rc != B_OK)
+		panic("Unable to get FDT module: %08lx!\n", rc);
 
-	if (sPxaInterruptArea < 0)
-		return sPxaInterruptArea;
-
-	sPxaInterruptBase[PXA_ICMR] = 0;
-	sPxaInterruptBase[PXA_ICMR2] = 0;
+	rc = sFdtModule->setup_devices(intc_table, intc_count, NULL);
+	if (rc != B_OK)
+		panic("No interrupt controllers found!\n");
 
 	return B_OK;
 }
@@ -338,10 +335,9 @@ arch_arm_irq(struct iframe *iframe)
 {
 	IFrameScope scope(iframe);
 
-	for (int i=0; i < 32; i++) {
-		if (sPxaInterruptBase[PXA_ICIP] & (1 << i))
-			int_io_interrupt_handler(i, true);
-	}
+	InterruptController *ic = InterruptController::Get();
+	if (ic != NULL)
+		ic->HandleInterrupt();
 }
 
 
@@ -350,10 +346,5 @@ arch_arm_fiq(struct iframe *iframe)
 {
 	IFrameScope scope(iframe);
 
-	for (int i=0; i < 32; i++) {
-		if (sPxaInterruptBase[PXA_ICIP] & (1 << i)) {
-			dprintf("arch_arm_fiq: help me, FIQ %d was triggered but no "
-				"FIQ support!\n", i);
-		}
-	}
+	panic("FIQ not implemented yet!");
 }

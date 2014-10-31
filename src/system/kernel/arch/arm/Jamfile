@@ -34,6 +34,12 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_atomic64.cpp
 	arch_atomic32.cpp
 
+	# SoC minimal kernel-required support
+	# (timers, interrupts, rtc?)
+	soc.cpp
+	soc_pxa.cpp
+	soc_omap3.cpp
+
 	# paging
 	arm_physical_page_mapper_large_memory.cpp
 	ARMPagingMethod.cpp

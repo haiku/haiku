@@ -19,6 +19,11 @@
 #include <arch/timer.h>
 #include <arch/cpu.h>
 
+#include <drivers/bus/FDT.h>
+#include "soc.h"
+
+#include "soc_pxa.h"
+#include "soc_omap3.h"
 
 //#define TRACE_ARCH_TIMER
 #ifdef TRACE_ARCH_TIMER
@@ -27,99 +32,49 @@
 #	define TRACE(x) ;
 #endif
 
+static fdt_module_info *sFdtModule;
 
-#define PXA_TIMERS_PHYS_BASE	0x40A00000
-#define PXA_TIMERS_SIZE		B_PAGE_SIZE
-#define PXA_TIMERS_INTERRUPT	7 /* OST_4_11 */
-
-#define PXA_OSSR		0x05
-#define PXA_OIER		0x07
-#define PXA_OSCR4		0x10
-#define PXA_OSCR5		0x11
-#define PXA_OSMR4		0x20
-#define PXA_OSMR5		0x21
-#define PXA_OMCR4		0x30
-#define PXA_OMCR5		0x31
-
-#define PXA_RES_S	(3 << 0)
-#define PXA_RES_MS	(1 << 1)
-#define PXA_RES_US	(1 << 2)
-
-#define US2S(bt)	((bt) / 1000000ULL)
-#define US2MS(bt)	((bt) / 1000ULL)
-
-static area_id sPxaTimersArea = -1;
-static uint32 *sPxaTimersBase = NULL;
-static bigtime_t sSystemTime = 0;
-
-static int32
-pxa_timer_interrupt(void *data)
-{
-	if (sPxaTimersBase[PXA_OSSR] & (1 << 4)) {
-		sPxaTimersBase[PXA_OSSR] |= (1 << 4);
-		return timer_interrupt();
+static struct fdt_device_info intc_table[] = {
+	{
+		.compatible = "marvell,pxa-timers",	// XXX not in FDT (also not in upstream!)
+		.init = PXATimer::Init,
+	}, {
+		.compatible = "ti,omap3430-timer",
+		.init = OMAP3Timer::Init,
 	}
+};
+static int intc_count = sizeof(intc_table) / sizeof(struct fdt_device_info);
 
-	if (sPxaTimersBase[PXA_OSSR]  & (1 << 5)) {
-		sPxaTimersBase[PXA_OSSR] |= (1 << 5);
-		sSystemTime += UINT_MAX + 1ULL;
-	}
-
-	return B_HANDLED_INTERRUPT;
-}
 
 void
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
-	uint32 val = timeout & UINT_MAX;
-	uint32 res = PXA_RES_US;
-
-	if (timeout & ~UINT_MAX) {
-		// Does not fit, so scale resolution down to milliseconds
-		if (US2MS(timeout) & ~UINT_MAX) {
-			// Still does not fit, scale down to seconds as last ditch attempt
-			val = US2S(timeout) & UINT_MAX;
-			res = PXA_RES_S;
-		} else {
-			// Fits in millisecond resolution
-			val = US2MS(timeout) & UINT_MAX;
-			res = PXA_RES_MS;
-		}
-	}
-
-	TRACE(("arch_timer_set_hardware_timer(val=%lu, res=%lu)\n", val, res));
-	sPxaTimersBase[PXA_OIER] |= (1 << 4);
-	sPxaTimersBase[PXA_OMCR4] = res;
-	sPxaTimersBase[PXA_OSMR4] = val;
-	sPxaTimersBase[PXA_OSCR4] = 0; // start counting from 0 again
+	HardwareTimer *timer = HardwareTimer::Get();
+	if (timer != NULL)
+		timer->SetTimeout(timeout);
 }
 
 
 void
 arch_timer_clear_hardware_timer()
 {
-	TRACE(("arch_timer_clear_hardware_timer\n"));
-
-	sPxaTimersBase[PXA_OMCR4] = 0; // disable our timer
-	sPxaTimersBase[PXA_OIER] &= ~(1 << 4);
+	HardwareTimer *timer = HardwareTimer::Get();
+	if (timer != NULL)
+		timer->Clear();
 }
 
 int
 arch_init_timer(kernel_args *args)
 {
 	TRACE(("%s\n", __func__));
-	sPxaTimersArea = map_physical_memory("pxa_timers", PXA_TIMERS_PHYS_BASE,
-		PXA_TIMERS_SIZE, 0, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&sPxaTimersBase);
 
-	if (sPxaTimersArea < 0)
-		return sPxaTimersArea;
+	status_t rc = get_module(B_FDT_MODULE_NAME, (module_info**)&sFdtModule);
+	if (rc != B_OK)
+		panic("Unable to get FDT module: %08lx!\n", rc);
 
-	sPxaTimersBase[PXA_OIER] |= (1 << 5); // enable timekeeping timer
-	sPxaTimersBase[PXA_OMCR5] = PXA_RES_US | (1 << 7);
-	sPxaTimersBase[PXA_OSMR5] = UINT_MAX;
-	sPxaTimersBase[PXA_OSCR5] = 0;
-
-	install_io_interrupt_handler(PXA_TIMERS_INTERRUPT, &pxa_timer_interrupt, NULL, 0);
+	rc = sFdtModule->setup_devices(intc_table, intc_count, NULL);
+	if (rc != B_OK)
+		panic("No interrupt controllers found!\n");
 
 	return B_OK;
 }
@@ -127,10 +82,9 @@ arch_init_timer(kernel_args *args)
 bigtime_t
 system_time(void)
 {
-	if (sPxaTimersArea < 0)
-		return 0;
+	HardwareTimer *timer = HardwareTimer::Get();
+	if (timer != NULL)
+		return timer->Time();
 
-	return (sPxaTimersBase != NULL) ?
-		sSystemTime + sPxaTimersBase[PXA_OSCR5] :
-		0ULL;
+	return 0;
 }
