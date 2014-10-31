@@ -1343,29 +1343,15 @@ AccelerantHWInterface::HideOverlay(Overlay* overlay)
 void
 AccelerantHWInterface::SetCursor(ServerCursor* cursor)
 {
-	HWInterface::SetCursor(cursor);
-		// HWInterface claims ownership of cursor.
-
 	// cursor should never be NULL, but let us be safe!!
 	if (cursor == NULL || LockExclusiveAccess() == false)
 		return;
 
-	if (cursor->CursorData() != NULL && fAccSetCursorShape != NULL) {
-		// BeOS BCursor, 16x16 monochrome
-		uint8 size = cursor->CursorData()[0];
-		// CursorData()[1] is color depth (always monochrome)
-		uint8 xHotSpot = cursor->CursorData()[2];
-		uint8 yHotSpot = cursor->CursorData()[3];
+	bool cursorSet = false;
 
-		// Create pointers to the cursor and/xor bit arrays
-		const uint8* andMask = cursor->CursorData() + 4;
-		const uint8* xorMask = cursor->CursorData() + 36;
-
-		// Time to talk to the accelerant!
-		fHardwareCursorEnabled = fAccSetCursorShape(size, size, xHotSpot,
-			yHotSpot, andMask, xorMask) == B_OK;
-	} else if (fAccSetCursorBitmap != NULL) {
+	if (fAccSetCursorBitmap != NULL) {
 		// Bitmap cursor
+		// TODO are x and y switched for this, too?
 		uint16 xHotSpot = (uint16)cursor->GetHotSpot().x;
 		uint16 yHotSpot = (uint16)cursor->GetHotSpot().y;
 
@@ -1373,12 +1359,72 @@ AccelerantHWInterface::SetCursor(ServerCursor* cursor)
 		uint16 height = (uint16)cursor->Bounds().Height();
 
 		// Time to talk to the accelerant!
-		fHardwareCursorEnabled = fAccSetCursorBitmap(width, height, xHotSpot,
+		cursorSet = fAccSetCursorBitmap(width, height, xHotSpot,
 			yHotSpot, cursor->ColorSpace(), (uint16)cursor->BytesPerRow(),
 			cursor->Bits()) == B_OK;
+	} else if (cursor->CursorData() != NULL && fAccSetCursorShape != NULL) {
+		// BeOS BCursor, 16x16 monochrome
+		uint8 size = cursor->CursorData()[0];
+		// CursorData()[1] is color depth (always monochrome)
+		// x and y are switched
+		uint8 xHotSpot = cursor->CursorData()[3];
+		uint8 yHotSpot = cursor->CursorData()[2];
+
+		// Create pointers to the cursor and/xor bit arrays
+		// for the BeOS BCursor there are two 32 byte, 16x16 bit arrays
+		// in the first:  1 is black,  0 is white
+		// in the second: 1 is opaque, 0 is transparent
+		// 1st	2nd
+		//  0	 0	 transparent
+		//  0	 1	 white
+		//  1	 0	 transparent
+		//  1	 1	 black
+		// for the HW cursor the first is ANDed and the second is XORed
+		// AND	XOR
+		//  0	 0	 white
+		//  0	 1	 black
+		//  1	 0	 transparent
+		//  1	 1	 reverse
+		// so, the first 32 bytes are the XOR mask
+		const uint8* xorMask = cursor->CursorData() + 4;
+		// the second 32 bytes *NOTed* are the AND mask
+		// TODO maybe this should be NOTed when copied to the ServerCursor
+		uint8 andMask[32];
+		const uint8* transMask = cursor->CursorData() + 36;
+		for (int32 i = 0; i < 32; i++)
+			andMask[i] = ~transMask[i];
+
+		// Time to talk to the accelerant!
+		cursorSet = fAccSetCursorShape(size, size, xHotSpot,
+			yHotSpot, andMask, xorMask) == B_OK;
 	}
 
+	if (cursorSet && !fHardwareCursorEnabled) {
+		// we switched from SW to HW, so we need to erase the SW cursor
+		if (fCursorVisible && fFloatingOverlaysLock.Lock()) {
+			IntRect r = _CursorFrame();
+			fCursorVisible = false;
+				// so the Invalidate doesn't draw it again
+			_RestoreCursorArea();
+			Invalidate(r);
+			fCursorVisible = true;
+			fFloatingOverlaysLock.Unlock();
+		}
+		// and we need to update our position
+		if (fAccMoveCursor != NULL)
+			fAccMoveCursor((uint16)fCursorLocation.x,
+				(uint16)fCursorLocation.y);
+	}
+
+	if (fAccShowCursor != NULL)
+		fAccShowCursor(cursorSet);
+
 	UnlockExclusiveAccess();
+
+	fHardwareCursorEnabled = cursorSet;
+
+	HWInterface::SetCursor(cursor);
+		// HWInterface claims ownership of cursor.
 }
 
 
@@ -1406,8 +1452,11 @@ AccelerantHWInterface::MoveCursorTo(float x, float y)
 	if (fHardwareCursorEnabled && LockExclusiveAccess()) {
 		if (fAccMoveCursor != NULL)
 				fAccMoveCursor((uint16)x, (uint16)y);
-		else
+		else {
 			fHardwareCursorEnabled = false;
+			if (fAccShowCursor != NULL)
+				fAccShowCursor(false);
+		}
 
 		UnlockExclusiveAccess();
 	}
