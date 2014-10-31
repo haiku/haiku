@@ -20,7 +20,7 @@
 
 #define TRACE_BFS 0
 #if TRACE_BFS
-#	define TRACE(x) printf x
+#	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
