@@ -1,6 +1,7 @@
 # BeagleBoard board-specific definitions
 
 HAIKU_BOARD_DESCRIPTION = "BeagleBoard" ;
+HAIKU_BOARD_FDT_NAME = "omap3-beagle-xm" ;
 
 
 #
