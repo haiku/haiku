@@ -14,78 +14,88 @@ if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 }
 
 
+# source directories
+local sourceDirs =
+	addons/quickcam
+	addons/sonix
+	addons/uvc
+	addons
+	cstransforms
+	sensors
+;
+
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media media-add-ons
+		usb_webcam $(sourceDir) ] ;
+}
+
+
+## addon sources
+local addonSources ;
+addonSources =
+	QuickCamDevice.cpp
+	SonixCamDevice.cpp
+	NW80xCamDevice.cpp
+#	UVCCamDevice.cpp UVCDeframer.cpp
+;
+
+## colorspace transforms sources
+local csTransformsSources ;
+csTransformsSources = Bayer.cpp ;
+
+## sensors sources
+local sensorsSources ;
+sensorsSources =
+	hdcs1000.cpp
+	hv7131e1.cpp
+	pas106b.cpp
+	pb0100.cpp
+	tas5110c1b.cpp
+	tas5130d1b.cpp
+;
+
+
+## how to build header files from sources to include the list of built-in addons
+
+rule USBWebcamHeaderGen header : macro : sources
+{
+	header = [ FGristFiles $(header) ] ;
+	sources = [ FGristFiles $(sources) ] ;
+
+	SEARCH on $(sources) = $(SEARCH_SOURCE) ;
+
+	Depends $(header) : $(sources) ;
+	MakeLocateArch $(header) ;
+	GREP_DEFINE on $(header) = $(macro) ;
+	USBWebcamHeaderGen1 $(header) : $(sources) ;
+	LocalClean clean : $(header) ;
+}
+
+
+actions USBWebcamHeaderGen1
+{
+	grep -h -a $(GREP_DEFINE) $(2) > $(1) ;
+}
+
+
+USBWebcamHeaderGen CamInternalAddons.h : B_WEBCAM_MKINTFUNC
+	: $(addonSources) ;
+USBWebcamHeaderGen CamInternalSensors.h : B_WEBCAM_DECLARE_SENSOR
+	: $(sensorsSources) ;
+USBWebcamHeaderGen CamInternalColorSpaceTransforms.h
+	: B_WEBCAM_DECLARE_CSTRANSFORM : $(csTransformsSources) ;
+
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 
-		# source directories
-		local sourceDirs =
-			addons/quickcam
-			addons/sonix
-			addons/uvc
-			addons
-			cstransforms
-			sensors
-		;
-
-		local sourceDir ;
 		for sourceDir in $(sourceDirs) {
-			SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media media-add-ons
-				usb_webcam $(sourceDir) ] ;
+			SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media
+				media-add-ons usb_webcam $(sourceDir) ] ;
 		}
-
-
-		## addon sources
-		local addonSources ;
-		addonSources =
-			QuickCamDevice.cpp
-			SonixCamDevice.cpp
-			NW80xCamDevice.cpp
-#			UVCCamDevice.cpp UVCDeframer.cpp
-		;
-
-		## colorspace transforms sources
-		local csTransformsSources ;
-		csTransformsSources = Bayer.cpp ;
-
-		## sensors sources
-		local sensorsSources ;
-		sensorsSources =
-			hdcs1000.cpp
-			hv7131e1.cpp
-			pas106b.cpp
-			pb0100.cpp
-			tas5110c1b.cpp
-			tas5130d1b.cpp
-		;
-
-		## how to build header files from sources to include the list of built-in addons
-
-		rule USBWebcamHeaderGen header : macro : sources
-		{
-			header = [ FGristFiles $(header) ] ;
-			sources = [ FGristFiles $(sources) ] ;
-
-			SEARCH on $(sources) = $(SEARCH_SOURCE) ;
-
-			Depends $(header) : $(sources) ;
-			MakeLocateArch $(header) ;
-			GREP_DEFINE on $(header) = $(macro) ;
-			USBWebcamHeaderGen1 $(header) : $(sources) ;
-			LocalClean clean : $(header) ;
-		}
-
-		actions USBWebcamHeaderGen1
-		{
-			grep -h -a $(GREP_DEFINE) $(2) > $(1) ;
-		}
-
-		USBWebcamHeaderGen CamInternalAddons.h : B_WEBCAM_MKINTFUNC
-			: $(addonSources) ;
-		USBWebcamHeaderGen CamInternalSensors.h : B_WEBCAM_DECLARE_SENSOR
-			: $(sensorsSources) ;
-		USBWebcamHeaderGen CamInternalColorSpaceTransforms.h
-			: B_WEBCAM_DECLARE_CSTRANSFORM : $(csTransformsSources) ;
 
 		Addon [ MultiArchDefaultGristFiles usb_webcam.media_addon ] :
 			$(addonSources)
@@ -106,6 +116,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		;
 	}
 }
+
 
 # force dependancies
 Includes [ FGristFiles CamRoster.cpp ] : [ FGristFiles CamInternalAddons.h ] ;
