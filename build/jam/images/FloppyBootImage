@@ -27,7 +27,7 @@ if $(NET_BOOT) = 1 {
 
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	acpi@x86,x86_64 ata@ata config_manager dpc pci
-	ide@ide isa@x86,x86_64 scsi $(USB_ONLY)usb
+	ide@ide isa@x86,x86_64 scsi $(USB_ONLY)usb fdt@arm
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS =
 	attribute_overlay bfs iso9660 packagefs write_overlay
@@ -61,7 +61,7 @@ AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
 
 if $(USB_BOOT) = 1 {
 	AddFilesToFloppyBootArchive system add-ons kernel busses usb
-		: <usb>uhci <usb>ohci <usb>ehci ;
+		: <usb>uhci <usb>ohci <usb>ehci <usb>xhci ;
 }
 
 if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
@@ -117,7 +117,7 @@ AddBootModuleSymlinksToFloppyBootArchive [ FFilterByBuildFeatures
 	generic_x86@x86
 	ahci generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
 	it8211
-	$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci
+	$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci $(USB_ONLY)<usb>xhci
 	scsi_cd scsi_disk $(USB_ONLY)usb_disk norflash@arm
 	intel session
 	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
