@@ -42,7 +42,7 @@ struct nor_driver_info {
 	size_t totalsize;
 
 	area_id id;
-	void *mapped;
+	uint8 *mapped;
 };
 
 
@@ -59,7 +59,7 @@ nor_init_device(void *_info, void **_cookie)
 	info->blocksize = 128 * 1024;
 	info->totalsize = (SIZE_IN_BLOCKS - HIDDEN_BLOCKS) * info->blocksize;
 
-	info->id = map_physical_memory("NORFlash", NORFLASH_ADDR, info->totalsize, B_ANY_KERNEL_ADDRESS, B_READ_AREA, &info->mapped);
+	info->id = map_physical_memory("NORFlash", NORFLASH_ADDR, info->totalsize, B_ANY_KERNEL_ADDRESS, B_READ_AREA, (void **)&info->mapped);
 	if (info->id < 0)
 		return info->id;
 
