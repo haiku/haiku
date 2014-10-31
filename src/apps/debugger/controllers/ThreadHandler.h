@@ -123,7 +123,6 @@ private:
 			target_addr_t		fPreviousInstructionPointer;
 			target_addr_t		fPreviousFrameAddress;
 			bool				fSingleStepping;
-			bool				fHasPendingConditionEvaluation;
 			sem_id				fConditionWaitSem;
 			Value*				fConditionResult;
 

@@ -100,7 +100,6 @@ ThreadHandler::ThreadHandler(Thread* thread, Worker* worker,
 	fPreviousInstructionPointer(0),
 	fPreviousFrameAddress(0),
 	fSingleStepping(false),
-	fHasPendingConditionEvaluation(false),
 	fConditionWaitSem(-1),
 	fConditionResult(NULL)
 {
@@ -441,13 +440,6 @@ ThreadHandler::HandleCpuStateChanged()
 void
 ThreadHandler::HandleStackTraceChanged()
 {
-	AutoLocker< ::Team> teamLocker(fThread->GetTeam());
-	if (fHasPendingConditionEvaluation && fThread->GetStackTrace() != NULL) {
-		fHasPendingConditionEvaluation = false;
-		teamLocker.Unlock();
-
-		_HandleBreakpointConditionIfNeeded(fThread->GetCpuState());
-	}
 }
 
 
@@ -876,10 +868,14 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 			continue;
 
 		StackTrace* stackTrace = fThread->GetStackTrace();
+		BReference<StackTrace> stackTraceReference;
 		if (stackTrace == NULL) {
-			fThread->SetCpuState(cpuState);
-			fHasPendingConditionEvaluation = true;
-			return true;
+			if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
+				fThread->GetTeam(), this, cpuState, stackTrace, NULL, 1,
+				false, true) == B_OK) {
+				stackTraceReference.SetTo(stackTrace, true);
+			} else
+				return false;
 		}
 
 		StackFrame* frame = stackTrace->FrameAt(0);
@@ -909,6 +905,8 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 
 		BPrivate::ObjectDeleter<ExpressionJobListener> deleter(listener);
 		if (error == B_OK) {
+			_SetThreadState(THREAD_STATE_STOPPED, cpuState,
+				THREAD_STOPPED_BREAKPOINT, BString());
 			teamLocker.Unlock();
 
 			do {
@@ -934,6 +932,8 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 			if (stop)
 				return false;
 			else {
+				_SetThreadState(THREAD_STATE_RUNNING, NULL,
+					THREAD_STOPPED_UNKNOWN, BString());
 				fDebuggerInterface->ContinueThread(fThread->ID());
 				return true;
 			}
