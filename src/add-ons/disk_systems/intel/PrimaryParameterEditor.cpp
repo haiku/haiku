@@ -19,12 +19,15 @@
 #define B_TRANSLATION_CONTEXT "PrimaryPartitionEditor"
 
 
-PrimaryPartitionEditor::PrimaryPartitionEditor()
+PrimaryPartitionEditor::PrimaryPartitionEditor(bool first)
 {
 	fActiveCheckBox = new BCheckBox("active", B_TRANSLATE("Active partition"),
 		NULL);
 	fView = new BGroupView(B_VERTICAL);
 	fView->AddChild(fActiveCheckBox);
+
+	// The first partition is active by default. Others are not.
+	fActiveCheckBox->SetValue(first);
 }
 
 
