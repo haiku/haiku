@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2009-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2009-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -223,16 +223,23 @@ private:
 
 struct SourceView::MarkerManager::BreakpointMarker : Marker {
 								BreakpointMarker(uint32 line,
-									target_addr_t address, bool enabled);
+									target_addr_t address,
+									UserBreakpoint* breakpoint);
+								~BreakpointMarker();
 
 			target_addr_t		Address() const		{ return fAddress; }
-			bool				IsEnabled() const	{ return fEnabled; }
+			bool				IsEnabled() const
+									{ return fBreakpoint->IsEnabled(); }
+			bool				HasCondition() const
+									{ return fBreakpoint->HasCondition(); }
+			UserBreakpoint*		Breakpoint() const
+									{ return fBreakpoint; }
 
 	virtual	void				Draw(BView* view, BRect rect);
 
 private:
 			target_addr_t		fAddress;
-			bool				fEnabled;
+			UserBreakpoint*		fBreakpoint;
 };
 
 
@@ -527,12 +534,19 @@ SourceView::MarkerManager::InstructionPointerMarker::_DrawArrow(BView* view,
 
 
 SourceView::MarkerManager::BreakpointMarker::BreakpointMarker(uint32 line,
-	target_addr_t address, bool enabled)
+	target_addr_t address, UserBreakpoint* breakpoint)
 	:
 	Marker(line),
 	fAddress(address),
-	fEnabled(enabled)
+	fBreakpoint(breakpoint)
 {
+	fBreakpoint->AcquireReference();
+}
+
+
+SourceView::MarkerManager::BreakpointMarker::~BreakpointMarker()
+{
+	fBreakpoint->ReleaseReference();
 }
 
 
@@ -540,8 +554,12 @@ void
 SourceView::MarkerManager::BreakpointMarker::Draw(BView* view, BRect rect)
 {
 	float y = (rect.top + rect.bottom) / 2;
-	view->SetHighColor((rgb_color){255, 0, 0, 255});
-	if (fEnabled)
+	if (fBreakpoint->HasCondition())
+		view->SetHighColor((rgb_color){0, 192, 0, 255});
+	else
+		view->SetHighColor((rgb_color){255,0,0,255});
+
+	if (fBreakpoint->IsEnabled())
 		view->FillEllipse(BPoint(rect.right - 8, y), 4, 4);
 	else
 		view->StrokeEllipse(BPoint(rect.right - 8, y), 3.5f, 3.5f);
@@ -716,7 +734,7 @@ SourceView::MarkerManager::_UpdateBreakpointMarkers()
 			}
 
 			BreakpointMarker* marker = new(std::nothrow) BreakpointMarker(
-				line, breakpointInstance->Address(), breakpoint->IsEnabled());
+				line, breakpointInstance->Address(), breakpoint);
 			if (marker == NULL || !fBreakpointMarkers.AddItem(marker)) {
 				delete marker;
 				break;
@@ -963,24 +981,35 @@ SourceView::MarkerView::MouseDown(BPoint where)
 	BReference<Statement> statementReference(statement, true);
 
 	int32 modifiers;
-	if (Looper()->CurrentMessage()->FindInt32("modifiers", &modifiers) != B_OK)
+	int32 buttons;
+	BMessage* message = Looper()->CurrentMessage();
+	if (message->FindInt32("modifiers", &modifiers) != B_OK)
 		modifiers = 0;
+	if (message->FindInt32("buttons", &buttons) != B_OK)
+		buttons = B_PRIMARY_MOUSE_BUTTON;
 
 	SourceView::MarkerManager::BreakpointMarker* marker =
 		fMarkerManager->BreakpointMarkerAtLine(line);
 	target_addr_t address = marker != NULL
 		? marker->Address() : statement->CoveringAddressRange().Start();
 
-	if ((modifiers & B_SHIFT_KEY) != 0) {
-		if (marker != NULL && !marker->IsEnabled())
-			fListener->ClearBreakpointRequested(address);
-		else
-			fListener->SetBreakpointRequested(address, false);
-	} else {
-		if (marker != NULL && marker->IsEnabled())
-			fListener->ClearBreakpointRequested(address);
-		else
-			fListener->SetBreakpointRequested(address, true);
+	if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+		if ((modifiers & B_SHIFT_KEY) != 0) {
+			if (marker != NULL && !marker->IsEnabled())
+				fListener->ClearBreakpointRequested(address);
+			else
+				fListener->SetBreakpointRequested(address, false);
+		} else {
+			if (marker != NULL && marker->IsEnabled())
+				fListener->ClearBreakpointRequested(address);
+			else
+				fListener->SetBreakpointRequested(address, true);
+		}
+	} else if (marker != NULL && (buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+		UserBreakpoint* breakpoint = marker->Breakpoint();
+		BMessage message(MSG_SHOW_BREAKPOINT_EDIT_WINDOW);
+		message.AddPointer("breakpoint", breakpoint);
+		Looper()->PostMessage(&message);
 	}
 }
 
