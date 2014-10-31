@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src add-ons kernel bus_managers fdt ;
+
+UsePrivateKernelHeaders ;
+UseLibraryHeaders [ FDirName libfdt ] ;
+
+local libFDTSources =
+	fdt.c
+	fdt_ro.c
+	fdt_rw.c
+	fdt_strerror.c
+	fdt_sw.c
+	fdt_wip.c
+;
+
+KernelAddon fdt :
+	fdt.cpp
+#	$(libFDTSources)
+	;
+
+SEARCH on [ FGristFiles $(libFDTSources) ]
+	= [ FDirName $(HAIKU_TOP) src libs libfdt ] ;
+
