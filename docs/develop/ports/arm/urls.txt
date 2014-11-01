@@ -9,3 +9,5 @@ http://www.devicetree.org/Device_Tree_Usage
 http://elinux.org/Device_Trees
 * OF
 http://www.openfirmware.info/Bindings
+* Floating Point; VFP
+https://wiki.debian.org/ArmHardFloatPort/VfpComparison
