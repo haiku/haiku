@@ -1059,6 +1059,13 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 		append_word_list(foundInfo, "rating");
 	}
 	
+	double prominenceOrdering;
+	if (data.FindDouble("prominenceOrdering", &prominenceOrdering) == B_OK) {
+		package->SetProminence(prominenceOrdering);
+
+		append_word_list(foundInfo, "prominence");
+	}
+	
 	BMessage screenshots;
 	if (data.FindMessage("pkgScreenshots", &screenshots) == B_OK) {
 		package->ClearScreenshotInfos();
