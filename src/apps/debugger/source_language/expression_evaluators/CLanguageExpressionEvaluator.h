@@ -80,6 +80,9 @@ class CLanguageExpressionEvaluator {
 			void				_RequestValueIfNeeded(const Token& token,
 									ValueNodeChild* child);
 
+			void				_CoerceTypeIfNeeded(const Token& token,
+									Number& _number);
+
 			Tokenizer*			fTokenizer;
 			type_code			fCurrentType;
 			ValueNodeManager*	fNodeManager;

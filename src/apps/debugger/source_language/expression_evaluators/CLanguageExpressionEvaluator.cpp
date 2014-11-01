@@ -876,6 +876,7 @@ CLanguageExpressionEvaluator::_ParseIdentifier(ValueNode* parentNode)
 	Value* nodeValue = node->GetValue();
 	nodeValue->ToVariant(variant);
 	value.SetTo(variant);
+	_CoerceTypeIfNeeded(token, value);
 
 	return value;
 }
@@ -989,3 +990,84 @@ CLanguageExpressionEvaluator::_RequestValueIfNeeded(const Token& token,
 		throw ParseException(errorMessage, token.position);
 	}
 }
+
+
+void
+CLanguageExpressionEvaluator::_CoerceTypeIfNeeded(const Token& token,
+	Number& _number)
+{
+	if (_number.Type() == 0) {
+		throw ParseException("Unable to resolve value type.",
+			token.position);
+	}
+
+	BVariant value = _number.GetValue();
+	type_code valueType = value.Type();
+
+	if (valueType == fCurrentType) {
+		// nothing to do.
+		return;
+	}
+
+	if (BVariant::TypeIsInteger(fCurrentType)) {
+		if (BVariant::TypeIsFloat(valueType)) {
+			value.SetTo((int64)value.ToDouble());
+			valueType = value.Type();
+		}
+
+		if (BVariant::TypeIsInteger(valueType)) {
+			switch (fCurrentType) {
+				case B_INT8_TYPE:
+					value.SetTo(value.ToInt8());
+					break;
+
+				case B_UINT8_TYPE:
+					value.SetTo(value.ToUInt8());
+					break;
+
+				case B_INT16_TYPE:
+					value.SetTo(value.ToInt16());
+					break;
+
+				case B_UINT16_TYPE:
+					value.SetTo(value.ToUInt16());
+					break;
+
+				case B_INT32_TYPE:
+					value.SetTo(value.ToInt32());
+					break;
+
+				case B_UINT32_TYPE:
+					value.SetTo(value.ToUInt32());
+					break;
+
+				case B_INT64_TYPE:
+					value.SetTo(value.ToInt64());
+					break;
+
+				case B_UINT64_TYPE:
+					value.SetTo(value.ToUInt64());
+					break;
+			}
+		}
+	} else if (BVariant::TypeIsFloat(fCurrentType)) {
+		if (BVariant::TypeIsInteger(valueType)) {
+			value.SetTo((double)value.ToInt64());
+			valueType = value.Type();
+		}
+
+		switch (fCurrentType) {
+			case B_FLOAT_TYPE:
+				value.SetTo(value.ToFloat());
+				break;
+
+			case B_DOUBLE_TYPE:
+				value.SetTo(value.ToDouble());
+				break;
+		}
+	}
+
+	_number.SetTo(value);
+}
+
+
