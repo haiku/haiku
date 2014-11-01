@@ -29,6 +29,16 @@ HAIKU_BOARD_UBOOT_IMAGE ?= u-boot-verdex-400-r1604.bin ;
 HAIKU_BOARD_UBOOT_IMAGE_URL =
 	http://www.gumstix.net/feeds/u-boot/u-boot-verdex-400-r1604.bin ;
 
+# flash offsets:
+#	FLASH_IMAGE_BLOCK_SIZE on $(image) = 128k ;
+#	FLASH_IMAGE_BLOCK_COUNT on $(image) = 256 ;
+#	#FLASH_IMAGE_UBOOT_OFFSET on $(image) = 0 ;
+#	FLASH_IMAGE_LOADER_OFFSET on $(image) = 248 ;
+# in kB
+FLASH_IMAGE_LOADER_OFFSET = 31744 ;
+
+# TODO: add U-Boot
+FLASH_IMAGE_PARTS = ;
 
 #
 # mmc/SD image
