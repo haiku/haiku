@@ -70,7 +70,7 @@ HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = boot.scr ;
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
 setenv bootargs debug_screen true; \
-if mmcinit; then \
+if mmc rescan; then \
 	fatload mmc 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader.ub; \
 	bootm $(HAIKU_BOARD_LOADER_UIBASE); \
 fi" ;
