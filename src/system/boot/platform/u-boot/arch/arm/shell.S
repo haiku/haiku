@@ -30,6 +30,14 @@ SYMBOL(_start_netbsd):
 	b	_start_common
 SYMBOL_END(_start_netbsd)
 
+/*
+ * called from bootm with linux loader compatible args
+ */
+SYMBOL(_start_linux):
+	mov	r4,#2
+	b	_start_common
+SYMBOL_END(_start_linux)
+
 
 
 SYMBOL(_start_common):
@@ -63,6 +71,8 @@ SYMBOL(_start_common):
 	beq	start_raw
 	cmp	r4,#1
 	beq	start_netbsd
+	cmp	r4,#2
+	beq	start_linux
 	mov	pc,lr
 SYMBOL_END(_start_common)
 
