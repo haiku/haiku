@@ -1170,6 +1170,11 @@ BMessage::_Reference()
 	if (result != B_OK)
 		return result;
 
+	if (areaInfo.team != BPrivate::current_team())
+		return B_BAD_VALUE;
+
+	set_area_protection(fHeader->message_area, B_READ_AREA);
+
 	uint8* address = (uint8*)areaInfo.address;
 
 	fFields = (field_header*)address;
@@ -1295,8 +1300,10 @@ BMessage::Unflatten(const char* flatBuffer)
 	if ((fHeader->flags & MESSAGE_FLAG_PASS_BY_AREA) != 0
 		&& fHeader->message_area >= 0) {
 		status_t result = _Reference();
-		if (result != B_OK)
+		if (result != B_OK) {
+			_InitHeader();
 			return result;
+		}
 	} else {
 		fHeader->message_area = -1;
 
