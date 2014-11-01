@@ -1,7 +1,7 @@
 # Gumstix Overo board-specific definitions
 
 HAIKU_BOARD_DESCRIPTION = "Gumstix Overo" ;
-
+HAIKU_BOARD_FDT_NAME = "omap3-overo-tobi" ;
 
 #
 # Various hardcoded addresses
