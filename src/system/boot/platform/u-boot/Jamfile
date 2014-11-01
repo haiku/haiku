@@ -69,22 +69,34 @@ BootMergeObject boot_platform_u-boot.o :
 	boot_platform_u-boot_common.o
 ;
 
+# TODO: handle flash and SD images as Container stuff ?
+
 # bootable flash image
-rule BuildUBootFlashImage image : haikuLoader : uboot_image
+rule BuildUBootFlashImage image : haikuLoader : parts
 {
 	Depends $(image) : $(haikuLoader) ;
 	#Depends $(image) : $(archive) ;
-	Depends $(image) : $(uboot_image) ;
+	Depends $(image) : $(parts) ;
 	LocalClean clean : $(image) ;
-	FLASH_IMAGE_BLOCK_SIZE on $(image) = 128k ;
-	FLASH_IMAGE_BLOCK_COUNT on $(image) = 256 ;
+	FLASH_IMAGE_BLOCK_SIZE on $(image) = 1024 ;
+	FLASH_IMAGE_BLOCK_COUNT on $(image) = 32768 ;
 	#FLASH_IMAGE_UBOOT_OFFSET on $(image) = 0 ;
 	FLASH_IMAGE_LOADER_OFFSET on $(image) = 248 ;
-	BuildUBootFlashImage1 $(image) : $(haikuLoader) $(uboot_image) ;
+
+	# add u-boot
+	FLASH_OFFSET on $(haikuLoader) = $(FLASH_IMAGE_LOADER_OFFSET) ;
+	local offsets = ;
+	for dep in $(haikuLoader) $(parts) {
+		offsets += [ on $(dep) return $(FLASH_OFFSET) ] ;
+	}
+	FLASH_OFFSETS on $(image) = $(offsets) ;
+
+	# create empty image
+	BuildUBootFlashImage1 $(image) : $(haikuLoader) $(parts) ;
 }
 
 
-actions BuildUBootFlashImage1
+actions BuildUBootFlashImage1 bind FLASH_OFFSETS
 {
 	$(RM) $(<)
 
@@ -94,24 +106,18 @@ actions BuildUBootFlashImage1
 		bs=$(FLASH_IMAGE_BLOCK_SIZE) \
 		count=$(FLASH_IMAGE_BLOCK_COUNT)
 
-	# add u-boot
-	dd of=$(<) \
-		if=$(>[2]) \
-		bs=$(FLASH_IMAGE_BLOCK_SIZE) \
-		conv=notrunc
-
-	# add root fs
-#	dd of=$(<) \
-#		if=$(>[3]) \
-#		bs=$(FLASH_IMAGE_BLOCK_SIZE) \
-#		conv=notrunc \
-#		seek=$(FLASH_IMAGE_ROOTFS_OFFSET)
-
-	# add haiku_loader (raw, elf or uimage)
-	dd of=$(<) \
-		if=$(>[1]) \
-		bs=$(FLASH_IMAGE_BLOCK_SIZE) \
-		conv=notrunc seek=$(FLASH_IMAGE_LOADER_OFFSET)
+	# add binaries
+	# ugly HACK
+	FLASH_OFFSETS=" $(FLASH_OFFSETS) "
+	FLASH_OFFSETS=${FLASH_OFFSETS# }
+	for b in $(>) ; do
+		s="${FLASH_OFFSETS%% *}"
+		FLASH_OFFSETS="${FLASH_OFFSETS#* }"
+		dd of=$(<) \
+			if=$b \
+			bs=$(FLASH_IMAGE_BLOCK_SIZE) \
+			conv=notrunc seek=$s
+	done
 }
 
 # uImage
@@ -195,7 +201,7 @@ actions BuildUBootSDImage1
 	$(RM) $(1).mtools
 	$(RM) uEnv.txt
 	# Add haiku bootstrap partition to MMC image
-	cat $(2[0]) >> $(1)
+	#cat $(2[0]) >> $(1)
 }
 
 # uimage targets
@@ -225,25 +231,21 @@ if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
 }
 
 # flash image targets
-# they currently depend on having an U-Boot binary available
-if $(ubootFile) {
 
 BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img : haiku_loader :
-	$(ubootFile) ;
+	$(FLASH_IMAGE_PARTS) ;
 NotFile haiku-flash-image ;
 Depends haiku-flash-image : haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img ;
 
 #BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img : boot_loader_u-boot :
-#	$(ubootFile) ;
+#	$(FLASH_IMAGE_PARTS) ;
 #NotFile haiku-flash-elf-image ;
 #Depends haiku-flash-elf-image : haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img ;
 
 BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img : haiku_loader.ub :
-	$(ubootFile) ;
+	$(FLASH_IMAGE_PARTS) ;
 NotFile haiku-flash-uimage ;
 Depends haiku-flash-uimage : haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img ;
-
-}
 
 # SD/mmc image targets
 BuildUBootSDImage haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_IMAGE) $(HAIKU_BOARD_SDIMAGE_FILES) ;
