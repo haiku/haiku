@@ -52,6 +52,15 @@ mloFile = [ DownloadFile $(HAIKU_BOARD_MLO_IMAGE)
 ubootFile = [ DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE)
         : $(HAIKU_BOARD_UBOOT_IMAGE_URL) ] ;
 
+# U-Boot environment
+# We load the uImage 2MB above its final destination, bootm will decode
+# it to the proper location. Our image is smaller than 2MB so this works.
+#HAIKU_BOARD_SDIMAGE_UBOOT_UENV_NAME = uEnv.txt ;
+HAIKU_BOARD_SDIMAGE_UBOOT_UENV = "uenvcmd=run loadImage; run mmcboot; \
+		loadImage=fatload mmc0 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader_nbsd.ub \
+		mmcboot=bootm $(HAIKU_BOARD_LOADER_UIBASE)" ;
+
+
 HAIKU_BOARD_SDIMAGE_FILES =
 	$(mloFile)
 	$(ubootFile)

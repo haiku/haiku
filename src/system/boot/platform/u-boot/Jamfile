@@ -187,11 +187,7 @@ actions BuildUBootSDImage1
 	MTOOLSRC=$(1).mtools mformat -L 32 -v "Haiku" i:
 
 	# generate u-boot environment variables
-	# We load the uImage 2MB above its final destination, bootm will decode
-	# it to the proper location. Our image is smaller than 2MB so this works.
-	echo 'uenvcmd=run loadImage; run mmcboot;
-		loadImage=fatload mmc0 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader_nbsd.ub
-		mmcboot=bootm $(HAIKU_BOARD_LOADER_UIBASE)' > uEnv.txt
+	echo '$(HAIKU_BOARD_SDIMAGE_UBOOT_UENV)' > uEnv.txt
 	# populate
 	MTOOLSRC=$(1).mtools mcopy $(2[1-]) i:
 	MTOOLSRC=$(1).mtools mcopy uEnv.txt i:
