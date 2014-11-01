@@ -24,6 +24,8 @@ HAIKU_BOARD_LOADER_UIBASE = 0x84000000 ;
 # Flash image
 #
 
+# cf. http://gumstix.org/how-to/70-writing-images-to-flash.html
+
 # OMAP x-loader image, must be first file in Flash image
 HAIKU_BOARD_MLO_IMAGE ?= MLO ;
 HAIKU_BOARD_MLO_IMAGE_URL =
@@ -41,6 +43,18 @@ mloFile = [ DownloadFile $(HAIKU_BOARD_MLO_IMAGE)
 ubootFile = [ DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE)
         : $(HAIKU_BOARD_UBOOT_IMAGE_URL) ] ;
 
+FLASH_IMAGE_PARTS =
+	$(mloFile)
+	$(ubootFile)
+	;
+
+# flash offsets:
+# in kB
+FLASH_IMAGE_LOADER_OFFSET = 31744 ;
+
+FLASH_OFFSET on $(mloFile) = 0 ;
+FLASH_OFFSET on $(ubootFile) = 512 ;
+
 
 #
 # mmc/SD image
@@ -53,7 +67,7 @@ HAIKU_BOARD_SDIMAGE_SIZE = 256 ;
 HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
 
 # autoboot script
-HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = gumstix-factory.script ;
+HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = boot.scr ;
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
 setenv bootargs debug_screen true; \
 if mmcinit; then \
@@ -62,6 +76,8 @@ if mmcinit; then \
 fi" ;
 
 HAIKU_BOARD_SDIMAGE_FILES =
+	$(mloFile)
+	$(ubootFile)
 	haiku_loader
 	haiku_loader.ub
 	haiku_loader_nbsd.ub
