@@ -1,49 +1,130 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	443107378
+1	finnish	x-vnd.Haiku-HaikuDepot	2631174450
 Name	PackageListView		Nimi
+Close	RatePackageWindow		Sulje
+The captcha puzzle needs to be solved.	UserLoginWindow		Captcha-pulma on ratkaistava.
 Changelog	PackageInfoView		Muutosloki
+Your rating:	RatePackageWindow		Arvosanasi:
+The passwords do not match.	UserLoginWindow		Salasanat eivät täsmää.
+Log in…	MainWindow		Kirjaudu...
+Rate %Package%	RatePackageWindow		Anna pakkaukselle %Package% arvosana
+Stability:	RatePackageWindow		Stabiilisuus:
 Click a package to view information	PackageInfoView		Napsauta pakkausta tietojen katsomiseksi
+Other users can see this rating	RatePackageWindow		Muut käyttäjät voivat nähdä tämän arvosanan
+Stability	RatePackageWindow		Stabiilisuus
 for %Version%	PackageInfoView		%Version%
 No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
 Depot:	FilterView		Varasto:
 Description	PackageListView		Kuvaus
 Install	PackageManager		Asenna
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Todentaminen epäonnistui. Käyttäjä ei ole olemassa tai tarjottiin väärää salasanaa.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Tilin luominen onnistui. Voit nyt antaa pakkauksille arvosanoja ja tehdä muita hyödyllisiä asioita.
 Tools	MainWindow		Työkalut
 HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		Sulje
 Rate package…	PackageInfoView		Anna pakkaukselle arvosana...
+Category	FilterView		Luokka
 Uninstall	PackageManager		Poista asennus
+An error occurred while obtaining the package list: %message%	MainWindow		Pakkausluetteloa haettaessa tapahtui virhe: %message%
+Your rating was updated successfully.	RatePackageWindow		Arvosanasi päivitys onnistui.
 <no info>	PackageInfoView		<ei tietoja>
 An error occurred while initializing the package manager: %message%	MainWindow		Pakkaushallintaa alustettaessa tapahtui virhe: %message%
+Email address:	UserLoginWindow		Sähköpostiosoite:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Arvosanasi kopiointi palvelimelle onnistui. Voit päivittää tai poistaa sen milloin vain antamalla pakkaukselle arvosanan uudelleen.
+Very unstable	RatePackageWindow		Hyvin epävakaa
+The username is already taken. Please choose another.	UserLoginWindow		Käyttäjätunnus on jo varattu. Valitse toinen käyttäjätunnus.
 Close	PackageManager		Sulje
+Not logged in	MainWindow		Et ole kirjautunut sisään
+The authentication was successful.	UserLoginWindow		Tunnistautuminen onnistui.
 Status	PackageListView		Tila
+Ignore	UserLoginWindow		Ohita
+Language	UserLoginWindow		Kieli
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Salasana on liian heikko tai virheellinen. Käytä vähintään 8 merkkiä, joista vähintään 2 on numeroita ja 2 suuria kirjaimia.
+Rate package	RatePackageWindow		Anna pakkaukselle arvosana
 Development	Model		Ohjelmakehitys
 Fatal error	PackageManager		Kriittinen virhe
+The user name needs to be at least 3 letters long.	UserLoginWindow		Käyttäjänimen on oltava vähintään 3 merkkiä pitkä.
+Log in	UserLoginWindow		Kirjaudu
+Repeat pass phrase:	UserLoginWindow		Toista salasana:
 Ratings	PackageInfoView		Arvosanat
+But none could be listed here, sorry.	UserLoginWindow		Tässä ei kyetty luetteloimaan mitään.
+System & Utilities	Model		Järjestelmä ja apuohjelmat
 Inactive	PackageListView		Ei käytössä
 Refresh depots	MainWindow		Päivitä varastot
+The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoimintoa ei voitu aikatauluttaa: %Error%
+Science & Mathematics	Model		Tiede ja matematiikka
 Main Menu	MainWindow		Päävalikko
 (%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha-pulman ratkaisui onnistui.
+Success	UserLoginWindow		Valmis
 Downloading:	PackageInfoView		Ladataan:
+Mostly stable	RatePackageWindow		Äärimmäisen stabiili
+There was a puzzling response from the web service.	RatePackageWindow		Webbipalvelun vastaus oli pulmallinen.
+Log out	MainWindow		Kirjaudu ulos
+Education	Model		Koulutus
 Search terms:	FilterView		Hakusanat:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
+Failed to update rating	RatePackageWindow		Arvosanan päivittäminen epäonnistui
+Does not start	RatePackageWindow		Ei käynnisty
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error% (%details%)
+It was not possible to contact the web service.	RatePackageWindow		Webbipalveluun ei saatu yhteyttä.
+There are problems in the form:\n\n	UserLoginWindow		Muodossa on pulmia:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Webbipalvelu ei löytänyt pakkausta. Tämä tarkoittaa luultavasti, että se tulee varastosta, jota ei seurata täällä. Arvosanojen antamista sellaisille pakkauksille ei tueta.
+Create account	UserLoginWindow		Luo tili
 Productivity	Model		Tuottavuus
+Authentication failed	UserLoginWindow		Todennus epäonnistui
+Language	RatePackageWindow		Kieli
 Size	PackageListView		Koko
+Failed to create or update rating: %s\n	RatePackageWindow		Arvosanan luominen tai päivittäminen epäonnistui: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.
+ It responded with: 	RatePackageWindow		 Se vastasi: 
+User name:	UserLoginWindow		Käyttäjätunnus:
+Unstable but usable	RatePackageWindow		Epävakaa, mutta käyttökelpoinen
+The email address appears to be malformed.	UserLoginWindow		Sähköpostiosoite on vääränmuotoinen.
 Games	Model		Pelit
 Rating	PackageListView		Arvosana
+There was a puzzling response from the web service.	UserLoginWindow		Webbipalvelun vastaus oli pulmallinen.
 Graphics	Model		Grafiikka
 Local	MainWindow		Paikallinen
 Close	MainWindow		Sulje
+Preferred language:	UserLoginWindow		Ensisijainen kieli:
+Failed to rate package	RatePackageWindow		Arvosanan antaminen paketille epäonnistui
+Internet & Network	Model		Internet ja verkko
+Cancel	MainWindow		Peru
+Input validation	UserLoginWindow		Syötevalidointi
+Update	RatePackageWindow		Päivitä
 Video	Model		Video
+All categories	FilterView		Kaikki luokat
 An error occurred while refreshing the repository: %error%	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error%
+Login or Create account	MainWindow		Kirjaudu tai luo tili
 Pending…	PackageListView		Odottaa...
 Depot	FilterView		Varasto
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
+OK	PackageInfoView		Valmis
 Uninstalled	PackageListView		Poistetut asennukset
+Stable	RatePackageWindow		Vakaa
 Unknown	PackageListView		Tuntematon
 All depots	FilterView		Kaikki varastot
+Comment language:	RatePackageWindow		Kommenttikieli:
+Pass phrase:	UserLoginWindow		Salasana:
+Not specified	RatePackageWindow		Ei määritelty
 Available	PackageListView		Käytettävissä
 n/a	PackageInfoView		–
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Jos et tarjoa sähköpostiosoitetta, et kykene nollaamaan salasanaasi silloin kun unohdat sen.
+ It responded with: 	UserLoginWindow		 Sen vastaus: 
+Authentication failed. Connection to the service failed.	UserLoginWindow		Todentaminen epäonnistui. Yhdistäminen palveluun epäonnistui.
+Cancel	RatePackageWindow		Peru
+Package action failed	PackageInfoView		Pakettitoiminta epäonnistui
+OK	UserLoginWindow		Valmis
 Send	RatePackageWindow		Lähetä
+Category:	FilterView		Luokka:
+Failed to create account	UserLoginWindow		Tilin luominen epäonnistui
+There are problems with the data you entered:\n\n	UserLoginWindow		Syöttämissäsi tiedoissa oli pulmia:\n\n
+Success	RatePackageWindow		Onnistui
+Business	Model		Yritys
 Audio	Model		Ääni
 About	PackageInfoView		Ohjelmasta
 Active	PackageListView		Käytössä
+It was not possible to contact the web service.	UserLoginWindow		Webbipalveluun ei saatu yhteyttä.
+Failed to create account: %s\n	UserLoginWindow		Tilin luominen epäonnistui: %s\n
+Cancel	UserLoginWindow		Peru

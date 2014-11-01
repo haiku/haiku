@@ -1,6 +1,5 @@
-1	russian	x-vnd.Haiku-HaikuDepot	4148520337
+1	russian	x-vnd.Haiku-HaikuDepot	609912956
 Name	PackageListView		Имя
-Source code	FilterView		Исходный код
 Close	RatePackageWindow		Закрыть
 Changelog	PackageInfoView		История изменений
 Your rating:	RatePackageWindow		Ваш рейтинг:
@@ -39,13 +38,14 @@ Language	UserLoginWindow		Язык
 Rate package	RatePackageWindow		Оценить пакет
 Development	Model		Разработка
 Fatal error	PackageManager		Неисправимая ошибка
+The user name needs to be at least 3 letters long.	UserLoginWindow		Имя пользователя должно состоять минимум из 3-х символов.
+Log in	UserLoginWindow		Войти…
 Repeat pass phrase:	UserLoginWindow		Повторить пароль:
 Ratings	PackageInfoView		Оценки
 System & Utilities	Model		Система и утилиты
 Inactive	PackageListView		Неактивный
 Refresh depots	MainWindow		Обновить склады
 Science & Mathematics	Model		Наука и математика
-Not logged in	FilterView		Вход не выполнен
 Main Menu	MainWindow		Главное меню
 (%Votes%)	PackageInfoView		(%Votes%)
 Success	UserLoginWindow		Выполнено успешно
@@ -58,21 +58,22 @@ Search terms:	FilterView		Условия поиска:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.
 Failed to update rating	RatePackageWindow		Не удалось обновить рейтинг
-Development	FilterView		Разработчикам
 Does not start	RatePackageWindow		Не запускается
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Не удалось связаться с веб сервером.
+There are problems in the form:\n\n	UserLoginWindow		В этой форме присутствуют ощибки:\n\n
 Create account	UserLoginWindow		Создать учётную запись
 Productivity	Model		Офис
 Authentication failed	UserLoginWindow		Авторизация завершилась неудачно
 Language	RatePackageWindow		Язык
 Size	PackageListView		Размер
 Failed to create or update rating: %s\n	RatePackageWindow		Не удалось создать или изменить рейтинг: %s\n
+ It responded with: 	RatePackageWindow		 Он ответил так: 
 User name:	UserLoginWindow		Имя пользователя:
 Unstable but usable	RatePackageWindow		Нестабилен, но пригодный для использования
+The email address appears to be malformed.	UserLoginWindow		Некорректный адрес электронной почты.
 Games	Model		Игры
 Rating	PackageListView		Оценка
-Logged in as %User%	FilterView		Выполнен вход под пользователем %User%
 There was a puzzling response from the web service.	UserLoginWindow		Был получен странный ответ от веб сервера.
 Graphics	Model		Графика
 Local	MainWindow		Локальный
@@ -80,7 +81,6 @@ Close	MainWindow		Закрыть
 Preferred language:	UserLoginWindow		Предпочитаемый язык:
 Failed to rate package	RatePackageWindow		Не удалось оценить пакет
 Internet & Network	Model		Интернет и сеть
-Available	FilterView		Доступные
 Cancel	MainWindow		Отменить
 Update	RatePackageWindow		Обновить
 Video	Model		Видео
@@ -94,13 +94,13 @@ Uninstalled	PackageListView		Удаленные
 Stable	RatePackageWindow		Стабилен
 Unknown	PackageListView		Неизвестно
 All depots	FilterView		Все склады
+Comment language:	RatePackageWindow		Язык комментария:
 Pass phrase:	UserLoginWindow		Пароль:
 Not specified	RatePackageWindow		Не указана
 Available	PackageListView		Доступен
 n/a	PackageInfoView		н/д
 Cancel	RatePackageWindow		Отмена
 OK	UserLoginWindow		OK
-Installed	FilterView		Установлен
 Send	RatePackageWindow		Отправить
 Category:	FilterView		Категория:
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
@@ -110,4 +110,5 @@ Audio	Model		Аудио
 About	PackageInfoView		О программе
 Active	PackageListView		Активирован
 It was not possible to contact the web service.	UserLoginWindow		Не удалось связаться с веб сервером.
+Failed to create account: %s\n	UserLoginWindow		Не удалось создать учётную запись: %s\n
 Cancel	UserLoginWindow		Отмена

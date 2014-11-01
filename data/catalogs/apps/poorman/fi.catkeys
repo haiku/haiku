@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PoorMan	4008245771
+1	finnish	x-vnd.Haiku-PoorMan	2059301223
 Website location	PoorMan		Webbisivusijainti
 Error Server	PoorMan		Virhepalvelin
 Settings…	PoorMan		Asetukset...
@@ -34,6 +34,7 @@ Log to console	PoorMan		Kirjaa pääteikkunaan
 Directory: (none)	PoorMan		Hakemisto: (ei mitään)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Köyhiksen luoma oletus ”public_html” kotikansiossasi.\nTai voit sen sijaan valita yhden omista kansioistasi.
 Log To Console	PoorMan		Kirjaa konsoliin
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# yhteys} other{# yhteyttä}}
 Connections	PoorMan		Yhteydet
 Status: Running	PoorMan		Tila: Suoritetaan
 Controls	PoorMan		Ohjaimet

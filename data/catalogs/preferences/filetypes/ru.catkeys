@@ -52,7 +52,7 @@ Set preferred application	Preferred App Menu		Установить предпо�
 Don't save	Application Type Window		Не сохранять
 Save changes before closing?	Application Type Window		Сохранить изменения перед выходом?
 File	Application Type Window		Файл
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# тип приложения был удален} few{# типа приложений были удалено} other{# типов приложений было удалено}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# тип приложения был удален} few{# типа приложений были удалены} other{# типов приложений было удалено}}
 Version:	Application Type Window		Версия:
 Select…	FileTypes Window		Выбрать…
 FileTypes request	FileTypes		Запрос типа файла

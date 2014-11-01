@@ -1,6 +1,5 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	1278451458
+1	japanese	x-vnd.Haiku-HaikuDepot	2631174450
 Name	PackageListView		名前
-Source code	FilterView		ソースコード
 Close	RatePackageWindow		閉じる
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha パズルを解く必要があります。
 Changelog	PackageInfoView		変更履歴
@@ -53,7 +52,6 @@ Inactive	PackageListView		無効
 Refresh depots	MainWindow		Depot を更新
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
 Science & Mathematics	Model		科学 & 数学
-Not logged in	FilterView		ログインしていません
 Main Menu	MainWindow		メインメニュー
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha パズルを正しく解いていません。
@@ -67,7 +65,6 @@ Search terms:	FilterView		検索語句:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		ユーザー格付けがありません。
 Failed to update rating	RatePackageWindow		評価の更新に失敗しました
-Development	FilterView		開発
 Does not start	RatePackageWindow		開始しない
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		リポジトリの更新中にエラーが発生しました: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		ウェブサービスにコンタクトできなかった。
@@ -86,7 +83,6 @@ Unstable but usable	RatePackageWindow		不安定であるが有用
 The email address appears to be malformed.	UserLoginWindow		メールアドレスが不正なようです。
 Games	Model		ゲーム
 Rating	PackageListView		評価
-Logged in as %User%	FilterView		%User% としてログイン
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
 Graphics	Model		グラフィック
 Local	MainWindow		ローカル
@@ -94,7 +90,6 @@ Close	MainWindow		閉じる
 Preferred language:	UserLoginWindow		優先言語:
 Failed to rate package	RatePackageWindow		パッケージの評価に失敗しました
 Internet & Network	Model		インターネット & ネットワーク
-Available	FilterView		利用可能
 Cancel	MainWindow		キャンセル
 Input validation	UserLoginWindow		入力検証
 Update	RatePackageWindow		更新
@@ -121,7 +116,6 @@ Authentication failed. Connection to the service failed.	UserLoginWindow		認証
 Cancel	RatePackageWindow		キャンセル
 Package action failed	PackageInfoView		パッケージアクションに失敗しました
 OK	UserLoginWindow		OK
-Installed	FilterView		インストール済
 Send	RatePackageWindow		送信する
 Category:	FilterView		分類:
 Failed to create account	UserLoginWindow		アカウントの作成に失敗しました

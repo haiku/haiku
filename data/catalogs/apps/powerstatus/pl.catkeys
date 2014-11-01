@@ -1,8 +1,9 @@
-1	polish	x-vnd.Haiku-PowerStatus	3224068645
+1	polish	x-vnd.Haiku-PowerStatus	2033673511
 Design capacity low warning: 	PowerStatus		Ostrzeżenie o niskiej pojemności projektowej: 
 Show percent	PowerStatus		Pokaż procent
 Design capacity: 	PowerStatus		Pojemność projektowa: 
  mW	PowerStatus		 mW
+Battery low	PowerStatus		Niski poziom naładowania akumulatora
 Type: 	PowerStatus		Typ: 
 non-rechargeable	PowerStatus		nieodnawialne
 Empty battery slot	PowerStatus		Gniazdo na baterie jest puste
@@ -25,8 +26,10 @@ Model number: 	PowerStatus		Numer modelu:
 Install in Deskbar	PowerStatus		Zainstaluj w Deskbarze
  mAh	PowerStatus		 mAh
 Capacity: 	PowerStatus		Pojemność: 
+The battery level is getting low, please plug the device in.	PowerStatus		Poziom naładowania akumulatora jest niski, podłącz urządzenie do prądu.
 Battery discharging	PowerStatus		Rozładowywanie baterii
 Serial number: 	PowerStatus		Numer seryjny: 
+Battery critical	PowerStatus		Krytycznie niski poziom naładowania akumulatora
 Capacity granularity 1: 	PowerStatus		Jednostka pojemności 1: 
 OEM info: 	PowerStatus		Informacje OEM: 
 Design voltage: 	PowerStatus		Projektowe napięcie: 
@@ -35,6 +38,7 @@ Design capacity warning: 	PowerStatus		Ostrzeżenie o projektowej pojemności:
 Battery info	PowerStatus		Informacje o baterii
 Quit	PowerStatus		Wyjdź
 rechargeable	PowerStatus		odnawialna
+The battery level is critical, please plug the device in immediately.	PowerStatus		Poziom naładowania akumulatora jest krytycznie niski, natychmiast podłącz urządzenie do prądu.
 charging	PowerStatus		ładowanie
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Możesz uruchomić PowerStatus w oknie lub zainstalować go w Deskbarze.
 Power status box	PowerStatus		Pole ze statusem energii

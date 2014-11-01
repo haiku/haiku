@@ -1,11 +1,13 @@
-1	finnish	x-vnd.Haiku-MidiPlayer	471142057
+1	finnish	x-vnd.Haiku-MidiPlayer	1046133011
 None	Main Window		Ei mikään
 Live input:	Main Window		Live-syöte:
 Stop	Main Window		Pysäytä
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Pienoisohjelma\nvoi soittaa tuhansia\ntosilauluja
 Cavern	Main Window		Luola
 Volume:	Main Window		Äänenvoimakkuus:
 Reverb:	Main Window		Kaikuefekti:
 OK	Main Window		Valmis
+Loading instruments…	Scope View		Ladataan soittimet...
 Off	Main Window		Pois päältä
 Dungeon	Main Window		Tyrmä
 Play	Main Window		Soita

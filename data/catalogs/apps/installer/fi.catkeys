@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	3930183175
+1	finnish	x-vnd.Haiku-Installer	215749586
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Oletko varma, että haluat keskeyttää asennuksen ja käynnistää järjestelmän uudelleen?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Asennusohjelma\n\ttekijät: Jérôme Duval ja Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -42,6 +42,7 @@ README	InstallerApp		LUEMINUT
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Kohdelevyllä ei ehkä ole riittävästi tilaa. Yritä valita eri levy tai älä valitse valinnaisten alkioiden asentamista.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sulje ensin Alkulataushallinta- ja Levyasema-asetusikkunat ennen asennusohjelman ikkunan sulkemista.
 Scanning for disks…	InstallerWindow		Etsitään levyjä…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Levyä ei voitu liittää. Valitse eri levy.
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry ”Haiku Alfa” {\n
@@ -86,6 +87,7 @@ With GRUB 2 the first logical partition always has the number \"5\", regardless 
 Write boot sector	InstallerWindow		Kirjoita alkulataussektori
 Cancel	InstallerWindow		Peru
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Levyasema-asetukset -sovelluksen käynnistäminen osioiden asettamiseksi epäonnistui.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Kohdetaltio ei ole tyhjä. Oletko varma, että haluat silti asentaa sille?\n\nHuomaa: Kansio 'system' on puhdas kopio lähdetaltiolta, mutta säilyttää settings-kansion, kaikki muut kansiota yhdistetään, kun taas tiedostot ja linkit, jotka ovat olemassa sekä lähde- että kohdetaltiolla korvataan lähdetaltion versiolla.
 No optional packages available.	PackagesView		Valinnaisia pakkauksia ei ole saatavilla.
 All hard disks start with \"hd\".\n	InstallerApp		Kaikki kiintolevynimet alkavat kirjaimilla ”hd”.\n
 Continue	InstallerApp		Jatka

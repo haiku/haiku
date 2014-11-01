@@ -47,7 +47,7 @@ Decline	PackageTextViewer		断る
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		ファイル '%s' がすでにパスに存在します。\nファイルをパッケージの物と置き換えますか、またはスキップしますか?
 All existing files will be skipped?	PackageView		既存のファイルをすべてスキップしますか?
 Continue	PackageInfo		続ける
-%index% of %total%	PackageInstall		%index%  / %total%
+%index% of %total%	PackageInstall		%index% / %total%
 %.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		中断
 PackageInstaller	System name		PackageInstaller

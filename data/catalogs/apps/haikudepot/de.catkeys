@@ -1,11 +1,10 @@
-1	german	x-vnd.Haiku-HaikuDepot	1278451458
+1	german	x-vnd.Haiku-HaikuDepot	2631174450
 Name	PackageListView		Name
-Source code	FilterView		Quellcode
 Close	RatePackageWindow		Schließen
 The captcha puzzle needs to be solved.	UserLoginWindow		Die Captcha-Frage muss beantwortet werden.
 Changelog	PackageInfoView		Änderungsprotokoll
 Your rating:	RatePackageWindow		Eigene Bewertung:
-The passwords do not match.	UserLoginWindow		Die Passwörter stimmen nicht überein.
+The passwords do not match.	UserLoginWindow		Die Kennwörter stimmen nicht überein.
 Log in…	MainWindow		Anmelden…
 Rate %Package%	RatePackageWindow		%Package% bewerten
 Stability:	RatePackageWindow		Stabilität:
@@ -41,7 +40,7 @@ Ignore	UserLoginWindow		Ignorieren
 Language	UserLoginWindow		Sprache
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Das Kennwort ist zu schwach oder ungültig. Es muss mindestens 8 Zeichen lang sein und mindestens 2 Zahlen und 2 Großbuchstaben enthalten.
 Rate package	RatePackageWindow		Paket bewerten
-Development	Model		Programmierung
+Development	Model		Entwicklung
 Fatal error	PackageManager		Schwerwiegender Fehler
 The user name needs to be at least 3 letters long.	UserLoginWindow		Der Benutzername muss mindestens 3 Zeichen lang sein.
 Log in	UserLoginWindow		Anmelden
@@ -53,13 +52,12 @@ Inactive	PackageListView		Deaktiviert
 Refresh depots	MainWindow		Depots aktualisieren
 The package action could not be scheduled: %Error%	PackageInfoView		Die Aktion konnte nicht auf das Paket angewandt werden: %Error%
 Science & Mathematics	Model		Wissenschaft
-Not logged in	FilterView		Nicht angemeldet
 Main Menu	MainWindow		Hauptmenü
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Die Captcha-Frage wurde nicht richtig beantwortet.
 Success	UserLoginWindow		Erfolg
 Downloading:	PackageInfoView		Aktueller Download:
-Mostly stable	RatePackageWindow		#document
+Mostly stable	RatePackageWindow		Ziemlich stabil
 There was a puzzling response from the web service.	RatePackageWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
 Log out	MainWindow		Abmelden
 Education	Model		Bildung
@@ -67,8 +65,7 @@ Search terms:	FilterView		Suchbegriffe:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
 Failed to update rating	RatePackageWindow		Die Bewertung konnte nicht aktualisiert werden.
-Development	FilterView		Programmierung
-Does not start	RatePackageWindow		#document
+Does not start	RatePackageWindow		Startet nicht
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Bei der Aktualisierung des Depots trat ein Fehler auf: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Der Web-Dienst konnte nicht erreicht werden.
 There are problems in the form:\n\n	UserLoginWindow		Es gibt Probleme mit dem Format:\n\n
@@ -86,7 +83,6 @@ Unstable but usable	RatePackageWindow		Instabil aber brauchbar
 The email address appears to be malformed.	UserLoginWindow		Das Format der angegebenen E-Mail-Adresse ist fehlerhaft.
 Games	Model		Spiele
 Rating	PackageListView		Bewertung
-Logged in as %User%	FilterView		Angemeldet als %User%
 There was a puzzling response from the web service.	UserLoginWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
 Graphics	Model		Grafik
 Local	MainWindow		Lokal
@@ -94,7 +90,6 @@ Close	MainWindow		Schließen
 Preferred language:	UserLoginWindow		Bevorzugte Sprache:
 Failed to rate package	RatePackageWindow		Paket konnte nicht bewertet werden
 Internet & Network	Model		Internet & Netzwerk
-Available	FilterView		Verfügbar
 Cancel	MainWindow		Abbrechen
 Input validation	UserLoginWindow		Eingabeprüfung
 Update	RatePackageWindow		Aktualisieren
@@ -111,7 +106,7 @@ Stable	RatePackageWindow		Stabil
 Unknown	PackageListView		Unbekannt
 All depots	FilterView		Alle Depots
 Comment language:	RatePackageWindow		Kommentar-Sprache:
-Pass phrase:	UserLoginWindow		Zugangsphrase:
+Pass phrase:	UserLoginWindow		Kennwort:
 Not specified	RatePackageWindow		Keine Angaben
 Available	PackageListView		Verfügbar
 n/a	PackageInfoView		n.v.
@@ -121,7 +116,6 @@ Authentication failed. Connection to the service failed.	UserLoginWindow		Anmeld
 Cancel	RatePackageWindow		Abbrechen
 Package action failed	PackageInfoView		Paket-Aktion fehlgeschlagen
 OK	UserLoginWindow		OK
-Installed	FilterView		Installiert
 Send	RatePackageWindow		Senden
 Category:	FilterView		Kategorie:
 Failed to create account	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden

@@ -1,7 +1,7 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1985556565
+1	hungarian	x-vnd.Haiku-HaikuDepot	2631174450
 Name	PackageListView		Név
-Source code	FilterView		Forráskód
 Close	RatePackageWindow		Bezárás
+The captcha puzzle needs to be solved.	UserLoginWindow		A kapta kód megadása szükséges.
 Changelog	PackageInfoView		Változásnapló
 Your rating:	RatePackageWindow		Saját értékelés:
 The passwords do not match.	UserLoginWindow		A jelszavak nem egyeznek.
@@ -9,12 +9,15 @@ Log in…	MainWindow		Bejelentkezés…
 Rate %Package%	RatePackageWindow		%Package% értékelése
 Stability:	RatePackageWindow		Stabilitás:
 Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
+Other users can see this rating	RatePackageWindow		A többi felhasználó számára látható az értékelés
 Stability	RatePackageWindow		Stabilitás
 for %Version%	PackageInfoView		%Version% verzióhoz
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 Depot:	FilterView		Raktár:
 Description	PackageListView		Leírás
 Install	PackageManager		Telepítés
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Hitelesítési hiba. A felhasználó nem létezik vagy hibás jelszó került megadásra.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		A fiók sikeresen létrehozva. Mostmár lehetőség van a csomagok értékelésére és további funkciókra.
 Tools	MainWindow		Eszközök
 HaikuDepot	System name		Raktár
 Close	UserLoginWindow		Bezárás
@@ -26,6 +29,8 @@ Your rating was updated successfully.	RatePackageWindow		Az értékelés elküld
 <no info>	PackageInfoView		<nincs információ>
 An error occurred while initializing the package manager: %message%	MainWindow		Hiba történt a csomagkezelő indításakor: %message%
 Email address:	UserLoginWindow		E-mail cím:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Az értékelés elküldve. A későbbiekben bármikor módosítható, csupán újra értékelni kell a csomagot.
+Very unstable	RatePackageWindow		Nagyon instabil
 The username is already taken. Please choose another.	UserLoginWindow		Ez a felhasználónév már foglalt. Válasszon másikat.
 Close	PackageManager		Bezárás
 Not logged in	MainWindow		Nincs bejelentkezve
@@ -33,18 +38,26 @@ The authentication was successful.	UserLoginWindow		A felhasználóazonosítás 
 Status	PackageListView		Állapot
 Ignore	UserLoginWindow		Mellőzés
 Language	UserLoginWindow		Nyelv
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		A jelszó érvénytelen vagy könnyen megfejthető. A jelszónak legalább 8 karakterből kell álnia, illetve legalább 2 számot és 2 nagybetűt tartalmaz.
 Rate package	RatePackageWindow		Csomag értékelése
 Development	Model		Fejlesztés
 Fatal error	PackageManager		Végzetes hiba
+The user name needs to be at least 3 letters long.	UserLoginWindow		A felhasználói névnek legalább 3 karakter hosszúnak kell lennie.
 Log in	UserLoginWindow		Bejelentkezés
+Repeat pass phrase:	UserLoginWindow		Jelszó ismétlése:
 Ratings	PackageInfoView		Értékelés
+But none could be listed here, sorry.	UserLoginWindow		A felsoroltak közül egyik sem használható.
+System & Utilities	Model		Rendszer és eszközök
 Inactive	PackageListView		Inaktív
 Refresh depots	MainWindow		Raktárak frissítése
-Not logged in	FilterView		Nincs bejelentkezve
+The package action could not be scheduled: %Error%	PackageInfoView		A csomaggal történő művelet nem ütemezhető be: %Error%
+Science & Mathematics	Model		Tudomány és matematika
 Main Menu	MainWindow		Főmenü
 (%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		A megadott kapta kód érvényes.
 Success	UserLoginWindow		Sikeres
 Downloading:	PackageInfoView		Letöltés:
+Mostly stable	RatePackageWindow		Nagyrészt stabil
 There was a puzzling response from the web service.	RatePackageWindow		A webes szolgáltatás rejtélyes választ adott.
 Log out	MainWindow		Kijelentkezés
 Education	Model		Oktatás
@@ -52,21 +65,24 @@ Search terms:	FilterView		Keresési feltétel:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
 Failed to update rating	RatePackageWindow		Az értékelés frissítése meghiúsult
-Development	FilterView		Fejlesztés
 Does not start	RatePackageWindow		Nem indul el
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Hiba történt a raktár frissítésekor: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Nem sikerült elérni a webes szolgáltatást.
+There are problems in the form:\n\n	UserLoginWindow		Az űrlap hibás:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		A csomag nem található. Lehetséges, hogy a csomag olyan raktárban van, ami nincs használatban. Az értékelés nem lehetséges.
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
 Productivity	Model		Alkalmazások
 Authentication failed	UserLoginWindow		A hitelesítés sikertelen
 Language	RatePackageWindow		Nyelv
 Size	PackageListView		Méret
 Failed to create or update rating: %s\n	RatePackageWindow		Az értékelés létrehozása vagy frissítése nem sikerült: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
  It responded with: 	RatePackageWindow		Ezt válaszolta:
 User name:	UserLoginWindow		Felhasználónév:
+Unstable but usable	RatePackageWindow		Instabil, de használható
+The email address appears to be malformed.	UserLoginWindow		Hibás az e-mail cím formátuma.
 Games	Model		Játékok
 Rating	PackageListView		Értékelés
-Logged in as %User%	FilterView		Bejelentkezett mint %User%
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
 Graphics	Model		Grafika
 Local	MainWindow		Helyi
@@ -74,14 +90,16 @@ Close	MainWindow		Bezárás
 Preferred language:	UserLoginWindow		Előnyben részesített nyelv:
 Failed to rate package	RatePackageWindow		A csomag értékelése sikertelen
 Internet & Network	Model		Internet és hálózat
-Available	FilterView		Elérhető
 Cancel	MainWindow		Mégse
+Input validation	UserLoginWindow		Bevitel érvényesítése
 Update	RatePackageWindow		Frissítés
 Video	Model		Videó
 All categories	FilterView		Minden kategória
 An error occurred while refreshing the repository: %error%	MainWindow		Hiba történt a raktár frissítése közben: %error%
+Login or Create account	MainWindow		Belépés vagy fiók létrehozása
 Pending…	PackageListView		Folyamatban…
 Depot	FilterView		Raktár
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# elem} other{# elem}}
 OK	PackageInfoView		Rendben
 Uninstalled	PackageListView		Eltávolítva
 Stable	RatePackageWindow		Stabil
@@ -92,13 +110,16 @@ Pass phrase:	UserLoginWindow		Jelszó:
 Not specified	RatePackageWindow		Nincs megadva
 Available	PackageListView		Elérhető
 n/a	PackageInfoView		nincs értékelve
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		E-mail cím hiányában a jelszó helyreállítása nem lehetséges.
  It responded with: 	UserLoginWindow		Ezt válaszolta:
+Authentication failed. Connection to the service failed.	UserLoginWindow		A hitelesítés sikertelen. Nem tudtam kapcsolódni a szolgáltatáshoz.
 Cancel	RatePackageWindow		Mégse
+Package action failed	PackageInfoView		A csomag telepítése sikertelen
 OK	UserLoginWindow		Rendben
-Installed	FilterView		Telepítve
 Send	RatePackageWindow		Küldés
 Category:	FilterView		Kategória:
 Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
+There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n
 Success	RatePackageWindow		Sikeres
 Business	Model		Üzleti
 Audio	Model		Audió

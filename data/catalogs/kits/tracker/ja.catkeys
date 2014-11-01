@@ -18,7 +18,7 @@ Recent documents	FavoritesMenu		最近開いたドキュメント
 Modified	QueryPoseView		更新日時
 Created	ContainerWindow		作成日時
 Error %error loading add-On %name.	ContainerWindow		%nameアドオンの読み込み中に%errorエラーが発生
-If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		settings  フォルダーを%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります。\n\n続けますか?
+If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		settings フォルダーを%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります。\n\n続けますか?
 contains	SelectionWindow		含む
 Sorry, you can't save things at the root of your system.	FilePanelPriv		システムのルートフォルダーに保存は許可されていません。
 Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示する
@@ -251,7 +251,7 @@ Reverse order	ContainerWindow		逆順にする
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# アイテム} other{# アイテム}}
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		このフォルダーを追加
-Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を \"%app\" で開けませんでした  (シンボル %symbol が見つかりません)。\n
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を \"%app\" で開けませんでした (シンボル %symbol が見つかりません)。\n
 The target disk does not support creating links.	FSUtils		指定されたディスクはリンクをサポートしていません。
 starts with	SelectionWindow		指定文字列で始まる
 Preparing to delete items…	StatusWindow		削除の準備をしています…
@@ -326,7 +326,7 @@ Handles any file	OpenWithWindow		すべてのファイルに対応
 Get info	FilePanelPriv		詳細情報…
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		中止
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\"  は開こうとしているドキュメントタイプをサポートしていません。\n進めますか?\n\n アプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\" は開こうとしているドキュメントタイプをサポートしていません。\n進めますか?\n\n アプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
 Disks	DirMenu		ディスク
 New folder %ld	FSUtils		新規フォルダー %ld 
 All BeOS disks	AutoMounterSettings		全 BFS パーティション

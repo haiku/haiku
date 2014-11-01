@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	843957219
+1	finnish	x-vnd.Haiku-About	489351976
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint-tekijät. Kaikki oikeudet pidätetty.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ja hänen NewOS-ytimensä)\n
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL ja Remi Lefebvre.
@@ -21,6 +21,7 @@ Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All r
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Osia tästä ohjelmistosta on copyright-suojattu.\nCopyright © 1996-2006 The FreeType Project. Kaikki oikeudet pidätetty.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Tekijänoikeus Haiku-koodiin on Haiku, Inc.-yrityksen tai vastaavien lähdekoodissa nimenomaisesti ilmaistujen tekijöiden omaisuutta. Haiku® ja HAIKU logo® ovat Haiku, Inc.-yrityksen rekisteröityjä tavaramerkkejä.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nKaikki oikeudet pidätetty.
+The HaikuPorts team\n	AboutView		HaikuPorts -ryhmä\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total mebitavua yhteensä, %inaccessible mebitavua luoksepääsemätön
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard, ja muut.
 Contributors:\n	AboutView		Avustajat:\n

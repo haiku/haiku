@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Installer	3930183175
+1	hungarian	x-vnd.Haiku-Installer	1426425234
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Biztosan meg szeretné szakítani a telepítést? A számítógép újra fog indulni!
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Telepítő\n\Írta Jérôme Duval és Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -16,12 +16,14 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		Kilépés a Rendszerválasztóból
 Stop	InstallerWindow		Leállítás
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Ha a rendszer betöltése nem működik, akkor a GRUB 2 rendelkezik egy további konfigurációs fájlal, aminek segítségével egyéni bejegyjézeket adhatunk a rendszertöltő menühöz. Ha a lista elejére szeretnénk új bejegyzést adni, akkor létre kell hozni / szerkeszteni kell a fájlt. Például:\n\n
 OK	InstallerApp		Rendben
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Válassza ki a lemezt melyről telepíteni szeretne és válassza ki azt, amelyre telepít. Ha végzett, kattitnson a „Mehet” gombra.
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
 Install from:	InstallerWindow		Honnan:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		FONTOS TUDNIVALÓK A HAIKU TELEPÍTÉSE ELŐTT\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		A GRUB partíció-elnevezési logikája: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Folytatás
 Write boot sector to '%s'	InstallerWindow		Bootszektor írása: „%s”
 Collecting copy information.	InstallProgress		Másolás információinak összegyűjtése…
@@ -42,6 +44,7 @@ README	InstallerApp		OLVASSEL
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		A céllemezen nincs elég hely a telepítéshez. Válasszon egy másik lemezt vagy csak a szükséges rendszerelemeket telepítse!
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Kérjük, zárja be a Rendszerválasztó és a Lemezkezelő ablakait még mielőtt a Telepítő ablakát bezárná.
 Scanning for disks…	InstallerWindow		Lemezek keresése…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		A lemez nem csatolható. Válasszon egy másikat!
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -86,6 +89,7 @@ With GRUB 2 the first logical partition always has the number \"5\", regardless 
 Write boot sector	InstallerWindow		Rendszerbetöltő írása
 Cancel	InstallerWindow		Mégse
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		A Lemezkezelőt, mellyel a merevlemez partícióit lehet módosítani, nem sikerült elindítani.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		A cél kötet nem üres. Biztosan telepíteni szeretnéd?\n\nMegjegyzés: a 'rendszer' mappa teljes egészében átmásolásra kerül a forrás lemezről, de a beállítások mappát megtartja, minden más mappa össze lesz fésülve. Azon fájlok és hivatkozások, melyek egyaránt léteznek a forrás és a cél lemezen is, azok esetében a cél lemezen lévő ki lesz cserélve.
 No optional packages available.	PackagesView		Nincsenek választható csomagok.
 All hard disks start with \"hd\".\n	InstallerApp		A merevlemezek mind \"hd\"-val kezdődnek.\n
 Continue	InstallerApp		Folytatás

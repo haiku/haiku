@@ -32,7 +32,7 @@ Display time with seconds	Time		秒を表示
 Time	System name		日付と時間
 America	Time		アメリカ
 Synchronize at boot	Time		システム起動時に同期する
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date  作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		不正な時間を受け取りました
 Antarctica	Time		南極
 Show time zone	Time		タイムゾーンを表示

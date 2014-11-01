@@ -5,7 +5,7 @@ Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		ここで、ブートメニューを実際に表示するために、\"GRUB_HIDDEN_TIMEOUT=0\"の行の先頭に \"#\"を追加して、コメントアウトする必要があります。
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが '%s' に書き込まれました。終了ボタンでインストーラーを終了するか、他に Haiku をインストールするボリュームを選択してください。
 Quit	InstallerApp		終了
-Additional disk space required: 0.0 KiB	InstallerWindow		必要な追加ディスク容量:  0.0 KiB
+Additional disk space required: 0.0 KiB	InstallerWindow		必要な追加ディスク容量: 0.0 KiB
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	中断
 Install progress:  	InstallerWindow		進行状況:
@@ -62,7 +62,7 @@ Installer	System name		インストーラー
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		インストール元ディスクへのインストールはできません。他のディスクを選んでください。
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\"はパーティション番号で、GRUB 2は\"1\"から数えます。\n
-Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		os-prober v1.44  以降 (たとえば、Ubuntu 11.04 以降) では、Haiku は設定なしで認識するはずです。Haiku を GRUB メニューに追加するには、ターミナルを立ち上げて以下を入力します:\n\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		os-prober v1.44 以降 (たとえば、Ubuntu 11.04 以降) では、Haiku は設定なしで認識するはずです。Haiku を GRUB メニューに追加するには、ターミナルを立ち上げて以下を入力します:\n\n
 Quit DriveSetup	InstallerWindow		DriveSetup を終了
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\"はハードディスクの番号で、\"0\"から数えます。\n
 Hide optional packages	InstallerWindow		オプショナルパッケージを隠す
@@ -73,7 +73,7 @@ Set up partitions…	InstallerWindow		パーティションを設定…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		このパーティションをマウントできません。他のパーティションを選択してください。
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		ブートマネージャー実行中…\n\nインストールを続けるには、ブートマネージャーを閉じてください。
 Install anyway	InstallProgress		それでもインストールする
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		エラーが発生しました。インストールは完了していません:\n\nエラー:  %s
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		エラーが発生しました。インストールは完了していません:\n\nエラー: %s
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s' から '%2s' へのインストールを開始するには、開始ボタンを押してください。
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup は実行中です。\n\nDriveSetup を終了させてからインストールを続行してください。
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Haikuを試用していただきありがとうございます。Haikuを堪能してください!そして、Haikuのことを気に入って頂ければ幸いです。
@@ -103,7 +103,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		インストールを中断しますか ?
 Onto:	InstallerWindow		インストール先:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		ブートマネージャーウィンドウを閉じてから、インストーラーウィンドウを閉じてください。
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   はじめて Haiku のブートに成功したら、 \"Welcome\" と \"Userguide\" を必ず読んでください。これらは、デスクトップ上のリンクおよび、WebPositive のブックマーク中にあります。\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) はじめて Haiku のブートに成功したら、 \"Welcome\" と \"Userguide\" を必ず読んでください。これらは、デスクトップ上のリンクおよび、WebPositive のブックマーク中にあります。\n\n
 Tools	InstallerWindow		ツール
 The mount point could not be retrieved.	InstallProgress		マウントポイントを取得できませんでした。
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <好みのテキストエディター> /boot/grub/menu.lst\n\n

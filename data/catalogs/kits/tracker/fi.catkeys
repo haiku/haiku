@@ -1,6 +1,7 @@
-1	finnish	x-vnd.Haiku-libtracker	2070021838
+1	finnish	x-vnd.Haiku-libtracker	137546976
 OK	WidgetAttributeText		Valmis
 Add-ons	FilePanelPriv		Lisäosat
+Mount settings…	ContainerWindow		Liittämisasetukset...
 Desktop	Model		Työpöytä
 Identify	ContainerWindow		Tunnista
 Warning space color	SettingsView		Varoitustilaväri
@@ -212,6 +213,7 @@ Created:	InfoWindow		Luotu:
 Copying: 	StatusWindow		Kopioidaan:
 Capacity:	InfoWindow		Kapasiteetti:
 Delete	FilePanelPriv		Poista
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# tavu)} other{(# tavua)}}
 Save	FindPanel		Tallenna
 copy	FSUtils	filename copy	kopioi
 Temporary	FindPanel		Tilapäinen
@@ -247,6 +249,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		Et voi muokata tuota
 Name	ContainerWindow		Nimi
 Reverse order	ContainerWindow		Käännä järjestys
 48 x 48	DeskWindow		48 x 48
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# kohde} other{# kohdetta}}
 OK	OpenWithWindow		Valmis
 Add current folder	FilePanelPriv		Lisää nykyinen kansio
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Asiakirjan ”%document” avaus sovelluksella ”%app” epäonnistui (Puuttuva symboli: %symbol). \n
@@ -291,6 +294,7 @@ Cancel	PoseView		Peru
 You can't move or copy items to read-only volumes.	FSUtils		Et voi siirtää tai kopioida kohteita kirjoitussuojatuille taltioille.
 Unknown	FilePermissionsView		Tuntematon
 All files and folders	FindPanel		Kaikki tiedostot ja kansiot
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# tiedostolle} other{# tiedostolle}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Asiakirjan ”%document” avaus epäonnistui (Puuttuvat kirjastot: %library).\n
 The Tracker must be running to see Info windows.	PoseView		Seuraajaohjelman on oltava käynnissä, jotta voit nähdä tietoikkunat.
 Other	FilePermissionsView		Muu
@@ -329,6 +333,7 @@ New folder %ld	FSUtils		Uusi kansio %ld
 All BeOS disks	AutoMounterSettings		Kaikki BeOS-levyt
 Used space color	SettingsView		Käytetyn tilan väri
 Sorry, could not create a new folder.	FSUtils		Uuden kansion luominen epäonnistui.
+Disk mount	TrackerSettingsWindow		Levyn liitäntä
 multiple disks	FindPanel		useita levyjä
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Sinun on pudotettava kohteet yhteen ”Levyt”-ikkunan levykuvakkeista.
 Untitled clipping	PoseView		Otsikoton leikkaus

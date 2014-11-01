@@ -1,8 +1,9 @@
-1	russian	x-vnd.Haiku-PowerStatus	3224068645
+1	russian	x-vnd.Haiku-PowerStatus	1273938332
 Design capacity low warning: 	PowerStatus		Уровень полного разряда: 
 Show percent	PowerStatus		Показать в процентах
 Design capacity: 	PowerStatus		Штатная емкость: 
  mW	PowerStatus		 мВт
+Battery low	PowerStatus		Низкий заряд батареи
 Type: 	PowerStatus		Тип: 
 non-rechargeable	PowerStatus		неперезаряжаемая
 Empty battery slot	PowerStatus		Пустой слот батареи
@@ -25,8 +26,10 @@ Model number: 	PowerStatus		Номер модели:
 Install in Deskbar	PowerStatus		Установить в Deskbar
  mAh	PowerStatus		 мАч
 Capacity: 	PowerStatus		Емкость: 
+The battery level is getting low, please plug the device in.	PowerStatus		Заряд батареи стал слишком низким, пожалуйста, подключите устройство к сети.
 Battery discharging	PowerStatus		Батарея разряжается
 Serial number: 	PowerStatus		Серийный номер: 
+Battery critical	PowerStatus		Критический заряд батареи
 Capacity granularity 1: 	PowerStatus		Детализация ёмкости 1: 
 OEM info: 	PowerStatus		Изготовитель: 
 Design voltage: 	PowerStatus		Штатное напряжение: 

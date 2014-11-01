@@ -1,6 +1,5 @@
-1	polish	x-vnd.Haiku-HaikuDepot	1278451458
+1	polish	x-vnd.Haiku-HaikuDepot	2631174450
 Name	PackageListView		Nazwa
-Source code	FilterView		Kod źródłowy
 Close	RatePackageWindow		Zamknij
 The captcha puzzle needs to be solved.	UserLoginWindow		Musisz rozwiązać test CAPTCHA.
 Changelog	PackageInfoView		Dziennik zmian
@@ -53,7 +52,6 @@ Inactive	PackageListView		Nieaktywny
 Refresh depots	MainWindow		Odśwież listy pakietów
 The package action could not be scheduled: %Error%	PackageInfoView		Akcja dla pakietu nie mogła zostać dodana do kolejki: %Error%
 Science & Mathematics	Model		Nauka & matematyka
-Not logged in	FilterView		Niezalogowany
 Main Menu	MainWindow		Menu główne
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Nie udało ci się przejść testu CAPTCHA.
@@ -67,7 +65,6 @@ Search terms:	FilterView		Szukana fraza:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Brak ocen użytkowników.
 Failed to update rating	RatePackageWindow		Nie udało się zaktualizować oceny
-Development	FilterView		Programowanie
 Does not start	RatePackageWindow		Nie uruchamia się
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Nie udało się połączyć z usługą sieciową.
@@ -86,7 +83,6 @@ Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
 The email address appears to be malformed.	UserLoginWindow		Adres e-mail wygląda na zniekształcony.
 Games	Model		Gry
 Rating	PackageListView		Ocena
-Logged in as %User%	FilterView		Zalogowano jako %User%
 There was a puzzling response from the web service.	UserLoginWindow		Odebrano dziwną odpowiedź od usługi sieciowej.
 Graphics	Model		Grafika
 Local	MainWindow		Lokalne
@@ -94,7 +90,6 @@ Close	MainWindow		Zamknij
 Preferred language:	UserLoginWindow		Preferowany język:
 Failed to rate package	RatePackageWindow		Nie udało się ocenić pakietu
 Internet & Network	Model		Internet i sieć
-Available	FilterView		Dostępny
 Cancel	MainWindow		Anuluj
 Input validation	UserLoginWindow		Walidacja wejścia
 Update	RatePackageWindow		Zaktualizuj
@@ -121,7 +116,6 @@ Authentication failed. Connection to the service failed.	UserLoginWindow		Autory
 Cancel	RatePackageWindow		Anuluj
 Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
 OK	UserLoginWindow		OK
-Installed	FilterView		Zainstalowane
 Send	RatePackageWindow		Wyślij
 Category:	FilterView		Kategoria:
 Failed to create account	UserLoginWindow		Nie udało się utworzyć konta

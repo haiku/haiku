@@ -1,4 +1,5 @@
-1	finnish	x-vnd.Haiku-Notifications	164019665
+1	finnish	x-vnd.Haiku-Notifications	44145084
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Asetuksia tallennettaessa tapahtui virhe.\nLevytila on mahdollisesti lopussa.
 Notifications	GeneralView		Ilmoitukset
 seconds of inactivity	GeneralView		joutilaisuussekunnit
 Revert	PrefletWin		Palauta
@@ -6,6 +7,7 @@ Mini icon	DisplayView		Minikuvake
 Enable notifications	GeneralView		Ota käyttöön ilmoitukset
 Error	NotificationView		Virhe
 OK	GeneralView		Valmis
+OK	PrefletWin		Valmis
 Type	NotificationView		Tyyppi
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Ilmoitusten pysäyttäminen epäonnistui, koska palvelinta ei tavoiteta.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Ilmoitusten käyttöönotto epäonnistui, koska palvelinta ei löydy.\nTämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.

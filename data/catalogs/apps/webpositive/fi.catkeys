@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	3528881455
+1	finnish	x-vnd.Haiku-WebPositive	1130172675
 Show home button	Settings Window		Näytä aloitussivupainike
 Username:	Authentication Panel		Käyttäjätunnus:
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
@@ -18,6 +18,7 @@ Error opening downloads folder	Download Window		Virhe avattaessa latauskansiota
 Paste	WebPositive Window		Liitä
 Double-click or middle-click to open new tab.	Tab Manager		Välilehden avaamiseksi napsauta hiiren kakkos- tai keskipainikkeella.
 Proxy username:	Settings Window		Välityspalvelimen käyttäjätunnus:
+Save page as…	WebPositive Window		Tallenna sivu nimellä...
 Settings	Settings Window		Asetukset
 %seconds seconds left	Download Window		%seconds sekuntia jäljellä
 Confirmation	WebPositive Window		Vahvistus

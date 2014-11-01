@@ -1,8 +1,9 @@
-1	finnish	x-vnd.Haiku-PowerStatus	3224068645
+1	finnish	x-vnd.Haiku-PowerStatus	2033673511
 Design capacity low warning: 	PowerStatus		Suunnittelukapasiteetti alhainen -varoitus: 
 Show percent	PowerStatus		Näytä prosenttiluku
 Design capacity: 	PowerStatus		Suunnittelukapasiteetti:
  mW	PowerStatus		 mW
+Battery low	PowerStatus		Akku lähes tyhjä
 Type: 	PowerStatus		Tyyppi: 
 non-rechargeable	PowerStatus		ei-uudelleenladattava
 Empty battery slot	PowerStatus		Tyhjä akkulokero
@@ -25,8 +26,10 @@ Model number: 	PowerStatus		Mallinumero:
 Install in Deskbar	PowerStatus		Asenna Työpöytäpalkkiin
  mAh	PowerStatus		 mAh
 Capacity: 	PowerStatus		Kapasiteetti: 
+The battery level is getting low, please plug the device in.	PowerStatus		Akkutaso on alhainen, kytke laite sähköverkkoon.
 Battery discharging	PowerStatus		Akkulatauksen purkaminen
 Serial number: 	PowerStatus		Sarjanumero: 
+Battery critical	PowerStatus		Akku kriittisellä tasolla
 Capacity granularity 1: 	PowerStatus		Kapasiteettirakeisuus 1: 
 OEM info: 	PowerStatus		OEM-tiedot: 
 Design voltage: 	PowerStatus		Suunnittelujännite: 
@@ -35,6 +38,7 @@ Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus:
 Battery info	PowerStatus		Akkutiedot
 Quit	PowerStatus		Lopeta
 rechargeable	PowerStatus		uudelleenladattava
+The battery level is critical, please plug the device in immediately.	PowerStatus		Akkutaso on kriittinen, kytke laite heti sähköverkkoon.
 charging	PowerStatus		ladataan
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
 Power status box	PowerStatus		Virtatilalaatikko

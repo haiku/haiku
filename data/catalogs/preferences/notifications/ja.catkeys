@@ -1,4 +1,5 @@
-1	japanese	x-vnd.Haiku-Notifications	164019665
+1	japanese	x-vnd.Haiku-Notifications	44145084
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		設定の保存中にエラーが発生しました。\nディスクの空きが無いのかもしれません。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		秒後に画面から隠されます。
 Revert	PrefletWin		元に戻す
@@ -6,9 +7,10 @@ Mini icon	DisplayView		小さいアイコン
 Enable notifications	GeneralView		通知を有効にする
 Error	NotificationView		エラー
 OK	GeneralView		OK
-Type	NotificationView		タイプ
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		サーバーと通信できないので通知を止めることができません。
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		サーバーが見つからないので通知を有効にできません。\nこれは、InfoPopper のインストールがうまく完了していないことを示しています。
+OK	PrefletWin		OK
+Type	NotificationView		種類
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		サーバーと通信できないので通知を止められません。
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		サーバーが見つからないので通知を有効にできません。\nこれは、InfoPopper のインストールが正しく完了していないことを示しています。
 Important	NotificationView		重要
 Cannot disable notifications because the server can't be reached.	GeneralView		サーバーと通信できないので通知を無効にできません。
 Progress	NotificationView		進行状況
@@ -35,6 +37,6 @@ Enabled	NotificationView		有効
 Unknown	NotificationView		不明
 Enable notifications at startup	GeneralView		起動時に通知を有効にする
 Notifications	PrefletView		通知
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		通知サーバーが見つかりません。これは、InfoPopper のインストールがうまく完了していないことを示しています。
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		通知サーバーが見つかりません。これは、InfoPopper のインストールが正しく完了していないことを示しています。
 Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		設定を保存できません。おそらく settings ディレクトリに書き込み権限がありません。
 Applications	NotificationView		アプリケーション

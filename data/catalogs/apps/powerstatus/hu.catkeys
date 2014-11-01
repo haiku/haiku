@@ -1,8 +1,9 @@
-1	hungarian	x-vnd.Haiku-PowerStatus	3224068645
+1	hungarian	x-vnd.Haiku-PowerStatus	2033673511
 Design capacity low warning: 	PowerStatus		Figyelmeztetés alacsony tervezett kapacitásnál: 
 Show percent	PowerStatus		Százalék megjelenítése
 Design capacity: 	PowerStatus		Tervezett kapacitás: 
  mW	PowerStatus		 mW
+Battery low	PowerStatus		Alacsony töltés
 Type: 	PowerStatus		Típus: 
 non-rechargeable	PowerStatus		Nem újratölthető
 Empty battery slot	PowerStatus		Nincs akku behelyezve
@@ -25,8 +26,10 @@ Model number: 	PowerStatus		Típusszám:
 Install in Deskbar	PowerStatus		Telepítés az Asztalsávra
  mAh	PowerStatus		 mAh
 Capacity: 	PowerStatus		Kapacitás: 
+The battery level is getting low, please plug the device in.	PowerStatus		Az akkumulátor töltöttsége alacsony, kérlek csatlakoztasd a töltőt.
 Battery discharging	PowerStatus		Akku használatban
 Serial number: 	PowerStatus		Szériaszám: 
+Battery critical	PowerStatus		Veszélyesen alacsony töltés
 Capacity granularity 1: 	PowerStatus		Kapacitás granularitás 1: 
 OEM info: 	PowerStatus		OEM információk: 
 Design voltage: 	PowerStatus		Tervezett feszültség: 
@@ -35,6 +38,7 @@ Design capacity warning: 	PowerStatus		Tervezett kapacitás figyelmeztetés:
 Battery info	PowerStatus		Akku infó
 Quit	PowerStatus		Kilépés
 rechargeable	PowerStatus		újratölthető
+The battery level is critical, please plug the device in immediately.	PowerStatus		Az akkumulátor töltöttsége veszélyesen alacsony, kérlek csatlakoztasd a töltőt.
 charging	PowerStatus		töltődik
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Futatthatja az Energiaállapotot egy ablakban, vagy az Asztalsávra telepítheti azt.
 Power status box	PowerStatus		Energiaállapot doboza

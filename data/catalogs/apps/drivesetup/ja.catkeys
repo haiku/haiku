@@ -16,7 +16,7 @@ Select a partition from the list below.	DiskView		下記の一覧からパーテ
 No disk devices have been recognized.	DiskView		ディスクデバイスが検出されていません。
 Failed to initialize the disk %s!\n	MainWindow		ディスク %s の初期化に失敗しました。\n
 The selected disk is read-only.	MainWindow		選択されたディスクは読み取り専用です。
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" をフォーマットしますか?  変更をディスクに書き込む直前に再度確認します。
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" をフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		強制的にマウント解除しても良いですか?\n\n注: アプリケーションが現在ボリュームに書き込み中の場合、マウント解除するとデータが失われるかもしれません。\n
 Could not mount partition %s.	MainWindow		パーティション %s をマウントできませんでした。
 The partition %s has been successfully formatted.\n	MainWindow		%s パーティションは正常にフォーマットされました。\n
@@ -51,7 +51,7 @@ Failed to change the parameters of the partition. No changes have been written t
 Failed to format the partition %s!\n	MainWindow		パーティション %s のフォーマットに失敗しました。\n
 Mount	MainWindow		マウント
 Partition type	PartitionList		パーティション種別 :
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		ディスク全体をフォーマットしますか?  (大抵の人はまずパーティショニングシステムでディスクを初期化します) 変更をディスクに書き込む直前に再度確認します。
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		ディスク全体をフォーマットしますか? (大抵の人はまずパーティショニングシステムでディスクを初期化します) 変更をディスクに書き込む直前に再度確認します。
 The panel experienced a problem!	MainWindow		パネルに問題が発生しました。
 Change parameters…	MainWindow		パラメーターを変更…
 Device	PartitionList		デバイス

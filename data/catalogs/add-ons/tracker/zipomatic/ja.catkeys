@@ -13,5 +13,5 @@ Archive	file:ZipperThread.cpp		アーカイブ
 Error creating archive	file:ZipOMaticWindow.cpp		アーカイブの作成中にエラーが発生しました。
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		%ld 個の Zip-O-Matic が動作中です。\n\n
 {0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# 個のファイルが追加されました。} other{# 個のファイルが追加されました。}}
-Archive created OK	file:ZipOMaticWindow.cpp		アーカイブを正常に作成しました。
+Archive created OK	file:ZipOMaticWindow.cpp		アーカイブを正しく作成しました。
 Stop them	file:ZipOMatic.cpp		これらを中止

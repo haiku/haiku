@@ -46,7 +46,7 @@ No file attributes, just plain data	Mail		Ei tiedostoattribuutteja, vain pelkki�
 Edit queries…	Mail		Muokkaa kyselyjä…
 queries	B_USER_DIRECTORY/mail/queries		kyselyt
 Paste	Mail		Liitä
-in	B_USER_DIRECTORY/mail/in		kohteessa
+in	B_USER_DIRECTORY/mail/in		tulevat
 Save attachment…	Mail		Tallenna liitteet…
 Include file attributes in attachments	Mail		Sisällytä tiedostoattribuutit liitteisiin
 OK	Mail		Valmis

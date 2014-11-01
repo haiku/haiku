@@ -1,9 +1,10 @@
-1	japanese	x-vnd.Haiku-PowerStatus	3224068645
-Design capacity low warning: 	PowerStatus		定格容量の低下警告:
+1	japanese	x-vnd.Haiku-PowerStatus	2033673511
+Design capacity low warning: 	PowerStatus		設計容量の低下警告:
 Show percent	PowerStatus		パーセントを表示
-Design capacity: 	PowerStatus		定格容量:
+Design capacity: 	PowerStatus		設計容量:
  mW	PowerStatus		 mW
-Type: 	PowerStatus		タイプ:
+Battery low	PowerStatus		バッテリー残量低下
+Type: 	PowerStatus		バッテリー残量低下
 non-rechargeable	PowerStatus		再充電不能
 Empty battery slot	PowerStatus		バッテリースロットが空です
  mV	PowerStatus		 mV
@@ -13,32 +14,35 @@ PowerStatus	System name		電源状態
 Battery info…	PowerStatus		バッテリー情報…
 Damaged battery	PowerStatus		損傷したバッテリー
 Show time	PowerStatus		時間を表示
-Last full charge: 	PowerStatus		現在の最大容量
+Last full charge: 	PowerStatus		前回の完全充電:
 Battery unused	PowerStatus		使用していないバッテリー
 Extended battery info	PowerStatus		拡張バッテリー情報
  mA	PowerStatus		 mA
-Current rate: 	PowerStatus		電流:
+Current rate: 	PowerStatus		電流率:
 discharging	PowerStatus		放電中
 Show text label	PowerStatus		テキストラベル表示
 About…	PowerStatus		このソフトウェアについて…
 Model number: 	PowerStatus		モデルナンバー:
-Install in Deskbar	PowerStatus		Deskbarにインストール
+Install in Deskbar	PowerStatus		Deskbar にインストール
  mAh	PowerStatus		 mAh
 Capacity: 	PowerStatus		容量:
+The battery level is getting low, please plug the device in.	PowerStatus		バッテリー 残量が低下してきたので、デバイスを電源につないでください。
 Battery discharging	PowerStatus		放電中
 Serial number: 	PowerStatus		シリアルナンバー:
+Battery critical	PowerStatus		バッテリー残量が空に近い
 Capacity granularity 1: 	PowerStatus		容量精度 1: 
 OEM info: 	PowerStatus		OEM情報:
-Design voltage: 	PowerStatus		定格電圧:
+Design voltage: 	PowerStatus		設計電圧:
 Battery charging	PowerStatus		充電中
-Design capacity warning: 	PowerStatus		定格容量警告:
+Design capacity warning: 	PowerStatus		設計容量警告:
 Battery info	PowerStatus		バッテリー情報
 Quit	PowerStatus		終了
-rechargeable	PowerStatus		再充電する
+rechargeable	PowerStatus		再充電可能
+The battery level is critical, please plug the device in immediately.	PowerStatus		バッテリー残量が空に近いので、すぐにデバイスを電源につないでください。
 charging	PowerStatus		充電中
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus をウィンドウモードで起動することや、 Deskbar 中にインストールすることができます。
 Power status box	PowerStatus		電源ステータスボックス
 Show status icon	PowerStatus		状態アイコンを表示
 Capacity granularity 2: 	PowerStatus		容量精度 2:
 Technology: 	PowerStatus		テクノロジー:
-no battery	PowerStatus		バッテリーが有りません
+no battery	PowerStatus		バッテリーがありません

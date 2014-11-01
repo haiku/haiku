@@ -33,7 +33,7 @@ Deskbar preferences	PreferencesWindow		Ustawienia Deskbara
 Mount	DeskbarMenu		Zamontuj
 Revert	PreferencesWindow		Przywróć
 Small	PreferencesWindow		Małe
-Recent applications:	PreferencesWindow		Ostatnio używane aplikacje:
+Recent applications:	PreferencesWindow		Ostatnio uruchamiane aplikacje:
 Shutdown…	DeskbarMenu		Wyłącz…
 Tracker always first	PreferencesWindow		Tracker zawsze na początku
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Ustawienia
