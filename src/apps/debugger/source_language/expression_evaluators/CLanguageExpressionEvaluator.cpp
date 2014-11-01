@@ -363,7 +363,6 @@ class CLanguageExpressionEvaluator::Tokenizer {
 			}
 		}
 
-//printf("next token: '%s'\n", fCurrentToken.string.String());
 		return fCurrentToken;
 	}
 
@@ -569,7 +568,7 @@ CLanguageExpressionEvaluator::Evaluate(const char* expressionString,
 	fTokenizer->SetType(type);
 	fTokenizer->SetTo(expressionString);
 
-	Number value = _ParseBinary();
+	Number value = _ParseSum();
 	Token token = fTokenizer->NextToken();
 	if (token.type != TOKEN_END_OF_LINE)
 		throw ParseException("parse error", token.position);
@@ -579,36 +578,8 @@ CLanguageExpressionEvaluator::Evaluate(const char* expressionString,
 
 
 Number
-CLanguageExpressionEvaluator::_ParseBinary()
-{
-	return _ParseSum();
-	// binary operation appearantly not supported by m_apm library,
-	// should not be too hard to implement though....
-
-//	double value = _ParseSum();
-//
-//	while (true) {
-//		Token token = fTokenizer->NextToken();
-//		switch (token.type) {
-//			case TOKEN_AND:
-//				value = (uint64)value & (uint64)_ParseSum();
-//				break;
-//			case TOKEN_OR:
-//				value = (uint64)value | (uint64)_ParseSum();
-//				break;
-//
-//			default:
-//				fTokenizer->RewindToken();
-//				return value;
-//		}
-//	}
-}
-
-
-Number
 CLanguageExpressionEvaluator::_ParseSum()
 {
-	// TODO: check isnan()...
 	Number value = _ParseProduct();
 
 	while (true) {
@@ -896,7 +867,7 @@ CLanguageExpressionEvaluator::_ParseAtom()
 
 	_EatToken(TOKEN_OPENING_BRACKET);
 
-	Number value = _ParseBinary();
+	Number value = _ParseSum();
 
 	_EatToken(TOKEN_CLOSING_BRACKET);
 
@@ -1069,5 +1040,3 @@ CLanguageExpressionEvaluator::_CoerceTypeIfNeeded(const Token& token,
 
 	_number.SetTo(value);
 }
-
-

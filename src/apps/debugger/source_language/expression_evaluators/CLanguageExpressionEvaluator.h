@@ -67,7 +67,6 @@ class CLanguageExpressionEvaluator {
 			class Tokenizer;
 
  private:
-			Number				_ParseBinary();
 			Number				_ParseSum();
 			Number				_ParseProduct();
 			Number				_ParsePower();
