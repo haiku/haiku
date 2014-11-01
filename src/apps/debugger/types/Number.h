@@ -25,6 +25,8 @@ public:
 									int32 base = 10);
 			void				SetTo(const BVariant& value);
 
+			type_code			Type() const { return fValue.Type(); }
+
 			Number&				operator=(const Number& rhs);
 			Number&				operator+=(const Number& rhs);
 			Number&				operator-=(const Number& rhs);
