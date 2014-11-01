@@ -1266,7 +1266,7 @@ PackageInfoView::PackageInfoView(BLocker* modelLock,
 	:
 	BView("package info view", 0),
 	fModelLock(modelLock),
-	fPackageListener(new(std::nothrow) MessagePackageListener(this))
+	fPackageListener(new(std::nothrow) OnePackageMessagePackageListener(this))
 {
 	fCardLayout = new BCardLayout();
 	SetLayout(fCardLayout);

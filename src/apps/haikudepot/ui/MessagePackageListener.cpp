@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-214, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -12,9 +12,13 @@
 #include "PackageInfo.h"
 
 
-MessagePackageListener::MessagePackageListener(BView* view)
+// #pragma mark - MessagePackageListener
+
+
+MessagePackageListener::MessagePackageListener(BHandler* target)
 	:
-	fView(view)
+	fTarget(target),
+	fChangesMask(0xffffffff)
 {
 }
 
@@ -27,7 +31,10 @@ MessagePackageListener::~MessagePackageListener()
 void
 MessagePackageListener::PackageChanged(const PackageInfoEvent& event)
 {
-	BMessenger messenger(fView);
+	if ((event.Changes() & fChangesMask) == 0)
+		return;
+	
+	BMessenger messenger(fTarget);
 	if (!messenger.IsValid())
 		return;
 
@@ -40,7 +47,29 @@ MessagePackageListener::PackageChanged(const PackageInfoEvent& event)
 
 
 void
-MessagePackageListener::SetPackage(const PackageInfoRef& package)
+MessagePackageListener::SetChangesMask(uint32 mask)
+{
+	fChangesMask = mask;
+}
+
+
+// #pragma mark - OnePackageMessagePackageListener
+
+
+OnePackageMessagePackageListener::OnePackageMessagePackageListener(BHandler* target)
+	:
+	MessagePackageListener(target)
+{
+}
+
+
+OnePackageMessagePackageListener::~OnePackageMessagePackageListener()
+{
+}
+
+
+void
+OnePackageMessagePackageListener::SetPackage(const PackageInfoRef& package)
 {
 	if (fPackage == package)
 		return;
@@ -58,7 +87,7 @@ MessagePackageListener::SetPackage(const PackageInfoRef& package)
 
 
 const PackageInfoRef&
-MessagePackageListener::Package() const
+OnePackageMessagePackageListener::Package() const
 {
 	return fPackage;
 }

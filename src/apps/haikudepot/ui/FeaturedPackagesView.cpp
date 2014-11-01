@@ -36,7 +36,8 @@ public:
 	PackageView()
 		:
 		BGroupView("package view", B_HORIZONTAL),
-		fPackageListener(new(std::nothrow) MessagePackageListener(this))
+		fPackageListener(
+			new(std::nothrow) OnePackageMessagePackageListener(this))
 	{
 		SetViewColor(255, 255, 255);
 		
@@ -145,7 +146,7 @@ public:
 	}
 
 private:
-	MessagePackageListener*			fPackageListener;
+	OnePackageMessagePackageListener* fPackageListener;
 
 	BitmapView*						fIconView;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-214, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MESSAGE_PACKAGE_LISTENER_H
@@ -13,21 +13,34 @@ enum {
 	MSG_UPDATE_PACKAGE		= 'updp'
 };
 
-class BView;
+class BHandler;
 
 
 class MessagePackageListener : public PackageInfoListener {
 public:
-								MessagePackageListener(BView* view);
+								MessagePackageListener(BHandler* target);
 	virtual						~MessagePackageListener();
 
 	virtual	void				PackageChanged(const PackageInfoEvent& event);
+
+			void				SetChangesMask(uint32 mask);
+
+private:
+			BHandler*			fTarget;
+			uint32				fChangesMask;
+};
+
+
+class OnePackageMessagePackageListener : public MessagePackageListener {
+public:
+								OnePackageMessagePackageListener(
+									BHandler* target);
+	virtual						~OnePackageMessagePackageListener();
 
 			void				SetPackage(const PackageInfoRef& package);
 			const PackageInfoRef& Package() const;
 
 private:
-			BView*				fView;
 			PackageInfoRef		fPackage;
 };
 

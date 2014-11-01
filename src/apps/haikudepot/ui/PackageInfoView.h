@@ -13,11 +13,11 @@
 
 class BCardLayout;
 class BLocker;
-class MessagePackageListener;
-class TitleView;
+class OnePackageMessagePackageListener;
 class PackageActionHandler;
 class PackageActionView;
 class PagesView;
+class TitleView;
 
 enum {
 	MSG_VOTE_UP			= 'vtup',
@@ -49,7 +49,7 @@ private:
 			PagesView*			fPagesView;
 
 			PackageInfoRef		fPackage;
-			MessagePackageListener* fPackageListener;
+			OnePackageMessagePackageListener* fPackageListener;
 };
 
 #endif // PACKAGE_INFO_VIEW_H
