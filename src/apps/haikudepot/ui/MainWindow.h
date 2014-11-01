@@ -63,6 +63,8 @@ private:
 
 			void				_InitWorkerThreads();
 			void				_AdoptModel();
+			bool				_IsProminentPackage(
+									const PackageInfoRef& package) const;
 
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();

@@ -61,7 +61,7 @@ enum {
 	MSG_LOG_IN					= 'lgin',
 	MSG_LOG_OUT					= 'lgot',
 	MSG_AUTHORIZATION_CHANGED	= 'athc',
-	MSG_PACKAGE_STATE_CHANGED	= 'mpsc',
+	MSG_PACKAGE_CHANGED			= 'pchd',
 
 	MSG_SHOW_AVAILABLE_PACKAGES	= 'savl',
 	MSG_SHOW_INSTALLED_PACKAGES	= 'sins',
@@ -147,7 +147,7 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	listArea->AddChild(fFeaturedPackagesView);
 	listArea->AddChild(fPackageListView);
 
-	fListLayout->SetVisibleItem((int32)1);
+	fListLayout->SetVisibleItem((int32)0);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.AddGroup(B_HORIZONTAL, 0.0f)
@@ -398,13 +398,23 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case MSG_PACKAGE_STATE_CHANGED:
+		case MSG_PACKAGE_CHANGED:
 		{
 			PackageInfo* info;
 			if (message->FindPointer("package", (void**)&info) == B_OK) {
 				PackageInfoRef ref(info, true);
-				BAutolock locker(fModel.Lock());
-				fModel.SetPackageState(ref, ref->State());
+				uint32 changes;
+				if (message->FindUInt32("changes", &changes) != B_OK)
+					changes = 0;
+				if ((changes & PKG_CHANGED_STATE) != 0) {
+					BAutolock locker(fModel.Lock());
+					fModel.SetPackageState(ref, ref->State());
+				}
+				if ((changes & PKG_CHANGED_PROMINENCE) != 0) {
+					BAutolock locker(fModel.Lock());
+					if (_IsProminentPackage(ref))
+						fFeaturedPackagesView->AddPackage(ref);
+				}
 			}
 			break;
 		}
@@ -444,10 +454,12 @@ MainWindow::StoreSettings(BMessage& settings) const
 void
 MainWindow::PackageChanged(const PackageInfoEvent& event)
 {
-	if ((event.Changes() & PKG_CHANGED_STATE) != 0) {
+	uint32 whatchedChanges = PKG_CHANGED_STATE | PKG_CHANGED_PROMINENCE;
+	if ((event.Changes() & whatchedChanges) != 0) {
 		PackageInfoRef ref(event.Package());
-		BMessage message(MSG_PACKAGE_STATE_CHANGED);
+		BMessage message(MSG_PACKAGE_CHANGED);
 		message.AddPointer("package", ref.Get());
+		message.AddUInt32("changes", event.Changes());
 		ref.Detach();
 			// reference needs to be released by MessageReceived();
 		PostMessage(&message);
@@ -563,8 +575,8 @@ MainWindow::_AdoptModel()
 		
 		const PackageInfoRef& package = fVisiblePackages.ItemAtFast(i);
 		fPackageListView->AddPackage(package);
-	
-		if (package->Title() == "beam" || package->Title() == "caya")
+
+		if (_IsProminentPackage(package))
 			fFeaturedPackagesView->AddPackage(package);
 	}
 
@@ -573,6 +585,23 @@ MainWindow::_AdoptModel()
 	fShowInstalledPackagesItem->SetMarked(fModel.ShowInstalledPackages());
 	fShowSourcePackagesItem->SetMarked(fModel.ShowSourcePackages());
 	fShowDevelopPackagesItem->SetMarked(fModel.ShowDevelopPackages());
+
+	if (fModel.Category() != ""
+		|| fModel.Depot() != ""
+		|| fModel.SearchTerms() != ""
+		|| fModel.ShowInstalledPackages()) {
+		fListLayout->SetVisibleItem((int32)1);
+	} else {
+		fListLayout->SetVisibleItem((int32)0);
+	}
+}
+
+
+bool
+MainWindow::_IsProminentPackage(const PackageInfoRef& package) const
+{
+	return package->HasProminence() && package->Prominence() <= 100
+		&& package->State() != ACTIVATED;
 }
 
 
