@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -19,8 +20,8 @@ TableCellEnumerationRenderer::TableCellEnumerationRenderer(Config* config)
 
 
 void
-TableCellEnumerationRenderer::RenderValue(Value* _value, BRect rect,
-	BView* targetView)
+TableCellEnumerationRenderer::RenderValue(Value* _value, bool valueChanged,
+	BRect rect, BView* targetView)
 {
 	Config* config = GetConfig();
 	if (config != NULL && config->IntegerFormat() == INTEGER_FORMAT_DEFAULT) {
@@ -31,12 +32,13 @@ TableCellEnumerationRenderer::RenderValue(Value* _value, BRect rect,
 		if (EnumeratorValue* enumValue
 				= value->GetType()->ValueFor(value->GetValue())) {
 			TableCellValueRendererUtils::DrawString(targetView, rect,
-				enumValue->Name(), B_ALIGN_RIGHT, true);
+				enumValue->Name(), valueChanged, B_ALIGN_RIGHT, true);
 			return;
 		}
 	}
 
-	TableCellIntegerRenderer::RenderValue(_value, rect, targetView);
+	TableCellIntegerRenderer::RenderValue(_value, valueChanged, rect,
+		targetView);
 }
 
 

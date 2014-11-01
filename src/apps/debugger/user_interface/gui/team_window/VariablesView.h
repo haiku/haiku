@@ -16,6 +16,7 @@ class ActionMenuItem;
 class CpuState;
 class SettingsMenu;
 class StackFrame;
+class StackFrameValues;
 class Thread;
 class Type;
 class TypeComponentPath;
@@ -81,10 +82,12 @@ private:
 			void				_SaveViewState() const;
 			void				_RestoreViewState();
 			status_t			_AddViewStateDescendentNodeInfos(
-									VariablesViewState* viewState, void* parent,
+									VariablesViewState* viewState,
+									void* parent,
 									TreeTablePath& path) const;
 			status_t			_ApplyViewStateDescendentNodeInfos(
-									VariablesViewState* viewState, void* parent,
+									VariablesViewState* viewState,
+									void* parent,
 									TreeTablePath& path);
 			void				_CopyVariableValueToClipboard();
 

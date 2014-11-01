@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -13,8 +14,8 @@
 
 class TableCellFloatRenderer : public TableCellValueRenderer {
 public:
-	virtual	void				RenderValue(Value* value, BRect rect,
-									BView* targetView);
+	virtual	void				RenderValue(Value* value, bool valueChanged,
+									BRect rect, BView* targetView);
 	virtual	float				PreferredValueWidth(Value* value,
 									BView* targetView);
 };

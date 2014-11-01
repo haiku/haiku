@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -41,8 +42,8 @@ TableCellIntegerRenderer::GetSettings() const
 
 
 void
-TableCellIntegerRenderer::RenderValue(Value* _value, BRect rect,
-	BView* targetView)
+TableCellIntegerRenderer::RenderValue(Value* _value, bool valueChanged,
+	BRect rect, BView* targetView)
 {
 	IntegerValue* value = dynamic_cast<IntegerValue*>(_value);
 	if (value == NULL)
@@ -59,7 +60,7 @@ TableCellIntegerRenderer::RenderValue(Value* _value, BRect rect,
 
 	// render
 	TableCellValueRendererUtils::DrawString(targetView, rect, buffer,
-		B_ALIGN_RIGHT, true);
+		valueChanged, B_ALIGN_RIGHT, true);
 }
 
 

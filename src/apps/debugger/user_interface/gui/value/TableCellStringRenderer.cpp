@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -15,8 +16,8 @@
 
 
 void
-TableCellStringRenderer::RenderValue(Value* value, BRect rect,
-	BView* targetView)
+TableCellStringRenderer::RenderValue(Value* value, bool valueChanged,
+	BRect rect, BView* targetView)
 {
 	BString string = "\"";
 	BString tempString;
@@ -64,7 +65,7 @@ TableCellStringRenderer::RenderValue(Value* value, BRect rect,
 	string += "\"";
 
 	TableCellValueRendererUtils::DrawString(targetView, rect, string,
-		B_ALIGN_RIGHT, true);
+		valueChanged, B_ALIGN_RIGHT, true);
 }
 
 

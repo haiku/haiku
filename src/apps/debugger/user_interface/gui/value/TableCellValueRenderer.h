@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -23,8 +24,8 @@ public:
 	virtual	Settings*			GetSettings() const;
 									// returns NULL, if no settings
 
-	virtual	void				RenderValue(Value* value, BRect rect,
-									BView* targetView) = 0;
+	virtual	void				RenderValue(Value* value, bool valueChanged,
+									BRect rect, BView* targetView) = 0;
 	virtual	float				PreferredValueWidth(Value* value,
 									BView* targetView) = 0;
 };

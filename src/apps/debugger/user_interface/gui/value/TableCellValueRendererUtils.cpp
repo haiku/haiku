@@ -16,7 +16,8 @@ static const float kTextMargin = 8;
 
 /*static*/ void
 TableCellValueRendererUtils::DrawString(BView* view, BRect rect,
-	const char* string, enum alignment alignment, bool truncate)
+	const char* string, bool valueChanged, enum alignment alignment,
+	bool truncate)
 {
 	// get font height info
 	font_height	fontHeight;
@@ -56,7 +57,15 @@ TableCellValueRendererUtils::DrawString(BView* view, BRect rect,
 		// TODO: This is the computation BColumnListView (respectively
 		// BTitledColumn) is using, which I find somewhat weird.
 
+	if (valueChanged) {
+		view->PushState();
+		view->SetHighColor((rgb_color){255, 0, 0, 255});
+	}
+
 	view->DrawString(string, BPoint(x, y));
+
+	if (valueChanged)
+		view->PopState();
 }
 
 

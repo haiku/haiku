@@ -108,13 +108,15 @@ public:
 		fNodeChild(nodeChild),
 		fVariable(variable),
 		fValue(NULL),
+		fPreviousValue(),
 		fValueHandler(NULL),
 		fTableCellRenderer(NULL),
 		fLastRendererSettings(),
 		fCastedType(NULL),
 		fComponentPath(NULL),
 		fIsPresentationNode(isPresentationNode),
-		fHidden(false)
+		fHidden(false),
+		fValueChanged(false)
 	{
 		fNodeChild->AcquireReference();
 	}
@@ -202,6 +204,18 @@ public:
 
 		if (fValue != NULL)
 			fValue->AcquireReference();
+
+		_CompareValues();
+	}
+
+	const BVariant& PreviousValue() const
+	{
+		return fPreviousValue;
+	}
+
+	void SetPreviousValue(const BVariant& value)
+	{
+		fPreviousValue = value;
 	}
 
 	Type* GetCastedType() const
@@ -288,6 +302,11 @@ public:
 		fHidden = hidden;
 	}
 
+	bool ValueChanged() const
+	{
+		return fValueChanged;
+	}
+
 	int32 CountChildren() const
 	{
 		return fChildren.CountItems();
@@ -333,10 +352,23 @@ private:
 	typedef BObjectList<ModelNode> ChildList;
 
 private:
+	void _CompareValues()
+	{
+		if (fValue == NULL)
+			fValueChanged = false;
+		else {
+			BVariant newValue;
+			fValue->ToVariant(newValue);
+			fValueChanged = (fPreviousValue != newValue);
+		}
+	}
+
+private:
 	ModelNode*				fParent;
 	ValueNodeChild*			fNodeChild;
 	Variable*				fVariable;
 	Value*					fValue;
+	BVariant				fPreviousValue;
 	ValueHandler*			fValueHandler;
 	TableCellValueRenderer*	fTableCellRenderer;
 	BMessage				fLastRendererSettings;
@@ -345,6 +377,7 @@ private:
 	TypeComponentPath*		fComponentPath;
 	bool					fIsPresentationNode;
 	bool					fHidden;
+	bool					fValueChanged;
 
 public:
 	ModelNode*			fNext;
@@ -373,8 +406,8 @@ protected:
 			ModelNode* node = dynamic_cast<ModelNode*>(value.ToReferenceable());
 			if (node != NULL && node->GetValue() != NULL
 				&& node->TableCellRenderer() != NULL) {
-				node->TableCellRenderer()->RenderValue(node->GetValue(), rect,
-					targetView);
+				node->TableCellRenderer()->RenderValue(node->GetValue(),
+					node->ValueChanged(), rect, targetView);
 				return;
 			}
 		} else if (value.Type() == B_STRING_TYPE) {
@@ -1101,6 +1134,8 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 		if (settings != NULL)
 			settings->RestoreValues(modelNode->GetLastRendererSettings());
 	}
+
+
 
 	// notify table model listeners
 	NotifyNodeChanged(modelNode);
@@ -2168,6 +2203,14 @@ VariablesView::_SaveViewState() const
 		return;
 	BReference<FunctionID> functionIDReference(functionID, true);
 
+	StackFrameValues* values = new(std::nothrow) StackFrameValues;
+	if (values == NULL)
+		return;
+	BReference<StackFrameValues> valuesReference(values, true);
+
+	if (values->Init() != B_OK)
+		return;
+
 	// create an empty view state
 	VariablesViewState* viewState = new(std::nothrow) VariablesViewState;
 	if (viewState == NULL)
@@ -2177,13 +2220,14 @@ VariablesView::_SaveViewState() const
 	if (viewState->Init() != B_OK)
 		return;
 
+	viewState->SetValues(values);
+
 	// populate it
 	TreeTablePath path;
-	if (_AddViewStateDescendentNodeInfos(viewState, fVariableTableModel->Root(),
-			path) != B_OK) {
+	if (_AddViewStateDescendentNodeInfos(viewState,
+			fVariableTableModel->Root(), path) != B_OK) {
 		return;
 	}
-// TODO: Add values!
 
 	// add the view state to the history
 	fViewStateHistory->SetState(fThread->ID(), functionID, viewState);
@@ -2243,10 +2287,22 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 				nodeInfo.SetRendererSettings(settings->Message());
 		}
 
-		status_t error = viewState->SetNodeInfo(node->GetVariable()->ID(),
-			node->GetPath(), nodeInfo);
+		ObjectID* id = node->GetVariable()->ID();
+		TypeComponentPath* componentPath = node->GetPath();
+
+		status_t error = viewState->SetNodeInfo(id, componentPath, nodeInfo);
 		if (error != B_OK)
 			return error;
+
+		Value* value = node->GetValue();
+		if (value != NULL) {
+			BVariant variableValueData;
+			if (value->ToVariant(variableValueData))
+				error = viewState->Values()->SetValue(id, componentPath,
+					variableValueData);
+			if (error != B_OK)
+				return error;
+		}
 
 		// recurse
 		error = _AddViewStateDescendentNodeInfos(viewState, node, path);
@@ -2271,8 +2327,10 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 			return B_NO_MEMORY;
 
 		// apply the node's info, if any
+		ObjectID* objectID = node->GetVariable()->ID();
+		TypeComponentPath* componentPath = node->GetPath();
 		const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
-			node->GetVariable()->ID(), node->GetPath());
+			objectID, componentPath);
 		if (nodeInfo != NULL) {
 			// NB: if the node info indicates that the node in question
 			// was being cast to a different type, this *must* be applied
@@ -2294,6 +2352,12 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 			node->SetLastRendererSettings(nodeInfo->GetRendererSettings());
 
 			fVariableTable->SetNodeExpanded(path, nodeInfo->IsNodeExpanded());
+
+			BVariant previousValue;
+			if (viewState->Values()->GetValue(objectID, componentPath,
+				previousValue)) {
+				node->SetPreviousValue(previousValue);
+			}
 
 			// recurse
 			status_t error = _ApplyViewStateDescendentNodeInfos(viewState, node,

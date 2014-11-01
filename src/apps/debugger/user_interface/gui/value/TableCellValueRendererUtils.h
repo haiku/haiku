@@ -17,6 +17,7 @@ class TableCellValueRendererUtils {
 public:
 	static	void				DrawString(BView* view, BRect rect,
 									const char* string,
+									bool valueChanged,
 									enum alignment alignment,
 									bool truncate = false);
 	static	float				PreferredStringWidth(BView* view,

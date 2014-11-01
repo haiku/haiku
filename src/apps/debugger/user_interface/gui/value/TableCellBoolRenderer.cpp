@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -18,14 +19,15 @@ bool_value_string(BoolValue* value)
 
 
 void
-TableCellBoolRenderer::RenderValue(Value* _value, BRect rect, BView* targetView)
+TableCellBoolRenderer::RenderValue(Value* _value, bool valueChanged,
+	BRect rect, BView* targetView)
 {
 	BoolValue* value = dynamic_cast<BoolValue*>(_value);
 	if (value == NULL)
 		return;
 
 	TableCellValueRendererUtils::DrawString(targetView, rect,
-		bool_value_string(value), B_ALIGN_RIGHT, true);
+		bool_value_string(value), valueChanged, B_ALIGN_RIGHT, true);
 }
 
 
