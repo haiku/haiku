@@ -221,7 +221,7 @@ test_latency(spinlock* lock)
 		if (sLatency[cpu][i].lock == lock) {
 			bigtime_t diff = system_time() - sLatency[cpu][i].timestamp;
 			if (diff > DEBUG_LATENCY && diff < 500000) {
-				panic("spinlock %p were held for %lld usecs (%d allowed)\n",
+				panic("spinlock %p was held for %lld usecs (%d allowed)\n",
 					lock, diff, DEBUG_LATENCY);
 			}
 
@@ -363,7 +363,8 @@ acquire_spinlock(spinlock* lock)
 			while (lock->lock != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
-						"for a long time!", lock);
+						"for a long time (last caller: %p, value: %" B_PRIx32
+						")", lock, find_lock_caller(lock), lock->lock);
 					count = 0;
 				}
 
@@ -380,11 +381,10 @@ acquire_spinlock(spinlock* lock)
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
-		int32 oldValue;
-		oldValue = atomic_get_and_set(&lock->lock, 1);
+		int32 oldValue = atomic_get_and_set(&lock->lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock: attempt to acquire lock %p twice on "
-				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
+				"non-SMP system (last caller: %p, value %" B_PRIx32 ")", lock,
 				find_lock_caller(lock), oldValue);
 		}
 
@@ -416,8 +416,9 @@ acquire_spinlock_nocheck(spinlock *lock)
 			uint32 count = 0;
 			while (lock->lock != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT_NO_CHECK) {
-					panic("acquire_spinlock(): Failed to acquire spinlock %p "
-						"for a long time!", lock);
+					panic("acquire_spinlock_nocheck(): Failed to acquire "
+						"spinlock %p for a long time (last caller: %p, value: %"
+						B_PRIx32 ")", lock, find_lock_caller(lock), lock->lock);
 					count = 0;
 				}
 
@@ -430,9 +431,11 @@ acquire_spinlock_nocheck(spinlock *lock)
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
-		if (atomic_get_and_set(&lock->lock, 1) != 0) {
+		int32 oldValue = atomic_get_and_set(&lock->lock, 1);
+		if (oldValue != 0) {
 			panic("acquire_spinlock_nocheck: attempt to acquire lock %p twice "
-				"on non-SMP system\n", lock);
+				"on non-SMP system (last caller: %p, value %" B_PRIx32 ")",
+				lock, find_lock_caller(lock), oldValue);
 		}
 #endif
 	}
@@ -460,7 +463,8 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 			while (lock->lock != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
 					panic("acquire_spinlock_cpu(): Failed to acquire spinlock "
-						"%p for a long time!", lock);
+						"%p for a long time (last caller: %p, value: %" B_PRIx32
+						")", lock, find_lock_caller(lock), lock->lock);
 					count = 0;
 				}
 
@@ -477,11 +481,10 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
-		int32 oldValue;
-		oldValue = atomic_get_and_set(&lock->lock, 1);
+		int32 oldValue = atomic_get_and_set(&lock->lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
-				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
+				"non-SMP system (last caller: %p, value %" B_PRIx32 ")", lock,
 				find_lock_caller(lock), oldValue);
 		}
 
