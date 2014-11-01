@@ -96,7 +96,7 @@ rule BuildUBootFlashImage image : haikuLoader : parts
 }
 
 
-actions BuildUBootFlashImage1 bind FLASH_OFFSETS
+actions BuildUBootFlashImage1
 {
 	$(RM) $(<)
 
