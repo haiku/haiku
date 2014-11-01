@@ -21,6 +21,28 @@ HAIKU_BOARD_LOADER_FAKE_OS = netbsd ;
 HAIKU_BOARD_LOADER_UIBASE = 0x84000000 ;
 
 #
+# Flash image
+#
+
+# OMAP x-loader image, must be first file in Flash image
+HAIKU_BOARD_MLO_IMAGE ?= MLO ;
+HAIKU_BOARD_MLO_IMAGE_URL =
+       http://cumulus.gumstix.org/images/angstrom/developer/current/MLO ;
+
+# u-boot binary image filename, to build the flash image
+# XXX: Locate it somehow (for now just put it in generated/)
+HAIKU_BOARD_UBOOT_IMAGE ?= u-boot.bin ;
+HAIKU_BOARD_UBOOT_IMAGE_URL =
+       http://cumulus.gumstix.org/images/angstrom/developer/current/u-boot.bin ;
+
+mloFile = [ DownloadFile $(HAIKU_BOARD_MLO_IMAGE)
+        : $(HAIKU_BOARD_MLO_IMAGE_URL) ] ;
+
+ubootFile = [ DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE)
+        : $(HAIKU_BOARD_UBOOT_IMAGE_URL) ] ;
+
+
+#
 # mmc/SD image
 #
 
