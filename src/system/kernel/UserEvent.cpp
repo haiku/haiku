@@ -251,13 +251,6 @@ CreateThreadEvent::CreateThreadEvent(const ThreadCreationAttributes& attributes)
 }
 
 
-CreateThreadEvent::~CreateThreadEvent()
-{
-	// cancel the DPC to be on the safe side
-	DPCQueue::DefaultQueue(B_NORMAL_PRIORITY)->Cancel(this);
-}
-
-
 /*static*/ CreateThreadEvent*
 CreateThreadEvent::Create(const ThreadCreationAttributes& attributes)
 {
@@ -289,4 +282,6 @@ CreateThreadEvent::DoDPC(DPCQueue* queue)
 	thread_id threadID = thread_create_thread(fCreationAttributes, false);
 	if (threadID >= 0)
 		resume_thread(threadID);
+
+	ReleaseReference();
 }

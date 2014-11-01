@@ -86,8 +86,6 @@ private:
 
 
 struct CreateThreadEvent : UserEvent, private DPCCallback {
-								~CreateThreadEvent();
-
 	static	CreateThreadEvent*	Create(
 									const ThreadCreationAttributes& attributes);
 
