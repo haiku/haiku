@@ -56,7 +56,8 @@ extern uint8 _end;
 
 extern "C" int main(stage2_args *args);
 extern "C" void _start(void);
-extern "C" int start_raw(int argc, const char **argv);
+extern "C" int start_gen(int argc, const char **argv,
+	struct image_header *uimage=NULL, void *fdt=NULL);
 extern "C" void dump_uimage(struct image_header *image);
 extern "C" void dump_fdt(const void *fdt);
 
@@ -134,15 +135,15 @@ start_netbsd(struct board_info *bd, struct image_header *image,
 	// TODO: Ensure cmdline is mapped into memory by MMU before usage.
 	if (cmdline && *cmdline)
 		argc++;
-	gUImage = image;
-	return start_raw(argc, argv);
+	return start_gen(argc, argv, image);
 }
 
 
 extern "C" int
 start_linux(int argc, int archnum, void *atags)
 {
-	return 1;
+	// newer U-Boot pass the FDT in atags
+	return start_gen(0, NULL, NULL, atags);
 }
 
 
@@ -159,13 +160,19 @@ extern "C" int
 start_linux_ppc_fdt(void *fdt, long/*UNUSED*/, long/*UNUSED*/,
 	uint32 epapr_magic, uint32 initial_mem_size)
 {
-	gFDT = fdt;	//XXX: make a copy?
-	return start_raw(0, NULL);
+	return start_gen(0, NULL, NULL, fdt);
 }
 
 
 extern "C" int
 start_raw(int argc, const char **argv)
+{
+	return start_gen(argc, argv);
+}
+
+
+extern "C" int
+start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 {
 	stage2_args args;
 
@@ -178,6 +185,10 @@ start_raw(int argc, const char **argv)
 	args.platform.boot_tgz_size = 0;
 	args.platform.fdt_data = NULL;
 	args.platform.fdt_size = 0;
+
+	gUImage = uimage;
+	gFDT = fdt;	//XXX: make a copy?
+		// TODO: check for atags instead and convert them
 
 	if (argv) {
 		// skip the kernel name
