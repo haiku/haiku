@@ -225,13 +225,13 @@ main(int argc, char** argv)
 		// system stats
 		get_system_info(&systemInfo);
 		printf("\nSystem Info\n");
-		printf("%" B_PRIu32 "k (%" B_PRIu32 " bytes) total memory\n",
+		printf("%" B_PRIu64 "k (%" B_PRIu64 " bytes) total memory\n",
 			(systemInfo.max_pages * B_PAGE_SIZE / 1024),
 			(systemInfo.max_pages * B_PAGE_SIZE));
-		printf("%" B_PRIu32 "k (%" B_PRIu32 " bytes) currently committed\n",
+		printf("%" B_PRIu64 "k (%" B_PRIu64 " bytes) currently committed\n",
 			(systemInfo.used_pages * B_PAGE_SIZE / 1024),
 			(systemInfo.used_pages * B_PAGE_SIZE));
-		printf("%" B_PRIu32 "k (%" B_PRIu32 " bytes) currently available\n",
+		printf("%" B_PRIu64 "k (%" B_PRIu64 " bytes) currently available\n",
 			(systemInfo.max_pages - systemInfo.used_pages) * B_PAGE_SIZE / 1024,
 			(systemInfo.max_pages - systemInfo.used_pages) * B_PAGE_SIZE);
 		printf("%2.1f%% memory utilisation\n",
