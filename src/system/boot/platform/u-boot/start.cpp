@@ -277,10 +277,6 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 			args.platform.boot_tgz_size);
 	}
 
-	// specify available physical memory, using 32MB for now, since our
-	// ARMv5 targets have very little by default. TODO get from FDT!
-	insert_physical_memory_range(SDRAM_BASE, 32 * 1024 * 1024);
-
 	// save the size of the FDT so we can map it easily after mmu_init
 	size_t fdtSize = gFDT ? fdt_totalsize(gFDT) : 0;
 

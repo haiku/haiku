@@ -23,6 +23,12 @@
 
 #include <string.h>
 
+extern "C" {
+#include <fdt.h>
+#include <libfdt.h>
+#include <libfdt_env.h>
+};
+
 
 //#define TRACE_MMU
 #ifdef TRACE_MMU
@@ -36,6 +42,8 @@
 	// Define this to print the memory map to serial debug,
 	// You also need to define ENABLE_SERIAL in serial.cpp
 	// for output to work.
+
+extern void *gFDT;
 
 
 /*
@@ -551,10 +559,112 @@ mmu_init_for_kernel(void)
 }
 
 
+//TODO:move this to generic/ ?
+static status_t
+find_physical_memory_ranges(uint64 &total)
+{
+	int node;
+	const void *prop;
+	int len;
+
+	dprintf("checking for memory...\n");
+	// let's just skip the OF way (prop memory on /chosen)
+	//node = fdt_path_offset(gFDT, "/chosen");
+	node = fdt_path_offset(gFDT, "/memory");
+	// TODO: check devicetype=="memory" ?
+
+	total = 0;
+
+	// Memory base addresses are provided in 32 or 64 bit flavors
+	// #address-cells and #size-cells matches the number of 32-bit 'cells'
+	// representing the length of the base address and size fields
+	int root = fdt_path_offset(gFDT, "/");
+	int32 regAddressCells = 1;
+	int32 regSizeCells = 1;
+	prop = fdt_getprop(gFDT, root, "#address-cells", &len);
+	if (prop && len == sizeof(uint32))
+		regAddressCells = fdt32_to_cpu(*(uint32_t *)prop);
+	prop = fdt_getprop(gFDT, root, "#size-cells", &len);
+	if (prop && len == sizeof(uint32))
+		regSizeCells = fdt32_to_cpu(*(uint32_t *)prop);
+
+
+	// NOTE : Size Cells of 2 is possible in theory... but I haven't seen it yet.
+	if (regAddressCells > 2 || regSizeCells > 1) {
+		panic("%s: Unsupported FDT cell count detected.\n"
+		"Address Cells: %" B_PRId32 "; Size Cells: %" B_PRId32
+		" (CPU > 64bit?).\n", __func__, regAddressCells, regSizeCells);
+		return B_ERROR;
+	}
+
+	prop = fdt_getprop(gFDT, node, "reg", &len);
+	if (prop == NULL) {
+		panic("FDT /memory reg property not set");
+		return B_ERROR;
+	}
+
+	const uint32 *p = (const uint32 *)prop;
+	for (int32 i = 0; len; i++) {
+		uint64 base;
+		uint64 size;
+		if (regAddressCells == 2)
+			base = fdt64_to_cpu(*(uint64_t *)p);
+		else
+			base = fdt32_to_cpu(*(uint32_t *)p);
+		p += regAddressCells;
+		if (regSizeCells == 2)
+			size = fdt64_to_cpu(*(uint64_t *)p);
+		else
+			size = fdt32_to_cpu(*(uint32_t *)p);
+		p += regAddressCells;
+		len -= sizeof(uint32) * (regAddressCells + regSizeCells);
+
+		if (size <= 0) {
+			dprintf("%ld: empty region\n", i);
+			continue;
+		}
+		dprintf("%" B_PRIu32 ": base = %" B_PRIu64 ","
+			"size = %" B_PRIu64 "\n", i, base, size);
+
+		total += size;
+
+		if (insert_physical_memory_range(base, size) != B_OK) {
+			dprintf("cannot map physical memory range "
+				"(num ranges = %" B_PRIu32 ")!\n",
+				gKernelArgs.num_physical_memory_ranges);
+			return B_ERROR;
+		}
+	}
+
+	return B_OK;
+}
+
+
 extern "C" void
 mmu_init(void)
 {
 	TRACE(("mmu_init\n"));
+
+	// skip RAM check if already done (rPi)
+	if (gKernelArgs.num_physical_memory_ranges == 0) {
+		// get map of physical memory (fill in kernel_args structure)
+
+		uint64 total;
+		if (find_physical_memory_ranges(total) != B_OK) {
+			dprintf("Error: could not find physical memory ranges!\n");
+
+#ifdef SDRAM_BASE
+			dprintf("Defaulting to 32MB at %" B_PRIx64 "\n", (uint64)SDRAM_BASE);
+			// specify available physical memory, using 32MB for now, since our
+			// ARMv5 targets have very little by default.
+			total = 32 * 1024 * 1024;
+			insert_physical_memory_range(SDRAM_BASE, total);
+#else
+			return /*B_ERROR*/;
+#endif
+		}
+		dprintf("total physical memory = %" B_PRId64 "MB\n", total / (1024 * 1024));
+	}
 
 	// see if subpages are disabled
 	if (mmu_read_C1() & (1 << 23))
