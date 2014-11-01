@@ -317,6 +317,12 @@ public:
 			void				SetRatingSummary(const RatingSummary& summary);
 			RatingSummary		CalculateRatingSummary() const;
 
+			void				SetProminence(float prominence);
+			float				Prominence() const
+									{ return fProminence; }
+			bool				HasProminence() const
+									{ return fProminence != 0.0f; }
+
 			void				ClearScreenshotInfos();
 			bool				AddScreenshotInfo(const ScreenshotInfo& info);
 			const ScreenshotInfoList& ScreenshotInfos() const
@@ -348,6 +354,7 @@ private:
 			CategoryList		fCategories;
 			UserRatingList		fUserRatings;
 			RatingSummary		fCachedRatingSummary;
+			float				fProminence;
 			ScreenshotInfoList	fScreenshotInfos;
 			BitmapList			fScreenshots;
 			PackageState		fState;

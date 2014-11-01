@@ -463,6 +463,7 @@ PackageInfo::PackageInfo()
 	fChangelog(),
 	fUserRatings(),
 	fCachedRatingSummary(),
+	fProminence(0.0f),
 	fScreenshotInfos(),
 	fScreenshots(),
 	fState(NONE),
@@ -487,6 +488,7 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fChangelog(),
 	fUserRatings(),
 	fCachedRatingSummary(),
+	fProminence(0.0f),
 	fScreenshotInfos(),
 	fScreenshots(),
 	fState(NONE),
@@ -525,6 +527,7 @@ PackageInfo::PackageInfo(const BString& title,
 	fCategories(),
 	fUserRatings(),
 	fCachedRatingSummary(),
+	fProminence(0.0f),
 	fScreenshotInfos(),
 	fScreenshots(),
 	fState(NONE),
@@ -550,6 +553,7 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fCategories(other.fCategories),
 	fUserRatings(other.fUserRatings),
 	fCachedRatingSummary(other.fCachedRatingSummary),
+	fProminence(other.fProminence),
 	fScreenshotInfos(other.fScreenshotInfos),
 	fScreenshots(other.fScreenshots),
 	fState(other.fState),
@@ -577,6 +581,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fCategories = other.fCategories;
 	fUserRatings = other.fUserRatings;
 	fCachedRatingSummary = other.fCachedRatingSummary;
+	fProminence = other.fProminence;
 	fScreenshotInfos = other.fScreenshotInfos;
 	fScreenshots = other.fScreenshots;
 	fState = other.fState;
@@ -605,6 +610,7 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fCategories == other.fCategories
 		&& fUserRatings == other.fUserRatings
 		&& fCachedRatingSummary == other.fCachedRatingSummary
+		&& fProminence == other.fProminence
 		&& fScreenshotInfos == other.fScreenshotInfos
 		&& fScreenshots == other.fScreenshots
 		&& fState == other.fState
@@ -828,6 +834,16 @@ PackageInfo::CalculateRatingSummary() const
 	summary.ratingCount = ratingsSpecified;
 
 	return summary;
+}
+
+
+void
+PackageInfo::SetProminence(float prominence)
+{
+	if (fProminence != prominence) {
+		fProminence = prominence;
+		_NotifyListeners(PKG_CHANGED_PROMINENCE);
+	}
 }
 
 
