@@ -189,9 +189,6 @@ FeaturedPackagesView::~FeaturedPackagesView()
 void
 FeaturedPackagesView::AddPackage(const PackageInfoRef& package)
 {
-	PackageView* view = new PackageView();
-	view->SetPackage(package);
-
 	// Find insertion index (alphabetical)
 	int32 index = 0;
 	for (int32 i = 0; BLayoutItem* item = fPackageListLayout->ItemAt(i); i++) {
@@ -200,11 +197,17 @@ FeaturedPackagesView::AddPackage(const PackageInfoRef& package)
 			break;
 
 		BString title = view->PackageTitle();
-		if (title.Compare(package->Title()) >= 0)
-			break;
+		if (title == package->Title()) {
+			// Don't add packages more than once
+			return;
+		}
 
-		index++;
+		if (title.Compare(package->Title()) < 0)
+			index++;
 	}
+
+	PackageView* view = new PackageView();
+	view->SetPackage(package);
 
 	fPackageListLayout->AddView(index, view);
 }
