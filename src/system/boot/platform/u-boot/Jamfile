@@ -225,6 +225,9 @@ if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
 }
 
 # flash image targets
+# they currently depend on having an U-Boot binary available
+if $(ubootFile) {
+
 BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img : haiku_loader :
 	$(ubootFile) ;
 NotFile haiku-flash-image ;
@@ -239,6 +242,8 @@ BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img : haiku_lo
 	$(ubootFile) ;
 NotFile haiku-flash-uimage ;
 Depends haiku-flash-uimage : haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img ;
+
+}
 
 # SD/mmc image targets
 BuildUBootSDImage haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_IMAGE) $(HAIKU_BOARD_SDIMAGE_FILES) ;
