@@ -13,6 +13,8 @@
 #include <ServerProtocol.h>
 #include <shared_cursor_area.h>
 
+#include <AppMisc.h>
+
 #include <new>
 #include <stdio.h>
 #include <string.h>
@@ -53,6 +55,8 @@ InputServerStream::InputServerStream(BMessenger& messenger)
 	fLatestMouseMoved(NULL)
 {
 	BMessage message(IS_ACQUIRE_INPUT);
+	message.AddInt32("remote team", BPrivate::current_team());
+
 	fCursorArea = create_area("shared cursor", (void **)&fCursorBuffer, B_ANY_ADDRESS,
 		B_PAGE_SIZE, B_LAZY_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (fCursorArea >= B_OK)

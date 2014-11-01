@@ -243,6 +243,7 @@ class InputServer : public BApplication {
 
 		sem_id 			fCursorSem;
 		port_id			fAppServerPort;
+		team_id			fAppServerTeam;
 		area_id			fCursorArea;
 		shared_cursor*	fCursorBuffer;
 };

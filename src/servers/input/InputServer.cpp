@@ -153,6 +153,7 @@ InputServer::InputServer()
 	fInputMethodAware(false),
 	fCursorSem(-1),
 	fAppServerPort(-1),
+	fAppServerTeam(-1),
 	fCursorArea(-1)
 {
 	CALLED();
@@ -393,6 +394,9 @@ InputServer::_AcquireInput(BMessage& message, BMessage& reply)
 				B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
 		}
 	}
+
+	if (message.FindInt32("remote team", &fAppServerTeam) != B_OK)
+		fAppServerTeam = -1;
 
 	fAppServerPort = create_port(200, "input server target");
 	if (fAppServerPort < B_OK) {
@@ -1836,7 +1840,8 @@ InputServer::_DispatchEvent(BMessage* event)
 
 	BMessenger reply;
 	BMessage::Private messagePrivate(event);
-	return messagePrivate.SendMessage(fAppServerPort, -1, 0, 0, false, reply);
+	return messagePrivate.SendMessage(fAppServerPort, fAppServerTeam, 0, 0,
+		false, reply);
 }
 
 
