@@ -759,8 +759,12 @@ BMessage::Rename(const char* oldEntry, const char* newEntry)
 	if (fHeader == NULL)
 		return B_NO_INIT;
 
-	if (fHeader->message_area >= 0)
-		_CopyForWrite();
+	status_t result;
+	if (fHeader->message_area >= 0) {
+		result = _CopyForWrite();
+		if (result != B_OK)
+			return result;
+	}
 
 	uint32 hash = _HashName(oldEntry) % fHeader->hash_table_size;
 	int32* nextField = &fHeader->hash_table[hash];
@@ -782,7 +786,7 @@ BMessage::Rename(const char* oldEntry, const char* newEntry)
 			*nextField = index;
 
 			int32 newLength = strlen(newEntry) + 1;
-			status_t result = _ResizeData(field->offset + 1,
+			result = _ResizeData(field->offset + 1,
 				newLength - field->name_length);
 			if (result != B_OK)
 				return result;
@@ -1793,11 +1797,15 @@ BMessage::AddData(const char* name, type_code type, const void* data,
 	if (fHeader == NULL)
 		return B_NO_INIT;
 
-	if (fHeader->message_area >= 0)
-		_CopyForWrite();
+	status_t result;
+	if (fHeader->message_area >= 0) {
+		result = _CopyForWrite();
+		if (result != B_OK)
+			return result;
+	}
 
 	field_header* field = NULL;
-	status_t result = _FindField(name, type, &field);
+	result = _FindField(name, type, &field);
 	if (result == B_NAME_NOT_FOUND)
 		result = _AddField(name, type, isFixedSize, &field);
 
@@ -1854,11 +1862,15 @@ BMessage::RemoveData(const char* name, int32 index)
 	if (fHeader == NULL)
 		return B_NO_INIT;
 
-	if (fHeader->message_area >= 0)
-		_CopyForWrite();
+	status_t result;
+	if (fHeader->message_area >= 0) {
+		result = _CopyForWrite();
+		if (result != B_OK)
+			return result;
+	}
 
 	field_header* field = NULL;
-	status_t result = _FindField(name, B_ANY_TYPE, &field);
+	result = _FindField(name, B_ANY_TYPE, &field);
 	if (result != B_OK)
 		return result;
 
@@ -1903,11 +1915,15 @@ BMessage::RemoveName(const char* name)
 	if (fHeader == NULL)
 		return B_NO_INIT;
 
-	if (fHeader->message_area >= 0)
-		_CopyForWrite();
+	status_t result;
+	if (fHeader->message_area >= 0) {
+		result = _CopyForWrite();
+		if (result != B_OK)
+			return result;
+	}
 
 	field_header* field = NULL;
-	status_t result = _FindField(name, B_ANY_TYPE, &field);
+	result = _FindField(name, B_ANY_TYPE, &field);
 	if (result != B_OK)
 		return result;
 
@@ -1976,8 +1992,11 @@ BMessage::ReplaceData(const char* name, type_code type, int32 index,
 	if (index < 0 || (uint32)index >= field->count)
 		return B_BAD_INDEX;
 
-	if (fHeader->message_area >= 0)
-		_CopyForWrite();
+	if (fHeader->message_area >= 0) {
+		result = _CopyForWrite();
+		if (result != B_OK)
+			return result;
+	}
 
 	if ((field->flags & FIELD_FLAG_FIXED_SIZE) != 0) {
 		ssize_t size = field->data_size / field->count;
