@@ -63,10 +63,11 @@ extern "C" void dump_fdt(const void *fdt);
 
 // declared in shell.S
 // those are initialized to NULL but not in the BSS
-extern struct image_header *gUImage;
 extern uboot_gd *gUBootGlobalData;
 extern uint32 gUBootOS;
-extern void *gFDT;
+
+struct image_header *gUImage;
+void *gFDT;
 
 static uint32 sBootOptions;
 
