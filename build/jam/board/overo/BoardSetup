@@ -12,6 +12,7 @@ HAIKU_BOARD_LOADER_BASE = 0x80008000 ;
 # entry points (raw binary, and netbsd loader emulation)
 HAIKU_BOARD_LOADER_ENTRY_RAW = 0x80008000 ;
 HAIKU_BOARD_LOADER_ENTRY_NBSD = 0x80008008 ;
+HAIKU_BOARD_LOADER_ENTRY_LINUX = 0x80008010 ;
 
 HAIKU_BOARD_LOADER_ENTRY = $(HAIKU_BOARD_LOADER_ENTRY_NBSD) ;
 HAIKU_BOARD_LOADER_FAKE_OS = netbsd ;
@@ -71,8 +72,10 @@ HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = boot.scr ;
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
 setenv bootargs debug_screen true; \
 if mmc rescan; then \
-	fatload mmc 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader_nbsd.ub; \
-	bootm $(HAIKU_BOARD_LOADER_UIBASE) ; \
+	fatload mmc 0 0x80100000 $(HAIKU_BOARD_FDT_NAME).dtb ; \
+	fatload mmc 0 0x80200000 haiku-floppyboot.tgz.ub; \
+	fatload mmc 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader_linux.ub; \
+	bootm $(HAIKU_BOARD_LOADER_UIBASE) 0x80200000 0x80100000; \
 fi" ;
 
 HAIKU_BOARD_SDIMAGE_FILES =
@@ -80,7 +83,10 @@ HAIKU_BOARD_SDIMAGE_FILES =
 	$(ubootFile)
 	haiku_loader
 	haiku_loader.ub
+	haiku_loader_linux.ub
 	haiku_loader_nbsd.ub
+	haiku-floppyboot.tgz.ub
+	$(HAIKU_BOARD_FDT_NAME).dtb
 	$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME)
 ;
 
