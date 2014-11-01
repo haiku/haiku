@@ -8,6 +8,13 @@ Server keystore_server :
 	Keyring.cpp
 	KeyStoreServer.cpp
 
-	: be [ TargetLibstdc++ ]
+	: be localestub [ TargetLibstdc++ ]
 	: keystore_server.rdef
+;
+
+DoCatalogs keystore_server :
+    x-vnd.Haiku-keystore_server
+    :
+	AppAccessRequestWindow.cpp
+	KeyRequestWindow.cpp
 ;

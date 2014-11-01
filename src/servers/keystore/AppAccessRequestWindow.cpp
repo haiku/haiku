@@ -7,6 +7,7 @@
 #include "AppAccessRequestWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <GridLayout.h>
 #include <GridView.h>
@@ -21,6 +22,10 @@
 #include <View.h>
 
 #include <new>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AppAccessRequestWindow"
 
 
 static const uint32 kMessageDisallow = 'btda';
@@ -53,27 +58,32 @@ public:
 			return;
 
 		BString details;
-		details << "The application:\n"
-			<< signature << " (" << path << ")\n\n";
+		details <<  B_TRANSLATE("The application:\n"
+			"%signature% (%path%)\n\n");
+		details.ReplaceFirst("%signature%", signature);
+		details.ReplaceFirst("%path%", path);
 
 		if (keyringName != NULL) {
-			details << "requests access to keyring:\n"
-				<< keyringName << "\n\n";
+			details <<  B_TRANSLATE("requests access to keyring:\n"
+				"%keyringName%\n\n");
+			details.ReplaceFirst("%keyringName%", keyringName);
 		}
 
 		if (accessString != NULL) {
-			details << "to perform the following action:\n"
-				<< accessString << "\n\n";
+			details <<  B_TRANSLATE("to perform the following action:\n"
+				"%accessString%\n\n");
+			details.ReplaceFirst("%accessString%", accessString);
 		}
 
 		if (appIsNew)
-			details << "This application hasn't been granted access before.";
+			details <<  B_TRANSLATE("This application hasn't been granted "
+			"access before.");
 		else if (appWasUpdated) {
-			details << "This application has been updated since it was last"
-				<< " granted access.";
+			details <<  B_TRANSLATE("This application has been updated since "
+			"it was last granted access.");
 		} else {
-			details << "This application doesn't yet have the required"
-				" privileges.";
+			details <<  B_TRANSLATE("This application doesn't yet have the "
+			"required privileges.");
 		}
 
 		message->SetText(details);
@@ -92,17 +102,17 @@ public:
 		if (buttons == NULL)
 			return;
 
-		fDisallowButton = new(std::nothrow) BButton("Disallow",
+		fDisallowButton = new(std::nothrow) BButton(B_TRANSLATE("Disallow"),
 			new BMessage(kMessageDisallow));
 		buttons->GroupLayout()->AddView(fDisallowButton);
 
 		buttons->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
-		fOnceButton = new(std::nothrow) BButton("Allow Once",
+		fOnceButton = new(std::nothrow) BButton(B_TRANSLATE("Allow once"),
 			new BMessage(kMessageOnce));
 		buttons->GroupLayout()->AddView(fOnceButton);
 
-		fAlwaysButton = new(std::nothrow) BButton("Allow Always",
+		fAlwaysButton = new(std::nothrow) BButton(B_TRANSLATE("Allow always"),
 			new BMessage(kMessageAlways));
 		buttons->GroupLayout()->AddView(fAlwaysButton);
 
@@ -132,7 +142,7 @@ AppAccessRequestWindow::AppAccessRequestWindow(const char* keyringName,
 	const char* signature, const char* path, const char* accessString,
 	bool appIsNew, bool appWasUpdated)
 	:
-	BWindow(BRect(50, 50, 269, 302), "Application Keyring Access",
+	BWindow(BRect(50, 50, 269, 302), B_TRANSLATE("Application keyring access"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
 			| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fRequestView(NULL),

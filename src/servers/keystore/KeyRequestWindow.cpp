@@ -7,6 +7,7 @@
 #include "KeyRequestWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <GridLayout.h>
 #include <GridView.h>
@@ -24,6 +25,10 @@
 #include <View.h>
 
 #include <new>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "KeyRequestWindow"
 
 
 static const uint32 kMessageCancel = 'btcl';
@@ -57,7 +62,7 @@ public:
 		layout->SetSpacing(inset, inset);
 
 		BStringView* label = new(std::nothrow) BStringView("keyringLabel",
-			"Keyring:");
+			B_TRANSLATE("Keyring:"));
 		if (label == NULL)
 			return;
 
@@ -70,7 +75,7 @@ public:
 
 		layout->AddView(fKeyringName, 1, row++);
 
-		fPassword = new(std::nothrow) BTextControl("Password:", "", NULL);
+		fPassword = new(std::nothrow) BTextControl(B_TRANSLATE("Password:"), "", NULL);
 		if (fPassword == NULL)
 			return;
 
@@ -86,23 +91,23 @@ public:
 		if (buttons == NULL)
 			return;
 
-		fCancelButton = new(std::nothrow) BButton("Cancel",
+		fCancelButton = new(std::nothrow) BButton(B_TRANSLATE("Cancel"),
 			new BMessage(kMessageCancel));
 		buttons->GroupLayout()->AddView(fCancelButton);
 
 		buttons->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
-		fUnlockButton = new(std::nothrow) BButton("Unlock",
+		fUnlockButton = new(std::nothrow) BButton(B_TRANSLATE("Unlock"),
 			new BMessage(kMessageUnlock));
 		buttons->GroupLayout()->AddView(fUnlockButton);
 
 		BTextView* message = new(std::nothrow) BTextView("message");
-		message->SetText("An application wants to access the keyring below, "
-			"but it is locked with a passphrase. Please enter the passphrase "
-			"to unlock the keyring.\n"
+		message->SetText(B_TRANSLATE("An application wants to access the "
+			"keyring below, but it is locked with a passphrase. Please enter "
+			"the passphrase to unlock the keyring.\n"
 			"If you unlock the keyring, it stays unlocked until the system is "
 			"shut down or the keyring is manually locked again.\n"
-			"If you cancel this dialog the keyring will remain locked.");
+			"If you cancel this dialog the keyring will remain locked."));
 		message->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
 		message->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
@@ -147,7 +152,7 @@ private:
 
 KeyRequestWindow::KeyRequestWindow()
 	:
-	BWindow(BRect(50, 50, 269, 302), "Unlock Keyring",
+	BWindow(BRect(50, 50, 269, 302), B_TRANSLATE("Unlock keyring"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
 			| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fRequestView(NULL),
