@@ -3925,7 +3925,7 @@ check_access_permissions(int accessMode, mode_t mode, gid_t nodeGroupID,
 		permissions = otherPermissions;
 	}
 
-	return (accessMode & ~permissions) == 0 ? B_OK : B_NOT_ALLOWED;
+	return (accessMode & ~permissions) == 0 ? B_OK : B_PERMISSION_DENIED;
 }
 
 
