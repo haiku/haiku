@@ -428,6 +428,10 @@ acquire_spinlock_nocheck(spinlock *lock)
 			if (atomic_get_and_set(&lock->lock, 1) == 0)
 				break;
 		}
+
+#	if DEBUG_SPINLOCKS
+		push_lock_caller(arch_debug_get_caller(), lock);
+#	endif
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
@@ -437,6 +441,8 @@ acquire_spinlock_nocheck(spinlock *lock)
 				"on non-SMP system (last caller: %p, value %" B_PRIx32 ")",
 				lock, find_lock_caller(lock), oldValue);
 		}
+
+		push_lock_caller(arch_debug_get_caller(), lock);
 #endif
 	}
 }
