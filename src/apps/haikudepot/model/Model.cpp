@@ -70,6 +70,11 @@ public:
 		return fDepot.Packages().Contains(package);
 	}
 
+	const BString& Depot() const
+	{
+		return fDepot.Name();
+	}
+
 private:
 	DepotInfo	fDepot;
 };
@@ -97,6 +102,11 @@ public:
 				return true;
 		}
 		return false;
+	}
+
+	const BString& Category() const
+	{
+		return fCategory;
 	}
 
 private:
@@ -235,6 +245,20 @@ public:
 		return true;
 	}
 
+	BString SearchTerms() const
+	{
+		BString searchTerms;
+		for (int32 i = 0; i < fSearchTerms.CountItems(); i++) {
+			const BString& term = fSearchTerms.ItemAtFast(i);
+			if (term.IsEmpty())
+				continue;
+			if (!searchTerms.IsEmpty())
+				searchTerms.Append(" ");
+			searchTerms.Append(term);
+		}
+		return searchTerms;
+	}
+
 private:
 	bool _TextContains(BString text, const BString& string) const
 	{
@@ -244,7 +268,7 @@ private:
 	}
 
 private:
-	List<BString, false>	fSearchTerms;
+	StringList fSearchTerms;
 };
 
 
@@ -477,10 +501,28 @@ Model::SetCategory(const BString& category)
 }
 
 
+BString
+Model::Category() const
+{
+	CategoryFilter* filter
+		= dynamic_cast<CategoryFilter*>(fCategoryFilter.Get());
+	if (filter == NULL)
+		return "";
+	return filter->Category();
+}
+
+
 void
 Model::SetDepot(const BString& depot)
 {
 	fDepotFilter = depot;
+}
+
+
+BString
+Model::Depot() const
+{
+	return fDepotFilter;
 }
 
 
@@ -495,6 +537,17 @@ Model::SetSearchTerms(const BString& searchTerms)
 		filter = new SearchTermsFilter(searchTerms);
 
 	fSearchTermsFilter.SetTo(filter, true);
+}
+
+
+BString
+Model::SearchTerms() const
+{
+	SearchTermsFilter* filter
+		= dynamic_cast<SearchTermsFilter*>(fSearchTermsFilter.Get());
+	if (filter == NULL)
+		return "";
+	return filter->SearchTerms();
 }
 
 

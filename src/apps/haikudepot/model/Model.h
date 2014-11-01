@@ -91,8 +91,11 @@ public:
 
 			// Configure PackageFilters
 			void				SetCategory(const BString& category);
+			BString				Category() const;
 			void				SetDepot(const BString& depot);
+			BString				Depot() const;
 			void				SetSearchTerms(const BString& searchTerms);
+			BString				SearchTerms() const;
 
 			void				SetShowAvailablePackages(bool show);
 			bool				ShowAvailablePackages() const
