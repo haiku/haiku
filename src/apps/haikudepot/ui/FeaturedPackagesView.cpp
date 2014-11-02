@@ -16,6 +16,7 @@
 #include <SpaceLayoutItem.h>
 
 #include "BitmapView.h"
+#include "MainWindow.h"
 #include "MessagePackageListener.h"
 #include "RatingView.h"
 #include "ScrollableGroupView.h"
@@ -40,6 +41,7 @@ public:
 			new(std::nothrow) OnePackageMessagePackageListener(this))
 	{
 		SetViewColor(255, 255, 255);
+		SetEventMask(B_POINTER_EVENTS);
 		
 		fIconView = new BitmapView("package icon view");
 		fTitleView = new BStringView("package title view", "");
@@ -104,6 +106,15 @@ public:
 				SetPackage(fPackageListener->Package());
 				break;
 			}
+		}
+	}
+	
+	virtual void MouseDown(BPoint where)
+	{
+		if (Bounds().Contains(where)) {
+			BMessage message(MSG_PACKAGE_SELECTED);
+			message.AddString("title", PackageTitle());
+			Window()->PostMessage(&message);
 		}
 	}
 
