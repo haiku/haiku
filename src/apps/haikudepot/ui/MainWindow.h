@@ -27,6 +27,7 @@ class PackageListView;
 
 enum {
 	MSG_MAIN_WINDOW_CLOSED		= 'mwcl',
+	MSG_PACKAGE_SELECTED		= 'pkgs',
 };
 
 

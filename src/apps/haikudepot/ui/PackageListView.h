@@ -17,11 +17,6 @@
 class PackageRow;
 class PackageListener;
 
-enum {
-	MSG_PACKAGE_SELECTED		= 'pkgs',
-};
-
-
 class PackageListView : public BColumnListView {
 public:
 								PackageListView(BLocker* modelLock);

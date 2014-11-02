@@ -15,6 +15,8 @@
 #include <ScrollBar.h>
 #include <Window.h>
 
+#include "MainWindow.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PackageListView"
