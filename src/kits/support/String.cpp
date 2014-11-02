@@ -474,6 +474,25 @@ BString::SetToFormatVarArgs(const char* format, va_list args)
 }
 
 
+int
+BString::ScanWithFormat(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	int result = ScanWithFormatVarArgs(format, args);
+	va_end(args);
+
+	return result;
+}
+
+
+int
+BString::ScanWithFormatVarArgs(const char* format, va_list args)
+{
+	return vsscanf(fPrivateData, format, args);
+}
+
+
 //	#pragma mark - Substring copying
 
 

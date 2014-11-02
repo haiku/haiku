@@ -61,6 +61,12 @@ public:
 								va_list args)
 								__attribute__((__format__(__printf__, 2, 0)));
 
+			int				ScanWithFormat(const char* format, ...)
+								__attribute__((__format__(__scanf__, 2, 3)));
+			int				ScanWithFormatVarArgs(const char* format,
+								va_list args)
+								__attribute__((__format__(__scanf__, 2, 0)));
+
 			// Substring copying
 			BString&		CopyInto(BString& into, int32 fromOffset,
 								int32 length) const;
