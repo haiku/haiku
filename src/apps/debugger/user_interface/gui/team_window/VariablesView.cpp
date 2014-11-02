@@ -354,9 +354,8 @@ private:
 private:
 	void _CompareValues()
 	{
-		if (fValue == NULL)
-			fValueChanged = false;
-		else {
+		fValueChanged = false;
+		if (fValue != NULL && fPreviousValue.Type() != 0) {
 			BVariant newValue;
 			fValue->ToVariant(newValue);
 			fValueChanged = (fPreviousValue != newValue);
