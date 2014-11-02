@@ -17,6 +17,7 @@
 
 #include "BitmapView.h"
 #include "MainWindow.h"
+#include "MarkupTextView.h"
 #include "MessagePackageListener.h"
 #include "RatingView.h"
 #include "ScrollableGroupView.h"
@@ -64,14 +65,22 @@ public:
 		fPublisherView->SetFont(&font);
 		fPublisherView->SetHighColor(kLightBlack);
 
-		// slightly bigger font
-		GetFont(&font);
-		font.SetSize(ceilf(font.Size() * 1.2f));
-
 		// Version info
-		fVersionInfo = new BStringView("package version info", "");
-		fVersionInfo->SetFont(&font);
-		fVersionInfo->SetHighColor(kLightBlack);
+		fSummaryView = new MarkupTextView("package summary");
+
+		// Rating view
+		fRatingView = new RatingView("package rating view");
+
+		fAvgRating = new BStringView("package average rating", "");
+		fAvgRating->SetFont(&font);
+		fAvgRating->SetHighColor(kLightBlack);
+
+		fVoteInfo = new BStringView("package vote info", "");
+		// small font
+		GetFont(&font);
+		font.SetSize(std::max(9.0f, floorf(font.Size() * 0.85f)));
+		fVoteInfo->SetFont(&font);
+		fVoteInfo->SetHighColor(kLightBlack);
 
 		BLayoutBuilder::Group<>(this)
 			.Add(fIconView)
@@ -81,11 +90,14 @@ public:
 				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 			.End()
 			.AddGlue(0.1f)
-			.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING, 2.0f)
-				.Add(fVersionInfo)
-				.AddGlue()
-				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
+			.AddGroup(B_HORIZONTAL, 0.8f)
+				.Add(fRatingView)
+				.Add(fAvgRating)
+				.Add(fVoteInfo)
 			.End()
+			.AddGlue(0.2f)
+			.Add(fSummaryView, 2.0f)
+
 			.SetInsets(B_USE_WINDOW_INSETS)
 		;
 
@@ -138,9 +150,29 @@ public:
 		BString publisher = package->Publisher().Name();
 		fPublisherView->SetText(publisher);
 
-		BString version = B_TRANSLATE("%Version%");
-		version.ReplaceAll("%Version%", package->Version().ToString());
-		fVersionInfo->SetText(version);
+		BString summary = package->ShortDescription();
+		fSummaryView->SetText(summary);
+
+		RatingSummary ratingSummary = package->CalculateRatingSummary();
+
+		fRatingView->SetRating(ratingSummary.averageRating);
+
+		if (ratingSummary.ratingCount > 0) {
+			BString avgRating;
+			avgRating.SetToFormat("%.1f", ratingSummary.averageRating);
+			fAvgRating->SetText(avgRating);
+
+			BString votes;
+			votes.SetToFormat("%d", ratingSummary.ratingCount);
+
+			BString voteInfo(B_TRANSLATE("(%Votes%)"));
+			voteInfo.ReplaceAll("%Votes%", votes);
+
+			fVoteInfo->SetText(voteInfo);
+		} else {
+			fAvgRating->SetText("");
+			fVoteInfo->SetText("");
+		}
 
 		InvalidateLayout();
 		Invalidate();
@@ -153,7 +185,10 @@ public:
 		fIconView->SetBitmap(NULL);
 		fTitleView->SetText("");
 		fPublisherView->SetText("");
-		fVersionInfo->SetText("");
+		fSummaryView->SetText("");
+		fRatingView->SetRating(-1.0f);
+		fAvgRating->SetText("");
+		fVoteInfo->SetText("");
 	}
 
 	const char* PackageTitle() const
@@ -169,7 +204,11 @@ private:
 	BStringView*					fTitleView;
 	BStringView*					fPublisherView;
 
-	BStringView*					fVersionInfo;
+	MarkupTextView*					fSummaryView;
+
+	RatingView*						fRatingView;
+	BStringView*					fAvgRating;
+	BStringView*					fVoteInfo;
 };
 
 
