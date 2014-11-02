@@ -600,7 +600,7 @@ MainWindow::_AdoptModel()
 bool
 MainWindow::_IsProminentPackage(const PackageInfoRef& package) const
 {
-	return package->HasProminence() && package->Prominence() <= 100
+	return package->HasProminence() && package->Prominence() <= 200
 		&& package->State() != ACTIVATED;
 }
 
