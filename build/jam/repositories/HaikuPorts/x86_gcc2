@@ -244,6 +244,8 @@ RemotePackageRepository HaikuPorts
 	pkgconfig-0.27.1-1
 	popt-1.16-1
 	popt_devel-1.16-1
+	psiconv-0.9.8-1
+	psiconv_devel-0.9.8-1
 	python-2.7.6-4
 	python_dateutil-1.5-2
 	python_lxml-3.3.5-2
@@ -812,6 +814,7 @@ RemotePackageRepository HaikuPorts
 	popt
 	protobuf_x86
 	protrekkr_x86
+	psiconv
 	python
 	python_dateutil
 	python_lxml
