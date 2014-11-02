@@ -8,20 +8,22 @@
 
 
 #include <GroupView.h>
+#include <util/OpenHashTable.h>
 
 #include "table/TreeTable.h"
 
 
 class ActionMenuItem;
 class CpuState;
+class ExpressionInfo;
 class SettingsMenu;
 class StackFrame;
-class StackFrameValues;
 class Thread;
 class Type;
 class TypeComponentPath;
 class ValueNode;
 class ValueNodeContainer;
+class Value;
 class Variable;
 class VariablesViewState;
 class VariablesViewStateHistory;
@@ -68,13 +70,22 @@ private:
 			class ContextMenu;
 			class TableCellContextMenuTracker;
 			typedef BObjectList<ActionMenuItem> ContextActionList;
+			typedef BObjectList<ExpressionInfo> ExpressionInfoList;
+
+			struct FunctionKey;
+			struct ExpressionInfoEntry;
+			struct ExpressionInfoEntryHashDefinition;
+
+			typedef BOpenHashTable<ExpressionInfoEntryHashDefinition>
+				ExpressionInfoTable;
 
 private:
 			void				_Init();
 
 			void				_RequestNodeValue(ModelNode* node);
 			status_t			_GetContextActionsForNode(ModelNode* node,
-									ContextActionList* actions);
+									ContextActionList*& _preActions,
+									ContextActionList*& _postActions);
 			status_t			_AddContextAction(const char* action,
 									uint32 what, ContextActionList* actions,
 									BMessage*& _message);
@@ -91,6 +102,19 @@ private:
 									TreeTablePath& path);
 			void				_CopyVariableValueToClipboard();
 
+			status_t			_AddExpression(const char* expression,
+									Type* resultType);
+			void				_RemoveExpression(ModelNode* node);
+
+			status_t			_AddExpressionNode(const ExpressionInfo& info);
+			void				_RestoreExpressionNodes();
+
+			void				_SetExpressionNodeValue(const char* expression,
+									status_t finalResult, Value* value);
+
+			status_t			_GetTypeForTypeCode(int32 typeCode,
+									Type*& _resultType) const;
+
 private:
 			Thread*				fThread;
 			StackFrame*			fStackFrame;
@@ -99,6 +123,7 @@ private:
 			ContainerListener*	fContainerListener;
 			VariablesViewState*	fPreviousViewState;
 			VariablesViewStateHistory* fViewStateHistory;
+			ExpressionInfoTable* fExpressions;
 			TableCellContextMenuTracker* fTableCellContextMenuTracker;
 			bool				fFrameClearPending;
 			Listener*			fListener;
@@ -112,6 +137,12 @@ public:
 	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
 									ValueNodeContainer* container,
 									ValueNode* valueNode) = 0;
+
+	virtual	void				ExpressionEvaluationRequested(
+									const char* expression,
+									type_code resultType,
+									StackFrame* frame,
+									Thread* thread) = 0;
 };
 
 

@@ -58,6 +58,7 @@
 #include "TypeComponentPath.h"
 #include "UiUtils.h"
 #include "UserInterface.h"
+#include "Value.h"
 #include "Variable.h"
 #include "WatchPromptWindow.h"
 
@@ -907,6 +908,20 @@ TeamWindow::ValueNodeValueRequested(CpuState* cpuState,
 
 
 void
+TeamWindow::ExpressionEvaluationRequested(const char* expression,
+	type_code resultType, StackFrame* frame, ::Thread* thread)
+{
+	SourceLanguage* language;
+	if (_GetActiveSourceLanguage(language) != B_OK)
+		return;
+
+	BReference<SourceLanguage> languageReference(language, true);
+	fListener->ExpressionEvaluationRequested(language, expression, resultType,
+		frame, thread);
+}
+
+
+void
 TeamWindow::ThreadStateChanged(const Team::ThreadEvent& event)
 {
 	BMessage message(MSG_THREAD_STATE_CHANGED);
@@ -973,6 +988,32 @@ TeamWindow::WatchpointChanged(const Team::WatchpointEvent& event)
 		&& PostMessage(&message) == B_OK) {
 		watchpointReference.Detach();
 	}
+}
+
+
+void
+TeamWindow::ExpressionEvaluated(const Team::ExpressionEvaluationEvent& event)
+{
+	BMessage message(MSG_EXPRESSION_EVALUATED);
+	if (message.AddString("expression", event.GetExpression()) != B_OK
+		|| message.AddInt32("result", event.GetResult()) != B_OK) {
+		return;
+	}
+
+	BReference<Value> reference;
+	Value* value = event.GetValue();
+	if (value != NULL) {
+		if (message.AddPointer("value", value) != B_OK)
+			return;
+		reference.SetTo(value);
+	}
+
+	// currently, the only circumstance in which TeamWindow cares about
+	// expression evaluation results is when handling them on behalf of
+	// VariablesView. As such, simply forward them on.
+	BMessenger messenger(fVariablesView);
+	if (messenger.SendMessage(&message) == B_OK)
+		reference.Detach();
 }
 
 

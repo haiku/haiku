@@ -25,6 +25,9 @@
 
 #include "ActionMenuItem.h"
 #include "Architecture.h"
+#include "ExpressionInfo.h"
+#include "ExpressionValueNode.h"
+#include "ExpressionValues.h"
 #include "FileSourceCode.h"
 #include "Function.h"
 #include "FunctionID.h"
@@ -38,6 +41,7 @@
 #include "StackTrace.h"
 #include "StackFrame.h"
 #include "StackFrameValues.h"
+#include "SyntheticPrimitiveType.h"
 #include "TableCellValueRenderer.h"
 #include "Team.h"
 #include "TeamDebugInfo.h"
@@ -67,12 +71,114 @@ enum {
 enum {
 	MSG_MODEL_NODE_HIDDEN			= 'monh',
 	MSG_VALUE_NODE_NEEDS_VALUE		= 'mvnv',
-	MSG_RESTORE_PARTIAL_VIEW_STATE	= 'mpvs'
+	MSG_RESTORE_PARTIAL_VIEW_STATE	= 'mpvs',
+	MSG_ADD_WATCH_EXPRESSION		= 'awex',
+	MSG_REMOVE_WATCH_EXPRESSION		= 'rwex'
 };
 
 
 // maximum number of array elements to show by default
 static const uint64 kMaxArrayElementCount = 10;
+
+
+// #pragma mark - FunctionKey
+
+
+struct VariablesView::FunctionKey {
+	FunctionID*			function;
+
+	FunctionKey(FunctionID* function)
+		:
+		function(function)
+	{
+	}
+
+	uint32 HashValue() const
+	{
+		return function->HashValue();
+	}
+
+	bool operator==(const FunctionKey& other) const
+	{
+		return *function == *other.function;
+	}
+};
+
+
+// #pragma mark - ExpressionInfoEntry
+
+
+struct VariablesView::ExpressionInfoEntry : FunctionKey, ExpressionInfoList {
+	ExpressionInfoEntry* next;
+
+	ExpressionInfoEntry(FunctionID* function)
+		:
+		FunctionKey(function),
+		ExpressionInfoList(10, false)
+	{
+		function->AcquireReference();
+	}
+
+	~ExpressionInfoEntry()
+	{
+		_Cleanup();
+	}
+
+	void SetInfo(const ExpressionInfoList& infoList)
+	{
+		_Cleanup();
+
+		for (int32 i = 0; i < infoList.CountItems(); i++) {
+			ExpressionInfo* info = infoList.ItemAt(i);
+			if (!AddItem(info))
+				break;
+
+			info->AcquireReference();
+		}
+	}
+
+private:
+	void _Cleanup()
+	{
+		for (int32 i = 0; i < CountItems(); i++)
+			ItemAt(i)->ReleaseReference();
+
+		MakeEmpty();
+	}
+};
+
+
+// #pragma mark - ExpressionInfoEntryHashDefinition
+
+
+struct VariablesView::ExpressionInfoEntryHashDefinition {
+	typedef FunctionKey		KeyType;
+	typedef	ExpressionInfoEntry	ValueType;
+
+	size_t HashKey(const FunctionKey& key) const
+	{
+		return key.HashValue();
+	}
+
+	size_t Hash(const ExpressionInfoEntry* value) const
+	{
+		return value->HashValue();
+	}
+
+	bool Compare(const FunctionKey& key,
+		const ExpressionInfoEntry* value) const
+	{
+		return key == *value;
+	}
+
+	ExpressionInfoEntry*& GetLink(ExpressionInfoEntry* value) const
+	{
+		return value->next;
+	}
+};
+
+
+// #pragma mark - ContainerListener
 
 
 class VariablesView::ContainerListener : public ValueNodeContainer::Listener {
@@ -97,6 +203,9 @@ private:
 			BHandler*			fIndirectTarget;
 			VariableTableModel*	fModel;
 };
+
+
+// #pragma mark - ModelNode
 
 
 class VariablesView::ModelNode : public BReferenceable {
@@ -377,6 +486,7 @@ private:
 	bool					fIsPresentationNode;
 	bool					fHidden;
 	bool					fValueChanged;
+	bool					fIsExpression;
 
 public:
 	ModelNode*			fNext;
@@ -482,6 +592,9 @@ public:
 	virtual	bool				GetToolTipForTablePath(
 									const TreeTablePath& path,
 									int32 columnIndex, BToolTip** _tip);
+
+			status_t			AddSyntheticNode(ModelNode* node);
+			void				RemoveSyntheticNode(ModelNode* node);
 
 private:
 			struct NodeHashDefinition {
@@ -1354,6 +1467,47 @@ VariablesView::VariableTableModel::GetToolTipForTablePath(
 
 
 status_t
+VariablesView::VariableTableModel::AddSyntheticNode(ModelNode* node)
+{
+	status_t error = node->Init();
+	if (error != B_OK)
+		return error;
+
+	int32 index = fNodes.CountItems();
+
+	if (!fNodes.AddItem(node)) {
+		return B_NO_MEMORY;
+		// NB: we take over the caller's reference
+	}
+
+	fNodeTable.Insert(node);
+
+	node->NodeChild()->Node()->SetContainer(fNodeManager->GetContainer());
+
+	NotifyNodesAdded(TreeTablePath(), index, 1);
+
+	return B_OK;
+}
+
+
+void
+VariablesView::VariableTableModel::RemoveSyntheticNode(ModelNode* node)
+{
+	int32 index = fNodes.IndexOf(node);
+	if (index < 0)
+		return;
+
+	fNodeTable.Remove(node);
+
+	fNodes.RemoveItemAt(index);
+
+	NotifyNodesRemoved(TreeTablePath(), index, 1);
+
+	node->ReleaseReference();
+}
+
+
+status_t
 VariablesView::VariableTableModel::_AddNode(Variable* variable,
 	ModelNode* parent, ValueNodeChild* nodeChild, bool isPresentationNode,
 	bool isOnlyChild)
@@ -1460,6 +1614,7 @@ VariablesView::VariablesView(Listener* listener)
 	fContainerListener(NULL),
 	fPreviousViewState(NULL),
 	fViewStateHistory(NULL),
+	fExpressions(NULL),
 	fTableCellContextMenuTracker(NULL),
 	fFrameClearPending(false),
 	fListener(listener)
@@ -1539,6 +1694,8 @@ VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 			ModelNode* node = (ModelNode*)fVariableTableModel->ChildAt(root, i);
 			_RequestNodeValue(node);
 		}
+
+		_RestoreExpressionNodes();
 	}
 
 	_RestoreViewState();
@@ -1757,6 +1914,66 @@ VariablesView::MessageReceived(BMessage* message)
 			looperMessage.AddInt32("length", piece.size);
 			looperMessage.AddUInt32("type", B_DATA_READ_WRITE_WATCHPOINT);
 			Looper()->PostMessage(&looperMessage);
+			break;
+		}
+		case MSG_ADD_WATCH_EXPRESSION:
+		{
+			BMessage looperMessage(MSG_SHOW_EXPRESSION_PROMPT_WINDOW);
+			looperMessage.AddPointer("target", this);
+			Looper()->PostMessage(&looperMessage);
+			break;
+		}
+		case MSG_REMOVE_WATCH_EXPRESSION:
+		{
+			ModelNode* node;
+			if (message->FindPointer("node", reinterpret_cast<void**>(&node))
+				!= B_OK) {
+				break;
+			}
+
+			_RemoveExpression(node);
+			break;
+		}
+		case MSG_ADD_NEW_EXPRESSION:
+		{
+			const char* expression;
+			int32 type;
+			Type* resultType;
+			if (message->FindString("expression", &expression) != B_OK
+				|| message->FindInt32("type", &type) != B_OK
+				|| _GetTypeForTypeCode(type, resultType) != B_OK) {
+				break;
+			}
+
+			BReference<Type> typeReference(resultType, true);
+
+			status_t error = _AddExpression(expression, resultType);
+			if (error != B_OK) {
+				// TODO: notify user of failure
+				break;
+			}
+
+			fListener->ExpressionEvaluationRequested(expression, type,
+				fStackFrame, fThread);
+			break;
+		}
+		case MSG_EXPRESSION_EVALUATED:
+		{
+			const char* expression;
+			status_t result;
+			Value* value = NULL;
+			if (message->FindString("expression", &expression) != B_OK
+				|| message->FindInt32("result", &result) != B_OK) {
+				break;
+			}
+
+			BReference<Value> valueReference;
+			if (message->FindPointer("value", reinterpret_cast<void**>(&value))
+				== B_OK) {
+				valueReference.SetTo(value, true);
+			}
+
+			_SetExpressionNodeValue(expression, result, value);
 			break;
 		}
 		case MSG_VALUE_NODE_CHANGED:
@@ -1980,19 +2197,23 @@ VariablesView::TreeTableCellMouseDown(TreeTable* table,
 		TableCellContextMenuTracker(node, Looper(), this);
 	BReference<TableCellContextMenuTracker> trackerReference(tracker);
 
-	ContextActionList* preActionList = new(std::nothrow) ContextActionList;
-	if (preActionList == NULL)
+	ContextActionList* preActionList;
+	ContextActionList* postActionList;
+
+	error = _GetContextActionsForNode(node, preActionList, postActionList);
+	if (error != B_OK)
 		return;
 
 	BPrivate::ObjectDeleter<ContextActionList> preActionListDeleter(
 		preActionList);
 
-	error = _GetContextActionsForNode(node, preActionList);
-	if (error != B_OK)
-		return;
+	BPrivate::ObjectDeleter<ContextActionList> postActionListDeleter(
+		postActionList);
 
-	if (tracker == NULL || tracker->Init(settings, settingsMenu, preActionList) != B_OK)
+	if (tracker == NULL || tracker->Init(settings, settingsMenu, preActionList,
+		postActionList) != B_OK) {
 		return;
+	}
 
 	fTableCellContextMenuTracker = trackerReference.Detach();
 	fTableCellContextMenuTracker->ShowMenu(screenWhere);
@@ -2027,6 +2248,10 @@ VariablesView::_Init()
 
 	fViewStateHistory = new VariablesViewStateHistory;
 	if (fViewStateHistory->Init() != B_OK)
+		throw std::bad_alloc();
+
+	fExpressions = new ExpressionInfoTable();
+	if (fExpressions->Init() != B_OK)
 		throw std::bad_alloc();
 }
 
@@ -2077,73 +2302,108 @@ VariablesView::_RequestNodeValue(ModelNode* node)
 
 status_t
 VariablesView::_GetContextActionsForNode(ModelNode* node,
-	ContextActionList* actions)
+	ContextActionList*& _preActions, ContextActionList*& _postActions)
 {
+	_preActions = NULL;
+	_postActions = NULL;
+
 	ValueLocation* location = node->NodeChild()->Location();
-	if (location == NULL)
-		return B_OK;
+
+	_preActions = new(std::nothrow) ContextActionList;
+	if (_preActions == NULL)
+		return B_NO_MEMORY;
+
+	BPrivate::ObjectDeleter<ContextActionList> preActionListDeleter(
+		_preActions);
 
 	status_t result = B_OK;
 	BMessage* message = NULL;
 
 	// only show the Inspect option if the value is in fact located
 	// in memory.
-	if (location->PieceAt(0).type == VALUE_PIECE_LOCATION_MEMORY) {
-		result = _AddContextAction("Inspect", MSG_SHOW_INSPECTOR_WINDOW,
-			actions, message);
-		if (result != B_OK)
-			return result;
-		message->AddUInt64("address", location->PieceAt(0).address);
-	}
-
-	ValueNode* valueNode = node->NodeChild()->Node();
-
-	if (valueNode != NULL) {
-		AddressType* type = dynamic_cast<AddressType*>(valueNode->GetType());
-		if (type != NULL && type->BaseType() != NULL) {
-			result = _AddContextAction("Cast to array", MSG_TYPECAST_TO_ARRAY,
-				actions, message);
+	if (location != NULL) {
+		if (location->PieceAt(0).type  == VALUE_PIECE_LOCATION_MEMORY) {
+			result = _AddContextAction("Inspect", MSG_SHOW_INSPECTOR_WINDOW,
+				_preActions, message);
 			if (result != B_OK)
 				return result;
-			message->AddPointer("node", node);
+			message->AddUInt64("address", location->PieceAt(0).address);
+		}
+
+		ValueNode* valueNode = node->NodeChild()->Node();
+
+		if (valueNode != NULL) {
+			AddressType* type = dynamic_cast<AddressType*>(valueNode->GetType());
+			if (type != NULL && type->BaseType() != NULL) {
+				result = _AddContextAction("Cast to array", MSG_TYPECAST_TO_ARRAY,
+					_preActions, message);
+				if (result != B_OK)
+					return result;
+				message->AddPointer("node", node);
+			}
+		}
+
+		result = _AddContextAction("Cast as" B_UTF8_ELLIPSIS,
+			MSG_SHOW_TYPECAST_NODE_PROMPT, _preActions, message);
+		if (result != B_OK)
+			return result;
+
+		result = _AddContextAction("Watch" B_UTF8_ELLIPSIS,
+			MSG_SHOW_WATCH_VARIABLE_PROMPT, _preActions, message);
+		if (result != B_OK)
+			return result;
+
+		if (valueNode == NULL)
+			return B_OK;
+
+		if (valueNode->LocationAndValueResolutionState() == B_OK) {
+			result = _AddContextAction("Copy Value", B_COPY, _preActions, message);
+			if (result != B_OK)
+				return result;
+		}
+
+		bool addRangedContainerItem = false;
+		// if the current node isn't itself a ranged container, check if it
+		// contains a hidden node which is, since in the latter case we
+		// want to present the range selection as well.
+		if (valueNode->IsRangedContainer())
+			addRangedContainerItem = true;
+		else if (node->CountChildren() == 1 && node->ChildAt(0)->IsHidden()) {
+			valueNode = node->ChildAt(0)->NodeChild()->Node();
+			if (valueNode != NULL && valueNode->IsRangedContainer())
+				addRangedContainerItem = true;
+		}
+
+		if (addRangedContainerItem) {
+			result = _AddContextAction("Set visible range" B_UTF8_ELLIPSIS,
+				MSG_SHOW_CONTAINER_RANGE_PROMPT, _preActions, message);
+			if (result != B_OK)
+				return result;
 		}
 	}
 
-	result = _AddContextAction("Cast as" B_UTF8_ELLIPSIS,
-		MSG_SHOW_TYPECAST_NODE_PROMPT, actions, message);
+	_postActions = new(std::nothrow) ContextActionList;
+	if (_postActions == NULL)
+		return B_NO_MEMORY;
+
+	BPrivate::ObjectDeleter<ContextActionList> postActionListDeleter(
+		_postActions);
+
+	result = _AddContextAction("Add watch expression" B_UTF8_ELLIPSIS,
+		MSG_ADD_WATCH_EXPRESSION, _postActions, message);
 	if (result != B_OK)
 		return result;
 
-	result = _AddContextAction("Watch" B_UTF8_ELLIPSIS,
-		MSG_SHOW_WATCH_VARIABLE_PROMPT, actions, message);
-	if (result != B_OK)
-		return result;
-
-	if (valueNode == NULL)
-		return B_OK;
-
-	if (valueNode->LocationAndValueResolutionState() == B_OK) {
-		result = _AddContextAction("Copy Value", B_COPY, actions, message);
+	if (dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild()) != NULL) {
+		result = _AddContextAction("Remove watch expression",
+			MSG_REMOVE_WATCH_EXPRESSION, _postActions, message);
 		if (result != B_OK)
 			return result;
+		message->AddPointer("node", node);
 	}
 
-	// if the current node isn't itself a ranged container, check if it
-	// contains a hidden node which is, since in the latter case we
-	// want to present the range selection as well.
-	if (!valueNode->IsRangedContainer()) {
-		if (node->CountChildren() == 1 && node->ChildAt(0)->IsHidden()) {
-			valueNode = node->ChildAt(0)->NodeChild()->Node();
-			if (valueNode == NULL || !valueNode->IsRangedContainer())
-				return B_OK;
-		} else
-			return B_OK;
-	}
-
-	result = _AddContextAction("Set visible range" B_UTF8_ELLIPSIS,
-		MSG_SHOW_CONTAINER_RANGE_PROMPT, actions, message);
-	if (result != B_OK)
-		return result;
+	preActionListDeleter.Detach();
+	postActionListDeleter.Detach();
 
 	return B_OK;
 }
@@ -2286,7 +2546,13 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 				nodeInfo.SetRendererSettings(settings->Message());
 		}
 
-		ObjectID* id = node->GetVariable()->ID();
+		Variable* variable = node->GetVariable();
+		if (variable == NULL) {
+			// ignore synthetic nodes
+			continue;
+		}
+
+		ObjectID* id = variable->ID();
 		TypeComponentPath* componentPath = node->GetPath();
 
 		status_t error = viewState->SetNodeInfo(id, componentPath, nodeInfo);
@@ -2326,6 +2592,11 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 			return B_NO_MEMORY;
 
 		// apply the node's info, if any
+		Variable* variable = node->GetVariable();
+		if (variable == NULL) {
+			// ignore synthetic nodes
+			return B_OK;
+		}
 		ObjectID* objectID = node->GetVariable()->ID();
 		TypeComponentPath* componentPath = node->GetPath();
 		const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
@@ -2389,6 +2660,183 @@ VariablesView::_CopyVariableValueToClipboard()
 		be_clipboard->Commit();
 		be_clipboard->Unlock();
 	}
+}
+
+
+status_t
+VariablesView::_AddExpression(const char* expression, Type* resultType)
+{
+	// if our stack frame doesn't have an associated function,
+	// we can't add an expression
+	FunctionInstance* function = fStackFrame->Function();
+	if (function == NULL)
+		return B_NOT_ALLOWED;
+
+	FunctionID* id = function->GetFunctionID();
+	if (id == NULL)
+		return B_NO_MEMORY;
+
+	BReference<FunctionID> idReference(id, true);
+
+	ExpressionInfoEntry* entry = fExpressions->Lookup(FunctionKey(id));
+	if (entry == NULL) {
+		entry = new(std::nothrow) ExpressionInfoEntry(id);
+		if (entry == NULL)
+			return B_NO_MEMORY;
+		status_t error = fExpressions->Insert(entry);
+		if (error != B_OK) {
+			delete entry;
+			return error;
+		}
+	}
+
+	ExpressionInfo* info = new(std::nothrow) ExpressionInfo(expression,
+		resultType);
+
+	if (info == NULL)
+		return B_NO_MEMORY;
+
+	BReference<ExpressionInfo> infoReference(info, true);
+
+	status_t error = _AddExpressionNode(*info);
+	if (error != B_OK)
+		return error;
+
+	if (!entry->AddItem(info))
+		return B_NO_MEMORY;
+
+	infoReference.Detach();
+	return B_OK;
+}
+
+
+void
+VariablesView::_RemoveExpression(ModelNode* node)
+{
+	ExpressionValueNodeChild* child
+		= dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild());
+	if (child == NULL)
+		return;
+
+	FunctionID* id = fStackFrame->Function()->GetFunctionID();
+	BReference<FunctionID> idReference(id, true);
+
+	ExpressionInfoEntry* entry = fExpressions->Lookup(FunctionKey(id));
+	if (entry == NULL)
+		return;
+
+	for (int32 i = 0; i < entry->CountItems(); i++) {
+		ExpressionInfo* info = entry->ItemAt(i);
+		if (info->Expression() == child->GetExpression()) {
+			entry->RemoveItemAt(i);
+			info->ReleaseReference();
+			break;
+		}
+	}
+
+	fVariableTableModel->RemoveSyntheticNode(node);
+}
+
+
+status_t
+VariablesView::_AddExpressionNode(const ExpressionInfo& info)
+{
+	Type* type = info.ResultType();
+	ExpressionValueNodeChild* child
+		= new(std::nothrow) ExpressionValueNodeChild(info.Expression(), type);
+	if (child == NULL)
+		return B_NO_MEMORY;
+
+	BReference<ValueNodeChild> childReference(child, true);
+
+	ExpressionValueNode* expressionNode
+		= new(std::nothrow) ExpressionValueNode(child, type);
+	if (expressionNode == NULL)
+		return B_NO_MEMORY;
+
+	BReference<ValueNode> expressionNodeReference(expressionNode, true);
+
+	child->SetNode(expressionNode);
+
+	ModelNode* modelNode = new(std::nothrow) ModelNode(NULL, NULL,
+		child, true);
+	if (modelNode == NULL)
+		return B_NO_MEMORY;
+
+	BReference<ModelNode> modelNodeReference(modelNode, true);
+
+	status_t error = fVariableTableModel->AddSyntheticNode(modelNode);
+	if (error != B_OK)
+		return error;
+
+	expressionNodeReference.Detach();
+	modelNodeReference.Detach();
+	return B_OK;
+}
+
+
+void
+VariablesView::_RestoreExpressionNodes()
+{
+	FunctionID* id = fStackFrame->Function()->GetFunctionID();
+	BReference<FunctionID> idReference(id, true);
+
+	ExpressionInfoEntry* entry = fExpressions->Lookup(FunctionKey(id));
+	if (entry == NULL)
+		return;
+
+	for (int32 i = 0; i < entry->CountItems(); i++) {
+		ExpressionInfo* info = entry->ItemAt(i);
+		_AddExpressionNode(*info);
+		SyntheticPrimitiveType* type
+			= dynamic_cast<SyntheticPrimitiveType*>(info->ResultType());
+		fListener->ExpressionEvaluationRequested(info->Expression(),
+			type->TypeConstant(), fStackFrame, fThread);
+	}
+}
+
+
+void
+VariablesView::_SetExpressionNodeValue(const char* expression,
+	status_t finalResult, Value* value)
+{
+	FunctionID* id = fStackFrame->Function()->GetFunctionID();
+	BReference<FunctionID> idReference(id, true);
+
+	ExpressionInfoEntry* entry = fExpressions->Lookup(FunctionKey(id));
+	if (entry == NULL)
+		return;
+
+	void* rootNode = fVariableTableModel->Root();
+	for (int32 i = 0; i < fVariableTableModel->CountChildren(rootNode); i++) {
+		ModelNode* node = (ModelNode*)fVariableTableModel->ChildAt(rootNode,
+			i);
+		ExpressionValueNodeChild* child
+			= dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild());
+		if (child == NULL)
+			continue;
+
+		if (child->GetExpression() != expression)
+			continue;
+
+		child->Node()->SetLocationAndValue(NULL, value, finalResult);
+		return;
+	}
+}
+
+
+status_t
+VariablesView::_GetTypeForTypeCode(int32 type, Type*& _resultType) const
+{
+	if (BVariant::TypeIsNumber(type)) {
+		_resultType = new(std::nothrow) SyntheticPrimitiveType(type);
+		if (_resultType == NULL)
+			return B_NO_MEMORY;
+
+		return B_OK;
+	}
+
+	return B_NOT_SUPPORTED;
 }
 
 

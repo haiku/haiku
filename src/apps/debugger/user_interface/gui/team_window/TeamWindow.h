@@ -127,6 +127,11 @@ private:
 	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
 									ValueNodeContainer* container,
 									ValueNode* valueNode);
+	virtual	void				ExpressionEvaluationRequested(
+									const char* expression,
+									type_code resultType,
+									StackFrame* frame,
+									::Thread* thread);
 
 	// Team::Listener
 	virtual	void				ThreadStateChanged(
@@ -143,8 +148,12 @@ private:
 									const Team::UserBreakpointEvent& event);
 	virtual	void				WatchpointChanged(
 									const Team::WatchpointEvent& event);
+	virtual	void				ExpressionEvaluated(
+									const Team::ExpressionEvaluationEvent&
+										event);
 	virtual void				DebugReportChanged(
 									const Team::DebugReportEvent& event);
+
 
 	// Function::Listener
 	virtual	void				FunctionSourceCodeChanged(Function* function);
