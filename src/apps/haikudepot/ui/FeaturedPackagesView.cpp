@@ -111,7 +111,12 @@ public:
 	
 	virtual void MouseDown(BPoint where)
 	{
-		if (Bounds().Contains(where)) {
+		BRect bounds = Bounds();
+		BRect parentBounds = Parent()->Bounds();
+		ConvertFromParent(&parentBounds);
+		bounds = bounds & parentBounds;
+		
+		if (bounds.Contains(where) && Window()->IsActive()) {
 			BMessage message(MSG_PACKAGE_SELECTED);
 			message.AddString("title", PackageTitle());
 			Window()->PostMessage(&message);
