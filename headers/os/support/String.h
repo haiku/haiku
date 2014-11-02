@@ -58,7 +58,8 @@ public:
 			BString&		SetToFormat(const char* format, ...)
 								__attribute__((__format__(__printf__, 2, 3)));
 			BString&		SetToFormatVarArgs(const char* format,
-								va_list args);
+								va_list args)
+								__attribute__((__format__(__printf__, 2, 0)));
 
 			// Substring copying
 			BString&		CopyInto(BString& into, int32 fromOffset,
