@@ -23,6 +23,7 @@
 #include <Messenger.h>
 #include <ScrollView.h>
 #include <StringList.h>
+#include <StringView.h>
 #include <TabView.h>
 
 #include <package/Context.h>
@@ -139,14 +140,24 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 
 	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
 
-	BView* listArea = new BView("list area", 0);
+	BGroupView* featuredPackagesGroup = new BGroupView(B_VERTICAL);
+	BStringView* featuredPackagesTitle = new BStringView(
+		"featured packages title", B_TRANSLATE("Featured packages"));
+	BFont font(be_bold_font);
+	font.SetSize(font.Size() * 1.3f);
+	featuredPackagesTitle->SetFont(&font);
+	featuredPackagesGroup->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	BLayoutBuilder::Group<>(featuredPackagesGroup)
+		.Add(featuredPackagesTitle)
+		.Add(fFeaturedPackagesView)
+	;
 
+	BView* listArea = new BView("list area", 0);
 	fListLayout = new BCardLayout();
 	listArea->SetLayout(fListLayout);
-
-	listArea->AddChild(fFeaturedPackagesView);
+	listArea->AddChild(featuredPackagesGroup);
 	listArea->AddChild(fPackageListView);
-
 	fListLayout->SetVisibleItem((int32)0);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
@@ -493,7 +504,6 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 	BMenu* menu = new BMenu(B_TRANSLATE("Tools"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh depots"),
 			new BMessage(MSG_REFRESH_DEPOTS)));
-	menu->AddSeparatorItem();
 
 	menuBar->AddItem(menu);
 
