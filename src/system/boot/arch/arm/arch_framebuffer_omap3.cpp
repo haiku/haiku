@@ -30,6 +30,8 @@
 //XXX
 extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
 	uint32 flags);
+extern "C" bool
+mmu_get_virtual_mapping(addr_t virtualAddress, phys_addr_t *_physicalAddress);
 
 
 #define write_io_32(a, v) ((*(vuint32 *)a) = v)
@@ -322,20 +324,6 @@ status_t
 ArchFBArmOmap3::Probe()
 {
 
-#if 0
-	// TODO: More dynamic framebuffer base?
-	if (!fBase) {
-		int err = platform_allocate_region(&gFrameBufferBase,
-			gKernelArgs.frame_buffer.physical_buffer.size, 0, false);
-		if (err < B_OK) return err;
-		gKernelArgs.frame_buffer.physical_buffer.start
-			= (addr_t)gFrameBufferBase;
-		dprintf("video framebuffer: %p\n", gFrameBufferBase);
-	}
-#else
-	gKernelArgs.frame_buffer.physical_buffer.start = fBase;
-#endif
-
 	gKernelArgs.frame_buffer.depth = 16;
 	gKernelArgs.frame_buffer.width = 1024;
 	gKernelArgs.frame_buffer.height = 768;
@@ -344,6 +332,26 @@ ArchFBArmOmap3::Probe()
 		= gKernelArgs.frame_buffer.width
 		* gKernelArgs.frame_buffer.height
 		* gKernelArgs.frame_buffer.depth / 8;
+
+#if 1
+	//dprintf("fBase %p\n", (void *)fBase);
+	if (!fBase || true) {
+		fBase = 0;
+		int err = platform_allocate_region((void **)&fBase,
+			gKernelArgs.frame_buffer.physical_buffer.size, 0, false);
+		if (err < B_OK) return err;
+		if (!mmu_get_virtual_mapping(fBase, &fPhysicalBase))
+			return B_ERROR;
+		gKernelArgs.frame_buffer.physical_buffer.start
+			= (addr_t)fPhysicalBase;
+		dprintf("video framebuffer: va: %p pa: %p\n", (void *)fBase,
+			(void *)fPhysicalBase);
+	}
+#else
+	// TODO: More dynamic framebuffer base?
+	fPhysicalBase = fBase;
+	gKernelArgs.frame_buffer.physical_buffer.start = fPhysicalBase;
+#endif
 
 	TRACE("video mode: %ux%ux%u\n", gKernelArgs.frame_buffer.width,
 		gKernelArgs.frame_buffer.height, gKernelArgs.frame_buffer.depth);
@@ -358,7 +366,7 @@ ArchFBArmOmap3::SetVideoMode(int width, int height, int depth)
 	TRACE("%s: %dx%d@%d\n", __func__, width, height, depth);
 
 	omap_set_lcd_mode(width, height);
-	omap_attach_framebuffer(fBase, width, height, depth);
+	omap_attach_framebuffer(fPhysicalBase, width, height, depth);
 
 	return B_OK;
 }
