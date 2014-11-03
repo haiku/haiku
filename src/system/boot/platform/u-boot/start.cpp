@@ -133,7 +133,6 @@ start_netbsd(struct board_info *bd, struct image_header *image,
 {
 	const char *argv[] = { "haiku", cmdline };
 	int argc = 1;
-	// TODO: Ensure cmdline is mapped into memory by MMU before usage.
 	if (cmdline && *cmdline)
 		argc++;
 	return start_gen(argc, argv, image);
@@ -193,9 +192,10 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 
 	if (argv) {
 		// skip the kernel name
-		args.arguments = ++argv;
-		args.arguments_count = --argc;
+		++argv;
+		--argc;
 	}
+	// TODO: Ensure cmdline is mapped into memory by MMU before usage.
 
 	// if we get passed a uimage, try to find the third blob
 	// only if we do not have FDT data yet
@@ -236,14 +236,7 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 				dprintf("Found boot tgz from FDT @ %p, %" B_PRIu32 " bytes\n",
 					args.platform.boot_tgz_data, args.platform.boot_tgz_size);
 			}
-			prop = fdt_getprop(gFDT, node, "bootargs", &len);
-			if (prop) {
-				dprintf("Found bootargs: %s\n", (const char *)prop);
-				static const char *sArgs[] = { NULL, NULL };
-				sArgs[0] = (const char *)prop;
-				args.arguments = sArgs;
-				args.arguments_count = 1;
-			}
+			// we check for bootargs after remapping the FDT
 		}
 	}
 
@@ -291,6 +284,30 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 	// .. and our FDT
 	if (gFDT != NULL)
 		gFDT = (void*)mmu_map_physical_memory((addr_t)gFDT, fdtSize, kDefaultPageFlags);
+
+	// if we get passed an FDT, check /chosen for bootargs now
+	// to avoid having to copy them.
+	if (gFDT != NULL) {
+		int node = fdt_path_offset(gFDT, "/chosen");
+		const void *prop;
+		int len;
+
+		if (node >= 0) {
+			prop = fdt_getprop(gFDT, node, "bootargs", &len);
+			if (prop) {
+				dprintf("Found bootargs: %s\n", (const char *)prop);
+				static const char *sArgs[] = { NULL, NULL };
+				sArgs[0] = (const char *)prop;
+				// override main() args
+				args.arguments = sArgs;
+				args.arguments_count = 1;
+			}
+		}
+		dprintf("args.arguments_count = %d\n", args.arguments_count);
+		for (int i = 0; i < args.arguments_count; i++)
+			dprintf("args.arguments[%d] @%lx = '%s'\n", i,
+				(uint32)args.arguments[i], args.arguments[i]);
+	}
 
 	// wait a bit to give the user the opportunity to press a key
 //	spin(750000);
