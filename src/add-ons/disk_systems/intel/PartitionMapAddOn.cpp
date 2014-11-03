@@ -301,9 +301,7 @@ PartitionMapHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	if (type == B_CREATE_PARAMETER_EDITOR
 		|| type == B_PROPERTIES_PARAMETER_EDITOR) {
 		try {
-			BMutablePartition* partition = Partition();
-			int32 count = partition->CountChildren();
-			*editor = new PrimaryPartitionEditor(count == 0);
+			*editor = new PrimaryPartitionEditor();
 		} catch (std::bad_alloc) {
 			return B_NO_MEMORY;
 		}

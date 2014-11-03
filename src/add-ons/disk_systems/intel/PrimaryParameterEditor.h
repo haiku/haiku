@@ -16,7 +16,7 @@
 
 class PrimaryPartitionEditor : public BPartitionParameterEditor {
 public:
-								PrimaryPartitionEditor(bool first);
+								PrimaryPartitionEditor();
 	virtual						~PrimaryPartitionEditor();
 
 	virtual		BView*			View();
