@@ -181,6 +181,7 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 	call_ctors();
 	args.heap_size = HEAP_SIZE;
 	args.arguments = NULL;
+	args.arguments_count = 0;
 	args.platform.boot_tgz_data = NULL;
 	args.platform.boot_tgz_size = 0;
 	args.platform.fdt_data = NULL;
