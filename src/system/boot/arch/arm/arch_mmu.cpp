@@ -429,6 +429,28 @@ unmap_page(addr_t virtualAddress)
 }
 
 
+// XXX: use phys_addr_t ?
+extern "C" bool
+mmu_get_virtual_mapping(addr_t virtualAddress, /*phys_*/addr_t *_physicalAddress)
+{
+	if (virtualAddress < KERNEL_LOAD_BASE) {
+		panic("mmu_get_virtual_mapping: asked to lookup invalid page %p!\n",
+			(void *)virtualAddress);
+		return false;
+	}
+
+	// map the page to the correct page table
+	uint32 *pageTable = get_or_create_page_table(virtualAddress,
+		ARM_MMU_L1_TYPE_COARSE);
+
+	uint32 pageTableIndex = VADDR_TO_PTENT(virtualAddress);
+
+	*_physicalAddress = pageTable[pageTableIndex] & ~(B_PAGE_SIZE - 1);
+
+	return true;
+}
+
+
 extern "C" void *
 mmu_allocate(void *virtualAddress, size_t size)
 {
