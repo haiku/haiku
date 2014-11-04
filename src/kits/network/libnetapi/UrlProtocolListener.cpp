@@ -27,6 +27,14 @@ BUrlProtocolListener::HostnameResolved(BUrlRequest*, const char*)
 }
 
 
+bool
+BUrlProtocolListener::CertificateVerificationFailed(BUrlRequest* caller,
+	BCertificate& certificate, const char* message)
+{
+	return false;
+}
+
+
 void
 BUrlProtocolListener::ResponseStarted(BUrlRequest*)
 {

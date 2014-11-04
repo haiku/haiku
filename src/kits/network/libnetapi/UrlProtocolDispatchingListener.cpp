@@ -125,6 +125,25 @@ BUrlProtocolDispatchingListener::RequestCompleted(BUrlRequest* caller,
 }
 
 
+bool
+BUrlProtocolDispatchingListener::CertificateVerificationFailed(
+	BUrlRequest* caller, BCertificate& certificate, const char* error)
+{
+	BMessage message(B_URL_PROTOCOL_NOTIFICATION);
+	message.AddString("url:error", error);
+	message.AddPointer("url:certificate", &certificate);
+	message.AddInt8(kUrlProtocolMessageType,
+		B_URL_PROTOCOL_CERTIFICATE_VERIFICATION_FAILED);
+	message.AddPointer(kUrlProtocolCaller, caller);
+
+	// Warning: synchronous reply
+	BMessage reply;
+	fMessenger.SendMessage(&message, &reply);
+
+	return reply.FindBool("url:continue");
+}
+
+
 void
 BUrlProtocolDispatchingListener::_SendMessage(BMessage* message, 
 	int8 notification, BUrlRequest* caller)

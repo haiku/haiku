@@ -142,6 +142,20 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 			}
 			break;
 
+		case B_URL_PROTOCOL_CERTIFICATE_VERIFICATION_FAILED:
+			{
+				const char* error = message->FindString("url:error");
+				BCertificate* certificate;
+				message->FindPointer("url:certificate", (void**)&certificate);
+				bool result = CertificateVerificationFailed(caller,
+					*certificate, error);
+
+				BMessage reply;
+				reply.AddBool("url:continue", result);
+				message->SendReply(&reply);
+			}
+			break;
+
 		default:
 			PRINT(("BUrlProtocolAsynchronousListener: Unknown notification %d\n",
 				notification));

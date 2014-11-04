@@ -19,6 +19,7 @@
 #include <new>
 
 #include <AutoDeleter.h>
+#include <Certificate.h>
 #include <Debug.h>
 #include <DynamicBuffer.h>
 #include <File.h>
@@ -29,6 +30,35 @@
 
 
 static const int32 kHttpBufferSize = 4096;
+
+
+class CheckedSecureSocket: public BSecureSocket
+{
+public:
+					CheckedSecureSocket(BHttpRequest* request);
+
+	bool			CertificateVerificationFailed(BCertificate& certificate,
+						const char* message);
+
+private:
+	BHttpRequest*	fRequest;
+};
+
+
+CheckedSecureSocket::CheckedSecureSocket(BHttpRequest* request)
+	:
+	BSecureSocket(),
+	fRequest(request)
+{
+}
+
+
+bool
+CheckedSecureSocket::CertificateVerificationFailed(BCertificate& certificate,
+	const char* message)
+{
+	return fRequest->_CertificateVerificationFailed(certificate, message);
+}
 
 
 BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
@@ -50,7 +80,7 @@ BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
 {
 	_ResetOptions();
 	if (fSSL)
-		fSocket = new(std::nothrow) BSecureSocket();
+		fSocket = new(std::nothrow) CheckedSecureSocket(this);
 	else
 		fSocket = new(std::nothrow) BSocket();
 }
@@ -76,7 +106,7 @@ BHttpRequest::BHttpRequest(const BHttpRequest& other)
 	_ResetOptions();
 		// FIXME some options may be copied from other instead.
 	if (fSSL)
-		fSocket = new(std::nothrow) BSecureSocket();
+		fSocket = new(std::nothrow) CheckedSecureSocket(this);
 	else
 		fSocket = new(std::nothrow) BSocket();
 }
@@ -791,7 +821,7 @@ BHttpRequest::_SendHeaders()
 		BString host = Url().Host();
 		if (Url().HasPort() && !_IsDefaultPort())
 			host << ':' << Url().Port();
-		
+
 		outputHeaders.AddHeader("Host", host);
 
 		outputHeaders.AddHeader("Accept", "*/*");
@@ -887,7 +917,7 @@ BHttpRequest::_SendHeaders()
 					break;
 				cookieString << "; ";
 			}
-	
+
 			outputHeaders.AddHeader("Cookie", cookieString);
 		}
 	}
@@ -1022,7 +1052,21 @@ BHttpRequest::_ResultStatusText()
 }
 
 
-bool BHttpRequest::_IsDefaultPort()
+bool
+BHttpRequest::_CertificateVerificationFailed(BCertificate& certificate,
+	const char* message)
+{
+	if (fListener != NULL) {
+		return fListener->CertificateVerificationFailed(this, certificate,
+			message);
+	}
+
+	return false;
+}
+
+
+bool
+BHttpRequest::_IsDefaultPort()
 {
 	if (fSSL && Url().Port() == 443)
 		return true;

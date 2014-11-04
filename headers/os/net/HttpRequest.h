@@ -8,6 +8,7 @@
 
 #include <deque>
 
+#include <Certificate.h>
 #include <HttpForm.h>
 #include <HttpHeaders.h>
 #include <HttpResult.h>
@@ -73,6 +74,12 @@ private:
 			BHttpHeaders&		_ResultHeaders();
 			void				_SetResultStatusCode(int32 statusCode);
 			BString&			_ResultStatusText();
+
+	// SSL failure management
+	friend	class				CheckedSecureSocket;
+			bool				_CertificateVerificationFailed(
+									BCertificate& certificate,
+									const char* message);
 
 	// Utility methods
 			bool				_IsDefaultPort();
