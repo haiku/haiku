@@ -23,9 +23,14 @@ parse_ASN1(ASN1_GENERALIZEDTIME *asn1)
 
 	if (sscanf((char*)asn1->data, "%2d%2d%2d%2d%2d%2d", &time.tm_year,
 			&time.tm_mon, &time.tm_mday, &time.tm_hour, &time.tm_min,
-			&time.tm_sec) == 6)
-		return mktime(&time);
+			&time.tm_sec) == 6) {
 
+		// Month is 0 based, and year is 1900-based for mktime.
+		time.tm_year += 100;
+		time.tm_mon -= 1;
+
+		return mktime(&time);
+	}
 	return B_BAD_DATA;
 }
 
@@ -33,11 +38,11 @@ parse_ASN1(ASN1_GENERALIZEDTIME *asn1)
 static BString
 decode_X509_NAME(X509_NAME* name)
 {
-	int len = X509_NAME_get_text_by_NID(name, 0, NULL, 0);
-	char buffer[len];
-	X509_NAME_get_text_by_NID(name, 0, buffer, len);
+	char* buffer = X509_NAME_oneline(name, NULL, 0);
 
-	return BString(buffer);
+	BString result(buffer);
+	OPENSSL_free(buffer);
+	return result;
 }
 
 
@@ -108,6 +113,7 @@ BCertificate::Private::Private(X509* data)
 	: fX509(data)
 {
 }
+
 
 #else
 
