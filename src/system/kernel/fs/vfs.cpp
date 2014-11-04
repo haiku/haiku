@@ -5582,6 +5582,7 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 {
 	struct vnode* vnode = descriptor->u.vnode;
 	off_t offset;
+	bool isDevice = false;
 
 	FUNCTION(("file_seek(pos = %" B_PRIdOFF ", seekType = %d)\n", pos,
 		seekType));
@@ -5592,13 +5593,16 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 		case S_IFSOCK:
 			return ESPIPE;
 
+		// drivers publish block devices as chr, so pick both
+		case S_IFBLK:
+		case S_IFCHR:
+			isDevice = true;
+			break;
 		// The Open Group Base Specs don't mention any file types besides pipes,
 		// fifos, and sockets specially, so we allow seeking them.
 		case S_IFREG:
-		case S_IFBLK:
 		case S_IFDIR:
 		case S_IFLNK:
-		case S_IFCHR:
 			break;
 	}
 
@@ -5621,6 +5625,22 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 				return status;
 
 			offset = stat.st_size;
+
+			if (offset == 0 && isDevice) {
+				// stat() on regular drivers doesn't report size
+				device_geometry geometry;
+
+				if (HAS_FS_CALL(vnode, ioctl)) {
+					status = FS_CALL(vnode, ioctl, descriptor->cookie,
+						B_GET_GEOMETRY, &geometry, sizeof(geometry));
+					if (status == B_OK)
+						offset = (off_t)geometry.bytes_per_sector
+							* geometry.sectors_per_track
+							* geometry.cylinder_count
+							* geometry.head_count;
+				}
+			}
+
 			break;
 		}
 		default:
