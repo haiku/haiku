@@ -2307,6 +2307,15 @@ DIEVariable::AddAttribute_start_scope(uint16 attributeName,
 }
 
 
+status_t
+DIEVariable::AddAttribute_external(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fIsExternal = value.flag;
+	return B_OK;
+}
+
+
 // #pragma mark - DIEVolatileType
 
 

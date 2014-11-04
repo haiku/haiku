@@ -1449,6 +1449,8 @@ public:
 
 			uint64				StartScope() const	{ return fStartScope; }
 
+			bool				IsExternal() const	{ return fIsExternal; }
+
 	virtual	status_t			AddAttribute_const_value(uint16 attributeName,
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_type(uint16 attributeName,
@@ -1461,10 +1463,12 @@ public:
 	virtual	status_t			AddAttribute_start_scope(
 									uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_external(
+									uint16 attributeName,
+									const AttributeValue& value);
 
 // TODO:
 // DW_AT_endianity
-// DW_AT_external
 // DW_AT_segment
 
 private:
@@ -1474,6 +1478,7 @@ private:
 			DebugInfoEntry*		fSpecification;
 			DIEVariable*		fAbstractOrigin;
 			uint64				fStartScope;
+			bool				fIsExternal;
 };
 
 
