@@ -27,7 +27,7 @@
 TabletProtocolHandler::TabletProtocolHandler(HIDReport &report,
 	HIDReportItem &xAxis, HIDReportItem &yAxis)
 	:
-	ProtocolHandler(report.Device(), "input/tablet/usb", 0),
+	ProtocolHandler(report.Device(), "input/tablet/usb/", 0),
 	fReport(report),
 
 	fXAxis(xAxis),
