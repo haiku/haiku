@@ -39,7 +39,8 @@ public:
 				EVENT_THREAD_STACK_TRACE_CHANGED	= 0x20,
 				EVENT_VALUE_NODE_CHANGED			= 0x40,
 				EVENT_TEAM_MEMORY_BLOCK_RETRIEVED	= 0x80,
-				EVENT_EXPRESSION_EVALUATED			= 0x100
+				EVENT_EXPRESSION_EVALUATED			= 0x100,
+				EVENT_DEBUG_REPORT_CHANGED			= 0x200
 			};
 
 public:
@@ -53,6 +54,9 @@ public:
 			void				Terminating();
 
 			bool				IsTerminating() const	{ return fTerminating; }
+
+			bool				IsInteractive() const	{ return fInteractive; }
+			void				SetInteractive(bool interactive);
 
 			// service methods for the input loop thread follow
 
@@ -110,6 +114,9 @@ private:
 									const Team::ExpressionEvaluationEvent&
 										event);
 
+	virtual	void				DebugReportChanged(
+									const Team::DebugReportEvent& event);
+
 	// TeamMemoryBlock::Listener
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
 
@@ -141,6 +148,7 @@ private:
 			uint32				fInputLoopWaitingForEvents;
 			uint32				fEventsOccurred;
 			bool				fInputLoopWaiting;
+			bool				fInteractive;
 	volatile bool				fTerminating;
 
 			Thread*				fCurrentThread;

@@ -128,6 +128,8 @@ CommandLineUserInterface::Init(Team* team, UserInterfaceListener* listener)
 	if (error != B_OK)
 		return error;
 
+	fContext.SetInteractive(!fSaveReport);
+
 	error = _RegisterCommands();
 	if (error != B_OK)
 		return error;
@@ -229,11 +231,7 @@ CommandLineUserInterface::Run()
 	if (error != B_OK)
 		return;
 
-	if (!fSaveReport) {
-		_InputLoop();
-		// Release the Show() semaphore to signal Terminate().
-		release_sem(fShowSemaphore);
-	} else {
+	if (fSaveReport) {
 		ArgumentVector args;
 		char buffer[256];
 		const char* parseErrorLocation;
@@ -245,6 +243,10 @@ CommandLineUserInterface::Run()
 		} else
 			_SubmitSaveReport();
 	}
+
+	_InputLoop();
+	// Release the Show() semaphore to signal Terminate().
+	release_sem(fShowSemaphore);
 }
 
 
@@ -262,21 +264,6 @@ CommandLineUserInterface::ThreadStateChanged(const Team::ThreadEvent& event)
 			&& thread->State() == THREAD_STATE_STOPPED) {
 			_SubmitSaveReport();
 		}
-	}
-}
-
-
-void
-CommandLineUserInterface::DebugReportChanged(
-	const Team::DebugReportEvent& event)
-{
-	printf("Successfully saved debug report to %s\n",
-		event.GetReportPath());
-
-	if (fSaveReport) {
-		fContext.QuitSession(true);
-		// Release the Show() semaphore to signal Terminate().
-		release_sem(fShowSemaphore);
 	}
 }
 

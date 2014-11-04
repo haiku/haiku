@@ -97,6 +97,7 @@ CliContext::CliContext()
 	fInputLoopWaitingForEvents(0),
 	fEventsOccurred(0),
 	fInputLoopWaiting(false),
+	fInteractive(true),
 	fTerminating(false),
 	fCurrentThread(NULL),
 	fCurrentStackTrace(NULL),
@@ -204,6 +205,13 @@ CliContext::Terminating()
 	_SignalInputLoop(EVENT_QUIT);
 
 	// TODO: Signal the input loop, should it be in PromptUser()!
+}
+
+
+void
+CliContext::SetInteractive(bool interactive)
+{
+	fInteractive = interactive;
 }
 
 
@@ -444,6 +452,13 @@ CliContext::ProcessPendingEvents()
 						fExpressionValue->AcquireReference();
 				}
 				break;
+			case EVENT_DEBUG_REPORT_CHANGED:
+				if (!IsInteractive()) {
+					Terminating();
+					QuitSession(true);
+				}
+				break;
+
 		}
 	}
 }
@@ -500,6 +515,17 @@ CliContext::ExpressionEvaluated(const Team::ExpressionEvaluationEvent& event)
 			NULL, NULL, event.GetExpression(), event.GetResult(),
 			event.GetValue()));
 	_SignalInputLoop(EVENT_EXPRESSION_EVALUATED);
+}
+
+
+void
+CliContext::DebugReportChanged(const Team::DebugReportEvent& event)
+{
+	printf("Successfully saved debug report to %s\n",
+		event.GetReportPath());
+
+	_QueueEvent(new(std::nothrow) Event(EVENT_DEBUG_REPORT_CHANGED));
+	_SignalInputLoop(EVENT_DEBUG_REPORT_CHANGED);
 }
 
 

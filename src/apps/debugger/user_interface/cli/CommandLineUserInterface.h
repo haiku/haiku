@@ -55,8 +55,6 @@ public:
 	// Team::Listener
 	virtual	void				ThreadStateChanged(
 									const Team::ThreadEvent& event);
-	virtual	void				DebugReportChanged(
-									const Team::DebugReportEvent& event);
 
 private:
 			struct CommandEntry;
