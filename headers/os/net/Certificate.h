@@ -14,12 +14,19 @@ class BCertificate {
 public:
 				~BCertificate();
 
-	BString		String();
+	int			Version();
 
 	time_t		StartDate();
 	time_t		ExpirationDate();
+
+	bool		IsValidAuthority();
+	bool		IsSelfSigned();
+
 	BString		Issuer();
 	BString		Subject();
+	BString		SignatureAlgorithm();
+
+	BString		String();
 
 private:
 	friend class BSecureSocket::Private;

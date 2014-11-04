@@ -14,6 +14,9 @@
 #ifdef OPENSSL_ENABLED
 
 
+#include <openssl/x509v3.h>
+
+
 static time_t
 parse_ASN1(ASN1_GENERALIZEDTIME *asn1)
 {
@@ -61,18 +64,10 @@ BCertificate::~BCertificate()
 }
 
 
-BString
-BCertificate::String()
+int
+BCertificate::Version()
 {
-	BIO *buffer = BIO_new(BIO_s_mem());
-	X509_print_ex(buffer, fPrivate->fX509, XN_FLAG_COMPAT, X509_FLAG_COMPAT);
-
-	char* pointer;
-	long length = BIO_get_mem_data(buffer, &pointer);
-	BString result(pointer, length);
-
-	BIO_free(buffer);
-	return result;
+	return X509_get_version(fPrivate->fX509) + 1;
 }
 
 
@@ -90,6 +85,20 @@ BCertificate::ExpirationDate()
 }
 
 
+bool
+BCertificate::IsValidAuthority()
+{
+	return X509_check_ca(fPrivate->fX509) > 0;
+}
+
+
+bool
+BCertificate::IsSelfSigned()
+{
+	return X509_check_issued(fPrivate->fX509, fPrivate->fX509) == X509_V_OK;
+}
+
+
 BString
 BCertificate::Issuer()
 {
@@ -103,6 +112,35 @@ BCertificate::Subject()
 {
 	X509_NAME* name = X509_get_subject_name(fPrivate->fX509);
 	return decode_X509_NAME(name);
+}
+
+
+BString
+BCertificate::SignatureAlgorithm()
+{
+	int algorithmIdentifier = OBJ_obj2nid(
+		fPrivate->fX509->cert_info->key->algor->algorithm);
+
+	if (algorithmIdentifier == NID_undef)
+		return BString("undefined");
+
+	const char* buffer = OBJ_nid2ln(algorithmIdentifier);
+	return BString(buffer);
+}
+
+
+BString
+BCertificate::String()
+{
+	BIO *buffer = BIO_new(BIO_s_mem());
+	X509_print_ex(buffer, fPrivate->fX509, XN_FLAG_COMPAT, X509_FLAG_COMPAT);
+
+	char* pointer;
+	long length = BIO_get_mem_data(buffer, &pointer);
+	BString result(pointer, length);
+
+	BIO_free(buffer);
+	return result;
 }
 
 
@@ -128,13 +166,6 @@ BCertificate::~BCertificate()
 }
 
 
-BString
-BCertificate::String()
-{
-	return BString();
-}
-
-
 time_t
 BCertificate::StartDate()
 {
@@ -149,6 +180,20 @@ BCertificate::ExpirationDate()
 }
 
 
+bool
+BCertificate::IsValidAuthority()
+{
+	return false;
+}
+
+
+int
+BCertificate::Version()
+{
+	return B_NOT_SUPPORTED;
+}
+
+
 BString
 BCertificate::Issuer()
 {
@@ -158,6 +203,20 @@ BCertificate::Issuer()
 
 BString
 BCertificate::Subject()
+{
+	return BString();
+}
+
+
+BString
+BCertificate::SignatureAlgorithm()
+{
+	return BString();
+}
+
+
+BString
+BCertificate::String()
 {
 	return BString();
 }

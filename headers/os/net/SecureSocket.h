@@ -21,7 +21,7 @@ public:
 	virtual						~BSecureSocket();
 
 	virtual bool				CertificateVerificationFailed(BCertificate&
-									certificate);
+									certificate, const char* message);
 
 	// BSocket implementation
 
