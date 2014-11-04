@@ -362,9 +362,15 @@ acquire_spinlock(spinlock* lock)
 			uint32 count = 0;
 			while (lock->lock != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
+#	if DEBUG_SPINLOCKS
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
 						"for a long time (last caller: %p, value: %" B_PRIx32
 						")", lock, find_lock_caller(lock), lock->lock);
+#	else
+					panic("acquire_spinlock(): Failed to acquire spinlock %p "
+						"for a long time (value: %" B_PRIx32 ")", lock,
+						lock->lock);
+#	endif
 					count = 0;
 				}
 
@@ -416,9 +422,15 @@ acquire_spinlock_nocheck(spinlock *lock)
 			uint32 count = 0;
 			while (lock->lock != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT_NO_CHECK) {
+#	if DEBUG_SPINLOCKS
 					panic("acquire_spinlock_nocheck(): Failed to acquire "
 						"spinlock %p for a long time (last caller: %p, value: %"
 						B_PRIx32 ")", lock, find_lock_caller(lock), lock->lock);
+#	else
+					panic("acquire_spinlock_nocheck(): Failed to acquire "
+						"spinlock %p for a long time (value: %" B_PRIx32 ")",
+						lock, lock->lock);
+#	endif
 					count = 0;
 				}
 
@@ -468,9 +480,15 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 			uint32 count = 0;
 			while (lock->lock != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
+#	if DEBUG_SPINLOCKS
 					panic("acquire_spinlock_cpu(): Failed to acquire spinlock "
 						"%p for a long time (last caller: %p, value: %" B_PRIx32
 						")", lock, find_lock_caller(lock), lock->lock);
+#	else
+					panic("acquire_spinlock_cpu(): Failed to acquire spinlock "
+						"%p for a long time (value: %" B_PRIx32 ")", lock,
+						lock->lock);
+#	endif
 					count = 0;
 				}
 
