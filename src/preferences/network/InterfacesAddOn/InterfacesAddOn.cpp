@@ -48,7 +48,8 @@ get_nth_addon(image_id image, int index)
 InterfacesAddOn::InterfacesAddOn(image_id image)
 	:
 	NetworkSetupAddOn(image),
-	BBox(NULL, B_NAVIGABLE_JUMP, B_NO_BORDER)
+	BBox(NULL, B_NAVIGABLE_JUMP, B_NO_BORDER),
+	fListView(NULL)
 {
 	SetName("Interfaces");
 }
