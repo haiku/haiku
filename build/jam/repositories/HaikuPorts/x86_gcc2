@@ -219,6 +219,7 @@ RemotePackageRepository HaikuPorts
 	mkdepend-1.7-3
 	moe-1.1.2-1
 	mog-0.63.1548-1
+	most-pre5.1_15-1
 	multitalk-1.4-1
 	nano-2.2.6-3
 	nasm-2.11.02-1
@@ -286,6 +287,8 @@ RemotePackageRepository HaikuPorts
 	sge-030809-2
 	sge_devel-030809-2
 	sharutils-4.14-1
+	slang-2.2.4-1
+	slang_devel-2.2.4-1
 	smjpeg-0.2.1-1
 	smjpeg_devel-0.2.1-1
 	smpeg-0.4.5-3
@@ -780,6 +783,7 @@ RemotePackageRepository HaikuPorts
 	mog
 	mpc_x86
 	mosh_x86
+	most
 	mpd_x86
 	mpfr_x86
 	mpg123_x86
@@ -852,6 +856,7 @@ RemotePackageRepository HaikuPorts
 	shared_mime_info_x86
 	sharutils
 	simh_x86
+	slang
 	smjpeg
 	smpeg
 	speex
