@@ -163,6 +163,8 @@ Application Debugger :
 	AreaInfo.cpp
 	Breakpoint.cpp
 	DisassembledCode.cpp
+	ExpressionInfo.cpp
+	ExpressionValues.cpp
 	FileSourceCode.cpp
 	Image.cpp
 	ImageInfo.cpp
@@ -336,6 +338,7 @@ Application Debugger :
 	CompoundValueNode.cpp
 	CStringValueNode.cpp
 	EnumerationValueNode.cpp
+	ExpressionValueNode.cpp
 	PointerToMemberValueNode.cpp
 	PrimitiveValueNode.cpp
 	VariableValueNodeChild.cpp
