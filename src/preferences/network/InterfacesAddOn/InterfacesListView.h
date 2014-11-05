@@ -60,7 +60,6 @@ private:
 			float				fFirstlineOffset;
 			float				fSecondlineOffset;
 			float				fThirdlineOffset;
-			float				fStateWidth;
 };
 
 
