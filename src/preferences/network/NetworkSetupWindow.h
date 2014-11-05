@@ -46,7 +46,6 @@ class NetworkSetupWindow : public BWindow
 			void				_BuildProfilesMenu(BMenu* menu, int32 msg);
 			void				_BuildShowTabView();
 
-			BButton*			fHelpButton;
 			BButton*			fRevertButton;
 			BButton*			fApplyButton;
 
