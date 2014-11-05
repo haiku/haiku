@@ -24,6 +24,7 @@
 #include <StringView.h>
 #include <TextControl.h>
 #include <TextView.h>
+#include <ViewPort.h>
 
 #include <StringForSize.h>
 
@@ -100,7 +101,9 @@ PartitionsPage::_BuildUI()
 		.SetColumnWeight(3, 0.5);
 	_FillPartitionsView(fPartitions);
 
-	BScrollView* scrollView = new BScrollView("scrollView", fPartitions, 0,
+	BViewPort* viewPort = new BViewPort(fPartitions);
+
+	BScrollView* scrollView = new BScrollView("scrollView", viewPort, 0,
 		false, true);
 
 	SetLayout(new BGroupLayout(B_VERTICAL));

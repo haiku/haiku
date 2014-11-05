@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src apps bootmanager ;
 
 UsePrivateHeaders shared storage tracker ;
+UsePrivateHeaders interface ;
 
 local cataloguedSources =
 	BootDrive.cpp
