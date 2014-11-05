@@ -128,6 +128,8 @@ public:
 			BStringView*	StatusLine();
 			void			ToggleMenuOnOff();
 
+			void			ErrorAlert(const char*, status_t);
+
 private:
 			void			_BuildCaptureControls();
 
@@ -140,7 +142,7 @@ private:
 			media_node*		fProducer;
 			port_id*		fPortPtr;
 
-			BView*			fVideoView;
+			BTextView*		fVideoView;
 
 			BTextControl*	fFileName;
 			BBox*			fCaptureSetupBox;
