@@ -13,9 +13,9 @@ NetworkSetupProfile::NetworkSetupProfile()
 	:
 	fRoot(new BEntry()),
 	fPath(new BPath()),
-	fName(NULL),
+	fIsDefault(false),
 	fIsCurrent(false),
-	fIsDefault(false)
+	fName(NULL)
 {
 }
 
@@ -24,8 +24,8 @@ NetworkSetupProfile::NetworkSetupProfile(const char* path)
 	:
 	fRoot(NULL),
 	fPath(NULL),
-	fIsCurrent(false),
-	fIsDefault(false)
+	fIsDefault(false),
+	fIsCurrent(false)
 {
 	SetTo(path);
 }
@@ -35,8 +35,8 @@ NetworkSetupProfile::NetworkSetupProfile(const entry_ref* ref)
 	:
 	fRoot(NULL),
 	fPath(NULL),
-	fIsCurrent(false),
-	fIsDefault(false)
+	fIsDefault(false),
+	fIsCurrent(false)
 {
 	SetTo(ref);
 }
@@ -46,8 +46,8 @@ NetworkSetupProfile::NetworkSetupProfile(BEntry* entry)
 	:
 	fRoot(NULL),
 	fPath(NULL),
-	fIsCurrent(false),
-	fIsDefault(false)
+	fIsDefault(false),
+	fIsCurrent(false)
 {
 	SetTo(entry);
 }
