@@ -55,17 +55,6 @@ const int32 kSliderViewRectHeight = 40;
 
 namespace {
 
-void
-VideoWindow::ErrorAlert(const char* message, status_t err)
-{
-	Lock();
-	fVideoView->SetText(message);
-	Unlock();
-
-	printf("%s\n%s [%" B_PRIx32 "]", message, strerror(err), err);
-}
-
-
 // functions for EnumeratedStringValueSettings
 
 const char*
@@ -493,7 +482,6 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 }
 
 
-
 VideoWindow::~VideoWindow()
 {
 	_QuitSettings();
@@ -684,7 +672,7 @@ VideoWindow::_BuildCaptureControls()
 		m->AddInt32("client", i);
 		fUploadClientMenu->AddItem(new BMenuItem(kUploadClients[i], m));
 	}
-	
+
 	fUploadClientMenu->SetTargetForItems(this);
 	fUploadClientMenu->FindItem(fUploadClientSetting->Value())->SetMarked(true);
 	fUploadClientSelector = new BMenuField("UploadClient", NULL,
@@ -751,6 +739,17 @@ VideoWindow::ApplyControls()
 	fPassiveFtp->Invoke();
 
 	Unlock();
+}
+
+
+void
+VideoWindow::ErrorAlert(const char* message, status_t err)
+{
+	Lock();
+	fVideoView->SetText(message);
+	Unlock();
+
+	printf("%s\n%s [%" B_PRIx32 "]", message, strerror(err), err);
 }
 
 
