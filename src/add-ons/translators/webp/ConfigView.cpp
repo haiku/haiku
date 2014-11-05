@@ -52,8 +52,8 @@ static const struct preset_name {
 };
 
 
-ConfigView::ConfigView(TranslatorSettings* settings, uint32 flags)
-	: BView(B_TRANSLATE("WebPTranslator Settings"), flags),
+ConfigView::ConfigView(TranslatorSettings* settings)
+	: BGroupView(B_TRANSLATE("WebPTranslator Settings"), B_VERTICAL),
 	fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -120,7 +120,8 @@ ConfigView::ConfigView(TranslatorSettings* settings, uint32 flags)
 		fPreprocessingCheckBox->SetValue(B_CONTROL_ON);
 
 	// Build the layout
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
+	BLayoutBuilder::Group<> builder(GroupLayout());
+	builder
 		.SetInsets(5)
 		.AddGroup(B_HORIZONTAL)
 			.Add(title)
@@ -130,13 +131,11 @@ ConfigView::ConfigView(TranslatorSettings* settings, uint32 flags)
 		.Add(copyrights)
 		.AddGlue()
 
-		.AddGrid()
-			.Add(presetsField->CreateLabelLayoutItem(), 0, 0)
-			.Add(presetsField->CreateMenuBarLayoutItem(), 1, 0)
-		.End()
+		.Add(presetsField)
 		.Add(fQualitySlider)
 		.Add(fMethodSlider)
 		.Add(fPreprocessingCheckBox);
+
 }
 
 
@@ -149,13 +148,18 @@ ConfigView::~ConfigView()
 void
 ConfigView::AttachedToWindow()
 {
-	BView::AttachedToWindow();
+	BGroupView::AttachedToWindow();
 
 	fPresetsMenu->SetTargetForItems(this);
 
 	fQualitySlider->SetTarget(this);
 	fMethodSlider->SetTarget(this);
 	fPreprocessingCheckBox->SetTarget(this);
+
+	if (Parent() == NULL && Window()->GetLayout() == NULL) {
+		Window()->SetLayout(new BGroupLayout(B_VERTICAL));
+		Window()->ResizeTo(PreferredSize().Width(), PreferredSize().Height());
+	}
 }
 
 
@@ -181,7 +185,7 @@ ConfigView::MessageReceived(BMessage* message)
 	}
 
 	if (maps[i].name == NULL) {
-		BView::MessageReceived(message);
+		BGroupView::MessageReceived(message);
 		return;
 	}
 

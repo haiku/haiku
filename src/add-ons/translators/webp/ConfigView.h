@@ -9,17 +9,16 @@
 #define CONFIG_VIEW_H
 
 
-#include <View.h>
+#include <GroupView.h>
 
 class BCheckBox;
 class BPopUpMenu;
 class BSlider;
 class TranslatorSettings;
 
-class ConfigView : public BView {
+class ConfigView : public BGroupView {
 public:
-							ConfigView(TranslatorSettings* settings,
-								uint32 flags = B_WILL_DRAW);
+							ConfigView(TranslatorSettings* settings);
 	virtual 				~ConfigView();
 
 	virtual void 			AttachedToWindow();

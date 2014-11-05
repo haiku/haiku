@@ -46,7 +46,7 @@
 
 GIFView::GIFView(TranslatorSettings* settings)
 	:
-	BView("GIFView", B_WILL_DRAW),
+	BGroupView("GIFView", B_VERTICAL),
 	fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -172,19 +172,17 @@ GIFView::GIFView(TranslatorSettings* settings)
 			.Add(fColorCountMF->CreateMenuBarLayoutItem(), 1, 1)
 
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(10.0f), 1, 2)
+		.End()
 
-			.Add(fDitheringBox, 1, 3)
-			.Add(fInterlacedBox, 1, 4)
-			.Add(fTransparentBox, 1, 5)
+		.Add(fDitheringBox)
+		.Add(fInterlacedBox)
+		.Add(fTransparentBox)
 
-			.End()
 		.AddGlue()
 		.End();
 
 	BFont font;
 	GetFont(&font);
-	SetExplicitPreferredSize(BSize((font.Size() * 400) / 12,
-		(font.Size() * 300) / 12));
 
 	fSettings->Acquire();
 
@@ -315,6 +313,11 @@ GIFView::AllAttached()
 	fColorCountM->SetTargetForItems(messenger);
 
 	BView::AllAttached();
+
+	if (Parent() == NULL && Window()->GetLayout() == NULL) {
+		Window()->SetLayout(new BGroupLayout(B_VERTICAL));
+		Window()->ResizeTo(PreferredSize().Width(), PreferredSize().Height());
+	}
 }
 
 

@@ -21,7 +21,7 @@
 #define GIF_VIEW_H
 
 
-#include <View.h>
+#include <GroupView.h>
 #include "TranslatorSettings.h"
 
 
@@ -54,7 +54,7 @@ class BTextControl;
 
 
 
-class GIFView : public BView {
+class GIFView : public BGroupView {
 public:
 								GIFView(TranslatorSettings* settings);
 	virtual						~GIFView();
