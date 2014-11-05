@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -12,6 +12,7 @@
 #include <util/OpenHashTable.h>
 
 
+class ExpressionValues;
 class ObjectID;
 class StackFrameValues;
 class Type;
@@ -59,6 +60,10 @@ public:
 									{ return fValues; }
 			void				SetValues(StackFrameValues* values);
 
+			ExpressionValues*	GetExpressionValues() const
+									{ return fExpressionValues; }
+			void				SetExpressionValues(ExpressionValues* values);
+
 			const VariablesViewNodeInfo* GetNodeInfo(ObjectID* variable,
 									const TypeComponentPath* path) const;
 	inline	const VariablesViewNodeInfo* GetNodeInfo(ObjectID* variable,
@@ -82,6 +87,7 @@ private:
 private:
 			NodeInfoTable*		fNodeInfos;
 			StackFrameValues*	fValues;
+			ExpressionValues*	fExpressionValues;
 };
 
 

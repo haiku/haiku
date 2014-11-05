@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -9,6 +9,7 @@
 
 #include <new>
 
+#include "ExpressionValues.h"
 #include "FunctionID.h"
 #include "StackFrameValues.h"
 #include "Type.h"
@@ -164,7 +165,8 @@ struct VariablesViewState::InfoEntryHashDefinition {
 VariablesViewState::VariablesViewState()
 	:
 	fNodeInfos(NULL),
-	fValues(NULL)
+	fValues(NULL),
+	fExpressionValues(NULL)
 {
 }
 
@@ -198,6 +200,22 @@ VariablesViewState::SetValues(StackFrameValues* values)
 
 	if (fValues != NULL)
 		fValues->AcquireReference();
+}
+
+
+void
+VariablesViewState::SetExpressionValues(ExpressionValues* values)
+{
+	if (fExpressionValues == values)
+		return;
+
+	if (fExpressionValues != NULL)
+		fExpressionValues->ReleaseReference();
+
+	fExpressionValues = values;
+
+	if (fExpressionValues != NULL)
+		fExpressionValues->AcquireReference();
 }
 
 
