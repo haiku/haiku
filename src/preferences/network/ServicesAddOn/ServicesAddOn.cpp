@@ -205,7 +205,7 @@ ServicesAddOn::_ParseXinetd()
 
 			if (loc) {
 				BString label;
-				token = strtok(loc, " ");
+				strtok(loc, " ");
 				token = strtok(NULL, " ");
 				label << token;
 				fServicesListView->AddItem(new BStringItem(label.String()));
