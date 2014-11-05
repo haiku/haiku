@@ -40,7 +40,8 @@ get_nth_addon(image_id image, int index)
 ServicesAddOn::ServicesAddOn(image_id image)
 	:
 	NetworkSetupAddOn(image),
-	BGroupView("Services")
+	BGroupView("Services"),
+	fServicesListView(NULL)
 {
 }
 
