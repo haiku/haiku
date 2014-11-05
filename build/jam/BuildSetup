@@ -196,6 +196,7 @@ switch $(HOST_GCC_MACHINE) {
 	# the following are rather unlikely as hosts ...
 	case arm-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
 	case armv7l-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+	case armv7hl-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
 	case armv7b-*	: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
 	case m68k-*		: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
 	case *			: Exit "Unsupported gcc host machine:" $(HOST_GCC_MACHINE) ;
