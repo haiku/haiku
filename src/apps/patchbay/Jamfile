@@ -11,8 +11,13 @@ SimpleTest PatchBay
 	EndpointInfo.cpp
 	MidiEventMeter.cpp
 	:
-	midi midi2 be libicon.a [ TargetLibstdc++ ]
+	midi midi2 be libicon.a localestub [ TargetLibstdc++ ]
 	:
 	PatchBay.rdef
 ;
 
+DoCatalogs PatchBay :
+	x-vnd.Haiku.PatchBay
+	:
+	PatchView.cpp
+;

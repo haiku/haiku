@@ -15,6 +15,7 @@
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <IconUtils.h>
 #include <InterfaceDefs.h>
@@ -26,6 +27,9 @@
 #include "EndpointInfo.h"
 #include "PatchRow.h"
 #include "UnknownDeviceIcons.h"
+
+
+#define B_TRANSLATION_CONTEXT "Patch Bay"
 
 
 PatchView::PatchView(BRect rect)
@@ -149,14 +153,31 @@ PatchView::Draw(BRect /* updateRect */)
 			const BBitmap* bitmap = (i->Icon()) ? i->Icon() : fUnknownDeviceIcon;
 			DrawBitmapAsync(bitmap, RowIconFrameAt(index++).LeftTop());
 	}
-			
+
 	// draw consumer icons
-	index = 0;
+	int32 index2 = 0;
 	for (list<EndpointInfo>::const_iterator i = fConsumers.begin();
 		i != fConsumers.end(); i++) {
 			const BBitmap* bitmap = (i->Icon()) ? i->Icon() : fUnknownDeviceIcon;
-			DrawBitmapAsync(bitmap, ColumnIconFrameAt(index++).LeftTop());
+			DrawBitmapAsync(bitmap, ColumnIconFrameAt(index2++).LeftTop());
 	}
+
+	if (index == 0 && index2 == 0) {
+		const char* message = B_TRANSLATE("No MIDI devices found!");
+		float width = StringWidth(message);
+		BRect rect = Bounds();
+
+		rect.top = rect.top + rect.bottom / 2;
+		rect.left = rect.left + rect.right / 2;
+		rect.left -= width / 2;
+
+		DrawString(message, rect.LeftTop());
+
+		// Since the message is centered, we need to redraw the whole view in
+		// this case.
+		SetFlags(Flags() | B_FULL_UPDATE_ON_RESIZE);
+	} else
+		SetFlags(Flags() & ~B_FULL_UPDATE_ON_RESIZE);
 }
 
 
