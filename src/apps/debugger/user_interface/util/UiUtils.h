@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -57,6 +58,8 @@ public:
 									int32 lowerBound, int32 upperBound,
 									bool fixedRange,
 									RangeList& _output);
+
+	static	const char*			TypeCodeToString(type_code type);
 };
 
 

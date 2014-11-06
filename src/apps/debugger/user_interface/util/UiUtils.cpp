@@ -1,6 +1,6 @@
 /*
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -452,4 +452,34 @@ UiUtils::ParseRangeExpression(const BString& rangeExpression, int32 lowerBound,
 	}
 
 	return B_OK;
+}
+
+
+/*static*/ const char*
+UiUtils::TypeCodeToString(type_code type)
+{
+	switch (type) {
+		case B_INT8_TYPE:
+			return "int8";
+		case B_UINT8_TYPE:
+			return "uint8";
+		case B_INT16_TYPE:
+			return "int16";
+		case B_UINT16_TYPE:
+			return "uint16";
+		case B_INT32_TYPE:
+			return "int32";
+		case B_UINT32_TYPE:
+			return "uint32";
+		case B_INT64_TYPE:
+			return "int64";
+		case B_UINT64_TYPE:
+			return "uint64";
+		case B_FLOAT_TYPE:
+			return "float";
+		case B_DOUBLE_TYPE:
+			return "double";
+		default:
+			return "unknown";
+	}
 }
