@@ -375,6 +375,7 @@ RemotePackageRepository HaikuPorts
 	cvsps_x86-2.2b1-1
 	dbus_x86-1.8.6-1
 	dbus_x86_devel-1.8.6-1
+	ddrescue_x86-1.19-1
 	devil_x86-1.7.8-2
 	devil_x86_devel-1.7.8-2
 	djvulibre_x86-3.5.25-1
@@ -645,6 +646,7 @@ RemotePackageRepository HaikuPorts
 	cvs
 	cvsps_x86
 	dbus_x86
+	ddrescue_x86
 	devil_x86
 	dfu_util
 	djvulibre_x86
