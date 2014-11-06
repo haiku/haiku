@@ -11,6 +11,7 @@
 
 class BButton;
 class BMenu;
+class BMenuItem;
 class BTextControl;
 
 
@@ -35,6 +36,8 @@ public:
 private:
 			void	 			_Init();
 			BMenu*				_BuildTypesMenu();
+			BMenuItem*			_AddMenuItemForType(BMenu* menu,
+									type_code type);
 
 private:
 			BTextControl*		fExpressionInput;

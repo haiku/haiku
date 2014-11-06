@@ -11,6 +11,7 @@
 #include <TextControl.h>
 
 #include "MessageCodes.h"
+#include "UiUtils.h"
 
 
 enum {
@@ -100,41 +101,34 @@ ExpressionPromptWindow::_BuildTypesMenu()
 	BMenu* menu = new BMenu("Types");
 	menu->SetLabelFromMarked(true);
 
-	BMessage message(MSG_CHANGE_EVALUATION_TYPE);
-	message.AddInt32("type", B_INT8_TYPE);
+	_AddMenuItemForType(menu, B_INT8_TYPE);
+	_AddMenuItemForType(menu, B_UINT8_TYPE);
+	_AddMenuItemForType(menu, B_INT16_TYPE);
+	_AddMenuItemForType(menu, B_UINT16_TYPE);
+	_AddMenuItemForType(menu, B_INT32_TYPE);
+	_AddMenuItemForType(menu, B_UINT32_TYPE);
+	BMenuItem* item = _AddMenuItemForType(menu, B_INT64_TYPE);
+	if (item != NULL)
+		item->SetMarked(true);
 
-	menu->AddItem(new BMenuItem("int8", new BMessage(message)));
-
-	message.ReplaceInt32("type", B_UINT8_TYPE);
-	menu->AddItem(new BMenuItem("uint8", new BMessage(message)));
-
-	message.ReplaceInt32("type", B_INT16_TYPE);
-	menu->AddItem(new BMenuItem("int16", new BMessage(message)));
-
-	message.ReplaceInt32("type", B_UINT16_TYPE);
-	menu->AddItem(new BMenuItem("uint16", new BMessage(message)));
-
-	message.ReplaceInt32("type", B_INT32_TYPE);
-	menu->AddItem(new BMenuItem("int32", new BMessage(message)));
-
-	message.ReplaceInt32("type", B_UINT32_TYPE);
-	menu->AddItem(new BMenuItem("uint32", new BMessage(message)));
-
-	message.ReplaceInt32("type", B_INT64_TYPE);
-	BMenuItem* item = new BMenuItem("int64", new BMessage(message));
-	menu->AddItem(item);
-	item->SetMarked(true);
-
-	message.ReplaceInt32("type", B_UINT64_TYPE);
-	menu->AddItem(new BMenuItem("uint64", new BMessage(message)));
-
-	message.ReplaceInt32("type", B_FLOAT_TYPE);
-	menu->AddItem(new BMenuItem("float", new BMessage(message)));
-
-	message.ReplaceInt32("type", B_DOUBLE_TYPE);
-	menu->AddItem(new BMenuItem("double", new BMessage(message)));
+	_AddMenuItemForType(menu, B_UINT64_TYPE);
+	_AddMenuItemForType(menu, B_FLOAT_TYPE);
+	_AddMenuItemForType(menu, B_DOUBLE_TYPE);
 
 	return menu;
+}
+
+
+BMenuItem*
+ExpressionPromptWindow::_AddMenuItemForType(BMenu* menu, type_code type)
+{
+	BMessage *message = new BMessage(MSG_CHANGE_EVALUATION_TYPE);
+	message->AddInt32("type", type);
+
+	BMenuItem* item = new BMenuItem(UiUtils::TypeCodeToString(type), message);
+	menu->AddItem(item);
+
+	return item;
 }
 
 
@@ -168,12 +162,13 @@ ExpressionPromptWindow::MessageReceived(BMessage* message)
 
 		case MSG_ADD_NEW_EXPRESSION:
 		{
-			BMessage addMessage(message->what);
+			BMessage addMessage(MSG_EXPRESSION_PROMPT_WINDOW_CLOSED);
 			addMessage.AddString("expression", fExpressionInput->Text());
 			addMessage.AddInt32("type", fCurrentType);
+			addMessage.AddMessenger("target", BMessenger(fAddTarget));
 
-			BMessenger(fAddTarget).SendMessage(&addMessage);
-			PostMessage(B_QUIT_REQUESTED);
+			BMessenger(fCloseTarget).SendMessage(&addMessage);
+			Quit();
 			break;
 		}
 

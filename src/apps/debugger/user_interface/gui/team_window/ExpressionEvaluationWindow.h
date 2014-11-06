@@ -12,6 +12,7 @@
 #include "types/Types.h"
 
 class BMenu;
+class BMenuItem;
 class BButton;
 class BStringView;
 class BTextControl;
@@ -53,6 +54,8 @@ public:
 private:
 			void	 			_Init();
 			BMenu*				_BuildTypesMenu();
+			BMenuItem*			_AddMenuItemForType(BMenu* menu,
+									type_code type);
 
 	// Team::Listener
 	virtual	void				ExpressionEvaluated(
