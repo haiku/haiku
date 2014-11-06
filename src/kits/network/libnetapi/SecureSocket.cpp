@@ -364,7 +364,7 @@ BSecureSocket::~BSecureSocket()
 
 
 bool
-BSecureSocket::CertificateVerificationFailed(BCertificate& certificate)
+BSecureSocket::CertificateVerificationFailed(BCertificate& certificate, const char*)
 {
 	(void)certificate;
 	return false;
