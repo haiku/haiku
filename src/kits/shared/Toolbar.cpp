@@ -10,6 +10,10 @@
 #include <SeparatorView.h>
 #include <SpaceLayoutItem.h>
 
+
+namespace BPrivate {
+
+
 class LockableButton: public BButton {
 public:
 			LockableButton(const char* name, const char* label,
@@ -196,3 +200,5 @@ BToolbar::_HideToolTips() const
 		view->HideToolTip();
 }
 
+
+} // namespace BPrivate

@@ -11,6 +11,7 @@
 #define SHOW_IMAGE_WINDOW_H
 
 
+#include <Toolbar.h>
 #include <Window.h>
 
 #include "ImageFileNavigator.h"
@@ -27,7 +28,6 @@ class BScrollView;
 class ProgressWindow;
 class ShowImageView;
 class ShowImageStatusView;
-class BToolbar;
 
 
 // public message constants

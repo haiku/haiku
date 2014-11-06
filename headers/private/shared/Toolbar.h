@@ -10,6 +10,7 @@
 
 class BButton;
 
+namespace BPrivate {
 
 class BToolbar : public BGroupView {
 public:
@@ -41,5 +42,9 @@ private:
 			BButton*			_FindButton(uint32 command) const;
 			void				_HideToolTips() const;
 };
+
+} // namespace BPrivate
+
+using BPrivate::BToolbar;
 
 #endif // _TOOLBAR_H
