@@ -39,6 +39,7 @@ SubInclude HAIKU_TOP src tests kits net ipv6 ;
 HaikuSubInclude libnetapi ;
 SubInclude HAIKU_TOP src tests kits net multicast ;
 SubInclude HAIKU_TOP src tests kits net netperf ;
+SubInclude HAIKU_TOP src tests kits net posixnet ;
 SubInclude HAIKU_TOP src tests kits net service ;
 SubInclude HAIKU_TOP src tests kits net sock ;
 SubInclude HAIKU_TOP src tests kits net tcp_shell ;
