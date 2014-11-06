@@ -42,6 +42,7 @@
 #include "DisassembledCode.h"
 #include "BreakpointEditWindow.h"
 #include "ExpressionEvaluationWindow.h"
+#include "ExpressionPromptWindow.h"
 #include "FileSourceCode.h"
 #include "GuiSettingsUtils.h"
 #include "GuiTeamUiSettings.h"
@@ -141,6 +142,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fBreakpointEditWindow(NULL),
 	fInspectorWindow(NULL),
 	fExpressionWindow(NULL),
+	fExpressionPromptWindow(NULL),
 	fFilePanel(NULL),
 	fActiveSourceWorker(-1)
 {
@@ -372,6 +374,49 @@ TeamWindow::MessageReceived(BMessage* message)
 		case MSG_EXPRESSION_WINDOW_CLOSED:
 		{
 			fExpressionWindow = NULL;
+			break;
+		}
+		case MSG_SHOW_EXPRESSION_PROMPT_WINDOW:
+		{
+			BHandler* addTarget;
+			if (message->FindPointer("target",
+				reinterpret_cast<void**>(&addTarget)) != B_OK) {
+				break;
+			}
+
+			if (fExpressionPromptWindow != NULL) {
+				AutoLocker<BWindow> lock(fExpressionPromptWindow);
+				if (lock.IsLocked())
+					fExpressionPromptWindow->Activate(true);
+			} else {
+				try {
+					fExpressionPromptWindow = ExpressionPromptWindow::Create(
+						addTarget, this);
+					if (fExpressionPromptWindow != NULL)
+						fExpressionPromptWindow->Show();
+	           	} catch (...) {
+	           		// TODO: notify user
+	           	}
+			}
+			break;
+		}
+		case MSG_EXPRESSION_PROMPT_WINDOW_CLOSED:
+		{
+			fExpressionPromptWindow = NULL;
+
+			const char* expression;
+			int32 type;
+			BMessenger targetMessenger;
+			if (message->FindString("expression", &expression) == B_OK
+				&& message->FindInt32("type", &type) == B_OK
+				&& message->FindMessenger("target", &targetMessenger)
+					== B_OK) {
+				BMessage addMessage(MSG_ADD_NEW_EXPRESSION);
+				addMessage.AddString("expression", expression);
+				addMessage.AddInt32("type", type);
+
+				targetMessenger.SendMessage(&addMessage);
+			}
 			break;
 		}
 		case MSG_SHOW_BREAK_CONDITION_CONFIG_WINDOW:

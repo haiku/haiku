@@ -35,12 +35,14 @@ class ConsoleOutputView;
 class BreakConditionConfigWindow;
 class BreakpointEditWindow;
 class ExpressionEvaluationWindow;
+class ExpressionPromptWindow;
 class Image;
 class InspectorWindow;
 class RegistersView;
 class SourceCode;
 class SourceLanguage;
 class StackFrame;
+class Type;
 class UserBreakpoint;
 class UserInterfaceListener;
 class VariablesView;
@@ -185,7 +187,8 @@ private:
 									const BMessage* settings);
 
 			status_t			_GetActiveSourceLanguage(
-									SourceLanguage*& language);
+									SourceLanguage*& _language);
+
 private:
 			::Team*				fTeam;
 			::Thread*			fActiveThread;
@@ -224,6 +227,7 @@ private:
 			BreakpointEditWindow* fBreakpointEditWindow;
 			InspectorWindow*	fInspectorWindow;
 			ExpressionEvaluationWindow* fExpressionWindow;
+			ExpressionPromptWindow* fExpressionPromptWindow;
 			GuiTeamUiSettings	fUiSettings;
 			BFilePanel*			fFilePanel;
 			thread_id			fActiveSourceWorker;
