@@ -270,6 +270,7 @@ Application Debugger :
 	BreakpointsView.cpp
 	ConsoleOutputView.cpp
 	ExpressionEvaluationWindow.cpp
+	ExpressionPromptWindow.cpp
 	ImageFunctionsView.cpp
 	ImageListView.cpp
 	RegistersView.cpp
