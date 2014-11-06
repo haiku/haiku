@@ -300,7 +300,6 @@ NetworkSettings::SetConfiguration()
 				interfaceConfig.SetAddress(fAddress[inet_id]);
 				interfaceConfig.SetMask(fNetmask[inet_id]);
 				fNetworkInterface->SetAddress(interfaceConfig);
-				fNetworkInterface->SetTo(zeroAddr);
 			} else {
 				// TODO : test this case (no address set for this protocol)
 				printf("no zeroAddr found for %s(%d), found %" B_PRIu32 "\n",
@@ -311,6 +310,20 @@ NetworkSettings::SetConfiguration()
 				fNetworkInterface->AddAddress(interfaceConfig);
 			}
 
+			// FIXME these flags shouldn't be interface-global, but specific to
+			// each protocol. Only set them for AF_INET otherwise there is
+			// confusion and freezes.
+			if (fProtocols[index].inet_id == AF_INET) {
+				int32 flags = fNetworkInterface->Flags();
+				if (AutoConfigure(fProtocols[index].inet_id)) {
+					flags |= IFF_AUTO_CONFIGURED;
+					fNetworkInterface->SetFlags(flags);
+					fNetworkInterface->AutoConfigure(fProtocols[index].inet_id);
+				} else {
+					flags &= ~(IFF_AUTO_CONFIGURED | IFF_CONFIGURING);
+					fNetworkInterface->SetFlags(flags);
+				}
+			}
 		}
 	}
 }

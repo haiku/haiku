@@ -564,8 +564,11 @@ InterfacesListView::_HandleNetworkMessage(BMessage* message)
 	switch (opcode) {
 		case B_NETWORK_INTERFACE_CHANGED:
 		case B_NETWORK_DEVICE_LINK_CHANGED:
-			if (item != NULL)
+			if (item != NULL) {
+				// Make sure the item reflects the current state
+				item->GetSettings()->ReadConfiguration();
 				InvalidateItem(IndexOf(item));
+			}
 			break;
 
 		case B_NETWORK_INTERFACE_ADDED:
