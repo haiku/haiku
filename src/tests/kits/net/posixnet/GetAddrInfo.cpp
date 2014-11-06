@@ -39,8 +39,7 @@ GetAddrInfoTest::EmptyTest()
 		freeaddrinfo(info);
 
 	// getaddrinfo shouldn't suggest that this may work better by trying again.
-	CPPUNIT_ASSERT(result != EAI_EAGAIN);
-	// TODO it should also not take 22 seconds before it says so!
+	CPPUNIT_ASSERT(result != EAI_AGAIN);
 }
 
 
