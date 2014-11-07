@@ -457,6 +457,13 @@ NotificationWindow::_LoadAppFilters(BMessage& settings)
 void
 NotificationWindow::_LoadGeneralSettings(BMessage& settings)
 {
+	bool shouldRun;
+	if (settings.FindBool(kAutoStartName, &shouldRun) == B_OK) {
+		if (shouldRun == false) {
+			// We should not start. Quit the app!
+			be_app_messenger.SendMessage(B_QUIT_REQUESTED);
+		}
+	}
 	if (settings.FindInt32(kTimeoutName, &fTimeout) != B_OK)
 		fTimeout = kDefaultTimeout;
 

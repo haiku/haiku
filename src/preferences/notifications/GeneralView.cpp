@@ -207,56 +207,6 @@ GeneralView::Save(BMessage& settings)
 	int32 timeout = atol(fTimeout->Text());
 	settings.AddInt32(kTimeoutName, timeout);
 
-	// Find server path
-	entry_ref ref;
-	if (!_CanFindServer(&ref)) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("The notifications server cannot be found.\n"
-			   "A possible cause is an installation not done correctly"),
-			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		(void)alert->Go();
-		return B_ERROR;
-	}
-
-	// UserBootscript command
-	BPath serverPath(&ref);
-
-	// Start server at boot time
-	BPath path;
-	status_t ret = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
-	if (ret != B_OK) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("Can't save preferences, you probably don't have "
-			"write access to the settings directory."), B_TRANSLATE("OK"),
-			NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		(void)alert->Go();
-		return ret;
-	}
-
-	path.Append("boot/launch");
-	BDirectory directory(path.Path());
-	BEntry entry(&directory, serverPath.Leaf());
-
-	// Remove symbolic link
-	entry.Remove();
-
-	if (autoStart) {
-		// Put a symlink into ~/config/boot/launch
-		if ((ret = directory.CreateSymLink(serverPath.Leaf(),
-			serverPath.Path(), NULL) != B_OK)) {
-			BAlert* alert = new BAlert("",
-				B_TRANSLATE("Can't enable notifications at startup time, "
-				"you probably don't have write permission to the boot settings"
-				" directory."), B_TRANSLATE("OK"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_STOP_ALERT);
-			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-			(void)alert->Go();
-			return ret;
-		}
-	}
-
 	return B_OK;
 }
 
