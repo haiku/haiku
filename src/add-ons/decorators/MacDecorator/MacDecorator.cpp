@@ -52,12 +52,12 @@ MacDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect)
 MacDecorator::MacDecorator(DesktopSettings& settings, BRect frame)
 	:
 	Decorator(settings, frame),
-	fButtonHighColor((rgb_color){ 232, 232, 232, 255 }),
-	fButtonLowColor((rgb_color){ 128, 128, 128, 255 }),
-	fFrameHighColor((rgb_color){ 255, 255, 255, 255 }),
-	fFrameMidColor((rgb_color){ 216, 216, 216, 255 }),
-	fFrameLowColor((rgb_color){ 110, 110, 110, 255 }),
-	fFrameLowerColor((rgb_color){ 0, 0, 0, 255 }),
+	fButtonHighColor((rgb_color) { 232, 232, 232, 255 }),
+	fButtonLowColor((rgb_color) { 128, 128, 128, 255 }),
+	fFrameHighColor((rgb_color) { 255, 255, 255, 255 }),
+	fFrameMidColor((rgb_color) { 216, 216, 216, 255 }),
+	fFrameLowColor((rgb_color) { 156, 156, 156, 255 }),
+	fFrameLowerColor((rgb_color) { 0, 0, 0, 255 }),
 	fFocusTextColor(settings.UIColor(B_WINDOW_TEXT_COLOR)),
 	fNonFocusTextColor(settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR))
 {
@@ -214,7 +214,7 @@ MacDecorator::_DoLayout()
 
 		// TODO the tab is drawn in a fixed height for now
 		fTitleBarRect.Set(fFrame.left - fBorderWidth,
-			fFrame.top - 23,
+			fFrame.top - 22,
 			((fFrame.right - fFrame.left) < 32.0 ?
 				fFrame.left + 32.0 : fFrame.right) + fBorderWidth,
 			fFrame.top - 3);
@@ -239,6 +239,7 @@ MacDecorator::_DoLayout()
 			tab->zoomRect.OffsetBy(0 - (tab->zoomRect.Width() + 4), 0);
 			if (Title(tab) != NULL && fDrawingEngine != NULL) {
 				tab->truncatedTitle = Title(tab);
+				fDrawingEngine->SetFont(fDrawState.Font());
 				tab->truncatedTitleLength
 					= (int32)fDrawingEngine->StringWidth(Title(tab),
 						strlen(Title(tab)));
@@ -395,12 +396,15 @@ MacDecorator::_DrawFrame(BRect invalid)
 				pt2.x--;
 				pt2.y--;
 			} else {
+				r.top -= 3;
+				RGBColor inactive(82, 82, 82);
+
 				fDrawingEngine->StrokeLine(r.LeftTop(), r.LeftBottom(),
-					fFrameLowColor);
+					inactive);
 				fDrawingEngine->StrokeLine(r.RightTop(), r.RightBottom(),
-					fFrameLowColor);
+					inactive);
 				fDrawingEngine->StrokeLine(r.LeftBottom(), r.RightBottom(),
-					fFrameLowColor);
+					inactive);
 
 				for (int i = 0; i < 4; i++) {
 					r.InsetBy(1, 1);
@@ -410,15 +414,19 @@ MacDecorator::_DrawFrame(BRect invalid)
 						fFrameMidColor);
 					fDrawingEngine->StrokeLine(r.LeftBottom(), r.RightBottom(),
 						fFrameMidColor);
+					fDrawingEngine->StrokeLine(r.LeftTop(), r.RightTop(),
+						fFrameMidColor);
 				}
 
 				r.InsetBy(1, 1);
 				fDrawingEngine->StrokeLine(r.LeftTop(), r.LeftBottom(),
-					fFrameLowColor);
+					inactive);
 				fDrawingEngine->StrokeLine(r.RightTop(), r.RightBottom(),
-					fFrameLowColor);
+					inactive);
 				fDrawingEngine->StrokeLine(r.LeftBottom(), r.RightBottom(),
-					fFrameLowColor);
+					inactive);
+				fDrawingEngine->StrokeLine(r.LeftTop(), r.RightTop(),
+					inactive);
 			}
 			break;
 		}
@@ -480,6 +488,8 @@ MacDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 			right = tab->tabRect.right;
 
 		if (tab->tabRect.left + tab->textOffset > left + 5) {
+			RGBColor dark(115, 115, 115);
+
 			// Left side
 
 			BPoint offset(left + 5, tab->closeRect.top);
@@ -498,7 +508,7 @@ MacDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 			pt2.Set(tab->tabRect.left + tab->textOffset - 4,
 				tab->closeRect.top + 1);
 
-			fDrawState.SetHighColor(RGBColor(fFrameLowColor));
+			fDrawState.SetHighColor(dark);
 			for (int32 i = 0; i < 6; i++) {
 				fDrawingEngine->StrokeLine(offset, pt2,
 					fDrawState.HighColor());
@@ -508,8 +518,8 @@ MacDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 
 			// Right side
 
-			offset.Set(tab->tabRect.left + tab->textOffset + 6
-				+ tab->truncatedTitleLength + 6, tab->zoomRect.top);
+			offset.Set(tab->tabRect.left + tab->textOffset
+				+ tab->truncatedTitleLength + 3, tab->zoomRect.top);
 			pt2.Set(right - 8, tab->zoomRect.top);
 
 			if (offset.x < pt2.x) {
@@ -521,11 +531,11 @@ MacDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 					pt2.y += 2;
 				}
 
-				offset.Set(tab->tabRect.left + tab->textOffset + 6
-					+ tab->truncatedTitleLength + 7, tab->zoomRect.top + 1);
+				offset.Set(tab->tabRect.left + tab->textOffset
+					+ tab->truncatedTitleLength + 4, tab->zoomRect.top + 1);
 				pt2.Set(right - 7, tab->zoomRect.top + 1);
 
-				fDrawState.SetHighColor(fFrameLowColor);
+				fDrawState.SetHighColor(dark);
 				for(int32 i = 0; i < 6; i++) {
 					fDrawingEngine->StrokeLine(offset, pt2,
 						fDrawState.HighColor());
@@ -537,14 +547,15 @@ MacDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 
 		_DrawButtons(tab, rect);
 	} else {
+		RGBColor inactive(82, 82, 82);
 		// Not focused - Just draw a plain light grey area with the title
 		// in the middle
 		fDrawingEngine->StrokeLine(rect.LeftTop(), rect.RightTop(),
-			fFrameLowColor);
+			inactive);
 		fDrawingEngine->StrokeLine(rect.LeftTop(), rect.LeftBottom(),
-			fFrameLowColor);
+			inactive);
 		fDrawingEngine->StrokeLine(rect.RightBottom(), rect.RightTop(),
-			fFrameLowColor);
+			inactive);
 	}
 
 	_DrawTitle(tab, tab->tabRect);
@@ -580,10 +591,9 @@ MacDecorator::_DrawTitle(Decorator::Tab* tab, BRect rect)
 	tab->truncatedTitle = Title(tab);
 	fDrawState.Font().TruncateString(&tab->truncatedTitle, B_TRUNCATE_END,
 		(tab->zoomRect.left - 5) - (tab->closeRect.right + 5));
-	tab->truncatedTitleLength = tab->truncatedTitle.Length();
 	fDrawingEngine->SetFont(fDrawState.Font());
 
-	fDrawingEngine->DrawString(tab->truncatedTitle, tab->truncatedTitleLength,
+	fDrawingEngine->DrawString(tab->truncatedTitle, tab->truncatedTitle.Length(),
 		BPoint(fTitleBarRect.left + tab->textOffset,
 			tab->closeRect.bottom - 1));
 }
@@ -592,133 +602,33 @@ MacDecorator::_DrawTitle(Decorator::Tab* tab, BRect rect)
 void
 MacDecorator::_DrawClose(Decorator::Tab* tab, bool direct, BRect r)
 {
-	bool down = tab->closePressed;
-
-	// Just like DrawZoom, but for a close button
-	BRect rect(r);
-
-	BPoint offset(r.LeftTop()), pt2(r.RightTop());
-
-	// Topleft dark grey border
-	pt2.x--;
-	fDrawingEngine->SetHighColor(RGBColor(136, 136, 136));
-	fDrawingEngine->StrokeLine(offset, pt2);
-
-	pt2 = r.LeftBottom();
-	pt2.y--;
-	fDrawingEngine->StrokeLine(offset, pt2);
-
-	// Bottomright white border
-	offset = r.RightBottom();
-	pt2 = r.RightTop();
-	pt2.y++;
-	fDrawingEngine->SetHighColor(RGBColor(255, 255, 255));
-	fDrawingEngine->StrokeLine(offset, pt2);
-
-	pt2 = r.LeftBottom();
-	pt2.x++;
-	fDrawingEngine->StrokeLine(offset, pt2);
-
-	// Black outline
-	rect.InsetBy(1, 1);
-	fDrawingEngine->SetHighColor(RGBColor(0, 0, 0));
-	fDrawingEngine->StrokeRect(rect);
-
-	// Double-shaded button
-	rect.InsetBy(1, 1);
-	_DrawBlendedRect(fDrawingEngine, rect, down);
-	rect.InsetBy(1, 1);
-	_DrawBlendedRect(fDrawingEngine, rect, !down);
+	_DrawButton(tab, direct, r, tab->closePressed);
 }
 
 
 void
-MacDecorator::_DrawZoom(Decorator::Tab* tab, bool direct, BRect r)
+MacDecorator::_DrawZoom(Decorator::Tab* tab, bool direct, BRect rect)
 {
-	bool down = tab->zoomPressed;
+	_DrawButton(tab, direct, rect, tab->zoomPressed);
 
-	// Just like DrawZoom, but for a close button
-	BRect rect(r);
-	BPoint offset(r.LeftTop()), pt2(r.RightTop());
+	rect.top++;
+	rect.left++;
+	rect.bottom = rect.top + 6;
+	rect.right = rect.left + 6;
 
-	pt2.x--;
-	fDrawState.SetHighColor(RGBColor(136, 136, 136));
-	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
-
-	pt2 = r.LeftBottom();
-	pt2.y--;
-	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
-
-	offset = r.RightBottom();
-	pt2 = r.RightTop();
-	pt2.y++;
-	fDrawState.SetHighColor(RGBColor(255, 255, 255));
-	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
-
-	pt2 = r.LeftBottom();
-	pt2.x++;
-	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
-
-	rect.InsetBy(1, 1);
-	fDrawState.SetHighColor(RGBColor(0, 0, 0));
+	fDrawState.SetHighColor(RGBColor(33, 33, 33));
 	fDrawingEngine->StrokeRect(rect, fDrawState.HighColor());
-
-	rect.InsetBy(1, 1);
-	_DrawBlendedRect(fDrawingEngine, rect, down);
-	rect.InsetBy(1, 1);
-	_DrawBlendedRect(fDrawingEngine, rect, !down);
-
-	rect.top += 2;
-	rect.left--;
-	rect.right++;
-
-	fDrawState.SetHighColor(RGBColor(0, 0, 0));
-	fDrawingEngine->StrokeLine(rect.LeftTop(), rect.RightTop(),
-		fDrawState.HighColor());
 }
 
 
 void
-MacDecorator::_DrawMinimize(Decorator::Tab* tab, bool direct, BRect r)
+MacDecorator::_DrawMinimize(Decorator::Tab* tab, bool direct, BRect rect)
 {
-	bool down = tab->minimizePressed;
+	_DrawButton(tab, direct, rect, tab->minimizePressed);
 
-	// Just like DrawZoom, but for a Minimize button
-	BRect rect(r);
-	BPoint offset(r.LeftTop()), pt2(r.RightTop());
+	rect.InsetBy(1, 5);
 
-	pt2.x--;
-	fDrawState.SetHighColor(RGBColor(136, 136, 136));
-	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
-
-	pt2 = r.LeftBottom();
-	pt2.y--;
-	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
-
-	offset = r.RightBottom();
-	pt2 = r.RightTop();
-	pt2.y++;
-	fDrawState.SetHighColor(RGBColor(255, 255, 255));
-	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
-
-	pt2 = r.LeftBottom();
-	pt2.x++;
-	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
-
-	rect.InsetBy(1, 1);
-	fDrawState.SetHighColor(RGBColor(0, 0, 0));
-	fDrawingEngine->StrokeRect(rect, fDrawState.HighColor());
-
-	rect.InsetBy(1, 1);
-	_DrawBlendedRect(fDrawingEngine, rect, down);
-	rect.InsetBy(1, 1);
-	_DrawBlendedRect(fDrawingEngine, rect, !down);
-
-	rect.top += 4;
-	rect.bottom -= 4;
-	rect.InsetBy(-2, 0);
-
-	fDrawState.SetHighColor(RGBColor(0, 0, 0));
+	fDrawState.SetHighColor(RGBColor(33, 33, 33));
 	fDrawingEngine->StrokeRect(rect, fDrawState.HighColor());
 }
 
@@ -903,6 +813,56 @@ MacDecorator::_UpdateFont(DesktopSettings& settings)
 
 
 // #pragma mark - Private methods
+
+
+// Draw a mac-style button
+void
+MacDecorator::_DrawButton(Decorator::Tab* tab, bool direct, BRect r,
+	bool down)
+{
+	BRect rect(r);
+
+	BPoint offset(r.LeftTop()), pt2(r.RightTop());
+
+	// Topleft dark grey border
+	pt2.x--;
+	fDrawingEngine->SetHighColor(RGBColor(136, 136, 136));
+	fDrawingEngine->StrokeLine(offset, pt2);
+
+	pt2 = r.LeftBottom();
+	pt2.y--;
+	fDrawingEngine->StrokeLine(offset, pt2);
+
+	// Bottomright white border
+	offset = r.RightBottom();
+	pt2 = r.RightTop();
+	pt2.y++;
+	fDrawingEngine->SetHighColor(RGBColor(255, 255, 255));
+	fDrawingEngine->StrokeLine(offset, pt2);
+
+	pt2 = r.LeftBottom();
+	pt2.x++;
+	fDrawingEngine->StrokeLine(offset, pt2);
+
+	// Black outline
+	rect.InsetBy(1, 1);
+	fDrawingEngine->SetHighColor(RGBColor(33, 33, 33));
+	fDrawingEngine->StrokeRect(rect);
+
+	// Double-shaded button
+	rect.InsetBy(1, 1);
+	fDrawingEngine->SetHighColor(RGBColor(140, 140, 140));
+	fDrawingEngine->StrokeLine(rect.RightBottom(), rect.RightTop());
+	fDrawingEngine->StrokeLine(rect.RightBottom(), rect.LeftBottom());
+	fDrawingEngine->SetHighColor(RGBColor(206, 206, 206));
+	fDrawingEngine->StrokeLine(rect.LeftBottom(), rect.LeftTop());
+	fDrawingEngine->StrokeLine(rect.LeftTop(), rect.RightTop());
+	fDrawingEngine->SetHighColor(RGBColor(255, 255, 255));
+	fDrawingEngine->StrokeLine(rect.LeftTop(), rect.LeftTop());
+
+	rect.InsetBy(1, 1);
+	_DrawBlendedRect(fDrawingEngine, rect, !down);
+}
 
 
 /*!	\brief Draws a rectangle with a gradient.

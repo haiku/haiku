@@ -78,6 +78,8 @@ protected:
 	virtual	void				_UpdateFont(DesktopSettings& settings);
 
 private:
+			void				_DrawButton(Decorator::Tab* tab, bool direct,
+									BRect rect, bool pressed);
 			void				_DrawBlendedRect(DrawingEngine* engine,
 									BRect r, bool down);
 
