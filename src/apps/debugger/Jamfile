@@ -250,6 +250,7 @@ Application Debugger :
 	GraphicalUserInterface.cpp
 
 	# user_interface/gui/model
+	SyntheticPrimitiveType.cpp
 	VariablesViewState.cpp
 	VariablesViewStateHistory.cpp
 
