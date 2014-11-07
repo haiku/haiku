@@ -16,11 +16,11 @@
 #include "snet_buffer.h"
 
 #define BT_DEBUG_THIS_MODULE
-#include <btDebug.h>	
+#include <btDebug.h>
 
 
 // TODO: split for commands and comunication (ACL & SCO)
-void 
+void
 sched_tx_processing(bt_usb_dev* bdev)
 {
 	net_buffer* nbuf;
@@ -36,7 +36,7 @@ sched_tx_processing(bt_usb_dev* bdev)
 			/* Do while this bit is on... so someone should set it before we
 			 * stop the iterations
 			 */
-			CLEAR_BIT(bdev->state, SENDING);
+			bdev->state = CLEAR_BIT(bdev->state, SENDING);
 			// check Commands
 	#ifdef EMPTY_COMMAND_QUEUE
 			while (!list_is_empty(&bdev->nbuffersTx[BT_COMMAND])) {
@@ -66,7 +66,7 @@ sched_tx_processing(bt_usb_dev* bdev)
 				err = submit_tx_acl(bdev, nbuf);
 				if (err != B_OK) {
 					// re-head it
-					list_insert_item_before(&bdev->nbuffersTx[BT_ACL], 
+					list_insert_item_before(&bdev->nbuffersTx[BT_ACL],
 							list_get_first_item(&bdev->nbuffersTx[BT_ACL]),
 							nbuf);
 				}
@@ -77,19 +77,19 @@ sched_tx_processing(bt_usb_dev* bdev)
 			}
 
 		} while (GET_BIT(bdev->state, SENDING));
-		
-		CLEAR_BIT(bdev->state, PROCESSING);
+
+		bdev->state = CLEAR_BIT(bdev->state, PROCESSING);
 
 	} else {
 		// We are processing so MARK that we need to still go on with that
-		SET_BIT(bdev->state, SENDING);
+		bdev->state = SET_BIT(bdev->state, SENDING);
 	}
 }
 
 
 #if 0
 // DEPRECATED
-status_t 
+status_t
 post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
 {
 	status_t err = B_ERROR;

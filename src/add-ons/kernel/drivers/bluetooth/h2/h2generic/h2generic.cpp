@@ -664,7 +664,7 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 			//  EVENTS
 			err = submit_rx_event(bdev);
 			if (err != B_OK) {
-				CLEAR_BIT(bdev->state, ANCILLYANT);
+				bdev->state = CLEAR_BIT(bdev->state, ANCILLYANT);
 				flowf("Queuing failed device stops running\n");
 				break;
 			}
@@ -673,14 +673,15 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 			for (i = 0; i < MAX_ACL_IN_WINDOW; i++) {
 				err = submit_rx_acl(bdev);
 				if (err != B_OK && i == 0) {
-				CLEAR_BIT(bdev->state, ANCILLYANT);	// Set the flaq in the HCI world
+					bdev->state = CLEAR_BIT(bdev->state, ANCILLYANT);
+						// Set the flaq in the HCI world
 					flowf("Queuing failed device stops running\n");
 					break;
 				}
 			}
 			#endif
 
-			SET_BIT(bdev->state, RUNNING);
+			bdev->state = SET_BIT(bdev->state, RUNNING);
 
 			#if BT_DRIVER_SUPPORTS_SCO
 				// TODO:  SCO / eSCO
