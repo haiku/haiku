@@ -12,6 +12,7 @@
 #include <Debug.h>
 #include <Window.h>
 
+#include <algorithm>
 #include <string.h>
 #include <math.h>
 #include <OS.h>
@@ -517,7 +518,6 @@ char	TShowBit::has_selection()
 		return 1;
 }
 
-/*------------------------------------------------------------*/
 
 void	TShowBit::change_selection(long h, long v)
 {
@@ -529,7 +529,7 @@ void	TShowBit::change_selection(long h, long v)
 	BRect	tmp_rect;
 	long	max;
 	long	width, height;
-	
+
 	clip(&h, &v);
 	new_select.top = v;
 	new_select.left = h;
@@ -544,19 +544,21 @@ void	TShowBit::change_selection(long h, long v)
 		v0 = (long) where.y;
 		width = h0 - h;
 		height = v0 - v;
-		max= ((v0>v) ^ (height < width)) ? height : width;
 
-		h0 = h+max; v0 = v+max;
+		max = std::max(std::abs(height), std::abs(width));
+
+		v0 = (v0 > v) ? (v + max) : (v - max);
+		h0 = (h0 > h) ? (h + max) : (h - max);
 
 		clip(&h0, &v0);
 		new_select.right = h0;
 		new_select.bottom = v0;
 
-		if ((old_select.top != new_select.top) || 
-		    (old_select.bottom != new_select.bottom) ||
-		    (old_select.right != new_select.right) ||
-		    (old_select.left != new_select.left)) {
-		
+		if ((old_select.top != new_select.top)
+			|| (old_select.bottom != new_select.bottom)
+			|| (old_select.right != new_select.right)
+			|| (old_select.left != new_select.left)) {
+
 			tmp_rect = sort_rect(&new_select);
 			StrokeRect(tmp_rect);
 
@@ -568,12 +570,12 @@ void	TShowBit::change_selection(long h, long v)
 		}
 
 		snooze(20000);
-	} while(buttons);
+	} while (buttons);
 
 	selection = sort_rect(&new_select);
 	if (!has_selection()) {
 		StrokeRect(selection);
 		selection.Set(-1000, -1000, -1000, -1000);
-	} 
+	}
 	SetDrawingMode(B_OP_COPY);
 }
