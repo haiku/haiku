@@ -71,6 +71,10 @@
 
 #define SCROLL_CREDITS_VIEW 'mviv'
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AboutWindow"
+
+
 
 static const char* UptimeToString(char string[], size_t size);
 static const char* MemSizeToString(char string[], size_t size,
@@ -244,9 +248,6 @@ AboutApp::AboutApp()
 
 //	#pragma mark -
 
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "AboutWindow"
 
 AboutWindow::AboutWindow()
 	: BWindow(BRect(0, 0, 500, 300), B_TRANSLATE("About this system"),
