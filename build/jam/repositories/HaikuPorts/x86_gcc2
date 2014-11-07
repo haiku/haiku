@@ -185,7 +185,8 @@ RemotePackageRepository HaikuPorts
 	libtheora_devel-1.1.1-2
 	libtool-2.4-8
 	libtool_libltdl-2.4-8
-	libusb-1.0.19-1
+	libusb-1.0.19-2
+	libusb_devel-1.0.19-2
 	libuuid-1.0.3-2
 	libuuid_devel-1.0.3-2
 	libvorbis-1.3.4-1
