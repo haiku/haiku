@@ -163,6 +163,8 @@ public:
 									const BMessage* message);
 			status_t			AddFlat(const char* name, BFlattenable* object,
 									int32 count = 1);
+			status_t			AddFlat(const char* name,
+									const BFlattenable* object, int32 count = 1);
 			status_t			AddData(const char* name, type_code type,
 									const void* data, ssize_t numBytes,
 									bool isFixedSize = true, int32 count = 1);

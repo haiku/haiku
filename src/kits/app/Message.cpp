@@ -2731,6 +2731,13 @@ BMessage::AddMessage(const char* name, const BMessage* message)
 status_t
 BMessage::AddFlat(const char* name, BFlattenable* object, int32 count)
 {
+	return AddFlat(name, (const BFlattenable*)object, count);
+}
+
+
+status_t
+BMessage::AddFlat(const char* name, const BFlattenable* object, int32 count)
+{
 	if (object == NULL)
 		return B_BAD_VALUE;
 
