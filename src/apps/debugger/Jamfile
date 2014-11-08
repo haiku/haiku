@@ -177,6 +177,7 @@ Application Debugger :
 	StackTrace.cpp
 	Statement.cpp
 	SymbolInfo.cpp
+	SyntheticPrimitiveType.cpp
 	SyscallInfo.cpp
 	SystemInfo.cpp
 	Team.cpp
@@ -250,7 +251,6 @@ Application Debugger :
 	GraphicalUserInterface.cpp
 
 	# user_interface/gui/model
-	SyntheticPrimitiveType.cpp
 	VariablesViewState.cpp
 	VariablesViewStateHistory.cpp
 
