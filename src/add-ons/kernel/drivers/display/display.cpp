@@ -9,6 +9,22 @@ typedef struct acpi_ns_device_info {
 
 extern "C" {
 
+
+/*
+
+TODO: ACPI Spec 5 Appendix B: Implement:
+_BCL Brightness control levels
+_BCM Brightness control method
+_BQC Brightness Query Current Level
+_DCS Get current hardware status
+_DDC Return the EDID for this device
+_DGS Query desired hardware active \ inactive state
+_DSS Set hardware active \ inactive state
+
+Brightness notifications
+
+*/
+
 	
 static status_t
 display_open(void *_cookie, const char* path, int flags, void** cookie)
@@ -37,7 +53,8 @@ display_write(void* cookie, off_t position, const void* buffer,
 
 static status_t
 display_control(void* cookie, uint32 op, void* arg, size_t len)
-{	return B_ERROR;
+{
+	return B_ERROR;
 }
 
 

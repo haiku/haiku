@@ -11,6 +11,22 @@ device_manager_info *gDeviceManager = NULL;
 acpi_module_info *gAcpi = NULL;
 
 
+/*
+
+TODO: ACPI Spec 5 Appendix B: Implement:
+_DOS Method to control display output switching
+(  _DOD Method to retrieve information about child output devices
+	- You can already do this by listing child devices )
+_ROM Method to retrieve the ROM image for this device
+_GPD Method for determining which VGA device will post
+_SPD Method for controlling which VGA device will post
+_VPO Method for determining the post options
+
+Display cycling notifications
+
+*/
+
+
 //	#pragma mark - device module API
 
 	
@@ -237,7 +253,8 @@ displayadapter_register_device(device_node *node)
 {
 	device_attr attrs[] = {
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "Display Adapter" }},
-		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_KEEP_DRIVER_LOADED | B_FIND_MULTIPLE_CHILDREN }},
+		{ B_DEVICE_FLAGS, B_UINT32_TYPE, {
+			ui32: B_KEEP_DRIVER_LOADED | B_FIND_MULTIPLE_CHILDREN }},
 		{ NULL }
 	};
 
