@@ -2470,6 +2470,14 @@ VariablesView::_SaveViewState() const
 	if (values->Init() != B_OK)
 		return;
 
+	ExpressionValues* expressionValues = new(std::nothrow) ExpressionValues;
+	if (expressionValues == NULL)
+		return;
+	BReference<ExpressionValues> expressionReference(expressionValues, true);
+
+	if (expressionValues->Init() != B_OK)
+		return;
+
 	// create an empty view state
 	VariablesViewState* viewState = new(std::nothrow) VariablesViewState;
 	if (viewState == NULL)
@@ -2480,6 +2488,7 @@ VariablesView::_SaveViewState() const
 		return;
 
 	viewState->SetValues(values);
+	viewState->SetExpressionValues(expressionValues);
 
 	// populate it
 	TreeTablePath path;
@@ -2546,33 +2555,47 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 				nodeInfo.SetRendererSettings(settings->Message());
 		}
 
-		Variable* variable = node->GetVariable();
-		if (variable == NULL) {
-			// ignore synthetic nodes
-			continue;
-		}
-
-		ObjectID* id = variable->ID();
-		TypeComponentPath* componentPath = node->GetPath();
-
-		status_t error = viewState->SetNodeInfo(id, componentPath, nodeInfo);
-		if (error != B_OK)
-			return error;
-
 		Value* value = node->GetValue();
-		if (value != NULL) {
-			BVariant variableValueData;
-			if (value->ToVariant(variableValueData))
-				error = viewState->Values()->SetValue(id, componentPath,
-					variableValueData);
+		Variable* variable = node->GetVariable();
+		if (variable != NULL) {
+			TypeComponentPath* componentPath = node->GetPath();
+			ObjectID* id = variable->ID();
+
+			status_t error = viewState->SetNodeInfo(id, componentPath, nodeInfo);
 			if (error != B_OK)
 				return error;
-		}
 
-		// recurse
-		error = _AddViewStateDescendentNodeInfos(viewState, node, path);
-		if (error != B_OK)
-			return error;
+			if (value != NULL) {
+				BVariant variableValueData;
+				if (value->ToVariant(variableValueData))
+					error = viewState->Values()->SetValue(id, componentPath,
+						variableValueData);
+				if (error != B_OK)
+					return error;
+			}
+
+			// recurse
+			error = _AddViewStateDescendentNodeInfos(viewState, node, path);
+			if (error != B_OK)
+				return error;
+		} else {
+			ExpressionValueNodeChild* child
+				= dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild());
+			if (child != NULL && value != NULL) {
+				BVariant variableValueData;
+				if (value->ToVariant(variableValueData)) {
+					FunctionID* id = fStackFrame->Function()->GetFunctionID();
+					if (id == NULL)
+						return B_NO_MEMORY;
+					BReference<FunctionID> functionReference(id, true);
+					status_t error = viewState->GetExpressionValues()
+						->SetValue(id, fThread, child->GetExpression(),
+						variableValueData);
+					if (error != B_OK)
+						return error;
+				}
+			}
+		}
 
 		path.RemoveLastComponent();
 	}
@@ -2593,48 +2616,61 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 
 		// apply the node's info, if any
 		Variable* variable = node->GetVariable();
-		if (variable == NULL) {
-			// ignore synthetic nodes
-			return B_OK;
-		}
-		ObjectID* objectID = node->GetVariable()->ID();
-		TypeComponentPath* componentPath = node->GetPath();
-		const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
-			objectID, componentPath);
-		if (nodeInfo != NULL) {
-			// NB: if the node info indicates that the node in question
-			// was being cast to a different type, this *must* be applied
-			// before any other view state restoration, since it potentially
-			// changes the child hierarchy under that node.
-			Type* type = nodeInfo->GetCastedType();
-			if (type != NULL) {
-				ValueNode* valueNode = NULL;
-				if (TypeHandlerRoster::Default()->CreateValueNode(
-					node->NodeChild(), type, valueNode) == B_OK) {
-					node->NodeChild()->SetNode(valueNode);
-					node->SetCastedType(type);
+		if (variable != NULL) {
+			ObjectID* objectID = node->GetVariable()->ID();
+			TypeComponentPath* componentPath = node->GetPath();
+			const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
+				objectID, componentPath);
+			if (nodeInfo != NULL) {
+				// NB: if the node info indicates that the node in question
+				// was being cast to a different type, this *must* be applied
+				// before any other view state restoration, since it
+				// potentially changes the child hierarchy under that node.
+				Type* type = nodeInfo->GetCastedType();
+				if (type != NULL) {
+					ValueNode* valueNode = NULL;
+					if (TypeHandlerRoster::Default()->CreateValueNode(
+						node->NodeChild(), type, valueNode) == B_OK) {
+						node->NodeChild()->SetNode(valueNode);
+						node->SetCastedType(type);
+					}
+				}
+
+				// we don't have a renderer yet so we can't apply the settings
+				// at this stage. Store them on the model node so we can lazily
+				// apply them once the value is retrieved.
+				node->SetLastRendererSettings(nodeInfo->GetRendererSettings());
+
+				fVariableTable->SetNodeExpanded(path,
+					nodeInfo->IsNodeExpanded());
+
+				BVariant previousValue;
+				if (viewState->Values()->GetValue(objectID, componentPath,
+					previousValue)) {
+					node->SetPreviousValue(previousValue);
 				}
 			}
-
-			// we don't have a renderer yet so we can't apply the settings
-			// at this stage. Store them on the model node so we can lazily
-			// apply them once the value is retrieved.
-			node->SetLastRendererSettings(nodeInfo->GetRendererSettings());
-
-			fVariableTable->SetNodeExpanded(path, nodeInfo->IsNodeExpanded());
-
-			BVariant previousValue;
-			if (viewState->Values()->GetValue(objectID, componentPath,
-				previousValue)) {
-				node->SetPreviousValue(previousValue);
+		} else {
+			ExpressionValueNodeChild* child
+				= dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild());
+			if (child != NULL) {
+				BVariant previousValue;
+				FunctionID* id = fStackFrame->Function()->GetFunctionID();
+				if (id == NULL)
+					return B_NO_MEMORY;
+				BReference<FunctionID> idReference(id, true);
+				if (viewState->GetExpressionValues()->GetValue(id, fThread,
+					child->GetExpression(), previousValue)) {
+					node->SetPreviousValue(previousValue);
+				}
 			}
-
-			// recurse
-			status_t error = _ApplyViewStateDescendentNodeInfos(viewState, node,
-				path);
-			if (error != B_OK)
-				return error;
 		}
+
+		// recurse
+		status_t error = _ApplyViewStateDescendentNodeInfos(viewState, node,
+			path);
+		if (error != B_OK)
+			return error;
 
 		path.RemoveLastComponent();
 	}
