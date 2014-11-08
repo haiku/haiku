@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Notifications	1127855757
+1	romanian	x-vnd.Haiku-Notifications	2718138102
 Notifications	GeneralView		Înștiințări
 seconds of inactivity	GeneralView		secunde de inactivitate
 Revert	PrefletWin		Revenire
@@ -15,9 +15,7 @@ Progress	NotificationView		Progres
 Last Received	NotificationView		Ultima primită
 General	PrefletView		General
 Display	PrefletView		Afișare
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nu se pot activa înștiințările la pornire, probabil că nu aveți drepturi de scriere în dosarul de configurări pentru pornirea sistemului.
 Search:	NotificationView		Caută:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Serverul de înștiințări nu poate fi găsit.\nO cauză posibilă este o instalare care nu s-a realizat corect
 Allowed	NotificationView		Permis
 Yes	NotificationView		Da
 Large icon	DisplayView		Pictogramă largă

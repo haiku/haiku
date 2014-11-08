@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-CodyCam	3353004969
+1	greek, modern (1453-)	x-vnd.Haiku-CodyCam	3019334284
 Capturing Image…	VideoConsumer.cpp		Σύλληψη Εικόνας...
 Every 30 seconds	CodyCam		Κάθε 30 δευτερόλεπτα
 File name:	CodyCam		Όνομα αρχείου:
@@ -63,7 +63,6 @@ Connected…	VideoConsumer.cpp		Συνδέθηκε...
 PASS <suppressed>  (real password sent)\n	FtpClient		ΚΩΔΙΚΟΣ <suppressed> (εστάλη ο πραγματικός κωδικός)\n
 Every 5 minutes	CodyCam		κάθε 5 λεπτά
 read: %d\n	SftpClient		ανάγνωση: %d\n
-OK	CodyCam		Εντάξει
 Capture controls	CodyCam		Έλεγχος σύλληψης
 Every hour	CodyCam		Κάθε ώρα
 Cannot connect the video source to the video window	CodyCam		Αδυναμία σύνδεσης της προέλευσης βίντεο με το παράθυρο βίντεο

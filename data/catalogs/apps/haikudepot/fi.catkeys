@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	2631174450
+1	finnish	x-vnd.Haiku-HaikuDepot	6505552
 Name	PackageListView		Nimi
+Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
 Close	RatePackageWindow		Sulje
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha-pulma on ratkaistava.
 Changelog	PackageInfoView		Muutosloki
@@ -8,6 +9,7 @@ The passwords do not match.	UserLoginWindow		Salasanat eivät täsmää.
 Log in…	MainWindow		Kirjaudu...
 Rate %Package%	RatePackageWindow		Anna pakkaukselle %Package% arvosana
 Stability:	RatePackageWindow		Stabiilisuus:
+Show available packages	MainWindow		Näytä käytettävissä olevat pakkaukset
 Click a package to view information	PackageInfoView		Napsauta pakkausta tietojen katsomiseksi
 Other users can see this rating	RatePackageWindow		Muut käyttäjät voivat nähdä tämän arvosanan
 Stability	RatePackageWindow		Stabiilisuus
@@ -36,6 +38,7 @@ Close	PackageManager		Sulje
 Not logged in	MainWindow		Et ole kirjautunut sisään
 The authentication was successful.	UserLoginWindow		Tunnistautuminen onnistui.
 Status	PackageListView		Tila
+Switch account…	MainWindow		Vaihda tiliä...
 Ignore	UserLoginWindow		Ohita
 Language	UserLoginWindow		Kieli
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Salasana on liian heikko tai virheellinen. Käytä vähintään 8 merkkiä, joista vähintään 2 on numeroita ja 2 suuria kirjaimia.
@@ -48,9 +51,10 @@ Repeat pass phrase:	UserLoginWindow		Toista salasana:
 Ratings	PackageInfoView		Arvosanat
 But none could be listed here, sorry.	UserLoginWindow		Tässä ei kyetty luetteloimaan mitään.
 System & Utilities	Model		Järjestelmä ja apuohjelmat
+Show installed packages	MainWindow		Näytä asennetut pakkaukset
 Inactive	PackageListView		Ei käytössä
 Refresh depots	MainWindow		Päivitä varastot
-The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoimintoa ei voitu aikatauluttaa: %Error%
+The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoiminnon aikatauluttaminen epäonnistui: %Error%
 Science & Mathematics	Model		Tiede ja matematiikka
 Main Menu	MainWindow		Päävalikko
 (%Votes%)	PackageInfoView		(%Votes%)
@@ -70,15 +74,19 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 It was not possible to contact the web service.	RatePackageWindow		Webbipalveluun ei saatu yhteyttä.
 There are problems in the form:\n\n	UserLoginWindow		Muodossa on pulmia:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Webbipalvelu ei löytänyt pakkausta. Tämä tarkoittaa luultavasti, että se tulee varastosta, jota ei seurata täällä. Arvosanojen antamista sellaisille pakkauksille ei tueta.
+Show source packages	MainWindow		Näytä lähdekoodipakkaukset
 Create account	UserLoginWindow		Luo tili
 Productivity	Model		Tuottavuus
 Authentication failed	UserLoginWindow		Todennus epäonnistui
+Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
 Language	RatePackageWindow		Kieli
 Size	PackageListView		Koko
 Failed to create or update rating: %s\n	RatePackageWindow		Arvosanan luominen tai päivittäminen epäonnistui: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.
  It responded with: 	RatePackageWindow		 Se vastasi: 
 User name:	UserLoginWindow		Käyttäjätunnus:
+User Menu	MainWindow		Käyttäjävalikko
+Options	MainWindow		Valitsimet
 Unstable but usable	RatePackageWindow		Epävakaa, mutta käyttökelpoinen
 The email address appears to be malformed.	UserLoginWindow		Sähköpostiosoite on vääränmuotoinen.
 Games	Model		Pelit
@@ -99,7 +107,7 @@ An error occurred while refreshing the repository: %error%	MainWindow		Varastoa 
 Login or Create account	MainWindow		Kirjaudu tai luo tili
 Pending…	PackageListView		Odottaa...
 Depot	FilterView		Varasto
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
+{0, plural, one{# item} other{# items}}	PackageListView		{0, monikko, yksi{# kohde} muut{# kohdetta}}
 OK	PackageInfoView		Valmis
 Uninstalled	PackageListView		Poistetut asennukset
 Stable	RatePackageWindow		Vakaa
@@ -117,6 +125,7 @@ Cancel	RatePackageWindow		Peru
 Package action failed	PackageInfoView		Pakettitoiminta epäonnistui
 OK	UserLoginWindow		Valmis
 Send	RatePackageWindow		Lähetä
+Show develop packages	MainWindow		Näytä kehityspakkaukset
 Category:	FilterView		Luokka:
 Failed to create account	UserLoginWindow		Tilin luominen epäonnistui
 There are problems with the data you entered:\n\n	UserLoginWindow		Syöttämissäsi tiedoissa oli pulmia:\n\n

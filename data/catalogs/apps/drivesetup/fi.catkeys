@@ -5,7 +5,7 @@ Delete	MainWindow		Poista
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
 Rescan	MainWindow		Etsi uudelleen
 OK	MainWindow		Valmis
-Could not aquire partitioning information.	MainWindow		Ei voitu hakea osiointitietoja.
+Could not aquire partitioning information.	MainWindow		Osiointitietojen hakeminen epäonnistui.
 There's no space on the partition where a child partition could be created.	MainWindow		Osiolla ei ole mitään tilaa, johon olisi voitu luoda tytärosio.
 Could not unmount partition	MainWindow		Osion irrottaminen epäonnistui
 Initialize	InitializeParametersPanel		Alusta
@@ -17,7 +17,7 @@ No disk devices have been recognized.	DiskView		Levyasemia ei tunnistettu.
 Failed to initialize the disk %s!\n	MainWindow		Levyn %s alustus epäonnistui!\n
 The selected disk is read-only.	MainWindow		Valittu levy on kirjoitussuojattu.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion \"%s\"? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
-Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Pitäisikö irrottaminen pakottaa?\n\nHuomaa: Jos sovellus parhaillaan kirjoittaa taltiolle, irrottaminen saattaa aiheutta datan katoamista.\n
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Pitäisikö irrottaminen pakottaa?\n\nHuomaa: Jos sovellus parhaillaan kirjoittaa taltiolle, irrottaminen saattaa aiheuttaa datan katoamista.\n
 Could not mount partition %s.	MainWindow		Osion %s liittäminen epäonnistui.
 The partition %s has been successfully formatted.\n	MainWindow		Osion %s alustus onnistui.\n
 Change parameters	MainWindow		Vaihda parametreja

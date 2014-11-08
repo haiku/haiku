@@ -1,5 +1,6 @@
-1	polish	x-vnd.Haiku-HaikuDepot	2631174450
+1	polish	x-vnd.Haiku-HaikuDepot	6505552
 Name	PackageListView		Nazwa
+Open %DeskbarLink%	PackageManager		Otwórz %DeskbarLink%
 Close	RatePackageWindow		Zamknij
 The captcha puzzle needs to be solved.	UserLoginWindow		Musisz rozwiązać test CAPTCHA.
 Changelog	PackageInfoView		Dziennik zmian
@@ -8,6 +9,7 @@ The passwords do not match.	UserLoginWindow		Hasła nie zgadzają się.
 Log in…	MainWindow		Zaloguj
 Rate %Package%	RatePackageWindow		Oceń %Package%
 Stability:	RatePackageWindow		Stabilność:
+Show available packages	MainWindow		Pokaż dostępne pakiety
 Click a package to view information	PackageInfoView		Kliknij na pakiet, aby zobaczyć informacje
 Other users can see this rating	RatePackageWindow		Inni użytkownicy będą mogli zobaczyć tę ocenę
 Stability	RatePackageWindow		Stabilność
@@ -36,6 +38,7 @@ Close	PackageManager		Zamknij
 Not logged in	MainWindow		Niezalogowany
 The authentication was successful.	UserLoginWindow		Autoryzacja powiodła się.
 Status	PackageListView		Status
+Switch account…	MainWindow		Przełącz konto…
 Ignore	UserLoginWindow		Ignoruj
 Language	UserLoginWindow		Język
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Hasło jest zbyt słabe lub niepoprawne. Użyj minimum 8 znaków, w tym co najmniej 2 cyfr i 2 wielkich liter.
@@ -48,6 +51,7 @@ Repeat pass phrase:	UserLoginWindow		Powtórz hasło:
 Ratings	PackageInfoView		Oceny
 But none could be listed here, sorry.	UserLoginWindow		Ale żaden nie mógł zostać tutaj wyświetlony.
 System & Utilities	Model		System & narzędzia
+Show installed packages	MainWindow		Pokaż zainstalowane pakiety
 Inactive	PackageListView		Nieaktywny
 Refresh depots	MainWindow		Odśwież listy pakietów
 The package action could not be scheduled: %Error%	PackageInfoView		Akcja dla pakietu nie mogła zostać dodana do kolejki: %Error%
@@ -70,15 +74,19 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 It was not possible to contact the web service.	RatePackageWindow		Nie udało się połączyć z usługą sieciową.
 There are problems in the form:\n\n	UserLoginWindow		W formularzu występują problemy:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Usługa sieciowa nie odnalazła pakietu. To prawdopodobnie oznacza, że pochodzi z repozytorium, które nie jest tutaj obsługiwane. Ocenianie takich pakietów jest niestety niewspierane.
+Show source packages	MainWindow		Pokaż źródłowe pakiety
 Create account	UserLoginWindow		Utwórz konto
 Productivity	Model		Programy użytkowe
 Authentication failed	UserLoginWindow		Autoryzacja nie powiodła się
+Logged in as %User%	MainWindow		Zalogowano jako %User%
 Language	RatePackageWindow		Język
 Size	PackageListView		Rozmiar
 Failed to create or update rating: %s\n	RatePackageWindow		Nie udało się utworzyć lub zaktualizować oceny: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Musisz być zalogowany, aby móc oceniać pakiety.
  It responded with: 	RatePackageWindow		Odpowiedź:
 User name:	UserLoginWindow		Nazwa użytkownika:
+User Menu	MainWindow		Menu użytkownika
+Options	MainWindow		Opcje
 Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
 The email address appears to be malformed.	UserLoginWindow		Adres e-mail wygląda na zniekształcony.
 Games	Model		Gry
@@ -117,6 +125,7 @@ Cancel	RatePackageWindow		Anuluj
 Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Wyślij
+Show develop packages	MainWindow		Pokaż deweloperskie pakiety
 Category:	FilterView		Kategoria:
 Failed to create account	UserLoginWindow		Nie udało się utworzyć konta
 There are problems with the data you entered:\n\n	UserLoginWindow		We wprowadzonych danych występują problemy:\n\n

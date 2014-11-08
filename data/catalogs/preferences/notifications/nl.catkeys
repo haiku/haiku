@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Notifications	1127855757
+1	dutch; flemish	x-vnd.Haiku-Notifications	2718138102
 Notifications	GeneralView		Aankondigingen
 seconds of inactivity	GeneralView		seconden inactief
 Revert	PrefletWin		Herstellen
@@ -15,9 +15,7 @@ Progress	NotificationView		Voortgang
 Last Received	NotificationView		Laatst ontvangen
 General	PrefletView		Algemeen
 Display	PrefletView		Weergave
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Kan Aankondigingen niet aanzetten bij het opstarten, u hebt waarschijnlijk geen toestemming om te schrijven naar het directory van de bootinstellingen.
 Search:	NotificationView		Zoek:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		De aankondigingen-server kon niet gevonden worden.\nEen mogelijke oorzaak is een installatie die niet correct werd uitgevoerd
 Allowed	NotificationView		Toegestaan
 Yes	NotificationView		Ja
 Large icon	DisplayView		Groot icoon

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Notifications	164019665
+1	english	x-vnd.Haiku-Notifications	4081029523
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		静止秒数
 Revert	PrefletWin		还原
@@ -16,9 +16,7 @@ Last Received	NotificationView		最近通知
 General	PrefletView		常规
 Apply	PrefletWin		应用
 Display	PrefletView		显示
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		无法在启动时启用通知，可能您不具有引导设置目录的写入权限。
 Search:	NotificationView		搜索：
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		未发现通知服务。\n可能是安装没有正确的完成。
 Allowed	NotificationView		允许
 Yes	NotificationView		是
 Large icon	DisplayView		大图标
@@ -36,5 +34,4 @@ Unknown	NotificationView		未知
 Enable notifications at startup	GeneralView		启动时启用通知
 Notifications	PrefletView		通知
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		通知服务器无法找到。\n您 InfoPopper 没有成功完成安装。
-Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		无法保存首选项，您可能没有配置文件夹写入权限。
 Applications	NotificationView		应用程序

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Notifications	164019665
+1	belarusian	x-vnd.Haiku-Notifications	4081029523
 Notifications	GeneralView		Паведамленні
 seconds of inactivity	GeneralView		секунд прастою
 Revert	PrefletWin		Вярнуць
@@ -16,9 +16,7 @@ Last Received	NotificationView		Апошняе атрыманае
 General	PrefletView		Агульныя
 Apply	PrefletWin		Ужыць
 Display	PrefletView		Экран
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Не ўдалося занесці паведамленні ў аўтазапуск, магчыма, вы не маеце правоў на змяненне дырэкторыі аўтазапуску.
 Search:	NotificationView		Пошук:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Сервер паведамленняў не знойдзены.\nМагчымая прычына - няправільная ўсталёўка
 Allowed	NotificationView		Дазволена
 Yes	NotificationView		Так
 Large icon	DisplayView		Вялікая іконка
@@ -36,5 +34,4 @@ Unknown	NotificationView		Невядомы
 Enable notifications at startup	GeneralView		Уключыць паведамленні пры запуску
 Notifications	PrefletView		Абвесткі
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Сервер паведамленняў не знойдзены, гэта сведчыць аб няўдалай усталёўцы InfoPopper.
-Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Не ўдалося захаваць наладкі, верагодна вы не маеце права пісаць у папку наладак.
 Applications	NotificationView		Праграмы

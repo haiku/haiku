@@ -4,7 +4,7 @@ Settings	Config Window		Asetukset
 Never	Config Window	show status window	Ei koskaan
 Only when dial-up is connected	Config Window		Vain kun valintayhteys on yhdistetty
 While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
-days	Config Window		päivä
+days	Config Window		päivää
 Incoming	Config Window		Tuleva
 Server name:	E-Mail		Palvelinnimi:
 OK	Config Window		Valmis
@@ -27,7 +27,7 @@ Show connection status window:	Config Window		Näytä yhteystilaikkuna:
 Server Name:	E-Mail		Palvelinnimi:
 While sending	Config Window		Lähetettäessä
 Schedule outgoing mail when dial-up is disconnected	Config Window		Aikatauluta lähtevä sähköposti kun valintayhteys ei ole kytketty
-hours	Config Window		tunti
+hours	Config Window		tuntia
 Enter a valid e-mail address.	AutoConfigWindow		Kirjoita kelvollinen sähköpostiosoite.
 Add	Config Window		Lisää
 Account settings	AutoConfigWindow		Tiliasetukset
@@ -48,7 +48,7 @@ Check every	Config Window		Tarkista joka
 Back	AutoConfigWindow		Takaisin
 Incoming mail filters	Config Views		Tulevan postin suodattimet
 Account settings	Config Views		Tiliasetukset
-minutes	Config Window		minuutti
+minutes	Config Window		minuuttia
 Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n
 Real name:	E-Mail		Oikea nimi:
 Apply	Config Window		Käytä

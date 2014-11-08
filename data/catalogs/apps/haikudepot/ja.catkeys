@@ -1,5 +1,6 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2631174450
+1	japanese	x-vnd.Haiku-HaikuDepot	6505552
 Name	PackageListView		名前
+Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 Close	RatePackageWindow		閉じる
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha パズルを解く必要があります。
 Changelog	PackageInfoView		変更履歴
@@ -8,6 +9,7 @@ The passwords do not match.	UserLoginWindow		パスワードが一致しませ�
 Log in…	MainWindow		ログイン…
 Rate %Package%	RatePackageWindow		%Package% を評価
 Stability:	RatePackageWindow		安定度:
+Show available packages	MainWindow		利用可能なパッケージを表示
 Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
 Other users can see this rating	RatePackageWindow		ほかのユーザーがこの評価を見ることができます
 Stability	RatePackageWindow		安定度
@@ -36,6 +38,7 @@ Close	PackageManager		閉じる
 Not logged in	MainWindow		ログインしていません
 The authentication was successful.	UserLoginWindow		認証に成功しました。
 Status	PackageListView		状態
+Switch account…	MainWindow		アカウントの切り替え…
 Ignore	UserLoginWindow		無視
 Language	UserLoginWindow		言語
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		パスワードが弱すぎるか不正です。8 文字以上で、数字が 2 文字以上、大文字が 2 文字以上のパスワードを使用してください。
@@ -48,6 +51,7 @@ Repeat pass phrase:	UserLoginWindow		パスフレーズの再入力:
 Ratings	PackageInfoView		評価
 But none could be listed here, sorry.	UserLoginWindow		すみません。しかし、ここにはなにもリストされていません。
 System & Utilities	Model		システム & ユーティリティ
+Show installed packages	MainWindow		インストール済みパッケージを表示
 Inactive	PackageListView		無効
 Refresh depots	MainWindow		Depot を更新
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
@@ -70,15 +74,19 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 It was not possible to contact the web service.	RatePackageWindow		ウェブサービスにコンタクトできなかった。
 There are problems in the form:\n\n	UserLoginWindow		次のフォームに問題があります:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		ウェブサービスはパッケージを見つけられませんでした。これは、おそらくここで追跡されていないデポからのパッケージであることを意味します。残念ながら、このようなパッケージの評価はサポートされていません。
+Show source packages	MainWindow		ソースパッケージを表示
 Create account	UserLoginWindow		アカウントの作成
 Productivity	Model		ビジネス
 Authentication failed	UserLoginWindow		認証に失敗しました
+Logged in as %User%	MainWindow		%User% としてログイン
 Language	RatePackageWindow		言語
 Size	PackageListView		サイズ
 Failed to create or update rating: %s\n	RatePackageWindow		次の評価の作成または更新に失敗しました: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。
  It responded with: 	RatePackageWindow		 反応する: 
 User name:	UserLoginWindow		ユーザー名:
+User Menu	MainWindow		ユーザーメニュー
+Options	MainWindow		オプション
 Unstable but usable	RatePackageWindow		不安定であるが有用
 The email address appears to be malformed.	UserLoginWindow		メールアドレスが不正なようです。
 Games	Model		ゲーム
@@ -117,6 +125,7 @@ Cancel	RatePackageWindow		キャンセル
 Package action failed	PackageInfoView		パッケージアクションに失敗しました
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		送信する
+Show develop packages	MainWindow		開発用パッケージを表示
 Category:	FilterView		分類:
 Failed to create account	UserLoginWindow		アカウントの作成に失敗しました
 There are problems with the data you entered:\n\n	UserLoginWindow		入力したデーターに問題があります:\n\n

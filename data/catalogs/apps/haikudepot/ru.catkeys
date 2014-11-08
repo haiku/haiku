@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	609912956
+1	russian	x-vnd.Haiku-HaikuDepot	2612937416
 Name	PackageListView		Имя
 Close	RatePackageWindow		Закрыть
 Changelog	PackageInfoView		История изменений
@@ -19,7 +19,7 @@ Tools	MainWindow		Инструменты
 HaikuDepot	System name		Склад
 Close	UserLoginWindow		Закрыть
 Rate package…	PackageInfoView		Оценить пакет…
-Category	FilterView		Категория
+Category	FilterView		Все категории
 Uninstall	PackageManager		Удалить
 An error occurred while obtaining the package list: %message%	MainWindow		Возникла ошибка при получении списка пакетов: %message%
 Your rating was updated successfully.	RatePackageWindow		Ваш рейтинг был успешно отправлен.
@@ -65,11 +65,13 @@ There are problems in the form:\n\n	UserLoginWindow		В этой форме пр
 Create account	UserLoginWindow		Создать учётную запись
 Productivity	Model		Офис
 Authentication failed	UserLoginWindow		Авторизация завершилась неудачно
+Logged in as %User%	MainWindow		Выполнен вход под пользователем %User%
 Language	RatePackageWindow		Язык
 Size	PackageListView		Размер
 Failed to create or update rating: %s\n	RatePackageWindow		Не удалось создать или изменить рейтинг: %s\n
  It responded with: 	RatePackageWindow		 Он ответил так: 
 User name:	UserLoginWindow		Имя пользователя:
+Options	MainWindow		Параметры
 Unstable but usable	RatePackageWindow		Нестабилен, но пригодный для использования
 The email address appears to be malformed.	UserLoginWindow		Некорректный адрес электронной почты.
 Games	Model		Игры
@@ -82,10 +84,12 @@ Preferred language:	UserLoginWindow		Предпочитаемый язык:
 Failed to rate package	RatePackageWindow		Не удалось оценить пакет
 Internet & Network	Model		Интернет и сеть
 Cancel	MainWindow		Отменить
+Input validation	UserLoginWindow		Проверка ввода
 Update	RatePackageWindow		Обновить
 Video	Model		Видео
 All categories	FilterView		Все категории
 An error occurred while refreshing the repository: %error%	MainWindow		Возникла ошибка при обновлении репозитория: %error%
+Login or Create account	MainWindow		Войти или создать учетную запись
 Pending…	PackageListView		Ожидание…
 Depot	FilterView		Все склады
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# объект} few{# объекта} other{# объектов}}
@@ -99,9 +103,11 @@ Pass phrase:	UserLoginWindow		Пароль:
 Not specified	RatePackageWindow		Не указана
 Available	PackageListView		Доступен
 n/a	PackageInfoView		н/д
+ It responded with: 	UserLoginWindow		 Он ответил так: 
 Cancel	RatePackageWindow		Отмена
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Отправить
+Show develop packages	MainWindow		Показать пакеты для разработчиков
 Category:	FilterView		Категория:
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
 Success	RatePackageWindow		Выполнено успешно

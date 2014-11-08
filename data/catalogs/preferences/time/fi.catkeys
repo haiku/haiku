@@ -2,7 +2,7 @@
 GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
 OK	Time		Valmis
 Asia	Time		Aasia
-\nNow: 	Time		\nNyt:
+\nNow: 	Time		\nNyt: 
 Africa	Time		Afrikka
 Reset to default server list	Time		Nollaa oletuspalvelinluettelo
 Stop	Time		Pysäytä
@@ -31,18 +31,18 @@ Arctic	Time		Pohjoinen napaseutu
 Display time with seconds	Time		Näytä aika sekunteina
 Time	System name		Aika-asetukset
 America	Time		Amerikka
-Synchronize at boot	Time		Synkronoi alkulatauksen yhteydessä
+Synchronize at boot	Time		Synkronoi käynnistyksen yhteydessä
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Vastaanotettiin virheellinen aika
 Antarctica	Time		Etelänapamanner
 Show time zone	Time		Näytä aikavyöhyke
-Show clock in Deskbar	Time		Näytä kello työpöytäpalkissa
+Show clock in Deskbar	Time		Näytä kello Työpöytäpalkissa
 The following error occured while synchronizing:r\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:r\n%s: %s
 <Other>	Time		<Muut>
 Current time:	Time		Nykyinen aika:
 Try all servers	Time		Yritä kaikkia palvelimia
 Time zone	Time		Aikavyöhyke
-Could not create socket	Time		Pistokkeen luominen epäonnistui
+Could not create socket	Time		Vastakkeen luominen epäonnistui
 Synchronize again	Time		Synkronoi uudelleen
 Clock	Time		Kello
 Network time	Time		Verkkoaika

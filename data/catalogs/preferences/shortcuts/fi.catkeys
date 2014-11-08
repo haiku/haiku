@@ -39,7 +39,7 @@ Quit	ShortcutsWindow		Poistu
 Don't save	ShortcutsWindow		Älä tallenna
 Multi	ShortcutsSpec		Moni
 Application	ShortcutsWindow		Sovellus
-Shift	ShortcutsSpec	Name for modifier on keyboard	Vaihto-painike
+Shift	ShortcutsSpec	Name for modifier on keyboard	Vaihtonäppäin
 *Beep	ShortcutsWindow		*Piip
 *MoveMouseTo 50% 50%	ShortcutsWindow		*SiirräHiiriKohteeseen 50% 50%
 Save KeySet as…	ShortcutsWindow		Tallenna KeySet-tiedosto nimellä…

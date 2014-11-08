@@ -1,5 +1,6 @@
-1	german	x-vnd.Haiku-HaikuDepot	2631174450
+1	german	x-vnd.Haiku-HaikuDepot	6505552
 Name	PackageListView		Name
+Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
 Close	RatePackageWindow		Schließen
 The captcha puzzle needs to be solved.	UserLoginWindow		Die Captcha-Frage muss beantwortet werden.
 Changelog	PackageInfoView		Änderungsprotokoll
@@ -8,6 +9,7 @@ The passwords do not match.	UserLoginWindow		Die Kennwörter stimmen nicht über
 Log in…	MainWindow		Anmelden…
 Rate %Package%	RatePackageWindow		%Package% bewerten
 Stability:	RatePackageWindow		Stabilität:
+Show available packages	MainWindow		Verfügbare Pakete anzeigen
 Click a package to view information	PackageInfoView		Paket anklicken, um Infos anzuzeigen
 Other users can see this rating	RatePackageWindow		Diese Bewertung ist für andere Anwender sichtbar
 Stability	RatePackageWindow		Stabilität
@@ -36,6 +38,7 @@ Close	PackageManager		Schließen
 Not logged in	MainWindow		Nicht angemeldet
 The authentication was successful.	UserLoginWindow		Anmeldung erfolgreich.
 Status	PackageListView		Status
+Switch account…	MainWindow		Konto wechseln…
 Ignore	UserLoginWindow		Ignorieren
 Language	UserLoginWindow		Sprache
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Das Kennwort ist zu schwach oder ungültig. Es muss mindestens 8 Zeichen lang sein und mindestens 2 Zahlen und 2 Großbuchstaben enthalten.
@@ -48,6 +51,7 @@ Repeat pass phrase:	UserLoginWindow		Zugangsphrase wiederholen:
 Ratings	PackageInfoView		Bewertungen
 But none could be listed here, sorry.	UserLoginWindow		Leider können sie hier nicht aufgeführt werden.
 System & Utilities	Model		Tools & System
+Show installed packages	MainWindow		Installierte Pakete anzeigen
 Inactive	PackageListView		Deaktiviert
 Refresh depots	MainWindow		Depots aktualisieren
 The package action could not be scheduled: %Error%	PackageInfoView		Die Aktion konnte nicht auf das Paket angewandt werden: %Error%
@@ -70,15 +74,19 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 It was not possible to contact the web service.	RatePackageWindow		Der Web-Dienst konnte nicht erreicht werden.
 There are problems in the form:\n\n	UserLoginWindow		Es gibt Probleme mit dem Format:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Das Paket konnte nicht vom Web-Dienst gefunden werden. Wahrscheinlich stammt das Paket aus einem Depot, das nicht vom Web-Dienst verwaltet wird. Solche Pakete können leider nicht bewertet werden.
+Show source packages	MainWindow		Quellcode-Pakete anzeigen
 Create account	UserLoginWindow		Benutzerkonto erstellen
 Productivity	Model		Büro
 Authentication failed	UserLoginWindow		Anmeldung fehlgeschlagen
+Logged in as %User%	MainWindow		Angemeldet als %User%
 Language	RatePackageWindow		Sprache
 Size	PackageListView		Größe
 Failed to create or update rating: %s\n	RatePackageWindow		Anlegen oder Aktualisieren der Bewertung fehlgeschlagen: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
  It responded with: 	RatePackageWindow		 Es hat geantwortet: 
 User name:	UserLoginWindow		Benutzername:
+User Menu	MainWindow		Benutzermenü
+Options	MainWindow		Optionen
 Unstable but usable	RatePackageWindow		Instabil aber brauchbar
 The email address appears to be malformed.	UserLoginWindow		Das Format der angegebenen E-Mail-Adresse ist fehlerhaft.
 Games	Model		Spiele
@@ -117,6 +125,7 @@ Cancel	RatePackageWindow		Abbrechen
 Package action failed	PackageInfoView		Paket-Aktion fehlgeschlagen
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Senden
+Show develop packages	MainWindow		Entwickler-Pakete anzeigen
 Category:	FilterView		Kategorie:
 Failed to create account	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden
 There are problems with the data you entered:\n\n	UserLoginWindow		Mit den eingegebenen Daten gab es Probleme:\n\n

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Notifications	44145084
+1	japanese	x-vnd.Haiku-Notifications	3961154942
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		設定の保存中にエラーが発生しました。\nディスクの空きが無いのかもしれません。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		秒後に画面から隠されます。
@@ -18,9 +18,7 @@ Last Received	NotificationView		最終受信時刻
 General	PrefletView		一般設定
 Apply	PrefletWin		適用
 Display	PrefletView		表示設定
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		起動時に通知を有効にできませんでした。おそらく、boot settings ディレクトリの書き込み権限がありません。
 Search:	NotificationView		検索:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		通知サーバーが見つかりません。\n考えられる原因として、インストールが正しく行われていないことがあります。
 Allowed	NotificationView		許可された
 Yes	NotificationView		はい
 Large icon	DisplayView		大きいアイコン
@@ -38,5 +36,4 @@ Unknown	NotificationView		不明
 Enable notifications at startup	GeneralView		起動時に通知を有効にする
 Notifications	PrefletView		通知
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		通知サーバーが見つかりません。これは、InfoPopper のインストールが正しく完了していないことを示しています。
-Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		設定を保存できません。おそらく settings ディレクトリに書き込み権限がありません。
 Applications	NotificationView		アプリケーション

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Notifications	44145084
+1	german	x-vnd.Haiku-Notifications	3961154942
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Das Speichern der Einstellungen ist fehlgeschlagen.\nMöglicherweise steht nicht genügend Speicherplatz zur Verfügung.
 Notifications	GeneralView		Notifications - Benachrichtigungen
 seconds of inactivity	GeneralView		Sekunden Leerlauf.
@@ -18,9 +18,7 @@ Last Received	NotificationView		Zuletzt empfangen
 General	PrefletView		Allgemein
 Apply	PrefletWin		Anwenden
 Display	PrefletView		Darstellung
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Die Benachrichtigungen konnten nach dem Systemstart nicht aktiviert werden. Wahrscheinlich fehlt die Schreibberechtigung auf den settings-Ordner des Boot-Laufwerks.
 Search:	NotificationView		Suchen:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Der Benachrichtiguns-Server wurde nicht gefunden.\nWahrscheinlich war die Installation nicht erfolgreich.
 Allowed	NotificationView		Erlaubt
 Yes	NotificationView		Ja
 Large icon	DisplayView		Großes Icon
@@ -38,5 +36,4 @@ Unknown	NotificationView		Unbekannt
 Enable notifications at startup	GeneralView		Benachrichtigungen beim Systemstart aktivieren
 Notifications	PrefletView		Benachrichtigungen
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Der Benachrichtiguns-Server wurde nicht gefunden.\nWahrscheinlich war die Installation nicht erfolgreich.
-Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Die Einstellungen konnten nicht gespeichert werden. Wahrscheinlich ist der entsprechende Ordner schreibgeschützt.
 Applications	NotificationView		Anwendungen

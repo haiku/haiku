@@ -57,7 +57,7 @@ Tooltip text	Colors tab		Työkaluvinkin teksti
 Bold font:	Font view		Lihavoitu kirjasin:
 Inactive window border	Colors tab		Ei-aktiivinen ikkunaraja
 Menu item text	Colors tab		Valikkovalinnan teksti
-LCD subpixel	AntialiasingSettingsView		LCD alipikseli
+LCD subpixel	AntialiasingSettingsView		LCD-alipikseli
 Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
 Strong	AntialiasingSettingsView		Vahva
 Panel text	Colors tab		Paneelin teksti

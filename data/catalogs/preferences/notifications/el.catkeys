@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Notifications	1127855757
+1	greek, modern (1453-)	x-vnd.Haiku-Notifications	2718138102
 Notifications	GeneralView		Κοινοποιήσεις
 seconds of inactivity	GeneralView		δευτερόλεπτα αδράνειας
 Revert	PrefletWin		Επαναφορά
@@ -15,9 +15,7 @@ Progress	NotificationView		Πρόοδος
 Last Received	NotificationView		Last Received
 General	PrefletView		Γενικά
 Display	PrefletView		Display
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.
 Search:	NotificationView		Αναζήτιση
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		The notifications server cannot be found.\nA possible cause is an installation not done correctly
 Allowed	NotificationView		Επιτρεπτό
 Yes	NotificationView		Ναί
 Large icon	DisplayView		Μεγάλο εικονίδιο

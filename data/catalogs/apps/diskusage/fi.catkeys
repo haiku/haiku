@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DiskUsage	755008487
+1	finnish	x-vnd.Haiku-DiskUsage	2770162254
 Scanning %refName%	Scanner		Tutkitaan %refName%
 Size	Info Window		Koko
 Rescan	Pie View		Tutki uudelleen
@@ -19,5 +19,6 @@ Modified	Info Window		Muokattu
 Abort	Status View		Keskeytä
 Open with	Pie View		Avaa sovelluksella
 Open	Pie View		Avaa
+{0, plural, one{# file} other{# files}}	Status View		{0, monikko, yksi{# tiedosto} muut{# tiedostoa}}
 %a, %d %b %Y, %r	Info Window		%a, %d. %Bta %Y, %r
 Free on %refName%	Scanner		Vapaata levyasemalla %refName%

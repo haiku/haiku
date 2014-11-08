@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Notifications	44145084
+1	hungarian	x-vnd.Haiku-Notifications	3961154942
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Nem sikerült menteni a beállításokat.\nLehetséges, hogy nincsen több szabad hely a lemezen.
 Notifications	GeneralView		Értesítések
 seconds of inactivity	GeneralView		másodpercnyi inaktivitás után
@@ -18,9 +18,7 @@ Last Received	NotificationView		Legutóbbi fogadott
 General	PrefletView		Általános
 Apply	PrefletWin		Alkalmaz
 Display	PrefletView		Kijelző
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nem lehet engedélyezni az értesítéseket indításkor, valószínűleg nem rendelkezik írási jogosultságokkal a boot beállításmappájához.
 Search:	NotificationView		Keresés:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Az értesítéskiszolgáló nem található.\nLehet, hogy nem lett jól feltelepítve.
 Allowed	NotificationView		Engedélyezve
 Yes	NotificationView		Igen
 Large icon	DisplayView		Nagy ikon
@@ -38,5 +36,4 @@ Unknown	NotificationView		Ismeretlen
 Enable notifications at startup	GeneralView		Értesítések engedélyezése indításkor
 Notifications	PrefletView		Értesítések
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Nem sikerült elérni a kiszolgálót, és ebből következően az InfoPopper telepítése sem volt sikeres.
-Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Nem sikerült elmenteni a beállításokat. Lehetséges, hogy nincs írási joga a beállítások mappához.
 Applications	NotificationView		Programok

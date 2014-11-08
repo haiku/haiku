@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Notifications	164019665
+1	lithuanian	x-vnd.Haiku-Notifications	4081029523
 Notifications	GeneralView		Pranešimai
 seconds of inactivity	GeneralView		sek. pasyvumo
 Revert	PrefletWin		Atšaukti pakeitimus
@@ -16,9 +16,7 @@ Last Received	NotificationView		Paskiausiai gautas
 General	PrefletView		Bendrosios
 Apply	PrefletWin		Taikyti
 Display	PrefletView		Išvaizda
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nustatyti, kad pranešimai būtų įjungiami įkeliant sistemą, nepavyko. Gali būti, jog Jums trūksta rašymo į paleisties nuostatų aplanką teisių.
 Search:	NotificationView		Ieškoti:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Pranešimų tarnyba nerasta.\nGali būti, jog ji nebuvo sėkmingai įdiegta.
 Allowed	NotificationView		Leidžiama
 Yes	NotificationView		Taip
 Large icon	DisplayView		didelės piktogramos
@@ -36,5 +34,4 @@ Unknown	NotificationView		Nežinoma
 Enable notifications at startup	GeneralView		Įjungti pranešimus sistemos paleisties metu
 Notifications	PrefletView		Pranešimai
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Pranešimų tarnyba nerasta. Tai reiškia, jog ji nebuvo sėkmingai įdiegta.
-Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Nuostatų įrašyti nepavyko – tikriausiai Jūs neturite teisių rašyti į nuostatų aplanką.
 Applications	NotificationView		Programos

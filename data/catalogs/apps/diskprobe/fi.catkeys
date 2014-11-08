@@ -59,14 +59,14 @@ Boolean value:	TypeEditors		Boolean-arvo:
 8 bit palette	TypeEditors		8-bittinen paletti
 Fit	ProbeView	Size of fonts, fits to available room	Sopii
 Probe device	OpenWindow		Koesta laite
- (native)	ProbeView		(alkuperäinen)
+ (native)	ProbeView		 (alkuperäinen)
 Unknown format	TypeEditors		Tuntematon muoto
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadesimaali
 MIME type:	TypeEditors		MIME-tyyppi:
 Page setup…	ProbeView		Sivuasetukset…
 New…	FileWindow		Uusi…
 DiskProbe request	AttributeWindow		Levykoestajapyyntö
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Ei voitu lukea kuvatiedostoa
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kuvatiedoston lukeminen epäonnistui
 BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Lohkokoko
 Save changes before closing?	ProbeView		Tallennatko muutokset ennen sulkemista?
 Type editor	AttributeWindow		Tyyppimuokkain

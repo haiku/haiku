@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Notifications	164019665
+1	portuguese (brazil)	x-vnd.Haiku-Notifications	4081029523
 Notifications	GeneralView		Notificações
 seconds of inactivity	GeneralView		segundos de inatividade
 Revert	PrefletWin		Reverter
@@ -16,9 +16,7 @@ Last Received	NotificationView		Último Recebido
 General	PrefletView		Geral
 Apply	PrefletWin		Aplicar
 Display	PrefletView		Tela
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Não é possível habilitar notificações em tempo de inicialização, provavelmente não há permissão de escrita para o diretório de definições de inicialização.
 Search:	NotificationView		Pesquisar:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		O servidor de notificações não pode ser encontrado.\nUma possível causa é uma instalação não concluída corretamente
 Allowed	NotificationView		Permitido
 Yes	NotificationView		Sim
 Large icon	DisplayView		Ícone grande
@@ -36,5 +34,4 @@ Unknown	NotificationView		Desconhecido
 Enable notifications at startup	GeneralView		Habilitar notificações ao iniciar
 Notifications	PrefletView		Notificações
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		O servidor de notificações não pode ser encontrado, isto significa que a instalação do InfoPopper não foi completada com sucesso.
-Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Não é possível salvar as preferências, você provavelmente não possui acesso a gravação no diretório de configuração.
 Applications	NotificationView		Aplicativos

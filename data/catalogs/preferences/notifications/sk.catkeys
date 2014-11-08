@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Notifications	1127855757
+1	slovak	x-vnd.Haiku-Notifications	2718138102
 Notifications	GeneralView		Oznamy
 seconds of inactivity	GeneralView		sekundách nečinnosti
 Revert	PrefletWin		Vrátiť
@@ -15,9 +15,7 @@ Progress	NotificationView		Priebeh
 Last Received	NotificationView		Posledný prijatý
 General	PrefletView		Všeobecné
 Display	PrefletView		Displej
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nie je možné zapnúť oznámenia pri štarte, pravdepodobne nemáte oprávnenie na zápis do adresára nastavení zavádzania systému.
 Search:	NotificationView		Hľadať:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		The notifications server cannot be found.\nMožná príčina je, že inštalácia nebola vykonaná správne
 Allowed	NotificationView		Povolené
 Yes	NotificationView		Áno
 Large icon	DisplayView		Veľká ikona

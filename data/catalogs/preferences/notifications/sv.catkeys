@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Notifications	164019665
+1	swedish	x-vnd.Haiku-Notifications	4081029523
 Notifications	GeneralView		Aviseringar
 seconds of inactivity	GeneralView		sekunder av inaktivitet
 Revert	PrefletWin		Återgå
@@ -16,9 +16,7 @@ Last Received	NotificationView		Sista mottagna
 General	PrefletView		Allmän
 Apply	PrefletWin		Verkställ
 Display	PrefletView		Visa
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Kan inte aktivera aviseringar vid start. Du saknar förmodligen behörighet att skriva till startinställningsmappen.
 Search:	NotificationView		Sök:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Aviseringsservern hittas inte.\nDet kan bero på att installationen inte är korrekt.
 Allowed	NotificationView		Tillåten
 Yes	NotificationView		Ja
 Large icon	DisplayView		Stor ikon
@@ -36,5 +34,4 @@ Unknown	NotificationView		Okänd
 Enable notifications at startup	GeneralView		Aktivera aviseringar vid start
 Notifications	PrefletView		Aviseringar
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Aviseringsservern hittas ej. Det betyder att din InfoPopper installation inte avslutades korrekt.
-Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Kan inte spara inställningarna. Du har förmodligen inga skrivrättigheter på Settings mappen
 Applications	NotificationView		Program

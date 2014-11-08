@@ -10,7 +10,7 @@ An item named '%name' already exists in the Translators folder! Shall the existi
 DataTranslations - Note	DataTranslations		Tietomuunnokset - Ilmoitus
 Overwrite	DataTranslations		Korvaa
 Info:	DataTranslations		Tiedot:
-Info	DataTranslations		tiedot
+Info	DataTranslations		Tiedot
 Path:	DataTranslations		Polku:
 The new translator has been installed successfully.	DataTranslations		Uusi tietomuunnin on asennettu onnistuneesti.
 DataTranslations - Error	DataTranslations		Tietomuunnokset - Virhe

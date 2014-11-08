@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-FileTypes	3116280330
+1	finnish	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		Sovellustyypit…
 Description:	Application Types Window		Kuvaus:
 Args only	Application Type Window		Vain argumentit
@@ -17,9 +17,9 @@ Rule:	FileTypes Window		Sääntö:
 Add icon…	Icon View		Lisää kuvake…
 Multiple files from \"%s\" file type	FileType Window		Useita tiedostoja ”%s”-tiedostotyypistä
 File type	FileType Window		Tiedostotyyppi
-Could not change attributes	Attribute Window		Ei voitu muuttaa attribuutteja
-Could not retrieve preferred application of this file	Preferred App Menu		Ei voitu noutaa tämän tiedoston ensisijaista sovellusta
-Beta	Application Types Window		Beta
+Could not change attributes	Attribute Window		Attribuuttien vaihtaminen epäonnistui
+Could not retrieve preferred application of this file	Preferred App Menu		Tämän tiedoston ensisijaisen sovelluksen noutaminen epäonnistui
+Beta	Application Types Window		Beeta
 Extensions:	FileTypes Window		Tiedostotarkentimet:
 Select same preferred application as	FileTypes Window		Valitse sama ensisijainen sovellus nimellä
 Save	Application Type Window		Tallenna
@@ -52,6 +52,7 @@ Set preferred application	Preferred App Menu		Aseta ensisijainen sovellus
 Don't save	Application Type Window		Älä tallenna
 Save changes before closing?	Application Type Window		Tallennetaanko muutokset ennen sulkemista?
 File	Application Type Window		Tiedosto
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, monikko, yksi{# sovellustyyppi olisi voitu poistaa} muut{# sovellustyyppiä olisi voitu poistaa}}
 Version:	Application Type Window		Versio:
 Select…	FileTypes Window		Valitse…
 FileTypes request	FileTypes		Tiedostotyyppien pyyntö
@@ -132,7 +133,7 @@ Same as…	FileTypes Window		Sama kuin…
 Exclusive launch	Application Type Window		Yksinomainen käynnistys
 FileTypes	System name		Tiedostotyyppiasetukset
 Application types	Application Types Window		Sovellustyypit
-Could not remove file type: %s\n	FileTypes Window		Ei voitu poistaa tiedostotyyppiä: %s\n
+Could not remove file type: %s\n	FileTypes Window		Tiedostotyypin poistaminen epäonnistui: %s\n
 Signature:	Application Types Window		Allekirjoitus:
 Gamma	Application Type Window		Gamma
 Cancel	Preferred App Menu		Peru

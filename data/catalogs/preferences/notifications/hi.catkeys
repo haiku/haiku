@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Notifications	1127855757
+1	hindi	x-vnd.Haiku-Notifications	2718138102
 Notifications	GeneralView		सूचनाएँ
 seconds of inactivity	GeneralView		निष्क्रियता के सेकेंड
 Revert	PrefletWin		वापस लौटना
@@ -15,9 +15,7 @@ Progress	NotificationView		प्रगति
 Last Received	NotificationView		पिछले प्राप्त
 General	PrefletView		जनरल
 Display	PrefletView		प्रदर्शन
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		स्टार्टअप समय पर सूचनाएं सक्षम नहीं सकते, शायद बूट सेटिंग्स निर्देशिका में लिखने की अनुमति नहीं है.
 Search:	NotificationView		खोजें:
-The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		सूचनाएं सर्वर नहीं पाया जा सकता है..\nएक संभव कारण है संस्थापन सही ढंग से नहीं कर
 Allowed	NotificationView		अनुमति दी
 Yes	NotificationView		हाँ
 Large icon	DisplayView		बड़े चिह्न

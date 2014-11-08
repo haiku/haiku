@@ -6,7 +6,7 @@ Refuse output format changes	AudioMixer		Kiellä lähtömuodon muutokset
 Output mapping	AudioMixer		Lähtökuvaus
 Allow input channel remapping	AudioMixer		Salli tulokanavien uudelleenkuvaus
 Resampling algorithm	AudioMixer		Uusintanäytealgoritmi
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		3 dB:n Vaimennussekoittajalähtö (kuten BeOS R5)
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		3 dB:n vaimennussekoittajalähtö (kuten BeOS R5)
 Display balance control for stereo connections	AudioMixer		Näytä balanssiohjaus stereoyhteyksille
 To output	AudioMixer		Lähtöön
 not connected	AudioMixer		ei ole yhdistetty

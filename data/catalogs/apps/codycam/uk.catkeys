@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CodyCam	2416864674
+1	ukrainian	x-vnd.Haiku-CodyCam	2083193989
 Capturing Image…	VideoConsumer.cpp		Захоплення зображення…
 Every 30 seconds	CodyCam		Кожні 30 секунд
 File name:	CodyCam		Ім’я файлу:
@@ -64,7 +64,6 @@ Connected…	VideoConsumer.cpp		Підключення…
 PASS <suppressed>  (real password sent)\n	FtpClient		Пароль <прихований> (дійсний пароль відправлено)\n
 Every 5 minutes	CodyCam		Кожні 5 хвилин
 read: %d\n	SftpClient		читання: %d\n
-OK	CodyCam		Гаразд
 Capture controls	CodyCam		Керування захопленням
 Every hour	CodyCam		Кожну годину
 Cannot connect the video source to the video window	CodyCam		Неможливо підключити відео джерело до відео вікна
