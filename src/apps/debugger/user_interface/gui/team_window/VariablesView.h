@@ -12,10 +12,11 @@
 
 #include "table/TreeTable.h"
 
+#include "ExpressionInfo.h"
+
 
 class ActionMenuItem;
 class CpuState;
-class ExpressionInfo;
 class SettingsMenu;
 class StackFrame;
 class Thread;
@@ -29,7 +30,8 @@ class VariablesViewState;
 class VariablesViewStateHistory;
 
 
-class VariablesView : public BGroupView, private TreeTableListener {
+class VariablesView : public BGroupView, private TreeTableListener,
+	private ExpressionInfo::Listener {
 public:
 	class Listener;
 
@@ -61,6 +63,10 @@ private:
 									const TreeTablePath& path,
 									int32 columnIndex, BPoint screenWhere,
 									uint32 buttons);
+
+	// ExpressionInfo::Listener
+	virtual	void				ExpressionEvaluated(ExpressionInfo* info,
+									status_t result, Value* value);
 
 private:
 			class ContainerListener;
@@ -103,14 +109,15 @@ private:
 			void				_CopyVariableValueToClipboard();
 
 			status_t			_AddExpression(const char* expression,
-									Type* resultType);
+									Type* resultType,
+									ExpressionInfo*& _info);
 			void				_RemoveExpression(ModelNode* node);
 
-			status_t			_AddExpressionNode(const ExpressionInfo& info);
+			status_t			_AddExpressionNode(ExpressionInfo* info);
 			void				_RestoreExpressionNodes();
 
-			void				_SetExpressionNodeValue(const char* expression,
-									status_t finalResult, Value* value);
+			void				_SetExpressionNodeValue(ExpressionInfo* info,
+									status_t result, Value* value);
 
 			status_t			_GetTypeForTypeCode(int32 typeCode,
 									Type*& _resultType) const;
@@ -139,8 +146,7 @@ public:
 									ValueNode* valueNode) = 0;
 
 	virtual	void				ExpressionEvaluationRequested(
-									const char* expression,
-									type_code resultType,
+									ExpressionInfo* info,
 									StackFrame* frame,
 									Thread* thread) = 0;
 };

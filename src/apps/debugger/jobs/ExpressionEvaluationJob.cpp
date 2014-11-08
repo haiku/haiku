@@ -10,10 +10,12 @@
 #include <AutoLocker.h>
 
 #include "DebuggerInterface.h"
+#include "ExpressionInfo.h"
 #include "SourceLanguage.h"
 #include "StackFrame.h"
 #include "Team.h"
 #include "Thread.h"
+#include "Type.h"
 #include "Value.h"
 #include "ValueNode.h"
 #include "ValueNodeManager.h"
@@ -21,23 +23,24 @@
 
 ExpressionEvaluationJob::ExpressionEvaluationJob(Team* team,
 	DebuggerInterface* debuggerInterface, SourceLanguage* language,
-	const char* expression, type_code resultType, StackFrame* frame,
+	ExpressionInfo* info, StackFrame* frame,
 	Thread* thread)
 	:
-	fKey(expression, JOB_TYPE_EVALUATE_EXPRESSION),
+	fKey(info->Expression(), JOB_TYPE_EVALUATE_EXPRESSION),
 	fTeam(team),
 	fDebuggerInterface(debuggerInterface),
 	fArchitecture(debuggerInterface->GetArchitecture()),
 	fTypeInformation(team->GetTeamTypeInformation()),
 	fLanguage(language),
-	fExpression(expression),
-	fResultType(resultType),
+	fExpressionInfo(info),
 	fFrame(frame),
 	fThread(thread),
 	fManager(NULL),
 	fResultValue(NULL)
 {
 	fLanguage->AcquireReference();
+	fExpressionInfo->AcquireReference();
+
 	if (fFrame != NULL)
 		fFrame->AcquireReference();
 	if (fThread != NULL)
@@ -48,6 +51,7 @@ ExpressionEvaluationJob::ExpressionEvaluationJob(Team* team,
 ExpressionEvaluationJob::~ExpressionEvaluationJob()
 {
 	fLanguage->ReleaseReference();
+	fExpressionInfo->ReleaseReference();
 	if (fFrame != NULL)
 		fFrame->ReleaseReference();
 	if (fThread != NULL)
@@ -80,13 +84,15 @@ ExpressionEvaluationJob::Do()
 	}
 
 	if (result != B_OK) {
-		fTeam->NotifyExpressionEvaluated(fExpression.String(), result, NULL);
+		fExpressionInfo->NotifyExpressionEvaluated(result, NULL);
 		return result;
 	}
 
 	ValueNode* neededNode = NULL;
-	result = fLanguage->EvaluateExpression(fExpression,
-		fResultType, fManager, fResultValue, neededNode);
+	PrimitiveType* type = dynamic_cast<PrimitiveType*>(
+		fExpressionInfo->ResultType());
+	result = fLanguage->EvaluateExpression(fExpressionInfo->Expression(),
+		type->TypeConstant(), fManager, fResultValue, neededNode);
 	if (neededNode != NULL) {
 		result = ResolveNodeValue(neededNode);
 		if (State() == JOB_STATE_WAITING)
@@ -94,9 +100,7 @@ ExpressionEvaluationJob::Do()
 		// if result != B_OK, fall through
 	}
 
-	AutoLocker<Team> teamLocker(fTeam);
-	fTeam->NotifyExpressionEvaluated(fExpression.String(), result,
-		fResultValue);
+	fExpressionInfo->NotifyExpressionEvaluated(result, fResultValue);
 
 	return B_OK;
 }

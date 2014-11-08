@@ -8,6 +8,7 @@
 
 #include <Window.h>
 
+#include "ExpressionInfo.h"
 #include "MemoryView.h"
 #include "Team.h"
 #include "TeamMemoryBlock.h"
@@ -26,7 +27,7 @@ class UserInterfaceListener;
 class InspectorWindow : public BWindow,
 	public TeamMemoryBlock::Listener,
 	public MemoryView::Listener,
-	private Team::Listener {
+	private ExpressionInfo::Listener {
 public:
 								InspectorWindow(::Team* team,
 									UserInterfaceListener* listener,
@@ -49,10 +50,9 @@ public:
 	// MemoryView::Listener
 	virtual	void				TargetAddressChanged(target_addr_t address);
 
-	// Team::Listener
-	virtual	void				ExpressionEvaluated(
-									const Team::ExpressionEvaluationEvent&
-										event);
+	// ExpressionInfo::Listener
+	virtual	void				ExpressionEvaluated(ExpressionInfo* info,
+									status_t result, Value* value);
 
 			status_t			LoadSettings(
 									const GuiTeamUiSettings& settings);
@@ -84,6 +84,7 @@ private:
 	target_addr_t				fCurrentAddress;
 	::Team*						fTeam;
 	SourceLanguage*				fLanguage;
+	ExpressionInfo*				fExpressionInfo;
 	BHandler*					fTarget;
 };
 

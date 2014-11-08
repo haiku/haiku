@@ -66,7 +66,7 @@ public:
 			void				HandleStackTraceChanged();
 
 private:
-			friend class ExpressionJobListener;
+			friend class ExpressionEvaluationListener;
 
 private:
 	// ImageDebugInfoProvider

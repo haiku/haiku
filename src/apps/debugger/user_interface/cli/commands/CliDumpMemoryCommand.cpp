@@ -18,7 +18,7 @@
 
 #include "CliContext.h"
 #include "CppLanguage.h"
-#include "Number.h"
+#include "SyntheticPrimitiveType.h"
 #include "Team.h"
 #include "TeamMemoryBlock.h"
 #include "UiUtils.h"
@@ -57,10 +57,28 @@ CliDumpMemoryCommand::Execute(int argc, const char* const* argv,
 		return;
 	}
 
+	ExpressionInfo* info = context.GetExpressionInfo();
+
 	target_addr_t address = 0;
-	context.SetCurrentExpression(argv[1]);
+
+	PrimitiveType* type = dynamic_cast<PrimitiveType*>(info->ResultType());
+	if (type == NULL || type->TypeConstant() != B_UINT64_TYPE) {
+		type = new(std::nothrow) SyntheticPrimitiveType(
+		B_UINT64_TYPE);
+		if (type == NULL) {
+			printf("Unable to evaluate expression: %s\n", strerror(B_NO_MEMORY));
+			return;
+		}
+
+		BReference<Type> typeReference(type, true);
+
+		info->SetResultType(type);
+	}
+
+	info->SetExpression(argv[1]);
+
 	context.GetUserInterfaceListener()->ExpressionEvaluationRequested(
-		fLanguage, argv[1], B_UINT64_TYPE);
+		fLanguage, info);
 	context.WaitForEvents(CliContext::EVENT_EXPRESSION_EVALUATED);
 	if (context.IsTerminating())
 		return;

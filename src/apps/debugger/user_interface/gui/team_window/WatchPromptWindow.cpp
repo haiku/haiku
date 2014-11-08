@@ -18,53 +18,61 @@
 #include "Architecture.h"
 #include "CppLanguage.h"
 #include "MessageCodes.h"
-#include "Number.h"
+#include "SyntheticPrimitiveType.h"
 #include "UserInterface.h"
 #include "Value.h"
 #include "Watchpoint.h"
 
 
-WatchPromptWindow::WatchPromptWindow(::Team* team, target_addr_t address,
-	uint32 type, int32 length, UserInterfaceListener* listener)
+WatchPromptWindow::WatchPromptWindow(Architecture* architecture,
+	target_addr_t address, uint32 type, int32 length,
+	UserInterfaceListener* listener)
 	:
 	BWindow(BRect(), "Edit Watchpoint", B_FLOATING_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fInitialAddress(address),
 	fInitialType(type),
 	fInitialLength(length),
-	fTeam(team),
+	fArchitecture(architecture),
 	fRequestedAddress(0),
 	fRequestedLength(0),
 	fAddressInput(NULL),
 	fLengthInput(NULL),
+	fAddressExpressionInfo(NULL),
+	fLengthExpressionInfo(NULL),
 	fTypeField(NULL),
 	fListener(listener),
 	fLanguage(NULL)
 {
-	AutoLocker< ::Team> teamLocker(fTeam);
-	fTeam->AddListener(this);
-	fTeam->GetArchitecture()->AcquireReference();
+	fArchitecture->AcquireReference();
 }
 
 
 WatchPromptWindow::~WatchPromptWindow()
 {
-	fTeam->GetArchitecture()->ReleaseReference();
-
-	AutoLocker< ::Team> teamLocker(fTeam);
-	fTeam->RemoveListener(this);
+	fArchitecture->ReleaseReference();
 
 	if (fLanguage != NULL)
 		fLanguage->ReleaseReference();
+
+	if (fAddressExpressionInfo != NULL) {
+		fAddressExpressionInfo->RemoveListener(this);
+		fAddressExpressionInfo->ReleaseReference();
+	}
+
+	if (fLengthExpressionInfo != NULL) {
+		fLengthExpressionInfo->RemoveListener(this);
+		fLengthExpressionInfo->ReleaseReference();
+	}
 }
 
 
 WatchPromptWindow*
-WatchPromptWindow::Create(::Team* team, target_addr_t address, uint32 type,
-	int32 length, UserInterfaceListener* listener)
+WatchPromptWindow::Create(Architecture* architecture, target_addr_t address,
+	uint32 type, int32 length, UserInterfaceListener* listener)
 {
-	WatchPromptWindow* self = new WatchPromptWindow(team, address, type,
-		length, listener);
+	WatchPromptWindow* self = new WatchPromptWindow(architecture, address,
+		type, length, listener);
 
 	try {
 		self->_Init();
@@ -83,17 +91,27 @@ WatchPromptWindow::_Init()
 {
 	fLanguage = new CppLanguage();
 
+	PrimitiveType* type = new SyntheticPrimitiveType(B_UINT64_TYPE);
+	BReference<PrimitiveType> typeReference(type, true);
+
 	BString text;
 	text.SetToFormat("0x%" B_PRIx64, fInitialAddress);
 	fAddressInput = new BTextControl("Address:", text, NULL);
+	fAddressExpressionInfo = new ExpressionInfo(text, type);
+	fAddressExpressionInfo->AddListener(this);
+
+	type = new SyntheticPrimitiveType(B_INT32_TYPE);
+	typeReference.SetTo(type, true);
 
 	text.SetToFormat("%" B_PRId32, fInitialLength);
 	fLengthInput = new BTextControl("Length:", text, NULL);
+	fLengthExpressionInfo = new ExpressionInfo(text, type);
+	fLengthExpressionInfo->AddListener(this);
 
 	int32 maxDebugRegisters = 0;
 	int32 maxBytesPerRegister = 0;
 	uint8 debugCapabilityFlags = 0;
-	fTeam->GetArchitecture()->GetWatchpointDebugCapabilities(maxDebugRegisters,
+	fArchitecture->GetWatchpointDebugCapabilities(maxDebugRegisters,
 		maxBytesPerRegister, debugCapabilityFlags);
 
 	BMenu* typeMenu = new BMenu("Watch type");
@@ -151,23 +169,11 @@ WatchPromptWindow::Show()
 
 
 void
-WatchPromptWindow::ExpressionEvaluated(
-	const Team::ExpressionEvaluationEvent& event)
+WatchPromptWindow::ExpressionEvaluated(ExpressionInfo* info, status_t result,
+	Value* value)
 {
 	BMessage message(MSG_EXPRESSION_EVALUATED);
-	AutoLocker<BLooper> lock(this);
-	if (!lock.IsLocked())
-		return;
-
-	BString expression = event.GetExpression();
-	if (expression != fAddressInput->Text()
-		&& expression != fLengthInput->Text()) {
-		return;
-	}
-
-	lock.Unlock();
-	message.AddInt32("result", event.GetResult());
-	Value* value = event.GetValue();
+	message.AddInt32("result", result);
 	BReference<Value> reference;
 	if (value != NULL) {
 		reference.SetTo(value);
@@ -231,11 +237,13 @@ WatchPromptWindow::MessageReceived(BMessage* message)
 			fRequestedAddress = 0;
 			fRequestedLength = 0;
 
+			fAddressExpressionInfo->SetExpression(fAddressInput->Text());
 			fListener->ExpressionEvaluationRequested(fLanguage,
-				fAddressInput->Text(), B_UINT64_TYPE);
+				fAddressExpressionInfo);
 
+			fLengthExpressionInfo->SetExpression(fLengthInput->Text());
 			fListener->ExpressionEvaluationRequested(fLanguage,
-				fLengthInput->Text(), B_INT32_TYPE);
+				fLengthExpressionInfo);
 			break;
 		}
 

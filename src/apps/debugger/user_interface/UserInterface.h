@@ -18,6 +18,7 @@
 class entry_ref;
 
 class CpuState;
+class ExpressionInfo;
 class FunctionInstance;
 class Image;
 class LocatableFile;
@@ -144,8 +145,7 @@ public:
 
 	virtual	void				ExpressionEvaluationRequested(
 									SourceLanguage* language,
-									const char* expression,
-									type_code resultType,
+									ExpressionInfo* info,
 									StackFrame* frame = NULL,
 									Thread* thread = NULL) = 0;
 

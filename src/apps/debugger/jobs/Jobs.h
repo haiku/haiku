@@ -18,6 +18,7 @@ class Architecture;
 class BVariant;
 class CpuState;
 class DebuggerInterface;
+class ExpressionInfo;
 class Function;
 class FunctionInstance;
 class Image;
@@ -236,8 +237,7 @@ public:
 								ExpressionEvaluationJob(Team* team,
 									DebuggerInterface* debuggerInterface,
 									SourceLanguage* language,
-									const char* expression,
-									type_code resultType,
+									ExpressionInfo* info,
 									StackFrame* frame,
 									Thread* thread);
 	virtual						~ExpressionEvaluationJob();
@@ -257,8 +257,7 @@ private:
 			Architecture*		fArchitecture;
 			TeamTypeInformation* fTypeInformation;
 			SourceLanguage*		fLanguage;
-			BString				fExpression;
-			type_code			fResultType;
+			ExpressionInfo*		fExpressionInfo;
 			StackFrame*			fFrame;
 			Thread*				fThread;
 			ValueNodeManager*	fManager;

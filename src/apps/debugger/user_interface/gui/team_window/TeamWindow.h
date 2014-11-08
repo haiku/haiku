@@ -128,8 +128,7 @@ private:
 									ValueNodeContainer* container,
 									ValueNode* valueNode);
 	virtual	void				ExpressionEvaluationRequested(
-									const char* expression,
-									type_code resultType,
+									ExpressionInfo* info,
 									StackFrame* frame,
 									::Thread* thread);
 
@@ -148,9 +147,6 @@ private:
 									const Team::UserBreakpointEvent& event);
 	virtual	void				WatchpointChanged(
 									const Team::WatchpointEvent& event);
-	virtual	void				ExpressionEvaluated(
-									const Team::ExpressionEvaluationEvent&
-										event);
 	virtual void				DebugReportChanged(
 									const Team::DebugReportEvent& event);
 

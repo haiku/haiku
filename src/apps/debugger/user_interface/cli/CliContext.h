@@ -13,6 +13,7 @@
 
 #include <Locker.h>
 
+#include "ExpressionInfo.h"
 #include "Team.h"
 #include "TeamMemoryBlock.h"
 #include "ValueNodeContainer.h"
@@ -28,6 +29,7 @@ class ValueNodeManager;
 
 class CliContext : private Team::Listener,
 	public TeamMemoryBlock::Listener,
+	public ExpressionInfo::Listener,
 	private ValueNodeContainer::Listener {
 public:
 			enum {
@@ -79,8 +81,8 @@ public:
 
 			TeamMemoryBlock*	CurrentBlock() const { return fCurrentBlock; }
 
-			void				SetCurrentExpression(const char* expression);
-
+			ExpressionInfo*		GetExpressionInfo() const
+									{ return fExpressionInfo; }
 			status_t			GetExpressionResult() const
 									{ return fExpressionResult; }
 			Value*				GetExpressionValue() const
@@ -110,15 +112,15 @@ private:
 	virtual	void				ThreadStackTraceChanged(
 									const Team::ThreadEvent& event);
 
-	virtual	void				ExpressionEvaluated(
-									const Team::ExpressionEvaluationEvent&
-										event);
-
 	virtual	void				DebugReportChanged(
 									const Team::DebugReportEvent& event);
 
 	// TeamMemoryBlock::Listener
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
+
+	// ExpressionInfo::Listener
+	virtual	void				ExpressionEvaluated(ExpressionInfo* info,
+									status_t result, Value* value);
 
 	// ValueNodeContainer::Listener
 	virtual	void				ValueNodeChanged(ValueNodeChild* nodeChild,
@@ -156,7 +158,7 @@ private:
 			int32				fCurrentStackFrameIndex;
 			TeamMemoryBlock*	fCurrentBlock;
 
-			const char*			fCurrentExpression;
+			ExpressionInfo*		fExpressionInfo;
 			status_t			fExpressionResult;
 			Value*				fExpressionValue;
 

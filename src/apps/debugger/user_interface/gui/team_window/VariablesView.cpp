@@ -1947,22 +1947,24 @@ VariablesView::MessageReceived(BMessage* message)
 
 			BReference<Type> typeReference(resultType, true);
 
-			status_t error = _AddExpression(expression, resultType);
+			ExpressionInfo* info;
+			status_t error = _AddExpression(expression, resultType, info);
 			if (error != B_OK) {
 				// TODO: notify user of failure
 				break;
 			}
 
-			fListener->ExpressionEvaluationRequested(expression, type,
-				fStackFrame, fThread);
+			fListener->ExpressionEvaluationRequested(info, fStackFrame,
+				fThread);
 			break;
 		}
 		case MSG_EXPRESSION_EVALUATED:
 		{
-			const char* expression;
+			ExpressionInfo* info;
 			status_t result;
 			Value* value = NULL;
-			if (message->FindString("expression", &expression) != B_OK
+			if (message->FindPointer("info",
+					reinterpret_cast<void**>(&info)) != B_OK
 				|| message->FindInt32("result", &result) != B_OK) {
 				break;
 			}
@@ -1973,7 +1975,7 @@ VariablesView::MessageReceived(BMessage* message)
 				valueReference.SetTo(value, true);
 			}
 
-			_SetExpressionNodeValue(expression, result, value);
+			_SetExpressionNodeValue(info, result, value);
 			break;
 		}
 		case MSG_VALUE_NODE_CHANGED:
@@ -2217,6 +2219,25 @@ VariablesView::TreeTableCellMouseDown(TreeTable* table,
 
 	fTableCellContextMenuTracker = trackerReference.Detach();
 	fTableCellContextMenuTracker->ShowMenu(screenWhere);
+}
+
+
+void
+VariablesView::ExpressionEvaluated(ExpressionInfo* info, status_t result,
+	Value* value)
+{
+	BMessage message(MSG_EXPRESSION_EVALUATED);
+	message.AddPointer("info", info);
+	message.AddInt32("result", result);
+	BReference<Value> valueReference;
+
+	if (value != NULL) {
+		valueReference.SetTo(value);
+		message.AddPointer("value", value);
+	}
+
+	if (BMessenger(this).SendMessage(&message) == B_OK)
+		valueReference.Detach();
 }
 
 
@@ -2700,7 +2721,8 @@ VariablesView::_CopyVariableValueToClipboard()
 
 
 status_t
-VariablesView::_AddExpression(const char* expression, Type* resultType)
+VariablesView::_AddExpression(const char* expression, Type* resultType,
+	ExpressionInfo*& _info)
 {
 	// if our stack frame doesn't have an associated function,
 	// we can't add an expression
@@ -2734,14 +2756,16 @@ VariablesView::_AddExpression(const char* expression, Type* resultType)
 
 	BReference<ExpressionInfo> infoReference(info, true);
 
-	status_t error = _AddExpressionNode(*info);
+	status_t error = _AddExpressionNode(info);
 	if (error != B_OK)
 		return error;
 
 	if (!entry->AddItem(info))
 		return B_NO_MEMORY;
 
+	info->AddListener(this);
 	infoReference.Detach();
+	_info = info;
 	return B_OK;
 }
 
@@ -2765,6 +2789,7 @@ VariablesView::_RemoveExpression(ModelNode* node)
 		ExpressionInfo* info = entry->ItemAt(i);
 		if (info->Expression() == child->GetExpression()) {
 			entry->RemoveItemAt(i);
+			info->RemoveListener(this);
 			info->ReleaseReference();
 			break;
 		}
@@ -2775,11 +2800,11 @@ VariablesView::_RemoveExpression(ModelNode* node)
 
 
 status_t
-VariablesView::_AddExpressionNode(const ExpressionInfo& info)
+VariablesView::_AddExpressionNode(ExpressionInfo* info)
 {
-	Type* type = info.ResultType();
+	Type* type = info->ResultType();
 	ExpressionValueNodeChild* child
-		= new(std::nothrow) ExpressionValueNodeChild(info.Expression(), type);
+		= new(std::nothrow) ExpressionValueNodeChild(info->Expression(), type);
 	if (child == NULL)
 		return B_NO_MEMORY;
 
@@ -2823,18 +2848,15 @@ VariablesView::_RestoreExpressionNodes()
 
 	for (int32 i = 0; i < entry->CountItems(); i++) {
 		ExpressionInfo* info = entry->ItemAt(i);
-		_AddExpressionNode(*info);
-		SyntheticPrimitiveType* type
-			= dynamic_cast<SyntheticPrimitiveType*>(info->ResultType());
-		fListener->ExpressionEvaluationRequested(info->Expression(),
-			type->TypeConstant(), fStackFrame, fThread);
+		_AddExpressionNode(info);
+		fListener->ExpressionEvaluationRequested(info, fStackFrame, fThread);
 	}
 }
 
 
 void
-VariablesView::_SetExpressionNodeValue(const char* expression,
-	status_t finalResult, Value* value)
+VariablesView::_SetExpressionNodeValue(ExpressionInfo* info, status_t result,
+	Value* value)
 {
 	FunctionID* id = fStackFrame->Function()->GetFunctionID();
 	BReference<FunctionID> idReference(id, true);
@@ -2852,10 +2874,10 @@ VariablesView::_SetExpressionNodeValue(const char* expression,
 		if (child == NULL)
 			continue;
 
-		if (child->GetExpression() != expression)
+		if (child->GetExpression() != info->Expression())
 			continue;
 
-		child->Node()->SetLocationAndValue(NULL, value, finalResult);
+		child->Node()->SetLocationAndValue(NULL, value, result);
 		return;
 	}
 }

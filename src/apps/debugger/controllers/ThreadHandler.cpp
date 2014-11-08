@@ -19,6 +19,7 @@
 #include "BreakpointManager.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
+#include "ExpressionInfo.h"
 #include "FunctionInstance.h"
 #include "ImageDebugInfo.h"
 #include "InstructionInfo.h"
@@ -30,6 +31,7 @@
 #include "SpecificImageDebugInfo.h"
 #include "StackTrace.h"
 #include "Statement.h"
+#include "SyntheticPrimitiveType.h"
 #include "Team.h"
 #include "Tracing.h"
 #include "Value.h"
@@ -46,38 +48,26 @@ enum {
 };
 
 
-class ExpressionJobListener : public JobListener {
+class ExpressionEvaluationListener : public ExpressionInfo::Listener {
 public:
-	ExpressionJobListener(ThreadHandler* handler)
+	ExpressionEvaluationListener(ThreadHandler* handler)
 	:
-	JobListener(),
 	fHandler(handler)
 	{
 		fHandler->AcquireReference();
 	}
 
-	~ExpressionJobListener()
+	~ExpressionEvaluationListener()
 	{
 		fHandler->ReleaseReference();
 	}
 
-	virtual void JobDone(Job* job)
+	virtual void ExpressionEvaluated(ExpressionInfo* info, status_t result,
+		Value* value)
 	{
-		Value* resultValue = dynamic_cast<ExpressionEvaluationJob*>(job)
-			->GetResultValue();
-
-		fHandler->_HandleBreakpointConditionEvaluated(resultValue);
+		fHandler->_HandleBreakpointConditionEvaluated(value);
 	}
 
-	virtual void JobFailed(Job* job)
-	{
-		fHandler->_HandleBreakpointConditionEvaluated(NULL);
-	}
-
-	virtual void JobAborted(Job* job)
-	{
-		fHandler->_HandleBreakpointConditionEvaluated(NULL);
-	}
 private:
 	ThreadHandler* fHandler;
 };
@@ -893,17 +883,33 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 			return false;
 
 		BReference<SourceLanguage> reference(language, true);
-		ExpressionJobListener* listener
-			= new(std::nothrow) ExpressionJobListener(this);
+		ExpressionEvaluationListener* listener
+			= new(std::nothrow) ExpressionEvaluationListener(this);
 		if (listener == NULL)
 			return false;
 
+		Type* type = new(std::nothrow) SyntheticPrimitiveType(B_UINT64_TYPE);
+		if (type == NULL)
+			return false;
+
+		BReference<Type> typeReference(type, true);
+
+		ExpressionInfo* expressionInfo = new(std::nothrow) ExpressionInfo(
+			userBreakpoint->Condition(), type);
+
+		if (expressionInfo == NULL)
+			return false;
+
+		BReference<ExpressionInfo> expressionReference(expressionInfo, true);
+
+		expressionInfo->AddListener(listener);
+
 		status_t error = fWorker->ScheduleJob(
 			new(std::nothrow) ExpressionEvaluationJob(fThread->GetTeam(),
-				fDebuggerInterface, language, userBreakpoint->Condition(),
-				B_UINT64_TYPE, frame, fThread), listener);
+				fDebuggerInterface, language, expressionInfo, frame, fThread));
 
-		BPrivate::ObjectDeleter<ExpressionJobListener> deleter(listener);
+		BPrivate::ObjectDeleter<ExpressionEvaluationListener> deleter(
+			listener);
 		if (error == B_OK) {
 			_SetThreadState(THREAD_STATE_STOPPED, cpuState,
 				THREAD_STOPPED_BREAKPOINT, BString());

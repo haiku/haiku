@@ -110,8 +110,7 @@ private:
 
 	virtual	void				ExpressionEvaluationRequested(
 									SourceLanguage* language,
-									const char* expression,
-									type_code resultType,
+									ExpressionInfo* info,
 									StackFrame* frame = NULL,
 									::Thread* thread = NULL);
 
@@ -198,8 +197,7 @@ private:
 
 			void				_HandleEvaluateExpression(
 									SourceLanguage* language,
-									const char* expression,
-									type_code resultType,
+									ExpressionInfo* info,
 									StackFrame* frame,
 									::Thread* thread);
 

@@ -21,7 +21,7 @@
 #include "GuiTeamUiSettings.h"
 #include "MemoryView.h"
 #include "MessageCodes.h"
-#include "Number.h"
+#include "SyntheticPrimitiveType.h"
 #include "Team.h"
 #include "UserInterface.h"
 #include "Value.h"
@@ -48,10 +48,9 @@ InspectorWindow::InspectorWindow(::Team* team, UserInterfaceListener* listener,
 	fCurrentAddress(0LL),
 	fTeam(team),
 	fLanguage(NULL),
+	fExpressionInfo(NULL),
 	fTarget(target)
 {
-	AutoLocker< ::Team> teamLocker(fTeam);
-	fTeam->AddListener(this);
 }
 
 
@@ -62,11 +61,13 @@ InspectorWindow::~InspectorWindow()
 		fCurrentBlock->ReleaseReference();
 	}
 
-	AutoLocker< ::Team> teamLocker(fTeam);
-	fTeam->RemoveListener(this);
-
 	if (fLanguage != NULL)
 		fLanguage->ReleaseReference();
+
+	if (fExpressionInfo != NULL) {
+		fExpressionInfo->RemoveListener(this);
+		fExpressionInfo->ReleaseReference();
+	}
 }
 
 
@@ -91,6 +92,10 @@ void
 InspectorWindow::_Init()
 {
 	fLanguage = new CppLanguage();
+	::Type* type = new SyntheticPrimitiveType(B_UINT64_TYPE);
+	BReference< ::Type> typeReference(type);
+	fExpressionInfo = new ExpressionInfo(NULL, type);
+	fExpressionInfo->AddListener(this);
 
 	BScrollView* scrollView;
 
@@ -210,10 +215,13 @@ InspectorWindow::MessageReceived(BMessage* message)
 		{
 			target_addr_t address = 0;
 			if (message->FindUInt64("address", &address) != B_OK) {
-				fListener->ExpressionEvaluationRequested(
-					fLanguage,
-					fAddressInput->Text(),
-					B_UINT64_TYPE);
+				if (fAddressInput->TextView()->TextLength() == 0)
+					break;
+
+				fExpressionInfo->SetExpression(fAddressInput->Text());
+
+				fListener->ExpressionEvaluationRequested(fLanguage,
+					fExpressionInfo);
 			} else
 				_SetToAddress(address);
 			break;
@@ -356,20 +364,11 @@ InspectorWindow::TargetAddressChanged(target_addr_t address)
 
 
 void
-InspectorWindow::ExpressionEvaluated(
-	const Team::ExpressionEvaluationEvent& event)
+InspectorWindow::ExpressionEvaluated(ExpressionInfo* info, status_t result,
+	Value* value)
 {
 	BMessage message(MSG_EXPRESSION_EVALUATED);
-	AutoLocker<BLooper> lock(this);
-	if (!lock.IsLocked())
-		return;
-
-	if (event.GetExpression() != fAddressInput->Text())
-		return;
-
-	lock.Unlock();
-	message.AddInt32("result", event.GetResult());
-	Value* value = event.GetValue();
+	message.AddInt32("result", result);
 	BReference<Value> reference;
 	if (value != NULL) {
 		reference.SetTo(value);

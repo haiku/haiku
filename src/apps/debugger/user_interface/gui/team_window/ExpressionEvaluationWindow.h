@@ -8,26 +8,27 @@
 
 #include <Window.h>
 
-#include "Team.h"
+#include "ExpressionInfo.h"
 #include "types/Types.h"
+
 
 class BMenu;
 class BMenuItem;
 class BButton;
 class BStringView;
 class BTextControl;
-class Team;
 class Thread;
+class PrimitiveType;
 class SourceLanguage;
 class StackFrame;
 class UserInterfaceListener;
 
 
-class ExpressionEvaluationWindow : public BWindow, private Team::Listener
+class ExpressionEvaluationWindow : public BWindow,
+	private ExpressionInfo::Listener
 {
 public:
 								ExpressionEvaluationWindow(
-									::Team* team,
 									SourceLanguage* language,
 									StackFrame* frame,
 									::Thread* thread,
@@ -37,7 +38,6 @@ public:
 								~ExpressionEvaluationWindow();
 
 	static	ExpressionEvaluationWindow* Create(
-									::Team* team,
 									SourceLanguage* language,
 									StackFrame* frame,
 									::Thread* thread,
@@ -57,14 +57,13 @@ private:
 			BMenuItem*			_AddMenuItemForType(BMenu* menu,
 									type_code type);
 
-	// Team::Listener
-	virtual	void				ExpressionEvaluated(
-									const Team::ExpressionEvaluationEvent&
-										event);
+	// ExpressionInfo::Listener
+	virtual	void				ExpressionEvaluated(ExpressionInfo* info,
+									status_t result, Value* value);
 
 private:
-			::Team*				fTeam;
 			SourceLanguage*		fLanguage;
+			ExpressionInfo*		fExpressionInfo;
 			BTextControl*		fExpressionInput;
 			BStringView*		fExpressionOutput;
 			BButton*			fEvaluateButton;
@@ -72,7 +71,6 @@ private:
 			StackFrame*			fStackFrame;
 			::Thread*			fThread;
 			BHandler*			fCloseTarget;
-			type_code			fCurrentEvaluationType;
 };
 
 #endif // EXPRESSION_EVALUATION_WINDOW_H

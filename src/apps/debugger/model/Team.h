@@ -48,9 +48,7 @@ enum {
 	TEAM_EVENT_WATCHPOINT_REMOVED,
 	TEAM_EVENT_WATCHPOINT_CHANGED,
 
-	TEAM_EVENT_DEBUG_REPORT_CHANGED,
-
-	TEAM_EVENT_EXPRESSION_EVALUATED
+	TEAM_EVENT_DEBUG_REPORT_CHANGED
 };
 
 
@@ -77,7 +75,6 @@ public:
 			class BreakpointEvent;
 			class ConsoleOutputEvent;
 			class DebugReportEvent;
-			class ExpressionEvaluationEvent;
 			class ImageEvent;
 			class ImageLoadEvent;
 			class ImageLoadNameEvent;
@@ -227,11 +224,6 @@ public:
 			// debug report related service methods
 			void				NotifyDebugReportChanged(
 									const char* reportPath);
-
-			// expression evaluation related service methods
-			void				NotifyExpressionEvaluated(
-									const char* expression,
-									status_t result, Value* value);
 
 private:
 			struct BreakpointByAddressPredicate;
@@ -392,25 +384,6 @@ protected:
 };
 
 
-class Team::ExpressionEvaluationEvent : public Event {
-public:
-								ExpressionEvaluationEvent(uint32 type,
-									Team* team, const char* expression,
-									status_t result, Value* value);
-	virtual						~ExpressionEvaluationEvent();
-
-			status_t			GetResult() const
-									{ return fEvaluationResult; }
-			BString				GetExpression() const	{ return fExpression; }
-			Value*				GetValue() const	{ return fValue; }
-
-protected:
-			BString				fExpression;
-			status_t			fEvaluationResult;
-			Value*				fValue;
-};
-
-
 class Team::Listener : public DoublyLinkedListLinkImpl<Team::Listener> {
 public:
 	virtual						~Listener();
@@ -454,10 +427,6 @@ public:
 									const Team::WatchpointEvent& event);
 	virtual	void				WatchpointChanged(
 									const Team::WatchpointEvent& event);
-
-	virtual	void				ExpressionEvaluated(
-									const Team::ExpressionEvaluationEvent&
-										event);
 
 	virtual void				DebugReportChanged(
 									const Team::DebugReportEvent& event);

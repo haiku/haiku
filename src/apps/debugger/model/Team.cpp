@@ -733,19 +733,6 @@ Team::NotifyDebugReportChanged(const char* reportPath)
 
 
 void
-Team::NotifyExpressionEvaluated(const char* expression, status_t result,
-	Value* value)
-{
-	for (ListenerList::Iterator it = fListeners.GetIterator();
-			Listener* listener = it.Next();) {
-		listener->ExpressionEvaluated(ExpressionEvaluationEvent(
-				TEAM_EVENT_EXPRESSION_EVALUATED, this, expression, result,
-				value));
-	}
-}
-
-
-void
 Team::_NotifyThreadAdded(Thread* thread)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -904,29 +891,6 @@ Team::UserBreakpointEvent::UserBreakpointEvent(uint32 type, Team* team,
 }
 
 
-// #pragma mark - ExpressionEvaluationEvent
-
-
-Team::ExpressionEvaluationEvent::ExpressionEvaluationEvent(uint32 type,
-	Team* team, const char* expression, status_t result, Value* value)
-	:
-	Event(type, team),
-	fExpression(expression),
-	fEvaluationResult(result),
-	fValue(value)
-{
-	if (fValue != NULL)
-		fValue->AcquireReference();
-}
-
-
-Team::ExpressionEvaluationEvent::~ExpressionEvaluationEvent()
-{
-	if (fValue != NULL)
-		fValue->ReleaseReference();
-}
-
-
 // #pragma mark - Listener
 
 
@@ -1047,12 +1011,5 @@ Team::Listener::WatchpointChanged(const Team::WatchpointEvent& event)
 
 void
 Team::Listener::DebugReportChanged(const Team::DebugReportEvent& event)
-{
-}
-
-
-void
-Team::Listener::ExpressionEvaluated(
-	const Team::ExpressionEvaluationEvent& event)
 {
 }

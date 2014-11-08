@@ -28,13 +28,13 @@ static CliContext* sCurrentContext;
 
 struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
 	Event(int type, Thread* thread = NULL, TeamMemoryBlock* block = NULL,
-		const char* expression = NULL, status_t expressionResult = B_OK,
+		ExpressionInfo* info = NULL, status_t expressionResult = B_OK,
 		Value* expressionValue = NULL)
 		:
 		fType(type),
 		fThreadReference(thread),
 		fMemoryBlockReference(block),
-		fExpression(expression),
+		fExpressionInfo(info),
 		fExpressionResult(expressionResult),
 		fExpressionValue(expressionValue)
 	{
@@ -55,9 +55,9 @@ struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
 		return fMemoryBlockReference.Get();
 	}
 
-	const BString& GetExpression() const
+	ExpressionInfo* GetExpressionInfo() const
 	{
-		return fExpression;
+		return fExpressionInfo;
 	}
 
 	status_t GetExpressionResult() const
@@ -75,7 +75,7 @@ private:
 	int					fType;
 	BReference<Thread>	fThreadReference;
 	BReference<TeamMemoryBlock> fMemoryBlockReference;
-	BString				fExpression;
+	BReference<ExpressionInfo> fExpressionInfo;
 	status_t			fExpressionResult;
 	BReference<Value>	fExpressionValue;
 };
@@ -103,7 +103,7 @@ CliContext::CliContext()
 	fCurrentStackTrace(NULL),
 	fCurrentStackFrameIndex(-1),
 	fCurrentBlock(NULL),
-	fCurrentExpression(NULL),
+	fExpressionInfo(NULL),
 	fExpressionResult(B_OK),
 	fExpressionValue(NULL)
 {
@@ -157,6 +157,11 @@ CliContext::Init(Team* team, UserInterfaceListener* listener)
 		return B_NO_MEMORY;
 	fNodeManager->AddListener(this);
 
+	fExpressionInfo = new(std::nothrow) ExpressionInfo();
+	if (fExpressionInfo == NULL)
+		return B_NO_MEMORY;
+	fExpressionInfo->AddListener(this);
+
 	return B_OK;
 }
 
@@ -192,6 +197,11 @@ CliContext::Cleanup()
 	if (fCurrentBlock != NULL) {
 		fCurrentBlock->ReleaseReference();
 		fCurrentBlock = NULL;
+	}
+
+	if (fExpressionInfo != NULL) {
+		fExpressionInfo->ReleaseReference();
+		fExpressionInfo = NULL;
 	}
 }
 
@@ -282,13 +292,6 @@ CliContext::SetCurrentStackFrameIndex(int32 index)
 	StackFrame* frame = fCurrentStackTrace->FrameAt(index);
 	if (frame != NULL)
 		fNodeManager->SetStackFrame(fCurrentThread, frame);
-}
-
-
-void
-CliContext::SetCurrentExpression(const char* expression)
-{
-	fCurrentExpression = expression;
 }
 
 
@@ -440,17 +443,14 @@ CliContext::ProcessPendingEvents()
 				fCurrentBlock = event->GetMemoryBlock();
 				break;
 			case EVENT_EXPRESSION_EVALUATED:
-				if (event->GetExpression() == fCurrentExpression) {
-					fCurrentExpression = NULL;
-					fExpressionResult = event->GetExpressionResult();
-					if (fExpressionValue != NULL) {
-						fExpressionValue->ReleaseReference();
-						fExpressionValue = NULL;
-					}
-					fExpressionValue = event->GetExpressionValue();
-					if (fExpressionValue != NULL)
-						fExpressionValue->AcquireReference();
+				fExpressionResult = event->GetExpressionResult();
+				if (fExpressionValue != NULL) {
+					fExpressionValue->ReleaseReference();
+					fExpressionValue = NULL;
 				}
+				fExpressionValue = event->GetExpressionValue();
+				if (fExpressionValue != NULL)
+					fExpressionValue->AcquireReference();
 				break;
 			case EVENT_DEBUG_REPORT_CHANGED:
 				if (!IsInteractive()) {
@@ -508,12 +508,12 @@ CliContext::ThreadStackTraceChanged(const Team::ThreadEvent& threadEvent)
 
 
 void
-CliContext::ExpressionEvaluated(const Team::ExpressionEvaluationEvent& event)
+CliContext::ExpressionEvaluated(ExpressionInfo* info, status_t result,
+	Value* value)
 {
 	_QueueEvent(
 		new(std::nothrow) Event(EVENT_EXPRESSION_EVALUATED,
-			NULL, NULL, event.GetExpression(), event.GetResult(),
-			event.GetValue()));
+			NULL, NULL, info, result, value));
 	_SignalInputLoop(EVENT_EXPRESSION_EVALUATED);
 }
 

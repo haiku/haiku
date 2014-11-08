@@ -28,6 +28,7 @@
 #include "CpuState.h"
 #include "DebuggerInterface.h"
 #include "DebugReportGenerator.h"
+#include "ExpressionInfo.h"
 #include "FileManager.h"
 #include "Function.h"
 #include "FunctionID.h"
@@ -751,18 +752,16 @@ TeamDebugger::MessageReceived(BMessage* message)
 			}
 
 			// ExpressionEvaluationRequested() acquires a reference
-			// on our behalf.
+			// to both the language and the expression info on our behalf.
 			BReference<SourceLanguage> reference(language, true);
 
-			const char* expression;
-			if (message->FindString("expression", &expression) != B_OK)
-				break;
-
-			type_code resultType;
-			if (message->FindInt32("type",
-				reinterpret_cast<int32*>(&resultType)) != B_OK) {
+			ExpressionInfo* info;
+			if (message->FindPointer("info",
+				reinterpret_cast<void**>(&info)) != B_OK) {
 				break;
 			}
+
+			BReference<ExpressionInfo> infoReference(info, true);
 
 			StackFrame* frame;
 			if (message->FindPointer("frame",
@@ -780,8 +779,7 @@ TeamDebugger::MessageReceived(BMessage* message)
 				thread = NULL;
 			}
 
-			_HandleEvaluateExpression(language, expression, resultType,
-				frame, thread);
+			_HandleEvaluateExpression(language, info, frame, thread);
 			break;
 		}
 
@@ -1162,21 +1160,22 @@ TeamDebugger::InspectRequested(target_addr_t address,
 
 void
 TeamDebugger::ExpressionEvaluationRequested(SourceLanguage* language,
-	const char* expression, type_code resultType, StackFrame* frame,
-	::Thread* thread)
+	ExpressionInfo* info, StackFrame* frame, ::Thread* thread)
 {
 	BMessage message(MSG_EVALUATE_EXPRESSION);
 	message.AddPointer("language", language);
-	message.AddString("expression", expression);
-	message.AddInt32("type", resultType);
+	message.AddPointer("info", info);
 	if (frame != NULL)
 		message.AddPointer("frame", frame);
 	if (thread != NULL)
 		message.AddPointer("thread", thread);
 
-	BReference<SourceLanguage> reference(language);
-	if (PostMessage(&message) == B_OK)
-		reference.Detach();
+	BReference<SourceLanguage> languageReference(language);
+	BReference<ExpressionInfo> infoReference(info);
+	if (PostMessage(&message) == B_OK) {
+		languageReference.Detach();
+		infoReference.Detach();
+	}
 }
 
 
@@ -2060,12 +2059,11 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 
 void
 TeamDebugger::_HandleEvaluateExpression(SourceLanguage* language,
-	const char* expression, type_code resultType, StackFrame* frame,
-	::Thread* thread)
+	ExpressionInfo* info, StackFrame* frame, ::Thread* thread)
 {
 	status_t result = fWorker->ScheduleJob(
 		new(std::nothrow) ExpressionEvaluationJob(fTeam, fDebuggerInterface,
-			language, expression, resultType, frame, thread));
+			language, info, frame, thread));
 	if (result != B_OK) {
 		_NotifyUser("Evaluate Expression", "Failed to evaluate expression: %s",
 			strerror(result));
