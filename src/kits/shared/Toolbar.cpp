@@ -44,9 +44,10 @@ LockableButton::MouseDown(BPoint point)
 }
 
 
-BToolbar::BToolbar(BRect frame)
+BToolbar::BToolbar(BRect frame, orientation ont)
 	:
-	BGroupView(B_HORIZONTAL)
+	BGroupView(ont),
+	fOrientation(ont)
 {
 	float inset = ceilf(be_control_look->DefaultItemSpacing() / 2);
 	GroupLayout()->SetInsets(inset, 0, inset, 0);
@@ -105,7 +106,9 @@ BToolbar::AddAction(BMessage* message, BHandler* target,
 void
 BToolbar::AddSeparator()
 {
-	_AddView(new BSeparatorView(B_VERTICAL, B_PLAIN_BORDER));
+	orientation ont = (fOrientation == B_HORIZONTAL) ?
+		B_VERTICAL : B_HORIZONTAL;
+	_AddView(new BSeparatorView(ont, B_PLAIN_BORDER));
 }
 
 

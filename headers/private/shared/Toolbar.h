@@ -1,6 +1,6 @@
 /*
- * Copyright 2011 Stephan Aßmus <superstippi@gmx.de>
- * All rights reserved. Distributed under the terms of the MIT license.
+ * Copyright 2011-2014, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _TOOLBAR_H
 #define _TOOLBAR_H
@@ -14,7 +14,8 @@ namespace BPrivate {
 
 class BToolbar : public BGroupView {
 public:
-								BToolbar(BRect frame);
+								BToolbar(BRect frame,
+									orientation ont = B_HORIZONTAL);
 	virtual						~BToolbar();
 
 	virtual	void				Hide();
@@ -41,6 +42,8 @@ private:
 			void				_AddView(BView* view);
 			BButton*			_FindButton(uint32 command) const;
 			void				_HideToolTips() const;
+			
+			orientation			fOrientation;
 };
 
 } // namespace BPrivate
