@@ -1,27 +1,15 @@
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <Errors.h>
-#include <string.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <ACPI.h>
-
-
-#define DISPLAY_DEVICE_MODULE_NAME "drivers/display/display/device_v1"
-
-
-extern device_manager_info *gDeviceManager;
-extern acpi_module_info *gAcpi;
+#include "display_adapter.h"
 
 
 typedef struct acpi_ns_device_info {
 	device_node *node;
 	acpi_handle acpi_device;
 } display_device_info;
+	
 
+extern "C" {
 
+	
 static status_t
 display_open(void *_cookie, const char* path, int flags, void** cookie)
 {
@@ -105,8 +93,9 @@ display_uninit(void *_cookie)
 	free(device);
 }
 
+} //extern c
 
-struct device_module_info display_device_module = {
+device_module_info display_device_module = {
 	{
 		DISPLAY_DEVICE_MODULE_NAME,
 		0,
@@ -128,3 +117,7 @@ struct device_module_info display_device_module = {
 	NULL,
 	NULL
 };
+
+
+
+

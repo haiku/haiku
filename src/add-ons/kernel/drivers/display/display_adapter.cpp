@@ -1,33 +1,4 @@
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <Errors.h>
-#include <string.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <ACPI.h>
-
-
-#define DISPLAYADAPTER_MODULE_NAME "drivers/display/display_adapter/driver_v1"
-#define DISPLAYADAPTER_DEVICE_MODULE_NAME \
-	"drivers/display/display_adapter/device_v1"
-
-#define DISPLAYADAPTER_BASENAME "display/display_adapter/%d"
-#define DISPLAYADAPTER_PATHID_GENERATOR "display_adapter/path_id"
-
-
-#define OS_DISPLAY_SWITCH 0
-#define BIOS_DISPLAY_SWITCH 1
-#define LOCK_DISPLAY_SWITCH 2
-#define NOTIFY_DISPLAY_SWITCH 3
-
-#define OS_BRIGHTNESS_CONTROL (1 << 2)
-#define BIOS_BRIGHTNESS_CONTROL (0 << 2)
-
-
-device_manager_info *gDeviceManager = NULL;
-acpi_module_info *gAcpi = NULL;
+#include "display_adapter.h"
 
 
 typedef struct acpi_ns_device_info {
@@ -36,9 +7,13 @@ typedef struct acpi_ns_device_info {
 } displayadapter_device_info;
 
 
+device_manager_info *gDeviceManager = NULL;
+acpi_module_info *gAcpi = NULL;
+
+
 //	#pragma mark - device module API
 
-
+	
 static status_t
 displayadapter_init_device(void *_cookie, void **cookie)
 {
@@ -46,8 +21,8 @@ displayadapter_init_device(void *_cookie, void **cookie)
 	displayadapter_device_info *device;
 //	device_node *parent;
 
-	acpi_objects arguments;
-	acpi_object_type argument;
+//	acpi_objects arguments;
+//	acpi_object_type argument;
 
 	const char *path;
 	dprintf("%s: start.\n", __func__);
@@ -65,7 +40,7 @@ displayadapter_init_device(void *_cookie, void **cookie)
 		free(device);
 		return B_ERROR;
 	}
-
+/*
 	argument.object_type = ACPI_TYPE_INTEGER;
 	argument.integer.integer = BIOS_DISPLAY_SWITCH | BIOS_BRIGHTNESS_CONTROL;
 	arguments.count = 1;
@@ -75,6 +50,7 @@ displayadapter_init_device(void *_cookie, void **cookie)
 		dprintf("%s: failed to set _DOS %s\n", __func__, path);
 
 	dprintf("%s: done.\n", __func__);
+*/
 	*cookie = device;
 	return B_OK;
 }
@@ -183,11 +159,85 @@ displayadapter_support(device_node *parent)
 
 
 static status_t
+register_displays(const char *parentName, device_node *node)
+{
+	acpi_handle acpiHandle;
+	const char *path;
+	device_node *parent = gDeviceManager->get_parent_node(node);
+	if (gDeviceManager->get_attr_string(parent, ACPI_DEVICE_PATH_ITEM, &path,
+			false) != B_OK
+		|| gAcpi->get_handle(NULL, path, &acpiHandle) != B_OK) {
+		dprintf("%s: failed to get acpi node.\n", __func__);
+		gDeviceManager->put_node(parent);
+		return B_ERROR;
+	}
+
+	//get list of ids from _DOD
+	acpi_object_type *pkgData = (acpi_object_type *)malloc(128);
+	if (pkgData == NULL)
+		return B_ERROR;
+
+	status_t status = gAcpi->evaluate_object(acpiHandle, "_DOD", NULL, pkgData,
+		128);
+	if (status != B_OK || pkgData->object_type != ACPI_TYPE_PACKAGE) {
+		dprintf("%s: fail. %ld %lu\n", __func__, status, pkgData->object_type);
+		free(pkgData);
+		return status;	
+	}
+
+	acpi_object_type *displayIDs = pkgData->package.objects;
+	for (uint32 i = 0; i < pkgData->package.count; i++) {
+		dprintf("Display ID = %lld\n", displayIDs[i].integer.integer);
+	}
+    
+	acpi_object_type result;
+	acpi_handle child = NULL;
+	while (gAcpi->get_next_object(ACPI_TYPE_DEVICE, acpiHandle, &child)
+		== B_OK) {
+		char name[5] = {0};
+		//TODO: HARDCODED type.
+		if(gAcpi->get_name(child, 1, name, 5) == B_OK) 
+			dprintf("name: %s\n", name);
+		if (gAcpi->evaluate_object(child, "_ADR", NULL, &result, sizeof(result))
+			!= B_OK)
+			continue;
+		
+		dprintf("Child _adr %llu\n", result.integer.integer);
+		uint32 i;
+		for (i = 0; i < pkgData->package.count; i++)
+			if (displayIDs[i].integer.integer == result.integer.integer) break;
+		
+		if (i == pkgData->package.count) continue;
+		
+		device_attr attrs[] = {
+			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: name }},
+			{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_KEEP_DRIVER_LOADED }},
+			{ NULL }
+		
+		};
+		
+		device_node* deviceNode;
+		gDeviceManager->register_node(node, DISPLAY_DEVICE_MODULE_NAME, attrs,
+				NULL, &deviceNode);
+
+		char deviceName[128];
+		snprintf(deviceName, sizeof(deviceName), "%s/%s", parentName, name);
+		gDeviceManager->publish_device(parent, deviceName,
+			DISPLAY_DEVICE_MODULE_NAME);
+		
+	}
+	gDeviceManager->put_node(parent);
+	free(pkgData);
+	return B_OK;
+}
+
+
+static status_t
 displayadapter_register_device(device_node *node)
 {
 	device_attr attrs[] = {
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "Display Adapter" }},
-		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_KEEP_DRIVER_LOADED }},
+		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_KEEP_DRIVER_LOADED | B_FIND_MULTIPLE_CHILDREN }},
 		{ NULL }
 	};
 
@@ -214,18 +264,22 @@ static status_t
 displayadapter_register_child_devices(void *_cookie)
 {
 	device_node *node = (device_node*)_cookie;
-	int path_id;
-	char name[128];
 
-	path_id = gDeviceManager->create_id(DISPLAYADAPTER_PATHID_GENERATOR);
+	int path_id = gDeviceManager->create_id(DISPLAYADAPTER_PATHID_GENERATOR);
 	if (path_id < 0) {
 		dprintf("displayadapter_register_child_devices: error creating path\n");
 		return B_ERROR;
 	}
 
+	char name[128];
 	snprintf(name, sizeof(name), DISPLAYADAPTER_BASENAME, path_id);
-	return gDeviceManager->publish_device(node, name,
+	status_t status = gDeviceManager->publish_device(node, name,
 		DISPLAYADAPTER_DEVICE_MODULE_NAME);
+
+	if (status == B_OK)
+		register_displays(name, node);
+
+	return status;
 }
 
 
@@ -253,7 +307,7 @@ driver_module_info displayadapter_driver_module = {
 };
 
 
-struct device_module_info displayadapter_device_module = {
+device_module_info displayadapter_device_module = {
 	{
 		DISPLAYADAPTER_DEVICE_MODULE_NAME,
 		0,
@@ -277,12 +331,9 @@ struct device_module_info displayadapter_device_module = {
 };
 
 
-extern struct device_module_info display_device_module;
-
-
 module_info *modules[] = {
-	(module_info *)&displayadapter_driver_module,
-	(module_info *)&displayadapter_device_module,
 	(module_info *)&display_device_module,
+	(module_info *)&displayadapter_device_module,
+	(module_info *)&displayadapter_driver_module,
 	NULL
 };

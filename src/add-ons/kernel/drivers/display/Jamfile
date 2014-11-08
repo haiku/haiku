@@ -1,11 +1,12 @@
 SubDir HAIKU_TOP src add-ons kernel drivers display ;
 
 UsePrivateHeaders kernel ;
+SubDirCcFlags -D_KERNEL_MODE ;
 
 KernelAddon display_adapter :
 	display.cpp
 	display_adapter.cpp
 	;
 
-Depends display_adapter : acpi ;
+#Depends display_adapter : acpi ;
 
