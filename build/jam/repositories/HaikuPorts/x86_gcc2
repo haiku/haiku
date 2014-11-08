@@ -588,6 +588,7 @@ RemotePackageRepository HaikuPorts
 	speex_x86_devel-1.2~rc1-2
 	sqlite_x86-3.8.0.2-1
 	sqlite_x86_devel-3.8.0.2-1
+	stm32flash_x86-0.3-1
 	strigi_x86-0.7.5-2
 	strigi_x86_devel-0.7.5-2
 	taglib_x86-1.9.1-1
@@ -871,6 +872,7 @@ RemotePackageRepository HaikuPorts
 	sqlite
 	sqlite_x86
 	srm
+	stm32flash_x86
 	strigi_x86
 	subversion
 	sum_it
