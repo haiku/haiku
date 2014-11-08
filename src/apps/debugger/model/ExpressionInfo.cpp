@@ -29,8 +29,7 @@ ExpressionInfo::ExpressionInfo(const ExpressionInfo& other)
 
 ExpressionInfo::~ExpressionInfo()
 {
-	if (fResultType != NULL)
-		fResultType->ReleaseReference();
+	SetResultType(NULL);
 }
 
 
@@ -47,11 +46,57 @@ ExpressionInfo::ExpressionInfo(const BString& expression, Type* resultType)
 void
 ExpressionInfo::SetTo(const BString& expression, Type* resultType)
 {
+	SetExpression(expression);
+	SetResultType(resultType);
+}
+
+
+void
+ExpressionInfo::SetExpression(const BString& expression)
+{
 	fExpression = expression;
+}
+
+
+void
+ExpressionInfo::SetResultType(Type* resultType)
+{
 	if (fResultType != NULL)
 		fResultType->ReleaseReference();
 
 	fResultType = resultType;
 	if (fResultType != NULL)
 		fResultType->AcquireReference();
+}
+
+
+void
+ExpressionInfo::AddListener(Listener* listener)
+{
+	fListeners.Add(listener);
+}
+
+
+void
+ExpressionInfo::RemoveListener(Listener* listener)
+{
+	fListeners.Remove(listener);
+}
+
+
+void
+ExpressionInfo::NotifyExpressionEvaluated(status_t result, Value* value)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->ExpressionEvaluated(this, result, value);
+	}
+}
+
+
+// #pragma mark - ExpressionInfo::Listener
+
+
+ExpressionInfo::Listener::~Listener()
+{
 }
