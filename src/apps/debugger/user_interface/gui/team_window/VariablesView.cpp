@@ -2839,7 +2839,14 @@ VariablesView::_AddExpressionNode(ExpressionInfo* info)
 void
 VariablesView::_RestoreExpressionNodes()
 {
-	FunctionID* id = fStackFrame->Function()->GetFunctionID();
+	FunctionInstance* instance = fStackFrame->Function();
+	if (instance == NULL)
+		return;
+
+	FunctionID* id = instance->GetFunctionID();
+	if (id == NULL)
+		return;
+
 	BReference<FunctionID> idReference(id, true);
 
 	ExpressionInfoEntry* entry = fExpressions->Lookup(FunctionKey(id));
@@ -2858,7 +2865,14 @@ void
 VariablesView::_SetExpressionNodeValue(ExpressionInfo* info, status_t result,
 	Value* value)
 {
-	FunctionID* id = fStackFrame->Function()->GetFunctionID();
+	FunctionInstance* instance = fStackFrame->Function();
+	if (instance == NULL)
+		return;
+
+	FunctionID* id = instance->GetFunctionID();
+	if (id == NULL)
+		return;
+
 	BReference<FunctionID> idReference(id, true);
 
 	ExpressionInfoEntry* entry = fExpressions->Lookup(FunctionKey(id));
