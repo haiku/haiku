@@ -22,6 +22,8 @@ public:
 
 			void				AddPackage(const PackageInfoRef& package);
 			void				Clear();
+			
+			void				SelectPackage(const PackageInfoRef& package);
 
 private:
 			BGroupLayout*		fPackageListLayout;

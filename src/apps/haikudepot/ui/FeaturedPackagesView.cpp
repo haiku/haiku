@@ -39,7 +39,8 @@ public:
 		:
 		BGroupView("package view", B_HORIZONTAL),
 		fPackageListener(
-			new(std::nothrow) OnePackageMessagePackageListener(this))
+			new(std::nothrow) OnePackageMessagePackageListener(this)),
+		fSelected(false)
 	{
 		SetViewColor(255, 255, 255);
 		SetEventMask(B_POINTER_EVENTS);
@@ -197,6 +198,38 @@ public:
 		return fTitleView->Text();
 	}
 
+	void SetSelected(bool selected)
+	{
+		if (fSelected == selected)
+			return;
+		fSelected = selected;
+		
+		rgb_color bgColor;
+		if (fSelected)
+			bgColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+		else
+			bgColor = (rgb_color){ 255, 255, 255, 255 };
+		
+		List<BView*, true> views;
+
+		views.Add(this);
+		views.Add(fIconView);
+		views.Add(fTitleView);
+		views.Add(fPublisherView);
+		views.Add(fSummaryView);
+		views.Add(fRatingView);
+		views.Add(fAvgRating);
+		views.Add(fVoteInfo);
+		
+		for (int32 i = 0; i < views.CountItems(); i++) {
+			BView* view = views.ItemAtFast(i);
+		
+			view->SetViewColor(bgColor);
+			view->SetLowColor(bgColor);
+			view->Invalidate();
+		}
+	}
+
 private:
 	OnePackageMessagePackageListener* fPackageListener;
 
@@ -210,6 +243,8 @@ private:
 	RatingView*						fRatingView;
 	BStringView*					fAvgRating;
 	BStringView*					fVoteInfo;
+
+	bool							fSelected;
 };
 
 
@@ -279,6 +314,20 @@ FeaturedPackagesView::Clear()
 			view->RemoveSelf();
 			delete view;
 		}
+	}
+}
+
+
+void
+FeaturedPackagesView::SelectPackage(const PackageInfoRef& package)
+{
+	for (int32 i = 0; BLayoutItem* item = fPackageListLayout->ItemAt(i); i++) {
+		PackageView* view = dynamic_cast<PackageView*>(item->View());
+		if (view == NULL)
+			break;
+
+		BString title = view->PackageTitle();
+		view->SetSelected(title == package->Title());
 	}
 }
 

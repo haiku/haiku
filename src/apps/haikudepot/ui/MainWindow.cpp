@@ -619,6 +619,8 @@ void
 MainWindow::_AdoptPackage(const PackageInfoRef& package)
 {
 	fPackageInfoView->SetPackage(package);
+	if (fFeaturedPackagesView != NULL)
+		fFeaturedPackagesView->SelectPackage(package);
 
 	// Trigger asynchronous package population from the web-app
 	{
