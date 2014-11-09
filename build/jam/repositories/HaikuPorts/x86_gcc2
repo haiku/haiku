@@ -188,8 +188,8 @@ RemotePackageRepository HaikuPorts
 	libtool_libltdl-2.4-8
 	libusb-1.0.19-2
 	libusb_devel-1.0.19-2
-	libusb_compat-0.1.5-1
-	libusb_compat_devel-0.1.5-1
+	libusb_compat-0.1.5-2
+	libusb_compat_devel-0.1.5-2
 	libuuid-1.0.3-2
 	libuuid_devel-1.0.3-2
 	libvorbis-1.3.4-1
