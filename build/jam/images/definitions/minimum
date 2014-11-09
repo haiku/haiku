@@ -26,8 +26,8 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	query quit
 	rc readlink reindex release renice rlog rm rmattr rmindex rmdir roster
 	route
-	safemode screen_blanker screenmode sdiff setarch setmime settype setversion
-	setvolume seq sha1sum sha256sum shred shuf shutdown sleep
+	safemode screen_blanker screeninfo screenmode sdiff setarch setmime settype
+	setversion setvolume seq sha1sum sha256sum shred shuf shutdown sleep
 	sort split stat strace stty su sum sync sysinfo
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
 	tr traceroute trash true truncate tsort tty
