@@ -396,7 +396,7 @@ Virge_WriteMode(const DisplayModeEx& mode, VirgeRegRec& regRec)
 
 	WriteCrtcReg(0x11, 0x00, 0x80);		// unlock CRTC reg's 0-7 by clearing bit 7 of cr11
 
-	for (int j = 0; j < B_COUNT_OF(regRec.CRTC); j++) {
+	for (int j = 0; j < (int)B_COUNT_OF(regRec.CRTC); j++) {
 		WriteCrtcReg(j, regRec.CRTC[j]);
 	}
 
