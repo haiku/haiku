@@ -65,8 +65,9 @@ public:
 		fPublisherView->SetFont(&font);
 		fPublisherView->SetHighColor(kLightBlack);
 
-		// Version info
+		// Summary text view
 		fSummaryView = new MarkupTextView("package summary");
+		fSummaryView->SetSelectionEnabled(false);
 
 		// Rating view
 		fRatingView = new RatingView("package rating view");
