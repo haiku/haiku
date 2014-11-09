@@ -202,6 +202,9 @@ extern void*	get_stack_frame(void);
 }
 #endif
 
+/* Count items in an array, count_of is a common define */
+#define B_COUNT_OF(a) (sizeof(a) / sizeof(a[0]))
+
 /* Obsolete or discouraged API */
 
 /* use 'true' and 'false' */
