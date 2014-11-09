@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2012-2014, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT licence.
  */
 
@@ -242,6 +242,7 @@ void SerialWindow::MenusBeginning()
 			new BMessage(kMsgOpenPort), 'Z', B_OPTION_KEY);
 		if (!connected)
 			disconnect->SetEnabled(false);
+		disconnect->SetTarget(be_app);
 		fConnectionMenu->AddItem(disconnect);
 	} else {
 		BMenuItem* noDevices = new BMenuItem("<no serial port available>", NULL);
@@ -253,16 +254,8 @@ void SerialWindow::MenusBeginning()
 
 void SerialWindow::MessageReceived(BMessage* message)
 {
-	switch(message->what)
+	switch (message->what)
 	{
-		case kMsgOpenPort:
-		{
-			BMenuItem* disconnectMenu;
-			if (message->FindPointer("source", (void**)&disconnectMenu) == B_OK)
-				disconnectMenu->SetMarked(false);
-			be_app->PostMessage(new BMessage(*message));
-			break;
-		}
 		case kMsgDataRead:
 		{
 			const char* bytes;
@@ -270,7 +263,7 @@ void SerialWindow::MessageReceived(BMessage* message)
 			if (message->FindData("data", B_RAW_TYPE, (const void**)&bytes,
 					&length) == B_OK)
 				fTermView->PushBytes(bytes, length);
-			break;
+			return;
 		}
 		case kMsgLogfile:
 		{
@@ -281,7 +274,7 @@ void SerialWindow::MessageReceived(BMessage* message)
 				fLogFilePanel->SetMessage(message);
 			}
 			fLogFilePanel->Show();
-			break;
+			return;
 		}
 		case kMsgSettings:
 		{
@@ -348,9 +341,9 @@ void SerialWindow::MessageReceived(BMessage* message)
 				}
 			}
 
-			break;
+			return;
 		}
-		default:
-			BWindow::MessageReceived(message);
 	}
+
+	BWindow::MessageReceived(message);
 }

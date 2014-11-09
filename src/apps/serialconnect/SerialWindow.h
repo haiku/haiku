@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2012-2014, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT licence.
  */
 
@@ -15,24 +15,25 @@ class TermView;
 class SerialWindow: public BWindow
 {
 	public:
-		SerialWindow();
-		~SerialWindow();
+					SerialWindow();
+					~SerialWindow();
 
-		void MenusBeginning();
-		void MessageReceived(BMessage* message);
+		void		MenusBeginning();
+		void		MessageReceived(BMessage* message);
+
 
 	private:
-		TermView* fTermView;
+						TermView*		fTermView;
 
-		BMenu* fConnectionMenu;
-		BMenu* fDatabitsMenu;
-		BMenu* fStopbitsMenu;
-		BMenu* fParityMenu;
-		BMenu* fFlowcontrolMenu;
-		BMenu* fBaudrateMenu;
-		BFilePanel* fLogFilePanel;
+						BMenu*			fConnectionMenu;
+						BMenu*			fDatabitsMenu;
+						BMenu*			fStopbitsMenu;
+						BMenu*			fParityMenu;
+						BMenu*			fFlowcontrolMenu;
+						BMenu*			fBaudrateMenu;
+						BFilePanel*		fLogFilePanel;
 
-		static const int kBaudrates[];
-		static const int kBaudrateConstants[];
-		static const char* kWindowTitle;
+		static const	int				kBaudrates[];
+		static const	int				kBaudrateConstants[];
+		static const	char*			kWindowTitle;
 };
