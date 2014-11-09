@@ -23,8 +23,6 @@
 #define ENABLE_DEBUG_TRACE		// if defined, turns on debug output to syslog
 
 
-#define NUM_ELEMENTS(a) ((int)(sizeof(a) / sizeof(a[0]))) 	// for computing number of elements in an array
-
 struct Benaphore {
 	sem_id	sem;
 	int32	count;

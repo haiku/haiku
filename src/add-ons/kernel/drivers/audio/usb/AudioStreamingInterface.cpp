@@ -281,7 +281,7 @@ AudioStreamAlternate::GetSamplingRateId(uint32 rate)
 	if (rate == 0)
 		rate = fSamplingRate;
 
-	for (size_t i = 0; i < _countof(ratesMap); i++)
+	for (size_t i = 0; i < B_COUNT_OF(ratesMap); i++)
 		if (ratesMap[i].rate == rate)
 			return ratesMap[i].rateId;
 
@@ -369,7 +369,7 @@ AudioStreamAlternate::GetFormatId()
 uint32
 AudioStreamAlternate::SamplingRateFromId(uint32 id)
 {
-	for (size_t i = 0; i < _countof(ratesMap); i++)
+	for (size_t i = 0; i < B_COUNT_OF(ratesMap); i++)
 		if (ratesMap[i].rateId == id)
 			return ratesMap[i].rate;
 

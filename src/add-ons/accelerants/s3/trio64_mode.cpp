@@ -178,7 +178,7 @@ Trio64_ModeInit(const DisplayModeEx& mode)
 
 	WriteCrtcReg(0x11, 0x00, 0x80);	// unlock CRTC reg's 0-7 by clearing bit 7 of cr11
 
-	for (int k = 0; k < NUM_ELEMENTS(crtc); k++) {
+	for (int k = 0; k < B_COUNT_OF(crtc); k++) {
 		WriteCrtcReg(k, crtc[k]);
 	}
 

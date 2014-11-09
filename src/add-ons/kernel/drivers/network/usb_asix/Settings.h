@@ -18,13 +18,6 @@
 #include "Driver.h"
 
 
-#ifdef _countof
-#warning "_countof(...) WAS ALREADY DEFINED!!! Remove local definition!"
-#undef _countof
-#endif
-#define _countof(array)(sizeof(array) / sizeof(array[0]))
-
-
 void load_settings();
 void release_settings();
 

@@ -104,7 +104,7 @@ Mixer::_ReadSupportedFormats()
 		{ CAP_PCM_RATE_48000, B_SR_48000 }
 	};
 
-	for (size_t i = 0; i < _countof(caps); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(caps); i++) {
 		if (ac97_has_capability(fAC97Dev, caps[i].fCap))
 			fOutputRates |= caps[i].fRate;
 	}
@@ -556,7 +556,7 @@ Mixer::_CreateMIXControlGroup(multi_mix_control_info* MultiInfo, int32& index,
 		TRACE("MUX:%#010x\n", Controls[index].id);
 		index++;
 
-		for (size_t i = 0; i < _countof(RecordSources); i++) {
+		for (size_t i = 0; i < B_COUNT_OF(RecordSources); i++) {
 			Controls[index].id		= IdMUXReg | (i << stepShift) | MIX_MUX;
 			Controls[index].flags	= B_MULTI_MIX_MUX_VALUE;
 			Controls[index].master	= 0;
@@ -585,7 +585,7 @@ Mixer::ListMixControls(multi_mix_control_info* Info)
 	Controls[index].string		= S_OUTPUT;
 	index++;
 
-	for (size_t i = 0; i < _countof(OutputControls); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(OutputControls); i++) {
 		_CreateMIXControlGroup(Info, index, mixerGroup, OutputControls[i]);	
 	}
 
@@ -596,7 +596,7 @@ Mixer::ListMixControls(multi_mix_control_info* Info)
 	Controls[index].string		= S_INPUT;
 	index++;
 
-	for (size_t i = 0; i < _countof(InputControls); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(InputControls); i++) {
 		_CreateMIXControlGroup(Info, index, inputGroup, InputControls[i]);
 	}
 
@@ -608,7 +608,7 @@ Mixer::ListMixControls(multi_mix_control_info* Info)
 	strlcpy(Controls[index].name, "Record", sizeof(Controls[index].name));
 	index++;
 
-	for (size_t i = 0; i < _countof(RecordControls); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(RecordControls); i++) {
 		_CreateMIXControlGroup(Info, index, recordGroup, RecordControls[i]);
 	}
 

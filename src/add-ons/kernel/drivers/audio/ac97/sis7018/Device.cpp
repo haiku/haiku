@@ -372,7 +372,7 @@ Device::_MultiGetDescription(multi_description *multiDescription)
 		return B_BAD_ADDRESS;
 
 	if (Description.request_channel_count
-			>= (int)(_countof(channel_descriptions))) {
+			>= (int)(B_COUNT_OF(channel_descriptions))) {
 		if (user_memcpy(multiDescription->channels,
 					&channel_descriptions, sizeof(channel_descriptions)) != B_OK)
 			return B_BAD_ADDRESS;

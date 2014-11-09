@@ -1966,8 +1966,7 @@ encoder_output_lock(bool lock)
 	Write32(OUT, R600_SCRATCH_REG6, biosScratch6);
 }
 
-static const uint32 ENCODER_NAME_MATRIX_SIZE = 37;
-static const char* encoder_name_matrix[ENCODER_NAME_MATRIX_SIZE] = {
+static const char* encoder_name_matrix[] = {
 	"NONE",
 	"Internal Radeon LVDS",
 	"Internal Radeon TMDS1",
@@ -2010,7 +2009,7 @@ static const char* encoder_name_matrix[ENCODER_NAME_MATRIX_SIZE] = {
 
 const char*
 encoder_name_lookup(uint32 encoderID) {
-	if (encoderID < ENCODER_NAME_MATRIX_SIZE)
+	if (encoderID < B_COUNT_OF(encoder_name_matrix))
 		return encoder_name_matrix[encoderID];
 	else
 		return "Unknown";

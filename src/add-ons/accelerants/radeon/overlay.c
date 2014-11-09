@@ -349,7 +349,6 @@ typedef struct {
 									// = 0: source pixel increment = 1, 4-tap filter
 } hscale_factor;
 
-#define count_of( a ) (sizeof( a ) / sizeof( a[0] ))
 
 // scaling/filter tables depending on overlay colour space:
 // magnifying pixels is no problem, but minifying can lead to overload,
@@ -432,17 +431,17 @@ static space_params space_params_table[16] = {
 	{ 0, 0, 0, 0, 0, NULL, 0 },	// reserved
 	{ 0, 0, 0, 0, 0, NULL, 0 },	// reserved
 	{ 0, 0, 0, 0, 0, NULL, 0 },	// reserved
-	{ 1, 1, 1, 0, 0, scale_RGB16, count_of( scale_RGB16 ) },	// RGB15
-	{ 1, 1, 1, 0, 0, scale_RGB16, count_of( scale_RGB16 ) },	// RGB16
+	{ 1, 1, 1, 0, 0, scale_RGB16, B_COUNT_OF( scale_RGB16 ) },	// RGB15
+	{ 1, 1, 1, 0, 0, scale_RGB16, B_COUNT_OF( scale_RGB16 ) },	// RGB16
 	{ 0, 0, 0, 0, 0, NULL, 0 },	// reserved
-	{ 2, 2, 1, 0, 0, scale_RGB32, count_of( scale_RGB32 ) },	// RGB32
+	{ 2, 2, 1, 0, 0, scale_RGB32, B_COUNT_OF( scale_RGB32 ) },	// RGB32
 	{ 0, 0, 0, 0, 0, NULL, 0 },	// reserved
 	{ 0, 0, 0, 0, 0, NULL, 0 },	// reserved
-	{ 0, 0, 3, 2, 2, scale_YUV9, count_of( scale_YUV9 ) },		// YUV9
-	{ 0, 0, 3, 1, 1, scale_YUV12, count_of( scale_YUV12 ) },	// YUV12, three-plane
-	{ 1, 1, 1, 1, 0, scale_YUV, count_of( scale_YUV ) },		// VYUY422
-	{ 1, 1, 1, 1, 0, scale_YUV, count_of( scale_YUV ) },		// YVYU422
-	{ 0, 1, 2, 1, 1, scale_YUV12, count_of( scale_YUV12 ) },	// YUV12, two-plane
+	{ 0, 0, 3, 2, 2, scale_YUV9, B_COUNT_OF( scale_YUV9 ) },		// YUV9
+	{ 0, 0, 3, 1, 1, scale_YUV12, B_COUNT_OF( scale_YUV12 ) },	// YUV12, three-plane
+	{ 1, 1, 1, 1, 0, scale_YUV, B_COUNT_OF( scale_YUV ) },		// VYUY422
+	{ 1, 1, 1, 1, 0, scale_YUV, B_COUNT_OF( scale_YUV ) },		// YVYU422
+	{ 0, 1, 2, 1, 1, scale_YUV12, B_COUNT_OF( scale_YUV12 ) },	// YUV12, two-plane
 	{ 0, 1, 2, 1, 1, NULL, 0 },	// ???
 	{ 0, 0, 0, 0, 0, NULL, 0 }	// reserved
 };

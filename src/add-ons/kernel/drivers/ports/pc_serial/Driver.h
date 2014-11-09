@@ -97,8 +97,6 @@ struct serial_config_descriptor {
 };
 
 
-/* Some usefull helper defines ... */
-#define SIZEOF(array) (sizeof(array) / sizeof(array[0])) /* size of array */
 /* This one rounds the size to integral count of segs (segments) */
 #define ROUNDUP(size, seg) (((size) + (seg) - 1) & ~((seg) - 1))
 /* Default device buffer size */

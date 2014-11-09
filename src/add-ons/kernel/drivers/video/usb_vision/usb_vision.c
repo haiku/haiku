@@ -60,7 +60,7 @@ status_t init_driver (void){
         
       usb_vision_names[0] = NULL;  
 
-      (*usb->register_driver)(DRIVER_NAME, supported_devices, SIZEOF(supported_devices), DRIVER_NAME);
+      (*usb->register_driver)(DRIVER_NAME, supported_devices, B_COUNT_OF(supported_devices), DRIVER_NAME);
       (*usb->install_notify)(DRIVER_NAME, &notify_hooks);
 
       usb_vision_lock = create_sem(1, DRIVER_NAME"_devices_table_lock");
@@ -348,7 +348,7 @@ status_t usb_vision_device_added(const usb_device *dev, void **cookie){
   TRACE_ALWAYS("Probing device: %08x/%08x\n", udd->vendor_id, udd->product_id);
 
   *cookie = 0;
-  for(dev_idx = 0; dev_idx < SIZEOF(supported_devices); dev_idx++)
+  for(dev_idx = 0; dev_idx < B_COUNT_OF(supported_devices); dev_idx++)
     if(supported_devices[dev_idx].vendor == udd->vendor_id
       && supported_devices[dev_idx].product == udd->product_id){
       const usb_configuration_info *uci;

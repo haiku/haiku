@@ -77,7 +77,7 @@ MIIBus::Init()
 		TRACE("MII Info(addr:%d,id:%#010x): OUI:%04x; Model:%04x; rev:%02x.\n",
 				addr, Id, MII_OUI(Id), MII_MODEL(Id), MII_REV(Id));
 
-		for (size_t i = 0; i < _countof(miiChipTable); i++){
+		for (size_t i = 0; i < B_COUNT_OF(miiChipTable); i++){
 			ChipInfo& info = miiChipTable[i];
 
 			if (info.fId != UnknownPHY && info.fId != (Id & 0xfffffff0))

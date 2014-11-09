@@ -42,7 +42,7 @@ init_hardware()
 
 	pci_info info = {0};
 	for (long i = 0; B_OK == (*gPCI->get_nth_pci_info)(i, &info); i++) {
-		for (size_t idx = 0; idx < _countof(cardInfos); idx++) {
+		for (size_t idx = 0; idx < B_COUNT_OF(cardInfos); idx++) {
 			if (info.vendor_id == cardInfos[idx].VendorId() &&
 				info.device_id == cardInfos[idx].DeviceId())
 			{
@@ -69,7 +69,7 @@ init_driver()
 
 	pci_info info = { 0 };
 	for (long i = 0; B_OK == (*gPCI->get_nth_pci_info)(i, &info); i++) {
-		for (size_t idx = 0; idx < _countof(cardInfos); idx++) {
+		for (size_t idx = 0; idx < B_COUNT_OF(cardInfos); idx++) {
 			if (info.vendor_id == cardInfos[idx].VendorId() &&
 				info.device_id == cardInfos[idx].DeviceId())
 			{

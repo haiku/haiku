@@ -64,7 +64,7 @@ lookup_and_create_device(usb_device device)
 	uint32 id = deviceDescriptor->vendor_id << 16
 					| deviceDescriptor->product_id;
 	int left  = -1;
-	int right = _countof(gSupportedDevices);
+	int right = B_COUNT_OF(gSupportedDevices);
 	while ((right - left) > 1) {
 		int i = (left + right) / 2;
 		((gSupportedDevices[i].Key() < id) ? left : right) = i;
@@ -192,7 +192,7 @@ init_driver()
 		&usb_davicom_device_removed
 	};
 
-	const size_t count = _countof(gSupportedDevices);
+	const size_t count = B_COUNT_OF(gSupportedDevices);
 	static usb_support_descriptor sDescriptors[count] = {{ 0 }};
 
 	for (size_t i = 0; i < count; i++) {

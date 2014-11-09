@@ -128,8 +128,6 @@ static int8 y_saw_tooth_slope[5] = { 1, 2, 2, 4, 8 };
 static int8 y_coeff_value[5] = { 2, 2, 0, 4, 0 };
 static bool y_coeff_enable[5] = { 1, 1, 0, 1, 0 };
 
-#define countof( a ) (sizeof( (a) ) / sizeof( (a)[0] ))
-
 // fixed point resolution of saw filter parameters
 #define TV_SAW_FILTER_FIX_SHIFT 13
 #define TV_SAW_FILTER_FIX_SCALE (1 << TV_SAW_FILTER_FIX_SHIFT)
@@ -151,15 +149,15 @@ static void Radeon_CalcImpacTVFlickerFixer(
 	lower_border = ((params->uv_inc + TV_UV_INC_FIX_SCALE - 1) >> TV_UV_INC_FIX_SHIFT);
 	upper_border = ((2 * params->uv_inc) >> TV_UV_INC_FIX_SHIFT);
 	
-	for( i = 0; i < countof( y_flicker_removal ); ++i ) {
+	for( i = 0; i < B_COUNT_OF( y_flicker_removal ); ++i ) {
 		if( lower_border <= y_flicker_removal[i] &&
 			upper_border > y_flicker_removal[i] )
 			break;
 	}
 	
 	// use least aggresive filtering if not in list
-	if( i >= countof( y_flicker_removal ))
-		i = countof( y_flicker_removal ) - 1;
+	if( i >= B_COUNT_OF( y_flicker_removal ))
+		i = B_COUNT_OF( y_flicker_removal ) - 1;
 		
 	flicker_removal = y_flicker_removal[i];
 	

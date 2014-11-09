@@ -411,7 +411,7 @@ AX88772Device::_WakeupPHY()
 		{ SW_RESET_IPRL, 31000 }
 	};
 
-	for (size_t i = 0; i < _countof(resetCommands); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(resetCommands); i++) {
 		result = gUSBModule->send_request(fDevice,
 			USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, WRITE_SOFT_RESET,
 			resetCommands[i].reset, 0, 0, 0, &actualLength);

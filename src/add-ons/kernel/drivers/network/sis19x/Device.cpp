@@ -536,7 +536,7 @@ Device::_InitRxFilter()
 	// disable disable packet filtering before address is set
 	WritePCI32(RxMACControl, (filter & ~RXM_Mask));
 
-	for (size_t i = 0; i < _countof(fMACAddress.ebyte); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(fMACAddress.ebyte); i++) {
 		WritePCI8(RxMACAddress + i, fMACAddress.ebyte[i]);
 	}
 
@@ -581,7 +581,7 @@ Device::ReadMACAddress(ether_address_t& address)
 	TRACE("EEPROM Signature: %#06x\n", signature);
 
 	if (signature != 0x0000 && signature != EIInvalid) {
-		for (size_t i = 0; i < _countof(address.ebyte) / 2; i++) {
+		for (size_t i = 0; i < B_COUNT_OF(address.ebyte) / 2; i++) {
 			uint16 addr = _ReadEEPROM(EEPROMAddress + i);
 			address.ebyte[i * 2 + 0] = (uint8)addr;
 			address.ebyte[i * 2 + 1] = (uint8)(addr >> 8);
@@ -607,7 +607,7 @@ Device::ReadMACAddress(ether_address_t& address)
 		if (pciInfo.vendor_id != 0x1039)
 			continue;
 
-		for (size_t idx = 0; idx < _countof(ids); idx++) {
+		for (size_t idx = 0; idx < B_COUNT_OF(ids); idx++) {
 			if (pciInfo.device_id == ids[idx]) {
 
 				// enable ports 0x78 0x79 to access APC registers
@@ -621,7 +621,7 @@ Device::ReadMACAddress(ether_address_t& address)
 					pciInfo.device, pciInfo.function, 0x48, 1);
 
 				// read factory MAC address
-				for (size_t i = 0; i < _countof(address.ebyte); i++) {
+				for (size_t i = 0; i < B_COUNT_OF(address.ebyte); i++) {
 					gPCIModule->write_io_8(0x78, 0x09 + i);
 					address.ebyte[i] = gPCIModule->read_io_8(0x79);
 				}
@@ -735,7 +735,7 @@ Device::DumpRegisters()
 		{ Reserved2,		"Reserved2",	false }
 	};
 
-	for (size_t i = 0; i < _countof(RegisterEntries); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(RegisterEntries); i++) {
 		uint32 registerContents = ReadPCI32(RegisterEntries[i].Base);
 		kprintf("%s:\t%08" B_PRIx32 "\n", RegisterEntries[i].Name,
 			registerContents);

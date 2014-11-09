@@ -64,8 +64,6 @@ struct usb_support_descriptor supported_devices[] = {
 	{0, 0, 0, 0, 0}
 };
 
-#define SIZEOF(array) (sizeof(array)/sizeof(array[0])) //?????
-
 usb_device_info *usb_devices[MAX_DEVICES_COUNT];
 /* main devices table locking semaphore */
 sem_id usb_serial_lock = -1;
@@ -929,7 +927,7 @@ static status_t std_ops(int32 op, ...)
 						for(i = 0; i < MAX_DEVICES_COUNT; i++)
 							usb_devices[i] = NULL;
 
-						if((*usb->register_driver)(MODULE_NAME, supported_devices, SIZEOF(supported_devices), "usb_dsk") == B_OK){
+						if((*usb->register_driver)(MODULE_NAME, supported_devices, B_COUNT_OF(supported_devices), "usb_dsk") == B_OK){
 							if((*usb->install_notify)(MODULE_NAME, &notify_hooks) == B_OK){
 								entry.sim_init = sim_init;
 								entry.sim_action = sim_action;

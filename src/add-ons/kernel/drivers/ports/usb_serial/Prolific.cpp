@@ -131,11 +131,11 @@ ProlificDevice::ResetDevice()
 {
 	TRACE_FUNCALLS("> ProlificDevice::ResetDevice(%08x)\n", this);
 
-	SendRequestList(prolific_reset_common, SIZEOF(prolific_reset_common));
+	SendRequestList(prolific_reset_common, B_COUNT_OF(prolific_reset_common));
 	if (fIsHX)
-		SendRequestList(prolific_reset_common_hx, SIZEOF(prolific_reset_common_hx));
+		SendRequestList(prolific_reset_common_hx, B_COUNT_OF(prolific_reset_common_hx));
 	else
-		SendRequestList(prolific_reset_common_nhx, SIZEOF(prolific_reset_common_nhx));
+		SendRequestList(prolific_reset_common_nhx, B_COUNT_OF(prolific_reset_common_nhx));
 
 	status_t status = B_OK; /* discard */
 	TRACE_FUNCRET("< ProlificDevice::ResetDevice() returns: 0x%08x\n", status);

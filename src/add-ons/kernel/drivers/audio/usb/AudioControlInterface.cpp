@@ -231,7 +231,7 @@ _Terminal::_GetTerminalDescription(uint16 TerminalType)
 		{ USB_AUDIO_INSTRUMENT_IO,			"Musical Instrument" }
 	};
 
-	for (size_t i = 0; _countof(termInfoPairs); i++)
+	for (size_t i = 0; B_COUNT_OF(termInfoPairs); i++)
 		if (termInfoPairs[i].type == TerminalType)
 			return termInfoPairs[i].description;
 
@@ -673,7 +673,7 @@ FeatureUnit::NormalizeAndTraceChannel(int32 Channel)
 	bool isRev1 = (fInterface->SpecReleaseNumber() < 0x200);
 
 	uint32 remappedBitmap = 0;
-	for (size_t i = 0; i < _countof(remapInfos); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(remapInfos); i++) {
 		uint32 bits = isRev1 ? remapInfos[i].rev1Bits : remapInfos[i].rev2Bits;
 		if ((fControlBitmaps[Channel] & bits) > 0) {
 			if (isRev1)
@@ -1257,7 +1257,7 @@ AudioControlInterface::_InitGainLimits(multi_mix_control& Control)
 	Control.gain.granularity = 1.;
 
 	size_t actualLength = 0;
-	for (size_t i = 0; i < _countof(gainInfos); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(gainInfos); i++) {
 		status_t status = gUSBModule->send_request(fDevice->USBDevice(),
 			USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_CLASS,
 			gainInfos[i].request, REQ_VALUE(Control.id),
@@ -1413,7 +1413,7 @@ AudioControlInterface::_ListFeatureUnitControl(int32& index, int32 parentIndex,
 	int32 masterIndex = 0;	// in case master channel has no volume
 							// control - add following "L+R" channels into it
 
-	for (size_t i = 0; i < _countof(channelInfos); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(channelInfos); i++) {
 		if ((channelsConfig & channelInfos[i].Mask) != channelInfos[i].Mask) {
 			// ignore non-listed and possibly non-paired stereo channels.
 			//	note that master channel with zero mask pass this check! ;-)
@@ -1734,7 +1734,7 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 		if (!outIsEx) {
 			// special case - extended (>2 channels) input cluster
 			// connected to 2-channels output - add into generic "Mixer" page
-			for (size_t i = 0; i < _countof(channelPairs); i++)
+			for (size_t i = 0; i < B_COUNT_OF(channelPairs); i++)
 				_CollectMixerUnitControls(controlIds,
 					channelPairs[i].inLeft, kLeftChannel,
 					channelPairs[i].inRight, kRightChannel,
@@ -1745,8 +1745,8 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 
 		// make separate mixer pages for set of extended (>2) input
 		// channels connected to extended (>2 channels) output
-		for (size_t in = 0; in < _countof(channelPairs); in++) {
-			for (size_t out = 0; out < _countof(channelPairs); out++) {
+		for (size_t in = 0; in < B_COUNT_OF(channelPairs); in++) {
+			for (size_t out = 0; out < B_COUNT_OF(channelPairs); out++) {
 				char outName[sizeof(Info->controls->name)] = { 0 };
 				if (in == out)
 					strlcpy(outName, channelPairs[out].name, sizeof(outName));

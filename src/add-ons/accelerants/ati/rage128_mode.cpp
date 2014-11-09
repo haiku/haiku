@@ -19,8 +19,6 @@
 #include <unistd.h>
 
 
-
-
 struct DisplayParams {
 	// CRTC registers
 	uint32	crtc_gen_cntl;
@@ -225,7 +223,7 @@ CalculatePLLRegisters(const DisplayModeEx& mode, DisplayParams& params)
 	int bitValue = -1;
 	uint32 output_freq;
 
-	for (int j = 0; j < ARRAY_SIZE(postDividers); j++) {
+	for (int j = 0; j < B_COUNT_OF(postDividers); j++) {
 		output_freq = postDividers[j].divider * freq;
 		if (output_freq >= pll.min_pll_freq && output_freq <= pll.max_pll_freq) {
 			params.feedback_div = DivideWithRounding(pll.reference_div * output_freq,

@@ -22,13 +22,6 @@ const uint32 kSamplesBufferSize = 1024;
 // [sub]buffers count
 const uint32 kSamplesBufferCount = 2;
 
-// calculate count of array members
-#ifdef _countof
-	#warning "countof(...) WAS ALREADY DEFINED!!! Remove local definition!"
-	#undef countof
-#endif
-#define _countof(array)(sizeof(array) / sizeof(array[0]))
-
 
 extern usb_module_info* gUSBModule;
 

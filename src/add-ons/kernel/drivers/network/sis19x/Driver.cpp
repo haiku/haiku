@@ -48,7 +48,7 @@ init_hardware()
 
 	pci_info info = {0};
 	for (long i = 0; B_OK == (*gPCIModule->get_nth_pci_info)(i, &info); i++) {
-		for (size_t idx = 0; idx < _countof(cardInfos); idx++) {
+		for (size_t idx = 0; idx < B_COUNT_OF(cardInfos); idx++) {
 			if (CARDID(info.vendor_id, info.device_id) == cardInfos[idx].Id()) {
 				TRACE_ALWAYS("Found:%s %#010x\n",
 						cardInfos[idx].Description(), cardInfos[idx].Id());
@@ -122,7 +122,7 @@ init_driver()
 
 	pci_info info = {0};
 	for (long i = 0; B_OK == (*gPCIModule->get_nth_pci_info)(i, &info); i++) {
-		for (size_t idx = 0; idx < _countof(cardInfos); idx++) {
+		for (size_t idx = 0; idx < B_COUNT_OF(cardInfos); idx++) {
 			if (info.vendor_id == cardInfos[idx].VendorId()
 					&& info.device_id == cardInfos[idx].DeviceId())
 			{

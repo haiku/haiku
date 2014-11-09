@@ -117,11 +117,11 @@ I810_GetWatermark(const DisplayModeEx& mode)
 	switch (mode.bitsPerPixel) {
 		case 8:
 			table = watermarks_8;
-			tableLen = ARRAY_SIZE(watermarks_8);
+			tableLen = B_COUNT_OF(watermarks_8);
 			break;
 		case 16:
 			table = watermarks_16;
-			tableLen = ARRAY_SIZE(watermarks_16);
+			tableLen = B_COUNT_OF(watermarks_16);
 			break;
 		default:
 			return 0;

@@ -14,8 +14,6 @@
 #include "nt100x.h"
 #include "tracing.h"
 
-#define SIZEOF(array) (sizeof(array)/sizeof(array[0]))
-
 /* "forgotten" attributes etc ...*/
 #define USB_EP_ADDR_DIR_IN   0x80
 #define USB_EP_ADDR_DIR_OUT  0x00

@@ -37,7 +37,6 @@ extern "C" {
 #	define TRACE(x) ;
 #endif
 
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 #define TRACE_MEMORY_MAP
 	// Define this to print the memory map to serial debug,
 	// You also need to define ENABLE_SERIAL in serial.cpp
@@ -323,7 +322,7 @@ init_page_directory()
 	// map our page directory region (TODO should not be identity mapped)
 	mmu_map_identity((addr_t)sPageDirectory, sPageTableRegionEnd, ARM_MMU_L2_FLAG_C);
 
-	for (uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
+	for (uint32 i = 0; i < B_COUNT_OF(LOADER_MEMORYMAP); i++) {
 
 		TRACE(("BLOCK: %s START: %lx END %lx\n", LOADER_MEMORYMAP[i].name,
 			LOADER_MEMORYMAP[i].start, LOADER_MEMORYMAP[i].end));

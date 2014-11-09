@@ -28,8 +28,6 @@ extern "C" {
 #define DRIVER_NAME		"usb_serial"	// driver name for debug output
 #define DEVICES_COUNT	20				// max simultaneously open devices
 
-/* Some usefull helper defines ... */
-#define SIZEOF(array) (sizeof(array) / sizeof(array[0])) /* size of array */
 /* This one rounds the size to integral count of segs (segments) */
 #define ROUNDUP(size, seg) (((size) + (seg) - 1) & ~((seg) - 1))
 /* Default device buffer size */

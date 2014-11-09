@@ -7,13 +7,6 @@
 #define _USB_DAVICOM_SETTINGS_H_
 
 
-#ifdef _countof
-#warning "_countof(...) WAS ALREADY DEFINED!!! Remove local definition!"
-#undef _countof
-#endif
-#define _countof(array)(sizeof(array) / sizeof(array[0]))
-
-
 void load_settings();
 void release_settings();
 void usb_davicom_trace(bool force, const char *func, const char *fmt, ...);
