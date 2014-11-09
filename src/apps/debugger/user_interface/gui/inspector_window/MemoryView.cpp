@@ -90,12 +90,13 @@ void
 MemoryView::SetTargetAddress(TeamMemoryBlock* block, target_addr_t address)
 {
 	fTargetAddress = address;
-	if (block != fTargetBlock && fTargetBlock != NULL)
-		fTargetBlock->ReleaseReference();
-
 	if (block != fTargetBlock) {
+		if (fTargetBlock != NULL)
+			fTargetBlock->ReleaseReference();
+
 		fTargetBlock = block;
-		fTargetBlock->AcquireReference();
+		if (block != NULL)
+			fTargetBlock->AcquireReference();
 	}
 
 	MakeFocus(true);

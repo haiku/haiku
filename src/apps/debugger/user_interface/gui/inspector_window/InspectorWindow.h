@@ -24,9 +24,8 @@ class SourceLanguage;
 class UserInterfaceListener;
 
 
-class InspectorWindow : public BWindow,
-	public TeamMemoryBlock::Listener,
-	public MemoryView::Listener,
+class InspectorWindow : public BWindow, private Team::Listener,
+	private TeamMemoryBlock::Listener,	private MemoryView::Listener,
 	private ExpressionInfo::Listener {
 public:
 								InspectorWindow(::Team* team,
@@ -41,6 +40,10 @@ public:
 
 	virtual void				MessageReceived(BMessage* message);
 	virtual bool				QuitRequested();
+
+	// Team::Listener
+	virtual	void				ThreadStateChanged(
+									const Team::ThreadEvent& event);
 
 	// TeamMemoryBlock::Listener
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
@@ -70,6 +73,7 @@ private:
 									BMessage& settings);
 
 	void						_SetToAddress(target_addr_t address);
+	void						_SetCurrentBlock(TeamMemoryBlock* block);
 
 private:
 	UserInterfaceListener*		fListener;

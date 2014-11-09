@@ -51,15 +51,14 @@ InspectorWindow::InspectorWindow(::Team* team, UserInterfaceListener* listener,
 	fExpressionInfo(NULL),
 	fTarget(target)
 {
+	AutoLocker< ::Team> teamLocker(fTeam);
+	fTeam->AddListener(this);
 }
 
 
 InspectorWindow::~InspectorWindow()
 {
-	if (fCurrentBlock != NULL) {
-		fCurrentBlock->RemoveListener(this);
-		fCurrentBlock->ReleaseReference();
-	}
+	_SetCurrentBlock(NULL);
 
 	if (fLanguage != NULL)
 		fLanguage->ReleaseReference();
@@ -68,6 +67,9 @@ InspectorWindow::~InspectorWindow()
 		fExpressionInfo->RemoveListener(this);
 		fExpressionInfo->ReleaseReference();
 	}
+
+	AutoLocker< ::Team> teamLocker(fTeam);
+	fTeam->RemoveListener(this);
 }
 
 
@@ -206,11 +208,27 @@ InspectorWindow::_Init()
 }
 
 
-
 void
 InspectorWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_THREAD_STATE_CHANGED:
+		{
+			::Thread* thread;
+			if (message->FindPointer("thread",
+					reinterpret_cast<void**>(&thread)) != B_OK) {
+				break;
+			}
+
+			BReference< ::Thread> threadReference(thread, true);
+			if (thread->State() == THREAD_STATE_STOPPED) {
+				if (fCurrentBlock != NULL) {
+					_SetCurrentBlock(NULL);
+					_SetToAddress(fCurrentAddress);
+				}
+			}
+			break;
+		}
 		case MSG_INSPECT_ADDRESS:
 		{
 			target_addr_t address = 0;
@@ -226,7 +244,6 @@ InspectorWindow::MessageReceived(BMessage* message)
 				_SetToAddress(address);
 			break;
 		}
-
 		case MSG_EXPRESSION_EVALUATED:
 		{
 			BString errorMessage;
@@ -281,17 +298,8 @@ InspectorWindow::MessageReceived(BMessage* message)
 				break;
 			}
 
-			{
-				AutoLocker< ::Team> teamLocker(fTeam);
-				block->RemoveListener(this);
-			}
-
 			if (result == B_OK) {
-				if (fCurrentBlock != NULL)
-					fCurrentBlock->ReleaseReference();
-
-				fCurrentBlock = block;
-				fMemoryView->SetTargetAddress(block, fCurrentAddress);
+				_SetCurrentBlock(block);
 				fPreviousBlockButton->SetEnabled(true);
 				fNextBlockButton->SetEnabled(true);
 			} else {
@@ -326,6 +334,18 @@ InspectorWindow::QuitRequested()
 
 	BMessenger(fTarget).SendMessage(&settings);
 	return true;
+}
+
+
+void
+InspectorWindow::ThreadStateChanged(const Team::ThreadEvent& event)
+{
+	BMessage message(MSG_THREAD_STATE_CHANGED);
+	BReference< ::Thread> threadReference(event.GetThread());
+	message.AddPointer("thread", threadReference.Get());
+
+	if (PostMessage(&message) == B_OK)
+		threadReference.Detach();
 }
 
 
@@ -479,4 +499,18 @@ InspectorWindow::_SetToAddress(target_addr_t address)
 		fListener->InspectRequested(address, this);
 	} else
 		fMemoryView->SetTargetAddress(fCurrentBlock, address);
+}
+
+
+void
+InspectorWindow::_SetCurrentBlock(TeamMemoryBlock* block)
+{
+	AutoLocker< ::Team> teamLocker(fTeam);
+	if (fCurrentBlock != NULL) {
+		fCurrentBlock->RemoveListener(this);
+		fCurrentBlock->ReleaseReference();
+	}
+
+	fCurrentBlock = block;
+	fMemoryView->SetTargetAddress(fCurrentBlock, fCurrentAddress);
 }
