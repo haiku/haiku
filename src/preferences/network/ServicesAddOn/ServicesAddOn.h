@@ -22,6 +22,7 @@ class ServicesAddOn : public NetworkSetupAddOn, public BGroupView {
 
 		void				AttachedToWindow();
 		void				MessageReceived(BMessage*);
+		void				Show();
 
 		status_t			Save();
 		status_t			Revert();
@@ -29,6 +30,7 @@ class ServicesAddOn : public NetworkSetupAddOn, public BGroupView {
 	private:
 		status_t			_ParseInetd();
 		status_t			_ParseXinetd();
+		void				_ShowPanel();
 
 	private:
 		BListView*			fServicesListView;

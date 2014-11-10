@@ -83,32 +83,20 @@ ServicesAddOn::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kSelectionChanged:
 		{
-			BStringItem* item = static_cast<BStringItem*>(
-				fServicesListView->ItemAt(message->FindInt32("index")));
-
-			if (item == NULL)
-				return;
-
-			BView* panel = Window()->FindView("panel");
-			BView* settingsView = panel->ChildAt(0);
-
-			// Remove currently displayed settings view
-			if (settingsView != NULL) {
-				settingsView->RemoveSelf();
-				delete settingsView;
-			}
-
-			if (strcmp(item->Text(), "DNS") == 0) {
-				settingsView = new DNSSettingsView();
-				panel->AddChild(settingsView);
-			} else {
-				// TODO show a standard "inetd service" view
-			}
+			_ShowPanel();
 			break;
 		}
 		default:
 			BGroupView::MessageReceived(message);
 	}
+}
+
+
+void
+ServicesAddOn::Show()
+{
+	BView::Show();
+	_ShowPanel();
 }
 
 
@@ -218,4 +206,31 @@ ServicesAddOn::_ParseXinetd()
 	}
 
 	return B_ERROR;
+}
+
+
+void
+ServicesAddOn::_ShowPanel()
+{
+	BStringItem* item = static_cast<BStringItem*>(
+		fServicesListView->ItemAt(fServicesListView->CurrentSelection()));
+
+	if (item == NULL)
+		return;
+
+	BView* panel = Window()->FindView("panel");
+	BView* settingsView = panel->ChildAt(0);
+
+	// Remove currently displayed settings view
+	if (settingsView != NULL) {
+		settingsView->RemoveSelf();
+		delete settingsView;
+	}
+
+	if (strcmp(item->Text(), "DNS") == 0) {
+		settingsView = new DNSSettingsView();
+		panel->AddChild(settingsView);
+	} else {
+		// TODO show a standard "inetd service" view
+	}
 }

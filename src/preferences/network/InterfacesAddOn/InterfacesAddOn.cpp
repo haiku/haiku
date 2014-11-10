@@ -116,38 +116,27 @@ InterfacesAddOn::Revert()
 void
 InterfacesAddOn::MessageReceived(BMessage* msg)
 {
-	int nr = fListView->CurrentSelection();
-	InterfaceListItem *item = NULL;
-	if (nr != -1)
-		item = dynamic_cast<InterfaceListItem*>(fListView->ItemAt(nr));
-
 	switch (msg->what) {
 		case kMsgInterfaceSelected:
-		{
-			if (item == NULL)
-				break;
-
-			BView* panel = Window()->FindView("panel");
-			BView* settingsView = panel->ChildAt(0);
-
-			// Remove currently displayed settings view
-			if (settingsView != NULL) {
-				settingsView->RemoveSelf();
-				delete settingsView;
-			}
-
-			settingsView = new InterfaceView(item->GetSettings());
-			Window()->FindView("panel")->AddChild(settingsView);
+			_ShowPanel();
 			break;
-		}
 
 		case B_OBSERVER_NOTICE_CHANGE:
 			fListView->Invalidate();
 			break;
 
 		default:
+			msg->PrintToStream();
 			BBox::MessageReceived(msg);
 	}
+}
+
+
+void
+InterfacesAddOn::Show()
+{
+	BView::Show();
+	_ShowPanel();
 }
 
 
@@ -156,4 +145,29 @@ InterfacesAddOn::_SettingsView()
 {
 	BView* view = Window()->FindView("panel")->ChildAt(0);
 	return dynamic_cast<InterfaceView*>(view);
+}
+
+
+void
+InterfacesAddOn::_ShowPanel()
+{
+	int nr = fListView->CurrentSelection();
+	InterfaceListItem *item = NULL;
+	if (nr != -1)
+		item = dynamic_cast<InterfaceListItem*>(fListView->ItemAt(nr));
+
+	if (item == NULL)
+		return;
+
+	BView* panel = Window()->FindView("panel");
+	BView* settingsView = panel->ChildAt(0);
+
+	// Remove currently displayed settings view
+	if (settingsView != NULL) {
+		settingsView->RemoveSelf();
+		delete settingsView;
+	}
+
+	settingsView = new InterfaceView(item->GetSettings());
+	Window()->FindView("panel")->AddChild(settingsView);
 }

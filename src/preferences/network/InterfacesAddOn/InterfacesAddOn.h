@@ -39,9 +39,11 @@ public:
 
 			void				AttachedToWindow();
 			void				MessageReceived(BMessage* msg);
+			void				Show();
 
 private:
 			InterfaceView*		_SettingsView();
+			void				_ShowPanel();
 private:
 			InterfacesListView*	fListView;
 };
