@@ -1,18 +1,5 @@
 SubDir HAIKU_TOP src preferences network DialUpAddOn ;
 
-# set some additional defines
-{
-	local defines ;
-	
-	if $(LANG_GERMAN) {
-		defines += LANG_GERMAN ;
-	}
-	
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) ;
-}
-
 UsePrivateHeaders net ;
 # For NetworkSetupAddOn.h, to be moved to private once...
 UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] ;
@@ -26,15 +13,15 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp ipcp ] ; # IPC
 
 AddResources DialUp : DialUpPreflet.rdef ;
 
-Addon DialUp : 
+Addon DialUp :
 	AddOn.cpp
 	DialUpView.cpp
-	
+
 	# utils
 	InterfaceUtils.cpp
 	MessageDriverSettingsUtils.cpp
 	TextRequestDialog.cpp
-	
+
 	# built-in add-ons
 	ConnectionOptionsAddon.cpp
 	GeneralAddon.cpp

@@ -63,16 +63,6 @@ static const uint32 kMsgSelectInterface = 'SELI';
 static const uint32 kMsgConnectButton = 'CONI';
 
 // labels
-#ifdef LANG_GERMAN
-static const char *kLabelInterface = "Verbindung: ";
-static const char *kLabelInterfaceName = "Verbindungs-Name: ";
-static const char *kLabelCreateNewInterface = "Neue Verbindung Erstellen";
-static const char *kLabelCreateNew = "Neu...";
-static const char *kLabelDeleteCurrent = "Auswahl Löschen";
-static const char *kLabelConnect = "Verbinden";
-static const char *kLabelDisconnect = "Trennen";
-static const char *kLabelOK = "OK";
-#else
 static const char *kLabelInterface = "Interface: ";
 static const char *kLabelInterfaceName = "Interface Name: ";
 static const char *kLabelCreateNewInterface = "Create New Interface";
@@ -81,23 +71,8 @@ static const char *kLabelDeleteCurrent = "Delete Current";
 static const char *kLabelConnect = "Connect";
 static const char *kLabelDisconnect = "Disconnect";
 static const char *kLabelOK = "OK";
-#endif
 
 // connection status strings
-#ifdef LANG_GERMAN
-static const char *kTextConnecting = "Verbinde...";
-static const char *kTextConnectionEstablished = "Verbindung hergestellt.";
-static const char *kTextNotConnected = "Nicht verbunden.";
-static const char *kTextDeviceUpFailed = "Konnte Verbindung nicht aufbauen.";
-static const char *kTextAuthenticating = "Authentifizierung...";
-static const char *kTextAuthenticationFailed = "Authentifizierung fehlgeschlagen!";
-static const char *kTextConnectionLost = "Verbindung verloren!";
-static const char *kTextCreationError = "Fehler beim Initialisieren!";
-static const char *kTextNoInterfacesFound = "Bitte erstellen Sie eine neue "
-											"Verbindung.";
-static const char *kTextChooseInterfaceName = "Bitte denken Sie sich einen neuen "
-											"Namen für diese Verbindung aus.";
-#else
 static const char *kTextConnecting = "Connecting...";
 static const char *kTextConnectionEstablished = "Connection established.";
 static const char *kTextNotConnected = "Not connected.";
@@ -109,19 +84,8 @@ static const char *kTextCreationError = "Error creating interface!";
 static const char *kTextNoInterfacesFound = "Please create a new interface...";
 static const char *kTextChooseInterfaceName = "Please choose a new name for this "
 											"interface.";
-#endif
 
 // error strings for alerts
-#ifdef LANG_GERMAN
-static const char *kErrorTitle = "Fehler";
-static const char *kErrorNoPPPStack = "Fehler: Kein Zugriff auf den PPP Stack!";
-static const char *kErrorInterfaceExists = "Fehler: Eine Verbindung mit diesem Namen "
-										"existiert bereits!";
-static const char *kErrorLoadingFailed = "Fehler: Konfiguration ist fehlerhaft! Die "
-										"Einstellungen werden zurückgesetzt.";
-static const char *kErrorSavingFailed = "Fehler: Speichern der Einstellungen ist "
-										"fehlgeschlagen!";
-#else
 static const char *kErrorTitle = "Error";
 static const char *kErrorNoPPPStack = "Error: Could not access the PPP stack!";
 static const char *kErrorInterfaceExists = "Error: An interface with this name "
@@ -129,7 +93,6 @@ static const char *kErrorInterfaceExists = "Error: An interface with this name "
 static const char *kErrorLoadingFailed = "Error: Failed loading interface! The "
 										"current settings will be deleted.";
 static const char *kErrorSavingFailed = "Error: Failed saving interface settings!";
-#endif
 
 
 static
@@ -798,11 +761,7 @@ DialUpView::LoadAddons()
 */	
 	// "PAP" authenticator
 	BMessage addon;
-#ifdef LANG_GERMAN
-	addon.AddString("FriendlyName", "Unverschlüsselt");
-#else
 	addon.AddString("FriendlyName", "Plain-text Authentication");
-#endif
 	addon.AddString("TechnicalName", "PAP");
 	addon.AddString("KernelModuleName", "pap");
 	fAddons.AddMessage(DUN_AUTHENTICATOR_ADDON_TYPE, &addon);

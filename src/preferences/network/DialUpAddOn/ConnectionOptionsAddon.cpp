@@ -37,18 +37,10 @@
 static const uint32 kMsgUpdateControls = 'UCTL';
 
 // labels
-#ifdef LANG_GERMAN
-static const char *kLabelConnectionOptions = "Optionen";
-static const char *kLabelDialOnDemand = "Automatisch Verbinden Bei Zugriff Auf "
-										"Internet";
-static const char *kLabelAskBeforeDialing = "Vor Dem Verbinden Fragen";
-static const char *kLabelAutoRedial = "Verbindung Automatisch Wiederherstellen";
-#else
 static const char *kLabelConnectionOptions = "Options";
 static const char *kLabelDialOnDemand = "Connect Automatically When Needed";
 static const char *kLabelAskBeforeDialing = "Ask Before Dialing";
 static const char *kLabelAutoRedial = "Redial Automatically";
-#endif
 
 
 ConnectionOptionsAddon::ConnectionOptionsAddon(BMessage *addons)

@@ -45,15 +45,6 @@ static const uint32 kDefaultButtonWidth = 80;
 static const uint32 kMsgUpdateControls = 'UCTL';
 
 // labels
-#ifdef LANG_GERMAN
-static const char *kLabelIPCP = "TCP/IP";
-static const char *kLabelIPAddress = "IP Adresse: ";
-static const char *kLabelPrimaryDNS = "Primärer DNS: ";
-static const char *kLabelSecondaryDNS = "Sekundärer DNS: ";
-static const char *kLabelOptional = "(Optional)";
-static const char *kLabelExtendedOptions = "Erweiterte Optionen:";
-static const char *kLabelEnabled = "TCP/IP-Protokoll Verwenden";
-#else
 static const char *kLabelIPCP = "TCP/IP";
 static const char *kLabelIPAddress = "IP Address: ";
 static const char *kLabelPrimaryDNS = "Primary DNS: ";
@@ -61,7 +52,6 @@ static const char *kLabelSecondaryDNS = "Secondary DNS: ";
 static const char *kLabelOptional = "(Optional)";
 static const char *kLabelExtendedOptions = "Extended Options:";
 static const char *kLabelEnabled = "Enable TCP/IP Protocol";
-#endif
 
 // add-on descriptions
 static const char *kKernelModuleName = "ipcp";

@@ -47,17 +47,6 @@ static const uint32 kMsgSelectDevice = 'SELD';
 static const uint32 kMsgSelectAuthenticator = 'SELA';
 
 // labels
-#ifdef LANG_GERMAN
-static const char *kLabelGeneral = "Allgemein";
-static const char *kLabelDevice = "Gerät: ";
-static const char *kLabelNoDevicesFound = "Keine Geräte Gefunden!";
-static const char *kLabelAuthenticator = "Login: ";
-static const char *kLabelNoAuthenticatorsFound = "Keine Login-Methoden gefunden!";
-static const char *kLabelName = "Benutzername: ";
-static const char *kLabelPassword = "Password: ";
-static const char *kLabelSavePassword = "Passwort Speichern";
-static const char *kLabelNone = "Ohne";
-#else
 static const char *kLabelGeneral = "General";
 static const char *kLabelDevice = "Device: ";
 static const char *kLabelNoDevicesFound = "No Devices Found!";
@@ -67,7 +56,6 @@ static const char *kLabelName = "Username: ";
 static const char *kLabelPassword = "Password: ";
 static const char *kLabelSavePassword = "Save Password";
 static const char *kLabelNone = "None";
-#endif
 
 // string constants for information saved in the settings message
 static const char *kGeneralTabAuthentication = "Authentication";

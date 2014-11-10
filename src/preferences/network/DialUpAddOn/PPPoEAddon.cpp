@@ -56,33 +56,17 @@ static const uint32 kMsgChangeService = 'CHGS';
 static const uint32 kMsgResetService = 'RESS';
 
 // labels
-#ifdef LANG_GERMAN
-static const char *kLabelInterfaceName = "Netzwerk-Adapter: ";
-static const char *kLabelOptional = "(Optional)";
-static const char *kLabelOtherInterface = "Anderer:";
-static const char *kLabelSelectInterface = "Adapter Auswählen...";
-static const char *kLabelServiceName = "Service: ";
-#else
 static const char *kLabelInterfaceName = "Network Interface: ";
 static const char *kLabelOptional = "(Optional)";
 static const char *kLabelOtherInterface = "Other:";
 static const char *kLabelSelectInterface = "Select Interface...";
 static const char *kLabelServiceName = "Service: ";
-#endif
 
 // requests
-#ifdef LANG_GERMAN
-static const char *kRequestInterfaceName = "Name Des Adapters: ";
-#else
 static const char *kRequestInterfaceName = "Network Interface Name: ";
-#endif
 
 // add-on descriptions
-#ifdef LANG_GERMAN
-static const char *kFriendlyName = "Breitband: DSL, Kabel, etc.";
-#else
 static const char *kFriendlyName = "Broadband: DSL, Cable, etc.";
-#endif
 static const char *kTechnicalName = "PPPoE";
 static const char *kKernelModuleName = "pppoe";
 
