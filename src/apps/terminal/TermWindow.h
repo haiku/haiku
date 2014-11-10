@@ -62,6 +62,9 @@ public:
 
 			void				SessionChanged();
 
+	static	BMenu*				MakeEncodingMenu();
+	static	BMenu*				MakeWindowSizeMenu();
+
 protected:
 	virtual bool				QuitRequested();
 	virtual void				MessageReceived(BMessage* message);
@@ -134,8 +137,6 @@ private:
 			void				_SetTermColors(TermViewContainerView* termView);
 			void				_InitWindow();
 			void				_SetupMenu();
-	static	BMenu*				_MakeEncodingMenu();
-	static	BMenu*				_MakeWindowSizeMenu();
 	static	BMenu*				_MakeFontSizeMenu(uint32 command,
 									uint8 defaultSize);
 			void				_UpdateSwitchTerminalsMenuItem();

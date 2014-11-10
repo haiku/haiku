@@ -422,7 +422,7 @@ TermWindow::MenusBeginning()
 
 /* static */
 BMenu*
-TermWindow::_MakeEncodingMenu()
+TermWindow::MakeEncodingMenu()
 {
 	BMenu* menu = new (std::nothrow) BMenu(B_TRANSLATE("Text encoding"));
 	if (menu == NULL)
@@ -470,6 +470,11 @@ TermWindow::_SetupMenu()
 	fFontSizeMenu->AddItem(fIncreaseFontSizeMenuItem);
 	fFontSizeMenu->AddItem(fDecreaseFontSizeMenuItem);
 
+	BMenu* windowSize = MakeWindowSizeMenu();
+	windowSize->AddSeparatorItem();
+	windowSize->AddItem(new BMenuItem(B_TRANSLATE("Full screen"),
+		new BMessage(FULLSCREEN), B_ENTER));
+
 	BLayoutBuilder::Menu<>(fMenuBar = new BMenuBar(Bounds(), "mbar"))
 		// Terminal
 		.AddMenu(B_TRANSLATE_COMMENT("Terminal", "The title for the main window"
@@ -511,13 +516,11 @@ TermWindow::_SetupMenu()
 
 		// Settings
 		.AddMenu(B_TRANSLATE("Settings"))
-			.AddItem(_MakeWindowSizeMenu())
-			.AddItem(fEncodingMenu = _MakeEncodingMenu())
+			.AddItem(windowSize)
+			.AddItem(fEncodingMenu = MakeEncodingMenu())
 			.AddItem(fFontSizeMenu)
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), MENU_PREF_OPEN)
-			.AddSeparator()
-			.AddItem(B_TRANSLATE("Save as default"), SAVE_AS_DEFAULT)
 		.End()
 	;
 
@@ -929,14 +932,6 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case SAVE_AS_DEFAULT:
-		{
-			BPath path;
-			if (PrefHandler::GetDefaultPath(path) == B_OK)
-				PrefHandler::Default()->SaveAsText(path.Path(),
-					PREFFILE_MIMETYPE);
-			break;
-		}
 		case MENU_PAGE_SETUP:
 			_DoPageSetup();
 			break;
@@ -1660,7 +1655,7 @@ TermWindow::_ResizeView(TermView *view)
 
 
 /* static */ BMenu*
-TermWindow::_MakeWindowSizeMenu()
+TermWindow::MakeWindowSizeMenu()
 {
 	BMenu* menu = new (std::nothrow) BMenu(B_TRANSLATE("Window size"));
 	if (menu == NULL)
@@ -1678,16 +1673,13 @@ TermWindow::_MakeWindowSizeMenu()
 		char label[32];
 		int32 columns = windowSizes[i][0];
 		int32 rows = windowSizes[i][1];
-		snprintf(label, sizeof(label), "%" B_PRId32 "x%" B_PRId32, columns, rows);
+		snprintf(label, sizeof(label), "%" B_PRId32 "x%" B_PRId32, columns,
+			rows);
 		BMessage* message = new BMessage(MSG_COLS_CHANGED);
 		message->AddInt32("columns", columns);
 		message->AddInt32("rows", rows);
 		menu->AddItem(new BMenuItem(label, message));
 	}
-
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Full screen"),
-		new BMessage(FULLSCREEN), B_ENTER));
 
 	return menu;
 }

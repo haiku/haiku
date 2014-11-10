@@ -27,8 +27,8 @@ static const uint32 MSG_BLINK_CURSOR_CHANGED			= 'mbcc';
 static const uint32 MSG_BRIGHT_INSTEAD_OF_BOLD_CHANGED	= 'bibc';
 static const uint32 MSG_WARN_ON_EXIT_CHANGED			= 'mwec';
 static const uint32 MSG_COLS_CHANGED					= 'mccl';
-static const uint32 MSG_ROWS_CHANGED					= 'mcrw';
 static const uint32 MSG_HISTORY_CHANGED					= 'mhst';
+// TODO MSG_ENCODING_CHANGED?
 
 static const uint32 MSG_PREF_MODIFIED					= 'mpmo';
 
@@ -51,12 +51,11 @@ public:
 	virtual void				MessageReceived(BMessage* message);
 	virtual void				AttachedToWindow();
 
-	virtual	void				GetPreferredSize(float* _width,
-									float* _height);
-
 private:
 			void				_ChangeColorScheme(color_scheme* scheme);
 			void				_SetCurrentColorScheme();
+			void				_SetEncoding(const char* encoding);
+			void				_SetWindowSize(int rows, int cols);
 
 	static	BMenu*				_MakeFontMenu(uint32 command,
 									const char* defaultFamily,
@@ -81,6 +80,9 @@ private:
 			BCheckBox*			fBrightInsteadOfBold;
 			BCheckBox*			fWarnOnExit;
 			BMenuField*			fFontField;
+
+			BMenuField*			fWindowSizeField;
+			BMenuField*			fEncodingField;
 
 			BMenuField*			fColorSchemeField;
 			BMenuField*			fColorField;

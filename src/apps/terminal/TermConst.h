@@ -65,15 +65,12 @@ static const ulong PSET_BACK_COLOR						= 'pbcl';
 static const ulong PSET__CODING							= 'pcod';
 
 // Terminal Size Messages
-static const uint32 EIGHTYTWENTYFOUR					= 'etfo';
 static const uint32 EIGHTYTWENTYFIVE					= 'etfv';
 static const uint32 EIGHTYFORTY							= 'efor';
-static const uint32 ONETHREETWOTWENTYFOUR				= 'hunf';
 static const uint32 ONETHREETWOTWENTYFIVE				= 'hunv';
 static const uint32 FULLSCREEN							= 'fscr';
 
 static const uint32 MSG_FONT_CHANGED					= 'fntc';
-static const uint32 SAVE_AS_DEFAULT 					= 'sadf';
 static const uint32 MSG_CHECK_CHILDREN					= 'ckch';
 static const uint32 MSG_REMOVE_RESIZE_VIEW_IF_NEEDED	= 'rmrv';
 static const uint32 MSG_TERMINAL_BUFFER_CHANGED			= 'bufc';
