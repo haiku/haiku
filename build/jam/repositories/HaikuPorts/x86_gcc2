@@ -581,7 +581,7 @@ RemotePackageRepository HaikuPorts
 	sge_x86-030809-1
 	sge_x86_devel-030809-1
 	shared_mime_info_x86-1.3-2
-	simh_x86-4.0.0_git-1
+	simh_x86-4.0.0_git-2
 	smjpeg_x86-0.2.1-1
 	smjpeg_x86_devel-0.2.1-1
 	smpeg_x86-0.4.5-3
