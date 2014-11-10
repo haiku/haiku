@@ -1,0 +1,16 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/x-vnd.gobe.productive-document";
+
+resource(2, "META:S:DESC") #'MSDC' "Gobe Productive Document";
+
+resource(3, "META:L:DESC") #'MLDC' "Gobe™ Productive™ Document";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "gp",
+	"extensions" = "gp2",
+	"extensions" = "gobe",
+	"type" = "application/x-vnd.gobe.productive-document"
+};
+
