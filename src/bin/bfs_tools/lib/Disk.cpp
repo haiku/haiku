@@ -114,6 +114,11 @@ Disk::Disk(const char *deviceName, bool rawMode, off_t start, off_t stop)
 		deviceName = fPath.Path();
 	}
 
+	if (deviceName == NULL) {
+		fprintf(stderr, "Path is not mapped to any device.\n");
+		return;
+	}
+
 	if (!rawMode && !strncmp(deviceName, "/dev/", 5)
 		&& !strcmp(deviceName + strlen(deviceName) - 3, "raw"))
 		fprintf(stderr, "Raw mode not selected, but raw device specified.\n");
