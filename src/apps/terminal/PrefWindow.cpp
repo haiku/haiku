@@ -44,15 +44,15 @@ PrefWindow::PrefWindow(const BMessenger& messenger)
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGroup(B_VERTICAL)
 		.SetInsets(10, 10, 10, 10)
-			.Add(new AppearancePrefView(B_TRANSLATE("Appearance"),
-				fTerminalMessenger))
+			.Add(fAppearanceView = new AppearancePrefView(
+				B_TRANSLATE("Appearance"), fTerminalMessenger))
 			.AddGroup(B_HORIZONTAL)
 				.Add(fSaveAsFileButton = new BButton("savebutton",
 					B_TRANSLATE("Save to file" B_UTF8_ELLIPSIS),
 					new BMessage(MSG_SAVEAS_PRESSED), B_WILL_DRAW))
 				.AddGlue()
 				.Add(fRevertButton = new BButton("revertbutton",
-					B_TRANSLATE("Cancel"), new BMessage(MSG_REVERT_PRESSED),
+					B_TRANSLATE("Revert"), new BMessage(MSG_REVERT_PRESSED),
 					B_WILL_DRAW))
 				.Add(fSaveButton = new BButton("okbutton", B_TRANSLATE("OK"),
 					new BMessage(MSG_SAVE_PRESSED), B_WILL_DRAW))
@@ -162,6 +162,8 @@ PrefWindow::_Revert()
 		fTerminalMessenger.SendMessage(MSG_TAB_TITLE_SETTING_CHANGED);
 		fTerminalMessenger.SendMessage(MSG_WINDOW_TITLE_SETTING_CHANGED);
 
+		fAppearanceView->Revert();
+
 		fDirty = false;
 	}
 }
@@ -182,7 +184,6 @@ PrefWindow::MessageReceived(BMessage* msg)
 
 		case MSG_REVERT_PRESSED:
 			_Revert();
-			PostMessage(B_QUIT_REQUESTED);
 			break;
 
 		case MSG_PREF_MODIFIED:

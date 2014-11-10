@@ -53,6 +53,8 @@ class PrefWindow : public BWindow
 						*fRevertButton,
 						*fSaveButton;
 
+		AppearancePrefView	*fAppearanceView;
+
 		bool			fDirty;
 		BMessenger		fTerminalMessenger;
 };

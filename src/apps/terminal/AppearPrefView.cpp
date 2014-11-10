@@ -152,16 +152,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fColorField->SetAlignment(B_ALIGN_RIGHT);
 	fColorSchemeField->SetAlignment(B_ALIGN_RIGHT);
 
-	fTabTitle->SetText(PrefHandler::Default()->getString(PREF_TAB_TITLE));
-	fWindowTitle->SetText(PrefHandler::Default()->getString(PREF_WINDOW_TITLE));
-
-	fColorControl->SetValue(
-		PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
-
-	fBlinkCursor->SetValue(PrefHandler::Default()->getBool(PREF_BLINK_CURSOR));
-	fBrightInsteadOfBold->SetValue(PrefHandler::Default()->getBool(
-		PREF_BRIGHT_INSTEAD_OF_BOLD));
-	fWarnOnExit->SetValue(PrefHandler::Default()->getBool(PREF_WARN_ON_EXIT));
+	Revert();
 
 	BTextControl* redInput = (BTextControl*)fColorControl->ChildAt(0);
 	BTextControl* greenInput = (BTextControl*)fColorControl->ChildAt(1);
@@ -192,12 +183,12 @@ AppearancePrefView::Revert()
 	fTabTitle->SetText(pref->getString(PREF_TAB_TITLE));
 	fWindowTitle->SetText(pref->getString(PREF_WINDOW_TITLE));
 
-	fWarnOnExit->SetValue(pref->getBool(
-		PREF_WARN_ON_EXIT));
+	fBlinkCursor->SetValue(pref->getBool(PREF_BLINK_CURSOR));
+	fBrightInsteadOfBold->SetValue(pref->getBool(PREF_BRIGHT_INSTEAD_OF_BOLD));
+	fWarnOnExit->SetValue(pref->getBool(PREF_WARN_ON_EXIT));
 
-	fColorSchemeField->Menu()->ItemAt(0)->SetMarked(true);
-	fColorControl->SetValue(pref->
-		getRGB(PREF_TEXT_FORE_COLOR));
+	_SetCurrentColorScheme();
+	fColorControl->SetValue(pref->getRGB(PREF_TEXT_FORE_COLOR));
 
 	const char* family = pref->getString(PREF_HALF_FONT_FAMILY);
 	const char* style = pref->getString(PREF_HALF_FONT_STYLE);
