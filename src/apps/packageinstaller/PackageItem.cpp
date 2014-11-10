@@ -187,6 +187,8 @@ PackageItem::InitPath(const char* path, BPath* destination)
 	} else if (fPathType == P_SYSTEM_PATH) {
 		if (gVerbose)
 			printf("InitPath - absolute: %s\n", fPath.String());
+		if (fPath == "")
+			fPath = "/";
 		ret = destination->SetTo(fPath.String());
 	} else {
 		if (gVerbose)
@@ -597,8 +599,11 @@ PackageScript::DoInstall(const char* path, ItemState* state)
 						// but it would be less save. For example, an app
 						// could have a folder named "config/be..." inside
 						// its installation folder.
-						// TODO: Use find_paths() or we are no better than 
+						// TODO: Use find_paths() or we are no better than
 						// these scripts.
+						script.ReplaceAll(
+							"/boot/beos/system/",
+							"/boot/system/");
 						script.ReplaceAll(
 							"~/config/be",
 							"~/config/settings/deskbar/menu");
