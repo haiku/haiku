@@ -182,7 +182,11 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	}
 
 	list->SetFont(be_bold_font);
-	list->DrawString(Name(), namePt);
+
+	BString name = Name();
+	name.RemoveFirst("/dev/net/");
+
+	list->DrawString(name, namePt);
 	list->SetFont(be_plain_font);
 	list->DrawString(interfaceState, statePt);
 
