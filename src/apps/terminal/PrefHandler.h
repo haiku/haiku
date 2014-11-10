@@ -42,7 +42,7 @@ class BEntry;
 class PrefHandler {
 	public:
 		PrefHandler(const PrefHandler* p);
-		PrefHandler();
+		PrefHandler(bool loadSettings = true);
 		~PrefHandler();
 
 	static	PrefHandler *Default();

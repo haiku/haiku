@@ -98,15 +98,17 @@ static const pref_defaults kTermDefaults[] = {
 PrefHandler *PrefHandler::sPrefHandler = NULL;
 
 
-PrefHandler::PrefHandler()
+PrefHandler::PrefHandler(bool loadSettings)
 	:
 	fContainer('Pref')
 {
 	_LoadFromDefault(kTermDefaults);
 
-	BPath path;
-	GetDefaultPath(path);
-	OpenText(path.Path());
+	if (loadSettings) {
+		BPath path;
+		GetDefaultPath(path);
+		OpenText(path.Path());
+	}
 
 	_ConfirmFont(be_fixed_font);
 }

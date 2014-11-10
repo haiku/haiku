@@ -54,12 +54,13 @@ PrefWindow::PrefWindow(const BMessenger& messenger)
 				.Add(fRevertButton = new BButton("revertbutton",
 					B_TRANSLATE("Revert"), new BMessage(MSG_REVERT_PRESSED),
 					B_WILL_DRAW))
-				.Add(fSaveButton = new BButton("okbutton", B_TRANSLATE("OK"),
-					new BMessage(MSG_SAVE_PRESSED), B_WILL_DRAW))
+				.Add(fDefaultsButton = new BButton("okbutton",
+					B_TRANSLATE("Defaults"), new BMessage(MSG_DEFAULTS_PRESSED),
+					B_WILL_DRAW))
 			.End()
 		.End();
 
-	fSaveButton->MakeDefault(true);
+	fRevertButton->SetEnabled(fDirty);
 
 	AddShortcut('Q', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
@@ -87,26 +88,8 @@ PrefWindow::Quit()
 bool
 PrefWindow::QuitRequested()
 {
-	if (!fDirty)
-		return true;
-
-	BAlert* alert = new BAlert("",
-		B_TRANSLATE("Save changes to this settings panel?"),
-		B_TRANSLATE("Cancel"), B_TRANSLATE("Don't save"), B_TRANSLATE("Save"),
-		B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-		B_WARNING_ALERT);
-	alert->SetShortcut(0, B_ESCAPE);
-	alert->SetShortcut(1, 'd');
-	alert->SetShortcut(2, 's');
-
-	int32 index = alert->Go();
-	if (index == 0)
-		return false;
-
-	if (index == 2)
+	if (fDirty)
 		_Save();
-	else
-		_Revert();
 
 	return true;
 }
@@ -136,7 +119,8 @@ PrefWindow::_SaveRequested(BMessage *msg)
 	BDirectory dir(&dirref);
 	BPath path(&dir, filename);
 
-	PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE, TERM_SIGNATURE);
+	PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE,
+		TERM_SIGNATURE);
 }
 
 
@@ -165,6 +149,7 @@ PrefWindow::_Revert()
 		fAppearanceView->Revert();
 
 		fDirty = false;
+		fRevertButton->SetEnabled(fDirty);
 	}
 }
 
@@ -173,11 +158,6 @@ void
 PrefWindow::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-		case MSG_SAVE_PRESSED:
-			_Save();
-			PostMessage(B_QUIT_REQUESTED);
-			break;
-
 		case MSG_SAVEAS_PRESSED:
 			_SaveAs();
 			break;
@@ -186,8 +166,18 @@ PrefWindow::MessageReceived(BMessage* msg)
 			_Revert();
 			break;
 
+		case MSG_DEFAULTS_PRESSED:
+			PrefHandler::SetDefault(new PrefHandler(false));
+			fTerminalMessenger.SendMessage(MSG_HALF_FONT_CHANGED);
+			fTerminalMessenger.SendMessage(MSG_COLOR_CHANGED);
+			fTerminalMessenger.SendMessage(MSG_TAB_TITLE_SETTING_CHANGED);
+			fTerminalMessenger.SendMessage(MSG_WINDOW_TITLE_SETTING_CHANGED);
+			fAppearanceView->Revert();
+			// fallthrough
+
 		case MSG_PREF_MODIFIED:
 			fDirty = true;
+			fRevertButton->SetEnabled(fDirty);
 			break;
 
 		case B_SAVE_REQUESTED:

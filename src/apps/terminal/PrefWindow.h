@@ -14,7 +14,7 @@
 #include <Window.h>
 
 // local messages
-const ulong MSG_SAVE_PRESSED = 'okok';
+const ulong MSG_DEFAULTS_PRESSED = 'defl';
 const ulong MSG_SAVEAS_PRESSED = 'canl';
 const ulong MSG_REVERT_PRESSED = 'revt';
 const ulong MSG_PREF_CLOSED = 'mspc';
@@ -48,10 +48,10 @@ class PrefWindow : public BWindow
 	private:
 		PrefHandler		*fPreviousPref;
 		BFilePanel		*fSavePanel;
-	
+
 		BButton			*fSaveAsFileButton,
 						*fRevertButton,
-						*fSaveButton;
+						*fDefaultsButton;
 
 		AppearancePrefView	*fAppearanceView;
 

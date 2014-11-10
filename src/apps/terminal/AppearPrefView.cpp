@@ -411,9 +411,11 @@ AppearancePrefView::_SetCurrentColorScheme()
 		}
 	}
 
+	// If the scheme is not one of the known ones, assume a custom one.
+	if (currentSchemeName == NULL)
+		currentSchemeName = "Custom";
+
 	for (int32 i = 0; i < fColorSchemeField->Menu()->CountItems(); i++) {
-		if (currentSchemeName == NULL)
-			break;
 		BMenuItem* item = fColorSchemeField->Menu()->ItemAt(i);
 		if (strcmp(item->Label(), currentSchemeName) == 0) {
 			item->SetMarked(true);
