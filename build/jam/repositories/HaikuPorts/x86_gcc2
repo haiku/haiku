@@ -237,7 +237,7 @@ RemotePackageRepository HaikuPorts
 	netpulse-0.2.3-2
 	netsurf-3.2-1
 	opensound-4.2_git-2
-	openssh-6.0p1-8
+	openssh-6.6p1-1
 	# sync openssl with secondary architecture (x86)
 	openssl-1.0.0o-1
 	openssl_devel-1.0.0o-1
