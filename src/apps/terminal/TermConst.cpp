@@ -34,4 +34,4 @@ const char* const kTooTipSetWindowTitlePlaceholders = B_TRANSLATE(
 
 const char* const kShellEscapeCharacters = " ~`#$&*()\\|[]{};'\"<>?!";
 const char* const kDefaultAdditionalWordCharacters = ":@-./_~";
-const char* const kURLAdditionalWordCharacters = ":/-._~[]?#@!$&'()*+,;=";
+const char* const kURLAdditionalWordCharacters = ":/-._~[]?#@!$%&'()*+,;=";
