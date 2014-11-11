@@ -11,11 +11,12 @@
 
 #include <Application.h>
 #include <Catalog.h>
+#include <Directory.h>
+#include <GroupLayout.h>
 #include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Path.h>
-#include <Directory.h>
 #include <Volume.h>
 #include <be_apps/Tracker/RecentItems.h>
 
@@ -27,6 +28,7 @@
 FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 	: ProbeWindow(rect, ref)
 {
+	SetLayout(new BGroupLayout(B_VERTICAL, 0));
 	// Set alternative window title for devices
 
 	BEntry entry(ref);
@@ -50,8 +52,7 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	// add the menu
 
-	BMenuBar *menuBar = new BMenuBar(BRect(0, 0, Bounds().Width(), 8), 
-		"menu bar");
+	BMenuBar *menuBar = new BMenuBar("menu bar");
 	AddChild(menuBar);
 
 	BMenu *menu = new BMenu(B_TRANSLATE("File"));
@@ -88,16 +89,12 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	// add our interface widgets
 
-	rect = Bounds();
-	rect.top = menuBar->Bounds().Height() + 1;
-	fProbeView = new ProbeView(rect, ref, NULL, settings);
+	fProbeView = new ProbeView(ref, NULL, settings);
 	AddChild(fProbeView);
 
 	fProbeView->AddSaveMenuItems(menu, 4);
 	fProbeView->AddPrintMenuItems(menu, menu->CountItems() - 4);
 	fProbeView->AddViewAsMenuItems();
-
-	fProbeView->UpdateSizeLimits();
 }
 
 

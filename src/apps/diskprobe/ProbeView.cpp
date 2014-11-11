@@ -23,6 +23,10 @@
 #include <Entry.h>
 #include <ExpressionParser.h>
 #include <fs_attr.h>
+#include <GridView.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <GroupView.h>
 #include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -70,7 +74,7 @@ static const uint32 kMsgStopFind = 'sfnd';
 
 class IconView : public BView {
 	public:
-		IconView(BRect frame, const entry_ref *ref, bool isDevice);
+		IconView(const entry_ref *ref, bool isDevice);
 		virtual ~IconView();
 
 		virtual void AttachedToWindow();
@@ -87,8 +91,8 @@ class IconView : public BView {
 
 class PositionSlider : public BSlider {
 	public:
-		PositionSlider(BRect rect, const char *name, BMessage *message,
-			off_t size, uint32 blockSize);
+		PositionSlider(const char *name, BMessage *message, off_t size,
+			uint32 blockSize);
 		virtual ~PositionSlider();
 
 #ifdef DRAW_SLIDER_BAR
@@ -115,15 +119,13 @@ class PositionSlider : public BSlider {
 };
 
 
-class HeaderView : public BView, public BInvoker {
+class HeaderView : public BGridView, public BInvoker {
 	public:
-		HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor);
+		HeaderView(const entry_ref *ref, DataEditor &editor);
 		virtual ~HeaderView();
 
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
-		virtual void Draw(BRect updateRect);
-		virtual void GetPreferredSize(float *_width, float *_height);
 		virtual void MessageReceived(BMessage *message);
 
 		base_type Base() const { return fBase; }
@@ -227,13 +229,14 @@ get_type_string(char *buffer, size_t bufferSize, type_code type)
 //	#pragma mark - IconView
 
 
-IconView::IconView(BRect rect, const entry_ref *ref, bool isDevice)
-	: BView(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW),
+IconView::IconView(const entry_ref *ref, bool isDevice)
+	: BView(NULL, B_WILL_DRAW),
 	fRef(*ref),
 	fIsDevice(isDevice),
 	fBitmap(NULL)
 {
 	UpdateIcon();
+	SetExplicitSize(BSize(32, 32));
 }
 
 
@@ -307,10 +310,10 @@ IconView::UpdateIcon()
 //	#pragma mark - PositionSlider
 
 
-PositionSlider::PositionSlider(BRect rect, const char *name, BMessage *message,
+PositionSlider::PositionSlider(const char *name, BMessage *message,
 	off_t size, uint32 blockSize)
-	: BSlider(rect, name, NULL, message, 0, kMaxSliderLimit, B_HORIZONTAL,
-		B_TRIANGLE_THUMB, B_FOLLOW_LEFT_RIGHT),
+	: BSlider(name, NULL, message, 0, kMaxSliderLimit, B_HORIZONTAL,
+		B_TRIANGLE_THUMB),
 	fSize(size),
 	fBlockSize(blockSize)
 {
@@ -469,8 +472,8 @@ PositionSlider::SetBlockSize(uint32 blockSize)
 //	#pragma mark - HeaderView
 
 
-HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
-	: BView(frame, "probeHeader", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
+HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
+	: BGridView("probeHeader", B_USE_SMALL_SPACING, B_USE_SMALL_SPACING),
 	fAttribute(editor.Attribute()),
 	fFileSize(editor.FileSize()),
 	fBlockSize(editor.BlockSize()),
@@ -480,34 +483,27 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	fLastPosition(0)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	GridLayout()->SetInsets(B_USE_SMALL_SPACING);
 
-	fIconView = new IconView(BRect(10, 10, 41, 41), ref, editor.IsDevice());
-	AddChild(fIconView);
+	fIconView = new IconView(ref, editor.IsDevice());
+	GridLayout()->AddView(fIconView, 0, 0, 1, 2);
+
+	BGroupView* line = new BGroupView(B_HORIZONTAL);
+	GridLayout()->AddView(line, 1, 0);
 
 	BFont boldFont = *be_bold_font;
 	boldFont.SetSize(10.0);
 	BFont plainFont = *be_plain_font;
 	plainFont.SetSize(10.0);
 
-	BRect rect = Bounds();
-	fStopButton = new BButton(BRect(0, 0, 20, 20), B_EMPTY_STRING, 
-		B_TRANSLATE("Stop"), new BMessage(kMsgStopFind), 
-		B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	fStopButton->SetFont(&plainFont);
-	fStopButton->ResizeToPreferred();
-	fStopButton->MoveTo(rect.right - 4 - fStopButton->Bounds().Width(), 4);
-	fStopButton->Hide();
-	AddChild(fStopButton);
-
-	BStringView *stringView = new BStringView(BRect(50, 6, rect.right, 20),
+	BStringView *stringView = new BStringView(
 		B_EMPTY_STRING, editor.IsAttribute()
 		? B_TRANSLATE("Attribute: ") 
 		: editor.IsDevice() 
 		? B_TRANSLATE("Device: ") 
 		: B_TRANSLATE("File: "));
 	stringView->SetFont(&boldFont);
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	line->AddChild(stringView);
 
 	BPath path(ref);
 	BString string = path.Path();
@@ -516,115 +512,88 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 		string.Prepend(fAttribute);
 		string.Append(")");
 	}
-	rect = stringView->Frame();
-	rect.left = rect.right;
-	rect.right = fStopButton->Frame().right - 1;
-	fPathView = new BStringView(rect, B_EMPTY_STRING, string.String(),
-		B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
+	fPathView = new BStringView(B_EMPTY_STRING, string.String());
 	fPathView->SetFont(&plainFont);
-	AddChild(fPathView);
+	line->AddChild(fPathView);
 
-	float top = 28;
 	if (editor.IsAttribute()) {
-		top += 3;
-		stringView = new BStringView(BRect(50, top, frame.right, top + 15),
-			B_EMPTY_STRING, B_TRANSLATE("Attribute type: "));
+		stringView = new BStringView(B_EMPTY_STRING,
+			B_TRANSLATE("Attribute type: "));
 		stringView->SetFont(&boldFont);
-		stringView->ResizeToPreferred();
-		AddChild(stringView);
-
-		rect = stringView->Frame();
-		rect.left = rect.right;
-		rect.right += 100;
-		rect.OffsetBy(0, -2);
-			// BTextControl oddities
+		line->AddChild(stringView);
 
 		char buffer[16];
 		get_type_string(buffer, sizeof(buffer), editor.Type());
-		fTypeControl = new BTextControl(rect, B_EMPTY_STRING, NULL, buffer,
+		fTypeControl = new BTextControl(B_EMPTY_STRING, NULL, buffer,
 			new BMessage(kMsgPositionUpdate));
 		fTypeControl->SetDivider(0.0);
 		fTypeControl->SetFont(&plainFont);
 		fTypeControl->TextView()->SetFontAndColor(&plainFont);
 		fTypeControl->SetEnabled(false);
 			// ToDo: for now
-		AddChild(fTypeControl);
+		line->AddChild(fTypeControl);
 
-		top += 25;
 	} else
 		fTypeControl = NULL;
 
-	stringView = new BStringView(BRect(50, top, frame.right, top + 15),
-		B_EMPTY_STRING, B_TRANSLATE("Block: "));
-	stringView->SetFont(&boldFont);
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	fStopButton = new BButton(B_EMPTY_STRING, 
+		B_TRANSLATE("Stop"), new BMessage(kMsgStopFind));
+	fStopButton->SetFont(&plainFont);
+	fStopButton->Hide();
+	line->AddChild(fStopButton);
 
-	rect = stringView->Frame();
-	rect.left = rect.right;
-	rect.right += 75;
-	rect.OffsetBy(0, -2);
+	BGroupLayoutBuilder(line).AddGlue();
+
+	line = new BGroupView(B_HORIZONTAL);
+	GridLayout()->AddView(line, 1, 1);
+
+	stringView = new BStringView(B_EMPTY_STRING, B_TRANSLATE("Block: "));
+	stringView->SetFont(&boldFont);
+	line->AddChild(stringView);
+
 		// BTextControl oddities
-	fPositionControl = new BTextControl(rect, B_EMPTY_STRING, NULL, "0x0",
+	fPositionControl = new BTextControl(B_EMPTY_STRING, NULL, "0x0",
 		new BMessage(kMsgPositionUpdate));
 	fPositionControl->SetDivider(0.0);
 	fPositionControl->SetFont(&plainFont);
 	fPositionControl->TextView()->SetFontAndColor(&plainFont);
 	fPositionControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	AddChild(fPositionControl);
+	line->AddChild(fPositionControl);
 
-	rect.left = rect.right + 4;
-	rect.right = rect.left + 75;
-	rect.OffsetBy(0, 2);
-	fSizeView = new BStringView(rect, B_EMPTY_STRING, B_TRANSLATE_COMMENT("of "
+	fSizeView = new BStringView(B_EMPTY_STRING, B_TRANSLATE_COMMENT("of "
 		"0x0", "This is a part of 'Block 0xXXXX of 0x0026' message. In "
 		"languages without 'of' structure it can be replaced simply "
 		"with '/'."));
 	fSizeView->SetFont(&plainFont);
-	AddChild(fSizeView);
+	line->AddChild(fSizeView);
 	UpdateFileSizeView();
 
-	rect.left = rect.right + 4;
-	rect.right = frame.right;
-	stringView = new BStringView(rect, B_EMPTY_STRING, B_TRANSLATE("Offset: "));
+	stringView = new BStringView(B_EMPTY_STRING, B_TRANSLATE("Offset: "));
 	stringView->SetFont(&boldFont);
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	line->AddChild(stringView);
 
-	rect = stringView->Frame();
-	rect.left = rect.right;
-	rect.right = rect.left + 40;
-	fOffsetView = new BStringView(rect, B_EMPTY_STRING, "0x0");
+	fOffsetView = new BStringView(B_EMPTY_STRING, "0x0");
 	fOffsetView->SetFont(&plainFont);
-	AddChild(fOffsetView);
+	line->AddChild(fOffsetView);
 	UpdateOffsetViews(false);
 
-	rect.left = rect.right + 4;
-	rect.right = frame.right;
-	stringView = new BStringView(rect, B_EMPTY_STRING, editor.IsAttribute()
+	stringView = new BStringView(B_EMPTY_STRING, editor.IsAttribute()
 		? B_TRANSLATE("Attribute offset: ") : editor.IsDevice()
 			? B_TRANSLATE("Device offset: ") : B_TRANSLATE("File offset: "));
 	stringView->SetFont(&boldFont);
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	line->AddChild(stringView);
 
-	rect = stringView->Frame();
-	rect.left = rect.right;
-	rect.right = rect.left + 70;
-	fFileOffsetView = new BStringView(rect, B_EMPTY_STRING, "0x0");
+	fFileOffsetView = new BStringView(B_EMPTY_STRING, "0x0");
 	fFileOffsetView->SetFont(&plainFont);
-	AddChild(fFileOffsetView);
+	line->AddChild(fFileOffsetView);
 
-	rect = Bounds();
-	rect.InsetBy(3, 0);
-	rect.top = top + 21;
-	rect.bottom = rect.top + 12;
-	fPositionSlider = new PositionSlider(rect, "slider",
+	BGroupLayoutBuilder(line).AddGlue();
+
+	fPositionSlider = new PositionSlider("slider",
 		new BMessage(kMsgSliderUpdate), editor.FileSize(), editor.BlockSize());
 	fPositionSlider->SetModificationMessage(new BMessage(kMsgSliderUpdate));
 	fPositionSlider->SetBarThickness(8);
-	fPositionSlider->ResizeToPreferred();
-	AddChild(fPositionSlider);
+	GridLayout()->AddView(fPositionSlider, 0, 2, 2, 1);
 }
 
 
@@ -665,33 +634,6 @@ HeaderView::DetachedFromWindow()
 	Window()->RemoveShortcut(B_END, B_COMMAND_KEY);
 	Window()->RemoveShortcut(B_PAGE_UP, B_COMMAND_KEY);
 	Window()->RemoveShortcut(B_PAGE_DOWN, B_COMMAND_KEY);
-}
-
-
-void
-HeaderView::Draw(BRect updateRect)
-{
-	BRect rect = Bounds();
-
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	SetHighColor(255, 255, 255);
-#else
-	SetHighColor(ui_color(B_SHINE_COLOR));
-#endif
-	StrokeLine(rect.LeftTop(), rect.LeftBottom());
-	StrokeLine(rect.LeftTop(), rect.RightTop());
-
-	// the gradient at the bottom is drawn by the BScrollView
-}
-
-
-void
-HeaderView::GetPreferredSize(float *_width, float *_height)
-{
-	if (_width)
-		*_width = Bounds().Width();
-	if (_height)
-		*_height = fPositionSlider->Frame().bottom + 2;
 }
 
 
@@ -843,11 +785,9 @@ HeaderView::MessageReceived(BMessage *message)
 				&& fFileSize > fBlockSize) {
 				fPositionSlider->SetEnabled(!state);
 				if (state) {
-					fPathView->ResizeBy(-fStopButton->Bounds().Width(), 0);
 					fStopButton->Show();
 				} else {
 					fStopButton->Hide();
-					fPathView->ResizeBy(fStopButton->Bounds().Width(), 0);
 				}
 			}
 
@@ -1182,13 +1122,14 @@ TypeView::FrameResized(float width, float height)
 //	#pragma mark - ProbeView
 
 
-ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute,
+ProbeView::ProbeView(entry_ref *ref, const char *attribute,
 		const BMessage *settings)
-	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW),
+	: BView("probeView", B_WILL_DRAW),
 	fPrintSettings(NULL),
 	fTypeView(NULL),
 	fLastSearch(NULL)
 {
+	SetLayout(new BGroupLayout(B_VERTICAL, 0));
 	fEditor.SetTo(*ref, attribute);
 
 	int32 baseType = kHexBase;
@@ -1198,22 +1139,16 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute,
 		settings->FindFloat("font_size", &fontSize);
 	}
 
-	rect = Bounds();
-	fHeaderView = new HeaderView(rect, &fEditor.Ref(), fEditor);
-	fHeaderView->ResizeToPreferred();
+	fHeaderView = new HeaderView(&fEditor.Ref(), fEditor);
 	fHeaderView->SetBase((base_type)baseType);
 	AddChild(fHeaderView);
 
-	rect = fHeaderView->Frame();
-	rect.top = rect.bottom + 3;
-	rect.bottom = Bounds().bottom - B_H_SCROLL_BAR_HEIGHT;
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	fDataView = new DataView(rect, fEditor);
+	fDataView = new DataView(fEditor);
 	fDataView->SetBase((base_type)baseType);
 	fDataView->SetFontSize(fontSize);
 
-	fScrollView = new BScrollView("scroller", fDataView, B_FOLLOW_ALL,
-		B_WILL_DRAW, true, true);
+	fScrollView = new BScrollView("scroller", fDataView, B_WILL_DRAW, true,
+		true);
 	AddChild(fScrollView);
 
 	fDataView->UpdateScroller();
@@ -1222,37 +1157,6 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute,
 
 ProbeView::~ProbeView()
 {
-}
-
-
-void
-ProbeView::UpdateSizeLimits()
-{
-	if (Window() == NULL)
-		return;
-
-	if (!fDataView->FontSizeFitsBounds()) {
-		float width, height;
-		fDataView->GetPreferredSize(&width, &height);
-
-		BRect frame = Window()->ConvertFromScreen(ConvertToScreen(
-			fHeaderView->Frame()));
-
-		Window()->SetSizeLimits(250, width + B_V_SCROLL_BAR_WIDTH,
-			200, height + frame.bottom + 4 + B_H_SCROLL_BAR_HEIGHT);
-	} else
-		Window()->SetSizeLimits(250, 32768, 200, 32768);
-
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	// In Haiku and Dano, the window is resized automatically
-	BRect bounds = Window()->Bounds();
-	float minWidth, maxWidth, minHeight, maxHeight;
-	Window()->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	if (maxWidth < bounds.Width() || maxHeight < bounds.Height()) {
-		Window()->ResizeTo(MIN(maxWidth, bounds.Width()), MIN(maxHeight,
-			bounds.Height()));
-	}
-#endif
 }
 
 
@@ -1394,6 +1298,8 @@ ProbeView::AddViewAsMenuItems()
 void
 ProbeView::AttachedToWindow()
 {
+	BView::AttachedToWindow();
+
 	fEditorLooper = new EditorLooper(fEditor.Ref().name, fEditor,
 		BMessenger(fDataView));
 	fEditorLooper->Run();
@@ -1409,11 +1315,8 @@ ProbeView::AttachedToWindow()
 	BMenuBar *bar = Window()->KeyMenuBar();
 	if (bar == NULL) {
 		// there is none? Well, but we really want to have one
-		bar = new BMenuBar(BRect(0, 0, 0, 0), NULL);
+		bar = new BMenuBar("");
 		Window()->AddChild(bar);
-
-		MoveBy(0, bar->Bounds().Height());
-		ResizeBy(0, -bar->Bounds().Height());
 
 		BMenu *menu = new BMenu(fEditor.IsAttribute()
 			? B_TRANSLATE("Attribute") : fEditor.IsDevice() ? B_TRANSLATE("Device") : B_TRANSLATE("File"));
@@ -1935,9 +1838,6 @@ ProbeView::MessageReceived(BMessage *message)
 						_UpdateSelectionMenuItems(start, end);
 					break;
 				}
-				case kDataViewPreferredSize:
-					UpdateSizeLimits();
-					break;
 			}
 			break;
 		}

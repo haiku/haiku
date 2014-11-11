@@ -94,8 +94,8 @@ is_valid_utf8(uint8 *data, size_t size)
 //	#pragma mark -
 
 
-DataView::DataView(BRect rect, DataEditor &editor)
-	: BView(rect, "dataView", B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS),
+DataView::DataView(DataEditor &editor)
+	: BView("dataView", B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS),
 	fEditor(editor),
 	fFocus(kHexFocus),
 	fBase(kHexBase),
@@ -909,6 +909,9 @@ DataView::UpdateScroller()
 {
 	float width, height;
 	GetPreferredSize(&width, &height);
+
+	SetExplicitMinSize(BSize(250, 200));
+	SetExplicitMaxSize(BSize(width, height));
 
 	BScrollBar *bar;
 	if ((bar = ScrollBar(B_HORIZONTAL)) != NULL) {

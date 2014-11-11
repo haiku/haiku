@@ -12,7 +12,8 @@
 
 
 ProbeWindow::ProbeWindow(BRect rect, entry_ref *ref)
-	: BWindow(rect, ref->name, B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+	: BWindow(rect, ref->name, B_DOCUMENT_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fRef(*ref)
 {
 }

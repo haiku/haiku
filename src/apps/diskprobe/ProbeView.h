@@ -24,7 +24,7 @@ class EditorLooper;
 
 class ProbeView : public BView {
 	public:
-		ProbeView(BRect rect, entry_ref* ref, const char* attribute = NULL,
+		ProbeView(entry_ref* ref, const char* attribute = NULL,
 			const BMessage* settings = NULL);
 		virtual ~ProbeView();
 
@@ -38,7 +38,6 @@ class ProbeView : public BView {
 		void AddPrintMenuItems(BMenu* menu, int32 index);
 		void AddViewAsMenuItems();
 
-		void UpdateSizeLimits();
 		bool QuitRequested();
 
 		DataEditor& Editor() { return fEditor; }

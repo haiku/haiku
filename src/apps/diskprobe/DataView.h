@@ -26,7 +26,7 @@ enum view_focus {
 
 class DataView : public BView {
 public:
-							DataView(BRect rect, DataEditor& editor);
+							DataView(DataEditor& editor);
 	virtual					~DataView();
 
 	virtual void			DetachedFromWindow();
