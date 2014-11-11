@@ -70,7 +70,7 @@ radeon_gpu_probe()
 			firmwareInfo->info_21.ulDefaultDispEngineClkFreq);
 		gInfo->displayClockFrequency *= 10;
 		if (gInfo->displayClockFrequency == 0) {
-			if (info.dceMajor >= 5)
+			if (info.dceMajor == 5)
 				gInfo->displayClockFrequency = 540000;
 			else
 				gInfo->displayClockFrequency = 600000;

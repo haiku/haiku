@@ -16,6 +16,7 @@
 #include "connector.h"
 #include "mode.h"
 #include "edid.h"
+#include "encoder.h"
 
 
 #undef TRACE
@@ -662,6 +663,41 @@ dp_get_adjust_train(dp_info* dp)
 }
 
 
+static uint8
+dp_encoder_service(uint32 connectorIndex, int action, int linkRate,
+	uint8 lane)
+{
+	DP_ENCODER_SERVICE_PARAMETERS args;
+	int index = GetIndexIntoMasterTable(COMMAND, DPEncoderService);
+
+	memset(&args, 0, sizeof(args));
+	args.ucLinkClock = linkRate;
+	args.ucAction = action;
+	args.ucLaneNum = lane;
+	args.ucConfig = 0;
+	args.ucStatus = 0;
+
+	// We really can't do ATOM_DP_ACTION_GET_SINK_TYPE with the
+	// way I designed this below. Not used though.
+
+	// Calculate encoder_id config
+	if (encoder_pick_dig(connectorIndex))
+		args.ucConfig |= ATOM_DP_CONFIG_DIG2_ENCODER;
+	else
+		args.ucConfig |= ATOM_DP_CONFIG_DIG1_ENCODER;
+
+	if (gConnector[connectorIndex]->encoder.linkEnumeration
+			== GRAPH_OBJECT_ENUM_ID2) {
+		args.ucConfig |= ATOM_DP_CONFIG_LINK_B;
+	} else
+		args.ucConfig |= ATOM_DP_CONFIG_LINK_A;
+
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
+
+	return args.ucStatus;
+}
+
+
 static void
 dp_set_tp(uint32 connectorIndex, int trainingPattern)
 {
@@ -675,6 +711,7 @@ dp_set_tp(uint32 connectorIndex, int trainingPattern)
 
 	/* set training pattern on the source */
 	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
+		TRACE("%s: Training with encoder...", __func__);
 		switch (trainingPattern) {
 			case DP_TRAIN_PATTERN_1:
 				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN1;
@@ -688,21 +725,17 @@ dp_set_tp(uint32 connectorIndex, int trainingPattern)
 		}
 		encoder_dig_setup(connectorIndex, pll->pixelClock, rawTrainingPattern);
 	} else {
-		ERROR("%s: TODO: dp_encoder_service\n", __func__);
-		return;
-		#if 0
+		TRACE("%s: Training with encoder service...", __func__);
 		switch (trainingPattern) {
-			case DP_TRAINING_PATTERN_1:
+			case DP_TRAIN_PATTERN_1:
 				rawTrainingPattern = 0;
 				break;
-			case DP_TRAINING_PATTERN_2:
+			case DP_TRAIN_PATTERN_2:
 				rawTrainingPattern = 1;
 				break;
 		}
-		radeon_dp_encoder_service(dp_info->rdev,
-			ATOM_DP_ACTION_TRAINING_PATTERN_SEL, dp_info->dp_clock,
-			dp_info->enc_id, rawTrainingPattern);
-		#endif
+		dp_encoder_service(connectorIndex, ATOM_DP_ACTION_TRAINING_PATTERN_SEL,
+			dp->linkRate, rawTrainingPattern);
 	}
 
 	// Enable training pattern on the sink
@@ -923,8 +956,8 @@ dp_link_train(uint8 crtcID)
 		encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 			ATOM_ENCODER_CMD_DP_LINK_TRAINING_START);
 	} else {
-		ERROR("%s: TODO: cannot use AtomBIOS DPEncoderService on card!\n",
-			__func__);
+		dp_encoder_service(connectorIndex, ATOM_DP_ACTION_TRAINING_START,
+			dp->linkRate, 0);
 	}
 
 	// Disable the training pattern on the sink
@@ -944,8 +977,8 @@ dp_link_train(uint8 crtcID)
 		encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 			ATOM_ENCODER_CMD_DP_LINK_TRAINING_COMPLETE);
 	} else {
-		ERROR("%s: TODO: cannot use AtomBIOS DPEncoderService on card!\n",
-			__func__);
+        dp_encoder_service(connectorIndex, ATOM_DP_ACTION_TRAINING_COMPLETE,
+			dp->linkRate, 0);
 	}
 
 	return B_OK;

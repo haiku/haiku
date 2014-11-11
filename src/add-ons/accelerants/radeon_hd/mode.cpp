@@ -51,8 +51,8 @@ create_mode_list(void)
 
 	gInfo->mode_list_area = create_display_modes("radeon HD modes",
 		&gDisplay[crtcID]->edidData, NULL, 0, kRadeonHDSpaces,
-		sizeof(kRadeonHDSpaces) / sizeof(kRadeonHDSpaces[0]),
-		is_mode_supported, &gInfo->mode_list, &gInfo->shared_info->mode_count);
+		B_COUNT_OF(kRadeonHDSpaces), is_mode_supported, &gInfo->mode_list,
+		&gInfo->shared_info->mode_count);
 	if (gInfo->mode_list_area < B_OK)
 		return gInfo->mode_list_area;
 

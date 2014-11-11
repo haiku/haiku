@@ -815,8 +815,6 @@ connector_probe()
 				}
 			}
 
-			// TODO: aux chan transactions
-
 			connector->valid = true;
 			connector->flags = connectorFlags;
 			connector->type = connectorType;
