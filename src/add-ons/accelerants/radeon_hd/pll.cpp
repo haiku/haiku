@@ -241,7 +241,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
-				if (pll->pixelClock * 10 > B_LENDIAN_TO_HOST_INT32(
+				if (pll->pixelClock / 10 > B_LENDIAN_TO_HOST_INT32(
 					ss_info->info.asSpreadSpectrum[i].ulTargetClockRange)) {
 					TRACE("%s: pixelClock > targetClockRange!\n", __func__);
 					continue;
@@ -270,7 +270,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
-				if (pll->pixelClock * 10 > B_LENDIAN_TO_HOST_INT32(
+				if (pll->pixelClock / 10 > B_LENDIAN_TO_HOST_INT32(
 					ss_info->info_2.asSpreadSpectrum[i].ulTargetClockRange)) {
 					TRACE("%s: pixelClock > targetClockRange!\n", __func__);
 					continue;
@@ -300,7 +300,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
-				if (pll->pixelClock * 10 > B_LENDIAN_TO_HOST_INT32(
+				if (pll->pixelClock / 10 > B_LENDIAN_TO_HOST_INT32(
 					ss_info->info_3.asSpreadSpectrum[i].ulTargetClockRange)) {
 					TRACE("%s: pixelClock > targetClockRange!\n", __func__);
 					continue;
