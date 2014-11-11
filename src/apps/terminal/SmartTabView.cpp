@@ -165,6 +165,8 @@ SmartTabView::AddTab(BView* target, BTab* tab)
 				bar->MoveBy(0, 1);
 			}
 		}
+
+		SetBorder(B_NO_BORDER);
 	}
 
 	Invalidate(TabFrame(CountTabs() - 1).InsetByCopy(-2, -2));
