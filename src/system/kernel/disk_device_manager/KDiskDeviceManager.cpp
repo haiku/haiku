@@ -1373,6 +1373,10 @@ KDiskDeviceManager::_ScanPartition(KPartition* partition,
 		return B_OK;
 	}
 
+	// This happens with some copy protected CDs. Just ignore the partition...
+	if (partition->Offset() < 0)
+		return B_BAD_DATA;
+
 	DBG(
 		KPath partitionPath;
 		partition->GetPath(&partitionPath);
