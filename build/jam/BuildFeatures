@@ -361,11 +361,11 @@ if [ IsPackageAvailable haikuwebkit_devel ] {
 # libpng
 if [ IsPackageAvailable libpng_devel ] {
 	ExtractBuildFeatureArchives libpng :
-		file: base libpng
+		file: base libpng16
 			runtime: lib
-		file: devel libpng_devel
+		file: devel libpng16_devel
 			depends: base
-			library: $(developLibDir)/libpng.so
+			library: $(developLibDir)/libpng16.so
 			headers: $(developHeadersDir)
 		;
 

@@ -27,7 +27,8 @@ AddHaikuImagePackages [ FFilterByBuildFeatures
 
 	regular_image @{
 		bzip2 ctags ffmpeg findutils gawk glu grep gutenprint jasper jpeg
-		less libicns libpng libwebp mesa mesa_devel mesa_swrast sed sharutils
+		less libicns libpng libpng16 libwebp mesa mesa_devel mesa_swrast
+		sed sharutils
 		tar tiff wget which
 	}@
 ] ;

@@ -103,7 +103,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
 			AddHaikuImagePackages curl_devel ffmpeg_devel freetype_devel
-				glu_devel jpeg_devel libpng_devel zlib_devel ;
+				glu_devel jpeg_devel libpng16_devel zlib_devel ;
 		}
 	}
 }

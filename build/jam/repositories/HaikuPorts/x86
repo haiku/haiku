@@ -43,8 +43,8 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_devel-0.10.2-4
 	flex-2.5.39-1
 	fossil-1.29-1
-	freetype-2.5.3-1
-	freetype_devel-2.5.3-1
+	freetype-2.5.3-4
+	freetype_devel-2.5.3-4
 	gawk-4.1.0-2
 	gcc-4.8.3_2014_07_26-2
 	gcc_syslibs-4.8.3_2014_07_26-2
@@ -202,8 +202,8 @@ RemotePackageRepository HaikuPorts
 	expat_x86_gcc2_devel-2.0.1-7
 	ffmpeg_x86_gcc2-0.10.2-4
 	ffmpeg_x86_gcc2_devel-0.10.2-4
-	freetype_x86_gcc2-2.5.3-1
-	freetype_x86_gcc2_devel-2.5.3-1
+	freetype_x86_gcc2-2.5.3-4
+	freetype_x86_gcc2_devel-2.5.3-4
 	gcc_x86_gcc2-2.95.3_2014_07_26-1
 	gcc_x86_gcc2_syslibs_devel-2.95.3_2014_07_26-1
 	gettext_x86_gcc2-0.18.1.1-6
