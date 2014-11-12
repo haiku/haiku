@@ -37,7 +37,8 @@ public:
 
 			status_t			StartLoading(const char* fileName,
 									BString& _requiredExternalFile);
-			status_t			Load(const BString& externalFilePath);
+			status_t			Load(uint8 addressSize,
+									const BString& externalFilePath);
 			status_t			FinishLoading();
 
 			const char*			Name() const		{ return fName; }
@@ -108,14 +109,19 @@ private:
 			struct ExpressionEvaluationContext;
 			struct FDEAugmentation;
 			struct CIEAugmentation;
+			struct FDELookupInfo;
 
 			typedef DoublyLinkedList<AbbreviationTable> AbbreviationTableList;
 			typedef BObjectList<CompilationUnit> CompilationUnitList;
 			typedef BOpenHashTable<TypeUnitTableHashDefinition> TypeUnitTable;
+			typedef BObjectList<FDELookupInfo> FDEInfoList;
 
 private:
 			status_t			_ParseDebugInfoSection();
 			status_t			_ParseTypesSection();
+			status_t			_ParseFrameSection(ElfSection* section,
+									uint8 addressSize, bool ehFrame,
+									FDEInfoList& infos);
 			status_t			_ParseCompilationUnit(CompilationUnit* unit);
 			status_t			_ParseTypeUnit(TypeUnit* unit);
 			status_t			_ParseDebugInfoEntry(DataReader& dataReader,
@@ -131,11 +137,11 @@ private:
 
 			status_t			_ParseLineInfo(CompilationUnit* unit);
 
-			status_t			_UnwindCallFrame(bool usingEHFrameSection,
-									CompilationUnit* unit,
+			status_t			_UnwindCallFrame(CompilationUnit* unit,
 									uint8 addressSize,
 									DIESubprogram* subprogramEntry,
 									target_addr_t location,
+									const FDELookupInfo* info,
 									const DwarfTargetInterface* inputInterface,
 									DwarfTargetInterface* outputInterface,
 									target_addr_t& _framePointer);
@@ -185,6 +191,13 @@ private:
 			CompilationUnit*	_GetContainingCompilationUnit(
 									off_t refAddr) const;
 
+			FDELookupInfo*		_GetContainingFDEInfo(
+									target_addr_t offset) const;
+
+			FDELookupInfo*		_GetContainingFDEInfo(
+									target_addr_t offset,
+									const FDEInfoList& infoList) const;
+
 private:
 			friend class 		DwarfFile::ExpressionEvaluationContext;
 
@@ -207,8 +220,11 @@ private:
 			DebugInfoEntryFactory fDebugInfoFactory;
 			CompilationUnitList	fCompilationUnits;
 			TypeUnitTable		fTypeUnits;
+			FDEInfoList			fDebugFrameInfos;
+			FDEInfoList			fEHFrameInfos;
 			bool				fTypesSectionRequired;
 			bool				fFinished;
+			bool				fItaniumEHFrameFormat;
 			status_t			fFinishError;
 };
 

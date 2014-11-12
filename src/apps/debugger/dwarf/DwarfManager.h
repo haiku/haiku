@@ -17,7 +17,7 @@ struct DwarfFileLoadingState;
 
 class DwarfManager {
 public:
-								DwarfManager();
+								DwarfManager(uint8 addressSize);
 								~DwarfManager();
 
 			status_t			Init();
@@ -36,6 +36,7 @@ private:
 			typedef DoublyLinkedList<DwarfFile> FileList;
 
 private:
+			uint8				fAddressSize;
 			BLocker				fLock;
 			FileList			fFiles;
 };

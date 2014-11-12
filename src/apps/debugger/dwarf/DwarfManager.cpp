@@ -15,8 +15,9 @@
 #include "DwarfFileLoadingState.h"
 
 
-DwarfManager::DwarfManager()
+DwarfManager::DwarfManager(uint8 addressSize)
 	:
+	fAddressSize(addressSize),
 	fLock("dwarf manager")
 {
 }
@@ -65,7 +66,7 @@ DwarfManager::LoadFile(const char* fileName, DwarfFileLoadingState& _state)
 		}
 	}
 
-	error = file->Load(_state.locatedExternalInfoPath);
+	error = file->Load(fAddressSize, _state.locatedExternalInfoPath);
 	if (error != B_OK) {
 		_state.state = DWARF_FILE_LOADING_STATE_FAILED;
 		return error;

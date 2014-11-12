@@ -10,6 +10,7 @@
 
 #include <string.h>
 
+#include "arch/Architecture.h"
 #include "DebuggerInterface.h"
 #include "DwarfFile.h"
 #include "DwarfImageDebugInfo.h"
@@ -47,7 +48,7 @@ DwarfTeamDebugInfo::~DwarfTeamDebugInfo()
 status_t
 DwarfTeamDebugInfo::Init()
 {
-	fManager = new(std::nothrow) DwarfManager;
+	fManager = new(std::nothrow) DwarfManager(fArchitecture->AddressSize());
 	if (fManager == NULL)
 		return B_NO_MEMORY;
 
