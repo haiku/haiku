@@ -1165,9 +1165,7 @@ Inode::Inode(Volume* volume, Inode* parent, const char* name, uint64 start,
 	:
 	fNext(NULL)
 {
-	fName = strdup(name);
-	if (fName == NULL)
-		return;
+	memset(&fWAVHeader, 0, sizeof(wav_header));
 
 	fID = volume->GetNextNodeID();
 	fType = type;
@@ -1178,6 +1176,10 @@ Inode::Inode(Volume* volume, Inode* parent, const char* name, uint64 start,
 	fGroupID = parent ? parent->GroupID() : getegid();
 
 	fCreationTime = fModificationTime = time(NULL);
+
+	fName = strdup(name);
+	if (fName == NULL)
+		return;
 
 	if (frames) {
 		// initialize WAV header
