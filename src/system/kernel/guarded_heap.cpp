@@ -63,7 +63,7 @@ struct guarded_heap {
 	rw_lock				lock;
 	size_t				page_count;
 	size_t				used_pages;
-	vint32				area_creation_counter;
+	int32				area_creation_counter;
 	guarded_heap_area*	areas;
 };
 
@@ -250,7 +250,7 @@ guarded_heap_free_page(guarded_heap_area& area, size_t pageIndex,
 static bool
 guarded_heap_pages_allocated(guarded_heap& heap, size_t pagesAllocated)
 {
-	return (atomic_add((vint32*)&heap.used_pages, pagesAllocated)
+	return (atomic_add((int32*)&heap.used_pages, pagesAllocated)
 			+ pagesAllocated)
 		>= heap.page_count - HEAP_GROW_SIZE / B_PAGE_SIZE / 2;
 }
@@ -395,7 +395,7 @@ guarded_heap_add_area(guarded_heap& heap, int32 counter, uint32 flags)
 		return false;
 	}
 
-	if (atomic_test_and_set((vint32*)&heap.area_creation_counter,
+	if (atomic_test_and_set(&heap.area_creation_counter,
 			counter + 1, counter) == counter) {
 		return guarded_heap_area_create(heap, flags);
 	}
@@ -515,7 +515,7 @@ guarded_heap_area_free(guarded_heap_area& area, void* address, uint32 flags)
 
 #if !DEBUG_GUARDED_HEAP_DISABLE_MEMORY_REUSE
 	area.used_pages -= pagesFreed;
-	atomic_add((vint32*)&area.heap->used_pages, -pagesFreed);
+	atomic_add((int32*)&area.heap->used_pages, -pagesFreed);
 #endif
 }
 
@@ -755,7 +755,7 @@ dump_guarded_heap(int argc, char** argv)
 	kprintf("page count: %" B_PRIuSIZE "\n", heap->page_count);
 	kprintf("used pages: %" B_PRIuSIZE "\n", heap->used_pages);
 	kprintf("area creation counter: %" B_PRId32 "\n",
-		(int32)heap->area_creation_counter);
+		heap->area_creation_counter);
 
 	size_t areaCount = 0;
 	guarded_heap_area* area = heap->areas;
