@@ -9,6 +9,7 @@
 #include <debug.h>
 
 #include "disasm_arch.h"
+#include "elf.h"
 #include "udis86.h"
 
 
@@ -33,6 +34,30 @@ read_next_byte(struct ud*)
 }
 
 
+static const char*
+resolve_symbol(struct ud*, uint64_t address, int64_t* offset)
+{
+	const char* symbolName;
+	addr_t baseAddress;
+	status_t error;
+
+	if (IS_KERNEL_ADDRESS(address)) {
+		error = elf_debug_lookup_symbol_address(address, &baseAddress,
+			&symbolName, NULL, NULL);
+	} else {
+		error = elf_debug_lookup_user_symbol_address(
+			debug_get_debugged_thread()->team, address, &baseAddress,
+			&symbolName, NULL, NULL);
+	}
+
+	if (error != B_OK)
+		return NULL;
+
+	*offset = address - baseAddress;
+	return symbolName;
+}
+
+
 static void
 setup_disassembler(addr_t where)
 {
@@ -42,6 +67,7 @@ setup_disassembler(addr_t where)
 	ud_set_pc(&sUDState, (uint64_t)where);
 	ud_set_syntax(&sUDState, sSyntax);
 	ud_set_vendor(&sUDState, sVendor);
+	ud_set_sym_resolver(&sUDState, resolve_symbol);
 }
 
 
@@ -113,6 +139,7 @@ disasm_arch_init()
 	// XXX: check for AMD and set sVendor;
 	return B_OK;
 }
+
 
 status_t
 disasm_arch_fini()
