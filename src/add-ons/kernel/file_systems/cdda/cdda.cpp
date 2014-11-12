@@ -9,6 +9,7 @@
 #include <KernelExport.h>
 #include <device/scsi.h>
 
+#include <algorithm>
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -460,6 +461,12 @@ read_frames(int fd, off_t firstFrame, uint8 *buffer, size_t count)
 	size_t framesLeft = count;
 
 	while (framesLeft > 0) {
+		// If the initial count was >= 32, and not a multiple of 8, and the
+		// ioctl fails, we switch to reading 8 frames at a time. However the
+		// last read can read between 1 and 7 frames only, to not overflow
+		// the buffer.
+		count = std::min(count, framesLeft);
+
 		scsi_read_cd read;
 		read.start_m = firstFrame / kFramesPerMinute;
 		read.start_s = (firstFrame / kFramesPerSecond) % 60;
@@ -482,6 +489,7 @@ read_frames(int fd, off_t firstFrame, uint8 *buffer, size_t count)
 				count = 8;
 			else
 				count = 1;
+
 			continue;
 		}
 
