@@ -31,8 +31,8 @@ RemotePackageRepository HaikuPorts
 	cmake-3.0.0_rc3-1
 	cpio-2.10-1
 	ctags-5.8-3
-	curl-7.36.0-1
-	curl_devel-7.36.0-1
+	curl-7.39.0-1
+	curl_devel-7.39.0-1
 	cvs-1.12.13.1-6
 	doxygen-1.6.3-4
 	dtc-1.4.0-1
@@ -105,8 +105,10 @@ RemotePackageRepository HaikuPorts
 	libogg_devel-1.3.0-2
 	libpcre-8.21-5
 	libpcre_devel-8.21-5
-	libpng-1.5.12-3
-	libpng_devel-1.5.12-3
+	libpng-1.5.12-4
+	libpng_devel-1.5.12-4
+	libpng16-1.6.13-1
+	libpng16_devel-1.6.13-1
 	libsdl-1.2.15-6
 	libsdl_devel-1.2.15-6
 	libsolv-0.3.0_haiku_2013_10_01-2
@@ -194,8 +196,8 @@ RemotePackageRepository HaikuPorts
 	binutils_x86_gcc2-2.17_2013_04_21-2
 	bzip2_x86_gcc2-1.0.6-5
 	bzip2_x86_gcc2_devel-1.0.6-5
-	curl_x86_gcc2-7.26.0-5
-	curl_x86_gcc2_devel-7.26.0-5
+	curl_x86_gcc2-7.39.0-1
+	curl_x86_gcc2_devel-7.39.0-1
 	expat_x86_gcc2-2.0.1-7
 	expat_x86_gcc2_devel-2.0.1-7
 	ffmpeg_x86_gcc2-0.10.2-4
@@ -229,8 +231,10 @@ RemotePackageRepository HaikuPorts
 	libiconv_x86_gcc2_devel-1.13.1-6
 	libogg_x86_gcc2-1.3.0-2
 	libogg_x86_gcc2_devel-1.3.0-2
-	libpng_x86_gcc2-1.5.12-3
-	libpng_x86_gcc2_devel-1.5.12-3
+	libpng_x86_gcc2-1.5.12-4
+	libpng_x86_gcc2_devel-1.5.12-4
+	libpng16_x86_gcc2-1.6.13-1
+	libpng16_x86_gcc2_devel-1.6.13-1
 	libsolv_x86_gcc2-0.3.0_haiku_2013_10_01-2
 	libsolv_x86_gcc2_devel-0.3.0_haiku_2013_10_01-2
 	libtheora_x86_gcc2-1.1.1-2
@@ -321,6 +325,7 @@ RemotePackageRepository HaikuPorts
 	libogg
 	libpcre
 	libpng
+	libpng16
 	libsdl
 	libsolv
 	libtheora
