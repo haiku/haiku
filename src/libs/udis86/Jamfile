@@ -7,7 +7,6 @@ UseHeaders [ LibraryHeaders [ FDirName udis86 libudis86 ] ] ;
 
 StaticLibrary libudis86.a :
 	decode.c
-	input.c
 	itab.c
 	syn-att.c
 	syn.c
