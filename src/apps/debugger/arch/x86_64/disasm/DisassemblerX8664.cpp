@@ -164,9 +164,10 @@ DisassemblerX8664::GetNextInstructionInfo(InstructionInfo& _info,
 	instruction_type type = INSTRUCTION_TYPE_OTHER;
 	target_addr_t targetAddress = 0;
 
-	if (fUdisData->mnemonic == UD_Icall)
+	ud_mnemonic_code mnemonic = ud_insn_mnemonic(fUdisData);
+	if (mnemonic == UD_Icall)
 		type = INSTRUCTION_TYPE_SUBROUTINE_CALL;
-	else if (fUdisData->mnemonic == UD_Ijmp)
+	else if (mnemonic == UD_Ijmp)
 		type = INSTRUCTION_TYPE_JUMP;
 	if (state != NULL)
 		targetAddress = GetInstructionTargetAddress(state);
@@ -186,7 +187,8 @@ DisassemblerX8664::GetNextInstructionInfo(InstructionInfo& _info,
 target_addr_t
 DisassemblerX8664::GetInstructionTargetAddress(CpuState* state) const
 {
-	if (fUdisData->mnemonic != UD_Icall && fUdisData->mnemonic != UD_Ijmp)
+	ud_mnemonic_code mnemonic = ud_insn_mnemonic(fUdisData);
+	if (mnemonic != UD_Icall && mnemonic != UD_Ijmp)
 		return 0;
 
 	CpuStateX8664* x64State = dynamic_cast<CpuStateX8664*>(state);
