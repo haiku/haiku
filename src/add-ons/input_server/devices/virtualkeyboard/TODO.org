@@ -6,3 +6,5 @@
 * TODO factor-out code common to both Keymap and VirtualKeyboard
 * TODO handle B_KEY_MAP_CHANGED and B_KEY_LOCKS_CHANGED
 * TODO find a way to not start it on boot (might need patching input_server)
+* TODO watch for active window to reposition the keyboard at top or bottom of screen
+* TODO watch for active control and dynamically display keyboard when on text control
