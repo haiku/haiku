@@ -115,11 +115,13 @@ public:
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
+			case B_MOUSE_WHEEL_CHANGED:
+				Window()->PostMessage(message, Parent());
+				break;
+
 			case MSG_UPDATE_PACKAGE:
-			{
 				SetPackage(fPackageListener->Package());
 				break;
-			}
 		}
 	}
 	
@@ -265,6 +267,10 @@ FeaturedPackagesView::FeaturedPackagesView()
 	BScrollView* scrollView = new BScrollView(
 		"featured packages scroll view", containerView,
 		0, false, true, B_FANCY_BORDER);
+
+	BScrollBar* scrollBar = scrollView->ScrollBar(B_VERTICAL);
+	if (scrollBar != NULL)
+		scrollBar->SetSteps(10.0f, 20.0f);
 
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollView, 1.0f)
