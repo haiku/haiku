@@ -1,0 +1,8 @@
+* TODO Improve the drawing of both Keymap and VirtualKeyboard (Same code)
+* TODO Create a handler class so that Keyboard View does not know about input device
+* TODO Add a window to change layout, font, and maps. The functions to load the items are already there! Just need to create a settings directory for preferences.
+* TODO The held down keys (ctrl, caps, shift, alt, etc) have an issue where they stay down. To replicate click one of the listed keys. Click an alphabet key. Then try click the held down key again. The key will stay stuck
+* TODO Add deskbar option to open the keyboard
+* TODO factor-out code common to both Keymap and VirtualKeyboard
+* TODO handle B_KEY_MAP_CHANGED and B_KEY_LOCKS_CHANGED
+* TODO find a way to not start it on boot (might need patching input_server)
