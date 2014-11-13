@@ -3,3 +3,4 @@
 -Add a window to change layout, font, and maps. The functions to load the items are already there! Just need to create a settings directory for preferences.
 -The held down keys (ctrl, caps, shift, alt, etc) have an issue where they stay down. To replicate click one of the listed keys. Click an alphabet key. Then try click the held down key again. The key will stay stuck
 -Add deskbar option to open the keyboard
+-factor-out code common to both Keymap and VirtualKeyboard
