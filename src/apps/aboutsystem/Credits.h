@@ -325,6 +325,7 @@ static const Translation kTranslations[] = {
 	"Raynald Lesieur\n" \
 	"Oscar Lesta\n" \
 	"Jerome Leveque\n" \
+	"Freeman Lou\n" \
 	"Brian Luft\n" \
 	"Christof Lutteroth\n" \
 	"Graham MacDonald\n" \
