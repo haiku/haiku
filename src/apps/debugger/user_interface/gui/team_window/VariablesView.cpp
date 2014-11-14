@@ -1660,12 +1660,19 @@ VariablesView::Create(Listener* listener)
 void
 VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 {
+	bool updateValues = fFrameClearPending;
+		// We only want to save previous values if we've continued
+		// execution (i.e. thread/frame are being cleared).
+		// Otherwise, we'll overwrite our previous values simply
+		// by switching frames within the same stack trace, which isn't
+		// desired behavior.
+
 	fFrameClearPending = false;
 
 	if (thread == fThread && stackFrame == fStackFrame)
 		return;
 
-	_SaveViewState();
+	_SaveViewState(updateValues);
 
 	_FinishContextMenu(true);
 
@@ -2470,7 +2477,7 @@ VariablesView::_FinishContextMenu(bool force)
 
 
 void
-VariablesView::_SaveViewState() const
+VariablesView::_SaveViewState(bool updateValues) const
 {
 	if (fThread == NULL || fStackFrame == NULL
 		|| fStackFrame->Function() == NULL) {
@@ -2483,21 +2490,40 @@ VariablesView::_SaveViewState() const
 		return;
 	BReference<FunctionID> functionIDReference(functionID, true);
 
-	StackFrameValues* values = new(std::nothrow) StackFrameValues;
-	if (values == NULL)
-		return;
-	BReference<StackFrameValues> valuesReference(values, true);
+	StackFrameValues* values = NULL;
+	ExpressionValues* expressionValues = NULL;
+	BReference<StackFrameValues> valuesReference;
+	BReference<ExpressionValues> expressionsReference;
 
-	if (values->Init() != B_OK)
-		return;
+	if (!updateValues) {
+		VariablesViewState* viewState = fViewStateHistory->GetState(fThread->ID(),
+			functionID);
+		if (viewState != NULL) {
+			values = viewState->Values();
+			valuesReference.SetTo(values);
 
-	ExpressionValues* expressionValues = new(std::nothrow) ExpressionValues;
-	if (expressionValues == NULL)
-		return;
-	BReference<ExpressionValues> expressionReference(expressionValues, true);
+			expressionValues = viewState->GetExpressionValues();
+			expressionsReference.SetTo(expressionValues);
+		}
+	}
 
-	if (expressionValues->Init() != B_OK)
-		return;
+	if (values == NULL) {
+		values = new(std::nothrow) StackFrameValues;
+		if (values == NULL)
+			return;
+		valuesReference.SetTo(values, true);
+
+		if (values->Init() != B_OK)
+			return;
+
+		expressionValues = new(std::nothrow) ExpressionValues;
+		if (expressionValues == NULL)
+			return;
+		expressionsReference.SetTo(expressionValues, true);
+
+		if (expressionValues->Init() != B_OK)
+			return;
+	}
 
 	// create an empty view state
 	VariablesViewState* viewState = new(std::nothrow) VariablesViewState;
@@ -2514,7 +2540,7 @@ VariablesView::_SaveViewState() const
 	// populate it
 	TreeTablePath path;
 	if (_AddViewStateDescendentNodeInfos(viewState,
-			fVariableTableModel->Root(), path) != B_OK) {
+			fVariableTableModel->Root(), path, updateValues) != B_OK) {
 		return;
 	}
 
@@ -2557,7 +2583,7 @@ VariablesView::_RestoreViewState()
 
 status_t
 VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
-	void* parent, TreeTablePath& path) const
+	void* parent, TreeTablePath& path, bool updateValues) const
 {
 	int32 childCount = fVariableTableModel->CountChildren(parent);
 	for (int32 i = 0; i < childCount; i++) {
@@ -2586,7 +2612,7 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 			if (error != B_OK)
 				return error;
 
-			if (value != NULL) {
+			if (value != NULL && updateValues) {
 				BVariant variableValueData;
 				if (value->ToVariant(variableValueData))
 					error = viewState->Values()->SetValue(id, componentPath,
@@ -2596,13 +2622,14 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 			}
 
 			// recurse
-			error = _AddViewStateDescendentNodeInfos(viewState, node, path);
+			error = _AddViewStateDescendentNodeInfos(viewState, node, path,
+				updateValues);
 			if (error != B_OK)
 				return error;
 		} else {
 			ExpressionValueNodeChild* child
 				= dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild());
-			if (child != NULL && value != NULL) {
+			if (child != NULL && value != NULL && updateValues) {
 				BVariant variableValueData;
 				if (value->ToVariant(variableValueData)) {
 					FunctionID* id = fStackFrame->Function()->GetFunctionID();

@@ -96,12 +96,13 @@ private:
 									uint32 what, ContextActionList* actions,
 									BMessage*& _message);
 			void				_FinishContextMenu(bool force);
-			void				_SaveViewState() const;
+			void				_SaveViewState(bool updateValues) const;
 			void				_RestoreViewState();
 			status_t			_AddViewStateDescendentNodeInfos(
 									VariablesViewState* viewState,
 									void* parent,
-									TreeTablePath& path) const;
+									TreeTablePath& path,
+									bool updateValues) const;
 			status_t			_ApplyViewStateDescendentNodeInfos(
 									VariablesViewState* viewState,
 									void* parent,
