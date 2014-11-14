@@ -3973,7 +3973,7 @@ vm_init(kernel_args* args)
 	slab_init(args);
 
 #if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
-	size_t heapSize = INITIAL_HEAP_SIZE;
+	off_t heapSize = INITIAL_HEAP_SIZE;
 	// try to accomodate low memory systems
 	while (heapSize > sAvailableMemory / 8)
 		heapSize /= 2;
