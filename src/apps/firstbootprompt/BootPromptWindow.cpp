@@ -63,7 +63,7 @@ static const char* kLanguageKeymapMappings[] = {
 	"Dutch", "US-International"
 };
 static const size_t kLanguageKeymapMappingsSize
-	 = sizeof(kLanguageKeymapMappings) / sizeof(kLanguageKeymapMappings[0]);
+	= sizeof(kLanguageKeymapMappings) / sizeof(kLanguageKeymapMappings[0]);
 
 
 class LanguageItem : public BStringItem {
@@ -214,6 +214,8 @@ BootPromptWindow::BootPromptWindow()
 		.End()
 		.View()
 	);
+
+	fLanguagesListView->MakeFocus();
 
 	_UpdateStrings();
 	CenterOnScreen();
