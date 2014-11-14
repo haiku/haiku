@@ -57,16 +57,42 @@ to_utf8(const char* string)
 	char buffer[256];
 	size_t out = 0;
 
-	// TODO: assume ISO-8859-1 character set for now
+	// TODO: assume CP1252 or ISO-8859-1 character set for now
 	while (uint32 c = (uint8)string[0]) {
-		if (out == sizeof(buffer) - 1)
-			break;
 
-		if (c < 0x80)
+		if (c < 0x80) {
+			if (out >= sizeof(buffer) - 1)
+				break;
+			// ASCII character: no change needed
 			buffer[out++] = c;
-		else if (c < 0x800) {
-			buffer[out++] = 0xc0 | (c >> 6);
-			buffer[out++] = 0x80 | (c & 0x3f);
+		} else {
+			if (c < 0xA0) {
+				// Windows CP-1252 - Use a lookup table
+				static const uint32 lookup[] = {
+					0x20AC, 0, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021,
+					0x02C6, 0x2030, 0x0160, 0x2039, 0x0152, 0, 0x017D, 0,
+					0, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014,
+					0x02DC, 0x2122, 0x0161, 0x203A, 0x0153, 0, 0x017E, 0x0178
+				};
+
+				c = lookup[c - 0x80];
+			}
+
+			// Convert to 2 or 3-byte representation
+			if (c == 0) {
+				// invalid character, ignore
+			} else if (c < 0x800) {
+				if (out >= sizeof(buffer) - 2)
+					break;
+				buffer[out++] = 0xc0 | (c >> 6);
+				buffer[out++] = 0x80 | (c & 0x3f);
+			} else {
+				if (out >= sizeof(buffer) - 3)
+					break;
+				buffer[out++] = 0xe0 | (c >> 12);
+				buffer[out++] = 0x80 | ((c >> 6) & 0x3f);
+				buffer[out++] = 0x80 | (c & 0x3f);
+			}
 		}
 
 		string++;
