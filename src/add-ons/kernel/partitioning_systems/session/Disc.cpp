@@ -275,23 +275,26 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar* buffer,
 	memset(raw_command.sense_data, 0, raw_command.sense_data_length);
 	raw_command.timeout = kScsiTimeout;
 
-	if (ioctl(deviceFD, B_RAW_DEVICE_COMMAND, &raw_command) == 0) {
-		if (raw_command.scsi_status == 0 && raw_command.cam_status == 1) {
-			// SUCCESS!!!
-			DBG(dump_full_table_of_contents(buffer, buffer_length));
+	// This does not always work on the first try, so do it twice just in case.
+	for (int attempt = 0; attempt < 2; attempt++) {
+		if (ioctl(deviceFD, B_RAW_DEVICE_COMMAND, &raw_command) == 0) {
+			if (raw_command.scsi_status == 0 && raw_command.cam_status == 1) {
+				// SUCCESS!!!
+				DBG(dump_full_table_of_contents(buffer, buffer_length));
+				return B_OK;
+			} else {
+				error = B_FILE_ERROR;
+				TRACE(("%s: scsi ioctl succeeded, but scsi command failed\n",
+					kModuleDebugName));
+			}
 		} else {
-			error = B_FILE_ERROR;
-			TRACE(("%s: scsi ioctl succeeded, but scsi command failed\n",
-				kModuleDebugName));
+			error = errno;
+			TRACE(("%s: scsi command failed with error 0x%" B_PRIx32 "\n",
+				kModuleDebugName, error));
 		}
-	} else {
-		error = errno;
-		TRACE(("%s: scsi command failed with error 0x%" B_PRIx32 "\n",
-			kModuleDebugName, error));
 	}
 
 	return error;
-
 }
 
 
