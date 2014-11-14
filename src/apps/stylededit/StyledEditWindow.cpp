@@ -1331,6 +1331,15 @@ StyledEditWindow::_LoadAttrs()
 	if (documentNode.InitCheck() != B_OK)
 		return;
 
+	// info about position of caret may live in the file attributes
+	int32 position = 0;
+	if (documentNode.ReadAttr("be:caret_position", B_INT32_TYPE, 0,
+			&position, sizeof(position)) != sizeof(position))
+		position = 0;
+
+	fTextView->Select(position, position);
+	fTextView->ScrollToOffset(position);
+
 	BRect newFrame;
 	ssize_t bytesRead = documentNode.ReadAttr(kInfoAttributeName, B_RECT_TYPE,
 		0, &newFrame, sizeof(BRect));
@@ -1346,15 +1355,6 @@ StyledEditWindow::_LoadAttrs()
 		MoveTo(newFrame.left, newFrame.top);
 		ResizeTo(newFrame.Width(), newFrame.Height());
 	}
-
-	// info about position of caret may live in the file attributes
-	int32 position = 0;
-	if (documentNode.ReadAttr("be:caret_position", B_INT32_TYPE, 0,
-			&position, sizeof(position)) != sizeof(position))
-		position = 0;
-
-	fTextView->Select(position, position);
-	fTextView->ScrollToOffset(position);
 }
 
 
