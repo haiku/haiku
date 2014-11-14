@@ -239,7 +239,6 @@ AHCIPort::ResetDevice()
 }
 
 
-
 status_t
 AHCIPort::ResetPort(bool forceDeviceReset)
 {
@@ -366,10 +365,9 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 			B_PRIx32 ", is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", fIndex,
 			fCommandsActive, is, ci);
 
-		TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
-		TRACE("sctl 0x%08" B_PRIx32 "\n", fRegs->sctl);
-		TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
-		TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
+		TRACE("ssts 0x%08" B_PRIx32 ", sctl 0x%08" B_PRIx32 ", serr 0x%08"
+			B_PRIx32 ", sact 0x%08" B_PRIx32 "\n",
+			fRegs->ssts, fRegs->sctl, fRegs->serr, fRegs->sact);
 	}
 
 	// read and clear SError

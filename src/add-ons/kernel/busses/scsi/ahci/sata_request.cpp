@@ -126,10 +126,8 @@ sata_request::Finish(int tfd, size_t bytesTransfered)
 		uint8 error = (tfd >> 8) & 0xff;
 
 		if (!IsTestUnitReady()) {
-			dprintf("ahci: sata_request::finish ATA command 0x%02x failed\n",
-				fFis[2]);
-			dprintf("ahci: sata_request::finish status 0x%02x, error 0x%02x\n",
-				status, error);
+			dprintf("ahci: sata_request::finish ATA command 0x%02x failed:"
+				" status 0x%02x, error 0x%02x\n", fFis[2], status, error);
 		}
 	}
 
