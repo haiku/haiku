@@ -548,6 +548,12 @@ Volume::AllocateForInode(Transaction& transaction, const Inode* parent,
 status_t
 Volume::WriteSuperBlock()
 {
+	const char emptySector[512] = { 0 };
+	// also erase the first block, otherwise we risk mis-identifying the
+	// file system later (e.g. NTFS is identified by sector 0).
+	if (write_pos(fDevice, 0, emptySector, 512) != 512)
+		return B_IO_ERROR;
+	 
 	if (write_pos(fDevice, 512, &fSuperBlock, sizeof(disk_super_block))
 			!= sizeof(disk_super_block))
 		return B_IO_ERROR;
