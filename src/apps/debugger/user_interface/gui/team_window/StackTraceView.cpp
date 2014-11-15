@@ -115,7 +115,7 @@ struct StackTraceView::StackTraceKey {
 
 	uint32 HashValue() const
 	{
-		return (uint32)stackTrace;
+		return *(uint32*)stackTrace;
 	}
 
 	bool operator==(const StackTraceKey& other) const
