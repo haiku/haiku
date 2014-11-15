@@ -1,7 +1,7 @@
 1	polish	x-vnd.Haiku-Keymap	439384761
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Shift:
-Revert	Modifier keys window		Przywróć
+Revert	Modifier keys window		Cofnij
 Slovak	Keyboard Layout View		Słowacki
 Hungarian	Keyboard Layout View		Węgierski
 German	Keyboard Layout View		Niemiecki
@@ -38,7 +38,7 @@ Bulgarian (Phonetic)	Keyboard Layout View		Bułgarski (Fonetyczny)
 Dvorak (programmer's)	Keyboard Layout View		Dvorak (programisty)
 Estonian	Keyboard Layout View		Estoński
 Russian (Mac)	Keyboard Layout View		Rosyjski (Mac)
-Defaults	Keymap window		Domyślne
+Defaults	Keymap window		Przywróć domyślne
 Quit	Keymap window		Zakończ
 Dutch	Keyboard Layout View		Holenderski
 Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
@@ -91,7 +91,7 @@ Layout	Keymap window		Układ
 Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
 Albanian	Keyboard Layout View		Albański
 Right command	Keyboard Layout View		Prawy Command
-Revert	Keymap window		Przywróć
+Revert	Keymap window		Cofnij
 Command:	Modifier keys window	Command key role name	Polecenie:
 Latin-American	Keyboard Layout View		Latyno-amerykański
 Spanish (Dvorak)	Keyboard Layout View		Hiszpański (Dvoraka)
@@ -109,7 +109,7 @@ Num lock	Keyboard Layout View		Num Lock
 Swedish	Keyboard Layout View		Szwedzki
 Macedonian	Keyboard Layout View		Macedoński
 (Current)	Keymap window		(Bieżący)
-Font	Keymap window		Czcionka
+Font	Keymap window		Font
 Keymap	System name		Układ klawiatury
 French (Mac)	Keyboard Layout View		Francuski (Mac)
 Left shift	Keyboard Layout View		Lewy Shift

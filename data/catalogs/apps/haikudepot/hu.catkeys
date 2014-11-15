@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	6505552
+1	hungarian	x-vnd.Haiku-HaikuDepot	2403755872
 Name	PackageListView		Név
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
 Close	RatePackageWindow		Bezárás
@@ -91,6 +91,7 @@ Unstable but usable	RatePackageWindow		Instabil, de használható
 The email address appears to be malformed.	UserLoginWindow		Hibás az e-mail cím formátuma.
 Games	Model		Játékok
 Rating	PackageListView		Értékelés
+(%Votes%)	FeaturedPackagesView		(%Votes%)
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
 Graphics	Model		Grafika
 Local	MainWindow		Helyi
@@ -129,6 +130,7 @@ Show develop packages	MainWindow		Fejlesztői csomagok megjelenítése
 Category:	FilterView		Kategória:
 Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
 There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n
+Featured packages	MainWindow		Ajánlott csomagok
 Success	RatePackageWindow		Sikeres
 Business	Model		Üzleti
 Audio	Model		Audió

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	3974501098
+1	dutch; flemish	x-vnd.Haiku-Terminal	1484812094
 Not found.	Terminal TermWindow		Niet gevonden.
 Switch Terminals	Terminal TermWindow		Wissel van Terminal
 Change directory	Terminal TermView		Directory veranderen
@@ -13,7 +13,6 @@ The pattern specifying the current tab title. The following placeholders\ncan be
 Select all	Terminal TermWindow		Alles selecteren
 Close tab	Terminal TermWindow		De tab sluiten
 Save to file…	Terminal PrefWindow		Opslaan naar bestand...
-OK	Terminal PrefWindow		Oké
 Window title:	Terminal AppearancePrefView		Venstertitel:
 Font:	Terminal AppearancePrefView		Lettertype:
 Copy here	Terminal TermView		Hierheen kopiëren
@@ -38,14 +37,13 @@ Use selection	Terminal FindWindow		Gebruik selectie
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Het proces \"%1\" is nog gaande.\nAls u de tab sluit, zal het proces afgebroken worden.
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan \"%command\" niet uitvoeren:\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h,   --help   toon deze hulp\n-t,   --title   stel de venstertitel in\n-f,   --fullscreen   start in volledig scherm\n
-Full screen	Terminal TermWindow		Volledig scherm
 Window title…	Terminal TermWindow		Venstertitel...
+Full screen	Terminal TermWindow		Volledig scherm
 Page setup…	Terminal TermWindow		Paginaconfiguratie
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		De volgende processen zijn nog gaande:\n\n%1\n\nAls u Terminal sluit, zullen de processen afgebroken worden.
 Insert path	Terminal TermView		Voeg pad in
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui en Takashi Murai.\n\nGebruik: %s [OPTIE][SHELL]\n
 No search string was entered.	Terminal TermWindow		Er werd geen zoektekst ingevoerd.
-Don't save	Terminal PrefWindow		Niet opslaan
 Set window title	Terminal TermWindow		Venstertitel instellen
 Terminal	System name		Terminal
 Close other tabs	Terminal TermWindow		Andere tabs sluiten
@@ -67,7 +65,6 @@ Clear all	Terminal TermWindow		Alles wissen
 Text encoding	Terminal TermWindow		Tekstcodering
 size	Terminal TermView		grootte
 Close window	Terminal TermWindow		Venster sluiten
-Save as default	Terminal TermWindow		Opslaan als standaard
 Set tab title	Terminal TermWindow		De tabtitel instellen
 Settings…	Terminal TermWindow		Instellingen...
 Abort	Terminal Shell		Afbreken
@@ -86,10 +83,7 @@ Tab title:	Terminal TermWindow		Tabtitel:
 Find next	Terminal TermWindow		Volgende zoeken
 Close active tab	Terminal TermWindow		Het actieve tabblad sluiten
 Paste	Terminal TermWindow		Plakken
-Save changes to this settings panel?	Terminal PrefWindow		Wilt u de wijzigingen uit dit instellingenpaneel opslaan?
-Cancel	Terminal PrefWindow		Annuleren
 Shell 	Terminal TermWindow		Shell
-Save	Terminal PrefWindow		Opslaan
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDe huidige werkmap van het actieve proces.\n\t\t\tOptioneel kan het maximale aantal padonderdelen\n\t\tworden opgegeven. Bijvoorbeeld '%2d' voor maximaal 2 onderdelen.\n\t%i\t-\tDe index van de tab.\n\t%p\t-\tDe naam van het actieve proces.\n\t%%\t-\tHet karakter '%'.
 Cancel	Terminal TermView		Annuleren
 Use default	Terminal SetTitleWindow		De standaard gebruiken

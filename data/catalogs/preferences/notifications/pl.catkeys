@@ -2,7 +2,7 @@
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Wystąpił błąd podczas zapisywania ustawień.\nMożliwe, że kończy się miejsce na dysku.
 Notifications	GeneralView		Powiadomienia
 seconds of inactivity	GeneralView		sekund nieaktywności
-Revert	PrefletWin		Przywróć
+Revert	PrefletWin		Cofnij
 Mini icon	DisplayView		Mini ikona
 Enable notifications	GeneralView		Włącz powiadomienia
 Error	NotificationView		Błąd

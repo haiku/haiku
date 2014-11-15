@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	3250775475
+1	russian	x-vnd.Haiku-Terminal	761086471
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -15,7 +15,6 @@ The pattern specifying the current tab title. The following placeholders\ncan be
 Select all	Terminal TermWindow		Выделить всё
 Close tab	Terminal TermWindow		Закрыть вкладку
 Save to file…	Terminal PrefWindow		Сохранить в файл…
-OK	Terminal PrefWindow		ОК
 Window title:	Terminal AppearancePrefView		Заголовок окна:
 Font:	Terminal AppearancePrefView		Шрифт:
 Copy here	Terminal TermView		Копировать сюда
@@ -43,8 +42,8 @@ Use selection	Terminal FindWindow		Использовать выделенный
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете вкладку, то этот процесс будет уничтожен.
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Невозможно выполнить \"%command\":\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               вывести эту справку\n  -t,     --title              задать заголовок окна\n  -f,     --fullscreen         запустить во весь экран\n
-Full screen	Terminal TermWindow		На весь экран
 Window title…	Terminal TermWindow		Заголовок окна…
+Full screen	Terminal TermWindow		На весь экран
 Page setup…	Terminal TermWindow		Настройка печати…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Данные процессы все еще работают:\n\n\t%1\n\nЕсли вы закроете Терминал, то эти процессы будут уничтожены.
 Insert path	Terminal TermView		Вставить путь
@@ -52,7 +51,6 @@ Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a
 No search string was entered.	Terminal TermWindow		Не введена строка поиска
 Font size	Terminal TermWindow		Размер шрифта
 Blinking cursor	Terminal AppearancePrefView		Мигающий курсор
-Don't save	Terminal PrefWindow		Не сохранять
 Set window title	Terminal TermWindow		Установить заголовок окна
 Terminal	System name		Терминал
 Copy path	Terminal TermView		Скопировать путь
@@ -83,7 +81,6 @@ size	Terminal TermView		размер
 Close window	Terminal TermWindow		Закрыть окно
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%T\t-\tИмя приложения Терминал для текущей локали.\n\t%e\t-\tКодировка текущей вкладки. Для UTF-8 не отображается.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n\t%%\t-\tСимвол процента - '%'.
 Copy absolute path	Terminal TermView		Скопировать абсолютный адрес
-Save as default	Terminal TermWindow		Сохранить
 Set tab title	Terminal TermWindow		Переименовть вкладку
 Settings…	Terminal TermWindow		Настройки…
 Abort	Terminal Shell		Отменить
@@ -105,10 +102,7 @@ Tab title:	Terminal TermWindow		Заголовок вкладки:
 Find next	Terminal TermWindow		Найти далее
 Close active tab	Terminal TermWindow		Закрыть активную вкладку
 Paste	Terminal TermWindow		Вставить
-Save changes to this settings panel?	Terminal PrefWindow		Сохранить изменения в панели настроек?
-Cancel	Terminal PrefWindow		Отмена
 Shell 	Terminal TermWindow		Консоль 
-Save	Terminal PrefWindow		Сохранить
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%i\t-\tНомер вкладки.\n\t%p\t-\tНазвание активного процесса.\n\t%%\t-\tСимвол процента - '%'.
 Cancel	Terminal TermView		Отмена
 Use default	Terminal SetTitleWindow		По умолчанию

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Terminal	3734948558
+1	romanian	x-vnd.Haiku-Terminal	1245259554
 Not found.	Terminal TermWindow		Nu a fost găsit.
 Switch Terminals	Terminal TermWindow		Comută terminale
 Change directory	Terminal TermView		Modifică dosar
@@ -13,7 +13,6 @@ The pattern specifying the current tab title. The following placeholders\ncan be
 Select all	Terminal TermWindow		Selectează tot
 Close tab	Terminal TermWindow		Închide tab
 Save to file…	Terminal PrefWindow		Salvează în fișier...
-OK	Terminal PrefWindow		OK
 Window title:	Terminal AppearancePrefView		Titlu fereastră:
 Font:	Terminal AppearancePrefView		Font:
 Copy here	Terminal TermView		Copiază aici
@@ -37,14 +36,13 @@ Background	Terminal AppearancePrefView		Fundal
 Use selection	Terminal FindWindow		Utilizează selecție
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Procesul „%1” încă rulează.\nDacă închideți tabul, procesul va fi oprit.
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nu se poate executa „%command”:\n\t%error
-Full screen	Terminal TermWindow		Pe tot ecranul
 Window title…	Terminal TermWindow		Titlu fereastră...
+Full screen	Terminal TermWindow		Pe tot ecranul
 Page setup…	Terminal TermWindow		Configurări pagină...
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Următoarele procese încă rulează:\n\n\t%1\n\nDacă închideți Terminalul, procesele vor fi oprite.
 Insert path	Terminal TermView		Inserează cale
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nDrepturi de autor 2001-2009 Haiku, Inc.\nDrepturi de autor(C) 1999 Kazuho Okui și Takashi Murai.\n\nUtilizare: %s [OPȚIUNE] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Nu s-a introdus un șir de căutat.
-Don't save	Terminal PrefWindow		Nu salva
 Set window title	Terminal TermWindow		Setează titlu fereastră
 Terminal	System name		Terminal
 Close other tabs	Terminal TermWindow		Închide alte taburi
@@ -66,7 +64,6 @@ Clear all	Terminal TermWindow		Eliberează tot
 Text encoding	Terminal TermWindow		Codificare text
 size	Terminal TermView		dimensiune
 Close window	Terminal TermWindow		Închide fereastră
-Save as default	Terminal TermWindow		Salvează ca implicit
 Set tab title	Terminal TermWindow		Setează titlu tab
 Settings…	Terminal TermWindow		Configurări...
 Abort	Terminal Shell		Renunță
@@ -85,10 +82,7 @@ Tab title:	Terminal TermWindow		Titlu tab:
 Find next	Terminal TermWindow		Găsește următorul
 Close active tab	Terminal TermWindow		Închide tabul activ
 Paste	Terminal TermWindow		Lipește
-Save changes to this settings panel?	Terminal PrefWindow		Salvați modificările la acest panou de configurări?
-Cancel	Terminal PrefWindow		Anulează
 Shell 	Terminal TermWindow		Shell
-Save	Terminal PrefWindow		Salvează
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDosarul curent al procesului activ.\n\t\t\tPoate fi specificat opțional numărul maxim de componente\n\t\t\tale căii.Ex: „%2d” pentru cel mult două componente.\n\t%i\t-\tIndicele de tab.\n\t%p\t-\tNumele procesului activ.\n\t%%\t-\tCaracterul „%”.
 Cancel	Terminal TermView		Anulează
 Use default	Terminal SetTitleWindow		Utilizează implicit

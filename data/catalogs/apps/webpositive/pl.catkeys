@@ -6,17 +6,17 @@ Cancel	Settings Window		Anuluj
 Close window	WebPositive Window		Zamknij okno
 Quit	WebPositive		Zakończ
 The download could not be opened.	Download Window		Pobrania nie można otworzyć.
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Folderu pobierania nie można otworzyć\n\nError: %error
-Open location	WebPositive Window		Otwarcie położenia
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Nie można otworzyć katalogu pobierania.\n\nError: %error
+Open location	WebPositive Window		Otwórz położenie
 Clear history	WebPositive Window		Wyczyść historię
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Wczoraj
-Default standard font size:	Settings Window		Domyślny standardowy rozmiar czcionki:
+Default standard font size:	Settings Window		Domyślny rozmiar fontu standardowego:
 Start page:	Settings Window		Strona startowa:
 History	WebPositive Window		Historia
-Error opening downloads folder	Download Window		Błąd podczas otwierania folderu pobierania
+Error opening downloads folder	Download Window		Błąd podczas otwierania katalogu pobierania
 Paste	WebPositive Window		Wklej
-Double-click or middle-click to open new tab.	Tab Manager		Dwuklik lub przyciśnięcie  środkowego przycisku myszy spowoduje otworzenie nowej karty.
+Double-click or middle-click to open new tab.	Tab Manager		Dwuklik lub wciśnięcie środkowego przycisku myszy spowoduje otworzenie nowej karty.
 Proxy username:	Settings Window		Nazwa użytkownika serwera proxy:
 Save page as…	WebPositive Window		Zapisz stronę jako…
 Settings	Settings Window		Ustawienia
@@ -24,47 +24,47 @@ Settings	Settings Window		Ustawienia
 Confirmation	WebPositive Window		Potwierdzenie
 Window	WebPositive Window		Okno
 Decrease size	WebPositive Window		Zmniejsz wielkość
-Serif font:	Settings Window		Czcionka szeryfowa:
+Serif font:	Settings Window		Font szeryfowy:
 Loading %url	WebPositive Window		Ładowanie %url
 Download aborted	Download Window		Pobieranie przerwane
 Page source	WebPositive Window		Źródło strony
 Next	WebPositive Window		Następna
 Find next	WebPositive Window		Znajdź następne
-Download folder:	Settings Window		Folder pobierania:
-Edit	WebPositive Window		Edytuj
+Download folder:	Settings Window		Katalog pobierania:
+Edit	WebPositive Window		Edycja
 Over %hours hours left	Download Window		Zostało ponad %hours godzin
 Cancel	Authentication Panel		Anuluj
 Match case	WebPositive Window		Uwzględnij wielkość liter
 Search page:	Settings Window		Strona wyszukiwania:
 Zoom text only	WebPositive Window		Powiększaj tylko tekst
-Default fixed font size:	Settings Window		Domyślny rozmiar czcionki o stałej szerokości:
+Default fixed font size:	Settings Window		Domyślny rozmiar fontu o stałej szerokości:
 Close tab	WebPositive Window		Zamknij kartę
 Auto-hide mouse pointer	Settings Window		Auto-chowanie  wskaźnika myszy
 Over 1 hour left	Download Window		Została ponad 1 godzina
 Quit	WebPositive Window		Zakończ
 Full screen	WebPositive Window		Pełny ekran
 Open download error	Download Window		Otwórz błąd pobierania
-Standard font:	Settings Window		Czcionka standardowa:
+Standard font:	Settings Window		Font standardowy:
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Wyszukuje poprzednie wystąpienie tekstu
 Restart	Download Window		Uruchom ponownie
 Proxy server	Settings Window		Serwer proxy
-Open containing folder	Download Window		Otwórz folder zawierający
+Open containing folder	Download Window		Otwórz katalog zawierający
 New window	WebPositive Window		Nowe okno
 Open	Download Window		Otwórz
-Reload	WebPositive Window		Odśwież 
+Reload	WebPositive Window		Odśwież
 Downloads	Download Window		Pobierane
-Sans serif font:	Settings Window		Czcionka bezszeryfowa:
+Sans serif font:	Settings Window		Font bezszeryfowy:
 Over %days days left	Download Window		Zostało ponad %days dni
 Forward	WebPositive Window		Dalej
 of	Download Window	...as in '12kB of 256kB'	z
-Revert	Settings Window		Cofa dokonane zmiany
-Fixed font:	Settings Window		Czcionka o stałej szerokości:
+Revert	Settings Window		Cofnij
+Fixed font:	Settings Window		Font o stałej szerokości:
 Cut	WebPositive Window		Wytnij
 Bookmark this page	WebPositive Window		Dodaj zakładkę
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Wystąpił błąd podczas próby pokazania folderu zakładek.\n\nBłąd: %error
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Wystąpił błąd podczas próby pokazania katalogu zakładek.\n\nBłąd: %error
 Open downloads folder	Download Window		Otwórz folder pobierania
 Proxy password:	Settings Window		Hasło serwera proxy:
-Number of days to keep links in History menu:	Settings Window		Liczba dni przechowywania linków w historii:
+Number of days to keep links in History menu:	Settings Window		Liczba dni przechowywania odnośników w historii:
 Hide	Download Window		Ukryj
 Reset size	WebPositive Window		Resetuj rozmiar
 Find:	WebPositive Window		Znajdź:
@@ -79,8 +79,8 @@ Bookmark info	WebPositive Window		Informacje o zakładkach
 Size:	Font Selection view		Rozmiar:
 Show tabs if only one page is open	Settings Window		Pokaż karty, nawet jeśli tylko jedna strona jest otwarta
 About	WebPositive Window		O programie
-Finish: 	Download Window	Finishing time	Do zakończenia:
-Fonts	Settings Window		Czcionki
+Finish: 	Download Window	Finishing time	Do zakończenia: 
+Fonts	Settings Window		Fonty
 OK	Download Window		OK
 Page source error	WebPositive Window		Błąd strony źródłowej
 Open blank page	Settings Window		Otwórz pustą stronę
@@ -133,7 +133,7 @@ There was an error creating the bookmark file.\n\nError: %error	WebPositive Wind
 Bookmark error	WebPositive Window		Błąd zakładki
 Do you really want to clear the browsing history?	WebPositive Window		Na pewno chcesz wyczyścić całą historię przeglądania?
 Copy	WebPositive Window		Kopiuj
-Open bookmarks confirmation	WebPositive Window		Otwórz zatwierdzone zakładki
+Open bookmarks confirmation	WebPositive Window		Potwierdzenie otwarcia zakładek
 Remove missing	Download Window		Usuń brakujące
 Clone current page	Settings Window		Sklonuj bieżącą stronę
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Czy naprawdę chcesz otworzyć wszystkie zakładki %addedCount na raz?

@@ -2,15 +2,15 @@
 Memory usage	ProcessController		Użycie pamięci
 Kill this team!	ProcessController		Zakończ ten wątek!
 Idle priority	ProcessController		Priorytet bezczynności
-Restart Deskbar	ProcessController		Zrestartuj Deskbar
+Restart Deskbar	ProcessController		Zrestartuj Deskbara
 Custom priority	ProcessController		Własny priorytet
-This team is already gone…	ProcessController		Ten zespół nie jest już obecny…
+This team is already gone…	ProcessController		Ten zespół już zniknął…
 Error saving file	ProcessController		Błąd przy zapisywaniu pliku
 Real-time priority	ProcessController		Priorytet czasu rzeczywistego
 Power saving	ProcessController		Oszczędzanie energii
 Your setting file could not be saved!\n(%s)	ProcessController		Twój plik ustawień nie może być zapisany!\n(%s)
-What do you want to do with the team \"%s\"?	ProcessController		Co chcesz zrobić z  tym wątkiem \"%s\"?
-This thread is already gone…	ProcessController		Ten wątek nie jest już obecny…
+What do you want to do with the team \"%s\"?	ProcessController		Co chcesz zrobić z wątkiem „%s”?
+This thread is already gone…	ProcessController		Ten wątek już zniknął…
 Cancel	ProcessController		Anuluj
 Display priority	ProcessController		Priorytet wyświetlania
 Run in window	ProcessController		Uruchom w oknie
@@ -21,7 +21,7 @@ This is the last active processor...\nYou can't turn it off!	ProcessController		
 Info	ProcessController		Informacja
 Quit application	ProcessController		Zakończ aplikację
 Low priority	ProcessController		Niski priorytet
-What do you want to do with the thread \"%s\"?	ProcessController		Co chcesz zrobić z wątkiem \"%s\"?
+What do you want to do with the thread \"%s\"?	ProcessController		Co chcesz zrobić z wątkiem „%s”?
 Gone teams…	ProcessController		Brakujące zespoły…
 Lowest active priority	ProcessController		Najniższy aktywny priorytet
 Restart Tracker	ProcessController		Zrestartuj Trackera
@@ -33,7 +33,7 @@ New Terminal	ProcessController		Nowy terminal
 Urgent priority	ProcessController		Pilny priorytet
 About ProcessController…	ProcessController		O ProcessController…
 Ok!	ProcessController		Ok!
-Quit an application	ProcessController		Wyjdź z aplikacji
+Quit an application	ProcessController		Zakończ aplikację
 Install in Deskbar	ProcessController		Zainstaluj w Deskbarze
 Threads and CPU usage	ProcessController		Wątki oraz użycie CPU
 Urgent display priority	ProcessController		Pilny priorytet wyświetlania

@@ -15,7 +15,7 @@ Account name:	Config Views		Nazwa konta:
 Create new account	AutoConfigWindow		Utwórz nowe konto
 OK	Config Views		OK
 The filter could not be moved. Deleting filter.	Config Views		Filtr nie mógł zostać przesunięty. Usuwanie filtru.
-Revert	Config Window		Przywróć
+Revert	Config Window		Cofnij
 Login name:	E-Mail		Login:
 Incoming	E-Mail		Przychodzące
 Password:	E-Mail		Hasło:
@@ -33,7 +33,7 @@ Add	Config Window		Dodaj
 Account settings	AutoConfigWindow		Ustawienia konta
 E-mail	System name		E-mail
 never	Config Window	mail checking frequency	nigdy
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGlobalne ustawienia nie mogły zostać przywrócone.\n\nBłąd podczas przywracania globlnych ustawień:\n%s\n
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGlobalne ustawienia nie mogły zostać przywrócone.\n\nBłąd podczas przywracania globalnych ustawień:\n%s\n
 Real name:	Config Views		Prawdziwe imię:
 \t\t· Outgoing	Config Window		\t\t· Wychodzące
 Choose Protocol	E-Mail		Wybierz protokół

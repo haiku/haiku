@@ -1,11 +1,11 @@
 1	polish	x-vnd.Haiku-Touchpad	607725922
 Scrolling	TouchpadPrefView		Przewijanie
 Touchpad	System name		Touchpad
-Revert	TouchpadPrefView		Przywróć
+Revert	TouchpadPrefView		Cofnij
 Tapping	TouchpadPrefView		Stukanie
 Please confirm	TouchpadPrefView		Proszę potwierdź
 Two finger scrolling	TouchpadPrefView		Przewijanie dwoma palcami
-Defaults	TouchpadPrefView		Domyślne
+Defaults	TouchpadPrefView		Przywróć domyślne
 Slow	TouchpadPrefView		Wolno
 Vertical	TouchpadPrefView		Pionowe
 High	TouchpadPrefView		Wysoka

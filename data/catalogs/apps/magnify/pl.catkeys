@@ -1,21 +1,21 @@
 1	polish	x-vnd.Haiku-Magnify	2046693978
-no clip msg\n	In console, when clipboard is empty after clicking Copy image		no clip msg\n
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		schowek pusty\n
 Make square	Magnify-Main		Zrób kwadrat
 Copy image	Magnify-Main		Kopiuj obraz
 usage: magnify [size] (magnify size * size pixels)\n	Console		użycie: magnify [rozmiar] (rozmiar powiększenia * rozmiar piksela)\n
 Stick coordinates	Magnify-Main		Zablokuj współrzędne
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# piksel/piksel} few{# piksele/piksel} many{# pikseli/piksel} other{# piksela/piksel}}
-Hide/Show grid	Magnify-Main		Ukryj/Pokaż siatkę
+Hide/Show grid	Magnify-Main		Ukryj/pokaż siatkę
 magnify: size must be a multiple of 4\n	Console		magnify: rozmiar musi być wielokrotnością liczby 4\n
 Decrease pixel size	Magnify-Main		Zmniejsz rozmiar piksela
 Magnify	System name		Magnify
 Info	Magnify-Main		Informacje
 Remove a crosshair	Magnify-Main		Usuń celownik
-Freeze/Unfreeze image	Magnify-Main		Zamroź/odmroź obraz
-Hide/Show info	Magnify-Main		Ukryj/Pokaż informacje
+Freeze/Unfreeze image	Magnify-Main		Zablokuj/odblokuj obraz
+Hide/Show info	Magnify-Main		Ukryj/pokaż informacje
 Save image	Magnify-Main		Zapisz obraz
-Increase window size	Magnify-Main		Powiększ rozmiar okna
+Increase window size	Magnify-Main		Zwiększ rozmiar okna
 Decrease window size	Magnify-Main		Zmniejsz rozmiar okna
-Increase pixel size	Magnify-Main		Powiększ rozmiar piksela
+Increase pixel size	Magnify-Main		Zwiększ rozmiar piksela
   size must be > 4 and a multiple of 4\n	Console		  rozmiar musi być większy od 4 i być wielokrotnością liczby 4\n
 Add a crosshair	Magnify-Main		Dodaj celownik

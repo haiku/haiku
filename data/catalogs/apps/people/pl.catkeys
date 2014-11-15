@@ -1,14 +1,14 @@
 1	polish	x-vnd.Be-PEPL	2332202134
-Edit	People		Edytuj
+Edit	People		Edycja
 Error	People		Błąd
 City	People		Miasto
-The file '%name%' could not be written.	People		Plik '%name%' nie mógł zostać zapisany.
+The file '%name%' could not be written.	People		Plik „%name%” nie mógł zostać zapisany.
 none	Groups list		brak
 Configure attributes	People		Konfiguracja atrybutów
 Company	People		Firma
 %name% picture	People		%name% zdjęcie
 Work phone	People		Telefon do pracy
-People	System name		Osoby
+People	System name		Ludzie
 New person	People		Nowa osoba
 Select all	People		Zaznacz wszystkie
 File	People		Plik
@@ -18,22 +18,22 @@ Country	People		Kraj
 Close	People		Zamknij
 Group	People		Grupa
 Nickname	People		Pseudonim
-Quit	People		Wyjdź
+Quit	People		Zakończ
 Name	People		Imię i nazwisko
-Revert	People		Przywróć
+Revert	People		Cofnij
 Don't save	People		Nie zapisuj
 Undo	People		Cofnij
 E-mail	People		E-mail
 Load image…	People		Wczytaj obraz…
 OK	People		OK
 Remove image	People		Usuń obraz
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Uruchomienie prefletu FileTypes aby skonfigurować atrybuty Person nie powiodło się.\n\nBłąd: 
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Uruchomienie panelu FileTypes, aby skonfigurować atrybuty osoby nie powiodło się.\n\nBłąd: 
 Home phone	People		Telefon domowy
 Save as…	People		Zapisz jako…
 Redo	People		Powtórz
 Save changes before closing?	People		Czy zapisać zmiany przed zamknięciem?
 Paste	People		Wklej
-Drop an image here,\nor use the contextual menu.	People		Opuść obraz tutaj,\nlub użyj menu kontekstowego.
+Drop an image here,\nor use the contextual menu.	People		Upuść obraz tutaj\nlub użyj menu kontekstowego.
 Save	People		Zapisz
 Person	Short mimetype description		Osoba
 New person…	People		Nowa osoba…

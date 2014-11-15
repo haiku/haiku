@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	3250775475
+1	swedish	x-vnd.Haiku-Terminal	761086471
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -15,7 +15,6 @@ The pattern specifying the current tab title. The following placeholders\ncan be
 Select all	Terminal TermWindow		Markera allt
 Close tab	Terminal TermWindow		Stäng flik
 Save to file…	Terminal PrefWindow		Spara till fil...
-OK	Terminal PrefWindow		OK
 Window title:	Terminal AppearancePrefView		Fönstertitel:
 Font:	Terminal AppearancePrefView		Typsnitt:
 Copy here	Terminal TermView		Kopiera hit
@@ -43,8 +42,8 @@ Use selection	Terminal FindWindow		Använd markering
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger fliken kommer processen att termineras.
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan inte utföra "%command":\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               visa denna hjälp\n  -t,     --title             sätt tittel på fönstret\n  -f,     --fullscreen         starta i fullskärm\n
-Full screen	Terminal TermWindow		Helskärm
 Window title…	Terminal TermWindow		Fönstertitel...
+Full screen	Terminal TermWindow		Helskärm
 Page setup…	Terminal TermWindow		Sidinställningar...
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Följande processer körs fortfarande:\n\n\t%1\n\nOm du stänger Terminalen kommer processerna att termineras.
 Insert path	Terminal TermView		Lägg till sökväg
@@ -52,7 +51,6 @@ Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a
 No search string was entered.	Terminal TermWindow		Ingen söksträng angiven.
 Font size	Terminal TermWindow		Typsnittsstorlek
 Blinking cursor	Terminal AppearancePrefView		Blinkande markör
-Don't save	Terminal PrefWindow		Spara inte
 Set window title	Terminal TermWindow		Ange fönstertitel
 Terminal	System name		Terminal
 Copy path	Terminal TermView		Kopiera sökväg
@@ -83,7 +81,6 @@ size	Terminal TermView		storlek
 Close window	Terminal TermWindow		Stäng fönster
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDen aktiva processens arbetskatalog i denna tab.\n\t\t\Teller maximalt antal sökvägskomponenter\n\t\t\tkan anges som. '%2d' för som mest två komponenter.\n\t%T\t-\tTerminal programmets namn på det valda språket för Os:et.\n\t%e\t-\tEnkodingen av den valda tabben . Visad i UTF-8.\n\t%i\t-\tIndexet för fönstret.\n\t%p\t-\tNamnet på den aktiva processen i den valda tabben.\n\t%t\t-\tNamnet på den valda tabben.\n\t%%\t-\tTecknet '%'.
 Copy absolute path	Terminal TermView		Kopiera absolut sökväg
-Save as default	Terminal TermWindow		Spara som förvald
 Set tab title	Terminal TermWindow		Ange fliktitel
 Settings…	Terminal TermWindow		Inställningar...
 Abort	Terminal Shell		Avbryt
@@ -105,10 +102,7 @@ Tab title:	Terminal TermWindow		Fliktitel:
 Find next	Terminal TermWindow		Sök nästa
 Close active tab	Terminal TermWindow		Stäng aktiv flik
 Paste	Terminal TermWindow		Klistra in
-Save changes to this settings panel?	Terminal PrefWindow		Spara ändringar i denna inställningspanel?
-Cancel	Terminal PrefWindow		Avbryt
 Shell 	Terminal TermWindow		Skal
-Save	Terminal PrefWindow		Spara
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDen aktiva processens arbetskatalog.\n\t\t\tEtt maximalt antal sökvägsdelar kan anges\n\t\t\tT.ex. '%2d' för som mest två delar.\n\t%i\t-\tFliknummer.\n\t%p\t-\tDen aktiva processens namn.\n\t%%\t-\tTecknet '%'.
 Cancel	Terminal TermView		Avbryt
 Use default	Terminal SetTitleWindow		Använd förvald

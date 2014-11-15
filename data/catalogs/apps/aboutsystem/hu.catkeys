@@ -1,6 +1,7 @@
-1	hungarian	x-vnd.Haiku-About	1763787961
+1	hungarian	x-vnd.Haiku-About	2170341380
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 a Gutenprint szerzőitől. Minden jog fenntartva.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrechtnek (NewOS kernel)\n
+Ralink (firmware)	AboutWindow		Ralink (firmware)
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL és Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Minden jog fenntartva.
 %d MiB total	AboutView		%d MiB összesen
@@ -18,24 +19,32 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright© 199
 Source Code: 	AboutView		Forráskód: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processzor:} other{# processzor:}}
 Kernel:	AboutView		Kernel:
+BSD (4-clause)	AboutWindow		BSD (4-clause)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman és Daniel Veillard. Minden jog fenntartva.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		E szoftver része szerzői jog által védettek.\nSzerzői jog © 1996-2006 The FreeType Project. Minden jog fenntartva.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		A Haiku kódjának szerzői jogai a Haiku, Inc.-et vagy, ha nevük a forráskódban külön ki van emelve, a kód egyes íróit illetik. A Haiku® és a HAIKU logo® a Haiku, Inc. bejegyzett védjegye.\n\n
+Marvell (firmware)	AboutWindow		Marvell (firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nMinden jog fenntartva.
+GNU LGPL v2	AboutWindow		GNU LGPL v2
 The HaikuPorts team\n	AboutView		A HaikuPorts csapatának\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB összesen, %inaccessible MiB nem használható
+Intel (2xxx firmware)	AboutWindow		Intel (2xxx firmware)
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard és munkatársai.
 Contributors:\n	AboutView		Közreműködők:\n
 Unknown	AboutView		Ismeretlen
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expat üzemeltetők.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Project. Minden jog fenntartva.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Minden jog fenntartva.
+Public Domain	AboutWindow		Public Domain
+Intel (firmware)	AboutWindow		Intel (firmware)
+BSD (2-clause)	AboutWindow		BSD (2-clause)
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Memória:
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Minden jog fenntartva.
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Ez a szoftver részben a Independent JPEG Group munkáján alapszik.
 Past maintainers:\n	AboutView		Régebbi karbantartók:\n
+GNU GPL v3	AboutWindow		GNU GPL v3
 \n\nSpecial thanks to:\n	AboutView		\n\nKülön köszönet jár:\n
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… és a többi ember, akiket lehet elfelejtettünk megemlíteni (elnézést!)\n\n
 Licenses: 	AboutView		Licencek: 
@@ -49,6 +58,7 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		Elindítva:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Szoftvereket tartalmaz a NetBSD Foundation, Inc-től, és annak közreműködőitől:\nftp, tput\nSzerzői jog © 1996-2008 The NetBSD Foundation, Inc. Minden jog fenntartva.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Szoftvereket tartalmaz a FreeBSD Projecttől, melyek BSD licenc alatt jelentek meg:\ncal, ftpd, ping, telnet, telnetd, traceroute\nSzerzői jog © 1994-2008 The FreeBSD Project. Minden jog fenntartva.
+GNU GPL v2	AboutWindow		GNU GPL v2
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		A Google "Google Summer of Code" és "Google Code In" programjának\n
 The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Minden jog fenntartva.
@@ -64,6 +74,7 @@ The BeGeistert team\n	AboutView		A BeGeistert csapatának\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Az Aucklandi Egyetem és Christof Lutteroth\n\n
 Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratórium, Tokiói Egyetem.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Minden jog fenntartva.
+GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Copyright © 2002-2008 Alexander L. Roshal. Minden jog fenntartva.
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Minden jog fenntartva.
 %ld MHz	AboutView		%ld MHz
@@ -74,6 +85,8 @@ Contains software from the GNU Project, released under the GPL and LGPL licenses
 MIT license. All rights reserved.	AboutView		MIT licenc. Minden jog fenntartva.
 [Click a license name to read the respective license.]\n\n	AboutView		[Kattintson rá a licenc nevére az adott licenc megjelenítéséhez!]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Minden jog fenntartva.
+MIT (no promotion)	AboutWindow		MIT (nem promóciós)
+BSD (3-clause)	AboutWindow		BSD (3-clause)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Minden jog fenntartva.
 License: 	AboutView		Licenc:
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 Andy Ritger által, az Általános Időzítéses Formula (Generalized Timing Formula) alapján

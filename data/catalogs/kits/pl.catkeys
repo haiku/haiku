@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libbe	84010340
+1	polish	x-vnd.Haiku-libbe	1465036988
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -6,24 +6,25 @@ Written by:	AboutWindow		Napisany przez:
 About %app%	AboutMenuItem		O %app%
 Cut	TextView		Wytnij
 Version	AboutWindow		Wersja
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nie można stworzyć replikanta dla \"%description\".\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nie można stworzyć replikanta dla „%description”.\n%error
 Copy	TextView		Kopiuj
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d bajtów
 alpha	AboutWindow		alfa
 Error	PrintJob		Błąd
-No Pages to print!	PrintJob		Brak Stron do wydrukowania!
-All Rights Reserved.	AboutWindow		Wszelkie Prawa Zastrzeżone.
+No Pages to print!	PrintJob		Brak stron do wydrukowania!
+All Rights Reserved.	AboutWindow		Wszelkie prawa zastrzeżone.
 About %app%	AboutWindow		O %app%
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Zielony:
 Version history:	AboutWindow		Historia zmian:
 Remove replicant	Dragger		Usuń replikant
+OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
-Print Server is not responding.	PrintJob		Serwer Wydruku nie odpowiada.
+Print Server is not responding.	PrintJob		Serwer wydruku nie odpowiada.
 Paste	TextView		Wklej
-Special Thanks:	AboutWindow		Specjalne Podziękowania dla:
+Special Thanks:	AboutWindow		Specjalne podziękowania dla:
 %.2f TiB	StringForSize		%.2f TiB
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nie można zlokalizować aplikacji dla replikanta. Nie dostarczono podpisu aplikacji.\n%error
 Redo	TextView		Ponów

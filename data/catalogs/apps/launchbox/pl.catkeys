@@ -3,33 +3,33 @@ New	LaunchBox		Nowy
 Set description…	LaunchBox		Ustaw opis…
 Vertical layout	LaunchBox		Układ pionowy
 OK	LaunchBox		OK
-Pad 1	LaunchBox		Pad 1
+Pad 1	LaunchBox		Panel 1
 last chance	LaunchBox		ostatnia szansa
-Quit	LaunchBox		Wyjdź
+Quit	LaunchBox		Zakończ
 Open containing folder	LaunchBox		Otwórz katalog docelowy
 Clear button	LaunchBox		Wyczyść przycisk
 LaunchBox	System name		LaunchBox
 Ignore double-click	LaunchBox		Ignoruj dwuklik
-Auto-raise	LaunchBox		Auto-raise
+Auto-raise	LaunchBox		Autoaktywacja
 Show on all workspaces	LaunchBox		Pokaż na wszystkich przestrzeniach roboczych
 Show window border	LaunchBox		Pokaż obramowanie okna
-Pad	LaunchBox		Pad
-Icon size	LaunchBox		Rozmair ikony
-Bummer	LaunchBox		Bummer
+Pad	LaunchBox		Panel
+Icon size	LaunchBox		Rozmiar ikon
+Bummer	LaunchBox		Lipa
 Cancel	LaunchBox		Anuluj
 Remove button	LaunchBox		Usuń przycisk
 Horizontal layout	LaunchBox		Układ poziomy
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNie udało uruchomić się aplikacji z sygnaturą '%2'.\n\nBłąd:
-Failed to launch '%1'.\n\nError:	LaunchBox		Nie udało uruchomić się '%1'.\n\nBłąd:
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNie udało się uruchomić aplikacji z sygnaturą „%2”.\n\nBłąd:
+Failed to launch '%1'.\n\nError:	LaunchBox		Nie udało się uruchomić „%1”.\n\nBłąd:
 Name Panel	LaunchBox		Panel nazeweniczy
 Add button here	LaunchBox		Dodaj przycisk tutaj
-Description for '%3'	LaunchBox		Opis dla '%3'
+Description for '%3'	LaunchBox		Opis dla „%3”
 Settings	LaunchBox		Ustawienia
-Failed to launch 'something', error in Pad data.	LaunchBox		Nie udało uruchomić się "czegoś", błąd w danych Pad.
-Pad %1	LaunchBox		Pad %1
+Failed to launch 'something', error in Pad data.	LaunchBox		Nie udało się uruchomić „czegoś”, błąd w danych panelu.
+Pad %1	LaunchBox		Panel %1
 Close	LaunchBox		Zamknij
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Błąd przy wysyłaniu komendy 'open folder' do Trackera.\n\nBłąd: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Błąd przy wysyłaniu komendy „otwórz katalog” do Trackera.\n\nBłąd: 
 You can drag an icon here.	LaunchBox		Możesz upuścić ikonę w tym miejscu.
 Clone	LaunchBox		Klonuj
 launch popup	LaunchBox		uruchom pop-up
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Na pewno zamknąć ten pad?\n(Pad nie zostanie zapamiętany.)
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Na pewno zamknąć ten panel?\n(Nie zostanie on zapamiętany.)

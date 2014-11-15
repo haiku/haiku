@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Terminal	4180340162
+1	hindi	x-vnd.Haiku-Terminal	1690651158
 Not found.	Terminal TermWindow		नहीं मिला.
 Switch Terminals	Terminal TermWindow		स्विच टर्मिनल्स
 Change directory	Terminal TermView		निर्देशिका बदलें
@@ -12,7 +12,6 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		निका�
 Select all	Terminal TermWindow		सभी का चयन करें
 Close tab	Terminal TermWindow		टैब बंद करें
 Save to file…	Terminal PrefWindow		फ़ाइल सहेजें...
-OK	Terminal PrefWindow		ठीक है
 Window title:	Terminal AppearancePrefView		विंडो शीर्षक:
 Font:	Terminal AppearancePrefView		फ़ॉन्ट:
 Copy here	Terminal TermView		यहाँ प्रतिलिपि बनाएँ
@@ -34,12 +33,11 @@ OK	Terminal SetTitleWindow		ठीक है
 Background	Terminal AppearancePrefView		पृष्ठभूमि
 Use selection	Terminal FindWindow		चयन का प्रयोग करें
 Cannot execute \"%command\":\n\t%error	Terminal Shell		अमल नहीं कर सकते \"%command\" को:\n\t%error
-Full screen	Terminal TermWindow		पूर्ण स्क्रीन
 Window title…	Terminal TermWindow		विंडो शीर्षक...
+Full screen	Terminal TermWindow		पूर्ण स्क्रीन
 Page setup…	Terminal TermWindow		पृष्ठ सेटअप ...
 Insert path	Terminal TermView		पथ सम्मिलित करें
 No search string was entered.	Terminal TermWindow		कोई खोजने वाली स्ट्रिंग को दर्ज किया नहीं गया था.
-Don't save	Terminal PrefWindow		न सहेजें
 Set window title	Terminal TermWindow		विंडो शीर्षक सेट करें
 Terminal	System name		टर्मिनल
 Close other tabs	Terminal TermWindow		अन्य टैब बंद करें
@@ -59,7 +57,6 @@ Clear all	Terminal TermWindow		सब साफ़
 Text encoding	Terminal TermWindow		टेक्स्ट एंकोडिंग
 size	Terminal TermView		आकार
 Close window	Terminal TermWindow		विंडो बंद करें
-Save as default	Terminal TermWindow		डिफ़ॉल्ट रूप में सहेजें
 Set tab title	Terminal TermWindow		टैब शीर्षक सेट करें
 Settings…	Terminal TermWindow		सेटिंग्स...
 Abort	Terminal Shell		रद्द करें
@@ -77,9 +74,6 @@ Tab title:	Terminal TermWindow		टैब शीर्षक:
 Find next	Terminal TermWindow		आगे खोजें
 Close active tab	Terminal TermWindow		सक्रिय टैब बंद करें
 Paste	Terminal TermWindow		चिपकाना
-Save changes to this settings panel?	Terminal PrefWindow		इस सेटिंग्स पैनल में बदलाव सहेजें?
-Cancel	Terminal PrefWindow		रद्द
 Shell 	Terminal TermWindow		शेल 
-Save	Terminal PrefWindow		सहेजें
 Cancel	Terminal TermView		रद्द
 Use default	Terminal SetTitleWindow		डिफ़ॉल्ट का प्रयोग करें

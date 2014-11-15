@@ -1,5 +1,6 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2612937416
+1	russian	x-vnd.Haiku-HaikuDepot	3658663669
 Name	PackageListView		Имя
+Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
 Close	RatePackageWindow		Закрыть
 Changelog	PackageInfoView		История изменений
 Your rating:	RatePackageWindow		Ваш рейтинг:
@@ -7,6 +8,7 @@ The passwords do not match.	UserLoginWindow		Пароли не совпадаю�
 Log in…	MainWindow		Войти…
 Rate %Package%	RatePackageWindow		Оценить %Package%
 Stability:	RatePackageWindow		Стабильность:
+Show available packages	MainWindow		Показать доступные пакеты
 Click a package to view information	PackageInfoView		Нажмите на пакет, чтобы увидеть информацию о нем
 Other users can see this rating	RatePackageWindow		Другие пользователи могут видеть этот рейтинг
 Stability	RatePackageWindow		Стабильность
@@ -15,6 +17,7 @@ No changelog available.	PackageInfoView		История изменений не�
 Depot:	FilterView		Склад:
 Description	PackageListView		Описание
 Install	PackageManager		Установить
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Аккаунт был успешно создан. Теперь вы можете оценивать пакеты и делать другие полезные вещи.
 Tools	MainWindow		Инструменты
 HaikuDepot	System name		Склад
 Close	UserLoginWindow		Закрыть
@@ -33,6 +36,7 @@ Close	PackageManager		Закрыть
 Not logged in	MainWindow		Вход не выполнен
 The authentication was successful.	UserLoginWindow		Авторизация прошла успешно.
 Status	PackageListView		Статус
+Switch account…	MainWindow		Сменить аккаунт…
 Ignore	UserLoginWindow		Игнорировать
 Language	UserLoginWindow		Язык
 Rate package	RatePackageWindow		Оценить пакет
@@ -43,6 +47,7 @@ Log in	UserLoginWindow		Войти…
 Repeat pass phrase:	UserLoginWindow		Повторить пароль:
 Ratings	PackageInfoView		Оценки
 System & Utilities	Model		Система и утилиты
+Show installed packages	MainWindow		Показать установленные пакеты
 Inactive	PackageListView		Неактивный
 Refresh depots	MainWindow		Обновить склады
 Science & Mathematics	Model		Наука и математика
@@ -62,6 +67,7 @@ Does not start	RatePackageWindow		Не запускается
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Не удалось связаться с веб сервером.
 There are problems in the form:\n\n	UserLoginWindow		В этой форме присутствуют ощибки:\n\n
+Show source packages	MainWindow		Показать пакеты с исходным кодом
 Create account	UserLoginWindow		Создать учётную запись
 Productivity	Model		Офис
 Authentication failed	UserLoginWindow		Авторизация завершилась неудачно
@@ -76,6 +82,7 @@ Unstable but usable	RatePackageWindow		Нестабилен, но пригодн
 The email address appears to be malformed.	UserLoginWindow		Некорректный адрес электронной почты.
 Games	Model		Игры
 Rating	PackageListView		Оценка
+(%Votes%)	FeaturedPackagesView		(%Votes%)
 There was a puzzling response from the web service.	UserLoginWindow		Был получен странный ответ от веб сервера.
 Graphics	Model		Графика
 Local	MainWindow		Локальный
@@ -110,6 +117,7 @@ Send	RatePackageWindow		Отправить
 Show develop packages	MainWindow		Показать пакеты для разработчиков
 Category:	FilterView		Категория:
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
+Featured packages	MainWindow		Популярные пакеты
 Success	RatePackageWindow		Выполнено успешно
 Business	Model		Бизнес
 Audio	Model		Аудио

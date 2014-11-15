@@ -12,7 +12,7 @@ Adapter:	EthernetSettingsView		Karta sieciowa:
 Domain:	EthernetSettingsView		Domena:
 DNS list is invalid	EthernetSettingsView		Lista serwerów DNS jest nieprawidłowa
 Gateway is invalid	EthernetSettingsView		Adres bramy jest nieprawidłowy
-Revert	EthernetSettingsView		Przywróć
+Revert	EthernetSettingsView		Cofnij
 DNS Servers, comma-separated	EthernetSettingsView		Serwery DNS, oddzielone przecinkami
 <no wireless networks found>	EthernetSettingsView		<nie znaleziono żadnych sieci bezprzewodowych>
 Network	System name		Sieć

@@ -18,10 +18,10 @@ Numbers	TimeFormatSettings		Liczby
 OK	Locale Preflet Window		OK
 Restart	Locale Preflet Window		Restart
 Full format:	TimeFormatSettings		Pełny format:
-Defaults	Locale Preflet Window		Domyślne
+Defaults	Locale Preflet Window		Przywróć domyślne
 Cancel	Locale Preflet Window		Anuluj
 Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Tłumacz aplikacje i nazwy folderów w Deskbarze i Trackerze.
-Revert	Locale Preflet Window		Przywróć
+Revert	Locale Preflet Window		Cofnij
 Medium format:	TimeFormatSettings		Średni format:
 12 hour	TimeFormatSettings		12 godzinny
 Time	TimeFormatSettings		Czas

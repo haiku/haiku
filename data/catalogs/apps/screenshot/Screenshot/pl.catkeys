@@ -8,20 +8,20 @@ Capture active window	ScreenshotWindow		Przechwyć aktywne okno
 Cancel	ScreenshotWindow		Anuluj
 Name:	ScreenshotWindow		Nazwa:
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Ten plik już istnieje.\n Na pewno chcesz go nadpisać?
-Choose folder	ScreenshotWindow		Wybierz folder
+Choose folder	ScreenshotWindow		Wybierz katalog
 Save	ScreenshotWindow		Zapisz
 Overwrite	ScreenshotWindow		Nadpisz
-Choose folder...	ScreenshotWindow		Wybierz folder...
+Choose folder...	ScreenshotWindow		Wybierz katalog...
 Please select	ScreenshotWindow		Proszę wybrać
 Save as:	ScreenshotWindow		Zapisz jako:
 Copy to clipboard	ScreenshotWindow		Kopiuj do schowka
 Save in:	ScreenshotWindow		Zapisz w:
-screenshot	Screenshot	Base filename of screenshot files	screenshot
+screenshot	Screenshot	Base filename of screenshot files	zrzut_ekranu
 New screenshot	ScreenshotWindow		Nowy zrzut ekranu
-Artwork folder	ScreenshotWindow		Folder na obrazki
-Home folder	ScreenshotWindow		Folder domowy
+Artwork folder	ScreenshotWindow		Katalog na obrazki
+Home folder	ScreenshotWindow		Katalog domowy
 Settings…	ScreenshotWindow		Ustawienia…
 overwrite	ScreenshotWindow		nadpisz
 Delay:	ScreenshotWindow		Opóźnienie:
 Include mouse pointer	ScreenshotWindow		Pokaż wskaźnik myszy
-Translator Settings	ScreenshotWindow		Ustawienia Translatora
+Translator Settings	ScreenshotWindow		Ustawienia translatora

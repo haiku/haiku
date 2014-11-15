@@ -34,7 +34,7 @@ Chart	System name		Wykres
 Animation:	ChartWindow		Animacja:
 Frames/s	ChartWindow		Klatek/s
 Auto demo	ChartWindow		Auto demo
-CPU load	ChartWindow		Obciążenie CPU
+CPU load	ChartWindow		Obciążenie procesora
 DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Czerwony
 None	ChartWindow		Brak

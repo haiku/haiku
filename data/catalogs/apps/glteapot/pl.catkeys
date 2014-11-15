@@ -7,12 +7,12 @@ White	TeapotWindow		Biały
 Yellow	TeapotWindow		Żółty
 Blue	TeapotWindow		Niebieski
 Gouraud shading	TeapotWindow		Cieniowanie Gourauda
-Quit	TeapotWindow		Wyjdź
+Quit	TeapotWindow		Zakończ
 Filled polygons	TeapotWindow		Wypełnione wielokąty
 Settings	TeapotWindow		Ustawienia
 Fog	TeapotWindow		Mgła
 Backface culling	TeapotWindow		Usuwanie niewidocznych powierzchni
-Z-buffered	TeapotWindow		Buforowane Z
+Z-buffered	TeapotWindow		Z buforem głębi
 File	TeapotWindow		Plik
 Perspective	TeapotWindow		Perspektywa
 GLTeapot	System name		GLTeapot

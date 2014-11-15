@@ -1,9 +1,9 @@
 1	polish	x-vnd.Haiku-Fonts	4164233892
 Plain font:	Font view		Zwykła czcionka:
-Defaults	Main window		Domyślne
+Defaults	Main window		Przywróć domyślne
 OK	main		OK
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Czcionki\n\tCopyright 2004-2005, Haiku.\n\n
-Revert	Main window		Przywróć
+Revert	Main window		Cofnij
 Size:	Font Selection view		Rozmiar:
 Menu font:	Font view		Czcionka menu:
 Fixed font:	Font view		Stała czcionka:

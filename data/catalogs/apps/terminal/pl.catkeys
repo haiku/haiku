@@ -1,30 +1,29 @@
-1	polish	x-vnd.Haiku-Terminal	3250775475
+1	polish	x-vnd.Haiku-Terminal	761086471
 Not found.	Terminal TermWindow		Nie znaleziono.
-Switch Terminals	Terminal TermWindow		Przełącz Terminal
+Switch Terminals	Terminal TermWindow		Przełącz terminal
 Change directory	Terminal TermView		Zmień folder
 Cursor	Terminal AppearancePrefView		Kursor
 Professional	Terminal colors scheme		Profesjonalny
 OK	Terminal TermWindow		OK
-New Terminal	Terminal TermWindow		Nowy Terminal
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nie może uruchomić shella. Przepraszamy.
+New Terminal	Terminal TermWindow		Nowy terminal
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nie może uruchomić powłoki. Przepraszamy.
 Match case	Terminal FindWindow		Dopasuj wielkość liter
-Quit	Terminal TermWindow		Wyjdź
-Use default shell	Terminal Shell		Użyj domyślnego shella
+Quit	Terminal TermWindow		Zakończ
+Use default shell	Terminal Shell		Użyj domyślnej powłoki
 Confirm exit if active programs exist	Terminal AppearancePrefView		Potwierdź wyjście jeśli istnieją aktywne programy
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Wzór ustalający tytuł aktywnej karty. Następujące wyznaczniki\nmogą zostać użyte:\n
 Select all	Terminal TermWindow		Zaznacz wszystko
 Close tab	Terminal TermWindow		Zamknij kartę
-Save to file…	Terminal PrefWindow		Zapisz w pliku…
-OK	Terminal PrefWindow		OK
+Save to file…	Terminal PrefWindow		Zapisz do pliku…
 Window title:	Terminal AppearancePrefView		Tytuł okna:
-Font:	Terminal AppearancePrefView		Czcionka:
+Font:	Terminal AppearancePrefView		Font:
 Copy here	Terminal TermView		Kopiuj tutaj
 Really close?	Terminal TermWindow		Na pewno zamknąć?
 Copy	Terminal TermWindow		Kopiuj
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Color scheme:	Terminal AppearancePrefView		Schemat kolorów:
 Window title:	Terminal TermWindow		Tytuł okna:
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Nieznana opcja \"%s\"\n
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Nieznana opcja „%s”\n
 Blue	Terminal colors scheme		Niebieski
 Custom	Terminal colors scheme		Niestandardowe
 %app% settings	Terminal PrefWindow	window title	Ustawienia %app%
@@ -40,19 +39,18 @@ The pattern specifying the window titles. The following placeholders\ncan be use
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Tło
 Use selection	Terminal FindWindow		Użyj zaznaczenia
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces \"%1\" jest wciąż w użyciu.\nJeśli zamkniesz kartę, proces zostanie zatrzymany.
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Nie można wykonać \"%command\":\n\t%error
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces „%1” jest wciąż w użyciu.\nJeśli zamkniesz kartę, proces zostanie zatrzymany.
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Nie można wykonać „%command”:\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               wyświetlenie tego tekstu pomocy\n  -t,     --title              zmiana tytułu okna\n  -f,     --fullscreen         tryb pełnoekranowy\n
-Full screen	Terminal TermWindow		Pełny ekran
 Window title…	Terminal TermWindow		Tytuł okna…
+Full screen	Terminal TermWindow		Pełny ekran
 Page setup…	Terminal TermWindow		Ustawienia strony…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Następujące procesy są wciąż w użyciu:\n\n\t%1\n\nJeśli zamkniesz terminal, te procesy zostaną zatrzymane.
 Insert path	Terminal TermView		Wstaw ścieżkę
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui i Takashi Murai.\n\nUżycie: %s [OPTION] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Nie podano ciągu znaków do wyszukania.
-Font size	Terminal TermWindow		Rozmiar czcionki
+Font size	Terminal TermWindow		Rozmiar fontu
 Blinking cursor	Terminal AppearancePrefView		Migający kursor
-Don't save	Terminal PrefWindow		Nie zapisuj
 Set window title	Terminal TermWindow		Ustaw tytuł okna
 Terminal	System name		Terminal
 Copy path	Terminal TermView		Kopiuj ścieżkę
@@ -61,7 +59,7 @@ Match word	Terminal FindWindow		Dopasuj słowo
 Nothing is selected.	Terminal TermWindow		Nic nie jest zaznaczone.
 Text not found.	Terminal TermWindow		Tekst nie znaleziony.
 Find…	Terminal TermWindow		Znajdź…
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" jest wciąż w użyciu.\nJeśli zamkniesz terminal, proces zostanie zatrzymany.
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces „%1” jest wciąż w użyciu.\nJeśli zamkniesz terminal, proces zostanie zatrzymany.
 Move here	Terminal TermView		Przenieś tutaj
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Błąd!
@@ -83,12 +81,11 @@ size	Terminal TermView		rozmiar
 Close window	Terminal TermWindow		Zamknij okno
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tBieżący katalog roboczy dla aktywnego procesu w bieżącej \n\t\t\tzakładce.  Ocjonalnie może być określona maksymalna \n\t\t\tliczba elementów ścieżki, np. '%2d' dla co najmnie dwóch elementów.\n\t%T\t-\tNszwa aplikacji Terminala przy obecnych ustawieniach językowych.\n\t%e\t-\tKodowanie znaków obecnej zakładki. Puste, jeśli kodowaniem \n\t\t\tjest UTF-8.\n\t%i\t-\tnr okna.\n\t%p\t-\tNazwa aktywnego procesu w bieżącej zakładce.\n\t%t\t-\tTytuł obecnej zakładki.\n\t%%\t-\tZnak '%'.
 Copy absolute path	Terminal TermView		Kopiuj ścieżkę absolutną
-Save as default	Terminal TermWindow		Zapisz jako domyślne
 Set tab title	Terminal TermWindow		Ustaw tytuł karty
 Settings…	Terminal TermWindow		Ustawienia…
 Abort	Terminal Shell		Anuluj
 Open link	Terminal TermView		Otwórz odnośnik
-Edit	Terminal TermWindow		Edytuj
+Edit	Terminal TermWindow		Edycja
 Color:	Terminal AppearancePrefView		Kolor:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Wzór ustalający tytuł okna. Następujące wyznaczniki\nmogą zostać użyte:\n
 Print	Terminal TermWindow		Drukuj
@@ -105,10 +102,7 @@ Tab title:	Terminal TermWindow		Tytuł karty:
 Find next	Terminal TermWindow		Znajdź następny
 Close active tab	Terminal TermWindow		Zamknij aktywną kartę
 Paste	Terminal TermWindow		Wklej
-Save changes to this settings panel?	Terminal PrefWindow		Zapisać zmiany w tym panelu?
-Cancel	Terminal PrefWindow		Anuluj
 Shell 	Terminal TermWindow		Shell 
-Save	Terminal PrefWindow		Zapisz
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tŚcieżka dostępu do aktywnych procesów.\n\t\t\tOpcjonalnie maksymalna liczba komponentów ścieżek która może zostać\n\t\t\tustalona. Np. '%2d' dla najwyżej dwóch komponentów.\n\t%i\t-\tIndex karty.\n\t%p\t-\tNazwa aktywnego procesu.\n\t%%\t-\tZnak '%'.
 Cancel	Terminal TermView		Anuluj
 Use default	Terminal SetTitleWindow		Użyj domyślnych

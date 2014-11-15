@@ -6,7 +6,7 @@ OK	SudokuWindow		OK
 New	SudokuWindow		Nowy
 Abort	ProgressWindow		Przerwij
 Sudoku	System name		Sudoku
-Could not open \"%s\":\n%s\n	SudokuWindow		Nie można otworzyć \"%s\":\n%s\n
+Could not open \"%s\":\n%s\n	SudokuWindow		Nie można otworzyć „%s”:\n%s\n
 Easy	SudokuWindow		Łatwy
 Open file…	SudokuWindow		Otwórz plik…
 Solve single field	SudokuWindow		Rozwiąż pojedyncze pole

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	6505552
+1	finnish	x-vnd.Haiku-HaikuDepot	2403755872
 Name	PackageListView		Nimi
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
 Close	RatePackageWindow		Sulje
@@ -91,6 +91,7 @@ Unstable but usable	RatePackageWindow		Epävakaa, mutta käyttökelpoinen
 The email address appears to be malformed.	UserLoginWindow		Sähköpostiosoite on vääränmuotoinen.
 Games	Model		Pelit
 Rating	PackageListView		Arvosana
+(%Votes%)	FeaturedPackagesView		(%Votes%)
 There was a puzzling response from the web service.	UserLoginWindow		Webbipalvelun vastaus oli pulmallinen.
 Graphics	Model		Grafiikka
 Local	MainWindow		Paikallinen
@@ -129,6 +130,7 @@ Show develop packages	MainWindow		Näytä kehityspakkaukset
 Category:	FilterView		Luokka:
 Failed to create account	UserLoginWindow		Tilin luominen epäonnistui
 There are problems with the data you entered:\n\n	UserLoginWindow		Syöttämissäsi tiedoissa oli pulmia:\n\n
+Featured packages	MainWindow		Mainostetut pakkaukset
 Success	RatePackageWindow		Onnistui
 Business	Model		Yritys
 Audio	Model		Ääni

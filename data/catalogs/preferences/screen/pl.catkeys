@@ -4,7 +4,7 @@ Use laptop panel:	Screen		Użyj ekranu laptopa:
 15 bits/pixel, 32768 colors	Screen		15 bitów/piksel, 32768 kolorów
 /other…	Screen		/inne…
 16 bits/pixel, 65536 colors	Screen		16 bitów/piksel, 65536 kolorów
-Revert	Screen		Przywróć
+Revert	Screen		Cofnij
 Swap displays:	Screen		Zamień wyświetlacze:
 Combine displays:	Screen		Połącz wyświetlacze:
 Done	Screen		Gotowe
@@ -35,7 +35,7 @@ horizontally	Screen		poziomo
 Other…	Screen		Inne…
 Cancel	Screen		Anuluj
 bits/pixel	Screen		bitów/piksel
-Settings will revert in %seconds seconds.	Screen		Ustawienia zostaną przywrócone w ciągu %seconds sekund.
+Settings will revert in %seconds seconds.	Screen		Ustawienia zostaną cofnięte w ciągu %seconds sekund.
 Refresh rate:	Screen		Częstotliwość odświeżania:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Czy chcesz zachować te ustawienia?

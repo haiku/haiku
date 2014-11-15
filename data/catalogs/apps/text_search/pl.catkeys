@@ -1,12 +1,12 @@
 1	polish	x-vnd.Haiku.TextSearch	2496563907
-%s: Not enough room to escape the filename.	Grepper		%s: Nie wystarczająca ilość miejsca do zaeskejpowania nazwy pliku.
+%s: Not enough room to escape the filename.	Grepper		%s: Niewystarczająca ilość miejsca do wyprowadzenia nazwy pliku.
 Trim to selection	GrepWindow		Zredukuj do zawartości
-Follow symbolic links	GrepWindow		Podążaj za linkami symbolicznymi
+Follow symbolic links	GrepWindow		Podążaj za dowiązaniami symbolicznymi
 Close	GrepWindow		Zamknij
 Cancel	GrepWindow		Anuluj
 The unselected files will be removed from the list.	GrepWindow		Niezaznaczone pliki zostaną usunięte z listy.
 Set target…	GrepWindow		Ustaw cel…
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Wybierz pliki które chcesz by zostały zaznaczone na Trackerze.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Wybierz pliki które chcesz zaznaczyć w Trackerze.
 Open files in Pe	GrepWindow		Otwórz pliki w Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		Kopiuj tekst do schowka
@@ -18,7 +18,7 @@ Skip folders starting with a dot	GrepWindow		Pomiń foldery zaczynające się od
 Escape search text	GrepWindow		Wyszukiwanie znaków wyjścia
 Search	GrepWindow		Szukaj
 Open selection	GrepWindow		Otwarte zaznaczenie
-Look in sub-folders	GrepWindow		Szukaj w sub-folderach
+Look in sub-folders	GrepWindow		Szukaj w podkatalogach
 Actions	GrepWindow		Akcje
 File	GrepWindow		Plik
 Encoding	GrepWindow		Kodowanie
@@ -27,9 +27,9 @@ History	GrepWindow		Historia
 New window	GrepWindow		Nowe okno
 Please select the files you wish to keep searching.	GrepWindow		Wybierz pliki dla których chcesz kontynuować wyszukiwanie.
 TextSearch	GrepWindow		TextSearch
-Quit	GrepWindow		Wyjdź
-Show files in Tracker	GrepWindow		Pokaż pliki na Trackerze
-Case-sensitive	GrepWindow		Wielkość liter ma znaczenie
+Quit	GrepWindow		Zakończ
+Show files in Tracker	GrepWindow		Pokaż pliki w Trackerze
+Case-sensitive	GrepWindow		Uwzględnij wielkość liter
 Text files only	GrepWindow		Tylko pliki tekstowe
 Show lines	GrepWindow		Pokaż linie
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

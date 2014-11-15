@@ -1,6 +1,7 @@
-1	japanese	x-vnd.Haiku-About	1763787961
+1	japanese	x-vnd.Haiku-About	2170341380
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint の著者たち. All rights reserved.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n
+Ralink (firmware)	AboutWindow		Ralink (ファームウェア)
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. All rights reserved.
 %d MiB total	AboutView		合計 %d MiB
@@ -18,24 +19,32 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 19
 Source Code: 	AboutView		ソースコード:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{# プロセッサ:} other{# プロセッサ:}}
 Kernel:	AboutView		カーネル:
+BSD (4-clause)	AboutWindow		BSD (四条項)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		このソフトウェアの一部は著作権下にあります。 \nCopyright © 1996-2006 The FreeType Project. All rights reserved.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haikuのコードの著作権はHaiku, Inc.または各ソースコードに明示された個々の著者に帰属します。Haiku®およびHAIKUロゴ・マーク®はHaiku, Inc.の(登録)商標です。\n\n
+Marvell (firmware)	AboutWindow		Marvell (ファームウェア)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.
+GNU LGPL v2	AboutWindow		GNU LGPL v2
 The HaikuPorts team\n	AboutView		HaikuPorts チーム\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		合計 %total MiB / %inaccessible MiB アクセス不可
+Intel (2xxx firmware)	AboutWindow		Intel (2xxx ファームウェア)
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard他.
 Contributors:\n	AboutView		その他の貢献者:\n
 Unknown	AboutView		不明
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expatのメンテナたち.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. All rights reserved.
+Public Domain	AboutWindow		パブリックドメイン
+Intel (firmware)	AboutWindow		Intel (ファームウェア)
+BSD (2-clause)	AboutWindow		BSD (二条項)
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		メモリ:
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. All rights reserved.
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. このソフトウェアの一部はIndependent JPEG Groupの著作物に基づいています.
 Past maintainers:\n	AboutView		過去のメンテナー\n
+GNU GPL v3	AboutWindow		GNU GPL v3
 \n\nSpecial thanks to:\n	AboutView		\n\n下記の協力者の方々に深く感謝します:\n
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…おそらく、ここに記載し忘れた方々もいることでしょう (すみません!)\n\n
 Licenses: 	AboutView		ライセンス:
@@ -49,6 +58,7 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		稼動時間:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		次のソフトウェアはNetBSD Foundation, Inc.およびその貢献者らにより開発されたソフトウェアを含みます:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		次のソフトウェアはFreeBSD Projectで開発され、BSDライセンスで公開されているソフトウェアを含みます:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.
+GNU GPL v2	AboutWindow		GNU GPL v2
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google および彼らの Google Summer of Code と Google Code In プログラム\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.
@@ -64,6 +74,7 @@ The BeGeistert team\n	AboutView		BeGeistert チーム\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Auckland 大学 および Christof Lutteroth\n\n
 Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 東京大学和田研究室.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. All rights reserved.
+GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. All rights reserved.
 %ld MHz	AboutView		%ld MHz
@@ -74,6 +85,8 @@ Contains software from the GNU Project, released under the GPL and LGPL licenses
 MIT license. All rights reserved.	AboutView		MITライセンス. All rights reserved.
 [Click a license name to read the respective license.]\n\n	AboutView		「各ライセンスを表示するには、ライセンス名をクリックしてください。」\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. All rights reserved.
+MIT (no promotion)	AboutWindow		MIT (promotion 無し)
+BSD (3-clause)	AboutWindow		BSD (三条項)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. All rights reserved.
 License: 	AboutView		ライセンス:
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 by Andy Ritger based on the Generalized Timing Formula

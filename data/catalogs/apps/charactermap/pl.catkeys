@@ -25,7 +25,7 @@ Ol Chiki	UnicodeBlocks		Ol Chiki
 Arabic	UnicodeBlocks		Arabski
 Ethiopic extended	UnicodeBlocks		Rozszerzony etiopski
 Arrows	UnicodeBlocks		Strzałki
-Font	CharacterWindow		Czcionka
+Font	CharacterWindow		Font
 Variation selectors supplement	UnicodeBlocks		Dodatkowe przełączniki wariantów glifów
 Gujarati	UnicodeBlocks		Gudżarati
 Cuneiform	UnicodeBlocks		Pismo klinowe
@@ -71,7 +71,7 @@ Latin extended C	UnicodeBlocks		Rozszerzony łaciński C
 Ancient smbols	UnicodeBlocks		Symbole starożytne
 Bopomofo extended	UnicodeBlocks		Rozszerzone bopomofo
 Lycian	UnicodeBlocks		Licyjsjki
-Font size:	CharacterWindow		Rozmiar czcionki:
+Font size:	CharacterWindow		Rozmiar fontu:
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Etiopski
 Bengali	UnicodeBlocks		Bengalski

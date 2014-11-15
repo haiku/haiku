@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	6505552
+1	german	x-vnd.Haiku-HaikuDepot	2403755872
 Name	PackageListView		Name
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
 Close	RatePackageWindow		Schließen
@@ -91,6 +91,7 @@ Unstable but usable	RatePackageWindow		Instabil aber brauchbar
 The email address appears to be malformed.	UserLoginWindow		Das Format der angegebenen E-Mail-Adresse ist fehlerhaft.
 Games	Model		Spiele
 Rating	PackageListView		Bewertung
+(%Votes%)	FeaturedPackagesView		(%Votes%)
 There was a puzzling response from the web service.	UserLoginWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
 Graphics	Model		Grafik
 Local	MainWindow		Lokal
@@ -129,6 +130,7 @@ Show develop packages	MainWindow		Entwickler-Pakete anzeigen
 Category:	FilterView		Kategorie:
 Failed to create account	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden
 There are problems with the data you entered:\n\n	UserLoginWindow		Mit den eingegebenen Daten gab es Probleme:\n\n
+Featured packages	MainWindow		Empfohlene Pakete
 Success	RatePackageWindow		Erfolg
 Business	Model		Geschäft
 Audio	Model		Audio

@@ -25,10 +25,10 @@ OK	PoorMan		OK
 Status: Stopped	PoorMan		Status: Wyłączony
 Dir Created	PoorMan		Katalog utworzono
 Log to file	PoorMan		Loguj do pliku
-Quit	PoorMan		Wyjdź
+Quit	PoorMan		Zakończ
 Hits: 0	PoorMan		Odsłon: 0
 Save log console	PoorMan		Zapisz log konsoli
-Edit	PoorMan		Edytuj
+Edit	PoorMan		Edycja
 Create Log File	PoorMan		Utwórz plik log
 Log to console	PoorMan		Loguj do konsoli
 Directory: (none)	PoorMan		Folder: (brak)
@@ -60,7 +60,7 @@ Site	PoorMan		Strona
 Cancel	PoorMan		Anuluj
 Console logging	PoorMan		Logowanie w konsoli
 Cannot start the server	PoorMan		Nie można uruchomić serwera
-Select	PoorMan		Zaznacz
+Select	PoorMan		Wybierz
 Save console as…	PoorMan		Zapisz konsolę jako…
 PoorMan	System name		PoorMan
 Console Logging	PoorMan		Logowanie w konsoli

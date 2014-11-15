@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	3250775475
+1	finnish	x-vnd.Haiku-Terminal	761086471
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -15,7 +15,6 @@ The pattern specifying the current tab title. The following placeholders\ncan be
 Select all	Terminal TermWindow		Valitse kaikki
 Close tab	Terminal TermWindow		Sulje välilehti
 Save to file…	Terminal PrefWindow		Tallenna tiedostoon…
-OK	Terminal PrefWindow		Valmis
 Window title:	Terminal AppearancePrefView		Ikkunaotsikko:
 Font:	Terminal AppearancePrefView		Kirjasintyyppi:
 Copy here	Terminal TermView		Kopioi tänne
@@ -43,8 +42,8 @@ Use selection	Terminal FindWindow		Käyttövalinta
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Prosessia ”%1” suoritetaan yhä.\nJos suljet välilehden, prosessi tapetaan.
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Ei voida suorittaa komentoa ”%command”:\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               tulosta tämä opaste\n  -t,     --title              aseta ikkunaotsikko\n  -f,     --fullscreen         käynnistä kokoruutunäyttö\n
-Full screen	Terminal TermWindow		Kokoruutunäyttö
 Window title…	Terminal TermWindow		Ikkunaotsikko...
+Full screen	Terminal TermWindow		Kokoruutunäyttö
 Page setup…	Terminal TermWindow		Sivuasetus...
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Seuraavia prosesseja suoritetaan edelleen:\n\n\t%1\n\nJos suljet Pääteikkunan, prosessit tapetaan.
 Insert path	Terminal TermView		Lisää polku
@@ -52,7 +51,6 @@ Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a
 No search string was entered.	Terminal TermWindow		Hakumerkkijono ei kirjoitettu.
 Font size	Terminal TermWindow		Kirjasinkoko
 Blinking cursor	Terminal AppearancePrefView		Vilkkuva kohdistin
-Don't save	Terminal PrefWindow		Älä tallenna
 Set window title	Terminal TermWindow		Aseta ikkunaotsikko
 Terminal	System name		Pääteikkuna
 Copy path	Terminal TermView		Kopioi polku
@@ -83,7 +81,6 @@ size	Terminal TermView		koko
 Close window	Terminal TermWindow		Sulje ikkuna
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktiivin prosessin työhakemisto nykyisessä\n\t\t\tvälilehdessä. Valinnaisesti voidaan määritellä polkukompo-\n\t\t\tnenttien enimmäismäärä. Esim.: '%2d' useimmille kahdelle komponentille.\n\t%T\t-\tPääteikkunasovelluksen nimi nykyiselle paikallisasetukselle.\n\t%e\t-\tNykyisen välilehden koodaus. Ei näytetä, jos koodaus on UTF-8.\n\t%i\t-\tIkkunan indeksi.\n\t%p\t-\tAktiivin prosessin nimi nykyisessä välilehdessä.\n\t%t\t-\tNykyisen välilehden otsikko.\n\t%%\t-\tKirjain '%'.
 Copy absolute path	Terminal TermView		Kopioi absoluuttinen polku
-Save as default	Terminal TermWindow		Tallenna oletuksena
 Set tab title	Terminal TermWindow		Aseta välilehtiotsikko
 Settings…	Terminal TermWindow		Asetukset...
 Abort	Terminal Shell		Keskeytä
@@ -105,10 +102,7 @@ Tab title:	Terminal TermWindow		Välilehtiotsikko:
 Find next	Terminal TermWindow		Löydä seuraava
 Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
 Paste	Terminal TermWindow		Liitä
-Save changes to this settings panel?	Terminal PrefWindow		Tallennetaan muutokset tähän asetuspaneeliin?
-Cancel	Terminal PrefWindow		Peru
 Shell 	Terminal TermWindow		Komentoikkuna
-Save	Terminal PrefWindow		Tallenna
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tKäynnissä olevan prosessin nykyinen työhakemisto.\n\t\t\tValinnaisesti määriteltävien polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: ’%2d’ kahdelle yleisimmälle komponentille.\n\t%i\t-\tVälilehden indeksi.\n\t%p\t-\tKäytössä olevan prosessin nimi.\n\t%%\t-\tMerkki ’%’.
 Cancel	Terminal TermView		Peru
 Use default	Terminal SetTitleWindow		Käytä oletusta

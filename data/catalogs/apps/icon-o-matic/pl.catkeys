@@ -98,7 +98,7 @@ Add Transformer	Icon-O-Matic-AddTransformersCmd		Dodanie transformatora
 Remove	Icon-O-Matic-PathsList		Usuń
 Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Przesunięcie punktu kontrolnego
 Pick a color	Icon-O-Matic-ColorPicker		Wybierz kolor
-Quit	Icon-O-Matic-Menu-File		Wyjdź
+Quit	Icon-O-Matic-Menu-File		Zakończ
 Export	Icon-O-Matic-Menu-File		Eksportuj
 No	Icon-O-Matic-StyledTextImport		Nie
 Rotate indices forwards	Icon-O-Matic-PathsList		Obróć indeksy do przodu
@@ -155,7 +155,7 @@ Add	Icon-O-Matic-PathsList		Dodaj
 Add Shapes	Icon-O-Matic-AddShapesCmd		Dodanie kształtu
 Move Style	Icon-O-Matic-MoveStylesCmd		Przesunięcie stylu
 Bummer	Cancel button - error alert		Klops
-Snap to grid	Icon-O-Matic-Menu-Settings		Przyciągaj do siatki
+Snap to grid	Icon-O-Matic-Menu-Settings		Przyciąganie do siatki
 Remove	Icon-O-Matic-ShapesList		Usuń
 Yes	Icon-O-Matic-StyledTextImport		Tak
 Transformation	Icon-O-Matic-TransformersList		Transformacja
@@ -163,7 +163,7 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Dodanie stylów
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Usunięcie punktów kontrolnych
 Format	Icon-O-Matic-SavePanel		Format
 Add rect	Icon-O-Matic-PathsList		Dodaj prostokąt
-Edit	Icon-O-Matic-Menus		Edytuj
+Edit	Icon-O-Matic-Menus		Edycja
 Duplicate	Icon-O-Matic-StylesList		Duplikuj
 Caps	Icon-O-Matic-PropertyNames		Nasadka
 Transform	Icon-O-Matic-PathManipulator		Przekształć

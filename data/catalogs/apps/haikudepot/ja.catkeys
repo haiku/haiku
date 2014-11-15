@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	6505552
+1	japanese	x-vnd.Haiku-HaikuDepot	2403755872
 Name	PackageListView		名前
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 Close	RatePackageWindow		閉じる
@@ -91,6 +91,7 @@ Unstable but usable	RatePackageWindow		不安定であるが有用
 The email address appears to be malformed.	UserLoginWindow		メールアドレスが不正なようです。
 Games	Model		ゲーム
 Rating	PackageListView		評価
+(%Votes%)	FeaturedPackagesView		(%Votes%)
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
 Graphics	Model		グラフィック
 Local	MainWindow		ローカル
@@ -129,6 +130,7 @@ Show develop packages	MainWindow		開発用パッケージを表示
 Category:	FilterView		分類:
 Failed to create account	UserLoginWindow		アカウントの作成に失敗しました
 There are problems with the data you entered:\n\n	UserLoginWindow		入力したデーターに問題があります:\n\n
+Featured packages	MainWindow		おすすめパッケージ
 Success	RatePackageWindow		成功
 Business	Model		ビジネス
 Audio	Model		オーディオ

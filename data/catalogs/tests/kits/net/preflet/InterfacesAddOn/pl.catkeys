@@ -13,7 +13,7 @@ The method for obtaining an IP address	IntefaceAddressView		Metoda uzyskania adr
 Your gateway	IntefaceAddressView		Brama
 Enable	InterfacesListView		Włącz
 Received:	IntefaceHardwareView		Otrzymano:
-Revert	InterfaceWindow		Przywróć
+Revert	InterfaceWindow		Cofnij
 connected	IntefaceHardwareView		połączono
 Gateway:	IntefaceAddressView		Brama:
 Disable	InterfacesListView		Wyłącz

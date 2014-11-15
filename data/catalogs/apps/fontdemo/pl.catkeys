@@ -14,9 +14,9 @@ Rotation: 0	ControlView		Obrót: 0
 Drawing mode:	ControlView		Tryb rysowania:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Sterowanie
-FontDemo	System name		Demo Czcionek
+FontDemo	System name		FontDemo
 Outline: %d	ControlView		Kontur: %d
 Text:	ControlView		Tekst:
-Antialiased text	ControlView		Wygładzany tekst
+Antialiased text	ControlView		Wygładzony tekst
 Bounding boxes	ControlView		Obwiednia
 Size: %d	ControlView		Rozmiar: %d

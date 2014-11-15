@@ -4,15 +4,15 @@ Automatic swap management	SettingsWindow		Automatyczne zarządzanie przestrzeni�
 Turn off	SettingsWindow		Wyłącz
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Wyłączenie pamięci wirtualnej może mieć niepożądany wpływ na stabilność systemu, gdy cała dostępna pamięć zostanie zużyta.\nPamięć wirtualna nie wpływa na wydajność systemu, aż do tego momentu.\n\nNa pewno chcesz ją wyłączyc?
 Requested swap file size:	SettingsWindow		Docelowy rozmiar pliku wymiany:
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Ustawienia określone w pliku ustawień są nieprawidłowe. Możesz załadować ustawienia domyślne lub zamknąć.
-Defaults	SettingsWindow		Domyślne
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Ustawienia określone w pliku ustawień są nieprawidłowe. Możesz załadować ustawienia domyślne lub zakończyć.
+Defaults	SettingsWindow		Przywróć domyślne
 Current Swap:	SettingsWindow		Aktualny plik wymiany:
 Use volume:	SettingsWindow		Użyj woluminu:
 Keep enabled	SettingsWindow		Pozostaw włączoną
-Revert	SettingsWindow		Przywróć
+Revert	SettingsWindow		Cofnij
 VirtualMemory	System name		PamięćWirtualna
 Use boot volume	SettingsWindow		Użyj woluminu rozruchowego
-Load defaults	SettingsWindow		Załaduj domyślne ustawienia
+Load defaults	SettingsWindow		Załaduj ustawienia domyślne
 OK	VirtualMemoryApp		OK
 Changes will take effect upon reboot.	SettingsWindow		Zmiany zostaną zastosowane po ponownym uruchomieniu.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Pamięc wirtualna\n\tstworzona przez Axel Dörfler\n\tCopyright 2005, Haiku.\n

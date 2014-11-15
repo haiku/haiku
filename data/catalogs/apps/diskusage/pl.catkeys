@@ -1,7 +1,7 @@
 1	polish	x-vnd.Haiku-DiskUsage	2770162254
 Scanning %refName%	Scanner		Skanowanie %refName%
 Size	Info Window		Rozmiar
-Rescan	Pie View		Przeskanuj
+Rescan	Pie View		Skanuj ponownie
 Kind	Info Window		Rodzaj
 file unavailable	Pie View		plik niedostępny
 no supporting apps	Pie View		brak wspierających aplikacji
@@ -11,10 +11,10 @@ Scan	Status View		Skanuj
 Rescan	Status View		Przeskanuj
 file unavailable	Status View		plik niedostępny
 Get info	Pie View		Pobierz informacje
-DiskUsage	System name		Wykorzystanie Dysku
+DiskUsage	System name		DiskUsage
  in %d files	Info Window		 w %d plikach
 %d files	Status View		%d plików
-Created	Info Window		Stworzony
+Created	Info Window		Utworzony
 Modified	Info Window		Zmodyfikowany
 Abort	Status View		Przerwij
 Open with	Pie View		Otwórz za pomocą

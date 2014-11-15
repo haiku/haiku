@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	2982384826
+1	finnish	x-vnd.Haiku-About	2170341380
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint-tekijät. Kaikki oikeudet pidätetty.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ja hänen NewOS-ytimensä)\n
 Ralink (firmware)	AboutWindow		Ralink (laiteohjelmisto)
@@ -19,7 +19,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 19
 Source Code: 	AboutView		Lähdekoodi: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, monikko, yksi{prosessori:} muut{# prosessoria:}}
 Kernel:	AboutView		Ydin:
-BSD (4-clause)	AboutWindow		BSD (4-lause)
+BSD (4-clause)	AboutWindow		BSD (4-ehto)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman ja Daniel Veillard. Kaikki oikeudet pidätetty.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Osia tästä ohjelmistosta on copyright-suojattu.\nCopyright © 1996-2006 The FreeType Project. Kaikki oikeudet pidätetty.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Tekijänoikeus Haiku-koodiin on Haiku, Inc.-yrityksen tai vastaavien lähdekoodissa nimenomaisesti ilmaistujen tekijöiden omaisuutta. Haiku® ja HAIKU logo® ovat Haiku, Inc.-yrityksen rekisteröityjä tavaramerkkejä.\n\n
@@ -37,7 +37,7 @@ Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutVie
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Kaikki oikeudet pidätetty.
 Public Domain	AboutWindow		Public domain-ohjelmisto
 Intel (firmware)	AboutWindow		Intel (laiteohjelmisto)
-BSD (2-clause)	AboutWindow		BSD (2-lause)
+BSD (2-clause)	AboutWindow		BSD (2-ehto)
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Muisti:
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Kaikki oikeudet pidätetty.
@@ -85,6 +85,8 @@ Contains software from the GNU Project, released under the GPL and LGPL licenses
 MIT license. All rights reserved.	AboutView		MIT-lisenssi. Kaikki oikeudet pidätetty.
 [Click a license name to read the respective license.]\n\n	AboutView		[Napsauta lisenssinimeä vastaavan lisenssin lukemiseksi.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Kaikki oikeudet pidätetty.
+MIT (no promotion)	AboutWindow		MIT (ei mainostamista)
+BSD (3-clause)	AboutWindow		BSD (3-ehto)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Kaikki oikeudet pidätetty.
 License: 	AboutView		Lisenssi: 
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001, Andy Ritger perustuen Generalized Timing Formula -standardiin

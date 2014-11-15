@@ -5,7 +5,7 @@ Control border	Colors tab		Obramowanie kontrolki
 Antialiasing type:	AntialiasingSettingsView		Typ antyaliasingu:
 Shadow	Colors tab		Cień
 On	AntialiasingSettingsView		Włącz
-Defaults	APRWindow		Ustaw domyślne
+Defaults	APRWindow		Przywróć domyślne
 Grayscale	AntialiasingSettingsView		Skala odcieni szarości
 Shine	Colors tab		Połysk
 About	DecorSettingsView		Informacje
@@ -18,7 +18,7 @@ Failure	Colors tab		Niepowodzenie
 Hinting menu	AntialiasingSettingsView		Menu hintingu
 Scroll bar:	DecorSettingsView		Pasek przewijania:
 Document background	Colors tab		Tło dokumentu
-Revert	APRWindow		Przywróć ustawienia
+Revert	APRWindow		Cofnij
 Window tab	Colors tab		Zakładka okna
 Tooltip background	Colors tab		Tło podpowiedzi
 Selected menu item background	Colors tab		Tło zaznaczonego elementu menu

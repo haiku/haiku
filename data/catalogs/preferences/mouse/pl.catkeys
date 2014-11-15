@@ -3,10 +3,10 @@ Mouse type:	SettingsView		Rodzaj myszy:
 Warp	SettingsView		Przeniesienie
 2-Button	SettingsView		Dwuprzyciskowa
 Double-click test area	SettingsView		Strefa testowania podw. kliknięcia
-Revert	MouseWindow		Przywróć
-...by Andrew Edward McCall	MouseApplication		...stworzone przez Andrew Edward McCall
+Revert	MouseWindow		Cofnij
+...by Andrew Edward McCall	MouseApplication		...autorstwa Andrew Edwarda McCalla
 Mouse acceleration	SettingsView		Przyspieszenie wskaźnika
-Click to focus	SettingsView		Kliknij by zaznaczyć
+Click to focus	SettingsView		Kliknij aby zaznaczyć
 Click to focus and raise	SettingsView		Kliknij aby zaznaczyć i podnieść
 3-Button	SettingsView		Trójprzyciskowa
 Mouse speed	SettingsView		Prędkość wskaźnika
@@ -15,9 +15,9 @@ Instant warp	SettingsView		Natychmiastowe przeniesienie
 Dig Deal	MouseApplication		Dig Deal
 1-Button	SettingsView		Jednoprzyciskowa
 Double-click speed	SettingsView		Prędkość dwukrotnego kliknięcia
-Defaults	MouseWindow		Domyślne
+Defaults	MouseWindow		Przywróć domyślne
 Focus follows mouse	SettingsView		Podążaj za wskaźnikiem myszy
-Accept first click	SettingsView		Akceptuj pierwsze klinięcie
+Accept first click	SettingsView		Akceptuj pierwsze kliknięcie
 Fast	SettingsView		Szybko
 Normal	SettingsView		Normalna
 Mouse	System name		Mysz

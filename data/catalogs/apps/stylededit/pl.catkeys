@@ -1,6 +1,6 @@
 1	polish	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		StyledEdit
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie \"%s\"? 
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie „%s”? 
 Paste	Menus		Wklej
 OK	LoadAlert		OK
 File	Menus		Plik
@@ -19,34 +19,34 @@ Can't undo	Menus		Nie można cofnąć
 Save	Menus		Zapisz
 Replace with:	FindandReplaceWindow		Zamień na:
 Cancel	SaveAlert		Anuluj
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywrócić, nie znaleziono pliku: \"%s\".
-Case-sensitive	FindandReplaceWindow		Wielkość liter brana pod uwagę
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywrócić, nie znaleziono pliku: „%s”.
+Case-sensitive	FindandReplaceWindow		Uwzględnij wielkość liter
 Green	Menus		Zielony
 Reload	NodeMonitorAlerts		Wczytaj ponownie
 Yellow	Menus		Żółty
 Replace in all windows	FindandReplaceWindow		Zamień we wszystkich oknach
 Wrap lines	Menus		Zawijaj wiersze
-Quit	Menus		Wyjdź
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Plik \"%file%\" został usunięty przez inny program. Czy chcesz go przywrócić?
+Quit	Menus		Zakończ
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Plik „%file%” został usunięty przez inny program. Czy chcesz go przywrócić?
 Document statistics	Statistics		Statystyki dokumentu
 Cancel	RevertToSavedAlert		Anuluj
 Autodetect	Menus		Autodetekcja
 Document	Menus		Dokument
-Save changes to the document \"%s\"? 	QuitAlert		Zapisać zmiany w dokumencie \"%s\"? 
-Edit	Menus		Edytuj
+Save changes to the document \"%s\"? 	QuitAlert		Zapisać zmiany w dokumencie „%s”? 
+Edit	Menus		Edycja
 Revert	RevertToSavedAlert		Przywróć
-Font	Menus		Czcionka
+Font	Menus		Font
 Replace all	FindandReplaceWindow		Zamień wszystkie
 Statistics…	Menus		Statystyki…
 Default	Open_and_SaveAsPanel		Domyślne
 Replace next	Menus		Zamień następne
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" ma niezapisane zmiany.\nCzy przywrócić ostatnią zapisaną wersję? 
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		„%s” zawiera niezapisane zmiany.\nCzy przywrócić ostatnią zapisaną wersję? 
 Cancel	FindandReplaceWindow		Anuluj
 Text encoding	Menus		Kodowanie tekstu
 Close	Menus		Zamknij
 Save	SaveAlert		Zapisz
 Words:	Statistics		Słów:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Błąd podczas otwierania \"%s\":\n\tFormat nieobsługiwany
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Błąd podczas otwierania „%s”:\n\tFormat nieobsługiwany
 OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Nie zapisuj
 Align	Menus		Wyrównaj
@@ -66,10 +66,10 @@ Wrap-around search	FindandReplaceWindow		Szukanie owijające
 Bold	Menus		Pogrubienie
 Find selection	Menus		Znajdź zaznaczenie
 Find:	FindandReplaceWindow		Znajdź:
-Error saving \"%s\":\n%s	SaveAlert		Błąd podczas zapisywania \"%s\":\n%s
+Error saving \"%s\":\n%s	SaveAlert		Błąd podczas zapisywania „%s”:\n%s
 Copy	Menus		Kopiuj
 Cut	Menus		Wytnij
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Plik \"%file%\" został zmieniony przez inny program. Czy wczytać go ponownie?
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Plik „%file%” został zmieniony przez inny program. Czy wczytać go ponownie?
 Replace	FindandReplaceWindow		Zamień
 Find again	Menus		Znajdź następne
 Cancel	QuitAlert		Anuluj
@@ -77,7 +77,7 @@ Find…	Menus		Znajdź…
 Select all	Menus		Zaznacz wszystko
 Don't save	SaveAlert		Nie zapisuj
 Recover	NodeMonitorAlerts		Odzyskaj
-Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania \"%s\":\n\t%s
+Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania „%s”:\n\t%s
 Ignore	NodeMonitorAlerts		Ignoruj
 Read-only	StatusView		Tylko do odczytu
 Undo typing	QuitAlert		Cofnij pisanie

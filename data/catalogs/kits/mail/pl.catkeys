@@ -6,6 +6,6 @@ KiB	ProtocolConfigView		KiB
 Mail server:	ProtocolConfigView		Serwer pocztowy:
 Select…	MailKit		Wybierz…
 Connection type:	ProtocolConfigView		Typ połączenia:
-Leave mail on server	ProtocolConfigView		Pozostawianie wiadomości na serwerze
-Username:	ProtocolConfigView		Użytkownik:
+Leave mail on server	ProtocolConfigView		Pozostaw wiadomości na serwerze
+Username:	ProtocolConfigView		Nazwa użytkownika:
 Login type:	ProtocolConfigView		Typ logowania:

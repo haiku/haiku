@@ -1,6 +1,6 @@
 1	polish	x-vnd.Haiku-SoundRecorder	24440888
-Loop	RecorderWindow		Pętla
-Cannot find default audio hardware	RecorderWindow		Nie można odnaleść domyślnego urządzenia audio
+Loop	RecorderWindow		Zapętl
+Cannot find default audio hardware	RecorderWindow		Nie można odnaleźć domyślnego urządzenia audio
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nie można zlokalizować pliku tymczasowego przechowującego nowe nagrania
 Sample size:	RecorderWindow		Rozmiar próbki:
 Nothing to play	RecorderWindow		Nic do otworzenia
@@ -37,7 +37,7 @@ Cannot get the file to play	RecorderWindow		Nie można załadować pliku do odtw
 Cannot record a sound that long	RecorderWindow		Nie można nagrać dźwięku tej długości
 Duration:	RecorderWindow		Czas trwania:
 Compression:	RecorderWindow		Kompresja:
-Cannot find an unused name to use for the new recording	RecorderWindow		Nie można odnaleść wolnej nazwy dla tego nagrania
+Cannot find an unused name to use for the new recording	RecorderWindow		Nie można odnaleźć wolnej nazwy dla tego nagrania
 Channels: 	RecorderWindow		Kanały: 
 Save	RecorderWindow		Zapisz
 Sample rate: 	RecorderWindow		Próbkowanie: 

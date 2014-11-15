@@ -3,25 +3,25 @@ TV	MainWin		Telewizja
 Channel	MainWin		Kanał
 Settings…	MainWin		Ustawienia…
 Interface	MainWin		Interfejs
-Keep aspect ratio	MainWin		Utrzymaj proporcje
+Keep aspect ratio	MainWin		Zachowaj proporcje
 Previous channel	MainWin		Poprzedni kanał
 Settings	MainWin		Ustawienia
 TV	System name		TV
 No border	MainWin		Bez ramki
 Always on top	MainWin		Zawsze na wierzchu
 OK	MainWin		OK
-Quit	MainWin		Wyjdź
-Full screen	MainWin		Pełen ekran
+Quit	MainWin		Zakończ
+Full screen	MainWin		Pełny ekran
 Debug	MainWin		Debuguj
-Scale to native size	MainWin		Zeskaluj do natywnego rozmiaru
+Scale to native size	MainWin		Zeskaluj do oryginalnego rozmiaru
 unknown	MainWin		nieznany
 Next channel	MainWin		Następny kanał
-Error, interface is busy:\n\n	MainWin		Błąd, zajęty interfejs:\n\n
+Error, interface is busy:\n\n	MainWin		Błąd, interfejs zajęty:\n\n
 None	MainWin		Puste
 force 704 x 576, display aspect 4:3	MainWin		wymuś 704 x 576, proporcje 4:3
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
 force 544 x 576, display aspect 4:3	MainWin		wymuś 544 x 576, proporcje 4:3
-pixel aspect ratio	MainWin		Proporcje pikseli
+pixel aspect ratio	MainWin		proporcje pikseli
 No menu	MainWin		Bez menu
 Error, connecting to interface failed:\n\n	MainWin		Błąd, nie można podłączyć interfejsu:\n\n
 force 720 x 576, display aspect 4:3	MainWin		wymuś 720 x 576, proporcje 4:3
