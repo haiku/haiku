@@ -212,7 +212,7 @@ unmap_page(addr_t virtualAddress)
 		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
 	pageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = 0;
 
-	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
+	asm volatile("invlpg (%0)" : : "r" (virtualAddress) : "memory");
 }
 
 
@@ -257,7 +257,7 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 
 	pageTable[tableEntry] = physicalAddress | flags;
 
-	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
+	asm volatile("invlpg (%0)" : : "r" (virtualAddress) : "memory");
 
 	TRACE("map_page: done\n");
 }
@@ -653,8 +653,9 @@ mmu_init(void)
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
 		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 
-	TRACE("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
-		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
+	TRACE("kernel stack at 0x%" B_PRIx64 " to 0x%" B_PRIx64 "\n",
+		gKernelArgs.cpu_kstack[0].start, gKernelArgs.cpu_kstack[0].start
+		+ gKernelArgs.cpu_kstack[0].size);
 
 	extended_memory *extMemoryBlock;
 	uint32 extMemoryCount = get_memory_map(&extMemoryBlock);
