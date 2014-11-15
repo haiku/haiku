@@ -830,32 +830,31 @@ display_crtc_fb_set(uint8 crtcID, display_mode* mode)
 		Write32(CRT, regs->grphSwapControl, fbSwap);
 	}
 
+	// TODO: Technically if chip >= RS600
+	int largeAlign = (info.dceMajor >= 2) ? 1 : 0;
+
 	// Align our framebuffer width
 	uint32 widthAligned = mode->virtual_width;
 	uint32 pitchMask = 0;
 
-	// assume micro-linear/macro-linear mode (i.e., not tiled)
 	switch (bytesPerPixel) {
 		case 1:
-			pitchMask = 63;
+			pitchMask = largeAlign ? 255 : 127;
 			break;
 		case 2:
-			pitchMask = 31;
+			pitchMask = largeAlign ? 127 : 31;
 			break;
 		case 3:
 		case 4:
-			pitchMask = 31;
+			pitchMask = largeAlign ? 63 : 15;
 			break;
 	}
 	widthAligned += pitchMask;
 	widthAligned &= ~pitchMask;
 
 	TRACE("%s: fb: %" B_PRIu32 "x%" B_PRIu32 " (%" B_PRIu32 " bpp)\n", __func__,
-		mode->virtual_width, mode->virtual_height, bitsPerPixel);
-	TRACE("%s: fb pitch: %" B_PRIu32 " \n", __func__,
-		widthAligned);
-	TRACE("%s: fb width aligned: %" B_PRIu32 "\n", __func__,
-		widthAligned);
+		mode->timing.h_display, mode->timing.v_display, bitsPerPixel);
+	TRACE("%s: fb pitch: %" B_PRIu32 " \n", __func__, widthAligned);
 
 	Write32(CRT, regs->grphSurfaceOffsetX, 0);
 	Write32(CRT, regs->grphSurfaceOffsetY, 0);
