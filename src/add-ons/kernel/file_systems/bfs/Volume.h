@@ -116,7 +116,7 @@ public:
 								{ return find_thread(NULL) == fCheckingThread; }
 
 			// cache access
-			status_t		WriteSuperBlock();
+			status_t		WriteSuperBlock(bool initializing = false);
 			status_t		FlushDevice();
 
 			// queries
