@@ -66,7 +66,7 @@ private:
 
 	// ExpressionInfo::Listener
 	virtual	void				ExpressionEvaluated(ExpressionInfo* info,
-									status_t result, Value* value);
+									status_t result, ExpressionResult* value);
 
 private:
 			class ContainerListener;
@@ -110,7 +110,6 @@ private:
 			void				_CopyVariableValueToClipboard();
 
 			status_t			_AddExpression(const char* expression,
-									Type* resultType,
 									ExpressionInfo*& _info);
 			void				_RemoveExpression(ModelNode* node);
 
@@ -118,7 +117,7 @@ private:
 			void				_RestoreExpressionNodes();
 
 			void				_SetExpressionNodeValue(ExpressionInfo* info,
-									status_t result, Value* value);
+									status_t result, ExpressionResult* value);
 
 			status_t			_GetTypeForTypeCode(int32 typeCode,
 									Type*& _resultType) const;

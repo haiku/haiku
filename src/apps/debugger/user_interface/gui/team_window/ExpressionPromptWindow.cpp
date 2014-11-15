@@ -6,17 +6,10 @@
 
 #include <Button.h>
 #include <LayoutBuilder.h>
-#include <MenuField.h>
 #include <String.h>
 #include <TextControl.h>
 
 #include "MessageCodes.h"
-#include "UiUtils.h"
-
-
-enum {
-	MSG_CHANGE_EVALUATION_TYPE = 'chet',
-};
 
 
 ExpressionPromptWindow::ExpressionPromptWindow(BHandler* addTarget,
@@ -28,8 +21,7 @@ ExpressionPromptWindow::ExpressionPromptWindow(BHandler* addTarget,
 	fCancelButton(NULL),
 	fAddButton(NULL),
 	fAddTarget(addTarget),
-	fCloseTarget(closeTarget),
-	fCurrentType(B_INT64_TYPE)
+	fCloseTarget(closeTarget)
 {
 }
 
@@ -68,16 +60,11 @@ ExpressionPromptWindow::_Init()
 	inputItem->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	labelItem->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BMenuField* typeField = new BMenuField("Type:", _BuildTypesMenu());
-	typeField->Menu()->SetTargetForItems(this);
-
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.AddGroup(B_HORIZONTAL, 4.0f)
 			.Add(labelItem)
 			.Add(inputItem)
-			.Add(typeField->CreateLabelLayoutItem())
-			.Add(typeField->CreateMenuBarLayoutItem())
 		.End()
 		.AddGroup(B_HORIZONTAL, 4.0f)
 			.AddGlue()
@@ -92,43 +79,6 @@ ExpressionPromptWindow::_Init()
 	fAddButton->SetTarget(this);
 	fAddButton->MakeDefault(true);
 	fExpressionInput->TextView()->MakeFocus(true);
-}
-
-
-BMenu*
-ExpressionPromptWindow::_BuildTypesMenu()
-{
-	BMenu* menu = new BMenu("Types");
-	menu->SetLabelFromMarked(true);
-
-	_AddMenuItemForType(menu, B_INT8_TYPE);
-	_AddMenuItemForType(menu, B_UINT8_TYPE);
-	_AddMenuItemForType(menu, B_INT16_TYPE);
-	_AddMenuItemForType(menu, B_UINT16_TYPE);
-	_AddMenuItemForType(menu, B_INT32_TYPE);
-	_AddMenuItemForType(menu, B_UINT32_TYPE);
-	BMenuItem* item = _AddMenuItemForType(menu, B_INT64_TYPE);
-	if (item != NULL)
-		item->SetMarked(true);
-
-	_AddMenuItemForType(menu, B_UINT64_TYPE);
-	_AddMenuItemForType(menu, B_FLOAT_TYPE);
-	_AddMenuItemForType(menu, B_DOUBLE_TYPE);
-
-	return menu;
-}
-
-
-BMenuItem*
-ExpressionPromptWindow::_AddMenuItemForType(BMenu* menu, type_code type)
-{
-	BMessage *message = new BMessage(MSG_CHANGE_EVALUATION_TYPE);
-	message->AddInt32("type", type);
-
-	BMenuItem* item = new BMenuItem(UiUtils::TypeCodeToString(type), message);
-	menu->AddItem(item);
-
-	return item;
 }
 
 
@@ -154,17 +104,10 @@ void
 ExpressionPromptWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_CHANGE_EVALUATION_TYPE:
-		{
-			fCurrentType = message->FindInt32("type");
-			break;
-		}
-
 		case MSG_ADD_NEW_EXPRESSION:
 		{
 			BMessage addMessage(MSG_EXPRESSION_PROMPT_WINDOW_CLOSED);
 			addMessage.AddString("expression", fExpressionInput->Text());
-			addMessage.AddInt32("type", fCurrentType);
 			addMessage.AddMessenger("target", BMessenger(fAddTarget));
 
 			BMessenger(fCloseTarget).SendMessage(&addMessage);

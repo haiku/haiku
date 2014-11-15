@@ -19,6 +19,7 @@
 #include "Value.h"
 #include "ValueNode.h"
 #include "ValueNodeManager.h"
+#include "Variable.h"
 
 
 ExpressionEvaluationJob::ExpressionEvaluationJob(Team* team,
@@ -89,10 +90,8 @@ ExpressionEvaluationJob::Do()
 	}
 
 	ValueNode* neededNode = NULL;
-	PrimitiveType* type = dynamic_cast<PrimitiveType*>(
-		fExpressionInfo->ResultType());
 	result = fLanguage->EvaluateExpression(fExpressionInfo->Expression(),
-		type->TypeConstant(), fManager, fResultValue, neededNode);
+		fManager, fResultValue, neededNode);
 	if (neededNode != NULL) {
 		result = ResolveNodeValue(neededNode);
 		if (State() == JOB_STATE_WAITING)

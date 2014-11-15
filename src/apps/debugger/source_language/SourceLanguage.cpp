@@ -30,7 +30,7 @@ SourceLanguage::ParseTypeExpression(const BString& expression,
 
 status_t
 SourceLanguage::EvaluateExpression(const BString& expression,
-	type_code type, ValueNodeManager* manager, Value*& _resultValue,
+	ValueNodeManager* manager, ExpressionResult*& _resultValue,
 	ValueNode*& _neededNode)
 {
 	return B_NOT_SUPPORTED;

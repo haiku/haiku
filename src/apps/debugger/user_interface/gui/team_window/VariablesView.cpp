@@ -1944,18 +1944,11 @@ VariablesView::MessageReceived(BMessage* message)
 		case MSG_ADD_NEW_EXPRESSION:
 		{
 			const char* expression;
-			int32 type;
-			Type* resultType;
-			if (message->FindString("expression", &expression) != B_OK
-				|| message->FindInt32("type", &type) != B_OK
-				|| _GetTypeForTypeCode(type, resultType) != B_OK) {
+			if (message->FindString("expression", &expression) != B_OK)
 				break;
-			}
-
-			BReference<Type> typeReference(resultType, true);
 
 			ExpressionInfo* info;
-			status_t error = _AddExpression(expression, resultType, info);
+			status_t error = _AddExpression(expression, info);
 			if (error != B_OK) {
 				// TODO: notify user of failure
 				break;
@@ -1969,14 +1962,14 @@ VariablesView::MessageReceived(BMessage* message)
 		{
 			ExpressionInfo* info;
 			status_t result;
-			Value* value = NULL;
+			ExpressionResult* value = NULL;
 			if (message->FindPointer("info",
 					reinterpret_cast<void**>(&info)) != B_OK
 				|| message->FindInt32("result", &result) != B_OK) {
 				break;
 			}
 
-			BReference<Value> valueReference;
+			BReference<ExpressionResult> valueReference;
 			if (message->FindPointer("value", reinterpret_cast<void**>(&value))
 				== B_OK) {
 				valueReference.SetTo(value, true);
@@ -2231,12 +2224,12 @@ VariablesView::TreeTableCellMouseDown(TreeTable* table,
 
 void
 VariablesView::ExpressionEvaluated(ExpressionInfo* info, status_t result,
-	Value* value)
+	ExpressionResult* value)
 {
 	BMessage message(MSG_EXPRESSION_EVALUATED);
 	message.AddPointer("info", info);
 	message.AddInt32("result", result);
-	BReference<Value> valueReference;
+	BReference<ExpressionResult> valueReference;
 
 	if (value != NULL) {
 		valueReference.SetTo(value);
@@ -2417,6 +2410,7 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	BPrivate::ObjectDeleter<ContextActionList> postActionListDeleter(
 		_postActions);
 
+#if 0
 	result = _AddContextAction("Add watch expression" B_UTF8_ELLIPSIS,
 		MSG_ADD_WATCH_EXPRESSION, _postActions, message);
 	if (result != B_OK)
@@ -2429,6 +2423,7 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 			return result;
 		message->AddPointer("node", node);
 	}
+#endif
 
 	preActionListDeleter.Detach();
 	postActionListDeleter.Detach();
@@ -2748,8 +2743,7 @@ VariablesView::_CopyVariableValueToClipboard()
 
 
 status_t
-VariablesView::_AddExpression(const char* expression, Type* resultType,
-	ExpressionInfo*& _info)
+VariablesView::_AddExpression(const char* expression, ExpressionInfo*& _info)
 {
 	// if our stack frame doesn't have an associated function,
 	// we can't add an expression
@@ -2775,8 +2769,7 @@ VariablesView::_AddExpression(const char* expression, Type* resultType,
 		}
 	}
 
-	ExpressionInfo* info = new(std::nothrow) ExpressionInfo(expression,
-		resultType);
+	ExpressionInfo* info = new(std::nothrow) ExpressionInfo(expression);
 
 	if (info == NULL)
 		return B_NO_MEMORY;
@@ -2829,7 +2822,7 @@ VariablesView::_RemoveExpression(ModelNode* node)
 status_t
 VariablesView::_AddExpressionNode(ExpressionInfo* info)
 {
-	Type* type = info->ResultType();
+#if 0
 	ExpressionValueNodeChild* child
 		= new(std::nothrow) ExpressionValueNodeChild(info->Expression(), type);
 	if (child == NULL)
@@ -2859,7 +2852,10 @@ VariablesView::_AddExpressionNode(ExpressionInfo* info)
 
 	expressionNodeReference.Detach();
 	modelNodeReference.Detach();
+
 	return B_OK;
+#endif
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -2890,7 +2886,7 @@ VariablesView::_RestoreExpressionNodes()
 
 void
 VariablesView::_SetExpressionNodeValue(ExpressionInfo* info, status_t result,
-	Value* value)
+	ExpressionResult* value)
 {
 	FunctionInstance* instance = fStackFrame->Function();
 	if (instance == NULL)
@@ -2918,7 +2914,8 @@ VariablesView::_SetExpressionNodeValue(ExpressionInfo* info, status_t result,
 		if (child->GetExpression() != info->Expression())
 			continue;
 
-		child->Node()->SetLocationAndValue(NULL, value, result);
+		child->Node()->SetLocationAndValue(NULL, value->PrimitiveValue(),
+			result);
 		return;
 	}
 }

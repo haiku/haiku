@@ -19,12 +19,11 @@
 #include "Architecture.h"
 #include "CppLanguage.h"
 #include "GuiTeamUiSettings.h"
+#include "IntegerValue.h"
 #include "MemoryView.h"
 #include "MessageCodes.h"
-#include "SyntheticPrimitiveType.h"
 #include "Team.h"
 #include "UserInterface.h"
-#include "Value.h"
 
 
 enum {
@@ -94,9 +93,7 @@ void
 InspectorWindow::_Init()
 {
 	fLanguage = new CppLanguage();
-	::Type* type = new SyntheticPrimitiveType(B_UINT64_TYPE);
-	BReference< ::Type> typeReference(type);
-	fExpressionInfo = new ExpressionInfo(NULL, type);
+	fExpressionInfo = new ExpressionInfo();
 	fExpressionInfo->AddListener(this);
 
 	BScrollView* scrollView;
@@ -236,7 +233,7 @@ InspectorWindow::MessageReceived(BMessage* message)
 				if (fAddressInput->TextView()->TextLength() == 0)
 					break;
 
-				fExpressionInfo->SetExpression(fAddressInput->Text());
+				fExpressionInfo->SetTo(fAddressInput->Text());
 
 				fListener->ExpressionEvaluationRequested(fLanguage,
 					fExpressionInfo);
@@ -247,18 +244,22 @@ InspectorWindow::MessageReceived(BMessage* message)
 		case MSG_EXPRESSION_EVALUATED:
 		{
 			BString errorMessage;
-			BReference<Value> reference;
-			Value* value = NULL;
+			BReference<ExpressionResult> reference;
+			ExpressionResult* value = NULL;
 			if (message->FindPointer("value",
 					reinterpret_cast<void**>(&value)) == B_OK) {
 				reference.SetTo(value, true);
-				BVariant variant;
-				value->ToVariant(variant);
-				if (variant.Type() == B_UINT64_TYPE) {
-					_SetToAddress(variant.ToUInt64());
-					break;
-				} else
-					value->ToString(errorMessage);
+				if (value->Kind() == EXPRESSION_RESULT_KIND_PRIMITIVE) {
+					Value* primitive = value->PrimitiveValue();
+					BVariant variantValue;
+					primitive->ToVariant(variantValue);
+					if (variantValue.Type() == B_STRING_TYPE) {
+						errorMessage.SetTo(variantValue.ToString());
+					} else {
+						_SetToAddress(variantValue.ToUInt64());
+						break;
+					}
+				}
 			} else {
 				status_t result = message->FindInt32("result");
 				errorMessage.SetToFormat("Failed to evaluate expression: %s",
@@ -385,11 +386,11 @@ InspectorWindow::TargetAddressChanged(target_addr_t address)
 
 void
 InspectorWindow::ExpressionEvaluated(ExpressionInfo* info, status_t result,
-	Value* value)
+	ExpressionResult* value)
 {
 	BMessage message(MSG_EXPRESSION_EVALUATED);
 	message.AddInt32("result", result);
-	BReference<Value> reference;
+	BReference<ExpressionResult> reference;
 	if (value != NULL) {
 		reference.SetTo(value);
 		message.AddPointer("value", value);

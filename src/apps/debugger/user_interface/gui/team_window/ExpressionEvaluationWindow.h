@@ -9,16 +9,12 @@
 #include <Window.h>
 
 #include "ExpressionInfo.h"
-#include "types/Types.h"
 
 
-class BMenu;
-class BMenuItem;
 class BButton;
 class BStringView;
 class BTextControl;
 class Thread;
-class PrimitiveType;
 class SourceLanguage;
 class StackFrame;
 class UserInterfaceListener;
@@ -53,13 +49,10 @@ public:
 
 private:
 			void	 			_Init();
-			BMenu*				_BuildTypesMenu();
-			BMenuItem*			_AddMenuItemForType(BMenu* menu,
-									type_code type);
 
 	// ExpressionInfo::Listener
 	virtual	void				ExpressionEvaluated(ExpressionInfo* info,
-									status_t result, Value* value);
+									status_t result, ExpressionResult* value);
 
 private:
 			SourceLanguage*		fLanguage;

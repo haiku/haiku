@@ -17,10 +17,10 @@
 
 #include "Architecture.h"
 #include "CppLanguage.h"
+#include "IntegerValue.h"
 #include "MessageCodes.h"
 #include "SyntheticPrimitiveType.h"
 #include "UserInterface.h"
-#include "Value.h"
 #include "Watchpoint.h"
 
 
@@ -91,21 +91,15 @@ WatchPromptWindow::_Init()
 {
 	fLanguage = new CppLanguage();
 
-	PrimitiveType* type = new SyntheticPrimitiveType(B_UINT64_TYPE);
-	BReference<PrimitiveType> typeReference(type, true);
-
 	BString text;
 	text.SetToFormat("0x%" B_PRIx64, fInitialAddress);
 	fAddressInput = new BTextControl("Address:", text, NULL);
-	fAddressExpressionInfo = new ExpressionInfo(text, type);
+	fAddressExpressionInfo = new ExpressionInfo(text);
 	fAddressExpressionInfo->AddListener(this);
-
-	type = new SyntheticPrimitiveType(B_INT32_TYPE);
-	typeReference.SetTo(type, true);
 
 	text.SetToFormat("%" B_PRId32, fInitialLength);
 	fLengthInput = new BTextControl("Length:", text, NULL);
-	fLengthExpressionInfo = new ExpressionInfo(text, type);
+	fLengthExpressionInfo = new ExpressionInfo(text);
 	fLengthExpressionInfo->AddListener(this);
 
 	int32 maxDebugRegisters = 0;
@@ -170,11 +164,12 @@ WatchPromptWindow::Show()
 
 void
 WatchPromptWindow::ExpressionEvaluated(ExpressionInfo* info, status_t result,
-	Value* value)
+	ExpressionResult* value)
 {
 	BMessage message(MSG_EXPRESSION_EVALUATED);
 	message.AddInt32("result", result);
-	BReference<Value> reference;
+	message.AddPointer("info", info);
+	BReference<ExpressionResult> reference;
 	if (value != NULL) {
 		reference.SetTo(value);
 		message.AddPointer("value", value);
@@ -192,20 +187,32 @@ WatchPromptWindow::MessageReceived(BMessage* message)
 		case MSG_EXPRESSION_EVALUATED:
 		{
 			BString errorMessage;
-			BReference<Value> reference;
-			Value* value = NULL;
+			BReference<ExpressionResult> reference;
+			ExpressionResult* value = NULL;
+			ExpressionInfo* info = NULL;
+			if (message->FindPointer("info",
+					reinterpret_cast<void**>(&info)) != B_OK) {
+				break;
+			}
+
 			if (message->FindPointer("value",
 					reinterpret_cast<void**>(&value)) == B_OK) {
 				reference.SetTo(value, true);
-				BVariant variant;
-				value->ToVariant(variant);
-				if (variant.Type() == B_UINT64_TYPE) {
-					fRequestedAddress = variant.ToUInt64();
-					break;
-				} else if (variant.Type() == B_INT32_TYPE)
-					fRequestedLength = variant.ToInt32();
-				else
-					value->ToString(errorMessage);
+				if (value->Kind() == EXPRESSION_RESULT_KIND_PRIMITIVE) {
+					Value* primitive = value->PrimitiveValue();
+					if (dynamic_cast<IntegerValue*>(primitive) != NULL) {
+						BVariant resultVariant;
+						primitive->ToVariant(resultVariant);
+						if (info == fAddressExpressionInfo) {
+							fRequestedAddress = resultVariant.ToUInt64();
+							break;
+						} else
+							fRequestedLength = resultVariant.ToInt32();
+					}
+					else
+						primitive->ToString(errorMessage);
+				} else
+					errorMessage.SetTo("Unsupported expression result.");
 			} else {
 				status_t result = message->FindInt32("result");
 				errorMessage.SetToFormat("Failed to evaluate expression: %s",
@@ -237,11 +244,11 @@ WatchPromptWindow::MessageReceived(BMessage* message)
 			fRequestedAddress = 0;
 			fRequestedLength = 0;
 
-			fAddressExpressionInfo->SetExpression(fAddressInput->Text());
+			fAddressExpressionInfo->SetTo(fAddressInput->Text());
 			fListener->ExpressionEvaluationRequested(fLanguage,
 				fAddressExpressionInfo);
 
-			fLengthExpressionInfo->SetExpression(fLengthInput->Text());
+			fLengthExpressionInfo->SetTo(fLengthInput->Text());
 			fListener->ExpressionEvaluationRequested(fLanguage,
 				fLengthExpressionInfo);
 			break;

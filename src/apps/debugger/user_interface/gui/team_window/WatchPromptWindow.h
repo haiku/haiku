@@ -43,7 +43,7 @@ public:
 
 	// ExpressionInfo::Listener
 	virtual	void				ExpressionEvaluated(ExpressionInfo* info,
-									status_t result, Value* value);
+									status_t result, ExpressionResult* value);
 
 private:
 			void	 			_Init();

@@ -19,6 +19,7 @@ class BVariant;
 class CpuState;
 class DebuggerInterface;
 class ExpressionInfo;
+class ExpressionResult;
 class Function;
 class FunctionInstance;
 class Image;
@@ -245,7 +246,7 @@ public:
 	virtual	const JobKey&		Key() const;
 	virtual	status_t			Do();
 
-			Value*				GetResultValue() const { return fResultValue; }
+			ExpressionResult*	GetResult() const { return fResultValue; }
 
 private:
 			status_t			ResolveNodeValue(ValueNode* node);
@@ -261,7 +262,7 @@ private:
 			StackFrame*			fFrame;
 			Thread*				fThread;
 			ValueNodeManager*	fManager;
-			Value*				fResultValue;
+			ExpressionResult*	fResultValue;
 };
 
 

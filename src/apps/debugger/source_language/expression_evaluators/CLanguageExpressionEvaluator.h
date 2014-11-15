@@ -18,6 +18,7 @@
 class ValueNode;
 class ValueNodeChild;
 class ValueNodeManager;
+class Variable;
 
 
 class ParseException {
@@ -38,6 +39,7 @@ class ParseException {
 	int32	position;
 };
 
+
 class ValueNeededException {
 public:
 	ValueNeededException(ValueNode* node)
@@ -50,6 +52,7 @@ public:
 };
 
 
+class ExpressionResult;
 class Number;
 
 
@@ -59,31 +62,28 @@ class CLanguageExpressionEvaluator {
 								CLanguageExpressionEvaluator();
 								~CLanguageExpressionEvaluator();
 
-			Number				Evaluate(const char* expressionString,
-									type_code type, ValueNodeManager* manager);
+			ExpressionResult*	Evaluate(const char* expressionString,
+									ValueNodeManager* manager);
 
  private:
+			class Operand;
 			struct Token;
 			class Tokenizer;
 
  private:
-			Number				_ParseSum();
-			Number				_ParseProduct();
-			Number				_ParsePower();
-			Number				_ParseUnary();
-			Number				_ParseIdentifier(ValueNode* parentNode = NULL);
-			Number				_ParseAtom();
+			Operand				_ParseSum();
+			Operand				_ParseProduct();
+			Operand				_ParsePower();
+			Operand				_ParseUnary();
+			Operand				_ParseIdentifier(ValueNode* parentNode = NULL);
+			Operand				_ParseAtom();
 
 			void				_EatToken(int32 type);
 
 			void				_RequestValueIfNeeded(const Token& token,
 									ValueNodeChild* child);
 
-			void				_CoerceTypeIfNeeded(const Token& token,
-									Number& _number);
-
 			Tokenizer*			fTokenizer;
-			type_code			fCurrentType;
 			ValueNodeManager*	fNodeManager;
 };
 

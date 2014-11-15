@@ -6,67 +6,120 @@
 
 #include "ExpressionInfo.h"
 
-#include "Type.h"
+#include "Value.h"
+#include "ValueNode.h"
+
+
+// #pragma mark - ExpressionResult
+
+
+ExpressionResult::ExpressionResult()
+	:
+	fResultKind(EXPRESSION_RESULT_KIND_UNKNOWN),
+	fPrimitiveValue(NULL),
+	fValueNodeValue(NULL)
+{
+}
+
+
+ExpressionResult::~ExpressionResult()
+{
+	if (fPrimitiveValue != NULL)
+		fPrimitiveValue->ReleaseReference();
+
+	if (fValueNodeValue != NULL)
+		fValueNodeValue->ReleaseReference();
+}
+
+
+void
+ExpressionResult::SetToPrimitive(Value* value)
+{
+	_Unset();
+
+	fPrimitiveValue = value;
+	if (fPrimitiveValue != NULL) {
+		fPrimitiveValue->AcquireReference();
+		fResultKind = EXPRESSION_RESULT_KIND_PRIMITIVE;
+	}
+}
+
+
+void
+ExpressionResult::SetToValueNode(ValueNodeChild* child)
+{
+	_Unset();
+
+	fValueNodeValue = child;
+	if (fValueNodeValue != NULL) {
+		fValueNodeValue->AcquireReference();
+		fResultKind = EXPRESSION_RESULT_KIND_VALUE_NODE;
+	}
+
+	// if the child has a node with a resolved value, store
+	// it as a primitive, so the consumer of the expression
+	// can use it as-is if desired.
+
+	ValueNode* node = child->Node();
+	if (node == NULL)
+		return;
+
+	fPrimitiveValue = node->GetValue();
+	if (fPrimitiveValue != NULL)
+		fPrimitiveValue->AcquireReference();
+}
+
+
+void
+ExpressionResult::_Unset()
+{
+	if (fPrimitiveValue != NULL) {
+		fPrimitiveValue->ReleaseReference();
+		fPrimitiveValue = NULL;
+	}
+
+	if (fValueNodeValue != NULL) {
+		fValueNodeValue->ReleaseReference();
+		fValueNodeValue = NULL;
+	}
+
+	fResultKind = EXPRESSION_RESULT_KIND_UNKNOWN;
+}
+
+
+// #pragma mark - ExpressionInfo
 
 
 ExpressionInfo::ExpressionInfo()
 	:
-	fExpression(),
-	fResultType(NULL)
+	fExpression()
 {
 }
 
 
 ExpressionInfo::ExpressionInfo(const ExpressionInfo& other)
 	:
-	fExpression(other.fExpression),
-	fResultType(other.fResultType)
+	fExpression(other.fExpression)
 {
-	if (fResultType != NULL)
-		fResultType->AcquireReference();
 }
 
 
 ExpressionInfo::~ExpressionInfo()
 {
-	SetResultType(NULL);
 }
 
 
-ExpressionInfo::ExpressionInfo(const BString& expression, Type* resultType)
+ExpressionInfo::ExpressionInfo(const BString& expression)
 	:
-	fExpression(expression),
-	fResultType(resultType)
+	fExpression(expression)
 {
-	if (resultType != NULL)
-		resultType->AcquireReference();
 }
 
 
 void
-ExpressionInfo::SetTo(const BString& expression, Type* resultType)
-{
-	SetExpression(expression);
-	SetResultType(resultType);
-}
-
-
-void
-ExpressionInfo::SetExpression(const BString& expression)
+ExpressionInfo::SetTo(const BString& expression)
 {
 	fExpression = expression;
-}
-
-
-void
-ExpressionInfo::SetResultType(Type* resultType)
-{
-	if (fResultType != NULL)
-		fResultType->ReleaseReference();
-
-	fResultType = resultType;
-	if (fResultType != NULL)
-		fResultType->AcquireReference();
 }
 
 
@@ -85,7 +138,8 @@ ExpressionInfo::RemoveListener(Listener* listener)
 
 
 void
-ExpressionInfo::NotifyExpressionEvaluated(status_t result, Value* value)
+ExpressionInfo::NotifyExpressionEvaluated(status_t result,
+	ExpressionResult* value)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			Listener* listener = it.Next();) {

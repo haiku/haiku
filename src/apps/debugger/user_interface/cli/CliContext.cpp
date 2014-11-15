@@ -12,8 +12,9 @@
 
 #include "StackTrace.h"
 #include "UserInterface.h"
-#include "Value.h"
 #include "ValueNodeManager.h"
+#include "Variable.h"
+
 
 // NOTE: This is a simple work-around for EditLine not having any kind of user
 // data field. Hence in _GetPrompt() we don't have access to the context object.
@@ -29,7 +30,7 @@ static CliContext* sCurrentContext;
 struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
 	Event(int type, Thread* thread = NULL, TeamMemoryBlock* block = NULL,
 		ExpressionInfo* info = NULL, status_t expressionResult = B_OK,
-		Value* expressionValue = NULL)
+		ExpressionResult* expressionValue = NULL)
 		:
 		fType(type),
 		fThreadReference(thread),
@@ -65,7 +66,7 @@ struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
 		return fExpressionResult;
 	}
 
-	Value* GetExpressionValue() const
+	ExpressionResult* GetExpressionValue() const
 	{
 		return fExpressionValue.Get();
 	}
@@ -77,7 +78,7 @@ private:
 	BReference<TeamMemoryBlock> fMemoryBlockReference;
 	BReference<ExpressionInfo> fExpressionInfo;
 	status_t			fExpressionResult;
-	BReference<Value>	fExpressionValue;
+	BReference<ExpressionResult> fExpressionValue;
 };
 
 
@@ -509,7 +510,7 @@ CliContext::ThreadStackTraceChanged(const Team::ThreadEvent& threadEvent)
 
 void
 CliContext::ExpressionEvaluated(ExpressionInfo* info, status_t result,
-	Value* value)
+	ExpressionResult* value)
 {
 	_QueueEvent(
 		new(std::nothrow) Event(EVENT_EXPRESSION_EVALUATED,

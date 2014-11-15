@@ -18,10 +18,10 @@
 
 class BreakpointManager;
 class DebuggerInterface;
+class ExpressionResult;
 class ImageDebugInfoJobListener;
 class StackFrame;
 class Statement;
-class Value;
 class Worker;
 
 
@@ -102,7 +102,8 @@ private:
 			bool				_HandleBreakpointConditionIfNeeded(
 									CpuState* cpuState);
 			void				_HandleBreakpointConditionEvaluated(
-									Value* value);
+									ExpressionResult* value);
+			bool				_CheckStopCondition();
 
 			bool				_HandleBreakpointHitStep(CpuState* cpuState);
 			bool				_HandleSingleStepStep(CpuState* cpuState);
@@ -124,7 +125,7 @@ private:
 			target_addr_t		fPreviousFrameAddress;
 			bool				fSingleStepping;
 			sem_id				fConditionWaitSem;
-			Value*				fConditionResult;
+			ExpressionResult*	fConditionResult;
 
 public:
 			ThreadHandler*		fNext;

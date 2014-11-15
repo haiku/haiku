@@ -18,12 +18,12 @@
 
 #include "CliContext.h"
 #include "CppLanguage.h"
-#include "SyntheticPrimitiveType.h"
 #include "Team.h"
 #include "TeamMemoryBlock.h"
 #include "UiUtils.h"
 #include "UserInterface.h"
 #include "Value.h"
+#include "Variable.h"
 
 
 CliDumpMemoryCommand::CliDumpMemoryCommand()
@@ -60,22 +60,7 @@ CliDumpMemoryCommand::Execute(int argc, const char* const* argv,
 	ExpressionInfo* info = context.GetExpressionInfo();
 
 	target_addr_t address = 0;
-
-	PrimitiveType* type = dynamic_cast<PrimitiveType*>(info->ResultType());
-	if (type == NULL || type->TypeConstant() != B_UINT64_TYPE) {
-		type = new(std::nothrow) SyntheticPrimitiveType(
-		B_UINT64_TYPE);
-		if (type == NULL) {
-			printf("Unable to evaluate expression: %s\n", strerror(B_NO_MEMORY));
-			return;
-		}
-
-		BReference<Type> typeReference(type, true);
-
-		info->SetResultType(type);
-	}
-
-	info->SetExpression(argv[1]);
+	info->SetTo(argv[1]);
 
 	context.GetUserInterfaceListener()->ExpressionEvaluationRequested(
 		fLanguage, info);
@@ -84,14 +69,17 @@ CliDumpMemoryCommand::Execute(int argc, const char* const* argv,
 		return;
 
 	BString errorMessage;
-	Value* value = context.GetExpressionValue();
-	if (value != NULL) {
-		BVariant variantValue;
-		value->ToVariant(variantValue);
-		if (variantValue.Type() == B_UINT64_TYPE)
-			address = variantValue.ToUInt64();
-		else
-			value->ToString(errorMessage);
+	ExpressionResult* result = context.GetExpressionValue();
+	if (result != NULL) {
+		if (result->Kind() == EXPRESSION_RESULT_KIND_PRIMITIVE) {
+			Value* value = result->PrimitiveValue();
+			BVariant variantValue;
+			value->ToVariant(variantValue);
+			if (variantValue.Type() == B_STRING_TYPE)
+				errorMessage.SetTo(variantValue.ToString());
+			else
+				address = variantValue.ToUInt64();
+		}
 	} else
 		errorMessage = strerror(context.GetExpressionResult());
 

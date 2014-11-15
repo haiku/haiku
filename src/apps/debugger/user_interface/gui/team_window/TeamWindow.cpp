@@ -406,15 +406,12 @@ TeamWindow::MessageReceived(BMessage* message)
 			fExpressionPromptWindow = NULL;
 
 			const char* expression;
-			int32 type;
 			BMessenger targetMessenger;
 			if (message->FindString("expression", &expression) == B_OK
-				&& message->FindInt32("type", &type) == B_OK
 				&& message->FindMessenger("target", &targetMessenger)
 					== B_OK) {
 				BMessage addMessage(MSG_ADD_NEW_EXPRESSION);
 				addMessage.AddString("expression", expression);
-				addMessage.AddInt32("type", type);
 
 				targetMessenger.SendMessage(&addMessage);
 			}

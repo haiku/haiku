@@ -11,11 +11,9 @@
 #include <stdlib.h>
 
 #include "CLanguageExpressionEvaluator.h"
-#include "FloatValue.h"
-#include "IntegerValue.h"
-#include "Number.h"
-#include "StringValue.h"
+#include "ExpressionInfo.h"
 #include "TeamTypeInformation.h"
+#include "StringValue.h"
 #include "Type.h"
 #include "TypeLookupConstraints.h"
 
@@ -167,46 +165,28 @@ CLanguageFamily::ParseTypeExpression(const BString& expression,
 
 
 status_t
-CLanguageFamily::EvaluateExpression(const BString& expression, type_code type,
-	ValueNodeManager* manager, Value*& _output, ValueNode*& _neededNode)
+CLanguageFamily::EvaluateExpression(const BString& expression,
+	ValueNodeManager* manager, ExpressionResult*& _output,
+	ValueNode*& _neededNode)
 {
 	_output = NULL;
 	_neededNode = NULL;
 	CLanguageExpressionEvaluator evaluator;
-	Number result;
 	try {
-		result = evaluator.Evaluate(expression, type, manager);
-		BVariant resultValue = result.GetValue();
-		switch (type) {
-			case B_INT8_TYPE:
-			case B_UINT8_TYPE:
-			case B_INT16_TYPE:
-			case B_UINT16_TYPE:
-			case B_INT32_TYPE:
-			case B_UINT32_TYPE:
-			case B_INT64_TYPE:
-			case B_UINT64_TYPE:
-				_output = new(std::nothrow) IntegerValue(resultValue);
-				break;
-
-			case B_FLOAT_TYPE:
-				_output = new(std::nothrow) FloatValue(resultValue.ToFloat());
-				break;
-
-			case B_DOUBLE_TYPE:
-				_output = new(std::nothrow) FloatValue(resultValue.ToDouble());
-				break;
-		}
-
-		if (_output == NULL)
-			return B_NO_MEMORY;
-
+		_output = evaluator.Evaluate(expression, manager);
 		return B_OK;
 	} catch (ParseException ex) {
-		BString stringValue;
-		stringValue.SetToFormat("Parse error at position %" B_PRId32 ": %s",
+		BString error;
+		error.SetToFormat("Parse error at position %" B_PRId32 ": %s",
 			ex.position, ex.message.String());
-		_output = new(std::nothrow) StringValue(stringValue);
+		StringValue* value = new(std::nothrow) StringValue(error.String());
+		if (value == NULL)
+			return B_NO_MEMORY;
+		BReference<Value> valueReference(value, true);
+		_output = new(std::nothrow) ExpressionResult();
+		if (_output == NULL)
+			return B_NO_MEMORY;
+		_output->SetToPrimitive(value);
 		return B_BAD_DATA;
 	} catch (ValueNeededException ex) {
 		_neededNode = ex.value;

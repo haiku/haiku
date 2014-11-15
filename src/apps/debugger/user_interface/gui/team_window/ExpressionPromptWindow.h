@@ -10,8 +10,6 @@
 
 
 class BButton;
-class BMenu;
-class BMenuItem;
 class BTextControl;
 
 
@@ -35,9 +33,6 @@ public:
 
 private:
 			void	 			_Init();
-			BMenu*				_BuildTypesMenu();
-			BMenuItem*			_AddMenuItemForType(BMenu* menu,
-									type_code type);
 
 private:
 			BTextControl*		fExpressionInput;
@@ -45,7 +40,6 @@ private:
 			BButton*			fAddButton;
 			BHandler*			fAddTarget;
 			BHandler*			fCloseTarget;
-			type_code			fCurrentType;
 };
 
 #endif // EXPRESSION_PROMPT_WINDOW_H

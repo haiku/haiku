@@ -11,6 +11,8 @@
 
 #include "CLanguageExpressionEvaluator.h"
 
+#include <algorithm>
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,7 +20,9 @@
 
 #include "AutoLocker.h"
 
-#include "Number.h"
+#include "ExpressionInfo.h"
+#include "FloatValue.h"
+#include "IntegerValue.h"
 #include "StackFrame.h"
 #include "Thread.h"
 #include "Type.h"
@@ -26,6 +30,7 @@
 #include "ValueNode.h"
 #include "ValueNodeManager.h"
 #include "Variable.h"
+#include "VariableValueNodeChild.h"
 
 
 enum {
@@ -62,6 +67,15 @@ enum {
 
 	TOKEN_MEMBER_PTR
 };
+
+
+enum operand_kind {
+	OPERAND_KIND_UNKNOWN = 0,
+	OPERAND_KIND_PRIMITIVE,
+	OPERAND_KIND_TYPE,
+	OPERAND_KIND_VALUE_NODE
+};
+
 
 static BString TokenTypeToString(int32 type)
 {
@@ -165,6 +179,1255 @@ static BString TokenTypeToString(int32 type)
 }
 
 
+// #pragma mark - CLanguageExpressionEvaluator::Operand
+
+
+class CLanguageExpressionEvaluator::Operand {
+public:
+	Operand()
+		:
+		fPrimitive(),
+		fValueNode(NULL),
+		fType(NULL),
+		fKind(OPERAND_KIND_UNKNOWN)
+	{
+	}
+
+	Operand(int64 value)
+		:
+		fPrimitive(value),
+		fValueNode(NULL),
+		fType(NULL),
+		fKind(OPERAND_KIND_PRIMITIVE)
+	{
+	}
+
+	Operand(double value)
+		:
+		fPrimitive(value),
+		fValueNode(NULL),
+		fType(NULL),
+		fKind(OPERAND_KIND_PRIMITIVE)
+	{
+	}
+
+	Operand(ValueNode* node)
+		:
+		fPrimitive(),
+		fValueNode(NULL),
+		fType(NULL),
+		fKind(OPERAND_KIND_UNKNOWN)
+	{
+		SetTo(node);
+	}
+
+	Operand(Type* type)
+		:
+		fPrimitive(),
+		fValueNode(NULL),
+		fType(NULL),
+		fKind(OPERAND_KIND_UNKNOWN)
+	{
+		SetTo(type);
+	}
+
+	Operand(const Operand& X)
+		:
+		fPrimitive(),
+		fValueNode(NULL),
+		fType(NULL),
+		fKind(OPERAND_KIND_UNKNOWN)
+	{
+		*this = X;
+	}
+
+
+	virtual ~Operand()
+	{
+		Unset();
+	}
+
+	Operand& operator=(const Operand& X)
+	{
+		switch (X.fKind) {
+			case OPERAND_KIND_UNKNOWN:
+				Unset();
+				break;
+
+			case OPERAND_KIND_PRIMITIVE:
+				SetTo(X.fPrimitive);
+				break;
+
+			case OPERAND_KIND_VALUE_NODE:
+				SetTo(X.fValueNode);
+				break;
+
+			case OPERAND_KIND_TYPE:
+				SetTo(X.fType);
+				break;
+		}
+
+		return *this;
+	}
+
+	void SetTo(const BVariant& value)
+	{
+		Unset();
+		fPrimitive = value;
+		fKind = OPERAND_KIND_PRIMITIVE;
+	}
+
+	void SetTo(ValueNode* node)
+	{
+		Unset();
+		fValueNode = node;
+		fValueNode->AcquireReference();
+
+		Value* value = node->GetValue();
+		if (value != NULL)
+			value->ToVariant(fPrimitive);
+
+		fKind = OPERAND_KIND_VALUE_NODE;
+	}
+
+	void SetTo(Type* type)
+	{
+		Unset();
+		fType = type;
+		fType->AcquireReference();
+
+		fKind = OPERAND_KIND_TYPE;
+	}
+
+	void Unset()
+	{
+		if (fValueNode != NULL)
+			fValueNode->ReleaseReference();
+
+		if (fType != NULL)
+			fType->ReleaseReference();
+
+		fValueNode = NULL;
+		fType = NULL;
+		fKind = OPERAND_KIND_UNKNOWN;
+	}
+
+	inline operand_kind Kind() const
+	{
+		return fKind;
+	}
+
+	inline const BVariant& PrimitiveValue() const
+	{
+		return fPrimitive;
+	}
+
+	inline ValueNode* GetValueNode() const
+	{
+		return fValueNode;
+
+	}
+
+	inline Type* GetType() const
+	{
+		return fType;
+	}
+
+	Operand& operator+=(const Operand& rhs)
+	{
+		Operand temp = rhs;
+		_ResolveTypesIfNeeded(temp);
+
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				fPrimitive.SetTo((int8)(fPrimitive.ToInt8()
+					+ temp.fPrimitive.ToInt8()));
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				fPrimitive.SetTo((uint8)(fPrimitive.ToUInt8()
+					+ temp.fPrimitive.ToUInt8()));
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				fPrimitive.SetTo((int16)(fPrimitive.ToInt16()
+					+ temp.fPrimitive.ToInt16()));
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				fPrimitive.SetTo((uint16)(fPrimitive.ToUInt16()
+					+ temp.fPrimitive.ToUInt16()));
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt32()
+					+ temp.fPrimitive.ToInt32());
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt32()
+					+ temp.fPrimitive.ToUInt32());
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt64()
+					+ temp.fPrimitive.ToInt64());
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt64()
+					+ temp.fPrimitive.ToUInt64());
+				break;
+			}
+
+			case B_FLOAT_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToFloat()
+					+ temp.fPrimitive.ToFloat());
+				break;
+			}
+
+			case B_DOUBLE_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToDouble()
+					+ temp.fPrimitive.ToDouble());
+				break;
+			}
+		}
+
+		return *this;
+	}
+
+	Operand& operator-=(const Operand& rhs)
+	{
+		Operand temp = rhs;
+		_ResolveTypesIfNeeded(temp);
+
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				fPrimitive.SetTo((int8)(fPrimitive.ToInt8()
+					- temp.fPrimitive.ToInt8()));
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				fPrimitive.SetTo((uint8)(fPrimitive.ToUInt8()
+					- temp.fPrimitive.ToUInt8()));
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				fPrimitive.SetTo((int16)(fPrimitive.ToInt16()
+					- temp.fPrimitive.ToInt16()));
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				fPrimitive.SetTo((uint16)(fPrimitive.ToUInt16()
+					- temp.fPrimitive.ToUInt16()));
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt32()
+					- temp.fPrimitive.ToInt32());
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt32()
+					- temp.fPrimitive.ToUInt32());
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt64()
+					- temp.fPrimitive.ToInt64());
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt64()
+					- temp.fPrimitive.ToUInt64());
+				break;
+			}
+
+			case B_FLOAT_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToFloat()
+					- temp.fPrimitive.ToFloat());
+				break;
+			}
+
+			case B_DOUBLE_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToDouble()
+					- temp.fPrimitive.ToDouble());
+				break;
+			}
+		}
+
+		return *this;
+	}
+
+	Operand& operator/=(const Operand& rhs)
+	{
+		Operand temp = rhs;
+		_ResolveTypesIfNeeded(temp);
+
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				fPrimitive.SetTo((int8)(fPrimitive.ToInt8()
+					/ temp.fPrimitive.ToInt8()));
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				fPrimitive.SetTo((uint8)(fPrimitive.ToUInt8()
+					/ temp.fPrimitive.ToUInt8()));
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				fPrimitive.SetTo((int16)(fPrimitive.ToInt16()
+					/ temp.fPrimitive.ToInt16()));
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				fPrimitive.SetTo((uint16)(fPrimitive.ToUInt16()
+					/ temp.fPrimitive.ToUInt16()));
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt32()
+					/ temp.fPrimitive.ToInt32());
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt32()
+					/ temp.fPrimitive.ToUInt32());
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt64()
+					/ temp.fPrimitive.ToInt64());
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt64()
+					/ temp.fPrimitive.ToUInt64());
+				break;
+			}
+
+			case B_FLOAT_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToFloat()
+					/ temp.fPrimitive.ToFloat());
+				break;
+			}
+
+			case B_DOUBLE_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToDouble()
+					/ temp.fPrimitive.ToDouble());
+				break;
+			}
+		}
+
+		return *this;
+	}
+
+	Operand& operator*=(const Operand& rhs)
+	{
+		Operand temp = rhs;
+		_ResolveTypesIfNeeded(temp);
+
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				fPrimitive.SetTo((int8)(fPrimitive.ToInt8()
+					* temp.fPrimitive.ToInt8()));
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				fPrimitive.SetTo((uint8)(fPrimitive.ToUInt8()
+					* temp.fPrimitive.ToUInt8()));
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				fPrimitive.SetTo((int16)(fPrimitive.ToInt16()
+					* temp.fPrimitive.ToInt16()));
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				fPrimitive.SetTo((uint16)(fPrimitive.ToUInt16()
+					* temp.fPrimitive.ToUInt16()));
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt32()
+					* temp.fPrimitive.ToInt32());
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt32()
+					* temp.fPrimitive.ToUInt32());
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt64()
+					* temp.fPrimitive.ToInt64());
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt64()
+					* temp.fPrimitive.ToUInt64());
+				break;
+			}
+
+			case B_FLOAT_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToFloat()
+					* temp.fPrimitive.ToFloat());
+				break;
+			}
+
+			case B_DOUBLE_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToDouble()
+					* temp.fPrimitive.ToDouble());
+				break;
+			}
+		}
+
+		return *this;
+	}
+
+	Operand& operator%=(const Operand& rhs)
+	{
+		Operand temp = rhs;
+		_ResolveTypesIfNeeded(temp);
+
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				fPrimitive.SetTo((int8)(fPrimitive.ToInt8()
+					% temp.fPrimitive.ToInt8()));
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				fPrimitive.SetTo((uint8)(fPrimitive.ToUInt8()
+					% temp.fPrimitive.ToUInt8()));
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				fPrimitive.SetTo((int16)(fPrimitive.ToInt16()
+					% temp.fPrimitive.ToInt16()));
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				fPrimitive.SetTo((uint16)(fPrimitive.ToUInt16()
+					% temp.fPrimitive.ToUInt16()));
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt32()
+					% temp.fPrimitive.ToInt32());
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt32()
+					% temp.fPrimitive.ToUInt32());
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt64()
+					% temp.fPrimitive.ToInt64());
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt64()
+					% temp.fPrimitive.ToUInt64());
+				break;
+			}
+		}
+
+		return *this;
+	}
+
+	Operand& operator&=(const Operand& rhs)
+	{
+		Operand temp = rhs;
+		_ResolveTypesIfNeeded(temp);
+
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				fPrimitive.SetTo((int8)(fPrimitive.ToInt8()
+					& temp.fPrimitive.ToInt8()));
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				fPrimitive.SetTo((uint8)(fPrimitive.ToUInt8()
+					& temp.fPrimitive.ToUInt8()));
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				fPrimitive.SetTo((int16)(fPrimitive.ToInt16()
+					& temp.fPrimitive.ToInt16()));
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				fPrimitive.SetTo((uint16)(fPrimitive.ToUInt16()
+					& temp.fPrimitive.ToUInt16()));
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt32()
+					& temp.fPrimitive.ToInt32());
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt32()
+					& temp.fPrimitive.ToUInt32());
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt64()
+					& temp.fPrimitive.ToInt64());
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt64()
+					& temp.fPrimitive.ToUInt64());
+				break;
+			}
+		}
+
+		return *this;
+	}
+
+	Operand& operator|=(const Operand& rhs)
+	{
+		Operand temp = rhs;
+		_ResolveTypesIfNeeded(temp);
+
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				fPrimitive.SetTo((int8)(fPrimitive.ToInt8()
+					| temp.fPrimitive.ToInt8()));
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				fPrimitive.SetTo((uint8)(fPrimitive.ToUInt8()
+					| temp.fPrimitive.ToUInt8()));
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				fPrimitive.SetTo((int16)(fPrimitive.ToInt16()
+					| temp.fPrimitive.ToInt16()));
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				fPrimitive.SetTo((uint16)(fPrimitive.ToUInt16()
+					| temp.fPrimitive.ToUInt16()));
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt32()
+					| temp.fPrimitive.ToInt32());
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt32()
+					| temp.fPrimitive.ToUInt32());
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt64()
+					| temp.fPrimitive.ToInt64());
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt64()
+					| temp.fPrimitive.ToUInt64());
+				break;
+			}
+		}
+
+		return *this;
+	}
+
+	Operand& operator^=(const Operand& rhs)
+	{
+		Operand temp = rhs;
+		_ResolveTypesIfNeeded(temp);
+
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				fPrimitive.SetTo((int8)(fPrimitive.ToInt8()
+					^ temp.fPrimitive.ToInt8()));
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				fPrimitive.SetTo((uint8)(fPrimitive.ToUInt8()
+					^ temp.fPrimitive.ToUInt8()));
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				fPrimitive.SetTo((int16)(fPrimitive.ToInt16()
+					^ temp.fPrimitive.ToInt16()));
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				fPrimitive.SetTo((uint16)(fPrimitive.ToUInt16()
+					^ temp.fPrimitive.ToUInt16()));
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt32()
+					^ temp.fPrimitive.ToInt32());
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt32()
+					^ temp.fPrimitive.ToUInt32());
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToInt64()
+					^ temp.fPrimitive.ToInt64());
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				fPrimitive.SetTo(fPrimitive.ToUInt64()
+					^ temp.fPrimitive.ToUInt64());
+				break;
+			}
+		}
+
+		return *this;
+	}
+
+	Operand operator-() const
+	{
+		Operand value(*this);
+		value._ResolveToPrimitive();
+
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				value.fPrimitive.SetTo((int8)-fPrimitive.ToInt8());
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				value.fPrimitive.SetTo((uint8)-fPrimitive.ToUInt8());
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				value.fPrimitive.SetTo((int16)-fPrimitive.ToInt16());
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				value.fPrimitive.SetTo((uint16)-fPrimitive.ToUInt16());
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				value.fPrimitive.SetTo(-fPrimitive.ToInt32());
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				value.fPrimitive.SetTo(-fPrimitive.ToUInt32());
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				value.fPrimitive.SetTo(-fPrimitive.ToInt64());
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				value.fPrimitive.SetTo(-fPrimitive.ToUInt64());
+				break;
+			}
+
+			case B_FLOAT_TYPE:
+			{
+				value.fPrimitive.SetTo(-fPrimitive.ToFloat());
+				break;
+			}
+
+			case B_DOUBLE_TYPE:
+			{
+				value.fPrimitive.SetTo(-fPrimitive.ToDouble());
+				break;
+			}
+		}
+
+		return value;
+	}
+
+	Operand operator~() const
+	{
+		Operand value(*this);
+		value._ResolveToPrimitive();
+
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				value.fPrimitive.SetTo((int8)~fPrimitive.ToInt8());
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				value.fPrimitive.SetTo((uint8)~fPrimitive.ToUInt8());
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				value.fPrimitive.SetTo((int16)~fPrimitive.ToInt16());
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				value.fPrimitive.SetTo((uint16)~fPrimitive.ToUInt16());
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				value.fPrimitive.SetTo(~fPrimitive.ToInt32());
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				value.fPrimitive.SetTo(~fPrimitive.ToUInt32());
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				value.fPrimitive.SetTo(~fPrimitive.ToInt64());
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				value.fPrimitive.SetTo(~fPrimitive.ToUInt64());
+				break;
+			}
+		}
+
+		return value;
+	}
+
+	int operator<(const Operand& rhs) const
+	{
+		Operand lhs = *this;
+		Operand temp = rhs;
+
+		lhs._ResolveTypesIfNeeded(temp);
+
+		int result = 0;
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt8() < temp.fPrimitive.ToInt8();
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt8() < temp.fPrimitive.ToUInt8();
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt16() < temp.fPrimitive.ToInt16();
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt16()
+					< temp.fPrimitive.ToUInt16();
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt32() < temp.fPrimitive.ToInt32();
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt32()
+					< temp.fPrimitive.ToUInt32();
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt64() < temp.fPrimitive.ToInt64();
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt64()
+					< temp.fPrimitive.ToUInt64();
+				break;
+			}
+
+			case B_FLOAT_TYPE:
+			{
+				result = lhs.fPrimitive.ToFloat() < temp.fPrimitive.ToFloat();
+				break;
+			}
+
+			case B_DOUBLE_TYPE:
+			{
+				result = lhs.fPrimitive.ToDouble()
+					< temp.fPrimitive.ToDouble();
+				break;
+			}
+		}
+
+		return result;
+	}
+
+	int operator<=(const Operand& rhs) const
+	{
+		return (*this < rhs) || (*this == rhs);
+	}
+
+	int operator>(const Operand& rhs) const
+	{
+		Operand lhs = *this;
+		Operand temp = rhs;
+		lhs._ResolveTypesIfNeeded(temp);
+
+		int result = 0;
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt8() > temp.fPrimitive.ToInt8();
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt8() > temp.fPrimitive.ToUInt8();
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt16() > temp.fPrimitive.ToInt16();
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt16()
+					> temp.fPrimitive.ToUInt16();
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt32() > temp.fPrimitive.ToInt32();
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt32()
+					> temp.fPrimitive.ToUInt32();
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt64() > temp.fPrimitive.ToInt64();
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt64()
+					> temp.fPrimitive.ToUInt64();
+				break;
+			}
+
+			case B_FLOAT_TYPE:
+			{
+				result = lhs.fPrimitive.ToFloat() > temp.fPrimitive.ToFloat();
+				break;
+			}
+
+			case B_DOUBLE_TYPE:
+			{
+				result = lhs.fPrimitive.ToDouble()
+					> temp.fPrimitive.ToDouble();
+				break;
+			}
+		}
+
+		return result;
+	}
+
+	int operator>=(const Operand& rhs) const
+	{
+		return (*this > rhs) || (*this == rhs);
+	}
+
+	int	operator==(const Operand& rhs) const
+	{
+		Operand lhs = *this;
+		Operand temp = rhs;
+		lhs._ResolveTypesIfNeeded(temp);
+
+		int result = 0;
+		switch (fPrimitive.Type()) {
+			case B_INT8_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt8() == temp.fPrimitive.ToInt8();
+				break;
+			}
+
+			case B_UINT8_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt8() == temp.fPrimitive.ToUInt8();
+				break;
+			}
+
+			case B_INT16_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt16() == temp.fPrimitive.ToInt16();
+				break;
+			}
+
+			case B_UINT16_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt16()
+					== temp.fPrimitive.ToUInt16();
+				break;
+			}
+
+			case B_INT32_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt32() == temp.fPrimitive.ToInt32();
+				break;
+			}
+
+			case B_UINT32_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt32()
+					== temp.fPrimitive.ToUInt32();
+				break;
+			}
+
+			case B_INT64_TYPE:
+			{
+				result = lhs.fPrimitive.ToInt64() == temp.fPrimitive.ToInt64();
+				break;
+			}
+
+			case B_UINT64_TYPE:
+			{
+				result = lhs.fPrimitive.ToUInt64()
+					== temp.fPrimitive.ToUInt64();
+				break;
+			}
+
+			case B_FLOAT_TYPE:
+			{
+				result = lhs.fPrimitive.ToFloat() == temp.fPrimitive.ToFloat();
+				break;
+			}
+
+			case B_DOUBLE_TYPE:
+			{
+				result = lhs.fPrimitive.ToDouble()
+					== temp.fPrimitive.ToDouble();
+				break;
+			}
+		}
+
+		return result;
+	}
+
+	int operator!=(const Operand& rhs) const
+	{
+		return !(*this == rhs);
+	}
+
+private:
+	void _GetAsType(type_code type)
+	{
+		switch (type) {
+			case B_INT8_TYPE:
+				fPrimitive.SetTo(fPrimitive.ToInt8());
+				break;
+			case B_UINT8_TYPE:
+				fPrimitive.SetTo(fPrimitive.ToUInt8());
+				break;
+			case B_INT16_TYPE:
+				fPrimitive.SetTo(fPrimitive.ToInt16());
+				break;
+			case B_UINT16_TYPE:
+				fPrimitive.SetTo(fPrimitive.ToUInt16());
+				break;
+			case B_INT32_TYPE:
+				fPrimitive.SetTo(fPrimitive.ToInt32());
+				break;
+			case B_UINT32_TYPE:
+				fPrimitive.SetTo(fPrimitive.ToUInt32());
+				break;
+			case B_INT64_TYPE:
+				fPrimitive.SetTo(fPrimitive.ToInt64());
+				break;
+			case B_UINT64_TYPE:
+				fPrimitive.SetTo(fPrimitive.ToUInt64());
+				break;
+			case B_FLOAT_TYPE:
+				fPrimitive.SetTo(fPrimitive.ToFloat());
+				break;
+			case B_DOUBLE_TYPE:
+				fPrimitive.SetTo(fPrimitive.ToDouble());
+				break;
+		}
+	}
+
+	void _ResolveTypesIfNeeded(Operand& other)
+	{
+		_ResolveToPrimitive();
+		other._ResolveToPrimitive();
+
+		if (!fPrimitive.IsNumber() || !other.fPrimitive.IsNumber()) {
+				throw ParseException("Cannot perform mathematical operations "
+					"between non-numerical objects.", 0);
+		}
+
+		type_code thisType = fPrimitive.Type();
+		type_code otherType = other.fPrimitive.Type();
+
+		if (thisType == otherType)
+			return;
+
+		type_code resolvedType = _ResolvePriorityType(thisType, otherType);
+		if (thisType != resolvedType)
+			_GetAsType(resolvedType);
+
+		if (otherType != resolvedType)
+			other._GetAsType(resolvedType);
+	}
+
+	void _ResolveToPrimitive()
+	{
+		if (Kind() == OPERAND_KIND_PRIMITIVE)
+			return;
+		else if (Kind() == OPERAND_KIND_TYPE) {
+			throw ParseException("Cannot perform mathematical operations "
+				"between type objects.", 0);
+		}
+
+		status_t error = fValueNode->LocationAndValueResolutionState();
+		if (error != B_OK) {
+			BString errorMessage;
+			errorMessage.SetToFormat("Failed to resolve value of %s: %"
+				B_PRId32 ".", fValueNode->Name().String(), error);
+			throw ParseException(errorMessage.String(), 0);
+		}
+
+		Value* value = fValueNode->GetValue();
+		BVariant tempValue;
+		if (value->ToVariant(tempValue))
+			SetTo(tempValue);
+		else {
+			BString error;
+			error.SetToFormat("Failed to retrieve value of %s.",
+				fValueNode->Name().String());
+			throw ParseException(error.String(), 0);
+		}
+	}
+
+	type_code _ResolvePriorityType(type_code lhs, type_code rhs) const
+	{
+		size_t byteSize = std::max(BVariant::SizeOfType(lhs),
+			BVariant::SizeOfType(rhs));
+		bool isFloat = BVariant::TypeIsFloat(lhs)
+			|| BVariant::TypeIsFloat(rhs);
+		bool isSigned = isFloat;
+		if (!isFloat) {
+			BVariant::TypeIsInteger(lhs, &isSigned);
+			if (!isSigned)
+				BVariant::TypeIsInteger(rhs, &isSigned);
+		}
+
+		if (isFloat) {
+			if (byteSize == sizeof(float))
+				return B_FLOAT_TYPE;
+			return B_DOUBLE_TYPE;
+		}
+
+		switch (byteSize) {
+			case 1:
+				return isSigned ? B_INT8_TYPE : B_UINT8_TYPE;
+			case 2:
+				return isSigned ? B_INT16_TYPE : B_UINT16_TYPE;
+			case 4:
+				return isSigned ? B_INT32_TYPE : B_UINT32_TYPE;
+			case 8:
+				return isSigned ? B_INT64_TYPE : B_UINT64_TYPE;
+			default:
+				break;
+		}
+
+		BString error;
+		error.SetToFormat("Unable to reconcile types %#" B_PRIx32
+			" and %#" B_PRIx32, lhs, rhs);
+		throw ParseException(error.String(), 0);
+	}
+
+private:
+	BVariant 		fPrimitive;
+	ValueNode*		fValueNode;
+	Type*			fType;
+	operand_kind	fKind;
+};
+
+
+// #pragma mark - CLanguageExpressionEvaluator::Token
+
+
 struct CLanguageExpressionEvaluator::Token {
 	Token()
 		: string(""),
@@ -201,20 +1464,22 @@ struct CLanguageExpressionEvaluator::Token {
 
 	BString		string;
 	int32		type;
-	Number		value;
+	BVariant	value;
 
 	int32		position;
 };
 
 
+// #pragma mark - CLanguageExpressionEvaluator::Tokenizer
+
+
 class CLanguageExpressionEvaluator::Tokenizer {
- public:
+public:
 	Tokenizer()
 		: fString(""),
 		  fCurrentChar(NULL),
 		  fCurrentToken(),
-		  fReuseToken(false),
-		  fType(B_INT32_TYPE)
+		  fReuseToken(false)
 	{
 	}
 
@@ -224,11 +1489,6 @@ class CLanguageExpressionEvaluator::Tokenizer {
 		fCurrentChar = fString.String();
 		fCurrentToken = Token();
 		fReuseToken = false;
-	}
-
-	void SetType(type_code type)
-	{
-		fType = type;
 	}
 
 	const Token& NextToken()
@@ -252,7 +1512,7 @@ class CLanguageExpressionEvaluator::Tokenizer {
 
 		if (decimal || isdigit(*fCurrentChar)) {
 			if (*fCurrentChar == '0' && fCurrentChar[1] == 'x')
-				return _ParseHexNumber();
+				return _ParseHexOperand();
 
 			BString temp;
 
@@ -267,33 +1527,11 @@ class CLanguageExpressionEvaluator::Tokenizer {
 			// optional post comma part
 			// (required if there are no digits before the comma)
 			if (*fCurrentChar == '.' || *fCurrentChar == ',') {
+				decimal = true;
 				temp << '.';
 				fCurrentChar++;
 
 				// optional post comma digits
-				while (isdigit(*fCurrentChar)) {
-					temp << *fCurrentChar;
-					fCurrentChar++;
-				}
-			}
-
-			// optional exponent part
-			if (*fCurrentChar == 'E') {
-				temp << *fCurrentChar;
-				fCurrentChar++;
-
-				// optional exponent sign
-				if (*fCurrentChar == '+' || *fCurrentChar == '-') {
-					temp << *fCurrentChar;
-					fCurrentChar++;
-				}
-
-				// required exponent digits
-				if (!isdigit(*fCurrentChar)) {
-					throw ParseException("missing exponent in constant",
-						fCurrentChar - begin);
-				}
-
 				while (isdigit(*fCurrentChar)) {
 					temp << *fCurrentChar;
 					fCurrentChar++;
@@ -324,7 +1562,13 @@ class CLanguageExpressionEvaluator::Tokenizer {
 
 			fCurrentToken = Token(begin, length, _CurrentPos() - length,
 				TOKEN_CONSTANT);
-			fCurrentToken.value.SetTo(fType, temp.String());
+			if (decimal)
+				fCurrentToken.value.SetTo(value);
+			else {
+				fCurrentToken.value.SetTo((int64)strtoll(temp.String(), NULL,
+						10));
+			}
+
 		} else if (isalpha(*fCurrentChar)) {
 			const char* begin = fCurrentChar;
 			while (*fCurrentChar != 0 && (isalpha(*fCurrentChar)
@@ -510,7 +1754,7 @@ class CLanguageExpressionEvaluator::Tokenizer {
 		return isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
 	}
 
-	Token& _ParseHexNumber()
+	Token& _ParseHexOperand()
 	{
 		const char* begin = fCurrentChar;
 		fCurrentChar += 2;
@@ -527,7 +1771,8 @@ class CLanguageExpressionEvaluator::Tokenizer {
 		fCurrentToken = Token(begin, length, _CurrentPos() - length,
 			TOKEN_CONSTANT);
 
-		fCurrentToken.value.SetTo(fType, fCurrentToken.string.String(), 16);
+		fCurrentToken.value.SetTo((int64)strtoull(
+				fCurrentToken.string.String(), NULL, 16));
 		return fCurrentToken;
 	}
 
@@ -540,14 +1785,15 @@ class CLanguageExpressionEvaluator::Tokenizer {
 	const char*	fCurrentChar;
 	Token		fCurrentToken;
 	bool		fReuseToken;
-	type_code	fType;
 };
+
+
+// #pragma mark - CLanguageExpressionEvaluator
 
 
 CLanguageExpressionEvaluator::CLanguageExpressionEvaluator()
 	:
 	fTokenizer(new Tokenizer()),
-	fCurrentType(B_INT64_TYPE),
 	fNodeManager(NULL)
 {
 }
@@ -559,28 +1805,53 @@ CLanguageExpressionEvaluator::~CLanguageExpressionEvaluator()
 }
 
 
-Number
+ExpressionResult*
 CLanguageExpressionEvaluator::Evaluate(const char* expressionString,
-	type_code type, ValueNodeManager* manager)
+	ValueNodeManager* manager)
 {
-	fCurrentType = type;
 	fNodeManager = manager;
-	fTokenizer->SetType(type);
 	fTokenizer->SetTo(expressionString);
 
-	Number value = _ParseSum();
+	Operand value = _ParseSum();
 	Token token = fTokenizer->NextToken();
 	if (token.type != TOKEN_END_OF_LINE)
 		throw ParseException("parse error", token.position);
 
-	return value;
+	ExpressionResult* result = new(std::nothrow)ExpressionResult;
+	if (result != NULL) {
+		BReference<ExpressionResult> resultReference(result, true);
+		Value* outputValue = NULL;
+		BVariant primitive = value.PrimitiveValue();
+		if (primitive.IsInteger())
+			outputValue = new(std::nothrow) IntegerValue(primitive);
+		else if (primitive.IsFloat()) {
+			outputValue = new(std::nothrow) FloatValue(
+				primitive.ToDouble());
+		}
+
+		BReference<Value> valueReference;
+		if (outputValue != NULL)
+			valueReference.SetTo(outputValue, true);
+
+		if (value.Kind() == OPERAND_KIND_PRIMITIVE) {
+			if (outputValue == NULL)
+				return NULL;
+
+			result->SetToPrimitive(outputValue);
+		} else if (value.Kind() == OPERAND_KIND_VALUE_NODE)
+			result->SetToValueNode(value.GetValueNode()->NodeChild());
+
+		resultReference.Detach();
+	}
+
+	return result;
 }
 
 
-Number
+CLanguageExpressionEvaluator::Operand
 CLanguageExpressionEvaluator::_ParseSum()
 {
-	Number value = _ParseProduct();
+	Operand value = _ParseProduct();
 
 	while (true) {
 		Token token = fTokenizer->NextToken();
@@ -600,10 +1871,12 @@ CLanguageExpressionEvaluator::_ParseSum()
 }
 
 
-Number
+CLanguageExpressionEvaluator::Operand
 CLanguageExpressionEvaluator::_ParseProduct()
 {
-	Number value = _ParsePower();
+	static Operand zero(int64(0LL));
+
+	Operand value = _ParsePower();
 
 	while (true) {
 		Token token = fTokenizer->NextToken();
@@ -613,8 +1886,8 @@ CLanguageExpressionEvaluator::_ParseProduct()
 				break;
 			case TOKEN_SLASH:
 			{
-				Number rhs = _ParsePower();
-				if (rhs == Number(fCurrentType, 0))
+				Operand rhs = _ParsePower();
+				if (rhs == zero)
 					throw ParseException("division by zero", token.position);
 				value /= rhs;
 				break;
@@ -622,8 +1895,8 @@ CLanguageExpressionEvaluator::_ParseProduct()
 
 			case TOKEN_MODULO:
 			{
-				Number rhs = _ParsePower();
-				if (rhs == Number())
+				Operand rhs = _ParsePower();
+				if (rhs == zero)
 					throw ParseException("modulo by zero", token.position);
 				value %= rhs;
 				break;
@@ -631,18 +1904,16 @@ CLanguageExpressionEvaluator::_ParseProduct()
 
 			case TOKEN_LOGICAL_AND:
 			{
-				Number zero(BVariant(0L));
-				value.SetTo(BVariant((int32)((value != zero)
-					&& (_ParsePower() != zero))));
+				value.SetTo((value != zero)
+					&& (_ParsePower() != zero));
 
 				break;
 			}
 
 			case TOKEN_LOGICAL_OR:
 			{
-				Number zero(BVariant(0L));
-				value.SetTo(BVariant((int32)((value != zero)
-					|| (_ParsePower() != zero))));
+				value.SetTo((value != zero)
+					|| (_ParsePower() != zero));
 				break;
 			}
 
@@ -659,27 +1930,27 @@ CLanguageExpressionEvaluator::_ParseProduct()
 				break;
 
 			case TOKEN_EQ:
-				value.SetTo(BVariant((int32)(value == _ParsePower())));
+				value.SetTo((int64)(value == _ParsePower()));
 				break;
 
 			case TOKEN_NE:
-				value.SetTo(BVariant((int32)(value != _ParsePower())));
+				value.SetTo((int64)(value != _ParsePower()));
 				break;
 
 			case TOKEN_GT:
-				value.SetTo(BVariant((int32)(value > _ParsePower())));
+				value.SetTo((int64)(value > _ParsePower()));
 				break;
 
 			case TOKEN_GE:
-				value.SetTo(BVariant((int32)(value >= _ParsePower())));
+				value.SetTo((int64)(value >= _ParsePower()));
 				break;
 
 			case TOKEN_LT:
-				value.SetTo(BVariant((int32)(value < _ParsePower())));
+				value.SetTo((int64)(value < _ParsePower()));
 				break;
 
 			case TOKEN_LE:
-				value.SetTo(BVariant((int32)(value <= _ParsePower())));
+				value.SetTo((int64)(value <= _ParsePower()));
 				break;
 
 			default:
@@ -690,10 +1961,10 @@ CLanguageExpressionEvaluator::_ParseProduct()
 }
 
 
-Number
+CLanguageExpressionEvaluator::Operand
 CLanguageExpressionEvaluator::_ParsePower()
 {
-	Number value = _ParseUnary();
+	Operand value = _ParseUnary();
 
 	while (true) {
 		Token token = fTokenizer->NextToken();
@@ -702,9 +1973,9 @@ CLanguageExpressionEvaluator::_ParsePower()
 			return value;
 		}
 
-		Number power = _ParseUnary();
-		Number temp = value;
-		int32 powerValue = power.GetValue().ToInt32();
+		Operand power = _ParseUnary();
+		Operand temp = value;
+		int64 powerValue = power.PrimitiveValue().ToInt64();
 		bool handleNegativePower = false;
 		if (powerValue < 0) {
 			powerValue = abs(powerValue);
@@ -712,14 +1983,14 @@ CLanguageExpressionEvaluator::_ParsePower()
 		}
 
 		if (powerValue == 0)
-			value.SetTo(fCurrentType, "1");
+			value.SetTo((int64)1);
 		else {
 			for (; powerValue > 1; powerValue--)
 				value *= temp;
 		}
 
 		if (handleNegativePower) {
-			temp.SetTo(fCurrentType, "1");
+			temp.SetTo((int64)1);
 			temp /= value;
 			value = temp;
 		}
@@ -727,7 +1998,7 @@ CLanguageExpressionEvaluator::_ParsePower()
 }
 
 
-Number
+CLanguageExpressionEvaluator::Operand
 CLanguageExpressionEvaluator::_ParseUnary()
 {
 	Token token = fTokenizer->NextToken();
@@ -745,7 +2016,10 @@ CLanguageExpressionEvaluator::_ParseUnary()
 			return ~_ParseUnary();
 
 		case TOKEN_LOGICAL_NOT:
-			return Number((int32)(_ParseUnary() == Number(BVariant(0L))));
+		{
+			Operand zero((int64)0);
+			return Operand((int64)(_ParseUnary() == zero));
+		}
 
 		case TOKEN_IDENTIFIER:
 			fTokenizer->RewindToken();
@@ -756,15 +2030,14 @@ CLanguageExpressionEvaluator::_ParseUnary()
 			return _ParseAtom();
 	}
 
-	return Number();
+	return Operand();
 }
 
 
-Number
+CLanguageExpressionEvaluator::Operand
 CLanguageExpressionEvaluator::_ParseIdentifier(ValueNode* parentNode)
 {
 	Token token = fTokenizer->NextToken();
-	Number value;
 
 	if (fNodeManager == NULL) {
 		throw ParseException("Identifiers not resolvable without manager.",
@@ -843,33 +2116,30 @@ CLanguageExpressionEvaluator::_ParseIdentifier(ValueNode* parentNode)
 	} else
 		fTokenizer->RewindToken();
 
-	BVariant variant;
-	Value* nodeValue = node->GetValue();
-	nodeValue->ToVariant(variant);
-	value.SetTo(variant);
-	_CoerceTypeIfNeeded(token, value);
-
-	return value;
+	return Operand(node);
 }
 
 
-Number
+CLanguageExpressionEvaluator::Operand
 CLanguageExpressionEvaluator::_ParseAtom()
 {
 	Token token = fTokenizer->NextToken();
 	if (token.type == TOKEN_END_OF_LINE)
 		throw ParseException("unexpected end of expression", token.position);
 
+	Operand value;
+
 	if (token.type == TOKEN_CONSTANT)
-		return token.value;
+		value.SetTo(token.value);
+	else {
+		fTokenizer->RewindToken();
 
-	fTokenizer->RewindToken();
+		_EatToken(TOKEN_OPENING_BRACKET);
 
-	_EatToken(TOKEN_OPENING_BRACKET);
+		value = _ParseSum();
 
-	Number value = _ParseSum();
-
-	_EatToken(TOKEN_CLOSING_BRACKET);
+		_EatToken(TOKEN_CLOSING_BRACKET);
+	}
 
 	return value;
 }
@@ -960,83 +2230,4 @@ CLanguageExpressionEvaluator::_RequestValueIfNeeded(const Token& token,
 			"%s", child->Name().String(), strerror(state));
 		throw ParseException(errorMessage, token.position);
 	}
-}
-
-
-void
-CLanguageExpressionEvaluator::_CoerceTypeIfNeeded(const Token& token,
-	Number& _number)
-{
-	if (_number.Type() == 0) {
-		throw ParseException("Unable to resolve value type.",
-			token.position);
-	}
-
-	BVariant value = _number.GetValue();
-	type_code valueType = value.Type();
-
-	if (valueType == fCurrentType) {
-		// nothing to do.
-		return;
-	}
-
-	if (BVariant::TypeIsInteger(fCurrentType)) {
-		if (BVariant::TypeIsFloat(valueType)) {
-			value.SetTo((int64)value.ToDouble());
-			valueType = value.Type();
-		}
-
-		if (BVariant::TypeIsInteger(valueType)) {
-			switch (fCurrentType) {
-				case B_INT8_TYPE:
-					value.SetTo(value.ToInt8());
-					break;
-
-				case B_UINT8_TYPE:
-					value.SetTo(value.ToUInt8());
-					break;
-
-				case B_INT16_TYPE:
-					value.SetTo(value.ToInt16());
-					break;
-
-				case B_UINT16_TYPE:
-					value.SetTo(value.ToUInt16());
-					break;
-
-				case B_INT32_TYPE:
-					value.SetTo(value.ToInt32());
-					break;
-
-				case B_UINT32_TYPE:
-					value.SetTo(value.ToUInt32());
-					break;
-
-				case B_INT64_TYPE:
-					value.SetTo(value.ToInt64());
-					break;
-
-				case B_UINT64_TYPE:
-					value.SetTo(value.ToUInt64());
-					break;
-			}
-		}
-	} else if (BVariant::TypeIsFloat(fCurrentType)) {
-		if (BVariant::TypeIsInteger(valueType)) {
-			value.SetTo((double)value.ToInt64());
-			valueType = value.Type();
-		}
-
-		switch (fCurrentType) {
-			case B_FLOAT_TYPE:
-				value.SetTo(value.ToFloat());
-				break;
-
-			case B_DOUBLE_TYPE:
-				value.SetTo(value.ToDouble());
-				break;
-		}
-	}
-
-	_number.SetTo(value);
 }

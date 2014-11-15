@@ -35,6 +35,7 @@
 #include "Team.h"
 #include "Tracing.h"
 #include "Value.h"
+#include "ValueLocation.h"
 #include "Worker.h"
 
 
@@ -63,7 +64,7 @@ public:
 	}
 
 	virtual void ExpressionEvaluated(ExpressionInfo* info, status_t result,
-		Value* value)
+		ExpressionResult* value)
 	{
 		fHandler->_HandleBreakpointConditionEvaluated(value);
 	}
@@ -888,14 +889,8 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 		if (listener == NULL)
 			return false;
 
-		Type* type = new(std::nothrow) SyntheticPrimitiveType(B_UINT64_TYPE);
-		if (type == NULL)
-			return false;
-
-		BReference<Type> typeReference(type, true);
-
 		ExpressionInfo* expressionInfo = new(std::nothrow) ExpressionInfo(
-			userBreakpoint->Condition(), type);
+			userBreakpoint->Condition());
 
 		if (expressionInfo == NULL)
 			return false;
@@ -921,23 +916,13 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 
 			teamLocker.Lock();
 
-			bool stop = false;
-			if (fConditionResult == NULL)
-				stop = true;
-			else {
-				BVariant value;
-				if (!fConditionResult->ToVariant(value))
-					stop = true;
-				if (!value.TypeIsInteger(value.Type()))
-					stop = true;
-				stop = value.ToBool();
-				fConditionResult->ReleaseReference();
-				fConditionResult = NULL;
-			}
-
-			if (stop)
+			if (_CheckStopCondition()) {
+				if (fConditionResult != NULL) {
+					fConditionResult->ReleaseReference();
+					fConditionResult = NULL;
+				}
 				return false;
-			else {
+			} else {
 				_SetThreadState(THREAD_STATE_RUNNING, NULL,
 					THREAD_STOPPED_UNKNOWN, BString());
 				fDebuggerInterface->ContinueThread(fThread->ID());
@@ -951,12 +936,31 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 
 
 void
-ThreadHandler::_HandleBreakpointConditionEvaluated(Value* value)
+ThreadHandler::_HandleBreakpointConditionEvaluated(ExpressionResult* value)
 {
 	fConditionResult = value;
 	if (fConditionResult != NULL)
 		fConditionResult->AcquireReference();
 	release_sem(fConditionWaitSem);
+}
+
+
+bool
+ThreadHandler::_CheckStopCondition()
+{
+	// if we we're unable to properly assess the expression result
+	// in any way, fall back to behaving like an unconditional breakpoint.
+	if (fConditionResult == NULL)
+		return true;
+
+	if (fConditionResult->Kind() != EXPRESSION_RESULT_KIND_PRIMITIVE)
+		return true;
+
+	BVariant value;
+	if (!fConditionResult->PrimitiveValue()->ToVariant(value))
+		return true;
+
+	return value.ToBool();
 }
 
 

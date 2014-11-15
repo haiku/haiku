@@ -85,7 +85,7 @@ public:
 									{ return fExpressionInfo; }
 			status_t			GetExpressionResult() const
 									{ return fExpressionResult; }
-			Value*				GetExpressionValue() const
+			ExpressionResult*	GetExpressionValue() const
 									{ return fExpressionValue; }
 
 			const char*			PromptUser(const char* prompt);
@@ -120,7 +120,7 @@ private:
 
 	// ExpressionInfo::Listener
 	virtual	void				ExpressionEvaluated(ExpressionInfo* info,
-									status_t result, Value* value);
+									status_t result, ExpressionResult* value);
 
 	// ValueNodeContainer::Listener
 	virtual	void				ValueNodeChanged(ValueNodeChild* nodeChild,
@@ -160,7 +160,7 @@ private:
 
 			ExpressionInfo*		fExpressionInfo;
 			status_t			fExpressionResult;
-			Value*				fExpressionValue;
+			ExpressionResult*	fExpressionValue;
 
 			EventList			fPendingEvents;
 };

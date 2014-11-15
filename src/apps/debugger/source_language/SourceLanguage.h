@@ -11,10 +11,10 @@
 
 
 class BString;
+class ExpressionResult;
 class SyntaxHighlighter;
 class TeamTypeInformation;
 class Type;
-class Value;
 class ValueNode;
 class ValueNodeManager;
 
@@ -34,8 +34,9 @@ public:
 									Type*& _resultType) const;
 
 	virtual	status_t			EvaluateExpression(const BString& expression,
-									type_code type, ValueNodeManager* manager,
-									Value*& _output, ValueNode*& _neededNode);
+									ValueNodeManager* manager,
+									ExpressionResult*& _output,
+									ValueNode*& _neededNode);
 };
 
 
