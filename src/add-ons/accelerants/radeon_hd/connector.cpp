@@ -9,6 +9,7 @@
 
 #include "connector.h"
 
+#include <assert.h>
 #include <Debug.h>
 
 #include "accelerant_protos.h"
@@ -152,6 +153,8 @@ connector_read_edid(uint32 connectorIndex, edid1_info* edid)
 bool
 connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 {
+	assert(mode);
+
 	uint8 dceMajor;
 	uint8 dceMinor;
 	int index = GetIndexIntoMasterTable(DATA, LVDS_Info);
@@ -161,6 +164,9 @@ connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 		struct _ATOM_LVDS_INFO info;
 		struct _ATOM_LVDS_INFO_V12 info_12;
 	};
+
+	// Wipe out display_mode
+	memset(mode, 0, sizeof(display_mode));
 
 	if (atom_parse_data_header(gAtomContext, index, NULL,
 		&dceMajor, &dceMinor, &offset) == B_OK) {
@@ -379,8 +385,10 @@ gpio_i2c_populate()
 			break;
 		}
 	}
-	if (gpioIndex < 0)
+	if (gpioIndex < 0) {
 		ERROR("%s: ERROR: Out of space for additional GPIO pins!\n", __func__);
+		return B_ERROR;
+	}
 
 	for (uint32 i = 0; i < numIndices; i++) {
 		if (gGPIOInfo[gpioIndex]->valid) {
