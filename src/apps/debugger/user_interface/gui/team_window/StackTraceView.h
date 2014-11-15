@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -6,6 +7,8 @@
 #define STACK_TRACE_VIEW_H
 
 #include <GroupView.h>
+
+#include <util/OpenHashTable.h>
 
 #include "table/Table.h"
 #include "Team.h"
@@ -37,6 +40,12 @@ public:
 
 private:
 			class FramesTableModel;
+			struct StackTraceKey;
+			struct StackTraceSelectionEntry;
+			struct StackTraceSelectionEntryHashDefinition;
+
+			typedef BOpenHashTable<StackTraceSelectionEntryHashDefinition>
+				StackTraceSelectionInfoTable;
 
 private:
 	// TableListener
@@ -49,6 +58,7 @@ private:
 			Table*				fFramesTable;
 			FramesTableModel*	fFramesTableModel;
 			bool				fTraceClearPending;
+			StackTraceSelectionInfoTable* fSelectionInfoTable;
 			Listener*			fListener;
 };
 
