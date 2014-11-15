@@ -309,8 +309,10 @@ gpio_general_populate()
 			break;
 		}
 	}
-	if (gpioIndex < 0)
+	if (gpioIndex < 0) {
 		ERROR("%s: ERROR: Out of space for additional GPIO pins!\n", __func__);
+		return B_ERROR;
+	}
 
 	ATOM_GPIO_PIN_ASSIGNMENT* pin = gpioInfo->asGPIO_Pin;
 	for (int i = 0; i < numIndices; i++) {
