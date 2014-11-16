@@ -214,6 +214,10 @@ command_create(int argc, const char* const* argv)
 		if (verbose)
 			printf("reading package '%s' ...\n", packageFileNames[i]);
 		BEntry entry(packageFileNames[i]);
+		if (!entry.Exists()) {
+			printf("package '%s' does not exist\n", packageFileNames[i]);
+			return 1;
+		}
 		result = repositoryWriter.AddPackage(entry);
 		if (result != B_OK)
 			return 1;
