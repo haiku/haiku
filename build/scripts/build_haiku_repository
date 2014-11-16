@@ -37,8 +37,7 @@ done
 
 # build the repository file
 cp "$repoInfo" "$repositoryDir/repo.info"
-"$packageRepo" create -C "$repositoryDir" "$repositoryDir/repo.info" \
-	"$packageDir"/*.hpkg
+"$packageRepo" create "$repositoryDir/repo.info" "$packageDir"/*.hpkg
 
 # create the checksum file
 $sha256 "$repositoryDir/repo" \
