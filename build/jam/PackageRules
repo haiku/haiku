@@ -214,7 +214,7 @@ rule BuildHaikuPackage package : packageInfo
 	local mainScript = build_haiku_package ;
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
 
-	LocalDepends $(package) : $(mainScript) $(scripts) ;
+	Depends $(package) : $(mainScript) $(scripts) ;
 	BuildHaikuPackage1 $(package) : $(mainScript) $(packageInfo) $(scripts) ;
 }
 
