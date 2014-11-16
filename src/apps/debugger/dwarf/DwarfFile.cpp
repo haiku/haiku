@@ -1900,10 +1900,6 @@ DwarfFile::_UnwindCallFrame(CompilationUnit* unit, uint8 addressSize,
 	if (cieRemaining < 0)
 		return B_BAD_DATA;
 
-	uint64 remaining = lengthOffset + length - info->fdeOffset;
-	if (remaining < 0)
-		return B_BAD_DATA;
-
 	// skip CIE ID, initial offset and range, since we already know those
 	// from FDELookupInfo.
 	dwarf64	? dataReader.Read<uint64>(0) : dataReader.Read<uint32>(0);
@@ -1946,6 +1942,10 @@ DwarfFile::_UnwindCallFrame(CompilationUnit* unit, uint8 addressSize,
 	error = context.SaveInitialRuleSet();
 	if (error != B_OK)
 		return error;
+
+	uint64 remaining = lengthOffset + length - dataReader.Offset();
+	if (remaining < 0)
+		return B_BAD_DATA;
 
 	DataReader restrictedReader =
 		dataReader.RestrictedReader(remaining);
@@ -2552,7 +2552,7 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				}
 
 				default:
-					WARNING("    unknown opcode %u!\n", opcode);
+					TRACE_CFI("    unknown opcode %u!\n", opcode);
 					return B_BAD_DATA;
 			}
 		}
