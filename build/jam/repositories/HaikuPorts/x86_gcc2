@@ -297,6 +297,7 @@ RemotePackageRepository HaikuPorts
 	sharutils-4.14-1
 	slang-2.2.4-1
 	slang_devel-2.2.4-1
+	slime_volley-2.4.2-1
 	smjpeg-0.2.1-1
 	smjpeg_devel-0.2.1-1
 	smpeg-0.4.5-3
@@ -874,6 +875,7 @@ RemotePackageRepository HaikuPorts
 	sharutils
 	simh_x86
 	slang
+	slime_volley
 	smjpeg
 	smpeg
 	speex
