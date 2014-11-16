@@ -116,7 +116,7 @@ public:
 								{ return find_thread(NULL) == fCheckingThread; }
 
 			// cache access
-			status_t		WriteSuperBlock(bool initializing = false);
+			status_t		WriteSuperBlock();
 			status_t		FlushDevice();
 
 			// queries
@@ -140,6 +140,9 @@ public:
 	static	status_t		CheckSuperBlock(const uint8* data,
 								uint32* _offset = NULL);
 	static	status_t		Identify(int fd, disk_super_block* superBlock);
+
+private:
+			status_t		_EraseUnusedBootBlock();
 
 protected:
 			fs_volume*		fVolume;
