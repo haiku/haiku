@@ -4008,6 +4008,7 @@ OutlineView::ChangeFocusRow(bool up, bool updateSelection,
 			fFocusRowRect.right = 10000;
 			Invalidate(fFocusRowRect);
 		}
+		BRow* oldFocusRow = fFocusRow;
 		fFocusRow = newRow;
 		fFocusRowRect.top = top;
 		fFocusRowRect.left = 0;
@@ -4021,12 +4022,32 @@ OutlineView::ChangeFocusRow(bool up, bool updateSelection,
 				DeselectAll();
 			}
 
+			// if the focus row isn't selected, add it to the selection
 			if (fFocusRow->fNextSelected == 0) {
 				fFocusRow->fNextSelected
 					= fSelectionListDummyHead.fNextSelected;
 				fFocusRow->fPrevSelected = &fSelectionListDummyHead;
 				fFocusRow->fNextSelected->fPrevSelected = fFocusRow;
 				fFocusRow->fPrevSelected->fNextSelected = fFocusRow;
+			} else if (oldFocusRow != NULL
+				&& fSelectionListDummyHead.fNextSelected == oldFocusRow
+				&& (((IndexOf(oldFocusRow->fNextSelected)
+						< IndexOf(oldFocusRow)) == up)
+					|| fFocusRow == oldFocusRow->fNextSelected)) {
+					// if the focus row is selected, if:
+					// 1. the previous focus row is last in the selection
+					// 2a. the next selected row is now the focus row
+					// 2b. or the next selected row is beyond the focus row
+					//	   in the move direction
+					// then deselect the previous focus row
+				fSelectionListDummyHead.fNextSelected
+					= oldFocusRow->fNextSelected;
+				if (fSelectionListDummyHead.fNextSelected != NULL) {
+					fSelectionListDummyHead.fNextSelected->fPrevSelected
+						= &fSelectionListDummyHead;
+					oldFocusRow->fNextSelected = NULL;
+				}
+				oldFocusRow->fPrevSelected = NULL;
 			}
 
 			fLastSelectedItem = fFocusRow;
