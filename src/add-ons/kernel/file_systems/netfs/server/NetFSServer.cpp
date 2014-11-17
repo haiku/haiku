@@ -40,8 +40,9 @@
 #include "Utils.h"
 #include "VolumeManager.h"
 
-static const char* kSettingsDirName		= "netfs";
-static const char* kSettingsFileName	= "netfs_server";
+static const char* kSettingsDirName				= "netfs";
+static const char* kSettingsFileName			= "netfs_server";
+static const char* kFallbackSettingsFileName	= "netfs_server_fallback";
 
 // usage
 static const char* kUsage =
@@ -796,89 +797,91 @@ NetFSServer::_LoadSecurityContext(SecurityContext** _securityContext)
 	}
 	ObjectDeleter<SecurityContext> securityContextDeleter(securityContext);
 
-	// load from driver settings for the time being
+	// load the fallback settings, if present
+	BPath path;
 	DriverSettings settings;
-	error = settings.Load("netfs-server");
-	if (error != B_OK)
-		return error;
-
-	// load users
-	DriverParameter parameter;
-	for (DriverParameterIterator it = settings.GetParameterIterator("user");
-		 it.GetNext(&parameter);) {
-		const char* userName = parameter.ValueAt(0);
-		const char* password = parameter.GetParameterValue("password");
-		if (!userName) {
-			WARN("Skipping nameless user settings entry.\n");
-			continue;
-		}
-//		PRINT(("user: %s, password: %s\n", parameter.ValueAt(0),
-//			parameter.GetParameterValue("password")));
-		error = securityContext->AddUser(userName, password);
-		if (error != B_OK)
-			ERROR("ERROR: Failed to add user `%s'\n", userName);
-	}
-
-	// load shares
-	for (DriverParameterIterator it = settings.GetParameterIterator("share");
-		 it.GetNext(&parameter);) {
-		const char* shareName = parameter.ValueAt(0);
-		const char* path = parameter.GetParameterValue("path");
-		if (!shareName || !path) {
-			WARN("settings: Skipping invalid share settings entry (no name"
-				" or no path).\n");
-			continue;
-		}
-//		PRINT(("share: %s, path: %s\n", parameter.ValueAt(0),
-//			parameter.GetParameterValue("path")));
-		Share* share;
-		error = securityContext->AddShare(shareName, path, &share);
-		if (error != B_OK) {
-			ERROR("ERROR: Failed to add share `%s'\n", shareName);
-			continue;
-		}
-		BReference<Share> shareReference(share, true);
-		DriverParameter userParameter;
-		// iterate through the share users
-		for (DriverParameterIterator userIt
-				= parameter.GetParameterIterator("user");
-			 userIt.GetNext(&userParameter);) {
-			const char* userName = userParameter.ValueAt(0);
-//			PRINT(("  user: %s\n", userName));
-			User* user = securityContext->FindUser(userName);
-			if (!user) {
-				ERROR("ERROR: Undefined user `%s'.\n", userName);
+	
+	if (_GetSettingsDirPath(&path, false) == B_OK
+			&& path.Append(kFallbackSettingsFileName) == B_OK
+			&& settings.Load(path.Path()) == B_OK) {
+		// load users
+		DriverParameter parameter;
+		for (DriverParameterIterator it = settings.GetParameterIterator("user");
+			 it.GetNext(&parameter);) {
+			const char* userName = parameter.ValueAt(0);
+			const char* password = parameter.GetParameterValue("password");
+			if (!userName) {
+				WARN("Skipping nameless user settings entry.\n");
 				continue;
 			}
-			BReference<User> userReference(user, true);
-			DriverParameter permissionsParameter;
-			if (!userParameter.FindParameter("permissions",
-					&permissionsParameter)) {
+//			PRINT(("user: %s, password: %s\n", parameter.ValueAt(0),
+//				parameter.GetParameterValue("password")));
+			error = securityContext->AddUser(userName, password);
+			if (error != B_OK)
+				ERROR("ERROR: Failed to add user `%s'\n", userName);
+		}
+
+		// load shares
+		for (DriverParameterIterator it = settings.GetParameterIterator("share");
+			 it.GetNext(&parameter);) {
+			const char* shareName = parameter.ValueAt(0);
+			const char* path = parameter.GetParameterValue("path");
+			if (!shareName || !path) {
+				WARN("settings: Skipping invalid share settings entry (no name"
+					" or no path).\n");
 				continue;
 			}
-			Permissions permissions;
-			for (int32 i = 0; i < permissionsParameter.CountValues(); i++) {
-				const char* permission = permissionsParameter.ValueAt(i);
-//				PRINT(("    permission: %s\n", permission));
-				if (strcmp(permission, "mount") == 0) {
-					permissions.AddPermissions(MOUNT_SHARE_PERMISSION);
-				} else if (strcmp(permission, "query") == 0) {
-					permissions.AddPermissions(QUERY_SHARE_PERMISSION);
-				} else if (strcmp(permission, "read") == 0) {
-					permissions.AddPermissions(READ_PERMISSION
-						| READ_DIR_PERMISSION | RESOLVE_DIR_ENTRY_PERMISSION);
-				} else if (strcmp(permission, "write") == 0) {
-					permissions.AddPermissions(WRITE_PERMISSION
-						| WRITE_DIR_PERMISSION);
-				} else if (strcmp(permission, "all") == 0) {
-					permissions.AddPermissions(ALL_PERMISSIONS);
-				}
-			}
-			error = securityContext->SetNodePermissions(share->GetPath(), user,
-				permissions);
+//			PRINT(("share: %s, path: %s\n", parameter.ValueAt(0),
+//				parameter.GetParameterValue("path")));
+			Share* share;
+			error = securityContext->AddShare(shareName, path, &share);
 			if (error != B_OK) {
-				ERROR("ERROR: Failed to set permissions for share `%s'\n",
-					share->GetName());
+				ERROR("ERROR: Failed to add share `%s'\n", shareName);
+				continue;
+			}
+			BReference<Share> shareReference(share, true);
+			DriverParameter userParameter;
+			// iterate through the share users
+			for (DriverParameterIterator userIt
+					= parameter.GetParameterIterator("user");
+				 userIt.GetNext(&userParameter);) {
+				const char* userName = userParameter.ValueAt(0);
+//				PRINT(("  user: %s\n", userName));
+				User* user = securityContext->FindUser(userName);
+				if (!user) {
+					ERROR("ERROR: Undefined user `%s'.\n", userName);
+					continue;
+				}
+				BReference<User> userReference(user, true);
+				DriverParameter permissionsParameter;
+				if (!userParameter.FindParameter("permissions",
+						&permissionsParameter)) {
+					continue;
+				}
+				Permissions permissions;
+				for (int32 i = 0; i < permissionsParameter.CountValues(); i++) {
+					const char* permission = permissionsParameter.ValueAt(i);
+//					PRINT(("    permission: %s\n", permission));
+					if (strcmp(permission, "mount") == 0) {
+						permissions.AddPermissions(MOUNT_SHARE_PERMISSION);
+					} else if (strcmp(permission, "query") == 0) {
+						permissions.AddPermissions(QUERY_SHARE_PERMISSION);
+					} else if (strcmp(permission, "read") == 0) {
+						permissions.AddPermissions(READ_PERMISSION
+							| READ_DIR_PERMISSION | RESOLVE_DIR_ENTRY_PERMISSION);
+					} else if (strcmp(permission, "write") == 0) {
+						permissions.AddPermissions(WRITE_PERMISSION
+							| WRITE_DIR_PERMISSION);
+					} else if (strcmp(permission, "all") == 0) {
+						permissions.AddPermissions(ALL_PERMISSIONS);
+					}
+				}
+				error = securityContext->SetNodePermissions(share->GetPath(), user,
+					permissions);
+				if (error != B_OK) {
+					ERROR("ERROR: Failed to set permissions for share `%s'\n",
+						share->GetName());
+				}
 			}
 		}
 	}
@@ -929,8 +932,8 @@ NetFSServer::_LoadSettings()
 
 	// if existing load the settings
 	BEntry bEntry;
-	if (FDManager::SetEntry(&bEntry, filePath.Path()) == B_OK
-		&& bEntry.Exists()) {
+	if (FDManager::SetEntry(&bEntry, filePath.Path()) != B_OK
+		|| !bEntry.Exists()) {
 		return B_ENTRY_NOT_FOUND;
 	}
 

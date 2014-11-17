@@ -520,7 +520,7 @@ ClientVolume::_NextVolumeID()
 }
 
 // sNextVolumeID
-vint32 ClientVolume::sNextVolumeID = 0;
+int32 ClientVolume::sNextVolumeID = 0;
 
 
 // #pragma -

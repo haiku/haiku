@@ -13,8 +13,6 @@
 #	FFMpeg					- audio/video library
 #	FFMpeg-devel			- FFMpeg development files
 #	Git						- the distributed version control system
-#	NetFS					- the native networked file system components
-#	UserlandFS				- aids native file system development (like FUSE)
 #	WebPositive				- native, WebKit-based web browser
 #	Welcome					- introductory documentation to Haiku
 #	WifiFirmwareScriptData	- data files needed by install-wifi-firmwares.sh
@@ -185,38 +183,6 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 	if $(TARGET_PACKAGING_ARCHS) != x86_gcc2 {
 		AddHaikuImagePackages git_cvs ;
 	}
-}
-
-
-# NetFS network file system
-if [ IsOptionalHaikuImagePackageAdded NetFS ] {
-# TODO: Make this an actual package!
-# 	# userlandfs module
-# 	AddFilesToHaikuImage home config add-ons userlandfs
-# 		: netfs ;
-#
-# 	# servers
-# 	AddFilesToHaikuImage system servers : netfs_server ;
-# 	AddFilesToHaikuImage system servers
-# 		: authentication_server ;
-#
-# 	# tools
-# 	AddFilesToHaikuImage system bin : netfs_config ;
-# 	AddFilesToHaikuImage system bin : netfs_server_prefs ;
-#
-# 	#example settings for netfs_server
-# 	local netfsServerSettingsFiles = <driver-settings>netfs-server ;
-# 	SEARCH on $(netfsServerSettingsFiles)
-# 		= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems netfs ] ;
-# 	AddFilesToHaikuImage home config settings kernel drivers
-# 	: $(netfsServerSettingsFiles) ;
-#
-# 	#userlandfs settings are needed for netfs_config to work (ioctls)
-# 	local userlandfsServerSettingsFiles = <driver-settings>userlandfs ;
-# 	SEARCH on $(userlandfsServerSettingsFiles)
-# 		= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems userlandfs ] ;
-# 	AddFilesToHaikuImage home config settings kernel drivers
-# 		: $(userlandfsServerSettingsFiles) ;
 }
 
 

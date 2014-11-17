@@ -1,0 +1,27 @@
+local netfsPackage = netfs.hpkg ;
+HaikuPackage $(netfsPackage) ;
+
+# userlandfs module
+AddFilesToPackage add-ons userlandfs : netfs ;
+
+# servers
+AddFilesToPackage servers : netfs_server ;
+AddFilesToPackage servers : authentication_server ;
+
+# tools
+AddFilesToPackage bin : netfs_config ;
+AddFilesToPackage bin : netfs_server_prefs ;
+AddFilesToPackage bin
+	: [ FDirName $(HAIKU_TOP) data bin netfs_mount ] ;
+
+# interface definition
+AddFilesToPackage data userlandfs file_systems
+	: [ FDirName $(HAIKU_TOP) data userlandfs file_systems netfs ]
+	: netfs ;
+
+# docs
+AddFilesToPackage documentation add-ons :
+	[ FDirName $(HAIKU_TOP) docs add-ons NetFS.html ] : NetFS.html ;
+
+BuildHaikuPackage $(netfsPackage) : netfs ;
+

@@ -27,7 +27,7 @@ public:
 									User** user);
 
 private:
-			vint32				fSocket;
+			int32				fSocket;
 };
 
 #endif	// NET_FS_INSECURE_CONNECTION_LISTENER_H

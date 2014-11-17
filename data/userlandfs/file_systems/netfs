@@ -1,0 +1,18 @@
+# NetFS interface definition for UserlandFS
+
+file_system netfs {
+	# NET_FS_IOCTL_ADD_SERVER
+	ioctl 11000 {
+		buffer_size			256
+		write_buffer_size	0
+		is_buffer			true
+	}
+
+	# NET_FS_IOCTL_REMOVE_SERVER
+	ioctl 11001 {
+		buffer_size			256
+		write_buffer_size	0
+		is_buffer			true
+	}
+}
+

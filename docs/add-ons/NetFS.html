@@ -1,0 +1,146 @@
+<!--
+If you move this file, you must update the package rules file at
+build/jam/packages/NetFS to reflect the new location. Otherwise the package will
+not build.
+-->
+<html>
+<head>
+<title>NetFS</title>
+<style>
+.code {
+	font-family: monospace;
+	background: #eee;
+	border: 1px solid black;
+	whitespace: pre;
+	padding: 1em;
+}
+span.code {
+	padding: 0;
+	border: 0;
+}
+</style>
+</head>
+<body>
+
+<h1 align="center">NetFS</h1>
+
+<hr />
+
+<h2 align="center">Client</h2>
+
+<p>To run the client, execute the following at the command line:</p>
+
+<pre class="code">
+$ netfs_mount
+</pre>
+
+<p>A "Network" icon will appear on your desktop, containing remote servers
+identified by host name. Inside the folder for each server are the shares on
+that server.</p>
+
+<p>You can also run the steps individually:</p>
+
+<pre class="code">
+$ /system/servers/authentication_server &amp;
+$ mkdir /network
+$ mount -t userlandfs -p "netfs" /network
+</pre>
+
+<hr />
+
+<h2 align="center">Server</h2>
+
+<p>To run the server:</p>
+
+<pre class="code">
+$ netfs_server_prefs launch
+</pre>
+
+<p>You can also start the server directly if you prefer.</p>
+
+<pre class="code">
+$ /system/servers/netfs_server &amp;
+</pre>
+
+<p>The server will then run until you shut down your computer, but it is also
+possible to stop it manually.</p>
+
+<pre class="code">
+$ netfs_server_prefs terminate
+</pre>
+
+<p>Once the server is running, you can define shared folders. The first step is
+to create a user who can access those folders, optionally with a password.</p>
+
+<pre class="code">
+$ netfs_server_prefs add user &lt;name&gt; [&lt;password&gt;]
+</pre>
+
+<p>Next create a shared folder and assign a user some permissions on it.</p>
+
+<pre class="code">
+$ netfs_server_prefs add share &lt;name&gt; &lt;path&gt;
+$ netfs_server_prefs permissions &lt;user&gt; &lt;share&gt; <flags>
+</pre>
+
+<p><span class="code">name</span> is the name that will appear to clients when
+they connect to your server.  <span class="code">flags</span> is one or more of:
+<span class="code">m</span> = mount, <span class="code">r</span> = read, <span
+class="code">w</span> = write, <span class="code">q</span> = query.</p>
+
+<p>Don't forget to save your settings.</p>
+
+<pre class="code">
+$ netfs_server_prefs save
+</pre>
+
+<p>The <span class="code">netfs_server_prefs</span> tool can also list and
+remove users and shares. See the help for details.</p>
+
+<pre class="code">
+$ netfs_server_prefs --help
+</pre>
+
+<hr />
+
+<h2 align="center">Fallback Settings File</h2>
+
+<p>The settings file is stored in a binary format, but if it is missing or
+damaged, the server will use a fallback settings file, which has a text-based
+format. This file must be located at <span
+class="code">/boot/home/config/settings/netfs/netfs_server_fallback</span>. (If
+neither the main settings file nor the fallback settings file can be loaded, the
+server will have no users or shares defined.)
+
+<p>Here is an example of a fallback settings file.</p>
+
+<pre class="code">
+# users
+user bonefish {
+	password	password
+}
+
+# user without a password
+user anonymous
+
+# shares
+share ttttt {
+	path /boot/home/Desktop/ttttt
+	user bonefish {
+		permissions	mount query read write
+	}
+}
+
+share sub-ttttt {
+	path /boot/home/Desktop/ttttt/rmessage
+	user bonefish {
+		permissions	mount query read write
+	}
+	user anonymous {
+		permissions	mount query read
+	}
+}
+</pre>
+
+</body>
+

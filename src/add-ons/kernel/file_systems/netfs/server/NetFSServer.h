@@ -87,10 +87,10 @@ private:
 			thread_id			fConnectionListenerThread;
 			thread_id			fConnectionDeleter;
 			thread_id			fBroadcaster;
-			vint32				fBroadcastingSocket;
+			int32				fBroadcastingSocket;
 			sem_id				fBroadcasterSemaphore;
 			thread_id			fServerInfoConnectionListener;
-			vint32				fServerInfoConnectionListenerSocket;
+			int32				fServerInfoConnectionListenerSocket;
 			int32				fServerInfoUpdated;
 			bool				fUseBroadcasting;
 			volatile bool		fTerminating;

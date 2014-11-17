@@ -6,6 +6,7 @@ local packages =
 	HaikuUserguide
 	HaikuWelcome
 	MakefileEngine
+	NetFS
 	UserlandFS
 	;
 

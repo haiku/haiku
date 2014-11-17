@@ -1,0 +1,21 @@
+name 			netfs
+version			%HAIKU_VERSION%
+architecture	%HAIKU_PACKAGING_ARCH%
+summary			"NetFS"
+
+description		"The package contains the NetFS add-on and servers."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2014 Haiku, Inc. et al"
+licenses		"MIT"
+
+provides {
+	netfs = %HAIKU_VERSION% compat >= R1~alpha1
+}
+
+requires {
+	userlandfs
+}
+

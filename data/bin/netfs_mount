@@ -1,0 +1,3 @@
+/system/servers/authentication_server &
+mkdir /network
+mount -t userlandfs -p "netfs" /network

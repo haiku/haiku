@@ -2,6 +2,7 @@
 
 #include <new>
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <driver_settings.h>
@@ -13,7 +14,13 @@
 
 using std::nothrow;
 
-static const char *kFSName = "userlandfs";
+static const directory_which kDirectories[] = {
+	B_USER_NONPACKAGED_DATA_DIRECTORY,
+	B_USER_DATA_DIRECTORY,
+	B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
+	B_SYSTEM_DATA_DIRECTORY
+};
+static const char *kFSSubpath = "/userlandfs/file_systems/";
 
 // IOCtlInfoMap
 struct Settings::IOCtlInfoMap : public HashMap<HashKey32<int>, IOCtlInfo*> {
@@ -163,21 +170,48 @@ Settings::SetTo(const char* fsName)
 	fIOCtlInfos = new(nothrow) IOCtlInfoMap;
 	if (!fIOCtlInfos)
 		RETURN_ERROR(B_NO_MEMORY);
-	// load the driver settings and find the entry for the FS
-	void *settings = load_driver_settings(kFSName);
-	const driver_parameter *fsParameter = NULL;
-	const driver_settings *ds = get_driver_settings(settings);
-	if (!ds)
-		RETURN_ERROR(B_ENTRY_NOT_FOUND);
-	fsParameter = _FindFSParameter(ds, fsName);
-	// init the object and unload the settings
-	status_t error = B_OK;
-	if (fsParameter)
-		_Init(ds, fsParameter);
-	else
-		error = B_ENTRY_NOT_FOUND;
-	unload_driver_settings(settings);
-	return B_OK;
+
+	// load the driver settings for the FS
+	char path[B_PATH_NAME_LENGTH];
+	for (size_t i = 0; i < sizeof(kDirectories) / sizeof(kDirectories[0]);
+			i++) {
+		if (find_directory(kDirectories[i], -1, false, (char*)&path,
+				B_PATH_NAME_LENGTH) != B_OK) {
+			continue;
+		}
+
+		// construct the path within the directory
+		strlcat(path, kFSSubpath, B_PATH_NAME_LENGTH);
+		strlcat(path, fsName, B_PATH_NAME_LENGTH);
+
+		// load the file at the constructed path
+		void *settings = load_driver_settings((char*)&path);
+		if (!settings)
+			continue;
+
+		// get the settings from the loaded file
+		const driver_settings *ds = get_driver_settings(settings);
+		if (!ds) {
+			unload_driver_settings(settings);
+			continue;
+		}
+
+		// get the parameter from the settings
+		const driver_parameter *fsParameter = NULL;
+		fsParameter = _FindFSParameter(ds, fsName);
+
+		//  init the object and unload the settings
+		if (fsParameter)
+			_Init(ds, fsParameter);
+		unload_driver_settings(settings);
+		
+		// if we found the parameter, we're done
+		if (fsParameter)
+			return B_OK;
+	}
+
+	// if we get here, we did not find the parameter
+	return B_ENTRY_NOT_FOUND;
 }
 
 // Unset
