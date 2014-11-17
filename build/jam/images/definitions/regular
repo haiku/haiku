@@ -218,7 +218,7 @@ SYSTEM_ADD_ONS_DRIVERS_POWER += [ FFilterByBuildFeatures
 
 SYSTEM_ADD_ONS_FILE_SYSTEMS +=
 	cdda
-	googlefs
+	#googlefs
 	nfs nfs4
 ;
 
