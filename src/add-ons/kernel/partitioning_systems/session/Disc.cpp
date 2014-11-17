@@ -248,35 +248,35 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar* buffer,
 	if (error)
 		return error;
 
-	// Init the scsi command and copy it into the "raw scsi command"
-	// ioctl struct
-	memset(raw_command.command, 0, 16);
-	scsi_command.command = 0x43;
-	scsi_command.msf = 1;
-	scsi_command.format = kFullTableOfContentsFormat;
-	scsi_command.number = first_session;
-	scsi_command.length = B_HOST_TO_BENDIAN_INT16(buffer_length);
-	scsi_command.control = 0;
-	scsi_command.reserved0 = scsi_command.reserved1 = scsi_command.reserved2
-		= scsi_command.reserved3 = scsi_command.reserved4
-		= scsi_command.reserved5 = scsi_command.reserved6 = 0;
-	memcpy(raw_command.command, &scsi_command, sizeof(scsi_command));
-
-	// Init the rest of the raw command
-	raw_command.command_length = 10;
-	raw_command.flags = kScsiFlags;
-	raw_command.scsi_status = 0;
-	raw_command.cam_status = 0;
-	raw_command.data = buffer;
-	raw_command.data_length = buffer_length;
-	memset(raw_command.data, 0, raw_command.data_length);
-	raw_command.sense_data = sense_data;
-	raw_command.sense_data_length = sense_data_length;
-	memset(raw_command.sense_data, 0, raw_command.sense_data_length);
-	raw_command.timeout = kScsiTimeout;
-
 	// This does not always work on the first try, so do it twice just in case.
 	for (int attempt = 0; attempt < 2; attempt++) {
+		// Init the scsi command and copy it into the "raw scsi command"
+		// ioctl struct
+		memset(raw_command.command, 0, 16);
+		scsi_command.command = 0x43;
+		scsi_command.msf = 1;
+		scsi_command.format = kFullTableOfContentsFormat;
+		scsi_command.number = first_session;
+		scsi_command.length = B_HOST_TO_BENDIAN_INT16(buffer_length);
+		scsi_command.control = 0;
+		scsi_command.reserved0 = scsi_command.reserved1 = scsi_command.reserved2
+			= scsi_command.reserved3 = scsi_command.reserved4
+			= scsi_command.reserved5 = scsi_command.reserved6 = 0;
+		memcpy(raw_command.command, &scsi_command, sizeof(scsi_command));
+
+		// Init the rest of the raw command
+		raw_command.command_length = 10;
+		raw_command.flags = kScsiFlags;
+		raw_command.scsi_status = 0;
+		raw_command.cam_status = 0;
+		raw_command.data = buffer;
+		raw_command.data_length = buffer_length;
+		memset(raw_command.data, 0, raw_command.data_length);
+		raw_command.sense_data = sense_data;
+		raw_command.sense_data_length = sense_data_length;
+		memset(raw_command.sense_data, 0, raw_command.sense_data_length);
+		raw_command.timeout = kScsiTimeout;
+
 		if (ioctl(deviceFD, B_RAW_DEVICE_COMMAND, &raw_command) == 0) {
 			if (raw_command.scsi_status == 0 && raw_command.cam_status == 1) {
 				// SUCCESS!!!
