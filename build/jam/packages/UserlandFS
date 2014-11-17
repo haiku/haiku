@@ -1,0 +1,46 @@
+local architecture = $(HAIKU_PACKAGING_ARCHS[1]) ;
+
+local userlandFSPackage = userland_fs.hpkg ;
+HaikuPackage $(userlandFSPackage) ;
+
+# kernel module
+AddFilesToPackage add-ons kernel file_systems : userlandfs ;
+
+# server
+AddFilesToPackage servers : userlandfs_server ;
+
+
+# libs
+local userlandfsLibs =
+	libuserlandfs_beos_kernel.so
+	libuserlandfs_haiku_kernel.so
+	libuserlandfs_fuse.so
+;
+AddLibrariesToPackage lib : $(userlandfsLibs) ;
+
+# TODO move development stuff to a separate package?
+
+# library symlinks
+local lib ;
+for lib in $(userlandfsLibs) {
+	AddSymlinkToPackage develop lib : /system/lib/$(lib:BS) ;
+}
+
+
+# FUSE headers
+
+local fuseHeaders =
+	fuse_common_compat.h
+	fuse_common.h
+	fuse_compat.h
+	fuse.h
+	fuse_lowlevel_compat.h
+	fuse_lowlevel.h
+	fuse_opt.h
+;
+fuseHeaders = $(fuseHeaders:G=userlandfs!fuse) ;
+SEARCH on $(fuseHeaders)
+	= [ FDirName $(HAIKU_TOP) headers private userlandfs fuse ] ;
+AddFilesToPackage develop headers userlandfs fuse : $(fuseHeaders) ;
+
+BuildHaikuPackage $(userlandFSPackage) : userland_fs ;

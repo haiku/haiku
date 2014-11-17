@@ -220,59 +220,6 @@ if [ IsOptionalHaikuImagePackageAdded NetFS ] {
 }
 
 
-# UserlandFS
-if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
-# TODO: Make this an actual package!
-# 	local arch = $(TARGET_ARCH) ;
-# 	local abi = gcc$(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) ;
-#
-# 	# kernel module
-# 	AddFilesToHaikuImage system add-ons kernel file_systems
-# 		: userlandfs ;
-#
-# 	# server
-# 	AddFilesToHaikuImage system servers : userlandfs_server ;
-#
-# 	# libs
-# 	local userlandfsLibs =
-# 		libuserlandfs_beos_kernel.so
-# 		libuserlandfs_haiku_kernel.so
-# 		libuserlandfs_fuse.so
-# 	;
-# 	AddFilesToHaikuImage system lib : $(userlandfsLibs) ;
-#
-# 	# development goodies
-# 	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] {
-# 		if ! ( $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) in 2 4 ) {
-# 			Exit "Optional package UserlandFS: Unsupported GCC version:"
-# 				$(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) ;
-# 		}
-#
-# 		# library symlinks
-# 		local lib ;
-# 		for lib in $(userlandfsLibs) {
-# 			AddSymlinkToHaikuImage develop abi $(arch) $(abi) lib
-# 				: /system/lib/$(lib:BS) ;
-# 		}
-#
-# 		# FUSE headers
-# 		local fuseHeaders =
-# 			fuse_common_compat.h
-# 			fuse_common.h
-# 			fuse_compat.h
-# 			fuse.h
-# 			fuse_lowlevel_compat.h
-# 			fuse_lowlevel.h
-# 			fuse_opt.h
-# 		;
-# 		fuseHeaders = $(fuseHeaders:G=userlandfs!fuse) ;
-# 		SEARCH on $(fuseHeaders)
-# 			= [ FDirName $(HAIKU_TOP) headers private userlandfs fuse ] ;
-# 		AddFilesToHaikuImage develop headers userlandfs fuse : $(fuseHeaders) ;
-# 	}
-}
-
-
 # WebPositive
 if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 	local architectureObject ;

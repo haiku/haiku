@@ -15,6 +15,7 @@ local packages =
 	haiku_userguide
 	haiku_welcome
 	makefile_engine
+	userland_fs
 
 	haiku_$(secondaryArchs)
 	haiku_$(secondaryArchs)_devel

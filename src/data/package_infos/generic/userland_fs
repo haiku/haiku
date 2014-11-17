@@ -1,0 +1,20 @@
+name			userland_fs
+version			%HAIKU_VERSION%
+architecture	%HAIKU_PACKAGING_ARCH%
+summary			"Userland filesystem support"
+description 	"A set of tools to mount and use filesystems that run in
+userland. FUSE compatibiity is also provided."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2007-2014 Haiku, Inc."
+licenses		MIT
+
+provides {
+	userland_fs=%HAIKU_VERSION%
+}
+
+requires {
+	haiku
+}

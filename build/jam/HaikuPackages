@@ -6,6 +6,7 @@ local packages =
 	HaikuUserguide
 	HaikuWelcome
 	MakefileEngine
+	UserlandFS
 	;
 
 if $(HAIKU_BUILD_TYPE) = bootstrap {
