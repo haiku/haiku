@@ -2869,13 +2869,14 @@ ClientConnection::_NodeMonitoringProcessorEntry(void* data)
 	return ((ClientConnection*)data)->_NodeMonitoringProcessor();
 }
 
+
 // _NodeMonitoringProcessor
 int32
 ClientConnection::_NodeMonitoringProcessor()
 {
 	while (!fClosed) {
 		// get the next request
-		NodeMonitoringRequest* request;
+		NodeMonitoringRequest* request = NULL;
 		status_t error = fNodeMonitoringEvents->Pop(&request);
 
 		// get a client connection reference
@@ -2899,6 +2900,7 @@ ClientConnection::_NodeMonitoringProcessor()
 	}
 	return 0;
 }
+
 
 // _PushNodeMonitoringEvent
 //
