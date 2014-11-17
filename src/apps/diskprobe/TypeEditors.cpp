@@ -14,9 +14,8 @@
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Catalog.h>
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#	include <IconUtils.h>
-#endif
+#include <GroupLayout.h>
+#include <IconUtils.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -42,7 +41,7 @@ static const uint32 kMimeTypeItem = 'miti';
 
 class StringEditor : public TypeEditorView {
 	public:
-		StringEditor(BRect rect, DataEditor& editor);
+		StringEditor(DataEditor& editor);
 
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
@@ -167,6 +166,14 @@ TypeEditorView::TypeEditorView(BRect rect, const char *name,
 }
 
 
+TypeEditorView::TypeEditorView(const char *name, uint32 flags,
+		DataEditor& editor)
+	: BView(name, flags),
+	fEditor(editor)
+{
+}
+
+
 TypeEditorView::~TypeEditorView()
 {
 }
@@ -194,27 +201,21 @@ TypeEditorView::TypeMatches()
 //	#pragma mark - StringEditor
 
 
-StringEditor::StringEditor(BRect rect, DataEditor& editor)
-	: TypeEditorView(rect, B_TRANSLATE("String editor"), B_FOLLOW_ALL, 0, editor)
+StringEditor::StringEditor(DataEditor& editor)
+	: TypeEditorView(B_TRANSLATE("String editor"), 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	BStringView *stringView = new BStringView(BRect(5, 5, rect.right, 20),
-		B_EMPTY_STRING, B_TRANSLATE("Contents:"));
+	BStringView *stringView = new BStringView(B_EMPTY_STRING,
+		B_TRANSLATE("Contents:"));
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
-	rect = Bounds();
-	rect.top = stringView->Frame().bottom + 5;
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-
-	fTextView = new BTextView(rect, B_EMPTY_STRING,
-		rect.OffsetToCopy(B_ORIGIN).InsetByCopy(5, 5),
-		B_FOLLOW_ALL, B_WILL_DRAW);
+	fTextView = new BTextView(B_EMPTY_STRING, B_WILL_DRAW);
 
 	BScrollView* scrollView = new BScrollView("scroller", fTextView,
-		B_FOLLOW_ALL, B_WILL_DRAW, true, true);
+		B_WILL_DRAW, true, true);
 	AddChild(scrollView);
 }
 
@@ -1319,7 +1320,7 @@ GetTypeEditorFor(BRect rect, DataEditor& editor)
 {
 	switch (editor.Type()) {
 		case B_STRING_TYPE:
-			return new StringEditor(rect, editor);
+			return new StringEditor(editor);
 		case B_MIME_STRING_TYPE:
 			return new MimeTypeEditor(rect, editor);
 		case B_BOOL_TYPE:
@@ -1381,7 +1382,7 @@ GetTypeEditorAt(int32 index, BRect rect, DataEditor& editor)
 
 	switch (index) {
 		case 0:
-			view = new StringEditor(rect, editor);
+			view = new StringEditor(editor);
 			break;
 		case 1:
 			view = new NumberEditor(rect, editor);

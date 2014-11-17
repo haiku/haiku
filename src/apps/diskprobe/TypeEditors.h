@@ -15,6 +15,7 @@ class TypeEditorView : public BView {
 	public:
 		TypeEditorView(BRect rect, const char* name, uint32 resizingMode,
 			uint32 flags, DataEditor& editor);
+		TypeEditorView(const char* name, uint32 flags, DataEditor& editor);
 		~TypeEditorView();
 
 		virtual void CommitChanges();
