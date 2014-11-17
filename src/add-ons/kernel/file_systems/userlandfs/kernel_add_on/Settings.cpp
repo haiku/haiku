@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include <driver_settings.h>
+#include <FindDirectory.h>
 
 #include "Debug.h"
 #include "HashMap.h"
