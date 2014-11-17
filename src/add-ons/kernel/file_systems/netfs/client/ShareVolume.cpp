@@ -191,7 +191,7 @@ PRINT(("ShareVolume::~ShareVolume()\n"));
 		// there shouldn't be any more nodes
 		if (fNodes->Size() > 0) {
 			WARN("ShareVolume::~ShareVolume(): WARNING: There are still "
-				"%ld nodes\n", fNodes->Size());
+				"%" B_PRId32 " nodes\n", fNodes->Size());
 		}
 		for (NodeMap::Iterator it = fNodes->GetIterator(); it.HasNext();)
 			delete it.Next().value;
@@ -203,7 +203,7 @@ PRINT(("ShareVolume::~ShareVolume()\n"));
 		// there shouldn't be any more entries
 		if (fEntries->Size() > 0) {
 			WARN("ShareVolume::~ShareVolume(): WARNING: There are still "
-				"%ld entries\n", fEntries->Size());
+				"%" B_PRId32 " entries\n", fEntries->Size());
 		}
 		for (EntryMap::Iterator it = fEntries->GetIterator(); it.HasNext();)
 			delete it.Next().value;
@@ -2751,7 +2751,7 @@ ShareVolume::_RemoveAttrDirIterator(ShareNode* node,
 		= fAttrDirIterators->Get(node->GetID());
 	if (!iteratorList) {
 		WARN("ShareVolume::_RemoveAttrDirIterator(): Iterator list not "
-			"found: node: %lld\n", node->GetID());
+			"found: node: %" B_PRIdINO "\n", node->GetID());
 		return;
 	}
 

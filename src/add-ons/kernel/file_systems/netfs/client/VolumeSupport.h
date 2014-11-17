@@ -31,7 +31,7 @@ next_dirent(struct dirent*& buffer, size_t& bufferSize)
 {
 	// align
 	char* nextBuffer = (char*)buffer + buffer->d_reclen;
-	nextBuffer = (char*)(((uint32)nextBuffer + 3) & ~0x3);
+	nextBuffer = (char*)(((addr_t)nextBuffer + 3) & ~0x3);
 
 	// check, if the buffer is at least large enough to align the current entry
 	int32 len = nextBuffer - (char*)buffer;

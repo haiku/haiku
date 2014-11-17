@@ -170,7 +170,7 @@ RequestChannel::SendRequest(Request* request)
 		RETURN_ERROR(error);
 	if (size < 0 || size > kMaxSaneRequestSize) {
 		ERROR("RequestChannel::SendRequest(): ERROR: Invalid request size: "
-			"%ld\n", size);
+			"%" B_PRId32 "\n", size);
 		RETURN_ERROR(B_BAD_DATA);
 	}
 
@@ -209,7 +209,7 @@ RequestChannel::ReceiveRequest(Request** _request)
 	header.size = B_HOST_TO_BENDIAN_INT32(header.size);
 	if (header.size < 0 || header.size > kMaxSaneRequestSize) {
 		ERROR("RequestChannel::ReceiveRequest(): ERROR: Invalid request size: "
-			"%ld\n", header.size);
+			"%" B_PRId32 "\n", header.size);
 		RETURN_ERROR(B_BAD_DATA);
 	}
 

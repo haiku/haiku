@@ -669,8 +669,10 @@ netfs_read_dir(void *ns, void *_node, void *cookie, long *count,
 	Node* node = (Node*)_node;
 	PRINT("netfs_read_dir(%p, %p, %p, %ld, %p, %lu)\n", ns, node, cookie,
 		*count, buffer, bufferSize);
+	int32 _count = *count;
 	status_t error = node->GetVolume()->ReadDir(node, cookie, buffer,
-		bufferSize, *count, count);
+		bufferSize, _count, &_count);
+	*count = _count;
 	PRINT("netfs_read_dir() done: (%lx, %ld)\n", error, *count);
 	#if DEBUG
 		dirent* entry = buffer;
@@ -767,8 +769,10 @@ netfs_read_attrdir(void *ns, void *_node, void *cookie, long *count,
 	Node* node = (Node*)_node;
 	PRINT("netfs_read_attrdir(%p, %p, %p, %ld, %p, %lu)\n", ns, node,
 		cookie, *count, buffer, bufferSize);
+	int32 _count = *count;
 	status_t error = node->GetVolume()->ReadAttrDir(node, cookie, buffer,
-		bufferSize, *count, count);
+		bufferSize, _count, &_count);
+	*count = _count;
 	PRINT("netfs_read_attrdir() done: (%lx, %ld)\n", error, *count);
 	return error;
 }
@@ -928,8 +932,10 @@ netfs_read_query(void *ns, void *cookie, long *count,
 
 	status_t error = B_BAD_VALUE;
 	if (volume) {
+		int32 _count = *count;
 		error = volume->ReadQuery(iterator, buffer, bufferSize,
-		*count, count);
+			_count, &_count);
+		*count = _count;
 	}
 
 	PRINT("netfs_read_query() done: (%lx, %ld)\n", error, *count);
