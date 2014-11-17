@@ -1,0 +1,31 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs cdda ;
+
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
+	userlandfs ] ;
+local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
+local cddaTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
+	cdda ] ;
+
+DEFINES += USER=1 ;
+
+SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
+
+SEARCH_SOURCE += $(cddaTop) ;
+SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
+
+UsePrivateHeaders drivers kernel shared storage ;
+
+Addon <userland>cdda
+	:
+	Debug.cpp
+	String.cpp
+
+	cdda.cpp
+	cddb.cpp
+	kernel_interface.cpp
+
+	: libuserlandfs_haiku_kernel.so
+	  be	# for BLocker only
+	  [ TargetLibsupc++ ]
+;
+
