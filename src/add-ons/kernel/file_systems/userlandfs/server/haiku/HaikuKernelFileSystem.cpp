@@ -398,7 +398,7 @@ userlandfs_create_file_system(const char* fsName, image_id image,
 
 	// find the module
 	file_system_module_info* module = NULL;
-	for (int32 i = 0; modules[i]->name; i++) {
+	for (int32 i = 0; modules[i] && modules[i]->name; i++) {
 		if (strcmp(modules[i]->name, moduleName) == 0) {
 			module = (file_system_module_info*)modules[i];
 			break;
