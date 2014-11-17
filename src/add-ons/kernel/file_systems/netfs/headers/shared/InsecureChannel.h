@@ -20,7 +20,7 @@ public:
 			status_t			GetPeerAddress(NetAddress *address) const;
 
 private:
-			vint32				fSocket;
+			int32				fSocket;
 			bool				fClosed;
 };
 

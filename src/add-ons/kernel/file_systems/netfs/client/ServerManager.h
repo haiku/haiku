@@ -48,7 +48,7 @@ private:
 			Locker				fLock;
 			ServerInfoMap*		fServerInfos;
 			thread_id			fBroadcastListener;
-			vint32				fBroadcastListenerSocket;
+			int32				fBroadcastListenerSocket;
 			Listener*			fListener;
 			volatile bool		fTerminating;
 };

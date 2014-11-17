@@ -66,7 +66,7 @@ private:
 			Resolver*			fResolver;
 
 	static	Resolver* volatile	sResolver;
-	static	vint32				sLockCounter;
+	static	int32				sLockCounter;
 };
 
 #endif	// NET_FS_NET_ADDRESS_H

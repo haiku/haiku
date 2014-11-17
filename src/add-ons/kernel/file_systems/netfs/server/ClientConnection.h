@@ -193,7 +193,7 @@ private:
 			thread_id			fNodeMonitoringProcessor;
 			Locker				fLock;
 			int32				fReferenceCount;
-			vint32				fInitialized;
+			int32				fInitialized;
 			bool				fClosed;
 			bool				fError;
 			bool				fInverseClientEndianess;

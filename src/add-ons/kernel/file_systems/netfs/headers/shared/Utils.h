@@ -24,7 +24,7 @@ template<typename T> T min(const T& a, const T& b) { return (a < b ? a : b); }
 */
 static inline
 void
-safe_closesocket(vint32& socketVar)
+safe_closesocket(int32& socketVar)
 {
 	int32 socket = atomic_or(&socketVar, -1);
 #ifdef __HAIKU__

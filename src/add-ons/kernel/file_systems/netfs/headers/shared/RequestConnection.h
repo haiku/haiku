@@ -41,7 +41,7 @@ private:
 			bool				fOwnsRequestHandler;
 			DownStreamThread*	fThreads;
 			int32				fThreadCount;
-			vint32				fTerminationCount;
+			int32				fTerminationCount;
 };
 
 #endif	// NET_FS_REQUEST_CONNECTION_H

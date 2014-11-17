@@ -301,4 +301,4 @@ NetAddressResolver::_Unlock()
 NetAddressResolver::Resolver* volatile NetAddressResolver::sResolver = NULL;
 
 // sLockCounter
-vint32 NetAddressResolver::sLockCounter = 0;
+int32 NetAddressResolver::sLockCounter = 0;

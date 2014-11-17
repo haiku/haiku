@@ -109,7 +109,7 @@ private:
 			Permissions			fSharePermissions;
 			bool				fMounted;
 
-	static	vint32				sNextVolumeID;
+	static	int32				sNextVolumeID;
 };
 
 // NodeMonitoringProcessor

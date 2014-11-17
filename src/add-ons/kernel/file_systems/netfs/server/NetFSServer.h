@@ -91,7 +91,7 @@ private:
 			sem_id				fBroadcasterSemaphore;
 			thread_id			fServerInfoConnectionListener;
 			vint32				fServerInfoConnectionListenerSocket;
-			vint32				fServerInfoUpdated;
+			int32				fServerInfoUpdated;
 			bool				fUseBroadcasting;
 			volatile bool		fTerminating;
 };

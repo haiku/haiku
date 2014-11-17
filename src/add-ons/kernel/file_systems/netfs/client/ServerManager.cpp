@@ -138,7 +138,7 @@ private:
 	ServerManager*		fServerManager;
 	ExtendedServerInfo*	fOldServerInfo;
 	ExtendedServerInfo*	fServerInfo;
-	vint32				fFD;
+	int32				fFD;
 	bool				fUpdate;
 	bool				fSuccess;
 };
