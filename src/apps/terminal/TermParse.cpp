@@ -362,8 +362,8 @@ TermParse::_GuessGroundTable(int encoding)
 int32
 TermParse::EscParse()
 {
-	int top;
-	int bottom;
+	int top = 0;
+	int bottom = 0;
 
 	char cbuf[4] = { 0 };
 	char dstbuf[4] = { 0 };
@@ -372,9 +372,11 @@ TermParse::EscParse()
 
 	int param[NPARAM];
 	int nparam = 1;
+	for (int i = 0; i < NPARAM; i++)
+		param[i] = DEFAULT;
 
-	int row;
-	int column;
+	int row = 0;
+	int column = 0;
 
 	// default encoding system is UTF8
 	int *groundtable = gUTF8GroundTable;
