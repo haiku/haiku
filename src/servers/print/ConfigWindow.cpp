@@ -20,8 +20,10 @@
 #include <Debug.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <IconUtils.h>
 #include <Layout.h>
 #include <Locale.h>
+#include <Resources.h>
 #include <Window.h>
 
 #include "pr_server.h"
@@ -151,8 +153,6 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BView* panel = new BBox(Bounds(), "temporary", B_FOLLOW_ALL, B_WILL_DRAW);
 	AddChild(panel);
 
-	BRect dummyRect(0, 0, 1, 1);
-
 	// print selection pop up menu
 	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("Select a printer"));
 	SetupPrintersMenu(menu);
@@ -160,8 +160,8 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	fPrinters = new BMenuField(B_TRANSLATE("Printer:"), menu);
 
 	// page format button
-	fPageSetup = AddPictureButton(panel, dummyRect, "Paper setup",
-		"PAGE_SETUP_ON", "PAGE_SETUP_OFF", MSG_PAGE_SETUP);
+	fPageSetup = AddPictureButton(panel, "Paper setup",
+		"PAGE_SETUP", MSG_PAGE_SETUP);
 
 	// add description to button
 	BStringView *pageFormatTitle = new BStringView("paperSetupTitle",
@@ -172,8 +172,8 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	fJobSetup = NULL;
 	BStringView* jobSetupTitle = NULL;
 	if (kind == kJobSetup) {
-		fJobSetup = AddPictureButton(panel, dummyRect, "Page setup",
-			"JOB_SETUP_ON", "JOB_SETUP_OFF", MSG_JOB_SETUP);
+		fJobSetup = AddPictureButton(panel, "Page setup",
+			"JOB_SETUP", MSG_JOB_SETUP);
 		// add description to button
 		jobSetupTitle = new BStringView("jobSetupTitle",
 			B_TRANSLATE("Page setup:"));
@@ -185,10 +185,9 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
 	// Cancel & OK button
-	BButton* cancel = new BButton(dummyRect, "Cancel", B_TRANSLATE("Cancel"),
+	BButton* cancel = new BButton("Cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
-	fOk = new BButton(dummyRect, "OK", B_TRANSLATE("OK"),
-		new BMessage(MSG_OK));
+	fOk = new BButton("OK", B_TRANSLATE("OK"), new BMessage(MSG_OK));
 
 	RemoveChild(panel);
 
@@ -349,42 +348,33 @@ ConfigWindow::SetWindowFrame(BRect r)
 }
 
 
-BPictureButton*
-ConfigWindow::AddPictureButton(BView* panel, BRect frame,
-	const char* name, const char* on, const char* off, uint32 what)
+BButton*
+ConfigWindow::AddPictureButton(BView* panel, const char* name,
+	const char* picture, uint32 what)
 {
-	BBitmap* onBM = LoadBitmap(on);
-	BBitmap* offBM = LoadBitmap(off);
+	BResources *res = BApplication::AppResources();
+	if (res == NULL)
+		return NULL;
 
-	BPicture* onPict = BitmapToPicture(panel, onBM);
-	BPicture* offPict = BitmapToPicture(panel, offBM);
+	size_t length;
+	const void *bits = res->LoadResource('VICN', picture, &length);
+	BButton* button = NULL;
 
-	BPictureButton* button = NULL;
+	BBitmap* onBM = new BBitmap(BRect(0, 0, 24, 24), B_RGBA32);
 
-	if (onPict != NULL && offPict != NULL) {
-		button = new BPictureButton(frame, name, onPict, offPict,
-			new BMessage(what));
+	if (onBM != NULL) {
+		if (BIconUtils::GetVectorIcon((uint8*)bits, length, onBM) != B_OK) {
+			delete onBM;
+			return NULL;
+		}
+
+		button = new BButton(name, new BMessage(what));
+		button->SetIcon(onBM, B_TRIM_ICON_BITMAP_KEEP_ASPECT);
 		button->SetViewColor(B_TRANSPARENT_COLOR);
-		panel->AddChild(button);
-		onBM->Lock();
-		int32 width = (int32)onBM->Bounds().Width();
-		int32 height = (int32)onBM->Bounds().Height();
-		button->ResizeTo(width, height);
-		button->SetExplicitMaxSize(BSize(width, height));
-		onBM->Unlock();
-		panel->RemoveChild(button);
-
-		BPicture* disabled = BitmapToGrayedPicture(panel, offBM);
-		button->SetDisabledOn(disabled);
-		delete disabled;
-
-		disabled = BitmapToGrayedPicture(panel, onBM);
-		button->SetDisabledOff(disabled);
-		delete disabled;
+		button->SetLabel(NULL);
 	}
 
-	delete onPict; delete offPict;
-	delete onBM; delete offBM;
+	delete onBM;
 
 	return button;
 }
