@@ -1,9 +1,0 @@
-1	brazilian_portuguese	x-vnd.Haiku-BMPTranslator	2497639570
-BMP Settings	BMPMain		Configurações BMP
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Imagem BMP (formato MS, %d bits)
-BMP image (OS/2 format, %d bits)	BMPTranslator		Imagem BMP (formato OS/2, %d bits)
-BMP image translator	BMPTranslator		Tradutor de imagem BMP
-BMP image translator	BMPView		Tradutor de imagem BMP
-BMP images	BMPTranslator		Imagens BMP
-BMPTranslator Settings	BMPTranslator		Configurações do BMPTranslator
-Version %d.%d.%d, %s	BMPView		Versão %d.%d.%d, %s
