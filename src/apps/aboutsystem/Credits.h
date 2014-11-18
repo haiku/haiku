@@ -71,12 +71,12 @@ static const Translation kTranslations[] = {
 	{ "en_ca",
 		"Edwin Amsler\n"
 		"infamy\n"
-	}
-	{ "en_gb"
+	},
+	{ "en_gb",
 		"Harsh Vardhan\n"
 		"Jessica_Lily\n"
 		"Richie Nyhus\n"
-	}
+	},
 	{ "eo",
 		"Travis D. Reed (Dancxjo)\n"
 	},
@@ -176,6 +176,7 @@ static const Translation kTranslations[] = {
 	{ "nb"
 		"Klapaucius\n"
 		"petterhj\n"
+	},
 	{ "nl",
 		"Floris Kint\n" // FKint
 		"Puck Meerburg\n" // puckipedia
