@@ -1592,21 +1592,21 @@ MainWin::_SetupVideoAspectItems(BMenu* menu)
 	// be "16 : 9".
 
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Stream settings"),
-		new BMessage(M_ASPECT_SAME_AS_SOURCE)));
+		new BMessage(M_ASPECT_SAME_AS_SOURCE), '1', B_SHIFT_KEY));
 	item->SetMarked(widthAspect == fWidthAspect
 		&& heightAspect == fHeightAspect);
 
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("No aspect correction"),
-		new BMessage(M_ASPECT_NO_DISTORTION)));
+		new BMessage(M_ASPECT_NO_DISTORTION), '0', B_SHIFT_KEY));
 	item->SetMarked(width == fWidthAspect && height == fHeightAspect);
 
 	menu->AddSeparatorItem();
 
 	menu->AddItem(item = new BMenuItem("4 : 3",
-		new BMessage(M_ASPECT_4_3)));
+		new BMessage(M_ASPECT_4_3), 2, B_SHIFT_KEY));
 	item->SetMarked(fWidthAspect == 4 && fHeightAspect == 3);
 	menu->AddItem(item = new BMenuItem("16 : 9",
-		new BMessage(M_ASPECT_16_9)));
+		new BMessage(M_ASPECT_16_9), 3, B_SHIFT_KEY));
 	item->SetMarked(fWidthAspect == 16 && fHeightAspect == 9);
 
 	menu->AddSeparatorItem();
@@ -2123,6 +2123,7 @@ MainWin::_KeyDown(BMessage* msg)
 			break;
 
 		case B_TAB:
+		case 'f':
 			if ((modifier & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
 					| B_MENU_KEY)) == 0) {
 				PostMessage(M_TOGGLE_FULLSCREEN);
@@ -2246,19 +2247,18 @@ MainWin::_KeyDown(BMessage* msg)
 			return true;
 
 		// Playback controls along the bottom of the keyboard:
-		// Z X C V B  for US International
+		// Z X C (V) B  for US International
 		case 0x4c:
 			PostMessage(M_SKIP_PREV);
 			return true;
 		case 0x4d:
-			fController->Play();
+			fController->TogglePlaying();
 			return true;
 		case 0x4e:
 			fController->Pause();
 			return true;
-		case 0x4f:
-			fController->Stop();
-			return true;
+		// 0x4f would be the "stop" button, but this is too dangerous to be
+		// triggered with a single key (it loses the current position)
 		case 0x50:
 			PostMessage(M_SKIP_NEXT);
 			return true;
