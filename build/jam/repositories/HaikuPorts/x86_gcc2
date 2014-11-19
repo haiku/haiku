@@ -149,6 +149,8 @@ RemotePackageRepository HaikuPorts
 	libao_devel-1.1.0-1
 	libart_lgpl-2.3.21-1
 	libart_lgpl_devel-2.3.21-1
+	libassuan-2.1.2-1
+	libassuan_devel-2.1.2-1
 	libedit-2012_06_01_3.0-1
 	libffi-3.0.13-2
 	libffi_devel-3.0.13-2
@@ -455,6 +457,8 @@ RemotePackageRepository HaikuPorts
 	libao_x86_devel-1.1.0-1
 	libart_lgpl_x86-2.3.21-1
 	libart_lgpl_x86_devel-2.3.21-1
+	libassuan_x86-2.1.2-1
+	libassuan_x86_devel-2.1.2-1
 	libattica_x86-0.4.2-1
 	libattica_x86_devel-0.4.2-1
 	libdbusmenu_qt_x86-0.9.2-1
@@ -743,6 +747,8 @@ RemotePackageRepository HaikuPorts
 	lha
 	libao
 	libart_lgpl
+	libassuan
+	libassuan_x86
 	libattica_x86
 	libdbusmenu_qt_x86
 	libedit
