@@ -125,6 +125,8 @@ WizardView::_BuildUI()
 		new BMessage(kMessagePrevious));
 	fNext = new BButton("next", B_TRANSLATE_COMMENT("Next", "Button"),
 		new BMessage(kMessageNext));
+	BButton* quit = new BButton("quit", B_TRANSLATE_COMMENT("Quit", "Button"),
+		new BMessage(B_QUIT_REQUESTED));
 
 	BLayoutBuilder::Group<>(this)
 		.Add(fPageContainer)
@@ -132,6 +134,7 @@ WizardView::_BuildUI()
 		.AddGroup(B_HORIZONTAL)
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.Add(quit)
 			.AddGlue()
 			.Add(fPrevious)
 			.Add(fNext)
