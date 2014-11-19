@@ -96,7 +96,7 @@ static const Translation kTranslations[] = {
 		"fatigatti\n"
 		"mpescador\n"
 		"OscarL\n"
-		"taos\n"
+		// "taos\n" bugfixes only, no actual translations
 	},
 	{ "fi",
 		"Jorma Karvonen (Karvjorm)\n"
@@ -130,7 +130,7 @@ static const Translation kTranslations[] = {
 	{ "hr",
 		"Ivica Koli\n"
 		"Zlatko Sehanović\n"
-		"taos\n"
+		// "taos\n" bugfixes only, no actual translations
 		"zvacet\n"
 	},
 	{ "hu",
@@ -188,7 +188,7 @@ static const Translation kTranslations[] = {
 		"michiel\n"
 		"Sintendo\n"
 		"Tagliano\n"
-		"taos\n"
+		// "taos\n" bugfixes only, no actual translations
 		"wrench123456789\n"
 	},
 	{ "pl",
@@ -208,7 +208,7 @@ static const Translation kTranslations[] = {
 		"Adriano Duarte\n"
 		"Louis de M.\n"
 		"Michael Vinícius de Oliveira (michaelvo)\n"
-		"taos\n"
+		// "taos\n" bugfixes only, no actual translations
 	},
 	{ "pt_BR",
 		"Cabral Bandeira (beyraq)\n"
@@ -242,7 +242,7 @@ static const Translation kTranslations[] = {
 		"Vladimir Vasilenko\n"
 		"Siaržuk Žarski\n"
 		"Ruskidecko\n"
-		"taos\n"
+		// "taos\n" bugfixes only, no actual translations
 	},
 	{ "sk",
 		"Bachoru\n"
