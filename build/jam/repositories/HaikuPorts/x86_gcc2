@@ -152,6 +152,8 @@ RemotePackageRepository HaikuPorts
 	libedit-2012_06_01_3.0-1
 	libffi-3.0.13-2
 	libffi_devel-3.0.13-2
+	libgpg_error-1.15-1
+	libgpg_error_devel-1.15-1
 	libicns-0.8.1-1
 	libicns_devel-0.8.1-1
 	libiconv-1.13.1-6
@@ -465,6 +467,8 @@ RemotePackageRepository HaikuPorts
 	libffi_x86_devel-3.0.13-1
 	libftdi_x86-1.0-1
 	libftdi_x86_devel-1.0-1
+	libgpg_error_x86-1.15-1
+	libgpg_error_x86_devel-1.15-1
 	libicns_x86-0.8.1-1
 	libicns_x86_devel-0.8.1-1
 	libiconv_x86-1.13.1-6
@@ -747,6 +751,8 @@ RemotePackageRepository HaikuPorts
 	libffi
 	libffi_x86
 	libftdi_x86
+	libgpg_error
+	libgpg_error_x86
 	libicns
 	libiconv
 	libid3tag
