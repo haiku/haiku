@@ -2257,8 +2257,9 @@ MainWin::_KeyDown(BMessage* msg)
 		case 0x4e:
 			fController->Pause();
 			return true;
-		// 0x4f would be the "stop" button, but this is too dangerous to be
-		// triggered with a single key (it loses the current position)
+		case 0x4f:
+			fController->Stop();
+			return true;
 		case 0x50:
 			PostMessage(M_SKIP_NEXT);
 			return true;
