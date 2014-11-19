@@ -351,6 +351,7 @@ RemotePackageRepository HaikuPorts
 	# secondary architecture (x86)
 	arm_none_eabi_binutils_x86-2.24_2014_03_19-6
 	arm_none_eabi_gcc_x86-4.8.2_2014_03_20-2
+	arm_none_eabi_gdb_x86-7.7-1
 	arm_none_eabi_newlib_x86-2.1.0-1
 	automoc_x86-0.9.88-2
 	avrdude_x86-6.0.1-1
@@ -608,6 +609,7 @@ RemotePackageRepository HaikuPorts
 	speex_x86_devel-1.2~rc1-2
 	sqlite_x86-3.8.0.2-1
 	sqlite_x86_devel-3.8.0.2-1
+	stlink_x86-1.0.0-1
 	stm32flash_x86-0.3-1
 	strigi_x86-0.7.5-2
 	strigi_x86_devel-0.7.5-2
@@ -634,6 +636,7 @@ RemotePackageRepository HaikuPorts
 	apr_util
 	arm_none_eabi_binutils_x86
 	arm_none_eabi_gcc_x86
+	arm_none_eabi_gdb_x86
 	arm_none_eabi_newlib_x86
 	asciidoc
 	autoconf
@@ -903,6 +906,7 @@ RemotePackageRepository HaikuPorts
 	sqlite
 	sqlite_x86
 	srm
+	stlink_x86
 	stm32flash_x86
 	strigi_x86
 	subversion
