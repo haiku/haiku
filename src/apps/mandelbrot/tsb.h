@@ -37,6 +37,7 @@ public:
 virtual					~TShowBit();
 virtual		void		Draw(BRect);
 virtual		void		MouseDown(BPoint where);
+			void		MessageReceived(BMessage* message);
 virtual		void		Pulse();
 			void		mand(double vx, double vy, double sx, double sy);
 			long		limit_v(long v);

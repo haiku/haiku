@@ -26,15 +26,10 @@
 
 /*------------------------------------------------------------*/
 
-TShowBit	*tsbb;
+static TShowBit	*tsbb;
+static long		niter = 256;
+static uchar	palette[256];
 
-/*------------------------------------------------------------*/
-long	niter = 256; 
-/*------------------------------------------------------------*/
-
-uchar	palette[256];
-
-/*------------------------------------------------------------*/
 
 void	TShowBit::MouseDown(BPoint where)
 {
@@ -54,7 +49,41 @@ void	TShowBit::MouseDown(BPoint where)
 	redraw_mand();
 }
 
-/*------------------------------------------------------------*/
+
+void
+TShowBit::MessageReceived(BMessage* message)
+{
+	switch(message->what) {
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			//float factor = 1;
+			float change = message->FindFloat("be:wheel_delta_y");
+			BPoint where;
+			GetMouse(&where, 0, 0);
+
+			selection = Bounds();
+
+			if (change < 0) {
+				// zoom in
+				selection.top = (where.y + selection.top) / 2;
+				selection.bottom = (where.y + selection.bottom) / 2;
+				selection.left = (where.x + selection.left) / 2;
+				selection.right = (where.x + selection.right) / 2;
+			} else {
+				// zoom out
+				selection.top = - where.y + selection.top * 2;
+				selection.bottom = - where.y + selection.bottom * 2;
+				selection.left = - where.x + selection.left * 2;
+				selection.right = - where.x + selection.right * 2;
+			}
+			redraw_mand();
+			break;
+		}
+		default:
+			BView::MessageReceived(message);
+	}
+}
+
 
 void	TShowBit::redraw_mand()
 {
@@ -66,13 +95,12 @@ void	TShowBit::redraw_mand()
 		px -= (scale / 2.0);
 		py -= (scale / 2.0);
 		scale *= 2.0;
-	}
-	else {
+	} else {
 		px0 = px + (scale * (selection.left / (1.0*size_x)));
 		py0 = py + (scale * (selection.top / (1.0*size_x)));
 		scale0 = scale * ((selection.bottom-selection.top) / (1.0*size_x));
 
-		px = px0; py = py0; scale = scale0;	
+		px = px0; py = py0; scale = scale0;
 	}
 	selection.Set(-1000, -1000, -1000, -1000);
 	mand(px, py, scale, scale);
@@ -97,7 +125,7 @@ void	TShowBit::set_palette(long code)
 {
 	rgb_color	c = {0, 0, 0, 255};
 	long		i;
-	
+
 	BScreen screen( Window() );
 
 	if (code == 0) {
@@ -192,7 +220,7 @@ int iterate_double(double a, double b)
 		y = (2.0 * x * y) + b;
 		i++;
 		x = a + (xsq - ysq);
-	
+
 		if ((xsq + ysq) > 4.0)
 			return(i);
 	}
@@ -222,7 +250,7 @@ int iterate_float(float a, float b)
 		y = (2.0f * x * y) + b;
 		i++;
 		x = a + (xsq - ysq);
-	
+
 		if ((xsq + ysq) > 4.0f)
 			return(i);
 	}
@@ -267,7 +295,7 @@ void	TShowBit::mand(double vx, double vy, double sx, double sy)
 	t1_done = 0; t2_done = 0;
 
 	precompute(vx, vy, sx, sy);
-	
+
 	resume_thread(spawn_thread(__calc1, "calc1", B_NORMAL_PRIORITY, NULL));
 	resume_thread(spawn_thread(__calc2, "calc2", B_NORMAL_PRIORITY, NULL));
 	busy = TRUE;
@@ -293,7 +321,7 @@ void	TShowBit::precompute(double vx, double vy, double sx, double sy)
 {
 	long	x, y;
 	double	cx, cy;
-	double	scale = sx;	
+	double	scale = sx;
 
 	sx = sx / (32.0);
 	sy = sy / (32.0);
@@ -328,7 +356,7 @@ void	TShowBit::mandb(double vx, double vy, double sx, double sy)
 	uchar	*b0;
 	long	y12;
 	long	x12;
-	double	scale = sx;	
+	double	scale = sx;
 	
 	sx = sx / (size_x * 1.0);
 	sy = sy / (size_y * 1.0);
@@ -344,7 +372,7 @@ void	TShowBit::mandb(double vx, double vy, double sx, double sy)
 		for (bx = 0; bx < size_x; bx += 12) {
 			x12 = (bx+6) / 12;
 			v = pc[x12][y12];
-			
+
 			if (exit_now)
 				goto done;
 
@@ -391,8 +419,8 @@ void	TShowBit::manda(double vx, double vy, double sx, double sy)
 	uchar	*b0;
 	long	y12;
 	long	x12;
-	double	scale = sx;	
-	
+	double	scale = sx;
+
 	sx = sx / (size_x * 1.0);
 	sy = sy / (size_y * 1.0);
 	cy = vy;
