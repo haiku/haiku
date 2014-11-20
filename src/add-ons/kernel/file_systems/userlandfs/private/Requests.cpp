@@ -10,7 +10,7 @@
 		return B_BAD_VALUE;							\
 	infos[*count].address = &_address;				\
 	infos[*count].flags = _flags;					\
-	infos[(*count)++].max_size = LONG_MAX;	// TODO:...
+	infos[(*count)++].max_size = INT32_MAX;	// TODO:...
 
 #define ADD_ADDRESS(address)	_ADD_ADDRESS(address, 0)
 #define ADD_STRING(address)		_ADD_ADDRESS(address, ADDRESS_IS_STRING)
