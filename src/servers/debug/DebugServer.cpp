@@ -818,17 +818,18 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 		BAlert *alert = new BAlert(NULL, buffer.String(),
 			B_TRANSLATE("Terminate"), B_TRANSLATE("Debug"),
 			B_TRANSLATE("Save report"), B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		debugAction = alert->Go();
-		_NotifyRegistrar(fTeam, false, debugAction != kActionKillTeam);
 #else
 		BAlert *alert = new BAlert(NULL, buffer.String(),
 			B_TRANSLATE("Kill"), B_TRANSLATE("Debug"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+#endif
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		debugAction = alert->Go();
+		if (debugAction < 0) {
+			// Happens when closed by escape key
+			debugAction = kActionKillTeam;
+		}
 		_NotifyRegistrar(fTeam, false, debugAction != kActionKillTeam);
-#endif
 	}
 
 	return debugAction;
