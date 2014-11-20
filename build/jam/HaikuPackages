@@ -1,13 +1,14 @@
 # The packages we build. Each is defined in its own file in the packages/
 # subdirectory.
-local packages =
+local packages = [ FFilterByBuildFeatures
 	HaikuDevel
 	HaikuLoader
 	HaikuUserguide
 	HaikuWelcome
 	MakefileEngine
-	NetFS
+	NetFS@!x86_64
 	UserlandFS
+	]
 	;
 
 if $(HAIKU_BUILD_TYPE) = bootstrap {
