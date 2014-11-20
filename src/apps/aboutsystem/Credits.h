@@ -56,7 +56,6 @@ static const Translation kTranslations[] = {
 		"Niels Sascha Reedijk\n"
 		"Joachim Seemer (Humdinger)\n"
 		"Matthias Spreiter\n"
-		"Mirko Israel\n"
 		"Ivaylo Tsenkov\n"
 		"svend\n"
 		"taos\n"
