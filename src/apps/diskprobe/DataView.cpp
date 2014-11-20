@@ -911,7 +911,8 @@ DataView::UpdateScroller()
 	GetPreferredSize(&width, &height);
 
 	SetExplicitMinSize(BSize(250, 200));
-	SetExplicitMaxSize(BSize(width, height));
+	SetExplicitMaxSize(BSize(B_SIZE_UNSET, height));
+	SetExplicitPreferredSize(BSize(width, height));
 
 	BScrollBar *bar;
 	if ((bar = ScrollBar(B_HORIZONTAL)) != NULL) {
