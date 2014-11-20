@@ -369,12 +369,14 @@ ReplaceChange::GetRange(off_t /*fileSize*/, off_t &_offset, off_t &_size)
 
 DataEditor::DataEditor()
 	: BLocker("data view")
+	, fAttribute(NULL)
 {
 }
 
 
 DataEditor::DataEditor(entry_ref &ref, const char *attribute)
 	: BLocker("data view")
+	, fAttribute(NULL)
 {
 	SetTo(ref, attribute);
 }
@@ -382,6 +384,7 @@ DataEditor::DataEditor(entry_ref &ref, const char *attribute)
 
 DataEditor::DataEditor(BEntry &entry, const char *attribute)
 	: BLocker("data view")
+	, fAttribute(NULL)
 {
 	SetTo(entry, attribute);
 }
@@ -389,12 +392,14 @@ DataEditor::DataEditor(BEntry &entry, const char *attribute)
 
 DataEditor::DataEditor(const DataEditor &editor)
 	: BLocker("data view")
+	, fAttribute(NULL)
 {
 }
 
 
 DataEditor::~DataEditor()
 {
+	free((void*)fAttribute);
 }
 
 
@@ -424,6 +429,12 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 	fRealViewOffset = 0;
 	fViewOffset = 0;
 	fRealViewSize = fViewSize = fBlockSize = 512;
+
+	free((void*)fAttribute);
+	if (attribute != NULL)
+		fAttribute = strdup(attribute);
+	else
+		fAttribute = NULL;
 
 	struct stat stat;
 	status_t status = entry.GetStat(&stat);
@@ -467,11 +478,6 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 
 	entry.GetRef(&fRef);
 	fIsDevice = S_ISBLK(stat.st_mode) || S_ISCHR(stat.st_mode);
-
-	if (attribute != NULL)
-		fAttribute = strdup(attribute);
-	else
-		fAttribute = NULL;
 
 	if (IsAttribute()) {
 		BNode node(&fAttributeRef);
