@@ -8,19 +8,19 @@ local repoInfo = <repository-info-template>haiku ;
 SEARCH on $(repoInfo) = $(HAIKU_TOP)/src/data/repository_infos ;
 
 local secondaryArchs = $(TARGET_PACKAGING_ARCHS[2-]) ;
-local packages =
+local packages = [ FFilterByBuildFeatures
 	haiku
 	haiku_devel
 	haiku_loader
 	haiku_userguide
 	haiku_welcome
 	makefile_engine
-	netfs
-	userland_fs
+	netfs@!x86_64
+	userland_fs@!x86_64
 
 	haiku_$(secondaryArchs)
 	haiku_$(secondaryArchs)_devel
-	;
+	] ;
 
 local webPositiveIsAvailable ;
 local architectureObject ;
