@@ -85,14 +85,14 @@ RequestPort::SendRequest(RequestAllocator* allocator)
 //PRINT(("RequestPort::SendRequest(%lu)\n", allocator->GetRequest()->GetType()));
 #if USER && !KERNEL_EMU
 	if (!is_userland_request(allocator->GetRequest()->GetType())) {
-		ERROR(("RequestPort::SendRequest(%lu): request is not a userland "
-			"request\n", allocator->GetRequest()->GetType()));
+		ERROR(("RequestPort::SendRequest(%" B_PRId32 "): request is not a "
+			"userland request\n", allocator->GetRequest()->GetType()));
 		debugger("Request is not a userland request.");
 	}
 #else
 	if (!is_kernel_request(allocator->GetRequest()->GetType())) {
-		ERROR(("RequestPort::SendRequest(%lu): request is not a kernel "
-			"request\n", allocator->GetRequest()->GetType()));
+		ERROR(("RequestPort::SendRequest(%" B_PRId32 "): request is not a "
+			"kernel request\n", allocator->GetRequest()->GetType()));
 		debugger("Request is not a kernel request.");
 	}
 #endif
