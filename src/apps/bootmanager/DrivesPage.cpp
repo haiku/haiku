@@ -164,9 +164,22 @@ DriveItem::DrawItem(BView* owner, BRect frame, bool complete)
 	if (fCanBeInstalled != B_OK) {
 		owner->SetHighColor(140, 0, 0);
 		owner->MovePenBy(fBaselineOffset, 0);
-		owner->DrawString(fCanBeInstalled == B_PARTITION_TOO_SMALL
-			? B_TRANSLATE_COMMENT("No space available!", "Cannot install")
-			: B_TRANSLATE_COMMENT("Cannot access!", "Cannot install"));
+		const char* message;
+		switch (fCanBeInstalled) {
+			case B_PARTITION_TOO_SMALL:
+				message = B_TRANSLATE_COMMENT("No space available!",
+					"Cannot install");
+				break;
+			case B_ENTRY_NOT_FOUND:
+				message = B_TRANSLATE_COMMENT("Incompatible format!",
+					"Cannot install");
+				break;
+			default:
+				message = B_TRANSLATE_COMMENT("Cannot access!",
+					"Cannot install");
+				break;
+		}
+		owner->DrawString(message);
 	}
 
 	owner->PopState();

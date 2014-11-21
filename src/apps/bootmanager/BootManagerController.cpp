@@ -297,12 +297,18 @@ BootManagerController::_CreateErrorEntryPage()
 {
 	BString description;
 
-	if (fCollectPartitionsStatus == B_PARTITION_TOO_SMALL) {
+	if (fCollectPartitionsStatus == B_ENTRY_NOT_FOUND) {
 		description << B_TRANSLATE_COMMENT("Partition table not compatible",
 				"Title") << "\n\n"
 			<< B_TRANSLATE("The partition table of the first hard disk is not "
 				"compatible with Boot Manager.\n"
-				"Boot Manager needs 2 KB available space before the first "
+				"Boot Manager only works with IBM PC MBR partitions.");
+	} else if (fCollectPartitionsStatus == B_PARTITION_TOO_SMALL) {
+		description << B_TRANSLATE_COMMENT("First partition starts too early",
+				"Title") << "\n\n"
+			<< B_TRANSLATE("The first partition on the disk starts too early "
+				"and does not leave enough space free for a boot menu.\n"
+				"Boot Manager needs 2 KiB available space before the first "
 				"partition.");
 	} else {
 		description << B_TRANSLATE_COMMENT("Error reading partition table",
