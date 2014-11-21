@@ -113,6 +113,7 @@ static int32
 simonThread(void* cookie)
 {
 	ObjectView* objectView = reinterpret_cast<ObjectView*>(cookie);
+	BScreen screen(objectView->Window());
 
 	int noPause = 0;
 	while (acquire_sem_etc(objectView->quittingSem, 1, B_TIMEOUT, 0) == B_NO_ERROR) {
@@ -125,6 +126,7 @@ simonThread(void* cookie)
 			noPause = 0;
 			waitEvent(objectView->drawEvent);
 		}
+		screen.WaitForRetrace();
 	}
 	return 0;
 }
