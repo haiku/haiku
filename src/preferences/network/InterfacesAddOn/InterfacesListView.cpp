@@ -549,8 +549,6 @@ InterfacesListView::_HandleNetworkMessage(BMessage* message)
 	const char* name;
 	int32 opcode;
 
-	message->PrintToStream();
-
 	if (message->FindInt32("opcode", &opcode) != B_OK)
 		return;
 

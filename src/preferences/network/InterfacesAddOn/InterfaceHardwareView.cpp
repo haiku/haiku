@@ -44,6 +44,8 @@ InterfaceHardwareView::InterfaceHardwareView(NetworkSettings* settings)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
+	SetFlags(Flags() | B_PULSE_NEEDED);
+
 	// TODO : Small graph of throughput?
 
 	float minimumWidth = be_control_look->DefaultItemSpacing() * 16;
@@ -160,6 +162,14 @@ InterfaceHardwareView::MessageReceived(BMessage* message)
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+void
+InterfaceHardwareView::Pulse()
+{
+	// TODO maybe not everything needs to be updated here.
+	Update();
 }
 
 

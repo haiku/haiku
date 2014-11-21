@@ -126,7 +126,6 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 			break;
 
 		default:
-			msg->PrintToStream();
 			BBox::MessageReceived(msg);
 	}
 }

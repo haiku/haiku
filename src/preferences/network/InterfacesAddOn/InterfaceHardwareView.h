@@ -33,6 +33,7 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual void				AttachedToWindow();
+			void				Pulse();
 			status_t			Revert();
 			status_t			Save();
 
