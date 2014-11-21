@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <ListView.h>
 #include <ScrollView.h>
 #include <String.h>
@@ -21,7 +22,12 @@
 #include "DNSSettingsView.h"
 
 
+#define B_TRANSLATION_CONTEXT "Services"
+
+
 static const int32 kSelectionChanged = 'ssrv';
+
+static const char* kDNSSettingsName = B_TRANSLATE_MARK("DNS Client");
 
 
 NetworkSetupAddOn*
@@ -56,7 +62,8 @@ ServicesAddOn::CreateView()
 	BScrollView* sv = new BScrollView( "ScrollView",
 		fServicesListView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
-	fServicesListView->AddItem(new BStringItem("DNS"));
+	fServicesListView->AddItem(new BStringItem(
+		B_TRANSLATE_NOCOLLECT(kDNSSettingsName)));
 
 #if 0
 	// Enable this when the inetd view is ready
@@ -227,7 +234,7 @@ ServicesAddOn::_ShowPanel()
 		delete settingsView;
 	}
 
-	if (strcmp(item->Text(), "DNS") == 0) {
+	if (strcmp(item->Text(), B_TRANSLATE_NOCOLLECT(kDNSSettingsName)) == 0) {
 		settingsView = new DNSSettingsView();
 		panel->AddChild(settingsView);
 	} else {
