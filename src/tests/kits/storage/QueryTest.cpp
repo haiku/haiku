@@ -13,6 +13,7 @@
 #include <MessageQueue.h>
 #include <Messenger.h>
 #include <NodeMonitor.h>
+#include <ObjectList.h>
 #include <OS.h>
 #include <Path.h>
 #include <Query.h>
@@ -265,7 +266,7 @@ public:
 		return (PredicateNode*)children.ItemAt(index);
 	}
 
-	BList children;
+	BObjectList<PredicateNode> children;
 };
 
 // OpNode

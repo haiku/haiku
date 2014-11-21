@@ -4,7 +4,7 @@
 #define _beos_test_app_h_
 
 #include <Application.h>
-#include <List.h>
+#include <ObjectList.h>
 #include <MessageQueue.h>
 
 // TestHandler
@@ -41,8 +41,9 @@ private:
 	static int32 _AppThreadStart(void *data);
 
 private:
+	typedef BObjectList<BTestHandler> TestHandlers;
 	thread_id		fAppThread;
-	BList			fHandlers;
+	TestHandlers	fHandlers;
 };
 
 #endif	// _beos_test_app_h_

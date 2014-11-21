@@ -236,6 +236,9 @@ test_find_directory(directory_which dir, BPath &path, dev_t device)
 		case B_USER_DIRECTORY:
 			error = path.SetTo("/boot/home");
 			break;
+		case B_USER_CACHE_DIRECTORY:
+			error = path.SetTo("/boot/common/cache");
+			break;
 		case B_USER_CONFIG_DIRECTORY:
 			error = path.SetTo("/boot/home/config");
 			break;
@@ -244,6 +247,9 @@ test_find_directory(directory_which dir, BPath &path, dev_t device)
 			break;
 		case B_USER_BOOT_DIRECTORY:
 			error = path.SetTo("/boot/home/config/boot");
+			break;
+		case B_USER_DATA_DIRECTORY:
+			error = path.SetTo("/boot/home/config/data");
 			break;
 		case B_USER_FONTS_DIRECTORY:
 			error = path.SetTo("/boot/home/config/fonts");
@@ -268,6 +274,9 @@ test_find_directory(directory_which dir, BPath &path, dev_t device)
 			break;
 		case B_USER_SOUNDS_DIRECTORY:
 			error = path.SetTo("/boot/home/config/sounds");
+			break;
+		case B_SYSTEM_DATA_DIRECTORY:
+			error = path.SetTo("/boot/system/data");
 			break;
 		// Global directories.
 		case B_APPS_DIRECTORY:
