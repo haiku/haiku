@@ -526,8 +526,10 @@ scan_isa_hardcoded()
 
 	for (i = 0; i < 4; i++) {
 		// skip the port used for kernel debugging...
-		if (sHardcodedPorts[i].ioBase == gKernelDebugPort)
+		if (sHardcodedPorts[i].ioBase == gKernelDebugPort) {
+			TRACE_ALWAYS("Skipping port %d as it is used for kernel debug.\n", i);
 			continue;
+		}
 
 		SerialDevice *device;
 		device = new(std::nothrow) SerialDevice(&sSupportedDevices[0],
