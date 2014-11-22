@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-BootManager	3014946856
+1	greek, modern (1453-)	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		Ο boot manager εγκαταστάθηκε επιτυχώς στο συστημά σας.
 After two seconds	DefaultPartitionPage		Ύστερα από δύο δευτερόλετπα
 Uninstall Boot Manager	UninstallPage	Title	Απεγκατάσταση Boot Manager
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	Η απεγκ�
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Παρακαλώ επιλέξτε τον δίσκο από τον οποίο επιθυμείτε να εγκατασταθεί ή να απεγκατασταθεί ο boot manager.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Παρακαλώ ορίστε την αρχική κατάτμηση και μια τιμή λήξης. \nΤο μενού εκκίνησης θα φορτώσει την προεπιλεγμένη κατάτμηση μετα το χρονικό όριο εκτός εάν επιλέξετε μια άλλη κατάτμηση. Μπορείτε επίσης να αφήσετε το μενού εκκίνησης να περιμένει για να επιλέξετε μια κατάτμηση. \nΚρατήστε το πλήκτρο 'ALT' πατημένο για να απενεργοποιηθεί το χρονικό όριο αναμονής στην εκκίνηση.
 After one second	DefaultPartitionPage		Ύστερα από ένα δευτερόλεπτο
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		To partition table του πρώτου σκληρού δίσκου δεν είναι συμβατό με τον Boot Manager. \nΟ Boot Manager απαιτεί 2 KB ελεύθερου χώρου πρίν από την πρώτη κατάτμηση.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Οι παρακάτω κατατμήσεις βρέθηκαν. Παρακαλώ επιλέξτε το κουτί δίπλα στις κατατμήσεις για να συμπεριληφθούν στο μενού εκκίνησης. Μπορείτε επίσης να ορίσετε τα ονόματα των κατατμήσεων για να εμφανίζονται έτσι στο μενού εκκίνησης.
 After one minute	DefaultPartitionPage		Ύστερα από ένα λεπτό
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Το Master Boot Record του δίσκου (%DISK) επαναφέρθηκε με επιτυχία από το %FILE.
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		Ο Β
 Error reading partition table	BootManagerController	Title	Σφάλμα ανάγνωσης του partition table
 Installation of boot menu failed	BootManagerController	Title	H εγκατάσταση του μενού εκκίνησης απέτυχε
 Backup Master Boot Record	BootManagerController	Title	Λήψη αντίγραφου ασφαλείας του Master Boot Record
-Quit	DrivesPage	Button	Έξοδος
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Σε λίγο θα εγκατασταθεί το μενού στον δίσκο. Είστε σίγουρος ότι θέλετε να συνεχίσετε;
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Το παλιό Master Boot Record αποθηκεύτηκε με επιτυχία στο %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Αρχική Κατάτμηση:

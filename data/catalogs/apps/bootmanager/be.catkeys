@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-BootManager	3014946856
+1	belarusian	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		Менеджэр запуску быў паспяхова ўсталяваны на вашу сістэму.
 After two seconds	DefaultPartitionPage		Пасля двух секунд
 Uninstall Boot Manager	UninstallPage	Title	Выдаліць Менеджэр Запуску
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	Выдален
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Калі ласка пазначце дыск на які вы збіраецеся усталяваць ці выдаліць мэнэджэр запуску.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Калі ласка, вызначце падзел па змоўчанню і таймаут.\nСістэма на падзеле па змоўчанню будзе запушчана пасля таймауту, калі вы не абераце іншы раздзел. Вы таксама можаце ўказаць загрузчыку чакаць вашага выбара.\nТрымайце націснутай клавішу 'ALT', каб спыніць адлік у час запуску.
 After one second	DefaultPartitionPage		Праз адну секунду
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Табліца падзелаў першага дыска несумяшчальная з Менеджерам Запуску.\nМенеджэру Запуску неабходна 2KB свабоднага месца перад першым падзелам.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Былі найдзеныя наступныя падзелы. Калі ласка, адзначце падзелы, якія будуць уключаны ў меню запуску. Вы таксама можаце ўказаць пажаданыя назвы падзелаў для меню.
 After one minute	DefaultPartitionPage		Праз адну хвіліну
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Загрузачны запіс (MBR) устройства (%DISK) паспяхова адноулены з файла %FILE.
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		Ме�
 Error reading partition table	BootManagerController	Title	Памылка пры чытанні табліцы падзелаў
 Installation of boot menu failed	BootManagerController	Title	Устаноўка загрузачнага меню не ўдалася
 Backup Master Boot Record	BootManagerController	Title	Захаваць рэзервовую копію Master Boot Record
-Quit	DrivesPage	Button	Выйсці
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Гатовы запісаць меню запуску на дыск. Вы сапраўды жадаеце працягваць?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Зыходны Master Boot Record паспяхова захаваны ў %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Прадвызначаны падзел:

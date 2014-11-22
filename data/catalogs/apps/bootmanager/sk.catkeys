@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-BootManager	3014946856
+1	slovak	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		Správca zavádzania bol úspešne nainštalovaný na váš systém.
 After two seconds	DefaultPartitionPage		Po dvoch sekundách
 Uninstall Boot Manager	UninstallPage	Title	Odinštalovať Správcu zavádzania
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	Odinštalovani
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Prosím, vyberte disk, kam chcete nainštalovať alebo odinštalovať správcu zavádzania.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Prosím, uveďte predvolenú diskovú oblasť a časový interval.\nMenu zavádzača načíta predvolenú oblasť po vypršaní intervalu ak si nevyberiete inú. Môžete tiež nechať menu čakať bez intervalu, kým sami nezvolíte oblasť\nAk chcete vypnúť časový interval pri zavádzaní, držte stlačený kláves „Alt“.
 After one second	DefaultPartitionPage		Po jednej sekunde
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Tabuľka oblastí prvého disku nie je kompatibilná so Správcom zavádzania.\nSprávca zavádzania potrebuje 2 KB voľného miesta pred prvou oblasťou.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Boli zistené nasledovné oblasti. Prosím, zaškrtnite pole vedľa oblastí, ktoré chcete zahrnúť do menu zavádzača. Môžete tiež nastaviť názvy oblastí, aké chcete aby sa zobrazovali v menu zavádzača.
 After one minute	DefaultPartitionPage		Po jednej minúte
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		MBR zavádzacieho zariadenia (%DISK) bol úspešne obnovený zo súboru %FILE.
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		Sprá
 Error reading partition table	BootManagerController	Title	Chyba pri čítaní tabuľky oblastí
 Installation of boot menu failed	BootManagerController	Title	Inštalácia menu zavádzača zlyhala
 Backup Master Boot Record	BootManagerController	Title	Zálohovať MBR
-Quit	DrivesPage	Button	Ukončiť
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Chystá sa zápis menu zavádzača na disk. Ste si istý, že chcete pokračovať?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Starý MBR bol úspešne uložený do %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Predvolená oblasť:

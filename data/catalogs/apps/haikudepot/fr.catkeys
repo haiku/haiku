@@ -1,5 +1,6 @@
-1	french	x-vnd.Haiku-HaikuDepot	3424104771
+1	french	x-vnd.Haiku-HaikuDepot	4023244533
 Name	PackageListView		Nom
+Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
 Close	RatePackageWindow		Fermer
 The captcha puzzle needs to be solved.	UserLoginWindow		L'énigme Captcha doit être résolue.
 Changelog	PackageInfoView		Journal des modifications
@@ -8,6 +9,7 @@ The passwords do not match.	UserLoginWindow		Les mots de passe ne concordent pas
 Log in…	MainWindow		Connexion…
 Rate %Package%	RatePackageWindow		Évaluer %Package%
 Stability:	RatePackageWindow		Stabilité :
+Show available packages	MainWindow		Afficher les paquets disponibles
 Click a package to view information	PackageInfoView		Cliquez sur un paquet pour afficher ses informations
 Other users can see this rating	RatePackageWindow		Les autres utilisateurs peuvent voir cette évaluation
 Stability	RatePackageWindow		Stabilité
@@ -36,6 +38,7 @@ Close	PackageManager		Fermer
 Not logged in	MainWindow		Non connecté
 The authentication was successful.	UserLoginWindow		L'authentification a réussi.
 Status	PackageListView		État
+Switch account…	MainWindow		Changer de compte…
 Ignore	UserLoginWindow		Ignorer
 Language	UserLoginWindow		Langue
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Le mot de passe est trop faible ou invalide. Utilisez au moins 8 caractères dont au moins 2 chiffres et 2 lettres majuscules.
@@ -48,6 +51,7 @@ Repeat pass phrase:	UserLoginWindow		Répéter le mot de passe :
 Ratings	PackageInfoView		Évaluations
 But none could be listed here, sorry.	UserLoginWindow		Mais aucun ne peut être listé ici, désolé.
 System & Utilities	Model		Système & Utilitaires
+Show installed packages	MainWindow		Afficher les paquets installés
 Inactive	PackageListView		Inactif
 Refresh depots	MainWindow		Rafraîchir les dépôts
 The package action could not be scheduled: %Error%	PackageInfoView		L'action du paquet n'a pas eu lieu : %Error%
@@ -73,16 +77,20 @@ The package was not found by the web service. This probably means that it comes 
 Create account	UserLoginWindow		Créer un compte
 Productivity	Model		Bureautique
 Authentication failed	UserLoginWindow		L'authentification a échoué
+Logged in as %User%	MainWindow		Connecté en tant que %User%
 Language	RatePackageWindow		Langue
 Size	PackageListView		Taille
 Failed to create or update rating: %s\n	RatePackageWindow		Votre évaluation n'a pas été prise en compte : %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Vous devez vous authentifier pour évaluer les paquets.
  It responded with: 	RatePackageWindow		 Il a répondu : 
 User name:	UserLoginWindow		Nom d'utilisateur :
+User Menu	MainWindow		Menu Utilisateur
+Options	MainWindow		Options
 Unstable but usable	RatePackageWindow		Instable mais utilisable
 The email address appears to be malformed.	UserLoginWindow		L'adresse email semble mal formée.
 Games	Model		Jeux
 Rating	PackageListView		Évaluation
+(%Votes%)	FeaturedPackagesView		(%Votes%)
 There was a puzzling response from the web service.	UserLoginWindow		La réponse du service web est incompréhensible.
 Graphics	Model		Graphisme
 Local	MainWindow		Local
@@ -116,6 +124,7 @@ Cancel	RatePackageWindow		Annuler
 Package action failed	PackageInfoView		L'action du paquet a échoué
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Envoyer
+Show develop packages	MainWindow		Afficher les paquets de développement
 Category:	FilterView		Catégorie :
 Failed to create account	UserLoginWindow		La création du compte a échoué
 There are problems with the data you entered:\n\n	UserLoginWindow		Il y a des problèmes dans les données saisies :\n\n

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-BootManager	3014946856
+1	dutch; flemish	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		De bootmanager is met succes op uw systeem geïnstalleerd.
 After two seconds	DefaultPartitionPage		Na twee seconden
 Uninstall Boot Manager	UninstallPage	Title	Boot Manager verwijderen
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	Verwijderen va
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Selecteer a.u.b de schijf waar je de boot manager op wilt installeren of van verwijderen.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Geef a.u.b een standaard partititie en een time-out.\nHet opstart menu laadt de standaard partitie na de time-out tenzij je een andere parititie selecteert. Je kan ook het opstartmenu laten wachten op jou om een partitie te selecteren\nHoud de 'ALT' toets ingedrukt om de time-out uit te schakelen tijdens het opstarten.
 After one second	DefaultPartitionPage		Na een seconde
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		De partitietabel van de eerste harde schijf is niet compatiebel met Boot Manager.\nBoot Manager heeft 2KB vrije ruimte nodig voor de eerste partitie.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		De volgende partities werden gedetecteerd. Gelieve het vakje naast de partities aan te vinken om opgenomen te worden in het opstartmenu. Je kan ook de namen van de partities aanpassen hoe jij ze wilt laten verschijnen in het opstartmenu.
 After one minute	DefaultPartitionPage		Na één minuut
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Het Master Boot Record van het opstartapparaat (%DISK) is succesvol hersteld vanuit %FILE.
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		Boot 
 Error reading partition table	BootManagerController	Title	Fout bij het lezen van partitietabel
 Installation of boot menu failed	BootManagerController	Title	Installatie van opstartmenu mislukt
 Backup Master Boot Record	BootManagerController	Title	Backup maken van Master Boot Record
-Quit	DrivesPage	Button	Afsluiten
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Op het punt om het opstartmenu naar de schijf te schrijven. Ben je zeker dat je wilt doorgaan?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		De oude Master Boot Record werd succesvol opgeslagen naar %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Standaardpartitie:

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-BootManager	3014946856
+1	portuguese (brazil)	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		O gerenciador de boot foi instalado com sucesso.
 After two seconds	DefaultPartitionPage		Após dois segundos
 Uninstall Boot Manager	UninstallPage	Title	Desinstalar Boot Manager
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	Desinstalaçã
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Escolha o drive que você quer instalar ou desinstalar o gerenciador de boot.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Por favor, especifique a partição padrão e o tempo.\nO menu de boot será carregado na partição padrão após o tempo a não ser que você escolha outra partição. Você também pode ter o menu de boot sem tempo definido para escolher uma partição.\nMantenha a tecla 'ALT' pressionada para desabilitar o tempo de boot.
 After one second	DefaultPartitionPage		Após um segundo
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		A tabela de partição do primeiro disco rígido não é compatível com o gerenciador de boot.\nO Gerenciador de Boot precisa de 2 Kb disponíveis antes da primeira partição.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		As seguintes partições foram detectadas. Por favor, siga adiante para as partições serem incluídas no menu de boot. Você também pode definir os nomes das partições da forma como gostaria que aparecessem no menu de boot. 
 After one minute	DefaultPartitionPage		Após um minuto
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		O Master Boot Record do dispositivo (%DISK) foi restaurado com sucesso a partir do arquivo %FILE.
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		O ger
 Error reading partition table	BootManagerController	Title	Erro na leitura da tabela de partições
 Installation of boot menu failed	BootManagerController	Title	Instalação do menu de boot falhou
 Backup Master Boot Record	BootManagerController	Title	Backup do Master Boot Record
-Quit	DrivesPage	Button	Sair
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Próximo de escrever o menu de boot no disco. Tem certeza de quer continuar.
 The old Master Boot Record was successfully saved to %s.	BootManagerController		O antigo Master Boot Record foi salvo com sucesso em %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Partição padrão:

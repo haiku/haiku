@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	761086471
+1	hungarian	x-vnd.Haiku-Terminal	1635947123
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -26,6 +26,7 @@ Window title:	Terminal TermWindow		Ablak címe:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Ismeretlen beállítás: %s\n
 Blue	Terminal colors scheme		Kék
 Custom	Terminal colors scheme		Egyéni
+Encoding:	Terminal AppearancePrefView		Kódolás:
 %app% settings	Terminal PrefWindow	window title	%app% beállítások
 Cancel	Terminal SetTitleWindow		Mégse
 Increase	Terminal TermWindow		Növelés
@@ -48,13 +49,16 @@ Page setup…	Terminal TermWindow		Oldalbeállítás…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Ezek a folyamatok még futnak: \n\n\t%1\n\nHa bezárja a Terminált, a folyamatok megszakadnak.
 Insert path	Terminal TermView		Útvonal beszúrása
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminál\nMinden jog fenntartva 2001-2009 Haiku, Inc.\nMinden jog fenntartva(C) 1999 Kazuho Okui és Takashi Murai.\n\nHasználata: %s [OPCIÓ] [SHELL]\n
+Window size:	Terminal AppearancePrefView		Ablak mérete:
 No search string was entered.	Terminal TermWindow		Nincs beírva keresendő szöveg
 Font size	Terminal TermWindow		Betűméret
 Blinking cursor	Terminal AppearancePrefView		Villogó kurzor
 Set window title	Terminal TermWindow		Ablak címének beállítása
+Revert	Terminal PrefWindow		Visszavonás
 Terminal	System name		Terminál
 Copy path	Terminal TermView		Útvonal másolása
 Close other tabs	Terminal TermWindow		Többi lap bezárása
+Defaults	Terminal PrefWindow		Eredeti
 Match word	Terminal FindWindow		Szóegyeszés
 Nothing is selected.	Terminal TermWindow		Nincs semmi kijelölve.
 Text not found.	Terminal TermWindow		Nem található a szöveg.

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-BootManager	3014946856
+1	english	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		引导管理器已经成功安装到您的系统。
 After two seconds	DefaultPartitionPage		两秒钟以后
 Uninstall Boot Manager	UninstallPage	Title	卸载引导管理器
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	卸载引导�
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		请选择设备以安装或卸载引导管理器。
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		请指定默认分区及超时限制。\n如果未选定分区，超时之后，引导菜单将会载入默认分区。您也可以使引导菜单等待您选定分区。\n按下 'Alt' 键以禁用引导期间的超时限制。
 After one second	DefaultPartitionPage		一秒钟以后
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		首个硬盘的分区表与引导管理器不兼容。\n引导管理器要求首个分区之前具有 2KB 的可用空间。
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		下述分区已删除。请选择分区表下的复选框以将其包含于引导菜单。您也可以设置分区的名称，它们将出现在引导菜单中。
 After one minute	DefaultPartitionPage		一分钟以后
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		引导设备（%DISK）的主引导记录已经从 %FILE 成功完成恢复。
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		引�
 Error reading partition table	BootManagerController	Title	分区表读取出错
 Installation of boot menu failed	BootManagerController	Title	引导菜单安装失败
 Backup Master Boot Record	BootManagerController	Title	备份主引导记录
-Quit	DrivesPage	Button	退出
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		将要写入引导菜单到磁盘。是否继续？
 The old Master Boot Record was successfully saved to %s.	BootManagerController		旧的主引导记录成功保存到 %s。
 Default Partition:	DefaultPartitionPage	Menu field label	默认分区：

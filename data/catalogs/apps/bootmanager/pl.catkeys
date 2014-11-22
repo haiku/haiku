@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-BootManager	3014946856
+1	polish	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		Menedżer rozruchu został pomyślnie zainstalowany na Twoim komputerze.
 After two seconds	DefaultPartitionPage		dwie sekundy
 Uninstall Boot Manager	UninstallPage	Title	Usuń Menedżera Rozruchu
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	Usuwanie menu 
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Wybierz dysk, na którym chcesz zainstalować lub usunąć menu rozruchowe.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Wskaż partycję domyślną i czas oczekiwania.\nMenu rozruchowe załaduje domyślną partycję po określonym czasie oczekiwania, chyba że wybierzesz inną partycję. Menu rozruchowe może czekać w nieskończoność.\nPrzytrzymaj wciśnięty Alt, aby wyłączyć czas oczekiwania podczas rozruchu.
 After one second	DefaultPartitionPage		sekunda
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Tablica partycji pierwszego dysku twardego nie jest kompatybilna z Menedżerem Rozruchu.\nMenedżer Rozruchu wymaga 2 KiB wolnego miejsca na dysku przed pierwszą partycją.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Wykryto następujące partycje. Zaznacz pole wyboru obok partycji, które mają wyświetlać się w menu rozruchowym, możesz także ustawić ich nazwy.
 After one minute	DefaultPartitionPage		minuta
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Główny Sektor Rozruchowy (MBR) urządzenia (%DISK) został pomyślnie przywrócony z pliku %FILE.
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		Mened
 Error reading partition table	BootManagerController	Title	Błąd odczytu tablicy partycji
 Installation of boot menu failed	BootManagerController	Title	Instalacja menu rozruchowego nie powiodła się
 Backup Master Boot Record	BootManagerController	Title	Kopia zapasowa Głównego Sektora Rozruchowego
-Quit	DrivesPage	Button	Zakończ
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Menu rozruchowe zostanie zapisany na dysku. Czy chcesz kontynuować?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Obecny Główny Sektor Rozruchowy został zapisany do %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Partycja domyślna:

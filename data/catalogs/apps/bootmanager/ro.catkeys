@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-BootManager	3014946856
+1	romanian	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		Administratorul de boot a fost instalat cu succes pe sistemul dumneavoastră.
 After two seconds	DefaultPartitionPage		După două secunde
 Uninstall Boot Manager	UninstallPage	Title	Dezinstalează Administrator de boot
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	Dezinstalarea 
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Selectați unitatea în care vreți să instalați sau să dezinstalați administratorul de boot.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Specificați o partiție implicită și o limită de timp.\nMeniul de boot va încărca partiția implicită după limita de timp doar dacă nu selectați altă partiție. Puteți să configurați meniul de boot astfel încât să aștepte un timp nedefinit pentru alegerea unei partiții.\nMențineți apăsată tasta „ALT” pentru a dezactiva limita de timp la pornire.
 After one second	DefaultPartitionPage		După o secundă
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Tabela de partiții al primului hard disc nu este compatibilă cu Administratorul de boot.\nAdministratorul de boot necesită un spațiu disponibil de 2 KiB înainte de prima partiție.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Următoarele partiții au fost detectate. Bifați caseta de lângă partiții pentru a le include în meniul de boot. Puteți să configurați numele partițiilor așa cum doriți să apară în meniul de boot.
 After one minute	DefaultPartitionPage		După un minut
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Înregistrarea de boot principală a unității de boot (%DISK) a fost restaurată cu succes de la %FILE.
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		Admin
 Error reading partition table	BootManagerController	Title	Eroare la citirea tabelului de partiție
 Installation of boot menu failed	BootManagerController	Title	Instalarea meniului de boot a eșuat
 Backup Master Boot Record	BootManagerController	Title	Copie de rezervă a Înregistrării de boot principală (MBR)
-Quit	DrivesPage	Button	Părăsește
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Pe cale de a scrie meniul de boot pe disc. Sigur doriți să continuați?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Înregistrarea de boot principală (MBR) veche a fost salvată cu succes la %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Partiție implicită:

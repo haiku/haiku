@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BootManager	3014946856
+1	french	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		Le gestionnaire d'amorçage a été installé avec succès sur votre système.
 After two seconds	DefaultPartitionPage		Après deux secondes
 Uninstall Boot Manager	UninstallPage	Title	Désinstallation du Gestionnaire d'amorçage
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	Le menu d'amor
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Veuillez sélectionner le lecteur sur lequel vous souhaiter installer ou désinstaller le gestionnaire d'amorçage.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Veuillez définir une partition par défaut et un délai d'expiration.\nPassé ce délai, le menu d'amorçage chargera cette partition, à moins que vous ayez sélectionné une autre partition. Vous pouvez aussi définir une attente infinie, qui nécessitera que vous renseigniez manuellement votre choix.\nGardez la touche “ALT” appuyée au démarrage pour désactiver le délai d'expiration.
 After one second	DefaultPartitionPage		Après une seconde
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		La table de partitions du premier disque dur n'est pas compatible avec le gestionnaire de démarrage.\nLe gestionnaire de démarrage a besoin de 2 Kilo-octets d'espace disque vide situé avant la première partition.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Les partitions suivantes ont été détectées. Veuillez cocher les cases correspondantes aux partitions à inclure dans le menu d'amorçage. Vous pouvez aussi définir le libellé que vous souhaitez voir apparaître dans le menu d'amorçage pour chacune des partitions.
 After one minute	DefaultPartitionPage		Après une minute
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Le MBR du périphérique de démarrage (%DISK) a été récupéré avec succès depuis %FILE.
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		Le ge
 Error reading partition table	BootManagerController	Title	Erreur de lecture de la table de partition
 Installation of boot menu failed	BootManagerController	Title	Echec de l'installation du menu de démarrage
 Backup Master Boot Record	BootManagerController	Title	Sauvegarde du MBR
-Quit	DrivesPage	Button	Quitter
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Vous êtes sur le point d'écrire le menu de démarrage sur le disque. Êtes-vous sûr de vouloir continuer ?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		L'ancien MBR a été correctement sauvegardé dans le fichier %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Partition par défaut :

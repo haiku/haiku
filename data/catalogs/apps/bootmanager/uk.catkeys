@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-BootManager	3014946856
+1	ukrainian	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		Завантажувач успішно встановлений на Вашу систему.
 After two seconds	DefaultPartitionPage		Після 2 секунд
 Uninstall Boot Manager	UninstallPage	Title	Видалити Завантажувач
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	Видален
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Виберіть пристрій на який треба встановити або з якого треба видалити завантажувач.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Визначте розділ по замовчуванню і затримку.\nБутменю загрузить розділ по замовчуванню після затримки, якщо Ви не вкажете іншого розділу. Ви також можете встановити невизначене очікування для вибраного   Вами розділу.\nУтримуйте клавішу 'ALT' для невілювання затримки під час завантаження.
 After one second	DefaultPartitionPage		Після 1 секунди
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Таблиця розділів першого жорсткого диску несумісна з Завантажувачем.\nЗавантажувач потребує 2 KB вільного простору до першого розділу.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Були знайдені наступні розділи. Відмітьте які з них треба включити до загрузочного меню. Ви також можете обрати імена розділів за вашим смаком, які буде видно при відображення бутменю на екрані.
 After one minute	DefaultPartitionPage		Після 1 хвилини
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Основний загрузочний запис пристрою (%DISK) був успішно відновлений з %FILE.
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		За�
 Error reading partition table	BootManagerController	Title	Помилка при читанні таблиці розділів
 Installation of boot menu failed	BootManagerController	Title	Встановлення бутменю призупинено
 Backup Master Boot Record	BootManagerController	Title	Відновлення основного загрузочного запису
-Quit	DrivesPage	Button	Вийти
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Про запис бутменю на диск. Ви дійсно бажаєте продовжити?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Старий MBR успішно збережено в %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Розділ по замовчуванню:

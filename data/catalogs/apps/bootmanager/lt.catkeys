@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-BootManager	3014946856
+1	lithuanian	x-vnd.Haiku-BootManager	2195645217
 The boot manager has been successfully installed on your system.	BootManagerController		Paleidyklė sėkmingai įdiegta į šią sistemą.
 After two seconds	DefaultPartitionPage		dvi sekundės
 Uninstall Boot Manager	UninstallPage	Title	Paleidyklės šalinimas
@@ -23,7 +23,6 @@ Uninstallation of boot menu completed	BootManagerController	Title	Paleidyklės m
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Pasirinkite kaupiklį, į kurį norite įdiegti (arba iš kurio pašalinti) paleidyklę.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Parinkite numatytąjį skaidinį ir laukimo laiką.\nPasibaigus laukimo laikui, paleidyklė automatiškai paleis numatytąjį skirsnį, jeigu nebus pasirinktas joks kitas. Jeigu norite, galite pasirinkti, kad paleidyklė skirsnio pasirinkimo lauktų neribotą laiką.\nJeigu sistemos įkėlimo metu laikysite nuspaudę Alt klavišą, tam kartui laukimo laikas bus neribotas.
 After one second	DefaultPartitionPage		viena sekundė
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Pirmojo standaus disko skaidinių lentelė nesuderinama su šia Paleidykle.\nPaleidyklei reikia bent 2 KB laisvos disko vietos prieš pirmojo skaidinio pradžią.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Aptikti žemiau išvardyti skaidiniai. Pažymėkite skaidinius, kuriuos norite matyti paleidyklės meniu. Taip pat galite nurodyti tokius skaidinių pavadinimus, kokius norite matyti paleidyklės meniu.
 After one minute	DefaultPartitionPage		viena minutė
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Paleidimo įrenginio (%DISK) paleidimo įrašas sėkmingai atkurtas iš failo %FILE.
@@ -52,7 +51,6 @@ Boot Manager is unable to read the partition table!	BootManagerController		Palei
 Error reading partition table	BootManagerController	Title	Klaida skaitant skaidinių lentelę
 Installation of boot menu failed	BootManagerController	Title	Paleidimo meniu įdiegti nepavyko
 Backup Master Boot Record	BootManagerController	Title	Esamo paleidimo įrašo atsarginė kopija
-Quit	DrivesPage	Button	Baigti darbą
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Paleidyklė bus įrašyta į diską. Ar tikrai norite tęsti?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Esamo paleidimo įrašo kopija sėkmingai įrašyta į failą %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Numatytasis skaidinys:
