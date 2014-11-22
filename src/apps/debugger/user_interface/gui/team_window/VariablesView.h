@@ -23,6 +23,7 @@ class Thread;
 class Type;
 class TypeComponentPath;
 class ValueNode;
+class ValueNodeChild;
 class ValueNodeContainer;
 class Value;
 class Variable;
@@ -70,6 +71,7 @@ private:
 
 private:
 			class ContainerListener;
+			class ExpressionVariableID;
 			class ModelNode;
 			class VariableValueColumn;
 			class VariableTableModel;
@@ -77,6 +79,7 @@ private:
 			class TableCellContextMenuTracker;
 			typedef BObjectList<ActionMenuItem> ContextActionList;
 			typedef BObjectList<ExpressionInfo> ExpressionInfoList;
+			typedef BObjectList<ValueNodeChild> ExpressionChildList;
 
 			struct FunctionKey;
 			struct ExpressionInfoEntry;
@@ -113,10 +116,9 @@ private:
 									ExpressionInfo*& _info);
 			void				_RemoveExpression(ModelNode* node);
 
-			status_t			_AddExpressionNode(ExpressionInfo* info);
 			void				_RestoreExpressionNodes();
 
-			void				_SetExpressionNodeValue(ExpressionInfo* info,
+			void				_AddExpressionNode(ExpressionInfo* info,
 									status_t result, ExpressionResult* value);
 
 			status_t			_GetTypeForTypeCode(int32 typeCode,
@@ -131,6 +133,7 @@ private:
 			VariablesViewState*	fPreviousViewState;
 			VariablesViewStateHistory* fViewStateHistory;
 			ExpressionInfoTable* fExpressions;
+			ExpressionChildList	fExpressionChildren;
 			TableCellContextMenuTracker* fTableCellContextMenuTracker;
 			bool				fFrameClearPending;
 			Listener*			fListener;

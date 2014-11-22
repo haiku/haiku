@@ -26,7 +26,6 @@
 #include "ActionMenuItem.h"
 #include "Architecture.h"
 #include "ExpressionInfo.h"
-#include "ExpressionValueNode.h"
 #include "ExpressionValues.h"
 #include "FileSourceCode.h"
 #include "Function.h"
@@ -41,6 +40,8 @@
 #include "StackTrace.h"
 #include "StackFrame.h"
 #include "StackFrameValues.h"
+#include "StringUtils.h"
+#include "StringValue.h"
 #include "SyntheticPrimitiveType.h"
 #include "TableCellValueRenderer.h"
 #include "Team.h"
@@ -202,6 +203,47 @@ public:
 private:
 			BHandler*			fIndirectTarget;
 			VariableTableModel*	fModel;
+};
+
+
+// #pragma mark - ExpressionVariableID
+
+
+class VariablesView::ExpressionVariableID : public ObjectID {
+public:
+	ExpressionVariableID(ExpressionInfo* info)
+		:
+		fInfo(info)
+	{
+		fInfo->AcquireReference();
+	}
+
+	virtual ~ExpressionVariableID()
+	{
+		fInfo->ReleaseReference();
+	}
+
+	virtual	bool operator==(const ObjectID& other) const
+	{
+		const ExpressionVariableID* otherID
+			= dynamic_cast<const ExpressionVariableID*>(&other);
+		if (otherID == NULL)
+			return false;
+
+		return fInfo == otherID->fInfo;
+	}
+
+protected:
+	virtual	uint32 ComputeHashValue() const
+	{
+		uint32 hash = *(uint32*)(&fInfo);
+		hash = hash * 19 + StringUtils::HashValue(fInfo->Expression());
+
+		return hash;
+	}
+
+private:
+	ExpressionInfo*	fInfo;
 };
 
 
@@ -593,7 +635,8 @@ public:
 									const TreeTablePath& path,
 									int32 columnIndex, BToolTip** _tip);
 
-			status_t			AddSyntheticNode(ModelNode* node);
+			status_t			AddSyntheticNode(Variable* variable,
+									ValueNodeChild*& _child);
 			void				RemoveSyntheticNode(ModelNode* node);
 
 private:
@@ -1467,24 +1510,50 @@ VariablesView::VariableTableModel::GetToolTipForTablePath(
 
 
 status_t
-VariablesView::VariableTableModel::AddSyntheticNode(ModelNode* node)
+VariablesView::VariableTableModel::AddSyntheticNode(Variable* variable,
+	ValueNodeChild*& _child)
 {
-	status_t error = node->Init();
+	ValueNodeContainer* container = fNodeManager->GetContainer();
+	AutoLocker<ValueNodeContainer> containerLocker(container);
+
+	_child = new(std::nothrow) VariableValueNodeChild(variable);
+	if (_child == NULL)
+		return B_NO_MEMORY;
+
+	BReference<ValueNodeChild> childReference(_child, true);
+	ValueNode* valueNode;
+	status_t error;
+	if (_child->IsInternal())
+		error = _child->CreateInternalNode(valueNode);
+	else {
+		error = TypeHandlerRoster::Default()->CreateValueNode(_child,
+			_child->GetType(), valueNode);
+	}
+
 	if (error != B_OK)
 		return error;
 
-	int32 index = fNodes.CountItems();
+	_child->SetNode(valueNode);
+	valueNode->ReleaseReference();
+	container->AddChild(_child);
 
-	if (!fNodes.AddItem(node)) {
-		return B_NO_MEMORY;
-		// NB: we take over the caller's reference
+	error = _AddNode(variable, NULL, _child);
+	if (error != B_OK) {
+		container->RemoveChild(_child);
+		return error;
 	}
 
-	fNodeTable.Insert(node);
+	// since we're injecting these nodes synthetically,
+	// we have to manually ask the node manager to create any
+	// applicable children; this would normally be done implicitly
+	// for top level nodes, as they're added from the parameters/locals,
+	// but not here.
+	fNodeManager->AddChildNodes(_child);
 
-	node->NodeChild()->Node()->SetContainer(fNodeManager->GetContainer());
-
-	NotifyNodesAdded(TreeTablePath(), index, 1);
+	ModelNode* childNode = fNodeTable.Lookup(_child);
+	if (childNode != NULL)
+		fContainerListener->ModelNodeValueRequested(childNode);
+	ValueNodeChildrenCreated(_child->Node());
 
 	return B_OK;
 }
@@ -1615,6 +1684,7 @@ VariablesView::VariablesView(Listener* listener)
 	fPreviousViewState(NULL),
 	fViewStateHistory(NULL),
 	fExpressions(NULL),
+	fExpressionChildren(10, false),
 	fTableCellContextMenuTracker(NULL),
 	fFrameClearPending(false),
 	fListener(listener)
@@ -1675,6 +1745,10 @@ VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 	_SaveViewState(updateValues);
 
 	_FinishContextMenu(true);
+
+	for (int32 i = 0; i < fExpressionChildren.CountItems(); i++)
+		fExpressionChildren.ItemAt(i)->ReleaseReference();
+	fExpressionChildren.MakeEmpty();
 
 	if (fThread != NULL)
 		fThread->ReleaseReference();
@@ -1975,7 +2049,7 @@ VariablesView::MessageReceived(BMessage* message)
 				valueReference.SetTo(value, true);
 			}
 
-			_SetExpressionNodeValue(info, result, value);
+			_AddExpressionNode(info, result, value);
 			break;
 		}
 		case MSG_VALUE_NODE_CHANGED:
@@ -2410,20 +2484,18 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	BPrivate::ObjectDeleter<ContextActionList> postActionListDeleter(
 		_postActions);
 
-#if 0
 	result = _AddContextAction("Add watch expression" B_UTF8_ELLIPSIS,
 		MSG_ADD_WATCH_EXPRESSION, _postActions, message);
 	if (result != B_OK)
 		return result;
 
-	if (dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild()) != NULL) {
+	if (fExpressionChildren.HasItem(node->NodeChild())) {
 		result = _AddContextAction("Remove watch expression",
 			MSG_REMOVE_WATCH_EXPRESSION, _postActions, message);
 		if (result != B_OK)
 			return result;
 		message->AddPointer("node", node);
 	}
-#endif
 
 	preActionListDeleter.Detach();
 	postActionListDeleter.Detach();
@@ -2599,46 +2671,27 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 
 		Value* value = node->GetValue();
 		Variable* variable = node->GetVariable();
-		if (variable != NULL) {
-			TypeComponentPath* componentPath = node->GetPath();
-			ObjectID* id = variable->ID();
+		TypeComponentPath* componentPath = node->GetPath();
+		ObjectID* id = variable->ID();
 
-			status_t error = viewState->SetNodeInfo(id, componentPath, nodeInfo);
+		status_t error = viewState->SetNodeInfo(id, componentPath, nodeInfo);
+		if (error != B_OK)
+			return error;
+
+		if (value != NULL && updateValues) {
+			BVariant variableValueData;
+			if (value->ToVariant(variableValueData))
+				error = viewState->Values()->SetValue(id, componentPath,
+					variableValueData);
 			if (error != B_OK)
 				return error;
-
-			if (value != NULL && updateValues) {
-				BVariant variableValueData;
-				if (value->ToVariant(variableValueData))
-					error = viewState->Values()->SetValue(id, componentPath,
-						variableValueData);
-				if (error != B_OK)
-					return error;
-			}
-
-			// recurse
-			error = _AddViewStateDescendentNodeInfos(viewState, node, path,
-				updateValues);
-			if (error != B_OK)
-				return error;
-		} else {
-			ExpressionValueNodeChild* child
-				= dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild());
-			if (child != NULL && value != NULL && updateValues) {
-				BVariant variableValueData;
-				if (value->ToVariant(variableValueData)) {
-					FunctionID* id = fStackFrame->Function()->GetFunctionID();
-					if (id == NULL)
-						return B_NO_MEMORY;
-					BReference<FunctionID> functionReference(id, true);
-					status_t error = viewState->GetExpressionValues()
-						->SetValue(id, fThread, child->GetExpression(),
-						variableValueData);
-					if (error != B_OK)
-						return error;
-				}
-			}
 		}
+
+		// recurse
+		error = _AddViewStateDescendentNodeInfos(viewState, node, path,
+			updateValues);
+		if (error != B_OK)
+			return error;
 
 		path.RemoveLastComponent();
 	}
@@ -2658,54 +2711,37 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 			return B_NO_MEMORY;
 
 		// apply the node's info, if any
-		Variable* variable = node->GetVariable();
-		if (variable != NULL) {
-			ObjectID* objectID = node->GetVariable()->ID();
-			TypeComponentPath* componentPath = node->GetPath();
-			const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
-				objectID, componentPath);
-			if (nodeInfo != NULL) {
-				// NB: if the node info indicates that the node in question
-				// was being cast to a different type, this *must* be applied
-				// before any other view state restoration, since it
-				// potentially changes the child hierarchy under that node.
-				Type* type = nodeInfo->GetCastedType();
-				if (type != NULL) {
-					ValueNode* valueNode = NULL;
-					if (TypeHandlerRoster::Default()->CreateValueNode(
-						node->NodeChild(), type, valueNode) == B_OK) {
-						node->NodeChild()->SetNode(valueNode);
-						node->SetCastedType(type);
-					}
-				}
-
-				// we don't have a renderer yet so we can't apply the settings
-				// at this stage. Store them on the model node so we can lazily
-				// apply them once the value is retrieved.
-				node->SetLastRendererSettings(nodeInfo->GetRendererSettings());
-
-				fVariableTable->SetNodeExpanded(path,
-					nodeInfo->IsNodeExpanded());
-
-				BVariant previousValue;
-				if (viewState->Values()->GetValue(objectID, componentPath,
-					previousValue)) {
-					node->SetPreviousValue(previousValue);
+		ObjectID* objectID = node->GetVariable()->ID();
+		TypeComponentPath* componentPath = node->GetPath();
+		const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
+			objectID, componentPath);
+		if (nodeInfo != NULL) {
+			// NB: if the node info indicates that the node in question
+			// was being cast to a different type, this *must* be applied
+			// before any other view state restoration, since it
+			// potentially changes the child hierarchy under that node.
+			Type* type = nodeInfo->GetCastedType();
+			if (type != NULL) {
+				ValueNode* valueNode = NULL;
+				if (TypeHandlerRoster::Default()->CreateValueNode(
+					node->NodeChild(), type, valueNode) == B_OK) {
+					node->NodeChild()->SetNode(valueNode);
+					node->SetCastedType(type);
 				}
 			}
-		} else {
-			ExpressionValueNodeChild* child
-				= dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild());
-			if (child != NULL) {
-				BVariant previousValue;
-				FunctionID* id = fStackFrame->Function()->GetFunctionID();
-				if (id == NULL)
-					return B_NO_MEMORY;
-				BReference<FunctionID> idReference(id, true);
-				if (viewState->GetExpressionValues()->GetValue(id, fThread,
-					child->GetExpression(), previousValue)) {
-					node->SetPreviousValue(previousValue);
-				}
+
+			// we don't have a renderer yet so we can't apply the settings
+			// at this stage. Store them on the model node so we can lazily
+			// apply them once the value is retrieved.
+			node->SetLastRendererSettings(nodeInfo->GetRendererSettings());
+
+			fVariableTable->SetNodeExpanded(path,
+				nodeInfo->IsNodeExpanded());
+
+			BVariant previousValue;
+			if (viewState->Values()->GetValue(objectID, componentPath,
+				previousValue)) {
+				node->SetPreviousValue(previousValue);
 			}
 		}
 
@@ -2776,10 +2812,6 @@ VariablesView::_AddExpression(const char* expression, ExpressionInfo*& _info)
 
 	BReference<ExpressionInfo> infoReference(info, true);
 
-	status_t error = _AddExpressionNode(info);
-	if (error != B_OK)
-		return error;
-
 	if (!entry->AddItem(info))
 		return B_NO_MEMORY;
 
@@ -2793,9 +2825,7 @@ VariablesView::_AddExpression(const char* expression, ExpressionInfo*& _info)
 void
 VariablesView::_RemoveExpression(ModelNode* node)
 {
-	ExpressionValueNodeChild* child
-		= dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild());
-	if (child == NULL)
+	if (!fExpressionChildren.HasItem(node->NodeChild()))
 		return;
 
 	FunctionID* id = fStackFrame->Function()->GetFunctionID();
@@ -2807,7 +2837,7 @@ VariablesView::_RemoveExpression(ModelNode* node)
 
 	for (int32 i = 0; i < entry->CountItems(); i++) {
 		ExpressionInfo* info = entry->ItemAt(i);
-		if (info->Expression() == child->GetExpression()) {
+		if (info->Expression() == node->Name()) {
 			entry->RemoveItemAt(i);
 			info->RemoveListener(this);
 			info->ReleaseReference();
@@ -2816,46 +2846,6 @@ VariablesView::_RemoveExpression(ModelNode* node)
 	}
 
 	fVariableTableModel->RemoveSyntheticNode(node);
-}
-
-
-status_t
-VariablesView::_AddExpressionNode(ExpressionInfo* info)
-{
-#if 0
-	ExpressionValueNodeChild* child
-		= new(std::nothrow) ExpressionValueNodeChild(info->Expression(), type);
-	if (child == NULL)
-		return B_NO_MEMORY;
-
-	BReference<ValueNodeChild> childReference(child, true);
-
-	ExpressionValueNode* expressionNode
-		= new(std::nothrow) ExpressionValueNode(child, type);
-	if (expressionNode == NULL)
-		return B_NO_MEMORY;
-
-	BReference<ValueNode> expressionNodeReference(expressionNode, true);
-
-	child->SetNode(expressionNode);
-
-	ModelNode* modelNode = new(std::nothrow) ModelNode(NULL, NULL,
-		child, true);
-	if (modelNode == NULL)
-		return B_NO_MEMORY;
-
-	BReference<ModelNode> modelNodeReference(modelNode, true);
-
-	status_t error = fVariableTableModel->AddSyntheticNode(modelNode);
-	if (error != B_OK)
-		return error;
-
-	expressionNodeReference.Detach();
-	modelNodeReference.Detach();
-
-	return B_OK;
-#endif
-	return B_NOT_SUPPORTED;
 }
 
 
@@ -2878,45 +2868,90 @@ VariablesView::_RestoreExpressionNodes()
 
 	for (int32 i = 0; i < entry->CountItems(); i++) {
 		ExpressionInfo* info = entry->ItemAt(i);
-		_AddExpressionNode(info);
 		fListener->ExpressionEvaluationRequested(info, fStackFrame, fThread);
 	}
 }
 
 
 void
-VariablesView::_SetExpressionNodeValue(ExpressionInfo* info, status_t result,
+VariablesView::_AddExpressionNode(ExpressionInfo* info, status_t result,
 	ExpressionResult* value)
 {
-	FunctionInstance* instance = fStackFrame->Function();
-	if (instance == NULL)
-		return;
+	Variable* variable = NULL;
+	BReference<Variable> variableReference;
+	BVariant valueData;
 
-	FunctionID* id = instance->GetFunctionID();
+	Value* primitive = value->PrimitiveValue();
+	if (primitive != NULL) {
+		if (!primitive->ToVariant(valueData))
+			return;
+	} else
+		valueData.SetTo("Unsupported expression result type.");
+
+	ExpressionVariableID* id
+		= new(std::nothrow) ExpressionVariableID(info);
 	if (id == NULL)
 		return;
+	BReference<ObjectID> idReference(id, true);
 
-	BReference<FunctionID> idReference(id, true);
+	Type* type = NULL;
+	if (_GetTypeForTypeCode(valueData.Type(), type) != B_OK)
+		return;
+	BReference<Type> typeReference(type, true);
 
-	ExpressionInfoEntry* entry = fExpressions->Lookup(FunctionKey(id));
-	if (entry == NULL)
+	ValueLocation* location = new(std::nothrow) ValueLocation();
+	if (location == NULL)
+		return;
+	BReference<ValueLocation> locationReference(location, true);
+	if (valueData.IsNumber()) {
+
+		ValuePieceLocation piece;
+		if (!piece.SetToValue(valueData.Bytes(), valueData.Size())
+			|| !location->AddPiece(piece)) {
+			return;
+		}
+	}
+
+	variable = new(std::nothrow) Variable(id,
+		info->Expression(), type, location);
+	if (variable == NULL)
+		return;
+	variableReference.SetTo(variable, true);
+
+	ValueNodeChild* child = NULL;
+	status_t error = fVariableTableModel->AddSyntheticNode(variable, child);
+	if (error != B_OK)
 		return;
 
-	void* rootNode = fVariableTableModel->Root();
-	for (int32 i = 0; i < fVariableTableModel->CountChildren(rootNode); i++) {
-		ModelNode* node = (ModelNode*)fVariableTableModel->ChildAt(rootNode,
-			i);
-		ExpressionValueNodeChild* child
-			= dynamic_cast<ExpressionValueNodeChild*>(node->NodeChild());
-		if (child == NULL)
-			continue;
+	// In the case of either an evaluation error, or an unsupported result
+	// type, set an explanatory string for the result directly.
+	if (result != B_OK || valueData.Type() == B_STRING_TYPE) {
+		StringValue* explicitValue = new(std::nothrow) StringValue(
+			valueData.ToString());
+		if (explicitValue == NULL)
+			return;
 
-		if (child->GetExpression() != info->Expression())
-			continue;
+		child->Node()->SetLocationAndValue(NULL, explicitValue, B_OK);
+	}
 
-		child->Node()->SetLocationAndValue(NULL, value->PrimitiveValue(),
-			result);
-		return;
+	if (fExpressionChildren.AddItem(child)) {
+		child->AcquireReference();
+
+		// attempt to restore our newly added node's view state,
+		// if applicable.
+		FunctionID* functionID = fStackFrame->Function()
+			->GetFunctionID();
+		if (functionID == NULL)
+			return;
+		BReference<FunctionID> functionIDReference(functionID,
+			true);
+		VariablesViewState* viewState = fViewStateHistory
+			->GetState(fThread->ID(), functionID);
+		if (viewState != NULL) {
+			TreeTablePath path;
+			_ApplyViewStateDescendentNodeInfos(viewState,
+				fVariableTableModel->Root(), path);
+		}
 	}
 }
 
@@ -2924,7 +2959,7 @@ VariablesView::_SetExpressionNodeValue(ExpressionInfo* info, status_t result,
 status_t
 VariablesView::_GetTypeForTypeCode(int32 type, Type*& _resultType) const
 {
-	if (BVariant::TypeIsNumber(type)) {
+	if (BVariant::TypeIsNumber(type) || type == B_STRING_TYPE) {
 		_resultType = new(std::nothrow) SyntheticPrimitiveType(type);
 		if (_resultType == NULL)
 			return B_NO_MEMORY;

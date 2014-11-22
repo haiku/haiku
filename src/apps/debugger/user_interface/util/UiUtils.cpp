@@ -479,6 +479,8 @@ UiUtils::TypeCodeToString(type_code type)
 			return "float";
 		case B_DOUBLE_TYPE:
 			return "double";
+		case B_STRING_TYPE:
+			return "string";
 		default:
 			return "unknown";
 	}
