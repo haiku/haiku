@@ -1656,24 +1656,36 @@ BColumnListView::KeyDown(const char* bytes, int32 numBytes)
 		case B_RIGHT_ARROW:
 		case B_LEFT_ARROW:
 		{
-			float  minVal, maxVal;
-			fHorizontalScrollBar->GetRange(&minVal, &maxVal);
-			float smallStep, largeStep;
-			fHorizontalScrollBar->GetSteps(&smallStep, &largeStep);
-			float oldVal = fHorizontalScrollBar->Value();
-			float newVal = oldVal;
+			if ((modifiers() & B_SHIFT_KEY) != 0) {
+				float  minVal, maxVal;
+				fHorizontalScrollBar->GetRange(&minVal, &maxVal);
+				float smallStep, largeStep;
+				fHorizontalScrollBar->GetSteps(&smallStep, &largeStep);
+				float oldVal = fHorizontalScrollBar->Value();
+				float newVal = oldVal;
 
-			if (c == B_LEFT_ARROW)
-				newVal -= smallStep;
-			else if (c == B_RIGHT_ARROW)
-				newVal += smallStep;
+				if (c == B_LEFT_ARROW)
+					newVal -= smallStep;
+				else if (c == B_RIGHT_ARROW)
+					newVal += smallStep;
 
-			if (newVal < minVal)
-				newVal = minVal;
-			else if (newVal > maxVal)
-				newVal = maxVal;
+				if (newVal < minVal)
+					newVal = minVal;
+				else if (newVal > maxVal)
+					newVal = maxVal;
 
-			fHorizontalScrollBar->SetValue(newVal);
+				fHorizontalScrollBar->SetValue(newVal);
+			} else {
+				BRow* focusRow = fOutlineView->FocusRow();
+				if (focusRow == NULL)
+					break;
+
+				bool expanded = focusRow->IsExpanded();
+				if ((c == B_RIGHT_ARROW && !expanded)
+					|| (c == B_LEFT_ARROW && expanded)) {
+					fOutlineView->ToggleFocusRowOpen();
+				}
+			}
 			break;
 		}
 
