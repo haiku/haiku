@@ -269,6 +269,7 @@ public:
 		fHidden(false),
 		fValueChanged(false)
 	{
+		fVariable->AcquireReference();
 		fNodeChild->AcquireReference();
 	}
 
@@ -282,6 +283,7 @@ public:
 			child->ReleaseReference();
 
 		fNodeChild->ReleaseReference();
+		fVariable->ReleaseReference();
 
 		if (fComponentPath != NULL)
 			fComponentPath->ReleaseReference();
@@ -1516,25 +1518,28 @@ VariablesView::VariableTableModel::AddSyntheticNode(Variable* variable,
 	ValueNodeContainer* container = fNodeManager->GetContainer();
 	AutoLocker<ValueNodeContainer> containerLocker(container);
 
-	_child = new(std::nothrow) VariableValueNodeChild(variable);
-	if (_child == NULL)
-		return B_NO_MEMORY;
-
-	BReference<ValueNodeChild> childReference(_child, true);
-	ValueNode* valueNode;
 	status_t error;
-	if (_child->IsInternal())
-		error = _child->CreateInternalNode(valueNode);
-	else {
-		error = TypeHandlerRoster::Default()->CreateValueNode(_child,
-			_child->GetType(), valueNode);
+	if (_child == NULL) {
+		_child = new(std::nothrow) VariableValueNodeChild(variable);
+		if (_child == NULL)
+			return B_NO_MEMORY;
+
+		BReference<ValueNodeChild> childReference(_child, true);
+		ValueNode* valueNode;
+		if (_child->IsInternal())
+			error = _child->CreateInternalNode(valueNode);
+		else {
+			error = TypeHandlerRoster::Default()->CreateValueNode(_child,
+				_child->GetType(), valueNode);
+		}
+
+		if (error != B_OK)
+			return error;
+
+		_child->SetNode(valueNode);
+		valueNode->ReleaseReference();
 	}
 
-	if (error != B_OK)
-		return error;
-
-	_child->SetNode(valueNode);
-	valueNode->ReleaseReference();
 	container->AddChild(_child);
 
 	error = _AddNode(variable, NULL, _child);
@@ -1551,8 +1556,14 @@ VariablesView::VariableTableModel::AddSyntheticNode(Variable* variable,
 	fNodeManager->AddChildNodes(_child);
 
 	ModelNode* childNode = fNodeTable.Lookup(_child);
-	if (childNode != NULL)
-		fContainerListener->ModelNodeValueRequested(childNode);
+	if (childNode != NULL) {
+		ValueNode* valueNode = _child->Node();
+		if (valueNode->LocationAndValueResolutionState()
+			== VALUE_NODE_UNRESOLVED) {
+			fContainerListener->ModelNodeValueRequested(childNode);
+		} else
+			ValueNodeValueChanged(valueNode);
+	}
 	ValueNodeChildrenCreated(_child->Node());
 
 	return B_OK;
@@ -2881,13 +2892,6 @@ VariablesView::_AddExpressionNode(ExpressionInfo* info, status_t result,
 	BReference<Variable> variableReference;
 	BVariant valueData;
 
-	Value* primitive = value->PrimitiveValue();
-	if (primitive != NULL) {
-		if (!primitive->ToVariant(valueData))
-			return;
-	} else
-		valueData.SetTo("Unsupported expression result type.");
-
 	ExpressionVariableID* id
 		= new(std::nothrow) ExpressionVariableID(info);
 	if (id == NULL)
@@ -2895,21 +2899,35 @@ VariablesView::_AddExpressionNode(ExpressionInfo* info, status_t result,
 	BReference<ObjectID> idReference(id, true);
 
 	Type* type = NULL;
-	if (_GetTypeForTypeCode(valueData.Type(), type) != B_OK)
-		return;
-	BReference<Type> typeReference(type, true);
-
-	ValueLocation* location = new(std::nothrow) ValueLocation();
-	if (location == NULL)
-		return;
-	BReference<ValueLocation> locationReference(location, true);
-	if (valueData.IsNumber()) {
-
-		ValuePieceLocation piece;
-		if (!piece.SetToValue(valueData.Bytes(), valueData.Size())
-			|| !location->AddPiece(piece)) {
+	ValueLocation* location = NULL;
+	ValueNodeChild* child = NULL;
+	BReference<Type> typeReference;
+	BReference<ValueLocation> locationReference;
+	if (value->Kind() == EXPRESSION_RESULT_KIND_PRIMITIVE) {
+		value->PrimitiveValue()->ToVariant(valueData);
+		if (_GetTypeForTypeCode(valueData.Type(), type) != B_OK)
 			return;
+		typeReference.SetTo(type, true);
+
+		location = new(std::nothrow) ValueLocation();
+		if (location == NULL)
+			return;
+		locationReference.SetTo(location, true);
+
+		if (valueData.IsNumber()) {
+
+			ValuePieceLocation piece;
+			if (!piece.SetToValue(valueData.Bytes(), valueData.Size())
+				|| !location->AddPiece(piece)) {
+				return;
+			}
 		}
+	} else if (value->Kind() == EXPRESSION_RESULT_KIND_VALUE_NODE) {
+		child = value->ValueNodeValue();
+		type = child->GetType();
+		typeReference.SetTo(type);
+		location = child->Location();
+		locationReference.SetTo(location);
 	}
 
 	variable = new(std::nothrow) Variable(id,
@@ -2918,7 +2936,6 @@ VariablesView::_AddExpressionNode(ExpressionInfo* info, status_t result,
 		return;
 	variableReference.SetTo(variable, true);
 
-	ValueNodeChild* child = NULL;
 	status_t error = fVariableTableModel->AddSyntheticNode(variable, child);
 	if (error != B_OK)
 		return;
