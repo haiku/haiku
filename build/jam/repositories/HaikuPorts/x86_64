@@ -34,6 +34,8 @@ RemotePackageRepository HaikuPorts
 	dtc-1.4.0-1
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
+	file-5.15-1
+	file_devel-5.15-1
 	findutils-4.4.2-1
 	ffmpeg-0.11.5-2
 	ffmpeg_devel-0.11.5-2
@@ -81,6 +83,7 @@ RemotePackageRepository HaikuPorts
 	htmldoc-1.8.27-3
 	icu-54.1-4
 	icu_devel-54.1-4
+	intltool-0.40.6-4
 	jam-2.5_2012_10_12-2
 	jasper-1.900.1-4
 	jasper_devel-1.900.1-4
@@ -92,6 +95,8 @@ RemotePackageRepository HaikuPorts
 	less-451-4
 	libedit-2012_06_01_3.0-1
 	libedit_devel-2012_06_01_3.0-1
+	libevent-2.0.21-7
+	libevent_devel-2.0.21-7
 	libexecinfo-1.1-2
 	libexecinfo_devel-1.1-2
 	libffi-3.0.13-2
@@ -184,12 +189,14 @@ RemotePackageRepository HaikuPorts
 	tiff_tools-3.9.6-2
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
+	transmission-2.84-3
 	unrar-5.1.5-1
 	vim-7.4-2
 	vision-0.9.7.r949-2
 	wget-1.15-1
 	which-2.20-2
 	wpa_supplicant-2.0-3
+	xml_parser-2.36-1
 	xz_utils-5.0.6-1
 	xz_utils_devel-5.0.6-1
 	yasm-1.2.0-3
@@ -215,6 +222,7 @@ RemotePackageRepository HaikuPorts
 	doxygen
 	dtc
 	expat
+	file
 	findutils
 	ffmpeg
 	flac
@@ -238,6 +246,7 @@ RemotePackageRepository HaikuPorts
 #	haikuwebkit
 	htmldoc
 	icu
+	intltool
 	jam
 	jasper
 	jpeg
@@ -245,6 +254,7 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher
 	less
 	libedit
+	libevent
 	libexecinfo
 	libffi
 	libicns
@@ -301,6 +311,7 @@ RemotePackageRepository HaikuPorts
 	texinfo
 	tiff
 	tinyxml
+	transmission
 	unrar
 	vim
 	vision
@@ -308,6 +319,7 @@ RemotePackageRepository HaikuPorts
 	which
 	wpa_supplicant
 	yasm
+	xml_parser
 	xz_utils
 	zlib
 	:

@@ -466,6 +466,8 @@ RemotePackageRepository HaikuPorts
 	libdbusmenu_qt_x86_devel-0.9.2-1
 	libelf_x86-0.8.13-1
 	libelf_x86_devel-0.8.13-1
+	libevent_x86-2.0.21-7
+	libevent_x86_devel-2.0.21-7
 	libexecinfo_x86-1.1-1
 	libexecinfo_x86_devel-1.1-1
 	libffi_x86-3.0.13-1
@@ -620,6 +622,7 @@ RemotePackageRepository HaikuPorts
 	tinyxml_x86-2.6.2-1
 	tinyxml_x86_devel-2.6.2-1
 	tig_x86-2.0.2-1
+	transmission_x86-2.84-3
 	vcmi_x86-0.94-1
 	wizznic_x86-0.9.9-2
 	xz_utils_x86-5.0.5-3
@@ -756,6 +759,7 @@ RemotePackageRepository HaikuPorts
 	libdbusmenu_qt_x86
 	libedit
 	libelf_x86
+	libevent_x86
 	libexecinfo_x86
 	libffi
 	libffi_x86
@@ -920,6 +924,7 @@ RemotePackageRepository HaikuPorts
 	tiff
 	tig_x86
 	tinyxml
+	transmission_x86
 	ubertuber
 	unrar
 	util_macros
