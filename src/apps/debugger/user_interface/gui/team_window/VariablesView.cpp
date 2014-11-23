@@ -267,7 +267,8 @@ public:
 		fComponentPath(NULL),
 		fIsPresentationNode(isPresentationNode),
 		fHidden(false),
-		fValueChanged(false)
+		fValueChanged(false),
+		fPresentationName()
 	{
 		fVariable->AcquireReference();
 		fNodeChild->AcquireReference();
@@ -324,7 +325,13 @@ public:
 
 	const BString& Name() const
 	{
-		return fNodeChild->Name();
+		return fPresentationName.IsEmpty()
+			? fNodeChild->Name() : fPresentationName;
+	}
+
+	void SetPresentationName(const BString& name)
+	{
+		fPresentationName = name;
 	}
 
 	Type* GetType() const
@@ -530,10 +537,10 @@ private:
 	bool					fIsPresentationNode;
 	bool					fHidden;
 	bool					fValueChanged;
-	bool					fIsExpression;
+	BString					fPresentationName;
 
 public:
-	ModelNode*			fNext;
+	ModelNode*				fNext;
 };
 
 
@@ -638,7 +645,8 @@ public:
 									int32 columnIndex, BToolTip** _tip);
 
 			status_t			AddSyntheticNode(Variable* variable,
-									ValueNodeChild*& _child);
+									ValueNodeChild*& _child,
+									const char* presentationName = NULL);
 			void				RemoveSyntheticNode(ModelNode* node);
 
 private:
@@ -1513,7 +1521,7 @@ VariablesView::VariableTableModel::GetToolTipForTablePath(
 
 status_t
 VariablesView::VariableTableModel::AddSyntheticNode(Variable* variable,
-	ValueNodeChild*& _child)
+	ValueNodeChild*& _child, const char* presentationName)
 {
 	ValueNodeContainer* container = fNodeManager->GetContainer();
 	AutoLocker<ValueNodeContainer> containerLocker(container);
@@ -1557,6 +1565,9 @@ VariablesView::VariableTableModel::AddSyntheticNode(Variable* variable,
 
 	ModelNode* childNode = fNodeTable.Lookup(_child);
 	if (childNode != NULL) {
+		if (presentationName != NULL)
+			childNode->SetPresentationName(presentationName);
+
 		ValueNode* valueNode = _child->Node();
 		if (valueNode->LocationAndValueResolutionState()
 			== VALUE_NODE_UNRESOLVED) {
@@ -2936,7 +2947,8 @@ VariablesView::_AddExpressionNode(ExpressionInfo* info, status_t result,
 		return;
 	variableReference.SetTo(variable, true);
 
-	status_t error = fVariableTableModel->AddSyntheticNode(variable, child);
+	status_t error = fVariableTableModel->AddSyntheticNode(variable, child,
+		info->Expression());
 	if (error != B_OK)
 		return;
 
