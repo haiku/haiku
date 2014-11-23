@@ -108,6 +108,12 @@ CharacterView::IsShowingBlock(int32 blockIndex) const
 void
 CharacterView::ScrollToBlock(int32 blockIndex)
 {
+	// don't scroll if the selected character is already in view.
+	// this prevents distracting jumps when crossing a block 
+	// boundary in the character view.
+	if (IsCharacterVisible(fCurrentCharacter))
+		return;
+		
 	if (blockIndex < 0)
 		blockIndex = 0;
 	else if (blockIndex >= (int32)kNumUnicodeBlocks)

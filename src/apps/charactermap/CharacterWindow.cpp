@@ -319,6 +319,8 @@ CharacterWindow::MessageReceived(BMessage* message)
 
 			fGlyphView->SetText(glyph);
 			fCodeView->SetText(text);
+			
+			fUnicodeBlockView->SelectBlockForCharacter(character);
 			break;
 		}
 

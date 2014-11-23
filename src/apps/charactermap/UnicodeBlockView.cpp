@@ -118,3 +118,22 @@ UnicodeBlockView::_CreateBlocks()
 	_UpdateBlocks();
 }
 
+
+void
+UnicodeBlockView::SelectBlockForCharacter(uint32 character)
+{
+	// find block containing the character
+
+	// TODO: could use binary search here
+	for (uint32 i = 0; i < kNumUnicodeBlocks; i++) {
+		if (kUnicodeBlocks[i].end < character)
+			continue;
+		if (kUnicodeBlocks[i].start > character) {
+			// Character is not mapped
+			break;
+		}
+
+		Select(i);
+		ScrollToSelection();
+	}
+}

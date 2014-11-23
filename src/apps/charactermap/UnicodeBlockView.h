@@ -40,6 +40,7 @@ public:
 								{ return fShowContainedBlocksOnly; }
 
 			bool			IsShowingBlock(int32 blockIndex) const;
+			void			SelectBlockForCharacter(uint32 character);
 
 private:
 			void			_UpdateBlocks();
