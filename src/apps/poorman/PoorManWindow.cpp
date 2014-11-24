@@ -524,18 +524,18 @@ PoorManWindow::SaveConsole(BMessage* message, bool selection)
 		// find the selected text and write it to a file
 		int32 start = 0, end = 0;
 		fLoggingView->GetSelection(&start, &end);
-		
+
 		BString buffer;
 		char * buffData = buffer.LockBuffer(end - start + 1);
-		// copy the selected text from the TextView to the buffer	
+		// copy the selected text from the TextView to the buffer
 		fLoggingView->GetText(start, end - start, buffData);
 		buffer.UnlockBuffer(end - start + 1);
-		
+
 		err = fwrite(buffer.String(), 1, end - start + 1, f);
 	}
-	
+
 	fclose(f);
-	
+
 	return err;
 }
 
@@ -543,12 +543,12 @@ PoorManWindow::SaveConsole(BMessage* message, bool selection)
 void
 PoorManWindow::DefaultSettings()
 {
-	BAlert* serverAlert = new BAlert(B_TRANSLATE("Error Server"), 
+	BAlert* serverAlert = new BAlert(B_TRANSLATE("Error Server"),
 		STR_ERR_CANT_START, B_TRANSLATE("OK"));
 	serverAlert->SetFlags(serverAlert->Flags() | B_CLOSE_ON_ESCAPE);
-	BAlert* dirAlert = new BAlert(B_TRANSLATE("Error Dir"), 
-		STR_ERR_WEB_DIR, B_TRANSLATE("Cancel"), B_TRANSLATE("Select"), 
-		B_TRANSLATE("Default"), B_WIDTH_AS_USUAL, B_OFFSET_SPACING);
+	BAlert* dirAlert = new BAlert(B_TRANSLATE("Error Dir"),
+		STR_ERR_WEB_DIR, B_TRANSLATE("Cancel"), B_TRANSLATE("Select"),
+		B_TRANSLATE("Create public_html"), B_WIDTH_AS_USUAL, B_OFFSET_SPACING);
 	dirAlert->SetShortcut(0, B_ESCAPE);
 	int32 buttonIndex = dirAlert->Go();
 
@@ -558,7 +558,7 @@ PoorManWindow::DefaultSettings()
 				Quit();
 			be_app_messenger.SendMessage(B_QUIT_REQUESTED);
 			break;
-		
+
 		case 1:
 			fPrefWindow = new PoorManPreferencesWindow(
 					fSetwindowFrame,
