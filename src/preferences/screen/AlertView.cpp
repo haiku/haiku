@@ -18,6 +18,7 @@
 #include <Catalog.h>
 #include <StringView.h>
 #include <String.h>
+#include <TimeUnitFormat.h>
 
 #include <IconUtils.h>
 #include <FindDirectory.h>
@@ -134,8 +135,13 @@ void
 AlertView::UpdateCountdownView()
 {
 	BString string;
-	string = B_TRANSLATE("Settings will revert in %seconds seconds.");
-	string.ReplaceFirst("%seconds", BString() << fSeconds);
+	string = B_TRANSLATE("Settings will revert in %seconds.");
+
+	BTimeUnitFormat format;
+	BString tmp;
+	format.Format(tmp, fSeconds, B_TIME_UNIT_SECOND);
+
+	string.ReplaceFirst("%seconds", tmp);
 	fCountdownView->SetText(string.String());
 }
 

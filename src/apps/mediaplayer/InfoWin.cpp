@@ -29,6 +29,7 @@
 #include <Catalog.h>
 #include <Debug.h>
 #include <MediaDefs.h>
+#include <MessageFormat.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <String.h>
@@ -385,16 +386,11 @@ printf("InfoWin::Update(0x%08" B_PRIx32 ")\n", which);
 				bitsPerSample);
 			s << bitString << " ";
 		}
-		if (channelCount == 1)
-			s << B_TRANSLATE("Mono");
-		else if (channelCount == 2)
-			s << B_TRANSLATE("Stereo");
-		else {
-			char channelString[20];
-			snprintf(channelString, sizeof(channelString),
-				B_TRANSLATE("%d Channels"), channelCount);
-			s << channelString;
-		}
+
+		static BMessageFormat channelFormat(B_TRANSLATE(
+			"{0, plural, =1{Mono} =2{Stereo} other{# Channels}}"));
+		channelFormat.Format(s, channelCount);
+
 		s << ", ";
 		if (sr > 0.0) {
 			char rateString[20];

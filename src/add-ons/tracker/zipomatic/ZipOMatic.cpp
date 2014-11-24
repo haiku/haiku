@@ -10,6 +10,7 @@
 #include "ZipOMatic.h"
 
 #include <Alert.h>
+#include <MessageFormat.h>
 #include <Roster.h>
 #include <TrackerAddOnAppLaunch.h>
 
@@ -153,13 +154,15 @@ ZipOMatic::QuitRequested(void)
 		// The multi-zipper case differs from the single-zipper case
 		// in that zippers are not paused while the BAlert is up.
 
-		BString question;
-		question << B_TRANSLATE("You have %ld Zip-O-Matic running.\n\n");
-		question << B_TRANSLATE("Do you want to stop them?");
+		static BMessageFormat format(
+			B_TRANSLATE("You have {0, plural, one{# Zip-O-Matic} "
+				"other{# Zip-O-Matics}} running.\n\n"));
 
-		BString temp;
-		temp << zippoCount;
-		question.ReplaceFirst("%ld", temp.String());
+		BString question;
+
+		format.Format(question, zippoCount);
+
+		question << B_TRANSLATE("Do you want to stop them?");
 
 		BAlert* alert = new BAlert(NULL, question.String(),
 			B_TRANSLATE("Stop them"), B_TRANSLATE("Let them continue"), NULL,

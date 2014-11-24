@@ -28,6 +28,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <Clipboard.h>
+#include <DurationFormat.h>
 #include <Entry.h>
 #include <File.h>
 #include <FilePanel.h>
@@ -317,11 +318,10 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 
 	int32 kDelays[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 20};
 	for (uint32 i = 0; i < sizeof(kDelays) / sizeof(kDelays[0]); i++) {
-		BString text(B_TRANSLATE_COMMENT("%SECONDS seconds",
-			"Don't translate %SECONDS"));
-		char seconds[32];
-		snprintf(seconds, sizeof(seconds), "%" B_PRIi32, kDelays[i]);
-		text.ReplaceFirst("%SECONDS", seconds);
+		BString text;
+		BDurationFormat format;
+		text.Truncate(0);
+		format.Format(text, 0, kDelays[i] * 1000000LL);
 
 		_AddDelayItem(delayMenu, text.String(), kDelays[i] * 1000000LL);
 	}

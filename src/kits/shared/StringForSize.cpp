@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+#include <MessageFormat.h>
 #include <SystemCatalog.h>
 
 using BPrivate::gSystemCatalog;
@@ -24,9 +25,15 @@ string_for_size(double size, char* string, size_t stringSize)
 {
 	double kib = size / 1024.0;
 	if (kib < 1.0) {
-		const char* trKey = B_TRANSLATE_MARK("%d bytes");
-		snprintf(string, stringSize, gSystemCatalog.GetString(trKey,
-			B_TRANSLATION_CONTEXT), (int)size);
+		const char* trKey = B_TRANSLATE_MARK(
+			"{0, plural, one{# byte} other{# bytes}");
+
+		BString tmp;
+		BMessageFormat format(
+			gSystemCatalog.GetString(trKey, B_TRANSLATION_CONTEXT));
+		format.Format(tmp, (int)size);
+
+		strlcpy(string, tmp.String(), stringSize);
 		return string;
 	}
 	double mib = kib / 1024.0;

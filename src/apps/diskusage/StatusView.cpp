@@ -46,7 +46,8 @@ StatusView::StatusView()
 		B_SIZE_UNSET));
 
 	char testLabel[256];
-	snprintf(testLabel, sizeof(testLabel), B_TRANSLATE("%d files"),
+	snprintf(testLabel, sizeof(testLabel), B_TRANSLATE_COMMENT("%d files",
+		"For UI layouting only, use the longest plural form for your language"),
 		999999);
 
 	fCountView = new BStringView(NULL, kEmptyStr);

@@ -28,6 +28,7 @@
 #include <SpaceLayoutItem.h>
 #include <StatusBar.h>
 #include <StringView.h>
+#include <TimeUnitFormat.h>
 
 #include "BrowserWindow.h"
 #include "WebDownload.h"
@@ -796,38 +797,36 @@ DownloadProgressView::_UpdateStatusText()
 		finishTime -= now;
 		time = gmtime(&finishTime);
 
+		BTimeUnitFormat timeFormat;
+
 		BString buffer2;
 		if (finishTime > secondsPerDay) {
 			int64 days = finishTime / secondsPerDay;
-			if (days == 1)
-				buffer2 << B_TRANSLATE("Over 1 day left");
-			else {
-				buffer2 << B_TRANSLATE("Over %days days left");
-				buffer2.ReplaceFirst("%days", BString() << days);
-			}
+
+			BString time;
+			timeFormat.Format(time, days, B_TIME_UNIT_DAY);
+
+			buffer2 << B_TRANSLATE("Over %days left");
+			buffer2.ReplaceFirst("%days", time);
 		} else if (finishTime > 60 * 60) {
 			int64 hours = finishTime / (60 * 60);
-			if (hours == 1)
-				buffer2 << B_TRANSLATE("Over 1 hour left");
-			else {
-				buffer2 << B_TRANSLATE("Over %hours hours left");
-				buffer2.ReplaceFirst("%hours", BString() << hours);
-			}
+			BString time;
+			timeFormat.Format(time, hours, B_TIME_UNIT_HOUR);
+
+			buffer2 << B_TRANSLATE("Over %hours left");
+			buffer2.ReplaceFirst("%hours", time);
 		} else if (finishTime > 60) {
 			int64 minutes = finishTime / 60;
 			if (minutes == 1)
 				buffer2 << B_TRANSLATE("Over 1 minute left");
-			else {
-				buffer2 << B_TRANSLATE("%minutes minutes");
-				buffer2.ReplaceFirst("%minutes", BString() << minutes);
-			}
+			else
+				timeFormat.Format(buffer2, minutes, B_TIME_UNIT_MINUTE);
 		} else {
-			if (finishTime == 1)
-				buffer2 << B_TRANSLATE("1 second left");
-			else {
-				buffer2 << B_TRANSLATE("%seconds seconds left");
-				buffer2.ReplaceFirst("%seconds", BString() << finishTime);
-			}
+			BString time;
+			timeFormat.Format(time, finishTime, B_TIME_UNIT_SECOND);
+
+			buffer2 << B_TRANSLATE("%seconds left");
+			buffer2.ReplaceFirst("%seconds", time);
 		}
 
 		buffer = "(";

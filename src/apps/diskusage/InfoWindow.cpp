@@ -17,6 +17,7 @@
 #include <vector>
 
 #include <Catalog.h>
+#include <MessageFormat.h>
 #include <StringForSize.h>
 #include <StringView.h>
 #include <Bitmap.h>
@@ -77,31 +78,36 @@ InfoWin::InfoWin(BPoint p, FileInfo *f, BWindow* parent)
 	Item item;
 
 	// Size
-	char name[B_PATH_NAME_LENGTH] = { 0 };
-	string_for_size(f->size, name, sizeof(name));
+	BString name;
 	if (f->count > 0) {
-		// This is a directory.
-		char str[64];
-		snprintf(str, sizeof(str), B_TRANSLATE(" in %d files"),
-			f->count);
-		strlcat(name, str, sizeof(name));
-	}
-	info.push_back(Item(B_TRANSLATE_MARK("Size"), name));
+		// This is a directory, include file count information
+		static BMessageFormat format(B_TRANSLATE(
+		"%size% in {0, plural, one{# file} other{# files}"));
+
+		format.Format(name, f->count);
+	} else
+		name = "%size%";
+
+	char tmp[B_PATH_NAME_LENGTH] = { 0 };
+	string_for_size(f->size, tmp, sizeof(tmp));
+	name.ReplaceFirst("%size%", tmp);
+
+	info.push_back(Item(B_TRANSLATE_MARK("Size"), name.String()));
 
 	// Created & modified dates
 	BEntry entry(&f->ref);
 	time_t t;
 	entry.GetCreationTime(&t);
-	strftime(name, 64, B_TRANSLATE("%a, %d %b %Y, %r"), localtime(&t));
-	info.push_back(Item(B_TRANSLATE("Created"), name));
+	strftime(tmp, 64, B_TRANSLATE("%a, %d %b %Y, %r"), localtime(&t));
+	info.push_back(Item(B_TRANSLATE("Created"), tmp));
 	entry.GetModificationTime(&t);
-	strftime(name, 64, B_TRANSLATE("%a, %d %b %Y, %r"), localtime(&t));
-	info.push_back(Item(B_TRANSLATE("Modified"), name));
+	strftime(tmp, 64, B_TRANSLATE("%a, %d %b %Y, %r"), localtime(&t));
+	info.push_back(Item(B_TRANSLATE("Modified"), tmp));
 
 	// Kind
 	BMimeType* type = f->Type();
-	type->GetShortDescription(name);
-	info.push_back(Item(B_TRANSLATE("Kind"), name));
+	type->GetShortDescription(tmp);
+	info.push_back(Item(B_TRANSLATE("Kind"), tmp));
 	delete type;
 
 	// Path
@@ -127,15 +133,15 @@ InfoWin::InfoWin(BPoint p, FileInfo *f, BWindow* parent)
 	float rightWidth = 0.0;
 	InfoList::iterator i = info.begin();
 	while (i != info.end()) {
-		float w = smallFont.StringWidth((*i).first.c_str()) + 
-			2.0 * kSmallHMargin;
+		float w = smallFont.StringWidth((*i).first.c_str())
+			+ 2.0 * kSmallHMargin;
 		leftWidth = max_c(leftWidth, w);
 		w = smallFont.StringWidth((*i).second.c_str()) + 2.0 * kSmallHMargin;
 		rightWidth = max_c(rightWidth, w);
 		i++;
 	}
 
-	float winHeight = 32.0 + 4.0 * kSmallVMargin + 5.0 * (fontHeight 
+	float winHeight = 32.0 + 4.0 * kSmallVMargin + 5.0 * (fontHeight
 		+ kSmallVMargin);
 	float winWidth = leftWidth + rightWidth;
 	ResizeTo(winWidth, winHeight);

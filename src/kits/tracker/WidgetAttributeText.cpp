@@ -49,6 +49,7 @@ All rights reserved.
 #include <DateTimeFormat.h>
 #include <Debug.h>
 #include <Locale.h>
+#include <MessageFormat.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <TextView.h>
@@ -105,7 +106,9 @@ TruncFileSizeBase(BString* outString, int64 value, const View* view,
 		*outString = "-";
 		return view->StringWidth("-");
 	} else if (value < kKBSize) {
-		buffer.SetToFormat(B_TRANSLATE("%Ld bytes"), value);
+		static BMessageFormat format(B_TRANSLATE(
+			"{0, plural, one{# byte} other{# bytes}}"));
+		format.Format(buffer, value);
 		if (view->StringWidth(buffer.String()) > width)
 			buffer.SetToFormat(B_TRANSLATE("%Ld B"), value);
 	} else {

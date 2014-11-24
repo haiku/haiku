@@ -9,6 +9,7 @@
 
 #include <Catalog.h>
 #include <MediaTrack.h>
+#include <MessageFormat.h>
 #include <stdio.h>
 
 #undef B_TRANSLATION_CONTEXT
@@ -26,7 +27,7 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 	_Reset();
 	if (!file)
 		return B_BAD_VALUE;
-	
+
 	BMediaTrack* track;
 	media_format format;
 	memset(&format, 0, sizeof(format));
@@ -52,6 +53,9 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 		if (ret != B_OK)
 			return ret;
 
+		static BMessageFormat frameFormat(B_TRANSLATE(
+			"{0, plural, one{# frame} other{# frames}}"));
+
 		if (format.IsVideo()) {
 			memset(&format, 0, sizeof(format));
 			format.type = B_MEDIA_RAW_VIDEO;
@@ -71,12 +75,14 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 			videoFrames = track->CountFrames();
 
 			BString details;
-			snprintf(details.LockBuffer(256), 256,
-					B_TRANSLATE_COMMENT("%u x %u, %.2ffps / %Ld frames",
-					"Width x Height, fps / frames"),
-					format.Width(), format.Height(),
-					rvf->field_rate / rvf->interlace, videoFrames);
-			details.UnlockBuffer();
+			details.SetToFormat(
+				B_TRANSLATE_COMMENT("%u x %u, %.2ffps", "Width x Height, fps"),
+				format.Width(), format.Height(),
+				rvf->field_rate / rvf->interlace);
+
+			details << " / ";
+			frameFormat.Format(details, videoFrames);
+
 			video.details << details;
 			videoDone = true;
 
@@ -91,14 +97,17 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 
 			BString details;
 			if (bytesPerSample == 1 || bytesPerSample == 2) {
-				snprintf(details.LockBuffer(16), 16,
-						B_TRANSLATE("%d bit "), bytesPerSample * 8);
+				static BMessageFormat bitFormat(
+					B_TRANSLATE("{0, plural, one{# bit} other{# bits}}"));
+				bitFormat.Format(details, bytesPerSample * 8);
+				details.SetToFormat(B_TRANSLATE("%d bit "), bytesPerSample * 8);
 			} else {
-				snprintf(details.LockBuffer(16), 16,
-						B_TRANSLATE("%d byte "), bytesPerSample);
+				static BMessageFormat bitFormat(
+					B_TRANSLATE("{0, plural, one{# byte} other{# bytes}}"));
+				bitFormat.Format(details, bytesPerSample);
 			}
-			details.UnlockBuffer();
 			audio.details << details;
+			audio.details << " ";
 
 			ret = track->GetCodecInfo(&codecInfo);
 			if (ret != B_OK)
@@ -109,19 +118,19 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 			audioFrames = track->CountFrames();
 			BString channels;
 			if (raf->channel_count == 1) {
-				snprintf(channels.LockBuffer(64), 64,
-				B_TRANSLATE("%.1f kHz mono / %lld frames"), 
-				raf->frame_rate / 1000.f, audioFrames);
+				channels.SetToFormat(B_TRANSLATE("%.1f kHz mono"),
+					raf->frame_rate / 1000.f);
 			} else if (raf->channel_count == 2) {
-				snprintf(channels.LockBuffer(64), 64,
-				B_TRANSLATE("%.1f kHz stereo / %lld frames"), 
-				raf->frame_rate / 1000.f, audioFrames);
+				channels.SetToFormat(B_TRANSLATE("%.1f kHz stereo"),
+					raf->frame_rate / 1000.f);
 			} else {
-				snprintf(channels.LockBuffer(64), 64,
-				B_TRANSLATE("%.1f kHz %ld channel / %lld frames"), 
-				raf->frame_rate / 1000.f, raf->channel_count, audioFrames);
+				channels.SetToFormat(B_TRANSLATE("%.1f kHz %ld channel"),
+					raf->frame_rate / 1000.f, raf->channel_count);
 			}
-			channels.UnlockBuffer();
+
+			channels << " / ";
+			frameFormat.Format(channels, audioFrames);
+
 			audio.details << channels;
 
 			audioDone = true;
@@ -133,7 +142,7 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 
 	useconds = MAX(audioDuration, videoDuration);
 	duration << (int32)(useconds / 1000000)
-			  << B_TRANSLATE(" seconds");
+			<< B_TRANSLATE(" seconds");
 
 	return B_OK;
 }

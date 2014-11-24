@@ -58,6 +58,7 @@ respective holders. All rights reserved.
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Locale.h>
+#include <MessageFormat.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <Roster.h>
@@ -2051,10 +2052,13 @@ FileStatToString(StatStruct* stat, char* buffer, int32 length)
 	tm timeData;
 	localtime_r(&stat->st_mtime, &timeData);
 
+	BString size;
+	static BMessageFormat format(
+		B_TRANSLATE("{0, plural, one{# byte} other{# bytes}}"));
+	format.Format(size, stat->st_size);
+	uint32 pos = snprintf(buffer, length, "\n\t(%s ", size.String());
 
-	uint32 pos = sprintf(buffer,
-		B_TRANSLATE("\n\t(%Ld bytes, "), stat->st_size);
-	strftime(buffer + pos, length - pos,"%b %d %Y, %I:%M:%S %p)", &timeData);
+	strftime(buffer + pos, length - pos, "%b %d %Y, %I:%M:%S %p)", &timeData);
 }
 
 
