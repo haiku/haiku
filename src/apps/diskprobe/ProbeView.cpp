@@ -498,9 +498,9 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 
 	BStringView *stringView = new BStringView(
 		B_EMPTY_STRING, editor.IsAttribute()
-		? B_TRANSLATE("Attribute: ") 
-		: editor.IsDevice() 
-		? B_TRANSLATE("Device: ") 
+		? B_TRANSLATE("Attribute: ")
+		: editor.IsDevice()
+		? B_TRANSLATE("Device: ")
 		: B_TRANSLATE("File: "));
 	stringView->SetFont(&boldFont);
 	line->AddChild(stringView);
@@ -536,7 +536,7 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 	} else
 		fTypeControl = NULL;
 
-	fStopButton = new BButton(B_EMPTY_STRING, 
+	fStopButton = new BButton(B_EMPTY_STRING,
 		B_TRANSLATE("Stop"), new BMessage(kMsgStopFind));
 	fStopButton->SetFont(&plainFont);
 	fStopButton->Hide();
@@ -1129,7 +1129,9 @@ ProbeView::ProbeView(entry_ref *ref, const char *attribute,
 	fTypeView(NULL),
 	fLastSearch(NULL)
 {
-	SetLayout(new BGroupLayout(B_VERTICAL, 0));
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
+	SetLayout(layout);
+	layout->SetInsets(-1, -1, -1, -1);
 	fEditor.SetTo(*ref, attribute);
 
 	int32 baseType = kHexBase;
@@ -1426,7 +1428,7 @@ ProbeView::AttachedToWindow()
 		"and 'BlockSize'"));
 	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base_type", kDecimalBase);
-	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Decimal", 
+	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Decimal",
 		"A menu item, as short as possible, noun is recommended if it is "
 		"shorter than adjective."), message, 'D'));
 	item->SetTarget(this);
@@ -1435,7 +1437,7 @@ ProbeView::AttachedToWindow()
 
 	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base_type", kHexBase);
-	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Hex", 
+	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Hex",
 		"A menu item, as short as possible, noun is recommended if it is "
 		"shorter than adjective."), message, 'H'));
 	item->SetTarget(this);
@@ -1447,9 +1449,8 @@ ProbeView::AttachedToWindow()
 
 	// Block Size
 
-	subMenu = new BMenu(B_TRANSLATE_COMMENT("BlockSize", "A menu item, a "
-		"shortened form from 'block size'. This is in the same menu window"
-		"than 'Base' and 'Font size'"));
+	subMenu = new BMenu(B_TRANSLATE_COMMENT("Block size", "Menu item. "
+		"This is in the same menu window than 'Base' and 'Font size'"));
 	subMenu->SetRadioMode(true);
 	const uint32 blockSizes[] = {512, 1024, 2048};
 	for (uint32 i = 0; i < sizeof(blockSizes) / sizeof(blockSizes[0]); i++) {
@@ -1466,7 +1467,8 @@ ProbeView::AttachedToWindow()
 	if (subMenu->FindMarked() == NULL) {
 		// if the device has some weird block size, we'll add it here, too
 		char buffer[32];
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("%ld (native)"), fEditor.BlockSize());
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("%ld (native)"),
+			fEditor.BlockSize());
 		subMenu->AddItem(item = new BMenuItem(buffer,
 			message = new BMessage(kMsgBlockSize)));
 		message->AddInt32("block_size", fEditor.BlockSize());

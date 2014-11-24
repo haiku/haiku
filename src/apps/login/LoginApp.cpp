@@ -33,9 +33,10 @@ const char *kLoginAppSig = "application/x-vnd.Haiku-Login";
 
 
 LoginApp::LoginApp()
-	: BApplication(kLoginAppSig),
-	  fEditShelfMode(false),
-	  fModalMode(true)
+	:
+	BApplication(kLoginAppSig),
+	fEditShelfMode(false),
+	fModalMode(true)
 {
 }
 
@@ -51,11 +52,10 @@ LoginApp::ReadyToRun()
 	BScreen screen;
 
 	if (fEditShelfMode) {
-		BAlert* alert = new BAlert(B_TRANSLATE("Info"), B_TRANSLATE("You can customize the "
-			"desktop shown behind the Login application by dropping replicants"
-			" onto it.\n"
-			"\n"
-			"When you are finished just quit the application (Alt-Q)."),
+		BAlert* alert = new BAlert(B_TRANSLATE("Info"), B_TRANSLATE("You can "
+			"customize the desktop shown behind the Login application by "
+			"dropping replicants onto it.\n\n"
+			"When you are finished just quit the application (Cmd-Q)."),
 			B_TRANSLATE("OK"));
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);

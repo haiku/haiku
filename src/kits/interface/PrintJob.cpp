@@ -294,7 +294,7 @@ BPrintJob::CommitJob()
 		return;
 
 	if (fSpoolFileHeader.page_count == 0) {
-		ShowError(B_TRANSLATE("No Pages to print!"));
+		ShowError(B_TRANSLATE("No pages to print!"));
 		CancelJob();
 		return;
 	}

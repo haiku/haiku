@@ -700,9 +700,11 @@ InstallerWindow::_LaunchBootManager()
 		BEntry entry(path.Path());
 		entry_ref ref;
 		if (entry.GetRef(&ref) != B_OK || be_roster->Launch(&ref) != B_OK) {
-			BAlert* alert = new BAlert("error", B_TRANSLATE("BootManager, the "
-				"application to configure the Haiku boot menu, could not be "
-				"launched."), B_TRANSLATE("OK"));
+			BAlert* alert = new BAlert(
+				B_TRANSLATE("Failed to launch Boot Manager"),
+				B_TRANSLATE("Boot Manager, the application to configure the "
+					"Haiku boot menu, could not be launched."),
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 		}

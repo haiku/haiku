@@ -957,7 +957,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	char message[512];
 
 	if (!found) {
-		snprintf(message, sizeof(message), B_TRANSLATE("Disk system \"%s\"\" "
+		snprintf(message, sizeof(message), B_TRANSLATE("Disk system \"%s\" "
 			"not found!"));
 		_DisplayPartitionError(message);
 		return;
@@ -966,7 +966,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	if (diskSystem.IsFileSystem()) {
 		if (disk->ID() == selectedPartition) {
 			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
-				"want to format a raw disk? (most people initialize the disk "
+				"want to format a raw disk? (Most people initialize the disk "
 				"with a partitioning system first) You will be asked "
 				"again before changes are written to the disk."));
 		} else if (partition->ContentName()
@@ -1145,7 +1145,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	BPartitioningInfo partitioningInfo;
 	status_t error = parent->GetPartitioningInfo(&partitioningInfo);
 	if (error != B_OK) {
-		_DisplayPartitionError(B_TRANSLATE("Could not aquire partitioning "
+		_DisplayPartitionError(B_TRANSLATE("Could not acquire partitioning "
 			"information."));
 		return;
 	}

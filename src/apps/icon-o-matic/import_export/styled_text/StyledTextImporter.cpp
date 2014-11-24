@@ -239,6 +239,7 @@ StyledTextImporter::Import(Icon* icon, const entry_ref* ref)
 	return _Import(icon, (const char *)mio.Buffer(), NULL);
 }
 
+
 // _Import
 status_t
 StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
@@ -246,17 +247,17 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 	CALLED();
 	status_t ret = Init(icon);
 	if (ret < B_OK) {
-		printf("StyledTextImporter::Import() - "
-			   "Init() error: %s\n", strerror(ret));
+		printf("StyledTextImporter::Import() - Init() error: %s\n",
+			strerror(ret));
 		return ret;
 	}
 
 	BString str(text);
 	if (str.Length() > 50) {
-		BAlert* alert = new BAlert(B_TRANSLATE("too big"),
-			B_TRANSLATE("The text you are trying to import is quite long,"
+		BAlert* alert = new BAlert(B_TRANSLATE("Text too long"),
+			B_TRANSLATE("The text you are trying to import is quite long, "
 				"are you sure?"),
-			B_TRANSLATE("Yes"), B_TRANSLATE("No"), NULL, 
+			B_TRANSLATE("Yes"), B_TRANSLATE("No"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go())
 			return B_CANCELED;
@@ -277,7 +278,7 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 		run = &runs->runs[0];
 	int32 len = str.Length();
 	int32 chars = str.CountChars();
-	BPoint origin(0,0);
+	BPoint origin(0, 0);
 	BPoint offset(origin);
 
 	for (int32 i = 0, c = 0; i < len && c < chars; c++) {

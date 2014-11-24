@@ -353,7 +353,7 @@ PackageView::ItemExists(PackageItem& item, BPath& path, int32& policy)
 		case P_EXISTS_NONE:
 		{
 			const char* formatString;
-			switch (item.ItemKind()){
+			switch (item.ItemKind()) {
 				case P_KIND_SCRIPT:
 					formatString = B_TRANSLATE("The script named \'%s\' "
 						"already exits in the given path.\nReplace the script "
@@ -368,10 +368,10 @@ PackageView::ItemExists(PackageItem& item, BPath& path, int32& policy)
 					formatString = B_TRANSLATE("The directory named \'%s\' "
 						"already exits in the given path.\nReplace the "
 						"directory with one from this package or skip it?");
- 					break;
+					break;
 				case P_KIND_SYM_LINK:
 					formatString = B_TRANSLATE("The symbolic link named \'%s\' "
-						"already exists in the give path.\nReplace the link "
+						"already exists in the given path.\nReplace the link "
 						"with the one from this package or skip it?");
 					break;
 				default:
@@ -390,7 +390,7 @@ PackageView::ItemExists(PackageItem& item, BPath& path, int32& policy)
 				B_TRANSLATE("Skip"),
 				B_TRANSLATE("Abort"));
 			alert->SetShortcut(2, B_ESCAPE);
-			
+
 			choice = alert->Go();
 			switch (choice) {
 				case 0:

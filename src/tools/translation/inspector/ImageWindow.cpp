@@ -52,10 +52,10 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	BMenuBar *pbar = new BMenuBar(rctbar, "MenuBar");
 
 	BMenu *pmnufile = new BMenu(B_TRANSLATE("File"));
-	BMenuItem *pitmopen = new BMenuItem(B_TRANSLATE("Open..."),
+	BMenuItem *pitmopen = new BMenuItem(B_TRANSLATE("Open" B_UTF8_ELLIPSIS),
 		new BMessage(M_OPEN_IMAGE), 'O', 0);
 
-	BMenuItem *pitmsave = new BMenuItem(B_TRANSLATE("Save..."),
+	BMenuItem *pitmsave = new BMenuItem(B_TRANSLATE("Save" B_UTF8_ELLIPSIS),
 		new BMessage(M_SAVE_IMAGE), 'S', 0);
 
 	BMenuItem *pitmquit = new BMenuItem(B_TRANSLATE("Quit"),

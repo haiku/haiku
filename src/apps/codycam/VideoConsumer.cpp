@@ -721,7 +721,7 @@ VideoConsumer::FtpSave(char* filename)
 
 		if (ftp->ChangeDir((string)fDirectoryText)) {
 			// cd to the desired directory
-			UpdateFtpStatus(B_TRANSLATE("Transmitting" B_UTF8_ELLIPSIS));
+			UpdateFtpStatus(B_TRANSLATE("Upload" B_UTF8_ELLIPSIS));
 
 			if (ftp->PutFile((string)filename, (string)"temp")) {
 				// send the file to the server
@@ -741,14 +741,11 @@ VideoConsumer::FtpSave(char* filename)
 					UpdateFtpStatus(s);
 					delete ftp;
 					return B_OK;
-				}
-				else
+				} else
 					UpdateFtpStatus(B_TRANSLATE("Rename failed"));
-			}
-			else
-				UpdateFtpStatus(B_TRANSLATE("File transmission failed"));
-		}
-		else
+			} else
+				UpdateFtpStatus(B_TRANSLATE("File upload failed"));
+		} else
 			UpdateFtpStatus(B_TRANSLATE("Couldn't find requested directory on "
 				"server"));
 	}

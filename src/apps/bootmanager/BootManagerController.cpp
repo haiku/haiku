@@ -358,10 +358,11 @@ BootManagerController::_CreateMBRSavedPage()
 			<< B_TRANSLATE("The old Master Boot Record was successfully "
 				"saved to %s.") << "\n";
 	} else {
-		description << B_TRANSLATE_COMMENT("Old Master Boot Record Saved "
+		description << B_TRANSLATE_COMMENT("Old Master Boot Record backup "
 				"failure", "Title") << "\n"
 			<< B_TRANSLATE("The old Master Boot Record could not be saved "
-				"to %s") << "\n";
+				"to %s. You can continue the installation but there will be no "
+				"way to uninstall the boot menu.") << "\n";
 	}
 	description.ReplaceFirst("%s", file);
 

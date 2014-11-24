@@ -514,7 +514,8 @@ ScreenshotWindow::_SetupOutputPathMenu(const BMessage& settings)
 	}
 
 	fOutputPathMenu->AddItem(new BSeparatorItem());
-	fOutputPathMenu->AddItem(new BMenuItem(B_TRANSLATE("Choose folder..."),
+	fOutputPathMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("Choose folder" B_UTF8_ELLIPSIS),
 		new BMessage(kChooseLocation), 'F'));
 }
 

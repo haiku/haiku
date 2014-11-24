@@ -40,9 +40,9 @@ StatusView::StatusView()
 	SetLowColor(kPieBGColor);
 
 	fSizeView = new BStringView(NULL, kEmptyStr);
-	fSizeView->SetExplicitMinSize(BSize(StringWidth(B_TRANSLATE("9999.99 GB")),
+	fSizeView->SetExplicitMinSize(BSize(StringWidth("9999.99 GiB"),
 		B_SIZE_UNSET));
-	fSizeView->SetExplicitMaxSize(BSize(StringWidth(B_TRANSLATE("9999.99 GB")),
+	fSizeView->SetExplicitMaxSize(BSize(StringWidth("9999.99 GiB"),
 		B_SIZE_UNSET));
 
 	char testLabel[256];
