@@ -28,6 +28,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings generic ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language expression_evaluators ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language syntax_highlighters ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
@@ -220,6 +221,10 @@ Application Debugger :
 
 	# source_language/expression_evaluators
 	CLanguageExpressionEvaluator.cpp
+
+	# source_language/syntax_highlighters
+	CLanguageFamilySyntaxHighlighter.cpp
+	CLanguageFamilySyntaxHighlightInfo.cpp
 
 	# types
 	ArrayIndexPath.cpp

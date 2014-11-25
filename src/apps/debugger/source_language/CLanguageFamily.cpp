@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include "CLanguageExpressionEvaluator.h"
+#include "CLanguageFamilySyntaxHighlighter.h"
 #include "ExpressionInfo.h"
 #include "TeamTypeInformation.h"
 #include "StringValue.h"
@@ -32,8 +33,7 @@ CLanguageFamily::~CLanguageFamily()
 SyntaxHighlighter*
 CLanguageFamily::GetSyntaxHighlighter() const
 {
-	// TODO:...
-	return NULL;
+	return new(std::nothrow) CLanguageFamilySyntaxHighlighter();
 }
 
 
