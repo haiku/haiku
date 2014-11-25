@@ -109,10 +109,10 @@ public:
 			void				ReadConfiguration();
 			void				SetConfiguration();
 
-			/*	Grab and write interface settings from interface configuration
-				file and let NetServer sort it out */
+			/*	Grab interface settings from interface configuration file */
 			void				LoadConfiguration();
-			void				WriteConfiguration();
+			/* Generate settings file entry suitable for interfaces settings */
+			BString				GenerateConfiguration();
 
 private:
 			status_t			_DetectProtocols();

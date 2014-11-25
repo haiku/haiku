@@ -339,13 +339,76 @@ NetworkSettings::LoadConfiguration()
 }
 
 
-/*!	WriteConfiguration reads this classes settings and write them to
-	the current interface configuration file that NetServer watches for.
+/*!	GenerateConfiguration reads this classes settings and write them to
+	a BString. This can then be put in the interfaces settings file to make
+	the settings persistant.
 */
-void
-NetworkSettings::WriteConfiguration()
+BString
+NetworkSettings::GenerateConfiguration()
 {
+	// TODO should use ProtocolVersions to know which protocols are there
+	bool autoConfigure = true;
+	if (!IsDisabled()) {
+		for (int i = 0; i < MAX_PROTOCOLS; i++) {
+			if (fProtocols[i].present && strlen(IP(fProtocols[i].inet_id)) != 0
+				&& !AutoConfigure(fProtocols[i].inet_id)) {
+				autoConfigure = false;
+			}
+		}
+	}
 
+	// If the interface is fully autoconfigured, don't include it in the
+	// settings file.
+	if (autoConfigure)
+		return BString();
+
+	BString result;
+
+	result.SetToFormat("interface %s {\n", Name());
+
+	if (IsDisabled())
+		result << "\tdisabled\ttrue\n";
+	else {
+		for (int i = 0; i < MAX_PROTOCOLS; i++) {
+			if (fProtocols[i].present && strlen(IP(fProtocols[i].inet_id)) != 0
+					&& !AutoConfigure(fProtocols[i].inet_id)) {
+				result << "\taddress {\n";
+
+				result << "\t\tfamily\t";
+				if (fProtocols[i].inet_id == AF_INET)
+					result << "inet\n";
+				else if (fProtocols[i].inet_id == AF_INET6)
+					result << "inet6\n";
+				else {
+					// FIXME the struct protocols should know the name to use.
+					debugger("Unknown protocol found!");
+				}
+
+				result << "\t\taddress\t" << IP(fProtocols[i].inet_id) << "\n";
+				result << "\t\tgateway\t" << Gateway(fProtocols[i].inet_id)
+					<< "\n";
+				result << "\t\tmask\t" << Netmask(fProtocols[i].inet_id)
+					<< "\n";
+				result << "\t}\n";
+			}
+		}
+	}
+
+#if 0
+	if (!networks.empty()) {
+		for (size_t index = 0; index < networks.size(); index++) {
+			wireless_network& network = networks[index];
+			fprintf(fp, "\tnetwork %s {\n", network.name);
+			fprintf(fp, "\t\tmac\t%s\n",
+				network.address.ToString().String());
+			fprintf(fp, "\t}\n");
+		}
+	}
+#endif
+
+	result << "}\n\n";
+
+	return result;
 }
 
 

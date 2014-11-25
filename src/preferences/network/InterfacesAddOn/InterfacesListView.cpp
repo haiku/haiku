@@ -492,7 +492,7 @@ InterfacesListView::FindItem(BPoint where)
 
 
 status_t
-InterfacesListView::SaveItems()
+InterfacesListView::SaveItems(BString& settingsData)
 {
 	// Grab each fSettings instance and write it's settings
 	for (int32 i = CountItems(); i-- > 0;) {
@@ -504,8 +504,8 @@ InterfacesListView::SaveItems()
 			continue;
 
 		NetworkSettings* ns = item->GetSettings();
-		// TODO : SetConfiguration doesn't use the interface settings file
 		ns->SetConfiguration();
+		settingsData << ns->GenerateConfiguration();
 	}
 
 	return B_OK;

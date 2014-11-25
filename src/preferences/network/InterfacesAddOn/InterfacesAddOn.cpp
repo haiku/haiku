@@ -22,10 +22,13 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <Directory.h>
+#include <FindDirectory.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <ListItem.h>
 #include <ListView.h>
+#include <Path.h>
 #include <ScrollView.h>
 
 
@@ -99,7 +102,34 @@ InterfacesAddOn::Save()
 	InterfaceView* settingsView = _SettingsView();
 	if (settingsView != NULL)
 		settingsView->Apply();
-	return fListView->SaveItems();
+
+	BString settingsData;
+
+	status_t result = fListView->SaveItems(settingsData);
+	if (result != B_OK)
+		return result;
+
+	if (settingsData.IsEmpty()) {
+		// Nothing to save, all interfaces are auto-configured
+		return B_OK;
+	}
+
+	BPath path;
+	result = find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path, true);
+	if (result != B_OK)
+		return result;
+
+	path.Append("network");
+	create_directory(path.Path(), 0755);
+
+	path.Append("interfaces");
+
+	BFile settingsFile(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	result = settingsFile.Write(settingsData.String(),settingsData.Length());
+	if (result != settingsData.Length())
+		return result;
+
+	return B_OK;
 }
 
 

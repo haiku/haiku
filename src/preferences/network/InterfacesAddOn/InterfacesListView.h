@@ -70,7 +70,7 @@ public:
 
 			InterfaceListItem*	FindItem(const char* name);
 			InterfaceListItem*	FindItem(BPoint where);
-			status_t			SaveItems();
+			status_t			SaveItems(BString& settingsData);
 
 protected:
 	virtual	void				AttachedToWindow();
