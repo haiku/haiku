@@ -436,6 +436,8 @@ RemotePackageRepository HaikuPorts
 	gmp_x86-6.0.0-1
 	gmp_x86_devel-6.0.0-1
 	goonies_x86-1.4.1528-1
+	gpgme_x86-1.5.2-1
+	gpgme_x86_devel-1.5.2-1
 	guilib_x86-1.2.1-1
 	guilib_x86_devel-1.2.1-1
 	haikuwebkit_x86-1.4.6-3
@@ -725,6 +727,7 @@ RemotePackageRepository HaikuPorts
 	gnupg
 	goonies_x86
 	gperf
+	gpgme_x86
 	grep
 	groff
 	gtk_doc
