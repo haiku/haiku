@@ -168,6 +168,7 @@ Application Debugger :
 	FileSourceCode.cpp
 	Image.cpp
 	ImageInfo.cpp
+	LineDataSource.cpp
 	ReturnValueInfo.cpp
 	SemaphoreInfo.cpp
 	SourceCode.cpp

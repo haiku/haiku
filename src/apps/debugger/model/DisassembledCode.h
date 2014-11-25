@@ -25,10 +25,6 @@ public:
 
 	virtual	SourceLanguage*		GetSourceLanguage() const;
 
-	virtual	int32				CountLines() const;
-	virtual	const char*			LineAt(int32 index) const;
-	virtual	int32				LineLengthAt(int32 index) const;
-
 	virtual	bool				GetStatementLocationRange(
 									const SourceLocation& location,
 									SourceLocation& _start,
@@ -40,6 +36,11 @@ public:
 			Statement*			StatementAtLocation(
 									const SourceLocation& location) const;
 			TargetAddressRange	StatementAddressRange() const;
+
+	// LineDataSource
+	virtual	int32				CountLines() const;
+	virtual	const char*			LineAt(int32 index) const;
+	virtual	int32				LineLengthAt(int32 index) const;
 
 public:
 			bool				AddCommentLine(const BString& line);

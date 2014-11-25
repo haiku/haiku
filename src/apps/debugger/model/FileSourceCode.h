@@ -33,16 +33,17 @@ public:
 
 	virtual	SourceLanguage*		GetSourceLanguage() const;
 
-	virtual	int32				CountLines() const;
-	virtual	const char*			LineAt(int32 index) const;
-	virtual int32				LineLengthAt(int32 index) const;
-
 	virtual	bool				GetStatementLocationRange(
 									const SourceLocation& location,
 									SourceLocation& _start,
 									SourceLocation& _end) const;
 
 	virtual	LocatableFile*		GetSourceFile() const;
+
+	// LineDataSource
+	virtual	int32				CountLines() const;
+	virtual	const char*			LineAt(int32 index) const;
+	virtual int32				LineLengthAt(int32 index) const;
 
 private:
 			int32				_FindSourceLocationIndex(

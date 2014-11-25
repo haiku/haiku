@@ -7,14 +7,6 @@
 #include "SyntaxHighlighter.h"
 
 
-// #pragma mark - SyntaxHighlightSource
-
-
-SyntaxHighlightSource::~SyntaxHighlightSource()
-{
-}
-
-
 // #pragma mark - SyntaxHighlightInfo
 
 
