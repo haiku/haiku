@@ -171,9 +171,18 @@ CharacterWindow::CharacterWindow()
 
 	const char* family;
 	const char* style;
+	BString displayName;
+	
 	if (settings.FindString("font family", &family) == B_OK
 		&& settings.FindString("font style", &style) == B_OK) {
 		_SetFont(family, style);
+		displayName << family << " " << style; 
+	} else {
+		font_family currentFontFamily;
+		font_style currentFontStyle;
+		fCharacterView->CharacterFont().GetFamilyAndStyle(&currentFontFamily,
+			&currentFontStyle);
+		displayName << currentFontFamily << " " << currentFontStyle;
 	}
 
 	int32 fontSize;
@@ -193,7 +202,7 @@ CharacterWindow::CharacterWindow()
 		fCharacterView, 0, false, true);
 
 	fFontSizeSlider = new FontSizeSlider("fontSizeSlider",
-		B_TRANSLATE("Font size:"),
+		displayName,
 		new BMessage(kMsgFontSizeChanged), kMinFontSize, kMaxFontSize);
 	fFontSizeSlider->SetValue(fontSize);
 
@@ -344,6 +353,12 @@ CharacterWindow::MessageReceived(BMessage* message)
 				fSelectedFontItem = item;
 
 				_SetFont(item->Menu()->Name(), item->Label());
+				
+				BString displayName;
+				displayName << item->Menu()->Name() << " " << item->Label();
+			
+				fFontSizeSlider->SetLabel(displayName);
+				
 				item = item->Menu()->Superitem();
 				item->SetMarked(true);
 			}
