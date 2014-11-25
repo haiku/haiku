@@ -15,6 +15,7 @@
 #include <Catalog.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Font.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Menu.h>
@@ -210,6 +211,18 @@ CharacterWindow::CharacterWindow()
 	fCodeView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		fCodeView->PreferredSize().Height()));
 
+	// set minimum width for character pane to prevent UI
+	// from jumping when longer code strings are displayed.
+	// use 'w' character for sizing as it's likely the widest
+	// character for a Latin font.  40 characters is a little
+	// wider than needed so hopefully this covers other 
+	// non-Latin fonts that may be wider.
+	BFont viewFont;
+	fCodeView->GetFont(&viewFont);
+	fCharacterView->SetExplicitMinSize(BSize(viewFont.StringWidth(
+		"w") * 40,
+		B_SIZE_UNSET));
+		
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(menuBar)
 		.AddGroup(B_HORIZONTAL)
