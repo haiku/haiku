@@ -442,8 +442,8 @@ RemotePackageRepository HaikuPorts
 	gpgme_x86_devel-1.5.2-2
 	guilib_x86-1.2.1-1
 	guilib_x86_devel-1.2.1-1
-	haikuwebkit_x86-1.4.6-3
-	haikuwebkit_x86_devel-1.4.6-3
+	haikuwebkit_x86-1.4.7-1
+	haikuwebkit_x86_devel-1.4.7-1
 	icu_x86-54.1-4
 	icu_x86_devel-54.1-4
 	ilmbase_x86-2.2.0-1
@@ -737,7 +737,7 @@ RemotePackageRepository HaikuPorts
 	guilib
 	gutenprint
 	gyp
-#	haikuwebkit_x86
+	haikuwebkit_x86
 	help2man
 	htmldoc
 	html_parser
