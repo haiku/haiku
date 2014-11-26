@@ -194,7 +194,7 @@ BOutlineListView::KeyDown(const char* bytes, int32 numBytes)
 			{
 				BListItem* item = ItemAt(currentSel);
 				if (item && item->fHasSubitems) {
-					if (!IsExpanded(currentSel))
+					if (!item->IsExpanded())
 						Expand(item);
 					else
 						Select(currentSel + 1);
