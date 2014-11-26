@@ -276,9 +276,9 @@ WorkspacesSettings::_Open(BFile& file, int mode)
 {
 	BPath path;
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	 if (status != B_OK)
+	if (status != B_OK)
 		status = find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path);
-	 if (status != B_OK)
+	if (status != B_OK)
 		return status;
 
 	path.Append(kSettingsFile);
@@ -343,7 +343,7 @@ WorkspacesView::WorkspacesView(BRect frame, bool showDragger=true)
 	fParentWhichDrawsOnChildren(NULL),
 	fCurrentFrame(frame)
 {
-	if(showDragger) {
+	if (showDragger) {
 		frame.OffsetTo(B_ORIGIN);
 		frame.top = frame.bottom - 7;
 		frame.left = frame.right - 7;
@@ -609,16 +609,15 @@ WorkspacesView::MouseDown(BPoint where)
 		if (window->IsAutoRaising())
 			item->SetMarked(true);
 		if (be_roster->IsRunning(kDeskbarSignature)) {
-			menu->AddItem(item = new BMenuItem(B_TRANSLATE("Live in the Deskbar"),
+			menu->AddItem(item = new BMenuItem(
+				B_TRANSLATE("Live in the Deskbar"),
 				new BMessage(kMsgToggleLiveInDeskbar)));
 			BDeskbar deskbar;
 			item->SetMarked(deskbar.HasItem(kDeskbarItemName));
 		}
 
 		menu->AddSeparatorItem();
-		menu->AddItem(new BMenuItem(B_TRANSLATE("About Workspaces" 
-			B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED)));
-		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 			new BMessage(B_QUIT_REQUESTED)));
 		menu->SetTargetForItems(window);
 	} else {
