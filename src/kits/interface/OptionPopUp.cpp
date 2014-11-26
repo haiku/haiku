@@ -193,7 +193,9 @@ BOptionPopUp::AllAttached()
 	BMenu* menu = fMenuField->Menu();
 	if (menu != NULL) {
 		float labelWidth = fMenuField->StringWidth(fMenuField->Label());
-		fMenuField->SetDivider(labelWidth + kLabelSpace);
+		if (labelWidth > 0.f)
+			labelWidth += kLabelSapce;
+		fMenuField->SetDivider(labelWidth);
 		menu->SetTargetForItems(this);
 	}
 }
