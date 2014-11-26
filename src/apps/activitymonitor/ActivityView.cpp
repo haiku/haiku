@@ -1356,6 +1356,10 @@ ActivityView::_DrawHistory(bool drawBackground)
 		resolution--;
 	}
 
+	// We would get a negative number of steps which isn't a good idea.
+	if (frame.IntegerWidth() <= 10)
+		return;
+
 	uint32 width = frame.IntegerWidth() - 10;
 	uint32 steps = width / step;
 	bigtime_t timeStep = RefreshInterval() * resolution;
@@ -1390,25 +1394,34 @@ ActivityView::_DrawHistory(bool drawBackground)
 		viewValues->Update(values, steps, fDrawResolution, now, timeStep,
 			RefreshInterval());
 
+		if (viewValues->Start() >= (int32)steps - 1)
+			continue;
+
 		uint32 x = viewValues->Start() * step;
-		BShape shape;
+
 		bool first = true;
-
-		for (uint32 i = viewValues->Start(); i < steps; x += step, i++) {
-			float y = _PositionForValue(source, values,
-				viewValues->ValueAt(i));
-
-			if (first) {
-				shape.MoveTo(BPoint(x, y));
-				first = false;
-			} else
-				shape.LineTo(BPoint(x, y));
-		}
 
 		view->SetHighColor(source->Color());
 		view->SetLineMode(B_BUTT_CAP, B_ROUND_JOIN);
 		view->MovePenTo(B_ORIGIN);
-		view->StrokeShape(&shape);
+
+		view->BeginLineArray(steps - viewValues->Start() - 1);
+
+		BPoint prev;
+
+		for (uint32 j = viewValues->Start(); j < steps; x += step, j++) {
+			float y = _PositionForValue(source, values,
+				viewValues->ValueAt(j));
+
+			if (first) {
+				first = false;
+			} else
+				view->AddLine(prev, BPoint(x, y), source->Color());
+
+			prev.Set(x, y);
+		}
+
+		view->EndLineArray();
 	}
 
 	// TODO: add marks when an app started or quit
