@@ -115,9 +115,12 @@ SettingsView::SettingsView(MouseSettings& settings)
 	fMouseView = new MouseView(fSettings);
 
 	// Create the "Double-click test area" text box...
+	const char* label = B_TRANSLATE("Double-click test area");
 	BTextControl* doubleClickTextControl = new BTextControl(NULL,
-		B_TRANSLATE("Double-click test area"), NULL);
+		label, NULL);
 	doubleClickTextControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
+	doubleClickTextControl->SetExplicitMinSize(
+		BSize(StringWidth(label), B_SIZE_UNSET));
 
 	// Add the "Mouse focus mode" pop up menu
 	fFocusMenu = new BPopUpMenu(B_TRANSLATE("Click to focus and raise"));
