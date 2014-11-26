@@ -1164,15 +1164,13 @@ KeyboardLayoutView::_HandleDeadKey(uint32 key, int32 modifiers)
 
 	bool isEnabled = false;
 	int32 deadKey = fKeymap->DeadKey(key, modifiers, &isEnabled);
-	if (fDeadKey != deadKey) {
-		if (isEnabled) {
-			Invalidate();
-			fDeadKey = deadKey;
-			return true;
-		}
-	} else if (fDeadKey != 0) {
+	if (fDeadKey != deadKey && isEnabled) {
+		fDeadKey = deadKey;
 		Invalidate();
+		return true;
+	} else if (fDeadKey != 0) {
 		fDeadKey = 0;
+		Invalidate();
 		return true;
 	}
 
@@ -1196,7 +1194,7 @@ KeyboardLayoutView::_KeyChanged(const BMessage* message)
 
 	bool checkSingle = true;
 
-	if (message->what == B_KEY_DOWN || message->what == B_UNMAPPED_KEY_DOWN) {
+	if (message->what == B_KEY_UP || message->what == B_UNMAPPED_KEY_UP) {
 		if (_HandleDeadKey(key, fModifiers))
 			checkSingle = false;
 
