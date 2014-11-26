@@ -792,11 +792,12 @@ DocumentBuilder::_AddShape(path_attributes& attributes, bool outline,
 
 
 	Gradient* gradient = NULL;
+	SVGGradient* g = NULL;
 	const char* url = outline ? attributes.stroke_url : attributes.fill_url;
 	if (url[0] != 0) {
-		if (SVGGradient* g = _FindGradient(url)) {
+		g = _FindGradient(url);
+		if (g != NULL)
 			gradient = g->GetGradient(shape->Bounds());
-		}
 	}
 
 	ObjectDeleter<Gradient> gradientDeleter(gradient);
@@ -845,8 +846,10 @@ DocumentBuilder::_AddShape(path_attributes& attributes, bool outline,
 		shape->Reset();
 //	}
 
-	if (gradient)
+	if (gradient) {
 		style->SetGradient(gradient);
+		style->SetName(g->ID());
+	}
 
 	shape->SetStyle(style);
 
