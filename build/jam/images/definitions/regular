@@ -33,7 +33,7 @@ DESKBAR_APPLICATIONS +=
 	Icon-O-Matic Installer
 	Magnify Mail MediaConverter MediaPlayer MidiPlayer
 	People PoorMan
-	SoundRecorder
+	SerialConnect SoundRecorder
 	TV
 ;
 
