@@ -20,7 +20,7 @@
 :fu FuncHaikuCheck()
 	call matchadd('Style', '\%>80v.\+', -1) " line over 80 char
 	call matchadd('Style', '^\s* \s*', -1)  " spaces instead of tabs
-	call matchadd('Style', '\(for\|if\|select\|switch\|while\)(', -1)
+	call matchadd('Style', '[\t ]\(for\|if\|select\|switch\|while\|catch\)(', -1)
 		"missing space after control statement
 	call matchadd('Style', '^\(\(?!\/\/\|\/\*\).\)*//\S', -1)
 		" Missing space at comment start
@@ -39,6 +39,7 @@
 		" > operator at EOL (without false positive on #include <file.h>)
 	call matchadd('Style', '){', -1) " Missing space after method header
 	call matchadd('Style', '}\n\s*else', -1) " Malformed else
+	call matchadd('Style', '}\n\s*catch', -1) " Malformed catch
 	call matchadd('Style', '\s$', -1) "Spaces at end of line
 	call matchadd('Style', ',\S', -1) " Missing space after comma
 	call matchadd('Style', '^}\n\{1,2}\S', -1)
