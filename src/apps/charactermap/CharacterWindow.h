@@ -36,7 +36,8 @@ private:
 
 			void			_SetFont(const char* family, const char* style);
 			BMenu*			_CreateFontMenu();
-
+			void			_UpdateFontMenu(BMenu* menu);
+			void 			MenusBeginning();
 private:
 			BTextControl*	fFilterControl;
 			UnicodeBlockView* fUnicodeBlockView;
@@ -45,6 +46,7 @@ private:
 			BSlider*		fFontSizeSlider;
 			BStringView*	fGlyphView;
 			BStringView*	fCodeView;
+			BMenu*			fFontMenu;
 };
 
 #endif	// CHARACTER_WINDOW_H

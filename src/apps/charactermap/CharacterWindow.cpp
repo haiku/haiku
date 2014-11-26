@@ -265,7 +265,8 @@ CharacterWindow::CharacterWindow()
 #endif
 	menuBar->AddItem(menu);
 
-	menuBar->AddItem(_CreateFontMenu());
+	fFontMenu = _CreateFontMenu();
+	menuBar->AddItem(fFontMenu);
 
 	AddCommonFilter(new EscapeMessageFilter(kMsgClearFilter));
 	AddCommonFilter(new RedirectUpAndDownFilter(fUnicodeBlockView));
@@ -530,8 +531,23 @@ BMenu*
 CharacterWindow::_CreateFontMenu()
 {
 	BMenu* menu = new BMenu(B_TRANSLATE("Font"));
-	BMenuItem* item;
 
+	_UpdateFontMenu(menu);
+
+	return menu;
+}
+
+
+void
+CharacterWindow::_UpdateFontMenu(BMenu* menu)
+{
+	BMenuItem* item;
+	
+	while (menu->CountItems() > 0) {
+		item = menu->RemoveItem(static_cast<long int>(0));
+		delete(item);
+	}	
+	
 	font_family currentFamily;
 	font_style currentStyle;
 	fCharacterView->CharacterFont().GetFamilyAndStyle(&currentFamily,
@@ -568,6 +584,13 @@ CharacterWindow::_CreateFontMenu()
 
 	item = menu->FindItem(currentFamily);
 	item->SetMarked(true);
-
-	return menu;
 }
+
+
+void CharacterWindow::MenusBeginning()
+{
+	if (update_font_families(false) == true) {
+		_UpdateFontMenu(fFontMenu);
+	}	
+}
+
