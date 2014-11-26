@@ -275,6 +275,8 @@ CharacterWindow::CharacterWindow()
 	fUnicodeBlockView->SetTarget(this);
 
 	fFilterControl->MakeFocus();
+	
+	fUnicodeBlockView->SelectBlockForCharacter(0);
 }
 
 

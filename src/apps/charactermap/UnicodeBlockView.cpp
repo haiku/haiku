@@ -133,7 +133,13 @@ UnicodeBlockView::SelectBlockForCharacter(uint32 character)
 			break;
 		}
 
-		Select(i);
-		ScrollToSelection();
+		BlockListItem* block = fBlocks.ItemAt(i);
+		
+		int32 blockNum = IndexOf(block);
+		
+		if (blockNum >= 0) {
+			Select(blockNum);
+			ScrollToSelection();
+		}
 	}
 }

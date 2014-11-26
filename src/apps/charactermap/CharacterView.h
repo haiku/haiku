@@ -33,6 +33,7 @@ public:
 			void			ScrollToBlock(int32 blockIndex);
 			void			ScrollToCharacter(uint32 c);
 			bool			IsCharacterVisible(uint32 c) const;
+			bool			IsBlockVisible(int32 block) const;
 
 	static	void			UnicodeToUTF8(uint32 c, char* text,
 								size_t textSize);

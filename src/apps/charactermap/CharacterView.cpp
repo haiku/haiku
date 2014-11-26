@@ -38,6 +38,7 @@ CharacterView::CharacterView(const char* name)
 	fCharacterFont.SetSize(fCharacterFont.Size() * 1.5f);
 
 	_UpdateFontSize();
+	DoLayout();
 }
 
 
@@ -108,10 +109,10 @@ CharacterView::IsShowingBlock(int32 blockIndex) const
 void
 CharacterView::ScrollToBlock(int32 blockIndex)
 {
-	// don't scroll if the selected character is already in view.
+	// don't scroll if the selected block is already in view.
 	// this prevents distracting jumps when crossing a block 
 	// boundary in the character view.
-	if (IsCharacterVisible(fCurrentCharacter))
+	if (IsBlockVisible(blockIndex))   
 		return;
 		
 	if (blockIndex < 0)
@@ -138,6 +139,19 @@ bool
 CharacterView::IsCharacterVisible(uint32 c) const
 {
 	return Bounds().Contains(_FrameFor(c));
+}
+
+
+bool
+CharacterView::IsBlockVisible(int32 block) const
+{
+	int32 topBlock = _BlockAt(BPoint(Bounds().left, Bounds().top));
+	int32 bottomBlock = _BlockAt(BPoint(Bounds().right, Bounds().bottom)); 
+
+	if (block >= topBlock && block <= bottomBlock) 
+		return true;
+		
+	return false;
 }
 
 
