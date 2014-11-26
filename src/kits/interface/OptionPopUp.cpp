@@ -194,7 +194,7 @@ BOptionPopUp::AllAttached()
 	if (menu != NULL) {
 		float labelWidth = fMenuField->StringWidth(fMenuField->Label());
 		if (labelWidth > 0.f)
-			labelWidth += kLabelSapce;
+			labelWidth += kLabelSpace;
 		fMenuField->SetDivider(labelWidth);
 		menu->SetTargetForItems(this);
 	}
@@ -219,7 +219,9 @@ BOptionPopUp::SetLabel(const char* text)
 	// We are not sure the menu can keep the whole
 	// string as label, so we check against the current label
 	float newWidth = fMenuField->StringWidth(fMenuField->Label());
-	fMenuField->SetDivider(newWidth + kLabelSpace);
+	if (newWidth > 0.f)
+		newWidth += kLabelSpace;
+	fMenuField->SetDivider(newWidth);
 }
 
 
