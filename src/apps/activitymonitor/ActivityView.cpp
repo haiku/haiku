@@ -1405,20 +1405,27 @@ ActivityView::_DrawHistory(bool drawBackground)
 		view->SetLineMode(B_BUTT_CAP, B_ROUND_JOIN);
 		view->MovePenTo(B_ORIGIN);
 
-		view->BeginLineArray(steps - viewValues->Start() - 1);
+		try {
+			view->BeginLineArray(steps - viewValues->Start() - 1);
 
-		BPoint prev;
+			BPoint prev;
 
-		for (uint32 j = viewValues->Start(); j < steps; x += step, j++) {
-			float y = _PositionForValue(source, values,
-				viewValues->ValueAt(j));
+			for (uint32 j = viewValues->Start(); j < steps; x += step, j++) {
+				float y = _PositionForValue(source, values,
+					viewValues->ValueAt(j));
 
-			if (first) {
-				first = false;
-			} else
-				view->AddLine(prev, BPoint(x, y), source->Color());
+				if (first) {
+					first = false;
+				} else
+					view->AddLine(prev, BPoint(x, y), source->Color());
 
-			prev.Set(x, y);
+				prev.Set(x, y);
+			}
+
+		} catch(std::bad_alloc) {
+			// Not enough memory to allocate the line array.
+			// TODO we could try to draw using the slower but less memory
+			// consuming solution using StrokeLine.
 		}
 
 		view->EndLineArray();
