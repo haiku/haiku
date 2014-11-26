@@ -3638,9 +3638,16 @@ BView::BeginLineArray(int32 count)
 	//	calls with a NULL fCommArray would drop into the debugger anyway,
 	//	we allow the possible std::bad_alloc exceptions here...
 	fCommArray = new _array_data_;
-	fCommArray->maxCount = count;
 	fCommArray->count = 0;
+
+	// Make sure the fCommArray is initialized to reasonable values in cases of
+	// bad_alloc. At least the exception can be caught and EndLineArray won't
+	// crash.
+	fCommArray->array = NULL;
+	fCommArray->maxCount = 0;
+
 	fCommArray->array = new ViewLineArrayInfo[count];
+	fCommArray->maxCount = count;
 }
 
 
