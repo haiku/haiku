@@ -16,10 +16,12 @@
 #include <Button.h>
 #include <Debug.h>
 #include <GradientLinear.h>
+#include <GradientRadial.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <Region.h>
+#include <Shape.h>
 #include <Slider.h>
 #include <TextControl.h>
 #include <TranslationUtils.h>
@@ -41,16 +43,11 @@ static const int32 kTwoButtonOffsets[4]
 static const int32 kThreeButtonOffsets[4]
 	= { 0, kMouseDownWidth / 3, kMouseDownWidth / 3 * 2, kMouseDownWidth };
 
-static const rgb_color kButtonPressedColor = { 120, 120, 120 };
-static const rgb_color kButtonReleasedLeftColor = { 255, 255, 255 };
-static const rgb_color kButtonReleasedRightColor = { 184, 184, 184 };
-static const rgb_color kButtonPressedSeparatorColor = { 48, 48, 48 };
-static const rgb_color kButtonReleasedSeparatorColor = { 88, 88, 88 };
-static const rgb_color kButtonTextColor = { 32, 32, 32 };
-static const rgb_color kMouseShadowColor = { 150, 150, 150 };
-static const rgb_color kMouseBodyTopColor = { 210, 210, 210 };
-static const rgb_color kMouseBodyBottomColor = { 140, 140, 140 };
-static const rgb_color kMouseOutlineColor = { 0, 0, 0 };
+static const rgb_color kButtonTextColor = { 32, 32, 32, 255 };
+static const rgb_color kMouseShadowColor = { 150, 150, 150, 255 };
+static const rgb_color kMouseBodyTopColor = { 0xed, 0xed, 0xed, 255};
+static const rgb_color kMouseBodyBottomColor = { 0x85, 0x85, 0x85, 255 };
+static const rgb_color kMouseOutlineColor = { 0, 0, 0, 255 };
 
 static const int32*
 getButtonOffsets(int32 type)
@@ -198,75 +195,79 @@ MouseView::AttachedToWindow()
 void
 MouseView::Draw(BRect updateFrame)
 {
-	BRect mouseBody(Bounds());
-	mouseBody.right -= 2;
-	mouseBody.bottom -= 2;
-	float radius = 10;
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+	SetScale(1.8);
+	SetOrigin(-21, -14);
+
+	BShape mouseShape;
+	mouseShape.MoveTo(BPoint(16, 12));
+	BPoint control[3] = { BPoint(12, 16), BPoint(8, 60), BPoint(32, 60) };
+	mouseShape.BezierTo(control);
+	BPoint control2[3] = { BPoint(56, 60), BPoint(52, 16), BPoint(48, 12) };
+	mouseShape.BezierTo(control2);
+	BPoint control3[3] = { BPoint(44, 8), BPoint(20, 8), BPoint(16, 12) };
+	mouseShape.BezierTo(control3);
+	mouseShape.Close();
 
 	// Draw the shadow
+	SetOrigin(-17, -11);
 	SetHighColor(kMouseShadowColor);
-	FillRoundRect(mouseBody.OffsetByCopy(2, 2), radius, radius);
+	FillShape(&mouseShape, B_SOLID_HIGH);
 
 	// Draw the body
-	BGradientLinear gradient(mouseBody.LeftTop(), mouseBody.LeftBottom());
-	gradient.AddColor(kMouseBodyTopColor, 0);
-	gradient.AddColor(kMouseBodyBottomColor, 255);
-	FillRoundRect(mouseBody, radius, radius, gradient);
+	SetOrigin(-21, -14);
+	BGradientRadial bodyGradient(28, 24, 128);
+	bodyGradient.AddColor(kMouseBodyTopColor, 0);
+	bodyGradient.AddColor(kMouseBodyBottomColor, 255);
+
+	FillShape(&mouseShape, bodyGradient);
 
 	// Draw the outline
+	SetDrawingMode(B_OP_OVER);
 	SetHighColor(kMouseOutlineColor);
-	StrokeRoundRect(mouseBody, radius, radius);
+
+	StrokeShape(&mouseShape, B_SOLID_HIGH);
+
+	BShape buttonsOutline;
+	buttonsOutline.MoveTo(BPoint(13, 27));
+	BPoint control4[] = { BPoint(18, 30), BPoint(46, 30), BPoint(51, 27) };
+	buttonsOutline.BezierTo(control4);
+
+	// Separator between the buttons
+	if (fType == 3) {
+		buttonsOutline.MoveTo(BPoint(26, 29));
+		buttonsOutline.LineTo(BPoint(26, 10));
+		buttonsOutline.MoveTo(BPoint(38, 29));
+		buttonsOutline.LineTo(BPoint(38, 10));
+	} else if (fType == 2) {
+		buttonsOutline.MoveTo(BPoint(32, 30));
+		buttonsOutline.LineTo(BPoint(32, 9));
+	}
+
+	StrokeShape(&buttonsOutline, B_SOLID_HIGH);
 
 	mouse_map map;
 	fSettings.Mapping(map);
 
 	const int32* offset = getButtonOffsets(fType);
-	bool middlePressed = fType == 3 && (map.button[2] & fButtons) != 0;
+//	bool middlePressed = fType == 3 && (map.button[2] & fButtons) != 0;
+
+	SetHighColor(kButtonTextColor);
+	SetDrawingMode(B_OP_OVER);
+	SetScale(1);
+	SetOrigin(0, 0);
 
 	for (int32 i = 0; i < fType; i++) {
-		BRect border(offset[i] + 1, kButtonTop + 2, offset[i + 1] - 1,
-			kButtonTop + kMouseDownHeight - 4);
+		// draw mapping number centered over the button
+
 		bool pressed = (fButtons & map.button[_ConvertFromVisualOrder(i)]) != 0;
 			// is button currently pressed?
 
-		if (pressed) {
-			BRect frame(offset[i], 0, offset[i + 1], kMouseDownHeight - 1);
-			frame.InsetBy(1, 1);
-			SetHighColor(kButtonPressedColor);
-			FillRect(frame.OffsetByCopy(0, kButtonTop));
-		}
+		SetFont(pressed ? be_bold_font : be_plain_font);
 
-		SetDrawingMode(B_OP_OVER);
-
-		if (i > 0 && fType > i) {
-			// left border
-			SetHighColor(pressed ?
-				kButtonPressedColor : kButtonReleasedLeftColor);
-			StrokeLine(BPoint(border.LeftTop()), BPoint(border.LeftBottom()));
-
-			// draw separator
-			BRect separator = border.OffsetByCopy(-1, -1);
-			separator.bottom += 2;
-			if (!middlePressed)
-				border.top++;
-
-			SetHighColor(middlePressed ?
-				kButtonPressedSeparatorColor : kButtonReleasedSeparatorColor);
-			StrokeLine(BPoint(separator.LeftTop()),
-				BPoint(separator.LeftBottom()));
-		}
-
-		if (fType > 1 && i + 1 < fType) {
-			// right border
-			SetHighColor(pressed ?
-				kButtonPressedColor : kButtonReleasedRightColor);
-			StrokeLine(BPoint(border.RightTop()),
-				BPoint(border.RightBottom()));
-		}
-
-		// draw mapping number centered over the button
-
-		SetHighColor(kButtonTextColor);
+		BRect border(offset[i] + 1, kButtonTop + 2, offset[i + 1] - 1,
+			kButtonTop + kMouseDownHeight - 4);
 
 		char number[2] = {0};
 		number[0] = getMappingNumber(map.button[_ConvertFromVisualOrder(i)])
