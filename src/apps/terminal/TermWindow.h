@@ -62,8 +62,8 @@ public:
 
 			void				SessionChanged();
 
-	static	BMenu*				MakeEncodingMenu();
-	static	BMenu*				MakeWindowSizeMenu();
+	static	void				MakeEncodingMenu(BMenu*);
+	static	void				MakeWindowSizeMenu(BMenu*);
 
 protected:
 	virtual bool				QuitRequested();

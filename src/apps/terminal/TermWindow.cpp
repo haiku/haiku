@@ -425,14 +425,9 @@ TermWindow::MenusBeginning()
 }
 
 
-/* static */
-BMenu*
-TermWindow::MakeEncodingMenu()
+/* static */ void
+TermWindow::MakeEncodingMenu(BMenu* menu)
 {
-	BMenu* menu = new (std::nothrow) BMenu(B_TRANSLATE("Text encoding"));
-	if (menu == NULL)
-		return NULL;
-
 	BCharacterSetRoster roster;
 	BCharacterSet charset;
 	while (roster.GetNextCharacterSet(&charset) == B_OK) {
@@ -457,8 +452,6 @@ TermWindow::MakeEncodingMenu()
 	}
 
 	menu->SetRadioMode(true);
-
-	return menu;
 }
 
 
@@ -475,10 +468,17 @@ TermWindow::_SetupMenu()
 	fFontSizeMenu->AddItem(fIncreaseFontSizeMenuItem);
 	fFontSizeMenu->AddItem(fDecreaseFontSizeMenuItem);
 
-	BMenu* windowSize = MakeWindowSizeMenu();
-	windowSize->AddSeparatorItem();
-	windowSize->AddItem(new BMenuItem(B_TRANSLATE("Full screen"),
-		new BMessage(FULLSCREEN), B_ENTER));
+	BMenu* windowSize = new(std::nothrow) BMenu(B_TRANSLATE("Widow size"));
+	if (windowSize != NULL) {
+		MakeWindowSizeMenu(windowSize);
+		windowSize->AddSeparatorItem();
+		windowSize->AddItem(new BMenuItem(B_TRANSLATE("Full screen"),
+			new BMessage(FULLSCREEN), B_ENTER));
+	}
+
+	fEncodingMenu = new(std::nothrow) BMenu(B_TRANSLATE("Text encoding"));
+	if (fEncodingMenu != NULL)
+		MakeEncodingMenu(fEncodingMenu);
 
 	BLayoutBuilder::Menu<>(fMenuBar = new BMenuBar(Bounds(), "mbar"))
 		// Terminal
@@ -522,7 +522,7 @@ TermWindow::_SetupMenu()
 		// Settings
 		.AddMenu(B_TRANSLATE("Settings"))
 			.AddItem(windowSize)
-			.AddItem(fEncodingMenu = MakeEncodingMenu())
+			.AddItem(fEncodingMenu)
 			.AddItem(fFontSizeMenu)
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), MENU_PREF_OPEN)
@@ -1659,13 +1659,9 @@ TermWindow::_ResizeView(TermView *view)
 }
 
 
-/* static */ BMenu*
-TermWindow::MakeWindowSizeMenu()
+/* static */ void
+TermWindow::MakeWindowSizeMenu(BMenu* menu)
 {
-	BMenu* menu = new (std::nothrow) BMenu(B_TRANSLATE("Window size"));
-	if (menu == NULL)
-		return NULL;
-
 	const int32 windowSizes[4][2] = {
 		{ 80, 25 },
 		{ 80, 40 },
@@ -1685,8 +1681,6 @@ TermWindow::MakeWindowSizeMenu()
 		message->AddInt32("rows", rows);
 		menu->AddItem(new BMenuItem(label, message));
 	}
-
-	return menu;
 }
 
 

@@ -102,12 +102,19 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE));
 	fFontField = new BMenuField(B_TRANSLATE("Font:"), fontMenu);
 
-	BMenu* sizeMenu = TermWindow::MakeWindowSizeMenu();
-	sizeMenu->SetLabelFromMarked(true);
+	BMenu* sizeMenu = new (std::nothrow) BPopUpMenu(
+		B_TRANSLATE_COMMENT("Custom", "Window size"));
+	if (sizeMenu != NULL) {
+		TermWindow::MakeWindowSizeMenu(sizeMenu);
+		sizeMenu->SetLabelFromMarked(true);
+	}
 	fWindowSizeField = new BMenuField(B_TRANSLATE("Window size:"), sizeMenu);
 
-	BMenu* encodingMenu = TermWindow::MakeEncodingMenu();
-	encodingMenu->SetLabelFromMarked(true);
+	BMenu* encodingMenu = new (std::nothrow) BPopUpMenu("Text encoding");
+	if (encodingMenu != NULL) {
+		TermWindow::MakeEncodingMenu(encodingMenu);
+		encodingMenu->SetLabelFromMarked(true);
+	}
 	fEncodingField = new BMenuField(B_TRANSLATE("Encoding:"), encodingMenu);
 
 	BPopUpMenu* schemesPopUp = _MakeColorSchemeMenu(MSG_COLOR_SCHEME_CHANGED,
