@@ -184,11 +184,18 @@ BOptionPopUp::AddOptionAt(const char* name, int32 value, int32 index)
 }
 
 
-/*! \brief Called to take special actions when the child views are attached.
-	It's used to set correctly the divider for the BMenuField.
-*/
+// BeOS R5 compatibility, do not remove
 void
 BOptionPopUp::AllAttached()
+{
+	BOptionControl::AllAttached();
+}
+
+
+/*! \brief Sets the divider for the BMenuField and target the menu items to ourselves.
+*/
+void
+BOptionPopUp::AttachedToWindow()
 {
 	BMenu* menu = fMenuField->Menu();
 	if (menu != NULL) {
