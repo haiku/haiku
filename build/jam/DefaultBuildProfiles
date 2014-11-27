@@ -153,8 +153,6 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_SIZE ?= 20000 ;
 
 			AddHaikuImagePackages
-				autoconf
-				automake
 				binutils
 				bison
 				curl_devel
@@ -165,8 +163,6 @@ rule DefineDefaultBuildProfiles
 				grep
 				haikuporter
 				less
-				libtool
-				libtool_libltdl
 				m4
 				make
 				ncurses
