@@ -73,4 +73,114 @@ inline long double abs (long double x) { return fabs (x); }
 
 } // extern "C++"
 
+// These are possible macros imported from C99-land.
+#undef fpclassify
+#undef isfinite
+#undef isinf
+#undef isnan
+#undef isnormal
+#undef signbit
+#undef isgreater
+#undef isgreaterequal
+#undef isless
+#undef islessequal
+#undef islessgreater
+#undef isunordered
+
+namespace std
+{
+  inline int fpclassify(float __x) { return __fpclassifyf(__x); }
+  inline int fpclassify(double __x) { return __fpclassify(__x); }
+  inline int fpclassify(long double __x) { return __fpclassifyl(__x); }
+
+  inline bool isfinite(float __x) { return __finitef(__x); }
+  inline bool isfinite(double __x) { return __finite(__x); }
+  inline bool isfinite(long double __x) { return __finitel(__x); }
+
+  inline bool isinf(float __x) { return __isinff(__x); }
+  inline bool isinf(double __x) { return __isinf(__x); }
+  inline bool isinf(long double __x) { return __isinfl(__x); }
+
+  inline bool isnan(float __x) { return __isnanf(__x); }
+  inline bool isnan(double __x) { return __isnan(__x); }
+  inline bool isnan(long double __x) { return __isnanl(__x); }
+
+  inline bool isnormal(float __x) { return __fpclassifyf(__x) == FP_NORMAL; }
+  inline bool isnormal(double __x) { return __fpclassify(__x) == FP_NORMAL; }
+  inline bool isnormal(long double __x) { return __fpclassifyl(__x) == FP_NORMAL; }
+
+  inline bool signbit(float __x) { return __signbitf(__x); }
+  inline bool signbit(double __x) { return __signbit(__x); }
+  inline bool signbit(long double __x) { return __signbitl(__x); }
+
+#undef _wrap_expr_typeof
+	#define _wrap_expr_typeof(x, y, body) ({	\
+		__typeof(x) X = (x);					\
+		__typeof(y) Y = (y);					\
+		return (body);})
+
+  inline bool isgreater(float __x, float __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X > Y);
+  };
+  inline bool isgreater(double __x, double __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X > Y);
+  };
+  inline bool isgreater(long double __x, long double __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X > Y);
+  };
+
+  inline bool isgreaterequal(float __x, float __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X >= Y);
+  };
+  inline bool isgreaterequal(double __x, double __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X >= Y);
+  };
+  inline bool isgreaterequal(long double __x, long double __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X >= Y);
+  };
+
+  inline bool isless(float __x, float __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X < Y);
+  };
+  inline bool isless(double __x, double __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X < Y);
+  };
+  inline bool isless(long double __x, long double __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X < Y);
+  };
+
+  inline bool islessequal(float __x, float __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X <= Y);
+  };
+  inline bool islessequal(double __x, double __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X <= Y);
+  };
+  inline bool islessequal(long double __x, long double __y) {
+    _wrap_expr_typeof(__x, __y, !isnan(X) && !isnan(Y) && X <= Y);
+  };
+
+  inline bool islessgeater(float __x, float __y) {
+    _wrap_expr_typeof(__x, __y, X < Y || Y < X);
+  };
+  inline bool islessgreater(double __x, double __y) {
+    _wrap_expr_typeof(__x, __y, X < Y || Y < X);
+  };
+  inline bool islessgreater(long double __x, long double __y) {
+    _wrap_expr_typeof(__x, __y, X < Y || Y < X);
+  };
+
+  inline bool isunordered(float __x, float __y) {
+    _wrap_expr_typeof(__x, __y, isnan(X) || isnan(Y));
+  };
+  inline bool isunordered(double __x, double __y) {
+    _wrap_expr_typeof(__x, __y, isnan(X) || isnan(Y));
+  };
+  inline bool isunordered(long double __x, long double __y) {
+    _wrap_expr_typeof(__x, __y, isnan(X) || isnan(Y));
+  };
+
+#undef _wrap_expr_typeof
+
+} // namespace
+
 #endif
