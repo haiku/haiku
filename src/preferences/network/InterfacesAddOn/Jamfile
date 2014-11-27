@@ -25,7 +25,7 @@ Addon Interfaces :
 	RadioView.cpp
 	WirelessNetworkMenuItem.cpp
 	:
-	be
+	be shared
 	<nogrist>Network
 	$(TARGET_NETWORK_LIBS)
 	libbnetapi.so

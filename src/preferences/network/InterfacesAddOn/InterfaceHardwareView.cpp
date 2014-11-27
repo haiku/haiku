@@ -23,6 +23,7 @@
 #include <NetworkAddress.h>
 #include <Screen.h>
 #include <Size.h>
+#include <StringForSize.h>
 #include <StringView.h>
 #include <TextControl.h>
 
@@ -210,12 +211,11 @@ InterfaceHardwareView::Update()
 	ifreq_stats stats;
 	char buffer[100];
 	fSettings->Stats(&stats);
-	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%" B_PRIu64 " KBytes"),
-		stats.send.bytes / 1024);
+
+	string_for_size(stats.send.bytes, buffer, sizeof(buffer));
 	fLinkTxField->SetText(buffer);
 
-	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%" B_PRIu64 " KBytes"),
-		stats.receive.bytes / 1024);
+	string_for_size(stats.receive.bytes, buffer, sizeof(buffer));
 	fLinkRxField->SetText(buffer);
 
 	// TODO move the wireless info to a separate tab. We should have a
