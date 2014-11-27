@@ -15,29 +15,16 @@
 #include <String.h>
 
 
+namespace CLanguage {
+	struct Token;
+	class Tokenizer;
+}
+
+
 class ValueNode;
 class ValueNodeChild;
 class ValueNodeManager;
 class Variable;
-
-
-class ParseException {
- public:
-	ParseException(const char* message, int32 position)
-		: message(message),
-		  position(position)
-	{
-	}
-
-	ParseException(const ParseException& other)
-		: message(other.message),
-		  position(other.position)
-	{
-	}
-
-	BString	message;
-	int32	position;
-};
 
 
 class ValueNeededException {
@@ -67,8 +54,6 @@ class CLanguageExpressionEvaluator {
 
  private:
 			class Operand;
-			struct Token;
-			class Tokenizer;
 
  private:
 			Operand				_ParseSum();
@@ -80,10 +65,11 @@ class CLanguageExpressionEvaluator {
 
 			void				_EatToken(int32 type);
 
-			void				_RequestValueIfNeeded(const Token& token,
+			void				_RequestValueIfNeeded(
+									const CLanguage::Token& token,
 									ValueNodeChild* child);
 
-			Tokenizer*			fTokenizer;
+			CLanguage::Tokenizer* fTokenizer;
 			ValueNodeManager*	fNodeManager;
 };
 

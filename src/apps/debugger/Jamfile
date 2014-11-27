@@ -221,6 +221,7 @@ Application Debugger :
 
 	# source_language/expression_evaluators
 	CLanguageExpressionEvaluator.cpp
+	CLanguageTokenizer.cpp
 
 	# source_language/syntax_highlighters
 	CLanguageFamilySyntaxHighlighter.cpp

@@ -12,12 +12,15 @@
 
 #include "CLanguageExpressionEvaluator.h"
 #include "CLanguageFamilySyntaxHighlighter.h"
+#include "CLanguageTokenizer.h"
 #include "ExpressionInfo.h"
 #include "TeamTypeInformation.h"
 #include "StringValue.h"
 #include "Type.h"
 #include "TypeLookupConstraints.h"
 
+
+using CLanguage::ParseException;
 
 
 CLanguageFamily::CLanguageFamily()
