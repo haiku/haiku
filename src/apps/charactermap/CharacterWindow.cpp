@@ -544,12 +544,12 @@ void
 CharacterWindow::_UpdateFontMenu(BMenu* menu)
 {
 	BMenuItem* item;
-	
+
 	while (menu->CountItems() > 0) {
-		item = menu->RemoveItem(static_cast<long int>(0));
+		item = menu->RemoveItem(static_cast<int32>(0));
 		delete(item);
-	}	
-	
+	}
+
 	font_family currentFamily;
 	font_style currentStyle;
 	fCharacterView->CharacterFont().GetFamilyAndStyle(&currentFamily,
