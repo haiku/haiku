@@ -12,6 +12,7 @@
 #include "FontDemoView.h"
 
 #include <Catalog.h>
+#include <GroupLayout.h>
 #include <Window.h>
 
 #undef B_TRANSLATION_CONTEXT
@@ -31,9 +32,11 @@ FontDemo::FontDemo()
 
 	BWindow* controlWindow = new BWindow(BRect(500, 30, 700, 420), B_TRANSLATE("Controls"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
-		B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS);
+		B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
+			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS);
 
-	ControlView* controlView = new ControlView(controlWindow->Bounds());
+	ControlView* controlView = new ControlView();
+	controlWindow->SetLayout(new BGroupLayout(B_VERTICAL));
 	controlWindow->AddChild(controlView);
 
 	controlView->SetTarget(demoView);

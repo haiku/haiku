@@ -18,6 +18,7 @@
 #include <MenuItem.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
+#include <PopUpMenu.h>
 #include <Slider.h>
 #include <String.h>
 #include <TextControl.h>
@@ -28,8 +29,8 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ControlView"
 
-ControlView::ControlView(BRect rect)
-	: BView(rect, "ControlView", B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE_JUMP),
+ControlView::ControlView()
+	: BGroupView("ControlView", B_VERTICAL),
 	fMessenger(NULL),
 	fMessageRunner(NULL),
 	fTextControl(NULL),
@@ -48,6 +49,7 @@ ControlView::ControlView(BRect rect)
 	fFontStyleindex(0)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	GroupLayout()->SetInsets(B_USE_WINDOW_SPACING);
 }
 
 
@@ -61,77 +63,54 @@ ControlView::~ControlView()
 void
 ControlView::AttachedToWindow()
 {
-	BRect rect(Bounds());
-	rect.InsetBySelf(10, 0);
-	rect.bottom = rect.top + 18;
-	rect.OffsetBy(0, 11);
-
-	float offsetX = 0;
-	float offsetY = 0;
-
-	fTextControl = new BTextControl(rect, "TextInput", B_TRANSLATE("Text:"),
+	fTextControl = new BTextControl("TextInput", B_TRANSLATE("Text:"),
 		B_TRANSLATE("Haiku, Inc."), NULL);
-	fTextControl->SetDivider(36.0);
 	fTextControl->SetModificationMessage(new BMessage(TEXT_CHANGED_MSG));
 	AddChild(fTextControl);
 
-	rect.OffsetBy(0.0, 27.0);
-	_AddFontMenu(rect);
+	_AddFontMenu();
 
-	rect.OffsetBy(0.0, 36.0);
-	fFontsizeSlider = new BSlider(rect, "Fontsize", B_TRANSLATE("Size: 50"),
-		NULL, 4, 360);
+	fFontsizeSlider = new BSlider("Fontsize", B_TRANSLATE("Size: 50"),
+		NULL, 4, 360, B_HORIZONTAL);
 	fFontsizeSlider->SetModificationMessage(new BMessage(FONTSIZE_MSG));
 	fFontsizeSlider->SetValue(50);
 	AddChild(fFontsizeSlider);
 
-	// Get the preferred size for the sliders
-	fFontsizeSlider->GetPreferredSize(&offsetY, &offsetX);
-	offsetX += 1;
-
-	rect.OffsetBy(0.0, offsetX);
-	fShearSlider = new BSlider(rect, "Shear", B_TRANSLATE("Shear: 90"), NULL,
-		45, 135);
+	fShearSlider = new BSlider("Shear", B_TRANSLATE("Shear: 90"), NULL,
+		45, 135, B_HORIZONTAL);
 	fShearSlider->SetModificationMessage(new BMessage(FONTSHEAR_MSG));
 	fShearSlider->SetValue(90);
 	AddChild(fShearSlider);
 
-	rect.OffsetBy(0.0, offsetX);
-	fRotationSlider = new BSlider(rect, "Rotation", B_TRANSLATE("Rotation: 0"),
-		NULL, 0, 360);
+	fRotationSlider = new BSlider("Rotation", B_TRANSLATE("Rotation: 0"),
+		NULL, 0, 360, B_HORIZONTAL);
 	fRotationSlider->SetModificationMessage( new BMessage(ROTATION_MSG));
 	fRotationSlider->SetValue(0);
 	AddChild(fRotationSlider);
 
-	rect.OffsetBy(0.0, offsetX);
-	fSpacingSlider = new BSlider(rect, "Spacing", B_TRANSLATE("Spacing: 0"),
-		NULL, -5, 50);
+	fSpacingSlider = new BSlider("Spacing", B_TRANSLATE("Spacing: 0"),
+		NULL, -5, 50, B_HORIZONTAL);
 	fSpacingSlider->SetModificationMessage(new BMessage(SPACING_MSG));
 	fSpacingSlider->SetValue(0);
 	AddChild(fSpacingSlider);
 
-	rect.OffsetBy(0.0, offsetX);
-	fOutlineSlider = new BSlider(rect, "Outline", B_TRANSLATE("Outline:"),
-		NULL, 0, 20);
+	fOutlineSlider = new BSlider("Outline", B_TRANSLATE("Outline:"),
+		NULL, 0, 20, B_HORIZONTAL);
 	fOutlineSlider->SetModificationMessage(new BMessage(OUTLINE_MSG));
 	AddChild(fOutlineSlider);
 
-	rect.OffsetBy(0.0, offsetX);
-	fAliasingCheckBox = new BCheckBox(rect, "Aliasing",
+	fAliasingCheckBox = new BCheckBox("Aliasing",
 		B_TRANSLATE("Antialiased text"), new BMessage(ALIASING_MSG));
 	fAliasingCheckBox->SetValue(B_CONTROL_ON);
 	AddChild(fAliasingCheckBox);
 
-	rect.OffsetBy(0.0, 30.0f);
-	_AddDrawingModeMenu(rect);
+	_AddDrawingModeMenu();
 
-	rect.OffsetBy(0.0, 30.0f);
-	fBoundingboxesCheckBox = new BCheckBox(rect, "BoundingBoxes",
+	fBoundingboxesCheckBox = new BCheckBox("BoundingBoxes",
 		B_TRANSLATE("Bounding boxes"), new BMessage(BOUNDING_BOX_MSG));
 	AddChild(fBoundingboxesCheckBox);
 
-	rect.OffsetBy(0.0, 30.0f);
-	fCyclingFontButton = new BButton(rect, "Cyclefonts",
+	fCyclingFontButton = new BButton("Cyclefonts",
 		B_TRANSLATE("Cycle fonts"), new BMessage(CYCLING_FONTS_MSG));
 	AddChild(fCyclingFontButton);
 
@@ -378,7 +357,7 @@ ControlView::_UpdateFontmenus(bool setInitialfont)
 
 	for (int32 i = 0; i < fontfamilies; i++) {
 		if (get_font_family(i, &fontFamilyName) == B_OK) {
-			stylemenu = new BMenu(fontFamilyName);
+			stylemenu = new BPopUpMenu(fontFamilyName);
 			const int32 styles = count_font_styles(fontFamilyName);
 
 			BMessage* familyMsg = new BMessage(FONTFAMILY_CHANGED_MSG);
@@ -422,25 +401,22 @@ ControlView::_UpdateFontmenus(bool setInitialfont)
 
 
 void
-ControlView::_AddFontMenu(BRect rect)
+ControlView::_AddFontMenu()
 {
-	fFontFamilyMenu = new BMenu("fontfamlilymenu");
+	fFontFamilyMenu = new BPopUpMenu("fontfamlilymenu");
 
 	_UpdateFontmenus(true);
 
-	rect.bottom += 4;
-	fFontMenuField = new BMenuField(rect, "FontMenuField",
-		B_TRANSLATE("Font:"), fFontFamilyMenu, true);
-	fFontMenuField->SetDivider(
-		fFontMenuField->StringWidth(B_TRANSLATE("Font:")) + 5);
+	fFontMenuField = new BMenuField("FontMenuField",
+		B_TRANSLATE("Font:"), fFontFamilyMenu);
 	AddChild(fFontMenuField);
 }
 
 
 void
-ControlView::_AddDrawingModeMenu(BRect rect)
+ControlView::_AddDrawingModeMenu()
 {
-	fDrawingModeMenu = new BMenu("drawingmodemenu");
+	fDrawingModeMenu = new BPopUpMenu("drawingmodemenu");
 
 	BMessage* drawingMsg = NULL;
 	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
@@ -480,11 +456,8 @@ ControlView::_AddDrawingModeMenu(BRect rect)
 
 	fDrawingModeMenu->SetLabelFromMarked(true);
 
-	rect.bottom += 4;
-	BMenuField* drawingModeMenuField = new BMenuField(rect, "FontMenuField",
-		B_TRANSLATE("Drawing mode:"), fDrawingModeMenu, true);
-	drawingModeMenuField->SetDivider(
-		fDrawingModeMenu->StringWidth(B_TRANSLATE("Drawing mode:") + 5));
+	BMenuField* drawingModeMenuField = new BMenuField("FontMenuField",
+		B_TRANSLATE("Drawing mode:"), fDrawingModeMenu);
 	AddChild(drawingModeMenuField);
 }
 

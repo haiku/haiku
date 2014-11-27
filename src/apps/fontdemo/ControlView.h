@@ -9,7 +9,7 @@
 #define CONTROL_VIEW_H
 
 
-#include <View.h>
+#include <GroupView.h>
 
 
 class BButton;
@@ -24,9 +24,9 @@ class BSlider;
 class BTextControl;
 
 
-class ControlView : public BView {
+class ControlView : public BGroupView {
 	public:
-		ControlView(BRect rect);
+		ControlView();
 		virtual ~ControlView();
 
 		virtual void AttachedToWindow();
@@ -35,8 +35,8 @@ class ControlView : public BView {
 		void SetTarget(BHandler* handler);
 
 	private:
-		void _AddFontMenu(BRect rect);
-		void _AddDrawingModeMenu(BRect rect);
+		void _AddFontMenu();
+		void _AddDrawingModeMenu();
 		void _UpdateFontmenus(bool setInitialfont = false);
 		void _DeselectOldItems();
 
