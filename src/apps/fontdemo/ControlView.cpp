@@ -286,38 +286,38 @@ ControlView::MessageReceived(BMessage* msg)
 
 			if (currentFamilyItem) {
 				familyindex = fFontFamilyMenu->IndexOf(currentFamilyItem);
-		 		const int32 installedStyles = count_font_styles(
-		 			const_cast<char*>(currentFamilyItem->Label()));
+				const int32 installedStyles = count_font_styles(
+					const_cast<char*>(currentFamilyItem->Label()));
 
-		 		BMenu* submenu = currentFamilyItem->Submenu();
-		 		if (submenu) {
-		 			BMenuItem* markedStyle = submenu->FindMarked();
-		 			fFontStyleindex = submenu->IndexOf(markedStyle);
+				BMenu* submenu = currentFamilyItem->Submenu();
+				if (submenu) {
+					BMenuItem* markedStyle = submenu->FindMarked();
+					fFontStyleindex = submenu->IndexOf(markedStyle);
 				}
 
-		 		if (fFontStyleindex < installedStyles - 1)
-		 			fFontStyleindex++;
-		 		else {
-		 			fFontStyleindex = 0;
+				if (fFontStyleindex < installedStyles - 1)
+					fFontStyleindex++;
+				else {
+					fFontStyleindex = 0;
 
-		 			if (familyindex < count_font_families() - 1)
-				 		familyindex++;
-				 	else
-			 			familyindex = 0;
+					if (familyindex < count_font_families() - 1)
+						familyindex++;
+					else
+						familyindex = 0;
 				}
 
 				BMenuItem* newFontFamilyItem = fFontFamilyMenu->ItemAt(familyindex);
-		 		BMenuItem* newstyleitem = submenu->ItemAt(fFontStyleindex);
+				BMenuItem* newstyleitem = submenu->ItemAt(fFontStyleindex);
 
-		 		if (newFontFamilyItem && newstyleitem) {
-		 			if (msg->AddString("_style", newstyleitem->Label()) != B_OK
-		 				|| msg->AddString("_family", newFontFamilyItem->Label()) != B_OK) {
-		 				printf("Failed to add style or family to the message\n");
-		 				return;
-		 			}
+				if (newFontFamilyItem && newstyleitem) {
+					if (msg->AddString("_style", newstyleitem->Label()) != B_OK
+						|| msg->AddString("_family", newFontFamilyItem->Label()) != B_OK) {
+						printf("Failed to add style or family to the message\n");
+						return;
+					}
 					printf("InstalledStyles(%" B_PRId32 "), Font(%s), Style(%s)\n",
-		 				installedStyles, newFontFamilyItem->Label(),
-		 				newstyleitem->Label());
+						installedStyles, newFontFamilyItem->Label(),
+						newstyleitem->Label());
 					_UpdateAndSendStyle(msg);
 				}
 			}
@@ -358,6 +358,7 @@ ControlView::_UpdateFontmenus(bool setInitialfont)
 	for (int32 i = 0; i < fontfamilies; i++) {
 		if (get_font_family(i, &fontFamilyName) == B_OK) {
 			stylemenu = new BPopUpMenu(fontFamilyName);
+			stylemenu->SetLabelFromMarked(false);
 			const int32 styles = count_font_styles(fontFamilyName);
 
 			BMessage* familyMsg = new BMessage(FONTFAMILY_CHANGED_MSG);
@@ -390,12 +391,13 @@ ControlView::_UpdateFontmenus(bool setInitialfont)
 					stylemenu->AddItem(styleItem);
 				}
 			}
+
+			stylemenu->SetRadioMode(true);
+			stylemenu->SetTargetForItems(this);
 		}
-		stylemenu->SetRadioMode(true);
-		stylemenu->SetTargetForItems(this);
 	}
 
-	fFontFamilyMenu->SetLabelFromMarked(true);
+	fFontFamilyMenu->SetLabelFromMarked(false);
 	fFontFamilyMenu->SetTargetForItems(this);
 }
 
@@ -405,11 +407,11 @@ ControlView::_AddFontMenu()
 {
 	fFontFamilyMenu = new BPopUpMenu("fontfamlilymenu");
 
-	_UpdateFontmenus(true);
-
 	fFontMenuField = new BMenuField("FontMenuField",
 		B_TRANSLATE("Font:"), fFontFamilyMenu);
 	AddChild(fFontMenuField);
+
+	_UpdateFontmenus(true);
 }
 
 
