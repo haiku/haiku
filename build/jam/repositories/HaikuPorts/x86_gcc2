@@ -36,6 +36,7 @@ RemotePackageRepository HaikuPorts
 	beam-1.2alpha-1
 	becjk-1.0.1-1
 	belife-1.0.0-2
+	bemines-1.0b2-1
 	bepdf-1.2.0-1
 	bescreencapture-1.9.4-1
 #	bezillabrowser-2.0.0.22pre_2010_05_02-1
@@ -656,6 +657,7 @@ RemotePackageRepository HaikuPorts
 	beam
 	becjk
 	belife
+	bemines
 	bepdf
 	bescreencapture
 	beshare_x86
