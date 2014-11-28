@@ -69,11 +69,11 @@ static BString TokenTypeToString(int32 type)
 			token = "**";
 			break;
 
-		case TOKEN_OPENING_BRACKET:
+		case TOKEN_OPENING_PAREN:
 			token = "(";
 			break;
 
-		case TOKEN_CLOSING_BRACKET:
+		case TOKEN_CLOSING_PAREN:
 			token = ")";
 			break;
 
@@ -1734,11 +1734,11 @@ CLanguageExpressionEvaluator::_ParseAtom()
 	else {
 		fTokenizer->RewindToken();
 
-		_EatToken(TOKEN_OPENING_BRACKET);
+		_EatToken(TOKEN_OPENING_PAREN);
 
 		value = _ParseSum();
 
-		_EatToken(TOKEN_CLOSING_BRACKET);
+		_EatToken(TOKEN_CLOSING_PAREN);
 	}
 
 	return value;
@@ -1765,8 +1765,8 @@ CLanguageExpressionEvaluator::_EatToken(int32 type)
 			case TOKEN_STAR:
 			case TOKEN_MODULO:
 			case TOKEN_POWER:
-			case TOKEN_OPENING_BRACKET:
-			case TOKEN_CLOSING_BRACKET:
+			case TOKEN_OPENING_PAREN:
+			case TOKEN_CLOSING_PAREN:
 			case TOKEN_LOGICAL_AND:
 			case TOKEN_BITWISE_AND:
 			case TOKEN_LOGICAL_OR:

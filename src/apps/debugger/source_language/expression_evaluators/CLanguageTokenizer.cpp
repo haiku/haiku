@@ -108,7 +108,7 @@ Tokenizer::NextToken()
 			TOKEN_END_OF_LINE);
 	}
 
-	bool decimal = *fCurrentChar == '.' || *fCurrentChar == ',';
+	bool decimal = *fCurrentChar == '.';
 
 	if (decimal || isdigit(*fCurrentChar)) {
 		if (*fCurrentChar == '0' && fCurrentChar[1] == 'x')
@@ -124,14 +124,14 @@ Tokenizer::NextToken()
 			fCurrentChar++;
 		}
 
-		// optional post comma part
-		// (required if there are no digits before the comma)
-		if (*fCurrentChar == '.' || *fCurrentChar == ',') {
+		// optional post decimal part
+		// (required if there are no digits before the decimal)
+		if (*fCurrentChar == '.') {
 			decimal = true;
 			temp << '.';
 			fCurrentChar++;
 
-			// optional post comma digits
+			// optional post decimal digits
 			while (isdigit(*fCurrentChar)) {
 				temp << *fCurrentChar;
 				fCurrentChar++;
@@ -162,15 +162,27 @@ Tokenizer::NextToken()
 			fCurrentToken.value.SetTo(value);
 		else
 			fCurrentToken.value.SetTo((int64)strtoll(temp.String(), NULL, 10));
-	} else if (isalpha(*fCurrentChar)) {
+	} else if (isalpha(*fCurrentChar) || *fCurrentChar == '_') {
 		const char* begin = fCurrentChar;
 		while (*fCurrentChar != 0 && (isalpha(*fCurrentChar)
-			|| isdigit(*fCurrentChar))) {
+			|| isdigit(*fCurrentChar) || *fCurrentChar == '_')) {
 			fCurrentChar++;
 		}
 		int32 length = fCurrentChar - begin;
 		fCurrentToken = Token(begin, length, _CurrentPos() - length,
 			TOKEN_IDENTIFIER);
+	} else if (*fCurrentChar == '"' || *fCurrentChar == '\'') {
+		const char* begin = fCurrentChar++;
+		while (*fCurrentChar != 0) {
+			if (*fCurrentChar == '\\') {
+				if (*(fCurrentChar++) != 0)
+					fCurrentChar++;
+			} else if (*(fCurrentChar++) == *begin)
+				break;
+		}
+		int32 length = fCurrentChar - begin;
+		fCurrentToken = Token(begin, length, _CurrentPos() - length,
+			TOKEN_STRING_LITERAL);
 	} else {
 		if (!_ParseOperator()) {
 			int32 type = TOKEN_NONE;
@@ -180,15 +192,48 @@ Tokenizer::NextToken()
 					break;
 
 				case '(':
-					type = TOKEN_OPENING_BRACKET;
+					type = TOKEN_OPENING_PAREN;
 					break;
 				case ')':
-					type = TOKEN_CLOSING_BRACKET;
+					type = TOKEN_CLOSING_PAREN;
+					break;
+
+				case '[':
+					type = TOKEN_OPENING_SQUARE_BRACKET;
+					break;
+				case ']':
+					type = TOKEN_CLOSING_SQUARE_BRACKET;
+					break;
+
+				case '{':
+					type = TOKEN_OPENING_CURLY_BRACE;
+					break;
+				case '}':
+					type = TOKEN_CLOSING_CURLY_BRACE;
 					break;
 
 				case '\\':
+					type = TOKEN_BACKSLASH;
+					break;
+
 				case ':':
-					type = TOKEN_SLASH;
+					type = TOKEN_COLON;
+					break;
+
+				case ';':
+					type = TOKEN_SEMICOLON;
+					break;
+
+				case ',':
+					type = TOKEN_COMMA;
+					break;
+
+				case '.':
+					type = TOKEN_PERIOD;
+					break;
+
+				case '#':
+					type = TOKEN_POUND;
 					break;
 
 				default:
@@ -227,18 +272,37 @@ Tokenizer::_ParseOperator()
 			break;
 
 		case '*':
-			if (_Peek() == '*')  {
-				type = TOKEN_POWER;
-				length = 2;
-			} else {
-				type = TOKEN_STAR;
-				length = 1;
+			switch (_Peek()) {
+				case '*':
+					type = TOKEN_POWER;
+					length = 2;
+					break;
+				case '/':
+					type = TOKEN_END_COMMENT_BLOCK;
+					length = 2;
+					break;
+				default:
+					type = TOKEN_STAR;
+					length = 1;
+					break;
 			}
 			break;
 
 		case '/':
-			type = TOKEN_SLASH;
-			length = 1;
+			switch (_Peek()) {
+				case '*':
+					type = TOKEN_BEGIN_COMMENT_BLOCK;
+					length = 2;
+					break;
+				case '/':
+					type = TOKEN_INLINE_COMMENT;
+					length = 2;
+					break;
+				default:
+					type = TOKEN_SLASH;
+					length = 1;
+					break;
+			}
 			break;
 
 		case '%':
@@ -285,6 +349,9 @@ Tokenizer::_ParseOperator()
 			if (_Peek() == '=') {
 				type = TOKEN_EQ;
 				length = 2;
+			} else {
+				type = TOKEN_ASSIGN;
+				length = 1;
 			}
 			break;
 
