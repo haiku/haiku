@@ -180,7 +180,7 @@ FileTypes::FileTypes()
 	fTypeWindowCount(0)
 {
 	fFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
-		B_FILE_NODE | B_DIRECTORY_NODE, false);
+		B_FILE_NODE, false);
 }
 
 
