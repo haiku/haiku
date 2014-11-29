@@ -49,6 +49,7 @@
 #include "PackageManager.h"
 #include "RatePackageWindow.h"
 #include "support.h"
+#include "ScreenshotWindow.h"
 #include "UserLoginWindow.h"
 
 
@@ -116,6 +117,7 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fScreenshotWindow(NULL),
 	fUserMenu(NULL),
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
@@ -215,6 +217,7 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings,
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fScreenshotWindow(NULL),
 	fUserMenu(NULL),
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
@@ -260,6 +263,9 @@ MainWindow::~MainWindow()
 
 	delete_sem(fPackageToPopulateSem);
 	wait_for_thread(fPopulatePackageWorker, NULL);
+
+	if (fScreenshotWindow != NULL && fScreenshotWindow->Lock())
+		fScreenshotWindow->Quit();
 }
 
 
@@ -432,6 +438,10 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_RATE_PACKAGE:
 			_RatePackage();
+			break;
+
+		case MSG_SHOW_SCREENSHOT:
+			_ShowScreenshot();
 			break;
 
 		default:
@@ -1084,3 +1094,25 @@ MainWindow::_RatePackage()
 	window->SetPackage(fPackageInfoView->Package());
 	window->Show();
 }
+
+
+void
+MainWindow::_ShowScreenshot()
+{
+	// TODO: Mechanism for remembering the window frame
+	if (fScreenshotWindow == NULL)
+		fScreenshotWindow = new ScreenshotWindow(this, BRect(0, 0, 500, 400));
+
+	if (fScreenshotWindow->LockWithTimeout(1000) != B_OK)
+		return;
+
+	fScreenshotWindow->SetPackage(fPackageInfoView->Package());
+
+	if (fScreenshotWindow->IsHidden())
+		fScreenshotWindow->Show();
+	else
+		fScreenshotWindow->Activate();
+
+	fScreenshotWindow->Unlock();
+}
+

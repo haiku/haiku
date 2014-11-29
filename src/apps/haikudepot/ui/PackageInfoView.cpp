@@ -663,7 +663,6 @@ private:
 
 
 enum {
-	MSG_SHOW_SCREENSHOT				= 'shss',
 	MSG_EMAIL_PUBLISHER				= 'emlp',
 	MSG_VISIT_PUBLISHER_WEBSITE		= 'vpws',
 };
@@ -758,7 +757,8 @@ public:
 		switch (message->what) {
 			case MSG_SHOW_SCREENSHOT:
 			{
-				printf("MSG_SHOW_SCREENSHOT\n");
+				// Forward to window for now
+				Window()->PostMessage(message, Window());
 				break;
 			}
 			

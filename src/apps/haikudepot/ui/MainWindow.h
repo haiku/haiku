@@ -23,6 +23,7 @@ class FilterView;
 class PackageActionsView;
 class PackageInfoView;
 class PackageListView;
+class ScreenshotWindow;
 
 
 enum {
@@ -85,6 +86,7 @@ private:
 									const BMessage& onSuccessMessage);
 			void				_UpdateAuthorization();
 			void				_RatePackage();
+			void				_ShowScreenshot();
 
 private:
 			FilterView*			fFilterView;
@@ -93,6 +95,8 @@ private:
 			PackageListView*	fPackageListView;
 			PackageInfoView*	fPackageInfoView;
 			BSplitView*			fSplitView;
+
+			ScreenshotWindow*	fScreenshotWindow;
 
 			BMenu*				fUserMenu;
 			BMenuItem*			fLogInItem;

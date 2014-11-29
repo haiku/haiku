@@ -59,6 +59,7 @@ Application HaikuDepot :
 	RatePackageWindow.cpp
 	RatingView.cpp
 	support.cpp
+	ScreenshotWindow.cpp
 	ScrollableGroupView.cpp
 	SharedBitmap.cpp
 	UserLoginWindow.cpp
@@ -88,6 +89,7 @@ DoCatalogs HaikuDepot :
 	PackageListView.cpp
 	PackageManager.cpp
 	RatePackageWindow.cpp
+	ScreenshotWindow.cpp
 	UserLoginWindow.cpp
 ;
 
