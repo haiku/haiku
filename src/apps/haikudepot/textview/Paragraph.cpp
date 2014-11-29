@@ -341,7 +341,7 @@ Paragraph::PrintToStream() const
 		else {
 			BString text = span.Text();
 			text.ReplaceAll("\n", "\\n");
-			printf("    <span>%s<span/>\n", text.String());
+			printf("    <span>%s</span>\n", text.String());
 		}
 	}
 	printf("  </p>\n");
