@@ -65,3 +65,6 @@ load_symbols true
 
 #4gb_memory_limit true
 	# Ignores all memory beyond the 4 GB address limit. Default is false.
+
+#fail_safe_video_mode true
+	# Use failsafe (vesa) video mode on every boot.
