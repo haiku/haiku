@@ -30,6 +30,7 @@
 #include "BitmapButton.h"
 #include "BitmapView.h"
 #include "LinkView.h"
+#include "LinkedBitmapView.h"
 #include "MarkupTextView.h"
 #include "MessagePackageListener.h"
 #include "PackageActionHandler.h"
@@ -662,6 +663,7 @@ private:
 
 
 enum {
+	MSG_SHOW_SCREENSHOT				= 'shss',
 	MSG_EMAIL_PUBLISHER				= 'emlp',
 	MSG_VISIT_PUBLISHER_WEBSITE		= 'vpws',
 };
@@ -695,7 +697,8 @@ public:
 		// all other screenshots associated with the package to the same folder
 		// so the user can use the ShowImage navigation to view the other
 		// screenshots.
-		fScreenshotView = new BitmapView("screenshot view");
+		fScreenshotView = new LinkedBitmapView("screenshot view",
+			new BMessage(MSG_SHOW_SCREENSHOT));
 		fScreenshotView->SetExplicitMinSize(BSize(64.0f, 64.0f));
 		fScreenshotView->SetExplicitMaxSize(
 			BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
@@ -745,12 +748,20 @@ public:
 
 	virtual void AttachedToWindow()
 	{
+		fScreenshotView->SetTarget(this);
+		fEmailLinkView->SetTarget(this);
 		fWebsiteLinkView->SetTarget(this);
 	}
 
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
+			case MSG_SHOW_SCREENSHOT:
+			{
+				printf("MSG_SHOW_SCREENSHOT\n");
+				break;
+			}
+			
 			case MSG_EMAIL_PUBLISHER:
 			{
 				// TODO: Implement. If memory serves, there is a
@@ -791,6 +802,7 @@ public:
 				screenshot = bitmapRef->Bitmap(SharedBitmap::SIZE_ANY);
 		}
 		fScreenshotView->SetBitmap(screenshot);
+		fScreenshotView->SetEnabled(screenshot != NULL);
 	}
 
 	void Clear()
@@ -802,6 +814,7 @@ public:
 		fWebsiteLinkView->SetText("");
 
 		fScreenshotView->SetBitmap(NULL);
+		fScreenshotView->SetEnabled(false);
 	}
 
 private:
@@ -819,7 +832,7 @@ private:
 private:
 	MarkupTextView*		fDescriptionView;
 
-	BitmapView*			fScreenshotView;
+	LinkedBitmapView*	fScreenshotView;
 
 	SharedBitmap		fEmailIcon;
 	BitmapView*			fEmailIconView;

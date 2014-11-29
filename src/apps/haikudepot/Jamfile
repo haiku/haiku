@@ -43,6 +43,7 @@ Application HaikuDepot :
 	FilterView.cpp
 	JobStateListener.cpp
 	LinkView.cpp
+	LinkedBitmapView.cpp
 	main.cpp
 	MainWindow.cpp
 	MarkupTextView.cpp
