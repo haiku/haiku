@@ -430,7 +430,7 @@ InterfacesListView::MouseDown(BPoint where)
 		if (item->GetSettings()->AutoConfigure(AF_INET)
 			|| item->GetSettings()->AutoConfigure(AF_INET6)) {
 			fContextMenu->AddItem(new BMenuItem(
-				B_TRANSLATE("Renegotiate Address"),
+				B_TRANSLATE("Renegotiate address"),
 					new BMessage(kMsgInterfaceRenegotiate)));
 		}
 		fContextMenu->AddItem(new BSeparatorItem());
