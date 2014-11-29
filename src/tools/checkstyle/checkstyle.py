@@ -38,7 +38,14 @@ def run(fileSet, rules, outputFileName):
 
 def visit(result, dir, names):
     extensions = [".cpp", ".h"]
-    names.remove(".git")
+    vcsCacheDirectory = [".bzr", ".git", ".hg", ".svn"]
+
+    for name in reversed(names):
+        for vcd in vcsCacheDirectory:
+            if name == vcd:
+                print(vcd + " cache directory has been ignored")
+                names.remove(vcd)
+
     for name in names:
         path = os.path.join(dir, name)
         if os.path.isfile(path) and os.path.splitext(name)[1] in extensions:
