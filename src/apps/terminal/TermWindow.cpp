@@ -468,7 +468,7 @@ TermWindow::_SetupMenu()
 	fFontSizeMenu->AddItem(fIncreaseFontSizeMenuItem);
 	fFontSizeMenu->AddItem(fDecreaseFontSizeMenuItem);
 
-	BMenu* windowSize = new(std::nothrow) BMenu(B_TRANSLATE("Widow size"));
+	BMenu* windowSize = new(std::nothrow) BMenu(B_TRANSLATE("Window size"));
 	if (windowSize != NULL) {
 		MakeWindowSizeMenu(windowSize);
 		windowSize->AddSeparatorItem();
