@@ -19,6 +19,7 @@ class SourceCode;
 class StackFrame;
 class StackTrace;
 class Statement;
+class SyntaxHighlightInfo;
 class Team;
 class Thread;
 class UserBreakpoint;
@@ -95,6 +96,7 @@ private:
 			TextView*			fTextView;
 			FontInfo			fFontInfo;
 			Listener*			fListener;
+			SyntaxHighlightInfo* fCurrentSyntaxInfo;
 };
 
 

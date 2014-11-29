@@ -41,6 +41,7 @@
 #include "SourceLanguage.h"
 #include "StackTrace.h"
 #include "Statement.h"
+#include "SyntaxHighlighter.h"
 #include "Team.h"
 #include "Tracing.h"
 
@@ -49,6 +50,9 @@ static const int32 kLeftTextMargin = 3;
 static const float kMinViewHeight = 80.0f;
 static const int32 kSpacesPerTab = 4;
 	// TODO: Should be settable!
+
+static const int32 kMaxHighlightsPerLine = 64;
+
 static const bigtime_t kScrollTimer = 10000LL;
 
 static const char* kClearBreakpointMessage = "Click to clear breakpoint at "
@@ -62,6 +66,21 @@ static const uint32 MSG_OPEN_SOURCE_FILE = 'mosf';
 static const uint32 MSG_SWITCH_DISASSEMBLY_STATE = 'msds';
 
 static const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
+
+
+// TODO: make configurable.
+// Current values taken from Pe's defaults.
+static rgb_color kSyntaxColors[] = {
+	{0, 0, 0, 255}, 			// SYNTAX_HIGHLIGHT_NONE
+	{0x39, 0x74, 0x79, 255},	// SYNTAX_HIGHLIGHT_KEYWORD
+	{0, 0x64, 0, 255},			// SYNTAX_HIGHLIGHT_PREPROCESSOR_KEYWORD
+	{0, 0, 0, 255},				// SYNTAX_HIGHLIGHT_IDENTIFIER
+	{0x44, 0x8a, 0, 255},		// SYNTAX_HIGHLIGHT_OPERATOR
+	{0, 0, 0, 255}, 			// SYNTAX_HIGHLIGHT_TYPE
+	{0x85, 0x19, 0x19, 255},	// SYNTAX_HIGHLIGHT_NUMERIC_LITERAL
+	{0x85, 0x19, 0x19, 255},	// SYNTAX_HIGHLIGHT_STRING_LITERAL
+	{0xa1, 0x64, 0xe, 255},		// SYNTAX_HIGHLIGHT_COMMENT
+};
 
 
 class SourceView::BaseView : public BView {
@@ -312,7 +331,8 @@ private:
 
 			float				_MaxLineWidth();
 			void				_FormatLine(const char* line,
-									BString& formattedLine);
+									BString& formattedLine,
+									int32* columns, int32 columnCount);
 	inline 	int32				_NextTabStop(int32 column) const;
 			float				_FormattedPosition(int32 line,
 									int32 offset) const;
@@ -1144,11 +1164,23 @@ SourceView::TextView::Draw(BRect updateRect)
 	SourceView::MarkerManager::InstructionPointerMarker* ipMarker;
 	int32 markerIndex = 0;
 	float y;
+
+	// syntax line data
+	int32 columns[kMaxHighlightsPerLine];
+	syntax_highlight_type types[kMaxHighlightsPerLine];
+	SyntaxHighlightInfo* info = fSourceView->fCurrentSyntaxInfo;
+
 	for (int32 i = minLine; i <= maxLine; i++) {
+		int32 syntaxCount = 0;
+		if (info != NULL) {
+			syntaxCount = info->GetLineHighlightRanges(i, columns, types,
+				kMaxHighlightsPerLine);
+		}
+
 		SetLowColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 		y = i * fFontInfo->lineHeight;
 		BString lineString;
-		_FormatLine(fSourceCode->LineAt(i), lineString);
+		_FormatLine(fSourceCode->LineAt(i), lineString, columns, syntaxCount);
 
 		FillRect(BRect(0.0, y, kLeftTextMargin, y + fFontInfo->lineHeight),
 			B_SOLID_LOW);
@@ -1176,8 +1208,28 @@ SourceView::TextView::Draw(BRect updateRect)
 
 		FillRect(BRect(kLeftTextMargin, y, Bounds().right,
 			y + fFontInfo->lineHeight - 1), B_SOLID_LOW);
-		DrawString(lineString,
-			BPoint(kLeftTextMargin, y + fFontInfo->fontHeight.ascent));
+		syntax_highlight_type currentHighlight = SYNTAX_HIGHLIGHT_NONE;
+		int32 currentColumn = 0;
+		SetHighColor(kSyntaxColors[currentHighlight]);
+		BPoint linePoint(kLeftTextMargin, y + fFontInfo->fontHeight.ascent);
+		for (int32 j = 0; j < syntaxCount; j++) {
+			int32 length = columns[j] - currentColumn;
+			if (length != 0) {
+				DrawString(lineString.String() + currentColumn, length,
+					linePoint);
+				currentColumn += length;
+				linePoint.x += fCharacterWidth * length;
+
+			}
+			currentHighlight = types[j];
+			SetHighColor(kSyntaxColors[currentHighlight]);
+		}
+
+		// draw remainder, if any.
+		if (currentColumn < lineString.Length()) {
+			DrawString(lineString.String() + currentColumn, lineString.Length()
+					- currentColumn, linePoint);
+		}
 	}
 
 	y = (maxLine + 1) * fFontInfo->lineHeight;
@@ -1480,20 +1532,33 @@ SourceView::TextView::_MaxLineWidth()
 
 
 void
-SourceView::TextView::_FormatLine(const char* line, BString& formattedLine)
+SourceView::TextView::_FormatLine(const char* line, BString& formattedLine,
+	int32* columns, int32 columnCount)
 {
 	int32 column = 0;
-	for (; *line != '\0'; line++) {
+	int32 columnAdjustments[columnCount];
+	memset(columnAdjustments, 0, sizeof(columnAdjustments));
+	for (int32 i = 0; line[i] != '\0'; i++) {
 		// TODO: That's probably not very efficient!
-		if (*line == '\t') {
+		if (line[i] == '\t') {
 			int32 nextTabStop = _NextTabStop(column);
+			int32 diff = nextTabStop - column;
 			for (; column < nextTabStop; column++)
 				formattedLine << ' ';
+			for (int32 j = 0; j < columnCount; j++) {
+				// syntax highlights need to be offset according
+				// to our tabstop adjustments as well.
+				if (columns[j] >= i && diff > 0)
+					columnAdjustments[j] += (diff - 1);
+			}
 		} else {
-			formattedLine << *line;
+			formattedLine << line[i];
 			column++;
 		}
 	}
+
+	for (int32 i = 0; i < columnCount; i++)
+		columns[i] += columnAdjustments[i];
 }
 
 
@@ -1945,7 +2010,8 @@ SourceView::SourceView(Team* team, Listener* listener)
 	fSourceCode(NULL),
 	fMarkerView(NULL),
 	fTextView(NULL),
-	fListener(listener)
+	fListener(listener),
+	fCurrentSyntaxInfo(NULL)
 {
 	// init font info
 	fFontInfo.font = *be_fixed_font;
@@ -2148,12 +2214,25 @@ SourceView::SetSourceCode(SourceCode* sourceCode)
 		fTextView->SetSourceCode(NULL);
 		fMarkerView->SetSourceCode(NULL);
 		fSourceCode->ReleaseReference();
+		delete fCurrentSyntaxInfo;
+		fCurrentSyntaxInfo = NULL;
 	}
 
 	fSourceCode = sourceCode;
 
-	if (fSourceCode != NULL)
+	if (fSourceCode != NULL) {
 		fSourceCode->AcquireReference();
+
+		SourceLanguage* language = fSourceCode->GetSourceLanguage();
+		if (language != NULL) {
+			SyntaxHighlighter* highlighter = language->GetSyntaxHighlighter();
+			if (highlighter != NULL) {
+				BReference<SyntaxHighlighter> syntaxReference(highlighter,
+					true);
+				highlighter->ParseText(fSourceCode, fCurrentSyntaxInfo);
+			}
+		}
+	}
 
 	fMarkerManager->SetSourceCode(fSourceCode);
 	fTextView->SetSourceCode(fSourceCode);
