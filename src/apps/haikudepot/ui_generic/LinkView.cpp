@@ -29,6 +29,8 @@ LinkView::LinkView(const char* name, const char* string, BMessage* message,
 void
 LinkView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
+	// TODO: Check that no buttons are pressed, don't indicate clickable
+	// link if a button is held.
 	if (transit == B_ENTERED_VIEW) {
 		fMouseInside = true;
 		_UpdateLinkColor();
@@ -90,7 +92,8 @@ LinkView::_UpdateLinkColor()
 		Invalidate();
 	} else {
 		SetHighColor(fNormalColor);
-		SetViewCursor(NULL);
+		BCursor cursor(B_CURSOR_SYSTEM_DEFAULT);
+		SetViewCursor(&cursor, true);
 		Invalidate();
 	}
 }
