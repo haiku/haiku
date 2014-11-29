@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-WebPositive	233049275
+1	slovak	x-vnd.Haiku-WebPositive	82284269
 Show home button	Settings Window		Zobraziť tlačidlo Domov
 Username:	Authentication Panel		Používateľské meno:
 Copy URL to clipboard	Download Window		Kopírovať URL do schránky
@@ -17,7 +17,6 @@ History	WebPositive Window		História
 Error opening downloads folder	Download Window		Chyba pri otváraní priečinka stiahnutých súborov
 Paste	WebPositive Window		Vložiť
 Settings	Settings Window		Nastavenie
-%seconds seconds left	Download Window		Zostáva %seconds sekúnd
 Confirmation	WebPositive Window		Potvrdenie
 Window	WebPositive Window		Okno
 Decrease size	WebPositive Window		Zmenšiť veľkosť
@@ -28,7 +27,6 @@ Next	WebPositive Window		Ďalší
 Find next	WebPositive Window		Nájsť ďalší
 Download folder:	Settings Window		Priečinok stiahnutých súborov:
 Edit	WebPositive Window		Upraviť
-Over %hours hours left	Download Window		Zostáva viac ako %hours hodín
 Cancel	Authentication Panel		Zrušiť
 Match case	WebPositive Window		Rozlišovať veľkosť
 Search page:	Settings Window		Vyhľadávacia stránka:
@@ -36,7 +34,6 @@ Zoom text only	WebPositive Window		Zväčšovať iba text
 Default fixed font size:	Settings Window		Predvolená veľkosť neproporcionálneho písma:
 Close tab	WebPositive Window		Zatvoriť kartu
 Auto-hide mouse pointer	Settings Window		Automaticky skrývať kurzor myši
-Over 1 hour left	Download Window		Zostáva viac ako 1 hodina
 Quit	WebPositive Window		Ukončiť
 Full screen	WebPositive Window		Celoobrazovkový režim
 Open download error	Download Window		Chyba pri otváraní sťahovaného súboru
@@ -49,7 +46,6 @@ Open	Download Window		Otvoriť
 Reload	WebPositive Window		Znovu načítať
 Downloads	Download Window		Sťahovania
 Sans serif font:	Settings Window		Bezpätkové písmo:
-Over %days days left	Download Window		Zostáva viac ako %days dní
 Forward	WebPositive Window		Dopredu
 of	Download Window	...as in '12kB of 256kB'	z
 Revert	Settings Window		Vrátiť
@@ -64,7 +60,6 @@ Reset size	WebPositive Window		Obnoviť veľkosť
 Find:	WebPositive Window		Nájsť:
 Increase size	WebPositive Window		Zväčšiť veľkosť
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Vyskytla sa chyba pri získavaní priečinka záložiek.\n\nChyba: %error
-Over 1 day left	Download Window		Zostáva viac ako 1 deň
 Downloads	WebPositive Window		Sťahovania
 Requesting %url	WebPositive Window		Prebieha požiadavka na %url
 Apply	Settings Window		Použiť
@@ -90,7 +85,6 @@ Settings	WebPositive Window		Nastavenia
 Proxy server address:	Settings Window		Adresa proxy servera:
 Proxy server port:	Settings Window		Port proxy servera:
 Bookmarks	WebPositive Window		Záložky
-%minutes minutes	Download Window		%minutes minút
 Paste	URL Bar		Vložiť
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Skryť text hesla
@@ -104,7 +98,6 @@ Password:	Authentication Panel		Heslo:
 Back	WebPositive Window		Späť
 New browser window	Download Window		Nové okno prehliadača
 Today	WebPositive Window		Dnes
-1 second left	Download Window		zostáva 1 sekunda
 Remember username and password for this site	Authentication Panel		Zapamätať si používateľské meno a heslo pre túto lokalitu
 Earlier	WebPositive Window		Skoršie
 Authentication required	Authentication Panel		Vyžaduje sa overenie totožnosti

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-PackageInstaller	792037176
+1	slovak	x-vnd.Haiku-PackageInstaller	3253212490
 Install to:	PackageView		Inštalovať do:
 OK	PackageView		OK
 Accept	PackageTextViewer		Prijať
@@ -21,7 +21,6 @@ none	PackageView		žiadny
 Stop	PackageStatus		Zastaviť
 Other…	PackageView		Iné…
 No installation type selected	PackageView		Nebol vybraný typ inštalácie
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolický odkaz s názvom „%s“ už v danej ceste existuje.\nNahradiť odkaz odkazom z tohto balíka alebo ho preskočiť?
 Installing files and folders	PackageInstall		Inštalujú sa súbory a priečinky
 Package installer	PackageView		Inštalátor balíkov
 Skip all	PackageView		Preskočiť všetky

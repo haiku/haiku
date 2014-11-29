@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-screenshot	1483476245
+1	russian	x-vnd.haiku-screenshot	363809141
 seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Рабочий стол
 Include window border	ScreenshotWindow		Включая заголовок окна
@@ -11,7 +11,6 @@ This file already exists.\n Are you sure you would like to overwrite it?	Screens
 Choose folder	ScreenshotWindow		Выбрать папку
 Save	ScreenshotWindow		Сохранить
 Overwrite	ScreenshotWindow		Перезаписать
-Choose folder...	ScreenshotWindow		Выбрать папку…
 Please select	ScreenshotWindow		Пожалуйста выберите
 Save as:	ScreenshotWindow		Сохранить как:
 Copy to clipboard	ScreenshotWindow		Скопировать в буфер

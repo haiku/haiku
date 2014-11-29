@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaConverter	2722282283
+1	finnish	x-vnd.Haiku-MediaConverter	217152063
 Video using parameters form settings	MediaConverter		Video käyttäen parametreja muotoasetuksiin
 Video encoding:	MediaConverter		Videokoodaus:
 Error read audio frame %lld	MediaConverter		Virhe luettaessa äänikehystä %lld
@@ -11,7 +11,6 @@ Open…	Menu		Avaa...
 Start [ms]: 	MediaConverter		Alku [ms]:
 Output file '%filename' created	MediaConverter		Tulostetiedosto ’%filename’ on luotu
 Output format	MediaConverter		Tulostemuoto
-%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld kehystä
 End   [ms]: 	MediaConverter		Loppu [ms]: 
 MediaConverter	System name		Mediamuunnin
 No video	Video codecs list		Ei videota
@@ -27,7 +26,6 @@ Source files	MediaConverter		Lähdetiedostot
 Error writing video frame %lld	MediaConverter		Virhe kirjoitettaessa videokehystä %lld
 Error writing audio frame %lld	MediaConverter		Virhe kirjoitettaessa äänikehystä %lld
 Cancelling	MediaConverter		Perutaan
-%d byte 	MediaFileInfo		%d tavu 
 Error loading files	MediaConverter		Virhe ladattaessa tiedostoja
 Cancel	MediaConverter		Peru
 None available	Video codecs		Ei mitään saatavilla
@@ -37,7 +35,6 @@ Select this folder	MediaConverter		Valitse tämä kansio
 Continue	MediaConverter		Jatka
 Encoder parameters	MediaConverter-EncoderWindow		Koodausparametrit
 Video:	MediaConverter-FileInfo		Video:
-%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f kehystä per sekunti / %Ld kehystä
 %d bit 	MediaFileInfo		%d bitti 
 Error creating '%filename'	MediaConverter		Virhe luotaessa tiedostoa ’%filename’
 Video quality not supported	MediaConverter		Videolaatua ei tueta
@@ -50,10 +47,8 @@ Preview	MediaConverter		Esikatselu
 File format:	MediaConverter		Tiedostomuoto:
 None available	Audio codecs		Ei mitään saatavilla
 MediaConverter+:SaveDirectory	MediaConverter		Mediamuunnin+:Tallenna hakemisto
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanava / %lld kehystä
 Error launching: %strError%	MediaConverter		Virhe käynnistettäessä: %strError%
 High	MediaConverter		Korkea
-The file was not recognized as a supported media file:	MediaConverter		Tiedostoa ei tunnistettu tuettuna media-tiedostona:
 Drop media files onto this window	MediaConverter		Pudota mediatiedostot tähän ikkunaan
 Audio encoding:	MediaConverter		Äänikoodaus:
 Audio quality not supported	MediaConverter		Äänen laatua ei tueta
@@ -64,5 +59,3 @@ Video quality: %3d%%	MediaConverter		Videolaatu: %3d%%
 Output folder	MediaConverter		Tulostekansio
 Audio quality: %3d%%	MediaConverter		Äänen laatu: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Tapahtui virhe luettaessa tiedostotietoja.\n\nVirhe : 
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles-tiedostoja ei tunnistettu tuettuina mediatiedostoina:
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld kehystä

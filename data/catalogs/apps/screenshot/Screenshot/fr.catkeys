@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-screenshot	1483476245
+1	french	x-vnd.haiku-screenshot	363809141
 seconds	ScreenshotWindow		secondes
 Desktop	ScreenshotWindow		Bureau
 Include window border	ScreenshotWindow		Inclure les bords des fenêtres
@@ -11,7 +11,6 @@ This file already exists.\n Are you sure you would like to overwrite it?	Screens
 Choose folder	ScreenshotWindow		Choisir un dossier
 Save	ScreenshotWindow		Enregistrer
 Overwrite	ScreenshotWindow		Écraser
-Choose folder...	ScreenshotWindow		Choisir un dossier…
 Please select	ScreenshotWindow		Veuillez sélectionner
 Save as:	ScreenshotWindow		Enregistrer sous :
 Copy to clipboard	ScreenshotWindow		Copier dans le presse-papiers

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CharacterMap	2745781253
+1	swedish	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Omslutna alfanumeriska tecken
 Basic Latin	UnicodeBlocks		Latin (standard)
 View	CharacterWindow		Visa
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Kombinera diakritiska mar
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Arabiska tillägg
 Latin extended C	UnicodeBlocks		Latin C (utökad)
-Ancient smbols	UnicodeBlocks		Antika symboler
 Bopomofo extended	UnicodeBlocks		Bopomofo (utökad)
 Lycian	UnicodeBlocks		Lykiska
-Font size:	CharacterWindow		Typsnittsstorlek:
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Etiopiska
 Bengali	UnicodeBlocks		Bengali

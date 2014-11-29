@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PoorMan	4008245771
+1	english	x-vnd.Haiku-PoorMan	3296382959
 Website location	PoorMan		网址
 Error Server	PoorMan		服务器出错
 Settings…	PoorMan		设置...
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		创建 PoorMan 日志
 Shutting down.\n	PoorMan		关闭。\n
 Hits: %lu	PoorMan		访问： %lu
 Web folder:	PoorMan		Web 目录：
-Default	PoorMan		默认
 Save log console selection	PoorMan		保存日志控制台选择
 Run server	PoorMan		运行服务器
 PoorMan settings	PoorMan		PoorMan 设置

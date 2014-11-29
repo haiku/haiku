@@ -1,11 +1,10 @@
-1	lithuanian	x-vnd.Haiku-DriveSetup	758245016
+1	lithuanian	x-vnd.Haiku-DriveSetup	4273934970
 DriveSetup	System name		Diskų ženklintuvas
 Cancel	AbstractParametersPanel		Atsisakyti
 Delete	MainWindow		Šalinti
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skaidinyje, bus negrįžtamai prarasti!
 Rescan	MainWindow		Peržvalgyti
 OK	MainWindow		Gerai
-Could not aquire partitioning information.	MainWindow		Duomenų apie skaidinius nerasta.
 There's no space on the partition where a child partition could be created.	MainWindow		Skaidinyje nepakanka vietos loginiam diskui sukurti.
 Could not unmount partition	MainWindow		Nepavyko atjungti skaidinio
 Initialize	InitializeParametersPanel		Ženklinti
@@ -44,14 +43,12 @@ Change	ChangeParametersPanel		Keisti
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys diske „%s“, bus negrįžtamai prarasti!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pašalinti pasirinktą skaidinį?\n\nJei tęsite toliau – visi duomenys, esantys skaidinyje, bus negrįžtamai prarasti!
 Create…	MainWindow		Kurti…
-Disk system \"%s\"\" not found!	MainWindow		Diskų sistema „%s“ nerasta!
 The disk has been successfully initialized.\n	MainWindow		Diskas sėkmingai suženklintas.\n
 Could not unmount partition %s.	MainWindow		Skaidinio „%s“ atjungti nepavyko.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Skaidinio savybių pakeisti nepavyko. Į diską neįrašyti jokie pakeitimai.
 Failed to format the partition %s!\n	MainWindow		Skaidinio „%s“ suženklinti nepavyko!\n
 Mount	MainWindow		Prijungti
 Partition type	PartitionList		Skaidinio tipas
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ar tikrai norite suženklinti neskaidytą diską? Dažniausiai, prieš suženklinant, diske sukuriama skaidinių lentelė. Prieš įrašant pakeitimus į diską, Jūsų bus paklausta dar kartą.
 The panel experienced a problem!	MainWindow		Polangyje iškilo problema!
 Change parameters…	MainWindow		Keisti savybes…
 Device	PartitionList		Įrenginys

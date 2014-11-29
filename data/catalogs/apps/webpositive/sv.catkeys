@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	3528881455
+1	swedish	x-vnd.Haiku-WebPositive	3378116449
 Show home button	Settings Window		Visa hem-knappen
 Username:	Authentication Panel		Användarnamn:
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
@@ -19,7 +19,6 @@ Paste	WebPositive Window		Klistra in
 Double-click or middle-click to open new tab.	Tab Manager		Dubbelklicka eller klicka på mittersta musknappen för att öppna en ny tab.
 Proxy username:	Settings Window		Proxyanvändarnamn:
 Settings	Settings Window		Inställningar
-%seconds seconds left	Download Window		%seconds secunder kvar
 Confirmation	WebPositive Window		Bekräftelse
 Window	WebPositive Window		Fönster
 Decrease size	WebPositive Window		Minska storlek
@@ -31,7 +30,6 @@ Next	WebPositive Window		Nästa
 Find next	WebPositive Window		Sök nästa
 Download folder:	Settings Window		Hämtningsmapp:
 Edit	WebPositive Window		Redigera
-Over %hours hours left	Download Window		Över %hours timmar kvar
 Cancel	Authentication Panel		Avbryt
 Match case	WebPositive Window		Exakt jämförelse
 Search page:	Settings Window		Söksida:
@@ -39,7 +37,6 @@ Zoom text only	WebPositive Window		Zooma bara text
 Default fixed font size:	Settings Window		Fixerad standardteckenstorlek:
 Close tab	WebPositive Window		Stäng flik
 Auto-hide mouse pointer	Settings Window		Automatisk göm musmarkören
-Over 1 hour left	Download Window		Över 1 timme kvar
 Quit	WebPositive Window		Avsluta
 Full screen	WebPositive Window		Helskärm
 Open download error	Download Window		Öppna nerladdnings error
@@ -53,7 +50,6 @@ Open	Download Window		Öppna
 Reload	WebPositive Window		Läs om
 Downloads	Download Window		Hämtningar
 Sans serif font:	Settings Window		Sans serif-typsnitt:
-Over %days days left	Download Window		Över %days dagar kvar
 Forward	WebPositive Window		Framåt
 of	Download Window	...as in '12kB of 256kB'	av
 Revert	Settings Window		Återgå
@@ -69,7 +65,6 @@ Reset size	WebPositive Window		Återställ storlek
 Find:	WebPositive Window		Sök:
 Increase size	WebPositive Window		Öka storlek
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Problem att hämta bokmärkes mappen.\n\nFel: %error
-Over 1 day left	Download Window		Över 1 dag kvar
 Downloads	WebPositive Window		Nerladdningar
 Requesting %url	WebPositive Window		Begär %url
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Sök nästa förekomst av söktermerna
@@ -99,7 +94,6 @@ Script console	WebPositive Window		Skriptkonsol
 Proxy server address:	Settings Window		Proxyserveradress:
 Proxy server port:	Settings Window		Port för proxyserver
 Bookmarks	WebPositive Window		Bokmärken
-%minutes minutes	Download Window		%minutes minuter
 Paste	URL Bar		Klistra in
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		gjöm lösenordstext
@@ -114,7 +108,6 @@ Password:	Authentication Panel		Lösenord:
 Back	WebPositive Window		Tillbaka
 New browser window	Download Window		Nytt fönster
 Today	WebPositive Window		Idag
-1 second left	Download Window		1 sekund kvar
 Remember username and password for this site	Authentication Panel		Kom ihåg användarnamn och lösenord på denna hemsida
 Earlier	WebPositive Window		Tidigare
 Authentication required	Authentication Panel		Autentisering krävs

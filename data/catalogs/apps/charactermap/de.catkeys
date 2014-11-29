@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CharacterMap	2745781253
+1	german	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Eingeschlossene alphanumerische Zeichen
 Basic Latin	UnicodeBlocks		Lateinisch
 View	CharacterWindow		Ansicht
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Kombinierende diakritisch
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Arabisch (Ergänzung)
 Latin extended C	UnicodeBlocks		Lateinisch (Erweiterung C)
-Ancient smbols	UnicodeBlocks		Antike Symbole
 Bopomofo extended	UnicodeBlocks		Bopomofo (Erweiterung)
 Lycian	UnicodeBlocks		Lykisch
-Font size:	CharacterWindow		Schriftgröße:
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Äthiopisch
 Bengali	UnicodeBlocks		Bengalisch

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	2070021838
+1	english	x-vnd.Haiku-libtracker	679062638
 OK	WidgetAttributeText		确定
 Add-ons	FilePanelPriv		附加组件
 Desktop	Model		桌面
@@ -102,7 +102,6 @@ Show space bars on volumes	SettingsView		显示卷进度栏
 Invert selection	ContainerWindow		反向选择
 Increase size	DeskWindow		增大尺寸
 Resize to fit	ContainerWindow		合适大小
-%Ld bytes	WidgetAttributeText		%Ld 字节
 Add printer…	ContainerWindow		添加打印机...
 New folder	ContainerWindow		新建文件夹
 Kind	ContainerWindow		种类
@@ -287,7 +286,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	移动
 Show Disks icon	SettingsView		显示磁盘图标
 Cancel	PoseView		取消
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld 字节， 
 You can't move or copy items to read-only volumes.	FSUtils		您无法移动或复制项目到只读卷。
 Unknown	FilePermissionsView		未知
 All files and folders	FindPanel		所有文件及目录

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	1402613194
+1	slovak	x-vnd.Haiku-libtracker	11653994
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Doplnky
 Desktop	Model		Plocha
@@ -99,7 +99,6 @@ Show space bars on volumes	SettingsView		Zobraziť indikátory voľného miesta 
 Invert selection	ContainerWindow		Invertovať výber
 Increase size	DeskWindow		Zväčšiť veľkosť
 Resize to fit	ContainerWindow		Prispôsobiť veľkosť
-%Ld bytes	WidgetAttributeText		%Ld bajtov
 Add printer…	ContainerWindow		Pridať tlačiareň…
 New folder	ContainerWindow		Nový priečinok
 Kind	ContainerWindow		Druh
@@ -282,7 +281,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	presuniete
 Show Disks icon	SettingsView		Zobraziť ikonu Disky
 Cancel	PoseView		Zrušiť
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld bajtov, 
 You can't move or copy items to read-only volumes.	FSUtils		Nemôžete presúvať alebo kopírovať položky na zväzky, ktoré sú len na čítanie.
 Unknown	FilePermissionsView		Neznáme
 All files and folders	FindPanel		Všetky súbory a priečinky

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CodyCam	2083193989
+1	dutch; flemish	x-vnd.Haiku-CodyCam	183572276
 Capturing Image…	VideoConsumer.cpp		Beeld vastleggen...
 Every 30 seconds	CodyCam		Elke 30 seconden
 File name:	CodyCam		Bestandsnaam:
@@ -32,7 +32,6 @@ Output	CodyCam		Uitvoer
 Every 15 minutes	CodyCam		Elke 15 minuten
 Cannot find an available video stream	CodyCam		Kan geen beschikbare videostream vinden
 Can't find an available connection to the video window	CodyCam		Kan geen beschikbare verbinding naar het videovenster vinden
-Transmitting…	VideoConsumer.cpp		Verzenden...
 Cannot get a time source	CodyCam		Kan geen tijdsbron krijgen
 Every 8 hours	CodyCam		Elke 8 uur
 Rename failed	VideoConsumer.cpp		Hernoemen is mislukt
@@ -83,7 +82,6 @@ reply: %d, %d\n	FtpClient		antwoord: %d, %d\n
 Cannot find the media roster	CodyCam		Kan medianaamlijst niet vinden
 Every 4 hours	CodyCam		Elke 4 uur
 FTP	CodyCam		FTP
-File transmission failed	VideoConsumer.cpp		Bestandsoverdracht is mislukt
 Cannot seek time source!	CodyCam		Kan geen tijdsbron zoeken!
 File	CodyCam		Bestand
 Image Format Menu	CodyCam		Beeldformaat Menu

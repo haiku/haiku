@@ -1,9 +1,8 @@
-1	lithuanian	x-vnd.Haiku-BootManager	2195645217
+1	lithuanian	x-vnd.Haiku-BootManager	3355843558
 The boot manager has been successfully installed on your system.	BootManagerController		Paleidyklė sėkmingai įdiegta į šią sistemą.
 After two seconds	DefaultPartitionPage		dvi sekundės
 Uninstall Boot Manager	UninstallPage	Title	Paleidyklės šalinimas
 At least one partition must be selected!	BootManagerController		Privalote pasirinkti bent vieną skaidinį!
-The old Master Boot Record could not be saved to %s	BootManagerController		Senojo paleidimo įrašo kopijos nepavyko įrašyti į failą „%s“
 Restore MBR	BootManagerController	Button	Atkurti paleidimo įrašą
 Hard Drive	DrivesPage	Default disk name	Standusis diskas
 USB Drive	DrivesPage	Default disk name	USB laikmena
@@ -41,7 +40,6 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	tipas nežinomas
 Update	DrivesPage	Button	Atnaujinti
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Parinkite failą su atsargine paleidimo įrašo (MBR) kopija atkūrimui. Šis failas turėjo būti sukurtas pirmąkart įdiegiant paleidyklę.
-Old Master Boot Record Saved failure	BootManagerController	Title	Esamo paleidimo įrašo kopija neįrašyta
 Drives	DrivesPage	Title	Kaupikliai
 No space available!	DrivesPage	Cannot install	Nepakanka laisvos vietos!
 Never	DefaultPartitionPage		Neribotas

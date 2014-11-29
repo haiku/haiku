@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-CharacterMap	2745781253
+1	polish	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Otoczone symbole alfanumeryczne
 Basic Latin	UnicodeBlocks		Podstawowy łaciński
 View	CharacterWindow		Widok
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Składające znaki diakry
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Uzupełnienie arabskiego
 Latin extended C	UnicodeBlocks		Rozszerzony łaciński C
-Ancient smbols	UnicodeBlocks		Symbole starożytne
 Bopomofo extended	UnicodeBlocks		Rozszerzone bopomofo
 Lycian	UnicodeBlocks		Licyjsjki
-Font size:	CharacterWindow		Rozmiar fontu:
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Etiopski
 Bengali	UnicodeBlocks		Bengalski

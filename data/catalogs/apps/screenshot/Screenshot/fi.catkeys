@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-screenshot	1483476245
+1	finnish	x-vnd.haiku-screenshot	363809141
 seconds	ScreenshotWindow		sekuntia
 Desktop	ScreenshotWindow		Työpöytä
 Include window border	ScreenshotWindow		Sisällytä ikkunaraja
@@ -11,7 +11,6 @@ This file already exists.\n Are you sure you would like to overwrite it?	Screens
 Choose folder	ScreenshotWindow		Valitse kansio
 Save	ScreenshotWindow		Tallenna
 Overwrite	ScreenshotWindow		Korvaa
-Choose folder...	ScreenshotWindow		Valitse kansio...
 Please select	ScreenshotWindow		Valitse
 Save as:	ScreenshotWindow		Tallenna nimellä:
 Copy to clipboard	ScreenshotWindow		Kopioi leikepöydälle

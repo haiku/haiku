@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PoorMan	3849521821
+1	greek, modern (1453-)	x-vnd.Haiku-PoorMan	3137659009
 Website location	PoorMan		Τοποθεσία ιστοσελίδας
 Error Server	PoorMan		Σφάλμα Εξυπηρετητή
 Settings…	PoorMan		Ρυθμίσεις...
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Δημιουργία καταγραφής PoorMan
 Shutting down.\n	PoorMan		Τερματισμός λειτουργίας.
 Hits: %lu	PoorMan		Επισκέψεις: %lu
 Web folder:	PoorMan		Φάκελος ιστού:
-Default	PoorMan		Προεπιλεγμένο
 Save log console selection	PoorMan		Αποθήκευση επιλεγμένης καταγραφής κονσόλας
 Run server	PoorMan		Εκκίνηση εξυπηρετητή
 PoorMan settings	PoorMan		Ρυθμίσεις PoorMan

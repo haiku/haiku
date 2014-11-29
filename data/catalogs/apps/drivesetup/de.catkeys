@@ -1,11 +1,10 @@
-1	german	x-vnd.Haiku-DriveSetup	758245016
+1	german	x-vnd.Haiku-DriveSetup	4273934970
 DriveSetup	System name		Datenträgerverwaltung
 Cancel	AbstractParametersPanel		Abbrechen
 Delete	MainWindow		Löschen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
 Rescan	MainWindow		Aktualisieren
 OK	MainWindow		OK
-Could not aquire partitioning information.	MainWindow		Partitionierungsinformationen konnten nicht ermittelt werden.
 There's no space on the partition where a child partition could be created.	MainWindow		Es gibt keinen Platz auf der Partition, in der eine Tochterpartition angelegt werden könnte.
 Could not unmount partition	MainWindow		Partition konnte nicht ausgehangen werden.
 Initialize	InitializeParametersPanel		Initialisieren
@@ -44,14 +43,12 @@ Change	ChangeParametersPanel		Ändern
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
 Create…	MainWindow		Anlegen…
-Disk system \"%s\"\" not found!	MainWindow		Medienschema \"%s\"\" nicht gefunden!
 The disk has been successfully initialized.\n	MainWindow		Der Datenträger wurde erfolgreich initialisiert.\n
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Die Parameter der Partition konnten nicht geändert werden. Es wurde nichts auf die Disk geschrieben.
 Failed to format the partition %s!\n	MainWindow		Formatierung der Partition \"%s\" fehlgeschlagen!\n
 Mount	MainWindow		Einhängen
 Partition type	PartitionList		Partitionstyp:
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Soll der leere Datenträger wirklich formatiert werden (üblicherweise wird zuerst eine Partitionstabelle angelegt)? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 The panel experienced a problem!	MainWindow		Es gab ein Problem mit dem Panel!
 Change parameters…	MainWindow		Parameter ändern…
 Device	PartitionList		Gerät

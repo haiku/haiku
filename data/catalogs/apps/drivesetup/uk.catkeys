@@ -1,11 +1,10 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	758245016
+1	ukrainian	x-vnd.Haiku-DriveSetup	4273934970
 DriveSetup	System name		DriveSetup
 Cancel	AbstractParametersPanel		Відмінити
 Delete	MainWindow		Видалити
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному розділі будуть безповоротно втрачені!
 Rescan	MainWindow		Пересканувати
 OK	MainWindow		Гаразд
-Could not aquire partitioning information.	MainWindow		Неможливо відобразити інформацію про розмітку.
 There's no space on the partition where a child partition could be created.	MainWindow		Відсутнє місце в розділі , де ви бажаєте створити дочірній розділ.
 Could not unmount partition	MainWindow		Неможливо відмонтувати розділ
 Initialize	InitializeParametersPanel		Ініціалізація
@@ -44,14 +43,12 @@ Change	ChangeParametersPanel		Змінити
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск просто зараз?\n\nВсі дані на диску %s будуть безпозворотно втрачені, якщо ви продовжите!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте видалити вибраний розділ?\n\nВсі дані на цьому розділі будуть безпозворотно втрачені, якщо ви продовжите!
 Create…	MainWindow		Створити…
-Disk system \"%s\"\" not found!	MainWindow		Дискова система \"%s\"\" не знайдена!
 The disk has been successfully initialized.\n	MainWindow		Диск був успішно ініціалізований.\n
 Could not unmount partition %s.	MainWindow		Неможливо підмонтувати розділ %s.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Не вдалося змінити параметри розділу. Зміни не були записані на диск.
 Failed to format the partition %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
 Mount	MainWindow		Підмонтувати
 Partition type	PartitionList		Тип розділу
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати цілий диск? (переважно на диску створюють систему розділів)Повторний запит буде видано безпосередньо перед записом змін на диск.
 The panel experienced a problem!	MainWindow		З панеллю сталася проблема!
 Change parameters…	MainWindow		Змінити параметри…
 Device	PartitionList		Пристрій

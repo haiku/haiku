@@ -10,7 +10,7 @@ Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Levyaseman ”%s” liittämisen purkaminen epäonnistui:\n\t%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		Liitetään taltio <nimetön taltio>\n\n
 OK	AutoMounter		Valmis
-The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Tiedostojärjestelmä tällä taltiolla ei ole Haiku-tiedostojärjestelmä. Suositellaan voimakkaasti, että se liitetään kirjoitussuojatussa tilassa. Tämä estää datan tahattoman häviämisen Haikun virheiden vuoksi.
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Tiedostojärjestelmä tällä taltiolla ei ole Haiku-tiedostojärjestelmä. Suosittelemme painokkaasti, että se liitetään kirjoitussuojatussa tilassa. Tämä estää datan tahattoman häviämisen Haikun virheiden vuoksi.
 Previous volumes mounted.	AutoMounter		Aikaisemmat liitetyt taltiot.
 Mount error	AutoMounter		Liittämisvirhe
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		On suositeltavaa liittää kaikki muut Haiku-taltiot kirjoitussuojatussa tilassa. Tämä estää datan tahattoman häviämisen Haikun virheiden vuoksi.

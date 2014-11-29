@@ -1,9 +1,8 @@
-1	swedish	x-vnd.Haiku-BootManager	2195645217
+1	swedish	x-vnd.Haiku-BootManager	3355843558
 The boot manager has been successfully installed on your system.	BootManagerController		Starthanteraren har installerats på ditt system.
 After two seconds	DefaultPartitionPage		Efter två sekunder
 Uninstall Boot Manager	UninstallPage	Title	Avinstallera Starthanteraren
 At least one partition must be selected!	BootManagerController		Minst en partition måste markeras!
-The old Master Boot Record could not be saved to %s	BootManagerController		Den gamla huvudstartsektorn kunde inte sparas till %s
 Restore MBR	BootManagerController	Button	Återställ MBR
 Hard Drive	DrivesPage	Default disk name	Hårddisk
 USB Drive	DrivesPage	Default disk name	USB-disk
@@ -41,7 +40,6 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Okänd
 Update	DrivesPage	Button	Uppdatera
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Vänligen lokalisera huvudstartsektorns (MBR) återställningsfil. Filen skpades första gången Starthanteraren installerades.
-Old Master Boot Record Saved failure	BootManagerController	Title	Kunde inte spara gamla huvudstartsektorn
 Drives	DrivesPage	Title	Diskar
 No space available!	DrivesPage	Cannot install	Inget utrymme tillgängligt!
 Never	DefaultPartitionPage		Aldrig

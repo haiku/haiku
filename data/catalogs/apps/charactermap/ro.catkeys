@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CharacterMap	1545664922
+1	romanian	x-vnd.Haiku-CharacterMap	3150914128
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerice încercuite
 Basic Latin	UnicodeBlocks		Latină de bază
 View	CharacterWindow		Vizualizare
@@ -67,10 +67,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Combinare semne diacritic
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Supliment arabic
 Latin extended C	UnicodeBlocks		Latină extinsă C
-Ancient smbols	UnicodeBlocks		Simboluri antice
 Bopomofo extended	UnicodeBlocks		Bopomofo extins
 Lycian	UnicodeBlocks		Lycian
-Font size:	CharacterWindow		Mărime font:
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Etiopic
 Bengali	UnicodeBlocks		Bengali

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ShowImage	4121021813
+1	hungarian	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Beállítás háttérnek…
 File	Menus		Fájl
 Slide delay	Menus		Képváltás közti szünet
@@ -21,7 +21,6 @@ Edit	Menus		Szerkesztés
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nem sikerült betölteni a képet! Vagy a fájl, vagy annak egy értelmezője nincs meg.
 First page	Menus		Első oldal
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum %d. oldala megváltozott. Bezárja a dokumentumot?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS másodperc
 Leave full screen	Menus		Kilépés a teljes képernyős módból
 Close	Menus		Bezárás
 Close	ClosePrompt		Bezárás

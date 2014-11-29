@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Screen	2033930135
+1	ukrainian	x-vnd.Haiku-Screen	1388881963
 yes	Screen		так
 Use laptop panel:	Screen		Використовувати панель ноутбука:
 15 bits/pixel, 32768 colors	Screen		15 біт/пікселів, 32768 кольорів
@@ -35,7 +35,6 @@ horizontally	Screen		горизонтально
 Other…	Screen		Інше…
 Cancel	Screen		Відміна
 bits/pixel	Screen		бітів/піксель
-Settings will revert in %seconds seconds.	Screen		Налаштування будуть повернуті через %seconds секунд.
 Refresh rate:	Screen		Частота обновлення:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Ви бажаєте зберегти ці налаштування?

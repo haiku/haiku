@@ -1,18 +1,19 @@
-1	hungarian	x-vnd.Haiku-BootManager	2195645217
+1	hungarian	x-vnd.Haiku-BootManager	3264203763
 The boot manager has been successfully installed on your system.	BootManagerController		A rendszerválasztó sikeresen telepítésre került.
 After two seconds	DefaultPartitionPage		Két másodperc elteltével
 Uninstall Boot Manager	UninstallPage	Title	A rendszerválasztó eltávolítása
 At least one partition must be selected!	BootManagerController		Legalább egy partíciót ki kell választania.
-The old Master Boot Record could not be saved to %s	BootManagerController		Az eredeti fő rendszerbetöltő nem menthető a(z) %s fájlba.
 Restore MBR	BootManagerController	Button	Eredeti rendszerbetöltő visszaállítása
 Hard Drive	DrivesPage	Default disk name	Merevlemez
 USB Drive	DrivesPage	Default disk name	USB meghajtó
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		A rendszertöltő \n\t%s lemez eredeti rendszerbetöltője elmentésre kerül. Kérem, válassza ki, melyik fájlba szeretné menteni.\n\nHa hiba történne a telepítéskor, vagy később szeretné eltávolítani a rendszerválasztó menüt, futtassa a Rendszerválasztó segédprogramot, és válassza az Eltávolítás opciót.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	A(z) %disk lemez eredeti rendszerbetöltőjének visszaállítása a(z) %file fájlból. Biztosan folytatni szeretné?
+First partition starts too early	BootManagerController	Title	Az első partíció nagyon közel van a lemez elejéhez
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		A rendszerválasztó telepítése közben hiba lépett fel. A rendszerbetöltő valószínűleg megsérült, kérjük, állítsa vissza!
 Partitions	PartitionsPage	Title	Partíciók
 Timeout: %s	DefaultPartitionPage		Továbblépés:
 Select	FileSelectionPage	Button	Kiválasztás
+Incompatible format!	DrivesPage	Cannot install	Nem kompatibilis formátum!
 Cannot access!	DrivesPage	Cannot install	Nem hozzáférhető!
 Uninstall boot manager	BootManagerController	Title	A rendszerválasztó eltávolítása
 After four seconds	DefaultPartitionPage		Négy másodperc elteltével
@@ -26,6 +27,7 @@ After one second	DefaultPartitionPage		Egy másodperc után
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Az alábbi partíciókat érzékelte a rendszer. Kérjük jelölje meg a partíciók előtt, amelyeket hozzáadná a menühöz. Ugyanezen módon beállíthatja a partíciók nevét is, ahogy azt szeretné feltüntetni a menüben.
 After one minute	DefaultPartitionPage		Egy perc után
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		A Master Boot Record (MBR) az indító lemezen (%DISK) sikeresen helyreállításra került a fájlból (%FILE).
+Quit	WizardView	Button	Kilépés
 Write boot menu	BootManagerController	Button	Rendszerválasztó menü rögzítése
 The Master Boot Record could not be restored!	BootManagerController		A Master Boot Record (MBR) nem helyreállítható!
 Uninstall	DrivesPage	Button	Eltávolítás
@@ -36,12 +38,12 @@ Installation of boot menu completed	BootManagerController	Title	A rendszerválas
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Nevtelen %d
 File:	FileSelectionPage	Text control label	Fájl
 Previous	WizardView	Button	Előző
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Az első partíció nagyon közel helyezkedik el a lemez elejéhez, így nem marad elegendő hely a rendszertöltő menühöz.\nA rendszertöltő menü számára 2 KiB hely szükséges az első partíció előtt.
 Install	DrivesPage	Button	Telepítés
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		A következő rendszerválasztó menü kiírására készül az indító lemezre (%s). Kérem ellenőrizze az információkat mielőtt folytatja.
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Ismeretlen
 Update	DrivesPage	Button	Frissítés
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Kérem keresse meg a Master Boot Record (MBR) biztonsági mentését ahonnan helyreállíthatná. Ez a fájl az, ami akkor készült amikor a rendszerválasztó először került telepítésre.
-Old Master Boot Record Saved failure	BootManagerController	Title	Régi MBR mentési hiba
 Drives	DrivesPage	Title	Lemezek
 No space available!	DrivesPage	Cannot install	Nincs szabad hely!
 Never	DefaultPartitionPage		Soha
@@ -50,6 +52,7 @@ Old Master Boot Record saved	BootManagerController	Title	Régi MBR elmentve
 Boot Manager is unable to read the partition table!	BootManagerController		A Rendszerválasztó nem képes a partíciót olvasni!
 Error reading partition table	BootManagerController	Title	Hiba történt a particiós tábla olvasásakor
 Installation of boot menu failed	BootManagerController	Title	A rendszerválasztó menü telepítése sikertelen
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Az első lemezen lévő partíciós tábla nem kompatibilis a rendszertöltő menüvel.\nCsak az IBM PC MBR partíciók használhatóak.
 Backup Master Boot Record	BootManagerController	Title	MBR biztonsági mentése
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Most a rendszerválasztó menü rögzítésre kerül a lemezen. Biztos hogy folytatni akarja?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		A régi MBR elmentésre került ide: %s.

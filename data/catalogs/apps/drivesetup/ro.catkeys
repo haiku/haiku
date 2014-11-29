@@ -1,11 +1,10 @@
-1	romanian	x-vnd.Haiku-DriveSetup	3288723486
+1	romanian	x-vnd.Haiku-DriveSetup	1487820795
 DriveSetup	System name		ConfigurareDiscuri
 Cancel	AbstractParametersPanel		Anulează
 Delete	MainWindow		Șterge
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția selectată vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Rescan	MainWindow		Rescanează
 OK	MainWindow		Bine
-Could not aquire partitioning information.	MainWindow		Nu s-au putut obține infomațiile de partiționare.
 There's no space on the partition where a child partition could be created.	MainWindow		Nu mai există spațiu liber pe partiția unde se poate crea o partiție secundară.
 Initialize	InitializeParametersPanel		Inițializează
 OK	AbstractParametersPanel		Bine
@@ -35,7 +34,6 @@ The partition %s is already mounted.	MainWindow		Partiția %s este deja montată
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul %s vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să ștergeți partiția selectată?\n\nToate datele de pe partiție vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Create…	MainWindow		Crează...
-Disk system \"%s\"\" not found!	MainWindow		Sistemul de disc „%s\”\” nu a fost găsit!
 Could not unmount partition %s.	MainWindow		Nu se poate demonta partiția %s.
 Mount	MainWindow		Montează
 Device	PartitionList		Dispozitiv

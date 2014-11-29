@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CodyCam	2083193989
+1	russian	x-vnd.Haiku-CodyCam	183572276
 Capturing Image…	VideoConsumer.cpp		Захват изображения…
 Every 30 seconds	CodyCam		Каждые 30 секунд
 File name:	CodyCam		Имя файла:
@@ -32,7 +32,6 @@ Output	CodyCam		Вывод
 Every 15 minutes	CodyCam		Каждые 15 минут
 Cannot find an available video stream	CodyCam		Невозможно найти видео поток
 Can't find an available connection to the video window	CodyCam		Не удалось обнаружить доступного соединения с видео окном
-Transmitting…	VideoConsumer.cpp		Передача…
 Cannot get a time source	CodyCam		Невозможно получить продолжительность
 Every 8 hours	CodyCam		Каждые 8 часов
 Rename failed	VideoConsumer.cpp		Не удалось переименовать
@@ -83,7 +82,6 @@ reply: %d, %d\n	FtpClient		ответ: %d, %d\n
 Cannot find the media roster	CodyCam		Невозможно найти медиа ростер
 Every 4 hours	CodyCam		Каждые 4 часа
 FTP	CodyCam		FTP
-File transmission failed	VideoConsumer.cpp		Не удалось передать файл
 Cannot seek time source!	CodyCam		Невозможно обратиться к счетчику времени!
 File	CodyCam		Файл
 Image Format Menu	CodyCam		Меню формата изображения

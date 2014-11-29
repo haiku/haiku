@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-CharacterMap	2745781253
+1	slovak	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Uzavreté alfanumerické znaky
 Basic Latin	UnicodeBlocks		Latinka - základné znaky
 View	CharacterWindow		Zobraziť
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Kombinujúce diakritické
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Arabčina, dodatok
 Latin extended C	UnicodeBlocks		Rozšírená latinka C
-Ancient smbols	UnicodeBlocks		Staroveké symboly
 Bopomofo extended	UnicodeBlocks		Bopomofo - ďalšie znaky
 Lycian	UnicodeBlocks		Lycian
-Font size:	CharacterWindow		Veľkosť písma:
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Etiópčina
 Bengali	UnicodeBlocks		Bengálčina

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PackageInstaller	2033288398
+1	russian	x-vnd.Haiku-PackageInstaller	199496416
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
@@ -23,7 +23,6 @@ Install %name%	PackageView		Установить %name%
 Stop	PackageStatus		Остановить
 Other…	PackageView		Другой…
 No installation type selected	PackageView		Не выбран тип установки
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Символическая ссылка с именем '%s' уже существует по этому пути.\nЗаменить эту ссылку той, что находится внутри пакета или пропустить ее?
 Installing files and folders	PackageInstall		Установка файлов и папок
 Package installer	PackageView		Установщик пакетов
 Skip all	PackageView		Пропустить все

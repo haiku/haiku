@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CharacterMap	2745781253
+1	ukrainian	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Закриті літери, цифри
 Basic Latin	UnicodeBlocks		Основна латиниця
 View	CharacterWindow		Вигляд
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Об'єднуючі ді�
 Syloti Nagri	UnicodeBlocks		Сілоті Нагрі
 Arabic supplement	UnicodeBlocks		Доповнення до арабської
 Latin extended C	UnicodeBlocks		Розширена латиниця C
-Ancient smbols	UnicodeBlocks		Давні символи
 Bopomofo extended	UnicodeBlocks		Бопомофо розширена
 Lycian	UnicodeBlocks		Лікійська
-Font size:	CharacterWindow		Розмір шрифту:
 Osmanya	UnicodeBlocks		Османія
 Ethiopic	UnicodeBlocks		Ефіопська
 Bengali	UnicodeBlocks		Бенгалі

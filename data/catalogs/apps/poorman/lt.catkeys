@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-PoorMan	4008245771
+1	lithuanian	x-vnd.Haiku-PoorMan	3296382959
 Website location	PoorMan		Svetainės adresas
 Error Server	PoorMan		Serverio klaida
 Settings…	PoorMan		Nuostatos…
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Sukurkite žurnalo failą
 Shutting down.\n	PoorMan		Išjungiama.\n
 Hits: %lu	PoorMan		Apsilankymų: %lu
 Web folder:	PoorMan		Svetainės aplankas:
-Default	PoorMan		Numatytasis
 Save log console selection	PoorMan		Pažymėtosios pulto žurnalo dalies įrašymas
 Run server	PoorMan		Paleisti serverį
 PoorMan settings	PoorMan		Saityno serverio nuostatos

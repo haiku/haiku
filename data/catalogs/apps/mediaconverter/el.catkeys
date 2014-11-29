@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	1928642235
+1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	3718479311
 Video using parameters form settings	MediaConverter		Βίντεο χρησιμοποιόντας τις ρυθμίσεις
 Video encoding:	MediaConverter		Κωδικοποίηση βίντεο:
 No audio	Audio codecs list		Χωρίς ήχο
@@ -9,7 +9,6 @@ Open…	Menu		Άνοιγμα...
 Start [ms]: 	MediaConverter		Αρχή [ms]:
 Output file '%filename' created	MediaConverter		Αρχείο εξόδου '%filename' φτιάχτηκε
 Output format	MediaConverter		Τύπος εξαγωγής
-%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld καρέ
 End   [ms]: 	MediaConverter		Τέλος [ms]:
 MediaConverter	System name		Μετατροπέας Μέσων
 No video	Video codecs list		Χωρίς βίντεο
@@ -22,7 +21,6 @@ Audio:	MediaConverter-FileInfo		Ήχος:
 OK	MediaConverter-FileInfo		Εντάξει
 Source files	MediaConverter		Πηγαία αρχεία
 Cancelling	MediaConverter		Ακύρωση
-%d byte 	MediaFileInfo		%d byte
 Error loading files	MediaConverter		Σφάλμα κατά τη φόρτωση των αρχείων
 Cancel	MediaConverter		Άκυρο
 None available	Video codecs		Κανένα διαθέσιμο
@@ -32,7 +30,6 @@ Select this folder	MediaConverter		Επιλέξτε αυτό τον φάκελο
 Continue	MediaConverter		Συνέχεια
 Encoder parameters	MediaConverter-EncoderWindow		Encoder parameters
 Video:	MediaConverter-FileInfo		Βίντεο:
-%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld καρέ
 %d bit 	MediaFileInfo		%d bit
 Error creating '%filename'	MediaConverter		Σφάλμα κατά τη δημιουργία του '%filename'
 Video quality not supported	MediaConverter		Η ποιότητα βίντεο δεν υποστηρίζεται
@@ -45,10 +42,8 @@ Preview	MediaConverter		Προεπισκόπηση
 File format:	MediaConverter		Μορφή αρχείου:
 None available	Audio codecs		Κανένα διαθέσιμο
 MediaConverter+:SaveDirectory	MediaConverter		ΜετατροπέαςΠολυμέσων+:ΑποθήκευσηΚαταλόγου
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld κανάλι/ %lld καρέ
 Error launching: %strError%	MediaConverter		Σφάλμα κατά την εκτέλεση του: %strError%
 High	MediaConverter		Υψηλή
-The file was not recognized as a supported media file:	MediaConverter		Το αρχείο δεν αναγνωρίστηκε ως ένα συμβατό αρχείο πολυμέσων:
 Drop media files onto this window	MediaConverter		Drop media files onto this window
 Audio encoding:	MediaConverter		Κωδικοποίηση ήχου:
 Audio quality not supported	MediaConverter		Η ποιότητα ήχου δεν υποστηρίζεται
@@ -59,5 +54,3 @@ Video quality: %3d%%	MediaConverter		Ποιότητα βίντεο: %3d%%
 Output folder	MediaConverter		Φάκελος εξαγωγής
 Audio quality: %3d%%	MediaConverter		Ποιότητα ήχου: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Προέκυψε ένα σφάλμα κατά την ανάγνωση των πληροφοριών του αρχείου.\n\nΣφάλμα:
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		Τα %amountOfFiles αρχεία δεν αναγνωρίστηκαν ως υποστηριζόμενα αρχεία πολυμέσων:
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld καρέ

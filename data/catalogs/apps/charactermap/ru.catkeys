@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CharacterMap	2745781253
+1	russian	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Вложенные буквы и цифры
 Basic Latin	UnicodeBlocks		Основная латиница
 View	CharacterWindow		Вид
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Комбинируемы�
 Syloti Nagri	UnicodeBlocks		Силоти Нагри
 Arabic supplement	UnicodeBlocks		Арабский дополнительные
 Latin extended C	UnicodeBlocks		Латинский расширение C
-Ancient smbols	UnicodeBlocks		Древние символы
 Bopomofo extended	UnicodeBlocks		Расширенный бопомото
 Lycian	UnicodeBlocks		Ликийский
-Font size:	CharacterWindow		Размер шрифта:
 Osmanya	UnicodeBlocks		Сомалийский
 Ethiopic	UnicodeBlocks		Эфиопский
 Bengali	UnicodeBlocks		Бенгали

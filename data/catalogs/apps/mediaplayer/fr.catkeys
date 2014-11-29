@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaPlayer	1727923642
+1	french	x-vnd.Haiku-MediaPlayer	3507634633
 raw audio	MediaPlayer-InfoWin		audio brut
 Location	MediaPlayer-InfoWin		Emplacement
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
@@ -31,7 +31,6 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Obteni
 Display mode	MediaPlayer-InfoWin		Modes d'affichage
 Medium	MediaPlayer-SettingsWindow		Intermédiaire
 Close	MediaPlayer-PlaylistWindow		Fermer
-Stereo	MediaPlayer-InfoWin		Stéréo
 Open…	MediaPlayer-PlaylistWindow		Ouvrir…
 Toggle mute.	MediaPlayer-Main		(Dés)Activer la sourdine.
 Undo	MediaPlayer-PlaylistWindow		Annuler
@@ -56,7 +55,6 @@ Start playing.	MediaPlayer-Main		Commencer la lecture.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Il n'existe pas de décodeur capable de prendre en charge ce format de fichier ou bien le décodeur a des soucis avec cette version spécifique du format.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importer une entrée
 Gets the URI of the currently playing item.	MediaPlayer-Main		Obtenir l'URI de l'élément en cours de lecture.
-%d Channels	MediaPlayer-InfoWin		%d canaux
 400% scale	MediaPlayer-Main		Échelle 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué :\n\nErreur : 
 Move Entries	MediaPlayer-MovePLItemsCmd		Déplacer les entrées
@@ -156,7 +154,6 @@ Always on top	MediaPlayer-Main		Toujours au dessus
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envoyer l'entrée à la corbeille
 Save	MediaPlayer-Main		Enregistrer
 <nothing to undo>	MediaPlayer-PlaylistWindow		<rien à rétablir>
-Mono	MediaPlayer-InfoWin		Mono
 File info	MediaPlayer-InfoWin		Informations du fichier
 Save	MediaPlayer-PlaylistWindow		Enregistrer
 %d Bit	MediaPlayer-InfoWin		%d Bit

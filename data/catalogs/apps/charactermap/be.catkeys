@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-CharacterMap	2745781253
+1	belarusian	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Закрытыя літары і лічбы
 Basic Latin	UnicodeBlocks		Простая лацінка
 View	CharacterWindow		Від
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Камбінаванне 
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Арабскія дапаўненні
 Latin extended C	UnicodeBlocks		Лацінка пашыраная C
-Ancient smbols	UnicodeBlocks		Старадаўнія сімвалы
 Bopomofo extended	UnicodeBlocks		Бопомофо пашыраны
 Lycian	UnicodeBlocks		Лікійскі
-Font size:	CharacterWindow		Памер шрыфту:
 Osmanya	UnicodeBlocks		Османскі
 Ethiopic	UnicodeBlocks		Эфіопскі
 Bengali	UnicodeBlocks		Бенгальскі

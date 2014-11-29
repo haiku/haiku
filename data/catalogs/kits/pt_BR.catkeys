@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libbe	84010340
+1	portuguese (brazil)	x-vnd.Haiku-libbe	1409488127
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GB
@@ -9,10 +9,8 @@ Version	AboutWindow		Versão
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Não é possível criar o replicante para \"%description\".\n%error
 Copy	TextView		Copiar
 %3.2f KiB	StringForSize		%3.2f KB
-%d bytes	StringForSize		%d bytes
 alpha	AboutWindow		alfa
 Error	PrintJob		Erro
-No Pages to print!	PrintJob		Nenhuma Página para imprimir!
 All Rights Reserved.	AboutWindow		Todos os direitos reservados.
 About %app%	AboutWindow		Sobre %app%
 OK	Dragger		OK

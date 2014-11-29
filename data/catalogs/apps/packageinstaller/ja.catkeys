@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PackageInstaller	2033288398
+1	japanese	x-vnd.Haiku-PackageInstaller	199496416
 Install to:	PackageView		インストール先:
 OK	PackageView		OK
 Accept	PackageTextViewer		承認
@@ -23,7 +23,6 @@ Install %name%	PackageView		%name% をインストール
 Stop	PackageStatus		中止
 Other…	PackageView		他の場所…
 No installation type selected	PackageView		インストールタイプが選択されていません
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		シンボリックリンク '%s' がすでにパスに存在します。\nリンクををパッケージの物と置き換えますか、またはスキップしますか?
 Installing files and folders	PackageInstall		ファイルとフォルダーをインストールしています
 Package installer	PackageView		パッケージインストーラー
 Skip all	PackageView		すべてスキップ

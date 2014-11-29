@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-icon_o_matic	472703777
+1	slovak	x-vnd.haiku-icon_o_matic	2373738110
 Select All	Icon-O-Matic-PathManipulator		Vybrať všetky
 Add Style	Icon-O-Matic-AddStylesCmd		Pridať štýl
 Color (#%02x%02x%02x)	Style name after dropping a color		Farba (#%02x%02x%02x)
@@ -103,7 +103,6 @@ Unassign Path	Icon-O-Matic-UnassignPathCmd		Zrušiť priradenie cesty
 load error	Icon-O-Matic-SVGImport		chyba načítania
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Presunúť tvary
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Odstrániť stýly
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Text, ktorý sa pokúšate importovať je dosť dlhý, ste si istý?
 Add	Icon-O-Matic-TransformersList		Pridať
 Color	Icon-O-Matic-StyleTypes		Farba
 Settings…	Icon-O-Matic-SavePanel		Nastavenia…
@@ -166,7 +165,6 @@ Caps	Icon-O-Matic-PropertyNames		Zakončenia
 Transform	Icon-O-Matic-PathManipulator		Transformovať
 Add Paths	Icon-O-Matic-AddPathsCmd		Pridať cesty
 Style type	Icon-O-Matic-StyleTypes		Typ štýlu
-too big	Icon-O-Matic-StyledTextImport		príliš veľký
 Assign Style	Icon-O-Matic-AssignStyleCmd		Priradiť štýl
 Add Path	Icon-O-Matic-AddPathsCmd		Pridať cestu
 Color	Icon-O-Matic-PropertyNames		Farba

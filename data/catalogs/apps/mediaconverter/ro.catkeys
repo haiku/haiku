@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaConverter	1928642235
+1	romanian	x-vnd.Haiku-MediaConverter	3718479311
 Video using parameters form settings	MediaConverter		Video ce utilizează configurările parametrilor de formular
 Video encoding:	MediaConverter		Codare video:
 No audio	Audio codecs list		Fără audio
@@ -9,7 +9,6 @@ Open…	Menu		Deschide...
 Start [ms]: 	MediaConverter		Start [ms]:
 Output file '%filename' created	MediaConverter		Fișierul de ieșire „%filename” a fost creat
 Output format	MediaConverter		Format de ieșire
-%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld cadre
 End   [ms]: 	MediaConverter		Final  [ms]:
 MediaConverter	System name		ConvertorMedia
 No video	Video codecs list		Fără video
@@ -22,7 +21,6 @@ Audio:	MediaConverter-FileInfo		Audio:
 OK	MediaConverter-FileInfo		OK
 Source files	MediaConverter		Fișiere sursă
 Cancelling	MediaConverter		Se anulează
-%d byte 	MediaFileInfo		%d octet
 Error loading files	MediaConverter		Eroare la încărcarea fișierelor
 Cancel	MediaConverter		Anulează
 None available	Video codecs		Nimic disponibil
@@ -32,7 +30,6 @@ Select this folder	MediaConverter		Selectează acest dosar
 Continue	MediaConverter		Continuă
 Encoder parameters	MediaConverter-EncoderWindow		Parametri de codor
 Video:	MediaConverter-FileInfo		Video:
-%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld cadre
 %d bit 	MediaFileInfo		%d bit
 Error creating '%filename'	MediaConverter		Eroare la crearea „%filename”
 Video quality not supported	MediaConverter		Calitate video nesuportată
@@ -45,10 +42,8 @@ Preview	MediaConverter		Previzualizare
 File format:	MediaConverter		Format fișier:
 None available	Audio codecs		Nimic disponibil
 MediaConverter+:SaveDirectory	MediaConverter		ConvertorMedia+:DosarSalvare
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canal / %lld cadre
 Error launching: %strError%	MediaConverter		Eroare la lansare: %strError%
 High	MediaConverter		Sus
-The file was not recognized as a supported media file:	MediaConverter		Fișierul nu a fost recunoscut ca un fișier media suportat:
 Drop media files onto this window	MediaConverter		Plasează fișiere media în această fereastră
 Audio encoding:	MediaConverter		Codare audio:
 Audio quality not supported	MediaConverter		Calitate audio nesuportată
@@ -59,5 +54,3 @@ Video quality: %3d%%	MediaConverter		Calitate video: %3d%%
 Output folder	MediaConverter		Dosar de ieșire
 Audio quality: %3d%%	MediaConverter		Calitate audio: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		A apărut o eroare la citirea informațiilor despre fișier.\n\nEroare:
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles fișiere nu au fost recunoscute ca fișiere media suportate:
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld cadre

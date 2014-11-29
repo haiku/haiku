@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Screen	2033930135
+1	portuguese (brazil)	x-vnd.Haiku-Screen	1388881963
 yes	Screen		sim
 Use laptop panel:	Screen		Usar o painel do laptop:
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 cores
@@ -35,7 +35,6 @@ horizontally	Screen		horizontalmente
 Other…	Screen		Outro...
 Cancel	Screen		Cancelar
 bits/pixel	Screen		bits/pixel
-Settings will revert in %seconds seconds.	Screen		As configurações serão revertidas em %seconds segundos.
 Refresh rate:	Screen		Taxa de atualizão:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Você deseja manter essas configurações?

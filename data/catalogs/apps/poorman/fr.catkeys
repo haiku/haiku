@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PoorMan	2059301223
+1	french	x-vnd.Haiku-PoorMan	1347438411
 Website location	PoorMan		Emplacement du site Web
 Error Server	PoorMan		Erreur du serveur
 Settings…	PoorMan		Réglages…
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Créer un journal pour PoorMan
 Shutting down.\n	PoorMan		Éteindre.\n
 Hits: %lu	PoorMan		Sollicitations : %lu
 Web folder:	PoorMan		Dossier Web :
-Default	PoorMan		Par défaut
 Save log console selection	PoorMan		Sauvegarder la sélection de la console de journalisation
 Run server	PoorMan		Mettre le serveur en fonction
 PoorMan settings	PoorMan		Réglages de PoorMan

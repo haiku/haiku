@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-ShowImage	4011843330
+1	hindi	x-vnd.Haiku-ShowImage	466377502
 Use as background…	Menus		पृष्ठभूमि के रूप में प्रयोग करें...
 File	Menus		फ़ाइल
 Slide delay	Menus		स्लाइड मे देरी
@@ -21,7 +21,6 @@ Edit	Menus		संपादित करें
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		छवि लोड नहीं की जा सकी! इसके लिए या तो फ़ाइल या छवि अनुवादक मौजूद नहीं है.
 First page	Menus		प्रथम पृष्ठ
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		दस्तावेज़ '%s' (पृष्ठ %d) बदल दिया गया है. क्या आप दस्तावेज़ को बंद करना चाहते हैं?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS सेकंड्स
 Leave full screen	Menus		फूल स्क्रीन को छोड़ें
 Close	Menus		बंद करें
 Close	ClosePrompt		बंद करें

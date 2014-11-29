@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	28048799
+1	finnish	x-vnd.haiku-icon_o_matic	1929083132
 Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add Style	Icon-O-Matic-AddStylesCmd		Lisää tyyli
 Color (#%02x%02x%02x)	Style name after dropping a color		Väri (#%02x%02x%02x)
@@ -106,7 +106,6 @@ Unassign Path	Icon-O-Matic-UnassignPathCmd		Liittämätön polku
 load error	Icon-O-Matic-SVGImport		lataa virhe
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Siirrä hahmoja
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Poista tyylejä
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Teksti, jota yrität tuoda, on aika pitkä. Oletko varma?
 Add	Icon-O-Matic-TransformersList		Lisää
 Color	Icon-O-Matic-StyleTypes		Väri
 Settings…	Icon-O-Matic-SavePanel		Asetukset...
@@ -169,7 +168,6 @@ Caps	Icon-O-Matic-PropertyNames		Isot kirjaimet
 Transform	Icon-O-Matic-PathManipulator		Muunna
 Add Paths	Icon-O-Matic-AddPathsCmd		Lisää polut
 Style type	Icon-O-Matic-StyleTypes		Tyylityyppi
-too big	Icon-O-Matic-StyledTextImport		liian iso
 Assign Style	Icon-O-Matic-AssignStyleCmd		Lisää tyyli
 Add Path	Icon-O-Matic-AddPathsCmd		Lisää polku
 Color	Icon-O-Matic-PropertyNames		Väri

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-WebPositive	3528881455
+1	english	x-vnd.Haiku-WebPositive	3378116449
 Show home button	Settings Window		显示 home 按钮
 Username:	Authentication Panel		用户名：
 Copy URL to clipboard	Download Window		复制 URL 到剪贴板
@@ -19,7 +19,6 @@ Paste	WebPositive Window		粘贴
 Double-click or middle-click to open new tab.	Tab Manager		双击或者单击中键以打开新标签。
 Proxy username:	Settings Window		代理服务器 用户名：
 Settings	Settings Window		设置
-%seconds seconds left	Download Window		剩余 %seconds 秒
 Confirmation	WebPositive Window		确认
 Window	WebPositive Window		窗口
 Decrease size	WebPositive Window		缩小
@@ -31,7 +30,6 @@ Next	WebPositive Window		下一页
 Find next	WebPositive Window		查找下一个
 Download folder:	Settings Window		下载目录：
 Edit	WebPositive Window		编辑
-Over %hours hours left	Download Window		剩余 %hours 小时
 Cancel	Authentication Panel		取消
 Match case	WebPositive Window		匹配条件
 Search page:	Settings Window		搜索页面：
@@ -39,7 +37,6 @@ Zoom text only	WebPositive Window		仅缩放文本
 Default fixed font size:	Settings Window		默认等宽字体大小：
 Close tab	WebPositive Window		关闭标签页
 Auto-hide mouse pointer	Settings Window		自动隐藏鼠标焦点
-Over 1 hour left	Download Window		剩余 1 个小时
 Quit	WebPositive Window		退出
 Full screen	WebPositive Window		全屏
 Open download error	Download Window		打开下载出错
@@ -53,7 +50,6 @@ Open	Download Window		打开
 Reload	WebPositive Window		重载页面
 Downloads	Download Window		下载
 Sans serif font:	Settings Window		无衬线字体：
-Over %days days left	Download Window		剩余 %days 天
 Forward	WebPositive Window		前一页
 of	Download Window	...as in '12kB of 256kB'	 全部
 Revert	Settings Window		恢复
@@ -69,7 +65,6 @@ Reset size	WebPositive Window		重设大小
 Find:	WebPositive Window		查找：
 Increase size	WebPositive Window		放大
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	检索书签目录出错。\n错误：%error
-Over 1 day left	Download Window		剩余 1 天
 Downloads	WebPositive Window		下载
 Requesting %url	WebPositive Window		请求 %url
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	查找搜索项出现的下个位置
@@ -99,7 +94,6 @@ Script console	WebPositive Window		脚本控制台
 Proxy server address:	Settings Window		代理服务器地址：
 Proxy server port:	Settings Window		代理服务器端口：
 Bookmarks	WebPositive Window		书签
-%minutes minutes	Download Window		%minutes 分
 Paste	URL Bar		粘贴
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		隐藏密码文本
@@ -114,7 +108,6 @@ Password:	Authentication Panel		密码：
 Back	WebPositive Window		后退
 New browser window	Download Window		新建浏览窗口
 Today	WebPositive Window		今天
-1 second left	Download Window		剩余 1 秒
 Remember username and password for this site	Authentication Panel		记住本站点的用户名和密码
 Earlier	WebPositive Window		早期
 Authentication required	Authentication Panel		需要身份验证

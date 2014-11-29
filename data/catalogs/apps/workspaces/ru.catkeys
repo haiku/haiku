@@ -1,10 +1,9 @@
-1	russian	x-vnd.Be-WORK	658966565
+1	russian	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		Неверный аргумент: %s\n
 Quit	Workspaces		Выход
 Workspaces	System name		Рабочие столы
 Change workspace count…	Workspaces		Изменить количество столов…
 Remove replicant	Workspaces		Удалить репликант
-About Workspaces…	Workspaces		О программе…
 Show window border	Workspaces		Показывать рамку окна
 Auto-raise	Workspaces		Всплывать при наведении
 Always on top	Workspaces		Всегда сверху

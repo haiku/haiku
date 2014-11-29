@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	761086471
+1	belarusian	x-vnd.Haiku-Terminal	902912385
 Not found.	Terminal TermWindow		Не знойдзена.
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Change directory	Terminal TermView		Змяніць дырэкторыю
@@ -30,7 +30,6 @@ Custom	Terminal colors scheme		Спецыяльнае
 Cancel	Terminal SetTitleWindow		Адмена
 Increase	Terminal TermWindow		Павялічыць
 Settings	Terminal TermWindow		Наладкі
-Window size	Terminal TermWindow		Памер вакна
 Selected text	Terminal AppearancePrefView		Выбраны тэкст
 Find	Terminal FindWindow		Шукаць
 Appearance	Terminal PrefWindow		Знешні выгляд

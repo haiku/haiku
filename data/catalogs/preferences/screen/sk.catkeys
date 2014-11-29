@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Screen	2033930135
+1	slovak	x-vnd.Haiku-Screen	1388881963
 yes	Screen		áno
 Use laptop panel:	Screen		Použiť panel noteboku:
 15 bits/pixel, 32768 colors	Screen		15 bitov/pixel, 32768 farieb
@@ -35,7 +35,6 @@ horizontally	Screen		vodorovne
 Other…	Screen		Iné…
 Cancel	Screen		Zrušiť
 bits/pixel	Screen		bitov/pixel
-Settings will revert in %seconds seconds.	Screen		Nastavenia sa vrátia späť o %seconds sekúnd.
 Refresh rate:	Screen		Obnovovacia frekvencia:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Chcete tieto nastavenia zachovať?

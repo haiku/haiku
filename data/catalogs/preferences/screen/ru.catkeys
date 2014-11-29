@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Screen	2033930135
+1	russian	x-vnd.Haiku-Screen	1388881963
 yes	Screen		да
 Use laptop panel:	Screen		Использовать экран ноутбука:
 15 bits/pixel, 32768 colors	Screen		15 бит на пиксель, 32768 цветов
@@ -35,7 +35,6 @@ horizontally	Screen		горизонтально
 Other…	Screen		Другая…
 Cancel	Screen		Отмена
 bits/pixel	Screen		бита на пиксель
-Settings will revert in %seconds seconds.	Screen		Настройки будут отменены через %seconds секунд.
 Refresh rate:	Screen		Частота обновления:
 Hz	Screen		Гц
 Do you wish to keep these settings?	Screen		Вы хотите сохранить эти настройки?

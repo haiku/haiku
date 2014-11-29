@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PoorMan	2059301223
+1	finnish	x-vnd.Haiku-PoorMan	1347438411
 Website location	PoorMan		Webbisivusijainti
 Error Server	PoorMan		Virhepalvelin
 Settings…	PoorMan		Asetukset...
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Luo Köyhisloki
 Shutting down.\n	PoorMan		Lopetetaan.\n
 Hits: %lu	PoorMan		Osumia: %lu
 Web folder:	PoorMan		Webbikansio:
-Default	PoorMan		Oletus
 Save log console selection	PoorMan		Tallenna lokikonsolivalinta
 Run server	PoorMan		Käynnistä palvelin
 PoorMan settings	PoorMan		Köyhisasetukset

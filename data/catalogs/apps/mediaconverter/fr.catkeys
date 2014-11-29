@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaConverter	2722282283
+1	french	x-vnd.Haiku-MediaConverter	217152063
 Video using parameters form settings	MediaConverter		La vidéo utilise les paramètres de réglages
 Video encoding:	MediaConverter		Encodage vidéo :
 Error read audio frame %lld	MediaConverter		Erreur de lecture de l'échantillon audio %lld
@@ -11,7 +11,6 @@ Open…	Menu		Ouvrir…
 Start [ms]: 	MediaConverter		Début [ms] : 
 Output file '%filename' created	MediaConverter		Le fichier cible « %filename » a été créé
 Output format	MediaConverter		Format de sortie
-%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stéréo / %Ld échantillons
 End   [ms]: 	MediaConverter		Fin [ms] : 
 MediaConverter	System name		MédiaConvertisseur
 No video	Video codecs list		Pas de vidéo
@@ -27,7 +26,6 @@ Source files	MediaConverter		Fichiers sources
 Error writing video frame %lld	MediaConverter		Erreur d'écriture de la trame vidéo %lld
 Error writing audio frame %lld	MediaConverter		Erreur d'écriture de l'échantillon audio %lld
 Cancelling	MediaConverter		Annulation
-%d byte 	MediaFileInfo		%d octets 
 Error loading files	MediaConverter		Erreur de chargement des fichiers
 Cancel	MediaConverter		Annuler
 None available	Video codecs		Aucun disponible
@@ -37,7 +35,6 @@ Select this folder	MediaConverter		Sélectionner ce dossier
 Continue	MediaConverter		Continuer
 Encoder parameters	MediaConverter-EncoderWindow		Paramètres d'encodage
 Video:	MediaConverter-FileInfo		Vidéo :
-%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2fips / %Ld images
 %d bit 	MediaFileInfo		%d bits 
 Error creating '%filename'	MediaConverter		Erreur à la création de « %filename »
 Video quality not supported	MediaConverter		Qualité vidéo non prise en charge
@@ -50,10 +47,8 @@ Preview	MediaConverter		Aperçu
 File format:	MediaConverter		Format de fichier :
 None available	Audio codecs		Aucun disponible
 MediaConverter+:SaveDirectory	MediaConverter		MédiaConvertisseur+ : Dossier d'enregistrement
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canaux / %Ld échantillons
 Error launching: %strError%	MediaConverter		Erreur de lancement : %strError%
 High	MediaConverter		Haute
-The file was not recognized as a supported media file:	MediaConverter		Le fichier n'a pas été reconnu comme un média pris en charge :
 Drop media files onto this window	MediaConverter		Déposez les médias à convertir dans cette fenêtre
 Audio encoding:	MediaConverter		Encodage audio :
 Audio quality not supported	MediaConverter		Qualité audio non prise en charge
@@ -64,5 +59,3 @@ Video quality: %3d%%	MediaConverter		Qualité vidéo : %3d%%
 Output folder	MediaConverter		Dossier de sortie
 Audio quality: %3d%%	MediaConverter		Qualité audio : %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Une erreur est survenue lors de la lecture des informations du fichier.\n\nErreur : 
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles fichiers ne sont pas des médias reconnus pour être pris en charge :
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %Ld échantillons

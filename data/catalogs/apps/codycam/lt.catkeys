@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-CodyCam	2589421346
+1	lithuanian	x-vnd.Haiku-CodyCam	689799633
 Capturing Image…	VideoConsumer.cpp		Fotografuojama…
 Every 30 seconds	CodyCam		30 sekundžių
 File name:	CodyCam		Failo vardas:
@@ -32,7 +32,6 @@ Output	CodyCam		Paskirtis
 Every 15 minutes	CodyCam		15 minučių
 Cannot find an available video stream	CodyCam		Nepavyko rasti laisvo vaizdo srauto
 Can't find an available connection to the video window	CodyCam		Nepavyko rasti laisvos jungties prie vaizdo lango
-Transmitting…	VideoConsumer.cpp		Siunčiama…
 Cannot get a time source	CodyCam		Nepavyko gauti laikmačio
 Every 8 hours	CodyCam		8 valandos
 Rename failed	VideoConsumer.cpp		Nepavyko pervardinti
@@ -82,7 +81,6 @@ password expected	CodyCam		reikalingas slaptažodis
 reply: %d, %d\n	FtpClient		atsakas: %d, %d\n
 Every 4 hours	CodyCam		4 valandos
 FTP	CodyCam		FTP
-File transmission failed	VideoConsumer.cpp		Failų perdavimas nepavyko
 Cannot seek time source!	CodyCam		Laikmačio pervynioti negalima!
 File	CodyCam		Failas
 Image Format Menu	CodyCam		Paveikslo formato meniu

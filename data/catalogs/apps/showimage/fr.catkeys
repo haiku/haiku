@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	4121021813
+1	french	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Utiliser comme fond d'écran…
 File	Menus		Fichier
 Slide delay	Menus		Délai de diaporama
@@ -21,7 +21,6 @@ Edit	Menus		Editer
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L'image n'a pas pu être lue ! Le fichier ou son traducteur n'existe pas.
 First page	Menus		Première page
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » (page %d) a changé. Voulez-vous fermer le document ?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS secondes
 Leave full screen	Menus		Sortie du plein écran
 Close	Menus		Fermer
 Close	ClosePrompt		Fermer

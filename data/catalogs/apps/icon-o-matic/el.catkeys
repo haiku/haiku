@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	984880419
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	2885914752
 Select All	Icon-O-Matic-PathManipulator		Επιλογή όλων
 Add Style	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
 Color (#%02x%02x%02x)	Style name after dropping a color		Χρώμα (#%02x%02x%02x)
@@ -102,7 +102,6 @@ Unassign Path	Icon-O-Matic-UnassignPathCmd		Αφαίρεση μονοπατιο�
 load error	Icon-O-Matic-SVGImport		σφάλμα φόρτωσης
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Μετακίνηση Σχημάτων
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Αφαίρεση Στυλ
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Το κείμενο που προσπαθείτε να εισάγετε είναι αρκετά μεγάλο, είστε σίγουρος;
 Add	Icon-O-Matic-TransformersList		Προσθήκη
 Color	Icon-O-Matic-StyleTypes		Χρώμα
 Settings…	Icon-O-Matic-SavePanel		Ρυθμίσεις...
@@ -164,7 +163,6 @@ Caps	Icon-O-Matic-PropertyNames		Caps
 Transform	Icon-O-Matic-PathManipulator		Μεταμόρφωση
 Add Paths	Icon-O-Matic-AddPathsCmd		Προσθήκη Μονοπατιών
 Style type	Icon-O-Matic-StyleTypes		Τύπος στύλ
-too big	Icon-O-Matic-StyledTextImport		τόσο μεγάλο
 Assign Style	Icon-O-Matic-AssignStyleCmd		Αντιστοίχιση Στυλ
 Add Path	Icon-O-Matic-AddPathsCmd		Προσθήκη Μονοπατιού
 Color	Icon-O-Matic-PropertyNames		Χρώμα

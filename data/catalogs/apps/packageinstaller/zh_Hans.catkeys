@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PackageInstaller	2033288398
+1	english	x-vnd.Haiku-PackageInstaller	199496416
 Install to:	PackageView		安装到：
 OK	PackageView		确认
 Accept	PackageTextViewer		接受
@@ -23,7 +23,6 @@ Install %name%	PackageView		安装 %name%
 Stop	PackageStatus		停止
 Other…	PackageView		其他...
 No installation type selected	PackageView		未选中安装类型
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		'%s' 符号连接已经存在于给定路径。\n是替换为包中的链接，还是跳过？
 Installing files and folders	PackageInstall		安装文件和目录
 Package installer	PackageView		包安装器
 Skip all	PackageView		跳过所有

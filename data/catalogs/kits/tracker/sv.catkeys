@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2070021838
+1	swedish	x-vnd.Haiku-libtracker	679062638
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Tillägg
 Desktop	Model		Skrivbord
@@ -102,7 +102,6 @@ Show space bars on volumes	SettingsView		Visa ledigt utrymme på volymer
 Invert selection	ContainerWindow		Invertera markering
 Increase size	DeskWindow		Öka storleken
 Resize to fit	ContainerWindow		Anpassa storleken
-%Ld bytes	WidgetAttributeText		%Ld byte
 Add printer…	ContainerWindow		Lägg till skrivare...
 New folder	ContainerWindow		Ny mapp
 Kind	ContainerWindow		Sort
@@ -287,7 +286,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	flytta
 Show Disks icon	SettingsView		Visa ikonen Volymer
 Cancel	PoseView		Avbryt
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld byte,
 You can't move or copy items to read-only volumes.	FSUtils		Du kan inte flytta eller kopiera saker till skrivskyddade volymer.
 Unknown	FilePermissionsView		Okänd
 All files and folders	FindPanel		Alla filer och mappar

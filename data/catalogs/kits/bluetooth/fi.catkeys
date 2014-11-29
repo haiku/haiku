@@ -32,7 +32,7 @@ Audio/Video	DeviceClass		Ääni/video
 Glasses	DeviceClass		Silmälasit
 Keyboard	DeviceClass		Näppäimistö
 Camera	DeviceClass		Kamera
-Major class: 	DeviceClass		Major-luokka:
+Major class: 	DeviceClass		Major-luokka: 
 50-67% utilized	DeviceClass		50-67% käytetty hyödyksi
 Card reader	DeviceClass		Kortinlukija
 Set-top box	DeviceClass		Digisovitin
@@ -43,7 +43,7 @@ SIM card reader	DeviceClass		SIM-korttilukija
 Headphones	DeviceClass		Korvakuulokkeet
 Information	DeviceClass		Tiedot
 Remote control	DeviceClass		Kauko-ohjain
-Service classes: 	DeviceClass		Palveluluokat:
+Service classes: 	DeviceClass		Palveluluokat: 
 Pager	DeviceClass	A small radio device to receive short text messages	Hakulaite
 Object transfer	DeviceClass		Objektisiirto
 Gaming/Toy	DeviceClass		Peli/Lelu
@@ -55,7 +55,7 @@ Loudspeaker	DeviceClass		Kaiutin
 Joystick	DeviceClass		Sauvaohjain
 LAN access	DeviceClass		LAN-liittymä
 Wrist watch	DeviceClass		Rannekello
-Minor class: 	DeviceClass		Minor-luokka:
+Minor class: 	DeviceClass		Minor-luokka: 
 Networking	DeviceClass		Verkkotyöskentely
 Portable audio	DeviceClass		Matkaradio
 Device conforms to the headset profile	DeviceClass		Laite on yhteensopiva kuulokeprofiilin kanssa
@@ -68,7 +68,7 @@ Peripheral	DeviceClass		Oheislaite
 #NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Ei ole kelvollinen nimi
 Wired modem or voice gateway	DeviceClass		Lankamodeemi tai ääniyhdyskäytävä
 Jacket	DeviceClass		Takki
-Unspecified	DeviceClass		Yksilöimätön
+Unspecified	DeviceClass		Määrittelemätön
 Fully available	DeviceClass		Täysin käytettävissä oleva
 67-83% utilized	DeviceClass		67-83% käytetty hyödyksi
 Not implemented	RemoteDevice		Ei ole toteutettu

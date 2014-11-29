@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-WebPositive	2880796666
+1	belarusian	x-vnd.Haiku-WebPositive	2730031660
 Show home button	Settings Window		Паказваць кнопку "Дадому"
 Username:	Authentication Panel		Карыстальнік:
 Copy URL to clipboard	Download Window		Скапіяваць спасылку
@@ -19,7 +19,6 @@ Paste	WebPositive Window		Уставіць
 Double-click or middle-click to open new tab.	Tab Manager		Скарыстайце сярэдню кнопку ці падвойны клік каб адкрыць новы таб.
 Proxy username:	Settings Window		Імя карыстальніка проксі:
 Settings	Settings Window		Наладкі
-%seconds seconds left	Download Window		Засталося %seconds секунд
 Confirmation	WebPositive Window		Пацверджанне
 Window	WebPositive Window		Вакно
 Decrease size	WebPositive Window		Паменшыць памер
@@ -30,7 +29,6 @@ Next	WebPositive Window		Наступны
 Find next	WebPositive Window		Шукаць наступнае
 Download folder:	Settings Window		Папка спамповак:
 Edit	WebPositive Window		Рэдагаваць
-Over %hours hours left	Download Window		Засталося %hours гадзін
 Cancel	Authentication Panel		Скасаваць
 Match case	WebPositive Window		Улічваць рэгістр
 Search page:	Settings Window		Старонка пошуку:
@@ -38,7 +36,6 @@ Zoom text only	WebPositive Window		Масштабаваць толькі тэк�
 Default fixed font size:	Settings Window		Дапомны памер роўнашырокага шрыфту:
 Close tab	WebPositive Window		Зачыніць укладку
 Auto-hide mouse pointer	Settings Window		Аўтаматычна хаваць курсор мышы
-Over 1 hour left	Download Window		Засталося болей за 1 гадзіну
 Quit	WebPositive Window		Выйсці
 Full screen	WebPositive Window		Поўнаэкранны рэжым
 Open download error	Download Window		Немагчыма адкрыць спампаваны файл
@@ -52,7 +49,6 @@ Open	Download Window		Адчыніць
 Reload	WebPositive Window		Перазагрузіць
 Downloads	Download Window		Запампоўкі
 Sans serif font:	Settings Window		Шрыфт Sans serif:
-Over %days days left	Download Window		Засталося болей за %days дзён
 Forward	WebPositive Window		Наперад
 of	Download Window	...as in '12kB of 256kB'	з
 Revert	Settings Window		Адвярнуць
@@ -68,7 +64,6 @@ Reset size	WebPositive Window		Вярнуць памер
 Find:	WebPositive Window		Шукаць:
 Increase size	WebPositive Window		Павялічыць памер
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Памылка чытання папкі з закладкамі.\n\nПамылка: %error
-Over 1 day left	Download Window		Засталося болей 1 дня
 Downloads	WebPositive Window		Спампоўкі
 Requesting %url	WebPositive Window		Запыт да %url
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Знайсці наступны выпадак таго, што шукаеце
@@ -98,7 +93,6 @@ Script console	WebPositive Window		Кансоль сцэнароў
 Proxy server address:	Settings Window		Адрэс проксі-сэрвера:
 Proxy server port:	Settings Window		Порт проксі-сэрвера:
 Bookmarks	WebPositive Window		Закладкі
-%minutes minutes	Download Window		%minutes хвілін
 Paste	URL Bar		Уставіць
 /s)	Download Window	...as in 'per second'	/с)
 Hide password text	Authentication Panel		Схаваць тэкст паролю
@@ -113,7 +107,6 @@ Password:	Authentication Panel		Пароль:
 Back	WebPositive Window		Назад
 New browser window	Download Window		Новае вакно
 Today	WebPositive Window		Сёння
-1 second left	Download Window		засталася 1 сэкунда
 Remember username and password for this site	Authentication Panel		Запамятаваць імя карыстальніка і пароль для гэтага сайта
 Earlier	WebPositive Window		Раней
 Authentication required	Authentication Panel		Патрабуецца аўтарызацыя

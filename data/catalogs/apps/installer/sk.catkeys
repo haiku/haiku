@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Installer	3930183175
+1	slovak	x-vnd.Haiku-Installer	528139900
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ste si istí, že chcete zrušiť inštaláciu a reštartovať systém?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Inštalátor\n\tnapísal Jérôme Duval a Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -89,7 +89,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Nie sú dostupné žiadne voliteľné balíky.
 All hard disks start with \"hd\".\n	InstallerApp		Všetky pevné disky začínajú „hd“.\n
 Continue	InstallerApp		Pokračovať
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Správca zavádzania (aplikácia na nastavenie zavádzacieho menu Haiku) sa nedal spustiť.
 Boot sector not written because of an internal error.	InstallProgress		Zavádzací sektor nebol zapísaný z dôvodu vnútornej chyby.
 Additional disk space required: %s	InstallerWindow		Je potrebných ešte %s miesta.
 Cancel	InstallProgress		Zrušiť

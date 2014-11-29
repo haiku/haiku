@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Terminal	2417000789
+1	lithuanian	x-vnd.Haiku-Terminal	2558826703
 Not found.	Terminal TermWindow		Nerasta.
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Change directory	Terminal TermView		Keisti aplanką
@@ -30,7 +30,6 @@ Custom	Terminal colors scheme		Pasirinktinė
 Cancel	Terminal SetTitleWindow		Atsisakyti
 Increase	Terminal TermWindow		Padidinti
 Settings	Terminal TermWindow		Nuostatos
-Window size	Terminal TermWindow		Lango dydis
 Selected text	Terminal AppearancePrefView		Pažymėto teksto
 Find	Terminal FindWindow		Ieškoti
 Appearance	Terminal PrefWindow		Išvaizda

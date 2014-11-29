@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	4011843330
+1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	466377502
 Use as background…	Menus		Ορισμός ως φόντου επιφάνειας εργασίας...
 File	Menus		Αρχείο
 Slide delay	Menus		Καθυστέρηση παρουσίασης
@@ -21,7 +21,6 @@ Edit	Menus		Επεξεργασία
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Δεν ήταν δυνατή η φόρτωση της εικόνας! Είτε το αρχείο ή ο μεταφραστής εικόνας δεν υπάρχει.
 First page	Menus		Πρώτη σελίδα
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' (σελίδα %d) έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS δευτερόλεπτα
 Leave full screen	Menus		Εγκατάλειψη πλήρους οθόνης
 Close	Menus		Κλείσιμο
 Close	ClosePrompt		Κλείσιμο

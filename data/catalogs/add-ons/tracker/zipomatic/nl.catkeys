@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku.zip-o-matic	2241557251
+1	dutch; flemish	x-vnd.haiku.zip-o-matic	1573273374
 Stop	file:ZipOMaticWindow.cpp		Stop
 Creating archive: %s	file:ZipOMaticWindow.cpp		Creëert archief: %s
 Continue	file:ZipOMaticWindow.cpp		Doorgaan
@@ -11,6 +11,5 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		B
 Stopped	file:ZipOMaticWindow.cpp		Gestopt
 Archive	file:ZipperThread.cpp		Archief
 Error creating archive	file:ZipOMaticWindow.cpp		Fout bij creatie van archief
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Uw %ld Zip-O-Matic zijn actief.\n\n
 Archive created OK	file:ZipOMaticWindow.cpp		Creatie van archief gelukt
 Stop them	file:ZipOMatic.cpp		Stoppen

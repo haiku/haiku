@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-screenshot	913664967
+1	slovak	x-vnd.haiku-screenshot	4088965159
 seconds	ScreenshotWindow		sekúnd
 Desktop	ScreenshotWindow		Plocha
 Include window border	ScreenshotWindow		Vrátane okraja okna
@@ -10,7 +10,6 @@ Name:	ScreenshotWindow		Názov:
 Choose folder	ScreenshotWindow		Vyberte priečinok
 Save	ScreenshotWindow		Uložiť
 Overwrite	ScreenshotWindow		Prepísať
-Choose folder...	ScreenshotWindow		Vyberte priečinok...
 Please select	ScreenshotWindow		Prosím, vyberte
 Save as:	ScreenshotWindow		Uložiť ako:
 Copy to clipboard	ScreenshotWindow		Skopírovať do schránky

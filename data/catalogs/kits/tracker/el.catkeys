@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	345809404
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3249817500
 OK	WidgetAttributeText		Εντάξει
 Add-ons	FilePanelPriv		Πρόσθετα
 Desktop	Model		Επιφάνεια εργασίας
@@ -89,7 +89,6 @@ Show space bars on volumes	SettingsView		Εμφάνιση μπαρών διασ�
 Invert selection	ContainerWindow		Αντιστροφή επιλογής
 Increase size	DeskWindow		Αύξηση μεγέθους
 Resize to fit	ContainerWindow		Αλλαγή μεγέθους για να χωράει
-%Ld bytes	WidgetAttributeText		%Ld bytes
 Add printer…	ContainerWindow		Προσθήκη εκτυπωτή
 New folder	ContainerWindow		Νέος κατάλογος
 Kind	ContainerWindow		Είδος
@@ -267,7 +266,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	μετακίνηση
 Show Disks icon	SettingsView		Εμφάνιση εικονιδίου δίσκων
 Cancel	PoseView		Άκυρο
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld bytes, 
 You can't move or copy items to read-only volumes.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στοιχεία σε τόμους μόνο ανάγνωσης.
 Unknown	FilePermissionsView		Άγνωστο
 All files and folders	FindPanel		Όλα τα αρχεία και τους φακέλους

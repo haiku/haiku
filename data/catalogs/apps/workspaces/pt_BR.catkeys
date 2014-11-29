@@ -1,10 +1,9 @@
-1	portuguese (brazil)	x-vnd.Be-WORK	658966565
+1	portuguese (brazil)	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		Argumento inválido: %s\n
 Quit	Workspaces		Sair
 Workspaces	System name		Espaços de Trabalho
 Change workspace count…	Workspaces		Alterar o número de ambientes de trabalho...
 Remove replicant	Workspaces		Remover replicante
-About Workspaces…	Workspaces		Sobre o Ambiente de Trabalho
 Show window border	Workspaces		Mostrar a borda da janela
 Auto-raise	Workspaces		Auto-levantar
 Always on top	Workspaces		Sempre no topo

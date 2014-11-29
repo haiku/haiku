@@ -1,10 +1,9 @@
-1	swedish	x-vnd.Be-WORK	658966565
+1	swedish	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		Felaktigt argument: %s\n
 Quit	Workspaces		Avsluta
 Workspaces	System name		Arbetsytor
 Change workspace count…	Workspaces		Ändra antalet arbetsytor...
 Remove replicant	Workspaces		Ta bort replicant
-About Workspaces…	Workspaces		Om Arbetsytor
 Show window border	Workspaces		Visa fönsterkant
 Auto-raise	Workspaces		Höj upp automatiskt
 Always on top	Workspaces		Alltid överst

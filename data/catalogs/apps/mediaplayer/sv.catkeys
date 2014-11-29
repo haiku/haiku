@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	1727923642
+1	swedish	x-vnd.Haiku-MediaPlayer	3507634633
 raw audio	MediaPlayer-InfoWin		raw-ljud
 Location	MediaPlayer-InfoWin		Plats
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -31,7 +31,6 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Få/s�
 Display mode	MediaPlayer-InfoWin		Visningsläge
 Medium	MediaPlayer-SettingsWindow		Medium
 Close	MediaPlayer-PlaylistWindow		Stäng
-Stereo	MediaPlayer-InfoWin		Stereo
 Open…	MediaPlayer-PlaylistWindow		Öppna...
 Toggle mute.	MediaPlayer-Main		Aktivera tyst läge.
 Undo	MediaPlayer-PlaylistWindow		Ångra
@@ -56,7 +55,6 @@ Start playing.	MediaPlayer-Main		Starta uppspelning.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Det finns ingen avkodare installerad som kan hantera filformatet, eller så har avkodaren problem med filformatsversionen.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importera post
 Gets the URI of the currently playing item.	MediaPlayer-Main		Hämta URIn från uppspelande objekt.
-%d Channels	MediaPlayer-InfoWin		%d Kanaler
 400% scale	MediaPlayer-Main		Skala till 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Misslyckades att spara spellistan:\n\nFel:
 Move Entries	MediaPlayer-MovePLItemsCmd		Flytta poster
@@ -156,7 +154,6 @@ Always on top	MediaPlayer-Main		Alltid överst
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
 Save	MediaPlayer-Main		Spara
 <nothing to undo>	MediaPlayer-PlaylistWindow		<inget att ångra>
-Mono	MediaPlayer-InfoWin		Mono
 File info	MediaPlayer-InfoWin		Filinformation
 Save	MediaPlayer-PlaylistWindow		Spara
 %d Bit	MediaPlayer-InfoWin		%d Bit

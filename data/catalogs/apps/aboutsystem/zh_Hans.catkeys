@@ -1,6 +1,7 @@
-1	english	x-vnd.Haiku-About	843957219
+1	english	x-vnd.Haiku-About	4233939510
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		版权所有 © 1999-2010 Gutenprint 的所有编写者，保留所有权利。
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht（和他的 NewOS 内核）\n
+Ralink (firmware)	AboutWindow		Ralink(固件)
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		版权所有 © 2000 Jean-Pierre ervbefeL 与 Remi Lefebvre。
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		版权所有 © 1996-2005 Julian R Seward，保留所有权利。
 %d MiB total	AboutView		总计%d MiB
@@ -20,14 +21,21 @@ Kernel:	AboutView		内核：
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		版权所有 © 2001-2002 Thomas Broyer，Charlie Bozeman 与 Daniel Veillard，保留所有权利。
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		本软件部分享有版权。\n版权所有 © 1996-2006 FreeType 项目，保留所有权利。
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku 代码的版权属于 Haiku, Inc. ，或者代码中注明的相应作者。Haiku® 和 HAIKU 标志® 是 Haiku, Inc. 的注册商标。\n\n
+Marvell (firmware)	AboutWindow		Marvell (固件)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		版权所有 © 1987-1988 Digital Equipment Corporation，Maynard, Massachusetts。\n保留所有权利。
+GNU LGPL v2	AboutWindow		GNU LGPL v2
+The HaikuPorts team\n	AboutView		Haiku-Ports 小组\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		总计 %total MiB，禁用 %inaccessible MiB
+Intel (2xxx firmware)	AboutWindow		英特尔(2xxx 固件)
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		版权所有 © 2000-2007 Fabrice Bellard，及其他参与者。
 Contributors:\n	AboutView		贡献者：\n
 Unknown	AboutView		未知
 Copyright © 2001-2003 Expat maintainers.	AboutView		版权所有 © 2001-2003 Expat 维护人员。
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		版权所有 © 1999-2006 Brian Paul. Mesa3D 项目，保留所有权利。
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		版权所有 © 2002-2004 Vivek Mohan，保留所有权利。
+Public Domain	AboutWindow		Public Domain
+Intel (firmware)	AboutWindow		英特尔(固件)
+BSD (2-clause)	AboutWindow		BSD (2 条款)
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		内存状态：
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		版权所有 © 1996-1997 Jeff Prosise，保留所有权利。

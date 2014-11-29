@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	1273975508
+1	french	x-vnd.haiku-icon_o_matic	3175009841
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -98,7 +98,6 @@ Unassign Path	Icon-O-Matic-UnassignPathCmd		Révoquer le chemin
 load error	Icon-O-Matic-SVGImport		erreur de chargement
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Déplacer les formes
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Enlever les styles
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Vous essayez d'importer un texte plutôt long, êtes-vous sûr de vous ?
 Add	Icon-O-Matic-TransformersList		Ajouter
 Color	Icon-O-Matic-StyleTypes		Couleur
 Settings…	Icon-O-Matic-SavePanel		Réglages…
@@ -152,7 +151,6 @@ Edit	Icon-O-Matic-Menus		Éditer
 Duplicate	Icon-O-Matic-StylesList		Dupliquer
 Add Paths	Icon-O-Matic-AddPathsCmd		Ajouter les chemins
 Style type	Icon-O-Matic-StyleTypes		Type de style
-too big	Icon-O-Matic-StyledTextImport		trop grand
 Assign Style	Icon-O-Matic-AssignStyleCmd		Assigner un style
 Add Path	Icon-O-Matic-AddPathsCmd		Ajouter un chemin
 Color	Icon-O-Matic-PropertyNames		Couleur

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	1245259554
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	1387085468
 Not found.	Terminal TermWindow		Δε βρέθηκε.
 Switch Terminals	Terminal TermWindow		Εναλλαγή Τερματικών
 Change directory	Terminal TermView		Αλλαγή καταλόγου
@@ -25,7 +25,6 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Μη αναγνωρισ
 Cancel	Terminal SetTitleWindow		Ακύρωση
 Increase	Terminal TermWindow		Άυξηση
 Settings	Terminal TermWindow		Ρυθμίσεις
-Window size	Terminal TermWindow		Μέγεθος παράθυρου
 Selected text	Terminal AppearancePrefView		Επιλεγμένο Κείμενο
 Find	Terminal FindWindow		Εύρεση
 Appearance	Terminal PrefWindow		Εμφάνιση

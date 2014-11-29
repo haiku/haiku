@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PoorMan	2059301223
+1	hungarian	x-vnd.Haiku-PoorMan	1347438411
 Website location	PoorMan		Oldal helye
 Error Server	PoorMan		Hibakiszolgáló
 Settings…	PoorMan		Beállítások…
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		SzegényEmber napló készítése
 Shutting down.\n	PoorMan		Leállás.\n
 Hits: %lu	PoorMan		Kérések: %lu
 Web folder:	PoorMan		Mappa:
-Default	PoorMan		Alapértelmezett
 Save log console selection	PoorMan		Konzolbéli kijelölés mentése
 Run server	PoorMan		Kiszolgáló futtatása
 PoorMan settings	PoorMan		SzegényEmber beállításai

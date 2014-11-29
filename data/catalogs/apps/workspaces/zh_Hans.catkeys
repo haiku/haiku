@@ -1,10 +1,9 @@
-1	english	x-vnd.Be-WORK	658966565
+1	english	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		无效参数：%s\n
 Quit	Workspaces		退出
 Workspaces	System name		工作区
 Change workspace count…	Workspaces		修改工作区数量... 
 Remove replicant	Workspaces		删除replicant
-About Workspaces…	Workspaces		关于工作区... 
 Show window border	Workspaces		显示窗口边框
 Auto-raise	Workspaces		自动
 Always on top	Workspaces		置顶

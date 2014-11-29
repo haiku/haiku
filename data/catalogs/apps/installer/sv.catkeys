@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	3930183175
+1	swedish	x-vnd.Haiku-Installer	528139900
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installerare\n\tskriven av Jérôme Duval och Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -89,7 +89,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Inga installationspaket fanns att välja.
 All hard disks start with \"hd\".\n	InstallerApp		Alla hårdiskar startar med \"hd\".\n
 Continue	InstallerApp		Fortsätt
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		BootManager, applikationen för att configurera Haiku boot meny kunde inte startas.
 Boot sector not written because of an internal error.	InstallProgress		Gick inte att skriva till bootsektorn på grund av ett internt fel.
 Additional disk space required: %s	InstallerWindow		Ytterligare diskutrymme behövs: %s
 Cancel	InstallProgress		Avbryt

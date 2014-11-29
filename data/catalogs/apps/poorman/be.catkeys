@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-PoorMan	4008245771
+1	belarusian	x-vnd.Haiku-PoorMan	3296382959
 Website location	PoorMan		Месцазнаходжанне вэб-сайта
 Error Server	PoorMan		Сервер Памылак
 Settings…	PoorMan		Наладкі…
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Стварыць лог PoorMan
 Shutting down.\n	PoorMan		Выключэнне.\n
 Hits: %lu	PoorMan		Пераходы: %lu
 Web folder:	PoorMan		Вэб-каталог:
-Default	PoorMan		Прадвызначана
 Save log console selection	PoorMan		Захоўваць выдзяленні кансолі ў лог
 Run server	PoorMan		Запусціць сервер
 PoorMan settings	PoorMan		Наладкі PoorMan

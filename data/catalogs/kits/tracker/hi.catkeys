@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-libtracker	3083574692
+1	hindi	x-vnd.Haiku-libtracker	1692615492
 OK	WidgetAttributeText		ठीक है
 Add-ons	FilePanelPriv		अतिरिक्त जोड़ सकते हैं
 Desktop	Model		डेस्कटॉप
@@ -91,7 +91,6 @@ Show space bars on volumes	SettingsView		आवाज़ की तीव्र�
 Invert selection	ContainerWindow		चुनाव उलटो
 Increase size	DeskWindow		आकार बढ़ाएँ
 Resize to fit	ContainerWindow		फिट के अनुसार आकार बदलें
-%Ld bytes	WidgetAttributeText		%Ld बाइट्स
 Add printer…	ContainerWindow		प्रिंटर जोड़ें ...
 New folder	ContainerWindow		नया फ़ोल्डर
 Kind	ContainerWindow		प्रकार
@@ -268,7 +267,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	मूव
 Show Disks icon	SettingsView		डिस्क चिह्न दिखाएँ
 Cancel	PoseView		रद्द करें
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld बाइट्स,
 You can't move or copy items to read-only volumes.	FSUtils		आप केवल पढ़ने के लिए संस्करणों कॉपी या स्थानांतरित नहीं कर सकते हैं.
 Unknown	FilePermissionsView		अज्ञात
 All files and folders	FindPanel		सभी फ़ाइल या फ़ोल्डर

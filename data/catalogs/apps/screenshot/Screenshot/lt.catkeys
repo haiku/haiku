@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-screenshot	1483476245
+1	lithuanian	x-vnd.haiku-screenshot	363809141
 seconds	ScreenshotWindow		sek.
 Desktop	ScreenshotWindow		Darbalaukis
 Include window border	ScreenshotWindow		Įtraukti lango rėmelį
@@ -11,7 +11,6 @@ This file already exists.\n Are you sure you would like to overwrite it?	Screens
 Choose folder	ScreenshotWindow		Parinkite aplanką
 Save	ScreenshotWindow		Įrašyti
 Overwrite	ScreenshotWindow		Perrašyti
-Choose folder...	ScreenshotWindow		Rinktis aplanką…
 Please select	ScreenshotWindow		Pasirinkite
 Save as:	ScreenshotWindow		Failo formatas:
 Copy to clipboard	ScreenshotWindow		Kopijuoti į iškarpinę

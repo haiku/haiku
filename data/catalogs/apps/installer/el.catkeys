@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Installer	3881897432
+1	greek, modern (1453-)	x-vnd.Haiku-Installer	479854157
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Είστε σίγουρος πως θέλετε να ακυρώσετε την εγκατάσταση και να επανεκκινήσετε το σύστημα;
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Το Πρόγραμμα Εγκατάστασης\n\γράφτηκε από τους Jérôme Duval και Stephan Aßmus\n\tΠνευματικά δικαιώματα 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -87,7 +87,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Δεν υπάρχουν διαθέσιμα προαιρετικά πακέτα.
 All hard disks start with \"hd\".\n	InstallerApp		Όλοι οι δίσκοι ξεκινούν με  \"hd\".\n
 Continue	InstallerApp		Συνέχεια
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Το BootManager, η εφαρμογή για τη ρύθμιση του μενού εκκίνησης του Haiku δε μπόρεσε να εκτελεστεί.
 Boot sector not written because of an internal error.	InstallProgress		Ο τομέας εκκίνησης δεν γράφτηκε λόγο ενός εσωτερικού σφάλματος.
 Additional disk space required: %s	InstallerWindow		Επιπλέον χώρος δίσκου που απαιτείται: %s
 Cancel	InstallProgress		Άκυρο

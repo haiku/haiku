@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	1635947123
+1	german	x-vnd.Haiku-Terminal	1777773037
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -31,7 +31,6 @@ Encoding:	Terminal AppearancePrefView		Zeichenkodierung:
 Cancel	Terminal SetTitleWindow		Abbrechen
 Increase	Terminal TermWindow		Vergrößern
 Settings	Terminal TermWindow		Einstellungen
-Window size	Terminal TermWindow		Fenstergröße
 Selected text	Terminal AppearancePrefView		Ausgewählter Text
 Find	Terminal FindWindow		Suchen
 Appearance	Terminal PrefWindow		Darstellung

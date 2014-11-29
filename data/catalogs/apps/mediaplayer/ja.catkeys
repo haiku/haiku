@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	1727923642
+1	japanese	x-vnd.Haiku-MediaPlayer	3507634633
 raw audio	MediaPlayer-InfoWin		raw オーディオ
 Location	MediaPlayer-InfoWin		場所
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
@@ -31,7 +31,6 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		現在
 Display mode	MediaPlayer-InfoWin		表示モード
 Medium	MediaPlayer-SettingsWindow		中
 Close	MediaPlayer-PlaylistWindow		閉じる
-Stereo	MediaPlayer-InfoWin		ステレオ
 Open…	MediaPlayer-PlaylistWindow		開く…
 Toggle mute.	MediaPlayer-Main		ミュートのオン / オフ
 Undo	MediaPlayer-PlaylistWindow		元に戻す
@@ -56,7 +55,6 @@ Start playing.	MediaPlayer-Main		再生開始
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		ファイルフォーマットを扱うデコーダーがインストールされていません。または、デコーダーと特定のバージョンのフォーマットに問題があります。
 Import Entry	MediaPlayer-ImportPLItemsCmd		項目をインポート
 Gets the URI of the currently playing item.	MediaPlayer-Main		再生中項目の URI を取得します。
-%d Channels	MediaPlayer-InfoWin		%d チャンネル
 400% scale	MediaPlayer-Main		400% 表示
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました:\n\nエラー:
 Move Entries	MediaPlayer-MovePLItemsCmd		項目を移動
@@ -156,7 +154,6 @@ Always on top	MediaPlayer-Main		常に最前面
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱へ移動
 Save	MediaPlayer-Main		保存
 <nothing to undo>	MediaPlayer-PlaylistWindow		<元に戻すものがありません>
-Mono	MediaPlayer-InfoWin		モノラル
 File info	MediaPlayer-InfoWin		ファイル情報
 Save	MediaPlayer-PlaylistWindow		保存
 %d Bit	MediaPlayer-InfoWin		%d ビット

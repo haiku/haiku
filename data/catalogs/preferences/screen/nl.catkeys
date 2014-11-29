@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Screen	2033930135
+1	dutch; flemish	x-vnd.Haiku-Screen	1388881963
 yes	Screen		ja
 Use laptop panel:	Screen		Gebruik laptopscherm:
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 kleuren
@@ -35,7 +35,6 @@ horizontally	Screen		horizontaal
 Other…	Screen		Anders...
 Cancel	Screen		Annuleren
 bits/pixel	Screen		bits/pixel
-Settings will revert in %seconds seconds.	Screen		Terug naar instellingen na %seconds seconden.
 Refresh rate:	Screen		Verversingssnelheid:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Wilt u deze instellingen behouden?

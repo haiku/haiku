@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	1426425234
+1	german	x-vnd.Haiku-Installer	2319349255
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Soll die Installation tatsächlich abgebrochen und der Rechner neu gestartet werden?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tvon Jérôme Duval und Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -93,7 +93,6 @@ The target volume is not empty. Are you sure you want to install anyway?\n\nNote
 No optional packages available.	PackagesView		Keine optionalen Pakete verfügbar.
 All hard disks start with \"hd\".\n	InstallerApp		Alle Festplatten beginnen mit \"hd\".\n
 Continue	InstallerApp		Weiter
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		BootManager, die Anwendung um das Haiku Bootmenü zu konfigurieren, konnte nicht gestartet werden.
 Boot sector not written because of an internal error.	InstallProgress		Der Bootsektor konnte aufgrund eines internen Fehlers nicht geschrieben werden.
 Additional disk space required: %s	InstallerWindow		Zusätzlich benötigter Speicherplatz: %s
 Cancel	InstallProgress		Abbrechen

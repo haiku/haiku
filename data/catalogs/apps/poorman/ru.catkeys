@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PoorMan	2059301223
+1	russian	x-vnd.Haiku-PoorMan	1347438411
 Website location	PoorMan		Расположение сайта
 Error Server	PoorMan		Ошибка сервера
 Settings…	PoorMan		Настройки…
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Создать log PoorMan
 Shutting down.\n	PoorMan		Выключение.\n
 Hits: %lu	PoorMan		Посещений: %lu
 Web folder:	PoorMan		Веб-папка:
-Default	PoorMan		По умолчанию
 Save log console selection	PoorMan		Сохранить выделенную часть лога консоли
 Run server	PoorMan		Запустить сервер
 PoorMan settings	PoorMan		Настройки PoorMan

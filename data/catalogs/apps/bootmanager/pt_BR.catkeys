@@ -1,9 +1,8 @@
-1	portuguese (brazil)	x-vnd.Haiku-BootManager	2195645217
+1	portuguese (brazil)	x-vnd.Haiku-BootManager	3355843558
 The boot manager has been successfully installed on your system.	BootManagerController		O gerenciador de boot foi instalado com sucesso.
 After two seconds	DefaultPartitionPage		Após dois segundos
 Uninstall Boot Manager	UninstallPage	Title	Desinstalar Boot Manager
 At least one partition must be selected!	BootManagerController		Pelo menos uma partição precisa ser selecionada!
-The old Master Boot Record could not be saved to %s	BootManagerController		O Master Boot Record antigo não pode ser salvo em %s
 Restore MBR	BootManagerController	Button	Restaurar MBR
 Hard Drive	DrivesPage	Default disk name	Disco rígido
 USB Drive	DrivesPage	Default disk name	Drive USB
@@ -41,7 +40,6 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Desconhecido
 Update	DrivesPage	Button	Atualizar
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Por favor, localize o arquivo salvo do Master Boot Record (MBR) para restaurá-lo. Este é o arquivo criado quando o gerenciador de boot foi instalado pela primeira vez.
-Old Master Boot Record Saved failure	BootManagerController	Title	Falha no antigo Master Boot Record salvo
 Drives	DrivesPage	Title	Drives
 No space available!	DrivesPage	Cannot install	Sem espaço disponível!
 Never	DefaultPartitionPage		Nunca

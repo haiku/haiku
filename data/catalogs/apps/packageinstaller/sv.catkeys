@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PackageInstaller	2033288398
+1	swedish	x-vnd.Haiku-PackageInstaller	199496416
 Install to:	PackageView		Installera till:
 OK	PackageView		OK
 Accept	PackageTextViewer		Acceptera
@@ -23,7 +23,6 @@ Install %name%	PackageView		Installera %name%
 Stop	PackageStatus		Stoppa
 Other…	PackageView		Annan...
 No installation type selected	PackageView		Ingen installationstyp vald
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		En länk med namnet '%s' finns redan på det aktuella stället. Vill du ersätta den med en ur det här paketet, eller vill du hoppa över?
 Installing files and folders	PackageInstall		Installerar filer och mappar
 Package installer	PackageView		Paket intallerare
 Skip all	PackageView		Hoppa över alla

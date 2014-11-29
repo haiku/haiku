@@ -1,0 +1,17 @@
+1	hungarian	x-vnd.Haiku-keystore_server	2429996361
+This application hasn't been granted access before.	AppAccessRequestWindow		Az alkalmazás eddig nem rendelkezik hozzáféréssel.
+Unlock	KeyRequestWindow		Feloldás
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Az alkalmazás frissítve lett a legutóbbi hozzáférés-engedélyezés óta.
+Allow always	AppAccessRequestWindow		Engedélyezés mindig
+Application keyring access	AppAccessRequestWindow		Alkalmazás hozzáférés
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		az alábbi művelet végrehajtásához:\n%accessString%\n\n
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Az alkalmazás:\n%signature% (%path%)\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		Az alkalmazás még nem rendelkezik a szükséges jogosultságokkal
+Password:	KeyRequestWindow		Jelszó:
+Cancel	KeyRequestWindow		Mégse
+Keyring:	KeyRequestWindow		Kulcstartó:
+Unlock keyring	KeyRequestWindow		Kulcstartó feloldása
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Az alkalmazás hozzá szeretne férni a kulcstartóhoz, de az jelszóval védve van. Kérlek, add meg a jelszót a feloldáshoz.\nFeloldás után feloldott állapotban marad a rendszer újraindításáig illetve az újbóli lezárásig.\nHa megszakítod a feloldást (bezárod az ablakot), akkor zárolva marad.
+Allow once	AppAccessRequestWindow		Egyszer engedélyezem
+Disallow	AppAccessRequestWindow		Tiltás
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		hozzáférés kérése a kulcstartóhoz:\n%keyringName%\n\n

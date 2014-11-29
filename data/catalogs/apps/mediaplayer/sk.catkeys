@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	2969013755
+1	slovak	x-vnd.Haiku-MediaPlayer	453757450
 raw audio	MediaPlayer-InfoWin		nespracovaný zvuk
 Location	MediaPlayer-InfoWin		Umiestnenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (americký)
@@ -29,7 +29,6 @@ Track %d	MediaPlayer-Main		Stopa %d
 Display mode	MediaPlayer-InfoWin		Zobrazovací režim
 Medium	MediaPlayer-SettingsWindow		Stredná
 Close	MediaPlayer-PlaylistWindow		Zatvoriť
-Stereo	MediaPlayer-InfoWin		Stereo
 Open…	MediaPlayer-PlaylistWindow		Otvoriť…
 Toggle mute.	MediaPlayer-Main		Prepnúť stlmenie.
 Undo	MediaPlayer-PlaylistWindow		Vrátiť
@@ -54,7 +53,6 @@ Start playing.	MediaPlayer-Main		Spustiť prehrávanie.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Žiaden dekodér na prehranie tohto formátu nie je nainštalovaný alebo dekodér má problém s prehraním konkrétnej verzie formátu.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importovať položku
 Gets the URI of the currently playing item.	MediaPlayer-Main		Získa URI práve prehrávanej položky.
-%d Channels	MediaPlayer-InfoWin		%d kanálov
 400% scale	MediaPlayer-Main		400% zmena veľkosti
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ukladanie zoznamu stôp zlyhalo:\n\nChyba: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Presunúť položky
@@ -150,7 +148,6 @@ Always on top	MediaPlayer-Main		Vždy na vrchu
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstrániť položku do Koša
 Save	MediaPlayer-Main		Uložiť
 <nothing to undo>	MediaPlayer-PlaylistWindow		<niet čo vrátiť>
-Mono	MediaPlayer-InfoWin		Mono
 File info	MediaPlayer-InfoWin		Info o súbore
 Save	MediaPlayer-PlaylistWindow		Uložiť
 %d Bit	MediaPlayer-InfoWin		%d bitov

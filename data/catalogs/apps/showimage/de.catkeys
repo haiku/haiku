@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	4121021813
+1	german	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Als Hintergrund verwenden…
 File	Menus		Datei
 Slide delay	Menus		Verzögerung
@@ -21,7 +21,6 @@ Edit	Menus		Bearbeiten
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Das Bild konnte nicht geladen werden! Entweder die Datei selbst oder ein passender Translator existiert nicht.
 First page	Menus		Erste Seite
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Das Dokument '%s' (Seite %d) wurde verändert. Trotzdem schließen?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS Sekunden
 Leave full screen	Menus		Vollbild verlassen
 Close	Menus		Schließen
 Close	ClosePrompt		Schließen

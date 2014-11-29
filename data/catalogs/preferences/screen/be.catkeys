@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Screen	2033930135
+1	belarusian	x-vnd.Haiku-Screen	1388881963
 yes	Screen		так
 Use laptop panel:	Screen		Выкарыстаць панель лаптопа:
 15 bits/pixel, 32768 colors	Screen		15 бітаў на піксель, 32768 колераў
@@ -35,7 +35,6 @@ horizontally	Screen		гарызантальна
 Other…	Screen		Іншае…
 Cancel	Screen		Адмена
 bits/pixel	Screen		бітаў на піксель
-Settings will revert in %seconds seconds.	Screen		Наладкі вернуцца праз %seconds секунд.
 Refresh rate:	Screen		Частата абнаўлення:
 Hz	Screen		Гц
 Do you wish to keep these settings?	Screen		Жадаеце захаваць гэтыя наладкі?

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	3881897432
+1	romanian	x-vnd.Haiku-Installer	479854157
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Sigur doriți să anulați instalarea și să reporniți sistemul?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Program de instalare\n\tscris de Jérôme Duval și Stephan Aßmus\n\tDrepturi de autor 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -87,7 +87,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Niciun pachet opțional disponibil.
 All hard disks start with \"hd\".\n	InstallerApp		Toate hard discurile încep cu „hd”.\n
 Continue	InstallerApp		Continuă
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		AdministratorBoot, aplicația de configurare a meniului de pornire Haiku, nu a putut fi lansată.
 Boot sector not written because of an internal error.	InstallProgress		Sectorul de boot nu a fost scris din cauza unei erori interne.
 Additional disk space required: %s	InstallerWindow		Spațiu de disc adițional necesar: %s
 Cancel	InstallProgress		Anulează

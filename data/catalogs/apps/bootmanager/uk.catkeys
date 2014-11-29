@@ -1,9 +1,8 @@
-1	ukrainian	x-vnd.Haiku-BootManager	2195645217
+1	ukrainian	x-vnd.Haiku-BootManager	3355843558
 The boot manager has been successfully installed on your system.	BootManagerController		Завантажувач успішно встановлений на Вашу систему.
 After two seconds	DefaultPartitionPage		Після 2 секунд
 Uninstall Boot Manager	UninstallPage	Title	Видалити Завантажувач
 At least one partition must be selected!	BootManagerController		Принаймні один розділ треба вибрати!
-The old Master Boot Record could not be saved to %s	BootManagerController		Старий MBR не було збережено до %s
 Restore MBR	BootManagerController	Button	Відновлення MBR
 Hard Drive	DrivesPage	Default disk name	Жорсткий диск
 USB Drive	DrivesPage	Default disk name	Пристрій USB
@@ -41,7 +40,6 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Невідомий
 Update	DrivesPage	Button	Обновити
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Виберіть файл з якого треба провести відновлення MBR. Цей файл було створено при першому встановленні завантажувача.
-Old Master Boot Record Saved failure	BootManagerController	Title	Збереження старого основного загрузочного запису не вдалося
 Drives	DrivesPage	Title	Пристрої
 No space available!	DrivesPage	Cannot install	Немає наявного простору!
 Never	DefaultPartitionPage		Ніколи

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-icon_o_matic	984880419
+1	romanian	x-vnd.haiku-icon_o_matic	2885914752
 Select All	Icon-O-Matic-PathManipulator		Selectează tot
 Add Style	Icon-O-Matic-AddStylesCmd		Adaugă stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Culoare (#%02x%02x%02x)
@@ -102,7 +102,6 @@ Unassign Path	Icon-O-Matic-UnassignPathCmd		Înlătură atribuire cale
 load error	Icon-O-Matic-SVGImport		eroare de încărcare
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Mută forme
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Elimină stiluri
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Textul pe care încercați să îl importați este destul de lung, sunteți sigur?
 Add	Icon-O-Matic-TransformersList		Adaugă
 Color	Icon-O-Matic-StyleTypes		Culoare
 Settings…	Icon-O-Matic-SavePanel		Configurări...
@@ -164,7 +163,6 @@ Caps	Icon-O-Matic-PropertyNames		Acoperire
 Transform	Icon-O-Matic-PathManipulator		Transformă
 Add Paths	Icon-O-Matic-AddPathsCmd		Adaugă căi
 Style type	Icon-O-Matic-StyleTypes		Tip de stil
-too big	Icon-O-Matic-StyledTextImport		prea mare
 Assign Style	Icon-O-Matic-AssignStyleCmd		Atribuie stil
 Add Path	Icon-O-Matic-AddPathsCmd		Adaugă cale
 Color	Icon-O-Matic-PropertyNames		Culoare

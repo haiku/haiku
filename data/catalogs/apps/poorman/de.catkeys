@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PoorMan	2059301223
+1	german	x-vnd.Haiku-PoorMan	1347438411
 Website location	PoorMan		Website-Adresse
 Error Server	PoorMan		Serverfehler
 Settings…	PoorMan		Einstellungen…
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Logdatei erstellen
 Shutting down.\n	PoorMan		Herunterfahren.\n
 Hits: %lu	PoorMan		Zugriffe: %lu
 Web folder:	PoorMan		Web-Ordner:
-Default	PoorMan		Standard
 Save log console selection	PoorMan		Auswahl der Logkonsole speichern
 Run server	PoorMan		Server starten
 PoorMan settings	PoorMan		Webserver-Einstellungen

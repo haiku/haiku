@@ -1,6 +1,7 @@
-1	russian	x-vnd.Haiku-About	1763787961
+1	russian	x-vnd.Haiku-About	2982384826
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 Авторы Gutenprint.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
+Ralink (firmware)	AboutWindow		Ralink (прошивка)
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Все права защищены © 2000 Jean-Pierre ervbefeL и Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Все права защищены © 1996-2005 Julian R Seward.
 %d MiB total	AboutView		Всего %d МБ
@@ -18,24 +19,32 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Все прав
 Source Code: 	AboutView		Исходный код: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Процессор:} few{# процессора:} other{# процессоров:}}
 Kernel:	AboutView		Ядро:
+BSD (4-clause)	AboutWindow		BSD (4-х пунктная)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Все права защищены © 2001-2002 Thomas Broyer, Charlie Bozeman и Daniel Veillard.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Отдельные части этого программного обеспечения находятся под авторским правом.\nВсе права защищены © 1996-2006 Проект FreeType.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku® и логотип HAIKU® являются зарегистрированными торговыми марками Haiku, Inc.\n\n
+Marvell (firmware)	AboutWindow		Marvell (прошивка)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Все права защищены © 1987-1988 Digital Equipment Corporation, Мейнард, Массачусетс.
+GNU LGPL v2	AboutWindow		GNU LGPL v2
 The HaikuPorts team\n	AboutView		Команде HaikuPorts\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total МБ всего, %inaccessible МБ недоступно
+Intel (2xxx firmware)	AboutWindow		Intel (2xxx прошивка)
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Все права защищены © 2000-2007 Fabrice Bellard и другие.
 Contributors:\n	AboutView		Внесли вклад в развитие:\n
 Unknown	AboutView		Неизвестен
 Copyright © 2001-2003 Expat maintainers.	AboutView		Все права защищены © 2001-2003 Разработчики Expat.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Все права защищены © 1999-2006 Brian Paul. Проект Mesa3D.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Все права защищены © 2002-2004 Steve Lhomme.
+Public Domain	AboutWindow		Общественное достояние
+Intel (firmware)	AboutWindow		Intel (прошивка)
+BSD (2-clause)	AboutWindow		BSD (2-х пунктная)
 %.2f GHz	AboutView		%.2f ГГц
 Memory:	AboutView		Память:
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Все права защищены © 1996-1997 Jeff Prosise.
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Все права защищены © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Все права защищены © 1994-2009, Thomas G. Lane, Guido Vollbeding. Это программное обеспечение частично основано на работе Independent JPEG Group.
 Past maintainers:\n	AboutView		Предыдущие разработчики:\n
+GNU GPL v3	AboutWindow		GNU GPL v3
 \n\nSpecial thanks to:\n	AboutView		\n\nОсобая благодарность:\n
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…а также те, кого мы забыли упомянуть (простите!)\n\n
 Licenses: 	AboutView		Лицензии: 
@@ -49,6 +58,7 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		Время работы:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Содержит программное обеспечение, разработанное NetBSD Foundation, Inc и его сотрудниками:\nftp, tput\nВсе права защищены © 1996-2008 NetBSD Foundation, Inc.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Содержит программное обеспечение из проекта FreeBSD, выпущен под лицензией BSD:\ncal, ftpd, ping, telnet, telnetd, tracerout\nВсе права защищены © 1994-2008 Проект FreeBSD.
+GNU GPL v2	AboutWindow		GNU GPL v2
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Корпорации Google и их программам Google Summer of Code и Google Code In\n
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Все права защищены © 1995, 1998-2001 Jef Poskanzer.
@@ -64,6 +74,7 @@ The BeGeistert team\n	AboutView		Команде BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Университету Окленда и Christof Lutteroth\n\n
 Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Все права защищены © 1990-2003 Wada Laboratory, Университет Токио.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Все права защищены © 1995-2001 Lars Düning.
+GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Все права защищены © 2002-2008 Александр Л. Рошал.
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Все права защищены © 2003-2006 Intel Corporation.
 %ld MHz	AboutView		%ld МГц

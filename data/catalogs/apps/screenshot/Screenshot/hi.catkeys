@@ -1,4 +1,4 @@
-1	hindi	x-vnd.haiku-screenshot	889794495
+1	hindi	x-vnd.haiku-screenshot	4065094687
 seconds	ScreenshotWindow		सेकंडस
 Desktop	ScreenshotWindow		डेस्कटॉप
 Include window border	ScreenshotWindow		विंडो बॉर्डर को शामिल करे
@@ -9,7 +9,6 @@ Cancel	ScreenshotWindow		रद्द करे
 Name:	ScreenshotWindow		नाम:
 Choose folder	ScreenshotWindow		फ़ोल्डर को चुनें
 Save	ScreenshotWindow		सहेजें
-Choose folder...	ScreenshotWindow		फ़ोल्डर को चुनें...
 Please select	ScreenshotWindow		कृपया चुनें
 Save as:	ScreenshotWindow		इस रूप में सहेजें:
 Copy to clipboard	ScreenshotWindow		क्लिपबोर्ड पर प्रतिलिपि करे

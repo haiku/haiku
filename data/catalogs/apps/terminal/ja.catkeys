@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	1635947123
+1	japanese	x-vnd.Haiku-Terminal	1777773037
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -31,7 +31,6 @@ Encoding:	Terminal AppearancePrefView		エンコーディング:
 Cancel	Terminal SetTitleWindow		中止
 Increase	Terminal TermWindow		大きく
 Settings	Terminal TermWindow		設定
-Window size	Terminal TermWindow		ウィンドウサイズ
 Selected text	Terminal AppearancePrefView		選択されたテキスト
 Find	Terminal FindWindow		検索
 Appearance	Terminal PrefWindow		外観

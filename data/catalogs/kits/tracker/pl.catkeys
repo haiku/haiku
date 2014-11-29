@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	137546976
+1	polish	x-vnd.Haiku-libtracker	3041555072
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Wtyczki
 Mount settings…	ContainerWindow		Ustawienia montowania…
@@ -103,7 +103,6 @@ Show space bars on volumes	SettingsView		Pokaż wskaźnik zajętości na wolumin
 Invert selection	ContainerWindow		Odwróc zaznaczenie
 Increase size	DeskWindow		Zwiększ rozmiar
 Resize to fit	ContainerWindow		Dopasuj do zawartości
-%Ld bytes	WidgetAttributeText		%Ld bajtów
 Add printer…	ContainerWindow		Dodaj drukarkę…
 New folder	ContainerWindow		Nowy katalog
 Kind	ContainerWindow		Rodzaj
@@ -215,7 +214,7 @@ Capacity:	InfoWindow		Pojemność:
 Delete	FilePanelPriv		Kasuj
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# bajt)} few{(# bajty)} many{(# bajtów)} other{(# bajta)}}
 Save	FindPanel		Zapisz
-copy	FSUtils	filename copy	Kopiuj
+copy	FSUtils	filename copy	kopia
 Temporary	FindPanel		Tymczasowy
 Version	OpenWithWindow		Wersja
 Default application	InfoWindow		Domyślna aplikacja
@@ -290,7 +289,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	przenieś
 Show Disks icon	SettingsView		Pokaż ikony dysków
 Cancel	PoseView		Anuluj
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld bajtów, 
 You can't move or copy items to read-only volumes.	FSUtils		Nie możesz kopiować ani przenosić plików do woluminów tylko do odczytu.
 Unknown	FilePermissionsView		Nieznany
 All files and folders	FindPanel		Wszystkie pliki i foldery

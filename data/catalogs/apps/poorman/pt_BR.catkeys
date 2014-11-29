@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PoorMan	4008245771
+1	portuguese (brazil)	x-vnd.Haiku-PoorMan	3296382959
 Website location	PoorMan		Local do sítio web
 Error Server	PoorMan		Erro do Servidor
 Settings…	PoorMan		Definições…
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Criar registro do Pobre Homem
 Shutting down.\n	PoorMan		Desligando.\n
 Hits: %lu	PoorMan		Visitas: %lu
 Web folder:	PoorMan		Pasta da Web:
-Default	PoorMan		Padrão
 Save log console selection	PoorMan		Salvar seleção do console de registro
 Run server	PoorMan		Executar servidor
 PoorMan settings	PoorMan		Definições do Pobre Homem

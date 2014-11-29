@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-CharacterMap	2745781253
+1	english	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		封装字母数字
 Basic Latin	UnicodeBlocks		基本拉丁语
 View	CharacterWindow		视图
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		组合变音符号
 Syloti Nagri	UnicodeBlocks		锡尔赫特城文
 Arabic supplement	UnicodeBlocks		阿拉伯语扩展
 Latin extended C	UnicodeBlocks		拉丁语扩展 C
-Ancient smbols	UnicodeBlocks		古代符号
 Bopomofo extended	UnicodeBlocks		汉语拼音扩展
 Lycian	UnicodeBlocks		利西亚语
-Font size:	CharacterWindow		字体大小：
 Osmanya	UnicodeBlocks		奥斯曼亚文
 Ethiopic	UnicodeBlocks		埃塞俄比亚语
 Bengali	UnicodeBlocks		孟加拉语

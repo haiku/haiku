@@ -1,10 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	3333034725
+1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	1532132034
 DriveSetup	System name		Εγκατάσταση Οδηγού
 Cancel	AbstractParametersPanel		Άκυρο
 Delete	MainWindow		Διαγραφή
 Rescan	MainWindow		Επανάληψη σάρωσης
 OK	MainWindow		Εντάξει
-Could not aquire partitioning information.	MainWindow		Αδυναμία απόκτησης πληροφορίας διαμέρισης.
 There's no space on the partition where a child partition could be created.	MainWindow		Δεν υπάρχει χώρος στη κατάτμηση, όπου θα μπορούσε να δημιουργηθεί νέα κατάτμηση.
 Initialize	InitializeParametersPanel		Αρχικοποίηση
 OK	AbstractParametersPanel		Εντάξει
@@ -32,7 +31,6 @@ The partition %s is already mounted.	MainWindow		Η κατάτμηση %s είν
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να γράψετε τις αλλαγές στο δίσκο τώρα;\n\nΌλα τα δεδομένα στο δίσκο %s θα χαθούν οριστικά αν το κάνετε αυτό!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να διαγράψετε την επιλεγμένη κατάτμηση;\n\nΌλα τα δεδομένα στη κατάτμηση θα χαθούν οριστικά αν το κάνετε αυτό!
 Create…	MainWindow		Δημιουργία...
-Disk system \"%s\"\" not found!	MainWindow		Ο δίσκος συστήματος \"%s\"\" δεν βρέθηκε!
 Could not unmount partition %s.	MainWindow		Αδυναμία αποπροσάρτησης της κατάτμησης %s.
 Mount	MainWindow		Προσάρτηση
 Device	PartitionList		Συσκευή

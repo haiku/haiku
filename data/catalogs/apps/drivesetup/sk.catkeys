@@ -1,11 +1,10 @@
-1	slovak	x-vnd.Haiku-DriveSetup	1752326393
+1	slovak	x-vnd.Haiku-DriveSetup	973049051
 DriveSetup	System name		Nastavenie diskových oblastí
 Cancel	AbstractParametersPanel		Zrušiť
 Delete	MainWindow		Zmazať
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
 Rescan	MainWindow		Znovu preskúmať
 OK	MainWindow		OK
-Could not aquire partitioning information.	MainWindow		Nepodarilo sa získať informácie o diskových oblastiach.
 There's no space on the partition where a child partition could be created.	MainWindow		Na oblasti nie je miesto, kde by bolo možné vytvoriť podriadenú oblasť.
 Initialize	InitializeParametersPanel		Inicializovať
 OK	AbstractParametersPanel		OK
@@ -39,12 +38,10 @@ Are you sure you want to format the partition? You will be asked again before ch
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na disku %s budú nenávratne stratené!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete zmazať vybranú diskovú oblasť?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
 Create…	MainWindow		Vytvoriť…
-Disk system \"%s\"\" not found!	MainWindow		Diskový systém „%s“ nenájdený!
 The disk has been successfully initialized.\n	MainWindow		Disk bol úspešne inicializovaný.\n
 Could not unmount partition %s.	MainWindow		Nepodarilo sa odpojiť oblasť %s.
 Failed to format the partition %s!\n	MainWindow		Nepodarilo sa naformátovať oblasť %s!\n
 Mount	MainWindow		Pripojiť
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ste si istí, že chcete naformátovať neformátovaný disk? (väčšina ľudí najskôr disk inicializuje pomocou systému na rozdelenie disku) Pred zapísaním zmien na disk sa vás program znova spýta.
 Device	PartitionList		Zariadenie
 Disk	MainWindow		Disk
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ste si istí, že chcete inicializovať vybraný disk? Stratia sa všetky údaje na ňom. Pred zapísaním zmien na disk sa vás program znova spýta.\n

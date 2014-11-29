@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Terminal	2133985648
+1	slovak	x-vnd.Haiku-Terminal	2275811562
 Not found.	Terminal TermWindow		Nenájdené.
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Change directory	Terminal TermView		Zmeniť adresár
@@ -30,7 +30,6 @@ Custom	Terminal colors scheme		Vlastné
 Cancel	Terminal SetTitleWindow		Zrušiť
 Increase	Terminal TermWindow		Zväčšiť
 Settings	Terminal TermWindow		Nastavenia
-Window size	Terminal TermWindow		Veľkosť okna
 Selected text	Terminal AppearancePrefView		Vybraný text
 Find	Terminal FindWindow		Nájsť
 Appearance	Terminal PrefWindow		Vzhľad

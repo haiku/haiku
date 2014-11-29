@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PackageInstaller	792037176
+1	dutch; flemish	x-vnd.Haiku-PackageInstaller	3253212490
 Install to:	PackageView		Installeren naar:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akkoord
@@ -21,7 +21,6 @@ none	PackageView		geen
 Stop	PackageStatus		Stoppen
 Other…	PackageView		Overige…
 No installation type selected	PackageView		Er is geen installatietype geselecteerd
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		De symbolische koppeling met de naam '%s' bestaad reeds op de gegeven locatie.\nWilt u die koppeling vervangen door de koppeling van dit pakket of deze overslaan?
 Installing files and folders	PackageInstall		Bestanden en mappen worden geïnstalleerd
 Package installer	PackageView		Pakketinstallatieprogramma
 Skip all	PackageView		Alles overslaan

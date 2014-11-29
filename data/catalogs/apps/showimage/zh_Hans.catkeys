@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ShowImage	4121021813
+1	english	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		设置为桌面背景…
 File	Menus		文件
 Slide delay	Menus		幻灯片延迟
@@ -21,7 +21,6 @@ Edit	Menus		编辑
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		无法打开图像！可能文件或者图像解码器不存在。
 First page	Menus		第一页
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		文档'%s' (page %d) 已经改变。是否关闭文档？
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS 秒
 Leave full screen	Menus		取消全屏
 Close	Menus		关闭
 Close	ClosePrompt		关闭

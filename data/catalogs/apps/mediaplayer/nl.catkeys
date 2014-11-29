@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	2969013755
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	453757450
 raw audio	MediaPlayer-InfoWin		ruwe audio
 Location	MediaPlayer-InfoWin		Locatie
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
@@ -29,7 +29,6 @@ Track %d	MediaPlayer-Main		Track %d
 Display mode	MediaPlayer-InfoWin		Weergavemodus
 Medium	MediaPlayer-SettingsWindow		Gemiddeld
 Close	MediaPlayer-PlaylistWindow		Afsluiten
-Stereo	MediaPlayer-InfoWin		Stereo
 Open…	MediaPlayer-PlaylistWindow		Openen...
 Toggle mute.	MediaPlayer-Main		Mute aan/uit.
 Undo	MediaPlayer-PlaylistWindow		Ongedaan maken
@@ -54,7 +53,6 @@ Start playing.	MediaPlayer-Main		Begin met afspelen.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Er is geen decoder geïnstalleerd die met het bestandstype kan omgaan, ofwel heeft de decoder moeite met de specifieke versie van het type. 
 Import Entry	MediaPlayer-ImportPLItemsCmd		Onderdeel importeren
 Gets the URI of the currently playing item.	MediaPlayer-Main		Haalt de URI op van het nu afspelende item.
-%d Channels	MediaPlayer-InfoWin		%d kanalen
 400% scale	MediaPlayer-Main		400% schaal
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Opslaan afspeellijst is mislukt:\n\nFout:
 Move Entries	MediaPlayer-MovePLItemsCmd		Onderdelen verplaatsen
@@ -150,7 +148,6 @@ Always on top	MediaPlayer-Main		Altijd op voorgrond
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen naar Trash
 Save	MediaPlayer-Main		Opslaan
 <nothing to undo>	MediaPlayer-PlaylistWindow		<niets om ongedaan te maken>
-Mono	MediaPlayer-InfoWin		Mono
 File info	MediaPlayer-InfoWin		Bestandsinformatie
 Save	MediaPlayer-PlaylistWindow		Opslaan
 %d Bit	MediaPlayer-InfoWin		%d bit

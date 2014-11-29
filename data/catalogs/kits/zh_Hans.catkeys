@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libbe	84010340
+1	english	x-vnd.Haiku-libbe	1409488127
 gamma	AboutWindow		伽马
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -9,10 +9,8 @@ Version	AboutWindow		版本
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		无法为 \"%description\" 创建克隆控件。\n%error
 Copy	TextView		复制
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d bytes
 alpha	AboutWindow		测试
 Error	PrintJob		错误
-No Pages to print!	PrintJob		无打印页面！
 All Rights Reserved.	AboutWindow		保留所有权利
 About %app%	AboutWindow		关于 %app%
 OK	Dragger		确定

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PoorMan	4008245771
+1	ukrainian	x-vnd.Haiku-PoorMan	3296382959
 Website location	PoorMan		Розташування сайту
 Error Server	PoorMan		Помилка сервера
 Settings…	PoorMan		Налаштування…
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Створити логи PoorMan
 Shutting down.\n	PoorMan		Вимкнути.\n
 Hits: %lu	PoorMan		Підказки: %lu
 Web folder:	PoorMan		Інтернет папка
-Default	PoorMan		По замовчуванню
 Save log console selection	PoorMan		Зберегти логи вибраної консолі
 Run server	PoorMan		Запустити сервер
 PoorMan settings	PoorMan		Настройки PoorMan

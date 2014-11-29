@@ -1,11 +1,10 @@
-1	swedish	x-vnd.Haiku-DriveSetup	758245016
+1	swedish	x-vnd.Haiku-DriveSetup	4273934970
 DriveSetup	System name		DiskHanterare
 Cancel	AbstractParametersPanel		Avbryt
 Delete	MainWindow		Ta bort
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringar tillbaka till disken ny?\n\nAlla data på den valda partitionen kommer att raderas om du gör så!
 Rescan	MainWindow		Uppdatera
 OK	MainWindow		OK
-Could not aquire partitioning information.	MainWindow		Kunde inte läsa partitionsinformation.
 There's no space on the partition where a child partition could be created.	MainWindow		Det finns inget utrymme för en underpartition på partitionen.
 Could not unmount partition	MainWindow		Kunde inte avmontera partition
 Initialize	InitializeParametersPanel		Initiera
@@ -44,14 +43,12 @@ Change	ChangeParametersPanel		Ändra
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringar tillbaka till disken ny?\n\nAlla data på partitionen %s kommer att raderas om du gör så!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill ta bort partitionen?\n\nAll data på partitionen kommer att gå förlorad!
 Create…	MainWindow		Skapa…
-Disk system \"%s\"\" not found!	MainWindow		Disksystemet \"%s\"\" hittades ej!
 The disk has been successfully initialized.\n	MainWindow		Partitionen har initierats.\n
 Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Kunde inte ändra parametrar på partionen. Inga ändringar skrivna till disk.
 Failed to format the partition %s!\n	MainWindow		Misslyckades att formatera partionen %s!\n
 Mount	MainWindow		Montera
 Partition type	PartitionList		Partitionstyp
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Är du säker att du vill formatera en raw disk? (de flesta initierar disken med en partion först) Du kommet att få frågan igen innan ändringarna skrivs till disk.
 The panel experienced a problem!	MainWindow		Panelen hade några problem!
 Change parameters…	MainWindow		Ändra parametrar...
 Device	PartitionList		Enhet

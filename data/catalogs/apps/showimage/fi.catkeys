@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	4121021813
+1	finnish	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Käytä taustana…
 File	Menus		Tiedosto
 Slide delay	Menus		Diaviive
@@ -21,7 +21,6 @@ Edit	Menus		Muokkaa
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kuvan lataus epäonnistui! Puuttuu joko tiedosto tai kuvamuunnin sitä varten.
 First page	Menus		Ensimmäinen sivu
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekuntia
 Leave full screen	Menus		Jätä kokoruututila
 Close	Menus		Sulje
 Close	ClosePrompt		Sulje

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-CharacterMap	2745781253
+1	lithuanian	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Įrėminti teksto ženklai
 Basic Latin	UnicodeBlocks		Baziniai lotynų
 View	CharacterWindow		Rodymas
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Kombinaciniai diakritinia
 Syloti Nagri	UnicodeBlocks		Silhato nagari
 Arabic supplement	UnicodeBlocks		Arabų papildomi
 Latin extended C	UnicodeBlocks		Lotynų papildomi C
-Ancient smbols	UnicodeBlocks		Senoviniai ženklai
 Bopomofo extended	UnicodeBlocks		Bopomofo papildomi
 Lycian	UnicodeBlocks		Likų
-Font size:	CharacterWindow		Šrifto dydis:
 Osmanya	UnicodeBlocks		Osmanų
 Ethiopic	UnicodeBlocks		Etiopų
 Bengali	UnicodeBlocks		Bengalų

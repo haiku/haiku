@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-icon_o_matic	28048799
+1	swedish	x-vnd.haiku-icon_o_matic	1929083132
 Select All	Icon-O-Matic-PathManipulator		Markera allt
 Add Style	Icon-O-Matic-AddStylesCmd		Lägg till stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Färg (#%02x%02x%02x)
@@ -106,7 +106,6 @@ Unassign Path	Icon-O-Matic-UnassignPathCmd		Avtilldela bana
 load error	Icon-O-Matic-SVGImport		laddningsfel
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Flytta figurer
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Ta bort stilar
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Texten som du försöker importera är ganska lång, är du säker?
 Add	Icon-O-Matic-TransformersList		Lägg till
 Color	Icon-O-Matic-StyleTypes		Färg
 Settings…	Icon-O-Matic-SavePanel		Inställningar...
@@ -169,7 +168,6 @@ Caps	Icon-O-Matic-PropertyNames		Versaler
 Transform	Icon-O-Matic-PathManipulator		Omvandla
 Add Paths	Icon-O-Matic-AddPathsCmd		Lägg till banor
 Style type	Icon-O-Matic-StyleTypes		Stiltyp
-too big	Icon-O-Matic-StyledTextImport		för stor
 Assign Style	Icon-O-Matic-AssignStyleCmd		Tilldela stil
 Add Path	Icon-O-Matic-AddPathsCmd		Skapa bana
 Color	Icon-O-Matic-PropertyNames		Färg

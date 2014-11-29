@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libbe	84010340
+1	belarusian	x-vnd.Haiku-libbe	1409488127
 gamma	AboutWindow		гамма
 beta	AboutWindow		бэта
 %3.2f GiB	StringForSize		%3.2f ГіБ
@@ -9,10 +9,8 @@ Version	AboutWindow		Версія
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Немагчыма стварыць рэплікант \"%description\".\n%error
 Copy	TextView		Капіяваць
 %3.2f KiB	StringForSize		%3.2f КіБ
-%d bytes	StringForSize		%d байтаў
 alpha	AboutWindow		альфа
 Error	PrintJob		Памылка
-No Pages to print!	PrintJob		Няма старонак для друку!
 All Rights Reserved.	AboutWindow		Усе правы захаваныя.
 About %app%	AboutWindow		Пра %app%
 OK	Dragger		ОК

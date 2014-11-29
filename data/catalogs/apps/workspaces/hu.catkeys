@@ -1,10 +1,9 @@
-1	hungarian	x-vnd.Be-WORK	658966565
+1	hungarian	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		Érvénytelen paraméter: %s\n
 Quit	Workspaces		Kilépés
 Workspaces	System name		Munkaasztalok
 Change workspace count…	Workspaces		Munkaasztalok számának megváltoztatása…
 Remove replicant	Workspaces		Replikáns eltávolítása
-About Workspaces…	Workspaces		Munkaasztalok névjegye…
 Show window border	Workspaces		Ablakkeret megjelenítése
 Auto-raise	Workspaces		Automatikus kiemelés
 Always on top	Workspaces		Mindig felül

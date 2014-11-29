@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Screen	2033930135
+1	french	x-vnd.Haiku-Screen	1388881963
 yes	Screen		oui
 Use laptop panel:	Screen		Utiliser l'écran du portable :
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 couleurs
@@ -35,7 +35,6 @@ horizontally	Screen		horizontalement
 Other…	Screen		Autre…
 Cancel	Screen		Annuler
 bits/pixel	Screen		bits/pixel
-Settings will revert in %seconds seconds.	Screen		Les réglages seront rétablis dans %seconds secondes.
 Refresh rate:	Screen		Fréquence de rafraîchissement :
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Voulez-vous conserver ces paramètres ?

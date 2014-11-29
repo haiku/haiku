@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DiskProbe	2706202187
+1	greek, modern (1453-)	x-vnd.Haiku-DiskProbe	2206273117
 File offset: 	ProbeView		Μετατόπιση αρχείου:
 %ld (native)	ProbeView		%ld (φυσικό)
 64 bit unsigned value:	TypeEditors		64 bit μη-υπογεγραμμένη τιμή:
@@ -66,7 +66,6 @@ Page setup…	ProbeView		Διαμόρφωση σελίδας...
 New…	FileWindow		Νέο...
 DiskProbe request	AttributeWindow		DiskProbe αίτηση
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Αδυναμία ανάγνωσης της εικόνας
-BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Μέγεθος Μπλοκ
 Save changes before closing?	ProbeView		Να αποθηκευτούν οι αλλαγές πριν το κλείσιμο;
 Type editor	AttributeWindow		Επεξεργαστής τύπου
 Native: 0x%0*Lx	ProbeView		Φυσικό: 0x%0*Lx

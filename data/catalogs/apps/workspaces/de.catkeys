@@ -1,10 +1,9 @@
-1	german	x-vnd.Be-WORK	658966565
+1	german	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		Ungültiger Parameter: %s\n
 Quit	Workspaces		Beenden
 Workspaces	System name		Arbeitsflächen
 Change workspace count…	Workspaces		Anzahl der Arbeitsflächen ändern...
 Remove replicant	Workspaces		Replikant entfernen
-About Workspaces…	Workspaces		Über Arbeitsflächen...
 Show window border	Workspaces		Fensterrahmen anzeigen
 Auto-raise	Workspaces		Automatisch nach vorn holen
 Always on top	Workspaces		Immer im Vordergrund

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	761086471
+1	finnish	x-vnd.Haiku-Terminal	1777773037
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -26,11 +26,11 @@ Window title:	Terminal TermWindow		Ikkunaotsikko:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Tunnistamaton valitsin ”%s”\n
 Blue	Terminal colors scheme		Sininen
 Custom	Terminal colors scheme		Räätälöity
+Encoding:	Terminal AppearancePrefView		Koodaus:
 %app% settings	Terminal PrefWindow	window title	%app%-asetukset
 Cancel	Terminal SetTitleWindow		Peru
 Increase	Terminal TermWindow		Kasvata
 Settings	Terminal TermWindow		Asetukset
-Window size	Terminal TermWindow		Ikkunakoko
 Selected text	Terminal AppearancePrefView		Valittu teksti
 Find	Terminal FindWindow		Etsi
 Appearance	Terminal PrefWindow		Ulkoasu
@@ -48,13 +48,16 @@ Page setup…	Terminal TermWindow		Sivuasetus...
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Seuraavia prosesseja suoritetaan edelleen:\n\n\t%1\n\nJos suljet Pääteikkunan, prosessit tapetaan.
 Insert path	Terminal TermView		Lisää polku
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Pääteikkuna\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ja Takashi Murai.\n\nKäyttö: %s [VALITSIN] [KOMENTOTULKKI]\n
+Window size:	Terminal AppearancePrefView		Ikkunakoko:
 No search string was entered.	Terminal TermWindow		Hakumerkkijono ei kirjoitettu.
 Font size	Terminal TermWindow		Kirjasinkoko
 Blinking cursor	Terminal AppearancePrefView		Vilkkuva kohdistin
 Set window title	Terminal TermWindow		Aseta ikkunaotsikko
+Revert	Terminal PrefWindow		Palauta
 Terminal	System name		Pääteikkuna
 Copy path	Terminal TermView		Kopioi polku
 Close other tabs	Terminal TermWindow		Sulje muut välilehdet
+Defaults	Terminal PrefWindow		Oletukset
 Match word	Terminal FindWindow		Täsmäävä sana
 Nothing is selected.	Terminal TermWindow		Mitään ei ole valittu.
 Text not found.	Terminal TermWindow		Tekstiä ei löydy.

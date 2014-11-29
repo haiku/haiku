@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CodyCam	2083193989
+1	romanian	x-vnd.Haiku-CodyCam	183572276
 Capturing Image…	VideoConsumer.cpp		Se capturează imaginea...
 Every 30 seconds	CodyCam		La fiecare 30 de secunde
 File name:	CodyCam		Nume fișier:
@@ -32,7 +32,6 @@ Output	CodyCam		Ieșire
 Every 15 minutes	CodyCam		La fiecare 15 minute
 Cannot find an available video stream	CodyCam		Nu se poate găsi un flux video disponibil
 Can't find an available connection to the video window	CodyCam		Nu se poate găsi o conexiune disponibilă la fereastra video
-Transmitting…	VideoConsumer.cpp		Se transmite...
 Cannot get a time source	CodyCam		Nu se poate obține o sursă de timp
 Every 8 hours	CodyCam		La fiecare 8 ore
 Rename failed	VideoConsumer.cpp		Redenumire eșuată
@@ -83,7 +82,6 @@ reply: %d, %d\n	FtpClient		răspuns: %d, %d\n
 Cannot find the media roster	CodyCam		Nu se poate găsi lista media
 Every 4 hours	CodyCam		La fiecare 4 ore
 FTP	CodyCam		FTP
-File transmission failed	VideoConsumer.cpp		Transmiterea fișierului a eșuat
 Cannot seek time source!	CodyCam		Nu se poate derula sursa de timp!
 File	CodyCam		Fișier
 Image Format Menu	CodyCam		Meniu format imagine

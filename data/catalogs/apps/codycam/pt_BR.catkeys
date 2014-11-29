@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-CodyCam	2083193989
+1	portuguese (brazil)	x-vnd.Haiku-CodyCam	183572276
 Capturing Image…	VideoConsumer.cpp		Capturando imagem...
 Every 30 seconds	CodyCam		A cada 30 segundos
 File name:	CodyCam		Nome do arquivo
@@ -32,7 +32,6 @@ Output	CodyCam		Saída
 Every 15 minutes	CodyCam		A cada 15 minutos
 Cannot find an available video stream	CodyCam		Não foi possível encontrar um fluxo de vídeo disponível
 Can't find an available connection to the video window	CodyCam		Não foi possível encontrar conexão para a janela de vídeo disponível
-Transmitting…	VideoConsumer.cpp		Transmitindo...
 Cannot get a time source	CodyCam		Não foi possível obter uma fonte de tempo
 Every 8 hours	CodyCam		A cada 8 horas
 Rename failed	VideoConsumer.cpp		Renomear falhou
@@ -83,7 +82,6 @@ reply: %d, %d\n	FtpClient		resposta: %d, %d\n
 Cannot find the media roster	CodyCam		Não foi possível encontrar uma lista de mídia
 Every 4 hours	CodyCam		A cada 4 horas
 FTP	CodyCam		FTP
-File transmission failed	VideoConsumer.cpp		A transmissão de arquivo falhou
 Cannot seek time source!	CodyCam		Não foi possível procurar uma fonte de tempo!
 File	CodyCam		Arquivo
 Image Format Menu	CodyCam		Menu de formato de imagem

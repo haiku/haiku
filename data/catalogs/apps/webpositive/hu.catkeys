@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	1130172675
+1	hungarian	x-vnd.Haiku-WebPositive	979407669
 Show home button	Settings Window		Kezdőlap-gomb megjelenítése
 Username:	Authentication Panel		Felhasználónév:
 Copy URL to clipboard	Download Window		Cím másolása a vágólapra
@@ -20,7 +20,6 @@ Double-click or middle-click to open new tab.	Tab Manager		Új fül dupla kattin
 Proxy username:	Settings Window		Felhasználónév a proxyhoz:
 Save page as…	WebPositive Window		Oldal mentése…
 Settings	Settings Window		Beállítások
-%seconds seconds left	Download Window		%seconds másodperc van hátra
 Confirmation	WebPositive Window		Megerősítés
 Window	WebPositive Window		Ablak
 Decrease size	WebPositive Window		Méret csökkentése
@@ -32,7 +31,6 @@ Next	WebPositive Window		Következő
 Find next	WebPositive Window		Következő találat
 Download folder:	Settings Window		Letöltések helye:
 Edit	WebPositive Window		Szerkesztés
-Over %hours hours left	Download Window		Több, mint %hours óra van hátra
 Cancel	Authentication Panel		Mégse
 Match case	WebPositive Window		Betűérzékeny
 Search page:	Settings Window		Keresőoldal:
@@ -40,7 +38,6 @@ Zoom text only	WebPositive Window		Csak a szöveg nagyítása
 Default fixed font size:	Settings Window		Alapértelmezett rögzített betűméret:
 Close tab	WebPositive Window		Oldal bezárása
 Auto-hide mouse pointer	Settings Window		Egérmutató automatikus elrejtése
-Over 1 hour left	Download Window		Több, mint 1 óra van hátra
 Quit	WebPositive Window		Kilépés
 Full screen	WebPositive Window		Teljes képernyő
 Open download error	Download Window		A letöltés nem nyitható meg
@@ -54,7 +51,6 @@ Open	Download Window		Megnyitás
 Reload	WebPositive Window		Újratöltés
 Downloads	Download Window		Letöltések
 Sans serif font:	Settings Window		Talpatlan betűtípus:
-Over %days days left	Download Window		Több, mint %days nap van hátra
 Forward	WebPositive Window		Következő
 of	Download Window	...as in '12kB of 256kB'	/
 Revert	Settings Window		Visszaállít
@@ -70,7 +66,6 @@ Reset size	WebPositive Window		Méret visszaállítása
 Find:	WebPositive Window		Keresés:
 Increase size	WebPositive Window		Méret növelése
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Hiba történt a Könyvjelzők mappa lekérésekor.\n\nHiba: %error
-Over 1 day left	Download Window		Több, mint 1 nap van hátra
 Downloads	WebPositive Window		Letöltések
 Requesting %url	WebPositive Window		%url megnyitása
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Következő találat
@@ -100,7 +95,6 @@ Script console	WebPositive Window		Szkript konzol
 Proxy server address:	Settings Window		Proxy címe:
 Proxy server port:	Settings Window		Proxy port:
 Bookmarks	WebPositive Window		Könyvjelzők
-%minutes minutes	Download Window		%minutes perc
 Paste	URL Bar		Beillesztés
 /s)	Download Window	...as in 'per second'	/mp)
 Hide password text	Authentication Panel		Jelszó elrejtése
@@ -115,7 +109,6 @@ Password:	Authentication Panel		Jelszó:
 Back	WebPositive Window		Előző
 New browser window	Download Window		Új böngészőablak
 Today	WebPositive Window		Ma
-1 second left	Download Window		1 másodperc van hátra
 Remember username and password for this site	Authentication Panel		Felhasználói név és jelszó megjegyzése
 Earlier	WebPositive Window		Korábban
 Authentication required	Authentication Panel		Hitelesítés szükséges

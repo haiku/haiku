@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Screen	2033930135
+1	romanian	x-vnd.Haiku-Screen	1388881963
 yes	Screen		da
 Use laptop panel:	Screen		Utilizează panou laptop:
 15 bits/pixel, 32768 colors	Screen		15 biți/pixel, 32768 culori
@@ -35,7 +35,6 @@ horizontally	Screen		orizontal
 Other…	Screen		Altele...
 Cancel	Screen		Anulează
 bits/pixel	Screen		biți/pixel
-Settings will revert in %seconds seconds.	Screen		Configurările vor reveni în %seconds secunde.
 Refresh rate:	Screen		Cotă de împrospătare:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Doriți să păstrați aceste configurări?

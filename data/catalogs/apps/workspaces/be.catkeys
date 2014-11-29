@@ -1,10 +1,9 @@
-1	belarusian	x-vnd.Be-WORK	658966565
+1	belarusian	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		Няправільны аргумент: %s\n
 Quit	Workspaces		Выйсці
 Workspaces	System name		Рабочыя сталы
 Change workspace count…	Workspaces		Змяніць колькасць рабочых сталоў…
 Remove replicant	Workspaces		Выдаліць дуплікант
-About Workspaces…	Workspaces		Пра Рабочыя сталы…
 Show window border	Workspaces		Паказваць межы вокнаў
 Auto-raise	Workspaces		Аўта-выплыванне
 Always on top	Workspaces		Заўсёды ў фокусе

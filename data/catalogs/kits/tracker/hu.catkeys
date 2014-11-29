@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	137546976
+1	hungarian	x-vnd.Haiku-libtracker	3041555072
 OK	WidgetAttributeText		Rendben
 Add-ons	FilePanelPriv		Kiegészítők
 Mount settings…	ContainerWindow		Csatolási beállítások…
@@ -103,7 +103,6 @@ Show space bars on volumes	SettingsView		Telítettség megjelenítése a lemezek
 Invert selection	ContainerWindow		Kijelölés megfordítása
 Increase size	DeskWindow		Méret növelése
 Resize to fit	ContainerWindow		Átméretezés hogy elférjen
-%Ld bytes	WidgetAttributeText		%Ld bájt
 Add printer…	ContainerWindow		Nyomtató hozzáadása…
 New folder	ContainerWindow		Új mappa
 Kind	ContainerWindow		Típus
@@ -290,7 +289,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	átmozgatja
 Show Disks icon	SettingsView		„Lemezek” ikon megjelenítése
 Cancel	PoseView		Mégse
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld bájt,
 You can't move or copy items to read-only volumes.	FSUtils		Írásvédett lemezre nem lehet mozgatni vagy átmásolni elemeket.
 Unknown	FilePermissionsView		Ismeretlen
 All files and folders	FindPanel		Minden fájl és mappa

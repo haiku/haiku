@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Screen	2033930135
+1	finnish	x-vnd.Haiku-Screen	1388881963
 yes	Screen		kyllä
 Use laptop panel:	Screen		Käytä sylimikropaneelia
 15 bits/pixel, 32768 colors	Screen		15 bittiä/pikseli, 32768 väriä
@@ -35,7 +35,6 @@ horizontally	Screen		vaakasuoraan
 Other…	Screen		Muut...
 Cancel	Screen		Peru
 bits/pixel	Screen		bittiä/pikseli
-Settings will revert in %seconds seconds.	Screen		Asetukset palautuvat %seconds sekunnissa.
 Refresh rate:	Screen		Virkistystaajuus:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Haluatko pitää nämä asetukset?

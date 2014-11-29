@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Installer	3930183175
+1	belarusian	x-vnd.Haiku-Installer	528139900
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Сапраўды спыніць усталёўку і перазагрузіць сістэму?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tАўтары: Jérôme Duval, Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -89,7 +89,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Дадатковыя пакункі недаступныя.
 All hard disks start with \"hd\".\n	InstallerApp		Імёны дыскаў пачынаюцца з \"hd\".\n
 Continue	InstallerApp		Працягваць
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Мэнэджэр загрузкі, праграма якая канфігуруе загрузачнае меню Haiku, ня можа быць запушчана.
 Boot sector not written because of an internal error.	InstallProgress		Загрузачны сектар не запісаны з-за ўнутранай памылкі.
 Additional disk space required: %s	InstallerWindow		Патрэбна месца дадаткова: %s
 Cancel	InstallProgress		Адмена

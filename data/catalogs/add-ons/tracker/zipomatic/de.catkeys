@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku.zip-o-matic	2924152822
+1	german	x-vnd.haiku.zip-o-matic	2255868945
 Stop	file:ZipOMaticWindow.cpp		Abbrechen
 Creating archive: %s	file:ZipOMaticWindow.cpp		Archiv wird erzeugt: %s
 Continue	file:ZipOMaticWindow.cpp		Fortsetzen
@@ -11,7 +11,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		S
 Stopped	file:ZipOMaticWindow.cpp		Abgebrochen
 Archive	file:ZipperThread.cpp		Archiv
 Error creating archive	file:ZipOMaticWindow.cpp		Fehler beim Erzeugen des Archivs
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Es laufen %ld Zip-O-Matic-Instanzen.\n\n
 {0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# Datei wurde hinzugefügt.} other{# Dateien wurden hinzugefügt.}}
 Archive created OK	file:ZipOMaticWindow.cpp		Archiv wurde fehlerfrei erzeugt
 Stop them	file:ZipOMatic.cpp		Abbrechen

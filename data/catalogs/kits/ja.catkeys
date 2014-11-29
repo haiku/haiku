@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libbe	84010340
+1	japanese	x-vnd.Haiku-libbe	1409488127
 gamma	AboutWindow		γ
 beta	AboutWindow		β
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -9,10 +9,8 @@ Version	AboutWindow		バージョン
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\" 用のレプリカントを作成できません。\n%error
 Copy	TextView		コピー
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d バイト
 alpha	AboutWindow		α
 Error	PrintJob		エラー
-No Pages to print!	PrintJob		印刷するページがありません。
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 About %app%	AboutWindow		%app% について
 OK	Dragger		OK

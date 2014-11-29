@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DiskProbe	2306672993
+1	ukrainian	x-vnd.Haiku-DiskProbe	1806743923
 File offset: 	ProbeView		Зміщення файлу:
 %ld (native)	ProbeView		%ld (рідна)
 64 bit unsigned value:	TypeEditors		64-х бітне беззнакове значення:
@@ -67,7 +67,6 @@ Page setup…	ProbeView		Налаштування сторінки…
 New…	FileWindow		Новий…
 DiskProbe request	AttributeWindow		Запит DiskProbe
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Неможливо прочитати образ
-BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Розмір блоку
 Save changes before closing?	ProbeView		Зберегти зміни перед закриттям?
 Type editor	AttributeWindow		Редактор типу
 Native: 0x%0*Lx	ProbeView		Рідний: 0x%0*Lx

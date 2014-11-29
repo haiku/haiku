@@ -1,10 +1,9 @@
-1	french	x-vnd.Be-WORK	658966565
+1	french	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		Argument invalide : %s\n
 Quit	Workspaces		Quitter
 Workspaces	System name		Bureaux
 Change workspace count…	Workspaces		Changer le nombre de bureaux virtuels…
 Remove replicant	Workspaces		Retirer les réplicants
-About Workspaces…	Workspaces		À propos de Bureaux…
 Show window border	Workspaces		Montrer la bordure de fenêtre
 Auto-raise	Workspaces		Auto-montée
 Always on top	Workspaces		Toujours au dessus

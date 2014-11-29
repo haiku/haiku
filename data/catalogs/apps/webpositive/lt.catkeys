@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-WebPositive	2880796666
+1	lithuanian	x-vnd.Haiku-WebPositive	2730031660
 Show home button	Settings Window		Rodyti Namų mygtuką
 Username:	Authentication Panel		Naudotojo vardas:
 Copy URL to clipboard	Download Window		Kopijuoti URL adresą į iškarpinę
@@ -19,7 +19,6 @@ Paste	WebPositive Window		Įdėti
 Double-click or middle-click to open new tab.	Tab Manager		Dukart spustelėkite arba spustelėkite vidurinį mygtuką naujai kortelei atverti.
 Proxy username:	Settings Window		Įgaliotojo serverio naudotojo vardas:
 Settings	Settings Window		Nuostatos
-%seconds seconds left	Download Window		Liko %seconds sek.
 Confirmation	WebPositive Window		Patvirtinimas
 Window	WebPositive Window		Langas
 Decrease size	WebPositive Window		Sumažinti dydį
@@ -30,7 +29,6 @@ Next	WebPositive Window		Toliau
 Find next	WebPositive Window		Ieškoti toliau
 Download folder:	Settings Window		Parsiuntimų aplankas:
 Edit	WebPositive Window		Taisa
-Over %hours hours left	Download Window		Liko daugiau nei %hours val.
 Cancel	Authentication Panel		Atsisakyti
 Match case	WebPositive Window		Paisyti raidžių registro
 Search page:	Settings Window		Paieškos tinklapis:
@@ -38,7 +36,6 @@ Zoom text only	WebPositive Window		Keisti tik teksto dydį
 Default fixed font size:	Settings Window		Numatytasis lygiapločio šrifto dydis:
 Close tab	WebPositive Window		Užverti kortelę
 Auto-hide mouse pointer	Settings Window		Automatiškai slėpti pelės žymeklį
-Over 1 hour left	Download Window		Liko daugiau nei 1 valanda
 Quit	WebPositive Window		Baigti darbą
 Full screen	WebPositive Window		Visas ekranas
 Open download error	Download Window		Klaida atveriant parsiųstą failą
@@ -52,7 +49,6 @@ Open	Download Window		Atverti
 Reload	WebPositive Window		Atsiųsti iš naujo
 Downloads	Download Window		Parsiuntimai
 Sans serif font:	Settings Window		Šriftas be užraitų:
-Over %days days left	Download Window		Liko daugiau nei %days d.
 Forward	WebPositive Window		Pirmyn
 of	Download Window	...as in '12kB of 256kB'	iš
 Revert	Settings Window		Atšaukti pakeitimus
@@ -68,7 +64,6 @@ Reset size	WebPositive Window		Atstatyti pradinį dydį
 Find:	WebPositive Window		Ieškoti:
 Increase size	WebPositive Window		Padidinti
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Bandant atverti adresyno aplanką, įvyko klaida.\n\nKlaida: %error
-Over 1 day left	Download Window		Liko daugiau nei 1 diena
 Downloads	WebPositive Window		Parsiuntimai
 Requesting %url	WebPositive Window		Siunčiama užklausa tinklapiui %url
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Rasti tolesnį ieškomos frazės pasikartojimą
@@ -98,7 +93,6 @@ Script console	WebPositive Window		Scenarijų pultas
 Proxy server address:	Settings Window		Įgaliotojo serverio adresas:
 Proxy server port:	Settings Window		Įgaliotojo serverio prievadas:
 Bookmarks	WebPositive Window		Adresynas
-%minutes minutes	Download Window		%minutes min.
 Paste	URL Bar		Įdėti
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Nerodyti slaptažodžio teksto
@@ -113,7 +107,6 @@ Password:	Authentication Panel		Slaptažodis:
 Back	WebPositive Window		Atgal
 New browser window	Download Window		Naujas naršyklės langas
 Today	WebPositive Window		Šiandien
-1 second left	Download Window		Liko 1 sekundė
 Remember username and password for this site	Authentication Panel		Įsiminti naudotojo vardą ir slaptažodį šioje svetainėje
 Earlier	WebPositive Window		Anksčiau
 Authentication required	Authentication Panel		Būtina nustatyti tapatybę

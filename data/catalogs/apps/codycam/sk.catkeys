@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-CodyCam	2083193989
+1	slovak	x-vnd.Haiku-CodyCam	183572276
 Capturing Image…	VideoConsumer.cpp		Zachytáva sa obrázok…
 Every 30 seconds	CodyCam		Každých 30 sekúnd
 File name:	CodyCam		Názov súboru:
@@ -32,7 +32,6 @@ Output	CodyCam		Výstup
 Every 15 minutes	CodyCam		Každých 15 minút
 Cannot find an available video stream	CodyCam		Nenájdený dostupný video stream
 Can't find an available connection to the video window	CodyCam		Nebolo nájdené dostupné spojenie s oknom s videom
-Transmitting…	VideoConsumer.cpp		Prenáša sa…
 Cannot get a time source	CodyCam		Nebolo možné získať zdroj času
 Every 8 hours	CodyCam		Každých 8 hodín
 Rename failed	VideoConsumer.cpp		Premenovanie zlyhalo
@@ -83,7 +82,6 @@ reply: %d, %d\n	FtpClient		odpoveď: %d, %d\n
 Cannot find the media roster	CodyCam		Nie je možné nájsť zoznam médií
 Every 4 hours	CodyCam		Každé 4 hodiny
 FTP	CodyCam		FTP
-File transmission failed	VideoConsumer.cpp		Prenos súboru zlyhal
 Cannot seek time source!	CodyCam		Nie je možné posunúť sa na zdroj času!
 File	CodyCam		Súbor
 Image Format Menu	CodyCam		Menu formát obrázka

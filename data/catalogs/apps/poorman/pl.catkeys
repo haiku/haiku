@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-PoorMan	2059301223
+1	polish	x-vnd.Haiku-PoorMan	1347438411
 Website location	PoorMan		Położenie strony
 Error Server	PoorMan		Błąd serwera
 Settings…	PoorMan		Ustawienia…
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Utwórz log programu PoorMan
 Shutting down.\n	PoorMan		Wyłączanie.\n
 Hits: %lu	PoorMan		Odsłon: %lu
 Web folder:	PoorMan		Folder WWW:
-Default	PoorMan		Domyślny
 Save log console selection	PoorMan		Zapisz wybrany fragment logu konsoli
 Run server	PoorMan		Uruchom serwer
 PoorMan settings	PoorMan		Ustawienia programu PoorMan

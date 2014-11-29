@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	761086471
+1	french	x-vnd.Haiku-Terminal	902912385
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -30,7 +30,6 @@ Custom	Terminal colors scheme		Personnalisé
 Cancel	Terminal SetTitleWindow		Annuler
 Increase	Terminal TermWindow		Augmenter
 Settings	Terminal TermWindow		Réglages
-Window size	Terminal TermWindow		Taille de la fenêtre
 Selected text	Terminal AppearancePrefView		Texte sélectionné
 Find	Terminal FindWindow		Rechercher
 Appearance	Terminal PrefWindow		Apparence

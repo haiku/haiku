@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	84010340
+1	finnish	x-vnd.Haiku-libbe	1409488127
 gamma	AboutWindow		gamma
 beta	AboutWindow		beeta
 %3.2f GiB	StringForSize		%3.2f gibitavua
@@ -9,10 +9,8 @@ Version	AboutWindow		Versio
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Ei voida luoda replikanttia kohteelle ”%description”.\n%error
 Copy	TextView		Kopioi
 %3.2f KiB	StringForSize		%3.2f kibitavua
-%d bytes	StringForSize		%d tavua
 alpha	AboutWindow		alfa
 Error	PrintJob		Virhe
-No Pages to print!	PrintJob		Ei ole tulostettavia sivuja!
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 About %app%	AboutWindow		Ohjelmasta %app%
 OK	Dragger		Valmis

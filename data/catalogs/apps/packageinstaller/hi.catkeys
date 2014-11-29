@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-PackageInstaller	792037176
+1	hindi	x-vnd.Haiku-PackageInstaller	3253212490
 Install to:	PackageView		इंस्टाल करें:
 OK	PackageView		ठीक है 
 Accept	PackageTextViewer		मंज़ूर है 
@@ -21,7 +21,6 @@ none	PackageView		कोई नहीं
 Stop	PackageStatus		रोकें 
 Other…	PackageView		और कोई...
 No installation type selected	PackageView		कोई इन्स्तोल्लेषण का प्रकार चुना नहीं गया है
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		सिम्बोलिक लिंक का नाम है '%s' पहले से ही उप्लोब्ध है दिए हुए पथ पर.\nलिंक को बदलें पेकेज के साथ वाल में से या फिर छोड़ दें?
 Installing files and folders	PackageInstall		फ़ाइल और फोल्डर को इंस्टाल कर रहें है 
 Package installer	PackageView		पैकेज इन्स्तोल्लर 
 Skip all	PackageView		सभ को छोड़ें 

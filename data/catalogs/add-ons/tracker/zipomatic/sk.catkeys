@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku.zip-o-matic	2241557251
+1	slovak	x-vnd.haiku.zip-o-matic	1573273374
 Stop	file:ZipOMaticWindow.cpp		Zastaviť
 Creating archive: %s	file:ZipOMaticWindow.cpp		Vytvára sa archív: %s
 Continue	file:ZipOMaticWindow.cpp		Pokračovať
@@ -11,6 +11,5 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		S
 Stopped	file:ZipOMaticWindow.cpp		Zastavené
 Archive	file:ZipperThread.cpp		Archív
 Error creating archive	file:ZipOMaticWindow.cpp		Chyba pri vytváraní archívu
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Beží vám %ld Zip-O-Matic.\n\n
 Archive created OK	file:ZipOMaticWindow.cpp		Archív úspešne vytvorený
 Stop them	file:ZipOMatic.cpp		Zastaviť ich

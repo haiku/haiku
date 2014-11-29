@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaConverter	2722282283
+1	swedish	x-vnd.Haiku-MediaConverter	217152063
 Video using parameters form settings	MediaConverter		Video med parametrar från inställningar
 Video encoding:	MediaConverter		Videokodning:
 Error read audio frame %lld	MediaConverter		Fel vid inläsning av ljudstycke %lld
@@ -11,7 +11,6 @@ Open…	Menu		Öppna...
 Start [ms]: 	MediaConverter		Start [ms]:
 Output file '%filename' created	MediaConverter		Utfil '%filename' skapad
 Output format	MediaConverter		Utformat
-%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld rutor
 End   [ms]: 	MediaConverter		Slut [ms]:
 MediaConverter	System name		MediaKonverterare
 No video	Video codecs list		Inga filmer
@@ -27,7 +26,6 @@ Source files	MediaConverter		Källfiler
 Error writing video frame %lld	MediaConverter		Fel vid skrivande av bildruta %lld
 Error writing audio frame %lld	MediaConverter		Fel vid skrivning av ljudstycke %lld
 Cancelling	MediaConverter		Avbryter
-%d byte 	MediaFileInfo		%d bytes
 Error loading files	MediaConverter		Fel vid inläsning av filer
 Cancel	MediaConverter		Avbryt
 None available	Video codecs		Inga tillgängliga
@@ -37,7 +35,6 @@ Select this folder	MediaConverter		Välj denna mapp
 Continue	MediaConverter		Fortsätt
 Encoder parameters	MediaConverter-EncoderWindow		Kodningsparametrar
 Video:	MediaConverter-FileInfo		Video:
-%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld rutor
 %d bit 	MediaFileInfo		%d bitar
 Error creating '%filename'	MediaConverter		Fel vid skapandet av '%filename'
 Video quality not supported	MediaConverter		Videokvalitén stöds ej
@@ -50,10 +47,8 @@ Preview	MediaConverter		Förhandsvisa
 File format:	MediaConverter		Filformat:
 None available	Audio codecs		Inte tillgängliga
 MediaConverter+:SaveDirectory	MediaConverter		MediaKonverterare+:SaveDirectory
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanal / %lld rutor
 Error launching: %strError%	MediaConverter		Fel vid start: %strError%
 High	MediaConverter		Hög
-The file was not recognized as a supported media file:	MediaConverter		Filen känns inte igen som en mediafil:
 Drop media files onto this window	MediaConverter		Släpp mediafiler i detta fönster
 Audio encoding:	MediaConverter		Ljudkodning:
 Audio quality not supported	MediaConverter		Ljudkvalité stöds ej
@@ -64,5 +59,3 @@ Video quality: %3d%%	MediaConverter		Videokvalité: %3d%%
 Output folder	MediaConverter		Utmapp
 Audio quality: %3d%%	MediaConverter		Ljudkvalité: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ett fel uppstod vid inläsning av filinformationen.\n\nFel:
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles kändes inte igen som mediafiler:
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld rutor

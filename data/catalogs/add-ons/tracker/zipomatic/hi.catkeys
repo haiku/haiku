@@ -1,4 +1,4 @@
-1	hindi	x-vnd.haiku.zip-o-matic	2241557251
+1	hindi	x-vnd.haiku.zip-o-matic	1573273374
 Stop	file:ZipOMaticWindow.cpp		रोक दो
 Creating archive: %s	file:ZipOMaticWindow.cpp		पुरालेख बन रहा है: %s
 Continue	file:ZipOMaticWindow.cpp		जारी रखें
@@ -11,6 +11,5 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Stopped	file:ZipOMaticWindow.cpp		रोका गया
 Archive	file:ZipperThread.cpp		पुरालेख
 Error creating archive	file:ZipOMaticWindow.cpp		पुरालेख बनाने में त्रुटि
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		तुम ने %ld ज़िप-ओ-मैटिक चल रही है. \n\n
 Archive created OK	file:ZipOMaticWindow.cpp		पुरालेख बन गया ठीक है
 Stop them	file:ZipOMatic.cpp		उन्हें रोको

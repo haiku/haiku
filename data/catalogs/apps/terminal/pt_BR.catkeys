@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	761086471
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	902912385
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
@@ -30,7 +30,6 @@ Custom	Terminal colors scheme		Personalizado
 Cancel	Terminal SetTitleWindow		Cancelar
 Increase	Terminal TermWindow		Aumentar
 Settings	Terminal TermWindow		Configurações
-Window size	Terminal TermWindow		Tamanho da janela
 Selected text	Terminal AppearancePrefView		Texto selecionado
 Find	Terminal FindWindow		Localizar
 Appearance	Terminal PrefWindow		Aparência

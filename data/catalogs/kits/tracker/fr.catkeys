@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	137546976
+1	french	x-vnd.Haiku-libtracker	3041555072
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Extensions
 Mount settings…	ContainerWindow		Réglages du montage…
@@ -103,7 +103,6 @@ Show space bars on volumes	SettingsView		Afficher la jauge d'espace sur les volu
 Invert selection	ContainerWindow		Inverser la sélection
 Increase size	DeskWindow		Augmenter la taille
 Resize to fit	ContainerWindow		Ajuster
-%Ld bytes	WidgetAttributeText		%Ld octets
 Add printer…	ContainerWindow		Ajouter une imprimante…
 New folder	ContainerWindow		Nouveau dossier
 Kind	ContainerWindow		Nature
@@ -290,7 +289,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	déplacez
 Show Disks icon	SettingsView		Afficher l'icône des disques
 Cancel	PoseView		Annuler
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld octets, 
 You can't move or copy items to read-only volumes.	FSUtils		Vous ne pouvez pas déplacer ou copiez des éléments dans un volume en lecture-seule.
 Unknown	FilePermissionsView		Inconnu
 All files and folders	FindPanel		Tout les fichiers et dossiers

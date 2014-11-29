@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-CharacterMap	2745781253
+1	portuguese (brazil)	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Alfanuméricos inclusos
 Basic Latin	UnicodeBlocks		Latin básico
 View	CharacterWindow		Visualizar
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Marcas de combinação di
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Árabe suplementar
 Latin extended C	UnicodeBlocks		Latino estendido C
-Ancient smbols	UnicodeBlocks		Símbolos antigos
 Bopomofo extended	UnicodeBlocks		Bopomofo estendido
 Lycian	UnicodeBlocks		Lício
-Font size:	CharacterWindow		Tamanho da fonte:
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Etíope
 Bengali	UnicodeBlocks		Bengali

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.haiku.zip-o-matic	2924152822
+1	portuguese (brazil)	x-vnd.haiku.zip-o-matic	2255868945
 Stop	file:ZipOMaticWindow.cpp		Parar
 Creating archive: %s	file:ZipOMaticWindow.cpp		Criando arquivo: %s
 Continue	file:ZipOMaticWindow.cpp		Continuar
@@ -11,7 +11,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		V
 Stopped	file:ZipOMaticWindow.cpp		Parado
 Archive	file:ZipperThread.cpp		Arquivar
 Error creating archive	file:ZipOMaticWindow.cpp		Erro ao criar conjunto de arquivos
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Você tem %ld Zip-O-Matic ativos.\n\n
 {0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, um{# arquivo adicionado.} outro{# arquivos adicionados.}}
 Archive created OK	file:ZipOMaticWindow.cpp		O grupo de arquivos foi criado com sucesso
 Stop them	file:ZipOMatic.cpp		Pará-lo

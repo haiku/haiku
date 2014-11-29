@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-CodyCam	2083193989
+1	hindi	x-vnd.Haiku-CodyCam	183572276
 Capturing Image…	VideoConsumer.cpp		कैपचरिंग इमेज...
 Every 30 seconds	CodyCam		हर 30 सेकंड
 File name:	CodyCam		फ़ाइल का नाम:
@@ -32,7 +32,6 @@ Output	CodyCam		उत्पादन
 Every 15 minutes	CodyCam		हर 15 मिनट में
 Cannot find an available video stream	CodyCam		एक उपलब्ध वीडियो धारा नहीं खोज सके
 Can't find an available connection to the video window	CodyCam		वीडियो विंडो के लिए एक कनेक्शन उपलब्ध नहीं खोज सके
-Transmitting…	VideoConsumer.cpp		प्रसारण ...
 Cannot get a time source	CodyCam		एक समय स्रोत प्राप्त नहीं कर सकते
 Every 8 hours	CodyCam		हर 8 घंटे
 Rename failed	VideoConsumer.cpp		नाम बदलने में विफल
@@ -83,7 +82,6 @@ reply: %d, %d\n	FtpClient		उत्तर: %d, %d\n
 Cannot find the media roster	CodyCam		मीडिया रोस्टर नहीं खोज सके
 Every 4 hours	CodyCam		हर 4 घंटे
 FTP	CodyCam		एफ़टीपी
-File transmission failed	VideoConsumer.cpp		फ़ाइल संचरण विफल
 Cannot seek time source!	CodyCam		समय के स्रोत की तलाश नहीं कर सकते!
 File	CodyCam		फ़ाइल
 Image Format Menu	CodyCam		इमेज प्रारूप मेनू

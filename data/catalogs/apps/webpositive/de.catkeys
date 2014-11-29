@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	1130172675
+1	german	x-vnd.Haiku-WebPositive	979407669
 Show home button	Settings Window		Home-Symbol anzeigen
 Username:	Authentication Panel		Benutzername:
 Copy URL to clipboard	Download Window		Adresse kopieren
@@ -20,7 +20,6 @@ Double-click or middle-click to open new tab.	Tab Manager		Doppel- oder Mittelkl
 Proxy username:	Settings Window		Proxy-Nutzername:
 Save page as…	WebPositive Window		Seite speichern unter…
 Settings	Settings Window		Einstellungen
-%seconds seconds left	Download Window		Noch %seconds Sekunden
 Confirmation	WebPositive Window		Bestätigung
 Window	WebPositive Window		Fenster
 Decrease size	WebPositive Window		Verkleinern
@@ -32,7 +31,6 @@ Next	WebPositive Window		Vorwärts
 Find next	WebPositive Window		Nächster Treffer
 Download folder:	Settings Window		Download-Ordner:
 Edit	WebPositive Window		Bearbeiten
-Over %hours hours left	Download Window		Noch über %hours Stunden
 Cancel	Authentication Panel		Abbrechen
 Match case	WebPositive Window		Groß-/Kleinschreibung beachten
 Search page:	Settings Window		Suchmachine:
@@ -40,7 +38,6 @@ Zoom text only	WebPositive Window		Nur Text vergrößern
 Default fixed font size:	Settings Window		Größe der Schrift fester Breite:
 Close tab	WebPositive Window		Reiter schließen
 Auto-hide mouse pointer	Settings Window		Mauszeiger automatisch ausblenden
-Over 1 hour left	Download Window		Noch über eine Stunde
 Quit	WebPositive Window		Beenden
 Full screen	WebPositive Window		Vollbild
 Open download error	Download Window		Fehler beim Öffnen
@@ -54,7 +51,6 @@ Open	Download Window		Öffnen
 Reload	WebPositive Window		Aktualisieren
 Downloads	Download Window		Downloads
 Sans serif font:	Settings Window		Serifenlose Schrift:
-Over %days days left	Download Window		Noch %days Tage
 Forward	WebPositive Window		Vorwärts
 of	Download Window	...as in '12kB of 256kB'	von
 Revert	Settings Window		Anfangswerte
@@ -70,7 +66,6 @@ Reset size	WebPositive Window		Größe zurücksetzen
 Find:	WebPositive Window		Suchen:
 Increase size	WebPositive Window		Vergrößern
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Auf den Lesezeichen-Ordner kann nicht zugegriffen werden.\n\nFehler: %error
-Over 1 day left	Download Window		Noch über einen Tag
 Downloads	WebPositive Window		Downloads
 Requesting %url	WebPositive Window		%url wird angefordert
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Nächster Treffer
@@ -100,7 +95,6 @@ Script console	WebPositive Window		Skript-Konsole
 Proxy server address:	Settings Window		Proxy-Serveradresse:
 Proxy server port:	Settings Window		Proxy-Serverport:
 Bookmarks	WebPositive Window		Lesezeichen
-%minutes minutes	Download Window		%minutes Minuten
 Paste	URL Bar		Einfügen
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Passwort verstecken
@@ -115,7 +109,6 @@ Password:	Authentication Panel		Passwort:
 Back	WebPositive Window		Zurück
 New browser window	Download Window		Neues Browser-Fenster
 Today	WebPositive Window		Heute
-1 second left	Download Window		Noch 1 Sekunde
 Remember username and password for this site	Authentication Panel		Benutzername und Passwort für diese Seite speichern
 Earlier	WebPositive Window		Früher
 Authentication required	Authentication Panel		Anmeldung erforderlich

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	1426425234
+1	french	x-vnd.Haiku-Installer	2319349255
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l'installation et redémarrer le système ?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installeur\n\técrit par Jérôme Duval et Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -93,7 +93,6 @@ The target volume is not empty. Are you sure you want to install anyway?\n\nNote
 No optional packages available.	PackagesView		Pas de paquets optionnels disponibles.
 All hard disks start with \"hd\".\n	InstallerApp		Tout les disques durs commencent par « hd ».\n
 Continue	InstallerApp		Continuer
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Le Gestionnaire d'amorçage d'Haiku qui configure le menu de démarrage, n'a pas pu être lancé.
 Boot sector not written because of an internal error.	InstallProgress		Le secteur d'amorçage n'a pas été écrit à cause d'une erreur interne.
 Additional disk space required: %s	InstallerWindow		Espace disque requis supplémentaire : %s
 Cancel	InstallProgress		Annuler

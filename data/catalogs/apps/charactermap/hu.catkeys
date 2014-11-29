@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-CharacterMap	2745781253
+1	hungarian	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Zárt alfanumerikus
 Basic Latin	UnicodeBlocks		Alap latin
 View	CharacterWindow		Nézet
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Diakritikus jelölések k
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Arab kiegészítés
 Latin extended C	UnicodeBlocks		Latin kiterjesztett C
-Ancient smbols	UnicodeBlocks		Ősi szimbólumok
 Bopomofo extended	UnicodeBlocks		Bopomofo kiterjesztett
 Lycian	UnicodeBlocks		Lícián
-Font size:	CharacterWindow		Betűméret:
 Osmanya	UnicodeBlocks		Osmán
 Ethiopic	UnicodeBlocks		Etióp
 Bengali	UnicodeBlocks		Bengali

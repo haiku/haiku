@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libbe	677628532
+1	slovak	x-vnd.Haiku-libbe	2003106319
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -9,10 +9,8 @@ Version	AboutWindow		Verzia
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nemožno vytvoriť replikanta pre „%description“.\n%error
 Copy	TextView		Kopírovať
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d bajtov
 alpha	AboutWindow		alfa
 Error	PrintJob		Chyba
-No Pages to print!	PrintJob		Žiadne strany na tlačenie!
 All Rights Reserved.	AboutWindow		Všetky práva vyhradené.
 OK	Dragger		OK
 OK	PrintJob		OK

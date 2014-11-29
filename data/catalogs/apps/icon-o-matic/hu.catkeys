@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	28048799
+1	hungarian	x-vnd.haiku-icon_o_matic	1929083132
 Select All	Icon-O-Matic-PathManipulator		Mind kijelölése
 Add Style	Icon-O-Matic-AddStylesCmd		Stílus hozzáadása
 Color (#%02x%02x%02x)	Style name after dropping a color		Szín (#%02x%02x%02x)
@@ -106,7 +106,6 @@ Unassign Path	Icon-O-Matic-UnassignPathCmd		Útvonal hozzárendelésének törl�
 load error	Icon-O-Matic-SVGImport		betöltési hiba
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Alakzatok áthelyezése
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Stílusok eltávolítása
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		A szöveg, amit importálni kíván, nagyon hosszú. Biztos importálja?
 Add	Icon-O-Matic-TransformersList		Hozzáadás
 Color	Icon-O-Matic-StyleTypes		Szín
 Settings…	Icon-O-Matic-SavePanel		Beállítások…
@@ -169,7 +168,6 @@ Caps	Icon-O-Matic-PropertyNames		Vonalvég
 Transform	Icon-O-Matic-PathManipulator		Átalakítás
 Add Paths	Icon-O-Matic-AddPathsCmd		Útvonalak hozzáadása
 Style type	Icon-O-Matic-StyleTypes		Stílus típusa
-too big	Icon-O-Matic-StyledTextImport		túl nagy
 Assign Style	Icon-O-Matic-AssignStyleCmd		Stílus hozzárendelése
 Add Path	Icon-O-Matic-AddPathsCmd		Útvonal hozzáadása
 Color	Icon-O-Matic-PropertyNames		Szín

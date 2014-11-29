@@ -1,9 +1,8 @@
-1	slovak	x-vnd.Haiku-BootManager	2195645217
+1	slovak	x-vnd.Haiku-BootManager	3355843558
 The boot manager has been successfully installed on your system.	BootManagerController		Správca zavádzania bol úspešne nainštalovaný na váš systém.
 After two seconds	DefaultPartitionPage		Po dvoch sekundách
 Uninstall Boot Manager	UninstallPage	Title	Odinštalovať Správcu zavádzania
 At least one partition must be selected!	BootManagerController		Musí byť vybraná aspoň jedna disková oblasť!
-The old Master Boot Record could not be saved to %s	BootManagerController		Starý MBR nebolo možné uložiť do %s
 Restore MBR	BootManagerController	Button	Obnoviť MBR
 Hard Drive	DrivesPage	Default disk name	Pevný disk
 USB Drive	DrivesPage	Default disk name	Disk USB
@@ -41,7 +40,6 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Neznámy
 Update	DrivesPage	Button	Aktualizovať
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Prosím, nájdite súbor s uloženým MBR, z ktorého chcete obnoviť MBR. Tento súbor bol vytvorený, keď ste prvýkrát nainštalovali Správcu zavádzania.
-Old Master Boot Record Saved failure	BootManagerController	Title	Zlyhalo uloženie starého MBR
 Drives	DrivesPage	Title	Disky
 No space available!	DrivesPage	Cannot install	Nie je voľné miesto!
 Never	DefaultPartitionPage		Nikdy

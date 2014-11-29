@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Installer	3930183175
+1	lithuanian	x-vnd.Haiku-Installer	528139900
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ar tikrai norite nutraukti diegimą ir paleisti kompiuterį iš naujo?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		„Haiku“ įdiegimo programa\n\tsukurta Jérôme'o Duval'io ir Stephan'o Aßmus'o\n\t© 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -89,7 +89,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Papildomų paketų nėra.
 All hard disks start with \"hd\".\n	InstallerApp		Visų standžiųjų diskų pavadinimas prasideda raidėmis „hd“.\n
 Continue	InstallerApp		Tęsti
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Paleidyklės – programos, įdiegiančios įjungus kompiuterį rodomą meniu, paleisti nepavyko.
 Boot sector not written because of an internal error.	InstallProgress		Paleidimo sektoriaus nepavyko įrašyti dėl vidinės klaidos.
 Additional disk space required: %s	InstallerWindow		Papildomai reikės disko vietos: %s
 Cancel	InstallProgress		Atsisakyti

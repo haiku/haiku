@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CharacterMap	2745781253
+1	japanese	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		囲み英数字
 Basic Latin	UnicodeBlocks		基本ラテン文字
 View	CharacterWindow		表示
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		記号用結合分音記�
 Syloti Nagri	UnicodeBlocks		シロティ・ナグリ文字
 Arabic supplement	UnicodeBlocks		アラビア文字補助
 Latin extended C	UnicodeBlocks		ラテン文字拡張C
-Ancient smbols	UnicodeBlocks		古代記号
 Bopomofo extended	UnicodeBlocks		注音字母拡張
 Lycian	UnicodeBlocks		リキア文字
-Font size:	CharacterWindow		フォントサイズ:
 Osmanya	UnicodeBlocks		オスマン文字
 Ethiopic	UnicodeBlocks		エチオピア文字
 Bengali	UnicodeBlocks		ベンガル文字

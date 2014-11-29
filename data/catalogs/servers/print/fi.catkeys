@@ -21,7 +21,7 @@ Would you like to set one up now?	PrintServerApp		Haluaisitko asettaa yhden nyt?
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Pystysuora
 All pages	ConfigWindow		Kaikki sivut
-There is no default printer set up.	PrintServerApp		Tulostimen oletusasetusta ei ole asetettu.
+There is no default printer set up.	PrintServerApp		Oletustulostinta ei ole asetettu.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter-koko
@@ -49,7 +49,7 @@ Get name of printer	Printer Scripting		Hae tulostimen nimi
 A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Hae siirron nimi
 A5	ConfigWindow	ISO 216 paper size	A5
-Would you like to make @ the default printer?	PrintServerApp		Haluaisitko tehdä @ oletustulostimeksi?
+Would you like to make @ the default printer?	PrintServerApp		Haluaisitko asettaa @ oletustulostimeksi?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid-koko
 Page setup	ConfigWindow		Sivuasetukset
 Paper setup:	ConfigWindow		Paperiasetukset:

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-CodyCam	2083193989
+1	hungarian	x-vnd.Haiku-CodyCam	183572276
 Capturing Image…	VideoConsumer.cpp		Kép készítése…
 Every 30 seconds	CodyCam		30 másodpercenként
 File name:	CodyCam		Fájlnév:
@@ -32,7 +32,6 @@ Output	CodyCam		Kimenet
 Every 15 minutes	CodyCam		15 percenként
 Cannot find an available video stream	CodyCam		Nem található elérhető videóadás
 Can't find an available connection to the video window	CodyCam		Nem található használható kapcsolat a videó ablakához
-Transmitting…	VideoConsumer.cpp		Átvitel…
 Cannot get a time source	CodyCam		Nem található időforrás
 Every 8 hours	CodyCam		8 óránként
 Rename failed	VideoConsumer.cpp		Átnevezés sikertelen
@@ -83,7 +82,6 @@ reply: %d, %d\n	FtpClient		válasz: %d, %d\n
 Cannot find the media roster	CodyCam		Nem található a médiajegyzék
 Every 4 hours	CodyCam		4 óránként
 FTP	CodyCam		FTP
-File transmission failed	VideoConsumer.cpp		A fáljátvitel sikertelen
 Cannot seek time source!	CodyCam		Nem lehet az időforráshoz ugrani!
 File	CodyCam		Fálj
 Image Format Menu	CodyCam		Képformátum menü

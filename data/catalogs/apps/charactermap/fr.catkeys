@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CharacterMap	2745781253
+1	french	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Alphanumériques cerclés
 Basic Latin	UnicodeBlocks		Latin basic
 View	CharacterWindow		Vue
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Marques diacritiques d'as
 Syloti Nagri	UnicodeBlocks		Sylotî nâgrî
 Arabic supplement	UnicodeBlocks		Arabe supplémentaire
 Latin extended C	UnicodeBlocks		Latin étendu C
-Ancient smbols	UnicodeBlocks		Symboles anciens
 Bopomofo extended	UnicodeBlocks		Bopomofo étendu
 Lycian	UnicodeBlocks		Lycien
-Font size:	CharacterWindow		Taille de police :
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Ethiopien
 Bengali	UnicodeBlocks		Bengali

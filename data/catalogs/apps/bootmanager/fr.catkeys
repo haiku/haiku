@@ -1,9 +1,8 @@
-1	french	x-vnd.Haiku-BootManager	2195645217
+1	french	x-vnd.Haiku-BootManager	1719213568
 The boot manager has been successfully installed on your system.	BootManagerController		Le gestionnaire d'amorçage a été installé avec succès sur votre système.
 After two seconds	DefaultPartitionPage		Après deux secondes
 Uninstall Boot Manager	UninstallPage	Title	Désinstallation du Gestionnaire d'amorçage
 At least one partition must be selected!	BootManagerController		Au moins une partition doit être sélectionnée !
-The old Master Boot Record could not be saved to %s	BootManagerController		L'ancien MBR n'a pas pu être sauvegardé vers %s
 Restore MBR	BootManagerController	Button	Restaurer le MBR
 Hard Drive	DrivesPage	Default disk name	Disque Dur
 USB Drive	DrivesPage	Default disk name	Disque USB
@@ -26,6 +25,7 @@ After one second	DefaultPartitionPage		Après une seconde
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Les partitions suivantes ont été détectées. Veuillez cocher les cases correspondantes aux partitions à inclure dans le menu d'amorçage. Vous pouvez aussi définir le libellé que vous souhaitez voir apparaître dans le menu d'amorçage pour chacune des partitions.
 After one minute	DefaultPartitionPage		Après une minute
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Le MBR du périphérique de démarrage (%DISK) a été récupéré avec succès depuis %FILE.
+Quit	WizardView	Button	Quitter
 Write boot menu	BootManagerController	Button	Écrire le menu de démarrage
 The Master Boot Record could not be restored!	BootManagerController		Le MBR n'a pas pu être restauré !
 Uninstall	DrivesPage	Button	Désinstaller
@@ -41,7 +41,6 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Inconnu
 Update	DrivesPage	Button	Mettre à jour
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Veuillez indiquer le fichier de sauvegarde du MBR qui va servir à la restauration de celui-ci. C'est normalement le fichier qui a été crée lors de la première installation du gestionnaire de démarrage.
-Old Master Boot Record Saved failure	BootManagerController	Title	Echec lors de l'enregistrement de l'ancien MBR
 Drives	DrivesPage	Title	Disques
 No space available!	DrivesPage	Cannot install	Espace insuffisant !
 Never	DefaultPartitionPage		Jamais

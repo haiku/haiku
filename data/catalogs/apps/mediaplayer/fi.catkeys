@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1727923642
+1	finnish	x-vnd.Haiku-MediaPlayer	3507634633
 raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -31,7 +31,6 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Hakee/
 Display mode	MediaPlayer-InfoWin		Näyttötila
 Medium	MediaPlayer-SettingsWindow		Media
 Close	MediaPlayer-PlaylistWindow		Sulje
-Stereo	MediaPlayer-InfoWin		Stereo
 Open…	MediaPlayer-PlaylistWindow		Avaa...
 Toggle mute.	MediaPlayer-Main		Vuorottele mykistystilaa.
 Undo	MediaPlayer-PlaylistWindow		Peru
@@ -56,7 +55,6 @@ Start playing.	MediaPlayer-Main		Aloita soittaminen.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Tätä tiedostomuotoa käsittelevää dekooderia ei ole asennettu, tai dekooderilla on vaikeuksia tietyn muotoversion kanssa.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Tuo kappale
 Gets the URI of the currently playing item.	MediaPlayer-Main		Hakee parhaillaan soitettavan kappaleen Internet-resurssin tunnusosoitetta.
-%d Channels	MediaPlayer-InfoWin		%d kanavaa
 400% scale	MediaPlayer-Main		400 % skaala
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelon tallentaminen epäonnistui:\n\nVirhe: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Siirrä kappaleita
@@ -156,7 +154,6 @@ Always on top	MediaPlayer-Main		Aina päällimmäisenä
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Poista kappale roskakoriin
 Save	MediaPlayer-Main		Tallenna
 <nothing to undo>	MediaPlayer-PlaylistWindow		<ei mitään tehtävää>
-Mono	MediaPlayer-InfoWin		Mono
 File info	MediaPlayer-InfoWin		Tiedostotiedot
 Save	MediaPlayer-PlaylistWindow		Tallenna
 %d Bit	MediaPlayer-InfoWin		%d-bittinen

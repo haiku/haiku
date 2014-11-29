@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Screen	2033930135
+1	greek, modern (1453-)	x-vnd.Haiku-Screen	1388881963
 yes	Screen		ναι
 Use laptop panel:	Screen		Χρήση πανελ φορητού υπολογιστή:
 15 bits/pixel, 32768 colors	Screen		15 bits/εικονοστοιχείο, 32768 χρώματα
@@ -35,7 +35,6 @@ horizontally	Screen		οριζόντια
 Other…	Screen		Άλλο...
 Cancel	Screen		Άκυρο
 bits/pixel	Screen		bits/εικονοστοιχείο
-Settings will revert in %seconds seconds.	Screen		Επαναφορά ρυθμίσεων σε %δευτερόλεπτα.
 Refresh rate:	Screen		Ρυθμός Ανανέωσης:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Θέλετε να διατηρήσετε τις ακόλουθες ρυθμίσεις;

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	4215560519
+1	german	x-vnd.Haiku-libtracker	2824601319
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-ons
 Mount settings…	ContainerWindow		Einhänge-Einstellungen…
@@ -100,7 +100,6 @@ Show space bars on volumes	SettingsView		Speicherplatzbalken bei Datenträgern a
 Invert selection	ContainerWindow		Auswahl umkehren
 Increase size	DeskWindow		Vergrößern
 Resize to fit	ContainerWindow		Optimale Größe
-%Ld bytes	WidgetAttributeText		%Ld Bytes
 Add printer…	ContainerWindow		Drucker hinzufügen…
 New folder	ContainerWindow		Neuer Ordner
 Kind	ContainerWindow		Art
@@ -285,7 +284,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	verschoben
 Show Disks icon	SettingsView		Datenträger-Icon anzeigen
 Cancel	PoseView		Abbrechen
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld Bytes,
 You can't move or copy items to read-only volumes.	FSUtils		Auf schreibgeschützte Datenträger können keine Objekte kopiert oder verschoben werden.
 Unknown	FilePermissionsView		Unbekannt
 All files and folders	FindPanel		Alle Dateien und Ordner

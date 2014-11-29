@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	1484812094
+1	dutch; flemish	x-vnd.Haiku-Terminal	1626638008
 Not found.	Terminal TermWindow		Niet gevonden.
 Switch Terminals	Terminal TermWindow		Wissel van Terminal
 Change directory	Terminal TermView		Directory veranderen
@@ -25,7 +25,6 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Niet-herkende optie \"%
 Cancel	Terminal SetTitleWindow		Annuleren
 Increase	Terminal TermWindow		Vermeerderen
 Settings	Terminal TermWindow		Instellingen
-Window size	Terminal TermWindow		Venstergrootte
 Selected text	Terminal AppearancePrefView		Geselecteerde tekst
 Find	Terminal FindWindow		Zoeken
 Appearance	Terminal PrefWindow		Uiterlijk

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Screen	2033930135
+1	lithuanian	x-vnd.Haiku-Screen	1388881963
 yes	Screen		taip
 Use laptop panel:	Screen		Naudoti skreitinuko ekraną:
 15 bits/pixel, 32768 colors	Screen		15 bitų spalvos, iš viso 32768
@@ -35,7 +35,6 @@ horizontally	Screen		horizontaliai
 Other…	Screen		Kitas…
 Cancel	Screen		Atsisakyti
 bits/pixel	Screen		bitų
-Settings will revert in %seconds seconds.	Screen		Už %seconds sek. bus grąžintos ankstesnės nuostatos.
 Refresh rate:	Screen		Kadrų dažnis:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Ar norite palikti šias nuostatas?

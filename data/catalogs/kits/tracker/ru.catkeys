@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	137546976
+1	russian	x-vnd.Haiku-libtracker	3041555072
 OK	WidgetAttributeText		ОК
 Add-ons	FilePanelPriv		Дополнения
 Mount settings…	ContainerWindow		Настройка подключения дисков…
@@ -103,7 +103,6 @@ Show space bars on volumes	SettingsView		Показывать индикатор
 Invert selection	ContainerWindow		Инвертировать
 Increase size	DeskWindow		Увеличить размер
 Resize to fit	ContainerWindow		Подогнать размер окна
-%Ld bytes	WidgetAttributeText		%Ld байт
 Add printer…	ContainerWindow		Добавить принтер…
 New folder	ContainerWindow		Новая папка
 Kind	ContainerWindow		Тип
@@ -290,7 +289,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	переместите
 Show Disks icon	SettingsView		Показывать значок дисков
 Cancel	PoseView		Отмена
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld байт, 
 You can't move or copy items to read-only volumes.	FSUtils		Невозможно перемещать или копировать что-либо на раздел в режиме только для чтения.
 Unknown	FilePermissionsView		Неизвестно
 All files and folders	FindPanel		Все файлы и папки

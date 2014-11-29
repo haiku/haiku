@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ShowImage	4121021813
+1	portuguese (brazil)	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Utilizar como plano de fundo…
 File	Menus		Arquivo
 Slide delay	Menus		Atraso de deslizamento
@@ -21,7 +21,6 @@ Edit	Menus		Editar
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível carregar a imagem! O arquivo, ou o tradutor de imagem para ele, não existe.
 First page	Menus		Primeira página
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Deseja fechar o documento?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS segundos
 Leave full screen	Menus		Sair da tela cheia
 Close	Menus		Fechar
 Close	ClosePrompt		Fechar

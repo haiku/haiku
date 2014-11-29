@@ -1,10 +1,9 @@
-1	japanese	x-vnd.Be-WORK	658966565
+1	japanese	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		無効な引数: %s\n
 Quit	Workspaces		終了
 Workspaces	System name		ワークスペース
 Change workspace count…	Workspaces		ワークスペースの数を変更…
 Remove replicant	Workspaces		レプリカントを削除
-About Workspaces…	Workspaces		Workspaces について…
 Show window border	Workspaces		ウィンドウ枠を表示
 Auto-raise	Workspaces		自動的に表示
 Always on top	Workspaces		常に最前面に

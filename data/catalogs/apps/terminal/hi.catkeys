@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Terminal	1690651158
+1	hindi	x-vnd.Haiku-Terminal	1832477072
 Not found.	Terminal TermWindow		नहीं मिला.
 Switch Terminals	Terminal TermWindow		स्विच टर्मिनल्स
 Change directory	Terminal TermView		निर्देशिका बदलें
@@ -24,7 +24,6 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		अपरिचित �
 Cancel	Terminal SetTitleWindow		रद्द
 Increase	Terminal TermWindow		बढ़ाना
 Settings	Terminal TermWindow		सेटिंग्स
-Window size	Terminal TermWindow		विंडो का आकार
 Selected text	Terminal AppearancePrefView		चयनित टेक्स्ट
 Find	Terminal FindWindow		खोजें
 Appearance	Terminal PrefWindow		दिखावट

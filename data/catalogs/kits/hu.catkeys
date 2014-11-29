@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libbe	84010340
+1	hungarian	x-vnd.Haiku-libbe	1409488127
 gamma	AboutWindow		gamma
 beta	AboutWindow		béta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -9,10 +9,8 @@ Version	AboutWindow		Verzió
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nem lehet replikánst létrehozni ehhez: %description.\n%error
 Copy	TextView		Másolás
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d bájt
 alpha	AboutWindow		alfa
 Error	PrintJob		Hiba
-No Pages to print!	PrintJob		Nincs nyomtatható oldal!
 All Rights Reserved.	AboutWindow		Minden jog fenntartva.
 About %app%	AboutWindow		%app% névjegye
 OK	Dragger		Rendben

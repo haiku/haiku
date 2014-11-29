@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	761086471
+1	ukrainian	x-vnd.Haiku-Terminal	902912385
 Not found.	Terminal TermWindow		Не знайдено.
 Switch Terminals	Terminal TermWindow		Перемкнути термінали
 Change directory	Terminal TermView		Змінити каталог
@@ -30,7 +30,6 @@ Custom	Terminal colors scheme		Налаштована вручну
 Cancel	Terminal SetTitleWindow		Відміна
 Increase	Terminal TermWindow		Збільшити
 Settings	Terminal TermWindow		Настройки
-Window size	Terminal TermWindow		Розмір вікна
 Selected text	Terminal AppearancePrefView		Вибрати текст
 Find	Terminal FindWindow		Знайти
 Appearance	Terminal PrefWindow		Зовн. вигляд

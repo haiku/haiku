@@ -1,11 +1,10 @@
-1	finnish	x-vnd.Haiku-DriveSetup	758245016
+1	finnish	x-vnd.Haiku-DriveSetup	4273934970
 DriveSetup	System name		Levyasema-asetukset
 Cancel	AbstractParametersPanel		Peru
 Delete	MainWindow		Poista
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
 Rescan	MainWindow		Etsi uudelleen
 OK	MainWindow		Valmis
-Could not aquire partitioning information.	MainWindow		Osiointitietojen hakeminen epäonnistui.
 There's no space on the partition where a child partition could be created.	MainWindow		Osiolla ei ole mitään tilaa, johon olisi voitu luoda tytärosio.
 Could not unmount partition	MainWindow		Osion irrottaminen epäonnistui
 Initialize	InitializeParametersPanel		Alusta
@@ -44,14 +43,12 @@ Change	ChangeParametersPanel		Vaihda
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki levyn %s tiedot katoavat palauttamattomasti, jos teet niin!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat poistaa valitun osion?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
 Create…	MainWindow		Luo…
-Disk system \"%s\"\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
 The disk has been successfully initialized.\n	MainWindow		Levyn alustus onnistui.\n
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Osion parametrien vaihtaminen epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
 Failed to format the partition %s!\n	MainWindow		Osion %s alustus epäonnistui!\n
 Mount	MainWindow		Liitä
 Partition type	PartitionList		Osiotyyppi
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa raakalevyn? (useimmat ihmiset alustavat levyn ensin osiointijärjestelmällä) Samaa kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
 The panel experienced a problem!	MainWindow		Paneelissa oli pulmia!
 Change parameters…	MainWindow		Vaihda parametreja...
 Device	PartitionList		Laite

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	472703777
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	2373738110
 Select All	Icon-O-Matic-PathManipulator		Alles selecteren
 Add Style	Icon-O-Matic-AddStylesCmd		Stijl toevoegen
 Color (#%02x%02x%02x)	Style name after dropping a color		Kleur (#02x%02x%02x)
@@ -103,7 +103,6 @@ Unassign Path	Icon-O-Matic-UnassignPathCmd		Pad ontzeggen
 load error	Icon-O-Matic-SVGImport		laadfout
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Vormen verplaatsen
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Stijlen verwijderen
-The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		De tekst die u wilt importeren is nogal lang, bent u zeker?
 Add	Icon-O-Matic-TransformersList		Toevoegen
 Color	Icon-O-Matic-StyleTypes		Kleur
 Settings…	Icon-O-Matic-SavePanel		Instellingen...
@@ -166,7 +165,6 @@ Caps	Icon-O-Matic-PropertyNames		Hoofdletters
 Transform	Icon-O-Matic-PathManipulator		Transformeren
 Add Paths	Icon-O-Matic-AddPathsCmd		Paden toevoegen
 Style type	Icon-O-Matic-StyleTypes		Stijltype
-too big	Icon-O-Matic-StyledTextImport		te groot
 Assign Style	Icon-O-Matic-AssignStyleCmd		Stijl toekennen
 Add Path	Icon-O-Matic-AddPathsCmd		Pad toevoegen
 Color	Icon-O-Matic-PropertyNames		Kleur

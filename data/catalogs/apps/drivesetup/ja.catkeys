@@ -1,11 +1,10 @@
-1	japanese	x-vnd.Haiku-DriveSetup	758245016
+1	japanese	x-vnd.Haiku-DriveSetup	4273934970
 DriveSetup	System name		DriveSetup
 Cancel	AbstractParametersPanel		中止
 Delete	MainWindow		削除
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		変更をディスクに保存しますか?\n\nその場合、選択されたパーティションのすべてのデータが失われますので、ご注意ください。
 Rescan	MainWindow		ディスクを再検出
 OK	MainWindow		OK
-Could not aquire partitioning information.	MainWindow		パーティション情報の取得に失敗しました。
 There's no space on the partition where a child partition could be created.	MainWindow		子パーティションを作成するスペースがありません。
 Could not unmount partition	MainWindow		パーティションをマウント解除できませんでした。
 Initialize	InitializeParametersPanel		初期化
@@ -44,14 +43,12 @@ Change	ChangeParametersPanel		変更
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われます。
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		選択されたパーティションを削除しますか?\n\nその場合、パーティションのすべてのデータが失われます。
 Create…	MainWindow		新規作成…
-Disk system \"%s\"\" not found!	MainWindow		\"%s\"\" ディスクシステムがみつかりません!
 The disk has been successfully initialized.\n	MainWindow		ディスクは正常に初期化されました。\n
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できませんでした。
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		パーティションのパラメーターの変更に失敗しました。ディスクは変更されていません。
 Failed to format the partition %s!\n	MainWindow		パーティション %s のフォーマットに失敗しました。\n
 Mount	MainWindow		マウント
 Partition type	PartitionList		パーティション種別 :
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		ディスク全体をフォーマットしますか? (大抵の人はまずパーティショニングシステムでディスクを初期化します) 変更をディスクに書き込む直前に再度確認します。
 The panel experienced a problem!	MainWindow		パネルに問題が発生しました。
 Change parameters…	MainWindow		パラメーターを変更…
 Device	PartitionList		デバイス

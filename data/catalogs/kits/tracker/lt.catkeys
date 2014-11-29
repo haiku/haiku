@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	2070021838
+1	lithuanian	x-vnd.Haiku-libtracker	679062638
 OK	WidgetAttributeText		Gerai
 Add-ons	FilePanelPriv		Priedai
 Desktop	Model		Darbalaukis
@@ -102,7 +102,6 @@ Show space bars on volumes	SettingsView		Rodyti tomų užpildymo indikatorius
 Invert selection	ContainerWindow		Invertuoti žymėjimą
 Increase size	DeskWindow		Padidinti
 Resize to fit	ContainerWindow		Pritaikyti dydį prie turinio
-%Ld bytes	WidgetAttributeText		%Ld B
 Add printer…	ContainerWindow		Pridėti spausdintuvą…
 New folder	ContainerWindow		Naujas aplankas
 Kind	ContainerWindow		Tipas
@@ -287,7 +286,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	perkelsite
 Show Disks icon	SettingsView		Rodyti Tomų piktogramą
 Cancel	PoseView		Atsisakyti
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld B, 
 You can't move or copy items to read-only volumes.	FSUtils		Perkelti ar kopijuoti objektų į tomus, prijungtus tik skaitymui, negalima.
 Unknown	FilePermissionsView		Nežinomas
 All files and folders	FindPanel		Visų failų ir aplankų

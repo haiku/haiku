@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ShowImage	4011843330
+1	dutch; flemish	x-vnd.Haiku-ShowImage	466377502
 Use as background…	Menus		Gebruik als achtergrond…
 File	Menus		Bestand
 Slide delay	Menus		Dia-vertraging
@@ -21,7 +21,6 @@ Edit	Menus		Aanpassen
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		De afbeelding kon niet geladen worden! Het bestand bestaat mogelijk niet, of er bestaat geen afbeeldings-omzetter voor.
 First page	Menus		Eerste pagina
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' (pagina %d) werd veranderd. Wilt u het document sluiten?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS seconden
 Leave full screen	Menus		Volledig scherm verlaten
 Close	Menus		Sluiten
 Close	ClosePrompt		Sluit

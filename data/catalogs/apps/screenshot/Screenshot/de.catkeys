@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-screenshot	1483476245
+1	german	x-vnd.haiku-screenshot	363809141
 seconds	ScreenshotWindow		Sekunden
 Desktop	ScreenshotWindow		Desktop
 Include window border	ScreenshotWindow		Inklusive Fensterrahmen
@@ -11,7 +11,6 @@ This file already exists.\n Are you sure you would like to overwrite it?	Screens
 Choose folder	ScreenshotWindow		Ordner wählen
 Save	ScreenshotWindow		Speichern
 Overwrite	ScreenshotWindow		Überschreiben
-Choose folder...	ScreenshotWindow		Ordner wählen...
 Please select	ScreenshotWindow		Bitte auswählen
 Save as:	ScreenshotWindow		Format:
 Copy to clipboard	ScreenshotWindow		In Ablage kopieren

@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Screen	2033930135
+1	hindi	x-vnd.Haiku-Screen	1388881963
 yes	Screen		हाँ
 Use laptop panel:	Screen		लैपटॉप पैनल प्रयोग करें :
 15 bits/pixel, 32768 colors	Screen		15 बिट / पिक्सेल, 32768 रंग
@@ -35,7 +35,6 @@ horizontally	Screen		क्षैतिज रूप
 Other…	Screen		अन्य...
 Cancel	Screen		रद्द
 bits/pixel	Screen		बिट/पिक्सेल
-Settings will revert in %seconds seconds.	Screen		सेटिंग्स %seconds सेकंड में लौट जाएगा.
 Refresh rate:	Screen		ताज़ा दर:
 Hz	Screen		हर्ट्ज
 Do you wish to keep these settings?	Screen		क्या आप इन सेटिंग्स को रखना चाहते हैं?

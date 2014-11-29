@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-ShowImage	4121021813
+1	lithuanian	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Naudoti kaip darbalaukio foną…
 File	Menus		Failas
 Slide delay	Menus		Skaidrių keitimo dažnis
@@ -21,7 +21,6 @@ Edit	Menus		Taisa
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nepavyko įkelti paveikslo! Arba nėra tokio failo, arba nerastas jam tinkamas keitiklis.
 First page	Menus		Pirmasis puslapis
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ (%d puslapis) pakeistas. Ar norite dokumentą užverti?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sek.
 Leave full screen	Menus		Normalioji veiksena
 Close	Menus		Užverti
 Close	ClosePrompt		Užverti

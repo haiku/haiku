@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PoorMan	3736662390
+1	romanian	x-vnd.Haiku-PoorMan	3024799578
 Website location	PoorMan		Locația site-ului web
 Error Server	PoorMan		Server de erori
 Settings…	PoorMan		Configurări
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		Creează istoric PoorMan
 Shutting down.\n	PoorMan		Se oprește.\n
 Hits: %lu	PoorMan		Vizite: %lu
 Web folder:	PoorMan		Dosar web:
-Default	PoorMan		Implicit
 Save log console selection	PoorMan		Salvează selecția consolei de istoric
 Run server	PoorMan		Pornește server
 PoorMan settings	PoorMan		Configurări PoorMan

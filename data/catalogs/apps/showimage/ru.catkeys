@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	4121021813
+1	russian	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Сделать фоном рабочего стола…
 File	Menus		Файл
 Slide delay	Menus		Задержка слайд шоу
@@ -21,7 +21,6 @@ Edit	Menus		Изменить
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Не удалось открыть изображение. Либо файл, либо транслятор этого изображения отсутствует.
 First page	Menus		Первая страница
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS секунды
 Leave full screen	Menus		Выйти из полного экрана
 Close	Menus		Закрыть
 Close	ClosePrompt		Закрыть

@@ -1,11 +1,10 @@
-1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	758245016
+1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	4273934970
 DriveSetup	System name		Configuração de Unidade
 Cancel	AbstractParametersPanel		Cancelar
 Delete	MainWindow		Excluir
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!
 Rescan	MainWindow		Re-examinar
 OK	MainWindow		OK
-Could not aquire partitioning information.	MainWindow		Não foi possível obter informações sobre a divisão em partições
 There's no space on the partition where a child partition could be created.	MainWindow		Não existe espaço suficiente na partição para criar uma partição dentro dela.
 Could not unmount partition	MainWindow		Não foi possível desmontar a partição
 Initialize	InitializeParametersPanel		Inicializar
@@ -44,14 +43,12 @@ Change	ChangeParametersPanel		Modificar
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja apagar a partição selecionada?\n\nTodos os dados na partição serão perdidos de forma irrecuperável se continuar!
 Create…	MainWindow		Criar...
-Disk system \"%s\"\" not found!	MainWindow		Disco de sistema \"%s\"\" não encontrado!
 The disk has been successfully initialized.\n	MainWindow		O disco foi inicializado com sucesso.\n
 Could not unmount partition %s.	MainWindow		Não foi possível desmontar a partição %s.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Falha ao modificar os parâmetros da partição. Nenhuma mudança foi gravada no disco.
 Failed to format the partition %s!\n	MainWindow		Falha ao formatar a partição %s!\n
 Mount	MainWindow		Montar
 Partition type	PartitionList		Tipo de partição
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Deseja realmente formatar um disco não preparado? (a maioria das pessoas inicializa o disco com um sistema de particionamento primeiro) Você será consultado novamente antes que as alterações sejam gravadas no disco.
 The panel experienced a problem!	MainWindow		Ocorreu um problema com a janela de diálogo!
 Change parameters…	MainWindow		Modificar parâmetros…
 Device	PartitionList		Dispositivo

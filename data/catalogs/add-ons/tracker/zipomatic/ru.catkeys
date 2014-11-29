@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku.zip-o-matic	2924152822
+1	russian	x-vnd.haiku.zip-o-matic	2255868945
 Stop	file:ZipOMaticWindow.cpp		Остановить
 Creating archive: %s	file:ZipOMaticWindow.cpp		Создание архива: %s
 Continue	file:ZipOMaticWindow.cpp		Продолжить
@@ -11,7 +11,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Stopped	file:ZipOMaticWindow.cpp		Остановлено
 Archive	file:ZipperThread.cpp		Архив
 Error creating archive	file:ZipOMaticWindow.cpp		Ошибка при создании архива
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У вас запущено %ld копий Zip-O-Matic.\n\n
 {0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# файл добавлен.} few{# файла добавлено} other{# файлов добавлено.}}
 Archive created OK	file:ZipOMaticWindow.cpp		Архив успешно создан
 Stop them	file:ZipOMatic.cpp		Остановить их

@@ -1,11 +1,10 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	758245016
+1	hungarian	x-vnd.Haiku-DriveSetup	4273934970
 DriveSetup	System name		Lemezkezelő
 Cancel	AbstractParametersPanel		Mégse
 Delete	MainWindow		Törlés
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Biztosan jóváhagyja az adatok felírását a lemezre?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Rescan	MainWindow		Frissítés
 OK	MainWindow		Rendben
-Could not aquire partitioning information.	MainWindow		A partíciók állapotát nem lehetett lekérdezni.
 There's no space on the partition where a child partition could be created.	MainWindow		Nincs hely már a partíción, ahol alpartíciót kellene létrehozni.
 Could not unmount partition	MainWindow		Nem lehet leválasztani a partíciót
 Initialize	InitializeParametersPanel		Előkészítés
@@ -44,14 +43,12 @@ Change	ChangeParametersPanel		Módosítás
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretné írni a kijelölt változtatásokat?\n\nEz esetben a „%s” lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Biztosan törölni szeretné a kiválasztott partíciót?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Create…	MainWindow		Létrehozás…
-Disk system \"%s\"\" not found!	MainWindow		„%s” rendszerlemez nem található!
 The disk has been successfully initialized.\n	MainWindow		A partíció (%s) hiba nélkül elő lett készítve.\n
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Nem sikerült megváltoztatni a partíció paramétereit. A lemezen nem történt változás.
 Failed to format the partition %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: „%s”.\n
 Mount	MainWindow		Csatol
 Partition type	PartitionList		Partíció típusa
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Biztosan formázni szeretné a nyers lemezt? (A legtöbb esetben elő szokták készíteni a lemezt formázás előtt.) Ezt még egyszer meg kell majd erősítenie.
 The panel experienced a problem!	MainWindow		A panel hibát okozott!
 Change parameters…	MainWindow		Paraméterek módosítása…
 Device	PartitionList		Eszköz

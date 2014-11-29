@@ -1,9 +1,8 @@
-1	hindi	x-vnd.Be-WORK	3338054173
+1	hindi	x-vnd.Be-WORK	1998542487
 Invalid argument: %s\n	Workspaces		अवैध तर्क: %s\n
 Quit	Workspaces		छोड़ें
 Workspaces	System name		कार्यक्षेत्र
 Change workspace count…	Workspaces		कार्यक्षेत्र की गिनती बदलें
-About Workspaces…	Workspaces		कार्यक्षेत्र के बारे में...
 Show window border	Workspaces		विंडो का बार्डर दिखाएँ
 Auto-raise	Workspaces		आपही-उठाना
 Always on top	Workspaces		हमेशा शीर्ष पर

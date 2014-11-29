@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CharacterMap	2745781253
+1	dutch; flemish	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Alfanumeriek omcirkeld
 Basic Latin	UnicodeBlocks		Basis-Latijns
 View	CharacterWindow		Beeld
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Combinerende diakritische
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Arabisch (toevoegsel)
 Latin extended C	UnicodeBlocks		Latijns (uitgebreid) C
-Ancient smbols	UnicodeBlocks		Oude symbolen
 Bopomofo extended	UnicodeBlocks		Bopomofo (uitgebreid)
 Lycian	UnicodeBlocks		Lycisch
-Font size:	CharacterWindow		Lettertekengrootte:
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Ethiopisch
 Bengali	UnicodeBlocks		Bengaals

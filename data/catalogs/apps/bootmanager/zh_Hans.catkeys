@@ -1,9 +1,8 @@
-1	english	x-vnd.Haiku-BootManager	2195645217
+1	english	x-vnd.Haiku-BootManager	3355843558
 The boot manager has been successfully installed on your system.	BootManagerController		引导管理器已经成功安装到您的系统。
 After two seconds	DefaultPartitionPage		两秒钟以后
 Uninstall Boot Manager	UninstallPage	Title	卸载引导管理器
 At least one partition must be selected!	BootManagerController		至少选中一个分区！
-The old Master Boot Record could not be saved to %s	BootManagerController		旧的主引导记录（MBR）无法保存到 %s
 Restore MBR	BootManagerController	Button	恢复 MBR
 Hard Drive	DrivesPage	Default disk name	硬盘
 USB Drive	DrivesPage	Default disk name	USB 设备
@@ -41,7 +40,6 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	未知
 Update	DrivesPage	Button	更新
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		请确定主引导记录备份文件以进行恢复。该文件创建于引导管理器首次安装时。
-Old Master Boot Record Saved failure	BootManagerController	Title	旧的主引导记录保存失败
 Drives	DrivesPage	Title	设备
 No space available!	DrivesPage	Cannot install	无可用空间！
 Never	DefaultPartitionPage		从不

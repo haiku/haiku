@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Terminal	1245259554
+1	romanian	x-vnd.Haiku-Terminal	1387085468
 Not found.	Terminal TermWindow		Nu a fost găsit.
 Switch Terminals	Terminal TermWindow		Comută terminale
 Change directory	Terminal TermView		Modifică dosar
@@ -25,7 +25,6 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Opțiune „%s” nerec
 Cancel	Terminal SetTitleWindow		Anulează
 Increase	Terminal TermWindow		Mărește
 Settings	Terminal TermWindow		Configurări
-Window size	Terminal TermWindow		Dimensiune fereastră
 Selected text	Terminal AppearancePrefView		Text selectat
 Find	Terminal FindWindow		Găsește
 Appearance	Terminal PrefWindow		Aspect

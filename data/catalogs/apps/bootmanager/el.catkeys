@@ -1,9 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-BootManager	2195645217
+1	greek, modern (1453-)	x-vnd.Haiku-BootManager	3355843558
 The boot manager has been successfully installed on your system.	BootManagerController		Ο boot manager εγκαταστάθηκε επιτυχώς στο συστημά σας.
 After two seconds	DefaultPartitionPage		Ύστερα από δύο δευτερόλετπα
 Uninstall Boot Manager	UninstallPage	Title	Απεγκατάσταση Boot Manager
 At least one partition must be selected!	BootManagerController		Πρέπει να επιλέξετε τουλάχιστον μια κατάτμηση
-The old Master Boot Record could not be saved to %s	BootManagerController		Το παλιό Master Boot Record δεν μπόρεσε να αποθηκευτεί στο %s
 Restore MBR	BootManagerController	Button	Επαναφορά MBR
 Hard Drive	DrivesPage	Default disk name	Σκληρός Δίσκος
 USB Drive	DrivesPage	Default disk name	Μονάδα USB
@@ -41,7 +40,6 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Άγνωστο
 Update	DrivesPage	Button	Αναβάθμιση
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Παρακαλώ βρείτε το αρχείο Master Boot Record (MBR) για να κάνετε επαναφορά. Το αρχείο δημιουργήθηκε όταν ο boot manager εγκαταστάθηκε για πρώτη φορά.
-Old Master Boot Record Saved failure	BootManagerController	Title	Αποτυχία αποθήκευσης του παλιού Master Boot Record
 Drives	DrivesPage	Title	Μονάδες Δίσκου
 No space available!	DrivesPage	Cannot install	Δεν υπάρχει διαθέσιμος χώρος!
 Never	DefaultPartitionPage		Ποτέ

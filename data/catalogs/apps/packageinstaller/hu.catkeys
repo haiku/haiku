@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PackageInstaller	2033288398
+1	hungarian	x-vnd.Haiku-PackageInstaller	199496416
 Install to:	PackageView		Telepítés ide:
 OK	PackageView		Rendben
 Accept	PackageTextViewer		Elfogadás
@@ -23,7 +23,6 @@ Install %name%	PackageView		%name% telepítése
 Stop	PackageStatus		Leállítás
 Other…	PackageView		Egyéb…
 No installation type selected	PackageView		Nincs másféle telepítéstípus kiválasztva
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		A(z) '%s' nevű szimbolikus link már létezik a megadott útvonalon.\nFelülírja, vagy ugorjuk át?
 Installing files and folders	PackageInstall		Fájlok és mappák telepítése
 Package installer	PackageView		Csomagtelepítő
 Skip all	PackageView		Összes átugrása

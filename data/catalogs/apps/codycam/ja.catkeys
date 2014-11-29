@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CodyCam	2083193989
+1	japanese	x-vnd.Haiku-CodyCam	183572276
 Capturing Image…	VideoConsumer.cpp		画像を取得中…
 Every 30 seconds	CodyCam		30 秒ごと
 File name:	CodyCam		ファイル名:
@@ -32,7 +32,6 @@ Output	CodyCam		出力
 Every 15 minutes	CodyCam		15 分ごと
 Cannot find an available video stream	CodyCam		有効なビデオストリームが見つかりません
 Can't find an available connection to the video window	CodyCam		有効な接続がビデオウィンドウ上に見つかりません
-Transmitting…	VideoConsumer.cpp		転送中…
 Cannot get a time source	CodyCam		タイムソースを取得できません
 Every 8 hours	CodyCam		8 時間ごと
 Rename failed	VideoConsumer.cpp		名前の変更に失敗しました
@@ -83,7 +82,6 @@ reply: %d, %d\n	FtpClient		返信: %d, %d\n
 Cannot find the media roster	CodyCam		media roster が見つかりません。
 Every 4 hours	CodyCam		4 時間ごと
 FTP	CodyCam		FTP
-File transmission failed	VideoConsumer.cpp		ファイル転送に失敗しました
 Cannot seek time source!	CodyCam		タイムソースをシークできません!
 File	CodyCam		ファイル
 Image Format Menu	CodyCam		画像形式メニュー

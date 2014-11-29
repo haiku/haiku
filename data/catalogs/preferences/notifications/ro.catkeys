@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Notifications	2718138102
+1	romanian	x-vnd.Haiku-Notifications	2139251523
 Notifications	GeneralView		Înștiințări
 seconds of inactivity	GeneralView		secunde de inactivitate
 Revert	PrefletWin		Revenire
@@ -6,6 +6,7 @@ Mini icon	DisplayView		Mini pictogramă
 Enable notifications	GeneralView		Activează înștiințări
 Error	NotificationView		Eroare
 OK	GeneralView		OK
+OK	PrefletWin		OK
 Type	NotificationView		Tip
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Înștiințările nu pot fi oprite, deoarece serverul nu poate fi contactat.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nu se pot activa înștiințările deoarece serverul nu poate fi găsit.\nÎnseamnă că instalarea InfoPopper nu a fost completată cu succes.

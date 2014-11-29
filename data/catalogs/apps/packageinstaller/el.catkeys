@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PackageInstaller	792037176
+1	greek, modern (1453-)	x-vnd.Haiku-PackageInstaller	3253212490
 Install to:	PackageView		Εγκατάσταση στο:
 OK	PackageView		Εντάξει
 Accept	PackageTextViewer		Αποδοχή
@@ -21,7 +21,6 @@ none	PackageView		κανένα
 Stop	PackageStatus		Διακοπή
 Other…	PackageView		Άλλο...
 No installation type selected	PackageView		Δεν επιλέχθηκε τύπος εγκατάστασης
-The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Ο συμβολιζόμενος σύνδεσμος '%s' υπάρχει ήδη στο ζητούμενο μονοπάτι.\nΝα αντικατασταθεί ο συμβολιζόμενος σύνδεσμος με ένα από αυτο το πακέτο ή να γίνει παράβλεψη;
 Installing files and folders	PackageInstall		Εγκατάσταση αρχείων και φακέλων
 Package installer	PackageView		Εγκαταστάτης πακέτων
 Skip all	PackageView		Παράβλεψη όλων

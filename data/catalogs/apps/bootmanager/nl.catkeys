@@ -1,9 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-BootManager	2195645217
+1	dutch; flemish	x-vnd.Haiku-BootManager	3355843558
 The boot manager has been successfully installed on your system.	BootManagerController		De bootmanager is met succes op uw systeem geïnstalleerd.
 After two seconds	DefaultPartitionPage		Na twee seconden
 Uninstall Boot Manager	UninstallPage	Title	Boot Manager verwijderen
 At least one partition must be selected!	BootManagerController		Er moet tenminste één partitie geselecteerd worden!
-The old Master Boot Record could not be saved to %s	BootManagerController		De oude Master Boot Record kon niet in %s worden opgeslagen.
 Restore MBR	BootManagerController	Button	MBR herstellen
 Hard Drive	DrivesPage	Default disk name	Harde Schijf
 USB Drive	DrivesPage	Default disk name	USB-schijf
@@ -41,7 +40,6 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Onbekend
 Update	DrivesPage	Button	Bijwerken
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Selecteer a.u.b. het Master Boot Record (MBR) bestan om van te herstellen. Dit is het bestand dat werd gecreeërd toen de boot-manager voor het eerst werd geïnstalleerd.
-Old Master Boot Record Saved failure	BootManagerController	Title	Oude Master Boot Record opslaan mislukt
 Drives	DrivesPage	Title	Schijven
 No space available!	DrivesPage	Cannot install	Geen ruimte beschikbaar!
 Never	DefaultPartitionPage		Nooit

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	3930183175
+1	english	x-vnd.Haiku-Installer	528139900
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		您是否确定终止安装，重新启动系统？
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		系统安装器\n\t编写者：Jérôme Duval 和 Stephan Aßmus \n\t版权所有 2005-2001 Haiku, Inc.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -89,7 +89,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		无可用附加软件包。
 All hard disks start with \"hd\".\n	InstallerApp		所有硬盘的起始字符为：\"hd\"。\n
 Continue	InstallerApp		继续
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		引导管理器，用于配置 Haiku 引导菜单，无法启动。
 Boot sector not written because of an internal error.	InstallProgress		由于内部错误，引导扇区未写入。
 Additional disk space required: %s	InstallerWindow		需要额外磁盘空间：%s
 Cancel	InstallProgress		取消

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CodyCam	2083193989
+1	swedish	x-vnd.Haiku-CodyCam	183572276
 Capturing Image…	VideoConsumer.cpp		Fångar bild…
 Every 30 seconds	CodyCam		Var 30:e sekund
 File name:	CodyCam		Filnamn:
@@ -32,7 +32,6 @@ Output	CodyCam		Utdata
 Every 15 minutes	CodyCam		Var 15:e minut
 Cannot find an available video stream	CodyCam		Kan inte hitta någon tillgänglig videoström
 Can't find an available connection to the video window	CodyCam		Kan inte hitta en tillgänglig anslutning till videofönstret
-Transmitting…	VideoConsumer.cpp		Sänder...
 Cannot get a time source	CodyCam		Kan inte hitta en tidskälla
 Every 8 hours	CodyCam		Var 8:e timme
 Rename failed	VideoConsumer.cpp		Filnamnsbyte misslyckades
@@ -83,7 +82,6 @@ reply: %d, %d\n	FtpClient		svar: %d, %d\n
 Cannot find the media roster	CodyCam		Kan inte hitta mediaförteckningen
 Every 4 hours	CodyCam		Var 4:e timme
 FTP	CodyCam		FTP
-File transmission failed	VideoConsumer.cpp		Filöverföring misslyckades
 Cannot seek time source!	CodyCam		Kan inte söka tidskällan!
 File	CodyCam		Arkiv
 Image Format Menu	CodyCam		Bildformatsmeny

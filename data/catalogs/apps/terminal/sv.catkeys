@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	761086471
+1	swedish	x-vnd.Haiku-Terminal	902912385
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -30,7 +30,6 @@ Custom	Terminal colors scheme		Anpassad
 Cancel	Terminal SetTitleWindow		Avbryt
 Increase	Terminal TermWindow		Öka
 Settings	Terminal TermWindow		Inställningar
-Window size	Terminal TermWindow		Fönsterstorlek
 Selected text	Terminal AppearancePrefView		Markerad text
 Find	Terminal FindWindow		Sök
 Appearance	Terminal PrefWindow		Utseende

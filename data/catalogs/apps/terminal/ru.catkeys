@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	761086471
+1	russian	x-vnd.Haiku-Terminal	1777773037
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -26,11 +26,11 @@ Window title:	Terminal TermWindow		Заголовок окна:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Нераспознанная опция \"%s\"\n
 Blue	Terminal colors scheme		Синий
 Custom	Terminal colors scheme		Настроена вручную
+Encoding:	Terminal AppearancePrefView		Кодировка:
 %app% settings	Terminal PrefWindow	window title	Настройки терминала
 Cancel	Terminal SetTitleWindow		Отмена
 Increase	Terminal TermWindow		Увеличить
 Settings	Terminal TermWindow		Настройки
-Window size	Terminal TermWindow		Размер окна
 Selected text	Terminal AppearancePrefView		Выделенного текста
 Find	Terminal FindWindow		Найти
 Appearance	Terminal PrefWindow		Внешний вид
@@ -48,13 +48,16 @@ Page setup…	Terminal TermWindow		Настройка печати…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Данные процессы все еще работают:\n\n\t%1\n\nЕсли вы закроете Терминал, то эти процессы будут уничтожены.
 Insert path	Terminal TermView		Вставить путь
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Терминал\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nИспользование: %s [OPTION] [SHELL]\n
+Window size:	Terminal AppearancePrefView		Размер окна
 No search string was entered.	Terminal TermWindow		Не введена строка поиска
 Font size	Terminal TermWindow		Размер шрифта
 Blinking cursor	Terminal AppearancePrefView		Мигающий курсор
 Set window title	Terminal TermWindow		Установить заголовок окна
+Revert	Terminal PrefWindow		Вернуть
 Terminal	System name		Терминал
 Copy path	Terminal TermView		Скопировать путь
 Close other tabs	Terminal TermWindow		Закрыть остальные вкладки
+Defaults	Terminal PrefWindow		По умолчанию
 Match word	Terminal FindWindow		Только слово целиком
 Nothing is selected.	Terminal TermWindow		Ничего не выделено
 Text not found.	Terminal TermWindow		Текст не найден

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	2769870140
+1	dutch; flemish	x-vnd.Haiku-libtracker	1378910940
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Invoegtoepassingen
 Desktop	Model		Bureaublad
@@ -100,7 +100,6 @@ Show space bars on volumes	SettingsView		Toon ruimte-indicator op gegevensdrager
 Invert selection	ContainerWindow		Selectie omkeren
 Increase size	DeskWindow		Vermeerder grootte
 Resize to fit	ContainerWindow		Grootte passend maken
-%Ld bytes	WidgetAttributeText		%Ld bytes
 Add printer…	ContainerWindow		Printer toevoegen...
 New folder	ContainerWindow		Nieuwe map
 Kind	ContainerWindow		Soort
@@ -283,7 +282,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	verplaatsen
 Show Disks icon	SettingsView		Toon schijf-iconen
 Cancel	PoseView		Annuleren
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld bytes,
 You can't move or copy items to read-only volumes.	FSUtils		U kunt items niet naar alleen-lezen-gegevensdragers verplaatsen of kopiëren.
 Unknown	FilePermissionsView		Onbekend
 All files and folders	FindPanel		Alle bestanden en mappen

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	1727923642
+1	english	x-vnd.Haiku-MediaPlayer	3507634633
 raw audio	MediaPlayer-InfoWin		原生音频
 Location	MediaPlayer-InfoWin		位置
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
@@ -31,7 +31,6 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		获取
 Display mode	MediaPlayer-InfoWin		显示模式
 Medium	MediaPlayer-SettingsWindow		中等
 Close	MediaPlayer-PlaylistWindow		关闭
-Stereo	MediaPlayer-InfoWin		立体声
 Open…	MediaPlayer-PlaylistWindow		打开...
 Toggle mute.	MediaPlayer-Main		切换静音。
 Undo	MediaPlayer-PlaylistWindow		撤销
@@ -56,7 +55,6 @@ Start playing.	MediaPlayer-Main		开始播放。
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		没有播放此文件格式的解码器，或者解码器与此版本的格式存在冲突。
 Import Entry	MediaPlayer-ImportPLItemsCmd		导入条目
 Gets the URI of the currently playing item.	MediaPlayer-Main		获取当前播放的项目的URI。
-%d Channels	MediaPlayer-InfoWin		%d 频道
 400% scale	MediaPlayer-Main		400％
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		播放列表保存失败：\n\n错误： 
 Move Entries	MediaPlayer-MovePLItemsCmd		移动条目
@@ -156,7 +154,6 @@ Always on top	MediaPlayer-Main		置顶
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		删除条目到垃圾箱
 Save	MediaPlayer-Main		保存
 <nothing to undo>	MediaPlayer-PlaylistWindow		<无撤销内容>
-Mono	MediaPlayer-InfoWin		单声道
 File info	MediaPlayer-InfoWin		文件信息
 Save	MediaPlayer-PlaylistWindow		保存
 %d Bit	MediaPlayer-InfoWin		%d Bit

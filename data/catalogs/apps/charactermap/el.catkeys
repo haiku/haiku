@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-CharacterMap	2745781253
+1	greek, modern (1453-)	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Κλειστά αλφαριθμητικά
 Basic Latin	UnicodeBlocks		Βασικά Λατινικά
 View	CharacterWindow		Προβολή
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Συνδυάζοντας 
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Αραβικά συμπληρωματικά
 Latin extended C	UnicodeBlocks		Λατινικά εκτεταμένα Γ
-Ancient smbols	UnicodeBlocks		Αρχαία σύμβολα
 Bopomofo extended	UnicodeBlocks		Bopomofo εκτεταμένα
 Lycian	UnicodeBlocks		Lycian
-Font size:	CharacterWindow		Μέγεθος γραμματοσειράς
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Αιθιοπικά
 Bengali	UnicodeBlocks		Bengali

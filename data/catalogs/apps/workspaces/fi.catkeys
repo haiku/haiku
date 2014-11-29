@@ -1,10 +1,9 @@
-1	finnish	x-vnd.Be-WORK	658966565
+1	finnish	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		Virheellinen argumentti: %s\n
 Quit	Workspaces		Poistu
 Workspaces	System name		Työtilat
 Change workspace count…	Workspaces		Vaihda työtilalukumäärää...
 Remove replicant	Workspaces		Poista kopio
-About Workspaces…	Workspaces		Ohjelmasta Työtilat...
 Show window border	Workspaces		Näytä ikkunaraja
 Auto-raise	Workspaces		Nosta automaattisesti
 Always on top	Workspaces		Aina päällimmäisenä

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	1727923642
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	3507634633
 raw audio	MediaPlayer-InfoWin		áudio não processado
 Location	MediaPlayer-InfoWin		Local
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -31,7 +31,6 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Obter/
 Display mode	MediaPlayer-InfoWin		Modo de exibição
 Medium	MediaPlayer-SettingsWindow		Mídia
 Close	MediaPlayer-PlaylistWindow		Fechar
-Stereo	MediaPlayer-InfoWin		Estéreo
 Open…	MediaPlayer-PlaylistWindow		Abrir…
 Toggle mute.	MediaPlayer-Main		Alternar mudo.
 Undo	MediaPlayer-PlaylistWindow		Desfazer
@@ -56,7 +55,6 @@ Start playing.	MediaPlayer-Main		Iniciar reprodução.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Não existe decodificador instalado para manipular o formato de arquivo, ou o decodificador tem problema com a versão específica do formato.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importar Entrada
 Gets the URI of the currently playing item.	MediaPlayer-Main		Obtém a URI do item em reprodução no momento.
-%d Channels	MediaPlayer-InfoWin		%d Canais
 400% scale	MediaPlayer-Main		escala de 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Falha ao salvar a lista de reprodução:\n\nErro:
 Move Entries	MediaPlayer-MovePLItemsCmd		Mover Entradas
@@ -156,7 +154,6 @@ Always on top	MediaPlayer-Main		Sempre no topo
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Remover Entrada para a Lixeira
 Save	MediaPlayer-Main		Salvar
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nada a desfazer>
-Mono	MediaPlayer-InfoWin		Mono
 File info	MediaPlayer-InfoWin		Informações do arquivo
 Save	MediaPlayer-PlaylistWindow		Salvar
 %d Bit	MediaPlayer-InfoWin		%d bit

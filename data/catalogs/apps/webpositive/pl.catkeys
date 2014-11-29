@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	1130172675
+1	polish	x-vnd.Haiku-WebPositive	979407669
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -20,7 +20,6 @@ Double-click or middle-click to open new tab.	Tab Manager		Dwuklik lub wciśnię
 Proxy username:	Settings Window		Nazwa użytkownika serwera proxy:
 Save page as…	WebPositive Window		Zapisz stronę jako…
 Settings	Settings Window		Ustawienia
-%seconds seconds left	Download Window		Pozostało %seconds sekund 
 Confirmation	WebPositive Window		Potwierdzenie
 Window	WebPositive Window		Okno
 Decrease size	WebPositive Window		Zmniejsz wielkość
@@ -32,7 +31,6 @@ Next	WebPositive Window		Następna
 Find next	WebPositive Window		Znajdź następne
 Download folder:	Settings Window		Katalog pobierania:
 Edit	WebPositive Window		Edycja
-Over %hours hours left	Download Window		Zostało ponad %hours godzin
 Cancel	Authentication Panel		Anuluj
 Match case	WebPositive Window		Uwzględnij wielkość liter
 Search page:	Settings Window		Strona wyszukiwania:
@@ -40,7 +38,6 @@ Zoom text only	WebPositive Window		Powiększaj tylko tekst
 Default fixed font size:	Settings Window		Domyślny rozmiar fontu o stałej szerokości:
 Close tab	WebPositive Window		Zamknij kartę
 Auto-hide mouse pointer	Settings Window		Auto-chowanie  wskaźnika myszy
-Over 1 hour left	Download Window		Została ponad 1 godzina
 Quit	WebPositive Window		Zakończ
 Full screen	WebPositive Window		Pełny ekran
 Open download error	Download Window		Otwórz błąd pobierania
@@ -54,7 +51,6 @@ Open	Download Window		Otwórz
 Reload	WebPositive Window		Odśwież
 Downloads	Download Window		Pobierane
 Sans serif font:	Settings Window		Font bezszeryfowy:
-Over %days days left	Download Window		Zostało ponad %days dni
 Forward	WebPositive Window		Dalej
 of	Download Window	...as in '12kB of 256kB'	z
 Revert	Settings Window		Cofnij
@@ -70,7 +66,6 @@ Reset size	WebPositive Window		Resetuj rozmiar
 Find:	WebPositive Window		Znajdź:
 Increase size	WebPositive Window		Zwiększ rozmiar
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Wystąpił błąd podczas otwierania katalogu zakładek.\n\nBłąd: %error
-Over 1 day left	Download Window		Został ponad 1 dzień
 Downloads	WebPositive Window		Pobieranie
 Requesting %url	WebPositive Window		Odpytywanie %url
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Wyszukuje następne wystąpienie tekstu
@@ -100,7 +95,6 @@ Script console	WebPositive Window		Konsola skryptów
 Proxy server address:	Settings Window		Adres serwera proxy:
 Proxy server port:	Settings Window		Port serwera proxy:
 Bookmarks	WebPositive Window		Zakładki
-%minutes minutes	Download Window		%minutes minut
 Paste	URL Bar		Wklej
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Ukryj tekst hasła
@@ -115,7 +109,6 @@ Password:	Authentication Panel		Hasło:
 Back	WebPositive Window		Wstecz
 New browser window	Download Window		Nowe okno
 Today	WebPositive Window		Dzisiaj
-1 second left	Download Window		Została 1 sekunda
 Remember username and password for this site	Authentication Panel		Pamiętaj nazwę użytkownika i hasło dla tej strony
 Earlier	WebPositive Window		Wcześniej
 Authentication required	Authentication Panel		Wymagane uwierzytelnienie

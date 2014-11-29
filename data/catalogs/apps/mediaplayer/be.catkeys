@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	1727923642
+1	belarusian	x-vnd.Haiku-MediaPlayer	3507634633
 raw audio	MediaPlayer-InfoWin		нефарматаване аўдыё
 Location	MediaPlayer-InfoWin		Месцазнаходжанне
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
@@ -31,7 +31,6 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Бяр
 Display mode	MediaPlayer-InfoWin		Рэжым паказу
 Medium	MediaPlayer-SettingsWindow		Сярэдняе
 Close	MediaPlayer-PlaylistWindow		Закрыць
-Stereo	MediaPlayer-InfoWin		Стэрэа
 Open…	MediaPlayer-PlaylistWindow		Адкрыць…
 Toggle mute.	MediaPlayer-Main		Укл/Выкл гук.
 Undo	MediaPlayer-PlaylistWindow		Адмяніць
@@ -56,7 +55,6 @@ Start playing.	MediaPlayer-Main		Пачаць прайгранне.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не ўстаноўлены неабходны для фармата гэтага файла дэкодэр, або ён канфліктуе з асабістай версіяй фармата.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Імпартаваць Элемент
 Gets the URI of the currently playing item.	MediaPlayer-Main		Вызначае URI цякучага элемента.
-%d Channels	MediaPlayer-InfoWin		%d Каналаў
 400% scale	MediaPlayer-Main		Маштаб 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Не ўдалося захаваць плэйліст:\n\nПамылка: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Перамясціць элементы
@@ -156,7 +154,6 @@ Always on top	MediaPlayer-Main		Заўседы наверсе
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Адправіць элемент у Сметніцу
 Save	MediaPlayer-Main		Захаваць
 <nothing to undo>	MediaPlayer-PlaylistWindow		<няма чаго адмяняць>
-Mono	MediaPlayer-InfoWin		Мона
 File info	MediaPlayer-InfoWin		Інфармацыя пра файл
 Save	MediaPlayer-PlaylistWindow		Захаваць
 %d Bit	MediaPlayer-InfoWin		%d Біт

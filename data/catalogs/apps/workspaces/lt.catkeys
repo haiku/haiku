@@ -1,10 +1,9 @@
-1	lithuanian	x-vnd.Be-WORK	658966565
+1	lithuanian	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		Netinkamas argumentas: %s\n
 Quit	Workspaces		Baigti darbą
 Workspaces	System name		Darbalaukiai
 Change workspace count…	Workspaces		Keisti darbalaukių skaičių…
 Remove replicant	Workspaces		Pašalinti replikantą
-About Workspaces…	Workspaces		Apie Darbalaukių keitiklį…
 Show window border	Workspaces		Rodyti lango rėmelį
 Auto-raise	Workspaces		Automatiškai iškelti
 Always on top	Workspaces		Visuomet viršuje

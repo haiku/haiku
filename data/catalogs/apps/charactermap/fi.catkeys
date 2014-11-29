@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CharacterMap	2745781253
+1	finnish	x-vnd.Haiku-CharacterMap	56063163
 Enclosed alphanumerics	UnicodeBlocks		Sisältyvät aakkosnumeeriset
 Basic Latin	UnicodeBlocks		Peruslatin-kirjaimisto
 View	CharacterWindow		Näkymä
@@ -68,10 +68,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		Yhdistetyt diakriittiset 
 Syloti Nagri	UnicodeBlocks		Sylhetin kieli
 Arabic supplement	UnicodeBlocks		Arabian täydennys
 Latin extended C	UnicodeBlocks		Latin-laajennus C
-Ancient smbols	UnicodeBlocks		Antiikin symbolit
 Bopomofo extended	UnicodeBlocks		Bopomofo-laajennus
 Lycian	UnicodeBlocks		Lyykian kieli
-Font size:	CharacterWindow		Kirjasinkoko:
 Osmanya	UnicodeBlocks		Osmanya
 Ethiopic	UnicodeBlocks		Etiopialainen
 Bengali	UnicodeBlocks		Bengali

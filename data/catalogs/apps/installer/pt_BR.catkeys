@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Installer	3930183175
+1	portuguese (brazil)	x-vnd.Haiku-Installer	528139900
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Você tem certeza que deseja abortar a instalação e reiniciar o sistema?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\desenvolvido por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t }\n\n
@@ -89,7 +89,6 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 No optional packages available.	PackagesView		Nenhum pacote opcional disponível.
 All hard disks start with \"hd\".\n	InstallerApp		Todos os discos rígidos iniciam com \"hd\".\n
 Continue	InstallerApp		Continuar
-BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Gerenciador de Inicialização, o aplicativo para configurar o menu de inicialização do Haiku, não pôde ser carregado.
 Boot sector not written because of an internal error.	InstallProgress		Setor de inicialização não gravado por causa de um erro interno.
 Additional disk space required: %s	InstallerWindow		Espaço adicional em disco requerido: %s
 Cancel	InstallProgress		Cancelar

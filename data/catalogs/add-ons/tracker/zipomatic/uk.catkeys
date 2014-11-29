@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku.zip-o-matic	2241557251
+1	ukrainian	x-vnd.haiku.zip-o-matic	1573273374
 Stop	file:ZipOMaticWindow.cpp		Зупинити
 Creating archive: %s	file:ZipOMaticWindow.cpp		Створення архіву: %s
 Continue	file:ZipOMaticWindow.cpp		Продовжити
@@ -11,6 +11,5 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Stopped	file:ZipOMaticWindow.cpp		Зупинено
 Archive	file:ZipperThread.cpp		Архів
 Error creating archive	file:ZipOMaticWindow.cpp		Помилка створення архіву
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У вас працює %ld копій Zip-O-Matic.\n\n
 Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створений
 Stop them	file:ZipOMatic.cpp		Зупинити це

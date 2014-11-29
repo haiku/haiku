@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	4121021813
+1	ukrainian	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Використати як тло…
 File	Menus		Файл
 Slide delay	Menus		Затримка слайда
@@ -21,7 +21,6 @@ Edit	Menus		Редагувати
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Неможливо завантажити зображення! Жодного файла або оброблювача зображень для нього не знайдено.
 First page	Menus		Перша сторінка
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (сторінка %d) були змінені. Ви хочете закрити документ?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS секунд
 Leave full screen	Menus		Вийти з повноекранного режиму
 Close	Menus		Закрити
 Close	ClosePrompt		Закрити

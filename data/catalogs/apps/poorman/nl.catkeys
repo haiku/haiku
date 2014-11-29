@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PoorMan	4008245771
+1	dutch; flemish	x-vnd.Haiku-PoorMan	3296382959
 Website location	PoorMan		Website-locatie
 Error Server	PoorMan		Serverfout
 Settings…	PoorMan		Instellingen...
@@ -6,7 +6,6 @@ Create PoorMan log	PoorMan		PoorMan-log aanmaken
 Shutting down.\n	PoorMan		Bezig met afsluiten.\n
 Hits: %lu	PoorMan		Hits: %lu
 Web folder:	PoorMan		Webmap:
-Default	PoorMan		Standaard
 Save log console selection	PoorMan		Selectie uit logconsole bewaren
 Run server	PoorMan		Server activeren
 PoorMan settings	PoorMan		PoorMan-instellingen

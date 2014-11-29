@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	4121021813
+1	japanese	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		デスクトップの背景にする…
 File	Menus		ファイル
 Slide delay	Menus		スライド間隔
@@ -21,7 +21,6 @@ Edit	Menus		編集
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		画像ファイルを読み込めません！ ファイルまたは画像トランスレーターが存在しません。
 First page	Menus		最初のページ
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		'%s' の %d ページが変更されました。それでもファイルを閉じますか?
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS 秒
 Leave full screen	Menus		全画面表示から戻る
 Close	Menus		閉じる
 Close	ClosePrompt		閉じる

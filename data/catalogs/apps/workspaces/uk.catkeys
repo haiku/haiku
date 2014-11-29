@@ -1,10 +1,9 @@
-1	ukrainian	x-vnd.Be-WORK	658966565
+1	ukrainian	x-vnd.Be-WORK	3614422175
 Invalid argument: %s\n	Workspaces		Невірний аргумент: %s\n
 Quit	Workspaces		Вийти
 Workspaces	System name		Робочі простори
 Change workspace count…	Workspaces		Змінити кількість робочих просторів…
 Remove replicant	Workspaces		Вилучити реплікант
-About Workspaces…	Workspaces		Про Робочі простори…
 Show window border	Workspaces		Показувати рамку вікна
 Auto-raise	Workspaces		Автоматичне спливання
 Always on top	Workspaces		Завжди поверх усіх

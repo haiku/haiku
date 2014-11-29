@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	761086471
+1	english	x-vnd.Haiku-Terminal	902912385
 Not found.	Terminal TermWindow		未找到。  
 Switch Terminals	Terminal TermWindow		切换终端
 Change directory	Terminal TermView		更改目录
@@ -30,7 +30,6 @@ Custom	Terminal colors scheme		自定义
 Cancel	Terminal SetTitleWindow		取消
 Increase	Terminal TermWindow		增大
 Settings	Terminal TermWindow		设置
-Window size	Terminal TermWindow		窗口大小
 Selected text	Terminal AppearancePrefView		选中文本
 Find	Terminal FindWindow		查找
 Appearance	Terminal PrefWindow		外观

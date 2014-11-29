@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaConverter	2722282283
+1	russian	x-vnd.Haiku-MediaConverter	217152063
 Video using parameters form settings	MediaConverter		Видео использует параметры из настроек
 Video encoding:	MediaConverter		Кодирование видео:
 Error read audio frame %lld	MediaConverter		Ошибка чтения аудио кадра %lld
@@ -11,7 +11,6 @@ Open…	Menu		Открыть…
 Start [ms]: 	MediaConverter		Начало [мс]: 
 Output file '%filename' created	MediaConverter		Выходящий файл '%filename' создан
 Output format	MediaConverter		Формат вывода
-%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f кГц стерео / кадров: %lld
 End   [ms]: 	MediaConverter		Конец [мс]: 
 MediaConverter	System name		Медиаконвертер
 No video	Video codecs list		Без видео
@@ -27,7 +26,6 @@ Source files	MediaConverter		Исходные файлы
 Error writing video frame %lld	MediaConverter		Ошибка записи видеокадра %lld
 Error writing audio frame %lld	MediaConverter		Ошибка записи аудио кадра %lld
 Cancelling	MediaConverter		Отменяется
-%d byte 	MediaFileInfo		%d байт 
 Error loading files	MediaConverter		Ошибка при загрузке файлов
 Cancel	MediaConverter		Отмена
 None available	Video codecs		Не доступно
@@ -37,7 +35,6 @@ Select this folder	MediaConverter		Выбрать эту папку
 Continue	MediaConverter		Продолжить
 Encoder parameters	MediaConverter-EncoderWindow		Параметры кодирования
 Video:	MediaConverter-FileInfo		Видео:
-%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld кадров
 %d bit 	MediaFileInfo		%d бит 
 Error creating '%filename'	MediaConverter		Ошибка создания '%filename'
 Video quality not supported	MediaConverter		Качество видео не поддерживается
@@ -50,10 +47,8 @@ Preview	MediaConverter		Предпросмотр
 File format:	MediaConverter		Формат файла:
 None available	Audio codecs		Недоступно
 MediaConverter+:SaveDirectory	MediaConverter		Медиаконвертер: выбор папки сохранения
-%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f кГц каналов: %ld / кадров: %lld
 Error launching: %strError%	MediaConverter		Ошибка запуска: %strError%
 High	MediaConverter		Высокое
-The file was not recognized as a supported media file:	MediaConverter		Этот файл не был распознан как поддерживаемый медиа файл:
 Drop media files onto this window	MediaConverter		Перенесите медиа файлы в это окно
 Audio encoding:	MediaConverter		Кодирование звука:
 Audio quality not supported	MediaConverter		Качество звука не поддерживается
@@ -64,5 +59,3 @@ Video quality: %3d%%	MediaConverter		Качество видео: %3d%%
 Output folder	MediaConverter		Сохранять в папку
 Audio quality: %3d%%	MediaConverter		Качество аудио: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Произошла ошибка при чтении информации о файле.\n\nОшибка: 
-%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles файлов не были распознаны как поддерживаемые медиа файлы:
-%.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / кадров: %lld

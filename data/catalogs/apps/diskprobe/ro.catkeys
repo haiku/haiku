@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DiskProbe	2706202187
+1	romanian	x-vnd.Haiku-DiskProbe	2206273117
 File offset: 	ProbeView		Decalaj fișier:
 %ld (native)	ProbeView		%ld (nativ)
 64 bit unsigned value:	TypeEditors		valoare pozitivă 64 biți:
@@ -66,7 +66,6 @@ Page setup…	ProbeView		Configurare pagină...
 New…	FileWindow		Nou...
 DiskProbe request	AttributeWindow		Cerere TestareDisc
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nu s-a putut citi mesajul
-BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	DimensiuneBloc
 Save changes before closing?	ProbeView		Salvați modificările înainte de a închide?
 Type editor	AttributeWindow		Editor de tip
 Native: 0x%0*Lx	ProbeView		Nativ: 0x%0*Lx

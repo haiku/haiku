@@ -1,11 +1,10 @@
-1	english	x-vnd.Haiku-DriveSetup	758245016
+1	english	x-vnd.Haiku-DriveSetup	4273934970
 DriveSetup	System name		磁盘管理器
 Cancel	AbstractParametersPanel		取消
 Delete	MainWindow		删除
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行此操作，选中分区上的所有数据将丢失，无法恢复！
 Rescan	MainWindow		重新扫描
 OK	MainWindow		确定
-Could not aquire partitioning information.	MainWindow		无法获取分区信息。
 There's no space on the partition where a child partition could be created.	MainWindow		所选分区没有足够的空间创建子分区。
 Could not unmount partition	MainWindow		无法卸载分区
 Initialize	InitializeParametersPanel		初始化
@@ -44,14 +43,12 @@ Change	ChangeParametersPanel		修改
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，磁盘 %s 中的所有数据将丢失，无法恢复！
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		您确定删除所选分区吗？\n\n如果执行该操作，分区中的所有数据将丢失，无法恢复！
 Create…	MainWindow		创建…
-Disk system \"%s\"\" not found!	MainWindow		磁盘系统 \"%s\"\"不存在！
 The disk has been successfully initialized.\n	MainWindow		磁盘 %s 已完成初始化。\n
 Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		修改分区参数失败。修改未写入磁盘。
 Failed to format the partition %s!\n	MainWindow		分区 %s 格式化失败！\n
 Mount	MainWindow		挂载
 Partition type	PartitionList		分区类型
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		您是否确定格式化原始磁盘？（首先需要将磁盘进行初始化分区）在磁盘写入修改前，您将需要再次确认。
 The panel experienced a problem!	MainWindow		面板遇到问题！
 Change parameters…	MainWindow		修改参数…
 Device	PartitionList		设备

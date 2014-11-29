@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-WebPositive	233049275
+1	dutch; flemish	x-vnd.Haiku-WebPositive	82284269
 Show home button	Settings Window		Thuisknop tonen
 Username:	Authentication Panel		Gebruikersnaam:
 Copy URL to clipboard	Download Window		URL naar klembord kopiëren
@@ -17,7 +17,6 @@ History	WebPositive Window		Geschiedenis
 Error opening downloads folder	Download Window		Fout bij het openen van de downloads-map
 Paste	WebPositive Window		Plakken
 Settings	Settings Window		Instellingen
-%seconds seconds left	Download Window		%seconds seconden over
 Confirmation	WebPositive Window		Bevestiging
 Window	WebPositive Window		Venster
 Decrease size	WebPositive Window		Grootte verkleinen
@@ -28,7 +27,6 @@ Next	WebPositive Window		Volgende
 Find next	WebPositive Window		Volgende zoeken
 Download folder:	Settings Window		Downloadmap:
 Edit	WebPositive Window		Bewerken
-Over %hours hours left	Download Window		Meer dan %hours uur te gaan
 Cancel	Authentication Panel		Annuleren
 Match case	WebPositive Window		Hoofdlettergevoelig
 Search page:	Settings Window		Zoekpagina:
@@ -36,7 +34,6 @@ Zoom text only	WebPositive Window		Alleen tekst inzoomen
 Default fixed font size:	Settings Window		Standaardgrootte van proportioneel lettertype:
 Close tab	WebPositive Window		Tabblad sluiten
 Auto-hide mouse pointer	Settings Window		Muisaanwijzer automatisch verbergen
-Over 1 hour left	Download Window		Meer dan 1 uur over
 Quit	WebPositive Window		Afsluiten
 Full screen	WebPositive Window		Volledig scherm
 Open download error	Download Window		Open download fout
@@ -49,7 +46,6 @@ Open	Download Window		Openen
 Reload	WebPositive Window		Herladen
 Downloads	Download Window		Downloads
 Sans serif font:	Settings Window		Schreefloos lettertype:
-Over %days days left	Download Window		Meer dan %days dagen te gaan
 Forward	WebPositive Window		Volgende
 of	Download Window	...as in '12kB of 256kB'	van
 Revert	Settings Window		Ongedaan maken
@@ -64,7 +60,6 @@ Reset size	WebPositive Window		Grootte opnieuw instellen
 Find:	WebPositive Window		Zoeken:
 Increase size	WebPositive Window		Vergroten
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Er was een fout bij het ophalen van de bladwijzermap.\n\nFout: %error
-Over 1 day left	Download Window		Meer dan 1 dag te gaan
 Downloads	WebPositive Window		Downloads
 Requesting %url	WebPositive Window		Opvragen van %url
 Apply	Settings Window		Toepassen
@@ -90,7 +85,6 @@ Settings	WebPositive Window		Instellingen
 Proxy server address:	Settings Window		Adres proxyserver:
 Proxy server port:	Settings Window		Poort proxyserver:
 Bookmarks	WebPositive Window		Bladwijzers
-%minutes minutes	Download Window		%minutes minuten
 Paste	URL Bar		Plakken
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Wachtwoordtekst verbergen
@@ -104,7 +98,6 @@ Password:	Authentication Panel		Wachtwoord:
 Back	WebPositive Window		Terug
 New browser window	Download Window		Nieuw browservenster
 Today	WebPositive Window		Vandaag
-1 second left	Download Window		1 seconde te gaan
 Remember username and password for this site	Authentication Panel		Gebruikersnaam en wachtwoord voor deze site onthouden
 Earlier	WebPositive Window		Vroeger
 Authentication required	Authentication Panel		Aanmelding is vereist

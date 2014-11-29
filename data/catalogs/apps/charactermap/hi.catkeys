@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-CharacterMap	584958634
+1	hindi	x-vnd.Haiku-CharacterMap	2190207840
 Enclosed alphanumerics	UnicodeBlocks		संलग्न अल्फनुमेरिक्स
 Basic Latin	UnicodeBlocks		मूल लैटिन
 View	CharacterWindow		देखें
@@ -67,10 +67,8 @@ Combining diacritical marks for symbols	UnicodeBlocks		प्रतीकों 
 Syloti Nagri	UnicodeBlocks		सिलोती नागरी
 Arabic supplement	UnicodeBlocks		अरबी संपूरक
 Latin extended C	UnicodeBlocks		लैटिन सी बढ़ाया
-Ancient smbols	UnicodeBlocks		प्राचीन प्रतीकों
 Bopomofo extended	UnicodeBlocks		बोपोमोफो विस्तारित
 Lycian	UnicodeBlocks		ल्य्चियन
-Font size:	CharacterWindow		फ़ॉन्ट का आकार:
 Ethiopic	UnicodeBlocks		एथिओपिक
 Bengali	UnicodeBlocks		बंगाली
 Supplementary private use area B	UnicodeBlocks		अनुपूरक निजी उपयोग के क्षेत्र बी

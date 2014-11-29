@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku.zip-o-matic	2241557251
+1	greek, modern (1453-)	x-vnd.haiku.zip-o-matic	1573273374
 Stop	file:ZipOMaticWindow.cpp		Διακοπή
 Creating archive: %s	file:ZipOMaticWindow.cpp		Δημιουργία συμπιεσμένου αρχείου: %s
 Continue	file:ZipOMaticWindow.cpp		Συνέχεια
@@ -11,6 +11,5 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Stopped	file:ZipOMaticWindow.cpp		Σταματημένο
 Archive	file:ZipperThread.cpp		Συμπιεσμένο αρχείο
 Error creating archive	file:ZipOMaticWindow.cpp		Σφάλμα κατά τη δημιουργία συμπιεσμένου αρχείου
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Έχετε το %ld Zip-O-Matic να εκτελείται. \n\n
 Archive created OK	file:ZipOMaticWindow.cpp		Το αρχείο δημιουργήθηκε επιτυχώς.
 Stop them	file:ZipOMatic.cpp		Σταματησέ τα 

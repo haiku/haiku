@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3658663669
+1	russian	x-vnd.Haiku-HaikuDepot	2053713001
 Name	PackageListView		Имя
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
 Close	RatePackageWindow		Закрыть
@@ -17,6 +17,7 @@ No changelog available.	PackageInfoView		История изменений не�
 Depot:	FilterView		Склад:
 Description	PackageListView		Описание
 Install	PackageManager		Установить
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Авторизация завершилась неудачно. Пользователь не существует или был введен неверный пароль.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Аккаунт был успешно создан. Теперь вы можете оценивать пакеты и делать другие полезные вещи.
 Tools	MainWindow		Инструменты
 HaikuDepot	System name		Склад

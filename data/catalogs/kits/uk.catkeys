@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libbe	84010340
+1	ukrainian	x-vnd.Haiku-libbe	1409488127
 gamma	AboutWindow		гамма
 beta	AboutWindow		бета
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -9,10 +9,8 @@ Version	AboutWindow		Версія
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Неможливо створити реплікант для \"%опису\".\n%помилки
 Copy	TextView		Копіювати
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d байт
 alpha	AboutWindow		альфа
 Error	PrintJob		Помилка
-No Pages to print!	PrintJob		Жодної сторінки для друку!
 All Rights Reserved.	AboutWindow		Усі права застережено.
 About %app%	AboutWindow		Про %app%
 OK	Dragger		Гаразд

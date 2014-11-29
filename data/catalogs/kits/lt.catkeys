@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libbe	84010340
+1	lithuanian	x-vnd.Haiku-libbe	1409488127
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -9,10 +9,8 @@ Version	AboutWindow		Versija
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nepavyko sukurti „%description“ replikanto.\n%error
 Copy	TextView		Kopijuoti
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d B
 alpha	AboutWindow		alfa
 Error	PrintJob		Klaida
-No Pages to print!	PrintJob		Nėra spausdintinų puslapių!
 All Rights Reserved.	AboutWindow		Visos teisės saugomos.
 About %app%	AboutWindow		Apie „%app%“
 OK	Dragger		Gerai

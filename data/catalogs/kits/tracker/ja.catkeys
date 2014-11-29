@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	3328793884
+1	japanese	x-vnd.Haiku-libtracker	1937834684
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		アドオン
 Mount settings…	ContainerWindow		マウント設定…
@@ -102,7 +102,6 @@ Show space bars on volumes	SettingsView		ディスクの容量グラフを表示
 Invert selection	ContainerWindow		選択範囲を反転
 Increase size	DeskWindow		サイズを大きく
 Resize to fit	ContainerWindow		最適な表示サイズに変更
-%Ld bytes	WidgetAttributeText		%Ld バイト
 Add printer…	ContainerWindow		プリンターの追加…
 New folder	ContainerWindow		新規フォルダー
 Kind	ContainerWindow		種類
@@ -289,7 +288,6 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	移動
 Show Disks icon	SettingsView		ディスクアイコンを表示
 Cancel	PoseView		中止
-\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld バイト、
 You can't move or copy items to read-only volumes.	FSUtils		読み取り専用パーティションへファイルまたはフォルダーを移動やコピーはできません。
 Unknown	FilePermissionsView		不明
 All files and folders	FindPanel		すべてのファイルとフォルダー

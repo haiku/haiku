@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	1727923642
+1	ukrainian	x-vnd.Haiku-MediaPlayer	3507634633
 raw audio	MediaPlayer-InfoWin		raw аудіо
 Location	MediaPlayer-InfoWin		Шлях
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
@@ -31,7 +31,6 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Отр
 Display mode	MediaPlayer-InfoWin		Режим показу
 Medium	MediaPlayer-SettingsWindow		Середній
 Close	MediaPlayer-PlaylistWindow		Закрити
-Stereo	MediaPlayer-InfoWin		Стерео
 Open…	MediaPlayer-PlaylistWindow		Відкрити…
 Toggle mute.	MediaPlayer-Main		Вимкнути звук.
 Undo	MediaPlayer-PlaylistWindow		Скасувати
@@ -56,7 +55,6 @@ Start playing.	MediaPlayer-Main		Почати відтворення.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Немає встановленого декодера щоб підтримував файл цього формату, або у декодера є проблема з спеціальною версією формату.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Імпортувати запис
 Gets the URI of the currently playing item.	MediaPlayer-Main		Отримати URI, який відтворюєтся в даний момент.
-%d Channels	MediaPlayer-InfoWin		%d каналів
 400% scale	MediaPlayer-Main		Масштаб 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Збереження списку відтворення призупинено:\n\nПомилка:
 Move Entries	MediaPlayer-MovePLItemsCmd		Перемістити записи
@@ -156,7 +154,6 @@ Always on top	MediaPlayer-Main		Завжди зверху
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис з кошика
 Save	MediaPlayer-Main		Зберегти
 <nothing to undo>	MediaPlayer-PlaylistWindow		Моно
-Mono	MediaPlayer-InfoWin		Моно
 File info	MediaPlayer-InfoWin		Інформація про файл
 Save	MediaPlayer-PlaylistWindow		Зберегти
 %d Bit	MediaPlayer-InfoWin		%d Біт
