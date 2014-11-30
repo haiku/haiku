@@ -27,8 +27,8 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings generic ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language expression_evaluators ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language syntax_highlighters ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language c_family ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language x86 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
@@ -211,21 +211,21 @@ Application Debugger :
 	SettingsDescription.cpp
 
 	# source_language
-	CLanguage.cpp
-	CLanguageFamily.cpp
-	CppLanguage.cpp
 	SourceLanguage.cpp
 	SyntaxHighlighter.cpp
 	UnsupportedLanguage.cpp
-	X86AssemblyLanguage.cpp
 
-	# source_language/expression_evaluators
+	# source_language/c_family
+	CLanguage.cpp
 	CLanguageExpressionEvaluator.cpp
-	CLanguageTokenizer.cpp
-
-	# source_language/syntax_highlighters
+	CLanguageFamily.cpp
 	CLanguageFamilySyntaxHighlighter.cpp
 	CLanguageFamilySyntaxHighlightInfo.cpp
+	CLanguageTokenizer.cpp
+	CppLanguage.cpp
+
+	# source_language/x86
+	X86AssemblyLanguage.cpp
 
 	# types
 	ArrayIndexPath.cpp
