@@ -642,7 +642,7 @@ LocaleWindow::_Defaults()
 		BListItem* superitem
 			= fConventionsListView->Superitem(fDefaultConventionsItem);
 		if (superitem != NULL && !superitem->IsExpanded())
-			superitem->SetExpanded(true);
+			fConventionsListView->Expand(superitem);
 		fConventionsListView->Select(fConventionsListView->IndexOf(
 				fDefaultConventionsItem));
 		fConventionsListView->ScrollToSelection();
