@@ -167,10 +167,8 @@ static const Translation kTranslations[] = {
 	},
 	{ "lt",
 		"Algirdas Buckus\n"
-		"Simonas Kazlauskas\n"
+		"Simonas Kazlauskas\n" //nagisa
 		"Rimas Kudelis\n"
-		"Niels Sascha Reedijk\n" //nielx
-		"nagisa\n"
 	},
 	{ "nb"
 		"Klapaucius\n"
