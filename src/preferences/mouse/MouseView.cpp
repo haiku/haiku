@@ -43,11 +43,11 @@ static const int32 kTwoButtonOffsets[4]
 static const int32 kThreeButtonOffsets[4]
 	= { 0, kMouseDownWidth / 3, kMouseDownWidth / 3 * 2, kMouseDownWidth };
 
-static const rgb_color kButtonTextColor = { 32, 32, 32, 255 };
+static const rgb_color kButtonTextColor = { 0, 0, 0, 255 };
 static const rgb_color kMouseShadowColor = { 150, 150, 150, 255 };
 static const rgb_color kMouseBodyTopColor = { 0xed, 0xed, 0xed, 255};
 static const rgb_color kMouseBodyBottomColor = { 0x85, 0x85, 0x85, 255 };
-static const rgb_color kMouseOutlineColor = { 0, 0, 0, 255 };
+static const rgb_color kMouseOutlineColor = { 0x51, 0x51, 0x51, 255 };
 
 static const int32*
 getButtonOffsets(int32 type)
@@ -224,6 +224,7 @@ MouseView::Draw(BRect updateFrame)
 	FillShape(&mouseShape, bodyGradient);
 
 	// Draw the outline
+	SetPenSize(1 / 1.8);
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(kMouseOutlineColor);
 
@@ -237,11 +238,11 @@ MouseView::Draw(BRect updateFrame)
 	// Separator between the buttons
 	if (fType == 3) {
 		buttonsOutline.MoveTo(BPoint(26, 29));
-		buttonsOutline.LineTo(BPoint(26, 10));
+		buttonsOutline.LineTo(BPoint(26, 9));
 		buttonsOutline.MoveTo(BPoint(38, 29));
-		buttonsOutline.LineTo(BPoint(38, 10));
+		buttonsOutline.LineTo(BPoint(38, 9));
 	} else if (fType == 2) {
-		buttonsOutline.MoveTo(BPoint(32, 30));
+		buttonsOutline.MoveTo(BPoint(32, 29));
 		buttonsOutline.LineTo(BPoint(32, 9));
 	}
 
