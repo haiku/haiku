@@ -221,6 +221,10 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fMonitorInfo->SetAlignment(B_ALIGN_CENTER);
 	screenBox->AddChild(fMonitorInfo);
 
+	fDeviceInfo = new BStringView("monitor info", "");
+	fDeviceInfo->SetAlignment(B_ALIGN_CENTER);
+	screenBox->AddChild(fDeviceInfo);
+
 	fMonitorView = new MonitorView(BRect(0.0, 0.0, 80.0, 80.0),
 		"monitor", screen.Frame().IntegerWidth() + 1,
 		screen.Frame().IntegerHeight() + 1);
@@ -1255,6 +1259,25 @@ ScreenWindow::_UpdateMonitor()
 			fMonitorInfo->Hide();
 	}
 
+	// Add info about the graphics device
+
+	accelerant_device_info deviceInfo;
+
+	if (fScreenMode.GetDeviceInfo(deviceInfo) == B_OK) {
+		BString deviceString;
+
+		if (deviceInfo.name[0] && deviceInfo.chipset[0]) {
+			deviceString.SetToFormat("%s (%s)", deviceInfo.name,
+				deviceInfo.chipset);
+		} else if (deviceInfo.name[0] || deviceInfo.chipset[0]) {
+			deviceString
+				= deviceInfo.name[0] ? deviceInfo.name : deviceInfo.chipset;
+		}
+
+		fDeviceInfo->SetText(deviceString);
+	}
+
+
 	char text[512];
 	size_t length = 0;
 	text[0] = 0;
@@ -1279,23 +1302,7 @@ ScreenWindow::_UpdateMonitor()
 				&& length < sizeof(text)) {
 				length += snprintf(text + length, sizeof(text) - length,
 					" (%u/%u)", info.produced.week, info.produced.year);
-	 		}
-		}
-	}
-
-	// Add info about the graphics device
-
-	accelerant_device_info deviceInfo;
-	if (fScreenMode.GetDeviceInfo(deviceInfo) == B_OK
-		&& length < sizeof(text)) {
-		if (deviceInfo.name[0] && deviceInfo.chipset[0]) {
-			length += snprintf(text + length, sizeof(text) - length,
-				"%s%s (%s)", length != 0 ? "\n\n" : "", deviceInfo.name,
-				deviceInfo.chipset);
-		} else if (deviceInfo.name[0] || deviceInfo.chipset[0]) {
-			length += snprintf(text + length, sizeof(text) - length,
-				"%s%s", length != 0 ? "\n\n" : "", deviceInfo.name[0]
-					? deviceInfo.name : deviceInfo.chipset);
+			}
 		}
 	}
 

@@ -70,6 +70,7 @@ private:
 			bool			fBootWorkspaceApplied;
 
 			BStringView*	fMonitorInfo;
+			BStringView*	fDeviceInfo;
 			MonitorView*	fMonitorView;
 			BMenuItem*		fAllWorkspacesItem;
 
