@@ -515,7 +515,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fApplyButton->SetEnabled(false);
 	BLayoutBuilder::Group<>(outerControlsView)
 		.AddGlue()
-			.AddGroup(B_HORIZONTAL)
+		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
 			.Add(fApplyButton);
 
@@ -525,11 +525,11 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.AddGroup(B_HORIZONTAL)
-			.AddGroup(B_VERTICAL, 0)
+			.AddGroup(B_VERTICAL, 0, 1)
 				.AddStrut(floorf(controlsBox->TopBorderOffset()) - 1)
 				.Add(screenBox)
 				.End()
-			.Add(controlsBox)
+			.Add(controlsBox, 2)
 			.End()
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)
