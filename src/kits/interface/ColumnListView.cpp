@@ -1292,7 +1292,7 @@ BColumnListView::SwapRows(int32 index1, int32 index2, BRow* parentRow1,
 	if (parentRow2 == NULL)
 		container2 = fOutlineView->RowList();
 	else
-		container2 = parentRow1->fChildList;
+		container2 = parentRow2->fChildList;
 
 	if (container2 == NULL)
 		return false;
