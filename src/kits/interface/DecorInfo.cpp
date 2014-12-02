@@ -15,8 +15,12 @@
 #include <FindDirectory.h>
 #include <Path.h>
 #include <Resources.h>
+#include <SystemCatalog.h>
 
 #include <DecoratorPrivate.h>
+
+
+#define B_TRANSLATION_CONTEXT "Default decorator about box"
 
 
 namespace BPrivate {
@@ -251,22 +255,26 @@ DecorInfo::_Init(bool isUpdate)
 	BEntry entry;
 
 	if (fPath == "Default") {
-		if (isUpdate){
+		if (isUpdate) {
 			// should never happen
 			fprintf(stderr, "DecorInfo::_Init(true)\tBUG BUG updating default"
 				"decorator!?!?!\n");
 			return;
 		}
 
-		fName = "Default";
 		fAuthors = "DarkWyrm, Stephan Aßmus, Clemens Zeidler, Ingo Weinhold";
-		fShortDescription = "Default Haiku window decorator.";
 		fLongDescription = fShortDescription;
 		fLicenseURL = "http://";
 		fLicenseName = "MIT";
 		fSupportURL = "http://www.haiku-os.org/";
 		fVersion = 0.5;
 		fInitStatus = B_OK;
+
+		fName = gSystemCatalog.GetString(B_TRANSLATE_MARK("Default"),
+			B_TRANSLATION_CONTEXT);
+		fShortDescription = gSystemCatalog.GetString(B_TRANSLATE_MARK(
+				"Default Haiku window decorator."),
+			B_TRANSLATION_CONTEXT);
 
 		// The following is to get the modification time of the app_server
 		// and, thusly, the Default decorator...
