@@ -2393,7 +2393,6 @@ do_for_request(Request* request, Task& task)
 		default:
 			return B_BAD_DATA;
 	}
-	return task(request);
 }
 
 status_t get_request_address_infos(Request* request, AddressInfo* infos,
