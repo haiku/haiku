@@ -39,6 +39,7 @@ public:
 			float				IconWidth() const;
 
 	virtual	void				DrawLabel(BView* owner, BRect frame);
+	virtual	void				DrawFocusMark(BView* owner, BRect frame);
 
 private:
 			BBitmap*			fIcon;
@@ -92,6 +93,14 @@ VolumeTab::DrawLabel(BView* owner, BRect frame)
 		BPoint(frame.left + IconWidth() + kSmallHMargin,
 			(frame.top + frame.bottom - fh.ascent - fh.descent) / 2.0
 				+ fh.ascent));
+}
+
+
+void
+VolumeTab::DrawFocusMark(BView* owner, BRect frame)
+{
+	frame.left += IconWidth();
+	BTab::DrawFocusMark(owner, frame);
 }
 
 
