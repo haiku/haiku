@@ -57,6 +57,7 @@ send_touchpad_arg_timeout(ps2_dev *dev, uint8 arg, bigtime_t timeout)
 {
 	int8 i;
 	uint8 val[8];
+
 	for (i = 0; i < 4; i++) {
 		val[2 * i] = (arg >> (6 - 2 * i)) & 3;
 		val[2 * i + 1] = 0xE8;
@@ -279,6 +280,15 @@ probe_synaptics(ps2_dev *dev)
 	uint8 deviceId;
 	status_t status;
 	TRACE("SYNAPTICS: probe\n");
+
+	// We reset the device here because it may have been left in a confused
+	// state by a previous probing attempt. Some synaptics touchpads are known
+	// to lockup when we attempt to detect them as IBM trackoints.
+	ps2_reset_mouse(dev);
+
+	// And after resetting we must wait a little for the device to become ready
+	// again...
+	snooze(400000);
 
 	status = send_touchpad_arg(dev, 0x00);
 	if (status != B_OK)
