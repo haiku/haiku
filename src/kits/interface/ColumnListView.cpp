@@ -1616,6 +1616,7 @@ BColumnListView::DrawLatch(BView* view, BRect rect, LatchType position, BRow*)
 			break;
 
 		case B_NO_LATCH:
+		default:
 			// No drawing
 			break;
 	}
