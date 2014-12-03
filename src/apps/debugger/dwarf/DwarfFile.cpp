@@ -712,7 +712,7 @@ DwarfFile::ResolveRangeList(CompilationUnit* unit, uint64 offset) const
 	if (unit == NULL || fDebugRangesSection == NULL)
 		return NULL;
 
-	if (offset < 0 || offset >= (uint64)fDebugRangesSection->Size())
+	if (offset >= (uint64)fDebugRangesSection->Size())
 		return NULL;
 
 	TargetAddressRangeList* ranges = new(std::nothrow) TargetAddressRangeList;
