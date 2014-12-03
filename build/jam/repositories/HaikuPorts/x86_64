@@ -117,6 +117,8 @@ RemotePackageRepository HaikuPorts
 	libsndfile_devel-1.0.25-3
 	libsdl-1.2.15-6
 	libsdl_devel-1.2.15-6
+	libsdl2-2.0.3-1
+	libsdl2_devel-2.0.3-1
 	libsolv-0.3.0_haiku_2013_10_01-1
 	libsolv_devel-0.3.0_haiku_2013_10_01-1
 	libtheora-1.1.1-2
@@ -264,6 +266,7 @@ RemotePackageRepository HaikuPorts
 	libpng
 	libpng16
 	libsdl
+	libsdl2
 	libsndfile
 	libsolv
 	libtheora
