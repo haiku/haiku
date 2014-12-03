@@ -1547,8 +1547,6 @@ BColumnListView::DrawLatch(BView* view, BRect rect, LatchType position, BRow*)
 {
 	const int32 rectInset = 4;
 
-	view->SetHighColor(0, 0, 0);
-
 	// make square
 	int32 sideLen = rect.IntegerWidth();
 	if (sideLen > rect.IntegerHeight())
@@ -1574,6 +1572,9 @@ BColumnListView::DrawLatch(BView* view, BRect rect, LatchType position, BRow*)
 		itemRect.right += 1;
 		itemRect.bottom += 1;
 	}
+
+	rgb_color highColor = view->HighColor();
+	view->SetHighColor(0, 0, 0);
 
 	switch (position) {
 		case B_OPEN_LATCH:
@@ -1618,6 +1619,8 @@ BColumnListView::DrawLatch(BView* view, BRect rect, LatchType position, BRow*)
 			// No drawing
 			break;
 	}
+
+	view->SetHighColor(highColor);
 }
 
 
