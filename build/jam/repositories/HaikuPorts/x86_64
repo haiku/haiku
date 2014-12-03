@@ -67,8 +67,8 @@ RemotePackageRepository HaikuPorts
 	glew_util-1.11.0-1
 	glib2-2.38.1-4
 	glib2_devel-2.38.1-4
-	glu-9.0.0-2
-	glu_devel-9.0.0-2
+	glu-9.0.0-3
+	glu_devel-9.0.0-3
 	gmp-6.0.0-1
 	gmp_devel-6.0.0-1
 	gperf-3.0.4-1
