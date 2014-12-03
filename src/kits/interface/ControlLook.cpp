@@ -668,8 +668,10 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 	// calculate scroll corner rect before messing with the "rect"
 	BRect scrollCornerFillRect(rect.right, rect.bottom,
 		rect.right, rect.bottom);
+
 	if (horizontalScrollBarFrame.IsValid())
 		scrollCornerFillRect.left = horizontalScrollBarFrame.right + 1;
+
 	if (verticalScrollBarFrame.IsValid())
 		scrollCornerFillRect.top = verticalScrollBarFrame.bottom + 1;
 
@@ -717,7 +719,6 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		_DrawFrame(view, horizontalScrollBarFrame, scrollbarFrameColor,
 			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
 			borders);
-
 
 		verticalScrollBarFrame.InsetBy(-1, -1);
 		// do not overdraw the left edge

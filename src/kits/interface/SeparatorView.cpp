@@ -34,8 +34,7 @@ BSeparatorView::BSeparatorView(orientation orientation, border_style border)
 
 
 BSeparatorView::BSeparatorView(const char* name, const char* label,
-		orientation orientation, border_style border,
-		const BAlignment& alignment)
+	orientation orientation, border_style border, const BAlignment& alignment)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 {
@@ -44,8 +43,7 @@ BSeparatorView::BSeparatorView(const char* name, const char* label,
 
 
 BSeparatorView::BSeparatorView(const char* name, BView* labelView,
-		orientation orientation, border_style border,
-		const BAlignment& alignment)
+	orientation orientation, border_style border, const BAlignment& alignment)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 {
@@ -54,8 +52,7 @@ BSeparatorView::BSeparatorView(const char* name, BView* labelView,
 
 
 BSeparatorView::BSeparatorView(const char* label,
-		orientation orientation, border_style border,
-		const BAlignment& alignment)
+	orientation orientation, border_style border, const BAlignment& alignment)
 	:
 	BView("", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 {
@@ -64,8 +61,7 @@ BSeparatorView::BSeparatorView(const char* label,
 
 
 BSeparatorView::BSeparatorView(BView* labelView,
-		orientation orientation, border_style border,
-		const BAlignment& alignment)
+	orientation orientation, border_style border, const BAlignment& alignment)
 	:
 	BView("", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 {
@@ -115,7 +111,7 @@ BSeparatorView::~BSeparatorView()
 }
 
 
-// #pragma mark - archiving
+// #pragma mark - Archiving
 
 
 BArchivable*
@@ -132,28 +128,28 @@ status_t
 BSeparatorView::Archive(BMessage* into, bool deep) const
 {
 	// TODO: Test this.
-	status_t ret = BView::Archive(into, deep);
-	if (ret != B_OK)
-		return ret;
+	status_t result = BView::Archive(into, deep);
+	if (result != B_OK)
+		return result;
 
 	if (fLabelView != NULL)
-		ret = into->AddString("_labelview", fLabelView->Name());
+		result = into->AddString("_labelview", fLabelView->Name());
 	else
-		ret = into->AddString("_label", fLabel.String());
+		result = into->AddString("_label", fLabel.String());
 
-	if (ret == B_OK)
-		ret = into->AddInt32("_orientation", fOrientation);
+	if (result == B_OK)
+		result = into->AddInt32("_orientation", fOrientation);
 
-	if (ret == B_OK)
-		ret = into->AddInt32("_halignment", fAlignment.horizontal);
+	if (result == B_OK)
+		result = into->AddInt32("_halignment", fAlignment.horizontal);
 
-	if (ret == B_OK)
-		ret = into->AddInt32("_valignment", fAlignment.vertical);
+	if (result == B_OK)
+		result = into->AddInt32("_valignment", fAlignment.vertical);
 
-	if (ret == B_OK)
-		ret = into->AddInt32("_border", fBorder);
+	if (result == B_OK)
+		result = into->AddInt32("_border", fBorder);
 
-	return ret;
+	return result;
 }
 
 
@@ -177,13 +173,15 @@ BSeparatorView::Draw(BRect updateRect)
 		float labelWidth = StringWidth(fLabel.String());
 		if (fOrientation == B_HORIZONTAL) {
 			switch (fAlignment.horizontal) {
-				default:
 				case B_ALIGN_LEFT:
+				default:
 					labelBounds.right = labelBounds.left + labelWidth;
 					break;
+
 				case B_ALIGN_RIGHT:
 					labelBounds.left = labelBounds.right - labelWidth;
 					break;
+
 				case B_ALIGN_CENTER:
 					labelBounds.left = (labelBounds.left + labelBounds.right
 						- labelWidth) / 2;
@@ -192,13 +190,15 @@ BSeparatorView::Draw(BRect updateRect)
 			}
 		} else {
 			switch (fAlignment.vertical) {
-				default:
 				case B_ALIGN_TOP:
+				default:
 					labelBounds.bottom = labelBounds.top + labelWidth;
 					break;
+
 				case B_ALIGN_BOTTOM:
 					labelBounds.top = labelBounds.bottom - labelWidth;
 					break;
+
 				case B_ALIGN_MIDDLE:
 					labelBounds.top = (labelBounds.top + labelBounds.bottom
 						- labelWidth) / 2;
@@ -234,6 +234,7 @@ BSeparatorView::Draw(BRect updateRect)
 		}
 		if (labelBounds.IsValid())
 			region.Include(labelBounds);
+
 		ConstrainClippingRegion(&region);
 	}
 
@@ -291,6 +292,7 @@ BSeparatorView::GetPreferredSize(float* _width, float* _height)
 
 	if (_width != NULL)
 		*_width = width;
+
 	if (_height != NULL)
 		*_height = height;
 }
@@ -313,6 +315,7 @@ BSeparatorView::MaxSize()
 		size.width = B_SIZE_UNLIMITED;
 	else
 		size.height = B_SIZE_UNLIMITED;
+
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 }
 
@@ -322,6 +325,7 @@ BSeparatorView::PreferredSize()
 {
 	BSize size;
 	GetPreferredSize(&size.width, &size.height);
+
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
 }
 
@@ -341,6 +345,7 @@ BSeparatorView::SetOrientation(orientation orientation)
 	GetFont(&font);
 	if (fOrientation == B_VERTICAL)
 		font.SetRotation(90.0f);
+
 	SetFont(&font);
 
 	Invalidate();
@@ -378,6 +383,7 @@ BSeparatorView::SetLabel(const char* label)
 {
 	if (label == NULL)
 		label = "";
+
 	if (fLabel == label)
 		return;
 
@@ -461,6 +467,7 @@ BSeparatorView::_BorderSize() const
 	switch (fBorder) {
 		case B_PLAIN_BORDER:
 			return 1.0f;
+
 		case B_FANCY_BORDER:
 			return 2.0f;
 
@@ -479,6 +486,7 @@ BSeparatorView::_MaxLabelBounds() const
 		bounds.InsetBy(kMinBorderLength, 0.0f);
 	else
 		bounds.InsetBy(0.0f, kMinBorderLength);
+
 	return bounds;
 }
 
@@ -496,4 +504,3 @@ void BSeparatorView::_ReservedSeparatorView7() {}
 void BSeparatorView::_ReservedSeparatorView8() {}
 void BSeparatorView::_ReservedSeparatorView9() {}
 void BSeparatorView::_ReservedSeparatorView10() {}
-

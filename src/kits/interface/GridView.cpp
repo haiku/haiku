@@ -1,7 +1,8 @@
 /*
- * Copyright 2010, Haiku, Inc.
+ * Copyright 2010 Haiku, Inc. All rights reserved.
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
- * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Distributed under the terms of the MIT License.
  */
 
 
@@ -81,4 +82,3 @@ void BGridView::_ReservedGridView7() {}
 void BGridView::_ReservedGridView8() {}
 void BGridView::_ReservedGridView9() {}
 void BGridView::_ReservedGridView10() {}
-

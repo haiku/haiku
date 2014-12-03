@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,7 +32,8 @@ BListItem::BListItem(uint32 level, bool expanded)
 
 
 BListItem::BListItem(BMessage* data)
-	: BArchivable(data),
+	:
+	BArchivable(data),
 	fTop(0.0),
 	fWidth(0),
 	fHeight(0),
@@ -219,4 +220,3 @@ BListItem::SetItemVisible(bool visible)
 {
 	fVisible = visible;
 }
-
