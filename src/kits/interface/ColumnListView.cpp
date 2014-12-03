@@ -1097,7 +1097,7 @@ BColumnListView::ColumnAt(BPoint point) const
 	float left = MAX(kLeftMargin, LatchWidth());
 
 	for (int i = 0; BColumn* column = (BColumn*)fColumns.ItemAt(i); i++) {
-		if (!column->IsVisible())
+		if (column == NULL || !column->IsVisible())
 			continue;
 
 		float right = left + column->Width();
@@ -1507,7 +1507,7 @@ BColumnListView::SuggestTextPosition(const BRow* row,
 		float leftEdge = MAX(kLeftMargin, LatchWidth());
 		for (int index = 0; index < fColumns.CountItems(); index++) {
 			BColumn* column = (BColumn*) fColumns.ItemAt(index);
-			if (!column->IsVisible())
+			if (column == NULL || !column->IsVisible())
 				continue;
 
 			if (column == inColumn) {
