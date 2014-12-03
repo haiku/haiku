@@ -29,7 +29,7 @@ main()
 		accelerant_device_info info;
 
 		// At the moment, screen.ID() is always 0;
-		printf("Screen %d:", screen.ID());
+		printf("Screen %" B_PRId32 ":", screen.ID().id);
 		if (screen.GetDeviceInfo(&info) != B_OK) {
 			printf(" unavailable\n");
 		} else {
