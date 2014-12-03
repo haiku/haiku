@@ -1786,78 +1786,45 @@ BColumnListView::Draw(BRect updateRect)
 {
 	BRect rect = Bounds();
 
-	if (be_control_look != NULL) {
-		uint32 flags = 0;
-		if (IsFocus() && Window()->IsActive())
-			flags |= BControlLook::B_FOCUSED;
+	uint32 flags = 0;
+	if (IsFocus() && Window()->IsActive())
+		flags |= BControlLook::B_FOCUSED;
 
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-		BRect verticalScrollBarFrame;
-		if (!fVerticalScrollBar->IsHidden())
-			verticalScrollBarFrame = fVerticalScrollBar->Frame();
-		BRect horizontalScrollBarFrame;
-		if (!fHorizontalScrollBar->IsHidden())
-			horizontalScrollBarFrame = fHorizontalScrollBar->Frame();
+	BRect verticalScrollBarFrame;
+	if (!fVerticalScrollBar->IsHidden())
+		verticalScrollBarFrame = fVerticalScrollBar->Frame();
 
-		if (fBorderStyle == B_NO_BORDER) {
-			// We still draw the left/top border, but not focused.
-			// The scrollbars cannot be displayed without frame and
-			// it looks bad to have no frame only along the left/top
-			// side.
-			rgb_color borderColor = tint_color(base, B_DARKEN_2_TINT);
-			SetHighColor(borderColor);
-			StrokeLine(BPoint(rect.left, rect.bottom),
-				BPoint(rect.left, rect.top));
-			StrokeLine(BPoint(rect.left + 1, rect.top),
-				BPoint(rect.right, rect.top));
-		}
+	BRect horizontalScrollBarFrame;
+	if (!fHorizontalScrollBar->IsHidden())
+		horizontalScrollBarFrame = fHorizontalScrollBar->Frame();
 
+	if (fBorderStyle == B_NO_BORDER) {
+		// We still draw the left/top border, but not focused.
+		// The scrollbars cannot be displayed without frame and
+		// it looks bad to have no frame only along the left/top
+		// side.
+		rgb_color borderColor = tint_color(base, B_DARKEN_2_TINT);
+		SetHighColor(borderColor);
+		StrokeLine(BPoint(rect.left, rect.bottom),
+			BPoint(rect.left, rect.top));
+		StrokeLine(BPoint(rect.left + 1, rect.top),
+			BPoint(rect.right, rect.top));
+	}
+
+	be_control_look->DrawScrollViewFrame(this, rect, updateRect,
+		verticalScrollBarFrame, horizontalScrollBarFrame,
+		base, fBorderStyle, flags);
+
+	if (fStatusView != NULL) {
+		rect = Bounds();
+		BRegion region(rect & fStatusView->Frame().InsetByCopy(-2, -2));
+		ConstrainClippingRegion(&region);
+		rect.bottom = fStatusView->Frame().top - 1;
 		be_control_look->DrawScrollViewFrame(this, rect, updateRect,
-			verticalScrollBarFrame, horizontalScrollBarFrame,
-			base, fBorderStyle, flags);
-
-		if (fStatusView != NULL) {
-			rect = Bounds();
-			BRegion region(rect & fStatusView->Frame().InsetByCopy(-2, -2));
-			ConstrainClippingRegion(&region);
-			rect.bottom = fStatusView->Frame().top - 1;
-			be_control_look->DrawScrollViewFrame(this, rect, updateRect,
-				BRect(), BRect(), base, fBorderStyle, flags);
-		}
-
-		return;
+			BRect(), BRect(), base, fBorderStyle, flags);
 	}
-
-	BRect cornerRect(rect.right - B_V_SCROLL_BAR_WIDTH,
-		rect.bottom - B_H_SCROLL_BAR_HEIGHT, rect.right, rect.bottom);
-	if (fBorderStyle == B_PLAIN_BORDER) {
-		BView::SetHighColor(0, 0, 0);
-		StrokeRect(rect);
-		cornerRect.OffsetBy(-1, -1);
-	} else if (fBorderStyle == B_FANCY_BORDER) {
-		bool isFocus = IsFocus() && Window()->IsActive();
-
-		if (isFocus) {
-			// TODO: Need to find focus color programatically
-			BView::SetHighColor(0, 0, 190);
-		} else
-			BView::SetHighColor(255, 255, 255);
-
-		StrokeRect(rect);
-		if (!isFocus)
-			BView::SetHighColor(184, 184, 184);
-		else
-			BView::SetHighColor(152, 152, 152);
-
-		rect.InsetBy(1,1);
-		StrokeRect(rect);
-		cornerRect.OffsetBy(-2, -2);
-	}
-
-	BView::SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		// fills lower right rect between scroll bars
-	FillRect(cornerRect);
 }
 
 
@@ -2509,35 +2476,7 @@ TitleView::DrawTitle(BView* view, BRect rect, BColumn* column, bool depressed)
 	rgb_color borderColor = mix_color(
 		fMasterView->Color(B_COLOR_HEADER_BACKGROUND),
 		make_color(0, 0, 0), 128);
-	rgb_color backgroundColor;
-
-	rgb_color bevelHigh;
-	rgb_color bevelLow;
-	// Want exterior borders to overlap.
-	if (be_control_look == NULL) {
-		rect.right += 1;
-		drawRect = rect;
-		drawRect.InsetBy(2, 2);
-		if (depressed) {
-			backgroundColor = mix_color(
-				fMasterView->Color(B_COLOR_HEADER_BACKGROUND),
-				make_color(0, 0, 0), 64);
-			bevelHigh = mix_color(backgroundColor, make_color(0, 0, 0), 64);
-			bevelLow = mix_color(backgroundColor, make_color(255, 255, 255),
-				128);
-			drawRect.left++;
-			drawRect.top++;
-		} else {
-			backgroundColor = fMasterView->Color(B_COLOR_HEADER_BACKGROUND);
-			bevelHigh = mix_color(backgroundColor, make_color(255, 255, 255),
-				192);
-			bevelLow = mix_color(backgroundColor, make_color(0, 0, 0), 64);
-			drawRect.bottom--;
-			drawRect.right--;
-		}
-	} else {
-		drawRect = rect;
-	}
+	drawRect = rect;
 
 	font_height fh;
 	GetFontHeight(&fh);
@@ -2545,49 +2484,27 @@ TitleView::DrawTitle(BView* view, BRect rect, BColumn* column, bool depressed)
 	float baseline = floor(drawRect.top + fh.ascent
 		+ (drawRect.Height() + 1 - (fh.ascent + fh.descent)) / 2);
 
-	if (be_control_look != NULL) {
-		BRect bgRect = rect;
+	BRect bgRect = rect;
 
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		view->SetHighColor(tint_color(base, B_DARKEN_2_TINT));
-		view->StrokeLine(bgRect.LeftBottom(), bgRect.RightBottom());
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	view->SetHighColor(tint_color(base, B_DARKEN_2_TINT));
+	view->StrokeLine(bgRect.LeftBottom(), bgRect.RightBottom());
 
-		bgRect.bottom--;
-		bgRect.right--;
+	bgRect.bottom--;
+	bgRect.right--;
 
-		if (depressed)
-			base = tint_color(base, B_DARKEN_1_TINT);
+	if (depressed)
+		base = tint_color(base, B_DARKEN_1_TINT);
 
-		be_control_look->DrawButtonBackground(view, bgRect, rect, base, 0,
-			BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
+	be_control_look->DrawButtonBackground(view, bgRect, rect, base, 0,
+		BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 
-		view->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DARKEN_2_TINT));
-		view->StrokeLine(rect.RightTop(), rect.RightBottom());
-
-	} else {
-
-		view->SetHighColor(borderColor);
-		view->StrokeRect(rect);
-		view->BeginLineArray(4);
-		view->AddLine(BPoint(rect.left + 1, rect.top + 1),
-			BPoint(rect.right - 1, rect.top + 1), bevelHigh);
-		view->AddLine(BPoint(rect.left + 1, rect.top + 1),
-			BPoint(rect.left + 1, rect.bottom - 1), bevelHigh);
-		view->AddLine(BPoint(rect.right - 1, rect.top + 1),
-			BPoint(rect.right - 1, rect.bottom - 1), bevelLow);
-		view->AddLine(BPoint(rect.left + 2, rect.bottom-1),
-			BPoint(rect.right - 1, rect.bottom - 1), bevelLow);
-		view->EndLineArray();
-
-		view->SetHighColor(backgroundColor);
-		view->SetLowColor(backgroundColor);
-
-		view->FillRect(rect.InsetByCopy(2, 2));
-	}
+	view->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_2_TINT));
+	view->StrokeLine(rect.RightTop(), rect.RightBottom());
 
 	// If no column given, nothing else to draw.
-	if (!column)
+	if (column == NULL)
 		return;
 
 	view->SetHighColor(fMasterView->Color(B_COLOR_HEADER_TEXT));
