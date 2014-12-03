@@ -87,11 +87,6 @@ const char *kUsage =
 "Options:\n"
 "  -h, --help    - Print this help text and exit.\n"
 "  --dry-run     - Do everything but actually writing the boot block to disk.\n"
-"\n"
-"[compatibility]\n"
-"  -alert        - Compatibility option. Ignored.\n"
-"  -full         - Compatibility option. Ignored.\n"
-"  -safe         - Compatibility option. Fail when specified.\n"
 ;
 
 
@@ -271,17 +266,10 @@ main(int argc, const char *const *argv)
 				print_usage_and_exit(false);
 			} else if (strcmp(arg, "--dry-run") == 0) {
 				dryRun = true;
-			} else if (strcmp(arg, "-alert") == 0) {
-				// ignore
-			} else if (strcmp(arg, "-full") == 0) {
-				// ignore
 			} else if (strcmp(arg, "--start-offset") == 0) {
 				if (argi >= argc)
 					print_usage_and_exit(true);
 				startOffset = strtoll(argv[argi++], NULL, 0);
-			} else if (strcmp(arg, "-safe") == 0) {
-				fprintf(stderr, "Error: Sorry, BeOS R3 isn't supported!\n");
-				exit(1);
 			} else {
 				print_usage_and_exit(true);
 			}
