@@ -64,7 +64,7 @@ ExpanderThread::ThreadStartup()
 
 	BPath path(&srcRef);
 	BString pathString(path.Path());
-	pathString.CharacterEscape("\"$`", '\\');
+	pathString.CharacterEscape("\\\"$`", '\\');
 	pathString.Prepend("\"");
 	pathString.Append("\"");
 	cmd.ReplaceAll("%s", pathString.String());
