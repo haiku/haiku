@@ -1,5 +1,0 @@
-SubDir HAIKU_TOP src add-ons input_server filters vmware_mouse ;
-
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
-Addon vmware_mouse : VMWareMouse.cpp : be input_server [ TargetLibsupc++ ] ;

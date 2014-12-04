@@ -1,5 +1,4 @@
 SubDir HAIKU_TOP src add-ons input_server filters ;
 
 SubInclude HAIKU_TOP src add-ons input_server filters screen_saver ;
-SubInclude HAIKU_TOP src add-ons input_server filters vmware_mouse ;
 SubInclude HAIKU_TOP src add-ons input_server filters shortcut_catcher ;
