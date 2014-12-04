@@ -148,7 +148,6 @@ SYSTEM_NETWORK_PROTOCOLS =
 SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
 	x86,x86_64 @{
 		vesa.accelerant
-		vmware.accelerant
 	}@ # x86,x86_64
 ] ;
 
@@ -177,7 +176,6 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
 	x86,x86_64 @{
 		vesa
-		vmware
 	}@ # x86,x86_64
 ] ;
 
