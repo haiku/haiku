@@ -1454,8 +1454,7 @@ SetViewColor(Parent()->ViewColor());
 	\brief Resizes the view to its preferred size keeping the position of the
 	       left top corner constant.
 
-	\warning It is not recommended to use this method for views that are part of
-	         a BLayout.
+	It is not recommended to use this method for views that are part of a BLayout.
 
 	\since BeOS R3
 */
@@ -2175,16 +2174,20 @@ SetViewColor(Parent()->ViewColor());
 	By passing \c B_FONT_ALL to the \a mask parameter as is the default all font
 	properties from \a font are set on the view.
 
-	\param font A pointer to a BFont object to set.
-	\param mask A mask of the following values to determine what font properties to set:
-	- \c B_FONT_FAMILY_AND_STYLE
-	- \c B_FONT_SPACING
-	- \c B_FONT_SIZE
-	- \c B_FONT_ENCODING
-	- \c B_FONT_SHEAR
-	- \c B_FONT_FACE
-	- \c B_FONT_ROTATION
-	- \c B_FONT_FLAGS
+	\param font A pointer to a BFont object to set. Choices include:
+	  - \c be_plain_font
+	  - \c be_bold_font
+	  - \c be_fixed_font
+	\param mask A mask of the following values to determine what font properties
+	            to set:
+	  - \c B_FONT_FAMILY_AND_STYLE
+	  - \c B_FONT_SPACING
+	  - \c B_FONT_SIZE
+	  - \c B_FONT_ENCODING
+	  - \c B_FONT_SHEAR
+	  - \c B_FONT_FACE
+	  - \c B_FONT_ROTATION
+	  - \c B_FONT_FLAGS
 
 	\since BeOS R3
 */
@@ -3956,6 +3959,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn BSize BView::MinSize()
 	\brief Return the minimum size of the view.
 
+	This is only meaningful if the view is part of a BLayout.
+
 	\return The minimum size of the view as a BSize.
 
 	\sa BAbstractLayout::MinSize()
@@ -3967,6 +3972,8 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn BSize BView::MaxSize()
 	\brief Return the maximum size of the view.
+
+	This is only meaningful if the view is part of a BLayout.
 
 	\return The maximum size of the view as a BSize.
 
@@ -3980,6 +3987,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn BSize BView::PreferredSize()
 	\brief Return the preferred size of the view.
 
+	This is only meaningful if the view is part of a BLayout.
+
 	\return The preferred size of the view as a BSize.
 
 	\sa BAbstractLayout::PreferredSize()
@@ -3992,6 +4001,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::SetExplicitMinSize(BSize size)
 	\brief Set this view's min size, to be used by MinSize().
 
+	This is only meaningful if the view is part of a BLayout.
+
 	\sa BAbstractLayout::SetExplicitMinSize()
 
 	\since Haiku R1
@@ -4001,6 +4012,8 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::SetExplicitMaxSize(BSize size)
 	\brief Set this view's max size, to be used by MaxSize().
+
+	This is only meaningful if the view is part of a BLayout.
 
 	\sa BAbstractLayout::SetExplicitMaxSize()
 
@@ -4012,6 +4025,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::SetExplicitPreferredSize(BSize size)
 	\brief Set this view's preferred size, to be used by PreferredSize().
 
+	This is only meaningful if the view is part of a BLayout.
+
 	\sa BAbstractLayout::SetExplicitPreferredSize()
 
 	\since Haiku R1
@@ -4021,6 +4036,8 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::SetExplicitAlignment(BAlignment alignment)
 	\brief Set this view's alignment, to be used by Alignment().
+
+	This is only meaningful if the view is part of a BLayout.
 
 	\sa BAbstractLayout::SetExplicitAlignment()
 
@@ -4032,6 +4049,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::SetLayout(BLayout* layout)
 	\brief Sets the \a layout of the view.
 
+	This is only meaningful if the view is part of a BLayout.
+
 	\param layout The \a layout to set.
 
 	\since Haiku R1
@@ -4041,6 +4060,8 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn BLayout* BView::GetLayout() const
 	\brief Get the layout of the view.
+
+	This is only meaningful if the view is part of a BLayout.
 
 	\returns The layout of the view.
 
@@ -4052,6 +4073,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::InvalidateLayout(bool descendants)
 	\brief Invalidate layout.
 
+	This is only meaningful if the view is part of a BLayout.
+
 	\param descendants Also invalidate its children views.
 
 	\since Haiku R1
@@ -4062,6 +4085,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::EnableLayoutInvalidation()
 	\brief Enable layout invalidation.
 
+	This is only meaningful if the view is part of a BLayout.
+
 	\since Haiku R1
 */
 
@@ -4070,6 +4095,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::DisableLayoutInvalidation()
 	\brief Disable layout invalidation.
 
+	This is only meaningful if the view is part of a BLayout.
+
 	\since Haiku R1
 */
 
@@ -4077,6 +4104,8 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn bool BView::IsLayoutInvalidationDisabled()
 	\brief Returns whether or not layout invalidation is disabled.
+
+	This is only meaningful if the view is part of a BLayout.
 
 	\return \c true of layout invalidation is disabled, \c false otherwise.
 
@@ -4087,6 +4116,8 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn bool BView::IsLayoutValid() const
 	\brief Returns whether or not the layout is valid.
+
+	This is only meaningful if the view is part of a BLayout.
 
 	\brief Returns \c true if the layout is valid, \c false otherwise.
 
@@ -4099,11 +4130,13 @@ SetViewColor(Parent()->ViewColor());
 	\brief Service call for BView derived classes re-enabling
 	       InvalidateLayout() notifications.
 
-	BLayout and  BView will avoid calling InvalidateLayout on views that have
+	BLayout and BView will avoid calling InvalidateLayout on views that have
 	already been invalidated, but if the view caches internal layout information
 	which it updates in methods other than DoLayout(), it has to invoke this
 	method, when it has done so, since otherwise the information might become
 	obsolete without the layout noticing.
+
+	This is only meaningful if the view is part of a BLayout.
 
 	\since Haiku R1
 */
@@ -4112,6 +4145,8 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::Layout(bool force)
 	\brief Layout the view.
+
+	This is only meaningful if the view is part of a BLayout.
 
 	\param force If \c true layout even if valid.
 
@@ -4123,6 +4158,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::Relayout()
 	\brief Relayout the view.
 
+	This is only meaningful if the view is part of a BLayout.
+
 	\since Haiku R1
 */
 
@@ -4130,6 +4167,8 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::DoLayout()
 	\brief Layout view within the layout context.
+
+	This is only meaningful if the view is part of a BLayout.
 
 	\since Haiku R1
 */
