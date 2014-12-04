@@ -118,6 +118,7 @@ _BTextInput_::KeyDown(const char* bytes, int32 numBytes)
 	}
 }
 
+
 void
 _BTextInput_::MakeFocus(bool state)
 {
@@ -155,8 +156,8 @@ _BTextInput_::MinSize()
 {
 	BSize min;
 	min.height = ceilf(LineHeight(0) + 2.0);
-		// we always add at least one pixel vertical inset top/bottom for
-		// the text rect.
+	// we always add at least one pixel vertical inset top/bottom for
+	// the text rect.
 	min.width = min.height * 3;
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), min);
 }
@@ -170,12 +171,32 @@ _BTextInput_::AlignTextRect()
 	// the text rect to be in the middle, normally this means there
 	// is one pixel spacing on each side
 	BRect textRect(Bounds());
-	textRect.left = 0.0;
-	float vInset = max_c(1, floorf((textRect.Height() - LineHeight(0)) / 2.0));
+	float vInset = max_c(1, 
+			floorf((textRect.Height() - LineHeight(0)) / 2.0));
 	float hInset = 2;
+	float textFontWidth = TextRect().right;
 
-	if (be_control_look != NULL)
-		hInset = be_control_look->DefaultLabelSpacing();
+	if (be_control_look != NULL) 
+	{
+		switch(Alignment())
+		{
+			case B_ALIGN_LEFT:
+				hInset = be_control_look->DefaultLabelSpacing();
+				break;
+
+			case B_ALIGN_RIGHT:
+				hInset  = textRect.right - textFontWidth;
+				hInset -= be_control_look->DefaultLabelSpacing();
+				break;
+
+			case B_ALIGN_CENTER:
+				hInset = (textRect.right - textFontWidth)/ 2.0;
+				break;
+
+			default:
+				break;
+		}
+	}
 
 	textRect.InsetBy(hInset, vInset);
 	SetTextRect(textRect);
