@@ -343,7 +343,7 @@
 
 /*!
 	\fn const char* BStringView::Text() const
-	\returns The text set to the item.
+	\brief Returns the text currently set to the string view.
 
 	\returns the text set to the string view.
 
