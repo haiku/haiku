@@ -360,6 +360,7 @@ FileTypeWindow::MessageReceived(BMessage* message)
 			panel.AddString("title", B_TRANSLATE("Select same type as"));
 			panel.AddInt32("message", kMsgSameTypeAsOpened);
 			panel.AddMessenger("target", this);
+			panel.AddBool("allowDirs", true);
 
 			be_app_messenger.SendMessage(&panel);
 			break;
@@ -404,6 +405,7 @@ FileTypeWindow::MessageReceived(BMessage* message)
 				B_TRANSLATE("Select same preferred application as"));
 			panel.AddInt32("message", kMsgSamePreferredAppAsOpened);
 			panel.AddMessenger("target", this);
+			panel.AddBool("allowDirs", true);
 
 			be_app_messenger.SendMessage(&panel);
 			break;

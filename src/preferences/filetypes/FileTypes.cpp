@@ -385,6 +385,12 @@ FileTypes::MessageReceived(BMessage* message)
 				title.Append(subTitle);
 			}
 
+			uint32 flavors = B_FILE_NODE;
+			if (message->FindBool("allowDirs"))
+				flavors |= B_DIRECTORY_NODE;
+			fFilePanel->SetNodeFlavors(flavors);
+
+
 			fFilePanel->SetMessage(new BMessage(what));
 			fFilePanel->Window()->SetTitle(title.String());
 			fFilePanel->SetTarget(target);

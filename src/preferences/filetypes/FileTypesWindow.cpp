@@ -826,6 +826,7 @@ FileTypesWindow::MessageReceived(BMessage* message)
 				B_TRANSLATE("Select same preferred application as"));
 			panel.AddInt32("message", kMsgSamePreferredAppAsOpened);
 			panel.AddMessenger("target", this);
+			panel.AddBool("allowDirs", true);
 
 			be_app_messenger.SendMessage(&panel);
 			break;
