@@ -67,6 +67,7 @@ class BFilePanel {
 		void			SetRefFilter(BRefFilter* filter);
 		void			SetSaveText(const char* text);
 		void			SetButtonLabel(file_panel_button button, const char* label);
+		void			SetNodeFlavors(uint32 flavors);
 
 		void			SetPanelDirectory(const BEntry* newDirectory);
 		void			SetPanelDirectory(const BDirectory* newDirectory);

@@ -264,6 +264,17 @@ BFilePanel::SetButtonLabel(file_panel_button button, const char* text)
 
 
 void
+BFilePanel::SetNodeFlavors(uint32 flavors)
+{
+	AutoLock<BWindow> lock(fWindow);
+	if (!lock)
+		return;
+
+	static_cast<TFilePanel*>(fWindow)->SetNodeFlavors(flavors);
+}
+
+
+void
 BFilePanel::GetPanelDirectory(entry_ref* ref) const
 {
 	AutoLock<BWindow> lock(fWindow);

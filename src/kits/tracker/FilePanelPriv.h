@@ -78,6 +78,7 @@ public:
 
 	void SetClientObject(BFilePanel*);
 	void SetRefFilter(BRefFilter*);
+	void SetNodeFlavors(uint32 nodeFlavors) { fNodeFlavors = nodeFlavors; }
 	void SetSaveText(const char* text);
 	void SetButtonLabel(file_panel_button, const char* text);
 	void SetTo(const entry_ref* ref);
