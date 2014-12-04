@@ -1,0 +1,440 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/StringView.h	hrev48439
+ *		src/kits/interface/StringView.cpp	hrev48439
+ */
+
+
+/*!
+	\file StringView.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BStringView class definition.
+*/
+
+
+/*!
+	\class BStringView
+	\ingroup interface
+	\ingroup libbe
+	\brief Draws a non-editable single-line text string,
+	       most commonly used as a label.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BStringView::BStringView(BRect frame, const char* name, const char* text,
+		uint32 resizingMode, uint32 flags)
+	\brief Creates a new BStringView object which displays the non-editable
+	       \a text string in the plain system font (\c be_plain_font).
+
+	\param frame The frame rectangle to draw the string view into.
+	\param name The string view's \a name. Can be \c NULL.
+	\param text The string view's label \a text. Can be \c NULL.
+	\param resizingMode Sets the parameters by which the BStringView can be
+	       resized. See BView for more information on resizing options.
+	\param flags The \a flags mask sets what notifications the BStringView can
+	       receive. See BView for more information on \a flags.
+	       \c B_FULL_UPDATE_ON_RESIZE is always set.
+
+	In order to prevent the string from being truncated the frame rectangle
+	must be large enough to display the entire string in the current font.
+	The string is drawn at the bottom of the frame rectangle and by default
+	is left-aligned, call SetAlignment() to set a different horizontal
+	alignment.
+
+	You may also change the font variety used by calling SetFont().
+
+	\see SetAlignment()
+	\see SetFont()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BStringView::BStringView(const char* name, const char* text, uint32 flags)
+	\brief Layout constructor.
+
+	\param name The string view's \a name. Can be \c NULL.
+	\param text The string view's label \a text. Can be \c NULL.
+	\param flags The \a flags mask sets what notifications the BStringView can
+	       receive. See BView for more information on \a flags.
+	       \c B_FULL_UPDATE_ON_RESIZE is always set.
+
+	The string is left-aligned by default. There are two ways to set the
+	horizontal alignment of the string view. The preferred method is to call
+	BLayoutItem::SetExplicitAlignment() or you may also call SetAlignment().
+
+	You may also change the font variety used by calling SetFont().
+
+	\see BLayoutItem::SetExplicitAlignment()
+	\see SetAlignment()
+	\see SetFont()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BStringView::BStringView(BMessage* archive)
+	\brief Archive constructor.
+
+	The string view's text, alignment, and view flags can be set using this
+	constructor.
+
+	\warning This method is usually not called directly. If you want to build
+	         a string view from an archive message you should call
+	         Instantiate() instead which can handle errors properly.
+
+	\param archive The message \a archive to construct the string view from.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BStringView::~BStringView()
+	\brief Destructor method, frees the memory used by the string view.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BArchivable* BStringView::Instantiate(BMessage* archive)
+	\brief Creates a new BStringView object from an \a archive message.
+
+	\return A newly created BStringView object or \c NULL if the message
+	        doesn't contain an archived BStringView.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BStringView::Archive(BMessage* archive, bool deep) const
+	\brief Archives the the BStringView object into the \a archive message.
+
+	\param archive A pointer to the BMessage to archive the object into.
+	\param deep This parameter has no effect for this class.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived successfully.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\name Hook methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BStringView::AttachedToWindow()
+	\brief Hook method called when the BStringView is attached to a window.
+
+	The view color is set to either the parent's view color or
+	\c B_TRANSPARENT_COLOR if the string view isn't attached to a view.
+
+	\sa BView::AttachedToWindow()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BStringView::DetachedFromWindow()
+	\brief Hook method called when the BStringView is detached from a window.
+
+	\copydetails BView::DetachedFromWindow()
+*/
+
+
+/*!
+	\fn void BStringView::AllAttached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+	       all child views have already been attached to a window.
+
+	\copydetails BView::AllAttached()
+*/
+
+
+/*!
+	\fn void BStringView::AllDetached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+	       all child views have already been detached from a window.
+
+	\copydetails BView::AllDetached()
+*/
+
+
+/*!
+	\fn void BStringView::Draw(BRect updateRect)
+	\brief Draws the area of the string view that intersects \a updateRect.
+
+	\note This is an hook method called by the Interface Kit, you don't
+	      have to call it yourself. If you need to forcefully redraw the
+	      string view consider calling Invalidate() instead.
+
+	\param updateRect The rectangular area to be drawn.
+
+	\sa BView::Draw()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BStringView::FrameMoved(BPoint newPosition)
+	\brief Hook method called when the string view is moved.
+
+	\copydetails BView::FrameMoved()
+*/
+
+
+/*!
+	\fn void BStringView::FrameResized(float newWidth, float newHeight)
+	\brief Hook method called when the string view is resized.
+
+	\copydetails BView::FrameResized()
+*/
+
+
+/*!
+	\fn void BStringView::MessageReceived(BMessage* message)
+	\brief Handle \a message received by the associated looper.
+
+	\copydetails BView::MessageReceived()
+*/
+
+
+/*!
+	\fn void BStringView::MouseDown(BPoint where)
+	\brief Hook method called when a mouse button is pressed.
+
+	\copydetails BView::MouseDown()
+*/
+
+
+/*!
+	\fn void BStringView::MouseMoved(BPoint where, uint32 code,
+		const BMessage* dragMessage)
+	\brief Hook method called when the mouse is moved.
+
+	\copydetails BView::MouseMoved()
+*/
+
+
+/*!
+	\fn void BStringView::MouseUp(BPoint where)
+	\brief Hook method called when a mouse button is released.
+
+	\copydetails BView::MouseUp()
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BStringView::MakeFocus(bool focus)
+	\brief Makes the string view the current focus view of the window or
+	       gives up being the window's focus view.
+
+	\copydetails BView::MakeFocus()
+*/
+
+
+/*!
+	\fn void BStringView::GetPreferredSize(float* _width, float* _height)
+	\brief Fills out the preferred width and height of the string view
+	       into the \a _width and \a _height parameters respectively.
+
+	\copydetails BView::GetPreferredSize()
+*/
+
+
+/*!
+	\fn BSize BStringView::MinSize()
+	\brief Returns the string view's minimum size.
+
+	\copydetails BView::MinSize()
+*/
+
+
+/*!
+	\fn BSize BStringView::MaxSize()
+	\brief Returns the string view's maximum size.
+
+	\copydetails BView::MaxSize()
+*/
+
+
+/*!
+	\fn BSize BStringView::PreferredSize()
+	\brief Returns the string view's preferred size.
+
+	\copydetails BView::PreferredSize()
+*/
+
+
+/*!
+	\fn void BStringView::ResizeToPreferred()
+	\brief Resize the string view to its preferred size.
+
+	\copydetails BView::ResizeToPreferred()
+*/
+
+
+/*!
+	\fn BAlignment BStringView::LayoutAlignment()
+	\brief Returns the alignment used by this view as part of a BLayout.
+
+	\return The alignment used by this view as a BAlignment.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Text methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BStringView::SetText(const char* text)
+	\brief Sets the \a text string displayed by the string view. The memory
+	       used by the old string is freed.
+
+	\param text The \a text string to set.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn const char* BStringView::Text() const
+	\returns The text set to the item.
+
+	\returns the text set to the string view.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\name Alignment methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BStringView::SetAlignment(alignment flag)
+	\brief Sets the way text is aligned within the view's frame.
+
+	Choices are:
+	- \c B_ALIGN_LEFT
+	- \c B_ALIGN_RIGHT
+	- \c B_ALIGN_CENTER
+
+	\remark For string views that are part of a BLayout consider
+	        using BLayoutItem::SetExplicitAlignment() instead.
+
+	\param flag The text alignment to set.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn alignment BStringView::Alignment() const
+	\brief Returns the currently set text alignment flag.
+
+	\return The current alignment flag.
+
+	\see SetAlignment()
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\fn BHandler* BStringView::ResolveSpecifier(BMessage* message, int32 index,
+		BMessage* specifier, int32 what, const char* property)
+	\copydoc BView::ResolveSpecifier()
+*/
+
+
+/*!
+	\fn status_t BStringView::GetSupportedSuites(BMessage* message)
+	\copydoc BView::GetSupportedSuites()
+*/
+
+
+/*!
+	\fn void BStringView::SetFont(const BFont* font, uint32 mask)
+	\brief Sets the font of the string view to \a font with the font
+	       parameters set by \a mask.
+
+	\param font The \a font to set the string view to.
+	\param mask A \a mask indicating which properties of \a font to set.
+
+	\see BView::SetFont()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BStringView::LayoutInvalidated(bool descendants)
+	\brief Hook method called when the layout is invalidated.
+
+	The default implementation invalidates the cached preferred size.
+
+	\copydetails BView::LayoutInvalidated(bool descendants)
+*/
+
+
+/*!
+	\fn status_t BStringView::Perform(perform_code code, void* _data)
+	\brief Perform some action. (Internal Method)
+
+	\since Haiku R1
+*/
