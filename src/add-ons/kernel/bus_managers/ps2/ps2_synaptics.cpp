@@ -283,16 +283,16 @@ probe_synaptics(ps2_dev *dev)
 
 	// We reset the device here because it may have been left in a confused
 	// state by a previous probing attempt. Some synaptics touchpads are known
-	// to lockup when we attempt to detect them as IBM trackoints.
+	// to lockup when we attempt to detect them as IBM trackpoints.
 	ps2_reset_mouse(dev);
 
-	// And after resetting we must wait a little for the device to become ready
-	// again...
-	snooze(400000);
-
+	// Request "Identify touchpad"
+	// The touchpad will delay this, until it's ready and calibrated.
 	status = send_touchpad_arg(dev, 0x00);
 	if (status != B_OK)
 		return status;
+
+	// "Status request" (executes "Identify touchpad")
 	status = ps2_dev_command(dev, 0xE9, NULL, 0, val, 3);
 	if (status != B_OK)
 		return status;
