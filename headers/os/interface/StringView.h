@@ -11,8 +11,8 @@
 
 class BStringView : public BView {
 public:
-								BStringView(BRect bounds, const char* name,
-									const char* text, uint32 resizeFlags
+								BStringView(BRect frame, const char* name,
+									const char* text, uint32 resizingMode
 										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
 									uint32 flags = B_WILL_DRAW);
 								BStringView(const char* name, const char* text,
@@ -34,7 +34,7 @@ public:
 	virtual	void				AllAttached();
 	virtual	void				AllDetached();
 
-	virtual	void				MakeFocus(bool state = true);
+	virtual	void				MakeFocus(bool focus = true);
 
 	virtual void				GetPreferredSize(float* _width,
 									float* _height);

@@ -46,40 +46,43 @@ static property_info sPropertyList[] = {
 
 
 BStringView::BStringView(BRect frame, const char* name, const char* text,
-			uint32 resizeMask, uint32 flags)
-	:	BView(frame, name, resizeMask, flags | B_FULL_UPDATE_ON_RESIZE),
-		fText(text ? strdup(text) : NULL),
-		fStringWidth(text ? StringWidth(text) : 0.0),
-		fAlign(B_ALIGN_LEFT),
-		fPreferredSize(-1, -1)
+	uint32 resizingMode, uint32 flags)
+	:
+	BView(frame, name, resizingMode, flags | B_FULL_UPDATE_ON_RESIZE),
+	fText(text ? strdup(text) : NULL),
+	fStringWidth(text ? StringWidth(text) : 0.0),
+	fAlign(B_ALIGN_LEFT),
+	fPreferredSize(-1, -1)
 {
 }
 
 
 BStringView::BStringView(const char* name, const char* text, uint32 flags)
-	:	BView(name, flags | B_FULL_UPDATE_ON_RESIZE),
-		fText(text ? strdup(text) : NULL),
-		fStringWidth(text ? StringWidth(text) : 0.0),
-		fAlign(B_ALIGN_LEFT),
-		fPreferredSize(-1, -1)
+	:
+	BView(name, flags | B_FULL_UPDATE_ON_RESIZE),
+	fText(text ? strdup(text) : NULL),
+	fStringWidth(text ? StringWidth(text) : 0.0),
+	fAlign(B_ALIGN_LEFT),
+	fPreferredSize(-1, -1)
 {
 }
 
 
-BStringView::BStringView(BMessage* data)
-	:	BView(data),
-		fText(NULL),
-		fStringWidth(0.0),
-		fPreferredSize(-1, -1)
+BStringView::BStringView(BMessage* archive)
+	:
+	BView(archive),
+	fText(NULL),
+	fStringWidth(0.0),
+	fPreferredSize(-1, -1)
 {
 	int32 align;
-	if (data->FindInt32("_align", &align) == B_OK)
+	if (archive->FindInt32("_align", &align) == B_OK)
 		fAlign = (alignment)align;
 	else
 		fAlign = B_ALIGN_LEFT;
 
 	const char* text;
-	if (data->FindString("_text", &text) != B_OK)
+	if (archive->FindString("_text", &text) != B_OK)
 		text = NULL;
 
 	SetText(text);
@@ -91,6 +94,9 @@ BStringView::~BStringView()
 {
 	free(fText);
 }
+
+
+// #pragma mark - Archiving methods
 
 
 BArchivable*
@@ -118,7 +124,7 @@ BStringView::Archive(BMessage* data, bool deep) const
 }
 
 
-// #pragma mark -
+// #pragma mark - Hook methods
 
 
 void
@@ -158,13 +164,13 @@ BStringView::AllDetached()
 }
 
 
-// #pragma mark -
+// #pragma mark - Layout methods
 
 
 void
-BStringView::MakeFocus(bool state)
+BStringView::MakeFocus(bool focus)
 {
-	BView::MakeFocus(state);
+	BView::MakeFocus(focus);
 }
 
 
@@ -227,6 +233,9 @@ BStringView::LayoutAlignment()
 }
 
 
+// #pragma mark - More hook methods
+
+
 void
 BStringView::FrameMoved(BPoint newPosition)
 {
@@ -239,9 +248,6 @@ BStringView::FrameResized(float newWidth, float newHeight)
 {
 	BView::FrameResized(newWidth, newHeight);
 }
-
-
-// #pragma mark -
 
 
 void
@@ -446,7 +452,7 @@ BStringView::LayoutInvalidated(bool descendants)
 }
 
 
-// #pragma mark -
+// #pragma mark - Perform
 
 
 status_t
@@ -457,22 +463,27 @@ BStringView::Perform(perform_code code, void* _data)
 			((perform_data_min_size*)_data)->return_value
 				= BStringView::MinSize();
 			return B_OK;
+
 		case PERFORM_CODE_MAX_SIZE:
 			((perform_data_max_size*)_data)->return_value
 				= BStringView::MaxSize();
 			return B_OK;
+
 		case PERFORM_CODE_PREFERRED_SIZE:
 			((perform_data_preferred_size*)_data)->return_value
 				= BStringView::PreferredSize();
 			return B_OK;
+
 		case PERFORM_CODE_LAYOUT_ALIGNMENT:
 			((perform_data_layout_alignment*)_data)->return_value
 				= BStringView::LayoutAlignment();
 			return B_OK;
+
 		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
 			((perform_data_has_height_for_width*)_data)->return_value
 				= BStringView::HasHeightForWidth();
 			return B_OK;
+
 		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
 		{
 			perform_data_get_height_for_width* data
@@ -481,12 +492,14 @@ BStringView::Perform(perform_code code, void* _data)
 				&data->preferred);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
 			BStringView::SetLayout(data->layout);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
 			perform_data_layout_invalidated* data
@@ -494,6 +507,7 @@ BStringView::Perform(perform_code code, void* _data)
 			BStringView::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_DO_LAYOUT:
 		{
 			BStringView::DoLayout();
@@ -505,10 +519,15 @@ BStringView::Perform(perform_code code, void* _data)
 }
 
 
+// #pragma mark - FBC padding methods
+
 
 void BStringView::_ReservedStringView1() {}
 void BStringView::_ReservedStringView2() {}
 void BStringView::_ReservedStringView3() {}
+
+
+// #pragma mark - Private methods
 
 
 BStringView&
@@ -517,9 +536,6 @@ BStringView::operator=(const BStringView&)
 	// Assignment not allowed (private)
 	return *this;
 }
-
-
-// #pragma mark -
 
 
 BSize
@@ -552,4 +568,3 @@ B_IF_GCC_2(InvalidateLayout__11BStringViewb,
 
 	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
-
