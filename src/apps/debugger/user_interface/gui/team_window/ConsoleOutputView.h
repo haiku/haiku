@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CONSOLE_OUTPUT_VIEW_H_
@@ -7,6 +7,7 @@
 
 
 #include <GroupView.h>
+#include <ObjectList.h>
 
 
 class BButton;
@@ -32,13 +33,22 @@ public:
 			status_t			SaveSettings(BMessage& settings);
 
 private:
+			struct OutputInfo;
+			typedef BObjectList<OutputInfo> OutputInfoList;
+
+private:
 			void				_Init();
+	static	int32				_OutputWorker(void* arg);
+			void				_HandleConsoleOutput(OutputInfo* info);
 
 private:
 			BCheckBox*			fStdoutEnabled;
 			BCheckBox*			fStderrEnabled;
 			BTextView*			fConsoleOutput;
 			BButton*			fClearButton;
+			OutputInfoList*		fPendingOutput;
+			sem_id				fWorkToDoSem;
+			thread_id			fOutputWorker;
 };
 
 
