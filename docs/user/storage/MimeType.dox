@@ -982,7 +982,7 @@
 	\fn status_t BMimeType::SetIconForType(const char* type,
 		const BBitmap* icon, icon_size which)
 	\brief Sets the large or mini icon used by an application of this type
-	       for files of the given type.
+	       for files of the given \a type.
 
 	This can be confusing, so here's how this function is intended to be used:
 	- The actual \c BMimeType object should be set to the MIME signature of an
@@ -1016,11 +1016,10 @@
 
 
 /*!
-	\fn status_t
-	BMimeType::SetIconForType(const char* type, const uint8* data,
+	\fn status_t BMimeType::SetIconForType(const char* type, const uint8* data,
 		size_t dataSize)
-	\brief Sets the large or mini icon used by an application of this type for
-	files of the given type.
+	\brief Sets the icon used by an application of this type for files of the
+	       given \a type.
 
 	This can be confusing, so here's how this function is intended to be used:
 	- The actual \c BMimeType object should be set to the MIME signature of an
@@ -1041,11 +1040,9 @@
 
 	\param type Pointer to a pre-allocated string containing the MIME type whose
 	       custom icon you wish to set.
-	\param icon Pointer to a pre-allocated \c BBitmap of proper size and
-	       colorspace containing the new icon, or \c NULL to clear the
-	       current icon.
-	\param icon_size Value that specifies which icon to update. Currently
-	       \c B_LARGE_ICON and \c B_MINI_ICON are supported.
+	\param data Pointer to a pre-allocated uint8 array of the proper size to
+	       contain the new icon, or \c NULL to clear the current icon.
+	\param dataSize The size of \a data in bytes.
 
 	\returns \c B_OK on success or another error code on failure.
 
