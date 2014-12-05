@@ -245,6 +245,9 @@ static const Translation kTranslations[] = {
 		"Bachoru\n"
 		"Ivan Masár\n"
 	},
+	{ "sl",
+		"Matej Horvat\n"
+	},
 #if 0
 	{ "sr",
 		"Nikola Miljković\n"
