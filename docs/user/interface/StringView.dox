@@ -345,7 +345,7 @@
 	\fn const char* BStringView::Text() const
 	\brief Returns the text currently set to the string view.
 
-	\returns the text set to the string view.
+	\returns The text set to the string view.
 
 	\since BeOS R3
 */
