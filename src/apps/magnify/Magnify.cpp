@@ -132,31 +132,32 @@ BuildInfoMenu(BMenu *menu)
 {
 	BMenuItem* menuItem;
 	menuItem = new BMenuItem(B_TRANSLATE("Save image"),
-		new BMessage(msg_save),'S');
+		new BMessage(msg_save), 'S');
 	menu->AddItem(menuItem);
-//	menuItem = new BMenuItem(B_TRANSLATE("Save selection"), new BMessage(msg_save),'S');
+//	menuItem = new BMenuItem(B_TRANSLATE("Save selection"),
+//		new BMessage(msg_save), 'S');
 //	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Copy image"),
-		new BMessage(msg_copy_image),'C');
+		new BMessage(msg_copy_image), 'C');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
 	menuItem = new BMenuItem(B_TRANSLATE("Hide/Show info"),
-		new BMessage(msg_show_info),'T');
+		new BMessage(msg_show_info), 'T');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Add a crosshair"),
-		new BMessage(msg_add_cross_hair),'H');
+		new BMessage(msg_add_cross_hair), 'H');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Remove a crosshair"),
 		new BMessage(msg_remove_cross_hair), 'H', B_SHIFT_KEY);
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Hide/Show grid"),
-		new BMessage(msg_toggle_grid),'G');
+		new BMessage(msg_toggle_grid), 'G');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
 	menuItem = new BMenuItem(B_TRANSLATE("Freeze/Unfreeze image"),
-		new BMessage(msg_freeze),'F');
+		new BMessage(msg_freeze), 'F');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Stick coordinates"),
 		new BMessage(msg_stick), 'I');
@@ -164,19 +165,19 @@ BuildInfoMenu(BMenu *menu)
 	menu->AddSeparatorItem();
 
 	menuItem = new BMenuItem(B_TRANSLATE("Make square"),
-		new BMessage(msg_make_square),'/');
+		new BMessage(msg_make_square), '/');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Decrease window size"),
-		new BMessage(msg_shrink),'-');
+		new BMessage(msg_shrink), '-');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Increase window size"),
-		new BMessage(msg_grow),'+');
+		new BMessage(msg_grow), '+');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Decrease pixel size"),
-		new BMessage(msg_shrink_pixel),',');
+		new BMessage(msg_shrink_pixel), ',');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Increase pixel size"),
-		new BMessage(msg_grow_pixel),'.');
+		new BMessage(msg_grow_pixel), '.');
 	menu->AddItem(menuItem);
 }
 
@@ -827,7 +828,7 @@ TInfoView::Draw(BRect updateRect)
 	dynamic_cast<TWindow*>(Window())->PixelCount(&hPixelCount, &vPixelCount);
 	int32 pixelSize = dynamic_cast<TWindow*>(Window())->PixelSize();
 
-	MovePenTo(10, fFontHeight + 5);
+	MovePenTo(15 + fPopUp->Bounds().Width(), fFontHeight + 5);
 
 	static BMessageFormat format(B_TRANSLATE("%width x %height  @ {0, plural, "
 		"one{# pixel/pixel} other{# pixels/pixel}}"));
@@ -857,7 +858,7 @@ TInfoView::Draw(BRect updateRect)
 	snprintf(str, sizeof(str), "R: %i G: %i B: %i (#%02x%02x%02x)",
 		color.red, color.green, color.blue, color.red, color.green, color.blue);
 
-	MovePenTo(10, fFontHeight*2+5);
+	MovePenTo(15 + fPopUp->Bounds().Width(), fFontHeight*2+5);
 	invalRect.Set(10, fFontHeight+7, 10 + StringWidth(fRGBStr), fFontHeight*2+7);
 	SetHighColor(ViewColor());
 	FillRect(invalRect);
@@ -928,9 +929,9 @@ TInfoView::AddMenu()
 	fMenu = new TMenu(dynamic_cast<TWindow*>(Window()), "");
 	BuildInfoMenu(fMenu);
 
-	BRect r(Bounds().Width()-27, 11, Bounds().Width()-11, 27);
+	BRect r(9, 11, 22, 27);
 	fPopUp = new BMenuField( r, "region menu", NULL, fMenu, true,
-		B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+		B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	AddChild(fPopUp);
 }
 
