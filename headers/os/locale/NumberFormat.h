@@ -19,9 +19,9 @@ enum BNumberElement {
 
 class BNumberFormat : public BFormat {
 public:
-		BNumberFormat();
-		BNumberFormat(const BNumberFormat &other);
-		~BNumberFormat();
+								BNumberFormat();
+								BNumberFormat(const BNumberFormat &other);
+								~BNumberFormat();
 
 								// formatting
 

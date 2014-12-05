@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/locale/DurationFormat.h	 hrev45084
- *		src/kits/locale/DurationFormat.cpp	 hrev45084
+ *		headers/os/locale/DurationFormat.h	hrev48439
+ *		src/kits/locale/DurationFormat.cpp	hrev48439
  */
 
 
@@ -66,34 +66,10 @@
 
 
 /*!
-	\fn BDurationFormat& BDurationFormat::operator=(const BDurationFormat& other)
-	\brief Assignment overload.
-
-	\param other The BDurationFormat object to copy from.
-
-	\returns The resulting BDurationFormat object.
-
-	\since Haiku R1
-*/
-
-
-/*!
 	\fn void BDurationFormat::SetSeparator(const BString& separator)
 	\brief Replace the separator for this formatter.
 
 	\param separator The separator string to set.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn status_t BDurationFormat::SetLocale(const BLocale* locale)
-	\brief Sets the locale for this formatter.
-
-	\param locale The BLocale object to set.
-
-	\returns A status code, \c B_OK on success or an error code on error.
 
 	\since Haiku R1
 */

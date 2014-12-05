@@ -1,0 +1,110 @@
+/*
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/locale/DateFormat.h	hrev48439
+ *		src/kits/locale/DateFormat.cpp	hrev48439
+ */
+
+
+/*!
+	\file DateFormat.h
+	\ingroup locale
+	\ingroup libbe
+	\brief Contains BDateTimeFormat class, a date formatter.
+*/
+
+
+/*!
+	\class BDateTimeFormat
+	\ingroup locale
+	\ingroup libbe
+	\brief Formatter for dates.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BDateTimeFormat::BDateTimeFormat(const BLocale* locale)
+	\brief Locale constructor.
+
+	\param locale The locale to use, can be \c NULL for the default locale.
+*/
+
+
+/*!
+	\fn BDateTimeFormat::BDateTimeFormat(const BLanguage& language,
+		const BFormattingConventions& format);
+	\brief Language and formatting convention constructor.
+
+	\param language The \a language to use.
+	\param format The formatting convention to use.
+*/
+
+
+/*!
+	\fn BDateTimeFormat::BDateTimeFormat(const BDateTimeFormat& other)
+	\brief Copy Constructor.
+
+	\param other The BDateTimeFormat object to copy from.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BDateTimeFormat::~BDateTimeFormat()
+	\brief Destructor.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t BDateTimeFormat::Format(char* target, const size_t maxSize,
+		const time_t time, BDateFormatStyle dateStyle,
+		BTimeFormatStyle timeStyle) const;
+	\brief Fills in \a string with a formatted datetime up to \a maxSize bytes
+	       for the given \a time and \a style for the locale.
+
+	\param target The string buffer to fill with the formatted datetime.
+	\param maxSize The size of the buffer.
+	\param time The time (in seconds since epoch) to format
+	\param dateStyle Specify the long format or the short format of the date.
+	\param timeStyle Specify the long format or the short format of the time.
+
+	\returns The number of bytes written during the datetime formatting.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_BAD_VALUE CheckedArrayByteSink overflowed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BDateTimeFormat::Format(BString& buffer, const time_t time,
+		BDateFormatStyle dateStyle, BTimeFormatStyle timeStyle,
+		const BTimeZone* timeZone) const
+	\brief Fills in \a string with a formatted datetime for the given
+	       \a time, \a timeStyle, and \a timeZone for the locale.
+
+	\param buffer The string buffer to fill with the formatted date.
+	\param time The time (in seconds since epoch) to format
+	\param dateStyle Specify the long format or the short format of the date.
+	\param timeStyle Specify the long format or the short format of the time.
+	\param timeZone The time zone.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BLocale.
+	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+
+	\since Haiku R1
+*/

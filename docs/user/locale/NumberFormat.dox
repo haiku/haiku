@@ -1,0 +1,190 @@
+/*
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/locale/NumberFormat.h	hrev48439
+ *		src/kits/locale/NumberFormat.cpp	hrev48439
+ */
+
+
+/*!
+	\file NumberFormat.h
+	\ingroup locale
+	\ingroup libbe
+	\brief Contains BNumberFormat class, a number formatter.
+*/
+
+
+/*!
+	\class BNumberFormat
+	\ingroup locale
+	\ingroup libbe
+	\brief Formatter for numbers and monetary values.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNumberFormat::BNumberFormat(const BNumberFormat& other)
+	\brief Copy Constructor.
+
+	\param other The BNumberFormat object to copy from.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNumberFormat::~BNumberFormat()
+	\brief Destructor.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t BNumberFormat::Format(char* string, size_t maxSize,
+		const double value) const
+	\brief Format the \c double \a value as a string and put the result
+	       into \a string up to \a maxSize bytes in the current locale.
+
+	\param string The string to put the formatted number into.
+	\param maxSize The maximum of bytes to copy into \a string.
+	\param value The number that you want to get a formatted version of.
+
+	\returns The length of the string created or an error status code.
+	\retval B_ERROR Unable to lock the BNumberFormat.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+	        object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BNumberFormat::Format(char* string, size_t maxSize,
+		int32 value) const
+	\sa ssize_t BNumberFormat::FormatMonetary(char* string, size_t maxSize,
+		double value) const
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNumberFormat::Format(BString& string,
+		const double value) const
+	\brief \brief Format the \c double \a value as a string and put the
+	       result into \a string in the current locale.
+
+	\param string The string to put the formatted number into.
+	\param value The number that you want to get a formatted version of.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BNumberFormat.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+	        object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BNumberFormat::Format(BString* string, int32 value) const
+	\sa BNumberFormat::FormatMonetary(BString* string, double value) const
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t BNumberFormat::Format(char* string, size_t maxSize,
+		const int32 value) const
+	\brief Format the \c int32 \a value as a string and put the result
+	       into \a string up to \a maxSize bytes in the current locale.
+
+	\param string The string to put the formatted number into.
+	\param maxSize The maximum of bytes to copy into \a string.
+	\param value The number that you want to get a formatted version of.
+
+	\returns The length of the string created or an error status code.
+	\retval B_ERROR Unable to lock the BNumberFormat.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat 
+	        object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BNumberFormat::Format(char* string, size_t maxSize,
+		double value) const
+	\sa BNumberFormat::FormatMonetary(char* string, size_t maxSize,
+		double value) const
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNumberFormat::Format(BString& string,
+		const int32 value) const
+	\brief Format the \c int32 \a value as a string and put the result
+	       into \a string in the current locale.
+
+	\param string The string to put the formatted number into.
+	\param value The number that you want to get a formatted version of.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BNumberFormat.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+	        object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BNumberFormat::Format(BString* string, double value) const
+	\sa BNumberFormat::FormatMonetary(BString* string, double value) const
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t BNumberFormat::FormatMonetary(char* string, size_t maxSize,
+		const double value) const
+	\brief Format the \c double \a value as a monetary string and put the
+	       result into \a string up to \a maxSize bytes in the current locale.
+
+	\param string The \a string to put the monetary formatted number into.
+	\param maxSize The maximum of bytes to copy into \a string.
+	\param value The number to format as a monetary \a value.
+
+	\returns The length of the string created or an error status code.
+	\retval B_ERROR Unable to lock the BNumberFormat.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+	        object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BNumberFormat::Format(char* string, size_t maxSize, double value) const
+	\sa BNumberFormat::Format(char* string, size_t maxSize, int32 value) const
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNumberFormat::FormatMonetary(BString& string,
+		const double value) const
+	\brief Format the \c double \a value as a monetary string and put
+	       the result into \a string in the current locale.
+
+	\param string The \a string to put the monetary formatted number into.
+	\param value The number to format as a monetary \a value.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ERROR Unable to lock the BNumberFormat.
+	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
+	        object.
+	\retval B_BAD_VALUE An error occurred while formatting the number.
+
+	\sa BNumberFormat::Format(BString* string, double value) const
+	\sa BNumberFormat::Format(BString* string, int32 value) const
+
+	\since Haiku R1
+*/
