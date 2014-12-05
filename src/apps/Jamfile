@@ -49,7 +49,6 @@ HaikuSubInclude processcontroller ;
 HaikuSubInclude pulse ;
 HaikuSubInclude remotedesktop ;
 HaikuSubInclude resedit ;
-HaikuSubInclude resourceedit ;
 HaikuSubInclude screenshot ;
 HaikuSubInclude serialconnect ;
 HaikuSubInclude showimage ;
