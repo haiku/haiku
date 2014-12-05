@@ -42,7 +42,7 @@ public:
 		Test("Radial Gradient")
 	{
 	}
-	
+
 	virtual void Draw(BView* view, BRect updateRect)
 	{
 		// Draws two radial gradients with the same stops and different radiis,
@@ -157,6 +157,41 @@ public:
 };
 
 
+// Test for https://dev.haiku-os.org/ticket/2945
+// Gradients with no stop at offset 0 or 255 draw random colors
+class OutOfBoundsGradientTest : public Test {
+public:
+	OutOfBoundsGradientTest()
+		:
+		Test("Out of bounds gradients")
+	{
+	}
+
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		{
+			// Linear gradient - Vertical
+			BPoint from(275, 10);
+			BPoint to(275, 138);
+			BGradientLinear l(from, to);
+			l.AddColor((rgb_color){ 255, 0, 0, 255 }, 100.0);
+			l.AddColor((rgb_color){ 255, 255, 0, 255 }, 156.0);
+			view->FillRect(BRect(275, 10, 2*265, 265), l);
+		}
+
+		{
+			// Linear gradient - Horizontal
+			BPoint from(10, 10);
+			BPoint to(138, 10);
+			BGradientLinear l(from, to);
+			l.AddColor((rgb_color){ 255, 0, 0, 255 }, 100.0);
+			l.AddColor((rgb_color){ 255, 255, 0, 255 }, 156.0);
+			view->FillRect(BRect(10, 10, 265, 265), l);
+		}
+	}
+};
+
+
 // #pragma mark -
 
 
@@ -169,6 +204,7 @@ main(int argc, char** argv)
 
 	window->AddTest(new RadialGradientTest());
 	window->AddTest(new AlphaGradientTest());
+	window->AddTest(new OutOfBoundsGradientTest());
 
 	window->SetToTest(0);
 	window->Show();
