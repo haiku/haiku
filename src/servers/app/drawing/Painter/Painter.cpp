@@ -2881,7 +2881,7 @@ Painter::_RasterizePath(VertexSource& path, const BGradient& gradient) const
 
 	agg::trans_affine gradientTransform;
 
-	switch(gradient.GetType()) {
+	switch (gradient.GetType()) {
 		case BGradient::TYPE_LINEAR:
 		{
 			GTRACE(("Painter::_FillPath> type == TYPE_LINEAR\n"));

@@ -185,7 +185,7 @@ DrawingContext::ConvertToScreenForDrawing(BRegion* region) const
 void
 DrawingContext::ConvertToScreenForDrawing(BGradient* gradient) const
 {
-	switch(gradient->GetType()) {
+	switch (gradient->GetType()) {
 		case BGradient::TYPE_LINEAR:
 		{
 			BGradientLinear* linear = (BGradientLinear*) gradient;
@@ -197,7 +197,6 @@ DrawingContext::ConvertToScreenForDrawing(BGradient* gradient) const
 			ConvertToScreen(&end);
 			linear->SetStart(start);
 			linear->SetEnd(end);
-			linear->SortColorStopsByOffset();
 			break;
 		}
 		case BGradient::TYPE_RADIAL:
@@ -207,7 +206,6 @@ DrawingContext::ConvertToScreenForDrawing(BGradient* gradient) const
 			fDrawState->Transform(&center);
 			ConvertToScreen(&center);
 			radial->SetCenter(center);
-			radial->SortColorStopsByOffset();
 			break;
 		}
 		case BGradient::TYPE_RADIAL_FOCUS:
@@ -221,7 +219,6 @@ DrawingContext::ConvertToScreenForDrawing(BGradient* gradient) const
 			ConvertToScreen(&focal);
 			radialFocus->SetCenter(center);
 			radialFocus->SetFocal(focal);
-			radialFocus->SortColorStopsByOffset();
 			break;
 		}
 		case BGradient::TYPE_DIAMOND:
@@ -231,7 +228,6 @@ DrawingContext::ConvertToScreenForDrawing(BGradient* gradient) const
 			fDrawState->Transform(&center);
 			ConvertToScreen(&center);
 			diamond->SetCenter(center);
-			diamond->SortColorStopsByOffset();
 			break;
 		}
 		case BGradient::TYPE_CONIC:
@@ -241,7 +237,6 @@ DrawingContext::ConvertToScreenForDrawing(BGradient* gradient) const
 			fDrawState->Transform(&center);
 			ConvertToScreen(&center);
 			conic->SetCenter(center);
-			conic->SortColorStopsByOffset();
 			break;
 		}
 		case BGradient::TYPE_NONE:
@@ -249,6 +244,23 @@ DrawingContext::ConvertToScreenForDrawing(BGradient* gradient) const
 			break;
 		}
 	}
+
+	// Make sure the gradient is fully padded so that out of bounds access
+	// get the correct colors
+	gradient->SortColorStopsByOffset();
+
+	BGradient::ColorStop* end = gradient->ColorStopAtFast(
+		gradient->CountColorStops() - 1);
+
+	if (end->offset != 255)
+		gradient->AddColor(end->color, 255);
+
+	BGradient::ColorStop* start = gradient->ColorStopAtFast(0);
+
+	if (start->offset != 0)
+		gradient->AddColor(start->color, 0);
+
+	gradient->SortColorStopsByOffset();
 }
 
 
