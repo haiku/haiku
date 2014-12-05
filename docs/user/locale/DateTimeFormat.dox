@@ -7,16 +7,16 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/locale/DateFormat.h	hrev48439
- *		src/kits/locale/DateFormat.cpp	hrev48439
+ *		headers/os/locale/DateTimeFormat.h	hrev48439
+ *		src/kits/locale/DateTimeFormat.cpp	hrev48439
  */
 
 
 /*!
-	\file DateFormat.h
+	\file DateTimeFormat.h
 	\ingroup locale
 	\ingroup libbe
-	\brief Contains BDateTimeFormat class, a date formatter.
+	\brief Contains BDateTimeFormat class, a datetime formatter.
 */
 
 
@@ -24,7 +24,7 @@
 	\class BDateTimeFormat
 	\ingroup locale
 	\ingroup libbe
-	\brief Formatter for dates.
+	\brief Formatter for datetimes.
 
 	\since Haiku R1
 */

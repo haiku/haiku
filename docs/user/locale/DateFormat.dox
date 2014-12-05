@@ -112,8 +112,8 @@
 	\fn status_t BDateFormat::Format(BString& string,
 		int*& fieldPositions, int& fieldCount, const time_t time,
 		const BDateFormatStyle style) const
-	\brief Fills in \a string with a formatted date for the given
-	       \a time and \a style for the locale.
+	\brief Fills in \a string with a custom formatted date according to the
+	       given parameters for the locale.
 
 	\param string The string buffer to fill with the formatted date.
 	\param fieldPositions An array of date field positions to use.

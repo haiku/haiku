@@ -13,10 +13,10 @@
 
 
 /*!
-	\file DateFormat.h
+	\file TimeFormat.h
 	\ingroup locale
 	\ingroup libbe
-	\brief Contains BTimeFormat class, a date formatter.
+	\brief Contains BTimeFormat class, a time formatter.
 */
 
 
@@ -24,7 +24,7 @@
 	\class BTimeFormat
 	\ingroup locale
 	\ingroup libbe
-	\brief Formatter for dates.
+	\brief Formatter for times.
 
 	\since Haiku R1
 */
@@ -67,7 +67,7 @@
 /*!
 	\fn ssize_t BTimeFormat::Format(char* string, size_t maxSize, time_t time,
 		BTimeFormatStyle style) const
-	\brief Fills in \a string with a formatted date up to \a maxSize bytes for
+	\brief Fills in \a string with a formatted time up to \a maxSize bytes for
 	       the given \a time and \a style for the locale.
 
 	\param string The string buffer to fill with the formatted time.
@@ -135,7 +135,8 @@
 	\fn status_t BTimeFormat::Format(BString& string,
 		int*& fieldPositions, int& fieldCount,
 		time_t time, BTimeFormatStyle style) const
-	\brief Fills in \a string with a formatted time for the given parameters.
+	\brief Fills in \a string with a custom formatted time according to the
+	       given parameters for the locale.
 
 	\param string The string buffer to fill with the formatted date.
 	\param fieldPositions An array of date field positions to use.
