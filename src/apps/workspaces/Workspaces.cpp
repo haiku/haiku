@@ -731,7 +731,7 @@ WorkspacesWindow::Zoom(BPoint origin, float width, float height)
 	uint32 columns, rows;
 	BPrivate::get_workspaces_layout(&columns, &rows);
 
-	float workspaceWidth = screenWidth / 10;
+	float workspaceWidth = Frame().Width() / columns;
 	float workspaceHeight = workspaceWidth / aspectRatio;
 
 	width = floor(workspaceWidth * columns);
@@ -746,12 +746,6 @@ WorkspacesWindow::Zoom(BPoint origin, float width, float height)
 	}
 
 	ResizeTo(width, height);
-
-	origin = screen.Frame().RightBottom();
-	origin.x -= kScreenBorderOffset + width;
-	origin.y -= kScreenBorderOffset + height;
-
-	MoveTo(origin);
 }
 
 
