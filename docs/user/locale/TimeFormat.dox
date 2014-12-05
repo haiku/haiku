@@ -7,8 +7,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/locale/DateFormat.h	hrev48439
- *		src/kits/locale/DateFormat.cpp	hrev48439
+ *		headers/os/locale/TimeFormat.h	hrev48439
+ *		src/kits/locale/TimeFormat.cpp	hrev48439
  */
 
 
@@ -77,7 +77,7 @@
 
 	\returns The number of bytes written during the time formatting.
 	\retval B_ERROR Unable to lock the BLocale.
-	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_NO_MEMORY Ran out of memory while creating the object.
 	\retval B_BAD_VALUE CheckedArrayByteSink overflowed.
 
 	\since Haiku R1
@@ -90,14 +90,14 @@
 	\brief Fills in \a string with a formatted time for the given
 	       \a time, \a style, and \a timeZone for the locale.
 
-	\param string The string buffer to fill with the formatted date.
+	\param string The string buffer to fill with the formatted time.
 	\param time The time (in seconds since epoch) to format
 	\param style Specify the long format or the short format.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
-	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_NO_MEMORY Ran out of memory while creating the object.
 
 	\sa BLocale::FormatDate(BString *string, time_t time,
 		BTimeFormatStyle style, const BTimeZone* timeZone) const
@@ -124,7 +124,7 @@
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
-	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_NO_MEMORY Ran out of memory while creating the object.
 	\retval B_BAD_VALUE An error occurred during time formatting.
 
 	\since Haiku R1
@@ -138,8 +138,8 @@
 	\brief Fills in \a string with a custom formatted time according to the
 	       given parameters for the locale.
 
-	\param string The string buffer to fill with the formatted date.
-	\param fieldPositions An array of date field positions to use.
+	\param string The string buffer to fill with the formatted time.
+	\param fieldPositions An array of time field positions to use.
 	\param fieldCount The number of \a fields in \a fieldPositions.
 	\param time The time (in seconds since epoch) to format
 	\param style Specify the long format (with day name, full
@@ -148,8 +148,8 @@
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
-	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
-	\retval B_BAD_VALUE An error occurred while performing the date formatting.
+	\retval B_NO_MEMORY Ran out of memory while creating the object.
+	\retval B_BAD_VALUE An error occurred while performing the time formatting.
 
 	\since Haiku R1
 */
@@ -163,7 +163,7 @@
 	This method is used most often in combination with FormatTime().
 	FormatTime() gives you the offset of each field in a formatted string,
 	and GetTimeFields() gives you the type of the field at a given offset.
-	With this information you can handle the formatted date string as
+	With this information you can handle the formatted time string as
 	a list of fields that you can split and alter at will.
 
 	\param fields Pointer to the fields object.
@@ -173,7 +173,7 @@
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
-	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_NO_MEMORY Ran out of memory while creating the object.
 	\retval B_BAD_VALUE An error occurred while getting the time fields.
 
 	\since Haiku R1

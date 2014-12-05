@@ -81,7 +81,7 @@
 
 	\returns The number of bytes written during the datetime formatting.
 	\retval B_ERROR Unable to lock the BLocale.
-	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_NO_MEMORY Ran out of memory while creating the object.
 	\retval B_BAD_VALUE CheckedArrayByteSink overflowed.
 
 	\since Haiku R1
@@ -104,7 +104,7 @@
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
-	\retval B_NO_MEMORY Ran out of memory while creating the DateFormat object.
+	\retval B_NO_MEMORY Ran out of memory while creating the object.
 
 	\since Haiku R1
 */
