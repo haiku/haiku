@@ -131,6 +131,8 @@ init_common(int device, bool isClone)
 		if (gConnector[id] == NULL)
 			return B_NO_MEMORY;
 		memset(gConnector[id], 0, sizeof(connector_info));
+
+		gConnector[id]->encoder.pll.id = ATOM_PPLL_INVALID;
 	}
 
 	// malloc for card gpio pin information
