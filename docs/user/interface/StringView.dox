@@ -88,9 +88,6 @@
 	\fn BStringView::BStringView(BMessage* archive)
 	\brief Archive constructor.
 
-	The string view's text, alignment, and view flags can be set using this
-	constructor.
-
 	\warning This method is usually not called directly. If you want to build
 	         a string view from an archive message you should call
 	         Instantiate() instead which can handle errors properly.
@@ -120,6 +117,16 @@
 /*!
 	\fn BArchivable* BStringView::Instantiate(BMessage* archive)
 	\brief Creates a new BStringView object from an \a archive message.
+
+	The string view's text, and alignment can be set using this method.
+	- The "_text" property is a \c B_STRING_TYPE containing the text of
+	  the string view.
+	- The "_align" property is a \c B_INT32_TYPE containing the string
+	  view's alignment flag. This should be casted to an alignment type.
+	  Choices are:
+      - \c B_ALIGN_LEFT
+      - \c B_ALIGN_RIGHT
+      - \c B_ALIGN_CENTER
 
 	\return A newly created BStringView object or \c NULL if the message
 	        doesn't contain an archived BStringView.
@@ -196,17 +203,17 @@
 
 /*!
 	\fn void BStringView::Draw(BRect updateRect)
-	\brief Draws the area of the string view that intersects \a updateRect.
+	\brief Draws the area of the view that intersects \a updateRect.
 
-	\note This is an hook method called by the Interface Kit, you don't
-	      have to call it yourself. If you need to forcefully redraw the
-	      string view consider calling Invalidate() instead.
+	\remark This is an hook method called by the Interface Kit, you don't have to
+	        call it yourself. If you need to forcefully redraw the view consider
+	        calling Invalidate() instead.
 
 	\param updateRect The rectangular area to be drawn.
 
-	\sa BView::Draw()
-
 	\since BeOS R3
+
+	\see BView::Draw()
 */
 
 
@@ -332,8 +339,12 @@
 
 /*!
 	\fn void BStringView::SetText(const char* text)
-	\brief Sets the \a text string displayed by the string view. The memory
-	       used by the old string is freed.
+	\brief Sets the \a text string displayed by the string view.
+
+	The \a text string is copied, BStringView does not take ownership
+	of the memory referenced by the pointer so you should free it yourself
+	afterwords. If a string has previously been set on the string view, the
+	memory used by the old string is freed before setting the new string.
 
 	\param text The \a text string to set.
 
@@ -343,9 +354,9 @@
 
 /*!
 	\fn const char* BStringView::Text() const
-	\brief Returns the text currently set to the string view.
+	\brief Returns the text currently set on the string view.
 
-	\returns The text set to the string view.
+	\returns The string view's text as a const char*.
 
 	\since BeOS R3
 */
