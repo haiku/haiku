@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-InterfacesAddOn	3793974760
+1	russian	x-vnd.Haiku-InterfacesAddOn	1264872285
 Interface	InterfaceWindow		Интерфейс
 Network:	IntefaceHardwareView		Сеть:
 Static	IntefaceAddressView		Статический
@@ -16,7 +16,6 @@ connected	IntefaceHardwareView		подключено
 Gateway:	IntefaceAddressView		Шлюз:
 Disable	InterfacesListView		Отключить
 Sent:	IntefaceHardwareView		Отправлено:
-Renegotiate Address	InterfacesListView		Переполучить адрес
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Режим:
 <no wireless networks found>	IntefaceHardwareView		<беспроводные сети не найдены>

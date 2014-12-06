@@ -1,4 +1,5 @@
-1	german	x-vnd.Haiku-Installer	2319349255
+1	german	x-vnd.Haiku-Installer	3421507633
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, die Anwendung zum Erstellen des Haiku Bootmenüs, konnte nicht gestartet werden.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Soll die Installation tatsächlich abgebrochen und der Rechner neu gestartet werden?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tvon Jérôme Duval und Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -20,6 +21,7 @@ If the os-prober approach doesn't work for you, GRUB 2 uses an extra configurati
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Bitte Quell- und Ziellaufwerk aus den Menüs wählen. Danach auf \"Start\" klicken.
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku auf /dev/sda7\n
+Failed to launch Boot Manager	InstallerWindow		Boot Manager konnte nicht gestartet werden
 Install from:	InstallerWindow		Installieren von:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld von %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		WICHTIGE INFORMATION VOR DER INSTALLATION VON HAIKU\n\n

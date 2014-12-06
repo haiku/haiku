@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	4273934970
+1	hungarian	x-vnd.Haiku-DriveSetup	2321187933
 DriveSetup	System name		Lemezkezelő
+Could not acquire partitioning information.	MainWindow		A partíciók állapotát nem lehetett lekérdezni.
 Cancel	AbstractParametersPanel		Mégse
 Delete	MainWindow		Törlés
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Biztosan jóváhagyja az adatok felírását a lemezre?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
@@ -43,6 +44,7 @@ Change	ChangeParametersPanel		Módosítás
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretné írni a kijelölt változtatásokat?\n\nEz esetben a „%s” lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Biztosan törölni szeretné a kiválasztott partíciót?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Create…	MainWindow		Létrehozás…
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Biztosan formázni szeretnéd a teljes lemezt? (Elsőként ajánlott beállítani a lemezt.) A változtatások előtt még egyszer meg kell erősíteni.
 The disk has been successfully initialized.\n	MainWindow		A partíció (%s) hiba nélkül elő lett készítve.\n
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Nem sikerült megváltoztatni a partíció paramétereit. A lemezen nem történt változás.
@@ -66,6 +68,7 @@ The panel could not return successfully.	MainWindow		A panel sikertelenül tért
 Cancel	MainWindow		Mégse
 Delete partition	MainWindow		Partíció törlése
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Biztosan módosítani szeretné a kijelölt partíció paramétereit?\n\nLehetséges, hogy a módosítás hatására a partíció nem lesz többé felismerhető a többi operációs rendszer számára!
+Disk system \"%s\" not found!	MainWindow		„%s” lemez típus nem található!
 Eject	MainWindow		Kiadás
 Partition	MainWindow		Partíció
 Validation of the given parameters failed.	MainWindow		A megadott paramétereket nem sikerült érvényesíteni.

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-BootManager	3264203763
+1	finnish	x-vnd.Haiku-BootManager	3886671855
 The boot manager has been successfully installed on your system.	BootManagerController		Käynnistyshallinta on asennettu onnistuneesti järjestelmääsi.
 After two seconds	DefaultPartitionPage		Kahden sekunnin jälkeen
 Uninstall Boot Manager	UninstallPage	Title	Poista Käynnistyshallinta
@@ -26,6 +26,7 @@ Please specify a default partition and a timeout.\nThe boot menu will load the d
 After one second	DefaultPartitionPage		Sekunnin jälkeen
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Havaittiin seuraavat osiot. Osio sisällytetään käynnistysvalikkoon valitsemalla osion viereinen valintaruutu. Voit myös asettaa osioiden nimet niin kuin haluat niiden näkyvän käynnistysvalikossa.
 After one minute	DefaultPartitionPage		Minuutin jälkeen
+The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Vanhan Master Boot Record-tietueen tallentaminen kohteeseen %s epäonnistui. Voit jatkaa asentamista, mutta tulevaisuudessa käynnistysvalikon palauttaminen ei onnistu.
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Käynnistyslaitteen (%DISK) Master Boot Record palautettiin onnistuneesti tiedostosta %FILE.
 Quit	WizardView	Button	Lopeta
 Write boot menu	BootManagerController	Button	Kirjoita käynnistysvalikko
@@ -49,6 +50,7 @@ No space available!	DrivesPage	Cannot install	Tilaa ei ole käytettävissä!
 Never	DefaultPartitionPage		Ei koskaan
 Partition table not compatible	BootManagerController	Title	Osiotaulu ei ole yhteensopiva
 Old Master Boot Record saved	BootManagerController	Title	Vanha Master Boot Record -tietue tallennettu
+Old Master Boot Record backup failure	BootManagerController	Title	Vanhan Master Boot Record-tietueen varmuuskopiohäiriö
 Boot Manager is unable to read the partition table!	BootManagerController		Käynnistyshallinta ei kykene lukemaan osiotaulua!
 Error reading partition table	BootManagerController	Title	Osiotaulun lukemisessa tapahtui virhe
 Installation of boot menu failed	BootManagerController	Title	Käynnistysvalikon asennus epäonnistui

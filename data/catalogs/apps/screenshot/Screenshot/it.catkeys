@@ -1,25 +1,24 @@
-1	italian	x-vnd.haiku-screenshot	731699482
-Artwork folder	ScreenshotWindow		Cartella Artwork
-Cancel	ScreenshotWindow		Cancella
-Capture active window	ScreenshotWindow		Cattura la finestra attiva
-Choose folder	ScreenshotWindow		Scegli cartella
-Choose folder...	ScreenshotWindow		Scegli cartella...
-Copy to clipboard	ScreenshotWindow		Copia nella clipboard
-Delay:	ScreenshotWindow		Ritardo:
-Desktop	ScreenshotWindow		Desktop
-Home folder	ScreenshotWindow		Cartella Home
-Include mouse pointer	ScreenshotWindow		Includi il puntatore del mouse
-Include window border	ScreenshotWindow		Includi bordi finestra
-Name:	ScreenshotWindow		Nome:
-New screenshot	ScreenshotWindow		Nuovo screenshot
-Please select	ScreenshotWindow		Per favore seleziona
-Save	ScreenshotWindow		Salva
-Save as:	ScreenshotWindow		Salva come:
-Save in:	ScreenshotWindow		Salva in:
-Select	ScreenshotWindow		Seleziona
-Settings…	ScreenshotWindow		Impostazioni
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Il file già esiste.\n Sei sicuro di volerlo sovrascrivere?
-Translator Settings	ScreenshotWindow		Impostazioni translator
-overwrite	ScreenshotWindow		Sovrascrivi
-screenshot	Screenshot	Base filename of screenshot files	screenshot
+1	italian	x-vnd.haiku-screenshot	4065094687
 seconds	ScreenshotWindow		Secondi
+Desktop	ScreenshotWindow		Desktop
+Include window border	ScreenshotWindow		Includi bordi finestra
+Screenshot	System name		Screenshot
+Select	ScreenshotWindow		Seleziona
+Capture active window	ScreenshotWindow		Cattura la finestra attiva
+Cancel	ScreenshotWindow		Cancella
+Name:	ScreenshotWindow		Nome:
+Choose folder	ScreenshotWindow		Scegli cartella
+Save	ScreenshotWindow		Salva
+Please select	ScreenshotWindow		Per favore seleziona
+Save as:	ScreenshotWindow		Salva come:
+Copy to clipboard	ScreenshotWindow		Copia nella clipboard
+Save in:	ScreenshotWindow		Salva in:
+screenshot	Screenshot	Base filename of screenshot files	screenshot
+New screenshot	ScreenshotWindow		Nuovo screenshot
+Artwork folder	ScreenshotWindow		Cartella Artwork
+Home folder	ScreenshotWindow		Cartella Home
+Settings…	ScreenshotWindow		Impostazioni
+overwrite	ScreenshotWindow		Sovrascrivi
+Delay:	ScreenshotWindow		Ritardo:
+Include mouse pointer	ScreenshotWindow		Includi il puntatore del mouse
+Translator Settings	ScreenshotWindow		Impostazioni translator

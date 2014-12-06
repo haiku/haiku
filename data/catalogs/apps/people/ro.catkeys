@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-PEPL	3273435274
+1	romanian	x-vnd.Be-PEPL	2332202134
 Edit	People		Editează
 Error	People		Eroare
 City	People		Oraș
@@ -6,7 +6,7 @@ The file '%name%' could not be written.	People		Nu a putut fi scris fișierul �
 none	Groups list		nimic
 Configure attributes	People		Configurează atribute
 Company	People		Companie
-%name% picture	People		Imagine %name%
+%name% picture	People		imagine %name%
 Work phone	People		Telefon de serviciu
 People	System name		Oameni
 New person	People		Persoană nouă
@@ -21,6 +21,7 @@ Nickname	People		Pseudonim
 Quit	People		Părăsește
 Name	People		Nume
 Revert	People		Revenire
+Don't save	People		Nu salva
 Undo	People		Refă
 E-mail	People		Email
 Load image…	People		Încarcă imagine...
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Telefon de acasă
 Save as…	People		Salvează ca...
 Redo	People		Repetă
+Save changes before closing?	People		Doriți să salvați modificările înainte de a închide?
 Paste	People		Lipește
 Drop an image here,\nor use the contextual menu.	People		Plasează o imagine aici,\nsau utilizează meniul contextual.
 Save	People		Salvează

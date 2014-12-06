@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-InterfacesAddOn	3793974760
+1	german	x-vnd.Haiku-InterfacesAddOn	1264872285
 Interface	InterfaceWindow		Adapter
 Network:	IntefaceHardwareView		Netzwerk:
 Static	IntefaceAddressView		Statisch
@@ -16,7 +16,6 @@ connected	IntefaceHardwareView		verbunden
 Gateway:	IntefaceAddressView		Gateway:
 Disable	InterfacesListView		Deaktivieren
 Sent:	IntefaceHardwareView		Gesendet:
-Renegotiate Address	InterfacesListView		Adresse neu anfordern
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Modus:
 <no wireless networks found>	IntefaceHardwareView		<keine Funknetzwerke gefunden>

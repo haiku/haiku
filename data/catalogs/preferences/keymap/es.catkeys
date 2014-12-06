@@ -1,21 +1,23 @@
-1	spanish	x-vnd.Haiku-Keymap	3858687220
-(Current)	Keymap window		(Actual)
-Acute trigger	Keymap window		Disparador de acento agudo (´)
+1	spanish; castilian	x-vnd.Haiku-Keymap	140876782
+Revert	Modifier keys window		Revertir
+Tilde trigger	Keymap window		Disparador de tilde (~)
+Grave trigger	Keymap window		Disparador de acento grave (`)
+Select dead keys	Keymap window		Seleccionar teclas muertas
+Quit	Keymap window		Salir
+Switch shortcut keys to Haiku mode	Keymap window		Cambiar atajos de teclado a modo Haiku
 Circumflex trigger	Keymap window		Disparador de acento circunflejo (^)
 Diaeresis trigger	Keymap window		Disparador de diéresis (¨)
-File	Keymap window		Archivo
-Font	Keymap window		Tipo de letra
-Grave trigger	Keymap window		Disparador de acento grave (`)
-Layout	Keymap window		Distribución
 Open…	Keymap window		Abrir…
-Quit	Keymap window		Salir
-Revert	Keymap window		Revertir
-Sample and clipboard:	Keymap window		Ejemplo y portapapeles:
-Save as…	Keymap window		Guardar como...
-Select dead keys	Keymap window		Seleccionar teclas muertas
-Switch shortcut keys	Keymap window		Cambiar atajos de teclado
-Switch shortcut keys to Haiku mode	Keymap window		Cambiar atajos de teclado a modo Haiku
-Switch shortcut keys to Windows/Linux mode	Keymap window		Cambiar atajos de teclado a modo Windows/Linux
 System:	Keymap window		Sistema:
-Tilde trigger	Keymap window		Disparador de tilde (~)
+Switch shortcut keys	Keymap window		Cambiar atajos de teclado
 User:	Keymap window		Usuario:
+Sample and clipboard:	Keymap window		Ejemplo y portapapeles:
+Layout	Keymap window		Distribución
+Switch shortcut keys to Windows/Linux mode	Keymap window		Cambiar atajos de teclado a modo Windows/Linux
+Revert	Keymap window		Revertir
+Save as…	Keymap window		Guardar como...
+File	Keymap window		Archivo
+(Current)	Keymap window		(Actual)
+Font	Keymap window		Tipo de letra
+Keymap	System name		Mapa de teclado
+Acute trigger	Keymap window		Disparador de acento agudo (´)

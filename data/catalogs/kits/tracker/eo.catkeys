@@ -1,8 +1,24 @@
-1	esperanto	x-vnd.Haiku-libtracker	818198503
-Add-ons	FilePanelPriv		Aldonaĵoj
-Close	VolumeWindow		Fermi
-Desktop	Model		Labortablo
-Icon view	VolumeWindow		Bildeta vido
-Identify	ContainerWindow		Identigi
+1	esperanto	x-vnd.Haiku-libtracker	2515890756
 OK	WidgetAttributeText		Bone
+Add-ons	FilePanelPriv		Aldonaĵoj
+Desktop	Model		Labortablo
+Identify	ContainerWindow		Identigi
 Open	OpenWithWindow		Malfermi
+Icon view	ContainerWindow		Bildeta vido
+OK	AutoMounterSettings		Bone
+Open	ContainerWindow		Malfermi
+OK	TrackerInitialState		Bone
+Add-ons	ContainerWindow		Aldonaĵoj
+Desktop	TrackerSettingsWindow		Labortablo
+OK	InfoWindow		Bone
+Open	InfoWindow		Malfermi
+OK	OpenWithWindow		Bone
+OK	PoseView		Bone
+Identify	InfoWindow		Identigi
+Desktop	B_DESKTOP_DIRECTORY		Labortablo
+Add-ons	DeskWindow		Aldonaĵoj
+Icon view	DeskWindow		Bildeta vido
+Close	ContainerWindow		Fermi
+OK	FSUtils		Bone
+Close	QueryContainerWindow		Fermi
+Open	FilePanelPriv		Malfermi

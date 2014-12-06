@@ -1,0 +1,6 @@
+1	esperanto	x-vnd.Haiku.TextSearch	3147874720
+Close	GrepWindow		Fermi
+Cancel	GrepWindow		Nuligi
+OK	GrepWindow		Bone
+Search	GrepWindow		Serĉi
+Quit	GrepWindow		Eliri

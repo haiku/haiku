@@ -1,46 +1,38 @@
-1	italian	x-vnd.Haiku-PowerStatus	51899741
-About	PowerStatus		informazioni
-About…	PowerStatus		Informazioni...
-Battery charging	PowerStatus		Batteria in carica
-Battery discharging	PowerStatus		Batteria in scarica
-Battery info	PowerStatus		Informazioni batteria
-Battery info…	PowerStatus		Informazioni batteria...
-Battery unused	PowerStatus		Batteria non usata
-Capacity granularity 1: 	PowerStatus		Granularità della capacità 1:
-Capacity granularity 2: 	PowerStatus		Granularità della capacità 2:
-Capacity: 	PowerStatus		Capacità:
-Current rate: 	PowerStatus		Valore attuale:
+1	italian	x-vnd.Haiku-PowerStatus	2647539100
 Design capacity low warning: 	PowerStatus		Avviso di batteria scarica (di fabbrica):
-Design capacity warning: 	PowerStatus		Avviso di capacità (di fabbrica):
-Design capacity: 	PowerStatus		Capacità (in base al costruttore):
-Design voltage: 	PowerStatus		Voltaggio di progettazione:
-Empty battery slot	PowerStatus		Slot della batteria vuoto
-Extended battery info	PowerStatus		Informazioni batteria estese
-Install in Deskbar	PowerStatus		Installa nella Deskbar
-Last full charge: 	PowerStatus		Ultima carica completa:
-Model number: 	PowerStatus		Numero modello:
-OEM info: 	PowerStatus		Informazioni OEM:
-OK	PowerStatus		OK
-Power status box	PowerStatus		Riquadro stato alimentazione
-PowerStatus	PowerStatus		PowerStatus
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nscritto da Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
-Quit	PowerStatus		Esci
-Run in window	PowerStatus		Esegui in una finestra
-Serial number: 	PowerStatus		Numero seriale:
 Show percent	PowerStatus		Mostra percentuale
-Show status icon	PowerStatus		Mostra l'icona di stato
-Show text label	PowerStatus		Mostra etichette di testo
-Show time	PowerStatus		Mostra il tempo
-Technology: 	PowerStatus		Tecnologia:
+Design capacity: 	PowerStatus		Capacità (in base al costruttore):
 Type: 	PowerStatus		Tipo:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus può essere eseguito in una finestra o installato nella Deskbar.
-charging	PowerStatus		in carica
-discharging	PowerStatus		in scarica
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		nessuna batteria
 non-rechargeable	PowerStatus		non ricaricabile
+Empty battery slot	PowerStatus		Slot della batteria vuoto
+Run in window	PowerStatus		Esegui in una finestra
+PowerStatus	System name		PowerStatus
+Battery info…	PowerStatus		Informazioni batteria...
+Show time	PowerStatus		Mostra il tempo
+Last full charge: 	PowerStatus		Ultima carica completa:
+Battery unused	PowerStatus		Batteria non usata
+Extended battery info	PowerStatus		Informazioni batteria estese
+Current rate: 	PowerStatus		Valore attuale:
+discharging	PowerStatus		in scarica
+Show text label	PowerStatus		Mostra etichette di testo
+About…	PowerStatus		Informazioni...
+Model number: 	PowerStatus		Numero modello:
+Install in Deskbar	PowerStatus		Installa nella Deskbar
+Capacity: 	PowerStatus		Capacità:
+Battery discharging	PowerStatus		Batteria in scarica
+Serial number: 	PowerStatus		Numero seriale:
+Capacity granularity 1: 	PowerStatus		Granularità della capacità 1:
+OEM info: 	PowerStatus		Informazioni OEM:
+Design voltage: 	PowerStatus		Voltaggio di progettazione:
+Battery charging	PowerStatus		Batteria in carica
+Design capacity warning: 	PowerStatus		Avviso di capacità (di fabbrica):
+Battery info	PowerStatus		Informazioni batteria
+Quit	PowerStatus		Esci
 rechargeable	PowerStatus		ricaricabile
+charging	PowerStatus		in carica
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus può essere eseguito in una finestra o installato nella Deskbar.
+Power status box	PowerStatus		Riquadro stato alimentazione
+Show status icon	PowerStatus		Mostra l'icona di stato
+Capacity granularity 2: 	PowerStatus		Granularità della capacità 2:
+Technology: 	PowerStatus		Tecnologia:
+no battery	PowerStatus		nessuna batteria

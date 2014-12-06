@@ -1,14 +1,20 @@
-1	italian	x-vnd.Haiku-Touchpad	3384076362
-Cancel	TouchpadPrefView		Cancella
+1	italian	x-vnd.Haiku-Touchpad	607725922
+Scrolling	TouchpadPrefView		Scorrimento
+Touchpad	System name		Touchpad
+Revert	TouchpadPrefView		Ripristina
+Tapping	TouchpadPrefView		Tocco
+Please confirm	TouchpadPrefView		Per favore conferma
+Two finger scrolling	TouchpadPrefView		Scorrimento con 2 dita
 Defaults	TouchpadPrefView		Predefiniti
-Fast	TouchpadPrefView		Veloce
+Slow	TouchpadPrefView		Lento
+Vertical	TouchpadPrefView		Verticale
 High	TouchpadPrefView		Alto
 Horizontal scrolling	TouchpadPrefView		Scorrimento orizzontale
+Fast	TouchpadPrefView		Veloce
 OK	TouchpadPrefView		OK
-Off	TouchpadPrefView		Disattivo
-Please confirm	TouchpadPrefView		Per favore conferma
-Revert	TouchpadPrefView		Ripristina
-Scrolling	TouchpadPrefView		Scorrimento
-Slow	TouchpadPrefView		Lento
+Acceleration	TouchpadPrefView		Accelerazione
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nuova area di scorrimento è molto larga e può impedire le normali operazioni del mouse. Davvero vuoi cambiarla?
-Two finger scrolling	TouchpadPrefView		Scorrimento con 2 dita
+Horizontal	TouchpadPrefView		Orizzontale
+Off	TouchpadPrefView		Disattivo
+Sensitivity	TouchpadPrefView		Sensibilità
+Cancel	TouchpadPrefView		Cancella

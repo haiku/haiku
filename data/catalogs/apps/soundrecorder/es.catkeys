@@ -1,0 +1,32 @@
+1	spanish; castilian	x-vnd.Haiku-SoundRecorder	804840835
+Loop	RecorderWindow		Bucle
+Cannot find default audio hardware	RecorderWindow		No se encuentra el hardware predeterminado de audio
+Cannot find the temporary file created to hold the new recording	RecorderWindow		No se encuentra el archivo temporal creado para guardar la nueva grabación
+Nothing to play	RecorderWindow		Nada que reproducir
+File info	RecorderWindow		Información del archivo
+Drop files here	SoundListView		Arrastrar los archivos aquí
+Input	RecorderWindow		Entrada
+Stop	RecorderWindow		Parar
+Sound List	RecorderWindow		Lista de sonidos
+Rewind	RecorderWindow		Rebobinar
+Sample rate:	RecorderWindow		Frecuencia de muestreo:
+Invalid audio files	RecorderWindow		Archivo de audio invalido
+OK	RecorderWindow		OK
+Cannot open the temporary file created to hold the new recording	RecorderWindow		No se puede abrir el archivo temporal creado para guardar la nueva grabación
+Input:	RecorderWindow		Entrada:
+Forward	RecorderWindow		Adelantar
+Play	RecorderWindow		Reproducir
+SoundRecorder	System name		Grabadora de Sonidos
+None	RecorderWindow		Ninguno
+Record	RecorderWindow		Grabar
+Sample size: 	RecorderWindow		Tamaño de la muestra :
+Cannot recognize this file as a media file	RecorderWindow		No se pudo reconocer este archivo como una archivo multimedia
+Format: 	RecorderWindow		Formato
+File name: 	RecorderWindow		Nombre del archivo :
+Cannot connect to the selected sound input	RecorderWindow		No se puede conectar a la entrada de audio seleccionada
+Cannot get the file to play	RecorderWindow		No se puede obtener el archivo a reproducir
+Cannot record a sound that long	RecorderWindow		No se puede grabar un sonido tan largo
+Duration:	RecorderWindow		Duración:
+Compression:	RecorderWindow		Compresión:
+Cannot find an unused name to use for the new recording	RecorderWindow		No se encuentra ningún nombre sin utilizar para la nueva grabación
+Channels: 	RecorderWindow		Canales:

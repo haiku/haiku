@@ -1,24 +1,24 @@
 1	esperanto	x-vnd.Haiku-Backgrounds	4220509773
-All workspaces	Main View		Ĉiuj laborspacoj
-Apply	Main View		Daŭrigi
-Center	Main View		Centra
-Current workspace	Main View		Aktuala laborspaco
+X:	Main View		Horizontala:
+Resolution: 	Image Filepanel		Distingivo:
+pick one	Main View		elektu unun
 Default	Main View		Apriora
-Default folder	Main View		Apriora dosierujo
-Folder: 	Main View		Dosierujo:
-Icon label outline	Main View		Bildeto-etikeda ĉirkaŭaĵo
-Image:	Main View		Bildo:
+Center	Main View		Centra
 Manual	Main View		Permana
+Default folder	Main View		Apriora dosierujo
+Revert	Main View		Malfari
 None	Main View		Neniu
-Other folder…	Main View		Alia dosierujo…
+All workspaces	Main View		Ĉiuj laborspacoj
+Icon label outline	Main View		Bildeto-etikeda ĉirkaŭaĵo
 Other…	Main View		Alia…
+Current workspace	Main View		Aktuala laborspaco
+Folder: 	Main View		Dosierujo:
+Apply	Main View		Daŭrigi
+Other folder…	Main View		Alia dosierujo…
+Y:	Main View		Vertikala:
+Tile	Main View		Tegola
+Select	Main View		Elekti
+Scale to fit	Main View		Skalita pro taŭgi
 Placement:	Main View		Poziciado:
 Preview	Main View		Antaŭvido
-Resolution: 	Image Filepanel		Distingivo:
-Revert	Main View		Malfari
-Scale to fit	Main View		Skalita pro taŭgi
-Select	Main View		Elekti
-Tile	Main View		Tegola
-X:	Main View		Horizontala:
-Y:	Main View		Vertikala:
-pick one	Main View		elektu unun
+Image:	Main View		Bildo:

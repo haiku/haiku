@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-BootManager	1719213568
+1	romanian	x-vnd.Haiku-BootManager	1620644661
 The boot manager has been successfully installed on your system.	BootManagerController		Administratorul de boot a fost instalat cu succes pe sistemul dumneavoastră.
 After two seconds	DefaultPartitionPage		După două secunde
 Uninstall Boot Manager	UninstallPage	Title	Dezinstalează Administrator de boot
@@ -12,6 +12,7 @@ An error occurred writing the boot menu. The Master Boot Record might be destroy
 Partitions	PartitionsPage	Title	Partiții
 Timeout: %s	DefaultPartitionPage		Timp alocat expirat: %s
 Select	FileSelectionPage	Button	Selectează
+Incompatible format!	DrivesPage	Cannot install	Format incompatibil!
 Cannot access!	DrivesPage	Cannot install	Nu se poate accesa!
 Uninstall boot manager	BootManagerController	Title	Dezinstalează administratorul de boot
 After four seconds	DefaultPartitionPage		După patru secunde
@@ -43,7 +44,6 @@ Update	DrivesPage	Button	Actualizează
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Localizați fișierul de salvare al Înregistrării de boot principală (MBR) din care se va restaura. Acesta este fișierul care a fost creat atunci când administratorul de boot a fost instalat prima dată.
 Drives	DrivesPage	Title	Unități
 No space available!	DrivesPage	Cannot install	Nu este spațiu disponibil!
-Never	DefaultPartitionPage		Niciodată
 Partition table not compatible	BootManagerController	Title	Tabela de partiții nu este compatibilă
 Old Master Boot Record saved	BootManagerController	Title	Înregistrarea de boot principală veche a fost salvată
 Boot Manager is unable to read the partition table!	BootManagerController		Administratorul de Boot nu a putut citi tabelul de patiție!
@@ -56,7 +56,7 @@ Default Partition:	DefaultPartitionPage	Menu field label	Partiție implicită:
 Partitions	DefaultPartitionPage	Pop up menu title	Partiții
 BootManager	System name		AdministratorPornire
 Summary	BootManagerController	Title	Rezumat
-OK	BootManagerController	Button	Bine
+OK	BootManagerController	Button	OK
 Immediately	DefaultPartitionPage		Imediat
 Done	BootManagerController	Button	Gata
 After three seconds	DefaultPartitionPage		După trei secunde

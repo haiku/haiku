@@ -1,3 +1,38 @@
-1	spanish	x-vnd.Be-TSKB	1884644663
+1	spanish; castilian	x-vnd.Be-TSKB	1259752388
+Power off	DeskbarMenu		Apagar
 Applications	PreferencesWindow		Aplicaciones
-Recent applications	BeMenu		Aplicaciones recientes
+Recent documents:	PreferencesWindow		Documentos recientes:
+Recent applications	DeskbarMenu		Aplicaciónes recientes
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicaciones
+Find…	DeskbarMenu		Buscar...
+Window	PreferencesWindow		Ventana
+Menu	PreferencesWindow		Menú
+Recent documents	DeskbarMenu		Documentos recientes
+Auto-hide	PreferencesWindow		Ocultar automáticamente
+Always on top	PreferencesWindow		Siempre encima
+<Deskbar folder is empty>	DeskbarMenu		<La carpeta de la barra está vacia>
+Show all	WindowMenu		Mostar todo
+No windows	WindowMenu		Sin ventanas
+Deskbar	System name		Barra de Escritorio
+Restart system	DeskbarMenu		Reiniciar sistema
+Auto-raise	PreferencesWindow		Redimensionar automáticamente
+Recent folders:	PreferencesWindow		Carpetas recientes:
+Show application expander	PreferencesWindow		Mostar expansor de aplicación
+Restart Tracker	DeskbarMenu		Reiniciar rastreador
+Close all	WindowMenu		Cerrar todo
+Deskbar preferences	PreferencesWindow		Preferencias de la barra de escritorio
+Mount	DeskbarMenu		Montar
+Recent applications:	PreferencesWindow		Aplicaciones recientes:
+Shutdown…	DeskbarMenu		Apagar...
+Tracker always first	PreferencesWindow		Tracker siempre al frente
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferencias
+Recent folders	DeskbarMenu		Carpetas recientes
+About this system	DeskbarMenu		Sobre este sistema
+Show calendar…	TimeView		Mostar calendario...
+Deskbar preferences…	DeskbarMenu		Preferencias de la barra de escritorio
+Expand new applications	PreferencesWindow		Expandir nuevas aplicaciones
+Show replicants	DeskbarMenu		Mostrar replicantes
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applets de escritorio
+Hide all	WindowMenu		Ocultar todo
+Quit application	WindowMenu		Salir de la aplicación

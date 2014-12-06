@@ -1,19 +1,25 @@
-1	romanian	x-vnd.Haiku-DriveSetup	1487820795
+1	romanian	x-vnd.Haiku-DriveSetup	3968441779
 DriveSetup	System name		ConfigurareDiscuri
+Could not acquire partitioning information.	MainWindow		Nu s-au putut obține informațiile de partiționare.
 Cancel	AbstractParametersPanel		Anulează
 Delete	MainWindow		Șterge
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția selectată vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Rescan	MainWindow		Rescanează
-OK	MainWindow		Bine
+OK	MainWindow		OK
 There's no space on the partition where a child partition could be created.	MainWindow		Nu mai există spațiu liber pe partiția unde se poate crea o partiție secundară.
+Could not unmount partition	MainWindow		Nu s-a putut demonta partiția
 Initialize	InitializeParametersPanel		Inițializează
-OK	AbstractParametersPanel		Bine
+OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<liber>
 Unable to find the selected partition by ID.	MainWindow		Nu s-a putut găsi partiția selectată după ID.
 Select a partition from the list below.	DiskView		Selectați o partiție din lista de mai jos.
 No disk devices have been recognized.	DiskView		Nu au fost recunoscute dispozitivele de disc.
+Failed to initialize the disk %s!\n	MainWindow		Inițializarea discului %s a eșuat!\n
 The selected disk is read-only.	MainWindow		Discul selectat este protejat la scriere.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați partiția \"%s\"? Veți fi întrebat din nou înainte ca schimbările să fie scrise pe disc.
 Could not mount partition %s.	MainWindow		Nu s-a putut monta partiția %s.
+The partition %s has been successfully formatted.\n	MainWindow		Partiția %s a fost formatată cu succes.\n
+Change parameters	MainWindow		Modifică parametrii
 The partition %s is already unmounted.	MainWindow		Partiția %s este deja demontată.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Ștergerea partiției a eșuat. Nu s-au scris modificări pe disc.
 Could not delete the selected partition.	MainWindow		Nu s-a putut șterge partiția selectată.
@@ -31,6 +37,9 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Write changes	MainWindow		Scrie modificări
 There was an error preparing the disk for modifications.	MainWindow		A apărut o eroare la pregătirea discului pentru modificări.
 The partition %s is already mounted.	MainWindow		Partiția %s este deja montată.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați partiția? Veți fi întrebat din nou înainte ca schimbările să fie scrise pe disc.
+Partition name:	ChangeParametersPanel		Nume partiție:
+Change	ChangeParametersPanel		Modificare
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul %s vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să ștergeți partiția selectată?\n\nToate datele de pe partiție vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Create…	MainWindow		Crează...
@@ -46,17 +55,25 @@ Cannot delete the selected partition.	MainWindow		Nu se poate șterge partiția 
 Mount all	MainWindow		Montează tot
 Cancel	MainWindow		Anulează
 Delete partition	MainWindow		Șterge partiție
+Disk system \"%s\" not found!	MainWindow		Sistemul de disc \"%s\" nu a fost găsit!
 Eject	MainWindow		Scoate
 Partition	MainWindow		Partiție
+Validation of the given parameters failed.	MainWindow		Validarea parametrilor furnizați a eșuat.
+Force unmount	MainWindow		Forțează demontarea
+Create	CreateParametersPanel		Creează
 File system	PartitionList		Sistem de fișiere
 Validation of the given creation parameters failed.	MainWindow		Validarea parametrilor de creare furnizați a eșuat.
+Partition type:	ChangeParametersPanel		Tip partiție:
 Size	PartitionList		Dimensiune
 Validation of the given initialization parameters failed.	MainWindow		Validarea parametrilor de inițializare furnizați a eșuat.
 The selected partition does not contain a partitioning system.	MainWindow		Partiția selectată nu conține un sistem de partiționare.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția %s vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 The partition %s is currently mounted.	MainWindow		Partiția %s este montantă curent.
 Surface test (not implemented)	MainWindow		Test de suprafață (nu este implementat)
+Format	MainWindow		Formatare
+Could not change the parameters of the selected partition.	MainWindow		Nu s-au putut modifica parametrii partiției selectate.
 Parameters	PartitionList		Parametri
 Creation of the partition has failed.	MainWindow		Crearea partiției a eșuat.
 The currently selected partition is not empty.	MainWindow		Partiția curentă selectată nu este liberă.
+Failed to format the partition. No changes have been written to disk.	MainWindow		Formatarea partiției a eșuat. Fără modificări scrise pe disc.
 Unmount	MainWindow		Demontează

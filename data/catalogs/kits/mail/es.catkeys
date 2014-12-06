@@ -1,0 +1,10 @@
+1	spanish; castilian	x-vnd.Haiku-libmail	161731481
+Partially download messages larger than	ProtocolConfigView		Bajar parcialmente mensajes mayores que 
+Password:	ProtocolConfigView		Contraseña:
+Remove mail from server when deleted	ProtocolConfigView		Eliminar del servidor de correo cuando se borren
+Mail server:	ProtocolConfigView		Servidor de correo:
+Select…	MailKit		Seleccionar...
+Connection type:	ProtocolConfigView		Tipo de conexión:
+Leave mail on server	ProtocolConfigView		Dejar el correo en el servidor
+Username:	ProtocolConfigView		Nombre de Usuario:
+Login type:	ProtocolConfigView		Tipo de ingreso:

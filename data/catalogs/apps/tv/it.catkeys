@@ -1,26 +1,27 @@
-1	italian	x-vnd.Haiku.TV	2971561976
-Always on top	MainWin		Sempre in primo piano
+1	italian	x-vnd.Haiku.TV	1995288111
+TV	MainWin		TV
 Channel	MainWin		Canale
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Trasmissione TV Video Digitale
-Debug	MainWin		Debug
-Error, connecting to interface failed:\n\n	MainWin		Errore, connessione all'interfaccia fallita:\n\n
-Error, interface is busy:\n\n	MainWin		Errore, l'interfaccia è occupata:\n\n
-Full screen	MainWin		Schermo intero
+Settings…	MainWin		Impostazioni…
 Interface	MainWin		Interfaccia
 Keep aspect ratio	MainWin		Conserva proporzioni
-Next channel	MainWin		Canale seguente
-No border	MainWin		Nessun bordo
-No menu	MainWin		Nessun menu
-None	MainWin		Nessuno
-OK	MainWin		OK
 Previous channel	MainWin		Canale precedente
-Quit	MainWin		Esci
-Scale to native size	MainWin		Dimensioni originali
 Settings	MainWin		Impostazioni
-Settings…	MainWin		Impostazioni…
-TV	MainWin		TV
-force 544 x 576, display aspect 4:3	MainWin		forza a 544 x 576, mostra aspetto in 4:3
-force 704 x 576, display aspect 4:3	MainWin		forza a 704 × 576, mostra aspetto in 4:3
-force 720 x 576, display aspect 4:3	MainWin		forza a 720 x 576, mostra aspetto in 4:3
-pixel aspect ratio	MainWin		aspetto pixel
+TV	System name		TV
+No border	MainWin		Nessun bordo
+Always on top	MainWin		Sempre in primo piano
+OK	MainWin		OK
+Quit	MainWin		Esci
+Full screen	MainWin		Schermo intero
+Debug	MainWin		Debug
+Scale to native size	MainWin		Dimensioni originali
 unknown	MainWin		sconosciuto
+Next channel	MainWin		Canale seguente
+Error, interface is busy:\n\n	MainWin		Errore, l'interfaccia è occupata:\n\n
+None	MainWin		Nessuno
+force 704 x 576, display aspect 4:3	MainWin		forza a 704 × 576, mostra aspetto in 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Trasmissione TV Video Digitale
+force 544 x 576, display aspect 4:3	MainWin		forza a 544 x 576, mostra aspetto in 4:3
+pixel aspect ratio	MainWin		aspetto pixel
+No menu	MainWin		Nessun menu
+Error, connecting to interface failed:\n\n	MainWin		Errore, connessione all'interfaccia fallita:\n\n
+force 720 x 576, display aspect 4:3	MainWin		forza a 720 x 576, mostra aspetto in 4:3

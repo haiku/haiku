@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ChartDemo	557376150
+1	romanian	x-vnd.Haiku-ChartDemo	986636897
 Slow rotation	ChartWindow		Rotaţie lentă
 Pink	ChartWindow		Roz
 Comet	ChartWindow		Cometă
@@ -9,6 +9,7 @@ Blue	ChartWindow		Albastru
 Colors	ChartWindow		Culori
 Novas	ChartWindow		Nove
 LineArray	ChartWindow		VectorLiniar
+ 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s (scală logaritmică)
 Free motion	ChartWindow		Mişcare liberă
 (high) 100% 	ChartWindow		(înalt) 100%
 Green	ChartWindow		Verde
@@ -20,6 +21,7 @@ Chaos	ChartWindow		Haos
 Full screen	ChartWindow		Ecran complet
 Spiral	ChartWindow		Spirală
 Slow motion	ChartWindow		Mişcare lentă
+ 5% (low)	ChartWindow		 5% (scăzut)
 Fast motion	ChartWindow		Mişcare rapidă
 Special	ChartWindow		Special
 Status	ChartWindow		Statut
@@ -32,7 +34,7 @@ Chart	System name		Grafic
 Animation:	ChartWindow		Animaţie:
 Frames/s	ChartWindow		Cadre/s
 Auto demo	ChartWindow		Demo automat
-CPU load	ChartWindow		Folosire procesor
+CPU load	ChartWindow		Încărcare CPU
 DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Roşu
 None	ChartWindow		Nimic

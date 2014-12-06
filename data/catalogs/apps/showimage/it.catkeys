@@ -1,59 +1,60 @@
-1	italian	x-vnd.Haiku-ShowImage	4229618244
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS secondi
-Browse	Menus		Sfoglia
-Cancel	ClosePrompt		Annulla
-Clear selection	Menus		Pulisci selezione
-Close	ClosePrompt		Chiudi
-Close	Menus		Chiudi
-Close document	ClosePrompt		Chiudi documento
-Copy	Menus		Copia
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Impossibile caricare l'immagine! Il file immagine, il translator relativo o entrambi non esistono.
-DPI:	PrintOptionsWindow		Punti per pollice:
-Edit	Menus		Modifica
+1	italian	x-vnd.Haiku-ShowImage	466377502
+Use as background…	Menus		Utilizza come sfondo…
 File	Menus		File
-First page	Menus		Prima pagina
-Fit image to page	PrintOptionsWindow		Adatta alla pagina
-Fit to window	Menus		Adatta alla finestra
-Flip left to right	Menus		Ribalta orizzontalmente
-Flip top to bottom	Menus		Ribalta verticalmente
+Slide delay	Menus		Tempo d'attesa
+Selection mode	Menus		Modalità selezione
+Zoom in	Menus		Zoom avanti
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' è stato modificato. Vuoi chiudere il documento?
+Page setup…	Menus		Imposta pagina…
+Print…	Menus		Stampa…
+OK	SaveToFile		Ok
+Previous page	Menus		Pagina precedente
+View	Menus		Visualizza
 Full screen	Menus		Schermo intero
 Go to page	Menus		Vai alla pagina
-Height: 	PrintOptionsWindow		Altezza: 
-High-quality zooming	Menus		Zoom di alta qualità
-Image	Menus		Immagine
-Job setup	PrintOptionsWindow		Imposta attività
-Last page	Menus		Ultima pagina
-Next file	Menus		File seguente
-Next page	Menus		Pagina seguente
-OK	Alerts		OK
-OK	SaveToFile		Ok
-Open…	Menus		Apri...
-Original size	Menus		Dimensione originale
-Page setup…	Menus		Imposta pagina…
-Previous file	Menus		File precedente
-Previous page	Menus		Pagina precedente
-Print options	PrintOptionsWindow		Opzioni di stampa
-Print…	Menus		Stampa…
-Progress monitor	ProgressWindow		Controllo avanzamento
-Quit	Menus		Esci
-Rating	Menus		Voto
-Resize to (in 1/72 inches):	PrintOptionsWindow		Ridimensiona (in 1/72 pollici):
-Rotate clockwise	Menus		Ruota in senso orario
-Rotate counterclockwise	Menus		Ruota in senso antiorario
-Save as…	Menus		salva come…
-Select all	Menus		Seleziona tutto
-Selection mode	Menus		Modalità selezione
-Show caption in full screen mode	Menus		Mostra didascalia in modalità schermo intero
-Slide delay	Menus		Tempo d'attesa
-Slide show	Menus		Mostra sequenza
-Stretch to window	Menus		Estendi alla finestra
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' (pagina %d) è stato modificato. Vuoi chiudere il documento?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' è stato modificato. Vuoi chiudere il documento?
-The file '%s' could not be written.	SaveToFile		Il file \"%s\" non può essere scritto.
-Undo	Menus		Annulla
-Use as background…	Menus		Utilizza come sfondo…
-View	Menus		Visualizza
-Width:	PrintOptionsWindow		Larghezza:
-Zoom factor in %:	PrintOptionsWindow		Fattore di zoom in %:
-Zoom in	Menus		Zoom avanti
 Zoom out	Menus		Zoom indietro
+Quit	Menus		Esci
+Rotate counterclockwise	Menus		Ruota in senso antiorario
+High-quality zooming	Menus		Zoom di alta qualità
+Browse	Menus		Sfoglia
+Edit	Menus		Modifica
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Impossibile caricare l'immagine! Il file immagine, il translator relativo o entrambi non esistono.
+First page	Menus		Prima pagina
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' (pagina %d) è stato modificato. Vuoi chiudere il documento?
+Leave full screen	Menus		Esci dallo schermo intero
+Close	Menus		Chiudi
+Close	ClosePrompt		Chiudi
+Resize to (in 1/72 inches):	PrintOptionsWindow		Ridimensiona (in 1/72 pollici):
+Rating	Menus		Voto
+Flip left to right	Menus		Ribalta orizzontalmente
+Show caption in full screen mode	Menus		Mostra didascalia in modalità schermo intero
+DPI:	PrintOptionsWindow		Punti per pollice:
+Open…	Menus		Apri...
+Next file	Menus		File seguente
+Clear selection	Menus		Pulisci selezione
+Close document	ClosePrompt		Chiudi documento
+Height: 	PrintOptionsWindow		Altezza: 
+The file '%s' could not be written.	SaveToFile		Il file \"%s\" non può essere scritto.
+Cancel	ClosePrompt		Annulla
+Show tool bar	Menus		Mostra strumenti
+Fit to window	Menus		Adatta alla finestra
+Print options	PrintOptionsWindow		Opzioni di stampa
+Copy	Menus		Copia
+Progress monitor	ProgressWindow		Controllo avanzamento
+Last page	Menus		Ultima pagina
+Stretch to window	Menus		Estendi alla finestra
+Previous file	Menus		File precedente
+ShowImage	System name		ShowImage
+Slide show	Menus		Mostra sequenza
+Fit image to page	PrintOptionsWindow		Adatta alla pagina
+Flip top to bottom	Menus		Ribalta verticalmente
+Select all	Menus		Seleziona tutto
+Zoom factor in %:	PrintOptionsWindow		Fattore di zoom in %:
+Width:	PrintOptionsWindow		Larghezza:
+Image	Menus		Immagine
+OK	Alerts		OK
+Rotate clockwise	Menus		Ruota in senso orario
+Job setup	PrintOptionsWindow		Imposta attività
+Original size	Menus		Dimensione originale
+Next page	Menus		Pagina seguente
+Save as…	Menus		salva come…

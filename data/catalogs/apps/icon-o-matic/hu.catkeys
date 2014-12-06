@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	1929083132
+1	hungarian	x-vnd.haiku-icon_o_matic	3554185674
 Select All	Icon-O-Matic-PathManipulator		Mind kijelölése
 Add Style	Icon-O-Matic-AddStylesCmd		Stílus hozzáadása
 Color (#%02x%02x%02x)	Style name after dropping a color		Szín (#%02x%02x%02x)
@@ -67,6 +67,7 @@ HVIF Source Code	Icon-O-Matic-SavePanel		HVIF forráskód
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Átalakítások visszaállítása
 Settings	Icon-O-Matic-Menus		Beállítások
 All	Icon-O-Matic-Properties		Összes
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		A szöveg, amit importálni kíván, nagyon hosszú. Biztos importálja?
 Multi Paste Properties	Icon-O-Matic-Properties		Többször beillesztés tulajdonsága
 Undo	Icon-O-Matic-Main		Visszavonás
 Click on a shape above	Empty transformers list - 1st line		Kattintson egy alakzatra
@@ -186,6 +187,7 @@ Save	Icon-O-Matic-Menu-File		Mentés
 Append…	Icon-O-Matic-Menu-File		Hozzáfűzés…
 Move Path	Icon-O-Matic-MovePathsCmd		Útvonal mozgatása
 Overwrite	Icon-O-Matic-SVGExport		Felülírás
+Text too long	Icon-O-Matic-StyledTextImport		A szöveg túl hosszú
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Alakzatok rögzítése
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Vezérlőpont felbontása
 Open…	Icon-O-Matic-Menu-File		Megnyitás…

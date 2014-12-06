@@ -1,57 +1,71 @@
-1	croatian	x-vnd.Haiku-Installer	1610767827
-2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
-Additional disk space required: %s	InstallerWindow		Potreban dodatni prostor na disku: %s
-Additional disk space required: 0.0 KiB	InstallerWindow		Potreban dodatni prostor na disku: 0.0 KiB
-All hard disks start with \"hd\".\n	InstallerApp		Svi tvrdi diskovi počinju sa \"hd\".\n
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Došlo je do greške i instalacija nije dovršena:\n\Greška: %s
-Are you sure you want to to stop the installation?	InstallerWindow		Jeste li sigurni da želite zaustaviti instalaciju?
-Begin	InstallerWindow		Počni
-Cancel	InstallProgress		Odustani
-Cancel	InstallerWindow		Odustani
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Iz pop-up izbornika izaberite disk na koji žekite instalirati.Zatim kliknite \"Počni\".
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Izaberite izvor i odredišni disk iz pop-up izbornika.Zatim kliknite
-\"Počni\".
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Izaberite disk izvora iz poo-up izbornika.Zatim kliknite \"Počni\".
-Continue	InstallerApp		Nastavi
-Finishing Installation.	InstallProgress		Završavam instalaciju.
-GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Grub shema imenovanja je još: (hdN,n)\n\n 
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Uživajte i puno vam hvala na isprobavanju Haiku-a!Nadamo se da vam se sviđa!
-Hide optional packages	InstallerWindow		Sakrij neobavezne pakete.
-IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VAŽNA INFORMACIJA PRIJE HAIKU INSTALACIJE\n\n
-Install from:	InstallerWindow		Instaliraj sa:
-Install progress:  	InstallerWindow		Napredak instalacije:
-Installation canceled.	InstallProgress		Instalacija opozvana.
+1	croatian	x-vnd.Haiku-Installer	1922039469
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Jeste li sigurni da želite prekinuti instalaciju i ponovno pokrenuti sustav?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tnapisali Jérôme Duval i Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nije pronađena ijedna particija pogodna za instalaciju.Molim uredite particije i inicirajte barem jednu sa Be File sustavom.
-OK	InstallProgress		U redu
-OK	InstallerApp		Uredu
-Performing installation.	InstallProgress		Vršim instalaciju.
-Please choose target	InstallerWindow		Molim izaberite metu
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Pritisnite tipku Počni za instalaciju sa '%1s' na '%2s'.
-Quit	InstallerApp		Isključi
-Quit	InstallerWindow		Isključi
-Restart system	InstallerWindow		Ponovo pokreni sustav
-Set up partitions…	InstallerWindow		Postavi particije...
-Show optional packages	InstallerWindow		Pokaži neobavezne pakete
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Ispod zaglavlja koje se ne smije uređivati,dodajte nešto poput ovih redaka:\n\n 
-Starting Installation.	InstallProgress		Pokretanje instalacije.
-Stop	InstallerWindow		Stop
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Odredišni direktorij možda nema dovoljno prostara.Probajte izabrati drugi disk ili izaberite neinstaliranje neobaveznih stavki.
-The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk ne može biti montiran.Izaberite drugi disk.
-The partition can't be mounted. Please choose a different partition.	InstallProgress		Particija se ne može montirati.molim izaberite drugu particiju.
-Tools	InstallerWindow		Alati
-Welcome to the Haiku Installer!\n\n	InstallerApp		Dobrodošli u Haiku instaler!\n\n
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Ne možete instalirati sadržaj diska na sami disk.Izaberite drugi disk.
-You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Primjetili ste da GRUB koristi drugačije imenovanje za tvrde diskove nego Linux.\n\n
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" je broj tvrdog diska, počevši sa\"0\".\n
-\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" je broj particije, koji također počinje sa \"0\".\n
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" je broj particije, koji za GRUB 2 počinje sa \"1\"\n
-\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
-\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
-\tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
-\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
-\trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 \t}\n\n	InstallerApp		\t}\n\n
+Quit	InstallerApp		Isključi
+Additional disk space required: 0.0 KiB	InstallerWindow		Potreban dodatni prostor na disku: 0.0 KiB
+\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
+Stop	InstallerWindow	In alert after pressing Stop	Stop
+Install progress:  	InstallerWindow		Napredak instalacije:  
+Starting Installation.	InstallProgress		Pokretanje instalacije.
+Are you sure you want to abort the installation?	InstallerWindow		Jeste li sigurni da želite prekinuti instalaciju?
+Stop	InstallerWindow		Stop
+\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+OK	InstallerApp		Uredu
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Izaberite izvor i odredišni disk iz pop-up izbornika.Zatim kliknite \"Počni\".
+\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
+Install from:	InstallerWindow		Instaliraj sa:
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld od %2ld
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VAŽNA INFORMACIJA PRIJE HAIKU INSTALACIJE\n\n
+Continue	InstallerWindow	In alert after pressing Stop	Nastavi
+Write boot sector to '%s'	InstallerWindow		Zapišite boot sektor na '%s'
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Izaberite disk izvora iz poo-up izbornika.Zatim kliknite \"Počni\".
+Quit	InstallerWindow		Isključi
+Welcome to the Haiku Installer!\n\n	InstallerApp		Dobrodošli u Haiku instaler!\n\n
+Boot sector successfully written.	InstallProgress		Boot sektor je uspješno zapisan.
+Performing installation.	InstallProgress		Vršim instalaciju.
+scanning…	InstallerWindow		skeniram...
+Set up boot menu	InstallerWindow		Postavljanje izbornika podizanja sustava
+Abort	InstallerWindow		Prekini
+Finishing Installation.	InstallProgress		Završavam instalaciju.
+\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <vaš omiljeni uređivač teksta> /etc/default/grub\n\n
+Restart	InstallerWindow		Ponovo pokreni
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Odredišni direktorij možda nema dovoljno prostara.Probajte izabrati drugi disk ili izaberite neinstaliranje neobaveznih stavki.
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 1\n
+The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk ne može biti montiran.Izaberite drugi disk.
+?? of ??	InstallerWindow	Unknown progress	?? od ??
+\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
+Show optional packages	InstallerWindow		Pokaži neobavezne pakete
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nije pronađena ijedna particija pogodna za instalaciju.Molim uredite particije i inicirajte barem jednu sa Be File sustavom.
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Iz pop-up izbornika izaberite disk na koji žekite instalirati.Zatim kliknite \"Počni\".
+Unknown Type	InstallProgress	Partition content type	Nepoznata vrsta
+<none>	InstallerWindow	No partition available	<nijedan>
+\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
+Installation canceled.	InstallProgress		Instalacija opozvana.
+Installer	System name		Instalacijski program
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Ne možete instalirati sadržaj diska na sami disk.Izaberite drugi disk.
+???	InstallerWindow	Unknown currently copied item	???
+\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" je broj particije, koji za GRUB 2 počinje sa \"1\"\n
+\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" je broj tvrdog diska, počevši sa\"0\".\n
+Hide optional packages	InstallerWindow		Sakrij neobavezne pakete.
+Restart system	InstallerWindow		Ponovo pokreni sustav
+OK	InstallerWindow		Uredu
+Set up partitions…	InstallerWindow		Postavi particije...
+The partition can't be mounted. Please choose a different partition.	InstallProgress		Particija se ne može montirati.molim izaberite drugu particiju.
+Install anyway	InstallProgress		Ipak instaliraj
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Došlo je do greške i instalacija nije dovršena:\n\Greška:   %s
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Pritisnite tipku Počni za instalaciju sa '%1s' na '%2s'.
+Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Uživajte i puno vam hvala na isprobavanju Haiku-a!Nadamo se da vam se sviđa!
+OK	InstallProgress		U redu
+Please choose target	InstallerWindow		Molim izaberite metu
+???	InstallerWindow	Unknown partition name	???
+Begin	InstallerWindow		Počni
+Write boot sector	InstallerWindow		Zapiši boot sektor
+Cancel	InstallerWindow		Odustani
+All hard disks start with \"hd\".\n	InstallerApp		Svi tvrdi diskovi počinju sa \"hd\".\n
+Continue	InstallerApp		Nastavi
+Additional disk space required: %s	InstallerWindow		Potreban dodatni prostor na disku: %s
+Cancel	InstallProgress		Odustani
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Ispod zaglavlja koje se ne smije uređivati,dodajte nešto poput ovih redaka:\n\n
+Are you sure you want to to stop the installation?	InstallerWindow		Jeste li sigurni da želite zaustaviti instalaciju?
+Tools	InstallerWindow		Alati

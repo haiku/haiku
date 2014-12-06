@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-GLTeapot	3675948244
+1	romanian	x-vnd.Haiku-GLTeapot	1557538833
 Upper center	TeapotWindow		Centru sus
 Lighting	TeapotWindow		Iluminare
 Off	TeapotWindow		Oprit
@@ -9,6 +9,7 @@ Blue	TeapotWindow		Albastru
 Gouraud shading	TeapotWindow		Umbrire Gouraud
 Quit	TeapotWindow		Părăsește
 Filled polygons	TeapotWindow		Poligoane completate
+Settings	TeapotWindow		Configurări
 Fog	TeapotWindow		Ceață
 File	TeapotWindow		Fișier
 Perspective	TeapotWindow		Perspectivă

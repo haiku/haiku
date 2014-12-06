@@ -1,33 +1,34 @@
-1	italian	x-vnd.Haiku-LaunchBox	2364133517
-Add button here	LaunchBox		Aggiungi un bottone qui
-Auto-raise	LaunchBox		Auto sollevamento
-Bummer	LaunchBox		Errore
-Cancel	LaunchBox		Cancella
-Clear button	LaunchBox		Cancella bottone
-Clone	LaunchBox		Clona
-Close	LaunchBox		Chiudi
-Description for '%3'	LaunchBox		Descrizione per '%3' 
-Failed to launch '%1'.\n\nError: 	LaunchBox		Fallito il lancio '%1'.\n\nError:
-Failed to launch 'something',error in Pad data.	LaunchBox		Fallito l'avvio di \"qualcosa\", errore nei dati del Pad.
-Failed to launch application with signature '%2'.\n\nError: 	LaunchBox		Fallito il lancio dell'applicazione con la firma '%2'.\n\nErrore:
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Fallito l'invio del comando 'open folder' al Tracker.\n\nErrore:
-Horizontal layout	LaunchBox		Disposizione orizzontale
-Icon size	LaunchBox		Dimensione icone
-Ignore double-click	LaunchBox		Ignora doppio click
-Name Panel	LaunchBox		Nome pannello
+1	italian	x-vnd.Haiku-LaunchBox	3241401664
 New	LaunchBox		Nuovo
+Set description…	LaunchBox		Imposta descrizione…
+Vertical layout	LaunchBox		Disposizione verticale
 OK	LaunchBox		OK
-Pad	LaunchBox		Pad
-Pad %1	LaunchBox		Pad %1
 Pad 1	LaunchBox		Pad 1
+last chance	LaunchBox		ultima possibilità
 Quit	LaunchBox		Esci
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Si è certi di voler chiudere questo pad?\n(Il pad non verrà ricordato.)
-Remove button	LaunchBox		Rimuovi bottone
-Set description…	LaunchBox		Imposta descrizione...
-Settings	LaunchBox		Impostazioni
+Open containing folder	LaunchBox		Apri cartella
+Clear button	LaunchBox		Cancella pulsante
+LaunchBox	System name		Launchbox
+Ignore double-click	LaunchBox		Ignora doppio clic
+Auto-raise	LaunchBox		Automaticamente in primo piano
 Show on all workspaces	LaunchBox		Mostra su tutti gli spazi di lavoro
 Show window border	LaunchBox		Mostra il bordo della finestra
-Vertical layout	LaunchBox		Disposizione verticale
-You can drag an icon here.	LaunchBox		E' possibile trascinare un'icona qui.
-last chance	LaunchBox		ultima possibilità
-launch popup	LaunchBox		lancia popup
+Pad	LaunchBox		Pad
+Icon size	LaunchBox		Dimensione icone
+Bummer	LaunchBox		Errore
+Cancel	LaunchBox		Annulla
+Remove button	LaunchBox		Elimina pulsante
+Horizontal layout	LaunchBox		Disposizione orizzontale
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nEsecuzione dell'applicazione con sigla '%2' fallita.\n\nErrore:
+Failed to launch '%1'.\n\nError:	LaunchBox		Esecuzione di '%1' fallita.\n\nError:
+Name Panel	LaunchBox		Nome pannello
+Add button here	LaunchBox		Aggiungi un pulsante in questa posizione
+Description for '%3'	LaunchBox		Descrizione per '%3' 
+Settings	LaunchBox		Impostazioni
+Failed to launch 'something', error in Pad data.	LaunchBox		Esecuzione di '????' fallita, errore nei dati del Pad.
+Pad %1	LaunchBox		Pad %1
+Close	LaunchBox		Chiudi
+You can drag an icon here.	LaunchBox		È possibile trascinare un'icona in questa posizione.
+Clone	LaunchBox		Clona
+launch popup	LaunchBox		esegui popup
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Si è certi di voler chiudere questo pad?\n(Il pad non sarà conservato.)

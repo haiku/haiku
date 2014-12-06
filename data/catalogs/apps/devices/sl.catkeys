@@ -1,0 +1,57 @@
+1	slovenian	x-vnd.Haiku-Devices	3720597334
+Manufacturer	DeviceSCSI		Proizvajalec
+Order by:	DevicesView		Razvrsti po:
+ACPI controller	Device		Krmilnik ACPI
+Memory controller	Device		Spominski krmilnik
+Driver used	DevicePCI		Gonilnik v rabi
+CD-ROM	DeviceSCSI		CD-ROM
+ISA bus	Device		Vodilo ISA
+ACPI bus	Device		Vodilo ACPI
+ISA bus	DevicesView		Vodilo ISA
+Computer	Device		Računalnik
+Unknown device	Device		Neznana naprava
+Processor	DeviceSCSI		Procesor
+Detailed	DevicesView		Podrobno
+Category	DevicesView		Kategorija
+Quit	DevicesView		Izhod
+Scanner	DeviceSCSI		Optični čitalnik
+Processor	Device		Procesor
+Bridge	DeviceSCSI		Most
+Not implemented	DevicePCI		Ni podprto
+Disk Drive	DeviceSCSI		Diskovni pogon
+Not implemented	DeviceACPI		Ni podprto
+Device name	DevicePCI		Ime naprave
+Display controller	Device		Zaslonski krmilnik
+Input device controller	Device		Krmilnik vhodnih naprav
+Network controller	Device		Omrežni krmilnik
+Device class	DeviceSCSI		Razred naprave
+Device name	DeviceACPI		Ime naprave
+Driver used	Device		Gonilnik v rabi
+Communications	DeviceSCSI		Komunikacije
+Bus	DevicesView		Vodilo
+Communication controller	Device		Komunikacijski krmilnik
+Manufacturer	DeviceACPI		Proizvajalec
+PCI bus	Device		Vodilo PCI
+None	Device		Noben
+PCI bus	DevicesView		Vodilo PCI
+ACPI bus	DevicesView		Vodilo ACPI
+Devices	System name		Naprave
+Multimedia controller	Device		Večpredstavnostni krmilnik
+Unknown	DevicePCI		Neznano
+Device name:	Device		Ime naprave:
+Computer	DevicesView		Računalnik
+Value	PropertyList		Vrednost
+Report compatibility	DevicesView		Poročaj o združljivosti
+Device	Device		Naprava
+Signal processing controller	Device		Krmilnik za obdelovanje signalov
+Serial bus controller	Device		Krmilnik serijskega vodila
+Device name	Device		Ime naprave
+Manufacturer	Device		Proizvajalec
+Manufacturer	DevicePCI		Proizvajalec
+Satellite communications controller	Device		Krmilnik za satelitsko komunikacijo
+Bridge	Device		Most
+Refresh devices	DevicesView		Osveži naprave
+Unknown device	DevicesView		Neznana naprava
+Tape Drive	DeviceSCSI		Tračni pogon
+Device name	DeviceSCSI		Ime naprave
+Devices	DevicesView		Naprave

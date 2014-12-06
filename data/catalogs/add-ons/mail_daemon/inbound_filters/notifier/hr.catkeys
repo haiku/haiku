@@ -1,0 +1,10 @@
+1	croatian	x-vnd.Haiku-NewMailNotification	3368431998
+{0, plural, one{# new message} other{# new messages}}	filter		{0, množina, jedna{# nova poruka} ostalo{# nove poruke}}
+Log window	ConfigView		Prozor prijave
+Method:	ConfigView		Metoda:
+Alert	ConfigView		Upozorenje
+none	ConfigView		nijedan
+You have {0, plural, one{# new message} other{# new messages}} for %account.	filter		Imate {0, množina, jedna{# nova poruka} ostalo{# nove poruke}} za %račun.
+New messages	filter		Nove poruke
+New mails notification	ConfigView		Obavijest o novim porukama
+OK	filter		U redu

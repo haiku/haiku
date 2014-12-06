@@ -1,8 +1,5 @@
-1	italian	x-vnd.Haiku-notification_server	906000487
-Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Impossibile avviare il monitoraggio delle schermate delle impostazioni. Il cambio dei filtri in tempo reale è stato disabilitato.
-Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Impossibile avviare il monitoraggio dei filtri. Il cambio dei filtri in tempo reale è stato disabilitato.
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Impossibile avviare il monitoraggio dei parametri generali.  Il cambio dei filtri in tempo reale è stato disabilitato.
-Darn.	NotificationWindow		Diamine
-Notification	NotificationWindow		Notifica
+1	italian	x-vnd.Haiku-notification_server	2022780929
+Warning	NotificationWindow		Attenzione
 OK	NotificationWindow		OK
-Warning	NotificationWindow		Avviso
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Impossibile monitorare le impostazioni generali.\nLe modifiche ai filtri in tempo reale sono state disattivate.
+Notification	NotificationWindow		Notifica

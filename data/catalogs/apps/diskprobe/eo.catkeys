@@ -1,0 +1,32 @@
+1	esperanto	x-vnd.Haiku-DiskProbe	3614290888
+Text	FindWindow		Teksto
+Find…	ProbeView		Trovi…
+Case sensitive	FindWindow		Usklecodistinga
+Cancel	OpenWindow		Nuligi
+Close	AttributeWindow		Fermi
+File	ProbeView		Dosiero
+File	FileWindow		Dosiero
+OK	DiskProbe		Bone
+Paste	ProbeView		Alglui
+PNG format	TypeEditors		PNG-a formato
+Stop	ProbeView		Halti
+Text	TypeEditors	This is the type of editor	Teksto
+Quit	FileWindow		Eliri
+Undo	ProbeView		Malfari
+Close	ProbeView		Fermi
+Copy	ProbeView		Kopii
+MIME type:	TypeEditors		MIME-tipo:
+New…	FileWindow		Nova…
+Open file…	FileWindow		Malfermi dosieron…
+Close	FileWindow		Fermi
+Icon	TypeEditors		Piktogramo
+OK	ProbeView		Bone
+Add	ProbeView		Aldoni
+Edit	ProbeView		Redakti
+Cancel	AttributeWindow		Nuligi
+Find	FindWindow		Trovi
+Remove	AttributeWindow		Forigi
+Print…	ProbeView		Presi…
+Redo	ProbeView		Refari
+File: 	ProbeView		Dosiero:
+Cancel	ProbeView		Nuligi

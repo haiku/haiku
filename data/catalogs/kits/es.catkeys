@@ -1,9 +1,8 @@
-1	spanish	x-vnd.Haiku-libbe	2677153267
-%.2f TiB	StringForSize		%.2f TiB
+1	spanish; castilian	x-vnd.Haiku-libbe	1448968507
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
-%d bytes	StringForSize		%d bytes
-Blue:	ColorControl		Azul:
 Green:	ColorControl		Verde:
+%.2f TiB	StringForSize		%.2f TiB
 Red:	ColorControl		Rojo:
+%3.2f MiB	StringForSize		%3.2f MiB
+Blue:	ColorControl		Azul:

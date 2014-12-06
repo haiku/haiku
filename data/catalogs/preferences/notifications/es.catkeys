@@ -1,0 +1,36 @@
+1	spanish; castilian	x-vnd.Haiku-Notifications	2718138102
+Notifications	GeneralView		Notificaciones
+seconds of inactivity	GeneralView		segundos de inactividad
+Revert	PrefletWin		revertir
+Mini icon	DisplayView		Mini icono
+Enable notifications	GeneralView		Permitir notificaciones
+Error	NotificationView		Error
+OK	GeneralView		Aceptar
+Type	NotificationView		Tipo
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		No se han podido parar las notificaciones porque no se ha podido contactar el servidor.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		No pudimos permitir notificacions porque no pudimos contactar el servidor.\nEste indica su InfoPopper instalación no era completa.
+Important	NotificationView		Importante
+Cannot disable notifications because the server can't be reached.	GeneralView		No pudimos inutilizar notificaciones porque no pudimos contactar el servidor.
+Progress	NotificationView		Progreso
+Last Received	NotificationView		Última Fecha
+General	PrefletView		General
+Display	PrefletView		Visualizador
+Search:	NotificationView		Buscar:
+Allowed	NotificationView		Permitido
+Yes	NotificationView		Sí
+Large icon	DisplayView		Icono grande
+Icon size:	DisplayView		Tamaño de icono:
+Hide notifications from screen after	GeneralView		Esconder notificaciones de pantalla después de
+Notifications	System name		Notificaciones
+Notifications	NotificationView		Notificaciones
+No	NotificationView		No
+Title	NotificationView		Título
+Information	NotificationView		Información
+Window width:	DisplayView		Ancho de ventana:
+Application	NotificationView		Aplicación
+Enabled	NotificationView		Permitido
+Unknown	NotificationView		Desconocido
+Enable notifications at startup	GeneralView		Activar notificaciones cuando empezar
+Notifications	PrefletView		Notificaciones
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		No pudimos encontrar el servidor de notificaciones, esto significa que su instalación InfoPopper no se completó correctamente.
+Applications	NotificationView		Applicaciones

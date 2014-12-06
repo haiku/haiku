@@ -1,13 +1,23 @@
-1	esperanto	x-vnd.Be-PSRV	1128772901
-All pages	ConfigWindow		Ĉiom da paĝoj
-Cancel	ConfigWindow		Nuligi
-Cancel	PrintServerApp		Nuligi
-No	PrintServerApp		Ne
-OK	ConfigWindow		Bone
-OK	PrintServerApp		Bone
-Page setup:	ConfigWindow		Paĝaj agordoj:
-Printer:	ConfigWindow		Printilo:
-Select a printer	ConfigWindow		Elektu printilon
+1	esperanto	x-vnd.Be-PSRV	169601089
 Undefined	ConfigWindow		Nedefinita
-Would you like to set one up now?	PrintServerApp		Ĉu vi volas agordi unu nun?
+Cancel	PrintServerApp		Nuligi
+Page setup:	ConfigWindow		Paĝaj agordoj:
+OK	ConfigWindow		Bone
+Cancel	ConfigWindow		Nuligi
 Yes	PrintServerApp		Jes
+Would you like to set one up now?	PrintServerApp		Ĉu vi volas agordi unu nun?
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Vertikale
+All pages	ConfigWindow		Ĉiom da paĝoj
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Usona letero
+Printer:	ConfigWindow		Printilo:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		Elektu printilon
+A4	ConfigWindow	ISO 216 paper size	A4
+No	PrintServerApp		Ne
+Landscape	ConfigWindow		Horizontale
+OK	PrintServerApp		Bone
+A1	ConfigWindow	ISO 216 paper size	A1
+A3	ConfigWindow	ISO 216 paper size	A3

@@ -1,0 +1,45 @@
+1	spanish; castilian	x-vnd.Haiku-ProcessController	2886374724
+Memory usage	ProcessController		Utilización de almacenamiento
+Idle priority	ProcessController		Prioridad Vacío
+Restart Deskbar	ProcessController		Reactivar Deskbar
+Custom priority	ProcessController		Prioridad personalizada
+This team is already gone…	ProcessController		Este equipo ya sale...
+Error saving file	ProcessController		Error cuando tratamos de gaurdar el archivo
+Real-time priority	ProcessController		Prioridad de Tiempo-Real
+Your setting file could not be saved!\n(%s)	ProcessController		¡Tu archivo de ajustes no pudo ser salvado!\n(%s)
+This thread is already gone…	ProcessController		Este hilo ya sale...
+Cancel	ProcessController		Cancelar
+Display priority	ProcessController		Prioridad de Muestra
+Run in window	ProcessController		Ejecutar en ventana
+Processor %d	ProcessController		Procesador %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		El Controlador de Procesos ya está instalado en barra de escritorio.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Este es la final procesador activo...\nNo puede desactivarlo!
+Info	ProcessController		Información
+Quit application	ProcessController		Salir applicación
+Low priority	ProcessController		Prioridad Baja
+What do you want to do with the thread \"%s\"?	ProcessController		¿Qué quiere hacer con el hilo \"%s\"?
+Gone teams…	ProcessController		Equipos salen...
+Lowest active priority	ProcessController		La prioridad activa más baja
+Restart Tracker	ProcessController		Reactivar Tracker
+Live in the Deskbar	ProcessController		Vivo en barra de escritorio
+Kill this thread!	ProcessController		Elimine este hilo!
+Debug this thread!	ProcessController		Depure este hilo!
+Normal priority	ProcessController		Prioridad Normal
+New Terminal	ProcessController		Terminal nuevo
+Urgent priority	ProcessController		Prioridad Urgente
+About ProcessController…	ProcessController		Sobre el Contralador de Procesos...
+Ok!	ProcessController		Vale!
+Quit an application	ProcessController		Salir una applicación
+Install in Deskbar	ProcessController		Instalar en barra de escritorio
+Threads and CPU usage	ProcessController		Hilos y utilización de CPU
+Urgent display priority	ProcessController		Prioridad de muestra Urgente
+OK	ProcessController		Aceptar
+Damned!	ProcessController		¡Ay caramba!
+Usage: %s [-deskbar]\n	ProcessController		Utilización: %s [-deskbar]\n
+ProcessController	System name		Controlador de Procesos
+Real-time display priority	ProcessController		Prioridad de muestra Tiempo-Real
+Please confirm	ProcessController		Por favor confirma
+System resources & caches…	ProcessController		Recursos de sistema y caches...
+That's no Fun!	ProcessController		¡No es divertido!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Puede ejecutar el Controlador de Procesos en una ventana o puede instalarlo en la Barra de escritorio.

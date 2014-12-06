@@ -1,0 +1,60 @@
+1	spanish; castilian	x-vnd.Haiku-Mail	3957822883
+Mail checking	Config Window		Comprobar correo
+Settings	Config Window		Configuración
+Never	Config Window	show status window	Nunca
+Only when dial-up is connected	Config Window		Solo cuando se está conectado por marcado de módem
+While sending and receiving	Config Window		Mientras se envíe y reciba
+days	Config Window		días
+Incoming	Config Window		Entrante
+OK	Config Window		Aceptar
+Start mail services on startup	Config Window		Iniciar los servicios de correo en el arranque
+E-mail address:	E-Mail		Dirección de correo:
+Account name:	E-Mail		Nombre de la cuenta:
+Account name:	Config Views		Nombre de la cuenta:
+Create new account	AutoConfigWindow		Crear una nueva cuenta
+OK	Config Views		Aceptar
+The filter could not be moved. Deleting filter.	Config Views		El filtro no se pudo mover. Eliminando el filtro.
+Revert	Config Window		Revertir
+Login name:	E-Mail		Nombre de usuario:
+Incoming	E-Mail		Entrante
+Password:	E-Mail		Contraseña:
+Accounts	Config Window		Cuentas
+Finish	AutoConfigWindow		Terminar
+Remove	Config Window		Eliminar
+Miscellaneous	Config Window		Varios
+Show connection status window:	Config Window		Mostrar ventana de estado de conexión:
+Server Name:	E-Mail		Nombre del servidor:
+While sending	Config Window		Mientras se envia
+Schedule outgoing mail when dial-up is disconnected	Config Window		Programar el Correo Saliente cuando el marcado de módem este desconectado
+hours	Config Window		horas
+Enter a valid e-mail address.	AutoConfigWindow		Introduzca una dirección de correo válida.
+Add	Config Window		Añadir
+Account settings	AutoConfigWindow		Configuración de la cuenta
+E-mail	System name		Correo electrónico
+never	Config Window	mail checking frequency	nunca
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nLa configuración general no se pudo revertir\n\nError al recuperar la configuración general:\n%s\n
+Real name:	Config Views		Nombre verdadero:
+\t\t· Outgoing	Config Window		\t\t· Saliente
+Choose Protocol	E-Mail		Seleccione protocolo
+Return address:	Config Views		Remitente:
+Edit mailbox menu…	Config Window		Editar menú del buzón de correo...
+Outgoing	E-Mail		Saliente
+\t\t· E-mail filters	Config Window		\t\t· Filtros de correo
+Remove	Config Views		Eliminar
+\t\t· Incoming	Config Window		\t\t· Entrante
+Next	AutoConfigWindow		Siguiente
+Check every	Config Window		Revisar cada
+Back	AutoConfigWindow		Anterior
+Incoming mail filters	Config Views		Filtros de correo entrante
+Account settings	Config Views		Configuraciónes de cuenta
+minutes	Config Window		minutos
+Error retrieving general settings: %s\n	Config Window		Error al recuperar la configuración general: %s\n
+Real name:	E-Mail		Nombre real:
+Apply	Config Window		Aplicar
+Always	Config Window		Siempre
+OK	AutoConfigWindow		Aceptar
+Add filter	Config Views		Agregar filtro
+Outgoing	Config Window		Saliente
+Outgoing mail filters	Config Views		Filtros de correo saliente
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nSe crea una cuenta nueva con el botón Agregar.\n\n Se elimina una cuenta en el botón Quitar del elemento seleccionado.\n\n Seleccione un elemento de la lista para cambiar su configuración.
+Error	Config Window		Error

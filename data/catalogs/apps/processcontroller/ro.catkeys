@@ -1,5 +1,6 @@
-1	romanian	x-vnd.Haiku-ProcessController	2886374724
+1	romanian	x-vnd.Haiku-ProcessController	4031596464
 Memory usage	ProcessController		Utilizarea memoriei
+Kill this team!	ProcessController		Omoară această echipă!
 Idle priority	ProcessController		Prioritate în așteptare
 Restart Deskbar	ProcessController		Repornește bara de desktop
 Custom priority	ProcessController		Prioritate personalizată
@@ -7,6 +8,7 @@ This team is already gone…	ProcessController		Această echipă este plecată d
 Error saving file	ProcessController		Eroare la salvarea fișierului
 Real-time priority	ProcessController		Prioritate în timp real
 Your setting file could not be saved!\n(%s)	ProcessController		Fișierul de configurare nu a putut fi salvat!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Ce doriți să faceți cu echipa \"%s\"?
 This thread is already gone…	ProcessController		Acest fir de execuție este plecat deja...
 Cancel	ProcessController		Anulează
 Display priority	ProcessController		Prioritate afișaj
@@ -18,7 +20,7 @@ This is the last active processor...\nYou can't turn it off!	ProcessController		
 Info	ProcessController		Detalii
 Quit application	ProcessController		Părăsește aplicația
 Low priority	ProcessController		Prioritate scăzută
-What do you want to do with the thread \"%s\"?	ProcessController		Ce doriți să faceți cu firul de execuție „%s”?
+What do you want to do with the thread \"%s\"?	ProcessController		Ce doriți să faceți cu firul de execuție \"%s\"?
 Gone teams…	ProcessController		Echipe plecate...
 Lowest active priority	ProcessController		Cea mai scăzută prioritate activă
 Restart Tracker	ProcessController		Repornește Tracker
@@ -32,10 +34,12 @@ About ProcessController…	ProcessController		Despre ControlerProces
 Ok!	ProcessController		OK!
 Quit an application	ProcessController		Părăsește o aplicație
 Install in Deskbar	ProcessController		Instalează pe bara de desktop
-Threads and CPU usage	ProcessController		Utilizare fire de execuție și procesor
+Threads and CPU usage	ProcessController		Utilizare fire de execuție și CPU
 Urgent display priority	ProcessController		Prioritate afișaj urgent
+Low latency	ProcessController		Latență scăzută
 OK	ProcessController		OK
 Damned!	ProcessController		Aiurea!
+Debug this team!	ProcessController		Depanează această echipă!
 Usage: %s [-deskbar]\n	ProcessController		Utilizare: %s [-deskbar]\n
 ProcessController	System name		ControlProcese
 Real-time display priority	ProcessController		Prioritate afișaj în timp real

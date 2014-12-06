@@ -1,0 +1,23 @@
+1	spanish; castilian	x-vnd.haiku-registrar	2599857937
+Restart system	ShutdownProcess		Reiniciar sistema
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		La aplicación \"%appName%\" puede estar bloqueada en un panel modal
+OK	ShutdownProcess		OK
+System is shut down	ShutdownProcess		El sistema está apagado
+It's now safe to turn off the computer.	ShutdownProcess		Es seguro apagar la computadora
+Cancel	ShutdownProcess		Cancelar
+Do you really want to shut down the system?	ShutdownProcess		¿Realmente quieres apagar el sistema?
+Asking other processes to quit.	ShutdownProcess		Solicitando que salgan a otros procesos
+Asking \"%appName%\" to quit.	ShutdownProcess		solicitando a \"%appName%\" a que salga
+%action%?	ShutdownProcess		%action%?
+Shutdown aborted	ShutdownProcess		Cancelado el apagado
+Restarting…	ShutdownProcess		Reiniciando...
+Asking background applications to quit.	ShutdownProcess		Solicitando a las aplicaciones de fondo que salgan.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		La aplicación \"%appName%\" a cancelado el proceso de apagado.
+Tidying things up a bit.	ShutdownProcess		Juntando un poco las cosas
+Do you really want to restart the system?	ShutdownProcess		¿Realmente quieres reiniciar el sistema?
+Shutdown status	ShutdownProcess		Estado de apagado
+Cancel shutdown	ShutdownProcess		Cancelar apagado
+Kill application	ShutdownProcess		Matar aplicación
+Shut down	ShutdownProcess		Apagar
+Restart	ShutdownProcess		Reiniciar
+Shutting down…	ShutdownProcess		Apagando...

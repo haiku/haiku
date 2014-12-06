@@ -1,0 +1,14 @@
+1	spanish; castilian	x-vnd.Haiku-desklink	3053930521
+Control physical output	MediaReplicant		Controlar salida física
+Couldn't launch 	MediaReplicant		No se puede lanzar
+OK	MediaReplicant		Aceptar
+Sound preferences…	MediaReplicant		Preferencias de sonido...
+%g dB	MediaReplicant		%g dB
+No media server running	VolumeControl		No hay un servidor multimedia ejecutándose
+Media preferences…	MediaReplicant		Preferencias multimedia...
+Open MediaPlayer	MediaReplicant		Abrir MediaPlayer
+desklink	MediaReplicant		desklink
+Options	MediaReplicant		Opciones
+%ld dB	VolumeControl		%ld dB
+Beep	MediaReplicant		Beep
+Volume	VolumeControl		Volumen

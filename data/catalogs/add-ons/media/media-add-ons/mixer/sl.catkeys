@@ -1,0 +1,8 @@
+1	slovenian	x-vnd.Haiku-mixer.media_addon	3490301070
+Linear interpolation	AudioMixer		Linearna interpolacija
+Resampling algorithm	AudioMixer		Algoritem prevzorčenja
+not connected	AudioMixer		ni povezave
+Drop/repeat samples	AudioMixer		Spuščaj oz. ponavljaj vzorce
+dB	AudioMixer		dB
+Mute	AudioMixer		Nemo
+Physical input channels	AudioMixer		Fizični vhodni kanali

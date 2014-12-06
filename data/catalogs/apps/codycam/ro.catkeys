@@ -9,7 +9,7 @@ Login:	CodyCam		Autentificare:
 Format:	CodyCam		Format:
 Every 2 hours	CodyCam		La fiecare 2 ore
 Closing the window\n	VideoConsumer.cpp		Se închide fereastra\n
-login ID expected	CodyCam		ID de autentificare așteptat
+login ID expected	CodyCam		așteptat ID de autentificare
 Rate:	CodyCam		Cotă:
 JPEG image	CodyCam		Imagine JPEG
 Capture Rate Menu	CodyCam		Meniul cotei de capturare
@@ -60,7 +60,7 @@ Error setting type of output file	VideoConsumer.cpp		Eroare la setarea tipului p
 upload client name expected	CodyCam		nume de client pentru încărcare așteptat
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Conectat...
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suprimată> (parolă reală trimisă)\n
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed> (parolă reală trimisă)\n
 Every 5 minutes	CodyCam		La fiecare 5 minute
 read: %d\n	SftpClient		citește: %d\n
 Capture controls	CodyCam		Controale de captură

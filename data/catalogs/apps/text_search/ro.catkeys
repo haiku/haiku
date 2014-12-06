@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku.TextSearch	1180598828
+1	romanian	x-vnd.Haiku.TextSearch	2496563907
 %s: Not enough room to escape the filename.	Grepper		%s: Nu există spațiu suficient pentru a tasta numele de fișier.
 Trim to selection	GrepWindow		Potrivește la selecție
 Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
@@ -8,6 +8,7 @@ The unselected files will be removed from the list.	GrepWindow		Fișierele nesel
 Set target…	GrepWindow		Configurează destinație...
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Selectați fișierele pe care le doriți selectate pentru dumneavoastră în Tracker.
 Open files in Pe	GrepWindow		Deschide fișiere în Pe
+%appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		Copiază text la clipboard
 Settings	GrepWindow		Configurări
 Select all	GrepWindow		Selectează tot
@@ -31,3 +32,4 @@ Show files in Tracker	GrepWindow		Afișează fișiere în Agentul de urmărire
 Case-sensitive	GrepWindow		Sensibil la majuscule
 Text files only	GrepWindow		Numai fișiere text
 Show lines	GrepWindow		Afișează linii
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

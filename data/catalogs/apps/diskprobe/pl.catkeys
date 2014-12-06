@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DiskProbe	1806743923
+1	polish	x-vnd.Haiku-DiskProbe	2944605311
 File offset: 	ProbeView		Przesunięcie pliku: 
 %ld (native)	ProbeView		%ld (natywny)
 64 bit unsigned value:	TypeEditors		64-bitowa wartość bez znaku:
@@ -98,6 +98,7 @@ Base	ProbeView	A menu item, the number that is basis for a system of calculation
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Widok obrazu
 Cancel	AttributeWindow		Anuluj
 Type editor not supported	ProbeView		Edytor typu nieobsługiwany
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Rozmiar bloku
 MIME type editor	TypeEditors		Edytor typu MIME
 Swapped: %Ld (0x%0*Lx)	ProbeView		Zamienione: %Ld (0x%0*Lx)
 Find	FindWindow		Wyszukaj

@@ -1,0 +1,12 @@
+1	slovenian	x-vnd.Haiku-CPUFrequencyPref	560974727
+Ok	Status view		V redu
+CPU frequency status view	CPU Frequency View		Stanje frekvence CPE
+OK	Status view		V redu
+Set state	Status view		Nastavi stanje
+Defaults	Pref Window		Privzete vrednosti
+Quit	Status view		Izhod
+High performance	Status view		Visoka hitrost
+Dynamic performance	Status view		Prilagojena hitrost
+Revert	Pref Window		Povrni
+Low energy	Status view		Nizka poraba energije
+CPUFrequency	System name		Frekvenca CPE

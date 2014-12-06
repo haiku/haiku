@@ -1,0 +1,21 @@
+1	spanish; castilian	x-vnd.Haiku-FontDemo	1300625863
+Outline:	ControlView		Esquema:
+Size: 50	ControlView		Tamaño: 50
+Stop cycling	ControlView		Detener ciclo
+Shear: 90	ControlView		Corte: 90
+Spacing: 0	ControlView		Espacio: 0
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Rotación: %d
+Shear: %d	ControlView		Corte: &d
+Spacing: %d	ControlView		Espacio: %d
+Cycle fonts	ControlView		Ciclar tipos de letra
+Font:	ControlView		Tipo de letra:
+Rotation: 0	ControlView		Rotación: %d
+Drawing mode:	ControlView		Modo de dibujo:
+Haiku, Inc.	ControlView		Haiku, Inc.
+Controls	FontDemo		Controles
+Outline: %d	ControlView		Esquema: %d
+Text:	ControlView		Text:
+Antialiased text	ControlView		Texto suavizado
+Bounding boxes	ControlView		Cajas con bordes
+Size: %d	ControlView		Tamaño: %d

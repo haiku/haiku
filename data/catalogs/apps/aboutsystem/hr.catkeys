@@ -1,46 +1,83 @@
-1	croatian	x-vnd.Haiku-About	356695232
-%.2f GHz	AboutView		%.2f GHz
-%d MiB total	AboutView		%d MiB ukupno
-%d MiB used (%d%%)	AboutView		%d MiB korišteno (%d%%)
-%ld MHz	AboutView		%ld MHz
-%ld Processors:	AboutView		%ld Procesori:
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%ukupno MiB ukupno, %nepristupačno MiB nepristupačno
-... and the many people making donations!\n\n	AboutView		... i mnogi ljudi koji su donirali!\n\n
-About this system	AboutWindow		O ovom sustavu
-BSD (4-clause)	AboutView		BSD (4-clause)
-Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. i njihovom razvojnom timu,jer su napravili BeOS!\n\n
-Contributors:\n	AboutView		Doprinositelji:\n
-Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Autorska prava © 1994-1997 Mark Kilgard.Sva prava pridržana.
-Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Autorska prava © 1994-2008 Xiph.Org.Sva prava pridržana.
-Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Autorska prava © 1995-2001  Lars Düning.Sva prava pridržana.
-Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Autorska prava © 1995-2004 Jean-loup Gailly and Mark Adler.
-Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Autorska prava © 1996-1997 Jeff Prosise.Sva prava pridržana.
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Autorska prava © 1998-2003 Daniel Veillard.Sva prava pridržana.
-Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Autorska prava © 1999-2000  Y.Takagi.Sva prava pridržana.
-Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Autorska prava © 1999-2007 Michael C. Ring.Sva prava pridržana.
-Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Autorska prava © 2002-2003 Steve Lhomme.Sva prava pridržana.
-Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Autorska prava © 2002-2006 Maxim Shemanarev (McSeem).
-Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Autorska prava © 2002-2008  Alexander L. Roshal.Sva prava pridržana.
-Current maintainers:\n	AboutView		Trenutni održavatelji
-GCC %d Hybrid	AboutView		GCC %d hibridni
-Kernel:	AboutView		Kernel:
-License: 	AboutView		Licenca:
-Licenses: 	AboutView		Licence:
-Memory:	AboutView		Memorija:
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (utemeljitelj projekta)\n\n
-Past maintainers:\n	AboutView		Bivši održavatelji:\n
-Processor:	AboutView		Procesor:
-Revision	AboutView		Revizija
-Source Code: 	AboutView		Izvorni kod:
-The BeGeistert team\n	AboutView		BeGeistert tim\n
-The Haiku-Ports team\n	AboutView		Haiku-Ports tim\n
-The Haikuware team and their bounty program\n	AboutView		Haikuware tim i njihov darežljivi program\n
-The University of Auckland and Christof Lutteroth\n\n	AboutView		Sveučilište u  Auckland-u i Christof Lutteroth\n\n
-Translations:\n	AboutView		Prijevodi:\n
+1	croatian	x-vnd.Haiku-About	1162882847
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Autorsko pravo © 1999-2010 Gutenprint autora. Sva prava pridržana.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i njegov NewOS kernel)\n
-Unknown	AboutView		Nepoznato
-Version:	AboutView		Verzija:
+Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Autorska prava © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Autorska prava © 1996-2005 Julian R Seward.Sva prava pridržana.
+%d MiB total	AboutView		%d MiB ukupno
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (utemeljitelj projekta)\n\n
+Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Autorska prava © 1998-2003 Daniel Veillard.Sva prava pridržana.
+%d MiB used (%d%%)	AboutView		%d MiB korišteno (%d%%)
 Website, marketing & documentation:\n	AboutView		Web stranica, marketing i dokumentacija:\n
-\nCopyrights\n\n	AboutView		\Autorska prava\n\n
+AboutSystem	System name		O sustavu
+Copyright © 2003 Peter Hanappe and others.	AboutView		Autorska prava © 2003 Peter Hanappe i ostali.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Autorska prava © 1994-1997 Mark Kilgard.Sva prava pridržana.
+Revision	AboutView		Revizija
+Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Autorska prava © 2002-2005 Industrial Light & Magic, odjel Lucas Digital Ltd. LLC.
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. i njihovom razvojnom timu, jer su napravili BeOS!\n\n
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Autorska prava © 1999-2000 Y.Takagi. Sva prava pridržana.
+Source Code: 	AboutView		Izvorni kod: 
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, množina, jedan{Processor:} ostalo{# Procesori:}}
+Kernel:	AboutView		Kernel:
+Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Autorska prava © 2001-2002 Thomas Broyer, Charlie Bozeman i Daniel Veillard. Sva prava pridržana.
+Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Dijelovi ovog software-a su pod autorskim pravima.\nAutorska prava © 1996-2006 The FreeType Project.Sva prava pridržana.
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Autorska prava na Haiku kod su vlasništvo Haiku, Inc. ili poštovanih autora gdje je to naznačeno u izvornom kodu. Haiku® and the HAIKU logo® su registrirani zaštitni znaci Haiku, Inc.\n
+Marvell (firmware)	AboutWindow		Marvell (firmware)
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Autorska prava © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nSva prava pridržana.
+GNU LGPL v2	AboutWindow		GNU LGPL v2
+The HaikuPorts team\n	AboutView		Haiku-Ports tim\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB ukupno, %inaccessible MiB nepristupačno
+Intel (2xxx firmware)	AboutWindow		Intel (2xxx firmware)
+Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Autorska prava © 2000-2007 Fabrice Bellard, et al.
+Contributors:\n	AboutView		Doprinositelji:\n
+Unknown	AboutView		Nepoznato
+Copyright © 2001-2003 Expat maintainers.	AboutView		Autorska prava © 2001-2003 Expat održavatelji.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Autorska prava © 1999-2006 Brian Paul. Mesa3D projekt. Sva prava pridržana.
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Autorska prava © 2002-2004 Vivek Mohan. Sva prava pridržana.
+Public Domain	AboutWindow		Javna domena
+Intel (firmware)	AboutWindow		Intel (firmware)
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Memorija:
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Autorska prava © 1996-1997 Jeff Prosise.Sva prava pridržana.
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Autorska prava © 2006-2012 Kentaro Fukuchi
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Autorsk prava © 1994-2009, Thomas G. Lane, Guido Vollbeding.Ovaj software je temeljen na dijelu rada Independent JPEG Group.
+Past maintainers:\n	AboutView		Bivši održavatelji:\n
+GNU GPL v3	AboutWindow		GNU GPL v3
 \n\nSpecial thanks to:\n	AboutView		\n\nPosebna zahvala:\n
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… i vjerojatno još neki koje smo zaboravili spomenuti (oprostite!)\n\n
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…i vjerojatno još neki koje smo zaboravili spomenuti (oprostite!)\n\n
+Licenses: 	AboutView		Licence: 
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Autorska prava © 1995-2004 Jean-loup Gailly and Mark Adler.
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Autorska prava © 2002-2003 Steve Lhomme.Sva prava pridržana.
+\nCopyrights\n\n	AboutView		\Autorska prava\n\n
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Autorska prava © 2007-2009 Marvell Semiconductor, Inc. Sva prava pridržana.
+Current maintainers:\n	AboutView		Trenutni održavatelji:\n
+Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Autorska prava © 2006-2007 Intel Corporation. Sva prava pridržana.
+Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Sadrži software koji je razvio  NetBSD Foundation, Inc. i njihovi doprinositelji:\nftp, tput\nAutorska prava © 1996-2008 The NetBSD Foundation, Inc. Sva prava pridržana.
+Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Sadrži software iz FreeBSD projekta, objavljenog pod BSD licencom:\ncal, ftpd, ping, telnet, telnetd, traceroute\nAutorska prava © 1994-2008 The FreeBSD Project. Sva prava pridržana.
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google i njhovi Google Summer of Code i Google Code In programi\n
+The Haikuware team and their bounty program\n	AboutView		Haikuware tim i njihov darežljivi program\n
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Autorska prava © 1995, 1998-2001 Jef Poskanzer. Sva prava pridržana.
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Autorska prava © 2010-2011 Google Inc. Sva prava pridržana.
+About this system	AboutWindow		O ovom sustavu
+Version:	AboutView		Verzija:
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Autorska prava © 1994-2008 Xiph.Org.Sva prava pridržana.
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Autorska prava © 1998-2000 Thai Open Source Software Center Ltd i Clark Cooper.
+Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Autorska prava © 2004-2005 Intel Corporation. Sva prava pridržana.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Autorska prava © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Autorska prava © 1999-2007 Michael C. Ring.Sva prava pridržana.
+The BeGeistert team\n	AboutView		BeGeistert tim\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		Sveučilište u Aucklandu i Christof Lutteroth\n\n
+Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Autorska prava © 1990-2003 Wada Laboratory, Sveučilište Tokyo.
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Autorska prava © 1995-2001 Lars Düning.Sva prava pridržana.
+GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
+Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Autorska prava © 2002-2008  Alexander L. Roshal.Sva prava pridržana.
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		 Autorska prava © 2003-2006 Intel Corporation. Sva prava pridržana.
+%ld MHz	AboutView		%ld MHz
+Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Autorska prava © 1997-2006 PDFlib GmbH and Thomas Merz. Sva prava pridržana.\nPDFlib and PDFlib logo su registrirani zaštitni znaci PDFlib GmbH.
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Autorska prava © 1991-2000 Silicon Graphics, Inc. Sva prava pridržana.
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Sadrži software iz GNU projekta,objavljenih pod GPL i LGPL licencama:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nAutorska prava © The Free Software Foundation.
+…and the many people making donations!\n\n	AboutView		... i mnogi ljudi koji su donirali!\n\n
+MIT license. All rights reserved.	AboutView		MIT licenca.Sva prava pridržana.
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		 Autorska prava © 2007 Ralink Technology Corporation. Sva prava pridržana.
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Autorska prava © 1990-2002 Info-ZIP.Sva prava pridržana.
+License: 	AboutView		Licenca: 
+Translations:\n	AboutView		Prijevodi:\n

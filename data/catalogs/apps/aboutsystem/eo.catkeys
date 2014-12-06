@@ -1,36 +1,29 @@
-1	esperanto	x-vnd.Haiku-About	3304165178
-%.2f GHz	AboutView		%.2f GHz
+1	esperanto	x-vnd.Haiku-About	2679163538
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (kaj lia NewOS kerno)\n
 %d MiB total	AboutView		%d MiBajtoj ĉiomaj
-%d MiB used (%d%%)	AboutView		%d MiBajtoj uzataj (%d%%)
-%ld MHz	AboutView		%ld MHz
-%ld Processors:	AboutView		%ld procesoroj:
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiBajtoj ĉiomaj, %inaccessible MiBajtoj nehaveblaj
-... and the many people making donations!\n\n	AboutView		...kaj la multaj donacantoj!\n\n
-About this system	AboutWindow		Pri la sistemo
-Contributors:\n	AboutView		Kontribuantoj:\n
-Current maintainers:\n	AboutView		Vartantoj:\n
-GCC %d Hybrid	AboutView		GCC %d Hibrido
-Google & their Google Summer of Code program\n	AboutView		Google kaj lia Somero de Fontkodo\n
-Kernel:	AboutView		Kerno:
-License: 	AboutView		Permesilo: 
-Licenses: 	AboutView		Permesiloj: 
-Memory:	AboutView		Memoro:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projekta fondinto)\n\n
-Past maintainers:\n	AboutView		Vartintoj:\n
-Processor:	AboutView		Procesoro:
+%d MiB used (%d%%)	AboutView		%d MiBajtoj uzataj (%d%%)
+Website, marketing & documentation:\n	AboutView		Retejo, merkatiko kaj dokumentado:\n
 Revision	AboutView		Revizio
 Source Code: 	AboutView		Fontkodo: 
-The BeGeistert team\n	AboutView		La grupo BeGeistert\n
-The Haiku-Ports team\n	AboutView		La Hajku-Portantaro\n
-The Haikuware team and their bounty program\n	AboutView		La Haikuware grupo kaj ilia premia programo\n
-The University of Auckland and Christof Lutteroth\n\n	AboutView		la Universitato de Aŭklando kaj Christof Lutteroth\n\n
-Time running:	AboutView		Ruldaŭro:
-Translations:\n	AboutView		Tradukoj:\n
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (kaj lia NewOS kerno)\n
+Kernel:	AboutView		Kerno:
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiBajtoj ĉiomaj, %inaccessible MiBajtoj nehaveblaj
+Contributors:\n	AboutView		Kontribuantoj:\n
 Unknown	AboutView		Nekonata
-Version:	AboutView		Versio:
-Website, marketing & documentation:\n	AboutView		Retejo, merkatiko kaj dokumentado:\n
-[Click a license name to read the respective license.]\n\n	AboutView		[Alklaku la nomon de la permesilo pro legi ĝin.]\n\n
-\nCopyrights\n\n	AboutView		\nAŭtorrajtoj\n\n
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Memoro:
+Past maintainers:\n	AboutView		Vartintoj:\n
 \n\nSpecial thanks to:\n	AboutView		\n\nDankegon al:\n
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…kaj sendube aliaj, kiujn ni forgesis mencii (ni bedaŭras!)\n\n
+Licenses: 	AboutView		Permesiloj: 
+\nCopyrights\n\n	AboutView		\nAŭtorrajtoj\n\n
+Current maintainers:\n	AboutView		Vartantoj:\n
+Time running:	AboutView		Ruldaŭro:
+The Haikuware team and their bounty program\n	AboutView		La Haikuware grupo kaj ilia premia programo\n
+About this system	AboutWindow		Pri la sistemo
+Version:	AboutView		Versio:
+The BeGeistert team\n	AboutView		La grupo BeGeistert\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		la Universitato de Aŭklando kaj Christof Lutteroth\n\n
+%ld MHz	AboutView		%ld MHz
+[Click a license name to read the respective license.]\n\n	AboutView		[Alklaku la nomon de la permesilo pro legi ĝin.]\n\n
+License: 	AboutView		Permesilo: 
+Translations:\n	AboutView		Tradukoj:\n

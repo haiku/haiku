@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	979407669
+1	hungarian	x-vnd.Haiku-WebPositive	98059607
 Show home button	Settings Window		Kezdőlap-gomb megjelenítése
 Username:	Authentication Panel		Felhasználónév:
 Copy URL to clipboard	Download Window		Cím másolása a vágólapra
@@ -19,6 +19,7 @@ Paste	WebPositive Window		Beillesztés
 Double-click or middle-click to open new tab.	Tab Manager		Új fül dupla kattintással vagy az egér középső gombjával.
 Proxy username:	Settings Window		Felhasználónév a proxyhoz:
 Save page as…	WebPositive Window		Oldal mentése…
+Over %days left	Download Window		Több, mint %days nap van hátra
 Settings	Settings Window		Beállítások
 Confirmation	WebPositive Window		Megerősítés
 Window	WebPositive Window		Ablak
@@ -109,6 +110,7 @@ Password:	Authentication Panel		Jelszó:
 Back	WebPositive Window		Előző
 New browser window	Download Window		Új böngészőablak
 Today	WebPositive Window		Ma
+Over %hours left	Download Window		Több, mint %hours óra van hátra
 Remember username and password for this site	Authentication Panel		Felhasználói név és jelszó megjegyzése
 Earlier	WebPositive Window		Korábban
 Authentication required	Authentication Panel		Hitelesítés szükséges
@@ -116,6 +118,7 @@ Use proxy server to connect to the internet	Settings Window		Proxy használata a
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Letöltés van folyamatban. Biztosan be akarja zárni a programot?
 Auto-hide interface in full screen mode	Settings Window		Vezérlők elrejtése teljes képernyős módban
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url betöltése sikertelen
+%seconds left	Download Window		%seconds másodperc van hátra
 New tab	WebPositive Window		Új fül
 Downloads in progress	WebPositive		Letöltés folyamatban
 Style:	Font Selection view		Stílus:

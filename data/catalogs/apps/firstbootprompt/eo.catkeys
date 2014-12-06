@@ -1,6 +1,5 @@
-1	esperanto	x-vnd.Haiku-FirstBootPrompt	1972532432
-Desktop (Live-CD)	BootPromptWindow		Labortablo (Viva Lumdisko)
-Keymap	BootPromptWindow		Klavara aranĝo
+1	esperanto	x-vnd.Haiku-FirstBootPrompt	416868896
 Language	BootPromptWindow		Lingvo
-Run Installer	BootPromptWindow		Lanĉi Instalilon
 Welcome to Haiku!	BootPromptWindow		Bonvenon ĉe Haiku!
+Run Installer	BootPromptWindow		Lanĉi Instalilon
+Keymap	BootPromptWindow		Klavara aranĝo

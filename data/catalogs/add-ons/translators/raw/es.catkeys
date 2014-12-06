@@ -1,0 +1,9 @@
+1	spanish; castilian	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		Configuración RAWTranslato
+Version %d.%d.%d, %s	ConfigView		Versión %d.%d.%d, %s
+RAW image translator	RAWTranslator		Traductor de imagen RAW
+RAW Settings	RAWTranslator main		Configuración RAW
+RAW images	RAWTranslator		Imágenes RAW
+RAW image translator	ConfigView		Traductor de imagen RAW
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	imagen RAW de %s
+Based on Dave Coffin's dcraw 8.63	ConfigView		Basado en dcraw 8.63 de Dave Coffin

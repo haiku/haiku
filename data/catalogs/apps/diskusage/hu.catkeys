@@ -1,5 +1,7 @@
-1	hungarian	x-vnd.Haiku-DiskUsage	1989103787
+1	hungarian	x-vnd.Haiku-DiskUsage	4126084555
 Scanning %refName%	Scanner		%refName% elemzése
+%size% in {0, plural, one{# file} other{# files}	Info Window		%size% {0, plural, one{# fájl} other{# fájl}}
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d fájl
 Size	Info Window		Méret
 Rescan	Pie View		Újraelemzés
 Kind	Info Window		Típus

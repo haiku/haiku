@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DiskProbe	1806743923
+1	finnish	x-vnd.Haiku-DiskProbe	2944605311
 File offset: 	ProbeView		Tiedostosiirros: 
 %ld (native)	ProbeView		%ld (alkuperäinen)
 64 bit unsigned value:	TypeEditors		64-bittinen etumerkitön arvo:
@@ -98,6 +98,7 @@ Base	ProbeView	A menu item, the number that is basis for a system of calculation
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Kuvanäkymä
 Cancel	AttributeWindow		Peru
 Type editor not supported	ProbeView		Tyyppimuokkainta ei tueta
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Lohkokoko
 MIME type editor	TypeEditors		MIME-tyyppimuokkain
 Swapped: %Ld (0x%0*Lx)	ProbeView		Siiretty näennäismuistiin: %Ld (0x%0*Lx)
 Find	FindWindow		Haku

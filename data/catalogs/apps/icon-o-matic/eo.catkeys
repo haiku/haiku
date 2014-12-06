@@ -1,0 +1,37 @@
+1	esperanto	x-vnd.haiku-icon_o_matic	1487435626
+Color (#%02x%02x%02x)	Style name after dropping a color		Koloro (#%02x%02x%02x)
+Add	Icon-O-Matic-StylesList		Aldoni
+Closed	Icon-O-Matic-PropertyNames		Fermita
+Duplicate	Icon-O-Matic-ShapesList		Duobligi
+Move	Icon-O-Matic-TransformationBoxStates		Movi
+OK	Icon-O-Matic-ColorPicker		Bone
+Error: 	Icon-O-Matic-Main		Eraro:
+Name	Icon-O-Matic-PropertyNames		Nomo
+Cancel	Icon-O-Matic-SVGExport		Nuligi
+Undo	Icon-O-Matic-Main		Malfari
+Cancel	Icon-O-Matic-Menu-Settings		Nuligi
+Remove	Icon-O-Matic-StylesList		Forigi
+Remove	Icon-O-Matic-PathsList		Forigi
+Quit	Icon-O-Matic-Menu-File		Eliri
+No	Icon-O-Matic-StyledTextImport		Ne
+Add	Icon-O-Matic-TransformersList		Aldoni
+Color	Icon-O-Matic-StyleTypes		Koloro
+Settings…	Icon-O-Matic-SavePanel		Agordoj…
+Remove	Icon-O-Matic-PathManipulator		Forigi
+Save	Icon-O-Matic-Menu-Settings		Konservi
+Cancel	Icon-O-Matic-ColorPicker		Nuligi
+Paste	Icon-O-Matic-Properties		Alglui
+File	Icon-O-Matic-Menus		Dosiero
+Error: 	Icon-O-Matic-Exporter		Eraro:
+Add	Icon-O-Matic-PathsList		Aldoni
+Remove	Icon-O-Matic-ShapesList		Forigi
+Yes	Icon-O-Matic-StyledTextImport		Jes
+Duplicate	Icon-O-Matic-StylesList		Duobligi
+Color	Icon-O-Matic-PropertyNames		Koloro
+Redo	Icon-O-Matic-Main		Refari
+OK	Icon-O-Matic-SVGImport		Bone
+Duplicate	Icon-O-Matic-PathsList		Duobligi
+Save	Icon-O-Matic-Menu-File		Konservi
+Overwrite	Icon-O-Matic-SVGExport		Anstataŭigi
+Open…	Icon-O-Matic-Menu-File		Malfermi…
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Koloro (#%02x%02x%02x)

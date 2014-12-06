@@ -1,25 +1,31 @@
-1	italian	x-vnd.Haiku-Locale	2295953467
-12 hour	TimeFormatSettings		12 ore
-24 hour	TimeFormatSettings		24 ore
+1	italian	x-vnd.Haiku-Locale	1488345554
 Available languages	Locale Preflet Window		Lingue disponibili
-Currency	TimeFormatSettings		Valuta
-Date	TimeFormatSettings		Data
-Defaults	Locale Preflet Window		Predefiniti
-Formatting	Locale Preflet Window		Formattazione
-Full format:	TimeFormatSettings		Formato grande:
-Language	Locale Preflet Window		Lingua
-Locale	Locale Preflet		Localizzazione
-Locale	Locale Preflet Window		Localizzazione
-Long format:	TimeFormatSettings		Formato esteso:
-Medium format:	TimeFormatSettings		Formato medio:
 Negative:	TimeFormatSettings		Negativo:
-Numbers	TimeFormatSettings		Numeri
-OK	Locale Preflet Window		OK
-Positive:	TimeFormatSettings		Positivo:
-Preferred languages	Locale Preflet Window		Lingue preferite
-Revert	Locale Preflet Window		Ripristina
-Short format:	TimeFormatSettings		Formato sintetico:
-Time	TimeFormatSettings		Ora
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La lista delle lingue disponibili non è stata trovata! La preflet è inutilizabile!
-Use month/day-names from preferred language	TimeFormatSettings		Usa nomi-mese/giorno dalla lingua preferita
 already chosen	LanguageListView		già scelto
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La lista delle lingue disponibili non è stata trovata! La preflet è inutilizabile!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Affinché le modifiche abbiano effetto occorre riavviare la Deskbar e il Tracker. Volete riavviarli ora?
+Long format:	TimeFormatSettings		Formato esteso:
+Currency	TimeFormatSettings		Valuta
+Locale	System name		Locale
+Short format:	TimeFormatSettings		Formato sintetico:
+Language	Locale Preflet Window		Lingua
+Preferred languages	Locale Preflet Window		Lingue preferite
+Use month/day-names from preferred language	TimeFormatSettings		Usa nomi-mese/giorno dalla lingua preferita
+Formatting	Locale Preflet Window		Formattazione
+Locale	Locale Preflet Window		Localizzazione
+Numbers	TimeFormatSettings		Numeri
+24 hour	TimeFormatSettings		24 ore
+OK	Locale Preflet Window		OK
+Restart	Locale Preflet Window		Riavvia
+Full format:	TimeFormatSettings		Formato grande:
+Defaults	Locale Preflet Window		Predefiniti
+Cancel	Locale Preflet Window		Annulla
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Traduci i nomi dei programmi e delle cartelle nella Deskbar e nel Tracker.
+Revert	Locale Preflet Window		Ripristina
+Medium format:	TimeFormatSettings		Formato medio:
+12 hour	TimeFormatSettings		12 ore
+Time	TimeFormatSettings		Ora
+Date	TimeFormatSettings		Data
+Positive:	TimeFormatSettings		Positivo:
+Locale	Locale Preflet		Localizzazione
+Options	Locale Preflet Window		Opzioni

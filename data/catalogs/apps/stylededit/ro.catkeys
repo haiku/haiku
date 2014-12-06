@@ -1,9 +1,10 @@
-1	romanian	x-vnd.Haiku-StyledEdit	3019034824
+1	romanian	x-vnd.Haiku-StyledEdit	1157359136
 StyledEdit	System name		EditorText
 Paste	Menus		Lipește
 OK	LoadAlert		OK
 File	Menus		Fișier
 ???	LoadAlert		???
+Modified	StatusView		Modificat
 Lines:	Statistics		Linii:
 Italic	Menus		Cursiv
 Left	Menus		Stânga
@@ -16,17 +17,19 @@ Can't undo	Menus		Nu se poate reface
 Save	Menus		Salvează
 Replace with:	FindandReplaceWindow		Înlocuiește cu:
 Cancel	SaveAlert		Anulează
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, nu s-a găsit fișierul: „%s”.
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, nu s-a găsit fișierul: \"%s\".
 Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
 Green	Menus		Verde
+Reload	NodeMonitorAlerts		Reîncărcare
 Yellow	Menus		Galben
 Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
 Wrap lines	Menus		Încadrează linii
 Quit	Menus		Părăsește
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Fișierul \"%file%\" a fost eliminat de altă aplicație, îl recuperați?
 Document statistics	Statistics		Statistici document
 Cancel	RevertToSavedAlert		Anulează
 Document	Menus		Document
-Save changes to the document \"%s\"? 	QuitAlert		Se salvează modificările la documentul „%s”?
+Save changes to the document \"%s\"? 	QuitAlert		Se salvează modificările la documentul \"%s\"? 
 Edit	Menus		Editează
 Font	Menus		Font
 Replace all	FindandReplaceWindow		Înlocuiește tot
@@ -34,10 +37,11 @@ Statistics…	Menus		Statistici...
 Default	Open_and_SaveAsPanel		Implicit
 Replace next	Menus		Înlocuiește următorul
 Cancel	FindandReplaceWindow		Anulează
+Text encoding	Menus		Codare text
 Close	Menus		Închide
 Save	SaveAlert		Salvează
 Words:	Statistics		Cuvinte:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Eroare la încărcarea lui „%s":\n\tFormat nesuportat
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Eroare la încărcarea lui \"%s\":\n\tFormat nesuportat
 OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Nu salva
 Align	Menus		Aliniază
@@ -47,7 +51,9 @@ OK	QuitAlert		OK
 Open…	Menus		Deschide...
 Center	Menus		Centru
 Blue	Menus		Albastru
+Unable to unlock file\n\t%s	QuitAlert		Nu s-a putut debloca fișierul\n\t%s
 Cyan	Menus		Cyan
+line %d, column %d	StatusView		linia %d, coloana %d
 OK	Statistics		OK
 Magenta	Menus		Magenta
 New	Menus		Nou
@@ -55,16 +61,19 @@ Wrap-around search	FindandReplaceWindow		Căutare încadrează împrejur
 Bold	Menus		Aldin
 Find selection	Menus		Găsește selecție
 Find:	FindandReplaceWindow		Găsește:
-Error saving \"%s\":\n%s	SaveAlert		Eroare la salvarea lui „%s”:\n%s
+Error saving \"%s\":\n%s	SaveAlert		Eroare la salvarea lui \"%s\":\n%s
 Copy	Menus		Copiază
 Cut	Menus		Taie
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Fișierul \"%file%\" a fost modificat de altă aplicație, îl reîncărcați?
 Replace	FindandReplaceWindow		Înlocuiește
 Find again	Menus		Găsește din nou
 Cancel	QuitAlert		Anulează
 Find…	Menus		Găsește...
 Select all	Menus		Selectează tot
 Don't save	SaveAlert		Nu salva
-Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui „%s”:\n\t%s
+Recover	NodeMonitorAlerts		Recuperează
+Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui \"%s\":\n\t%s
+Ignore	NodeMonitorAlerts		Ignoră
 Undo typing	QuitAlert		Refă tastarea
 Black	Menus		Negru
 Untitled 	StyledEditWindow		Fără titlu
@@ -74,5 +83,6 @@ Encoding	Open_and_SaveAsPanel		Codare
 Characters:	Statistics		Caractere:
 Save as…	Menus		Salvează ca...
 Redo typing	QuitAlert		Repetă tastarea
+Reload…	Menus		Reîncărcare...
 Replace…	Menus		Înlocuiește...
 Right	Menus		Dreapta

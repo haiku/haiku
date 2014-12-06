@@ -1,13 +1,17 @@
-1	romanian	x-vnd.haiku-screenshot	3099045764
+1	romanian	x-vnd.haiku-screenshot	3896204963
 seconds	ScreenshotWindow		secunde
 Desktop	ScreenshotWindow		Desktop
 Include window border	ScreenshotWindow		Include margine fereastră
+Screenshot	System name		Captură de ecran
 Select	ScreenshotWindow		Selectează
 Capture active window	ScreenshotWindow		Capturează fereastra activă
 Cancel	ScreenshotWindow		Anulează
 Name:	ScreenshotWindow		Nume:
+Choose folder…	ScreenshotWindow		Alege dosar...
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Acest fișier există deja.\n Sigur doriți să-l suprascrieți?
 Choose folder	ScreenshotWindow		Alege dosar
 Save	ScreenshotWindow		Salvează
+Overwrite	ScreenshotWindow		Suprascrie
 Please select	ScreenshotWindow		Alegeți
 Save as:	ScreenshotWindow		Salvează ca:
 Copy to clipboard	ScreenshotWindow		Copiază la clipboard

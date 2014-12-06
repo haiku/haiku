@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Screen	1388881963
+1	finnish	x-vnd.Haiku-Screen	2339556848
 yes	Screen		kyllä
 Use laptop panel:	Screen		Käytä sylimikropaneelia
 15 bits/pixel, 32768 colors	Screen		15 bittiä/pikseli, 32768 väriä
@@ -12,6 +12,7 @@ Set background…	Screen		Aseta tausta...
 Undo	Screen		Peru
 if needed	Screen		jos tarvittu
 Screen preferences by the Haiku team	Screen		Haiku-ryhmän näyttöasetukset
+Settings will revert in %seconds.	Screen		Asetukset palautuvat %seconds sekunnissa.
 Screen	System name		Näyttöasetukset
 OK	Screen		Valmis
 Workspaces	Screen		Työtilat

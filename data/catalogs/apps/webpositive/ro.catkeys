@@ -1,0 +1,105 @@
+1	romanian	x-vnd.Haiku-WebPositive	1585649103
+Username:	Authentication Panel		Nume utilizator:
+Copy URL to clipboard	Download Window		Copiază URL în clipboard
+Cancel	Settings Window		Anulează
+Close window	WebPositive Window		Închide fereastra
+Quit	WebPositive		Renunţă
+The download could not be opened.	Download Window		Descărcarea nu a putut fi deschisă.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Dosarul de descărcări nu a putut fi deschis..\n\nEroare: %error
+Open location	WebPositive Window		Deschide locația
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Ieri
+Start page:	Settings Window		Pagină de start:
+History	WebPositive Window		Istoric
+Error opening downloads folder	Download Window		Eroare la deschiderea dosarului de descărcări
+Paste	WebPositive Window		Lipire
+Proxy username:	Settings Window		Nume utilizator proxy:
+Save page as…	WebPositive Window		Salvează pagina ca…
+Over %days left	Download Window		Peste %days rămase
+Settings	Settings Window		Configurări
+Confirmation	WebPositive Window		Confirmare
+Window	WebPositive Window		Fereastră
+Serif font:	Settings Window		Font serif:
+Loading %url	WebPositive Window		Se încarcă %url
+Page source	WebPositive Window		Sursa paginii
+Next	WebPositive Window		Următorul
+Download folder:	Settings Window		Dosar descărcări:
+Edit	WebPositive Window		Editează
+Cancel	Authentication Panel		Anulează
+Search page:	Settings Window		Caută pagina:
+Close tab	WebPositive Window		Închide tabul
+Quit	WebPositive Window		Renunţă
+Full screen	WebPositive Window		Ecran complet
+Open download error	Download Window		Deschide eroarea descărcării
+Standard font:	Settings Window		Font standard:
+Restart	Download Window		Repornire
+Proxy server	Settings Window		Server proxy
+New window	WebPositive Window		Fereastră nouă
+Open	Download Window		Deschide
+Reload	WebPositive Window		Reîncarcă
+Downloads	Download Window		Descărcări
+Sans serif font:	Settings Window		Font sans serif:
+Forward	WebPositive Window		Înainte
+of	Download Window	...as in '12kB of 256kB'	din
+Revert	Settings Window		Revenire
+Fixed font:	Settings Window		Font fix:
+Cut	WebPositive Window		Tăiere
+Open downloads folder	Download Window		Deschide dosarul de descărcări
+Proxy password:	Settings Window		Parolă proxy:
+Hide	Download Window		Ascunde
+Find:	WebPositive Window		Caută:
+Increase size	WebPositive Window		Mărește dimensiunea
+Downloads	WebPositive Window		Descărcări
+Apply	Settings Window		Aplică
+Size:	Font Selection view		Dimensiune:
+About	WebPositive Window		Despre
+Fonts	Settings Window		Fonturi
+OK	Download Window		OK
+New tabs:	Settings Window		Taburi noi:
+Cancel	WebPositive Window		Anulează
+Open all	WebPositive Window		Deschide toate
+Proxy server requires authentication	Settings Window		Serverul proxy necesită autentificare
+Clear	URL Bar		Eliberează
+Cut	URL Bar		Tăiere
+Clear	WebPositive Window		Eliberează
+Script console	Console Window		Consolă script
+Remove	Download Window		Elimină
+Find	WebPositive Window		Căutare
+Find previous	WebPositive Window		Caută precedentul
+Settings	WebPositive Window		Configurări
+Script console	WebPositive Window		Consola scriptului
+Proxy server address:	Settings Window		Adresă server proxy:
+Proxy server port:	Settings Window		Port server proxy:
+Bookmarks	WebPositive Window		Semne de carte
+Paste	URL Bar		Lipire
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Ascunde textul parolei
+Over 1 minute left	Download Window		Peste un minut rămas
+Open start page	Settings Window		Deschide pagina de start
+Continue downloads	WebPositive		Continuă descărcări
+Cancel	Download Window		Anulează
+Open search page	Settings Window		Deschide pagina de căutare
+Clear	Console Window		Eliberează
+Password:	Authentication Panel		Parolă:
+Back	WebPositive Window		Înapoi
+Today	WebPositive Window		Astăzi
+Over %hours left	Download Window		Peste %hours rămase
+Remember username and password for this site	Authentication Panel		Ține minte numele de utilizator și parola pentru această pagină
+Earlier	WebPositive Window		Mai devreme
+Authentication required	Authentication Panel		Autentificare necesară
+Use proxy server to connect to the internet	Settings Window		Utilizează server proxy pentru conectare la internet
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url a eșuat
+%seconds left	Download Window		%seconds rămase
+New tab	WebPositive Window		Tab nou
+Downloads in progress	WebPositive		Descărcări în progres
+Style:	Font Selection view		Stil:
+General	Settings Window		General
+View	WebPositive Window		Vizualizare
+Copy	WebPositive Window		Copiază
+Clone current page	Settings Window		Clonează pagina curentă
+OK	Authentication Panel		OK
+Copy	URL Bar		Copiază
+Download finished	Download Window		Descărcare terminată
+OK	WebPositive Window		OK
+New windows:	Settings Window		Ferestre noi:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url s-a terminat.

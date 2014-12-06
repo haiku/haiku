@@ -1,16 +1,31 @@
-1	spanish	x-vnd.Haiku-Locale	167059322
-12 hour	TimeFormatSettings		12 horas
-24 hour	TimeFormatSettings		24 horas
+1	spanish; castilian	x-vnd.Haiku-Locale	1488345554
 Available languages	Locale Preflet Window		Idiomas disponibles
-Currency	TimeFormatSettings		Moneda
-Date	TimeFormatSettings		Fecha
-Defaults	Locale Preflet Window		Predeterminados
-Language	Locale Preflet Window		Idioma
-Locale	Locale Preflet		Región de procedencia
+Negative:	TimeFormatSettings		Negativo:
+already chosen	LanguageListView		ya escogido
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		¡No se pueden encontrar los lenguajes disponibles! ¡No se puede usar este preflet!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar y Tracker deben reiniciarse para que estos cambios tomen efecto. ¿Desea reiniciarlos ahora?
 Long format:	TimeFormatSettings		Formato largo:
-Numbers	TimeFormatSettings		Números
-OK	Locale Preflet Window		Aceptar
-Preferred languages	Locale Preflet Window		Idiomas preferidos
-Revert	Locale Preflet Window		Revertir
+Currency	TimeFormatSettings		Moneda
+Locale	System name		Traducciones
 Short format:	TimeFormatSettings		Formato corto:
+Language	Locale Preflet Window		Idioma
+Preferred languages	Locale Preflet Window		Idiomas preferidos
+Use month/day-names from preferred language	TimeFormatSettings		Usar nombres de mes/día del lenguaje preferido
+Formatting	Locale Preflet Window		Formateando
+Locale	Locale Preflet Window		Sitio
+Numbers	TimeFormatSettings		Números
+24 hour	TimeFormatSettings		24 horas
+OK	Locale Preflet Window		Aceptar
+Restart	Locale Preflet Window		Reiniciar
+Full format:	TimeFormatSettings		Formato completo:
+Defaults	Locale Preflet Window		Predeterminados
+Cancel	Locale Preflet Window		Cancelar
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Traducir nombres de aplicaciones y carpetas en el Deskbar y Tracker
+Revert	Locale Preflet Window		Revertir
+Medium format:	TimeFormatSettings		Formato mediano:
+12 hour	TimeFormatSettings		12 horas
 Time	TimeFormatSettings		Hora
+Date	TimeFormatSettings		Fecha
+Positive:	TimeFormatSettings		Positivo:
+Locale	Locale Preflet		Región de procedencia
+Options	Locale Preflet Window		Opciones

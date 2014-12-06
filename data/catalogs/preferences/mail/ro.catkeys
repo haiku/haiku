@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Mail	3957822883
+1	romanian	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		Verificare mail
 Settings	Config Window		Configurări
 Never	Config Window	show status window	Niciodată
@@ -6,13 +6,14 @@ Only when dial-up is connected	Config Window		Doar atunci când linia comutată 
 While sending and receiving	Config Window		În timp ce se trimite și se recepționează
 days	Config Window		zile
 Incoming	Config Window		De primire
-OK	Config Window		Bine
+Server name:	E-Mail		Nume server:
+OK	Config Window		OK
 Start mail services on startup	Config Window		Rulează serviciile de mail la pornire
 E-mail address:	E-Mail		Adresă email:
 Account name:	E-Mail		Nume cont:
 Account name:	Config Views		Nume cont:
 Create new account	AutoConfigWindow		Creează un cont nou
-OK	Config Views		Bine
+OK	Config Views		OK
 The filter could not be moved. Deleting filter.	Config Views		Filtrul nu a putut fi mișcat. Se șterge filtrul.
 Revert	Config Window		Revenire
 Login name:	E-Mail		Nume de autentificare:

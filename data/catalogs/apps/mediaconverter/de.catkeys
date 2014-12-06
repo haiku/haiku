@@ -1,9 +1,12 @@
-1	german	x-vnd.Haiku-MediaConverter	217152063
+1	german	x-vnd.Haiku-MediaConverter	341686525
 Video using parameters form settings	MediaConverter		Video benutzt die Parameter aus den Einstellungen
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Die Datei wurde nicht als unterstützte Mediendatei erkannt:} other{# Dateien wurden nicht als unterstützte Mediendateien erkannt:}}
 Video encoding:	MediaConverter		Videokodierung:
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fBilder/s
 Error read audio frame %lld	MediaConverter		Fehler beim Einlesen von Audio-Frame %lld
 No audio	Audio codecs list		Keine Tonspur
 Error	MediaConverter		Fehler
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# Bit} other{# Bits}}
 Error loading a file	MediaConverter		Fehler beim Laden einer Datei
 Error read video frame %lld	MediaConverter		Fehler beim Einlesen von Video-Frame %lld
 File Error	MediaConverter-FileInfo		Dateifehler
@@ -16,6 +19,7 @@ MediaConverter	System name		Media-Konverter
 No video	Video codecs list		Keine Videospur
 Duration:	MediaConverter-FileInfo		Dauer:
 OK	MediaConverter		OK
+%.1f kHz mono	MediaFileInfo		%.1f kHz Mono
 Error converting '%filename'	MediaConverter		Fehler beim Konvertieren von '%filename'
 Low	MediaConverter		Niedrig
 Conversion completed	MediaConverter		Konvertierung abgeschlossen
@@ -24,8 +28,10 @@ OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 Sekunden
 Source files	MediaConverter		Quelldateien
 Error writing video frame %lld	MediaConverter		Fehler beim Schreiben von Video-Frame %lld
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# Bild} other{# Bilder}}
 Error writing audio frame %lld	MediaConverter		Fehler beim Schreiben von Audio-Frame %lld
 Cancelling	MediaConverter		Abbruch
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# Byte} other{# Bytes}}
 Error loading files	MediaConverter		Fehler beim Laden der Dateien
 Cancel	MediaConverter		Abbrechen
 None available	Video codecs		Keine verfügbar
@@ -53,9 +59,11 @@ Drop media files onto this window	MediaConverter		Mediadateien auf diesem Fenste
 Audio encoding:	MediaConverter		Audiokodierung:
 Audio quality not supported	MediaConverter		Tonqualität nicht einstellbar
 File	Menu		Datei
+%.1f kHz stereo	MediaFileInfo		%.1f kHz Stereo
 Convert	MediaConverter		Konvertieren
 Writing audio track: %ld%% complete	MediaConverter		Tonspur wird geschrieben: %ld%% fertig
 Video quality: %3d%%	MediaConverter		Videoqualität: %3d%%
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld Kanal
 Output folder	MediaConverter		Ausgabeordner
 Audio quality: %3d%%	MediaConverter		Tonqualität: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Es ist ein Fehler beim Lesen der Dateiinformationen aufgetreten.\n\nFehler:

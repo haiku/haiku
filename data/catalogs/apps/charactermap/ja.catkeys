@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CharacterMap	56063163
+1	japanese	x-vnd.Haiku-CharacterMap	1534181938
 Enclosed alphanumerics	UnicodeBlocks		囲み英数字
 Basic Latin	UnicodeBlocks		基本ラテン文字
 View	CharacterWindow		表示
@@ -123,6 +123,7 @@ Vai	UnicodeBlocks		ヴァイ文字
 Yi Radicals	UnicodeBlocks		イ文字部首
 Cyrillic extended B	UnicodeBlocks		キリル文字拡張 B
 Quit	CharacterWindow		終了
+Ancient symbols	UnicodeBlocks		古代記号
 Braille patterns	UnicodeBlocks		点字図形
 New Tai Lue	UnicodeBlocks		新タイ・ルー文字
 Runic	UnicodeBlocks		ルーン文字

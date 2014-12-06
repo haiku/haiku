@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1937834684
+1	japanese	x-vnd.Haiku-libtracker	1313160091
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		アドオン
 Mount settings…	ContainerWindow		マウント設定…
@@ -54,6 +54,7 @@ Select all	FilePanelPriv		すべて選択
 Link to:	InfoWindow		リンク先:
 Location	ContainerWindow		場所
 Location	QueryPoseView		場所
+config	B_USER_CONFIG_DIRECTORY		config
 apps	B_APPS_DIRECTORY		アプリケーション
 Icon view	ContainerWindow		アイコン表示
 Size	QueryPoseView		サイズ
@@ -199,8 +200,10 @@ Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	移動
 Get info	ContainerWindow		詳細情報…
 Error creating link to \"%name\".	FSUtils		\"%name\"へのリンクの作成時にエラーが発生しました。
 Select	SelectionWindow		選択
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# バイト} other{# バイト}}
 Or	FindPanel		または
 The Tracker must be running to see set the default printer.	PoseView		デフォルトプリンタを設定するには、 Tracker が実行されている必要があります。
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# バイト} other{# バイト}}
 by formula	FindPanel		式で検索
 40 x 40	DeskWindow		40 x 40
 Name	PoseView		名前
@@ -407,6 +410,7 @@ New	ContainerWindow		新規
 Name matches wildcard expression:###	SelectionWindow		ファイル名がワイルドカード表現と一致: ###
 less than	FindPanel		より小さい
 64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		develop
 Modified	ContainerWindow		更新日時
 Edit Query template	FindPanel		クエリテンプレートを編集
 Prompt	FSUtils		プロンプト

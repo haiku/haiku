@@ -1,0 +1,9 @@
+1	romanian	x-vnd.Haiku-SpamFilter	1975155212
+or empty e-mail	SpamFilterConfig		sau e-mail liber
+Spam Filter (AGMS Bayesian)	SpamFilter		Filtru spam (AGMS Bayesian)
+Genuine below and uncertain above:	SpamFilterConfig		Autentic dedesubt și nesigur deasupra:
+Spam above:	SpamFilterConfig		Spam deasupra:
+Add spam rating to start of subject	SpamFilterConfig		Adaugă evaluarea spamului la începutul subiectului
+Learn from all incoming e-mail	SpamFilterConfig		Învață din tot emailul de sosire
+Sorry, unable to launch the spamdbm program to let you edit the server settings.	SpamFilterConfig		Nu s-a putut lansa programul spamdbm pentru a edita configurările serverului.
+Close	SpamFilterConfig		Închide

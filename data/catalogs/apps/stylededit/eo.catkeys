@@ -1,46 +1,50 @@
-1	esperanto	x-vnd.Haiku-StyledEdit	1866082924
-???	LoadAlert		???
-Align	Menus		Ĝisrandigo
-Black	Menus		Nigra
-Blue	Menus		Blua
-Can't undo	Menus		Nemalfarebla
-Cancel	FindandReplaceWindow		Nuligi
-Cancel	QuitAlert		Nuligi
-Cancel	RevertToSavedAlert		Nuligi
-Case-sensitive	FindandReplaceWindow		Usklecodistinga
-Center	Menus		Centra
-Color	Menus		Koloro
-Cyan	Menus		Cejana
-Default	Open_and_SaveAsPanel		Apriora
-Document	Menus		Dokumento
-Don't save	QuitAlert		Ne konservi
-Find	FindandReplaceWindow		Trovi
-Find again	Menus		Retrovi
-Find selection	Menus		Trovi elektitan
-Find:	FindandReplaceWindow		Trovi:
-Find…	Menus		Trovi…
-Font	Menus		Tiparo
-Green	Menus		Verda
-Left	Menus		Maldekstren
-Magenta	Menus		Fuksino
-New	Menus		Nova
+1	esperanto	x-vnd.Haiku-StyledEdit	3511634065
 OK	LoadAlert		Bone
-OK	RevertToSavedAlert		Bone
-OK	SaveAlert		Bone
-Open…	Menus		Malfermi…
-Red	Menus		Ruĝa
-Replace	FindandReplaceWindow		Anstaŭigi
-Replace all	FindandReplaceWindow		Anstataŭigi ĉiujn
-Replace in all windows	FindandReplaceWindow		Anstataŭigi en ĉiu fenestro
-Replace with:	FindandReplaceWindow		Anstataŭigi kun:
-Replace…	Menus		Anstataŭigi…
-Revert to saved…	Menus		Malfari ŝanĝojn…
-Right	Menus		Dekstren
-Save	Menus		Konservi
-Save	QuitAlert		Konservi
+???	LoadAlert		???
+Left	Menus		Maldekstren
 Search backwards	FindandReplaceWindow		Ŝerĉi kontraŭen
 Size	Menus		Grandeco
-Untitled 	StyledEditWindow		Sentitolo 
-Wrap lines	Menus		Faldi linojn
-Wrap-around search	FindandReplaceWindow		Ŝerĉi ek la komenco
+Save	QuitAlert		Konservi
+Can't undo	Menus		Nemalfarebla
+Save	Menus		Konservi
+Replace with:	FindandReplaceWindow		Anstataŭigi kun:
+Cancel	SaveAlert		Nuligi
+Case-sensitive	FindandReplaceWindow		Usklecodistinga
+Green	Menus		Verda
 Yellow	Menus		Flava
+Replace in all windows	FindandReplaceWindow		Anstataŭigi en ĉiu fenestro
+Wrap lines	Menus		Faldi linojn
+Cancel	RevertToSavedAlert		Nuligi
+Document	Menus		Dokumento
+Font	Menus		Tiparo
+Replace all	FindandReplaceWindow		Anstataŭigi ĉiujn
+Default	Open_and_SaveAsPanel		Apriora
+Cancel	FindandReplaceWindow		Nuligi
+Save	SaveAlert		Konservi
+OK	RevertToSavedAlert		Bone
+Don't save	QuitAlert		Ne konservi
+Align	Menus		Ĝisrandigo
+Color	Menus		Koloro
+Red	Menus		Ruĝa
+OK	QuitAlert		Bone
+Open…	Menus		Malfermi…
+Center	Menus		Centra
+Blue	Menus		Blua
+Cyan	Menus		Cejana
+OK	Statistics		Bone
+Magenta	Menus		Fuksino
+New	Menus		Nova
+Wrap-around search	FindandReplaceWindow		Ŝerĉi ek la komenco
+Find selection	Menus		Trovi elektitan
+Find:	FindandReplaceWindow		Trovi:
+Replace	FindandReplaceWindow		Anstaŭigi
+Find again	Menus		Retrovi
+Cancel	QuitAlert		Nuligi
+Find…	Menus		Trovi…
+Don't save	SaveAlert		Ne konservi
+Black	Menus		Nigra
+Untitled 	StyledEditWindow		Sentitolo 
+OK	SaveAlert		Bone
+Find	FindandReplaceWindow		Trovi
+Replace…	Menus		Anstataŭigi…
+Right	Menus		Dekstren

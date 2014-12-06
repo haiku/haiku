@@ -1,17 +1,20 @@
-1	croatian	system	1448089599
-%.2f TiB	StringForSize		%.2f TiB
+1	croatian	x-vnd.Haiku-libbe	3061565693
 %3.2f GiB	StringForSize		%3.2f GiB
-%3.2f KiB	StringForSize		%3.2f KiB
-%3.2f MiB	StringForSize		%3.2f MiB
-%d bytes	StringForSize		%d byte-ova
-About…	AboutWindow		O programu...
-Blue:	ColorControl		Plavo:
-Close	AboutWindow		Zatvori
-Copy	TextView		Kopiraj
-Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
-Cut	TextView		Izreži
-Green:	ColorControl		Zeleno:
-Paste	TextView		Zalijepi
-Red:	ColorControl		Crveno:
-Select All	TextView		Odaberi sve
 Written by:	AboutWindow		Napisao:
+Cut	TextView		Izreži
+Copy	TextView		Kopiraj
+%3.2f KiB	StringForSize		%3.2f KiB
+Error	PrintJob		Greška
+OK	Dragger		U redu
+OK	PrintJob		U redu
+Green:	ColorControl		Zeleno:
+OK	ZombieReplicantView		U redu
+Paste	TextView		Zalijepi
+%.2f TiB	StringForSize		%.2f TiB
+Select All	TextView		Odaberi sve
+Warning	Dragger		Upozorenje
+Undo	TextView		Poništi
+Red:	ColorControl		Crveno:
+%3.2f MiB	StringForSize		%3.2f MiB
+Error	ZombieReplicantView		Greška
+Blue:	ColorControl		Plavo:

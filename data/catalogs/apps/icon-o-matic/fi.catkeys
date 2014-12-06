@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	1929083132
+1	finnish	x-vnd.haiku-icon_o_matic	3554185674
 Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add Style	Icon-O-Matic-AddStylesCmd		Lisää tyyli
 Color (#%02x%02x%02x)	Style name after dropping a color		Väri (#%02x%02x%02x)
@@ -67,6 +67,7 @@ HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-lähdekoodi
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Nollaa muuntimet
 Settings	Icon-O-Matic-Menus		Asetukset
 All	Icon-O-Matic-Properties		Kaikki
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Teksti, jota yrität tuoda, on aika pitkä. Oletko varma?
 Multi Paste Properties	Icon-O-Matic-Properties		Useita liittämisominaisuuksia
 Undo	Icon-O-Matic-Main		Peru
 Click on a shape above	Empty transformers list - 1st line		Napsauta yllä olevaa hahmoa
@@ -186,6 +187,7 @@ Save	Icon-O-Matic-Menu-File		Tallenna
 Append…	Icon-O-Matic-Menu-File		Liitä...
 Move Path	Icon-O-Matic-MovePathsCmd		Siirrä polku
 Overwrite	Icon-O-Matic-SVGExport		Korvaa
+Text too long	Icon-O-Matic-StyledTextImport		Teksti on liian pitkä
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Jähmetä hahmot
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Halkaise ohjauspiste
 Open…	Icon-O-Matic-Menu-File		Avaa...

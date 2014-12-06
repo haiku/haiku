@@ -1,26 +1,33 @@
-1	romanian	x-vnd.Haiku-SoundRecorder	1728054007
+1	romanian	x-vnd.Haiku-SoundRecorder	1524328115
 Loop	RecorderWindow		Buclă
 Cannot find default audio hardware	RecorderWindow		Nu se poate găsi harware-ul audio implicit
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nu se poate găsi fișierul temporar creat pentru a păstra înregistrarea nouă
 Nothing to play	RecorderWindow		Nimic de redat
+Duration: 	RecorderWindow		Durată: 
 File info	RecorderWindow		Info fișier
 Drop files here	SoundListView		Plasați fișiere aici
 Input	RecorderWindow		Intrare
 Stop	RecorderWindow		Oprește
+Format:	RecorderWindow		Format:
 Sound List	RecorderWindow		Listă de sunet
+Compression: 	RecorderWindow		Comprimare: 
 Rewind	RecorderWindow		Derulează înapoi
 Invalid audio files	RecorderWindow		Fișiere audio nevalide
-OK	RecorderWindow		Bine
+ seconds	RecorderWindow		 secunde
+OK	RecorderWindow		OK
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Nu se poate deschide fișierul temporar creat pentru a păstra înregistrarea nouă
 Input:	RecorderWindow		Intrare:
 Forward	RecorderWindow		Înainte
 Play	RecorderWindow		Redă
 SoundRecorder	System name		InregistrareSunet
+Channels:	RecorderWindow		Canale:
+ bits	RecorderWindow		 biți
 None	RecorderWindow		Nimic
 Record	RecorderWindow		Înregistrează
 Sample size: 	RecorderWindow		Dimensiune mostră:
 Cannot recognize this file as a media file	RecorderWindow		Nu se poate recunoaște acest fișier ca fiind un fișier media
 Format: 	RecorderWindow		Format:
+File name: 	RecorderWindow		Nume fișier: 
 Cannot connect to the selected sound input	RecorderWindow		Nu se poate conecta la intrarea de sunet selectată
 Cannot get the file to play	RecorderWindow		Nu se poate reda fișierul
 Cannot record a sound that long	RecorderWindow		Nu se poate înregistra un sunet atât de lung
@@ -31,4 +38,5 @@ Channels: 	RecorderWindow		Canale:
 Save	RecorderWindow		Salvează
 Sample rate: 	RecorderWindow		Rată monstră:
 Cannot connect to media server	RecorderWindow		Nu se poate conecta la serverul media
+The file doesn't appear to be an audio file.	RecorderWindow		Fișierul nu pare să fie un fișier audio.
 File name:	RecorderWindow		Nume de fișier:

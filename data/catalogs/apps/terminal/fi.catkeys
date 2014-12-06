@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	1777773037
+1	finnish	x-vnd.Haiku-Terminal	336113194
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -46,6 +46,7 @@ Window title…	Terminal TermWindow		Ikkunaotsikko...
 Full screen	Terminal TermWindow		Kokoruutunäyttö
 Page setup…	Terminal TermWindow		Sivuasetus...
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Seuraavia prosesseja suoritetaan edelleen:\n\n\t%1\n\nJos suljet Pääteikkunan, prosessit tapetaan.
+Custom	Terminal AppearancePrefView	Window size	Räätälöity
 Insert path	Terminal TermView		Lisää polku
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Pääteikkuna\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ja Takashi Murai.\n\nKäyttö: %s [VALITSIN] [KOMENTOTULKKI]\n
 Window size:	Terminal AppearancePrefView		Ikkunakoko:

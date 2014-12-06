@@ -1,62 +1,105 @@
-1	croatian	x-vnd.Haiku-CharacterMap	2544432910
-Ancient Greek musical notation	UnicodeBlocks		Drevna grčka glazbena notacija
-Ancient Greek numbers	UnicodeBlocks		Starogrčki brojevi
-Ancient smbols	UnicodeBlocks		Drevni simboli
-Arabic	UnicodeBlocks		Arapski
-Armenian	UnicodeBlocks		Armenski
-Arrows	UnicodeBlocks		Strelice
-Bengali	UnicodeBlocks		Bengalski
-Braille patterns	UnicodeBlocks		Brajlovi uzorci
-CharacterMap	System name		Karta znakova
-Code	CharacterWindow		Kod
-Combining diacritical marks	UnicodeBlocks		Kobinirani dijakritički znakovi
-Coptic	UnicodeBlocks		Koptski
-Currency symbols	UnicodeBlocks		Simboli valute
-Cyrillic	UnicodeBlocks		Ćirilićno
-Devanagari	UnicodeBlocks		Devangari
-Domino tiles	UnicodeBlocks		Domino pločice
-Ethiopic	UnicodeBlocks		Etiopski
-Ethiopic extended	UnicodeBlocks		Etiopski prošireni
-File	CharacterWindow		Datoteka
-Filter:	CharacterWindow		Filter:
-Font	CharacterWindow		Font
-Font size:	CharacterWindow		Veličina fonta:
-Geometric shapes	UnicodeBlocks		Geometrijski oblici
-Gothic	UnicodeBlocks		Gotički
-Greek and Coptic	UnicodeBlocks		Grčki i koptski
-Greek extended	UnicodeBlocks		Grčki prošireni
-Gujarati	UnicodeBlocks		Gujarati
-Hebrew	UnicodeBlocks		Hebrejski
-Hiragana	UnicodeBlocks		Hiragana
-IPA extensions	UnicodeBlocks		IPA proširenja
-Ideographic description characters	UnicodeBlocks		Ideografski opisni znakovi
-Katakana	UnicodeBlocks		Katakana
-Khmer	UnicodeBlocks		Kmerski
-Khmer symbols	UnicodeBlocks		Kmerski simboli
-Mahjong tiles	UnicodeBlocks		Mahjong pločice
-Mathematical operators	UnicodeBlocks		Matematički operatori
-Miscellaneous mathematical symbols A	UnicodeBlocks		Ostali matematički simboli A
-Miscellaneous mathematical symbols B	UnicodeBlocks		Ostali matematički simboli B
-Miscellaneous symbols	UnicodeBlocks		Ostali simboli
-Miscellaneous symbols and arrows	UnicodeBlocks		Ostali simboli i strelice
-Mongolian	UnicodeBlocks		Mongolski
-Muscial symbols	UnicodeBlocks		Glazbeni simboli
-Myanmar	UnicodeBlocks		Mijanmarski
-New Tai Lue	UnicodeBlocks		Novi Tai Lue
-Number forms	UnicodeBlocks		Forme brojeva
-Ogham	UnicodeBlocks		Ogham
-Old Persian	UnicodeBlocks		Staroperzijski
-Old italic	UnicodeBlocks		Staroitalski
-Phoenician	UnicodeBlocks		Fenički
-Phonetic extensions	UnicodeBlocks		Fonetička proširenja
-Quit	CharacterWindow		Isključi
-Runic	UnicodeBlocks		Runski
-Tagalog	UnicodeBlocks		Tagalog
-Tagbanwa	UnicodeBlocks		Tagbanwa
-Tai Le	UnicodeBlocks		Tai Le
-Tai Xuan Jing symbols	UnicodeBlocks		Tai Xuan Jing simboli
-Tamil	UnicodeBlocks		Tamilski
-Thaana	UnicodeBlocks		Thaana
-Tibetan	UnicodeBlocks		Tibetanski
-Vertical forms	UnicodeBlocks		Okomite forme
+1	croatian	x-vnd.Haiku-CharacterMap	1727845192
 View	CharacterWindow		Pogled
+Hebrew	UnicodeBlocks		Hebrejski
+Khmer	UnicodeBlocks		Kmerski
+Greek extended	UnicodeBlocks		Grčki prošireni
+Devanagari	UnicodeBlocks		Devangari
+Armenian	UnicodeBlocks		Armenski
+Mathematical operators	UnicodeBlocks		Matematički operatori
+Vertical forms	UnicodeBlocks		Okomite forme
+Arabic	UnicodeBlocks		Arapski
+Ethiopic extended	UnicodeBlocks		Etiopski prošireni
+Arrows	UnicodeBlocks		Strelice
+Font	CharacterWindow		Font
+Gujarati	UnicodeBlocks		Gujarati
+Cuneiform	UnicodeBlocks		Klinasto pismo
+Phonetic extensions	UnicodeBlocks		Fonetička proširenja
+Khmer symbols	UnicodeBlocks		Kmerski simboli
+Tagbanwa	UnicodeBlocks		Tagbanwa
+Syriac	UnicodeBlocks		Sirijski
+Musical symbols	UnicodeBlocks		Glazbeni simboli
+Coptic	UnicodeBlocks		Koptski
+Tai Le	UnicodeBlocks		Tai Le
+Mahjong tiles	UnicodeBlocks		Mahjong pločice
+Aegean numbers	UnicodeBlocks		Aegean brojevi
+Old italic	UnicodeBlocks		Staroitalski
+Cyrillic extended A	UnicodeBlocks		Ćirilica proširena-A
+Cyrillic	UnicodeBlocks		Ćirilićno
+Katakana	UnicodeBlocks		Katakana
+Clear	CharacterWindow		Očisti
+Sundanese	UnicodeBlocks		Sudanski
+Miscellaneous mathematical symbols A	UnicodeBlocks		Ostali matematički simboli A
+Cyrillic supplement	UnicodeBlocks		Ćirilični nadomjestak
+Small form variants	UnicodeBlocks		Varijante malih oblika
+IPA extensions	UnicodeBlocks		IPA proširenja
+Thaana	UnicodeBlocks		Thaana
+Ogham	UnicodeBlocks		Ogham
+Syloti Nagri	UnicodeBlocks		Syloti Nagri
+Arabic supplement	UnicodeBlocks		Arapski nadomjestak
+Latin extended C	UnicodeBlocks		Latinični prošireni C
+Lycian	UnicodeBlocks		Likijski
+Osmanya	UnicodeBlocks		Osmanski
+Ethiopic	UnicodeBlocks		Etiopski
+Bengali	UnicodeBlocks		Bengalski
+Filter:	CharacterWindow		Filter:
+Ideographic description characters	UnicodeBlocks		Ideografski opisni znakovi
+Arabic presentation forms B	UnicodeBlocks		Arapske prezentacijske forme B
+CJK compatibility forms	UnicodeBlocks		Kin./jap./kor. obrasci kompatibilnosti
+Hiragana	UnicodeBlocks		Hiragana
+Tagalog	UnicodeBlocks		Tagalog
+Control pictures	UnicodeBlocks		Kontrolne slike
+Variation selectors	UnicodeBlocks		Izbornici varijacija
+Code	CharacterWindow		Kod
+Ancient Greek musical notation	UnicodeBlocks		Drevna grčka glazbena notacija
+Geometric shapes	UnicodeBlocks		Geometrijski oblici
+Letterlike symbols	UnicodeBlocks		Simboli slični slovima
+Tamil	UnicodeBlocks		Tamilski
+Currency symbols	UnicodeBlocks		Simboli valute
+Combining diacritical marks	UnicodeBlocks		Kobinirani dijakritički znakovi
+Supplement punctuation	UnicodeBlocks		Dopunjene interpunkcije
+Unified Canadian Aboriginal syllabics	UnicodeBlocks		Unificirani kanadski aboridžinski slogovi
+CJK symbols and punctuation	UnicodeBlocks		Kin./jap./kor. simboli i interpunkcija
+File	CharacterWindow		Datoteka
+Number forms	UnicodeBlocks		Forme brojeva
+Tags	UnicodeBlocks		Oznake
+Latin extended A	UnicodeBlocks		Latinični prošireni-A
+Miscellaneous symbols	UnicodeBlocks		Ostali simboli
+Old Persian	UnicodeBlocks		Staroperzijski
+Myanmar	UnicodeBlocks		Mijanmarski
+Latin extended D	UnicodeBlocks		Latinični prošireni D
+Tibetan	UnicodeBlocks		Tibetanski
+Ancient Greek numbers	UnicodeBlocks		Starogrčki brojevi
+Vai	UnicodeBlocks		Vai
+Cyrillic extended B	UnicodeBlocks		Ćirilica proširena B
+Quit	CharacterWindow		Isključi
+Braille patterns	UnicodeBlocks		Brajlovi uzorci
+New Tai Lue	UnicodeBlocks		Novi Tai Lue
+Runic	UnicodeBlocks		Runski
+Miscellaneous mathematical symbols B	UnicodeBlocks		Ostali matematički simboli B
+Cuneiform numbers and punctuation	UnicodeBlocks		Brojevi i iterpunkcija klinastog pisma
+Private use area	UnicodeBlocks		Područje za privatno korištenje
+CJK unified ideographs extension B	UnicodeBlocks		CJK ujedinjeni ideografi proširenje B
+Tai Xuan Jing symbols	UnicodeBlocks		Tai Xuan Jing simboli
+Buhid	UnicodeBlocks		Buhid
+Telugu	UnicodeBlocks		Telugu
+Gurmukhi	UnicodeBlocks		Gurmuki
+CharacterMap	System name		Karta znakova
+Gothic	UnicodeBlocks		Gotički
+Phoenician	UnicodeBlocks		Fenički
+Mongolian	UnicodeBlocks		Mongolski
+Supplemental arrows A	UnicodeBlocks		Dodatne strelice A
+Miscellaneous symbols and arrows	UnicodeBlocks		Ostali simboli i strelice
+Yijing hexagram symbols	UnicodeBlocks		Yijing heksagramski simboli
+Supplemental mathematical operators	UnicodeBlocks		Nadomjesni matematički operatori
+Alphabetic presentation forms	UnicodeBlocks		Oblici abecednog prikaza
+Halfwidth and fullwidth forms	UnicodeBlocks		Obrasci polovične i pune širine
+Latin extended B	UnicodeBlocks		Latinični prošireni B
+Copy character	CharacterView		Kopiraj znak
+Greek and Coptic	UnicodeBlocks		Grčki i koptski
+Georgian	UnicodeBlocks		Gruzijski
+CJK compatibility	UnicodeBlocks		CJK kompatibilnost
+Malayalam	UnicodeBlocks		Malajalamski
+N'Ko	UnicodeBlocks		N'ko
+Kannada	UnicodeBlocks		Kanada
+Phonetic extensions supplement	UnicodeBlocks		Fonetska proširenja dopunjeno
+Domino tiles	UnicodeBlocks		Domino pločice

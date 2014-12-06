@@ -1,0 +1,24 @@
+1	slovenian	x-vnd.Haiku-InterfacesAddOn	864589889
+Interface	InterfaceWindow		Vmesnik
+Configure…	InterfacesListView		Nastavi…
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		Stanje:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Save	InterfaceWindow		Shrani
+Link speed:	IntefaceHardwareView		Hitrost povezave:
+The method for obtaining an IP address	IntefaceAddressView		Način pridobivanja naslova IP
+Your gateway	IntefaceAddressView		Vaš prehod
+Enable	InterfacesListView		Omogoči
+Received:	IntefaceHardwareView		Prejeto:
+Revert	InterfaceWindow		Povrni
+connected	IntefaceHardwareView		povezan
+Gateway:	IntefaceAddressView		Prehod:
+Disable	InterfacesListView		Onemogoči
+Your netmask	IntefaceAddressView		Vaša omrežna maska
+IP Address:	IntefaceAddressView		Naslov IP:
+Off	IntefaceAddressView		Izključeno
+MAC address:	IntefaceHardwareView		Naslov MAC:
+Netmask:	IntefaceAddressView		Omrežna maska:
+Your IP address	IntefaceAddressView		Vaš naslov IP
+%llu KBytes	IntefaceHardwareView		%llu kilobajtov
+disconnected	IntefaceHardwareView		ni povezan

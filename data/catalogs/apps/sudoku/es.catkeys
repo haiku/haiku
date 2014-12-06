@@ -1,0 +1,34 @@
+1	spanish; castilian	x-vnd.Haiku-Sudoku	2463385585
+Restore snapshot	SudokuWindow		Restaurar
+Could not set Sudoku:\n%s\n	SudokuWindow		No puedo crear el Sudoku:\n%s\n
+Export as…	SudokuWindow		Exportar como…
+OK	SudokuWindow		Aceptar
+New	SudokuWindow		Nuevo
+Abort	ProgressWindow		Abortar
+Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		No puedo abrir \"%s\":\n%s\n
+Easy	SudokuWindow		Facil
+Open file…	SudokuWindow		Abrir archivo…
+Solve single field	SudokuWindow		Resolver un campo
+Solve	SudokuWindow		Resolver
+Redo	SudokuWindow		Rehacer
+File	SudokuWindow		Archivo
+Advanced	SudokuWindow		Avanzada
+Start again	SudokuWindow		Reiniciar
+HTML	SudokuWindow		HTML
+Sudoku request	SudokuWindow		Solicitar sudoku
+Copy	SudokuWindow		Copiar
+Mark valid hints	SudokuWindow		Marcar pistas válidas
+Sudoku solved - congratulations!\n	SudokuWindow		Ha resuelto el sudoku. ¡Felicidades!\n
+Hard	SudokuWindow		Dificil
+Snapshot current	SudokuWindow		Guardar progreso
+Text	SudokuWindow		Texto
+Creating solvable field	SudokuGenerator		Crear campo resoluble
+View	SudokuWindow		Vista
+Progress monitor	ProgressWindow		Indicador de progreso
+Mark invalid values	SudokuWindow		Marcar valores incorrectos
+Blank	SudokuWindow		Vacio
+Help	SudokuWindow		Ayuda
+Searching for removable values	SudokuGenerator		Buscar valores eliminables
+Undo	SudokuWindow		Deshacer
+Quit	SudokuWindow		Salir

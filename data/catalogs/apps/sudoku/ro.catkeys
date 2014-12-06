@@ -1,0 +1,22 @@
+1	romanian	x-vnd.Haiku-Sudoku	3899812328
+Could not set Sudoku:\n%s\n	SudokuWindow		Nu s-a putut stabili Sudoku:\n%s\n
+Export as…	SudokuWindow		Exportă ca...
+OK	SudokuWindow		OK
+New	SudokuWindow		Nou
+Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		Nu s-a putut deschide \"%s\":\n%s\n
+Easy	SudokuWindow		Simplu
+Open file…	SudokuWindow		Deschidere fișier...
+Solve	SudokuWindow		Rezolvare
+File	SudokuWindow		Fișier
+Advanced	SudokuWindow		Avansat
+Start again	SudokuWindow		Pornește din nou
+HTML	SudokuWindow		HTML
+Copy	SudokuWindow		Copiere
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku rezolvat - felicitări!\n
+Hard	SudokuWindow		Dificil
+Text	SudokuWindow		Text
+View	SudokuWindow		Vizualizare
+Blank	SudokuWindow		Spațiu
+Help	SudokuWindow		Ajutor
+Quit	SudokuWindow		Renunţă

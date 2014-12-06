@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2824601319
+1	german	x-vnd.Haiku-libtracker	1096206338
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-ons
 Mount settings…	ContainerWindow		Einhänge-Einstellungen…
@@ -195,8 +195,10 @@ Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Verschieben
 Get info	ContainerWindow		Datei-Info
 Error creating link to \"%name\".	FSUtils		Fehler beim Erstellen der Verknüpfung zu \"%name\".
 Select	SelectionWindow		Auswählen
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{(# Byte)} other{(# Bytes)}}
 Or	FindPanel		Oder
 The Tracker must be running to see set the default printer.	PoseView		Um den Standarddrucker zu sehen, muss Tracker laufen.
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{(# Byte)} other{(# Bytes)}}
 by formula	FindPanel		nach Formel
 40 x 40	DeskWindow		40 x 40
 Name	PoseView		Name

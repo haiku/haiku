@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DiskProbe	1806743923
+1	hungarian	x-vnd.Haiku-DiskProbe	2944605311
 File offset: 	ProbeView		Fájl lenyomat:
 %ld (native)	ProbeView		%ld (natív)
 64 bit unsigned value:	TypeEditors		64-bites aláíratlan érték:
@@ -98,6 +98,7 @@ Base	ProbeView	A menu item, the number that is basis for a system of calculation
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Képnézet
 Cancel	AttributeWindow		Mégse
 Type editor not supported	ProbeView		Nem támogatott típusszerkesztő
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Blokkméret
 MIME type editor	TypeEditors		MIME típusszerkesztő
 Swapped: %Ld (0x%0*Lx)	ProbeView		Cserélve: %Ld (0x%0*Lx)
 Find	FindWindow		Keresés

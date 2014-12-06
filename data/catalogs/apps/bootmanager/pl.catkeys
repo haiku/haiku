@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-BootManager	3264203763
+1	polish	x-vnd.Haiku-BootManager	3886671855
 The boot manager has been successfully installed on your system.	BootManagerController		Menedżer rozruchu został pomyślnie zainstalowany na Twoim komputerze.
 After two seconds	DefaultPartitionPage		dwie sekundy
 Uninstall Boot Manager	UninstallPage	Title	Usuń Menedżera Rozruchu
@@ -26,6 +26,7 @@ Please specify a default partition and a timeout.\nThe boot menu will load the d
 After one second	DefaultPartitionPage		sekunda
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Wykryto następujące partycje. Zaznacz pole wyboru obok partycji, które mają wyświetlać się w menu rozruchowym, możesz także ustawić ich nazwy.
 After one minute	DefaultPartitionPage		minuta
+The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Obecny Główny Sektor Rozruchowy (MBR) nie mógł zostać zapisany do %s. Możesz kontynuować instalację, ale nie będzie sposobu, by usunąć menu rozruchowe.
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Główny Sektor Rozruchowy (MBR) urządzenia (%DISK) został pomyślnie przywrócony z pliku %FILE.
 Quit	WizardView	Button	Zakończ
 Write boot menu	BootManagerController	Button	Zapisz menu rozruchowe
@@ -49,6 +50,7 @@ No space available!	DrivesPage	Cannot install	Brak miejsca!
 Never	DefaultPartitionPage		nieograniczony
 Partition table not compatible	BootManagerController	Title	Tablica partycji jest niekompatybilna
 Old Master Boot Record saved	BootManagerController	Title	Obecny Główny Sektor Rozruchowy został zapisany
+Old Master Boot Record backup failure	BootManagerController	Title	Wystąpił problem z zapisem kopii zapasowej obecnego Głównego Sektora Rozruchowego
 Boot Manager is unable to read the partition table!	BootManagerController		Menedżer Rozruchu nie jest w stanie odczytać tablicy partycji!
 Error reading partition table	BootManagerController	Title	Błąd odczytu tablicy partycji
 Installation of boot menu failed	BootManagerController	Title	Instalacja menu rozruchowego nie powiodła się

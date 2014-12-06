@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-InterfacesAddOn	3793974760
+1	hungarian	x-vnd.Haiku-InterfacesAddOn	1264872285
 Interface	InterfaceWindow		Felület
 Network:	IntefaceHardwareView		Hálózat:
 Static	IntefaceAddressView		Állandó
@@ -16,7 +16,6 @@ connected	IntefaceHardwareView		csatlakozva
 Gateway:	IntefaceAddressView		Átjáró:
 Disable	InterfacesListView		Letiltás
 Sent:	IntefaceHardwareView		Küldött:
-Renegotiate Address	InterfacesListView		Cím újrakérése
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Mód:
 <no wireless networks found>	IntefaceHardwareView		<vezetéknélküli hálózat nem található>

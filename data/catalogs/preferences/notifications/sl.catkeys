@@ -1,0 +1,35 @@
+1	slovenian	x-vnd.Haiku-Notifications	2659658615
+Notifications	GeneralView		Obvestila
+seconds of inactivity	GeneralView		sekundah nedejavnosti
+Revert	PrefletWin		Povrni
+Mini icon	DisplayView		Majhna ikona
+Enable notifications	GeneralView		Omogoči obvestila
+Error	NotificationView		Napaka
+OK	GeneralView		V redu
+Type	NotificationView		Vrsta
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Obvestil ni mogoče ustaviti, ker strežnika ni mogoče doseči.
+Important	NotificationView		Pomembno
+Cannot disable notifications because the server can't be reached.	GeneralView		Ni mogoče onemogočiti obvestil, ker ni mogoče doseči strežnika.
+Progress	NotificationView		Potek
+Last Received	NotificationView		Zadnjič prejeto
+General	PrefletView		Splošno
+Apply	PrefletWin		Uporabi
+Display	PrefletView		Prikaz
+Search:	NotificationView		Išči:
+Allowed	NotificationView		Dovoljeno
+Yes	NotificationView		Da
+Large icon	DisplayView		Velika ikona
+Icon size:	DisplayView		Velikost ikone:
+Hide notifications from screen after	GeneralView		Skrij obvestila z zaslona po
+Notifications	System name		Obvestila
+Notifications	NotificationView		Obvestila
+No	NotificationView		Ne
+Title	NotificationView		Naslov
+Information	NotificationView		Informacije
+Window width:	DisplayView		Širina okna:
+Application	NotificationView		Aplikacija
+Enabled	NotificationView		Omogočeno
+Unknown	NotificationView		Neznano
+Enable notifications at startup	GeneralView		Omogoči obvestila ob zagonu računalnika
+Notifications	PrefletView		Obvestila
+Applications	NotificationView		Aplikacije

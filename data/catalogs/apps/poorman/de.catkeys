@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PoorMan	1347438411
+1	german	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		Website-Adresse
 Error Server	PoorMan		Serverfehler
 Settings…	PoorMan		Einstellungen…
@@ -12,6 +12,7 @@ PoorMan settings	PoorMan		Webserver-Einstellungen
 Clear hit counter	PoorMan		Zugriffszähler löschen
 Copy	PoorMan		Kopieren
 Max. simultaneous connections:	PoorMan		Max. gleichzeitige Verbindungen:
+Create public_html	PoorMan		public_html erzeugen
 Start page:	PoorMan		Startseite:
 done.\n	PoorMan		fertig.\n
 Create	PoorMan		Erstelle

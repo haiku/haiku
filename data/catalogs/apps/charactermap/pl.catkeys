@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-CharacterMap	56063163
+1	polish	x-vnd.Haiku-CharacterMap	1534181938
 Enclosed alphanumerics	UnicodeBlocks		Otoczone symbole alfanumeryczne
 Basic Latin	UnicodeBlocks		Podstawowy łaciński
 View	CharacterWindow		Widok
@@ -123,6 +123,7 @@ Vai	UnicodeBlocks		Wai
 Yi Radicals	UnicodeBlocks		Radykały Yi
 Cyrillic extended B	UnicodeBlocks		Rozszerzona cyrylica B
 Quit	CharacterWindow		Zakończ
+Ancient symbols	UnicodeBlocks		Symbole starożytne
 Braille patterns	UnicodeBlocks		Pismo Braille'a
 New Tai Lue	UnicodeBlocks		Nowy tai le
 Runic	UnicodeBlocks		Runiczny

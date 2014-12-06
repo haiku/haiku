@@ -1,0 +1,16 @@
+1	slovenian	x-vnd.Haiku-VirtualMemory	4124626612
+Quit	SettingsWindow		Izhod
+Automatic swap management	SettingsWindow		Samodejno upravljanje izmenjavanja
+Turn off	SettingsWindow		Izključi
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Onemogočanje navideznega spomina bo imelo neželene učinke na sistemsko stabilnost, ko zmanjka spomina.\nNavidezni spomin ne vpliva na hitrost sistema, dokler ni porabljen ves spomin.\n\nAli ste prepričani, da ga želite izključiti?
+Requested swap file size:	SettingsWindow		Zahtevana velikost izmenjevalne datoteke:
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Nastavitve, ki so določene v nastavitveni datoteki, niso veljavne. Lahko jih povrnete na privzete vrednosti ali končate.
+Defaults	SettingsWindow		Privzete vrednosti
+Use volume:	SettingsWindow		Uporabi nosilec:
+Revert	SettingsWindow		Povrni
+VirtualMemory	System name		Navidezni spomin
+Use boot volume	SettingsWindow		Uporabi zagonski nosilec
+Load defaults	SettingsWindow		Naloži privzete vrednosti
+OK	VirtualMemoryApp		V redu
+Changes will take effect upon reboot.	SettingsWindow		Spremembe se bodo uveljavile ob naslednjem zagonu.
+Enable virtual memory	SettingsWindow		Omogoči navidezni spomin

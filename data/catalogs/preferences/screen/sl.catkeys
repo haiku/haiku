@@ -1,0 +1,33 @@
+1	slovenian	x-vnd.Haiku-Screen	2042293652
+yes	Screen		da
+15 bits/pixel, 32768 colors	Screen		15 bitov na piksel, 32768 barv
+/other…	Screen		/ostalo…
+16 bits/pixel, 65536 colors	Screen		16 bitov na piksel, 65536 barv
+Revert	Screen		Povrni
+Swap displays:	Screen		Zamenjaj zaslona:
+Combine displays:	Screen		Združi zaslona:
+Done	Screen		Končano
+Set background…	Screen		Nastavi ozadje…
+Undo	Screen		Razveljavi
+if needed	Screen		če je potrebno
+Screen	System name		Zaslon
+OK	Screen		V redu
+Workspaces	Screen		Delovne površine
+The screen mode could not be set:\n\t%s\n	Screen		Zaslonskega načina ni mogoče nastaviti:\n\t%s\n
+no	Screen		ne
+always	Screen		vedno
+32 bits/pixel, 16 Million colors	Screen		32 bitov na piksel, 16 milijonov barv
+Current workspace	Screen		Trenutna delovna površina
+About	Screen		O programu
+24 bits/pixel, 16 Million colors	Screen		24 bitov na piksel, 16 milijonov barv
+horizontally	Screen		vodoravno
+Other…	Screen		Drugo…
+Cancel	Screen		Prekliči
+bits/pixel	Screen		bitov na piksel
+Screen	Screen		Zaslon
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 bitov na piksel, 256 barv
+Apply	Screen		Uporabi
+Refresh rate	Screen		Hitrost osveževanja
+%sSerial no.: %s	Screen		%sSerijska št.: %s
+Colors:	Screen		Barv:

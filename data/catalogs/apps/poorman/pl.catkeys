@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-PoorMan	1347438411
+1	polish	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		Położenie strony
 Error Server	PoorMan		Błąd serwera
 Settings…	PoorMan		Ustawienia…
@@ -12,6 +12,7 @@ PoorMan settings	PoorMan		Ustawienia programu PoorMan
 Clear hit counter	PoorMan		Wyczyść licznik odsłon
 Copy	PoorMan		Kopiuj
 Max. simultaneous connections:	PoorMan		Limit jednoczesnych połączeń:
+Create public_html	PoorMan		Utwórz public_html
 Start page:	PoorMan		Strona startowa:
 done.\n	PoorMan		gotowe.\n
 Create	PoorMan		Utwórz

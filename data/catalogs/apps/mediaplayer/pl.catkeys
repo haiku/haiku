@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	3507634633
+1	polish	x-vnd.Haiku-MediaPlayer	68841021
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -139,6 +139,7 @@ Start media server	MediaPlayer-Main		Uruchom serwer mediów
 Toggle fullscreen.	MediaPlayer-Main		Przełącz tryb pełnoekranowy.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Pobiera czas trwania aktualnie odtwarzanego elementu w mikrosekundach.
 ToggleFullscreen	MediaPlayer-Main		PrzałączeniePełnegoEkranu
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} few{# kanały} many{# kanałów} other{# kanału}}
 <unnamed>	PlaylistItem-name		<bez nazwy>
 Open Clips	MediaPlayer-Main		Otwórz pliki
 OK	MediaPlayer-PlaylistWindow		OK

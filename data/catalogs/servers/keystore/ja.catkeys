@@ -1,0 +1,17 @@
+1	japanese	x-vnd.Haiku-keystore_server	2429996361
+This application hasn't been granted access before.	AppAccessRequestWindow		このアプリケーションはこれまでに接続が許可されていません。
+Unlock	KeyRequestWindow		ロック解除
+This application has been updated since it was last granted access.	AppAccessRequestWindow		このアプリケーションは最後の許可されたアクセスのときからアップデートされています。
+Allow always	AppAccessRequestWindow		常に許可する
+Application keyring access	AppAccessRequestWindow		アプリケーションキーリングアクセス
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		次のアクションを実行:\n%accessString%\n\n
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		アプリケーション:\n%signature% (%path%)\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		このアプリケーションはまだ必要な特権がありません。
+Password:	KeyRequestWindow		パスワード:
+Cancel	KeyRequestWindow		キャンセル
+Keyring:	KeyRequestWindow		キーリング:
+Unlock keyring	KeyRequestWindow		キーリングのロック解除
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		アプリケーションが以下のキーリングへのアクセスを必要としていますが、パスフレーズでロックされています。パスフレーズを入力してキーリングのロックを解除してください。\nキーリングをロック解除すると、システムがシャットダウンされるまで解除されたままか、または手動で再ロックされます。\nもしこのダイアログをキャンセルすれば、キーリングはロックされたままです。
+Allow once	AppAccessRequestWindow		一度だけ許可する
+Disallow	AppAccessRequestWindow		許可しない
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		以下のキーリングへのアクセス要求:\n%keyringName%\n\n

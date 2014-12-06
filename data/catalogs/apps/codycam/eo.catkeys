@@ -1,3 +1,17 @@
-1	esperanto	x-vnd.Haiku.CodyCam	197981196
+1	esperanto	x-vnd.Haiku-CodyCam	1794764551
 Capturing Image…	VideoConsumer.cpp		Kaptante bildon…
+Every 30 seconds	CodyCam		Po 30 sekondoj
+File name:	CodyCam		Dosiernomo:
 Remote host has closed the connection.\n	FtpClient		Malloka gastanto fermis la konektadon.n
+Login:	CodyCam		Salutnomo:
+Format:	CodyCam		Formato:
+JPEG image	CodyCam		JPEG-a bildo
+Password:	CodyCam		Pasvorto
+password	CodyCam		passworto
+Directory:	CodyCam		Dosierujo:
+Server:	CodyCam		Servilo:
+Output	CodyCam		Eligo
+Quit	CodyCam		Eliri
+Never	CodyCam		Neniam
+FTP	CodyCam		FTP
+File	CodyCam		Dosiero

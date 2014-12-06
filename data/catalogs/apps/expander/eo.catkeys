@@ -1,13 +1,16 @@
-1	esperanto	x-vnd.Haiku-Expander	253085262
-Cancel	ExpanderWindow		Nuligi
-Close	ExpanderMenu		Malfermi
-Continue	ExpanderWindow		Daŭri
+1	esperanto	x-vnd.Haiku-Expander	96598594
 Expand	ExpanderMenu		Elvolvi
-Expand	ExpanderWindow		Elvolvi
-File	ExpanderMenu		Dosiero
+Cancel	ExpanderWindow		Nuligi
+Continue	ExpanderWindow		Daŭri
+Cancel	ExpanderPreferences		Nuligi
 Select	DirectoryFilePanel		Elekti
 Settings	ExpanderMenu		Agordoj
 Settings…	ExpanderMenu		Agordoj…
+Select	ExpanderPreferences		Elekti
 Show contents	ExpanderWindow		Montri la enhavojn
 Stop	ExpanderMenu		Halti
+File	ExpanderMenu		Dosiero
+Expand	ExpanderWindow		Elvolvi
+Close	ExpanderMenu		Malfermi
+Show contents	ExpanderMenu		Montri la enhavojn
 Stop	ExpanderWindow		Halti

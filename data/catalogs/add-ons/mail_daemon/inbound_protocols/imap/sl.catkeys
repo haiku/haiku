@@ -1,0 +1,7 @@
+1	slovenian	x-vnd.Haiku-IMAP	1738732913
+Destination:	imap_config		Cilj:
+status	IMAPFolderConfig		stanje
+Apply	IMAPFolderConfig		Uporabi
+IMAP Folders	imap_config		Mape IMAP
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Dobivam mape IMAP, bodite potrpežljivi…
+IMAP Folders	IMAPFolderConfig		Mape IMAP

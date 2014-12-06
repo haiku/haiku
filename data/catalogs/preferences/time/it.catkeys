@@ -1,15 +1,30 @@
-1	italian	x-vnd.Haiku-Time	2610033694
+1	italian	x-vnd.Haiku-Time	324409609
+OK	Time		OK
+\nNow: 	Time		\nOra:
+Stop	Time		Interrompi
+Could not contact server	Time		Non è stato possibile contattare il server
+Preview time:	Time		Durata dell'anteprima:
+Synchronize	Time		Sincronizza
+Revert	Time		Ripristina
+Add	Time		Aggiungi
+Date and time	Time		Data e ora
+about	Time		informazioni
+Message receiving failed	Time		Ricezione del messaggio fallito
+Set time zone	Time		Imposta fuso orario
+Waiting for answer failed	Time		Attesa di una risposta fallita
+Hardware clock set to:	Time		Orologio hardware impostato su:
+The following error occured while synchronizing:r\n%s	Time		Si è verificato il seguente errore durante la sincronizzazione:r\n%s
+Remove	Time		Rimuovi
+Time	Time		Ora
+Sending request failed	Time		Invio di una richiesta fallita
+Time	System name		Orario
+Synchronize at boot	Time		Sincronizza all'avvio
+Received invalid time	Time		Orario ricevuto illegittimo
+The following error occured while synchronizing:r\n%s: %s	Time		Si è verificato il seguente errore durante la sincronizzazione:r\n%s: %s
 <Other>	Time		<Altro>
 Current time:	Time		Ora attuale:
-Etc	Time		Ecc
-GMT	Time		GMT
-Local time	Time		Ora locale
-OK	Time		OK
-Preview time:	Time		Durata dell'anteprima:
-Revert	Time		Ripristina
-Set time zone	Time		Imposta fuso orario
-Time	Time		Ora
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, scritto da:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Try all servers	Time		Prova con tutti i server
 Time zone	Time		Fuso orario
-\nNow: 	Time		\nOra:
-about	Time		informazioni
+Could not create socket	Time		Non è stato possibile creare un socket
+Synchronize again	Time		Sincronizza nuovamente
+Network time	Time		Orario di Rete

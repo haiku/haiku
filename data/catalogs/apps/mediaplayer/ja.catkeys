@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	3507634633
+1	japanese	x-vnd.Haiku-MediaPlayer	68841021
 raw audio	MediaPlayer-InfoWin		raw オーディオ
 Location	MediaPlayer-InfoWin		場所
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
@@ -139,6 +139,7 @@ Start media server	MediaPlayer-Main		メディアサーバーを起動する
 Toggle fullscreen.	MediaPlayer-Main		全画面表示 / 解除
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		現在再生中の項目の再生時間をマイクロセコンド単位で得る。
 ToggleFullscreen	MediaPlayer-Main		全画面表示 / 解除
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{モノラル} =2{ステレオ} other{# チャンネル}}
 <unnamed>	PlaylistItem-name		<名前が無い>
 Open Clips	MediaPlayer-Main		クリップを開く
 OK	MediaPlayer-PlaylistWindow		OK

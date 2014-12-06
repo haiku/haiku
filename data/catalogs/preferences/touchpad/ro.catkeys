@@ -1,10 +1,16 @@
-1	romanian	x-vnd.Haiku-Touchpad	4054922715
+1	romanian	x-vnd.Haiku-Touchpad	1042888532
 Scrolling	TouchpadPrefView		Derulare
 Revert	TouchpadPrefView		Revenire
+Please confirm	TouchpadPrefView		Confirmați
 Two finger scrolling	TouchpadPrefView		Derulare cu două degete
 Defaults	TouchpadPrefView		Implicite
 Slow	TouchpadPrefView		Încet
+Vertical	TouchpadPrefView		Vertical
 High	TouchpadPrefView		Înalt
 Horizontal scrolling	TouchpadPrefView		Derulare orizontală
 Fast	TouchpadPrefView		Repede
+OK	TouchpadPrefView		OK
+Horizontal	TouchpadPrefView		Orizontal
 Off	TouchpadPrefView		Oprit
+Sensitivity	TouchpadPrefView		Sensibilitate
+Cancel	TouchpadPrefView		Anulează

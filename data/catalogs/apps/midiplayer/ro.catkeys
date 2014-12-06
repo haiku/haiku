@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MidiPlayer	471142057
+1	romanian	x-vnd.Haiku-MidiPlayer	3558603571
 None	Main Window		Nimic
 Live input:	Main Window		Intrare directă:
 Stop	Main Window		Oprește
@@ -6,6 +6,7 @@ Cavern	Main Window		Cavernă
 Volume:	Main Window		Volum:
 Reverb:	Main Window		Reflectă:
 OK	Main Window		OK
+Loading instruments…	Scope View		Se încarcă instrumentele...
 Off	Main Window		Oprit
 Dungeon	Main Window		Donjon
 Play	Main Window		Redă

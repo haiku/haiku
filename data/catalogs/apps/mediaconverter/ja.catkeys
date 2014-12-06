@@ -1,9 +1,12 @@
-1	japanese	x-vnd.Haiku-MediaConverter	217152063
-Video using parameters form settings	MediaConverter		設定のパラメーターを使ったビデオ
+1	japanese	x-vnd.Haiku-MediaConverter	341686525
+Video using parameters form settings	MediaConverter		{0, plural, one{ファイルはサポートされたメディアファイルとして認識できませんでした:} other{# 個のファイルがサポートされたメディアファイルとして認識できませんでした:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{ファイルはサポートされたメディファイルとして認識されませんでした:} other{# 個のファイルがサポートされたメディファイルとして認識されませんでした::}}
 Video encoding:	MediaConverter		ビデオエンコーディング:
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error read audio frame %lld	MediaConverter		オーディオフレーム %lld の読み取り時にエラーが発生しました
 No audio	Audio codecs list		オーディオ無し
 Error	MediaConverter		エラー
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# ビット} other{# ビット}}
 Error loading a file	MediaConverter		ファイルのロード中にエラーが発生しました
 Error read video frame %lld	MediaConverter		ビデオフレーム %lld の読み取り時にエラーが発生しました
 File Error	MediaConverter-FileInfo		ファイルエラー
@@ -16,6 +19,7 @@ MediaConverter	System name		メディアコンバーター
 No video	Video codecs list		ビデオ無し
 Duration:	MediaConverter-FileInfo		再生時間:
 OK	MediaConverter		OK
+%.1f kHz mono	MediaFileInfo		%.1f kHz モノラル
 Error converting '%filename'	MediaConverter		'%filename'の変換中にエラーが発生しました
 Low	MediaConverter		低い
 Conversion completed	MediaConverter		変換が完了しました
@@ -24,8 +28,10 @@ OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		秒
 Source files	MediaConverter		ソースファイル
 Error writing video frame %lld	MediaConverter		ビデオフレーム %lld の書き込み時にエラーが発生しました
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# フレーム} other{# フレーム}}
 Error writing audio frame %lld	MediaConverter		オーディオフレーム %lld の書き出し中にエラーが発生しました
 Cancelling	MediaConverter		キャンセル中
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# バイト} other{# バイト}}
 Error loading files	MediaConverter		ファイルのロード中にエラーが発生しました
 Cancel	MediaConverter		中止
 None available	Video codecs		利用できません
@@ -53,9 +59,11 @@ Drop media files onto this window	MediaConverter		メディアファイルをこ
 Audio encoding:	MediaConverter		オーディオエンコーディング
 Audio quality not supported	MediaConverter		オーディオ品質がサポートされていません
 File	Menu		ファイル
+%.1f kHz stereo	MediaFileInfo		%.1f kHz ステレオ
 Convert	MediaConverter		変換
 Writing audio track: %ld%% complete	MediaConverter		オーディオトラックの書き込み: %ld%% 完了
 Video quality: %3d%%	MediaConverter		映像品質: %3d%%
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld チャンネル
 Output folder	MediaConverter		出力先フォルダー
 Audio quality: %3d%%	MediaConverter		音声品質: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		ファイル情報を読み取る際にエラーが発生しました。\n\nError : 

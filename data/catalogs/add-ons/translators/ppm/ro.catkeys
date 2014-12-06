@@ -1,1 +1,18 @@
-1	romanian	x-vnd.Haiku-PPMTranslator	0
+1	romanian	x-vnd.Haiku-PPMTranslator	3543309902
+PPM Settings	PPMMain		Configurări PPM
+OK	PPMMain		OK
+Grayscale 8 bits	PPMTranslator		Scală de gri 8 biți
+CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 biți
+PPM image	PPMTranslator		Imagine PPM
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bițî
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 biți
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 biți
+bits/space	PPMTranslator		biți/spațiu
+Version %d.%d.%d %s	PPMTranslator		Versiunea %d.%d.%d %s
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 biți
+Write ASCII	PPMTranslator		Scrie ASCII
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 biți
+None	PPMTranslator		Nimic
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 biți
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 biți
+System palette 8 bits	PPMTranslator		Paletă de sistem 8 biți

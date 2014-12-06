@@ -1,29 +1,45 @@
-1	italian	x-vnd.Haiku-Mail	1980480499
-Account name:	Config Views		Nome account:
-Account settings	Config Views		Impostazioni account
-Accounts	Config Window		Account
-Add	Config Window		Aggiungi
-Always	Config Window		Sempre
-Apply	Config Window		Applica
-Check every	Config Window		Controlla ogni
-Edit mailbox menu…	Config Window		Modifica menu della casella di posta...
-Error	Config Window		Errore
-Error retrieving general settings: %s\n	Config Window		Errore nel recupero delle impostazioni generali: %s\n
+1	italian	x-vnd.Haiku-Mail	2381680093
 Mail checking	Config Window		Controllo posta
-Miscellaneous	Config Window		Altro
-OK	Config Window		OK
-Only when dial-up is connected	Config Window		Solo quando il modem è connesso
-Real name:	Config Views		Nome reale:
-Remove	Config Window		Rimuovi
-Return address:	Config Views		Indirizzo del mittente:
-Revert	Config Window		Ripristina
 Settings	Config Window		Impostazioni
-Show connection status window:	Config Window		Mostra la finestra di stato della connessione:
-Start mail services on startup	Config Window		Avvia i servizi di posta all'avvio del sistema
-While sending	Config Window		Durante l'invio
+Only when dial-up is connected	Config Window		Solo quando il modem è connesso
 While sending and receiving	Config Window		Durante l'invio e la ricezione
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nLe impostazioni generali non possono essere ripristinate.\n\nErrore nel recupero delle impostazioni generali:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCrea un nuovo account con il pulsante "Aggiungi".\n\nRimuovi un account con il pulsante "Rimuovi" sull'elemento selezionato.\n\nSeleziona un elemento dalla lista per cambiarne le impostazioni.
 days	Config Window		giorni
+OK	Config Window		OK
+Start mail services on startup	Config Window		Avvia i servizi di posta all'avvio del sistema
+E-mail address:	E-Mail		Indirizzo e-mail:
+Account name:	E-Mail		Nome account:
+Account name:	Config Views		Nome account:
+OK	Config Views		OK
+The filter could not be moved. Deleting filter.	Config Views		Non è stato possibile spostare il filtro. Eliminazione filtro.
+Revert	Config Window		Ripristina
+Password:	E-Mail		Password:
+Accounts	Config Window		Account
+Remove	Config Window		Rimuovi
+Miscellaneous	Config Window		Altro
+Show connection status window:	Config Window		Mostra la finestra di stato della connessione:
+Server Name:	E-Mail		Nome Server:
+While sending	Config Window		Durante l'invio
+Schedule outgoing mail when dial-up is disconnected	Config Window		Pianificazione invio dei messaggi quando il modem è disconnesso
 hours	Config Window		ore
+Add	Config Window		Aggiungi
+Account settings	AutoConfigWindow		Impostazioni account
+E-mail	System name		E-mail
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nLe impostazioni generali non possono essere ripristinate.\n\nErrore nel recupero delle impostazioni generali:\n%s\n
+Real name:	Config Views		Nome reale:
+Choose Protocol	E-Mail		Seleziona Protocollo
+Return address:	Config Views		Indirizzo del mittente:
+Edit mailbox menu…	Config Window		Modifica menu della casella di posta...
+Remove	Config Views		Rimuovi
+Check every	Config Window		Controlla ogni
+Incoming mail filters	Config Views		Filtri della posta in entrata
+Account settings	Config Views		Impostazioni account
 minutes	Config Window		minuti
+Error retrieving general settings: %s\n	Config Window		Errore nel recupero delle impostazioni generali: %s\n
+Real name:	E-Mail		Nome reale:
+Apply	Config Window		Applica
+Always	Config Window		Sempre
+OK	AutoConfigWindow		OK
+Add filter	Config Views		Aggiungi filtro
+Outgoing mail filters	Config Views		Filtri della posta in uscita
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCrea un nuovo account con il pulsante "Aggiungi".\n\nRimuovi un account con il pulsante "Rimuovi" sull'elemento selezionato.\n\nSeleziona un elemento dalla lista per cambiarne le impostazioni.
+Error	Config Window		Errore

@@ -1,0 +1,12 @@
+1	spanish; castilian	x-vnd.Haiku-HPGSTranslator	3633584048
+Based on HPGS (http://hpgs.berlios.de)	ConfigView		Basado en HPGS (http://hpgs.berlios.de)
+Version %d.%d.%d, %s	ConfigView		Versión %d.%d.%d, %s
+Error: Cannot process plot data %s\n	HPGSTranslator		Error: No se pueden procesar los datos de trazado %s\n
+HPGS image	HPGSTranslator		Imagen HPGS
+HPGSTranslator Settings	ConfigView		Configuraciones de HPGSTranslator
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Error: No se sabe de qué dispositivo de trazado leer: %s\n
+HPGS images	ConfigView		Imágenes HPGS
+HPGS images	HPGSTranslator		Imágenes HPGS
+no hpgs\n	HPGSTranslator		sin hpgs\n
+HPGS image translator	HPGSTranslator		Traductor de imagen HPGS
+Write error %s\n	HPGSTranslator		Error de escritura %s\n

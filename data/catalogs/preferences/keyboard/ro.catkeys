@@ -6,7 +6,7 @@ Key repeat rate	KeyboardView		Rata de repetare a tastei
 Revert	KeyboardWindow		Revenire
 Delay until key repeat	KeyboardView		Întârziere până la repetarea tastei
 Keyboard	System name		Tastatură
-OK	KeyboardApplication		Bine
+OK	KeyboardApplication		OK
 Fast	KeyboardView		Rapid
 Slow	KeyboardView		Lent
 Something has gone wrong!	KeyboardApplication		Ceva nu a mers bine!

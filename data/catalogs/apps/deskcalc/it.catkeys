@@ -1,4 +1,10 @@
-1	italian	x-vnd.Haiku-DeskCalc	1432606073
-Audio Feedback	CalcView		Suoni
-Enable Num Lock on startup	CalcView		Attiva il Bloc Num all'avvio
-Show keypad	CalcView		Mostra tasti
+1	italian	x-vnd.Haiku-DeskCalc	1694821448
+Compact	CalcView		Compatta
+Scientific	CalcView		Scientifica
+DeskCalc	System name		DeskCalc
+Basic	CalcView		Normale
+Radians	CalcView		Radianti
+Enable Num Lock on startup	CalcView		Attiva BlocNum all'avvio
+Calculating	CalcView		Calcolo in corso
+Degrees	CalcView		Gradi
+Audio Feedback	CalcView		Restituire feedback sonoro

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	1777773037
+1	russian	x-vnd.Haiku-Terminal	336113194
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -46,9 +46,10 @@ Window title…	Terminal TermWindow		Заголовок окна…
 Full screen	Terminal TermWindow		На весь экран
 Page setup…	Terminal TermWindow		Настройка печати…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Данные процессы все еще работают:\n\n\t%1\n\nЕсли вы закроете Терминал, то эти процессы будут уничтожены.
+Custom	Terminal AppearancePrefView	Window size	Настроена вручную
 Insert path	Terminal TermView		Вставить путь
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Терминал\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nИспользование: %s [OPTION] [SHELL]\n
-Window size:	Terminal AppearancePrefView		Размер окна
+Window size:	Terminal AppearancePrefView		Размер окна:
 No search string was entered.	Terminal TermWindow		Не введена строка поиска
 Font size	Terminal TermWindow		Размер шрифта
 Blinking cursor	Terminal AppearancePrefView		Мигающий курсор

@@ -1,4 +1,5 @@
-1	romanian	x-vnd.Haiku-Appearance	963859935
+1	romanian	x-vnd.Haiku-Appearance	4022094371
+Plain font:	Font view		Font simplu:
 Control highlight	Colors tab		Punct principal de control
 Control border	Colors tab		Margine de control
 Antialiasing type:	AntialiasingSettingsView		Tip de anti-alias:
@@ -8,12 +9,14 @@ Defaults	APRWindow		Implicite
 Grayscale	AntialiasingSettingsView		Scală de gri
 Shine	Colors tab		Strălucire
 About	DecorSettingsView		Despre
+About decorator	DecorSettingsView		Despre decorator
 Off	AntialiasingSettingsView		Oprit
 Choose Decorator	DecorSettingsView		Alege decorator
 Success	Colors tab		Succes
 Inactive window tab text	Colors tab		Text de fereastră tab inactivă
 Failure	Colors tab		Eşec
 Hinting menu	AntialiasingSettingsView		Meniu de sugestii
+Scroll bar:	DecorSettingsView		Bară de derulare:
 Document background	Colors tab		Fundalul documentului
 Revert	APRWindow		Revenire
 Window tab	Colors tab		Tab de fereastră
@@ -28,11 +31,16 @@ Navigation pulse	Colors tab		Puls de navigare
 Selected menu item text	Colors tab		Textul elementului de meniu selectat
 Menu background	Colors tab		Fundalul meniului
 OK	DecorSettingsView		OK
+Size:	Font Selection view		Dimensiune:
+Decorator:	DecorSettingsView		Decorator:
 Panel background	Colors tab		Fundalul panoului
+Menu font:	Font view		Font meniu:
 Colors	APRWindow		Culori
 Control background	Colors tab		Fundalul controlului   
 Inactive window tab	Colors tab		Fereastră tab inactivă
 Appearance	System name		Aspect
+Fixed font:	Font view		Font fix:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicență: %decorLic\n\n%decorDesc\n
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce intensitatea filtrului marginilor colorate:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Anti-aliasul pe bază de subpixel în combinație cu indiciul glyph nu este diponibilă în această versiune compilată Haiku pentru a evita problemele posibile de încălcare a proprietății intelectuale. Pentru a face disponibilă această caracteristică, trebuie să construiți o altă variantă Haiku și să activați anumite opțiuni în antetul de configurație libfreetype.
 Control text	Colors tab		Text de control
@@ -45,4 +53,5 @@ Strong	AntialiasingSettingsView		Îngroșat
 Panel text	Colors tab		Text de panou
 Monospaced fonts only	AntialiasingSettingsView		Doar fonturi monospațiate
 Antialiasing menu	AntialiasingSettingsView		Meniu anticrenelare
+Fonts	APRWindow		Fonturi
 Glyph hinting:	AntialiasingSettingsView		Indiciu glyph:

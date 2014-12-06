@@ -1,0 +1,37 @@
+1	slovenian	x-vnd.Haiku-BootManager	1988720480
+The boot manager has been successfully installed on your system.	BootManagerController		Zagonski upravitelj je bil uspešno nameščen na vaš sistem.
+After two seconds	DefaultPartitionPage		Po dveh sekundah
+Hard Drive	DrivesPage	Default disk name	Trdi disk
+USB Drive	DrivesPage	Default disk name	Naprava USB
+Partitions	PartitionsPage	Title	Particije
+Timeout: %s	DefaultPartitionPage		Časovna omejitev: %s
+Select	FileSelectionPage	Button	Izberi
+Cannot access!	DrivesPage	Cannot install	Dostop ni mogoč!
+After four seconds	DefaultPartitionPage		Po štirih sekundah
+Next	WizardView	Button	Naprej
+After one second	DefaultPartitionPage		Po eni sekundi
+After one minute	DefaultPartitionPage		Po eni minuti
+Uninstall	DrivesPage	Button	Odstrani
+Default Partition	DefaultPartitionPage	Title	Privzeta particija
+After five seconds	DefaultPartitionPage		Po petih sekundah
+Back	BootManagerController	Button	Nazaj
+Installation of boot menu completed	BootManagerController	Title	Namestitev zagonskega menija končana
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Neimenovana %d
+File:	FileSelectionPage	Text control label	Datoteka:
+Previous	WizardView	Button	Nazaj
+Install	DrivesPage	Button	Namesti
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Neznana
+Update	DrivesPage	Button	Posodobi
+No space available!	DrivesPage	Cannot install	Ni prostora!
+Never	DefaultPartitionPage		Nikoli
+Partition table not compatible	BootManagerController	Title	Particijska tabela ni podprta
+Boot Manager is unable to read the partition table!	BootManagerController		Zagonski upravitelj ne more prebrati particijske tabele!
+Error reading partition table	BootManagerController	Title	Napaka pri branju particijske tabele
+Installation of boot menu failed	BootManagerController	Title	Namestitev zagonskega menija ni uspela
+Default Partition:	DefaultPartitionPage	Menu field label	Privzeta particija:
+Partitions	DefaultPartitionPage	Pop up menu title	Particije
+Summary	BootManagerController	Title	Povzetek
+OK	BootManagerController	Button	V redu
+Immediately	DefaultPartitionPage		Takoj
+Done	BootManagerController	Button	Končano
+After three seconds	DefaultPartitionPage		Po treh sekundah

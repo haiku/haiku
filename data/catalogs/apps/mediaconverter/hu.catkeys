@@ -1,9 +1,12 @@
-1	hungarian	x-vnd.Haiku-MediaConverter	217152063
+1	hungarian	x-vnd.Haiku-MediaConverter	341686525
 Video using parameters form settings	MediaConverter		Videó a beállítások paramétereivel
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{A fájl nem felismerhető média formátumú:} other{# fájl nem felismerhető média formátumú:}}
 Video encoding:	MediaConverter		Videó kódolása:
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error read audio frame %lld	MediaConverter		Hiba történt a %lld. hang olvasása közben
 No audio	Audio codecs list		Nincs hang
 Error	MediaConverter		Hiba
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bit}}
 Error loading a file	MediaConverter		Hiba történt a fájl betöltése során
 Error read video frame %lld	MediaConverter		Hiba történt a %lld. képkocka olvasása közben
 File Error	MediaConverter-FileInfo		Fájlhiba
@@ -16,6 +19,7 @@ MediaConverter	System name		Médiaátalakító
 No video	Video codecs list		Nincs videó
 Duration:	MediaConverter-FileInfo		Időtartam:
 OK	MediaConverter		Rendben
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 Error converting '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl átalakítása közben
 Low	MediaConverter		Alacsony
 Conversion completed	MediaConverter		Átalakítás kész
@@ -24,8 +28,10 @@ OK	MediaConverter-FileInfo		Rendben
  seconds	MediaFileInfo		 másodperc
 Source files	MediaConverter		Forrásfájlok
 Error writing video frame %lld	MediaConverter		Hiba történt a %lld. képkocka írása közben
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# képkocka} other{# képkocka}}
 Error writing audio frame %lld	MediaConverter		Hiba történt a %lld. hang írása közben
 Cancelling	MediaConverter		Megszakítás folyamatban
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bájt} other{# bájt}}
 Error loading files	MediaConverter		Hiba történt a fájlok betöltése során
 Cancel	MediaConverter		Mégse
 None available	Video codecs		Nincs elérhető
@@ -53,9 +59,11 @@ Drop media files onto this window	MediaConverter		Húzzon médiafájlokat erre a
 Audio encoding:	MediaConverter		Audió kódolása:
 Audio quality not supported	MediaConverter		Ez a hangminőség nem támogatott
 File	Menu		Fájl
+%.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
 Convert	MediaConverter		Átalakítás
 Writing audio track: %ld%% complete	MediaConverter		Audiósáv írása: %ld%% kész
 Video quality: %3d%%	MediaConverter		Videó minősége: %3d%%
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld csatorna
 Output folder	MediaConverter		Kimeneti mappa
 Audio quality: %3d%%	MediaConverter		Audió minősége: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Hiba történt a fájl beolvasása közben.\n\nHiba:

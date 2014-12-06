@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	1777773037
+1	japanese	x-vnd.Haiku-Terminal	336113194
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -46,6 +46,7 @@ Window title…	Terminal TermWindow		ウィンドウタイトル…
 Full screen	Terminal TermWindow		全画面表示
 Page setup…	Terminal TermWindow		ページ設定…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		次のプロセスがまだ実行中です:\n\n\t%1\n\nTerminalを閉じると強制終了されます。
+Custom	Terminal AppearancePrefView	Window size	カスタム
 Insert path	Terminal TermView		パスを挿入
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n
 Window size:	Terminal AppearancePrefView		ウィンドウサイズ:

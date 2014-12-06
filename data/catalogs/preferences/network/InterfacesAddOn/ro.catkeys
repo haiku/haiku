@@ -1,0 +1,25 @@
+1	romanian	x-vnd.Haiku-InterfacesAddOn	1882931603
+Interface	InterfaceWindow		Interfață
+Network:	IntefaceHardwareView		Rețea:
+Static	IntefaceAddressView		Static
+None	InterfacesListView		Nimic
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		Stare:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+The method for obtaining an IP address	IntefaceAddressView		Metoda de obținere unei adrese IP
+Enable	InterfacesListView		Activare
+Received:	IntefaceHardwareView		Primit:
+Choose automatically	IntefaceHardwareView		Alege automat
+connected	IntefaceHardwareView		conectat
+Gateway:	IntefaceAddressView		Gateway:
+Disable	InterfacesListView		Dezactivare
+Sent:	IntefaceHardwareView		Trimis:
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Mod:
+<no wireless networks found>	IntefaceHardwareView		<no wireless networks found>
+IP Address:	IntefaceAddressView		Adresă IP:
+Off	IntefaceAddressView		Oprit
+MAC address:	IntefaceHardwareView		Adresă MAC:
+Renegotiate	IntefaceHardwareView		Renegociază
+disconnected	IntefaceHardwareView		deconectat
+Disable	IntefaceHardwareView		Dezactivare

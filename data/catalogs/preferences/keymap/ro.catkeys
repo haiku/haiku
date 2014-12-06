@@ -1,23 +1,83 @@
-1	romanian	x-vnd.Haiku-Keymap	140876782
+1	romanian	x-vnd.Haiku-Keymap	1154155435
+Dvorak	Keyboard Layout View		Dvorak
 Revert	Modifier keys window		Revenire
+Slovak	Keyboard Layout View		Slovacă
+Hungarian	Keyboard Layout View		Maghiară
+German	Keyboard Layout View		Germană
+Greek	Keyboard Layout View		Greacă
+Menu	Keyboard Layout View	Menu key	Meniu
+Spanish	Keyboard Layout View		Spaniolă
+Ukrainian (Mac)	Keyboard Layout View		Ucraineană (Mac)
+Belarusian	Keyboard Layout View		Bielorusă
+Italian	Keyboard Layout View		Italiană
 Tilde trigger	Keymap window		Declanșator tildă
 Grave trigger	Keymap window		Declanșator grav
+Role	Modifier keys window	As in the role of a modifier key	Rol
 Select dead keys	Keymap window		Selectează chei moarte
+Bulgarian (Cyrillic)	Keyboard Layout View		Bulgară (Chirilică)
+Cancel	Modifier keys window		Anulează
+Russian	Keyboard Layout View		Rusă
+Icelandic	Keyboard Layout View		Islandeză
+Command	Keyboard Layout View	Command key	Comandă
+Polish	Keyboard Layout View		Poloneză
+Serbian (Cyrillic)	Keyboard Layout View		Sârbă (Chirilică)
+French	Keyboard Layout View		Franceză
+Faeroese	Keyboard Layout View		Feroeză
+Japanese	Keyboard Layout View		Japoneză
+Estonian	Keyboard Layout View		Estonă
+Russian (Mac)	Keyboard Layout View		Rusă (Mac)
+Defaults	Keymap window		Implicite
 Quit	Keymap window		Părăsește
+Dutch	Keyboard Layout View		Olandeză
 Switch shortcut keys to Haiku mode	Keymap window		Schimbă scurtăturile la modul Haiku
 Circumflex trigger	Keymap window		Declanșator circumflex
+Hebrew	Keyboard Layout View		Ebraică
+ISO-9995	Keyboard Layout View		ISO-9995
 Diaeresis trigger	Keymap window		Declanșator tremă
+Disabled	Modifier keys window	Do nothing	Dezactivat
+Danish	Keyboard Layout View		Daneză
 Open…	Keymap window		Deschide…
+Error: duplicate keys	Modifier keys window		Eroare: taste duplicate
 System:	Keymap window		Sistem:
+Lithuanian	Keyboard Layout View		Lituaniană
+Finnish	Keyboard Layout View		Finlandeză
+Svorak	Keyboard Layout View		Svorak
+Romanian	Keyboard Layout View		Română
+Option:	Modifier keys window	Option key role name	Opțiune:
+Control	Keyboard Layout View	Control key	Control
+Portuguese	Keyboard Layout View		Portugheză
 Switch shortcut keys	Keymap window		Schimbă scurtături
+Norwegian	Keyboard Layout View		Norvegiană
 User:	Keymap window		Utilizator:
+Esperanto	Keyboard Layout View		Esperanto
+Arabic (102)	Keyboard Layout View		Arabă (102)
+German (Mac)	Keyboard Layout View		Germană (Mac)
+Key	Modifier keys window	As in a computer keyboard key	Tastă
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tasta Ctrl
+Control:	Modifier keys window	Control key role name	Control:
+Option	Keyboard Layout View	Option key	Opțiune
 Sample and clipboard:	Keymap window		Mostră și clipboard:
 Layout	Keymap window		Aranjament
 Switch shortcut keys to Windows/Linux mode	Keymap window		Schimbă scurtăturile la modul Windows/Linux
+Albanian	Keyboard Layout View		Albaneză
 Revert	Keymap window		Revenire
+Command:	Modifier keys window	Command key role name	Comandă:
+Lithuanian (Standard)	Keyboard Layout View		Lituaniană (Standard)
+Irish	Keyboard Layout View		Irlandeză
+Turkish (Type-F)	Keyboard Layout View		Turcă (Type-F)
+Slovene	Keyboard Layout View		Slovenă
+Turkish (Type-Q)	Keyboard Layout View		Turcă (Type-Q)
 Save as…	Keymap window		Salvează ca…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tasta Win/Cmd
 File	Keymap window		Fișier
+Num lock	Keyboard Layout View		Num lock
+Swedish	Keyboard Layout View		Suedeză
+Macedonian	Keyboard Layout View		Macedoneană
 (Current)	Keymap window		(Curent)
 Font	Keymap window		Font
 Keymap	System name		HartăTaste
+French (Mac)	Keyboard Layout View		Franceză (Mac)
+Croatian	Keyboard Layout View		Croată
+Czech	Keyboard Layout View		Cehă
+Colemak	Keyboard Layout View		Colemak
 Acute trigger	Keymap window		Declanșator ascuțit

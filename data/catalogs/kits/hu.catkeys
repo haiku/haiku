@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libbe	1409488127
+1	hungarian	x-vnd.Haiku-libbe	1743278280
 gamma	AboutWindow		gamma
 beta	AboutWindow		béta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -13,16 +13,19 @@ alpha	AboutWindow		alfa
 Error	PrintJob		Hiba
 All Rights Reserved.	AboutWindow		Minden jog fenntartva.
 About %app%	AboutWindow		%app% névjegye
+No pages to print!	PrintJob		Nincs nyomtatható oldal!
 OK	Dragger		Rendben
 OK	PrintJob		Rendben
 Green:	ColorControl		Zöld:
 Version history:	AboutWindow		Előző verziók:
 Remove replicant	Dragger		Replikáns eltávolítása
+OK	AboutWindow		Rendben
 OK	ZombieReplicantView		Rendben
 Print Server is not responding.	PrintJob		A nyomtatókiszolgáló nem válaszol.
 Paste	TextView		Beillesztés
 Special Thanks:	AboutWindow		Külön köszönet:
 %.2f TiB	StringForSize		%.2f TiB
+{0, plural, one{# byte} other{# bytes}	StringForSize		{0, plural, one{# bájt} other{# bájt}
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nem található a replikánshoz tartozó program. Nincs megadva programaláírás.\n%error
 Redo	TextView		Újra
 <empty>	Menu		<üres>

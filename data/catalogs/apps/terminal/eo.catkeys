@@ -1,0 +1,24 @@
+1	esperanto	x-vnd.Haiku-Terminal	3950736600
+OK	Terminal TermWindow		Bone
+Quit	Terminal TermWindow		Eliri
+Window title:	Terminal AppearancePrefView		fenestra titolo:
+Copy	Terminal TermWindow		Kopii
+Window title:	Terminal TermWindow		fenestra titolo:
+Cancel	Terminal SetTitleWindow		Rezigni
+Settings	Terminal TermWindow		Agordoj
+Find	Terminal FindWindow		Trovi
+OK	Terminal SetTitleWindow		Bone
+Background	Terminal AppearancePrefView		Fono
+Window title…	Terminal TermWindow		Fenestra titolo…
+Find…	Terminal TermWindow		Trovi…
+Error!	Terminal getString		Eraro!
+Close	Terminal TermWindow		Fermi
+Text	Terminal AppearancePrefView		Teksto
+Close window	Terminal TermWindow		Fermi fenestron
+Settings…	Terminal TermWindow		Agordoj…
+Color:	Terminal AppearancePrefView		Koloroj:
+Print	Terminal TermWindow		Presi
+Cancel	Terminal TermWindow		Rezigni
+OK	Terminal TermApp		Bone
+Paste	Terminal TermWindow		Alglui
+Cancel	Terminal TermView		Rezigni

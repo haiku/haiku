@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-screenshot	363809141
+1	finnish	x-vnd.haiku-screenshot	3896204963
 seconds	ScreenshotWindow		sekuntia
 Desktop	ScreenshotWindow		Työpöytä
 Include window border	ScreenshotWindow		Sisällytä ikkunaraja
@@ -7,6 +7,7 @@ Select	ScreenshotWindow		Valitse
 Capture active window	ScreenshotWindow		Kaappaa aktiivinen ikkuna
 Cancel	ScreenshotWindow		Peru
 Name:	ScreenshotWindow		Nimi:
+Choose folder…	ScreenshotWindow		Valitse kansio...
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Tiedosto on jo olemassa.\n Haluako todella korvata sen?
 Choose folder	ScreenshotWindow		Valitse kansio
 Save	ScreenshotWindow		Tallenna

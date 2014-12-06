@@ -1,0 +1,21 @@
+1	spanish; castilian	x-vnd.Haiku-NetworkStatus	3946594365
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Opciones del estado de red:\n\t--barra del escritorio\tautomáticamente agregar replicante a la barra del escritorio\n\t--ayuda\t\timprimir esta informacion y salir\n
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Puedes arrancar NetworkStatus en una ventana o instalarlo en la Barra de escritorio
+<no wireless networks found>	NetworkStatusView		<no se pudo encontrar redes inalámbricas>
+Run in window	NetworkStatus		Ejecutar en ventana
+No link	NetworkStatusView		sin enlace
+Install in Deskbar	NetworkStatus		Instalar en la barra de escritorio
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		lanzamiento de la red falló.\n\nError:
+Netmask	NetworkStatusView		Máscara de red
+Broadcast	NetworkStatusView		Transmisión
+Unknown	NetworkStatusView		Desconocido
+Ready	NetworkStatusView		Listo
+No stateful configuration	NetworkStatusView		Ninguna configuración con estado
+%ifaceName information:\n	NetworkStatusView		%ifaceName información:\n
+Configuring	NetworkStatusView		Configurando
+Address	NetworkStatusView		Dirección
+OK	NetworkStatusView		Aceptar
+NetworkStatus	System name		NetworkStatus
+Open network preferences…	NetworkStatusView		Abrir preferencias de red ...
+Could not join wireless network:\n	NetworkStatusView		No se puedo unir a la red inalámbrica
+Quit	NetworkStatusView		Salir

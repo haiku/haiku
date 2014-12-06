@@ -1,46 +1,48 @@
-1	croatian	x-vnd.Haiku-Bluetooth	3811567498
+1	croatian	x-vnd.Haiku-Bluetooth	3064073961
+Display	DeviceClass		Zaslon
+Printer	DeviceClass		Pisač
+Uncategorized	DeviceClass		Nesortirano
+Positioning	DeviceClass		Pozicioniranje
+Phone	DeviceClass		Telefon
 #ServerNotReady#Not Valid name	RemoteDevice		#Poslužitelj nije spreman#Ime nije valjano
+Controller	DeviceClass		Kontroler
+No service available	DeviceClass		Nema dostupnih servisa
+Handheld	DeviceClass		Priručni
+Computer	DeviceClass		Računalo
+Cellular	DeviceClass		Mobitel
+Microphone	DeviceClass		Mikrofon
+Cordless	DeviceClass		Bežično
+Common ISDN access	DeviceClass		Uobičajeni ISDN pristup
+Scanner	DeviceClass		Skener
+Game	DeviceClass		Igra
 (reserved)	DeviceClass		(rezervirano)
-Audio	DeviceClass		Audio
 Audio/Video	DeviceClass		Audio/Video
+Glasses	DeviceClass		Naočale
+Keyboard	DeviceClass		Tipkovnica
 Camera	DeviceClass		Kamera
 Card reader	DeviceClass		Čitač kartica
-Cellular	DeviceClass		Mobitel
-Common ISDN access	DeviceClass		Uobičajeni ISDN pristup
-Computer	DeviceClass		Računalo
-Controller	DeviceClass		Kontroler
-Cordless	DeviceClass		Bežično
-Fully available	DeviceClass		Potpuno dostupno
-Game	DeviceClass		Igra
-Glasses	DeviceClass		Naočale
-Handheld	DeviceClass		Priručni
-Headphones	DeviceClass		Slušalice
-HiFi audio device	DeviceClass		HiFi audio uređaj
-Information	DeviceClass		Informacija
-Jacket	DeviceClass		Jakna
-Keyboard	DeviceClass		Tipkovnica
-LAN access	DeviceClass		LAN pristup
 Laptop	DeviceClass		Prijenosno računalo
-Loudspeaker	DeviceClass		Zvučnik
-Microphone	DeviceClass		Mikrofon
-Miscellaneous	DeviceClass		Razno
-Networking	DeviceClass		Umrežavanje
-No service available	DeviceClass		Nema dostupnih servisa
-Not implemented	RemoteDevice		Nije primjenjeno
-Palm	DeviceClass	A palm-held device	Palm
-Phone	DeviceClass		Telefon
-Printer	DeviceClass		Pisač
-Remote control	DeviceClass		Udaljena kontrola
-Robot	DeviceClass		Robot
 SIM card reader	DeviceClass		Čitač SIM kartica
-Scanner	DeviceClass		Skener
+Headphones	DeviceClass		Slušalice
+Information	DeviceClass		Informacija
+Remote control	DeviceClass		Udaljena kontrola
+Audio	DeviceClass		Audio
+Robot	DeviceClass		Robot
+Loudspeaker	DeviceClass		Zvučnik
+LAN access	DeviceClass		LAN pristup
+Wrist watch	DeviceClass		Ručni sat
+Networking	DeviceClass		Umrežavanje
+Vehicle	DeviceClass		Vozilo
+Palm	DeviceClass	A palm-held device	Palm
+Video display and loudspeaker	DeviceClass		Video zaslon i zvučnik
+Jacket	DeviceClass		Jakna
+Unspecified	DeviceClass		Neodređeno
+Fully available	DeviceClass		Potpuno dostupno
+Not implemented	RemoteDevice		Nije primjenjeno
 Server	DeviceClass		Poslužitelj
+Video camera	DeviceClass		Video kamera
+HiFi audio device	DeviceClass		HiFi audio uređaj
 Smart phone	DeviceClass		Smartphone
 Telephony	DeviceClass		Telefonija
-Uncategorized	DeviceClass		Nesortirano
-Unspecified	DeviceClass		Neodređeno
 VCR	DeviceClass		VCR
-Vehicle	DeviceClass		Vozilo
-Video camera	DeviceClass		Video kamera
-Video display and loudspeaker	DeviceClass		Video zaslon i zvučnik
-Wrist watch	DeviceClass		Ručni sat
+Miscellaneous	DeviceClass		Razno

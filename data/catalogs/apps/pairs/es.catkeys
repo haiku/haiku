@@ -1,11 +1,11 @@
-1	spanish	x-vnd.Haiku-Pairs	1273308166
-Beginner (4x4)	PairsWindow		Principiante (4x4)
+1	spanish; castilian	x-vnd.Haiku-Pairs	2647083837
 Expert (8x8)	PairsWindow		Experto (8x8)
-Game	PairsWindow		Juego
-Intermediate (6x6)	PairsWindow		Intermedio (6x6)
-New	PairsWindow		Nuevo
-New game	PairsWindow		Nueva partida
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs no encontró suficientes iconos vectoriales en el sistema; se necesitan por lo menos %d.
-Quit	PairsWindow		Salir
+Beginner (4x4)	PairsWindow		Principiante (4x4)
 Quit game	PairsWindow		Finalizar partida
+Game	PairsWindow		Juego
 Size	PairsWindow		Tamaño
+New	PairsWindow		Nuevo
+Intermediate (6x6)	PairsWindow		Intermedio (6x6)
+Quit	PairsWindow		Salir
+Pairs	System name		Pares
+New game	PairsWindow		Nueva partida

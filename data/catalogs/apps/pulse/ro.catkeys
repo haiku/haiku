@@ -21,7 +21,7 @@ Mini mode	PrefsWindow		Mod mini
 OK	PulseApp		OK
 Bar colors	ConfigView		Culori bară
 Settings…	PulseView		Configurări...
-You can't disable the last active CPU.	PulseView		Nu puteți dezactiva ultimul procesor activ.
+You can't disable the last active CPU.	PulseView		Nu puteți dezactiva ultimul CPU activ.
 Info	PulseApp		Detalii
 Info	CPUButton		Info
 OK	PulseView		OK
@@ -35,7 +35,7 @@ Pulse	NormalPulseView		Puls
 Deskbar mode	NormalPulseView		Mod bară de desktop
 Pulse	PulseApp		Puls
 Width of icon:	ConfigView		Lățimea pictogramei:
-You can't disable the last active CPU.	CPUButton		Nu puteți dezactiva ultimul procesor activ.
+You can't disable the last active CPU.	CPUButton		Nu puteți dezactiva ultimul CPU activ.
 Normal mode	DeskbarPulseView		Mod normal
 OK	CPUButton		OK
 About Pulse…	CPUButton		Despre Puls...
@@ -45,4 +45,4 @@ Info	DeskbarPulseView		Info
 Pulse settings	PulseWindow		Configurări Puls
 Idle color	ConfigView		Culoare în așteptare
 Installing in Deskbar failed\n%s	PulseApp		Instalarea pe Deskbar a eșuat\n%s
-CPU progress bar	NormalPulseView		Bara de progres a procesorului
+CPU progress bar	NormalPulseView		Bara de progres a CPU

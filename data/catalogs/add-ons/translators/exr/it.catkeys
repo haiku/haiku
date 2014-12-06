@@ -1,9 +1,8 @@
-1	italian	x-vnd.Haiku-EXRTranslator	3390292316
-Based on OpenEXR (http://www.openexr.com)	ConfigView		Basato su OpenEXR (http://www.openexr.com)
-EXR Images	ConfigView		EXR Immagini
-EXR Images	EXRTranslator		EXR Immagini
-EXR Settings	main		EXR Impostazioni
-EXR image	EXRTranslator		EXR Immagine
-EXR image translator	EXRTranslator		EXR immagine translator
+1	italian	x-vnd.Haiku-EXRTranslator	33353118
 Version %d.%d.%d, %s	ConfigView		Versione %d.%d.%d, %s
+EXR image translator	EXRTranslator		EXR immagine translator
+Based on OpenEXR (http://www.openexr.com)	ConfigView		Basato su OpenEXR (http://www.openexr.com)
+EXR Settings	main		EXR Impostazioni
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		una divisione della Lucasfilm Entertainment Company Ltd
+EXR image	EXRTranslator		EXR Immagine
+EXR image translator	ConfigView		EXR immagine translator

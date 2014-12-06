@@ -1,0 +1,29 @@
+1	spanish; castilian	x-vnd.Haiku-Media	1376555819
+Couldn't add volume control in Deskbar: %s\n	Media views		No se ha podido agregar el control de volumen en el Deskbar: %s\n
+Ready for use…	Media Window		Listo para usar...
+Video input:	Media views		Entrada de video:
+Waiting for media_server to quit.	Media Window		Esperando que cierre el media_server. Para salir
+Cleaning up.	Media Window		Limpiando.
+Defaults	Media views		Predeterminados
+Stopping media server…	Media Window		Deteniendo el servidor de media ...
+Quit	Media Window		Salir
+Starting media server…	Media Window		Iniciando el servidor de media…
+Done shutting down.	Media Window		Apagado.
+Video settings	Media Window		Configuración de video
+Video output:	Media views		Salida de video:
+Could not connect to the media server.\nWould you like to start it ?	Media Window		No se puede conectar con el servidor de media.\n¿Desea iniciarlo?
+Restart media services	Media views		Reiniciar los servicios multimedia
+Couldn't remove volume control in Deskbar: %s\n	Media views		No se ha podido remover el control de volumen en el Deskbar: %s\n
+Media	System name		Media
+Telling media_addon_server to quit.	Media Window		Solicitando al media_addon_server que termine.
+Audio mixer	Media Window		Mezclador de audio
+This hardware has no controls.	Media Window		Este dispositivo no tiene controles.
+Audio output:	Media views		Salida de audio:
+Restarting media services\nStarting media server…\n	Media Window		Reiniciando servicios multimedia\nIniciando servidor multimedia…\n
+Audio settings	Media Window		Configuración de audio
+Start media server	Media Window		Iniciar servidor multimedia
+Restarting media services\nShutting down media server\n	Media Window		Reiniciando servicios de medios\nApagando el servidor de media\n
+<none>	Media views		<ninguno>
+Channel:	Media views		Canal:
+Show volume control on Deskbar	Media views		Mostrar control de volumen en la barra de escritorio
+Audio input:	Media views		Entrada de audio:

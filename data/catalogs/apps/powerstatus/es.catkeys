@@ -1,0 +1,39 @@
+1	spanish; castilian	x-vnd.Haiku-PowerStatus	556468018
+Design capacity low warning: 	PowerStatus		Advertencia sobre la capacidad baja de diseño:
+Show percent	PowerStatus		Mostrar porcentaje
+Design capacity: 	PowerStatus		Capacidad de diseño:
+Type: 	PowerStatus		Tipo:
+non-rechargeable	PowerStatus		No es recargable
+Empty battery slot	PowerStatus		Espacio de batería vacío
+Run in window	PowerStatus		Ejecutar en ventana
+PowerStatus	System name		PowerStatus
+Battery info…	PowerStatus		Info de batería...
+Damaged battery	PowerStatus		Batería dañada
+Show time	PowerStatus		Mostrar hora
+Last full charge: 	PowerStatus		Carga completa más reciente:
+Battery unused	PowerStatus		Batería no es utilizado
+Extended battery info	PowerStatus		Información sobre la batería más extenso
+Current rate: 	PowerStatus		Velocidad actual:
+discharging	PowerStatus		descargando
+Show text label	PowerStatus		Mostrar etiqueta texto
+About…	PowerStatus		Sobre...
+Model number: 	PowerStatus		Número del modelo:
+Install in Deskbar	PowerStatus		Instalar en barra de escritorio
+Capacity: 	PowerStatus		Capacidad:
+Battery discharging	PowerStatus		Batería está descargando
+Serial number: 	PowerStatus		Número en serie:
+Capacity granularity 1: 	PowerStatus		Granulación de capacidad 1:
+OEM info: 	PowerStatus		Información de OEM:
+Design voltage: 	PowerStatus		Voltaje de diseño:
+Battery charging	PowerStatus		Batería está cambiando
+Design capacity warning: 	PowerStatus		Advertencia de la capacidad de diseño:
+Battery info	PowerStatus		Información de la batería
+Quit	PowerStatus		Salir
+rechargeable	PowerStatus		recargable
+charging	PowerStatus		cargando
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puede ejecutar Estado de Energía en una ventana o puede instalarlo en barra de escritorio.
+Power status box	PowerStatus		Modulo de estado de energía
+Show status icon	PowerStatus		Mostrar icono de estado
+Capacity granularity 2: 	PowerStatus		Granulación de capacidad 2:
+Technology: 	PowerStatus		Tecnología:
+no battery	PowerStatus		no batería

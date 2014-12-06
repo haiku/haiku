@@ -1,21 +1,22 @@
-1	italian	x-vnd.Haiku-Keymap	3858687220
-(Current)	Keymap window		(Attuale)
-Acute trigger	Keymap window		Attivatore accento acuto
+1	italian	x-vnd.Haiku-Keymap	2739695646
+Revert	Modifier keys window		Ripristina
+Tilde trigger	Keymap window		Attivatore accento tilde
+Grave trigger	Keymap window		Attivatore accento grave
+Select dead keys	Keymap window		Seleziona tasti morti
+Quit	Keymap window		Esci
+Switch shortcut keys to Haiku mode	Keymap window		Tasti di scelta rapida in modalità Haiku
 Circumflex trigger	Keymap window		Attivatore accento circonflesso
 Diaeresis trigger	Keymap window		Attivatore accento dieresi
-File	Keymap window		File
-Font	Keymap window		Font
-Grave trigger	Keymap window		Attivatore accento grave
-Layout	Keymap window		Layout
 Open…	Keymap window		Apri…
-Quit	Keymap window		Esci
-Revert	Keymap window		Ripristina
-Sample and clipboard:	Keymap window		Prova campione e appunti:
-Save as…	Keymap window		Salva come…
-Select dead keys	Keymap window		Seleziona tasti morti
-Switch shortcut keys	Keymap window		Tasti di scelta rapida
-Switch shortcut keys to Haiku mode	Keymap window		Tasti di scelta rapida in modalità Haiku
-Switch shortcut keys to Windows/Linux mode	Keymap window		Tasti di scelta rapida in modalità Windows/Linux
 System:	Keymap window		Sistema:
-Tilde trigger	Keymap window		Attivatore accento tilde
+Switch shortcut keys	Keymap window		Tasti di scelta rapida
 User:	Keymap window		Utente:
+Sample and clipboard:	Keymap window		Prova campione e appunti:
+Layout	Keymap window		Layout
+Switch shortcut keys to Windows/Linux mode	Keymap window		Tasti di scelta rapida in modalità Windows/Linux
+Revert	Keymap window		Ripristina
+Save as…	Keymap window		Salva come…
+File	Keymap window		File
+(Current)	Keymap window		(Attuale)
+Font	Keymap window		Font
+Acute trigger	Keymap window		Attivatore accento acuto

@@ -1,10 +1,11 @@
-1	finnish	x-vnd.haiku.zip-o-matic	2255868945
+1	finnish	x-vnd.haiku.zip-o-matic	2032806096
 Stop	file:ZipOMaticWindow.cpp		Pysäytä
 Creating archive: %s	file:ZipOMaticWindow.cpp		Luodaan arkisto: %s
 Continue	file:ZipOMaticWindow.cpp		Jatka
 Preparing to archive	file:ZipperThread.cpp		Valmistellaan arkistointia
 Drop files here.	file:ZipOMaticWindow.cpp		Pudota tiedostot tähän.
 Filename: %s	file:ZipOMaticWindow.cpp		Tiedostonimi: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Sinulla on {0, plural, one{# Zip-O-Matic-ohjelma} other{# Zip-O-Matic-ohjelmaa}} käynnissä.\n\n
 Let them continue	file:ZipOMatic.cpp		Salli niiden jatkaa
 Do you want to stop them?	file:ZipOMatic.cpp		Haluatko pysäyttää ne?
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Oletko varma, että haluat pysäyttää tämän arkiston luomisen?

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PackageInstaller	199496416
+1	japanese	x-vnd.Haiku-PackageInstaller	3672759664
 Install to:	PackageView		インストール先:
 OK	PackageView		OK
 Accept	PackageTextViewer		承認
@@ -54,6 +54,7 @@ Abort	PackageInstall		中断
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		続ける
 Begin	PackageView		開始
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		'%s' で指定されたシンボリックリンクはすでに与えられたパスに存在します。\nリンクをパッケージからのものに置き換えますか、またはスキップしますか?
 Replace	PackageView		置き換える
 Installation progress	PackageView		インストール状況
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		パッケージファイルを読めません。\n考えられる原因のひとつとして、要求されたファイルが正しい BeOS .pkg パッケージで無いことが考えられます。

@@ -1,0 +1,19 @@
+1	slovenian	x-vnd.Haiku-Sudoku	1952126207
+Export as…	SudokuWindow		Izvozi kot…
+OK	SudokuWindow		V redu
+New	SudokuWindow		Nova
+Abort	ProgressWindow		Prekini
+Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		Ni bilo mogoče odpreti \"%s\":\n%s\n
+Easy	SudokuWindow		Lahka
+Open file…	SudokuWindow		Odpri datoteko…
+Solve single field	SudokuWindow		Reši eno polje
+Solve	SudokuWindow		Reši
+Redo	SudokuWindow		Ponovno uveljavi
+File	SudokuWindow		Datoteka
+Start again	SudokuWindow		Začni znova
+HTML	SudokuWindow		HTML
+Mark invalid values	SudokuWindow		Označi neveljavne vrednosti
+Help	SudokuWindow		Pomoč
+Undo	SudokuWindow		Razveljavi
+Quit	SudokuWindow		Izhod

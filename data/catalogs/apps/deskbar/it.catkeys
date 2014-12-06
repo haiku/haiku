@@ -1,38 +1,51 @@
-1	italian	x-vnd.Be-TSKB	3232664655
-<Be folder is empty>	BeMenu		<La cartella Be è vuota>
-Always on top	PreferencesWindow		Sempre in primo piano
+1	italian	x-vnd.Be-TSKB	2335730970
+Power off	DeskbarMenu		Spegni
+Sort applications by name	PreferencesWindow		Ordina per nome
+Suspend	DeskbarMenu		Sospendi
+Hide clock	TimeView		Nascondi orologio
 Applications	PreferencesWindow		Applicazioni
-Auto-raise	PreferencesWindow		Porta automaticamente in primo piano
-Change time…	TimeView		Modifica orario…
-Clock	PreferencesWindow		Orologio
-Close all	WindowMenu		Chiudi tutto
-Deskbar preferences	PreferencesWindow		Preferenze della Deskbar
-Deskbar preferences…	BeMenu		Preferenze della Deskbar…
-Edit menu…	PreferencesWindow		Modifica menu…
-Expand new applications	PreferencesWindow		Espandi le nuove applicazioni
-Find…	BeMenu		Trova…
-Hide all	WindowMenu		Nascondi tutto
-Hide time	TimeView		Nascondi l'orario
-Menu	PreferencesWindow		Menu
-Mount	BeMenu		Monta
-No windows	WindowMenu		Nessuna finestra
-Power off	BeMenu		Spegni
-Quit application	WindowMenu		Chiudi l'applicazione
-Recent applications	BeMenu		Applicazioni recenti
-Recent applications:	PreferencesWindow		Applicazioni recenti:
-Recent documents	BeMenu		Documenti recenti
+Time preferences…	TimeView		Preferenze Data e ora…
+About Haiku	DeskbarMenu		Informazioni su Haiku
+Edit in Tracker…	PreferencesWindow		Modifica…
 Recent documents:	PreferencesWindow		Documenti recenti:
-Recent folders	BeMenu		Cartelle recenti
-Recent folders:	PreferencesWindow		Cartelle recenti:
-Restart Tracker	BeMenu		Riavvia Tracker
-Restart system	BeMenu		Riavvia il sistema
-Show Time	Tray		Mostra l'orario
-Show all	WindowMenu		Mostra tutto
-Show application expander	PreferencesWindow		Mostra espansore applicazione
-Show calendar…	TimeView		Mostra il calendario…
-Show replicants	BeMenu		Mostra i replicanti
-Show seconds	PreferencesWindow		Mostra secondi
-Shutdown…	BeMenu		Arresta il sistema…
-Sort running applications	PreferencesWindow		Ordina applicazioni in esecuzione
-Tracker always first	PreferencesWindow		Tracker sempre per primo
+Recent applications	DeskbarMenu		Applicazioni recenti
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Applicazioni
+Find…	DeskbarMenu		Trova...
+Show clock	Tray		Mostra orologio
 Window	PreferencesWindow		Finestra
+Defaults	PreferencesWindow		Predefinite
+Menu	PreferencesWindow		Menu
+Recent documents	DeskbarMenu		Documenti recenti
+Auto-hide	PreferencesWindow		Nascondi automaticamente
+Always on top	PreferencesWindow		Sempre in primo piano
+<Deskbar folder is empty>	DeskbarMenu		<La cartella Deskbar è vuota>
+Show all	WindowMenu		Mostra tutto
+No windows	WindowMenu		Nessuna finestra
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Riavvia
+Large	PreferencesWindow		Grandi
+Auto-raise	PreferencesWindow		Automaticamente in primo piano
+Recent folders:	PreferencesWindow		Cartelle recenti:
+Show application expander	PreferencesWindow		Mostra espansore applicazione
+Restart Tracker	DeskbarMenu		Riavvia il Tracker
+Close all	WindowMenu		Chiudi tutto
+Deskbar preferences	PreferencesWindow		Preferenze di Deskbar
+Mount	DeskbarMenu		Monta
+Revert	PreferencesWindow		Annulla
+Small	PreferencesWindow		Piccole
+Recent applications:	PreferencesWindow		Applicazioni recenti:
+Shutdown…	DeskbarMenu		Uscita da Haiku…
+Tracker always first	PreferencesWindow		#document
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferenze
+Recent folders	DeskbarMenu		Cartelle recenti
+About this system	DeskbarMenu		Informazioni sul sistema
+Show calendar…	TimeView		Mostra il calendario…
+Deskbar preferences…	DeskbarMenu		Preferenze di Deskbar…
+Expand new applications	PreferencesWindow		Espandi le nuove applicazioni
+Show replicants	DeskbarMenu		Mostra replicanti
+Hide application names	PreferencesWindow		Nascondi il nome delle applicazioni
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Applicazioni dimostrative
+Icon size	PreferencesWindow		Dimensione icone
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet del desktop
+Hide all	WindowMenu		Nascondi tutto
+Quit application	WindowMenu		Chiudi l'applicazione

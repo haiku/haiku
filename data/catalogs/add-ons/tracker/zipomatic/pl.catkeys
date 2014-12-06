@@ -1,10 +1,11 @@
-1	polish	x-vnd.haiku.zip-o-matic	2255868945
+1	polish	x-vnd.haiku.zip-o-matic	2032806096
 Stop	file:ZipOMaticWindow.cpp		Zatrzymaj
 Creating archive: %s	file:ZipOMaticWindow.cpp		Tworzenie archiwum: %s
 Continue	file:ZipOMaticWindow.cpp		Wznów
 Preparing to archive	file:ZipperThread.cpp		Przygotowanie do archiwizacji
 Drop files here.	file:ZipOMaticWindow.cpp		Przeciągnij pliki tutaj.
 Filename: %s	file:ZipOMaticWindow.cpp		Nazwa pliku: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Masz {0, plural, one{uruchomioną # kopię} few{uruchiomione # kopie} many{uruchomionych # kopii} other{uruchomione # kopii}} Zip-O-Matic.\n\n
 Let them continue	file:ZipOMatic.cpp		Pozwól im kontynuować
 Do you want to stop them?	file:ZipOMatic.cpp		Chcesz je zatrzymać?
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Na pewno chcesz przerwać tworzenie tego archiwum?

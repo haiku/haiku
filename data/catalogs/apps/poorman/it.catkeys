@@ -1,60 +1,57 @@
-1	italian	x-vnd.Haiku.PoorMan	3256761185
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Una cartella web di default è stata creata in \"/boot/home/public_html.\"\nAssicurarsi che ci sia un file HTML chiamato \"index.html\" nella cartella.
-About PoorMan…	PoorMan		Informazioni su PoorMan
+1	italian	x-vnd.Haiku-PoorMan	3137659009
+Website location	PoorMan		Posizione del sito web
+Error Server	PoorMan		Errore del Server
+Settings…	PoorMan		Impostazioni...
+Create PoorMan log	PoorMan		Crea un log di PoorMan
+Shutting down.\n	PoorMan		Spegnimento.\n
+Hits: %lu	PoorMan		Hit: %lu
+Web folder:	PoorMan		Cartella Web:
+Save log console selection	PoorMan		Salva la selezione del log della console
+Run server	PoorMan		Esegui server
+PoorMan settings	PoorMan		Impostazioni di PoorMan
+Clear hit counter	PoorMan		Ripristina il contatore degli hit
+Copy	PoorMan		Copia
+Max. simultaneous connections:	PoorMan		Connessioni simultanee massime:
+Start page:	PoorMan		Pagina iniziale:
+done.\n	PoorMan		fatto.\n
+Create	PoorMan		Crea
+Shutting down.	PoorMan		Spegnimento.
+Website options	PoorMan		Opzioni del sito
+File Name	PoorMan		Nome del file
+Clear console log	PoorMan		Pulisci il log della console
 Advanced	PoorMan		Avanzato
+OK	PoorMan		OK
+Status: Stopped	PoorMan		Stato: Stop
+Dir Created	PoorMan		Cartella creata
+Quit	PoorMan		Esci
+Hits: 0	PoorMan		Hit: 0
+Save log console	PoorMan		Salva il log della console
+Edit	PoorMan		Modifica
+Directory: (none)	PoorMan		Cartella: (nessuno)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Scegliere una cartella da pubblicare sul web.\n\nPoorMan può creare un \"public_html\" di default nella cartella home.\nOppure selezionare una delle proprie cartelle.
+Log To Console	PoorMan		Invia il log alla Console
+Status: Running	PoorMan		Stato: In esecuzione
+Controls	PoorMan		Controlli
+Send file listing if there's no start page	PoorMan		Mostra la lista dei file se non c'è nessuna pagina iniziale
+Error Dir	PoorMan		Errore nella cartella
+Select all	PoorMan		Seleziona tutto
+File	PoorMan		File
+Save console selections as…	PoorMan		Salva selezione della console come...
+File logging	PoorMan		Log su file
+Select web folder	PoorMan		Seleziona cartella web
+Logging view	PoorMan		Vista log
+Logging	PoorMan		Log
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Una cartella web di default è stata creata in \"/boot/home/public_html.\"\nAssicurarsi che ci sia un file HTML chiamato \"index.html\" nella cartella.
+Clear log file	PoorMan		Cancella file log
+Log file name:	PoorMan		Nome del file di log:
+Directory: 	PoorMan		Cartella:
+Log To File	PoorMan		Log su file
+Done	PoorMan		Fatto
+Create log file	PoorMan		Crea un file di log
+Starting up... 	PoorMan		Avviamento...
+Site	PoorMan		Sito
 Cancel	PoorMan		Cancella
 Cannot start the server	PoorMan		Non è stato possibile avviare il server
-Clear console log	PoorMan		Pulisci il log della console
-Clear hit counter	PoorMan		Ripristina il contatore degli hit
-Clear log file	PoorMan		Cancella file log
-Console Logging	PoorMan		Log della console
-Controls	PoorMan		Controlli
-Copy	PoorMan		Copia
-Create	PoorMan		Crea
-Create PoorMan log	PoorMan		Crea un log di PoorMan
-Create log file	PoorMan		Crea un file di log
-Default	PoorMan		Predefinita
-Dir Created	PoorMan		Cartella creata
-Directory: 	PoorMan		Cartella:
-Directory: (none)	PoorMan		Cartella: (nessuno)
-Done	PoorMan		Fatto
-Edit	PoorMan		Modifica
-Error Dir	PoorMan		Errore nella cartella
-Error Server	PoorMan		Errore del Server
-File	PoorMan		File
-File Name	PoorMan		Nome del file
-File logging	PoorMan		Log su file
-Hits: %lu	PoorMan		Hit: %lu
-Hits: 0	PoorMan		Hit: 0
-Log To Console	PoorMan		Invia il log alla Console
-Log To File	PoorMan		Log su file
-Log file name:	PoorMan		Nome del file di log:
-Logging	PoorMan		Log
-Logging view	PoorMan		Vista log
-Max. simultaneous connections:	PoorMan		Connessioni simultanee massime:
-OK	PoorMan		OK
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Scegliere una cartella da pubblicare sul web.\n\nPoorMan può creare un \"public_html\" di default nella cartella home.\nOppure selezionare una delle proprie cartelle.
-PoorMan settings	PoorMan		Impostazioni di PoorMan
-Quit	PoorMan		Esci
-Run server	PoorMan		Esegui server
-Save console as…	PoorMan		Salva console come...
-Save console selections as…	PoorMan		Salva selezione della console come...
-Save log console	PoorMan		Salva il log della console
-Save log console selection	PoorMan		Salva la selezione del log della console
 Select	PoorMan		Seleziona
-Select all	PoorMan		Seleziona tutto
-Select web folder	PoorMan		Seleziona cartella web
-Send file listing if there's no start page	PoorMan		Mostra la lista dei file se non c'è nessuna pagina iniziale
-Settings…	PoorMan		Impostazioni...
-Shutting down.	PoorMan		Spegnimento.
-Shutting down.\n	PoorMan		Spegnimento.\n
-Site	PoorMan		Sito
-Start page:	PoorMan		Pagina iniziale:
-Starting up... 	PoorMan		Avviamento...
-Status: Running	PoorMan		Stato: In esecuzione
-Status: Stopped	PoorMan		Stato: Stop
-Web folder:	PoorMan		Cartella Web:
-Website location	PoorMan		Posizione del sito web
-Website options	PoorMan		Opzioni del sito
-connections	PoorMan		connessioni
-done.\n	PoorMan		fatto.\n
+Save console as…	PoorMan		Salva console come...
+Console Logging	PoorMan		Log della console

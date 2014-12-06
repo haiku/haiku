@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	1777773037
+1	hungarian	x-vnd.Haiku-Terminal	336113194
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -46,6 +46,7 @@ Window title…	Terminal TermWindow		Ablak címe…
 Full screen	Terminal TermWindow		Teljes képernyő
 Page setup…	Terminal TermWindow		Oldalbeállítás…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Ezek a folyamatok még futnak: \n\n\t%1\n\nHa bezárja a Terminált, a folyamatok megszakadnak.
+Custom	Terminal AppearancePrefView	Window size	Egyéni
 Insert path	Terminal TermView		Útvonal beszúrása
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminál\nMinden jog fenntartva 2001-2009 Haiku, Inc.\nMinden jog fenntartva(C) 1999 Kazuho Okui és Takashi Murai.\n\nHasználata: %s [OPCIÓ] [SHELL]\n
 Window size:	Terminal AppearancePrefView		Ablak mérete:

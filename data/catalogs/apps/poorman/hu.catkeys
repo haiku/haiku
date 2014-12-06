@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PoorMan	1347438411
+1	hungarian	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		Oldal helye
 Error Server	PoorMan		Hibakiszolgáló
 Settings…	PoorMan		Beállítások…
@@ -12,6 +12,7 @@ PoorMan settings	PoorMan		SzegényEmber beállításai
 Clear hit counter	PoorMan		Kérések nullázása
 Copy	PoorMan		Másolás
 Max. simultaneous connections:	PoorMan		Maximális kapcsolatok száma:
+Create public_html	PoorMan		public_html létrehozása
 Start page:	PoorMan		Kezdőlap:
 done.\n	PoorMan		kész.\n
 Create	PoorMan		Készítés

@@ -1,0 +1,48 @@
+1	spanish; castilian	x-vnd.Haiku-Pulse	2324471783
+OK	PrefsWindow		Aceptar
+Quit	DeskbarPulseView		Salir
+Mini mode	DeskbarPulseView		Modo reducido
+Remove replicant	CPUButton		Eliminar duplicador
+Active color	ConfigView		Activar el color
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Usos: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Colores apagados
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nBy David Ramsey y Arve Hjønnevåg\nRevisado por Daniel Switkin\n
+OK	DeskbarPulseView		Aceptar
+Deskbar mode	PrefsWindow		Modo escritorio
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		Modo normal
+Defaults	PrefsWindow		Predeterminada
+Normal mode	MiniPulseView		Modo normal
+Error	PulseApp		Error
+Info	PulseView		Información
+Deskbar	CPUButton		Barra del escritorio
+Frame color	ConfigView		Color del marco
+Mini mode	PrefsWindow		Modo reducido
+OK	PulseApp		OK
+Bar colors	ConfigView		Colores de la barra
+Settings…	PulseView		Ajustes...
+You can't disable the last active CPU.	PulseView		No puedes desactivar el último procesador activo
+Info	PulseApp		Información
+Info	CPUButton		Información
+OK	PulseView		Ok
+Deskbar menu	CPUButton		Menu de escritorio
+About Pulse…	PulseView		Acerca de Pulse…
+Deskbar mode	MiniPulseView		Modo escritorio
+Quit	MiniPulseView		Salir
+Pulse	System name		Pulse
+Pulse	NormalPulseView		Pulse
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		Modo minimizado
+Pulse	PulseApp		Pulso
+Width of icon:	ConfigView		Ancho de icono:
+You can't disable the last active CPU.	CPUButton		No se puede deshabilitar el último procesador activo
+Normal mode	DeskbarPulseView		Modo normal
+OK	CPUButton		OK
+About Pulse…	CPUButton		Sobre pulse....
+Removing from Deskbar failed.\n%s	DeskbarPulseView		La eliminación de la Barra de Escritorio falló.\n%s
+Mini mode	NormalPulseView		Modo reducido
+Info	DeskbarPulseView		Información
+Pulse settings	PulseWindow		Configuraciones de Pulse...
+Idle color	ConfigView		Color libre
+Installing in Deskbar failed\n%s	PulseApp		La instalación en la Barra de Escritorio falló.\n%s
+CPU progress bar	NormalPulseView		Barra de progreso de la CPU

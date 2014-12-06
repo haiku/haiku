@@ -1,41 +1,37 @@
-1	croatian	x-vnd.Haiku-PowerStatus	3258970354
-About	PowerStatus		O programu
-About…	PowerStatus		O programu...
-Battery charging	PowerStatus		Baterija se puni
-Battery discharging	PowerStatus		Pražnjenje baterije
-Battery info	PowerStatus		Informacije o bateriji
-Battery info…	PowerStatus		Informacije o bateriji...
-Battery unused	PowerStatus		Baterija nekorištena
-Capacity granularity 1: 	PowerStatus		Granulacija kapaciteta 1:
-Capacity granularity 2: 	PowerStatus		Granulacija kapaciteta 2:
-Capacity: 	PowerStatus		Kapacitet:
-Damaged battery	PowerStatus		Oštećena baterija
-Empty battery slot	PowerStatus		Prazano ležište baterije
-Extended battery info	PowerStatus		Proširene informacije o bateriji
-Last full charge: 	PowerStatus		Zadnje potpuno punjenje:
-Model number: 	PowerStatus		Broj modela:
-OEM info: 	PowerStatus		OEM info:
-OK	PowerStatus		U redu
-PowerStatus	PowerStatus		Stanjeenergije
-PowerStatus	System name		Stanjeenergije
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Stanjeenergije\nnapisao Axel Dörfler, Clemens Zeidler\nAutorska prava 2006, Haiku, Inc.\n
-Quit	PowerStatus		Izađi
-Run in window	PowerStatus		Pokreni u prozoru
-Serial number: 	PowerStatus		Serijski broj:
+1	croatian	x-vnd.Haiku-PowerStatus	9417258
 Show percent	PowerStatus		Prikaži prostotke
-Show status icon	PowerStatus		Prikaži statusnu ikonu
-Show text label	PowerStatus		Prikaži tekst naljepnice
-Show time	PowerStatus		Prikaži vrijeme
-Technology: 	PowerStatus		Tehnologija:
-Type: 	PowerStatus		Tip:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Možete pokrenuti PowerStatus u prozoru ili ga instalirati u Deskbaru.
-charging	PowerStatus		punjenje
-discharging	PowerStatus		pražnjenje
-mA	PowerStatus		mA
-mAh	PowerStatus		mAh
-mV	PowerStatus		mV
-mW	PowerStatus		mW
-mWh	PowerStatus		mWh
-no battery	PowerStatus		nema baterije
+ mW	PowerStatus		 mW
+Type: 	PowerStatus		Tip: 
 non-rechargeable	PowerStatus		Nepunjivo
+Empty battery slot	PowerStatus		Prazano ležište baterije
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Pokreni u prozoru
+PowerStatus	System name		Stanjeenergije
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Informacije o bateriji...
+Damaged battery	PowerStatus		Oštećena baterija
+Show time	PowerStatus		Prikaži vrijeme
+Last full charge: 	PowerStatus		Zadnje potpuno punjenje: 
+Battery unused	PowerStatus		Baterija nekorištena
+Extended battery info	PowerStatus		Proširene informacije o bateriji
+ mA	PowerStatus		 mA
+discharging	PowerStatus		pražnjenje
+Show text label	PowerStatus		Prikaži tekst naljepnice
+About…	PowerStatus		O programu...
+Model number: 	PowerStatus		Broj modela: 
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Kapacitet: 
+Battery discharging	PowerStatus		Pražnjenje baterije
+Serial number: 	PowerStatus		Serijski broj: 
+Capacity granularity 1: 	PowerStatus		Granulacija kapaciteta 1: 
+OEM info: 	PowerStatus		OEM info: 
+Battery charging	PowerStatus		Baterija se puni
+Battery info	PowerStatus		Informacije o bateriji
+Quit	PowerStatus		Izađi
 rechargeable	PowerStatus		Punjivo
+charging	PowerStatus		punjenje
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Možete pokrenuti PowerStatus u prozoru ili ga instalirati u Deskbaru.
+Show status icon	PowerStatus		Prikaži statusnu ikonu
+Capacity granularity 2: 	PowerStatus		Granulacija kapaciteta 2: 
+Technology: 	PowerStatus		Tehnologija: 
+no battery	PowerStatus		nema baterije

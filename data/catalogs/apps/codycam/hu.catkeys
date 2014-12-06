@@ -1,4 +1,5 @@
-1	hungarian	x-vnd.Haiku-CodyCam	183572276
+1	hungarian	x-vnd.Haiku-CodyCam	2193838145
+Upload…	VideoConsumer.cpp		Feltöltés…
 Capturing Image…	VideoConsumer.cpp		Kép készítése…
 Every 30 seconds	CodyCam		30 másodpercenként
 File name:	CodyCam		Fájlnév:
@@ -61,6 +62,7 @@ upload client name expected	CodyCam		nincs megadva a feltöltési kliens neve
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Csatlakozva…
 PASS <suppressed>  (real password sent)\n	FtpClient		PASS <rejtve> (itt az igazi jelszó lett elküldve)\n
+File upload failed	VideoConsumer.cpp		Sikertelen feltöltés
 Every 5 minutes	CodyCam		5 percenként
 read: %d\n	SftpClient		olvasás: %d\n
 Capture controls	CodyCam		Képkészítés vezérlői

@@ -1,0 +1,34 @@
+1	spanish; castilian	x-vnd.Haiku-LaunchBox	3016105370
+New	LaunchBox		Nuevo
+Set description…	LaunchBox		Definir descripción...
+Vertical layout	LaunchBox		Distribución vertical
+OK	LaunchBox		Aceptar
+Pad 1	LaunchBox		Pad 1
+last chance	LaunchBox		última oportunidad
+Quit	LaunchBox		Salir
+Clear button	LaunchBox		Limpiar botón
+LaunchBox	System name		LaunchBox
+Ignore double-click	LaunchBox		Hacer caso omiso de doble clic
+Auto-raise	LaunchBox		Auto-levantar
+Show on all workspaces	LaunchBox		Mostrar en todos espacios trabajo
+Show window border	LaunchBox		Mostrar borde de ventana
+Pad	LaunchBox		Pad
+Icon size	LaunchBox		Tamaño de icono
+Bummer	LaunchBox		Latazo
+Cancel	LaunchBox		Cancelar
+Remove button	LaunchBox		Eliminar botón
+Horizontal layout	LaunchBox		Distribución horizontal
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\n Falló al iniciar la aplicación con la firma '%2'.\n\nError:
+Failed to launch '%1'.\n\nError:	LaunchBox		Fracasó al lanzarse '%1'.\n\nError:
+Name Panel	LaunchBox		Panel de nombre
+Add button here	LaunchBox		Insertar botón aquí
+Description for '%3'	LaunchBox		Descripción para: '%3'
+Settings	LaunchBox		Configuración
+Failed to launch 'something', error in Pad data.	LaunchBox		Falló al lanzar 'algo', error en dato Pad
+Pad %1	LaunchBox		Pad %1
+Close	LaunchBox		Cerrar
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Falló al enviar el comando 'abrir carpeta' a Tracker.\n\nError:
+You can drag an icon here.	LaunchBox		Puede arrastrar un icono aquí.
+Clone	LaunchBox		Clonar
+launch popup	LaunchBox		Activar emergente (popup)
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		¿Realmente desea cerrar este pad?\n(El pad no se recordará)

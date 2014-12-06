@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-icon_o_matic	2885914752
+1	romanian	x-vnd.haiku-icon_o_matic	2192714724
 Select All	Icon-O-Matic-PathManipulator		Selectează tot
 Add Style	Icon-O-Matic-AddStylesCmd		Adaugă stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Culoare (#%02x%02x%02x)
@@ -64,7 +64,9 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		Elimină formă
 Reverse	Icon-O-Matic-PathsList		Inversează
 HVIF Source Code	Icon-O-Matic-SavePanel		Cod sursă HVIF
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Restabilește transformări
+Settings	Icon-O-Matic-Menus		Configurări
 All	Icon-O-Matic-Properties		Tot
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Textul pe care încercați să-l importați este destul de lung, sunteți sigur?
 Multi Paste Properties	Icon-O-Matic-Properties		Proprietăți multi lipire
 Undo	Icon-O-Matic-Main		Refă
 Click on a shape above	Empty transformers list - 1st line		Dați clic pe o formă de mai sus
@@ -75,6 +77,7 @@ Perspective	Transformation		Perspectivă
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mută transformator
 Opacity	Icon-O-Matic-PropertyNames		Opacitate
 Add with path	Icon-O-Matic-ShapesList		Adaugă cu cale
+Export icon	Dialog title		Exportă pictogramă
 Gradient type	Icon-O-Matic-StyleTypes		Tip degrade
 Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Anulează
@@ -181,9 +184,11 @@ Save	Icon-O-Matic-Menu-File		Salvează
 Append…	Icon-O-Matic-Menu-File		Adaugă...
 Move Path	Icon-O-Matic-MovePathsCmd		Mută cale
 Overwrite	Icon-O-Matic-SVGExport		Suprascrie
+Text too long	Icon-O-Matic-StyledTextImport		Text prea lung
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Îngheață forme
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Separă punct de control
 Open…	Icon-O-Matic-Menu-File		Deschide...
+Save icon	Dialog title		Salvează pictogramă
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Culoare (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Editează degrade
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Curăță cale

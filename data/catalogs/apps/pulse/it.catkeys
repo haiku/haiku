@@ -1,38 +1,48 @@
-1	italian	x-vnd.Haiku-Pulse	628764229
-About Pulse…	CPUButton		Informazioni su Pulse…
-About Pulse…	PulseView		Informazioni su Pulse…
-Active color	ConfigView		Colore attivo
-Bar colors	ConfigView		Colori della barra
-CPU progress bar	NormalPulseView		Barra di avanzamento CPU
-Defaults	PrefsWindow		Predefiniti
-Deskbar	CPUButton		Deskbar
-Deskbar menu	CPUButton		Menu Deskbar
-Deskbar mode	MiniPulseView		Modalità Deskbar
-Deskbar mode	NormalPulseView		Modalità Deskbar
-Deskbar mode	PrefsWindow		Modalità Deskbar
-Fade colors	ConfigView		Colori sfumati
-Frame color	ConfigView		Colore cornice
-Idle color	ConfigView		Colore di inattività
-Info	CPUButton		Informazioni
-Info	DeskbarPulseView		Informazioni
-Mini mode	DeskbarPulseView		Modalità mini
-Mini mode	NormalPulseView		Modalità mini
-Mini mode	PrefsWindow		Modalità mini
-Normal mode	DeskbarPulseView		Modalità normale
-Normal mode	MiniPulseView		Modalità normale
-Normal mode	PrefsWindow		Modalità normale
-OK	CPUButton		Ok
-OK	DeskbarPulseView		Ok
+1	italian	x-vnd.Haiku-Pulse	2324471783
 OK	PrefsWindow		Ok
-OK	PulseApp		Ok
-OK	PulseView		Ok
-Pulse	NormalPulseView		Pulse
-Pulse settings	PulseWindow		Impostazioni di Pulse
 Quit	DeskbarPulseView		Esci
-Quit	MiniPulseView		Esci
+Mini mode	DeskbarPulseView		Modalità mini
 Remove replicant	CPUButton		Rimuovi replicante
-Settings…	PulseView		Impostazioni…
+Active color	ConfigView		Colore attivo
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Utilizzo:  Pulse [--mini] [-w valore] [--width=valore]\n\t[--deskbar] [--normal] [--framecolor 0xrrvvbb]\n\t[--activecolor 0xrrvvbb] [--idlecolor 0xrrvvbb]\n
+Fade colors	ConfigView		Colori sfumati
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDi David Ramsey e Arve Hjønnevåg\nModificato da Daniel Switkin\n
+OK	DeskbarPulseView		Ok
+Deskbar mode	PrefsWindow		Modalità Deskbar
+%.2f GHz	NormalPulseView		%.2f GHz
+Normal mode	PrefsWindow		Modalità normale
+Defaults	PrefsWindow		Predefiniti
+Normal mode	MiniPulseView		Modalità normale
+Error	PulseApp		Errore
+Info	PulseView		Informazioni
+Deskbar	CPUButton		Deskbar
+Frame color	ConfigView		Colore cornice
+Mini mode	PrefsWindow		Modalità mini
+OK	PulseApp		Ok
+Bar colors	ConfigView		Colori della barra
+Settings…	PulseView		Impostazioni…
+You can't disable the last active CPU.	PulseView		Non potete disattivare l'unica CPU attiva.
+Info	PulseApp		Informazioni
+Info	CPUButton		Informazioni
+OK	PulseView		Ok
+Deskbar menu	CPUButton		Menu Deskbar
+About Pulse…	PulseView		Informazioni su Pulse…
+Deskbar mode	MiniPulseView		Modalità Deskbar
+Quit	MiniPulseView		Esci
+Pulse	System name		Pulse
+Pulse	NormalPulseView		Pulse
+%ld MHz	NormalPulseView		%ld MHz
+Deskbar mode	NormalPulseView		Modalità Deskbar
+Pulse	PulseApp		Pulse
 Width of icon:	ConfigView		Larghezza dell'icona:
 You can't disable the last active CPU.	CPUButton		Non puoi disattivare l'ultima CPU attiva.
-You can't disable the last active CPU.	PulseView		Non potete disattivare l'unica CPU attiva.
+Normal mode	DeskbarPulseView		Modalità normale
+OK	CPUButton		Ok
+About Pulse…	CPUButton		Informazioni su Pulse…
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Rimozione dalla Deskbar fallita.\n%s
+Mini mode	NormalPulseView		Modalità mini
+Info	DeskbarPulseView		Informazioni
+Pulse settings	PulseWindow		Impostazioni di Pulse
+Idle color	ConfigView		Colore di inattività
+Installing in Deskbar failed\n%s	PulseApp		Installazione nella Deskbar fallita.\n%s
+CPU progress bar	NormalPulseView		Barra di avanzamento CPU

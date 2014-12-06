@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libbe	1409488127
+1	russian	x-vnd.Haiku-libbe	1311938724
 gamma	AboutWindow		гамма
 beta	AboutWindow		бета
 %3.2f GiB	StringForSize		%3.2f ГБ
@@ -13,11 +13,13 @@ alpha	AboutWindow		альфа
 Error	PrintJob		Ошибка
 All Rights Reserved.	AboutWindow		Все права защищены.
 About %app%	AboutWindow		О программе…
+No pages to print!	PrintJob		Нет страниц для печати!
 OK	Dragger		ОК
 OK	PrintJob		ОК
 Green:	ColorControl		Зеленый:
 Version history:	AboutWindow		История версий:
 Remove replicant	Dragger		Удалить репликант
+OK	AboutWindow		ОК
 OK	ZombieReplicantView		ОК
 Print Server is not responding.	PrintJob		Сервер печати не отвечает.
 Paste	TextView		Вставить

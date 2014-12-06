@@ -1,0 +1,11 @@
+1	slovenian	x-vnd.Haiku-hmulti_audio.media_addon	1010006026
+Master	MultiAudio		Glavni
+SPDIF	MultiAudio		S/PDIF
+Headphones	MultiAudio		Slušalke
+Beep	MultiAudio		Pisk
+Input	MultiAudio		Vhod
+Volume	MultiAudio		Glasnost
+Output	MultiAudio		Izhod
+Mic	MultiAudio		Mikrofon
+ frequency:	MultiAudio		 frekvenca:
+Enable	MultiAudio		Omogoči

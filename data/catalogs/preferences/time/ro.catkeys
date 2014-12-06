@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Time	891089298
+1	romanian	x-vnd.Haiku-Time	149989678
 GMT (UNIX compatible)	Time		GMT (compatibil cu UNIX)
 OK	Time		OK
 Asia	Time		Asia
@@ -11,6 +11,7 @@ Preview time:	Time		Previzualizare oră:
 Synchronize	Time		Sincronizează
 Revert	Time		Inversează
 Pacific	Time		Pacific
+Show day of week	Time		Afișează ziua săptămânii
 Add	Time		Adaugă
 Date and time	Time		Dată și oră
 about	Time		despre
@@ -26,11 +27,13 @@ Time	Time		Oră
 Indian	Time		Indian
 Sending request failed	Time		Trimiterea cererii a eșuat
 Arctic	Time		Arctic
+Display time with seconds	Time		Afișează ceasul cu secunde
 Time	System name		Oră
 America	Time		America
 Synchronize at boot	Time		Sincronizează la pornirea sistemului
 Received invalid time	Time		S-a primit o oră invalidă
 Antarctica	Time		Antarctica
+Show time zone	Time		Afișează fusul orar
 The following error occured while synchronizing:r\n%s: %s	Time		Următoarea eroare a apărut în timpul sincronizării:r\n%s: %s
 <Other>	Time		<Altele>
 Current time:	Time		Oră curentă:
@@ -38,5 +41,6 @@ Try all servers	Time		Încearcă toate serverele
 Time zone	Time		Fus orar
 Could not create socket	Time		Nu s-a putut crea socketul
 Synchronize again	Time		Sincronizează din nou
+Clock	Time		Ceas
 Network time	Time		Oră rețea
 Atlantic	Time		Atlantic

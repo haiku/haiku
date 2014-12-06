@@ -1,42 +1,42 @@
-1	croatian	x-vnd.Haiku-Time	1174770494
-<Other>	Time		<Drugo>
-Add	Time		Dodaj
-Africa	Time		Afrika
-America	Time		Amerika
-Antarctica	Time		Antartika
-Arctic	Time		Arktik
-Asia	Time		Azija
-Atlantic	Time		Atlantik
-Australia	Time		Australija
-Could not contact server	Time		Ne mogu doći u kontakt sa poslužiteljem
-Current time:	Time		Trenutno vrijeme:
-Date and time	Time		Datum i vrijeme
-Europe	Time		Europa
+1	croatian	x-vnd.Haiku-Time	3076123051
 GMT (UNIX compatible)	Time		GMT(kompatibilno sa UNIX-om)
-Hardware clock set to:	Time		Hardware-ski sat je postavljen na:
-Indian	Time		Indijsko
+OK	Time		OK
+Asia	Time		Azija
+\nNow: 	Time		\nSad: 
+Africa	Time		Afrika
+Stop	Time		Stani
+Could not contact server	Time		Ne mogu doći u kontakt sa poslužiteljem
+Australia	Time		Australija
+Preview time:	Time		Vrijeme gledanja:
+Synchronize	Time		Sinkroniziraj
+Revert	Time		Obrni
+Pacific	Time		Pacifik
+Add	Time		Dodaj
+Date and time	Time		Datum i vrijeme
+about	Time		O
 Local time (Windows compatible)	Time		Lokalno vrijeme(kompatibilno sa Windows-ima)
 Message receiving failed	Time		 Neuspjelo primanje poruke
-OK	Time		OK
-Pacific	Time		Pacifik
-Preview time:	Time		Vrijeme gledanja:
-Received invalid time	Time		Primljeno netočno vrijeme
-Remove	Time		Ukloni
-Reset	Time		Ponovno pokreni
-Revert	Time		Obrni
-Sending request failed	Time		 Neuspjelo slanje upita
 Set time zone	Time		Postavi vremensku zonu
-Stop	Time		Stani
-Synchronize	Time		Sinkroniziraj
-Synchronize again	Time		Sinkroniziraj opet
-Synchronize at boot	Time		Sinkroniziraj pri podizanju sustava
-The following error occured while synchronizing:r\n%s	Time		Sljedeća greška se dogodila prilikom sinkronizacije:r\n%s
-The following error occured while synchronizing:r\n%s: %s	Time		Sljedeća greška se dogodila prilikom sinkronizacijer\n%s: %s
-Time	System name		Vrijeme
-Time	Time		Vrijeme
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Vrijeme i datum, napisali:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulunu\n\tPhilippe Saint-Piere\n\nAutorska prava 2004-2008, Haiku.
-Time zone	Time		Vremenska zona
-Try all servers	Time		Probaj sve servere
 Waiting for answer failed	Time		 Neuspjelo čekanje odgovora
-\nNow: 	Time		\nSad:
-about	Time		O
+Hardware clock set to:	Time		Hardware-ski sat je postavljen na:
+The following error occured while synchronizing:r\n%s	Time		Sljedeća greška se dogodila prilikom sinkronizacije:r\n%s
+Europe	Time		Europa
+Remove	Time		Ukloni
+Time	Time		Vrijeme
+Indian	Time		Indijsko
+Sending request failed	Time		 Neuspjelo slanje upita
+Arctic	Time		Arktik
+Time	System name		Vrijeme
+America	Time		Amerika
+Synchronize at boot	Time		Sinkroniziraj pri podizanju sustava
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Vrijeme i datum, napisali:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nAutorska prava 2004-2012, Haiku.
+Received invalid time	Time		Primljeno netočno vrijeme
+Antarctica	Time		Antartika
+The following error occured while synchronizing:r\n%s: %s	Time		Sljedeća greška se dogodila prilikom sinkronizacijer\n%s: %s
+<Other>	Time		<Drugo>
+Current time:	Time		Trenutno vrijeme:
+Try all servers	Time		Probaj sve servere
+Time zone	Time		Vremenska zona
+Synchronize again	Time		Sinkroniziraj opet
+Network time	Time		Mrežno vrijeme
+Atlantic	Time		Atlantik

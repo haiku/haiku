@@ -1,5 +1,6 @@
-1	german	x-vnd.Haiku-DriveSetup	4273934970
+1	german	x-vnd.Haiku-DriveSetup	2321187933
 DriveSetup	System name		Datenträgerverwaltung
+Could not acquire partitioning information.	MainWindow		Partitionierungsinformationen konnten nicht ermittelt werden.
 Cancel	AbstractParametersPanel		Abbrechen
 Delete	MainWindow		Löschen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
@@ -43,6 +44,7 @@ Change	ChangeParametersPanel		Ändern
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
 Create…	MainWindow		Anlegen…
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Soll der Datenträger tatsächlich direkt formattiert werden? (Normalerweise wird zuvor mit einem Partitionierungssystem initialisiert.) Bevor die Änderungen durchgeführt werden, wird nochmals nachgefragt.
 The disk has been successfully initialized.\n	MainWindow		Der Datenträger wurde erfolgreich initialisiert.\n
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Die Parameter der Partition konnten nicht geändert werden. Es wurde nichts auf die Disk geschrieben.
@@ -66,6 +68,7 @@ The panel could not return successfully.	MainWindow		Das Fenster meldete sich ni
 Cancel	MainWindow		Abbrechen
 Delete partition	MainWindow		Partition löschen
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sollen die Parameter der ausgewählten Partition wirklich geändert werden?\n\nAndere Betriebssysteme können die Partition unter Umständen nicht mehr erkennen!
+Disk system \"%s\" not found!	MainWindow		Medienschema \"%s\" nicht gefunden!
 Eject	MainWindow		Auswerfen
 Partition	MainWindow		Partition
 Validation of the given parameters failed.	MainWindow		Die Überprüfung der angegebenen Parameter ist fehlgeschlagen.

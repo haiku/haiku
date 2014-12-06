@@ -1,16 +1,14 @@
-1	italian	x-vnd.Haiku-Sounds	145262565
-<none>	HEventList		<nessuno>
-<none>	HWindow		<nessuno>
-About Sounds	SoundsHApp		Informazioni su Sounds
-Event	HEventList		Evento
+1	italian	x-vnd.Haiku-Sounds	267143214
+Sounds	System name		Sounds
 No such file or directory	HEventList		Nessun file o cartella
+OK	SoundsHApp		OK
 OK	HEventList		OK
 OK	HWindow		OK
-OK	SoundsHApp		OK
-Other…	HWindow		Altro…
-Play	HWindow		Riproduci
-Sound	HEventList		Suono
-Sound File:	HWindow		File sonoro:
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n Realizzato da: \n\tOliver ruiz Dorantes\n\tJérôme Duval.\n Lavoro iniziale di Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku Inc.
-Stop	HWindow		Interrompi
 This is not an audio file.	HWindow		Questo non è un file audio.
+About Sounds	SoundsHApp		Informazioni su Sounds
+Sound	HEventList		Suono
+Event	HEventList		Evento
+<none>	HEventList		<nessuno>
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n Realizzato da: \n\tOliver ruiz Dorantes\n\tJérôme Duval.\n Lavoro iniziale di Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku Inc.
+<none>	HWindow		<nessuno>
+Other…	HWindow		Altro…

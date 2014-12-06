@@ -1,0 +1,4 @@
+1	spanish; castilian	x-vnd.Haiku-SystemLogger	57960782
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nEste demonio es responsable de recolectar todos los mensajes del sistema y escribirlos en un gran log de sistema en \"%s\".\n\n
+OK	SyslogDaemon		OK
+Syslog Daemon	SyslogDaemon		Demoño Syslog

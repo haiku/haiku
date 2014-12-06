@@ -1,18 +1,17 @@
-1	esperanto	x-vnd.Haiku-MidiPlayer	3885957623
-Cavern	Main Window		Kavo
-Closet	Main Window		Ĉambreto
-Could not load song	Main Window		La kanto ne eblis ŝarĝiĝi.
-Drop MIDI file here	Scope View		Faligu MIDI-an dosieron ĉi tie
-Dungeon	Main Window		Karcero
-Garage	Main Window		Aŭtejo
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI-a Legilo 1.0.0 beta\n\nLa programet' ĉi\nEblas legi milojn da\nRidindaj kantoj
-Igor's lab	Main Window		La laboratorio de Igoro
-Live input:	Main Window		Viva enigo:
+1	esperanto	x-vnd.Haiku-MidiPlayer	176589976
 None	Main Window		Neniu
+Live input:	Main Window		Viva enigo:
+Stop	Main Window		Halti
+Cavern	Main Window		Kavo
+Volume:	Main Window		Laŭteco:
+Reverb:	Main Window		Eĥo:
 OK	Main Window		Bone
 Off	Main Window		Malŝaltita
+Dungeon	Main Window		Karcero
 Play	Main Window		Legi
-Reverb:	Main Window		Eĥo:
+Garage	Main Window		Aŭtejo
+Closet	Main Window		Ĉambreto
+Drop MIDI file here	Scope View		Faligu MIDI-an dosieron ĉi tie
+Igor's lab	Main Window		La laboratorio de Igoro
 Scope	Main Window		Skopo
-Stop	Main Window		Halti
-Volume:	Main Window		Laŭteco:
+Could not load song	Main Window		La kanto ne eblis ŝarĝiĝi.

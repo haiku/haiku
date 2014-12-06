@@ -1,19 +1,18 @@
-1	croatian	x-vnd.Haiku-3DRendering	69309664
-Auxiliary buffer(s):	Capabilities		Pomoćna međumemorija(e):
-Available	Extensions		Dostupno
-Capabilities	Capabilities		Mogućnosti
-Extensions	Extensions		Proširenja
-GLU version:	InfoView		 GLU verzija
-GLUT API version:	InfoView		GLUT API verzija:
+1	croatian	x-vnd.Haiku-3DRendering	2331207112
 Information	InfoView		Informacija
-Max. 2D texture size:	Capabilities		Najveća 2D veličina teksture:
-Max. 3D texture size:	Capabilities		Najveća 3D tekstura:
-Max. convolution:	Capabilities		Maksimalni skup:
-Max. lights:	Capabilities		Max. svijetla:
-Max. recommended index elements:	Capabilities		Maksimalni preporučeni elementi indeksa:
-Max. recommended vertex elements:	Capabilities		Max. dozvoljeni broj vertex elemenata:
+GL version:	InfoView		 GLU verzija:
 Max. texture units:	Capabilities		Max. veličine tekskture:
-3D Rendering	System name		3D Rendering
-GL version:	InfoView		 GL verzija
 Renderer name:	InfoView		Ime renderera:
 Vendor name:	InfoView		Naziv proizvođaća:
+Auxiliary buffer(s):	Capabilities		Pomoćna međumemorija(e):
+Max. recommended vertex elements:	Capabilities		Max. dozvoljeni broj vertex elemenata:
+GLU version:	InfoView		 GLU verzija:
+Max. lights:	Capabilities		Max. svijetla:
+Max. 2D texture size:	Capabilities		Najveća 2D veličina teksture:
+Max. convolution:	Capabilities		Maksimalni skup:
+GLUT API version:	InfoView		GLUT API verzija:
+Max. 3D texture size:	Capabilities		Najveća 3D tekstura:
+Capabilities	Capabilities		Mogućnosti
+Max. recommended index elements:	Capabilities		Maksimalni preporučeni elementi indeksa:
+Available	Extensions		Dostupno
+Extensions	Extensions		Proširenja

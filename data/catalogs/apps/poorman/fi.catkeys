@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PoorMan	1347438411
+1	finnish	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		Webbisivusijainti
 Error Server	PoorMan		Virhepalvelin
 Settings…	PoorMan		Asetukset...
@@ -12,6 +12,7 @@ PoorMan settings	PoorMan		Köyhisasetukset
 Clear hit counter	PoorMan		Nollaa osumalaskuri
 Copy	PoorMan		Kopioi
 Max. simultaneous connections:	PoorMan		Enintään samanaikaisia yhteyksiä:
+Create public_html	PoorMan		Luo public_html
 Start page:	PoorMan		Aloitussivu:
 done.\n	PoorMan		valmis.\n
 Create	PoorMan		Luo

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PoorMan	1347438411
+1	japanese	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		ウェブサイトの場所
 Error Server	PoorMan		サーバーエラー
 Settings…	PoorMan		設定…
@@ -12,6 +12,7 @@ PoorMan settings	PoorMan		PoorMan 設定
 Clear hit counter	PoorMan		ヒットカウンタを消去
 Copy	PoorMan		コピー
 Max. simultaneous connections:	PoorMan		最大同時接続数:
+Create public_html	PoorMan		public_html を生成
 Start page:	PoorMan		スタートページ:
 done.\n	PoorMan		完了。\n
 Create	PoorMan		作成

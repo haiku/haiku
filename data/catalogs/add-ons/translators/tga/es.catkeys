@@ -1,0 +1,16 @@
+1	spanish; castilian	x-vnd.Haiku-TGATranslator	3289993499
+Targa image (%d bits truecolor)	TGATranslator		Imagen Targa (%d bits de color verdadero)
+Version %d.%d.%d %s	TGAView		Versión %d.%d.%d %s
+Ignore TGA alpha channel	TGAView		Ignorar el canal alfa TGA
+Targa image (%d bits colormap)	TGATranslator		Imagen Targa (%d bits de mapa de color)
+TGA image translator	TGAView		Conversor de imagen TGA
+Targa image (%d bits RLE colormap)	TGATranslator		Imagen Targa (%d bits RLE de mapa de color)
+Targa image (%d bits gray)	TGATranslator		Imagen Targa (%d bits de gris)
+Written by the Haiku Translation Kit Team	TGAView		Escrito por el equipo de traducción de Haiku
+Targa image (%d bits RLE truecolor)	TGATranslator		Imagen Targa (%d bits RLE de color verdadero)
+TGA images	TGATranslator		Imágenes TGA
+TGATranslator Settings	TGATranslator		Configuración TGATranslator
+Save with RLE Compression	TGAView		Guardar con Compresión RLE
+TGA image translator	TGATranslator		Conversor de imagen TGA
+Targa image (%d bits RLE gray)	TGATranslator		Imagen Targa (%d bits RLE de gris)
+TGA Settings	TGAMain		Configuración TGA

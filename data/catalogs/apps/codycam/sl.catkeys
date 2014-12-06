@@ -1,0 +1,54 @@
+1	slovenian	x-vnd.Haiku-CodyCam	2341873751
+Capturing Image…	VideoConsumer.cpp		Zajemam sliko…
+Every 30 seconds	CodyCam		Vsakih 30 sekund
+File name:	CodyCam		Ime datoteke:
+Last Capture: 	VideoConsumer.cpp		Zadnji zajem:
+Server login failed	VideoConsumer.cpp		Prijava na strežnik ni uspela
+Remote host has closed the connection.\n	FtpClient		Strežnik je prekinil povezavo.\n
+Login:	CodyCam		Uporabnik:
+Format:	CodyCam		Format:
+Every 2 hours	CodyCam		Vsaki 2 uri
+Closing the window\n	VideoConsumer.cpp		Zapiranje okna\n
+Rate:	CodyCam		Hitrost:
+JPEG image	CodyCam		Slika JPEG
+Password:	CodyCam		Geslo:
+Passive FTP	CodyCam		Pasivni FTP
+destination directory expected	CodyCam		pričakovan ciljni imenik
+Directory:	CodyCam		Mapa:
+Every minute	CodyCam		Vsako minuto
+read: %ld\n	SftpClient		prebral: %ld\n
+Waiting…	CodyCam		Čakam…
+Server:	CodyCam		Strežnik:
+server address expected	CodyCam		pričakovan naslov strežnika
+Error creating output file	VideoConsumer.cpp		Napaka pri ustvarjanju izhodne datoteke
+Output	CodyCam		Izhod
+Every 15 minutes	CodyCam		Vsakih 15 minut
+Cannot get a time source	CodyCam		Ni mogoče dobiti časovnega vira
+Every 8 hours	CodyCam		Vsakih 8 ur
+Rename failed	VideoConsumer.cpp		Preimenovanje ni uspelo
+Every 24 hours	CodyCam		Vsakih 24 ur
+Every 15 seconds	CodyCam		Vsakih 15 sekund
+Error writing output file	VideoConsumer.cpp		Napaka pri pisanju izhodne datoteke
+image file format expected	CodyCam		pričakovan slikovni format
+Type:	CodyCam		Vrsta:
+Stop video	CodyCam		Ustavi video
+Locking the window\n	VideoConsumer.cpp		Zaklepanje okna\n
+Couldn't find requested directory on server	VideoConsumer.cpp		Ni mogoče najti zahtevanega imenika na strežniku
+Renaming…	VideoConsumer.cpp		Preimenovanje…
+Local	CodyCam		Lokalno
+Error setting type of output file	VideoConsumer.cpp		Napaka pri nastavljanju vrste izhodne datoteke
+SFTP	CodyCam		SFTP
+Connected…	VideoConsumer.cpp		Povezan…
+Every 5 minutes	CodyCam		Vsakih 5 minut
+read: %d\n	SftpClient		prebral: %d\n
+on or off expected	Settings	Do not translate 'on' and 'off'	pričakovano on ali off
+Quit	CodyCam		Izhod
+cmd: '%s'\n	FtpClient		ukaz: '%s'\n
+Never	CodyCam		Nikoli
+Every 10 minutes	CodyCam		Vsakih 10 minut
+password expected	CodyCam		pričakovano geslo
+Every 4 hours	CodyCam		Vsake 4 ure
+File	CodyCam		Datoteka
+Every 30 minutes	CodyCam		Vsakih 30 minut
+reply: '%s'\n	SftpClient		odgovor: '%s'\n
+Start video	CodyCam		Začni video

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	979407669
+1	japanese	x-vnd.Haiku-WebPositive	98059607
 Show home button	Settings Window		ホームボタンを表示する
 Username:	Authentication Panel		ユーザー名:
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
@@ -19,6 +19,7 @@ Paste	WebPositive Window		貼り付け
 Double-click or middle-click to open new tab.	Tab Manager		ダブルクリックまたは中央ボタンクリックで新しいタブを開く
 Proxy username:	Settings Window		ユーザー名:
 Save page as…	WebPositive Window		名前を付けてページを保存…
+Over %days left	Download Window		残り %days 日超
 Settings	Settings Window		設定
 Confirmation	WebPositive Window		確認
 Window	WebPositive Window		ウィンドウ
@@ -109,6 +110,7 @@ Password:	Authentication Panel		パスワード:
 Back	WebPositive Window		戻る
 New browser window	Download Window		新規ブラウザウィンドウ
 Today	WebPositive Window		今日
+Over %hours left	Download Window		残り %hours 時間超
 Remember username and password for this site	Authentication Panel		このサイトのユーザー名とパスワードを記憶する
 Earlier	WebPositive Window		6 日以上前
 Authentication required	Authentication Panel		認証が必要です
@@ -116,6 +118,7 @@ Use proxy server to connect to the internet	Settings Window		インターネッ�
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		ダウンロードが進行中です。WebPositive を今終了しますか?
 Auto-hide interface in full screen mode	Settings Window		全画面表示時に自動的にインターフェイスを隠す。
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url 失敗。
+%seconds left	Download Window		残り %seconds 秒
 New tab	WebPositive Window		新規タブ
 Downloads in progress	WebPositive		ダウンロードが進行中です
 Style:	Font Selection view		スタイル:

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-InterfacesAddOn	3793974760
+1	finnish	x-vnd.Haiku-InterfacesAddOn	1264872285
 Interface	InterfaceWindow		Käyttöliittymä
 Network:	IntefaceHardwareView		Verkko:
 Static	IntefaceAddressView		Kiinteä
@@ -16,7 +16,6 @@ connected	IntefaceHardwareView		yhdistetty
 Gateway:	IntefaceAddressView		Yhdyskäytävä:
 Disable	InterfacesListView		Poista käytöstä
 Sent:	IntefaceHardwareView		Lähetetty:
-Renegotiate Address	InterfacesListView		Kysele osoite uudelleen
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Tila:
 <no wireless networks found>	IntefaceHardwareView		<langattomia verkkoja ei löytynyt>

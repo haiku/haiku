@@ -1,0 +1,28 @@
+1	croatian	x-vnd.Haiku-Notifications	3414142265
+Notifications	GeneralView		Obavijesti
+seconds of inactivity	GeneralView		sekunde neaktivnosti
+Revert	PrefletWin		Obrnuto
+Mini icon	DisplayView		Mini ikona
+Enable notifications	GeneralView		Omogući obavijesti
+Error	NotificationView		Greška
+OK	GeneralView		U redu
+Type	NotificationView		Tip
+Important	NotificationView		Važno
+Progress	NotificationView		Napredak
+General	PrefletView		Općenito
+Search:	NotificationView		Traži:
+Allowed	NotificationView		Dopušteno
+Yes	NotificationView		Da
+Large icon	DisplayView		Velika ikona
+Icon size:	DisplayView		Veličina ikone:
+Notifications	System name		Obavijesti
+Notifications	NotificationView		Obavijesti
+No	NotificationView		Ne
+Title	NotificationView		Naslov
+Information	NotificationView		Informacija
+Window width:	DisplayView		Širina prozora:
+Application	NotificationView		Program
+Enabled	NotificationView		Omogućeno
+Unknown	NotificationView		Nepoznato
+Notifications	PrefletView		Obavijesti
+Applications	NotificationView		Programi

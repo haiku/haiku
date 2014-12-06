@@ -1,0 +1,43 @@
+1	spanish; castilian	x-vnd.Be-PRNT	2906062670
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impresora: %printer_name%\nControlador: %driver%\n
+Waiting	JobListView		Espera
+Print test page	PrintersWindow		Página de impresión de prueba
+Test Page	TestPageView		Página de Test
+Test Page	PrintersWindow		Página de Test
+page	JobListView		página
+Cancel	AddPrinterDialog		Cancelar
+Add printer	AddPrinterDialog		Añadir impresora
+Green	TestPageView		Verde
+Printers	PrintersWindow		Impresoras
+Default Printer	PrinterListView		Impresora por defecto
+Transport: %transport% %transport_address%	PrinterListView		Medio: %transport% %transport_address%
+No pending jobs.	PrinterListView		No hay trabajos pendientes
+pages	JobListView		páginas
+Printers	System name		Impresoras
+Processing	JobListView		Procesando
+Red	TestPageView		Rojo
+Printer name:	AddPrinterDialog		Nombre de la impresora:
+Driver: %driver%	PrinterListView		Controldor: %driver%
+Black	TestPageView		Negro
+Restart job	PrintersWindow		Continuar el trabajo
+Add	AddPrinterDialog		Añadir
+Make default	PrintersWindow		Convertir en la impresora por defecto
+Transport: %transport% %transport_address%	TestPageView		Transporte: %transport% %transport_address%
+Cancel job	PrintersWindow		Cancelar el trabajo
+Yellow	TestPageView		Amarillo
+Blue	TestPageView		Azul
+1 pending job.	PrinterListView		1 Trabajo pendiente
+Remove	PrintersWindow		Eliminar
+<pick one>	AddPrinterDialog		<elegir uno >
+Add …	PrintersWindow		Añadir ...
+Print jobs for 	PrintersWindow		Trabajos de impresión para
+Failed	JobListView		Fallado
+%.2f KB	JobListView		%.2f KB
+Magenta	TestPageView		Magenta
+Completed	JobListView		Terminado
+No printer found!	TransportMenu		Impresora no encontrada!
+Print jobs: No printer selected	PrintersWindow		Trabajos de impresión: ninguna impresora seleccionada
+Cyan	TestPageView		Cian
+Unknown status	JobListView		Estado desconocido
+Connected to:	AddPrinterDialog		Conectado a:
+Printer type:	AddPrinterDialog		Tipo de impresión:

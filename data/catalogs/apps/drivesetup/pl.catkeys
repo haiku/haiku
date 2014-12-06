@@ -1,5 +1,6 @@
-1	polish	x-vnd.Haiku-DriveSetup	4273934970
+1	polish	x-vnd.Haiku-DriveSetup	1450212098
 DriveSetup	System name		DriveSetup
+Could not acquire partitioning information.	MainWindow		Nie można uzyskać informacji na temat partycji.
 Cancel	AbstractParametersPanel		Anuluj
 Delete	MainWindow		Usuń
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na wybranej partycji bedą bezpowrotnie utracone!
@@ -66,6 +67,7 @@ The panel could not return successfully.	MainWindow		Działanie panelu zakończy
 Cancel	MainWindow		Anuluj
 Delete partition	MainWindow		Usuń partycję
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Czy jesteś pewna/pewny, że chcesz zmienić parametry wybranej partycji?\n\nPartycja może już nie być rozpoznawana przez inne systemy operacyjne!
+Disk system \"%s\" not found!	MainWindow		Typ układu dysku „%s” nie odnaleziony!
 Eject	MainWindow		Wysuń
 Partition	MainWindow		Partycja
 Validation of the given parameters failed.	MainWindow		Sprawdzenie poprawności parametrów nie powiodło się.

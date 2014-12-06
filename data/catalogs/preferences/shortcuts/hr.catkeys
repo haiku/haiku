@@ -1,32 +1,33 @@
-1	croatian	x-vnd.Haiku-Shortcuts	302026053
-(Choose application with file requester)	ShortcutsWindow		(Odaberi program sa zahtjevom za datoteku)
-*MouseDown	ShortcutsWindow		*Mišdolje
-*MouseUp	ShortcutsWindow		*Mišgore
-Add new shortcut	ShortcutsWindow		Dodaj novi prečac
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Append	ShortcutsWindow		Dodaj 
-Application	ShortcutsWindow		Program
+1	croatian	x-vnd.Haiku-Shortcuts	3811316972
+MoveMouse	ShortcutsSpec		Pomakni miša
+OK	ShortcutsWindow		U redu
 Cancel	ShortcutsWindow		Otkaži
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
-Don't save	ShortcutsWindow		Nemoj spremiti
-File	ShortcutsWindow		Datoteka
 Key	ShortcutsWindow		Tipka
-MouseDown	ShortcutsSpec		Mišdolje
 MouseUp	ShortcutsSpec		Mišgore
-MoveMouse	ShortcutsSpec		Pomakni miša
-MoveMouseTo	ShortcutsSpec		Pomaknimišna
-Multi	ShortcutsSpec		Multi
-OK	ShortcutsWindow		U redu
-Oh no	ShortcutsWindow		Oh ne
-Open	ShortcutsWindow		Otvori
-Quit	ShortcutsWindow		Izađi
-Really quit without saving your changes?	ShortcutsWindow		Želite li izaći bez spremanja vaših izmjena?
-Remove selected shortcut	ShortcutsWindow		Ukloni odabrani prečac
 Revert to saved	ShortcutsWindow		Vrati na spremljeno
-Save	ShortcutsWindow		Spremi
-Save & apply	ShortcutsWindow		Spremi i primjeni
-Select	ShortcutsWindow		Odaberi
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+*MouseUp	ShortcutsWindow		*Mišgore
+(Choose application with file requester)	ShortcutsWindow		(Odaberi program sa zahtjevom za datoteku)
 SendMessage	ShortcutsSpec		Pošaljiporuku
+MoveMouseTo	ShortcutsSpec		Pomaknimišna
+Save	ShortcutsWindow		Spremi
+MouseDown	ShortcutsSpec		Mišdolje
+Remove selected shortcut	ShortcutsWindow		Ukloni odabrani prečac
+Add new shortcut	ShortcutsWindow		Dodaj novi prečac
+Save & apply	ShortcutsWindow		Spremi i primjeni
+Append	ShortcutsWindow		Dodaj
+File	ShortcutsWindow		Datoteka
+Quit	ShortcutsWindow		Izađi
+*MouseDown	ShortcutsWindow		*Mišdolje
+Don't save	ShortcutsWindow		Nemoj spremiti
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		Program
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open	ShortcutsWindow		Otvori
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shorcuts nije mogao raščlaniti vaš keyset file!
+Select	ShortcutsWindow		Odaberi
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shorcuts nije mogao snimiti vaš keyset file!
+Oh no	ShortcutsWindow		Oh ne
+LaunchHandler	ShortcutsSpec		LaunchHandler
 Shortcuts	System name		Prečaci
-Window	ShortcutsSpec	Name for modifier on keyboard	Prozor

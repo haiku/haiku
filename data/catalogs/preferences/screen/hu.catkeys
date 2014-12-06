@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Screen	1388881963
+1	hungarian	x-vnd.Haiku-Screen	2339556848
 yes	Screen		igen
 Use laptop panel:	Screen		Használt laptopképernyő:
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 szín
@@ -12,6 +12,7 @@ Set background…	Screen		Háttér beállítása…
 Undo	Screen		Visszavonás
 if needed	Screen		ha szükséges
 Screen preferences by the Haiku team	Screen		A Haiku csapat képernyő-beállításai
+Settings will revert in %seconds.	Screen		A beállítások módosításai %seconds másodperc múlva visszavonásra kerülnek
 Screen	System name		Képernyő
 OK	Screen		Rendben
 Workspaces	Screen		Munkaasztalok

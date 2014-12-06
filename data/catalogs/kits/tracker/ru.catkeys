@@ -390,7 +390,7 @@ Could not update permissions of file \"%name\". %error	FSUtils		Невозмож
 Select…	FilePanelPriv		Выделить…
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" программа устаревшего типа. Пожалуйста получите обновленную версию.
 There was an error resolving the link.	Tracker		Возникла ошибка при открытии ссылки.
-%BytesPerSecond/s	StatusWindow		%BytesPerSecond/с
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Вы не можете перемещать или копировать корзину.
 ends with	SelectionWindow		заканчивается на
 Volume icons	TrackerSettingsWindow		Значки дисков

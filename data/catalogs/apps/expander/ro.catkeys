@@ -1,11 +1,12 @@
-1	romanian	x-vnd.Haiku-Expander	3394631502
+1	romanian	x-vnd.Haiku-Expander	2825579001
 Expand	ExpanderMenu		Extinde
 Close window when done expanding	ExpanderPreferences		Închide fereastra atunci când s-a încheiat extinderea
 Set destination…	ExpanderMenu		Setează destinația…
 Use:	ExpanderPreferences		Utilizează:
 File expanded	ExpanderWindow		Fișier extins
-The destination is read only.	ExpanderWindow		Destinația este în mod \"doar citire\".
+The destination is read only.	ExpanderWindow		Destinația este protejată la scriere.
 Expander: Open	ExpanderWindow		Extensor: Deschide
+ is not supported	ExpanderWindow		 nesuportat
 Expander settings	ExpanderPreferences		Configurări Extensor
 Select current	DirectoryFilePanel		Selectează curent
 Source	ExpanderWindow		Sursă
@@ -28,6 +29,7 @@ Show contents	ExpanderWindow		Afișează conținut
 Automatically show contents listing	ExpanderPreferences		Afișează automat enumerarea conținuturilor
 OK	ExpanderPreferences		OK
 Leave destination folder path empty	ExpanderPreferences		Lasă goală calea dosarului de destinație
+Select '%s'…	DirectoryFilePanel		Selectează '%s'...
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Dosarul a fost mutat, redenumit\nsau nu este suportat.
 The file doesn't exist	ExpanderWindow		Fișierul nu există
 Stop	ExpanderMenu		Oprește

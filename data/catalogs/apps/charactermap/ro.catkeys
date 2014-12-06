@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CharacterMap	3150914128
+1	romanian	x-vnd.Haiku-CharacterMap	1534181938
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerice încercuite
 Basic Latin	UnicodeBlocks		Latină de bază
 View	CharacterWindow		Vizualizare
@@ -40,6 +40,7 @@ Tagbanwa	UnicodeBlocks		Tagbanwa
 Kanbun	UnicodeBlocks		Kanbun
 Syriac	UnicodeBlocks		Syriac
 CJK compatibility ideographs Supplement	UnicodeBlocks		Supliment de ideografuri de compatibilitate CJK
+Musical symbols	UnicodeBlocks		Simboluri muzicale
 Hangul syllables	UnicodeBlocks		Silabe Hangul
 Coptic	UnicodeBlocks		Coptic
 Tai Le	UnicodeBlocks		Tai Le
@@ -122,6 +123,7 @@ Vai	UnicodeBlocks		Vai
 Yi Radicals	UnicodeBlocks		Radicali Yi
 Cyrillic extended B	UnicodeBlocks		Chirilic extins B
 Quit	CharacterWindow		Părăsește
+Ancient symbols	UnicodeBlocks		Simboluri antice
 Braille patterns	UnicodeBlocks		Modele Braille
 New Tai Lue	UnicodeBlocks		Tai Lue nou
 Runic	UnicodeBlocks		Runic

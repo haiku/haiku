@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Screen	1388881963
+1	polish	x-vnd.Haiku-Screen	2339556848
 yes	Screen		tak
 Use laptop panel:	Screen		Użyj ekranu laptopa:
 15 bits/pixel, 32768 colors	Screen		15 bitów/piksel, 32768 kolorów
@@ -12,6 +12,7 @@ Set background…	Screen		Ustaw tło…
 Undo	Screen		Cofnij
 if needed	Screen		jeśli potrzeba
 Screen preferences by the Haiku team	Screen		Ustawienia ekranu. Stworzone przez zespół Haiku
+Settings will revert in %seconds.	Screen		Ustawienia zostaną cofnięte w ciągu %seconds.
 Screen	System name		Ekran
 OK	Screen		OK
 Workspaces	Screen		Obszary robocze

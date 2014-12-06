@@ -1,0 +1,13 @@
+1	esperanto	x-vnd.Haiku-ShowImage	840951462
+File	Menus		Dosiero
+Print…	Menus		Presi…
+OK	SaveToFile		Bone
+Quit	Menus		Eliri
+Close	Menus		Fermi
+Close	ClosePrompt		Fermi
+Open…	Menus		Malfermi…
+Cancel	ClosePrompt		Rezigni
+Copy	Menus		Kopii
+Image	Menus		Bildo
+OK	Alerts		Bone
+Save as…	Menus		Konservi kiel…

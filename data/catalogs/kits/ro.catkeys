@@ -1,13 +1,19 @@
-1	romanian	x-vnd.Haiku-libbe	2976995487
+1	romanian	x-vnd.Haiku-libbe	742159760
+gamma	AboutWindow		gama
+beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Scris de:
 About %app%	AboutMenuItem		Despre %app%
 Cut	TextView		Taie
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nu se poate crea copie pentru „%description”.\n%error
+Version	AboutWindow		Versiune
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nu se poate crea copie pentru \"%description\".\n%error
 Copy	TextView		Copiază
 %3.2f KiB	StringForSize		%3.2f KiB
+alpha	AboutWindow		alfa
 Error	PrintJob		Eroare
+All Rights Reserved.	AboutWindow		Toate drepturile rezervate.
 About %app%	AboutWindow		Despre %app%
+No pages to print!	PrintJob		Fără pagini de imprimat!
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Verde:
@@ -16,7 +22,9 @@ OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Serverul de imprimare nu răspunde.
 Paste	TextView		Lipește
+Special Thanks:	AboutWindow		Mulţumiri speciale:
 %.2f TiB	StringForSize		%.2f TiB
+{0, plural, one{# byte} other{# bytes}	StringForSize		{0, plural, one{# octet} other{# octeți}
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate găsi aplicația pentru copie. Nu a fost furnizată nicio semnătură de aplicație.\n%error
 Redo	TextView		Repetă
 <empty>	Menu		<liber>
@@ -26,6 +34,7 @@ Undo	TextView		Refă
 Red:	ColorControl		Roșu:
 %3.2f MiB	StringForSize		%3.2f MiB
 About %app…	Dragger		Despre %app...
+development	AboutWindow		dezvoltare
 Error	ZombieReplicantView		Eroare
 Blue:	ColorControl		Albastru:
 Can't delete this replicant from its original application. Life goes on.	Dragger		Nu se poate șterge această copie din locația originală. Viața merge mai departe.

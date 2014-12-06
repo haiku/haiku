@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Screen	1388881963
+1	japanese	x-vnd.Haiku-Screen	2339556848
 yes	Screen		はい
 Use laptop panel:	Screen		ラップトップパネルを使用:
 15 bits/pixel, 32768 colors	Screen		15ビット/画素, 32768色
@@ -12,6 +12,7 @@ Set background…	Screen		背景を設定…
 Undo	Screen		元に戻す
 if needed	Screen		必要ならば
 Screen preferences by the Haiku team	Screen		Haiku チームによる画面設定
+Settings will revert in %seconds.	Screen		設定は %seconds 秒以内に元に戻ります。
 Screen	System name		画面
 OK	Screen		OK
 Workspaces	Screen		ワークスペース

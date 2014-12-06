@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	3041555072
+1	hungarian	x-vnd.Haiku-libtracker	1313160091
 OK	WidgetAttributeText		Rendben
 Add-ons	FilePanelPriv		Kiegészítők
 Mount settings…	ContainerWindow		Csatolási beállítások…
@@ -200,8 +200,10 @@ Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Mozgatás
 Get info	ContainerWindow		Információ
 Error creating link to \"%name\".	FSUtils		Hiba történt a hivatkozás (%name) létrehozása közben.
 Select	SelectionWindow		Kijelölés
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# bájt} other{# bájt}}
 Or	FindPanel		Vagy
 The Tracker must be running to see set the default printer.	PoseView		A Nyomkövetőnek futnia kell, hogy az alapértelmezett nyomtatót át lehessen állítani.
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bájt} other{# bájt}}
 by formula	FindPanel		képlet alapján
 40 x 40	DeskWindow		40 x 40
 Name	PoseView		Név

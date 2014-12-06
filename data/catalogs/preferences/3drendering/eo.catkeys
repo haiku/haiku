@@ -1,26 +1,25 @@
-1	esperanto	x-vnd.Haiku-3DRendering	899836772
-Attributes stack size:	Capabilities		Atributstaka grandeco:
-Auxiliary buffer(s):	Capabilities		Helpanta(j) bufro(j):
-Available	Extensions		Haveblaj
-Capabilities	Capabilities		Ebloj
-Extensions	Extensions		Etendiloj
-GLU version:	InfoView		Versio de GLU:
-GLUT API version:	InfoView		Versio de GLUT-a API:
-Information	InfoView		Informoj
+1	esperanto	x-vnd.Haiku-3DRendering	1539891217
 List stack size:	Capabilities		Liststaka grandeco:
-Max. 2D texture size:	Capabilities		Pleja grandeco de du-dimensiaj teksturoj:
-Max. 3D texture size:	Capabilities		Pleja grandeco de tri-dimensiaj teksturoj:
+Information	InfoView		Informoj
 Max. clipping planes:	Capabilities		Plej da tondaj ebenoj:
-Max. convolution:	Capabilities		Plej da kunfaldaĵo:
-Max. evaluators equation order:	Capabilities		Pleja dimensio de valorigila ekvacio:
-Max. lights:	Capabilities		Plej da lumoj:
-Max. recommended index elements:	Capabilities		Plej da rekomendataj indekseroj:
-Max. recommended vertex elements:	Capabilities		Plej da rekomendataj verticaj eroj:
 Max. texture units:	Capabilities		Plej da teksturaj eroj:
-Model stack size:	Capabilities		Ŝablonstaka grandeco:
-Name stack size:	Capabilities		Nomstaka grandeco:
-OpenGL version:	InfoView		Versio de OpenGL:
-Projection stack size:	Capabilities		Projekciaĵstaka grandeco:
 Renderer name:	InfoView		Bildigila nomo:
-Texture stack size:	Capabilities		Teksturstaka grandeco:
 Vendor name:	InfoView		Vendanta nomo:
+Attributes stack size:	Capabilities		Atributstaka grandeco:
+Name stack size:	Capabilities		Nomstaka grandeco:
+Auxiliary buffer(s):	Capabilities		Helpanta(j) bufro(j):
+Max. recommended vertex elements:	Capabilities		Plej da rekomendataj verticaj eroj:
+GLU version:	InfoView		Versio de GLU:
+Model stack size:	Capabilities		Ŝablonstaka grandeco:
+Projection stack size:	Capabilities		Projekciaĵstaka grandeco:
+Max. lights:	Capabilities		Plej da lumoj:
+Max. 2D texture size:	Capabilities		Pleja grandeco de du-dimensiaj teksturoj:
+Max. convolution:	Capabilities		Plej da kunfaldaĵo:
+GLUT API version:	InfoView		Versio de GLUT-a API:
+Texture stack size:	Capabilities		Teksturstaka grandeco:
+Max. evaluators equation order:	Capabilities		Pleja dimensio de valorigila ekvacio:
+Max. 3D texture size:	Capabilities		Pleja grandeco de tri-dimensiaj teksturoj:
+Capabilities	Capabilities		Ebloj
+Max. recommended index elements:	Capabilities		Plej da rekomendataj indekseroj:
+Available	Extensions		Haveblaj
+Extensions	Extensions		Etendiloj

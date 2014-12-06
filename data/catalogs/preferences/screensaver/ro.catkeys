@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ScreenSaver	904083067
+1	romanian	x-vnd.Haiku-ScreenSaver	3955331319
 Could not load screen saver	ScreenSaver		Nu s-a putut încărca protectorul de ecran
 30 seconds	ScreenSaver		30 de secunde
 Start screensaver	ScreenSaver		Pornește protectorul de ecran
@@ -22,4 +22,5 @@ Blackness	ScreenSaver		Întunecat
 Use custom password	ScreenSaver		Utilizează parolă personalizată
 Done	ScreenSaver		Gata
 Confirm password:	ScreenSaver		Confirmare parolă:
+No preview available	PreviewView		Nicio previzualizare disponibilă
 Use network password	ScreenSaver		Utilizează parolă de rețea

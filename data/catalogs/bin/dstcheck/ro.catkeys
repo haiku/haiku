@@ -1,4 +1,5 @@
-1	romanian	x-vnd.Haiku-cmd-dstconfig	3548307002
+1	romanian	x-vnd.Haiku-cmd-dstconfig	1861992467
 Use this time	dstcheck		Utilizează această oră
 Ask me later	dstcheck		Întreabă-mă mai târziu
 Manually adjust time…	dstcheck		Ajustează ora manual...
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Atenție!\n\nDin cauza schimbării de la ora de vară, ceasul calculatorului s-ar putea să fie înainte cu o oră.\nCalculatorul crede că acum este %current time%.\n\nAceasta este ora corectă?

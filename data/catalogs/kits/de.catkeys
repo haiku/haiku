@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libbe	1409488127
+1	german	x-vnd.Haiku-libbe	1743278280
 gamma	AboutWindow		Gamma
 beta	AboutWindow		Beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -13,16 +13,19 @@ alpha	AboutWindow		Alpha
 Error	PrintJob		Fehler
 All Rights Reserved.	AboutWindow		Alle Rechte vorbehalten.
 About %app%	AboutWindow		Über %app%
+No pages to print!	PrintJob		Keine Seiten zum Drucken!
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Grün:
 Version history:	AboutWindow		Historie:
 Remove replicant	Dragger		Replikant entfernen
+OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Drucker-Server reagiert nicht.
 Paste	TextView		Einfügen
 Special Thanks:	AboutWindow		Besonderen Dank an:
 %.2f TiB	StringForSize		%.2f TiB
+{0, plural, one{# byte} other{# bytes}	StringForSize		{0, plural, one{# Byte} other{# Bytes}
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Das Ursprungsprogramm für den Replikanten konnte nicht gefunden werden, da keine Programm-Signatur zur Verfügung steht.\n%error
 Redo	TextView		Wiederholen
 <empty>	Menu		<leer>

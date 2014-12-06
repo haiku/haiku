@@ -1,0 +1,13 @@
+1	spanish; castilian	x-vnd.Haiku-SMTP	1052586247
+SMTP server:	ConfigView		Servidor SMTP:
+Error while logging in to %serv	smtp		Error durante el logado en %serv
+. The server says:\n	smtp		. El servidor dice:\n
+ESMTP	ConfigView		ESTMP
+Connecting to server…	smtp		Conectando al servidor...
+Error while opening connection to %serv	smtp		Error durante la apertura de la conexión a %serv
+POP3 authentication failed. The server said:\n	smtp		Fallo de autenticación POP3. El servidor dijo:\n
+Destination:	ConfigView		Destino:
+: Connection refused or host not found.	smtp		: Conexión rechazada o no se ha encontrado el host.
+None	ConfigView		Ninguno
+POP3 before SMTP	ConfigView		POP3 antes que SMTP
+. The server said:\n	smtp		. El servidor dijo:\n

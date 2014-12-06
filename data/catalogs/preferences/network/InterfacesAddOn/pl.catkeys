@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-InterfacesAddOn	3793974760
+1	polish	x-vnd.Haiku-InterfacesAddOn	1264872285
 Interface	InterfaceWindow		Interfejs
 Network:	IntefaceHardwareView		Sieć:
 Static	IntefaceAddressView		Statyczny
@@ -16,7 +16,6 @@ connected	IntefaceHardwareView		połączony
 Gateway:	IntefaceAddressView		Brama:
 Disable	InterfacesListView		Wyłącz
 Sent:	IntefaceHardwareView		Wysłano:
-Renegotiate Address	InterfacesListView		Uzyskaj adres ponownie
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Tryb:
 <no wireless networks found>	IntefaceHardwareView		<nie znaleziono sieci bezprzewodowych>

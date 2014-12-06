@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	979407669
+1	polish	x-vnd.Haiku-WebPositive	98059607
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -19,6 +19,7 @@ Paste	WebPositive Window		Wklej
 Double-click or middle-click to open new tab.	Tab Manager		Dwuklik lub wciśnięcie środkowego przycisku myszy spowoduje otworzenie nowej karty.
 Proxy username:	Settings Window		Nazwa użytkownika serwera proxy:
 Save page as…	WebPositive Window		Zapisz stronę jako…
+Over %days left	Download Window		Zostało ponad %days
 Settings	Settings Window		Ustawienia
 Confirmation	WebPositive Window		Potwierdzenie
 Window	WebPositive Window		Okno
@@ -109,6 +110,7 @@ Password:	Authentication Panel		Hasło:
 Back	WebPositive Window		Wstecz
 New browser window	Download Window		Nowe okno
 Today	WebPositive Window		Dzisiaj
+Over %hours left	Download Window		Zostało ponad %hours
 Remember username and password for this site	Authentication Panel		Pamiętaj nazwę użytkownika i hasło dla tej strony
 Earlier	WebPositive Window		Wcześniej
 Authentication required	Authentication Panel		Wymagane uwierzytelnienie
@@ -116,6 +118,7 @@ Use proxy server to connect to the internet	Settings Window		Użyj serwera proxy
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		W toku jest pobieranie, czy na pewno chcesz teraz zamknąć WebPositive?
 Auto-hide interface in full screen mode	Settings Window		Automatyczne ukrywanie interfejsu w trybie pełnoekranowym 
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url nie załadował się
+%seconds left	Download Window		Zostało %seconds
 New tab	WebPositive Window		Nowa karta
 Downloads in progress	WebPositive		Pobieranie jest w toku
 Style:	Font Selection view		Styl:

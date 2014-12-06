@@ -1,0 +1,8 @@
+1	spanish; castilian	x-vnd.Haiku-InstalledPackages	4131220089
+No package selected.	UninstallView		Ningún paquete seleccionado.
+Remove	UninstallView		Eliminar
+Package description	UninstallView		Descripción de paquetes
+InstalledPackages	System name		Paquetes instalados
+The package you selected has been successfully removed from your system.	UninstallView		El paquete seleccionado ha sido eliminado con éxito del sistema.
+OK	UninstallView		Aceptar
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		El paquete seleccionado se eliminó del sistema. La información del paquete instalado puede estar dañada.

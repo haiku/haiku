@@ -1,0 +1,57 @@
+1	spanish; castilian	x-vnd.Haiku-PoorMan	3137659009
+Website location	PoorMan		Posición del sitio web
+Error Server	PoorMan		Error de servidor
+Settings…	PoorMan		Configuración...
+Create PoorMan log	PoorMan		Crear registro de Hombre Pobre
+Shutting down.\n	PoorMan		Cerrando.\n
+Hits: %lu	PoorMan		Golpes:%lu
+Web folder:	PoorMan		Carpeta web:
+Save log console selection	PoorMan		Guardar registro de la consola de selección
+Run server	PoorMan		Ejecutar servidor
+PoorMan settings	PoorMan		Configuración de Hombre Pobre
+Clear hit counter	PoorMan		Despejar ficha de golpes
+Copy	PoorMan		Copiar
+Max. simultaneous connections:	PoorMan		Máxima conexiones simultáneas:
+Start page:	PoorMan		Página de inicio:
+done.\n	PoorMan		terminado.\n
+Create	PoorMan		Crear
+Shutting down.	PoorMan		Cerrando.
+Website options	PoorMan		Opciones de sitio web
+File Name	PoorMan		Nombre del archivo
+Clear console log	PoorMan		Despejar registro de la consola
+Advanced	PoorMan		Avanzado
+OK	PoorMan		Aceptar
+Status: Stopped	PoorMan		Estado: Parado
+Dir Created	PoorMan		Directorio creado
+Quit	PoorMan		Salir
+Hits: 0	PoorMan		Golpes: 0
+Save log console	PoorMan		Guarder registro de consola
+Edit	PoorMan		Editar
+Directory: (none)	PoorMan		Directorio: (ninguno)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor, seleccione la carpeta para publicar en la web. \ n \ nHombre Pobre puede crear un defecto \ "public_html \" en la carpeta de inicio. \ nO se selecciona una de sus propias carpetas en su lugar.
+Log To Console	PoorMan		Registrar a consola
+Status: Running	PoorMan		Estado: Ejecutando
+Controls	PoorMan		Controles
+Send file listing if there's no start page	PoorMan		Enviar archivo de lista si no hay página de inicio
+Error Dir	PoorMan		Error Dir
+Select all	PoorMan		Seleccionar todo
+File	PoorMan		Archivo
+Save console selections as…	PoorMan		Guardar selecciónes de consola como...
+File logging	PoorMan		Registrando de archivos
+Select web folder	PoorMan		Seleccionar carpeta de web
+Logging view	PoorMan		Vista de registrar
+Logging	PoorMan		Registrando
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Una carpeta web por defecto se ha creado en \ "/ boot / home / public_html. \" \nAsegúrese de que hay un archivo HTML denominado \ "index.html \" en esa carpeta.
+Clear log file	PoorMan		Despejar archivo de registro
+Log file name:	PoorMan		Nombre de archivo de registro:
+Directory: 	PoorMan		Directorio:
+Log To File	PoorMan		Registrar a archivo
+Done	PoorMan		Terminado
+Create log file	PoorMan		Crear archivo de registro
+Starting up... 	PoorMan		Empezando...
+Site	PoorMan		Sitio
+Cancel	PoorMan		Cancelar
+Cannot start the server	PoorMan		No pudimos iniciar el servidor
+Select	PoorMan		Seleccionar
+Save console as…	PoorMan		Guardar consola como...
+Console Logging	PoorMan		Registrando la consola

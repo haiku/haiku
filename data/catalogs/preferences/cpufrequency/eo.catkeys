@@ -1,0 +1,19 @@
+1	esperanto	x-vnd.Haiku-CPUFrequencyPref	3974849433
+Ok	Status view		Bone
+CPU frequency status view	CPU Frequency View		Procesorofteca stato
+Set state	Status view		Ŝanĝi staton
+Defaults	Pref Window		Aprioraj
+Install replicant into Deskbar	CPU Frequency View		Instali la kopianton en la Deskbar-on
+Quit	Status view		Eliri
+High performance	Status view		Plejbona rendimento
+Stepping policy	CPU Frequency View		Akcela reĝimo
+Dynamic performance	Status view		Dinamika rendimento
+Step up by CPU usage	Color Step View		Akcelo per procesora uzo:
+Dynamic stepping	CPU Frequency View		Dinamika akcelo
+Stepping policy: 	CPU Frequency View		Akcela reĝimo:
+Integration time [ms]: 	CPU Frequency View		Integralada tempo [ms]:
+Open Speedstep preferences…	Status view		Malfermi la Speedstep-ajn agordojn…
+Revert	Pref Window		Malfari
+Low energy	Status view		Malgranda energio
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Malsukcesis lanĉi la procesorofteca prefileto.\n\nEraro:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Procesorofteco\n\tskribita per Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n

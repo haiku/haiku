@@ -1,29 +1,32 @@
-1	croatian	x-vnd.Haiku.TextSearch	2098016430
+1	croatian	x-vnd.Haiku.TextSearch	2249292548
 %s: Not enough room to escape the filename.	Grepper		%s: Nedovoljno prostora za izbjegavanje imena datoteke.
-%s: There was a problem running grep.	Grepper		%s: Dogodio se problem dok je grep radio.
-Cancel	GrepWindow		Odustani
-Case-sensitive	GrepWindow		Osjetljivost na slova
-Close	GrepWindow		Zatvori
-Escape search text	GrepWindow		Ugasi search tekst
-File	GrepWindow		Datoteka
-Follow symbolic links	GrepWindow		Slijedi simboličke poveznice
-History	GrepWindow		Povijest
-Look in sub-folders	GrepWindow		Pogledaj u podmape
-New window	GrepWindow		Novi prozor
-OK	GrepWindow		Uredu
-Open files in Pe	GrepWindow		Otvori datoteke u Pe
-Open selection	GrepWindow		Otvori lokaciju
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Označi datoteke koje želiš selektovati za Tracker
-Please select the files you wish to keep searching.	GrepWindow		Odaberite datoteke koje želite nastaviti tražiti.
-Quit	GrepWindow		Isključi
-Search	GrepWindow		Traži
-Select all	GrepWindow		Odaberi sve
-Set target…	GrepWindow		Postavi metu...
-Settings	GrepWindow		Postavke
-Show files in Tracker	GrepWindow		Prikaži datoteke u Tracker-u
-Show lines	GrepWindow		Pokaži retke
-Skip folders starting with a dot	GrepWindow		Preskoči mape koje počinju sa točkom
-Text files only	GrepWindow		Samo tekstualne datoteke
-TextSearch	GrepWindow		TextSearch
-The unselected files will be removed from the list.	GrepWindow		Neizabrane datoteke će biti uklonjene sa liste.
 Trim to selection	GrepWindow		Skrati odabir
+Follow symbolic links	GrepWindow		Slijedi simboličke poveznice
+Close	GrepWindow		Zatvori
+Cancel	GrepWindow		Odustani
+The unselected files will be removed from the list.	GrepWindow		Neizabrane datoteke će biti uklonjene sa liste.
+Set target…	GrepWindow		Postavi metu...
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Označi datoteke koje želiš selektirati za sebe u Tracker-u.
+Open files in Pe	GrepWindow		Otvori datoteke u Pe
+Settings	GrepWindow		Postavke
+Select all	GrepWindow		Odaberi sve
+OK	GrepWindow		Uredu
+Skip folders starting with a dot	GrepWindow		Preskoči mape koje počinju sa točkom
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME ne može otvoriti jednu iili više mapa.
+Escape search text	GrepWindow		Izbjegni traženje teksta
+Search	GrepWindow		Traži
+Open selection	GrepWindow		Otvori lokaciju
+Look in sub-folders	GrepWindow		Pogledaj u podmape
+Actions	GrepWindow		Akcije
+File	GrepWindow		Datoteka
+Encoding	GrepWindow		Enkodiranje
+History	GrepWindow		Povijest
+%s: There was a problem running grep.	Grepper		%s: Dogodio se problem dok je grep radio.
+New window	GrepWindow		Novi prozor
+Please select the files you wish to keep searching.	GrepWindow		Odaberite datoteke koje želite nastaviti tražiti.
+TextSearch	GrepWindow		TextSearch
+Quit	GrepWindow		Isključi
+Show files in Tracker	GrepWindow		Prikaži datoteke u Tracker-u
+Case-sensitive	GrepWindow		Osjetljivost na slova
+Text files only	GrepWindow		Samo tekstualne datoteke
+Show lines	GrepWindow		Pokaži retke

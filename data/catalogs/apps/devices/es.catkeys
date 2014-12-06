@@ -1,0 +1,72 @@
+1	spanish; castilian	x-vnd.Haiku-Devices	3390622992
+Manufacturer	DeviceSCSI		Fabricante
+Order by:	DevicesView		Ordenar por:
+ACPI controller	Device		Controlador ACPI
+Memory controller	Device		Controlador de memoria
+Driver used	DevicePCI		Controlador utilizado
+CD-ROM	DeviceSCSI		CD-ROM
+ISA bus	Device		Bus ISA
+ACPI bus	Device		Bus ACPI
+ISA bus	DevicesView		Bus ISA
+Docking station	Device		Estación de acoplamiento
+Computer	Device		Computadora
+Unknown device	Device		Dispositivo desconocido
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Información de clase:\t\t\t\t:  %classInfo%
+Processor	DeviceSCSI		Procesador
+RBC	DeviceSCSI		RBC
+Detailed	DevicesView		Detallado
+Category	DevicesView		Categoría
+Quit	DevicesView		Salir
+Device paths	Device		Rutas de Dispositivo
+Scanner	DeviceSCSI		Escáner
+Printer	DeviceSCSI		Impresora
+Processor	Device		Procesador
+Optical Drive	DeviceSCSI		Dispositivo óptico
+ACPI Processor Namespace '%2'	DeviceACPI		Espacio de nombres '%2' ACPI del Procesador
+Bridge	DeviceSCSI		Puente
+unknown	Device		desconocido
+ACPI Information	DeviceACPI		Información ACPI
+Generic system peripheral	Device		Sistema periférico genérico
+Not implemented	DevicePCI		No implementado
+Disk Drive	DeviceSCSI		Dispositivo de disco
+Not implemented	DeviceACPI		No implementado
+Device name	DevicePCI		Nombre de dispositivo
+Display controller	Device		Controlador de pantalla
+Mass storage controller	Device		Controlador de almacenamiento masivo
+Input device controller	Device		Controlador de dispisitivo de entrada
+Network controller	Device		Controlador de red
+Device class	DeviceSCSI		Clase de dispositivo
+Device name	DeviceACPI		Nombre de dispositivo
+Driver used	Device		Controlador utilizado
+Other	DeviceSCSI		Otro
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nombre de dispositivo\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nControlador utilizado\t\t\t\t: %DriverUsed%\nRutas de dispositivo\t: %DevicePaths%
+ACPI Thermal Zone	DeviceACPI		Zona Termal ACPI
+Communications	DeviceSCSI		Comunicaciones
+Bus	DevicesView		Bus
+Communication controller	Device		Controlador de communicaciones
+Manufacturer	DeviceACPI		Fabricante
+PCI bus	Device		Bus PCI
+ACPI System Indicator	DeviceACPI		Indicador de Sistema ACPI
+None	Device		Ninguno
+PCI bus	DevicesView		Bus PCI
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Información de clase:\t\t\t\t: %classInfo%
+Basic information	DevicesView		Información básica
+PCI Information	DevicePCI		Información de PCI
+Manufacturer:	Device		Fabricante:
+ACPI bus	DevicesView		Bus ACPI
+Changer	DeviceSCSI		Cambiador
+ACPI System Bus	DeviceACPI		Bus de Sistema ACPI
+Devices	System name		Dispositivos
+Worm	DeviceSCSI		Gusano
+Multimedia controller	Device		Controlador multimedia
+Unknown	DevicePCI		Desconocido
+Device name:	Device		Nombre del dispositivo:
+Computer	DevicesView		Computadora
+Device name	Device		Nombre de dispositivo
+Manufacturer	Device		Fabricante
+Manufacturer	DevicePCI		Fabricante
+Bridge	Device		Puente
+Unknown device	DevicesView		Dispositivo desconocido
+Device name	DeviceSCSI		Nombre de dispositivo
+Device paths	DevicePCI		Rutas de Dispositivo
+Devices	DevicesView		Dispositivos

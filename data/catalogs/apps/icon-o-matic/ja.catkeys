@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-icon_o_matic	1929083132
+1	japanese	x-vnd.haiku-icon_o_matic	3554185674
 Select All	Icon-O-Matic-PathManipulator		すべて選択
 Add Style	Icon-O-Matic-AddStylesCmd		スタイルを追加
 Color (#%02x%02x%02x)	Style name after dropping a color		カラー (#%02x%02x%02x)
@@ -67,6 +67,7 @@ HVIF Source Code	Icon-O-Matic-SavePanel		HVIF ソースコード
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		変形をリセット
 Settings	Icon-O-Matic-Menus		設定
 All	Icon-O-Matic-Properties		すべて
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		インポートしようとしているテキストはとても長いですがよろしいですか?
 Multi Paste Properties	Icon-O-Matic-Properties		プロパティの複数貼り付け
 Undo	Icon-O-Matic-Main		元に戻す
 Click on a shape above	Empty transformers list - 1st line		上のシェイプをクリックして
@@ -186,6 +187,7 @@ Save	Icon-O-Matic-Menu-File		保存
 Append…	Icon-O-Matic-Menu-File		追加…
 Move Path	Icon-O-Matic-MovePathsCmd		パスを移動
 Overwrite	Icon-O-Matic-SVGExport		上書き
+Text too long	Icon-O-Matic-StyledTextImport		テキストが長過ぎます
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		シェイプを固定
 Split Control Point	Icon-O-Matic-SplitPointsCmd		コントロールポイントを分割
 Open…	Icon-O-Matic-Menu-File		開く…

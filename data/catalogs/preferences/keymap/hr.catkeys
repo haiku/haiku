@@ -1,0 +1,22 @@
+1	croatian	x-vnd.Haiku-Keymap	1959302094
+Revert	Modifier keys window		Obrnuto
+Cancel	Modifier keys window		Otkaži
+Defaults	Keymap window		Zadano
+Quit	Keymap window		Završi
+Switch shortcut keys to Haiku mode	Keymap window		Prebaci tipke prečaca u Haiku način rada
+Disabled	Modifier keys window	Do nothing	Onemogućeno
+Open…	Keymap window		Otvori...
+System:	Keymap window		Sustav:
+Option:	Modifier keys window	Option key role name	Opcija:
+User:	Keymap window		Korisnik:
+Key	Modifier keys window	As in a computer keyboard key	Tipka
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl tipka
+Control:	Modifier keys window	Control key role name	Control:
+Layout	Keymap window		Raspored
+Switch shortcut keys to Windows/Linux mode	Keymap window		Prebaci tipke prečaca u Windows/Linux način rada
+Revert	Keymap window		Obrnuto
+Command:	Modifier keys window	Command key role name	Naredba:
+Save as…	Keymap window		Spremi kao...
+File	Keymap window		Datoteka
+(Current)	Keymap window		(Trenutno)
+Font	Keymap window		Font

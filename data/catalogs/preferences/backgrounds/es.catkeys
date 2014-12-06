@@ -1,24 +1,25 @@
-1	spanish	x-vnd.Haiku-Backgrounds	4220509773
-All workspaces	Main View		Todas las áreas de trabajo
-Apply	Main View		Aplicar
-Center	Main View		Centrar
-Current workspace	Main View		Área de trabajo actual
+1	spanish; castilian	x-vnd.Haiku-Backgrounds	3513602073
+Backgrounds	System name		Fondos
+X:	Main View		X:
+Resolution: 	Image Filepanel		Resolución:
+pick one	Main View		seleccione una
 Default	Main View		Predeterminada
-Default folder	Main View		Carpeta predeterminada
-Folder: 	Main View		Carpeta:
-Icon label outline	Main View		Contorno de la etiqueta de los iconos
-Image:	Main View		Imagen:
+Center	Main View		Centrar
 Manual	Main View		Manual
+Default folder	Main View		Carpeta predeterminada
+Revert	Main View		Revertir
 None	Main View		Ninguna
-Other folder…	Main View		Otra carpeta...
+All workspaces	Main View		Todas las áreas de trabajo
+Icon label outline	Main View		Contorno de la etiqueta de los iconos
 Other…	Main View		Otra...
+Current workspace	Main View		Área de trabajo actual
+Folder: 	Main View		Carpeta:
+Apply	Main View		Aplicar
+Other folder…	Main View		Otra carpeta...
+Y:	Main View		Y:
+Tile	Main View		Mosaico
+Select	Main View		Seleccionar
+Scale to fit	Main View		Ajustar al tamaño de la pantalla
 Placement:	Main View		Posición:
 Preview	Main View		Vista preliminar
-Resolution: 	Image Filepanel		Resolución:
-Revert	Main View		Revertir
-Scale to fit	Main View		Ajustar al tamaño de la pantalla
-Select	Main View		Seleccionar
-Tile	Main View		Mosaico
-X:	Main View		X:
-Y:	Main View		Y:
-pick one	Main View		seleccione una
+Image:	Main View		Imagen:

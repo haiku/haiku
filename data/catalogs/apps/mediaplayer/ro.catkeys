@@ -1,4 +1,5 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	1567310872
+1	romanian	x-vnd.Haiku-MediaPlayer	3541682348
+Location	MediaPlayer-InfoWin		Locaţie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 Stream settings	MediaPlayer-Main		Configurări flux
 <unknown>	PlaylistItem-album		<necunoscut>
@@ -8,6 +9,7 @@ Subtitle size:	MediaPlayer-SettingsWindow		Dimensiune subtitrare:
 Save Playlist	MediaPlayer-PlaylistWindow		Salvează lista de redare
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Niciun fișier pe care ați vrut să le redați nu par a fi fișiere media.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvarea listei de redare a eșuat.\n\nEroare:
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Player nou...
 100% scale	MediaPlayer-Main		scală 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Amplasare subtitrare:
@@ -18,7 +20,8 @@ Open	MediaPlayer-Main		Deschide
 Next	MediaPlayer-Main		Următor
 OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Pista %d
-2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.31 : 1 (Cinemascop)
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascop)
+Display mode	MediaPlayer-InfoWin		Mod de afișare
 Medium	MediaPlayer-SettingsWindow		Mediu
 Close	MediaPlayer-PlaylistWindow		Închide
 Open…	MediaPlayer-PlaylistWindow		Deschide...
@@ -32,8 +35,10 @@ Close window after playing audio	MediaPlayer-SettingsWindow		Închide fereastra 
 Full volume	MediaPlayer-SettingsWindow		Volum complet
 Drop files to play	MediaPlayer-Main		Plasați fișiere pentru a le reda
 TogglePlaying	MediaPlayer-Main		ComutăRedare
+Copyright	MediaPlayer-InfoWin		Drepturi de autor
 Cancel	MediaPlayer-SettingsWindow		Anulează
 Loop audio	MediaPlayer-SettingsWindow		Repetă audio
+Container	MediaPlayer-InfoWin		Recipient
 Nothing to Play	MediaPlayer-Main		Nimic de redat
 Muted	MediaPlayer-SettingsWindow		Mut
 Quit	MediaPlayer-Main		Părăsește
@@ -51,10 +56,12 @@ MediaPlayer	System name		PlayerMedia
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		Configurări...
 MediaPlayer settings	MediaPlayer-SettingsWindow		Configurări MediaPlayer
+h	MediaPlayer-InfoWin	Hours	ore
 Select all	MediaPlayer-PlaylistWindow		Selectează tot
 Move Entry	MediaPlayer-MovePLItemsCmd		Mută intrare
 Open	MediaPlayer-PlaylistWindow		Deschide
 Stop playing.	MediaPlayer-Main		Oprește redarea.
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Fișierul '%filename' nu s-a putut deschide.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Eroare:
 Audio	MediaPlayer-InfoWin		Audio
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Eroare internă (mesaj greșit). Salvarea listei de redare a eșuat.
@@ -83,6 +90,7 @@ Attributes	MediaPlayer-Main		Atribute
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nu s-au putut muta toate fișierele la gunoi.
 <untitled>	PlaylistItem-title		<fără titlu>
 Track	Audio Track Menu		Pistă
+unknown format	MediaPlayer-InfoWin		format necunoscut
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nimic de repetat>
 Skip to the next track.	MediaPlayer-Main		Mergi la pista următoare.
 Play	MediaPlayer-Main		Redă
@@ -93,7 +101,9 @@ Aspect ratio	MediaPlayer-Main		Proporție aspect
 Error: 	MediaPlayer-Main		Eroare:
 Large	MediaPlayer-SettingsWindow		Larg
 Bottom of video	MediaPlayer-SettingsWindow		Baza video
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		Oprește
+<unnamed media>	MediaPlayer-InfoWin		<unnamed media>
 Volume of background clips	MediaPlayer-SettingsWindow		Volumul clipurilor din fundal
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Eroare internă (fără memorie). Salvarea listei de redare a eșuat.
 Hide interface	MediaPlayer-Main		Ascunde interfață
@@ -103,6 +113,8 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Mută fișierul la Gunoi
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Mut
 Toggle pause/play.	MediaPlayer-Main		Comută pornit/oprit.
+Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Kit Media: 
+min	MediaPlayer-InfoWin	Minutes	minute
 Small	MediaPlayer-SettingsWindow		Mic
 Randomize	MediaPlayer-PlaylistWindow		Amestecă aleator
 Off	Subtitles menu		Oprit
@@ -110,11 +122,15 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Amestecă aleator intrările
 Revert	MediaPlayer-SettingsWindow		Revenire
 Edit	MediaPlayer-PlaylistWindow		Editează
 Start media server	MediaPlayer-Main		Pornește server media
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Toggle fullscreen.	MediaPlayer-Main		Comutare ecran complet.
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Canale}}
 <unnamed>	PlaylistItem-name		<nedenumit>
 Open Clips	MediaPlayer-Main		Deschide clipuri
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		nimic
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obține/configurează volumul (0.0-2.0)
+Duration	MediaPlayer-Main		Durată
 Playlist…	MediaPlayer-Main		Listă de redare...
 <unknown>	PlaylistItem-author		<necunoscut>
 Save as…	MediaPlayer-PlaylistWindow		Salvează ca...
@@ -124,7 +140,9 @@ Always on top	MediaPlayer-Main		Întotdeauna deasupra
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrările la gunoi
 Save	MediaPlayer-Main		Salvează
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nimic de refăcut>
+File info	MediaPlayer-InfoWin		Informații fișier
 Save	MediaPlayer-PlaylistWindow		Salvează
+%d Bit	MediaPlayer-InfoWin		%d bit
 Remove	MediaPlayer-PlaylistWindow		Elimină
 Full screen	MediaPlayer-Main		Ecran complet
 Open file…	MediaPlayer-Main		Deschide fișier...

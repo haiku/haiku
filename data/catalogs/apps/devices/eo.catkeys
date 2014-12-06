@@ -1,8 +1,9 @@
-1	esperanto	x-vnd.Haiku-Devices	1770999487
-ACPI controller	Device		ACPI stirilo
-Category	DevicesView		Kategorio
-Computer	Device		Komputilo
-Docking station	Device		Pordejo
-Memory controller	Device		Memora stirilo
+1	esperanto	x-vnd.Haiku-Devices	3494963791
 Order by:	DevicesView		Ordigi per:
+ACPI controller	Device		ACPI stirilo
+Memory controller	Device		Memora stirilo
+Docking station	Device		Pordejo
+Computer	Device		Komputilo
+Category	DevicesView		Kategorio
 Quit	DevicesView		Eliri
+Computer	DevicesView		Komputilo

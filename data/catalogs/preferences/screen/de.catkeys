@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Screen	1388881963
+1	german	x-vnd.Haiku-Screen	2339556848
 yes	Screen		Ja
 Use laptop panel:	Screen		Laptop-Panel verwenden:
 15 bits/pixel, 32768 colors	Screen		15 Bits/Pixel, 32768 Farben
@@ -12,6 +12,7 @@ Set background…	Screen		Hintergrund einstellen…
 Undo	Screen		Rückgängig
 if needed	Screen		falls nötig
 Screen preferences by the Haiku team	Screen		Bildschirm Einstellungen, vom Haiku Team
+Settings will revert in %seconds.	Screen		Die Einstellungen werden in %seconds Sekunden zurückgesetzt.
 Screen	System name		Bildschirm
 OK	Screen		OK
 Workspaces	Screen		Arbeitsflächen

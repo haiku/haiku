@@ -1,38 +1,20 @@
-1	esperanto	x-vnd.Be-TSKB	3232664655
-<Be folder is empty>	BeMenu		<La dosierujo Be estas malplena>
-Always on top	PreferencesWindow		Ĉiam malfona
+1	esperanto	x-vnd.Be-TSKB	2555074958
 Applications	PreferencesWindow		Aplikaĵoj
+Recent documents:	PreferencesWindow		Ĵusaj dokumentoj:
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikaĵoj
+Window	PreferencesWindow		Fenestro
+Menu	PreferencesWindow		Menuo
+Always on top	PreferencesWindow		Ĉiam malfona
+Show all	WindowMenu		Vidigi ĉiujn
+No windows	WindowMenu		Neniu fenestro
 Auto-raise	PreferencesWindow		Aŭtomate malfonigi
-Change time…	TimeView		Regli la horloĝon…
-Clock	PreferencesWindow		Horloĝo
+Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
+Show application expander	PreferencesWindow		Vidigi la elvolvilon de aplikaĵoj
 Close all	WindowMenu		Fermi ĉiujn
 Deskbar preferences	PreferencesWindow		Laborstriaj agordoj
-Deskbar preferences…	BeMenu		Laborstriaj agordoj…
-Edit menu…	PreferencesWindow		Redakti menuon…
-Expand new applications	PreferencesWindow		Elvolvi novajn aplikaĵojn
-Find…	BeMenu		Trovi…
-Hide all	WindowMenu		Malvidigi ĉiujn
-Hide time	TimeView		Malvidigi la horloĝon
-Menu	PreferencesWindow		Menuo
-Mount	BeMenu		Munti
-No windows	WindowMenu		Neniu fenestro
-Power off	BeMenu		Malŝalti
-Quit application	WindowMenu		Eliri la aplikaĵon
-Recent applications	BeMenu		Ĵusaj aplikaĵoj
 Recent applications:	PreferencesWindow		Ĵusaj aplikaĵoj:
-Recent documents	BeMenu		Ĵusaj dokumentoj
-Recent documents:	PreferencesWindow		Ĵusaj dokumentoj:
-Recent folders	BeMenu		Ĵusaj dosierujoj
-Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
-Restart Tracker	BeMenu		Relanĉi Tracker-on
-Restart system	BeMenu		Reŝargi la sistemon
-Show Time	Tray		Vidigi la Horloĝon
-Show all	WindowMenu		Vidigi ĉiujn
-Show application expander	PreferencesWindow		Vidigi la elvolvilon de aplikaĵoj
-Show calendar…	TimeView		Vidigi la kalendaron…
-Show replicants	BeMenu		Vidigi la kopiataĵojn
-Show seconds	PreferencesWindow		Vidigi sekundojn
-Shutdown…	BeMenu		Fermi la sistemon…
-Sort running applications	PreferencesWindow		Ordigi aktivajn aplikaĵojn
 Tracker always first	PreferencesWindow		Tracker ĉiam unua
-Window	PreferencesWindow		Fenestro
+Show calendar…	TimeView		Vidigi la kalendaron…
+Expand new applications	PreferencesWindow		Elvolvi novajn aplikaĵojn
+Hide all	WindowMenu		Malvidigi ĉiujn
+Quit application	WindowMenu		Eliri la aplikaĵon

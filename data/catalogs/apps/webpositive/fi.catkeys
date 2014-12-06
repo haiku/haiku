@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	979407669
+1	finnish	x-vnd.Haiku-WebPositive	98059607
 Show home button	Settings Window		Näytä aloitussivupainike
 Username:	Authentication Panel		Käyttäjätunnus:
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
@@ -19,6 +19,7 @@ Paste	WebPositive Window		Liitä
 Double-click or middle-click to open new tab.	Tab Manager		Välilehden avaamiseksi napsauta hiiren kakkos- tai keskipainikkeella.
 Proxy username:	Settings Window		Välityspalvelimen käyttäjätunnus:
 Save page as…	WebPositive Window		Tallenna sivu nimellä...
+Over %days left	Download Window		Yli %days jäljellä
 Settings	Settings Window		Asetukset
 Confirmation	WebPositive Window		Vahvistus
 Window	WebPositive Window		Ikkuna
@@ -109,6 +110,7 @@ Password:	Authentication Panel		Salasana:
 Back	WebPositive Window		Takaisin
 New browser window	Download Window		Uusi selainikkuna
 Today	WebPositive Window		Tänään
+Over %hours left	Download Window		Yli %hours jäljellä
 Remember username and password for this site	Authentication Panel		Muista tämän sivuston käyttäjätunniste ja salasana
 Earlier	WebPositive Window		Aiempi
 Authentication required	Authentication Panel		Todennus vaaditaan
@@ -116,6 +118,7 @@ Use proxy server to connect to the internet	Settings Window		Käytä välityspal
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Latauksia on yhä käynnissä, haluatko todella poistu WebPositive-ohjelmasta nyt?
 Auto-hide interface in full screen mode	Settings Window		Piilota käyttöliittymä kokoruutunäyttötilassa automaattisesti
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url epäonnistui
+%seconds left	Download Window		%seconds jäljellä
 New tab	WebPositive Window		Uusi välilehti
 Downloads in progress	WebPositive		Latauksia käynnissä
 Style:	Font Selection view		Tyyli:

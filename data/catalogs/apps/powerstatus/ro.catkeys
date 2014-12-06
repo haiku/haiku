@@ -1,24 +1,29 @@
-1	romanian	x-vnd.Haiku-PowerStatus	556468018
+1	romanian	x-vnd.Haiku-PowerStatus	3224068645
 Design capacity low warning: 	PowerStatus		Avertisment de capacitate redusă model:
 Show percent	PowerStatus		Afișează procentaj
 Design capacity: 	PowerStatus		Capacitate model:
+ mW	PowerStatus		 mW
 Type: 	PowerStatus		Tip:
 non-rechargeable	PowerStatus		nu este reîncărcabilă
 Empty battery slot	PowerStatus		Fantă liberă de baterie
+ mV	PowerStatus		 mV
 Run in window	PowerStatus		Rulează în fereastră
 PowerStatus	System name		StareConsum
+ mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Info baterie...
 Damaged battery	PowerStatus		Baterie deteriorată
 Show time	PowerStatus		Afișează oră
 Last full charge: 	PowerStatus		Ultima încărcate completă:
 Battery unused	PowerStatus		Baterie neutilizată
 Extended battery info	PowerStatus		Info extins baterie
+ mA	PowerStatus		 mA
 Current rate: 	PowerStatus		Cotă curentă:
 discharging	PowerStatus		se descarcă
 Show text label	PowerStatus		Afișează etichetă text
 About…	PowerStatus		Despre...
 Model number: 	PowerStatus		Numărul modelului:
 Install in Deskbar	PowerStatus		Instalează pe bara de desktop
+ mAh	PowerStatus		  mAh
 Capacity: 	PowerStatus		Capacitate:
 Battery discharging	PowerStatus		Se descarcă bateria
 Serial number: 	PowerStatus		Număr de serie:

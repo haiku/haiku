@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Haiku-DriveSetup	4273934970
+1	finnish	x-vnd.Haiku-DriveSetup	2321187933
 DriveSetup	System name		Levyasema-asetukset
+Could not acquire partitioning information.	MainWindow		Osiointitietojen hakeminen epäonnistui.
 Cancel	AbstractParametersPanel		Peru
 Delete	MainWindow		Poista
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
@@ -43,6 +44,7 @@ Change	ChangeParametersPanel		Vaihda
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki levyn %s tiedot katoavat palauttamattomasti, jos teet niin!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat poistaa valitun osion?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
 Create…	MainWindow		Luo…
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa raakadatamuotoisen levyn? (Useimmat ihmiset jakavat levyn ensin osioihin) Asiaa kysytään uudelleen ennen muutosten tallentamista levylle.
 The disk has been successfully initialized.\n	MainWindow		Levyn alustus onnistui.\n
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Osion parametrien vaihtaminen epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
@@ -66,6 +68,7 @@ The panel could not return successfully.	MainWindow		Paluu paneelista epäonnist
 Cancel	MainWindow		Peru
 Delete partition	MainWindow		Poista osio
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Oletko varma, että haluat vaihtaa valitun osion parametreja?\n\nMuut käyttöjärjestelmät eivät ehkä enää tunnista osiota!
+Disk system \"%s\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
 Eject	MainWindow		Poista asemasta
 Partition	MainWindow		Osio
 Validation of the given parameters failed.	MainWindow		Annettujen parametrien todentaminen epäonnistui.

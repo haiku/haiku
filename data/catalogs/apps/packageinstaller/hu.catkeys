@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PackageInstaller	199496416
+1	hungarian	x-vnd.Haiku-PackageInstaller	3672759664
 Install to:	PackageView		Telepítés ide:
 OK	PackageView		Rendben
 Accept	PackageTextViewer		Elfogadás
@@ -54,6 +54,7 @@ Abort	PackageInstall		Megszakítás
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Folytatás
 Begin	PackageView		Kezdés
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		A '%s' nevű hivatkozás már létezik a megadott útvonalon.\nKicseréljem a csomagban találhatóval vagy ugorjam át?
 Replace	PackageView		Csere
 Installation progress	PackageView		Telepítés állapota
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		A csomagfájl nem olvasható.\nLehet, hogy nem érvényes BeOS .pkg csomagformátumban van.

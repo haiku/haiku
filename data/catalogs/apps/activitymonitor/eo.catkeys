@@ -1,6 +1,11 @@
-1	esperanto	x-vnd.Haiku-ActivityMonitor	1634840657
-Add graph	ActivityWindow		Aldoni grafeon
-Media nodes	DataSource		Plurmediaj nodoj
+1	esperanto	x-vnd.Haiku-ActivityMonitor	124192401
 P-faults	DataSource		P-misfunkcioj
-Teams	DataSource		Teamoj
+Media nodes	DataSource		Plurmediaj nodoj
 Threads	DataSource		Fadenoj
+Add graph	ActivityWindow		Aldoni grafeon
+Teams	DataSource		Teamoj
+Settings	ActivityWindow		Agordoj
+Settings…	ActivityWindow		Agordoj…
+Quit	ActivityWindow		Eliri
+File	ActivityWindow		Dosiero
+Memory	DataSource		Memoro

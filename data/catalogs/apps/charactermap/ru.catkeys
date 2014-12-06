@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CharacterMap	56063163
+1	russian	x-vnd.Haiku-CharacterMap	1534181938
 Enclosed alphanumerics	UnicodeBlocks		Вложенные буквы и цифры
 Basic Latin	UnicodeBlocks		Основная латиница
 View	CharacterWindow		Вид
@@ -123,6 +123,7 @@ Vai	UnicodeBlocks		Ваи
 Yi Radicals	UnicodeBlocks		Корни Юи
 Cyrillic extended B	UnicodeBlocks		Кириллица расширение B
 Quit	CharacterWindow		Выход
+Ancient symbols	UnicodeBlocks		Древние символы
 Braille patterns	UnicodeBlocks		Шрифт Брейля
 New Tai Lue	UnicodeBlocks		Новый тай лю
 Runic	UnicodeBlocks		Рунический

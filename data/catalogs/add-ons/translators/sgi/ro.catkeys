@@ -1,1 +1,9 @@
-1	romanian	x-vnd.Haiku-SGITranslator	0
+1	romanian	x-vnd.Haiku-SGITranslator	4020710204
+Use compression:	SGIView		Utilizează comprimare:
+Version %d.%d.%d %s	SGIView		Versiunea %d.%d.%d %s
+None	SGIView		Nimic
+SGI images	SGITranslator		Imagini SGI
+SGI image	SGITranslator		Imagine SGI
+RLE	SGIView		RLE
+SGI Settings	SGIMain		Configurări SGI
+written by:\n	SGIView		scris de:\n

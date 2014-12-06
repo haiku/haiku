@@ -1,10 +1,11 @@
-1	romanian	x-vnd.Be-MAIL	831414304
+1	romanian	x-vnd.Be-MAIL	2809023250
 View	Mail		Vizualizare
 %d - Date	Mail		%d - Dată
 Attach attributes:	Mail		Atașează atribute:
 Inconsistency occurred in the undo/redo buffer.	Mail		A apărut o inconsecvență în preîncărcarea refă/repetă.
 An error occurred trying to save the attachment.	Mail		A apărut o eroare când s-a încercat salvarea atașamentului.
 Copy to new	Mail		Copiază la nou
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lasă ca 'New'
 Edit	Mail		Editează
 Print	Mail		Tipărește
 <none>	Mail		<nimic>
@@ -45,7 +46,7 @@ Paste	Mail		Lipește
 in	B_USER_DIRECTORY/mail/in		primit
 Save attachment…	Mail		Salvează atașament...
 Include file attributes in attachments	Mail		Include atributele de fișier în atașamente
-OK	Mail		Bine
+OK	Mail		OK
 Send	Mail		Trimite
 Show icons only	Mail		Afișează doar pictogramele
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Eliminarea atașamentelor de la un mail trimis mai departe nu este încă implementată!\nNu va funcționa corect încă.
@@ -59,12 +60,15 @@ Print…	Mail		Tipărește
 Warn unencodable:	Mail		Avertisment care nu se poate coda:
 Quit	Mail		Părăsește
 %n - Full name	Mail		%n - Nume complet
+ Read 	Mail		 Citește 
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Gunoi
 Default account:	Mail		Cont implicit:
 Size:	Mail		Dimensiune:
 Account from mail	Mail		Cont de la mail
 Edit signatures…	Mail		Editează semnături...
 New	Mail		Nou
+Attachments: 	Mail		Atașamente: 
 On	Mail		Pornit
 Set to %s	Mail		Stabilește la %s
 Forward	Mail		Trimite mai departe
@@ -75,6 +79,7 @@ Only files can be added as attachments.	Mail		Numai fișierele pot fi adăugate 
 Previous message	Mail		Mesajul precedent
 Attachments:	Mail		Atașamente:
 Title:	Mail		Titlu:
+<no account found>	Mail		<no account found>
 Find…	Mail		Găsește...
 Accounts…	Mail		Conturi...
 Mail preferences	Mail		Preferințe email
@@ -112,6 +117,7 @@ Account:	Mail		Cont:
 Decoding:	Mail		Decodare:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Îmi pare rău, nu s-a putut găsi o aplicație care suportă tipul de date „Persoană”.
 Delete	Mail		Șterge
+Don't send	Mail		Nu trimite
 Leave as '%s'	Mail		Menține ca „%s”
 Copy	Mail		Copiază
 Mail couldn't find its dictionary.	Mail		Mail nu a putut găsi dicționarul.
@@ -126,6 +132,7 @@ Font:	Mail		Font:
 (Address unavailable)	Mail		(Adresă indisponibilă)
 Save address	Mail		Salvează adresa
 Queries	Mail		Interogări
+Send this message before closing?	Mail		Trimiteți acest mesaj înainte să închideți?
 Save	Mail		Salvează
 Random	Mail		Aleator
 Close and 	Mail		Închide și

@@ -1,51 +1,49 @@
-1	italian	x-vnd.Haiku-Shortcuts	2965605727
-(Choose application with file requester)	ShortcutsWindow		(Seleziona applicazione con la finestra di richiesta file)
-*Beep	ShortcutsWindow		*Bip
-*InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
-*LaunchHandler text/html	ShortcutsWindow		*AvviaGestore text/html
-*MouseButton 1	ShortcutsWindow		*TastoMouse 1
-*MouseDown	ShortcutsWindow		*MousePremuto
-*MouseUp	ShortcutsWindow		*MouseRilasciato
-*MoveMouse +20 +0	ShortcutsWindow		*MuoviMouse +20 +0
-*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multiplo \"*MuoviMouseVerso 100% 0\" \"*TastoMouse 1\"
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*InviaMessaggio application/x-vnd.Be-TRAK 'Tfnd'
-Add new shortcut	ShortcutsWindow		Aggiungi nuova scorciatoia
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Append	ShortcutsWindow		Accoda
-Append KeySet…	ShortcutsWindow		Accoda Impostazione Tasti…
-Application	ShortcutsWindow		Applicazione
-Beep	ShortcutsSpec		Bip
-Cancel	ShortcutsWindow		Annulla
-Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
-Don't save	ShortcutsWindow		Non salvare
-Error, NULL state description?\n	ShortcutsSpec		Errore, descrizione di stato NULL?\n
-File	ShortcutsWindow		File
-InsertString	ShortcutsSpec		InserisciStringa
-Key	ShortcutsWindow		Tasto
-LaunchHandler	ShortcutsSpec		AvviaGestore 
-MouseButton	ShortcutsSpec		TastoMouse
-MouseDown	ShortcutsSpec		MousePremuto
-MouseUp	ShortcutsSpec		MouseRilasciato
+1	italian	x-vnd.Haiku-Shortcuts	3618270780
 MoveMouse	ShortcutsSpec		MuoviMouse
-MoveMouseTo	ShortcutsSpec		MuoviMouseVerso
-Multi	ShortcutsSpec		Multiplo
 OK	ShortcutsWindow		OK
-Oh no	ShortcutsWindow		Oh no
-Open	ShortcutsWindow		Apri
-Open KeySet…	ShortcutsWindow		Apri Impostazione Tasti…
-Quit	ShortcutsWindow		Esci
-Really quit without saving your changes?	ShortcutsWindow		Vuoi davvero uscire senza salvare le tue modifiche?
-Remove selected shortcut	ShortcutsWindow		Rimuovi scorciatoia selezionata
-Revert to saved	ShortcutsWindow		Ripristina quanto salvato
-Save	ShortcutsWindow		Salva
-Save & apply	ShortcutsWindow		Salva e applica
-Save KeySet as…	ShortcutsWindow		Salva Impostazione tasti come…
-Select	ShortcutsWindow		Seleziona
-SendMessage	ShortcutsSpec		InviaMessaggio
-Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di aprire il vostro file di impostazione tasti!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di elaborare il tuo file di impostazione tasti!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di salvare il tuo file di impostazione tasti!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts non è stato capace di salvare le tue impostazioni di tasti.
-Window	ShortcutsSpec	Name for modifier on keyboard	Finestra
+Cancel	ShortcutsWindow		Annulla
+InsertString	ShortcutsSpec		InserisciStringa
+Append KeySet…	ShortcutsWindow		Accoda Impostazione Tasti…
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Key	ShortcutsWindow		Tasto
+Open KeySet…	ShortcutsWindow		Apri Impostazione Tasti…
+MouseUp	ShortcutsSpec		MouseRilasciato
+Revert to saved	ShortcutsWindow		Ripristina quanto salvato
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
+*MouseUp	ShortcutsWindow		*MouseRilasciato
+(Choose application with file requester)	ShortcutsWindow		(Seleziona applicazione con la finestra di richiesta file)
+*LaunchHandler text/html	ShortcutsWindow		*AvviaGestore text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di aprire il vostro file di impostazione tasti!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multiplo \"*MuoviMouseVerso 100% 0\" \"*TastoMouse 1\"
+SendMessage	ShortcutsSpec		InviaMessaggio
+MoveMouseTo	ShortcutsSpec		MuoviMouseVerso
+Save	ShortcutsWindow		Salva
+*MouseButton 1	ShortcutsWindow		*TastoMouse 1
+*MoveMouse +20 +0	ShortcutsWindow		*MuoviMouse +20 +0
+MouseDown	ShortcutsSpec		MousePremuto
+Remove selected shortcut	ShortcutsWindow		Rimuovi scorciatoia selezionata
+MouseButton	ShortcutsSpec		TastoMouse
+Add new shortcut	ShortcutsWindow		Aggiungi nuova scorciatoia
+Save & apply	ShortcutsWindow		Salva e applica
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*InviaMessaggio application/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		Accoda
+File	ShortcutsWindow		File
+Beep	ShortcutsSpec		Bip
+Quit	ShortcutsWindow		Esci
+*MouseDown	ShortcutsWindow		*MousePremuto
+Don't save	ShortcutsWindow		Non salvare
+Multi	ShortcutsSpec		Multiplo
+Application	ShortcutsWindow		Applicazione
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Bip
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
+Save KeySet as…	ShortcutsWindow		Salva Impostazione tasti come…
+Open	ShortcutsWindow		Apri
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di elaborare il tuo file di impostazione tasti!
+Select	ShortcutsWindow		Seleziona
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di salvare il tuo file di impostazione tasti!
+Oh no	ShortcutsWindow		Oh no
+LaunchHandler	ShortcutsSpec		AvviaGestore 
+Shortcuts	System name		Shortcuts

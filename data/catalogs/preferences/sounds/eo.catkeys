@@ -1,2 +1,6 @@
-1	esperanto	x-vnd.Haiku-Sounds	3047296305
-Stop	HWindow		Halti
+1	esperanto	x-vnd.Haiku-Sounds	1676177770
+OK	SoundsHApp		Bone
+OK	HEventList		Bone
+OK	HWindow		Bone
+<none>	HEventList		<neniu>
+<none>	HWindow		<neniu>

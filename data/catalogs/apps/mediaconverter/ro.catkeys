@@ -1,8 +1,10 @@
-1	romanian	x-vnd.Haiku-MediaConverter	3718479311
+1	romanian	x-vnd.Haiku-MediaConverter	3215615925
 Video using parameters form settings	MediaConverter		Video ce utilizează configurările parametrilor de formular
 Video encoding:	MediaConverter		Codare video:
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 No audio	Audio codecs list		Fără audio
 Error	MediaConverter		Eroare
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# biți}}
 Error loading a file	MediaConverter		Eroare la încărcarea unui fișier
 File Error	MediaConverter-FileInfo		Eroare fișier
 Open…	Menu		Deschide...
@@ -14,13 +16,17 @@ MediaConverter	System name		ConvertorMedia
 No video	Video codecs list		Fără video
 Duration:	MediaConverter-FileInfo		Durată:
 OK	MediaConverter		OK
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 Error converting '%filename'	MediaConverter		Eroare la convertirea „%filename”
 Low	MediaConverter		Jos
 Conversion completed	MediaConverter		Conversie completă
 Audio:	MediaConverter-FileInfo		Audio:
 OK	MediaConverter-FileInfo		OK
+ seconds	MediaFileInfo		 secunde
 Source files	MediaConverter		Fișiere sursă
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# cadru} other{# cadre}}
 Cancelling	MediaConverter		Se anulează
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# octet} other{# octeți}}
 Error loading files	MediaConverter		Eroare la încărcarea fișierelor
 Cancel	MediaConverter		Anulează
 None available	Video codecs		Nimic disponibil
@@ -48,6 +54,7 @@ Drop media files onto this window	MediaConverter		Plasează fișiere media în a
 Audio encoding:	MediaConverter		Codare audio:
 Audio quality not supported	MediaConverter		Calitate audio nesuportată
 File	Menu		Fișier
+%.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
 Convert	MediaConverter		Convertește
 Writing audio track: %ld%% complete	MediaConverter		Scriere pistă audio: %ld%% complet
 Video quality: %3d%%	MediaConverter		Calitate video: %3d%%

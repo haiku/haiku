@@ -1,5 +1,9 @@
-1	croatian	x-vnd.Haiku-DeskCalc	531567394
-Basic	CalcView		Osnovno
+1	croatian	x-vnd.Haiku-DeskCalc	1425096792
 Compact	CalcView		Kompaktno
-Enable Num Lock on startup	CalcView		Omogući Num Lock pri pokretanju
 Scientific	CalcView		Znanstveno
+DeskCalc	System name		DeskCalc
+Basic	CalcView		Osnovno
+Radians	CalcView		Radijani
+Enable Num Lock on startup	CalcView		Omogući Num Lock pri pokretanju
+Calculating	CalcView		Računanje
+Degrees	CalcView		Stupnjevi

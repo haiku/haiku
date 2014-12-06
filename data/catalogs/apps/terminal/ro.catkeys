@@ -1,7 +1,9 @@
-1	romanian	x-vnd.Haiku-Terminal	1387085468
+1	romanian	x-vnd.Haiku-Terminal	850247788
 Not found.	Terminal TermWindow		Nu a fost găsit.
 Switch Terminals	Terminal TermWindow		Comută terminale
 Change directory	Terminal TermView		Modifică dosar
+Cursor	Terminal AppearancePrefView		Cursor
+Professional	Terminal colors scheme		Profesional
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Terminal nou
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalul nu a putut porni shell. Îmi pare rău.
@@ -19,9 +21,13 @@ Copy here	Terminal TermView		Copiază aici
 Really close?	Terminal TermWindow		Sigur închideți?
 Copy	Terminal TermWindow		Copiază
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+Color scheme:	Terminal AppearancePrefView		Schemă de culori:
 Window title:	Terminal TermWindow		Titlu fereastră:
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Opțiune „%s” nerecunoscută\n
-%app% settings	Terminal PrefWindow	window title	Setări %app%
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Opțiune \"%s\" nerecunoscută\n
+Blue	Terminal colors scheme		Albastru
+Custom	Terminal colors scheme		Personalizat
+Encoding:	Terminal AppearancePrefView		Codare:
+%app% settings	Terminal PrefWindow	window title	configurări %app%
 Cancel	Terminal SetTitleWindow		Anulează
 Increase	Terminal TermWindow		Mărește
 Settings	Terminal TermWindow		Configurări
@@ -33,29 +39,36 @@ The pattern specifying the window titles. The following placeholders\ncan be use
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Fundal
 Use selection	Terminal FindWindow		Utilizează selecție
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Procesul „%1” încă rulează.\nDacă închideți tabul, procesul va fi oprit.
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Nu se poate executa „%command”:\n\t%error
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Procesul \"%1\" încă rulează.\nDacă închideți tabul, procesul va fi oprit.
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Nu se poate executa \"%command\":\n\t%error
 Window title…	Terminal TermWindow		Titlu fereastră...
 Full screen	Terminal TermWindow		Pe tot ecranul
 Page setup…	Terminal TermWindow		Configurări pagină...
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Următoarele procese încă rulează:\n\n\t%1\n\nDacă închideți Terminalul, procesele vor fi oprite.
 Insert path	Terminal TermView		Inserează cale
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nDrepturi de autor 2001-2009 Haiku, Inc.\nDrepturi de autor(C) 1999 Kazuho Okui și Takashi Murai.\n\nUtilizare: %s [OPȚIUNE] [SHELL]\n
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nDrepturi de autor 2001-2009 Haiku, Inc.\nDrepturi de autor(C) 1999 Kazuho Okui și Takashi Murai.\n\nUtilizare: %s [OPTION] [SHELL]\n
+Window size:	Terminal AppearancePrefView		Dimensiune fereastră:
 No search string was entered.	Terminal TermWindow		Nu s-a introdus un șir de căutat.
+Font size	Terminal TermWindow		Dimensiune font
 Set window title	Terminal TermWindow		Setează titlu fereastră
+Revert	Terminal PrefWindow		Revenire
 Terminal	System name		Terminal
+Copy path	Terminal TermView		Copiază calea
 Close other tabs	Terminal TermWindow		Închide alte taburi
+Defaults	Terminal PrefWindow		Implicite
 Match word	Terminal FindWindow		Potrivire cuvânt
 Nothing is selected.	Terminal TermWindow		Nimic nu este selectat.
 Text not found.	Terminal TermWindow		Nu s-a găsit textul.
 Find…	Terminal TermWindow		Caută...
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Procesul „%1” încă rulează.\nDacă închideți Terminalul, procesul va fi oprit.
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Procesul \"%1\" încă rulează.\nDacă închideți Terminalul, procesul va fi oprit.
 Move here	Terminal TermView		Mută aici
+Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Eroare!
 New tab	Terminal TermWindow		Tab nou
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Tiparul care specifică titlurile tabului curent. Următoarele marcaje\npot fi utilizate:\n
 Selected background	Terminal AppearancePrefView		Fundal selectat
 Decrease	Terminal TermWindow		Micșorează
+Default	Terminal colors scheme		Implicit
 Create link here	Terminal TermView		Creează legătură aici
 Close	Terminal TermWindow		Închide
 Text	Terminal AppearancePrefView		Text
@@ -63,9 +76,11 @@ Clear all	Terminal TermWindow		Eliberează tot
 Text encoding	Terminal TermWindow		Codificare text
 size	Terminal TermView		dimensiune
 Close window	Terminal TermWindow		Închide fereastră
+Copy absolute path	Terminal TermView		Copiază calea absolută
 Set tab title	Terminal TermWindow		Setează titlu tab
 Settings…	Terminal TermWindow		Configurări...
 Abort	Terminal Shell		Renunță
+Open link	Terminal TermView		Deschide linkul
 Edit	Terminal TermWindow		Editează
 Color:	Terminal AppearancePrefView		Culoare:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Tiparul care specifică titlul ferestrei. Următoarele marcaje\npot fi utilizate:\n
@@ -76,7 +91,9 @@ OK	Terminal TermApp		OK
 Find failed	Terminal TermWindow		Găsește eșuat
 Search forward	Terminal FindWindow		Caută înainte
 Edit tab title…	Terminal TermWindow		Editează titlu tab...
+Open path	Terminal TermView		Deschide calea
 Find previous	Terminal TermWindow		Găsește precedent
+Copy link location	Terminal TermView		Copiază locația legăturii
 Tab title:	Terminal TermWindow		Titlu tab:
 Find next	Terminal TermWindow		Găsește următorul
 Close active tab	Terminal TermWindow		Închide tabul activ

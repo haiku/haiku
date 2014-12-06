@@ -1,0 +1,78 @@
+1	spanish; castilian	x-vnd.Haiku-StyledEdit	3019034824
+StyledEdit	System name		Edición con Estilo
+Paste	Menus		Pegar
+OK	LoadAlert		Aceptar
+File	Menus		Archivo
+???	LoadAlert		¿¿¿???
+Lines:	Statistics		Pauta
+Italic	Menus		Itálica
+Left	Menus		Izquierda
+Search backwards	FindandReplaceWindow		Buscar hacia atrás
+Size	Menus		Tamaño
+Save	QuitAlert		Guardar
+Page setup…	Menus		Configuarción de pagina...
+Print…	Menus		Imprimir...
+Can't undo	Menus		No se puede deshacer
+Save	Menus		Guardar
+Replace with:	FindandReplaceWindow		Reemplazar con:
+Cancel	SaveAlert		Cancelar
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No se puede revertir, archivo no encontrado: \"%s\".
+Case-sensitive	FindandReplaceWindow		Distinguir mayúsculas de minúsculas
+Green	Menus		Verde
+Yellow	Menus		Amarillo
+Replace in all windows	FindandReplaceWindow		Reemplazar en todas las ventanas
+Wrap lines	Menus		Ajustar líneas
+Quit	Menus		Quitar
+Document statistics	Statistics		Estadísticas del documento
+Cancel	RevertToSavedAlert		Cancelar
+Document	Menus		Documento
+Save changes to the document \"%s\"? 	QuitAlert		¿Desea guardar los cambios realizados sobre el documento \"%s\"?
+Edit	Menus		Editar
+Font	Menus		Tipografía
+Replace all	FindandReplaceWindow		Reemplazar todo
+Statistics…	Menus		Estadísticas...
+Default	Open_and_SaveAsPanel		Predeterminado
+Replace next	Menus		Reemplazar siguiente
+Cancel	FindandReplaceWindow		Cancelar
+Close	Menus		Cerrar
+Save	SaveAlert		Guardar
+Words:	Statistics		Palabras...
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Error cargando  \"%s\":\n\tFormato no soportado
+OK	RevertToSavedAlert		Aceptar
+Don't save	QuitAlert		No guardar
+Align	Menus		Alinear
+Color	Menus		Color
+Red	Menus		Rojo
+OK	QuitAlert		Aceptar
+Open…	Menus		Abrir…
+Center	Menus		Centro
+Blue	Menus		Azul
+Cyan	Menus		Cian
+OK	Statistics		OK
+Magenta	Menus		Magenta
+New	Menus		Nuevo
+Wrap-around search	FindandReplaceWindow		Buscar desde el principio
+Bold	Menus		Negrita
+Find selection	Menus		Encontrar selección
+Find:	FindandReplaceWindow		Encontrar:
+Error saving \"%s\":\n%s	SaveAlert		Error guardando \"%s\":\n%s
+Copy	Menus		Copiar
+Cut	Menus		Cortar
+Replace	FindandReplaceWindow		Reemplazar
+Find again	Menus		Buscar de nuevo
+Cancel	QuitAlert		Cancelar
+Find…	Menus		Buscar…
+Select all	Menus		Seleccionar todo
+Don't save	SaveAlert		No guardar
+Error loading \"%s\":\n\t%s	LoadAlert		Error cargando \"%s\":\n\t%s
+Undo typing	QuitAlert		Deshacer lo escrito
+Black	Menus		Negro
+Untitled 	StyledEditWindow		Sin nombre
+OK	SaveAlert		Aceptar
+Find	FindandReplaceWindow		Buscar
+Encoding	Open_and_SaveAsPanel		Codificación
+Characters:	Statistics		Carácteres:
+Save as…	Menus		Guardar como...
+Redo typing	QuitAlert		rehacer lo escrito
+Replace…	Menus		Reemplazar...
+Right	Menus		Derecha

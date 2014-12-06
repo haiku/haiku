@@ -1,0 +1,13 @@
+1	spanish; castilian	x-vnd.Haiku-JPEG2000Translator	547915409
+Write	JPEG2000Translator		Escribir
+JPEG2000 images	JPEG2000Translator		Imágenes JPEG2000
+Output only codestream (.jpc)	JPEG2000Translator		Salida sólo a codestream (.jpc)
+Write black-and-white images as RGB24	JPEG2000Translator		Escribir imágenes blanco y negro como RGB24
+Output quality	JPEG2000Translator		Calidad de salida
+Read	JPEG2000Translator		Leer
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBasado en libreria JasPer:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Formato de Mapa de Bits Be (JPEG2000Translator)
+Low	JPEG2000Translator		Bajo
+About	JPEG2000Translator		Acerca
+High	JPEG2000Translator		Alto
+Read greyscale images as RGB32	JPEG2000Translator		Leer imágenes en escala de grises como RGB32 

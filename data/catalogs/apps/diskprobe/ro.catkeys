@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DiskProbe	2206273117
+1	romanian	x-vnd.Haiku-DiskProbe	2944605311
 File offset: 	ProbeView		Decalaj fișier:
 %ld (native)	ProbeView		%ld (nativ)
 64 bit unsigned value:	TypeEditors		valoare pozitivă 64 biți:
@@ -18,7 +18,7 @@ Selection	ProbeView		Selecție
 DiskProbe	System name		TestareDisc
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ce: „%.4s”\n\n
 File	FileWindow		Fișier
-OK	DiskProbe		Bine
+OK	DiskProbe		OK
 Boolean	TypeEditors	This is the type of editor	Logic
 Paste	ProbeView		Lipește
 PNG format	TypeEditors		Format PNG
@@ -59,6 +59,7 @@ Boolean value:	TypeEditors		Valoare logică:
 8 bit palette	TypeEditors		paletă de 8 bit
 Fit	ProbeView	Size of fonts, fits to available room	Potrivește
 Probe device	OpenWindow		Testează dispozitiv
+ (native)	ProbeView		 (nativ)
 Unknown format	TypeEditors		Format necunoscut
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexazecimal
 MIME type:	TypeEditors		Tip MIME:
@@ -86,7 +87,7 @@ Icon	TypeEditors		Pictogramă
 Block: 	ProbeView		Bloc:
 Examine device:	OpenWindow		Examinează dispozitiv:
 Offset: 	ProbeView		Decalaj:
-OK	ProbeView		Bine
+OK	ProbeView		OK
 Add	ProbeView		Adaugă
 Edit	ProbeView		Editează
 Native: %Ld (0x%0*Lx)	ProbeView		Nativ: %Ld (0x%0*Lx)
@@ -97,6 +98,7 @@ Base	ProbeView	A menu item, the number that is basis for a system of calculation
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Vizualizare imagine
 Cancel	AttributeWindow		Anulează
 Type editor not supported	ProbeView		Editorul de tip nu este suportat
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Dimensiune bloc
 MIME type editor	TypeEditors		Editor tip MIME
 Swapped: %Ld (0x%0*Lx)	ProbeView		Interschimbat: %Ld (0x%0*Lx)
 Find	FindWindow		Găsește

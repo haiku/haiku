@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	979407669
+1	german	x-vnd.Haiku-WebPositive	98059607
 Show home button	Settings Window		Home-Symbol anzeigen
 Username:	Authentication Panel		Benutzername:
 Copy URL to clipboard	Download Window		Adresse kopieren
@@ -19,6 +19,7 @@ Paste	WebPositive Window		Einfügen
 Double-click or middle-click to open new tab.	Tab Manager		Doppel- oder Mittelklick, um neuen Reiter zu öffnen.
 Proxy username:	Settings Window		Proxy-Nutzername:
 Save page as…	WebPositive Window		Seite speichern unter…
+Over %days left	Download Window		Noch über %days Tage
 Settings	Settings Window		Einstellungen
 Confirmation	WebPositive Window		Bestätigung
 Window	WebPositive Window		Fenster
@@ -109,6 +110,7 @@ Password:	Authentication Panel		Passwort:
 Back	WebPositive Window		Zurück
 New browser window	Download Window		Neues Browser-Fenster
 Today	WebPositive Window		Heute
+Over %hours left	Download Window		Noch über %hours Stunden
 Remember username and password for this site	Authentication Panel		Benutzername und Passwort für diese Seite speichern
 Earlier	WebPositive Window		Früher
 Authentication required	Authentication Panel		Anmeldung erforderlich
@@ -116,6 +118,7 @@ Use proxy server to connect to the internet	Settings Window		Proxy-Server zur Ve
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Es werden noch Dateien heruntergeladen. Soll WebPositive wirklich beendet werden?
 Auto-hide interface in full screen mode	Settings Window		Bedienelemente im Vollbildmodus ausblenden
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url fehlgeschlagen
+%seconds left	Download Window		Noch %seconds Sekunden
 New tab	WebPositive Window		Neuer Reiter
 Downloads in progress	WebPositive		Download Warnung
 Style:	Font Selection view		Stil:

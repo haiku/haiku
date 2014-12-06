@@ -1,0 +1,10 @@
+1	romanian	x-vnd.Haiku-keystore_server	772566179
+This application hasn't been granted access before.	AppAccessRequestWindow		Acestei aplicații nu i s-a permis accesul înainte.
+Unlock	KeyRequestWindow		Deblochează
+Allow always	AppAccessRequestWindow		Permite întotdeauna
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Aplicația:\n%signature% (%path%)\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		Această aplicație nu are încă privilegiile necesare.
+Password:	KeyRequestWindow		Parolă:
+Cancel	KeyRequestWindow		Anulează
+Allow once	AppAccessRequestWindow		Permite o dată
+Disallow	AppAccessRequestWindow		Refuză

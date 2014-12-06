@@ -1,0 +1,18 @@
+1	spanish; castilian	x-vnd.Haiku-DataTranslations	3820343452
+DataTranslations	System name		Traductores de datos
+Cancel	DataTranslations		Cancelar
+Name:	DataTranslations		Nombre:
+Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Nombre: %s \nVersión: %ld.%ld.%ld\n\nInformación:\n%s\n\nRuta:\n%s\n
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		El elemento '%name' no parece ser un traductor de datos y no será instalado.
+Could not install %s:\n%s	DataTranslations		No pude instalar %s:\n%s
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Use este panel de control para establecer valores predeterminados para convertidores de datos, que se usarán cuando ningún ajuste se facilite por la aplicación.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		¡Un elemento llamado '%name' ya existe en la carpeta de conversores! ¿Quiere que el convertidor existente se sobrescriba?
+DataTranslations - Note	DataTranslations		Traductores de datos - Nota
+Overwrite	DataTranslations		Sobrescribir
+Info:	DataTranslations		Información:
+Info	DataTranslations		información
+Path:	DataTranslations		Ruta:
+The new translator has been installed successfully.	DataTranslations		El nuevo traductor ha sido instalado con éxito.
+DataTranslations - Error	DataTranslations		Traductores de datos - Error
+OK	DataTranslations		Aceptar
+Version:	DataTranslations		Versión:

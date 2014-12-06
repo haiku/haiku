@@ -1,24 +1,28 @@
-1	croatian	x-vnd.Be.ChartDemo	3539070788
-(high) 100% 	ChartWindow		(visoko) 100%
-5% (low)	ChartWindow		5% (nisko)
-600.0 f/s	ChartWindow		600.0 f/s
-Animation:	ChartWindow		Animacija:
-Blue	ChartWindow		Plavo
-CPU load	ChartWindow		Opterećenje CPU
-Chaos	ChartWindow		Kaos
-Chart	System name		Karta
-Colors	ChartWindow		Boje
-Fast motion	ChartWindow		Ubrzana slika
-Free motion	ChartWindow		Slobodni pokret
-Full screen	ChartWindow		Cijeli zaslon
-Green	ChartWindow		Zeleno
-None	ChartWindow		Nijedan
-Orange	ChartWindow		Narančasto
-Pink	ChartWindow		Ružičasto
-Red	ChartWindow		Crveno
-Refresh rate	ChartWindow		Vrijeme osvježenja
-Slow motion	ChartWindow		Usporena slika
+1	croatian	x-vnd.Haiku-ChartDemo	1370204926
 Slow rotation	ChartWindow		Sporo okretanje
-Status	ChartWindow		Stanje
-White	ChartWindow		Bijelo
+Pink	ChartWindow		Ružičasto
+Comet	ChartWindow		Kometa
+Orange	ChartWindow		Narančasto
+Refresh rate	ChartWindow		Vrijeme osvježenja
+Blue	ChartWindow		Plavo
+Colors	ChartWindow		Boje
+Free motion	ChartWindow		Slobodni pokret
+(high) 100% 	ChartWindow		(visoko) 100% 
+Green	ChartWindow		Zeleno
 Yellow	ChartWindow		Žuto
+Chaos	ChartWindow		Kaos
+Full screen	ChartWindow		Cijeli zaslon
+Slow motion	ChartWindow		Usporena slika
+ 5% (low)	ChartWindow		  5% (nisko)
+Fast motion	ChartWindow		Ubrzana slika
+Status	ChartWindow		Stanje
+600.0 f/s	ChartWindow		600.0 f/s
+Display:	ChartWindow		Zaslon
+White	ChartWindow		Bijelo
+Chart	System name		Karta
+Animation:	ChartWindow		Animacija:
+CPU load	ChartWindow		Opterećenje CPU
+Red	ChartWindow		Crveno
+None	ChartWindow		Nijedan
+Battle	ChartWindow		Bitka
+Space:	ChartWindow		Razmak:

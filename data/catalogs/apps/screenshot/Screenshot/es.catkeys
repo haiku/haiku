@@ -1,29 +1,24 @@
-1	spanish	x-vnd.Haiku-screenshot-cli	1091349652
+1	spanish; castilian	x-vnd.haiku-screenshot	4065094687
 seconds	ScreenshotWindow		segundos
-Options	ScreenshotWindow		Opciones
 Desktop	ScreenshotWindow		Escritorio
-Include window border	ScreenshotWindow		Incluir bordes de ventana
-Back to saving	ScreenshotWindow		Regresar al cuadro guardar
+Include window border	ScreenshotWindow		Incuir el borde de la ventana
+Screenshot	System name		Captura de pantallia
 Select	ScreenshotWindow		Seleccionar
-Capture active window	ScreenshotWindow		Capturar ventana activa
+Capture active window	ScreenshotWindow		Capturar la ventana actual
 Cancel	ScreenshotWindow		Cancelar
-screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	captura de pantalla
 Name:	ScreenshotWindow		Nombre:
-screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	captura de pantalla1
-SomethingLongHere	ScreenshotWindow	!! length >= screenshot file name? !!	AlgoLargoAquí
-Save screenshot	ScreenshotWindow		Guardar captura de pantalla
-Capture entire screen	ScreenshotWindow		Capturar pantalla completa
 Choose folder	ScreenshotWindow		Elegir carpeta
-Take screenshot	ScreenshotWindow		Capturar pantalla
 Save	ScreenshotWindow		Guardar
-Overwrite	ScreenshotWindow		Sobreescribir
-Retake screenshot	ScreenshotWindow		Volver a capturar pantalla
-Choose folder...	ScreenshotWindow		Elegir carpeta...
-Please select	ScreenshotWindow		Por favor seleccione
+Please select	ScreenshotWindow		Por favor elija
 Save as:	ScreenshotWindow		Guardar como:
+Copy to clipboard	ScreenshotWindow		Copiar al portapapeles
 Save in:	ScreenshotWindow		Guardar en:
-Take screenshot after a delay of	ScreenshotWindow		Capturar pantalla después de un retardo de
-Artwork folder	ScreenshotWindow		Carpeta de material gráfico
-Home folder	ScreenshotWindow		Carpeta de inicio
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		El fichero ya existe.\n ¿Desea sobreescribirlo?
-Include mouse pointer	ScreenshotWindow		Incluir puntero de ratón
+screenshot	Screenshot	Base filename of screenshot files	Captura
+New screenshot	ScreenshotWindow		Nueva captura
+Artwork folder	ScreenshotWindow		Carpeta de Artwork
+Home folder	ScreenshotWindow		Carpeta home
+Settings…	ScreenshotWindow		Ajustes...
+overwrite	ScreenshotWindow		Sobreescribir
+Delay:	ScreenshotWindow		Espera:
+Include mouse pointer	ScreenshotWindow		Incluir el puntero del ratón
+Translator Settings	ScreenshotWindow		Ajustes de traducción

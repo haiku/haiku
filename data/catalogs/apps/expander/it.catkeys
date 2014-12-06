@@ -1,48 +1,43 @@
-1	italian	x-vnd.Haiku-Expander	3000790344
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Siete sicuri di voler interrompere l'espansione di questo\narchivio? I file estratti potrebbero essere incompleti.
-Automatically expand files	ExpanderPreferences		Decomprimi automaticamente i file
-Automatically show contents listing	ExpanderPreferences		Mostra automaticamente listato contenuti
-Cancel	ExpanderPreferences		Cancella
-Cancel	ExpanderWindow		Annulla
-Close	ExpanderMenu		Chiudi
+1	italian	x-vnd.Haiku-Expander	3394631502
+Expand	ExpanderMenu		Decomprimi
 Close window when done expanding	ExpanderPreferences		Chiudi la finestra quando la decompressione è completata
-Continue	ExpanderWindow		Continua
-Creating listing for '%s'	ExpanderWindow		Creazione lista per '%s'
-Destination	ExpanderWindow		Destinazione
-Destination folder:	ExpanderPreferences		Cartella di destinazione
-Error when expanding archive	ExpanderWindow		Errore durante la decompressione dell'archivio
-Expand	ExpanderMenu		Espandi
-Expand	ExpanderWindow		Decomprimi
-Expander settings	ExpanderPreferences		Impostazioni Expander
-Expander: Choose destination	DirectoryFilePanel		Expander: Scegli la destinazione
-Expander: Open	ExpanderWindow		Expander: Apri
-Expanding '%s'	ExpanderWindow		Espansione '%s 
-Expansion:	ExpanderPreferences		Espansione:
-File	ExpanderMenu		File
-File expanded	ExpanderWindow		File decompresso
-Hide contents	ExpanderWindow		Nascondi il contenuto
-Leave destination folder path empty	ExpanderPreferences		Lascia il percorso della cartella di destinazione vuoto
-OK	ExpanderPreferences		OK
-Open destination folder after extraction	ExpanderPreferences		Apri la cartella di destinazione dopo l'estrazione
-Other:	ExpanderPreferences		Altro:
-Same directory as source (archive) file	ExpanderPreferences		Stessa directory come sorgente del file archivio
-Select	DirectoryFilePanel		Seleziona
-Select	ExpanderPreferences		Seleziona
-Select '%s'	DirectoryFilePanel		Seleziona '%s'
-Select current	DirectoryFilePanel		Seleziona la directory corrente
 Set destination…	ExpanderMenu		Scegli la destinazione…
-Set source…	ExpanderMenu		Scegli la sorgente…
+Use:	ExpanderPreferences		Usa:
+File expanded	ExpanderWindow		File decompresso
+The destination is read only.	ExpanderWindow		La destinazione è di sola lettura.
+Expander: Open	ExpanderWindow		Decompressore: Apri
+Expander settings	ExpanderPreferences		Impostazioni Expander
+Select current	DirectoryFilePanel		Seleziona la directory corrente
+Source	ExpanderWindow		Origine
+Error when expanding archive	ExpanderWindow		Errore durante la decompressione dell'archivio
+Hide contents	ExpanderWindow		Nascondi il contenuto
+Cancel	ExpanderWindow		Annulla
+Automatically expand files	ExpanderPreferences		Decomprimi automaticamente i file
+Creating listing for '%s'	ExpanderWindow		Creazione lista per '%s'
+Continue	ExpanderWindow		Continua
+Cancel	ExpanderPreferences		Cancella
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Siete sicuri di voler interrompere la decompressione di questo\narchivio? I file estratti potrebbero essere incompleti.
+Select	DirectoryFilePanel		Seleziona
+Same directory as source (archive) file	ExpanderPreferences		Stessa directory come sorgente del file archivio
+Expanding '%s'	ExpanderWindow		Decompressione '%s 
 Settings	ExpanderMenu		Impostazioni
 Settings…	ExpanderMenu		Impostazioni…
-Show contents	ExpanderMenu		Mostra il contenuto
+Expander: Choose destination	DirectoryFilePanel		Decompressore: Scegli la destinazione
+Select	ExpanderPreferences		Seleziona
 Show contents	ExpanderWindow		Mostra contenuto
-Source	ExpanderWindow		Origine
-Stop	ExpanderMenu		Arresta
-Stop	ExpanderWindow		Arresta
-The destination folder does not exist.	ExpanderWindow		La cartella di destinazione non esiste.
-The destination is not a folder.	ExpanderWindow		La destinazione non è una cartella.
-The destination is read only.	ExpanderWindow		La destinazione è di sola lettura.
-The file doesn't exist	ExpanderWindow		Il file non esiste
+Automatically show contents listing	ExpanderPreferences		Mostra automaticamente listato contenuti
+OK	ExpanderPreferences		OK
+Leave destination folder path empty	ExpanderPreferences		Lascia il percorso della cartella di destinazione vuoto
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		La cartella è stata spostata, rinominata o non è supportata.
-Use:	ExpanderPreferences		Usa:
-is not supported	ExpanderWindow		non è supportato
+The file doesn't exist	ExpanderWindow		Il file non esiste
+Stop	ExpanderMenu		Arresta
+File	ExpanderMenu		File
+Expander	System name		Decompressore
+Expand	ExpanderWindow		Decomprimi
+Close	ExpanderMenu		Chiudi
+The destination is not a folder.	ExpanderWindow		La destinazione non è una cartella.
+Open destination folder after extraction	ExpanderPreferences		Apri la cartella di destinazione dopo l'estrazione
+Set source…	ExpanderMenu		Scegli la sorgente…
+Show contents	ExpanderMenu		Mostra il contenuto
+Stop	ExpanderWindow		Arresta
+Destination	ExpanderWindow		Destinazione

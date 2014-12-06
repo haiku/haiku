@@ -1,6 +1,4 @@
-1	italian	x-vnd.Haiku-cmd-dstconfig	2337923203
-.\n\nIs this the correct time?	dstcheck		.\n\nQuesta è l'ora esatta?
-Ask me later	dstcheck		Ricordamelo dopo
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Attenzione!\n\nA causa del passaggio all'ora legale, l'orologio del computer potrebbe indicare un orario non preciso. \nIl computer stima che l'orario è 
-Manually adjust time…	dstcheck		Impostare manualmente l'ora...
+1	italian	x-vnd.Haiku-cmd-dstconfig	3548307002
 Use this time	dstcheck		Usare quest'ora
+Ask me later	dstcheck		Ricordamelo dopo
+Manually adjust time…	dstcheck		Impostare manualmente l'ora...

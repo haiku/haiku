@@ -1,0 +1,51 @@
+1	italian	x-vnd.Haiku-PackageInstaller	3523139039
+Install to:	PackageView		Installare su:
+OK	PackageView		Ok
+Accept	PackageTextViewer		Accetta
+Continue	PackageInstall		Prosegui
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		È fallita l'installazione del pacchetto richiesto sul vostro sistema. Questo potrebbe essere dovuto ad un problema relativo al file pacchetto di destinazione. Consultate il fornitore del pacchetto riguardo questo inconveniente.
+Image not loaded correctly	PackageImageViewer		Immagine non caricata correttamente
+No package selected.	PackageInfo		Nessun pacchetto selezionato.
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Il pacchetto dato sembra essere già stato installato sul vostro sistema.Volete disinstallare quanto già presente e proseguire con l'installazione?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Volete applicare la stessa scelta per il resto di questa installazione?\n
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Il pacchetto sembra possedere una dimensione del file inaspettata. Questo potrebbe essere corrotto o aver subito una modifica successiva alla sua creazione. Volete proseguire?
+Error while installing the package\n	PackageView		È occorso un errore durante l'installazione del pacchetto\n
+Disclaimer	PackageTextViewer		Esclusione di responsabilità
+%.1f GiB	PackageView		%.1f GiB
+The installation of the package has been aborted.	PackageView		L'installazione del pacchetto è stata annullata.
+Done	PackageInstall		Fatto
+All existing files will be replaced?	PackageView		Volete sostituire tutti i file già presenti?
+Preparing package	PackageInstall		Preparazione del pacchetto
+No package available.	PackageInfo		Nessun pacchetto disponibile.
+Stop	PackageStatus		Interrompi
+Other…	PackageView		Altro…
+No installation type selected	PackageView		Non avete scelto il tipo di installazione
+Installing files and folders	PackageInstall		Installazione dei file e cartelle
+Package installer	PackageView		Installatore pacchetti
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		L'oggetto con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirlo con quanto presente in questo pacchetto oppure lo ignorate?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Lo script con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirlo con quanto presente in questo pacchetto oppure lo ignorate?
+Running post-installation scripts	PackageInstall		Avvio script per il dopo-installazione
+%llu bytes	PackageView		%llu byte
+Skip	PackageView		Ignora
+%.1f MiB	PackageView		%.1f MiB
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		La cartella con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirla con quanto presente in questo pacchetto oppure la ignorate?
+The package you requested has been successfully installed on your system.	PackageView		Il pacchetto richiesto è stato installato con successo nel vostro sistema.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Errore! \"%s\" non è un percorso valido.\n
+Installation type:	PackageView		Tipo di installazione:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Errore (%s)! Impossibile aprire \"%s\".\n
+Finishing installation	PackageInstall		Completamento dell'installazione
+Installing package	PackageStatus		Installazione del pacchetto
+Ask again	PackageView		Ripeti richiesta
+Abort	PackageView		Annulla
+Decline	PackageTextViewer		Rifiuto
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Il file con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirlo con quanto presente in questo pacchetto oppure lo ignorate?
+All existing files will be skipped?	PackageView		Volete ignorare tutti i file già presenti?
+Continue	PackageInfo		Prosegui
+%.1f KiB	PackageView		%.1f KiB
+Abort	PackageInfo		Annulla
+PackageInstaller	System name		PackageInstaller
+Abort	PackageInstall		Annulla
+Continue	PackageTextViewer		Prosegui
+Replace	PackageView		Sostituisci
+Installation progress	PackageView		Avanzamento dell'installazione
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Il pacchetto è illeggibile.\nUna probabile causa è che il file .pkg sottoposto non è un pacchetto valido per BeOS.

@@ -1,0 +1,9 @@
+1	spanish; castilian	x-vnd.Haiku-IMAP	3892875357
+Destination:	imap_config		Destino:
+status	IMAPFolderConfig		Estado:
+Apply	IMAPFolderConfig		Aplicar
+IMAP Folders	imap_config		Carpetas IMAP
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Recopilando carpetas IMAP, paciencia por favor...
+IMAP Folders	IMAPFolderConfig		Carpetas IMAP
+Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Dar de alta / baja carpetas IMAP, paciencia por favor...
+Failed to fetch available storage.	IMAPFolderConfig		No se pudo recopilar el espacio disponible.

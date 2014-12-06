@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	3507634633
+1	finnish	x-vnd.Haiku-MediaPlayer	68841021
 raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -139,6 +139,7 @@ Start media server	MediaPlayer-Main		Käynnistä mediapalvelin
 Toggle fullscreen.	MediaPlayer-Main		Täysruututila päälle/pois.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Hakee nykyisen soittokappaleen keston mikrosekunteina.
 ToggleFullscreen	MediaPlayer-Main		ToggleFullscreen
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# kanavaa}}
 <unnamed>	PlaylistItem-name		<nimetön>
 Open Clips	MediaPlayer-Main		Avaa videoleikkeet
 OK	MediaPlayer-PlaylistWindow		Valmis

@@ -1,0 +1,87 @@
+1	romanian	x-vnd.Haiku-HaikuDepot	2319922393
+Name	PackageListView		Nume
+Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
+Close	RatePackageWindow		Închidere
+The captcha puzzle needs to be solved.	UserLoginWindow		Puzzle captcha trebuie rezolvat.
+Stability:	RatePackageWindow		Stabilitate:
+Show available packages	MainWindow		Afișează pachetele disponibile
+Click a package to view information	PackageInfoView		Clic pe un pachet pentru a vizualiza informații
+Stability	RatePackageWindow		Stabilitate
+for %Version%	PackageInfoView		pentru %Version%
+Description	PackageListView		Descriere
+Category	FilterView		Categorie
+Uninstall	PackageManager		Dezinstalare
+<no info>	PackageInfoView		<no info>
+Email address:	UserLoginWindow		Adresă email:
+Very unstable	RatePackageWindow		Foarte instabil
+The username is already taken. Please choose another.	UserLoginWindow		Acest nume de utilizator este deja folosit. Alegeți altul.
+Close	PackageManager		Închidere
+Not logged in	MainWindow		Nu sunteți autentificat
+The authentication was successful.	UserLoginWindow		Autentificarea a fost reușită.
+Status	PackageListView		Stare
+Switch account…	MainWindow		Schimbare cont...
+Ignore	UserLoginWindow		Ignoră
+Language	UserLoginWindow		Limbă
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Parola e prea slabă sau nevalidă. Utilizați cel puțin 8 caractere cu minimum 2 numere și 2 litere majuscule.
+Development	Model		Dezvoltare
+Fatal error	PackageManager		Eroare fatală
+The user name needs to be at least 3 letters long.	UserLoginWindow		Numele de utilizator trebuie să fie de cel puțin 3 litere.
+Log in	UserLoginWindow		Autentificare
+Repeat pass phrase:	UserLoginWindow		Repetare parolă:
+System & Utilities	Model		Sistem & Utilități
+Show installed packages	MainWindow		Afișează packetele instalate
+Inactive	PackageListView		Inactiv
+Science & Mathematics	Model		Știință & Matematică
+Main Menu	MainWindow		Meniu principal
+(%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Nu ați rezolvat corect puzzle captcha.
+Success	UserLoginWindow		Succes
+Downloading:	PackageInfoView		Se descarcă:
+%Version%	PackageInfoView		%Version%
+Does not start	RatePackageWindow		Nu pornește
+It was not possible to contact the web service.	RatePackageWindow		Contactarea serviciului web nu a fost posibilă.
+There are problems in the form:\n\n	UserLoginWindow		Sunt probleme de forma:\n\n
+Productivity	Model		Productivitate
+Authentication failed	UserLoginWindow		Autentificarea a eșuat
+Logged in as %User%	MainWindow		Autentificat ca %User%
+Language	RatePackageWindow		Limbă
+Size	PackageListView		Dimensiune
+ It responded with: 	RatePackageWindow		 A răspuns cu: 
+User name:	UserLoginWindow		Nume utilizator:
+User Menu	MainWindow		Meniu utilizator
+Options	MainWindow		Opțiuni
+Unstable but usable	RatePackageWindow		Instabil dar utilizabil
+Games	Model		Jocuri
+Local	MainWindow		Local
+Close	MainWindow		Închidere
+Preferred language:	UserLoginWindow		Limbă preferată:
+Internet & Network	Model		Internet & Rețea
+Cancel	MainWindow		Anulează
+Update	RatePackageWindow		Actualizare
+Video	Model		Video
+All categories	FilterView		Toate categoriile
+Login or Create account	MainWindow		Autentificare sau Creare cont
+Pending…	PackageListView		În așteptare...
+Depot	FilterView		Depot
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elemente}}
+OK	PackageInfoView		OK
+Uninstalled	PackageListView		Dezinstalat
+Stable	RatePackageWindow		Stabil
+Unknown	PackageListView		Necunoscut
+All depots	FilterView		Toate depozitele
+Pass phrase:	UserLoginWindow		Parolă:
+Not specified	RatePackageWindow		Nespecificat
+Available	PackageListView		Disponibil
+n/a	PackageInfoView		n/a
+Cancel	RatePackageWindow		Anulează
+OK	UserLoginWindow		OK
+Send	RatePackageWindow		Trimitere
+Category:	FilterView		Categorie:
+Failed to create account	UserLoginWindow		Eșec la crearea contului
+There are problems with the data you entered:\n\n	UserLoginWindow		Există probleme cu datele pe care le-ați introdus:\n\n
+Featured packages	MainWindow		Pachete recomandate
+Success	RatePackageWindow		Succes
+Business	Model		Afaceri
+Audio	Model		Audio
+About	PackageInfoView		Despre
+Active	PackageListView		Activ
