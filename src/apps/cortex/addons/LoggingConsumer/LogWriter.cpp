@@ -232,7 +232,8 @@ LogWriter::HandleMessage(log_what what, const log_message& msg)
 	if (mFilters.find(what) != mFilters.end()) return;
 
 	// always write the message's type and timestamp
-	sprintf(buf, "%-24s : realtime = %Ld, perftime = %Ld\n", log_what_to_string(what), msg.tstamp, msg.now);
+	sprintf(buf, "%-24s : realtime = %" B_PRIdBIGTIME ", perftime = %" B_PRIdBIGTIME "\n",
+		log_what_to_string(what), msg.tstamp, msg.now);
 	mWriteBuf = buf;
 
 	// put any special per-message-type handling here
@@ -245,7 +246,8 @@ LogWriter::HandleMessage(log_what what, const log_message& msg)
 	case LOG_BUFFER_RECEIVED:
 		if (msg.buffer_data.offset < 0)
 		{
-			sprintf(buf, "\tstart = %Ld, offset = %Ld\n", msg.buffer_data.start_time, msg.buffer_data.offset);
+			sprintf(buf, "\tstart = %" B_PRIdBIGTIME ", offset = %" B_PRIdBIGTIME "\n",
+				msg.buffer_data.start_time, msg.buffer_data.offset);
 			mWriteBuf += buf;
 			sprintf(buf, "\tBuffer received *LATE*\n");
 			mWriteBuf += buf;
@@ -253,18 +255,19 @@ LogWriter::HandleMessage(log_what what, const log_message& msg)
 		break;
 
 	case LOG_SET_PARAM_HANDLED:
-		sprintf(buf, "\tparam id = %ld, value = %f\n", msg.param.id, msg.param.value);
+		sprintf(buf, "\tparam id = %" B_PRId32 ", value = %f\n", msg.param.id, msg.param.value);
 		mWriteBuf += buf;
 		break;
 
 	case LOG_INVALID_PARAM_HANDLED:
 	case LOG_GET_PARAM_VALUE:
-		sprintf(buf, "\tparam id = %ld\n", msg.param.id);
+		sprintf(buf, "\tparam id = %" B_PRId32 "\n", msg.param.id);
 		mWriteBuf += buf;
 		break;
 
 	case LOG_BUFFER_HANDLED:
-		sprintf(buf, "\tstart = %Ld, offset = %Ld\n", msg.buffer_data.start_time, msg.buffer_data.offset);
+		sprintf(buf, "\tstart = %" B_PRIdBIGTIME ", offset = %" B_PRIdBIGTIME "\n",
+			msg.buffer_data.start_time, msg.buffer_data.offset);
 		mWriteBuf += buf;
 		if (msg.buffer_data.offset < 0)
 		{

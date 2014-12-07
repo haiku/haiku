@@ -11,5 +11,5 @@ Application cortex_logging_consumer.media_addon :
 	NodeHarnessWin.cpp
 	LogWriter.cpp
 	LoggingConsumer.cpp
-	: be media
+	: be media [ TargetLibstdc++ ]
 ;

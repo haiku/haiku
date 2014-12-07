@@ -43,6 +43,7 @@
 #include <media/TimeSource.h>
 #include <media/MediaTheme.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 const int32 BUTTON_CONNECT = 'Cnct';
 const int32 BUTTON_START = 'Strt';
@@ -199,7 +200,7 @@ NodeHarnessWin::MessageReceived(BMessage *msg)
 			// for video input, we need to set the downstream latency for record -> playback
 			bigtime_t latency;
 			r->GetLatencyFor(mConnection.producer, &latency);
-			printf("Setting producer run mode latency to %Ld\n", latency);
+			printf("Setting producer run mode latency to %" B_PRIdBIGTIME "\n", latency);
 			r->SetProducerRunModeDelay(mConnection.producer, latency + 6000);
 
 			// preroll first, to be a good citizen
