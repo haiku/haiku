@@ -19,6 +19,49 @@
 */
 
 
+template<typename inType, typename outType, int gnum, int gden, int offset,
+	int32 min, int32 max> static void
+kernel(Resampler* object, const void *_src, int32 srcSampleOffset,
+	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
+	int32 destSampleCount, float _gain)
+{
+	register const char * src = (const char *)_src;
+	register char * dest = (char *)_dest;
+	register int32 count = destSampleCount;
+	register float gain = _gain * gnum / gden;
+
+	if (srcSampleCount == destSampleCount) {
+		// optimized case for no resampling
+		while (count--) {
+			float tmp = *(const inType*)src * gain + offset;
+			if (tmp < min) tmp = min;
+			if (tmp > max) tmp = max;
+			*(outType *)dest = (outType)tmp;
+			src += srcSampleOffset;
+			dest += destSampleOffset;
+		}
+		return;
+	}
+
+	register float delta = float(srcSampleCount) / float(destSampleCount);
+	register float current = 0.0f;
+
+	// downsample
+	while (count--) {
+		float tmp = *(const inType*)src * gain + offset;
+		if (tmp < min) tmp = min;
+		if (tmp > max) tmp = max;
+		*(outType *)dest = (outType)tmp;
+
+		dest += destSampleOffset;
+		current += delta;
+		register int32 skipcount = (int32)current;
+		current -= skipcount;
+		src += skipcount * srcSampleOffset;
+	}
+}
+
+
 Resampler::Resampler(uint32 src_format, uint32 dst_format)
 	:
 	fFunc(0)
@@ -26,19 +69,19 @@ Resampler::Resampler(uint32 src_format, uint32 dst_format)
 	if (dst_format == media_raw_audio_format::B_AUDIO_FLOAT) {
 		switch (src_format) {
 			case media_raw_audio_format::B_AUDIO_FLOAT:
-				fFunc = &Resampler::float_to_float;
+				fFunc = &kernel<float, float, 1, 1, 0, -1, 1>;
 				return;
 			case media_raw_audio_format::B_AUDIO_INT:
-				fFunc = &Resampler::int32_to_float;
+				fFunc = &kernel<int32, float, 1, INT32_MAX, 0, -1, 1>;
 				return;
 			case media_raw_audio_format::B_AUDIO_SHORT:
-				fFunc = &Resampler::int16_to_float;
+				fFunc = &kernel<int16, float, 1, INT16_MAX, 0, -1, 1>;
 				return;
 			case media_raw_audio_format::B_AUDIO_CHAR:
-				fFunc = &Resampler::int8_to_float;
+				fFunc = &kernel<int8, float, 1, INT8_MAX, 0, -1, 1>;
 				return;
 			case media_raw_audio_format::B_AUDIO_UCHAR:
-				fFunc = &Resampler::uint8_to_float;
+				fFunc = &kernel<uint8, float, 2, UINT8_MAX, -128, -1, 1>;
 				return;
 			default:
 				ERROR("Resampler::Resampler: unknown source format 0x%x\n",
@@ -51,19 +94,24 @@ Resampler::Resampler(uint32 src_format, uint32 dst_format)
 		switch (dst_format) {
 			// float=>float already handled above
 			case media_raw_audio_format::B_AUDIO_INT:
-				fFunc = &Resampler::float_to_int32;
+				fFunc = &kernel<float, int32, INT32_MAX, 1, 0,
+					INT32_MIN, INT32_MAX>;
 				return;
 			case media_raw_audio_format::B_AUDIO_SHORT:
-				fFunc = &Resampler::float_to_int16;
+				fFunc = &kernel<float, int16, INT16_MAX, 1, 0,
+					INT16_MIN, INT16_MAX>;
 				return;
 			case media_raw_audio_format::B_AUDIO_CHAR:
-				fFunc = &Resampler::float_to_int8;
+				fFunc = &kernel<float, int8, INT8_MAX, 1, 0,
+					INT8_MIN, INT8_MAX>;
 				return;
 			case media_raw_audio_format::B_AUDIO_UCHAR:
-				fFunc = &Resampler::float_to_uint8;
+				fFunc = &kernel<float, uint8, UINT8_MAX, 2, 1,
+					0, UINT8_MAX>;
 				return;
 			default:
-				ERROR("Resampler::Resampler: unknown destination format 0x%x\n", dst_format);
+				ERROR("Resampler::Resampler: unknown destination format 0x%x\n",
+					dst_format);
 				return;
 		}
 	}
@@ -73,517 +121,10 @@ Resampler::Resampler(uint32 src_format, uint32 dst_format)
 }
 
 
-Resampler::~Resampler()
+Resampler::Resampler()
+	:
+	fFunc(0)
 {
 }
 
 
-status_t
-Resampler::InitCheck() const
-{
-	return fFunc != 0 ? B_OK : B_ERROR;
-}
-
-
-void
-Resampler::float_to_float(const void *_src, int32 srcSampleOffset,
-	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
-	int32 destSampleCount, float _gain)
-{
-	register const char * src = (const char *)_src;
-	register char * dest = (char *)_dest;
-	register int32 count = destSampleCount;
-	register float gain = _gain;
-
-	if (srcSampleCount == destSampleCount) {
-		// optimized case for no resampling
-		while (count--) {
-			*(float *)dest = *(const float *)src * gain;
-			src += srcSampleOffset;
-			dest += destSampleOffset;
-		}
-		return;
-	}
-
-	register float delta = float(srcSampleCount) / float(destSampleCount);
-	register float current = 0.0f;
-
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			*(float *)dest = *(const float *)src * gain;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			*(float *)dest = *(const float *)src * gain;
-			dest += destSampleOffset;
-			current += delta;
-			register int32 skipcount = (int32)current;
-			current -= skipcount;
-			src += skipcount * srcSampleOffset;
-		}
-	}
-}
-
-
-void
-Resampler::int32_to_float(const void *_src, int32 srcSampleOffset,
-	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
-	int32 destSampleCount, float _gain)
-{
-	register const char * src = (const char *)_src;
-	register char * dest = (char *)_dest;
-	register int32 count = destSampleCount;
-	register float gain = _gain / 2147483647.0;
-
-	if (srcSampleCount == destSampleCount) {
-		// optimized case for no resampling
-		while (count--) {
-			*(float *)dest = *(const int32 *)src * gain;
-			src += srcSampleOffset;
-			dest += destSampleOffset;
-		}
-		return;
-	}
-
-	register float delta = float(srcSampleCount) / float(destSampleCount);
-	register float current = 0.0f;
-
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			*(float *)dest = *(const int32 *)src * gain;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			*(float *)dest = *(const int32 *)src * gain;
-			dest += destSampleOffset;
-			current += delta;
-			register int32 skipcount = (int32)current;
-			current -= skipcount;
-			src += skipcount * srcSampleOffset;
-		}
-	}
-}
-
-
-void
-Resampler::int16_to_float(const void *_src, int32 srcSampleOffset,
-	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
-	int32 destSampleCount, float _gain)
-{
-	register const char * src = (const char *)_src;
-	register char * dest = (char *)_dest;
-	register int32 count = destSampleCount;
-	register float gain = _gain / 32767.0;
-
-	if (srcSampleCount == destSampleCount) {
-		// optimized case for no resampling
-		while (count--) {
-			*(float *)dest = *(const int16 *)src * gain;
-			src += srcSampleOffset;
-			dest += destSampleOffset;
-		}
-		return;
-	}
-
-	register float delta = float(srcSampleCount) / float(destSampleCount);
-	register float current = 0.0f;
-
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			*(float *)dest = *(const int16 *)src * gain;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			*(float *)dest = *(const int16 *)src * gain;
-			dest += destSampleOffset;
-			current += delta;
-			register int32 skipcount = (int32)current;
-			current -= skipcount;
-			src += skipcount * srcSampleOffset;
-		}
-	}
-}
-
-
-void
-Resampler::int8_to_float(const void *_src, int32 srcSampleOffset,
-	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
-	int32 destSampleCount, float _gain)
-{
-	register const char * src = (const char *)_src;
-	register char * dest = (char *)_dest;
-	register int32 count = destSampleCount;
-	register float gain = _gain / 127.0;
-
-	if (srcSampleCount == destSampleCount) {
-		// optimized case for no resampling
-		while (count--) {
-			*(float *)dest = *(const int8 *)src * gain;
-			src += srcSampleOffset;
-			dest += destSampleOffset;
-		}
-		return;
-	}
-
-	register float delta = float(srcSampleCount) / float(destSampleCount);
-	register float current = 0.0f;
-
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			*(float *)dest = *(const int8 *)src * gain;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			*(float *)dest = *(const int8 *)src * gain;
-			dest += destSampleOffset;
-			current += delta;
-			register int32 skipcount = (int32)current;
-			current -= skipcount;
-			src += skipcount * srcSampleOffset;
-		}
-	}
-}
-
-
-void
-Resampler::uint8_to_float(const void *_src, int32 srcSampleOffset,
-	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
-	int32 destSampleCount, float _gain)
-{
-	register const char * src = (const char *)_src;
-	register char * dest = (char *)_dest;
-	register int32 count = destSampleCount;
-	register float gain = _gain / 127.0;
-
-	if (srcSampleCount == destSampleCount) {
-		// optimized case for no resampling
-		while (count--) {
-			*(float *)dest = (((int32) *(const uint8 *)src) - 128) * gain;
-			src += srcSampleOffset;
-			dest += destSampleOffset;
-		}
-		return;
-	}
-
-	register float delta = float(srcSampleCount) / float(destSampleCount);
-	register float current = 0.0f;
-
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			*(float *)dest = (((int32) *(const uint8 *)src) - 128) * gain;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			*(float *)dest = (((int32) *(const uint8 *)src) - 128) * gain;
-			dest += destSampleOffset;
-			current += delta;
-			register int32 skipcount = (int32)current;
-			current -= skipcount;
-			src += skipcount * srcSampleOffset;
-		}
-	}
-}
-
-
-void
-Resampler::float_to_int32(const void *_src, int32 srcSampleOffset,
-	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
-	int32 destSampleCount, float _gain)
-{
-	register const char * src = (const char *)_src;
-	register char * dest = (char *)_dest;
-	register int32 count = destSampleCount;
-	register float gain = _gain * 2147483647.0;
-
-	if (srcSampleCount == destSampleCount) {
-		// optimized case for no resampling
-		while (count--) {
-			register float sample = *(const float *)src * gain;
-			if (sample > 2147483647.0f)
-				*(int32 *)dest = 2147483647L;
-			else if (sample < -2147483647.0f)
-				*(int32 *)dest = -2147483647L;
-			else
-				*(int32 *)dest = (int32)sample;
-			src += srcSampleOffset;
-			dest += destSampleOffset;
-		}
-		return;
-	}
-
-	register float delta = float(srcSampleCount) / float(destSampleCount);
-	register float current = 0.0f;
-
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			register float sample = *(const float *)src * gain;
-			if (sample > 2147483647.0f)
-				*(int32 *)dest = 2147483647L;
-			else if (sample < -2147483647.0f)
-				*(int32 *)dest = -2147483647L;
-			else
-				*(int32 *)dest = (int32)sample;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			register float sample = *(const float *)src * gain;
-			if (sample > 2147483647.0f)
-				*(int32 *)dest = 2147483647L;
-			else if (sample < -2147483647.0f)
-				*(int32 *)dest = -2147483647L;
-			else
-				*(int32 *)dest = (int32)sample;
-			dest += destSampleOffset;
-			current += delta;
-			register int32 skipcount = (int32)current;
-			current -= skipcount;
-			src += skipcount * srcSampleOffset;
-		}
-	}
-}
-
-
-void
-Resampler::float_to_int16(const void *_src, int32 srcSampleOffset,
-	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
-	int32 destSampleCount, float _gain)
-{
-	register const char * src = (const char *)_src;
-	register char * dest = (char *)_dest;
-	register int32 count = destSampleCount;
-	register float gain = _gain * 32767.0;
-
-	if (srcSampleCount == destSampleCount) {
-		// optimized case for no resampling
-		while (count--) {
-			register float sample = *(const float *)src * gain;
-			if (sample > 32767.0f)
-				*(int16 *)dest = 32767;
-			else if (sample < -32767.0f)
-				*(int16 *)dest = -32767;
-			else
-				*(int16 *)dest = (int16)sample;
-			src += srcSampleOffset;
-			dest += destSampleOffset;
-		}
-		return;
-	}
-
-	register float delta = float(srcSampleCount) / float(destSampleCount);
-	register float current = 0.0f;
-
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			register float sample = *(const float *)src * gain;
-			if (sample > 32767.0f)
-				*(int16 *)dest = 32767;
-			else if (sample < -32767.0f)
-				*(int16 *)dest = -32767;
-			else
-				*(int16 *)dest = (int16)sample;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			register float sample = *(const float *)src * gain;
-			if (sample > 32767.0f)
-				*(int16 *)dest = 32767;
-			else if (sample < -32767.0f)
-				*(int16 *)dest = -32767;
-			else
-				*(int16 *)dest = (int16)sample;
-			dest += destSampleOffset;
-			current += delta;
-			register int32 skipcount = (int32)current;
-			current -= skipcount;
-			src += skipcount * srcSampleOffset;
-		}
-	}
-}
-
-
-void
-Resampler::float_to_int8(const void *_src, int32 srcSampleOffset,
-	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
-	int32 destSampleCount, float _gain)
-{
-	register const char * src = (const char *)_src;
-	register char * dest = (char *)_dest;
-	register int32 count = destSampleCount;
-	register float gain = _gain * 127.0;
-
-	if (srcSampleCount == destSampleCount) {
-		// optimized case for no resampling
-		while (count--) {
-			register float sample = *(const float *)src * gain;
-			if (sample > 127.0f)
-				*(int8 *)dest = 127;
-			else if (sample < -127.0f)
-				*(int8 *)dest = -127;
-			else
-				*(int8 *)dest = (int8)sample;
-			src += srcSampleOffset;
-			dest += destSampleOffset;
-		}
-		return;
-	}
-
-	register float delta = float(srcSampleCount) / float(destSampleCount);
-	register float current = 0.0f;
-
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			register float sample = *(const float *)src * gain;
-			if (sample > 127.0f)
-				*(int8 *)dest = 127;
-			else if (sample < -127.0f)
-				*(int8 *)dest = -127;
-			else
-				*(int8 *)dest = (int8)sample;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			register float sample = *(const float *)src * gain;
-			if (sample > 127.0f)
-				*(int8 *)dest = 127;
-			else if (sample < -127.0f)
-				*(int8 *)dest = -127;
-			else
-				*(int8 *)dest = (int8)sample;
-			dest += destSampleOffset;
-			current += delta;
-			register int32 skipcount = (int32)current;
-			current -= skipcount;
-			src += skipcount * srcSampleOffset;
-		}
-	}
-}
-
-
-void
-Resampler::float_to_uint8(const void *_src, int32 srcSampleOffset,
-	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
-	int32 destSampleCount, float _gain)
-{
-	register const char * src = (const char *)_src;
-	register char * dest = (char *)_dest;
-	register int32 count = destSampleCount;
-	register float gain = _gain * 127.0;
-
-	if (srcSampleCount == destSampleCount) {
-		// optimized case for no resampling
-		while (count--) {
-			register float sample = 128.0f + *(const float *)src * gain;
-			if (sample > 255.0f)
-				*(uint8 *)dest = 255;
-			else if (sample < 1.0f)
-				*(uint8 *)dest = 1;
-			else
-				*(uint8 *)dest = (uint8)sample;
-			src += srcSampleOffset;
-			dest += destSampleOffset;
-		}
-		return;
-	}
-
-	register float delta = float(srcSampleCount) / float(destSampleCount);
-	register float current = 0.0f;
-
-	if (delta < 1.0) {
-		// upsample
-		while (count--) {
-			register float sample = 128.0f + *(const float *)src * gain;
-			if (sample > 255.0f)
-				*(uint8 *)dest = 255;
-			else if (sample < 1.0f)
-				*(uint8 *)dest = 1;
-			else
-				*(uint8 *)dest = (uint8)sample;
-			dest += destSampleOffset;
-			current += delta;
-			if (current >= 1.0f) {
-				current -= 1.0f;
-				src += srcSampleOffset;
-			}
-		}
-	} else {
-		// downsample
-		while (count--) {
-			register float sample = 128.0f + *(const float *)src * gain;
-			if (sample > 255.0f)
-				*(uint8 *)dest = 255;
-			else if (sample < 1.0f)
-				*(uint8 *)dest = 1;
-			else
-				*(uint8 *)dest = (uint8)sample;
-			dest += destSampleOffset;
-			current += delta;
-			register int32 skipcount = (int32)current;
-			current -= skipcount;
-			src += skipcount * srcSampleOffset;
-		}
-	}
-}
