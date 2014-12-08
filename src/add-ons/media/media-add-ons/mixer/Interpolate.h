@@ -13,8 +13,8 @@ class Interpolate: public Resampler {
 public:
 							Interpolate(uint32 sourceFormat,
 								uint32 destFormat);
-private:
 
+			float			fOldSample;
 };
 
 

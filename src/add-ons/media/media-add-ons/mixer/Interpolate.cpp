@@ -43,13 +43,14 @@ kernel(Resampler* object, const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount - 1) / float(destSampleCount - 1);
+	register float delta = float(srcSampleCount) / float(destSampleCount);
 	register float current = 0.0f;
+	float oldSample = ((Interpolate*)object)->fOldSample;
 
-	#define SRC(n) *(const inType*)(src + n * srcSampleOffset)
+	#define SRC *(const inType*)(src)
 
-	while (--count) {
-		float tmp = (gain * (SRC(0) + (SRC(1) - SRC(0)) * current) + offset);
+	while (count--) {
+		float tmp = (gain * (oldSample + (SRC - oldSample) * current) + offset);
 		if (tmp < min) tmp = min;
 		if (tmp > max) tmp = max;
 		*(outType *)dest = (outType)tmp;
@@ -59,17 +60,19 @@ kernel(Resampler* object, const void *_src, int32 srcSampleOffset,
 		if (current >= 1.0f) {
 			double ipart;
 			current = modf(current, &ipart);
+			oldSample = SRC;
 			src += srcSampleOffset * (int)ipart;
 		}
 	}
 
-	*(outType*)dest = (outType)(SRC(0) * gain + offset);
+	((Interpolate*)object)->fOldSample = oldSample;
 }
 
 
 Interpolate::Interpolate(uint32 src_format, uint32 dst_format)
 	:
-	Resampler()
+	Resampler(),
+	fOldSample(0)
 {
 	if (dst_format == media_raw_audio_format::B_AUDIO_FLOAT) {
 		switch (src_format) {
