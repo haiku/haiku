@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2011 Haiku Inc. All rights reserved.
+ * Copyright 2003-2014 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,6 +24,7 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <SeparatorView.h>
 #include <Slider.h>
 #include <TextControl.h>
 #include <TranslationUtils.h>
@@ -47,6 +48,7 @@ mouse_mode_to_index(mode_mouse mode)
 			return 2;
 	}
 }
+
 
 static int32
 focus_follows_mouse_mode_to_index(mode_focus_follows_mouse mode)
@@ -142,8 +144,8 @@ SettingsView::SettingsView(MouseSettings& settings)
 
 	const char *focusFollowsMouseLabels[] = {B_TRANSLATE_MARK("Normal"),
 		B_TRANSLATE_MARK("Warp"), B_TRANSLATE_MARK("Instant warp")};
-	const mode_focus_follows_mouse focusFollowsMouseModes[] =
-		{B_NORMAL_FOCUS_FOLLOWS_MOUSE, B_WARP_FOCUS_FOLLOWS_MOUSE,
+	const mode_focus_follows_mouse focusFollowsMouseModes[]
+		= {B_NORMAL_FOCUS_FOLLOWS_MOUSE, B_WARP_FOCUS_FOLLOWS_MOUSE,
 			B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE};
 
 	for (int i = 0; i < 3; i++) {
@@ -164,19 +166,11 @@ SettingsView::SettingsView(MouseSettings& settings)
 		new BMessage(kMsgAcceptFirstClick));
 
 	// dividers
-	// This one is a vertical line for B_HORIZONTAL 
-	BBox* hdivider = new BBox(
-		BRect(0, 0, 1, 1), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
-			B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
-	hdivider->SetExplicitMaxSize(BSize(1, B_SIZE_UNLIMITED));
+	// This one is a vertical line for B_HORIZONTAL
+	BSeparatorView* hdivider = new BSeparatorView(B_VERTICAL, B_FANCY_BORDER);
 
 	// This one is a horizontal line for B_VERTICAL
-	BBox* vdivider = new BBox(
-		BRect(0, 0, 1, 1), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
-			B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
-	vdivider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
-
-	int globalInset = 7;
+	BSeparatorView* vdivider = new BSeparatorView(B_HORIZONTAL, B_FANCY_BORDER);
 
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -186,13 +180,13 @@ SettingsView::SettingsView(MouseSettings& settings)
 	// -----
 	//   C
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, globalInset)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_SMALL_SPACING)
 
 		// Horizontal : A|B
-		.AddGroup(B_HORIZONTAL, globalInset)
+		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 
 			// Vertical block A: mouse type/view/test
-			.AddGroup(B_VERTICAL, 10) 
+			.AddGroup(B_VERTICAL, 10)
 				.AddGroup(B_HORIZONTAL, 0)
 					.AddGlue()
 					.Add(typeField)
@@ -224,18 +218,19 @@ SettingsView::SettingsView(MouseSettings& settings)
 				)
 			.End()
 		.End()
-		
+
 		.Add(vdivider)
-		
+
 		// Horizontal Block C: focus mode
-		.AddGroup(B_HORIZONTAL, globalInset)
+		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.Add(focusField)
 			.AddGlue()
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fAcceptFirstClickBox)
 			.End()
 		.End()
-		.SetInsets(globalInset,globalInset,globalInset,globalInset)
+		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
+			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 	);
 }
 
