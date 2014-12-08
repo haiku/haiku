@@ -266,6 +266,12 @@ MainWindow::MessageReceived(BMessage* message)
 				Interpolate sampler(media_raw_audio_format::B_AUDIO_FLOAT,
 					media_raw_audio_format::B_AUDIO_FLOAT);
 
+				// First call initializes the "old sample" in the interpolator.
+				// Since we do the interpolation on exactly one period of the
+				// sound wave, this works.
+				sampler.Resample(fWaveView->waves[1].Raw(), sizeof(float), irate,
+					fWaveView->waves[2].Raw(), sizeof(float), orate, 1);
+
 				sampler.Resample(fWaveView->waves[1].Raw(), sizeof(float), irate,
 					fWaveView->waves[2].Raw(), sizeof(float), orate, 1);
 			} else {
