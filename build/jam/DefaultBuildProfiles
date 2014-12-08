@@ -85,6 +85,7 @@ rule DefineDefaultBuildProfiles
 				subversion
 				timgmsoundfont
 				vision
+				vl_gothic
 				wpa_supplicant
 				wqy_microhei
 				# xz_utils can't be built with gcc2, so we install it for
