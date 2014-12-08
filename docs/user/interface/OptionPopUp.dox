@@ -1,0 +1,67 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *
+ * Corresponds to:
+ *		headers/os/interface/OptionPopUp.h	 hrev48458
+ *		src/kits/interface/OptionPopUp.cpp	 hrev48458
+ */
+
+
+/*!
+	\file OptionPopUp.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BOptionPopUp class definition.
+*/
+
+
+/*!
+	\class BOptionPopUp
+	\ingroup interface
+	\ingroup libbe
+	\brief A BMenuField based BControl implementation
+
+	This class is a wrapper around \a BMenuField that implements BControl
+	semantics. Each menu item holds a value, which is used as the control
+	value when that item is selected.
+
+	The menu is populated using the \a AddOptionAt() method, giving the label
+	and value for each option. It is set to radio mode by default.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn BMenuField::GetOptionAt(int32 index, const char** _name, int32* _value)
+	\brief Get option at given index.
+*/
+
+/*!
+	\fn BOptionPopUp::RemoveOptionAt(int32 index)
+	\brief Remove option at given index from the menu.
+*/
+
+
+/*!
+	\fn BOptionPopUp::CountOptions() const
+	\brief Count options in the menu
+*/
+
+
+/*!
+	\fn BOptionPopUpAddOptionAt(const char* name, int32 value, int32 index)
+	\brief Add an option to the menu.
+
+	Note that the option value is independant from its position in the menu.
+*/
+
+
+/*!
+	\fn BOptionPopUp::SelectedOption(const char** _name = 0, int32* _value = 0)
+	\brief Get the label and/or value of the currently selected option.
+*/
