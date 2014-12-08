@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src tests add-ons media media-add-ons mixer ;
+
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src add-ons media media-add-ons mixer ] ;
+
+SimpleTest mixerToy :
+	main.cpp
+
+	Resampler.cpp
+	Interpolate.cpp
+
+	: be
+;
+
+# Tell Jam where to find these sources
+SEARCH on [ FGristFiles Resampler.cpp Interpolate.cpp ]
+	= [ FDirName $(HAIKU_TOP) src add-ons media media-add-ons mixer ] ;
