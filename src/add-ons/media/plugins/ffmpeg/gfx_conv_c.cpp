@@ -134,19 +134,6 @@ gfx_conv_yuv420p_ycbcr422_c(AVFrame *in, AVFrame *out, int width, int height)
 	}
 }
 
-void
-gfx_conv_yuv410p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
-{
-	gfx_conv_null(in, out, width, height);
-}
-
-
-void
-gfx_conv_yuv411p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
-{
-	gfx_conv_null(in, out, width, height);
-}
-
 
 #define CLIP(a) if (0xffffff00 & (uint32)a) { if (a < 0) a = 0; else a = 255; }
 
@@ -157,7 +144,7 @@ YUV444TORGBA8888(uint8 y, uint8 u, uint8 v)
 	int32 c = y - 16;
 	int32 d = u - 128;
 	int32 e = v - 128;
-	
+
 	int32 r = (298 * c + 409 * e + 128) >> 8;
 	int32 g = (298 * c - 100 * d - 208 * e + 128) >> 8;
 	int32 b = (298 * c + 516 * d + 128) >> 8;
@@ -165,8 +152,55 @@ YUV444TORGBA8888(uint8 y, uint8 u, uint8 v)
 	CLIP(r);
 	CLIP(g);
 	CLIP(b);
-    
-	return (uint32)((r << 16) | (g << 8) | b);
+
+	return (uint32)((255 << 24) | (r << 16) | (g << 8) | b);
+}
+
+
+void
+gfx_conv_yuv410p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
+{
+	uint8 *ybase = (uint8 *)in->data[0];
+	uint8 *ubase = (uint8 *)in->data[1];
+	uint8 *vbase = (uint8 *)in->data[2];
+	
+	uint32 *rgbbase = (uint32 *)out->data[0];
+
+	int uv_index;
+
+	for (int32 i = 0; i < height; i++) {
+		uv_index = 0;
+		for (int32 j=0; j < width; j+=4) {
+			rgbbase[j] = YUV444TORGBA8888(ybase[j], ubase[uv_index],
+				vbase[uv_index]);
+			rgbbase[j + 1] = YUV444TORGBA8888(ybase[j + 1], ubase[uv_index],
+				vbase[uv_index]);
+			rgbbase[j + 2] = YUV444TORGBA8888(ybase[j + 2], ubase[uv_index],
+				vbase[uv_index]);
+			rgbbase[j + 3] = YUV444TORGBA8888(ybase[j + 3], ubase[uv_index],
+				vbase[uv_index]);
+    		uv_index++;
+		}
+
+		// Advance pointers to next line
+		ybase += in->linesize[0];
+
+		if ((i & 3) == 0) {
+			// These are the same for 4 lines
+			ubase += in->linesize[1];
+			vbase += in->linesize[2];
+		}
+		
+		rgbbase += out->linesize[0] / 4;
+	}
+
+}
+
+
+void
+gfx_conv_yuv411p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
+{
+	gfx_conv_null(in, out, width, height);
 }
 
 
