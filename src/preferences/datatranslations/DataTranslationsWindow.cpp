@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Haiku, Inc.
+ * Copyright 2002-2014, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -12,6 +12,7 @@
 
 #include "DataTranslationsWindow.h"
 
+#include <algorithm>
 #include <stdio.h>
 
 #include <Alert.h>
@@ -90,6 +91,8 @@ DataTranslationsWindow::_PopulateListView()
 	translator_id* translators = NULL;
 	roster->GetAllTranslators(&translators, &numTranslators);
 
+	float maxWidth = 0;
+
 	for (int32 i = 0; i < numTranslators; i++) {
 		// Getting the first three Infos: Name, Info & Version
 		int32 version;
@@ -97,7 +100,10 @@ DataTranslationsWindow::_PopulateListView()
 		const char* info;
 		roster->GetTranslatorInfo(translators[i], &name, &info, &version);
 		fTranslatorListView->AddItem(new TranslatorItem(translators[i], name));
+		maxWidth = std::max(maxWidth, fTranslatorListView->StringWidth(name));
 	}
+
+	fTranslatorListView->SetExplicitSize(BSize(maxWidth + 20, B_SIZE_UNSET));
 
 	delete[] translators;
 	return B_OK;
@@ -208,13 +214,15 @@ DataTranslationsWindow::_SetupViews()
 	fRightBox = new BBox("Right_Side");
 	fRightBox->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 			B_ALIGN_USE_FULL_HEIGHT));
+	fRightBox->SetExplicitMinSize(BSize(350, 300));
 
 	// Add the translator icon view
 	fIconView = new IconView();
 
 	// Add the translator info button
 	fButton = new BButton("info", B_TRANSLATE("Info"),
-		new BMessage(kMsgTranslatorInfo), B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+		new BMessage(kMsgTranslatorInfo),
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 	fButton->SetEnabled(false);
 
 	// Populate the translators list view
