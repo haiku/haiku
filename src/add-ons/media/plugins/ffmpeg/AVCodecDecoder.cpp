@@ -503,16 +503,45 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	inOutFormat->u.raw_video = fInputFormat.u.encoded_video.output;
 	inOutFormat->u.raw_video.interlace = 1;
 		// Progressive (non-interlaced) video frames are delivered
-	inOutFormat->u.raw_video.first_active = fHeader.u.raw_video.first_active_line;
+	inOutFormat->u.raw_video.first_active
+		= fHeader.u.raw_video.first_active_line;
 	inOutFormat->u.raw_video.last_active = fHeader.u.raw_video.line_count;
-	inOutFormat->u.raw_video.pixel_width_aspect = fHeader.u.raw_video.pixel_width_aspect;
-	inOutFormat->u.raw_video.pixel_height_aspect = fHeader.u.raw_video.pixel_height_aspect;
+	inOutFormat->u.raw_video.pixel_width_aspect
+		= fHeader.u.raw_video.pixel_width_aspect;
+	inOutFormat->u.raw_video.pixel_height_aspect
+		= fHeader.u.raw_video.pixel_height_aspect;
+#if 0
+	// This was added by Colin Günther in order to handle streams with a
+	// variable frame rate. fOutputFrameRate is computed from the stream
+	// time_base, but it actually assumes a timebase equal to the FPS. As far
+	// as I can see, a stream with a variable frame rate would have a higher
+	// resolution time_base and increment the pts (presentation time) of each
+	// frame by a value bigger than one.
+	//
+	// Fixed rate stream:
+	// time_base = 1/50s, frame PTS = 1, 2, 3... (for 50Hz)
+	//
+	// Variable rate stream:
+	// time_base = 1/300s, frame PTS = 6, 12, 18, ... (for 50Hz)
+	// time_base = 1/300s, frame PTS = 5, 10, 15, ... (for 60Hz)
+	//
+	// The fOutputFrameRate currently does not take this into account and
+	// ignores the PTS. This results in playing the above sample at 300Hz
+	// instead of 50 or 60.
+	//
+	// However, comparing the PTS for two consecutive implies we have already
+	// decoded 2 frames, which may not be the case when this method is first
+	// called.
 	inOutFormat->u.raw_video.field_rate = fOutputFrameRate;
 		// Was calculated by first call to _DecodeNextVideoFrame()
+#endif
 	inOutFormat->u.raw_video.display.format = fOutputColorSpace;
-	inOutFormat->u.raw_video.display.line_width = fHeader.u.raw_video.display_line_width;
-	inOutFormat->u.raw_video.display.line_count = fHeader.u.raw_video.display_line_count;
-	inOutFormat->u.raw_video.display.bytes_per_row = fHeader.u.raw_video.bytes_per_row;
+	inOutFormat->u.raw_video.display.line_width
+		= fHeader.u.raw_video.display_line_width;
+	inOutFormat->u.raw_video.display.line_count
+		= fHeader.u.raw_video.display_line_count;
+	inOutFormat->u.raw_video.display.bytes_per_row
+		= fHeader.u.raw_video.bytes_per_row;
 
 #ifdef TRACE_AV_CODEC
 	char buffer[1024];
