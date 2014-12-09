@@ -6,6 +6,7 @@
 
 #include "ExpressionInfo.h"
 
+#include "Type.h"
 #include "Value.h"
 #include "ValueNode.h"
 
@@ -17,7 +18,8 @@ ExpressionResult::ExpressionResult()
 	:
 	fResultKind(EXPRESSION_RESULT_KIND_UNKNOWN),
 	fPrimitiveValue(NULL),
-	fValueNodeValue(NULL)
+	fValueNodeValue(NULL),
+	fTypeResult(NULL)
 {
 }
 
@@ -29,6 +31,9 @@ ExpressionResult::~ExpressionResult()
 
 	if (fValueNodeValue != NULL)
 		fValueNodeValue->ReleaseReference();
+
+	if (fTypeResult != NULL)
+		fTypeResult->ReleaseReference();
 }
 
 
@@ -71,6 +76,19 @@ ExpressionResult::SetToValueNode(ValueNodeChild* child)
 
 
 void
+ExpressionResult::SetToType(Type* type)
+{
+	_Unset();
+
+	fTypeResult = type;
+	if (fTypeResult != NULL) {
+		fTypeResult->AcquireReference();
+		fResultKind = EXPRESSION_RESULT_KIND_TYPE;
+	}
+}
+
+
+void
 ExpressionResult::_Unset()
 {
 	if (fPrimitiveValue != NULL) {
@@ -81,6 +99,11 @@ ExpressionResult::_Unset()
 	if (fValueNodeValue != NULL) {
 		fValueNodeValue->ReleaseReference();
 		fValueNodeValue = NULL;
+	}
+
+	if (fTypeResult != NULL) {
+		fTypeResult->ReleaseReference();
+		fTypeResult = NULL;
 	}
 
 	fResultKind = EXPRESSION_RESULT_KIND_UNKNOWN;

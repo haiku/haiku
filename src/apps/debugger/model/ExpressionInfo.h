@@ -13,6 +13,7 @@
 #include <Variant.h>
 
 
+class Type;
 class Value;
 class ValueNodeChild;
 
@@ -20,7 +21,8 @@ class ValueNodeChild;
 enum expression_result_kind {
 	EXPRESSION_RESULT_KIND_UNKNOWN = 0,
 	EXPRESSION_RESULT_KIND_PRIMITIVE,
-	EXPRESSION_RESULT_KIND_VALUE_NODE
+	EXPRESSION_RESULT_KIND_VALUE_NODE,
+	EXPRESSION_RESULT_KIND_TYPE
 };
 
 
@@ -30,23 +32,26 @@ public:
 	virtual						~ExpressionResult();
 
 
-	expression_result_kind		Kind() const { return fResultKind; }
+			expression_result_kind Kind() const { return fResultKind; }
 
 			Value*				PrimitiveValue() const
 									{ return fPrimitiveValue; }
 			ValueNodeChild*		ValueNodeValue() const
 									{ return fValueNodeValue; }
+			Type*				GetType() const
+									{ return fTypeResult; }
 
-	void						SetToPrimitive(Value* value);
-	void						SetToValueNode(ValueNodeChild* child);
+			void				SetToPrimitive(Value* value);
+			void				SetToValueNode(ValueNodeChild* child);
+			void				SetToType(Type* type);
+private:
+			void				_Unset();
 
 private:
-	void						_Unset();
-
-private:
-	expression_result_kind		fResultKind;
-	Value*						fPrimitiveValue;
-	ValueNodeChild*				fValueNodeValue;
+			expression_result_kind fResultKind;
+			Value*				fPrimitiveValue;
+			ValueNodeChild*		fValueNodeValue;
+			Type*				fTypeResult;
 };
 
 
