@@ -248,8 +248,8 @@ BHttpForm::BHttpForm()
 
 BHttpForm::BHttpForm(const BHttpForm& other)
 	:
-	fType(other.fType),
 	fFields(other.fFields),
+	fType(other.fType),
 	fMultipartBoundary(other.fMultipartBoundary)
 {
 }
