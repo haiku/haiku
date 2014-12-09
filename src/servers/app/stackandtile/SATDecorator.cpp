@@ -46,22 +46,16 @@ static const rgb_color kHighlightFrameColors[6] = {
 	{ 8, 8, 8, 255 }
 };
 
-static const rgb_color kTabColor = {255, 203, 0, 255};
-static const rgb_color kHighlightTabColor = tint_color(kTabColor,
-	B_DARKEN_2_TINT);
-static const rgb_color kHighlightTabColorLight = tint_color(kHighlightTabColor,
-	(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2);
-static const rgb_color kHighlightTabColorBevel = tint_color(kHighlightTabColor,
-	B_LIGHTEN_2_TINT);
-static const rgb_color kHighlightTabColorShadow = tint_color(kHighlightTabColor,
-	(B_DARKEN_1_TINT + B_NO_TINT) / 2);
-
-
 SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame)
 	:
-	DefaultDecorator(settings, frame)
+	DefaultDecorator(settings, frame),
+	kHighlightTabColor(tint_color(kFocusTabColor, B_DARKEN_2_TINT)),
+	kHighlightTabColorLight(tint_color(kHighlightTabColor,
+		(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2)),
+	kHighlightTabColorBevel(tint_color(kHighlightTabColor, B_LIGHTEN_2_TINT)),
+	kHighlightTabColorShadow(tint_color(kHighlightTabColor,
+		(B_DARKEN_1_TINT + B_NO_TINT) / 2))
 {
-
 }
 
 
@@ -70,18 +64,17 @@ SATDecorator::GetComponentColors(Component component, uint8 highlight,
 	ComponentColors _colors, Decorator::Tab* _tab)
 {
 	DefaultDecorator::Tab* tab = static_cast<DefaultDecorator::Tab*>(_tab);
-	// we handle only our own highlights
-	if (highlight != HIGHLIGHT_STACK_AND_TILE) {
-		DefaultDecorator::GetComponentColors(component, highlight,
-			_colors, tab);
+
+	// Get the standard colors from the DefaultDecorator
+	DefaultDecorator::GetComponentColors(component, highlight, _colors, tab);
+
+	// Now we need to make some changes if the Stack and tile highlight is used
+	if (highlight != HIGHLIGHT_STACK_AND_TILE)
 		return;
-	}
 
 	if (tab && tab->isHighlighted == false
 		&& (component == COMPONENT_TAB || component == COMPONENT_CLOSE_BUTTON
 			|| component == COMPONENT_ZOOM_BUTTON)) {
-		DefaultDecorator::GetComponentColors(component, highlight,
-			_colors, tab);
 		return;
 	}
 

@@ -29,6 +29,12 @@ protected:
 	virtual	void				GetComponentColors(Component component,
 									uint8 highlight, ComponentColors _colors,
 									Decorator::Tab* tab = NULL);
+
+private:
+			const rgb_color		kHighlightTabColor;
+			const rgb_color		kHighlightTabColorLight;
+			const rgb_color		kHighlightTabColorBevel;
+			const rgb_color		kHighlightTabColorShadow;
 };
 
 
