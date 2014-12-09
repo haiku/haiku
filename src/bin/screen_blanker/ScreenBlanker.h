@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2003-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jérôme Duval, jerome.duval@free.fr
  * 		Michael Phipps
  *		John Scipione, jscipione@gmail.com
+ *		Puck Meerburg, puck@puckipedia.nl
  */
 #ifndef SCREEN_SAVER_APP_H
 #define SCREEN_SAVER_APP_H
@@ -50,6 +51,7 @@ private:
 			PasswordWindow*		fPasswordWindow;
 
 			bigtime_t			fBlankTime;
+			bool				fTestSaver;
 			BMessageRunner*		fResumeRunner;
 
 			BMessageRunner*		fStandByScreenRunner;

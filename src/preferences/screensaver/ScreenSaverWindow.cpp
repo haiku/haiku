@@ -7,6 +7,7 @@
  *		Jérôme Duval, jerome.duval@free.fr
  *		Michael Phipps
  *		John Scipione, jscipione@gmail.com
+ *		Puck Meerburg, puck@puckipedia.nl
  */
 
 
@@ -53,7 +54,7 @@
 #include "PreviewView.h"
 #include "ScreenCornerSelector.h"
 #include "ScreenSaverItem.h"
-
+#include "ScreenSaverShared.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ScreenSaver"
@@ -64,7 +65,6 @@ const uint32 kMinSettingsWidth = 230;
 const uint32 kMinSettingsHeight = 120;
 
 const int32 kMsgSaverSelected = 'SSEL';
-const int32 kMsgTestSaver = 'TEST';
 const int32 kMsgPasswordCheckBox = 'PWCB';
 const int32 kMsgRunSliderChanged = 'RSch';
 const int32 kMsgRunSliderUpdate = 'RSup';
@@ -639,7 +639,8 @@ ModulesView::MessageReceived(BMessage* message)
 
 			be_roster->StartWatching(BMessenger(this, Looper()),
 				B_REQUEST_QUIT);
-			if (be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.Message(),
+			BMessage message(kMsgTestSaver);
+			if (be_roster->Launch(SCREEN_BLANKER_SIG, &message,
 					&fScreenSaverTestTeam) == B_OK) {
 				break;
 			}
@@ -656,7 +657,7 @@ ModulesView::MessageReceived(BMessage* message)
 			BEntry entry(path.Path());
 			entry_ref ref;
 			if (entry.GetRef(&ref) == B_OK) {
-				be_roster->Launch(&ref, &fSettings.Message(),
+				be_roster->Launch(&ref, &message,
 					&fScreenSaverTestTeam);
 			}
 			break;

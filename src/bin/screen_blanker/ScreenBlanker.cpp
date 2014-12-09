@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2003-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Ryan Leavengood, leavengood@gmail.com
  *		Michael Phipps
  *		John Scipione, jscipione@gmail.com
+ *		Puck Meerburg, puck@puckipedia.nl
  */
 
 
@@ -27,6 +28,7 @@
 #include <string.h>
 #include <syslog.h>
 
+#include "ScreenSaverShared.h"
 
 const static uint32 kMsgTurnOffScreen = 'tofs';
 const static uint32 kMsgSuspendScreen = 'suss';
@@ -42,6 +44,7 @@ ScreenBlanker::ScreenBlanker()
 	fWindow(NULL),
 	fSaverRunner(NULL),
 	fPasswordWindow(NULL),
+	fTestSaver(false),
 	fResumeRunner(NULL),
 	fStandByScreenRunner(NULL),
 	fSuspendScreenRunner(NULL),
@@ -67,7 +70,7 @@ ScreenBlanker::ReadyToRun()
 	// create a BDirectWindow and start the render thread.
 	// TODO: we need a window per screen...
 	BScreen screen(B_MAIN_SCREEN_ID);
-	fWindow = new ScreenSaverWindow(screen.Frame());
+	fWindow = new ScreenSaverWindow(screen.Frame(), fTestSaver);
 	fPasswordWindow = new PasswordWindow();
 
 	BView* view = fWindow->ChildAt(0);
@@ -263,6 +266,10 @@ ScreenBlanker::MessageReceived(BMessage* message)
 
 		case kMsgStandByScreen:
 			_SetDPMSMode(B_DPMS_STAND_BY);
+			break;
+
+		case kMsgTestSaver:
+			fTestSaver = true;
 			break;
 
 		default:
