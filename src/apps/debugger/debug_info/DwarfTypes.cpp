@@ -152,7 +152,8 @@ DwarfTypeContext::DwarfTypeContext(Architecture* architecture, image_id imageID,
 {
 	fArchitecture->AcquireReference();
 	fFile->AcquireReference();
-	fTargetInterface->AcquireReference();
+	if (fTargetInterface != NULL)
+		fTargetInterface->AcquireReference();
 }
 
 
@@ -160,6 +161,8 @@ DwarfTypeContext::~DwarfTypeContext()
 {
 	fArchitecture->ReleaseReference();
 	fFile->ReleaseReference();
+	if (fTargetInterface != NULL)
+		fTargetInterface->ReleaseReference();
 }
 
 

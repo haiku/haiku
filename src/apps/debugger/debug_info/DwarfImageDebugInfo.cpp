@@ -430,27 +430,6 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 	const BString& name, const TypeLookupConstraints& constraints,
 	Type*& _type)
 {
-	int32 registerCount = fArchitecture->CountRegisters();
-	const Register* registers = fArchitecture->Registers();
-
-	// get the DWARF -> architecture register map
-	RegisterMap* fromDwarfMap;
-	status_t error = fArchitecture->GetDwarfRegisterMaps(NULL, &fromDwarfMap);
-	if (error != B_OK)
-		return error;
-	BReference<RegisterMap> fromDwarfMapReference(fromDwarfMap, true);
-
-	// create the target interface
-	BasicTargetInterface *inputInterface
-		= new(std::nothrow) BasicTargetInterface(registers, registerCount,
-			fromDwarfMap, fArchitecture, fDebuggerInterface);
-
-	if (inputInterface == NULL)
-		return B_NO_MEMORY;
-
-	BReference<BasicTargetInterface> inputInterfaceReference(inputInterface,
-		true);
-
 	// iterate through all compilation units
 	for (int32 i = 0; CompilationUnit* unit = fFile->CompilationUnitAt(i);
 		i++) {
@@ -489,8 +468,7 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 			if (typeContext == NULL) {
 				typeContext = new(std::nothrow)
 					DwarfTypeContext(fArchitecture, fImageInfo.ImageID(), fFile,
-					unit, NULL, 0, 0, fRelocationDelta, inputInterface,
-					fromDwarfMap);
+					unit, NULL, 0, 0, fRelocationDelta, NULL, NULL);
 				if (typeContext == NULL)
 					return B_NO_MEMORY;
 				typeContextReference.SetTo(typeContext, true);
@@ -499,7 +477,7 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 			// create the type
 			DwarfType* type;
 			DwarfTypeFactory typeFactory(typeContext, fTypeLookup, cache);
-			error = typeFactory.CreateType(typeEntry, type);
+			status_t error = typeFactory.CreateType(typeEntry, type);
 			if (error != B_OK)
 				continue;
 
