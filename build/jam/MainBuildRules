@@ -179,9 +179,9 @@ rule AssembleNasm
 actions AssembleNasm
 {
 	if test $(ASFLAGS) ; then
-		$(HAIKU_NASM) -d $(ASFLAGS) $(NASMFLAGS) -o $(1) $(2);
+		$(HAIKU_NASM) -d $(ASFLAGS) $(NASMFLAGS) -I$(2:D)/ -o $(1) $(2) ;
 	else
-		$(HAIKU_NASM) $(NASMFLAGS) -o $(1) $(2);
+		$(HAIKU_NASM) $(NASMFLAGS) -I$(2:D)/ -o $(1) $(2) ;
 	fi
 }
 
