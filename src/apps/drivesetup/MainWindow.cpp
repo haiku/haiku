@@ -150,6 +150,9 @@ public:
 
 	virtual bool Visit(BDiskDevice* device)
 	{
+		if (device->ContainsFileSystem())
+			device->Mount();
+
 		return false; // Don't stop yet!
 	}
 
