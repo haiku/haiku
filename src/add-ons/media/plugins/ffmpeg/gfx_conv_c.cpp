@@ -160,38 +160,38 @@ YUV444TORGBA8888(uint8 y, uint8 u, uint8 v)
 void
 gfx_conv_yuv410p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 {
-	uint8 *ybase = (uint8 *)in->data[0];
-	uint8 *ubase = (uint8 *)in->data[1];
-	uint8 *vbase = (uint8 *)in->data[2];
+	uint8 *yBase = (uint8 *)in->data[0];
+	uint8 *uBase = (uint8 *)in->data[1];
+	uint8 *vBase = (uint8 *)in->data[2];
 	
-	uint32 *rgbbase = (uint32 *)out->data[0];
+	uint32 *rgbBase = (uint32 *)out->data[0];
 
-	int uv_index;
+	int uvIndex;
 
 	for (int32 i = 0; i < height; i++) {
-		uv_index = 0;
+		uvIndex = 0;
 		for (int32 j=0; j < width; j+=4) {
-			rgbbase[j] = YUV444TORGBA8888(ybase[j], ubase[uv_index],
-				vbase[uv_index]);
-			rgbbase[j + 1] = YUV444TORGBA8888(ybase[j + 1], ubase[uv_index],
-				vbase[uv_index]);
-			rgbbase[j + 2] = YUV444TORGBA8888(ybase[j + 2], ubase[uv_index],
-				vbase[uv_index]);
-			rgbbase[j + 3] = YUV444TORGBA8888(ybase[j + 3], ubase[uv_index],
-				vbase[uv_index]);
-    		uv_index++;
+			rgbBase[j] = YUV444TORGBA8888(yBase[j], uBase[uvIndex],
+				vBase[uvIndex]);
+			rgbBase[j + 1] = YUV444TORGBA8888(yBase[j + 1], uBase[uvIndex],
+				vBase[uvIndex]);
+			rgbBase[j + 2] = YUV444TORGBA8888(yBase[j + 2], uBase[uvIndex],
+				vBase[uvIndex]);
+			rgbBase[j + 3] = YUV444TORGBA8888(yBase[j + 3], uBase[uvIndex],
+				vBase[uvIndex]);
+			uvIndex++;
 		}
 
 		// Advance pointers to next line
-		ybase += in->linesize[0];
+		yBase += in->linesize[0];
 
 		if ((i & 3) == 0) {
 			// These are the same for 4 lines
-			ubase += in->linesize[1];
-			vbase += in->linesize[2];
+			uBase += in->linesize[1];
+			vBase += in->linesize[2];
 		}
 		
-		rgbbase += out->linesize[0] / 4;
+		rgbBase += out->linesize[0] / 4;
 	}
 
 }
@@ -207,32 +207,32 @@ gfx_conv_yuv411p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 void
 gfx_conv_YCbCr422_RGB32_c(AVFrame *in, AVFrame *out, int width, int height)
 {
-	uint8 *ybase = (uint8 *)in->data[0];
-	uint8 *ubase = (uint8 *)in->data[1];
-	uint8 *vbase = (uint8 *)in->data[2];
-	
-	uint32 *rgbbase = (uint32 *)out->data[0];
+	uint8 *yBase = (uint8 *)in->data[0];
+	uint8 *uBase = (uint8 *)in->data[1];
+	uint8 *vBase = (uint8 *)in->data[2];
 
-	int uv_index;
+	uint32 *rgbBase = (uint32 *)out->data[0];
+
+	int uvIndex;
 
 	for (int32 i = 0; i < height; i++) {
 
-		uv_index = 0;
+		uvIndex = 0;
 
 		for (uint32 j=0; j < width; j+=2) {
-			rgbbase[j] = YUV444TORGBA8888(ybase[j], ubase[uv_index],
-				vbase[uv_index]);
-			rgbbase[j + 1] = YUV444TORGBA8888(ybase[j + 1], ubase[uv_index],
-				vbase[uv_index]);
-    	
-    		uv_index++;
+			rgbBase[j] = YUV444TORGBA8888(yBase[j], uBase[uvIndex],
+				vBase[uvIndex]);
+			rgbBase[j + 1] = YUV444TORGBA8888(yBase[j + 1], uBase[uvIndex],
+				vBase[uvIndex]);
+
+			uvIndex++;
 		}
-		
-		ybase += in->linesize[0];
-		ubase += in->linesize[1];
-		vbase += in->linesize[2];
-		
-		rgbbase += out->linesize[0] / 4;
+
+		yBase += in->linesize[0];
+		uBase += in->linesize[1];
+		vBase += in->linesize[2];
+
+		rgbBase += out->linesize[0] / 4;
 	}
 
 	if (height & 1) {
