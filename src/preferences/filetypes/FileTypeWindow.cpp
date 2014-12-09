@@ -116,7 +116,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 
 	BLayoutBuilder::Grid<>(preferredBox, padding, padding / 2)
 		.SetInsets(padding, padding * 2, padding, padding)
-		.Add(fPreferredField, 0, 0, 3, 1)
+		.Add(fPreferredField, 0, 0, 2, 1)
 		.Add(fSelectAppButton, 0, 1)
 		.Add(fSameAppAsButton, 1, 1);
 
