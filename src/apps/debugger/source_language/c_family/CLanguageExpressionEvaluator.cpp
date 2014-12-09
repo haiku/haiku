@@ -18,11 +18,18 @@
 #include "CLanguageTokenizer.h"
 #include "ExpressionInfo.h"
 #include "FloatValue.h"
+#include "IntegerFormatter.h"
 #include "IntegerValue.h"
+#include "ObjectID.h"
 #include "StackFrame.h"
+#include "SyntheticPrimitiveType.h"
+#include "TeamTypeInformation.h"
 #include "Thread.h"
 #include "Type.h"
+#include "TypeHandlerRoster.h"
+#include "TypeLookupConstraints.h"
 #include "Value.h"
+#include "ValueLocation.h"
 #include "ValueNode.h"
 #include "ValueNodeManager.h"
 #include "Variable.h"
@@ -140,6 +147,42 @@ static BString TokenTypeToString(int32 type)
 
 	return token;
 }
+
+
+// #pragma mark - CLanguageExpressionEvaluator::InternalVariableID
+
+
+class CLanguageExpressionEvaluator::InternalVariableID : public ObjectID {
+public:
+	InternalVariableID(const BVariant& value)
+		:
+		fValue(value)
+	{
+	}
+
+	virtual ~InternalVariableID()
+	{
+	}
+
+	virtual	bool operator==(const ObjectID& other) const
+	{
+		const InternalVariableID* otherID
+			= dynamic_cast<const InternalVariableID*>(&other);
+		if (otherID == NULL)
+			return false;
+
+		return fValue == otherID->fValue;
+	}
+
+protected:
+	virtual	uint32 ComputeHashValue() const
+	{
+		return *(uint32*)(&fValue);
+	}
+
+private:
+	BVariant fValue;
+};
 
 
 // #pragma mark - CLanguageExpressionEvaluator::Operand
@@ -1394,6 +1437,7 @@ private:
 CLanguageExpressionEvaluator::CLanguageExpressionEvaluator()
 	:
 	fTokenizer(new Tokenizer()),
+	fTypeInfo(NULL),
 	fNodeManager(NULL)
 {
 }
@@ -1407,9 +1451,10 @@ CLanguageExpressionEvaluator::~CLanguageExpressionEvaluator()
 
 ExpressionResult*
 CLanguageExpressionEvaluator::Evaluate(const char* expressionString,
-	ValueNodeManager* manager)
+	ValueNodeManager* manager, TeamTypeInformation* info)
 {
 	fNodeManager = manager;
+	fTypeInfo = info;
 	fTokenizer->SetTo(expressionString);
 
 	Operand value = _ParseSum();
@@ -1420,26 +1465,26 @@ CLanguageExpressionEvaluator::Evaluate(const char* expressionString,
 	ExpressionResult* result = new(std::nothrow)ExpressionResult;
 	if (result != NULL) {
 		BReference<ExpressionResult> resultReference(result, true);
-		Value* outputValue = NULL;
-		BVariant primitive = value.PrimitiveValue();
-		if (primitive.IsInteger())
-			outputValue = new(std::nothrow) IntegerValue(primitive);
-		else if (primitive.IsFloat()) {
-			outputValue = new(std::nothrow) FloatValue(
-				primitive.ToDouble());
-		}
-
-		BReference<Value> valueReference;
-		if (outputValue != NULL)
-			valueReference.SetTo(outputValue, true);
-
 		if (value.Kind() == OPERAND_KIND_PRIMITIVE) {
-			if (outputValue == NULL)
-				return NULL;
+			Value* outputValue = NULL;
+			BVariant primitive = value.PrimitiveValue();
+			if (primitive.IsInteger())
+				outputValue = new(std::nothrow) IntegerValue(primitive);
+			else if (primitive.IsFloat()) {
+				outputValue = new(std::nothrow) FloatValue(
+					primitive.ToDouble());
+			}
 
-			result->SetToPrimitive(outputValue);
+			BReference<Value> valueReference;
+			if (outputValue != NULL) {
+				valueReference.SetTo(outputValue, true);
+				result->SetToPrimitive(outputValue);
+			} else
+				return NULL;
 		} else if (value.Kind() == OPERAND_KIND_VALUE_NODE)
 			result->SetToValueNode(value.GetValueNode()->NodeChild());
+		else if (value.Kind() == OPERAND_KIND_TYPE)
+			result->SetToType(value.GetType());
 
 		resultReference.Detach();
 	}
@@ -1638,13 +1683,30 @@ CLanguageExpressionEvaluator::Operand
 CLanguageExpressionEvaluator::_ParseIdentifier(ValueNode* parentNode)
 {
 	Token token = fTokenizer->NextToken();
+	const BString& identifierName = token.string;
+
+	if (fTypeInfo != NULL) {
+		Type* resultType = NULL;
+		status_t error = fTypeInfo->LookupTypeByName(identifierName,
+			TypeLookupConstraints(), resultType);
+		if (error == B_OK) {
+			BReference<Type> typeReference(resultType, true);
+			return _ParseType(resultType);
+		} else if (error != B_ENTRY_NOT_FOUND) {
+			BString errorMessage;
+			errorMessage.SetToFormat("Failed to look up type name '%s': %"
+				B_PRId32 ".", identifierName.String(), error);
+			throw ParseException(errorMessage.String(), token.position);
+		}
+
+		// we didn't recognize the identifier as a type name, fall through
+		// and see if it's possibly a value
+	}
 
 	if (fNodeManager == NULL) {
 		throw ParseException("Identifiers not resolvable without manager.",
 			token.position);
 	}
-
-	const BString& identifierName = token.string;
 
 	ValueNodeContainer* container = fNodeManager->GetContainer();
 	AutoLocker<ValueNodeContainer> containerLocker(container);
@@ -1725,7 +1787,7 @@ CLanguageExpressionEvaluator::_ParseAtom()
 {
 	Token token = fTokenizer->NextToken();
 	if (token.type == TOKEN_END_OF_LINE)
-		throw ParseException("unexpected end of expression", token.position);
+		throw ParseException("Unexpected end of expression", token.position);
 
 	Operand value;
 
@@ -1739,6 +1801,41 @@ CLanguageExpressionEvaluator::_ParseAtom()
 		value = _ParseSum();
 
 		_EatToken(TOKEN_CLOSING_PAREN);
+	}
+
+	if (value.Kind() == OPERAND_KIND_TYPE) {
+		token = fTokenizer->NextToken();
+		if (token.type == TOKEN_END_OF_LINE)
+			return value;
+
+		Type* castType = value.GetType();
+		// if our evaluated result was a type, and there still remain
+		// further tokens to evaluate, then this is a typecast for
+		// a subsequent expression. Attempt to evaluate it, and then
+		// apply the cast to the result.
+		fTokenizer->RewindToken();
+		value = _ParseSum();
+		ValueNodeChild* child = NULL;
+		if (value.Kind() != OPERAND_KIND_PRIMITIVE
+			&& value.Kind() != OPERAND_KIND_VALUE_NODE) {
+			throw ParseException("Expected value or variable expression after"
+				" typecast.", token.position);
+		}
+
+		if (value.Kind() == OPERAND_KIND_VALUE_NODE)
+			child = value.GetValueNode()->NodeChild();
+		else if (value.Kind() == OPERAND_KIND_PRIMITIVE)
+			_GetNodeChildForPrimitive(token, value.PrimitiveValue(), child);
+
+		ValueNode* newNode = NULL;
+		status_t error = TypeHandlerRoster::Default()->CreateValueNode(child,
+			castType, newNode);
+		if (error != B_OK) {
+			throw ParseException("Unable to create value node for typecast"
+				" operation.", token.position);
+		}
+		child->SetNode(newNode);
+		value.SetTo(newNode);
 	}
 
 	return value;
@@ -1760,28 +1857,6 @@ CLanguageExpressionEvaluator::_EatToken(int32 type)
 				expected = "a constant";
 				break;
 
-			case TOKEN_PLUS:
-			case TOKEN_MINUS:
-			case TOKEN_STAR:
-			case TOKEN_MODULO:
-			case TOKEN_POWER:
-			case TOKEN_OPENING_PAREN:
-			case TOKEN_CLOSING_PAREN:
-			case TOKEN_LOGICAL_AND:
-			case TOKEN_BITWISE_AND:
-			case TOKEN_LOGICAL_OR:
-			case TOKEN_BITWISE_OR:
-			case TOKEN_LOGICAL_NOT:
-			case TOKEN_BITWISE_NOT:
-			case TOKEN_EQ:
-			case TOKEN_NE:
-			case TOKEN_GT:
-			case TOKEN_GE:
-			case TOKEN_LT:
-			case TOKEN_LE:
-				expected << "'" << TokenTypeToString(type) << "'";
-				break;
-
 			case TOKEN_SLASH:
 				expected = "'/', '\\', or ':'";
 				break;
@@ -1789,12 +1864,87 @@ CLanguageExpressionEvaluator::_EatToken(int32 type)
 			case TOKEN_END_OF_LINE:
 				expected = "'\\n'";
 				break;
+
+			default:
+				expected << "'" << TokenTypeToString(type) << "'";
+				break;
 		}
+
 		BString temp;
 		temp << "Expected " << expected.String() << " got '" << token.string
 			<< "'";
 		throw ParseException(temp.String(), token.position);
 	}
+}
+
+
+CLanguageExpressionEvaluator::Operand
+CLanguageExpressionEvaluator::_ParseType(Type* baseType)
+{
+	BReference<Type> typeReference;
+	Type* finalType = baseType;
+
+	bool arraySpecifierEncountered = false;
+	status_t error;
+	for (;;) {
+		Token token = fTokenizer->NextToken();
+		if (token.type == TOKEN_STAR || token.type == TOKEN_BITWISE_AND) {
+			if (arraySpecifierEncountered)
+				break;
+
+			address_type_kind addressKind = (token.type == TOKEN_STAR)
+					? DERIVED_TYPE_POINTER : DERIVED_TYPE_REFERENCE;
+			AddressType* derivedType = NULL;
+			error = finalType->CreateDerivedAddressType(addressKind,
+				derivedType);
+			if (error != B_OK) {
+				BString errorMessage;
+				errorMessage.SetToFormat("Failed to create derived address"
+					" type %d for base type %s: %s (%" B_PRId32 ")",
+					addressKind, finalType->Name().String(), strerror(error),
+					error);
+				throw ParseException(errorMessage, token.position);
+			}
+
+			finalType = derivedType;
+			typeReference.SetTo(finalType, true);
+		} else if (token.type == TOKEN_OPENING_SQUARE_BRACKET) {
+			Operand indexSize = _ParseSum();
+			if (indexSize.Kind() == OPERAND_KIND_TYPE) {
+				throw ParseException("Cannot specify type name as array"
+					" subscript.", token.position);
+			}
+
+			_EatToken(TOKEN_CLOSING_SQUARE_BRACKET);
+
+			uint32 resolvedSize = indexSize.PrimitiveValue().ToUInt32();
+			if (resolvedSize == 0) {
+				throw ParseException("Non-zero array size required in type"
+					" specifier.", token.position);
+			}
+
+			ArrayType* derivedType = NULL;
+			error = finalType->CreateDerivedArrayType(0, resolvedSize, true,
+				derivedType);
+			if (error != B_OK) {
+				BString errorMessage;
+				errorMessage.SetToFormat("Failed to create derived array type"
+					" of size %" B_PRIu32 " for base type %s: %s (%"
+					B_PRId32 ")", resolvedSize, finalType->Name().String(),
+					strerror(error), error);
+				throw ParseException(errorMessage, token.position);
+			}
+
+			arraySpecifierEncountered = true;
+			finalType = derivedType;
+			typeReference.SetTo(finalType, true);
+		} else
+			break;
+	}
+
+	typeReference.Detach();
+	fTokenizer->RewindToken();
+	return Operand(finalType);
 }
 
 
@@ -1830,5 +1980,61 @@ CLanguageExpressionEvaluator::_RequestValueIfNeeded(
 		errorMessage.SetToFormat("Unable to resolve variable value for '%s': "
 			"%s", child->Name().String(), strerror(state));
 		throw ParseException(errorMessage, token.position);
+	}
+}
+
+
+void
+CLanguageExpressionEvaluator::_GetNodeChildForPrimitive(const Token& token,
+	const BVariant& value, ValueNodeChild*& _output) const
+{
+	Type* type = new(std::nothrow) SyntheticPrimitiveType(value.Type());
+	if (type == NULL) {
+		throw ParseException("Out of memory while creating type object.",
+			token.position);
+	}
+
+	BReference<Type> typeReference(type, true);
+	ValueLocation* location = new(std::nothrow) ValueLocation();
+	if (location == NULL) {
+		throw ParseException("Out of memory while creating location object.",
+			token.position);
+	}
+
+	BReference<ValueLocation> locationReference(location, true);
+	ValuePieceLocation piece;
+	if (!piece.SetToValue(value.Bytes(), value.Size())
+		|| !location->AddPiece(piece)) {
+		throw ParseException("Out of memory populating location"
+			" object.", token.position);
+	}
+
+	char variableName[32];
+	if (!IntegerFormatter::FormatValue(value, INTEGER_FORMAT_HEX_DEFAULT,
+		variableName, sizeof(variableName))) {
+		throw ParseException("Failed to generate internal variable name.",
+			token.position);
+	}
+
+	InternalVariableID* id = new(std::nothrow) InternalVariableID(value);
+	if (id == NULL) {
+		throw ParseException("Out of memory while creating ID object.",
+			token.position);
+	}
+
+	BReference<ObjectID> idReference(id, true);
+	Variable* variable = new(std::nothrow) Variable(id, variableName, type,
+		location);
+	if (variable == NULL) {
+		throw ParseException("Out of memory while creating variable object.",
+			token.position);
+	}
+
+	BReference<Variable> variableReference(variable, true);
+	_output = new(std::nothrow) VariableValueNodeChild(
+		variable);
+	if (_output == NULL) {
+		throw ParseException("Out of memory while creating node child object.",
+			token.position);
 	}
 }

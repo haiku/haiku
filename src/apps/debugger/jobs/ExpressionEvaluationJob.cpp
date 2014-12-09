@@ -91,7 +91,7 @@ ExpressionEvaluationJob::Do()
 
 	ValueNode* neededNode = NULL;
 	result = fLanguage->EvaluateExpression(fExpressionInfo->Expression(),
-		fManager, fResultValue, neededNode);
+		fManager, fTeam->GetTeamTypeInformation(), fResultValue, neededNode);
 	if (neededNode != NULL) {
 		result = ResolveNodeValue(neededNode);
 		if (State() == JOB_STATE_WAITING)

@@ -169,14 +169,14 @@ CLanguageFamily::ParseTypeExpression(const BString& expression,
 
 status_t
 CLanguageFamily::EvaluateExpression(const BString& expression,
-	ValueNodeManager* manager, ExpressionResult*& _output,
-	ValueNode*& _neededNode)
+	ValueNodeManager* manager, TeamTypeInformation* info,
+	ExpressionResult*& _output, ValueNode*& _neededNode)
 {
 	_output = NULL;
 	_neededNode = NULL;
 	CLanguageExpressionEvaluator evaluator;
 	try {
-		_output = evaluator.Evaluate(expression, manager);
+		_output = evaluator.Evaluate(expression, manager, info);
 		return B_OK;
 	} catch (ParseException ex) {
 		BString error;

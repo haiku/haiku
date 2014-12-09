@@ -20,7 +20,9 @@ namespace CLanguage {
 	class Tokenizer;
 }
 
-
+class BVariant;
+class TeamTypeInformation;
+class Type;
 class ValueNode;
 class ValueNodeChild;
 class ValueNodeManager;
@@ -45,17 +47,19 @@ class Number;
 
 class CLanguageExpressionEvaluator {
 
- public:
+public:
 								CLanguageExpressionEvaluator();
 								~CLanguageExpressionEvaluator();
 
 			ExpressionResult*	Evaluate(const char* expressionString,
-									ValueNodeManager* manager);
+									ValueNodeManager* manager,
+									TeamTypeInformation* info);
 
- private:
+private:
+ 			class InternalVariableID;
 			class Operand;
 
- private:
+private:
 			Operand				_ParseSum();
 			Operand				_ParseProduct();
 			Operand				_ParsePower();
@@ -65,11 +69,27 @@ class CLanguageExpressionEvaluator {
 
 			void				_EatToken(int32 type);
 
+			Operand				_ParseType(Type* baseType);
+									// the passed in Type object
+									// is expected to be the initial
+									// base type that was recognized by
+									// e.g. ParseIdentifier. This function then
+									// takes care of handling any modifiers
+									// that go with it, and returns a
+									// corresponding final type.
+
 			void				_RequestValueIfNeeded(
 									const CLanguage::Token& token,
 									ValueNodeChild* child);
 
+			void				_GetNodeChildForPrimitive(
+									const CLanguage::Token& token,
+									const BVariant& value,
+									ValueNodeChild*& _output) const;
+
+private:
 			CLanguage::Tokenizer* fTokenizer;
+			TeamTypeInformation* fTypeInfo;
 			ValueNodeManager*	fNodeManager;
 };
 

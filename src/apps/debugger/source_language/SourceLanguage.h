@@ -35,6 +35,7 @@ public:
 
 	virtual	status_t			EvaluateExpression(const BString& expression,
 									ValueNodeManager* manager,
+									TeamTypeInformation* info,
 									ExpressionResult*& _output,
 									ValueNode*& _neededNode);
 };
