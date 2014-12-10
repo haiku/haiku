@@ -137,12 +137,12 @@ AbstractArrayValueNode::CreateChildrenInRange(int32 lowIndex,
 		fLowerBound = lowerBound;
 		fUpperBound = upperBound;
 		fBoundsInitialized = true;
-	} else {
-		if (lowIndex < fLowerBound)
-			fLowerBound = lowIndex;
-		if (highIndex > fUpperBound)
-			fUpperBound = highIndex;
 	}
+
+	if (lowIndex < fLowerBound)
+		lowIndex = fLowerBound;
+	if (highIndex > fUpperBound)
+		highIndex = fUpperBound;
 
 	// create children for the array elements
 	for (int32 i = lowIndex; i <= highIndex; i++) {
