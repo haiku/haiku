@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+
 #include <ControlLook.h>
 #include <Bitmap.h>
 #include <TextControl.h>
@@ -280,20 +282,8 @@ BColorControl::SetValue(int32 value)
 		Invalidate(_PaletteSelectorFrame(fSelectedPaletteColorIndex));
 
 		fPreviousSelectedPaletteColorIndex = fSelectedPaletteColorIndex;
-	} else {
-		if (c1.red != c2.red) {
-			_InvalidateSelector(1, c1, IsFocus() && fFocusedRamp == 1);
-			_InvalidateSelector(1, c2, IsFocus() && fFocusedRamp == 1);
-		}
-		if (c1.green != c2.green) {
-			_InvalidateSelector(2, c1, IsFocus() && fFocusedRamp == 2);
-			_InvalidateSelector(2, c2, IsFocus() && fFocusedRamp == 2);
-		}
-		if (c1.blue != c2.blue) {
-			_InvalidateSelector(3, c1, IsFocus() && fFocusedRamp == 3);
-			_InvalidateSelector(3, c2, IsFocus() && fFocusedRamp == 3);
-		}
-	}
+	} else if (c1 != c2)
+		Invalidate();
 
 	// Set the value here, since BTextControl will trigger
 	// Window()->UpdateIfNeeded() which will cause us to draw the indicators
@@ -472,10 +462,11 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 			}
 		}
 	} else {
+		rgb_color color = ValueAsColor();
 		rgb_color white = { 255, 255, 255, 255 };
-		rgb_color red   = { 255, 0, 0, 255 };
-		rgb_color green = { 0, 255, 0, 255 };
-		rgb_color blue  = { 0, 0, 255, 255 };
+		rgb_color red   = { 255, color.green, color.blue, 255 };
+		rgb_color green = { color.red, 255, color.blue, 255 };
+		rgb_color blue  = { color.red, color.green, 255, 255 };
 
 		rgb_color compColor = { 0, 0, 0, 255 };
 		if (!enabled) {
