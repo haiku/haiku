@@ -91,6 +91,11 @@ SimpleTest CheckBoxTest :
 	: be [ TargetLibsupc++ ]
 	;
 
+SimpleTest ListViewTest :
+	ListViewTest.cpp
+	: be [ TargetLibsupc++ ]
+	;
+
 SimpleTest ScreenTest :
 	ScreenTest.cpp
 	: be
