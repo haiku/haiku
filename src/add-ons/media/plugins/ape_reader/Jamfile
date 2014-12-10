@@ -1,16 +1,21 @@
 SubDir HAIKU_TOP src add-ons media plugins ape_reader ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders media ;
+SubDirHdrs [ FDirName $(SUBDIR) ../LibMonkeysAudio ] ;
 
 SubDirHdrs [ FDirName $(SUBDIR) LibMonkeysAudio ] ;
 SubDirHdrs [ FDirName $(SUBDIR) MAClib ] ;
 
-Addon ape_reader :
-	APEReader.cpp
-	: libMonkeysAudio.a MAClib.a be libmedia.so [ TargetLibsupc++ ]
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Addon [ MultiArchDefaultGristFiles ape_reader ] :
+			APEReader.cpp
+			: [ MultiArchDefaultGristFiles libMonkeysAudio.a MAClib.a ]
+			be media [ TargetLibsupc++ ]
+		;
+	}
+}
 
 SubInclude HAIKU_TOP src add-ons media plugins ape_reader LibMonkeysAudio ;
 SubInclude HAIKU_TOP src add-ons media plugins ape_reader MAClib ;
