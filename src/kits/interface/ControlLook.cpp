@@ -1344,6 +1344,12 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
+	// Snap the rectangle to pixels to avoid rounding errors.
+	rect.left = floorf(rect.left);
+	rect.right = floorf(rect.right);
+	rect.top = floorf(rect.top);
+	rect.bottom = floorf(rect.bottom);
+
 	// save the clipping constraints of the view
 	view->PushState();
 
