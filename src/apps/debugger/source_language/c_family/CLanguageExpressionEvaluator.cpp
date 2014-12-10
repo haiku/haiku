@@ -72,10 +72,6 @@ static BString TokenTypeToString(int32 type)
 			token = "%";
 			break;
 
-		case TOKEN_POWER:
-			token = "**";
-			break;
-
 		case TOKEN_OPENING_PAREN:
 			token = "(";
 			break;
@@ -1521,17 +1517,17 @@ CLanguageExpressionEvaluator::_ParseProduct()
 {
 	static Operand zero(int64(0LL));
 
-	Operand value = _ParsePower();
+	Operand value = _ParseUnary();
 
 	while (true) {
 		Token token = fTokenizer->NextToken();
 		switch (token.type) {
 			case TOKEN_STAR:
-				value *= _ParsePower();
+				value *= _ParseUnary();
 				break;
 			case TOKEN_SLASH:
 			{
-				Operand rhs = _ParsePower();
+				Operand rhs = _ParseUnary();
 				if (rhs == zero)
 					throw ParseException("division by zero", token.position);
 				value /= rhs;
@@ -1540,7 +1536,7 @@ CLanguageExpressionEvaluator::_ParseProduct()
 
 			case TOKEN_MODULO:
 			{
-				Operand rhs = _ParsePower();
+				Operand rhs = _ParseUnary();
 				if (rhs == zero)
 					throw ParseException("modulo by zero", token.position);
 				value %= rhs;
@@ -1550,7 +1546,7 @@ CLanguageExpressionEvaluator::_ParseProduct()
 			case TOKEN_LOGICAL_AND:
 			{
 				value.SetTo((value != zero)
-					&& (_ParsePower() != zero));
+					&& (_ParseUnary() != zero));
 
 				break;
 			}
@@ -1558,86 +1554,49 @@ CLanguageExpressionEvaluator::_ParseProduct()
 			case TOKEN_LOGICAL_OR:
 			{
 				value.SetTo((value != zero)
-					|| (_ParsePower() != zero));
+					|| (_ParseUnary() != zero));
 				break;
 			}
 
 			case TOKEN_BITWISE_AND:
-				value &= _ParsePower();
+				value &= _ParseUnary();
 				break;
 
 			case TOKEN_BITWISE_OR:
-				value |= _ParsePower();
+				value |= _ParseUnary();
 				break;
 
 			case TOKEN_BITWISE_XOR:
-				value ^= _ParsePower();
+				value ^= _ParseUnary();
 				break;
 
 			case TOKEN_EQ:
-				value.SetTo((int64)(value == _ParsePower()));
+				value.SetTo((int64)(value == _ParseUnary()));
 				break;
 
 			case TOKEN_NE:
-				value.SetTo((int64)(value != _ParsePower()));
+				value.SetTo((int64)(value != _ParseUnary()));
 				break;
 
 			case TOKEN_GT:
-				value.SetTo((int64)(value > _ParsePower()));
+				value.SetTo((int64)(value > _ParseUnary()));
 				break;
 
 			case TOKEN_GE:
-				value.SetTo((int64)(value >= _ParsePower()));
+				value.SetTo((int64)(value >= _ParseUnary()));
 				break;
 
 			case TOKEN_LT:
-				value.SetTo((int64)(value < _ParsePower()));
+				value.SetTo((int64)(value < _ParseUnary()));
 				break;
 
 			case TOKEN_LE:
-				value.SetTo((int64)(value <= _ParsePower()));
+				value.SetTo((int64)(value <= _ParseUnary()));
 				break;
 
 			default:
 				fTokenizer->RewindToken();
 				return value;
-		}
-	}
-}
-
-
-CLanguageExpressionEvaluator::Operand
-CLanguageExpressionEvaluator::_ParsePower()
-{
-	Operand value = _ParseUnary();
-
-	while (true) {
-		Token token = fTokenizer->NextToken();
-		if (token.type != TOKEN_POWER) {
-			fTokenizer->RewindToken();
-			return value;
-		}
-
-		Operand power = _ParseUnary();
-		Operand temp = value;
-		int64 powerValue = power.PrimitiveValue().ToInt64();
-		bool handleNegativePower = false;
-		if (powerValue < 0) {
-			powerValue = abs(powerValue);
-			handleNegativePower = true;
-		}
-
-		if (powerValue == 0)
-			value.SetTo((int64)1);
-		else {
-			for (; powerValue > 1; powerValue--)
-				value *= temp;
-		}
-
-		if (handleNegativePower) {
-			temp.SetTo((int64)1);
-			temp /= value;
-			value = temp;
 		}
 	}
 }

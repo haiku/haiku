@@ -273,10 +273,6 @@ Tokenizer::_ParseOperator()
 
 		case '*':
 			switch (_Peek()) {
-				case '*':
-					type = TOKEN_POWER;
-					length = 2;
-					break;
 				case '/':
 					type = TOKEN_END_COMMENT_BLOCK;
 					length = 2;

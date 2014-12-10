@@ -62,7 +62,6 @@ private:
 private:
 			Operand				_ParseSum();
 			Operand				_ParseProduct();
-			Operand				_ParsePower();
 			Operand				_ParseUnary();
 			Operand				_ParseIdentifier(ValueNode* parentNode = NULL);
 			Operand				_ParseAtom();

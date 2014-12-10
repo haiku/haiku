@@ -326,7 +326,6 @@ CLanguageFamilySyntaxHighlightInfo::_MapTokenToSyntaxType(const Token& token)
 		case TOKEN_STAR:
 		case TOKEN_SLASH:
 		case TOKEN_MODULO:
-		case TOKEN_POWER:
 		case TOKEN_OPENING_PAREN:
 		case TOKEN_CLOSING_PAREN:
 		case TOKEN_OPENING_SQUARE_BRACKET:
