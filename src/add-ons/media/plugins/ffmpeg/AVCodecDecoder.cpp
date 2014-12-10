@@ -1144,8 +1144,8 @@ AVCodecDecoder::_UpdateMediaHeaderForAudioFrame()
 	and the start time it should be presented isn't established at the moment.
 	Though this	might change in the future.
 
-    More over the fOutputFrameRate variable is updated for every decoded video
-    frame.
+	More over the fOutputFrameRate variable is updated for every decoded video
+	frame.
 
 	On first call the member variables fSwsContext / fFormatConversionFunc	are
 	initialized.
@@ -1154,11 +1154,18 @@ AVCodecDecoder::_UpdateMediaHeaderForAudioFrame()
 	\returns B_LAST_BUFFER_ERROR when there are no more video frames available.
 	\returns B_NO_MEMORY when we have no memory left for correct operation.
 	\returns Other Errors
- */
+*/
 status_t
 AVCodecDecoder::_DecodeNextVideoFrame()
 {
+#if 0
+	// Well, I heard this was not supposed to happen, but it does
+	// (for example with http://thud.us/videos/misc/xvid-samples/flyby-divx.avi
+	// see #11409). Since that video otherwise plays fine when removing the
+	// assert, I'm assuming we are being overcautious here and commenting it
+	// out.
 	assert(fTempPacket.size >= 0);
+#endif
 
 	while (true) {
 		status_t loadingChunkStatus
