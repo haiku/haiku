@@ -15,9 +15,6 @@ public:
 	virtual						~CLanguage();
 
 	virtual	const char*			Name() const;
-
-protected:
-	virtual	bool				IsModifierValid(char modifier) const;
 };
 
 

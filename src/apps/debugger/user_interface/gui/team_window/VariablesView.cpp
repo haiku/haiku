@@ -544,6 +544,34 @@ public:
 };
 
 
+// #pragma mark - VariablesExpressionInfo
+
+
+class VariablesView::VariablesExpressionInfo : public ExpressionInfo {
+public:
+	VariablesExpressionInfo(const BString& expression, ModelNode* node)
+		:
+		ExpressionInfo(expression),
+		fTargetNode(node)
+	{
+		fTargetNode->AcquireReference();
+	}
+
+	virtual ~VariablesExpressionInfo()
+	{
+		fTargetNode->ReleaseReference();
+	}
+
+	inline ModelNode* TargetNode() const
+	{
+		return fTargetNode;
+	}
+
+private:
+	ModelNode* fTargetNode;
+};
+
+
 // #pragma mark - VariableValueColumn
 
 
@@ -1708,6 +1736,7 @@ VariablesView::VariablesView(Listener* listener)
 	fExpressions(NULL),
 	fExpressionChildren(10, false),
 	fTableCellContextMenuTracker(NULL),
+	fPendingTypecastInfo(NULL),
 	fFrameClearPending(false),
 	fListener(listener)
 {
@@ -1730,6 +1759,8 @@ VariablesView::~VariablesView()
 	}
 
 	delete fContainerListener;
+	if (fPendingTypecastInfo != NULL)
+		fPendingTypecastInfo->ReleaseReference();
 }
 
 
@@ -1848,44 +1879,27 @@ VariablesView::MessageReceived(BMessage* message)
 				break;
 			}
 
-			Type* type = NULL;
-			BString typeExpression = message->FindString("text");
-			if (typeExpression.Length() == 0)
-				break;
+			BString typeExpression;
+			if (message->FindString("text", &typeExpression) == B_OK) {
+				if (typeExpression.IsEmpty())
+					break;
 
-			FileSourceCode* code = fStackFrame->Function()->GetFunction()
-				->GetSourceCode();
-			if (code == NULL)
-				break;
+				if (fPendingTypecastInfo != NULL)
+					fPendingTypecastInfo->ReleaseReference();
 
-			SourceLanguage* language = code->GetSourceLanguage();
-			if (language == NULL)
-				break;
+				fPendingTypecastInfo = new(std::nothrow)
+					VariablesExpressionInfo(typeExpression, node);
+				if (fPendingTypecastInfo == NULL) {
+					// TODO: notify user
+					break;
+				}
 
-			if (language->ParseTypeExpression(typeExpression,
-				fThread->GetTeam()->DebugInfo(), type) != B_OK) {
-				BString errorMessage;
-				errorMessage.SetToFormat("Failed to resolve type %s",
-					typeExpression.String());
-				BAlert* alert = new(std::nothrow) BAlert("Error",
-					errorMessage.String(), "Close");
-				if (alert != NULL)
-					alert->Go();
+				fPendingTypecastInfo->AddListener(this);
+				fListener->ExpressionEvaluationRequested(fPendingTypecastInfo,
+					fStackFrame, fThread);
 				break;
-			}
-
-			BReference<Type> typeRef(type, true);
-			ValueNode* valueNode = NULL;
-			if (TypeHandlerRoster::Default()->CreateValueNode(
-					node->NodeChild(), type, valueNode) != B_OK) {
+			} else
 				break;
-			}
-
-			typeRef.Detach();
-			node->NodeChild()->SetNode(valueNode);
-			node->SetCastedType(type);
-			fVariableTableModel->NotifyNodeChanged(node);
-			break;
 		}
 		case MSG_TYPECAST_TO_ARRAY:
 		{
@@ -2071,7 +2085,17 @@ VariablesView::MessageReceived(BMessage* message)
 				valueReference.SetTo(value, true);
 			}
 
-			_AddExpressionNode(info, result, value);
+			VariablesExpressionInfo* variableInfo
+				= dynamic_cast<VariablesExpressionInfo*>(info);
+			if (variableInfo != NULL) {
+				if (fPendingTypecastInfo == variableInfo) {
+					_HandleTypecastResult(result, value);
+					fPendingTypecastInfo->ReleaseReference();
+					fPendingTypecastInfo = NULL;
+				}
+			} else
+				_AddExpressionNode(info, result, value);
+
 			break;
 		}
 		case MSG_VALUE_NODE_CHANGED:
@@ -2982,6 +3006,60 @@ VariablesView::_AddExpressionNode(ExpressionInfo* info, status_t result,
 				fVariableTableModel->Root(), path);
 		}
 	}
+}
+
+
+void
+VariablesView::_HandleTypecastResult(status_t result, ExpressionResult* value)
+{
+	BString errorMessage;
+	if (value == NULL) {
+		errorMessage.SetToFormat("Failed to evaluate expression \"%s\": %s (%"
+			B_PRId32 ")", fPendingTypecastInfo->Expression().String(),
+			strerror(result), result);
+	} else if (result != B_OK) {
+		BVariant valueData;
+		value->PrimitiveValue()->ToVariant(valueData);
+
+		// usually, the evaluation can give us back an error message to
+		// specifically indicate why it failed. If it did, simply use
+		// the message directly, otherwise fall back to generating an error
+		// message based on the error code
+		if (valueData.Type() == B_STRING_TYPE)
+			errorMessage = valueData.ToString();
+		else {
+			errorMessage.SetToFormat("Failed to evaluate expression \"%s\":"
+				" %s (%" B_PRId32 ")",
+				fPendingTypecastInfo->Expression().String(), strerror(result),
+				result);
+		}
+
+	} else if (value->Kind() != EXPRESSION_RESULT_KIND_TYPE) {
+		errorMessage.SetToFormat("Expression \"%s\" does not evaluate to a"
+			" type.", fPendingTypecastInfo->Expression().String());
+	}
+
+	if (!errorMessage.IsEmpty()) {
+		BAlert* alert = new(std::nothrow) BAlert("Typecast error",
+			errorMessage, "Close");
+		if (alert != NULL)
+			alert->Go();
+
+		return;
+	}
+
+	Type* type = value->GetType();
+	BReference<Type> typeRef(type);
+	ValueNode* valueNode = NULL;
+	ModelNode* node = fPendingTypecastInfo->TargetNode();
+	if (TypeHandlerRoster::Default()->CreateValueNode(node->NodeChild(), type,
+			valueNode) != B_OK) {
+		return;
+	}
+
+	node->NodeChild()->SetNode(valueNode);
+	node->SetCastedType(type);
+	fVariableTableModel->NotifyNodeChanged(node);
 }
 
 

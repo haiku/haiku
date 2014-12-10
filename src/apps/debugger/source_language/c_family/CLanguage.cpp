@@ -23,13 +23,3 @@ CLanguage::Name() const
 {
 	return "C";
 }
-
-
-bool
-CLanguage::IsModifierValid(char modifier) const
-{
-	if (modifier == '*')
-		return true;
-
-	return false;
-}

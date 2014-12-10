@@ -23,13 +23,3 @@ CppLanguage::Name() const
 {
 	return "C++";
 }
-
-
-bool
-CppLanguage::IsModifierValid(char modifier) const
-{
-	if (modifier == '*' || modifier == '&')
-		return true;
-
-	return false;
-}

@@ -29,10 +29,6 @@ public:
 									// returns a reference,
 									// may return NULL, if not available
 
-	virtual status_t			ParseTypeExpression(const BString& expression,
-									TeamTypeInformation* info,
-									Type*& _resultType) const;
-
 	virtual	status_t			EvaluateExpression(const BString& expression,
 									ValueNodeManager* manager,
 									TeamTypeInformation* info,

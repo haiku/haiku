@@ -17,18 +17,11 @@ public:
 
 	virtual	SyntaxHighlighter*	GetSyntaxHighlighter() const;
 
-	virtual status_t 			ParseTypeExpression(const BString& expression,
-									TeamTypeInformation* lookup,
-									Type*& _resultType) const;
-
 	virtual	status_t			EvaluateExpression(const BString& expression,
 									ValueNodeManager* manager,
 									TeamTypeInformation* info,
 									ExpressionResult*& _output,
 									ValueNode*& _neededNode);
-
-protected:
-	virtual	bool				IsModifierValid(char modifier) const = 0;
 };
 
 

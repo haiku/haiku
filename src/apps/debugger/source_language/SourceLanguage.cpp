@@ -21,14 +21,6 @@ SourceLanguage::GetSyntaxHighlighter() const
 
 
 status_t
-SourceLanguage::ParseTypeExpression(const BString& expression,
-	TeamTypeInformation* info, Type*& _resultType) const
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-status_t
 SourceLanguage::EvaluateExpression(const BString& expression,
 	ValueNodeManager* manager, TeamTypeInformation* info,
 	ExpressionResult*& _resultValue, ValueNode*& _neededNode)

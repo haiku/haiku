@@ -77,6 +77,7 @@ private:
 			class VariableTableModel;
 			class ContextMenu;
 			class TableCellContextMenuTracker;
+			class VariablesExpressionInfo;
 			typedef BObjectList<ActionMenuItem> ContextActionList;
 			typedef BObjectList<ExpressionInfo> ExpressionInfoList;
 			typedef BObjectList<ValueNodeChild> ExpressionChildList;
@@ -121,6 +122,9 @@ private:
 			void				_AddExpressionNode(ExpressionInfo* info,
 									status_t result, ExpressionResult* value);
 
+			void				_HandleTypecastResult(status_t result,
+									ExpressionResult* value);
+
 			status_t			_GetTypeForTypeCode(int32 typeCode,
 									Type*& _resultType) const;
 
@@ -135,6 +139,7 @@ private:
 			ExpressionInfoTable* fExpressions;
 			ExpressionChildList	fExpressionChildren;
 			TableCellContextMenuTracker* fTableCellContextMenuTracker;
+			VariablesExpressionInfo* fPendingTypecastInfo;
 			bool				fFrameClearPending;
 			Listener*			fListener;
 };
