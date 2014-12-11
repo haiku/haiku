@@ -152,7 +152,7 @@ pixfmt_to_string(int pixFormat)
 {
 	const char* name = av_get_pix_fmt_name((enum PixelFormat)pixFormat);
 	if (name == NULL)
-		return "(unknownn)";
+		return "(unknown)";
 	return name;
 }
 
@@ -167,7 +167,7 @@ pixfmt_to_colorspace(int pixFormat)
 			// Supposed to fall through.
 		case PIX_FMT_NONE:
 			return B_NO_COLOR_SPACE;
-	
+
 		// NOTE: See pixfmt_to_colorspace() for what these are.
 		case PIX_FMT_YUV420P:
 			return B_YUV420;
