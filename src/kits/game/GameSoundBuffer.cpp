@@ -343,7 +343,7 @@ GameSoundBuffer::UpdateMods()
 }
 
 
-	void
+void
 GameSoundBuffer::Reset()
 {
 	fGain = 1.0;

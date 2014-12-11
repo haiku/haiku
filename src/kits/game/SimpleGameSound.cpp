@@ -54,12 +54,16 @@ BSimpleGameSound::BSimpleGameSound(const void *inData, size_t inFrameCount,
 	if (InitCheck() != B_OK)
 		return;
 
+	gs_audio_format actual = *format;
+	if (actual.byte_order == 0)
+		actual.byte_order = B_MEDIA_HOST_ENDIAN;
+
 	size_t frameSize
 		= get_sample_size(format->format) * format->channel_count;
 	uchar * data = new uchar[inFrameCount * frameSize];
 	memcpy(data, inData, inFrameCount * frameSize);
 
-	SetInitError(Init(data, inFrameCount, format));
+	SetInitError(Init(data, inFrameCount, &actual));
 }
 
 
