@@ -44,35 +44,12 @@
 
 
 // Sound Buffer Utility functions ----------------------------------------
-inline void
-ApplyMod(uint8 * data, uint8 * buffer, int64 index, float gain, float * pan)
+template<typename T>
+static inline void
+ApplyMod(T* data, T* buffer, int64 index, float * pan)
 {
-	data[index * 2] += uint8(float(buffer[index * 2]) * gain * pan[0]);
-	data[index * 2 + 1] += uint8(float(buffer[index * 2 + 1]) * gain * pan[1]);
-}
-
-
-inline void
-ApplyMod(int16 * data, int16 * buffer, int32 index, float gain, float * pan)
-{
-	data[index * 2] = int16(float(buffer[index * 2]) * gain * pan[0]);
-	data[index * 2 + 1] = int16(float(buffer[index * 2 + 1]) * gain * pan[1]);
-}
-
-
-inline void
-ApplyMod(int32 * data, int32 * buffer, int32 index, float gain, float * pan)
-{
-	data[index * 2] += int32(float(buffer[index * 2]) * gain * pan[0]);
-	data[index * 2 + 1] += int32(float(buffer[index * 2 + 1]) * gain * pan[1]);
-}
-
-
-inline void
-ApplyMod(float * data, float * buffer, int32 index, float gain, float * pan)
-{
-	data[index * 2] += buffer[index * 2] * gain * pan[0];
-	data[index * 2 + 1] += buffer[index * 2 + 1] * gain * pan[1];
+	data[index * 2] += T(float(buffer[index * 2]) * pan[0]);
+	data[index * 2 + 1] += T(float(buffer[index * 2 + 1]) * pan[1]);
 }
 
 
@@ -94,7 +71,7 @@ GameSoundBuffer::GameSoundBuffer(const gs_audio_format * format)
 
 	fFrameSize = get_sample_size(format->format) * format->channel_count;
 
-	memcpy(&fFormat, format, sizeof(gs_audio_format));
+	fFormat = *format;
 }
 
 
@@ -245,7 +222,7 @@ GameSoundBuffer::SetAttributes(gs_attribute * attributes,
 	status_t error = B_OK;
 
 	for (size_t i = 0; i < attributeCount; i++) {
-		switch(attributes[i].attribute) {
+		switch (attributes[i].attribute) {
 			case B_GS_GAIN:
 				error = SetGain(attributes[i].value, attributes[i].duration);
 				break;
@@ -270,57 +247,70 @@ GameSoundBuffer::SetAttributes(gs_attribute * attributes,
 void
 GameSoundBuffer::Play(void * data, int64 frames)
 {
-	float pan[2];
-	pan[0] = fPanRight;
-	pan[1] = fPanLeft;
+	// Mh... should we add some locking?
+	if (!fIsPlaying)
+		return;
 
-	char * buffer = new char[fFrameSize * frames];
+	if (fFormat.channel_count == 2) {
+		float pan[2];
+		pan[0] = fPanRight * fGain;
+		pan[1] = fPanLeft * fGain;
 
-	FillBuffer(buffer, frames);
+		char * buffer = new char[fFrameSize * frames];
 
-	switch (fFormat.format) {
-		case gs_audio_format::B_GS_U8:
-		{
-			for (int64 i = 0; i < frames; i++) {
-				ApplyMod((uint8*)data, (uint8*)buffer, i, fGain, pan);
-				UpdateMods();
+		FillBuffer(buffer, frames);
+
+		switch (fFormat.format) {
+			case gs_audio_format::B_GS_U8:
+			{
+				for (int64 i = 0; i < frames; i++) {
+					ApplyMod((uint8*)data, (uint8*)buffer, i, pan);
+					UpdateMods();
+				}
+
+				break;
 			}
 
-			break;
-		}
+			case gs_audio_format::B_GS_S16:
+			{
+				for (int64 i = 0; i < frames; i++) {
+					ApplyMod((int16*)data, (int16*)buffer, i, pan);
+					UpdateMods();
+				}
 
-		case gs_audio_format::B_GS_S16:
-		{
-			for (int64 i = 0; i < frames; i++) {
-				ApplyMod((int16*)data, (int16*)buffer, i, fGain, pan);
-				UpdateMods();
+				break;
 			}
 
-			break;
-		}
+			case gs_audio_format::B_GS_S32:
+			{
+				for (int64 i = 0; i < frames; i++) {
+					ApplyMod((int32*)data, (int32*)buffer, i, pan);
+					UpdateMods();
+				}
 
-		case gs_audio_format::B_GS_S32:
-		{
-			for (int64 i = 0; i < frames; i++) {
-				ApplyMod((int32*)data, (int32*)buffer, i, fGain, pan);
-				UpdateMods();
+				break;
 			}
 
-			break;
-		}
+			case gs_audio_format::B_GS_F:
+			{
+				for (int64 i = 0; i < frames; i++) {
+					ApplyMod((float*)data, (float*)buffer, i, pan);
+					UpdateMods();
+				}
 
-		case gs_audio_format::B_GS_F:
-		{
-			for (int64 i = 0; i < frames; i++) {
-				ApplyMod((float*)data, (float*)buffer, i, fGain, pan);
-				UpdateMods();
+				break;
 			}
-
-			break;
 		}
-	}
+		delete[] buffer;
+	} else if (fFormat.channel_count == 1) {
+		// FIXME the output should be stereo, and we could pan mono sounds
+		// here. But currently the output has the same number of channels as
+		// the sound and we can't do this.
+		// FIXME also, we don't handle the gain here.
+		FillBuffer(data, frames);
+	} else
+		debugger("Invalid number of channels.");
 
-	delete[] buffer;
 }
 
 
@@ -353,7 +343,7 @@ GameSoundBuffer::UpdateMods()
 }
 
 
-void
+	void
 GameSoundBuffer::Reset()
 {
 	fGain = 1.0;
@@ -492,9 +482,7 @@ SimpleSoundBuffer::SimpleSoundBuffer(const gs_audio_format * format,
 	fPosition(0)
 {
 	fBufferSize = frames * fFrameSize;
-	fBuffer = new char[fBufferSize];
-
-	memcpy(fBuffer, data, fBufferSize);
+	fBuffer = (char*)data;
 }
 
 

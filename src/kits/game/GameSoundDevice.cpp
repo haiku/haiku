@@ -150,10 +150,8 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const gs_audio_format* format,
 	int32 position = AllocateSound();
 
 	if (position >= 0) {
-		media_node systemMixer;
-		BMediaRoster::Roster()->GetAudioMixer(&systemMixer);
 		fSounds[position] = new SimpleSoundBuffer(format, data, frames);
-		err = fSounds[position]->Connect(&systemMixer);
+		err = B_OK;
 	}
 
 	if (err == B_OK)
@@ -174,11 +172,9 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const void* object,
 	int32 position = AllocateSound();
 
 	if (position >= 0) {
-		media_node systemMixer;
-		BMediaRoster::Roster()->GetAudioMixer(&systemMixer);
 		fSounds[position] = new StreamingSoundBuffer(format, object,
 			inBufferFrameCount, inBufferCount);
-		err = fSounds[position]->Connect(&systemMixer);
+		err = B_OK;
 	}
 
 	if (err == B_OK)
@@ -228,6 +224,9 @@ BGameSoundDevice::StartPlaying(gs_id sound)
 		return B_BAD_VALUE;
 
 	if (!fSounds[sound - 1]->IsPlaying()) {
+		media_node systemMixer;
+		BMediaRoster::Roster()->GetAudioMixer(&systemMixer);
+		fSounds[sound - 1]->Connect(&systemMixer);
 		// tell the producer to start playing the sound
 		return fSounds[sound - 1]->StartPlaying();
 	}
