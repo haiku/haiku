@@ -20,6 +20,8 @@ void gfx_conv_yuv420p_ycbcr422_c(AVFrame *in, AVFrame *out, int width,
 	int height);
 
 
+void gfx_conv_yuv420p10le_rgb32_c(AVFrame *in, AVFrame *out, int width,
+	int height);
 void gfx_conv_yuv410p_rgb32_c(AVFrame *in, AVFrame *out, int width,
 	int height);
 void gfx_conv_yuv411p_rgb32_c(AVFrame *in, AVFrame *out, int width,

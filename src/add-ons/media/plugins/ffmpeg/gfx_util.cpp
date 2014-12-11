@@ -44,7 +44,7 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 				return gfx_conv_yuv411p_rgb32_c;
 			}
 
-			if (pixelFormat == PIX_FMT_YUV420P 
+			if (pixelFormat == PIX_FMT_YUV420P
 				|| pixelFormat == PIX_FMT_YUVJ420P) {
 #ifndef __x86_64__
 				if (cpu.HasSSSE3() && width % 8 == 0 && height % 2 == 0) {
@@ -80,7 +80,7 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 				TRACE("resolve_colorspace: gfx_conv_YCbCr422p_RGB32_c\n");
 				return gfx_conv_YCbCr422_RGB32_c;
 			}
-			
+
 			// Packed Formats
 			if (pixelFormat == PIX_FMT_YUYV422) {
 #ifndef __x86_64__
@@ -95,7 +95,10 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 #endif
 				return gfx_conv_YCbCr422_RGB32_c;
 			}
-			
+
+			if (pixelFormat == PIX_FMT_YUV420P10LE)
+				return gfx_conv_yuv420p10le_rgb32_c;
+
 			TRACE("resolve_colorspace: %s => B_RGB32: NULL\n",
 				pixfmt_to_string(pixelFormat));
 			return NULL;

@@ -137,8 +137,62 @@ gfx_conv_yuv420p_ycbcr422_c(AVFrame *in, AVFrame *out, int width, int height)
 
 #define CLIP(a) if (0xffffff00 & (uint32)a) { if (a < 0) a = 0; else a = 255; }
 
+static inline uint32
+YUV10TORGBA8888(uint16 y, uint16 u, uint16 v)
+{
+	int32 c = y - 64;
+	int32 d = u - 512;
+	int32 e = v - 512;
+
+	int32 r = (298 * c + 409 * e + 512) >> 10;
+	int32 g = (298 * c - 100 * d - 208 * e + 512) >> 10;
+	int32 b = (298 * c + 516 * d + 512) >> 10;
+
+	CLIP(r);
+	CLIP(g);
+	CLIP(b);
+
+	return (uint32)((255 << 24) | (r << 16) | (g << 8) | b);
+}
+
+
+void
+gfx_conv_yuv420p10le_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
+{
+	uint16 *yBase = (uint16 *)in->data[0];
+	uint16 *uBase = (uint16 *)in->data[1];
+	uint16 *vBase = (uint16 *)in->data[2];
+
+	uint32 *rgbBase = (uint32 *)out->data[0];
+
+	int uvIndex;
+
+	for (int32 i = 0; i < height; i++) {
+		uvIndex = 0;
+		for (int32 j=0; j < width; j += 2) {
+			rgbBase[j] = YUV10TORGBA8888(yBase[j], uBase[uvIndex],
+				vBase[uvIndex]);
+			rgbBase[j + 1] = YUV10TORGBA8888(yBase[j + 1], uBase[uvIndex],
+				vBase[uvIndex]);
+			uvIndex++;
+		}
+
+		// Advance pointers to next line
+		yBase += in->linesize[0] / 2;
+
+		if ((i & 1) == 0) {
+			// These are the same for 2 lines
+			uBase += in->linesize[1] / 2;
+			vBase += in->linesize[2] / 2;
+		}
+
+		rgbBase += out->linesize[0] / 4;
+	}
+}
+
+
 // http://en.wikipedia.org/wiki/YUV
-uint32
+static inline uint32
 YUV444TORGBA8888(uint8 y, uint8 u, uint8 v)
 {
 	int32 c = y - 16;
@@ -163,7 +217,7 @@ gfx_conv_yuv410p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 	uint8 *yBase = (uint8 *)in->data[0];
 	uint8 *uBase = (uint8 *)in->data[1];
 	uint8 *vBase = (uint8 *)in->data[2];
-	
+
 	uint32 *rgbBase = (uint32 *)out->data[0];
 
 	int uvIndex;
@@ -190,10 +244,9 @@ gfx_conv_yuv410p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 			uBase += in->linesize[1];
 			vBase += in->linesize[2];
 		}
-		
+
 		rgbBase += out->linesize[0] / 4;
 	}
-
 }
 
 
