@@ -207,23 +207,8 @@ BListView::Draw(BRect updateRect)
 		BListItem* item = ItemAt(i);
 		itemFrame.bottom = itemFrame.top + ceilf(item->Height()) - 1;
 
-		rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
-		rgb_color disabledColor;
-		if (textColor.red + textColor.green + textColor.blue > 128 * 3)
-			disabledColor = tint_color(textColor, B_DARKEN_2_TINT);
-		else
-			disabledColor = tint_color(textColor, B_LIGHTEN_2_TINT);
-
-		if (itemFrame.Intersects(updateRect)) {
-			if (!item->IsEnabled())
-				SetHighColor(disabledColor);
-			else if (item->IsSelected())
-				SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
-			else
-				SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
-
+		if (itemFrame.Intersects(updateRect))
 			DrawItem(item, itemFrame);
-		}
 
 		itemFrame.top = itemFrame.bottom + 1;
 	}
@@ -1738,6 +1723,20 @@ BListView::_CalcLastSelected(int32 before)
 void
 BListView::DrawItem(BListItem* item, BRect itemRect, bool complete)
 {
+	rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
+	rgb_color disabledColor;
+	if (textColor.red + textColor.green + textColor.blue > 128 * 3)
+		disabledColor = tint_color(textColor, B_DARKEN_2_TINT);
+	else
+		disabledColor = tint_color(textColor, B_LIGHTEN_2_TINT);
+
+	if (!item->IsEnabled())
+		SetHighColor(disabledColor);
+	else if (item->IsSelected())
+		SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+	else
+		SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+
 	item->DrawItem(this, itemRect, complete);
 }
 

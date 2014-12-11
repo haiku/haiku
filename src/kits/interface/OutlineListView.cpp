@@ -925,7 +925,7 @@ BOutlineListView::DrawItem(BListItem* item, BRect itemRect, bool complete)
 	}
 
 	itemRect.left += LatchRect(itemRect, item->fLevel).right;
-	item->DrawItem(this, itemRect, complete);
+	BListView::DrawItem(item, itemRect, complete);
 }
 
 
