@@ -3,6 +3,10 @@
 #include <strings.h>
 #include <stdio.h>
 
+extern "C" {
+#include <libavutil/pixdesc.h>
+}
+
 #include "CpuCapabilities.h"
 #include "gfx_conv_c.h"
 #include "gfx_conv_mmx.h"
@@ -143,242 +147,17 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 const char*
 pixfmt_to_string(int pixFormat)
 {
-	switch (pixFormat) {
-		case PIX_FMT_NONE:
-			return "PIX_FMT_NONE";
-	
-		case PIX_FMT_YUV420P:
-			// planar YUV 4:2:0, 12bpp, (1 Cr & Cb sample per 2x2 Y samples)
-			return "PIX_FMT_YUV420P";
-	
-		case PIX_FMT_YUYV422:
-			// packed YUV 4:2:2, 16bpp, Y0 Cb Y1 Cr
-			return "PIX_FMT_YUYV422";
-	
-		case PIX_FMT_RGB24:
-			// packed RGB 8:8:8, 24bpp, RGBRGB...
-			return "PIX_FMT_RGB24";
-	
-		case PIX_FMT_BGR24:
-			// packed RGB 8:8:8, 24bpp, BGRBGR...
-			return "PIX_FMT_BGR24";
-	
-		case PIX_FMT_YUV422P:
-			// planar YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)
-			return "PIX_FMT_YUV422P";
-	
-		case PIX_FMT_YUV444P:
-			// planar YUV 4:4:4, 24bpp, (1 Cr & Cb sample per 1x1 Y samples)
-			return "PIX_FMT_YUV444P";
-	
-		case PIX_FMT_RGB32:
-			// packed RGB 8:8:8, 32bpp, (msb)8A 8R 8G 8B(lsb), in CPU
-			// endianness
-			return "PIX_FMT_RGB32";
-	
-		case PIX_FMT_YUV410P:
-			// planar YUV 4:1:0,  9bpp, (1 Cr & Cb sample per 4x4 Y samples)
-			return "PIX_FMT_YUV410P";
-	
-		case PIX_FMT_YUV411P:
-			// planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples)
-			return "PIX_FMT_YUV411P";
-	
-		case PIX_FMT_RGB565:
-			// packed RGB 5:6:5, 16bpp, (msb)5R 6G 5B(lsb), in CPU endianness
-			return "PIX_FMT_RGB565";
-	
-		case PIX_FMT_RGB555:
-			// packed RGB 5:5:5, 16bpp, (msb)1A 5R 5G 5B(lsb), in CPU
-			// endianness, most significant bit to 0
-			return "PIX_FMT_RGB555";
-	
-		case PIX_FMT_GRAY8:
-			// Y, 8bpp
-			return "PIX_FMT_GRAY8";
-	
-		case PIX_FMT_MONOWHITE:
-			// Y, 1bpp, 0 is white, 1 is black
-			return "PIX_FMT_MONOWHITE";
-	
-		case PIX_FMT_MONOBLACK:
-			// Y, 1bpp, 0 is black, 1 is white
-			return "PIX_FMT_MONOBLACK";
-	
-		case PIX_FMT_PAL8:
-			// 8 bit with PIX_FMT_RGB32 palette
-			return "PIX_FMT_PAL8";
-	
-		case PIX_FMT_YUVJ420P:
-			// planar YUV 4:2:0, 12bpp, full scale (JPEG)
-			return "PIX_FMT_YUVJ420P - YUV420P (Jpeg)";
-	
-		case PIX_FMT_YUVJ422P:
-			// planar YUV 4:2:2, 16bpp, full scale (JPEG)
-			return "PIX_FMT_YUVJ422P - YUV422P (Jpeg)";
-	
-		case PIX_FMT_YUVJ444P:
-			// planar YUV 4:4:4, 24bpp, full scale (JPEG)
-			return "PIX_FMT_YUVJ444P";
-	
-		case PIX_FMT_XVMC_MPEG2_MC:
-			// XVideo Motion Acceleration via common packet passing
-			return "PIX_FMT_XVMC_MPEG2_MC";
-	
-		case PIX_FMT_XVMC_MPEG2_IDCT:
-			return "PIX_FMT_XVMC_MPEG2_IDCT";
-		case PIX_FMT_UYVY422:
-			// packed YUV 4:2:2, 16bpp, Cb Y0 Cr Y1
-			return "PIX_FMT_UYVY422";
-	
-		case PIX_FMT_UYYVYY411:
-			// packed YUV 4:1:1, 12bpp, Cb Y0 Y1 Cr Y2 Y3
-			return "PIX_FMT_UYYVYY411";
-	
-		case PIX_FMT_BGR32:
-			// packed RGB 8:8:8, 32bpp, (msb)8A 8B 8G 8R(lsb), in CPU
-			// endianness
-			return "PIX_FMT_BGR32";
-	
-		case PIX_FMT_BGR565:
-			// packed RGB 5:6:5, 16bpp, (msb)5B 6G 5R(lsb), in CPU endianness
-			return "PIX_FMT_BGR565";
-	
-		case PIX_FMT_BGR555:
-			// packed RGB 5:5:5, 16bpp, (msb)1A 5B 5G 5R(lsb), in CPU
-			// endianness, most significant bit to 1
-			return "PIX_FMT_BGR555";
-	
-		case PIX_FMT_BGR8:
-			// packed RGB 3:3:2, 8bpp, (msb)2B 3G 3R(lsb)
-			return "PIX_FMT_BGR8";
-	
-		case PIX_FMT_BGR4:
-			// packed RGB 1:2:1, 4bpp, (msb)1B 2G 1R(lsb)
-			return "PIX_FMT_BGR4";
-	
-		case PIX_FMT_BGR4_BYTE:
-			// packed RGB 1:2:1,  8bpp, (msb)1B 2G 1R(lsb)
-			return "PIX_FMT_BGR4_BYTE";
-	
-		case PIX_FMT_RGB8:
-			// packed RGB 3:3:2, 8bpp, (msb)2R 3G 3B(lsb)
-			return "PIX_FMT_RGB8";
-	
-		case PIX_FMT_RGB4:
-			// packed RGB 1:2:1, 4bpp, (msb)1R 2G 1B(lsb)
-			return "PIX_FMT_RGB4";
-	
-		case PIX_FMT_RGB4_BYTE:
-			// packed RGB 1:2:1, 8bpp, (msb)1R 2G 1B(lsb)
-			return "PIX_FMT_RGB4_BYTE";
-	
-		case PIX_FMT_NV12:
-			// planar YUV 4:2:0, 12bpp, 1 plane for Y and 1 for UV
-			return "PIX_FMT_NV12";
-	
-		case PIX_FMT_NV21:
-			// as above, but U and V bytes are swapped
-			return "PIX_FMT_NV21";
-	
-		case PIX_FMT_RGB32_1:
-			// packed RGB 8:8:8, 32bpp, (msb)8R 8G 8B 8A(lsb), in CPU
-			// endianness
-			return "PIX_FMT_RGB32_1";
-	
-		case PIX_FMT_BGR32_1:
-			// packed RGB 8:8:8, 32bpp, (msb)8B 8G 8R 8A(lsb), in CPU
-			// endianness
-			return "PIX_FMT_BGR32_1";
-	
-		case PIX_FMT_GRAY16BE:
-			// Y, 16bpp, big-endian
-			return "PIX_FMT_GRAY16BE";
-	
-		case PIX_FMT_GRAY16LE:
-			// Y, 16bpp, little-endian
-			return "PIX_FMT_GRAY16LE";
-	
-		case PIX_FMT_YUV440P:
-			// planar YUV 4:4:0 (1 Cr & Cb sample per 1x2 Y samples)
-			return "PIX_FMT_YUV440P";
-	
-		case PIX_FMT_YUVJ440P:
-			// planar YUV 4:4:0 full scale (JPEG)
-			return "PIX_FMT_YUVJ440P - YUV440P (Jpeg)";
-	
-		case PIX_FMT_YUVA420P:
-			// planar YUV 4:2:0, 20bpp, (1 Cr & Cb sample per 2x2 Y & A
-			// samples)
-			return "PIX_FMT_YUVA420P - YUV420P (Alpha)";
-	
-		case PIX_FMT_VDPAU_H264:
-			// H.264 HW decoding with VDPAU, data[0] contains a
-			// vdpau_render_state struct which contains the bitstream of the
-			// slices as well as various fields extracted from headers
-			return "PIX_FMT_VDPAU_H264";
-	
-		case PIX_FMT_VDPAU_MPEG1:
-			// MPEG-1 HW decoding with VDPAU, data[0] contains a
-			// vdpau_render_state struct which contains the bitstream of the
-			// slices as well as various fields extracted from headers
-			return "PIX_FMT_VDPAU_MPEG1";
-	
-		case PIX_FMT_VDPAU_MPEG2:
-			// MPEG-2 HW decoding with VDPAU, data[0] contains a
-			// vdpau_render_state struct which contains the bitstream of the
-			// slices as well as various fields extracted from headers
-			return "PIX_FMT_VDPAU_MPEG2";
-	
-		case PIX_FMT_VDPAU_WMV3:
-			// WMV3 HW decoding with VDPAU, data[0] contains a
-			// vdpau_render_state struct which contains the bitstream of the
-			// slices as well as various fields extracted from headers
-			return "PIX_FMT_VDPAU_WMV3";
-	
-		case PIX_FMT_VDPAU_VC1:
-			// VC-1 HW decoding with VDPAU, data[0] contains a
-			// vdpau_render_state struct which contains the bitstream of the
-			// slices as well as various fields extracted from headers
-			return "PIX_FMT_VDPAU_VC1";
-	
-		case PIX_FMT_RGB48BE:
-			// packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, big-endian
-			return "PIX_FMT_RGB48BE";
-	
-		case PIX_FMT_RGB48LE:
-			// packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, little-endian
-			return "PIX_FMT_RGB48LE";
-	
-		case PIX_FMT_VAAPI_MOCO:
-			// HW acceleration through VA API at motion compensation
-			// entry-point, Picture.data[0] contains a vaapi_render_state
-			// struct which contains macroblocks as well as various fields
-			// extracted from headers
-			return "PIX_FMT_VAAPI_MOCO";
-	
-		case PIX_FMT_VAAPI_IDCT:
-			// HW acceleration through VA API at IDCT entry-point,
-			// Picture.data[0] contains a vaapi_render_state struct which
-			// contains fields extracted from headers
-			return "PIX_FMT_VAAPI_IDCT";
-	
-		case PIX_FMT_VAAPI_VLD:
-			// HW decoding through VA API, Picture.data[0] contains a
-			// vaapi_render_state struct which contains the bitstream of the
-			// slices as well as various fields extracted from headers
-			return "PIX_FMT_VAAPI_VLD";
-	
-		default:
-			return "(unknown)";
-	}
+	const char* name = av_get_pix_fmt_name((enum PixelFormat)pixFormat);
+	if (name == NULL)
+		return "(unknownn)";
+	return name;
 }
 
 
 color_space
 pixfmt_to_colorspace(int pixFormat)
 {
-	switch(pixFormat) {
+	switch (pixFormat) {
 		default:
 			TRACE("No BE API colorspace definition for pixel format "
 				"\"%s\".\n", pixfmt_to_string(pixFormat));
