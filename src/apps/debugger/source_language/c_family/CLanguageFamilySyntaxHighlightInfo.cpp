@@ -34,6 +34,7 @@ static const char* kLanguageKeywords[] = {
 	"do",
 	"double",
 	"dynamic_cast",
+	"else",
 	"enum",
 	"explicit",
 	"extern",
@@ -41,6 +42,7 @@ static const char* kLanguageKeywords[] = {
 	"float",
 	"for",
 	"goto",
+	"if",
 	"inline",
 	"int",
 	"long",
@@ -74,7 +76,7 @@ static const char* kLanguageKeywords[] = {
 	"using",
 	"virtual",
 	"void",
-	"volatile"
+	"volatile",
 	"while"
 };
 
@@ -346,6 +348,7 @@ CLanguageFamilySyntaxHighlightInfo::_MapTokenToSyntaxType(const Token& token)
 		case TOKEN_LT:
 		case TOKEN_LE:
 		case TOKEN_MEMBER_PTR:
+		case TOKEN_CONDITION:
 		case TOKEN_COLON:
 		case TOKEN_SEMICOLON:
 		case TOKEN_BACKSLASH:

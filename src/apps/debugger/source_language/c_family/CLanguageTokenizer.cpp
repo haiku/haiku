@@ -376,6 +376,12 @@ Tokenizer::_ParseOperator()
 			length = 1;
 			break;
 
+
+		case '?':
+			type = TOKEN_CONDITION;
+			length = 1;
+			break;
+
 		case '.':
 			type = TOKEN_MEMBER_PTR;
 			length = 1;
