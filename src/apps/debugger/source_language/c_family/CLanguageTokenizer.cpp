@@ -441,8 +441,15 @@ Tokenizer::_ParseHexOperand()
 	fCurrentToken = Token(begin, length, _CurrentPos() - length,
 		TOKEN_CONSTANT);
 
-	fCurrentToken.value.SetTo((int64)strtoull(
+	if (length <= 10) {
+		// including the leading 0x, a 32-bit constant will be at most
+		// 10 characters. Anything larger, and 64 is necessary.
+		fCurrentToken.value.SetTo((uint32)strtoul(
 			fCurrentToken.string.String(), NULL, 16));
+	} else {
+		fCurrentToken.value.SetTo((uint64)strtoull(
+			fCurrentToken.string.String(), NULL, 16));
+	}
 	return fCurrentToken;
 }
 
