@@ -1428,7 +1428,10 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 			return true;
 		case 2:
 		{
-			Type* type = node->GetType();
+			// use the type of the underlying value node, as it may
+			// be different from the initially assigned top level type
+			// due to casting
+			Type* type = node->NodeChild()->Node()->GetType();
 			if (type == NULL)
 				return false;
 
