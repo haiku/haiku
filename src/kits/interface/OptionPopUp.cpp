@@ -197,6 +197,8 @@ BOptionPopUp::AllAttached()
 void
 BOptionPopUp::AttachedToWindow()
 {
+	BOptionControl::AttachedToWindow();
+
 	BMenu* menu = fMenuField->Menu();
 	if (menu != NULL) {
 		float labelWidth = fMenuField->StringWidth(fMenuField->Label());
