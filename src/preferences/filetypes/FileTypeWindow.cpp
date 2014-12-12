@@ -58,7 +58,10 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 
 	// "File Type" group
 	BBox* fileTypeBox = new BBox("file type BBox");
-	fileTypeBox->SetLabel(B_TRANSLATE("File type"));
+	const char* label = B_TRANSLATE("File type");
+	fileTypeBox->SetLabel(label);
+	fileTypeBox->SetExplicitMinSize(BSize(be_bold_font->StringWidth(label) + 20,
+		B_SIZE_UNSET));
 
 	fTypeControl = new BTextControl("type", NULL, "Type Control",
 		new BMessage(kMsgTypeEntered));
@@ -86,7 +89,10 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	// "Icon" group
 
 	BBox* iconBox = new BBox("icon BBox");
-	iconBox->SetLabel(B_TRANSLATE("Icon"));
+	label = B_TRANSLATE("Icon");
+	iconBox->SetLabel(label);
+	iconBox->SetExplicitMinSize(BSize(be_bold_font->StringWidth(label) + 20,
+		B_SIZE_UNSET));
 	fIconView = new IconView("icon");
 	BLayoutBuilder::Group<>(iconBox, B_HORIZONTAL)
 		.SetInsets(padding, padding * 2, padding, padding)
@@ -95,7 +101,10 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	// "Preferred Application" group
 
 	BBox* preferredBox = new BBox("preferred BBox");
-	preferredBox->SetLabel(B_TRANSLATE("Preferred application"));
+	label = B_TRANSLATE("Preferred application");
+	preferredBox->SetLabel(label);
+	preferredBox->SetExplicitMinSize(BSize(be_bold_font->StringWidth(label)
+		+ 20, B_SIZE_UNSET));
 
 	BMenu* menu = new BPopUpMenu("preferred");
 	BMenuItem* item;
