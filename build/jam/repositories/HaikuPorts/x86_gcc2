@@ -54,6 +54,7 @@ RemotePackageRepository HaikuPorts
 	ccache-3.1.9-1
 	cdrtools-3.01~a18-1
 	cdrtools_devel-3.01~a18-1
+	chat-20100903-2
 	ctags-5.8-3
 	colors-2.3-1
 	curl-7.39.0-1
@@ -685,6 +686,7 @@ RemotePackageRepository HaikuPorts
 	caya
 	ccache
 	cdrtools
+	chat
 	cmake_x86
 	colors
 	confuse_x86
