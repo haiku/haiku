@@ -214,7 +214,6 @@ DataTranslationsWindow::_SetupViews()
 	fRightBox = new BBox("Right_Side");
 	fRightBox->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 			B_ALIGN_USE_FULL_HEIGHT));
-	fRightBox->SetExplicitMinSize(BSize(350, 300));
 
 	// Add the translator icon view
 	fIconView = new IconView();
