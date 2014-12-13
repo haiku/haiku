@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	336113194
+1	hungarian	x-vnd.Haiku-Terminal	194287280
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -31,6 +31,7 @@ Encoding:	Terminal AppearancePrefView		Kódolás:
 Cancel	Terminal SetTitleWindow		Mégse
 Increase	Terminal TermWindow		Növelés
 Settings	Terminal TermWindow		Beállítások
+Window size	Terminal TermWindow		Ablak mérete
 Selected text	Terminal AppearancePrefView		Kijelölt szöveg
 Find	Terminal FindWindow		Keresés
 Appearance	Terminal PrefWindow		Megjelenés

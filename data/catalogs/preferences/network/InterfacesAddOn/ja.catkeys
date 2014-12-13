@@ -1,9 +1,10 @@
-1	japanese	x-vnd.Haiku-InterfacesAddOn	1264872285
+1	japanese	x-vnd.Haiku-InterfacesAddOn	606366088
 Interface	InterfaceWindow		インターフェース
 Network:	IntefaceHardwareView		ネットワーク:
 Static	IntefaceAddressView		固定
 None	InterfacesListView		なし
 IP:	InterfacesListView	IPv4 address label	IP アドレス:
+Renegotiate address	InterfacesListView		再ネゴシエートアドレス
 Status:	IntefaceHardwareView		状態:
 IPv6:	InterfacesListView	IPv6 address label	IPv6:
 Link speed:	IntefaceHardwareView		リンクスピード:

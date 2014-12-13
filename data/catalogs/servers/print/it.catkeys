@@ -24,7 +24,7 @@ All pages	ConfigWindow		Tutte le pagine
 There is no default printer set up.	PrintServerApp		Non è stata impostata nessuna stampante predefinita.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
-Letter	ConfigWindow	ANSI A (letter), a North American paper size	US-letter
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	US-Letter
 Printer:	ConfigWindow		Stampante:
 A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Seleziona una stampante

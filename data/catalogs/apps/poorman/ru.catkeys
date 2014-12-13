@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PoorMan	1347438411
+1	russian	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		Расположение сайта
 Error Server	PoorMan		Ошибка сервера
 Settings…	PoorMan		Настройки…
@@ -12,6 +12,7 @@ PoorMan settings	PoorMan		Настройки PoorMan
 Clear hit counter	PoorMan		Очистить счетчик посещений
 Copy	PoorMan		Копировать
 Max. simultaneous connections:	PoorMan		Максимум одновременных соединений:
+Create public_html	PoorMan		Создать public_html
 Start page:	PoorMan		Начальная страница:
 done.\n	PoorMan		готово.\n
 Create	PoorMan		Создать

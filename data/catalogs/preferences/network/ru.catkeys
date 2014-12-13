@@ -1,27 +1,11 @@
-1	russian	x-vnd.Haiku-Network	1167831177
-Choose automatically	EthernetSettingsView		Выбрать автоматически
-DNS:	EthernetSettingsView		DNS:
-Gateway:	EthernetSettingsView		Шлюз:
-Netmask:	EthernetSettingsView		Маска:
-DHCP	EthernetSettingsView		DHCP
-Apply	EthernetSettingsView		Применить
-Netmask is invalid	EthernetSettingsView		Маска указана в неверном формате
-OK	EthernetSettingsView		ОК
-IP address:	EthernetSettingsView		IP-адрес:
-Adapter:	EthernetSettingsView		Адаптер:
-Domain:	EthernetSettingsView		Домен:
-DNS list is invalid	EthernetSettingsView		DNS список указан в неправильном формате
-Gateway is invalid	EthernetSettingsView		Шлюз указан в неверном формате
-Revert	EthernetSettingsView		Вернуть
-DNS Servers, comma-separated	EthernetSettingsView		DNS сервера, разделённые запятыми
-<no wireless networks found>	EthernetSettingsView		<беспроводные сети не найдены>
-Network	System name		Сеть
-Mode:	EthernetSettingsView		Режим:
-IP address is invalid	EthernetSettingsView		IP адрес указан в неверном формате
-Hardware address:	EthernetSettingsView		Аппаратный адрес:
-Network:	EthernetSettingsView		Сеть:
-The net_server needs to run for the auto configuration!	EthernetSettingsView		net_server должен быть запущен для автонастройки!
-Disabled	EthernetSettingsView		Отключен
-Auto-configuring failed: 	EthernetSettingsView		Не удалось выполнить автонастройку: 
-Static	EthernetSettingsView		Статический IP-адрес
-<no adapter>	EthernetSettingsView		<адаптеры не найдены>
+1	russian	x-vnd.Haiku-Network	2475894736
+Revert	NetworkSetupWindow		Вернуть
+EAP	EAP protected network		EAP
+WPA2	WPA2 protected network		WPA2
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Apply	NetworkSetupWindow		Применить
+Manage…	NetworkSetupWindow		Настроить…
+WPA	WPA protected network		WPA
+open	Open network		открытая
+New…	NetworkSetupWindow		Создать…
+WEP	WEP protected network		WEP

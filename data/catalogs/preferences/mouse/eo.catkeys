@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Mouse	1036956709
+1	esperanto	x-vnd.Haiku-Mouse	3993447388
 Mouse type:	SettingsView		Mustipo:
 Warp	SettingsView		Teleporti
 2-Button	SettingsView		Dubutona
@@ -17,6 +17,4 @@ Double-click speed	SettingsView		Rapideco de duobla klako
 Defaults	MouseWindow		Aprioraj
 Focus follows mouse	SettingsView		Musosekvanta fokuso
 Accept first click	SettingsView		Akceptu unuan klakon
-Fast	SettingsView		Rapida
 Normal	SettingsView		Normala
-Slow	SettingsView		Malrapida

@@ -1,9 +1,10 @@
-1	russian	x-vnd.Haiku-MediaConverter	217152063
+1	russian	x-vnd.Haiku-MediaConverter	1667214194
 Video using parameters form settings	MediaConverter		Видео использует параметры из настроек
 Video encoding:	MediaConverter		Кодирование видео:
 Error read audio frame %lld	MediaConverter		Ошибка чтения аудио кадра %lld
 No audio	Audio codecs list		Без аудио
 Error	MediaConverter		Ошибка
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# бит} few{# бита} other{# битов}}
 Error loading a file	MediaConverter		Ошибка при загрузке файла
 Error read video frame %lld	MediaConverter		Ошибка чтения видеокадра %lld
 File Error	MediaConverter-FileInfo		Ошибка файла
@@ -16,6 +17,7 @@ MediaConverter	System name		Медиаконвертер
 No video	Video codecs list		Без видео
 Duration:	MediaConverter-FileInfo		Длительность:
 OK	MediaConverter		ОК
+%.1f kHz mono	MediaFileInfo		%.1f кГц моно
 Error converting '%filename'	MediaConverter		Ошибка конвертации '%filename'
 Low	MediaConverter		Низкое
 Conversion completed	MediaConverter		Конвертация завершена
@@ -24,8 +26,10 @@ OK	MediaConverter-FileInfo		ОК
  seconds	MediaFileInfo		 секунд
 Source files	MediaConverter		Исходные файлы
 Error writing video frame %lld	MediaConverter		Ошибка записи видеокадра %lld
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# кадр} few{# кадра} other{# кадров}}
 Error writing audio frame %lld	MediaConverter		Ошибка записи аудио кадра %lld
 Cancelling	MediaConverter		Отменяется
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# байт} few{# байта} other{# байтов}}
 Error loading files	MediaConverter		Ошибка при загрузке файлов
 Cancel	MediaConverter		Отмена
 None available	Video codecs		Не доступно
@@ -53,6 +57,7 @@ Drop media files onto this window	MediaConverter		Перенесите меди�
 Audio encoding:	MediaConverter		Кодирование звука:
 Audio quality not supported	MediaConverter		Качество звука не поддерживается
 File	Menu		Файл
+%.1f kHz stereo	MediaFileInfo		%.1f кГц стерео
 Convert	MediaConverter		Конвертировать
 Writing audio track: %ld%% complete	MediaConverter		Запись аудио дорожки: %ld%% завершено
 Video quality: %3d%%	MediaConverter		Качество видео: %3d%%

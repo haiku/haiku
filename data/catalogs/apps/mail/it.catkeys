@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-MAIL	3248393910
+1	italian	x-vnd.Be-MAIL	3833297840
 View	Mail		Visualizza
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Attributi del file allegato:
@@ -27,3 +27,4 @@ Reply to sender	Mail		Rispondi al mittente
 There is no installed handler for URL links.	Mail		Nessun programma è associato al collegamento URL.
 Signature	Mail		Firma
 Find again	Mail		Cerca di nuovo
+Revert	Mail		Ripristina

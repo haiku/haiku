@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Mouse	1033564338
+1	portuguese (brazil)	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		Tipo de mouse:
 Warp	SettingsView		Deformar
 2-Button	SettingsView		Dois botões
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		Velocidade do duplo clique
 Defaults	MouseWindow		Padrões
 Focus follows mouse	SettingsView		O foco segue o mouse
 Accept first click	SettingsView		Aceitar primeiro clique
-Fast	SettingsView		Rápido
 Normal	SettingsView		Normal
 Mouse	System name		Mouse
-Slow	SettingsView		Lento

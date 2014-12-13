@@ -1,9 +1,10 @@
-1	hungarian	x-vnd.Haiku-InterfacesAddOn	1264872285
+1	hungarian	x-vnd.Haiku-InterfacesAddOn	606366088
 Interface	InterfaceWindow		Felület
 Network:	IntefaceHardwareView		Hálózat:
 Static	IntefaceAddressView		Állandó
 None	InterfacesListView		Nincs
 IP:	InterfacesListView	IPv4 address label	IP:
+Renegotiate address	InterfacesListView		Cím újrakérése
 Status:	IntefaceHardwareView		Állapot:
 IPv6:	InterfacesListView	IPv6 address label	IPv6:
 Link speed:	IntefaceHardwareView		Kapcsolat sebessége:

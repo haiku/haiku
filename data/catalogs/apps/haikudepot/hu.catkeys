@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2403755872
+1	hungarian	x-vnd.Haiku-HaikuDepot	1838577979
 Name	PackageListView		Név
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
 Close	RatePackageWindow		Bezárás
@@ -116,6 +116,7 @@ Unknown	PackageListView		Ismeretlen
 All depots	FilterView		Összes raktár
 Comment language:	RatePackageWindow		Hozzászólás nyelve:
 Pass phrase:	UserLoginWindow		Jelszó:
+Screenshot	ScreenshotWindow		Képernyőkép
 Not specified	RatePackageWindow		Nincs megadva
 Available	PackageListView		Elérhető
 n/a	PackageInfoView		nincs értékelve

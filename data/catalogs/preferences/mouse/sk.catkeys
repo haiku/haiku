@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Mouse	1033564338
+1	slovak	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		Typ myši:
 Warp	SettingsView		Zrýchlenie
 2-Button	SettingsView		2-tlačidlová
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		Rýchlosť dvojitého kliknutia
 Defaults	MouseWindow		Predvolené
 Focus follows mouse	SettingsView		Aktivácia pod kurzorom myši
 Accept first click	SettingsView		Prijať prvé kliknutie
-Fast	SettingsView		Rýchla
 Normal	SettingsView		Normálna
 Mouse	System name		Myš
-Slow	SettingsView		Pomalá

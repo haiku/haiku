@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Mouse	1033564338
+1	ukrainian	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		Тип миші:
 Warp	SettingsView		Переміщення
 2-Button	SettingsView		Двухкнопочна
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		Швидкість подвійного клі�
 Defaults	MouseWindow		За замовчуванням
 Focus follows mouse	SettingsView		Фокус слідкує за вказівником
 Accept first click	SettingsView		Сприймати перший клік
-Fast	SettingsView		Швидко
 Normal	SettingsView		Нормально
 Mouse	System name		Мишка
-Slow	SettingsView		Повільно

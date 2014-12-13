@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	336113194
+1	polish	x-vnd.Haiku-Terminal	194287280
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz terminal
 Change directory	Terminal TermView		Zmień folder
@@ -31,6 +31,7 @@ Encoding:	Terminal AppearancePrefView		Kodowanie:
 Cancel	Terminal SetTitleWindow		Anuluj
 Increase	Terminal TermWindow		Powiększ
 Settings	Terminal TermWindow		Ustawienia
+Window size	Terminal TermWindow		Rozmiar okna
 Selected text	Terminal AppearancePrefView		Zaznaczony tekst
 Find	Terminal FindWindow		Znajdź
 Appearance	Terminal PrefWindow		Wygląd

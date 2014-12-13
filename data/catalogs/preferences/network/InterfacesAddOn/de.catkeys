@@ -1,9 +1,10 @@
-1	german	x-vnd.Haiku-InterfacesAddOn	1264872285
+1	german	x-vnd.Haiku-InterfacesAddOn	606366088
 Interface	InterfaceWindow		Adapter
 Network:	IntefaceHardwareView		Netzwerk:
 Static	IntefaceAddressView		Statisch
 None	InterfacesListView		Keine
 IP:	InterfacesListView	IPv4 address label	IP:
+Renegotiate address	InterfacesListView		Adresse neu anfordern
 Status:	IntefaceHardwareView		Status:
 IPv6:	InterfacesListView	IPv6 address label	IPv6:
 Link speed:	IntefaceHardwareView		Geschwindigkeit:

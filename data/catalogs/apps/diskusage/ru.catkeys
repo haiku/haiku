@@ -1,5 +1,7 @@
-1	russian	x-vnd.Haiku-DiskUsage	1989103787
+1	russian	x-vnd.Haiku-DiskUsage	4126084555
 Scanning %refName%	Scanner		Сканируется раздел %refName%
+%size% in {0, plural, one{# file} other{# files}	Info Window		%size% в {0, plural, one{# файле} few{# файлах} other{# файлах}}
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d файлов
 Size	Info Window		Размер
 Rescan	Pie View		Пересканировать
 Kind	Info Window		Тип

@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-Mouse	1176015830
+1	slovenian	x-vnd.Haiku-Mouse	4132506509
 Mouse type:	SettingsView		Vrsta miši:
 2-Button	SettingsView		2-gumbna
 Double-click test area	SettingsView		Prostor za preizkus dvoklika
@@ -11,7 +11,5 @@ Mouse speed	SettingsView		Hitrost miši
 Double-click speed	SettingsView		Hitrost dvoklika
 Defaults	MouseWindow		Privzete vrednosti
 Accept first click	SettingsView		Sprejmi prvi klik
-Fast	SettingsView		visoka
 Normal	SettingsView		običajna
 Mouse	System name		Miš
-Slow	SettingsView		nizka

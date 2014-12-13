@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Mouse	1033564338
+1	english	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		鼠标类型：
 Warp	SettingsView		弯曲
 2-Button	SettingsView		第二个键
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		双击速度
 Defaults	MouseWindow		默认
 Focus follows mouse	SettingsView		指针踪迹
 Accept first click	SettingsView		接受单击
-Fast	SettingsView		快速
 Normal	SettingsView		正常
 Mouse	System name		鼠标
-Slow	SettingsView		慢速

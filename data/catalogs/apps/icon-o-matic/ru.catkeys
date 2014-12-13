@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	1929083132
+1	russian	x-vnd.haiku-icon_o_matic	3554185674
 Select All	Icon-O-Matic-PathManipulator		Выделить всё
 Add Style	Icon-O-Matic-AddStylesCmd		Добавить стиль
 Color (#%02x%02x%02x)	Style name after dropping a color		Цвет (#%02x%02x%02x)
@@ -67,6 +67,7 @@ HVIF Source Code	Icon-O-Matic-SavePanel		Исходный код HVIF
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Сбросить изменения
 Settings	Icon-O-Matic-Menus		Настройки
 All	Icon-O-Matic-Properties		Все
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Текст, который вы пытаетесь импортировать, довольно длинный. Уверены?
 Multi Paste Properties	Icon-O-Matic-Properties		Вставить все свойства
 Undo	Icon-O-Matic-Main		Отменить
 Click on a shape above	Empty transformers list - 1st line		Нажмите на форму выше
@@ -186,6 +187,7 @@ Save	Icon-O-Matic-Menu-File		Сохранить
 Append…	Icon-O-Matic-Menu-File		Добавить…
 Move Path	Icon-O-Matic-MovePathsCmd		Переместить контур
 Overwrite	Icon-O-Matic-SVGExport		Перезаписать
+Text too long	Icon-O-Matic-StyledTextImport		Текст слишком длинный
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Заморозить формы
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Разделить точку
 Open…	Icon-O-Matic-Menu-File		Открыть…

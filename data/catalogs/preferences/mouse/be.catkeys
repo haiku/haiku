@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Mouse	1033564338
+1	belarusian	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		Тып мышы:
 Warp	SettingsView		Заварот
 2-Button	SettingsView		Дзвюхкнопкавая
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		Хуткасць падвойнага клік�
 Defaults	MouseWindow		Прадвызначаныя
 Focus follows mouse	SettingsView		Фокус суправаджае мыш
 Accept first click	SettingsView		Успрымаць з першага кліку
-Fast	SettingsView		Хутка
 Normal	SettingsView		Нармальна
 Mouse	System name		Мыш
-Slow	SettingsView		Павольна

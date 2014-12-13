@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	336113194
+1	russian	x-vnd.Haiku-Terminal	194287280
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -31,6 +31,7 @@ Encoding:	Terminal AppearancePrefView		Кодировка:
 Cancel	Terminal SetTitleWindow		Отмена
 Increase	Terminal TermWindow		Увеличить
 Settings	Terminal TermWindow		Настройки
+Window size	Terminal TermWindow		Размер окна
 Selected text	Terminal AppearancePrefView		Выделенного текста
 Find	Terminal FindWindow		Найти
 Appearance	Terminal PrefWindow		Внешний вид

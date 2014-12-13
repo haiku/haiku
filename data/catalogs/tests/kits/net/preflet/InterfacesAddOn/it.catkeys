@@ -13,7 +13,7 @@ The method for obtaining an IP address	IntefaceAddressView		Metodo di acquisizio
 Your gateway	IntefaceAddressView		Gateway (proprio)
 Enable	InterfacesListView		Attiva
 Received:	IntefaceHardwareView		Ricevuti:
-Revert	InterfaceWindow		Annulla
+Revert	InterfaceWindow		Ripristina
 connected	IntefaceHardwareView		connesso
 Gateway:	IntefaceAddressView		Gateway:
 Disable	InterfacesListView		Disattiva

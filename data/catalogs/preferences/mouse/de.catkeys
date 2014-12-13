@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Mouse	1033564338
+1	german	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		Mausart:
 Warp	SettingsView		Warp
 2-Button	SettingsView		2-Tasten
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		Doppelklickgeschwindigkeit
 Defaults	MouseWindow		Standardwerte
 Focus follows mouse	SettingsView		Ohne Klicken aktivieren
 Accept first click	SettingsView		Auf ersten Klick reagieren
-Fast	SettingsView		Schnell
 Normal	SettingsView		Normal
 Mouse	System name		Maus
-Slow	SettingsView		Langsam

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Mouse	1033564338
+1	finnish	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		Hiirityyppi:
 Warp	SettingsView		Vääristymä
 2-Button	SettingsView		2-painike
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		Kaksoisnapsautusnopeus
 Defaults	MouseWindow		Oletukset
 Focus follows mouse	SettingsView		Kohdistus seuraa hiirtä
 Accept first click	SettingsView		Hyväksy ensimmäinen napsautus
-Fast	SettingsView		Nopea
 Normal	SettingsView		Normaali
 Mouse	System name		Hiiriasetukset
-Slow	SettingsView		Hidas

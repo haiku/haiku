@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PSDTranslator	1950176710
+1	russian	x-vnd.Haiku-PSDTranslator	3139009143
 Uncompressed	PSDConfig		Без сжатия
 Indexed	PSDLoader		Индексированное
 Grayscale	PSDLoader		Оттенки серого
@@ -7,6 +7,8 @@ Photoshop image translator	PSDTranslator		Транслятор Photoshop изо�
 Version %d.%d.%d, %s	PSDConfig		Версия %d.%d.%d, %s
 Photoshop image	PSDTranslator		Изображение Photoshop
 RLE	PSDConfig		кодирования повторов (RLE)
+Photoshop image (%s)	PSDTranslator		Изображение Photoshop (%s)
+CMYK	PSDLoader		CMYK
 Compression: 	PSDConfig		Сжатие: 
 Format: 	PSDConfig		Формат: 
 Multichannel	PSDLoader		Многоканальный

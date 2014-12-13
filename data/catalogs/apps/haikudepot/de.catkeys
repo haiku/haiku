@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2403755872
+1	german	x-vnd.Haiku-HaikuDepot	1838577979
 Name	PackageListView		Name
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
 Close	RatePackageWindow		Schließen
@@ -116,6 +116,7 @@ Unknown	PackageListView		Unbekannt
 All depots	FilterView		Alle Depots
 Comment language:	RatePackageWindow		Kommentar-Sprache:
 Pass phrase:	UserLoginWindow		Kennwort:
+Screenshot	ScreenshotWindow		Bildschirmfoto
 Not specified	RatePackageWindow		Keine Angaben
 Available	PackageListView		Verfügbar
 n/a	PackageInfoView		n.v.

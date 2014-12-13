@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	1777773037
+1	german	x-vnd.Haiku-Terminal	194287280
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -31,6 +31,7 @@ Encoding:	Terminal AppearancePrefView		Zeichenkodierung:
 Cancel	Terminal SetTitleWindow		Abbrechen
 Increase	Terminal TermWindow		Vergrößern
 Settings	Terminal TermWindow		Einstellungen
+Window size	Terminal TermWindow		Fenstergröße
 Selected text	Terminal AppearancePrefView		Ausgewählter Text
 Find	Terminal FindWindow		Suchen
 Appearance	Terminal PrefWindow		Darstellung
@@ -46,6 +47,7 @@ Window title…	Terminal TermWindow		Fenstertitel…
 Full screen	Terminal TermWindow		Vollbild
 Page setup…	Terminal TermWindow		Seiten einrichten…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Die folgenden Prozesse laufen noch:\n\n\t%1\n\n Wird das Terminal geschlossen, werden auch diese Prozesse abgebrochen.
+Custom	Terminal AppearancePrefView	Window size	Benutzerdefiniert
 Insert path	Terminal TermView		Pfad einfügen
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui und Takashi Murai.\n\nGebrauch: %s [OPTION] [SHELL]\n
 Window size:	Terminal AppearancePrefView		Fenstergröße

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-StyledEdit	3019034824
+1	italian	x-vnd.Haiku-StyledEdit	3217484262
 StyledEdit	System name		StyledEdit
 Paste	Menus		Incolla
 OK	LoadAlert		OK
@@ -28,11 +28,13 @@ Cancel	RevertToSavedAlert		Annulla
 Document	Menus		Documento
 Save changes to the document \"%s\"? 	QuitAlert		Salva le modifiche sul documento \"%s\"? 
 Edit	Menus		Modifica
+Revert	RevertToSavedAlert		Ripristina
 Font	Menus		Carattere
 Replace all	FindandReplaceWindow		Sostituisci tutto
 Statistics…	Menus		Statistiche...
 Default	Open_and_SaveAsPanel		Predefinito
 Replace next	Menus		Sostituisci prossimo
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		Le modifiche a \"%s\" non sono state salvate.\nRipristinare l'ultima versione salvata? 
 Cancel	FindandReplaceWindow		Annulla
 Close	Menus		Chiudi
 Save	SaveAlert		Salva

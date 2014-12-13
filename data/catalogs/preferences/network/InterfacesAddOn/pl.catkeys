@@ -1,9 +1,10 @@
-1	polish	x-vnd.Haiku-InterfacesAddOn	1264872285
+1	polish	x-vnd.Haiku-InterfacesAddOn	606366088
 Interface	InterfaceWindow		Interfejs
 Network:	IntefaceHardwareView		Sieć:
 Static	IntefaceAddressView		Statyczny
 None	InterfacesListView		Brak
 IP:	InterfacesListView	IPv4 address label	IP:
+Renegotiate address	InterfacesListView		Uzyskaj adres ponownie
 Status:	IntefaceHardwareView		Stan:
 IPv6:	InterfacesListView	IPv6 address label	IPv6:
 Link speed:	IntefaceHardwareView		Prędkość połączenia:

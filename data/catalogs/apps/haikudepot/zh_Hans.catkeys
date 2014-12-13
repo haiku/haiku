@@ -1,5 +1,6 @@
-1	english	x-vnd.Haiku-HaikuDepot	443107378
+1	english	x-vnd.Haiku-HaikuDepot	1848881261
 Name	PackageListView		名称
+Close	RatePackageWindow		关闭
 Changelog	PackageInfoView		更新记录
 Click a package to view information	PackageInfoView		点击软件包查看信息
 for %Version%	PackageInfoView		用于 %Version%
@@ -9,6 +10,7 @@ Description	PackageListView		描述
 Install	PackageManager		安装
 Tools	MainWindow		工具
 HaikuDepot	System name		Haiku 软件库
+Close	UserLoginWindow		关闭
 Rate package…	PackageInfoView		软件包评分…
 Uninstall	PackageManager		卸载
 <no info>	PackageInfoView		<无信息>
@@ -31,6 +33,7 @@ Productivity	Model		生产力
 Size	PackageListView		大小
 Games	Model		游戏
 Rating	PackageListView		评级
+(%Votes%)	FeaturedPackagesView		（%Votes%）
 Graphics	Model		图形
 Local	MainWindow		本地
 Close	MainWindow		关闭

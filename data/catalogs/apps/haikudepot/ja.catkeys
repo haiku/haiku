@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2403755872
+1	japanese	x-vnd.Haiku-HaikuDepot	1838577979
 Name	PackageListView		名前
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 Close	RatePackageWindow		閉じる
@@ -116,6 +116,7 @@ Unknown	PackageListView		不明
 All depots	FilterView		すべて
 Comment language:	RatePackageWindow		コメント言語:
 Pass phrase:	UserLoginWindow		パスフレーズ:
+Screenshot	ScreenshotWindow		スクリーンショット
 Not specified	RatePackageWindow		指定なし
 Available	PackageListView		利用可能
 n/a	PackageInfoView		利用不可

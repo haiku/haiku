@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Mouse	1033564338
+1	hungarian	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		Egér típusa:
 Warp	SettingsView		Áthajlás
 2-Button	SettingsView		Kétgombos
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		Duplakattintás sebessége
 Defaults	MouseWindow		Eredeti
 Focus follows mouse	SettingsView		Ha az egér felette van
 Accept first click	SettingsView		Első kattintásra
-Fast	SettingsView		Gyors
 Normal	SettingsView		Megszokott
 Mouse	System name		Egér
-Slow	SettingsView		Lassú

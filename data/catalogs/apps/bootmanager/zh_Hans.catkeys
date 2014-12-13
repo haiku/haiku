@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-BootManager	3355843558
+1	english	x-vnd.Haiku-BootManager	1719213568
 The boot manager has been successfully installed on your system.	BootManagerController		引导管理器已经成功安装到您的系统。
 After two seconds	DefaultPartitionPage		两秒钟以后
 Uninstall Boot Manager	UninstallPage	Title	卸载引导管理器
@@ -25,6 +25,7 @@ After one second	DefaultPartitionPage		一秒钟以后
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		下述分区已删除。请选择分区表下的复选框以将其包含于引导菜单。您也可以设置分区的名称，它们将出现在引导菜单中。
 After one minute	DefaultPartitionPage		一分钟以后
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		引导设备（%DISK）的主引导记录已经从 %FILE 成功完成恢复。
+Quit	WizardView	Button	退出
 Write boot menu	BootManagerController	Button	写入引导菜单
 The Master Boot Record could not be restored!	BootManagerController		主引导记录无法恢复！
 Uninstall	DrivesPage	Button	卸载

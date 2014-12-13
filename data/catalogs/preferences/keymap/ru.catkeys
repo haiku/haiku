@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Keymap	1747616034
+1	russian	x-vnd.Haiku-Keymap	439384761
 Dvorak	Keyboard Layout View		Дворак
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Вернуть
@@ -65,17 +65,25 @@ Control	Keyboard Layout View	Control key	Control
 Left option	Keyboard Layout View		Левый option
 Portuguese	Keyboard Layout View		Португальская
 Right control	Keyboard Layout View		Правый control
+Belgian (point)	Keyboard Layout View		Бельгийская (пункт)
 Switch shortcut keys	Keymap window		Переключение горячих клавиш
 Norwegian	Keyboard Layout View		Норвежская
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавиша Shift
 User:	Keymap window		Пользовательские:
 Esperanto	Keyboard Layout View		Эсперанто
+Arabic (102)	Keyboard Layout View		Арабская (102)
+United-Kingdom	Keyboard Layout View		Великобритания
+German (Mac)	Keyboard Layout View		Немецкая (Mac)
 Right option	Keyboard Layout View		Правый option
+Right shift	Keyboard Layout View		Правый shift
 Key	Modifier keys window	As in a computer keyboard key	Клавиша
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавиша Ctrl
 Control:	Modifier keys window	Control key role name	Control:
 Brazilian	Keyboard Layout View		Бразильская
+Brazilian (ABNT2)	Keyboard Layout View		Бразильская (ABNT-2)
+French (Bépo)	Keyboard Layout View		Французская (Bépo)
 Option	Keyboard Layout View	Option key	Option
+US-International	Keyboard Layout View		США международная
 Sample and clipboard:	Keymap window		Пример и буфер обмена:
 Swiss-German	Keyboard Layout View		Шведо-немецкая
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Клавиша Alt/Opt

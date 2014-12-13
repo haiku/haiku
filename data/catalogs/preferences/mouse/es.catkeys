@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Mouse	1033564338
+1	spanish; castilian	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		Tipo de ratón:
 Warp	SettingsView		\"Warp\"
 2-Button	SettingsView		2-Botones
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		Velocidad del doble clic
 Defaults	MouseWindow		Valores predeterminados
 Focus follows mouse	SettingsView		El foco sigue al ratón
 Accept first click	SettingsView		Aceptar primer clic
-Fast	SettingsView		Rápido 
 Normal	SettingsView		Normal
 Mouse	System name		Ratón
-Slow	SettingsView		Lento

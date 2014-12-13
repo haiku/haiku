@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Mouse	1033564338
+1	japanese	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		マウスの種類:
 Warp	SettingsView		ワープ
 2-Button	SettingsView		2 ボタン
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		ダブルクリック速度
 Defaults	MouseWindow		デフォルト
 Focus follows mouse	SettingsView		フォーカスをマウス位置に合わせる
 Accept first click	SettingsView		最初のクリックを受け入れる
-Fast	SettingsView		速い (大)
 Normal	SettingsView		普通
 Mouse	System name		マウス
-Slow	SettingsView		遅い (小)

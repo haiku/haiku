@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Mouse	3367955327
+1	croatian	x-vnd.Haiku-Mouse	2029478710
 Mouse type:	SettingsView		Tip miša:
 2-Button	SettingsView		2-tipka
 Mouse acceleration	SettingsView		Ubrzanje miša
@@ -8,7 +8,5 @@ Mouse speed	SettingsView		Brzina miša
 Double-click speed	SettingsView		Brzina dvostrukog klika
 Defaults	MouseWindow		Zadano
 Accept first click	SettingsView		Prihvati prvi klik
-Fast	SettingsView		Brzo
 Normal	SettingsView		Normalno
 Mouse	System name		Miš
-Slow	SettingsView		Sporo

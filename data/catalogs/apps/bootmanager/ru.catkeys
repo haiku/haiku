@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-BootManager	3445750418
+1	russian	x-vnd.Haiku-BootManager	2570087442
 The boot manager has been successfully installed on your system.	BootManagerController		Менеджер загрузки был успешно установлен.
 After two seconds	DefaultPartitionPage		2 секунды
 Uninstall Boot Manager	UninstallPage	Title	Удалить Менеджер Загрузки
@@ -48,6 +48,7 @@ No space available!	DrivesPage	Cannot install	Нет места для MBR!
 Never	DefaultPartitionPage		бесконечно
 Partition table not compatible	BootManagerController	Title	Несовместимая таблица разделов
 Old Master Boot Record saved	BootManagerController	Title	Предыдущая загрузочная запись (MBR) сохранена
+Old Master Boot Record backup failure	BootManagerController	Title	Предыдущая загрузочная запись (MBR) не сохранена
 Boot Manager is unable to read the partition table!	BootManagerController		Менеджеру загрузки не удалось прочитать таблицу разделов!
 Error reading partition table	BootManagerController	Title	Ошибка чтения таблицы разделов
 Installation of boot menu failed	BootManagerController	Title	Удаление загрузочного меню завершено

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Mouse	1033564338
+1	swedish	x-vnd.Haiku-Mouse	3990055017
 Mouse type:	SettingsView		Mustyp:
 Warp	SettingsView		Teleportera
 2-Button	SettingsView		2 knappar
@@ -18,7 +18,5 @@ Double-click speed	SettingsView		Dubbelklickshastighet
 Defaults	MouseWindow		Förval
 Focus follows mouse	SettingsView		Fokus följer muspekaren
 Accept first click	SettingsView		Agera på första klicket
-Fast	SettingsView		Snabb
 Normal	SettingsView		Normal
 Mouse	System name		Mus
-Slow	SettingsView		Långsam

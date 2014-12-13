@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	902912385
+1	english	x-vnd.Haiku-Terminal	3756219838
 Not found.	Terminal TermWindow		未找到。  
 Switch Terminals	Terminal TermWindow		切换终端
 Change directory	Terminal TermView		更改目录
@@ -45,6 +45,7 @@ Window title…	Terminal TermWindow		窗口标题...
 Full screen	Terminal TermWindow		全屏
 Page setup…	Terminal TermWindow		页面设置...  
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		下述进程仍在运行：\n\n\t%1\n\n如果您关闭终端，这些进程将被杀死。
+Custom	Terminal AppearancePrefView	Window size	自定义
 Insert path	Terminal TermView		插入路径  
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku终端\n版权所有 2001-2009 Haiku Inc。\n版权所有（C）1999 Kazuho Okui 和 Takashi Murai。\n\n用法：%s 【OPTION】【SHELL】\n
 No search string was entered.	Terminal TermWindow		未输入任何字符。

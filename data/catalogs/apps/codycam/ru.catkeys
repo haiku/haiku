@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-CodyCam	183572276
+1	russian	x-vnd.Haiku-CodyCam	2193838145
+Upload…	VideoConsumer.cpp		Загрузить…
 Capturing Image…	VideoConsumer.cpp		Захват изображения…
 Every 30 seconds	CodyCam		Каждые 30 секунд
 File name:	CodyCam		Имя файла:
@@ -61,6 +62,7 @@ upload client name expected	CodyCam		укажите имя клиент загр
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Подключен…
 PASS <suppressed>  (real password sent)\n	FtpClient		ПАРОЛЬ <скрыт> (реальный пароль отослан)\n
+File upload failed	VideoConsumer.cpp		Не удалось отправить файл
 Every 5 minutes	CodyCam		Каждые 5 минут
 read: %d\n	SftpClient		чтение: %d\n
 Capture controls	CodyCam		Настройки захвата
