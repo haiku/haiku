@@ -140,7 +140,7 @@ RemotePackageRepository HaikuPorts
 	m4-1.4.16-5
 	make-3.82-5
 	man-1.6g-3
-	mercurial-2.2.2-5
+	mercurial-2.9.2-1
 	mesa-10.1.1-1
 	mesa_devel-10.1.1-1
 	mesa_swrast-10.1.1-1
