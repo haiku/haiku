@@ -25,6 +25,7 @@
 #include <Locale.h>
 #include <MediaRoster.h>
 #include <MediaTheme.h>
+#include <Notification.h>
 #include <Resources.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -161,7 +162,6 @@ MediaWindow::MediaWindow(BRect frame)
 	fAudioOutputs(5, true),
 	fVideoInputs(5, true),
 	fVideoOutputs(5, true),
-	fAlert(NULL),
 	fInitCheck(B_OK)
 {
 	_InitWindow();
@@ -314,17 +314,18 @@ MediaWindow::MessageReceived(BMessage* message)
 		case B_SOME_APP_LAUNCHED:
 		{
 			PRINT_OBJECT(*message);
-			if (fAlert == NULL)
-				break;
 
 			BString mimeSig;
 			if (message->FindString("be:signature", &mimeSig) == B_OK
 				&& (mimeSig == "application/x-vnd.Be.addon-host"
 					|| mimeSig == "application/x-vnd.Be.media-server")) {
-				fAlert->Lock();
-				fAlert->TextView()->SetText(
+				BNotification notificationPopup(B_PROGRESS_NOTIFICATION);
+				notificationPopup.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
+				notificationPopup.SetTitle(B_TRANSLATE("Media Service"));
+				notificationPopup.SetProgress(0.5);
+				notificationPopup.SetContent(
 					B_TRANSLATE("Starting media server" B_UTF8_ELLIPSIS));
-				fAlert->Unlock();
+				notificationPopup.Send();
 			}
 			break;
 		}
@@ -418,10 +419,13 @@ MediaWindow::_InitMedia(bool first)
 		if (alert->Go() == 0)
 			return B_ERROR;
 
-		fAlert = new MediaAlert(BRect(0, 0, 300, 60), "restart_alert",
-			B_TRANSLATE("Restarting media services\nStarting media server"
-				B_UTF8_ELLIPSIS "\n"));
-		fAlert->Show();
+		BNotification notificationPopup(B_PROGRESS_NOTIFICATION);
+		notificationPopup.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
+		notificationPopup.SetTitle(B_TRANSLATE("Media Service"));
+		notificationPopup.SetProgress(0.5);
+		notificationPopup.SetContent(
+			B_TRANSLATE("Starting media server" B_UTF8_ELLIPSIS));
+		notificationPopup.Send();
 
 		Show();
 
@@ -435,11 +439,14 @@ MediaWindow::_InitMedia(bool first)
 		&& fListView->ItemAt(0)->IsSelected())
 		isVideoSelected = false;
 
-	if ((!first || (first && err) ) && fAlert) {
-		BAutolock locker(fAlert);
-		if (locker.IsLocked())
-			fAlert->TextView()->SetText(
-				B_TRANSLATE("Ready for use" B_UTF8_ELLIPSIS));
+	if (!first || (first && err) ) {
+		BNotification notificationPopup(B_PROGRESS_NOTIFICATION);
+		notificationPopup.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
+		notificationPopup.SetTitle(B_TRANSLATE("Media Service"));
+		notificationPopup.SetProgress(1.0);
+		notificationPopup.SetContent(
+			B_TRANSLATE("Ready for use" B_UTF8_ELLIPSIS));
+		notificationPopup.Send();
 	}
 
 	while (fListView->CountItems() > 0)
@@ -516,12 +523,6 @@ MediaWindow::_InitMedia(bool first)
 		fListView->Select(fListView->IndexOf(video));
 	else
 		fListView->Select(fListView->IndexOf(audio));
-
-	if (fAlert != NULL) {
-		snooze(800000);
-		fAlert->PostMessage(B_QUIT_REQUESTED);
-	}
-	fAlert = NULL;
 
 	Unlock();
 
@@ -648,22 +649,24 @@ status_t
 MediaWindow::_RestartMediaServices(void* data)
 {
 	MediaWindow* window = (MediaWindow*)data;
-	window->fAlert = new MediaAlert(BRect(0, 0, 300, 60),
-		"restart_alert", B_TRANSLATE(
-		"Restarting media services\nShutting down media server\n"));
-
-	window->fAlert->Show();
+	
+	BNotification notificationPopup(B_PROGRESS_NOTIFICATION);
+	notificationPopup.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
+	notificationPopup.SetTitle(B_TRANSLATE("Media Service"));
+	notificationPopup.SetContent( B_TRANSLATE("Shutting down media server"));
 
 	shutdown_media_server(B_INFINITE_TIMEOUT, MediaWindow::_UpdateProgress,
-		window->fAlert);
+		NULL);
 
-	{
-		BAutolock locker(window->fAlert);
-		if (locker.IsLocked())
-			window->fAlert->TextView()->SetText(
-				B_TRANSLATE("Starting media server" B_UTF8_ELLIPSIS));
-	}
+	notificationPopup.SetContent(
+		B_TRANSLATE("Starting media server" B_UTF8_ELLIPSIS));
+	notificationPopup.SetProgress(0.5);
+	notificationPopup.Send();
+
 	launch_media_server();
+
+	notificationPopup.SetProgress(1);
+	notificationPopup.Send();
 
 	return window->PostMessage(ML_INIT_MEDIA);
 }
@@ -672,7 +675,10 @@ MediaWindow::_RestartMediaServices(void* data)
 bool
 MediaWindow::_UpdateProgress(int stage, const char* message, void* cookie)
 {
-	MediaAlert* alert = static_cast<MediaAlert*>(cookie);
+	// parameters "message" and "cookie" are no longer used.
+	// They remain here because they're declared within BeOS API and 
+	// thus could not be removed.
+
 	PRINT(("stage : %i\n", stage));
 	const char* string = "Unknown stage";
 	switch (stage) {
@@ -693,9 +699,13 @@ MediaWindow::_UpdateProgress(int stage, const char* message, void* cookie)
 			break;
 	}
 
-	BAutolock locker(alert);
-	if (locker.IsLocked())
-		alert->TextView()->SetText(string);
+	BNotification info(B_PROGRESS_NOTIFICATION);
+	info.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
+	info.SetProgress(stage/100.0);
+	info.SetTitle(B_TRANSLATE("Media Service"));
+	info.SetContent(string);
+	info.Send();
+
 	return true;
 }
 
