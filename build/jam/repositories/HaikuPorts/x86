@@ -35,6 +35,7 @@ RemotePackageRepository HaikuPorts
 	curl-7.39.0-1
 	curl_devel-7.39.0-1
 	cvs-1.12.13.1-6
+	cvsps-2.2b1-1
 	doxygen-1.6.3-4
 	dtc-1.4.0-1
 	expat-2.0.1-7
@@ -294,6 +295,7 @@ RemotePackageRepository HaikuPorts
 	ctags
 	curl
 	cvs
+	cvsps
 	doxygen
 	dtc
 	expat
