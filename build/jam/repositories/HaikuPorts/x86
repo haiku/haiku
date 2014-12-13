@@ -56,13 +56,13 @@ RemotePackageRepository HaikuPorts
 	gettext_libintl-0.18.1.1-6
 	giflib-5.1.0-1
 	giflib_devel-5.1.0-1
-	git-1.8.3.4-2
-	git_arch-1.8.3.4-2
-	git_cvs-1.8.3.4-2
-	git_daemon-1.8.3.4-2
-	git_email-1.8.3.4-2
-	git_remote_helpers-1.8.3.4-2
-	git_svn-1.8.3.4-2
+	git-1.8.3.4-4
+	git_arch-1.8.3.4-4
+	git_cvs-1.8.3.4-4
+	git_daemon-1.8.3.4-4
+	git_email-1.8.3.4-4
+	git_remote_helpers-1.8.3.4-4
+	git_svn-1.8.3.4-4
 	glew-1.11.0-1
 	glew_devel-1.11.0-1
 	glew_util-1.11.0-1
@@ -161,7 +161,7 @@ RemotePackageRepository HaikuPorts
 	perl-5.18.2-2
 	pixman-0.32.6-1
 	pkgconfig-0.27.1-2
-	python-2.6.9-1
+	python-2.7.8-1
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
 	qemu-2.1.2-1
@@ -171,7 +171,7 @@ RemotePackageRepository HaikuPorts
 	readline_devel-6.3-2
 	ruby-1.9.1-2
 	ruby_devel-1.9.1-2
-	scons-2.2.0-2
+	scons-2.3.1-4
 	sed-4.2.1-6
 	sharutils-4.14-1
 	speex-1.2~rc1-2
