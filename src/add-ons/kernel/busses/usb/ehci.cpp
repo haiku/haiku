@@ -252,54 +252,53 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	uint32 extendedCapPointer = ReadCapReg32(EHCI_HCCPARAMS) >> EHCI_ECP_SHIFT;
 	extendedCapPointer &= EHCI_ECP_MASK;
-	if (extendedCapPointer > 0) {
+	for (uint32 eec = extendedCapPointer; eec != 0; extendedCapPointer = EHCI_EECP_NEXT(eec)) {
 		TRACE("extended capabilities register at %" B_PRIu32 "\n",
 			extendedCapPointer);
 
-		uint32 legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
+		eec = sPCIModule->read_pci_config(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function, extendedCapPointer, 4);
-		if ((legacySupport & EHCI_LEGSUP_CAPID_MASK) == EHCI_LEGSUP_CAPID) {
-			if ((legacySupport & EHCI_LEGSUP_BIOSOWNED) != 0) {
-				TRACE_ALWAYS("the host controller is bios owned, claiming"
-					" ownership\n");
 
-				sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-					fPCIInfo->function, extendedCapPointer + 3, 1, 1);
+		if ((eec & EHCI_LEGSUP_CAPID_MASK) != EHCI_LEGSUP_CAPID)
+			continue;
 
-				for (int32 i = 0; i < 20; i++) {
-					legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
-						fPCIInfo->device, fPCIInfo->function,
-						extendedCapPointer, 4);
+		uint32 legacySupport = eec;
 
-					if ((legacySupport & EHCI_LEGSUP_BIOSOWNED) == 0)
-						break;
+		if ((legacySupport & EHCI_LEGSUP_BIOSOWNED) != 0) {
+			TRACE_ALWAYS("the host controller is bios owned, claiming"
+				" ownership\n");
 
-					TRACE_ALWAYS("controller is still bios owned, waiting\n");
-					snooze(50000);
-				}
-			}
-
-			if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
-				TRACE_ERROR("bios won't give up control over the host "
-					"controller (ignoring)\n");
-			} else if (legacySupport & EHCI_LEGSUP_OSOWNED) {
-				TRACE_ALWAYS(
-					"successfully took ownership of the host controller\n");
-			}
-
-			// Force off the BIOS owned flag, and clear all SMIs. Some BIOSes
-			// do indicate a successful handover but do not remove their SMIs
-			// and then freeze the system when interrupts are generated.
 			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-				fPCIInfo->function, extendedCapPointer + 2, 1, 0);
-			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-				fPCIInfo->function, extendedCapPointer + 4, 4, 0);
-		} else {
-			TRACE_ALWAYS(
-				"extended capability is not a legacy support register\n");
+				fPCIInfo->function, extendedCapPointer + 3, 1, 1);
+
+			for (int32 i = 0; i < 20; i++) {
+				legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
+					fPCIInfo->device, fPCIInfo->function,
+					extendedCapPointer, 4);
+
+				if ((legacySupport & EHCI_LEGSUP_BIOSOWNED) == 0)
+					break;
+
+				TRACE_ALWAYS("controller is still bios owned, waiting\n");
+				snooze(50000);
+			}
 		}
-	} else {
-		TRACE_ALWAYS("no extended capabilities register\n");
+
+		if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
+			TRACE_ERROR("bios won't give up control over the host "
+				"controller (ignoring)\n");
+		} else if (legacySupport & EHCI_LEGSUP_OSOWNED) {
+			TRACE_ALWAYS(
+				"successfully took ownership of the host controller\n");
+		}
+
+		// Force off the BIOS owned flag, and clear all SMIs. Some BIOSes
+		// do indicate a successful handover but do not remove their SMIs
+		// and then freeze the system when interrupts are generated.
+		sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+			fPCIInfo->function, extendedCapPointer + 2, 1, 0);
+		sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+			fPCIInfo->function, extendedCapPointer + 4, 4, 0);
 	}
 
 	// disable interrupts

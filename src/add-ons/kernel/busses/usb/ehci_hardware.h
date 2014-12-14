@@ -103,6 +103,7 @@
 // Extended Capabilities
 #define EHCI_ECP_SHIFT			8			// Extended Capability Pointer
 #define EHCI_ECP_MASK			0xff
+#define EHCI_EECP_NEXT(x)		(((x) >> 8) & 0xff)
 #define EHCI_LEGSUP_CAPID_MASK	0xff
 #define EHCI_LEGSUP_CAPID		0x01
 #define EHCI_LEGSUP_OSOWNED		(1 << 24)	// OS Owned Semaphore
