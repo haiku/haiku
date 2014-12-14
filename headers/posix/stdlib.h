@@ -11,6 +11,7 @@
 #include <limits.h>
 #include <stddef.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <wchar_t.h>
 
 #define RAND_MAX      0x7fffffff
@@ -70,6 +71,9 @@ extern char		*ecvt(double value, int digits, int *_decimalPoint, int *_sign);
 extern char		*fcvt(double value, int precision, int *_decimalPoint,
 					int *_sign);
 extern char		*gcvt(double value, int digits, char *buffer);
+
+extern char		*l64a(long n);
+extern long		a64l(const char *string);
 
 /* environment variables */
 extern char		**environ;

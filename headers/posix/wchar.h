@@ -9,6 +9,7 @@
 #include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <time.h>
 
 
 /* stddef.h is not supposed to define wint_t, but gcc 2.95.3's one does.
