@@ -69,9 +69,14 @@ typedef uint64_t uintmax_t;
 #define INT32_MIN 	(-INT32_MAX-1)
 #define UINT32_MAX	(4294967295U)
 
-#define INT64_MAX	(9223372036854775807LL)
-#define INT64_MIN	(-INT64_MAX-1)
+#if defined(__SIZEOF_LONG__) && __SIZEOF_LONG__ > 4
+#define INT64_MAX	(9223372036854775807UL)
+#define UINT64_MAX	(18446744073709551615UL)
+#else
+#define INT64_MAX	(9223372036854775807ULL)
 #define UINT64_MAX	(18446744073709551615ULL)
+#endif
+#define INT64_MIN	(-INT64_MAX-1)
 
 /* Limits of minimum-width integer types */
 #define INT_LEAST8_MIN  	INT8_MIN
