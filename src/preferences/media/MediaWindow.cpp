@@ -319,13 +319,8 @@ MediaWindow::MessageReceived(BMessage* message)
 			if (message->FindString("be:signature", &mimeSig) == B_OK
 				&& (mimeSig == "application/x-vnd.Be.addon-host"
 					|| mimeSig == "application/x-vnd.Be.media-server")) {
-				BNotification notificationPopup(B_PROGRESS_NOTIFICATION);
-				notificationPopup.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
-				notificationPopup.SetTitle(B_TRANSLATE("Media Service"));
-				notificationPopup.SetProgress(0.5);
-				notificationPopup.SetContent(
-					B_TRANSLATE("Starting media server" B_UTF8_ELLIPSIS));
-				notificationPopup.Send();
+				_Notify(0.75, B_TRANSLATE("Starting media server"
+					B_UTF8_ELLIPSIS));
 			}
 			break;
 		}
@@ -419,13 +414,7 @@ MediaWindow::_InitMedia(bool first)
 		if (alert->Go() == 0)
 			return B_ERROR;
 
-		BNotification notificationPopup(B_PROGRESS_NOTIFICATION);
-		notificationPopup.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
-		notificationPopup.SetTitle(B_TRANSLATE("Media Service"));
-		notificationPopup.SetProgress(0.5);
-		notificationPopup.SetContent(
-			B_TRANSLATE("Starting media server" B_UTF8_ELLIPSIS));
-		notificationPopup.Send();
+		_Notify(0, B_TRANSLATE("Starting media server" B_UTF8_ELLIPSIS));
 
 		Show();
 
@@ -439,15 +428,8 @@ MediaWindow::_InitMedia(bool first)
 		&& fListView->ItemAt(0)->IsSelected())
 		isVideoSelected = false;
 
-	if (!first || (first && err) ) {
-		BNotification notificationPopup(B_PROGRESS_NOTIFICATION);
-		notificationPopup.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
-		notificationPopup.SetTitle(B_TRANSLATE("Media Service"));
-		notificationPopup.SetProgress(1.0);
-		notificationPopup.SetContent(
-			B_TRANSLATE("Ready for use" B_UTF8_ELLIPSIS));
-		notificationPopup.Send();
-	}
+	if (!first || (first && err) )
+		_Notify(1, B_TRANSLATE("Ready for use" B_UTF8_ELLIPSIS));
 
 	while (fListView->CountItems() > 0)
 		delete fListView->RemoveItem((int32)0);
@@ -650,23 +632,10 @@ MediaWindow::_RestartMediaServices(void* data)
 {
 	MediaWindow* window = (MediaWindow*)data;
 	
-	BNotification notificationPopup(B_PROGRESS_NOTIFICATION);
-	notificationPopup.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
-	notificationPopup.SetTitle(B_TRANSLATE("Media Service"));
-	notificationPopup.SetContent( B_TRANSLATE("Shutting down media server"));
-
 	shutdown_media_server(B_INFINITE_TIMEOUT, MediaWindow::_UpdateProgress,
-		NULL);
-
-	notificationPopup.SetContent(
-		B_TRANSLATE("Starting media server" B_UTF8_ELLIPSIS));
-	notificationPopup.SetProgress(0.5);
-	notificationPopup.Send();
+		data);
 
 	launch_media_server();
-
-	notificationPopup.SetProgress(1);
-	notificationPopup.Send();
 
 	return window->PostMessage(ML_INIT_MEDIA);
 }
@@ -675,9 +644,8 @@ MediaWindow::_RestartMediaServices(void* data)
 bool
 MediaWindow::_UpdateProgress(int stage, const char* message, void* cookie)
 {
-	// parameters "message" and "cookie" are no longer used.
-	// They remain here because they're declared within BeOS API and 
-	// thus could not be removed.
+	// parameter "message" is no longer used. It is kept for compatibility with
+	// BeOS as this is used as a shutdown_media_server callback.
 
 	PRINT(("stage : %i\n", stage));
 	const char* string = "Unknown stage";
@@ -699,14 +667,21 @@ MediaWindow::_UpdateProgress(int stage, const char* message, void* cookie)
 			break;
 	}
 
-	BNotification info(B_PROGRESS_NOTIFICATION);
-	info.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
-	info.SetProgress(stage/100.0);
-	info.SetTitle(B_TRANSLATE("Media Service"));
-	info.SetContent(string);
-	info.Send();
+	((MediaWindow*)cookie)->_Notify(stage / 150.0, string);
 
 	return true;
+}
+
+
+void
+MediaWindow::_Notify(float progress, const char* message)
+{
+	BNotification info(B_PROGRESS_NOTIFICATION);
+	info.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
+	info.SetProgress(progress);
+	info.SetTitle(B_TRANSLATE("Media Service"));
+	info.SetContent(message);
+	info.Send();
 }
 
 

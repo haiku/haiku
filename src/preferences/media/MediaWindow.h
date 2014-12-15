@@ -34,9 +34,9 @@ class MidiSettingsView;
 class MediaWindow : public BWindow {
 public:
 								MediaWindow(BRect frame);
-   								~MediaWindow();
+								~MediaWindow();
 
-    		status_t			InitCheck();
+			status_t			InitCheck();
 
 	// methods to be called by MediaListItems...
 			void				SelectNode(const dormant_node_info* node);
@@ -53,8 +53,8 @@ public:
 									MediaListItem::media_type type,
 									const dormant_node_info* node);
 
-    virtual	bool 				QuitRequested();
-    virtual	void				MessageReceived(BMessage* message);
+	virtual	bool 				QuitRequested();
+	virtual	void				MessageReceived(BMessage* message);
 
 private:
 	typedef BObjectList<dormant_node_info> NodeList;
@@ -73,8 +73,9 @@ private:
 			NodeListItem*		_FindNodeListItem(dormant_node_info* info);
 
 	static	status_t			_RestartMediaServices(void* data);
-	static	bool				_UpdateProgress(int stage, const char* message, 
+	static	bool				_UpdateProgress(int stage, const char* message,
 									void* cookie);
+			void				_Notify(float progress, const char* message);
 
 			void				_ClearParamView();
 			void				_MakeParamView();
