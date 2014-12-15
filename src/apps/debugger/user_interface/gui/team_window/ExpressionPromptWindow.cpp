@@ -13,15 +13,16 @@
 
 
 ExpressionPromptWindow::ExpressionPromptWindow(BHandler* addTarget,
-	BHandler* closeTarget)
+	BHandler* closeTarget, bool isPersistent)
 	:
-	BWindow(BRect(), "Add Expression", B_FLOATING_WINDOW,
-		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
+	BWindow(BRect(), isPersistent ? "Add Expression" : "Evaluate Expression",
+		B_FLOATING_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fExpressionInput(NULL),
 	fCancelButton(NULL),
 	fAddButton(NULL),
 	fAddTarget(addTarget),
-	fCloseTarget(closeTarget)
+	fCloseTarget(closeTarget),
+	fPersistentExpression(isPersistent)
 {
 }
 
@@ -32,10 +33,11 @@ ExpressionPromptWindow::~ExpressionPromptWindow()
 
 
 ExpressionPromptWindow*
-ExpressionPromptWindow::Create(BHandler* addTarget, BHandler* closeTarget)
+ExpressionPromptWindow::Create(BHandler* addTarget, BHandler* closeTarget,
+	bool isPersistent)
 {
 	ExpressionPromptWindow* self = new ExpressionPromptWindow(addTarget,
-		closeTarget);
+		closeTarget, isPersistent);
 
 	try {
 		self->_Init();
@@ -108,6 +110,7 @@ ExpressionPromptWindow::MessageReceived(BMessage* message)
 		{
 			BMessage addMessage(MSG_EXPRESSION_PROMPT_WINDOW_CLOSED);
 			addMessage.AddString("expression", fExpressionInput->Text());
+			addMessage.AddBool("persistent", fPersistentExpression);
 			addMessage.AddMessenger("target", BMessenger(fAddTarget));
 
 			BMessenger(fCloseTarget).SendMessage(&addMessage);

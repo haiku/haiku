@@ -114,6 +114,7 @@ private:
 			void				_CopyVariableValueToClipboard();
 
 			status_t			_AddExpression(const char* expression,
+									bool persistentExpression,
 									ExpressionInfo*& _info);
 			void				_RemoveExpression(ModelNode* node);
 
@@ -140,6 +141,7 @@ private:
 			ExpressionChildList	fExpressionChildren;
 			TableCellContextMenuTracker* fTableCellContextMenuTracker;
 			VariablesExpressionInfo* fPendingTypecastInfo;
+			ExpressionInfo*		fTemporaryExpression;
 			bool				fFrameClearPending;
 			Listener*			fListener;
 };

@@ -34,7 +34,6 @@ class BTabView;
 class ConsoleOutputView;
 class BreakConditionConfigWindow;
 class BreakpointEditWindow;
-class ExpressionEvaluationWindow;
 class ExpressionPromptWindow;
 class Image;
 class InspectorWindow;
@@ -231,7 +230,6 @@ private:
 			BreakConditionConfigWindow* fBreakConditionConfigWindow;
 			BreakpointEditWindow* fBreakpointEditWindow;
 			InspectorWindow*	fInspectorWindow;
-			ExpressionEvaluationWindow* fExpressionWindow;
 			ExpressionPromptWindow* fExpressionPromptWindow;
 			GuiTeamUiSettings	fUiSettings;
 			BFilePanel*			fFilePanel;

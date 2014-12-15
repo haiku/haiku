@@ -1740,6 +1740,7 @@ VariablesView::VariablesView(Listener* listener)
 	fExpressionChildren(10, false),
 	fTableCellContextMenuTracker(NULL),
 	fPendingTypecastInfo(NULL),
+	fTemporaryExpression(NULL),
 	fFrameClearPending(false),
 	fListener(listener)
 {
@@ -1764,6 +1765,9 @@ VariablesView::~VariablesView()
 	delete fContainerListener;
 	if (fPendingTypecastInfo != NULL)
 		fPendingTypecastInfo->ReleaseReference();
+
+	if (fTemporaryExpression != NULL)
+		fTemporaryExpression->ReleaseReference();
 }
 
 
@@ -2060,8 +2064,11 @@ VariablesView::MessageReceived(BMessage* message)
 			if (message->FindString("expression", &expression) != B_OK)
 				break;
 
+			bool persistentExpression = message->FindBool("persistent");
+
 			ExpressionInfo* info;
-			status_t error = _AddExpression(expression, info);
+			status_t error = _AddExpression(expression, persistentExpression,
+				info);
 			if (error != B_OK) {
 				// TODO: notify user of failure
 				break;
@@ -2096,8 +2103,13 @@ VariablesView::MessageReceived(BMessage* message)
 					fPendingTypecastInfo->ReleaseReference();
 					fPendingTypecastInfo = NULL;
 				}
-			} else
+			} else {
 				_AddExpressionNode(info, result, value);
+				if (info == fTemporaryExpression) {
+					info->ReleaseReference();
+					fTemporaryExpression = NULL;
+				}
+			}
 
 			break;
 		}
@@ -2828,29 +2840,33 @@ VariablesView::_CopyVariableValueToClipboard()
 
 
 status_t
-VariablesView::_AddExpression(const char* expression, ExpressionInfo*& _info)
+VariablesView::_AddExpression(const char* expression,
+	bool persistentExpression, ExpressionInfo*& _info)
 {
-	// if our stack frame doesn't have an associated function,
-	// we can't add an expression
-	FunctionInstance* function = fStackFrame->Function();
-	if (function == NULL)
-		return B_NOT_ALLOWED;
+	ExpressionInfoEntry* entry = NULL;
+	if (persistentExpression) {
+		// if our stack frame doesn't have an associated function,
+		// we can't add an expression
+		FunctionInstance* function = fStackFrame->Function();
+		if (function == NULL)
+			return B_NOT_ALLOWED;
 
-	FunctionID* id = function->GetFunctionID();
-	if (id == NULL)
-		return B_NO_MEMORY;
-
-	BReference<FunctionID> idReference(id, true);
-
-	ExpressionInfoEntry* entry = fExpressions->Lookup(FunctionKey(id));
-	if (entry == NULL) {
-		entry = new(std::nothrow) ExpressionInfoEntry(id);
-		if (entry == NULL)
+		FunctionID* id = function->GetFunctionID();
+		if (id == NULL)
 			return B_NO_MEMORY;
-		status_t error = fExpressions->Insert(entry);
-		if (error != B_OK) {
-			delete entry;
-			return error;
+
+		BReference<FunctionID> idReference(id, true);
+
+		entry = fExpressions->Lookup(FunctionKey(id));
+		if (entry == NULL) {
+			entry = new(std::nothrow) ExpressionInfoEntry(id);
+			if (entry == NULL)
+				return B_NO_MEMORY;
+			status_t error = fExpressions->Insert(entry);
+			if (error != B_OK) {
+				delete entry;
+				return error;
+			}
 		}
 	}
 
@@ -2861,8 +2877,11 @@ VariablesView::_AddExpression(const char* expression, ExpressionInfo*& _info)
 
 	BReference<ExpressionInfo> infoReference(info, true);
 
-	if (!entry->AddItem(info))
-		return B_NO_MEMORY;
+	if (persistentExpression) {
+		if (!entry->AddItem(info))
+			return B_NO_MEMORY;
+	} else
+		fTemporaryExpression = info;
 
 	info->AddListener(this);
 	infoReference.Detach();
@@ -2926,6 +2945,7 @@ void
 VariablesView::_AddExpressionNode(ExpressionInfo* info, status_t result,
 	ExpressionResult* value)
 {
+	bool temporaryExpression = (info == fTemporaryExpression);
 	Variable* variable = NULL;
 	BReference<Variable> variableReference;
 	BVariant valueData;
@@ -2990,8 +3010,11 @@ VariablesView::_AddExpressionNode(ExpressionInfo* info, status_t result,
 		child->Node()->SetLocationAndValue(NULL, explicitValue, B_OK);
 	}
 
-	if (fExpressionChildren.AddItem(child)) {
+	if (temporaryExpression || fExpressionChildren.AddItem(child)) {
 		child->AcquireReference();
+
+		if (temporaryExpression)
+			return;
 
 		// attempt to restore our newly added node's view state,
 		// if applicable.

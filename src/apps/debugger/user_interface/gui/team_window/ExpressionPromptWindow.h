@@ -17,12 +17,13 @@ class ExpressionPromptWindow : public BWindow
 {
 public:
 								ExpressionPromptWindow(BHandler* addTarget,
-									BHandler* closeTarget);
+									BHandler* closeTarget, bool isPersistent);
 
 								~ExpressionPromptWindow();
 
 	static	ExpressionPromptWindow* Create(BHandler* addTarget,
-									BHandler* closeTarget);
+									BHandler* closeTarget,
+									bool isPersistent);
 									// throws
 
 
@@ -40,6 +41,7 @@ private:
 			BButton*			fAddButton;
 			BHandler*			fAddTarget;
 			BHandler*			fCloseTarget;
+			bool				fPersistentExpression;
 };
 
 #endif // EXPRESSION_PROMPT_WINDOW_H
