@@ -73,6 +73,7 @@ rule DefineDefaultBuildProfiles
 			AddHaikuImagePackages
 				bepdf
 				cvs
+				dejavu
 				keymapswitcher
 				llvm
 				man
