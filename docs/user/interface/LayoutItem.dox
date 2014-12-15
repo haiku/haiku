@@ -164,6 +164,11 @@
 	\fn void BLayoutItem::SetExplicitMinSize(BSize size) = 0
 	\brief Set this item's explicit min size, to be used in MinSize().
 
+	This forces the minimal size for the item and overrides any constraints
+	that would normally be used to compute it. Most importantly, the minimal
+	size of children is ignored, so setting this can lead to the children not
+	fitting the view.
+
 	\since Haiku R1
 */
 
