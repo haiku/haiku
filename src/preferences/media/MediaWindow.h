@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2012, Haiku, Inc.
+ * Copyright 2003-2014, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -18,7 +18,6 @@
 
 #include <ObjectList.h>
 
-#include "MediaAlert.h"
 #include "MediaIcons.h"
 #include "MediaListItem.h"
 #include "MediaViews.h"

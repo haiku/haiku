@@ -10,7 +10,6 @@ UsePrivateHeaders media shared ;
 
 Preference Media :
 	Media.cpp
-	MediaAlert.cpp
 	MediaIcons.cpp
 	MediaListItem.cpp
 	MediaViews.cpp
