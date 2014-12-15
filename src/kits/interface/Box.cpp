@@ -119,10 +119,10 @@ BBox::Archive(BMessage* archive, bool deep) const
 	status_t ret = BView::Archive(archive, deep);
 
 	if (fLabel && ret == B_OK)
-		 ret = archive->AddString("_label", fLabel);
+		ret = archive->AddString("_label", fLabel);
 
 	if (fLabelView && ret == B_OK)
-		 ret = archive->AddBool("_lblview", true);
+		ret = archive->AddBool("_lblview", true);
 
 	if (fStyle != B_FANCY_BORDER && ret == B_OK)
 		ret = archive->AddInt32("_style", fStyle);
@@ -516,6 +516,8 @@ BBox::MinSize()
 	_ValidateLayoutData();
 
 	BSize size = (GetLayout() ? GetLayout()->MinSize() : fLayoutData->min);
+	if (size.width < fLayoutData->min.width)
+		size.width = fLayoutData->min.width;
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
@@ -583,8 +585,7 @@ BBox::DoLayout()
 				// don't trigger a relayout
 			AddChild(fLabelView, ChildAt(0));
 			EnableLayoutInvalidation();
-		} else
-			return;
+		}
 	}
 
 	_ValidateLayoutData();
@@ -828,9 +829,8 @@ BBox::_ValidateLayoutData()
 		BSize size = fLabelView->PreferredSize();
 		fLayoutData->label_box.Set(10, 0, 10 + size.width, size.height);
 		labelHeight = size.height + 1;
-	} else {
+	} else
 		label = false;
-	}
 
 	// border
 	switch (fStyle) {
