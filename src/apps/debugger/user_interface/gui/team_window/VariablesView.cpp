@@ -515,10 +515,19 @@ private:
 	void _CompareValues()
 	{
 		fValueChanged = false;
-		if (fValue != NULL && fPreviousValue.Type() != 0) {
-			BVariant newValue;
-			fValue->ToVariant(newValue);
-			fValueChanged = (fPreviousValue != newValue);
+		if (fValue != NULL) {
+			if (fPreviousValue.Type() != 0) {
+				BVariant newValue;
+				fValue->ToVariant(newValue);
+				fValueChanged = (fPreviousValue != newValue);
+			} else {
+				// for expression variables, always consider the initial
+				// value as changed, since their evaluation has just been
+				// requested, and thus their initial value is by definition
+				// new/of interest
+				fValueChanged = dynamic_cast<ExpressionVariableID*>(
+					fVariable->ID()) != NULL;
+			}
 		}
 	}
 
