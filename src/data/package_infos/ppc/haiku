@@ -188,4 +188,5 @@ requires {
 	lib:libstdc++
 	lib:libsupc++
 	lib:libz
+	vl_gothic
 }

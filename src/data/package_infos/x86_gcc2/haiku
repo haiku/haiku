@@ -193,4 +193,5 @@ requires {
 	lib:libsolv
 	lib:libsolvext
 	lib:libz
+	vl_gothic
 }
