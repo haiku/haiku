@@ -92,6 +92,7 @@ RemotePackageRepository HaikuPorts
 	fribidi_devel-0.19.5-1
 	friss-0.8.0-1
 	gawk-4.1.0-2
+	gcal-3.6.3-1
 	gcc-2.95.3_2014_10_14-3
 	gcc_syslibs_devel-2.95.3_2014_10_14-3
 	getconf-r260000-1
@@ -729,6 +730,7 @@ RemotePackageRepository HaikuPorts
 	fribidi
 	friss
 	gawk
+	gcal
 	gcc
 	gcc_x86
 	gcc6809_x86
