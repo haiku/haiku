@@ -489,7 +489,7 @@ ScreenshotWindow::_SetupOutputPathMenu(const BMessage& settings)
 	_AddItemToPathMenu(path.Path(), label, 0,
 		path.Path() == lastSelectedPath, 'D');
 
-	find_directory(B_BEOS_ETC_DIRECTORY, &path);
+	find_directory(B_USER_NONPACKAGED_DATA_DIRECTORY, &path);
 	path.Append("artwork");
 
 	label.SetTo(B_TRANSLATE("Artwork folder"));
