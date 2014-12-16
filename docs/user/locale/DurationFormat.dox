@@ -16,7 +16,7 @@
 	\file DurationFormat.h
 	\ingroup locale
 	\ingroup libbe
-	\brief Contains BDurationFormat class, a time interval formatter.
+	\brief Contains BDurationFormat class, a time interval formatter and parser.
 */
 
 
@@ -106,7 +106,7 @@
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_BAD_VALUE Buffer was \c NULL.
+	\retval B_BAD_VALUE \a buffer was \c NULL or invalid.
 	\retval B_ERROR Formatting error.
 
 	\since Haiku R1

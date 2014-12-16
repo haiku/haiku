@@ -16,7 +16,7 @@
 	\file TimeFormat.h
 	\ingroup locale
 	\ingroup libbe
-	\brief Contains BTimeFormat class, a time formatter.
+	\brief Contains BTimeFormat class, a time formatter and parser.
 */
 
 
@@ -32,7 +32,9 @@
 
 /*!
 	\fn BTimeFormat::BTimeFormat()
-	\brief Constructor.
+	\brief Default Constructor. The current system locale is used.
+
+	\since Haiku R1
 */
 
 
@@ -43,6 +45,8 @@
 
 	\param language The \a language to use.
 	\param format The formatting convention to use.
+
+	\since Haiku R1
 */
 
 
@@ -72,13 +76,13 @@
 
 	\param string The string buffer to fill with the formatted time.
 	\param maxSize The size of the buffer.
-	\param time The time (in seconds since epoch) to format
+	\param time The time (in seconds since midnight) to format.
 	\param style Specify the long format or the short format.
 
 	\returns The number of bytes written during the time formatting.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the object.
-	\retval B_BAD_VALUE CheckedArrayByteSink overflowed.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\since Haiku R1
 */
@@ -88,10 +92,10 @@
 	\fn status_t BTimeFormat::Format(char* string, size_t maxSize,
 		time_t time, BTimeFormatStyle style) const
 	\brief Fills in \a string with a formatted time for the given
-	       \a time, \a style, and \a timeZone for the locale.
+	       \a time, and \a style for the locale.
 
 	\param string The string buffer to fill with the formatted time.
-	\param time The time (in seconds since epoch) to format
+	\param time The time (in seconds since midnight) to format.
 	\param style Specify the long format or the short format.
 
 	\returns A status code.
@@ -99,11 +103,10 @@
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the object.
 
-	\sa BLocale::FormatDate(BString *string, time_t time,
-		BTimeFormatStyle style, const BTimeZone* timeZone) const
-	\sa BLocale::FormatDateTime(BString* target, time_t time,
-		BTimeFormatStyle dateStyle, BTimeFormatStyle timeStyle,
-		const BTimeZone* timeZone) const
+	\sa BLocale::FormatDate(BString*, time_t, BTimeFormatStyle,
+		const BTimeZone*) const
+	\sa BLocale::FormatDateTime(BString*, time_t, BTimeFormatStyle,
+		BTimeFormatStyle, const BTimeZone*) const
 
 	\since Haiku R1
 */
@@ -113,35 +116,42 @@
 	\fn status_t BTimeFormat::Format(BString& string, const time_t time,
 		const BTimeFormatStyle style, const BTimeZone* timeZone) const
 	\brief Fills in \a string with a formatted time for the given
-	       \a time and \a style for the locale.
+	       \a time, \a style, and \a timeZone for the locale.
 
 	\param string The string buffer to fill with the formatted time.
 	\param time The time (in seconds since epoch) to format.
-	\param style Specify the long format or the short format.
-	\param timeZone The time zone to use, if \c NULL, uses the one set by the
-	       locale.
+	\param style Specifies whether to use the long format or short format.
+	\param timeZone Specifies the time zone to use, if \c NULL, use the
+	       system default time zone (usually UTC).
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the object.
-	\retval B_BAD_VALUE An error occurred during time formatting.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t BTimeFormat::Format(BString& string,
-		int*& fieldPositions, int& fieldCount,
-		time_t time, BTimeFormatStyle style) const
-	\brief Fills in \a string with a custom formatted time according to the
-	       given parameters for the locale.
+	\fn status_t BTimeFormat::Format(BString& string, int*& fieldPositions,
+		int& fieldCount, time_t time, BTimeFormatStyle style) const
+	\brief Fills in \a string with a custom formatted date according to the
+	       given parameters for the locale and fills out an array of
+	       \a fieldPositions which must be freed by the caller and a
+	       \a fieldCount which contains the number of positions.
+
+	The positions are offsets in the string at which each element of the time
+	(hour, minute, second, etc) and the separator starting positions. These
+	can be used, for example, to split the string in parts to use in a
+	locale-aware set of BMenuFields to edit the time in the local format.
 
 	\param string The string buffer to fill with the formatted time.
-	\param fieldPositions An array of time field positions to use.
-	\param fieldCount The number of \a fields in \a fieldPositions.
-	\param time The time (in seconds since epoch) to format
+	\param fieldPositions An array of time field positions to be filled out.
+	\param fieldCount The number of \a fields in \a fieldPositions to be
+	       filled out.
+	\param time The time (in seconds since epoch) to format.
 	\param style Specify the long format (with day name, full
 		month name) or the short format, 08/12/2010 or similar.
 
@@ -149,7 +159,7 @@
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the object.
-	\retval B_BAD_VALUE An error occurred while performing the time formatting.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\since Haiku R1
 */
@@ -174,7 +184,7 @@
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the object.
-	\retval B_BAD_VALUE An error occurred while getting the time fields.
+	\retval B_BAD_VALUE Bad or invalid \a fields data.
 
 	\since Haiku R1
 */

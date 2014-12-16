@@ -16,7 +16,7 @@
 	\file NumberFormat.h
 	\ingroup locale
 	\ingroup libbe
-	\brief Contains BNumberFormat class, a number formatter.
+	\brief Contains BNumberFormat class, a number formatter and parser.
 */
 
 
@@ -62,7 +62,7 @@
 	\retval B_ERROR Unable to lock the BNumberFormat.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
 	        object.
-	\retval B_BAD_VALUE An error occurred while formatting the number.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\sa BNumberFormat::Format(char* string, size_t maxSize,
 		int32 value) const
@@ -87,7 +87,7 @@
 	\retval B_ERROR Unable to lock the BNumberFormat.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
 	        object.
-	\retval B_BAD_VALUE An error occurred while formatting the number.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\sa BNumberFormat::Format(BString* string, int32 value) const
 	\sa BNumberFormat::FormatMonetary(BString* string, double value) const
@@ -110,7 +110,7 @@
 	\retval B_ERROR Unable to lock the BNumberFormat.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat 
 	        object.
-	\retval B_BAD_VALUE An error occurred while formatting the number.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\sa BNumberFormat::Format(char* string, size_t maxSize,
 		double value) const
@@ -135,7 +135,7 @@
 	\retval B_ERROR Unable to lock the BNumberFormat.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
 	        object.
-	\retval B_BAD_VALUE An error occurred while formatting the number.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\sa BNumberFormat::Format(BString* string, double value) const
 	\sa BNumberFormat::FormatMonetary(BString* string, double value) const
@@ -150,6 +150,9 @@
 	\brief Format the \c double \a value as a monetary string and put the
 	       result into \a string up to \a maxSize bytes in the current locale.
 
+	It uses the money symbol set by the Locale (€, $, ...) or the generic money
+	symbol (¤) if the locale is not country-specific.
+
 	\param string The \a string to put the monetary formatted number into.
 	\param maxSize The maximum of bytes to copy into \a string.
 	\param value The number to format as a monetary \a value.
@@ -158,7 +161,7 @@
 	\retval B_ERROR Unable to lock the BNumberFormat.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
 	        object.
-	\retval B_BAD_VALUE An error occurred while formatting the number.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\sa BNumberFormat::Format(char* string, size_t maxSize, double value) const
 	\sa BNumberFormat::Format(char* string, size_t maxSize, int32 value) const
@@ -181,7 +184,7 @@
 	\retval B_ERROR Unable to lock the BNumberFormat.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
 	        object.
-	\retval B_BAD_VALUE An error occurred while formatting the number.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\sa BNumberFormat::Format(BString* string, double value) const
 	\sa BNumberFormat::Format(BString* string, int32 value) const

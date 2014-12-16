@@ -16,7 +16,7 @@
 	\file DateTimeFormat.h
 	\ingroup locale
 	\ingroup libbe
-	\brief Contains BDateTimeFormat class, a datetime formatter.
+	\brief Contains BDateTimeFormat class, a datetime formatter and parser.
 */
 
 
@@ -82,7 +82,7 @@
 	\returns The number of bytes written during the datetime formatting.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the object.
-	\retval B_BAD_VALUE CheckedArrayByteSink overflowed.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\since Haiku R1
 */
@@ -97,9 +97,10 @@
 
 	\param buffer The string buffer to fill with the formatted date.
 	\param time The time (in seconds since epoch) to format
-	\param dateStyle Specify the long format or the short format of the date.
-	\param timeStyle Specify the long format or the short format of the time.
-	\param timeZone The time zone.
+	\param dateStyle Specifies the long format or the short format of the date.
+	\param timeStyle Specifies the long format or the short format of the time.
+	\param timeZone Specifies the time zone to use, if \c NULL, use the
+	       system default time zone (usually UTC).
 
 	\returns A status code.
 	\retval B_OK Everything went fine.

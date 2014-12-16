@@ -25,7 +25,24 @@
 	\class BTimeZone
 	\ingroup locale
 	\ingroup libbe
-	\brief Provides information about time zones.
+	\brief Defines the time zone API which specifies a time zone, allows you to
+	       display it to the user, and converts between GMT and local time.
+
+	When displaying the name of a time zone to the user, use the display name,
+	not the time zone ID. The display name can be retrieved by the
+	BTimeZone::Name(), BTimeZone::DaylightSavingName(), BTimeZone::ShortName(),
+	and BTimeZone::ShortDaylightSavingName() methods.
+
+	- The standard name looks like "Pacific Standard Time".
+	- The daylight savings time name looks like "Pacific Daylight Time".
+	- The short name looks like either "PST" or "PDT" depending on whether the
+	  standard or daylight savings time name is requested.
+
+	\sa BTimeZone::ID()
+	\sa BTimeZone::Name()
+	\sa BTimeZone::DaylightSavingName()
+	\sa BTimeZone::ShortName()
+	\sa BTimeZone::ShortDaylightSavingName()
 
 	\since Haiku R1
 */
@@ -40,12 +57,19 @@
 	BCountry class which can enumerate all timezones in a country, or use the
 	BLocaleRoster, which knows the timezone selected by the user.
 
+	\param zoneID A time zone ID, for example, "America/Los_Angeles".
+	       This ID is used to call up a specific real-world time zone.
+	\param language The \a language to use when displaying the time zone.
+
 	\since Haiku R1
 */
 
 
 /*!
 	\fn BTimeZone::BTimeZone(const BTimeZone& other)
+	\brief Copy constructor.
+
+	\param other The BTimeZone object to copy from.
 
 	\since Haiku R1
 */
@@ -53,6 +77,9 @@
 
 /*!
 	\fn BTimeZone& BTimeZone::operator=(const BTimeZone& source)
+	\brief Assignment operator.
+
+	\param source The BTimeZone object to copy from.
 
 	\since Haiku R1
 */
@@ -60,7 +87,11 @@
 
 /*!
 	\fn const BString& BTimeZone::ID() const
-	\brief Returns the ID of the time zone.
+	\brief Returns the ID of the time zone as a BString, for example,
+	       "America/Los_Angeles".
+
+	When displaying the name of a time zone to the user, use the display name,
+	not the time zone ID.
 
 	\since Haiku R1
 */
@@ -68,7 +99,8 @@
 
 /*!
 	\fn const BString& BTimeZone::Name() const
-	\brief Returns the localized name of the time zone.
+	\brief Returns the localized name of the time zone, for example
+	       "Pacific Standard Time".
 
 	Use this method to display the time zone's name to the user.
 
@@ -78,7 +110,8 @@
 
 /*!
 	\fn const BString& BTimeZone::DaylightSavingName() const
-	\brief Returns the name of the daylight savings rules used in this timezone.
+	\brief Returns the localized daylight savings name of the time zone,
+	       for example "Pacific Daylight Time".
 
 	\since Haiku R1
 */
@@ -86,7 +119,8 @@
 
 /*!
 	\fn const BString& BTimeZone::ShortName() const
-	\brief Returns the short name of the timezone, in the user's locale.
+	\brief Returns the short name of the timezone, in the user's locale,
+	       for example "PST".
 
 	\since Haiku R1
 */
@@ -94,8 +128,8 @@
 
 /*!
 	\fn const BString& BTimeZone::ShortDaylightSavingName() const
-	\brief Returns the short name of the daylight savings rules used in this
-	       timezone.
+	\brief Returns the localized daylight savings name of the time zone,
+	       for example "PDT".
 
 	\since Haiku R1
 */
@@ -103,9 +137,14 @@
 
 /*!
 	\fn int BTimeZone::OffsetFromGMT() const
-	\brief Return the offset from GMT.
+	\brief Returns the offset, in milliseconds, between the standard time
+	       of a time zone and GMT.
 
-	The offset is a number of seconds, positive or negative.
+	Positive raw offsets are east of Greenwich, negative offsets are west of
+	Greenwich.
+
+	\return The offset as a number of milliseconds from GMT, positive
+	        or negative.
 
 	\since Haiku R1
 */
@@ -113,7 +152,10 @@
 
 /*!
 	\fn bool BTimeZone::SupportsDaylightSaving() const
-	\brief Return true if the time zone has daylight saving rules
+	\brief Returns whether or not if the time zone support daylight saving time.
+
+	\return \c true if the time zone supports daylight savings time,
+	        \c false otherwise.
 
 	\since Haiku R1
 */
@@ -121,9 +163,11 @@
 
 /*!
 	\fn status_t BTimeZone::InitCheck() const
-	\brief Return \c false if there was an error creating the timezone
-	       for instance if you called the constructor or SetTo() with an
-	       invalid timezone code.
+	\brief Returns whether or not the constructor initialized the time zone.
+
+	\return \c true if BTimeZone object was initialized successfully, \c false
+	        if there was an error initializing the BTimeZone, for instance if the
+	        constructor or SetTo() was called with an invalid timezone ID.
 
 	\since Haiku R1
 */
@@ -131,11 +175,15 @@
 
 /*!
 	\fn status_t BTimeZone::SetTo(const char* zoneCode,
-		const BLanguage* language = NULL)
-	\brief Set the timezone to another code.
+		const BLanguage* language)
+	\brief Set the BTimeZone object to use a different time zone.
 
-	\returns \c false if there was an error (likely due to an invalid
-	         timezone code.)
+	\param zoneCode The time zone ID to use, for example "America/Los_Angeles".
+	\param language The \a language to use when displaying the time zone.
+
+	\return \c true if time zone was set successfully, \c false if there was an
+	        error setting the time zone, for instance if this method was called
+	        using an invalid \a zoneCode.
 
 	\since Haiku R1
 */

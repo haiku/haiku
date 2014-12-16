@@ -16,7 +16,7 @@
 	\file DateFormat.h
 	\ingroup locale
 	\ingroup libbe
-	\brief Contains BDateFormat class, a date formatter.
+	\brief Contains BDateFormat class, a date formatter and parser.
 */
 
 
@@ -35,6 +35,8 @@
 	\brief Locale constructor.
 
 	\param locale The locale to use, can be \c NULL for the default locale.
+
+	\since Haiku R1
 */
 
 
@@ -45,6 +47,8 @@
 
 	\param language The \a language to use.
 	\param format The formatting convention to use.
+
+	\since Haiku R1
 */
 
 
@@ -81,7 +85,7 @@
 	\returns The number of bytes written during the date formatting.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the object.
-	\retval B_BAD_VALUE CheckedArrayByteSink overflowed.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\since Haiku R1
 */
@@ -97,7 +101,8 @@
 	\param time The time (in seconds since epoch) to format
 	\param style Specify the long format (with day name, full
 		month name) or the short format, 08/12/2010 or similar.
-	\param timeZone The time zone.
+	\param timeZone Specifies the time zone to use, if \c NULL, use the
+	       system default time zone (usually UTC).
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
@@ -113,11 +118,19 @@
 		int*& fieldPositions, int& fieldCount, const time_t time,
 		const BDateFormatStyle style) const
 	\brief Fills in \a string with a custom formatted date according to the
-	       given parameters for the locale.
+	       given parameters for the locale and fills out an array of
+	       \a fieldPositions which must be freed by the caller and a
+	       \a fieldCount which contains the number of positions.
+
+	The positions are offsets in the string at which each element of the date
+	(day, month, year, etc) and the separator starting positions. These
+	can be used, for example, to split the string into parts to use in a
+	locale-aware set of BMenuFields to edit the date in the local format.
 
 	\param string The string buffer to fill with the formatted date.
-	\param fieldPositions An array of date field positions to use.
-	\param fieldCount The number of \a fields in \a fieldPositions.
+	\param fieldPositions An array of date field positions to be filled out.
+	\param fieldCount The number of \a fields in \a fieldPositions to be
+	       filled out.
 	\param time The time (in seconds since epoch) to format
 	\param style Specify the long format (with day name, full
 		month name) or the short format, 08/12/2010 or similar.
@@ -125,8 +138,9 @@
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
-	\retval B_NO_MEMORY Ran out of memory while creating the object.
-	\retval B_BAD_VALUE An error occurred while performing the date formatting.
+	\retval B_NO_MEMORY Ran out of memory while creating the \a string buffer
+	        or \a fieldPositions array.
+	\retval B_BAD_VALUE There was not enough space to store the result.
 
 	\since Haiku R1
 */
@@ -137,25 +151,27 @@
 		BDateFormatStyle style) const
 	\brief Get the type of each field in the date format of the locale.
 
-	This method is most often used in combination with FormatDate().
-	FormatDate() gives you the offset of each field in a formatted string,
-	and GetDateFields() gives you the type of the field at a given offset.
-	With these informations, you can handle the formatted date string as
-	a list of fields that you can split and alter at will.
+	This method is most often used in combination with the version of Format()
+	that takes a fieldPositions parameter. Format() gives you the offset of
+	each field in a formatted string, and GetFields() gives you the type of
+	the field at a given offset. With these informations, you can handle the
+	formatted date string as a list of fields that you can split and alter at
+	will.
 
-	\param fields Pointer to the fields object.
-	\param fieldCount The number of fields.
-	\param style Specify the long format (with day name, full
-	       month name) or the short format, 08/12/2010 or similar.
+	\param fields Pointer to the array of BDateElement objects.
+	\param fieldCount The number of fields in \a fields.
+	\param style Specify the long format (with day name, full month name)
+	       or the short format, "08/12/2010" or similar.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the object.
-	\retval B_BAD_VALUE An error occurred while getting the date fields.
+	\retval B_BAD_VALUE Bad or invalid \a fields data.
 
-	\sa BDateFormat::GetTimeFields(BDateElement*& fields, int& fieldCount,
-		BTimeFormatStyle style) const
+	\sa BDateFormat::GetFields(BDateElement*&, int&, BTimeFormatStyle) const
+	\sa BDateFormat::Format(BString&, int*&, int&, const time_t,
+		const BDateFormatStyle) const
 
 	\since Haiku R1
 */
