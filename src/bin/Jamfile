@@ -28,7 +28,6 @@ AddResources urlwrapper : urlwrapper.rdef ;
 # standard commands that don't need any additional library
 StdBinCommands
 	badblocks.cpp
-	cal.c
 	chop.c
 	clear.c
 	driveinfo.c
