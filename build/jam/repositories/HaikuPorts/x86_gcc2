@@ -265,6 +265,7 @@ RemotePackageRepository HaikuPorts
 	openssl-1.0.0o-1
 	openssl_devel-1.0.0o-1
 	p7zip-9.20.1-4
+	paladin-git-4
 	pciutils-3.2.1-1
 	pciutils_devel-3.2.1-1
 	pe-2.4.5-1
@@ -882,6 +883,7 @@ RemotePackageRepository HaikuPorts
 	openssl
 	openttd_x86
 	p7zip
+	paladin
 	pciutils
 	pe
 	pecorename
