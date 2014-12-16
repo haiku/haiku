@@ -37,7 +37,7 @@
 
 
 /*!
-	\fn BMenuField::GetOptionAt(int32 index, const char** _name, int32* _value)
+	\fn BOptionPopUp::GetOptionAt(int32 index, const char** _name, int32* _value)
 	\brief Get option at given index.
 */
 
@@ -54,10 +54,10 @@
 
 
 /*!
-	\fn BOptionPopUpAddOptionAt(const char* name, int32 value, int32 index)
+	\fn BOptionPopUp::AddOptionAt(const char* name, int32 value, int32 index)
 	\brief Add an option to the menu.
 
-	Note that the option value is independant from its position in the menu.
+	Note that the option value is independent from its position in the menu.
 */
 
 
