@@ -65,6 +65,7 @@ provides {
 	cmd:gzip
 	cmd:hd
 	cmd:head
+	cmd:hey
 	cmd:hostname
 	cmd:id
 	cmd:install
