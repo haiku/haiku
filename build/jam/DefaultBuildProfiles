@@ -125,6 +125,7 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_SIZE ?= 600 ;
 
 			AddHaikuImagePackages
+				dejavu
 				man
 				nano
 				openssh
@@ -158,6 +159,7 @@ rule DefineDefaultBuildProfiles
 				binutils
 				bison
 				curl_devel
+				dejavu
 				flex
 				freetype_devel
 				gawk
