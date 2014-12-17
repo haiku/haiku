@@ -20,6 +20,7 @@
 #include <TypeConstants.h>
 
 #include <AutoDeleter.h>
+#include <util/SinglyLinkedList.h>
 #include <util/DoublyLinkedList.h>
 
 #include "cdda.h"
@@ -41,7 +42,7 @@ struct attr_cookie;
 struct dir_cookie;
 
 typedef DoublyLinkedList<Attribute> AttributeList;
-typedef DoublyLinkedList<attr_cookie> AttrCookieList;
+typedef SinglyLinkedList<attr_cookie> AttrCookieList;
 
 struct riff_header {
 	uint32		magic;
@@ -255,7 +256,7 @@ enum {
 	ITERATION_STATE_BEGIN	= ITERATION_STATE_DOT,
 };
 
-struct attr_cookie : DoublyLinkedListLinkImpl<attr_cookie> {
+struct attr_cookie : SinglyLinkedListLinkImpl<attr_cookie> {
 	Attribute*	current;
 };
 
@@ -1372,7 +1373,8 @@ Inode::AddAttrCookie(attr_cookie* cookie)
 void
 Inode::RemoveAttrCookie(attr_cookie* cookie)
 {
-	fAttrCookies.Remove(cookie);
+	if (!fAttrCookies.Remove(cookie))
+		panic("Tried to remove %p which is not in cookie list.", cookie);
 }
 
 
