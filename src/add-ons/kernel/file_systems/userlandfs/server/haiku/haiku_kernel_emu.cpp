@@ -204,7 +204,8 @@ get_vnode(fs_volume *_volume, ino_t vnodeID, void **privateNode)
 	if (error != B_OK)
 		return error;
 
-	*privateNode = ((HaikuKernelNode*)foundNode)->private_node;
+	if (privateNode)
+		*privateNode = ((HaikuKernelNode*)foundNode)->private_node;
 
 	return B_OK;
 }
