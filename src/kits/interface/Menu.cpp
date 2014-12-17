@@ -2140,8 +2140,16 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			BRect parentFrame;
 			BRect* overrideFrame = NULL;
 			if (dynamic_cast<_BMCMenuBar_*>(Supermenu()) != NULL) {
-				parentFrame = Supermenu()->Bounds();
-				overrideFrame = &parentFrame;
+				// When the menu is modified while it's open, we get here in a
+				// situation where trying to lock the looper would deadlock
+				// (the window is locked waiting for the menu to terminate).
+				// In that case, just give up on getting the supermenu bounds
+				// and keep the menu at the current width and position.
+				if (Supermenu()->LockLooperWithTimeout(0) == B_OK) {
+					parentFrame = Supermenu()->Bounds();
+					Supermenu()->UnlockLooper();
+					overrideFrame = &parentFrame;
+				}
 			}
 
 			_ComputeColumnLayout(index, bestFit, moveItems, overrideFrame,
