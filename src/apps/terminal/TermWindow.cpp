@@ -514,13 +514,12 @@ TermWindow::_SetupMenu()
 			.AddItem(B_TRANSLATE("Find next"), MENU_FIND_NEXT, 'G')
 				.GetItem(fFindNextMenuItem)
 				.SetEnabled(false)
-			.AddSeparator()
-			.AddItem(B_TRANSLATE("Window title" B_UTF8_ELLIPSIS),
-				kEditWindowTitle)
 		.End()
 
 		// Settings
 		.AddMenu(B_TRANSLATE("Settings"))
+			.AddItem(B_TRANSLATE("Window title" B_UTF8_ELLIPSIS),
+				kEditWindowTitle)
 			.AddItem(windowSize)
 			.AddItem(fEncodingMenu)
 			.AddItem(fFontSizeMenu)
