@@ -16,8 +16,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <OS.h>
-#include <termcap.h>
 #include <termios.h>
+
+#include "termcap.h"
 
 static const char IDLE_NAME[] = "idle thread ";
 static bigtime_t lastMeasure = 0;
