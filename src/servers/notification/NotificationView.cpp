@@ -240,7 +240,7 @@ NotificationView::Draw(BRect updateRect)
 
 	// Icon size
 	float iconSize = (float)fParent->IconSize();
-	
+
 	BRect stripeRect = Bounds();
 	stripeRect.right = kIconStripeWidth;
 	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
@@ -250,7 +250,7 @@ NotificationView::Draw(BRect updateRect)
 	SetHighColor(fStripeColor);
 	stripeRect.right = 2;
 	FillRect(stripeRect);
-	
+
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	// Rectangle for icon and overlay icon
 	BRect iconRect(0, 0, 0, 0);
@@ -277,6 +277,10 @@ NotificationView::Draw(BRect updateRect)
 		LineInfo *l = (*lIt);
 
 		SetFont(&l->font);
+		// Truncate the string. We have already line-wrapped the text but if
+		// there is a very long 'word' we can only truncate it.
+		TruncateString(&(l->text), B_TRUNCATE_END,
+			Bounds().Width() - l->location.x - 8);
 		DrawString(l->text.String(), l->text.Length(), l->location);
 	}
 
