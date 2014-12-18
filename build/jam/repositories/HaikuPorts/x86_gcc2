@@ -265,7 +265,7 @@ RemotePackageRepository HaikuPorts
 	openssl-1.0.0o-1
 	openssl_devel-1.0.0o-1
 	p7zip-9.20.1-4
-	paladin-git-4
+	paladin-git-5
 	pciutils-3.2.1-1
 	pciutils_devel-3.2.1-1
 	pe-2.4.5-1
@@ -589,6 +589,7 @@ RemotePackageRepository HaikuPorts
 	pciutils_x86_devel-3.2.1-1
 	physfs_x86-2.0.3-1
 	physfs_x86_devel-2.0.3-1
+	paladin_x86-git-5
 	pixman_x86-0.32.6-1
 	pixman_x86_devel-0.32.6-1
 	pkgconfig_x86-0.27.1-2
