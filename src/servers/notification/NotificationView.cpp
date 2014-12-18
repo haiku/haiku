@@ -280,7 +280,7 @@ NotificationView::Draw(BRect updateRect)
 		// Truncate the string. We have already line-wrapped the text but if
 		// there is a very long 'word' we can only truncate it.
 		TruncateString(&(l->text), B_TRUNCATE_END,
-			Bounds().Width() - l->location.x - 8);
+			Bounds().Width() - l->location.x);
 		DrawString(l->text.String(), l->text.Length(), l->location);
 	}
 
