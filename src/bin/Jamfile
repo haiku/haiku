@@ -68,6 +68,9 @@ StdBinCommands
 }
 
 # standard commands that need libncurses.a
+Includes [ FGristFiles top.c watch.c ]
+	: [ BuildFeatureAttribute ncurses : headers ] ;
+
 StdBinCommands
 	top.c
 	watch.c
