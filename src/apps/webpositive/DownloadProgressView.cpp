@@ -257,6 +257,13 @@ DownloadProgressView::Init(BMessage* archive)
 	}
 
 	fInfoView = new BStringView("info view", "");
+	
+	BSize topButtonSize = fTopButton->PreferredSize();
+	BSize bottomButtonSize = fBottomButton->PreferredSize();
+	if (bottomButtonSize.width < topButtonSize.width)
+		fBottomButton->SetExplicitMaxSize(topButtonSize);
+	else
+		fTopButton->SetExplicitMaxSize(bottomButtonSize);
 
 	BGroupLayout* layout = GroupLayout();
 	layout->SetInsets(8, 5, 5, 6);
