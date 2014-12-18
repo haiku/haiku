@@ -10,7 +10,7 @@ local defines = [ FDefines USE_TERMIO=1 ] ;
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
 
-BinCommand telnetd :
+local sources =
 	authenc.c
 	global.c
 	slc.c
@@ -19,6 +19,14 @@ BinCommand telnetd :
 	telnetd.c
 	termstat.c
 	utility.c
+;
+
+Includes [ FGristFiles $(sources) ]
+	: [ BuildFeatureAttribute ncurses : headers ] ;
+
+
+BinCommand telnetd :
+	$(sources)
 	: [ BuildFeatureAttribute ncurses : library ] libtelnet.a libutil.a
 	libbsd.so $(TARGET_NETWORK_LIBS)
 ;

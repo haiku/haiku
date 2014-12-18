@@ -9,7 +9,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers libs ncurses ] : true ;
 local defines = [ FDefines SCCSID=0 ] ;
 SubDirCcFlags $(defines) ;
 
-StaticLibrary libedit.a :
+local sources =
 	chared.c
 	common.c
 	el.c
@@ -30,5 +30,13 @@ StaticLibrary libedit.a :
 	term.c
 	tty.c
 	vi.c
+;
+
+Includes [ FGristFiles $(sources) ]
+	: [ BuildFeatureAttribute ncurses : headers ] ;
+
+
+StaticLibrary libedit.a :
+	$(sources)
 ;
 
