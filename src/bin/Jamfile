@@ -9,7 +9,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 UsePrivateHeaders app interface shared storage support tracker usb ;
 UsePrivateSystemHeaders ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
-UseLibraryHeaders ncurses ;
+UseBuildFeatureHeaders ncurses ;
 
 local haiku-utils_rsrc = [ FGristFiles haiku-utils.rsrc ] ;
 
@@ -70,7 +70,8 @@ StdBinCommands
 # standard commands that need libncurses.a
 StdBinCommands
 	top.c
-	: libncurses.a : $(haiku-utils_rsrc) ;
+	watch.c
+	: [ BuildFeatureAttribute ncurses : library ] : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so
 StdBinCommands
@@ -231,15 +232,10 @@ StdBinCommands
 	checkitout.cpp
 	: be bnetapi tracker [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
-#standard commands that need libbe.so, libtracker.so and the stub catalog
+#standard commands that need libbe.so, libtracker.so and the catalog stub
 StdBinCommands
 	filepanel.cpp
 	: be tracker [ TargetLibsupc++ ] localestub : $(haiku-utils_rsrc) ;
-
-# standard commands that need libncurses.a
-StdBinCommands
-	watch.c
-	: libncurses.a : $(haiku-utils_rsrc) ;
 
 # mimeset needs libstorage_kit_mime.a
 StdBinCommands

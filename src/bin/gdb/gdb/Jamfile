@@ -10,7 +10,7 @@ SubDirSysHdrs [ FDirName $(HAIKU_TOP) src bin gawk intl ] ;
 	# Use gawk's libintl for the time being.
 	# TODO: Put a current version of intl ot src/libs and build a static lib
 	# all interested apps can link against.
-UseLibraryHeaders ncurses ;
+UseBuildFeatureHeaders ncurses ;
 UsePrivateHeaders debug ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DLOCALEDIR=\\\"/etc/locale\\\"
@@ -286,7 +286,7 @@ BinCommand gdb : gdb.c :
 	<gdb>libreadline.a
 	<gawk>libintl.a	# use gawk's libintl for the time being
 
-	libncurses.a
+	[ BuildFeatureAttribute ncurses : library ]
 
 	libdebug.so
 	libnetwork.so

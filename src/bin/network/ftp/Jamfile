@@ -21,7 +21,8 @@ BinCommand ftp :
 	progressbar.c
 	ruserpass.c
 	util.c
-	: libedit.a libncurses.a libutil.a libbsd.so $(TARGET_NETWORK_LIBS)
+	: libedit.a [ BuildFeatureAttribute ncurses : library ] libutil.a libbsd.so
+	$(TARGET_NETWORK_LIBS)
 ;
 
 # Installation -- in the test directory for the time being
@@ -29,7 +30,7 @@ HaikuInstall install-networking
 	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
 	: ftp ;
 
-HaikuInstall install-userland-networking 
+HaikuInstall install-userland-networking
 	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
 	: ftp
 	: installed-userland-networking

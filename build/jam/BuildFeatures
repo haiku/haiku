@@ -520,6 +520,23 @@ if [ IsPackageAvailable libwebp_devel ] {
 }
 
 
+# ncurses
+if [ IsPackageAvailable ncurses_devel ] {
+	ExtractBuildFeatureArchives ncurses :
+		file: base ncurses
+			runtime: lib
+		file: devel ncurses_devel
+			depends: base
+			library: $(developLibDir)/libncurses.so.5
+			headers: $(developHeadersDir) $(developHeadersDir)/ncurses
+		;
+
+	EnableBuildFeatures ncurses ;
+} else {
+	Echo "ncurses support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # GPL add-ons
 if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
 	EnableBuildFeatures gpl ;

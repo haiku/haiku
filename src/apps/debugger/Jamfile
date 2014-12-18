@@ -365,12 +365,13 @@ Application Debugger :
 	<nogrist>Debugger_dwarf.o
 	<nogrist>DebugAnalyzer_gui_table.o
 
+	[ BuildFeatureAttribute ncurses : library ]
+
 	libudis86.a
 	<bin>debug_utils.a
 	libcolumnlistview.a
 	libshared.a
 	libedit.a
-	libncurses.a
 
 	[ TargetLibstdc++ ]
 	be package tracker libbsd.so libdebug.so

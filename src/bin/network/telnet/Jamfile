@@ -1,9 +1,10 @@
 SubDir HAIKU_TOP src bin network telnet ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers libs ncurses ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs libtelnet ] : false ;
+
+UseBuildFeatureHeaders ncurses ;
 
 local defines = [ FDefines USE_TERMIO=1 OLD_ENVIRON=1 ENV_HACK=1 ] ;
 
@@ -20,5 +21,6 @@ BinCommand telnet :
 	telnet.c
 	terminal.c
 	utilities.c
-	: libncurses.a libtelnet.a libutil.a libbsd.so $(TARGET_NETWORK_LIBS)
+	: [ BuildFeatureAttribute ncurses : library ] libtelnet.a libutil.a
+	libbsd.so $(TARGET_NETWORK_LIBS)
 ;
