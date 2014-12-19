@@ -1,0 +1,546 @@
+/*
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/TextControl.h	hrev48527
+ *		src/kits/interface/TextControl.cpp	hrev48527
+ */
+
+
+/*!
+	\file TextControl.h
+	\ingroup interface
+	\ingroup libbe
+	\brief Provides the BTextControl class.
+*/
+
+
+/*!
+	\class BTextControl
+	\ingroup interface
+	\ingroup libbe
+	\brief Displays a labeled text view control.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTextControl::BTextControl(BRect frame, const char* name, const char* label,
+		const char* text, BMessage* message, uint32 resizeMask, uint32 flags)
+	\brief Creates a new BTextControl object.
+
+	\param frame The frame rectangle of the control.
+	\param name The (internal) name of the control.
+	\param label The control's \a label text.
+	\param text The initial \a text content of the control.
+	\param message The \a message to send to the control's target in response
+	       to a change.
+	\param resizeMask Resizing mask, passed to BView.
+	\param flags \a flags passed to BView.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTextControl::BTextControl(const char* name, const char* label,
+		const char* text, BMessage* message, uint32 flags)
+	\brief Creates a new BTextControl object for use in a BLayout.
+
+	\param name The name of the object.
+	\param label The control's \a label text.
+	\param text The initial \a text content of the control.
+	\param message The \a message to send to the control's target in response
+	       to a change.
+	\param flags \a flags passed to BView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTextControl::BTextControl(const char* label, const char* text,
+		BMessage* message)
+	\brief Creates a new BTextControl object, dynamic layout version.
+
+	\param label The control's \a label text.
+	\param text The initial \a text content of the control.
+	\param message The \a message to send to the control's target in response
+	       to a change.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTextControl::BTextControl(BMessage* archive)
+	\brief Creates a BTextControl object from the passed in \a archive.
+
+	\param archive The BMessage object from which the object is created.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTextControl::~BTextControl()
+	\brief Frees the memory allocated and destroys the object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BArchivable* BTextControl::Instantiate(BMessage* archive)
+	\brief Instantiates a BTextControl object from the passed in \a archive.
+
+	\param archive The BMessage object that the object is created from.
+
+	\return A new BTextControl object as a BArchivable.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BTextControl::Archive(BMessage* data, bool deep) const
+	\brief Archives the object into the \a data message.
+
+	- The label is stored in \c _a_label
+	- The text is stored in \c _a_text
+	- The current divider position is stored in \c _divide
+	  (ignored in the BLayout version)
+	- The modification message is stored in \c _mod_msg
+
+	\param data A pointer to the BMessage object to archive the object into.
+	\param deep Whether or not to archive child controls as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BTextControl::AllArchived(BMessage* into) const
+	\brief Hook method called when all views have been archived.
+
+	\copydetails BView::AllArchived()
+*/
+
+
+/*!
+	\fn status_t BTextControl::AllUnarchived(const BMessage* from)
+	\copydetails BView::AllUnarchived()
+*/
+
+
+//! @}
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTextControl::AllAttached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+	       all child views have already been attached to a window.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::AllDetached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+	       all child views have already been detached from a window.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::AttachedToWindow()
+	\brief Sets the font color to \c B_DOCUMENT_TEXT_COLOR and the view and
+	       low colors to \c B_DOCUMENT_BACKGROUND_COLOR.
+
+	If the control is disabled, the font, view, and low colors are set to
+	\c B_PANEL_BACKGROUND_COLOR is tinted to show a disabled text color and
+	background instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::DetachedFromWindow()
+	\brief Hook method called when the object is detached from a window.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::Draw(BRect updateRect)
+	\brief Hook method called to draw the contents of the text control.
+
+	\param updateRect The rectangular area to draw.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::FrameMoved(BPoint newPosition)
+	\brief Hook method called when the control position is moved.
+
+	\param newPosition The point of the top left corner of the frame
+	       that the view has been moved to.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::FrameResized(float newWidth, float newHeight)
+	\brief Hook method that is called when the control position is resized.
+
+	This method updates only the parts of the frame that changed.
+
+	\param newWidth The new width of the control.
+	\param newHeight The new height of the control.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BTextControl::Invoke(BMessage* message)
+	\brief Sends a copy of the model \a message to the designated target.
+
+	\copydetails BControl::Invoke()
+*/
+
+
+/*!
+	\fn void BTextControl::LayoutInvalidated(bool descendants)
+	\brief Hook method called when the layout is invalidated.
+
+	\param descendants Whether or not child views have also been invalidated.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BTextControl::MessageReceived(BMessage* message)
+	\brief Handle \a message received by the associated looper.
+
+	\copydetails BView::MessageReceived()
+*/
+
+
+/*!
+	\fn void BTextControl::MouseDown(BPoint where)
+	\brief Hook method that is called when a mouse text control is pushed down while
+	       the cursor is contained in the control.
+
+	Focuses the text control.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::MouseMoved(BPoint where, uint32 code,
+		const BMessage* dragMessage)
+	\brief Hook method called when the mouse is moved.
+
+	\copydetails BControl::MouseMoved()
+*/
+
+
+/*!
+	\fn void BTextControl::MouseUp(BPoint where)
+	\brief Hook method called when a mouse button is released.
+
+	\copydetails BControl::MouseUp()
+*/
+
+
+/*!
+	\fn void BTextControl::WindowActivated(bool active)
+	\brief Hook method that is called when the window becomes the active window
+	       or gives up that status.
+
+	Redraw focus indicator and notify the text view.
+
+	\copydetails BView::WindowActivated()
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BTextControl::SetText(const char* text)
+	\brief Sets the text displayed by the BTextControl.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn const char* BTextControl::Text() const
+	\brief Returns the text displayed by the BTextControl.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::MarkAsInvalid(bool invalid)
+	\brief Sets or removes the invalid flag.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BTextControl::SetValue(int32 value)
+	\brief Calls BControl::SetValue(). This isn't particularly useful.
+
+	\copydetails BControl::SetValue()
+*/
+
+
+/*!
+	\fn BTextView* BTextControl::TextView() const
+	\brief Returns a pointer to the TextView object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::SetModificationMessage(BMessage* message)
+	\brief Assigns \a message to the control, freeing the previously
+	       assigned message.
+
+	Passing NULL deletes the current modification message without replacing it.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BMessage* BTextControl::ModificationMessage() const
+	\brief Returns the control's modification message.
+*/
+
+
+/*!
+	\fn void BTextControl::SetAlignment(alignment labelAlignment,
+		alignment textAlignment)
+	\brief Set the alignment of the label and the text within the control.
+
+	The default is \c B_ALIGN_LEFT for both label and text.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::GetAlignment(alignment* _label,
+		alignment* _text) const
+	\brief Fills out the label and text alignments into \a _label and \a text.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::SetDivider(float position)
+	\brief Sets the horizontal \a position of the divider that separates the
+	       label from the text view.
+
+	\remark It is not recommended to use this method for text control that are
+	        part of a BLayout. Instead split the label and text view into
+	        separate layout items using CreateLabelLayoutItem() and
+	        CreateTextViewLayoutItem(). This allows you to have better control
+	        over the position of the label and text view portions of your
+	        text control.
+
+	\param position The divider \a position to set, should be an integral value.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn float BTextControl::Divider() const
+	\brief Returns the current divider position.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::MakeFocus(bool focus)
+	\brief Passes MakeFocus() to the child BTextView.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::SetEnabled(bool enable)
+	\brief Enables or disables the text control.
+
+	\param enable \c true to enable the control, \c false to disable it.
+
+	\since R3
+*/
+
+
+/*!
+	\fn void BTextControl::GetPreferredSize(float* _width, float* _height)
+	\brief Fills out \a _width and \a _height with the optimal width and
+	       height of the text control to display the label and the text
+		   respectively.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::ResizeToPreferred()
+	\brief Resizes the text control to its preferred size, keeping its left
+	       and top sides constant while adjusting the width and height of
+	       the text view.
+
+	\warning It is not recommended to use this method for text control that
+	         are part of a BLayout.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextControl::SetFlags(uint32 flags)
+	\brief Sets the control flags according to the \a flags mask.
+
+	Passes the \c B_NAVIGABLE to the BTextView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHandler* BTextControl::ResolveSpecifier(BMessage* message, int32 index,
+		BMessage* specifier, int32 what, const char* property)
+	\copydoc BHandler::ResolveSpecifier()
+*/
+
+
+/*!
+	\fn status_t BTextControl::GetSupportedSuites(BMessage* data)
+	\copydoc BHandler::GetSupportedSuites()
+*/
+
+
+/*!
+	\fn BSize BTextControl::MinSize()
+	\brief Returns the text control's minimum size.
+
+	\return The text control's minimum size as a BSize.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSize BTextControl::MaxSize()
+	\brief Returns the text control's maximum size.
+
+	\return The text control's maximum size as a BSize.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSize BTextControl::PreferredSize()
+	\brief Returns the text control's preferred size.
+
+	\return The text control's preferred size as a BSize.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAlignment BTextControl::LayoutAlignment()
+	\brief Returns the alignment used by this control in a layout.
+
+	\since Haiku R1
+*/
+
+
+
+/*!
+	\fn BLayoutItem* BTextControl::CreateLabelLayoutItem()
+	\brief Creates a label layout item and returns a pointer to it.
+	       (Layout constructor only)
+
+	\sa CreateTextViewLayoutItem()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutItem* BTextControl::CreateTextViewLayoutItem()
+	\brief Creates a text view layout item and returns a pointer to it.
+
+	\sa CreateLabelLayoutItem()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BTextControl::DoLayout()
+	\brief Layout view within the layout context.
+
+	\remark This is only meaningful if the view is part of a BLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	status_t BTextControl::SetIcon(const BBitmap* icon, uint32 flags)
+	\copydoc BControl::SetIcon()
+*/
