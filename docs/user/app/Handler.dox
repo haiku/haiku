@@ -528,7 +528,7 @@ ShowImageApp::MessageReceived(BMessage *message)
 /*!
 	\fn status_t BHandler::GetSupportedSuites(BMessage* data)
 	\brief Reports the suites of messages and specifiers that derived classes
-		understand.
+	       understand.
 
 	\since BeOS R3
 */

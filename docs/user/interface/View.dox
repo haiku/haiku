@@ -778,7 +778,7 @@ SetViewColor(Parent()->ViewColor());
 	\fn status_t BView::AllUnarchived(const BMessage* from)
 	\brief Hook method called when all views have been unarchived.
 
-	\since Haiku R1
+	\since BeOS R3
 */
 
 
@@ -786,7 +786,7 @@ SetViewColor(Parent()->ViewColor());
 	\fn status_t BView::AllArchived(BMessage* into) const
 	\brief Hook method called when all views have been archived.
 
-	\since Haiku R1
+	\since BeOS R3
 */
 
 
@@ -866,8 +866,8 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::FrameResized(float newWidth, float newHeight)
 	\brief Hook method called when the view is resized.
 
-	\param newWidth The new \a width of the view.
-	\param newHeight The new \a height of the view.
+	\param newWidth The new width of the view.
+	\param newHeight The new height of the view.
 
 	\since BeOS R3
 */
@@ -3908,10 +3908,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn status_t BView::GetSupportedSuites(BMessage* data)
-	\brief Reports the suites of messages and specifiers understood by the
-	       view.
-
-	\copydetails BHandler::GetSupportedSuites()
+	\copydoc BHandler::GetSupportedSuites()
 */
 
 
