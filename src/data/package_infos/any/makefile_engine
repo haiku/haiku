@@ -16,4 +16,5 @@ provides {
 
 requires {
 	cmd:make
+	cmd:mkdepend
 }
