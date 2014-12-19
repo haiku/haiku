@@ -21,6 +21,7 @@
 #include <Catalog.h>
 #include <Debug.h>
 #include <Deskbar.h>
+#include <IconUtils.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MediaRoster.h>
@@ -36,6 +37,7 @@
 #include <String.h>
 #include <TextView.h>
 
+#include "Media.h"
 #include "MediaIcons.h"
 #include "MidiSettingsView.h"
 
@@ -676,12 +678,20 @@ MediaWindow::_UpdateProgress(int stage, const char* message, void* cookie)
 void
 MediaWindow::_Notify(float progress, const char* message)
 {
-	BNotification info(B_PROGRESS_NOTIFICATION);
-	info.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
-	info.SetProgress(progress);
-	info.SetTitle(B_TRANSLATE("Media Service"));
-	info.SetContent(message);
-	info.Send();
+	BNotification notification(B_PROGRESS_NOTIFICATION);
+	notification.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
+	notification.SetProgress(progress);
+	notification.SetGroup(B_TRANSLATE("Media Service"));
+	notification.SetContent(message);
+
+	app_info info;
+	be_roster->GetAppInfo(kApplicationSignature, &info);
+	BBitmap icon(BRect(0, 0, 32, 32), B_RGBA32);
+	BNode node(&info.ref);
+	BIconUtils::GetVectorIcon(&node, "BEOS:ICON", &icon);
+	notification.SetIcon(&icon);
+
+	notification.Send();
 }
 
 
