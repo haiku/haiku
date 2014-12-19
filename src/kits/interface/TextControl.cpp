@@ -156,9 +156,9 @@ static const int32 kLabelInputSpacing = 3;
 
 
 BTextControl::BTextControl(BRect frame, const char* name, const char* label,
-		const char* text, BMessage* message, uint32 mask, uint32 flags)
+	const char* text, BMessage* message, uint32 resizeMask, uint32 flags)
 	:
-	BControl(frame, name, label, message, mask, flags | B_FRAME_EVENTS)
+	BControl(frame, name, label, message, resizeMask, flags | B_FRAME_EVENTS)
 {
 	_InitData(label);
 	_InitText(text);
@@ -167,7 +167,7 @@ BTextControl::BTextControl(BRect frame, const char* name, const char* label,
 
 
 BTextControl::BTextControl(const char* name, const char* label,
-		const char* text, BMessage* message, uint32 flags)
+	const char* text, BMessage* message, uint32 flags)
 	:
 	BControl(name, label, message, flags | B_FRAME_EVENTS)
 {
@@ -178,7 +178,7 @@ BTextControl::BTextControl(const char* name, const char* label,
 
 
 BTextControl::BTextControl(const char* label, const char* text,
-		BMessage* message)
+	BMessage* message)
 	:
 	BControl(NULL, label, message,
 		B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS)
@@ -194,6 +194,9 @@ BTextControl::~BTextControl()
 	SetModificationMessage(NULL);
 	delete fLayoutData;
 }
+
+
+//	#pragma mark - Archiving
 
 
 BTextControl::BTextControl(BMessage* archive)
@@ -232,25 +235,29 @@ BTextControl::Instantiate(BMessage* archive)
 
 
 status_t
-BTextControl::Archive(BMessage *data, bool deep) const
+BTextControl::Archive(BMessage* data, bool deep) const
 {
 	BArchiver archiver(data);
-	status_t ret = BControl::Archive(data, deep);
-	alignment labelAlignment, textAlignment;
+	status_t result = BControl::Archive(data, deep);
 
-	GetAlignment(&labelAlignment, &textAlignment);
+	alignment labelAlignment;
+	alignment textAlignment;
+	if (result == B_OK)
+		GetAlignment(&labelAlignment, &textAlignment);
 
-	if (ret == B_OK)
-		ret = data->AddInt32("_a_label", labelAlignment);
-	if (ret == B_OK)
-		ret = data->AddInt32("_a_text", textAlignment);
-	if (ret == B_OK)
-		ret = data->AddFloat("_divide", Divider());
+	if (result == B_OK)
+		result = data->AddInt32("_a_label", labelAlignment);
 
-	if (ModificationMessage() && (ret == B_OK))
-		ret = data->AddMessage("_mod_msg", ModificationMessage());
+	if (result == B_OK)
+		result = data->AddInt32("_a_text", textAlignment);
 
-	return archiver.Finish(ret);
+	if (result == B_OK)
+		result = data->AddFloat("_divide", Divider());
+
+	if (result == B_OK && ModificationMessage() != NULL)
+		result = data->AddMessage("_mod_msg", ModificationMessage());
+
+	return archiver.Finish(result);
 }
 
 
@@ -307,252 +314,20 @@ BTextControl::AllUnarchived(const BMessage* from)
 }
 
 
+//	#pragma mark - Hook methods
+
+
 void
-BTextControl::SetText(const char *text)
+BTextControl::AllAttached()
 {
-	if (InvokeKind() != B_CONTROL_INVOKED)
-		return;
-
-	CALLED();
-
-	fText->SetText(text);
-
-	if (fText->IsFocus()) {
-		fText->SetInitialText();
-		fText->SelectAll();
-	}
-
-	fText->Invalidate();
-}
-
-
-const char *
-BTextControl::Text() const
-{
-	return fText->Text();
+	BControl::AllAttached();
 }
 
 
 void
-BTextControl::MarkAsInvalid(bool invalid)
+BTextControl::AllDetached()
 {
-	uint32 look = fLook;
-
-	if (invalid)
-		fLook |= BControlLook::B_INVALID;
-	else
-		fLook &= ~BControlLook::B_INVALID;
-
-	if (look != fLook)
-		Invalidate();
-}
-
-
-void
-BTextControl::SetValue(int32 value)
-{
-	BControl::SetValue(value);
-}
-
-
-status_t
-BTextControl::Invoke(BMessage *message)
-{
-	return BControl::Invoke(message);
-}
-
-
-BTextView*
-BTextControl::TextView() const
-{
-	return fText;
-}
-
-
-void
-BTextControl::SetModificationMessage(BMessage *message)
-{
-	delete fModificationMessage;
-	fModificationMessage = message;
-}
-
-
-BMessage *
-BTextControl::ModificationMessage() const
-{
-	return fModificationMessage;
-}
-
-
-void
-BTextControl::SetAlignment(alignment labelAlignment, alignment textAlignment)
-{
-	fText->SetAlignment(textAlignment);
-	fText->AlignTextRect();
-
-	if (fLabelAlign != labelAlignment) {
-		fLabelAlign = labelAlignment;
-		Invalidate();
-	}
-}
-
-
-void
-BTextControl::GetAlignment(alignment* _label, alignment* _text) const
-{
-	if (_label != NULL)
-		*_label = fLabelAlign;
-
-	if (_text != NULL)
-		*_text = fText->Alignment();
-}
-
-
-void
-BTextControl::SetDivider(float dividingLine)
-{
-	fDivider = floorf(dividingLine + 0.5);
-
-	_LayoutTextView();
-
-	if (Window()) {
-		fText->Invalidate();
-		Invalidate();
-	}
-}
-
-
-float
-BTextControl::Divider() const
-{
-	return fDivider;
-}
-
-
-void
-BTextControl::Draw(BRect updateRect)
-{
-	bool enabled = IsEnabled();
-	bool active = fText->IsFocus() && Window()->IsActive();
-
-	BRect rect = fText->Frame();
-	rect.InsetBy(-2, -2);
-
-	if (be_control_look != NULL) {
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 flags = fLook;
-		if (!enabled)
-			flags |= BControlLook::B_DISABLED;
-		if (active)
-			flags |= BControlLook::B_FOCUSED;
-		be_control_look->DrawTextControlBorder(this, rect, updateRect, base,
-			flags);
-
-		if (Label() != NULL) {
-			if (fLayoutData->label_layout_item != NULL) {
-				rect = fLayoutData->label_layout_item->FrameInParent();
-			} else {
-				rect = Bounds();
-				rect.right = fDivider - kLabelInputSpacing;
-			}
-
-			be_control_look->DrawLabel(this, Label(), rect, updateRect,
-				base, flags, BAlignment(fLabelAlign, B_ALIGN_MIDDLE));
-		}
-		return;
-	}
-
-	// outer bevel
-
-	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
-	rgb_color lighten2 = tint_color(noTint, B_LIGHTEN_2_TINT);
-	rgb_color darken1 = tint_color(noTint, B_DARKEN_1_TINT);
-	rgb_color darken2 = tint_color(noTint, B_DARKEN_2_TINT);
-	rgb_color darken4 = tint_color(noTint, B_DARKEN_4_TINT);
-	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
-
-	if (enabled)
-		SetHighColor(darken1);
-	else
-		SetHighColor(noTint);
-
-	StrokeLine(rect.LeftBottom(), rect.LeftTop());
-	StrokeLine(rect.RightTop());
-
-	if (enabled)
-		SetHighColor(lighten2);
-	else
-		SetHighColor(lighten1);
-
-	StrokeLine(BPoint(rect.left + 1.0f, rect.bottom), rect.RightBottom());
-	StrokeLine(BPoint(rect.right, rect.top + 1.0f), rect.RightBottom());
-
-	// inner bevel
-
-	rect.InsetBy(1.0f, 1.0f);
-
-	if (active) {
-		SetHighColor(navigationColor);
-		StrokeRect(rect);
-	} else {
-		if (enabled)
-			SetHighColor(darken4);
-		else
-			SetHighColor(darken2);
-
-		StrokeLine(rect.LeftTop(), rect.LeftBottom());
-		StrokeLine(rect.LeftTop(), rect.RightTop());
-
-		SetHighColor(noTint);
-		StrokeLine(BPoint(rect.left + 1.0f, rect.bottom), rect.RightBottom());
-		StrokeLine(BPoint(rect.right, rect.top + 1.0f));
-	}
-
-	// label
-
-	if (Label()) {
-		_ValidateLayoutData();
-		font_height& fontHeight = fLayoutData->font_info;
-
-		float y = Bounds().top + (Bounds().Height() + 1 - fontHeight.ascent
-			- fontHeight.descent) / 2 + fontHeight.ascent;
-		float x;
-
-		float labelWidth = StringWidth(Label());
-		switch (fLabelAlign) {
-			case B_ALIGN_RIGHT:
-				x = fDivider - labelWidth - kLabelInputSpacing;
-				break;
-
-			case B_ALIGN_CENTER:
-				x = fDivider - labelWidth / 2.0;
-				break;
-
-			default:
-				x = 0.0;
-				break;
-		}
-
-		BRect labelArea(x, Bounds().top, x + labelWidth, Bounds().bottom);
-		if (x < fDivider && updateRect.Intersects(labelArea)) {
-			labelArea.right = fText->Frame().left - kLabelInputSpacing;
-
-			BRegion clipRegion(labelArea);
-			ConstrainClippingRegion(&clipRegion);
-			SetHighColor(IsEnabled() ? ui_color(B_CONTROL_TEXT_COLOR)
-				: tint_color(noTint, B_DISABLED_LABEL_TINT));
-			DrawString(Label(), BPoint(x, y));
-		}
-	}
-}
-
-
-void
-BTextControl::MouseDown(BPoint where)
-{
-	if (!fText->IsFocus())
-		fText->MakeFocus(true);
+	BControl::AllDetached();
 }
 
 
@@ -567,172 +342,6 @@ BTextControl::AttachedToWindow()
 
 
 void
-BTextControl::MakeFocus(bool state)
-{
-	if (state != fText->IsFocus()) {
-		fText->MakeFocus(state);
-
-		if (state)
-			fText->SelectAll();
-	}
-}
-
-
-void
-BTextControl::SetEnabled(bool enabled)
-{
-	if (IsEnabled() == enabled)
-		return;
-
-	if (Window()) {
-		fText->MakeEditable(enabled);
-		if (enabled)
-			fText->SetFlags(fText->Flags() | B_NAVIGABLE);
-		else
-			fText->SetFlags(fText->Flags() & ~B_NAVIGABLE);
-
-		_UpdateTextViewColors(enabled);
-
-		fText->Invalidate();
-		Window()->UpdateIfNeeded();
-	}
-
-	BControl::SetEnabled(enabled);
-}
-
-
-void
-BTextControl::GetPreferredSize(float *_width, float *_height)
-{
-	CALLED();
-
-	_ValidateLayoutData();
-
-	if (_width) {
-		float minWidth = fLayoutData->min.width;
-		if (Label() == NULL && !(Flags() & B_SUPPORTS_LAYOUT)) {
-			// Indeed, only if there is no label! BeOS backwards compatible
-			// behavior:
-			minWidth = max_c(minWidth, Bounds().Width());
-		}
-		*_width = minWidth;
-	}
-
-	if (_height)
-		*_height = fLayoutData->min.height;
-}
-
-
-void
-BTextControl::ResizeToPreferred()
-{
-	BView::ResizeToPreferred();
-
-	fDivider = 0.0;
-	const char* label = Label();
-	if (label)
-		fDivider = ceil(StringWidth(label)) + 2.0;
-
-	_LayoutTextView();
-}
-
-
-void
-BTextControl::SetFlags(uint32 flags)
-{
-	// If the textview is navigable, set it to not navigable if needed
-	// Else if it is not navigable, set it to navigable if needed
-	if (fText->Flags() & B_NAVIGABLE) {
-		if (!(flags & B_NAVIGABLE))
-			fText->SetFlags(fText->Flags() & ~B_NAVIGABLE);
-
-	} else {
-		if (flags & B_NAVIGABLE)
-			fText->SetFlags(fText->Flags() | B_NAVIGABLE);
-	}
-
-	// Don't make this one navigable
-	flags &= ~B_NAVIGABLE;
-
-	BView::SetFlags(flags);
-}
-
-
-void
-BTextControl::MessageReceived(BMessage *message)
-{
-	if (message->what == B_GET_PROPERTY || message->what == B_SET_PROPERTY) {
-		BMessage reply(B_REPLY);
-		bool handled = false;
-
-		BMessage specifier;
-		int32 index;
-		int32 form;
-		const char *property;
-		if (message->GetCurrentSpecifier(&index, &specifier, &form, &property) == B_OK) {
-			if (strcmp(property, "Value") == 0) {
-				if (message->what == B_GET_PROPERTY) {
-					reply.AddString("result", fText->Text());
-					handled = true;
-				} else {
-					const char* value = NULL;
-					// B_SET_PROPERTY
-					if (message->FindString("data", &value) == B_OK) {
-						fText->SetText(value);
-						reply.AddInt32("error", B_OK);
-						handled = true;
-					}
-				}
-			}
-		}
-
-		if (handled) {
-			message->SendReply(&reply);
-			return;
-		}
-	}
-
-	BControl::MessageReceived(message);
-}
-
-
-BHandler*
-BTextControl::ResolveSpecifier(BMessage* message, int32 index,
-	BMessage* specifier, int32 what, const char* property)
-{
-	BPropertyInfo propInfo(sPropertyList);
-
-	if (propInfo.FindMatch(message, 0, specifier, what, property) >= B_OK)
-		return this;
-
-	return BControl::ResolveSpecifier(message, index, specifier, what,
-		property);
-}
-
-
-status_t
-BTextControl::GetSupportedSuites(BMessage* data)
-{
-	return BControl::GetSupportedSuites(data);
-}
-
-
-void
-BTextControl::MouseUp(BPoint point)
-{
-	BControl::MouseUp(point);
-}
-
-
-void
-BTextControl::MouseMoved(BPoint point, uint32 transit,
-	const BMessage* dragMessage)
-{
-	BControl::MouseMoved(point, transit, dragMessage);
-}
-
-
-void
 BTextControl::DetachedFromWindow()
 {
 	BControl::DetachedFromWindow();
@@ -740,16 +349,36 @@ BTextControl::DetachedFromWindow()
 
 
 void
-BTextControl::AllAttached()
+BTextControl::Draw(BRect updateRect)
 {
-	BControl::AllAttached();
-}
+	bool enabled = IsEnabled();
+	bool active = fText->IsFocus() && Window()->IsActive();
 
+	BRect rect = fText->Frame();
+	rect.InsetBy(-2, -2);
 
-void
-BTextControl::AllDetached()
-{
-	BControl::AllDetached();
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 flags = fLook;
+	if (!enabled)
+		flags |= BControlLook::B_DISABLED;
+
+	if (active)
+		flags |= BControlLook::B_FOCUSED;
+
+	be_control_look->DrawTextControlBorder(this, rect, updateRect, base,
+		flags);
+
+	if (Label() != NULL) {
+		if (fLayoutData->label_layout_item != NULL) {
+			rect = fLayoutData->label_layout_item->FrameInParent();
+		} else {
+			rect = Bounds();
+			rect.right = fDivider - kLabelInputSpacing;
+		}
+
+		be_control_look->DrawLabel(this, Label(), rect, updateRect,
+			base, flags, BAlignment(fLabelAlign, B_ALIGN_MIDDLE));
+	}
 }
 
 
@@ -816,6 +445,83 @@ BTextControl::FrameResized(float width, float height)
 }
 
 
+status_t
+BTextControl::Invoke(BMessage* message)
+{
+	return BControl::Invoke(message);
+}
+
+
+void
+BTextControl::LayoutInvalidated(bool descendants)
+{
+	CALLED();
+
+	fLayoutData->valid = false;
+}
+
+
+void
+BTextControl::MessageReceived(BMessage* message)
+{
+	if (message->what == B_GET_PROPERTY || message->what == B_SET_PROPERTY) {
+		BMessage reply(B_REPLY);
+		bool handled = false;
+
+		BMessage specifier;
+		int32 index;
+		int32 form;
+		const char* property;
+		if (message->GetCurrentSpecifier(&index, &specifier, &form, &property) == B_OK) {
+			if (strcmp(property, "Value") == 0) {
+				if (message->what == B_GET_PROPERTY) {
+					reply.AddString("result", fText->Text());
+					handled = true;
+				} else {
+					const char* value = NULL;
+					// B_SET_PROPERTY
+					if (message->FindString("data", &value) == B_OK) {
+						fText->SetText(value);
+						reply.AddInt32("error", B_OK);
+						handled = true;
+					}
+				}
+			}
+		}
+
+		if (handled) {
+			message->SendReply(&reply);
+			return;
+		}
+	}
+
+	BControl::MessageReceived(message);
+}
+
+
+void
+BTextControl::MouseDown(BPoint where)
+{
+	if (!fText->IsFocus())
+		fText->MakeFocus(true);
+}
+
+
+void
+BTextControl::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
+	BControl::MouseMoved(where, transit, dragMessage);
+}
+
+
+void
+BTextControl::MouseUp(BPoint where)
+{
+	BControl::MouseUp(where);
+}
+
+
 void
 BTextControl::WindowActivated(bool active)
 {
@@ -830,6 +536,243 @@ BTextControl::WindowActivated(bool active)
 		fText->Invalidate();
 	}
 }
+
+
+//	#pragma mark - Getters and Setters
+
+
+void
+BTextControl::SetText(const char* text)
+{
+	if (InvokeKind() != B_CONTROL_INVOKED)
+		return;
+
+	CALLED();
+
+	fText->SetText(text);
+
+	if (fText->IsFocus()) {
+		fText->SetInitialText();
+		fText->SelectAll();
+	}
+
+	fText->Invalidate();
+}
+
+
+const char*
+BTextControl::Text() const
+{
+	return fText->Text();
+}
+
+
+void
+BTextControl::MarkAsInvalid(bool invalid)
+{
+	uint32 look = fLook;
+
+	if (invalid)
+		fLook |= BControlLook::B_INVALID;
+	else
+		fLook &= ~BControlLook::B_INVALID;
+
+	if (look != fLook)
+		Invalidate();
+}
+
+
+void
+BTextControl::SetValue(int32 value)
+{
+	BControl::SetValue(value);
+}
+
+
+BTextView*
+BTextControl::TextView() const
+{
+	return fText;
+}
+
+
+void
+BTextControl::SetModificationMessage(BMessage* message)
+{
+	delete fModificationMessage;
+	fModificationMessage = message;
+}
+
+
+BMessage*
+BTextControl::ModificationMessage() const
+{
+	return fModificationMessage;
+}
+
+
+void
+BTextControl::SetAlignment(alignment labelAlignment, alignment textAlignment)
+{
+	fText->SetAlignment(textAlignment);
+	fText->AlignTextRect();
+
+	if (fLabelAlign != labelAlignment) {
+		fLabelAlign = labelAlignment;
+		Invalidate();
+	}
+}
+
+
+void
+BTextControl::GetAlignment(alignment* _label, alignment* _text) const
+{
+	if (_label != NULL)
+		*_label = fLabelAlign;
+
+	if (_text != NULL)
+		*_text = fText->Alignment();
+}
+
+
+void
+BTextControl::SetDivider(float position)
+{
+	fDivider = floorf(position + 0.5);
+
+	_LayoutTextView();
+
+	if (Window()) {
+		fText->Invalidate();
+		Invalidate();
+	}
+}
+
+
+float
+BTextControl::Divider() const
+{
+	return fDivider;
+}
+
+
+void
+BTextControl::MakeFocus(bool state)
+{
+	if (state != fText->IsFocus()) {
+		fText->MakeFocus(state);
+
+		if (state)
+			fText->SelectAll();
+	}
+}
+
+
+void
+BTextControl::SetEnabled(bool enable)
+{
+	if (IsEnabled() == enable)
+		return;
+
+	if (Window() != NULL) {
+		fText->MakeEditable(enable);
+		if (enable)
+			fText->SetFlags(fText->Flags() | B_NAVIGABLE);
+		else
+			fText->SetFlags(fText->Flags() & ~B_NAVIGABLE);
+
+		_UpdateTextViewColors(enable);
+
+		fText->Invalidate();
+		Window()->UpdateIfNeeded();
+	}
+
+	BControl::SetEnabled(enable);
+}
+
+
+void
+BTextControl::GetPreferredSize(float* _width, float* _height)
+{
+	CALLED();
+
+	_ValidateLayoutData();
+
+	if (_width) {
+		float minWidth = fLayoutData->min.width;
+		if (Label() == NULL && !(Flags() & B_SUPPORTS_LAYOUT)) {
+			// Indeed, only if there is no label! BeOS backwards compatible
+			// behavior:
+			minWidth = max_c(minWidth, Bounds().Width());
+		}
+		*_width = minWidth;
+	}
+
+	if (_height)
+		*_height = fLayoutData->min.height;
+}
+
+
+void
+BTextControl::ResizeToPreferred()
+{
+	BView::ResizeToPreferred();
+
+	fDivider = 0.0;
+	const char* label = Label();
+	if (label)
+		fDivider = ceil(StringWidth(label)) + 2.0;
+
+	_LayoutTextView();
+}
+
+
+void
+BTextControl::SetFlags(uint32 flags)
+{
+	// If the textview is navigable, set it to not navigable if needed
+	// Else if it is not navigable, set it to navigable if needed
+	if (fText->Flags() & B_NAVIGABLE) {
+		if (!(flags & B_NAVIGABLE))
+			fText->SetFlags(fText->Flags() & ~B_NAVIGABLE);
+
+	} else {
+		if (flags & B_NAVIGABLE)
+			fText->SetFlags(fText->Flags() | B_NAVIGABLE);
+	}
+
+	// Don't make this one navigable
+	flags &= ~B_NAVIGABLE;
+
+	BView::SetFlags(flags);
+}
+
+
+//	#pragma mark - Scripting
+
+
+BHandler*
+BTextControl::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
+{
+	BPropertyInfo propInfo(sPropertyList);
+
+	if (propInfo.FindMatch(message, 0, specifier, what, property) >= B_OK)
+		return this;
+
+	return BControl::ResolveSpecifier(message, index, specifier, what,
+		property);
+}
+
+
+status_t
+BTextControl::GetSupportedSuites(BMessage* data)
+{
+	return BControl::GetSupportedSuites(data);
+}
+
+
+//	#pragma mark - Layout
 
 
 BSize
@@ -898,15 +841,6 @@ BTextControl::CreateTextViewLayoutItem()
 
 
 void
-BTextControl::LayoutInvalidated(bool descendants)
-{
-	CALLED();
-
-	fLayoutData->valid = false;
-}
-
-
-void
 BTextControl::DoLayout()
 {
 	// Bail out, if we shan't do layout.
@@ -966,6 +900,9 @@ BTextControl::DoLayout()
 }
 
 
+// #pragma mark - protected methods
+
+
 status_t
 BTextControl::SetIcon(const BBitmap* icon, uint32 flags)
 {
@@ -973,7 +910,7 @@ BTextControl::SetIcon(const BBitmap* icon, uint32 flags)
 }
 
 
-// #pragma mark - BTextControl private methods
+// #pragma mark - private methods
 
 
 status_t
@@ -1062,6 +999,9 @@ BTextControl::Perform(perform_code code, void* _data)
 }
 
 
+//	#pragma mark - FBC padding
+
+
 void BTextControl::_ReservedTextControl1() {}
 void BTextControl::_ReservedTextControl2() {}
 void BTextControl::_ReservedTextControl3() {}
@@ -1076,7 +1016,7 @@ BTextControl::operator=(const BTextControl&)
 
 
 void
-BTextControl::_UpdateTextViewColors(bool enabled)
+BTextControl::_UpdateTextViewColors(bool enable)
 {
 	rgb_color textColor;
 	rgb_color color;
@@ -1084,7 +1024,7 @@ BTextControl::_UpdateTextViewColors(bool enabled)
 
 	fText->GetFontAndColor(0, &font);
 
-	if (enabled)
+	if (enable)
 		textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 	else {
 		textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
@@ -1093,7 +1033,7 @@ BTextControl::_UpdateTextViewColors(bool enabled)
 
 	fText->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
-	if (enabled)
+	if (enable)
 		color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 	else {
 		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
@@ -1135,7 +1075,7 @@ BTextControl::_InitData(const char* label, const BMessage* archive)
 	if (flags != 0)
 		SetFont(&font, flags);
 
-	if (label)
+	if (label != NULL)
 		fDivider = floorf(bounds.Width() / 2.0f);
 
 	fLook = 0;
