@@ -10,7 +10,7 @@ SimpleTest TeamMonitorTest :
 	TeamMonitorTest.cpp
 	TeamMonitorWindow.cpp
 	TeamListItem.cpp
-	: be
+	: be localestub shared
 	;
 
 SEARCH on [ FGristFiles

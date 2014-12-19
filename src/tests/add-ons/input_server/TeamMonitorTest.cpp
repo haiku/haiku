@@ -22,8 +22,15 @@ main()
 {
 	BApplication app("application/x-vnd.tmwindow-test");
 	TeamMonitorWindow *window = new TeamMonitorWindow();
+
+	// The window should quit the app when it is done
+	window->SetFlags(window->Flags() | B_QUIT_ON_WINDOW_CLOSE);
 	window->Enable();
 
-	// we don't even quit when the window is closed...
+	// The window is designed to never quit unless this message was received.
+	// And in our case we would like it to quit.
+	BMessage message(SYSTEM_SHUTTING_DOWN);
+	window->PostMessage(&message);
+
 	app.Run();
 }
