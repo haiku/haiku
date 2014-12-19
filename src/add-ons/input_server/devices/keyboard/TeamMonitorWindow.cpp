@@ -26,6 +26,7 @@
 #include <Screen.h>
 #include <SpaceLayoutItem.h>
 #include <String.h>
+#include <StringView.h>
 #include <TextView.h>
 
 #include <syscalls.h>
@@ -56,7 +57,7 @@ QuitTeamThreadFunction(void* data)
 	if (teamQuitter == NULL)
 		return B_ERROR;
 
-	status_t status;	
+	status_t status;
 	BMessenger messenger(NULL, teamQuitter->team, &status);
 	if (status != B_OK)
 		return status;
@@ -109,7 +110,9 @@ FilterKeyDown(BMessage* message, BHandler** target,
 class AllShowingTextView : public BTextView {
 public:
 							AllShowingTextView(const char* name);
-	virtual void			FrameResized(float width, float height);
+	virtual	bool			HasHeightForWidth();
+	virtual	void			GetHeightForWidth(float width, float* min,
+								float* max, float* preferred);
 };
 
 
@@ -131,11 +134,12 @@ private:
 			BMessageRunner*	fRebootRunner;
 			IconView*		fIconView;
 	const	char*			fInfoString;
-	const	char*			fSysComponentString;
-	const	char*			fQuitOverdueString;
 			BCardLayout*	fLayout;
-			AllShowingTextView*	fIconTextView;
-			AllShowingTextView*	fInfoTextView;
+			AllShowingTextView*		fInfoTextView;
+
+			BStringView*	fTeamName;
+			BStringView*	fSysComponent;
+			BStringView*	fQuitOverdue;
 };
 
 
@@ -153,7 +157,7 @@ static const uint32 kMsgRebootTick = 'TMrt';
 
 TeamMonitorWindow::TeamMonitorWindow()
 	:
-	BWindow(BRect(0, 0, 350, 400), B_TRANSLATE("Team monitor"),
+	BWindow(BRect(0, 0, 350, 100), B_TRANSLATE("Team monitor"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
 			| B_CLOSE_ON_ESCAPE | B_AUTO_UPDATE_SIZE_LIMITS,
@@ -174,67 +178,44 @@ TeamMonitorWindow::TeamMonitorWindow()
 
 	BScrollView* scrollView = new BScrollView("scroll_teams", fListView,
 		0, B_SUPPORTS_LAYOUT, false, true, B_FANCY_BORDER);
-	layout->AddView(scrollView);
-
-	BGroupView* groupView = new BGroupView(B_HORIZONTAL);
-	layout->AddView(groupView);
+	scrollView->SetExplicitMinSize(BSize(B_SIZE_UNSET, 150));
 
 	fKillButton = new BButton("kill", B_TRANSLATE("Kill application"),
 		new BMessage(TM_KILL_APPLICATION));
-	groupView->AddChild(fKillButton);
 	fKillButton->SetEnabled(false);
-	
+
 	fQuitButton = new BButton("quit", B_TRANSLATE("Quit application"),
 		new BMessage(TM_QUIT_APPLICATION));
-	groupView->AddChild(fQuitButton);
 	fQuitButton->SetEnabled(false);
 
-	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
-
 	fDescriptionView = new TeamDescriptionView;
-	layout->AddView(fDescriptionView);
-
-	groupView = new BGroupView(B_HORIZONTAL);
-	layout->AddView(groupView);
 
 	BButton* forceReboot = new BButton("force", B_TRANSLATE("Force reboot"),
 		new BMessage(TM_FORCE_REBOOT));
-	groupView->GroupLayout()->AddView(forceReboot);
-
-	BSpaceLayoutItem* glue = BSpaceLayoutItem::CreateGlue();
-	glue->SetExplicitMinSize(BSize(inset, -1));
-	groupView->GroupLayout()->AddItem(glue);
 
 	fRestartButton = new BButton("restart", B_TRANSLATE("Restart the desktop"),
 		new BMessage(TM_RESTART_DESKTOP));
-	SetDefaultButton(fRestartButton);
-	groupView->GroupLayout()->AddView(fRestartButton);
-
-	glue = BSpaceLayoutItem::CreateGlue();
-	glue->SetExplicitMinSize(BSize(inset, -1));
-	groupView->GroupLayout()->AddItem(glue);
 
 	fCancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(TM_CANCEL));
 	SetDefaultButton(fCancelButton);
-	groupView->GroupLayout()->AddView(fCancelButton);
 
-	BSize preferredSize = layout->View()->PreferredSize();
-	if (preferredSize.width > Bounds().Width())
-		ResizeTo(preferredSize.width, Bounds().Height());
-	if (preferredSize.height > Bounds().Height())
-		ResizeTo(Bounds().Width(), preferredSize.height);
+	BGroupLayoutBuilder(layout)
+		.Add(scrollView)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fKillButton)
+			.Add(fQuitButton)
+			.AddGlue()
+			.End()
+		.Add(fDescriptionView)
+		.AddGroup(B_HORIZONTAL)
+			.Add(forceReboot)
+			.AddGlue()
+			.Add(fRestartButton)
+			.AddGlue(inset)
+			.Add(fCancelButton);
 
-	BRect screenFrame = BScreen(this).Frame();
-	BPoint point;
-	point.x = (screenFrame.Width() - Bounds().Width()) / 2;
-	point.y = (screenFrame.Height() - Bounds().Height()) / 2;
-
-	if (screenFrame.Contains(point))
-		MoveTo(point);
-
-	SetSizeLimits(Bounds().Width(), Bounds().Width() * 2,
-		Bounds().Height(), screenFrame.Height());
+	CenterOnScreen();
 
 	fRestartButton->Hide();
 
@@ -303,7 +284,7 @@ TeamMonitorWindow::MessageReceived(BMessage* msg)
 		case TM_FORCE_REBOOT:
 			_kern_shutdown(true);
 			break;
-			
+
 		case TM_KILL_APPLICATION:
 		{
 			TeamListItem* item = dynamic_cast<TeamListItem*>(fListView->ItemAt(
@@ -386,6 +367,11 @@ TeamMonitorWindow::Enable()
 		}
 		Unlock();
 	}
+
+	// Not sure why this is needed, but without it the layout isn't correct
+	// when the window is first shown and the buttons at the bottom aren't
+	// visible.
+	InvalidateLayout();
 }
 
 
@@ -602,16 +588,22 @@ TeamDescriptionView::TeamDescriptionView()
 		"in order to close it.\n\n"
 		"Hold CONTROL+ALT+DELETE for %ld seconds to reboot.");
 
-	fSysComponentString = B_TRANSLATE("(This team is a system component)");
-	fQuitOverdueString = B_TRANSLATE("If the application will not quit "
-		"you may have to kill it.");
+	fTeamName = new BStringView("team name", "team name");
+	fSysComponent = new BStringView("system component", B_TRANSLATE(
+		"(This team is a system component)"));
+	fQuitOverdue = new BStringView("quit overdue", B_TRANSLATE(
+		"If the application will not quit you may have to kill it."));
+	fQuitOverdue->SetFont(be_bold_font);
 
 	fInfoTextView = new AllShowingTextView("info text");
-	fIconTextView = new AllShowingTextView("icon text");
+	BGroupView* group = new BGroupView(B_VERTICAL);
+	BGroupLayoutBuilder(group)
+		.Add(fInfoTextView)
+		.AddGlue();
 
 	fIconView = new IconView();
 	fIconView->SetExplicitAlignment(
-		BAlignment(B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_TOP));
+		BAlignment(B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_VERTICAL_CENTER));
 
 	BView* teamPropertiesView = new BView("team properties", B_WILL_DRAW);
 	teamPropertiesView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -619,11 +611,16 @@ TeamDescriptionView::TeamDescriptionView()
 	teamPropertiesView->SetLayout(layout);
 	BGroupLayoutBuilder(layout)
 		.Add(fIconView)
-		.Add(fIconTextView);
+		.AddGroup(B_VERTICAL)
+			.Add(fTeamName)
+			.Add(fSysComponent)
+			.Add(fQuitOverdue)
+		.End()
+		.AddGlue();
 
 	fLayout = new BCardLayout();
 	SetLayout(fLayout);
-	fLayout->AddView(fInfoTextView);
+	fLayout->AddView(group);
 	fLayout->AddView(teamPropertiesView);
 
 	SetItem(NULL);
@@ -678,39 +675,46 @@ void
 TeamDescriptionView::SetItem(TeamListItem* item)
 {
 	fItem = item;
-	int32 styleStart = 0;
-	int32 styleEnd = 0;
-	BTextView* view = NULL;
 
 	if (item == NULL) {
+		int32 styleStart = 0;
+		int32 styleEnd = 0;
 		BString text;
+
 		text.SetToFormat(fInfoString, fSeconds);
 		fInfoTextView->SetText(text);
 		if (fRebootRunner != NULL && fSeconds < 4) {
 			styleStart = text.FindLast('\n');
 			styleEnd = text.Length();
 		}
-		view = fInfoTextView;
-	} else {
-		BString text = item->Path()->Path();
-		if (item->IsSystemServer())
-			text << "\n" << fSysComponentString;
-		if (item->IsRefusingToQuit()) {
-			text << "\n\n" << fQuitOverdueString;
-			styleStart = text.FindLast('\n');
-			styleEnd = text.Length();
-		}
-		view = fIconTextView;
-		fIconTextView->SetText(text);
-		fIconView->SetIcon(item->Path()->Path());
-	}
 
-	if (styleStart != styleEnd && view != NULL) {
-		BFont font;
-		view->GetFont(&font);
-		font.SetFace(B_BOLD_FACE);
-		view->SetStylable(true);
-		view->SetFontAndColor(styleStart, styleEnd, &font);
+		if (styleStart != styleEnd && fInfoTextView != NULL) {
+			BFont font;
+			fInfoTextView->GetFont(&font);
+			font.SetFace(B_BOLD_FACE);
+			fInfoTextView->SetStylable(true);
+			fInfoTextView->SetFontAndColor(styleStart, styleEnd, &font);
+		}
+	} else {
+		fTeamName->SetText(item->Path()->Path());
+
+		if (item->IsSystemServer()) {
+			if (fSysComponent->IsHidden(fSysComponent))
+				fSysComponent->Show();
+		} else {
+			if (!fSysComponent->IsHidden(fSysComponent))
+				fSysComponent->Hide();
+		}
+
+		if (item->IsRefusingToQuit()) {
+			if (fQuitOverdue->IsHidden(fQuitOverdue))
+				fQuitOverdue->Show();
+		} else {
+			if (!fQuitOverdue->IsHidden(fQuitOverdue))
+				fQuitOverdue->Hide();
+		}
+
+		fIconView->SetIcon(item->Path()->Path());
 	}
 
 	if (fLayout == NULL)
@@ -738,10 +742,19 @@ AllShowingTextView::AllShowingTextView(const char* name)
 }
 
 
-void
-AllShowingTextView::FrameResized(float width, float height)
+bool
+AllShowingTextView::HasHeightForWidth()
 {
+	return true;
+}
+
+
+void
+AllShowingTextView::GetHeightForWidth(float width, float* min, float* max,
+	float* preferred)
+{
+	BTextView::GetHeightForWidth(width, min, max, preferred);
 	float minHeight = TextHeight(0, CountLines() - 1);
-	SetExplicitMinSize(BSize(B_SIZE_UNSET, minHeight));
-	BTextView::FrameResized(width, minHeight);
+	if (min)
+		*min = minHeight;
 }
