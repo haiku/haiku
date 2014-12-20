@@ -5,27 +5,29 @@
 
 
 #include "convert.h"
-#include "Stack.h"
 
-#include <TranslatorFormats.h>
+#include <algorithm>
+#include <set>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Application.h>
-#include <TextView.h>
-#include <TypeConstants.h>
 #include <ByteOrder.h>
 #include <File.h>
 #include <Font.h>
+#include <fs_attr.h>
+#include <TextView.h>
+#include <TranslatorFormats.h>
+#include <TypeConstants.h>
 
 #include <AutoDeleter.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <algorithm>
+#include "Stack.h"
 
-#include <set>
-#include <fs_attr.h>
+
 #define READ_BUFFER_SIZE 2048
+
 
 struct conversion_context {
 	conversion_context()
@@ -483,7 +485,8 @@ TextOutput::Command(RTF::Command *command)
 			// missing font info will be replaced by the default font
 
 		RTF::Command *info;
-		for (int32 index = 0; (info = fonts->FindDefinition("f", index)) != NULL; index++) {
+		for (int32 index = 0; (info = fonts->FindDefinition("f", index))
+			!= NULL; index++) {
 			if (info->Option() != command->Option())
 				continue;
 
@@ -672,9 +675,9 @@ status_t convert_styled_text_to_rtf(
 	
 	// Read STXT and TEXT headers
 	if (source->Read(&stxtheader, kstxtsize) != kstxtsize)
-				return B_ERROR;
-	if (source->Read(&txtheader, ktxtsize) != ktxtsize ||
-		swap_data(B_UINT32_TYPE, &txtheader,
+		return B_ERROR;
+	if (source->Read(&txtheader, ktxtsize) != ktxtsize
+		|| swap_data(B_UINT32_TYPE, &txtheader,
 			sizeof(TranslatorStyledTextTextHeader),
 			B_SWAP_BENDIAN_TO_HOST) != B_OK)
 		return B_ERROR;
@@ -699,37 +702,28 @@ status_t convert_styled_text_to_rtf(
 		
 	BString rtfFile =
 		"{\\rtf1\\ansi";
-		
 
 	ssize_t read = 0;
 	TranslatorStyledTextStyleHeader stylHeader;
 	read = source->Read(buffer, sizeof(stylHeader));
 
 	if (read < 0)
-	{
 		return B_ERROR;
-	}
 
 	if (read != sizeof(stylHeader) && read != 0)
-	{
 		return B_NO_TRANSLATOR;
-	}
 
-	if (read == sizeof(stylHeader)) // There is a STYL section
-	{
+	if (read == sizeof(stylHeader)) { // There is a STYL section
 		memcpy(&stylHeader, buffer, sizeof(stylHeader));
 		if (swap_data(B_UINT32_TYPE, &stylHeader, sizeof(stylHeader),
-			B_SWAP_BENDIAN_TO_HOST) != B_OK)
-		{
+			B_SWAP_BENDIAN_TO_HOST) != B_OK) {
 			return B_ERROR;
 		}
 
 		if (stylHeader.header.magic != 'STYL'
-			|| stylHeader.header.header_size != sizeof(stylHeader))
-		{
+			|| stylHeader.header.header_size != sizeof(stylHeader)) {
 			return B_NO_TRANSLATOR;
 		}
-
 
 		uint8 unflattened[stylHeader.header.data_size];
 		source->Read(unflattened, stylHeader.header.data_size);
@@ -741,8 +735,7 @@ status_t convert_styled_text_to_rtf(
 		std::set<BString> fontTable;
 
 		font_family out;
-		for (int i = 0; i < styles->count; i++)
-		{
+		for (int i = 0; i < styles->count; i++) {
 			colorTable.insert(styles->runs[i].color);
 			styles->runs[i].font.GetFamilyAndStyle(&out, NULL);
 			fontTable.insert(BString(out));
@@ -753,16 +746,14 @@ status_t convert_styled_text_to_rtf(
 		uint32 count = 0;
 
 		rtfFile << "{\\fonttbl";
-		for (it = fontTable.begin(); it != fontTable.end(); it++)
-		{
+		for (it = fontTable.begin(); it != fontTable.end(); it++) {
 			rtfFile << "{\\f" << count << " " << *it << ";}";
 			count++;
 		}
 		rtfFile << "}{\\colortbl";
 
 		std::set<rgb_color, color_compare>::iterator cit;
-		for (cit = colorTable.begin(); cit != colorTable.end(); cit++)
-		{
+		for (cit = colorTable.begin(); cit != colorTable.end(); cit++) {
 			rtfFile << "\\red" << cit->red
 				<< "\\green" << cit->green
 				<< "\\blue" << cit->blue
@@ -771,8 +762,7 @@ status_t convert_styled_text_to_rtf(
 		rtfFile << "}";
 
 		// Now we put out the actual text with styling information run by run
-		for (int i = 0; i < styles->count; i++)
-		{
+		for (int i = 0; i < styles->count; i++) {
 			// Find font and color indices
 			styles->runs[i].font.GetFamilyAndStyle(&out, NULL);
 			int fontIndex = std::distance(fontTable.begin(),
@@ -784,17 +774,11 @@ status_t convert_styled_text_to_rtf(
 			// Apply various font styles
 			uint16 fontFace = styles->runs[i].font.Face();
 			if (fontFace & B_ITALIC_FACE)
-			{
 				rtfFile << "\\i";
-			}
 			if (fontFace & B_UNDERSCORE_FACE)
-			{
 				rtfFile << "\\ul";
-			}
 			if (fontFace & B_BOLD_FACE)
-			{
 				rtfFile << "\\b";
-			}
 
 			// RTF font size unit is half-points, but BFont::Size() returns
 			// points
@@ -802,12 +786,9 @@ status_t convert_styled_text_to_rtf(
 				<< static_cast<int>(styles->runs[i].font.Size() * 2);
 
 			int length;
-			if (i < styles->count - 1)
-			{
+			if (i < styles->count - 1) {
 				length = styles->runs[i + 1].offset - styles->runs[i].offset;
-			}
-			else
-			{
+			} else {
 				length = plainText.Length() - styles->runs[i].offset;
 			}
 
@@ -824,9 +805,8 @@ status_t convert_styled_text_to_rtf(
 		delete styles;
 
 		rtfFile << "}";
-	}
-	else // There is no STYL section
-	{
+	} else {
+		// There is no STYL section
 		// Just use a generic preamble
 		rtfFile << "{\\fonttbl\\f0 DejaVu Sans;}\\f0\\pard " << plainText
 			<< "}";

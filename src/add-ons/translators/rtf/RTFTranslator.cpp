@@ -5,14 +5,17 @@
 
 
 #include "RTFTranslator.h"
-#include "ConfigView.h"
-#include "RTF.h"
-#include "convert.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Catalog.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+
+#include "ConfigView.h"
+#include "convert.h"
+#include "RTF.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "RTFTranslator"
