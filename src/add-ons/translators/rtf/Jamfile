@@ -21,7 +21,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			RTF.cpp
 			RTFTranslator.cpp
 
-			: be translation 
+			: be translation [ TargetLibstdc++ ]
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
 			[ TargetLibsupc++ ] localestub
 			: true

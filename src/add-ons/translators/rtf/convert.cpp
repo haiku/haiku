@@ -23,6 +23,7 @@
 #include <string.h>
 #include <algorithm>
 
+#include <set>
 #include <fs_attr.h>
 #define READ_BUFFER_SIZE 2048
 
@@ -649,6 +650,13 @@ convert_to_plain_text(RTF::Header &header, BPositionIO &target)
 	return B_OK;
 }
 
+struct color_compare
+{
+	bool operator()(const rgb_color& left, const rgb_color& right) const
+	{
+		return (*(const uint32 *)&left) < (*(const uint32 *)&right);
+	}
+};
 
 status_t convert_styled_text_to_rtf(
 	BPositionIO* source, BPositionIO* target)
@@ -662,61 +670,170 @@ status_t convert_styled_text_to_rtf(
 	TranslatorStyledTextTextHeader txtheader;
 	char buffer[READ_BUFFER_SIZE];
 	
+	// Read STXT and TEXT headers
 	if (source->Read(&stxtheader, kstxtsize) != kstxtsize)
-		return B_ERROR;
-	if (source->Read(&txtheader, ktxtsize) != ktxtsize)
+				return B_ERROR;
+	if (source->Read(&txtheader, ktxtsize) != ktxtsize ||
+		swap_data(B_UINT32_TYPE, &txtheader,
+			sizeof(TranslatorStyledTextTextHeader),
+			B_SWAP_BENDIAN_TO_HOST) != B_OK)
 		return B_ERROR;
 	
-
-	BString plainText;	
+	// source now points to the beginning of the plain text section
+	BString plainText;
 	ssize_t nread = 0, nreed = 0, ntotalread = 0;
-	nreed = min((size_t)READ_BUFFER_SIZE,
+	nreed = std::min((size_t)READ_BUFFER_SIZE,
 		(size_t)txtheader.header.data_size - ntotalread);
 	nread = source->Read(buffer, nreed);
 	while (nread > 0) {
 		plainText << buffer;
 
 		ntotalread += nread;
-		nreed = min((size_t)READ_BUFFER_SIZE,
+		nreed = std::min((size_t)READ_BUFFER_SIZE,
 			(size_t)txtheader.header.data_size - ntotalread);
 		nread = source->Read(buffer, nreed);
-	}	
+	}
+
 	if ((ssize_t)txtheader.header.data_size != ntotalread)
 		return B_NO_TRANSLATOR;
 		
-	BString rtfFile = 
-		"{\\rtf1\\ansi{\\fonttbl\\f0\\fswiss Helvetica;}\\f0\\pard ";
+	BString rtfFile =
+		"{\\rtf1\\ansi";
 		
-	rtfFile << plainText << " }";
-	target->Write((const void*)rtfFile, rtfFile.Length());
-	
 
-	BNode* node = (BNode*)source;
-	const char* kAttrName = "styles";
-	attr_info info;
-	
-	if (node->GetAttrInfo(kAttrName, &info) != B_OK
-		|| info.type != B_RAW_TYPE || info.size < 160)
+	ssize_t read = 0;
+	TranslatorStyledTextStyleHeader stylHeader;
+	read = source->Read(buffer, sizeof(stylHeader));
+
+	if (read < 0)
+	{
 		return B_ERROR;
+	}
 
-	uint8* flatRunArray = new (std::nothrow) uint8[info.size];
-	if (flatRunArray == NULL)
-		return B_NO_MEMORY;
+	if (read != sizeof(stylHeader) && read != 0)
+	{
+		return B_NO_TRANSLATOR;
+	}
 
-	if (node->ReadAttr(kAttrName, B_RAW_TYPE, 0, flatRunArray, info.size
-		!= info.size))
-		return B_OK;
-			
-	//todo: convert stxt attributes to rtf commands	
-			
-	//text_run_array* styles = (text_run_array*)flatRunArray;
-	size_t stylesSize = info.size / 3;
-	
-	for(uint32 i = 0; i < stylesSize; i++) {
-	
+	if (read == sizeof(stylHeader)) // There is a STYL section
+	{
+		memcpy(&stylHeader, buffer, sizeof(stylHeader));
+		if (swap_data(B_UINT32_TYPE, &stylHeader, sizeof(stylHeader),
+			B_SWAP_BENDIAN_TO_HOST) != B_OK)
+		{
+			return B_ERROR;
+		}
+
+		if (stylHeader.header.magic != 'STYL'
+			|| stylHeader.header.header_size != sizeof(stylHeader))
+		{
+			return B_NO_TRANSLATOR;
+		}
+
+
+		uint8 unflattened[stylHeader.header.data_size];
+		source->Read(unflattened, stylHeader.header.data_size);
+		text_run_array *styles = BTextView::UnflattenRunArray(unflattened);
+
+		// RTF needs us to mention font and color names in advance so
+		// we collect them in sets
+		std::set<rgb_color, color_compare> colorTable;
+		std::set<BString> fontTable;
+
+		font_family out;
+		for (int i = 0; i < styles->count; i++)
+		{
+			colorTable.insert(styles->runs[i].color);
+			styles->runs[i].font.GetFamilyAndStyle(&out, NULL);
+			fontTable.insert(BString(out));
+		}
+
+		// Now we write them to the file
+		std::set<BString>::iterator it;
+		uint32 count = 0;
+
+		rtfFile << "{\\fonttbl";
+		for (it = fontTable.begin(); it != fontTable.end(); it++)
+		{
+			rtfFile << "{\\f" << count << " " << *it << ";}";
+			count++;
+		}
+		rtfFile << "}{\\colortbl";
+
+		std::set<rgb_color, color_compare>::iterator cit;
+		for (cit = colorTable.begin(); cit != colorTable.end(); cit++)
+		{
+			rtfFile << "\\red" << cit->red
+				<< "\\green" << cit->green
+				<< "\\blue" << cit->blue
+				<< ";";
+		}
+		rtfFile << "}";
+
+		// Now we put out the actual text with styling information run by run
+		for (int i = 0; i < styles->count; i++)
+		{
+			// Find font and color indices
+			styles->runs[i].font.GetFamilyAndStyle(&out, NULL);
+			int fontIndex = std::distance(fontTable.begin(),
+				fontTable.find(BString(out)));
+			int colorIndex = std::distance(colorTable.begin(),
+				colorTable.find(styles->runs[i].color));
+			rtfFile << "\\pard\\plain\\f" << fontIndex << "\\cf" << colorIndex;
+
+			// Apply various font styles
+			uint16 fontFace = styles->runs[i].font.Face();
+			if (fontFace & B_ITALIC_FACE)
+			{
+				rtfFile << "\\i";
+			}
+			if (fontFace & B_UNDERSCORE_FACE)
+			{
+				rtfFile << "\\ul";
+			}
+			if (fontFace & B_BOLD_FACE)
+			{
+				rtfFile << "\\b";
+			}
+
+			// RTF font size unit is half-points, but BFont::Size() returns
+			// points
+			rtfFile << "\\fs"
+				<< static_cast<int>(styles->runs[i].font.Size() * 2);
+
+			int length;
+			if (i < styles->count - 1)
+			{
+				length = styles->runs[i + 1].offset - styles->runs[i].offset;
+			}
+			else
+			{
+				length = plainText.Length() - styles->runs[i].offset;
+			}
+
+			BString segment;
+			plainText.CopyInto(segment, styles->runs[i].offset, length);
+
+			// Escape control structures
+			segment.CharacterEscape("\\{}", '\\');
+			segment.ReplaceAll("\n", "\\line");
+
+			rtfFile << " " << segment;
+		}
+
+		delete styles;
+
+		rtfFile << "}";
+	}
+	else // There is no STYL section
+	{
+		// Just use a generic preamble
+		rtfFile << "{\\fonttbl\\f0 DejaVu Sans;}\\f0\\pard " << plainText
+			<< "}";
 	}
 	
-	delete[] flatRunArray;
+	target->Write(rtfFile.String(), rtfFile.Length());
+
 	return B_OK;
 }
 
