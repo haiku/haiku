@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -41,12 +41,13 @@ static property_info sPropertyList[] = {
 		NULL, 0,
 		{ B_INT32_TYPE }
 	},
+
 	{}
 };
 
 
 
-BTab::BTab(BView *tabView)
+BTab::BTab(BView* tabView)
 	:
 	fEnabled(true),
 	fSelected(false),
@@ -56,7 +57,7 @@ BTab::BTab(BView *tabView)
 }
 
 
-BTab::BTab(BMessage *archive)
+BTab::BTab(BMessage* archive)
 	:
 	BArchivable(archive),
 	fSelected(false),
@@ -84,8 +85,8 @@ BTab::~BTab()
 }
 
 
-BArchivable *
-BTab::Instantiate(BMessage *archive)
+BArchivable*
+BTab::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BTab"))
 		return new BTab(archive);
@@ -95,27 +96,27 @@ BTab::Instantiate(BMessage *archive)
 
 
 status_t
-BTab::Archive(BMessage *archive, bool deep) const
+BTab::Archive(BMessage* data, bool deep) const
 {
-	status_t err = BArchivable::Archive(archive, deep);
-	if (err != B_OK)
-		return err;
+	status_t result = BArchivable::Archive(data, deep);
+	if (result != B_OK)
+		return result;
 
 	if (!fEnabled)
-		err = archive->AddBool("_disable", false);
+		result = data->AddBool("_disable", false);
 
-	return err;
+	return result;
 }
 
 
 status_t
-BTab::Perform(uint32 d, void *arg)
+BTab::Perform(uint32 d, void* arg)
 {
 	return BArchivable::Perform(d, arg);
 }
 
 
-const char *
+const char*
 BTab::Label() const
 {
 	if (fView)
@@ -126,7 +127,7 @@ BTab::Label() const
 
 
 void
-BTab::SetLabel(const char *label)
+BTab::SetLabel(const char* label)
 {
 	if (!label || !fView)
 		return;
@@ -143,7 +144,7 @@ BTab::IsSelected() const
 
 
 void
-BTab::Select(BView *owner)
+BTab::Select(BView* owner)
 {
 	// TODO: Shouldn't we still maintain fSelected like in Deselect()?
 	if (!owner || !View() || !owner->Window())
@@ -178,9 +179,9 @@ BTab::Deselect()
 
 
 void
-BTab::SetEnabled(bool enabled)
+BTab::SetEnabled(bool enable)
 {
-	fEnabled = enabled;
+	fEnabled = enable;
 }
 
 
@@ -192,9 +193,9 @@ BTab::IsEnabled() const
 
 
 void
-BTab::MakeFocus(bool inFocus)
+BTab::MakeFocus(bool focus)
 {
-	fFocus = inFocus;
+	fFocus = focus;
 }
 
 
@@ -206,7 +207,7 @@ BTab::IsFocus() const
 
 
 void
-BTab::SetView(BView *view)
+BTab::SetView(BView* view)
 {
 	if (!view || fView == view)
 		return;
@@ -219,7 +220,7 @@ BTab::SetView(BView *view)
 }
 
 
-BView *
+BView*
 BTab::View() const
 {
 	return fView;
@@ -227,7 +228,7 @@ BTab::View() const
 
 
 void
-BTab::DrawFocusMark(BView *owner, BRect frame)
+BTab::DrawFocusMark(BView* owner, BRect frame)
 {
 	float width = owner->StringWidth(Label());
 
@@ -242,7 +243,7 @@ BTab::DrawFocusMark(BView *owner, BRect frame)
 
 
 void
-BTab::DrawLabel(BView *owner, BRect frame)
+BTab::DrawLabel(BView* owner, BRect frame)
 {
 	be_control_look->DrawLabel(owner, Label(), frame, frame,
 		ui_color(B_PANEL_BACKGROUND_COLOR),
@@ -252,91 +253,32 @@ BTab::DrawLabel(BView *owner, BRect frame)
 
 
 void
-BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
+BTab::DrawTab(BView* owner, BRect frame, tab_position position, bool full)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 borders = BControlLook::B_TOP_BORDER
+		| BControlLook::B_BOTTOM_BORDER;
 
-	if (be_control_look != NULL) {
-		uint32 borders = BControlLook::B_TOP_BORDER
-			| BControlLook::B_BOTTOM_BORDER;
-		if (frame.left == owner->Bounds().left)
-			borders |= BControlLook::B_LEFT_BORDER;
-		if (frame.right == owner->Bounds().right)
-			borders |= BControlLook::B_RIGHT_BORDER;
+	if (frame.left == owner->Bounds().left)
+		borders |= BControlLook::B_LEFT_BORDER;
 
-		if (position == B_TAB_FRONT) {
-			frame.bottom += 1;
-			be_control_look->DrawActiveTab(owner, frame, frame, no_tint, 0,
-				borders);
-		} else {
-			be_control_look->DrawInactiveTab(owner, frame, frame, no_tint, 0,
-				borders);
-		}
+	if (frame.right == owner->Bounds().right)
+		borders |= BControlLook::B_RIGHT_BORDER;
 
-		DrawLabel(owner, frame);
-		return;
-	}
-
-	rgb_color lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT);
-	rgb_color darken2 = tint_color(no_tint, B_DARKEN_2_TINT);
-	rgb_color darken3 = tint_color(no_tint, B_DARKEN_3_TINT);
-	rgb_color darken4 = tint_color(no_tint, B_DARKEN_4_TINT);
-	rgb_color darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
-
-	owner->SetHighColor(darkenmax);
-	owner->SetLowColor(no_tint);
-	// NOTE: "frame" goes from the beginning of the left slope to the beginning
-	// of the right slope - "lableFrame" is the frame between both slopes
-	BRect lableFrame = frame;
-	lableFrame.left = lableFrame.left + frame.Height() / 2.0;
-	DrawLabel(owner, lableFrame);
-
-	owner->SetDrawingMode(B_OP_OVER);
-
-	owner->BeginLineArray(12);
-
-	int32 slopeWidth = (int32)ceilf(frame.Height() / 2.0);
-
-	if (position != B_TAB_ANY) {
-		// full height left side
-		owner->AddLine(BPoint(frame.left, frame.bottom),
-			BPoint(frame.left + slopeWidth, frame.top), darken3);
-		owner->AddLine(BPoint(frame.left, frame.bottom + 1),
-			BPoint(frame.left + slopeWidth, frame.top + 1), lightenmax);
+	if (position == B_TAB_FRONT) {
+		frame.bottom += 1;
+		be_control_look->DrawActiveTab(owner, frame, frame, no_tint, 0,
+			borders);
 	} else {
-		// upper half of left side
-		owner->AddLine(BPoint(frame.left + slopeWidth / 2,
-				frame.bottom - slopeWidth),
-			BPoint(frame.left + slopeWidth, frame.top), darken3);
-		owner->AddLine(BPoint(frame.left + slopeWidth / 2 + 2,
-				frame.bottom - slopeWidth - 1),
-			BPoint(frame.left + slopeWidth, frame.top + 1), lightenmax);
+		be_control_look->DrawInactiveTab(owner, frame, frame, no_tint, 0,
+			borders);
 	}
 
-	// lines along the top
-	owner->AddLine(BPoint(frame.left + slopeWidth, frame.top),
-		BPoint(frame.right, frame.top), darken3);
-	owner->AddLine(BPoint(frame.left + slopeWidth, frame.top + 1),
-		BPoint(frame.right, frame.top + 1), lightenmax);
-
-	if (full) {
-		// full height right side
-		owner->AddLine(BPoint(frame.right, frame.top),
-			BPoint(frame.right + slopeWidth + 2, frame.bottom), darken2);
-		owner->AddLine(BPoint(frame.right, frame.top + 1),
-			BPoint(frame.right + slopeWidth + 1, frame.bottom), darken4);
-	} else {
-		// upper half of right side
-		owner->AddLine(BPoint(frame.right, frame.top),
-			BPoint(frame.right + slopeWidth / 2 + 1,
-				frame.bottom - slopeWidth), darken2);
-		owner->AddLine(BPoint(frame.right, frame.top + 1),
-			BPoint(frame.right + slopeWidth / 2,
-				frame.bottom - slopeWidth), darken4);
-	}
-
-	owner->EndLineArray();
+	DrawLabel(owner, frame);
 }
+
+
+//	#pragma mark - FBC padding and private methods
 
 
 void BTab::_ReservedTab1() {}
@@ -362,7 +304,7 @@ BTab &BTab::operator=(const BTab &)
 //	#pragma mark - BTabView
 
 
-BTabView::BTabView(const char *name, button_width width, uint32 flags)
+BTabView::BTabView(const char* name, button_width width, uint32 flags)
 	:
 	BView(name, flags)
 {
@@ -370,10 +312,10 @@ BTabView::BTabView(const char *name, button_width width, uint32 flags)
 }
 
 
-BTabView::BTabView(BRect frame, const char *name, button_width width,
-	uint32 resizingMode, uint32 flags)
+BTabView::BTabView(BRect frame, const char* name, button_width width,
+	uint32 resizeMask, uint32 flags)
 	:
-	BView(frame, name, resizingMode, flags)
+	BView(frame, name, resizeMask, flags)
 {
 	_InitObject(false, width);
 }
@@ -388,7 +330,7 @@ BTabView::~BTabView()
 }
 
 
-BTabView::BTabView(BMessage *archive)
+BTabView::BTabView(BMessage* archive)
 	:
 	BView(BUnarchiver::PrepareArchive(archive)),
 	fTabList(new BList),
@@ -432,14 +374,14 @@ BTabView::BTabView(BMessage *archive)
 	_InitContainerView(Flags() & B_SUPPORTS_LAYOUT);
 
 	while (archive->FindMessage("_l_items", i, &tabMsg) == B_OK) {
-		BArchivable *archivedTab = instantiate_object(&tabMsg);
+		BArchivable* archivedTab = instantiate_object(&tabMsg);
 
 		if (archivedTab) {
-			BTab *tab = dynamic_cast<BTab *>(archivedTab);
+			BTab* tab = dynamic_cast<BTab*>(archivedTab);
 
 			BMessage viewMsg;
 			if (archive->FindMessage("_view_list", i, &viewMsg) == B_OK) {
-				BArchivable *archivedView = instantiate_object(&viewMsg);
+				BArchivable* archivedView = instantiate_object(&viewMsg);
 				if (archivedView)
 					AddTab(dynamic_cast<BView*>(archivedView), tab);
 			}
@@ -451,8 +393,8 @@ BTabView::BTabView(BMessage *archive)
 }
 
 
-BArchivable *
-BTabView::Instantiate(BMessage *archive)
+BArchivable*
+BTabView::Instantiate(BMessage* archive)
 {
 	if ( validate_instantiation(archive, "BTabView"))
 		return new BTabView(archive);
@@ -466,28 +408,28 @@ BTabView::Archive(BMessage* archive, bool deep) const
 {
 	BArchiver archiver(archive);
 
-	status_t ret = BView::Archive(archive, deep);
+	status_t result = BView::Archive(archive, deep);
 
-	if (ret == B_OK)
-		ret = archive->AddInt16("_but_width", fTabWidthSetting);
-	if (ret == B_OK)
-		ret = archive->AddFloat("_high", fTabHeight);
-	if (ret == B_OK)
-		ret = archive->AddInt32("_sel", fSelection);
-	if (ret == B_OK && fBorderStyle != B_FANCY_BORDER)
-		ret = archive->AddInt32("_border_style", fBorderStyle);
+	if (result == B_OK)
+		result = archive->AddInt16("_but_width", fTabWidthSetting);
+	if (result == B_OK)
+		result = archive->AddFloat("_high", fTabHeight);
+	if (result == B_OK)
+		result = archive->AddInt32("_sel", fSelection);
+	if (result == B_OK && fBorderStyle != B_FANCY_BORDER)
+		result = archive->AddInt32("_border_style", fBorderStyle);
 
-	if (ret == B_OK && deep) {
+	if (result == B_OK && deep) {
 		for (int32 i = 0; i < CountTabs(); i++) {
 			BTab* tab = TabAt(i);
 
-			if ((ret = archiver.AddArchivable("_l_items", tab, deep)) != B_OK)
+			if ((result = archiver.AddArchivable("_l_items", tab, deep)) != B_OK)
 				break;
-			ret = archiver.AddArchivable("_view_list", tab->View(), deep);
+			result = archiver.AddArchivable("_view_list", tab->View(), deep);
 		}
 	}
 
-	return archiver.Finish(ret);
+	return archiver.Finish(result);
 }
 
 
@@ -579,7 +521,7 @@ BTabView::AllDetached()
 
 
 void
-BTabView::MessageReceived(BMessage *message)
+BTabView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_GET_PROPERTY:
@@ -591,7 +533,7 @@ BTabView::MessageReceived(BMessage *message)
 			BMessage specifier;
 			int32 index;
 			int32 form;
-			const char *property;
+			const char* property;
 			if (message->GetCurrentSpecifier(&index, &specifier, &form, &property) == B_OK) {
 				if (strcmp(property, "Selection") == 0) {
 					if (message->what == B_GET_PROPERTY) {
@@ -651,7 +593,7 @@ BTabView::MessageReceived(BMessage *message)
 
 
 void
-BTabView::KeyDown(const char *bytes, int32 numBytes)
+BTabView::KeyDown(const char* bytes, int32 numBytes)
 {
 	if (IsHidden())
 		return;
@@ -687,34 +629,34 @@ BTabView::KeyDown(const char *bytes, int32 numBytes)
 
 
 void
-BTabView::MouseDown(BPoint point)
+BTabView::MouseDown(BPoint where)
 {
-	if (point.y > fTabHeight)
+	if (where.y > fTabHeight)
 		return;
 
 	for (int32 i = 0; i < CountTabs(); i++) {
-		if (TabFrame(i).Contains(point)
+		if (TabFrame(i).Contains(where)
 			&& i != Selection()) {
 			Select(i);
 			return;
 		}
 	}
 
-	BView::MouseDown(point);
+	BView::MouseDown(where);
 }
 
 
 void
-BTabView::MouseUp(BPoint point)
+BTabView::MouseUp(BPoint where)
 {
-	BView::MouseUp(point);
+	BView::MouseUp(where);
 }
 
 
 void
-BTabView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+BTabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
-	BView::MouseMoved(point, transit, message);
+	BView::MouseMoved(where, transit, dragMessage);
 }
 
 
@@ -734,7 +676,7 @@ BTabView::Select(int32 index)
 	if (index < 0 || index >= CountTabs())
 		index = Selection();
 
-	BTab *tab = TabAt(Selection());
+	BTab* tab = TabAt(Selection());
 
 	if (tab)
 		tab->Deselect();
@@ -786,16 +728,16 @@ BTabView::WindowActivated(bool active)
 
 
 void
-BTabView::MakeFocus(bool focused)
+BTabView::MakeFocus(bool focus)
 {
-	BView::MakeFocus(focused);
+	BView::MakeFocus(focus);
 
-	SetFocusTab(Selection(), focused);
+	SetFocusTab(Selection(), focus);
 }
 
 
 void
-BTabView::SetFocusTab(int32 tab, bool focused)
+BTabView::SetFocusTab(int32 tab, bool focus)
 {
 	if (tab >= CountTabs())
 		tab = 0;
@@ -803,7 +745,7 @@ BTabView::SetFocusTab(int32 tab, bool focused)
 	if (tab < 0)
 		tab = CountTabs() - 1;
 
-	if (focused) {
+	if (focus) {
 		if (tab == fFocus)
 			return;
 
@@ -1080,9 +1022,9 @@ BTabView::ResizeToPreferred()
 
 
 void
-BTabView::GetPreferredSize(float *width, float *height)
+BTabView::GetPreferredSize(float* _width, float* _height)
 {
-	BView::GetPreferredSize(width, height);
+	BView::GetPreferredSize(_width, _height);
 }
 
 
@@ -1144,25 +1086,25 @@ BTabView::PreferredSize()
 
 
 void
-BTabView::FrameMoved(BPoint newLocation)
+BTabView::FrameMoved(BPoint newPosition)
 {
-	BView::FrameMoved(newLocation);
+	BView::FrameMoved(newPosition);
 }
 
 
 void
-BTabView::FrameResized(float width,float height)
+BTabView::FrameResized(float newWidth, float newHeight)
 {
-	BView::FrameResized(width, height);
+	BView::FrameResized(newWidth, newHeight);
 }
 
 
 // #pragma mark -
 
 
-BHandler *
-BTabView::ResolveSpecifier(BMessage *message, int32 index,
-	BMessage *specifier, int32 what, const char *property)
+BHandler*
+BTabView::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
 {
 	BPropertyInfo propInfo(sPropertyList);
 
@@ -1174,7 +1116,7 @@ BTabView::ResolveSpecifier(BMessage *message, int32 index,
 
 
 status_t
-BTabView::GetSupportedSuites(BMessage *message)
+BTabView::GetSupportedSuites(BMessage* message)
 {
 	message->AddString("suites", "suite/vnd.Be-tab-view");
 
@@ -1189,7 +1131,7 @@ BTabView::GetSupportedSuites(BMessage *message)
 
 
 void
-BTabView::AddTab(BView *target, BTab *tab)
+BTabView::AddTab(BView* target, BTab* tab)
 {
 	if (tab == NULL)
 		tab = new BTab(target);
@@ -1208,13 +1150,13 @@ BTabView::AddTab(BView *target, BTab *tab)
 }
 
 
-BTab *
+BTab*
 BTabView::RemoveTab(int32 index)
 {
 	if (index < 0 || index >= CountTabs())
 		return NULL;
 
-	BTab *tab = (BTab *)fTabList->RemoveItem(index);
+	BTab* tab = (BTab*)fTabList->RemoveItem(index);
 	if (tab == NULL)
 		return NULL;
 
@@ -1237,10 +1179,10 @@ BTabView::RemoveTab(int32 index)
 }
 
 
-BTab *
+BTab*
 BTabView::TabAt(int32 index) const
 {
-	return (BTab *)fTabList->ItemAt(index);
+	return (BTab*)fTabList->ItemAt(index);
 }
 
 
@@ -1299,7 +1241,7 @@ BTabView::Border() const
 }
 
 
-BView *
+BView*
 BTabView::ContainerView() const
 {
 	return fContainerView;
@@ -1313,10 +1255,10 @@ BTabView::CountTabs() const
 }
 
 
-BView *
+BView*
 BTabView::ViewForTab(int32 tabIndex) const
 {
-	BTab *tab = TabAt(tabIndex);
+	BTab* tab = TabAt(tabIndex);
 	if (tab)
 		return tab->View();
 
@@ -1493,4 +1435,3 @@ B_IF_GCC_2(_ReservedTabView1__8BTabView, _ZN8BTabView17_ReservedTabView1Ev)(
 {
 	tabView->BTabView::SetBorder(border);
 }
-

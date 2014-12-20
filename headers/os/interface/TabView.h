@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TAB_VIEW_H
@@ -24,8 +24,7 @@ public:
 								BTab(BMessage* archive);
 	static	BArchivable*		Instantiate(BMessage* archive);
 
-	virtual	status_t			Archive(BMessage* archive,
-									bool deep = true) const;
+	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
 	virtual	status_t			Perform(uint32 d, void* arg);
 
 			const char*			Label() const;
@@ -35,10 +34,10 @@ public:
 	virtual	void				Select(BView* owner);
 	virtual	void				Deselect();
 
-	virtual	void				SetEnabled(bool enabled);
+	virtual	void				SetEnabled(bool enable);
 			bool				IsEnabled() const;
 
-			void				MakeFocus(bool inFocus = true);
+			void				MakeFocus(bool focus = true);
 			bool				IsFocus() const;
 
 	//	sets/gets the view to be displayed for this tab
@@ -86,7 +85,7 @@ public:
 										| B_FRAME_EVENTS | B_NAVIGABLE);
 								BTabView(BRect frame, const char* name,
 									button_width width = B_WIDTH_AS_USUAL,
-									uint32 resizingMode = B_FOLLOW_ALL,
+									uint32 resizeMask = B_FOLLOW_ALL,
 									uint32 flags = B_FULL_UPDATE_ON_RESIZE
 										| B_WILL_DRAW | B_NAVIGABLE_JUMP
 										| B_FRAME_EVENTS | B_NAVIGABLE);
@@ -106,9 +105,9 @@ public:
 
 	virtual	void 				MessageReceived(BMessage* message);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
-	virtual	void				MouseDown(BPoint point);
-	virtual	void				MouseUp(BPoint point);
-	virtual	void 				MouseMoved(BPoint point, uint32 transit,
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+	virtual	void 				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
 	virtual	void				Pulse();
 
@@ -129,15 +128,14 @@ public:
 	virtual	void				SetResizingMode(uint32 mode);
 
 	virtual	void				ResizeToPreferred();
-	virtual	void				GetPreferredSize(float* _width,
-									float* _height);
+	virtual	void				GetPreferredSize(float* _width, float* _height);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
 
-	virtual	void 				FrameMoved(BPoint newLocation);
-	virtual	void				FrameResized(float width,float height);
+	virtual	void 				FrameMoved(BPoint newPosition);
+	virtual	void				FrameResized(float newWidth, float newHeight);
 
 	virtual	BHandler*			ResolveSpecifier(BMessage* message,
 									int32 index, BMessage* specifier,
