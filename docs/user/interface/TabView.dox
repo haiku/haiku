@@ -50,7 +50,7 @@
 /*!
 	\var tab_position B_TAB_ANY
 
-	Represents any tab in the tab view.
+	Any tab in the tab view.
 
 	\since BeOS R3
 */
@@ -60,7 +60,7 @@
 	\class BTab
 	\ingroup interface
 	\ingroup libbe
-	\brief A Tab that goes in a TabView.
+	\brief A tab that goes in a BTabView.
 
 	\since BeOS R3
 */

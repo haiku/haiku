@@ -430,7 +430,7 @@
 	\fn void BTextControl::GetPreferredSize(float* _width, float* _height)
 	\brief Fills out \a _width and \a _height with the optimal width and
 	       height of the text control to display the label and the text
-		   respectively.
+	       respectively.
 
 	\since BeOS R3
 */
@@ -513,8 +513,8 @@
 
 /*!
 	\fn BLayoutItem* BTextControl::CreateLabelLayoutItem()
-	\brief Creates a label layout item and returns a pointer to it.
-	       (Layout constructor only)
+	\brief Creates a label layout item and returns a pointer to it
+	       (Layout constructor only).
 
 	\sa CreateTextViewLayoutItem()
 
