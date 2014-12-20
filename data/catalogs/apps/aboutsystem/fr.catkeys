@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	2170341380
+1	french	x-vnd.Haiku-About	3703615311
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 par les auteurs de Gutenprint. Tous droits réservés.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (et son noyau, NewOS)\n
 Ralink (firmware)	AboutWindow		Ralink (firmware)
@@ -57,7 +57,6 @@ Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyri
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Le code source spécifique à Haiku, en particulier, celui du noyau et des applications liées, est distribué suivant les termes de la <licence MIT>. Quelques librairies systèmes contiennent du code tiers, distribué sous <licence LGPL>. Vous pouvez trouver les copyrights de ce code ci-dessous.\n\n
 Time running:	AboutView		Temps depuis le démarrage :
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Contient des logiciels développés par la Foundation NetBSD, Inc. et ses contributeurs :\nftp, tput\nCopyright © 1996-2008 La Fondation NetBSD, Inc. Tous droits réservés.
-Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Contient des logiciels du projet FreeBSD, publiés sous la licence BSD :\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 le Projet FreeBSD. Tous droits réservés.
 GNU GPL v2	AboutWindow		GNU GPL v2
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google et ses programmes Google Summer of Code et Google Code In\n
 The Haikuware team and their bounty program\n	AboutView		L'équipe Haikuware et son programme de récompenses\n

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-About	843957219
+1	lithuanian	x-vnd.Haiku-About	2377231150
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		© 1999-2010 „Gutenprint“ autoriai. Visos teisės saugomos.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis'ui Geiselbrecht'ui (už „NewOS“ branduolį)\n
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		© 2000 Jean-Pierre ervbefeL ir Remi Lefebvre.
@@ -46,7 +46,6 @@ Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		© 200
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Pirminiai tekstai, kurti specialiai „Haiku“ projektui, ypač branduolys ir bet koks programinis kodas, su kuriuo programos gali būti saistomos, yra platinamas pagal <MIT licenciją>. Kai kuriose sisteminėse bibliotekose gali būti trečiųjų šalių kurto programinio kodo, platinamo pagal <LGPL licenciją>. Trečiųjų šalių kurto programinio kodo autorių teisės išvardintos žemiau.\n\n
 Time running:	AboutView		Veikimo laikas:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Dalies pateiktos programinės įrangos autorių teisės priklauso „NetBSD Foundation, Inc.“ ir talkininkams:\nftp, tput\n© 1996-2008 The NetBSD Foundation, Inc. Visos teisės saugomos.
-Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Dalis pateiktos programinės įrangos yra iš „FreeBSD“ Projekto, ir platinama pagal BSD licenciją:\ncal, ftpd, ping, telnet, telnetd, traceroute\n© 1994-2008 The FreeBSD Project. Visos teisės saugomos.
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		„Google“korporacijai už „Google Summer of Code“ ir „Google Code In“ programas
 The Haikuware team and their bounty program\n	AboutView		„Haikuware“ komandai už premijavimo programą bei šios programos dalyviams\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		© 1995, 1998-2001 Jef Poskanzer. Visos teisės saugomos.

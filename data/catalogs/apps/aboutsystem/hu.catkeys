@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-About	2170341380
+1	hungarian	x-vnd.Haiku-About	3703615311
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 a Gutenprint szerzőitől. Minden jog fenntartva.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrechtnek (NewOS kernel)\n
 Ralink (firmware)	AboutWindow		Ralink (firmware)
@@ -57,7 +57,6 @@ Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyri
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Minden egyedi kód a Haikuban, különösen a kernel és azon kódrészletek, amelyek csatolva vannak programokhoz, az <MIT licenc> alatt érhetőek el. Néhány funkciótár tartalmaz harmadik féltől származó kódot, ezek az <LGPL licenc> alatt érhetőek el. A harmadik felekre vonatkozó szerzői jogok alább találhatóak.
 Time running:	AboutView		Elindítva:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Szoftvereket tartalmaz a NetBSD Foundation, Inc-től, és annak közreműködőitől:\nftp, tput\nSzerzői jog © 1996-2008 The NetBSD Foundation, Inc. Minden jog fenntartva.
-Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Szoftvereket tartalmaz a FreeBSD Projecttől, melyek BSD licenc alatt jelentek meg:\ncal, ftpd, ping, telnet, telnetd, traceroute\nSzerzői jog © 1994-2008 The FreeBSD Project. Minden jog fenntartva.
 GNU GPL v2	AboutWindow		GNU GPL v2
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		A Google "Google Summer of Code" és "Google Code In" programjának\n
 The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n

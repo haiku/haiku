@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	2170341380
+1	finnish	x-vnd.Haiku-About	3703615311
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint-tekijät. Kaikki oikeudet pidätetty.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ja hänen NewOS-ytimensä)\n
 Ralink (firmware)	AboutWindow		Ralink (laiteohjelmisto)
@@ -57,7 +57,6 @@ Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyri
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Koodi, joka on uniikkia Haikulle, erityisesti ydinkoodi ja kaikki koodi, johon sovellukset linkittyvät, jaetaan <MIT license>-lisenssin ehtojen mukaisesti. Jotkut järjestelmäkirjastot sisältävät kolmannen osapuolen koodia, joka jaetaan <LGPL license>-lisenssin alaisena. Voit löytää kolmannen osapuolen koodin copyrights-tiedot alla.\n\n
 Time running:	AboutView		Käynnissäoloaika:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Sisältää ohjelmistoa, jonka on kehittänyt NetBSD Foundation, Inc. ja sen avustajat:\nftp, tput\nCopyright © 1996-2008 NetBSD Foundation, Inc. Kaikki oikeudet pidätetty.
-Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Sisältää ohjelmistoa FreeBSD Project-hankkeesta, julkaistu BSD-lisenssin alaisena:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Kaikki oikeudet pidätetty.
 GNU GPL v2	AboutWindow		GNU GPL v2
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google ja heidän Coogle Summer of Code- ja Google Code In-ohjelmansa\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware-ryhmä ja heidän bounty-ohjelmansa\n

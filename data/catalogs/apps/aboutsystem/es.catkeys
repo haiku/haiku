@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-About	4060100718
+1	spanish; castilian	x-vnd.Haiku-About	1298407353
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 por los autores de Gutenprint. Todos los derechos reservados.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (y su núcleo NewOS)\n
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL y Remi Lefebvre.
@@ -44,7 +44,6 @@ Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyri
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	El código que es único en Haiku, especialmente el núcleo y todo el código al que las aplicaciones se pueden enlazar, se distribuye bajo los términos de la <Licencia MIT>. Algunas bibliotecas de sistema que contienen código de terceros distribuido bajo la <licencia LGPL>. Se pueden encontrar las leyendas de derechos reservados de terceros en el código debajo.\n\n
 Time running:	AboutView		Tiempo en ejecución:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Contiene software desarrollado por NetBSD Foundation, Inc. y sus contribuidores:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. Todos los derechos reservados.
-Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Contiene software del Proyecto FreeBSD liberado bajo la licencia BSD:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Todos los derechos reservados.
 The Haikuware team and their bounty program\n	AboutView		El equipo de Haikuware y su programa de recompensas\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Todos los derechos reservados.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Todos los derechos reservados.

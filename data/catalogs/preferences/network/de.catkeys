@@ -1,8 +1,11 @@
-1	german	x-vnd.Haiku-Network	1260826877
+1	german	x-vnd.Haiku-Network	2475894736
 Revert	NetworkSetupWindow		Anfangswerte
+EAP	EAP protected network		EAP
 WPA2	WPA2 protected network		WPA2
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Apply	NetworkSetupWindow		Anwenden
+Manage…	NetworkSetupWindow		Verwalten…
 WPA	WPA protected network		WPA
+open	Open network		frei
 New…	NetworkSetupWindow		Neu…
 WEP	WEP protected network		WEP

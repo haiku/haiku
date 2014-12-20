@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Media	1376555819
+1	english	x-vnd.Haiku-Media	4081089471
 Couldn't add volume control in Deskbar: %s\n	Media views		无法添加音量控件到桌面栏：%s\n
 Ready for use…	Media Window		准备使用…
 Video input:	Media views		视频输入:
@@ -19,10 +19,8 @@ Telling media_addon_server to quit.	Media Window		控制 media_addon_server 退�
 Audio mixer	Media Window		音频混合器
 This hardware has no controls.	Media Window		硬件控制失败。
 Audio output:	Media views		音频输出：
-Restarting media services\nStarting media server…\n	Media Window		重启多媒体服务\n正在启动 media server…\n
 Audio settings	Media Window		音频设置
 Start media server	Media Window		启动 media server
-Restarting media services\nShutting down media server\n	Media Window		重启多媒体服务\n 关闭 media server\n
 <none>	Media views		<无>
 Channel:	Media views		频道：
 Show volume control on Deskbar	Media views		在桌面栏中显示声音控制

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Media	1376555819
+1	belarusian	x-vnd.Haiku-Media	4081089471
 Couldn't add volume control in Deskbar: %s\n	Media views		Не ўдалося дадаць элемент кіравання гучнасцю у Deskbar: %s\n
 Ready for use…	Media Window		Гатовы да карыстання…
 Video input:	Media views		Відэа ўваход:
@@ -19,10 +19,8 @@ Telling media_addon_server to quit.	Media Window		Адпраўка каманд�
 Audio mixer	Media Window		Аўдыё мікшар
 This hardware has no controls.	Media Window		Гэтая апаратура не мае элементаў кіравання.
 Audio output:	Media views		Гукавы выхад:
-Restarting media services\nStarting media server…\n	Media Window		Запуск Медыя службаў наноў\nЗапуск Медыя Сервера…\n
 Audio settings	Media Window		Наладкі гука
 Start media server	Media Window		Запусціць медыясервер
-Restarting media services\nShutting down media server\n	Media Window		Запуск медыяслужбаў наноў\nЗакрыццё медыясервера\n
 <none>	Media views		<няма>
 Channel:	Media views		Канал:
 Show volume control on Deskbar	Media views		Усталяваць кіраванне гукам у Deskbar

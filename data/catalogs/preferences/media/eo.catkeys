@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Media	351697644
+1	esperanto	x-vnd.Haiku-Media	3056231296
 Ready for use…	Media Window		Preta je uziĝi…
 Video input:	Media views		Videa enigo:
 Waiting for media_server to quit.	Media Window		Atendo de la fino de la plurmedia servilo.
@@ -14,10 +14,8 @@ Restart media services	Media views		Relanĉu la plurmediaj servoj
 Telling media_addon_server to quit.	Media Window		Ordonante, ke la plurmedia aldona servilo finu.
 This hardware has no controls.	Media Window		Ĉi-tiu aparato ne havas agordilojn.
 Audio output:	Media views		Sona eligo:
-Restarting media services\nStarting media server…\n	Media Window		Relanĉo de plurmediaj servoj\nLanĉo de plurmedia servilo…\n
 Audio settings	Media Window		Sonaj agordoj
 Start media server	Media Window		Lanĉu la plurmedian servilon
-Restarting media services\nShutting down media server\n	Media Window		Relanĉo de plurmediaj servoj\nHalto de la plurmedia servilo\n
 <none>	Media views		<neniu>
 Channel:	Media views		Kanalo:
 Show volume control on Deskbar	Media views		Montru la volumagordilon en Deskbar

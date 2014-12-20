@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Media	3929254170
+1	russian	x-vnd.Haiku-Media	2338820526
 Couldn't add volume control in Deskbar: %s\n	Media views		Не удалось добавить регулятор громкости в Deskbar: %s\n
 Ready for use…	Media Window		Готов к использованию…
 Video input:	Media views		Видео вход:
@@ -20,10 +20,8 @@ Telling media_addon_server to quit.	Media Window		Запрос завершен�
 Audio mixer	Media Window		Микшер
 This hardware has no controls.	Media Window		Это оборудование не имеет параметров настройки.
 Audio output:	Media views		Аудио выход:
-Restarting media services\nStarting media server…\n	Media Window		Перезапуск медиа служб\nЗапуск медиасервера…\n
 Audio settings	Media Window		Настройки звука
 Start media server	Media Window		Запустить медиасервер
-Restarting media services\nShutting down media server\n	Media Window		Перезапуск медиа служб\nОстановка медиасервера\n
 <none>	Media views		<нет>
 Channel:	Media views		Канал:
 Show volume control on Deskbar	Media views		Отображать регулятор громкости в Deskbar

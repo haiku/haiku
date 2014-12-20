@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-About	4233939510
+1	english	x-vnd.Haiku-About	1472246145
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		版权所有 © 1999-2010 Gutenprint 的所有编写者，保留所有权利。
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht（和他的 NewOS 内核）\n
 Ralink (firmware)	AboutWindow		Ralink(固件)
@@ -54,7 +54,6 @@ Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		版权
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku所独有的代码，尤其是内核及与之紧密关联的所有应用程序的代码，它们都在 <MIT 协议> 条款下发布。那些包含第三方代码的系统库则在 <LGPL 协议> 下发布。您可以在下述信息中找到第三方部分代码的版权信息。\n\n
 Time running:	AboutView		运行时间：
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		包含由 NetBSD Foundation, Inc 及其贡献者所开发的软件：\nftp，tput\n版权所有 © 1996-2008 The NetBSD Foundation, Inc，保留所有权利。
-Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		包含来自 FreeBSD 项目的软件，这些软件在 BSD 协议下发布：\ncal，ftpd，ping，telnet，telnetd，traceroute\n版权所有 © 1994-2008 The FreeBSD Project，保留所有权利。
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		谷歌及其编程之夏和 Google Code In 比赛项目\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware 组织及其捐赠程序\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		版权所有 © 1995, 1998-2001 Jef Poskanzer，保留所有权利。

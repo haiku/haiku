@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-About	2916049630
+1	portuguese (brazil)	x-vnd.Haiku-About	154356265
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Direitos autorais © 1999-2010 pelos autores do Gutenprint. Todos os direitos reservados.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e seu kernel NewOS)\n
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Direitos autorais © 2000 Jean-Pierre ervbefeL e Remi Lefebvre.
@@ -52,7 +52,6 @@ Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Direit
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	O código que é único ao Haiku, especialmente o núcleo e todo o código que os aplicativos podem fazer referência ao primeiro, é distribuído sob os termos da <licença MIT>. Algumas bibliotecas de sistema contém código de terceiros distribuído sob a <licença LGPL>. Você pode encontrar os direitos autorais para o código de terceiros abaixo.\n\n
 Time running:	AboutView		Tempo de funcionamento:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Contém software desenvolvido pela NetBSD Foundation, Inc. e seus contribuidores:\nftp, tput\nDireitos autorais © 1996-2008 The NetBSD Foundation, Inc. Todos os direitos reservados.
-Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Contém software do Projeto FreeBSD, lançado sob licença BSD:\ncal, ftpd, ping, telnet, telnetd, traceroute\nDireitos autorais © 1994-2008 The FreeBSD Project. Todos os direitos reservados.
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google e seus programas Google Summer of Code e Google Code In\n
 The Haikuware team and their bounty program\n	AboutView		A equipe do Haikuware e o seu programa de recompensas\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Direitos autorais © 1995, 1998-2001 Jef Poskanzer. Todos os direitos reservados.
