@@ -111,7 +111,7 @@ public:
 									const BMessage* dragMessage);
 	virtual	void				Pulse();
 
-	virtual	void				Select(int32 tab);
+	virtual	void				Select(int32 index);
 			int32				Selection() const;
 
 	virtual	void				WindowActivated(bool active);
