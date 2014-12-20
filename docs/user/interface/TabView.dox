@@ -1,0 +1,733 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/TabView.h	 hrev45377
+ *		src/kits/interface/TabView.cpp	 hrev45377
+ */
+
+
+/*!
+	\file TabView.h
+	\ingroup interface
+	\ingroup libbe
+	\brief Provides the BTab and BTabView classes.
+*/
+
+
+/*!
+	\enum tab_position
+	\ingroup interface
+
+	Tab position flags
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var tab_position B_TAB_FIRST
+
+	First tab in the tab view.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var tab_position B_TAB_FRONT
+
+	Front most tab in the tab view.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var tab_position B_TAB_ANY
+
+	Represents any tab in the tab view.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\class BTab
+	\ingroup interface
+	\ingroup libbe
+	\brief A Tab that goes in a TabView.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTab::BTab(BView* tabView)
+	\brief Initializes a new BTab object as part of a \a tabView.
+
+	The BTab is enabled, but not selected nor the current focus. \a tabView
+	is set as the tab's target view -- when the tab is selected, its target
+	view is activated.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTab::BTab(BMessage* archive)
+	\brief Archive Constructor.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTab::~BTab()
+	\brief Destructor.
+*/
+
+
+/*!
+	\fn BArchivable* BTab::Instantiate(BMessage* archive)
+	\brief Instantiates a BTab object from the passed in \a archive.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BTab::Archive(BMessage* data, bool deep) const
+	\brief Archives the object into the \a data message.
+
+	\param data A pointer to the BMessage object to archive the object into.
+	\param deep Whether or not to archive child views as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BTab::Perform(uint32 d, void* arg)
+	\brief Perform some action. (Internal Method)
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn const char* BTab::Label() const
+	\brief Returns the tab's label (The target view's name).
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTab::SetLabel(const char* label)
+	\brief Sets the tab's label.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\class BTabView
+	\ingroup interface
+	\ingroup libbe
+	\brief Displays and manipulates styled text.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BTab::IsSelected() const
+	\brief Returns whether or not the tab is selected.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTab::Select(BView* owner)
+	\brief Selects the tab.
+
+	This also adds the tab's target view to the \a owner view.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTab::Deselect()
+	\brief Delects the tab.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTab::SetEnabled(bool enable)
+	\brief Enables or disables the tab.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BTab::IsEnabled() const
+	\brief Returns whether or not the tab is enabled.
+*/
+
+
+/*!
+	\fn void BTab::MakeFocus(bool focus)
+	\brief Makes the tab the window's focus view or removes it.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BTab::IsFocus() const
+	\brief Returns whether or not the tab is the window's focus view.
+*/
+
+
+/*!
+	\fn void BTab::SetView(BView* view)
+	\brief Sets the view to be displayed for this tab.
+*/
+
+
+/*!
+	\fn BView* BTab::View() const
+	\brief Returns a pointer to the view to be displayed for this tab.
+*/
+
+
+/*!
+	\fn void BTab::DrawFocusMark(BView* owner, BRect frame)
+	\brief Draws the mark indicating that the BTab object is in focus.
+
+	This consists of a blue line drawn across the bottom of the tab frame
+	by default.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTab::DrawLabel(BView* owner, BRect frame)
+	\brief Draws the tab's title.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTab::DrawTab(BView* owner, BRect frame, tab_position position,
+		bool full)
+	\brief Draws the tab.
+
+	This method draws the tab's title by calling DrawLabel(), then draws the
+	tab itself. The \a position of the tab may affect how the tab is rendered
+	-- for example the frontmost tab may have a different appearance than the
+	other tabs.
+
+	\param owner The view that owns the tab.
+	\param frame The frame rectangle to draw in.
+	\param position May affect how the tab is rendered. Choices include:
+	       - \c B_TAB_FIRST
+	       - \c B_TAB_FRONT
+	       - \c B_TAB_ANY
+	\param full Whether or not to completely draw the tab, no longer used.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\class BTabView
+	\ingroup interface
+	\ingroup libbe
+	\brief A container for BTab objects to display all tabs.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTabView::BTabView(const char* name, button_width width, uint32 flags)
+	\brief Initializes a new BTabView object for use as part of a BLayout.
+
+	\param name The name of the tab view.
+	\param width The tab width flag to use. Options include:
+	       - \c B_WIDTH_AS_USUAL
+	       - \c B_WIDTH_FROM_WIDEST
+	       - \c B_WIDTH_FROM_LABEL
+	\param flags \a flags passed to BView.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTabView::BTabView(BRect frame, const char* name, button_width width,
+		uint32 resizeMask, uint32 flags)
+	\brief Initializes a new BTabView object.
+
+	\param frame The frame rectangle.
+	\param name The name of the tab view.
+	\param width The tab width flag to use. Options include:
+	       - \c B_WIDTH_AS_USUAL
+	       - \c B_WIDTH_FROM_WIDEST
+	       - \c B_WIDTH_FROM_LABEL
+	\param resizeMask Resizing mask, passed to BView.
+	\param flags \a flags passed to BView.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTabView::BTabView(BMessage* archive)
+	\brief Creates a BTabView object from the passed in \a archive.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTabView::~BTabView()
+	\brief Frees the memory allocated by each tab then destroys the object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BArchivable* BTabView::Instantiate(BMessage* archive)
+	\brief Instantiates a BTabView object from the passed in \a archive.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BTabView::Archive(BMessage* data, bool deep) const
+	\brief Archives the object into the \a data message.
+
+	\param data A pointer to the BMessage object to archive the object into.
+	\param deep Whether or not to archive child views as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BTabView::AllUnarchived(const BMessage* from)
+	\brief Hook method called when all views have been unarchived.
+
+	\copydetails BView::AllUnarchived()
+*/
+
+
+//! @}
+
+
+/*!
+	\fn status_t BTabView::Perform(perform_code code, void* _data)
+	\brief Perform some action. (Internal Method)
+*/
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTabView::AllAttached()
+	\copydoc BView::AllAttached()
+*/
+
+
+/*!
+	\fn void BTabView::AllDetached()
+	\copydoc BView::AllDetached()
+*/
+
+
+/*!
+	\fn void BTabView::AttachedToWindow()
+	\copydoc BView::AttachedToWindow()
+*/
+
+
+/*!
+	\fn void BTabView::DetachedFromWindow()
+	\copydoc BView::DetachedFromWindow()
+*/
+
+
+/*!
+	\fn void BTabView::Draw(BRect updateRect)
+	\brief Draws the focus tab and the tab view frame.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BRect BTabView::DrawTabs()
+	\brief Draws all the tabs in the BTabView and returns the frame rectangle
+	       of the currently selected tab.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTabView::DrawBox(BRect selTabRect)
+	\brief Draws the box that encloses the container view.
+
+	\param selTabRect The frame rectangle of the currently selected tab.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTabView::FrameResized(float newWidth, float newHeight)
+	\copydoc BView::FrameResized()
+*/
+
+
+/*!
+	\fn void BTabView::KeyDown(const char* bytes, int32 numBytes)
+	\brief Handles keyboard navigation for the BTabView.
+
+	Down and left arrow keys move the focus tab left, up and right
+	arrow keys move the focus tab right. The space bar and enter keys
+	select the currently focused tab.
+
+	\sa BView::KeyDown()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTabView::MessageReceived(BMessage* message)
+	\brief Handles scripting messages for the tab view.
+
+	\copydetails BView::MessageReceived()
+*/
+
+
+/*!
+	\fn void BTabView::MouseDown(BPoint where)
+	\brief Selects the tab that the user clicked on (if any).
+
+	\sa BView::MouseDown()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTabView::MouseUp(BPoint where)
+	\copydoc BView::MouseUp()
+*/
+
+
+/*!
+	\fn void BTabView::MouseMoved(BPoint where, uint32 code,
+		const BMessage* dragMessage)
+	\copydoc BView::MouseMoved()
+*/
+
+
+/*!
+	\fn void BTabView::Pulse()
+	\copydoc BView::Pulse()
+*/
+
+
+/*!
+	\fn void BTabView::Select(int32 index)
+	\brief Selects the tab at the given \a index making it the selected tab.
+
+	\param index The zero-based tab index of the tab to select.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn int32 BTabView::Selection() const
+	\brief Returns the currently selected tab's index.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTabView::WindowActivated(bool active)
+	\copydoc BView::WindowActivated()
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BTabView::MakeFocus(bool focus)
+	\brief Highlight or unhighlight the selection when the tab view acquires
+	       or loses its focus state.
+
+	\copydetails BView::MakeFocus()
+*/
+
+
+/*!
+	\fn void BTabView::SetFocusTab(int32 tab, bool focus)
+	\brief Sets the focus state of the specified \a tab.
+
+	\param tab The index of the tab to set the focus state of.
+	\param focus \c true to set focus, \c false to remove it.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn int32 BTabView::FocusTab() const
+	\brief Returns the index of the current focus tab.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BRect BTabView::TabFrame(int32 index) const
+	\brief Returns the frame rectangle of the tab at the specified \a index.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTabView::SetFlags(uint32 flags)
+	\copydoc BView::SetFlags()
+*/
+
+
+/*!
+	\fn void BTabView::SetResizingMode(uint32 mode)
+	\copydoc BView::SetResizingMode()
+*/
+
+
+/*!
+	\fn void BTabView::ResizeToPreferred()
+	\copydoc BView::ResizeToPreferred()
+*/
+
+
+/*!
+	\fn void BTabView::GetPreferredSize(float* _width, float* _height)
+	\copydoc BView::GetPreferredSize()
+*/
+
+
+/*!
+	\fn BSize BTabView::MinSize()
+	\brief Returns the tab view's minimum size in a BLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSize BTabView::MaxSize()
+	\brief Returns the tab view's maximum size in a BLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSize BTabView::PreferredSize()
+	\brief Returns the tab view's preferred size in a BLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BTabView::FrameMoved(BPoint newPosition)
+	\copydoc BView::FrameMoved()
+*/
+
+
+/*!
+	\fn void BTabView::FrameResized(float newWidth, float newHeight)
+	\copydoc BView::FrameResized()
+
+
+/*!
+	\fn BHandler* BTabView::ResolveSpecifier(BMessage* message, int32 index,
+		BMessage* specifier, int32 what, const char* property)
+	\copydoc BHandler::ResolveSpecifier()
+*/
+
+
+/*!
+	\fn status_t BTabView::GetSupportedSuites(BMessage* message)
+	\copydoc BHandler::GetSupportedSuites()
+*/
+
+
+/*!
+	\fn void BTabView::AddTab(BView* target, BTab* tab)
+	\brief Adds the specified \a tab to the BTabView.
+
+	The tab is added to the end of the tab list. The new tab's target view is
+	set to \a target. If \a tab is \c NULL, a new BTab object is constructed
+	and added to the BTabView. You can get a pointer to the new tab by calling
+	the TabAt() method.
+
+	If you choose to reimplement AddTab(), you should call this parent method
+	at the end of your method.
+
+	\sa BTabView::TabAt()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTab* BTabView::RemoveTab(int32 index)
+	\brief Removes the tab at the specified \a index from the BTabView and
+	       returns a pointer to the BTab object.
+
+	The BTab object is not deleted, if you don't need it anymore you should delete it.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BTab* BTabView::TabAt(int32 index) const
+	\brief Returns a pointer to the BTab object at the specified \a index.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTabView::SetTabWidth(button_width width)
+	\brief Sets the width of the tabs in the BTabView
+
+	\a width is one of the following:
+	- \c B_WIDTH_FROM_WIDEST Each tab's width is determined from the width of the widest tab.
+	- \c B_WIDTH_AS_USUAL The default tab width is used for all tabs.
+	- \c B_WIDTH_FROM_LABEL The label of each tab determines the tab width.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn button_width BTabView::TabWidth() const
+	\brief Returns the current tab width flag.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTabView::SetTabHeight(float height)
+	\brief Sets the height of the tabs to \a height.
+
+	\a height should be an integral value.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn float BTabView::TabHeight() const
+	\brief Returns the current tab height.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTabView::SetBorder(border_style border)
+	\brief Sets the border of the tab view to \a border.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn border_style BTabView::Border() const
+	\brief Returns the current border_style flag.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BView* BTabView::ContainerView() const
+	\brief Returns a pointer to the tab view's container view.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BTabView::CountTabs() const
+	\brief Returns the number of tabs in the tab view.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BView* BTabView::ViewForTab(int32 tabIndex) const
+	\brief Returns the BView of the tab at the specified \a tabIndex.
+
+	\since Haiku R1
+*/
+
