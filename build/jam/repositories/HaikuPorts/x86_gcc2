@@ -5,7 +5,7 @@ RemotePackageRepository HaikuPorts
 	# architecture "any" packages
 	be_book-2008_10_26-1
 	ca_root_certificates-2014_04_08-2
-	dejavu-2.34-1
+	dejavu-2.34-2
 	docbook_xml_dtd-4.5-2
 	docbook_xsl_stylesheets-1.78.1-1
 	droid-113-1
