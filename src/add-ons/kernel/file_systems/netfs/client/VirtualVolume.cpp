@@ -240,7 +240,7 @@ VirtualVolume::GetUniqueEntryName(const char* baseName, char* buffer)
 	while (fRootNode->GetChildNode(baseName)) {
 		// create a suffix
 		char suffix[13];
-		sprintf(suffix, " %ld", suffixNumber);
+		sprintf(suffix, " %" B_PRId32, suffixNumber);
 		suffixNumber++;
 
 		// check the len

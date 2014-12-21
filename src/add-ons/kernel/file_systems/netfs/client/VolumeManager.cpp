@@ -11,8 +11,13 @@
 #include "VolumeManager.h"
 
 // VolumeSet
+#ifdef B_HAIKU_64_BIT
+struct VolumeManager::VolumeSet : HashSet<HashKey64<Volume*> > {
+};
+#else
 struct VolumeManager::VolumeSet : HashSet<HashKey32<Volume*> > {
 };
+#endif
 
 // NodeIDVolumeMap
 struct VolumeManager::NodeIDVolumeMap : HashMap<HashKey64<vnode_id>, Volume*> {
