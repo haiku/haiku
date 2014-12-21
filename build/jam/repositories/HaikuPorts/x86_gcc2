@@ -279,7 +279,7 @@ RemotePackageRepository HaikuPorts
 	popt_devel-1.16-1
 	psiconv-0.9.8-1
 	psiconv_devel-0.9.8-1
-	python-2.7.8-1
+	python-2.7.9-1
 	python_dateutil-1.5-2
 	python_lxml-3.3.5-2
 	python_mechanize-0.2.5-2
