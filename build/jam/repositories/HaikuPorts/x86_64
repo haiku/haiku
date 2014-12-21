@@ -101,8 +101,8 @@ RemotePackageRepository HaikuPorts
 	libevent_devel-2.0.21-7
 	libexecinfo-1.1-2
 	libexecinfo_devel-1.1-2
-	libffi-3.0.13-2
-	libffi_devel-3.0.13-2
+	libffi-3.2.1-2
+	libffi_devel-3.2.1-2
 	libicns-0.8.1-1
 	libicns_devel-0.8.1-1
 	libiconv-1.13.1-6
