@@ -112,7 +112,7 @@ void
 BLocker::Unlock()
 {
 	// The Be Book explicitly allows any thread, not just the lock owner, to
-	// unlock. This is bad practise and Haiku should not allow it.
+	// unlock. This is bad practice and Haiku should not allow it.
 	if (!IsLocked())
 		debugger("Trying to unlock from the wrong thread (#6400)");
 
