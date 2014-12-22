@@ -1271,9 +1271,11 @@ ActivityView::_LegendFrameAt(BRect frame, int32 index) const
 {
 	int32 column = index & 1;
 	int32 row = index / 2;
-	if (column == 0)
-		frame.right = frame.left + floorf(frame.Width() / 2) - 5;
-	else
+	if (column == 0) {
+		// The last item, if it is on the first column, can use the full width.
+		if (index < fSources.CountItems() - 1)
+			frame.right = frame.left + floorf(frame.Width() / 2) - 5;
+	} else
 		frame.left = frame.right - floorf(frame.Width() / 2) + 5;
 
 	BAutolock _(fSourcesLock);
