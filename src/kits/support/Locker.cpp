@@ -94,58 +94,59 @@ bool
 BLocker::Lock()
 {
 	status_t result;
-    return AcquireLock(B_INFINITE_TIMEOUT, &result);
+	return AcquireLock(B_INFINITE_TIMEOUT, &result);
 }
 
 
 status_t
 BLocker::LockWithTimeout(bigtime_t timeout)
 {
-    status_t result;
+	status_t result;
 
 	AcquireLock(timeout, &result);
-    return result;
+	return result;
 }
-
 
 
 void
 BLocker::Unlock()
 {
-	// If the thread currently holds the lockdecrement
-	if (IsLocked()) {
-		// Decrement the number of outstanding locks this thread holds
-		// on this BLocker.
-		fRecursiveCount--;
+	// The Be Book explicitly allows any thread, not just the lock owner, to
+	// unlock. This is bad practise and Haiku should not allow it.
+	if (!IsLocked())
+		debugger("Trying to unlock from the wrong thread (#6400)");
 
-		// If the recursive count is now at 0, that means the BLocker has
-		// been released by the thread.
-		if (fRecursiveCount == 0) {
-			// The BLocker is no longer owned by any thread.
-			fLockOwner = B_ERROR;
+	// Decrement the number of outstanding locks this thread holds
+	// on this BLocker.
+	fRecursiveCount--;
 
-    		// Decrement the benaphore count and store the undecremented
-    		// value in oldBenaphoreCount.
-			int32 oldBenaphoreCount = atomic_add(&fBenaphoreCount, -1);
+	// If the recursive count is now at 0, that means the BLocker has
+	// been released by the thread.
+	if (fRecursiveCount == 0) {
+		// The BLocker is no longer owned by any thread.
+		fLockOwner = B_ERROR;
 
-			// If the oldBenaphoreCount is greater than 1, then there is
-			// at lease one thread waiting for the lock in the case of a
-			// benaphore.
-   		    if (oldBenaphoreCount > 1) {
- 				// Since there are threads waiting for the lock, it must
- 				// be released.  Note, the old benaphore count will always be
- 				// greater than 1 for a semaphore so the release is always done.
-    			release_sem(fSemaphoreID);
-	    	}
-	    }
-    }
+		// Decrement the benaphore count and store the undecremented
+		// value in oldBenaphoreCount.
+		int32 oldBenaphoreCount = atomic_add(&fBenaphoreCount, -1);
+
+		// If the oldBenaphoreCount is greater than 1, then there is
+		// at lease one thread waiting for the lock in the case of a
+		// benaphore.
+		if (oldBenaphoreCount > 1) {
+			// Since there are threads waiting for the lock, it must
+			// be released.  Note, the old benaphore count will always be
+			// greater than 1 for a semaphore so the release is always done.
+			release_sem(fSemaphoreID);
+		}
+	}
 }
 
 
 thread_id
 BLocker::LockingThread() const
 {
-    return fLockOwner;
+	return fLockOwner;
 }
 
 
@@ -155,28 +156,28 @@ BLocker::IsLocked() const
 	// This member returns true if the calling thread holds the lock.
 	// The easiest way to determine this is to compare the result of
 	// find_thread() to the fLockOwner.
-    return find_thread(NULL) == fLockOwner;
+	return find_thread(NULL) == fLockOwner;
 }
 
 
 int32
 BLocker::CountLocks() const
 {
-    return fRecursiveCount;
+	return fRecursiveCount;
 }
 
 
 int32
 BLocker::CountLockRequests() const
 {
-    return fBenaphoreCount;
+	return fBenaphoreCount;
 }
 
 
 sem_id
 BLocker::Sem() const
 {
-    return fSemaphoreID;
+	return fSemaphoreID;
 }
 
 
@@ -217,10 +218,10 @@ BLocker::AcquireLock(bigtime_t timeout, status_t *error)
 
 	// Only try to acquire the lock if the thread doesn't already own it.
 	if (!IsLocked()) {
-		// Increment the benaphore count and test to see if it was already greater
-		// than 0.  If it is greater than 0, then some thread already has the
-		// benaphore or the style is a semaphore.  Either way, we need to acquire
-		// the semaphore in this case.
+		// Increment the benaphore count and test to see if it was already
+		// greater than 0. If it is greater than 0, then some thread already has
+		// the benaphore or the style is a semaphore. Either way, we need to
+		// acquire the semaphore in this case.
 		int32 oldBenaphoreCount = atomic_add(&fBenaphoreCount, 1);
 		if (oldBenaphoreCount > 0) {
 			do {
