@@ -1138,7 +1138,6 @@
 
 	\see AddData() for a more detailed overview of the inner workings.
 	\see FindPointer()
-	\see GetPointer()
 	\see ReplacePointer()
 
 	\since BeOS R3
@@ -3501,39 +3500,6 @@ bool enabled = GetBool("enabled", false);
 	\fn double BMessage::GetDouble(const char* name, int32 index,
 		double defaultValue) const
 	\brief Return the double value from message with \a name and \a index, or
-	       \a defaultValue if not found.
-
-	\param name The name of the item to retrieve.
-	\param index The index of the item to retrieve if there is more than one.
-	\param defaultValue The value to use if the item specified by \a name
-	       is not found.
-
-	\return The item with \a name, or \a defaultValue if not found.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn void* BMessage::GetPointer(const char* name,
-		const void* defaultValue) const
-	\brief Return the pointer from message with \a name, or
-	       \a defaultValue if not found.
-
-	\param name The name of the item to retrieve.
-	\param defaultValue The value to use if the item specified by \a name
-	       is not found.
-
-	\return The item with \a name, or \a defaultValue if not found.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn void* BMessage::GetPointer(const char* name, int32 index,
-		const void* defaultValue) const
-	\brief Return the pointer from message with \a name and \a index, or
 	       \a defaultValue if not found.
 
 	\param name The name of the item to retrieve.

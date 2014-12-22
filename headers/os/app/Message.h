@@ -446,10 +446,6 @@ public:
 									double defaultValue) const;
 			double				GetDouble(const char* name, int32 index,
 									double defaultValue) const;
-			void*				GetPointer(const char* name,
-									const void* defaultValue) const;
-			void*				GetPointer(const char* name, int32 index,
-									const void* defaultValue) const;
 			const char*			GetString(const char* name,
 									const char* defaultValue) const;
 			const char*			GetString(const char* name, int32 index,
