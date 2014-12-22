@@ -66,6 +66,7 @@ notify_entry_created(dev_t device, ino_t directory, const char *name,
 		directory, node, NULL, name);
 }
 
+
 // notify_entry_removed
 status_t
 notify_entry_removed(dev_t device, ino_t directory, const char *name,
@@ -77,6 +78,7 @@ notify_entry_removed(dev_t device, ino_t directory, const char *name,
 	return UserlandFS::KernelEmu::notify_listener(B_ENTRY_REMOVED, 0, device, 0,
 		directory, node, NULL, name);
 }
+
 
 // notify_entry_moved
 status_t
@@ -91,6 +93,7 @@ notify_entry_moved(dev_t device, ino_t fromDirectory,
 		fromDirectory, toDirectory, node, fromName, toName);
 }
 
+
 // notify_stat_changed
 status_t
 notify_stat_changed(dev_t device, ino_t node, uint32 statFields)
@@ -98,6 +101,7 @@ notify_stat_changed(dev_t device, ino_t node, uint32 statFields)
 	return UserlandFS::KernelEmu::notify_listener(B_STAT_CHANGED, statFields,
 		device, 0, 0, node, NULL, NULL);
 }
+
 
 // notify_attribute_changed
 status_t
@@ -111,12 +115,14 @@ notify_attribute_changed(dev_t device, ino_t node, const char *attribute,
 		device, 0, 0, node, NULL, attribute);
 }
 
+
 // notify_select_event
 status_t
 notify_select_event(selectsync *sync, uint8 event)
 {
 	return UserlandFS::KernelEmu::notify_select_event(sync, event, false);
 }
+
 
 // notify_query_entry_created
 status_t
@@ -129,6 +135,7 @@ notify_query_entry_created(port_id port, int32 token, dev_t device,
 	return UserlandFS::KernelEmu::notify_query(port, token, B_ENTRY_CREATED,
 		device, directory, name, node);
 }
+
 
 // notify_query_entry_removed
 status_t
@@ -168,6 +175,7 @@ new_vnode(fs_volume *_volume, ino_t vnodeID, void *privateNode,
 	return error;
 }
 
+
 // publish_vnode
 status_t
 publish_vnode(fs_volume *_volume, ino_t vnodeID, void *privateNode,
@@ -191,6 +199,7 @@ publish_vnode(fs_volume *_volume, ino_t vnodeID, void *privateNode,
 	return error;
 }
 
+
 // get_vnode
 status_t
 get_vnode(fs_volume *_volume, ino_t vnodeID, void **privateNode)
@@ -204,11 +213,12 @@ get_vnode(fs_volume *_volume, ino_t vnodeID, void **privateNode)
 	if (error != B_OK)
 		return error;
 
-	if (privateNode)
+	if (privateNode != NULL)
 		*privateNode = ((HaikuKernelNode*)foundNode)->private_node;
 
 	return B_OK;
 }
+
 
 // put_vnode
 status_t
@@ -219,6 +229,7 @@ put_vnode(fs_volume *_volume, ino_t vnodeID)
 	return UserlandFS::KernelEmu::put_vnode(volume->GetID(), vnodeID);
 }
 
+
 // acquire_vnode
 status_t
 acquire_vnode(fs_volume *_volume, ino_t vnodeID)
@@ -227,6 +238,7 @@ acquire_vnode(fs_volume *_volume, ino_t vnodeID)
 
 	return UserlandFS::KernelEmu::acquire_vnode(volume->GetID(), vnodeID);
 }
+
 
 // remove_vnode
 status_t
@@ -237,6 +249,7 @@ remove_vnode(fs_volume *_volume, ino_t vnodeID)
 	return UserlandFS::KernelEmu::remove_vnode(volume->GetID(), vnodeID);
 }
 
+
 // unremove_vnode
 status_t
 unremove_vnode(fs_volume *_volume, ino_t vnodeID)
@@ -245,6 +258,7 @@ unremove_vnode(fs_volume *_volume, ino_t vnodeID)
 
 	return UserlandFS::KernelEmu::unremove_vnode(volume->GetID(), vnodeID);
 }
+
 
 // get_vnode_removed
 status_t
@@ -255,6 +269,7 @@ get_vnode_removed(fs_volume *_volume, ino_t vnodeID, bool* removed)
 	return UserlandFS::KernelEmu::get_vnode_removed(volume->GetID(), vnodeID,
 		removed);
 }
+
 
 // volume_for_vnode
 fs_volume*
