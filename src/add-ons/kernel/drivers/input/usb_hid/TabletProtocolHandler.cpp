@@ -147,7 +147,7 @@ TabletProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 		return;
 
 	uint32 inputReportCount = 0;
-	HIDReport *inputReports[maxReportCount] = {0};
+	HIDReport *inputReports[maxReportCount];
 	collection.BuildReportList(HID_REPORT_TYPE_INPUT, inputReports,
 		inputReportCount);
 
