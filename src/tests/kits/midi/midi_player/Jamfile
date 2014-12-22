@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src tests kits midi midi_player ;
-
-SimpleTest MidiPlayer
-	: MidiPlayer.cpp
-	  Midi1To2Bridge.cpp
-	  MidiDelay.cpp
-	: midi midi2 be stdc++.r4
-;
-

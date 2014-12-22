@@ -279,7 +279,7 @@ void SSynthFileReader::Dump(bool play, uint32 instrOnly) {
 						Read(elems);
 						rest -= 4;
 						
-						printf("elems = %ld\n", elems);
+						printf("elems = %d\n", elems);
 						
 						if (elems > 0 || rest >= 16) {
 							Dump(elems * 8 + 21); printf("\n");

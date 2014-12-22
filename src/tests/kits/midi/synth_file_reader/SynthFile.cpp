@@ -77,9 +77,9 @@ SInstrument::SInstrument(uint8 instrument)
 
 // SSynthFile
 
-static int bySoundId(const SSound** a, const SSound** b)
+static int bySoundId(const SSound* a, const SSound* b)
 {
-	return (*a)->Id() - (*b)->Id();
+	return (a)->Id() - (b)->Id();
 }
 
 SSynthFile::SSynthFile(const char* fileName)
@@ -123,8 +123,7 @@ void
 SSynthFile::InstrumentAtPut(int i, SInstrument* instr)
 {
 	ASSERT(fInstruments.CountItems() == 128);
-	SInstrument** array = (SInstrument**)fInstruments.Items();
-	array[i] = instr;
+	fInstruments.ReplaceItem(i, instr);
 }
 
 

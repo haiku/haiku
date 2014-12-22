@@ -31,7 +31,7 @@ THE SOFTWARE.
 #define _SYNTH_FILE_H
 
 #include "SynthFileReader.h"
-#include "TList.h"
+#include <ObjectList.h>
 
 
 class SSound {
@@ -85,7 +85,7 @@ class SInstrument {
 	uint8                fId;
 	BString              fName;
 	SSound*              fDefaultSound;
-	TList<SSoundInRange> fSounds;
+	BObjectList<SSoundInRange> fSounds;
 	
 public:
 	SInstrument(uint8 instrument);
@@ -101,15 +101,15 @@ public:
 	void SetDefaultSound(SSound* sound)        { fDefaultSound = sound; }
 	SSound*               DefaultSound() const { return fDefaultSound; }
 	
-	TList<SSoundInRange>* Sounds()             { return &fSounds; }
+	BObjectList<SSoundInRange>* Sounds()       { return &fSounds; }
 };
 
 
 class SSynthFile;
 
 class SSynthFile {
-	TList<SInstrument> fInstruments;
-	TList<SSound>      fSounds;
+	BObjectList<SInstrument> fInstruments;
+	BObjectList<SSound>      fSounds;
 	SSynthFileReader   fReader;
 	status_t           fStatus;
 	
