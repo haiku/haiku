@@ -29,6 +29,7 @@ public:
 
 	virtual void				SelectionChanged();
 
+	virtual void				Clear();
 			void				AddPackage(const PackageInfoRef& package);
 
 private:

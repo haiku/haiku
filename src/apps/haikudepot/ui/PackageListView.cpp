@@ -549,7 +549,7 @@ class PackageListView::ItemCountView : public BView {
 public:
 	ItemCountView()
 		:
-		BView("item count view", B_WILL_DRAW),
+		BView("item count view", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 		fItemCount(0)
 	{
 		BFont font(be_plain_font);
@@ -603,8 +603,10 @@ public:
 	{
 		if (count == fItemCount)
 			return;
+		BSize minSize = MinSize();
 		fItemCount = count;
-		InvalidateLayout();
+		if (minSize != MinSize())
+			InvalidateLayout();
 		Invalidate();
 	}
 
@@ -721,6 +723,14 @@ PackageListView::SelectionChanged()
 		message.AddString("title", selected->Package()->Title());
 
 	Window()->PostMessage(&message);
+}
+
+
+void
+PackageListView::Clear()
+{
+	fItemCountView->SetItemCount(0);
+	BColumnListView::Clear();
 }
 
 
