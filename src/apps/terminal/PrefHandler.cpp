@@ -84,7 +84,7 @@ static const pref_defaults kTermDefaults[] = {
 
 	{ PREF_IM_AWARE,			"0"},
 
-	{ PREF_TAB_TITLE,			"%1d: %p" },
+	{ PREF_TAB_TITLE,			"%1d: %p%e" },
 	{ PREF_WINDOW_TITLE,		"%T %i: %t" },
 	{ PREF_BLINK_CURSOR,		PREF_TRUE },
 	{ PREF_WARN_ON_EXIT,		PREF_TRUE },
