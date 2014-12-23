@@ -380,6 +380,10 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 //			audioFrameSize = (raf->format & 0xf) * raf->channel_count;
 			outAudTrack = outFile->CreateTrack(&outAudFormat, audioCodec);
 
+			// Negociate the format with the inTrack again in case the codec
+			// made some changes to it...
+			inTrack->DecodedFormat(&outAudFormat);
+
 			if (outAudTrack != NULL) {
 				if (outAudTrack->SetQuality(audioQuality / 100.0f) != B_OK
 					&& fWin->Lock()) {
