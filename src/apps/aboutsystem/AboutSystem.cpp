@@ -1156,13 +1156,6 @@ AboutView::_CreateCreditsView()
 		.SetLicense(kBSDFourClause)
 		.SetURL("http://bzip.org"));
 
-	// lp_solve copyrights
-	_AddPackageCredit(PackageCredit("lp_solve")
-		.SetCopyright(COPYRIGHT_STRING
-			"Michel Berkelaar, Kjell Eikland, Peter Notebaert")
-		.SetLicense(kLGPLv21)
-		.SetURL("http://lpsolve.sourceforge.net/"));
-
 	// OpenEXR copyrights
 	_AddPackageCredit(PackageCredit("OpenEXR")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2005 Industrial "
@@ -1194,13 +1187,6 @@ AboutView::_CreateCreditsView()
 		.SetCopyright(COPYRIGHT_STRING "1999-2006 Intel Corp.")
 		.SetLicense("Intel (ACPICA)")
 		.SetURL("http://www.acpica.org"));
-
-	// unrar copyrights
-	_AddPackageCredit(PackageCredit("unrar")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2008 Alexander "
-			"L. Roshal. All rights reserved."))
-		.SetLicense("UnRAR")
-		.SetURL("http://www.rarlab.com"));
 
 	// libpng copyrights
 	_AddPackageCredit(PackageCredit("libpng")
