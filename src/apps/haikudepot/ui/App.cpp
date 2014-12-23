@@ -7,11 +7,13 @@
 
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Catalog.h>
 #include <Entry.h>
 #include <Message.h>
 #include <package/PackageInfo.h>
 #include <Path.h>
+#include <Roster.h>
 #include <String.h>
 
 #include "support.h"
@@ -30,6 +32,7 @@ App::App()
 	fWindowCount(0),
 	fSettingsRead(false)
 {
+	_CheckPackageDaemonRuns();
 }
 
 
@@ -223,5 +226,59 @@ App::_GetNextWindowFrame(bool singlePackageMode)
 
 	make_sure_frame_is_on_screen(frame);
 	return frame;
+}
+
+
+// #pragma mark -
+
+
+static const char* kPackageDaemonSignature
+	= "application/x-vnd.haiku-package_daemon";
+
+void
+App::_CheckPackageDaemonRuns()
+{
+	while (!be_roster->IsRunning(kPackageDaemonSignature)) {
+		BAlert* alert = new BAlert("start_package_daemon",
+			B_TRANSLATE("HaikuDepot needs the package daemon to function, "
+				"and it appears to be not running.\n"
+				"Would you like to start it now?"),
+			B_TRANSLATE("No, quit HaikuDepot"),
+			B_TRANSLATE("Start package daemon"), NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+
+		if (alert->Go() == 0)
+			exit(1);
+
+		if (!_LaunchPackageDaemon())
+			break;
+	}		
+}
+
+
+bool
+App::_LaunchPackageDaemon()
+{
+	status_t ret = be_roster->Launch(kPackageDaemonSignature);
+	if (ret != B_OK) {
+		BString errorMessage
+			= B_TRANSLATE("Starting the package daemon failed:\n\n%Error%");
+		errorMessage.ReplaceAll("%Error%", strerror(ret));
+		
+		BAlert* alert = new BAlert("package_daemon_problem",
+			errorMessage,
+			B_TRANSLATE("Quit HaikuDepot"),
+			B_TRANSLATE("Try again"), NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+
+		if (alert->Go() == 0)
+			return false;
+	}
+	// TODO: Would be nice to send a message to the package daemon instead
+	// and get a reply once it is ready.
+	snooze(2000000);
+	return true;
 }
 
