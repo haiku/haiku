@@ -1,0 +1,137 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/private/interface/ToolTip.h	hrev48560
+ *		src/kits/interface/ToolTip.cpp	hrev48560
+ */
+
+
+/*!
+	\file ToolTip.h
+	\ingroup interface
+	\ingroup libbe
+	\brief Provides the BToolTip class.
+*/
+
+
+/*!
+	\class BToolTip
+	\ingroup interface
+	\ingroup libbe
+	\brief Displays help text on hover.
+
+	\attention Use at your own risk! This class is private and may change before release.
+
+	\since Haiku R1A3
+*/
+
+
+/*!
+	\fn BToolTip::BToolTip()
+	\brief Creates a new BToolTip object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BToolTip::BToolTip(BMessage* archive)
+	\brief Creates a BToolTip object from the passed in \a archive.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BToolTip::~BToolTip()
+	\brief Frees the memory allocated and destroys the object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BToolTip::Archive(BMessage* archive, bool deep) const
+	\brief Archives the object into the \a data message.
+
+	Saves the tool tip's sticky flag.
+
+	\param archive A pointer to the BMessage object to archive the object into.
+	\param deep Whether or not to archive child views as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BToolTip::SetSticky(bool enable)
+	\brief Turns sticky flag on and off.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BToolTip::IsSticky() const
+	\brief Returns whether or not the sticky flag is set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BToolTip::SetMouseRelativeLocation(BPoint location)
+	\brief Set the location of the tooltip relative to the current mouse position.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPoint BToolTip::MouseRelativeLocation() const
+	\brief Returns the tool tip's relative mouse location.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BToolTip::SetAlignment(BAlignment alignment)
+	\brief Set the alignment of the tool tip.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAlignment BToolTip::Alignment() const
+	\brief Returns the tool tip's alignment.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BToolTip::Lock()
+	\brief Allows derived classes to lock the tool tip while changing it.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BToolTip::Unlock()
+	\brief Allows derived classes to unlock the tool tip.
+
+	\since Haiku R1
+*/

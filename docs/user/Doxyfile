@@ -668,6 +668,7 @@ INPUT                  = . \
                          ../../headers/os/drivers/USB_spec.h \
                          ../../headers/os/game \
                          ../../headers/os/interface \
+                         ../../headers/private/interface \
                          ../../headers/os/locale \
                          ../../headers/os/media \
                          ../../headers/os/midi2 \
