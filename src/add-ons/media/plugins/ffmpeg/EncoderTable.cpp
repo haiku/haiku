@@ -123,7 +123,7 @@ const EncoderDescription gEncoderTable[] = {
 			0,
 			{ 0 }
 		},
-		B_ANY_FORMAT_FAMILY,
+		B_WAV_FORMAT_FAMILY,
 		B_MEDIA_RAW_AUDIO,
 		B_MEDIA_ENCODED_AUDIO,
 		1
