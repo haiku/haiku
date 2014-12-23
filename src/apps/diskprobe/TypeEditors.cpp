@@ -15,12 +15,14 @@
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <IconUtils.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
 #include <PopUpMenu.h>
+#include <ScrollBar.h>
 #include <ScrollView.h>
 #include <Slider.h>
 #include <String.h>
@@ -119,7 +121,7 @@ class BooleanEditor : public TypeEditorView {
 
 class ImageView : public TypeEditorView {
 	public:
-		ImageView(BRect rect, DataEditor &editor);
+		ImageView(DataEditor &editor);
 		virtual ~ImageView();
 
 		virtual void AttachedToWindow();
@@ -843,14 +845,16 @@ BooleanEditor::MessageReceived(BMessage *message)
 //	#pragma mark - ImageView
 
 
-ImageView::ImageView(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, B_TRANSLATE_COMMENT("Image view", "Image means "
-		"here a picture file, not a disk image."), B_FOLLOW_NONE, 
-	B_WILL_DRAW, editor),
+ImageView::ImageView(DataEditor &editor)
+	: TypeEditorView(B_TRANSLATE_COMMENT("Image view", "Image means here a "
+		"picture file, not a disk image."),
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE, editor),
 	fBitmap(NULL),
 	fScaleSlider(NULL)
 {
-	if (editor.Type() == B_MINI_ICON_TYPE 
+	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL);
+	SetLayout(layout);
+	if (editor.Type() == B_MINI_ICON_TYPE
 		|| editor.Type() == B_LARGE_ICON_TYPE
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		|| editor.Type() == B_VECTOR_ICON_TYPE
@@ -858,26 +862,38 @@ ImageView::ImageView(BRect rect, DataEditor &editor)
 		)
 		SetName(B_TRANSLATE("Icon view"));
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	fDescriptionView = new BStringView("",
+		B_TRANSLATE_COMMENT("Could not read image", "Image means "
+		"here a picture file, not a disk image."));
+	fDescriptionView->SetAlignment(B_ALIGN_CENTER);
+
 	if (editor.Type() == B_VECTOR_ICON_TYPE) {
 		// vector icon
-		fScaleSlider = new BSlider(BRect(0, 0, 195, 20), "", NULL,
-			new BMessage(kMsgScaleChanged), 2, 32);
+		fScaleSlider = new BSlider("", NULL,
+			new BMessage(kMsgScaleChanged), 2, 32, B_HORIZONTAL);
 		fScaleSlider->SetModificationMessage(new BMessage(kMsgScaleChanged));
 		fScaleSlider->ResizeToPreferred();
 		fScaleSlider->SetValue(8);
 		fScaleSlider->SetHashMarks(B_HASH_MARKS_BOTH);
 		fScaleSlider->SetHashMarkCount(15);
-		AddChild(fScaleSlider);
+
+		BGroupLayoutBuilder(layout)
+			.SetInsets(B_USE_WINDOW_SPACING, 256, B_USE_WINDOW_SPACING,
+				B_H_SCROLL_BAR_HEIGHT) // Leave space for the icon
+			.AddGlue()
+			.AddGroup(B_VERTICAL)
+				.Add(fDescriptionView)
+				.Add(fScaleSlider)
+			.End()
+			.AddGlue();
+	} else {
+		BGroupLayoutBuilder(layout)
+			.SetInsets(B_USE_WINDOW_SPACING, 256, B_USE_WINDOW_SPACING,
+				B_USE_WINDOW_SPACING) // Leave space for the icon
+			.AddGlue()
+			.Add(fDescriptionView)
+			.AddGlue();
 	}
-#endif
-
-	fDescriptionView = new BStringView(Bounds(), "", 
-		B_TRANSLATE_COMMENT("Could not read image", "Image means "
-		"here a picture file, not a disk image."), B_FOLLOW_NONE);
-	fDescriptionView->SetAlignment(B_ALIGN_CENTER);
-
-	AddChild(fDescriptionView);
 }
 
 
@@ -1078,52 +1094,20 @@ ImageView::_UpdateImage()
 				break;
 		}
 		snprintf(buffer, sizeof(buffer), "%s, %g x %g, %s", type,
-			fBitmap->Bounds().Width() + 1, fBitmap->Bounds().Height() + 1, 
+			fBitmap->Bounds().Width() + 1, fBitmap->Bounds().Height() + 1,
 			colorSpace);
 		fDescriptionView->SetText(buffer);
 	} else
-		fDescriptionView->SetText(B_TRANSLATE_COMMENT("Could not read image", 
+		fDescriptionView->SetText(B_TRANSLATE_COMMENT("Could not read image",
 			"Image means here a picture file, not a disk image."));
 
-	// Update the view size to match the image and its description
-
-	float width, height;
-	fDescriptionView->GetPreferredSize(&width, &height);
-	fDescriptionView->ResizeTo(width, height);
-
-	BRect rect = fDescriptionView->Bounds();
 	if (fBitmap != NULL) {
-		BRect bounds = fBitmap->Bounds();
-		rect.bottom += bounds.Height() + 5;
-
-		if (fScaleSlider != NULL && rect.Width() < fScaleSlider->Bounds().Width())
-			rect.right = fScaleSlider->Bounds().right;
-		if (bounds.Width() > rect.Width())
-			rect.right = bounds.right;
-
-		// center description below the bitmap
-		fDescriptionView->MoveTo((rect.Width() - fDescriptionView->Bounds().Width()) / 2,
-			bounds.Height() + 5);
-
 		if (fScaleSlider != NULL) {
-			// center slider below description
-			rect.bottom += fScaleSlider->Bounds().Height() + 5;
-			fScaleSlider->MoveTo((rect.Width() - fScaleSlider->Bounds().Width()) / 2,
-				fDescriptionView->Frame().bottom + 5);
-
 			if (fScaleSlider->IsHidden())
 				fScaleSlider->Show();
 		}
 	} else if (fScaleSlider != NULL && !fScaleSlider->IsHidden())
 		fScaleSlider->Hide();
-
-	ResizeTo(rect.Width(), rect.Height());
-	if (Parent()) {
-		// center within parent view
-		BRect parentBounds = Parent()->Bounds();
-		MoveTo((parentBounds.Width() - rect.Width()) / 2,
-			(parentBounds.Height() - rect.Height()) / 2);
-	}
 
 	Invalidate();
 
@@ -1349,7 +1333,7 @@ GetTypeEditorFor(BRect rect, DataEditor& editor)
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		case B_VECTOR_ICON_TYPE:
 #endif
-			return new ImageView(rect, editor);
+			return new ImageView(editor);
 	}
 
 	return NULL;
@@ -1394,7 +1378,7 @@ GetTypeEditorAt(int32 index, BRect rect, DataEditor& editor)
 			view = new MessageView(rect, editor);
 			break;
 		case 4:
-			view = new ImageView(rect, editor);
+			view = new ImageView(editor);
 			break;
 
 		default:
