@@ -519,7 +519,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 		}
 
 		framesRead = 0;
-		for (int64 i = start; (i <= end) && !fCancel; i += framesRead) {
+		for (int64 i = start; (i < end) && !fCancel; i += framesRead) {
 			if ((ret = inVidTrack->ReadFrames(videoBuffer, &framesRead,
 					&mh)) != B_OK) {
 				fprintf(stderr, "Error reading video frame %" B_PRId64 ": %s\n",
@@ -579,7 +579,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				start = 0;
 		}
 
-		for (int64 i = start; (i <= end) && !fCancel; i += framesRead) {
+		for (int64 i = start; (i < end) && !fCancel; i += framesRead) {
 			if ((ret = inAudTrack->ReadFrames(audioBuffer, &framesRead,
 				&mh)) != B_OK) {
 				fprintf(stderr, "Error reading audio frames: %s\n", strerror(ret));
