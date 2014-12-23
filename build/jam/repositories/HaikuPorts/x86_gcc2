@@ -332,8 +332,8 @@ RemotePackageRepository HaikuPorts
 	sqlite_devel-3.8.4.3-1
 	srm-1.2.12-1
 	substrate-1.0-1
-	subversion-1.8.10-1
-	subversion_devel-1.8.10-1
+	subversion-1.8.11-1
+	subversion_devel-1.8.11-1
 	sum_it-0.2beta-3
 	super_transball-2.1.5-1
 	taglib-1.7.2-1

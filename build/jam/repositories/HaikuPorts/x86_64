@@ -184,8 +184,8 @@ RemotePackageRepository HaikuPorts
 	speex_devel-1.2~rc1-2
 	sqlite-3.8.6-1
 	sqlite_devel-3.8.6-1
-	subversion-1.8.10-1
-	subversion_devel-1.8.10-1
+	subversion-1.8.11-1
+	subversion_devel-1.8.11-1
 	tar-1.27.1-2
 	texinfo-4.13a-7
 	tiff-3.9.6-2
