@@ -462,12 +462,12 @@ AVCodecEncoder::_Setup()
 	if (fContext->codec_id == CODEC_ID_MPEG2VIDEO) {
 		// Just for testing, we also add B frames */
 		fContext->max_b_frames = 2;
-    } else if (fContext->codec_id == CODEC_ID_MPEG1VIDEO){
+	} else if (fContext->codec_id == CODEC_ID_MPEG1VIDEO) {
 		// Needed to avoid using macroblocks in which some coeffs overflow.
 		// This does not happen with normal video, it just happens here as
 		// the motion of the chroma plane does not match the luma plane.
 		fContext->mb_decision = 2;
-    }
+	}
 
 	// Unfortunately, we may fail later, when we try to open the codec
 	// for real... but we need to delay this because we still allow
@@ -490,6 +490,8 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 
 	if (fCodecInitStatus == CODEC_INIT_FAILED)
 		return false;
+
+	fContext->strict_std_compliance = -2;
 
 	// Open the codec
 	int result = avcodec_open(fContext, fCodec);

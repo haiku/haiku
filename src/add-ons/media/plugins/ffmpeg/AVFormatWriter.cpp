@@ -171,6 +171,9 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 
 		// channels
 		fStream->codec->channels = format->u.raw_audio.channel_count;
+
+		// set fStream to the audio format we want to use. This is only a hint
+		// (each encoder has a different set of accepted formats)
 		switch (format->u.raw_audio.format) {
 			case media_raw_audio_format::B_AUDIO_FLOAT:
 				fStream->codec->sample_fmt = AV_SAMPLE_FMT_FLT;
@@ -193,6 +196,49 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 				return B_MEDIA_BAD_FORMAT;
 				break;
 		}
+
+		// Now negociate the actual format with the encoder
+		// First check if the requested format is acceptable
+		AVCodec* codec = avcodec_find_encoder(fStream->codec->codec_id);
+		const enum AVSampleFormat *p = codec->sample_fmts;
+		for (; *p != -1; p++) {
+			if (*p == fStream->codec->sample_fmt)
+				break;
+		}
+		// If not, force one of the acceptable ones
+		if (*p == -1) {
+			fStream->codec->sample_fmt = codec->sample_fmts[0];
+
+			// And finally set the format struct to the accepted format. It is
+			// then up to the caller to make sure we get data matching that
+			// format.
+			switch (fStream->codec->sample_fmt) {
+				case AV_SAMPLE_FMT_FLT:
+					format->u.raw_audio.format
+						= media_raw_audio_format::B_AUDIO_FLOAT;
+					break;
+				case AV_SAMPLE_FMT_DBL:
+					format->u.raw_audio.format
+						= media_raw_audio_format::B_AUDIO_DOUBLE;
+					break;
+				case AV_SAMPLE_FMT_S32:
+					format->u.raw_audio.format
+						= media_raw_audio_format::B_AUDIO_INT;
+					break;
+				case AV_SAMPLE_FMT_S16:
+					format->u.raw_audio.format
+						= media_raw_audio_format::B_AUDIO_SHORT;
+					break;
+				case AV_SAMPLE_FMT_U8:
+					format->u.raw_audio.format
+						= media_raw_audio_format::B_AUDIO_UCHAR;
+					break;
+				default:
+					return B_MEDIA_BAD_FORMAT;
+					break;
+			}
+		}
+
 		if (format->u.raw_audio.channel_mask == 0) {
 			// guess the channel mask...
 			switch (format->u.raw_audio.channel_count) {
@@ -418,6 +464,7 @@ AVFormatWriter::CommitHeader()
 		// we have no idea (in the future) what CodecID some encoder uses,
 		// it may be an encoder from a different plugin.
 		AVCodecContext* codecContext = stream->codec;
+		codecContext->strict_std_compliance = -2;
 		AVCodec* codec = avcodec_find_encoder(codecContext->codec_id);
 		if (codec == NULL || avcodec_open(codecContext, codec) < 0) {
 			TRACE("  stream[%u] - failed to open AVCodecContext\n", i);

@@ -121,7 +121,7 @@ const media_file_format gMuxerTable[] = {
 			| media_file_format::B_KNOWS_ENCODED_VIDEO
 			| media_file_format::B_KNOWS_ENCODED_AUDIO,
 		{ 0 },
-		B_QUICKTIME_FORMAT_FAMILY,
+		B_ANY_FORMAT_FAMILY,
 		100,
 		{ 0 },
 		"video/x-matroska",

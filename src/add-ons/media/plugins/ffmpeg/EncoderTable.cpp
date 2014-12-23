@@ -104,6 +104,19 @@ const EncoderDescription gEncoderTable[] = {
 	},
 	{
 		{
+			"Advanced Audio Coding (AAC)",
+			"aac",
+			0,
+			CODEC_ID_AAC,
+			{ 0 }
+		},
+		B_MPEG_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
+	{
+		{
 			"Raw audio",
 			"pcm",
 			0,
@@ -115,24 +128,9 @@ const EncoderDescription gEncoderTable[] = {
 		B_MEDIA_ENCODED_AUDIO,
 		1
 	},
-	// All of those crash ffmpeg in one way or another...
-#if 0
 	{
 		{
-			"Advanced Audio Coding (AAC)",
-			"aac",
-			0,
-			CODEC_ID_AAC,
-			{ 0 }
-		},
-		B_ANY_FORMAT_FAMILY,
-		B_MEDIA_RAW_AUDIO,
-		B_MEDIA_ENCODED_AUDIO,
-		10
-	},
-	{
-		{
-			"Dolby AC-3",
+			"Dolby Digital (AC-3)",
 			"ac3",
 			0,
 			CODEC_ID_AC3,
@@ -143,6 +141,7 @@ const EncoderDescription gEncoderTable[] = {
 		B_MEDIA_ENCODED_AUDIO,
 		10
 	},
+#if 0
 	{
 		{
 			"Apple Lossless Audio Codec",
@@ -214,19 +213,6 @@ const EncoderDescription gEncoderTable[] = {
 			"wma",
 			0,
 			CODEC_ID_WMAV2,
-			{ 0 }
-		},
-		B_ANY_FORMAT_FAMILY,
-		B_MEDIA_RAW_AUDIO,
-		B_MEDIA_ENCODED_AUDIO,
-		10
-	},
-	{
-		{
-			"Dolby Digital (AC-3)",
-			"ac3",
-			0,
-			CODEC_ID_AC3,
 			{ 0 }
 		},
 		B_ANY_FORMAT_FAMILY,
