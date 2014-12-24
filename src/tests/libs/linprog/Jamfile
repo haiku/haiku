@@ -4,8 +4,14 @@ SubDir HAIKU_TOP src tests libs linprog ;
 UseLibraryHeaders lp_solve linprog ;
 
 
-SimpleTest linprog_test :
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+SimpleTest [ MultiArchDefaultGristFiles linprog_test ] :
 	Program.cpp
 	:
-	be liblpsolve55.so linprog.a [ TargetLibsupc++ ] [ TargetLibstdc++ ]
+	be [ MultiArchDefaultGristFiles liblinprog.a ]
+		[ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;
+	}
+}

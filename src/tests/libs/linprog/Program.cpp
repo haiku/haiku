@@ -4,7 +4,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <List.h>
 #include <SupportDefs.h>
 
 #include "LinearSpec.h"
