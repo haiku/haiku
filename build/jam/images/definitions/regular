@@ -244,17 +244,6 @@ AddFilesToHaikuImage home config settings Tracker "Tracker New Templates"
 	"<tracker-new-templates>text file"
 ;
 
-#local bashCompletionFiles = [ Glob $(etcDir)/bash_completion.d : * ] ;
-#local bashCompletionHelperFiles
-#    = [ Glob $(etcDir)/bash_completion.d/helpers : * ] ;
-#bashCompletionFiles = $(bashCompletionFiles:G=bash-completion) ;
-#bashCompletionHelperFiles = $(bashCompletionHelperFiles:G=bash-completion-hlp) ;
-#AddDirectoryToHaikuImage system etc bash_completion.d ;
-#AddDirectoryToHaikuImage system etc bash_completion.d helpers ;
-#AddFilesToHaikuImage system etc bash_completion.d : $(bashCompletionFiles) ;
-#AddFilesToHaikuImage system etc bash_completion.d helpers
-#    : $(bashCompletionHelperFiles) ;
-
 # decorators
 #AddFilesToHaikuImage system non-packaged add-ons decorators
 #	: BeDecorator MacDecorator WinDecorator ;
