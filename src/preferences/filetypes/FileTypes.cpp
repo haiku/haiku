@@ -238,7 +238,8 @@ FileTypes::RefsReceived(BMessage* message)
 		}
 
 		if (!is_application(file) && !is_resource(file)) {
-			if (entry.GetRef(&ref) == B_OK)
+			entry_ref target;
+			if (entry.GetRef(&target) == B_OK && target != ref)
 				message->ReplaceRef("refs", index - 1, &ref);
 			continue;
 		}
