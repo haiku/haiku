@@ -510,6 +510,7 @@ private:
 
 			status_t			_ValidateMessage();
 
+			void				_UpdateOffsets(uint32 offset, int32 change);
 			status_t			_ResizeData(uint32 offset, int32 change);
 
 			uint32				_HashName(const char* name) const;

@@ -1567,13 +1567,10 @@ BMessage::PopSpecifier()
 }
 
 
-status_t
-BMessage::_ResizeData(uint32 offset, int32 change)
+void
+BMessage::_UpdateOffsets(uint32 offset, int32 change)
 {
-	if (change == 0)
-		return B_OK;
-
-	/* optimize for the most usual case: appending data */
+	// Update the header to match the new position of the fields
 	if (offset < fHeader->data_size) {
 		field_header* field = fFields;
 		for (uint32 i = 0; i < fHeader->field_count; i++, field++) {
@@ -1581,19 +1578,37 @@ BMessage::_ResizeData(uint32 offset, int32 change)
 				field->offset += change;
 		}
 	}
+}
+
+
+status_t
+BMessage::_ResizeData(uint32 offset, int32 change)
+{
+	if (change == 0)
+		return B_OK;
+
+	/* optimize for the most usual case: appending data */
 
 	if (change > 0) {
+		// We need to make the field bigger
+		// check if there is enough free space allocated
 		if (fDataAvailable >= (uint32)change) {
+			// In this case, we just need to move the data after the growing
+			// field to get the space at the right place
 			if (offset < fHeader->data_size) {
 				memmove(fData + offset + change, fData + offset,
 					fHeader->data_size - offset);
 			}
+
+			_UpdateOffsets(offset, change);
 
 			fDataAvailable -= change;
 			fHeader->data_size += change;
 			return B_OK;
 		}
 
+		// We need to grow the buffer. We try to optimize reallocations by
+		// preallocating space for more fields.
 		size_t size = fHeader->data_size * 2;
 		size = min_c(size, fHeader->data_size + MAX_DATA_PREALLOCATION);
 		size = max_c(size, fHeader->data_size + change);
@@ -1625,6 +1640,7 @@ BMessage::_ResizeData(uint32 offset, int32 change)
 			uint8* newData = (uint8*)realloc(fData, size);
 			if (size > 0 && newData == NULL) {
 				// this is strange, but not really fatal
+				_UpdateOffsets(offset, change);
 				return B_OK;
 			}
 
@@ -1633,6 +1649,7 @@ BMessage::_ResizeData(uint32 offset, int32 change)
 		}
 	}
 
+	_UpdateOffsets(offset, change);
 	return B_OK;
 }
 
@@ -3133,7 +3150,7 @@ BMessage::ReplaceRef(const char* name, int32 index, const entry_ref* ref)
 	status_t error = BPrivate::entry_ref_flatten(buffer, &size, ref);
 
 	if (error >= B_OK)
-		error = ReplaceData(name, B_REF_TYPE, index, &buffer, size);
+		error = ReplaceData(name, B_REF_TYPE, index, buffer, size);
 
 	return error;
 }
