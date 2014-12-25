@@ -293,9 +293,6 @@ SubInclude HAIKU_TOP src bin screenmode ;
 SubInclude HAIKU_TOP src bin writembr ;
 SubInclude HAIKU_TOP src bin zic ;
 
-# RCS commands
-SubInclude HAIKU_TOP src bin rcs ;
-
 # debugging tools
 SubInclude HAIKU_TOP src bin debug ;
 
