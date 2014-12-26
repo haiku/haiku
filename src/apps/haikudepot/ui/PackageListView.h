@@ -32,6 +32,8 @@ public:
 	virtual void				Clear();
 			void				AddPackage(const PackageInfoRef& package);
 
+			void				SelectPackage(const PackageInfoRef& package);
+
 private:
 			PackageRow*			_FindRow(const PackageInfoRef& package,
 									PackageRow* parent = NULL);

@@ -758,6 +758,21 @@ PackageListView::AddPackage(const PackageInfoRef& package)
 }
 
 
+void
+PackageListView::SelectPackage(const PackageInfoRef& package)
+{
+	PackageRow* row = _FindRow(package);
+	BRow* selected = CurrentSelection();
+	if (row != selected)
+		DeselectAll();
+	if (row != NULL) {
+		AddToSelection(row);
+		SetFocusRow(row, false);
+		ScrollTo(row);
+	}
+}
+
+
 PackageRow*
 PackageListView::_FindRow(const PackageInfoRef& package, PackageRow* parent)
 {
