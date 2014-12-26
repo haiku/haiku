@@ -645,6 +645,11 @@ MainWindow::_AdoptModel()
 		fListLayout->SetVisibleItem((int32)0);
 	else
 		fListLayout->SetVisibleItem((int32)1);
+
+	// Maintain selection
+	const PackageInfoRef& selectedPackage = fPackageInfoView->Package();
+	fFeaturedPackagesView->SelectPackage(selectedPackage);
+	fPackageListView->SelectPackage(selectedPackage);
 }
 
 
@@ -652,8 +657,11 @@ void
 MainWindow::_AdoptPackage(const PackageInfoRef& package)
 {
 	fPackageInfoView->SetPackage(package);
+
 	if (fFeaturedPackagesView != NULL)
 		fFeaturedPackagesView->SelectPackage(package);
+	if (fPackageListView != NULL)
+		fPackageListView->SelectPackage(package);
 
 	// Trigger asynchronous package population from the web-app
 	{
