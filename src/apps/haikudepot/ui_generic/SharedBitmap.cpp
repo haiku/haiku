@@ -71,7 +71,7 @@ SharedBitmap::SharedBitmap(BPositionIO& data)
 	fMimeType()
 {
 	status_t status = data.GetSize(&fSize);
-	const off_t kMaxSize = 128 * 1024;
+	const off_t kMaxSize = 1024 * 1024;
 	if (status == B_OK && fSize > 0 && fSize <= kMaxSize) {
 		fBuffer = new(std::nothrow) uint8[fSize];
 		if (fBuffer != NULL) {
