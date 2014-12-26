@@ -333,8 +333,9 @@ Model::Model()
 	fDepotFilter(""),
 	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
 
+	fShowFeaturedPackages(true),
 	fShowAvailablePackages(true),
-	fShowInstalledPackages(false),
+	fShowInstalledPackages(true),
 	fShowSourcePackages(false),
 	fShowDevelopPackages(false),
 
@@ -422,6 +423,7 @@ Model::CreatePackageList() const
 			const PackageInfoRef& package = packages.ItemAtFast(j);
 			if (fCategoryFilter->AcceptsPackage(package)
 				&& fSearchTermsFilter->AcceptsPackage(package)
+				&& (package->IsProminent() || !fShowFeaturedPackages)
 				&& (fShowAvailablePackages || package->State() != NONE)
 				&& (fShowInstalledPackages || package->State() != ACTIVATED)
 				&& (fShowSourcePackages || !is_source_package(package))
@@ -548,6 +550,13 @@ Model::SearchTerms() const
 	if (filter == NULL)
 		return "";
 	return filter->SearchTerms();
+}
+
+
+void
+Model::SetShowFeaturedPackages(bool show)
+{
+	fShowFeaturedPackages = show;
 }
 
 

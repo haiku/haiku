@@ -322,6 +322,7 @@ public:
 									{ return fProminence; }
 			bool				HasProminence() const
 									{ return fProminence != 0.0f; }
+			bool				IsProminent() const;
 
 			void				ClearScreenshotInfos();
 			bool				AddScreenshotInfo(const ScreenshotInfo& info);

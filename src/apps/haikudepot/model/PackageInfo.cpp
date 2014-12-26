@@ -847,6 +847,13 @@ PackageInfo::SetProminence(float prominence)
 }
 
 
+bool
+PackageInfo::IsProminent() const
+{
+	return HasProminence() && Prominence() <= 200;
+}
+
+
 void
 PackageInfo::ClearScreenshotInfos()
 {

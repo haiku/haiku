@@ -97,6 +97,9 @@ public:
 			void				SetSearchTerms(const BString& searchTerms);
 			BString				SearchTerms() const;
 
+			void				SetShowFeaturedPackages(bool show);
+			bool				ShowFeaturedPackages() const
+									{ return fShowFeaturedPackages; }
 			void				SetShowAvailablePackages(bool show);
 			bool				ShowAvailablePackages() const
 									{ return fShowAvailablePackages; }
@@ -207,6 +210,7 @@ private:
 			BString				fDepotFilter;
 			PackageFilterRef	fSearchTermsFilter;
 
+			bool				fShowFeaturedPackages;
 			bool				fShowAvailablePackages;
 			bool				fShowInstalledPackages;
 			bool				fShowSourcePackages;
