@@ -161,7 +161,6 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	listArea->SetLayout(fListLayout);
 	listArea->AddChild(featuredPackagesGroup);
 	listArea->AddChild(fPackageListView);
-	fListLayout->SetVisibleItem((int32)0);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.AddGroup(B_HORIZONTAL, 0.0f)
@@ -191,6 +190,12 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 		fPackageListView->LoadState(&columnSettings);
 
 	bool showOption;
+	if (settings.FindBool("show featured packages", &showOption) == B_OK)
+		fModel.SetShowFeaturedPackages(showOption);
+	if (settings.FindBool("show available packages", &showOption) == B_OK)
+		fModel.SetShowAvailablePackages(showOption);
+	if (settings.FindBool("show installed packages", &showOption) == B_OK)
+		fModel.SetShowInstalledPackages(showOption);
 	if (settings.FindBool("show develop packages", &showOption) == B_OK)
 		fModel.SetShowDevelopPackages(showOption);
 	if (settings.FindBool("show source packages", &showOption) == B_OK)
@@ -201,6 +206,11 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 		&& username.Length() > 0) {
 		fModel.SetUsername(username);
 	}
+
+	if (fModel.ShowFeaturedPackages())
+		fListLayout->SetVisibleItem((int32)0);
+	else
+		fListLayout->SetVisibleItem(1);
 
 	// start worker threads
 	BPackageRoster().StartWatching(this,
@@ -474,6 +484,12 @@ MainWindow::StoreSettings(BMessage& settings) const
 	
 		settings.AddMessage("column settings", &columnSettings);
 	
+		settings.AddBool("show featured packages",
+			fModel.ShowFeaturedPackages());
+		settings.AddBool("show available packages",
+			fModel.ShowAvailablePackages());
+		settings.AddBool("show installed packages",
+			fModel.ShowInstalledPackages());
 		settings.AddBool("show develop packages", fModel.ShowDevelopPackages());
 		settings.AddBool("show source packages", fModel.ShowSourcePackages());
 	}
