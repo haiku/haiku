@@ -327,13 +327,17 @@ FeaturedPackagesView::Clear()
 void
 FeaturedPackagesView::SelectPackage(const PackageInfoRef& package)
 {
+	BString selectedTitle;
+	if (package.Get() != NULL)
+		selectedTitle = package->Title();
+	
 	for (int32 i = 0; BLayoutItem* item = fPackageListLayout->ItemAt(i); i++) {
 		PackageView* view = dynamic_cast<PackageView*>(item->View());
 		if (view == NULL)
 			break;
 
 		BString title = view->PackageTitle();
-		view->SetSelected(title == package->Title());
+		view->SetSelected(title == selectedTitle);
 	}
 }
 
