@@ -152,8 +152,10 @@ StartTeamWindow::MessageReceived(BMessage* message)
 					messageString.String(), "Close");
 				if (alert != NULL)
 					alert->Go();
-			} else
+			} else {
+				be_app->PostMessage(MSG_START_TEAM_WINDOW_CLOSED);
 				PostMessage(B_QUIT_REQUESTED);
+			}
 			break;
 		}
 		default:

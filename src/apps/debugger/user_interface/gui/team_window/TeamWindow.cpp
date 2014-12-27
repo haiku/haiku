@@ -1080,9 +1080,19 @@ TeamWindow::_Init()
 		fSourcePathView->AddFilter(filter);
 
 	// add menus and menu items
-	BMenu* menu = new BMenu("Team");
+	BMenu* menu = new BMenu("Debugger");
 	fMenuBar->AddItem(menu);
-	BMenuItem* item = new BMenuItem("Restart", new BMessage(
+	BMenuItem* item = new BMenuItem("Start new team" B_UTF8_ELLIPSIS,
+		new BMessage(MSG_SHOW_START_TEAM_WINDOW));
+	menu->AddItem(item);
+	item->SetTarget(be_app);
+	item = new BMenuItem("Show Teams window" B_UTF8_ELLIPSIS,
+		new BMessage(MSG_SHOW_TEAMS_WINDOW));
+	menu->AddItem(item);
+	item->SetTarget(be_app);
+	menu = new BMenu("Team");
+	fMenuBar->AddItem(menu);
+	item = new BMenuItem("Restart", new BMessage(
 		MSG_TEAM_RESTART_REQUESTED), 'R', B_SHIFT_KEY);
 	menu->AddItem(item);
 	item->SetTarget(this);

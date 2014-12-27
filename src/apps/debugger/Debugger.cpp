@@ -28,6 +28,7 @@
 #include "MessageCodes.h"
 #include "SettingsManager.h"
 #include "SignalSet.h"
+#include "StartTeamWindow.h"
 #include "TeamDebugger.h"
 #include "TeamsWindow.h"
 #include "TypeHandlerRoster.h"
@@ -369,6 +370,7 @@ private:
 			TeamDebuggerList	fTeamDebuggers;
 			int32				fRunningTeamDebuggers;
 			TeamsWindow*		fTeamsWindow;
+			StartTeamWindow*	fStartTeamWindow;
 };
 
 
@@ -398,7 +400,8 @@ Debugger::Debugger()
 	:
 	BApplication(kDebuggerSignature),
 	fRunningTeamDebuggers(0),
-	fTeamsWindow(NULL)
+	fTeamsWindow(NULL),
+	fStartTeamWindow(NULL)
 {
 }
 
@@ -447,6 +450,23 @@ Debugger::MessageReceived(BMessage* message)
 		{
 			fTeamsWindow = NULL;
 			Quit();
+			break;
+		}
+		case MSG_SHOW_START_TEAM_WINDOW:
+		{
+			BMessenger messenger(fStartTeamWindow);
+			if (!messenger.IsValid()) {
+				fStartTeamWindow = StartTeamWindow::Create();
+				if (fStartTeamWindow == NULL)
+					break;
+				fStartTeamWindow->Show();
+			} else
+				fStartTeamWindow->Activate();
+			break;
+		}
+		case MSG_START_TEAM_WINDOW_CLOSED:
+		{
+			fStartTeamWindow = NULL;
 			break;
 		}
 		case MSG_DEBUG_THIS_TEAM:

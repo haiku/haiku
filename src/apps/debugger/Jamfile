@@ -38,6 +38,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui inspector_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui teams_window ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui utility_windows ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface util ] ;
@@ -265,17 +266,13 @@ Application Debugger :
 	MemoryView.cpp
 
 	# user_interface/gui/teams_window
-	StartTeamWindow.cpp
 	TeamsWindow.cpp
 	TeamsListView.cpp
 
 	# user_interface/gui/team_window
-	BreakConditionConfigWindow.cpp
-	BreakpointEditWindow.cpp
 	BreakpointListView.cpp
 	BreakpointsView.cpp
 	ConsoleOutputView.cpp
-	ExpressionPromptWindow.cpp
 	ImageFunctionsView.cpp
 	ImageListView.cpp
 	RegistersView.cpp
@@ -284,7 +281,6 @@ Application Debugger :
 	TeamWindow.cpp
 	ThreadListView.cpp
 	VariablesView.cpp
-	WatchPromptWindow.cpp
 
 	# user_interface/gui/util
 	ActionMenuItem.cpp
@@ -292,6 +288,12 @@ Application Debugger :
 	SettingsMenu.cpp
 	TargetAddressTableColumn.cpp
 
+	# user_interface/gui/utility_windows
+	BreakConditionConfigWindow.cpp
+	BreakpointEditWindow.cpp
+	ExpressionPromptWindow.cpp
+	StartTeamWindow.cpp
+	WatchPromptWindow.cpp
 
 	# user_interface/gui/value
 	TableCellBoolRenderer.cpp

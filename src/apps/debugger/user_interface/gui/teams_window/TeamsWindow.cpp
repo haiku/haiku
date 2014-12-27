@@ -23,7 +23,6 @@
 
 #include "MessageCodes.h"
 #include "SettingsManager.h"
-#include "StartTeamWindow.h"
 #include "TeamsWindow.h"
 #include "TeamsListView.h"
 
@@ -38,7 +37,6 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 	BWindow(BRect(100, 100, 500, 250), "Teams", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
 	fTeamsListView(NULL),
-	fStartTeamWindow(NULL),
 	fAttachTeamButton(NULL),
 	fCreateTeamButton(NULL),
 	fSettingsManager(settingsManager)
@@ -51,7 +49,6 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 
 TeamsWindow::~TeamsWindow()
 {
-	BMessenger(fStartTeamWindow).SendMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -92,19 +89,6 @@ void
 TeamsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_START_NEW_TEAM:
-		{
-			BMessenger messenger(fStartTeamWindow);
-			if (!messenger.IsValid()) {
-				fStartTeamWindow = StartTeamWindow::Create();
-				if (fStartTeamWindow == NULL)
-					break;
-			}
-
-			fStartTeamWindow->Show();
-			break;
-		}
-
 		case MSG_DEBUG_THIS_TEAM:
 		{
 			TeamRow* row = dynamic_cast<TeamRow*>(
@@ -172,7 +156,7 @@ TeamsWindow::_Init()
 			.Add(fAttachTeamButton = new BButton("Attach", new BMessage(
 						MSG_DEBUG_THIS_TEAM)))
 			.Add(fCreateTeamButton = new BButton("Start new team"
-					B_UTF8_ELLIPSIS, new BMessage(MSG_START_NEW_TEAM)))
+					B_UTF8_ELLIPSIS, new BMessage(MSG_SHOW_START_TEAM_WINDOW)))
 			.End()
 		.End();
 
@@ -181,6 +165,7 @@ TeamsWindow::_Init()
 			MSG_TEAM_SELECTION_CHANGED));
 
 	fAttachTeamButton->SetEnabled(false);
+	fCreateTeamButton->SetTarget(be_app);
 }
 
 
