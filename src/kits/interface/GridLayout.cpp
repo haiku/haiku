@@ -425,7 +425,7 @@ BGridLayout::AddItem(BLayoutItem* item)
 	// find a free spot
 	for (int32 row = 0; row < fRowCount; row++) {
 		for (int32 column = 0; column < fColumnCount; column++) {
-			if (_IsGridCellEmpty(row, column))
+			if (_IsGridCellEmpty(column, row))
 				return AddItem(item, column, row, 1, 1);
 		}
 	}
