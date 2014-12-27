@@ -15,10 +15,7 @@ BootstrapPackageRepository HaikuPortsCross
 	}@ # secondary_x86_gcc2
 	:
 	# repository architecture packages (stage 1)
-	autoconf_bootstrap-2.69-2
-	automake_bootstrap-1.13.1-1
-	libtool_cross_generic-2.4
-	bash_bootstrap-4.3.27-2
+	bash_bootstrap-4.3.30-1
 	binutils_bootstrap-2.24_2014_03_19-1
 	bison_bootstrap-2.4.3-1
 	findutils_bootstrap-4.4.2-1
@@ -29,8 +26,6 @@ BootstrapPackageRepository HaikuPortsCross
 	grep_bootstrap-2.14-1
 	icu_bootstrap-54.1-1
 	icu_bootstrap_devel-54.1-1
-	libtool_bootstrap-2.4-8
-	libtool_bootstrap_libltdl-2.4-8
 	m4_bootstrap-1.4.16-1
 	make_bootstrap-3.82-1
 	ncurses_bootstrap-5.9-1
@@ -63,8 +58,6 @@ BootstrapPackageRepository HaikuPortsCross
 	}@ # secondary_x86_gcc2
 	:
 	# source packages
-	autoconf_bootstrap
-	automake_bootstrap
 	bash_bootstrap
 	binutils_bootstrap
 	bison_bootstrap
@@ -75,7 +68,6 @@ BootstrapPackageRepository HaikuPortsCross
 	gcc_bootstrap
 	grep_bootstrap
 	libsolv_bootstrap
-	libtool_bootstrap
 	m4_bootstrap
 	make_bootstrap
 	ncurses_bootstrap
