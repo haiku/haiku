@@ -272,6 +272,19 @@ private:
 };
 
 
+class IsFeaturedFilter : public PackageFilter {
+public:
+	IsFeaturedFilter()
+	{
+	}
+
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
+	{
+		return package.Get() != NULL && package->IsProminent();
+	}
+};
+
+
 static inline bool
 is_source_package(const PackageInfoRef& package)
 {
@@ -332,6 +345,7 @@ Model::Model()
 	fCategoryFilter(PackageFilterRef(new AnyFilter(), true)),
 	fDepotFilter(""),
 	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
+	fIsFeaturedFilter(),
 
 	fShowFeaturedPackages(true),
 	fShowAvailablePackages(true),
@@ -342,6 +356,8 @@ Model::Model()
 	fPopulateAllPackagesThread(-1),
 	fStopPopulatingAllPackages(false)
 {
+	_UpdateIsFeaturedFilter();
+
 	// Don't forget to add new categories to this list:
 	fCategories.Add(fCategoryGames);
 	fCategories.Add(fCategoryBusiness);
@@ -423,7 +439,7 @@ Model::CreatePackageList() const
 			const PackageInfoRef& package = packages.ItemAtFast(j);
 			if (fCategoryFilter->AcceptsPackage(package)
 				&& fSearchTermsFilter->AcceptsPackage(package)
-				&& (package->IsProminent() || !fShowFeaturedPackages)
+				&& fIsFeaturedFilter->AcceptsPackage(package)
 				&& (fShowAvailablePackages || package->State() != NONE)
 				&& (fShowInstalledPackages || package->State() != ACTIVATED)
 				&& (fShowSourcePackages || !is_source_package(package))
@@ -539,6 +555,7 @@ Model::SetSearchTerms(const BString& searchTerms)
 		filter = new SearchTermsFilter(searchTerms);
 
 	fSearchTermsFilter.SetTo(filter, true);
+	_UpdateIsFeaturedFilter();
 }
 
 
@@ -557,6 +574,7 @@ void
 Model::SetShowFeaturedPackages(bool show)
 {
 	fShowFeaturedPackages = show;
+	_UpdateIsFeaturedFilter();
 }
 
 
@@ -776,6 +794,16 @@ Model::SetAuthorization(const BString& username, const BString& password,
 
 
 // #pragma mark - private
+
+
+void
+Model::_UpdateIsFeaturedFilter()
+{
+	if (fShowFeaturedPackages && SearchTerms().IsEmpty())
+		fIsFeaturedFilter = PackageFilterRef(new IsFeaturedFilter(), true);
+	else 
+		fIsFeaturedFilter = PackageFilterRef(new AnyFilter(), true);
+}
 
 
 int32

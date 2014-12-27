@@ -143,6 +143,8 @@ public:
 
 
 private:
+			void				_UpdateIsFeaturedFilter();
+
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
 			void				_PopulateAllPackagesThread(bool fromCacheOnly);
 
@@ -209,6 +211,7 @@ private:
 			PackageFilterRef	fCategoryFilter;
 			BString				fDepotFilter;
 			PackageFilterRef	fSearchTermsFilter;
+			PackageFilterRef	fIsFeaturedFilter;
 
 			bool				fShowFeaturedPackages;
 			bool				fShowAvailablePackages;
