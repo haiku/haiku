@@ -380,11 +380,13 @@ MainWindow::MessageReceived(BMessage* message)
 		{
 			BString title;
 			if (message->FindString("title", &title) == B_OK) {
+				BAutolock locker(fModel.Lock());
 				int count = fVisiblePackages.CountItems();
 				for (int i = 0; i < count; i++) {
 					const PackageInfoRef& package
 						= fVisiblePackages.ItemAtFast(i);
 					if (package.Get() != NULL && package->Title() == title) {
+						locker.Unlock();
 						_AdoptPackage(package);
 						break;
 					}
@@ -662,12 +664,15 @@ MainWindow::_AdoptModel()
 void
 MainWindow::_AdoptPackage(const PackageInfoRef& package)
 {
-	fPackageInfoView->SetPackage(package);
-
-	if (fFeaturedPackagesView != NULL)
-		fFeaturedPackagesView->SelectPackage(package);
-	if (fPackageListView != NULL)
-		fPackageListView->SelectPackage(package);
+	{
+		BAutolock locker(fModel.Lock());
+		fPackageInfoView->SetPackage(package);
+	
+		if (fFeaturedPackagesView != NULL)
+			fFeaturedPackagesView->SelectPackage(package);
+		if (fPackageListView != NULL)
+			fPackageListView->SelectPackage(package);
+	}
 
 	// Trigger asynchronous package population from the web-app
 	{
