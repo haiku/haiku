@@ -449,7 +449,10 @@ MainWindow::MessageReceived(BMessage* message)
 				}
 				if ((changes & PKG_CHANGED_PROMINENCE) != 0) {
 					BAutolock locker(fModel.Lock());
-					if (ref->IsProminent())
+					// The package didn't get a chance yet to be in the
+					// visible package list
+					fVisiblePackages = fModel.CreatePackageList();
+					if (ref->IsProminent() && fVisiblePackages.Contains(ref))
 						fFeaturedPackagesView->AddPackage(ref);
 				}
 			}
