@@ -232,9 +232,9 @@ ClipboardApp::Copy(const char *string)
 
 	if (string == NULL) {
 		// read from standard input
-		char c;
+		int c;
 		while ((c = fgetc(stdin)) != EOF) {
-			inputString += c;
+			inputString += (char) c;
 		}
 
 		string = inputString.String();
