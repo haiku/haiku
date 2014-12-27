@@ -23,14 +23,16 @@ public:
 	HashMapElement()
 		:
 		fKey(),
-		fValue()
+		fValue(),
+		fNext(NULL)
 	{
 	}
 
 	HashMapElement(const Key& key, const Value& value)
 		:
 		fKey(key),
-		fValue(value)
+		fValue(value),
+		fNext(NULL)
 	{
 	}
 
