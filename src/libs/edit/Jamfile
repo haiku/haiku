@@ -4,7 +4,6 @@ SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
 UseBuildFeatureHeaders ncurses ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers libs ncurses ] : true ;
 
 local defines = [ FDefines SCCSID=0 ] ;
 SubDirCcFlags $(defines) ;
