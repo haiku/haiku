@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	194287280
+1	german	x-vnd.Haiku-Terminal	22895100
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -108,6 +108,5 @@ Find next	Terminal TermWindow		Weitersuchen
 Close active tab	Terminal TermWindow		Aktiven Reiter schließen
 Paste	Terminal TermWindow		Einfügen
 Shell 	Terminal TermWindow		Konsole
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDas aktuelle Arbeitsverzeichnis des aktiven Prozesses.\n\t\t\tOptional kann die maximale Anzahl von Pfad-Komponenten\n\t\t\t angegeben werden, z.B. '%2d' für maximal zwei Komponenten.\n\t%i\t-\tDer Index des Reiters.\n\t%p\t-\tDer Name des aktiven Prozesses.\n\t%%\t-\tDas %-Zeichen.
 Cancel	Terminal TermView		Abbrechen
 Use default	Terminal SetTitleWindow		Standardwerte

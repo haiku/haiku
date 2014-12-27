@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	3756219838
+1	english	x-vnd.Haiku-Terminal	3584827658
 Not found.	Terminal TermWindow		未找到。  
 Switch Terminals	Terminal TermWindow		切换终端
 Change directory	Terminal TermView		更改目录
@@ -103,6 +103,5 @@ Find next	Terminal TermWindow		查找下一个
 Close active tab	Terminal TermWindow		关闭活动标签
 Paste	Terminal TermWindow		粘贴
 Shell 	Terminal TermWindow		Shell
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d-\t活动进程的当前工作目录。\n\t\t组件可以指定的\n\t\t最大路径数量。例如，'%2d' ，可以指定至多两个组件。\n\t%i\t-\t标签的索引。\n\t%p\t-\t活跃进程。\n\t%%\t-\t字符 '%' 。
 Cancel	Terminal TermView		取消
 Use default	Terminal SetTitleWindow		使用默认

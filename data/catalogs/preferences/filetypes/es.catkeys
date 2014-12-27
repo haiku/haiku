@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-FileTypes	3583076725
+1	spanish; castilian	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		Tipos de aplicaciones
 Description:	Application Types Window		Descripción:
 Args only	Application Type Window		Solamente args
@@ -48,7 +48,11 @@ Name:	Application Types Window		Nombre:
 Group name:	New File Type Window		Nombre de grupo:
 Preferred application	FileType Window		Aplicación preferida
 Progress	Application Types Window		Progreso
+Set preferred application	Preferred App Menu		Seleccione la aplicación preferida
+Don't save	Application Type Window		No guardar
+Save changes before closing?	Application Type Window		¿Guardar cambios antes de cerrar?
 File	Application Type Window		Archivo
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# tipo de aplicación pudo removerse} other{# aplicaciones pudieron removerse}}
 Version:	Application Type Window		Versión:
 Select…	FileTypes Window		Selección...
 FileTypes request	FileTypes		Petición de Tipos de archivo

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PoorMan	1347438411
+1	french	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		Emplacement du site Web
 Error Server	PoorMan		Erreur du serveur
 Settings…	PoorMan		Réglages…
@@ -12,6 +12,7 @@ PoorMan settings	PoorMan		Réglages de PoorMan
 Clear hit counter	PoorMan		Réinitialiser le compteur de sollicitations
 Copy	PoorMan		Copier
 Max. simultaneous connections:	PoorMan		Nombre max. de connexions simultanées :
+Create public_html	PoorMan		Créer public_html
 Start page:	PoorMan		Page d'acceuil :
 done.\n	PoorMan		fait.\n
 Create	PoorMan		Créer

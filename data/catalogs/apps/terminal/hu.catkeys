@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	194287280
+1	hungarian	x-vnd.Haiku-Terminal	22895100
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -108,6 +108,5 @@ Find next	Terminal TermWindow		Következő keresése
 Close active tab	Terminal TermWindow		Aktív lap bezárása
 Paste	Terminal TermWindow		Beillesztés
 Shell 	Terminal TermWindow		Shell
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAz a mappa amiben az aktív folyamat jelenleg fu.\n\t\t\tMeg lehet adni az elérési út komponenseinek\n\t\t\tszámát. Pl. '%2d' maximum két komponenshez.\n\t%i\t-\tA lap indexe.\n\t%p\t-\tA futó folyamat neve.\n\t%%\t-\tEgy '%' karakter.
 Cancel	Terminal TermView		Mégse
 Use default	Terminal SetTitleWindow		Eredeti

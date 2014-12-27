@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Media	2338820526
+1	hungarian	x-vnd.Haiku-Media	2163090586
 Couldn't add volume control in Deskbar: %s\n	Media views		Nem lehetett hangerőszabályzót helyezni az Asztalsávra: %s\n
 Ready for use…	Media Window		Használatra kész…
 Video input:	Media views		Képbemenet:
@@ -17,6 +17,7 @@ Restart media services	Media views		Médiaszolgáltatások újraindítása
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nem lehetett a hangerőszabályzót eltávolítani az Asztalsávról: %s\n
 Media	System name		Média
 Telling media_addon_server to quit.	Media Window		A Médiabővítmény-kiszolgáló leállítása.
+Media Service	Media Window		Média szolgáltatás
 Audio mixer	Media Window		Hangerőszabályzó
 This hardware has no controls.	Media Window		Ennek az eszköznek nincsenek vezérlői.
 Audio output:	Media views		Hangkimenet:

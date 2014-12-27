@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-CharacterMap	3150914128
+1	spanish; castilian	x-vnd.Haiku-CharacterMap	1534181938
 Enclosed alphanumerics	UnicodeBlocks		Alfanuméricos adjuntos
 Basic Latin	UnicodeBlocks		Latín básico
 View	CharacterWindow		Ver
@@ -40,6 +40,7 @@ Tagbanwa	UnicodeBlocks		Tagbanwa
 Kanbun	UnicodeBlocks		Kanbun
 Syriac	UnicodeBlocks		Siríaco
 CJK compatibility ideographs Supplement	UnicodeBlocks		Suplemento de ideogramas de compatibilidad de CJK
+Musical symbols	UnicodeBlocks		Símbolos musicales
 Hangul syllables	UnicodeBlocks		Sílabas de Hangul
 Coptic	UnicodeBlocks		Copto
 Tai Le	UnicodeBlocks		Tai Le
@@ -122,6 +123,7 @@ Vai	UnicodeBlocks		Vai
 Yi Radicals	UnicodeBlocks		Carácteres de Yi
 Cyrillic extended B	UnicodeBlocks		Cirílico extendido B
 Quit	CharacterWindow		Salir
+Ancient symbols	UnicodeBlocks		Símbolos antiguos
 Braille patterns	UnicodeBlocks		Braille
 New Tai Lue	UnicodeBlocks		Tai Lue Nuevo
 Runic	UnicodeBlocks		Rúnico

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.haiku-icon_o_matic	2885914752
+1	spanish; castilian	x-vnd.haiku-icon_o_matic	3554185674
 Select All	Icon-O-Matic-PathManipulator		Seleccionar todo
 Add Style	Icon-O-Matic-AddStylesCmd		Agregar estilo
 Color (#%02x%02x%02x)	Style name after dropping a color		Color (#%02x%02x%02x)
@@ -42,6 +42,7 @@ Untitled	Icon-O-Matic-Main		Sin título
 Multi Set 	Multi Set (property name)		Conjunto variado
 any of the other lists to	Empty property list - 2nd line		cualquiera de las otras listas a
 Save as…	Icon-O-Matic-Menu-File		Guardar como...
+Don't save	Icon-O-Matic-Menu-Settings		No guardar
 Change Color	Icon-O-Matic-SetColorCmd		Cambiar color
 Style	Icon-O-Matic-Menus		Estilo
 <modify path>	Icon-O-Matic-PathCmd		<modificar ruta>
@@ -64,17 +65,21 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		Eliminar forma
 Reverse	Icon-O-Matic-PathsList		Invertir
 HVIF Source Code	Icon-O-Matic-SavePanel		Código fuente HVIF
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Anular transformaciones
+Settings	Icon-O-Matic-Menus		Configuración
 All	Icon-O-Matic-Properties		Todo
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		El texto que está tratando importar es muy largo, ¿está seguro?
 Multi Paste Properties	Icon-O-Matic-Properties		Multipegar propiedades
 Undo	Icon-O-Matic-Main		Deshacer
 Click on a shape above	Empty transformers list - 1st line		Hacer clic en una forma encima
 Add Shape	Icon-O-Matic-AddShapesCmd		Agregar patrón
 Contour	Transformation		Contorno
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		¿Guardar los cambios al icono actual antes de cerrar?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nada que rehacer>
 Perspective	Transformation		Perspectiva
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mover transformador
 Opacity	Icon-O-Matic-PropertyNames		Opacidad
 Add with path	Icon-O-Matic-ShapesList		Agregar con ruta
+Export icon	Dialog title		Exportar icono
 Gradient type	Icon-O-Matic-StyleTypes		Tipo de gradiente
 Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Cancelar
@@ -113,6 +118,7 @@ Gradient	Icon-O-Matic-StyleTypes		Gradiente
 Min LOD	Icon-O-Matic-PropertyNames		LOD mínimo
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atributo BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Invertir selección
+Drop shapes	Icon-O-Matic-ShapesList		Desechar las formas
 Export as…	Icon-O-Matic-Menu-File		Exportar como...
 Transformation	Transformation		Transformación
 Click on an object in	Empty property list - 1st line		Hacer clic en un objeto en
@@ -181,9 +187,11 @@ Save	Icon-O-Matic-Menu-File		Guardar
 Append…	Icon-O-Matic-Menu-File		Agregar...
 Move Path	Icon-O-Matic-MovePathsCmd		Mover ruta
 Overwrite	Icon-O-Matic-SVGExport		Sobrescribir
+Text too long	Icon-O-Matic-StyledTextImport		Texto demasiado largo
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Congelar formas
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Dividir punto del control
 Open…	Icon-O-Matic-Menu-File		Abrir...
+Save icon	Dialog title		Guardar icono
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Color (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Editar gradiente
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Limpiar ruta

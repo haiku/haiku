@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Terminal	2275811562
+1	slovak	x-vnd.Haiku-Terminal	2104419382
 Not found.	Terminal TermWindow		Nenájdené.
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Change directory	Terminal TermView		Zmeniť adresár
@@ -95,6 +95,5 @@ Find next	Terminal TermWindow		Nájsť ďalší
 Close active tab	Terminal TermWindow		Zatvoriť aktívnu kartu
 Paste	Terminal TermWindow		Vložiť
 Shell 	Terminal TermWindow		Shell 
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktuálny adresár aktívneho procesu.\n\t\t\tNepovinne je možné určiť maximálny počet\n\t\t\tzložiek cesty. Napr. „%2d“ pre najviac dve zložky.\n\t%i\t-\tIndex karty.\n\t%p\t-\tNázov aktívneho procesu.\n\t%%\t-\tZnak „%“.
 Cancel	Terminal TermView		Zrušiť
 Use default	Terminal SetTitleWindow		Použiť predvolené

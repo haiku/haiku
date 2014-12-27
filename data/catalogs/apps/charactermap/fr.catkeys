@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CharacterMap	56063163
+1	french	x-vnd.Haiku-CharacterMap	1534181938
 Enclosed alphanumerics	UnicodeBlocks		Alphanumériques cerclés
 Basic Latin	UnicodeBlocks		Latin basic
 View	CharacterWindow		Vue
@@ -123,6 +123,7 @@ Vai	UnicodeBlocks		Vaï
 Yi Radicals	UnicodeBlocks		Clés yi
 Cyrillic extended B	UnicodeBlocks		Cyrillique étendu B
 Quit	CharacterWindow		Quitter
+Ancient symbols	UnicodeBlocks		Symboles anciens
 Braille patterns	UnicodeBlocks		Combinaisons braille
 New Tai Lue	UnicodeBlocks		Nouveau taï lü
 Runic	UnicodeBlocks		Runes

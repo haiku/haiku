@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	3175009841
+1	french	x-vnd.haiku-icon_o_matic	357553475
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -62,6 +62,7 @@ HVIF Source Code	Icon-O-Matic-SavePanel		Code source HVIF
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Réinitialiser les Transformations
 Settings	Icon-O-Matic-Menus		Réglages
 All	Icon-O-Matic-Properties		Tout
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Vous essayez d’importer un texte plutôt long, êtes-vous sûr de vous ?
 Undo	Icon-O-Matic-Main		Annuler
 Click on a shape above	Empty transformers list - 1st line		Cliquer sur une forme ci-dessus
 Add Shape	Icon-O-Matic-AddShapesCmd		Ajouter une forme

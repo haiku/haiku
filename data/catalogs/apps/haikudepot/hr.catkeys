@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-HaikuDepot	727040687
+1	croatian	x-vnd.Haiku-HaikuDepot	2644962330
 Name	PackageListView		Ime
 Close	RatePackageWindow		Zatvori
 Changelog	PackageInfoView		Dnevnik promjena
@@ -6,7 +6,6 @@ The passwords do not match.	UserLoginWindow		Lozinke se ne podudaraju.
 Log in…	MainWindow		Prijava...
 Rate %Package%	RatePackageWindow		Ocijeni %paket%
 Stability:	RatePackageWindow		Stabilnost:
-Show available packages	MainWindow		Pokaži dostupne pakete
 Click a package to view information	PackageInfoView		Klikni na paket da vidiš informacije
 Other users can see this rating	RatePackageWindow		Ostali korisnici mogu vidjeti ovo ocjenjivanje
 Stability	RatePackageWindow		Stabilnost
@@ -40,7 +39,6 @@ Rate package	RatePackageWindow		Ocijeni paket
 Development	Model		Razvoj
 Fatal error	PackageManager		Ozbiljna greška
 Ratings	PackageInfoView		Ocjenjivanja
-Show installed packages	MainWindow		Pokaži instalirane pakete
 Inactive	PackageListView		Neaktivan
 Science & Mathematics	Model		Znanost i matematika
 Main Menu	MainWindow		Glavni izbornik
@@ -54,7 +52,6 @@ Search terms:	FilterView		Pojmovi pretrage:
 %Version%	PackageInfoView		%Verzija%
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Dogodila se greška kod osvježavanja repozitorija:%greška%(%pojedinosti%)
 It was not possible to contact the web service.	RatePackageWindow		Nije bilo moguće kontaktirati web servis.
-Show source packages	MainWindow		Pokaži izvorne pakete
 Create account	UserLoginWindow		Napravi račun
 Productivity	Model		Produktivnost
 Authentication failed	UserLoginWindow		Neuspjela ovjera
@@ -62,7 +59,6 @@ Logged in as %User%	MainWindow		Prijavljen kao  %korisnik%
 Language	RatePackageWindow		Jezik
 User name:	UserLoginWindow		Korisničko ime:
 User Menu	MainWindow		Korisnički izbornik
-Options	MainWindow		Opcije
 Unstable but usable	RatePackageWindow		Nestabilan ali može se koristiti
 The email address appears to be malformed.	UserLoginWindow		Email adresa je oštećena.
 Games	Model		Igre
@@ -89,7 +85,6 @@ Available	PackageListView		Dostupno
 Cancel	RatePackageWindow		Otkaži
 OK	UserLoginWindow		U redu
 Send	RatePackageWindow		Pošalji
-Show develop packages	MainWindow		Pokaži razvojne pakete
 Category:	FilterView		Kategorija:
 Failed to create account	UserLoginWindow		Neuspjelo kreiranje računa
 There are problems with the data you entered:\n\n	UserLoginWindow		Ima problema sa podacima koje ste unijeli:\n

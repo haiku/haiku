@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	902912385
+1	french	x-vnd.Haiku-Terminal	22895100
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -26,10 +26,12 @@ Window title:	Terminal TermWindow		Titre de la fenêtre :
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Option « %s » non reconnue\n
 Blue	Terminal colors scheme		Bleu
 Custom	Terminal colors scheme		Personnalisé
+Encoding:	Terminal AppearancePrefView		Encodage :
 %app% settings	Terminal PrefWindow	window title	Réglages du %app%
 Cancel	Terminal SetTitleWindow		Annuler
 Increase	Terminal TermWindow		Augmenter
 Settings	Terminal TermWindow		Réglages
+Window size	Terminal TermWindow		Taille de la fenêtre
 Selected text	Terminal AppearancePrefView		Texte sélectionné
 Find	Terminal FindWindow		Rechercher
 Appearance	Terminal PrefWindow		Apparence
@@ -45,15 +47,19 @@ Window title…	Terminal TermWindow		Titre de la fenêtre…
 Full screen	Terminal TermWindow		Plein écran
 Page setup…	Terminal TermWindow		Mise en page…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Les applications suivantes sont encore en fonctionnement :\n\n\t%1\n\nSi vous fermez le Terminal, les applications seront interrompues.
+Custom	Terminal AppearancePrefView	Window size	Personnalisé
 Insert path	Terminal TermView		Insérer un chemin de recherche
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui et Takashi Murai.\n\nUtilisation : %s [OPTION] [SHELL]\n
+Window size:	Terminal AppearancePrefView		Taille de la fenêtre :
 No search string was entered.	Terminal TermWindow		Aucun texte à rechercher n'a été indiqué.
 Font size	Terminal TermWindow		Taille de la police
 Blinking cursor	Terminal AppearancePrefView		Curseur clignotant
 Set window title	Terminal TermWindow		Changer le titre de la fenêtre
+Revert	Terminal PrefWindow		Rétablir
 Terminal	System name		Terminal
 Copy path	Terminal TermView		Copier le chemin
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
+Defaults	Terminal PrefWindow		Paramètres par défaut
 Match word	Terminal FindWindow		Rechercher le mot
 Nothing is selected.	Terminal TermWindow		Rien n'est selectionné.
 Text not found.	Terminal TermWindow		Texte non trouvé.
@@ -102,6 +108,5 @@ Find next	Terminal TermWindow		Rechercher le suivant
 Close active tab	Terminal TermWindow		Fermer l'onglet actif
 Paste	Terminal TermWindow		Coller
 Shell 	Terminal TermWindow		Interpréteur de commande
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail courant du processus actif.\n\t\t\tOptionnellement, le nombre maximum d'élément peut-\n\t\t\têtre spécifié. E.g. '%2d' pour au plus deux éléments.\n\t%i\t-\tL'index de l'onglet.\n\t%p\t-\tLe nom du processus actif.\n\t%%\t-\tLe caractere '%'.
 Cancel	Terminal TermView		Annuler
 Use default	Terminal SetTitleWindow		Par défaut

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtextencoding	3062073902
+1	spanish; castilian	x-vnd.Haiku-libtextencoding	1525027211
 ISO Greek	textencodings		ISO griego
 ISO South European	textencodings		ISO sur de Europa
 Chinese Big5	textencodings		Chino Gran5
@@ -7,6 +7,7 @@ ISO Arabic	textencodings		ISO árabe
 ISO Latin 9	textencodings		ISO Latin 9
 Japanese Shift JIS	textencodings		Japonés Shift JIS
 DOS Cyrillic	textencodings		DOS cirílico
+Windows Central European (CP 1250)	textencodings		Windows Centro Europeo (CP 1250)
 Windows Cyrillic (CP 1251)	textencodings		Windows cirílico (CP 1251)
 Japanese EUC	textencodings		EUC japonés
 Unicode	textencodings		Unicode

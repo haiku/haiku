@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Notifications	2718138102
+1	spanish; castilian	x-vnd.Haiku-Notifications	3502142944
 Notifications	GeneralView		Notificaciones
 seconds of inactivity	GeneralView		segundos de inactividad
 Revert	PrefletWin		revertir
@@ -6,6 +6,7 @@ Mini icon	DisplayView		Mini icono
 Enable notifications	GeneralView		Permitir notificaciones
 Error	NotificationView		Error
 OK	GeneralView		Aceptar
+OK	PrefletWin		Aceptar
 Type	NotificationView		Tipo
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		No se han podido parar las notificaciones porque no se ha podido contactar el servidor.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		No pudimos permitir notificacions porque no pudimos contactar el servidor.\nEste indica su InfoPopper instalación no era completa.
@@ -14,6 +15,7 @@ Cannot disable notifications because the server can't be reached.	GeneralView		N
 Progress	NotificationView		Progreso
 Last Received	NotificationView		Última Fecha
 General	PrefletView		General
+Apply	PrefletWin		Aplicar
 Display	PrefletView		Visualizador
 Search:	NotificationView		Buscar:
 Allowed	NotificationView		Permitido

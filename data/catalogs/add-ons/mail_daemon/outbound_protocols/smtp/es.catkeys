@@ -1,6 +1,8 @@
-1	spanish; castilian	x-vnd.Haiku-SMTP	1052586247
+1	spanish; castilian	x-vnd.Haiku-SMTP	2740407895
 SMTP server:	ConfigView		Servidor SMTP:
+STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Error durante el logado en %serv
+Unencrypted	ConfigView		Sin cifrar
 . The server says:\n	smtp		. El servidor dice:\n
 ESMTP	ConfigView		ESTMP
 Connecting to server…	smtp		Conectando al servidor...
@@ -10,4 +12,5 @@ Destination:	ConfigView		Destino:
 : Connection refused or host not found.	smtp		: Conexión rechazada o no se ha encontrado el host.
 None	ConfigView		Ninguno
 POP3 before SMTP	ConfigView		POP3 antes que SMTP
+SSL	ConfigView		SSL
 . The server said:\n	smtp		. El servidor dijo:\n

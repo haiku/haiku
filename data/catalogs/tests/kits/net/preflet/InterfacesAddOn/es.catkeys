@@ -1,0 +1,33 @@
+1	spanish; castilian	x-vnd.Haiku-InterfacesAddOn	160108912
+Interface	InterfaceWindow		Interfaz
+Configure…	InterfacesListView		Configurar…
+Static	IntefaceAddressView		Estático
+None	InterfacesListView		Ninguno
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		Estado:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Save	InterfaceWindow		Guardar
+Link speed:	IntefaceHardwareView		Velocidad de enlace:
+Renegotiate	InterfacesAddOn		Renegociar
+The method for obtaining an IP address	IntefaceAddressView		El método para obtener una dirección IP
+Your gateway	IntefaceAddressView		Su puerta de salida
+Enable	InterfacesListView		Habilitar
+Received:	IntefaceHardwareView		Recibido:
+Revert	InterfaceWindow		Revertir
+connected	IntefaceHardwareView		conectado
+Gateway:	IntefaceAddressView		Puerta de enlace:
+Disable	InterfacesListView		Deshabilitar
+Sent:	IntefaceHardwareView		Enviado:
+Disable	InterfacesAddOn		Deshabilitar
+Configure…	InterfacesAddOn		Configurar…
+Renegotiate Address	InterfacesListView		Renegociar dirección
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Modo:
+Your netmask	IntefaceAddressView		Su máscara de red
+IP Address:	IntefaceAddressView		Dirección IP:
+Off	IntefaceAddressView		Apagado
+MAC address:	IntefaceHardwareView		Dirección MAC:
+Netmask:	IntefaceAddressView		Máscara de red:
+Your IP address	IntefaceAddressView		Su dirección IP
+%llu KBytes	IntefaceHardwareView		%llu KBytes
+disconnected	IntefaceHardwareView		desconectado

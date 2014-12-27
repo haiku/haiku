@@ -1,0 +1,116 @@
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	2287587534
+Name	PackageListView		Nombre
+Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
+Close	RatePackageWindow		Cerrar
+The captcha puzzle needs to be solved.	UserLoginWindow		El acertijo de captcha debe ser resuelto.
+Changelog	PackageInfoView		Registro de cambios
+Your rating:	RatePackageWindow		Su puntuación:
+The passwords do not match.	UserLoginWindow		Las contraseñas no coinciden.
+Log in…	MainWindow		Iniciar sesión…
+Rate %Package%	RatePackageWindow		Puntuar %Package%
+Stability:	RatePackageWindow		Estabilidad:
+Click a package to view information	PackageInfoView		Haga clic en un paquete para ver su información
+Other users can see this rating	RatePackageWindow		Otros usuarios pueden ver esta puntuación
+Stability	RatePackageWindow		Estabilidad
+for %Version%	PackageInfoView		para %Version%
+No changelog available.	PackageInfoView		No hay registro de cambios disponible.
+Depot:	FilterView		Depósito:
+Description	PackageListView		Descripción
+Install	PackageManager		Instalar
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autenticación fallida. El usuario no existe o la contraseña no se escribió correctamente.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Cuenta creada exitosamente. Ahora puede puntuar paquetes y hacer otras cosas útiles.
+Tools	MainWindow		Herramientas
+HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		Cerrar
+Rate package…	PackageInfoView		Puntuar paquete…
+Category	FilterView		Categoría
+Uninstall	PackageManager		Desinstalar
+An error occurred while obtaining the package list: %message%	MainWindow		Ocurrió un error al obtener la lista de paquetes: %message%
+Your rating was updated successfully.	RatePackageWindow		Su puntuación fue enviada exitosamente.
+<no info>	PackageInfoView		<no hay información>
+An error occurred while initializing the package manager: %message%	MainWindow		Ocurrió un error al iniciar el administrador de paquetes: %message%
+Email address:	UserLoginWindow		Dirección de correo electrónico:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Su puntuación fue enviada exitosamente. Puede actualizarla o borrarla en cualquier momento puntuado el paquete otra vez.
+Very unstable	RatePackageWindow		Muy inestable
+The username is already taken. Please choose another.	UserLoginWindow		El nombre de usuario ya fue tomado. Por favor elija otro.
+Close	PackageManager		Cerrar
+Not logged in	MainWindow		No se inició sesión
+The authentication was successful.	UserLoginWindow		La autenticación fue exitosa.
+Status	PackageListView		Estado
+Switch account…	MainWindow		Cambiar de cuenta…
+Ignore	UserLoginWindow		Ignorar
+Language	UserLoginWindow		Idioma
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		La contraseña es demasiado débil o inválida. Por favor use al menos 8 caracteres con al menos 2 números y 2 letras mayúsculas.
+Rate package	RatePackageWindow		Puntuar paquete
+Development	Model		Desarrollo
+Fatal error	PackageManager		Error fatal
+The user name needs to be at least 3 letters long.	UserLoginWindow		El nombre de usuario debe ser al menos de tres letras de longitud.
+Log in	UserLoginWindow		Iniciar sesión
+Repeat pass phrase:	UserLoginWindow		Repetir frase de ingreso:
+Ratings	PackageInfoView		Valoraciones
+But none could be listed here, sorry.	UserLoginWindow		Pero ninguno se pudo listar aquí, lo siento.
+System & Utilities	Model		Sistema y utilidades
+Inactive	PackageListView		Inactivo
+Refresh depots	MainWindow		Actualizar depósitos
+Main Menu	MainWindow		Menú principal
+(%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		No ha resuelto el acertijo captcha correctamente.
+Success	UserLoginWindow		Éxito
+Downloading:	PackageInfoView		Descargando:
+Mostly stable	RatePackageWindow		Mayormente estable
+There was a puzzling response from the web service.	RatePackageWindow		Hubo una respuesta misteriosa desde el servicio Web.
+Log out	MainWindow		Cerrar sesión
+Education	Model		Educación
+Search terms:	FilterView		Términos de búsqueda
+%Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		No hay valoraciones de usuario disponibles.
+Failed to update rating	RatePackageWindow		Fallo al actualizar la valoración
+Does not start	RatePackageWindow		No inicia
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ocurrió un error mientras se actualizaba el repositorio: %error% (%details%)
+It was not possible to contact the web service.	RatePackageWindow		Fue imposible contactar con el servicio Web.
+There are problems in the form:\n\n	UserLoginWindow		Hay problemas en el formulario:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		El paquete no se encontró por el servicio Web. Esto probablemente signifique que viene de un depósito el cual no se rastrea aquí. Valorar tales paquetes desafortunadamente no está soportado.
+Failed to create or update rating: %s\n	RatePackageWindow		Fallo al crear o actualizar la valoración: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		Necesita haber ingresado con una cuenta antes de poder valorar paquetes.
+ It responded with: 	RatePackageWindow		 Respondió con: 
+User name:	UserLoginWindow		Nombre de usuario:
+User Menu	MainWindow		Menú de usuario
+Unstable but usable	RatePackageWindow		Inestable pero usable
+The email address appears to be malformed.	UserLoginWindow		La dirección de correo electrónico parece estar malformada.
+Games	Model		Juegos
+Cancel	MainWindow		Cancelar
+Input validation	UserLoginWindow		Validación de entrada
+Update	RatePackageWindow		Actualizar
+Video	Model		Vídeo
+All categories	FilterView		Todas las categorías
+An error occurred while refreshing the repository: %error%	MainWindow		Un error ocurrió al actualizar el repositorio: %error%
+Login or Create account	MainWindow		Ingresar o crear una cuenta
+Pending…	PackageListView		Pendiente…
+Depot	FilterView		Depósito
+Unknown	PackageListView		Desconocido
+All depots	FilterView		Todos los depósitos
+Comment language:	RatePackageWindow		Comentar idioma:
+Pass phrase:	UserLoginWindow		Frase de paso:
+Screenshot	ScreenshotWindow		Captura de pantalla
+Not specified	RatePackageWindow		Sin especificar
+Available	PackageListView		Disponible
+n/a	PackageInfoView		n/d
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Si no proporciona una dirección de correo, no será capaz de restablecer su conraseña si la olvida.
+ It responded with: 	UserLoginWindow		 Respondió con: 
+Authentication failed. Connection to the service failed.	UserLoginWindow		Falló la autenticación. La conexión al servicio falló.
+Cancel	RatePackageWindow		Cancelar
+Package action failed	PackageInfoView		La acción del paquete falló
+OK	UserLoginWindow		Aceptar
+Send	RatePackageWindow		Enviar
+Category:	FilterView		Categoría:
+Failed to create account	UserLoginWindow		Fallo al registrar la cuenta
+There are problems with the data you entered:\n\n	UserLoginWindow		Hubo problemas con la información que se ingresó:\n\n
+Featured packages	MainWindow		Paquetes destacados
+Success	RatePackageWindow		Éxito
+Business	Model		Trabajo
+Audio	Model		Audio
+About	PackageInfoView		Acerca de
+Active	PackageListView		Activo
+It was not possible to contact the web service.	UserLoginWindow		No fue posible contactar al servicio Web.
+Failed to create account: %s\n	UserLoginWindow		Fallo al crear la cuenta: %s\n
+Cancel	UserLoginWindow		Cancelar

@@ -1,10 +1,12 @@
-1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	234995750
+1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	1211510241
 P-faults	DataSource		Averías de P
 Media nodes	DataSource		Nodos de media
 Threads	DataSource		Hilos
+Always on top	ActivityWindow		Siempre visible
 Add graph	ActivityWindow		Insertar gráfico
 Teams	DataSource		Equipos
 Hide legend	ActivityView		Esconder clave
+MiB	DataSource		MiB
 Network send	DataSource		Envío de red
 CPU usage (combined)	DataSource		Uso de CPU (conjunto)
 CPU	DataSource		CPU
@@ -25,12 +27,14 @@ Update time interval:	SettingsWindow		Intervalo de tiempo de actualización:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Salir
 Block cache memory	DataSource		Bloquear memoria de caché
+%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Quitar el gráfico
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Uso de CPU
 Raw clipboard	DataSource		Portapapeles en bruto
 Sems	DataSource		Sems
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		Monitor de actividad
 Running applications	DataSource		Aplicaciones corriendo
 Semaphores	DataSource		Semáforos

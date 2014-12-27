@@ -1,6 +1,7 @@
-1	spanish; castilian	x-vnd.Haiku-CPUFrequencyPref	3079996868
+1	spanish; castilian	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		Aceptar
 CPU frequency status view	CPU Frequency View		Vista de estado de frecuencia de la CPU
+OK	Status view		Aceptar
 Set state	Status view		Poner estado
 Defaults	Pref Window		Valores predeterminados
 Install replicant into Deskbar	CPU Frequency View		Instalar replicante en la barra de escritorio

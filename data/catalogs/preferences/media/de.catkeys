@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Media	2338820526
+1	german	x-vnd.Haiku-Media	2163090586
 Couldn't add volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht in der Deskbar installiert werden: %s\n
 Ready for use…	Media Window		Einsatzbereit…
 Video input:	Media views		Video-Eingang:
@@ -17,6 +17,7 @@ Restart media services	Media views		Mediadienste neustarten
 Couldn't remove volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht aus der Deskbar entfernt werden: %s\n
 Media	System name		Audio & Video
 Telling media_addon_server to quit.	Media Window		Media_addon_server wird aufgefordert sich zu beenden.
+Media Service	Media Window		Mediadienste
 Audio mixer	Media Window		Audiomixer
 This hardware has no controls.	Media Window		Dieses Gerät hat keine Einstellmöglichkeiten.
 Audio output:	Media views		Audio-Ausgang:

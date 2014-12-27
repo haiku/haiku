@@ -1,4 +1,5 @@
-1	french	x-vnd.Haiku-Installer	2319349255
+1	french	x-vnd.Haiku-Installer	3421507633
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Le Gestionnaire d’amorçage, l’application pour configurer le menu d’amorçage d’Haiku, ne peux pas être lancé.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l'installation et redémarrer le système ?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installeur\n\técrit par Jérôme Duval et Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -20,6 +21,7 @@ If the os-prober approach doesn't work for you, GRUB 2 uses an extra configurati
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Sélectionner la source et la destination dans les listes déroulantes. Puis cliquer sur « Commencer ».
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku sur /dev/sda7\n
+Failed to launch Boot Manager	InstallerWindow		Échec au lancement du Gestionnaire d’amorçage
 Install from:	InstallerWindow		Installer depuis :
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld sur %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMATIONS IMPORTANTES AVANT D'INSTALLER HAIKU\n\n

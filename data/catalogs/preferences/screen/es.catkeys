@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Screen	1388881963
+1	spanish; castilian	x-vnd.Haiku-Screen	2339556848
 yes	Screen		si
 Use laptop panel:	Screen		utiliza panel del portátil
 15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 colores
@@ -12,6 +12,7 @@ Set background…	Screen		Configurar el fondo
 Undo	Screen		Deshacer
 if needed	Screen		si se necesita
 Screen preferences by the Haiku team	Screen		Preferencias de pantalla por el equipo de Haiku
+Settings will revert in %seconds.	Screen		La configuración se revertirá en %seconds segundos.
 Screen	System name		Pantalla
 OK	Screen		Aceptar
 Workspaces	Screen		Espacios de trabajo

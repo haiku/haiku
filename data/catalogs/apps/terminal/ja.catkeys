@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	194287280
+1	japanese	x-vnd.Haiku-Terminal	22895100
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -108,6 +108,5 @@ Find next	Terminal TermWindow		次を検索
 Close active tab	Terminal TermWindow		アクティブタブを閉じる
 Paste	Terminal TermWindow		貼り付け
 Shell 	Terminal TermWindow		シェル
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t実行中プロセスのカレントワーキングディレクトリ。\n\t\t\tオプションで最大パス要素を\n\t\t\t指定できます。 例. '%2d' 最大 2 要素。\n\t%i\t-\tタブのインデックス。\n\t%p\t-\t実行中のプロセス名。\n\t%%\t-\t文字 '%'.
 Cancel	Terminal TermView		中止
 Use default	Terminal SetTitleWindow		デフォルトを使用

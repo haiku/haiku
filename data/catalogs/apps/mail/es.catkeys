@@ -1,20 +1,23 @@
-1	spanish; castilian	x-vnd.Be-MAIL	3136546386
+1	spanish; castilian	x-vnd.Be-MAIL	233997769
 View	Mail		Ver
 %d - Date	Mail		%d - Fecha
 Attach attributes:	Mail		Adjuntar atributos:
 Inconsistency occurred in the undo/redo buffer.	Mail		Se produjo una inconsistencia en el búfer de deshacer/rehacer.
 An error occurred trying to save the attachment.	Mail		Se produjo un error mientras se trataba de guardar el archivo adjunto.
 Copy to new	Mail		Copiar a mensaje nuevo
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Dejar como 'Nuevo'
 Edit	Mail		Editar
 Print	Mail		Imprimir
 <none>	Mail		<ninguno>
 New mail message	Mail		Crear mensaje de correo
+Untitled	Mail		Sin título
 Automatic	Mail		Automático
-Automatically mark mail as read:	Mail		Marcar correo automáticamente como leído:
+Automatically mark mail as read:	Mail		Marcar correo como leído automáticamente:
 helpful message	Mail		mensaje útil
 Colored quotes:	Mail		Citas coloreadas:
 Subject:	Mail		Asunto:
 Reply to all	Mail		Responder a todos
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Adjunto: %name% (Tipo: %type%)
 Show icons & labels	Mail		Mostrar iconos y etiquetas
 Remove attachment	Mail		Eliminar adjunto
 Button bar:	Mail		Barra de botones:
@@ -24,7 +27,139 @@ Don't save	Mail		No guardar
 Expert	Mail		Experto
 Reply account:	Mail		Cuenta para responder:
 Message	Mail		Mensaje
+Settings…	Mail		Configuración…
 Reply to sender	Mail		Responder al remitente
 There is no installed handler for URL links.	Mail		No hay manejadores instalados para enlaces URL.
 Signature	Mail		Firma
-Find again	Mail		Buscar nuevamente
+Find again	Mail		Buscar de nuevo
+Bcc:	Mail		Cco:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El texto que ha escrito contiene %ld caracteres indecodificables. ¿Quizás un carácter diferente podría funcionar mejor? Presione enviar de cualquier manera (un carácter sustituto se utilizará en lugar de los indecodificables), o presione Cancelar para regresar e intentar arreglarlo.
+Signature:	Mail		Firma:
+Save changes to this signature?	Mail		¿Guardar cambios a esta firma?
+Cc:	Mail		Cc:
+Off	Mail		Apagado
+Find	Mail		Encontrar
+Undo	Mail		Deshacer
+Date:	Mail		Fecha:
+An error occurred trying to open this signature.	Mail		Se produjo un error mientras se trataba de abrir la firma.
+No file attributes, just plain data	Mail		Sin atributos de archivo, solo información plana
+Edit queries…	Mail		Editar consultas…
+queries	B_USER_DIRECTORY/mail/queries		consultas
+Paste	Mail		Pegar
+in	B_USER_DIRECTORY/mail/in		en
+Save attachment…	Mail		Guardar archivo adjunto…
+Include file attributes in attachments	Mail		Incluir atributos de archivo en adjuntos
+OK	Mail		Aceptar
+Send	Mail		Enviar
+Show icons only	Mail		Mostrar solo iconos
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		La función de remover archivos adjuntos de un correo reenviado todavía no se implementa.\nTodavía no funciona correctamente.
+Hide	Mail		Ocultar
+Forward without attachments	Mail		Reenviar sin archivos adjuntos
+Previous	Mail		Anterior
+Redo	Mail		Rehacer
+Add enclosure…	Mail		Agregar anexo…
+Mail	System name		Correo
+Print…	Mail		Imprimir…
+Warn unencodable:	Mail		Precaución indecodificable:
+Quit	Mail		Salir
+%n - Full name	Mail		%n - Nombre completo
+ Read 	Mail		 Leer 
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Trash	Mail		Papelera
+Default account:	Mail		Cuenta predeterminada:
+Size:	Mail		Tamaño:
+Account from mail	Mail		Cuenta de correo
+Edit signatures…	Mail		Editar firmas...
+New	Mail		Nuevo
+Attachments: 	Mail		Archivos adjuntos:
+On	Mail		En
+Set to %s	Mail		Establecer a %s
+Forward	Mail		Reenviar
+E-mail draft could not be saved!	Mail		¡No se pudo guardar el borrador!
+%e wrote:\\n	Mail		%e escribió:\\n
+To:	Mail		Para:
+Only files can be added as attachments.	Mail		Solo se pueden agregar archivos como adjuntos.
+Previous message	Mail		Mensaje anterior
+Attachments:	Mail		Archivos adjuntos:
+Title:	Mail		Título:
+<no account found>	Mail		<ninguna cuenta encontrada>
+Find…	Mail		Encontrar…
+Accounts…	Mail		Cuentas…
+Mail preferences	Mail		Preferencias de correo
+Initial spell check mode:	Mail		Modo de comprobación de ortografía inicial:
+Leave same	Mail		Dejar el mismo
+Page setup…	Mail		Configuración de la página…
+Text wrapping:	Mail		Ajuste del texto:
+Revert	Mail		Revertir
+File	Mail		Archivo
+mail	B_USER_DIRECTORY/mail		correo
+None	Mail		Ninguno
+(Name unavailable)	Mail		(Nombre indisponible)
+Copy link location	Mail		Copiar la ubicación del enlace
+out	B_USER_DIRECTORY/mail/out		fuera
+Show header	Mail		Mostrar encabezado
+%e - E-mail address	Mail		%e - Dirección de correo
+Resend	Mail		Enviar de nuevo
+Show raw message	Mail		Mostrar mensaje en bruto
+\\n - Newline	Mail		\\n - Nueva línea
+Start now	Mail		Iniciar ahora
+Close	Mail		Cerrar
+No matches	Mail		Sin coincidencias
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		El mail_daemon no está corriendo. El mensaje se puso en cola y se enviará cuando el demonio de correo inicie.
+Really delete this signature? This cannot be undone.	Mail		¿Borrar realmente esta firma? Esto no se puede deshacer.
+Save this message as a draft before closing?	Mail		¿Guardar este mensaje como borrador antes de cerrar?
+Open	Mail		Abrir
+draft	B_USER_DIRECTORY/mail/draft		borrador
+Quote	Mail		Cita
+Add	Mail		Añadir
+Next message	Mail		Mensaje siguiente
+User interface	Mail		Interfaz de usuario
+Cancel	Mail		Cancelar
+Send message	Mail		Enviar mensaje
+Remove enclosure	Mail		Remover anexo
+Account:	Mail		Cuenta:
+Decoding:	Mail		Decodificar:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Lo siento, no se pudo encontrar una aplicación que soporte el tipo de dato 'Persona'.
+Delete	Mail		Borrar
+Don't send	Mail		No enviar
+Leave as '%s'	Mail		Dejar como '%s'
+Copy	Mail		Copiar
+Mail couldn't find its dictionary.	Mail		Mail no pudo encontrar su diccionario.
+Reply preamble:	Mail		Responder preámbulo:
+Signatures	Mail		Firmas
+Next	Mail		Siguiente
+Set to…	Mail		Ajustar a…
+Use default account	Mail		Usar la cuenta por omisión
+Sorry	Mail		Disculpe
+Encoding:	Mail		Codificación:
+Font:	Mail		Tipografía:
+(Address unavailable)	Mail		(Dirección indisponible)
+Save address	Mail		Guardar dirección
+Queries	Mail		Consultas
+Send this message before closing?	Mail		¿Enviar este mensaje antes de cerrar?
+Save	Mail		Guardar
+Random	Mail		Aleatorio
+Close and 	Mail		Cerrar y 
+Save as draft	Mail		Guardar como borrador
+The mail_daemon could not be started:\n\t	Mail		El mail_daemon no se pudo iniciar:\n\t
+Open attachment	Mail		Abrir adjunto
+sent	B_USER_DIRECTORY/mail/sent		enviado
+(Date unavailable)	Mail		(Fecha indisponible)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Ponga sus consultas y plantillas de consulta de correo favoritas en esta carpeta.
+Reply	Mail		Responder
+From:	Mail		De:
+Couldn't open this signature. Sorry.	Mail		No se pudo abrir la firma. Disculpe.
+Open draft	Mail		Abrir borrador
+Cut	Mail		Cortar
+Check spelling	Mail		Comprobar ortografía
+Set to Saved	Mail		Ajustar como Guardado
+Open this link	Mail		Abrir este enlace
+Auto signature:	Mail		Autofirma:
+Add signature	Mail		Agregar firma
+Need Tracker to move items to trash	Mail		Hacer que Tracker mueva elementos a la basura
+Mailing	Mail		Envío de correo
+Unread	Mail		Sin leer
+Remove quote	Mail		Eliminar cita
+Move to trash	Mail		Mover a la papelera
+Select all	Mail		Seleccionar todo
+An error occurred trying to save this signature.	Mail		Se produjo un error mientras se trataba de guardar esta firma.

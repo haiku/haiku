@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	1626638008
+1	dutch; flemish	x-vnd.Haiku-Terminal	1455245828
 Not found.	Terminal TermWindow		Niet gevonden.
 Switch Terminals	Terminal TermWindow		Wissel van Terminal
 Change directory	Terminal TermView		Directory veranderen
@@ -83,6 +83,5 @@ Find next	Terminal TermWindow		Volgende zoeken
 Close active tab	Terminal TermWindow		Het actieve tabblad sluiten
 Paste	Terminal TermWindow		Plakken
 Shell 	Terminal TermWindow		Shell
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDe huidige werkmap van het actieve proces.\n\t\t\tOptioneel kan het maximale aantal padonderdelen\n\t\tworden opgegeven. Bijvoorbeeld '%2d' voor maximaal 2 onderdelen.\n\t%i\t-\tDe index van de tab.\n\t%p\t-\tDe naam van het actieve proces.\n\t%%\t-\tHet karakter '%'.
 Cancel	Terminal TermView		Annuleren
 Use default	Terminal SetTitleWindow		De standaard gebruiken

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1838577979
+1	hungarian	x-vnd.Haiku-HaikuDepot	3756499622
 Name	PackageListView		Név
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
 Close	RatePackageWindow		Bezárás
@@ -9,7 +9,6 @@ The passwords do not match.	UserLoginWindow		A jelszavak nem egyeznek.
 Log in…	MainWindow		Bejelentkezés…
 Rate %Package%	RatePackageWindow		%Package% értékelése
 Stability:	RatePackageWindow		Stabilitás:
-Show available packages	MainWindow		Elérhető csomagok megjelenítése
 Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
 Other users can see this rating	RatePackageWindow		A többi felhasználó számára látható az értékelés
 Stability	RatePackageWindow		Stabilitás
@@ -51,7 +50,6 @@ Repeat pass phrase:	UserLoginWindow		Jelszó ismétlése:
 Ratings	PackageInfoView		Értékelés
 But none could be listed here, sorry.	UserLoginWindow		A felsoroltak közül egyik sem használható.
 System & Utilities	Model		Rendszer és eszközök
-Show installed packages	MainWindow		Telepített csomagok megjelenítése
 Inactive	PackageListView		Inaktív
 Refresh depots	MainWindow		Raktárak frissítése
 The package action could not be scheduled: %Error%	PackageInfoView		A csomaggal történő művelet nem ütemezhető be: %Error%
@@ -74,7 +72,6 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 It was not possible to contact the web service.	RatePackageWindow		Nem sikerült elérni a webes szolgáltatást.
 There are problems in the form:\n\n	UserLoginWindow		Az űrlap hibás:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		A csomag nem található. Lehetséges, hogy a csomag olyan raktárban van, ami nincs használatban. Az értékelés nem lehetséges.
-Show source packages	MainWindow		Forráskód csomagok megjelenítése
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
 Productivity	Model		Alkalmazások
 Authentication failed	UserLoginWindow		A hitelesítés sikertelen
@@ -86,7 +83,6 @@ You need to be logged into an account before you can rate packages.	MainWindow		
  It responded with: 	RatePackageWindow		Ezt válaszolta:
 User name:	UserLoginWindow		Felhasználónév:
 User Menu	MainWindow		Felhasználói menü
-Options	MainWindow		Beállítások
 Unstable but usable	RatePackageWindow		Instabil, de használható
 The email address appears to be malformed.	UserLoginWindow		Hibás az e-mail cím formátuma.
 Games	Model		Játékok
@@ -127,7 +123,6 @@ Cancel	RatePackageWindow		Mégse
 Package action failed	PackageInfoView		A csomag telepítése sikertelen
 OK	UserLoginWindow		Rendben
 Send	RatePackageWindow		Küldés
-Show develop packages	MainWindow		Fejlesztői csomagok megjelenítése
 Category:	FilterView		Kategória:
 Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
 There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n

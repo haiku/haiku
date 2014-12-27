@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Devices	3390622992
+1	spanish; castilian	x-vnd.Haiku-Devices	865240481
 Manufacturer	DeviceSCSI		Fabricante
 Order by:	DevicesView		Ordenar por:
 ACPI controller	Device		Controlador ACPI
@@ -62,11 +62,34 @@ Multimedia controller	Device		Controlador multimedia
 Unknown	DevicePCI		Desconocido
 Device name:	Device		Nombre del dispositivo:
 Computer	DevicesView		Computadora
+Value	PropertyList		Valor
+Report compatibility	DevicesView		Reporte de compatibilidad
+Device	Device		Dispositivo
+Signal processing controller	Device		Controlador de procesamiento de señal
+Serial bus controller	Device		Controlador de bus serial
+Wireless controller	Device		Controlador inalámbrico
+ACPI node '%1'	DeviceACPI		Nodo ACPI '%1'
 Device name	Device		Nombre de dispositivo
 Manufacturer	Device		Fabricante
+Name	PropertyList		Nombre
 Manufacturer	DevicePCI		Fabricante
+Intelligent controller	Device		Controlador inteligente
+Satellite communications controller	Device		Controlador de comunicaciones de satélite
+SCSI Information	DeviceSCSI		Información de SCSI
+Enclosure	DeviceSCSI		Anexo
+Array	DeviceSCSI		Arreglo
 Bridge	Device		Puente
+Refresh devices	DevicesView		Actualizar dispositivos
 Unknown device	DevicesView		Dispositivo desconocido
+Graphics Peripheral	DeviceSCSI		Periféricos gráficos
+Tape Drive	DeviceSCSI		Unidad de cinta
+Bus Information	Device		Información de Bus
+Connection	DevicesView		Conexión
+Generate system information	DevicesView		Generar información del sistema
+Encryption controller	Device		Controlador de cifrado
+Unclassified device	Device		Dispositivo sin clasificar
 Device name	DeviceSCSI		Nombre de dispositivo
+Card Reader	DeviceSCSI		Lector de tarjetas
+Class info	DevicePCI		Información de clase
 Device paths	DevicePCI		Rutas de Dispositivo
 Devices	DevicesView		Dispositivos

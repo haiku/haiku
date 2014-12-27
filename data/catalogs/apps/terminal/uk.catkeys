@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	902912385
+1	ukrainian	x-vnd.Haiku-Terminal	731520205
 Not found.	Terminal TermWindow		Не знайдено.
 Switch Terminals	Terminal TermWindow		Перемкнути термінали
 Change directory	Terminal TermView		Змінити каталог
@@ -102,6 +102,5 @@ Find next	Terminal TermWindow		Знайти наступне
 Close active tab	Terminal TermWindow		Закрити активну вкладку
 Paste	Terminal TermWindow		Вставити
 Shell 	Terminal TermWindow		Оболонка
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний каталог активного процесу.\n\t\t\tДодатково можна вказати максимальну кількість компонентів шляху\n\t\t\t Наприклад '%2d' ніж 2 компоненти.\n\t%i\t-\tіндекс вкладки.\n\t%p\t-\tІм'я активного процесу.\n\t%%\t-\tСимвол '%'.
 Cancel	Terminal TermView		Відміна
 Use default	Terminal SetTitleWindow		Використати по замовчуванню

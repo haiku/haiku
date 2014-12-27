@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-GLTeapot	3688092856
+1	spanish; castilian	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Superior al centro
 Lighting	TeapotWindow		Iluminación
 Off	TeapotWindow		Apagado
@@ -9,6 +9,7 @@ Blue	TeapotWindow		Azul
 Gouraud shading	TeapotWindow		Sombreado Gouraud
 Quit	TeapotWindow		Salir
 Filled polygons	TeapotWindow		Polígonos llenos
+Settings	TeapotWindow		Configuración
 Fog	TeapotWindow		Niebla
 Backface culling	TeapotWindow		Ocultar caras traseras
 Z-buffered	TeapotWindow		Con búfer Z

@@ -1,23 +1,76 @@
-1	spanish; castilian	x-vnd.Haiku-Keymap	140876782
+1	spanish; castilian	x-vnd.Haiku-Keymap	348798011
+Dvorak	Keyboard Layout View		Dvorak
+Shift:	Modifier keys window	Shift key role name	Mayúsculas:
 Revert	Modifier keys window		Revertir
+Slovak	Keyboard Layout View		Eslovaco
+Hungarian	Keyboard Layout View		Húngaro
+German	Keyboard Layout View		Alemán
+Swiss-French	Keyboard Layout View		Suizo francés
+Warning: left and right key roles do not match	Modifier keys window		Advertencia: los roles de tecla izquierda y derecha no concuerdan
+Italian	Keyboard Layout View		Italiano
+Polish (Typewriter)	Keyboard Layout View		Polaco (máquina de escribir)
 Tilde trigger	Keymap window		Disparador de tilde (~)
 Grave trigger	Keymap window		Disparador de acento grave (`)
+Role	Modifier keys window	As in the role of a modifier key	Rol
+Caps lock	Keyboard Layout View		Bloqueo de mayúsculas
 Select dead keys	Keymap window		Seleccionar teclas muertas
+Bulgarian (Cyrillic)	Keyboard Layout View		Búlgaro (cirílico)
+Cancel	Modifier keys window		Cancelar
+Russian	Keyboard Layout View		Ruso
+Icelandic	Keyboard Layout View		Islandés
+Command	Keyboard Layout View	Command key	Comando
+Polish	Keyboard Layout View		Polaco
+Serbian (Cyrillic)	Keyboard Layout View		Serbio (Cirílico)
+Defaults	Keymap window		Predeterminados
 Quit	Keymap window		Salir
 Switch shortcut keys to Haiku mode	Keymap window		Cambiar atajos de teclado a modo Haiku
 Circumflex trigger	Keymap window		Disparador de acento circunflejo (^)
+ISO-9995	Keyboard Layout View		ISO-9995
 Diaeresis trigger	Keymap window		Disparador de diéresis (¨)
+Disabled	Modifier keys window	Do nothing	Desactivado
+Belarusian (Latin)	Keyboard Layout View		Bielorruso (Latino)
+Danish	Keyboard Layout View		Danés
 Open…	Keymap window		Abrir…
+Russian (Typewriter)	Keyboard Layout View		Ruso (máquina de escribir)
+Error: duplicate keys	Modifier keys window		Error: teclas duplicadas
 System:	Keymap window		Sistema:
+Lithuanian	Keyboard Layout View		Lituano
+Finnish	Keyboard Layout View		Finlandés
+Set modifier keys…	Keymap window		Elegir teclas modificadoras…
+Option:	Modifier keys window	Option key role name	Opción:
 Switch shortcut keys	Keymap window		Cambiar atajos de teclado
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla mayúsculas
 User:	Keymap window		Usuario:
+Arabic (102)	Keyboard Layout View		Árabe (102)
+United-Kingdom	Keyboard Layout View		Reino Unido
+German (Mac)	Keyboard Layout View		Alemán (Mac)
+Right option	Keyboard Layout View		Opción derecha
+Right shift	Keyboard Layout View		Mayúsculas derecha
+Key	Modifier keys window	As in a computer keyboard key	Tecla
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tecla control
+Control:	Modifier keys window	Control key role name	Control:
+Brazilian	Keyboard Layout View		Portugués de Brasil
+Brazilian (ABNT2)	Keyboard Layout View		Portugués de Brasil (ABNT-2)
+French (Bépo)	Keyboard Layout View		Francés (Bépo)
+Option	Keyboard Layout View	Option key	Opción
+US-International	Keyboard Layout View		Estadounidense internacional
 Sample and clipboard:	Keymap window		Ejemplo y portapapeles:
+Swiss-German	Keyboard Layout View		Suizo alemán
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tecla Alt/Opt
 Layout	Keymap window		Distribución
 Switch shortcut keys to Windows/Linux mode	Keymap window		Cambiar atajos de teclado a modo Windows/Linux
+Albanian	Keyboard Layout View		Albanés
+Right command	Keyboard Layout View		Comando derecho
 Revert	Keymap window		Revertir
+Command:	Modifier keys window	Command key role name	Comando:
+Latin-American	Keyboard Layout View		Latinoamericano
 Save as…	Keymap window		Guardar como...
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
 File	Keymap window		Archivo
+Swedish	Keyboard Layout View		Sueco
 (Current)	Keymap window		(Actual)
 Font	Keymap window		Tipo de letra
 Keymap	System name		Mapa de teclado
+Set modifier keys	Modifier keys window		Elegir teclas modificadoras
+Modifier keys	Modifier keys window		Teclas modificadoras
 Acute trigger	Keymap window		Disparador de acento agudo (´)

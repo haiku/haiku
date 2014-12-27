@@ -1,9 +1,10 @@
-1	finnish	x-vnd.Haiku-InterfacesAddOn	1264872285
+1	finnish	x-vnd.Haiku-InterfacesAddOn	606366088
 Interface	InterfaceWindow		Käyttöliittymä
 Network:	IntefaceHardwareView		Verkko:
 Static	IntefaceAddressView		Kiinteä
 None	InterfacesListView		Ei asetettu
 IP:	InterfacesListView	IPv4 address label	IP:
+Renegotiate address	InterfacesListView		Kysele osoite uudelleen
 Status:	IntefaceHardwareView		Tila:
 IPv6:	InterfacesListView	IPv6 address label	IPv6:
 Link speed:	IntefaceHardwareView		Yhteysnopeus:

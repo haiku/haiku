@@ -1,4 +1,5 @@
-1	spanish; castilian	x-vnd.Haiku-cmd-dstconfig	3548307002
+1	spanish; castilian	x-vnd.Haiku-cmd-dstconfig	1861992467
 Use this time	dstcheck		Usar esta hora
 Ask me later	dstcheck		Preguntarme después
 Manually adjust time…	dstcheck		Ajustar manualmente la hora...
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		¡Atención!\n\nDebido al cambio del horario de verano, el reloj de su computadora puede estar una hora equivocado.\nEste equipo piensa que es %current time%.\n\n¿Es la hora correcta?

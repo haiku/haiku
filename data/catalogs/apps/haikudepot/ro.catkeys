@@ -1,10 +1,9 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2319922393
+1	romanian	x-vnd.Haiku-HaikuDepot	2305186312
 Name	PackageListView		Nume
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
 Close	RatePackageWindow		Închidere
 The captcha puzzle needs to be solved.	UserLoginWindow		Puzzle captcha trebuie rezolvat.
 Stability:	RatePackageWindow		Stabilitate:
-Show available packages	MainWindow		Afișează pachetele disponibile
 Click a package to view information	PackageInfoView		Clic pe un pachet pentru a vizualiza informații
 Stability	RatePackageWindow		Stabilitate
 for %Version%	PackageInfoView		pentru %Version%
@@ -29,7 +28,6 @@ The user name needs to be at least 3 letters long.	UserLoginWindow		Numele de ut
 Log in	UserLoginWindow		Autentificare
 Repeat pass phrase:	UserLoginWindow		Repetare parolă:
 System & Utilities	Model		Sistem & Utilități
-Show installed packages	MainWindow		Afișează packetele instalate
 Inactive	PackageListView		Inactiv
 Science & Mathematics	Model		Știință & Matematică
 Main Menu	MainWindow		Meniu principal
@@ -49,7 +47,6 @@ Size	PackageListView		Dimensiune
  It responded with: 	RatePackageWindow		 A răspuns cu: 
 User name:	UserLoginWindow		Nume utilizator:
 User Menu	MainWindow		Meniu utilizator
-Options	MainWindow		Opțiuni
 Unstable but usable	RatePackageWindow		Instabil dar utilizabil
 Games	Model		Jocuri
 Local	MainWindow		Local

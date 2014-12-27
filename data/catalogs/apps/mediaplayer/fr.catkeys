@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaPlayer	3507634633
+1	french	x-vnd.Haiku-MediaPlayer	68841021
 raw audio	MediaPlayer-InfoWin		audio brut
 Location	MediaPlayer-InfoWin		Emplacement
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
@@ -139,6 +139,7 @@ Start media server	MediaPlayer-Main		Démarrer le serveur de médias
 Toggle fullscreen.	MediaPlayer-Main		Basculer en plein écran.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obtenir la durée de l'élément en cours de lecture en microsecondes.
 ToggleFullscreen	MediaPlayer-Main		Basculer en plein écran
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stéréo} other{# Canaux}}
 <unnamed>	PlaylistItem-name		<sans nom>
 Open Clips	MediaPlayer-Main		Ouvrir des clips
 OK	MediaPlayer-PlaylistWindow		OK

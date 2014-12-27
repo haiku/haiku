@@ -1,8 +1,39 @@
-1	spanish; castilian	x-vnd.Haiku-libbe	1448968507
+1	spanish; castilian	x-vnd.Haiku-libbe	1409488127
+gamma	AboutWindow		gama
+beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		Escrito por:
+About %app%	AboutMenuItem		Acerca de %app%
+Cut	TextView		Cortar
+Version	AboutWindow		Versión
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		No se puede crear el replicante para \"%description\".\n%error
+Copy	TextView		Copiar
 %3.2f KiB	StringForSize		%3.2f KiB
+alpha	AboutWindow		alfa
+Error	PrintJob		Error
+All Rights Reserved.	AboutWindow		Todos los derechos reservados.
+About %app%	AboutWindow		Acerca de %app%
+OK	Dragger		Aceptar
+OK	PrintJob		Aceptar
 Green:	ColorControl		Verde:
+Version history:	AboutWindow		Historal de versión:
+Remove replicant	Dragger		Remover replicante
+OK	ZombieReplicantView		Aceptar
+Print Server is not responding.	PrintJob		El servidor de impresión no responde.
+Paste	TextView		Pegar
+Special Thanks:	AboutWindow		Agradecimientos especiales:
 %.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No se puede localizar la aplicación para el replicante. Ninguna firma de aplicación se proporcionó:\n%error
+Redo	TextView		Rehacer
+<empty>	Menu		<vacío>
+Select All	TextView		Seleccionar todo
+Warning	Dragger		Advertencia
+Undo	TextView		Deshacer
 Red:	ColorControl		Rojo:
 %3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		Acerca de %app…
+development	AboutWindow		desarrollo
+Error	ZombieReplicantView		Error
 Blue:	ColorControl		Azul:
+gold master	AboutWindow		maestro dorado
+Can't delete this replicant from its original application. Life goes on.	Dragger		No se puede borrar este replicante de su aplicación original. La vida sigue.

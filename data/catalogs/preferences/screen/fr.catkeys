@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Screen	1388881963
+1	french	x-vnd.Haiku-Screen	2339556848
 yes	Screen		oui
 Use laptop panel:	Screen		Utiliser l'écran du portable :
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 couleurs
@@ -12,6 +12,7 @@ Set background…	Screen		Choisir un fond d'écran…
 Undo	Screen		Annuler
 if needed	Screen		si nécessaire
 Screen preferences by the Haiku team	Screen		Préférences de l'écran par l'équipe Haiku
+Settings will revert in %seconds.	Screen		Les réglages seront rétablis dans %seconds secondes.
 Screen	System name		Écran
 OK	Screen		OK
 Workspaces	Screen		Espaces de travail

@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-Terminal	3807051506
+1	slovenian	x-vnd.Haiku-Terminal	3635659326
 Not found.	Terminal TermWindow		Ni mogoče najti.
 Change directory	Terminal TermView		Zamenjaj imenik
 Cursor	Terminal AppearancePrefView		Kurzor
@@ -57,6 +57,5 @@ Find next	Terminal TermWindow		Najdi naslednje
 Close active tab	Terminal TermWindow		Zapri trenutni jeziček
 Paste	Terminal TermWindow		Prilepi
 Shell 	Terminal TermWindow		Lupina
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tTrenutni delovni imenik delujočega procesa.\n\t\t\tDoločite lahko največje dovoljeno število komponent poti,\n\t\t\tnpr. '%2d' za največ dve komponenti.\n\t%i\t-\tIndeks jezička.\n\t%p\t-\tIme procesa.\n\t%%\t-\tZnak '%'.
 Cancel	Terminal TermView		Prekliči
 Use default	Terminal SetTitleWindow		Uporabi privzeto

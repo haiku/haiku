@@ -1,8 +1,9 @@
-1	spanish; castilian	x-vnd.Haiku-EXRTranslator	33353118
+1	spanish; castilian	x-vnd.Haiku-EXRTranslator	106859695
 Version %d.%d.%d, %s	ConfigView		Versión %d.%d.%d, %s
 EXR image translator	EXRTranslator		Traductor de imagen EXR
 Based on OpenEXR (http://www.openexr.com)	ConfigView		Basado en OpenEXR (http://www.openexr.com)
 EXR Settings	main		Configuración EXR
+EXR images	EXRTranslator		Imágenes EXR
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		Una división de Lucasfilms Entretainment Company Ltd
 EXR image	EXRTranslator		Imagen EXR
 EXR image translator	ConfigView		Traductor de imagen EXR

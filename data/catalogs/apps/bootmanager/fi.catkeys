@@ -49,7 +49,7 @@ Drives	DrivesPage	Title	Levyasemat
 No space available!	DrivesPage	Cannot install	Tilaa ei ole käytettävissä!
 Never	DefaultPartitionPage		Ei koskaan
 Partition table not compatible	BootManagerController	Title	Osiotaulu ei ole yhteensopiva
-Old Master Boot Record saved	BootManagerController	Title	Vanha Master Boot Record -tietue tallennettu
+Old Master Boot Record saved	BootManagerController	Title	Vanha Master Boot Record-tietue tallennettu
 Old Master Boot Record backup failure	BootManagerController	Title	Vanhan Master Boot Record-tietueen varmuuskopiohäiriö
 Boot Manager is unable to read the partition table!	BootManagerController		Käynnistyshallinta ei kykene lukemaan osiotaulua!
 Error reading partition table	BootManagerController	Title	Osiotaulun lukemisessa tapahtui virhe

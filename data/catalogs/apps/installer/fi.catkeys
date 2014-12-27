@@ -4,7 +4,7 @@ Are you sure you want to abort the installation and restart the system?	Installe
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Asennusohjelma\n\ttekijät: Jérôme Duval ja Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Tässä sinun on muutettava rivi ”GRUB_HIDDEN_TIMEOUT=0” kommentiksi laittamalla merkin ”#” sen eteen, jotta alkukäynnistysvalikko todella näytettäisiin.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Käynnistyssektori kirjoitettiin kohteeseen ’%s’. Jätä asennusohjelma painamalla Lopeta-painiketta tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Käynnistyssektori kirjoitettiin levylle ’%s’. Jätä asennusohjelma painamalla Lopeta-painiketta tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
 Quit	InstallerApp		Lopeta
 Additional disk space required: 0.0 KiB	InstallerWindow		Vaadittu lisälevytilaa: 0.0 kibitavua
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
@@ -22,12 +22,12 @@ OK	InstallerApp		Valmis
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Valitse lähde- ja kohdelevyt ponnahdusvalikoista. Napsauta sitten ”Aloita”.
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
 Failed to launch Boot Manager	InstallerWindow		Käynnistyshallinnan käynnistäminen epäonnistui
-Install from:	InstallerWindow		Asennetaan levyltä:
+Install from:	InstallerWindow		Asenna levyltä:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		TÄRKEITÄ TIETOJA ENNEN HAIKUN ASENTAMISTA\n\n
 GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		GRUB:in nimeämiskaava osioille on: (hdN,n)\n
 Continue	InstallerWindow	In alert after pressing Stop	Jatka
-Write boot sector to '%s'	InstallerWindow		Kirjoita käynnistyssektori kohteeseen ’%s’
+Write boot sector to '%s'	InstallerWindow		Kirjoita käynnistyssektori levylle ’%s’
 Collecting copy information.	InstallProgress		Kerätään kopiointitietoja.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse lähdelevy ponnahdusvalikosta. Napsauta sitten ”Aloita”.
 Quit Boot Manager and DriveSetup	InstallerWindow		Poistu Käynnistyshallinnasta ja Levyasema-asetuksista
@@ -58,7 +58,7 @@ Choose the disk you want to install onto from the pop-up menu. Then click \"Begi
 Unknown Type	InstallProgress	Partition content type	Tuntematon tyyppi
 <none>	InstallerWindow	No partition available	<ei mitään>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Käynnistyssektori kirjoitettiin kohteeseen ’%s’. Paina Käynnistä uudelleen -painiketta tietokoneen käynnistämiseksi uudelleen tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Käynnistyssektori kirjoitettiin levylle ’%s’. Paina Käynnistä uudelleen -painiketta tietokoneen käynnistämiseksi uudelleen tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
 Installation canceled.	InstallProgress		Asennus peruttu.
 Installer	System name		Asennusohjelma
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Et voi asentaa levyn sisältö itseensä. Valitse eri levy.
@@ -76,7 +76,7 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Suoritetaan Käynnistyshallintaa…\n\nSulje Käynnistyshallinta asennuksen jatkamiseksi.
 Install anyway	InstallProgress		Asenna kaikesta huolimatta
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Kohdattiin virhe ja asennus ei onnistunut:\n\nVirhe:  %s
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Paina Aloita-painiketta asentaaksesi kohteesta ’%1s’ kohteeseen ’%2s’.
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Paina Aloita-painiketta asentaaksesi levyltä ’%1s’ levylle ’%2s’.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Suoritetaan Levyasema-asetuksia…\n\nSulje Levyasema-asetukset asennuksen jatkamiseksi.
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Pidä hauskaa ja kiitoksia siitä, että yrität käyttää Haikua! Toivomme, että pidät siitä!
 OK	InstallProgress		Valmis
@@ -102,7 +102,7 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Try installing anyway	InstallProgress		Yritä asentaa kaikesta huolimatta
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Lisää alle sen otsakkeen alapuolelle, jota ei saa muokata, joitakin seuraavanlaisia rivejä:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Oletko varma, että haluat pysäyttää asennuksen?
-Onto:	InstallerWindow		Kohteeseen:
+Onto:	InstallerWindow		levylle:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sulje Käynnistyshallintaikkuna ennen Asennusohjelmaikkunan sulkemista.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kun käynnistät Haikun onnistuneesti ensimmäisen kerran, lue varmuuden vuoksi \"Tervetuloa\" ja \"Käyttäjäopas\" -asiakirjamme. Niihin löytyy linkit työpöydältä ja WebPositive-selaimen kirjanmerkeistä.\n\n
 Tools	InstallerWindow		Työkalut

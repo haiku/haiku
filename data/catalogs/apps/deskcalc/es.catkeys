@@ -1,3 +1,10 @@
-1	spanish; castilian	x-vnd.Haiku-DeskCalc	1498939458
+1	spanish; castilian	x-vnd.Haiku-DeskCalc	1694821448
 Compact	CalcView		Compacta
 Scientific	CalcView		Científica
+DeskCalc	System name		Calculadora
+Basic	CalcView		Básica
+Radians	CalcView		Radianes
+Enable Num Lock on startup	CalcView		Activar bloqueo numérico al inicio
+Calculating	CalcView		Calculando
+Degrees	CalcView		Grados
+Audio Feedback	CalcView		Acople (retroalimentación acústica)

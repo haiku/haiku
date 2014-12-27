@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-LaunchBox	3016105370
+1	spanish; castilian	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Nuevo
 Set description…	LaunchBox		Definir descripción...
 Vertical layout	LaunchBox		Distribución vertical
@@ -6,6 +6,7 @@ OK	LaunchBox		Aceptar
 Pad 1	LaunchBox		Pad 1
 last chance	LaunchBox		última oportunidad
 Quit	LaunchBox		Salir
+Open containing folder	LaunchBox		Abrir carpeta contenedora
 Clear button	LaunchBox		Limpiar botón
 LaunchBox	System name		LaunchBox
 Ignore double-click	LaunchBox		Hacer caso omiso de doble clic

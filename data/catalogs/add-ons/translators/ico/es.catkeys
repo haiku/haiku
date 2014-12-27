@@ -1,8 +1,9 @@
-1	spanish; castilian	x-vnd.Haiku-ICOTranslator	1211895126
+1	spanish; castilian	x-vnd.Haiku-ICOTranslator	3916328565
 Cursor	ICOTranslator		Cursor
 Version %d.%d.%d, %s	ConfigView		Versión %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Imagen %s de Windows de %ld bits
 Valid icon sizes are 16, 32, or 48	ConfigView		Los tamaños válidos de icono son 16, 32 o 48
+Windows icons	ICOTranslator		Iconos tipo Windows
 Enforce valid icon sizes	ConfigView		Permitir solo tamaños válidos de icono
 ICO Settings	main		Configuración de ICO
 Windows icon translator	ICOTranslator		Traductor de iconos de Windows

@@ -1,4 +1,5 @@
-1	spanish; castilian	x-vnd.Haiku-CodyCam	1119712571
+1	spanish; castilian	x-vnd.Haiku-CodyCam	2193838145
+Upload…	VideoConsumer.cpp		Subir…
 Capturing Image…	VideoConsumer.cpp		Capturando imagen...
 Every 30 seconds	CodyCam		Cada 30 segundos
 File name:	CodyCam		Nombre de archivo:
@@ -37,6 +38,7 @@ Every 8 hours	CodyCam		Cada 8 horas
 Rename failed	VideoConsumer.cpp		El renombrado fracasó
 Cannot start time source!	CodyCam		No se puede Iniciar fuente de tiempo!
 Cannot register the video window	CodyCam		No se puede registrar ventana de vídeo
+CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		Cada 24 horas
 unknown command	SettingsHandler		comando desconocido
 Video settings	CodyCam		Configuración de vídeo
@@ -60,6 +62,7 @@ upload client name expected	CodyCam		cargar nombre de cliente previsto
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Conectado...
 PASS <suppressed>  (real password sent)\n	FtpClient		PASE <suprimido> (contraseña verdadera enviada)
+File upload failed	VideoConsumer.cpp		La subida de archivo falló
 Every 5 minutes	CodyCam		Cada 5 minutos
 read: %d\n	SftpClient		leer: %d\n
 Capture controls	CodyCam		Controles de captura

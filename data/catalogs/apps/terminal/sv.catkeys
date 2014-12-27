@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	902912385
+1	swedish	x-vnd.Haiku-Terminal	731520205
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -102,6 +102,5 @@ Find next	Terminal TermWindow		Sök nästa
 Close active tab	Terminal TermWindow		Stäng aktiv flik
 Paste	Terminal TermWindow		Klistra in
 Shell 	Terminal TermWindow		Skal
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDen aktiva processens arbetskatalog.\n\t\t\tEtt maximalt antal sökvägsdelar kan anges\n\t\t\tT.ex. '%2d' för som mest två delar.\n\t%i\t-\tFliknummer.\n\t%p\t-\tDen aktiva processens namn.\n\t%%\t-\tTecknet '%'.
 Cancel	Terminal TermView		Avbryt
 Use default	Terminal SetTitleWindow		Använd förvald

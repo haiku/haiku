@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Terminal	2558826703
+1	lithuanian	x-vnd.Haiku-Terminal	2387434523
 Not found.	Terminal TermWindow		Nerasta.
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Change directory	Terminal TermView		Keisti aplanką
@@ -101,6 +101,5 @@ Find next	Terminal TermWindow		Ieškoti kito
 Close active tab	Terminal TermWindow		Užverti aktyvią kortelę
 Paste	Terminal TermWindow		Įdėti
 Shell 	Terminal TermWindow		Apvalkalas
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tKortelėje vydomos aktyvios užduoties veikiamasis aplankas.\n\t\t\tTaip pat galima nurodyti didžiausią kelio komponenčių skaičių.\n\t\t\tPavyzdžiui, „%2d“ reikš ne daugiau kaip dvi komponentes.\n\t%i\t-\tKortelės eilės numeris.\n\t%p\t-\tKortelėje vykdomos aktyvios užduoties pavadinimas.\n\t%%\t-\tSimbolis „%“.
 Cancel	Terminal TermView		Atsisakyti
 Use default	Terminal SetTitleWindow		Grąžinti numatytąją

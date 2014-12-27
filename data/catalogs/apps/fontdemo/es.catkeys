@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-FontDemo	1300625863
+1	spanish; castilian	x-vnd.Haiku-FontDemo	3522850500
 Outline:	ControlView		Esquema:
 Size: 50	ControlView		Tamaño: 50
 Stop cycling	ControlView		Detener ciclo
@@ -14,6 +14,7 @@ Rotation: 0	ControlView		Rotación: %d
 Drawing mode:	ControlView		Modo de dibujo:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Controles
+FontDemo	System name		FontDemo
 Outline: %d	ControlView		Esquema: %d
 Text:	ControlView		Text:
 Antialiased text	ControlView		Texto suavizado

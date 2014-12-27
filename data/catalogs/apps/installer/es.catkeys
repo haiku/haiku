@@ -1,4 +1,5 @@
-1	spanish; castilian	x-vnd.Haiku-Installer	479854157
+1	spanish; castilian	x-vnd.Haiku-Installer	2181874765
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, la aplicación para configurar el menú de arranque de Haiku, no se pudo abrir.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		¿Está seguro que desea abortar la instalación y reiniciar el sistema?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tescrito por Jérôme Duval y Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -16,9 +17,11 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		Salir del administrador de arranque
 Stop	InstallerWindow		Detener
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Si el acercamiento de os-prober no le funciona, GRUB 2 usa un archivo de configuración adicional para agregar entradas personalizadas al menú de ingreso. Para agregarlas en la parte superior, debe crear/editar un archivo abriendo su editor favorito desde una Terminal así:\n\n
 OK	InstallerApp		Aceptar
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Elija los discos de origen y destino del menú desplegable. Después haga clic en \"Empezar\".
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku en /dev/sda7\n
+Failed to launch Boot Manager	InstallerWindow		Fallo al iniciar Boot Manager
 Install from:	InstallerWindow		Instalar desde:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMACION IMPORTANTE ANTES DE INSTALAR HAIKU\n\n
@@ -33,6 +36,7 @@ Boot sector successfully written.	InstallProgress		Sector de arranque escrito co
 Performing installation.	InstallProgress		Realizando instalación.
 scanning…	InstallerWindow		buscando discos...
 Set up boot menu	InstallerWindow		Configurar menú de Arranque
+2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (desde os-prober v1.44)\n
 Abort	InstallerWindow		Abortar
 Finishing Installation.	InstallProgress		Completando instalación.
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <su editor de textos preferido> /etc/default/grub\n\n
@@ -41,6 +45,7 @@ README	InstallerApp		LÉEME
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		El disco de destino puede que no tenga suficiente espacio libre. Intente seleccionar otro disco o desmarque elementos opcionales.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Por favor cierre las ventanas de administrador de arranque y configuración de unidad antes de cerrar la ventana de instalación.
 Scanning for disks…	InstallerWindow		Buscando discos…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		No se puede montar el disco. Por favor, elija otro.
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alfa\" {\n
@@ -58,6 +63,7 @@ Installer	System name		Instalador
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		No puede instalar los contenidos de un disco sobre sí mismos. Por favor, elija otro disco.
 ???	InstallerWindow	Unknown currently copied item	¿¿¿???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" es el numero de partición, el cual para GRUB 2 comienza en \"1\"\n
+Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Comenzando con os-prober v1.44 (p.ej. en Ubuntu 11.04 o posterior), Haiku debería reconocerse de paquete. Para agregar a Haiku al menú de GRUB, abra una Terminal y escriba:\n\n
 Quit DriveSetup	InstallerWindow		Salir de la configuración de la unidad
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" es el numero de disco duro, empezando con \"0\".\n
 Hide optional packages	InstallerWindow		Ocultar paquetes opcionales
@@ -96,6 +102,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		¿Está seguro de querer parar la instalación?
 Onto:	InstallerWindow		En:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Por favor cierre la ventana del Administrador de Arranque antes de cerrar la ventana de instalación.
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Cuando arranque exitosamente en Haiku la primera vez, asegúrese de ler nuestra documentación de \"Bienvenida\" y \"Guía de usuario\". Hay enlaces en el escritorio y en los marcadores de WebPositive.\n\n
 Tools	InstallerWindow		Herramientas
 The mount point could not be retrieved.	InstallProgress		No se pudo recuperar el punto de montaje.
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <su editor de textos preferido> /etc/grub.d/40_custom\n\n

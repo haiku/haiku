@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PackageInstaller	3253212490
+1	spanish; castilian	x-vnd.Haiku-PackageInstaller	199496416
 Install to:	PackageView		Instalar a:
 OK	PackageView		OK
 Accept	PackageTextViewer		Aceptar
@@ -12,12 +12,14 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		Error al instalar el paquete\n
 Disclaimer	PackageTextViewer		Descargo de responsabilidad
 %.1f GiB	PackageView		%.1f GiB
+%name% (%size% free)	PackageView		%name% (%size% libre)
 The installation of the package has been aborted.	PackageView		La instalación del paquete ha sido abortada.
 Done	PackageInstall		Hecho
 All existing files will be replaced?	PackageView		Serán reemplazados todos los archivos existentes?
 Preparing package	PackageInstall		Preparando paquete
 No package available.	PackageInfo		No hay un paquete disponible.
 none	PackageView		ninguno
+Install %name%	PackageView		Instalar %name%
 Stop	PackageStatus		Parar
 Other…	PackageView		Otro...
 No installation type selected	PackageView		No se ha seleccionado el tipo de instalación
@@ -44,11 +46,14 @@ Decline	PackageTextViewer		Cancelar
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Ya existe en la ruta provista el archivo llamado '%s'.\n¿Reemplazar el archivo por el que viene en el paquete u omitir?
 All existing files will be skipped?	PackageView		¿Todos los archivos existentes serán omitidos?
 Continue	PackageInfo		Continuar
+%index% of %total%	PackageInstall		%index% de %total%
 %.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		Cancelar
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Cancelar
+%name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Continuar
+Begin	PackageView		Empezar
 Replace	PackageView		Reemplazar
 Installation progress	PackageView		Progreso de instalación
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		No se puede leer el paquete.\nQuizás una de las razones es que el archivo solicitado no es un paquete .pkg válido de BeOS

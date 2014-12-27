@@ -1,24 +1,34 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1567310872
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	3507634633
+raw audio	MediaPlayer-InfoWin		audio bruto
+Location	MediaPlayer-InfoWin		Ubicación
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
+%d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		Configuración de transmisión
 <unknown>	PlaylistItem-album		<desconocido>
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Escalar controles en modo de pantalla completa
 Video	MediaPlayer-InfoWin		Video
 Subtitle size:	MediaPlayer-SettingsWindow		Tamaño de subtítulo:
 Save Playlist	MediaPlayer-PlaylistWindow		Guardar lista de reproducción
+<no media>	MediaPlayer-InfoWin		<sin medios>
+(not supported)	MediaPlayer-InfoWin		(sin implementar)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ninguno de los archivos que quería reproducir parecen ser archivos multimedia.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Guardar la lista de reproducción falló.\n\nError:
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Nuevo reproductor de medios...
 100% scale	MediaPlayer-Main		Escala al 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Posición del subtítulo
 Close	MediaPlayer-Main		Cerrar
+Display Mode	MediaPlayer-InfoWin		Modo de visualización
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		No se pudo poner algunos archivos en la papelera.
 <unknown>	MediaPlayer-InfoWin		<desconocido>
+Seek	MediaPlayer-Main		Buscar
 Open	MediaPlayer-Main		Abrir
 Next	MediaPlayer-Main		Siguiente
 OK	MediaPlayer-SettingsWindow		Aceptar
 Track %d	MediaPlayer-Main		Pista %d
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Obtiene/establece la posición actual en microsegundos.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+Display mode	MediaPlayer-InfoWin		Modo de visualización
 Medium	MediaPlayer-SettingsWindow		Mediano
 Close	MediaPlayer-PlaylistWindow		Cerrar
 Open…	MediaPlayer-PlaylistWindow		Abrir...
@@ -27,13 +37,16 @@ Undo	MediaPlayer-PlaylistWindow		Deshacer
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Usar capas de hardware de video si es posible.
 File info…	MediaPlayer-Main		Información del archivo...
 Pause playback.	MediaPlayer-Main		Pausar reproducción.
+Overlay	MediaPlayer-InfoWin		Superposición
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Eliminar entrada
 Close window after playing audio	MediaPlayer-SettingsWindow		Cerrar ventana después de reproducir audio
 Full volume	MediaPlayer-SettingsWindow		Máximo volumen
 Drop files to play	MediaPlayer-Main		Arrastrar archivos a reproducir
 TogglePlaying	MediaPlayer-Main		Reproducir
+Copyright	MediaPlayer-InfoWin		Derechos de autor
 Cancel	MediaPlayer-SettingsWindow		Cancelar
 Loop audio	MediaPlayer-SettingsWindow		Repetir audio
+Container	MediaPlayer-InfoWin		Contenedor
 Nothing to Play	MediaPlayer-Main		Nada para reproducir
 Muted	MediaPlayer-SettingsWindow		Silencio
 Quit	MediaPlayer-Main		Salir
@@ -51,12 +64,16 @@ MediaPlayer	System name		MediaPlayer
 OK	MediaPlayer-Main		Aceptar
 Settings…	MediaPlayer-Main		Configuración...
 MediaPlayer settings	MediaPlayer-SettingsWindow		Configuración del Reproductor de Media
+h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Seleccionar todo
 Move Entry	MediaPlayer-MovePLItemsCmd		Mover entrada
 Open	MediaPlayer-PlaylistWindow		Abrir
 Stop playing.	MediaPlayer-Main		Detener la reproducción
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		Buscar por las cantidades especificadas de microsegundos.
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		El archivo '%filename' no se pudo abrir.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Error:
 Audio	MediaPlayer-InfoWin		Audio
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Error al mover a la papelera
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (mensaje incorrecto). Guardar la lista de reproducción falló.
 Skip to the previous track.	MediaPlayer-Main		Ir a la pista anterior.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% ha encontrado un error interno. No se ha podido abrir el archivo.
@@ -83,17 +100,23 @@ Attributes	MediaPlayer-Main		Atributos
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		No se pudo poner todos los archivos en la papelera.
 <untitled>	PlaylistItem-title		<sin título>
 Track	Audio Track Menu		Pista
+unknown format	MediaPlayer-InfoWin		formato desconocido
+Position	MediaPlayer-Main		Posición
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nada para rehacer>
 Skip to the next track.	MediaPlayer-Main		Ir a la pista siguiente.
 Play	MediaPlayer-Main		Reproducir
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entradas a la papelera
 200% scale	MediaPlayer-Main		Escala al 200%
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece el servidor de medios no está ejecutando.\n¿Quiere iniciarlo?
+Duration	MediaPlayer-InfoWin		Duración
 Aspect ratio	MediaPlayer-Main		Radio de aspecto:
 Error: 	MediaPlayer-Main		Error:
 Large	MediaPlayer-SettingsWindow		Grande
 Bottom of video	MediaPlayer-SettingsWindow		Parte inferior del vídeo
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Stop	MediaPlayer-Main		Parar
+<unnamed media>	MediaPlayer-InfoWin		<multimedia sin nombrar>
+raw video	MediaPlayer-InfoWin		video bruto
 Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (sin memoria ). Guardar lista de reproducción falló.
 Hide interface	MediaPlayer-Main		Esconder interfaz
@@ -103,6 +126,8 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Mover archivo a la papelera
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Silenciar
 Toggle pause/play.	MediaPlayer-Main		Pausar/Reproducir
+Haiku Media Kit: 	MediaPlayer-InfoWin		Kit Multimedia de Haiku: 
+min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Pequeño
 Randomize	MediaPlayer-PlaylistWindow		Aleatorio
 Off	Subtitles menu		Apagar
@@ -110,11 +135,16 @@ Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Desordenar las entradas
 Revert	MediaPlayer-SettingsWindow		Revertir
 Edit	MediaPlayer-PlaylistWindow		Editar
 Start media server	MediaPlayer-Main		Empezar servidor de medios
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Toggle fullscreen.	MediaPlayer-Main		Alternar la vista de pantalla completa.
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obtiene la duración del elemento reproduciéndose actualmente en microsegundos.
+ToggleFullscreen	MediaPlayer-Main		Cambiar a pantalla completa
 <unnamed>	PlaylistItem-name		<sin nombre>
 Open Clips	MediaPlayer-Main		Abrir las secuencias
 OK	MediaPlayer-PlaylistWindow		Aceptar
 none	Audio track menu		ninguno
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obtener/Configurar el voluman (0.0-2.0)
+Duration	MediaPlayer-Main		Duración
 Playlist…	MediaPlayer-Main		Lista de reproducción...
 <unknown>	PlaylistItem-author		<desconocido>
 Save as…	MediaPlayer-PlaylistWindow		Guardar como...
@@ -124,7 +154,9 @@ Always on top	MediaPlayer-Main		Siempre al frente
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entrada a la papelera
 Save	MediaPlayer-Main		Guardar
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nada para deshacer>
+File info	MediaPlayer-InfoWin		Información del archivo
 Save	MediaPlayer-PlaylistWindow		Guardar
+%d Bit	MediaPlayer-InfoWin		%d Bit
 Remove	MediaPlayer-PlaylistWindow		Quitar
 Full screen	MediaPlayer-Main		Pantalla completa
 Open file…	MediaPlayer-Main		Abrir archivo...

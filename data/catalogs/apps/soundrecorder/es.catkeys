@@ -1,22 +1,31 @@
-1	spanish; castilian	x-vnd.Haiku-SoundRecorder	804840835
+1	spanish; castilian	x-vnd.Haiku-SoundRecorder	1849114076
 Loop	RecorderWindow		Bucle
 Cannot find default audio hardware	RecorderWindow		No se encuentra el hardware predeterminado de audio
 Cannot find the temporary file created to hold the new recording	RecorderWindow		No se encuentra el archivo temporal creado para guardar la nueva grabación
+Sample size:	RecorderWindow		Tamaño de la muestra:
 Nothing to play	RecorderWindow		Nada que reproducir
+None of the files appear to be audio files.	RecorderWindow		Ninguno de los archivos parece ser archivo de audio.
+Duration: 	RecorderWindow		Duración: 
 File info	RecorderWindow		Información del archivo
 Drop files here	SoundListView		Arrastrar los archivos aquí
 Input	RecorderWindow		Entrada
+Some of the files don't appear to be audio files.	RecorderWindow		Algunos de los archivos no parecen ser archivos de audio.
 Stop	RecorderWindow		Parar
+Format:	RecorderWindow		Formato:
 Sound List	RecorderWindow		Lista de sonidos
+Compression: 	RecorderWindow		Compresión: 
 Rewind	RecorderWindow		Rebobinar
 Sample rate:	RecorderWindow		Frecuencia de muestreo:
 Invalid audio files	RecorderWindow		Archivo de audio invalido
+ seconds	RecorderWindow		 segundos
 OK	RecorderWindow		OK
 Cannot open the temporary file created to hold the new recording	RecorderWindow		No se puede abrir el archivo temporal creado para guardar la nueva grabación
 Input:	RecorderWindow		Entrada:
 Forward	RecorderWindow		Adelantar
 Play	RecorderWindow		Reproducir
 SoundRecorder	System name		Grabadora de Sonidos
+Channels:	RecorderWindow		Canales:
+ bits	RecorderWindow		 bits
 None	RecorderWindow		Ninguno
 Record	RecorderWindow		Grabar
 Sample size: 	RecorderWindow		Tamaño de la muestra :
@@ -30,3 +39,7 @@ Duration:	RecorderWindow		Duración:
 Compression:	RecorderWindow		Compresión:
 Cannot find an unused name to use for the new recording	RecorderWindow		No se encuentra ningún nombre sin utilizar para la nueva grabación
 Channels: 	RecorderWindow		Canales:
+Save	RecorderWindow		Guardar
+Sample rate: 	RecorderWindow		Frecuencia de muestreo: 
+Cannot connect to media server	RecorderWindow		No se puede conectar con el servidor de media
+File name:	RecorderWindow		Nombre del archivo:

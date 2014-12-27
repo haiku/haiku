@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Mail	3957822883
+1	spanish; castilian	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		Comprobar correo
 Settings	Config Window		Configuración
 Never	Config Window	show status window	Nunca
@@ -6,6 +6,7 @@ Only when dial-up is connected	Config Window		Solo cuando se está conectado por
 While sending and receiving	Config Window		Mientras se envíe y reciba
 days	Config Window		días
 Incoming	Config Window		Entrante
+Server name:	E-Mail		Nombre del servidor:
 OK	Config Window		Aceptar
 Start mail services on startup	Config Window		Iniciar los servicios de correo en el arranque
 E-mail address:	E-Mail		Dirección de correo:

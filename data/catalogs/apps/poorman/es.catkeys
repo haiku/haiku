@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PoorMan	3137659009
+1	spanish; castilian	x-vnd.Haiku-PoorMan	3296382959
 Website location	PoorMan		Posición del sitio web
 Error Server	PoorMan		Error de servidor
 Settings…	PoorMan		Configuración...
@@ -23,19 +23,24 @@ Advanced	PoorMan		Avanzado
 OK	PoorMan		Aceptar
 Status: Stopped	PoorMan		Estado: Parado
 Dir Created	PoorMan		Directorio creado
+Log to file	PoorMan		Registrar en un archivo
 Quit	PoorMan		Salir
 Hits: 0	PoorMan		Golpes: 0
 Save log console	PoorMan		Guarder registro de consola
 Edit	PoorMan		Editar
+Create Log File	PoorMan		Crear archivo de registro
+Log to console	PoorMan		Registrar a consola
 Directory: (none)	PoorMan		Directorio: (ninguno)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor, seleccione la carpeta para publicar en la web. \ n \ nHombre Pobre puede crear un defecto \ "public_html \" en la carpeta de inicio. \ nO se selecciona una de sus propias carpetas en su lugar.
 Log To Console	PoorMan		Registrar a consola
+Connections	PoorMan		Conexiones
 Status: Running	PoorMan		Estado: Ejecutando
 Controls	PoorMan		Controles
 Send file listing if there's no start page	PoorMan		Enviar archivo de lista si no hay página de inicio
 Error Dir	PoorMan		Error Dir
 Select all	PoorMan		Seleccionar todo
 File	PoorMan		Archivo
+File Logging	PoorMan		Registro de archivos
 Save console selections as…	PoorMan		Guardar selecciónes de consola como...
 File logging	PoorMan		Registrando de archivos
 Select web folder	PoorMan		Seleccionar carpeta de web
@@ -51,7 +56,9 @@ Create log file	PoorMan		Crear archivo de registro
 Starting up... 	PoorMan		Empezando...
 Site	PoorMan		Sitio
 Cancel	PoorMan		Cancelar
+Console logging	PoorMan		Registro de consola
 Cannot start the server	PoorMan		No pudimos iniciar el servidor
 Select	PoorMan		Seleccionar
 Save console as…	PoorMan		Guardar consola como...
+PoorMan	System name		PoorMan
 Console Logging	PoorMan		Registrando la consola

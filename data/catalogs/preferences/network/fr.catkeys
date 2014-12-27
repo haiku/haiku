@@ -1,27 +1,11 @@
-1	french	x-vnd.Haiku-Network	1167831177
-Choose automatically	EthernetSettingsView		Choisir automatiquement
-DNS:	EthernetSettingsView		DNS :
-Gateway:	EthernetSettingsView		Passerelle :
-Netmask:	EthernetSettingsView		Masque réseau :
-DHCP	EthernetSettingsView		DHCP
-Apply	EthernetSettingsView		Appliquer
-Netmask is invalid	EthernetSettingsView		Le masque réseau est invalide
-OK	EthernetSettingsView		OK
-IP address:	EthernetSettingsView		Adresse IP :
-Adapter:	EthernetSettingsView		Adaptateur :
-Domain:	EthernetSettingsView		Domaine :
-DNS list is invalid	EthernetSettingsView		La liste des DNS est invalide
-Gateway is invalid	EthernetSettingsView		La passerelle est invalide
-Revert	EthernetSettingsView		Rétablir
-DNS Servers, comma-separated	EthernetSettingsView		Serveurs DNS, séparés par des virgules
-<no wireless networks found>	EthernetSettingsView		<aucun réseau sans fil disponible>
-Network	System name		Réseau
-Mode:	EthernetSettingsView		Mode :
-IP address is invalid	EthernetSettingsView		L'adresse IP est invalide
-Hardware address:	EthernetSettingsView		Adresse matérielle :
-Network:	EthernetSettingsView		Réseau :
-The net_server needs to run for the auto configuration!	EthernetSettingsView		Le net_server doit être lancé pour la configuration automatique !
-Disabled	EthernetSettingsView		Désactivé
-Auto-configuring failed: 	EthernetSettingsView		Échec de la configuration automatique : 
-Static	EthernetSettingsView		Statique
-<no adapter>	EthernetSettingsView		<aucun adaptateur>
+1	french	x-vnd.Haiku-Network	2475894736
+Revert	NetworkSetupWindow		Rétablir
+EAP	EAP protected network		EAP
+WPA2	WPA2 protected network		WPA2
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Apply	NetworkSetupWindow		Appliquer
+Manage…	NetworkSetupWindow		Gérer…
+WPA	WPA protected network		WPA
+open	Open network		ouvrir
+New…	NetworkSetupWindow		Nouveau…
+WEP	WEP protected network		WEP

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	336113194
+1	finnish	x-vnd.Haiku-Terminal	22895100
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -31,6 +31,7 @@ Encoding:	Terminal AppearancePrefView		Koodaus:
 Cancel	Terminal SetTitleWindow		Peru
 Increase	Terminal TermWindow		Kasvata
 Settings	Terminal TermWindow		Asetukset
+Window size	Terminal TermWindow		Ikkunakoko
 Selected text	Terminal AppearancePrefView		Valittu teksti
 Find	Terminal FindWindow		Etsi
 Appearance	Terminal PrefWindow		Ulkoasu
@@ -107,6 +108,5 @@ Find next	Terminal TermWindow		Löydä seuraava
 Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
 Paste	Terminal TermWindow		Liitä
 Shell 	Terminal TermWindow		Komentoikkuna
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tKäynnissä olevan prosessin nykyinen työhakemisto.\n\t\t\tValinnaisesti määriteltävien polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: ’%2d’ kahdelle yleisimmälle komponentille.\n\t%i\t-\tVälilehden indeksi.\n\t%p\t-\tKäytössä olevan prosessin nimi.\n\t%%\t-\tMerkki ’%’.
 Cancel	Terminal TermView		Peru
 Use default	Terminal SetTitleWindow		Käytä oletusta

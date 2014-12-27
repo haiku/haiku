@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-PEPL	3273435274
+1	spanish; castilian	x-vnd.Be-PEPL	2332202134
 Edit	People		Editar
 Error	People		Error
 City	People		Ciudad
@@ -21,6 +21,7 @@ Nickname	People		Apodo
 Quit	People		Abandonar
 Name	People		Nombre
 Revert	People		revertir
+Don't save	People		No guardar
 Undo	People		deshacer
 E-mail	People		E-mail
 Load image…	People		Cargar imagen...
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Teléfono de casa
 Save as…	People		Guardar como...
 Redo	People		Rehacer
+Save changes before closing?	People		¿Desea guardar los cambios antes de cerrar?
 Paste	People		Pegar
 Drop an image here,\nor use the contextual menu.	People		Deja una imagen aquí,\ o usa el menú contextual 
 Save	People		Guardar

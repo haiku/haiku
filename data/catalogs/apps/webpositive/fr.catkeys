@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	979407669
+1	french	x-vnd.Haiku-WebPositive	3678460971
 Show home button	Settings Window		Afficher le bouton de la page d'accueil
 Username:	Authentication Panel		Utilisateur :
 Copy URL to clipboard	Download Window		Copier l'URL dans le presse-papiers
@@ -6,9 +6,9 @@ Cancel	Settings Window		Annuler
 Close window	WebPositive Window		Fermer la fenêtre
 Quit	WebPositive		Quitter
 The download could not be opened.	Download Window		Impossible d'ouvrir l'objet téléchargé.
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Le dossier de téléchargement n'a pas pu être ouvert.\n\nErreur : %error
-Open location	WebPositive Window		Ouvrir l'emplacement
-Clear history	WebPositive Window		Nettoyer l'historique
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Le dossier de téléchargement n’a pas pu être ouvert.\n\nErreur : %error
+Open location	WebPositive Window		Ouvrir l’emplacement
+Clear history	WebPositive Window		Nettoyer l’historique
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Hier
 Default standard font size:	Settings Window		Taille par défaut de la police standard :
@@ -17,8 +17,9 @@ History	WebPositive Window		Historique
 Error opening downloads folder	Download Window		Impossible d'ouvrir le dossier de téléchargement
 Paste	WebPositive Window		Coller
 Double-click or middle-click to open new tab.	Tab Manager		Double-cliquez ou cliquez au milieu pour ouvrir un nouvel onglet.
-Proxy username:	Settings Window		Nom d'utilisateur du serveur mandataire :
+Proxy username:	Settings Window		Nom d’utilisateur du serveur mandataire :
 Save page as…	WebPositive Window		Sauvegarder la page sous…
+Over %days left	Download Window		Plus d’%days restant(s)
 Settings	Settings Window		Réglages
 Confirmation	WebPositive Window		Confirmation
 Window	WebPositive Window		Fenêtre
@@ -36,17 +37,18 @@ Match case	WebPositive Window		Respecter la casse
 Search page:	Settings Window		Page de recherche :
 Zoom text only	WebPositive Window		Grossir uniquement le texte
 Default fixed font size:	Settings Window		Taille par défaut de la police à chasse fixe :
-Close tab	WebPositive Window		Fermer l'onglet
+Close tab	WebPositive Window		Fermer l’onglet
 Auto-hide mouse pointer	Settings Window		Cacher le pointeur de souris automatiquement
 Quit	WebPositive Window		Quitter
 Full screen	WebPositive Window		Plein écran
-Open download error	Download Window		Erreur à l'ouverture du téléchargement
+Open download error	Download Window		Erreur à l’ouverture du téléchargement
 Standard font:	Settings Window		Police standard :
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Rechercher la précédente occurrence de la chaîne
 Restart	Download Window		Recommencer
 Proxy server	Settings Window		Serveur mandataire
 Open containing folder	Download Window		Ouvrir le dossier contenant le fichier
 New window	WebPositive Window		Nouvelle fenêtre
+WebPositive	Download Window		WebPositive
 Open	Download Window		Ouvrir
 Reload	WebPositive Window		Recharger
 Downloads	Download Window		Téléchargements
@@ -57,7 +59,7 @@ Revert	Settings Window		Restaurer
 Fixed font:	Settings Window		Police à chasse fixe :
 Cut	WebPositive Window		Couper
 Bookmark this page	WebPositive Window		Poser un signet sur cette page
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Une erreur est survenue essayant d'afficher le dossier des signets.\n\nErreur : %error
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Une erreur est survenue essayant d’afficher le dossier des signets.\n\nErreur : %error
 Open downloads folder	Download Window		Ouvrir le dossier des téléchargements
 Proxy password:	Settings Window		Mot de passe du serveur mandataire :
 Number of days to keep links in History menu:	Settings Window		Nombre de jours de conservation de l'historique :
@@ -72,7 +74,7 @@ Find next occurrence of search terms	WebPositive Window	find bar next button too
 Apply	Settings Window		Appliquer
 Bookmark info	WebPositive Window		Informations sur le signet
 Size:	Font Selection view		Taille :
-Show tabs if only one page is open	Settings Window		Afficher les onglets même s'il n'y a qu'une page ouverte
+Show tabs if only one page is open	Settings Window		Afficher les onglets même s’il n’y a qu'une page ouverte
 About	WebPositive Window		À propos
 Finish: 	Download Window	Finishing time	Fin : 
 Fonts	Settings Window		Polices
@@ -109,6 +111,7 @@ Password:	Authentication Panel		Mot de passe :
 Back	WebPositive Window		Précédent
 New browser window	Download Window		Nouvelle fenêtre de navigation
 Today	WebPositive Window		Aujourd'hui
+Over %hours left	Download Window		Plus d’%hours restante(s)
 Remember username and password for this site	Authentication Panel		Mémoriser l'utilisateur et son mot de passe pour ce site
 Earlier	WebPositive Window		Avant
 Authentication required	Authentication Panel		Authentification requise
@@ -116,6 +119,7 @@ Use proxy server to connect to the internet	Settings Window		Utiliser un serveur
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Il y a encore des téléchargements en cours. Voulez vous vraiment quitter WebPositive maintenant ?
 Auto-hide interface in full screen mode	Settings Window		Cacher automatiquement l'interface en mode plein écran
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url a échoué
+%seconds left	Download Window		%seconds restante(s)
 New tab	WebPositive Window		Nouvel onglet
 Downloads in progress	WebPositive		Téléchargement en cours
 Style:	Font Selection view		Style :

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	4023244533
+1	french	x-vnd.Haiku-HaikuDepot	3756499622
 Name	PackageListView		Nom
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
 Close	RatePackageWindow		Fermer
@@ -9,7 +9,6 @@ The passwords do not match.	UserLoginWindow		Les mots de passe ne concordent pas
 Log in…	MainWindow		Connexion…
 Rate %Package%	RatePackageWindow		Évaluer %Package%
 Stability:	RatePackageWindow		Stabilité :
-Show available packages	MainWindow		Afficher les paquets disponibles
 Click a package to view information	PackageInfoView		Cliquez sur un paquet pour afficher ses informations
 Other users can see this rating	RatePackageWindow		Les autres utilisateurs peuvent voir cette évaluation
 Stability	RatePackageWindow		Stabilité
@@ -51,7 +50,6 @@ Repeat pass phrase:	UserLoginWindow		Répéter le mot de passe :
 Ratings	PackageInfoView		Évaluations
 But none could be listed here, sorry.	UserLoginWindow		Mais aucun ne peut être listé ici, désolé.
 System & Utilities	Model		Système & Utilitaires
-Show installed packages	MainWindow		Afficher les paquets installés
 Inactive	PackageListView		Inactif
 Refresh depots	MainWindow		Rafraîchir les dépôts
 The package action could not be scheduled: %Error%	PackageInfoView		L'action du paquet n'a pas eu lieu : %Error%
@@ -85,7 +83,6 @@ You need to be logged into an account before you can rate packages.	MainWindow		
  It responded with: 	RatePackageWindow		 Il a répondu : 
 User name:	UserLoginWindow		Nom d'utilisateur :
 User Menu	MainWindow		Menu Utilisateur
-Options	MainWindow		Options
 Unstable but usable	RatePackageWindow		Instable mais utilisable
 The email address appears to be malformed.	UserLoginWindow		L'adresse email semble mal formée.
 Games	Model		Jeux
@@ -114,6 +111,8 @@ Stable	RatePackageWindow		Stable
 Unknown	PackageListView		Inconnu
 All depots	FilterView		Tous les dépôts
 Comment language:	RatePackageWindow		Langue du commentaire :
+Pass phrase:	UserLoginWindow		Mot de passe :
+Screenshot	ScreenshotWindow		Capture d'écran
 Not specified	RatePackageWindow		Non spécifié
 Available	PackageListView		Disponible
 n/a	PackageInfoView		n/a
@@ -124,10 +123,10 @@ Cancel	RatePackageWindow		Annuler
 Package action failed	PackageInfoView		L'action du paquet a échoué
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Envoyer
-Show develop packages	MainWindow		Afficher les paquets de développement
 Category:	FilterView		Catégorie :
 Failed to create account	UserLoginWindow		La création du compte a échoué
 There are problems with the data you entered:\n\n	UserLoginWindow		Il y a des problèmes dans les données saisies :\n\n
+Featured packages	MainWindow		Paquets sélectionnés
 Success	RatePackageWindow		Opération réussie
 Business	Model		Professionnel
 Audio	Model		Son

@@ -1,5 +1,7 @@
-1	spanish; castilian	x-vnd.Haiku-DiskUsage	1435170580
+1	spanish; castilian	x-vnd.Haiku-DiskUsage	4126084555
 Scanning %refName%	Scanner		Escaneando %refName%
+%size% in {0, plural, one{# file} other{# files}	Info Window		%size% en {0, plural, one{# archivo} other{# archivos}
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d archivos
 Size	Info Window		Tamaño
 Rescan	Pie View		Escanear nuevamente
 Kind	Info Window		Tipo
@@ -9,9 +11,13 @@ Path	Info Window		Ruta
 Scan	Status View		Escanear
 Rescan	Status View		Escanear nuevamente
 file unavailable	Status View		Archivo no disponible
+Get info	Pie View		Obtener información
 DiskUsage	System name		DiskUsage
 Created	Info Window		Creado
 Modified	Info Window		Modificado
+Abort	Status View		Abortar
+Open with	Pie View		Abrir con
 Open	Pie View		Abrir
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# archivo} other{# archivos}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Libre en %refName%

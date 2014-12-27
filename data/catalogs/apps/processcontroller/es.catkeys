@@ -1,5 +1,6 @@
-1	spanish; castilian	x-vnd.Haiku-ProcessController	2886374724
+1	spanish; castilian	x-vnd.Haiku-ProcessController	1848752768
 Memory usage	ProcessController		Utilización de almacenamiento
+Kill this team!	ProcessController		¡Eliminar este equipo!
 Idle priority	ProcessController		Prioridad Vacío
 Restart Deskbar	ProcessController		Reactivar Deskbar
 Custom priority	ProcessController		Prioridad personalizada
@@ -7,6 +8,7 @@ This team is already gone…	ProcessController		Este equipo ya sale...
 Error saving file	ProcessController		Error cuando tratamos de gaurdar el archivo
 Real-time priority	ProcessController		Prioridad de Tiempo-Real
 Your setting file could not be saved!\n(%s)	ProcessController		¡Tu archivo de ajustes no pudo ser salvado!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		¿Qué quiere hacer con el equipo \"%s\"?
 This thread is already gone…	ProcessController		Este hilo ya sale...
 Cancel	ProcessController		Cancelar
 Display priority	ProcessController		Prioridad de Muestra
@@ -36,6 +38,7 @@ Threads and CPU usage	ProcessController		Hilos y utilización de CPU
 Urgent display priority	ProcessController		Prioridad de muestra Urgente
 OK	ProcessController		Aceptar
 Damned!	ProcessController		¡Ay caramba!
+Debug this team!	ProcessController		¡Depurar este hilo!
 Usage: %s [-deskbar]\n	ProcessController		Utilización: %s [-deskbar]\n
 ProcessController	System name		Controlador de Procesos
 Real-time display priority	ProcessController		Prioridad de muestra Tiempo-Real

@@ -1,6 +1,6 @@
-1	spanish; castilian	x-vnd.Haiku-Shortcuts	3618270780
+1	spanish; castilian	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		Mover ratón
-OK	ShortcutsWindow		OK
+OK	ShortcutsWindow		Aceptar
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Atajos no pudo guardar tu conjunto de teclas.
 Cancel	ShortcutsWindow		Cancelar
 InsertString	ShortcutsSpec		Insertar cadena
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		Anexar conjunto de claves ...
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Tecla
 Open KeySet…	ShortcutsWindow		Abrir el conjunto de claves
+Error, NULL state description?	ShortcutsSpec		Error, ¿descripción de estado nula?\n
 MouseUp	ShortcutsSpec		Ratón arriba
 Revert to saved	ShortcutsWindow		Volver  guardar
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
@@ -19,10 +20,12 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Atajos no pudo ab
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 SendMessage	ShortcutsSpec		Enviar mensaje
 MoveMouseTo	ShortcutsSpec		MoverRatón a
+Option	ShortcutsSpec	Name for modifier on keyboard	Opción
 Save	ShortcutsWindow		Guardar
 *MouseButton 1	ShortcutsWindow		*Botóndelratón 1
 *MoveMouse +20 +0	ShortcutsWindow		*MovimientodelRatón +20 +0
 MouseDown	ShortcutsSpec		RatónAbajo
+Save changes before closing?	ShortcutsWindow		¿Guardar cambios antes de cerrar?
 Remove selected shortcut	ShortcutsWindow		Eliminar el atajo seleccionado
 MouseButton	ShortcutsSpec		BotóndelRatón
 Add new shortcut	ShortcutsWindow		Añadir un nuevo atajo

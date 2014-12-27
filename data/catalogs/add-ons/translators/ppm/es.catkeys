@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PPMTranslator	2435270880
+1	spanish; castilian	x-vnd.Haiku-PPMTranslator	276252412
 PPM Settings	PPMMain		Configuración PPM
 Based on PPMTranslator sample code	PPMTranslator		Basado en el código de ejemplo de PPMTranslator
 OK	PPMMain		Aceptar
@@ -9,6 +9,7 @@ RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Formato Be Bitmap (PPMTranslator)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
+PPM image translator	PPMTranslator		Transformador de imágenes PPM
 bits/space	PPMTranslator		bits/espacio
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian

@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-HaikuDepot	2422410743
+1	slovenian	x-vnd.Haiku-HaikuDepot	3192425036
 Name	PackageListView		Ime
 Close	RatePackageWindow		Zapri
 Changelog	PackageInfoView		Zapisnik sprememb
@@ -56,7 +56,6 @@ You need to be logged into an account before you can rate packages.	MainWindow		
  It responded with: 	RatePackageWindow		 Odgovoril je: 
 User name:	UserLoginWindow		Uporabniško ime:
 User Menu	MainWindow		Uporabniški meni
-Options	MainWindow		Možnosti
 Unstable but usable	RatePackageWindow		Nestabilen, toda ne neuporaben
 The email address appears to be malformed.	UserLoginWindow		Naslov elektronske pošte se zdi neveljaven.
 Games	Model		Igre
@@ -80,7 +79,6 @@ Authentication failed. Connection to the service failed.	UserLoginWindow		Prijav
 Cancel	RatePackageWindow		Prekliči
 OK	UserLoginWindow		V redu
 Send	RatePackageWindow		Pošlji
-Show develop packages	MainWindow		Pokaži razvojne pakete
 Category:	FilterView		Kategorija:
 Failed to create account	UserLoginWindow		Ni bilo mogoče ustvariti računa
 There are problems with the data you entered:\n\n	UserLoginWindow		S podatki, ki ste jih vnesli, ni vse v redu:\n\n

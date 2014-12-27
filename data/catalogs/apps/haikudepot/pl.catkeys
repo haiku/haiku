@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	1838577979
+1	polish	x-vnd.Haiku-HaikuDepot	3756499622
 Name	PackageListView		Nazwa
 Open %DeskbarLink%	PackageManager		Otwórz %DeskbarLink%
 Close	RatePackageWindow		Zamknij
@@ -9,7 +9,6 @@ The passwords do not match.	UserLoginWindow		Hasła nie zgadzają się.
 Log in…	MainWindow		Zaloguj
 Rate %Package%	RatePackageWindow		Oceń %Package%
 Stability:	RatePackageWindow		Stabilność:
-Show available packages	MainWindow		Pokaż dostępne pakiety
 Click a package to view information	PackageInfoView		Kliknij na pakiet, aby zobaczyć informacje
 Other users can see this rating	RatePackageWindow		Inni użytkownicy będą mogli zobaczyć tę ocenę
 Stability	RatePackageWindow		Stabilność
@@ -51,7 +50,6 @@ Repeat pass phrase:	UserLoginWindow		Powtórz hasło:
 Ratings	PackageInfoView		Oceny
 But none could be listed here, sorry.	UserLoginWindow		Ale żaden nie mógł zostać tutaj wyświetlony.
 System & Utilities	Model		System & narzędzia
-Show installed packages	MainWindow		Pokaż zainstalowane pakiety
 Inactive	PackageListView		Nieaktywny
 Refresh depots	MainWindow		Odśwież listy pakietów
 The package action could not be scheduled: %Error%	PackageInfoView		Akcja dla pakietu nie mogła zostać dodana do kolejki: %Error%
@@ -74,7 +72,6 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 It was not possible to contact the web service.	RatePackageWindow		Nie udało się połączyć z usługą sieciową.
 There are problems in the form:\n\n	UserLoginWindow		W formularzu występują problemy:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Usługa sieciowa nie odnalazła pakietu. To prawdopodobnie oznacza, że pochodzi z repozytorium, które nie jest tutaj obsługiwane. Ocenianie takich pakietów jest niestety niewspierane.
-Show source packages	MainWindow		Pokaż źródłowe pakiety
 Create account	UserLoginWindow		Utwórz konto
 Productivity	Model		Programy użytkowe
 Authentication failed	UserLoginWindow		Autoryzacja nie powiodła się
@@ -86,7 +83,6 @@ You need to be logged into an account before you can rate packages.	MainWindow		
  It responded with: 	RatePackageWindow		Odpowiedź:
 User name:	UserLoginWindow		Nazwa użytkownika:
 User Menu	MainWindow		Menu użytkownika
-Options	MainWindow		Opcje
 Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
 The email address appears to be malformed.	UserLoginWindow		Adres e-mail wygląda na zniekształcony.
 Games	Model		Gry
@@ -127,7 +123,6 @@ Cancel	RatePackageWindow		Anuluj
 Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Wyślij
-Show develop packages	MainWindow		Pokaż deweloperskie pakiety
 Category:	FilterView		Kategoria:
 Failed to create account	UserLoginWindow		Nie udało się utworzyć konta
 There are problems with the data you entered:\n\n	UserLoginWindow		We wprowadzonych danych występują problemy:\n\n

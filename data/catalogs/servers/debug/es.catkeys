@@ -1,3 +1,5 @@
-1	spanish; castilian	x-vnd.Haiku-debug_server	3203333611
+1	spanish; castilian	x-vnd.Haiku-debug_server	1440673937
+Terminate	DebugServer		Terminar
 Debug	DebugServer		Depurar
+Save report	DebugServer		Guardar reporte
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		La aplicación:\n\n %app\n\nha encontrado un error el cual le impide continuar. Haiku terminará con la aplicación y la limpiará.

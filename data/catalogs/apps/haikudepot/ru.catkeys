@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2053713001
+1	russian	x-vnd.Haiku-HaikuDepot	3971634644
 Name	PackageListView		Имя
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
 Close	RatePackageWindow		Закрыть
@@ -8,7 +8,6 @@ The passwords do not match.	UserLoginWindow		Пароли не совпадаю�
 Log in…	MainWindow		Войти…
 Rate %Package%	RatePackageWindow		Оценить %Package%
 Stability:	RatePackageWindow		Стабильность:
-Show available packages	MainWindow		Показать доступные пакеты
 Click a package to view information	PackageInfoView		Нажмите на пакет, чтобы увидеть информацию о нем
 Other users can see this rating	RatePackageWindow		Другие пользователи могут видеть этот рейтинг
 Stability	RatePackageWindow		Стабильность
@@ -48,7 +47,6 @@ Log in	UserLoginWindow		Войти…
 Repeat pass phrase:	UserLoginWindow		Повторить пароль:
 Ratings	PackageInfoView		Оценки
 System & Utilities	Model		Система и утилиты
-Show installed packages	MainWindow		Показать установленные пакеты
 Inactive	PackageListView		Неактивный
 Refresh depots	MainWindow		Обновить склады
 Science & Mathematics	Model		Наука и математика
@@ -68,7 +66,6 @@ Does not start	RatePackageWindow		Не запускается
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Не удалось связаться с веб сервером.
 There are problems in the form:\n\n	UserLoginWindow		В этой форме присутствуют ощибки:\n\n
-Show source packages	MainWindow		Показать пакеты с исходным кодом
 Create account	UserLoginWindow		Создать учётную запись
 Productivity	Model		Офис
 Authentication failed	UserLoginWindow		Авторизация завершилась неудачно
@@ -78,7 +75,6 @@ Size	PackageListView		Размер
 Failed to create or update rating: %s\n	RatePackageWindow		Не удалось создать или изменить рейтинг: %s\n
  It responded with: 	RatePackageWindow		 Он ответил так: 
 User name:	UserLoginWindow		Имя пользователя:
-Options	MainWindow		Параметры
 Unstable but usable	RatePackageWindow		Нестабилен, но пригодный для использования
 The email address appears to be malformed.	UserLoginWindow		Некорректный адрес электронной почты.
 Games	Model		Игры
@@ -115,7 +111,6 @@ n/a	PackageInfoView		н/д
 Cancel	RatePackageWindow		Отмена
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Отправить
-Show develop packages	MainWindow		Показать пакеты для разработчиков
 Category:	FilterView		Категория:
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
 Featured packages	MainWindow		Популярные пакеты

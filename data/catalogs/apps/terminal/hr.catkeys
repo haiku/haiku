@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Terminal	3878084819
+1	croatian	x-vnd.Haiku-Terminal	3706692639
 Not found.	Terminal TermWindow		Nije pronađeno.
 Switch Terminals	Terminal TermWindow		Zamjeni terminale
 Change directory	Terminal TermView		Promijeni direktorij
@@ -85,6 +85,5 @@ Find next	Terminal TermWindow		Nađi tekst
 Close active tab	Terminal TermWindow		Zatvori aktivnu karticu
 Paste	Terminal TermWindow		Zalijepi
 Shell 	Terminal TermWindow		Shell 
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tRadna direktorija aktivnog procesa\n\t\t\tOpcionalni maksimalni broj komponenti koje mogu biti\n\t\t\tspecificirane. Npr. '%2d' za najviše dvije komponente\n\t%i\t-\tIndex tab-a.\n\t%p\t-\tIme aktivnog procesa\n\t%%\t-\tKarakter '%'.
 Cancel	Terminal TermView		Odustani
 Use default	Terminal SetTitleWindow		Koristi zadano

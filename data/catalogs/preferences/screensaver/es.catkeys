@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ScreenSaver	904083067
+1	spanish; castilian	x-vnd.Haiku-ScreenSaver	1801423325
 Could not load screen saver	ScreenSaver		No podemos activar salvapantallas
 30 seconds	ScreenSaver		30 segundos
 Start screensaver	ScreenSaver		Iniciar salvapantallas
@@ -10,7 +10,9 @@ Display Power Management Signaling not available	ScreenSaver		La señal de manej
 ScreenSaver	System name		Salvapantallas
 Test	ScreenSaver		Prueba
 General	ScreenSaver		General
+Fade now when mouse is here	ScreenSaver		Atenuar cuando el ratón esté aquí
 Enable screensaver	ScreenSaver		Habilitar salvapantallas
+Don't fade when mouse is here	ScreenSaver		No atenuar cuando el ratón esté aquí
 Cancel	ScreenSaver		Cancelar
 Turn off screen	ScreenSaver		Apagar pantalla
 No options available	ScreenSaver		No hay opciones disponibles.

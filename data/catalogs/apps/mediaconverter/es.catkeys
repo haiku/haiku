@@ -1,9 +1,14 @@
-1	spanish; castilian	x-vnd.Haiku-MediaConverter	3718479311
+1	spanish; castilian	x-vnd.Haiku-MediaConverter	341686525
 Video using parameters form settings	MediaConverter		Usar parámetros de video de la configuración
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{El archivo no se reconoció como un archivo de medios soportado:} other{# archivos no se reconocieron como archivos de medios soportados:}}
 Video encoding:	MediaConverter		Codificación de video:
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Error read audio frame %lld	MediaConverter		Error al leer el frame de audio %lld
 No audio	Audio codecs list		Sin audio
 Error	MediaConverter		Error
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
 Error loading a file	MediaConverter		Error al cargar un archivo
+Error read video frame %lld	MediaConverter		Error leyendo el frame de video %lld
 File Error	MediaConverter-FileInfo		Error de archivo
 Open…	Menu		Abrir...
 Start [ms]: 	MediaConverter		Iniciar [ms]:
@@ -14,13 +19,19 @@ MediaConverter	System name		MediaConverter
 No video	Video codecs list		Sin video
 Duration:	MediaConverter-FileInfo		Duración:
 OK	MediaConverter		Aceptar
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 Error converting '%filename'	MediaConverter		Error al convertir '%filename'
 Low	MediaConverter		Bajo
 Conversion completed	MediaConverter		Conversión completada
 Audio:	MediaConverter-FileInfo		Audio:
 OK	MediaConverter-FileInfo		Aceptar
+ seconds	MediaFileInfo		 segundos
 Source files	MediaConverter		Archivos de entrada
+Error writing video frame %lld	MediaConverter		Error escribiendo el frame de video %lld
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
+Error writing audio frame %lld	MediaConverter		Error escribiendo el frame de audio %lld
 Cancelling	MediaConverter		Cancelando
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
 Error loading files	MediaConverter		Error al cargar los archivos
 Cancel	MediaConverter		Cancelar
 None available	Video codecs		No hay ninguno disponible
@@ -48,9 +59,11 @@ Drop media files onto this window	MediaConverter		Arrastre los archivos multimed
 Audio encoding:	MediaConverter		Codificación de audio:
 Audio quality not supported	MediaConverter		Calidad de audio no soportada
 File	Menu		Archivo
+%.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
 Convert	MediaConverter		Convertir
 Writing audio track: %ld%% complete	MediaConverter		Escribiendo pista de audio: %ld%% completo
 Video quality: %3d%%	MediaConverter		Calidad de video: %3d%%
+%.1f kHz %ld channel	MediaFileInfo		canal %.1f kHz %ld
 Output folder	MediaConverter		Directorio de salida
 Audio quality: %3d%%	MediaConverter		Calidad de audio: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Un error ha ocurrido al leer la información del archivo.\n\nError:

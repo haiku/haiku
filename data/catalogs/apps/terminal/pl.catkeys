@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	194287280
+1	polish	x-vnd.Haiku-Terminal	22895100
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz terminal
 Change directory	Terminal TermView		Zmień folder
@@ -108,6 +108,5 @@ Find next	Terminal TermWindow		Znajdź następny
 Close active tab	Terminal TermWindow		Zamknij aktywną kartę
 Paste	Terminal TermWindow		Wklej
 Shell 	Terminal TermWindow		Shell 
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tŚcieżka dostępu do aktywnych procesów.\n\t\t\tOpcjonalnie maksymalna liczba komponentów ścieżek która może zostać\n\t\t\tustalona. Np. '%2d' dla najwyżej dwóch komponentów.\n\t%i\t-\tIndex karty.\n\t%p\t-\tNazwa aktywnego procesu.\n\t%%\t-\tZnak '%'.
 Cancel	Terminal TermView		Anuluj
 Use default	Terminal SetTitleWindow		Użyj domyślnych

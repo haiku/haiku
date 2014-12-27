@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-mixer.media_addon	839382147
+1	spanish; castilian	x-vnd.Haiku-mixer.media_addon	3450667169
 Input gain controls represent	AudioMixer		Controles de ganancia de entrada representan
 Linear interpolation	AudioMixer		Interpolación lineal
 Virtual output channels	AudioMixer		Canales virtuales de salida
@@ -10,6 +10,8 @@ Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Salida del mezclador at
 Display balance control for stereo connections	AudioMixer		Pantalla de control de balance para las conexiones estéreo
 To output	AudioMixer		A salida
 not connected	AudioMixer		no conectado
+Refuse input format changes	AudioMixer		Rechazar los cambios de formato de entrada
+Drop/repeat samples	AudioMixer		Muestras de soltar/repetir
 Output channel sources	AudioMixer		Fuentes de salida del canal
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Controles de ganancia

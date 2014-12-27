@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Terminal	850247788
+1	romanian	x-vnd.Haiku-Terminal	678855608
 Not found.	Terminal TermWindow		Nu a fost găsit.
 Switch Terminals	Terminal TermWindow		Comută terminale
 Change directory	Terminal TermView		Modifică dosar
@@ -99,6 +99,5 @@ Find next	Terminal TermWindow		Găsește următorul
 Close active tab	Terminal TermWindow		Închide tabul activ
 Paste	Terminal TermWindow		Lipește
 Shell 	Terminal TermWindow		Shell
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDosarul curent al procesului activ.\n\t\t\tPoate fi specificat opțional numărul maxim de componente\n\t\t\tale căii.Ex: „%2d” pentru cel mult două componente.\n\t%i\t-\tIndicele de tab.\n\t%p\t-\tNumele procesului activ.\n\t%%\t-\tCaracterul „%”.
 Cancel	Terminal TermView		Anulează
 Use default	Terminal SetTitleWindow		Utilizează implicit

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	3703615311
+1	french	x-vnd.Haiku-About	2602947375
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 par les auteurs de Gutenprint. Tous droits réservés.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (et son noyau, NewOS)\n
 Ralink (firmware)	AboutWindow		Ralink (firmware)
@@ -44,6 +44,7 @@ Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright �
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Ce logiciel est basé en partie sur le travail de l'Independent JPEG Group.
 Past maintainers:\n	AboutView		Précédents développeurs :\n
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Contient des logiciels du projet FreeBSD, publiés sous licence BSD :\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Tout droits réservés.
 GNU GPL v3	AboutWindow		GNU GPL v3
 \n\nSpecial thanks to:\n	AboutView		\n\nRemerciements spéciaux à :\n
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…et surement d'autres que nous avons oubliés (désolé !)\n\n
@@ -74,7 +75,6 @@ The University of Auckland and Christof Lutteroth\n\n	AboutView		L'université d
 Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratory, l'Université de Tokyo.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Tous droits réservés.
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
-Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Copyright © 2002-2008 Alexander L. Roshal. Tous droits réservés.
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Tous droits réservés.
 %ld MHz	AboutView		%ld MHz
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH et Thomas Merz. Tous droits réservés.\nPDFlib et le logo PDFlib sont des marques déposées de PDFlib GmbH.

@@ -1,4 +1,5 @@
-1	spanish; castilian	x-vnd.Haiku-Time	3798603099
+1	spanish; castilian	x-vnd.Haiku-Time	2290715672
+GMT (UNIX compatible)	Time		UTC (Tiempo Universal Coordinado, compatible UNIX)
 OK	Time		Aceptar
 Asia	Time		Asia
 \nNow: 	Time		\nAhora:
@@ -10,11 +11,13 @@ Preview time:	Time		Vista previa de hora:
 Synchronize	Time		Sincronizar
 Revert	Time		Revertir
 Pacific	Time		Pacífico
+Show day of week	Time		Mostrar día de la semana
 Add	Time		Añadir
 Date and time	Time		Fecha y hora
 about	Time		sobre
+Local time (Windows compatible)	Time		Hora local (compatible con Windows)
 Message receiving failed	Time		Fallo en la recepción del mensaje
-Set time zone	Time		Definir huso horario:
+Set time zone	Time		Definir zona horaria
 Waiting for answer failed	Time		Fallo en la espera de respuesta
 Hardware clock set to:	Time		Establecer el reloj físico a:
 The following error occured while synchronizing:r\n%s	Time		Se produjo el siguiente error durante la sincronización:r\n%s
@@ -24,17 +27,22 @@ Time	Time		Hora
 Indian	Time		Hindú
 Sending request failed	Time		Falló el envío de solicitud
 Arctic	Time		Ártico
+Display time with seconds	Time		Mostrar hora con segundos
 Time	System name		Hora
 America	Time		América
 Synchronize at boot	Time		Sincronizar al inicio
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Fecha y hora, escrito por:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\n Copyright 2004-2012, Haiku.
 Received invalid time	Time		Se recibió un tiempo inválido
 Antarctica	Time		Antártico
+Show time zone	Time		Mostrar huso horario:
+Show clock in Deskbar	Time		Mostrar reloj en la barra de escritorio
 The following error occured while synchronizing:r\n%s: %s	Time		Se produjo el siguiente error durante la sincronización:r\n%s :%s
 <Other>	Time		<Otro>
-Current time:	Time		Hora Actual:
+Current time:	Time		Hora actual:
 Try all servers	Time		Probar todos los servidores
-Time zone	Time		Huso horario
+Time zone	Time		Zona horaria
 Could not create socket	Time		No se pudo crear el socket
 Synchronize again	Time		Sincronizar de nuevo
+Clock	Time		Reloj
 Network time	Time		Hora de red
 Atlantic	Time		Atlántico
