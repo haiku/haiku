@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
@@ -42,6 +42,10 @@ enum {
 	kActionSaveReportTeam,
 	kActionPromptUser
 };
+
+
+static const char* kDebuggerSignature = "application/x-vnd.Haiku-Debugger";
+static const int32 MSG_DEBUG_THIS_TEAM = 'dbtt';
 
 
 //#define HANDOVER_USE_GDB 1
@@ -648,6 +652,20 @@ TeamDebugHandler::_EnterDebugger(bool saveReport)
 		"terminal (debugger) for team %" B_PRId32 "...\n", fTeam));
 
 #elif defined(HANDOVER_USE_DEBUGGER)
+	if (!debugInConsoled && !saveReport
+		&& be_roster->IsRunning(kDebuggerSignature)) {
+
+		// for graphical handovers, check if Debugger is already running,
+		// and if it is, simply send it a message to attach to the requested
+		// team.
+		BMessenger messenger(kDebuggerSignature);
+		BMessage message(MSG_DEBUG_THIS_TEAM);
+		if (message.AddInt32("team", fTeam) == B_OK
+			&& messenger.SendMessage(&message) == B_OK) {
+			return 0;
+		}
+	}
+
 	// prepare the argument vector
 	BPath debuggerPath;
 	if (debugInConsoled) {
