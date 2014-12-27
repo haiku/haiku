@@ -653,6 +653,9 @@ MainWindow::_AdoptModel()
 	const PackageInfoRef& selectedPackage = fPackageInfoView->Package();
 	fFeaturedPackagesView->SelectPackage(selectedPackage);
 	fPackageListView->SelectPackage(selectedPackage);
+
+	if (!fVisiblePackages.Contains(fPackageInfoView->Package()))
+		fPackageInfoView->Clear();
 }
 
 
