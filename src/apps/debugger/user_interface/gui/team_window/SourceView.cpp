@@ -330,6 +330,8 @@ private:
 			};
 
 			float				_MaxLineWidth();
+	inline	float				_FormattedLineWidth(const char* line) const;
+
 			void				_DrawLineSyntaxSection(const char* line,
 									int32 length, int32& _column,
 									BPoint& _offset);
@@ -1523,13 +1525,27 @@ SourceView::TextView::_MaxLineWidth()
 
 	fMaxLineWidth = 0;
 	if (fSourceCode != NULL) {
-		for (int32 i = 0; const char* line = fSourceCode->LineAt(i); i++) {
-			fMaxLineWidth = std::max(fMaxLineWidth,
-				fFontInfo->font.StringWidth(line));
-		}
+		for (int32 i = 0; const char* line = fSourceCode->LineAt(i); i++)
+			fMaxLineWidth = std::max(fMaxLineWidth, _FormattedLineWidth(line));
 	}
 
 	return fMaxLineWidth;
+}
+
+
+float
+SourceView::TextView::_FormattedLineWidth(const char* line) const
+{
+	int32 column = 0;
+	int32 i = 0;
+	for (; line[i] != '\0'; i++) {
+		if (line[i] == '\t')
+			column = _NextTabStop(column);
+		else
+			++column;
+	}
+
+	return column * fCharacterWidth;
 }
 
 
