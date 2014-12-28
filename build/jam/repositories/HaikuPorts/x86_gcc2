@@ -375,7 +375,7 @@ RemotePackageRepository HaikuPorts
 	automoc_x86-0.9.88-2
 	avrdude_x86-6.0.1-1
 	beshare_x86-4-1
-	binutils_x86-2.24_2014_03_19-8
+	binutils_x86-2.25_2014_12_27-1
 	bison_x86-2.5-1
 	boost_x86-1.55.0-5
 	boost_x86_atomic-1.55.0-5
