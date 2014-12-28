@@ -38,10 +38,12 @@ ObjectTracker::~ObjectTracker()
 	ObjectTrackable* trackable = fTrackables.First();
 	if (trackable) {
 		WARN(("ObjectTracker: WARNING: There are still undeleted objects:\n"));
+#ifndef _KERNEL_MODE
 		for (; trackable; trackable = fTrackables.GetNext(trackable)) {
 			WARN(("  trackable: %p: type: `%s'\n", trackable,
 				typeid(*trackable).name()));
 		}
+#endif
 	}
 }
 
