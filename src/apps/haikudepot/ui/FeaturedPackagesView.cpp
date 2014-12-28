@@ -29,6 +29,8 @@
 
 static const rgb_color kLightBlack = (rgb_color){ 60, 60, 60, 255 };
 
+static BitmapRef sInstalledIcon(new(std::nothrow) SharedBitmap(504), true);
+
 
 // #pragma mark - PackageView
 
@@ -46,6 +48,7 @@ public:
 		SetEventMask(B_POINTER_EVENTS);
 		
 		fIconView = new BitmapView("package icon view");
+		fInstalledIconView = new BitmapView("installed icon view");
 		fTitleView = new BStringView("package title view", "");
 		fPublisherView = new BStringView("package publisher view", "");
 
@@ -87,7 +90,11 @@ public:
 		BLayoutBuilder::Group<>(this)
 			.Add(fIconView)
 			.AddGroup(B_VERTICAL, 1.0f, 2.2f)
-				.Add(fTitleView)
+				.AddGroup(B_HORIZONTAL)
+					.Add(fTitleView)
+					.Add(fInstalledIconView)
+					.AddGlue()
+				.End()
 				.Add(fPublisherView)
 				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 			.End()
@@ -149,6 +156,12 @@ public:
 		} else
 			fIconView->SetBitmap(NULL);
 
+		if (package->State() == ACTIVATED) {
+			fInstalledIconView->SetBitmap(
+				sInstalledIcon->Bitmap(SharedBitmap::SIZE_16));
+		} else
+			fInstalledIconView->SetBitmap(NULL);
+
 		fTitleView->SetText(package->Title());
 
 		BString publisher = package->Publisher().Name();
@@ -187,6 +200,7 @@ public:
 		fPackageListener->SetPackage(PackageInfoRef(NULL));
 
 		fIconView->SetBitmap(NULL);
+		fInstalledIconView->SetBitmap(NULL);
 		fTitleView->SetText("");
 		fPublisherView->SetText("");
 		fSummaryView->SetText("");
@@ -216,6 +230,7 @@ public:
 
 		views.Add(this);
 		views.Add(fIconView);
+		views.Add(fInstalledIconView);
 		views.Add(fTitleView);
 		views.Add(fPublisherView);
 		views.Add(fSummaryView);
@@ -236,6 +251,7 @@ private:
 	OnePackageMessagePackageListener* fPackageListener;
 
 	BitmapView*						fIconView;
+	BitmapView*						fInstalledIconView;
 
 	BStringView*					fTitleView;
 	BStringView*					fPublisherView;
@@ -247,6 +263,7 @@ private:
 	BStringView*					fVoteInfo;
 
 	bool							fSelected;
+
 };
 
 
@@ -341,3 +358,9 @@ FeaturedPackagesView::SelectPackage(const PackageInfoRef& package)
 	}
 }
 
+
+void
+FeaturedPackagesView::CleanupIcons()
+{
+	sInstalledIcon.Unset();
+}

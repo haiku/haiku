@@ -25,9 +25,10 @@ public:
 			
 			void				SelectPackage(const PackageInfoRef& package);
 
+	static	void				CleanupIcons();
+
 private:
 			BGroupLayout*		fPackageListLayout;
-
 };
 
 
