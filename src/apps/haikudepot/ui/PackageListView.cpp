@@ -451,7 +451,7 @@ enum {
 	kTitleColumn,
 	kRatingColumn,
 	kDescriptionColumn,
-	kSizeColumn,
+//	kSizeColumn,
 	kStatusColumn,
 };
 
@@ -480,7 +480,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 
 	// Size
 	// TODO: Store package size
-	SetField(new BStringField("0 KiB"), kSizeColumn);
+//	SetField(new BStringField("0 KiB"), kSizeColumn);
 
 	// Status
 	SetField(new BStringField(package_state_to_string(fPackage)),
@@ -640,8 +640,8 @@ PackageListView::PackageListView(BLocker* modelLock)
 		B_TRUNCATE_MIDDLE), kRatingColumn);
 	AddColumn(new PackageColumn(B_TRANSLATE("Description"), 300, 80, 1000,
 		B_TRUNCATE_MIDDLE), kDescriptionColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Size"), 60, 50, 100,
-		B_TRUNCATE_END), kSizeColumn);
+//	AddColumn(new PackageColumn(B_TRANSLATE("Size"), 60, 50, 100,
+//		B_TRUNCATE_END), kSizeColumn);
 	AddColumn(new PackageColumn(B_TRANSLATE("Status"), 60, 60, 100,
 		B_TRUNCATE_END), kStatusColumn);
 
