@@ -890,31 +890,31 @@ public:
 		fPackageVersionView->SetHighColor(kLightBlack);
 
 		// TODO: User rating IDs to identify which rating to vote up or down
-		BMessage* voteUpMessage = new BMessage(MSG_VOTE_UP);
-		voteUpMessage->AddInt32("rating id", -1);
-		BMessage* voteDownMessage = new BMessage(MSG_VOTE_DOWN);
-		voteDownMessage->AddInt32("rating id", -1);
-
-		fVoteUpIconView = new BitmapButton("vote up icon", voteUpMessage);
-		fUpVoteCountView = new BStringView("up vote count", "");
-		fVoteDownIconView = new BitmapButton("vote down icon", voteDownMessage);
-		fDownVoteCountView = new BStringView("up vote count", "");
-
-		fVoteUpIconView->SetBitmap(
-			voteUpIcon->Bitmap(SharedBitmap::SIZE_16));
-		fVoteDownIconView->SetBitmap(
-			voteDownIcon->Bitmap(SharedBitmap::SIZE_16));
-
-		fUpVoteCountView->SetFont(&versionFont);
-		fUpVoteCountView->SetHighColor(kLightBlack);
-		fDownVoteCountView->SetFont(&versionFont);
-		fDownVoteCountView->SetHighColor(kLightBlack);
-
-		BString voteCountLabel;
-		voteCountLabel.SetToFormat("%" B_PRId32, rating.UpVotes());
-		fUpVoteCountView->SetText(voteCountLabel);
-		voteCountLabel.SetToFormat("%" B_PRId32, rating.DownVotes());
-		fDownVoteCountView->SetText(voteCountLabel);
+//		BMessage* voteUpMessage = new BMessage(MSG_VOTE_UP);
+//		voteUpMessage->AddInt32("rating id", -1);
+//		BMessage* voteDownMessage = new BMessage(MSG_VOTE_DOWN);
+//		voteDownMessage->AddInt32("rating id", -1);
+//
+//		fVoteUpIconView = new BitmapButton("vote up icon", voteUpMessage);
+//		fUpVoteCountView = new BStringView("up vote count", "");
+//		fVoteDownIconView = new BitmapButton("vote down icon", voteDownMessage);
+//		fDownVoteCountView = new BStringView("up vote count", "");
+//
+//		fVoteUpIconView->SetBitmap(
+//			voteUpIcon->Bitmap(SharedBitmap::SIZE_16));
+//		fVoteDownIconView->SetBitmap(
+//			voteDownIcon->Bitmap(SharedBitmap::SIZE_16));
+//
+//		fUpVoteCountView->SetFont(&versionFont);
+//		fUpVoteCountView->SetHighColor(kLightBlack);
+//		fDownVoteCountView->SetFont(&versionFont);
+//		fDownVoteCountView->SetHighColor(kLightBlack);
+//
+//		BString voteCountLabel;
+//		voteCountLabel.SetToFormat("%" B_PRId32, rating.UpVotes());
+//		fUpVoteCountView->SetText(voteCountLabel);
+//		voteCountLabel.SetToFormat("%" B_PRId32, rating.DownVotes());
+//		fDownVoteCountView->SetText(voteCountLabel);
 
 		fTextView = new TextView("rating text");
 		fTextView->SetViewColor(ViewColor());
@@ -934,13 +934,13 @@ public:
 					.AddGlue(0.1f)
 					.Add(fPackageVersionView)
 					.AddGlue(5.0f)
-					.AddGroup(B_HORIZONTAL, 0.0f, 0.0f)
-						.Add(fVoteUpIconView)
-						.Add(fUpVoteCountView)
-						.AddStrut(B_USE_HALF_ITEM_SPACING)
-						.Add(fVoteDownIconView)
-						.Add(fDownVoteCountView)
-					.End()
+//					.AddGroup(B_HORIZONTAL, 0.0f, 0.0f)
+//						.Add(fVoteUpIconView)
+//						.Add(fUpVoteCountView)
+//						.AddStrut(B_USE_HALF_ITEM_SPACING)
+//						.Add(fVoteDownIconView)
+//						.Add(fDownVoteCountView)
+//					.End()
 				.End()
 				.Add(fTextView)
 			.End()
@@ -955,10 +955,10 @@ private:
 	BStringView*	fRatingLabelView;
 	BStringView*	fPackageVersionView;
 
-	BitmapView*		fVoteUpIconView;
-	BStringView*	fUpVoteCountView;
-	BitmapView*		fVoteDownIconView;
-	BStringView*	fDownVoteCountView;
+//	BitmapView*		fVoteUpIconView;
+//	BStringView*	fUpVoteCountView;
+//	BitmapView*		fVoteDownIconView;
+//	BStringView*	fDownVoteCountView;
 
 	TextView*		fTextView;
 };
