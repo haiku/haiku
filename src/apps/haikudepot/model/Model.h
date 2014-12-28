@@ -120,6 +120,7 @@ public:
 	static	const uint32		POPULATE_SCREEN_SHOTS	= 1 << 3;
 	static	const uint32		POPULATE_CHANGELOG		= 1 << 4;
 	static	const uint32		POPULATE_CATEGORIES		= 1 << 5;
+	static	const uint32		POPULATE_FORCE			= 1 << 6;
 
 			void				PopulatePackage(const PackageInfoRef& package,
 									uint32 flags);

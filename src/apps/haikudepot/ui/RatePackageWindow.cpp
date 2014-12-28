@@ -567,6 +567,10 @@ RatePackageWindow::_SendRatingThread()
 		_SetWorkerThread(-1);
 	} else {
 		_SetWorkerThread(-1);
+
+		fModel.PopulatePackage(fPackage,
+			Model::POPULATE_FORCE | Model::POPULATE_USER_RATINGS);
+
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 
 		BString message;

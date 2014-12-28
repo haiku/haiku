@@ -620,9 +620,11 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 	// Especially screen-shots will be a problem eventually.
 	{
 		BAutolock locker(&fLock);
-		if (fPopulatedPackages.Contains(package))
+		bool alreadyPopulated = fPopulatedPackages.Contains(package);
+		if ((flags & POPULATE_FORCE) == 0 && alreadyPopulated)
 			return;
-		fPopulatedPackages.Add(package);
+		if (!alreadyPopulated)
+			fPopulatedPackages.Add(package);
 	}
 
 	if ((flags & POPULATE_USER_RATINGS) != 0) {
