@@ -172,17 +172,27 @@ Tokenizer::NextToken()
 		fCurrentToken = Token(begin, length, _CurrentPos() - length,
 			TOKEN_IDENTIFIER);
 	} else if (*fCurrentChar == '"' || *fCurrentChar == '\'') {
+		bool terminatorFound = false;
 		const char* begin = fCurrentChar++;
 		while (*fCurrentChar != 0) {
 			if (*fCurrentChar == '\\') {
 				if (*(fCurrentChar++) != 0)
 					fCurrentChar++;
-			} else if (*(fCurrentChar++) == *begin)
+			} else if (*(fCurrentChar++) == *begin) {
+				terminatorFound = true;
 				break;
+			}
 		}
+		int32 tokenType = TOKEN_STRING_LITERAL;
+		if (!terminatorFound) {
+			tokenType = *begin == '"' ? TOKEN_DOUBLE_QUOTE
+					: TOKEN_SINGLE_QUOTE;
+			fCurrentChar = begin + 1;
+		}
+
 		int32 length = fCurrentChar - begin;
 		fCurrentToken = Token(begin, length, _CurrentPos() - length,
-			TOKEN_STRING_LITERAL);
+			tokenType);
 	} else {
 		if (!_ParseOperator()) {
 			int32 type = TOKEN_NONE;
