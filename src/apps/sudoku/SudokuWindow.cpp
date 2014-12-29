@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2014, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -274,6 +274,10 @@ SudokuWindow::SudokuWindow()
 	menu->AddItem(fRestoreStateItem = new BMenuItem(
 		B_TRANSLATE("Restore snapshot"), new BMessage(kMsgRestoreState)));
 	fRestoreStateItem->SetEnabled(fStoredState != NULL);
+	menu->AddSeparatorItem();
+
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Set all hints"),
+		new BMessage(kMsgSetAllHints)));
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Solve"),

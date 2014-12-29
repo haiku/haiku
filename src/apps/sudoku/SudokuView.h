@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2014, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SUDOKU_VIEW_H
@@ -12,6 +12,7 @@
 
 class BDataIO;
 class SudokuField;
+class SudokuSolver;
 struct entry_ref;
 
 
@@ -113,6 +114,10 @@ private:
 			void				_UndoRedo(BObjectList<BMessage>& undos,
 									BObjectList<BMessage>& redos);
 			void				_PushUndo();
+			void				_SetAllHints();
+			void				_Solve();
+			void				_SolveSingle();
+			bool				_GetSolutions(SudokuSolver& solver);
 
 private:
 			rgb_color			fBackgroundColor;
@@ -146,6 +151,7 @@ private:
 static const uint32 kMsgSudokuSolved = 'susl';
 static const uint32 kMsgSolveSudoku = 'slvs';
 static const uint32 kMsgSolveSingle = 'slsg';
+static const uint32 kMsgSetAllHints = 'salh';
 
 // you can observe these:
 static const int32 kUndoRedoChanged = 'unre';

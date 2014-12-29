@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2014, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1101,53 +1101,17 @@ SudokuView::MessageReceived(BMessage* message)
 			Redo();
 			break;
 
-		case kMsgSolveSudoku:
-		{
-			SudokuSolver solver;
-			solver.SetTo(fField);
-			bigtime_t start = system_time();
-			solver.ComputeSolutions();
-			printf("found %" B_PRIu32 " solutions in %g msecs\n",
-				solver.CountSolutions(), (system_time() - start) / 1000.0);
-			if (solver.CountSolutions() > 0) {
-				_PushUndo();
-				fField->SetTo(solver.SolutionAt(0));
-				Invalidate();
-			} else
-				beep();
+		case kMsgSetAllHints:
+			_SetAllHints();
 			break;
-		}
+
+		case kMsgSolveSudoku:
+			_Solve();
+			break;
 
 		case kMsgSolveSingle:
-		{
-			if (fField->IsSolved()) {
-				beep();
-				break;
-			}
-
-			SudokuSolver solver;
-			solver.SetTo(fField);
-			bigtime_t start = system_time();
-			solver.ComputeSolutions();
-			printf("found %" B_PRIu32 " solutions in %g msecs\n",
-				solver.CountSolutions(), (system_time() - start) / 1000.0);
-			if (solver.CountSolutions() > 0) {
-				_PushUndo();
-
-				// find free spot
-				uint32 x, y;
-				do {
-					x = rand() % fField->Size();
-					y = rand() % fField->Size();
-				} while (fField->ValueAt(x, y));
-
-				fField->SetValueAt(x, y,
-					solver.SolutionAt(0)->ValueAt(x, y));
-				_InvalidateField(x, y);
-			} else
-				beep();
+			_SolveSingle();
 			break;
-		}
 
 		default:
 			BView::MessageReceived(message);
@@ -1320,3 +1284,70 @@ SudokuView::Draw(BRect /*updateRect*/)
 }
 
 
+void
+SudokuView::_SetAllHints()
+{
+	uint32 size = fField->Size();
+
+	for (uint32 y = 0; y < size; y++) {
+		for (uint32 x = 0; x < size; x++) {
+			uint32 validMask = fField->ValidMaskAt(x, y);
+			fField->SetHintMaskAt(x, y, validMask);
+		}
+	}
+	Invalidate();
+}
+
+
+void
+SudokuView::_Solve()
+{
+	SudokuSolver solver;
+	if (_GetSolutions(solver)) {
+		_PushUndo();
+		fField->SetTo(solver.SolutionAt(0));
+		Invalidate();
+	} else
+		beep();
+}
+
+
+void
+SudokuView::_SolveSingle()
+{
+	if (fField->IsSolved()) {
+		beep();
+		return;
+	}
+
+	SudokuSolver solver;
+	if (_GetSolutions(solver)) {
+		_PushUndo();
+
+		// find free spot
+		uint32 x, y;
+		do {
+			x = rand() % fField->Size();
+			y = rand() % fField->Size();
+		} while (fField->ValueAt(x, y));
+
+		fField->SetValueAt(x, y,
+			solver.SolutionAt(0)->ValueAt(x, y));
+		_InvalidateField(x, y);
+	} else
+		beep();
+}
+
+
+bool
+SudokuView::_GetSolutions(SudokuSolver& solver)
+{
+	solver.SetTo(fField);
+	bigtime_t start = system_time();
+	solver.ComputeSolutions();
+
+	printf("found %" B_PRIu32 " solutions in %g msecs\n",
+		solver.CountSolutions(), (system_time() - start) / 1000.0);
+
+	return solver.CountSolutions() > 0;
+}
