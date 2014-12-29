@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -410,38 +410,7 @@ PowerStatusView::Update(bool force)
 	if ((hadBattery && !fHasBattery)
 		|| (previousPercent > kLowBatteryPercentage
 			&& fPercent <= kLowBatteryPercentage)) {
-
-		BBitmap* bitmap = NULL;
-		BResources resources;
-		resources.SetToImage((void*)&instantiate_deskbar_item);
-		if (resources.InitCheck() == B_OK) {
-			size_t resourceSize = 0;
-			const void* resourceData = resources.LoadResource(
-				B_VECTOR_ICON_TYPE, fHasBattery
-					? "battery_low" : "battery_critical", &resourceSize);
-			if (resourceData != NULL) {
-				BMemoryIO memoryIO(resourceData, resourceSize);
-				bitmap = BTranslationUtils::GetBitmap(&memoryIO);
-			}
-		}
-
-		BNotification notification(fHasBattery ? B_INFORMATION_NOTIFICATION
-			: B_ERROR_NOTIFICATION);
-
-		if (fHasBattery) {
-			notification.SetTitle(B_TRANSLATE("Battery low"));
-			notification.SetContent(B_TRANSLATE(
-				"The battery level is getting low, please plug the device in."));
-		} else {
-			notification.SetTitle(B_TRANSLATE("Battery critical"));
-			notification.SetContent(B_TRANSLATE(
-				"The battery level is critical, please plug the device in"
-				" immediately."));
-		}
-
-		notification.SetIcon(bitmap);
-		notification.Send();
-		delete bitmap;
+		_NotifyLowBattery();
 	}
 }
 
@@ -505,11 +474,49 @@ PowerStatusView::_GetBatteryInfo(battery_info* batteryInfo, int batteryID)
 }
 
 
-//	#pragma mark -
+void
+PowerStatusView::_NotifyLowBattery()
+{
+	BBitmap* bitmap = NULL;
+	BResources resources;
+	resources.SetToImage((void*)&instantiate_deskbar_item);
+
+	if (resources.InitCheck() == B_OK) {
+		size_t resourceSize = 0;
+		const void* resourceData = resources.LoadResource(
+			B_VECTOR_ICON_TYPE, fHasBattery
+				? "battery_low" : "battery_critical", &resourceSize);
+		if (resourceData != NULL) {
+			BMemoryIO memoryIO(resourceData, resourceSize);
+			bitmap = BTranslationUtils::GetBitmap(&memoryIO);
+		}
+	}
+
+	BNotification notification(
+		fHasBattery ? B_INFORMATION_NOTIFICATION : B_ERROR_NOTIFICATION);
+
+	if (fHasBattery) {
+		notification.SetTitle(B_TRANSLATE("Battery low"));
+		notification.SetContent(B_TRANSLATE(
+			"The battery level is getting low, please plug in the device."));
+	} else {
+		notification.SetTitle(B_TRANSLATE("Battery critical"));
+		notification.SetContent(B_TRANSLATE(
+			"The battery level is critical, please plug in the device "
+			"immediately."));
+	}
+
+	notification.SetIcon(bitmap);
+	notification.Send();
+	delete bitmap;
+}
+
+
+// #pragma mark - Replicant view
 
 
 PowerStatusReplicant::PowerStatusReplicant(BRect frame, int32 resizingMode,
-		bool inDeskbar)
+	bool inDeskbar)
 	:
 	PowerStatusView(NULL, frame, resizingMode, -1, inDeskbar)
 {

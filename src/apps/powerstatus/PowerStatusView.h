@@ -49,6 +49,7 @@ private:
 			void			_Init();
 			void			_SetLabel(char* buffer, size_t bufferLength);
 			void			_DrawBattery(BRect rect);
+			void			_NotifyLowBattery();
 
 protected:
 			PowerStatusDriverInterface*	fDriverInterface;
