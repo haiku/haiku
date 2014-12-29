@@ -351,6 +351,15 @@ PowerStatusView::Update(bool force)
 		fTimeLeft = -1;
 	}
 
+	if (fOnline && (fPercent <= 0 || fPercent > 100)) {
+		// Just ignore this probe -- it obviously returned invalid values
+		fPercent = previousPercent;
+		fTimeLeft = previousTimeLeft;
+		fOnline = wasOnline;
+		fHasBattery = hadBattery;
+		return;
+	}
+
 	if (fInDeskbar) {
 		// make sure the tray icon is large enough
 		float width = fShowStatusIcon ? kMinIconWidth + 2 : 0;
