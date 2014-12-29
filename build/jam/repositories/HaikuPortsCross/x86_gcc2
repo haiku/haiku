@@ -49,12 +49,12 @@ BootstrapPackageRepository HaikuPortsCross
 	}@ # secondary_x86
 	:
 	# repository architecture packages (stage 2)
-	libsolv_bootstrap-0.3.0_haiku_2013_10_01-3
-	libsolv_bootstrap_devel-0.3.0_haiku_2013_10_01-3
+	libsolv_bootstrap-0.3.0_haiku_2014_12_22-1
+	libsolv_bootstrap_devel-0.3.0_haiku_2014_12_22-1
 
 	secondary_x86 @{
-		libsolv_bootstrap_x86-0.3.0_haiku_2013_10_01-3
-		libsolv_bootstrap_x86_devel-0.3.0_haiku_2013_10_01-3
+		libsolv_bootstrap_x86-0.3.0_haiku_2014_12_22-1
+		libsolv_bootstrap_x86_devel-0.3.0_haiku_2014_12_22-1
 	}@ # secondary_x86
 	:
 	# source packages
