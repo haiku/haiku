@@ -5,9 +5,9 @@ BootstrapPackageRepository HaikuPortsCross
 	haikuporter-0-1
 	:
 	# repository architecture packages (stage 0)
-	gcc_bootstrap-4.8.3_2014_08_03-1
-	gcc_bootstrap_syslibs-4.8.3_2014_08_03-1
-	gcc_bootstrap_syslibs_devel-4.8.3_2014_08_03-1
+	gcc_bootstrap-4.8.4_2014_12_21-1
+	gcc_bootstrap_syslibs-4.8.4_2014_12_21-1
+	gcc_bootstrap_syslibs_devel-4.8.4_2014_12_21-1
 	:
 	# repository architecture packages (stage 1)
 	zlib_bootstrap-1.2.8-2
