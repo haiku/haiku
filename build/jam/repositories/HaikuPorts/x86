@@ -119,8 +119,8 @@ RemotePackageRepository HaikuPorts
 	libpng16_devel-1.6.16-1
 	libsdl-1.2.15-6
 	libsdl_devel-1.2.15-6
-	libsolv-0.3.0_haiku_2013_10_01-2
-	libsolv_devel-0.3.0_haiku_2013_10_01-2
+	libsolv-0.3.0_haiku_2014_12_22-1
+	libsolv_devel-0.3.0_haiku_2014_12_22-1
 	libtheora-1.1.1-2
 	libtheora_devel-1.1.1-2
 	libtool-2.4.2-1
@@ -245,8 +245,8 @@ RemotePackageRepository HaikuPorts
 	libpng_x86_gcc2_devel-1.5.21-1
 	libpng16_x86_gcc2-1.6.16-1
 	libpng16_x86_gcc2_devel-1.6.16-1
-	libsolv_x86_gcc2-0.3.0_haiku_2013_10_01-2
-	libsolv_x86_gcc2_devel-0.3.0_haiku_2013_10_01-2
+	libsolv_x86_gcc2-0.3.0_haiku_2014_12_22-1
+	libsolv_x86_gcc2_devel-0.3.0_haiku_2014_12_22-1
 	libtheora_x86_gcc2-1.1.1-2
 	libtheora_x86_gcc2_devel-1.1.1-2
 	libvorbis_x86_gcc2-1.3.2-2

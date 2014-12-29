@@ -199,8 +199,8 @@ RemotePackageRepository HaikuPorts
 	libsdl_devel-1.2.15-6
 	libsndfile-1.0.25-2
 	libsndfile_devel-1.0.25-2
-	libsolv-0.3.0_haiku_2013_10_01-3
-	libsolv_devel-0.3.0_haiku_2013_10_01-3
+	libsolv-0.3.0_haiku_2014_12_22-1
+	libsolv_devel-0.3.0_haiku_2014_12_22-1
 	libssh2-1.4.3-1
 	libssh2_devel-1.4.3-1
 	libtheora-1.1.1-2
@@ -531,8 +531,8 @@ RemotePackageRepository HaikuPorts
 	libsdl2_x86_devel-2.0.1-3
 	libsndfile_x86-1.0.25-2
 	libsndfile_x86_devel-1.0.25-2
-	libsolv_x86-0.3.0_haiku_2013_10_01-2
-	libsolv_x86_devel-0.3.0_haiku_2013_10_01-2
+	libsolv_x86-0.3.0_haiku_2014_12_22-1
+	libsolv_x86_devel-0.3.0_haiku_2014_12_22-1
 	libtheora_x86-1.1.1-2
 	libtheora_x86_devel-1.1.1-2
 	libusb_x86-1.0.18-1
