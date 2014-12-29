@@ -906,10 +906,7 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 		BPrivate::ObjectDeleter<ExpressionEvaluationListener> deleter(
 			listener);
 		if (error == B_OK) {
-			_SetThreadState(THREAD_STATE_STOPPED, cpuState,
-				THREAD_STOPPED_BREAKPOINT, BString());
 			teamLocker.Unlock();
-
 			do {
 				error = acquire_sem(fConditionWaitSem);
 			} while (error == B_INTERRUPTED);
@@ -921,11 +918,11 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 					fConditionResult->ReleaseReference();
 					fConditionResult = NULL;
 				}
+				_SetThreadState(THREAD_STATE_STOPPED, cpuState,
+					THREAD_STOPPED_BREAKPOINT, BString());
 				return false;
 			} else {
-				_SetThreadState(THREAD_STATE_RUNNING, NULL,
-					THREAD_STOPPED_UNKNOWN, BString());
-				fDebuggerInterface->ContinueThread(fThread->ID());
+				fDebuggerInterface->ContinueThread(ThreadID());
 				return true;
 			}
 		}
