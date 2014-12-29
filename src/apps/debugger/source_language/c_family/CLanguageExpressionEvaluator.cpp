@@ -1644,7 +1644,56 @@ CLanguageExpressionEvaluator::_ParseIdentifier(ValueNode* parentNode)
 	Token token = fTokenizer->NextToken();
 	const BString& identifierName = token.string;
 
-	if (fTypeInfo != NULL) {
+	ValueNodeChild* child = NULL;
+	if (fNodeManager != NULL) {
+		ValueNodeContainer* container = fNodeManager->GetContainer();
+		AutoLocker<ValueNodeContainer> containerLocker(container);
+
+		if (parentNode == NULL) {
+			ValueNodeChild* thisChild = NULL;
+			for (int32 i = 0; i < container->CountChildren(); i++) {
+				ValueNodeChild* current = container->ChildAt(i);
+				const BString& nodeName = current->Name();
+				if (nodeName == identifierName) {
+					child = current;
+					break;
+				} else if (nodeName == "this")
+					thisChild = current;
+			}
+
+			if (child == NULL && thisChild != NULL) {
+				// the name was not found in the variables or parameters,
+				// but we have a class pointer. Try to find the name in the
+				// list of members.
+				_RequestValueIfNeeded(token, thisChild);
+				ValueNode* thisNode = thisChild->Node();
+				fTokenizer->RewindToken();
+				return _ParseIdentifier(thisNode);
+			}
+		} else {
+			// skip intermediate address nodes
+			if (parentNode->GetType()->Kind() == TYPE_ADDRESS
+				&& parentNode->CountChildren() == 1) {
+				child = parentNode->ChildAt(0);
+
+				_RequestValueIfNeeded(token, child);
+				parentNode = child->Node();
+				fTokenizer->RewindToken();
+				return _ParseIdentifier(parentNode);
+			}
+
+			for (int32 i = 0; i < parentNode->CountChildren(); i++) {
+				ValueNodeChild* current = parentNode->ChildAt(i);
+				const BString& nodeName = current->Name();
+				if (nodeName == identifierName) {
+					child = current;
+					break;
+				}
+			}
+		}
+	}
+
+	if (child == NULL && fTypeInfo != NULL) {
 		Type* resultType = NULL;
 		status_t error = fTypeInfo->LookupTypeByName(identifierName,
 			TypeLookupConstraints(), resultType);
@@ -1656,61 +1705,6 @@ CLanguageExpressionEvaluator::_ParseIdentifier(ValueNode* parentNode)
 			errorMessage.SetToFormat("Failed to look up type name '%s': %"
 				B_PRId32 ".", identifierName.String(), error);
 			throw ParseException(errorMessage.String(), token.position);
-		}
-
-		// we didn't recognize the identifier as a type name, fall through
-		// and see if it's possibly a value
-	}
-
-	if (fNodeManager == NULL) {
-		throw ParseException("Identifiers not resolvable without manager.",
-			token.position);
-	}
-
-	ValueNodeContainer* container = fNodeManager->GetContainer();
-	AutoLocker<ValueNodeContainer> containerLocker(container);
-
-	ValueNodeChild* child = NULL;
-	if (parentNode == NULL) {
-		ValueNodeChild* thisChild = NULL;
-		for (int32 i = 0; i < container->CountChildren(); i++) {
-			ValueNodeChild* current = container->ChildAt(i);
-			const BString& nodeName = current->Name();
-			if (nodeName == identifierName) {
-				child = current;
-				break;
-			} else if (nodeName == "this")
-				thisChild = current;
-		}
-
-		if (child == NULL && thisChild != NULL) {
-			// the name was not found in the variables or parameters,
-			// but we have a class pointer. Try to find the name in the
-			// list of members.
-			_RequestValueIfNeeded(token, thisChild);
-			ValueNode* thisNode = thisChild->Node();
-			fTokenizer->RewindToken();
-			return _ParseIdentifier(thisNode);
-		}
-	} else {
-		// skip intermediate address nodes
-		if (parentNode->GetType()->Kind() == TYPE_ADDRESS
-			&& parentNode->CountChildren() == 1) {
-			child = parentNode->ChildAt(0);
-
-			_RequestValueIfNeeded(token, child);
-			parentNode = child->Node();
-			fTokenizer->RewindToken();
-			return _ParseIdentifier(parentNode);
-		}
-
-		for (int32 i = 0; i < parentNode->CountChildren(); i++) {
-			ValueNodeChild* current = parentNode->ChildAt(i);
-			const BString& nodeName = current->Name();
-			if (nodeName == identifierName) {
-				child = current;
-				break;
-			}
 		}
 	}
 
