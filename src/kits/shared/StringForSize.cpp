@@ -26,7 +26,7 @@ string_for_size(double size, char* string, size_t stringSize)
 	double kib = size / 1024.0;
 	if (kib < 1.0) {
 		const char* trKey = B_TRANSLATE_MARK(
-			"{0, plural, one{# byte} other{# bytes}");
+			"{0, plural, one{# byte} other{# bytes}}");
 
 		BString tmp;
 		BMessageFormat format(

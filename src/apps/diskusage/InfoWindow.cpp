@@ -82,7 +82,7 @@ InfoWin::InfoWin(BPoint p, FileInfo *f, BWindow* parent)
 	if (f->count > 0) {
 		// This is a directory, include file count information
 		static BMessageFormat format(B_TRANSLATE(
-		"%size% in {0, plural, one{# file} other{# files}"));
+		"%size% in {0, plural, one{# file} other{# files}}"));
 
 		format.Format(name, f->count);
 	} else
