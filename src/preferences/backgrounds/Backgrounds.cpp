@@ -30,6 +30,7 @@ public:
 							BackgroundsWindow();
 
 			void			RefsReceived(BMessage* message);
+			void			MessageReceived(BMessage* message);
 
 protected:
 	virtual	bool			QuitRequested();
@@ -67,6 +68,14 @@ BackgroundsApplication::BackgroundsApplication()
 void
 BackgroundsApplication::MessageReceived(BMessage* message)
 {
+	const void *data;
+	ssize_t size;
+	if (message->WasDropped() && message->FindData("RGBColor", B_RGB_COLOR_TYPE,
+			&data, &size) == B_OK) {
+		// This is the desktop telling us that it was changed by a color drop
+		BMessenger(fWindow).SendMessage(message);
+		return;
+	}
 	switch (message->what) {
 		case B_SILENT_RELAUNCH:
 			fWindow->Activate();
@@ -113,6 +122,13 @@ BackgroundsWindow::RefsReceived(BMessage* message)
 {
 	fBackgroundsView->RefsReceived(message);
 	Activate();
+}
+
+
+void
+BackgroundsWindow::MessageReceived(BMessage* message)
+{
+	BMessenger(fBackgroundsView).SendMessage(message);
 }
 
 

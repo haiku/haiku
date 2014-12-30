@@ -293,6 +293,19 @@ BackgroundsView::AllAttached()
 void
 BackgroundsView::MessageReceived(BMessage* message)
 {
+	// Color drop
+	if (message->WasDropped()) {
+		rgb_color *clr;
+		ssize_t out_size;
+		if (message->FindData("RGBColor", B_RGB_COLOR_TYPE,
+			(const void **)&clr, &out_size) == B_OK) {
+			fPicker->SetValue(*clr);
+			_UpdatePreview();
+			_UpdateButtons();
+			return;
+		}
+	}
+
 	switch (message->what) {
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:

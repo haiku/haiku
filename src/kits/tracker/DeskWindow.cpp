@@ -39,6 +39,7 @@ All rights reserved.
 #include <Debug.h>
 #include <FindDirectory.h>
 #include <Locale.h>
+#include <Messenger.h>
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <PathFinder.h>
@@ -641,6 +642,14 @@ BDeskWindow::MessageReceived(BMessage* message)
 			BScreen(this).SetDesktopColor(*color);
 			fPoseView->SetViewColor(*color);
 			fPoseView->SetLowColor(*color);
+
+			// Notify the backgrounds app that the background changed
+			status_t initStatus;
+			BMessenger messenger("application/x-vnd.Haiku-Backgrounds", -1,
+				&initStatus);
+			if (initStatus == B_OK)
+				messenger.SendMessage(message);
+
 			return;
 		}
 	}
