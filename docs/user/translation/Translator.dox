@@ -2,7 +2,6 @@
  * Copyright 2014 Markus Himmel. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- *
  * Authors:
  *		Markus Himmel, markus@himmel-villmar.de
  *
@@ -55,7 +54,7 @@
 	type. As an example, the translator for GIF images only translates between
 	GIF images and bitmaps, the baseline format for images.
 
-	The function `make_nth_translator` enables add-ons to expose translators.
+	The function \c make_nth_translator enables add-ons to expose translators.
 	Communication between applications and BTranslators is carried
 	out by the BTranslatorRoster class.
 
@@ -87,7 +86,7 @@
 	\brief Increments the reference count by 1 and returns a pointer to
 		itself.
 
-	\returns `this`.
+	\returns \c this.
 
 	\since BeOS R3
 */
@@ -97,7 +96,7 @@
 	\brief Decrements the reference count by 1. If the reference count is
 		decreased to zero, the object is deleted.
 
-	\returns `this` if the object was not destroyed, `NULL` if it was.
+	\returns \c this if the object was not destroyed, \c NULL if it was.
 
 	\since BeOS R3
 */
@@ -145,7 +144,7 @@
 	\brief Pure virtual. Returns the version of the translator.
 
 	The correct way to format the version is using the
-	`B_TRANSLATION_MAKE_VERSION` macro from TranslationDefs.h.
+	\c B_TRANSLATION_MAKE_VERSION macro from TranslationDefs.h.
 
 	\returns The version of the translator.
 
@@ -192,15 +191,15 @@
 	\fn virtual status_t BTranslator::Identify(BPositionIO* source, const\
 		translation_format* format, BMessage* extension, translator_info* info,\
 		uint32 outType) = 0;
-	\brief Pure virtual. Analyzes *source* and decides whether this translator
+	\brief Pure virtual. Analyzes \a source and decides whether this translator
 		can work with the provided format.
 
 	The translator examines the data in source and tries to identify its format
-	(for instance by checking for magic numbers). It may use the hints provided by *format*.
-	If it is successful, and it is able to translate the data at hand
-	to *outType*, it populates *info* with information about the input format
-	and returns `B_OK`. If it is unable to identify the data or cannot translate
-	it to *outType*, it returns `B_NO_TRANSLATOR`.
+	(for instance by checking for magic numbers). It may use the hints provided
+	by \a format. If it is successful, and it is able to translate the data at
+	hand to \a outType, it populates \a info with information about the input
+	format and returns \c B_OK. If it is unable to identify the data or cannot
+	translate it to \a outType, it returns \c B_NO_TRANSLATOR.
 
 	\param source Read and seek interface to the input data.
 	\param format Hints about the incoming data.
@@ -209,18 +208,18 @@
 		TranslatorFormats.h.
 	\param info Where the translator will write information about the determined
 		input format in case identification is successful.
-	\param outType If *outType* is non-zero, identification will only be
+	\param outType If \a outType is non-zero, identification will only be
 		successful if the translator can transform the data in source to the
-		format denoted by *outType*.
+		format denoted by \a outType.
 	\warning When creating a translator, be prepared for the information
-		in *format* to be inaccurate or wrong.
+		in \a format to be inaccurate or wrong.
 
-	\retval B_OK The translator has identified the data in *source*, has
-		verified its ability to translate it to *outType* and has
-		written information describing it to *info*.
+	\retval B_OK The translator has identified the data in \a source, has
+		verified its ability to translate it to \a outType and has
+		written information describing it to \a info.
 	\retval B_NO_TRANSLATOR The translator does not know how to handle the
-		data in *source* or cannot translate it to *outType*.
-	\retval B_BAD_VALUE *extension* was `NULL` or contained bad data.
+		data in \a source or cannot translate it to \a outType.
+	\retval B_BAD_VALUE \a extension was \c NULL or contained bad data.
 	\retval B_ERROR An error occurred.
 
 	\since BeOS R3
@@ -228,31 +227,31 @@
 
 /*!
 	\fn virtual status_t BTranslator::Translate(BPositionIO* source, const\
-		translation_format* info, BMessage* extension, uint32 outType,\
+		translator_info* info, BMessage* extension, uint32 outType,\
 		BPositionIO* destination) = 0
 	\brief Pure virtual. Reads the provided data and tries to translate it
 		to a given format.
 
-	The translator attempts to translate the data in *source*, which may or may
-	not have the format represented by *info*, to *outType* and then write
-	the result to *destination*. Upon success, it returns `B_OK`.
+	The translator attempts to translate the data in \a source, which may or may
+	not have the format represented by \a info, to \a outType and then write
+	the result to destination. Upon success, it returns \c B_OK.
 
 	\param source Read and seek interface to the input data.
 	\param info Hints about the incoming data.
 	\param extension A message containing configuration information for the
 		translator. A standard set of possible fields is defined in
 		TranslatorFormats.h.
-	\param outType The identifier of the desired output format. An *outType* of
+	\param outType The identifier of the desired output format. An \a outType of
 		0 is equivalent to the defualt format for the media type if the
 		translator.
 	\param destination Write interface for the destination of the data.
 	\warning When creating a translator, be prepared for the information
-		in *format* to be inaccurate or wrong.
+		in \a format to be inaccurate or wrong.
 
 	\retval B_OK The translated data was successfully written to destination.
 	\retval B_ERROR An error occurred during memory allocation or the
 		conversion itself.
-	\retval B_BAD_VALUE *extension* was `NULL` or contained bad data.
+	\retval B_BAD_VALUE \a extension was \c NULL or contained bad data.
 	\retval B_NO_TRANSLATOR The translator cannot handle the input.
 
 	\since BeOS R3
@@ -273,7 +272,7 @@
 		options for the translator.
 
 	This method is optional. If the translator chose not to implement
-	it, `B_ERROR` will be returned.
+	it, \c B_ERROR will be returned.
 
 	\param extension A message containing configuration information for the
 		translator. A standard set of possible fields is defined in
@@ -285,8 +284,8 @@
 	\retval B_OK Everything went well.
 	\retval B_ERROR An error occurred or the method was not overriden by the
 		translator.
-	\retval B_BAD_VALUE *_view* or *_extent* were `NULL` or *extension*
-		was `NULL` or contained bad data.
+	\retval B_BAD_VALUE \a _view or \a _extent were \c NULL or \a extension
+		was \c NULL or contained bad data.
 
 	\since BeOS R3
 */
@@ -297,7 +296,7 @@
 	\brief Populates a BMessage with the settings of the translator.
 
 	A standard set of possible fields is defined in TranslatorFormats.h. This
-	method is optional. If the translator chose not to implement it, `B_ERROR`
+	method is optional. If the translator chose not to implement it, \c B_ERROR
 	will be returned.
 
 	\param extension The BMessage that is populated.
@@ -305,7 +304,7 @@
 	\retval B_OK Everything went well.
 	\retval B_ERROR An error occurred or the method was not overriden by the
 		translator.
-	\retval B_BAD_VALUE *extension* was `NULL`.
+	\retval B_BAD_VALUE \a extension was \c NULL.
 
 	\since BeOS R3
 */
