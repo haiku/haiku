@@ -1,0 +1,313 @@
+/*
+ * Copyright 2014 Markus Himmel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ *
+ * Authors:
+ *		Markus Himmel, markus@himmel-villmar.de
+ *
+ * Corresponds to:
+ *		headers/os/translation/Translator.h	hrev48573
+ *		src/kits/translation/Translator.cpp	hrev48573
+ */
+
+/*!
+	\file Translator.h
+	\ingroup translation
+	\ingroup libbe
+	\brief BTranslator class definition.
+*/
+
+/*!
+	\file TranslationDefs.h
+	\ingroup translation
+	\ingroup libbe
+	\brief Defines structures and preprocessor macros that are used by the
+		translation kit.
+*/
+
+/*!
+	\file TranslatorFormats.h
+	\ingroup translation
+	\ingroup libbe
+	\brief Defines identifiers and structures for data formats and configuration
+		messages.
+*/
+
+/*!
+	\class BTranslator
+	\ingroup translation
+	\ingroup libbe
+	\brief Abstract class that defines the necessary functionality of a
+		translator.
+
+	BTranslator is the core class of the translation kit.
+	Every translator defines input and output data types it can work with. A
+	BTranslator uses BPositionIO as an abstraction for the data it operates on.
+	It is able to
+	decide wether incoming data is of any of its known input types and, upon
+	successful identification, translate it to any of its output formats. It
+	may also provide a config view that appears in the DataTranslations
+	preference app.
+
+	Usually, a translator is very specific. It only offers translations
+	between the format it was created for and the basic format for that media
+	type. As an example, the translator for GIF images only translates between
+	GIF images and bitmaps, the baseline format for images.
+
+	The function `make_nth_translator` enables add-ons to expose translators.
+	Communication between applications and BTranslators is carried
+	out by the BTranslatorRoster class.
+
+	\note Another option to create a translator is using a BFuncTranslator.
+
+	\remark In most cases it is easier to derive from BaseTranslator instead
+		of BTranslator. BaseTranslator provides a lot of functionality that is
+		common for most translators as well as a unified method to save settings
+		and routines for handling bitmaps.
+
+	\since BeOS R3
+*/
+
+/*!
+	\name Constructor and reference counting
+*/
+
+//! @{
+
+/*!
+	\fn BTranslator::BTranslator()
+	\brief Creates a new BTranslator and sets its reference count to 1.
+
+	\since BeOS R3
+*/
+
+/*!
+	\fn BTranslator* BTranslator::Acquire()
+	\brief Increments the reference count by 1 and returns a pointer to
+		itself.
+
+	\returns `this`.
+
+	\since BeOS R3
+*/
+
+/*!
+	\fn BTranslator* BTranslator::Release()
+	\brief Decrements the reference count by 1. If the reference count is
+		decreased to zero, the object is deleted.
+
+	\returns `this` if the object was not destroyed, `NULL` if it was.
+
+	\since BeOS R3
+*/
+
+/*!
+	\fn int32 BTranslator::ReferenceCount()
+	\brief Gets the current reference count.
+
+	\returns The current reference count.
+
+	\since BeOS R3
+*/
+
+//! @}
+
+/*!
+	\name Accessors
+*/
+
+//! @{
+
+/*!
+	\fn virtual const char* BTranslator::TranslatorName() const = 0
+	\brief Pure virtual. Returns the name of the translator.
+
+	Amongst other uses, the name is used to populate Save as-dropdowns and for
+	the preference window.
+
+	\returns The name of the translator.
+
+	\since BeOS R3
+*/
+
+/*!
+	\fn virtual const char* BTranslator::TranslatorInfo() const = 0
+	\brief Pure virtual. Returns a brief description of the translator.
+
+	\returns A brief description of the translator.
+
+	\since BeOS R3
+*/
+
+/*!
+	\fn virtual int32 BTranslator::TranslatorVersion() const = 0
+	\brief Pure virtual. Returns the version of the translator.
+
+	The correct way to format the version is using the
+	`B_TRANSLATION_MAKE_VERSION` macro from TranslationDefs.h.
+
+	\returns The version of the translator.
+
+	\since BeOS R3
+*/
+
+/*!
+	\fn virtual const translation_format*\
+		BTranslator::InputFormats(int32* _count) const = 0
+	\brief Pure virtual. Returns an array containing information about all
+		input formats the translator can handle.
+
+	\param _count Where the number of input formats that are returned will be
+		written.
+
+	\returns A pointer to the first element of the array of input formats.
+
+	\since BeOS R3
+*/
+
+/*!
+	\fn virtual const translation_format*\
+		BTranslator::OutputFormats(int32* _count) const = 0
+	\brief Pure virtual. Returns an array containing information about all
+		output formats the translator can produce.
+
+	\param _count Where the number of output formats that are returned will be
+		written.
+
+	\returns A pointer to the first element of the array of output formats.
+
+	\since BeOS R3
+*/
+
+//! @}
+
+/*!
+	\name Core methods
+*/
+
+//! @{
+
+/*!
+	\fn virtual status_t BTranslator::Identify(BPositionIO* source, const\
+		translation_format* format, BMessage* extension, translator_info* info,\
+		uint32 outType) = 0;
+	\brief Pure virtual. Analyzes *source* and decides whether this translator
+		can work with the provided format.
+
+	The translator examines the data in source and tries to identify its format
+	(for instance by checking for magic numbers). It may use the hints provided by *format*.
+	If it is successful, and it is able to translate the data at hand
+	to *outType*, it populates *info* with information about the input format
+	and returns `B_OK`. If it is unable to identify the data or cannot translate
+	it to *outType*, it returns `B_NO_TRANSLATOR`.
+
+	\param source Read and seek interface to the input data.
+	\param format Hints about the incoming data.
+		\param extension A message containing configuration information for the
+		translator. A standard set of possible fields is defined in
+		TranslatorFormats.h.
+	\param info Where the translator will write information about the determined
+		input format in case identification is successful.
+	\param outType If *outType* is non-zero, identification will only be
+		successful if the translator can transform the data in source to the
+		format denoted by *outType*.
+	\warning When creating a translator, be prepared for the information
+		in *format* to be inaccurate or wrong.
+
+	\retval B_OK The translator has identified the data in *source*, has
+		verified its ability to translate it to *outType* and has
+		written information describing it to *info*.
+	\retval B_NO_TRANSLATOR The translator does not know how to handle the
+		data in *source* or cannot translate it to *outType*.
+	\retval B_BAD_VALUE *extension* was `NULL` or contained bad data.
+	\retval B_ERROR An error occurred.
+
+	\since BeOS R3
+*/
+
+/*!
+	\fn virtual status_t BTranslator::Translate(BPositionIO* source, const\
+		translation_format* info, BMessage* extension, uint32 outType,\
+		BPositionIO* destination) = 0
+	\brief Pure virtual. Reads the provided data and tries to translate it
+		to a given format.
+
+	The translator attempts to translate the data in *source*, which may or may
+	not have the format represented by *info*, to *outType* and then write
+	the result to *destination*. Upon success, it returns `B_OK`.
+
+	\param source Read and seek interface to the input data.
+	\param info Hints about the incoming data.
+	\param extension A message containing configuration information for the
+		translator. A standard set of possible fields is defined in
+		TranslatorFormats.h.
+	\param outType The identifier of the desired output format. An *outType* of
+		0 is equivalent to the defualt format for the media type if the
+		translator.
+	\param destination Write interface for the destination of the data.
+	\warning When creating a translator, be prepared for the information
+		in *format* to be inaccurate or wrong.
+
+	\retval B_OK The translated data was successfully written to destination.
+	\retval B_ERROR An error occurred during memory allocation or the
+		conversion itself.
+	\retval B_BAD_VALUE *extension* was `NULL` or contained bad data.
+	\retval B_NO_TRANSLATOR The translator cannot handle the input.
+
+	\since BeOS R3
+*/
+
+//! @}
+
+/*!
+	\name Configuration methods
+*/
+
+//! @{
+
+/*!
+	\fn virtual status_t BTranslator::MakeConfigurationView(BMessage*\
+		extension, BView** _view, BRect* _extent)
+	\brief Virtual. Creates a BView that contains information and configuration
+		options for the translator.
+
+	This method is optional. If the translator chose not to implement
+	it, `B_ERROR` will be returned.
+
+	\param extension A message containing configuration information for the
+		translator. A standard set of possible fields is defined in
+		TranslatorFormats.h.
+	\param _view Where a pointer to the newly created configuration view will
+		be stored.
+	\param _extent Where the size of the newly created configureation view will
+		be stored.
+	\retval B_OK Everything went well.
+	\retval B_ERROR An error occurred or the method was not overriden by the
+		translator.
+	\retval B_BAD_VALUE *_view* or *_extent* were `NULL` or *extension*
+		was `NULL` or contained bad data.
+
+	\since BeOS R3
+*/
+
+/*!
+	\fn virtual status_t BTranslator::GetConfigurationMessage(BMessage*\
+		extension)
+	\brief Populates a BMessage with the settings of the translator.
+
+	A standard set of possible fields is defined in TranslatorFormats.h. This
+	method is optional. If the translator chose not to implement it, `B_ERROR`
+	will be returned.
+
+	\param extension The BMessage that is populated.
+
+	\retval B_OK Everything went well.
+	\retval B_ERROR An error occurred or the method was not overriden by the
+		translator.
+	\retval B_BAD_VALUE *extension* was `NULL`.
+
+	\since BeOS R3
+*/
+
+//! @}
