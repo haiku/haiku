@@ -551,9 +551,9 @@ ObjectView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 void
 ObjectView::FrameResized(float width, float height)
 {
-	LockGL();
-
 	BGLView::FrameResized(width, height);
+
+	LockGL();
 
 	width = Bounds().Width();
 	height = Bounds().Height();
