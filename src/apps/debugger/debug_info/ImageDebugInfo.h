@@ -45,6 +45,11 @@ public:
 									const TypeLookupConstraints& constraints,
 									Type*& _type);
 									// returns a reference
+
+			bool				HasType(const BString& name,
+									const TypeLookupConstraints& constraints)
+									const;
+
 			AddressSectionType	GetAddressSectionType(target_addr_t address)
 									const;
 

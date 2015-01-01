@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -57,6 +57,14 @@ DebuggerImageDebugInfo::GetType(GlobalTypeCache* cache,
 	Type*& _type)
 {
 	return B_UNSUPPORTED;
+}
+
+
+bool
+DebuggerImageDebugInfo::HasType(const BString& name,
+	const TypeLookupConstraints& constraints) const
+{
+	return false;
 }
 
 

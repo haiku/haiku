@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef GLOBAL_TYPE_LOOKUP_H
@@ -69,6 +70,11 @@ public:
 									const TypeLookupConstraints& constraints,
 									Type*& _type) = 0;
 									// returns a reference
+
+	virtual	bool				HasType(GlobalTypeCache* cache,
+									const BString& name,
+									const TypeLookupConstraints& constraints)
+									= 0;
 };
 
 

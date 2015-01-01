@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_TYPE_INFORMATION_H
@@ -24,6 +24,10 @@ public:
 									const TypeLookupConstraints& constraints,
 									Type*& _type) = 0;
 									// returns reference
+
+	virtual	bool				TypeExistsByName(const BString& name,
+									const TypeLookupConstraints& constraints)
+									= 0;
 };
 
 

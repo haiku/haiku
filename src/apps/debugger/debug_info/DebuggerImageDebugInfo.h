@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUGGER_IMAGE_DEBUG_INFO_H
@@ -33,6 +33,10 @@ public:
 									const BString& name,
 									const TypeLookupConstraints& constraints,
 									Type*& _type);
+	virtual	bool				HasType(const BString& name,
+									const TypeLookupConstraints& constraints)
+									const;
+
 	virtual AddressSectionType	GetAddressSectionType(target_addr_t address);
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,

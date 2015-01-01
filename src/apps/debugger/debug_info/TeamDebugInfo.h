@@ -49,10 +49,15 @@ public:
 									const BString& name,
 									const TypeLookupConstraints& constraints,
 									Type*& _type);
+	virtual	bool				HasType(GlobalTypeCache* cache,
+									const BString& name,
+									const TypeLookupConstraints& constraints);
 
 	virtual status_t			LookupTypeByName(const BString& name,
 									const TypeLookupConstraints& constraints,
 									Type*& _type);
+	virtual	bool				TypeExistsByName(const BString& name,
+									const TypeLookupConstraints& constraints);
 
 			status_t			LoadImageDebugInfo(const ImageInfo& imageInfo,
 									LocatableFile* imageFile,

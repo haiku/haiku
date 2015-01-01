@@ -380,12 +380,22 @@ TeamDebugInfo::LookupTypeByName(const BString& name,
 	return GetType(fTypeCache, name, constraints, _type);
 }
 
+
+bool
+TeamDebugInfo::TypeExistsByName(const BString& name,
+	const TypeLookupConstraints& constraints)
+{
+	return HasType(fTypeCache, name, constraints);
+}
+
+
 status_t
 TeamDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 	const TypeLookupConstraints& constraints, Type*& _type)
 {
 	// maybe the type is already cached
 	AutoLocker<GlobalTypeCache> cacheLocker(cache);
+
 	Type* type = cache->GetType(name, constraints);
 	if (type != NULL) {
 		type->AcquireReference();
@@ -422,6 +432,47 @@ TeamDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 		imageDebugInfo->ReleaseReference();
 
 	return error;
+}
+
+
+bool
+TeamDebugInfo::HasType(GlobalTypeCache* cache, const BString& name,
+	const TypeLookupConstraints& constraints)
+{
+	// maybe the type is already cached
+	AutoLocker<GlobalTypeCache> cacheLocker(cache);
+
+	Type* type = cache->GetType(name, constraints);
+	if (type != NULL)
+		return true;
+
+	cacheLocker.Unlock();
+
+	// Clone the image list and get references to the images, so we can iterate
+	// through them without locking.
+	AutoLocker<BLocker> locker(fLock);
+
+	ImageList images;
+	for (int32 i = 0; ImageDebugInfo* imageDebugInfo = fImages.ItemAt(i); i++) {
+		if (images.AddItem(imageDebugInfo))
+			imageDebugInfo->AcquireReference();
+	}
+
+	locker.Unlock();
+
+	bool found = false;
+	for (int32 i = 0; ImageDebugInfo* imageDebugInfo = images.ItemAt(i); i++) {
+		if (imageDebugInfo->HasType(name, constraints)) {
+			found = true;
+			break;
+		}
+	}
+
+	// release the references
+	for (int32 i = 0; ImageDebugInfo* imageDebugInfo = images.ItemAt(i); i++)
+		imageDebugInfo->ReleaseReference();
+
+	return found;
 }
 
 

@@ -567,6 +567,39 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 }
 
 
+bool
+DwarfImageDebugInfo::HasType(const BString& name,
+	const TypeLookupConstraints& constraints) const
+{
+	TypeNameEntry* entry = fTypeNameTable->Lookup(name);
+	if (entry == NULL)
+		return false;
+
+	for (int32 i = 0; TypeEntryInfo* info = entry->types.ItemAt(i); i++) {
+		DIEType* typeEntry = info->type;
+		if (constraints.HasTypeKind()) {
+			if (dwarf_tag_to_type_kind(typeEntry->Tag())
+				!= constraints.TypeKind()) {
+				continue;
+			}
+
+			if (!_EvaluateBaseTypeConstraints(typeEntry, constraints))
+				continue;
+		}
+
+		if (constraints.HasSubtypeKind()
+			&& dwarf_tag_to_subtype_kind(typeEntry->Tag())
+				!= constraints.SubtypeKind()) {
+			continue;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+
 AddressSectionType
 DwarfImageDebugInfo::GetAddressSectionType(target_addr_t address)
 {

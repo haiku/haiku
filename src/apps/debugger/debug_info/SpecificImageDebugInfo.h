@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SPECIFIC_IMAGE_DEBUG_INFO_H
@@ -52,6 +52,10 @@ public:
 									const TypeLookupConstraints& constraints,
 									Type*& _type) = 0;
 									// returns a reference
+	virtual	bool				HasType(const BString& name,
+									const TypeLookupConstraints& constraints)
+									const = 0;
+
 	virtual AddressSectionType	GetAddressSectionType(target_addr_t address)
 									= 0;
 

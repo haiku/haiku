@@ -105,6 +105,20 @@ ImageDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 }
 
 
+bool
+ImageDebugInfo::HasType(const BString& name,
+	const TypeLookupConstraints& constraints) const
+{
+	for (int32 i = 0; SpecificImageDebugInfo* specificInfo
+			= fSpecificInfos.ItemAt(i); i++) {
+		if (specificInfo->HasType(name, constraints))
+			return true;
+	}
+
+	return false;
+}
+
+
 AddressSectionType
 ImageDebugInfo::GetAddressSectionType(target_addr_t address) const
 {

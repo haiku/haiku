@@ -58,6 +58,9 @@ public:
 									const BString& name,
 									const TypeLookupConstraints& constraints,
 									Type*& _type);
+	virtual	bool				HasType(const BString& name,
+									const TypeLookupConstraints& constraints)
+									const;
 
 	virtual AddressSectionType	GetAddressSectionType(target_addr_t address);
 
