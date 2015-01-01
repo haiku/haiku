@@ -1,0 +1,520 @@
+/*
+ * Copyright 2014-2015 Markus Himmel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Markus Himmel, markus@himmel-villmar.de
+ *
+ * Corresponds to:
+ *		headers/os/translation/TranslatorRoster.h	hrev48588
+ *		src/kits/translation/TranslatorRoster.cpp	hrev48588
+ */
+
+/*!
+	\file TranslatorRoster.h
+	\ingroup translation
+	\ingroup libtranslation
+	\brief BTranslatorRoster class definition
+*/
+
+/*!
+	\class BTranslatorRoster
+	\ingroup translation
+	\ingroup libtranslation
+	\brief Class that serves as an interface between applications and
+		translators.
+
+	BTranslatorRoster gives applications access to the translation kit.
+	Applications can request translations and BTranslatorRoster will
+	automatically search for a matching translator and have it perfrom the
+	translation.
+
+	\warning BTranslatorRoster does not perform chaining of any sort. Only
+		translations that can be made by invoking a single translator are
+		supported.
+
+	\note BTranslationUtils provides some helper methods that perform the
+		interaction with BTranslatorRoster for you.
+
+	BTranslationRoster acts as a container. While in most cases the default
+	roster is used, it is possible to create a roster that interacts with a
+	custom set of translators.
+*/
+
+/*!
+	\name Constructors and Destructor
+*/
+
+//! @{
+
+/*!
+	\fn BTranslatorRoster::BTranslatorRoster()
+	\brief Constructs an empty BTranslatorRoster.
+
+	\warning Only call the contructor if you want to use a custom collection of
+		translators. Use Default() if you don't.
+*/
+
+/*!
+	\fn BTranslatorRoster::BTranslatorRoster(BMessage* model);
+	\brief Constructs a BTranslatorRoster and fills it.
+
+	\param model A message that contains information about a
+		BTranslatorRoster.
+
+	After initialization, \a model is searched for strings with the name
+	\c "be:translator_path". The translators that are located at each path
+	are added to the roster. If multiple paths point to translators with the
+	same name, the translator at the path with the lowest index within the
+	message will be kept.
+
+	\warning Use Instantiate() instead of this constructor if \a model was
+		created using Archive().
+*/
+
+/*!
+	\fn BTranslatorRoster::~BTranslatorRoster();
+	\brief Deletes this BTranslatorRoster.
+
+	If the BTranslatorRoster that is deleted is the default roster, a new
+	default roster will be created when BTranslatorRoster::Default() is called
+	for the next time.
+
+	Release() is called on all translators in the roster.
+*/
+
+/*!
+	\fn static BTranslatorRoster* BTranslatorRoster::Default();
+	\brief Gets the default BTranslatorRoster.
+
+	There is only one default translator. It is created when it is first
+	requested. It is poplated according to the following rules:
+
+	If the environment variable \c TRANSLATORS is set, it will be populated
+	with all translators that are present in the directories denoted by
+	\c TRANSLATORS. The paths are separated by a colon (<tt>:</tt>). If
+	multiple paths contain a translator with the same name, the translator
+	that is located in the path that appears earliest in \c TRANSLATORS will
+	be kept.
+
+	If \c TRANSLATORS is unset, the user non-packaged add-ons directory, the
+	user add-ons directory, the system non-packaged add-ons directory and the
+	system add-ons directory will be used. If those directories do not contain
+	a subdirectory \c Translators, it will be created. The subdirectories are
+	then added in the above order. If multiple directories contain a translator
+	with the same name, the translator that is located in the path that appears
+	earliest in the above list will be kept.
+*/
+
+//! @}
+
+/*!
+	\name Archiving
+*/
+
+//! @{
+
+/*!
+	\fn virtual status_t BTranslatorRoster::Archive(BMessage* into, bool deep\
+		= true) const;
+	\brief Archive this BTranslatorRoster into a BMessage.
+
+	\param into Where the BTranslatorRoster will be stored.
+	\param deep Unused.
+
+	\retval B_OK The operation was successful.
+	\retval B_BAD_VALUE \a into was NULL.
+	\retval B_ERROR The operation failed.
+*/
+
+/*!
+	\fn static BArchivable* BTranslatorRoster::Instantiate(BMessage* from);
+	\brief Creates a new BTranslatorRoster from a message.
+
+	\param from The message that contains information about a
+		BTranslatorRoster.
+
+	\returns \c NULL if \a from was \c NULL, contained invalid archive data or
+		archive data of a class that is not BTranslatorRoster. A pointer to a
+		new BTranslatorRoster containing the information from \a from
+		otherwise.
+*/
+
+//! @}
+
+/*!
+	\name Roster Management
+*/
+
+//! @{
+
+/*!
+	\fn status_t BTranslatorRoster::AddTranslators(const char* loadPath =\
+		NULL);
+	\brief Adds translators from a directory to the roster.
+
+	\param loadPath A colon-separated list of directories to search for
+		translators in.
+
+	The following method is used to determine which translators to add:
+
+	If \a loadPath is not \c NULL, the roster will be populated with all
+	translators that are present in the directores denoted by \a loadPath. The
+	paths are separated by a colon (<tt>:</tt>). If multiple paths contain a
+	translator with the same name, the translator that is located in the path
+	that appears earliest in \a loadPath will be kept.
+
+	If \a loadPath is \c NULL and the environment variable \c TRANSLATORS is
+	set, it will be populated with all translators that are present in the
+	directories denoted by \c TRANSLATORS. The paths are separated by a colon
+	(<tt>:</tt>). If multiple paths contain a translator with the same name,
+	the translator that is located in the path that appears earliest in
+	\c TRANSLATORS will be kept.
+
+	If \a loadPath is \c NULL and \c TRANSLATORS is unset, the user
+	non-packaged add-ons directory, the user add-ons directory, the system
+	non-packaged add-ons directory and the system add-ons directory will be
+	used. If those directories do not contain a subdirectory \c Translators, it
+	will be created. The subdirectories are then added in the above order. If
+	multiple directories contain a translator with the same name, the
+	translator that is located in the path that appears earliest in the above
+	list will be kept.
+
+	\returns \c B_OK if everything went well, an error code specific to the
+		operation that failed otherwise.
+*/
+
+/*!
+	\fn status_t BTranslatorRoster::AddTranslator(BTranslator* translator);
+	\brief Adds a single BTranslator to the roster.
+
+	\param translator The translator that should be added.
+
+	\remark AddTranslator() calls Acquire() on the translator, so it is safe
+		to release it if you had acquired it before.
+
+	\retval B_OK The translator was successfully added to the roster.
+	\retval B_NO_MEMORY There was no memory to enlarge the roster.
+	\retval B_BAD_VALUE \a translator was \c NULL.
+*/
+
+//! @}
+
+/*!
+	\name Translator Access
+*/
+
+//! @{
+
+/*!
+	\fn virtual status_t BTranslatorRoster::GetTranslators(BPositionIO*\
+		source, BMessage* ioExtension, translator_info** _info, int32*\
+		_numInfo, uint32 hintType = 0, const char* hintMIME = NULL, uint32\
+		wantType = 0);
+	\brief Collects information about all translators that are able to perform
+		a certain conversion in an array.
+
+	\param source Read and seek interface to the data to be examinded.
+	\param ioExtension A message containing configuration information for the
+		translators.
+	\param _info Where the resulting array will be stored.
+	\param _numInfo Where the number of elements in the resulting array will
+		be stored.
+	\param hintType A hint about the data format in \a source. \c 0 represents
+		an unknown type.
+	\param hintMIME A hint about the MIME type of \a source. \c NULL represents
+		an unknown type.
+	\param wantType The format that \a source needs to be translated into. \c 0
+		permits any output type.
+
+	If this function returns \c B_OK the caller has to call \c delete[] when
+	they are done using \a _info.
+
+	\retval B_OK \a _info and \a _numInfo were successfully populated.
+	\retval B_NO_TRANSLATOR No suitable translator was found.
+	\retval B_BAD_VALUE \a source, \a _info or \a _numInfo was \c NULL.
+	\retval B_IO_ERROR There was an error interacting with \a source.
+	\retval B_NO_MEMORY Could not allocate enough memory for the array.
+*/
+
+/*!
+	\fn virtual status_t BTranslatorRoster::GetAllTranslators(translator_id**\
+		_list, int32* _count);
+	\brief Collects the IDs of all translators in the roster in an array.
+
+	\param _list Where the resulting array will be stored.
+	\param _count Where the number of elements in the resulting array will be
+		stored.
+
+	If this function returns \c B_OK the caller has to call \c delete[] when
+	they are done using \a _info.
+
+	\retval B_OK \a _list and \a _count were populated successfully.
+	\retval B_NO_MEMORY Could not allocate the memory for the array.
+*/
+
+/*!
+	\fn virtual status_t BTranslatorRoster::GetTranslatorInfo(translator_id\
+		translatorID, const char** _name, const char** _info, int32* _version);
+	\brief Looks up general information of the translator with a given ID.
+
+	\param translatorID The ID of the translator whose information is
+		requested.
+	\param _name Where the name of the translator will be stored.
+	\param _info Where the description of the translator will be stored.
+	\param _version Where the version of the translator will be stored.
+
+	Do not free any returned data. If any of \a _name, \a _info and \a _version
+	are \c NULL, the non-null pointers will still be written to.
+
+	\retval B_OK All non-null pointers were written to successfully.
+	\retval B_BAD_VALUE All three pointers were \c NULL.
+	\retval B_NO_TRANSLATOR The roster does not contain any translator with the
+		ID \a translatorID.
+*/
+
+/*!
+	\fn virtual status_t BTranslatorRoster::GetInputFormats(translator_id\
+		translatorID, const translation_format** _formats, int32* _numFormats);
+	\brief Looks up the input formats of the translator with a given ID.
+
+	\param translatorID The ID of the translator whose input formats are
+		requested.
+	\param _formats Where the array of input formats will be stored.
+	\param _numFormats Where the number of elements in the array of input
+		formats will be stored.
+
+	Do not free any of the returned data.
+
+	\retval B_OK \a _formats and \a _numFormats were successfully set.
+	\retval B_BAD_VALUE \a _formats or \a _numFormats was \c NULL.
+	\retval B_NO_TRANSLATOR The roster does not contain any translator with the
+		ID \a translatorID.
+*/
+
+/*!
+	\fn virtual status_t BTranslatorRoster::GetOutputFormats(translator_id\
+		translatorID, const translation_format** _formats, int32* _numFormats);
+	\brief Looks up the output formats of the translator with a given ID.
+
+	\param translatorID The ID of the translator whose output formats are
+		requested.
+	\param _formats Where the array of output formats will be stored.
+	\param _numFormats Where the number of elements in the array of output
+		formats will be stored.
+
+	Do not free any of the returned data.
+
+	\retval B_OK \a _formats and \a _numFormats were successfully set.
+	\retval B_BAD_VALUE \a _formats or \a _numFormats was \c NULL.
+	\retval B_NO_TRANSLATOR The roster does not contain any translator with the
+		ID \a translatorID.
+*/
+
+/*!
+	\fn virtual status_t BTranslatorRoster::MakeConfigurationView(\
+		translator_id translatorID, BMessage* ioExtension, BView** _view,\
+		BRect* _extent);
+	\brief Creates the configuration view of a specified translator from the
+		roster.
+
+	\param translatorID The ID of the translator whose configuration view
+		should be created.
+	\param ioExtension A message containing configuration information for the
+		translator.
+	\param _view Where a pointer to the newly created configuration view will
+		be stored.
+	\param _extent Where the size of of the newly created configuration view
+		will be stored.
+
+	\retval B_OK Everything went well.
+	\retval B_BAD_VALUE \a _view or \a _extent were \c NULL or \a ioExtension
+		was \c NULL or contained bad data.
+	\retval B_NO_TRANSLATOR The roster does not contain any translator with the
+		ID \a translatorID.
+	\retval B_ERROR An error occurred or the translator chose not to supply
+		a configuration view.
+*/
+
+/*!
+	\fn virtual status_t BTranslatorRoster::GetConfigurationMessage(\
+		translator_id translatorID, BMessage* ioExtension)
+	\brief Populates a BMessage with the settings of the specified translator.
+
+	\param translatorID The ID of the translator whose settings \a ioExtension
+		should be populated with.
+	\param ioExtension The message that should be populated.
+
+	\retval B_OK \a ioExtension was populated successfully.
+	\retval B_NO_TRANSLATOR The roster does not contain any translator with the
+		ID \a translatorID.
+	\retval B_BAD_VALUE \a ioExtension was \c NULL.
+	\retval B_ERROR An error occurred or the translator chose not to provide
+		this functionality.
+*/
+
+/*!
+	\fn status_t BTranslatorRoster::GetRefFor(translator_id translatorID,\
+		entry_ref* ref);
+	\brief Returns the entry_ref of the specified translator.
+
+	\param translatorID The ID of the translator whose entry_ref is to be
+		found.
+	\param ref Where the entry_ref will be written.
+
+	\retval B_OK Everything went well.
+	\retval B_BAD_VALUE \a ref was \c NULL.
+	\retval B_NO_TRANSLATOR The roster does not contain any translator with the
+		ID \a translatorID.
+	\retval B_ERROR An error occurred.
+*/
+
+//! @}
+
+/*!
+	\name Core Methods
+*/
+
+//! @{
+
+/*!
+	\fn virtual status_t BTranslatorRoster::Identify(BPositionIO* source,\
+		BMessage* ioExtension, translator_info* _info, uint32 hintType = 0,\
+		const char* hintMIME = NULL, uint32 wantType = 0);
+	\brief Determines the best translator in the roster to perform a certain
+		conversion.
+
+	\param source Read and seek interface to the data to be examined.
+	\param ioExtension A message containing configuration infortmation for the
+		translators.
+	\param _info Where information about the best translator will be written.
+	\param hintType A hint about the data format in \a source. \c 0 represents
+		an unknown type.
+	\param hintMIME A hint about the MIME type of \a source. \c NULL represents
+		an unknown type.
+	\param wantType The format that \a source needs to be translated into. \c 0
+		permits any output type.
+
+	To determine the best translator, for all translators that report that
+	they are able to perform the translation, the values they return for
+	quality and capability are multiplied. The translator with the highest
+	value gets returned. Note that quality and capability for the output
+	format are not taken into consideration.
+
+	\retval B_OK Identification was successful. Information about the chosen
+		translator was written to \a _info.
+	\retval B_NO_TRANSLATOR No suitable translator was found.
+	\retval B_BAD_VALUE \a source or \a _info was \c NULL.
+	\retval B_IO_ERROR There was an error interacting with \a source.
+*/
+
+/*!
+	\fn virtual status_t BTranslatorRoster::Translate(BPositionIO* source,\
+		const translator_info* info, BMessage* ioExtension, BPositionIO*\
+		destination, uint32 wantOutType, uint32 hintType = 0, const char*\
+		hintMIME = NULL);
+	\brief Finds and invokes the best translator for a conversion.
+
+	\param source Read and seek interface to the input data.
+	\param info Information about wich translator should be used. If
+		\a info is \c NULL, Identify() will be used to find a suitable
+		translator.
+	\param ioExtension A message containing configuration information for the
+		translator.
+	\param destination Write interface to the output location.
+	\param wantOutType The desired output format. If this is \c 0, any type
+		is permitted.
+	\param hintType A hint about the type of the data in \a source.
+	\param hintMIME A hint about the MIME type of the data in \a source.
+
+	\retval B_OK The translated data was successfully written to
+		\a destination.
+	\retval B_NO_TRANSLATOR \a info was non-null but did not match to any
+		translator in the roster.
+	\retval B_NO_TRANSLATOR \a info was \c NULL and no suitable translator was
+		found.
+	\retval B_ERROR An error occurred.
+	\retval B_BAD_VALUE \a source or \a destination was \c NULL or
+		\a ioExtension was \c NULL or contained bad data.
+	\retval B_IO_ERROR An error occurred accessing \a source or \a destination.
+*/
+
+/*!
+	\fn virtual status_t BTranslatorRoster::Translate(translator_id\
+		translatorID, BPositionIO* source, BMessage* ioExtension, BPositionIO*\
+		destination, uint32 wantOutType);
+	\brief Uses a specified translator from the roster to perform a conversion.
+
+	\param translatorID The ID of the translator that should be used.
+	\param source Read and seek interface to the input data.
+	\param ioExtension A message containing configuration information for the
+		translator.
+	\param destination Write interface to the output location.
+	\param wantOutType The desired output format. If this is \c 0, any type is
+		permitted.
+
+	\retval B_OK The translated data was successfully written to
+		\a destination.
+	\retval B_NO_TRANSLATOR The specified translator cannot handle the data in
+		\a source.
+	\retval B_ERROR An error occurred.
+	\retval B_BAD_VALUE \a source or \a destination was \c NULL or
+		\a ioExtension was \c NULL or contained bad data.
+	\retval B_IO_ERROR An error occurred accessing \a source or \a destination.
+*/
+
+//! @}
+
+/*!
+	\name Miscellaneous
+*/
+
+//! @{
+
+/*!
+	\fn bool BTranslatorRoster::IsTranslator(entry_ref* ref);
+	\brief Determines whether the specified add-on contains at least one
+		translator.
+
+	\param ref The entry_ref to be tested.
+
+	\retval true The add-on exposes translators.
+	\retval false The add-on exposes no translators or an error occurred.
+*/
+
+//! @}
+
+/*!
+	\name Notifications
+*/
+
+//! @{
+
+/*!
+	\fn status_t BTranslatorRoster::StartWatching(BMessenger target);
+	\brief Register a messenger to be notified when the roster changes.
+
+	\param target The BMessenger to be registered.
+
+	Whenever a translator is added to or removed from the roster, all
+	messengers that were registered through this method are sent a message.
+	\c message->what will be \c B_TRANSLATOR_ADDED or \c B_TRANSLATOR_REMOVED
+	(as defined in AppDefs.h) respectively.
+
+	\retval B_OK \a target was successfully registered.
+	\retval B_NO_MEMORY Unable to allocate more memory for the list of targets.
+*/
+
+/*!
+	\fn status_t BTranslatorRoster::StopWatching(BMessenger target);
+	\brief Unregister a messenger from the notification list.
+
+	\param target The BMessenger to be removed.
+
+	\retval B_OK \a target was successfully unsubscribed.
+	\retval B_BAD_VALUE \a target could not be found on the notification list.
+
+	\sa StartWatching(BMessenger target)
+*/
+
+//! @}
