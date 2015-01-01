@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Markus Himmel. All rights reserved.
+ * Copyright 2014-2015 Markus Himmel. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,14 +13,14 @@
 /*!
 	\file Translator.h
 	\ingroup translation
-	\ingroup libbe
+	\ingroup libtranslation
 	\brief BTranslator class definition.
 */
 
 /*!
 	\file TranslationDefs.h
 	\ingroup translation
-	\ingroup libbe
+	\ingroup libtranslation
 	\brief Defines structures and preprocessor macros that are used by the
 		translation kit.
 */
@@ -28,7 +28,7 @@
 /*!
 	\file TranslatorFormats.h
 	\ingroup translation
-	\ingroup libbe
+	\ingroup libtranslation
 	\brief Defines identifiers and structures for data formats and configuration
 		messages.
 */
@@ -36,7 +36,7 @@
 /*!
 	\class BTranslator
 	\ingroup translation
-	\ingroup libbe
+	\ingroup libtranslation
 	\brief Abstract class that defines the necessary functionality of a
 		translator.
 
@@ -279,7 +279,7 @@
 		TranslatorFormats.h.
 	\param _view Where a pointer to the newly created configuration view will
 		be stored.
-	\param _extent Where the size of the newly created configureation view will
+	\param _extent Where the size of the newly created configuration view will
 		be stored.
 	\retval B_OK Everything went well.
 	\retval B_ERROR An error occurred or the method was not overriden by the
