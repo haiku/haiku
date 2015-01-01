@@ -131,7 +131,7 @@ class HeaderView : public BGridView, public BInvoker {
 		base_type Base() const { return fBase; }
 		void SetBase(base_type);
 
-		off_t CursorOffset() const { return fOffset; }
+		off_t CursorOffset() const { return fPosition % fBlockSize; }
 		off_t Position() const { return fPosition; }
 		uint32 BlockSize() const { return fBlockSize; }
 		void SetTo(off_t position, uint32 blockSize);
@@ -148,7 +148,6 @@ class HeaderView : public BGridView, public BInvoker {
 		const char		*fAttribute;
 		off_t			fFileSize;
 		uint32			fBlockSize;
-		off_t			fOffset;
 		base_type		fBase;
 		off_t			fPosition;
 		off_t			fLastPosition;
@@ -157,8 +156,8 @@ class HeaderView : public BGridView, public BInvoker {
 		BTextControl	*fPositionControl;
 		BStringView		*fPathView;
 		BStringView		*fSizeView;
-		BStringView		*fOffsetView;
-		BStringView		*fFileOffsetView;
+		BTextControl	*fOffsetControl;
+		BTextControl	*fFileOffsetControl;
 		PositionSlider	*fPositionSlider;
 		IconView		*fIconView;
 		BButton			*fStopButton;
@@ -477,7 +476,6 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 	fAttribute(editor.Attribute()),
 	fFileSize(editor.FileSize()),
 	fBlockSize(editor.BlockSize()),
-	fOffset(0),
 	fBase(kHexBase),
 	fPosition(0),
 	fLastPosition(0)
@@ -551,13 +549,14 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 	stringView->SetFont(&boldFont);
 	line->AddChild(stringView);
 
+	BMessage* msg = new BMessage(kMsgPositionUpdate);
+	msg->AddBool("fPositionControl", true);
 		// BTextControl oddities
-	fPositionControl = new BTextControl(B_EMPTY_STRING, NULL, "0x0",
-		new BMessage(kMsgPositionUpdate));
+	fPositionControl = new BTextControl(B_EMPTY_STRING, NULL, "0x0", msg);
 	fPositionControl->SetDivider(0.0);
 	fPositionControl->SetFont(&plainFont);
 	fPositionControl->TextView()->SetFontAndColor(&plainFont);
-	fPositionControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+	fPositionControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_LEFT);
 	line->AddChild(fPositionControl);
 
 	fSizeView = new BStringView(B_EMPTY_STRING, B_TRANSLATE_COMMENT("of "
@@ -572,9 +571,14 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 	stringView->SetFont(&boldFont);
 	line->AddChild(stringView);
 
-	fOffsetView = new BStringView(B_EMPTY_STRING, "0x0");
-	fOffsetView->SetFont(&plainFont);
-	line->AddChild(fOffsetView);
+	msg = new BMessage(kMsgPositionUpdate);
+	msg->AddBool("fOffsetControl", false);
+	fOffsetControl = new BTextControl(B_EMPTY_STRING, NULL, "0x0", msg);
+	fOffsetControl->SetDivider(0.0);
+	fOffsetControl->SetFont(&plainFont);
+	fOffsetControl->TextView()->SetFontAndColor(&plainFont);
+	fOffsetControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_LEFT);
+	line->AddChild(fOffsetControl);
 	UpdateOffsetViews(false);
 
 	stringView = new BStringView(B_EMPTY_STRING, editor.IsAttribute()
@@ -583,9 +587,14 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 	stringView->SetFont(&boldFont);
 	line->AddChild(stringView);
 
-	fFileOffsetView = new BStringView(B_EMPTY_STRING, "0x0");
-	fFileOffsetView->SetFont(&plainFont);
-	line->AddChild(fFileOffsetView);
+	msg = new BMessage(kMsgPositionUpdate);
+	msg->AddBool("fFileOffsetControl", false);
+	fFileOffsetControl = new BTextControl(B_EMPTY_STRING, NULL, "0x0", msg);
+	fFileOffsetControl->SetDivider(0.0);
+	fFileOffsetControl->SetFont(&plainFont);
+	fFileOffsetControl->TextView()->SetFontAndColor(&plainFont);
+	fFileOffsetControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_LEFT);
+	line->AddChild(fFileOffsetControl);
 
 	BGroupLayoutBuilder(line).AddGlue();
 
@@ -609,6 +618,8 @@ HeaderView::AttachedToWindow()
 
 	fStopButton->SetTarget(Parent());
 	fPositionControl->SetTarget(this);
+	fOffsetControl->SetTarget(this);
+	fFileOffsetControl->SetTarget(this);
 	fPositionSlider->SetTarget(this);
 
 	BMessage *message;
@@ -660,8 +671,8 @@ HeaderView::UpdatePositionViews(bool all)
 	fPositionControl->SetText(buffer);
 
 	if (all) {
-		FormatValue(buffer, sizeof(buffer), fPosition + fOffset);
-		fFileOffsetView->SetText(buffer);
+		FormatValue(buffer, sizeof(buffer), fPosition);
+		fFileOffsetControl->SetText(buffer);
 	}
 }
 
@@ -670,12 +681,12 @@ void
 HeaderView::UpdateOffsetViews(bool all)
 {
 	char buffer[64];
-	FormatValue(buffer, sizeof(buffer), fOffset);
-	fOffsetView->SetText(buffer);
+	FormatValue(buffer, sizeof(buffer), fPosition % fBlockSize);
+	fOffsetControl->SetText(buffer);
 
 	if (all) {
-		FormatValue(buffer, sizeof(buffer), fPosition + fOffset);
-		fFileOffsetView->SetText(buffer);
+		FormatValue(buffer, sizeof(buffer), fPosition);
+		fFileOffsetControl->SetText(buffer);
 	}
 }
 
@@ -743,7 +754,8 @@ HeaderView::MessageReceived(BMessage *message)
 				case kDataViewCursorPosition:
 					off_t offset;
 					if (message->FindInt64("position", &offset) == B_OK) {
-						fOffset = offset;
+						fPosition = (fPosition / fBlockSize) * fBlockSize
+							+ offset;
 						UpdateOffsetViews();
 					}
 					break;
@@ -810,6 +822,7 @@ HeaderView::MessageReceived(BMessage *message)
 
 			off_t position;
 			int32 delta;
+			bool round = true;
 			if (message->FindInt64("position", &position) == B_OK)
 				fPosition = position;
 			else if (message->FindInt64("block", &position) == B_OK) {
@@ -822,8 +835,19 @@ HeaderView::MessageReceived(BMessage *message)
 				try {
 					ExpressionParser parser;
 					parser.SetSupportHexInput(true);
-					fPosition = parser.EvaluateToInt64(
-						fPositionControl->Text()) * fBlockSize;
+					if (message->FindBool("fPositionControl", &round)
+						== B_OK) {
+						fPosition = parser.EvaluateToInt64(
+							fPositionControl->Text()) * fBlockSize;
+					} else if (message->FindBool("fOffsetControl", &round)
+					== B_OK) {
+						fPosition = (fPosition / fBlockSize) * fBlockSize +
+							parser.EvaluateToInt64(fOffsetControl->Text());
+					} else if (message->FindBool("fFileOffsetControl", &round)
+						== B_OK) {
+						fPosition = parser.EvaluateToInt64(
+							fFileOffsetControl->Text());
+					}
 				} catch (...) {
 					beep();
 					break;
@@ -831,7 +855,9 @@ HeaderView::MessageReceived(BMessage *message)
 			}
 
 			fLastPosition = lastPosition;
-			fPosition = (fPosition / fBlockSize) * fBlockSize;
+
+			if (round)
+				fPosition = (fPosition / fBlockSize) * fBlockSize;
 				// round to block size
 
 			if (fPosition < 0)
@@ -975,6 +1001,11 @@ EditorLooper::MessageReceived(BMessage *message)
 			if (message->FindInt64("position", &position) == B_OK) {
 				BAutolock locker(fEditor);
 				fEditor.SetViewOffset(position);
+
+				BMessage message(kMsgSetSelection);
+				message.AddInt64("start", position - fEditor.ViewOffset());
+				message.AddInt64("end", position - fEditor.ViewOffset());
+				fMessenger.SendMessage(&message);
 			}
 			break;
 		}
