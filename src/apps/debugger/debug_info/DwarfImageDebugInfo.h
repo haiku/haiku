@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_IMAGE_DEBUG_INFO_H
@@ -90,6 +90,16 @@ private:
 			struct UnwindTargetInterface;
 			struct EntryListWrapper;
 
+			struct TypeNameKey;
+			struct TypeNameEntry;
+			struct TypeNameEntryHashDefinition;
+
+			typedef BOpenHashTable<TypeNameEntryHashDefinition>
+				TypeNameTable;
+
+			struct TypeEntryInfo;
+			typedef BObjectList<TypeEntryInfo> TypeEntryList;
+
 private:
 			status_t 			_AddSourceCodeInfo(CompilationUnit* unit,
 									FileSourceCode* sourceCode,
@@ -112,7 +122,10 @@ private:
 									DwarfStackFrameDebugInfo& factory);
 
 			bool				_EvaluateBaseTypeConstraints(DIEType* type,
-									const TypeLookupConstraints& constraints);
+									const TypeLookupConstraints& constraints)
+									const;
+
+			status_t			_BuildTypeNameTable();
 
 private:
 			BLocker				fLock;
@@ -122,6 +135,7 @@ private:
 			FileManager*		fFileManager;
 			GlobalTypeLookup*	fTypeLookup;
 			GlobalTypeCache*	fTypeCache;
+			TypeNameTable*		fTypeNameTable;
 			DwarfFile*			fFile;
 			ElfSegment*			fTextSegment;
 			target_addr_t		fRelocationDelta;

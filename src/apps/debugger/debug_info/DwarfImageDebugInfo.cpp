@@ -232,6 +232,97 @@ struct DwarfImageDebugInfo::EntryListWrapper {
 };
 
 
+// #pragma mark - DwarfImageDebugInfo::TypeNameKey
+
+
+struct DwarfImageDebugInfo::TypeNameKey {
+	BString			typeName;
+
+	TypeNameKey(const BString& typeName)
+		:
+		typeName(typeName)
+	{
+	}
+
+	uint32 HashValue() const
+	{
+		return StringUtils::HashValue(typeName);
+	}
+
+	bool operator==(const TypeNameKey& other) const
+	{
+		return typeName == other.typeName;
+	}
+};
+
+
+// #pragma mark - DwarfImageDebugInfo::TypeNameEntry
+
+
+struct DwarfImageDebugInfo::TypeNameEntry : TypeNameKey {
+	TypeNameEntry* next;
+	TypeEntryList types;
+
+	TypeNameEntry(const BString& name)
+		:
+		TypeNameKey(name),
+		types(10, false)
+	{
+	}
+
+	~TypeNameEntry()
+	{
+	}
+
+};
+
+
+// #pragma mark - DwarfImageDebugInfo::TypeNameEntryHashDefinition
+
+
+struct DwarfImageDebugInfo::TypeNameEntryHashDefinition {
+	typedef TypeNameKey		KeyType;
+	typedef	TypeNameEntry	ValueType;
+
+	size_t HashKey(const TypeNameKey& key) const
+	{
+		return key.HashValue();
+	}
+
+	size_t Hash(const TypeNameEntry* value) const
+	{
+		return value->HashValue();
+	}
+
+	bool Compare(const TypeNameKey& key,
+		const TypeNameEntry* value) const
+	{
+		return key == *value;
+	}
+
+	TypeNameEntry*& GetLink(TypeNameEntry* value) const
+	{
+		return value->next;
+	}
+};
+
+
+// #pragma mark - DwarfImageDebugInfo::TypeEntryInfo
+
+
+struct DwarfImageDebugInfo::TypeEntryInfo {
+	DIEType* type;
+	CompilationUnit* unit;
+
+	TypeEntryInfo(DIEType* type, CompilationUnit* unit)
+		:
+		type(type),
+		unit(unit)
+	{
+	}
+};
+
+
 // #pragma mark - DwarfImageDebugInfo
 
 
@@ -247,6 +338,7 @@ DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
 	fFileManager(fileManager),
 	fTypeLookup(typeLookup),
 	fTypeCache(typeCache),
+	fTypeNameTable(NULL),
 	fFile(file),
 	fTextSegment(NULL),
 	fRelocationDelta(0),
@@ -266,6 +358,8 @@ DwarfImageDebugInfo::~DwarfImageDebugInfo()
 	fDebuggerInterface->ReleaseReference();
 	fFile->ReleaseReference();
 	fTypeCache->ReleaseReference();
+
+	delete fTypeNameTable;
 }
 
 
@@ -294,7 +388,7 @@ DwarfImageDebugInfo::Init()
 		fPLTSectionEnd = fPLTSectionStart + section->Size();
 	}
 
-	return B_OK;
+	return _BuildTypeNameTable();
 }
 
 
@@ -426,64 +520,47 @@ DwarfImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo>& symbols,
 
 
 status_t
-DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
-	const BString& name, const TypeLookupConstraints& constraints,
-	Type*& _type)
+DwarfImageDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
+	const TypeLookupConstraints& constraints, Type*& _type)
 {
-	// iterate through all compilation units
-	for (int32 i = 0; CompilationUnit* unit = fFile->CompilationUnitAt(i);
-		i++) {
-		DwarfTypeContext* typeContext = NULL;
-		BReference<DwarfTypeContext> typeContextReference;
+	TypeNameEntry* entry = fTypeNameTable->Lookup(name);
+	if (entry == NULL)
+		return B_ENTRY_NOT_FOUND;
 
-		// iterate through all types of the compilation unit
-		for (DebugInfoEntryList::ConstIterator it
-				= unit->UnitEntry()->Types().GetIterator();
-			DIEType* typeEntry = dynamic_cast<DIEType*>(it.Next());) {
-			if (typeEntry->IsDeclaration())
+	for (int32 i = 0; TypeEntryInfo* info = entry->types.ItemAt(i); i++) {
+		DIEType* typeEntry = info->type;
+		if (constraints.HasTypeKind()) {
+			if (dwarf_tag_to_type_kind(typeEntry->Tag())
+				!= constraints.TypeKind()) {
 				continue;
-
-			if (constraints.HasTypeKind()) {
-				if (dwarf_tag_to_type_kind(typeEntry->Tag())
-					!= constraints.TypeKind())
-				continue;
-
-				if (!_EvaluateBaseTypeConstraints(typeEntry,
-					constraints))
-					continue;
 			}
 
-			if (constraints.HasSubtypeKind()
-				&& dwarf_tag_to_subtype_kind(typeEntry->Tag())
-					!= constraints.SubtypeKind())
+			if (!_EvaluateBaseTypeConstraints(typeEntry, constraints))
 				continue;
-
-			BString typeEntryName;
-			DwarfUtils::GetFullyQualifiedDIEName(typeEntry, typeEntryName);
-			if (typeEntryName != name)
-				continue;
-
-			// The name matches and the entry is not just a declaration --
-			// create the type. First create the type context lazily.
-			if (typeContext == NULL) {
-				typeContext = new(std::nothrow)
-					DwarfTypeContext(fArchitecture, fImageInfo.ImageID(), fFile,
-					unit, NULL, 0, 0, fRelocationDelta, NULL, NULL);
-				if (typeContext == NULL)
-					return B_NO_MEMORY;
-				typeContextReference.SetTo(typeContext, true);
-			}
-
-			// create the type
-			DwarfType* type;
-			DwarfTypeFactory typeFactory(typeContext, fTypeLookup, cache);
-			status_t error = typeFactory.CreateType(typeEntry, type);
-			if (error != B_OK)
-				continue;
-
-			_type = type;
-			return B_OK;
 		}
+
+		if (constraints.HasSubtypeKind()
+			&& dwarf_tag_to_subtype_kind(typeEntry->Tag())
+				!= constraints.SubtypeKind()) {
+			continue;
+		}
+
+		DwarfTypeContext* typeContext = new(std::nothrow)
+			DwarfTypeContext(fArchitecture, fImageInfo.ImageID(), fFile,
+				info->unit, NULL, 0, 0, fRelocationDelta, NULL, NULL);
+		if (typeContext == NULL)
+			return B_NO_MEMORY;
+		BReference<DwarfTypeContext> typeContextReference(typeContext, true);
+
+		// create the type
+		DwarfType* type;
+		DwarfTypeFactory typeFactory(typeContext, fTypeLookup, cache);
+		status_t error = typeFactory.CreateType(typeEntry, type);
+		if (error != B_OK)
+			continue;
+
+		_type = type;
+		return B_OK;
 	}
 
 	return B_ENTRY_NOT_FOUND;
@@ -1162,7 +1239,7 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 
 bool
 DwarfImageDebugInfo::_EvaluateBaseTypeConstraints(DIEType* type,
-	const TypeLookupConstraints& constraints)
+	const TypeLookupConstraints& constraints) const
 {
 	if (constraints.HasBaseTypeName()) {
 		BString baseEntryName;
@@ -1203,4 +1280,56 @@ DwarfImageDebugInfo::_EvaluateBaseTypeConstraints(DIEType* type,
 	}
 
 	return true;
+}
+
+
+status_t
+DwarfImageDebugInfo::_BuildTypeNameTable()
+{
+	fTypeNameTable = new(std::nothrow) TypeNameTable;
+	if (fTypeNameTable == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = fTypeNameTable->Init();
+	if (error != B_OK)
+		return error;
+
+	// iterate through all compilation units
+	for (int32 i = 0; CompilationUnit* unit = fFile->CompilationUnitAt(i);
+		i++) {
+
+		// iterate through all types of the compilation unit
+		for (DebugInfoEntryList::ConstIterator it
+				= unit->UnitEntry()->Types().GetIterator();
+			DIEType* typeEntry = dynamic_cast<DIEType*>(it.Next());) {
+			if (typeEntry->IsDeclaration())
+				continue;
+
+			BString typeEntryName;
+			DwarfUtils::GetFullyQualifiedDIEName(typeEntry, typeEntryName);
+
+			TypeNameEntry* entry = fTypeNameTable->Lookup(typeEntryName);
+			if (entry == NULL) {
+				entry = new(std::nothrow) TypeNameEntry(typeEntryName);
+				if (entry == NULL)
+					return B_NO_MEMORY;
+
+				error = fTypeNameTable->Insert(entry);
+				if (error != B_OK)
+					return error;
+			}
+
+			TypeEntryInfo* info = new(std::nothrow) TypeEntryInfo(typeEntry,
+				unit);
+			if (info == NULL)
+				return B_NO_MEMORY;
+
+			if (!entry->types.AddItem(info)) {
+				delete info;
+				return B_NO_MEMORY;
+			}
+		}
+	}
+
+	return B_OK;
 }
