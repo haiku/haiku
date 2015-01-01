@@ -16,12 +16,15 @@ namespace CLanguage {
 	class Tokenizer;
 }
 
+class TeamTypeInformation;
+
 
 class CLanguageFamilySyntaxHighlightInfo : public SyntaxHighlightInfo {
 public:
 								CLanguageFamilySyntaxHighlightInfo(
 									LineDataSource* source,
-									CLanguage::Tokenizer* tokenizer);
+									CLanguage::Tokenizer* tokenizer,
+									TeamTypeInformation* info);
 	virtual						~CLanguageFamilySyntaxHighlightInfo();
 
 	virtual	int32				GetLineHighlightRanges(int32 line,
@@ -44,6 +47,7 @@ private:
 private:
 	LineDataSource*				fHighlightSource;
 	CLanguage::Tokenizer*		fTokenizer;
+	TeamTypeInformation*		fTypeInfo;
 	LineInfoList				fLineInfos;
 };
 

@@ -31,7 +31,7 @@ CLanguageFamilySyntaxHighlighter::~CLanguageFamilySyntaxHighlighter()
 
 status_t
 CLanguageFamilySyntaxHighlighter::ParseText(LineDataSource* source,
-	SyntaxHighlightInfo*& _info)
+	TeamTypeInformation* typeInfo, SyntaxHighlightInfo*& _info)
 {
 	Tokenizer* tokenizer = new(std::nothrow) Tokenizer();
 	if (tokenizer == NULL)
@@ -39,7 +39,7 @@ CLanguageFamilySyntaxHighlighter::ParseText(LineDataSource* source,
 	ObjectDeleter<Tokenizer> deleter(tokenizer);
 
 	_info = new(std::nothrow) CLanguageFamilySyntaxHighlightInfo(source,
-		tokenizer);
+		tokenizer, typeInfo);
 	if (_info == NULL)
 		return B_NO_MEMORY;
 

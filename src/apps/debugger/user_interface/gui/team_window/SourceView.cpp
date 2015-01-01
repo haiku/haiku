@@ -76,7 +76,7 @@ static rgb_color kSyntaxColors[] = {
 	{0, 0x64, 0, 255},			// SYNTAX_HIGHLIGHT_PREPROCESSOR_KEYWORD
 	{0, 0, 0, 255},				// SYNTAX_HIGHLIGHT_IDENTIFIER
 	{0x44, 0x8a, 0, 255},		// SYNTAX_HIGHLIGHT_OPERATOR
-	{0, 0, 0, 255}, 			// SYNTAX_HIGHLIGHT_TYPE
+	{0x70, 0x70, 0x70, 255},	// SYNTAX_HIGHLIGHT_TYPE
 	{0x85, 0x19, 0x19, 255},	// SYNTAX_HIGHLIGHT_NUMERIC_LITERAL
 	{0x3f, 0x48, 0x84, 255},	// SYNTAX_HIGHLIGHT_STRING_LITERAL
 	{0xa1, 0x64, 0xe, 255},		// SYNTAX_HIGHLIGHT_COMMENT
@@ -2254,7 +2254,8 @@ SourceView::SetSourceCode(SourceCode* sourceCode)
 			if (highlighter != NULL) {
 				BReference<SyntaxHighlighter> syntaxReference(highlighter,
 					true);
-				highlighter->ParseText(fSourceCode, fCurrentSyntaxInfo);
+				highlighter->ParseText(fSourceCode,
+					fTeam->GetTeamTypeInformation(), fCurrentSyntaxInfo);
 			}
 		}
 	}

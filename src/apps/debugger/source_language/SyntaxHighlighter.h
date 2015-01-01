@@ -13,6 +13,7 @@
 
 
 class LineDataSource;
+class TeamTypeInformation;
 
 
 enum syntax_highlight_type {
@@ -48,6 +49,7 @@ public:
 	virtual						~SyntaxHighlighter();
 
 	virtual	status_t			ParseText(LineDataSource* source,
+									TeamTypeInformation* typeInfo,
 									SyntaxHighlightInfo*& _info) = 0;
 										// caller owns the returned info
 };

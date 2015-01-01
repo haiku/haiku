@@ -10,6 +10,8 @@
 
 #include "CLanguageTokenizer.h"
 #include "LineDataSource.h"
+#include "TeamTypeInformation.h"
+#include "TypeLookupConstraints.h"
 
 
 using namespace CLanguage;
@@ -167,11 +169,13 @@ private:
 
 
 CLanguageFamilySyntaxHighlightInfo::CLanguageFamilySyntaxHighlightInfo(
-	LineDataSource* source, Tokenizer* tokenizer)
+	LineDataSource* source, Tokenizer* tokenizer,
+	TeamTypeInformation* typeInfo)
 	:
 	SyntaxHighlightInfo(),
 	fHighlightSource(source),
 	fTokenizer(tokenizer),
+	fTypeInfo(typeInfo),
 	fLineInfos(10, true)
 {
 	fHighlightSource->AcquireReference();
@@ -310,11 +314,14 @@ CLanguageFamilySyntaxHighlightInfo::_ParseLine(int32 line,
 syntax_highlight_type
 CLanguageFamilySyntaxHighlightInfo::_MapTokenToSyntaxType(const Token& token)
 {
+	static TypeLookupConstraints constraints;
+
 	switch (token.type) {
 		case TOKEN_IDENTIFIER:
-			// TODO: recognize types
 			if (IsLanguageKeyword(token))
 				return SYNTAX_HIGHLIGHT_KEYWORD;
+			else if (fTypeInfo->TypeExistsByName(token.string, constraints))
+				return SYNTAX_HIGHLIGHT_TYPE;
 			break;
 
 		case TOKEN_CONSTANT:

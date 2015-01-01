@@ -15,6 +15,7 @@ public:
 	virtual						~CLanguageFamilySyntaxHighlighter();
 
 	virtual	status_t			ParseText(LineDataSource* source,
+									TeamTypeInformation* typeInfo,
 									SyntaxHighlightInfo*& _info);
 										// caller owns the returned info
 };
