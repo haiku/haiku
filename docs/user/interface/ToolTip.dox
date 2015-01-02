@@ -3,6 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
+ *		Axel Dörfler, axeld@pinc-software.de
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
@@ -25,9 +27,13 @@
 	\ingroup libbe
 	\brief Displays help text on hover.
 
-	\attention Use at your own risk! This class is private and may change before release.
+	\attention Use at your own risk! This class is private and may change
+	           before release.
 
-	\since Haiku R1A3
+	This class is for advanced uses of tool tips with custom contents or
+	behavior. The simple way to use tooltips is via BView::SetToolTip().
+
+	\since Haiku R1
 */
 
 
@@ -75,7 +81,8 @@
 
 /*!
 	\fn void BToolTip::SetSticky(bool enable)
-	\brief Turns sticky flag on and off.
+	\brief Turns sticky flag on or off which determines whether or not the
+	       tool tip stays visible when the mouse moves.
 
 	\since Haiku R1
 */
@@ -93,6 +100,11 @@
 	\fn void BToolTip::SetMouseRelativeLocation(BPoint location)
 	\brief Set the location of the tooltip relative to the current mouse position.
 
+	The position is relative to the mouse cursor location at the time the
+	tool tip is shown. It should be as close as possible to the mouse cursor
+	without hiding important parts of the UI near the cursor while the parent
+	view remains visible and reachable.
+
 	\since Haiku R1
 */
 
@@ -107,7 +119,9 @@
 
 /*!
 	\fn void BToolTip::SetAlignment(BAlignment alignment)
-	\brief Set the alignment of the tool tip.
+	\brief Set the alignment of the tool tip which determines where the tool
+	       tip should appear i.e. left or right from the current mouse cursor
+	       position, etc.
 
 	\since Haiku R1
 */
@@ -123,7 +137,7 @@
 
 /*!
 	\fn bool BToolTip::Lock()
-	\brief Allows derived classes to lock the tool tip while changing it.
+	\brief Allows derived classes to lock the tool tip while modifying it.
 
 	\since Haiku R1
 */
