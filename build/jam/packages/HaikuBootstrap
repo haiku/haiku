@@ -148,9 +148,7 @@ AddFilesToPackage data fortunes : $(fortuneFiles) ;
 
 local fontDir = [ FDirName $(HAIKU_TOP) data system data fonts ] ;
 local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
-local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
 AddFilesToPackage data fonts psfonts : $(psFonts) ;
-AddFilesToPackage data fonts ttfonts : $(ttFonts) ;
 
 # keymaps
 AddFilesToPackage data Keymaps : $(HAIKU_KEYMAP_FILES) ;

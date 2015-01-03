@@ -1191,6 +1191,15 @@ AboutView::_CreateCreditsView()
 		.SetLicenses("OpenGroup", "DEC", NULL));
 			// TODO: URL
 
+	// Bitstream Charter font
+	_AddPackageCredit(PackageCredit("Bitstream Charter font")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1989-1992 Bitstream Inc.,"
+			" Cambridge, MA.\n"
+			"BITSTREAM CHARTER is a registered trademark of Bitstream Inc."),
+			NULL)
+		.SetLicense("Bitstream Charter")
+		.SetURL("http://www.bitstream.com/"));
+
 	// Noto fonts copyright
 	_AddPackageCredit(PackageCredit("Noto fonts")
 		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING
