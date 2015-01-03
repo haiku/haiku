@@ -1072,11 +1072,12 @@ AboutView::_CreateCreditsView()
 
 	// FreeType copyrights
 	_AddPackageCredit(PackageCredit("FreeType2")
-		.SetCopyright(B_TRANSLATE("Portions of this software are under "
-			"copyright.\n"
-			COPYRIGHT_STRING "1996-2006 "
-			"The FreeType Project. All rights reserved."))
-		.SetLicense("FTL")
+		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "1996-2002, 2006 "
+			"David Turner, Robert Wilhelm and Werner Lemberg."),
+			COPYRIGHT_STRING "2014 The FreeType Project. "
+			"All rights reserved.",
+			NULL)
+		.SetLicense("FreeType")
 		.SetURL("http://www.freetype.org"));
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
