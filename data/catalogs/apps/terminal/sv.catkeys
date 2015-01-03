@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	731520205
+1	swedish	x-vnd.Haiku-Terminal	1993449439
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -26,10 +26,12 @@ Window title:	Terminal TermWindow		Fönstertitel:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Okänt alternativ \"%s\"\n
 Blue	Terminal colors scheme		Blå
 Custom	Terminal colors scheme		Anpassad
+Encoding:	Terminal AppearancePrefView		Kodning:
 %app% settings	Terminal PrefWindow	window title	%app% inställningar
 Cancel	Terminal SetTitleWindow		Avbryt
 Increase	Terminal TermWindow		Öka
 Settings	Terminal TermWindow		Inställningar
+Window size	Terminal TermWindow		Fönsterstorlek
 Selected text	Terminal AppearancePrefView		Markerad text
 Find	Terminal FindWindow		Sök
 Appearance	Terminal PrefWindow		Utseende
@@ -45,15 +47,19 @@ Window title…	Terminal TermWindow		Fönstertitel...
 Full screen	Terminal TermWindow		Helskärm
 Page setup…	Terminal TermWindow		Sidinställningar...
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Följande processer körs fortfarande:\n\n\t%1\n\nOm du stänger Terminalen kommer processerna att termineras.
+Custom	Terminal AppearancePrefView	Window size	Anpassad
 Insert path	Terminal TermView		Lägg till sökväg
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nUpphovsrätt 2001-2009 Haiku, Inc.\nUpphovsrätt (C) 1999 Kazuho Okui and Takashi Murai.\n\nHantering: %s [OPTION] [SHELL]\n
+Window size:	Terminal AppearancePrefView		Fönsterstorlek:
 No search string was entered.	Terminal TermWindow		Ingen söksträng angiven.
 Font size	Terminal TermWindow		Typsnittsstorlek
 Blinking cursor	Terminal AppearancePrefView		Blinkande markör
 Set window title	Terminal TermWindow		Ange fönstertitel
+Revert	Terminal PrefWindow		Återställ
 Terminal	System name		Terminal
 Copy path	Terminal TermView		Kopiera sökväg
 Close other tabs	Terminal TermWindow		Stäng övriga flikar
+Defaults	Terminal PrefWindow		Standard
 Match word	Terminal FindWindow		Matcha ord
 Nothing is selected.	Terminal TermWindow		Ingenting markerat.
 Text not found.	Terminal TermWindow		Text hittades inte.
@@ -95,6 +101,7 @@ Find failed	Terminal TermWindow		Sökning misslyckades
 Search forward	Terminal FindWindow		Sök framåt
 Edit tab title…	Terminal TermWindow		Redigera fliktitel...
 Open path	Terminal TermView		Öppna sökväg
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tArbetskatalog för den aktiva processen.\n\t\t\tValfritt så kan den maximala antal sökvägs komponenter vara\n\t\t\tspecificerad. E.g. '%2d' för som mest två komponenter.\n\t%i\t-\tIndexeringen av tabben.\n\t%e\t-\tEncoding av den valda tabben. Visas inte som UTF-8.\n\t%p\t-\tNamnet på den aktiva processen.\n\t%%\t-\tTecknet '%'.
 Find previous	Terminal TermWindow		Sök föregående
 Copy link location	Terminal TermView		Kopiera länkplats
 Tab title:	Terminal TermWindow		Fliktitel:

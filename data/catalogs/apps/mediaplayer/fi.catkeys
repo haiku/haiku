@@ -7,7 +7,7 @@ Stream settings	MediaPlayer-Main		Virta-asetukset
 <unknown>	PlaylistItem-album		<tuntematon>
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaalausohjaimet kokonäyttötilassa
 Video	MediaPlayer-InfoWin		Video
-Subtitle size:	MediaPlayer-SettingsWindow		Aliotsikkokoko:
+Subtitle size:	MediaPlayer-SettingsWindow		Tekstityskoko:
 Save Playlist	MediaPlayer-PlaylistWindow		Tallenna soittoluettelo
 <no media>	MediaPlayer-InfoWin		<ei mediaa>
 (not supported)	MediaPlayer-InfoWin		(ei ole tuettu)
@@ -16,7 +16,7 @@ Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettel
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Uusi soitin...
 100% scale	MediaPlayer-Main		100 % skaala
-Subtitle placement:	MediaPlayer-SettingsWindow		Aliotsikon sijainti:
+Subtitle placement:	MediaPlayer-SettingsWindow		Tekstityksen sijainti:
 Close	MediaPlayer-Main		Sulje
 Display Mode	MediaPlayer-InfoWin		Näyttötila
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Joidenkin tiedostojen siirtäminen roskakoriin epäonnistui.
@@ -29,7 +29,7 @@ Track %d	MediaPlayer-Main		Kappale %d
 Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Hakee/asettaa nykyisen soittosijainnin mikrosekunneissa.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Näyttötila
-Medium	MediaPlayer-SettingsWindow		Media
+Medium	MediaPlayer-SettingsWindow		Keskikokoinen
 Close	MediaPlayer-PlaylistWindow		Sulje
 Open…	MediaPlayer-PlaylistWindow		Avaa...
 Toggle mute.	MediaPlayer-Main		Vuorottele mykistystilaa.

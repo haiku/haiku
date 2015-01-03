@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-HaikuDepot	3756499622
+1	french	x-vnd.Haiku-HaikuDepot	877153484
 Name	PackageListView		Nom
+Available packages	MainWindow		Paquets disponibles
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
 Close	RatePackageWindow		Fermer
-The captcha puzzle needs to be solved.	UserLoginWindow		L'énigme Captcha doit être résolue.
+The captcha puzzle needs to be solved.	UserLoginWindow		Vous devez résoudre l’énigme Captcha.
 Changelog	PackageInfoView		Journal des modifications
 Your rating:	RatePackageWindow		Votre évaluation :
 The passwords do not match.	UserLoginWindow		Les mots de passe ne concordent pas.
@@ -13,29 +14,32 @@ Click a package to view information	PackageInfoView		Cliquez sur un paquet pour 
 Other users can see this rating	RatePackageWindow		Les autres utilisateurs peuvent voir cette évaluation
 Stability	RatePackageWindow		Stabilité
 for %Version%	PackageInfoView		pour %Version%
-No changelog available.	PackageInfoView		La liste des modifications n'est pas disponible.
+No changelog available.	PackageInfoView		La liste des modifications n’est pas disponible.
 Depot:	FilterView		Dépôt :
 Description	PackageListView		Description
 Install	PackageManager		Installer
-Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		L'authentification a échoué. L'utilisateur n'existe pas, ou le mot de passe est incorrect.
-Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Compte créé avec succès. Vous pouvez maintenant évaluer les paquets, et faire d'autres choses utiles.
+Source packages	MainWindow		Paquets sources
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		L’authentification a échoué. L’utilisateur n’existe pas, ou le mot de passe est incorrect.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Compte créé avec succès. Vous pouvez maintenant évaluer les paquets, et faire d’autres choses utiles.
 Tools	MainWindow		Outils
 HaikuDepot	System name		Dépôt Haiku
 Close	UserLoginWindow		Fermer
 Rate package…	PackageInfoView		Évaluer le paquet…
 Category	FilterView		Catégorie
 Uninstall	PackageManager		Désinstaller
-An error occurred while obtaining the package list: %message%	MainWindow		Une erreur est survenue pendant l'obtention de la liste des paquets : %message%
+An error occurred while obtaining the package list: %message%	MainWindow		Une erreur est survenue pendant l’obtention de la liste des paquets : %message%
 Your rating was updated successfully.	RatePackageWindow		Votre évaluation a été prise en compte.
-<no info>	PackageInfoView		<pas d'info>
-An error occurred while initializing the package manager: %message%	MainWindow		Une erreur est survenue à l'initialisation du gestionnaire de paquet : %message%
+<no info>	PackageInfoView		<pas d’info>
+Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de paquets a échoué :\n\n%Error%
+An error occurred while initializing the package manager: %message%	MainWindow		Une erreur est survenue à l’initialisation du gestionnaire de paquet : %message%
 Email address:	UserLoginWindow		Adresse e-mail :
-Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Votre évaluation a été prise en compte. Vous pouvez la mettre à jour ou l'effacer en évaluant de nouveau le paquet.
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Votre évaluation a été prise en compte. Vous pouvez la mettre à jour ou l’effacer en évaluant de nouveau le paquet.
 Very unstable	RatePackageWindow		Très instable
-The username is already taken. Please choose another.	UserLoginWindow		Ce nom d'utilisateur est déjà pris. Veuillez en choisir un autre.
+The username is already taken. Please choose another.	UserLoginWindow		Ce nom d’utilisateur est déjà pris. Veuillez en choisir un autre.
 Close	PackageManager		Fermer
 Not logged in	MainWindow		Non connecté
-The authentication was successful.	UserLoginWindow		L'authentification a réussi.
+The authentication was successful.	UserLoginWindow		L’authentification a réussi.
+Installed packages	MainWindow		Paquets installés
 Status	PackageListView		État
 Switch account…	MainWindow		Changer de compte…
 Ignore	UserLoginWindow		Ignorer
@@ -44,7 +48,7 @@ The password is too weak or invalid. Please use at least 8 characters with at le
 Rate package	RatePackageWindow		Évaluer le paquet
 Development	Model		Développement
 Fatal error	PackageManager		Erreur fatale
-The user name needs to be at least 3 letters long.	UserLoginWindow		Le nom d'utilisateur doit comporter au moins 3 caractères.
+The user name needs to be at least 3 letters long.	UserLoginWindow		Le nom d’utilisateur doit comporter au moins 3 caractères.
 Log in	UserLoginWindow		Connexion
 Repeat pass phrase:	UserLoginWindow		Répéter le mot de passe :
 Ratings	PackageInfoView		Évaluations
@@ -52,12 +56,13 @@ But none could be listed here, sorry.	UserLoginWindow		Mais aucun ne peut être 
 System & Utilities	Model		Système & Utilitaires
 Inactive	PackageListView		Inactif
 Refresh depots	MainWindow		Rafraîchir les dépôts
-The package action could not be scheduled: %Error%	PackageInfoView		L'action du paquet n'a pas eu lieu : %Error%
+The package action could not be scheduled: %Error%	PackageInfoView		L’action du paquet n’a pas eu lieu : %Error%
 Science & Mathematics	Model		Science & Mathématiques
 Main Menu	MainWindow		Menu principal
 (%Votes%)	PackageInfoView		(%Votes%)
-You have not solved the captcha puzzle correctly.	UserLoginWindow		Vous n'avez pas résolu correctement l'énigme Captcha.
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Vous n’avez pas résolu correctement l’énigme Captcha.
 Success	UserLoginWindow		Opération réussie
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Le Dépôt Haiku a besoin du serveur de paquets pour fonctionner, et il ne semble pas être démarré.\nVoulez-vous le démarrer maintenant ?
 Downloading:	PackageInfoView		Téléchargement en cours :
 Mostly stable	RatePackageWindow		Plutôt stable
 There was a puzzling response from the web service.	RatePackageWindow		La réponse du service web est incompréhensible.
@@ -65,26 +70,26 @@ Log out	MainWindow		Déconnexion
 Education	Model		Enseignement
 Search terms:	FilterView		Termes à rechercher :
 %Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		Aucun avis d'utilisateurs.
-Failed to update rating	RatePackageWindow		Impossible de modifier l'évaluation.
+No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
+Failed to update rating	RatePackageWindow		Impossible de modifier l’évaluation.
 Does not start	RatePackageWindow		Ne démarre pas
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error% (%details%)
-It was not possible to contact the web service.	RatePackageWindow		Le service web n'a pas pu être joint.
+It was not possible to contact the web service.	RatePackageWindow		Le service web n’a pas pu être joint.
 There are problems in the form:\n\n	UserLoginWindow		Il y a des problèmes dans le formulaire :\n\n
-The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Le service web n'a pas trouvé le paquet. Ce dernier a probablement été retiré du dépôt duquel il provient. Dans ce cas, il n'est malheureusement plus possible d'évaluer le paquet.
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Le service web n’a pas trouvé le paquet. Ce dernier a probablement été retiré du dépôt duquel il provient. Dans ce cas, il n’est malheureusement plus possible d’évaluer le paquet.
 Create account	UserLoginWindow		Créer un compte
 Productivity	Model		Bureautique
-Authentication failed	UserLoginWindow		L'authentification a échoué
+No, quit HaikuDepot	App		Non, quitter le Dépôt Haiku
+Authentication failed	UserLoginWindow		L’authentification a échoué
 Logged in as %User%	MainWindow		Connecté en tant que %User%
 Language	RatePackageWindow		Langue
-Size	PackageListView		Taille
-Failed to create or update rating: %s\n	RatePackageWindow		Votre évaluation n'a pas été prise en compte : %s\n
+Failed to create or update rating: %s\n	RatePackageWindow		Votre évaluation n’a pas été prise en compte : %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Vous devez vous authentifier pour évaluer les paquets.
  It responded with: 	RatePackageWindow		 Il a répondu : 
-User name:	UserLoginWindow		Nom d'utilisateur :
+User name:	UserLoginWindow		Nom d’utilisateur :
 User Menu	MainWindow		Menu Utilisateur
 Unstable but usable	RatePackageWindow		Instable mais utilisable
-The email address appears to be malformed.	UserLoginWindow		L'adresse email semble mal formée.
+The email address appears to be malformed.	UserLoginWindow		L’adresse email semble mal formée.
 Games	Model		Jeux
 Rating	PackageListView		Évaluation
 (%Votes%)	FeaturedPackagesView		(%Votes%)
@@ -93,40 +98,45 @@ Graphics	Model		Graphisme
 Local	MainWindow		Local
 Close	MainWindow		Fermer
 Preferred language:	UserLoginWindow		Langue préférée :
-Failed to rate package	RatePackageWindow		Impossible d'évaluer le paquet
+Failed to rate package	RatePackageWindow		Impossible d’évaluer le paquet
 Internet & Network	Model		Internet & Réseau
 Cancel	MainWindow		Annuler
+Quit HaikuDepot	App		Quitter le Dépôt Haiku
 Input validation	UserLoginWindow		Validation des entrées
 Update	RatePackageWindow		Mettre à jour
 Video	Model		Vidéo
 All categories	FilterView		Toutes les catégories
 An error occurred while refreshing the repository: %error%	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error%
+Try again	App		Essayer à nouveau
 Login or Create account	MainWindow		Se connecter ou créer un compte
 Pending…	PackageListView		En attente…
 Depot	FilterView		Dépôt
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# objet} other{# objets}}
 OK	PackageInfoView		OK
 Uninstalled	PackageListView		Désinstallé
+Show	MainWindow		Afficher
 Stable	RatePackageWindow		Stable
 Unknown	PackageListView		Inconnu
 All depots	FilterView		Tous les dépôts
 Comment language:	RatePackageWindow		Langue du commentaire :
 Pass phrase:	UserLoginWindow		Mot de passe :
-Screenshot	ScreenshotWindow		Capture d'écran
+Screenshot	ScreenshotWindow		Capture d’écran
 Not specified	RatePackageWindow		Non spécifié
 Available	PackageListView		Disponible
+Develop packages	MainWindow		Paquets de développement
 n/a	PackageInfoView		n/a
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Si vous ne fournissez pas d'adresse email, vous ne pourrez pas réinitialiser votre mot de passe en cas d'oubli.
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Si vous ne fournissez pas d’adresse email, vous ne pourrez pas réinitialiser votre mot de passe en cas d’oubli.
  It responded with: 	UserLoginWindow		 Il a répondu : 
-Authentication failed. Connection to the service failed.	UserLoginWindow		L'authentification a échoué. Impossible de se connecter au service.
+Authentication failed. Connection to the service failed.	UserLoginWindow		L’authentification a échoué. Impossible de se connecter au service.
 Cancel	RatePackageWindow		Annuler
-Package action failed	PackageInfoView		L'action du paquet a échoué
+Package action failed	PackageInfoView		L’action du paquet a échoué
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Envoyer
 Category:	FilterView		Catégorie :
 Failed to create account	UserLoginWindow		La création du compte a échoué
 There are problems with the data you entered:\n\n	UserLoginWindow		Il y a des problèmes dans les données saisies :\n\n
 Featured packages	MainWindow		Paquets sélectionnés
+Start package daemon	App		Démarrer le gestionnaire de paquets
 Success	RatePackageWindow		Opération réussie
 Business	Model		Professionnel
 Audio	Model		Son

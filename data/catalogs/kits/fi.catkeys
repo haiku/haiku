@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	1743278280
+1	finnish	x-vnd.Haiku-libbe	1311938724
 gamma	AboutWindow		gamma
 beta	AboutWindow		beeta
 %3.2f GiB	StringForSize		%3.2f gibitavua
@@ -25,7 +25,6 @@ Print Server is not responding.	PrintJob		Tulostuspalvelin ei vastaa.
 Paste	TextView		Liitä
 Special Thanks:	AboutWindow		Erityiskiitokset:
 %.2f TiB	StringForSize		%.2f tebitavua
-{0, plural, one{# byte} other{# bytes}	StringForSize		{0, plural, one{# tavu} other{# tavua}
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Ei voi paikallistaa sovellusta replikantille. Sovellusallekirjoitusta ei ole tarjottu.\n%error
 Redo	TextView		Tee uudelleen
 <empty>	Menu		<tyhjä>

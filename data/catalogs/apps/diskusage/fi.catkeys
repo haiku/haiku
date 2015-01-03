@@ -1,6 +1,5 @@
-1	finnish	x-vnd.Haiku-DiskUsage	4126084555
+1	finnish	x-vnd.Haiku-DiskUsage	2002508600
 Scanning %refName%	Scanner		Tutkitaan %refName%
-%size% in {0, plural, one{# file} other{# files}	Info Window		%size% {0, plural, one{# tiedostossa} other{# tiedostossa}
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d tiedostoa
 Size	Info Window		Koko
 Rescan	Pie View		Tutki uudelleen

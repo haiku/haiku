@@ -1,11 +1,13 @@
-1	swedish	x-vnd.Haiku-MidiPlayer	471142057
+1	swedish	x-vnd.Haiku-MidiPlayer	1046133011
 None	Main Window		Inget
 Live input:	Main Window		Livekälla:
 Stop	Main Window		Stopp
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Detta lilla program\nKan spela tusentals av\nHäftigt ljudliga låtar
 Cavern	Main Window		Grotta
 Volume:	Main Window		Volym:
 Reverb:	Main Window		Eko:
 OK	Main Window		OK
+Loading instruments…	Scope View		Läs in instrument...
 Off	Main Window		Av
 Dungeon	Main Window		Stor grotta
 Play	Main Window		Spela

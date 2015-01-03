@@ -45,7 +45,7 @@ Information	DeviceClass		Information
 Remote control	DeviceClass		Télécommande
 Service classes: 	DeviceClass		Classe de service : 
 Pager	DeviceClass	A small radio device to receive short text messages	Radiomessagerie
-Object transfer	DeviceClass		Transfert d'objet
+Object transfer	DeviceClass		Transfert d’objet
 Gaming/Toy	DeviceClass		Jouet
 Audio	DeviceClass		Audio
 Robot	DeviceClass		Robot
@@ -85,4 +85,4 @@ Video monitor	DeviceClass		Moniteur
 Pointing device	DeviceClass		Dispositif de pointage
 Miscellaneous	DeviceClass		Divers
 33-50% utilized	DeviceClass		33 à 55% utilisés
-Imaging	DeviceClass		Dispositif d'imagerie
+Imaging	DeviceClass		Dispositif d’imagerie

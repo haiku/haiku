@@ -39,13 +39,13 @@ Khmer symbols	UnicodeBlocks		Symboles khmers
 Tagbanwa	UnicodeBlocks		Tagbanoua
 Kanbun	UnicodeBlocks		Kanboun
 Syriac	UnicodeBlocks		Syriaque
-CJK compatibility ideographs Supplement	UnicodeBlocks		Supplément d'idéogrammes de compatibilité CJC
+CJK compatibility ideographs Supplement	UnicodeBlocks		Supplément d’idéogrammes de compatibilité CJC
 Musical symbols	UnicodeBlocks		Symboles musicaux
 Hangul syllables	UnicodeBlocks		Syllabes hangûl
 Coptic	UnicodeBlocks		Copte
 Tai Le	UnicodeBlocks		Taï-le
 Mahjong tiles	UnicodeBlocks		Tuiles de Mahjong
-Spacing modifier letters	UnicodeBlocks		Lettres modificatives d'espace
+Spacing modifier letters	UnicodeBlocks		Lettres modificatives d’espace
 Aegean numbers	UnicodeBlocks		Nombres égéens
 CJK strokes	UnicodeBlocks		Traits CJC
 Old italic	UnicodeBlocks		Italique ancien
@@ -64,7 +64,7 @@ Small form variants	UnicodeBlocks		Petites variantes de forme
 IPA extensions	UnicodeBlocks		Phonétique international étendu
 Thaana	UnicodeBlocks		Thâna
 Ogham	UnicodeBlocks		Oġam
-Combining diacritical marks for symbols	UnicodeBlocks		Marques diacritiques d'association pour les symboles
+Combining diacritical marks for symbols	UnicodeBlocks		Marques diacritiques d’association pour les symboles
 Syloti Nagri	UnicodeBlocks		Sylotî nâgrî
 Arabic supplement	UnicodeBlocks		Arabe supplémentaire
 Latin extended C	UnicodeBlocks		Latin étendu C
@@ -96,7 +96,7 @@ Letterlike symbols	UnicodeBlocks		Symboles de type lettre
 Hangul Jamo	UnicodeBlocks		Jamos Hangûl
 Tamil	UnicodeBlocks		Tamoul
 Currency symbols	UnicodeBlocks		Symboles monétaires
-Combining diacritical marks	UnicodeBlocks		Marques diacritiques d'association
+Combining diacritical marks	UnicodeBlocks		Marques diacritiques d’association
 Supplement punctuation	UnicodeBlocks		Supplément de ponctuation
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Syllabaires unifiés des aborigènes Canadiens
 Ugaritic	UnicodeBlocks		Ougaritique
@@ -112,7 +112,7 @@ Miscellaneous symbols	UnicodeBlocks		Symboles divers
 Saurashtra	UnicodeBlocks		Saurâshtra
 Optical character recognition	UnicodeBlocks		Reconnaissance optique de caractères
 Old Persian	UnicodeBlocks		Perse ancien
-Combining diacritical marks supplement	UnicodeBlocks		Supplément aux marques diacritiques d'association
+Combining diacritical marks supplement	UnicodeBlocks		Supplément aux marques diacritiques d’association
 Myanmar	UnicodeBlocks		Myanmar (Birman)
 Latin extended D	UnicodeBlocks		Latin étendu D
 Byzantine musical symbols	UnicodeBlocks		Symboles musicaux byzantins
@@ -132,7 +132,7 @@ Cuneiform numbers and punctuation	UnicodeBlocks		Nombres et ponctuation cunéifo
 Private use area	UnicodeBlocks		Zone à usage privé
 CJK unified ideographs extension B	UnicodeBlocks		Supplément B aux idéogrammes unifiés CJC
 Phags-pa	UnicodeBlocks		Phags-pa
-Kangxi radicals	UnicodeBlocks		Clés K'ang-hsi
+Kangxi radicals	UnicodeBlocks		Clés K’ang-hsi
 Dingbats	UnicodeBlocks		Casseau
 Tai Xuan Jing symbols	UnicodeBlocks		Symboles du Classique du mystère suprême
 Yi syllables	UnicodeBlocks		Syllabaire Yi
@@ -172,7 +172,7 @@ Phaistos disc	UnicodeBlocks		Disque de Phaistos
 Shavian	UnicodeBlocks		Shavien
 CJK compatibility	UnicodeBlocks		Compatibilité CJC
 Malayalam	UnicodeBlocks		Malayalam
-N'Ko	UnicodeBlocks		N'Ko
+N'Ko	UnicodeBlocks		N’Ko
 Kannada	UnicodeBlocks		Kannada
 Copy as escaped byte string	CharacterView		Copier une chaîne avec échappement
 Phonetic extensions supplement	UnicodeBlocks		Supplément phonétique étendu

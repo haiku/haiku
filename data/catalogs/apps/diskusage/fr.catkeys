@@ -1,6 +1,5 @@
-1	french	x-vnd.Haiku-DiskUsage	4126084555
+1	french	x-vnd.Haiku-DiskUsage	2002508600
 Scanning %refName%	Scanner		Examen de %refName%
-%size% in {0, plural, one{# file} other{# files}	Info Window		%size% dans {0, plural, one{# fichier} other{# fichiers}}
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d fichiers
 Size	Info Window		Taille
 Rescan	Pie View		Réexaminer

@@ -18,8 +18,8 @@ New player…	MediaPlayer-Main		Nouveau lecteur…
 100% scale	MediaPlayer-Main		Échelle 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Emplacement des sous-titres :
 Close	MediaPlayer-Main		Fermer
-Display Mode	MediaPlayer-InfoWin		Modes d'affichage
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Certains fichiers n'ont pas pu être envoyés à la corbeille.
+Display Mode	MediaPlayer-InfoWin		Modes d’affichage
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Certains fichiers n’ont pas pu être envoyés à la corbeille.
 <unknown>	MediaPlayer-InfoWin		<inconnu>
 Seek	MediaPlayer-Main		Rechercher
 Open	MediaPlayer-Main		Ouvrir
@@ -28,7 +28,7 @@ OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Piste %d
 Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Obtenir/régler la position de lecture actuelle en microsecondes.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinémascope)
-Display mode	MediaPlayer-InfoWin		Modes d'affichage
+Display mode	MediaPlayer-InfoWin		Modes d’affichage
 Medium	MediaPlayer-SettingsWindow		Intermédiaire
 Close	MediaPlayer-PlaylistWindow		Fermer
 Open…	MediaPlayer-PlaylistWindow		Ouvrir…
@@ -38,12 +38,12 @@ Use hardware video overlays if available	MediaPlayer-SettingsWindow		Utiliser le
 File info…	MediaPlayer-Main		Informations du fichier…
 Pause playback.	MediaPlayer-Main		Suspendre la lecture.
 Overlay	MediaPlayer-InfoWin		Recouvrement
-Remove Entry	MediaPlayer-RemovePLItemsCmd		Retirer l'entrée
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Retirer l’entrée
 Close window after playing audio	MediaPlayer-SettingsWindow		Fermer la fenêtre après la lecture des pistes audios
 Full volume	MediaPlayer-SettingsWindow		Plein volume
 Drop files to play	MediaPlayer-Main		Déposez les fichiers à lire
 TogglePlaying	MediaPlayer-Main		Lecture/Pause
-Copyright	MediaPlayer-InfoWin		Droits d'auteurs
+Copyright	MediaPlayer-InfoWin		Droits d’auteurs
 Cancel	MediaPlayer-SettingsWindow		Annuler
 Loop audio	MediaPlayer-SettingsWindow		Lire les pistes audios en boucle
 Container	MediaPlayer-InfoWin		Conteneur
@@ -52,9 +52,9 @@ Muted	MediaPlayer-SettingsWindow		Muet
 Quit	MediaPlayer-Main		Quitter
 Video	MediaPlayer-Main		Vidéo
 Start playing.	MediaPlayer-Main		Commencer la lecture.
-There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Il n'existe pas de décodeur capable de prendre en charge ce format de fichier ou bien le décodeur a des soucis avec cette version spécifique du format.
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Il n’existe pas de décodeur capable de prendre en charge ce format de fichier ou bien le décodeur a des soucis avec cette version spécifique du format.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importer une entrée
-Gets the URI of the currently playing item.	MediaPlayer-Main		Obtenir l'URI de l'élément en cours de lecture.
+Gets the URI of the currently playing item.	MediaPlayer-Main		Obtenir l’URI de l’élément en cours de lecture.
 400% scale	MediaPlayer-Main		Échelle 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué :\n\nErreur : 
 Move Entries	MediaPlayer-MovePLItemsCmd		Déplacer les entrées
@@ -66,17 +66,17 @@ Settings…	MediaPlayer-Main		Réglages…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Réglages de MédiaPlayer
 h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Sélectionner tout
-Move Entry	MediaPlayer-MovePLItemsCmd		Déplacer l'entrée
+Move Entry	MediaPlayer-MovePLItemsCmd		Déplacer l’entrée
 Open	MediaPlayer-PlaylistWindow		Ouvrir
 Stop playing.	MediaPlayer-Main		Arrêter la lecture.
 Seek by the specified amounts of microseconds.	MediaPlayer-Main		Rechercher suivant le pas indiqué en microsecondes.
-The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Impossible d'ouvrir le fichier « %filename ».\n\n
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Impossible d’ouvrir le fichier « %filename ».\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Erreur : 
 Audio	MediaPlayer-InfoWin		Audio
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Erreur en déplaçant dans la corbeille
-Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (message incorrect). La liste de lecture n'a pas pu être sauvegardée.
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (message incorrect). La liste de lecture n’a pas pu être sauvegardée.
 Skip to the previous track.	MediaPlayer-Main		Passer à la piste précédente.
-%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% a rencontré une erreur interne. Le fichier n'a pas pu être ouvert.
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% a rencontré une erreur interne. Le fichier n’a pas pu être ouvert.
 Close window after playing video	MediaPlayer-SettingsWindow		Fermer la fenêtre après la lecture des vidéos
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Redimensionner le film harmonieusement (mode sans-recouvrements)
 OK	MediaPlayer-RemovePLItemsCmd		OK
@@ -87,17 +87,17 @@ Volume	MediaPlayer-Main		Volume
 Audio track	MediaPlayer-Main		Piste audio
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importer une entrée
 Pause	MediaPlayer-Main		Pause
-No aspect correction	MediaPlayer-Main		Pas de correction d'aspect
+No aspect correction	MediaPlayer-Main		Pas de correction d’aspect
 Automatically start playing	MediaPlayer-SettingsWindow		Commencer la lecture automatiquement
 Track	Video Track Menu		Piste
-Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (échec du verrouillage). La liste de lecture n'a pas pu être sauvegardée.
-View options	MediaPlayer-SettingsWindow		Options d'affichage
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (échec du verrouillage). La liste de lecture n’a pas pu être sauvegardée.
+View options	MediaPlayer-SettingsWindow		Options d’affichage
 Play mode	MediaPlayer-SettingsWindow		Mode de lecture
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Retirer les entrées
 Video track	MediaPlayer-Main		Piste vidéo
 Loop video	MediaPlayer-SettingsWindow		Lire les vidéos en boucle
 Attributes	MediaPlayer-Main		Attributs
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Les fichiers n'ont pas tous pu être envoyés à la corbeille.
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Les fichiers n’ont pas tous pu être envoyés à la corbeille.
 <untitled>	PlaylistItem-title		<sans titre>
 Track	Audio Track Menu		Piste
 unknown format	MediaPlayer-InfoWin		format inconnu
@@ -118,9 +118,9 @@ Stop	MediaPlayer-Main		Arrêt
 <unnamed media>	MediaPlayer-InfoWin		<média sans nom>
 raw video	MediaPlayer-InfoWin		vidéo brute
 Volume of background clips	MediaPlayer-SettingsWindow		Volume en arrière-plan
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (plus de mémoire). La liste de lecture n'a pas pu être sauvegardée.
-Hide interface	MediaPlayer-Main		Masquer l'interface
-Copy Entry	MediaPlayer-CopyPLItemsCmd		Copier l'entrée
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (plus de mémoire). La liste de lecture n’a pas pu être sauvegardée.
+Hide interface	MediaPlayer-Main		Masquer l’interface
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Copier l’entrée
 none	Subtitles menu		aucun
 Move file to Trash	MediaPlayer-PlaylistWindow		Envoyer le fichier à la corbeille
 URI	MediaPlayer-Main		URI
@@ -137,7 +137,7 @@ Edit	MediaPlayer-PlaylistWindow		Éditer
 Start media server	MediaPlayer-Main		Démarrer le serveur de médias
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Basculer en plein écran.
-Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obtenir la durée de l'élément en cours de lecture en microsecondes.
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obtenir la durée de l’élément en cours de lecture en microsecondes.
 ToggleFullscreen	MediaPlayer-Main		Basculer en plein écran
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stéréo} other{# Canaux}}
 <unnamed>	PlaylistItem-name		<sans nom>
@@ -152,7 +152,7 @@ Save as…	MediaPlayer-PlaylistWindow		Enregistrer sous…
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Copier les entrées
 Redo	MediaPlayer-PlaylistWindow		Rétablir
 Always on top	MediaPlayer-Main		Toujours au dessus
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envoyer l'entrée à la corbeille
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envoyer l’entrée à la corbeille
 Save	MediaPlayer-Main		Enregistrer
 <nothing to undo>	MediaPlayer-PlaylistWindow		<rien à rétablir>
 File info	MediaPlayer-InfoWin		Informations du fichier
@@ -162,8 +162,8 @@ Remove	MediaPlayer-PlaylistWindow		Retirer
 Full screen	MediaPlayer-Main		Plein écran
 Open file…	MediaPlayer-Main		Ouvrir un fichier…
 300% scale	MediaPlayer-Main		Echelle 300%
-Bottom of screen	MediaPlayer-SettingsWindow		Au bas de l'écran
-Save error	MediaPlayer-PlaylistWindow		Enregistrer l'erreur
+Bottom of screen	MediaPlayer-SettingsWindow		Au bas de l’écran
+Save error	MediaPlayer-PlaylistWindow		Enregistrer l’erreur
 Rating	MediaPlayer-Main		Évaluation
 Playlist	MediaPlayer-PlaylistWindow		Liste de lecture
 Lock Peaks	MediaPlayer-PeakView		Verrouiller les crêtes

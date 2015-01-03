@@ -1,5 +1,6 @@
-1	swedish	x-vnd.Haiku-DiskUsage	4268917316
+1	swedish	x-vnd.Haiku-DiskUsage	2002508600
 Scanning %refName%	Scanner		Skannar %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d filer
 Size	Info Window		Storlek
 Rescan	Pie View		Skanna om
 Kind	Info Window		Typ
@@ -16,5 +17,6 @@ Modified	Info Window		Modifierad
 Abort	Status View		Avbryt
 Open with	Pie View		Öppna med
 Open	Pie View		Öppna
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# fil} other{# filer}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Ledigt på %refName%

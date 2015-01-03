@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-icon_o_matic	1929083132
+1	swedish	x-vnd.haiku-icon_o_matic	3554185674
 Select All	Icon-O-Matic-PathManipulator		Markera allt
 Add Style	Icon-O-Matic-AddStylesCmd		Lägg till stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Färg (#%02x%02x%02x)
@@ -67,6 +67,7 @@ HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-källkod
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Återställ omvandlingar
 Settings	Icon-O-Matic-Menus		Inställningar
 All	Icon-O-Matic-Properties		Alla
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Texten som du försöker importera är ganska lång, är du säker att du vill importera den?
 Multi Paste Properties	Icon-O-Matic-Properties		Flerinklistringsinställningar
 Undo	Icon-O-Matic-Main		Ångra
 Click on a shape above	Empty transformers list - 1st line		Klicka på en figur ovan
@@ -186,6 +187,7 @@ Save	Icon-O-Matic-Menu-File		Spara
 Append…	Icon-O-Matic-Menu-File		Bifoga...
 Move Path	Icon-O-Matic-MovePathsCmd		Flytta bana
 Overwrite	Icon-O-Matic-SVGExport		Skriv över
+Text too long	Icon-O-Matic-StyledTextImport		Texten är för långt
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Frys figurer
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Klyv kontrollpunkt
 Open…	Icon-O-Matic-Menu-File		Öppna...

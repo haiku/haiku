@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	443107378
+1	belarusian	x-vnd.Haiku-HaikuDepot	2996812689
 Name	PackageListView		Імя
 Changelog	PackageInfoView		Гісторыя зменаў
 Click a package to view information	PackageInfoView		Клікніце пакет каб пабачыць інфарамацыю пра яго
@@ -28,7 +28,6 @@ Search terms:	FilterView		Умовы пошуку:
 No user ratings available.	PackageInfoView		Рэйтынг карыстальнікаў не існуе
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Падчас аднаўлення інфармацыі сховішчаў адбылася памылка: %error% (%details%)
 Productivity	Model		Прадукцыйнасць
-Size	PackageListView		Памер
 Games	Model		Гульні
 Rating	PackageListView		Рэйтынг
 Graphics	Model		Графіка

@@ -1,6 +1,5 @@
-1	german	x-vnd.Haiku-DiskUsage	4126084555
+1	german	x-vnd.Haiku-DiskUsage	2002508600
 Scanning %refName%	Scanner		Analysiere %refName%
-%size% in {0, plural, one{# file} other{# files}	Info Window		%size% in {0, plural, one{einer Datei}, other{# Dateien}}
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d Dateien
 Size	Info Window		Größe
 Rescan	Pie View		Erneut analysieren

@@ -8,7 +8,7 @@ Reset to default server list	Time		Restaurer la liste de serveurs par défaut
 Stop	Time		Arrêter
 Could not contact server	Time		Impossible de contacter le serveur
 Australia	Time		Australie
-Preview time:	Time		Aperçu de l'heure :
+Preview time:	Time		Aperçu de l’heure :
 Synchronize	Time		Synchroniser
 Revert	Time		Rétablir
 Pacific	Time		Pacifique
@@ -19,16 +19,16 @@ about	Time		À propos
 Local time (Windows compatible)	Time		Heure locale (compatible Windows)
 Message receiving failed	Time		La réception du message a échoué
 Set time zone	Time		Régler le fuseau horaire
-Waiting for answer failed	Time		L'attente d'une réponse a échoué
-Hardware clock set to:	Time		L'horloge matérielle est réglée sur :
-The following error occured while synchronizing:r\n%s	Time		L'erreur suivante est survenue lors de la synchronisation :\n%s
+Waiting for answer failed	Time		L’attente d’une réponse a échoué
+Hardware clock set to:	Time		L’horloge matérielle est réglée sur :
+The following error occured while synchronizing:r\n%s	Time		L’erreur suivante est survenue lors de la synchronisation :\n%s
 Europe	Time		Europe
 Remove	Time		Retirer
 Time	Time		Heure
 Indian	Time		Indien
-Sending request failed	Time		L'envoi d'une requête a échoué
+Sending request failed	Time		L’envoi d’une requête a échoué
 Arctic	Time		Arctique
-Display time with seconds	Time		Afficher l'heure avec les secondes
+Display time with seconds	Time		Afficher l’heure avec les secondes
 Time	System name		Heure
 America	Time		Amérique
 Synchronize at boot	Time		Synchroniser au démarrage
@@ -36,8 +36,8 @@ Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhil
 Received invalid time	Time		Une heure non valide a été reçue
 Antarctica	Time		Antarctique
 Show time zone	Time		Afficher le fuseau horaire
-Show clock in Deskbar	Time		Afficher l'heure dans la Deskbar
-The following error occured while synchronizing:r\n%s: %s	Time		L'erreur suivante est survenue lors de la synchronisation :\n%s : %s
+Show clock in Deskbar	Time		Afficher l’heure dans la Deskbar
+The following error occured while synchronizing:r\n%s: %s	Time		L’erreur suivante est survenue lors de la synchronisation :\n%s : %s
 <Other>	Time		<Autre>
 Current time:	Time		Heure actuelle :
 Try all servers	Time		Essayer tous les serveurs

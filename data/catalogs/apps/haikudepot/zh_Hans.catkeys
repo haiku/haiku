@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	1848881261
+1	english	x-vnd.Haiku-HaikuDepot	107619276
 Name	PackageListView		名称
 Close	RatePackageWindow		关闭
 Changelog	PackageInfoView		更新记录
@@ -30,7 +30,6 @@ Search terms:	FilterView		搜索项目：
 No user ratings available.	PackageInfoView		未发现用户评分。
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		刷新软件库出现错误：%error% (%details%)
 Productivity	Model		生产力
-Size	PackageListView		大小
 Games	Model		游戏
 Rating	PackageListView		评级
 (%Votes%)	FeaturedPackagesView		（%Votes%）

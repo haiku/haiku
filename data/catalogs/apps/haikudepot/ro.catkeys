@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2305186312
+1	romanian	x-vnd.Haiku-HaikuDepot	563924327
 Name	PackageListView		Nume
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
 Close	RatePackageWindow		Închidere
@@ -43,7 +43,6 @@ Productivity	Model		Productivitate
 Authentication failed	UserLoginWindow		Autentificarea a eșuat
 Logged in as %User%	MainWindow		Autentificat ca %User%
 Language	RatePackageWindow		Limbă
-Size	PackageListView		Dimensiune
  It responded with: 	RatePackageWindow		 A răspuns cu: 
 User name:	UserLoginWindow		Nume utilizator:
 User Menu	MainWindow		Meniu utilizator

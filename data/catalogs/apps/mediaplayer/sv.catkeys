@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	3507634633
+1	swedish	x-vnd.Haiku-MediaPlayer	68841021
 raw audio	MediaPlayer-InfoWin		raw-ljud
 Location	MediaPlayer-InfoWin		Plats
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -139,6 +139,7 @@ Start media server	MediaPlayer-Main		Starta mediaserver
 Toggle fullscreen.	MediaPlayer-Main		Växla helskärmsläge.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Få varaktigheten på det som spelas nu i mikrosekunder.
 ToggleFullscreen	MediaPlayer-Main		Växla helskärmsläge
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Kanaler}}
 <unnamed>	PlaylistItem-name		<odöpt>
 Open Clips	MediaPlayer-Main		Öppna klipp
 OK	MediaPlayer-PlaylistWindow		OK

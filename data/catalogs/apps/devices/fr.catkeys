@@ -8,7 +8,7 @@ CD-ROM	DeviceSCSI		CD-ROM
 ISA bus	Device		Bus ISA
 ACPI bus	Device		Bus ACPI
 ISA bus	DevicesView		Bus ISA
-Docking station	Device		Station d'accueil
+Docking station	Device		Station d’accueil
 Computer	Device		Ordinateur
 Unknown device	Device		Périphérique inconnu
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Information de classe\t\t\t: %classInfo%
@@ -31,9 +31,9 @@ Not implemented	DevicePCI		Non implémenté
 Disk Drive	DeviceSCSI		Unité de disque
 Not implemented	DeviceACPI		Non implémenté
 Device name	DevicePCI		Nom du périphérique
-Display controller	Device		Contrôleur d'affichage
+Display controller	Device		Contrôleur d’affichage
 Mass storage controller	Device		Contrôleur de mémoire de masse
-Input device controller	Device		Contrôleur de périphérique d'entrée
+Input device controller	Device		Contrôleur de périphérique d’entrée
 Network controller	Device		Adaptateur réseau
 Device class	DeviceSCSI		Classe de périphérique
 Device name	DeviceACPI		Nom du périphérique

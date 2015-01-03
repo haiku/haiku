@@ -34,7 +34,7 @@ Pulse	NormalPulseView		Pulsation
 %ld MHz	NormalPulseView		%ld MHz
 Deskbar mode	NormalPulseView		Mode Deskbar
 Pulse	PulseApp		Pulsation
-Width of icon:	ConfigView		Largeur de l'icône :
+Width of icon:	ConfigView		Largeur de l’icône :
 You can't disable the last active CPU.	CPUButton		Vous ne pouvez pas désactiver le dernier processeur actif.
 Normal mode	DeskbarPulseView		Mode normal
 OK	CPUButton		OK
@@ -44,5 +44,5 @@ Mini mode	NormalPulseView		Mode miniature
 Info	DeskbarPulseView		Informations
 Pulse settings	PulseWindow		Réglages de Pulsation
 Idle color	ConfigView		Couleur inactive
-Installing in Deskbar failed\n%s	PulseApp		Échec de l'installation dans la Deskbar\n%s
-CPU progress bar	NormalPulseView		Jauge d'activité CPU
+Installing in Deskbar failed\n%s	PulseApp		Échec de l’installation dans la Deskbar\n%s
+CPU progress bar	NormalPulseView		Jauge d’activité CPU

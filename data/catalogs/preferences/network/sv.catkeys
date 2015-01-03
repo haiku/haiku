@@ -1,23 +1,11 @@
-1	swedish	x-vnd.Haiku-Network	3992214214
-Choose automatically	EthernetSettingsView		Välj automatiskt
-Gateway:	EthernetSettingsView		Gateway:
-Netmask:	EthernetSettingsView		Nätmask:
-DHCP	EthernetSettingsView		DHCP
-Apply	EthernetSettingsView		Använd
-Netmask is invalid	EthernetSettingsView		Nätmasken är felaktig
-OK	EthernetSettingsView		Ok
-IP address:	EthernetSettingsView		IP-adress:
-Adapter:	EthernetSettingsView		Nätverkskort:
-Domain:	EthernetSettingsView		Domän:
-Gateway is invalid	EthernetSettingsView		Gateway är ogiltig
-Revert	EthernetSettingsView		Återställ
-<no wireless networks found>	EthernetSettingsView		<inga trådlösa nätverk funna>
-Network	System name		Nätverk
-Mode:	EthernetSettingsView		Konfiguration:
-IP address is invalid	EthernetSettingsView		IP-adressen är felaktig
-Network:	EthernetSettingsView		Nätverk:
-The net_server needs to run for the auto configuration!	EthernetSettingsView		Automatisk konfiguration kan inte ske utan att net_server körs!
-Disabled	EthernetSettingsView		Inaktiverad
-Auto-configuring failed: 	EthernetSettingsView		Automatisk konfiguration misslyckades:
-Static	EthernetSettingsView		Statisk
-<no adapter>	EthernetSettingsView		<Ingen enhet>
+1	swedish	x-vnd.Haiku-Network	2475894736
+Revert	NetworkSetupWindow		Återställ
+EAP	EAP protected network		EAP
+WPA2	WPA2 protected network		WPA2
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Apply	NetworkSetupWindow		Använd
+Manage…	NetworkSetupWindow		Hantera...
+WPA	WPA protected network		WPA
+open	Open network		öppna
+New…	NetworkSetupWindow		Ny…
+WEP	WEP protected network		WEP

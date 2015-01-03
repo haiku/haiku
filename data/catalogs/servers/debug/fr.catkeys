@@ -2,4 +2,4 @@
 Terminate	DebugServer		Terminer
 Debug	DebugServer		Déboguer
 Save report	DebugServer		Enregistrer le rapport
-The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		L'application :\n\n      %app\n\na rencontré une erreur l'empêchant de continuer. Haiku va fermer l'application et libérer ses ressources.
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		L’application :\n\n      %app\n\na rencontré une erreur l’empêchant de continuer. Haiku va fermer l’application et libérer ses ressources.

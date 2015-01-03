@@ -13,7 +13,7 @@ Clear hit counter	PoorMan		Réinitialiser le compteur de sollicitations
 Copy	PoorMan		Copier
 Max. simultaneous connections:	PoorMan		Nombre max. de connexions simultanées :
 Create public_html	PoorMan		Créer public_html
-Start page:	PoorMan		Page d'acceuil :
+Start page:	PoorMan		Page d’accueil :
 done.\n	PoorMan		fait.\n
 Create	PoorMan		Créer
 Shutting down.	PoorMan		Extinction.
@@ -38,8 +38,8 @@ Log To Console	PoorMan		Consigner vers la console
 Connections	PoorMan		Connexions
 Status: Running	PoorMan		État : En fonction
 Controls	PoorMan		Contrôles
-Send file listing if there's no start page	PoorMan		Envoyer la liste des fichiers s'il n'y a pas de page d'accueil.
-Error Dir	PoorMan		Répertoire d'erreurs
+Send file listing if there's no start page	PoorMan		Envoyer la liste des fichiers s’il n’y a pas de page d’accueil.
+Error Dir	PoorMan		Répertoire d’erreurs
 Select all	PoorMan		Sélectionner tout
 File	PoorMan		Fichier
 File Logging	PoorMan		Fichier de journalisation
@@ -48,7 +48,7 @@ File logging	PoorMan		Fichier de journalisation
 Select web folder	PoorMan		Sélectionner un dossier Web
 Logging view	PoorMan		Vue du journal
 Logging	PoorMan		Journalisation
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Un dossier Web par défaut a été créé à « /boot/home/public_html ».\nVérifiez qu'il existe un fichier HTML nommé « index.html » dans ce dossier.
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Un dossier Web par défaut a été créé à « /boot/home/public_html ».\nVérifiez qu’il existe un fichier HTML nommé « index.html » dans ce dossier.
 Clear log file	PoorMan		Vider le journal
 Log file name:	PoorMan		Nom du fichier de journalisation :
 Directory: 	PoorMan		Répertoire : 

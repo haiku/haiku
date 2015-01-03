@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	2175336122
+1	russian	x-vnd.Haiku-MediaPlayer	2244320589
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -100,6 +100,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Все ф
 <untitled>	PlaylistItem-title		<безымянный>
 Track	Audio Track Menu		Дорожка
 unknown format	MediaPlayer-InfoWin		неизвестный формат
+Position	MediaPlayer-Main		Позиция
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нечего возвращать>
 Skip to the next track.	MediaPlayer-Main		Перейти к следующему треку.
 Play	MediaPlayer-Main		Играть

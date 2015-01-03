@@ -2,7 +2,7 @@
 Loop	RecorderWindow		Boucler
 Cannot find default audio hardware	RecorderWindow		Impossible de trouver le périphérique audio par défaut
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Impossible de trouver le fichier temporaire créé pour contenir le nouvel enregistrement.
-Sample size:	RecorderWindow		Taille de l'échantillon :
+Sample size:	RecorderWindow		Taille de l’échantillon :
 Nothing to play	RecorderWindow		Rien à jouer
 None of the files appear to be audio files.	RecorderWindow		Aucun des fichiers n’apparaît-être un fichier audio.
 Duration: 	RecorderWindow		Durée : 
@@ -15,11 +15,11 @@ Format:	RecorderWindow		Format :
 Sound List	RecorderWindow		Liste des sons
 Compression: 	RecorderWindow		Compression : 
 Rewind	RecorderWindow		Rembobiner
-Sample rate:	RecorderWindow		Fréquence d'échantillonnage :
+Sample rate:	RecorderWindow		Fréquence d’échantillonnage :
 Invalid audio files	RecorderWindow		Fichiers audio non valides
  seconds	RecorderWindow		 secondes
 OK	RecorderWindow		OK
-Cannot open the temporary file created to hold the new recording	RecorderWindow		Impossible d'ouvrir le fichier temporaire créé pour recevoir le nouvel enregistrement
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Impossible d’ouvrir le fichier temporaire créé pour recevoir le nouvel enregistrement
 Input:	RecorderWindow		Source :
 Forward	RecorderWindow		Avancer
 Play	RecorderWindow		Lecture
@@ -28,19 +28,19 @@ Channels:	RecorderWindow		Canaux :
  bits	RecorderWindow		 bits
 None	RecorderWindow		Aucun
 Record	RecorderWindow		Enregistrer
-Sample size: 	RecorderWindow		Taille de l'échantillon : 
-Cannot recognize this file as a media file	RecorderWindow		Ce fichier n'est pas un média reconnu
+Sample size: 	RecorderWindow		Taille de l’échantillon : 
+Cannot recognize this file as a media file	RecorderWindow		Ce fichier n’est pas un média reconnu
 Format: 	RecorderWindow		Format : 
 File name: 	RecorderWindow		Nom du fichier : 
 Cannot connect to the selected sound input	RecorderWindow		Impossible de se connecter à la source sonore sélectionnée
-Cannot get the file to play	RecorderWindow		Impossible d'obtenir le fichier à jouer
-Cannot record a sound that long	RecorderWindow		Impossible d'enregistrer un son aussi long
+Cannot get the file to play	RecorderWindow		Impossible d’obtenir le fichier à jouer
+Cannot record a sound that long	RecorderWindow		Impossible d’enregistrer un son aussi long
 Duration:	RecorderWindow		Durée :
 Compression:	RecorderWindow		Compression :
 Cannot find an unused name to use for the new recording	RecorderWindow		Impossible de trouver un nom inutilisé pour le nouvel enregistrement
 Channels: 	RecorderWindow		Canaux : 
 Save	RecorderWindow		Sauvegarder
-Sample rate: 	RecorderWindow		Fréquence d'échantillonnage : 
+Sample rate: 	RecorderWindow		Fréquence d’échantillonnage : 
 Cannot connect to media server	RecorderWindow		Impossible de se connecter au serveur de média
 The file doesn't appear to be an audio file.	RecorderWindow		Le fichier ne semble pas être un fichier audio.
 File name:	RecorderWindow		Nom du fichier :

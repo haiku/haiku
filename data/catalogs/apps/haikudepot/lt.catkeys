@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-HaikuDepot	443107378
+1	lithuanian	x-vnd.Haiku-HaikuDepot	2996812689
 Name	PackageListView		Pavadinimas
 Changelog	PackageInfoView		Pakeitimų žurnalas
 Click a package to view information	PackageInfoView		Spustelėkite paketą jo informacijai pamatyti
@@ -28,7 +28,6 @@ Search terms:	FilterView		Ieškomi žodžiai:
 No user ratings available.	PackageInfoView		Naudotojų įvertinimų nėra.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Atnaujinant saugyklos turinį, įvyko klaida: %error% (%details%)
 Productivity	Model		Raštinė
-Size	PackageListView		Dydis
 Games	Model		Žaidimai
 Rating	PackageListView		Įvertinimas
 Graphics	Model		Grafika

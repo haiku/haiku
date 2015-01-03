@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PowerStatus	2033673511
+1	french	x-vnd.Haiku-PowerStatus	248799648
 Design capacity low warning: 	PowerStatus		Alerte de capacité nominale faible : 
 Show percent	PowerStatus		Afficher les pourcentages
 Design capacity: 	PowerStatus		Capacité nominale : 
@@ -9,7 +9,7 @@ non-rechargeable	PowerStatus		non-rechargeable
 Empty battery slot	PowerStatus		Emplacement libre de batterie
  mV	PowerStatus		 mV
 Run in window	PowerStatus		Exécuter en fenêtre
-PowerStatus	System name		État d'énergie
+PowerStatus	System name		État d’énergie
  mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Informations batteries…
 Damaged battery	PowerStatus		Batterie endommagée
@@ -20,13 +20,12 @@ Extended battery info	PowerStatus		Informations additionnelles
  mA	PowerStatus		 mA
 Current rate: 	PowerStatus		Consommation actuelle : 
 discharging	PowerStatus		sur batteries
-Show text label	PowerStatus		Afficher l'étiquette texte
+Show text label	PowerStatus		Afficher l’étiquette texte
 About…	PowerStatus		À propos…
 Model number: 	PowerStatus		Numéro de modèle : 
 Install in Deskbar	PowerStatus		Installer dans la Deskbar
  mAh	PowerStatus		 mAh
 Capacity: 	PowerStatus		Capacité : 
-The battery level is getting low, please plug the device in.	PowerStatus		La charge de la batterie devient faible. Veuillez brancher l'alimentation.
 Battery discharging	PowerStatus		Consommation des batteries
 Serial number: 	PowerStatus		Numéro de série : 
 Battery critical	PowerStatus		Batterie épuisée
@@ -38,11 +37,10 @@ Design capacity warning: 	PowerStatus		Avertissement de capacité nominale :
 Battery info	PowerStatus		Informations batteries
 Quit	PowerStatus		Quitter
 rechargeable	PowerStatus		rechargeable
-The battery level is critical, please plug the device in immediately.	PowerStatus		La batterie est épuisée. Veuillez brancher l'alimentation immédiatement.
 charging	PowerStatus		en charge
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Vous pouvez exécuter « État d'énergie » dans une fenêtre ou l'installer dans la Deskbar.
-Power status box	PowerStatus		Zone d'énergie
-Show status icon	PowerStatus		Afficher l'icône d'état
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Vous pouvez exécuter « État d’énergie » dans une fenêtre ou l’installer dans la Deskbar.
+Power status box	PowerStatus		Zone d’énergie
+Show status icon	PowerStatus		Afficher l’icône d’état
 Capacity granularity 2: 	PowerStatus		Granularité de charge 2 : 
 Technology: 	PowerStatus		Technologie : 
 no battery	PowerStatus		pas de batterie

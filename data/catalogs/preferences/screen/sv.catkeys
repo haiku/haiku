@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Screen	1388881963
+1	swedish	x-vnd.Haiku-Screen	2339556848
 yes	Screen		ja
 Use laptop panel:	Screen		Använd bärbar panel:
 15 bits/pixel, 32768 colors	Screen		15 bitar/pixel, 32768 färger
@@ -12,6 +12,7 @@ Set background…	Screen		Bakgrundsinställningar...
 Undo	Screen		Ångra
 if needed	Screen		om det behövs
 Screen preferences by the Haiku team	Screen		Skärm, skrivet av Haiku-teamet
+Settings will revert in %seconds.	Screen		Inställningarna kommer att återställas inom %seconds.
 Screen	System name		Skärm
 OK	Screen		OK
 Workspaces	Screen		Arbetsytor

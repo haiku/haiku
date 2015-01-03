@@ -3,8 +3,8 @@ Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		Non compressé
 Indexed	PSDLoader		Indexé
 Grayscale	PSDLoader		Niveaux de gris
-Photoshop image translator	PSDConfig		Traducteur d'images Photoshop
-Photoshop image translator	PSDTranslator		Traducteur d'images Photoshop
+Photoshop image translator	PSDConfig		Traducteur d’images Photoshop
+Photoshop image translator	PSDTranslator		Traducteur d’images Photoshop
 Version %d.%d.%d, %s	PSDConfig		Version %d.%d.%d, %s
 Photoshop image	PSDTranslator		Image Photoshop
 RLE	PSDConfig		RLE

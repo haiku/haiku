@@ -1,6 +1,7 @@
-1	swedish	x-vnd.Haiku-libtracker	679062638
+1	swedish	x-vnd.Haiku-libtracker	1313160091
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Tillägg
+Mount settings…	ContainerWindow		Monteringsinställningar...
 Desktop	Model		Skrivbord
 Identify	ContainerWindow		Identifiera
 Warning space color	SettingsView		Färg för utrymmesvarning
@@ -199,8 +200,10 @@ Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Flytta
 Get info	ContainerWindow		Visa information
 Error creating link to \"%name\".	FSUtils		Fel vid skapande av länk till "%name".
 Select	SelectionWindow		Markera
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 Or	FindPanel		Eller
 The Tracker must be running to see set the default printer.	PoseView		Tracker måste köras för att se standardskrivaren.
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 by formula	FindPanel		med formel
 40 x 40	DeskWindow		40 x 40
 Name	PoseView		Namn
@@ -211,6 +214,7 @@ Created:	InfoWindow		Skapad:
 Copying: 	StatusWindow		Kopierar:
 Capacity:	InfoWindow		Kapacitet:
 Delete	FilePanelPriv		Ta bort
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
 Save	FindPanel		Spara
 copy	FSUtils	filename copy	kopia
 Temporary	FindPanel		Tillfällig
@@ -246,6 +250,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		Du kan inte redigera
 Name	ContainerWindow		Namn
 Reverse order	ContainerWindow		Omvänd ordning
 48 x 48	DeskWindow		48 x 48
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# artifakt} other{# artifakter}}
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Lägg till nuvarande katalog
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Kunde inte öppna "%document" med programmet "%app" (Saknar symbol: %symbol). \n
@@ -289,6 +294,7 @@ Cancel	PoseView		Avbryt
 You can't move or copy items to read-only volumes.	FSUtils		Du kan inte flytta eller kopiera saker till skrivskyddade volymer.
 Unknown	FilePermissionsView		Okänd
 All files and folders	FindPanel		Alla filer och mappar
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # fil} other{for # filer}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Kunde inte öppna "%document" (Saknar bibliotek: %library). \n
 The Tracker must be running to see Info windows.	PoseView		Tracker måste köras för att se Infofönster.
 Other	FilePermissionsView		Annan
@@ -327,6 +333,7 @@ New folder %ld	FSUtils		Ny mapp %ld
 All BeOS disks	AutoMounterSettings		Alla BeOS volymer
 Used space color	SettingsView		Färg för diskanvändning
 Sorry, could not create a new folder.	FSUtils		Kan inte skapa en ny mapp.
+Disk mount	TrackerSettingsWindow		Diskmontering
 multiple disks	FindPanel		flera diskar
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Du måste släppa objekt(en) på en av diskikonerna i "Volymer"-fönstret.
 Untitled clipping	PoseView		Namnlöst urklipp

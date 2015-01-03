@@ -35,11 +35,11 @@ CPU usage	DataSource		Activité CPU
 Raw clipboard	DataSource		Presse-papier brut
 Sems	DataSource		Sems
 %.1f MiB	DataSource		%.1f Mio
-ActivityMonitor	System name		Moniteur d'activité
+ActivityMonitor	System name		Moniteur d’activité
 Running applications	DataSource		Applications en cours
 Semaphores	DataSource		Sémaphores
 Block cache	DataSource		Cache blocs
-Swap space	DataSource		Espace d'échange
+Swap space	DataSource		Espace d’échange
 Swap	DataSource		Échange
 File	ActivityWindow		Fichier
 usage	DataSource		utilisation

@@ -1,10 +1,11 @@
-1	swedish	x-vnd.Haiku-Media	4081089471
+1	swedish	x-vnd.Haiku-Media	2163090586
 Couldn't add volume control in Deskbar: %s\n	Media views		Kunde inte lägga till volymkontroll i Deskbar: %s\n
 Ready for use…	Media Window		Redo att användas…
 Video input:	Media views		Videoingång:
 Waiting for media_server to quit.	Media Window		Väntar på att mediaservern ska stängas ner.
 Cleaning up.	Media Window		Städar upp.
 Defaults	Media views		Förval
+MIDI Settings	Media Window		MIDI Inställningar
 Stopping media server…	Media Window		Avslutar mediaservern…
 Quit	Media Window		Avsluta
 Starting media server…	Media Window		Startar mediaservern…
@@ -16,6 +17,7 @@ Restart media services	Media views		Starta om mediatjänsterna
 Couldn't remove volume control in Deskbar: %s\n	Media views		Kunde inte ta bort volymkontrollen från Deskbar: %s\n
 Media	System name		Media
 Telling media_addon_server to quit.	Media Window		Säger till media_addon_server att avsluta.
+Media Service	Media Window		Media tjänst
 Audio mixer	Media Window		Ljudmixer
 This hardware has no controls.	Media Window		Hårdvaran saknar kontroller.
 Audio output:	Media views		Ljudutgång:

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libbe	742159760
+1	romanian	x-vnd.Haiku-libbe	310820204
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -24,7 +24,6 @@ Print Server is not responding.	PrintJob		Serverul de imprimare nu răspunde.
 Paste	TextView		Lipește
 Special Thanks:	AboutWindow		Mulţumiri speciale:
 %.2f TiB	StringForSize		%.2f TiB
-{0, plural, one{# byte} other{# bytes}	StringForSize		{0, plural, one{# octet} other{# octeți}
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate găsi aplicația pentru copie. Nu a fost furnizată nicio semnătură de aplicație.\n%error
 Redo	TextView		Repetă
 <empty>	Menu		<liber>

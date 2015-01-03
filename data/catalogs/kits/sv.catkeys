@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libbe	1409488127
+1	swedish	x-vnd.Haiku-libbe	1311938724
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -13,11 +13,13 @@ alpha	AboutWindow		alfa
 Error	PrintJob		Fel
 All Rights Reserved.	AboutWindow		Alla rättigheter resarverade.
 About %app%	AboutWindow		Om %app%
+No pages to print!	PrintJob		Inga sidor att skriva ut!
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Grön:
 Version history:	AboutWindow		Versionshistorik:
 Remove replicant	Dragger		Ta bort replikant
+OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Utskriftservern svarar inte.
 Paste	TextView		Klistra in

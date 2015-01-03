@@ -1,6 +1,5 @@
-1	japanese	x-vnd.Haiku-DiskUsage	4126084555
+1	japanese	x-vnd.Haiku-DiskUsage	2002508600
 Scanning %refName%	Scanner		%refName%をスキャン中
-%size% in {0, plural, one{# file} other{# files}	Info Window		 {0, plural, one{# ファイル} other{# ファイル}, %size%
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d 個のファイル
 Size	Info Window		サイズ
 Rescan	Pie View		再スキャン

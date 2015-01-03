@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	443107378
+1	ukrainian	x-vnd.Haiku-HaikuDepot	2996812689
 Name	PackageListView		Ім'я
 Changelog	PackageInfoView		Журнал змін
 Click a package to view information	PackageInfoView		Натисніть на пакунок, щоб побачити інформацію про нього
@@ -28,7 +28,6 @@ Search terms:	FilterView		Умови пошуку:
 No user ratings available.	PackageInfoView		Рейтинг користувачів недоступний.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Виникла помилка при оновленні репозиторія: %error% (%details%)
 Productivity	Model		Офіс
-Size	PackageListView		Розмір
 Games	Model		Ігри
 Rating	PackageListView		Оцінка
 Graphics	Model		Зображення

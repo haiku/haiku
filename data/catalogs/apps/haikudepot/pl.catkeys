@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	3756499622
+1	polish	x-vnd.Haiku-HaikuDepot	2015237637
 Name	PackageListView		Nazwa
 Open %DeskbarLink%	PackageManager		Otwórz %DeskbarLink%
 Close	RatePackageWindow		Zamknij
@@ -77,7 +77,6 @@ Productivity	Model		Programy użytkowe
 Authentication failed	UserLoginWindow		Autoryzacja nie powiodła się
 Logged in as %User%	MainWindow		Zalogowano jako %User%
 Language	RatePackageWindow		Język
-Size	PackageListView		Rozmiar
 Failed to create or update rating: %s\n	RatePackageWindow		Nie udało się utworzyć lub zaktualizować oceny: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Musisz być zalogowany, aby móc oceniać pakiety.
  It responded with: 	RatePackageWindow		Odpowiedź:

@@ -14,7 +14,7 @@ Settings	GrepWindow		Réglages
 Select all	GrepWindow		Tout sélectionner
 OK	GrepWindow		OK
 Skip folders starting with a dot	GrepWindow		Ignorer les dossiers commençant par un point
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME n'a pas pu ouvrir un ou plusieurs dossiers.
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME n’a pas pu ouvrir un ou plusieurs dossiers.
 Escape search text	GrepWindow		Coder le texte à rechercher
 Search	GrepWindow		Rechercher
 Open selection	GrepWindow		Ouvrir la sélection

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PackageInstaller	199496416
+1	swedish	x-vnd.Haiku-PackageInstaller	3672759664
 Install to:	PackageView		Installera till:
 OK	PackageView		OK
 Accept	PackageTextViewer		Acceptera
@@ -54,6 +54,7 @@ Abort	PackageInstall		Avbryt
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Fortsätt
 Begin	PackageView		Börja
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Symboliska länken '%s' finns redan.\nErsätt länken med den från detta paket eller avbryt?
 Replace	PackageView		Ersätt
 Installation progress	PackageView		Installationsförlopp
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paketfilen är inte läsbar.\nEn möjlig anledning är att den begärda filen inte är ett giltigt BeOS paket.

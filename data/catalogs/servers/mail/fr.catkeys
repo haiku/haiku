@@ -15,7 +15,7 @@ Create new message…	DeskbarView		Créer un nouveau message…
 No new messages	MailDaemon		Aucun nouveau message
 Check for mail now	DeskbarView		Vérifier les courriels maintenant
 No new messages	DeskbarView		Aucun nouveau message
-Mail daemon status log	MailDaemon		Journal d'état du démon de courrier
+Mail daemon status log	MailDaemon		Journal d’état du démon de courrier
 Settings…	DeskbarView		Réglages…
 No new messages.	MailDaemon		Aucun nouveau message.
 Mail status	Notifier		État du courrier

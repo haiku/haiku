@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-screenshot	363809141
+1	swedish	x-vnd.haiku-screenshot	3896204963
 seconds	ScreenshotWindow		sekunder
 Desktop	ScreenshotWindow		Skrivbord
 Include window border	ScreenshotWindow		Inkludera fönsterkant
@@ -7,6 +7,7 @@ Select	ScreenshotWindow		Markera
 Capture active window	ScreenshotWindow		Fånga aktivt fönster
 Cancel	ScreenshotWindow		Avbryt
 Name:	ScreenshotWindow		Namn:
+Choose folder…	ScreenshotWindow		Välj mapp...
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Denna fil finns redan.\n Är du säker på att du vill skriva över den?
 Choose folder	ScreenshotWindow		Välj mapp
 Save	ScreenshotWindow		Spara

@@ -1,14 +1,14 @@
 1	french	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		BougerSouris
 OK	ShortcutsWindow		OK
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Raccourcis n'a pas pu enregistrer votre jeu de touches.
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Raccourcis n’a pas pu enregistrer votre jeu de touches.
 Cancel	ShortcutsWindow		Annuler
 InsertString	ShortcutsSpec		InsérerTexte
 Append KeySet…	ShortcutsWindow		Ajouter un jeu de touches…
 Control	ShortcutsSpec	Name for modifier on keyboard	Contrôle
 Key	ShortcutsWindow		Touche
 Open KeySet…	ShortcutsWindow		Ouvrir un jeu de touches…
-Error, NULL state description?	ShortcutsSpec		Erreur : description d'état NULL ?
+Error, NULL state description?	ShortcutsSpec		Erreur : description d’état NULL ?
 MouseUp	ShortcutsSpec		SourisEnHaut
 Revert to saved	ShortcutsWindow		Revenir à la version enregistrée
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
@@ -16,7 +16,7 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *MouseUp	ShortcutsWindow		*SourisEnHaut
 (Choose application with file requester)	ShortcutsWindow		(Choisissez une application avec une requête de fichier)
 *LaunchHandler text/html	ShortcutsWindow		*GestionnaireDeLancement text/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu ouvrir le fichier de jeu de touches !
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Raccourcis n’a pas pu ouvrir le fichier de jeu de touches !
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi « *BougerSourisEn 100% 0 » « *BoutonSouris 1 »
 SendMessage	ShortcutsSpec		EnvoiMessage
 MoveMouseTo	ShortcutsSpec		BougerSourisEn
@@ -44,9 +44,9 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Majuscule
 *MoveMouseTo 50% 50%	ShortcutsWindow		*BougerLaSourisEn 50% 50%
 Save KeySet as…	ShortcutsWindow		Enregistrer le jeu de touches sous…
 Open	ShortcutsWindow		Ouvrir
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu analyser votre fichier de jeu de touches !
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Raccourcis n’a pas pu analyser votre fichier de jeu de touches !
 Select	ShortcutsWindow		Sélectionner
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu enregistrer votre fichier de jeu de touches !
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Raccourcis n’a pas pu enregistrer votre fichier de jeu de touches !
 Oh no	ShortcutsWindow		Oh non !
 LaunchHandler	ShortcutsSpec		GestionnaireDeLancement
 Shortcuts	System name		Raccourcis

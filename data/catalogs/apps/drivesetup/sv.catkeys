@@ -1,5 +1,6 @@
-1	swedish	x-vnd.Haiku-DriveSetup	4273934970
+1	swedish	x-vnd.Haiku-DriveSetup	2321187933
 DriveSetup	System name		DiskHanterare
+Could not acquire partitioning information.	MainWindow		Kunde inte läsa partitionsinformation.
 Cancel	AbstractParametersPanel		Avbryt
 Delete	MainWindow		Ta bort
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringar tillbaka till disken ny?\n\nAlla data på den valda partitionen kommer att raderas om du gör så!
@@ -43,6 +44,7 @@ Change	ChangeParametersPanel		Ändra
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringar tillbaka till disken ny?\n\nAlla data på partitionen %s kommer att raderas om du gör så!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill ta bort partitionen?\n\nAll data på partitionen kommer att gå förlorad!
 Create…	MainWindow		Skapa…
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Är du säker på att du vill formatera en rå disk?(De flesta initierar disken med en partion först). Du kommer att få en fråga igen innan ändringar skrivs till disk.
 The disk has been successfully initialized.\n	MainWindow		Partitionen har initierats.\n
 Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Kunde inte ändra parametrar på partionen. Inga ändringar skrivna till disk.
@@ -66,6 +68,7 @@ The panel could not return successfully.	MainWindow		Panelen kunde inte återska
 Cancel	MainWindow		Avbryt
 Delete partition	MainWindow		Radera partition
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Är du säker på att du vill ändra parametrarna till partionen?\n\nPartionen kommer kanske inte kunna läsas av andra operativsystem!
+Disk system \"%s\" not found!	MainWindow		Disksystemet \"%s\" hittades ej!
 Eject	MainWindow		Mata ut
 Partition	MainWindow		Partition
 Validation of the given parameters failed.	MainWindow		Valideringen av den givna parametern misslyckades.

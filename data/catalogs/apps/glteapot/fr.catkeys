@@ -18,7 +18,7 @@ Perspective	TeapotWindow		Perspective
 GLTeapot	System name		GLTeapot
 Green	TeapotWindow		Vert
 Right	TeapotWindow		À droite
-FPS display	TeapotWindow		Afficher la vitesse d'animation
+FPS display	TeapotWindow		Afficher la vitesse d’animation
 Add a teapot	TeapotWindow		Ajouter une théière
 Red	TeapotWindow		Rouge
 Lights	TeapotWindow		Lumières

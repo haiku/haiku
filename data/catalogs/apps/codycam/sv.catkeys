@@ -1,4 +1,5 @@
-1	swedish	x-vnd.Haiku-CodyCam	183572276
+1	swedish	x-vnd.Haiku-CodyCam	2193838145
+Upload…	VideoConsumer.cpp		Ladda upp...
 Capturing Image…	VideoConsumer.cpp		Fångar bild…
 Every 30 seconds	CodyCam		Var 30:e sekund
 File name:	CodyCam		Filnamn:
@@ -61,6 +62,7 @@ upload client name expected	CodyCam		uppladdningsklientnamn förväntas
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Ansluen...
 PASS <suppressed>  (real password sent)\n	FtpClient		PASS <upphävt> (riktigt lösenord skickat)\n
+File upload failed	VideoConsumer.cpp		Uppladdning av fil misslyckades
 Every 5 minutes	CodyCam		Var 5:e minut
 read: %d\n	SftpClient		läst: %d\n
 Capture controls	CodyCam		Inhämtningsinställningar

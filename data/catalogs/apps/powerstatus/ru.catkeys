@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PowerStatus	2033673511
+1	russian	x-vnd.Haiku-PowerStatus	248799648
 Design capacity low warning: 	PowerStatus		Уровень полного разряда: 
 Show percent	PowerStatus		Показать в процентах
 Design capacity: 	PowerStatus		Штатная емкость: 
@@ -26,7 +26,6 @@ Model number: 	PowerStatus		Номер модели:
 Install in Deskbar	PowerStatus		Установить в Deskbar
  mAh	PowerStatus		 мАч
 Capacity: 	PowerStatus		Емкость: 
-The battery level is getting low, please plug the device in.	PowerStatus		Заряд батареи стал слишком низким, пожалуйста, подключите устройство к сети.
 Battery discharging	PowerStatus		Батарея разряжается
 Serial number: 	PowerStatus		Серийный номер: 
 Battery critical	PowerStatus		Критический заряд батареи
@@ -38,7 +37,6 @@ Design capacity warning: 	PowerStatus		Уровень низкого заряд�
 Battery info	PowerStatus		Информация о батарее
 Quit	PowerStatus		Выход
 rechargeable	PowerStatus		перезаряжаемая
-The battery level is critical, please plug the device in immediately.	PowerStatus		Критический уровень заряда батареи, пожалуйста, подключите устройство к сети прямо сейчас.
 charging	PowerStatus		зарядка
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Вы можете запустить состояние электропитания в окне или установить его в Deskbar.
 Power status box	PowerStatus		Состояние электропитания

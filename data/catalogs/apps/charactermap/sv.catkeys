@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CharacterMap	56063163
+1	swedish	x-vnd.Haiku-CharacterMap	1534181938
 Enclosed alphanumerics	UnicodeBlocks		Omslutna alfanumeriska tecken
 Basic Latin	UnicodeBlocks		Latin (standard)
 View	CharacterWindow		Visa
@@ -123,6 +123,7 @@ Vai	UnicodeBlocks		Vai
 Yi Radicals	UnicodeBlocks		Yi-radikaler
 Cyrillic extended B	UnicodeBlocks		Kyrilliska B (utökade)
 Quit	CharacterWindow		Avsluta
+Ancient symbols	UnicodeBlocks		Antika symboler
 Braille patterns	UnicodeBlocks		Bildskriftsmönster
 New Tai Lue	UnicodeBlocks		New Tai Lue
 Runic	UnicodeBlocks		Runor

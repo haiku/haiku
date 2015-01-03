@@ -1,9 +1,12 @@
-1	swedish	x-vnd.Haiku-MediaConverter	217152063
+1	swedish	x-vnd.Haiku-MediaConverter	341686525
 Video using parameters form settings	MediaConverter		Video med parametrar från inställningar
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Filen kändes inte igen som en media fil:} other{# filer kändes inte igen som en media filer:}}
 Video encoding:	MediaConverter		Videokodning:
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error read audio frame %lld	MediaConverter		Fel vid inläsning av ljudstycke %lld
 No audio	Audio codecs list		Inget ljud
 Error	MediaConverter		Fel
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
 Error loading a file	MediaConverter		Fel vid inläsning av en fil
 Error read video frame %lld	MediaConverter		Fel vid inläsning av bildruta %lld
 File Error	MediaConverter-FileInfo		Filfel
@@ -16,6 +19,7 @@ MediaConverter	System name		MediaKonverterare
 No video	Video codecs list		Inga filmer
 Duration:	MediaConverter-FileInfo		Speltid:
 OK	MediaConverter		OK
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 Error converting '%filename'	MediaConverter		Fel vid konvertering av '%filename'
 Low	MediaConverter		Låg
 Conversion completed	MediaConverter		Konverteringen klar
@@ -24,8 +28,10 @@ OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 sekunder
 Source files	MediaConverter		Källfiler
 Error writing video frame %lld	MediaConverter		Fel vid skrivande av bildruta %lld
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
 Error writing audio frame %lld	MediaConverter		Fel vid skrivning av ljudstycke %lld
 Cancelling	MediaConverter		Avbryter
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
 Error loading files	MediaConverter		Fel vid inläsning av filer
 Cancel	MediaConverter		Avbryt
 None available	Video codecs		Inga tillgängliga
@@ -53,9 +59,11 @@ Drop media files onto this window	MediaConverter		Släpp mediafiler i detta fön
 Audio encoding:	MediaConverter		Ljudkodning:
 Audio quality not supported	MediaConverter		Ljudkvalité stöds ej
 File	Menu		Arkiv
+%.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
 Convert	MediaConverter		Konvertera
 Writing audio track: %ld%% complete	MediaConverter		Skriver ljudspår: %ld%% klart
 Video quality: %3d%%	MediaConverter		Videokvalité: %3d%%
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanaler
 Output folder	MediaConverter		Utmapp
 Audio quality: %3d%%	MediaConverter		Ljudkvalité: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ett fel uppstod vid inläsning av filinformationen.\n\nFel:

@@ -1,6 +1,5 @@
-1	polish	x-vnd.Haiku-DiskUsage	4126084555
+1	polish	x-vnd.Haiku-DiskUsage	2002508600
 Scanning %refName%	Scanner		Skanowanie %refName%
-%size% in {0, plural, one{# file} other{# files}	Info Window		%size w {0, plural, one{# pliku} few{# plikach} many{# plikach} other{# pliku}}
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d plików
 Size	Info Window		Rozmiar
 Rescan	Pie View		Skanuj ponownie

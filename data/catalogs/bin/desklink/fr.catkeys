@@ -6,7 +6,7 @@ OK	MediaReplicant		OK
 Sound preferences…	MediaReplicant		Réglages sons…
 %g dB	MediaReplicant		%g dB
 Open %name	DeskButton	Don't translate variable %name	Ouvrir %name
-No media server running	VolumeControl		Aucun serveur de médias en cours d'exécution
+No media server running	VolumeControl		Aucun serveur de médias en cours d’exécution
 Media preferences…	MediaReplicant		Réglages média…
 Open MediaPlayer	MediaReplicant		Ouvrir le Lecteur Média
 desklink	MediaReplicant		desklink

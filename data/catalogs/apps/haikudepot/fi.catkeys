@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3756499622
+1	finnish	x-vnd.Haiku-HaikuDepot	2015237637
 Name	PackageListView		Nimi
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
 Close	RatePackageWindow		Sulje
@@ -77,7 +77,6 @@ Productivity	Model		Tuottavuus
 Authentication failed	UserLoginWindow		Todennus epäonnistui
 Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
 Language	RatePackageWindow		Kieli
-Size	PackageListView		Koko
 Failed to create or update rating: %s\n	RatePackageWindow		Arvosanan luominen tai päivittäminen epäonnistui: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.
  It responded with: 	RatePackageWindow		 Se vastasi: 

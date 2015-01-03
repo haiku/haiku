@@ -2,13 +2,13 @@
 seconds	ScreenshotWindow		secondes
 Desktop	ScreenshotWindow		Bureau
 Include window border	ScreenshotWindow		Inclure les bords des fenêtres
-Screenshot	System name		Capture d'écran
+Screenshot	System name		Capture d’écran
 Select	ScreenshotWindow		Sélectionner
 Capture active window	ScreenshotWindow		Capturer la fenêtre active
 Cancel	ScreenshotWindow		Annuler
 Name:	ScreenshotWindow		Nom :
 Choose folder…	ScreenshotWindow		Choisir un dossier…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Ce fichier existe déjà.\n Êtes vous sûr de vouloir l'écraser ?
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Ce fichier existe déjà.\n Êtes-vous sûr de vouloir l’écraser ?
 Choose folder	ScreenshotWindow		Choisir un dossier
 Save	ScreenshotWindow		Enregistrer
 Overwrite	ScreenshotWindow		Écraser
@@ -18,7 +18,7 @@ Copy to clipboard	ScreenshotWindow		Copier dans le presse-papiers
 Save in:	ScreenshotWindow		Enregistrer dans :
 screenshot	Screenshot	Base filename of screenshot files	capture
 New screenshot	ScreenshotWindow		Nouvelle capture
-Artwork folder	ScreenshotWindow		Dossier d'images
+Artwork folder	ScreenshotWindow		Dossier d’images
 Home folder	ScreenshotWindow		Dossier personnel
 Settings…	ScreenshotWindow		Réglages…
 overwrite	ScreenshotWindow		écraser

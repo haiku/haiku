@@ -6,8 +6,8 @@ Unencrypted	ConfigView		Non-chiffré
 . The server says:\n	smtp		. Le serveur indique :\n
 ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		Connexion au serveur…
-Error while opening connection to %serv	smtp		Impossible d'ouvrir une connexion avec %serv
-POP3 authentication failed. The server said:\n	smtp		L'authentification POP3 a échoué. Le serveur a indiqué :\n
+Error while opening connection to %serv	smtp		Impossible d’ouvrir une connexion avec %serv
+POP3 authentication failed. The server said:\n	smtp		L’authentification POP3 a échoué. Le serveur a indiqué :\n
 Destination:	ConfigView		Destination :
 : Connection refused or host not found.	smtp		: Connexion refusée ou hôte non trouvé.
 None	ConfigView		Aucun

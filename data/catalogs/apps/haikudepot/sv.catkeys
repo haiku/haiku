@@ -1,14 +1,23 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	443107378
+1	swedish	x-vnd.Haiku-HaikuDepot	804763508
 Name	PackageListView		Namn
+Close	RatePackageWindow		Stäng
 Changelog	PackageInfoView		Ändringslogg
+Your rating:	RatePackageWindow		Dina betyg:
+The passwords do not match.	UserLoginWindow		Lösenorden stämmer inte överens.
+Log in…	MainWindow		Logga in...
+Stability:	RatePackageWindow		Stabilitet:
 Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
+Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
+Stability	RatePackageWindow		Stabilitet
 for %Version%	PackageInfoView		för %Version%
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
 Depot:	FilterView		Depot:
 Description	PackageListView		Beskrivning
 Install	PackageManager		Installera
+Source packages	MainWindow		Källkodspaket
 Tools	MainWindow		Verktyg
 HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		Stäng
 Rate package…	PackageInfoView		Hastighet paket...
 Uninstall	PackageManager		Avinstallera
 <no info>	PackageInfoView		<Ingen information>
@@ -28,9 +37,9 @@ Search terms:	FilterView		Sökvillkor
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error% (%details%)
 Productivity	Model		Produktivitet
-Size	PackageListView		Storlek
 Games	Model		Spel
 Rating	PackageListView		Betyg
+(%Votes%)	FeaturedPackagesView		(%Votes%)
 Graphics	Model		Grafik
 Local	MainWindow		Lokal
 Close	MainWindow		Stäng

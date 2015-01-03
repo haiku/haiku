@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Installer	595649905
+1	russian	x-vnd.Haiku-Installer	3221042352
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Вы уверены, что хотите прервать установку и перезагрузить компьютер?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\n\tразработал Jérôme Duval и Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -19,6 +19,7 @@ Stop	InstallerWindow		Остановить
 OK	InstallerApp		ОК
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		В выпадающих меню выберите источник и раздел, на который хотите установить Haiku. Затем нажмите \"Начать\".
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
+Failed to launch Boot Manager	InstallerWindow		Ну удалось запустить Менеджер загрузки
 Install from:	InstallerWindow		Установить с:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld из %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ВАЖНАЯ ИНФОРМАЦИЯ ПЕРЕД НАЧАЛОМ УСТАНОВКИ HAIKU\n\n

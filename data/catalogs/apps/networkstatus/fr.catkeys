@@ -1,6 +1,6 @@
 1	french	x-vnd.Haiku-NetworkStatus	1729819859
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Options de État Réseau :\n\t--deskbar\tajoute automatiquement un réplicant à la Deskbar\n\t--help\t\taffiche cette aide et sort\n
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vous pouvez exécuter État Réseau dans une fenêtre ou l'installer dans la Deskbar.
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vous pouvez exécuter État Réseau dans une fenêtre ou l’installer dans la Deskbar.
 <no wireless networks found>	NetworkStatusView		<aucun réseaux sans fil détecté>
 Run in window	NetworkStatus		Exécuter dans une fenêtre
 No link	NetworkStatusView		Débranché

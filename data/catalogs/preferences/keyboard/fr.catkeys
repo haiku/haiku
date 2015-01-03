@@ -9,6 +9,6 @@ Keyboard	System name		Clavier
 OK	KeyboardApplication		OK
 Fast	KeyboardView		Rapide
 Slow	KeyboardView		Lente
-Something has gone wrong!	KeyboardApplication		Quelque chose s'est mal passé !
+Something has gone wrong!	KeyboardApplication		Quelque chose s’est mal passé !
 Long	KeyboardView		Longue
 Short	KeyboardView		Courte

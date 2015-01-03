@@ -1,10 +1,10 @@
-1	french	x-vnd.haiku-icon_o_matic	357553475
+1	french	x-vnd.haiku-icon_o_matic	4112423386
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
 Add	Icon-O-Matic-StylesList		Ajouter
 Move Shape	Icon-O-Matic-MoveShapesCommand		Déplacer la forme
-Opening the document failed!	Icon-O-Matic-Main		L'ouverture du document a échoué !
+Opening the document failed!	Icon-O-Matic-Main		L’ouverture du document a échoué !
 Reset transformation	Icon-O-Matic-ShapesList		Réinitialiser la transformation
 Move Paths	Icon-O-Matic-MovePathsCmd		Déplacer les chemins
 None	Icon-O-Matic-Properties		Aucun
@@ -44,7 +44,7 @@ Don't save	Icon-O-Matic-Menu-Settings		Ne pas sauvegarder
 Change Color	Icon-O-Matic-SetColorCmd		Changer la couleur
 Style	Icon-O-Matic-Menus		Style
 <modify path>	Icon-O-Matic-PathCmd		<modifier le chemin>
-Opening the icon failed!	Icon-O-Matic-Main		L'ouverture de l'icône a échoué !
+Opening the icon failed!	Icon-O-Matic-Main		L’ouverture de l’icône a échoué !
 Error: 	Icon-O-Matic-Main		Erreur : 
 Name	Icon-O-Matic-PropertyNames		Nom
 bad news	Icon-O-Matic-Exporter		mauvaises nouvelles
@@ -63,22 +63,24 @@ Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Réinitialiser les Tr
 Settings	Icon-O-Matic-Menus		Réglages
 All	Icon-O-Matic-Properties		Tout
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Vous essayez d’importer un texte plutôt long, êtes-vous sûr de vous ?
+Multi Paste Properties	Icon-O-Matic-Properties		Propriétés de collage multiple
 Undo	Icon-O-Matic-Main		Annuler
 Click on a shape above	Empty transformers list - 1st line		Cliquer sur une forme ci-dessus
 Add Shape	Icon-O-Matic-AddShapesCmd		Ajouter une forme
 Contour	Transformation		Contour
-Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Sauvegarder les changements de l'icône actuelle avant de fermer ?
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Sauvegarder les changements de l’icône actuelle avant de fermer ?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<rien à restaurer>
 Perspective	Transformation		Perspective
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Déplacer la Transformation
 Opacity	Icon-O-Matic-PropertyNames		Opacité
 Add with path	Icon-O-Matic-ShapesList		Ajouter avec un chemin
-Export icon	Dialog title		Exporter l'icône
+Export icon	Dialog title		Exporter l’icône
 Gradient type	Icon-O-Matic-StyleTypes		Type de dégradé
 Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Annuler
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifier le point de contrôle
-Saving your document failed!	Icon-O-Matic-Exporter		L'enregistrement du document a échoué !
+Saving your document failed!	Icon-O-Matic-Exporter		L’enregistrement du document a échoué !
+edit it's properties here.	Empty property list - 3rd line		éditer ses propriétés ici.
 Split	Icon-O-Matic-PathManipulator		Diviser
 Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Orner les points de contrôle
 Remove	Icon-O-Matic-StylesList		Enlever
@@ -131,7 +133,7 @@ File	Icon-O-Matic-Menus		Fichier
 Error: 	Icon-O-Matic-Exporter		Erreur : 
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Path	Icon-O-Matic-PropertyNames		Chemin
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Impossible d'ouvrir le fichier « %s » en tant que document SVG.\n\nError : %s
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Impossible d’ouvrir le fichier « %s » en tant que document SVG.\n\nError : %s
 Swatches	Icon-O-Matic-Menus		Nuancier
 <unavailable>	Icon-O-Matic-StyleTypes		<indisponible>
 Rotation	Icon-O-Matic-PropertyNames		Rotation
@@ -150,6 +152,7 @@ Format	Icon-O-Matic-SavePanel		Format
 Add rect	Icon-O-Matic-PathsList		Ajouter un rectangle
 Edit	Icon-O-Matic-Menus		Éditer
 Duplicate	Icon-O-Matic-StylesList		Dupliquer
+Caps	Icon-O-Matic-PropertyNames		Majuscules
 Add Paths	Icon-O-Matic-AddPathsCmd		Ajouter les chemins
 Style type	Icon-O-Matic-StyleTypes		Type de style
 Assign Style	Icon-O-Matic-AssignStyleCmd		Assigner un style
@@ -169,14 +172,15 @@ Save	Icon-O-Matic-Menu-File		Enregistrer
 Append…	Icon-O-Matic-Menu-File		Ajouter…
 Move Path	Icon-O-Matic-MovePathsCmd		Déplacer les chemins
 Overwrite	Icon-O-Matic-SVGExport		Écraser
+Text too long	Icon-O-Matic-StyledTextImport		Texte trop long
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Figer les formes
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Diviser le point de contrôle
 Open…	Icon-O-Matic-Menu-File		Ouvrir…
-Save icon	Dialog title		Enregistrer l'icône
+Save icon	Dialog title		Enregistrer l’icône
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Couleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Éditer le dégadé
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Nettoyer le chemin
 Rounding	Icon-O-Matic-PropertyNames		Arrondi
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Enlever les formes
 Clean up	Icon-O-Matic-PathsList		Nettoyer
-Detect Orient.	Icon-O-Matic-PropertyNames		Détecter l'orientation.
+Detect Orient.	Icon-O-Matic-PropertyNames		Détecter l’orientation.

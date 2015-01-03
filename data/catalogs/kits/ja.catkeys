@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libbe	1743278280
+1	japanese	x-vnd.Haiku-libbe	1311938724
 gamma	AboutWindow		γ
 beta	AboutWindow		β
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -25,7 +25,6 @@ Print Server is not responding.	PrintJob		プリントサーバーが応答し�
 Paste	TextView		貼り付け
 Special Thanks:	AboutWindow		Special Thanks:
 %.2f TiB	StringForSize		%.2f TiB
-{0, plural, one{# byte} other{# bytes}	StringForSize		{0, plural, one{# バイト} other{# バイト}
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		このレプリカント用のアプリケーションを見つけることができません。アプリケーション識別子が提供されていません。\n%error
 Redo	TextView		やり直し
 <empty>	Menu		<空>

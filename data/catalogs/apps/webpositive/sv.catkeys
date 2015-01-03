@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	3378116449
+1	swedish	x-vnd.Haiku-WebPositive	3678460971
 Show home button	Settings Window		Visa hem-knappen
 Username:	Authentication Panel		Användarnamn:
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
@@ -18,6 +18,8 @@ Error opening downloads folder	Download Window		Fel vid öppnande av nerladdning
 Paste	WebPositive Window		Klistra in
 Double-click or middle-click to open new tab.	Tab Manager		Dubbelklicka eller klicka på mittersta musknappen för att öppna en ny tab.
 Proxy username:	Settings Window		Proxyanvändarnamn:
+Save page as…	WebPositive Window		Spara sida som...
+Over %days left	Download Window		Över %days kvar
 Settings	Settings Window		Inställningar
 Confirmation	WebPositive Window		Bekräftelse
 Window	WebPositive Window		Fönster
@@ -46,6 +48,7 @@ Restart	Download Window		Starta om
 Proxy server	Settings Window		Proxyserver
 Open containing folder	Download Window		Öppna innehållande mapp
 New window	WebPositive Window		Nytt fönster
+WebPositive	Download Window		WebPositive
 Open	Download Window		Öppna
 Reload	WebPositive Window		Läs om
 Downloads	Download Window		Hämtningar
@@ -108,6 +111,7 @@ Password:	Authentication Panel		Lösenord:
 Back	WebPositive Window		Tillbaka
 New browser window	Download Window		Nytt fönster
 Today	WebPositive Window		Idag
+Over %hours left	Download Window		Över %hours kvar
 Remember username and password for this site	Authentication Panel		Kom ihåg användarnamn och lösenord på denna hemsida
 Earlier	WebPositive Window		Tidigare
 Authentication required	Authentication Panel		Autentisering krävs
@@ -115,6 +119,7 @@ Use proxy server to connect to the internet	Settings Window		Använd en proxyser
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Det finna nerladdningar som laddas ner, vill du stänga ner WebPositive nu?
 Auto-hide interface in full screen mode	Settings Window		Automatisk göm interfacet i fullskärmsläge.
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url misslyckades
+%seconds left	Download Window		%seconds kvar
 New tab	WebPositive Window		Ny flik
 Downloads in progress	WebPositive		Nerladdningar pågår
 Style:	Font Selection view		Stil:

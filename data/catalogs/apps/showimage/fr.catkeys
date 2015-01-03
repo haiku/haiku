@@ -1,5 +1,5 @@
 1	french	x-vnd.Haiku-ShowImage	575555985
-Use as background…	Menus		Utiliser comme fond d'écran…
+Use as background…	Menus		Utiliser comme fond d’écran…
 File	Menus		Fichier
 Slide delay	Menus		Délai de diaporama
 Selection mode	Menus		Mode de sélection
@@ -18,7 +18,7 @@ Rotate counterclockwise	Menus		Rotation antihoraire
 High-quality zooming	Menus		Zoom haute qualité
 Browse	Menus		Parcourir
 Edit	Menus		Editer
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L'image n'a pas pu être lue ! Le fichier ou son traducteur n'existe pas.
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L’image n’a pas pu être lue ! Le fichier ou son traducteur n’existe pas.
 First page	Menus		Première page
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » (page %d) a changé. Voulez-vous fermer le document ?
 Leave full screen	Menus		Sortie du plein écran
@@ -36,9 +36,9 @@ Close document	ClosePrompt		Fermer le document
 Height: 	PrintOptionsWindow		Hauteur : 
 The file '%s' could not be written.	SaveToFile		Le fichier « %s » ne peut pas être écrit.
 Cancel	ClosePrompt		Annuler
-Show tool bar	Menus		Afficher la barre d'outils
+Show tool bar	Menus		Afficher la barre d’outils
 Fit to window	Menus		Ajuster à la fenêtre
-Print options	PrintOptionsWindow		Options d'impression
+Print options	PrintOptionsWindow		Options d’impression
 Copy	Menus		Copier
 Progress monitor	ProgressWindow		Moniteur de progression
 Last page	Menus		Dernière page
@@ -46,7 +46,7 @@ Stretch to window	Menus		Étirer à la fenêtre
 Previous file	Menus		Fichier précédent
 ShowImage	System name		Visionneuse
 Slide show	Menus		Diaporama
-Fit image to page	PrintOptionsWindow		Adapter l'image à la page
+Fit image to page	PrintOptionsWindow		Adapter l’image à la page
 Flip top to bottom	Menus		Mirroir horizontal
 Select all	Menus		Selectionner tout
 Zoom factor in %:	PrintOptionsWindow		Facteur de zoom en % :

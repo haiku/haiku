@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libbe	1743278280
+1	german	x-vnd.Haiku-libbe	1311938724
 gamma	AboutWindow		Gamma
 beta	AboutWindow		Beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -25,7 +25,6 @@ Print Server is not responding.	PrintJob		Drucker-Server reagiert nicht.
 Paste	TextView		Einfügen
 Special Thanks:	AboutWindow		Besonderen Dank an:
 %.2f TiB	StringForSize		%.2f TiB
-{0, plural, one{# byte} other{# bytes}	StringForSize		{0, plural, one{# Byte} other{# Bytes}
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Das Ursprungsprogramm für den Replikanten konnte nicht gefunden werden, da keine Programm-Signatur zur Verfügung steht.\n%error
 Redo	TextView		Wiederholen
 <empty>	Menu		<leer>

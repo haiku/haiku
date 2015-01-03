@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	22895100
+1	hungarian	x-vnd.Haiku-Terminal	1993449439
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -101,6 +101,7 @@ Find failed	Terminal TermWindow		Sikertelen keresés
 Search forward	Terminal FindWindow		Keresés előre
 Edit tab title…	Terminal TermWindow		Lap címének szerkesztése…
 Open path	Terminal TermView		Útvonal megnyitása
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAz aktív folyamat aktuális mappája.\n\t\t\tOpcionálisan az útvonal maximális elemei megadhatóak.\n\t\t\tPéldául '%2d' az utolsó két elem számára.\n\t%i\t-\tA fül sorszáma.\n\t%e\t-\tAz aktuális fül kódolása. UTF-8 esetén nem jelenik meg.\n\t%p\t-\tAz aktív folyamat neve.\n\t%%\t-\t'%' karakter.
 Find previous	Terminal TermWindow		Előző keresése
 Copy link location	Terminal TermView		Hivatkozás másolása
 Tab title:	Terminal TermWindow		Lap címe:

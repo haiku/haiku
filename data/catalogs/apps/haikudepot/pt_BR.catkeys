@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	443107378
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2996812689
 Name	PackageListView		Nome
 Changelog	PackageInfoView		Registro de alterações
 Click a package to view information	PackageInfoView		Clique em um pacote para visualizar a informação
@@ -28,7 +28,6 @@ Search terms:	FilterView		Termos para pesquisa:
 No user ratings available.	PackageInfoView		Nenhuma avaliação de usuário disponível.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Um erro ocorreu ao atualizar o repositório: %error% (%details%)
 Productivity	Model		Produtividade
-Size	PackageListView		Tamanho
 Games	Model		Jogos
 Rating	PackageListView		Avaliação
 Graphics	Model		Gráficos

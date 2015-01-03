@@ -16,7 +16,7 @@ pages	JobListView		pages
 Printers	System name		Imprimantes
 Processing	JobListView		Traitement
 Red	TestPageView		Rouge
-Printer name:	AddPrinterDialog		Nom de l'imprimante :
+Printer name:	AddPrinterDialog		Nom de l’imprimante :
 Driver: %driver%	PrinterListView		Pilote : %driver%
  pending jobs.	PrinterListView		 travaux en attente.
 Black	TestPageView		Noir
@@ -31,14 +31,14 @@ Blue	TestPageView		Bleu
 Remove	PrintersWindow		Retirer
 <pick one>	AddPrinterDialog		<choisir>
 Add …	PrintersWindow		Ajouter…
-Print jobs for 	PrintersWindow		Travaux d'impression pour 
+Print jobs for 	PrintersWindow		Travaux d’impression pour 
 Failed	JobListView		Échoué
 %.2f KB	JobListView		%.2f Ko
 Magenta	TestPageView		Magenta
 Completed	JobListView		Achevé
 No printer found!	TransportMenu		Aucune imprimante trouvée !
-Print jobs: No printer selected	PrintersWindow		Travaux d'impression : Aucune imprimante sélectionnée
+Print jobs: No printer selected	PrintersWindow		Travaux d’impression : Aucune imprimante sélectionnée
 Cyan	TestPageView		Cyan
 Unknown status	JobListView		État inconnu
 Connected to:	AddPrinterDialog		Connecté à :
-Printer type:	AddPrinterDialog		Type d'imprimante :
+Printer type:	AddPrinterDialog		Type d’imprimante :

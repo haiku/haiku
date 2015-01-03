@@ -25,7 +25,7 @@ Slow motion	ChartWindow		Mouvement lent
 Fast motion	ChartWindow		Mouvement rapide
 Special	ChartWindow		Spécial
 Status	ChartWindow		État
-Star density	ChartWindow		Densité d'étoiles
+Star density	ChartWindow		Densité d’étoiles
 600.0 f/s	ChartWindow		600.0 f/s
 Display:	ChartWindow		Affichage :
 Space color	ChartWindow		Espace de couleur

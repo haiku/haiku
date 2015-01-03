@@ -1,6 +1,6 @@
 1	french	x-vnd.haiku-registrar	2599857937
 Restart system	ShutdownProcess		Redémarrer le système
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'application « %appName% » est peut-être bloquée sur une fenêtre modale.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L’application « %appName% » est peut-être bloquée sur une fenêtre modale.
 OK	ShutdownProcess		OK
 System is shut down	ShutdownProcess		Le système est arrêté
 It's now safe to turn off the computer.	ShutdownProcess		Vous pouvez maintenant éteindre votre ordinateur.
@@ -12,12 +12,12 @@ Asking \"%appName%\" to quit.	ShutdownProcess		Arrêt de « %appName% » deman
 Shutdown aborted	ShutdownProcess		Extinction interrompue
 Restarting…	ShutdownProcess		Redémarrage…
 Asking background applications to quit.	ShutdownProcess		Arrêt des tâches de fond demandé.
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'application « %appName% » a interrompu le processus d'arrêt.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L’application « %appName% » a interrompu le processus d’arrêt.
 Tidying things up a bit.	ShutdownProcess		On calme un peu les choses.
 Do you really want to restart the system?	ShutdownProcess		Voulez-vous vraiment redémarrer le système ?
-Shutdown status	ShutdownProcess		État de l'extinction
-Cancel shutdown	ShutdownProcess		Annuler l'arrêt
-Kill application	ShutdownProcess		Tuer l'application
+Shutdown status	ShutdownProcess		État de l’extinction
+Cancel shutdown	ShutdownProcess		Annuler l’arrêt
+Kill application	ShutdownProcess		Tuer l’application
 Shut down	ShutdownProcess		Éteindre
 Restart	ShutdownProcess		Redémarrer
 Shutting down…	ShutdownProcess		Fermeture…

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	22895100
+1	french	x-vnd.Haiku-Terminal	1993449439
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -6,14 +6,14 @@ Cursor	Terminal AppearancePrefView		Curseur
 Professional	Terminal colors scheme		Professionnel
 OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Nouveau Terminal
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ne peut pas démarrer l'interpréteur de commande.
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ne peut pas démarrer l’interpréteur de commande.
 Match case	Terminal FindWindow		Sensible à la casse
 Quit	Terminal TermWindow		Quitter
-Use default shell	Terminal Shell		Utiliser l'interpréteur de commande par défaut
+Use default shell	Terminal Shell		Utiliser l’interpréteur de commande par défaut
 Confirm exit if active programs exist	Terminal AppearancePrefView		Demander une confirmation à la fermeture si un programme est actif
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre de l'onglet actif peut\ncontenir les éléments suivants :\n
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre de l’onglet actif peut\ncontenir les éléments suivants :\n
 Select all	Terminal TermWindow		Sélectionner tout
-Close tab	Terminal TermWindow		Fermer l'onglet
+Close tab	Terminal TermWindow		Fermer l’onglet
 Save to file…	Terminal PrefWindow		Enregistrer sous…
 Window title:	Terminal AppearancePrefView		Titre de la fenêtre :
 Font:	Terminal AppearancePrefView		Police :
@@ -35,13 +35,13 @@ Window size	Terminal TermWindow		Taille de la fenêtre
 Selected text	Terminal AppearancePrefView		Texte sélectionné
 Find	Terminal FindWindow		Rechercher
 Appearance	Terminal PrefWindow		Apparence
-Tab title:	Terminal AppearancePrefView		Titre de l'onglet :
+Tab title:	Terminal AppearancePrefView		Titre de l’onglet :
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Fond
 Use selection	Terminal FindWindow		Utiliser la sélection
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		L'application « %1 » fonctionne encore.\nSi vous fermez l'onglet, l'application sera interrompue.
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossible d'exécuter « %command » :\n\t%error
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		L’application « %1 » fonctionne encore.\nSi vous fermez l’onglet, l’application sera interrompue.
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossible d’exécuter « %command » :\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               affiche cette aide\n  -t,     --title              défini le titre de la fenêtre\n  -f,     --fullscreen         démarre en plein écran\n
 Window title…	Terminal TermWindow		Titre de la fenêtre…
 Full screen	Terminal TermWindow		Plein écran
@@ -51,7 +51,7 @@ Custom	Terminal AppearancePrefView	Window size	Personnalisé
 Insert path	Terminal TermView		Insérer un chemin de recherche
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui et Takashi Murai.\n\nUtilisation : %s [OPTION] [SHELL]\n
 Window size:	Terminal AppearancePrefView		Taille de la fenêtre :
-No search string was entered.	Terminal TermWindow		Aucun texte à rechercher n'a été indiqué.
+No search string was entered.	Terminal TermWindow		Aucun texte à rechercher n’a été indiqué.
 Font size	Terminal TermWindow		Taille de la police
 Blinking cursor	Terminal AppearancePrefView		Curseur clignotant
 Set window title	Terminal TermWindow		Changer le titre de la fenêtre
@@ -61,10 +61,10 @@ Copy path	Terminal TermView		Copier le chemin
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Defaults	Terminal PrefWindow		Paramètres par défaut
 Match word	Terminal FindWindow		Rechercher le mot
-Nothing is selected.	Terminal TermWindow		Rien n'est selectionné.
+Nothing is selected.	Terminal TermWindow		Rien n’est sélectionné.
 Text not found.	Terminal TermWindow		Texte non trouvé.
 Find…	Terminal TermWindow		Rechercher…
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		L'application « %1 » fonctionne encore.\nSi vous fermez le Terminal, l'application sera interrompue.
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		L’application « %1 » fonctionne encore.\nSi vous fermez le Terminal, l’application sera interrompue.
 Move here	Terminal TermView		Déplacer ici
 Retro	Terminal colors scheme		Rétro
 Error!	Terminal getString		Erreur !
@@ -84,9 +84,9 @@ Clear all	Terminal TermWindow		Effacer tout
 Text encoding	Terminal TermWindow		Encodage texte
 size	Terminal TermView		taille
 Close window	Terminal TermWindow		Fermer la fenêtre
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail du processus actif dans l'onglet courant.\n\t\t\tVous pouvez éventuellement spécifier le nombre d'éléments maximum\n\t\t\tdans le chemin. Par exemple, '%2d' pour au plus deux éléments.\n\t%T\t-\tLe nom de l'application Terminal suivant les préférences linguistique en cours.\n\t%e\t-\tJeu de caractère utilisé par l'onglet courant. Masqué pour UTF-8.\n\t%i\t-\tL'indice de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l'onglet courant.\n\t%t\t-\tLe titre de l'onglet courant.\n\t%%\t-\tLe caractère '%'.
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail du processus actif dans l’onglet courant.\n\t\t\tVous pouvez éventuellement spécifier le nombre d’éléments maximum\n\t\t\tdans le chemin. Par exemple, '%2d' pour au plus deux éléments.\n\t%T\t-\tLe nom de l’application Terminal suivant les préférences linguistiques en cours.\n\t%e\t-\tJeu de caractère utilisé par l’onglet courant. Masqué pour UTF-8.\n\t%i\t-\tL’indice de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l’onglet courant.\n\t%t\t-\tLe titre de l’onglet courant.\n\t%%\t-\tLe caractère '%'.
 Copy absolute path	Terminal TermView		Copier le chemin absolu
-Set tab title	Terminal TermWindow		Changer le titre de l'onglet
+Set tab title	Terminal TermWindow		Changer le titre de l’onglet
 Settings…	Terminal TermWindow		Réglages…
 Abort	Terminal Shell		Abandonner
 Open link	Terminal TermView		Ouvrir le lien
@@ -99,13 +99,14 @@ Cancel	Terminal TermWindow		Annuler
 OK	Terminal TermApp		OK
 Find failed	Terminal TermWindow		Échec de la recherche
 Search forward	Terminal FindWindow		Rechercher en avant
-Edit tab title…	Terminal TermWindow		Éditer le titre de l'onglet…
-Open path	Terminal TermView		Ouvrir l'emplacement
+Edit tab title…	Terminal TermWindow		Éditer le titre de l’onglet…
+Open path	Terminal TermView		Ouvrir l’emplacement
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail du processus actif.\n\t\t\tVous pouvez éventuellement spécifier le nombre d’éléments maximum\n\t\t\tdans le chemin. Par exemple, '%2d' pour au plus deux éléments.\n\t%i\t-\tL’indice de l’onglet.\n\t%e\t-\tLe jeu de caractère utilisé par l’onglet courant. Masqué pour UTF-8.\n\t%p\t-\tLe nom du processus actif.\n\t%%\t-\tLe caractère '%'.
 Find previous	Terminal TermWindow		Rechercher le précédent
-Copy link location	Terminal TermView		Copier l'emplacement du lien
-Tab title:	Terminal TermWindow		Titre de l'onglet :
+Copy link location	Terminal TermView		Copier l’emplacement du lien
+Tab title:	Terminal TermWindow		Titre de l’onglet :
 Find next	Terminal TermWindow		Rechercher le suivant
-Close active tab	Terminal TermWindow		Fermer l'onglet actif
+Close active tab	Terminal TermWindow		Fermer l’onglet actif
 Paste	Terminal TermWindow		Coller
 Shell 	Terminal TermWindow		Interpréteur de commande
 Cancel	Terminal TermView		Annuler

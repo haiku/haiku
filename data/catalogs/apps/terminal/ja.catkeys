@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	22895100
+1	japanese	x-vnd.Haiku-Terminal	1993449439
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -101,6 +101,7 @@ Find failed	Terminal TermWindow		見つかりませんでした
 Search forward	Terminal FindWindow		順方向検索
 Edit tab title…	Terminal TermWindow		タブタイトルの編集…
 Open path	Terminal TermView		パスを開く
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tThe アクティブなプロセスのカレントワーキングディレクトリ。\n\t\t\tオプションとして、パス要素の最大数を指定できます。\n\t\t\t例 '%2d' は最大 2 つの要素を示します。\n\t%i\t-\tタブのインデックス。\n\t%e\t-\t現在のタブのエンコーディング。UTF-8 の場合は表示されません。\n\t%p\t-\tアクティブなプロセス名。\n\t%%\t-\t文字 '%'.
 Find previous	Terminal TermWindow		前を検索
 Copy link location	Terminal TermView		リンクの場所をコピー
 Tab title:	Terminal TermWindow		タブタイトル:

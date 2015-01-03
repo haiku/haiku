@@ -1,5 +1,6 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3971634644
+1	russian	x-vnd.Haiku-HaikuDepot	2477150673
 Name	PackageListView		Имя
+Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
 Close	RatePackageWindow		Закрыть
 Changelog	PackageInfoView		История изменений
@@ -16,6 +17,7 @@ No changelog available.	PackageInfoView		История изменений не�
 Depot:	FilterView		Склад:
 Description	PackageListView		Описание
 Install	PackageManager		Установить
+Source packages	MainWindow		Пакеты с исходным кодом
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Авторизация завершилась неудачно. Пользователь не существует или был введен неверный пароль.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Аккаунт был успешно создан. Теперь вы можете оценивать пакеты и делать другие полезные вещи.
 Tools	MainWindow		Инструменты
@@ -27,6 +29,7 @@ Uninstall	PackageManager		Удалить
 An error occurred while obtaining the package list: %message%	MainWindow		Возникла ошибка при получении списка пакетов: %message%
 Your rating was updated successfully.	RatePackageWindow		Ваш рейтинг был успешно отправлен.
 <no info>	PackageInfoView		<нет информации>
+Starting the package daemon failed:\n\n%Error%	App		Не удалось запустить пакетный демон:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Возникла ошибка при инициализации менеджера пакетов: %message%
 Email address:	UserLoginWindow		Email адрес:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Ваш рейтинг был успешно отправлен. Вы можете изменить или удалить его в любой момент оценив пакет еще раз.
@@ -35,6 +38,7 @@ The username is already taken. Please choose another.	UserLoginWindow		Тако�
 Close	PackageManager		Закрыть
 Not logged in	MainWindow		Вход не выполнен
 The authentication was successful.	UserLoginWindow		Авторизация прошла успешно.
+Installed packages	MainWindow		Установленные пакеты
 Status	PackageListView		Статус
 Switch account…	MainWindow		Сменить аккаунт…
 Ignore	UserLoginWindow		Игнорировать
@@ -71,7 +75,6 @@ Productivity	Model		Офис
 Authentication failed	UserLoginWindow		Авторизация завершилась неудачно
 Logged in as %User%	MainWindow		Выполнен вход под пользователем %User%
 Language	RatePackageWindow		Язык
-Size	PackageListView		Размер
 Failed to create or update rating: %s\n	RatePackageWindow		Не удалось создать или изменить рейтинг: %s\n
  It responded with: 	RatePackageWindow		 Он ответил так: 
 User name:	UserLoginWindow		Имя пользователя:
@@ -93,19 +96,23 @@ Update	RatePackageWindow		Обновить
 Video	Model		Видео
 All categories	FilterView		Все категории
 An error occurred while refreshing the repository: %error%	MainWindow		Возникла ошибка при обновлении репозитория: %error%
+Try again	App		Попробовать снова
 Login or Create account	MainWindow		Войти или создать учетную запись
 Pending…	PackageListView		Ожидание…
 Depot	FilterView		Все склады
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# объект} few{# объекта} other{# объектов}}
 OK	PackageInfoView		OK
 Uninstalled	PackageListView		Удаленные
+Show	MainWindow		Показывать
 Stable	RatePackageWindow		Стабилен
 Unknown	PackageListView		Неизвестно
 All depots	FilterView		Все склады
 Comment language:	RatePackageWindow		Язык комментария:
 Pass phrase:	UserLoginWindow		Пароль:
+Screenshot	ScreenshotWindow		Снимок экрана
 Not specified	RatePackageWindow		Не указана
 Available	PackageListView		Доступен
+Develop packages	MainWindow		Пакеты для разработчиков
 n/a	PackageInfoView		н/д
  It responded with: 	UserLoginWindow		 Он ответил так: 
 Cancel	RatePackageWindow		Отмена
@@ -114,6 +121,7 @@ Send	RatePackageWindow		Отправить
 Category:	FilterView		Категория:
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
 Featured packages	MainWindow		Популярные пакеты
+Start package daemon	App		Запустить пакетный демон
 Success	RatePackageWindow		Выполнено успешно
 Business	Model		Бизнес
 Audio	Model		Аудио

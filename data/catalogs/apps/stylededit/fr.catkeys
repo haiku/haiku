@@ -15,7 +15,7 @@ Size	Menus		Taille
 Save	QuitAlert		Sauvegarder
 Page setup…	Menus		Mise en page…
 Print…	Menus		Imprimer…
-Can't undo	Menus		Impossible d'annuler
+Can't undo	Menus		Impossible d’annuler
 Save	Menus		Sauvegarder
 Replace with:	FindandReplaceWindow		Remplacer par :
 Cancel	SaveAlert		Annuler
@@ -66,7 +66,7 @@ Wrap-around search	FindandReplaceWindow		Recherche en boucle
 Bold	Menus		Gras
 Find selection	Menus		Chercher la sélection
 Find:	FindandReplaceWindow		Chercher :
-Error saving \"%s\":\n%s	SaveAlert		Erreur à l'enregistrement de « %s » :\n%s
+Error saving \"%s\":\n%s	SaveAlert		Erreur à l’enregistrement de « %s » :\n%s
 Copy	Menus		Copier
 Cut	Menus		Couper
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Le fichier « %file% » a été modifié par une autre application, voulez-vous le recharger ?

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libbe	1743278280
+1	french	x-vnd.Haiku-libbe	1311938724
 gamma	AboutWindow		gamma
 beta	AboutWindow		bêta
 %3.2f GiB	StringForSize		%3.2f Gio
@@ -21,12 +21,11 @@ Version history:	AboutWindow		Historique des versions :
 Remove replicant	Dragger		Enlever le réplicant
 OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
-Print Server is not responding.	PrintJob		Le serveur d'impression ne répond pas.
+Print Server is not responding.	PrintJob		Le serveur d’impression ne répond pas.
 Paste	TextView		Coller
 Special Thanks:	AboutWindow		Remerciements particuliers :
 %.2f TiB	StringForSize		%.2f Tio
-{0, plural, one{# byte} other{# bytes}	StringForSize		{0, plural, one{# octet} other{# octets}}
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossible de localiser l'application du réplicant. Aucune signature d'application fournie.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossible de localiser l’application du réplicant. Aucune signature d’application fournie.\n%error
 Redo	TextView		Refaire
 <empty>	Menu		<vide>
 Select All	TextView		Sélectionner tout
@@ -39,4 +38,4 @@ development	AboutWindow		développement
 Error	ZombieReplicantView		Erreur
 Blue:	ColorControl		Bleu :
 gold master	AboutWindow		finale
-Can't delete this replicant from its original application. Life goes on.	Dragger		Impossible de supprimer ce réplicant à partir de son application d'origine. La vie continue.
+Can't delete this replicant from its original application. Life goes on.	Dragger		Impossible de supprimer ce réplicant à partir de son application d’origine. La vie continue.

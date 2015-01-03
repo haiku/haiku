@@ -7,5 +7,5 @@ Mail server:	ProtocolConfigView		Serveur mail :
 Select…	MailKit		Sélectionner…
 Connection type:	ProtocolConfigView		Type de connexion :
 Leave mail on server	ProtocolConfigView		Laisser le message sur le serveur
-Username:	ProtocolConfigView		Nom d'utilisateur :
+Username:	ProtocolConfigView		Nom d’utilisateur :
 Login type:	ProtocolConfigView		Type de connexion :
