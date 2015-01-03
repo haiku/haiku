@@ -79,8 +79,8 @@ RemotePackageRepository HaikuPorts
 	groff-1.20.1-3
 	gutenprint-5.2.10-1
 	gutenprint_devel-5.2.10-1
-	haikuwebkit-1.4.6-3
-	haikuwebkit_devel-1.4.6-3
+	haikuwebkit-1.4.8-2
+	haikuwebkit_devel-1.4.8-2
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
 	icu-54.1-4
@@ -153,6 +153,7 @@ RemotePackageRepository HaikuPorts
 	ncurses_devel-5.9-10
 	neon-0.29.6-7
 	neon_devel-0.29.6-7
+	ninja-1.5.1-2
 	openjdk-1.7_2013_11_08-2
 	openssh-6.0p1-8
 	# sync openssl with secondary architecture (x86_gcc2)
