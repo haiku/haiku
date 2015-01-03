@@ -38,6 +38,8 @@ private:
 	static	int32				_DownloadThreadEntry(void* data);
 			void				_DownloadThread();
 
+			void				_ResizeToFitAndCenter();
+
 private:
 			BMessenger			fOnCloseTarget;
 			BMessage			fOnCloseMessage;

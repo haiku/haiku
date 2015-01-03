@@ -34,13 +34,19 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 	fScreenshotView->SetExplicitMaxSize(
 		BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
+	BGroupView* groupView = new BGroupView(B_VERTICAL);
+	groupView->SetViewColor(0, 0, 0);
+	fScreenshotView->SetLowColor(0, 0, 0);
+
 	// Build layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.Add(fScreenshotView)
-		.SetInsets(B_USE_WINDOW_INSETS)
+		.AddGroup(groupView)
+			.Add(fScreenshotView)
+			.SetInsets(B_USE_WINDOW_INSETS)
+		.End()
 	;
 
-	CenterIn(parent->Frame());
+	CenterOnScreen();
 }
 
 
@@ -197,8 +203,20 @@ ScreenshotWindow::_DownloadThread()
 		printf("got screenshot");
 		fScreenshot = BitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
 		fScreenshotView->SetBitmap(fScreenshot->Bitmap(SharedBitmap::SIZE_ANY));
+		_ResizeToFitAndCenter();
 		Unlock();
 	} else {
 		printf("  failed to download screenshot\n");
 	}
+}
+
+
+void
+ScreenshotWindow::_ResizeToFitAndCenter()
+{
+	float minWidth;
+	float minHeight;
+	GetSizeLimits(&minWidth, NULL, &minHeight, NULL);
+	ResizeTo(minWidth, minHeight);
+	CenterOnScreen();
 }
