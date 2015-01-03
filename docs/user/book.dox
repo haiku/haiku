@@ -554,6 +554,8 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 		formats.
 
 
+	\defgroup libtranslation (libtranslation.so)
+
 	\defgroup libbe (libbe.so)
 
 
