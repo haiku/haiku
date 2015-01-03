@@ -1172,7 +1172,7 @@ AboutView::_CreateCreditsView()
 	// atftp copyrights
 	_AddPackageCredit(PackageCredit("atftp")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2000 Jean-Pierre "
-			"ervbefeL and Remi Lefebvre."))
+			"Lefebvre and Remi Lefebvre."))
 		.SetLicense(kGPLv2)
 		.SetURL("http://freecode.com/projects/atftp"));
 
