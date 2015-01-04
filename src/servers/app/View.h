@@ -14,7 +14,7 @@
 #define VIEW_H
 
 
-#include "DrawingContext.h"
+#include "Canvas.h"
 #include "IntRect.h"
 
 #include <GraphicsDefs.h>
@@ -37,7 +37,7 @@ class ServerCursor;
 class ServerPicture;
 class BGradient;
 
-class View: public DrawingContext {
+class View: public Canvas {
 public:
 							View(IntRect frame, IntPoint scrollingOffset,
 								const char* name, int32 token,

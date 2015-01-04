@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2014, Haiku, Inc.
+ * Copyright (c) 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -9,9 +9,10 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Marcus Overhagen <marcus@overhagen.de>
  *		Adrien Destugues <pulkomandy@pulkomandy.tk>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
-#ifndef DRAWING_CONTEXT_H
-#define DRAWING_CONTEXT_H
+#ifndef CANVAS_H
+#define CANVAS_H
 
 
 #include <Point.h>
@@ -27,11 +28,11 @@ class IntRect;
 class ServerPicture;
 
 
-class DrawingContext {
+class Canvas {
 public:
-							DrawingContext();
-							DrawingContext(const DrawState& state);
-	virtual					~DrawingContext();
+							Canvas();
+							Canvas(const DrawState& state);
+	virtual					~Canvas();
 
 			status_t		InitCheck() const;
 
@@ -47,10 +48,10 @@ public:
 
 			void			SetUserClipping(const BRegion* region);
 				// region is expected in view coordinates
-	
+
 			void			SetAlphaMask(AlphaMask* mask);
 			AlphaMask*		GetAlphaMask() const;
-	
+
 			void			ConvertToScreenForDrawing(BPoint* point) const;
 			void			ConvertToScreenForDrawing(BRect* rect) const;
 			void			ConvertToScreenForDrawing(BRegion* region) const;
@@ -82,9 +83,9 @@ protected:
 };
 
 
-class OffscreenContext: public DrawingContext {
+class OffscreenCanvas : public Canvas {
 public:
-							OffscreenContext(DrawingEngine* engine,
+							OffscreenCanvas(DrawingEngine* engine,
 								const DrawState& state);
 
 							// Screen and View coordinates are the same for us.
@@ -108,4 +109,4 @@ private:
 };
 
 
-#endif
+#endif // CANVAS_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2014, Haiku, Inc.
+ * Copyright (c) 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -9,10 +9,11 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Marcus Overhagen <marcus@overhagen.de>
  *		Adrien Destugues <pulkomandy@pulkomandy.tk
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 
 
-#include "DrawingContext.h"
+#include "Canvas.h"
 
 #include <new>
 
@@ -27,27 +28,27 @@
 #include "DrawState.h"
 
 
-DrawingContext::DrawingContext()
+Canvas::Canvas()
 	:
 	fDrawState(new(std::nothrow) DrawState())
 {
 }
 
 
-DrawingContext::DrawingContext(const DrawState& state)
+Canvas::Canvas(const DrawState& state)
 	:
 	fDrawState(new(std::nothrow) DrawState(state))
 {
 }
 
 
-DrawingContext::~DrawingContext()
+Canvas::~Canvas()
 {
 }
 
 
 status_t
-DrawingContext::InitCheck() const
+Canvas::InitCheck() const
 {
 	if (fDrawState == NULL)
 		return B_NO_MEMORY;
@@ -57,7 +58,7 @@ DrawingContext::InitCheck() const
 
 
 void
-DrawingContext::PushState()
+Canvas::PushState()
 {
 	DrawState* newState = fDrawState->PushState();
 	if (newState)
@@ -66,7 +67,7 @@ DrawingContext::PushState()
 
 
 void
-DrawingContext::PopState()
+Canvas::PopState()
 {
 	if (fDrawState->PreviousState() == NULL)
 		return;
@@ -83,7 +84,7 @@ DrawingContext::PopState()
 
 
 void
-DrawingContext::SetDrawingOrigin(BPoint origin)
+Canvas::SetDrawingOrigin(BPoint origin)
 {
 	fDrawState->SetOrigin(origin);
 
@@ -94,7 +95,7 @@ DrawingContext::SetDrawingOrigin(BPoint origin)
 
 
 BPoint
-DrawingContext::DrawingOrigin() const
+Canvas::DrawingOrigin() const
 {
 	BPoint origin(fDrawState->Origin());
 	float scale = Scale();
@@ -107,7 +108,7 @@ DrawingContext::DrawingOrigin() const
 
 
 void
-DrawingContext::SetScale(float scale)
+Canvas::SetScale(float scale)
 {
 	fDrawState->SetScale(scale);
 
@@ -118,31 +119,31 @@ DrawingContext::SetScale(float scale)
 
 
 float
-DrawingContext::Scale() const
+Canvas::Scale() const
 {
 	return fDrawState->Scale();
 }
 
 
 void
-DrawingContext::SetUserClipping(const BRegion* region)
+Canvas::SetUserClipping(const BRegion* region)
 {
 	fDrawState->SetClippingRegion(region);
 
-	// rebuild clipping (for just this context)
+	// rebuild clipping (for just this canvas)
 	RebuildClipping(false);
 }
 
 
 void
-DrawingContext::SetAlphaMask(AlphaMask* mask)
+Canvas::SetAlphaMask(AlphaMask* mask)
 {
 	fDrawState->SetAlphaMask(mask);
 }
 
 
 AlphaMask*
-DrawingContext::GetAlphaMask() const
+Canvas::GetAlphaMask() const
 {
 	return fDrawState->GetAlphaMask();
 }
@@ -150,7 +151,7 @@ DrawingContext::GetAlphaMask() const
 
 //! converts a point from local *drawing* to screen coordinate system
 void
-DrawingContext::ConvertToScreenForDrawing(BPoint* point) const
+Canvas::ConvertToScreenForDrawing(BPoint* point) const
 {
 	fDrawState->Transform(point);
 	// NOTE: from here on, don't use the
@@ -161,7 +162,7 @@ DrawingContext::ConvertToScreenForDrawing(BPoint* point) const
 
 //! converts a rect from local *drawing* to screen coordinate system
 void
-DrawingContext::ConvertToScreenForDrawing(BRect* rect) const
+Canvas::ConvertToScreenForDrawing(BRect* rect) const
 {
 	fDrawState->Transform(rect);
 	// NOTE: from here on, don't use the
@@ -172,7 +173,7 @@ DrawingContext::ConvertToScreenForDrawing(BRect* rect) const
 
 //! converts a region from local *drawing* to screen coordinate system
 void
-DrawingContext::ConvertToScreenForDrawing(BRegion* region) const
+Canvas::ConvertToScreenForDrawing(BRegion* region) const
 {
 	fDrawState->Transform(region);
 	// NOTE: from here on, don't use the
@@ -183,7 +184,7 @@ DrawingContext::ConvertToScreenForDrawing(BRegion* region) const
 
 //! converts a gradient from local *drawing* to screen coordinate system
 void
-DrawingContext::ConvertToScreenForDrawing(BGradient* gradient) const
+Canvas::ConvertToScreenForDrawing(BGradient* gradient) const
 {
 	switch (gradient->GetType()) {
 		case BGradient::TYPE_LINEAR:
@@ -266,7 +267,7 @@ DrawingContext::ConvertToScreenForDrawing(BGradient* gradient) const
 
 //! converts points from local *drawing* to screen coordinate system
 void
-DrawingContext::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const
+Canvas::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const
 {
 	// TODO: optimize this, it should be smarter
 	while (num--) {
@@ -283,7 +284,7 @@ DrawingContext::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 
 
 //! converts rects from local *drawing* to screen coordinate system
 void
-DrawingContext::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const
+Canvas::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const
 {
 	// TODO: optimize this, it should be smarter
 	while (num--) {
@@ -300,7 +301,7 @@ DrawingContext::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 nu
 
 //! converts regions from local *drawing* to screen coordinate system
 void
-DrawingContext::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const
+Canvas::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const
 {
 	// TODO: optimize this, it should be smarter
 	while (num--) {
@@ -317,20 +318,20 @@ DrawingContext::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int3
 
 //! converts a point from screen to local coordinate system
 void
-DrawingContext::ConvertFromScreenForDrawing(BPoint* point) const
+Canvas::ConvertFromScreenForDrawing(BPoint* point) const
 {
 	ConvertFromScreen(point);
 	fDrawState->InverseTransform(point);
 }
 
 
-// #pragma mark - OffscreenContext
+// #pragma mark - OffscreenCanvas
 
 
-OffscreenContext::OffscreenContext(DrawingEngine* engine,
+OffscreenCanvas::OffscreenCanvas(DrawingEngine* engine,
 		const DrawState& state)
 	:
-	DrawingContext(state),
+	Canvas(state),
 	fDrawingEngine(engine)
 {
 	ResyncDrawState();
@@ -338,7 +339,7 @@ OffscreenContext::OffscreenContext(DrawingEngine* engine,
 
 
 void
-OffscreenContext::ResyncDrawState()
+OffscreenCanvas::ResyncDrawState()
 {
 	fDrawingEngine->SetDrawState(fDrawState);
 }

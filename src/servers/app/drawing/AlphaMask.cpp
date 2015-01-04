@@ -12,7 +12,7 @@
 
 #include "BitmapHWInterface.h"
 #include "BitmapManager.h"
-#include "DrawingContext.h"
+#include "Canvas.h"
 #include "DrawingEngine.h"
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
@@ -56,7 +56,7 @@ AlphaMask::Update(BRect bounds, BPoint offset)
 {
 	fViewBounds = bounds;
 	fViewOffset = offset;
-	
+
 	if (fPreviousMask != NULL)
 		fPreviousMask->Update(bounds, offset);
 }
@@ -98,7 +98,7 @@ AlphaMask::Generate()
 		delete[] fCachedBitmap;
 		fCachedBitmap = new(std::nothrow) uint8[width * height];
 	}
-	
+
 	// If rendering the picture fails, we will draw without any clipping.
 	ServerBitmap* bitmap = _RenderPicture();
 	if (bitmap == NULL || fCachedBitmap == NULL) {
@@ -140,7 +140,7 @@ AlphaMask::Generate()
 			transferBitmap = false;
 		}
 	}
-	
+
 	if (transferBitmap) {
 		for (uint32 y = 0; y < height; y++) {
 			for (uint32 x = 0; x < width; x++) {
@@ -194,8 +194,8 @@ AlphaMask::_RenderPicture() const
 		return NULL;
 	}
 
-	OffscreenContext context(engine, fDrawState);
-	context.PushState();
+	OffscreenCanvas canvas(engine, fDrawState);
+	canvas.PushState();
 
 	if (engine->LockParallelAccess()) {
 		// FIXME ConstrainClippingRegion docs says passing NULL disables
@@ -203,11 +203,11 @@ AlphaMask::_RenderPicture() const
 		BRegion clipping;
 		clipping.Include(fViewBounds);
 		engine->ConstrainClippingRegion(&clipping);
-		fPicture->Play(&context);
+		fPicture->Play(&canvas);
 		engine->UnlockParallelAccess();
 	}
 
-	context.PopState();
+	canvas.PopState();
 	delete engine;
 
 	return bitmap;

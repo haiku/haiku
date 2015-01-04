@@ -152,8 +152,8 @@ SharedLibrary libtestappserver.so :
 
 	AlphaMask.cpp
 	BitmapHWInterface.cpp
+	Canvas.cpp
 	DesktopSettings.cpp
-	DrawingContext.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindow.cpp
 	RegionPool.cpp
@@ -173,9 +173,9 @@ SharedLibrary libtestappserver.so :
 	[ BuildFeatureAttribute freetype : library ]
 ;
 
-Includes [ FGristFiles AppServer.cpp BitmapManager.cpp
+Includes [ FGristFiles AppServer.cpp BitmapManager.cpp Canvas.cpp
 	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp
-	DrawState.cpp DrawingContext.cpp DrawingEngine.cpp ServerApp.cpp
+	DrawState.cpp DrawingEngine.cpp ServerApp.cpp
 	ServerBitmap.cpp ServerCursor.cpp ServerFont.cpp ServerPicture.cpp
 	ServerWindow.cpp View.cpp Window.cpp WorkspacesView.cpp
 	$(decorator_src) $(font_src) ]

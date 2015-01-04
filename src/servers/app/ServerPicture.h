@@ -18,7 +18,7 @@
 
 
 class BFile;
-class DrawingContext;
+class Canvas;
 class ServerApp;
 class View;
 
@@ -49,7 +49,7 @@ public:
 			void				SyncState(View* view);
 			void				SetFontFromLink(BPrivate::LinkReceiver& link);
 
-			void				Play(DrawingContext* target);
+			void				Play(Canvas* target);
 
 			void 				PushPicture(ServerPicture* picture);
 			ServerPicture*		PopPicture();
