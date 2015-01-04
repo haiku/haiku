@@ -25,6 +25,7 @@ RemotePackageRepository HaikuPorts
 	acr-0.9.9_git-1
 	album-0.9.3-1
 	ale-0.9.1-2
+	app2png-1.0.0-1
 	apr-1.5.0-1
 	apr_devel-1.5.0-1
 	apr_util-1.5.3-1
@@ -655,6 +656,7 @@ RemotePackageRepository HaikuPorts
 	acr
 	album
 	ale
+	app2png
 	apr
 	apr_util
 	arm_none_eabi_binutils_x86
