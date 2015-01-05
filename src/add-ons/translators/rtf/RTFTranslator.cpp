@@ -154,18 +154,21 @@ status_t
 RTFTranslator::Identify(BPositionIO *stream,
 	const translation_format *format, BMessage *ioExtension,
 	translator_info *info, uint32 outType)
-{	
+{
 	if (!outType)
 		outType = B_TRANSLATOR_TEXT;
 	else if (outType != B_TRANSLATOR_TEXT && outType != B_STYLED_TEXT_FORMAT
 		&& outType != RTF_TEXT_FORMAT)
 		return B_NO_TRANSLATOR;
 
-	
+
 	RTF::Parser parser(*stream);
 	status_t status = parser.Identify();
-	
+
 	if (status == B_OK) {
+		// Source data is RTF. We can translate to RTF (no-op), plaintext, or
+		// styled text.
+
 		// return information about the data in the stream
 		info->type = B_TRANSLATOR_TEXT; //RTF_TEXT_FORMAT;
 		info->group = B_TRANSLATOR_TEXT;
@@ -175,9 +178,14 @@ RTFTranslator::Identify(BPositionIO *stream,
 			sizeof(info->name));
 		strcpy(info->MIME, "text/rtf");
 	} else {
+		// Not an RTF file. We can only work with it if we are translating to
+		// RTF.
+		if (outType != RTF_TEXT_FORMAT)
+			return B_NO_TRANSLATOR;
+
 		stream->Seek(0, SEEK_SET);
 		TranslatorStyledTextStreamHeader header;
-		stream->Read(&header, sizeof(header)); 
+		stream->Read(&header, sizeof(header));
 		swap_data(B_UINT32_TYPE, &header, sizeof(header),
 			B_SWAP_BENDIAN_TO_HOST);
 		stream->Seek(0, SEEK_SET);
@@ -191,7 +199,7 @@ RTFTranslator::Identify(BPositionIO *stream,
 			info->capability = STXT_IN_CAPABILITY;
 			strlcpy(info->name, B_TRANSLATE("Be style text file"),
 				sizeof(info->name));
-			strcpy(info->MIME, "text/x-vnd.Be-stxt");		
+			strcpy(info->MIME, "text/x-vnd.Be-stxt");
 		} else {
 			info->type = B_TRANSLATOR_TEXT;
 			info->group = B_TRANSLATOR_TEXT;
@@ -219,7 +227,7 @@ RTFTranslator::Translate(BPositionIO *source,
 	if (outType != B_TRANSLATOR_TEXT && outType != B_STYLED_TEXT_FORMAT
 		&& outType != RTF_TEXT_FORMAT)
 		return B_NO_TRANSLATOR;
-	
+
 	if (strncmp(inInfo->MIME, "text/rtf", 8) == 0) {
 		RTF::Parser parser(*source);
 
@@ -232,19 +240,19 @@ RTFTranslator::Translate(BPositionIO *source,
 			return convert_to_plain_text(header, *target);
 		else
 			return convert_to_stxt(header, *target);
-			
+
 	} else if (inInfo->type == B_TRANSLATOR_TEXT) {
-		return convert_plain_text_to_rtf(*source, *target);	
+		return convert_plain_text_to_rtf(*source, *target);
 	} else if (inInfo->type == B_STYLED_TEXT_FORMAT) {
-		return convert_styled_text_to_rtf(source, target);	
+		return convert_styled_text_to_rtf(source, target);
 	} else
 		return B_BAD_VALUE;
-	
+
 }
 
 
 status_t
-RTFTranslator::MakeConfigurationView(BMessage *ioExtension, BView **_view, 
+RTFTranslator::MakeConfigurationView(BMessage *ioExtension, BView **_view,
 	BRect *_extent)
 {
 	if (_view == NULL || _extent == NULL)
