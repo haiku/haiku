@@ -133,10 +133,32 @@ public:
 					return false;
 				if (!fCpuState->GetRegisterValue(reg, value))
 					value.SetTo("?", B_VARIANT_DONT_COPY_DATA);
+				else if (reg->Format() == REGISTER_FORMAT_SIMD)
+					_FormatSIMDValue(reg, value);
 				return true;
 			default:
 				return false;
 		}
+	}
+
+private:
+	void _FormatSIMDValue(const Register* reg, BVariant& _value)
+	{
+		// for now, format SIMD registers as groups of 16-bit integer values.
+		// TODO: support multiple formats.
+		BString temp("{");
+		uint16* data = (uint16*)_value.ToPointer();
+		uint32 count = reg->BitSize() / (sizeof(uint16) * 8);
+		for (uint32 i = 0; i < count; i++) {
+			BString intFormat;
+			intFormat.SetToFormat("%#" B_PRIx16, data[i]);
+			temp += intFormat;
+			if (i < count - 1)
+				temp += ", ";
+		}
+		temp += "}";
+
+		_value.SetTo(temp);
 	}
 
 private:
