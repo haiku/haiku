@@ -141,6 +141,8 @@ APRView::MessageReceived(BMessage *msg)
 		if (msg->FindData("RGBColor", (type_code)'RGBC', (const void**)&color,
 				&size) == B_OK) {
 			_SetCurrentColor(*color);
+
+			Window()->PostMessage(kMsgUpdate);
 		}
 	}
 
@@ -150,6 +152,8 @@ APRView::MessageReceived(BMessage *msg)
 			// Received from the color fPicker when its color changes
 			rgb_color color = fPicker->ValueAsColor();
 			_SetCurrentColor(color);
+
+			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 
@@ -262,8 +266,6 @@ APRView::_SetCurrentColor(rgb_color color)
 	fPicker->SetValue(color);
 	fColorPreview->SetColor(color);
 	fColorPreview->Invalidate();
-
-	Window()->PostMessage(kMsgUpdate);
 }
 
 
