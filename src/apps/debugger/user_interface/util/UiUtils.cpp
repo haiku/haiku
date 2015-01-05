@@ -70,7 +70,7 @@ UiUtils::VariantToString(const BVariant& value, char* buffer,
 	switch (value.Type()) {
 		case B_FLOAT_TYPE:
 		case B_DOUBLE_TYPE:
-			snprintf(buffer, bufferSize, "%g", value.ToDouble());
+			snprintf(buffer, bufferSize, "%.3g", value.ToDouble());
 			break;
 		case B_INT8_TYPE:
 		case B_UINT8_TYPE:
