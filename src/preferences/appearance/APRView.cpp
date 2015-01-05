@@ -150,8 +150,6 @@ APRView::MessageReceived(BMessage *msg)
 			// Received from the color fPicker when its color changes
 			rgb_color color = fPicker->ValueAsColor();
 			_SetCurrentColor(color);
-
-			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 
@@ -167,8 +165,6 @@ APRView::MessageReceived(BMessage *msg)
 			fWhich = item->ColorWhich();
 			rgb_color color = fCurrentSet.GetColor(fWhich);
 			_SetCurrentColor(color);
-
-			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 
@@ -266,6 +262,8 @@ APRView::_SetCurrentColor(rgb_color color)
 	fPicker->SetValue(color);
 	fColorPreview->SetColor(color);
 	fColorPreview->Invalidate();
+
+	Window()->PostMessage(kMsgUpdate);
 }
 
 
