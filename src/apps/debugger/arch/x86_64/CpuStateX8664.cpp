@@ -50,6 +50,51 @@ CpuStateX8664::CpuStateX8664(const x86_64_debug_cpu_state& state)
 	SetIntRegister(X86_64_REGISTER_GS, state.gs);
 	SetIntRegister(X86_64_REGISTER_SS, state.ss);
 
+	const x86_64_extended_registers& extended = state.extended_registers;
+
+	SetFloatRegister(X86_64_REGISTER_ST0,
+		(double)(*(long double*)(extended.fp_registers[0].value)));
+	SetFloatRegister(X86_64_REGISTER_ST1,
+		(double)(*(long double*)(extended.fp_registers[1].value)));
+	SetFloatRegister(X86_64_REGISTER_ST2,
+		(double)(*(long double*)(extended.fp_registers[2].value)));
+	SetFloatRegister(X86_64_REGISTER_ST3,
+		(double)(*(long double*)(extended.fp_registers[3].value)));
+	SetFloatRegister(X86_64_REGISTER_ST4,
+		(double)(*(long double*)(extended.fp_registers[4].value)));
+	SetFloatRegister(X86_64_REGISTER_ST5,
+		(double)(*(long double*)(extended.fp_registers[5].value)));
+	SetFloatRegister(X86_64_REGISTER_ST6,
+		(double)(*(long double*)(extended.fp_registers[6].value)));
+	SetFloatRegister(X86_64_REGISTER_ST7,
+		(double)(*(long double*)(extended.fp_registers[7].value)));
+
+	SetMMXRegister(X86_64_REGISTER_MM0, extended.mmx_registers[0].value);
+	SetMMXRegister(X86_64_REGISTER_MM1, extended.mmx_registers[1].value);
+	SetMMXRegister(X86_64_REGISTER_MM2, extended.mmx_registers[2].value);
+	SetMMXRegister(X86_64_REGISTER_MM3, extended.mmx_registers[3].value);
+	SetMMXRegister(X86_64_REGISTER_MM4, extended.mmx_registers[4].value);
+	SetMMXRegister(X86_64_REGISTER_MM5, extended.mmx_registers[5].value);
+	SetMMXRegister(X86_64_REGISTER_MM6, extended.mmx_registers[6].value);
+	SetMMXRegister(X86_64_REGISTER_MM7, extended.mmx_registers[7].value);
+
+	SetXMMRegister(X86_64_REGISTER_XMM0, extended.xmm_registers[0].value);
+	SetXMMRegister(X86_64_REGISTER_XMM1, extended.xmm_registers[1].value);
+	SetXMMRegister(X86_64_REGISTER_XMM2, extended.xmm_registers[2].value);
+	SetXMMRegister(X86_64_REGISTER_XMM3, extended.xmm_registers[3].value);
+	SetXMMRegister(X86_64_REGISTER_XMM4, extended.xmm_registers[4].value);
+	SetXMMRegister(X86_64_REGISTER_XMM5, extended.xmm_registers[5].value);
+	SetXMMRegister(X86_64_REGISTER_XMM6, extended.xmm_registers[6].value);
+	SetXMMRegister(X86_64_REGISTER_XMM7, extended.xmm_registers[7].value);
+	SetXMMRegister(X86_64_REGISTER_XMM8, extended.xmm_registers[8].value);
+	SetXMMRegister(X86_64_REGISTER_XMM9, extended.xmm_registers[9].value);
+	SetXMMRegister(X86_64_REGISTER_XMM10, extended.xmm_registers[10].value);
+	SetXMMRegister(X86_64_REGISTER_XMM11, extended.xmm_registers[11].value);
+	SetXMMRegister(X86_64_REGISTER_XMM12, extended.xmm_registers[12].value);
+	SetXMMRegister(X86_64_REGISTER_XMM13, extended.xmm_registers[13].value);
+	SetXMMRegister(X86_64_REGISTER_XMM14, extended.xmm_registers[14].value);
+	SetXMMRegister(X86_64_REGISTER_XMM15, extended.xmm_registers[15].value);
+
 	fInterruptVector = state.vector;
 }
 
@@ -68,7 +113,13 @@ CpuStateX8664::Clone(CpuState*& _clone) const
 
 
 	memcpy(newState->fIntRegisters, fIntRegisters, sizeof(fIntRegisters));
+	memcpy(newState->fFloatRegisters, fFloatRegisters,
+		sizeof(fFloatRegisters));
+	memcpy(newState->fMMXRegisters, fMMXRegisters, sizeof(fMMXRegisters));
+	memcpy(newState->fXMMRegisters, fXMMRegisters, sizeof(fXMMRegisters));
+
 	newState->fSetRegisters = fSetRegisters;
+	newState->fInterruptVector = fInterruptVector;
 
 	_clone = newState;
 
@@ -107,6 +158,26 @@ CpuStateX8664::UpdateDebugState(void* state, size_t size) const
 	x64State->fs = IntRegisterValue(X86_64_REGISTER_FS);
 	x64State->gs = IntRegisterValue(X86_64_REGISTER_GS);
 	x64State->ss = IntRegisterValue(X86_64_REGISTER_SS);
+
+	for (int32 i = 0; i < 8; i++) {
+		*(long double*)(x64State->extended_registers.fp_registers[i].value)
+			= (long double)FloatRegisterValue(X86_64_REGISTER_ST0 + i);
+
+		if (IsRegisterSet(X86_64_REGISTER_MM0 + i)) {
+			memcpy(&x64State->extended_registers.mmx_registers[i],
+				&fMMXRegisters[i], sizeof(x86_64_fp_register));
+		}
+	}
+
+	for (int32 i = 0; i < 16; i++) {
+		if (IsRegisterSet(X86_64_REGISTER_XMM0 + i)) {
+			memcpy(&x64State->extended_registers.xmm_registers[i],
+				&fXMMRegisters[i], sizeof(x86_64_xmm_register));
+		} else {
+			memset(&x64State->extended_registers.xmm_registers[i],
+				0, sizeof(x86_64_xmm_register));
+		}
+	}
 
 	return B_OK;
 }
@@ -150,13 +221,29 @@ CpuStateX8664::GetRegisterValue(const Register* reg, BVariant& _value) const
 	if (!IsRegisterSet(index))
 		return false;
 
-	if (index >= X86_64_INT_REGISTER_END)
+	if (index >= X86_64_XMM_REGISTER_END)
 		return false;
 
-	if (reg->BitSize() == 16)
-		_value.SetTo((uint16)fIntRegisters[index]);
-	else
-		_value.SetTo(fIntRegisters[index]);
+	if (BVariant::TypeIsInteger(reg->ValueType())) {
+		if (reg->BitSize() == 16)
+			_value.SetTo((uint16)fIntRegisters[index]);
+		else
+			_value.SetTo(fIntRegisters[index]);
+	} else if (BVariant::TypeIsFloat(reg->ValueType())) {
+		index -= X86_64_REGISTER_ST0;
+		if (reg->ValueType() == B_FLOAT_TYPE)
+			_value.SetTo((float)fFloatRegisters[index]);
+		else
+			_value.SetTo(fFloatRegisters[index]);
+	} else {
+		if (index >= X86_64_REGISTER_MM0 && index < X86_64_REGISTER_XMM0) {
+			index -= X86_64_REGISTER_MM0;
+			_value.SetTo(fMMXRegisters[index].value);
+		} else {
+			index -= X86_64_REGISTER_XMM0;
+			_value.SetTo(fXMMRegisters[index].value);
+		}
+	}
 
 	return true;
 }
@@ -166,7 +253,7 @@ bool
 CpuStateX8664::SetRegisterValue(const Register* reg, const BVariant& value)
 {
 	int32 index = reg->Index();
-	if (index >= X86_64_INT_REGISTER_END)
+	if (index >= X86_64_XMM_REGISTER_END)
 		return false;
 
 	fIntRegisters[index] = value.ToUInt64();
@@ -199,6 +286,77 @@ CpuStateX8664::SetIntRegister(int32 index, uint64 value)
 		return;
 
 	fIntRegisters[index] = value;
+	fSetRegisters[index] = 1;
+}
+
+
+double
+CpuStateX8664::FloatRegisterValue(int32 index) const
+{
+	if (index < X86_64_REGISTER_ST0 || index >= X86_64_FP_REGISTER_END
+		|| !IsRegisterSet(index)) {
+		return 0.0;
+	}
+
+	return fFloatRegisters[index - X86_64_REGISTER_ST0];
+}
+
+
+void
+CpuStateX8664::SetFloatRegister(int32 index, double value)
+{
+	if (index < X86_64_REGISTER_ST0 || index >= X86_64_FP_REGISTER_END)
+		return;
+
+	fFloatRegisters[index - X86_64_REGISTER_ST0] = value;
+	fSetRegisters[index] = 1;
+}
+
+
+const void*
+CpuStateX8664::MMXRegisterValue(int32 index) const
+{
+	if (index < X86_64_REGISTER_MM0 || index >= X86_64_MMX_REGISTER_END
+		|| !IsRegisterSet(index)) {
+		return 0;
+	}
+
+	return fMMXRegisters[index - X86_64_REGISTER_MM0].value;
+}
+
+
+void
+CpuStateX8664::SetMMXRegister(int32 index, const uint8* value)
+{
+	if (index < X86_64_REGISTER_MM0 || index >= X86_64_MMX_REGISTER_END)
+		return;
+
+	memcpy(fMMXRegisters[index - X86_64_REGISTER_MM0].value, value,
+		sizeof(uint64));
+	fSetRegisters[index] = 1;
+}
+
+
+const void*
+CpuStateX8664::XMMRegisterValue(int32 index) const
+{
+	if (index < X86_64_REGISTER_XMM0 || index >= X86_64_XMM_REGISTER_END
+		|| !IsRegisterSet(index)) {
+		return NULL;
+	}
+
+	return fXMMRegisters[index - X86_64_REGISTER_XMM0].value;
+}
+
+
+void
+CpuStateX8664::SetXMMRegister(int32 index, const uint8* value)
+{
+	if (index < X86_64_REGISTER_XMM0 || index >= X86_64_XMM_REGISTER_END)
+		return;
+
+	memcpy(fXMMRegisters[index - X86_64_REGISTER_XMM0].value, value,
+		sizeof(x86_64_xmm_register));
 	fSetRegisters[index] = 1;
 }
 

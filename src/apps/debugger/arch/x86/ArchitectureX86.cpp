@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -41,18 +41,32 @@ static const int32 kFromDwarfRegisters[] = {
 	X86_REGISTER_EIP,
 	-1,	// eflags
 	-1,	// trap number
-	-1,	// st(0)
-	-1,	// st(1)
-	-1,	// st(2)
-	-1,	// st(3)
-	-1,	// st(4)
-	-1,	// st(5)
-	-1,	// st(6)
-	-1,	// st(7)
+	X86_REGISTER_ST0,
+	X86_REGISTER_ST1,
+	X86_REGISTER_ST2,
+	X86_REGISTER_ST3,
+	X86_REGISTER_ST4,
+	X86_REGISTER_ST5,
+	X86_REGISTER_ST6,
+	X86_REGISTER_ST7,
 	-1,	// ?
 	-1,	// ?
-	-1, -1, -1, -1, -1, -1, -1, -1,	// SSE
-	-1, -1, -1, -1, -1, -1, -1, -1	// MMX
+	X86_REGISTER_XMM0,
+	X86_REGISTER_XMM1,
+	X86_REGISTER_XMM2,
+	X86_REGISTER_XMM3,
+	X86_REGISTER_XMM4,
+	X86_REGISTER_XMM5,
+	X86_REGISTER_XMM6,
+	X86_REGISTER_XMM7,
+	X86_REGISTER_MM0,
+	X86_REGISTER_MM1,
+	X86_REGISTER_MM2,
+	X86_REGISTER_MM3,
+	X86_REGISTER_MM4,
+	X86_REGISTER_MM5,
+	X86_REGISTER_MM6,
+	X86_REGISTER_MM7,
 };
 
 static const int32 kFromDwarfRegisterCount = sizeof(kFromDwarfRegisters) / 4;
@@ -169,6 +183,34 @@ ArchitectureX86::Init()
 			REGISTER_TYPE_SPECIAL_PURPOSE, true);
 		_AddIntegerRegister(X86_REGISTER_SS, "ss", B_UINT16_TYPE,
 			REGISTER_TYPE_SPECIAL_PURPOSE, true);
+
+		_AddFPRegister(X86_REGISTER_ST0, "st0");
+		_AddFPRegister(X86_REGISTER_ST1, "st1");
+		_AddFPRegister(X86_REGISTER_ST2, "st2");
+		_AddFPRegister(X86_REGISTER_ST3, "st3");
+		_AddFPRegister(X86_REGISTER_ST4, "st4");
+		_AddFPRegister(X86_REGISTER_ST5, "st5");
+		_AddFPRegister(X86_REGISTER_ST6, "st6");
+		_AddFPRegister(X86_REGISTER_ST7, "st7");
+
+		_AddSIMDRegister(X86_REGISTER_MM0, "mm0", sizeof(uint64));
+		_AddSIMDRegister(X86_REGISTER_MM1, "mm1", sizeof(uint64));
+		_AddSIMDRegister(X86_REGISTER_MM2, "mm2", sizeof(uint64));
+		_AddSIMDRegister(X86_REGISTER_MM3, "mm3", sizeof(uint64));
+		_AddSIMDRegister(X86_REGISTER_MM4, "mm4", sizeof(uint64));
+		_AddSIMDRegister(X86_REGISTER_MM5, "mm5", sizeof(uint64));
+		_AddSIMDRegister(X86_REGISTER_MM6, "mm6", sizeof(uint64));
+		_AddSIMDRegister(X86_REGISTER_MM7, "mm7", sizeof(uint64));
+
+		_AddSIMDRegister(X86_REGISTER_XMM0, "xmm0", sizeof(x86_xmm_register));
+		_AddSIMDRegister(X86_REGISTER_XMM1, "xmm1", sizeof(x86_xmm_register));
+		_AddSIMDRegister(X86_REGISTER_XMM2, "xmm2", sizeof(x86_xmm_register));
+		_AddSIMDRegister(X86_REGISTER_XMM3, "xmm3", sizeof(x86_xmm_register));
+		_AddSIMDRegister(X86_REGISTER_XMM4, "xmm4", sizeof(x86_xmm_register));
+		_AddSIMDRegister(X86_REGISTER_XMM5, "xmm5", sizeof(x86_xmm_register));
+		_AddSIMDRegister(X86_REGISTER_XMM6, "xmm6", sizeof(x86_xmm_register));
+		_AddSIMDRegister(X86_REGISTER_XMM7, "xmm7", sizeof(x86_xmm_register));
+
 	} catch (std::bad_alloc) {
 		return B_NO_MEMORY;
 	}
@@ -704,6 +746,23 @@ ArchitectureX86::_AddIntegerRegister(int32 index, const char* name,
 {
 	_AddRegister(index, name, 8 * BVariant::SizeOfType(valueType), valueType,
 		type, calleePreserved);
+}
+
+
+void
+ArchitectureX86::_AddFPRegister(int32 index, const char* name)
+{
+	_AddRegister(index, name, 8 * BVariant::SizeOfType(B_DOUBLE_TYPE),
+		B_DOUBLE_TYPE, REGISTER_TYPE_GENERAL_PURPOSE, true);
+}
+
+
+void
+ArchitectureX86::_AddSIMDRegister(int32 index, const char* name,
+	uint32 byteSize)
+{
+	_AddRegister(index, name, byteSize * 8, B_RAW_TYPE,
+		REGISTER_TYPE_GENERAL_PURPOSE, true);
 }
 
 
