@@ -98,7 +98,7 @@ BHttpRequest::BHttpRequest(const BHttpRequest& other)
 	fOptHeaders(NULL),
 	fOptPostFields(NULL),
 	fOptInputData(NULL),
-	fOptInputDataSize(0),
+	fOptInputDataSize(-1),
 	fOptRangeStart(other.fOptRangeStart),
 	fOptRangeEnd(other.fOptRangeEnd),
 	fOptFollowLocation(other.fOptFollowLocation)
@@ -999,6 +999,12 @@ BHttpRequest::_SendPostData()
 		}
 	} else if ((fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT)
 		&& fOptInputData != NULL) {
+
+		// If the input data is seekable, we rewind it for each new request.
+		BPositionIO* seekableData
+			= dynamic_cast<BPositionIO*>(fOptInputData);
+		if (seekableData)
+			seekableData->Seek(0, SEEK_SET);
 
 		for (;;) {
 			char outputTempBuffer[kHttpBufferSize];
