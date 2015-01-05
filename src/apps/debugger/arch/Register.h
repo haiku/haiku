@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef REGISTER_H
@@ -11,7 +12,8 @@
 
 enum register_format {
 	REGISTER_FORMAT_INTEGER,
-	REGISTER_FORMAT_FLOAT
+	REGISTER_FORMAT_FLOAT,
+	REGISTER_FORMAT_SIMD
 };
 
 enum register_type {
