@@ -59,7 +59,7 @@ ClipboardApp::~ClipboardApp(void)
 }
 
 
-void 
+void
 ClipboardApp::ArgvReceived(int32 argc, char **argv)
 {
 	status_t status = B_OK;
@@ -77,7 +77,8 @@ ClipboardApp::ArgvReceived(int32 argc, char **argv)
 	};
 
 	int c;
-	while ((c = getopt_long(argc, argv, "l:s:o:c:ripdh", kLongOptions, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "l:s:o:c:ripdh", kLongOptions, NULL))
+		!= -1) {
 		switch (c) {
 			case 'l':
 				status = Load(optarg);
@@ -118,6 +119,7 @@ ClipboardApp::ArgvReceived(int32 argc, char **argv)
 		sExitValue = EXIT_FAILURE;
 }
 
+
 void
 ClipboardApp::ReadyToRun(void)
 {
@@ -156,7 +158,8 @@ ClipboardApp::Load(const char *path)
 
 	status = file.SetTo(path, B_READ_ONLY);
 	if (status != B_OK) {
-		fprintf(stderr, "%s: Could not open file: %s\n", kProgramName, strerror(status));
+		fprintf(stderr, "%s: Could not open file: %s\n", kProgramName,
+			strerror(status));
 		return status;
 	}
 
@@ -164,7 +167,8 @@ ClipboardApp::Load(const char *path)
 	BMessage clipFromFile;
 	status = clipFromFile.Unflatten(&file);
 	if (status != B_OK) {
-		fprintf(stderr, "%s: Could not read clip: %s\n", kProgramName, strerror(status));
+		fprintf(stderr, "%s: Could not read clip: %s\n", kProgramName,
+			strerror(status));
 		return status;
 	}
 
@@ -181,7 +185,8 @@ ClipboardApp::Load(const char *path)
 
 	status = be_clipboard->Commit();
 	if (status != B_OK) {
-		fprintf(stderr, "%s: could not commit data to clipboard.\n", kProgramName);
+		fprintf(stderr, "%s: could not commit data to clipboard.\n",
+			kProgramName);
 		be_clipboard->Unlock();
 		return status;
 	}
@@ -199,7 +204,8 @@ ClipboardApp::Save(const char *path)
 
 	status = file.SetTo(path, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	if (status != B_OK) {
-		fprintf(stderr, "%s: Could not create file: %s\n", kProgramName, strerror(status));
+		fprintf(stderr, "%s: Could not create file: %s\n", kProgramName,
+			strerror(status));
 		return status;
 	}
 
@@ -216,7 +222,8 @@ ClipboardApp::Save(const char *path)
 	// flatten clip to file
 	status = clip->Flatten(&file);
 	if (status != B_OK) {
-		fprintf(stderr, "%s: Could not write data: %s\n", kProgramName, strerror(status));
+		fprintf(stderr, "%s: Could not write data: %s\n", kProgramName,
+			strerror(status));
 		return status;
 	}
 
@@ -234,25 +241,26 @@ ClipboardApp::Copy(const char *string)
 		// read from standard input
 		int c;
 		while ((c = fgetc(stdin)) != EOF) {
-			inputString += (char) c;
+			inputString += (char)c;
 		}
 
 		string = inputString.String();
 	}
 
 	// get clipboard BMessage
-	
+
 	if (be_clipboard->Lock()) {
 		be_clipboard->Clear();
 
 		BMessage *clip = be_clipboard->Data();
 
 		// add data to clipboard
-		clip->AddData("text/plain", B_MIME_TYPE, string, strlen(string));			
+		clip->AddData("text/plain", B_MIME_TYPE, string, strlen(string));
 
 		status = be_clipboard->Commit();
 		if (status != B_OK) {
-			fprintf(stderr, "%s: could not commit data to clipboard.\n", kProgramName);
+			fprintf(stderr, "%s: could not commit data to clipboard.\n",
+				kProgramName);
 			be_clipboard->Unlock();
 			return status;
 		}
@@ -294,7 +302,7 @@ ClipboardApp::Clear(void)
 status_t
 ClipboardApp::Print(bool debug)
 {
-	// get clip & print contents 
+	// get clip & print contents
 	// (or the entire clip, in case of --debug)
 
 	if (!be_clipboard->Lock()) {
@@ -304,18 +312,19 @@ ClipboardApp::Print(bool debug)
 
 	BMessage *clip = be_clipboard->Data();
 
-	if (debug) {
+	if (debug)
 		clip->PrintToStream();
-	} else {
+	else {
 		const char * textBuffer;
 		ssize_t textLength;
-		clip->FindData("text/plain", B_MIME_TYPE, (const void **)&textBuffer, &textLength);
+		clip->FindData("text/plain", B_MIME_TYPE, (const void **)&textBuffer,
+			&textLength);
 
 		if (textBuffer != NULL && textLength > 0) {
 			BString textString(textBuffer, textLength);
 			printf("%s\n", textString.String());
 		}
-	}	
+	}
 
 	be_clipboard->Unlock();
 	return B_OK;
