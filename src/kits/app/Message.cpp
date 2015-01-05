@@ -1274,65 +1274,8 @@ BMessage::Unflatten(const char* flatBuffer)
 	if (flatBuffer == NULL)
 		return B_BAD_VALUE;
 
-	uint32 format = *(uint32*)flatBuffer;
-	if (format != MESSAGE_FORMAT_HAIKU)
-		return BPrivate::MessageAdapter::Unflatten(format, this, flatBuffer);
-
-	// native message unflattening
-
-	_Clear();
-
-	fHeader = (message_header*)malloc(sizeof(message_header));
-	if (fHeader == NULL)
-		return B_NO_MEMORY;
-
-	memcpy(fHeader, flatBuffer, sizeof(message_header));
-	flatBuffer += sizeof(message_header);
-
-	if (fHeader->format != MESSAGE_FORMAT_HAIKU
-		|| (fHeader->flags & MESSAGE_FLAG_VALID) == 0) {
-		_InitHeader();
-		return B_BAD_VALUE;
-	}
-
-	what = fHeader->what;
-
-	if ((fHeader->flags & MESSAGE_FLAG_PASS_BY_AREA) != 0
-		&& fHeader->message_area >= 0) {
-		status_t result = _Reference();
-		if (result != B_OK) {
-			_InitHeader();
-			return result;
-		}
-	} else {
-		fHeader->message_area = -1;
-
-		if (fHeader->field_count > 0) {
-			size_t fieldsSize = fHeader->field_count * sizeof(field_header);
-			fFields = (field_header*)malloc(fieldsSize);
-			if (fFields == NULL) {
-				_InitHeader();
-				return B_NO_MEMORY;
-			}
-
-			memcpy(fFields, flatBuffer, fieldsSize);
-			flatBuffer += fieldsSize;
-		}
-
-		if (fHeader->data_size > 0) {
-			fData = (uint8*)malloc(fHeader->data_size);
-			if (fData == NULL) {
-				free(fFields);
-				fFields = NULL;
-				_InitHeader();
-				return B_NO_MEMORY;
-			}
-
-			memcpy(fData, flatBuffer, fHeader->data_size);
-		}
-	}
-
-	return _ValidateMessage();
+	BMemoryIO io(flatBuffer, SIZE_MAX);
+	return Unflatten(&io);
 }
 
 
