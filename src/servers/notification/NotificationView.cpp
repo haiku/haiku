@@ -76,7 +76,7 @@ NotificationView::NotificationView(NotificationWindow* win,
 
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	switch (fNotification->Type()) {
 		case B_IMPORTANT_NOTIFICATION:
 			fStripeColor = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
@@ -90,7 +90,7 @@ NotificationView::NotificationView(NotificationWindow* win,
 			progress->SetBarHeight(12.0f);
 			progress->SetMaxValue(1.0f);
 			progress->Update(fNotification->Progress());
-			
+
 			BString label = "";
 			label << (int)(fNotification->Progress() * 100) << " %";
 			progress->SetTrailingText(label);
@@ -465,7 +465,7 @@ NotificationView::SetText(float newMaxWidth)
 	titleLine->text = fNotification->Title();
 	titleLine->font = *be_bold_font;
 
-	titleLine->location = BPoint(iconRight, y);
+	titleLine->location = BPoint(iconRight + kEdgePadding, y);
 
 	fLines.push_front(titleLine);
 	y += fontHeight;
