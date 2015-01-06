@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2015, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -45,10 +45,10 @@ public:
 			BString				SimpleName(const entry_ref& ref,
 									const BMailAccountSettings& settings) const;
 			BString				DescriptiveName(int32 index,
-									const BMailAccountSettings& settings,
+									const BMailAccountSettings& accountSettings,
 									const BMailAddOnSettings* settings) const;
 			BString				DescriptiveName(const entry_ref& ref,
-									const BMailAccountSettings& settings,
+									const BMailAccountSettings& accountSettings,
 									const BMailAddOnSettings* settings) const;
 
 			BMailSettingsView*	CreateSettingsView(

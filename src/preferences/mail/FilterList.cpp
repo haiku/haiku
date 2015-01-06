@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2015, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -8,6 +8,7 @@
 #include "FilterList.h"
 
 #include <set>
+#include <stdio.h>
 
 #include <Directory.h>
 #include <FindDirectory.h>
