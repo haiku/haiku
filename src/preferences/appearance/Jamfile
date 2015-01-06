@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences appearance ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders app interface [ FDirName servers app ] ;
 UseBuildFeatureHeaders freetype ;
 
@@ -45,3 +47,8 @@ DoCatalogs Appearance :
 	FontView.cpp
 	FontSelectionView.cpp
 ;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Appearance
+		: tests!apps ;
+}
