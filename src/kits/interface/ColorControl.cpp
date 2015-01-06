@@ -462,11 +462,10 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 			}
 		}
 	} else {
-		rgb_color color = ValueAsColor();
 		rgb_color white = { 255, 255, 255, 255 };
-		rgb_color red   = { 255, color.green, color.blue, 255 };
-		rgb_color green = { color.red, 255, color.blue, 255 };
-		rgb_color blue  = { color.red, color.green, 255, 255 };
+		rgb_color red   = { 255, 0, 0, 255 };
+		rgb_color green = { 0, 255, 0, 255 };
+		rgb_color blue  = { 0, 0, 255, 255 };
 
 		rgb_color compColor = { 0, 0, 0, 255 };
 		if (!enabled) {
@@ -500,36 +499,22 @@ BColorControl::_DrawSelectors(BView* target)
 	} else {
 		rgb_color color = ValueAsColor();
 		target->SetHighColor(255, 255, 255);
+		target->SetLowColor(0, 0, 0);
 
-		BPoint center = _SelectorPosition(_RampFrame(1), color.red);
-		if (fFocusedRamp == 1) {
-			target->SetPenSize(kSelectorPenSize / 2);
-			target->StrokeEllipse(center, kSelectorSize, kSelectorSize);
-			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
-		} else {
+		int components[4] = { color.alpha, color.red, color.green, color.blue };
+
+		for (int i = 1; i < 4; i++) {
+			BPoint center = _SelectorPosition(_RampFrame(i), components[i]);
+
 			target->SetPenSize(kSelectorPenSize);
 			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
-		}
-
-		center = _SelectorPosition(_RampFrame(2), color.green);
-		if (fFocusedRamp == 2) {
 			target->SetPenSize(kSelectorPenSize / 2);
-			target->StrokeEllipse(center, kSelectorSize, kSelectorSize);
-			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
-		} else {
-			target->SetPenSize(kSelectorPenSize);
-			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
-		}
-
-
-		center = _SelectorPosition(_RampFrame(3), color.blue);
-		if (fFocusedRamp == 3) {
-			target->SetPenSize(kSelectorPenSize / 2);
-			target->StrokeEllipse(center, kSelectorSize, kSelectorSize);
-			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
-		} else {
-			target->SetPenSize(kSelectorPenSize);
-			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
+			target->StrokeEllipse(center, kSelectorSize, kSelectorSize,
+				B_SOLID_LOW);
+			if (i == fFocusedRamp) {
+				target->StrokeEllipse(center,
+					kSelectorSize / 2, kSelectorSize / 2, B_SOLID_LOW);
+			}
 		}
 
 		target->SetPenSize(1.0f);
@@ -543,7 +528,7 @@ BColorControl::_DrawColorRamp(BRect rect, BView* target,
 	BRect updateRect)
 {
 	float width = rect.Width() + 1;
-	rgb_color color;
+	rgb_color color = ValueAsColor();
 	color.alpha = 255;
 
 	updateRect = updateRect & rect;
@@ -553,10 +538,13 @@ BColorControl::_DrawColorRamp(BRect rect, BView* target,
 
 		for (float i = (updateRect.left - rect.left);
 				i <= (updateRect.right - rect.left) + 1; i++) {
-			color.red = (uint8)(i * baseColor.red / width) + compColor.red;
-			color.green = (uint8)(i * baseColor.green / width)
-				+ compColor.green;
-			color.blue = (uint8)(i * baseColor.blue / width) + compColor.blue;
+			if (baseColor.red == 255)
+				color.red = (uint8)(i * 255 / width) + compColor.red;
+			if (baseColor.green == 255)
+				color.green = (uint8)(i * 255 / width) + compColor.green;
+			if (baseColor.blue == 255)
+				color.blue = (uint8)(i * 255 / width) + compColor.blue;
+
 			target->AddLine(BPoint(rect.left + i, rect.top),
 				BPoint(rect.left + i, rect.bottom - 1), color);
 		}
