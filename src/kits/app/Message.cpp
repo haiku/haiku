@@ -1311,19 +1311,28 @@ BMessage::Unflatten(BDataIO* stream)
 
 	what = fHeader->what;
 
-	fHeader->message_area = -1;
-
-	if (fHeader->field_count > 0) {
-		ssize_t fieldsSize = fHeader->field_count * sizeof(field_header);
-		fFields = (field_header*)malloc(fieldsSize);
-		if (fFields == NULL) {
+	if ((fHeader->flags & MESSAGE_FLAG_PASS_BY_AREA) != 0
+		&& fHeader->message_area >= 0) {
+		status_t result = _Reference();
+		if (result != B_OK) {
 			_InitHeader();
-			return B_NO_MEMORY;
+			return result;
 		}
+	} else {
+		fHeader->message_area = -1;
 
-		result = stream->Read(fFields, fieldsSize);
-		if (result != fieldsSize)
-			return result < 0 ? result : B_BAD_VALUE;
+		if (fHeader->field_count > 0) {
+			ssize_t fieldsSize = fHeader->field_count * sizeof(field_header);
+			fFields = (field_header*)malloc(fieldsSize);
+			if (fFields == NULL) {
+				_InitHeader();
+				return B_NO_MEMORY;
+			}
+
+			result = stream->Read(fFields, fieldsSize);
+			if (result != fieldsSize)
+				return result < 0 ? result : B_BAD_VALUE;
+		}
 	}
 
 	if (fHeader->data_size > 0) {
