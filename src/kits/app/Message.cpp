@@ -1274,6 +1274,10 @@ BMessage::Unflatten(const char* flatBuffer)
 	if (flatBuffer == NULL)
 		return B_BAD_VALUE;
 
+	uint32 format = *(uint32*)flatBuffer;
+	if (format != MESSAGE_FORMAT_HAIKU)
+		return BPrivate::MessageAdapter::Unflatten(format, this, flatBuffer);
+
 	BMemoryIO io(flatBuffer, SIZE_MAX);
 	return Unflatten(&io);
 }
