@@ -1333,20 +1333,20 @@ BMessage::Unflatten(BDataIO* stream)
 			if (result != fieldsSize)
 				return result < 0 ? result : B_BAD_VALUE;
 		}
-	}
 
-	if (fHeader->data_size > 0) {
-		fData = (uint8*)malloc(fHeader->data_size);
-		if (fData == NULL) {
-			free(fFields);
-			fFields = NULL;
-			_InitHeader();
-			return B_NO_MEMORY;
+		if (fHeader->data_size > 0) {
+			fData = (uint8*)malloc(fHeader->data_size);
+			if (fData == NULL) {
+				free(fFields);
+				fFields = NULL;
+				_InitHeader();
+				return B_NO_MEMORY;
+			}
+
+			result = stream->Read(fData, fHeader->data_size);
+			if (result != (ssize_t)fHeader->data_size)
+				return result < 0 ? result : B_BAD_VALUE;
 		}
-
-		result = stream->Read(fData, fHeader->data_size);
-		if (result != (ssize_t)fHeader->data_size)
-			return result < 0 ? result : B_BAD_VALUE;
 	}
 
 	return _ValidateMessage();
