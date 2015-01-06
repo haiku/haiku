@@ -20,12 +20,18 @@
 #include <LayoutUtils.h>
 #include <LocaleRoster.h>
 #include <Message.h>
-#include <TabView.h>
+#include <OutlineListView.h>
 #include <ScrollView.h>
 #include <SpaceLayoutItem.h>
 #include <StatusBar.h>
 #include <StringView.h>
+#include <TabView.h>
 #include <Url.h>
+
+#include <package/hpkg/PackageReader.h>
+#include <package/hpkg/NoErrorOutput.h>
+#include <package/hpkg/PackageContentHandler.h>
+#include <package/hpkg/PackageEntry.h>
 
 #include "BitmapButton.h"
 #include "BitmapView.h"
@@ -34,6 +40,8 @@
 #include "MarkupTextView.h"
 #include "MessagePackageListener.h"
 #include "PackageActionHandler.h"
+#include "PackageContentsView.h"
+#include "PackageInfo.h"
 #include "PackageManager.h"
 #include "RatingView.h"
 #include "ScrollableGroupView.h"
@@ -44,7 +52,7 @@
 #define B_TRANSLATION_CONTEXT "PackageInfoView"
 
 
-static const rgb_color kLightBlack = (rgb_color){ 60, 60, 60, 255 };
+static const rgb_color kLightBlack = (rgb_color) { 60, 60, 60, 255 };
 static const float kContentTint = (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0f;
 
 
@@ -1158,6 +1166,52 @@ private:
 };
 
 
+// #pragma mark - ContentsView
+
+
+class ContentsView : public BView {
+public:
+	ContentsView()
+		:
+		BView("package contents view", B_WILL_DRAW),
+		fLayout(new BGroupLayout(B_HORIZONTAL))
+	{
+		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			kContentTint));
+		BRect frame = Bounds();
+		frame.InsetBy(5,5) ;
+
+		SetLayout(fLayout);
+		fPackageContents = new PackageContentsView(frame, "contents_list");
+		AddChild(fPackageContents);
+
+	}
+
+	virtual ~ContentsView()
+	{
+	}
+
+	virtual void Draw(BRect updateRect)
+	{
+	}
+
+	void SetPackage(const PackageInfo& package)
+	{
+		fPackageContents -> AddPackage(package);
+	}
+
+	void Clear()
+	{
+		fPackageContents->MakeEmpty();
+	}
+	
+
+private:
+	BGroupLayout*		fLayout;
+	PackageContentsView*  fPackageContents;
+};
+
+
 // #pragma mark - ChangelogView
 
 
@@ -1230,14 +1284,17 @@ public:
 		fAboutView = new AboutView();
 		fUserRatingsView = new UserRatingsView();
 		fChangelogView = new ChangelogView();
+		fContentsView = new ContentsView();
 
 		AddTab(fAboutView);
 		AddTab(fUserRatingsView);
 		AddTab(fChangelogView);
-
+		AddTab(fContentsView);
+		
 		TabAt(0)->SetLabel(B_TRANSLATE("About"));
 		TabAt(1)->SetLabel(B_TRANSLATE("Ratings"));
 		TabAt(2)->SetLabel(B_TRANSLATE("Changelog"));
+		TabAt(3)->SetLabel(B_TRANSLATE("Contents"));
 
 		Select(0);
 	}
@@ -1254,6 +1311,7 @@ public:
 		fAboutView->SetPackage(package);
 		fUserRatingsView->SetPackage(package);
 		fChangelogView->SetPackage(package);
+		fContentsView->SetPackage(package);
 	}
 
 	void Clear()
@@ -1261,6 +1319,7 @@ public:
 		fAboutView->Clear();
 		fUserRatingsView->Clear();
 		fChangelogView->Clear();
+		fContentsView->Clear();
 	}
 
 private:
@@ -1269,6 +1328,7 @@ private:
 	AboutView*			fAboutView;
 	UserRatingsView*	fUserRatingsView;
 	ChangelogView*		fChangelogView;
+	ContentsView* 		fContentsView;
 };
 
 

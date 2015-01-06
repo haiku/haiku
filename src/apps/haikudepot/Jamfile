@@ -51,6 +51,7 @@ Application HaikuDepot :
 	Model.cpp
 	PackageAction.cpp
 	PackageActionHandler.cpp
+	PackageContentsView.cpp
 	PackageInfo.cpp
 	PackageInfoListener.cpp
 	PackageInfoView.cpp
@@ -85,6 +86,7 @@ DoCatalogs HaikuDepot :
 	FilterView.cpp
 	MainWindow.cpp
 	Model.cpp
+	PackageContentsView.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
 	PackageManager.cpp
