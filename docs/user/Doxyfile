@@ -649,6 +649,7 @@ WARN_LOGFILE           =
 
 INPUT                  = . \
                          app \
+                         device \
                          drivers \
                          game \
                          interface \
@@ -663,6 +664,7 @@ INPUT                  = . \
                          support \
                          translation \
                          ../../headers/os/app \
+                         ../../headers/os/device/Joystick.h \
                          ../../headers/os/drivers/fs_interface.h \
                          ../../headers/os/drivers/USB3.h \
                          ../../headers/os/drivers/USB_spec.h \
