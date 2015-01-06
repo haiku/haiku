@@ -1,0 +1,18 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *      Mandar Juvekar, mjuvekar7@gmail.com
+ *
+ * Corresponds to:
+ *      headers/os/device/Joystick.h    hrev48613
+ *      src/kits/device/Joystick.cpp    hrev48613
+ */
+
+/*!
+    \fn int32 BJoystick::CountDevices()
+    \brief Count the number of joysticks connected.
+
+    \return The number of joystick devices connected.
+*/
