@@ -1,0 +1,234 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Augustin Cavalier, waddlesplash@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Size.h	 hrev48620
+ *		src/kits/interface/Size.cpp	 hrev48620
+ */
+
+
+/*!
+	\file Size.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BSize class definition and related enum definition.
+*/
+
+
+/*!
+	\var B_SIZE_UNSET
+
+	A meaningless size value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var B_SIZE_UNLIMITED
+
+	The largest possible size value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BSize
+	\ingroup interface
+	\ingroup libbe
+	\brief A two-dimensional size.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BSize::width
+	\brief The horizontal dimension.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BSize::height
+	\brief The vertical dimension.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline BSize::BSize()
+	\brief Initializes a BSize object with both dimensions set to \c B_SIZE_UNSET.
+
+	\see BSize::Set()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline BSize::BSize(float width, float height)
+	\brief Initializes a BSize object with the specified \a width and
+	       \a height values.
+
+	\param width The \a width value to set.
+	\param height The \a height value to set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline BSize::BSize(const BSize& other)
+	\brief Initializes a BSize object from another BSize.
+
+	\param other The BSize object to copy from.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline float BSize::Width() const
+	\brief Gets the \a width of the BSize object.
+
+	\returns BSize::width
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline float BSize::Height() const
+	\brief Gets the \a height of the BSize object.
+
+	\returns BSize::height
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline void BSize::Set(float width, float height)
+	\brief Sets the \a width and \a height values of a BSize object.
+
+	\param width The \a width value to set.
+	\param height The \a height value to set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline void BSize::SetWidth(float width)
+	\brief Sets the \a width value of a BSize object.
+
+	\param width The \a width value to set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline void BSize::SetHeight(float height)
+	\brief Sets the \a height value of a BSize object.
+
+	\param height The \a height value to set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline int32 BSize::IntegerWidth() const
+	\brief Returns the \a width value of a BSize object as an \a int32.
+
+	\returns BSize::width, cast to an \a int32.
+
+	\warning This may lose precision!
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline int32 BSize::IntegerHeight() const
+	\brief Returns the \a height value of a BSize object as an \a int32.
+
+	\returns BSize::height, cast to an \a int32.
+
+	\warning This may lose precision!
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline bool BSize::IsWidthSet() const
+	\brief Checks if the BSize::width is not \c B_SIZE_UNSET.
+
+	\returns \c true if the width is set, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn inline bool BSize::IsHeightSet() const
+	\brief Checks if the BSize::height is not \c B_SIZE_UNSET.
+
+	\returns \c true if the height is set, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Operators
+*/
+
+
+//! @{
+
+
+/*!
+	\fn inline BSize& BSize::operator=(const BSize& other)
+	\brief Initializes a BSize object from another BSize by overloading
+	       the = operator.
+
+	\param other The BSize object to copy from.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BSize::operator!=(const BSize& other) const
+	\brief Returns whether or not the width and height values of the BSize
+	       objects differ.
+
+	\return \c true if the width or height values differ, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BSize::operator==(const BSize& other) const
+	\brief Returns whether or not the width and height values of the BSize
+	       objects are equal.
+
+	\return \c true if the width and height values are equal, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+//! @}
