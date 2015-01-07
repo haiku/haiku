@@ -800,7 +800,7 @@ NetFSServer::_LoadSecurityContext(SecurityContext** _securityContext)
 	// load the fallback settings, if present
 	BPath path;
 	DriverSettings settings;
-	
+
 	if (_GetSettingsDirPath(&path, false) == B_OK
 			&& path.Append(kFallbackSettingsFileName) == B_OK
 			&& settings.Load(path.Path()) == B_OK) {
@@ -1283,9 +1283,15 @@ NetFSServer::_ServerInfoConnectionListener()
 
 		// create a server info sender thread
 		ServerInfoSender* sender = new(std::nothrow) ServerInfoSender(fd, info);
-		if (!sender || sender->Init() != B_OK) {
+		if (sender == NULL) {
 			closesocket(fd);
 			delete sender;
+			return B_NO_MEMORY;
+		}
+		if ((error = sender->Init()) != B_OK) {
+			closesocket(fd);
+			delete sender;
+			return error;
 		}
 		taskManager.RunTask(sender);
 	}
