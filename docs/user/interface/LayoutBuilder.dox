@@ -90,6 +90,20 @@ BLayoutBuilder::Group<>(B_HORIZONTAL)
 		// back to the Group<>::GridBuilder
 \endcode
 
+	Note that the C++ language does not impose any sequence points in such
+	method chains. This means the arguments to all calls may be evaluated in an
+	unexpected order. For exemple, the following code may not result in adding
+	the 3 views in rows 0, 1 and 2 in the target grid:
+
+\code
+	// Don't do this!
+	int row = 0;
+	BLayoutBuilder::Grid<>(target)
+		.Add(viewA, row++)
+		.Add(viewB, row++)
+		.Add(viewC, row++);
+\endcode
+
 	\since Haiku R1
 */
 
