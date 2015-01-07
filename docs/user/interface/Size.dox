@@ -22,7 +22,8 @@
 /*!
 	\var B_SIZE_UNSET
 
-	A meaningless size value.
+	A placeholder size value. Controls that are passed this value
+	will create their own sizing.
 
 	\since Haiku R1
 */
