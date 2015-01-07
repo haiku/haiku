@@ -1400,8 +1400,21 @@ status_t
 BMediaRoster::RollNode(const media_node& node, bigtime_t startPerformance,
 	bigtime_t stopPerformance, bigtime_t atMediaTime)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (IS_INVALID_NODE(node))
+		return B_MEDIA_BAD_NODE;
+
+	TRACE("BMediaRoster::RollNode, node %" B_PRId32 ", at start perf %"
+		B_PRId64 ", at stop perf %" B_PRId64 ", at media time %"
+		B_PRId64 "\n", node.node, startPerformance,
+		stopPerformance, atMediaTime);
+
+	node_roll_command command;
+	command.start_performance_time = startPerformance;
+	command.stop_performance_time = stopPerformance;
+	command.seek_media_time = atMediaTime;
+
+	return write_port(node.port, NODE_ROLL, &command, sizeof(command));
 }
 
 

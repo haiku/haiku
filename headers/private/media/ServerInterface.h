@@ -88,6 +88,7 @@ enum {
 	NODE_SET_RUN_MODE,
 	NODE_TIME_WARP,
 	NODE_PREROLL,
+	NODE_ROLL,
 	NODE_SET_TIMESOURCE,
 	NODE_GET_TIMESOURCE,
 	NODE_REQUEST_COMPLETED,
@@ -897,6 +898,12 @@ struct node_stop_command : command_data {
 struct node_seek_command : command_data {
 	bigtime_t				media_time;
 	bigtime_t				performance_time;
+};
+
+struct node_roll_command : command_data {
+	bigtime_t				start_performance_time;
+	bigtime_t				stop_performance_time;
+	bigtime_t				seek_media_time;
 };
 
 struct node_set_run_mode_command : command_data {

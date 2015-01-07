@@ -632,6 +632,23 @@ BMediaNode::HandleMessage(int32 message,
 			return B_OK;
 		}
 
+		case NODE_ROLL:
+		{
+			const node_roll_command *command
+				= static_cast<const node_roll_command *>(data);
+
+			TRACE("BMediaNode::HandleMessage NODE_ROLL, node %ld\n",
+				fNodeID);
+
+			if (command->seek_media_time != B_INFINITE_TIMEOUT)
+				Seek(command->seek_media_time,
+					command->start_performance_time);
+
+			Start(command->start_performance_time);
+			Stop(command->stop_performance_time, false);
+			return B_OK;
+		}
+
 		case NODE_SET_TIMESOURCE:
 		{
 			const node_set_timesource_command *command = static_cast<const node_set_timesource_command *>(data);
