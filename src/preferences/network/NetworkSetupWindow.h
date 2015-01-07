@@ -38,6 +38,7 @@ class NetworkSetupWindow : public BWindow
 	static	const uint32		kMsgProfileNew = 'newp';
 	static	const uint32		kMsgApply = 'aply';
 	static	const uint32		kMsgRevert = 'rvrt';
+	static	const uint32		kMsgToggleReplicant = 'trep';
 
 			bool				QuitRequested();
 			void				MessageReceived(BMessage* msg);
@@ -45,6 +46,9 @@ class NetworkSetupWindow : public BWindow
 	private:
 			void				_BuildProfilesMenu(BMenu* menu, int32 msg);
 			void				_BuildShowTabView();
+
+			bool				_IsReplicantInstalled();
+			void				_ShowReplicant(bool show);
 
 			BButton*			fRevertButton;
 			BButton*			fApplyButton;

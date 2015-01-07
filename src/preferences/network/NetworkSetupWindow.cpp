@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2011 Haiku Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  *	Authors:
  *		Alexander von Gluck, <kallisti5@unixzen.com>
+ *		Adrien Destugues, <pulkomandy@pulkomandy.tk>
  */
 
 
@@ -12,6 +13,7 @@
 #include <Application.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <Deskbar.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <InterfaceKit.h>
@@ -61,6 +63,11 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 		new BMessage(kMsgRevert));
 	// fRevertButton->SetEnabled(false);
 
+	BMessage* message = new BMessage(kMsgToggleReplicant);
+	BCheckBox* replicantStatus = new BCheckBox("replicantStatus",
+		B_TRANSLATE("Show interfaces status in Deskbar"), message);
+	replicantStatus->SetValue(_IsReplicantInstalled());
+
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
@@ -75,6 +82,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 			.Add(fPanel)
 			.Add(new BGroupView("panel"))
 		.End()
+		.Add(replicantStatus)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)
 			.AddGlue()
@@ -106,9 +114,9 @@ NetworkSetupWindow::QuitRequested()
 
 
 void
-NetworkSetupWindow::MessageReceived(BMessage*	msg)
+NetworkSetupWindow::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case kMsgProfileNew:
 			break;
 
@@ -118,7 +126,7 @@ NetworkSetupWindow::MessageReceived(BMessage*	msg)
 			bool is_default;
 			bool is_current;
 
-			if (msg->FindString("path", &path) != B_OK)
+			if (message->FindString("path", &path) != B_OK)
 				break;
 
 			name.SetTo(path);
@@ -139,7 +147,6 @@ NetworkSetupWindow::MessageReceived(BMessage*	msg)
 			break;
 		}
 
-
 		case kMsgApply: {
 			for (int addonIndex = 0; addonIndex < fAddonCount; addonIndex++) {
 				NetworkSetupAddOn* addon
@@ -149,8 +156,12 @@ NetworkSetupWindow::MessageReceived(BMessage*	msg)
 			break;
 		}
 
+		case kMsgToggleReplicant: {
+			_ShowReplicant(message->FindInt32("be:value"));
+		}
+
 		default:
-			inherited::MessageReceived(msg);
+			inherited::MessageReceived(message);
 	}
 }
 
@@ -297,4 +308,37 @@ NetworkSetupWindow::_BuildShowTabView()
 	}
 
 	free(search_paths);
+}
+
+
+void
+NetworkSetupWindow::_ShowReplicant(bool show)
+{
+	if (show) {
+		char* argv[] = {const_cast<char *>("--deskbar"), NULL};
+
+		status_t ret = be_roster->Launch(
+			"application/x-vnd.Haiku-NetworkStatus", 1, argv);
+
+		if (ret != B_OK) {
+			BString errorMessage;
+			errorMessage.SetToFormat(
+				B_TRANSLATE("Installing NetworkStatus in Deskbar failed: %s"),
+				strerror(ret));
+			BAlert* alert = new BAlert(B_TRANSLATE("launch error"),
+				errorMessage, B_TRANSLATE("Ok"));
+			alert->Go(NULL);
+		}
+	} else {
+		BDeskbar deskbar;
+		deskbar.RemoveItem("NetworkStatus");
+	}
+}
+
+
+bool
+NetworkSetupWindow::_IsReplicantInstalled()
+{
+	BDeskbar deskbar;
+	return deskbar.HasItem("NetworkStatus");
 }
