@@ -42,7 +42,7 @@ HIDWriter::DefineInputPadding(uint8 count, uint8 bitLength)
 	SetReportSize(bitLength);
 	SetReportCount(count);
 
-	main_item_data data;
+	main_item_data data = { 0 };
 	data.data_constant = 1;
 	return Input(data);
 }
