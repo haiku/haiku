@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 welcomeURL="\
 	http://cgit.haiku-os.org/haiku/plain/docs/welcome/welcome_en.html"
