@@ -205,11 +205,13 @@ AddFilesToPackage add-ons accelerants	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
 AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 
-AddFilesToPackage add-ons mail_daemon inbound_protocols		: POP3 IMAP ;
-AddFilesToPackage add-ons mail_daemon outbound_protocols 	: SMTP ;
-AddFilesToPackage add-ons mail_daemon inbound_filters
-	: MatchHeader SpamFilter NewMailNotification ;
-AddFilesToPackage add-ons mail_daemon outbound_filters		: Fortune ;
+# TODO: fix these.
+#AddFilesToPackage add-ons mail_daemon inbound_protocols		: POP3 
+#	IMAP ;
+#AddFilesToPackage add-ons mail_daemon outbound_protocols 	: SMTP ;
+#AddFilesToPackage add-ons mail_daemon inbound_filters
+#	: MatchHeader SpamFilter NewMailNotification ;
+#AddFilesToPackage add-ons mail_daemon outbound_filters		: Fortune ;
 
 AddFilesToPackage add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
