@@ -305,7 +305,7 @@ ICNSSaver::SaveData(BPositionIO *target)
 	icns_byte_t *dataPtrOut;
 	icns_export_family_data(fIconFamily, &dataSize, &dataPtrOut);
 	if (dataSize != 0 && dataPtrOut != NULL) {
-		if (target->Write(dataPtrOut, dataSize) == dataSize);
+		if (target->Write(dataPtrOut, dataSize) == dataSize)
 			return B_OK;
 	}
 	return B_ERROR;
