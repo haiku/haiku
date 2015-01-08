@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,7 +45,7 @@ protected:
 			status_t		ToMessage(BMessage* message) const;
 
 private:
-			void			_GetBatteryInfo(battery_info* info, int batteryID);
+			void			_GetBatteryInfo(int batteryID, battery_info* info);
 			void			_Init();
 			void			_SetLabel(char* buffer, size_t bufferLength);
 			void			_DrawBattery(BRect rect);

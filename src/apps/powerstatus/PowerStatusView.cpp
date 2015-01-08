@@ -106,7 +106,7 @@ PowerStatusView::_Init()
 	fShowTime = false;
 	fShowStatusIcon = true;
 
-	fPercent = -1;
+	fPercent = 100;
 	fOnline = true;
 	fTimeLeft = 0;
 }
@@ -338,13 +338,12 @@ PowerStatusView::Update(bool force)
 	bool wasOnline = fOnline;
 	bool hadBattery = fHasBattery;
 
-	_GetBatteryInfo(&fBatteryInfo, fBatteryID);
-
-	fHasBattery = (fBatteryInfo.state & BATTERY_CRITICAL_STATE) == 0;
+	_GetBatteryInfo(fBatteryID, &fBatteryInfo);
+	fHasBattery = fBatteryInfo.full_capacity > 0;
 
 	if (fBatteryInfo.full_capacity > 0 && fHasBattery) {
 		fPercent = (100 * fBatteryInfo.capacity) / fBatteryInfo.full_capacity;
-		fOnline = (fBatteryInfo.state & BATTERY_CHARGING) != 0;
+		fOnline = (fBatteryInfo.state & BATTERY_DISCHARGING) == 0;
 		fTimeLeft = fBatteryInfo.time_left;
 	} else {
 		fPercent = 0;
@@ -352,7 +351,7 @@ PowerStatusView::Update(bool force)
 		fTimeLeft = -1;
 	}
 
-	if (fOnline && (fPercent <= 0 || fPercent > 100)) {
+	if (fHasBattery && (fPercent <= 0 || fPercent > 100)) {
 		// Just ignore this probe -- it obviously returned invalid values
 		fPercent = previousPercent;
 		fTimeLeft = previousTimeLeft;
@@ -417,9 +416,8 @@ PowerStatusView::Update(bool force)
 		Invalidate();
 	}
 
-	if ((hadBattery && !fHasBattery)
-		|| (previousPercent > kLowBatteryPercentage
-			&& fPercent <= kLowBatteryPercentage)) {
+	if (!fOnline && fHasBattery && previousPercent > kLowBatteryPercentage
+			&& fPercent <= kLowBatteryPercentage) {
 		_NotifyLowBattery();
 	}
 }
@@ -462,19 +460,26 @@ PowerStatusView::ToMessage(BMessage* archive) const
 
 
 void
-PowerStatusView::_GetBatteryInfo(battery_info* batteryInfo, int batteryID)
+PowerStatusView::_GetBatteryInfo(int batteryID, battery_info* batteryInfo)
 {
 	if (batteryID >= 0) {
 		fDriverInterface->GetBatteryInfo(batteryID, batteryInfo);
 	} else {
+		bool first = true;
+		memset(batteryInfo, 0, sizeof(battery_info));
+
 		for (int i = 0; i < fDriverInterface->GetBatteryCount(); i++) {
 			battery_info info;
 			fDriverInterface->GetBatteryInfo(i, &info);
 
-			if (i == 0)
+			if (info.full_capacity <= 0)
+				continue;
+
+			if (first) {
 				*batteryInfo = info;
-			else {
-				batteryInfo->state &= info.state;
+				first = false;
+			} else {
+				batteryInfo->state |= info.state;
 				batteryInfo->capacity += info.capacity;
 				batteryInfo->full_capacity += info.full_capacity;
 				batteryInfo->time_left += info.time_left;
