@@ -8,7 +8,7 @@ SimpleTest mixerToy :
 	Resampler.cpp
 	Interpolate.cpp
 
-	: be
+	: be [ TargetLibsupc++ ]
 ;
 
 # Tell Jam where to find these sources
