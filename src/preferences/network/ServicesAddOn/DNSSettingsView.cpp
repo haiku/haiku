@@ -39,14 +39,16 @@ DNSSettingsView::DNSSettingsView()
 	fServerListView = new BListView("nameservers");
 	fTextControl = new BTextControl("", "", NULL);
 	fTextControl->SetModificationMessage(new BMessage(kEditServer));
-	
+	fTextControl->SetExplicitMinSize(BSize(fTextControl->StringWidth("5") * 18,
+		B_SIZE_UNSET));
+
 	fAddButton = new BButton("Add", new BMessage(kAddServer));
 	fUpButton = new BButton("Move up", new BMessage(kMoveUp));
 	fDownButton = new BButton("Move down", new BMessage(kMoveDown));
 	fRemoveButton = new BButton("Remove", new BMessage(kDeleteServer));
 
 	BLayoutBuilder::Group<>(this)
-		.AddGrid(B_HORIZONTAL)
+		.AddGrid()
 			.Add(fTextControl, 0, 0)
 			.Add(fAddButton, 1, 0)
 			.Add(new BScrollView("scroll", fServerListView, 0, false, true),
