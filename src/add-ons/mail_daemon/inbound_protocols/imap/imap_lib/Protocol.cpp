@@ -256,9 +256,10 @@ Protocol::SendCommand(int32 id, const char* command)
 {
 	char buffer[2048];
 	int32 length;
-	if (id > 0)
-		length = snprintf(buffer, sizeof(buffer), "A%.7ld %s\r\n", id, command);
-	else
+	if (id > 0) {
+		length = snprintf(buffer, sizeof(buffer), "A%.7" B_PRId32 " %s\r\n",
+			id, command);
+	} else
 		length = snprintf(buffer, sizeof(buffer), "%s\r\n", command);
 
 	TRACE("C: %s", buffer);
@@ -271,7 +272,7 @@ Protocol::SendCommand(int32 id, const char* command)
 }
 
 
-int32
+ssize_t
 Protocol::SendData(const char* buffer, uint32 length)
 {
 	return fSocket->Write(buffer, length);

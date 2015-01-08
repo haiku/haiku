@@ -72,7 +72,7 @@ private:
 			BString				fLog;
 			int32				fNumMessages;
 			size_t				fMailDropSize;
-			BList				fSizes;
+			std::vector<size_t>	fSizes;
 			off_t				fTotalSize;
 			BMessage			fSettings;
 

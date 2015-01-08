@@ -746,7 +746,7 @@ POP3Protocol::Delete(int32 index)
 size_t
 POP3Protocol::MessageSize(int32 index)
 {
-	return (size_t)fSizes.ItemAt(index);
+	return fSizes[index];
 }
 
 
@@ -863,7 +863,7 @@ status_t
 POP3Protocol::_RetrieveUniqueIDs()
 {
 	fUniqueIDs.MakeEmpty();
-	fSizes.MakeEmpty();
+	fSizes.clear();
 	fTotalSize = 0;
 
 	status_t status = SendCommand("UIDL" CRLF);
@@ -896,7 +896,7 @@ POP3Protocol::_RetrieveUniqueIDs()
 			size = 0;
 
 		fTotalSize += size;
-		fSizes.AddItem((void*)size);
+		fSizes.push_back(size);
 	}
 
 	return B_OK;

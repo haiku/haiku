@@ -33,8 +33,8 @@ public:
 								NotifyFilter(BMailProtocol& protocol,
 									const BMailAddOnSettings& settings);
 
-			void				HeaderFetched(const entry_ref& ref,
-									BFile* file);
+			BMailFilterAction	HeaderFetched(entry_ref& ref,
+									BFile& file, BMessage& attributes);
 			void				MailboxSynchronized(status_t status);
 
 private:
@@ -53,15 +53,17 @@ NotifyFilter::NotifyFilter(BMailProtocol& protocol,
 }
 
 
-void
-NotifyFilter::HeaderFetched(const entry_ref& ref, BFile* file)
+BMailFilterAction
+NotifyFilter::HeaderFetched(entry_ref& ref, BFile& file,
+	BMessage& attributes)
 {
 	// TODO: do not use MAIL:status here!
 	char statusString[256];
-	if (file->ReadAttr("MAIL:status", B_STRING_TYPE, 0, statusString, 256) < 0)
-		return;
+	if (file.ReadAttr("MAIL:status", B_STRING_TYPE, 0, statusString, 256) < 0)
+		return B_NO_MAIL_ACTION;
 	if (BString(statusString).Compare("Read") != 0)
 		fNNewMessages++;
+	return B_NO_MAIL_ACTION;
 }
 
 

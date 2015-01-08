@@ -106,7 +106,8 @@ IMAPFolder::IMAPFolder(IMAPProtocol& protocol, const BString& mailboxName,
 
 	fUIDValidity = _ReadUInt32(node, kUIDValidityAttribute);
 	fLastUID = _ReadUInt32(node, kLastUIDAttribute);
-	printf("IMAP: %s, last UID %lu\n", fMailboxName.String(), fLastUID);
+	printf("IMAP: %s, last UID %" B_PRIu32 "\n", fMailboxName.String(),
+		fLastUID);
 
 	attr_info info;
 	status_t status = node.GetAttrInfo(kStateAttribute, &info);

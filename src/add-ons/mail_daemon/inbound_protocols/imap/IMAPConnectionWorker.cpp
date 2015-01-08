@@ -163,7 +163,7 @@ public:
 		if (status != B_OK)
 			return status;
 
-		printf("IMAP: fetch body for %lu\n", fUID);
+		printf("IMAP: fetch body for %" B_PRIu32 "\n", fUID);
 		// Since RFC3501 does not specify whether the FETCH response may
 		// alter the order of the message data items we request, we cannot
 		// request more than a single UID at a time, or else we may not be
@@ -337,7 +337,8 @@ public:
 			uint32 from = fFirstIndex + kMaxFetchEntries < to
 				? fLastIndex - kMaxFetchEntries : fFirstIndex;
 
-			printf("IMAP: get entries from %lu to %lu\n", from, to);
+			printf("IMAP: get entries from %" B_PRIu32 " to %" B_PRIu32 "\n",
+				from, to);
 
 			IMAP::MessageEntryList entries;
 			IMAP::FetchMessageEntriesCommand fetch(entries, from, to, false);
@@ -352,8 +353,9 @@ public:
 			// size into account if it's below the limit -- that does not
 			// seem to be possible, though
 			for (size_t i = 0; i < entries.size(); i++) {
-				printf("%10lu %8lu bytes, flags: %#lx\n", entries[i].uid,
-					entries[i].size, entries[i].flags);
+				printf("%10" B_PRIu32 " %8" B_PRIu32 " bytes, flags: %#"
+					B_PRIx32 "\n", entries[i].uid, entries[i].size,
+					entries[i].flags);
 				fMailbox->AddMessageEntry(from + i, entries[i].uid,
 					entries[i].flags, entries[i].size);
 
@@ -577,7 +579,7 @@ IMAPConnectionWorker::EnqueueRetrieveMail(entry_ref& ref)
 void
 IMAPConnectionWorker::MessageExistsReceived(uint32 count)
 {
-	printf("Message exists: %lu\n", count);
+	printf("Message exists: %" B_PRIu32 "\n", count);
 	fMessagesExist = count;
 
 	// TODO: We might want to trigger another check even during sync
@@ -589,7 +591,7 @@ IMAPConnectionWorker::MessageExistsReceived(uint32 count)
 void
 IMAPConnectionWorker::MessageExpungeReceived(uint32 index)
 {
-	printf("Message expunge: %ld\n", index);
+	printf("Message expunge: %" B_PRIu32 "\n", index);
 	if (fSelectedBox == NULL)
 		return;
 

@@ -84,7 +84,8 @@ IMAPMailbox::MessageSize(uint32 uid) const
 uint32
 IMAPMailbox::MessageAdded(const MessageToken& fromToken, const entry_ref& ref)
 {
-	printf("IMAP: message added %s, uid %lu\n", ref.name, fromToken.uid);
+	printf("IMAP: message added %s, uid %" B_PRIu32 "\n", ref.name,
+		fromToken.uid);
 	return 0;
 }
 
@@ -92,7 +93,7 @@ IMAPMailbox::MessageAdded(const MessageToken& fromToken, const entry_ref& ref)
 void
 IMAPMailbox::MessageDeleted(const MessageToken& token)
 {
-	printf("IMAP: message deleted, uid %lu\n", token.uid);
+	printf("IMAP: message deleted, uid %" B_PRIu32 "\n", token.uid);
 }
 
 
@@ -100,6 +101,6 @@ void
 IMAPMailbox::MessageFlagsChanged(const MessageToken& token,
 	const entry_ref& ref, uint32 oldFlags, uint32 newFlags)
 {
-	printf("IMAP: flags changed %s, uid %lu, from %lx to %lx\n", ref.name,
-		token.uid, oldFlags, newFlags);
+	printf("IMAP: flags changed %s, uid %" B_PRIu32 ", from %" B_PRIx32 " to %"
+		B_PRIx32 "\n", ref.name, token.uid, oldFlags, newFlags);
 }
