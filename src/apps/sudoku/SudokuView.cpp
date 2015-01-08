@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2014, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -783,6 +783,67 @@ SudokuView::_RemoveHint()
 
 
 void
+SudokuView::_ToggleValue(uint32 x, uint32 y, uint32 value, uint32 field)
+{
+	bool wasCompleted;
+	if (fField->ValueAt(x, y) > 0) {
+		// Remove value
+		value = fField->ValueAt(x, y) - 1;
+		wasCompleted = fField->IsValueCompleted(value + 1);
+
+		fField->SetValueAt(x, y, 0);
+		fShowHintX = x;
+		fShowHintY = y;
+	} else {
+		// Set value
+		wasCompleted = fField->IsValueCompleted(value + 1);
+
+		fField->SetValueAt(x, y, value + 1);
+		BMessenger(this).SendMessage(kMsgCheckSolved);
+
+		// allow dragging to remove the hint from other fields
+		fLastHintValueSet = false;
+		fLastHintValue = value;
+		fLastField = field;
+	}
+
+	if (value + 1 != fValueHintValue && fValueHintValue != ~0UL)
+		_SetValueHintValue(value + 1);
+
+	if (wasCompleted != fField->IsValueCompleted(value + 1))
+		_InvalidateValue(value + 1, false, x, y);
+	else
+		_InvalidateField(x, y);
+}
+
+
+void
+SudokuView::_ToggleHintValue(uint32 x, uint32 y, uint32 hintX, uint32 hintY,
+	uint32 value, uint32 field)
+{
+	uint32 hintMask = fField->HintMaskAt(x, y);
+	uint32 valueMask = 1UL << value;
+	fLastHintValueSet = (hintMask & valueMask) == 0;
+
+	if (fLastHintValueSet)
+		hintMask |= valueMask;
+	else
+		hintMask &= ~valueMask;
+
+	fField->SetHintMaskAt(x, y, hintMask);
+
+	if (value + 1 != fValueHintValue) {
+		_SetValueHintValue(UINT32_MAX);
+		_InvalidateHintField(x, y, hintX, hintY);
+	} else
+		_InvalidateField(x, y);
+
+	fLastHintValue = value;
+	fLastField = field;
+}
+
+
+void
 SudokuView::_UndoRedo(BObjectList<BMessage>& undos,
 	BObjectList<BMessage>& redos)
 {
@@ -865,60 +926,14 @@ SudokuView::MouseDown(BPoint where)
 	if ((clicks == 2 && fLastHintValue == value && fLastField == field)
 		|| (buttons & (B_SECONDARY_MOUSE_BUTTON
 				| B_TERTIARY_MOUSE_BUTTON)) != 0) {
-		// double click or other buttons set a value
-		if (!fField->IsInitialValue(x, y)) {
-			bool wasCompleted;
-			if (fField->ValueAt(x, y) > 0) {
-				// Remove value
-				value = fField->ValueAt(x, y) - 1;
-				wasCompleted = fField->IsValueCompleted(value + 1);
+		// Double click or other buttons set or remove a value
+		if (!fField->IsInitialValue(x, y))
+			_ToggleValue(x, y, value, field);
 
-				fField->SetValueAt(x, y, 0);
-				fShowHintX = x;
-				fShowHintY = y;
-			} else {
-				// Set value
-				wasCompleted = fField->IsValueCompleted(value + 1);
-
-				fField->SetValueAt(x, y, value + 1);
-				BMessenger(this).SendMessage(kMsgCheckSolved);
-
-				// allow dragging to remove the hint from other fields
-				fLastHintValueSet = false;
-				fLastHintValue = value;
-				fLastField = field;
-			}
-
-			if (value + 1 != fValueHintValue && fValueHintValue != ~0UL)
-				_SetValueHintValue(value + 1);
-
-			if (wasCompleted != fField->IsValueCompleted(value + 1))
-				_InvalidateValue(value + 1, false, x, y);
-			else
-				_InvalidateField(x, y);
-		}
 		return;
 	}
 
-	uint32 hintMask = fField->HintMaskAt(x, y);
-	uint32 valueMask = 1UL << value;
-	fLastHintValueSet = (hintMask & valueMask) == 0;
-
-	if (fLastHintValueSet)
-		hintMask |= valueMask;
-	else
-		hintMask &= ~valueMask;
-
-	fField->SetHintMaskAt(x, y, hintMask);
-
-	if (value + 1 != fValueHintValue) {
-		_SetValueHintValue(UINT32_MAX);
-		_InvalidateHintField(x, y, hintX, hintY);
-	} else
-		_InvalidateField(x, y);
-
-	fLastHintValue = value;
-	fLastField = field;
+	_ToggleHintValue(x, y, hintX, hintY, value, field);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2014, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SUDOKU_VIEW_H
@@ -103,6 +103,11 @@ private:
 			void				_InsertKey(char rawKey, int32 modifiers);
 			void				_SetValueHintValue(uint32 value);
 			void				_RemoveHint();
+			void				_ToggleValue(uint32 x, uint32 y, uint32 value,
+									uint32 field);
+			void				_ToggleHintValue(uint32 x, uint32 y,
+									uint32 hintX, uint32 hintY,
+									uint32 value, uint32 field);
 			bool				_GetHintFieldFor(BPoint where, uint32 x,
 									uint32 y, uint32& hintX, uint32& hintY);
 			bool				_GetFieldFor(BPoint where, uint32& x,
