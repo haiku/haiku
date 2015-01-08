@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2014.12.08
-# Date:    2014-12-08 20:34:11
+# Version: 2015.01.07
+# Date:    2015-01-07 12:51:50
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -3541,6 +3541,7 @@
 	26b5  MF4200 series
 	26da  LBP3010B printer
 	26e6  iR1024
+	2736  I-SENSYS MF4550d
 	2737  MF4410
 	3041  PowerShot S10
 	3042  CanoScan FS4000US Film Scanner
@@ -3820,6 +3821,10 @@
 	3288  Powershot ELPH 135 / IXUS 145
 	3289  PowerShot ELPH 340 HS / IXUS 265 HS
 	328a  PowerShot ELPH 150 IS / IXUS 155
+	328b  PowerShot N Facebook(R) Ready
+	329a  PowerShot SX60 HS
+	329b  PowerShot SX520 HS
+	329c  PowerShot SX400 IS
 04aa  DaeWoo Telecom, Ltd
 04ab  Chromatic Research
 04ac  Micro Audiometrics Corp.
@@ -7253,6 +7258,7 @@
 	0607  Logitech G110 Hub
 	0608  Hub
 	0610  4-port hub
+	0616  hub
 	0660  USB 2.0 Hub
 	0700  SIIG US2256 CompactFlash Card Reader
 	0701  USB 2.0 IDE Adapter
@@ -10105,6 +10111,7 @@
 	23dd  DocuPrint M760 (X760_USB)
 	3ce8  Phaser 3428 Printer
 	3d5b  Phaser 6115MFP TWAIN Scanner
+	3d6d  WorkCentre 6015N/NI
 	420f  WorkCentre PE220 Series
 	421f  M20 Scanner
 	423b  Printing Support
@@ -10207,7 +10214,7 @@
 	653d  Kingston DataTraveler 2.0 Stick (1GB)
 	653e  Flash Memory
 	6540  TransMemory Flash Memory
-	6544  Kingston DataTraveler 2.0 Stick (2GB)
+	6544  TransMemory-Mini / Kingston DataTraveler 2.0 Stick (2GB)
 	6545  Kingston DataTraveler 102/2.0 / HEMA Flash Drive 2 GB / PNY Attache 4GB Stick
 0931  Harmonic Data Systems, Ltd
 0932  Crescentec Corp.
@@ -10315,13 +10322,14 @@
 	1653  Data Traveler 100 G2 8 GiB
 	1656  DataTraveler Ultimate G2
 	1665  Digital DataTraveler SE9 64GB
+	1666  DataTraveler G4
 	1689  DataTraveler SE9
 	168a  DataTraveler Micro
 	168c  DT Elite 3.0
 0954  RPM Systems Corp.
 0955  NVidia Corp.
 	7030  Tegra 3 (recovery mode)
-	7100  Notion Ink Adam
+	7100  Tegra Device
 	7820  Tegra 2 AC100 developer mode
 	b400  SHIELD (debug)
 	b401  SHIELD
@@ -11531,6 +11539,8 @@
 	2200  FreeAgent Go FW
 	2300  Expansion Portable
 	2320  USB 3.0 bridge [Portable Expansion Drive]
+	2321  Expansion Portable
+	2340  FreeAgent External Hard Drive
 	3000  FreeAgent Desktop
 	3008  FreeAgent Desk 1TB
 	3101  FreeAgent XTreme 640GB
@@ -11932,6 +11942,9 @@
 0c4b  Reiner SCT Kartensysteme GmbH
 	0100  cyberJack e-com/pinpad
 	0300  cyberJack pinpad(a)
+	0400  cyberJack e-com(a)
+	0401  cyberJack pinpad(a2)
+	0500  cyberJack RFID standard dual interface smartcard reader
 	0501  cyberJack RFID comfort dual interface smartcard reader
 	9102  cyberJack RFID basis contactless smartcard reader
 0c4c  Needham's Electronics
@@ -16207,6 +16220,9 @@
 1c22  ZHONGSHAN CHIANG YU ELECTRIC CO., LTD.
 1c26  Shanghai Haiying Electronics Co., Ltd.
 1c27  HuiYang D & S Cable Co., Ltd.
+1c29  Elster GmbH
+	0001  ExMFE5 Simulator
+	10fc  enCore device
 1c31  LS Cable Ltd.
 1c34  SpringCard
 	7241  Prox'N'Roll RFID Scanner
@@ -16932,15 +16948,24 @@
 2fb2  Fujitsu, Ltd
 3125  Eagletron
 	0001  TrackerPod Camera Stand
+3136  Navini Networks
 3176  Whanam Electronics Co., Ltd
+3195  Link Instruments
+	f190  MSO-19
+	f280  MSO-28
+	f281  MSO-28
 3275  VidzMedia Pte Ltd
 	4fb1  MonsterTV P2H
+3333  InLine
+	3333  2 port KVM switch model 60652K
 3334  AEI
 	1701  Fast Ethernet
 3340  Yakumo
 	043a  Mio A701 DigiWalker PPCPhone
 	0e3a  Pocket PC 300 GPS SL / Typhoon MyGuide 3500
 	a0a3  deltaX 5 BT (D) PDA
+3344  Leaguer Microelectronics (LME)
+	3744  OEM PC Remote
 3504  Micro Star
 	f110  Security Key
 3538  Power Quotient International Co., Ltd
@@ -17123,9 +17148,14 @@
 4146  USBest Technology
 	9281  Iomega Micro Mini 128MB Flash Drive
 	ba01  Intuix Flash Drive
+4168  Targus
+	1010  Wireless Compact Laser Mouse
 4242  USB Design by Example
 	4201  Buttons and Lights HID device
 	4220  Echo 1 Camera
+4255  GoPro
+	1000  9FF2 [Digital Photo Display]
+	2000  HD2-14 [Hero 2 Camera]
 4317  Broadcom Corp.
 	0700  U.S. Robotics USR5426 802.11g Adapter
 	0701  U.S. Robotics USR5425 Wireless MAXg Adapter
@@ -17172,6 +17202,10 @@
 	1001  Cetus CDC Device
 5345  Owon
 	1234  PDS6062T Oscilloscope
+534c  SatoshiLabs
+	0001  Bitcoin Wallet [TREZOR]
+5354  Meyer Instruments (MIS)
+	0017  PAXcam2
 544d  Transmeta Corp.
 5543  UC-Logic Technology Corp.
 	0002  SuperPen WP3325U Tablet
@@ -17222,6 +17256,7 @@
 	0241  BisonCam, NB Pro
 	02d0  Lenovo Integrated Webcam [R5U877]
 	03d0  Lenovo Integrated Webcam [R5U877]
+59e3  Nonolith Labs
 5a57  Zinwell
 	0260  RT2570
 	0280  802.11a/b/g/n USB Wireless LAN Card
@@ -17238,6 +17273,35 @@
 6189  Sitecom
 	182d  USB 2.0 Ethernet
 	2068  USB to serial cable (v2)
+6244  LightingSoft AG
+	0101  Intelligent Usb Dmx Interface SIUDI5A
+	0201  Intelligent Usb Dmx Interface SIUDI5C
+	0300  Intelligent Usb Dmx Interface SIUDI6 Firmware download
+	0301  Intelligent Usb Dmx Interface SIUDI6C
+	0302  Intelligent Usb Dmx Interface SIUDI6A
+	0303  Intelligent Usb Dmx Interface SIUDI6D
+	0400  Touch Sensitive Intelligent Control Keypad STICK1A
+	0401  Touch Sensitive Intelligent Control Keypad STICK1A
+	0410  Intelligent Usb Dmx Interface SIUDI7 Firmware Download
+	0411  Intelligent Usb Dmx Interface SIUDI7A
+	0420  Intelligent Usb Dmx Interface SIUDI8A Firmware Download
+	0421  Intelligent Usb Dmx Interface SIUDI8A
+	0430  Intelligent Usb Dmx Interface SIUDI8C Firmware Download
+	0431  Intelligent Usb Dmx Interface SIUDI8C
+	0440  Intelligent Usb Dmx Interface SIUDI9A Firmware Download
+	0441  Intelligent Usb Dmx Interface SIUDI9A
+	0450  Intelligent Usb Dmx Interface SIUDI9C Firmware Download
+	0451  Intelligent Usb Dmx Interface SIUDI9C
+	0460  Touch Sensitive Intelligent Control Keypad STICK2 Firmware download
+	0461  Touch Sensitive Intelligent Control Keypad STICK2
+	0470  Touch Sensitive Intelligent Control Keypad STICK1B Firmware download
+	0471  Touch Sensitive Intelligent Control Keypad STICK1B
+	0480  Touch Sensitive Intelligent Control Keypad STICK3 Firmware download
+	0481  Touch Sensitive Intelligent Control Keypad STICK3
+	0490  Intelligent Usb Dmx Interface SIUDI9D Firmware Download
+	0491  Intelligent Usb Dmx Interface SIUDI9D
+	0500  Touch Sensitive Intelligent Control Keypad STICK2B Firmware download
+	0501  Touch Sensitive Intelligent Control Keypad STICK2B
 6253  TwinHan Technology Co., Ltd
 	0100  Ir reciver f. remote control
 636c  CoreLogic, Inc.
@@ -17329,6 +17393,15 @@
 	3301  Retro Adapter Mouse
 8341  EGO Systems, Inc.
 	2000  Flashdisk
+8564  Transcend Information, Inc.
+	1000  JetFlash
+		8564 1000  JetFlash
+	4000  RDF8
+8644  Intenso GmbG
+	8003  Micro Line
+	800b  Micro Line (4GB)
+8e06  CH Products, Inc.
+	f700  DT225 Trackball
 9016  Sitecom
 	182d  WL-022 802.11b Adapter
 9022  TeVii Technology Ltd.
@@ -17349,6 +17422,10 @@
 	7830  MCS7830 10/100 Mbps Ethernet adapter
 	7832  MCS7832 10/100 Mbps Ethernet adapter
 	7840  MCS7820/MCS7840 2/4 port serial adapter
+9849  Bestmedia CD Recordable GmbH & Co. KG
+	0701  Platinum MyDrive HP
+9999  Odeon
+	0001  JAF Mobile Phone Flasher Interface
 99fa  Grandtec
 	8988  V.cap Camera Device
 9ac4  J. Westhues
@@ -17377,16 +17454,27 @@ a727  3Com
 	6893  3CRUSB20075 OfficeConnect Wireless 108Mbps 11g Adapter [Atheros AR5523]
 	6895  AR5523
 	6897  AR5523
+aaaa  MXT
+	8815  microSD CardReader
 abcd  Unknown
 	cdee  Petcam
+b58e  Blue Microphones
+	9e84  Yeti Stereo Microphone
+c216  Card Device Expert Co., LTD
+	0180  MSR90 MagStripe reader
 c251  Keil Software, Inc.
 	2710  ULink
 cace  CACE Technologies Inc.
 	0002  AirPCAP Classic 802.11 packet capture adapter
 	0300  AirPcap NX [Atheros AR9001U-(2)NG]
+cd12  SMART TECHNOLOGY INDUSTRIAL LTD.
+d208  Ultimarc
+	0310  Mini-PAC Arcade Control Interface
 d209  Ultimarc
 	0301  I-PAC Arcade Control Interface
 	0501  Ultra-Stik Ultimarc Ultra-Stik Player 1
+d904  LogiLink
+	0003  Laser Mouse (ID0009A)
 e4e4  Xorcom Ltd.
 	1130  Astribank series
 	1131  Astribank series
@@ -17419,10 +17507,22 @@ eb1a  eMPIA Technology, Inc.
 	50a6  Gadmei UTV330 TV Box
 	e355  KWorld DVB-T 355U Digital TV Dongle
 eb2a  KWorld
+ef18  SMART TECHNOLOGY INDUSTRIAL LTD.
 f003  Hewlett Packard
 	6002  PhotoSmart C500
+f182  Leap Motion
+	0003  Controller
 f4ec  Atten Electronics / Siglent Technologies
 	ee38  Digital Storage Oscilloscope
+f4ed  Shenzhen Siglent Co., Ltd.
+	ee37  SDG1010 Waveform Generator
+	ee3a  SDG1010 Waveform Generator (TMC mode)
+f766  Hama
+	0001  PC-Gamepad "Greystorm"
+fc08  Conrad Electronic SE
+	0101  MIDI Cable UA0037
+ffee  FNK Tech
+	0100  Card Reader Controller RTS5101/RTS5111/RTS5116
 
 # List of known device classes, subclasses and protocols
 
