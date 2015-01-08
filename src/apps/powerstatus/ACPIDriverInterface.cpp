@@ -17,13 +17,15 @@
 #include <Path.h>
 
 
+static const char* kDriverDir = "/dev/power";
+
+
 RateBuffer::RateBuffer()
 	:
 	fPosition(0),
 	fSize(kRateBufferSize),
 	fCurrentSize(0)
 {
-
 }
 
 
@@ -53,6 +55,9 @@ RateBuffer::GetMeanRate()
 
 	return mean / fCurrentSize;
 }
+
+
+// #pragma mark -
 
 
 Battery::Battery(int driverHandler)
@@ -148,6 +153,10 @@ ACPIDriverInterface::~ACPIDriverInterface()
 	for (int i = 0; i < fDriverList.CountItems(); i++)
 		delete fDriverList.ItemAt(i);
 
+ACPIDriverInterface::ACPIDriverInterface()
+	:
+	fInterfaceLocker("acpi interface")
+{
 }
 
 

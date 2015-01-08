@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,15 +19,15 @@ const int8 kRateBufferSize = 10;
 
 class RateBuffer {
 public:
-							RateBuffer();
-	void					AddRate(int32 rate);
-	int32					GetMeanRate();
+								RateBuffer();
+	void						AddRate(int32 rate);
+	int32						GetMeanRate();
 
 private:
-	int32					fRateBuffer[kRateBufferSize];
-	int8					fPosition;
-	int8					fSize;
-	int8					fCurrentSize;
+	int32						fRateBuffer[kRateBufferSize];
+	int8						fPosition;
+	int8						fSize;
+	int8						fCurrentSize;
 };
 
 
@@ -47,7 +47,7 @@ public:
 private:
 	void						_Init();
 
-
+private:
 	int							fDriverHandler;
 	status_t					fInitStatus;
 
@@ -60,7 +60,8 @@ private:
 
 class ACPIDriverInterface : public PowerStatusDriverInterface {
 public:
-	virtual					~ACPIDriverInterface();
+								ACPIDriverInterface();
+	virtual						~ACPIDriverInterface();
 
 	virtual status_t		Connect();
 	virtual status_t 		GetBatteryInfo(battery_info* info, int32 index);

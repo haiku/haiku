@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -53,7 +53,8 @@ PowerStatusDriverInterface::PowerStatusDriverInterface()
 	:
 	fIsWatching(0),
 	fWaitSem(-1),
-	fThread(-1)
+	fThread(-1),
+	fListLocker("driver list")
 {
 }
 
