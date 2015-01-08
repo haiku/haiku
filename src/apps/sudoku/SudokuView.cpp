@@ -1130,6 +1130,8 @@ SudokuView::_ToggleValue(uint32 x, uint32 y, uint32 value, uint32 field)
 		fField->SetValueAt(x, y, value + 1);
 		BMessenger(this).SendMessage(kMsgCheckSolved);
 
+		_RemoveHintValues(x, y, value);
+
 		// allow dragging to remove the hint from other fields
 		fLastHintValueSet = false;
 		fLastHintValue = value;
@@ -1169,6 +1171,44 @@ SudokuView::_ToggleHintValue(uint32 x, uint32 y, uint32 hintX, uint32 hintY,
 
 	fLastHintValue = value;
 	fLastField = field;
+}
+
+
+void
+SudokuView::_RemoveHintValues(uint32 atX, uint32 atY, uint32 value)
+{
+	// Remove all hints in the same block
+	uint32 blockSize = fField->BlockSize();
+	uint32 blockX = (atX / blockSize) * blockSize;
+	uint32 blockY = (atY / blockSize) * blockSize;
+	uint32 valueMask = 1UL << value;
+
+	for (uint32 y = blockY; y < blockY + blockSize; y++) {
+		for (uint32 x = blockX; x < blockX + blockSize; x++) {
+			if (x != atX && y != atY)
+				_RemoveHintValue(x, y, valueMask);
+		}
+	}
+
+	// Remove all hints from the vertical and horizontal lines
+
+	for (uint32 i = 0; i < fField->Size(); i++) {
+		if (i != atX)
+			_RemoveHintValue(i, atY, valueMask);
+		if (i != atY)
+			_RemoveHintValue(atX, i, valueMask);
+	}
+}
+
+
+void
+SudokuView::_RemoveHintValue(uint32 x, uint32 y, uint32 valueMask)
+{
+	uint32 hintMask = fField->HintMaskAt(x, y);
+	if ((hintMask & valueMask) != 0) {
+		fField->SetHintMaskAt(x, y, hintMask & ~valueMask);
+		_InvalidateField(x, y);
+	}
 }
 
 

@@ -111,6 +111,10 @@ private:
 			void				_ToggleHintValue(uint32 x, uint32 y,
 									uint32 hintX, uint32 hintY,
 									uint32 value, uint32 field);
+			void				_RemoveHintValues(uint32 atX, uint32 atY,
+									uint32 value);
+			void				_RemoveHintValue(uint32 x, uint32 y,
+									uint32 valueMask);
 			void				_SetAllHints();
 			void				_Solve();
 			void				_SolveSingle();
