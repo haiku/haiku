@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef IMAP_FOLDER_H
@@ -15,6 +15,7 @@
 #include <String.h>
 
 
+class BFile;
 class IMAPProtocol;
 
 
@@ -94,8 +95,13 @@ private:
 									size_t& length);
 
 private:
+#if __GNUC__ >= 4
+	typedef __gnu_cxx::hash_map<uint32, uint32> UIDToFlagsMap;
+	typedef __gnu_cxx::hash_map<uint32, entry_ref> UIDToRefMap;
+#else
 	typedef std::hash_map<uint32, uint32> UIDToFlagsMap;
 	typedef std::hash_map<uint32, entry_ref> UIDToRefMap;
+#endif
 
 			IMAPProtocol&		fProtocol;
 			const entry_ref		fRef;

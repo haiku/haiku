@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef IMAP_MAILBOX_H
@@ -53,7 +53,11 @@ protected:
 		uint32	flags;
 		uint32	size;
 	};
+#if __GNUC__ >= 4
+	typedef __gnu_cxx::hash_map<uint32, MessageFlagsAndSize> MessageEntryMap;
+#else
 	typedef std::hash_map<uint32, MessageFlagsAndSize> MessageEntryMap;
+#endif
 
 			IMAP::Protocol&		fProtocol;
 			BString				fMailboxName;
