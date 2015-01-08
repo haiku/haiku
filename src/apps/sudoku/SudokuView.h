@@ -40,7 +40,6 @@ public:
 
 	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
 	static	BArchivable*		Instantiate(BMessage* archive);
-			void				InitObject(const BMessage* archive);
 
 			status_t			SaveState(BMessage& state) const;
 
@@ -84,6 +83,8 @@ protected:
 	virtual void				Draw(BRect updateRect);
 
 private:
+			void				_InitObject(const BMessage* archive);
+
 			status_t			_FilterString(const char* data,
 									size_t dataLength, char* buffer,
 									uint32& out, bool& ignore);
@@ -101,28 +102,28 @@ private:
 									uint32 y = UINT32_MAX);
 			void				_InvalidateKeyboardFocus(uint32 x, uint32 y);
 			void				_InsertKey(char rawKey, int32 modifiers);
-			void				_SetValueHintValue(uint32 value);
-			void				_RemoveHint();
+			bool				_GetHintFieldFor(BPoint where, uint32 x,
+									uint32 y, uint32& hintX, uint32& hintY);
+			bool				_GetFieldFor(BPoint where, uint32& x,
+									uint32& y);
 			void				_ToggleValue(uint32 x, uint32 y, uint32 value,
 									uint32 field);
 			void				_ToggleHintValue(uint32 x, uint32 y,
 									uint32 hintX, uint32 hintY,
 									uint32 value, uint32 field);
-			bool				_GetHintFieldFor(BPoint where, uint32 x,
-									uint32 y, uint32& hintX, uint32& hintY);
-			bool				_GetFieldFor(BPoint where, uint32& x,
-									uint32& y);
-			void				_FitFont(BFont& font, float width,
-									float height);
-			void				_DrawKeyboardFocus();
-			void				_DrawHints(uint32 x, uint32 y);
-			void				_UndoRedo(BObjectList<BMessage>& undos,
-									BObjectList<BMessage>& redos);
-			void				_PushUndo();
 			void				_SetAllHints();
 			void				_Solve();
 			void				_SolveSingle();
 			bool				_GetSolutions(SudokuSolver& solver);
+			void				_UndoRedo(BObjectList<BMessage>& undos,
+									BObjectList<BMessage>& redos);
+			void				_PushUndo();
+			void				_SetValueHintValue(uint32 value);
+			void				_RemoveHint();
+			void				_FitFont(BFont& font, float width,
+									float height);
+			void				_DrawKeyboardFocus();
+			void				_DrawHints(uint32 x, uint32 y);
 
 private:
 			rgb_color			fBackgroundColor;

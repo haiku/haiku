@@ -45,10 +45,11 @@ extern const char* kSignature;
 
 SudokuView::SudokuView(BRect frame, const char* name,
 		const BMessage& settings, uint32 resizingMode)
-	: BView(frame, name, resizingMode,
+	:
+	BView(frame, name, resizingMode,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 {
-	InitObject(&settings);
+	_InitObject(&settings);
 
 #if 0
 	BRect rect(Bounds());
@@ -61,9 +62,10 @@ SudokuView::SudokuView(BRect frame, const char* name,
 
 
 SudokuView::SudokuView(BMessage* archive)
-	: BView(archive)
+	:
+	BView(archive)
 {
-	InitObject(archive);
+	_InitObject(archive);
 }
 
 
@@ -106,46 +108,6 @@ SudokuView::Instantiate(BMessage* archive)
 }
 
 
-void
-SudokuView::InitObject(const BMessage* archive)
-{
-	fField = NULL;
-	fShowHintX = UINT32_MAX;
-	fValueHintValue = UINT32_MAX;
-	fLastHintValue = UINT32_MAX;
-	fLastField = UINT32_MAX;
-	fKeyboardX = 0;
-	fKeyboardY = 0;
-	fShowKeyboardFocus = false;
-	fEditable = true;
-
-	BMessage field;
-	if (archive->FindMessage("field", &field) == B_OK) {
-		fField = new SudokuField(&field);
-		if (fField->InitCheck() != B_OK) {
-			delete fField;
-			fField = NULL;
-		} else if (fField->IsSolved())
-			ClearAll();
-	}
-	if (fField == NULL)
-		fField = new SudokuField(3);
-
-	fBlockSize = fField->BlockSize();
-
-	if (archive->FindInt32("hint flags", (int32*)&fHintFlags) != B_OK)
-		fHintFlags = kMarkInvalid;
-	if (archive->FindBool("show cursor", &fShowCursor) != B_OK)
-		fShowCursor = false;
-
-	SetViewColor(B_TRANSPARENT_COLOR);
-		// to avoid flickering
-	fBackgroundColor = kBackgroundColor;
-	SetLowColor(fBackgroundColor);
-	FrameResized(0, 0);
-}
-
-
 status_t
 SudokuView::SaveState(BMessage& state) const
 {
@@ -159,35 +121,6 @@ SudokuView::SaveState(BMessage& state) const
 		status = state.AddBool("show cursor", fShowCursor);
 
 	return status;
-}
-
-
-status_t
-SudokuView::_FilterString(const char* data, size_t dataLength, char* buffer,
-	uint32& out, bool& ignore)
-{
-	uint32 maxOut = fField->Size() * fField->Size();
-
-	for (uint32 i = 0; i < dataLength && data[i]; i++) {
-		if (data[i] == '#')
-			ignore = true;
-		else if (data[i] == '\n')
-			ignore = false;
-
-		if (ignore || isspace(data[i]))
-			continue;
-
-		if (!_ValidCharacter(data[i])) {
-			return B_BAD_VALUE;
-		}
-
-		buffer[out++] = data[i];
-		if (out == maxOut)
-			break;
-	}
-
-	buffer[out] = '\0';
-	return B_OK;
 }
 
 
@@ -593,27 +526,26 @@ SudokuView::SetEditable(bool editable)
 
 
 void
-SudokuView::AttachedToWindow()
+SudokuView::Undo()
 {
-	MakeFocus(true);
+	_UndoRedo(fUndos, fRedos);
 }
 
 
 void
-SudokuView::_FitFont(BFont& font, float fieldWidth, float fieldHeight)
+SudokuView::Redo()
 {
-	font.SetSize(100);
+	_UndoRedo(fRedos, fUndos);
+}
 
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
 
-	float width = font.StringWidth("W");
-	float height = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
+// #pragma mark - BWindow methods
 
-	float factor = fieldWidth != fHintWidth ? 4.f / 5.f : 1.f;
-	float widthFactor = fieldWidth / (width / factor);
-	float heightFactor = fieldHeight / (height / factor);
-	font.SetSize(100 * min_c(widthFactor, heightFactor));
+
+void
+SudokuView::AttachedToWindow()
+{
+	MakeFocus(true);
 }
 
 
@@ -647,248 +579,6 @@ SudokuView::FrameResized(float /*width*/, float /*height*/)
 	BView *dragger = FindView("_dragger_");
 	if (dragger)
 		dragger->MoveTo(Bounds().right - 7, Bounds().bottom - 7);
-}
-
-
-BPoint
-SudokuView::_LeftTop(uint32 x, uint32 y)
-{
-	return BPoint(x * fWidth - 1 + x / fBlockSize * kStrongLineSize + 1,
-		y * fHeight - 1 + y / fBlockSize * kStrongLineSize + 1);
-}
-
-
-BRect
-SudokuView::_Frame(uint32 x, uint32 y)
-{
-	BPoint leftTop = _LeftTop(x, y);
-	BPoint rightBottom = leftTop + BPoint(fWidth - 2, fHeight - 2);
-
-	return BRect(leftTop, rightBottom);
-}
-
-
-void
-SudokuView::_InvalidateHintField(uint32 x, uint32 y, uint32 hintX,
-	uint32 hintY)
-{
-	BPoint leftTop = _LeftTop(x, y);
-	leftTop.x += hintX * fHintWidth;
-	leftTop.y += hintY * fHintHeight;
-	BPoint rightBottom = leftTop;
-	rightBottom.x += fHintWidth;
-	rightBottom.y += fHintHeight;
-
-	Invalidate(BRect(leftTop, rightBottom));
-}
-
-
-void
-SudokuView::_InvalidateField(uint32 x, uint32 y)
-{
-	Invalidate(_Frame(x, y));
-}
-
-
-void
-SudokuView::_InvalidateValue(uint32 value, bool invalidateHint,
-	uint32 fieldX, uint32 fieldY)
-{
-	for (uint32 y = 0; y < fField->Size(); y++) {
-		for (uint32 x = 0; x < fField->Size(); x++) {
-			if (fField->ValueAt(x, y) == value || (x == fieldX && y == fieldY))
-				Invalidate(_Frame(x, y));
-			else if (invalidateHint && fField->ValueAt(x, y) == 0
-				&& fField->HasHint(x, y, value))
-				Invalidate(_Frame(x, y));
-		}
-	}
-}
-
-
-void
-SudokuView::_InvalidateKeyboardFocus(uint32 x, uint32 y)
-{
-	BRect frame = _Frame(x, y);
-	frame.InsetBy(-1, -1);
-	Invalidate(frame);
-}
-
-
-bool
-SudokuView::_GetHintFieldFor(BPoint where, uint32 x, uint32 y,
-	uint32& hintX, uint32& hintY)
-{
-	BPoint leftTop = _LeftTop(x, y);
-	hintX = (uint32)floor((where.x - leftTop.x) / fHintWidth);
-	hintY = (uint32)floor((where.y - leftTop.y) / fHintHeight);
-
-	if (hintX >= fBlockSize || hintY >= fBlockSize)
-		return false;
-
-	return true;
-}
-
-
-bool
-SudokuView::_GetFieldFor(BPoint where, uint32& x, uint32& y)
-{
-	float block = fWidth * fBlockSize + kStrongLineSize;
-	x = (uint32)floor(where.x / block);
-	uint32 offsetX = (uint32)floor((where.x - x * block) / fWidth);
-	x = x * fBlockSize + offsetX;
-
-	block = fHeight * fBlockSize + kStrongLineSize;
-	y = (uint32)floor(where.y / block);
-	uint32 offsetY = (uint32)floor((where.y - y * block) / fHeight);
-	y = y * fBlockSize + offsetY;
-
-	if (offsetX >= fBlockSize || offsetY >= fBlockSize
-		|| x >= fField->Size() || y >= fField->Size())
-		return false;
-
-	return true;
-}
-
-
-void
-SudokuView::_SetValueHintValue(uint32 value)
-{
-	if (value == fValueHintValue)
-		return;
-
-	if (fValueHintValue != UINT32_MAX)
-		_InvalidateValue(fValueHintValue, true);
-
-	fValueHintValue = value;
-
-	if (fValueHintValue != UINT32_MAX)
-		_InvalidateValue(fValueHintValue, true);
-}
-
-
-void
-SudokuView::_RemoveHint()
-{
-	if (fShowHintX == UINT32_MAX)
-		return;
-
-	uint32 x = fShowHintX;
-	uint32 y = fShowHintY;
-	fShowHintX = UINT32_MAX;
-	fShowHintY = UINT32_MAX;
-
-	_InvalidateField(x, y);
-}
-
-
-void
-SudokuView::_ToggleValue(uint32 x, uint32 y, uint32 value, uint32 field)
-{
-	bool wasCompleted;
-	if (fField->ValueAt(x, y) > 0) {
-		// Remove value
-		value = fField->ValueAt(x, y) - 1;
-		wasCompleted = fField->IsValueCompleted(value + 1);
-
-		fField->SetValueAt(x, y, 0);
-		fShowHintX = x;
-		fShowHintY = y;
-	} else {
-		// Set value
-		wasCompleted = fField->IsValueCompleted(value + 1);
-
-		fField->SetValueAt(x, y, value + 1);
-		BMessenger(this).SendMessage(kMsgCheckSolved);
-
-		// allow dragging to remove the hint from other fields
-		fLastHintValueSet = false;
-		fLastHintValue = value;
-		fLastField = field;
-	}
-
-	if (value + 1 != fValueHintValue && fValueHintValue != ~0UL)
-		_SetValueHintValue(value + 1);
-
-	if (wasCompleted != fField->IsValueCompleted(value + 1))
-		_InvalidateValue(value + 1, false, x, y);
-	else
-		_InvalidateField(x, y);
-}
-
-
-void
-SudokuView::_ToggleHintValue(uint32 x, uint32 y, uint32 hintX, uint32 hintY,
-	uint32 value, uint32 field)
-{
-	uint32 hintMask = fField->HintMaskAt(x, y);
-	uint32 valueMask = 1UL << value;
-	fLastHintValueSet = (hintMask & valueMask) == 0;
-
-	if (fLastHintValueSet)
-		hintMask |= valueMask;
-	else
-		hintMask &= ~valueMask;
-
-	fField->SetHintMaskAt(x, y, hintMask);
-
-	if (value + 1 != fValueHintValue) {
-		_SetValueHintValue(UINT32_MAX);
-		_InvalidateHintField(x, y, hintX, hintY);
-	} else
-		_InvalidateField(x, y);
-
-	fLastHintValue = value;
-	fLastField = field;
-}
-
-
-void
-SudokuView::_UndoRedo(BObjectList<BMessage>& undos,
-	BObjectList<BMessage>& redos)
-{
-	if (undos.IsEmpty())
-		return;
-
-	BMessage* undo = undos.RemoveItemAt(undos.CountItems() - 1);
-
-	BMessage* redo = new BMessage;
-	if (fField->Archive(redo, true) == B_OK)
-		redos.AddItem(redo);
-
-	SudokuField field(undo);
-	delete undo;
-
-	fField->SetTo(&field);
-
-	SendNotices(kUndoRedoChanged);
-	Invalidate();
-}
-
-
-void
-SudokuView::Undo()
-{
-	_UndoRedo(fUndos, fRedos);
-}
-
-
-void
-SudokuView::Redo()
-{
-	_UndoRedo(fRedos, fUndos);
-}
-
-
-void
-SudokuView::_PushUndo()
-{
-	fRedos.MakeEmpty();
-
-	BMessage* undo = new BMessage;
-	if (fField->Archive(undo, true) == B_OK
-		&& fUndos.AddItem(undo))
-		SendNotices(kUndoRedoChanged);
 }
 
 
@@ -991,39 +681,6 @@ SudokuView::MouseMoved(BPoint where, uint32 transit,
 	fShowHintX = x;
 	fShowHintY = y;
 	_InvalidateField(x, y);
-}
-
-
-void
-SudokuView::_InsertKey(char rawKey, int32 modifiers)
-{
-	if (!fEditable || !_ValidCharacter(rawKey)
-		|| fField->IsInitialValue(fKeyboardX, fKeyboardY))
-		return;
-
-	uint32 value = rawKey - _BaseCharacter();
-
-	if (modifiers & (B_SHIFT_KEY | B_OPTION_KEY)) {
-		// set or remove hint
-		if (value == 0)
-			return;
-
-		_PushUndo();
-		uint32 hintMask = fField->HintMaskAt(fKeyboardX, fKeyboardY);
-		uint32 valueMask = 1UL << (value - 1);
-		if (modifiers & B_OPTION_KEY)
-			hintMask &= ~valueMask;
-		else
-			hintMask |= valueMask;
-
-		fField->SetValueAt(fKeyboardX, fKeyboardY, 0);
-		fField->SetHintMaskAt(fKeyboardX, fKeyboardY, hintMask);
-	} else {
-		_PushUndo();
-		fField->SetValueAt(fKeyboardX, fKeyboardY, value);
-		if (value)
-			BMessenger(this).SendMessage(kMsgCheckSolved);
-	}
 }
 
 
@@ -1135,81 +792,6 @@ SudokuView::MessageReceived(BMessage* message)
 }
 
 
-char
-SudokuView::_BaseCharacter()
-{
-	return fField->Size() > 9 ? '@' : '0';
-}
-
-
-bool
-SudokuView::_ValidCharacter(char c)
-{
-	char min = _BaseCharacter();
-	char max = min + fField->Size();
-	return c >= min && c <= max;
-}
-
-
-void
-SudokuView::_SetText(char* text, uint32 value)
-{
-	text[0] = value + _BaseCharacter();
-	text[1] = '\0';
-}
-
-
-void
-SudokuView::_DrawKeyboardFocus()
-{
-	BRect frame = _Frame(fKeyboardX, fKeyboardY);
-	SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-	StrokeRect(frame);
-	frame.InsetBy(-1, -1);
-	StrokeRect(frame);
-	frame.InsetBy(2, 2);
-	StrokeRect(frame);
-}
-
-
-void
-SudokuView::_DrawHints(uint32 x, uint32 y)
-{
-	bool showAll = fShowHintX == x && fShowHintY == y;
-	uint32 hintMask = fField->HintMaskAt(x, y);
-	if (hintMask == 0 && !showAll)
-		return;
-
-	uint32 validMask = fField->ValidMaskAt(x, y);
-	BPoint leftTop = _LeftTop(x, y);
-	SetFont(&fHintFont);
-
-	for (uint32 j = 0; j < fBlockSize; j++) {
-		for (uint32 i = 0; i < fBlockSize; i++) {
-			uint32 value = j * fBlockSize + i;
-			if ((hintMask & (1UL << value)) != 0) {
-				SetHighColor(kHintColor);
-			} else {
-				if (!showAll)
-					continue;
-
-				if ((fHintFlags & kMarkValidHints) == 0
-					|| (validMask & (1UL << value)) != 0)
-					SetHighColor(110, 110, 80);
-				else
-					SetHighColor(180, 180, 120);
-			}
-
-			char text[2];
-			_SetText(text, value + 1);
-			DrawString(text, leftTop + BPoint((i + 0.5f) * fHintWidth
-				- StringWidth(text) / 2, floorf(j * fHintHeight)
-					+ fHintBaseline));
-		}
-	}
-}
-
-
 void
 SudokuView::Draw(BRect /*updateRect*/)
 {
@@ -1299,6 +881,297 @@ SudokuView::Draw(BRect /*updateRect*/)
 }
 
 
+// #pragma mark - Private methods
+
+
+void
+SudokuView::_InitObject(const BMessage* archive)
+{
+	fField = NULL;
+	fShowHintX = UINT32_MAX;
+	fValueHintValue = UINT32_MAX;
+	fLastHintValue = UINT32_MAX;
+	fLastField = UINT32_MAX;
+	fKeyboardX = 0;
+	fKeyboardY = 0;
+	fShowKeyboardFocus = false;
+	fEditable = true;
+
+	BMessage field;
+	if (archive->FindMessage("field", &field) == B_OK) {
+		fField = new SudokuField(&field);
+		if (fField->InitCheck() != B_OK) {
+			delete fField;
+			fField = NULL;
+		} else if (fField->IsSolved())
+			ClearAll();
+	}
+	if (fField == NULL)
+		fField = new SudokuField(3);
+
+	fBlockSize = fField->BlockSize();
+
+	if (archive->FindInt32("hint flags", (int32*)&fHintFlags) != B_OK)
+		fHintFlags = kMarkInvalid;
+	if (archive->FindBool("show cursor", &fShowCursor) != B_OK)
+		fShowCursor = false;
+
+	SetViewColor(B_TRANSPARENT_COLOR);
+		// to avoid flickering
+	fBackgroundColor = kBackgroundColor;
+	SetLowColor(fBackgroundColor);
+	FrameResized(0, 0);
+}
+
+
+status_t
+SudokuView::_FilterString(const char* data, size_t dataLength, char* buffer,
+	uint32& out, bool& ignore)
+{
+	uint32 maxOut = fField->Size() * fField->Size();
+
+	for (uint32 i = 0; i < dataLength && data[i]; i++) {
+		if (data[i] == '#')
+			ignore = true;
+		else if (data[i] == '\n')
+			ignore = false;
+
+		if (ignore || isspace(data[i]))
+			continue;
+
+		if (!_ValidCharacter(data[i])) {
+			return B_BAD_VALUE;
+		}
+
+		buffer[out++] = data[i];
+		if (out == maxOut)
+			break;
+	}
+
+	buffer[out] = '\0';
+	return B_OK;
+}
+
+
+void
+SudokuView::_SetText(char* text, uint32 value)
+{
+	text[0] = value + _BaseCharacter();
+	text[1] = '\0';
+}
+
+
+char
+SudokuView::_BaseCharacter()
+{
+	return fField->Size() > 9 ? '@' : '0';
+}
+
+
+bool
+SudokuView::_ValidCharacter(char c)
+{
+	char min = _BaseCharacter();
+	char max = min + fField->Size();
+	return c >= min && c <= max;
+}
+
+
+BPoint
+SudokuView::_LeftTop(uint32 x, uint32 y)
+{
+	return BPoint(x * fWidth - 1 + x / fBlockSize * kStrongLineSize + 1,
+		y * fHeight - 1 + y / fBlockSize * kStrongLineSize + 1);
+}
+
+
+BRect
+SudokuView::_Frame(uint32 x, uint32 y)
+{
+	BPoint leftTop = _LeftTop(x, y);
+	BPoint rightBottom = leftTop + BPoint(fWidth - 2, fHeight - 2);
+
+	return BRect(leftTop, rightBottom);
+}
+
+
+void
+SudokuView::_InvalidateHintField(uint32 x, uint32 y, uint32 hintX,
+	uint32 hintY)
+{
+	BPoint leftTop = _LeftTop(x, y);
+	leftTop.x += hintX * fHintWidth;
+	leftTop.y += hintY * fHintHeight;
+	BPoint rightBottom = leftTop;
+	rightBottom.x += fHintWidth;
+	rightBottom.y += fHintHeight;
+
+	Invalidate(BRect(leftTop, rightBottom));
+}
+
+
+void
+SudokuView::_InvalidateField(uint32 x, uint32 y)
+{
+	Invalidate(_Frame(x, y));
+}
+
+
+void
+SudokuView::_InvalidateValue(uint32 value, bool invalidateHint,
+	uint32 fieldX, uint32 fieldY)
+{
+	for (uint32 y = 0; y < fField->Size(); y++) {
+		for (uint32 x = 0; x < fField->Size(); x++) {
+			if (fField->ValueAt(x, y) == value || (x == fieldX && y == fieldY))
+				Invalidate(_Frame(x, y));
+			else if (invalidateHint && fField->ValueAt(x, y) == 0
+				&& fField->HasHint(x, y, value))
+				Invalidate(_Frame(x, y));
+		}
+	}
+}
+
+
+void
+SudokuView::_InvalidateKeyboardFocus(uint32 x, uint32 y)
+{
+	BRect frame = _Frame(x, y);
+	frame.InsetBy(-1, -1);
+	Invalidate(frame);
+}
+
+
+void
+SudokuView::_InsertKey(char rawKey, int32 modifiers)
+{
+	if (!fEditable || !_ValidCharacter(rawKey)
+		|| fField->IsInitialValue(fKeyboardX, fKeyboardY))
+		return;
+
+	uint32 value = rawKey - _BaseCharacter();
+
+	if (modifiers & (B_SHIFT_KEY | B_OPTION_KEY)) {
+		// set or remove hint
+		if (value == 0)
+			return;
+
+		_PushUndo();
+		uint32 hintMask = fField->HintMaskAt(fKeyboardX, fKeyboardY);
+		uint32 valueMask = 1UL << (value - 1);
+		if (modifiers & B_OPTION_KEY)
+			hintMask &= ~valueMask;
+		else
+			hintMask |= valueMask;
+
+		fField->SetValueAt(fKeyboardX, fKeyboardY, 0);
+		fField->SetHintMaskAt(fKeyboardX, fKeyboardY, hintMask);
+	} else {
+		_PushUndo();
+		fField->SetValueAt(fKeyboardX, fKeyboardY, value);
+		if (value)
+			BMessenger(this).SendMessage(kMsgCheckSolved);
+	}
+}
+
+
+bool
+SudokuView::_GetHintFieldFor(BPoint where, uint32 x, uint32 y,
+	uint32& hintX, uint32& hintY)
+{
+	BPoint leftTop = _LeftTop(x, y);
+	hintX = (uint32)floor((where.x - leftTop.x) / fHintWidth);
+	hintY = (uint32)floor((where.y - leftTop.y) / fHintHeight);
+
+	if (hintX >= fBlockSize || hintY >= fBlockSize)
+		return false;
+
+	return true;
+}
+
+
+bool
+SudokuView::_GetFieldFor(BPoint where, uint32& x, uint32& y)
+{
+	float block = fWidth * fBlockSize + kStrongLineSize;
+	x = (uint32)floor(where.x / block);
+	uint32 offsetX = (uint32)floor((where.x - x * block) / fWidth);
+	x = x * fBlockSize + offsetX;
+
+	block = fHeight * fBlockSize + kStrongLineSize;
+	y = (uint32)floor(where.y / block);
+	uint32 offsetY = (uint32)floor((where.y - y * block) / fHeight);
+	y = y * fBlockSize + offsetY;
+
+	if (offsetX >= fBlockSize || offsetY >= fBlockSize
+		|| x >= fField->Size() || y >= fField->Size())
+		return false;
+
+	return true;
+}
+
+
+void
+SudokuView::_ToggleValue(uint32 x, uint32 y, uint32 value, uint32 field)
+{
+	bool wasCompleted;
+	if (fField->ValueAt(x, y) > 0) {
+		// Remove value
+		value = fField->ValueAt(x, y) - 1;
+		wasCompleted = fField->IsValueCompleted(value + 1);
+
+		fField->SetValueAt(x, y, 0);
+		fShowHintX = x;
+		fShowHintY = y;
+	} else {
+		// Set value
+		wasCompleted = fField->IsValueCompleted(value + 1);
+
+		fField->SetValueAt(x, y, value + 1);
+		BMessenger(this).SendMessage(kMsgCheckSolved);
+
+		// allow dragging to remove the hint from other fields
+		fLastHintValueSet = false;
+		fLastHintValue = value;
+		fLastField = field;
+	}
+
+	if (value + 1 != fValueHintValue && fValueHintValue != ~0UL)
+		_SetValueHintValue(value + 1);
+
+	if (wasCompleted != fField->IsValueCompleted(value + 1))
+		_InvalidateValue(value + 1, false, x, y);
+	else
+		_InvalidateField(x, y);
+}
+
+
+void
+SudokuView::_ToggleHintValue(uint32 x, uint32 y, uint32 hintX, uint32 hintY,
+	uint32 value, uint32 field)
+{
+	uint32 hintMask = fField->HintMaskAt(x, y);
+	uint32 valueMask = 1UL << value;
+	fLastHintValueSet = (hintMask & valueMask) == 0;
+
+	if (fLastHintValueSet)
+		hintMask |= valueMask;
+	else
+		hintMask &= ~valueMask;
+
+	fField->SetHintMaskAt(x, y, hintMask);
+
+	if (value + 1 != fValueHintValue) {
+		_SetValueHintValue(UINT32_MAX);
+		_InvalidateHintField(x, y, hintX, hintY);
+	} else
+		_InvalidateField(x, y);
+
+	fLastHintValue = value;
+	fLastField = field;
+}
+
+
 void
 SudokuView::_SetAllHints()
 {
@@ -1365,4 +1238,139 @@ SudokuView::_GetSolutions(SudokuSolver& solver)
 		solver.CountSolutions(), (system_time() - start) / 1000.0);
 
 	return solver.CountSolutions() > 0;
+}
+
+
+void
+SudokuView::_UndoRedo(BObjectList<BMessage>& undos,
+	BObjectList<BMessage>& redos)
+{
+	if (undos.IsEmpty())
+		return;
+
+	BMessage* undo = undos.RemoveItemAt(undos.CountItems() - 1);
+
+	BMessage* redo = new BMessage;
+	if (fField->Archive(redo, true) == B_OK)
+		redos.AddItem(redo);
+
+	SudokuField field(undo);
+	delete undo;
+
+	fField->SetTo(&field);
+
+	SendNotices(kUndoRedoChanged);
+	Invalidate();
+}
+
+
+void
+SudokuView::_PushUndo()
+{
+	fRedos.MakeEmpty();
+
+	BMessage* undo = new BMessage;
+	if (fField->Archive(undo, true) == B_OK
+		&& fUndos.AddItem(undo))
+		SendNotices(kUndoRedoChanged);
+}
+
+
+void
+SudokuView::_SetValueHintValue(uint32 value)
+{
+	if (value == fValueHintValue)
+		return;
+
+	if (fValueHintValue != UINT32_MAX)
+		_InvalidateValue(fValueHintValue, true);
+
+	fValueHintValue = value;
+
+	if (fValueHintValue != UINT32_MAX)
+		_InvalidateValue(fValueHintValue, true);
+}
+
+
+void
+SudokuView::_RemoveHint()
+{
+	if (fShowHintX == UINT32_MAX)
+		return;
+
+	uint32 x = fShowHintX;
+	uint32 y = fShowHintY;
+	fShowHintX = UINT32_MAX;
+	fShowHintY = UINT32_MAX;
+
+	_InvalidateField(x, y);
+}
+
+
+void
+SudokuView::_FitFont(BFont& font, float fieldWidth, float fieldHeight)
+{
+	font.SetSize(100);
+
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
+
+	float width = font.StringWidth("W");
+	float height = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
+
+	float factor = fieldWidth != fHintWidth ? 4.f / 5.f : 1.f;
+	float widthFactor = fieldWidth / (width / factor);
+	float heightFactor = fieldHeight / (height / factor);
+	font.SetSize(100 * min_c(widthFactor, heightFactor));
+}
+
+
+void
+SudokuView::_DrawKeyboardFocus()
+{
+	BRect frame = _Frame(fKeyboardX, fKeyboardY);
+	SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+	StrokeRect(frame);
+	frame.InsetBy(-1, -1);
+	StrokeRect(frame);
+	frame.InsetBy(2, 2);
+	StrokeRect(frame);
+}
+
+
+void
+SudokuView::_DrawHints(uint32 x, uint32 y)
+{
+	bool showAll = fShowHintX == x && fShowHintY == y;
+	uint32 hintMask = fField->HintMaskAt(x, y);
+	if (hintMask == 0 && !showAll)
+		return;
+
+	uint32 validMask = fField->ValidMaskAt(x, y);
+	BPoint leftTop = _LeftTop(x, y);
+	SetFont(&fHintFont);
+
+	for (uint32 j = 0; j < fBlockSize; j++) {
+		for (uint32 i = 0; i < fBlockSize; i++) {
+			uint32 value = j * fBlockSize + i;
+			if ((hintMask & (1UL << value)) != 0) {
+				SetHighColor(kHintColor);
+			} else {
+				if (!showAll)
+					continue;
+
+				if ((fHintFlags & kMarkValidHints) == 0
+					|| (validMask & (1UL << value)) != 0)
+					SetHighColor(110, 110, 80);
+				else
+					SetHighColor(180, 180, 120);
+			}
+
+			char text[2];
+			_SetText(text, value + 1);
+			DrawString(text, leftTop + BPoint((i + 0.5f) * fHintWidth
+				- StringWidth(text) / 2, floorf(j * fHintHeight)
+					+ fHintBaseline));
+		}
+	}
 }
