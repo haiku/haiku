@@ -215,112 +215,122 @@ KeyboardLayoutView::MouseDown(BPoint point)
 		&& (modifiers() & B_CONTROL_KEY) != 0)) {
 		// secondary mouse button, pop up a swap context menu
 		if (!is_mappable_to_modifier(key->code)) {
-			// ToDo: pop up a list of alternative characters
-			fButtons = buttons;
-			return;
+			// ToDo: Pop up a list of alternative characters to map
+			// the key to. Currently we only add an option to remove the
+			// current key mapping.
+			BPopUpMenu* alternativesPopUp = new BPopUpMenu(
+				"Alternatives pop up", true, true, B_ITEMS_IN_COLUMN);
+			BMessage* message = new BMessage(kMsgUpdateNormalKeys);
+			message->AddUInt32("keyCode", key->code);
+			message->AddBool("unset", true);
+			alternativesPopUp->AddItem(new BMenuItem(B_TRANSLATE("Remove"),
+				message));
+			alternativesPopUp->SetAsyncAutoDestruct(true);
+			if (alternativesPopUp->SetTargetForItems(Window()) == B_OK)
+				alternativesPopUp->Go(ConvertToScreen(point), true);
+		} else {
+			// pop up the modifier keys menu
+			BPopUpMenu* modifiersPopUp = new BPopUpMenu("Modifiers pop up",
+				true, true, B_ITEMS_IN_COLUMN);
+			const key_map& map = fKeymap->Map();
+			bool isLockKey = is_lock_key(key->code);
+			BMenuItem* item = NULL;
+
+			if (is_left_modifier_key(key->code) || isLockKey) {
+				item = _CreateSwapModifiersMenuItem(B_LEFT_SHIFT_KEY,
+					isLockKey ? B_LEFT_SHIFT_KEY : B_SHIFT_KEY,
+					map.left_shift_key, key->code);
+				modifiersPopUp->AddItem(item);
+				if (key->code == map.left_shift_key)
+					item->SetMarked(true);
+
+				item = _CreateSwapModifiersMenuItem(B_LEFT_CONTROL_KEY,
+					isLockKey ? B_LEFT_CONTROL_KEY : B_CONTROL_KEY,
+					map.left_control_key, key->code);
+				modifiersPopUp->AddItem(item);
+				if (key->code == map.left_control_key)
+					item->SetMarked(true);
+
+				item = _CreateSwapModifiersMenuItem(B_LEFT_OPTION_KEY,
+					isLockKey ? B_LEFT_OPTION_KEY : B_OPTION_KEY,
+					map.left_option_key, key->code);
+				modifiersPopUp->AddItem(item);
+				if (key->code == map.left_option_key)
+					item->SetMarked(true);
+
+				item = _CreateSwapModifiersMenuItem(B_LEFT_COMMAND_KEY,
+					isLockKey ? B_LEFT_COMMAND_KEY : B_COMMAND_KEY,
+					map.left_command_key, key->code);
+				modifiersPopUp->AddItem(item);
+				if (key->code == map.left_command_key)
+					item->SetMarked(true);
+			}
+
+			if (is_right_modifier_key(key->code) || isLockKey) {
+				if (isLockKey)
+					modifiersPopUp->AddSeparatorItem();
+
+				item = _CreateSwapModifiersMenuItem(B_RIGHT_SHIFT_KEY,
+					isLockKey ? B_RIGHT_SHIFT_KEY : B_SHIFT_KEY,
+					map.right_shift_key, key->code);
+				modifiersPopUp->AddItem(item);
+				if (key->code == map.right_shift_key)
+					item->SetMarked(true);
+
+				item = _CreateSwapModifiersMenuItem(B_RIGHT_CONTROL_KEY,
+					isLockKey ? B_RIGHT_CONTROL_KEY : B_CONTROL_KEY,
+					map.right_control_key, key->code);
+				modifiersPopUp->AddItem(item);
+				if (key->code == map.right_control_key)
+					item->SetMarked(true);
+			}
+
+			item = _CreateSwapModifiersMenuItem(B_MENU_KEY, B_MENU_KEY,
+				map.menu_key, key->code);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.menu_key)
+				item->SetMarked(true);
+
+			if (is_right_modifier_key(key->code) || isLockKey) {
+				item = _CreateSwapModifiersMenuItem(B_RIGHT_OPTION_KEY,
+					isLockKey ? B_RIGHT_OPTION_KEY : B_OPTION_KEY,
+					map.right_option_key, key->code);
+				modifiersPopUp->AddItem(item);
+				if (key->code == map.right_option_key)
+					item->SetMarked(true);
+
+				item = _CreateSwapModifiersMenuItem(B_RIGHT_COMMAND_KEY,
+					isLockKey ? B_RIGHT_COMMAND_KEY : B_COMMAND_KEY,
+					map.right_command_key, key->code);
+				modifiersPopUp->AddItem(item);
+				if (key->code == map.right_command_key)
+					item->SetMarked(true);
+			}
+
+			modifiersPopUp->AddSeparatorItem();
+
+			item = _CreateSwapModifiersMenuItem(B_CAPS_LOCK, B_CAPS_LOCK,
+				map.caps_key, key->code);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.caps_key)
+				item->SetMarked(true);
+
+			item = _CreateSwapModifiersMenuItem(B_NUM_LOCK, B_NUM_LOCK,
+				map.num_key, key->code);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.num_key)
+				item->SetMarked(true);
+
+			item = _CreateSwapModifiersMenuItem(B_SCROLL_LOCK, B_SCROLL_LOCK,
+				map.scroll_key, key->code);
+			modifiersPopUp->AddItem(item);
+			if (key->code == map.scroll_key)
+				item->SetMarked(true);
+
+			modifiersPopUp->SetAsyncAutoDestruct(true);
+			if (modifiersPopUp->SetTargetForItems(Window()) == B_OK)
+				modifiersPopUp->Go(ConvertToScreen(point), true);
 		}
-
-		// pop up the modifier keys menu
-		BPopUpMenu* modifiersPopUp = new BPopUpMenu("Modifiers pop up",
-			true, true, B_ITEMS_IN_COLUMN);
-		const key_map& map = fKeymap->Map();
-		bool isLockKey = is_lock_key(key->code);
-		BMenuItem* item = NULL;
-
-		if (is_left_modifier_key(key->code) || isLockKey) {
-			item = _CreateSwapModifiersMenuItem(B_LEFT_SHIFT_KEY,
-				isLockKey ? B_LEFT_SHIFT_KEY : B_SHIFT_KEY,
-				map.left_shift_key, key->code);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.left_shift_key)
-				item->SetMarked(true);
-
-			item = _CreateSwapModifiersMenuItem(B_LEFT_CONTROL_KEY,
-				isLockKey ? B_LEFT_CONTROL_KEY : B_CONTROL_KEY,
-				map.left_control_key, key->code);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.left_control_key)
-				item->SetMarked(true);
-
-			item = _CreateSwapModifiersMenuItem(B_LEFT_OPTION_KEY,
-				isLockKey ? B_LEFT_OPTION_KEY : B_OPTION_KEY,
-				map.left_option_key, key->code);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.left_option_key)
-				item->SetMarked(true);
-
-			item = _CreateSwapModifiersMenuItem(B_LEFT_COMMAND_KEY,
-				isLockKey ? B_LEFT_COMMAND_KEY : B_COMMAND_KEY,
-				map.left_command_key, key->code);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.left_command_key)
-				item->SetMarked(true);
-		}
-
-		if (is_right_modifier_key(key->code) || isLockKey) {
-			if (isLockKey)
-				modifiersPopUp->AddSeparatorItem();
-
-			item = _CreateSwapModifiersMenuItem(B_RIGHT_SHIFT_KEY,
-				isLockKey ? B_RIGHT_SHIFT_KEY : B_SHIFT_KEY,
-				map.right_shift_key, key->code);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.right_shift_key)
-				item->SetMarked(true);
-
-			item = _CreateSwapModifiersMenuItem(B_RIGHT_CONTROL_KEY,
-				isLockKey ? B_RIGHT_CONTROL_KEY : B_CONTROL_KEY,
-				map.right_control_key, key->code);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.right_control_key)
-				item->SetMarked(true);
-		}
-
-		item = _CreateSwapModifiersMenuItem(B_MENU_KEY, B_MENU_KEY,
-			map.menu_key, key->code);
-		modifiersPopUp->AddItem(item);
-		if (key->code == map.menu_key)
-			item->SetMarked(true);
-
-		if (is_right_modifier_key(key->code) || isLockKey) {
-			item = _CreateSwapModifiersMenuItem(B_RIGHT_OPTION_KEY,
-				isLockKey ? B_RIGHT_OPTION_KEY : B_OPTION_KEY,
-				map.right_option_key, key->code);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.right_option_key)
-				item->SetMarked(true);
-
-			item = _CreateSwapModifiersMenuItem(B_RIGHT_COMMAND_KEY,
-				isLockKey ? B_RIGHT_COMMAND_KEY : B_COMMAND_KEY,
-				map.right_command_key, key->code);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.right_command_key)
-				item->SetMarked(true);
-		}
-
-		modifiersPopUp->AddSeparatorItem();
-
-		item = _CreateSwapModifiersMenuItem(B_CAPS_LOCK, B_CAPS_LOCK,
-			map.caps_key, key->code);
-		modifiersPopUp->AddItem(item);
-		if (key->code == map.caps_key)
-			item->SetMarked(true);
-
-		item = _CreateSwapModifiersMenuItem(B_NUM_LOCK, B_NUM_LOCK,
-			map.num_key, key->code);
-		modifiersPopUp->AddItem(item);
-		if (key->code == map.num_key)
-			item->SetMarked(true);
-
-		item = _CreateSwapModifiersMenuItem(B_SCROLL_LOCK, B_SCROLL_LOCK,
-			map.scroll_key, key->code);
-		modifiersPopUp->AddItem(item);
-		if (key->code == map.scroll_key)
-			item->SetMarked(true);
-
-		modifiersPopUp->SetAsyncAutoDestruct(true);
-		if (modifiersPopUp->SetTargetForItems(Window()) == B_OK)
-			modifiersPopUp->Go(ConvertToScreen(point), true);
 	} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0
 		&& (fButtons & B_TERTIARY_MOUSE_BUTTON) == 0) {
 		// tertiary mouse button, toggle the "deadness" of dead keys

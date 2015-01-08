@@ -374,7 +374,7 @@ Keymap::SetKey(uint32 keyCode, uint32 modifiers, int8 deadKey,
 	if (offset < 0)
 		return;
 
-	if (numBytes == -1)
+	if (numBytes < 0)
 		numBytes = strlen(bytes);
 	if (numBytes > 6)
 		return;

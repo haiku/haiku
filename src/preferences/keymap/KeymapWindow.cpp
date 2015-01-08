@@ -320,6 +320,21 @@ KeymapWindow::MessageReceived(BMessage* message)
 			_UpdateButtons();
 			break;
 
+		case kMsgUpdateNormalKeys:
+		{
+			uint32 keyCode;
+			if (message->FindUInt32("keyCode", &keyCode) != B_OK)
+				break;
+
+			bool unset;
+			if (message->FindBool("unset", &unset) == B_OK && unset) {
+				fCurrentMap.SetKey(keyCode, modifiers(), 0, "", 0);
+				_UpdateButtons();
+				fKeyboardLayoutView->SetKeymap(&fCurrentMap);
+			}
+			break;
+		}
+
 		case kMsgUpdateModifierKeys:
 		{
 			uint32 keyCode;
