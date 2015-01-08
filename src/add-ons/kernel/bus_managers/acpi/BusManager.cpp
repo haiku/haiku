@@ -1,7 +1,7 @@
 /*
  * Copyright 2009, Vincent Duvert, vincent.duvert@free.fr
  * Copyright 2009, Clemens Zeidler, haiku@clemens-zeidler.de
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2015, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2006, Bryan Varner. All rights reserved.
  * Copyright 2005, Nathan Whitehorn. All rights reserved.
  *
@@ -203,7 +203,7 @@ acpi_std_ops(int32 op,...)
 			}
 
 			if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
-					B_NORMAL_PRIORITY) != B_OK) {
+					B_URGENT_DISPLAY_PRIORITY + 1) != B_OK) {
 				ERROR("failed to create os execution queue\n");
 				return B_ERROR;
 			}
