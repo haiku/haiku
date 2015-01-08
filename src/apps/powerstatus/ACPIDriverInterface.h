@@ -39,7 +39,7 @@ public:
 	status_t					InitCheck();
 
 	// Read battery info and update the cache.
-	status_t 					ReadBatteryInfo();
+	status_t 					UpdateBatteryInfo();
 	status_t 					GetBatteryInfoCached(battery_info* info);
 	status_t 					GetExtendedBatteryInfo(
 									acpi_extended_battery_info* info);
@@ -54,7 +54,7 @@ private:
 	acpi_extended_battery_info	fExtendedBatteryInfo;
 
 	RateBuffer					fRateBuffer;
-	acpi_battery_info			fCachedAcpiInfo;
+	acpi_battery_info			fCachedInfo;
 };
 
 
@@ -63,23 +63,23 @@ public:
 								ACPIDriverInterface();
 	virtual						~ACPIDriverInterface();
 
-	virtual status_t		Connect();
-	virtual status_t 		GetBatteryInfo(battery_info* info, int32 index);
-	virtual status_t	 	GetExtendedBatteryInfo(
-								acpi_extended_battery_info* info, int32 index);
+	virtual status_t			Connect();
+	virtual status_t 			GetBatteryInfo(int32 index, battery_info* info);
+	virtual status_t	 		GetExtendedBatteryInfo(int32 index,
+									acpi_extended_battery_info* info);
 
-	virtual int32			GetBatteryCount();
+	virtual int32				GetBatteryCount();
 
 protected:
 	// Read the battery info from the hardware.
-	virtual status_t 		_ReadBatteryInfo();
+	virtual status_t 			_UpdateBatteryInfo();
 
-	virtual void			_WatchPowerStatus();
-	virtual status_t		_FindDrivers(const char* dirpath);
+	virtual void				_WatchPowerStatus();
+	virtual status_t			_FindDrivers(const char* dirpath);
 
-	BObjectList<Battery>	fDriverList;
-
-	BLocker					fInterfaceLocker;
+private:
+	BLocker						fInterfaceLocker;
+	BObjectList<Battery>		fDriverList;
 };
 
 #endif	// ACPI_DRIVER_INTERFACE_H

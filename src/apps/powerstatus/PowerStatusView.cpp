@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -62,7 +62,8 @@ const int32 kLowBatteryPercentage = 15;
 
 PowerStatusView::PowerStatusView(PowerStatusDriverInterface* interface,
 	BRect frame, int32 resizingMode,  int batteryID, bool inDeskbar)
-	: BView(frame, kDeskbarItemName, resizingMode,
+	:
+	BView(frame, kDeskbarItemName, resizingMode,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fDriverInterface(interface),
 	fBatteryID(batteryID),
@@ -464,11 +465,11 @@ void
 PowerStatusView::_GetBatteryInfo(battery_info* batteryInfo, int batteryID)
 {
 	if (batteryID >= 0) {
-		fDriverInterface->GetBatteryInfo(batteryInfo, batteryID);
+		fDriverInterface->GetBatteryInfo(batteryID, batteryInfo);
 	} else {
 		for (int i = 0; i < fDriverInterface->GetBatteryCount(); i++) {
 			battery_info info;
-			fDriverInterface->GetBatteryInfo(&info, i);
+			fDriverInterface->GetBatteryInfo(i, &info);
 
 			if (i == 0)
 				*batteryInfo = info;

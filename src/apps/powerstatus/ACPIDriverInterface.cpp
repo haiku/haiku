@@ -1,15 +1,18 @@
 /*
- * Copyright 2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 
 
 #include "ACPIDriverInterface.h"
 
+#include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <Autolock.h>
 #include <Directory.h>
@@ -82,15 +85,19 @@ Battery::InitCheck()
 
 
 status_t
-Battery::ReadBatteryInfo()
+Battery::UpdateBatteryInfo()
 {
-	status_t status;
-	status = ioctl(fDriverHandler, GET_BATTERY_INFO, &fCachedAcpiInfo,
-		sizeof(acpi_battery_info));
+	acpi_battery_info info;
+	if (ioctl(fDriverHandler, GET_BATTERY_INFO, &info,
+			sizeof(acpi_battery_info)) != 0)
+		return errno;
 
-	if (status != B_OK)
-		return status;
+	if ((fExtendedBatteryInfo.last_full_charge > 0
+			&& info.capacity > fExtendedBatteryInfo.last_full_charge)
+		|| info.capacity < 0)
+		return B_BAD_DATA;
 
+	fCachedInfo = info;
 	return B_OK;
 }
 
@@ -98,15 +105,16 @@ Battery::ReadBatteryInfo()
 status_t
 Battery::GetBatteryInfoCached(battery_info* info)
 {
-	info->state = fCachedAcpiInfo.state;
-	info->current_rate = fCachedAcpiInfo.current_rate;
-	info->capacity = fCachedAcpiInfo.capacity;
+	info->state = fCachedInfo.state;
+	info->current_rate = fCachedInfo.current_rate;
+	info->capacity = fCachedInfo.capacity;
 	info->full_capacity = fExtendedBatteryInfo.last_full_charge;
-	fRateBuffer.AddRate(fCachedAcpiInfo.current_rate);
-	if (fCachedAcpiInfo.current_rate > 0 && fRateBuffer.GetMeanRate() != 0)
-		info->time_left = 3600 * fCachedAcpiInfo.capacity
+
+	fRateBuffer.AddRate(fCachedInfo.current_rate);
+	if (fCachedInfo.current_rate > 0 && fRateBuffer.GetMeanRate() != 0) {
+		info->time_left = 3600 * fCachedInfo.capacity
 			/ fRateBuffer.GetMeanRate();
-	else
+	} else
 		info->time_left = -1;
 
 	return B_OK;
@@ -116,11 +124,11 @@ Battery::GetBatteryInfoCached(battery_info* info)
 status_t
 Battery::GetExtendedBatteryInfo(acpi_extended_battery_info* info)
 {
-	status_t status;
-	status = ioctl(fDriverHandler, GET_EXTENDED_BATTERY_INFO, info,
-		sizeof(acpi_extended_battery_info));
+	if (ioctl(fDriverHandler, GET_EXTENDED_BATTERY_INFO, info,
+			sizeof(acpi_extended_battery_info)) != 0)
+		return errno;
 
-	return status;
+	return B_OK;
 }
 
 
@@ -128,30 +136,21 @@ void
 Battery::_Init()
 {
 	uint32 magicId = 0;
-	fInitStatus = ioctl(fDriverHandler, IDENTIFY_DEVICE, &magicId,
-		sizeof(uint32));
-	if (fInitStatus != B_OK)
+	if (ioctl(fDriverHandler, IDENTIFY_DEVICE, &magicId, sizeof(uint32)) != 0) {
+		fInitStatus = errno;
 		return;
-
-	fInitStatus = ioctl(fDriverHandler, GET_EXTENDED_BATTERY_INFO,
-		&fExtendedBatteryInfo, sizeof(acpi_extended_battery_info));
-	if (fInitStatus != B_OK)
-		return;
-
-	fInitStatus = ioctl(fDriverHandler, GET_BATTERY_INFO, &fCachedAcpiInfo,
-		sizeof(acpi_battery_info));
+	}
+	fInitStatus = GetExtendedBatteryInfo(&fExtendedBatteryInfo);
 	if (fInitStatus != B_OK)
 		return;
 
 	printf("ACPI driver found\n");
-
+	UpdateBatteryInfo();
 }
 
 
-ACPIDriverInterface::~ACPIDriverInterface()
-{
-	for (int i = 0; i < fDriverList.CountItems(); i++)
-		delete fDriverList.ItemAt(i);
+// #pragma mark - ACPIDriverInterface
+
 
 ACPIDriverInterface::ACPIDriverInterface()
 	:
@@ -160,42 +159,40 @@ ACPIDriverInterface::ACPIDriverInterface()
 }
 
 
-const char* kDriverDir = "/dev/power";
+ACPIDriverInterface::~ACPIDriverInterface()
+{
+	for (int i = 0; i < fDriverList.CountItems(); i++)
+		delete fDriverList.ItemAt(i);
+}
 
 
 status_t
 ACPIDriverInterface::Connect()
 {
-	printf("ACPI connect\n");
 	return _FindDrivers(kDriverDir);
 }
 
 
 status_t
-ACPIDriverInterface::GetBatteryInfo(battery_info* info, int32 index)
+ACPIDriverInterface::GetBatteryInfo(int32 index, battery_info* info)
 {
 	BAutolock autolock(fInterfaceLocker);
 	if (index < 0 || index >= fDriverList.CountItems())
 		return B_ERROR;
 
-	status_t status;
-	status = fDriverList.ItemAt(index)->GetBatteryInfoCached(info);
-	return status;
+	return fDriverList.ItemAt(index)->GetBatteryInfoCached(info);
 }
 
 
 status_t
-ACPIDriverInterface::GetExtendedBatteryInfo(acpi_extended_battery_info* info,
-	int32 index)
+ACPIDriverInterface::GetExtendedBatteryInfo(int32 index,
+	acpi_extended_battery_info* info)
 {
 	BAutolock autolock(fInterfaceLocker);
 	if (index < 0 || index >= fDriverList.CountItems())
 		return B_ERROR;
 
-	status_t status;
-	status = fDriverList.ItemAt(index)->GetExtendedBatteryInfo(info);
-
-	return status;
+	return fDriverList.ItemAt(index)->GetExtendedBatteryInfo(info);
 }
 
 
@@ -207,10 +204,10 @@ ACPIDriverInterface::GetBatteryCount()
 
 
 status_t
-ACPIDriverInterface::_ReadBatteryInfo()
+ACPIDriverInterface::_UpdateBatteryInfo()
 {
 	for (int i = 0; i < fDriverList.CountItems(); i++)
-		fDriverList.ItemAt(i)->ReadBatteryInfo();
+		fDriverList.ItemAt(i)->UpdateBatteryInfo();
 
 	return B_OK;
 }
@@ -223,7 +220,7 @@ ACPIDriverInterface::_WatchPowerStatus()
 		// every two seconds
 
 	while (atomic_get(&fIsWatching) > 0) {
-		_ReadBatteryInfo();
+		_UpdateBatteryInfo();
 		Broadcast(kMsgUpdate);
 		acquire_sem_etc(fWaitSem, 1, B_RELATIVE_TIMEOUT, kUpdateInterval);
 	}
@@ -245,21 +242,18 @@ ACPIDriverInterface::_FindDrivers(const char* dirpath)
 		if (entry.IsDirectory()) {
 			if (_FindDrivers(path.Path()) == B_OK)
 				return B_OK;
-		}
-		else {
+		} else {
 			int32 handler = open(path.Path(), O_RDWR);
 			if (handler >= 0) {
 				printf("try %s\n", path.Path());
 				Battery* battery = new Battery(handler);
-				if (battery->InitCheck() == B_OK) {
-					fDriverList.AddItem(battery);
+				if (battery->InitCheck() == B_OK
+					&& fDriverList.AddItem(battery)) {
 					status = B_OK;
-				}
-				else
+				} else
 					delete battery;
 			}
 		}
-
 	}
 	return status;
 }

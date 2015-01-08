@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -324,7 +324,7 @@ ExtPowerStatusView::Update(bool force)
 		return;
 
 	acpi_extended_battery_info extInfo;
-	fDriverInterface->GetExtendedBatteryInfo(&extInfo, fBatteryID);
+	fDriverInterface->GetExtendedBatteryInfo(fBatteryID, &extInfo);
 
 	fBatteryInfoView->Update(fBatteryInfo, extInfo);
 	fBatteryInfoView->Invalidate();
@@ -338,8 +338,8 @@ ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 	:
 	BWindow(BRect(100, 150, 500, 500), B_TRANSLATE("Extended battery info"),
 		B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT |
-		B_ASYNCHRONOUS_CONTROLS),
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT
+			| B_ASYNCHRONOUS_CONTROLS),
 	fDriverInterface(interface),
 	fSelectedView(NULL)
 {
