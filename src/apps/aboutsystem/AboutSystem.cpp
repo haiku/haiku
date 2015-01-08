@@ -140,6 +140,7 @@ TranslationComparator(const void* left, const void* right)
 class AboutApp : public BApplication {
 public:
 							AboutApp();
+			void			MessageReceived(BMessage* message);
 };
 
 
@@ -243,6 +244,19 @@ AboutApp::AboutApp()
 	AboutWindow *window = new(std::nothrow) AboutWindow();
 	if (window)
 		window->Show();
+}
+
+
+void
+AboutApp::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case B_SILENT_RELAUNCH:
+			WindowAt(0)->Activate();
+			break;
+	}
+
+	BApplication::MessageReceived(message);
 }
 
 
