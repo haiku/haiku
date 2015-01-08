@@ -58,6 +58,7 @@ const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
 
 const int32 kLowBatteryPercentage = 15;
+const int32 kNoteBatteryPercentage = 30;
 
 
 PowerStatusView::PowerStatusView(PowerStatusDriverInterface* interface,
@@ -206,6 +207,8 @@ PowerStatusView::_DrawBattery(BRect rect)
 		if (fHasBattery) {
 			if (percent <= kLowBatteryPercentage)
 				base.set_to(180, 0, 0);
+			else if (percent <= kNoteBatteryPercentage)
+				base.set_to(200, 140, 0);
 			else
 				base.set_to(20, 180, 0);
 
