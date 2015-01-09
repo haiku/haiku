@@ -34,22 +34,22 @@
 		typedef int		KeyType;
 		typedef	Foo		ValueType;
 
-		size_t HashKey(int key) const
+		size_t HashKey(KeyType key) const
 		{
 			return key >> 1;
 		}
 
-		size_t Hash(Foo* value) const
+		size_t Hash(ValueType* value) const
 		{
 			return HashKey(value->bar);
 		}
 
-		bool Compare(int key, Foo* value) const
+		bool Compare(KeyType key, ValueType* value) const
 		{
 			return value->bar == key;
 		}
 
-		Foo*& GetLink(Foo* value) const
+		ValueType*& GetLink(ValueType* value) const
 		{
 			return value->fNext;
 		}
