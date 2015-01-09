@@ -12,6 +12,7 @@
 #include <Catalog.h>
 #include <OS.h>
 #include <String.h>
+#include <StringForRate.h>
 
 #include "SystemInfo.h"
 
@@ -1225,7 +1226,7 @@ void
 NetworkUsageDataSource::Print(BString& text, int64 value) const
 {
 	char buffer[32];
-	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%.1f KiB/s"), value / 1024.0);
+	string_for_rate(value, buffer, sizeof(buffer));
 
 	text = buffer;
 }
