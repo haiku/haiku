@@ -24,7 +24,6 @@
 #include <KernelExport.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
-#include <util/khash.h>
 #include <util/DoublyLinkedList.h>
 #include <util/MultiHashTable.h>
 

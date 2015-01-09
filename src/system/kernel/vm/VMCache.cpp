@@ -23,7 +23,6 @@
 #include <slab/Slab.h>
 #include <smp.h>
 #include <tracing.h>
-#include <util/khash.h>
 #include <util/AutoLock.h>
 #include <vfs.h>
 #include <vm/vm.h>

@@ -25,7 +25,6 @@
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
-#include <util/khash.h>
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
 

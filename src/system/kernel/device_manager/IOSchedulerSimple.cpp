@@ -14,7 +14,6 @@
 
 #include <algorithm>
 
-#include <khash.h>
 #include <lock.h>
 #include <thread_types.h>
 #include <thread.h>

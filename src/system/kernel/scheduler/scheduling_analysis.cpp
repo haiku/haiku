@@ -10,7 +10,6 @@
 #include <scheduler_defs.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
-#include <util/khash.h>
 
 #include "scheduler_tracing.h"
 

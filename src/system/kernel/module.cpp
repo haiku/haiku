@@ -32,7 +32,6 @@
 #include <safemode.h>
 #include <syscalls.h>
 #include <util/AutoLock.h>
-#include <util/khash.h>
 #include <util/Stack.h>
 #include <vfs.h>
 

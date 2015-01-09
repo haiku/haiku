@@ -20,8 +20,8 @@
 #include <thread.h>
 #include <util/atomic.h>
 #include <util/AutoLock.h>
-#include <util/khash.h>
 #include <util/OpenHashTable.h>
+#include <util/StringHash.h>
 
 
 class SemInfo {
