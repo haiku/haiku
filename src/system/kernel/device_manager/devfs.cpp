@@ -33,7 +33,6 @@
 #include <lock.h>
 #include <Notifications.h>
 #include <util/AutoLock.h>
-#include <util/khash.h>
 #include <vfs.h>
 #include <vm/vm.h>
 
@@ -99,12 +98,40 @@ struct devfs_vnode {
 
 #define DEVFS_HASH_SIZE 16
 
+
+struct NodeHash {
+	typedef ino_t			KeyType;
+	typedef	devfs_vnode		ValueType;
+
+	size_t HashKey(KeyType key) const
+	{
+		return key ^ (key >> 32);
+	}
+
+	size_t Hash(ValueType* value) const
+	{
+		return HashKey(value->id);
+	}
+
+	bool Compare(KeyType key, ValueType* value) const
+	{
+		return value->id == key;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->all_next;
+	}
+};
+
+typedef BOpenHashTable<NodeHash> NodeTable;
+
 struct devfs {
 	dev_t				id;
 	fs_volume*			volume;
 	recursive_lock		lock;
- 	int32				next_vnode_id;
-	hash_table*			vnode_hash;
+	int32				next_vnode_id;
+	NodeTable*			vnode_hash;
 	struct devfs_vnode*	root_vnode;
 };
 
@@ -208,32 +235,6 @@ scan_for_drivers_if_needed(devfs_vnode* dir)
 }
 
 
-static uint32
-devfs_vnode_hash(void* _vnode, const void* _key, uint32 range)
-{
-	struct devfs_vnode* vnode = (struct devfs_vnode*)_vnode;
-	const ino_t* key = (const ino_t*)_key;
-
-	if (vnode != NULL)
-		return vnode->id % range;
-
-	return (uint64)*key % range;
-}
-
-
-static int
-devfs_vnode_compare(void* _vnode, const void* _key)
-{
-	struct devfs_vnode* vnode = (struct devfs_vnode*)_vnode;
-	const ino_t* key = (const ino_t*)_key;
-
-	if (vnode->id == *key)
-		return 0;
-
-	return -1;
-}
-
-
 static void
 init_directory_vnode(struct devfs_vnode* vnode, int permissions)
 {
@@ -283,7 +284,7 @@ devfs_delete_vnode(struct devfs* fs, struct devfs_vnode* vnode,
 		return B_NOT_ALLOWED;
 
 	// remove it from the global hash table
-	hash_remove(fs->vnode_hash, vnode);
+	fs->vnode_hash->Remove(vnode);
 
 	if (S_ISCHR(vnode->stream.type)) {
 		if (vnode->stream.u.dev.partition == NULL) {
@@ -465,7 +466,7 @@ add_partition(struct devfs* fs, struct devfs_vnode* device, const char* name,
 	partitionNode->stream.u.dev.device = device->stream.u.dev.device;
 	partitionNode->stream.u.dev.partition = partition;
 
-	hash_insert(fs->vnode_hash, partitionNode);
+	fs->vnode_hash->Insert(partitionNode);
 	devfs_insert_in_dir(device->parent, partitionNode);
 
 	TRACE(("add_partition(name = %s, offset = %Ld, size = %Ld)\n",
@@ -536,7 +537,7 @@ out:
 static void
 publish_node(devfs* fs, devfs_vnode* dirNode, struct devfs_vnode* node)
 {
-	hash_insert(fs->vnode_hash, node);
+	fs->vnode_hash->Insert(node);
 	devfs_insert_in_dir(dirNode, node);
 }
 
@@ -896,10 +897,8 @@ devfs_mount(fs_volume* volume, const char* devfs, uint32 flags,
 
 	recursive_lock_init(&fs->lock, "devfs lock");
 
-	fs->vnode_hash = hash_init(DEVFS_HASH_SIZE, offsetof(devfs_vnode, all_next),
-		//(addr_t)&vnode->all_next - (addr_t)vnode,
-		&devfs_vnode_compare, &devfs_vnode_hash);
-	if (fs->vnode_hash == NULL) {
+	fs->vnode_hash = new NodeTable();
+	if (fs->vnode_hash == NULL || fs->vnode_hash->Init(DEVFS_HASH_SIZE) != B_OK) {
 		err = B_NO_MEMORY;
 		goto err2;
 	}
@@ -918,7 +917,7 @@ devfs_mount(fs_volume* volume, const char* devfs, uint32 flags,
 	init_directory_vnode(vnode, 0755);
 	fs->root_vnode = vnode;
 
-	hash_insert(fs->vnode_hash, vnode);
+	fs->vnode_hash->Insert(vnode);
 	publish_vnode(volume, vnode->id, vnode, &kVnodeOps, vnode->stream.type, 0);
 
 	*_rootNodeID = vnode->id;
@@ -926,7 +925,7 @@ devfs_mount(fs_volume* volume, const char* devfs, uint32 flags,
 	return B_OK;
 
 err3:
-	hash_uninit(fs->vnode_hash);
+	delete fs->vnode_hash;
 err2:
 	recursive_lock_destroy(&fs->lock);
 	free(fs);
@@ -940,7 +939,6 @@ devfs_unmount(fs_volume* _volume)
 {
 	struct devfs* fs = (struct devfs*)_volume->private_volume;
 	struct devfs_vnode* vnode;
-	struct hash_iterator i;
 
 	TRACE(("devfs_unmount: entry fs = %p\n", fs));
 
@@ -950,12 +948,12 @@ devfs_unmount(fs_volume* _volume)
 	put_vnode(fs->volume, fs->root_vnode->id);
 
 	// delete all of the vnodes
-	hash_open(fs->vnode_hash, &i);
-	while ((vnode = (devfs_vnode*)hash_next(fs->vnode_hash, &i)) != NULL) {
+	NodeTable::Iterator i(fs->vnode_hash);
+	while (i.HasNext()) {
+		vnode = i.Next();
 		devfs_delete_vnode(fs, vnode, true);
 	}
-	hash_close(fs->vnode_hash, &i, false);
-	hash_uninit(fs->vnode_hash);
+	delete fs->vnode_hash;
 
 	recursive_lock_destroy(&fs->lock);
 	free(fs);
@@ -1032,7 +1030,7 @@ devfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _vnode, int* _type,
 
 	RecursiveLocker _(fs->lock);
 
-	struct devfs_vnode* vnode = (devfs_vnode*)hash_lookup(fs->vnode_hash, &id);
+	struct devfs_vnode* vnode = fs->vnode_hash->Lookup(id);
 	if (vnode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
