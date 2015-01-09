@@ -1169,20 +1169,16 @@ private:
 // #pragma mark - ContentsView
 
 
-class ContentsView : public BView {
+class ContentsView : public BGroupView {
 public:
 	ContentsView()
 		:
-		BView("package contents view", B_WILL_DRAW),
-		fLayout(new BGroupLayout(B_HORIZONTAL))
+		BGroupView("package contents view", B_HORIZONTAL)
 	{
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint));
-		BRect frame = Bounds();
-		frame.InsetBy(5,5) ;
 
-		SetLayout(fLayout);
-		fPackageContents = new PackageContentsView(frame, "contents_list");
+		fPackageContents = new PackageContentsView("contents_list");
 		AddChild(fPackageContents);
 
 	}
@@ -1197,35 +1193,30 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		fPackageContents -> AddPackage(package);
+		fPackageContents->SetPackage(package);
 	}
 
 	void Clear()
 	{
-		fPackageContents->MakeEmpty();
+		fPackageContents->Clear();
 	}
-	
 
 private:
-	BGroupLayout*		fLayout;
-	PackageContentsView*  fPackageContents;
+	PackageContentsView*	fPackageContents;
 };
 
 
 // #pragma mark - ChangelogView
 
 
-class ChangelogView : public BView {
+class ChangelogView : public BGroupView {
 public:
 	ChangelogView()
 		:
-		BView("package changelog view", B_WILL_DRAW),
-		fLayout(new BGroupLayout(B_HORIZONTAL))
+		BGroupView("package changelog view", B_HORIZONTAL)
 	{
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint));
-
-		SetLayout(fLayout);
 
 		fTextView = new MarkupTextView("changelog view");
 		fTextView->SetLowColor(ViewColor());
@@ -1234,7 +1225,7 @@ public:
 		BScrollView* scrollView = new CustomScrollView(
 			"changelog scroll view", fTextView);
 
-		BLayoutBuilder::Group<>(fLayout)
+		BLayoutBuilder::Group<>(this)
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
 			.Add(scrollView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
@@ -1264,7 +1255,6 @@ public:
 	}
 
 private:
-	BGroupLayout*		fLayout;
 	MarkupTextView*		fTextView;
 };
 

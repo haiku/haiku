@@ -1,3 +1,8 @@
+/*
+ * Copyright 2015, TigerKid001.
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+
 #include "PackageContentsView.h"
 
 #include <algorithm>
@@ -66,39 +71,86 @@ public:
 	}
 };
 
+// #pragma mark - PackageEntryItem
 
-//	#pragma mark - PackageContentOutliner
+
+class PackageEntryItem : public BStringItem {
+public:
+	PackageEntryItem(const BPackageEntry* entry)
+		:
+		BStringItem(entry->Name()),
+		fEntry(entry)
+	{
+	}
+	
+	inline const BPackageEntry* PackageEntry() const
+	{
+		return fEntry;
+	}
+
+private:
+	const BPackageEntry* fEntry;
+};
+
+
+// #pragma mark - PackageContentOutliner
 
 
 class PackageContentsView::PackageContentOutliner
-			: public BPackageContentHandler {
-	public:
-	PackageContentOutliner(BOutlineListView* contentsList)
+	: public BPackageContentHandler {
+
+public:
+	PackageContentOutliner(BOutlineListView* listView)
+		:
+		fListView(listView),
+		fLastParentEntry(NULL),
+		fLastParentItem(NULL),
+		fLastEntry(NULL),
+		fLastItem(NULL)
 	{
-		fContents = contentsList;
 	}
 
 	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
+		PackageEntryItem* item = new PackageEntryItem(entry);
+
 		if (entry->Parent() == NULL) {
-			fSuperParent = entry;
-			fSuperParentItem = new BStringItem(fSuperParent->Name());
-			fContents->AddItem(fSuperParentItem);
-			fParent = fSuperParent;
-			fParentItem = fSuperParentItem;
+			fListView->AddItem(item);
+		} else if (entry->Parent() == fLastEntry) {
+			fListView->AddUnder(item, fLastItem);
+			fLastParentEntry = fLastEntry;
+			fLastParentItem = fLastItem;
+		} else if (entry->Parent() == fLastParentEntry) {
+			fListView->AddUnder(item, fLastParentItem);
 		} else {
-			if (entry->Parent() == fParent) {
-				BListItem* item = new BStringItem(entry->Name());
-				fContents->AddUnder(item, fParentItem);
-				fParent = entry;
-				fParentItem = item;
-			} else if (entry->Parent() == fSuperParent) {
-				BListItem* item = new BStringItem(entry->Name());
-				fContents->AddUnder(item, fSuperParentItem);
-				fParent = entry;
-				fParentItem = item;
+			// Not the last parent entry, need to search for the parent
+			// among the already added list items.
+			bool foundParent = false;
+			for (int32 i = 0; i < fListView->CountItems(); i++) {
+				PackageEntryItem* listItem
+					= dynamic_cast<PackageEntryItem*>(fListView->ItemAt(i));
+				if (listItem == NULL)
+					continue;
+				if (listItem->PackageEntry() == entry->Parent()) {
+					fLastParentEntry = listItem->PackageEntry();
+					fLastParentItem = listItem;
+					fListView->AddUnder(item, fLastParentItem);
+					foundParent = true;
+					break;
+				}
+			}
+			if (!foundParent) {
+				// NOTE: Should not happen. Just add this entry at the
+				// root level.
+				printf("Did not find parent entry for %s (%s)!\n",
+					entry->Name(), entry->Parent()->Name());
+				fListView->AddItem(item);
 			}
 		}
+
+		fLastEntry = entry;
+		fLastItem = item;
+
 		return B_OK;
 	}
 
@@ -123,46 +175,41 @@ class PackageContentsView::PackageContentOutliner
 	{
 	}
 	
-	BOutlineListView* GetContentsList() {
-		return fContents;
-	}
-	
-	private:
-	BOutlineListView* fContents;
-	BListItem* fParentItem;
-	BListItem* fSuperParentItem;
-	BPackageEntry* fParent;
-	BPackageEntry* fSuperParent;
+private:
+	BOutlineListView*		fListView;
+
+	const BPackageEntry*	fLastParentEntry;
+	PackageEntryItem*		fLastParentItem;
+
+	const BPackageEntry*	fLastEntry;
+	PackageEntryItem*		fLastItem;
 };
 
 
 // #pragma mark - PackageContentView
 
 
-PackageContentsView::PackageContentsView(BRect frame, const char* name)
+PackageContentsView::PackageContentsView(const char* name)
 	:
-	BView("package_contents_view",B_WILL_DRAW),
+	BView("package_contents_view", B_WILL_DRAW),
 	fLayout(new BGroupLayout(B_HORIZONTAL))
 {
-	BRect frame = Bounds();
-	frame.InsetBy(5,5);
-	
-	fContentsList = new BOutlineListView(frame, "contents_list", 
-									B_SINGLE_SELECTION_LIST);
+	fContentListView = new BOutlineListView("content list view", 
+		B_SINGLE_SELECTION_LIST);
 	
 	BScrollView* scrollView = new CustomScrollView("contents scroll view", 
-															fContentsList);
+		fContentListView);
 															
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollView, 1.0f)
-		.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
+		.SetInsets(0.0f, -1.0f, -1.0f, -1.0f)
 	;
 }
 
 
 PackageContentsView::~PackageContentsView()
 {
-	MakeEmpty();
+	Clear();
 }
 
 
@@ -181,11 +228,10 @@ PackageContentsView::AllAttached()
 
 
 void
-PackageContentsView::AddPackage(const PackageInfo& package)
+PackageContentsView::SetPackage(const PackageInfo& package)
 {
-	fContentsList->MakeEmpty();
-	status_t status;
-	
+	Clear();
+
 	if (package.IsLocalFile() ) {
 		BString pathString = package.LocalFilePath();
 		BPath packagePath;
@@ -194,28 +240,27 @@ PackageContentsView::AddPackage(const PackageInfo& package)
 		BNoErrorOutput errorOutput;
 		BPackageReader reader(&errorOutput);
 	
-		status = reader.Init(packagePath.Path());
-			if (status != B_OK) {
-				printf("failed to init BPackageReader(%s): %s\n",
-					packagePath.Path(), strerror(status));
-				return;
-			}
+		status_t status = reader.Init(packagePath.Path());
+		if (status != B_OK) {
+			printf("PackageContentsView::SetPackage(): failed to init "
+				"BPackageReader(%s): %s\n",
+				packagePath.Path(), strerror(status));
+			return;
+		}
 	
 		// Scan package contents and populate list
-		PackageContentOutliner contentHandler(fContentsList);
+		PackageContentOutliner contentHandler(fContentListView);
 		status = reader.ParseContent(&contentHandler);
 		if (status != B_OK) {
-			printf("PackageContnetsView::PackageContentsView(): "
+			printf("PackageContentsView::SetPackage(): "
 				"failed parse package contents: %s\n", strerror(status));
-		} else {
-			fContentsList = contentHandler.GetContentsList();
 		}
 	}
-	Invalidate();
 }
 
 
 void 
-PackageContentsView::MakeEmpty() {
-	fContentsList->MakeEmpty();
+PackageContentsView::Clear()
+{
+	fContentListView->MakeEmpty();
 }

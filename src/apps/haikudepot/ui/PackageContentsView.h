@@ -1,6 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2013, Rene Gollent <rene@gollent.com>.
+ * Copyright 2015, TigerKid001.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_CONTENTS_VIEW_H
@@ -13,18 +12,20 @@
 
 class PackageContentsView : public BView {
 public:
-								PackageContentsView(BRect frame, const char* name);
+								PackageContentsView(const char* name);
 	virtual						~PackageContentsView();
 
 	virtual void				AttachedToWindow();
 	virtual	void				AllAttached();
 
-			void				AddPackage(const PackageInfo& package);
-			void 			MakeEmpty();
+			void				SetPackage(const PackageInfo& package);
+			void	 			Clear();
+
 private:
 			class PackageContentOutliner;
+
 			BGroupLayout*		fLayout;
-			BOutlineListView* fContentsList;
+			BOutlineListView*	fContentListView;
 };
 
 #endif // PACKAGE_CONTENTS_VIEW_H
