@@ -287,7 +287,7 @@ TeamRow::_SetTo(team_info& info)
 
 TeamsListView::TeamsListView(const char* name, team_id currentTeam)
 	:
-	Inherited(name, 0),
+	Inherited(name, B_NAVIGABLE, B_PLAIN_BORDER),
 	fUpdateRunner(NULL),
 	fCurrentTeam(currentTeam)
 {
