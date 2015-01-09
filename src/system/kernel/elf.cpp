@@ -34,7 +34,6 @@
 #include <thread.h>
 #include <runtime_loader.h>
 #include <util/AutoLock.h>
-#include <util/khash.h>
 #include <vfs.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
@@ -56,7 +55,29 @@
 
 #define IMAGE_HASH_SIZE 16
 
-static hash_table *sImagesHash;
+struct ImageHashDefinition {
+	typedef struct elf_image_info ValueType;
+	typedef image_id KeyType;
+
+	size_t Hash(ValueType* entry) const
+		{ return HashKey(entry->id); }
+	ValueType*& GetLink(ValueType* entry) const
+		{ return entry->next; }
+
+	size_t HashKey(KeyType key) const
+	{
+		return (size_t)key;
+	}
+
+	bool Compare(KeyType key, ValueType* entry) const
+	{
+		return key - entry->id;
+	}
+};
+
+typedef BOpenHashTable<ImageHashDefinition> ImageHash;
+
+static ImageHash *sImagesHash;
 
 static struct elf_image_info *sKernelImage = NULL;
 static mutex sImageMutex = MUTEX_INITIALIZER("kimages_lock");
@@ -71,36 +92,11 @@ static elf_sym *elf_find_symbol(struct elf_image_info *image, const char *name,
 	const elf_version_info *version, bool lookupDefault);
 
 
-/*! Calculates hash for an image using its ID */
-static uint32
-image_hash(void *_image, const void *_key, uint32 range)
-{
-	struct elf_image_info *image = (struct elf_image_info *)_image;
-	image_id id = (image_id)(addr_t)_key;
-
-	if (image != NULL)
-		return image->id % range;
-
-	return (uint32)id % range;
-}
-
-
-/*!	Compares an image to a given ID */
-static int
-image_compare(void *_image, const void *_key)
-{
-	struct elf_image_info *image = (struct elf_image_info *)_image;
-	image_id id = (image_id)(addr_t)_key;
-
-	return id - image->id;
-}
-
-
 static void
 unregister_elf_image(struct elf_image_info *image)
 {
 	unregister_image(team_get_kernel_team(), image->id);
-	hash_remove(sImagesHash, image);
+	sImagesHash->Remove(image);
 }
 
 
@@ -161,7 +157,7 @@ register_elf_image(struct elf_image_info *image)
 
 	image->id = register_image(team_get_kernel_team(), &imageInfo,
 		sizeof(image_info));
-	hash_insert(sImagesHash, image);
+	sImagesHash->Insert(image);
 }
 
 
@@ -169,20 +165,19 @@ register_elf_image(struct elf_image_info *image)
 static struct elf_image_info *
 find_image_at_address(addr_t address)
 {
-	struct hash_iterator iterator;
-	struct elf_image_info *image;
+	struct elf_image_info *image = NULL;
 
 #if KDEBUG
 	if (!debug_debugger_running())
 		ASSERT_LOCKED_MUTEX(&sImageMutex);
 #endif
 
-	hash_open(sImagesHash, &iterator);
+	ImageHash::Iterator iterator(sImagesHash);
 
 	// get image that may contain the address
 
-	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
-			!= NULL) {
+	while (iterator.HasNext()) {
+		image = iterator.Next();
 		if ((address >= image->text_region.start && address
 				<= (image->text_region.start + image->text_region.size))
 			|| (address >= image->data_region.start
@@ -191,7 +186,6 @@ find_image_at_address(addr_t address)
 			break;
 	}
 
-	hash_close(sImagesHash, &iterator, false);
 	return image;
 }
 
@@ -234,26 +228,24 @@ dump_address_info(int argc, char **argv)
 static struct elf_image_info *
 find_image(image_id id)
 {
-	return (elf_image_info *)hash_lookup(sImagesHash, (void *)(addr_t)id);
+	return sImagesHash->Lookup(id);
 }
 
 
 static struct elf_image_info *
 find_image_by_vnode(void *vnode)
 {
-	struct hash_iterator iterator;
-	struct elf_image_info *image;
+	struct elf_image_info *image = NULL;
 
 	mutex_lock(&sImageMutex);
-	hash_open(sImagesHash, &iterator);
+	ImageHash::Iterator iterator(sImagesHash);
 
-	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
-			!= NULL) {
+	while (iterator.HasNext()) {
+		image = iterator.Next();
 		if (image->vnode == vnode)
 			break;
 	}
 
-	hash_close(sImagesHash, &iterator, false);
 	mutex_unlock(&sImageMutex);
 
 	return image;
@@ -357,14 +349,13 @@ dump_symbol(int argc, char **argv)
 	}
 
 	struct elf_image_info *image = NULL;
-	struct hash_iterator iterator;
 	const char *pattern = argv[1];
 
 	void* symbolAddress = NULL;
 
-	hash_open(sImagesHash, &iterator);
-	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
-			!= NULL) {
+	ImageHash::Iterator iterator(sImagesHash);
+	while (iterator.HasNext()) {
+		image = iterator.Next();
 		if (image->num_debug_symbols > 0) {
 			// search extended debug symbol table (contains static symbols)
 			for (uint32 i = 0; i < image->num_debug_symbols; i++) {
@@ -396,7 +387,6 @@ dump_symbol(int argc, char **argv)
 			}
 		}
 	}
-	hash_close(sImagesHash, &iterator, false);
 
 	if (symbolAddress != NULL)
 		set_debug_variable("_", (addr_t)symbolAddress);
@@ -409,7 +399,6 @@ static int
 dump_symbols(int argc, char **argv)
 {
 	struct elf_image_info *image = NULL;
-	struct hash_iterator iterator;
 	uint32 i;
 
 	// if the argument looks like a hex number, treat it as such
@@ -420,22 +409,21 @@ dump_symbols(int argc, char **argv)
 			if (IS_KERNEL_ADDRESS(num)) {
 				// find image at address
 
-				hash_open(sImagesHash, &iterator);
-				while ((image = (elf_image_info *)hash_next(sImagesHash,
-						&iterator)) != NULL) {
+				ImageHash::Iterator iterator(sImagesHash);
+				while (iterator.HasNext()) {
+					image = iterator.Next();
 					if (image->text_region.start <= num
 						&& image->text_region.start + image->text_region.size
 							>= num)
 						break;
 				}
-				hash_close(sImagesHash, &iterator, false);
 
 				if (image == NULL) {
 					kprintf("No image covers %#" B_PRIxADDR " in the kernel!\n",
 						num);
 				}
 			} else {
-				image = (elf_image_info *)hash_lookup(sImagesHash, (void *)num);
+				image = sImagesHash->Lookup(num);
 				if (image == NULL) {
 					kprintf("image %#" B_PRIxADDR " doesn't exist in the "
 						"kernel!\n", num);
@@ -443,13 +431,12 @@ dump_symbols(int argc, char **argv)
 			}
 		} else {
 			// look for image by name
-			hash_open(sImagesHash, &iterator);
-			while ((image = (elf_image_info *)hash_next(sImagesHash,
-					&iterator)) != NULL) {
+			ImageHash::Iterator iterator(sImagesHash);
+			while (iterator.HasNext()) {
+				image = iterator.Next();
 				if (!strcmp(image->name, argv[1]))
 					break;
 			}
-			hash_close(sImagesHash, &iterator, false);
 
 			if (image == NULL)
 				kprintf("No image \"%s\" found in kernel!\n", argv[1]);
@@ -545,7 +532,6 @@ dump_image_info(struct elf_image_info *image)
 static int
 dump_image(int argc, char **argv)
 {
-	struct hash_iterator iterator;
 	struct elf_image_info *image;
 
 	// if the argument looks like a hex number, treat it as such
@@ -556,7 +542,7 @@ dump_image(int argc, char **argv)
 			// semi-hack
 			dump_image_info((struct elf_image_info *)num);
 		} else {
-			image = (elf_image_info *)hash_lookup(sImagesHash, (void *)num);
+			image = sImagesHash->Lookup(num);
 			if (image == NULL) {
 				kprintf("image %#" B_PRIxADDR " doesn't exist in the kernel!\n",
 					num);
@@ -568,14 +554,13 @@ dump_image(int argc, char **argv)
 
 	kprintf("loaded kernel images:\n");
 
-	hash_open(sImagesHash, &iterator);
+	ImageHash::Iterator iterator(sImagesHash);
 
-	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
-			!= NULL) {
+	while (iterator.HasNext()) {
+		image = iterator.Next();
 		kprintf("%p (%" B_PRId32 ") %s\n", image, image->id, image->name);
 	}
 
-	hash_close(sImagesHash, &iterator, false);
 	return 0;
 }
 
@@ -1767,11 +1752,10 @@ addr_t
 elf_debug_lookup_symbol(const char* searchName)
 {
 	struct elf_image_info *image = NULL;
-	struct hash_iterator iterator;
 
-	hash_open(sImagesHash, &iterator);
-	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
-			!= NULL) {
+	ImageHash::Iterator iterator(sImagesHash);
+	while (iterator.HasNext()) {
+		image = iterator.Next();
 		if (image->num_debug_symbols > 0) {
 			// search extended debug symbol table (contains static symbols)
 			for (uint32 i = 0; i < image->num_debug_symbols; i++) {
@@ -1795,7 +1779,6 @@ elf_debug_lookup_symbol(const char* searchName)
 			}
 		}
 	}
-	hash_close(sImagesHash, &iterator, false);
 
 	return 0;
 }
@@ -2572,9 +2555,12 @@ elf_init(kernel_args *args)
 
 	image_init();
 
-	sImagesHash = hash_init(IMAGE_HASH_SIZE, 0, image_compare, image_hash);
+	sImagesHash = new ImageHash();
 	if (sImagesHash == NULL)
 		return B_NO_MEMORY;
+	status_t init = sImagesHash->Init(IMAGE_HASH_SIZE);
+	if (init != B_OK)
+		return init;
 
 	// Build a image structure for the kernel, which has already been loaded.
 	// The preloaded_images were already prepared by the VM.
