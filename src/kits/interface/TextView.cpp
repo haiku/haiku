@@ -2696,14 +2696,12 @@ BTextView::AllocRunArray(int32 entryCount, int32* outSize)
 {
 	int32 size = sizeof(text_run_array) + (entryCount - 1) * sizeof(text_run);
 
-	text_run_array* runArray = (text_run_array*)malloc(size);
+	text_run_array* runArray = (text_run_array*)calloc(size, 1);
 	if (runArray == NULL) {
 		if (outSize != NULL)
 			*outSize = 0;
 		return NULL;
 	}
-
-	memset(runArray, 0, sizeof(size));
 
 	runArray->count = entryCount;
 
