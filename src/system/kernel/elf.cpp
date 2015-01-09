@@ -71,7 +71,7 @@ struct ImageHashDefinition {
 
 	bool Compare(KeyType key, ValueType* entry) const
 	{
-		return key - entry->id;
+		return key == entry->id;
 	}
 };
 
