@@ -14,6 +14,7 @@
 
 #include <Beep.h>
 #include <Catalog.h>
+#include <ColumnTypes.h>
 #include <Directory.h>
 #include <Locale.h>
 #include <NodeInfo.h>
@@ -24,8 +25,8 @@
 #include "ColumnListView.h"
 
 #include "BitFieldTesters.h"
-#include "Colors.h"
 #include "CommandActuators.h"
+#include "KeyInfos.h"
 #include "MetaKeyStateMap.h"
 #include "ParseCommandLine.h"
 
@@ -42,7 +43,6 @@ static MetaKeyStateMap sMetaMaps[ShortcutsSpec::NUM_META_COLUMNS];
 static bool sFontCached = false;
 static BFont sViewFont;
 static float sFontHeight;
-static BBitmap* sActuatorBitmaps[2];
 
 const char* ShortcutsSpec::sShiftName;
 const char* ShortcutsSpec::sControlName;
@@ -99,35 +99,6 @@ GetNthKeyMap(int which)
 }
 
 
-static BBitmap*
-MakeActuatorBitmap(bool lit)
-{
-	BBitmap* map = new BBitmap(ICON_BITMAP_RECT, ICON_BITMAP_SPACE, true);
-	const rgb_color yellow = {255, 255, 0};
-	const rgb_color red = {200, 200, 200};
-	const rgb_color black = {0, 0, 0};
-	const BPoint points[10] = {
-		BPoint(8, 0), BPoint(9.8, 5.8), BPoint(16, 5.8),
-		BPoint(11, 9.0), BPoint(13, 16), BPoint(8, 11),
-		BPoint(3, 16), BPoint(5, 9.0), BPoint(0, 5.8),
-		BPoint(6.2, 5.8) };
-
-	BView* view = new BView(BRect(0, 0, 16, 16), NULL, B_FOLLOW_ALL_SIDES, 0L);
-	map->AddChild(view);
-	map->Lock();
-	view->SetHighColor(B_TRANSPARENT_32_BIT);
-	view->FillRect(ICON_BITMAP_RECT);
-	view->SetHighColor(lit ? yellow : red);
-	view->FillPolygon(points, 10);
-	view->SetHighColor(black);
-	view->StrokePolygon(points, 10);
-	map->Unlock();
-	map->RemoveChild(view);
-	delete view;
-	return map;
-}
-
-
 /*static*/ void
 ShortcutsSpec::InitializeMetaMaps()
 {
@@ -149,17 +120,13 @@ ShortcutsSpec::InitializeMetaMaps()
 
 	SetupStandardMap(sMetaMaps[ShortcutsSpec::OPTION_COLUMN_INDEX], sOptionName
 		, B_OPTION_KEY, B_LEFT_OPTION_KEY, B_RIGHT_OPTION_KEY);
-
-	sActuatorBitmaps[0] = MakeActuatorBitmap(false);
-	sActuatorBitmaps[1] = MakeActuatorBitmap(true);
 }
 
 
 ShortcutsSpec::ShortcutsSpec(const char* cmd)
 	:
-	CLVListItem(0, false, false, _height),
+	BRow(),
 	fCommand(NULL),
-	fTextOffset(0),
 	fBitmap(ICON_BITMAP_RECT, ICON_BITMAP_SPACE),
 	fLastBitmapName(NULL),
 	fBitmapValid(false),
@@ -174,9 +141,8 @@ ShortcutsSpec::ShortcutsSpec(const char* cmd)
 
 ShortcutsSpec::ShortcutsSpec(const ShortcutsSpec& from)
 	:
-	CLVListItem(0, false, false, _height),
+	BRow(),
 	fCommand(NULL),
-	fTextOffset(from.fTextOffset),
 	fBitmap(ICON_BITMAP_RECT, ICON_BITMAP_SPACE),
 	fLastBitmapName(NULL),
 	fBitmapValid(false),
@@ -188,14 +154,17 @@ ShortcutsSpec::ShortcutsSpec(const ShortcutsSpec& from)
 
 	SetCommand(from.fCommand);
 	SetSelectedColumn(from.GetSelectedColumn());
+
+	for (int i = 0; i < from.CountFields(); i++)
+		SetField(new BStringField(
+					static_cast<const BStringField*>(from.GetField(i))->String()), i);
 }
 
 
 ShortcutsSpec::ShortcutsSpec(BMessage* from)
 	:
-	CLVListItem(0, false, false, _height),
+	BRow(),
 	fCommand(NULL),
-	fTextOffset(0),
 	fBitmap(ICON_BITMAP_RECT, ICON_BITMAP_SPACE),
 	fLastBitmapName(NULL),
 	fBitmapValid(false),
@@ -221,6 +190,10 @@ ShortcutsSpec::ShortcutsSpec(BMessage* from)
 			printf(CLASS);
 			printf(" Error, no modifiers int32 in archive BMessage!\n");
 		}
+
+	const char* string;
+	for (int i = 0; (string = from->GetString("strings", i, NULL)); i++)
+		SetField(new BStringField(string), i);
 }
 
 
@@ -233,7 +206,7 @@ ShortcutsSpec::SetCommand(const char* command)
 	fCommandNul = fCommandLen - 1;
 	fCommand = new char[fCommandLen];
 	strcpy(fCommand, command);
-	_UpdateIconBitmap();
+	SetField(new BStringField(command), STRING_COLUMN_INDEX);
 }
 
 
@@ -252,6 +225,12 @@ ShortcutsSpec::Archive(BMessage* into, bool deep) const
 		return ret;
 
 	into->AddString("class", "ShortcutsSpec");
+
+	for (int i = 0; i < CountFields(); i++) {
+		const BStringField* field =
+			static_cast<const BStringField*>(GetField(i));
+		into->AddString("strings", field->String());
+	}
 
 	// These fields are for our prefs panel's benefit only
 	into->AddString("command", fCommand);
@@ -281,24 +260,8 @@ ShortcutsSpec::Archive(BMessage* into, bool deep) const
 	delete act;
 
 	into->AddMessage("act", &actMsg);
+
 	return ret;
-}
-
-
-static bool IsValidActuatorName(const char* c);
-static bool
-IsValidActuatorName(const char* c)
-{
-	return (strcmp(c, B_TRANSLATE("InsertString")) == 0
-		|| strcmp(c, B_TRANSLATE("MoveMouse")) == 0
-		|| strcmp(c, B_TRANSLATE("MoveMouseTo")) == 0
-		|| strcmp(c, B_TRANSLATE("MouseButton")) == 0
-		|| strcmp(c, B_TRANSLATE("LaunchHandler")) == 0
-		|| strcmp(c, B_TRANSLATE("Multi")) == 0
-		|| strcmp(c, B_TRANSLATE("MouseDown")) == 0
-		|| strcmp(c, B_TRANSLATE("MouseUp")) == 0
-		|| strcmp(c, B_TRANSLATE("SendMessage")) == 0
-		|| strcmp(c, B_TRANSLATE("Beep")) == 0);
 }
 
 
@@ -339,150 +302,11 @@ ShortcutsSpec::_CacheViewFont(BView* owner)
 }
 
 
-void
-ShortcutsSpec::DrawItemColumn(BView* owner, BRect item_column_rect,
-	int32 column_index, bool columnSelected, bool complete)
-{
-	const float STRING_COLUMN_LEFT_MARGIN = 25.0f;
-		// 16 for the icon, +9 empty
-
-	rgb_color color;
-	bool selected = IsSelected();
-	if (selected)
-		color = columnSelected ? BeBackgroundGrey : BeListSelectGrey;
-	else
-		color = BeInactiveControlGrey;
-	owner->SetLowColor(color);
-	owner->SetDrawingMode(B_OP_COPY);
-	owner->SetHighColor(color);
-	owner->FillRect(item_column_rect);
-
-	const char* text = GetCellText(column_index);
-
-	if (text == NULL)
-		return;
-
-	_CacheViewFont(owner);
-		// Ensure that sViewFont is configured before using it to calculate
-		// widths.  The lack of this call was causing the initial display of
-		// columns to be incorrect, with a "jump" as all the columns correct
-		// themselves upon the first column resize.
-
-	float textWidth = sViewFont.StringWidth(text);
-	BPoint point;
-	rgb_color lowColor = color;
-
-	if (column_index == STRING_COLUMN_INDEX) {
-		// left justified
-		point.Set(item_column_rect.left + STRING_COLUMN_LEFT_MARGIN,
-			item_column_rect.top + fTextOffset);
-
-		item_column_rect.left = point.x;
-			// keep text from drawing into icon area
-
-		// scroll if too wide
-		float rectWidth = item_column_rect.Width() - STRING_COLUMN_LEFT_MARGIN;
-		float extra = textWidth - rectWidth;
-		if (extra > 0.0f)
-			point.x -= extra;
-	} else {
-		if ((column_index < NUM_META_COLUMNS) && (text[0] == '('))
-			return; // don't draw for this ...
-
-		if ((column_index <= NUM_META_COLUMNS) && (text[0] == '\0'))
-			return; // don't draw for this ...
-
-		// centered
-		point.Set((item_column_rect.left + item_column_rect.right) / 2.0,
-			item_column_rect.top + fTextOffset);
-		_CacheViewFont(owner);
-		point.x -= textWidth / 2.0f;
-	}
-
-	BRegion Region;
-	Region.Include(item_column_rect);
-	owner->ConstrainClippingRegion(&Region);
-	if (column_index != STRING_COLUMN_INDEX) {
-		const float KEY_MARGIN = 3.0f;
-		const float CORNER_RADIUS = 3.0f;
-		_CacheViewFont(owner);
-
-		// How about I draw a nice "key" background for this one?
-		BRect textRect(point.x - KEY_MARGIN, (point.y - sFontHeight) - KEY_MARGIN,
-			point.x + textWidth + KEY_MARGIN - 2.0f, point.y + KEY_MARGIN);
-
-		if (column_index == KEY_COLUMN_INDEX)
-			lowColor = ReallyLightPurple;
-		else
-			lowColor = LightYellow;
-
-		owner->SetHighColor(lowColor);
-		owner->FillRoundRect(textRect, CORNER_RADIUS, CORNER_RADIUS);
-		owner->SetHighColor(Black);
-		owner->StrokeRoundRect(textRect, CORNER_RADIUS, CORNER_RADIUS);
-	}
-
-	owner->SetHighColor(Black);
-	owner->SetLowColor(lowColor);
-	owner->DrawString(text, point);
-	// with a cursor at the end if highlighted
-	if (column_index == STRING_COLUMN_INDEX) {
-		// Draw cursor
-		if ((columnSelected) && (selected)) {
-			point.x += textWidth;
-			point.y += (fTextOffset / 4.0f);
-
-			BPoint pt2 = point;
-			pt2.y -= fTextOffset;
-			owner->StrokeLine(point, pt2);
-
-			fCursorPt1 = point;
-			fCursorPt2 = pt2;
-			fCursorPtsValid = true;
-		}
-
-		BRegion bitmapRegion;
-		item_column_rect.left	-= (STRING_COLUMN_LEFT_MARGIN - 4.0f);
-		item_column_rect.right	= item_column_rect.left + 16.0f;
-		item_column_rect.top	+= 3.0f;
-		item_column_rect.bottom	= item_column_rect.top + 16.0f;
-
-		bitmapRegion.Include(item_column_rect);
-		owner->ConstrainClippingRegion(&bitmapRegion);
-		owner->SetDrawingMode(B_OP_ALPHA);
-
-		if ((fCommand != NULL) && (fCommand[0] == '*'))
-			owner->DrawBitmap(sActuatorBitmaps[fBitmapValid ? 1 : 0],
-				ICON_BITMAP_RECT, item_column_rect);
-		else
-			// Draw icon, if any
-			if (fBitmapValid)
-				owner->DrawBitmap(&fBitmap, ICON_BITMAP_RECT,
-					item_column_rect);
-	}
-
-	owner->SetDrawingMode(B_OP_COPY);
-	owner->ConstrainClippingRegion(NULL);
-}
-
-
-void
-ShortcutsSpec::Update(BView* owner, const BFont* font)
-{
-	CLVListItem::Update(owner, font);
-	font_height FontAttributes;
-	be_plain_font->GetHeight(&FontAttributes);
-	float fontHeight = ceil(FontAttributes.ascent) +
-		ceil(FontAttributes.descent);
-	fTextOffset = ceil(FontAttributes.ascent) + (Height() - fontHeight) / 2.0;
-}
-
-
 const char*
 ShortcutsSpec::GetCellText(int whichColumn) const
 {
 	const char* temp = ""; // default
-	switch(whichColumn) {
+	switch (whichColumn) {
 		case KEY_COLUMN_INDEX:
 		{
 			if ((fKey > 0) && (fKey <= 0xFF)) {
@@ -504,6 +328,8 @@ ShortcutsSpec::GetCellText(int whichColumn) const
 			if ((whichColumn >= 0) && (whichColumn < NUM_META_COLUMNS))
 				temp = sMetaMaps[whichColumn].GetNthStateDesc(
 							fMetaCellStateIndex[whichColumn]);
+			if (temp[0] == '(')
+				temp = "";
 			break;
 	}
 	return temp;
@@ -527,7 +353,7 @@ ShortcutsSpec::ProcessColumnMouseClick(int whichColumn)
 bool
 ShortcutsSpec::ProcessColumnTextString(int whichColumn, const char* string)
 {
-	switch(whichColumn) {
+	switch (whichColumn) {
 		case STRING_COLUMN_INDEX:
 			SetCommand(string);
 			return true;
@@ -536,6 +362,8 @@ ShortcutsSpec::ProcessColumnTextString(int whichColumn, const char* string)
 		case KEY_COLUMN_INDEX:
 		{
 			fKey = FindKeyCode(string);
+			SetField(new BStringField(GetCellText(whichColumn)),
+				KEY_COLUMN_INDEX);
 			return true;
 			break;
 		}
@@ -669,7 +497,7 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 {
 	bool result = false;
 
-	switch(whichColumn) {
+	switch (whichColumn) {
 		case KEY_COLUMN_INDEX:
 			if (key > -1) {
 				if ((int32)fKey != key) {
@@ -681,7 +509,7 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 
 		case STRING_COLUMN_INDEX:
 		{
-			switch(bytes[0]) {
+			switch (bytes[0]) {
 				case B_BACKSPACE:
 				case B_DELETE:
 					if (fCommandNul > 0) {
@@ -689,13 +517,11 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 						fCommand[fCommandNul - 1] = '\0';
 						fCommandNul--;	// note new nul position
 						result = true;
-						_UpdateIconBitmap();
 					}
 					break;
 
 				case B_TAB:
 					if (_AttemptTabCompletion()) {
-						_UpdateIconBitmap();
 						result = true;
 					} else
 						beep();
@@ -727,7 +553,6 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 						strncat(fCommand, bytes, fCommandLen);
 						fCommandNul += newCharLen;
 						result = true;
-						_UpdateIconBitmap();
 					}
 				}
 			}
@@ -787,75 +612,9 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 				result = true;
 	}
 
+	SetField(new BStringField(GetCellText(whichColumn)), whichColumn);
+
 	return result;
-}
-
-
-int
-ShortcutsSpec::CLVListItemCompare(const CLVListItem* firstItem,
-	const CLVListItem* secondItem, int32 keyColumn)
-{
-	ShortcutsSpec* left = (ShortcutsSpec*) firstItem;
-	ShortcutsSpec* right = (ShortcutsSpec*) secondItem;
-
-	int result = strcmp(left->GetCellText(keyColumn),
-		right->GetCellText(keyColumn));
-
-	return result > 0 ? 1 : (result == 0 ? 0 : -1);
-}
-
-
-void
-ShortcutsSpec::Pulse(BView* owner)
-{
-	if ((fCursorPtsValid)&&(owner->Window()->IsActive())) {
-		rgb_color prevColor = owner->HighColor();
-		rgb_color backgroundColor = (GetSelectedColumn() ==
-			STRING_COLUMN_INDEX) ? BeBackgroundGrey : BeListSelectGrey;
-		rgb_color barColor = ((GetSelectedColumn() == STRING_COLUMN_INDEX)
-			&& ((system_time() % 1000000) > 500000)) ? Black : backgroundColor;
-		owner->SetHighColor(barColor);
-		owner->StrokeLine(fCursorPt1, fCursorPt2);
-		owner->SetHighColor(prevColor);
-	}
-}
-
-
-void
-ShortcutsSpec::_UpdateIconBitmap()
-{
-	BString firstWord = ParseArgvZeroFromString(fCommand);
-
-	// we only need to change if the first word has changed...
-	if (fLastBitmapName == NULL || firstWord.Length() == 0
-		|| firstWord.Compare(fLastBitmapName)) {
-		if (firstWord.ByteAt(0) == '*')
-			fBitmapValid = IsValidActuatorName(&firstWord.String()[1]);
-		else {
-			fBitmapValid = false;
-			// default until we prove otherwise
-
-			if (firstWord.Length() > 0) {
-				delete [] fLastBitmapName;
-				fLastBitmapName = new char[firstWord.Length() + 1];
-				strcpy(fLastBitmapName, firstWord.String());
-
-				BEntry progEntry(fLastBitmapName, true);
-				if ((progEntry.InitCheck() == B_NO_ERROR)
-					&& (progEntry.Exists())) {
-					BNode progNode(&progEntry);
-					if (progNode.InitCheck() == B_NO_ERROR) {
-						BNodeInfo progNodeInfo(&progNode);
-						if ((progNodeInfo.InitCheck() == B_NO_ERROR)
-						&& (progNodeInfo.GetTrackerIcon(&fBitmap, B_MINI_ICON)
-							== B_NO_ERROR)) {
-							fBitmapValid = fBitmap.IsValid();
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 

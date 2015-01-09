@@ -19,11 +19,14 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <Clipboard.h>
+#include <ColumnListView.h>
+#include <ColumnTypes.h>
 #include <ControlLook.h>
 #include <File.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
 #include <Input.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Message.h>
 #include <Menu.h>
@@ -38,11 +41,11 @@
 #include <String.h>
 #include <SupportDefs.h>
 
-#include "ColumnListView.h"
-
+#include "EditWindow.h"
 #include "KeyInfos.h"
 #include "MetaKeyStateMap.h"
 #include "ParseCommandLine.h"
+#include "PopUpColumn.h"
 #include "ShortcutsFilterConstants.h"
 #include "ShortcutsSpec.h"
 
@@ -113,10 +116,6 @@ ShortcutsWindow::ShortcutsWindow()
 
 	float spacing = be_control_look->DefaultItemSpacing();
 
-	BView* top = new BView(Bounds(), NULL, B_FOLLOW_ALL_SIDES, 0);
-	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(top);
-
 	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), "Menu Bar");
 
 	BMenu* fileMenu = new BMenu(B_TRANSLATE("File"));
@@ -136,23 +135,14 @@ ShortcutsWindow::ShortcutsWindow()
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(fileMenu);
 
-	top->AddChild(menuBar);
-
 	BRect tableBounds = Bounds();
 	tableBounds.top = menuBar->Bounds().bottom + 1;
 	tableBounds.right -= B_V_SCROLL_BAR_WIDTH;
 	tableBounds.bottom -= B_H_SCROLL_BAR_HEIGHT;
 
-	BScrollView* containerView;
-	fColumnListView = new ColumnListView(tableBounds, &containerView, NULL,
-		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE,
-		B_SINGLE_SELECTION_LIST, true, true, true, B_NO_BORDER);
+	fColumnListView = new BColumnListView(NULL,
+		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
 
-	fColumnListView->SetEditMessage(new BMessage(HOTKEY_ITEM_MODIFIED),
-		BMessenger(this));
-
-	float minListWidth = 0;
-		// A running total is kept as the columns are created.
 	float cellWidth = be_plain_font->StringWidth("Either") + 20;
 		// ShortcutsSpec does not seem to translate the string "Either".
 
@@ -160,17 +150,17 @@ ShortcutsWindow::ShortcutsWindow()
 		const char* name = ShortcutsSpec::GetColumnName(i);
 		float headerWidth = be_plain_font->StringWidth(name) + 20;
 		float width = max_c(headerWidth, cellWidth);
-		minListWidth += width + 1;
 
-		fColumnListView->AddColumn(
-			new CLVColumn(name, CreateMetaPopUp(i), width, CLV_SORT_KEYABLE));
+		fColumnListView->AddColumn(new PopUpColumn(CreateMetaPopUp(i), name,
+				width, width - 1, width * 1.5, B_TRUNCATE_END, false, true, 1),
+			fColumnListView->CountColumns());
 	}
 
 	float keyCellWidth = be_plain_font->StringWidth("Caps Lock") + 20;
-	fColumnListView->AddColumn(new CLVColumn(B_TRANSLATE("Key"),
-		CreateKeysPopUp(), keyCellWidth, CLV_SORT_KEYABLE));
-	minListWidth += keyCellWidth + 1;
-
+	fColumnListView->AddColumn(new PopUpColumn(CreateKeysPopUp(),
+			B_TRANSLATE("Key"), keyCellWidth, keyCellWidth - 10,
+			keyCellWidth + 30, B_TRUNCATE_END),
+		fColumnListView->CountColumns());
 	BPopUpMenu* popup = new BPopUpMenu(NULL, false);
 	popup->AddItem(new BMenuItem(
 		B_TRANSLATE("(Choose application with file requester)"), NULL));
@@ -190,15 +180,12 @@ ShortcutsWindow::ShortcutsWindow()
 	popup->AddItem(new BMenuItem(
 		B_TRANSLATE("*SendMessage application/x-vnd.Be-TRAK 'Tfnd'"), NULL));
 	popup->AddItem(new BMenuItem(B_TRANSLATE("*Beep"), NULL));
-	fColumnListView->AddColumn(new CLVColumn(B_TRANSLATE("Application"), popup,
-		323.0, CLV_SORT_KEYABLE));
-	minListWidth += 323.0 + 1;
-	minListWidth += B_V_SCROLL_BAR_WIDTH;
-
-	fColumnListView->SetSortFunction(ShortcutsSpec::CLVListItemCompare);
-	top->AddChild(containerView);
+	fColumnListView->AddColumn(new PopUpColumn(popup, B_TRANSLATE("Application"),
+			300.0, 223.0, 324.0, B_TRUNCATE_END, true),
+		fColumnListView->CountColumns());
 
 	fColumnListView->SetSelectionMessage(new BMessage(HOTKEY_ITEM_SELECTED));
+	fColumnListView->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fColumnListView->SetTarget(this);
 
 	fAddButton = new BButton(BRect(0, 0, 0, 0), "add",
@@ -207,7 +194,6 @@ ShortcutsWindow::ShortcutsWindow()
 	fAddButton->ResizeToPreferred();
 	fAddButton->MoveBy(spacing,
 		Bounds().bottom - fAddButton->Bounds().bottom - spacing);
-	top->AddChild(fAddButton);
 
 	fRemoveButton = new BButton(BRect(0, 0, 0, 0), "remove",
 		B_TRANSLATE("Remove selected shortcut"),
@@ -215,7 +201,6 @@ ShortcutsWindow::ShortcutsWindow()
 	fRemoveButton->ResizeToPreferred();
 	fRemoveButton->MoveBy(fAddButton->Frame().right + spacing,
 		Bounds().bottom - fRemoveButton->Bounds().bottom - spacing);
-	top->AddChild(fRemoveButton);
 
 	fRemoveButton->SetEnabled(false);
 
@@ -225,23 +210,8 @@ ShortcutsWindow::ShortcutsWindow()
 	fSaveButton->ResizeToPreferred();
 	fSaveButton->MoveBy(Bounds().right - fSaveButton->Bounds().right - spacing,
 		Bounds().bottom - fSaveButton->Bounds().bottom - spacing);
-	top->AddChild(fSaveButton);
 
 	fSaveButton->SetEnabled(false);
-
-	containerView->ResizeBy(0,
-		-(fAddButton->Bounds().bottom + 2 * spacing + 2));
-
-	float minButtonBarWidth = fRemoveButton->Frame().right
-		+ fSaveButton->Bounds().right + 2 * spacing;
-	float minWidth = max_c(minListWidth, minButtonBarWidth);
-
-	float menuBarHeight = menuBar->Bounds().bottom;
-	float buttonBarHeight = Bounds().bottom - containerView->Frame().bottom;
-	float minHeight = menuBarHeight + 200 + buttonBarHeight;
-
-	SetSizeLimits(minWidth, MAX_WIDTH, minHeight, MAX_HEIGHT);
-		// SetSizeLimits() will resize the window to the minimum size.
 
 	CenterOnScreen();
 
@@ -264,6 +234,26 @@ ShortcutsWindow::ShortcutsWindow()
 		PostMessage(&message);
 			// tell ourselves to load this file if it exists
 	}
+
+	fColumnListView->ResizeAllColumnsToPreferred();
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.Add(menuBar)
+		.AddGroup(B_VERTICAL)
+			.SetInsets(B_USE_WINDOW_INSETS)
+			.Add(fColumnListView)
+			.AddGroup(B_HORIZONTAL)
+				.AddGroup(B_HORIZONTAL)
+				.SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP))
+				.Add(fAddButton)
+				.Add(fRemoveButton)
+				.End()
+				.AddGroup(B_HORIZONTAL)
+					.SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_TOP))
+					.Add(fSaveButton)
+				.End()
+			.End()
+		.End();
 
 	Show();
 }
@@ -291,7 +281,7 @@ ShortcutsWindow::QuitRequested()
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->SetShortcut(1, 'd');
 		alert->SetShortcut(2, 's');
-		switch(alert->Go()) {
+		switch (alert->Go()) {
 			case 0:
 				result = false;
 				break;
@@ -311,7 +301,7 @@ ShortcutsWindow::QuitRequested()
 							B_TRANSLATE("Oh no"));
 						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						alert->Go();
-						result = true; //quit anyway
+						result = true; // quit anyway
 					}
 				} else {
 					PostMessage(SAVE_KEYSET);
@@ -361,9 +351,9 @@ ShortcutsWindow::_SaveKeySet(BEntry& saveEntry)
 		return false;
 
 	BMessage saveMessage;
-	for (int i = 0; i < fColumnListView->CountItems(); i++) {
+	for (int i = 0; i < fColumnListView->CountRows(); i++) {
 		BMessage next;
-		if (((ShortcutsSpec*)fColumnListView->ItemAt(i))->Archive(&next)
+		if (((ShortcutsSpec*)fColumnListView->RowAt(i))->Archive(&next)
 				== B_OK) {
 			saveMessage.AddMessage("spec", &next);
 		} else
@@ -392,7 +382,7 @@ ShortcutsWindow::_LoadKeySet(const BMessage& loadMessage)
 		ShortcutsSpec* spec
 			= (ShortcutsSpec*)ShortcutsSpec::Instantiate(&message);
 		if (spec != NULL)
-			fColumnListView->AddItem(spec);
+			fColumnListView->AddRow(spec);
 		else
 			printf("_LoadKeySet: Error parsing spec!\n");
 	}
@@ -428,7 +418,7 @@ ShortcutsWindow::_SaveWindowSettings(BEntry& saveEntry)
 	saveMsg.AddRect("window frame", Frame());
 
 	for (int i = 0; i < fColumnListView->CountColumns(); i++) {
-		CLVColumn* column = fColumnListView->ColumnAt(i);
+		BColumn* column = fColumnListView->ColumnAt(i);
 		saveMsg.AddFloat("column width", column->Width());
 	}
 
@@ -457,7 +447,7 @@ ShortcutsWindow::_LoadWindowSettings(const BMessage& loadMessage)
 	}
 
 	for (int i = 0; i < fColumnListView->CountColumns(); i++) {
-		CLVColumn* column = fColumnListView->ColumnAt(i);
+		BColumn* column = fColumnListView->ColumnAt(i);
 		float columnWidth;
 		if (loadMessage.FindFloat("column width", i, &columnWidth) == B_OK)
 			column->SetWidth(max_c(column->Width(), columnWidth));
@@ -473,26 +463,27 @@ ShortcutsWindow::_AddNewSpec(const char* defaultCommand)
 	_MarkKeySetModified();
 
 	ShortcutsSpec* spec;
-	int curSel = fColumnListView->CurrentSelection();
-	if (curSel >= 0) {
-		spec = new ShortcutsSpec(*((ShortcutsSpec*)
-			fColumnListView->ItemAt(curSel)));
+	BRow* curSel = fColumnListView->CurrentSelection();
+	if (curSel)
+		spec = new ShortcutsSpec(*((ShortcutsSpec*)curSel));
+	else {
+		spec = new ShortcutsSpec("");
+		for (int i = 0; i < fColumnListView->CountColumns(); i++)
+			spec->SetField(new BStringField(""), i);
+	}
 
-		if (defaultCommand)
-			spec->SetCommand(defaultCommand);
-	} else
-		spec = new ShortcutsSpec(defaultCommand ? defaultCommand : "");
-
-	fColumnListView->AddItem(spec);
-	fColumnListView->Select(fColumnListView->CountItems() - 1);
-	fColumnListView->ScrollToSelection();
+	fColumnListView->AddRow(spec);
+	fColumnListView->AddToSelection(spec);
+	fColumnListView->ScrollTo(spec);
+	if (defaultCommand)
+		spec->SetCommand(defaultCommand);
 }
 
 
 void
 ShortcutsWindow::MessageReceived(BMessage* message)
 {
-	switch(message->what) {
+	switch (message->what) {
 		case OPEN_KEYSET:
 		case APPEND_KEYSET:
 			fLastOpenWasAppend = (message->what == APPEND_KEYSET);
@@ -531,7 +522,7 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 				BEntry entry(&ref);
 				if (entry.InitCheck() == B_OK) {
 					BPath path(&entry);
-					
+
 					if (path.InitCheck() == B_OK) {
 						// Add a new item with the given path.
 						BString str(path.Path());
@@ -570,13 +561,14 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 						}
 					}
 				}
- 
+
 				if (fLastOpenWasAppend == false) {
 					// Clear the menu...
-					while (ShortcutsSpec* item
-						= ((ShortcutsSpec*)
-							fColumnListView->RemoveItem((int32)0))) {
-						delete item;
+					while (fColumnListView->CountRows()) {
+						ShortcutsSpec* row =
+							static_cast<ShortcutsSpec*>(fColumnListView->RowAt(0));
+						fColumnListView->RemoveRow(row);
+						delete row;
 					}
 				}
 
@@ -604,18 +596,18 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 		// these messages come from the pop-up menu of the Applications column
 		case SELECT_APPLICATION:
 		{
-			int csel = fColumnListView->CurrentSelection();
-			if (csel >= 0) {
+			ShortcutsSpec* row =
+				static_cast<ShortcutsSpec*>(fColumnListView->CurrentSelection());
+			if (row != NULL) {
 				entry_ref aref;
 				if (message->FindRef("refs", &aref) == B_OK) {
 					BEntry ent(&aref);
 					if (ent.InitCheck() == B_OK) {
 						BPath path;
 						if ((ent.GetPath(&path) == B_OK)
-							&& (((ShortcutsSpec*)fColumnListView->ItemAt(csel))->
+							&& (row->
 								ProcessColumnTextString(ShortcutsSpec::STRING_COLUMN_INDEX,
 									path.Path()))) {
-							fColumnListView->InvalidateItem(csel);
 							_MarkKeySetModified();
 						}
 					}
@@ -673,26 +665,27 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 
 		case REMOVE_HOTKEY_ITEM:
 		{
-			int index = fColumnListView->CurrentSelection();
-			if (index >= 0) {
-				CLVListItem* item = (CLVListItem*) 
-					fColumnListView->ItemAt(index);
-				fColumnListView->RemoveItem(index);
+			BRow* item = fColumnListView->CurrentSelection();
+			if (item) {
+				int index = fColumnListView->IndexOf(item);
+				fColumnListView->RemoveRow(item);
 				delete item;
 				_MarkKeySetModified();
 
 				// Rules for new selection: If there is an item at (index),
 				// select it. Otherwise, if there is an item at (index-1), 
 				// select it. Otherwise, select nothing.
-				int num = fColumnListView->CountItems();
+				int num = fColumnListView->CountRows();
 				if (num > 0) {
 					if (index < num)
-						fColumnListView->Select(index);
+						fColumnListView->AddToSelection(
+							fColumnListView->RowAt(index));
 					else {
 						if (index > 0)
 							index--;
-						if (index < num) 
-							fColumnListView->Select(index);
+						if (index < num)
+							fColumnListView->AddToSelection(
+								fColumnListView->RowAt(index));
 					}
 				}
 			}
@@ -702,10 +695,10 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 		// Received when the user clicks on the ColumnListView
 		case HOTKEY_ITEM_SELECTED:
 		{
-			int32 index = -1;
-			message->FindInt32("index", &index);
-			bool validItem = (index >= 0);
-			fRemoveButton->SetEnabled(validItem);
+			if (fColumnListView->CountRows() > 0)
+				fRemoveButton->SetEnabled(true);
+			else
+				fRemoveButton->SetEnabled(false);
 			break;
 		}
 
@@ -721,20 +714,20 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 
 				if (row >= 0) {
 					ShortcutsSpec* item = (ShortcutsSpec*)
-						fColumnListView->ItemAt(row);
+						fColumnListView->RowAt(row);
 					bool repaintNeeded = false; // default
 
 					if (message->HasInt32("mouseClick")) {
 						repaintNeeded = item->ProcessColumnMouseClick(column);
 					} else if ((message->FindString("bytes", &bytes) == B_OK)
 						&& (message->FindInt32("key", &key) == B_OK)) {
-						repaintNeeded = item->ProcessColumnKeyStroke(column, 
+						repaintNeeded = item->ProcessColumnKeyStroke(column,
 							bytes, key);
 					} else if (message->FindInt32("unmappedkey", &key) ==
 						B_OK) {
-						repaintNeeded = ((column == item->KEY_COLUMN_INDEX) 
-							&& ((key > 0xFF) || (GetKeyName(key) != NULL)) 
-							&& (item->ProcessColumnKeyStroke(column, NULL, 
+						repaintNeeded = ((column == item->KEY_COLUMN_INDEX)
+							&& ((key > 0xFF) || (GetKeyName(key) != NULL))
+							&& (item->ProcessColumnKeyStroke(column, NULL,
 							key)));
 					} else if (message->FindString("text", &bytes) == B_OK) {
 						if ((bytes[0] == '(')&&(bytes[1] == 'C')) {
@@ -747,16 +740,15 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 									NULL, 0, false, &message);
 								fSelectPanel->Show();
 							}
-							fSelectPanel->SetButtonLabel(B_DEFAULT_BUTTON, 
+							fSelectPanel->SetButtonLabel(B_DEFAULT_BUTTON,
 								B_TRANSLATE("Select"));
-						} else {
+						} else
 							repaintNeeded = item->ProcessColumnTextString(
 								column, bytes);
-						}
 					}
-					
+
 					if (repaintNeeded) {
-						fColumnListView->InvalidateItem(row);
+						fColumnListView->Invalidate(row);
 						_MarkKeySetModified();
 					}
 				}
@@ -784,10 +776,6 @@ ShortcutsWindow::_MarkKeySetModified()
 void
 ShortcutsWindow::Quit()
 {
-	for (int i = fColumnListView->CountItems() - 1; i >= 0; i--)
-		delete (ShortcutsSpec*)fColumnListView->ItemAt(i);
-
-	fColumnListView->MakeEmpty();
 	BWindow::Quit();
 }
 
@@ -795,29 +783,28 @@ ShortcutsWindow::Quit()
 void
 ShortcutsWindow::DispatchMessage(BMessage* message, BHandler* handler)
 {
-	switch(message->what) {
+	switch (message->what) {
+		case B_SIMPLE_DATA:
+			MessageReceived(message);
+			break;
+
 		case B_COPY:
 		case B_CUT:
 			if (be_clipboard->Lock()) {
-				int32 row = fColumnListView->CurrentSelection(); 
-				int32 column = fColumnListView->GetSelectedColumn();
-				if ((row >= 0) 
-					&& (column == ShortcutsSpec::STRING_COLUMN_INDEX)) {
-					ShortcutsSpec* spec = (ShortcutsSpec*)
-						fColumnListView->ItemAt(row);
-					if (spec) {
-						BMessage* data = be_clipboard->Data();
-						data->RemoveName("text/plain");
-						data->AddData("text/plain", B_MIME_TYPE, 
-							spec->GetCellText(column), 
-							strlen(spec->GetCellText(column)));
-						be_clipboard->Commit();
-						
-						if (message->what == B_CUT) {
-							spec->ProcessColumnTextString(column, "");
-							_MarkKeySetModified();
-							fColumnListView->InvalidateItem(row);
-						}
+				ShortcutsSpec* row =
+					static_cast<ShortcutsSpec*>(fColumnListView->CurrentSelection());
+				if (row) {
+					BMessage* data = be_clipboard->Data();
+					data->RemoveName("text/plain");
+					data->AddData("text/plain", B_MIME_TYPE,
+						row->GetCellText(ShortcutsSpec::STRING_COLUMN_INDEX),
+						strlen(row->GetCellText(ShortcutsSpec::STRING_COLUMN_INDEX)));
+					be_clipboard->Commit();
+
+					if (message->what == B_CUT) {
+						row->ProcessColumnTextString(
+							ShortcutsSpec::STRING_COLUMN_INDEX, "");
+						_MarkKeySetModified();
 					}
 				}
 				be_clipboard->Unlock();
@@ -831,26 +818,35 @@ ShortcutsWindow::DispatchMessage(BMessage* message, BHandler* handler)
 				ssize_t textLen;
 				if (data->FindData("text/plain", B_MIME_TYPE, (const void**)
 					&text, &textLen) == B_OK) {
-					int32 row = fColumnListView->CurrentSelection();
-					int32 column = fColumnListView->GetSelectedColumn();
-					if ((row >= 0) 
-						&& (column == ShortcutsSpec::STRING_COLUMN_INDEX)) {
-						ShortcutsSpec* spec = (ShortcutsSpec*)
-							fColumnListView->ItemAt(row);
-						if (spec) {
-							for (ssize_t i = 0; i < textLen; i++) {
-								char buf[2] = {text[i], 0x00};
-								spec->ProcessColumnKeyStroke(column, buf, 0);
-							}
+					ShortcutsSpec* row =
+					static_cast<ShortcutsSpec*>(fColumnListView->CurrentSelection());
+					if (row) {
+						for (ssize_t i = 0; i < textLen; i++) {
+							char buf[2] = {text[i], 0x00};
+							row->ProcessColumnKeyStroke(
+								ShortcutsSpec::STRING_COLUMN_INDEX, buf, 0);
 						}
-						fColumnListView->InvalidateItem(row);
-						_MarkKeySetModified();
 					}
+					_MarkKeySetModified();
 				}
 				be_clipboard->Unlock();
 			}
 			break;
-		
+
+		case B_KEY_DOWN:
+			ShortcutsSpec* selected;
+			if (message->GetInt32("modifiers", 0) != 0)
+				BWindow::DispatchMessage(message, handler);
+			else if (handler == fColumnListView
+				&& (selected =
+					static_cast<ShortcutsSpec*>(fColumnListView->CurrentSelection()))) {
+				selected->ProcessColumnTextString(
+						ShortcutsSpec::KEY_COLUMN_INDEX,
+						GetKeyName(message->GetInt32("key", 0)));
+				_MarkKeySetModified();
+			}
+			break;
+
 		default:
 			BWindow::DispatchMessage(message, handler);
 			break;

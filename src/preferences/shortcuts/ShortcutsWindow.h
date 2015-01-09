@@ -10,15 +10,16 @@
 #define SHORTCUTS_WINDOW_H
 
 
+#include <ColumnListView.h>
 #include <Entry.h>
 #include <Window.h>
 
-#include "ColumnListView.h"
-
 
 class BButton;
+class BColumnListView;
 class BFilePanel;
 class BMessage;
+class ShortcutsSpec;
 
 // This class defines our preferences/configuration window.
 class ShortcutsWindow : public BWindow {
@@ -69,7 +70,7 @@ private:
 			BButton*			fAddButton;
 			BButton*			fRemoveButton;
 			BButton*			fSaveButton;
-			ColumnListView*		fColumnListView;
+			BColumnListView*	fColumnListView;
 			BFilePanel*			fSavePanel;
 				// for saving settings
 			BFilePanel*			fOpenPanel;
@@ -85,6 +86,8 @@ private:
 
 			// true iff the file-requester's ref should be appended to current
 			bool				fLastOpenWasAppend;
+
+			BRow*				fSelectedRow;
 };
 
 

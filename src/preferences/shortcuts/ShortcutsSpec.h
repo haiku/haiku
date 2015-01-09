@@ -12,7 +12,7 @@
 
 #include <Bitmap.h>
 
-#include "CLVListItem.h"
+#include <ColumnListView.h>
 #include "KeyInfos.h"
 
 
@@ -28,7 +28,7 @@ MetaKeyStateMap& GetNthKeyMap(int which);
  * the proper GUI display, and the proper BitFieldTester and CommandActuator
  * object for the ShortcutsCatcher add-on to use.
  */
-class ShortcutsSpec : public CLVListItem {
+class ShortcutsSpec : public BRow, public BArchivable {
 public:
 	static	void			InitializeMetaMaps();
 
@@ -38,18 +38,9 @@ public:
 							~ShortcutsSpec();
 
 	virtual	status_t		Archive(BMessage* into, bool deep = true) const;
-	virtual	void 			Pulse(BView* owner);
 	static	BArchivable*	Instantiate(BMessage* from);
-			void			Update(BView* owner, const BFont* font);
 	const	char* 			GetCellText(int whichColumn) const;
 			void			SetCommand(const char* commandStr);
-
-	virtual	void			DrawItemColumn(BView* owner, BRect item_column_rect,
-								int32 column_index, bool columnSelected,
-								bool complete);
-	
-	static	int				CLVListItemCompare(const CLVListItem* firstItem,
-								const CLVListItem* secondItem, int32 keyColumn);
 
 	// Returns the name of the Nth Column.
 	static	const char*		GetColumnName(int index);
@@ -84,13 +75,9 @@ private:
 			void 			_CacheViewFont(BView* owner);
 			bool 			_AttemptTabCompletion();
 
-			// call this to ensure the icon is up-to-date
-			void 			_UpdateIconBitmap();
-
 			char*			fCommand;
 			uint32			fCommandLen;	// number of bytes in fCommand buffer
 			uint32			fCommandNul;	// index of the NUL byte in fCommand
-			float			fTextOffset;
 
 			// icon for associated program. Invalid if none available.
 			BBitmap			fBitmap;
