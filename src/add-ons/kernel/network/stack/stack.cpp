@@ -22,7 +22,6 @@
 
 #include <lock.h>
 #include <util/AutoLock.h>
-#include <util/khash.h>
 
 #include <KernelExport.h>
 
@@ -68,6 +67,8 @@ struct family {
 	ChainList		chains;
 };
 
+struct ChainHash;
+
 struct chain : DoublyLinkedListLinkImpl<chain> {
 	chain(int family, int type, int protocol);
 	~chain();
@@ -76,15 +77,13 @@ struct chain : DoublyLinkedListLinkImpl<chain> {
 	void Release();
 	void Uninitialize();
 
-	static int Compare(void* _chain, const void* _key);
-	static uint32 Hash(void* _chain, const void* _key, uint32 range);
-	static struct chain* Lookup(hash_table* chains, int family, int type,
-		int protocol);
-	static struct chain* Add(hash_table* chains, int family, int type,
-		int protocol, va_list modules);
-	static struct chain* Add(hash_table* chains, int family, int type,
-		int protocol, ...);
-	static void DeleteChains(hash_table* chains);
+	static struct chain* Lookup(BOpenHashTable<ChainHash>* chains,
+		int family, int type, int protocol);
+	static struct chain* Add(BOpenHashTable<ChainHash>* chains,
+		int family, int type, int protocol, va_list modules);
+	static struct chain* Add(BOpenHashTable<ChainHash>* chains,
+		int family, int type, int protocol, ...);
+	static void DeleteChains(BOpenHashTable<ChainHash>* chains);
 
 	chain*			next;
 	struct family*	parent;
@@ -99,15 +98,78 @@ struct chain : DoublyLinkedListLinkImpl<chain> {
 	module_info*	infos[MAX_CHAIN_MODULES + 1];
 };
 
+struct ChainHash {
+	typedef chain_key	KeyType;
+	typedef	chain		ValueType;
+
+// TODO: check if this makes a good hash...
+#define HASH(o) ((uint32)(((o)->family) ^ ((o)->type) ^ ((o)->protocol)))
+
+	size_t HashKey(KeyType key) const
+	{
+		return HASH(&key);
+	}
+
+	size_t Hash(ValueType* value) const
+	{
+		return HASH(value);
+	}
+
+#undef HASH
+
+	bool Compare(KeyType key, ValueType* chain) const
+	{
+		if (chain->family == key.family
+			&& chain->type == key.type
+			&& chain->protocol == key.protocol)
+			return true;
+
+		return false;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->next;
+	}
+};
+
+struct FamilyHash {
+	typedef int			KeyType;
+	typedef	family		ValueType;
+
+	size_t HashKey(KeyType key) const
+	{
+		return key;
+	}
+
+	size_t Hash(ValueType* value) const
+	{
+		return value->type;
+	}
+
+	bool Compare(KeyType key, ValueType* family) const
+	{
+		return family->type == key;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->next;
+	}
+};
+
+typedef BOpenHashTable<ChainHash> ChainTable;
+typedef BOpenHashTable<FamilyHash> FamilyTable;
+
 #define CHAIN_MISSING_MODULE	0x02
 #define CHAIN_INITIALIZED		0x01
 
 static mutex sChainLock;
 static mutex sInitializeChainLock;
-static hash_table* sProtocolChains;
-static hash_table* sDatalinkProtocolChains;
-static hash_table* sReceivingProtocolChains;
-static hash_table* sFamilies;
+static ChainTable* sProtocolChains;
+static ChainTable* sDatalinkProtocolChains;
+static ChainTable* sReceivingProtocolChains;
+static FamilyTable* sFamilies;
 static bool sInitialized;
 
 
@@ -142,36 +204,10 @@ family::Release()
 }
 
 
-/*static*/ int
-family::Compare(void* _family, const void* _key)
-{
-	struct family* family = (struct family*)_family;
-	int key = (addr_t)_key;
-
-	if (family->type == key)
-		return 0;
-
-	return 1;
-}
-
-
-/*static*/ uint32
-family::Hash(void* _family, const void* _key, uint32 range)
-{
-	struct family* family = (struct family*)_family;
-	int key = (addr_t)_key;
-
-	if (family != NULL)
-		return family->type % range;
-
-	return key % range;
-}
-
-
 /*static*/ struct family*
 family::Lookup(int type)
 {
-	return (struct family*)hash_lookup(sFamilies, (void*)(addr_t)type);
+	return sFamilies->Lookup(type);
 }
 
 
@@ -182,7 +218,7 @@ family::Add(int type)
 	if (family == NULL)
 		return NULL;
 
-	if (hash_insert(sFamilies, family) != B_OK) {
+	if (sFamilies->Insert(family) != B_OK) {
 		delete family;
 		return NULL;
 	}
@@ -294,60 +330,23 @@ chain::Uninitialize()
 }
 
 
-/*static*/ int
-chain::Compare(void* _chain, const void* _key)
-{
-	const chain_key* key = (const chain_key*)_key;
-	struct chain* chain = (struct chain*)_chain;
-
-	if (chain->family == key->family
-		&& chain->type == key->type
-		&& chain->protocol == key->protocol)
-		return 0;
-
-	return 1;
-}
-
-
-/*static*/ uint32
-chain::Hash(void* _chain, const void* _key, uint32 range)
-{
-	const chain_key* key = (const chain_key*)_key;
-	struct chain* chain = (struct chain*)_chain;
-
-// TODO: check if this makes a good hash...
-#define HASH(o) ((uint32)(((o)->family) ^ ((o)->type) ^ ((o)->protocol)) % range)
-#if 0
-	TRACE(("%d.%d.%d: Hash: %lu\n", chain ? chain->family : key->family,
-		chain ? chain->type : key->type, chain ? chain->protocol : key->protocol,
-		chain ? HASH(chain) : HASH(key)));
-#endif
-
-	if (chain != NULL)
-		return HASH(chain);
-
-	return HASH(key);
-#undef HASH
-}
-
-
 /*static*/ struct chain*
-chain::Lookup(hash_table* chains, int family, int type, int protocol)
+chain::Lookup(ChainTable* chains, int family, int type, int protocol)
 {
 	struct chain_key key = { family, type, protocol };
-	return (struct chain*)hash_lookup(chains, &key);
+	return chains->Lookup(key);
 }
 
 
 /*static*/ struct chain*
-chain::Add(hash_table* chains, int family, int type, int protocol,
+chain::Add(ChainTable* chains, int family, int type, int protocol,
 	va_list modules)
 {
 	struct chain* chain = new (std::nothrow) ::chain(family, type, protocol);
 	if (chain == NULL)
 		return NULL;
 
-	if (chain->parent == NULL || hash_insert(chains, chain) != B_OK) {
+	if (chain->parent == NULL || chains->Insert(chain) != B_OK) {
 		delete chain;
 		return NULL;
 	}
@@ -365,14 +364,14 @@ chain::Add(hash_table* chains, int family, int type, int protocol,
 		chain->modules[count] = strdup(module);
 		if (chain->modules[count] == NULL
 			|| ++count >= MAX_CHAIN_MODULES) {
-			hash_remove(chains, chain);
+			chains->Remove(chain);
 			delete chain;
 			return NULL;
 		}
 	}
 
 	if (chains == sProtocolChains && count == 0) {
-		hash_remove(chains, chain);
+		chains->Remove(chain);
 		delete chain;
 		return NULL;
 	}
@@ -382,7 +381,7 @@ chain::Add(hash_table* chains, int family, int type, int protocol,
 
 
 /*static*/ struct chain*
-chain::Add(hash_table* chains, int family, int type, int protocol, ...)
+chain::Add(ChainTable* chains, int family, int type, int protocol, ...)
 {
 	va_list modules;
 	va_start(modules, protocol);
@@ -395,16 +394,16 @@ chain::Add(hash_table* chains, int family, int type, int protocol, ...)
 
 
 /*static*/ void
-chain::DeleteChains(hash_table* chains)
+chain::DeleteChains(ChainTable* chains)
 {
-	uint32 cookie = 0;
-	while (true) {
-		struct chain* chain = (struct chain*)hash_remove_first(chains, &cookie);
-		if (chain == NULL)
-			break;
+	struct chain* current;
+	current = chains->Clear(true);
+	while (current) {
+		struct chain* next = current->next;
 
-		chain->Uninitialize();
-		delete chain;
+		current->Uninitialize();
+		delete current;
+		current = next;
 	}
 }
 
@@ -799,30 +798,28 @@ init_stack()
 	mutex_init(&sChainLock, "net chains");
 	mutex_init(&sInitializeChainLock, "net intialize chains");
 
-	sFamilies = hash_init(10, offsetof(struct family, next),
-		&family::Compare, &family::Hash);
-	if (sFamilies == NULL) {
+	sFamilies = new FamilyTable();
+	if (sFamilies == NULL || sFamilies->Init(10) != B_OK) {
 		status = B_NO_MEMORY;
 		goto err5;
 	}
 
-	sProtocolChains = hash_init(10, offsetof(struct chain, next),
-		&chain::Compare, &chain::Hash);
-	if (sProtocolChains == NULL) {
+	sProtocolChains = new ChainTable();
+	if (sProtocolChains == NULL || sProtocolChains->Init(10) != B_OK) {
 		status = B_NO_MEMORY;
 		goto err6;
 	}
 
-	sDatalinkProtocolChains = hash_init(10, offsetof(struct chain, next),
-		&chain::Compare, &chain::Hash);
-	if (sDatalinkProtocolChains == NULL) {
+	sDatalinkProtocolChains = new ChainTable();
+	if (sDatalinkProtocolChains == NULL
+			|| sDatalinkProtocolChains->Init(10) != B_OK) {
 		status = B_NO_MEMORY;
 		goto err7;
 	}
 
-	sReceivingProtocolChains = hash_init(10, offsetof(struct chain, next),
-		&chain::Compare, &chain::Hash);
-	if (sReceivingProtocolChains == NULL) {
+	sReceivingProtocolChains = new ChainTable();
+	if (sReceivingProtocolChains == NULL
+			|| sReceivingProtocolChains->Init(10) != B_OK) {
 		status = B_NO_MEMORY;
 		goto err8;
 	}
@@ -850,11 +847,11 @@ init_stack()
 	return B_OK;
 
 err8:
-	hash_uninit(sDatalinkProtocolChains);
+	delete sDatalinkProtocolChains;
 err7:
-	hash_uninit(sProtocolChains);
+	delete sProtocolChains;
 err6:
-	hash_uninit(sFamilies);
+	delete sFamilies;
 err5:
 	mutex_destroy(&sInitializeChainLock);
 	mutex_destroy(&sChainLock);
@@ -891,20 +888,19 @@ uninit_stack()
 	chain::DeleteChains(sDatalinkProtocolChains);
 	chain::DeleteChains(sReceivingProtocolChains);
 
-	uint32 cookie = 0;
-	while (true) {
-		struct family* family = (struct family*)hash_remove_first(sFamilies,
-			&cookie);
-		if (family == NULL)
-			break;
+	struct family* current;
+	current = sFamilies->Clear(true);
+	while (current) {
+		struct family* next = current->next;
 
-		delete family;
+		delete current;
+		current = next;
 	}
 
-	hash_uninit(sProtocolChains);
-	hash_uninit(sDatalinkProtocolChains);
-	hash_uninit(sReceivingProtocolChains);
-	hash_uninit(sFamilies);
+	delete sProtocolChains;
+	delete sDatalinkProtocolChains;
+	delete sReceivingProtocolChains;
+	delete sFamilies;
 
 	return B_OK;
 }
