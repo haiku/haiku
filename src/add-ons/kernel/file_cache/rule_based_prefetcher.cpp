@@ -148,18 +148,19 @@ class RuleMatcher {
 		team_rules	*fRules;
 };
 
+
 struct RuleHash {
 		typedef char*		KeyType;
 		typedef	rules		ValueType;
 
 		size_t HashKey(KeyType key) const
 		{
-			return key >> 1;
+			return hash_hash_string(key);
 		}
 
 		size_t Hash(ValueType* value) const
 		{
-			return HashKey(value->bar);
+			return HashKey(value->name);
 		}
 
 		bool Compare(KeyType key, ValueType* rules) const
@@ -172,6 +173,7 @@ struct RuleHash {
 			return value->fNext;
 		}
 };
+
 
 struct TeamHash {
 		typedef team_id		KeyType;
