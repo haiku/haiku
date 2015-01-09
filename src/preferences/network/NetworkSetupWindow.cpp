@@ -157,7 +157,9 @@ NetworkSetupWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgToggleReplicant: {
-			_ShowReplicant(message->FindInt32("be:value"));
+			_ShowReplicant(message->GetInt32("be:value", B_CONTROL_OFF)
+				== B_CONTROL_ON);
+			break;
 		}
 
 		default:
