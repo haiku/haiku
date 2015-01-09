@@ -15,7 +15,6 @@
 #include <Node.h>
 
 #include <util/kernel_cpp.h>
-#include <util/khash.h>
 #include <util/AutoLock.h>
 #include <thread.h>
 #include <team.h>
@@ -51,7 +50,7 @@ enum match_type {
 enum rule_type {
 	LAUNCH_TYPE		= 0x1,
 	OPEN_FILE_TYPE	= 0x2,
-	ARGUMENTS_TYPE	= 0x4,	
+	ARGUMENTS_TYPE	= 0x4,
 	ALL_TYPES		= 0xff,
 };
 
@@ -84,7 +83,8 @@ class Rule {
 		void AddBody(struct body *body);
 
 		struct head *FindHead(mount_id device, vnode_id node);
-		match_type Match(int32 state, mount_id device, vnode_id parent, const char *name);
+		match_type Match(int32 state, mount_id device, vnode_id parent,
+			const char *name);
 		void Apply();
 
 		void KnownFileOpened() { fKnownFileOpened++; }
@@ -143,67 +143,69 @@ class RuleMatcher {
 	private:
 		void _CollectRules(const char *name);
 		void _MatchFile(mount_id device, vnode_id parent, const char *name);
-		void _MatchArguments(int32 argCount, char * const *args);		
+		void _MatchArguments(int32 argCount, char * const *args);
 
 		team_rules	*fRules;
 };
 
-static hash_table *sRulesHash;
-static hash_table *sTeamHash;
+struct RuleHash {
+		typedef char*		KeyType;
+		typedef	rules		ValueType;
+
+		size_t HashKey(KeyType key) const
+		{
+			return key >> 1;
+		}
+
+		size_t Hash(ValueType* value) const
+		{
+			return HashKey(value->bar);
+		}
+
+		bool Compare(KeyType key, ValueType* rules) const
+		{
+			return strcmp(rules->name, key) == 0;
+		}
+
+		ValueType*& GetLink(ValueType* value) const
+		{
+			return value->fNext;
+		}
+};
+
+struct TeamHash {
+		typedef team_id		KeyType;
+		typedef	team_rules	ValueType;
+
+		size_t HashKey(KeyType key) const
+		{
+			return key;
+		}
+
+		size_t Hash(ValueType* value) const
+		{
+			return value->team;
+		}
+
+		bool Compare(KeyType key, ValueType* value) const
+		{
+			return value->team == key;
+		}
+
+		ValueType*& GetLink(ValueType* value) const
+		{
+			return value->fNext;
+		}
+};
+
+
+typedef BOpenHashTable<RuleHash> RuleTable;
+typedef BOpenHashTable<TeamHash> TeamTable;
+
+static RuleTable *sRulesHash;
+static TeamTable *sTeamHash;
 static recursive_lock sLock;
 int32 sMinConfidence = 5000;
-
-
-static int
-rules_compare(void *_rules, const void *_key)
-{
-	struct rules *rules = (struct rules *)_rules;
-	const char *key = (const char *)_key;
-
-	return strcmp(rules->name, key);
-}
-
-
-static uint32
-rules_hash(void *_rules, const void *_key, uint32 range)
-{
-	struct rules *rules = (struct rules *)_rules;
-	const char *key = (const char *)_key;
-
-	if (rules != NULL)
-		return hash_hash_string(rules->name) % range;
-
-	return hash_hash_string(key) % range;
-}
-
-
-//	#pragma mark -
-
-
-static int
-team_compare(void *_rules, const void *_key)
-{
-	team_rules *rules = (team_rules *)_rules;
-	const team_id *team = (const team_id *)_key;
-
-	if (rules->team == *team)
-		return 0;
-
-	return -1;
-}
-
-
-static uint32
-team_hash(void *_rules, const void *_key, uint32 range)
-{
-	team_rules *rules = (team_rules *)_rules;
-	const team_id *team = (const team_id *)_key;
-
-	if (rules != NULL)
-		return rules->team % range;
-
-	return *team % range;
-}
 
 
 static void
@@ -212,7 +214,7 @@ team_gone(team_id team, void *_rules)
 	team_rules *rules = (team_rules *)_rules;
 
 	recursive_lock_lock(&sLock);
-	hash_remove(sTeamHash, rules);
+	sTeamHash->Remove(rules);
 	recursive_lock_unlock(&sLock);
 
 	delete rules;
@@ -253,7 +255,7 @@ head::head()
 static inline rules *
 find_rules(const char *name)
 {
-	return (rules *)hash_lookup(sRulesHash, name);
+	return sRulesHash->Lookup(name);
 }
 
 
@@ -274,7 +276,7 @@ get_rule(const char *name, rule_type type)
 
 		strlcpy(rules->name, name, B_FILE_NAME_LENGTH);
 		rules->first = NULL;
-		hash_insert(sRulesHash, rules);
+		sRulesHash->Insert(rules);
 	}
 
 	// search for matching rule type
@@ -561,7 +563,7 @@ RuleMatcher::RuleMatcher(team_id team, const char *name)
 	if (name == NULL)
 		return;
 
-	fRules = (team_rules *)hash_lookup(sTeamHash, &team);
+	fRules = sTeamHash->Lookup(team);
 	if (fRules != NULL)
 		return;
 
@@ -576,7 +578,7 @@ RuleMatcher::RuleMatcher(team_id team, const char *name)
 dprintf("new rules for \"%s\"\n", name);
 	_CollectRules(name);
 
-	hash_insert(sTeamHash, fRules);
+	sTeamHash->Insert(fRules);
 	start_watching_team(team, team_gone, fRules);
 
 	fRules->timestamp = system_time();
@@ -592,7 +594,7 @@ RuleMatcher::~RuleMatcher()
 void
 RuleMatcher::_CollectRules(const char *name)
 {
-	struct rules *rules = (struct rules *)hash_lookup(sRulesHash, name);
+	struct rules *rules = sRulesHash->Lookup(name);
 	if (rules == NULL) {
 		// there are no rules for this command
 		return;
@@ -715,14 +717,15 @@ uninit()
 
 	// free all sessions from the hashes
 
-	uint32 cookie = 0;
-	team_rules *teamRules;
-	while ((teamRules = (team_rules *)hash_remove_first(sTeamHash, &cookie)) != NULL) {
+	team_rules *teamRules = sTeamHash->Clear(true);
+	while ((teamRules != NULL) {
+		team_rules *next = teamRules->next;
 		delete teamRules;
+		teamRules = next;
 	}
-	struct rules *rules;
-	cookie = 0;
-	while ((rules = (struct rules *)hash_remove_first(sRulesHash, &cookie)) != NULL) {
+
+	struct rules *rules = sRulesHash->Clear(true);
+	while ((rules != NULL) {
 		Rule *rule = rules->first;
 		while (rule) {
 			Rule *next = rule->Next();
@@ -733,11 +736,14 @@ uninit()
 			delete rule;
 			rule = next;
 		}
+
+		struct rules *next = rules->next;
 		delete rules;
+		rules = next;
 	}
 
-	hash_uninit(sTeamHash);
-	hash_uninit(sRulesHash);
+	delete sTeamHash;
+	delete sRulesHash;
 	recursive_lock_destroy(&sLock);
 }
 
@@ -745,15 +751,15 @@ uninit()
 static status_t
 init()
 {
-	sTeamHash = hash_init(64, 0, &team_compare, &team_hash);
-	if (sTeamHash == NULL)
+	sTeamHash = new TeamTable();
+	if (sTeamHash == NULL || sTeamHash->Init(64) != B_OK)
 		return B_NO_MEMORY;
 
 	status_t status;
 
-	sRulesHash = hash_init(64, 0, &rules_compare, &rules_hash);
-	if (sRulesHash == NULL) {
-		hash_uninit(sTeamHash);
+	sRulesHash = new RuleTable();
+	if (sRulesHash == NULL || sRulesHash->Init(64) != B_OK) {
+		delete sTeamHash;
 		return B_NO_MEMORY;
 	}
 
