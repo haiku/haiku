@@ -22,7 +22,6 @@
 #include <util/atomic.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
-#include <util/khash.h>
 
 #include <ByteOrder.h>
 #include <KernelExport.h>
@@ -80,8 +79,6 @@ struct arp_entry {
 
 	BufferList  queue;
 
-	static int Compare(void *_entry, const void *_key);
-	static uint32 Hash(void *_entry, const void *_key, uint32 range);
 	static arp_entry *Lookup(in_addr_t protocolAddress);
 	static arp_entry *Add(in_addr_t protocolAddress,
 		sockaddr_dl *hardwareAddress, uint32 flags);
@@ -122,9 +119,38 @@ static void arp_timer(struct net_timer *timer, void *data);
 net_buffer_module_info* gBufferModule;
 static net_stack_module_info* sStackModule;
 static net_datalink_module_info* sDatalinkModule;
-static hash_table* sCache;
 static mutex sCacheLock;
 static bool sIgnoreReplies;
+
+
+struct arpHash {
+	typedef in_addr_t KeyType;
+	typedef arp_entry ValueType;
+
+	size_t HashKey(KeyType key) const
+	{
+		return key;
+	}
+
+	size_t Hash(ValueType* value) const
+	{
+		return HashKey(value->protocol_address);
+	}
+
+	bool Compare(KeyType key, ValueType* value) const
+	{
+		return value->protocol_address == key;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->next;
+	}
+};
+
+
+typedef BOpenHashTable<arpHash> AddressCache;
+static AddressCache* sCache;
 
 
 #ifdef TRACE_ARP
@@ -221,46 +247,10 @@ ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
 // #pragma mark -
 
 
-/*static*/ int
-arp_entry::Compare(void *_entry, const void *_key)
-{
-	arp_entry *entry = (arp_entry *)_entry;
-	in_addr_t *key = (in_addr_t *)_key;
-
-	if (entry->protocol_address == *key)
-		return 0;
-
-	return 1;
-}
-
-
-/*static*/ uint32
-arp_entry::Hash(void *_entry, const void *_key, uint32 range)
-{
-	arp_entry *entry = (arp_entry *)_entry;
-	const in_addr_t *key = (const in_addr_t *)_key;
-
-// TODO: check if this makes a good hash...
-#define HASH(o) ((((o) >> 24) ^ ((o) >> 16) ^ ((o) >> 8) ^ (o)) % range)
-
-#if 0
-	in_addr_t a = entry ? entry->protocol_address : *key;
-	dprintf("%ld.%ld.%ld.%ld: Hash: %lu\n", a >> 24, (a >> 16) & 0xff,
-		(a >> 8) & 0xff, a & 0xff, HASH(a));
-#endif
-
-	if (entry != NULL)
-		return HASH(entry->protocol_address);
-
-	return HASH(*key);
-#undef HASH
-}
-
-
 /*static*/ arp_entry *
 arp_entry::Lookup(in_addr_t address)
 {
-	return (arp_entry *)hash_lookup(sCache, &address);
+	return sCache->Lookup(address);
 }
 
 
@@ -295,7 +285,7 @@ arp_entry::Add(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 		entry->hardware_address.sdl_len = sizeof(sockaddr_dl);
 	}
 
-	if (hash_insert(sCache, entry) != B_OK) {
+	if (sCache->Insert(entry) != B_OK) {
 		// We can delete the entry here with the sCacheLock held, since it's
 		// guaranteed there are no timers pending.
 		delete entry;
@@ -496,7 +486,7 @@ arp_remove_local_entry(arp_protocol* protocol, const sockaddr* local,
 
 	arp_entry* entry = arp_entry::Lookup(inetAddress);
 	if (entry != NULL) {
-		hash_remove(sCache, entry);
+		sCache->Remove(entry);
 		entry->flags |= ARP_FLAG_REMOVED;
 	}
 
@@ -722,7 +712,7 @@ arp_timer(struct net_timer *timer, void *data)
 				break;
 			}
 
-			hash_remove(sCache, entry);
+			sCache->Remove(entry);
 			locker.Unlock();
 
 			delete entry;
@@ -891,16 +881,14 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 
 		case ARP_GET_ENTRIES:
 		{
-			hash_iterator iterator;
-			hash_open(sCache, &iterator);
+			AddressCache::Iterator iterator(sCache);
 
-			arp_entry *entry;
+			arp_entry *entry = NULL;
 			uint32 i = 0;
-			while ((entry = (arp_entry *)hash_next(sCache, &iterator)) != NULL
-				&& i < control.cookie) {
+			while (iterator.HasNext() && i < control.cookie) {
+				entry = iterator.Next();
 				i++;
 			}
-			hash_close(sCache, &iterator, false);
 
 			if (entry == NULL)
 				return B_ENTRY_NOT_FOUND;
@@ -931,18 +919,17 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 
 		case ARP_FLUSH_ENTRIES:
 		{
-			hash_iterator iterator;
-			hash_open(sCache, &iterator);
+			AddressCache::Iterator iterator(sCache);
 
 			arp_entry *entry;
-			while ((entry = (arp_entry *)hash_next(sCache, &iterator)) != NULL) {
+			while (iterator.HasNext()) {
+				entry = iterator.Next();
 				// we never flush local ARP entries
 				if ((entry->flags & ARP_FLAG_LOCAL) != 0)
 					continue;
 
 				entry->ScheduleRemoval();
 			}
-			hash_close(sCache, &iterator, false);
 			return B_OK;
 		}
 
@@ -960,9 +947,8 @@ arp_init()
 {
 	mutex_init(&sCacheLock, "arp cache");
 
-	sCache = hash_init(64, offsetof(struct arp_entry, next),
-		&arp_entry::Compare, &arp_entry::Hash);
-	if (sCache == NULL) {
+	sCache = new AddressCache();
+	if (sCache == NULL || sCache->Init(64) != B_OK) {
 		mutex_destroy(&sCacheLock);
 		return B_NO_MEMORY;
 	}
