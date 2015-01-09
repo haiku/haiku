@@ -1,6 +1,6 @@
 /*
- * Copyright 2005, Jérôme Duval. All rights reserved.
  * Copyright 2014, Dario Casalinuovo. All rights reserved.
+ * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Inspired by SoundCapture from Be newsletter (Media Kit Basics:
@@ -43,7 +43,6 @@
 #include <TimeSource.h>
 #include <NodeInfo.h>
 
-#include "SoundUtils.h"
 #include "RecorderWindow.h"
 #include "FileUtils.h"
 
@@ -1224,9 +1223,10 @@ RecorderWindow::RecordFile(void* cookie, bigtime_t timestamp,
 
 
 void
-RecorderWindow::NotifyRecordFile(void * cookie, int32 code, ...)
+RecorderWindow::NotifyRecordFile(void * cookie,
+	BMediaRecorder::notification code, ...)
 {
-	if ((code == B_WILL_STOP) || (code == B_NODE_DIES)) {
+	if (code == BMediaRecorder::B_WILL_STOP) {
 		RecorderWindow * window = (RecorderWindow *)cookie;
 		// Tell the window we've stopped, if it doesn't
 		// already know.

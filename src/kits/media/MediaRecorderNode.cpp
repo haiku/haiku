@@ -1,6 +1,6 @@
 /*
- * Copyright 1999, Be Incorporated
  * Copyright 2014, Dario Casalinuovo
+ * Copyright 1999, Be Incorporated
  * All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
@@ -13,8 +13,8 @@
 #include <TimedEventQueue.h>
 #include <TimeSource.h>
 
-#include "MediaDebug.h"
-#include "MediaRecorder.h"
+#include <MediaDebug.h>
+#include <MediaRecorder.h>
 
 
 BMediaRecorderNode::BMediaRecorderNode(const char* name,
@@ -146,7 +146,7 @@ BMediaRecorderNode::Start(bigtime_t performanceTime)
 
 	if (fRecorder->fNotifyHook)
 		(*fRecorder->fNotifyHook)(fRecorder->fBufferCookie,
-			B_WILL_START, performanceTime);
+			BMediaRecorder::B_WILL_START, performanceTime);
 
 	fRecorder->fRunning = true;
 }
@@ -159,7 +159,7 @@ BMediaRecorderNode::Stop(bigtime_t performanceTime, bool immediate)
 
 	if (fRecorder->fNotifyHook)
 		(*fRecorder->fNotifyHook)(fRecorder->fBufferCookie,
-			B_WILL_STOP, performanceTime, immediate);
+			BMediaRecorder::B_WILL_STOP, performanceTime, immediate);
 
 	fRecorder->fRunning = false;
 }
@@ -172,7 +172,7 @@ BMediaRecorderNode::Seek(bigtime_t mediaTime, bigtime_t performanceTime)
 
 	if (fRecorder->fNotifyHook)
 		(*fRecorder->fNotifyHook)(fRecorder->fBufferCookie,
-			B_WILL_SEEK, performanceTime, mediaTime);
+			BMediaRecorder::B_WILL_SEEK, performanceTime, mediaTime);
 }
 
 
@@ -185,7 +185,7 @@ BMediaRecorderNode::TimeWarp(bigtime_t realTime, bigtime_t performanceTime)
 	// at them, so we can ignore the time warp as a consumer.
 	if (fRecorder->fNotifyHook)
 		(*fRecorder->fNotifyHook)(fRecorder->fBufferCookie,
-			B_WILL_TIMEWARP, realTime, performanceTime);
+			BMediaRecorder::B_WILL_TIMEWARP, realTime, performanceTime);
 }
 
 

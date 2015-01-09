@@ -1,51 +1,20 @@
 /*
- * Copyright 1999, Be Incorporated
+ * Copyright 2015, Hamish Morrison <hamishm53@gmail.com>
  * Copyright 2014, Dario Casalinuovo
+ * Copyright 1999, Be Incorporated
  * All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
 
 
-#include "MediaRecorder.h"
+#include <MediaRecorder.h>
 
 #include <MediaAddOn.h>
 #include <MediaRoster.h>
 #include <TimeSource.h>
 
-#include "MediaDebug.h"
-#include "MediaRecorderNode.h"
-
-
-class MediaNodeReleaser {
-public:
-				MediaNodeReleaser(media_node& mediaNode,
-					bool release = true)
-					:
-					fNode(mediaNode),
-					fRelease(release)
-				{
-				}
-
-				~MediaNodeReleaser()
-				{
-					if (fRelease)
-						BMediaRoster::Roster()->ReleaseNode(fNode);
-				}
-
-	void		SetTo(media_node& node)
-				{
-					fNode = node;
-				}
-
-	void		SetRelease(bool release)
-				{
-					fRelease = release;
-				}
-
-private:
-	media_node& fNode;
-	bool		fRelease;
-};
+#include <MediaDebug.h>
+#include <MediaRecorderNode.h>
 
 
 BMediaRecorder::BMediaRecorder(const char* name, media_type type)
@@ -53,7 +22,7 @@ BMediaRecorder::BMediaRecorder(const char* name, media_type type)
 	fInitErr(B_OK),
 	fConnected(false),
 	fRunning(false),
-	fTimeSource(NULL),
+	fReleaseOutputNode(false),
 	fRecordHook(NULL),
 	fNotifyHook(NULL),
 	fNode(NULL),
@@ -64,7 +33,10 @@ BMediaRecorder::BMediaRecorder(const char* name, media_type type)
 	BMediaRoster::Roster(&fInitErr);
 
 	if (fInitErr == B_OK) {
-		fNode = new BMediaRecorderNode(name, this, type);
+		fNode = new(std::nothrow) BMediaRecorderNode(name, this, type);
+		if (fNode == NULL)
+			fInitErr = B_NO_MEMORY;
+
 		fInitErr = BMediaRoster::CurrentRoster()->RegisterNode(fNode);
 	}
 }
@@ -79,10 +51,6 @@ BMediaRecorder::~BMediaRecorder()
 		Disconnect();
 		fNode->Release();
 	}
-
-	if (fTimeSource != NULL)
-		fTimeSource->Release();
-
 }
 
 
@@ -132,7 +100,7 @@ BMediaRecorder::BufferReceived(void* buffer, size_t size,
 
 
 status_t
-BMediaRecorder::Connect(const media_format& format, uint32 flags)
+BMediaRecorder::Connect(const media_format& format)
 {
 	CALLED();
 
@@ -142,13 +110,42 @@ BMediaRecorder::Connect(const media_format& format, uint32 flags)
 	if (fConnected)
 		return B_MEDIA_ALREADY_CONNECTED;
 
-	return _Connect(&format, flags, NULL, NULL, NULL);
+	status_t err = B_OK;
+	media_node node;
+
+	switch (format.type) {
+		// switch on format for default
+		case B_MEDIA_RAW_AUDIO:
+			err = BMediaRoster::Roster()->GetAudioMixer(&node);
+			break;
+		case B_MEDIA_RAW_VIDEO:
+		case B_MEDIA_ENCODED_VIDEO:
+			err = BMediaRoster::Roster()->GetVideoInput(&node);
+			break;
+		// give up?
+		default:
+			return B_MEDIA_BAD_FORMAT;
+	}
+
+	if (err != B_OK)
+		return err;
+
+	fReleaseOutputNode = true;
+
+	err = _Connect(node, NULL, format);
+
+	if (err != B_OK) {
+		BMediaRoster::Roster()->ReleaseNode(node);
+		fReleaseOutputNode = false;
+	}
+
+	return err;
 }
 
 
 status_t
-BMediaRecorder::Connect(const dormant_node_info& dormantInfo,
-	const media_format* format, uint32 flags)
+BMediaRecorder::Connect(const dormant_node_info& dormantNode,
+	const media_format& format)
 {
 	CALLED();
 
@@ -158,14 +155,29 @@ BMediaRecorder::Connect(const dormant_node_info& dormantInfo,
 	if (fConnected)
 		return B_MEDIA_ALREADY_CONNECTED;
 
-	return _Connect(format, flags, &dormantInfo, NULL, NULL);
+	media_node node;
+	status_t err = BMediaRoster::Roster()->InstantiateDormantNode(dormantNode,
+		&node, B_FLAVOR_IS_GLOBAL);
+
+	if (err != B_OK)
+		return err;
+
+	fReleaseOutputNode = true;
+
+	err = _Connect(node, NULL, format);
+
+	if (err != B_OK) {
+		BMediaRoster::Roster()->ReleaseNode(node);
+		fReleaseOutputNode = false;
+	}
+
+	return err;
 }
 
 
 status_t
 BMediaRecorder::Connect(const media_node& node,
-	const media_output* useOutput, const media_format* format,
-	uint32 flags)
+	const media_output* output, const media_format* format)
 {
 	CALLED();
 
@@ -175,7 +187,10 @@ BMediaRecorder::Connect(const media_node& node,
 	if (fConnected)
 		return B_MEDIA_ALREADY_CONNECTED;
 
-	return _Connect(format, flags, NULL, &node, useOutput);
+	if (format == NULL && output != NULL)
+		format = &output->format;
+
+	return _Connect(node, output, *format);
 }
 
 
@@ -206,11 +221,9 @@ BMediaRecorder::Disconnect()
 		fOutputNode.node, fOutput.source,
 			fNode->Node().node, fInput.destination);
 
-	BMediaRoster::Roster()->ReleaseNode(fOutputNode);
-
-	if (fTimeSource != NULL) {
-		fTimeSource->Release();
-		fTimeSource = NULL;
+	if (fReleaseOutputNode) {
+		BMediaRoster::Roster()->ReleaseNode(fOutputNode);
+		fReleaseOutputNode = false;
 	}
 
 	fConnected = false;
@@ -240,12 +253,12 @@ BMediaRecorder::Start(bool force)
 	// start node here
 	status_t err = B_OK;
 
-	if (fNode->Node().kind & B_TIME_SOURCE)
+	if ((fOutputNode.kind & B_TIME_SOURCE) != 0)
 		err = BMediaRoster::CurrentRoster()->StartTimeSource(
 			fOutputNode, BTimeSource::RealTime());
 	else
 		err = BMediaRoster::CurrentRoster()->StartNode(
-			fOutputNode, fTimeSource->Now());
+			fOutputNode, fNode->TimeSource()->Now());
 
 	// then un-mute it
 	if (err == B_OK) {
@@ -327,99 +340,42 @@ BMediaRecorder::Format() const
 
 
 status_t
-BMediaRecorder::_Connect(const media_format* format,
-	uint32 flags, const dormant_node_info* dormantNode,
-	const media_node* mediaNode, const media_output* output)
+BMediaRecorder::_Connect(const media_node& node,
+	const media_output* output, const media_format& format)
 {
 	CALLED();
 
 	status_t err = B_OK;
-	media_format ourFormat;
-	media_node node;
-	MediaNodeReleaser away(node, false);
+	media_format ourFormat = format;
 	media_output ourOutput;
-
-	// argument checking and set-up
-	if (format != NULL)
-		ourFormat = *format;
 
 	if (fNode == NULL)
 		return B_ERROR;
 
-	if (mediaNode == NULL && output != NULL)
-		return B_MISMATCHED_VALUES;
-
-	if (dormantNode != NULL && (mediaNode != NULL || output != NULL))
-		return B_MISMATCHED_VALUES;
-
-	if (format == NULL && output != NULL)
-		ourFormat = output->format;
-
 	fNode->SetAcceptedFormat(ourFormat);
-
-	// figure out the node to instantiate
-	if (dormantNode != NULL) {
-
-		err = BMediaRoster::Roster()->InstantiateDormantNode(
-			*dormantNode, &node, B_FLAVOR_IS_GLOBAL);
-
-		away.SetRelease(true);
-
-	} else if (mediaNode != NULL) {
-		node = *mediaNode;
-	} else {
-		switch (ourFormat.type) {
-
-			// switch on format for default
-			case B_MEDIA_RAW_AUDIO:
-				err = BMediaRoster::Roster()->GetAudioInput(&node);
-				away.SetRelease(true);
-				break;
-
-			case B_MEDIA_RAW_VIDEO:
-			case B_MEDIA_ENCODED_VIDEO:
-				err = BMediaRoster::Roster()->GetVideoInput(&node);
-				away.SetRelease(true);
-				break;
-
-			// give up?
-			default:
-				return B_MEDIA_BAD_FORMAT;
-				break;
-		}
-	}
 
 	fOutputNode = node;
 
 	// figure out the output provided
-
 	if (output != NULL) {
 		ourOutput = *output;
 	} else if (err == B_OK) {
-
 		media_output outputs[10];
 		int32 count = 10;
 
-		err = BMediaRoster::Roster()->GetFreeOutputsFor(node,
+		err = BMediaRoster::Roster()->GetFreeOutputsFor(fOutputNode,
 			outputs, count, &count, ourFormat.type);
 
 		if (err != B_OK)
 			return err;
 
-		err = B_MEDIA_BAD_SOURCE;
-
 		for (int i = 0; i < count; i++) {
 			if (format_is_compatible(outputs[i].format, ourFormat)) {
 				ourOutput = outputs[i];
-				err = B_OK;
 				ourFormat = outputs[i].format;
 				break;
 			}
-
 		}
-
-	} else {
-		return err;
 	}
 
 	if (ourOutput.source == media_source::null)
@@ -427,30 +383,26 @@ BMediaRecorder::_Connect(const media_format* format,
 
 	// find our Node's free input
 	media_input ourInput;
-
 	err = fNode->GetInput(&ourInput);
 	if (err != B_OK)
 		return err;
 
-	media_node time_source;
-	if (node.kind & B_TIME_SOURCE)
-		time_source = node;
+	media_node timeSource;
+	if ((node.kind & B_TIME_SOURCE) != 0)
+		timeSource = node;
 	else
-		BMediaRoster::Roster()->GetSystemTimeSource(&time_source);
+		BMediaRoster::Roster()->GetTimeSource(&timeSource);
 
 	// set time source
-	BMediaRoster::Roster()->SetTimeSourceFor(
-		fNode->Node().node, time_source.node);
-
-	fTimeSource = BMediaRoster::CurrentRoster()->MakeTimeSourceFor(
-		fNode->Node());
+	err = BMediaRoster::Roster()->SetTimeSourceFor(fNode->Node().node,
+		timeSource.node);
 
 	if (err != B_OK)
 		return err;
 
 	// start the recorder node (it's always running)
-	err = BMediaRoster::CurrentRoster()->StartNode(
-		fOutputNode, fTimeSource->Now());
+	err = BMediaRoster::CurrentRoster()->StartNode(fOutputNode,
+		fNode->TimeSource()->Now());
 
 	if (err != B_OK)
 		return err;
@@ -467,7 +419,16 @@ BMediaRecorder::_Connect(const media_format* format,
 		return err;
 
 	fConnected = true;
-	away.SetRelease(false);
-
-	return err;
+	return B_OK;
 }
+
+
+void BMediaRecorder::_ReservedMediaRecorder0() { }
+void BMediaRecorder::_ReservedMediaRecorder1() { }
+void BMediaRecorder::_ReservedMediaRecorder2() { }
+void BMediaRecorder::_ReservedMediaRecorder3() { }
+void BMediaRecorder::_ReservedMediaRecorder4() { }
+void BMediaRecorder::_ReservedMediaRecorder5() { }
+void BMediaRecorder::_ReservedMediaRecorder6() { }
+void BMediaRecorder::_ReservedMediaRecorder7() { }
+

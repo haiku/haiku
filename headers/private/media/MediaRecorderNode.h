@@ -1,6 +1,6 @@
 /*
- * Copyright 1999, Be Incorporated
  * Copyright 2014, Dario Casalinuovo
+ * Copyright 1999, Be Incorporated
  * All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
@@ -76,27 +76,23 @@ protected:
 	virtual	void			BufferReceived(BBuffer* buffer);
 
 	virtual	void			ProducerDataStatus(
-								const media_destination& forWhom,
+								const media_destination& destination,
 								int32 status,
 								bigtime_t performanceTime);
 
-	virtual	status_t		GetLatencyFor(
-								const media_destination& forWhom,
-								bigtime_t*  outLatency,
-								media_node_id*  outTimesource);
+	virtual	status_t		GetLatencyFor(const media_destination& destination,
+								bigtime_t* outLatency,
+								media_node_id* outTimesource);
 
-	virtual	status_t		Connected(
-								const media_source& producer,
+	virtual	status_t		Connected(const media_source& producer,
 								const media_destination& where,
-								const media_format& withFormat,
+								const media_format& format,
 								media_input* outInput);
 
-	virtual	void			Disconnected(
-								const media_source& producer,
+	virtual	void			Disconnected(const media_source& producer,
 								const media_destination& where);
 
-	virtual	status_t		FormatChanged(
-								const media_source& producer,
+	virtual	status_t		FormatChanged(const media_source& producer,
 								const media_destination& consumer,
 								int32 tag,
 								const media_format& format);

@@ -168,7 +168,7 @@ private:
 		void ErrorAlert(const char * action, status_t err);
 
 static	void RecordFile(void * cookie, bigtime_t timestamp, void * data, size_t size, const media_format & format);
-static	void NotifyRecordFile(void * cookie, int32 code, ...);
+static	void NotifyRecordFile(void * cookie, BMediaRecorder::notification code, ...);
 
 static	void PlayFile(void * cookie, void * data, size_t size, const media_raw_audio_format & format);
 static	void NotifyPlayFile(void * cookie, BSoundPlayer::sound_player_notification code, ...);

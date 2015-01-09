@@ -20,7 +20,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# Private Media Kit
 			!missing_symbols.cpp
 			MediaRecorder.cpp
-			MediaRecorderNode.cpp
 
 			# Public Media Kit
 			Buffer.cpp
@@ -58,6 +57,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DefaultMediaTheme.cpp
 			DormantNodeManager.cpp
 			FormatManager.cpp
+			MediaRecorderNode.cpp
 			Notifications.cpp
 			request_data.cpp
 			SharedBufferList.cpp
@@ -66,7 +66,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			TimeSourceObject.cpp
 			TimeSourceObjectManager.cpp
 			SoundPlayNode.cpp
-			SoundUtils.cpp
 
 			# Old (R3) Media Kit (built only for GCC2)
 			OldAudioModule.cpp

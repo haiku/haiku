@@ -6,16 +6,31 @@
 #define _MEDIA_RECORDER_H
 
 
+#include <MediaDefs.h>
 #include <MediaNode.h>
-#include <TimeSource.h>
-
-#include "MediaRecorderNode.h"
-#include "SoundUtils.h"
 
 
 namespace BPrivate { namespace media {
 
+
+class BMediaRecorderNode;
+
 class BMediaRecorder {
+public:
+	enum notification {
+		B_WILL_START = 1,	// performance_time
+		B_WILL_STOP,		// performance_time immediate
+		B_WILL_SEEK,		// performance_time media_time
+		B_WILL_TIMEWARP,	// real_time performance_time
+	};
+
+	typedef void				(*ProcessFunc)(void* cookie,
+									bigtime_t timestamp, void* data,
+									size_t size, const media_format& format);
+
+	typedef void				(*NotifyFunc)(void* cookie,
+									notification what, ...);
+
 public:
 								BMediaRecorder(const char* name,
 									media_type type
@@ -24,14 +39,6 @@ public:
 	virtual						~BMediaRecorder();
 
 			status_t			InitCheck() const;
-
-	typedef void				(*ProcessFunc)(void* cookie,
-									bigtime_t timestamp, void* data,
-									size_t datasize,
-									const media_format& format);
-
-	typedef void				(*NotifyFunc)(void* cookie,
-									int32 code, ...);
 
 			status_t			SetHooks(ProcessFunc recordFunc = NULL,
 									NotifyFunc notifyFunc = NULL,
@@ -43,17 +50,14 @@ public:
 	virtual status_t			Start(bool force = false);
 	virtual status_t			Stop(bool force = false);
 
-	virtual status_t			Connect(const media_format& format,
-									uint32 flags = 0);
+	virtual status_t			Connect(const media_format& format);
 
 	virtual status_t			Connect(const dormant_node_info& dormantInfo,
-									const media_format* format = NULL,
-									uint32 flags = 0);
+									const media_format& format);
 
 	virtual status_t			Connect(const media_node& node,
-									const media_output* useOutput = NULL,
-									const media_format* format = NULL,
-									uint32 flags = 0);
+									const media_output* output = NULL,
+									const media_format* format = NULL);
 
 	virtual status_t			Disconnect();
 
@@ -67,37 +71,42 @@ public:
 
 protected:
 
-	virtual	void				BufferReceived(void* buffer,
-									size_t size,
+	virtual	void				BufferReceived(void* buffer, size_t size,
 									const media_header& header);
 private:
 
-		status_t				_Connect(
-									const media_format* format,
-									uint32 flags,
-									const dormant_node_info* dormantNode,
-									const media_node* mediaNode,
-									const media_output* output);
+			status_t			_Connect(const media_node& mediaNode,
+									const media_output* output,
+									const media_format& format);
 
-		status_t				fInitErr;
+	virtual	void				_ReservedMediaRecorder0();
+	virtual	void				_ReservedMediaRecorder1();
+	virtual	void				_ReservedMediaRecorder2();
+	virtual	void				_ReservedMediaRecorder3();
+	virtual	void				_ReservedMediaRecorder4();
+	virtual	void				_ReservedMediaRecorder5();
+	virtual	void				_ReservedMediaRecorder6();
+	virtual	void				_ReservedMediaRecorder7();
 
-		bool					fConnected;
-		bool					fRunning;
+			status_t			fInitErr;
 
-		BTimeSource*			fTimeSource;
+			bool				fConnected;
+			bool				fRunning;
+			bool				fReleaseOutputNode;
 
-		ProcessFunc				fRecordHook;
-		NotifyFunc				fNotifyHook;
+			ProcessFunc			fRecordHook;
+			NotifyFunc			fNotifyHook;
 
-		media_node				fOutputNode;
-		media_output			fOutput;
+			media_node			fOutputNode;
+			media_output		fOutput;
 
-		BMediaRecorderNode*		fNode;
-		media_input				fInput;
+			BMediaRecorderNode*	fNode;
+			media_input			fInput;
 
-		void*					fBufferCookie;
+			void*				fBufferCookie;
+			uint32				fPadding[32];
 
-		friend class			BMediaRecorderNode;
+			friend class		BMediaRecorderNode;
 };
 
 }
