@@ -18,7 +18,6 @@
 #include <util/atomic.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
-#include <util/khash.h>
 #include <KernelExport.h>
 
 #include <netinet/in.h>
@@ -58,13 +57,11 @@ static net_stack_module_info* sStackModule;
 static net_datalink_module_info* sDatalinkModule;
 static net_protocol_module_info* sIPv6Module;
 static net_protocol* sIPv6Protocol;
-static hash_table* sCache;
 static mutex sCacheLock;
 static const net_buffer* kDeletedBuffer = (net_buffer*)~0;
 
 // needed for IN6_IS_ADDR_UNSPECIFIED() macro
 const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
-
 
 //	#pragma mark -
 
@@ -112,8 +109,6 @@ struct ndp_entry {
 
 	BufferList  queue;
 
-	static int Compare(void* _entry, const void* _key);
-	static uint32 Hash(void* _entry, const void* _key, uint32 range);
 	static ndp_entry* Lookup(const in6_addr& protocolAddress);
 	static ndp_entry* Add(const in6_addr& protocolAddress,
 		sockaddr_dl* hardwareAddress, uint32 flags);
@@ -125,6 +120,38 @@ struct ndp_entry {
 	void MarkValid();
 	void ScheduleRemoval();
 };
+
+
+struct ndpHash {
+	typedef in6_addr KeyType;
+	typedef ndp_entry ValueType;
+
+	size_t HashKey(in6_addr key) const
+	{
+		return jenkins_hashword((const uint32*)&(key),
+			sizeof(in6_addr) / sizeof(uint32), 0);
+	}
+
+	size_t Hash(ndp_entry* value) const
+	{
+		return HashKey(value->protocol_address);
+	}
+
+	bool Compare(in6_addr key, ndp_entry* value) const
+	{
+		return value->protocol_address == key;
+	}
+
+	ndp_entry*& GetLink(ndp_entry* value) const
+	{
+		return value->next;
+	}
+};
+
+
+typedef BOpenHashTable<ndpHash> AddressCache;
+static AddressCache* sCache;
+
 
 #define NDP_FLAG_LOCAL		0x01
 #define NDP_FLAG_REJECT		0x02
@@ -209,14 +236,6 @@ ipv6_to_solicited_multicast(sockaddr_in6* target, const in6_addr& address)
 }
 
 
-static inline uint32
-hash_ipv6_address(const in6_addr& address, uint32 range)
-{
-	return jenkins_hashword((const uint32*)&address,
-		sizeof(in6_addr) / sizeof(uint32), 0) % range;
-}
-
-
 //	#pragma mark -
 
 
@@ -258,36 +277,10 @@ delete_request_buffer(ndp_entry* entry)
 }
 
 
-int
-ndp_entry::Compare(void* _entry, const void* _key)
-{
-	ndp_entry* entry = (ndp_entry*)_entry;
-	in6_addr* key = (in6_addr*)_key;
-
-	if (entry->protocol_address == *key)
-		return 0;
-
-	return 1;
-}
-
-
-uint32
-ndp_entry::Hash(void* _entry, const void* _key, uint32 range)
-{
-	ndp_entry* entry = (ndp_entry*)_entry;
-	const in6_addr* key = (const in6_addr*)_key;
-
-	if (entry != NULL)
-		return hash_ipv6_address(entry->protocol_address, range);
-
-	return hash_ipv6_address(*key, range);
-}
-
-
 ndp_entry*
 ndp_entry::Lookup(const in6_addr& address)
 {
-	return (ndp_entry*)hash_lookup(sCache, &address);
+	return sCache->Lookup(address);
 }
 
 
@@ -322,7 +315,7 @@ ndp_entry::Add(const in6_addr& protocolAddress, sockaddr_dl* hardwareAddress,
 		entry->hardware_address.sdl_len = sizeof(sockaddr_dl);
 	}
 
-	if (hash_insert(sCache, entry) != B_OK) {
+	if (sCache->Insert(entry) != B_OK) {
 		// We can delete the entry here with the sCacheLock held, since it's
 		// guaranteed there are no timers pending.
 		delete entry;
@@ -414,9 +407,8 @@ ndp_init()
 
 	mutex_init(&sCacheLock, "ndp cache");
 
-	sCache = hash_init(64, offsetof(struct ndp_entry, next),
-		&ndp_entry::Compare, &ndp_entry::Hash);
-	if (sCache == NULL) {
+	sCache = new AddressCache();
+	if (sCache == NULL || sCache->Init(64) != B_OK) {
 		mutex_destroy(&sCacheLock);
 		return B_NO_MEMORY;
 	}
@@ -534,7 +526,7 @@ ndp_remove_local_entry(ipv6_datalink_protocol* protocol, const sockaddr* local,
 
 	ndp_entry* entry = ndp_entry::Lookup(inetAddress);
 	if (entry != NULL) {
-		hash_remove(sCache, entry);
+		sCache->Remove(entry);
 		entry->flags |= NDP_FLAG_REMOVED;
 	}
 
@@ -851,7 +843,7 @@ ndp_timer(struct net_timer* timer, void* data)
 				break;
 			}
 
-			hash_remove(sCache, entry);
+			sCache->Remove(entry);
 			mutex_unlock(&sCacheLock);
 
 			delete entry;
