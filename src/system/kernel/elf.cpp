@@ -165,8 +165,6 @@ register_elf_image(struct elf_image_info *image)
 static struct elf_image_info *
 find_image_at_address(addr_t address)
 {
-	struct elf_image_info *image = NULL;
-
 #if KDEBUG
 	if (!debug_debugger_running())
 		ASSERT_LOCKED_MUTEX(&sImageMutex);
@@ -177,16 +175,16 @@ find_image_at_address(addr_t address)
 	// get image that may contain the address
 
 	while (iterator.HasNext()) {
-		image = iterator.Next();
+		struct elf_image_info* image = iterator.Next();
 		if ((address >= image->text_region.start && address
 				<= (image->text_region.start + image->text_region.size))
 			|| (address >= image->data_region.start
 				&& address
 					<= (image->data_region.start + image->data_region.size)))
-			break;
+			return image;
 	}
 
-	return image;
+	return NULL;
 }
 
 
@@ -235,20 +233,16 @@ find_image(image_id id)
 static struct elf_image_info *
 find_image_by_vnode(void *vnode)
 {
-	struct elf_image_info *image = NULL;
+	MutexLocker locker(sImageMutex);
 
-	mutex_lock(&sImageMutex);
 	ImageHash::Iterator iterator(sImagesHash);
-
 	while (iterator.HasNext()) {
-		image = iterator.Next();
+		struct elf_image_info* image = iterator.Next();
 		if (image->vnode == vnode)
-			break;
+			return image;
 	}
 
-	mutex_unlock(&sImageMutex);
-
-	return image;
+	return NULL;
 }
 
 
@@ -411,11 +405,13 @@ dump_symbols(int argc, char **argv)
 
 				ImageHash::Iterator iterator(sImagesHash);
 				while (iterator.HasNext()) {
-					image = iterator.Next();
-					if (image->text_region.start <= num
-						&& image->text_region.start + image->text_region.size
-							>= num)
+					elf_image_info* current = iterator.Next();
+					if (current->text_region.start <= num
+						&& current->text_region.start + current->text_region.size
+							>= num) {
+						image = current;
 						break;
+					}
 				}
 
 				if (image == NULL) {
@@ -433,9 +429,11 @@ dump_symbols(int argc, char **argv)
 			// look for image by name
 			ImageHash::Iterator iterator(sImagesHash);
 			while (iterator.HasNext()) {
-				image = iterator.Next();
-				if (!strcmp(image->name, argv[1]))
+				elf_image_info* current = iterator.Next();
+				if (!strcmp(current->name, argv[1])) {
+					image = current;
 					break;
+				}
 			}
 
 			if (image == NULL)
