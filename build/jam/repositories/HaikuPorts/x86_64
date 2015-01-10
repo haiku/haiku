@@ -157,8 +157,8 @@ RemotePackageRepository HaikuPorts
 	neon-0.29.6-7
 	neon_devel-0.29.6-7
 	openssh-6.6p1-1
-	openssl-1.0.0o-1
-	openssl_devel-1.0.0o-1
+	openssl-1.0.0p-1
+	openssl_devel-1.0.0p-1
 	p7zip-9.20.1-5
 	pe-2.4.5-1
 	perl-5.18.2-2
