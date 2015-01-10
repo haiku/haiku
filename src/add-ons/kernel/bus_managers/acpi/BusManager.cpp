@@ -90,6 +90,9 @@ get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, void* context,
 }
 
 
+#ifdef ACPI_DEBUG_OUTPUT
+
+
 static void
 globalGPEHandler(UINT32 eventType, ACPI_HANDLE device, UINT32 eventNumber,
 	void* context)
@@ -163,6 +166,9 @@ static void globalNotifyHandler(ACPI_HANDLE device, UINT32 value, void* context)
 
 	dprintf("acpi: Notify event %d for %s\n", value, deviceName);
 }
+
+
+#endif
 
 
 //	#pragma mark - ACPI bus manager API
@@ -264,6 +270,7 @@ acpi_std_ops(int32 op,...)
 
 			//TODO: Walk namespace init ALL _PRW's
 
+#ifdef ACPI_DEBUG_OUTPUT
 			checkAndLogFailure(
 				AcpiInstallGlobalEventHandler(globalGPEHandler, NULL),
 				"Failed to install global GPE-handler.");
@@ -271,7 +278,7 @@ acpi_std_ops(int32 op,...)
 			checkAndLogFailure(AcpiInstallNotifyHandler(ACPI_ROOT_OBJECT,
 					ACPI_ALL_NOTIFY, globalNotifyHandler, NULL),
 				"Failed to install global Notify-handler.");
-
+#endif
 			checkAndLogFailure(AcpiEnableAllRuntimeGpes(),
 				"Failed to enable all runtime Gpes");
 
