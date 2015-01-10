@@ -407,8 +407,8 @@ dump_symbols(int argc, char **argv)
 				while (iterator.HasNext()) {
 					elf_image_info* current = iterator.Next();
 					if (current->text_region.start <= num
-						&& current->text_region.start + current->text_region.size
-							>= num) {
+						&& current->text_region.start
+							+ current->text_region.size	>= num) {
 						image = current;
 						break;
 					}
