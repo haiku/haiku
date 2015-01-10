@@ -10,21 +10,23 @@
 
 #include <Autolock.h>
 #include <Catalog.h>
+#include <FindDirectory.h>
 #include <MessageFormat.h>
-#include <ScrollBar.h>
-#include <Window.h>
 #include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <OutlineListView.h>
 #include <Path.h>
+#include <ScrollBar.h>
 #include <ScrollView.h>
+#include <StringItem.h>
 
-#include <package/hpkg/PackageReader.h>
+#include <package/PackageDefs.h>
 #include <package/hpkg/NoErrorOutput.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
-#include "MainWindow.h"
-#include "PackageAction.h"
+#include <package/hpkg/PackageReader.h>
+
+using namespace BPackageKit;
 
 using BPackageKit::BHPKG::BNoErrorOutput;
 using BPackageKit::BHPKG::BPackageContentHandler;
@@ -81,6 +83,7 @@ public:
 		BStringItem(entry->Name()),
 		fEntry(entry)
 	{
+		printf("PackageEntryItem(%s)\n", entry->Name());
 	}
 	
 	inline const BPackageEntry* PackageEntry() const
@@ -96,45 +99,70 @@ private:
 // #pragma mark - PackageContentOutliner
 
 
-class PackageContentsView::PackageContentOutliner
-	: public BPackageContentHandler {
-
+class PackageContentOutliner : public BPackageContentHandler {
 public:
-	PackageContentOutliner(BOutlineListView* listView)
+	PackageContentOutliner(BOutlineListView* listView,
+			const PackageInfo* packageInfo,
+			BLocker& packageLock, PackageInfoRef& packageInfoRef)
 		:
 		fListView(listView),
 		fLastParentEntry(NULL),
 		fLastParentItem(NULL),
 		fLastEntry(NULL),
-		fLastItem(NULL)
+		fLastItem(NULL),
+
+		fPackageInfoToPopulate(packageInfo),
+		fPackageLock(packageLock),
+		fPackageInfoRef(packageInfoRef)
 	{
 	}
 
 	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
+		printf("HandleEntry(%s/%s)\n",
+			entry->Parent() != NULL ? entry->Parent()->Name() : "NULL",
+			entry->Name());
+
+		{
+			// Check if we are still supposed to popuplate the list
+			BAutolock lock(&fPackageLock);
+			if (fPackageInfoRef.Get() != fPackageInfoToPopulate)
+				return B_ERROR;
+		}
+
+		if (!fListView->LockLooper())
+			return B_ERROR;
+
 		PackageEntryItem* item = new PackageEntryItem(entry);
 
 		if (entry->Parent() == NULL) {
+			printf("  adding root entry\n");
 			fListView->AddItem(item);
+			fLastParentEntry = NULL;
+			fLastParentItem = NULL;
 		} else if (entry->Parent() == fLastEntry) {
+			printf("  adding to last entry %s\n", fLastEntry->Name());
 			fListView->AddUnder(item, fLastItem);
 			fLastParentEntry = fLastEntry;
 			fLastParentItem = fLastItem;
 		} else if (entry->Parent() == fLastParentEntry) {
+			printf("  adding to last parent %s\n", fLastParentEntry->Name());
 			fListView->AddUnder(item, fLastParentItem);
 		} else {
 			// Not the last parent entry, need to search for the parent
 			// among the already added list items.
 			bool foundParent = false;
-			for (int32 i = 0; i < fListView->CountItems(); i++) {
+			for (int32 i = 0; i < fListView->FullListCountItems(); i++) {
 				PackageEntryItem* listItem
-					= dynamic_cast<PackageEntryItem*>(fListView->ItemAt(i));
+					= dynamic_cast<PackageEntryItem*>(
+						fListView->FullListItemAt(i));
 				if (listItem == NULL)
 					continue;
 				if (listItem->PackageEntry() == entry->Parent()) {
 					fLastParentEntry = listItem->PackageEntry();
 					fLastParentItem = listItem;
-					fListView->AddUnder(item, fLastParentItem);
+					printf("  found parent %s\n", listItem->Text());
+					fListView->AddUnder(item, listItem);
 					foundParent = true;
 					break;
 				}
@@ -145,11 +173,15 @@ public:
 				printf("Did not find parent entry for %s (%s)!\n",
 					entry->Name(), entry->Parent()->Name());
 				fListView->AddItem(item);
+				fLastParentEntry = NULL;
+				fLastParentItem = NULL;
 			}
 		}
 
 		fLastEntry = entry;
 		fLastItem = item;
+
+		fListView->UnlockLooper();
 
 		return B_OK;
 	}
@@ -183,6 +215,10 @@ private:
 
 	const BPackageEntry*	fLastEntry;
 	PackageEntryItem*		fLastItem;
+
+	const PackageInfo*		fPackageInfoToPopulate;
+	BLocker&				fPackageLock;
+	PackageInfoRef&			fPackageInfoRef;
 };
 
 
@@ -192,7 +228,7 @@ private:
 PackageContentsView::PackageContentsView(const char* name)
 	:
 	BView("package_contents_view", B_WILL_DRAW),
-	fLayout(new BGroupLayout(B_HORIZONTAL))
+	fPackageLock("package contents populator lock")
 {
 	fContentListView = new BOutlineListView("content list view", 
 		B_SINGLE_SELECTION_LIST);
@@ -204,12 +240,18 @@ PackageContentsView::PackageContentsView(const char* name)
 		.Add(scrollView, 1.0f)
 		.SetInsets(0.0f, -1.0f, -1.0f, -1.0f)
 	;
+
+	_InitContentPopulator();
 }
 
 
 PackageContentsView::~PackageContentsView()
 {
 	Clear();
+
+	delete_sem(fContentPopulatorSem);
+	if (fContentPopulator >= 0)
+		wait_for_thread(fContentPopulator, NULL);
 }
 
 
@@ -228,39 +270,135 @@ PackageContentsView::AllAttached()
 
 
 void
-PackageContentsView::SetPackage(const PackageInfo& package)
+PackageContentsView::SetPackage(const PackageInfoRef& package)
 {
+	if (fPackage == package)
+		return;
+
+	printf("PackageContentsView::SetPackage(%s)\n",
+		package.Get() != NULL ? package->Title().String() : "NULL");
+
 	Clear();
 
-	if (package.IsLocalFile() ) {
-		BString pathString = package.LocalFilePath();
-		BPath packagePath;
-		packagePath.SetTo(pathString.String());
-	
-		BNoErrorOutput errorOutput;
-		BPackageReader reader(&errorOutput);
-	
-		status_t status = reader.Init(packagePath.Path());
-		if (status != B_OK) {
-			printf("PackageContentsView::SetPackage(): failed to init "
-				"BPackageReader(%s): %s\n",
-				packagePath.Path(), strerror(status));
-			return;
-		}
-	
-		// Scan package contents and populate list
-		PackageContentOutliner contentHandler(fContentListView);
-		status = reader.ParseContent(&contentHandler);
-		if (status != B_OK) {
-			printf("PackageContentsView::SetPackage(): "
-				"failed parse package contents: %s\n", strerror(status));
-		}
+	{
+		BAutolock lock(&fPackageLock);
+		fPackage = package;
 	}
+	release_sem_etc(fContentPopulatorSem, 1, 0);
 }
 
 
 void 
 PackageContentsView::Clear()
 {
+	{
+		BAutolock lock(&fPackageLock);
+		fPackage.Unset();
+	}
+
 	fContentListView->MakeEmpty();
+}
+
+
+// #pragma mark - private
+
+
+void
+PackageContentsView::_InitContentPopulator()
+{
+	fContentPopulatorSem = create_sem(0, "PopulatePackageContents");
+	if (fContentPopulatorSem >= 0) {
+		fContentPopulator = spawn_thread(&_ContentPopulatorThread,
+			"Package Contents Populator", B_NORMAL_PRIORITY, this);
+		if (fContentPopulator >= 0)
+			resume_thread(fContentPopulator);
+	} else
+		fContentPopulator = -1;
+}
+
+
+/*static*/ int32
+PackageContentsView::_ContentPopulatorThread(void* arg)
+{
+	PackageContentsView* view = reinterpret_cast<PackageContentsView*>(arg);
+
+	while (acquire_sem(view->fContentPopulatorSem) == B_OK) {
+		PackageInfoRef package;
+		{
+			BAutolock lock(&view->fPackageLock);
+			package = view->fPackage;
+		}
+
+		if (package.Get() != NULL)
+			view->_PopuplatePackageContens(*package.Get());
+	}
+
+	return 0;
+}
+
+
+void
+PackageContentsView::_PopuplatePackageContens(const PackageInfo& package)
+{
+	BPath packagePath;
+
+	// Obtain path to the package file
+	if (package.IsLocalFile()) {
+		BString pathString = package.LocalFilePath();
+		packagePath.SetTo(pathString.String());
+	} else {
+		int32 installLocation = _InstallLocation(package);
+		if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
+			if (find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &packagePath)
+				!= B_OK) {
+				return;
+			}
+		} else if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_HOME) {
+			if (find_directory(B_USER_PACKAGES_DIRECTORY, &packagePath)
+				!= B_OK) {
+				return;
+			}
+		} else {
+			printf("PackageContentsView::_PopuplatePackageContens(): "
+				"unknown install location");
+			return;
+		}
+
+		packagePath.Append(package.FileName());
+	}
+
+	// Setup a BPackageReader
+	BNoErrorOutput errorOutput;
+	BPackageReader reader(&errorOutput);
+
+	status_t status = reader.Init(packagePath.Path());
+	if (status != B_OK) {
+		printf("PackageContentsView::_PopuplatePackageContens(): "
+			"failed to init BPackageReader(%s): %s\n",
+			packagePath.Path(), strerror(status));
+		return;
+	}
+
+	// Scan package contents and populate list
+	PackageContentOutliner contentHandler(fContentListView, &package,
+		fPackageLock, fPackage);
+	status = reader.ParseContent(&contentHandler);
+	if (status != B_OK) {
+		printf("PackageContentsView::SetPackage(): "
+			"failed parse package contents: %s\n", strerror(status));
+	}
+}
+
+
+int32
+PackageContentsView::_InstallLocation(const PackageInfo& package) const
+{
+	const PackageInstallationLocationSet& locations
+		= package.InstallationLocations();
+
+	// If the package is already installed, return its first installed location
+	if (locations.size() != 0)
+		return *locations.begin();
+
+	return B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 }

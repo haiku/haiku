@@ -1191,7 +1191,7 @@ public:
 	{
 	}
 
-	void SetPackage(const PackageInfo& package)
+	void SetPackage(const PackageInfoRef& package)
 	{
 		fPackageContents->SetPackage(package);
 	}
@@ -1294,13 +1294,13 @@ public:
 		Clear();
 	}
 
-	void SetPackage(const PackageInfo& package, bool switchToDefaultTab)
+	void SetPackage(const PackageInfoRef& package, bool switchToDefaultTab)
 	{
 		if (switchToDefaultTab)
 			Select(0);
-		fAboutView->SetPackage(package);
-		fUserRatingsView->SetPackage(package);
-		fChangelogView->SetPackage(package);
+		fAboutView->SetPackage(*package.Get());
+		fUserRatingsView->SetPackage(*package.Get());
+		fChangelogView->SetPackage(*package.Get());
 		fContentsView->SetPackage(package);
 	}
 
@@ -1404,8 +1404,8 @@ PackageInfoView::MessageReceived(BMessage* message)
 				break;
 			}
 
-			const PackageInfo& package = *fPackageListener->Package().Get();
-			if (package.Title() != title)
+			const PackageInfoRef& package = fPackageListener->Package();
+			if (package->Title() != title)
 				break;
 
 			BAutolock _(fModelLock);
@@ -1417,11 +1417,11 @@ PackageInfoView::MessageReceived(BMessage* message)
 
 			if ((changes & PKG_CHANGED_RATINGS) != 0) {
 				fPagesView->SetPackage(package, false);
-				fTitleView->SetPackage(package);
+				fTitleView->SetPackage(*package.Get());
 			}
 
 			if ((changes & PKG_CHANGED_STATE) != 0) {
-				fPackageActionView->SetPackage(package);
+				fPackageActionView->SetPackage(*package.Get());
 			}
 
 			break;
@@ -1445,7 +1445,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 
 	fTitleView->SetPackage(package);
 	fPackageActionView->SetPackage(package);
-	fPagesView->SetPackage(package, switchToDefaultTab);
+	fPagesView->SetPackage(packageRef, switchToDefaultTab);
 
 	fCardLayout->SetVisibleItem(1);
 

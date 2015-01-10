@@ -5,10 +5,13 @@
 #ifndef PACKAGE_CONTENTS_VIEW_H
 #define PACKAGE_CONTENTS_VIEW_H
 
-#include <OutlineListView.h>
+#include <Locker.h>
 #include <View.h>
+
 #include "PackageInfo.h"
-#include "ScrollableGroupView.h"
+
+class BOutlineListView;
+
 
 class PackageContentsView : public BView {
 public:
@@ -18,14 +21,24 @@ public:
 	virtual void				AttachedToWindow();
 	virtual	void				AllAttached();
 
-			void				SetPackage(const PackageInfo& package);
+			void				SetPackage(const PackageInfoRef& package);
 			void	 			Clear();
 
 private:
-			class PackageContentOutliner;
+			void				_InitContentPopulator();
+	static	int32				_ContentPopulatorThread(void* arg);
+			void				_PopuplatePackageContens(
+									const PackageInfo& package);
+			int32				_InstallLocation(
+									const PackageInfo& package) const;
 
-			BGroupLayout*		fLayout;
+private:
 			BOutlineListView*	fContentListView;
+
+			thread_id			fContentPopulator;
+			sem_id				fContentPopulatorSem;
+			BLocker				fPackageLock;
+			PackageInfoRef		fPackage;
 };
 
 #endif // PACKAGE_CONTENTS_VIEW_H
