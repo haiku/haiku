@@ -340,15 +340,23 @@ PackageContentsView::_ContentPopulatorThread(void* arg)
 			package = view->fPackage;
 		}
 
-		if (package.Get() != NULL)
-			view->_PopuplatePackageContens(*package.Get());
+		if (package.Get() != NULL) {
+			if (!view->_PopuplatePackageContens(*package.Get())) {
+				if (view->LockLooper()) {
+					view->fContentListView->AddItem(
+						new BStringItem(B_TRANSLATE("<Package contents not "
+							"available for remote packages>")));
+					view->UnlockLooper();
+				}
+			}
+		}
 	}
 
 	return 0;
 }
 
 
-void
+bool
 PackageContentsView::_PopuplatePackageContens(const PackageInfo& package)
 {
 	BPath packagePath;
@@ -362,17 +370,17 @@ PackageContentsView::_PopuplatePackageContens(const PackageInfo& package)
 		if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
 			if (find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &packagePath)
 				!= B_OK) {
-				return;
+				return false;
 			}
 		} else if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_HOME) {
 			if (find_directory(B_USER_PACKAGES_DIRECTORY, &packagePath)
 				!= B_OK) {
-				return;
+				return false;
 			}
 		} else {
 			printf("PackageContentsView::_PopuplatePackageContens(): "
 				"unknown install location");
-			return;
+			return false;
 		}
 
 		packagePath.Append(package.FileName());
@@ -387,7 +395,7 @@ PackageContentsView::_PopuplatePackageContens(const PackageInfo& package)
 		printf("PackageContentsView::_PopuplatePackageContens(): "
 			"failed to init BPackageReader(%s): %s\n",
 			packagePath.Path(), strerror(status));
-		return;
+		return false;
 	}
 
 	// Scan package contents and populate list
@@ -397,7 +405,10 @@ PackageContentsView::_PopuplatePackageContens(const PackageInfo& package)
 	if (status != B_OK) {
 		printf("PackageContentsView::SetPackage(): "
 			"failed parse package contents: %s\n", strerror(status));
+		// NOTE: Do not return false, since it taken to mean this
+		// is a remote package.
 	}
+	return true;
 }
 
 

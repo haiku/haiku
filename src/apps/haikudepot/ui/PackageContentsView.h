@@ -27,7 +27,7 @@ public:
 private:
 			void				_InitContentPopulator();
 	static	int32				_ContentPopulatorThread(void* arg);
-			void				_PopuplatePackageContens(
+			bool				_PopuplatePackageContens(
 									const PackageInfo& package);
 			int32				_InstallLocation(
 									const PackageInfo& package) const;
