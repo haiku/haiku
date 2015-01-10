@@ -1,48 +1,111 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2996812689
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	1567356868
 Name	PackageListView		Nome
+Available packages	MainWindow		Pacotes disponíveis
+Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
+Close	RatePackageWindow		Fechar
+The captcha puzzle needs to be solved.	UserLoginWindow		O quebra-cabeça captcha precisa ser resolvido.
 Changelog	PackageInfoView		Registro de alterações
+Your rating:	RatePackageWindow		Sua avaliação:
+The passwords do not match.	UserLoginWindow		As senhas não conferem.
+Log in…	MainWindow		Entrar…
+Rate %Package%	RatePackageWindow		Avaliar %Package%
+Stability:	RatePackageWindow		Estabilidade:
 Click a package to view information	PackageInfoView		Clique em um pacote para visualizar a informação
+Other users can see this rating	RatePackageWindow		Outros usuários podem ver esta avaliação
+Stability	RatePackageWindow		Estabilidade
 for %Version%	PackageInfoView		para %Version%
 No changelog available.	PackageInfoView		Nenhum relatório de mudanças disponível.
 Depot:	FilterView		Depósito:
 Description	PackageListView		Descrição
 Install	PackageManager		Instalar
+Source packages	MainWindow		Pacotes fonte
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Conta criada com sucesso. Você pode agora classificar pacotes e fazer outras coisas úteis.
 Tools	MainWindow		Ferramentas
 HaikuDepot	System name		Depósito Haiku
+Close	UserLoginWindow		Fechar
 Rate package…	PackageInfoView		Avaliar pacote...
+Category	FilterView		Categoria
 Uninstall	PackageManager		Desinstalar
+An error occurred while obtaining the package list: %message%	MainWindow		Um erro ocorreu ao obter a lista de pacotes: %message%
+Your rating was updated successfully.	RatePackageWindow		Sua avaliação foi atualizada com sucesso.
 <no info>	PackageInfoView		<sem informação>
+Starting the package daemon failed:\n\n%Error%	App		A inicialização do daemon de pacote falhou:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Um erro ocorreu ao inicializar o gerenciador de pacotes: %message%
+Email address:	UserLoginWindow		Endereço de e-mail:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Sua classificação foi enviada com sucesso. Você pode atualizá-la ou removê-la a qualquer tempo para classificar o pacote novamente.
+Very unstable	RatePackageWindow		Muito instável
+The username is already taken. Please choose another.	UserLoginWindow		Este nome de usuário já pertence a alguém. Escolha outro, por favor.
 Close	PackageManager		Fechar
 Status	PackageListView		Estado
 Development	Model		Desenvolvimento
 Fatal error	PackageManager		Erro fatal
+Log in	UserLoginWindow		Entrar
+Repeat pass phrase:	UserLoginWindow		Repita a frase secreta:
 Ratings	PackageInfoView		Classificações
+But none could be listed here, sorry.	UserLoginWindow		Mas nenhum pode ser listado aqui, desculpe.
+System & Utilities	Model		Sistema & Utilitários
 Inactive	PackageListView		Inativo
 Refresh depots	MainWindow		Atualizar depósitos
+The package action could not be scheduled: %Error%	PackageInfoView		A ação do pacote não pode ser agendada: %Error%
+Science & Mathematics	Model		Ciência & Matemática
 Main Menu	MainWindow		Menu Principal
 (%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Você não resolveu o quebra-cabeça captcha corretamente.
+Success	UserLoginWindow		Sucesso
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		O Depósito Haiku precisa do daemon de pacote para funcionar e ele parece não estar em execução.\nGostaria de iniciá-lo agora?
 Downloading:	PackageInfoView		Baixando:
+Mostly stable	RatePackageWindow		Na maior parte estável
+There was a puzzling response from the web service.	RatePackageWindow		Houve uma resposta enigmática do serviço web.
+Log out	MainWindow		Sair
+Education	Model		Educação
 Search terms:	FilterView		Termos para pesquisa:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Nenhuma avaliação de usuário disponível.
+Failed to update rating	RatePackageWindow		Falhou ao atualizar a avaliação
+Does not start	RatePackageWindow		Não iniciar
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Um erro ocorreu ao atualizar o repositório: %error% (%details%)
+It was not possible to contact the web service.	RatePackageWindow		Não é possível contatar o serviço web.
+Only featured packages	MainWindow		Apenas pacotes em destaque
+There are problems in the form:\n\n	UserLoginWindow		Existem problemas no formulário:\n\n
 Productivity	Model		Produtividade
+User name:	UserLoginWindow		Nome do usuário:
+User Menu	MainWindow		Menu do Usuário
+Unstable but usable	RatePackageWindow		Instável mas utilizável
+The email address appears to be malformed.	UserLoginWindow		O endereço de e-mail parece disforme.
 Games	Model		Jogos
 Rating	PackageListView		Avaliação
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+There was a puzzling response from the web service.	UserLoginWindow		Houve uma resposta enigmática do serviço web.
 Graphics	Model		Gráficos
 Local	MainWindow		Local
 Close	MainWindow		Fechar
+Preferred language:	UserLoginWindow		Idioma preferido:
+Failed to rate package	RatePackageWindow		Falhou ao avaliar pacote
+Internet & Network	Model		Internet & Rede
+Cancel	MainWindow		Cancelar
 Video	Model		Vídeo
 An error occurred while refreshing the repository: %error%	MainWindow		Ocorreu um erro ao atualizar o repositório: %error%
 Pending…	PackageListView		Pendente…
 Depot	FilterView		Depósito
 Uninstalled	PackageListView		Não instalado
+Stable	RatePackageWindow		Estável
 Unknown	PackageListView		Desconhecido
 All depots	FilterView		Todos os depósitos
+Comment language:	RatePackageWindow		Idioma do comentário:
+Pass phrase:	UserLoginWindow		Frase secreta:
+Screenshot	ScreenshotWindow		Captura de tela
+Not specified	RatePackageWindow		Não especificado
 Available	PackageListView		Disponível
+Develop packages	MainWindow		Desenvolver pacotes
 n/a	PackageInfoView		n/a
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Se não fornecer um endereço de e-mail, você não será capaz de redefinir sua senha se esquecê-la.
+ It responded with: 	UserLoginWindow		 Ele respondeu com: 
+Authentication failed. Connection to the service failed.	UserLoginWindow		Autenticação falhou. Conexão ao serviço falhou.
 Send	RatePackageWindow		Enviar
+Business	Model		Negócios
 Audio	Model		Áudio
 About	PackageInfoView		Sobre
 Active	PackageListView		Ativo
+It was not possible to contact the web service.	UserLoginWindow		Não foi possível contatar o serviço web.
+Failed to create account: %s\n	UserLoginWindow		Falhou ao criar conta: %s\n
+Cancel	UserLoginWindow		Cancelar

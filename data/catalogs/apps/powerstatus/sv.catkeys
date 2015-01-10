@@ -1,8 +1,9 @@
-1	swedish	x-vnd.Haiku-PowerStatus	248799648
+1	swedish	x-vnd.Haiku-PowerStatus	3969330583
 Design capacity low warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
 Show percent	PowerStatus		Visa procent
 Design capacity: 	PowerStatus		Tillverkningskapacitet:
  mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Du börjat få lite ström i ditt batteri, anslut en laddkabel för att inte datorn ska få slut på batteri.
 Battery low	PowerStatus		Batterikapaciteten är låg
 Type: 	PowerStatus		Typ:
 non-rechargeable	PowerStatus		Ej uppladdningsbar
@@ -33,6 +34,7 @@ Capacity granularity 1: 	PowerStatus		Kapacitetskornighet 1:
 OEM info: 	PowerStatus		OEM information:
 Design voltage: 	PowerStatus		Tillverkningsspänning:
 Battery charging	PowerStatus		Laddar batteri
+The battery level is critical, please plug in the device immediately.	PowerStatus		Batteri nivån är kritisk, sätt i laddkabel nu.
 Design capacity warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
 Battery info	PowerStatus		Batteriinformation
 Quit	PowerStatus		Avsluta

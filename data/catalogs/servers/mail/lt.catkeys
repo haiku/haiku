@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-POST	3583868911
+1	lithuanian	x-vnd.Be-POST	825141276
 Fetching mail for %name	Notifier		Gaunami %name laiškai
 Check for mails only	DeskbarView		Tik patikrinti laiškus
 Send pending mails	DeskbarView		Išsiųsti eilėje esančius laiškus
@@ -13,5 +13,4 @@ Check for mail now	DeskbarView		Patikrinti paštą
 No new messages	DeskbarView		Naujų laiškų nėra
 Mail daemon status log	MailDaemon		El. pašto tarnybos būsenos žurnalas
 Settings…	DeskbarView		Nuostatos…
-No new messages.	MailDaemon		Naujų laiškų nėra.
 Mail status	Notifier		Pašto būsena

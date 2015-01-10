@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-POST	3583868911
+1	dutch; flemish	x-vnd.Be-POST	825141276
 Fetching mail for %name	Notifier		Mail ophalen voor %name
 Check for mails only	DeskbarView		Alleen mails controleren
 Send pending mails	DeskbarView		Mails in wachtrij verzenden
@@ -13,5 +13,4 @@ Check for mail now	DeskbarView		Nu mail controleren
 No new messages	DeskbarView		Geen nieuwe berichten
 Mail daemon status log	MailDaemon		Statuslog van maildaemon
 Settings…	DeskbarView		Instellingen…
-No new messages.	MailDaemon		Geen nieuwe berichten.
 Mail status	Notifier		Mailstatus

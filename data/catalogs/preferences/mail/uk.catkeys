@@ -1,14 +1,10 @@
-1	ukrainian	x-vnd.Haiku-Mail	2592587573
-Mail checking	Config Window		Перевірка пошти
+1	ukrainian	x-vnd.Haiku-Mail	688530788
 Settings	Config Window		Налаштування
 Never	Config Window	show status window	Ніколи
-Only when dial-up is connected	Config Window		Тільки при включеному діалапі
 While sending and receiving	Config Window		При відправці і отриманні
-days	Config Window		днів
 Incoming	Config Window		Вхідні
 Server name:	E-Mail		Ім'я серверу:
 OK	Config Window		Гаразд
-Start mail services on startup	Config Window		Запускати сервіс при старті
 E-mail address:	E-Mail		Адреса ел.пошти:
 Account name:	E-Mail		Назва облікового запису:
 Account name:	Config Views		Ім'я аккаунта:
@@ -22,17 +18,12 @@ Password:	E-Mail		Гасло:
 Accounts	Config Window		Облікові записи
 Finish	AutoConfigWindow		Фініш
 Remove	Config Window		Видалити
-Miscellaneous	Config Window		Змішаний
-Show connection status window:	Config Window		Показати вікно стану підключення:
 Server Name:	E-Mail		Ім'я серверу:
 While sending	Config Window		Поки відправляється
-Schedule outgoing mail when dial-up is disconnected	Config Window		Затримувати відправку вихідних при відключеному діалапі
-hours	Config Window		годин
 Enter a valid e-mail address.	AutoConfigWindow		Введіть чинну адресу ел. пошти.
 Add	Config Window		Додати
 Account settings	AutoConfigWindow		Параметри облікового запису
 E-mail	System name		Ел.пошта
-never	Config Window	mail checking frequency	ніколи
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n
 Real name:	Config Views		Справжнє ім'я:
 \t\t· Outgoing	Config Window		\t\t· Вихідні
@@ -52,10 +43,8 @@ minutes	Config Window		хвилин
 Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних настройок: %s\n
 Real name:	E-Mail		Справжнє ім'я:
 Apply	Config Window		Прийняти
-Always	Config Window		Завжди
 OK	AutoConfigWindow		Гаразд
 Add filter	Config Views		Додати фільтр
 Outgoing	Config Window		Вихідні
 Outgoing mail filters	Config Views		Фільтри вихідної пошти
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтворіть новий обліковий запис натиснувши кнопку Додати .\n\nВидаліть обліковий запис при допомозі кнопки Видалити на вибраному елементі\n\nВиберіть елемент зі списку для зміни його налаштувань.
 Error	Config Window		Помилка

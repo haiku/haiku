@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-POST	3583868911
+1	belarusian	x-vnd.Be-POST	825141276
 Fetching mail for %name	Notifier		Атрымліваю пошту для %name
 Check for mails only	DeskbarView		Толькі праверыць пошту
 Send pending mails	DeskbarView		Даслаць паведамленні што чакаюць
@@ -13,5 +13,4 @@ Check for mail now	DeskbarView		Праверыць пошту
 No new messages	DeskbarView		Няма новых паведамленняў
 Mail daemon status log	MailDaemon		Пратакол паштовай службы
 Settings…	DeskbarView		Наладкі…
-No new messages.	MailDaemon		Няма новых паведамленняў.
 Mail status	Notifier		Статус пошты

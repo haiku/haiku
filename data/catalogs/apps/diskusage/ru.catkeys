@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-DiskUsage	2002508600
+1	russian	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% в {0, plural, one{# файле} few{# файлах} other{# файлах}}
 Scanning %refName%	Scanner		Сканируется раздел %refName%
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d файлов
 Size	Info Window		Размер

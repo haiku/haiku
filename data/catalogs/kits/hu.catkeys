@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libbe	1311938724
+1	hungarian	x-vnd.Haiku-libbe	2929679013
 gamma	AboutWindow		gamma
 beta	AboutWindow		béta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -12,6 +12,7 @@ Copy	TextView		Másolás
 alpha	AboutWindow		alfa
 Error	PrintJob		Hiba
 All Rights Reserved.	AboutWindow		Minden jog fenntartva.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# bájt} other{# bájt}}
 About %app%	AboutWindow		%app% névjegye
 No pages to print!	PrintJob		Nincs nyomtatható oldal!
 OK	Dragger		Rendben

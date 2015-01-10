@@ -1,15 +1,12 @@
-1	japanese	x-vnd.Haiku-Shortcuts	1965025444
-MoveMouse	ShortcutsSpec		MoveMouse
+1	japanese	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できませんでした。
 Cancel	ShortcutsWindow		中止
-InsertString	ShortcutsSpec		InsertString
 Append KeySet…	ShortcutsWindow		キーセットの追加…
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Key
 Open KeySet…	ShortcutsWindow		キーセットを開く…
 Error, NULL state description?	ShortcutsSpec		エラー、記述がありません?\n
-MouseUp	ShortcutsSpec		MouseUp
 Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"テキストをここに\"
@@ -18,26 +15,20 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした！
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-SendMessage	ShortcutsSpec		SendMessage
-MoveMouseTo	ShortcutsSpec		MoveMouseTo
 Option	ShortcutsSpec	Name for modifier on keyboard	オプション
 Save	ShortcutsWindow		保存
 *MouseButton 1	ShortcutsWindow		*MouseButton 1
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
-MouseDown	ShortcutsSpec		MouseDown
 Save changes before closing?	ShortcutsWindow		閉じる前に変更を保存しますか?
 Remove selected shortcut	ShortcutsWindow		選択部を削除
-MouseButton	ShortcutsSpec		MouseButton
 Add new shortcut	ShortcutsWindow		新規作成
 Save & apply	ShortcutsWindow		保存して適用
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		追加
 File	ShortcutsWindow		ファイル
-Beep	ShortcutsSpec		Beep
 Quit	ShortcutsWindow		終了
 *MouseDown	ShortcutsWindow		*MouseDown
 Don't save	ShortcutsWindow		保存しない
-Multi	ShortcutsSpec		Multi
 Application	ShortcutsWindow		アプリケーション
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Beep
@@ -48,5 +39,4 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセット
 Select	ShortcutsWindow		選択
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセットファイルを保存できませんでした!
 Oh no	ShortcutsWindow		Oh no
-LaunchHandler	ShortcutsSpec		LaunchHandler
 Shortcuts	System name		キーボードショートカット

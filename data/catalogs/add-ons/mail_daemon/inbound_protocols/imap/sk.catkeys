@@ -1,9 +1,7 @@
-1	slovak	x-vnd.Haiku-IMAP	3892875357
+1	slovak	x-vnd.Haiku-IMAP	3950045582
 Destination:	imap_config		Cieľ:
 status	IMAPFolderConfig		stav
 Apply	IMAPFolderConfig		Použiť
-IMAP Folders	imap_config		Priečinky IMAP
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Sťahujú sa priečinky IMAP, strpenie...
 IMAP Folders	IMAPFolderConfig		Priečinky IMAP
-Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Prihlasuje/odhlasuje sa odber priečinkov IMAP, strpenie...
 Failed to fetch available storage.	IMAPFolderConfig		Nepodarilo sa zistiť dostupné úložné miesto.

@@ -1,7 +1,6 @@
-1	croatian	x-vnd.Haiku-About	3533032961
+1	croatian	x-vnd.Haiku-About	2757844502
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Autorsko pravo © 1999-2010 Gutenprint autora. Sva prava pridržana.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i njegov NewOS kernel)\n
-Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Autorska prava © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Autorska prava © 1996-2005 Julian R Seward.Sva prava pridržana.
 %d MiB total	AboutView		%d MiB ukupno
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (utemeljitelj projekta)\n\n
@@ -19,7 +18,6 @@ Source Code: 	AboutView		Izvorni kod:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, množina, jedan{Processor:} ostalo{# Procesori:}}
 Kernel:	AboutView		Kernel:
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Autorska prava © 2001-2002 Thomas Broyer, Charlie Bozeman i Daniel Veillard. Sva prava pridržana.
-Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Dijelovi ovog software-a su pod autorskim pravima.\nAutorska prava © 1996-2006 The FreeType Project.Sva prava pridržana.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Autorska prava na Haiku kod su vlasništvo Haiku, Inc. ili poštovanih autora gdje je to naznačeno u izvornom kodu. Haiku® and the HAIKU logo® su registrirani zaštitni znaci Haiku, Inc.\n
 Marvell (firmware)	AboutWindow		Marvell (firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Autorska prava © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nSva prava pridržana.

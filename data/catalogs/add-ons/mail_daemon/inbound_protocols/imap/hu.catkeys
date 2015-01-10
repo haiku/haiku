@@ -1,9 +1,7 @@
-1	hungarian	x-vnd.Haiku-IMAP	3892875357
+1	hungarian	x-vnd.Haiku-IMAP	3950045582
 Destination:	imap_config		Mappa:
 status	IMAPFolderConfig		állapot
 Apply	IMAPFolderConfig		Alkalmaz
-IMAP Folders	imap_config		IMAP mappák
 Fetching IMAP folders, have patience...	IMAPFolderConfig		IMAP mappák letöltése, kis türelmet…
 IMAP Folders	IMAPFolderConfig		IMAP mappák
-Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Feliratkozás / leiratkozás IMAP mappákról, kis türelmet…
 Failed to fetch available storage.	IMAPFolderConfig		Nem sikerült letölteni az elérhető tárhely mennyiségét.

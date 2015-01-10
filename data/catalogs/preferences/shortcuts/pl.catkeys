@@ -1,15 +1,12 @@
-1	polish	x-vnd.Haiku-Shortcuts	1965025444
-MoveMouse	ShortcutsSpec		MoveMouse
+1	polish	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Skróty nie mogły zapisać ustawienia klawiszy.
 Cancel	ShortcutsWindow		Anuluj
-InsertString	ShortcutsSpec		InsertString
 Append KeySet…	ShortcutsWindow		Dodaj KeySet…
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Przycisk
 Open KeySet…	ShortcutsWindow		Otwórz KeySet…
 Error, NULL state description?	ShortcutsSpec		Błąd, brak opisu stanu?
-MouseUp	ShortcutsSpec		MouseUp
 Revert to saved	ShortcutsWindow		Cofnięto do zapisu
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tutaj umieść swój tekst\"
@@ -18,26 +15,20 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Skróty nie zdołały otworzyć pliku KeySet!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-SendMessage	ShortcutsSpec		SendMessage
-MoveMouseTo	ShortcutsSpec		MoveMouseTo
 Option	ShortcutsSpec	Name for modifier on keyboard	Opcja
 Save	ShortcutsWindow		Zapisz
 *MouseButton 1	ShortcutsWindow		*MouseButton 1
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
-MouseDown	ShortcutsSpec		MouseDown
 Save changes before closing?	ShortcutsWindow		Zapisać zmiany przed zamknięciem?
 Remove selected shortcut	ShortcutsWindow		Usuń zaznaczony skrót
-MouseButton	ShortcutsSpec		MouseButton
 Add new shortcut	ShortcutsWindow		Dodaj nowy skrót
 Save & apply	ShortcutsWindow		Zapisz i zastosuj
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		Dodaj
 File	ShortcutsWindow		Plik
-Beep	ShortcutsSpec		Beep
 Quit	ShortcutsWindow		Wyjdź
 *MouseDown	ShortcutsWindow		*MouseDown
 Don't save	ShortcutsWindow		Nie zapisuj
-Multi	ShortcutsSpec		Multi
 Application	ShortcutsWindow		Aplikacja
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Beep
@@ -48,5 +39,4 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Skróty nie zdo
 Select	ShortcutsWindow		Wybierz
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Skróty nie zdołały zapisać pliku Keyset!
 Oh no	ShortcutsWindow		Och nie
-LaunchHandler	ShortcutsSpec		LaunchHandler
 Shortcuts	System name		Skróty klawiszowe

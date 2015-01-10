@@ -1,15 +1,12 @@
-1	french	x-vnd.Haiku-Shortcuts	1965025444
-MoveMouse	ShortcutsSpec		BougerSouris
+1	french	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Raccourcis n’a pas pu enregistrer votre jeu de touches.
 Cancel	ShortcutsWindow		Annuler
-InsertString	ShortcutsSpec		InsérerTexte
 Append KeySet…	ShortcutsWindow		Ajouter un jeu de touches…
 Control	ShortcutsSpec	Name for modifier on keyboard	Contrôle
 Key	ShortcutsWindow		Touche
 Open KeySet…	ShortcutsWindow		Ouvrir un jeu de touches…
 Error, NULL state description?	ShortcutsSpec		Erreur : description d’état NULL ?
-MouseUp	ShortcutsSpec		SourisEnHaut
 Revert to saved	ShortcutsWindow		Revenir à la version enregistrée
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsérerTexte « votre texte ici »
@@ -18,26 +15,20 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*GestionnaireDeLancement text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Raccourcis n’a pas pu ouvrir le fichier de jeu de touches !
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi « *BougerSourisEn 100% 0 » « *BoutonSouris 1 »
-SendMessage	ShortcutsSpec		EnvoiMessage
-MoveMouseTo	ShortcutsSpec		BougerSourisEn
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
 Save	ShortcutsWindow		Enregistrer
 *MouseButton 1	ShortcutsWindow		*BoutonSouris 1
 *MoveMouse +20 +0	ShortcutsWindow		*BougeSouris +20 +0
-MouseDown	ShortcutsSpec		SourisEnBas
 Save changes before closing?	ShortcutsWindow		Voulez-vous enregistrer les modifications avant de fermer ?
 Remove selected shortcut	ShortcutsWindow		Supprimer le raccourci sélectionné
-MouseButton	ShortcutsSpec		BoutonSouris
 Add new shortcut	ShortcutsWindow		Ajouter un nouveau raccourci
 Save & apply	ShortcutsWindow		Sauver et appliquer
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*EnvoyerMessage application/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		Ajouter
 File	ShortcutsWindow		Fichier
-Beep	ShortcutsSpec		Bip
 Quit	ShortcutsWindow		Quitter
 *MouseDown	ShortcutsWindow		*SourisEnBas
 Don't save	ShortcutsWindow		Ne pas enregistrer
-Multi	ShortcutsSpec		Multi
 Application	ShortcutsWindow		Application
 Shift	ShortcutsSpec	Name for modifier on keyboard	Majuscule
 *Beep	ShortcutsWindow		*Bip
@@ -48,5 +39,4 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Raccourcis n’
 Select	ShortcutsWindow		Sélectionner
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Raccourcis n’a pas pu enregistrer votre fichier de jeu de touches !
 Oh no	ShortcutsWindow		Oh non !
-LaunchHandler	ShortcutsSpec		GestionnaireDeLancement
 Shortcuts	System name		Raccourcis

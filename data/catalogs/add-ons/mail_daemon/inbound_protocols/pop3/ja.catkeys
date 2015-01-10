@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-POP3	672805158
+1	japanese	x-vnd.Haiku-POP3	924806949
 Plain text	ConfigView		平文
 Sending APOP authentication…	pop3		APOP認証情報を送信中…
 Sending username…	pop3		ユーザーID送信中…
@@ -7,7 +7,6 @@ Getting mailbox size…	pop3		メールボックスのサイズを取得して�
 Connecting to POP3 server…	pop3		POP3サーバーに接続しています…
 Getting UniqueIDs…	pop3		固有のIDを取得中…
 : No reply.\n	pop3		返答がありません。\n
-: Connection refused or host not found	pop3		接続が拒否されたかサーバーが見つかりません。
 Error while connecting to server %serv	pop3		サーバー %serv に接続中にエラーが発生しました
 Error while authenticating user %user	pop3		ユーザー %user 認証中にエラーが発生しました
 Destination:	ConfigView		メッセージの保存先:

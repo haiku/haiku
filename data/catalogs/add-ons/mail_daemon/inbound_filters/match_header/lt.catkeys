@@ -1,12 +1,10 @@
-1	lithuanian	x-vnd.Haiku-MatchHeader	1205906732
+1	lithuanian	x-vnd.Haiku-MatchHeader	3677427558
 <Choose action>	ConfigView		<parinkite veiksmą>
 has	ConfigView		turi
 Move to	ConfigView		perkelti į
 Then	ConfigView		tuomet
-value (use REGEX: in from of regular expressions like *spam*)	ConfigView		reikšmę (naudokite REGEX: šablonams, pvz., *spam*, aprašyti)
 this field is based on the action	ConfigView		šio lauko galimos reikšmės priklauso nuo veiksmo
 Delete message	ConfigView		pašalinti laišką
-Rule filter	RuleFilter		Filtras pagal taisyklę
 <Choose account>	ConfigView		<parinkite paskyrą>
 Set flags to	ConfigView		nustatyti požymius į
 Set as read	ConfigView		pažymėti kaip skaitytą

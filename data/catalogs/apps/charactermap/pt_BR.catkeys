@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-CharacterMap	56063163
+1	portuguese (brazil)	x-vnd.Haiku-CharacterMap	1534181938
 Enclosed alphanumerics	UnicodeBlocks		Alfanuméricos inclusos
 Basic Latin	UnicodeBlocks		Latin básico
 View	CharacterWindow		Visualizar
@@ -123,6 +123,7 @@ Vai	UnicodeBlocks		Vai
 Yi Radicals	UnicodeBlocks		Radicais Yi
 Cyrillic extended B	UnicodeBlocks		Cirílico estendido B
 Quit	CharacterWindow		Sair
+Ancient symbols	UnicodeBlocks		Símbolos antigos
 Braille patterns	UnicodeBlocks		Padrões braile
 New Tai Lue	UnicodeBlocks		Tai Lue Novo
 Runic	UnicodeBlocks		Rúnico

@@ -1,12 +1,10 @@
-1	belarusian	x-vnd.Haiku-MatchHeader	1205906732
+1	belarusian	x-vnd.Haiku-MatchHeader	3677427558
 <Choose action>	ConfigView		<Абярыце аперацыю>
 has	ConfigView		меў
 Move to	ConfigView		Перасунуць у
 Then	ConfigView		Тады
-value (use REGEX: in from of regular expressions like *spam*)	ConfigView		параметр (выкарыстайце REGEX: у выглядзе regular expressions, напрыклад *spam*)
 this field is based on the action	ConfigView		гэты параметр грунтуецца на аперацыі
 Delete message	ConfigView		Выдаліць паведамленне
-Rule filter	RuleFilter		Правіла фільтра
 <Choose account>	ConfigView		<Абярыце рахунак>
 Set flags to	ConfigView		Меткі паведамлення ў
 Set as read	ConfigView		Пазначыць як прагледжанае

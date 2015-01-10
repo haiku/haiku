@@ -2,7 +2,7 @@
 Edit	People		Editar
 Error	People		Error
 City	People		Ciudad
-The file '%name%' could not be written.	People		no pudo ser escrito el archivo '%name% '
+The file '%name%' could not be written.	People		El archivo '%name%' no pudo ser escrito.
 none	Groups list		Ninguna
 Configure attributes	People		Configurar atributos
 Company	People		Empresa
@@ -10,36 +10,36 @@ Company	People		Empresa
 Work phone	People		Teléfono de trabajo
 People	System name		Gente
 New person	People		Nueva persona
-Select all	People		seleccionar todo
+Select all	People		Seleccionar todo
 File	People		Archivo
 Unnamed person	People		Persona sin nombre
-Could not create %s.	People		no se pudo crear %s
-Country	People		país
+Could not create %s.	People		No se pudo crear %s.
+Country	People		País
 Close	People		Cerrar
 Group	People		Grupo
 Nickname	People		Apodo
-Quit	People		Abandonar
+Quit	People		Salir
 Name	People		Nombre
-Revert	People		revertir
+Revert	People		Revertir
 Don't save	People		No guardar
-Undo	People		deshacer
-E-mail	People		E-mail
+Undo	People		Deshacer
+E-mail	People		Correo electrónico
 Load image…	People		Cargar imagen...
 OK	People		Aceptar
 Remove image	People		Quitar imagen
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		la ejecución del preflet FileTypes para configurar los atributos de la persona a fallado.\n\nError: 
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		La ejecución del preflet FileTypes para configurar los atributos de la Persona ha fallado.\n\nError: 
 Home phone	People		Teléfono de casa
 Save as…	People		Guardar como...
 Redo	People		Rehacer
 Save changes before closing?	People		¿Desea guardar los cambios antes de cerrar?
 Paste	People		Pegar
-Drop an image here,\nor use the contextual menu.	People		Deja una imagen aquí,\ o usa el menú contextual 
+Drop an image here,\nor use the contextual menu.	People		Deje una imagen aquí,\no use el menú contextual.
 Save	People		Guardar
 Person	Short mimetype description		Persona
 New person…	People		Nueva Persona
 Address	People		Dirección
 URL	People		URL
-Sorry	People		Perdon
+Sorry	People		Perdón
 Zip	People		Zip
 Contact information for a person.	Long mimetype description		Información de contacto para una persona.
 Fax	People		Fax

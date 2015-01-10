@@ -1,5 +1,6 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	2287587534
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	133580983
 Name	PackageListView		Nombre
+Available packages	MainWindow		Paquetes disponibles
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
 Close	RatePackageWindow		Cerrar
 The captcha puzzle needs to be solved.	UserLoginWindow		El acertijo de captcha debe ser resuelto.
@@ -17,6 +18,7 @@ No changelog available.	PackageInfoView		No hay registro de cambios disponible.
 Depot:	FilterView		Depósito:
 Description	PackageListView		Descripción
 Install	PackageManager		Instalar
+Source packages	MainWindow		Paquetes fuente
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autenticación fallida. El usuario no existe o la contraseña no se escribió correctamente.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Cuenta creada exitosamente. Ahora puede puntuar paquetes y hacer otras cosas útiles.
 Tools	MainWindow		Herramientas
@@ -28,6 +30,7 @@ Uninstall	PackageManager		Desinstalar
 An error occurred while obtaining the package list: %message%	MainWindow		Ocurrió un error al obtener la lista de paquetes: %message%
 Your rating was updated successfully.	RatePackageWindow		Su puntuación fue enviada exitosamente.
 <no info>	PackageInfoView		<no hay información>
+Starting the package daemon failed:\n\n%Error%	App		Fallo al iniciar el demonio de paquete:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Ocurrió un error al iniciar el administrador de paquetes: %message%
 Email address:	UserLoginWindow		Dirección de correo electrónico:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Su puntuación fue enviada exitosamente. Puede actualizarla o borrarla en cualquier momento puntuado el paquete otra vez.
@@ -36,6 +39,7 @@ The username is already taken. Please choose another.	UserLoginWindow		El nombre
 Close	PackageManager		Cerrar
 Not logged in	MainWindow		No se inició sesión
 The authentication was successful.	UserLoginWindow		La autenticación fue exitosa.
+Installed packages	MainWindow		Paquetes instalados
 Status	PackageListView		Estado
 Switch account…	MainWindow		Cambiar de cuenta…
 Ignore	UserLoginWindow		Ignorar
@@ -52,10 +56,13 @@ But none could be listed here, sorry.	UserLoginWindow		Pero ninguno se pudo list
 System & Utilities	Model		Sistema y utilidades
 Inactive	PackageListView		Inactivo
 Refresh depots	MainWindow		Actualizar depósitos
+The package action could not be scheduled: %Error%	PackageInfoView		La acción de paquete no se pudo programar: %Error%
+Science & Mathematics	Model		Ciencia y matemáticas
 Main Menu	MainWindow		Menú principal
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		No ha resuelto el acertijo captcha correctamente.
 Success	UserLoginWindow		Éxito
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot necesita que el demonio de paquete funcione, y parece no estar corriendo.\n¿Le gustaría iniciarlo ahora?
 Downloading:	PackageInfoView		Descargando:
 Mostly stable	RatePackageWindow		Mayormente estable
 There was a puzzling response from the web service.	RatePackageWindow		Hubo una respuesta misteriosa desde el servicio Web.
@@ -68,8 +75,14 @@ Failed to update rating	RatePackageWindow		Fallo al actualizar la valoración
 Does not start	RatePackageWindow		No inicia
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ocurrió un error mientras se actualizaba el repositorio: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Fue imposible contactar con el servicio Web.
+Only featured packages	MainWindow		Solo paquetes destacados
 There are problems in the form:\n\n	UserLoginWindow		Hay problemas en el formulario:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		El paquete no se encontró por el servicio Web. Esto probablemente signifique que viene de un depósito el cual no se rastrea aquí. Valorar tales paquetes desafortunadamente no está soportado.
+Create account	UserLoginWindow		Crear cuenta
+Productivity	Model		Productividad
+No, quit HaikuDepot	App		No, salir de HaikuDepot
+Authentication failed	UserLoginWindow		Falló la autenticación
+Language	RatePackageWindow		Idioma
 Failed to create or update rating: %s\n	RatePackageWindow		Fallo al crear o actualizar la valoración: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Necesita haber ingresado con una cuenta antes de poder valorar paquetes.
  It responded with: 	RatePackageWindow		 Respondió con: 
@@ -78,6 +91,10 @@ User Menu	MainWindow		Menú de usuario
 Unstable but usable	RatePackageWindow		Inestable pero usable
 The email address appears to be malformed.	UserLoginWindow		La dirección de correo electrónico parece estar malformada.
 Games	Model		Juegos
+Rating	PackageListView		Valoraciones
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+There was a puzzling response from the web service.	UserLoginWindow		Hubo una respuesta misteriosa desde el servicio Web.
+Close	MainWindow		Cerrar
 Cancel	MainWindow		Cancelar
 Input validation	UserLoginWindow		Validación de entrada
 Update	RatePackageWindow		Actualizar
@@ -87,6 +104,8 @@ An error occurred while refreshing the repository: %error%	MainWindow		Un error 
 Login or Create account	MainWindow		Ingresar o crear una cuenta
 Pending…	PackageListView		Pendiente…
 Depot	FilterView		Depósito
+OK	PackageInfoView		Aceptar
+Uninstalled	PackageListView		Desinstalado
 Unknown	PackageListView		Desconocido
 All depots	FilterView		Todos los depósitos
 Comment language:	RatePackageWindow		Comentar idioma:

@@ -1,14 +1,11 @@
-1	italian	x-vnd.Haiku-Shortcuts	3618270780
-MoveMouse	ShortcutsSpec		MuoviMouse
+1	italian	x-vnd.Haiku-Shortcuts	1755582132
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts non è stato capace di salvare le tue impostazioni di tasti.
 Cancel	ShortcutsWindow		Annulla
-InsertString	ShortcutsSpec		InserisciStringa
 Append KeySet…	ShortcutsWindow		Accoda Impostazione Tasti…
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Tasto
 Open KeySet…	ShortcutsWindow		Apri Impostazione Tasti…
-MouseUp	ShortcutsSpec		MouseRilasciato
 Revert to saved	ShortcutsWindow		Ripristina quanto salvato
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
@@ -17,24 +14,18 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*AvviaGestore text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di aprire il vostro file di impostazione tasti!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multiplo \"*MuoviMouseVerso 100% 0\" \"*TastoMouse 1\"
-SendMessage	ShortcutsSpec		InviaMessaggio
-MoveMouseTo	ShortcutsSpec		MuoviMouseVerso
 Save	ShortcutsWindow		Salva
 *MouseButton 1	ShortcutsWindow		*TastoMouse 1
 *MoveMouse +20 +0	ShortcutsWindow		*MuoviMouse +20 +0
-MouseDown	ShortcutsSpec		MousePremuto
 Remove selected shortcut	ShortcutsWindow		Rimuovi scorciatoia selezionata
-MouseButton	ShortcutsSpec		TastoMouse
 Add new shortcut	ShortcutsWindow		Aggiungi nuova scorciatoia
 Save & apply	ShortcutsWindow		Salva e applica
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*InviaMessaggio application/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		Accoda
 File	ShortcutsWindow		File
-Beep	ShortcutsSpec		Bip
 Quit	ShortcutsWindow		Esci
 *MouseDown	ShortcutsWindow		*MousePremuto
 Don't save	ShortcutsWindow		Non salvare
-Multi	ShortcutsSpec		Multiplo
 Application	ShortcutsWindow		Applicazione
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Bip
@@ -45,5 +36,4 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts non �
 Select	ShortcutsWindow		Seleziona
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di salvare il tuo file di impostazione tasti!
 Oh no	ShortcutsWindow		Oh no
-LaunchHandler	ShortcutsSpec		AvviaGestore 
 Shortcuts	System name		Shortcuts

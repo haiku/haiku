@@ -1,12 +1,10 @@
-1	slovak	x-vnd.Haiku-MatchHeader	1205906732
+1	slovak	x-vnd.Haiku-MatchHeader	3677427558
 <Choose action>	ConfigView		<Vyberte operáciu>
 has	ConfigView		má
 Move to	ConfigView		Presunúť do
 Then	ConfigView		potom
-value (use REGEX: in from of regular expressions like *spam*)	ConfigView		hodnota (použite reg. výraz: v tvare reg. výrazov ako *spam*)
 this field is based on the action	ConfigView		toto pole je založené na operácii
 Delete message	ConfigView		Zmazať správu
-Rule filter	RuleFilter		Filter pravidiel
 <Choose account>	ConfigView		<Vyberte účet>
 Set flags to	ConfigView		Nastaviť príznaky na
 Set as read	ConfigView		Nastaviť ako prečítané

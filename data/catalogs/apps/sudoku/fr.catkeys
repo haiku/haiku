@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Sudoku	2463385585
+1	french	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Restaurer le cliché
 Could not set Sudoku:\n%s\n	SudokuWindow		Impossible d’initialiser Sudoku :\n%s\n
 Export as…	SudokuWindow		Exporter sous…
@@ -26,6 +26,7 @@ Text	SudokuWindow		Texte
 Creating solvable field	SudokuGenerator		Création d’un champ solvable
 View	SudokuWindow		Vue
 Progress monitor	ProgressWindow		Moniteur de progression
+Set all hints	SudokuWindow		Mettre toutes les indications
 Mark invalid values	SudokuWindow		Marquer les valeurs invalides
 Blank	SudokuWindow		Vide
 Help	SudokuWindow		Aide

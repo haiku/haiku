@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-POST	3641225974
+1	polish	x-vnd.Be-POST	2437005641
 Fetching mail for %name	Notifier		Pobieranie poczty dla konta %name
 Check for mails only	DeskbarView		Sprawdź tylko pocztę
 Send pending mails	DeskbarView		Wyślij oczekującą pocztę
@@ -9,13 +9,10 @@ New Messages	MailDaemon		Nowe wiadomości
 Mail status	MailDaemon		Status poczty
 Shutdown mail services	DeskbarView		Wyłącz usługi poczty
 Sending mail for %name	Notifier		Wysyłanie poczty z konta %name
-{0, plural, one{# new message.} other{# new messages.}}	MailDaemon		{0, plural, one{# nowa wiadomość.} few{# nowe wiadomości.} many{# nowych wiadomości.} other{# nowej wiadomości.}}
 Create new message…	DeskbarView		Utwórz nową wiadomość…
-{0, plural, one{# new message} other{# new messages}}	MailDaemon		{0, plural, one{# nowa wiadomość} few{# nowe wiadomości} many{# nowych wiadomości} other{# nowej wiadomości}}
 No new messages	MailDaemon		Brak nowych wiadomości
 Check for mail now	DeskbarView		Sprawdź pocztę teraz
 No new messages	DeskbarView		Brak nowych wiadomości
 Mail daemon status log	MailDaemon		Plik logów serwera poczty
 Settings…	DeskbarView		Ustawienia…
-No new messages.	MailDaemon		Brak nowych wiadomości.
 Mail status	Notifier		Status poczty

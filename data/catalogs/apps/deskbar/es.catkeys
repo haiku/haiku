@@ -10,7 +10,7 @@ Edit in Tracker…	PreferencesWindow		Editar en Tracker…
 Recent documents:	PreferencesWindow		Documentos recientes:
 Recent applications	DeskbarMenu		Aplicaciónes recientes
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicaciones
-Find…	DeskbarMenu		Buscar...
+Find…	DeskbarMenu		Buscar…
 Show clock	Tray		Mostrar reloj
 Window	PreferencesWindow		Ventana
 Defaults	PreferencesWindow		Predefinidos
@@ -38,7 +38,7 @@ Shutdown…	DeskbarMenu		Apagar...
 Tracker always first	PreferencesWindow		Tracker siempre al frente
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferencias
 Recent folders	DeskbarMenu		Carpetas recientes
-About this system	DeskbarMenu		Sobre este sistema
+About this system	DeskbarMenu		Acerca de este sistema
 Show calendar…	TimeView		Mostar calendario...
 Deskbar preferences…	DeskbarMenu		Preferencias de la barra de escritorio
 Expand new applications	PreferencesWindow		Expandir nuevas aplicaciones

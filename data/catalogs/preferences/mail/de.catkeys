@@ -1,14 +1,10 @@
-1	german	x-vnd.Haiku-Mail	2592587573
-Mail checking	Config Window		E-Mail abfragen
+1	german	x-vnd.Haiku-Mail	688530788
 Settings	Config Window		Einstellungen
 Never	Config Window	show status window	Nie
-Only when dial-up is connected	Config Window		Nur bei aktiver Einwahlverbindung
 While sending and receiving	Config Window		Beim Senden und Empfangen
-days	Config Window		Tage
 Incoming	Config Window		Eingang
 Server name:	E-Mail		Servername:
 OK	Config Window		OK
-Start mail services on startup	Config Window		Starte E-Mail-Dienst beim Systemstart
 E-mail address:	E-Mail		E-Mail-Adresse:
 Account name:	E-Mail		Kontoname:
 Account name:	Config Views		Kontoname:
@@ -22,17 +18,12 @@ Password:	E-Mail		Passwort:
 Accounts	Config Window		Konten
 Finish	AutoConfigWindow		Beenden
 Remove	Config Window		Entfernen
-Miscellaneous	Config Window		Verschiedenes
-Show connection status window:	Config Window		Statusfenster anzeigen:
 Server Name:	E-Mail		Servername:
 While sending	Config Window		Beim Senden
-Schedule outgoing mail when dial-up is disconnected	Config Window		Versand aufschieben falls Einwahlverbindung nicht aktiv
-hours	Config Window		Stunden
 Enter a valid e-mail address.	AutoConfigWindow		Eine gültige E-Mail-Adresse angeben.
 Add	Config Window		Hinzu
 Account settings	AutoConfigWindow		Kontoeinstellungen
 E-mail	System name		E-Mail-Dienst
-never	Config Window	mail checking frequency	nie
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nDie allgemeinen Einstellungen konnten nicht zurückgenommen werden.\n\nFehler beim Abrufen der allgemeinen Einstellungen:\n%s\n
 Real name:	Config Views		Benutzername:
 \t\t· Outgoing	Config Window		\t\t· Ausgang
@@ -52,10 +43,8 @@ minutes	Config Window		Minuten
 Error retrieving general settings: %s\n	Config Window		Fehler beim Einlesen der allgemeinen Einstellungen: %s\n
 Real name:	E-Mail		Benutzername:
 Apply	Config Window		Anwenden
-Always	Config Window		Immer
 OK	AutoConfigWindow		OK
 Add filter	Config Views		Filter hinzufügen
 Outgoing	Config Window		Ausgang
 Outgoing mail filters	Config Views		Filter für ausgehende E-Mail
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNeues Konto erstellen über den \"Hinzu\" Button.\n\nZum Löschen, Konto auswählen und \"Entfernen\" klicken.\n\nKonto auswählen, um dessen Einstellungen zu ändern.
 Error	Config Window		Fehler

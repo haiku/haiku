@@ -1,14 +1,10 @@
-1	swedish	x-vnd.Haiku-Mail	2592587573
-Mail checking	Config Window		Kontrollera e-post
+1	swedish	x-vnd.Haiku-Mail	688530788
 Settings	Config Window		Inställningar
 Never	Config Window	show status window	Aldrig
-Only when dial-up is connected	Config Window		Endast när uppringd förbindelse är uppkopplad
 While sending and receiving	Config Window		När sändning och mottagning sker
-days	Config Window		dagar
 Incoming	Config Window		Inkommande
 Server name:	E-Mail		Servernamn:
 OK	Config Window		OK
-Start mail services on startup	Config Window		Starta e-posttjänster vid start
 E-mail address:	E-Mail		E-postadress:
 Account name:	E-Mail		Kontonamn:
 Account name:	Config Views		Kontonamn:
@@ -22,17 +18,12 @@ Password:	E-Mail		Lösenord:
 Accounts	Config Window		Konton
 Finish	AutoConfigWindow		Slutför
 Remove	Config Window		Ta bort
-Miscellaneous	Config Window		Diverse
-Show connection status window:	Config Window		Visa anslutningsstatusfönster:
 Server Name:	E-Mail		Servernamn:
 While sending	Config Window		När sändning sker
-Schedule outgoing mail when dial-up is disconnected	Config Window		Schemalägg utgående e-post när uppringning är nerkopplad
-hours	Config Window		timmar
 Enter a valid e-mail address.	AutoConfigWindow		Ange en giltig e-postadress.
 Add	Config Window		Lägg till
 Account settings	AutoConfigWindow		Kontoinställningar
 E-mail	System name		E-post
-never	Config Window	mail checking frequency	aldrig
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGrundinställningarna kunde inte återställas.\n\nEtt fel uppstod när grundinställningarna skulle återställas:\n%s\n
 Real name:	Config Views		Verkligt namn:
 \t\t· Outgoing	Config Window		\t\t· Utgående
@@ -52,10 +43,8 @@ minutes	Config Window		minuter
 Error retrieving general settings: %s\n	Config Window		Misslyckades att hämta grundinställningarna: %s\n
 Real name:	E-Mail		Verkligt namn:
 Apply	Config Window		Verkställ
-Always	Config Window		Alltid
 OK	AutoConfigWindow		OK
 Add filter	Config Views		Lägg till filter
 Outgoing	Config Window		Utgående
 Outgoing mail filters	Config Views		Utgående e-postfilter
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nSkapa ett nytt konto via Lägg till-knappen.\n\nTa bort ett konto med Ta bort-knappen vid den valda objektet.\n\nVälj ett listobjekt för att ändra dess inställningar.
 Error	Config Window		Fel

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-BootManager	3355843558
+1	portuguese (brazil)	x-vnd.Haiku-BootManager	3886671855
 The boot manager has been successfully installed on your system.	BootManagerController		O gerenciador de boot foi instalado com sucesso.
 After two seconds	DefaultPartitionPage		Após dois segundos
 Uninstall Boot Manager	UninstallPage	Title	Desinstalar Boot Manager
@@ -8,10 +8,12 @@ Hard Drive	DrivesPage	Default disk name	Disco rígido
 USB Drive	DrivesPage	Default disk name	Drive USB
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		O Master Boot Record (MBR) do dispositivo de boot \n\t%s\nserá salvo no disco. Escolha um arquivo para salvar o MBR.\n\nSe algo der errado com a instalação ou se mais tarde você quiser remover o menu de boot, apenas rode o gerenciador de boot e escolha a opção 'Desinstalar'.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Próximo de restaurar o Master Boot Record (MBR) de %disk do arquivo %file. Deseja continuar?
+First partition starts too early	BootManagerController	Title	A primeira partição iniciou muito cedo
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Ocorreu um erro ao escrever o menu de boot. O Master Boot Record poderá ser destruído. Restaure o MBR o quanto antes!
 Partitions	PartitionsPage	Title	Partições
 Timeout: %s	DefaultPartitionPage		Tempo restante: %s
 Select	FileSelectionPage	Button	Escolher
+Incompatible format!	DrivesPage	Cannot install	Formato incompatível!
 Cannot access!	DrivesPage	Cannot install	Não foi possível acessar!
 Uninstall boot manager	BootManagerController	Title	Desinstalar gerenciador de boot
 After four seconds	DefaultPartitionPage		Após quatro segundos
@@ -24,7 +26,9 @@ Please specify a default partition and a timeout.\nThe boot menu will load the d
 After one second	DefaultPartitionPage		Após um segundo
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		As seguintes partições foram detectadas. Por favor, siga adiante para as partições serem incluídas no menu de boot. Você também pode definir os nomes das partições da forma como gostaria que aparecessem no menu de boot. 
 After one minute	DefaultPartitionPage		Após um minuto
+The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		O Master Boot Record antigo não pode ser salvo em %s. Você pode continuar a instalação mas não haverá meio de desinstalar o menu de inicialização.
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		O Master Boot Record do dispositivo (%DISK) foi restaurado com sucesso a partir do arquivo %FILE.
+Quit	WizardView	Button	Sair
 Write boot menu	BootManagerController	Button	Escrever menu de boot
 The Master Boot Record could not be restored!	BootManagerController		O Master Boot Record não pode ser restaurado.
 Uninstall	DrivesPage	Button	Desinstalar
@@ -35,6 +39,7 @@ Installation of boot menu completed	BootManagerController	Title	Instalação do 
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	%d sem nome
 File:	FileSelectionPage	Text control label	Arquivo:
 Previous	WizardView	Button	Anterior
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		A primeira partição do disco iniciou muito cedo e não deixou espaço livre suficiente para um menu de inicialização.\nO Gerenciador de Inicialização necessita de 2 Kb de espaço disponível antes da primeira partição.
 Install	DrivesPage	Button	Instalar
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Próximo de escrever o seguinte menu de boot no disco (%s). Por favor verifique a informação antes de continuar.
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Desconhecido
@@ -45,9 +50,11 @@ No space available!	DrivesPage	Cannot install	Sem espaço disponível!
 Never	DefaultPartitionPage		Nunca
 Partition table not compatible	BootManagerController	Title	Tabela de partições não compatível
 Old Master Boot Record saved	BootManagerController	Title	Antigo Master Boot Record salvo
+Old Master Boot Record backup failure	BootManagerController	Title	Falha da cópia de segurança do antigo Master Boot Record
 Boot Manager is unable to read the partition table!	BootManagerController		O gerenciador de boot não pode ler a tabela de partições!
 Error reading partition table	BootManagerController	Title	Erro na leitura da tabela de partições
 Installation of boot menu failed	BootManagerController	Title	Instalação do menu de boot falhou
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		A tábua de particção do primeiro disco rígido não é compatível com o Gerenciador de Inicialização./nO Gerenciador de Inicialização trabalha exclusivamente com partições MBR IBM PC.
 Backup Master Boot Record	BootManagerController	Title	Backup do Master Boot Record
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Próximo de escrever o menu de boot no disco. Tem certeza de quer continuar.
 The old Master Boot Record was successfully saved to %s.	BootManagerController		O antigo Master Boot Record foi salvo com sucesso em %s.

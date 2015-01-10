@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Sudoku	2463385585
+1	hungarian	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Mentett állás visszaállítása
 Could not set Sudoku:\n%s\n	SudokuWindow		Nem sikerült beállítani ezt:\n%s\n
 Export as…	SudokuWindow		Exportálás…
@@ -26,6 +26,7 @@ Text	SudokuWindow		Szöveg
 Creating solvable field	SudokuGenerator		Megoldható mező készítése
 View	SudokuWindow		Nézet
 Progress monitor	ProgressWindow		Állapot kijelzése
+Set all hints	SudokuWindow		Összes javaslat
 Mark invalid values	SudokuWindow		Érvénytelen mezők bejelölése
 Blank	SudokuWindow		Üres
 Help	SudokuWindow		Segítség

@@ -1,15 +1,12 @@
-1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	1965025444
-MoveMouse	ShortcutsSpec		Mover o Mouse
+1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		O Atalhos não pode salvar sua combinação de teclas
 Cancel	ShortcutsWindow		Cancelar
-InsertString	ShortcutsSpec		Inserir expressão
 Append KeySet…	ShortcutsWindow		Juntar combinação de teclas...
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Tecla
 Open KeySet…	ShortcutsWindow		Abrir combinação de teclas...
 Error, NULL state description?	ShortcutsSpec		Erro, descrição de estado NULL?
-MouseUp	ShortcutsSpec		Mouse para cima
 Revert to saved	ShortcutsWindow		Reverter para salvo
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Seu Texto Aqui\"
@@ -18,26 +15,20 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		O Atalhos não pode abrir seu arquivo de combinação de teclas!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-SendMessage	ShortcutsSpec		Enviar Mensagem
-MoveMouseTo	ShortcutsSpec		Mover Mouse Para
 Option	ShortcutsSpec	Name for modifier on keyboard	Opção
 Save	ShortcutsWindow		Salvar
 *MouseButton 1	ShortcutsWindow		*Botão do Mouse 1
 *MoveMouse +20 +0	ShortcutsWindow		*Mover Mouse +20 +0
-MouseDown	ShortcutsSpec		Mouse para baixo
 Save changes before closing?	ShortcutsWindow		Salvar alterações antes de fechar?
 Remove selected shortcut	ShortcutsWindow		Remover atalho selecionado
-MouseButton	ShortcutsSpec		Botão do Mouse
 Add new shortcut	ShortcutsWindow		Adicionar novo atalho
 Save & apply	ShortcutsWindow		Salvar & aplicar
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Enviar Mensagem application/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		Juntar
 File	ShortcutsWindow		Arquivo
-Beep	ShortcutsSpec		Beep
 Quit	ShortcutsWindow		Sair
 *MouseDown	ShortcutsWindow		*Mouse para Baixo
 Don't save	ShortcutsWindow		Não salvar
-Multi	ShortcutsSpec		Multi
 Application	ShortcutsWindow		Aplicativo
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Alarme sonoro
@@ -48,5 +39,4 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		O Atalhos não 
 Select	ShortcutsWindow		Selecionar
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		O Atalhos não pode salvar seu arquivo combinação de teclas!
 Oh no	ShortcutsWindow		Oh não!
-LaunchHandler	ShortcutsSpec		Controlador de Lançamentos
 Shortcuts	System name		Atalhos

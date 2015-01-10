@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libbe	1311938724
+1	swedish	x-vnd.Haiku-libbe	2929679013
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -12,6 +12,7 @@ Copy	TextView		Kopiera
 alpha	AboutWindow		alfa
 Error	PrintJob		Fel
 All Rights Reserved.	AboutWindow		Alla rättigheter resarverade.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
 About %app%	AboutWindow		Om %app%
 No pages to print!	PrintJob		Inga sidor att skriva ut!
 OK	Dragger		OK

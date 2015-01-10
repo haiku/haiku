@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Sudoku	2463385585
+1	swedish	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Hämta ögonblicksbild
 Could not set Sudoku:\n%s\n	SudokuWindow		Kunde inte ställa in Sudoku:\n%s\n
 Export as…	SudokuWindow		Exportera som...
@@ -26,6 +26,7 @@ Text	SudokuWindow		Text
 Creating solvable field	SudokuGenerator		Skapar lösbart fält
 View	SudokuWindow		Visa
 Progress monitor	ProgressWindow		Förloppsindikator
+Set all hints	SudokuWindow		Sätt alla ledrådar
 Mark invalid values	SudokuWindow		Markera felaktiga värden
 Blank	SudokuWindow		Tom
 Help	SudokuWindow		Hjälp

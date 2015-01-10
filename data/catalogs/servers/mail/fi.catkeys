@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-POST	3641225974
+1	finnish	x-vnd.Be-POST	2437005641
 Fetching mail for %name	Notifier		Noudetaan sähköpostia vastaanottajalle %name
 Check for mails only	DeskbarView		Tarkista vain sähköpostit
 Send pending mails	DeskbarView		Lähetä odottamassa olevat sähköpostit
@@ -9,13 +9,10 @@ New Messages	MailDaemon		Uudet viestit
 Mail status	MailDaemon		Sähköpostitila
 Shutdown mail services	DeskbarView		Sulje sähköpostipalvelut
 Sending mail for %name	Notifier		Lähetetään sähköpostia vastaanottajalle %name
-{0, plural, one{# new message.} other{# new messages.}}	MailDaemon		{0, plural, one{# uusi viesti.} other{# uutta viestiä.}}
 Create new message…	DeskbarView		Luo uusi viesti...
-{0, plural, one{# new message} other{# new messages}}	MailDaemon		{0, plural, one{# uusi viesti} other{# uutta viestiä}}
 No new messages	MailDaemon		Ei uusia viestejä
 Check for mail now	DeskbarView		Tarkista sähköposti nyt
 No new messages	DeskbarView		Ei uusia viestejä
 Mail daemon status log	MailDaemon		Sähköpostitaustaohjelman tilaloki
 Settings…	DeskbarView		Asetukset…
-No new messages.	MailDaemon		Ei uusia viestejä.
 Mail status	Notifier		Sähköpostitila

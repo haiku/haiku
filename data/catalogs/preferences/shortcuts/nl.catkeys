@@ -1,14 +1,11 @@
-1	dutch; flemish	x-vnd.Haiku-Shortcuts	3618270780
-MoveMouse	ShortcutsSpec		VerplaatsMuis
+1	dutch; flemish	x-vnd.Haiku-Shortcuts	1755582132
 OK	ShortcutsWindow		Oké
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatie op te slaan.
 Cancel	ShortcutsWindow		Annuleren
-InsertString	ShortcutsSpec		VoegTekstIn
 Append KeySet…	ShortcutsWindow		Toevoegen toetsencombinatie...
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Toets
 Open KeySet…	ShortcutsWindow		Openen toetsencombinatie...
-MouseUp	ShortcutsSpec		MuisOmhoog
 Revert to saved	ShortcutsWindow		Herstellen naar opgeslagen data
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*VoegTekstIn \"Uw Tekst Hier\"
@@ -17,24 +14,18 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*StartAfhandelaar text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sneltoetsen kon uw toetsencombinatiebestand niet openen!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Meerdere \"*VerplaatsMuisNaar 100% 0\" \"*MuisKnop 1\"
-SendMessage	ShortcutsSpec		VerzendBericht
-MoveMouseTo	ShortcutsSpec		VerplaatsMuisNaar
 Save	ShortcutsWindow		Opslaan
 *MouseButton 1	ShortcutsWindow		*Muisknop 1
 *MoveMouse +20 +0	ShortcutsWindow		*VerplaatsMuis +20 +0
-MouseDown	ShortcutsSpec		MuisNeer
 Remove selected shortcut	ShortcutsWindow		Geselecteerde sneltoets verwijderen
-MouseButton	ShortcutsSpec		MuisKnop
 Add new shortcut	ShortcutsWindow		Nieuwe sneltoets toevoegen
 Save & apply	ShortcutsWindow		Opslaan & toepassen
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*VerzendBericht toepassing/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		Toevoegen
 File	ShortcutsWindow		Bestand
-Beep	ShortcutsSpec		Piep
 Quit	ShortcutsWindow		Afsluiten
 *MouseDown	ShortcutsWindow		*MuisNeer
 Don't save	ShortcutsWindow		Niet opslaan
-Multi	ShortcutsSpec		Multi
 Application	ShortcutsWindow		Toepassing
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Piep
@@ -45,5 +36,4 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sneltoetsen was
 Select	ShortcutsWindow		Selecteren
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand op te slaan!
 Oh no	ShortcutsWindow		Oh nee
-LaunchHandler	ShortcutsSpec		StartAfhandelaar
 Shortcuts	System name		Snelkoppelingen

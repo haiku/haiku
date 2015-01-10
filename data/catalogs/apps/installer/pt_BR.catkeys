@@ -1,4 +1,5 @@
-1	portuguese (brazil)	x-vnd.Haiku-Installer	528139900
+1	portuguese (brazil)	x-vnd.Haiku-Installer	3299873127
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		O Gerenciador de Inicialização, aplicação para configurar o menu de inicialização do Haiku, não pode ser carregado.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Você tem certeza que deseja abortar a instalação e reiniciar o sistema?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\desenvolvido por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t }\n\n

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Terminal	2930890216
+1	spanish; castilian	x-vnd.Haiku-Terminal	3911290985
 Not found.	Terminal TermWindow		No encontrado.
 Switch Terminals	Terminal TermWindow		Intercambiar Terminales
 Change directory	Terminal TermView		Cambiar directorio 
@@ -47,6 +47,7 @@ Window title…	Terminal TermWindow		Título de la ventana...
 Full screen	Terminal TermWindow		Pantalla completa
 Page setup…	Terminal TermWindow		Configuración de la página...
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Los siguientes procesos están activos:\n\n\t%1\n\nSi cierras la Terminal, Los procesos se finalizarán
+Custom	Terminal AppearancePrefView	Window size	Personalizada
 Insert path	Terminal TermView		Insertar la ruta de acceso
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui y Takashi Murai.\n\nUsos: %s [OPCIONES] [SHELL]\n
 Window size:	Terminal AppearancePrefView		Tamaño de la ventana:
@@ -57,6 +58,7 @@ Set window title	Terminal TermWindow		Fijar el título de la ventana
 Terminal	System name		Terminal
 Copy path	Terminal TermView		Copiar ruta
 Close other tabs	Terminal TermWindow		Cerrar otras pestañas
+Defaults	Terminal PrefWindow		Predeterminado
 Match word	Terminal FindWindow		Solo palabras completas
 Nothing is selected.	Terminal TermWindow		Nada ha sido seleccionado.
 Text not found.	Terminal TermWindow		Texto no encontrado.

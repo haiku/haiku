@@ -1,10 +1,14 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	804763508
+1	swedish	x-vnd.Haiku-HaikuDepot	3293630594
 Name	PackageListView		Namn
+Available packages	MainWindow		Tillgängliga paket
+Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
 Close	RatePackageWindow		Stäng
+The captcha puzzle needs to be solved.	UserLoginWindow		Captcha pusslet behöver lösas.
 Changelog	PackageInfoView		Ändringslogg
 Your rating:	RatePackageWindow		Dina betyg:
 The passwords do not match.	UserLoginWindow		Lösenorden stämmer inte överens.
 Log in…	MainWindow		Logga in...
+Rate %Package%	RatePackageWindow		Betyg%Package%
 Stability:	RatePackageWindow		Stabilitet:
 Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
 Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
@@ -15,23 +19,47 @@ Depot:	FilterView		Depot:
 Description	PackageListView		Beskrivning
 Install	PackageManager		Installera
 Source packages	MainWindow		Källkodspaket
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentisering misslyckades. Användaren finns inte eller så är fel lösenord angivet.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontot lyckades skapas. Du kan nu betygsätta paket och göra andra vettiga saker.
 Tools	MainWindow		Verktyg
 HaikuDepot	System name		HaikuDepot
 Close	UserLoginWindow		Stäng
 Rate package…	PackageInfoView		Hastighet paket...
+Category	FilterView		Kategori
 Uninstall	PackageManager		Avinstallera
+An error occurred while obtaining the package list: %message%	MainWindow		Ett fel inträffade när packet manager hämtade paketlistan: %message%
+Your rating was updated successfully.	RatePackageWindow		Ditt betyg har uppdaterats med lyckat resultat.
 <no info>	PackageInfoView		<Ingen information>
+Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Ett fel inträffade när packet manager startade: %message%
+Email address:	UserLoginWindow		E-postadress:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Din betygsättning laddadesupp ok. Du kan närsomhelst uppdatera eller tabort ditt betyg för paketet genom att ge ett nytt betyg.
+Very unstable	RatePackageWindow		Mycket ostabil
+The username is already taken. Please choose another.	UserLoginWindow		Användarnamnet används redan. Välj ett annat.
 Close	PackageManager		Stäng
+Not logged in	MainWindow		Inte inloggad
+The authentication was successful.	UserLoginWindow		Behörighetskontrollen lyckades.
+Installed packages	MainWindow		Installerade paket
 Status	PackageListView		Status
+Switch account…	MainWindow		Byt konto...
+Ignore	UserLoginWindow		Ignorera
+Language	UserLoginWindow		Språk
+Rate package	RatePackageWindow		Betygsatt paket
 Development	Model		Utveckling
 Fatal error	PackageManager		Allvarligt fel
+The user name needs to be at least 3 letters long.	UserLoginWindow		användarnamnet måste vara minst 3 bokstäver långt.
+Log in	UserLoginWindow		Logga in
+Repeat pass phrase:	UserLoginWindow		Upprepa lösenord:
 Ratings	PackageInfoView		Betyg
+But none could be listed here, sorry.	UserLoginWindow		Ursäkta, Men ingen kunde listas här.
+System & Utilities	Model		System & Verktyg
 Inactive	PackageListView		Inaktiv
 Refresh depots	MainWindow		Uppdatera depå
 Main Menu	MainWindow		Huvudmeny
 (%Votes%)	PackageInfoView		(%Votes%)
-Downloading:	PackageInfoView		Hämtar:
+Success	UserLoginWindow		Klar
+Downloading:	PackageInfoView		Mestadels stabil
+Mostly stable	RatePackageWindow		Mestadels stabil
 Search terms:	FilterView		Sökvillkor
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.

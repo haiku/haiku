@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Keymap	348798011
+1	spanish; castilian	x-vnd.Haiku-Keymap	618043781
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Mayúsculas:
 Revert	Modifier keys window		Revertir
@@ -7,6 +7,7 @@ Hungarian	Keyboard Layout View		Húngaro
 German	Keyboard Layout View		Alemán
 Swiss-French	Keyboard Layout View		Suizo francés
 Warning: left and right key roles do not match	Modifier keys window		Advertencia: los roles de tecla izquierda y derecha no concuerdan
+Belarusian (Mac)	Keyboard Layout View		Bielorruso (Mac)
 Italian	Keyboard Layout View		Italiano
 Polish (Typewriter)	Keyboard Layout View		Polaco (máquina de escribir)
 Tilde trigger	Keymap window		Disparador de tilde (~)
@@ -36,8 +37,10 @@ Error: duplicate keys	Modifier keys window		Error: teclas duplicadas
 System:	Keymap window		Sistema:
 Lithuanian	Keyboard Layout View		Lituano
 Finnish	Keyboard Layout View		Finlandés
+Svorak	Keyboard Layout View		Svorak
 Set modifier keys…	Keymap window		Elegir teclas modificadoras…
 Option:	Modifier keys window	Option key role name	Opción:
+Control	Keyboard Layout View	Control key	Control
 Switch shortcut keys	Keymap window		Cambiar atajos de teclado
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla mayúsculas
 User:	Keymap window		Usuario:
@@ -71,6 +74,7 @@ Swedish	Keyboard Layout View		Sueco
 (Current)	Keymap window		(Actual)
 Font	Keymap window		Tipo de letra
 Keymap	System name		Mapa de teclado
+Shift	Keyboard Layout View	Shift key	Mayúsculas
 Set modifier keys	Modifier keys window		Elegir teclas modificadoras
 Modifier keys	Modifier keys window		Teclas modificadoras
 Acute trigger	Keymap window		Disparador de acento agudo (´)

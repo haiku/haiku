@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Sudoku	2463385585
+1	japanese	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		スナップショットを戻す
 Could not set Sudoku:\n%s\n	SudokuWindow		数独を設定できませんでした:\n%s\n
 Export as…	SudokuWindow		別形式でエクスポート…
@@ -26,6 +26,7 @@ Text	SudokuWindow		テキスト
 Creating solvable field	SudokuGenerator		回答可能なフィールドを作成中
 View	SudokuWindow		表示
 Progress monitor	ProgressWindow		進行モニター
+Set all hints	SudokuWindow		すべてのヒントを設定
 Mark invalid values	SudokuWindow		正しくない値を表示
 Blank	SudokuWindow		空のフィールド
 Help	SudokuWindow		ヘルプ

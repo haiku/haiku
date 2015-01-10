@@ -1,8 +1,9 @@
-1	hungarian	x-vnd.Haiku-PowerStatus	248799648
+1	hungarian	x-vnd.Haiku-PowerStatus	3969330583
 Design capacity low warning: 	PowerStatus		Figyelmeztetés alacsony tervezett kapacitásnál: 
 Show percent	PowerStatus		Százalék megjelenítése
 Design capacity: 	PowerStatus		Tervezett kapacitás: 
  mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Az akkumulátor töltöttsége alacsony, kérlek csatlakoztasd a töltőt.
 Battery low	PowerStatus		Alacsony töltés
 Type: 	PowerStatus		Típus: 
 non-rechargeable	PowerStatus		Nem újratölthető
@@ -33,6 +34,7 @@ Capacity granularity 1: 	PowerStatus		Kapacitás granularitás 1:
 OEM info: 	PowerStatus		OEM információk: 
 Design voltage: 	PowerStatus		Tervezett feszültség: 
 Battery charging	PowerStatus		Akku töltődik
+The battery level is critical, please plug in the device immediately.	PowerStatus		Az akkumulátor töltöttsége veszélyesen alacsony, kérlek csatlakoztasd a töltőt.
 Design capacity warning: 	PowerStatus		Tervezett kapacitás figyelmeztetés: 
 Battery info	PowerStatus		Akku infó
 Quit	PowerStatus		Kilépés

@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-POST	3583868911
+1	english	x-vnd.Be-POST	825141276
 Fetching mail for %name	Notifier		获取 %name 的邮件
 Check for mails only	DeskbarView		只检查邮件
 Send pending mails	DeskbarView		发送挂起邮件
@@ -13,5 +13,4 @@ Check for mail now	DeskbarView		开始检查邮件
 No new messages	DeskbarView		无新消息
 Mail daemon status log	MailDaemon		邮箱服务状态记录
 Settings…	DeskbarView		设置…
-No new messages.	MailDaemon		无新消息。
 Mail status	Notifier		邮箱状态

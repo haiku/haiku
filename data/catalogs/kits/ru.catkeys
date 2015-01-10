@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libbe	1311938724
+1	russian	x-vnd.Haiku-libbe	2929679013
 gamma	AboutWindow		гамма
 beta	AboutWindow		бета
 %3.2f GiB	StringForSize		%3.2f ГБ
@@ -12,6 +12,7 @@ Copy	TextView		Копировать
 alpha	AboutWindow		альфа
 Error	PrintJob		Ошибка
 All Rights Reserved.	AboutWindow		Все права защищены.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# байт} few{# байта} other{# байтов}}
 About %app%	AboutWindow		О программе…
 No pages to print!	PrintJob		Нет страниц для печати!
 OK	Dragger		ОК

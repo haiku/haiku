@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-PowerStatus	248799648
+1	french	x-vnd.Haiku-PowerStatus	3969330583
 Design capacity low warning: 	PowerStatus		Alerte de capacité nominale faible : 
 Show percent	PowerStatus		Afficher les pourcentages
 Design capacity: 	PowerStatus		Capacité nominale : 
  mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		La charge de la batterie devient faible. Veuillez brancher l’alimentation.
 Battery low	PowerStatus		Batterie faible
 Type: 	PowerStatus		Type : 
 non-rechargeable	PowerStatus		non-rechargeable
@@ -33,6 +34,7 @@ Capacity granularity 1: 	PowerStatus		Granularité de charge 1 :
 OEM info: 	PowerStatus		Informations fabricant : 
 Design voltage: 	PowerStatus		Voltage nominal : 
 Battery charging	PowerStatus		Batterie en charge
+The battery level is critical, please plug in the device immediately.	PowerStatus		La batterie est épuisée. Veuillez brancher l’alimentation immédiatement.
 Design capacity warning: 	PowerStatus		Avertissement de capacité nominale : 
 Battery info	PowerStatus		Informations batteries
 Quit	PowerStatus		Quitter

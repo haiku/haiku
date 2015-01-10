@@ -1,14 +1,10 @@
-1	slovak	x-vnd.Haiku-Mail	2592587573
-Mail checking	Config Window		Kontrola pošty
+1	slovak	x-vnd.Haiku-Mail	688530788
 Settings	Config Window		Nastavenie
 Never	Config Window	show status window	Nikdy
-Only when dial-up is connected	Config Window		Iba ak je vytočené spojenie
 While sending and receiving	Config Window		Počas odosielania a prijímania
-days	Config Window		dní
 Incoming	Config Window		Prichádzajúce
 Server name:	E-Mail		Názov servera:
 OK	Config Window		OK
-Start mail services on startup	Config Window		Spustiť služby pošty pri štarte
 E-mail address:	E-Mail		Emailová adresa:
 Account name:	E-Mail		Názov účtu:
 Account name:	Config Views		Názov účtu:
@@ -22,17 +18,12 @@ Password:	E-Mail		Heslo:
 Accounts	Config Window		Účty
 Finish	AutoConfigWindow		Dokončiť
 Remove	Config Window		Odstrániť
-Miscellaneous	Config Window		Rozličné
-Show connection status window:	Config Window		Zobraziť okno stavu spojenia:
 Server Name:	E-Mail		Názov servera:
 While sending	Config Window		Počas odosielania
-Schedule outgoing mail when dial-up is disconnected	Config Window		Naplánovať odchádzajúcu poštu pri odpojení vytáčaného spojenia
-hours	Config Window		hodín
 Enter a valid e-mail address.	AutoConfigWindow		Zadajte platnú emailovú adresu.
 Add	Config Window		Pridať
 Account settings	AutoConfigWindow		Nastavenie účtu
 E-mail	System name		Email
-never	Config Window	mail checking frequency	nikdy
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nVšeobecné nastavenia nebolo možné vrátiť.\n\nChyba pri získavaní všeobecných nastavení:\n%s\n
 Real name:	Config Views		Skutočné meno:
 \t\t· Outgoing	Config Window		\t \t · Odchádzajúce
@@ -52,10 +43,8 @@ minutes	Config Window		minút
 Error retrieving general settings: %s\n	Config Window		Chyba pri získavaní všeobecných nastavení: %s\n
 Real name:	E-Mail		Skutočné meno:
 Apply	Config Window		Použiť
-Always	Config Window		Vždy
 OK	AutoConfigWindow		OK
 Add filter	Config Views		Pridať server
 Outgoing	Config Window		Odchádzajúce
 Outgoing mail filters	Config Views		Filtre odchádzajúcej pošty
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNový účet vytvoríte tlačidlom Pridať.\n\nÚčet odstránite tlačidlom odstrániť na vybranej položke.\n\nNastavenia položky zmeníte jej vybraním v zozname.
 Error	Config Window		Chyba

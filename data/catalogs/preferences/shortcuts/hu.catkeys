@@ -1,15 +1,12 @@
-1	hungarian	x-vnd.Haiku-Shortcuts	1965025444
-MoveMouse	ShortcutsSpec		EgérMozgatás
+1	hungarian	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		Rendben
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait.
 Cancel	ShortcutsWindow		Mégse
-InsertString	ShortcutsSpec		Karakterbeszúrás
 Append KeySet…	ShortcutsWindow		Gyorsbillentyű hozzáadása…
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Billentyű
 Open KeySet…	ShortcutsWindow		Gyorsbillentyű megnyitása…
 Error, NULL state description?	ShortcutsSpec		Hiba, NULL állapotleírás?
-MouseUp	ShortcutsSpec		EgérFel
 Revert to saved	ShortcutsWindow		Visszaállítás az elmentettre
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*KarakterekBeszúrása \"Ide írja a szöveget\"
@@ -18,26 +15,20 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*Indítás text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta megnyitni a beállításfájlját!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*EgérMozgatásIde 100% 0\" \"*EgérGomb 1\"
-SendMessage	ShortcutsSpec		ÜzenetKüldés
-MoveMouseTo	ShortcutsSpec		EgérMozgatásIde
 Option	ShortcutsSpec	Name for modifier on keyboard	Opció
 Save	ShortcutsWindow		Mentés
 *MouseButton 1	ShortcutsWindow		*EgérGomb 1
 *MoveMouse +20 +0	ShortcutsWindow		*EgérMozgatás +20 +0
-MouseDown	ShortcutsSpec		EgérLe
 Save changes before closing?	ShortcutsWindow		Menti a változtatásokat kilépés előtt?
 Remove selected shortcut	ShortcutsWindow		Kiválasztott gyorsbillentyű eltávolítása
-MouseButton	ShortcutsSpec		EgérGomb
 Add new shortcut	ShortcutsWindow		Új gyorsbillentyű hozzáadása
 Save & apply	ShortcutsWindow		Mentés és alkalmazás
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*ÜzenetKüldés application/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		Hozzáfűzés
 File	ShortcutsWindow		Fájl
-Beep	ShortcutsSpec		Sípolás
 Quit	ShortcutsWindow		Kilépés
 *MouseDown	ShortcutsWindow		*EgérLe
 Don't save	ShortcutsWindow		Ne mentse
-Multi	ShortcutsSpec		Multi
 Application	ShortcutsWindow		Program
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Sípolás
@@ -48,5 +39,4 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		A Parancsgombok
 Select	ShortcutsWindow		Kiválasztás
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait!
 Oh no	ShortcutsWindow		Ó jaj
-LaunchHandler	ShortcutsSpec		IndításKezelő
 Shortcuts	System name		Parancsgombok

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Shortcuts	1465609034
+1	lithuanian	x-vnd.Haiku-Shortcuts	2611306178
 OK	ShortcutsWindow		Gerai
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko.
 Cancel	ShortcutsWindow		Atsisakyti
@@ -19,7 +19,6 @@ Append	ShortcutsWindow		Įterpti
 File	ShortcutsWindow		Failas
 Quit	ShortcutsWindow		Baigti darbą
 Don't save	ShortcutsWindow		Neįrašyti
-Multi	ShortcutsSpec		Multi
 Application	ShortcutsWindow		Programa
 Shift	ShortcutsSpec	Name for modifier on keyboard	Lyg2
 Save KeySet as…	ShortcutsWindow		Įrašyti sparčiųjų klavišų rinkinį kaip…

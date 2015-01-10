@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PSDTranslator	195783696
+1	portuguese (brazil)	x-vnd.Haiku-PSDTranslator	489719358
 Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		Sem compressão
 Indexed	PSDLoader		Indexado
@@ -14,3 +14,9 @@ Photoshop image (%s)	PSDTranslator		Imagem do Photoshop (%s)
 Photoshop Big Document (PSB File)	PSDConfig		Documento Grande do Photoshop (Arquivo PSB)
 PSDTranslator Settings	PSDConfig		Definições do Tradutor PSD
 RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Mapa de bits
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Compressão: 
+Format: 	PSDConfig		Formato: 
+Multichannel	PSDLoader		Multicanal
+Duotone	PSDLoader		Duotone

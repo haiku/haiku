@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-POST	3583868911
+1	spanish; castilian	x-vnd.Be-POST	825141276
 Fetching mail for %name	Notifier		Búsqueda de correo para %name
 Check for mails only	DeskbarView		Sólo mirar si hay correo
 Send pending mails	DeskbarView		Enviar correos pendientes
@@ -13,5 +13,4 @@ Check for mail now	DeskbarView		Mirar si hay correo ahora
 No new messages	DeskbarView		No hay mensajes nuevos
 Mail daemon status log	MailDaemon		Registro del estado del demonio de correo
 Settings…	DeskbarView		Configuración…
-No new messages.	MailDaemon		No hay mensajes nuevos.
 Mail status	Notifier		Estado del correo

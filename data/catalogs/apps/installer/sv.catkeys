@@ -1,4 +1,5 @@
-1	swedish	x-vnd.Haiku-Installer	528139900
+1	swedish	x-vnd.Haiku-Installer	3421507633
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, den applikation man använder för att konfigurera Haiku boot meny kunde inte startas.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installerare\n\tskriven av Jérôme Duval och Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -16,12 +17,15 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		Avsluta Starthanteraren
 Stop	InstallerWindow		Stopp
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Os-prober sättet fungerar inte för dig, GRUB 2 använder en extra konfigurerings fil för att lägg till egna värden till boot menyn. För att lägga till dem högst upp, behöver du ändra/skapa filen med din favorit editor från Terminalen på följande sätt:\n\n
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Välj käll- och måldisk från menyn. Klicka sedan på \"Starta\".
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku på /dev/sda7\n
+Failed to launch Boot Manager	InstallerWindow		Kunde inte starta Boot Manager
 Install from:	InstallerWindow		Installera från:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld av %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VIKTIG INFORMATION INNAN DU INSTALLERAR HAIKU\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		GRUB's namn standard för partioner är: (hdN,n)\n \n
 Continue	InstallerWindow	In alert after pressing Stop	Fortsätt
 Write boot sector to '%s'	InstallerWindow		Skriv startsektor till '%s'
 Collecting copy information.	InstallProgress		Förbereder inför kopiering.
@@ -42,6 +46,7 @@ README	InstallerApp		LÄS MIG
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Måldisken kan ha för lite ledigt utrymme. Försök att välja en annan disk eller välj att installera färre valbara paket.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Vänligen stäng Starthanterarens- och DiskHanterings fönster innan du stänger Installerarens fönster.
 Scanning for disks…	InstallerWindow		Skannar efter diskar…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disken kan inte monteras. Var god välj en annan disk.
 ?? of ??	InstallerWindow	Unknown progress	?? av ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -86,6 +91,7 @@ With GRUB 2 the first logical partition always has the number \"5\", regardless 
 Write boot sector	InstallerWindow		Skriv boot sektor
 Cancel	InstallerWindow		Avbryt
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, applikationen för att konfigurera disk partitioner kunde inte startas.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Den tänkta volumen är inte tom. Är du säker att du villinstallera ändå?\n\nNotering: Systemfoldern kommer att vara en kopia från källans systemfolder men kommer att behålla inställningsfoldern, alla anda foldrar kommer att mergas. De filer och länkar som finns på båda ställena kommer att skrivas över med de nyare.
 No optional packages available.	PackagesView		Inga installationspaket fanns att välja.
 All hard disks start with \"hd\".\n	InstallerApp		Alla hårdiskar startar med \"hd\".\n
 Continue	InstallerApp		Fortsätt

@@ -1,14 +1,10 @@
-1	croatian	x-vnd.Haiku-Mail	3540100731
-Mail checking	Config Window		Provjera pošte
+1	croatian	x-vnd.Haiku-Mail	3370895820
 Settings	Config Window		Postavke
 Never	Config Window	show status window	Nikada
-Only when dial-up is connected	Config Window		Samo kada je spojen dial-up
 While sending and receiving	Config Window		Za vrijeme slanja i primanja
-days	Config Window		dani
 Incoming	Config Window		Dolazno
 Server name:	E-Mail		Ime poslužitelja:
 OK	Config Window		U redu
-Start mail services on startup	Config Window		Pokreni servise pošte pri pokretanju računala
 E-mail address:	E-Mail		Adresa elektroničke pošte:
 Account name:	E-Mail		Ime računa:
 Account name:	Config Views		Ime računa:
@@ -22,16 +18,12 @@ Password:	E-Mail		Lozinka:
 Accounts	Config Window		Računi
 Finish	AutoConfigWindow		Kraj
 Remove	Config Window		Ukloni
-Miscellaneous	Config Window		Razno
-Show connection status window:	Config Window		Pokaži prozor stanja veze:
 Server Name:	E-Mail		Ime poslužitelja:
 While sending	Config Window		Prilikom slanja
-hours	Config Window		sati
 Enter a valid e-mail address.	AutoConfigWindow		Unesite valjanu adresu elektroničke pošte.
 Add	Config Window		Dodaj
 Account settings	AutoConfigWindow		Postavke računa
 E-mail	System name		Elektronička pošta
-never	Config Window	mail checking frequency	nikada
 Real name:	Config Views		Pravo ime:
 \t\t· Outgoing	Config Window		\t\t· Odlazno
 Choose Protocol	E-Mail		Odaberite protokol
@@ -49,10 +41,8 @@ Account settings	Config Views		Postavke računa
 minutes	Config Window		minute
 Real name:	E-Mail		Pravo ime:
 Apply	Config Window		Primjeni
-Always	Config Window		Uvijek
 OK	AutoConfigWindow		U redu
 Add filter	Config Views		Dodaj filter
 Outgoing	Config Window		Odlazno
 Outgoing mail filters	Config Views		Filteri odlazne pošte
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNapravite novi račun sa Dodaj tipkom.\n\nUkloni račun sa Ukloni tipkom na odabranoj stavci.\n\nOdaberite stavku na listi da biste promjenili njezine postavke.
 Error	Config Window		Greška

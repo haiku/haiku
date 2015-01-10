@@ -1,8 +1,7 @@
-1	slovenian	x-vnd.Haiku-MatchHeader	2091420865
+1	slovenian	x-vnd.Haiku-MatchHeader	538909502
 has	ConfigView		ima
 Move to	ConfigView		Premakni v
 Then	ConfigView		potem
-value (use REGEX: in from of regular expressions like *spam*)	ConfigView		vrednost (uporabite regularne izraze, npr. *spam*)
 Delete message	ConfigView		Izbriši sporočilo
 Set flags to	ConfigView		Nastavi zastavice na
 Set as read	ConfigView		Označi kot prebrano

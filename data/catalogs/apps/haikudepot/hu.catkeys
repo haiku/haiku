@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1717397185
+1	hungarian	x-vnd.Haiku-HaikuDepot	780031017
 Name	PackageListView		Név
 Available packages	MainWindow		Elérhető csomagok
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
@@ -107,6 +107,7 @@ Input validation	UserLoginWindow		Bevitel érvényesítése
 Update	RatePackageWindow		Frissítés
 Video	Model		Videó
 All categories	FilterView		Minden kategória
+Contents	PackageInfoView		Tartalom
 An error occurred while refreshing the repository: %error%	MainWindow		Hiba történt a raktár frissítése közben: %error%
 Try again	App		Próbálja újra
 Login or Create account	MainWindow		Belépés vagy fiók létrehozása

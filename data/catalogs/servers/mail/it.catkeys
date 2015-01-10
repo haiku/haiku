@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-POST	3641225974
+1	italian	x-vnd.Be-POST	2437005641
 Fetching mail for %name	Notifier		Recupero della posta elettronica di %name in corso
 Check for mails only	DeskbarView		Controllare solo la posta in arrivo
 Send pending mails	DeskbarView		Inviare la posta in uscita
@@ -9,13 +9,10 @@ New Messages	MailDaemon		Nuovi Messaggi
 Mail status	MailDaemon		Status
 Shutdown mail services	DeskbarView		Arresto servizi di posta elettronica
 Sending mail for %name	Notifier		Invio della posta di %name in corso
-{0, plural, one{# new message.} other{# new messages.}}	MailDaemon		{0, plural, one{# nuovo messaggio.} other{# nuovi messaggi.}}
 Create new message…	DeskbarView		Crea nuovo messaggio…
-{0, plural, one{# new message} other{# new messages}}	MailDaemon		{0, plural, one{# nuovo messaggio} other{# nuovi messaggi}}
 No new messages	MailDaemon		Nessun nuovo messaggio
 Check for mail now	DeskbarView		Controllare adesso la posta in arrivo
 No new messages	DeskbarView		Nessun nuovo messaggio
 Mail daemon status log	MailDaemon		Log del server di posta elettronica
 Settings…	DeskbarView		Impostazioni…
-No new messages.	MailDaemon		Nessun nuovo messaggio.
 Mail status	Notifier		Stato posta elettronica

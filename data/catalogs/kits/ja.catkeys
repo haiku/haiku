@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libbe	1311938724
+1	japanese	x-vnd.Haiku-libbe	2929679013
 gamma	AboutWindow		γ
 beta	AboutWindow		β
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -12,6 +12,7 @@ Copy	TextView		コピー
 alpha	AboutWindow		α
 Error	PrintJob		エラー
 All Rights Reserved.	AboutWindow		All Rights Reserved.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# バイト} other{# バイト}}
 About %app%	AboutWindow		%app% について
 No pages to print!	PrintJob		印刷するページがありません。
 OK	Dragger		OK

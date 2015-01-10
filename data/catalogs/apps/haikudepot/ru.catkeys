@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2477150673
+1	russian	x-vnd.Haiku-HaikuDepot	2140521490
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -91,6 +91,7 @@ Preferred language:	UserLoginWindow		Предпочитаемый язык:
 Failed to rate package	RatePackageWindow		Не удалось оценить пакет
 Internet & Network	Model		Интернет и сеть
 Cancel	MainWindow		Отменить
+Quit HaikuDepot	App		Закрыть HaikuDepot
 Input validation	UserLoginWindow		Проверка ввода
 Update	RatePackageWindow		Обновить
 Video	Model		Видео

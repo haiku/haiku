@@ -1,9 +1,7 @@
-1	romanian	x-vnd.Haiku-IMAP	3892875357
+1	romanian	x-vnd.Haiku-IMAP	3950045582
 Destination:	imap_config		Destinație:
 status	IMAPFolderConfig		stare
 Apply	IMAPFolderConfig		Aplică
-IMAP Folders	imap_config		Dosare IMAP
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Se aduc dosarele IMAP, aveți răbdare...
 IMAP Folders	IMAPFolderConfig		Dosare IMAP
-Subcribe / Unsuscribe IMAP folders, have patience...	IMAPFolderConfig		Se abonează / dezabonează dosare IMAP, aveți răbdare...
 Failed to fetch available storage.	IMAPFolderConfig		Nu s-a putut aduce depozitul disponibil.

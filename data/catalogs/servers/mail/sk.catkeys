@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-POST	3583868911
+1	slovak	x-vnd.Be-POST	825141276
 Fetching mail for %name	Notifier		Sťahuje sa pošta účtu %name
 Check for mails only	DeskbarView		Iba skontrolovať poštu
 Send pending mails	DeskbarView		Poslať čakajúcu poštu
@@ -13,5 +13,4 @@ Check for mail now	DeskbarView		Skontrolovať poštu teraz
 No new messages	DeskbarView		Žiadne nové správy
 Mail daemon status log	MailDaemon		Stavový záznam poštového démona
 Settings…	DeskbarView		Nastavenia…
-No new messages.	MailDaemon		Žiadne nové správy.
 Mail status	Notifier		Stav pošty

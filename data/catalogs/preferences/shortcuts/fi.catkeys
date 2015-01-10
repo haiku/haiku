@@ -1,15 +1,12 @@
-1	finnish	x-vnd.Haiku-Shortcuts	1965025444
-MoveMouse	ShortcutsSpec		SiirräHiirtä
+1	finnish	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		Valmis
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt tallentamaan keyset-tiedostoa.
 Cancel	ShortcutsWindow		Peru
-InsertString	ShortcutsSpec		LisääMerkkijono
 Append KeySet…	ShortcutsWindow		Liitä KeySet-tiedosto…
 Control	ShortcutsSpec	Name for modifier on keyboard	Control-painike
 Key	ShortcutsWindow		Näppäin
 Open KeySet…	ShortcutsWindow		Avaa KeySet-tiedosto…
 Error, NULL state description?	ShortcutsSpec		Virhe, NULL-tilakuvaus?
-MouseUp	ShortcutsSpec		HiiriYlös
 Revert to saved	ShortcutsWindow		Palauta tallennettuun
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt-painike
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
@@ -18,26 +15,20 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt-painike
 *LaunchHandler text/html	ShortcutsWindow		*Käynnistyskäsittelijä text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt avaamaan KeySet-tiedostoa!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni ”*SiirräHiiriKohteeseen 100% 0” ”*Hiiripainike 1”
-SendMessage	ShortcutsSpec		LähetäViesti
-MoveMouseTo	ShortcutsSpec		SiirräHiiriKohteeseen
 Option	ShortcutsSpec	Name for modifier on keyboard	Valitsin
 Save	ShortcutsWindow		Tallenna
 *MouseButton 1	ShortcutsWindow		*Hiiripainike 1
 *MoveMouse +20 +0	ShortcutsWindow		*SiirräHiiri +20 +0
-MouseDown	ShortcutsSpec		HiiriAlas
 Save changes before closing?	ShortcutsWindow		Tallennetaanko muutokset ennen sulkemista?
 Remove selected shortcut	ShortcutsWindow		Poista valittu pikanäppäin
-MouseButton	ShortcutsSpec		HiiriPainike
 Add new shortcut	ShortcutsWindow		Lisää uusi pikanäppäin
 Save & apply	ShortcutsWindow		Tallenna ja käytä
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK ’Tfnd’
 Append	ShortcutsWindow		Liitä
 File	ShortcutsWindow		Tiedosto
-Beep	ShortcutsSpec		Piip
 Quit	ShortcutsWindow		Poistu
 *MouseDown	ShortcutsWindow		*HiiriAlas
 Don't save	ShortcutsWindow		Älä tallenna
-Multi	ShortcutsSpec		Moni
 Application	ShortcutsWindow		Sovellus
 Shift	ShortcutsSpec	Name for modifier on keyboard	Vaihtonäppäin
 *Beep	ShortcutsWindow		*Piip
@@ -48,5 +39,4 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinas
 Select	ShortcutsWindow		Valitse
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset eivät kyennyt tallentamaan KeySet-tiedostoa!
 Oh no	ShortcutsWindow		Oh ei
-LaunchHandler	ShortcutsSpec		Käynnistyskäsittelijä
 Shortcuts	System name		Pikanäppäinasetukset

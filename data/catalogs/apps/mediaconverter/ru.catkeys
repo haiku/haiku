@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaConverter	1667214194
+1	russian	x-vnd.Haiku-MediaConverter	3111641182
 Video using parameters form settings	MediaConverter		Видео использует параметры из настроек
 Video encoding:	MediaConverter		Кодирование видео:
 Error read audio frame %lld	MediaConverter		Ошибка чтения аудио кадра %lld
@@ -61,6 +61,7 @@ File	Menu		Файл
 Convert	MediaConverter		Конвертировать
 Writing audio track: %ld%% complete	MediaConverter		Запись аудио дорожки: %ld%% завершено
 Video quality: %3d%%	MediaConverter		Качество видео: %3d%%
+%.1f kHz %ld channel	MediaFileInfo		%.1f кГц %ld канал
 Output folder	MediaConverter		Сохранять в папку
 Audio quality: %3d%%	MediaConverter		Качество аудио: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Произошла ошибка при чтении информации о файле.\n\nОшибка: 

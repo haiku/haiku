@@ -1,15 +1,12 @@
-1	romanian	x-vnd.Haiku-Shortcuts	1965025444
-MoveMouse	ShortcutsSpec		MutăMaus
+1	romanian	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Scurtături nu a putut să salveze setul de taste.
 Cancel	ShortcutsWindow		Anulează
-InsertString	ShortcutsSpec		InsereazăȘir
 Append KeySet…	ShortcutsWindow		Adăugare set de taste...
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Tastă
 Open KeySet…	ShortcutsWindow		Deschide set de taste...
 Error, NULL state description?	ShortcutsSpec		Eroare, descriere stare NULL?
-MouseUp	ShortcutsSpec		MausSus
 Revert to saved	ShortcutsWindow		Revenire la salvat
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Textul aici\"
@@ -18,26 +15,20 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*OperatorLansare text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Scurtături nu a putut deschide fișierul dumneavoastră set de taste!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-SendMessage	ShortcutsSpec		TrimiteMesaj
-MoveMouseTo	ShortcutsSpec		MutăMausLa
 Option	ShortcutsSpec	Name for modifier on keyboard	Opțiune
 Save	ShortcutsWindow		Salvează
 *MouseButton 1	ShortcutsWindow		*ButonMaus 1
 *MoveMouse +20 +0	ShortcutsWindow		*MutăMaus +20 +0
-MouseDown	ShortcutsSpec		MausJos
 Save changes before closing?	ShortcutsWindow		Doriți să salvați modificările înainte de a închide?
 Remove selected shortcut	ShortcutsWindow		Elimină scurtătura selectată
-MouseButton	ShortcutsSpec		ButonMaus
 Add new shortcut	ShortcutsWindow		Adaugă scurtătură nouă
 Save & apply	ShortcutsWindow		Salvează & aplică
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*TrimiteMesaj application/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		Adaugă
 File	ShortcutsWindow		Fișier
-Beep	ShortcutsSpec		Bip
 Quit	ShortcutsWindow		Părăsește
 *MouseDown	ShortcutsWindow		*MausJos
 Don't save	ShortcutsWindow		Nu salva
-Multi	ShortcutsSpec		Multi
 Application	ShortcutsWindow		Aplicație
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Bip
@@ -48,5 +39,4 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Scurtături nu 
 Select	ShortcutsWindow		Selectează
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Scurtături nu a putut salva fișierul dumneavoastră set de taste!
 Oh no	ShortcutsWindow		Oh nu
-LaunchHandler	ShortcutsSpec		OperatorLansare
 Shortcuts	System name		Scurtături

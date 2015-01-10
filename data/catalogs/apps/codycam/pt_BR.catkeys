@@ -1,4 +1,5 @@
-1	portuguese (brazil)	x-vnd.Haiku-CodyCam	183572276
+1	portuguese (brazil)	x-vnd.Haiku-CodyCam	2193838145
+Upload…	VideoConsumer.cpp		Enviar…
 Capturing Image…	VideoConsumer.cpp		Capturando imagem...
 Every 30 seconds	CodyCam		A cada 30 segundos
 File name:	CodyCam		Nome do arquivo
@@ -61,6 +62,7 @@ upload client name expected	CodyCam		nome do cliente de envio esperado
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Conectado...
 PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suprimida> (senha real enviada)\n
+File upload failed	VideoConsumer.cpp		Falha no envio do arquivo
 Every 5 minutes	CodyCam		A cada 5 minutos
 read: %d\n	SftpClient		ler: %d\n
 Capture controls	CodyCam		Controles de captura

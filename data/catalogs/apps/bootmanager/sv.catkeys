@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-BootManager	648914190
+1	swedish	x-vnd.Haiku-BootManager	3886671855
 The boot manager has been successfully installed on your system.	BootManagerController		Starthanteraren har installerats på ditt system.
 After two seconds	DefaultPartitionPage		Efter två sekunder
 Uninstall Boot Manager	UninstallPage	Title	Avinstallera Starthanteraren
@@ -39,6 +39,7 @@ Installation of boot menu completed	BootManagerController	Title	Installationen a
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Odöpt %d
 File:	FileSelectionPage	Text control label	Fil:
 Previous	WizardView	Button	Föregående
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Den första partionen startar för tidigt och lämnar inte tillräckligt med utrymme för att installera boot meny.\nBoot Manager behöver 2KiB utrymme före den första partionen.
 Install	DrivesPage	Button	Installera
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Följande startmeny kommer att skrivas till startdisken (%s). Vänligen kontrollera informationen nedan innan du fortsätter.
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Okänd
@@ -49,9 +50,11 @@ No space available!	DrivesPage	Cannot install	Inget utrymme tillgängligt!
 Never	DefaultPartitionPage		Aldrig
 Partition table not compatible	BootManagerController	Title	Partitionstabellen är ej kompatibel
 Old Master Boot Record saved	BootManagerController	Title	Gamla huvudstartsektorn sparad
+Old Master Boot Record backup failure	BootManagerController	Title	Kunde inte spara gamla MBR
 Boot Manager is unable to read the partition table!	BootManagerController		Starthanteraren kan inte läsa partitionstabellen!
 Error reading partition table	BootManagerController	Title	Kan ej läsa partitionstabellen
 Installation of boot menu failed	BootManagerController	Title	Installationen av startmenyn misslyckades
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Partitionen på första hårdisken är inte kopatibel med Boot Manager.\nBoot Manager fungerar bara med IBM PC MBR partitioner.
 Backup Master Boot Record	BootManagerController	Title	Säkerhetskopiera huvudstartsektorn
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Kommer att skriva bootmenyn till hårddisken. Är du säker på att du vill fortsätta?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Den gamla huvudstartsektorn sparades till %s.

@@ -1,5 +1,6 @@
-1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	4273934970
+1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	2321187933
 DriveSetup	System name		Configuração de Unidade
+Could not acquire partitioning information.	MainWindow		Não foi possível obter informação sobre o particionamento.
 Cancel	AbstractParametersPanel		Cancelar
 Delete	MainWindow		Excluir
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!
@@ -43,6 +44,7 @@ Change	ChangeParametersPanel		Modificar
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja apagar a partição selecionada?\n\nTodos os dados na partição serão perdidos de forma irrecuperável se continuar!
 Create…	MainWindow		Criar...
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Está certo de que deseja formatar um disco não processado? (A maioria das pessoas inicializa o disco com um sistema de particionamento primeiro) Você será questionado novamente antes que mudanças sejam gravadas no disco.
 The disk has been successfully initialized.\n	MainWindow		O disco foi inicializado com sucesso.\n
 Could not unmount partition %s.	MainWindow		Não foi possível desmontar a partição %s.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Falha ao modificar os parâmetros da partição. Nenhuma mudança foi gravada no disco.
@@ -66,6 +68,7 @@ The panel could not return successfully.	MainWindow		A janela de diálogo pode n
 Cancel	MainWindow		Cancelar
 Delete partition	MainWindow		Excluir partição
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Está seguro que deseja modificar os parâmetros da partição selecionada?\n\nA partição pode não mais ser reconhecida por outros sistemas operacionais!
+Disk system \"%s\" not found!	MainWindow		Disco de sistema \"%s\" não encontrado!
 Eject	MainWindow		Ejetar
 Partition	MainWindow		Partição
 Validation of the given parameters failed.	MainWindow		A validação dos parâmetros dados falhou.

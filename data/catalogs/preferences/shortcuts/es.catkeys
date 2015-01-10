@@ -1,15 +1,12 @@
-1	spanish; castilian	x-vnd.Haiku-Shortcuts	1965025444
-MoveMouse	ShortcutsSpec		Mover ratón
+1	spanish; castilian	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		Aceptar
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Atajos no pudo guardar tu conjunto de teclas.
 Cancel	ShortcutsWindow		Cancelar
-InsertString	ShortcutsSpec		Insertar cadena
 Append KeySet…	ShortcutsWindow		Anexar conjunto de claves ...
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Tecla
 Open KeySet…	ShortcutsWindow		Abrir el conjunto de claves
 Error, NULL state description?	ShortcutsSpec		Error, ¿descripción de estado nula?\n
-MouseUp	ShortcutsSpec		Ratón arriba
 Revert to saved	ShortcutsWindow		Volver  guardar
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tu texto aquí\"
@@ -18,26 +15,20 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Atajos no pudo abrir tu conjunto de claves!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
-SendMessage	ShortcutsSpec		Enviar mensaje
-MoveMouseTo	ShortcutsSpec		MoverRatón a
 Option	ShortcutsSpec	Name for modifier on keyboard	Opción
 Save	ShortcutsWindow		Guardar
 *MouseButton 1	ShortcutsWindow		*Botóndelratón 1
 *MoveMouse +20 +0	ShortcutsWindow		*MovimientodelRatón +20 +0
-MouseDown	ShortcutsSpec		RatónAbajo
 Save changes before closing?	ShortcutsWindow		¿Guardar cambios antes de cerrar?
 Remove selected shortcut	ShortcutsWindow		Eliminar el atajo seleccionado
-MouseButton	ShortcutsSpec		BotóndelRatón
 Add new shortcut	ShortcutsWindow		Añadir un nuevo atajo
 Save & apply	ShortcutsWindow		Guardar y aplicar
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*aplicación enviar mensaje/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		Añadir
 File	ShortcutsWindow		Archivo
-Beep	ShortcutsSpec		Pitido
 Quit	ShortcutsWindow		Quitar
 *MouseDown	ShortcutsWindow		*RatónAbajo
 Don't save	ShortcutsWindow		No guardar
-Multi	ShortcutsSpec		Multi
 Application	ShortcutsWindow		Aplicación
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Pitido
@@ -48,5 +39,4 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Atajos no puedo
 Select	ShortcutsWindow		Seleccionar
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Atajos no pudo guardar tu archivo KeySet
 Oh no	ShortcutsWindow		Oh no
-LaunchHandler	ShortcutsSpec		Lanzar Manejador
 Shortcuts	System name		Atajos

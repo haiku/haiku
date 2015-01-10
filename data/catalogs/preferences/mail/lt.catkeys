@@ -1,14 +1,10 @@
-1	lithuanian	x-vnd.Haiku-Mail	2592587573
-Mail checking	Config Window		Pašto tikrinimas
+1	lithuanian	x-vnd.Haiku-Mail	688530788
 Settings	Config Window		Nuostatos
 Never	Config Window	show status window	niekada
-Only when dial-up is connected	Config Window		Tik esant prisijungus prie tinklo
 While sending and receiving	Config Window		siunčiant ir gaunant
-days	Config Window		d.
 Incoming	Config Window		Pašto gavimas
 Server name:	E-Mail		Serverio vardas:
 OK	Config Window		Gerai
-Start mail services on startup	Config Window		Paleisti el. pašto tarnybą įkeliant sistemą
 E-mail address:	E-Mail		El. pašto adresas:
 Account name:	E-Mail		Paskyros pavadinimas:
 Account name:	Config Views		Paskyros pavadinimas:
@@ -22,17 +18,12 @@ Password:	E-Mail		Slaptažodis:
 Accounts	Config Window		Paskyros
 Finish	AutoConfigWindow		Atlikta
 Remove	Config Window		Pašalinti
-Miscellaneous	Config Window		Kita
-Show connection status window:	Config Window		Rodyti ryšio būsenos langą:
 Server Name:	E-Mail		Serverio vardas:
 While sending	Config Window		siunčiant
-Schedule outgoing mail when dial-up is disconnected	Config Window		Kai prie tinklo neprisijungta, laiškų išsiuntimą įtraukti užduočių eilėn
-hours	Config Window		val.
 Enter a valid e-mail address.	AutoConfigWindow		Įveskite galiojantį elektroninio pašto adresą.
 Add	Config Window		Pridėti
 Account settings	AutoConfigWindow		Paskyros nuostatos
 E-mail	System name		El. paštas
-never	Config Window	mail checking frequency	Niekada
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAtšaukti bendrųjų nuostatų pakeitimų nepavyko.\n\nKlaida gaunant bendrąsias nuostatas:\n%s\n
 Real name:	Config Views		Asmenvardis:
 \t\t· Outgoing	Config Window		\t\t· Siuntimas
@@ -52,10 +43,8 @@ minutes	Config Window		min.
 Error retrieving general settings: %s\n	Config Window		Klaida gaunant bendrąsias nuostatas: %s\n
 Real name:	E-Mail		Asmenvardis:
 Apply	Config Window		Taikyti
-Always	Config Window		visada
 OK	AutoConfigWindow		Gerai
 Add filter	Config Views		Pridėti filtrą
 Outgoing	Config Window		Pašto siuntimas
 Outgoing mail filters	Config Views		Siunčiamų laiškų filtrai
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNaują paskyrą galite susikurti, spustelėję mygtuką „Pridėti“.\n\nEsamą paskyrą galite pašalinti, ją pasirinkę ir spustelėję mygtuką „Pašalinti“.\n\nJeigu norite keisti kažkurio paskyros nuostatas, išsirinkite ją sąraše.
 Error	Config Window		Klaida
