@@ -11,51 +11,52 @@
  */
 
 /*!
-    \file Joystick.h
-    \ingroup device
-    \brief BJoystick class definition.
+	\file Joystick.h
+	\ingroup device
+	\brief BJoystick class definition.
 */
 
 /*!
-    \class Joystick
-    \ingroup device
-    \brief Class that provides an interface to a joystick and other similar game
-           controllers.
+	\class Joystick
+	\ingroup device
+	\brief Class that provides an interface to joysticks and game controllers.
 
-    This class adds support for joysticks and other similar game controllers
-    through game ports, both, on cards and some build-in ports.
+	This class allows application to access the data from game controllers of
+	any type (joysticks, gamepads, racing wheels, etc). It provides discovery
+	of the button configuration and axis layout and reports the status of the
+	buttons and position of the axis. There is also support for enumerating the
+	available controllers.
 
-    The class also provides two modes - standard and enhanced
+	Joysticks can be accessed in two modes called standard and enhanced. The
+	standard mode is for compatibility with the BeBox joysticks and is not
+	implemented in Haiku. New applications should use the enhanced mode.
 */
 
 /*!
-    \fn int32 BJoystick::CountDevices()
-    \brief Count the number of joysticks connected.
+	\fn int32 BJoystick::CountDevices()
+	\brief Count the number of joysticks connected.
 
-    \return The number of joystick devices connected.
+	\return The number of joystick devices connected to the computer.
 */
 
 /*!
-    \fn status_t BJoystick::Open(const char *portname, bool enhanced)
-    \brief Open a specific game port.
+	\fn status_t BJoystick::Open(const char *portname, bool enhanced)
+	\brief Open a specific game port.
 
-    This method can be used to open the game port specified by the parameter
-    \c portname amd also allows you to specify whether to use enhanced mode or
-    not.
+	This method can be used to open the game port specified by the parameter
+	\c portname amd also allows you to specify whether to use enhanced mode or
+	not. The port name can be either an absolute path to the game port device,
+	or only the device file name.
 
-    Enhanced mode adds support for up to 32 buttons per joystick, an indefinite
-    number of axes and thumb controls, and also allows you to connect multiple
-    joysticks to a single game port. It provides several methods to determine
-    the state of a joystick and also a preference application.
+	Enhanced mode adds support for more than 32 buttons per joystick, and an
+	unlimited number of axes and thumb controls. To support this, several
+	functions allow to get information about the device, such as the button
+	count, the name of each button, and the number and name of the axis.
 
-    Enhanced mode also provides a mechanism to determine what joysticks are
-    available and what types of and how many controls are available on them.
-
-    \param portname The name of the game port to be opened.
-    \param enhanced Specifies whether to use enhanced mode while opening the port.
-    \return B_BAD_VALUE if portname is null.
-            B_ERROR if the specified port is unable to open or if portname is not valid.
-            A positive integer if the port is opened succesfully.
-    \see CountDevices()
-         GetDeviceName()
+	\param portname The name of the game port to be opened.
+	\param enhanced Specifies whether to use enhanced mode while opening the port.
+	\return B_BAD_VALUE if portname is null.
+	\return B_NO_INIT if the object failed to initialize.
+	\return B_ERROR if the specified port cannot be open.
+	\return The file descriptor for the port if it is opened succesfully.
 */
