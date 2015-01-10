@@ -884,7 +884,6 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 			AddressCache::Iterator iterator(sCache);
 
 			arp_entry *entry = NULL;
-			uint32 i = 0;
 			for (uint32 i = 0; i <= control.cookie; i++) {
 				if (!iterator.HasNext())
 					return B_ENTRY_NOT_FOUND;
