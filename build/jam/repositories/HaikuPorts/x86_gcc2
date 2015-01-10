@@ -88,8 +88,8 @@ RemotePackageRepository HaikuPorts
 	fontconfig-2.11.1-3
 	fontconfig_devel-2.11.1-3
 	fossil-1.29-1
-	freetype-2.5.3-5
-	freetype_devel-2.5.3-5
+	freetype-2.5.5-1
+	freetype_devel-2.5.5-1
 	fribidi-0.19.5-1
 	fribidi_devel-0.19.5-1
 	friss-0.8.0-1
@@ -435,8 +435,8 @@ RemotePackageRepository HaikuPorts
 	fontconfig_x86-2.11.1-2
 	fontconfig_x86_devel-2.11.1-2
 	freedroidrpg_x86-0.15.1-1
-	freetype_x86-2.5.3-4
-	freetype_x86_devel-2.5.3-4
+	freetype_x86-2.5.5-1
+	freetype_x86_devel-2.5.5-1
 	fribidi_x86-0.19.5-1
 	fribidi_x86_devel-0.19.5-1
 	gcc_x86-4.8.4_2014_12_21-1
