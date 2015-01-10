@@ -885,13 +885,11 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 
 			arp_entry *entry = NULL;
 			uint32 i = 0;
-			while (iterator.HasNext() && i < control.cookie) {
+			for (uint32 i = 0; i <= control.cookie; i++) {
+				if (!iterator.HasNext())
+					return B_ENTRY_NOT_FOUND;
 				entry = iterator.Next();
-				i++;
 			}
-
-			if (entry == NULL)
-				return B_ENTRY_NOT_FOUND;
 
 			control.cookie++;
 			control.address = entry->protocol_address;
