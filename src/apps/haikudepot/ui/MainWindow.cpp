@@ -611,7 +611,8 @@ MainWindow::_InitWorkerThreads()
 			"Planet Express", B_NORMAL_PRIORITY, this);
 		if (fPendingActionsWorker >= 0)
 			resume_thread(fPendingActionsWorker);
-	}
+	} else
+		fPendingActionsWorker = -1;
 
 	fPackageToPopulateSem = create_sem(0, "PopulatePackage");
 	if (fPackageToPopulateSem >= 0) {
@@ -619,7 +620,8 @@ MainWindow::_InitWorkerThreads()
 			"Package Populator", B_NORMAL_PRIORITY, this);
 		if (fPopulatePackageWorker >= 0)
 			resume_thread(fPopulatePackageWorker);
-	}
+	} else
+		fPopulatePackageWorker = -1;
 }
 
 
