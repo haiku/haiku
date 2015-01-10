@@ -34,7 +34,7 @@ RemotePackageRepository HaikuPorts
 	autoconf-2.69-5
 	automake-1.13.1-4
 	avra-1.3.0-1
-	bash-4.3.28-1
+	bash-4.3.33-1
 	beae-1.2-2
 	beam-1.2alpha-4
 	becjk-1.0.1-1
