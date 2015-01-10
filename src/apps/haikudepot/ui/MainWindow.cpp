@@ -266,14 +266,16 @@ MainWindow::~MainWindow()
 	BPackageRoster().StopWatching(this);
 
 	fTerminating = true;
-	if (fModelWorker > 0)
+	if (fModelWorker >= 0)
 		wait_for_thread(fModelWorker, NULL);
 
 	delete_sem(fPendingActionsSem);
-	wait_for_thread(fPendingActionsWorker, NULL);
+	if (fPendingActionsWorker >= 0)
+		wait_for_thread(fPendingActionsWorker, NULL);
 
 	delete_sem(fPackageToPopulateSem);
-	wait_for_thread(fPopulatePackageWorker, NULL);
+	if (fPopulatePackageWorker >= 0)
+		wait_for_thread(fPopulatePackageWorker, NULL);
 
 	if (fScreenshotWindow != NULL && fScreenshotWindow->Lock())
 		fScreenshotWindow->Quit();
