@@ -947,6 +947,8 @@ SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel drivers audio ac97 sis7018 : 0
 SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel file_systems btrfs : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel file_systems ntfs libntfs : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel file_systems udf : 0 : local ;
+SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel file_systems userlandfs server : 0 : local ; # fails with gcc2 only
+SetConfigVar DEBUG : HAIKU_TOP src add-ons kernel file_systems userlandfs server haiku : 0 : local ; # fails with gcc2 only
 SetConfigVar DEBUG : HAIKU_TOP src add-ons media media-add-ons dvb : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src add-ons print drivers gutenprint : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src servers input : 0 : local ;
