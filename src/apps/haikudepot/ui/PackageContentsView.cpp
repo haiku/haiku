@@ -78,21 +78,23 @@ public:
 
 class PackageEntryItem : public BStringItem {
 public:
-	PackageEntryItem(const BPackageEntry* entry)
+	PackageEntryItem(const BPackageEntry* entry, const BString& path)
 		:
 		BStringItem(entry->Name()),
-		fEntry(entry)
+		fPath(path)
 	{
-		printf("PackageEntryItem(%s)\n", entry->Name());
+		if (fPath.Length() > 0)
+			fPath.Append("/");
+		fPath.Append(entry->Name());
 	}
 	
-	inline const BPackageEntry* PackageEntry() const
+	inline const BString& EntryPath() const
 	{
-		return fEntry;
+		return fPath;
 	}
 
 private:
-	const BPackageEntry* fEntry;
+	BString fPath;
 };
 
 
@@ -119,34 +121,43 @@ public:
 
 	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
-		printf("HandleEntry(%s/%s)\n",
-			entry->Parent() != NULL ? entry->Parent()->Name() : "NULL",
-			entry->Name());
-
-		{
-			// Check if we are still supposed to popuplate the list
-			BAutolock lock(&fPackageLock);
-			if (fPackageInfoRef.Get() != fPackageInfoToPopulate)
-				return B_ERROR;
-		}
+//		printf("HandleEntry(%s/%s)\n",
+//			entry->Parent() != NULL ? entry->Parent()->Name() : "NULL",
+//			entry->Name());
 
 		if (!fListView->LockLooper())
 			return B_ERROR;
 
-		PackageEntryItem* item = new PackageEntryItem(entry);
+		// Check if we are still supposed to popuplate the list
+		if (fPackageInfoRef.Get() != fPackageInfoToPopulate) {
+//			printf("stopping package content population\n");
+			fListView->UnlockLooper();
+			return B_ERROR;
+		}
+
+		BString path;
+		const BPackageEntry* parent = entry->Parent();
+		while (parent != NULL) {
+			if (path.Length() > 0)
+				path.Prepend("/");
+			path.Prepend(parent->Name());
+			parent = parent->Parent();
+		}
+
+		PackageEntryItem* item = new PackageEntryItem(entry, path);
 
 		if (entry->Parent() == NULL) {
-			printf("  adding root entry\n");
+//			printf("  adding root entry\n");
 			fListView->AddItem(item);
 			fLastParentEntry = NULL;
 			fLastParentItem = NULL;
 		} else if (entry->Parent() == fLastEntry) {
-			printf("  adding to last entry %s\n", fLastEntry->Name());
+//			printf("  adding to last entry %s\n", fLastEntry->Name());
 			fListView->AddUnder(item, fLastItem);
 			fLastParentEntry = fLastEntry;
 			fLastParentItem = fLastItem;
 		} else if (entry->Parent() == fLastParentEntry) {
-			printf("  adding to last parent %s\n", fLastParentEntry->Name());
+//			printf("  adding to last parent %s\n", fLastParentEntry->Name());
 			fListView->AddUnder(item, fLastParentItem);
 		} else {
 			// Not the last parent entry, need to search for the parent
@@ -158,10 +169,10 @@ public:
 						fListView->FullListItemAt(i));
 				if (listItem == NULL)
 					continue;
-				if (listItem->PackageEntry() == entry->Parent()) {
-					fLastParentEntry = listItem->PackageEntry();
+				if (listItem->EntryPath() == path) {
+					fLastParentEntry = entry->Parent();
 					fLastParentItem = listItem;
-					printf("  found parent %s\n", listItem->Text());
+//					printf("  found parent %s\n", listItem->Text());
 					fListView->AddUnder(item, listItem);
 					foundParent = true;
 					break;
@@ -170,8 +181,8 @@ public:
 			if (!foundParent) {
 				// NOTE: Should not happen. Just add this entry at the
 				// root level.
-				printf("Did not find parent entry for %s (%s)!\n",
-					entry->Name(), entry->Parent()->Name());
+//				printf("Did not find parent entry for %s (%s)!\n",
+//					entry->Name(), entry->Parent()->Name());
 				fListView->AddItem(item);
 				fLastParentEntry = NULL;
 				fLastParentItem = NULL;
@@ -275,8 +286,8 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 	if (fPackage == package)
 		return;
 
-	printf("PackageContentsView::SetPackage(%s)\n",
-		package.Get() != NULL ? package->Title().String() : "NULL");
+//	printf("PackageContentsView::SetPackage(%s)\n",
+//		package.Get() != NULL ? package->Title().String() : "NULL");
 
 	Clear();
 
