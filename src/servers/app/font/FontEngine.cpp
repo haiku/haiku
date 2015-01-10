@@ -301,10 +301,10 @@ decompose_ft_bitmap_mono(const FT_Bitmap& bitmap, int x, int y,
 		y += bitmap.rows;
 		pitch = -pitch;
 	}
-	for (int i = 0; i < bitmap.rows; i++) {
+	for (unsigned int i = 0; i < bitmap.rows; i++) {
 		sl.reset_spans();
 		agg::bitset_iterator bits(buf, 0);
-		for (int j = 0; j < bitmap.width; j++) {
+		for (unsigned int j = 0; j < bitmap.width; j++) {
 			if (bits.bit())
 				sl.add_cell(x + j, agg::cover_full);
 			++bits;
@@ -332,20 +332,20 @@ decompose_ft_bitmap_gray8(const FT_Bitmap& bitmap, int x, int y,
 		y += bitmap.rows;
 		pitch = -pitch;
 	}
-	for (int i = 0; i < bitmap.rows; i++) {
+	for (unsigned int i = 0; i < bitmap.rows; i++) {
 		sl.reset_spans();
 
 		if (bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
 			// font has built-in mono bitmap
 			agg::bitset_iterator bits(buf, 0);
-			for (int j = 0; j < bitmap.width; j++) {
+			for (unsigned int j = 0; j < bitmap.width; j++) {
 				if (bits.bit())
 					sl.add_cell(x + j, agg::cover_full);
 				++bits;
 			}
 		} else {
 			const uint8* p = buf;
-			for (int j = 0; j < bitmap.width; j++) {
+			for (unsigned int j = 0; j < bitmap.width; j++) {
 				if (*p)
 					sl.add_cell(x + j, *p);
 				++p;
@@ -378,13 +378,13 @@ decompose_ft_bitmap_subpix(const FT_Bitmap& bitmap, int x, int y,
 		pitch = -pitch;
 	}
 
-	for (int i = 0; i < bitmap.rows; i++) {
+	for (unsigned int i = 0; i < bitmap.rows; i++) {
 		sl.reset_spans();
 
 		if (bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
 			// font has built-in mono bitmap
 			agg::bitset_iterator bits(buf, 0);
-			for (int j = 0; j < bitmap.width; j++) {
+			for (unsigned int j = 0; j < bitmap.width; j++) {
 				if (bits.bit()) {
 					sl.add_cell(x + j,
 						agg::cover_full, agg::cover_full, agg::cover_full);
