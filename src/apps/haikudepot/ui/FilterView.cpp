@@ -121,15 +121,16 @@ FilterView::MessageReceived(BMessage* message)
 void
 FilterView::AdoptModel(const Model& model)
 {
+	// Adopt depots
 	BMenu* repositoryMenu = fRepositoryField->Menu();
 		repositoryMenu->RemoveItems(0, repositoryMenu->CountItems(), true);
 
 	repositoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All depots"),
 		new BMessage(MSG_DEPOT_SELECTED)));
-	repositoryMenu->ItemAt(0)->SetMarked(true);
 
 	repositoryMenu->AddItem(new BSeparatorItem());
 
+	bool foundSelectedDepot = false;
 	const DepotList& depots = model.Depots();
 	for (int i = 0; i < depots.CountItems(); i++) {
 		const DepotInfo& depot = depots.ItemAtFast(i);
@@ -137,8 +138,17 @@ FilterView::AdoptModel(const Model& model)
 		message->AddString("name", depot.Name());
 		BMenuItem* item = new BMenuItem(depot.Name(), message);
 		repositoryMenu->AddItem(item);
+		
+		if (depot.Name() == model.Depot()) {
+			item->SetMarked(true);
+			foundSelectedDepot = true;
+		}
 	}
 
+	if (!foundSelectedDepot)
+		repositoryMenu->ItemAt(0)->SetMarked(true);	
+
+	// Adopt categories
 	BMenu* showMenu = fShowField->Menu();
 	showMenu->RemoveItems(0, showMenu->CountItems(), true);
 
@@ -149,6 +159,21 @@ FilterView::AdoptModel(const Model& model)
 
 	add_categories_to_menu(model.Categories(), showMenu);
 
-	showMenu->ItemAt(0)->SetMarked(true);
+	bool foundSelectedCategory = false;
+	for (int32 i = 0; i < showMenu->CountItems(); i++) {
+		BMenuItem* item = showMenu->ItemAt(i);
+		BMessage* message = item->Message();
+		if (message == NULL)
+			continue;
+		BString category;
+		if (message->FindString("name", &category) == B_OK
+			&& model.Category() == category) {
+			item->SetMarked(true);
+			foundSelectedCategory = true;
+			break;
+		}
+	}
+	if (!foundSelectedCategory)
+		showMenu->ItemAt(0)->SetMarked(true);	
 }
 
