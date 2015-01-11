@@ -451,13 +451,39 @@ MainWindow::MessageReceived(BMessage* message)
 					BAutolock locker(fModel.Lock());
 					fModel.SetPackageState(ref, ref->State());
 				}
-				if ((changes & PKG_CHANGED_PROMINENCE) != 0) {
+
+				// Asynchronous updates to the package information
+				// can mean that the package needs to be added or
+				// removed to/from the visible packages when the current
+				// filter parameters are re-evaluated on this package.
+				bool wasVisible = fVisiblePackages.Contains(ref);
+				bool isVisible;
+				{
 					BAutolock locker(fModel.Lock());
 					// The package didn't get a chance yet to be in the
 					// visible package list
-					fVisiblePackages = fModel.CreatePackageList();
-					if (ref->IsProminent() && fVisiblePackages.Contains(ref))
-						fFeaturedPackagesView->AddPackage(ref);
+					PackageList visiblePackages = fModel.CreatePackageList();
+					isVisible = visiblePackages.Contains(ref);
+
+					// Transfer this single package, otherwise we miss
+					// other packages if they appear or disappear along
+					// with this one before receive a notification for
+					// them.
+					if (isVisible) {
+						fVisiblePackages.Add(ref);
+					} else if (wasVisible)
+						fVisiblePackages.Remove(ref);
+				}
+
+				if (wasVisible != isVisible) {
+					if (!isVisible) {
+						fPackageListView->RemovePackage(ref);
+						fFeaturedPackagesView->RemovePackage(ref);
+					} else {
+						fPackageListView->AddPackage(ref);
+						if (ref->IsProminent())
+							fFeaturedPackagesView->AddPackage(ref);
+					}
 				}
 			}
 			break;
