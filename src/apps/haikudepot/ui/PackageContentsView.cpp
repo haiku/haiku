@@ -125,7 +125,7 @@ public:
 //			entry->Parent() != NULL ? entry->Parent()->Name() : "NULL",
 //			entry->Name());
 
-		if (!fListView->LockLooper())
+		if (fListView->LockLooperWithTimeout(1000000) != B_OK)
 			return B_ERROR;
 
 		// Check if we are still supposed to popuplate the list
@@ -342,7 +342,7 @@ PackageContentsView::_ContentPopulatorThread(void* arg)
 
 		if (package.Get() != NULL) {
 			if (!view->_PopuplatePackageContens(*package.Get())) {
-				if (view->LockLooper()) {
+				if (view->LockLooperWithTimeout(1000000) == B_OK) {
 					view->fContentListView->AddItem(
 						new BStringItem(B_TRANSLATE("<Package contents not "
 							"available for remote packages>")));
@@ -403,10 +403,11 @@ PackageContentsView::_PopuplatePackageContens(const PackageInfo& package)
 		fPackageLock, fPackage);
 	status = reader.ParseContent(&contentHandler);
 	if (status != B_OK) {
-		printf("PackageContentsView::SetPackage(): "
+		printf("PackageContentsView::_PopuplatePackageContens(): "
 			"failed parse package contents: %s\n", strerror(status));
 		// NOTE: Do not return false, since it taken to mean this
-		// is a remote package.
+		// is a remote package, but is it not, we simply want to stop
+		// populating the contents early.
 	}
 	return true;
 }
