@@ -31,6 +31,7 @@ public:
 
 	virtual void				Clear();
 			void				AddPackage(const PackageInfoRef& package);
+			void				RemovePackage(const PackageInfoRef& package);
 
 			void				SelectPackage(const PackageInfoRef& package);
 

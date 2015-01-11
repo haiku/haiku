@@ -759,6 +759,20 @@ PackageListView::AddPackage(const PackageInfoRef& package)
 
 
 void
+PackageListView::RemovePackage(const PackageInfoRef& package)
+{
+	PackageRow* packageRow = _FindRow(package);
+	if (packageRow == NULL)
+		return;
+
+	RemoveRow(packageRow);
+	delete packageRow;
+
+	fItemCountView->SetItemCount(CountRows());
+}
+
+
+void
 PackageListView::SelectPackage(const PackageInfoRef& package)
 {
 	PackageRow* row = _FindRow(package);
