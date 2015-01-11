@@ -605,6 +605,7 @@ RemotePackageRepository HaikuPorts
 	quassel_x86-0.10.0-2
 	quicklaunch-0.9.8-1
 	qupzilla_x86-1.7.x-4
+	rcs_x86-5.9.3-1
 	readline_x86-6.3-2
 	readline_x86_devel-6.3-2
 	rocksndiamonds_x86-3.3.1.2-2
@@ -916,6 +917,7 @@ RemotePackageRepository HaikuPorts
 	quassel_x86
 	quicklaunch
 	qupzilla_x86
+	rcs_x86
 	readline
 	readline_x86
 	roadfighter
