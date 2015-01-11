@@ -21,6 +21,7 @@ public:
 	virtual						~FeaturedPackagesView();
 
 			void				AddPackage(const PackageInfoRef& package);
+			void				RemovePackage(const PackageInfoRef& package);
 			void				Clear();
 			
 			void				SelectPackage(const PackageInfoRef& package);

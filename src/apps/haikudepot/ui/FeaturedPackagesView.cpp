@@ -328,6 +328,25 @@ FeaturedPackagesView::AddPackage(const PackageInfoRef& package)
 
 
 void
+FeaturedPackagesView::RemovePackage(const PackageInfoRef& package)
+{
+	// Find the package
+	for (int32 i = 0; BLayoutItem* item = fPackageListLayout->ItemAt(i); i++) {
+		PackageView* view = dynamic_cast<PackageView*>(item->View());
+		if (view == NULL)
+			break;
+
+		BString title = view->PackageTitle();
+		if (title == package->Title()) {
+			view->RemoveSelf();
+			delete view;
+			break;
+		}
+	}
+}
+
+
+void
 FeaturedPackagesView::Clear()
 {
 	for (int32 i = fPackageListLayout->CountItems() - 1;
