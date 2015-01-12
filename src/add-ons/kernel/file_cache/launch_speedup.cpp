@@ -19,7 +19,6 @@
 #include <Node.h>
 
 #include <util/kernel_cpp.h>
-#include <util/khash.h>
 #include <util/AutoLock.h>
 #include <thread.h>
 #include <team.h>
@@ -64,6 +63,33 @@ struct node {
 	size_t		part_count;
 };
 
+struct NodeHash {
+	typedef node_ref	KeyType;
+	typedef	node		ValueType;
+
+	size_t HashKey(KeyType key) const
+	{
+		return VNODE_HASH(key.device, key.node);
+	}
+
+	size_t Hash(ValueType* value) const
+	{
+		return HashKey(value->ref);
+	}
+
+	bool Compare(KeyType key, ValueType* node) const
+	{
+		return (node->ref.device == key.device && node->ref.node == key.node);
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->next;
+	}
+};
+
+typedef BOpenHashTable<NodeHash> NodeTable;
+
 class Session {
 	public:
 		Session(team_id team, const char *name, dev_t device,
@@ -94,7 +120,6 @@ class Session {
 		void Prefetch();
 
 		Session *&Next() { return fNext; }
-		static uint32 NextOffset() { return offsetof(Session, fNext); }
 
 	private:
 		struct node *_FindNode(dev_t device, ino_t node);
@@ -102,7 +127,7 @@ class Session {
 		Session		*fNext;
 		char		fName[B_OS_NAME_LENGTH];
 		mutex		fLock;
-		hash_table	*fNodeHash;
+		NodeTable	*fNodeHash;
 		struct node	*fNodes;
 		int32		fNodeCount;
 		team_id		fTeam;
@@ -127,8 +152,8 @@ class SessionGetter {
 };
 
 static Session *sMainSession;
-static hash_table *sTeamHash;
-static hash_table *sPrefetchHash;
+static SessionTable *sTeamHash;
+static PrefetchTable *sPrefetchHash;
 static Session *sMainPrefetchSessions;
 	// singly-linked list
 static recursive_lock sLock;
@@ -140,83 +165,61 @@ node_ref::node_ref()
 }
 
 
-static int
-node_compare(void *_node, const void *_key)
-{
-	struct node *node = (struct node *)_node;
-	const struct node_ref *key = (node_ref *)_key;
+struct PrefetchHash {
+	typedef node_ref	KeyType;
+	typedef	Session		ValueType;
 
-	if (node->ref.device == key->device && node->ref.node == key->node)
-		return 0;
+	size_t HashKey(KeyType key) const
+	{
+		return VNODE_HASH(key.device, key.node);
+	}
 
-	return -1;
-}
+	size_t Hash(ValueType* value) const
+	{
+		return HashKey(value->NodeRef());
+	}
 
+	bool Compare(KeyType key, ValueType* session) const
+	{
+		return (session->NodeRef().device == key.device
+			&& session->NodeRef().node == key.node);
+	}
 
-static uint32
-node_hash(void *_node, const void *_key, uint32 range)
-{
-	struct node *node = (struct node *)_node;
-	const struct node_ref *key = (node_ref *)_key;
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->Next();
+	}
+};
 
-	if (node != NULL)
-		return VNODE_HASH(node->ref.device, node->ref.node) % range;
-
-	return VNODE_HASH(key->device, key->node) % range;
-}
-
-
-static int
-prefetch_compare(void *_session, const void *_key)
-{
-	Session *session = (Session *)_session;
-	const struct node_ref *key = (node_ref *)_key;
-
-	if (session->NodeRef().device == key->device
-		&& session->NodeRef().node == key->node)
-		return 0;
-
-	return -1;
-}
+typedef BOpenHashTable<PrefetchHash> PrefetchTable;
 
 
-static uint32
-prefetch_hash(void *_session, const void *_key, uint32 range)
-{
-	Session *session = (Session *)_session;
-	const struct node_ref *key = (node_ref *)_key;
+struct SessionHash {
+	typedef team_id		KeyType;
+	typedef	Session		ValueType;
 
-	if (session != NULL)
-		return VNODE_HASH(session->NodeRef().device, session->NodeRef().node) % range;
+	size_t HashKey(KeyType key) const
+	{
+		return key;
+	}
 
-	return VNODE_HASH(key->device, key->node) % range;
-}
+	size_t Hash(ValueType* value) const
+	{
+		return HashKey(value->Team());
+	}
 
+	bool Compare(KeyType key, ValueType* session) const
+	{
+		return session->Team == key;
+	}
 
-static int
-team_compare(void *_session, const void *_key)
-{
-	Session *session = (Session *)_session;
-	const team_id *team = (const team_id *)_key;
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->Next();
+	}
+};
 
-	if (session->Team() == *team)
-		return 0;
-
-	return -1;
-}
-
-
-static uint32
-team_hash(void *_session, const void *_key, uint32 range)
-{
-	Session *session = (Session *)_session;
-	const team_id *team = (const team_id *)_key;
-
-	if (session != NULL)
-		return session->Team() % range;
-
-	return *team % range;
-}
+typedef BOpenHashTable<SessionHash> SessionTable;
 
 
 static void
@@ -234,7 +237,7 @@ stop_session(Session *session)
 		RecursiveLocker locker(&sLock);
 
 		if (session->Team() >= B_OK)
-			hash_remove(sTeamHash, session);
+			sTeamHash->Remove(session);
 
 		if (session == sMainSession)
 			sMainSession = NULL;
@@ -282,7 +285,7 @@ start_session(team_id team, dev_t device, ino_t node, const char *name,
 	}
 
 	if (team >= B_OK)
-		hash_insert(sTeamHash, session);
+		sTeamHash->Insert(session);
 
 	session->Lock();
 	return session;
@@ -354,7 +357,7 @@ load_prefetch_data()
 			session->Next() = sMainPrefetchSessions;
 			sMainPrefetchSessions = session;
 		} else {
-			hash_insert(sPrefetchHash, session);
+			sPrefetchHash->Insert(session);
 		}
 	}
 
@@ -384,7 +387,11 @@ Session::Session(team_id team, const char *name, dev_t device,
 		fName[0] = '\0';
 
 	mutex_init(&fLock, "launch speedup session");
-	fNodeHash = hash_init(64, 0, &node_compare, &node_hash);
+	fNodeHash = new(std::nothrow) NodeTable();
+	if (fNodeHash && fNodeHash->Init(64) != B_OK) {
+		delete fNodeHash;
+		fNodeHash = NULL;
+	}
 	fActiveUntil = system_time() + seconds * 1000000LL;
 	fTimestamp = system_time();
 
@@ -419,27 +426,22 @@ Session::~Session()
 	mutex_destroy(&fLock);
 
 	// free all nodes
+	struct node *node, *next = NULL;
 
 	if (fNodeHash) {
 		// ... from the hash
-		uint32 cookie = 0;
-		struct node *node;
-		while ((node = (struct node *)hash_remove_first(fNodeHash, &cookie)) != NULL) {
-			//TRACE(("  node %ld:%Ld\n", node->ref.device, node->ref.node));
-			free(node);
-		}
-
-		hash_uninit(fNodeHash);
+		node = fNodeHash->Clear(true);
 	} else {
 		// ... from the list
-		struct node *node = fNodes, *next = NULL;
-
-		for (; node != NULL; node = next) {
-			next = node->next;
-			free(node);
-		}
+		node = fNodes;
 	}
 
+	for (; node != NULL; node = next) {
+		next = node->next;
+		free(node);
+	}
+
+	delete fNodeHash;
 	StopWatchingTeam();
 }
 
@@ -461,7 +463,7 @@ Session::_FindNode(dev_t device, ino_t node)
 	key.device = device;
 	key.node = node;
 
-	return (struct node *)hash_lookup(fNodeHash, &key);
+	return fNodeHash->Lookup(key);
 }
 
 
@@ -478,7 +480,7 @@ Session::AddNode(dev_t device, ino_t id)
 	if (node == NULL)
 		return;
 
-	hash_insert(fNodeHash, node);
+	fNodeHash->Insert(node);
 	fNodeCount++;
 }
 
@@ -488,7 +490,7 @@ Session::RemoveNode(dev_t device, ino_t id)
 {
 	struct node *node = _FindNode(device, id);
 	if (node != NULL && --node->ref_count <= 0) {
-		hash_remove(fNodeHash, node);
+		fNodeHash->Remove(node);
 		fNodeCount--;
 	}
 }
@@ -605,11 +607,9 @@ Session::Save()
 	// enlarge file, so that it can be written faster
 	ftruncate(fd, 512 * 1024);
 
-	struct hash_iterator iterator;
-	struct node *node;
-
-	hash_open(fNodeHash, &iterator);
-	while ((node = (struct node *)hash_next(fNodeHash, &iterator)) != NULL) {
+	NodeTable::Iterator iterator(fNodeHash);
+	while (iterator.HasNext()) {
+		struct node *node = iterator.Next();
 		snprintf(name, sizeof(name), "%ld:%Ld\n", node->ref.device, node->ref.node);
 
 		ssize_t bytesWritten = write(fd, name, strlen(name));
@@ -620,8 +620,6 @@ Session::Save()
 
 		fileSize += bytesWritten;
 	}
-
-	hash_close(fNodeHash, &iterator, false);
 
 	ftruncate(fd, fileSize);
 	close(fd);
@@ -661,7 +659,7 @@ SessionGetter::SessionGetter(team_id team, Session **_session)
 	if (sMainSession != NULL)
 		fSession = sMainSession;
 	else
-		fSession = (Session *)hash_lookup(sTeamHash, &team);
+		fSession = sTeamHash->Lookup(team);
 
 	if (fSession != NULL) {
 		if (!fSession->IsClosing())
@@ -814,14 +812,17 @@ uninit()
 
 	// free all sessions from the hashes
 
-	uint32 cookie = 0;
-	Session *session;
-	while ((session = (Session *)hash_remove_first(sTeamHash, &cookie)) != NULL) {
+	Session *session = sTeamHash->Clear(true);
+	while (session != NULL) {
+		Session *next = session->next;
 		delete session;
+		session = next;
 	}
-	cookie = 0;
-	while ((session = (Session *)hash_remove_first(sPrefetchHash, &cookie)) != NULL) {
+	session = sPrefetchHash->Clear(true);
+	while (session != NULL) {
+		Session *next = session->next;
 		delete session;
+		session = next;
 	}
 
 	// free all sessions from the main prefetch list
@@ -832,8 +833,8 @@ uninit()
 		session = sMainPrefetchSessions;
 	}
 
-	hash_uninit(sTeamHash);
-	hash_uninit(sPrefetchHash);
+	delete sTeamHash;
+	delete sPrefetchHash;
 	recursive_lock_destroy(&sLock);
 }
 
@@ -841,14 +842,14 @@ uninit()
 static status_t
 init()
 {
-	sTeamHash = hash_init(64, Session::NextOffset(), &team_compare, &team_hash);
-	if (sTeamHash == NULL)
+	sTeamHash = new(std::nothrow) SessionTable();
+	if (sTeamHash == NULL || sTeamHash->Init(64) != B_OK)
 		return B_NO_MEMORY;
 
 	status_t status;
 
-	sPrefetchHash = hash_init(64, Session::NextOffset(), &prefetch_compare, &prefetch_hash);
-	if (sPrefetchHash == NULL) {
+	sPrefetchHash = new(std::nothrow) PrefetchTable();
+	if (sPrefetchHash == NULL || sPrefetchHash->Init(64) != B_OK) {
 		status = B_NO_MEMORY;
 		goto err1;
 	}
@@ -876,9 +877,9 @@ init()
 
 err3:
 	recursive_lock_destroy(&sLock);
-	hash_uninit(sPrefetchHash);
+	delete sPrefetchHash;
 err1:
-	hash_uninit(sTeamHash);
+	delete sTeamHash;
 	return status;
 }
 
