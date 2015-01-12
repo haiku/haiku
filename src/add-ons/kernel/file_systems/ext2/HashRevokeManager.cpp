@@ -33,16 +33,16 @@ HashRevokeManager::~HashRevokeManager()
 {
 	if (fHash != NULL) {
 		if (fRevokeCount != 0) {
-			RevokeElement *element =
-				(RevokeElement*)hash_remove_first(fHash, NULL);
+			RevokeElement *element = fHash->Clear(true);
 
 			while (element != NULL) {
+				RevokeElement* next = element->next;
 				delete element;
-				element = (RevokeElement*)hash_remove_first(fHash, NULL);
+				element = next;
 			}
 		}
 
-		hash_uninit(fHash);
+		delete fHash;
 	}
 }
 
@@ -50,13 +50,9 @@ HashRevokeManager::~HashRevokeManager()
 status_t
 HashRevokeManager::Init()
 {
-	RevokeElement dummyElement;
-	
-	fHash = hash_init(kInitialHashSize, offset_of_member(dummyElement, next),
-		&HashRevokeManager::Compare,
-		&HashRevokeManager::Hash);
+	fHash = new(std::nothrow) RevokeTable();
 
-	if (fHash == NULL)
+	if (fHash == NULL || fHash->Init(kInitialHashSize) != B_OK)
 		return B_NO_MEMORY;
 
 	return B_OK;
@@ -66,20 +62,19 @@ HashRevokeManager::Init()
 status_t
 HashRevokeManager::Insert(uint32 block, uint32 commitID)
 {
-	RevokeElement* element = (RevokeElement*)hash_lookup(fHash, &block);
+	RevokeElement* element = fHash->Lookup(block);
    
 	if (element != NULL) {
 		TRACE("HashRevokeManager::Insert(): Already has an element\n");
 		if (element->commitID < commitID) {
 			TRACE("HashRevokeManager::Insert(): Deleting previous element\n");
-			status_t retValue = hash_remove(fHash, element);
+			bool retValue = fHash->Remove(element);
 			
-			if (retValue != B_OK)
-				return retValue;
+			if (!retValue)
+				return B_ERROR;
 
 			delete element;
-		}
-		else {
+		} else {
 			return B_OK;
 				// We already have a newer version of the block
 		}
@@ -92,24 +87,24 @@ HashRevokeManager::Insert(uint32 block, uint32 commitID)
 status_t
 HashRevokeManager::Remove(uint32 block)
 {
-	RevokeElement* element = (RevokeElement*)hash_lookup(fHash, &block);
+	RevokeElement* element = fHash->Lookup(block);
 
 	if (element == NULL)
 		return B_ERROR; // TODO: Perhaps we should just ignore?
 
-	status_t retValue = hash_remove(fHash, element);
+	bool retValue = fHash->Remove(element);
 	
-	if (retValue == B_OK)
+	if (retValue)
 		delete element;
 
-	return retValue;
+	return B_ERROR;
 }
 
 
 bool
 HashRevokeManager::Lookup(uint32 block, uint32 commitID)
 {
-	RevokeElement* element = (RevokeElement*)hash_lookup(fHash, &block);
+	RevokeElement* element = fHash->Lookup(block);
 
 	if (element == NULL)
 		return false;
@@ -157,7 +152,7 @@ HashRevokeManager::_ForceInsert(uint32 block, uint32 commitID)
 	element->block = block;
 	element->commitID = commitID;
 
-	status_t retValue = hash_insert_grow(fHash, element);
+	status_t retValue = fHash->Insert(element);
 
 	if (retValue == B_OK) {
 		fRevokeCount++;

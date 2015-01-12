@@ -8,7 +8,7 @@
 #ifndef HASHREVOKEMANAGER_H
 #define HASHREVOKEMANAGER_H
 
-#include <util/khash.h>
+#include <util/OpenHashTable.h>
 
 #include "RevokeManager.h"
 
@@ -18,6 +18,35 @@ struct RevokeElement {
 	uint32			block;
 	uint32			commitID;
 };
+
+
+struct RevokeHash {
+		typedef uint32			KeyType;
+		typedef	RevokeElement	ValueType;
+
+		size_t HashKey(KeyType key) const
+		{
+			return key;
+		}
+
+		size_t Hash(ValueType* value) const
+		{
+			return HashKey(value->block);
+		}
+
+		bool Compare(KeyType key, ValueType* value) const
+		{
+			return value->block == key;
+		}
+
+		ValueType*& GetLink(ValueType* value) const
+		{
+			return value->next;
+		}
+
+};
+
+typedef BOpenHashTable<RevokeHash> RevokeTable;
 
 
 class HashRevokeManager : public RevokeManager {
@@ -30,7 +59,7 @@ public:
 	virtual	status_t	Insert(uint32 block, uint32 commitID);
 	virtual	status_t	Remove(uint32 block);
 	virtual	bool		Lookup(uint32 block, uint32 commitID);
-			
+
 	static	int			Compare(void* element, const void* key);
 	static	uint32		Hash(void* element, const void* key, uint32 range);
 
@@ -38,7 +67,7 @@ protected:
 			status_t	_ForceInsert(uint32 block, uint32 commitID);
 
 private:
-			hash_table*	fHash;
+			RevokeTable*	fHash;
 
 	const	int			kInitialHashSize;
 };
