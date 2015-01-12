@@ -226,7 +226,6 @@ static status_t unload_driver(legacy_driver *driver);
 static status_t load_driver(legacy_driver *driver);
 
 
-static hash_table* sDriverHash;
 static DriverWatcher sDriverWatcher;
 static int32 sDriverEventsPending;
 static DriverEventList sDriverEvents;
@@ -241,27 +240,35 @@ static bool sWatching;
 //	#pragma mark - driver private
 
 
-static uint32
-driver_entry_hash(void *_driver, const void *_key, uint32 range)
-{
-	legacy_driver *driver = (legacy_driver *)_driver;
-	const char *key = (const char *)_key;
+struct DriverHash {
+	typedef const char*			KeyType;
+	typedef legacy_driver		ValueType;
 
-	if (driver != NULL)
-		return hash_hash_string(driver->name) % range;
+	size_t HashKey(KeyType key) const
+	{
+		return hash_hash_string(key);
+	}
 
-	return hash_hash_string(key) % range;
-}
+	size_t Hash(ValueType* driver) const
+	{
+		return HashKey(driver->name);
+	}
+
+	bool Compare(KeyType key, ValueType* driver) const
+	{
+		return strcmp(driver->name, key) == 0;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->next;
+	}
+};
+
+typedef BOpenHashTable<DriverHash> DriverTable;
 
 
-static int
-driver_entry_compare(void *_driver, const void *_key)
-{
-	legacy_driver *driver = (legacy_driver *)_driver;
-	const char *key = (const char *)_key;
-
-	return strcmp(driver->name, key);
-}
+static DriverTable* sDriverHash;
 
 
 /*!	Collects all published devices of a driver, compares them to what the
@@ -543,18 +550,14 @@ get_leaf(const char *path)
 static legacy_driver *
 find_driver(dev_t device, ino_t node)
 {
-	hash_iterator iterator;
-	hash_open(sDriverHash, &iterator);
-	legacy_driver *driver;
-	while (true) {
-		driver = (legacy_driver *)hash_next(sDriverHash, &iterator);
-		if (driver == NULL
-			|| (driver->device == device && driver->node == node))
-			break;
+	DriverTable::Iterator iterator(sDriverHash);
+	while (iterator.HasNext()) {
+		legacy_driver *driver = iterator.Next();
+		if (driver->device == device && driver->node == node)
+			return driver;
 	}
 
-	hash_close(sDriverHash, &iterator, false);
-	return driver;
+	return NULL;
 }
 
 
@@ -579,8 +582,7 @@ add_driver(const char *path, image_id image)
 
 	RecursiveLocker _(sLock);
 
-	legacy_driver *driver = (legacy_driver *)hash_lookup(sDriverHash,
-		get_leaf(path));
+	legacy_driver *driver = sDriverHash->Lookup(get_leaf(path));
 	if (driver != NULL) {
 		// we know this driver
 		if (strcmp(driver->path, path) != 0) {
@@ -638,7 +640,7 @@ add_driver(const char *path, image_id image)
 	driver->uninit_hardware = NULL;
 	new(&driver->devices) DeviceList;
 
-	hash_insert(sDriverHash, driver);
+	sDriverHash->Insert(driver);
 	if (stat.st_dev > 0)
 		change_driver_watcher(stat.st_dev, stat.st_ino, true);
 
@@ -715,7 +717,7 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 				RecursiveLocker locker(sLock);
 				TRACE(("  add driver %p\n", event->path));
 
-				legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
+				legacy_driver* driver = sDriverHash->Lookup(
 					get_leaf(event->path));
 				if (driver == NULL)
 					legacy_driver_add(event->path);
@@ -730,7 +732,7 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 				RecursiveLocker locker(sLock);
 				TRACE(("  remove driver %p\n", event->path));
 
-				legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
+				legacy_driver* driver = sDriverHash->Lookup(
 					get_leaf(event->path));
 				if (driver != NULL
 					&& get_priority(event->path) >= driver->priority)
@@ -760,13 +762,10 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 
 	RecursiveLocker locker(sLock);
 
-	hash_iterator iterator;
-	hash_open(sDriverHash, &iterator);
-	legacy_driver *driver;
-	while (true) {
-		driver = (legacy_driver *)hash_next(sDriverHash, &iterator);
-		if (driver == NULL)
-			break;
+	DriverTable::Iterator iterator(sDriverHash);
+	while (iterator.HasNext()) {
+		legacy_driver *driver = iterator.Next();
+
 		if (!driver->binary_updated || driver->devices_used != 0)
 			continue;
 
@@ -774,7 +773,6 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 		reload_driver(driver);
 	}
 
-	hash_close(sDriverHash, &iterator, false);
 	locker.Unlock();
 }
 
@@ -876,13 +874,9 @@ dump_driver(int argc, char** argv)
 	if (argc < 2) {
 		// print list of all drivers
 		kprintf("address    image used publ.   pri name\n");
-		hash_iterator iterator;
-		hash_open(sDriverHash, &iterator);
-		while (true) {
-			legacy_driver* driver = (legacy_driver*)hash_next(sDriverHash,
-				&iterator);
-			if (driver == NULL)
-				break;
+		DriverTable::Iterator iterator(sDriverHash);
+		while (iterator.HasNext()) {
+			legacy_driver* driver = iterator.Next();
 
 			kprintf("%p  %5" B_PRId32 " %3" B_PRIu32 " %5" B_PRId32 " %c "
 				"%3" B_PRId32 " %s\n", driver,
@@ -892,7 +886,6 @@ dump_driver(int argc, char** argv)
 				driver->name);
 		}
 
-		hash_close(sDriverHash, &iterator, false);
 		return 0;
 	}
 
@@ -901,7 +894,7 @@ dump_driver(int argc, char** argv)
 		return 0;
 	}
 
-	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash, argv[1]);
+	legacy_driver* driver = sDriverHash->Lookup(argv[1]);
 	if (driver == NULL) {
 		kprintf("Driver named \"%s\" not found.\n", argv[1]);
 		return 0;
@@ -1458,8 +1451,7 @@ legacy_driver_rescan(const char* driverName)
 {
 	RecursiveLocker locker(sLock);
 
-	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
-		driverName);
+	legacy_driver* driver = sDriverHash->Lookup(driverName);
 	if (driver == NULL)
 		return B_ENTRY_NOT_FOUND;
 
@@ -1518,11 +1510,8 @@ legacy_driver_probe(const char* subPath)
 extern "C" status_t
 legacy_driver_init(void)
 {
-	legacy_driver dummyDriver;
-	sDriverHash = hash_init(DRIVER_HASH_SIZE,
-		offset_of_member(dummyDriver, next), &driver_entry_compare,
-		&driver_entry_hash);
-	if (sDriverHash == NULL)
+	sDriverHash = new DriverTable();
+	if (sDriverHash == NULL || sDriverHash->Init(DRIVER_HASH_SIZE) != B_OK)
 		return B_NO_MEMORY;
 
 	recursive_lock_init(&sLock, "legacy driver");
