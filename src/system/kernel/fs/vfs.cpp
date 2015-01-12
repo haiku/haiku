@@ -5145,10 +5145,11 @@ vfs_init(kernel_args* args)
 	vnode::StaticInit();
 
 	sVnodeTable = new(std::nothrow) VnodeTable();
-	if (sVnodeTable == NULL | sVnodeTable->Init(VNODE_HASH_TABLE_SIZE) != B_OK)
+	if (sVnodeTable == NULL || sVnodeTable->Init(VNODE_HASH_TABLE_SIZE) != B_OK)
 		panic("vfs_init: error creating vnode hash table\n");
 
-	list_init_etc(&sUnusedVnodeList, offsetof(struct vnode, unused_link));
+	struct vnode dummy_vnode;
+	list_init_etc(&sUnusedVnodeList, offset_of_member(dummy_vnode, unused_link));
 
 	struct fs_mount dummyMount;
 	sMountsTable = new(std::nothrow) MountTable();

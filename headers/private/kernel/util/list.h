@@ -20,6 +20,15 @@
  * you don't have to care about the difference between a link and an item.
  */
 
+
+// The use of offsetof() on non-PODs is invalid. Since many structs use
+// templated members (i.e. DoublyLinkedList) which makes them non-PODs we
+// can't use offsetof() anymore. This macro does the same, but requires an
+// instance of the object in question.
+#define offset_of_member(OBJECT, MEMBER) \
+	((size_t)((char*)&OBJECT.MEMBER - (char*)&OBJECT))
+
+
 typedef struct list_link list_link;
 
 /* The object that is put into the list must begin with these
