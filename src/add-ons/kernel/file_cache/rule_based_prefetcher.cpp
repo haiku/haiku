@@ -753,13 +753,13 @@ uninit()
 static status_t
 init()
 {
-	sTeamHash = new TeamTable();
+	sTeamHash = new(std::nothrow) TeamTable();
 	if (sTeamHash == NULL || sTeamHash->Init(64) != B_OK)
 		return B_NO_MEMORY;
 
 	status_t status;
 
-	sRulesHash = new RuleTable();
+	sRulesHash = new(std::nothrow) RuleTable();
 	if (sRulesHash == NULL || sRulesHash->Init(64) != B_OK) {
 		delete sTeamHash;
 		return B_NO_MEMORY;

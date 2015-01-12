@@ -2553,7 +2553,7 @@ elf_init(kernel_args *args)
 
 	image_init();
 
-	sImagesHash = new ImageHash();
+	sImagesHash = new(std::nothrow) ImageHash();
 	if (sImagesHash == NULL)
 		return B_NO_MEMORY;
 	status_t init = sImagesHash->Init(IMAGE_HASH_SIZE);

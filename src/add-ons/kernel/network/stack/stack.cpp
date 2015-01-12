@@ -798,26 +798,26 @@ init_stack()
 	mutex_init(&sChainLock, "net chains");
 	mutex_init(&sInitializeChainLock, "net intialize chains");
 
-	sFamilies = new FamilyTable();
+	sFamilies = new(std::nothrow) FamilyTable();
 	if (sFamilies == NULL || sFamilies->Init(10) != B_OK) {
 		status = B_NO_MEMORY;
 		goto err5;
 	}
 
-	sProtocolChains = new ChainTable();
+	sProtocolChains = new(std::nothrow) ChainTable();
 	if (sProtocolChains == NULL || sProtocolChains->Init(10) != B_OK) {
 		status = B_NO_MEMORY;
 		goto err6;
 	}
 
-	sDatalinkProtocolChains = new ChainTable();
+	sDatalinkProtocolChains = new(std::nothrow) ChainTable();
 	if (sDatalinkProtocolChains == NULL
 			|| sDatalinkProtocolChains->Init(10) != B_OK) {
 		status = B_NO_MEMORY;
 		goto err7;
 	}
 
-	sReceivingProtocolChains = new ChainTable();
+	sReceivingProtocolChains = new(std::nothrow) ChainTable();
 	if (sReceivingProtocolChains == NULL
 			|| sReceivingProtocolChains->Init(10) != B_OK) {
 		status = B_NO_MEMORY;

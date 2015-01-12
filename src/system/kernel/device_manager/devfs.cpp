@@ -887,7 +887,7 @@ devfs_mount(fs_volume* volume, const char* devfs, uint32 flags,
 	if (fs == NULL) {
 		err = B_NO_MEMORY;
 		goto err;
- 	}
+	}
 
 	volume->private_volume = fs;
 	volume->ops = &kVolumeOps;
@@ -897,7 +897,7 @@ devfs_mount(fs_volume* volume, const char* devfs, uint32 flags,
 
 	recursive_lock_init(&fs->lock, "devfs lock");
 
-	fs->vnode_hash = new NodeTable();
+	fs->vnode_hash = new(std::nothrow) NodeTable();
 	if (fs->vnode_hash == NULL || fs->vnode_hash->Init(DEVFS_HASH_SIZE) != B_OK) {
 		err = B_NO_MEMORY;
 		goto err2;

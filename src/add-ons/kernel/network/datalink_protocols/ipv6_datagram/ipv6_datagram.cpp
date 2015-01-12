@@ -407,7 +407,7 @@ ndp_init()
 
 	mutex_init(&sCacheLock, "ndp cache");
 
-	sCache = new AddressCache();
+	sCache = new(std::nothrow) AddressCache();
 	if (sCache == NULL || sCache->Init(64) != B_OK) {
 		mutex_destroy(&sCacheLock);
 		return B_NO_MEMORY;
