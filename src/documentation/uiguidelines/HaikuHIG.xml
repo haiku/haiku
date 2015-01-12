@@ -134,7 +134,7 @@
 
 
 <sect1>
-<title>Program Options: Format and Location</title>
+<title>Program Settings: Format and Location</title>
 
 <para>While there are lots of ways to store program settings, the easiest and recommended method is placing them in a BMessage and flattening it to a BFile. By using BMessages as your container, you don't have to concern yourself with writing and debugging other code. The exact location used to store them depends on the number of files you will need. If your software needs only one file and will only ever need one, then it is just simplest to place it in the user's config/settings folder. However, should you need more than one file, please put them in their own folder to minimize the clutter. The folder should either follow the format home/config/settings/your_app_name_here or home/config/settings/your_company_name_here/your_app_name_here.</para>
 </sect1>
@@ -287,7 +287,7 @@
 <varlistentry><term>B_COMMAND_KEY + L: </term><listitem>Replace and Find</listitem></varlistentry>
 
 
-<varlistentry><term>B_COMMAND_KEY + ,: </term><listitem>Program Options</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + ,: </term><listitem>Program Settings</listitem></varlistentry>
 
 <varlistentry><term>B_COMMAND_KEY + B: </term><listitem>(Word processor) Bold font</listitem></varlistentry>
 <varlistentry><term>B_COMMAND_KEY + U: </term><listitem>(Word processor) Underline font</listitem></varlistentry>
@@ -474,11 +474,29 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>Special Case: The Command Line</title>
 
-<para>When designing a program to work in a command-line environment there are some special considerations which must be addressed. Interaction with other programs, use in shell scripts, and a generally consistent interface for command-line programs are just some of the things you will need to keep in mind. The major design decisions you should make are how your program will get its data, what options will be available, and what feedback the user will be given.</para>
+<para>When designing a program to work in a command-line environment there are
+	some special considerations which must be addressed. Interaction with other
+	programs, use in shell scripts, and a generally consistent interface for
+	command-line programs are just some of the things you will need to keep in
+	mind. The major design decisions you should make are how your program will
+	get its data, what options will be available, and what feedback the user
+	will be given.</para>
 
 <para>Spend some time thinking about how your program should interact with the shell and with other programs. Most of the time, this will boil down to whether your program is file-oriented or stream-oriented. Stream-oriented programs like grep and less work pretty much like filters, getting data from stdin and dumping data to stdout. File-oriented programs like zip and bzip2 are given a list of files which the program then operates on. Your program can certainly do both, but choose a primary method because it will influence design decisions later on. Seriously consider handling wildcards instead of relying on the shell to do it for you if your program is file-oriented. This does mean more work for you as a developer, but it also reduces typing and, thus, typing errors for the user. Of course, if it doesn't make sense to support wildcards, then don't do it.</para>
 
-<para>Choose options which are going to be accessible by command-line switches carefully. Make each one available only if it fills a reasonably common task. From the perspective of the user, adding an option is adding a feature, which will, in turn, increase the complexity of your program. Provide GNU-style (double dash + long name) switches for all options. The most commonly-used options should also have a short (single-dash + single letter) counterpart. The switches --help and -h are reserved for showing help information. Only standard UNIX applications (ls, tar, df, etc.) are not required to follow the standard for -h in order to avoid breaking backward compatibility. All new command-line programs need to follow this. Also, if your program requires one or more parameters, do the user a favor and show the help message if there are no extra parameters instead of telling the user to retype the command with the help switch.</para>
+<para>Choose options which are going to be accessible by command-line switches
+	carefully. Make each one available only if it fills a reasonably common
+	task. From the perspective of the user, adding an option is adding a
+	feature, which will, in turn, increase the complexity of your program.
+	Provide GNU-style (double dash + long name) switches for all options. The
+	most commonly-used options should also have a short (single-dash + single
+	letter) counterpart. The switches --help and -h are reserved for showing
+	help information. Only standard UNIX applications (ls, tar, df, etc.) are
+	not required to follow the standard for -h in order to avoid breaking
+	backward compatibility. All new command-line programs need to follow this.
+	Also, if your program requires one or more parameters, do the user a favor
+	and show the help message if there are no extra parameters instead of
+	telling the user to retype the command with the help switch.</para>
 
 <para>When an option requires a particular value, there is also a standard for how the user is to provide the information. GNU-style command options should follow the format --option=value with the option to enclose the value in quotes. Multiple values for a switch should be comma-separated. Short-style command options should place a space between each value that follows it like this: -t value1 value2 value3 ... As mentioned above, wildcards should be handled by the program except when it does not make sense. If your program does something which modifies data, make sure that your program requires some sort of parameter -- a switch, a file, or whatever -- so that data is not lost if the user invokes your program without knowing what it does. You can assume that the user is sharper than a bowling ball, but do not expect the user to have expert knowledge of the operating system or, for that matter, your program. Programs which merely report information -- ls and df come to mind -- are not required to do this as long as the information displayed gives the user an idea of what the program does.</para>
 
@@ -585,7 +603,7 @@ There are other possible ways, but these should be enough for you to get the ide
 
 <para>Undo and Redo perform related, though opposite, functions. Cut, Copy, and Paste are all clipboard functions, so the belong in a group separate from Undo and Redo. A font menu would group font styles together. When organizing the menus in a menu bar, try to have a logical progression from one menu to another. A financial program might have these menus: Program, File, Account, Transaction, and Help.</para>
 
-<para>Submenus are another option for grouping menu items, particularly for attributes. They should be avoided when other options exist because they slow the user down and also add complexity to the interface. Younger and older users also have trouble navigating to submenus because of the fine motor skills required. If your submenu has 6 or more items in it, consider placing them in their own top-level menu.</para>
+<para>Submenus are another possibility for grouping menu items, particularly for attributes. They should be avoided when other options exist because they slow the user down and also add complexity to the interface. Younger and older users also have trouble navigating to submenus because of the fine motor skills required. If your submenu has 6 or more items in it, consider placing them in their own top-level menu.</para>
 </sect1>
 
 <sect1>
@@ -605,7 +623,7 @@ Show Color Picker
 Hide Color Picker
 -----------------
 
-|Options|
+|Settings|
 ---------------------------
 Change to Wireframe Preview
 Change to Full Preview
@@ -641,16 +659,27 @@ Choose Font and Size...
 <sect1>
 <title>Common Menus and their Contents</title>
 
-<para>Below are descriptions for menus that are common to many programs. Because they are so common, there are some guidelines to their use so that there is some consistency from program to program. With the exception of the Program menu, each of these menus should be used only if they make sense for your program.</para>
+<para>Below are descriptions for menus that are common to many programs. Because
+	they are so common, there are some guidelines to their use so that there is
+	some consistency from program to program. With the exception of the Program
+	menu, each of these menus should be used only if they make sense for your
+	program.</para>
 
 <variablelist>
 <title>Program: Items related to operating on the program itself.</title>
 
-<varlistentry><term>About &lt;app name here&gt;...  </term><listitem><para>Shows the About window. This is not a commonly-accessed item, so do not provide a keyboard shortcut for it.</para></listitem></varlistentry>
+<varlistentry><term>About &lt;app name here&gt;…  </term><listitem><para>Shows
+	the About window. This is not a commonly-accessed item, so do not provide a
+	keyboard shortcut for it.</para></listitem></varlistentry>
 
-<varlistentry><term>Options... (Command - ,) </term><listitem><para>Show the window which is used to customize options for your program. This can be a submenu if your program only has a couple of options.</para></listitem></varlistentry>
+<varlistentry><term>Settings… (Command - ,) </term><listitem><para>Show the
+	window which is used to customize settings for your program. This can be a
+	submenu if your program only has a couple of settings.</para></listitem>
+</varlistentry>
 
-<varlistentry><term>Quit (Command + Q) </term><listitem><para>This should be the bottom item in the menu and a separator should go above it. Clicking on this item should close all windows and quit the program.</para></listitem></varlistentry>
+<varlistentry><term>Quit (Command + Q) </term><listitem><para>This should be the
+	bottom item in the menu and a separator should go above it. Clicking on this
+	item should close all windows and quit the program.</para></listitem></varlistentry>
 </variablelist>
 
 <variablelist>
@@ -729,7 +758,7 @@ Select All (Command + A) </term><listitem><para>Selects all data in the current 
 <title>Search: Tasks in this menu include finding and replacing data and other navigation commands.</title>
 
 <varlistentry><term>
-Find... (Command + F) </term><listitem><para>This always shows a Find window for the program. The Find window should then allow the user to choose whatever options he desires for the find and disappear when the actual find is executed.</para></listitem></varlistentry>
+Find… (Command + F) </term><listitem><para>This always shows a Find window for the program. The Find window should then allow the user to choose whatever options he desires for the find and disappear when the actual find is executed.</para></listitem></varlistentry>
 
 <varlistentry><term>
 Find Again (Command + G) </term><listitem><para>This repeats the most recent Find. If no find has been performed in the program yet, it should show the Find window. Because this command does not normally show a window, no ellipsis is needed.</para></listitem></varlistentry>
@@ -740,7 +769,7 @@ Find Again (Command + G) </term><listitem><para>This repeats the most recent Fin
 <title>Help: Different ways that the user can learn more about your program and get help when needed.</title>
 
 <varlistentry><term>
-Read the Manual... </term><listitem><para>Shows the manual for the program in a new window. The manual should never be shown in a BAlert.</para></listitem></varlistentry>
+Read the Manual… </term><listitem><para>Shows the manual for the program in a new window. The manual should never be shown in a BAlert.</para></listitem></varlistentry>
 
 <varlistentry><term>
 Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default web browser at the website for the program or the program's company, respectively.</para></listitem></varlistentry>
@@ -851,16 +880,23 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 
 </sect1>
 <sect1>
-<title>Options Window Design</title>
+<title>Settings Window Design</title>
 
-<para>Windows to allow the user to change various program options are another place where developers commonly commit a usability faux pas or two. The most common mistakes are poorly-chosen defaults, inappropriate language for the target audience, and too many choices. Here are some guidelines for making a good one:
+<para>Windows to allow the user to change various program settings are another
+	place where developers commonly commit a usability faux pas or two. The most
+	common mistakes are poorly-chosen defaults, inappropriate language for the
+	target audience, and too many choices. Here are some guidelines for making a
+	good one:
 
 <itemizedlist>
 <listitem><para>Choose defaults which fit the most number of people.</para></listitem>
 
 <listitem><para>When possible, have changes take place immediately instead of requiring the user to click OK. If you do this, provide buttons to revert changes and also to set the default values.</para></listitem>
 
-<listitem><para>Provide options for significant features. This would include things like default file format for CD ripper, European vs American date format, or the default account in a mail client. Unncessary options include "Use Ins key for paste" and "Confirm Program Quit".</para></listitem>
+<listitem><para>Provide settings for significant features. This would include
+		things like default file format for CD ripper, European vs American date
+		format, or the default account in a mail client. Unncessary settings
+		include "Use Ins key for paste" and "Confirm Program Quit".</para></listitem>
 
 <listitem><para>Use language appropriate for the target audience as mentioned in Chapter 2. For example, the web browser option "Move system caret with focus/selection changes" requires some technical knowledge. A better way to label such an option would be "Allow text to be selected with the keyboard." Both refer to the same option. The difference is how many people can understand what it does.</para></listitem>
 </itemizedlist>
@@ -870,7 +906,16 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <sect1>
 <title>Open and Save Panels</title>
 
-<para>BFilePanel is used for both opening and saving files, but there is more to using them well than merely showing a list of files. Remember the location the user was viewing, and if it is inaccessible for some reason, show the Home folder. When possible, make use of file filters to eliminate files your program does not handle. By filtering out "bad" files, you eliminate errors and at the same time reduce the amount of time the user needs to find the file he wants by reducing the number of options. Offering a possible file name when saving a new document is another way to help the user. The title of the panel needs to match the task, whether it is Import, Export As, Save As, Save, Open, or something else.</para>
+<para>BFilePanel is used for both opening and saving files, but there is more to
+	using them well than merely showing a list of files. Remember the location
+	the user was viewing, and if it is inaccessible for some reason, show the
+	Home folder. When possible, make use of file filters to eliminate files your
+	program does not handle. By filtering out "bad" files, you eliminate errors
+	and at the same time reduce the amount of time the user needs to find the
+	file he wants by reducing the number of options. Offering a possible file
+	name when saving a new document is another way to help the user. The title
+	of the panel needs to match the task, whether it is Import, Export As,
+	Save As, Save, Open, or something else.</para>
 </sect1>
 </chapter>
 
@@ -1158,7 +1203,8 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <varlistentry><term>Lists</term>
 <listitem>
 <para>
-	Lists are used to display lots of individual items, possibly in a hierarchy. They can also allow multiple or single selections.
+	Lists are used to display lots of individual items, possibly in a hierarchy.
+	They can also allow multiple or single selections.
 
 <table frame="all">
 <title>Do's and Don'ts of List Views</title>
@@ -1191,7 +1237,8 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <varlistentry><term>Tabs</term>
 <listitem>
 <para>
-	Tabs can be quite handy for displaying multiple views in a small space. Unfortunately, they seem to suffer from being too easy to abuse.
+	Tabs can be quite handy for displaying multiple views in a small space.
+	Unfortunately, they seem to suffer from being too easy to abuse.
 
 <table frame="all">
 <title>Do's and Don'ts of Tabs</title>
