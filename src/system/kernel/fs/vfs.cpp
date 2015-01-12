@@ -40,7 +40,6 @@
 #include <fd.h>
 #include <file_cache.h>
 #include <fs/node_monitor.h>
-#include <khash.h>
 #include <KPath.h>
 #include <lock.h>
 #include <low_resource_manager.h>
@@ -252,12 +251,73 @@ static rw_lock sVnodeLock = RW_LOCK_INITIALIZER("vfs_vnode_lock");
 static mutex sIOContextRootLock = MUTEX_INITIALIZER("io_context::root lock");
 
 
+struct VnodeHash {
+	typedef vnode_hash_key	KeyType;
+	typedef	struct vnode	ValueType;
+
+#define VHASH(mountid, vnodeid) \
+	(((uint32)((vnodeid) >> 32) + (uint32)(vnodeid)) ^ (uint32)(mountid))
+
+	size_t HashKey(KeyType key) const
+	{
+		return VHASH(key.device, key.vnode);
+	}
+
+	size_t Hash(ValueType* vnode) const
+	{
+		return VHASH(vnode->device, vnode->id);
+	}
+
+#undef VHASH
+
+	bool Compare(KeyType key, ValueType* vnode) const
+	{
+		return vnode->device == key.device && vnode->id == key.vnode;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->next;
+	}
+};
+
+typedef BOpenHashTable<VnodeHash> VnodeTable;
+
+
+struct MountHash {
+	typedef dev_t			KeyType;
+	typedef	struct fs_mount	ValueType;
+
+	size_t HashKey(KeyType key) const
+	{
+		return key;
+	}
+
+	size_t Hash(ValueType* mount) const
+	{
+		return mount->id;
+	}
+
+	bool Compare(KeyType key, ValueType* mount) const
+	{
+		return mount->id == key;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->next;
+	}
+};
+
+typedef BOpenHashTable<MountHash> MountTable;
+
+
 #define VNODE_HASH_TABLE_SIZE 1024
-static hash_table* sVnodeTable;
+static VnodeTable* sVnodeTable;
 static struct vnode* sRoot;
 
 #define MOUNTS_HASH_TABLE_SIZE 16
-static hash_table* sMountsTable;
+static MountTable* sMountsTable;
 static dev_t sNextMountID = 1;
 
 #define MAX_TEMP_IO_VECS 8
@@ -647,32 +707,6 @@ public:
 #endif	// VFS_PAGES_IO_TRACING
 
 
-static int
-mount_compare(void* _m, const void* _key)
-{
-	struct fs_mount* mount = (fs_mount*)_m;
-	const dev_t* id = (dev_t*)_key;
-
-	if (mount->id == *id)
-		return 0;
-
-	return -1;
-}
-
-
-static uint32
-mount_hash(void* _m, const void* _key, uint32 range)
-{
-	struct fs_mount* mount = (fs_mount*)_m;
-	const dev_t* id = (dev_t*)_key;
-
-	if (mount)
-		return mount->id % range;
-
-	return (uint32)*id % range;
-}
-
-
 /*! Finds the mounted device (the fs_mount structure) with the given ID.
 	Note, you must hold the gMountMutex lock when you call this function.
 */
@@ -681,7 +715,7 @@ find_mount(dev_t id)
 {
 	ASSERT_LOCKED_MUTEX(&sMountMutex);
 
-	return (fs_mount*)hash_lookup(sMountsTable, (void*)&id);
+	return sMountsTable->Lookup(id);
 }
 
 
@@ -809,37 +843,6 @@ get_file_system_name_for_layer(const char* fsNames, int32 layer)
 }
 
 
-static int
-vnode_compare(void* _vnode, const void* _key)
-{
-	struct vnode* vnode = (struct vnode*)_vnode;
-	const struct vnode_hash_key* key = (vnode_hash_key*)_key;
-
-	if (vnode->device == key->device && vnode->id == key->vnode)
-		return 0;
-
-	return -1;
-}
-
-
-static uint32
-vnode_hash(void* _vnode, const void* _key, uint32 range)
-{
-	struct vnode* vnode = (struct vnode*)_vnode;
-	const struct vnode_hash_key* key = (vnode_hash_key*)_key;
-
-#define VHASH(mountid, vnodeid) \
-	(((uint32)((vnodeid) >> 32) + (uint32)(vnodeid)) ^ (uint32)(mountid))
-
-	if (vnode != NULL)
-		return VHASH(vnode->device, vnode->id) % range;
-
-	return VHASH(key->device, key->vnode) % range;
-
-#undef VHASH
-}
-
-
 static void
 add_vnode_to_mount_list(struct vnode* vnode, struct fs_mount* mount)
 {
@@ -874,7 +877,7 @@ lookup_vnode(dev_t mountID, ino_t vnodeID)
 	key.device = mountID;
 	key.vnode = vnodeID;
 
-	return (vnode*)hash_lookup(sVnodeTable, &key);
+	return sVnodeTable->Lookup(key);
 }
 
 
@@ -933,7 +936,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 	}
 
 	// add the vnode to the mount's node list and the hash table
-	hash_insert(sVnodeTable, vnode);
+	sVnodeTable->Insert(vnode);
 	add_vnode_to_mount_list(vnode, vnode->mount);
 
 	mutex_unlock(&sMountMutex);
@@ -993,7 +996,7 @@ free_vnode(struct vnode* vnode, bool reenter)
 	// The file system has removed the resources of the vnode now, so we can
 	// make it available again (by removing the busy vnode from the hash).
 	rw_lock_write_lock(&sVnodeLock);
-	hash_remove(sVnodeTable, vnode);
+	sVnodeTable->Remove(vnode);
 	rw_lock_write_unlock(&sVnodeLock);
 
 	// if we have a VMCache attached, remove it
@@ -1205,7 +1208,7 @@ restart:
 				FS_CALL(vnode, put_vnode, reenter);
 
 			rw_lock_write_lock(&sVnodeLock);
-			hash_remove(sVnodeTable, vnode);
+			sVnodeTable->Remove(vnode);
 			remove_vnode_from_mount_list(vnode, vnode->mount);
 			rw_lock_write_unlock(&sVnodeLock);
 
@@ -3149,7 +3152,7 @@ dump_mount(int argc, char** argv)
 	ulong val = parse_expression(argv[1]);
 	uint32 id = val;
 
-	struct fs_mount* mount = (fs_mount*)hash_lookup(sMountsTable, (void*)&id);
+	struct fs_mount* mount = sMountsTable->Lookup(id);
 	if (mount == NULL) {
 		if (IS_USER_ADDRESS(id)) {
 			kprintf("fs_mount not found\n");
@@ -3175,12 +3178,11 @@ dump_mounts(int argc, char** argv)
 		B_PRINTF_POINTER_WIDTH, "address", B_PRINTF_POINTER_WIDTH, "root",
 		B_PRINTF_POINTER_WIDTH, "covers", B_PRINTF_POINTER_WIDTH, "cookie");
 
-	struct hash_iterator iterator;
 	struct fs_mount* mount;
 
-	hash_open(sMountsTable, &iterator);
-	while ((mount = (struct fs_mount*)hash_next(sMountsTable, &iterator))
-			!= NULL) {
+	MountTable::Iterator iterator(sMountsTable);
+	while (iterator.HasNext()) {
+		mount = iterator.Next();
 		kprintf("%p%4" B_PRIdDEV " %p %p %p %s\n", mount, mount->id, mount->root_vnode,
 			mount->root_vnode->covers, mount->volume->private_volume,
 			mount->volume->file_system_name);
@@ -3193,7 +3195,6 @@ dump_mounts(int argc, char** argv)
 		}
 	}
 
-	hash_close(sMountsTable, &iterator, false);
 	return 0;
 }
 
@@ -3225,19 +3226,18 @@ dump_vnode(int argc, char** argv)
 		return 0;
 	}
 
-	struct hash_iterator iterator;
 	dev_t device = parse_expression(argv[argi]);
 	ino_t id = parse_expression(argv[argi + 1]);
 
-	hash_open(sVnodeTable, &iterator);
-	while ((vnode = (struct vnode*)hash_next(sVnodeTable, &iterator)) != NULL) {
+	VnodeTable::Iterator iterator(sVnodeTable);
+	while (iterator.HasNext()) {
+		vnode = iterator.Next();
 		if (vnode->id != id || vnode->device != device)
 			continue;
 
 		_dump_vnode(vnode, printPath);
 	}
 
-	hash_close(sVnodeTable, &iterator, false);
 	return 0;
 }
 
@@ -3253,15 +3253,15 @@ dump_vnodes(int argc, char** argv)
 	// restrict dumped nodes to a certain device if requested
 	dev_t device = parse_expression(argv[1]);
 
-	struct hash_iterator iterator;
 	struct vnode* vnode;
 
 	kprintf("%-*s   dev     inode  ref %-*s   %-*s   %-*s   flags\n",
 		B_PRINTF_POINTER_WIDTH, "address", B_PRINTF_POINTER_WIDTH, "cache",
 		B_PRINTF_POINTER_WIDTH, "fs-node", B_PRINTF_POINTER_WIDTH, "locking");
 
-	hash_open(sVnodeTable, &iterator);
-	while ((vnode = (struct vnode*)hash_next(sVnodeTable, &iterator)) != NULL) {
+	VnodeTable::Iterator iterator(sVnodeTable);
+	while (iterator.HasNext()) {
+		vnode = iterator.Next();
 		if (vnode->device != device)
 			continue;
 
@@ -3272,7 +3272,6 @@ dump_vnodes(int argc, char** argv)
 			vnode->IsUnpublished() ? "u" : "-");
 	}
 
-	hash_close(sVnodeTable, &iterator, false);
 	return 0;
 }
 
@@ -3280,7 +3279,6 @@ dump_vnodes(int argc, char** argv)
 static int
 dump_vnode_caches(int argc, char** argv)
 {
-	struct hash_iterator iterator;
 	struct vnode* vnode;
 
 	if (argc > 2 || !strcmp(argv[1], "--help")) {
@@ -3296,8 +3294,9 @@ dump_vnode_caches(int argc, char** argv)
 	kprintf("%-*s   dev     inode %-*s       size   pages\n",
 		B_PRINTF_POINTER_WIDTH, "address", B_PRINTF_POINTER_WIDTH, "cache");
 
-	hash_open(sVnodeTable, &iterator);
-	while ((vnode = (struct vnode*)hash_next(sVnodeTable, &iterator)) != NULL) {
+	VnodeTable::Iterator iterator(sVnodeTable);
+	while (iterator.HasNext()) {
+		vnode = iterator.Next();
 		if (vnode->cache == NULL)
 			continue;
 		if (device != -1 && vnode->device != device)
@@ -3309,7 +3308,6 @@ dump_vnode_caches(int argc, char** argv)
 			vnode->cache->page_count);
 	}
 
-	hash_close(sVnodeTable, &iterator, false);
 	return 0;
 }
 
@@ -3384,16 +3382,7 @@ dump_vnode_usage(int argc, char** argv)
 	kprintf("Unused vnodes: %" B_PRIu32 " (max unused %" B_PRIu32 ")\n",
 		sUnusedVnodes, kMaxUnusedVnodes);
 
-	struct hash_iterator iterator;
-	hash_open(sVnodeTable, &iterator);
-
-	uint32 count = 0;
-	struct vnode* vnode;
-	while ((vnode = (struct vnode*)hash_next(sVnodeTable, &iterator)) != NULL) {
-		count++;
-	}
-
-	hash_close(sVnodeTable, &iterator, false);
+	uint32 count = sVnodeTable->CountElements();
 
 	kprintf("%" B_PRIu32 " vnodes total (%" B_PRIu32 " in use).\n", count,
 		count - sUnusedVnodes);
@@ -3727,7 +3716,7 @@ publish_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 			vnode->SetUnpublished(false);
 		} else {
 			locker.Lock();
-			hash_remove(sVnodeTable, vnode);
+			sVnodeTable->Remove(vnode);
 			remove_vnode_from_mount_list(vnode, vnode->mount);
 			free(vnode);
 		}
@@ -5155,18 +5144,16 @@ vfs_init(kernel_args* args)
 {
 	vnode::StaticInit();
 
-	struct vnode dummyVnode;
-	sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE,
-		offset_of_member(dummyVnode, next), &vnode_compare, &vnode_hash);
-	if (sVnodeTable == NULL)
+	sVnodeTable = new(std::nothrow) VnodeTable();
+	if (sVnodeTable == NULL | sVnodeTable->Init(VNODE_HASH_TABLE_SIZE) != B_OK)
 		panic("vfs_init: error creating vnode hash table\n");
 
-	list_init_etc(&sUnusedVnodeList, offset_of_member(dummyVnode, unused_link));
+	list_init_etc(&sUnusedVnodeList, offsetof(struct vnode, unused_link));
 
 	struct fs_mount dummyMount;
-	sMountsTable = hash_init(MOUNTS_HASH_TABLE_SIZE,
-		offset_of_member(dummyMount, next), &mount_compare, &mount_hash);
-	if (sMountsTable == NULL)
+	sMountsTable = new(std::nothrow) MountTable();
+	if (sMountsTable == NULL
+			|| sMountsTable->Init(MOUNTS_HASH_TABLE_SIZE) != B_OK)
 		panic("vfs_init: error creating mounts hash table\n");
 
 	node_monitor_init();
@@ -7375,7 +7362,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	// insert mount struct into list before we call FS's mount() function
 	// so that vnodes can be created for this mount
 	mutex_lock(&sMountMutex);
-	hash_insert(sMountsTable, mount);
+	sMountsTable->Insert(mount);
 	mutex_unlock(&sMountMutex);
 
 	ino_t rootID;
@@ -7492,7 +7479,7 @@ err3:
 		put_vnode(coveredNode);
 err2:
 	mutex_lock(&sMountMutex);
-	hash_remove(sMountsTable, mount);
+	sMountsTable->Remove(mount);
 	mutex_unlock(&sMountMutex);
 err1:
 	delete mount;
@@ -7700,7 +7687,7 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 
 	// remove the mount structure from the hash table
 	mutex_lock(&sMountMutex);
-	hash_remove(sMountsTable, mount);
+	sMountsTable->Remove(mount);
 	mutex_unlock(&sMountMutex);
 
 	mountOpLocker.Unlock();
