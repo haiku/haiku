@@ -6,7 +6,6 @@
 #define RESOLVABLE_FAMILY_H
 
 
-#include <util/khash.h>
 #include <util/OpenHashTable.h>
 
 #include "Resolvable.h"

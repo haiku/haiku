@@ -10,7 +10,6 @@
 
 #include <SupportDefs.h>
 
-#include <util/khash.h>
 #include <util/OpenHashTable.h>
 
 #include "String.h"

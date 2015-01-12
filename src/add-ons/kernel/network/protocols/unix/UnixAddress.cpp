@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <util/khash.h>
+#include <util/StringHash.h>
 
 #include <net_datalink.h>
 #include <NetUtilities.h>

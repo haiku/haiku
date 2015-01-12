@@ -14,7 +14,7 @@
 
 #include <lock.h>
 #include <messaging.h>
-#include <util/khash.h>
+#include <util/StringHash.h>
 
 
 #ifdef __cplusplus

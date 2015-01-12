@@ -31,7 +31,6 @@
 #include <lock.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
-#include <util/khash.h>
 #include <util/list.h>
 
 #include "EndpointManager.h"

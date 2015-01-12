@@ -6,7 +6,6 @@
 #define DEPENDENCY_FAMILY_H
 
 
-#include <util/khash.h>
 #include <util/OpenHashTable.h>
 
 #include "Dependency.h"

@@ -16,8 +16,6 @@
 #include <net_socket.h>
 #include <net_stack.h>
 
-#include <util/khash.h>
-
 #include <ByteOrder.h>
 
 #include <sys/socket.h>

@@ -9,8 +9,8 @@
 #include <stdlib.h>
 
 #include <util/AutoLock.h>
-#include <util/khash.h>
 #include <util/OpenHashTable.h>
+#include <util/StringHash.h>
 
 
 struct EntryCacheKey {

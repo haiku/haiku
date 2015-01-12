@@ -13,7 +13,6 @@
 
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
-#include <util/khash.h>
 #include <util/OpenHashTable.h>
 
 #include "String.h"

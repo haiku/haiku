@@ -12,8 +12,8 @@
 #include <Referenceable.h>
 
 #include <util/DoublyLinkedList.h>
-#include <util/khash.h>
 #include <util/OpenHashTable.h>
+#include <util/StringHash.h>
 
 #include <lock.h>
 

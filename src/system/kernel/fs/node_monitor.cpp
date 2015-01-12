@@ -16,7 +16,6 @@
 #include <NodeMonitor.h>
 
 #include <fd.h>
-#include <khash.h>
 #include <lock.h>
 #include <messaging.h>
 #include <Notifications.h>

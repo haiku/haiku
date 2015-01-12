@@ -22,7 +22,6 @@
 
 #include <condition_variable.h>
 #include <debug_hex_dump.h>
-#include <khash.h>
 #include <lock.h>
 #include <select_sync_pool.h>
 #include <syscall_restart.h>
@@ -42,9 +41,6 @@
 #else
 #	define TRACE(x...)
 #endif
-
-
-#define PIPEFS_HASH_SIZE		16
 
 
 namespace fifo {
