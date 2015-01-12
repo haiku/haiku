@@ -314,71 +314,64 @@ static bool sDisableUserAddOns = false;
 */
 static recursive_lock sModulesLock;
 
+
+struct ModuleHash {
+	typedef const char* KeyType;
+	typedef module ValueType;
+
+	size_t Hash(ValueType* module) const
+		{ return HashKey(module->name); }
+	ValueType*& GetLink(ValueType* entry) const
+		{ return entry->next; }
+
+	size_t HashKey(KeyType key) const
+	{
+		return hash_hash_string(key);
+	}
+
+	bool Compare(KeyType key, ValueType* module) const
+	{
+		if (key == NULL)
+			return false;
+		return strcmp(module->name, key) == 0;
+	}
+};
+
+typedef BOpenHashTable<ModuleHash> ModuleTable;
+
+
+struct ImageHash {
+	typedef const char* KeyType;
+	typedef module_image ValueType;
+
+	size_t Hash(ValueType* image) const
+		{ return HashKey(image->path); }
+	ValueType*& GetLink(ValueType* entry) const
+		{ return entry->next; }
+
+	size_t HashKey(KeyType key) const
+	{
+		return hash_hash_string(key);
+	}
+
+	bool Compare(KeyType key, ValueType* image) const
+	{
+		if (key == NULL)
+			return false;
+		return strcmp(image->path, key) == 0;
+	}
+};
+
+typedef BOpenHashTable<ImageHash> ImageTable;
+
+
 /* We store the loaded modules by directory path, and all known modules
  * by module name in a hash table for quick access
  */
-static hash_table* sModuleImagesHash;
-static hash_table* sModulesHash;
+static ImageTable* sModuleImagesHash;
+static ModuleTable* sModulesHash;
 
 
-/*!	Calculates hash for a module using its name */
-static uint32
-module_hash(void* _module, const void* _key, uint32 range)
-{
-	module* module = (struct module*)_module;
-	const char* name = (const char*)_key;
-
-	if (module != NULL)
-		return hash_hash_string(module->name) % range;
-
-	if (name != NULL)
-		return hash_hash_string(name) % range;
-
-	return 0;
-}
-
-
-/*!	Compares a module to a given name */
-static int
-module_compare(void* _module, const void* _key)
-{
-	module* module = (struct module*)_module;
-	const char* name = (const char*)_key;
-	if (name == NULL)
-		return -1;
-
-	return strcmp(module->name, name);
-}
-
-
-/*!	Calculates the hash of a module image using its path */
-static uint32
-module_image_hash(void* _module, const void* _key, uint32 range)
-{
-	module_image* image = (module_image*)_module;
-	const char* path = (const char*)_key;
-
-	if (image != NULL)
-		return hash_hash_string(image->path) % range;
-
-	if (path != NULL)
-		return hash_hash_string(path) % range;
-
-	return 0;
-}
-
-
-/*!	Compares a module image to a path */
-static int
-module_image_compare(void* _module, const void* _key)
-{
-	module_image* image = (module_image*)_module;
-	const char* path = (const char*)_key;
-	if (path == NULL)
-		return -1;
-
-	return strcmp(image->path, path);
-}
 
 
 /*!	Try to load the module image at the specified \a path.
@@ -432,7 +425,7 @@ load_module_image(const char* path, module_image** _moduleImage)
 	moduleImage->image = image;
 	moduleImage->ref_count = 0;
 
-	hash_insert(sModuleImagesHash, moduleImage);
+	sModuleImagesHash->Insert(moduleImage);
 
 	TRACE(("load_module_image(\"%s\"): image loaded: %p\n", path, moduleImage));
 
@@ -458,13 +451,13 @@ unload_module_image(module_image* moduleImage, bool remove)
 	ASSERT_LOCKED_RECURSIVE(&sModulesLock);
 
 	if (moduleImage->ref_count != 0) {
-		FATAL(("Can't unload %s due to ref_cnt = %" B_PRId32 "\n", moduleImage->path,
-			moduleImage->ref_count));
+		FATAL(("Can't unload %s due to ref_cnt = %" B_PRId32 "\n",
+			moduleImage->path, moduleImage->ref_count));
 		return B_ERROR;
 	}
 
 	if (remove)
-		hash_remove(sModuleImagesHash, moduleImage);
+		sModuleImagesHash->Remove(moduleImage);
 
 	unload_kernel_add_on(moduleImage->image);
 	free(moduleImage->path);
@@ -499,7 +492,7 @@ get_module_image(const char* path, module_image** _image)
 
 	RecursiveLocker _(sModulesLock);
 
-	image = (module_image*)hash_lookup(sModuleImagesHash, path);
+	image = sModuleImagesHash->Lookup(path);
 	if (image == NULL) {
 		status_t status = load_module_image(path, &image);
 		if (status < B_OK)
@@ -527,7 +520,7 @@ create_module(module_info* info, int offset, module** _module)
 	if (!info->name)
 		return B_BAD_VALUE;
 
-	module = (struct module*)hash_lookup(sModulesHash, info->name);
+	module = sModulesHash->Lookup(info->name);
 	if (module) {
 		FATAL(("Duplicate module name (%s) detected... ignoring new one\n",
 			info->name));
@@ -554,7 +547,7 @@ create_module(module_info* info, int offset, module** _module)
 	module->flags = info->flags;
 
 	recursive_lock_lock(&sModulesLock);
-	hash_insert(sModulesHash, module);
+	sModulesHash->Insert(module);
 	recursive_lock_unlock(&sModulesLock);
 
 	if (_module)
@@ -591,8 +584,7 @@ check_module_image(const char* path, const char* searchedName,
 		// try to create a module for every module_info, check if the
 		// name matches if it was a new entry
 		bool freshModule = false;
-		struct module* module = (struct module*)hash_lookup(sModulesHash,
-			(*info)->name);
+		struct module* module = sModulesHash->Lookup((*info)->name);
 		if (module != NULL) {
 			// Module does already exist
 			if (module->module_image == NULL && module->ref_count == 0) {
@@ -660,7 +652,7 @@ search_module(const char* name, module_image** _moduleImage)
 	if (status != B_OK)
 		return NULL;
 
-	return (module*)hash_lookup(sModulesHash, name);
+	return sModulesHash->Lookup(name);
 }
 
 
@@ -906,12 +898,11 @@ iterator_get_next_module(module_iterator* iterator, char* buffer,
 
 	if (iterator->loaded_modules) {
 		recursive_lock_lock(&sModulesLock);
-		hash_iterator hashIterator;
-		hash_open(sModulesHash, &hashIterator);
+		ModuleTable::Iterator hashIterator(sModulesHash);
 
-		struct module* module = (struct module*)hash_next(sModulesHash,
-			&hashIterator);
-		for (int32 i = 0; module != NULL; i++) {
+		for (int32 i = 0; hashIterator.HasNext(); i++) {
+			struct module* module = hashIterator.Next();
+
 			if (i >= iterator->module_offset) {
 				if (!strncmp(module->name, iterator->prefix,
 						iterator->prefix_length)
@@ -919,15 +910,12 @@ iterator_get_next_module(module_iterator* iterator, char* buffer,
 					*_bufferSize = strlcpy(buffer, module->name, *_bufferSize);
 					iterator->module_offset = i + 1;
 
-					hash_close(sModulesHash, &hashIterator, false);
 					recursive_lock_unlock(&sModulesLock);
 					return B_OK;
 				}
 			}
-			module = (struct module*)hash_next(sModulesHash, &hashIterator);
 		}
 
-		hash_close(sModulesHash, &hashIterator, false);
 		recursive_lock_unlock(&sModulesLock);
 
 		// prevent from falling into modules hash iteration again
@@ -1139,7 +1127,7 @@ register_preloaded_module_image(struct preloaded_image* image)
 	moduleImage->image = image->id;
 	moduleImage->ref_count = 0;
 
-	hash_insert(sModuleImagesHash, moduleImage);
+	sModuleImagesHash->Insert(moduleImage);
 
 	for (info = moduleImage->info; *info; info++) {
 		struct module* module = NULL;
@@ -1164,15 +1152,13 @@ error:
 static int
 dump_modules(int argc, char** argv)
 {
-	hash_iterator iterator;
 	struct module_image* image;
-	struct module* module;
 
-	hash_rewind(sModulesHash, &iterator);
+	ModuleTable::Iterator iterator(sModulesHash);
 	kprintf("-- known modules:\n");
 
-	while ((module = (struct module*)hash_next(sModulesHash, &iterator))
-			!= NULL) {
+	while (iterator.HasNext()) {
+		struct module* module = iterator.Next();
 		kprintf("%p: \"%s\", \"%s\" (%" B_PRId32 "), refcount = %" B_PRId32 ", "
 			"state = %d, mimage = %p\n", module, module->name,
 			module->module_image ? module->module_image->path : "",
@@ -1180,11 +1166,11 @@ dump_modules(int argc, char** argv)
 			module->module_image);
 	}
 
-	hash_rewind(sModuleImagesHash, &iterator);
+	ImageTable::Iterator imageIterator(sModuleImagesHash);
 	kprintf("\n-- loaded module images:\n");
 
-	while ((image = (struct module_image*)hash_next(sModuleImagesHash,
-				&iterator)) != NULL) {
+	while (imageIterator.HasNext()) {
+		image = imageIterator.Next();
 		kprintf("%p: \"%s\" (image_id = %" B_PRId32 "), info = %p, refcount = "
 			"%" B_PRId32 "\n", image, image->path, image->image, image->info,
 			image->ref_count);
@@ -1703,7 +1689,7 @@ ModuleNotificationService::Notify(int32 opcode, dev_t device, ino_t directory,
 
 
 /*static*/ void
-ModuleNotificationService::HandleNotifications(void */*data*/,
+ModuleNotificationService::HandleNotifications(void * /*data*/,
 	int /*iteration*/)
 {
 	sModuleNotificationService._HandleNotifications();
@@ -1722,7 +1708,7 @@ unload_module(const char* path)
 	struct module_image* moduleImage;
 
 	recursive_lock_lock(&sModulesLock);
-	moduleImage = (module_image*)hash_lookup(sModuleImagesHash, path);
+	moduleImage = sModuleImagesHash->Lookup(path);
 	recursive_lock_unlock(&sModulesLock);
 
 	if (moduleImage == NULL)
@@ -1788,13 +1774,14 @@ module_init(kernel_args* args)
 
 	recursive_lock_init(&sModulesLock, "modules rlock");
 
-	sModulesHash = hash_init(MODULE_HASH_SIZE, 0, module_compare, module_hash);
-	if (sModulesHash == NULL)
+	sModulesHash = new(std::nothrow) ModuleTable();
+	if (sModulesHash == NULL
+			|| sModulesHash->Init(MODULE_HASH_SIZE) != B_OK)
 		return B_NO_MEMORY;
 
-	sModuleImagesHash = hash_init(MODULE_HASH_SIZE, 0, module_image_compare,
-		module_image_hash);
-	if (sModuleImagesHash == NULL)
+	sModuleImagesHash = new(std::nothrow) ImageTable();
+	if (sModuleImagesHash == NULL
+			|| sModuleImagesHash->Init(MODULE_HASH_SIZE) != B_OK)
 		return B_NO_MEMORY;
 
 	// register built-in modules
@@ -1847,11 +1834,10 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 
 	// First of all, clear all pre-loaded module's module_image, if the module
 	// isn't in use.
-	hash_iterator iterator;
-	hash_open(sModulesHash, &iterator);
+	ModuleTable::Iterator iterator(sModulesHash);
 	struct module* module;
-	while ((module = (struct module*)hash_next(sModulesHash, &iterator))
-			!= NULL) {
+	while (iterator.HasNext()) {
+		module = iterator.Next();
 		if (module->ref_count == 0
 			&& (module->flags & B_BUILT_IN_MODULE) == 0) {
 			TRACE(("  module %p, \"%s\" unused, clearing image\n", module,
@@ -1862,23 +1848,21 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 
 	// Now iterate through the images and drop them respectively normalize their
 	// paths.
-	hash_open(sModuleImagesHash, &iterator);
+	ImageTable::Iterator imageIterator(sModuleImagesHash);
 
 	module_image* imagesToReinsert = NULL;
 		// When renamed, an image is added to this list to be re-entered in the
 		// hash at the end. We can't do that during the iteration.
 
-	while (true) {
-		struct module_image* image
-			= (struct module_image*)hash_next(sModuleImagesHash, &iterator);
-		if (image == NULL)
-			break;
+	while (imageIterator.HasNext()) {
+		struct module_image* image = imageIterator.Next();
 
 		if (image->ref_count == 0) {
 			// not in use -- unload it
 			TRACE(("  module image %p, \"%s\" unused, removing\n", image,
 				image->path));
-			hash_remove_current(sModuleImagesHash, &iterator);
+			// Using RemoveUnchecked to avoid invalidating the iterator
+			sModuleImagesHash->RemoveUnchecked(image);
 			unload_module_image(image, false);
 		} else if (bootingFromBootLoaderVolume) {
 			bool pathNormalized = false;
@@ -1934,7 +1918,7 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 
 				// remove the image -- its hash value has probably changed,
 				// so we need to re-insert it later
-				hash_remove_current(sModuleImagesHash, &iterator);
+				sModuleImagesHash->RemoveUnchecked(image);
 				image->next = imagesToReinsert;
 				imagesToReinsert = image;
 			} else {
@@ -1947,7 +1931,7 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 	// re-insert the images that have got a new path
 	while (module_image* image = imagesToReinsert) {
 		imagesToReinsert = image->next;
-		hash_insert(sModuleImagesHash, image);
+		sModuleImagesHash->Insert(image);
 	}
 
 	TRACE(("module_init_post_boot_device() done\n"));
@@ -2151,21 +2135,17 @@ get_next_loaded_module_name(uint32* _cookie, char* buffer, size_t* _bufferSize)
 
 	RecursiveLocker _(sModulesLock);
 
-	hash_iterator iterator;
-	hash_open(sModulesHash, &iterator);
-	struct module* module = (struct module*)hash_next(sModulesHash, &iterator);
+	ModuleTable::Iterator iterator(sModulesHash);
 
-	for (uint32 i = 0; module != NULL; i++) {
+	for (uint32 i = 0; iterator.HasNext(); i++) {
+		struct module* module = iterator.Next();
 		if (i >= offset) {
 			*_bufferSize = strlcpy(buffer, module->name, *_bufferSize);
 			*_cookie = i + 1;
 			status = B_OK;
 			break;
 		}
-		module = (struct module*)hash_next(sModulesHash, &iterator);
 	}
-
-	hash_close(sModulesHash, &iterator, false);
 
 	return status;
 }
@@ -2185,7 +2165,7 @@ get_module(const char* path, module_info** _info)
 
 	RecursiveLocker _(sModulesLock);
 
-	module = (struct module*)hash_lookup(sModulesHash, path);
+	module = sModulesHash->Lookup(path);
 
 	// if we don't have it cached yet, search for it
 	if (module == NULL || ((module->flags & B_BUILT_IN_MODULE) == 0
@@ -2242,7 +2222,7 @@ put_module(const char* path)
 
 	RecursiveLocker _(sModulesLock);
 
-	module = (struct module*)hash_lookup(sModulesHash, path);
+	module = sModulesHash->Lookup(path);
 	if (module == NULL) {
 		FATAL(("module: We don't seem to have a reference to module %s\n",
 			path));
