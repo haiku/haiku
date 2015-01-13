@@ -106,8 +106,7 @@ private:
 									uint32 y, uint32& hintX, uint32& hintY);
 			bool				_GetFieldFor(BPoint where, uint32& x,
 									uint32& y);
-			void				_ToggleValue(uint32 x, uint32 y, uint32 value,
-									uint32 field);
+			void				_SetValue(uint32 x, uint32 y, uint32 value);
 			void				_ToggleHintValue(uint32 x, uint32 y,
 									uint32 hintX, uint32 hintY,
 									uint32 value, uint32 field);

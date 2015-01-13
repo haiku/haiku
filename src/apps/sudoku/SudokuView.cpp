@@ -618,7 +618,7 @@ SudokuView::MouseDown(BPoint where)
 				| B_TERTIARY_MOUSE_BUTTON)) != 0) {
 		// Double click or other buttons set or remove a value
 		if (!fField->IsInitialValue(x, y))
-			_ToggleValue(x, y, value, field);
+			_SetValue(x, y, fField->ValueAt(x, y) == 0 ? value + 1 : 0);
 
 		return;
 	}
@@ -1068,9 +1068,7 @@ SudokuView::_InsertKey(char rawKey, int32 modifiers)
 		fField->SetHintMaskAt(fKeyboardX, fKeyboardY, hintMask);
 	} else {
 		_PushUndo();
-		fField->SetValueAt(fKeyboardX, fKeyboardY, value);
-		if (value)
-			BMessenger(this).SendMessage(kMsgCheckSolved);
+		_SetValue(fKeyboardX, fKeyboardY, value);
 	}
 }
 
@@ -1112,37 +1110,37 @@ SudokuView::_GetFieldFor(BPoint where, uint32& x, uint32& y)
 
 
 void
-SudokuView::_ToggleValue(uint32 x, uint32 y, uint32 value, uint32 field)
+SudokuView::_SetValue(uint32 x, uint32 y, uint32 value)
 {
 	bool wasCompleted;
-	if (fField->ValueAt(x, y) > 0) {
+	if (value == 0) {
 		// Remove value
-		value = fField->ValueAt(x, y) - 1;
-		wasCompleted = fField->IsValueCompleted(value + 1);
+		value = fField->ValueAt(x, y);
+		wasCompleted = fField->IsValueCompleted(value);
 
 		fField->SetValueAt(x, y, 0);
 		fShowHintX = x;
 		fShowHintY = y;
 	} else {
 		// Set value
-		wasCompleted = fField->IsValueCompleted(value + 1);
+		wasCompleted = fField->IsValueCompleted(value);
 
-		fField->SetValueAt(x, y, value + 1);
+		fField->SetValueAt(x, y, value);
 		BMessenger(this).SendMessage(kMsgCheckSolved);
 
 		_RemoveHintValues(x, y, value);
 
 		// allow dragging to remove the hint from other fields
 		fLastHintValueSet = false;
-		fLastHintValue = value;
-		fLastField = field;
+		fLastHintValue = value - 1;
+		fLastField = x + y * fField->Size();
 	}
 
-	if (value + 1 != fValueHintValue && fValueHintValue != ~0UL)
-		_SetValueHintValue(value + 1);
+	if (value != fValueHintValue && fValueHintValue != ~0UL)
+		_SetValueHintValue(value);
 
-	if (wasCompleted != fField->IsValueCompleted(value + 1))
-		_InvalidateValue(value + 1, false, x, y);
+	if (wasCompleted != fField->IsValueCompleted(value))
+		_InvalidateValue(value, false, x, y);
 	else
 		_InvalidateField(x, y);
 }
@@ -1181,7 +1179,7 @@ SudokuView::_RemoveHintValues(uint32 atX, uint32 atY, uint32 value)
 	uint32 blockSize = fField->BlockSize();
 	uint32 blockX = (atX / blockSize) * blockSize;
 	uint32 blockY = (atY / blockSize) * blockSize;
-	uint32 valueMask = 1UL << value;
+	uint32 valueMask = 1UL << (value - 1);
 
 	for (uint32 y = blockY; y < blockY + blockSize; y++) {
 		for (uint32 x = blockX; x < blockX + blockSize; x++) {
@@ -1259,9 +1257,8 @@ SudokuView::_SolveSingle()
 			y = rand() % fField->Size();
 		} while (fField->ValueAt(x, y));
 
-		fField->SetValueAt(x, y,
-			solver.SolutionAt(0)->ValueAt(x, y));
-		_InvalidateField(x, y);
+		uint32 value = solver.SolutionAt(0)->ValueAt(x, y);
+		_SetValue(x, y, value);
 	} else
 		beep();
 }
