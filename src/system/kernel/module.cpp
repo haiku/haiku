@@ -1910,15 +1910,16 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 				TRACE(("  normalized path of module image %p, \"%s\" -> "
 					"\"%s\"\n", image, image->path, pathBuffer.Path()));
 
+				// remove the image -- its hash value has probably changed,
+				// so we need to re-insert it later
+				sModuleImagesHash->RemoveUnchecked(image);
+
 				// set the new path
 				free(image->path);
 				size_t pathLen = pathBuffer.Length();
 				image->path = (char*)realloc(pathBuffer.DetachBuffer(),
 					pathLen + 1);
 
-				// remove the image -- its hash value has probably changed,
-				// so we need to re-insert it later
-				sModuleImagesHash->RemoveUnchecked(image);
 				image->next = imagesToReinsert;
 				imagesToReinsert = image;
 			} else {
