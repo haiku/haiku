@@ -70,6 +70,16 @@ struct MallocAllocator {
 };
 
 
+/** Implements an hash table with open hashing, that is, colliding entries are
+ * stored in a linked list. The table may be made to adjust its number of slots
+ * depending on the load factor (this should be enabled unless the object is to
+ * be used at times where memory allocations aren't possible, such as code
+ * called byt he memory allocator).
+ *
+ * The link between entries is part of the ValueType stored items, which makes
+ * sure the table can always accept new items and will never fail because it is
+ * out of memory (except at Init time).
+ */
 template<typename Definition, bool AutoExpand = true,
 	bool CheckDuplicates = false, typename Allocator = MallocAllocator>
 class BOpenHashTable {
@@ -168,6 +178,11 @@ public:
 		return B_OK;
 	}
 
+	/*! \brief Inserts a value without resizing the table.
+
+		Use this method if you need to insert a value into the table while
+		iterating it, as regular insertion can invalidate iterators.
+	*/
 	void InsertUnchecked(ValueType* value)
 	{
 		if (CheckDuplicates && _ExhaustiveSearch(value)) {
@@ -196,6 +211,15 @@ public:
 		return true;
 	}
 
+	/*! \brief Removes a value without resizing the table.
+
+		Use this method if you need to remove a value from the table while
+		iterating it, as Remove can invalidate iterators.
+
+		Also use this method if you know you are going to reinsert the item soon
+		(possibly with a different hash) to avoid shrinking then growing the
+		table again.
+	*/
 	bool RemoveUnchecked(ValueType* value)
 	{
 		size_t index = fDefinition.Hash(value) & (fTableSize - 1);
@@ -232,9 +256,11 @@ public:
 		return true;
 	}
 
-	/*!	Removes all elements from the hash table. No resizing happens. The
-		elements are not deleted. If \a returnElements is \c true, the method
-		returns all elements chained via their hash table link.
+	/*!	\brief Removes all elements from the hash table.
+
+		No resizing happens. The elements are not deleted. If \a returnElements
+		is \c true, the method returns all elements chained via their hash table
+		link.
 	*/
 	ValueType* Clear(bool returnElements = false)
 	{
@@ -296,7 +322,7 @@ public:
 	}
 
 	/*!	Resizes the table using the given allocation. The allocation must not
-		be \c NULL. It must be of size \a size, which must a value returned
+		be \c NULL. It must be of size \a size, which must be a value returned
 		earlier by ResizeNeeded(). If the size requirements have changed in the
 		meantime, the method free()s the given allocation and returns \c false,
 		unless \a force is \c true, in which case the supplied allocation is
@@ -317,6 +343,11 @@ public:
 		return true;
 	}
 
+	/*! \brief Iterator for BOpenHashMap
+
+		The iterator is not invalidated when removing the current element from
+		the table, unless the removal triggers a resize.
+	*/
 	class Iterator {
 	public:
 		Iterator(const HashTable* table)
