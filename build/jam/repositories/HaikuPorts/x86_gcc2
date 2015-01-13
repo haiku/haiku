@@ -17,7 +17,7 @@ RemotePackageRepository HaikuPorts
 	timgmsoundfont-fixed-5
 	vl_gothic-20141206-1
 	wqy_microhei-0.2.0~beta-3
-	youtube_dl-2014.10.15-1
+	youtube_dl-2015.01.10-1
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
