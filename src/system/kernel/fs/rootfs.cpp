@@ -8,9 +8,11 @@
 
 
 #if FS_SHELL
+#	include <new>
+
 #	include "fssh_api_wrapper.h"
 
-#	include "hash.h"
+#	include "KOpenHashTable.h"
 #	include "list.h"
 #else
 #	include <stdio.h>
@@ -23,12 +25,13 @@
 #	include <NodeMonitor.h>
 
 #	include <debug.h>
-#	include <khash.h>
 #	include <lock.h>
+#	include <OpenHashTable.h>
 #	include <util/AutoLock.h>
 #	include <vfs.h>
 #	include <vm/vm.h>
 #endif
+
 
 
 #if FS_SHELL
@@ -71,12 +74,39 @@ struct rootfs_vnode {
 	struct rootfs_stream		stream;
 };
 
+struct VnodeHash {
+	typedef	ino_t			KeyType;
+	typedef	rootfs_vnode	ValueType;
+
+	size_t HashKey(KeyType key) const
+	{
+		return key;
+	}
+
+	size_t Hash(ValueType* vnode) const
+	{
+		return vnode->id;
+	}
+
+	bool Compare(KeyType key, ValueType* vnode) const
+	{
+		return vnode->id == key;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->all_next;
+	}
+};
+
+typedef BOpenHashTable<VnodeHash> VnodeTable;
+
 struct rootfs {
 	fs_volume*					volume;
 	dev_t						id;
 	rw_lock						lock;
 	ino_t						next_vnode_id;
-	hash_table*					vnode_list_hash;
+	VnodeTable*					vnode_list_hash;
 	struct rootfs_vnode*		root_vnode;
 };
 
@@ -114,32 +144,6 @@ current_timespec()
 	tv.tv_sec = time / 1000000;
 	tv.tv_nsec = (time % 1000000) * 1000;
 	return tv;
-}
-
-
-static uint32
-rootfs_vnode_hash_func(void* _v, const void* _key, uint32 range)
-{
-	struct rootfs_vnode* vnode = (rootfs_vnode*)_v;
-	const ino_t* key = (const ino_t*)_key;
-
-	if (vnode != NULL)
-		return vnode->id % range;
-
-	return (uint64)*key % range;
-}
-
-
-static int
-rootfs_vnode_compare_func(void* _v, const void* _key)
-{
-	struct rootfs_vnode* v = (rootfs_vnode*)_v;
-	const ino_t* key = (const ino_t*)_key;
-
-	if (v->id == *key)
-		return 0;
-
-	return -1;
 }
 
 
@@ -188,7 +192,7 @@ rootfs_delete_vnode(struct rootfs* fs, struct rootfs_vnode* v, bool force_delete
 		return EPERM;
 
 	// remove it from the global hash table
-	hash_remove(fs->vnode_list_hash, v);
+	fs->vnode_list_hash->Remove(v);
 
 	if (S_ISDIR(v->stream.type))
 		mutex_destroy(&v->stream.dir.cookie_lock);
@@ -376,10 +380,9 @@ rootfs_mount(fs_volume* volume, const char* device, uint32 flags,
 
 	rw_lock_init(&fs->lock, "rootfs");
 
-	fs->vnode_list_hash = hash_init(ROOTFS_HASH_SIZE,
-		offsetof(rootfs_vnode, all_next), &rootfs_vnode_compare_func,
-		&rootfs_vnode_hash_func);
-	if (fs->vnode_list_hash == NULL) {
+	fs->vnode_list_hash = new(std::nothrow) VnodeTable();
+	if (fs->vnode_list_hash == NULL
+			|| fs->vnode_list_hash->Init(ROOTFS_HASH_SIZE) != B_OK) {
 		err = B_NO_MEMORY;
 		goto err2;
 	}
@@ -393,7 +396,7 @@ rootfs_mount(fs_volume* volume, const char* device, uint32 flags,
 	vnode->parent = vnode;
 
 	fs->root_vnode = vnode;
-	hash_insert(fs->vnode_list_hash, vnode);
+	fs->vnode_list_hash->Insert(vnode);
 	publish_vnode(volume, vnode->id, vnode, &sVnodeOps, vnode->stream.type, 0);
 
 	*_rootID = vnode->id;
@@ -401,7 +404,7 @@ rootfs_mount(fs_volume* volume, const char* device, uint32 flags,
 	return B_OK;
 
 err3:
-	hash_uninit(fs->vnode_list_hash);
+	delete fs->vnode_list_hash;
 err2:
 	rw_lock_destroy(&fs->lock);
 	free(fs);
@@ -421,17 +424,14 @@ rootfs_unmount(fs_volume* _volume)
 	put_vnode(fs->volume, fs->root_vnode->id);
 
 	// delete all of the vnodes
-	struct hash_iterator i;
-	hash_open(fs->vnode_list_hash, &i);
+	VnodeTable::Iterator i(fs->vnode_list_hash);
 
-	while (struct rootfs_vnode* vnode = (struct rootfs_vnode*)
-			hash_next(fs->vnode_list_hash, &i)) {
+	while (i.HasNext()) {
+		struct rootfs_vnode* vnode = i.Next();
 		rootfs_delete_vnode(fs, vnode, true);
 	}
 
-	hash_close(fs->vnode_list_hash, &i, false);
-
-	hash_uninit(fs->vnode_list_hash);
+	delete fs->vnode_list_hash;
 	rw_lock_destroy(&fs->lock);
 	free(fs);
 
@@ -503,7 +503,7 @@ rootfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _vnode, int* _type,
 	if (!reenter)
 		rw_lock_read_lock(&fs->lock);
 
-	vnode = (rootfs_vnode*)hash_lookup(fs->vnode_list_hash, &id);
+	vnode = fs->vnode_list_hash->Lookup(id);
 
 	if (!reenter)
 		rw_lock_read_unlock(&fs->lock);
@@ -644,7 +644,7 @@ rootfs_create_dir(fs_volume* _volume, fs_vnode* _dir, const char* name,
 		return B_NO_MEMORY;
 
 	rootfs_insert_in_dir(fs, dir, vnode);
-	hash_insert(fs->vnode_list_hash, vnode);
+	fs->vnode_list_hash->Insert(vnode);
 
 	entry_cache_add(fs->volume->id, dir->id, name, vnode->id);
 	notify_entry_created(fs->id, dir->id, name, vnode->id);
@@ -877,7 +877,7 @@ rootfs_symlink(fs_volume* _volume, fs_vnode* _dir, const char* name,
 		return B_NO_MEMORY;
 
 	rootfs_insert_in_dir(fs, dir, vnode);
-	hash_insert(fs->vnode_list_hash, vnode);
+	fs->vnode_list_hash->Insert(vnode);
 
 	vnode->stream.symlink.path = strdup(path);
 	if (vnode->stream.symlink.path == NULL) {
@@ -1086,7 +1086,7 @@ rootfs_create_special_node(fs_volume* _volume, fs_vnode* _dir, const char* name,
 	else
 		flags |= B_VNODE_PUBLISH_REMOVED;
 
-	hash_insert(fs->vnode_list_hash, vnode);
+	fs->vnode_list_hash->Insert(vnode);
 
 	_superVnode->private_node = vnode;
 	_superVnode->ops = &sVnodeOps;
