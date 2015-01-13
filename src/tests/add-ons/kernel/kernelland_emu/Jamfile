@@ -15,7 +15,6 @@ SharedLibrary libkernelland_emu.so :
 	smp.cpp
 	vm.cpp
 
-	khash.cpp
 	list.cpp
 
 	: be [ TargetLibstdc++ ] ;
@@ -24,5 +23,5 @@ AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
 	: /boot/home/config/lib : false ;
 
 SEARCH on [ FGristFiles
-		list.cpp khash.cpp
+		list.cpp
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;

@@ -35,7 +35,6 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	# kernel
 	block_cache.cpp
 	file_map.cpp
-	khash.cpp
 	Notifications.cpp
 	Referenceable.cpp
 
@@ -64,10 +63,6 @@ SEARCH on [ FGristFiles
 		block_cache.cpp
 		file_map.cpp
 	] = [ FDirName $(HAIKU_TOP) src system kernel cache ] ;
-
-SEARCH on [ FGristFiles
-		khash.cpp
-	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles
 		Referenceable.cpp

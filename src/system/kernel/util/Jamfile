@@ -10,7 +10,6 @@ KernelMergeObject kernel_util.o :
 	inet_ntop.c
 	kernel_cpp.cpp
 	KernelReferenceable.cpp
-	khash.cpp
 	list.cpp
 	queue.cpp
 	ring_buffer.cpp

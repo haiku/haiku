@@ -14,7 +14,6 @@ StdBinCommands
 SimpleTest BlockMapTest :
 	BlockMapTest.cpp
 	BlockMap.cpp
-	khash.cpp
 	: libkernelland_emu.so ;
 
 SimpleTest block_cache_test :
