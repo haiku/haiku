@@ -11,11 +11,6 @@ StdBinCommands
 	cache_control.cpp
 	;
 
-SimpleTest BlockMapTest :
-	BlockMapTest.cpp
-	BlockMap.cpp
-	: libkernelland_emu.so ;
-
 SimpleTest block_cache_test :
 	block_cache_test.cpp
 	: libkernelland_emu.so ;
