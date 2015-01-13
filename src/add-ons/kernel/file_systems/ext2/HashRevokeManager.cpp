@@ -63,13 +63,13 @@ status_t
 HashRevokeManager::Insert(uint32 block, uint32 commitID)
 {
 	RevokeElement* element = fHash->Lookup(block);
-   
+
 	if (element != NULL) {
 		TRACE("HashRevokeManager::Insert(): Already has an element\n");
 		if (element->commitID < commitID) {
 			TRACE("HashRevokeManager::Insert(): Deleting previous element\n");
 			bool retValue = fHash->Remove(element);
-			
+
 			if (!retValue)
 				return B_ERROR;
 
@@ -92,12 +92,11 @@ HashRevokeManager::Remove(uint32 block)
 	if (element == NULL)
 		return B_ERROR; // TODO: Perhaps we should just ignore?
 
-	bool retValue = fHash->Remove(element);
-	
-	if (retValue)
-		delete element;
+	fHash->Remove(element);
+		// Can't fail as we just did a sucessful Lookup()
 
-	return B_ERROR;
+	delete element;
+	return B_OK;
 }
 
 
