@@ -805,10 +805,10 @@ Keymap::_SaveSourceText(FILE* file)
 {
 #endif
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	static const rgb_color kCommentColor = (rgb_color){200, 92, 92, 255};
 	static const rgb_color kTextColor = (rgb_color){0, 0, 0, 255};
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	BFont font = *be_fixed_font;
 
 	if (runs != NULL) {
