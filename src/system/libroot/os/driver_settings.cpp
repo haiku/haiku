@@ -820,21 +820,16 @@ load_driver_settings_file(int fd)
 void *
 parse_driver_settings_string(const char *settingsString)
 {
+	if (settingsString == NULL)
+		return NULL;
+
 	// we simply copy the whole string to use it as our internal buffer
 	char *text = strdup(settingsString);
-	if (settingsString == NULL || text != NULL) {
-		settings_handle *handle
-			= (settings_handle*)malloc(sizeof(settings_handle));
-		if (handle != NULL) {
-			handle->magic = SETTINGS_MAGIC;
-			handle->text = text;
-
-			if (parse_settings(handle) == B_OK)
-				return handle;
-
-			free(handle);
-		}
-		free(text);
+	if (text != NULL) {
+		settings_handle *handle = new_settings(text, NULL);
+		if (handle == NULL)
+			free(text);
+		return handle;
 	}
 
 	return NULL;
