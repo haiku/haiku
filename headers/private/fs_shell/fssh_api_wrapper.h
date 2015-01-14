@@ -6,6 +6,10 @@
 #define _FSSH_API_WRAPPER_H
 
 
+#include <string.h>
+#ifdef __cplusplus
+#include <new>
+#endif
 #include <stdlib.h>
 
 #include "fssh_dirent.h"

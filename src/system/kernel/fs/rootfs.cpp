@@ -10,10 +10,6 @@
 #if FS_SHELL
 #	include "fssh_api_wrapper.h"
 
-#	undef size_t
-#	include <new>
-#	define size_t fssh_size_t
-
 #	include "KOpenHashTable.h"
 #	include "list.h"
 #else
