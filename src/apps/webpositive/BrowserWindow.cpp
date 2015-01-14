@@ -1546,7 +1546,7 @@ BrowserWindow::MainDocumentError(const BString& failingURL,
 
 	// Try delegating the URL to an external app instead.
 	int32 at = failingURL.FindFirst(":");
-	if (at != B_ERROR) {
+	if (at > 0) {
 		BString proto;
 		failingURL.CopyInto(proto, 0, at);
 
@@ -2461,20 +2461,27 @@ BrowserWindow::_IsValidDomainChar(char ch)
 }
 
 
+/*! \brief "smart" parser for user-entered URLs
+
+	We try to be flexible in what we accept as a valid URL. The protocol may
+	be missing, or something we can't handle (in that case we run the matching
+	app). If all attempts to make sense of the input fail, we make a search
+	engine query for it.
+ */
 void
 BrowserWindow::_SmartURLHandler(const BString& url)
 {
-	// Only process if this doesn't look like a full URL (http:// or
-	// file://, etc.)
-
+	// First test if the URL has a protocol field
 	int32 at = url.FindFirst(":");
 
 	if (at != B_ERROR) {
+		// There is a protocol, let's see if we can handle it
 		BString proto;
 		url.CopyInto(proto, 0, at);
 
 		bool handled = false;
 
+		// First try the built-in supported ones
 		for (unsigned int i = 0; i < sizeof(kHandledProtocols) / sizeof(char*);
 				i++) {
 			handled = (proto == kHandledProtocols[i]);
@@ -2482,26 +2489,43 @@ BrowserWindow::_SmartURLHandler(const BString& url)
 				break;
 		}
 
-		if (handled)
+		if (handled) {
+			// This is the easy case, a complete and well-formed URL, we can
+			// navigate to it without further efforts.
 			_VisitURL(url);
-		else {
+			return;
+		} else {
+			// There is what looks like a protocol, but one we don't know.
+			// Ask the BRoster if there is a matching filetype and app which
+			// can handle it.
 			BString temp;
 			temp = "application/x-vnd.Be.URL.";
 			temp += proto;
 
 			char* argv[1] = { (char*)url.String() };
 
-			if (be_roster->Launch(temp.String(), 1, argv) != B_OK)
-				_VisitSearchEngine(url);
+			if (be_roster->Launch(temp.String(), 1, argv) == B_OK)
+				return;
 		}
-	} else if (url == "localhost")
+	}
+
+	// There is no protocol or only an unsupported one. So let's try harder to
+	// guess what the request is.
+
+	// "localhost" is a special case, it is a valid domain name but has no dots.
+	// Handle it separately.
+	if (url == "localhost")
 		_VisitURL("http://localhost/");
 	else {
+		// Also handle URLs starting with "localhost" followed by a path.
 		const char* localhostPrefix = "localhost/";
 
 		if (url.Compare(localhostPrefix, strlen(localhostPrefix)) == 0)
 			_VisitURL(url);
 		else {
+			// In all other cases we try to detect a valid domain name. There
+			// must be at least one dot and no spaces until the first / in the
+			// URL.
 			bool isURL = false;
 
 			for (int32 i = 0; i < url.CountChars(); i++) {
@@ -2516,10 +2540,19 @@ BrowserWindow::_SmartURLHandler(const BString& url)
 				}
 			}
 
-			if (isURL)
-				_VisitURL(url);
-			else
+			if (isURL) {
+				// This is apparently an URL missing the protocol part. In that
+				// case we default to http.
+				BString prefixed = "http://";
+				prefixed << url;
+				_VisitURL(prefixed);
+				return;
+			} else {
+				// We couldn't find anything that looks like an URL. Let's
+				// assume what we have is a search request and go to the search
+				// engine.
 				_VisitSearchEngine(url);
+			}
 		}
 	}
 }
