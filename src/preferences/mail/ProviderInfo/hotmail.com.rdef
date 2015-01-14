@@ -1,0 +1,7 @@
+resource(1, "POP Server") "pop3.live.com";
+resource(3, "SMTP Server") "smtp.live.com";
+resource(4, "POP Authentication") 0;
+resource(5, "SMTP Authentication") 1;
+resource(6, "POP SSL") 1;
+resource(8, "SMTP SSL") 1;
+resource(9, "Username Pattern") 0;
