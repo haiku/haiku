@@ -77,6 +77,8 @@ typedef struct settings_handle {
 	list_link	link;
 	char		name[B_OS_NAME_LENGTH];
 	int32		ref_count;
+		// A negative ref_count means the node is not reference counted and not
+		// stored in the list.
 #endif
 	int32		magic;
 	struct		driver_settings settings;
@@ -101,8 +103,9 @@ static mutex sLock = MUTEX_INITIALIZER("driver settings");
 
 
 /*!
-	Returns true for any characters that separate parameters -
-	those are ignored in the input stream and won't be added
+	\brief Returns true for any characters that separate parameters
+
+	Those characters are ignored in the input stream and won't be added
 	to any words.
 */
 static inline bool
@@ -112,9 +115,8 @@ is_parameter_separator(char c)
 }
 
 
-/** Indicates if "c" begins a new word or not.
- */
-
+/*! Indicates if "c" begins a new word or not.
+*/
 static inline bool
 is_word_break(char c)
 {
@@ -413,6 +415,9 @@ new_settings(char *buffer, const char *driverName)
 	if (driverName != NULL) {
 		handle->ref_count = 1;
 		strlcpy(handle->name, driverName, sizeof(handle->name));
+	} else {
+		handle->ref_count = -1;
+		handle->name[0] = 0;
 	}
 #endif
 
@@ -687,11 +692,14 @@ unload_driver_settings(void *_handle)
 
 #ifdef _KERNEL_MODE
 	mutex_lock(&sLock);
-	if (--handle->ref_count == 0 && gBootDevice > 0) {
-		// don't unload an handle when /boot is not available
-		list_remove_link(&handle->link);
-	} else
-		handle = NULL;
+
+	if (handle->ref_count > 0) {
+		if (--handle->ref_count == 0 && gBootDevice > 0) {
+			// don't unload an handle when /boot is not available
+			list_remove_link(&handle->link);
+		} else
+			handle = NULL;
+	}
 	mutex_unlock(&sLock);
 #endif
 
