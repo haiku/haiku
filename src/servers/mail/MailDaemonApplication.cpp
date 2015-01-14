@@ -305,14 +305,6 @@ MailDaemonApplication::MessageReceived(BMessage* msg)
 			_ReloadAccounts(msg);
 			break;
 
-		case kMsgSetStatusWindowMode:	// when to show the status window
-		{
-			int32 mode;
-			if (msg->FindInt32("ShowStatusWindow", &mode) == B_OK)
-				fNotifyMode = mode;
-			break;
-		}
-
 		case kMsgMarkMessageAsRead:
 		{
 			int32 account = msg->FindInt32("account");
@@ -413,7 +405,8 @@ MailDaemonApplication::MessageReceived(BMessage* msg)
 
 			_UpdateNewMessagesNotification();
 
-			if (fNotifyMode != B_MAIL_SHOW_STATUS_WINDOW_NEVER)
+			if (fSettingsFile.ShowStatusWindow()
+					!= B_MAIL_SHOW_STATUS_WINDOW_NEVER)
 				fNotification->Send();
 			break;
 		}
@@ -654,7 +647,7 @@ MailDaemonApplication::_InitAccount(BMailAccountSettings& settings)
 	}
 	if (account.inboundProtocol != NULL) {
 		DefaultNotifier* notifier = new DefaultNotifier(settings.Name(), true,
-			fErrorLogWindow, fNotifyMode);
+			fErrorLogWindow, fSettingsFile.ShowStatusWindow());
 		account.inboundProtocol->SetMailNotifier(notifier);
 		account.inboundProtocol->Run();
 	}
@@ -666,7 +659,7 @@ MailDaemonApplication::_InitAccount(BMailAccountSettings& settings)
 	}
 	if (account.outboundProtocol != NULL) {
 		DefaultNotifier* notifier = new DefaultNotifier(settings.Name(), false,
-			fErrorLogWindow, fNotifyMode);
+			fErrorLogWindow, fSettingsFile.ShowStatusWindow());
 		account.outboundProtocol->SetMailNotifier(notifier);
 		account.outboundProtocol->Run();
 	}

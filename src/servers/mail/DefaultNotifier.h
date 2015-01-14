@@ -20,7 +20,7 @@ class DefaultNotifier : public BMailNotifier {
 public:
 								DefaultNotifier(const char* accountName,
 									bool inbound, ErrorLogWindow* errorWindow,
-									uint32& showMode);
+									uint32 showMode);
 								~DefaultNotifier();
 
 			BMailNotifier*		Clone();
@@ -33,6 +33,9 @@ public:
 			void				ReportProgress(uint32 messages, uint64 bytes,
 									const char* message = NULL);
 			void				ResetProgress(const char* message = NULL);
+
+private:
+			void				_NotifyIfAllowed(int timeout = 0);
 
 private:
 			BString				fAccountName;

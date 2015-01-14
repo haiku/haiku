@@ -21,7 +21,7 @@
 
 
 DefaultNotifier::DefaultNotifier(const char* accountName, bool inbound,
-	ErrorLogWindow* errorWindow, uint32& showMode)
+	ErrorLogWindow* errorWindow, uint32 showMode)
 	:
 	fAccountName(accountName),
 	fIsInbound(inbound),
@@ -131,11 +131,7 @@ DefaultNotifier::ReportProgress(uint32 messages, uint64 bytes,
 	if (fItemsDone == fTotalItems && fTotalItems != 0)
 		timeout = 1; // We're done, make the window go away faster
 
-	if ((!fIsInbound
-			&& (fShowMode & B_MAIL_SHOW_STATUS_WINDOW_WHEN_SENDING) != 0)
-		|| (fIsInbound
-			&& (fShowMode & B_MAIL_SHOW_STATUS_WINDOW_WHEN_ACTIVE) != 0))
-		fNotification.Send(timeout);
+	_NotifyIfAllowed(timeout);
 }
 
 
@@ -145,5 +141,19 @@ DefaultNotifier::ResetProgress(const char* message)
 	fNotification.SetProgress(0);
 	if (message != NULL)
 		fNotification.SetTitle(message);
-	fNotification.Send(0);
+	_NotifyIfAllowed();
+}
+
+
+void
+DefaultNotifier::_NotifyIfAllowed(int timeout)
+{
+	int32 flag;
+	if (fIsInbound)
+		flag = B_MAIL_SHOW_STATUS_WINDOW_WHEN_ACTIVE;
+	else
+		flag = B_MAIL_SHOW_STATUS_WINDOW_WHEN_SENDING;
+
+	if ((fShowMode & flag) != 0)
+		fNotification.Send(timeout);
 }

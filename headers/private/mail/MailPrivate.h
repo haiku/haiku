@@ -22,7 +22,6 @@ const uint32 kMsgCheckMessage = 'mnow';
 const uint32 kMsgSendMessages = 'msnd';
 const uint32 kMsgSettingsUpdated = 'mrrs';
 const uint32 kMsgAccountsChanged = 'macc';
-const uint32 kMsgSetStatusWindowMode = 'shst';
 const uint32 kMsgCountNewMessages = 'mnum';
 const uint32 kMsgMarkMessageAsRead = 'mmar';
 const uint32 kMsgFetchBody = 'mfeb';
