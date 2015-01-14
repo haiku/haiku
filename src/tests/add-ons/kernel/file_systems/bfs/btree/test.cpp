@@ -7,6 +7,9 @@
 //! BFS B+Tree torture test
 
 
+#include <set>
+#include <string>
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -179,12 +182,7 @@ dumpKeys()
 void
 generateName(int32 i, char* name, int32* _length)
 {
-	// We're using the index position as a hint for the length
-	// of the string - this way, it's much less expansive to
-	// test for string uniqueness.
-	// We don't want to sort the strings to have more realistic
-	// access patterns to the tree (only true for the strings test).
-	int32 length = i % (MAX_STRING - MIN_STRING) + MIN_STRING;
+	int32 length = rand() % (MAX_STRING - MIN_STRING) + MIN_STRING;
 	for (int32 i = 0; i < length; i++) {
 		int32 c = int32(52.0 * rand() / RAND_MAX);
 		if (c >= 26)
@@ -244,18 +242,6 @@ fillBuffer(void* buffer, int32 start)
 }
 
 
-bool
-findKey(void* key, int32 length, int32 maxIndex)
-{
-	for (int32 i = length; i < maxIndex; i += MAX_STRING - MIN_STRING) {
-		if (length == (int32)gKeys[i].length
-			&& !memcpy(key, gKeys[i].data, length))
-			return true;
-	}
-	return false;
-}
-
-
 status_t
 createKeys()
 {
@@ -264,18 +250,23 @@ createKeys()
 		return B_NO_MEMORY;
 
 	if (gType == S_STR_INDEX) {
+		std::set<std::string> set;
+
 		for (int32 i = 0; i < gNum; i++) {
 			char name[B_FILE_NAME_LENGTH];
 			int32 length;
 			int32 tries = 0;
-			bool last;
+			std::set<std::string>::const_iterator found;
 
 			// create unique keys!
-			do {
+			while (tries++ < 100) {
 				generateName(i, name, &length);
-			} while ((last = findKey(name, length, i)) && tries++ < 100);
+				found = set.find(string(name));
+				if (found == set.end())
+					break;
+			}
 
-			if (last) {
+			if (found != set.end()) {
 				printf("Couldn't create unique key list!\n");
 				dumpKeys();
 				bailOut();
@@ -287,6 +278,7 @@ createKeys()
 			gKeys[i].in = 0;
 			gKeys[i].count = 0;
 			gKeys[i].value = i;
+			set.insert(name);
 		}
 	} else {
 		int32 length;
@@ -437,8 +429,7 @@ addAllKeys(Transaction& transaction, BPlusTree* tree)
 		if (status != B_OK) {
 			printf("BPlusTree::Insert() returned: %s\n", strerror(status));
 			printf("key: ");
-			dumpKey(gKeys[i].data, gKeys[i].length);
-			putchar('\n');
+			bailOutWithKey(gKeys[i].data, gKeys[i].length);
 		} else {
 			gKeys[i].in++;
 			gTreeCount++;
@@ -779,7 +770,8 @@ main(int argc, char** argv)
 
 	transaction.Done();
 
-	// of course, we would have to free all our memory in a real application here...
+	// Of course, we would have to free all our memory in a real application
+	// here...
 
 	// write the cache back to the tree
 	shutdown_cache(gVolume->Device(), gVolume->BlockSize());
