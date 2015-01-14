@@ -249,7 +249,7 @@ MailProtocolConfigView::AddAuthMethod(const char* label, bool needUserPassword)
 	if (fAuthenticationField != NULL) {
 		fAuthenticationField->Menu()->AddItem(new BMenuItem(label,
 			new BMessage(needUserPassword
-				? kMsgLeaveOnServer : kMsgNoPassword)));
+				? kMsgNeedPassword : kMsgNoPassword)));
 
 		if (fAuthenticationField->Menu()->FindMarked() == NULL) {
 			BMenuItem* item = fAuthenticationField->Menu()->ItemAt(0);
