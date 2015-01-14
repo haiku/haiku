@@ -32,6 +32,7 @@
 #include <MessageFormat.h>
 #include <Mime.h>
 #include <NodeInfo.h>
+#include <Screen.h>
 #include <String.h>
 #include <StringForRate.h>
 #include <StringView.h>
@@ -218,6 +219,13 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 
 	fController->AddListener(fControllerObserver);
 	Update();
+
+	// Move window on screen if needed
+	BScreen screen(this);
+	if (screen.Frame().bottom < Frame().bottom)
+		MoveBy(0, screen.Frame().bottom - Frame().bottom);
+	if (screen.Frame().right < Frame().right)
+		MoveBy(0, screen.Frame().right - Frame().right);
 
 	Show();
 }
