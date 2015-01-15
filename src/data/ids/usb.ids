@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.01.07
-# Date:    2015-01-07 12:51:50
+# Version: 2015.01.12
+# Date:    2015-01-12 20:34:06
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -21,7 +21,6 @@
 #		interface  interface_name		<-- two tabs
 
 0001  Fry's Electronics
-	142b  Arbiter Systems, Inc.
 	7778  Counterfeit flash drive [Kingston]
 0002  Ingram
 0003  Club Mac
