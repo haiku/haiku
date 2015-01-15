@@ -239,7 +239,7 @@
 	\fn bigtime_t BInvoker::Timeout() const
 	\brief Returns the current timeout value.
 
-	\since BeOS R3
+	\since BeOS R5
 */
 
 
