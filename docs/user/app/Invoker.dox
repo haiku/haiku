@@ -1,0 +1,280 @@
+/*
+ * Copyright 2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/app/Invoker.h	hrev48680
+ *		src/kits/app/Invoker.cpp	hrev48680
+ */
+
+
+/*!
+	\file Invoker.h
+	\ingroup app
+	\ingroup libbe
+	\brief Provides the BInvoker class.
+*/
+
+
+/*!
+	\class BInvoker
+	\ingroup app
+	\ingroup libbe
+	\brief An object that can be "invoked" to send a message to a BHandler.
+
+	When Invoke() is called, the message is sent to the designated BHandler
+	known as the "target". The message is sent as a BMessage. The message is
+	not copied, rather ownership of the BMessage object is transferred to
+	the invoker.
+
+	BInvoker is most often used as a mix-in class, for example, BControl
+	derives from BInvoker as well as from BView.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BInvoker::BInvoker(BMessage* message, BMessenger messenger)
+	\brief Initializes the BInvoker with \a message and sets the target
+	       \a messenger where the message is sent when Invoke() is called.
+
+	A BMessenger can target either local or remote objects.
+
+	\sa Invoke()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BInvoker::BInvoker(BMessage* message, const BHandler* handler,
+		const BLooper* looper)
+	\brief Initializes the BInvoker with \a message and sets the target
+	       to either a local \a handler or as the preferred handler of a
+	       local \a looper where the message is sent when Invoke() is called.
+
+	\note It is not necessary to specify both the \a handler and the
+	      \a looper, the unused parameter should be passed in as \c NULL.
+
+	\sa Invoke()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BInvoker::BInvoker()
+	\brief Initializes a BInvoker without a message or target.
+
+	You must call SetTarget() to set the invoker's target before calling
+	Invoke() for the message to be sent.
+
+	You may call SetMessage() to set the message to send when calling Invoke(),
+	alternatively you may pass a BMessage to Invoke() each time you call it.
+
+	\sa Invoke()
+	\sa SetMessage()
+	\sa SetTarget()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BInvoker::~BInvoker()
+	\brief Destructor method, deletes the BMessage object if set.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BInvoker::SetMessage(BMessage* message)
+	\brief Assigns \a message to the invoker, deleting any previously
+	       assigned message.
+
+	You may pass \c NULL into \a message to delete the current message
+	without replacing it.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BMessage* BInvoker::Message() const
+	\brief Returns a pointer to the invoker's message object.
+
+	\note If a message has not been assigned to the invoker this method
+	      returns \c NULL instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn uint32 BInvoker::Command() const
+	\brief Returns the messages \c what data member.
+
+	\note If a message has not been assigned to the invoker this method
+	      returns \c NULL instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BInvoker::SetTarget(BMessenger messenger)
+	\brief Sets the invoker's target to \a messenger.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BInvoker::SetTarget(const BHandler* handler,
+		const BLooper* looper)
+	\brief Sets the target to either a local \a handler or as the preferred
+	       handler of a local \a looper.
+
+	\note It is not necessary to specify both the \a handler and the
+	      \a looper, the unused parameter should be passed in as \c NULL.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BInvoker::IsTargetLocal() const
+	\brief Returns whether or not the invoker and its target belong to the
+	       same team.
+
+	\return \c true if the invoker and its target are in the same team,
+	        \c false if they reside in separate address spaces.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BMessenger BInvoker::Messenger() const
+	\brief Returns the BMessenger object that the invoker uses to send its
+	       messages.
+
+	If a target hasn't been set yet, the returned BMessenger object will be
+	invalid.
+
+	\see BMessenger::IsValid()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BInvoker::SetHandlerForReply(BHandler* replyHandler)
+	\brief Sets the BHandler object responsible for handling reply messages.
+
+	When Invoke() is called, the \a replyHandler is passed to the messenger's
+	SendMessage() method, as follows:
+
+\code
+   messenger->SendMessage(message, replyHandler);
+\endcode
+
+	By default, the handler for replies is \c NULL, consequently all reply
+	messages will be sent to the BApplication instead.
+
+    \return Always returns \c B_OK.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BHandler* BInvoker::HandlerForReply() const
+	\brief Returns the previously set reply handler or \c NULL if not set.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BInvoker::Invoke(BMessage* message)
+	\brief Sends the \a message to the invoker's target.
+
+	If \a message is \c NULL the message previously set on the invoker is sent
+	to the invoker's target instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BInvoker::InvokeNotify(BMessage* message, uint32 kind)
+	\brief Sends the \a message to its target, using the notification code
+	       specified by \a kind.
+
+	If message is \c NULL, no message is sent to the target, but any watchers
+	of the invoker's handler will receive their expected notifications.
+	By default, \a kind is \c B_CONTROL_INVOKED, the same as sent by Invoke().
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn status_t BInvoker::SetTimeout(bigtime_t timeout)
+	\brief Sets the timeout to use when sending the message to the target.
+
+	By default the timeout is set to \c B_INFINITE_TIMEOUT.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn bigtime_t BInvoker::Timeout() const
+	\brief Returns the current timeout value.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn uint32 BInvoker::InvokeKind(bool* _notify)
+	\brief Returns the kind set by InvokeNotify().
+
+	Derived classes should implement this method and call it from within
+	Invoke() to determine what kind was specified when InvokeNotify()
+	was called.
+
+	If you care whether Invoke() or InvokeNotify() was originally called,
+	you can use a bool pointer and set it's value to \c true if InvokeNotify()
+	was called, or \c false if Invoke() was called. This lets you fetch the
+	InvokeNotify() arguments from Invoke() without breaking binary compatibility
+	with older applications.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn void BInvoker::BeginInvokeNotify(uint32 kind)
+	\brief Implement this method to set up an InvokeNotify() context.
+
+	This is used by derive classes to emulate an InvokeNotify() call inside of
+	Invoke() without breaking binary compatibility.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn void BInvoker::EndInvokeNotify()
+	\brief \brief Implement this method to tear down an InvokeNotify() context.
+
+	\since BeOS R5
+*/
