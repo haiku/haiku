@@ -51,10 +51,10 @@ Volume::Mount(const char* parameterString)
 {
 	const char* source = NULL;
 	void* parameterHandle = parse_driver_settings_string(parameterString);
-	if (parameterHandle != NULL) {
+	CObjectDeleter<void, status_t> parameterDeleter(parameterHandle,
+		delete_driver_settings);
+	if (parameterHandle != NULL)
 		source = get_driver_parameter(parameterHandle, "source", NULL, NULL);
-		delete_driver_settings(parameterHandle);
-	}
 	if (source == NULL || source[0] == '\0') {
 		ERROR("need source folder ('source' parameter)!\n");
 		RETURN_ERROR(B_BAD_VALUE);
