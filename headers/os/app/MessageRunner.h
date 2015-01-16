@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MESSAGE_RUNNER_H
@@ -41,8 +41,7 @@ public:
 
 private:
 								BMessageRunner(const BMessageRunner &);
-								BMessageRunner &operator=(
-									const BMessageRunner &);
+			BMessageRunner&		operator=(const BMessageRunner&);
 
 	static	int32				_RegisterRunner(BMessenger target,
 									const BMessage* message, bigtime_t interval,
