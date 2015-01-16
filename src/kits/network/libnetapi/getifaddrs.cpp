@@ -33,13 +33,28 @@ int getifaddrs(struct ifaddrs **ifap)
 
 	struct ifaddrs* previous = NULL;
 	struct ifaddrs* current = NULL;
-	BNetworkInterface* interface = new BNetworkInterface();
+	BNetworkInterface* interface = new(std::nothrow) BNetworkInterface();
+	if (interface == NULL) {
+		errno = B_NO_MEMORY;
+		return -1;
+	}
 
 	while (roster.GetNextInterface(&cookie, *interface) == B_OK) {
 		BNetworkInterfaceAddress address;
 		int32 i = 0;
 		while (interface->GetAddressAt(i++, address) == B_OK) {
-			current = new ifaddrs();
+			if (interface == NULL) {
+				freeifaddrs(previous);
+				errno = B_NO_MEMORY;
+				return -1;
+			}
+
+			current = new(std::nothrow) ifaddrs();
+			if (current == NULL) {
+				freeifaddrs(previous);
+				errno = B_NO_MEMORY;
+				return -1;
+			}
 
 			// Chain this interface with the next one
 			current->ifa_next = previous;
@@ -55,7 +70,7 @@ int getifaddrs(struct ifaddrs **ifap)
 			current->ifa_dstaddr = new sockaddr(address.Destination().SockAddr());
 		}
 
-		interface = new BNetworkInterface();
+		interface = new(std::nothrow) BNetworkInterface();
 	}
 
 	delete interface;
@@ -65,7 +80,8 @@ int getifaddrs(struct ifaddrs **ifap)
 }
 
 
-void freeifaddrs(struct ifaddrs *ifa)
+void
+freeifaddrs(struct ifaddrs *ifa)
 {
 	struct ifaddrs* next;
 	BNetworkInterface* interface = NULL;
