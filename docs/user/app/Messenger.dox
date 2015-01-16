@@ -16,7 +16,8 @@
 	\file Messenger.h
 	\ingroup app
 	\ingroup libbe
-	\brief Provides the BMessenger class.
+	\brief Provides the BMessenger class and some BMessenger operator
+	       functions.
 */
 
 
@@ -478,4 +479,29 @@
 	\brief Returns a hash value that uniquely identifies the messenger.
 
 	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool operator<(const BMessenger& _a, const BMessenger& _b)
+	\brief Returns whether the first messenger is less than the second one.
+
+	This method defines an order on BMessengers based on their member
+	variables \c fPort, \c fHandlerToken and \c fPreferredTarget.
+
+	\param _a The first messenger.
+	\param _b The second messenger.
+
+	\return \c true, if \a a was less than \a b, \c false otherwise.
+*/
+
+
+/*!	\fn bool operator!=(const BMessenger& a, const BMessenger& b)
+	\brief Returns whether two BMessengers do NOT have the same target.
+
+	\param a The first messenger.
+	\param b The second messenger.
+
+	\return \c false, if \a a and \a b had the same targets or both were not
+	        properly initialized, \c true otherwise.
 */

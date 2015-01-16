@@ -415,17 +415,9 @@ BMessenger::_InitData(const BHandler* handler, const BLooper* looper,
 }
 
 
-/*!	Returns whether the first one of two BMessengers is less than the
-	second one.
+//	#pragma mark - Operator functions
 
-	This method defines an order on BMessengers based on their member
-	variables \c fPort, \c fHandlerToken and \c fPreferredTarget.
 
-	\param a The first messenger.
-	\param b The second messenger.
-
-	\return \c true, if \a a is less than \a b, \c false otherwise.
-*/
 bool
 operator<(const BMessenger& _a, const BMessenger& _b)
 {
@@ -446,14 +438,6 @@ operator<(const BMessenger& _a, const BMessenger& _b)
 }
 
 
-/*!	Returns whether two BMessengers have not the same target.
-
-	\param a The first messenger.
-	\param b The second messenger.
-
-	\return \c false, if \a a and \a b have the same targets or are both not
-	        properly initialized, \c true otherwise.
-*/
 bool
 operator!=(const BMessenger& a, const BMessenger& b)
 {
