@@ -34,7 +34,7 @@
 	The most significant (set of) method(s) in the class is SendMessage(),
 	which sends its message to the target. For a local target SendMessage()
 	is roughly equivalent in terms of efficiency to posting a message
-	directly to the BMessenger's target (i.e. BLooper::PostMessage()).
+	directly to the messenger's target (i.e. BLooper::PostMessage()).
 
 	The global \a be_app_messenger pointer targets the main message
 	loop of \a be_app is automatically initialized for you when you create
@@ -496,7 +496,8 @@
 */
 
 
-/*!	\fn bool operator!=(const BMessenger& a, const BMessenger& b)
+/*!
+	\fn bool operator!=(const BMessenger& a, const BMessenger& b)
 	\brief Returns whether two BMessengers do NOT have the same target.
 
 	\param a The first messenger.
