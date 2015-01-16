@@ -3,6 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *		Axel Dörfler, axeld@pinc-software.de
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
@@ -25,13 +27,13 @@
 	\ingroup libbe
 	\brief An object that can be "invoked" to send a message to a BHandler.
 
-	When Invoke() is called, the message is sent to the designated BHandler
-	known as the "target". The message is sent as a BMessage. The message is
-	not copied, rather ownership of the BMessage object is transferred to
-	the invoker.
+	The designated BHandler of a BInvoker is known as its "target".
 
 	BInvoker is most often used as a mix-in class, for example, BControl
 	derives from BInvoker as well as from BView.
+
+	\sa Invoke()
+	\sa SetTarget(const BHandler*, const BLooper*) for details.
 
 	\since BeOS R3
 */
@@ -44,7 +46,7 @@
 
 	A BMessenger can target either local or remote objects.
 
-	\sa Invoke()
+	\sa SetMessage() for details.
 
 	\since BeOS R3
 */
@@ -61,6 +63,7 @@
 	      \a looper, the unused parameter should be passed in as \c NULL.
 
 	\sa Invoke()
+	\sa SetTarget(const BHandler*, const BLooper*) for details.
 
 	\since BeOS R3
 */
@@ -100,6 +103,11 @@
 	You may pass \c NULL into \a message to delete the current message
 	without replacing it.
 
+	When Invoke() is called, the message is sent to the designated BHandler
+	known as the "target". The message is sent as a BMessage. The message is
+	not copied, rather ownership of the BMessage object is transferred to
+	the invoker.
+
 	\since BeOS R3
 */
 
@@ -117,7 +125,7 @@
 
 /*!
 	\fn uint32 BInvoker::Command() const
-	\brief Returns the messages \c what data member.
+	\brief Returns the message's \c what data member.
 
 	\note If a message has not been assigned to the invoker this method
 	      returns \c NULL instead.
@@ -142,6 +150,13 @@
 
 	\note It is not necessary to specify both the \a handler and the
 	      \a looper, the unused parameter should be passed in as \c NULL.
+
+	If given a \a handler, it must be attached to a BLooper. The message
+	is always sent to a BLooper which distributes the message to the
+	correct handler (which might be the \a looper itself).
+
+	The preferred handler, i.e. for a window, is the view that currently
+	has focus.
 
 	\since BeOS R3
 */
@@ -221,6 +236,9 @@
 	of the invoker's handler will receive their expected notifications.
 	By default, \a kind is \c B_CONTROL_INVOKED, the same as sent by Invoke().
 
+	\sa BLooper::StartWatching()
+	\sa BHandler::NoticeChange()
+
 	\since BeOS R5
 */
 
@@ -229,7 +247,10 @@
 	\fn status_t BInvoker::SetTimeout(bigtime_t timeout)
 	\brief Sets the timeout to use when sending the message to the target.
 
-	By default the timeout is set to \c B_INFINITE_TIMEOUT.
+	By default the timeout is set to \c B_INFINITE_TIMEOUT. The \a timeout
+	value is passed into the timeout parameter of BMessenger::SendMessage().
+
+	\sa BMessenger::SendMessage(BMessage*, BHandler*, bigtime_t) for details.
 
 	\since BeOS R5
 */
