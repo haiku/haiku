@@ -1,0 +1,267 @@
+/*
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
+ * Corresponds to:
+ *		headers/os/app/MessageRunner.h	hrev48689
+ *		src/kits/app/MessageRunner.cpp	hrev48689
+ */
+
+
+/*!
+	\file MessageRunner.h
+	\ingroup app
+	\ingroup libbe
+	\brief Provides the BMessageRunner class.
+*/
+
+
+/*!
+	\class BMessageRunner
+	\ingroup app
+	\ingroup libbe
+	\brief Provides a mechanism for sending one or more messages
+	       to a messenger at a specified interval and receive
+	       reply messages.
+
+	The application that creates the BMessageRunner can specify the message,
+	the BMessenger to send the message to, how often to send the message,
+	how many times to send the message, and the BMessenger to send reply
+	messages from.
+
+	The system roster handles dispatching the messages to the appropriate
+	messengers at the specified time intervals. The target for any reply
+	messages is \c be_app_messenger by default, or it can be specified in the
+	constructor.
+
+	After initializing a BMessageRunner, the initialization can and should be
+	checked by calling InitCheck(). BMessageRunner will not take ownership of
+	the message, you may freely change or delete the message after
+	initialization.
+
+	The BMessageRunner can be reconfigured (to change the interval or count)
+	by calling SetInterval() and SetCount(). This is useful if you want to stop
+	a BMessageRunner from sending messages early or if messages are set to
+	be sent forever.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn BMessageRunner::BMessageRunner(BMessenger target,
+		const BMessage* message, bigtime_t interval, int32 count)
+	\brief Creates and initializes a new BMessageRunner and instructs the
+	       system roster to send the specified \a message to the \a target
+	       \a count times every \a interval microseconds, reply messages are
+	       sent to \c be_app_messenger.
+
+	\param target The target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+	       between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+	       A negative value indicates that the message will be sent
+	       forever, or until the BMessageRunner is reconfigured or deleted.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn BMessageRunner::BMessageRunner(BMessenger target,
+		const BMessage& message, bigtime_t interval, int32 count)
+	\brief Creates and initializes a new BMessageRunner and instructs the
+	       system roster to send the specified \a message to the \a target
+	       \a count times every \a interval microseconds, reply messages are
+	       sent to \c be_app_messenger.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+	       between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+	       A negative value indicates that the message will be sent
+	       forever, or until the BMessageRunner is reconfigured or deleted.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BMessageRunner::BMessageRunner(BMessenger target,
+		const BMessage* message, bigtime_t interval, int32 count,
+		BMessenger replyTo)
+	\brief Creates and initializes a new BMessageRunner and instructs the
+	       system roster to send the specified \a message to the \a target
+	       \a count times every \a interval microseconds.
+
+	This constructor also allows you to specify the target for replies to
+	the delivered messages.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+	       between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+	       A negative value indicates that the message will be sent
+	       forever, or until the BMessageRunner is reconfigured or deleted.
+	\param replyTo Target replies to the delivered message(s) shall be sent to.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn BMessageRunner::BMessageRunner(BMessenger target,
+		const BMessage& message, bigtime_t interval, int32 count,
+		BMessenger replyTo)
+	\brief Creates and initializes a new BMessageRunner and instructs the
+	       system roster to send the specified \a message to the \a target
+	       \a count times every \a interval microseconds.
+
+	This constructor also allows you to specify the target for replies to
+	the delivered messages.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+	       between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+	       A negative value indicates that the message will be sent
+	       forever, or until the BMessageRunner is reconfigured or deleted.
+	\param replyTo Target replies to the delivered message(s) shall be sent to.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BMessageRunner::~BMessageRunner()
+	\brief Frees all resources associated with the object.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn status_t BMessageRunner::InitCheck() const
+	\brief Returns the initialization status.
+
+	\note As soon as the last message is sent, the message runner
+	      becomes unusable. InitCheck() will still return \c B_OK, but
+	      SetInterval(), SetCount() and GetInfo() will all fail.
+
+	\return \c B_OK if the object was properly initialized or an error code
+	        otherwise.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn status_t BMessageRunner::SetInterval(bigtime_t interval)
+	\brief Sets the interval of time between messages.
+
+	\param interval The new interval in microseconds.
+
+	\return A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The message runner was not properly initialized.
+	\retval B_BAD_VALUE \a interval was \c 0 or negative, or the message runner
+	        had already sent all messages and became unusable.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn status_t BMessageRunner::SetCount(int32 count)
+	\brief Sets the number of times message should be sent.
+
+	\param count Specifies how many times the message shall be sent.
+	       A negative value indicates that the message will be sent
+	       forever, or until the BMessageRunner is reconfigured or deleted.
+
+	\return A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The message runner was not properly initialized.
+	\retval B_BAD_VALUE \a interval was \c 0 or negative, or the message runner
+	        had already sent all messages and became unusable.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn status_t BMessageRunner::GetInfo(bigtime_t* interval,
+		int32* count) const
+	\brief Returns the time interval between two messages and the number of
+	       times the message has still to be sent.
+
+	Both parameters (\a interval and \a count) may be \c NULL.
+
+	\param interval Pointer to a pre-allocated bigtime_t variable to be set
+	       to the time interval. May be \c NULL.
+	\param count Pointer to a pre-allocated int32 variable to be set
+	       to the number of times the message has still to be sent.
+	       May be \c NULL.
+
+	\return A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_VALUE \a interval was 0 or negative, or the message runner
+	        had already sent all messages and became unusable.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn status_t BMessageRunner::StartSending(BMessenger target,
+		const BMessage* message, bigtime_t interval, int32 count)
+	\brief Creates and initializes a detached BMessageRunner and instructs the
+	       system roster to send the specified \a message to the \a target
+	       \a count times every \a interval microseconds, reply messages are
+	       sent to \c be_app_messenger.
+
+	You cannot alter the runner after the creation, and it will be deleted
+	automatically the last message is sent.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+		   between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+	       A negative value indicates that the message will be sent
+	       forever, or until the BMessageRunner is reconfigured or deleted.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMessageRunner::StartSending(BMessenger target,
+		const BMessage* message, bigtime_t interval, int32 count,
+		BMessenger replyTo)
+	\brief Creates and initializes a detached BMessageRunner and instructs the
+	       system roster to send the specified \a message to the \a target
+	       \a count times every \a interval microseconds.
+
+	You cannot alter the runner after the creation, and it will be deleted
+	automatically once the last message is sent.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+	       between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+	       A negative value indicates that the message will be sent
+	       forever, or until the BMessageRunner is reconfigured or deleted.
+	\param replyTo Target replies to the delivered message(s) shall be sent to.
+
+	\since Haiku R1
+*/
