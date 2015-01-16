@@ -1,0 +1,481 @@
+/*
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *
+ * Corresponds to:
+ *		headers/os/app/Messenger.h	hrev48689
+ *		src/kits/app/Messenger.cpp	hrev48689
+ */
+
+
+/*!
+	\file Messenger.h
+	\ingroup app
+	\ingroup libbe
+	\brief Provides the BMessenger class.
+*/
+
+
+/*!
+	\class BMessenger
+	\ingroup app
+	\ingroup libbe
+	\brief A class to send messages to a target BLooper or BHandler.
+
+	A BMessenger can send messages to local and remote targets. If the target
+	belongs to the same team as the BMessenger it is a local target, otherwise
+	if the target lives in a separate address space it is a remote target.
+
+	The most significant (set of) method(s) in the class is SendMessage(),
+	which sends its message to the target. For a local target SendMessage()
+	is roughly equivalent in terms of efficiency to posting a message
+	directly to the BMessenger's target (i.e. BLooper::PostMessage()).
+
+	The global \a be_app_messenger pointer targets the main message
+	loop of \a be_app is automatically initialized for you when you create
+	a BApplication object, you can use it wherever a BMessenger is called for.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BMessenger::BMessenger()
+	\brief Creates an uninitialized BMessenger.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BMessenger::BMessenger(const char* signature, team_id team,
+		status_t* result)
+	\brief Creates a BMessenger and initializes it to target the already
+	       running application identified by its signature and/or team ID.
+
+	When only a \a signature is given, and multiple instances of the application
+	are running it is indeterminate which one is chosen as the target. In case
+	only a \a team ID is passed, the target application is identified uniquely.
+	If both are supplied, the application identified by the \a team ID must have
+	a matching signature, otherwise the initialization fails.
+
+	\param signature The target application's signature. May be \c NULL.
+	\param team The target application's team ID. May be < 0.
+	\param result An optional pointer to a pre-allocated status_t into which
+	       the result of the initialization is written.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BMessenger::BMessenger(const BHandler* handler, const BLooper* looper,
+		status_t* _result)
+	\brief Creates a BMessenger and initializes it to target the local
+	       BHandler and/or BLooper.
+
+	When a \c NULL \a handler is supplied, the preferred handler in the
+	\a looper is targeted. If no \a looper is supplied the looper that \a handler
+	belongs to is used instead -- that means in particular, that the \a handler
+	must already belong to a looper. If both are supplied the \a handler must
+	belong to the \a looper.
+
+	\param handler The target handler. May be \c NULL.
+	\param looper The target looper. May be \c NULL.
+	\param _result An optional pointer to a pre-allocated status_t into which
+		   the result of the initialization is written.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn	BMessenger::BMessenger(const BMessenger& other)
+	\brief Creates a BMessenger and initializes it to have the same target
+	       as the supplied messenger.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn	BMessenger::~BMessenger()
+	\brief Frees all resources associated with this object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\name Target
+*/
+
+
+//! @{
+
+
+/*!
+	\fn	bool BMessenger::IsTargetLocal() const
+	\brief Returns whether the messenger and target belong to the same team.
+
+	\return \c true if the messenger is properly initialized and its target
+	        belong ot the same team, \c false if they reside in separate
+	        address spaces.
+
+	\since BeOS R3
+*/
+
+
+
+/*!
+	\fn BHandler* BMessenger::Target(BLooper** _looper) const
+	\brief Returns the handler and looper targeted by the messenger
+	       (if the target is local).
+
+	The handler is returned directly, the looper by reference. If both are
+	\c NULL, the object is either not properly initialized, the target
+	objects have been deleted or the target is remote. If only the returned
+	handler is \c NULL, either the looper's preferred handler is targeted or
+	the handler has been deleted.
+
+	\param _looper A pointer to a pre-allocated BLooper pointer into which
+	               the pointer to the targeted looper is written.
+
+	\return The BHandler targeted by the messenger.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn	bool BMessenger::LockTarget() const
+	\brief Locks the BLooper targeted by the messenger
+	       (if the target is local).
+
+	This method is a shorthand for retrieving the targeted looper via
+	Target() and calling BLooper::Lock() on the looper afterwards.
+
+	\see BLooper::Lock() for details.
+
+	\return \c true, if the looper was locked successfully, \c false, if
+	        the messenger was not properly initialized, the target was remote,
+	        or the targeted looper was invalid.
+
+	\since BeOS R3
+*/
+
+
+
+/*!
+	\fn status_t BMessenger::LockTargetWithTimeout(bigtime_t timeout) const
+	\brief Locks the BLooper targeted by the messenger with a \a timeout
+	       (if the target is local).
+
+	This method is a shorthand for retrieving the targeted looper via
+	Target() and calling BLooper::LockWithTimeout() on the looper afterwards.
+
+	\see BLooper::LockWithTimeout() for details.
+
+	\return A status code, \c B_OK on success or an error code otherwise,
+	        all other error codes returned by BLooper::LockWithTimeout().
+	\retval B_OK if the looper could be locked successfully,
+	\retval B_BAD_VALUE if the messenger is not properly initialized,
+	        the target is remote, or the targeted looper is invalid.
+
+	\see BLooper::LockWithTimeout() for more error codes.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\name SendMessage
+*/
+
+
+//! @{
+
+
+/*!
+	\fn	status_t BMessenger::SendMessage(uint32 command, BHandler* replyTo) const
+	\brief Delivers a BMessage with a \c what parameter set to \a command
+	       synchronously to the messenger's target, without waiting for a reply.
+
+	If the target's message port is full, the method waits indefinitely, until
+	space becomes available in the port. After delivery the method returns
+	immediately. It does not wait until the target processes the message or
+	even sends a reply.
+
+	\param command The what field of the message to deliver.
+	\param replyTo The handler to which a reply to the message shall be sent.
+	       May be \c NULL.
+
+	\return A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_PORT_ID The messenger is not properly initialized or its
+	        target doesn't exist anymore.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BMessenger::SendMessage(BMessage* message, BHandler* replyTo,
+		bigtime_t timeout) const
+	\brief Delivers a BMessage synchronously to the messenger's target,
+	       without waiting for a reply.
+
+	A copy of the supplied message is sent and the caller retains ownership
+	of \a message.
+
+	If the target's message port is full, the method waits until space becomes
+	available in the port or the specified timeout occurs (whichever happens
+	first). After delivery the method returns immediately. It does not wait
+	until the target processes the message or even sends a reply.
+
+	\param message The message to be sent.
+	\param replyTo The handler to which a reply to the message shall be sent.
+	       May be \c NULL.
+	\param timeout A timeout for the delivery of the message.
+
+	\return A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_PORT_ID The messenger was not properly initialized or its
+	        target didn't exist.
+	\retval B_WOULD_BLOCK A delivery timeout of 0 was supplied and the target
+	        port was full when trying to deliver the message.
+	\retval B_TIMED_OUT The timeout expired while trying to deliver the
+	        message.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn	status_t BMessenger::SendMessage(BMessage* message, BMessenger replyTo,
+		bigtime_t timeout) const
+	\brief Delivers a BMessage synchronously to the messenger's target,
+	       without waiting for a reply.
+
+	A copy of the supplied message is sent and the caller retains ownership
+	of \a message.
+
+	If the target's message port is full, the method waits until space becomes
+	available in the port or the specified timeout occurs (whichever happens
+	first). After delivery the method returns immediately. It does not wait
+	until the target processes the message or even sends a reply.
+
+	\param message The message to be sent.
+	\param replyTo A messenger specifying the target for a reply to \a message.
+	\param timeout A timeout for the delivery of the message.
+
+	\return A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_PORT_ID The messenger was not properly initialized or its
+	        target didn't exist.
+	\retval B_WOULD_BLOCK A delivery timeout of 0 was supplied and the target
+	        port was full when trying to deliver the message.
+	\retval B_TIMED_OUT The timeout expired while trying to deliver the
+	        message.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn	status_t BMessenger::SendMessage(uint32 command, BMessage* reply) const
+	\brief Delivers a BMessage with a \c what parameter set to \a command
+	       synchronously to the messenger's target and waits for a reply.
+
+	The method does wait for a reply. The reply message is copied into
+	\a reply. If the target doesn't send a reply, the \c what field of
+	\a reply is set to \c B_NO_REPLY.
+
+	\param command The what field of the message to deliver.
+	\param reply A pointer to a pre-allocated BMessage into which the reply
+	       message will be copied.
+
+	\return A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_PORT_ID The messenger was not properly initialized or its
+	        target didn't exist.
+	\retval B_NO_MORE_PORTS All reply ports were in use.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn	status_t BMessenger::SendMessage(BMessage* message, BMessage* reply,
+		bigtime_t deliveryTimeout, bigtime_t replyTimeout) const
+	\brief Delivers a BMessage synchronously to the messenger's target and
+	       waits for a reply.
+
+	A copy of the supplied message is sent and the caller retains ownership
+	of \a message.
+
+	The method does wait for a reply. The reply message is copied into
+	\a reply. If the target doesn't send a reply or if a reply timeout occurs,
+	the \c what field of \a reply is set to \c B_NO_REPLY.
+
+	\param message The message to be sent.
+	\param reply A pointer to a pre-allocated BMessage into which the reply
+		   message will be copied.
+	\param deliveryTimeout A timeout for the delivery of the message.
+	\param replyTimeout A timeout for waiting for the reply.
+
+	\return A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK Everything went fine.
+	\retval B_BAD_PORT_ID The messenger was not properly initialized or its
+	        target didn't exist.
+	\retval B_WOULD_BLOCK A delivery timeout of 0 was supplied and the target
+	        port was full when trying to deliver the message.
+	\retval B_TIMED_OUT The timeout expired while trying to deliver the
+	        message.
+	\retval B_NO_MORE_PORTS All reply ports were in use.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\name SetTo
+*/
+
+
+//! @{
+
+
+/*!
+	\fn	status_t BMessenger::SetTo(const char* signature, team_id team)
+	\brief Reinitializes a BMessenger to target the already running application
+	       identified by the supplied signature and/or team ID.
+
+	When only a signature is given, and multiple instances of the application
+	are running it is indeterminate which one is chosen as the target. In case
+	only a team ID is passed, the target application is identified uniquely.
+	If both are supplied, the application identified by the team ID must have
+	a matching signature, otherwise the initialization fails.
+
+	\param signature The target application's signature. May be \c NULL.
+	\param team The target application's team ID. May be negative.
+
+	\return A status code, \c B_OK if the reinitialization was successful or an
+	        error code otherwise.
+	\retval B_OK The reinitialization was successful.
+	\retval B_BAD_VALUE No application with the given \a signature or \a team
+	        ID was running.
+	\retval B_BAD_TYPE No \a team ID was given and the \a signature was \c NULL.
+	\retval B_MISMATCHED_VALUES The supplied \a signature and the signature of
+	        the team didn't match.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn	status_t BMessenger::SetTo(const BHandler* handler,
+		const BLooper* looper)
+	\brief Reinitializes a BMessenger to target the local BHandler and/or
+	       BLooper.
+
+	When a \c NULL handler is supplied, the preferred handler in the given
+	looper is targeted. If no looper is supplied the looper the given handler
+	belongs to is used -- that means in particular, that the handler must
+	already belong to a looper. If both are supplied the handler must actually
+	belong to looper.
+
+	\param handler The target handler. May be \c NULL.
+	\param looper The target looper. May be \c NULL.
+
+	\return A status code, \c B_OK if the reinitialization was successful or an
+	        error code otherwise.
+	\retval B_OK The reinitialization was successful.
+	\retval B_BAD_VALUE Both \a handler and \a looper were \c NULL or invalid.
+	\retval B_MISMATCHED_VALUES The looper of the supplied \a handler and
+	        \a looper didn't match.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Operators
+*/
+
+
+//! @{
+
+
+/*!
+	\fn	BMessenger& BMessenger::operator=(const BMessenger& other)
+	\brief Assignment operator, makes this BMessenger a copy of \a other.
+
+	\param other the messenger to be copied.
+
+	\return A reference to this object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn	bool BMessenger::operator==(const BMessenger& other) const
+	\brief Comparison operator, returns whether this and \a other have the same
+	       target.
+
+	\param other The messenger to be compared to.
+
+	\return \c true, if the messengers have the same target or if both aren't
+	        properly initialized, \c false otherwise.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\fn	bool BMessenger::IsValid() const
+	\brief Returns whether the messenger's target looper still exists.
+
+	\warning This method does not check whether the target handler
+	         also still exists.
+
+	\return \c true, if the messenger's target looper still exists,
+	        \c false otherwise.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn	team_id BMessenger::Team() const
+	\brief Returns the ID of the team that the messenger's target belongs to.
+
+	\return The team of the messenger's target.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn	uint32 BMessenger::HashValue() const
+	\brief Returns a hash value that uniquely identifies the messenger.
+
+	\since Haiku R1
+*/
