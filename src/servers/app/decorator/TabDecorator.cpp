@@ -465,14 +465,16 @@ TabDecorator::_SetTitle(Decorator::Tab* tab, const char* string,
 {
 	// TODO: we could be much smarter about the update region
 
-	BRect rect = TabRect(tab);
+	BRect rect = TabRect((int32) 0) | TabRect(CountTabs() - 1);
+		// Get a rect of all the tabs
 
 	_DoLayout();
 
 	if (updateRegion == NULL)
 		return;
 
-	rect = rect | TabRect(tab);
+	rect = rect | TabRect(CountTabs() - 1);
+		// Update the rect to guarantee it updates all the tabs
 
 	rect.bottom++;
 		// the border will look differently when the title is adjacent
