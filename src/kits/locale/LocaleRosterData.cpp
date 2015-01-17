@@ -24,8 +24,10 @@
 #include <Locale.h>
 #include <Node.h>
 #include <Path.h>
+#include <PathFinder.h>
 #include <Roster.h>
 #include <String.h>
+#include <StringList.h>
 #include <TimeZone.h>
 
 // ICU includes
@@ -333,36 +335,16 @@ LocaleRosterData::_InitializeCatalogAddOns()
 	defaultCatalogAddOnInfo->fCreateFunc = DefaultCatalog::Create;
 	fCatalogAddOnInfos.AddItem((void*)defaultCatalogAddOnInfo);
 
-	directory_which folders[] = {
-		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-		B_USER_ADDONS_DIRECTORY,
-		B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-		B_SYSTEM_ADDONS_DIRECTORY,
-	};
+	BStringList folders;
+	BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "locale/catalogs/",
+		B_FIND_PATH_EXISTING_ONLY, folders);
+
 	BPath addOnPath;
 	BDirectory addOnFolder;
 	char buf[4096];
 	status_t err;
-	for (uint32 f = 0; f < sizeof(folders) / sizeof(directory_which); ++f) {
-		find_directory(folders[f], &addOnPath);
-		BString addOnFolderName(addOnPath.Path());
-		addOnFolderName << "/locale/catalogs";
-
-		system_info info;
-		if (get_system_info(&info) == B_OK
-				&& (info.abi & B_HAIKU_ABI_MAJOR)
-				!= (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR)) {
-			switch (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR) {
-				case B_HAIKU_ABI_GCC_2:
-					addOnFolderName << "/gcc2";
-					break;
-				case B_HAIKU_ABI_GCC_4:
-					addOnFolderName << "/gcc4";
-					break;
-			}
-		}
-
-
+	for (int32 f = 0; f < folders.CountStrings(); f++) {
+		BString addOnFolderName = folders.StringAt(f);
 		err = addOnFolder.SetTo(addOnFolderName.String());
 		if (err != B_OK)
 			continue;
@@ -374,12 +356,14 @@ LocaleRosterData::_InitializeCatalogAddOns()
 		BNode node;
 		BEntry entry;
 		dirent* dent;
-		while ((count = addOnFolder.GetNextDirents((dirent*)buf, 4096)) > 0) {
+		while ((count = addOnFolder.GetNextDirents((dirent*)buf, sizeof(buf)))
+				> 0) {
 			dent = (dirent*)buf;
 			while (count-- > 0) {
-				if (strcmp(dent->d_name, ".") && strcmp(dent->d_name, "..")
-						&& strcmp(dent->d_name, "gcc2")
-						&& strcmp(dent->d_name, "gcc4")) {
+				if (strcmp(dent->d_name, ".") != 0
+						&& strcmp(dent->d_name, "..") != 0
+						&& strcmp(dent->d_name, "x86") != 0
+						&& strcmp(dent->d_name, "x86_gcc2") != 0) {
 					// we have found (what should be) a catalog-add-on:
 					eref.device = dent->d_pdev;
 					eref.directory = dent->d_pino;
