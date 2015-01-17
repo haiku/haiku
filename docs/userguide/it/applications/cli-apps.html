@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -94,18 +94,22 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
-<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> è un semplice metodo per aspettare che una particolare applicazione venga avviata o terminata.</p>
+<tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
+<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... Thanks to Scot Hacker's BeOS Bible, there's a nice <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">query</span> è la versione su riga di comando del pannello Trova. Infatti, un modo rapido per generare i termini di ricerca è creare una query nel pannello Trova, selezionando <span class="menu">per formula</span>, e aggiungendo le doppie virgolette (<tt>"</tt>) in testa e in coda, successivamente si incolla l'intera stringa dopo il comando <span class="cli">query</span> nel Terminale o nello script che si sta realizzando.</p></td></tr></table>
+		<td valign="top"><p><span class="cli">query</span> è la versione su riga di comando del pannello Trova. Infatti, un modo rapido per generare i termini di ricerca è creare una query nel pannello Trova, selezionando <span class="menu">per formula</span>, e aggiungendo le doppie virgolette (<tt>"</tt>) in testa e in coda, successivamente si incolla l'intera stringa dopo il comando <span class="cli">query</span> nel Terminale o nello script che si sta realizzando.</p></td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">waitfor</span> è un semplice metodo per aspettare che una particolare applicazione venga avviata o terminata.</p>
+</td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-other" name="cli-other">Altri comandi</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> è un'applicazione importante per verificare la presenza di errori nel filesystem. Basta aggiungere il nome del volume o del dispositivo e il programma esaminerà ogni file e correrreggerà eventuali inconsistenze dove possibile.</p></td></tr>
+		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add a volume name like <span class="path">/Haiku</span> or device path and it'll run through every file and correct inconsistencies where possible.</p>
+</td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> può aggiungere un'icona per qualsiasi file, cartella, query o applicazione da mostrare nella Deskbar. Offre anche un'opzione che permette di mostrare un menù contestuale quando, per eseguire azioni speciali, si fa clic con il tasto destro su un'icona. Per esempio, digitate nel terminale quanto segue per aggiungere alla Deskbar il programma su riga di comando <span class="app">screenshot</span> con le varie opzioni (il "<tt>\</tt>" nella prima riga serve semplicemente per segnalare l'andata a capo al Terminale):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \

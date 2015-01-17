@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -88,11 +88,14 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
-<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> 是一个用于等待特殊的程序或者进程启动或者终止的非常好的方式。</p>
+<tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
+<td valign="top"><p><span class="cli">hey</span> 是一个小巧的帮助工具，可以发送 BMessages 给应用，并打印出回复结果。它可以用于应用脚本，例如，通过命令行或者脚本 “远程控制” 一个程序。它的使用会有一点复杂。非常感谢 Scot Hacker 的 BeOS 圣经，其中有一个 Chris Herborth 编写的 <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html"> hey 入门指南</a>。 </p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> 是查询面板的命令行版本。实际上，一个创建搜索项目的快速方式是在搜索面板创建一个查询，选择 <span class="menu">by formula</span> ，在查询词的前后添加双引号（<tt>"</tt>），然后在终端或者脚本中的 <span class="cli">query</span> 命令之后粘贴所要查找的整个查询词。</p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">waitfor</span> 是一个用于等待特殊的程序或者进程启动或者终止的非常好的方式。</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -100,10 +103,10 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> 是一个非常重要的工具，主要用于检查文件系统中的错误。只需在该命令之后添加磁卷或者设备名，它就会遍历所有的文件，然后修复所有可能出现不一致的地方。</p>
+		<td><p><span class="cli">checkfs</span>是一个非常重要的工具，主要用于检查文件系统中的错误。只需在该命令之后添加磁卷，如  <span class="path">/Haiku</span> 或者设备名，它就会遍历所有的文件，然后修复所有可能出现不一致的地方。</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> 可以为任何文件，文件夹，查询或者程序在桌面栏托盘中安装图标。它也可以为相应的图标提供一个右键菜单。例如，尝试下面的脚本，为 <span class="app">Screenshot</span> 添加不同的选项 （第一行中的"<tt>\</tt>" 用于在终端中进行换行）：
+		<td valign="top"><p><span class="cli">desklink</span>可以为任何文件，文件夹，查询或者程序在桌面栏托盘中安装图标。它也可以为相应的图标提供一个右键菜单。例如，尝试下面的脚本，为 <span class="app">Screenshot</span> 添加不同的选项 （第一行中的"<tt>\</tt>" 用于在终端中进行换行）：
 </p>
 <pre class="terminal">desklink "cmd=Active window (2s):/boot/system/apps/Screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=Screenshot" /boot/system/apps/Screenshot
@@ -111,10 +114,10 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">diskimage</span> 可用于注册普通文件作为磁盘设备。例如，您可以注册 Haiku anyboot 镜像，将其挂载在文件浏览器中，并且可以在安装器使用之前，编辑和移动其中的文件。</p>
+		<td valign="top"><p><span class="cli">diskimage</span>可用于注册普通文件作为磁盘设备。例如，您可以注册 Haiku anyboot 镜像，将其挂载在文件浏览器中，并且可以在安装器使用之前，编辑和移动其中的文件。</p>
 </td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> 是一个非常小巧的工具。通过它，您可以以默认的程序打开任何文件，或者利用程序的签名还打开该程序而无需知道它的路径。它也可以用于打开网页，甚至“虚拟” 的目录， <tt>.</tt> 用于当前目录或者 <tt>..</tt> 用于上层目录，并且可以在 Tracker 中打开相应的文件夹。</p>
+		<td valign="top"><p><span class="cli">open</span>是一个非常小巧的工具。通过它，您可以以默认的程序打开任何文件，或者利用程序的签名还打开该程序而无需知道它的路径。它也可以用于打开网页，甚至“虚拟” 的目录， <tt>.</tt> 用于当前目录或者 <tt>..</tt> 用于上层目录，并且可以在 Tracker 中打开相应的文件夹。</p>
 </td></tr>
 </table>
 </div>

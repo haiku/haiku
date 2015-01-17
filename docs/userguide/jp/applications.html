@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2015, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -61,25 +61,26 @@
 <h1>アプリケーション</h1>
 
 <p>Haiku に付属しているすべてのアプリケーションに飛び込む前に、プログラムのインストールとアンインストールのやり方についてさらに詳しく見てみましょう。アプリケーションの検索、インストール、アップデートおよびアンインストールは、Haiku のパッケージ管理システムを通じて行うのがもっとも簡単な方法です。しかし、Haiku は先祖の BeOS との幅広いバイナリおよびソース互換性があるため、今でも同様にインストールできる以前のアーカイブ (.zip および pkg) を見つけられるでしょう。</p>
-<div class="box-info">以下に、言及された Home フォルダーの <tt>~/config/</tt> 階層を常に見つけるでしょう。もし、パッケージをすべてのユーザー (Haiku がマルチユーザー対応になったとすれば) と共用するつもりなら、<tt>/system/</tt> 以下のミラーされたファイルシステム階層を使うべきです。追加の情報については、<a href="filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください。</div>
+<div class="box-info">以下に、言及された <tt>/system/</tt> 階層を常に見つけるでしょう。もし、パッケージをシングルユーザー (Haiku がマルチユーザー対応になったとすれば) のみにインストールするつもりなら、ホームフォルダーの<tt>~/config/</tt> 以下のミラーされたファイルシステム階層を使うべきです。追加の情報については、<a href="filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください。</div>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hpkg" name="hpkg">Haiku パッケージ (.hpkg)</a></h2>
 <p>パッケージの検索、ダウンロード、および自動的なインストール / アンインストールを行うには、<a href="applications/haikudepot.html">HaikuDepot</a> 
-を使うのがもっとも簡単です。もしそれが選択できないなら、たぶんどこかからパッケージをダウンロードしたのでしょう。なぜならそれが (まだ) 公式のリポジトリに入っていないからです。パッケージをマニュアルでインストールするのも簡単なことです。単に、.hpkg ファイルを <tt>~/config/packages/</tt> に移動するだけです。</p>
-<p>新規にインストールされたアプリケーションは <tt>~/config/apps/</tt> の中に、また、コマンドラインアプリケーションの場合は、 <tt>~/config/bin/</tt> の中に見つかります。アプリケーション以外のプログラムが依存するファイル (ライブラリ、データ、アドオンなど) は自動的にファイルシステム中の適切な位置に現れます。</p>
+を使うのがもっとも簡単です。もし、どこかからパッケージをダウンロードしたなら -  おそらくそれが (まだ) 公式のリポジトリに入っていないからでしょう - それをダブルクリックすると、HaikuDepotで開き、そこからインストールできます。</p>
+<p>新規にインストールされたアプリケーションは <tt>/system/apps/</tt> の中に、また、コマンドラインアプリケーションの場合は、<tt>/system/bin/</tt> の中に見つかります。アプリケーション以外のプログラムが依存するファイル (ライブラリ、データ、アドオンなど) は自動的にファイルシステム中の適切な位置に現れます。</p>
 <p><a href="deskbar.html">Deskbar</a> または<a href="desktop-applets/launchbox.html">ランチャー</a>のトピックに、新規にインストールしたアプリケーションへのショートカットを追加する方法が記載されています。</p>
-<p>アンインストールも同じく簡単です。パッケージを <tt>~/config/packages/</tt> から移動してください。</p>
 <div class="box-info">ところで、.hpkg ファイルは解凍できますが、それはパッケージをインストールするときにパッケージ管理システムが行っていることではありません。下層のファイルシステムは、ファイルを適切なフォルダーに分散するためだけに出現します。解凍の前後で物理的な移動はありません。これが、インストール / アンインストールがとても速くクリーンである理由です。
 </div>
 <p>パッケージがほかのいくつかのライブラリやパッケージに依存している場合、ウィンドウが表示され、必要なファイルをダウンロードして同様にインストールしてよいか尋ねます。
 </p>
+<p>アンインストールも同じく簡単です。パッケージを HaikuDepot 内で検索して、<span class="button">アンインストール (Uninstall)</span> ボタンを押すだけです。</p>
+<p>ターミナル内で作業しているか、パッケージのアンインストール / インストールをスクリプトで行うなら、コマンド <tt>pkgman --help</tt> を見るべきです。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">以前の BeOS アーカイブ (.zip および .pkg)</a></h2>
 <p>BeOS のアーカイブで、アプリケーションに必要なものをそのフォルダー内にすべて含んでいるものは、単に <tt>/boot/home/</tt> 内のどこかに解凍して (ダブルクリックで<span class="app">ファイル解凍</span>または以前の <span class="app">PackageInstaller</span> が開きます)、そこから実行できます。そのようなすべてを含んでいるアプリケーションをアンインストールするのは簡単です。つまり、アプリケーションのフォルダーを削除するだけです。</p>
 <p>このことは、ほとんどの古い BeOS アプリケーションについて当てはまります。アーカイブがファイルを存在し
-ないハードコートされた場所にまき散らすため、アーカイブを解凍しただけでアプリケーションが動かない場合、手動で修正する必要があります。<tt>~/config/non-packaged/</tt> フォルダーに必要なフォルダー階層を作成できます。本物の.hpkg ファイルがより多く利用できるようになり、古い BeOS アプリケーションが再パッケージされるようになれば、手動で行う必要は少なくなるでしょう。<tt>non-packaged</tt> フォルダー階層を使うには、この<a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">オンライン記事</a>を参照ください。</p>
+ないハードコートされた場所にまき散らすため、アーカイブを解凍しただけでアプリケーションが動かない場合、手動で修正する必要があります。<tt>/system/non-packaged/</tt> フォルダーに必要なフォルダー階層を作成できます。本物の.hpkg ファイルがより多く利用できるようになり、古い BeOS アプリケーションが再パッケージされるようになれば、手動で行う必要は少なくなるでしょう。<tt>non-packaged</tt> フォルダー階層の使い方は、この<a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">オンライン記事</a>を参照ください。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -90,8 +91,6 @@
 		<td valign="top">CPU やメモリの使用量といったシステムリソースを追跡するツールです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">ブートマネージャー</a></td><td> </td>
 		<td valign="top">ドライブのマスターブートレコード (MBR) にブートメニューをインストールするためのツールです。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CD プレーヤー</a></td><td> </td>
-		<td valign="top">音楽 CD プレーヤーです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">文字表</a></td><td> </td>
 		<td valign="top">Unicode の文字コードマップを表示するアプリケーションです。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>

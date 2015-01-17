@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -90,11 +90,14 @@ Soll eine Verknüpfung erstellt werden?" "Auf dem Desktop" "In der Deskbar" "Nei
 <pre class="terminal">filepanel -s -t "Logdatei speichern" -d ~/config/settings -n Spitzen.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
-<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>Mittels <span class="cli">waitfor</span> lässt sich auf den Start bzw. die Beendigung eines bestimmten Threads oder einer Anwendung warten.</p>
+<tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
+<td valign="top"><p><span class="cli">hey</span> ist ein kleines tool das BMessages an Anwendungen sendet und deren Antwort ausgibt. Es kann zum Skripten von Anwendungen benutzt werden, also zum "Fernsteuern" von Programmen mittels Skripts oder von der Kommandozeile aus. Das ist leider etwas kompliziert... Aber Dank Scot Hacker's BeOS Bible gibt es ein schönes <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey Tutorial</a> von Chris Herborth.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> ist die Konsolen-Variante des Find Panels. Um eine Suchformel bequem zu generieren lässt sich übrigens sehr gut eben dieses Find Panel benutzen: Einfach dort die entsprechende Suche zusammenklicken, dann umschalten zum "<span class="menu">by formula</span>" Mode, Anführungszeichen (<tt>"</tt>) an Anfang und Ende und anschließend das Ganze hinter den <span class="cli">query</span> Befehl ins Terminal oder Skript einfügen.</p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>Mittels <span class="cli">waitfor</span> lässt sich auf den Start bzw. die Beendigung eines bestimmten Threads oder einer Anwendung warten.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -102,7 +105,7 @@ Soll eine Verknüpfung erstellt werden?" "Auf dem Desktop" "In der Deskbar" "Nei
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> ist ein wichtiges Tool um das Dateisystem zu überprüfen. Es wird einfach ein Partitions- oder Gerätename übergeben, um dort jede Datei durchzusehen und Inkonsistenzen zu beheben, sofern möglich.</p>
+		<td><p><span class="cli">checkfs</span> ist ein wichtiges Tool um das Dateisystem zu überprüfen. Es wird einfach ein Partitionsname, beispielsweise <span class="path">/Haiku</span> oder ein Device-Pfad übergeben, um dort alle Dateien durchzusehen und Inkonsistenzen zu beheben, sofern möglich.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p>Mit <span class="cli">desklink</span> kann im Deskbar Tray ein Icon für jedwede Datei, Ordner, Query oder Anwendung installiert werden. Dabei gibt es die Möglichkeit bei einem Rechtsklick auf das entsprechende Icon ein Kontextmenü mit besonderen Funktionen anzubieten. Folgendes Beispiel macht das mit dem Konsolenprogramm <span class="app">screenshot</span> (das "<tt>\</tt>" in der ersten Zeile dient nur einem Zeilenumbruch im Terminal):</p>
@@ -112,7 +115,7 @@ Soll eine Verknüpfung erstellt werden?" "Auf dem Desktop" "In der Deskbar" "Nei
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>MIttels <span class="cli">diskimage</span> können normale Dateien als "Disk" angemeldet werden. So lässt dich beispielsweise ein Haiku Anyboot Image anmelden. Anschließend kann es per Tracker eingehängt werden, um Dateien darauf zu kopieren, zu ändern oder zu löschen, bevor man es als Quelle für den Installer benutzt.</p>
+		<td valign="top"><p>Mittels <span class="cli">diskimage</span> können normale Dateien als "Disk" angemeldet werden. So lässt dich beispielsweise ein Haiku Anyboot Image anmelden. Anschließend kann es per Tracker eingehängt werden, um Dateien darauf zu kopieren, zu ändern oder zu löschen, bevor man es als Quelle für den Installer benutzt.</p>
 </td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">open</span> ist ein nützliches kleines Tool. Es öffnet jedwede Datei mit ihrer bevorzugten Anwendung oder startet eine bestimmte Anwendung anhand ihrer Signatur ohne ihren genauen Pfad kennen zu müssen. Das funktioniert auch mit URLs und sogar den "virtuellen" Verzeichnissen, <tt>.</tt> für das aktuelle Verzeichnis und <tt>..</tt> für das übergeordnete, die dann im Tracker geöffnet werden.</p>

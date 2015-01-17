@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2015, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,27 +56,29 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 <h1>Programok</h1>
 
 <p>Mielőtt elmerülnénk a Haiku-val érkező programokban, előtte nézzük meg, hogy hogyan is telepíthetünk illetve távolíthatunk el programokat. A legkézenfekvőbb megoldás a csomagok keresésére, frissítésére, telepítésére és eltávolítására a Haiku csomagkezelő használata. Azonban, mivel a Haiku binárisan nagyrészt kompatibilis elődjével, a BeOS-al, így a régebbi csomagok (.zip és .pkg) szintén használhatóak.</p>
-<div class="box-info">A továbbiakban többször találkozunk a <tt>~/config/</tt> hierarchiával, mely a Saját mappán belül lévőre utal. Ha megszeretnénk osztani programjainkat a többi felhasználóval (majd mikor a későbbiekben a Haiku többfelhasználós lesz), akkor a <tt>/system/</tt> mappában lévő megfelelőjét kell használni. További információ a <a href="filesystem-layout.html">Fájlrendszer felépítése</a> fejezetben.</div>
+<div class="box-info">Below you'll always find the <tt>/system/</tt> hierarchy of the mentioned. If you intend to install packages only for a single user (once Haiku becomes multi-user aware), you should use the mirrored filesystem hierarchy under home: <tt>~/config/</tt>. See topic <a href="filesystem-layout.html">Filesystem layout</a> for more information.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hpkg" name="hpkg">Haiku csomagok (.hpkg)</a></h2>
-<p>A csomagokat keresésére, letöltésére és telepítésére, eltávolítására a legjobb megoldás a <a href="applications/haikudepot.html">Raktár</a> használata. Ha ez nem jöhet szóba, mert máshonnan, nem nyilvános helyről származik a csomagunk, akkor egyszerűen csak a <tt>~/config/packages/</tt> mappába kell helyezni azt. </p>
-<p>Az újonnan telepített programokat a <tt>~/config/apps/</tt>, illetve a parancssori programokat a <tt>~/config/bin/</tt> mappában találjuk. Az összes többi fájl, amire a programnak szüksége van (funciótárak, adatok, kiegészítők, stb.) automatikusan a megfelelő helyen jelenik meg.</p>
+<p>The simplest way is to use <a href="applications/haikudepot.html">HaikuDepot</a> to find, download and automatically install and uninstall a package. If you have downloaded a package from somewhere else — maybe because it's not (yet) in a public repository — just double-click it to open in HaikuDepot and install from there.</p>
+<p>You'll find the newly installed application in <tt>/system/apps/</tt> or, in case of a commandline application, in <tt>/system/bin/</tt>. All other files the program depends upon (libraries, data, add-ons, etc.) appear automatically in the right locations in the filesystem.</p>
 <p>Az <a href="deskbar.html">Asztalsáv</a> vagy az <a href="desktop-applets/launchbox.html">Indítósáv</a> leírásai tartalmaznak információkat, hogy hogyan lehet létrehozni indító ikonokat az új programokhoz.</p>
-<p>Az eltávolítás egyszerű: csupán távolítsuk el a csomagot a <tt>~/config/packages/</tt> mappából.</p>
 <div class="box-info">Bár egy .hpkg fájl is ugyan úgy kicsomagolható, mint bármilyen másik csomag, a csomagkezelő nem így működik. A fájlrendszeren belül, ahol a fájlok megjelennek, valójában nincsenek ott, ugyanis nem történik meg a fájlok tényleges átmásolása. Éppen ezért olyan gyors a telepítés illetve az eltávolítás.</div>
 <p>Ha a csomagnak van valamilyen előfeltétele (funkciótár vagy egy másik csomag), akkor kapunk egy előugró ablakot, ami rákérdez a szükséges fájlok letöltésére és telepítésére.</p>
+<p>Uninstalling is just as easy: Simply find the package in HaikuDepot and click <span class="button">Uninstall</span>.</p>
+<p>If you're working in the Terminal or want to do un/installing of packages in a script, you should have a look at the command <tt>pkgman --help</tt>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">Régi BeOS csomagok (.zip és .pkg)</a></h2>
 <p>A BeOS csomagok, melyek tartalmaznak minden szükséges fájl a programhoz, egyszerűen kicsomagolhatóak (duplakattintással a <span class="app">Kicsomagoló</span> vagy pedig a régi <span class="app">Csomagtelepítő</span> nyílik meg) bárhová a <tt>/boot/home/</tt> mappán belül és onnan futtathatóak is. Az eltávolításuk épp ilyen egyszerű: csak töröljük ki a program mappáját.</p>
-<p>Bár nagyrészt igaz, hogy a régi, BeOS programok is használhatóak, megeshet, hogy olyannal találkozunk, ami nem működik. Ez leginkább akkor lehetséges, ha a programban konkrét útvonalakat adtak meg, ami viszont nem létezik Haiku alatt. Ekkor magunknak kell megodlani a problémát. A <tt>~/config/non-packaged/</tt> lehetőséget biztosít a szükséges mappák létrehozására. Mivel egyre több BeOS csomag érhető el .hpkg formátumban az újracsomagolásuknak köszönhetően, így erre már nem nagyon lesz szükség. További információt a <tt>non-packaged</tt> mappa használatáról az <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> cikkben találunk.</p>
+<p>This is true for the majority of old BeOS applications. If you happen upon one that doesn't work out-of-the-box, because it wants to spread its files to hard-coded locations that are not guaranteed to exist, you can try to fix things manually. The folder <tt>/system/non-packaged/</tt> allows you to recreate the needed folder hierarchy. As more and more real .hpkg packages become available and old BeOS applications get re-packaged, this will become less needed. Please consult this <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">online article</a> on how to use the <tt>non-packaged</tt> hierarchy.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -87,8 +89,6 @@
 		<td valign="top">A rendszer terheltségét/kihasználtságát jeleníti meg grafikonon.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">Rendszerválasztó</a></td><td> </td>
 		<td valign="top">Rendszerválasztó menü telepítése a lemezre.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CDLejátszó</a></td><td> </td>
-		<td valign="top">CD lejátszó.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">Karaktertábla</a></td><td> </td>
 		<td valign="top">Unicode karaktertábla megjelenítése.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>

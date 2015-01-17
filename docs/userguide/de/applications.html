@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2015, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -62,23 +62,24 @@
 <h1>Anwendungen</h1>
 
 <p>Vor der Beschreibung all der von Haiku mitgelieferten Anwendungen, eine Erklärung wie Programme installiert und deinstalliert werden. Am einfachsten geht das suchen, installieren, updaten und deinstallieren von Anwendungen mit Haikus Paketmanagement. Da Haiku allerdings auch weitgehend binär- und source-kompatibel zu seinem Vorfahren BeOS ist, stößt man vielleicht ab und zu auch noch auf alte Archive (.zip und .pkg), die immer noch installiert werden können.</p>
-<div class="box-info">Nachfolgend ist immer die <tt>~/config/</tt> Hierarchie im Home-Ordner beschrieben. Falls Pakete mit alles Benutzern geteilt werde sollen (sobald Haiku mehrbenutzerfähig wird), muss die entsprechend gespiegelte Hierarchie unter <tt>/system/</tt> benutzt werden. Für mehr Infos, siehe <a href="filesystem-layout.html">Dateisystem Layout</a>.</div>
+<div class="box-info">Nachfolgend ist immer die <tt>/system/</tt> Hierarchie beschrieben. Falls Pakete nur für einen einzigen Benutzern installiert werden sollen (sobald Haiku mehrbenutzerfähig wird), muss die entsprechend gespiegelte Hierarchie i Home-Ordner benutzt werden: <tt>~/config/</tt>. Für mehr Infos, siehe <a href="filesystem-layout.html">Dateisystem Layout</a>.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hpkg" name="hpkg">Haiku Pakete (.hpkg)</a></h2>
-<p>Am einfachsten benutzt man <a href="applications/haikudepot.html">HaikuDepot</a> um ein Paket zu finden, installieren und zu deinstallieren. Ist das nicht möglich — vielleicht wurde das Paket irgendwo heruntergeladen, weil es (noch) nicht in einem öffentlichen Repository ist — ist die manuelle Installation eigentlich genauso einfach: Man verschiebt die .hpkg Datei einfach nach <tt>~/config/packages/</tt>. </p>
-<p>Die neu installierte Anwendung taucht in <tt>~/config/apps/</tt> auf oder, im Falle eines Konsolen-Programms, in <tt>~/config/bin/</tt>. Alle anderen Dateien, die das Programm benötigt (Bibliotheken, Daten, Add-Ons etc.) erscheinen automatisch an den richtigen Orten im Dateisystem.</p>
+<p>Am einfachsten benutzt man <a href="applications/haikudepot.html">HaikuDepot</a> um ein Paket zu finden, installieren und zu deinstallieren. Wurde ein Paket von irgendwo anders heruntergeladen — vielleicht weil es (noch) nicht in einem öffentlichen Repository ist — öffnet man es einfach per Doppelklick in HaikuDepot und installiert es von dort.</p>
+<p>Die neu installierte Anwendung taucht in <tt>/system/apps/</tt> auf oder, im Falle eines Konsolen-Programms, in <tt>/system/bin/</tt>. Alle anderen Dateien, die das Programm benötigt (Bibliotheken, Daten, Add-Ons etc.) erscheinen automatisch an den richtigen Orten im Dateisystem.</p>
 <p>In den Kapiteln <a href="deskbar.html">Deskbar</a> und <a href="desktop-applets/launchbox.html">LaunchBox</a> ist beschrieben wie man Verknüpfungen zu den neu installierten Anwendung herstellt.</p>
-<p>Die Deinstallation ist genauso einfach: Man verschiebt das Paket einfach wieder aus dem Ordner <tt>~/config/packages/</tt>.</p>
 <div class="box-info">Obwohl man eine .hpkg Datei wie jedes andere Archiv entpacken kann, macht das das Paketmanagement beim Installieren eines Pakets gerade nicht. Es sieht nur so aus, als würde das darunterliegende Dateisystem die Dateien in die entsprechenden Ordner verteilen. In Wahrheit findet eben kein physisches Herumverteilen statt, weswegen das Installieren/Deinstalliern auch so schnell und sauber funktionert.</div>
 <p>Ist ein Paket von einer anderen Bibliothek oder anderen Paketen abhängig, erscheint ein Fenster mit der Nachfrage, ob die benötigten Dateien ebenfalls heruntergeladen und installiert werden sollen.</p>
+<p>Die Deinstallation ist genauso einfach: Einfach das Paket in HaikuDepot suchen und <span class="button">Deinstallieren</span> klicken.</p>
+<p>Arbeitet man im Terminal oder möchte Pakete in einem Skript de/installieren, sollte man sich mit dem Befehl <tt>pkgman --help</tt> vertraut machen.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">Alte BeOS Archive (.zip und .pkg)</a></h2>
 <p>BeOS Archive, die alles nötige in ihrem Anwendungsordner mitbringen, können einfach irgendwo unter <tt>/boot/home/</tt> entpackt werden (ein Doppelklick öffnet den <span class="app">Entpacker</span> bzw. den alten <span class="app">PackageInstaller</span>) und von dort gestartet werden. Die Deinstallation solcher in sich geschlossenen Anwendung ist auch einfach: Man löscht einfach den Anwendungsordner.</p>
-<p>Obiges gilt für die Mehrheit an alten BeOS Anwendungen. Wenn man allerdings an eine gerät die nicht auf Anhieb funktioniert, weil sie Dateien an fest einprogrammierte Orte verteilen will, deren Existenz nicht gewährleistet ist, kann man versuchen das manuell zu beheben. Der Ordner <tt>~/config/non-packaged/</tt> gestattet das Anlegen der benötigten Ordner-Hierarchie. Das wird immer seltener nötig werden, während die Anzahl richtiger .hpkg Pakete zunimmt und alte BeOS Anwendungen entsprechend umgepackt werden. Der Artikel "<a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a>" zeigt online, wie die <tt>non-packaged</tt> Hierarchie zu benutzen ist.</p>
+<p>Obiges gilt für die Mehrheit an alten BeOS Anwendungen. Wenn man allerdings an eine gerät die nicht auf Anhieb funktioniert, weil sie Dateien an fest einprogrammierte Orte verteilen will, deren Existenz nicht gewährleistet ist, kann man versuchen das manuell zu beheben. Der Ordner <tt>/system/non-packaged/</tt> gestattet das Anlegen der benötigten Ordner-Hierarchie. Das wird immer seltener nötig werden, während die Anzahl richtiger .hpkg Pakete zunimmt und alte BeOS Anwendungen entsprechend umgepackt werden. Der Artikel "<a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a>" zeigt online, wie die <tt>non-packaged</tt> Hierarchie zu benutzen ist.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -89,8 +90,6 @@
 		<td valign="top">Ein Programm zur Anzeige unterschiedlicher Systemressourcen wie CPU-Auslastung oder Speicherverbrauch.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html"><acronym title="BootManager">Bootmanager</acronym></a></td><td> </td>
 		<td valign="top">Ein Tool zum Installieren eines Bootmenüs im MBR (Master Boot Record) eines Laufwerks.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html"><acronym title="CDPlayer">CD-Player</acronym></a></td><td> </td>
-		<td valign="top">Ein Player für Audio CDs.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html"><acronym title="CharacterMap">Zeichentabelle</acronym></a></td><td> </td>
 		<td valign="top">Ein Programm zum Anzeigen einer Unicode Zeichentabelle.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html"><acronym title="CodyCam">Webcam</acronym></a></td><td> </td>

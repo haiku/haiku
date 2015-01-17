@@ -55,7 +55,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />Näppäimistökuvaus</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -78,9 +77,9 @@ Siten Näppäimistökuvaus-asetukset eivät ole paikallisen näppäimistön aset
 <p>Vasemmalla näkyvät luettelot tarjoavat järjestelmän esiasetetut näppäimistökuvaukset ja alla on, jos niitä on saatavilla, käyttäjän määrittelemät kuvaukset. Voit vaihtaa näppäimistökuvausta raahaamalla ja pudottamalla näppäimistökuvauksessa: hiiren ykköspainike kopioi näppäimen ja hiiren kakkospainike vaihtaa kaksi näppäintä keskenään.</p>
 <p>Vaihtoehtona tälle näppäinten raahaamiselle ja pudottamiselle on valikko <span class="menu">Tiedosto | Aseta muunninnäppäimet...</span>, joka avaa tämän ikkunan:</p>
 <img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
-<p>Here, you can assign keys to their respective roles or even completely disable the role of a key. You can even assign the same key to different roles, though that's not a good idea most of the time and you'll be warned by a small exclamation mark beside the pop-up menus if you do that.<br />
-Pressing <span class="button">Set modifier keys</span> applies your changes and closes the window.</p>
-<p>When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
+<p>Tässä voit liittää näppäimet niiden vastaaviin rooleihin tai jopa ottaa avaimen rooli kokonaan pois käytöstä. Voit jopa liittää samalle näppäimelle eri rooleja, vaikka se ei ole useimmiten hyvä ajatus ja sinua varoitetaan pienellä huutomerkillä ponnahdusvalikon sivussa, jos teet sen.<br />
+Painamalla <span class="button">Aseta muokkausnäppäimet</span> toteutetaan muutoksesi ja suljetaan ikkuna.</p>
+<p>Valmistumisen jälkeen voit tallentaa tuloksen valikossa <span class="menu">Tiedosto | Tallenna...</span>. Muokattu kuvauksesi esiintyy vain käyttäjän määrittelemässä luettelossa, jos se on tallennettu tiedostoon <span class="path">~/config/settings/Keymap/</span>. Muussa tapauksessa sinun on ladattava se manuaalisesti kohdasta <span class="menu">Tiedosto | Avaa...</span>.</p>
 <p>Jotta Näppäimistökuvaus täsmäisi paremmin fyysiseen näppäimistöösi, käytettävissä on useita erilaisia asetuksia <span class="menu">Ulkoasu</span>-valikossa.</p>
 <p>Käytetyn näppäimistöesityksen kirjasimet asetetaan valikosta <span class="menu">Kirjasin</span>. Huomaa, määritellyssä kirjasimessa ei aina välttämättä ole tietyn näppäimistökuvauksen kaikkia merkkejä.</p>
 <p>Lopuksi käytettävissä on <span class="button">Palauta</span>-painike, joka palauttaa asetukset sellaisiksi, kuin ne olivat Näppäimistöasetukset-sovelluksen käynnistyessä.</p>
@@ -91,8 +90,8 @@ Pressing <span class="button">Set modifier keys</span> applies your changes and 
 <p>Näppäimistökuvausasetusten lisäksi on myös toinen tapa räätälöidä näppäimistökuvaustasi. Se sisältää heksadesimaaliarvoja sisältävän tekstitiedoston muokkaamisen, mikä voi tuntua ensi silmäykseltä pelottavalta, mutta ei lopulta ole mahdotonta tajuta.</p>
 <p>Voit vedostaa nykyisen näppäimistökuvauksesi komennolla Pääteikkunassa:</p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
-<p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
-At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use the <a href="shortcuts.html">Shortcuts</a> preferences.</p>
+<p>Tuotettu tekstitiedosto voidaan sitten avata tekstieditorilla. Varmista, että käytät tasavälisiä kirjasimia tuossa editorissa tai et saa tuota tiedostoa koskaan oikein...<br />
+Tuon tiedoston alusta löydät tyylitellyn näppäimistön selitteen, jossa jokaista näppäintä vastaa heksadesimaaliarvo. Sen alla on jokaisen jokaisen arvon todelliset liittämiset. Voit tehdä kaikki räätälöinnit, jotka ovat myös saatavilla Näppäimistökuvausasetusten paneelissa, ja vielä jotain muuta. Jos näppäimistössä sattuu olemaan joitain erikoisnäppäimiä, voit ehkä kokeilla niiden aktivoimista. Se tarkoittaa, että voit käyttää niitä tavallisina näppäiminä tai muuntonäppäiminä, kuten Alt- tai Ctrl-näppäimiä. Et kykene esimerkiksi käyttämään multimedianäppäimiä pienentämään tai suurentamaan äänen voimakkuutta tai käynnistämään jonkun sovelluksen. Tätä varten voit käyttää esimerkiksi <a href="shortcuts.html">Pikanäppäimet</a>-asetusta.</p>
 <p>Kun olet valmis, tallenna tiedosto ja järjestelmä lataa muokatun näppäimistökuvauksen tällä komennolla:</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
 <p>Jos haluat viedä tämän näppäimistökuvauksen Näppäimistökuvaus-paneeliin, se on ensin käännettävä binaarimuotoon:</p>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -91,11 +91,14 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
-<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> je dobrý spôsob ako počkať, kým sa daná aplikácia alebo vlákno nespustí alebo neukončí.</p>
+<tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
+<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... Thanks to Scot Hacker's BeOS Bible, there's a nice <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> je verzia panela „Nájsť...“ pre príkazový riadok. Rýchlym spôsobom ako vygenerovať hľadaný termín je vytvoriť požiadavku v paneli „Nájsť...“, prepnúť na <span class="menu">podľa vzorca</span>, pridať úvodzovky (<tt>"</tt>) na začiatok a koniec a celý reťazec skopírovať za váš príkaz <span class="cli">query</span> v Termináli alebo vašom skripte.</p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">waitfor</span> je dobrý spôsob ako počkať, kým sa daná aplikácia alebo vlákno nespustí alebo neukončí.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -103,7 +106,7 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> je dôležity nástroj na hľadanie chýb vo vašom súborovom systéme. Jednoducho pridajte názov zväzku alebo zariadenia a systém prebehne každý súbor a opraví možné nezrovnalosti.</p>
+		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add a volume name like <span class="path">/Haiku</span> or device path and it'll run through every file and correct inconsistencies where possible.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> dokáže priradiť ikonu ľubovolnému súboru, priečinku, požiadavke alebo aplikácii v oznamovacej oblasti Panela. Taktiež ponúka možnosť poskytnúť kontextové menu po kliknutí na ikonu pravým tlačidlom na vykonanie špeciálnych operácií. Ako príklad môžete skúsiť pridať aplikáciu príkazového riadka <span class="app">screenshot</span> s rôznymi možnosťami pomocou tohto kódu (znak „<tt>\</tt>“ v prvom riadku je na zalomenie riadka v Termináli):</p>

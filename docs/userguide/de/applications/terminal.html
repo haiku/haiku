@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -82,18 +82,23 @@ Als Standard, <tt>%1d: %p</tt>, zeigt ein Reiter den aktuellen Ordner und per <t
 Mittels <span class="menu">Bearbeiten | Fenstertitel...</span> kann der Fenstertitel des Terminals auf ähnliche Weise definiert werden.</p>
 <p>Ein Rechtsklick auf einen Reiter öffnet ein Kontextmenü, um <span class="menu">Reiter schließen</span> oder <span class="menu">Andere Reiter schließen</span> oder wie durch Doppelklick <span class="menu">Reiter umbenennen...</span> zu können.</p>
 <p>Ein Terminal-Fenster kann wie jedes andere Programmfenster in seiner Größe verändert werden. Es sind auch vorgegebene Einstellungen unter <span class="menu">Einstellungen | Fenstergröße</span> vorhanden. Mittels <span class="key">ALT</span> <span class="key">RETURN</span> kann in den Vollbildmodus (und zurück) geschaltet werden.</p>
-<p>Geänderte Fenstergröße und Text-Kodierung werden nur behalten, wenn sie mit dem Menüpunkt <span class="menu">Einstellungen | Als Standard speichern</span> als Voreinstellung gespeichert werden.</p>
+<p>Alle Einstellungen, die direkt im Menü <span class="menu">Einstellungen</span> geändert werden, <span class="menu">Fenstertitel</span>, <span class="menu">Fenstergröße</span>, <span class="menu">Kodierung</span> oder <span class="menu">Schriftgröße</span>, bleiben durch in der aktuellen Sitzung erhalten. Will man diese Änderungen dauerhaft behalten, müssen sie im Panel <span class="menu">Einstellungen...</span> vorgenommen werden.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Einstellungen</a></h2>
 <p><span class="menu">Einstellungen | Einstellungen...</span> öffnet ein Fenster, um die Standardeinstellungen eines Terminals zu konfigurieren.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>Zuerst kommen die "Formeln" zur Benennung von Reiter- und Fenstertiteln. Wieder werden die verschiedenen Variablen durch einen Tooltip gezeigt. Darunter stellt man die Schriftart und -größe und verschiedene Text- und Hintergrundfarben ein. Entweder verwendet man vordefinierte Farbschema wie <span class="menu">Schwarz auf Weiß</span> oder <span class="menu">Weiß auf Schwarz</span> oder erstellt ein Schema <span class="menu">Benutzdefiniert</span>, indem man die Farbregler darunter benutzt.<br />
-Wird die Option <span class="menu">Beenden bestätigen, falls noch aktive Programme laufen</span> aktiviert, erscheint eine Warnung wenn man ein Terminal-Fenster schließen möchte, in dem gerade noch ein Programm ausgeführt wird.<br />
-Unterschiedliche Einstellungen lassen sich in getrennten Profilen speichern, die bei einem Doppelklick ein entsprechend konfiguriertes Terminal starten.<br />
-<span class="button">OK</span> speichert die aktuellen Einstellungen als Standardwerte.</p>
-
+<p>Die meisten Einstellungen sind selbsterklärend.<br />
+Lässt man den Maszeiger über den "Formeln" für Reiter- und Fenstertitel schweben, werden die verschiedenen Variablen durch einen Tooltip erklärt.<br />
+Entweder verwendet man vordefinierte Farbschema wie <span class="menu">Mitternacht</span> oder <span class="menu">Retro</span> oder erstellt ein Schema <span class="menu">Benutzerdefiniert</span>, indem man die zu ändernde Farbe wählt (<span class="menu">Text</span>, <span class="menu">Hintergrund</span>, <span class="menu">Cursor</span> etc.) und den Farbregler darunter benutzt.</p>
+<p>Es folgen noch ein paar weitere Einstellungen: Man kann einen <span class="menu">Blinkenden Cursor</span> haben und einstellen, dass <span class="menu">Text heller statt fett gedruckt</span> wird. Letzteres umgeht die manchmal unansehnliche Anzeige fetter Buchstaben im Terminal<br />
+Wird die Option <span class="menu">Beenden bestätigen, falls noch aktive Programme laufen</span> aktiviert, erscheint eine Warnung wenn man ein Terminal-Fenster schließen möchte, in dem gerade noch ein Programm ausgeführt wird.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td class="onelinetop"><span class="button">In Datei speichern...</span></td><td width="10"> </td><td>Hiermit lassen sich unterschiedliche Einstellungen in getrennten Profilen speichern, die bei einem Doppelklick ein entsprechend konfiguriertes Terminal starten.</td></tr>
+<tr><td><span class="button">Anfangswerte</span></td><td> </td><td>Setzt die Einstellungen auf die Werte zurück, die beim Start des Einstellungspanels aktiv waren.</td></tr>
+<tr><td><span class="button">Standardwerte</span></td><td> </td><td>Setzt alle Einstellungen auf die Standardwerte zurück.</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Tastaturkürzel</a></h2>

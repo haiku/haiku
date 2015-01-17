@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -91,18 +91,20 @@ Parmi les paramètres disponibles, vous pouvez définir un répertoire de dépar
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
+<tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
+<td valign="top"><p><span class="cli">hey</span> est un petit utilitaire pour envoyer des BMessages aux applications et afficher leurs réponses.  Il peut être utilisé pour écrire des scripts d'applications, i.e. "contrôle à distance" d'un programme à partir d'un script ou de la ligne de commande. Son utilisation est un peu complexe... Mais grâce à la "BeOS Bible" de Scot Hacker, il y a un beau <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">tutoriel pour hey</a> pour Chris Herborth.</p></td></tr>
+<tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">query</span> est la version ligne de commande de la fenêtre de recherche. En fait, une façon rapide de créer une expression de recherche, est de construire une requête dans la fenêtre de recherche, de basculer vers les formules (<span class="menu">by formula</span>), et de copier le tout entre doubles quottes (<tt>"</tt>) en paramètre à la commande <span class="cli">query</span> que vous appelez à partir du Terminal ou de votre script.</p></td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">waitfor</span> est une méthode élégante pour attendre qu'une application ou une tâche particulière soit démarrée, ou terminée.</p>
-</td></tr>
-<tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">query</span> est la version ligne de commande de la fenêtre de recherche. En fait, une façon rapide de créer une expression de recherche, est de construire une requête dans la fenêtre de recherche, de basculer vers les formules (<span class="menu">by formula</span>), et de copier le tout entre doubles quottes (<tt>"</tt>) en paramètre à la commande <span class="cli">query</span> que vous appelez à partir du Terminal ou de votre script.</p></td></tr></table>
+</td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-other" name="cli-other">Autres commandes</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> est un outil important pour détecter les erreurs dans votre système de fichiers. Il suffit d'ajouter le nom du volume ou du périphérique, et il va parcourir tous les fichiers et si possible, corriger des incohérences.</p>
+		<td><p><span class="cli">checkfs</span> est un outil important pour détecter les erreurs dans votre système de fichiers. Il suffit d'ajouter le nom du volume comme par exemple <span class="path">/Haiku</span> ou du périphérique, et il va parcourir tous les fichiers et si possible, corriger des incohérences.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> vous permet d'installer une icône dans le cartouche de la Deskbar à partir de n'importe quel fichier, dossier, requête ou application. Vous pourrez également pourvoir le menu contextuel d'actions spécifiques à exécuter quand vous ferez un clic droit sur l'icône.

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -91,11 +91,14 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
-<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> удобный способ для ожидания запуска или завершения работы какого-либо приложения или нити.</p>
+<tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
+<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... Thanks to Scot Hacker's BeOS Bible, there's a nice <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> является аналогом панели "Найти", выполненным для командной строки. Существует способ быстрого создания правила поиска:  постройте запрос в панели "Найти", переключитесь в режим <span class="menu">по формуле</span>, добавьте двойные кавычки (<tt>"</tt>) в начале и в конце и вставьте строку после комманды <span class="cli">query</span> в Терминале или вашем скрипте.</p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">waitfor</span> удобный способ для ожидания запуска или завершения работы какого-либо приложения или нити.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -103,7 +106,7 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span>   - очень важный инструмент, используемый для проверки вашей файловой системы на наличие ошибок. Просто добавьте имя раздела или устройства, а утилита проверит каждый файл и по возможности исправит все несоотсветствия.</p>
+		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add a volume name like <span class="path">/Haiku</span> or device path and it'll run through every file and correct inconsistencies where possible.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> помещает иконку для любого файла, папки, запроса или приложения в трей Deskbar, и позволяет назначить контекстное меню, вызываемое правым кликом мыши по иконке для выполнения специальных действий. В качестве примера, попробуйте добавить приложение командной строки <span class="app">screenshot</span> с несколькими параметрами ("<tt>\</tt>" в первой строке используется для разрыва строки в Terminal):</p>

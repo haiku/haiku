@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2011, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,7 +59,7 @@
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>インデックス</td></tr>
+<tr class="heading"><td>目次</td></tr>
 <tr class="index"><td>
 	<a href="#mounting-volumes">ボリュームのマウント</a><br />
 	<a href="#navigating">ナビゲーション</a><br />
@@ -113,7 +113,7 @@
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="type-ahead-filter" name="type-ahead-filter">先行入力フィルター</a></h3>
-<p>入力中にジャンプする代わりに、先行入力文字列に一致しないファイルを取り除くオプションもあります。特に、ファイルが多すぎるフォルダーの場合、これは明快さを著しく改善します。<span class="key">SHIFT</span> <span class="key">SPACE</span> を区切りとして使うことで、複数の文字列でフィルタリングさえできます。<br />
+<p>入力中にジャンプする代わりに、先行入力文字列に一致しないファイルを取り除くオプションもあります。特に、ファイルがたくさんあるフォルダーの場合、これは明快さを著しく改善します。<span class="key">SHIFT</span> <span class="key">SPACE</span> を区切りとして使うことで、複数の文字列でフィルタリングさえできます。<br />
 先行入力ジャンプと異なり、フィルタリングは <span class="key">ESC</span> を押すか、ウィンドウを閉じる (または、シングルウィンドウナビゲーションモードのときはフォルダーを去る) までは有効です。<br />
 この先行入力フィルタリングは、<a href="#tracker-preferences.html">Tracker preferences</a> 中で設定されます。</p>
 
@@ -152,10 +152,11 @@
 <li><p><span class="menu">デスクトップ (Desktop)</span> - マウントされたディスクを、すべてデスクトップに表示するか、またはデスクトップ上の単独のディスク (Disks) アイコンをクリックして表示されるウィンドウ中に表示するかを決めます。</p></li>
 <li><p><span class="menu">ウィンドウ (Windows)</span> - <span class="menu">シングルウィンドウナビゲーション (Single window navigation)</span> を設定できます。つまり、フォルダーをダブルクリックすると、それ自身のウィンドウを開く代わりにすでに開いているウィンドウの中に開きます。これは上記の <span class="key">OPT</span> キーを押しながらクリックするのとは違います。なぜなら、ウィンドウごとに保存された位置やサイズを失うからです。<br /><br /></p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-<p>シングルウィンドウナビゲーションモードへ Tracker を切り替える前に、よりなじんでいるかもしれないので、まずはメニューベースのブラウジングを試して見ることを勧めます。メニューベースに慣れた後では、実際にはるかに速く動作するかもしれません。一方、シングルウィンドウブラウズは<i>ナビゲーター</i>を提供します。そこでは、パス名の入力や、コピー＆ペーストができます。また、戻る、進む、および上の階層へ移動のボタンを使用できます。</p> 
+<p>Tracker を<span class="menu">シングルウィンドウナビゲーション</span>へ切り替える前に、よりなじんでいるかもしれないので、まずはメニューベースのブラウジングを試して見ることを勧めます。メニューベースに慣れた後では、実際にはるかに速く動作するかもしれません。一方、シングルウィンドウブラウズは<i>ナビゲーター</i>を提供します。そこでは、パス名の入力や、コピー＆ペーストができます。また、戻る、進む、および上の階層へ移動のボタンを使用できます。</p> 
 <p> <span class="menu">先行入力フィルターを有効にする (Enable type-ahead filtering)</span>  を有効にすると、入力している間、入力文字列がファイル名または表示されている属性にマッチするファイルだけを表示するように、Tracker ウィンドウの内容をフィルタリングします。<a href="#type-ahead-filter">上記を</a>見てください。</p></li>
-<li><p><span class="menu">ごみ箱 (Trash)</span> - ファイルを削除する時の振る舞いを設定します。</p></li>
+<li><p><span class="menu">ごみ箱 (Trash)</span> - ファイルを削除する時の動作を設定します。</p></li>
 <li><p><span class="menu">ディスクアイコン (Volume icons)</span> - ディスクアイコンの横に表示される空き容量表示の有無や色を設定します。</p></li>
+<li><p><span class="menu">Disk mount</span> -  <a href="#mounting-volumes">"ボリュームのマウント"</a>で述べられているように、いつ、どのディスクが自動でマウントするかを定義します。</p></li>
 </ul>
 <p>ところで、このパネルは Deskbar <span class="menu">プレファレンス</span> の <span class="app">Tracker</span>  としても利用できます。</p>
 

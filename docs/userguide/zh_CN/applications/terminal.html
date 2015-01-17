@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -83,28 +83,30 @@
 使用 <span class="menu">Edit|Window title...</span> 也可以以类似的方式编辑终端窗口的标题。</p>
 <p>右键点击标签将会出现一个右键菜单：<span class="menu">Close tab</span>，<span class="menu">Close other tabs</span> 或者，如双击，则显示 <span class="menu">Edit tab title...</span> 。</p>
 <p>终端的窗口和其他窗口一样可以调整尺寸，或者使用 <span class="menu">Settings | Window Size</span> 菜单中的预置尺寸。 <span class="key">ALT</span> <span class="key">ENTER</span> 组合键将会切换到全屏模式。</p>
-<p>调整的窗口尺寸和文字编码只有通过 <span class="menu">Settings | Save as default</span> 才可以进行保持不变。</p>
+<p>All the settings you change directly through the <span class="menu">Settings</span> menu, like <span class="menu">Window title</span>, <span class="menu">Window size</span>, <span class="menu">Text encoding</span> or <span class="menu">Font size</span> are only kept for the current session. If you want to make permanent changes, you have to apply them in the <span class="menu">Settings...</span> panel.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">设置</a></h2>
 <p><span class="menu">Settings | Settings...</span> 打开一个面板，用于配置终端的标准设置。</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>它以 "公式" 开始为标签和窗口标题进行命名。同时，提示框会显示可用的变量。在其下，您可以设置字体类型，字体大小和不同文本及其背景颜色。您可以选择一种预置的颜色方案，如 <span class="menu">Black on white</span> ， <span class="menu">White on black</span> 或者使用下面的颜色选择器 <span class="menu">自定义</span> 一种方案。<br />
-
-激活 <span class="menu">Confirm exit if active programs exist</span> 复选框，那么在程序运行过程中，尝试关闭终端窗口时，您将会获取一个警告。<br />
-
-您可以保存不同设置为独立的配置文件，当双击文件时将会打开相应配置的终端。<br />
-
-按下 <span class="button">OK</span> 将会保存当前设置为默认配置。</p>
-
+<p>Most of the offered settings speak for themselves.<br />
+Hover your mouse over the "formulas" for naming tab and window titles to get tooltips for the available variables. <br />
+You can choose pre-defined color schema like <span class="menu">Midnight</span> or <span class="menu">Retro</span> or create a <span class="menu">Custom</span> one by selecting which color you want to change (<span class="menu">Text</span>, <span class="menu">Background</span>, <span class="menu">Cursor</span> etc.) and then use  the color picker below.</p>
+<p>A few more options follow: you can have a <span class="menu">Blinking cursor</span> and choose to <span class="menu">Use bright instead of bold text</span>. The latter setting avoids the sometimes rather unsightly rendering of bold fonts in the Terminal.<br />
+Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td class="onelinetop"><span class="button">Save to file...</span></td><td width="10"> </td><td>let's you save different settings as separate profiles, which on double-click open an accordingly configured Terminal.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you opened the settings panel.</td></tr>
+<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">快捷键</a></h2>
 <p>您可以在 <a href="../keyboard-shortcuts.html#terminal">快捷键和组合键</a> 主题中找到非常有用的快捷键的列表。</p>
 <p>Another nice feature that is more a key &amp; mouse combination: When holding <span class="key">ALT</span> a path or URL under the mouse pointer gets highlighted. A left-click opens the file/folder or website. A right-click opens a context menu to either <span class="menu">Copy path</span> or <span class="menu">Copy absolute path</span>. Imagine you're in <span class="path">/MyData/source/haiku/</span> and have the path <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> under the mouse pointer, the latter menu item  will result in the combined, absolute path &lt;<i>deep breath</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
-<p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
-<p>By the way, right-clicking into the Terminal window will insert the clipboard. In combination with copying parts of highlighted paths, this can be used for speedy navigation of deep folder hierarchies.</p>
+<p>如果您同时按下 <span class="key">ALT</span> <span class="key">SHIFT</span> 按键，那么只有鼠标移动起始位置之间的部分会被高亮显示。 </p>
+<p>提示一下，右键点击终端窗口，将会插入剪贴板内容。通过和拷贝高亮路径部分组合，该方法可用于快速导航到深层次目录。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

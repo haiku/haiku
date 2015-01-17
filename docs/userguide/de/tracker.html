@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2011, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -73,8 +73,8 @@
 
 <h1>Tracker</h1>
 
-<p>Der Tracker ist die graphische Oberfläche zu den gespeicherten Dateien. Alle Dateioperationen (Dateien und Ordner anlegen oder löschen, kopieren, verschieben, oder ausführen) können hier vorgenommen werden.</p>
-<p>Der Tracker ist genauso eine Anwendung, wie alle anderen. Deshalb wird er auch in der Deskbar mit allen geöffneten Fenstern gelistet. Da der Arbeitsplatz mit den Icons auch "nur" ein Tracker-Fenster im Vollbild-Modus ist, macht sich es sich hier im Besonderen bemerkbar, sollte der Tracker einmal einfrieren. Am leichtesten kann er (und die Deskbar) über den <a href="teammonitor.html"><acronym title="Team Monitor">Teammonitor</acronym></a> reaktiviert werden.</p>
+<p>Der Tracker ist die graphische Oberfläche für den Umgang mit Dateien. Alle Dateioperationen (Dateien und Ordner anlegen oder löschen, kopieren, verschieben, oder ausführen) können hier vorgenommen werden.</p>
+<p>Der Tracker ist eine Anwendung, wie jede andere (die Arbeitsfläche mit all ihren Icons is tatsächlich auch nur ein Fenster im Vollbild-Modus im Hintergrund). Deshalb wird er auch in der Deskbar mit allen geöffneten Fenstern gelistet und kann beendet und neu gestartet werden. Sollte der Tracker (oder auch die Deskbar) einmal einfrieren kann er am leichtesten  über den <a href="teammonitor.html"><acronym title="Team Monitor">Teammonitor</acronym></a> reaktiviert werden.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -151,14 +151,15 @@ Dieses "type-ahead" filtern wird in den <a href="#tracker-preferences.html">Trac
 <p>Über <span class="menu">Fenster | Einstellungen...</span> wird ein Fenster geöffnet, dessen zahlreiche Einstellungen sich stellenweise nicht sofort erschließen. Da jedoch alle Einstellungen direkt angewendet werden, kann man die Änderungen sofort erkennen.<br />Hier eine kurze Erklärung zu den nicht ganz offensichtlichen Einstellungen:</p>
 <ul>
 <li><p><span class="menu">Desktop</span> - Hier kann ausgewählt werden, ob jedes eingebundene Laufwerk für sich am Arbeitsplatz angezeigt wird, oder alle zusammen in einem Tracker-Fenster, das mit dem Icon "Datenträger" repräsentiert wird.</p></li>
-<li><p><span class="menu">Fenster</span> - Wenn man <span class="menu">Einzelfenster-Modus</span> markiert, wird jeder geöffnete Ordner im gleichen Fenster, statt in seinem eigenen angezeigt. Diese Einstellung unterscheidet sich zu der oben erwähnten Möglichkeit, einen Ordner bei gedrückter <span class="key">OPT</span>-Taste zu öffnen, da hier die individuellen Einstellungen zu Anzeige und Position des Fensters verloren gehen.
+<li><p><span class="menu">Fenster</span> - Wird <span class="menu">Einzelfenster-Modus</span> aktiviert, öffnet sich ein doppelgeklickter Ordner nicht in einem neuen Fenster, sondern der Inhalt wird stattdessen im selben Fenster dargestellt. Diese Einstellung unterscheidet sich zu der oben erwähnten Möglichkeit, einen Ordner bei gedrückter <span class="key">OPT</span>-Taste zu öffnen, da hier die individuellen Einstellungen zu Anzeige und Position des Fensters verloren gehen.
 <br /><br />
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
 </p>
-<p>Auch wenn die Ein-Fenster-Navigation sich vielleicht vertrauter anfühlt, sollte man der ursprünglichen Navigation von Haiku eine Chance geben, da es durchaus sein kann, dass man hiermit schneller navigiert. Andererseits bietet nur diese Einstellung die Möglichkeit, einen <i>Navigator</i> einzublenden, in dem man per Symbol "vor" und "zurück", sowie ein Verzeichnis höher gehen und einen neuen Verzeichnispfad hineinkopieren kann.</p>
+<p>Auch wenn sich die Ein-Fenster-Navigation vielleicht vertrauter anfühlt, sollte man der ursprünglichen Navigation von Haiku eine Chance geben, da es durchaus sein kann, dass man hiermit schneller navigiert wenn man sich erstmal daran gewöhnt hat. Andererseits bietet nur diese Einstellung die Möglichkeit, einen <i>Navigator</i> einzublenden, in dem man per Symbol "vor" und "zurück", sowie ein Verzeichnis höher gehen und einen neuen Verzeichnispfad hineinkopieren kann.</p>
 <p>Anstatt zu den Dateien zu springen während man lostippt, gibt es mit <span class="menu">Filtern während der Eingabe</span> auch noch die Möglichkeit alle Dateien rauszufiltern, die die eingegebene Zeichenfolge nicht enthalten, siehe <a href="#type-ahead-filter">weiter oben</a>.</p></li>
-<li><p><span class="menu">Papierkorb</span> - Die Verhaltensweise beim Löschen einer Datei kann hier eingestellt werden.</p></li>
-<li><p><span class="menu">Datenträger-Icons</span> - Die Farbe des optionalen Füllstandsanzeigers bei den eingebundenen Datenträger kann hier eingestellt werden.</p></li>
+<li><p><span class="menu">Papierkorb</span> - Einstellungen zum Verhalten beim Löschen von Dateien.</p></li>
+<li><p><span class="menu">Datenträger-Icons</span> - Farbe des optionalen Füllstandsanzeigers von eingebundenen Datenträger.</p></li>
+<li><p><span class="menu">Datenträger einhängen</span> - Hier lässt sich einstellen wann welche Datenträger automatisch eingehängt werden, wie es weiter oben unter <a href="#mounting-volumes">"Einbinden von Datenträgern"</a> beschrieben ist.</p></li>
 </ul>
 <p>Dieses Einstellungs-Fenster kann auch mittels <span class="app">Tracker</span> aus den <span class="menu">Einstellungen</span> der Deskbar aufgerufen werden.</p>
 

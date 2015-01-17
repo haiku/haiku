@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2015, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,28 +58,30 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h1>应用程序
 </h1>
 
 <p>在深入了解 Haiku 系统内置应用程序之前，我们需要对如何进行程序的安装和卸载进行一个详细的了解。木钱，最方便的查询，安装，更新以及卸载程序的方式是通过 Haiku 的包管理系统。由于 Haiku 保持了对其启蒙系统 BeOS 的二进制和源代码的兼容，您可能会发现原有的压缩档（.zip 和 .pkg）仍然可以进行程序安装。</p>
-<div class="box-info">在下面的指南中，您可能会发现 Home 目录下的 <tt>~/config/</tt> 结构经常被提及。如果您希望与所有的用户共享软件包（在 Haiku 成为多用户系统后），您需要使用 <tt>/system/</tt> 目录下的映像文件系统结构。 更多信息，请查看 <a href="filesystem-layout.html">文件系统布局</a> 。</div>
+<div class="box-info">Below you'll always find the <tt>/system/</tt> hierarchy of the mentioned. If you intend to install packages only for a single user (once Haiku becomes multi-user aware), you should use the mirrored filesystem hierarchy under home: <tt>~/config/</tt>. See topic <a href="filesystem-layout.html">Filesystem layout</a> for more information.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hpkg" name="hpkg">Haiku 软件包 (.hpkg)</a></h2>
-<p>最简单的方法是使用 <a href="applications/haikudepot.html">HaikuDepot</a> 查询，下载和自动安装卸载软件包。如果没有该选项，该软件不存在于公共仓库中，您可以从其他地方下载该软件包，那么可以通过手动进行安装：将 .hpkg 文件移动到  <tt>~/config/packages/</tt> 即可。 </p>
-<p>您可以在 <tt>~/config/apps/</tt> 中找到新安装的应用程序，在 <tt>~/config/bin/</tt> 中找到相应的命令行程序。所有其他的程序文件根据类型 (库文件，数据，附加组件等)不同会自动安装在文件系统的相应位置。</p>
+<p>The simplest way is to use <a href="applications/haikudepot.html">HaikuDepot</a> to find, download and automatically install and uninstall a package. If you have downloaded a package from somewhere else — maybe because it's not (yet) in a public repository — just double-click it to open in HaikuDepot and install from there.</p>
+<p>You'll find the newly installed application in <tt>/system/apps/</tt> or, in case of a commandline application, in <tt>/system/bin/</tt>. All other files the program depends upon (libraries, data, add-ons, etc.) appear automatically in the right locations in the filesystem.</p>
 <p>在 <a href="deskbar.html">桌面栏</a> 或者 <a href="desktop-applets/launchbox.html">快速启动</a> 两个主题中讲述了如何为新的程序安装快捷方式。</p>
-<p>软件包卸载也很简单：将软件包从 <tt>~/config/packages/</tt> 中移出即可。</p>
 <div class="box-info">善意提醒，尽管您可以像其他压缩文件一样打开 .hpkg 文件，但是当您安装软件包时，包管理系统并不会进行此类操作。相应的文件系统仅仅在相应文件夹中展开这些文件，但是并不会有实际的文件物理移动操作发生。这也是安装卸载程序包快速和干净的原因。</div>
 <p>如果某个软件包依赖于其他的库或者包，那么将会弹出窗口，询问是否下载和安装所必需的文件。</p>
+<p>Uninstalling is just as easy: Simply find the package in HaikuDepot and click <span class="button">Uninstall</span>.</p>
+<p>If you're working in the Terminal or want to do un/installing of packages in a script, you should have a look at the command <tt>pkgman --help</tt>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">原有 BeOS 压缩档（.zip 和 .pkg）</a></h2>
 <p>BeOS 压缩档包含了相应应用程序目录中的所有需要文件，可以简单的双击（双击打开 <span class="app">Expander</span> 或者老的 <span class="app">PackageInstaller</span> 程序）并解压到 <tt>/boot/home/</tt> 中的任何地方，然后从这里运行程序。这些程序的卸载也非常容易，直接删掉程序目录即可。</p>
-<p>对于大多数的原有 BeOS 应用程序，上述方法都可用。如果您碰巧遇到了无法使用的程序，它希望向已经不存在的硬编码位置释放文件，您可以尝试手动进行修改。<tt>~/config/non-packaged/</tt> 目录允许您重新创建需要的目录结构。由于越来越多的 .hpkg 软件包可用，以及原有 BeOS 应用的重新打包，这些操作可能将越少使用。请咨询这些 <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">在线文档</a> 了解如何使用 <tt>non-packaged</tt> 文件系统结构。</p>
+<p>This is true for the majority of old BeOS applications. If you happen upon one that doesn't work out-of-the-box, because it wants to spread its files to hard-coded locations that are not guaranteed to exist, you can try to fix things manually. The folder <tt>/system/non-packaged/</tt> allows you to recreate the needed folder hierarchy. As more and more real .hpkg packages become available and old BeOS applications get re-packaged, this will become less needed. Please consult this <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">online article</a> on how to use the <tt>non-packaged</tt> hierarchy.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -90,8 +92,6 @@
 		<td valign="top">一个用于监视系统资源的工具，如：CPU 或者内存的利用情况。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">启动管理器</a></td><td> </td>
 		<td valign="top">一个用于安装引导菜单到设备主引导记录（MBR）的工具。</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CD播放器</a></td><td> </td>
-		<td valign="top">一个音频 CD 播放器。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">字符映射表</a></td><td> </td>
 		<td valign="top">一个用于显示国际字符映射表的应用程序。</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">摄像头</a></td><td> </td>

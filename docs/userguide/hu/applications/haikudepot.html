@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013 Haiku. All rights reserved.
+ * Copyright 2013-2014 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,6 +55,18 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td><a href="#filter">The Filter</a><br />
+                <a href="#list">The List</a><br />
+                <a href="#info">The Info Area</a><br />
+                <a href="#menu">Tools and Options</a><br />
+                <a href="#account">Creating a User Account</a><br />
+                <a href="#rating">Rating and Commenting</a><br />
+</td></tr>
+</table>
 
 <h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />Raktár (HaikuDepot)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -63,45 +75,75 @@
 <tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
 </table>
 <p><br /></p>
-<p>A programok, csomagok kezelésére a Raktár használata az elsődleges megoldás. Segítségével válogathatunk a rendelkezésre álló csomagok közül, telepíthetjük, frissíthetjük illetve eltávolíthatjuk azokat.</p>
+<p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories (also called "depots") and install, update and uninstall packages. HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users. As soon as you enter a term in the search box or choose a category, the display changes to smaller icons and more information arranged in columns.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
 
-<h3>A szűrő</h3>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="filter" name="filter">A szűrő</a></h2>
 <p>Az ablak felső részében találunk több lehetőséget is a csomagok szűrésére:</p>
 <ul>
-<li><p>A <span class="menu">Megjelenítés</span> menüből különféle kategóriák közül választhatunk, mint például "<i>Audió</i>" vagy "<i>Játékok</i>". Továbbá megjeleníthetjük csak a telepített csomagokat illetve azokat, amikhez fissítés érhető el.</p></li>
-<li><p>A <span class="menu">Raktár</span> menüből megadva csak az adott raktárban lévő csomagok jelennek meg,</p></li>
-<li><p>A <span class="menu">Keresési feltétel</span> mezőben kulcsszavak beírásával.</p></li>
+<li><p>A <span class="menu">Kategória</span> menüből különféle kategóriák közül választhatunk, mint például "<i>Audió</i>" vagy "<i>Játékok</i>". </p></li>
+<li><p>A <span class="menu">Raktár</span> menü segítségével választhatjuk ki az interneten elérhető raktárak, vagy a más forrásból származó csomagokat ("<i>Helyi</i>"). Ez utóbbi lehet például USB tárhely, letöltött vagy saját készítésű csomag.</p></li>
+<li><p>A <span class="menu">Keresési feltétel</span> mezőben kulcsszavak beírásával szűrhetünk minden szóra (szóközzel elválasztva) a csomagok nevében vagy a leírásukban.</p></li>
 </ul>
 
-<h3>A lista</h3>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list" name="list">A lista</a></h2>
 <p>Mint minden Nyomkövető ablakban, az oszlopfejlécen jobb egérgombbal kattintva itt is megadhatjuk, hogy melyik oszlop jelenjen meg. A bal gombbal kattintva pedig rendezhetjük a lista tartalmát, és persze az oszlopok sorrendje is módosítható azok mozgatásával.</p>
 <p>A csomag állapota több féle is lehet:</p>
 <ul>
-<li><p><span class="menu">Elérhető</span>: A csomag a raktárban jelen van és készen áll a letöltésre és a telepítésre. Ha bármely más csomag az előfeltétele a kiválasztott csomagnak, akkor a program informál minket azok letöltéséről/telepítéséről is.</p></li>
 <li><p><span class="menu">Aktív</span>: A csomag már telepítve van és használatra készen áll.</p></li>
+<li><p><span class="menu">Elérhető</span>: A csomag a raktárban jelen van és készen áll a letöltésre és a telepítésre. Ha bármely más csomag az előfeltétele a kiválasztott csomagnak, akkor a program informál minket azok letöltéséről/telepítéséről is.</p></li>
+<li><p><span class="menu">Folyamatban / %</span>: A <i>Folyamatban</i> állapot akkor látható, amikor a csomag beütemezésre került letöltésre vagy telepítésre. Letöltés közben a folyamat százalékban jelenik meg.</p></li>
 <li><p><span class="menu">Frissítés érhető el</span>: A már telepített csomag egy újabb verziója érhető el.</p></li>
 </ul>
 <p>A lista és az információs panel közötti pontozott vonalat függőlegesen mozgatva a lista méretét módosíthatjuk.</p>
 
-<h3>Információs panel</h3>
-<p>Az ablak alsó részében a kiválasztott csomagról kaphatunk információt.<br />
-A csomag neve mellett kapott helyet a fejlesztő személy/csoport, az értékelés és a verzió. Mindezek mellett pedig egy gomb, ami – a csomag állapotától függően – lehet <span class="button">Telepítés</span>, <span class="button">Eltávolítás</span> vagy <span class="button">Frissítés</span>.</p>
-<p>Az alábbi három lehetőséget kapjuk:</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="info" name="info">Információs panel</a></h2>
+<p>At the bottom is an area that displays information on the package that is currently selected in the list above it.<br />
+To the right of package name, author, rating and version is a button, that – depending on the current state of the package – lets you <span class="button">Install</span>, <span class="button">Uninstall</span> or <span class="button">Update</span> it. If a package is already installed, you'll find an additional button there to <span class="button">Open</span> the application.</p>
+<p>Below are three tabs: About, Ratings, and Changelog.</p>
 <ul>
-<li><p>A <span class="menu">Névjegy</span> részletes információkkal szolgál a csomagról, például képernyőképpel és ha elérhető, akkor a csomagért felelős csoport/személy elérhetőségével.</p></li>
-<li><p>Az <span class="menu">Értékelés</span> panelen az felhasználók esetleges visszajelzéseit láthatjuk. A felhasználók megjegyzéseit is lehet értékelni a jobb oldalon található gombokkal.</p></li>
-<li><p>A <span class="menu">Változásnapló</span> segítségével nyomon követhetjük a csomag eddigi változásait.</p></li>
+<li><p _translation_id="5252"><span class="menu">About</span></p>
+<p _translation_id="5253">The first tab has a detailed description of the package, as well as screenshots and a contact address and URL of the team that maintains the packaged software, if available. Clicking the screenshot thumbnail will open it full-size in a new window</p></li>
+<li><p _translation_id="5254"><span class="menu">Ratings</span></p>
+<p _translation_id="5255">The second tab shows ratings and comments of users, if available.</p>
+<img src="../images/apps-images/haikudepot-rating-tab.png" alt="haikudepot-rating-tab.png" />
+<p _translation_id="5268">To the left is a statistic, showing the number of stars (1 to 5) the package got from how many users.<br />
+In the middle are user comments with their nickname, the number of stars they gave the package and which version of the package they were rating or commenting on. You'll find more on how to rate a package yourself <a href="#rating">further down</a>.<br />
+With the little thumb up/down icons to the right, you can show your approval or disapproval with a certain comment.</p></li>
+<li><p _translation_id="5257"><span class="menu">Changelog</span></p>
+<p _translation_id="5258">The last tab shows the detailed history of all the  versions of the package that have been released so far.</p></li>
 </ul>
 
-<h3>Eszközök és Beállítások</h3>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="menu" name="menu">Eszközök és Beállítások</a></h2>
 <p>Az <span class="menu">Eszközök</span> menüben találjuk a <span class="menu">Raktárak frissítése</span> menüt. Ezzel lekérhetjük az összes elérhető csomagot a raktárakból.</p>
 <p>A <span class="menu">Beállítások</span> menüben találjuk a <span class="menu">Fejlesztői csomagok megjelenítése</span> és a <span class="menu">Forráskód csomagok megjelenítése</span> opciót. Általában az átlag felhasználónak nincs szüksége ezekre a csomagokra. Ugyanakkor fontosak lehetnek azoknak, akik ezekre a csomagokra alapozva fejlesztik a programjaikat.</p>
+<p>Of more interest are the other two items, <span class="menu">Show available packages</span> and <span class="menu">Show installed packages</span>, which are pretty self-explanatory.</p>
 
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="account" name="account">Creating a User Account</a></h2>
+<p>To be able to rate a package, you need a user account at the <a href="http://depot.haiku-os.org">Haiku Depot Server</a> that serves all the packages and keeps track of ratings and user comments. You can create an account within the HaikuDepot application by clicking on the menu in the far right of the menu bar that shows your current status: <span class="menu">Not logged in</span>. Choosing <span class="menu">Log in...</span> opens a window with two tabs; one to enter your user name and password (once you have those) to log in, and the other to create a new account:</p>
+<img src="../images/apps-images/haikudepot-login-tab.png" alt="haikudepot-login-tab.png" /> 
+<p>To create an account you need to:</p>
+<ul><li>use an all lower-case user name without special characters</li>
+<li>use a password that's at least 8 characters long with at least 2 capitals and 2 numbers</li>
+<li>provide a valid email address (if you want a new password sent to you in case you forgot it)</li>
+<li>solve the captcha</li></ul>
+<p>After logging in, the top-right menu of the HaikuDepot window will now say <span class="menu">Logged in as (...)</span>, showing your user name. The menu now offers you to <span class="menu">Switch account...</span> or <span class="menu">Log out</span>.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="rating" name="rating">Rating and Commenting</a></h2>
+<p>After you've created a user account and are logged in, you can rate a package and leave a comment, if you want. Just hover the mouse over the rating stars in the info area of a package and they turn into a <span class="button">Rating...</span> button. Click it to open the rating window:</p>
+<img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
+<p>Here you move the mouse over the stars to light them up and choose your rating, you can also choose from a number of levels to judge the stability of the application and pick the language of your optional comment. To make a comment meaningful, you should have worked with the application you're about to rate for a while to become familiar with its features, bugs and quirks. And don't write the next great American novel... keep it short, sweet and polite. :)<br />
+After you click <span class="button">Send</span> the data is transmitted to the server. You may have to go to the <span class="menu">Tools</span> menu to <span class="menu">Refresh depots</span> before you can see your changes.</p>
+<p>At any time, you can come back and edit your comment and re-rate it. You can also hide your rating from other users by deactivating the checkbox <span class="menu">Other users can see this rating</span>.</p>
 </div>
 </div>
 
-<!--
 <div class="nav">
 <div class="inner"><span>
  «  <a href="expander.html">Kicsomagoló</a> 
@@ -109,6 +151,6 @@ A csomag neve mellett kapott helyet a fejlesztő személy/csoport, az értékel�
 ::  <a href="icon-o-matic.html">Icon-O-Matic</a>  »
 </span></div>
 </div>
--->
+
 </body>
 </html>

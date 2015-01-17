@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,6 +56,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Aplicações em linha de comando específicas do Haiku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -90,11 +91,14 @@ Gostaria de um atalho para ele?" "Na Área de Trabalho" "No Deskbar" "Não, obri
 <pre class="terminal">filepanel -s -t "Salve seu arquivo de log" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
-<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> é uma maneira elegante de aguardar por um aplicativo particular ou tarefa ser iniciado ou até ter terminado.</p>
+<tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
+<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... Thanks to Scot Hacker's BeOS Bible, there's a nice <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> é a versão em linha de comando da janela Procurar. Na verdade, uma maneira rápida para gerar o termo de pesquisa é construir uma consulta na janela Procurar, converter para <span class="menu">por fórmula</span>, adicionar aspas duplas (<tt>"</tt>) no início e no fim e colar a sequência inteira após o comando <span class="cli">query</span> no Terminal ou no seu script.</p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">waitfor</span> é uma maneira elegante de aguardar por um aplicativo particular ou tarefa ser iniciado ou até ter terminado.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -102,7 +106,7 @@ Gostaria de um atalho para ele?" "Na Área de Trabalho" "No Deskbar" "Não, obri
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> é uma importante ferramenta para checar erros no seu sistema de arquivos. Simplesmente adicione o nome do volume ou dispositivo e ele irá executar através de todos os arquivos e corrigir inconsistências quando possível.</p>
+		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add a volume name like <span class="path">/Haiku</span> or device path and it'll run through every file and correct inconsistencies where possible.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> pode instalar um ícone para qualquer arquivo, pasta, consulta ou aplicativo na bandeja do Deskbar. Ele também oferece a opção de prover um menu de contexto quando clicar com o botão direito do mouse em um ícone para executar ações especiais. Como um exemplo, tente isto para adicionar o aplicativo de linha de comando <span class="app">screenshot</span> com várias opções (a "<tt>\</tt>" na primeira linha é apenas para a quebra de linha no Terminal):</p>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -90,11 +90,14 @@ További információk az <a href="../index.html">Indexek</a> fejezetben.</p>
 <pre class="terminal">filepanel -s -t "Mentse el a naplót" -d ~/config/settings -n Napló.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
-<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>A <span class="cli">waitfor</span> egy hasznos kis program, aminek segítségével várhatunk egy program elindításáig, vagy bezárásig.</p>
+<tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
+<td valign="top"><p>A <span class="cli">hey</span> egy hasznos kis program, ami segítségével BMessage üzeneteket küldhetünk programoknak, majd megkapjuk a válaszokat is. Ez szkript írásakor lehet hasznos, például egy program "távirányítása" szkriptből vagy parancssorból. A használata egy kicsit összetett... Köszönhetően Scot Hacker BeOS Bible könyvének, kapunk egy kis <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey</a> leírást, melyet Chris Herborth készített.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p>A <span class="cli">query</span> a kereső panel parancssori megfelelője. A leggyorsabb módja a kereső feltételeknek a generálására az, ha a kereső panelben a <span class="menu">képlet alapján</span> készítjük el a keresési szabályt, majd azt dupla idézőjel (<tt>"</tt>) közé rakva bemásoljuk a <span class="cli">query</span> parancs után paraméternek a Terminálba vagy a szkriptbe.</p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>A <span class="cli">waitfor</span> egy hasznos kis program, aminek segítségével várhatunk egy program elindításáig, vagy bezárásig.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -102,8 +105,7 @@ További információk az <a href="../index.html">Indexek</a> fejezetben.</p>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p>A <span class="cli">checkfs</span> egy fontos program, ami a fájlrendszer hibáit ellenőrzi. Egyszerűen csak adjuk meg a lemez nevét, és az összes fájlt le fogja ellenőrizni.</p>
-</td></tr>
+		<td><p>A <span class="cli">checkfs</span> egy fontos program, ami a fájlrendszer hibáit ellenőrzi. Egyszerűen csak adjuk meg a lemez nevét, például <span class="path">/Haiku</span> és az összes fájlt le fogja ellenőrizni.</p></td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p>A <span class="cli">desklink</span> lehetőséget ad arra, hogy bármilyen fájlt, mappát, lekérdezést vagy programot az Asztalsávra, a Polcra helyezzünk. Továbbá lehetőségünk van helyi menüvel is ellátni azt. Az alábbi példa a <span class="app">screenshot</span> programot használja néhány opcióval (a "<tt>\</tt>" az első sor végén a sortörést jelzi a Terminálban):</p>
 <pre class="terminal">desklink "cmd=Aktív ablak (2mp):/bin/screenshot --window --border --delay 2" \

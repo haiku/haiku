@@ -48,9 +48,9 @@
 <li><a href="../../en/applications/vision.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="pe.html">Pe</a> 
-::  <a href="../applications.html#list-of-bundled-apps" class="uplink">Anwendungen</a> 
-::  <a href="wonderbrush.html">WonderBrush</a>  »
+ «  <a href="pe.html">Pe</a> 
+::  <a href="../applications.html#list-of-bundled-apps" class="uplink">Anwendungen</a> 
+::  <a href="wonderbrush.html">WonderBrush</a>  »
 </span></div>
 </div>
 
@@ -67,6 +67,188 @@
 <p>Vision ist ein IRC Client, der ursprünglich für das BeOS entwickelt wurde. Auf der <a href="http://vision.sourceforge.net/">Vision Webseite</a> findet man Anleitung und Bugtracker.</p>
 <div class="box-info">In den  <a href="http://www.haiku-os.org/community/irc">Haiku Kanälen</a> findet man in verschiedenen Sprachen Hilfe von anderen Benutzern und Entwicklern.<br />
 Am besten besucht, ist der englischsprachige Kanal #haiku von irc.freenode.org.</div>
+<p>Hier eine Liste von Befehlen, die in Vision eingegeben werden können. Sie wurden mit Genehmigung von der Vision Webseite kopiert. </p>
+<p>Die Syntax:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="0">
+<tr><td><tt>/BEFEHL</tt></td><td width="10"></td><td>der Befehl</td></tr>
+<tr><td><tt>&lt;benötigt&gt;</tt></td><td></td><td>ein benötigter Parameter</td></tr>
+<tr><td><tt>[optional]</tt></td><td></td><td>ein optionaler Parameter</td></tr>
+<tr><td><tt>|</tt></td><td></td><td>eine Oder-Verknüpfung</td></tr>
+<tr><td><tt>...</tt></td><td></td><td>weitere Parameter möglich</td></tr>
+</table>
+
+<ul>
+<li><p><span class="menu">/ABOUT</span><br />
+Öffnet Visions "Über" Fenster.</p></li>
+
+<li><p><span class="menu">/ACRONYM [Wort]</span><br />
+Öffnet www.acronymfinder.com mit der für HTML bevorzugten Anwendung.</p></li>
+
+<li><p><span class="menu">/AWAY [Begründung]</span><br />
+Setzt den "Away" Status im aktuellen Netzwerk. Wird keine Begründung mit angegeben, wird er auf 'BRB' gesetzt ("be right back" - "Bin gleich zurück").</p></li>
+
+<li><p><span class="menu">/BACK</span><br />
+Setzt den Status im aktuellen Netzwerk zurück ("back" - "Bin zurück").</p></li>
+
+<li><p><span class="menu">/CLEAR</span><br />
+Leert den aktuellen Textpuffer.</p></li>
+
+<li><p><span class="menu">/CTCP &lt;Username|Kanal&gt; &lt;PING|VERSION|FINGER|TIME|CLIENTINFO|USERINFO&gt;</span><br />
+Wendet den angegebenen CTCP Befehl auf einen User oder Kanal an.</p></li>
+
+<li><p><span class="menu">/DCC &lt;CHAT&gt; &lt;Username&gt;</span><br />
+Öffnet eine private DCC Chat Sitzung mit dem angegebenen Usern.</p></li>
+
+<li><p><span class="menu">/DCC &lt;SEND&gt; &lt;Username&gt; [Datei]</span><br />
+Schickt eine Datei an &lt;Username&gt;. Wird keine Datei angegeben, öffnet sich ein Auswahl-Dialog,</p></li>
+
+<li><p><span class="menu">/DEOP /DOP /DEVOICE &lt;Username1&gt; [Username2] ...</span><br />
+De-ops oder de-voices &lt;Username(n)&gt;.</p></li>
+
+<li><p><span class="menu">/DESCRIBE &lt;Username&gt; &lt;Nachricht&gt;</span><br />
+Wie /ME, aber es wird eine Anfrage an  &lt;Username&gt; geöffnet.</p></li>
+
+<li><p><span class="menu">/DNS &lt;Domäne/IP Adresse&gt;</span><br />
+Löst die angegebene IP oder Domäne auf.</p></li>
+
+<li><p><span class="menu">/EXIT</span><br />
+Beendet Vision.</p></li>
+
+<li><p><span class="menu">/GAWAY [Begründung]</span><br />
+Wie /AWAY, aber für alle verbundenen Netzwerke.</p></li>
+
+<li><p><span class="menu">/GBACK</span><br />
+Wie /BACK, aber für alle verbundenen Netzwerke.</p></li>
+
+<li><p><span class="menu">/GOOGLE [Suchbegriff]</span><br />
+Öffnet www.google.com mit der für HTML bevorzugte Anwendung.</p></li>
+
+<li><p><span class="menu">/INVITE /I &lt;Username&gt; &lt;Kanal&gt;</span><br />
+Lädt &lt;Username&gt; in den &lt;Kanal&gt; ein.</p></li>
+
+<li><p><span class="menu">/JOIN /J &lt;Kanal&gt; [Kanal-Schlüssel]</span><br />
+Betritt den &lt;Kanal&gt;. Übergibt den [Kanal-Schlüssel], falls erforderlich.</p></li>
+
+<li><p><span class="menu">/KICK /K &lt;Username&gt; [Begründung]</span><br />
+Kickt &lt;Username&gt; aus dem aktuellen Kanal. Wird keine [Begründung] angegeben, wird die in den Einstellungen definierte benutzt.</p></li>
+
+<li><p><span class="menu">/KILL &lt;Username&gt; [Nachricht]</span><br />
+Der IRC Operator-Befehl um einen User aus dem Netzwerk zu werfen.</p></li>
+
+<li><p><span class="menu">/LIST</span><br />
+Öffnet ein neues Panel mit einer Liste aller Kanäle des aktuellen Netzwerks [außer versteckte Kanäle].</p></li>
+
+<li><p><span class="menu">/M</span><br />
+Zeigt die Kanal-Modi des aktuellen Kanals an.</p></li>
+
+<li><p><span class="menu">/M &lt;+-ohvbeqa&gt; &lt;Username1&gt; [Username2] ...</span><br />
+Wie <span class="menu">MODE &lt;Kanal&gt; &lt;Modi&gt; &lt;Username&gt;</span>, aber für den aktuellen Kanal.</p></li>
+
+<li><p><span class="menu">/M &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
+Wie <span class="menu">/MODE &lt;Kanal&gt; &lt;Modi&gt;</span>, aber für den aktuellen Kanal.</p></li>
+
+<li><p><span class="menu">/ME &lt;Text&gt;</span><br />
+Anzeige: <i>* humdinger &lt;Text&gt;.</i></p></li>
+
+<li><p><span class="menu">/MODE &lt;Kanal&gt; &lt;+-ohvbeqa&gt; &lt;Username1&gt; [Username2] ...</span><br />
+Setzt den Modus für &lt;Username(n)&gt; auf  &lt;Kanal&gt;.<br />
+z. B. <span class="menu">/MODE #Kanal +o Username</span><br />
+oder <span class="menu">/MODE #Kanal +oo-o Username1 Username2 Username3</span></p></li>
+
+<li><p><span class="menu">/MODE &lt;Kanal&gt; &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
+Setzt den Modus von &lt;Kanal&gt; (die Kommas dienen nur zur optischen Trennung).<br />
+z. B. <span class="menu">/MODE #Kanal +ms</span>.</p></li>
+
+<li><p><span class="menu">/MSG &lt;Username&gt; &lt;Nachricht&gt;</span><br />
+Schickt eine &lt;Nachricht&gt; an &lt;Username&gt;.</p></li>
+
+<li><p><span class="menu">/NAMES</span><br />
+Listet alle Kanäle und alle User des Netzwerks im Netzwerkpanel auf (Achtung: damit sollte man vorsichtig sein).</p></li>
+
+<li><p><span class="menu">/NAMES &lt;Kanal&gt;</span><br />
+Listet alle User in &lt;Kanal&gt;.</p></li>
+
+<li><p><span class="menu">/NICK &lt;neuer-Username&gt;</span><br />
+Ändert den Usernamen zu &lt;neuer-Username&gt;.</p></li>
+
+<li><p><span class="menu">/NOTICE &lt;Username&gt; &lt;Nachricht&gt;</span><br />
+Schickt einen Hinweis mit der &lt;Nachricht&gt; an &lt;Username&gt;.</p></li>
+
+<li><p><span class="menu">/NOTIFY &lt;Username1&gt; [Username2] ...</span><br />
+Fügt &lt;Username(n)&gt; zur Benachrichtungsliste.</p></li>
+
+<li><p><span class="menu">/PEXEC /RRUN &lt;Anwendung1&gt; [ | &lt;Anwendung2&gt; | ... ]</span><br />
+Startet die angebene &lt;Anwendung&gt;. Wird mehr als eine Anwendung übergeben, werden sie nacheinander ausgeführt.<br />
+z. B. <span class="menu">/PEXEC Terminal | StyledEdit</span> öffnet ein Terminal und danach StyledEdit<br />
+oder <span class="menu">/PEXEC ls -la ~/Downloads/</span> zeigt den INhalt des ~/Downloads/ Ordner im aktuellen Fenster an (also Achtung!).</p></li>
+
+<li><p><span class="menu">/OP /VOICE &lt;Username1&gt; [Username2] ...</span><br />
+"Ops" oder "voices" für &lt;Username(n)&gt;.</p></li>
+
+<li><p><span class="menu">/PART</span><br />
+Verlässt den aktuellen Kanal der Netzwerk.</p></li>
+
+<li><p><span class="menu">/PING &lt;Username&gt;</span><br />
+Pingt &lt;Username&gt; und gibt die Ping-Zeit aus. Entspricht <span class="menu">/CTCP &lt;Username&gt; PING</span>.</p></li>
+
+<li><p><span class="menu">/QUERY /Q &lt;Username&gt; [Nachricht]</span><br />
+Öffnet ein Anfragefenster für &lt;Username&gt; und sendet optional gleich eine [Nachricht].</p></li>
+
+<li><p><span class="menu">/QUIT /QUI [eigene-Verabschiedung]</span><br />
+Verlässt das aktuelle Netzwerk. Wird keine [eigene-Verabschiedung] angegeben, wird die in den Einstellungen definierte benutzt.</p></li>
+
+<li><p><span class="menu">/RAW /QUOTE &lt;Befehl|Text&gt;</span><br />
+Sendet einen IRC Befehl.</p></li>
+
+<li><p><span class="menu">/RECONNECT</span><br />
+Baut die Verbindung zum aktuellen Netzwerk erneut auf, wenn die 47 automatischen Versuche fehlgeschlagen sind.</p></li>
+
+<li><p><span class="menu">/SLEEP &lt;Dezi-Sekunden&gt;</span><br />
+Lässt den aktuellen Thread für die angegebene Zeit schlafen ; für zukünftiges Scripting.</p></li>
+
+<li><p><span class="menu">/SQUIT</span><br />
+IRC Operator-Befehl um die Verbindung zu einen Server abzubrechen.</p></li>
+
+<li><p><span class="menu">/T</span><br />
+Zeigt das Thema des aktuellen Kanals an.</p></li>
+
+<li><p><span class="menu">/T &lt;Neues-Kanal-Thema&gt;</span><br />
+Wie <span class="menu">/TOPIC &lt;Kanal&gt; &lt;Neues-Kanal-Thema&gt;</span>, aber für den aktuellen Kanal.
+</p></li>
+
+<li><p><span class="menu">/TIME &lt;Usernam&gt;</span><br />
+Zeigt die lokale Zeit von &lt;Username&gt;. Entspricht <span class="menu">/CTCP &lt;Username&gt; TIME</span>.</p></li>
+
+<li><p><span class="menu">/TOPIC &lt;Kanal&gt;</span><br />
+Zeigt das Thema von &lt;Kanal&gt;.</p></li>
+
+<li><p><span class="menu">/TOPIC &lt;Kanal&gt; &lt;Neues-Kanal-Thema&gt;</span><br />
+Setzt das Thema von &lt;Kanal&gt; auf &lt;Neues-Kanal-Thema&gt;.</p></li>
+
+<li><p><span class="menu">/UNNOTIFY &lt;Username1&gt; [Username2] ...</span><br />
+Entfernt &lt;Username(n)&gt; von der Benachrichtigungsiste.</p></li>
+
+<li><p><span class="menu">/UPTIME [-l]</span><br />
+Zeigt die System-Laufzeit. Mit [-l] wird die Laufzeit nur lokal ausgegeben und nicht zum Netzwerk gesendet.</p></li>
+
+<li><p><span class="menu">/VERSION &lt;Username&gt;</span><br />
+Zeigt die Version des IRC-Programms von  &lt;Username&gt;. Entspricht <span class="menu">/CTCP &lt;Username&gt; VERSION</span>.</p></li>
+
+<li><p><span class="menu">/VISIT &lt;URL&gt;</span><br />
+Öffnet die &lt;URL&gt; mit der für HTML bevorzugten Anwendung.</p></li>
+
+<li><p><span class="menu">/WEBSTER /DICTIONARY [Wort]</span><br />
+Öffnet www.m-w.com (Merriam Webster) mit der für HTML bevorzugten Anwendung.</p></li>
+
+<li><p><span class="menu">/VUPTIME [-l]</span><br />
+Zeigt die Laufzeit von Vision. Der [-l] Parameter ist derselbe wie für <span class="menu">/UPTIME</span>.</p></li>
+
+<li><p><span class="menu">/WALLOPS</span><br />
+IRC Operator-Befehl zum Senden einer "wallops" Nachricht (sichtbar für alle mit aktivem umode w.).</p></li>
+
+<li><p><span class="menu">/WHOIS /W &lt;Username&gt;</span><br />
+Zeigt whois Infos von &lt;Username&gt;.</p></li>
+</ul>
 
 </div>
 </div>
@@ -74,9 +256,9 @@ Am besten besucht, ist der englischsprachige Kanal #haiku von irc.freenode.org.<
 <!--
 <div class="nav">
 <div class="inner"><span>
- «  <a href="pe.html">Pe</a> 
-::  <a href="../applications.html#list-of-bundled-apps" class="uplink">Anwendungen</a> 
-::  <a href="wonderbrush.html">WonderBrush</a>  »
+ «  <a href="pe.html">Pe</a> 
+::  <a href="../applications.html#list-of-bundled-apps" class="uplink">Anwendungen</a> 
+::  <a href="wonderbrush.html">WonderBrush</a>  »
 </span></div>
 </div>
 -->

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -83,18 +83,23 @@
 Выбрав в меню <span class="menu">Изменить</span> пункт <span class="menu">Заголовок окна...</span> можно изменить заголовок окна Терминала.</p>
 <p>Правый щелчок мыши по вкладке вызывает контекстное меню, которое содержит следующие пункты: <span class="menu">Закрыть вкладку</span>, <span class="menu">Закрыть остальные вкладки</span>, <span class="menu">Переименовать вкладку</span>.</p>
 <p>У окна Терминала изменяется размер, как и у любого другого приложения, а также имеется возможность использовать предустановленные размеры окна, выберите в меню <span class="menu">Настройки</span> пункт <span class="menu">Размер окна</span>. Сочетание клавиш <span class="key">ALT</span>+<span class="key">ENTER</span> включает полноэкранный режим.</p>
-<p>Измененный размер окна и кодировку текста можно сохранить, выбрав в меню <span class="menu">Настройки</span>  пункт <span class="menu">Сохранить</span>.</p>
+<p>All the settings you change directly through the <span class="menu">Settings</span> menu, like <span class="menu">Window title</span>, <span class="menu">Window size</span>, <span class="menu">Text encoding</span> or <span class="menu">Font size</span> are only kept for the current session. If you want to make permanent changes, you have to apply them in the <span class="menu">Settings...</span> panel.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Настройки</a></h2>
 <p>Выбрав в меню <span class="menu">Настройки</span> пункт <span class="menu">Настройки...</span> откроется окно настроек Терминала.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>Можно установить "формулу" для заголовков терминала и вкладок. Также позволяет настроить шрифт. Вы также можете выбрать одну из предустановленных цветовых схем: <span class="menu">Чёрный текст на белом фоне</span> or <span class="menu">Белый текст на чёрном фоне</span>, либо создать свою <span class="menu">Настроена вручную</span>, используя палитру цветов ниже.<br />
-Активировав пункт <span class="menu">Подтверждать выход если процессы ещё запущены</span>, вы будете информированы, когда попытаетесь закрыть окно Терминала, в котором ещё есть запущенные приложения.<br />
-Вы можете сохранять разные настройки в файлы, для их загрузки в будущем вам просто потребуется дважды щёлкнуть по файлу с настройками, после чего откроется Терминал с соответствующими настройками.<br />
-Нажав кнопку <span class="button">Ок</span> текущие настройки сохранятся как настройки по умолчанию.</p>
-
+<p>Most of the offered settings speak for themselves.<br />
+Hover your mouse over the "formulas" for naming tab and window titles to get tooltips for the available variables. <br />
+You can choose pre-defined color schema like <span class="menu">Midnight</span> or <span class="menu">Retro</span> or create a <span class="menu">Custom</span> one by selecting which color you want to change (<span class="menu">Text</span>, <span class="menu">Background</span>, <span class="menu">Cursor</span> etc.) and then use  the color picker below.</p>
+<p>A few more options follow: you can have a <span class="menu">Blinking cursor</span> and choose to <span class="menu">Use bright instead of bold text</span>. The latter setting avoids the sometimes rather unsightly rendering of bold fonts in the Terminal.<br />
+Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td class="onelinetop"><span class="button">Save to file...</span></td><td width="10"> </td><td>let's you save different settings as separate profiles, which on double-click open an accordingly configured Terminal.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you opened the settings panel.</td></tr>
+<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Горячие клавиши</a></h2>

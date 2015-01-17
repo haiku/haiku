@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -91,18 +91,21 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
-<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> はアプリケーションやスレッドの開始および終了を待つのにピッタリです。</p>
+<tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
+<td valign="top"><p><span class="cli">hey</span> は、BMessage をアプリケーションに送信し、アプリケーションからの返信を出力する小さなヘルパーツールです。それは、アプリケーションスクリプティングに使用されます。つまり、あるプログラムを、スクリプトまたはコマンドラインから "リモートコントロール" します。使い方はすこし複雑です... Scot Hacker の BeOS Bible のおかげで、Chris Herborth によるすばらしい <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey チュートリアル</a> があります。</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">query</span> は、検索 (Find) パネルのコマンドラインバージョンです。ちなみに、検索語句をすばやく生成するには、検索パネルでクエリを生成し、<span class="menu">式で検索 (by formula)</span> に切り替えて先頭と末尾にダブルクオート (<tt>"</tt>) を追加し、その文字列全体をターミナルまたはスクリプトの <span class="cli">query</span> コマンドの後に貼り付けます。</p></td></tr></table>
+		<td valign="top"><p><span class="cli">query</span> は、検索 (Find) パネルのコマンドラインバージョンです。ちなみに、検索語句をすばやく生成するには、検索パネルでクエリを生成し、<span class="menu">式で検索 (by formula)</span> に切り替えて先頭と末尾にダブルクオート (<tt>"</tt>) を追加し、その文字列全体をターミナルまたはスクリプトの <span class="cli">query</span> コマンドの後に貼り付けます。</p></td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">waitfor</span> はアプリケーションやスレッドの開始および終了を待つのにピッタリです。</p>
+</td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-other" name="cli-other">ほかのコマンド</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> はファイルシステムのエラーをチェックするための重要なツールです。実行は単にボリューム名またはデバイス名を追加するだけです。すると、すべてのファイルを走査して、可能な場合は不整合を修復します。</p>
+		<td><p><span class="cli">checkfs</span> はファイルシステムのエラーをチェックするための重要なツールです。実行は単に <span class="path">/Haiku</span> のようなボリューム名またはデバイス名を追加するだけです。すると、すべてのファイルを走査して、可能な場合は不整合を修復します。</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> を使用すると、任意のファイルやフォルダー、クエリ、アプリケーションのアイコンを Deskbar トレイにインストールできます。特別なアクションを実行するためにアイコンを右クリックしたときに表示されるコンテキストメニューを定義するためのオプションもあります。例として、次のようにいろいろなオプション (1 行目の "<tt>\</tt>" はターミナルでの改行を表します) を付けて、<span class="app">スクリーンショット (screenshot) </span> を Deskbar に追加してみましょう。</p>

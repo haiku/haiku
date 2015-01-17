@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2015, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,28 +59,30 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h1>Applications</h1>
 
 <p>Avant de s'intéresser à toutes les applications fournies avec Haiku, voyons plus en détails comment installer et désinstaller des programmes. La méthode la plus commode pour trouver, installer, mettre à jour et désinstaller des applications se fait via le système de gestion de paquet de Haiku. Cependant, depuis que Haiku est en grande partie compatible avec les binaires et les sources de son ancêtre BeOS, vous pourrez trouver des archives plus anciennes (.zip et .pkg) qui peuvent tout aussi bien être installées.</p>
-<div class="box-info">Ci-dessous vous trouverez toujours  la hiérarchie <tt>~/config/</tt> du dossier Home    mentionné. Si vous avez l'intention de partager les paquets avec tous les utilisateurs (une fois que Haiku sera devenu multi-utilisateurs), vous devriez utiliser l'arborescence des fichiers système miroir dans <tt>/system/</tt>. Voir sujet <a href="filesystem-layout.html">Arborescence des fichiers système</a> pour plus d'informations.</div>
+<div class="box-info">Below you'll always find the <tt>/system/</tt> hierarchy of the mentioned. If you intend to install packages only for a single user (once Haiku becomes multi-user aware), you should use the mirrored filesystem hierarchy under home: <tt>~/config/</tt>. See topic <a href="filesystem-layout.html">Filesystem layout</a> for more information.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hpkg" name="hpkg">Les paquets Haiku (.hpkg)</a></h2>
-<p>La façon la plus simple est d'utiliser <a href="applications/haikudepot.html">HaikuDepot</a> pour trouver, télécharger et installer ou désinstaller automatiquement un package. Si l'installation n'est pas disponible — peut-être parce que vous avez téléchargé un package dans un dépôt (repositories) qui n'est pas (encore) public — il est tout aussi facile de l'installer manuellement: Déplacez simplement le fichier .hpkg vers <tt>~/config/packages/</tt>. </p>
-<p>Vous trouverez l'application nouvellement installée dans <tt>~/config/apps/</tt> ou, dans le cas d'une application en ligne de commande, dans <tt>~/config/bin/</tt>. Tous les autres fichiers dont dépend le programme (libraires, données, extensions, etc.) apparaissent automatiquement à l'emplacement des fichiers système.</p>
+<p>The simplest way is to use <a href="applications/haikudepot.html">HaikuDepot</a> to find, download and automatically install and uninstall a package. If you have downloaded a package from somewhere else — maybe because it's not (yet) in a public repository — just double-click it to open in HaikuDepot and install from there.</p>
+<p>You'll find the newly installed application in <tt>/system/apps/</tt> or, in case of a commandline application, in <tt>/system/bin/</tt>. All other files the program depends upon (libraries, data, add-ons, etc.) appear automatically in the right locations in the filesystem.</p>
 <p>Généralement, rien de tout cela ne sera nécessaire et vous aurez terminé après avoir décompressé l'archive.<br />
 Consultez les sujets <a href="deskbar.html">Deskbar</a> ou <a href="desktop-applets/launchbox.html">LaunchBox</a> pour savoir comment créer des raccourcis vers vos applications nouvellement installées.</p>
-<p>Désinstaller est tout aussi simple: déplacez le fichier hors de <tt>~/config/packages/</tt>.</p>
 <div class="box-info">À propos, bien que vous pouvez déballer un fichier .hpkg comme n'importe quel autre archive, ce n'est pas ce que le gestionnaire de paquets fait lorsque vous installer un paquet. Les fichiers système sous-jacents apparaissent seulement pour propager des fichiers dans leurs dossiers respectifs, il n'y a aucun mouvement autour de là où ils se trouvent. Ceci explique la rapidité et la netteté de l'installation/désinstallation.</div>
 <p>Si le paquet dépend d'une autre librairie ou d'un autre paquet, une fenêtre apparaîtra, demandant si les fichiers nécessaires doivent être téléchargés et installés.</p>
+<p>Uninstalling is just as easy: Simply find the package in HaikuDepot and click <span class="button">Uninstall</span>.</p>
+<p>If you're working in the Terminal or want to do un/installing of packages in a script, you should have a look at the command <tt>pkgman --help</tt>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">Anciennes archives BeOS (.zip and .pkg)</a></h2>
 <p>Les archives BeOS qui incluent tout ce dont elles ont besoin dans le dossier de l'application peuvent simplement être déballées (double cliquer ouvre <span class="app">Expander</span> ou le vieux <span class="app">PackageInstaller</span>) n'importe où dans <tt>/boot/home/</tt> et démarre à partir de là. Désinstaller  une telle application auto-suffisante est très aisé. Supprimez simplement le dossier de l'application.</p>
-<p>Ce n'est pas vrai pour la majorité des anciennes applications BeOS. Si vous tombez sur une application qui ne marche pas parce qu'elle veut déployer des fichiers dans des endroits qui n'existent peut-être pas, vous pouvez essayer de réparer le problème manuellement. Le dossier <tt>~/config/non-packaged/</tt> vous permet de recréer l'arborescence des dossiers nécessaires. Puisque de plus en plus de paquets .hpkg sont disponibles et que les vieilles applications BeOS sont ré-empaquetées, ceci sera bientôt inutile. Veuillez consulter <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">cet article</a> pour savoir comment utiliser l'arborescence des <tt>dossiers non empaquetée</tt>.</p>
+<p>This is true for the majority of old BeOS applications. If you happen upon one that doesn't work out-of-the-box, because it wants to spread its files to hard-coded locations that are not guaranteed to exist, you can try to fix things manually. The folder <tt>/system/non-packaged/</tt> allows you to recreate the needed folder hierarchy. As more and more real .hpkg packages become available and old BeOS applications get re-packaged, this will become less needed. Please consult this <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">online article</a> on how to use the <tt>non-packaged</tt> hierarchy.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -91,8 +93,6 @@ Consultez les sujets <a href="deskbar.html">Deskbar</a> ou <a href="desktop-appl
 		<td valign="top">Permet de surveiller les ressources système comme le processeur et la mémoire.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">BootManager</a></td><td> </td>
 		<td valign="top">Installe un menu d'amorçage dans le "Master Boot Record" (MBR) au début du disque.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CDPlayer</a></td><td> </td>
-		<td valign="top">Un lecteur de CD audio.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">CharacterMap</a></td><td> </td>
 		<td valign="top">Affiche la table des caractères Unicode.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>

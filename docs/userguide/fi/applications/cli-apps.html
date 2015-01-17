@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -61,7 +61,7 @@
 <tr><td>Sijainti:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Kaikki Haikun mukana toimitettavat komentorivisovellukset ovat joko kansiossa  <span class="path">/boot/system/bin</span>. Omien tai ylimääräisinä asennettujen komentorivisovellusten pitäisi mennä kansioon <span class="path">~/config/bin</span>, kun ne asennetaan .hpkg-pakkauksesta. Muussa tapauksessa laitat ne kansioon <span class="path">~/config/non-packaged/bin/</span>. Kaikki nämä sijainnit ovat PATH-muuttujan osia ja löytyvät siksi automaattisesti.<br />
+<p>Kaikki Haikun mukana toimitettavat komentorivisovellukset ovat kansiossa  <span class="path">/boot/system/bin</span>. Omien tai ylimääräisinä asennettujen komentorivisovellusten pitäisi mennä kansioon <span class="path">~/config/bin</span>, kun ne asennetaan .hpkg-pakkauksesta. Muussa tapauksessa laitat ne kansioon <span class="path">~/config/non-packaged/bin/</span>. Kaikki nämä sijainnit ovat PATH-muuttujan osia ja löytyvät siksi automaattisesti.<br />
 Seuraava ei ole tyhjentävä luettelo kaikista Haiku-kohtaisista CLI-sovelluksista, se palvelee vain korostamalla muutamaa kaikkein hyödyllisintä antamaan sinulle makua komentorivisovelluksista. Rohkaistu itse omalta osaltasi tutkimaan, mitä on <span class="path">bin/</span> -kansioissa. Sovelluksen suorittaminen parametrillä <tt>--help</tt> näyttää komennon käytön ja kaikki sen eri valitsimet.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -89,11 +89,14 @@ Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"
 <pre class="terminal">filepanel -s -t "Tallenna lokitiedostosi" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
-<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> on kiva tapa odottaa tietyn sovelluksen tai säikeen käynnistymistä tai loppumista.</p>
+<tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
+<td valign="top"><p><span class="cli">hey</span> on pieni aputyökalu, joka lähettää BMessage-viestit sovellukseen ja tulostaa niiden vastauksen. Sitä voidaan käyttää sovellusskriptaukseen, toisin sanoen sovelluksen "kauko-ohjaukseen" skriptistä tai komentoriviltä. Sen käyttö on hiukan mutkikasta... Scot Hackerin BeOS-raamatussa on perusteellinen <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey-oppikurssi</a>, jonka tekijä on Chris Herborth.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> on komentoriviversio Etsi-paneelista. Itse asiassa, nopea tapa tuottaa hakutermi on rakentaa kysely Työpöytäpalkin Etsi-paneelissa, vaihtaa valikkoon <span class="menu">kaavoittain</span>, lisätä kaksoislainausmerkit (<tt>"</tt>) eteen ja taakse ja liittää koko merkkijono <span class="cli">query</span>-komentosi perään Pääteikkunassa tai skriptissäsi.</p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">waitfor</span> on kiva tapa odottaa tietyn sovelluksen tai säikeen käynnistymistä tai loppumista.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -101,7 +104,7 @@ Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> on tärkeä työkalu tarkistamaan tiedostojärjestelmäsi virheet. Lisää yksinkertaisesti taltio tai laitenimi ja ohjelma käy lävitse jokaisen tiedoston ja korjaa epäyhtenäisyydet missä mahdollista.</p>
+		<td><p><span class="cli">checkfs</span> on tärkeä työkalu tarkistamaan tiedostojärjestelmäsi virheet. Lisää yksinkertaisesti taltionimi, kuten <span class="path">/Haiku</span> tai laitepolku ja ohjelma käy lävitse jokaisen tiedoston ja korjaa epäyhtenäisyydet missä mahdollista.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> voi asentaa kuvakkeen mille tahansa tiedostolle, kansiolle, kyselylle tai sovellukselle Työpöytäpalkin tarjottimelle. Se tarjoaa myös mahdollisuuden tiettyjen toimintojen suorittamiseen kontekstivalikosta napsauttamalla hiiren oikealla painikkeella kuvaketta. Esimerkkinä, yritä tätä lisäämällä komentorivisovellus <span class="app">screenshot</span> eri valitsimilla ("<tt>\</tt>" ensimmäisellä rivillä on vain rivinvaihto Pääteikkunassa):</p>

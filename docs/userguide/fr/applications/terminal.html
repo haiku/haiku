@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,6 +58,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -83,19 +84,24 @@ De la même façon, vous pouvez éditer le titre de la fenêtre du Terminal via 
 <p>Right-clicking a tab shows a context menu to <span class="menu">Close tab</span>, <span class="menu">Close other tabs</span> or, like double-clicking, <span class="menu">Edit tab title...</span>.
 Un clic droit sur un onglet affiche un menu contextuel pour fermer cet onglet (<span class="menu">Close tab</span>), fermer les autres onglets (<span class="menu">Close other tabs</span>) ou, comme un double-clic, éditer le titre de l'onglet (<span class="menu">Edit tab title...</span>).</p>
 <p>Une fenêtre du Terminal peut être redimensionnée comme toute autre fenêtre ou en utilisant le menu <span class="menu">Settings | Window Size</span>. <span class="key">ALT</span> <span class="key">ENTRÉE</span> permet de basculer en mode plein écran.</p>
-<p>Les changement de taille de fenêtre ou de police ne sont conservés que si vous faites <span class="menu">Settings | Save as default</span>.</p>
+<p>Tous les réglages que vous changez directement depuis le menu <span class="menu">Settings</span> (Réglages)
+comme <span class="menu">Window title</span> (Titre de la fenêtre), <span class="menu">Window size</span> (Taille de la fenêtre), <span class="menu">Text encoding</span> (Encodage texte) or <span class="menu">Font size</span> (Taille de la police) ne s'appliquent qu'à la session en cours. Si vous souhaitez rendre les modifications permanentes, vous devez les appliquer depuis le panneau des <span class="menu">Settings...</span> (Réglages...).</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Réglages</a></h2>
 <p><span class="menu">Settings | Settings...</span> ouvre un panneau pour configurer les réglages standards du Terminal.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>Ça commence avec la formule servant à nommer les onglets et les titres des fenêtres. Là encore, des bulles d'aides montres les variables disponibles.
-En dessous, vous réglez le type et la taille de la police, ainsi que les différentes couleurs de texte et d'arrière plan. Vous pouvez choisir un schéma de couleur prédéfini comme <span class="menu">Black on white</span> (noir sur blanc) ou <span class="menu">White on black</span> (blanc sur noir) ou en créer un <span class="menu">Personnel</span> en utilisant le sélecteur de couleur au dessous.<br />
-En activant la boite à cocher <span class="menu">Confirm exit if active programs exist</span> La fenêtre du terminal que vous essayerez de fermer, vous avertira de la présence d'une application en cours d'exécution<br />
-Vous pouvez enregistrer différents réglages dans des profils distinct, qui sur un double-clic ouvriront un Terminal conformément à la configuration.<br />
-Pressez <span class="button">OK</span> pour sauvegarder les réglages en cours comme étant ceux par défaut.</p>
-
+<p>La plupart des réglages proposés parlent d'eux même.<br />
+Quand vous passez votre souris sur les «formules» servant à nommer les titres des onglets et des fenêtres, les variables à votre disposition apparaissent dans des bulles d’aides.<br />
+Vous pouvez choisir un schéma de couleur prédéfini comme <span class="menu">Midnight</span> (Minuit) ou <span class="menu">Rétro</span>, ou en créer un <span class="menu">Personnalisé</span> quelle couleur vous souhaiter modifier (<span class="menu">Texte</span>, <span class="menu">Arrière plan</span>, <span class="menu">Curseur</span> etc.) en utilisant le sélecteur de couleur au dessous.</p>
+<p>Suivent quelques options : vous pouvez avoir un <span class="menu">Curseur clignotant</span> et choisir d'<span class="menu">utiliser du clair plutôt qu'un texte gras</span>. Ce dernier réglage évite le rendu parfois assez inesthétique des caractères gras dans le Terminal.<br />
+En activant la boite à cocher <span class="menu">Confirm exit if active programs exist</span> (Demander une confirmation à la fermeture si un programme est actif), la fenêtre du terminal que vous essayerez de fermer, vous avertira de la présence d'une application en cours d'exécution.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td class="onelinetop"><span class="button">Save to file...</span></td><td width="10"> </td><td>let's you save different settings as separate profiles, which on double-click open an accordingly configured Terminal.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you opened the settings panel.</td></tr>
+<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Raccourcis claviers</a></h2>

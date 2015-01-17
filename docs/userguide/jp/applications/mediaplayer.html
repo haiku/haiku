@@ -4,7 +4,7 @@
 <head>
 <!--
  *
- * Copyright 2010-2011, Haiku. All rights reserved.
+ * Copyright 2010-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -99,7 +99,7 @@
 <p>最後の設定は、現在アクティブでは無いウィンドウのクリップの音量を設定します。<span class="menu">最大音量 (Full volume)</span> で鳴らすか、<span class="menu">低音量 (Low volume)</span>、または<span class="menu">ミュート (Muted)</span> にできます。</p>
 
 <h2>キーボードコントロール</h2>
-<p>メディアプレーヤーはプレイバックをコントロールするためにマウスを使わない便利なキーの組み合わせを提供します。</p>
+<p>メディアプレーヤーは再生をコントロールするためにマウスを使わない便利なキーの組み合わせを提供します。</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="key">Z</span></td><td style="width:15px;"></td><td>前のトラックに移動</td></tr>
 <tr><td><span class="key">X</span></td><td></td><td>再生</td></tr>
@@ -109,21 +109,17 @@
 </table>
 <p>これらのキーはコントロールボタンの機能に割り当てられています。これらは常にキーボードの左下に割り当てられ、現在のキーマップに関係なく使用されます。以下のキーは US-american の標準キーマップに対応しています。</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
-<tr><td align="right"><span class="key">→</span></td><td style="width:15px;"></td><td>前へシーク</td></tr>
-<tr><td align="right"><span class="key">SHIFT</span> <span class="key">→</span></td><td></td><td>10 秒後にジャンプ</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">→</span></td><td></td><td>30 秒後にジャンプ</td></tr>
-<tr><td align="right"><span class="key">←</span></td><td></td><td>うしろへシーク</td></tr>
-<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span></td><td></td><td>10 秒前にジャンプ</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span></td><td></td><td>30 秒前にジャンプ</td></tr>
+<tr><td align="right"><span class="key">←</span> / <span class="key">→</span></td><td style="width:15px;"></td><td>前 / 後へシーク</td></tr>
+<tr><td align="right"><span class="key">SHIFT</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>10 秒前 / 10 秒後へジャンプ</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>30 秒前 / 30 秒後へジャンプ</td></tr>
 
-<tr><td align="right"><span class="key">↑</span></td><td></td><td>音量を上げる</td></tr>
-<tr><td align="right"><span class="key">↓</span></td><td></td><td>音量を下げる</td></tr>
+<tr><td align="right"><span class="key">↓</span> / <span class="key">↑</span></td><td></td><td>音量を下げる / 上げる</td></tr>
 
-<tr><td align="right"><span class="key">ALT</span> <span class="key">↑</span></td><td></td><td>前のトラックに移動</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span></td><td></td><td>次のトラックに移動</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">↓</span> / <span class="key">↑</span></td><td></td><td>次のトラック / 前のトラックに移動</td></tr>
 
 <tr><td align="right"><span class="key">Spacebar</span></td><td></td><td>再生と一時停止を切り替える</td></tr>
-<tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>全画面表示モードを切り替える (ビデオをダブル左クリックでもできます)</td></tr>
+<tr><td align="right"><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>全画面表示モードを切り替える (ビデオをダブル左クリック、または<span class="key">F</span> か <span class="key">TAB</span> を押すことでもできます)</td></tr>
+<tr><td class="onelinetop" align="right"><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">0</span> / <span class="key">1</span> / <span class="key">2</span> / <span class="key">3</span></td><td></td><td>アスペクト比を <span class="menu">Stream settings</span> (ビデオはどのようにエンコードされたか), <span class="menu">No aspect correction</span> (ビデオのピクセルを 1:1 でスクリーンにマップする), <span class="menu">4:3</span>, <span class="menu">16:9</span> に変更する。</td></tr>
 </table>
 
 </div>

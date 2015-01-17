@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,15 +55,14 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Pääteikkuna</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki:</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
 <tr><td>Sijainti:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>Asetukset:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - lisää/korvaa oletukset tiedostossa <span class="path">/boot/system/settings/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - lisää/korvaa oletukset tiedostossa <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
 <p>Pääteikkuna on Haikun käyttöliittymä bash-komentotulkkiin, the Bourne Again Shell.</p>
@@ -80,31 +79,36 @@ Oletuksena, <tt>%1d: %p</tt>, välilehti näyttää nykyisen kansion ja, erotett
 Valikon <span class="menu">Muokkaa | Ikkunaotsikko...</span> Pääteikkunaotssikkoa voidaan muokata samalla tavoin.</p>
 <p>Välilehden napsauttaminen hiiren kakkospainikkeella näyttää asiayhteysvalikon <span class="menu">Sulje välilehti</span>, <span class="menu">Sulje muut välilehdet</span> tai, kuten kaksoisnapsautuksessa, <span class="menu">Muokkaa välilehtiotsikkoa...</span>.</p>
 <p>Pääteikkunan kokoa voidaan muuttaa kuten kaikkia muitakin ikkunoita tai voit käyttää uudelleenasetuksia valikosta <span class="menu">Asetukset | Ikkunakoko</span>. Näppäimet <span class="key">ALT</span> <span class="key">ENTER</span> vaihtavat kokonäyttötilaan.</p>
-<p>Vaihdettu ikkunakoko ja tekstikoodaus säilyy vain valitsemalla <span class="menu">Asetukset | Tallenna oletuksena</span>.</p>
+<p>Kaikki asetukset, jotka muutat suoraan <span class="menu">Asetukset</span>-valikon kautta, kuten <span class="menu">Ikkunaotsikko</span>, <span class="menu">Ikkunakoko</span>, <span class="menu">Tekstikoodaus</span> tai <span class="menu">Kirjasinkoko</span> säilytetään vain nykyisessä istunnossa. Jos haluat tehdä pysyvät muutokset, sinun on toteutettava ne <span class="menu">Asetukset...</span>-paneelissa.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Asetukset</a></h2>
 <p><span class="menu">Asetukset | Asetukset...</span> avaa paneelin Pääteikkunan vakioasetusten asettamiseksi.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>Se alkaa "kaavoina" välilehti- ja ikkunaotsikoiden nimeämiseksi. Taas työkaluvihjeet näyttävät käytettävissä olevat muuttuja. Sen alla voit asettaa kirjasintyypin, kirjasinkoon ja erilaiset teksti- ja taustavärit. Voit valita esiasetetun värikaavan, kuten <span class="menu">Musta valkoisella</span> tai <span class="menu">Valkoinen mustalla</span> tai luoda <span class="menu">Oma</span>n käyttämällä alla olevaa väripoimijaa.<br />
-Aktivoi valintaruutu <span class="menu">Vahvista poistuminen, jos aktiiviohjelmasta poistutaan</span> ja sinua varoitetaan kun Pääteikkuna yritetään sulkea silloin, kun sovellusta vielä suoritetaan.<br />
-Voit tallentaa erilaisia asetuksia erillisinä profiileina, joiden kaksoisnapsauttaminen aukaisee vastaavalla tavalla asetetun Pääteikkunan.<br />
-Painamalla painiketta <span class="button">Valmis</span> nykyiset asetukset tallennetaan oletuksena.</p>
-
+<p>Useimmat tarjotut asetukset selittävät itsensä.<br />
+Välilehden ja ikkunaotsikon nimeämiseksi liikuta hiiren kohdistinta kohdan "kaavat" yläpuolella, jolloin saat työkaluvihjeet saatavilla olevista muuttujista. <br />
+Voit valita esiasennetun värikaavan kuten <span class="menu">Keskiyö</span> tai <span class="menu">Retro</span> tai luoda <span class="menu">Oma</span>:n värikaavan valitsemalla sen värin, jonka halat muuttaa (<span class="menu">Teksti</span>, <span class="menu">Tausta</span>, <span class="menu">Kohdistin</span> jne.) ja käytä sitten alla olevaa väripoimijaa.</p>
+<p>Sitten seuraa lisää valitsimia: sinulla voi olla <span class="menu">Vilkkuva kohdistin</span> ja valitse <span class="menu">Käytä vaaleaa eikä vahvennettua tekstin sijasta</span>. Jälkimmäinen asetus välttää joskus melko näkymättömän lihavointikirjasimien renderoinnin Pääteikkunassa.<br />
+Aktivoi valintaruutu <span class="menu">Vahvista poistuminen, jos ohjelmia on käytössä</span> ja sinua varoitetaan, kun yrität sulkea Pääteikkunan, jossa suoritetaan sovellusta.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td class="onelinetop"><span class="button">Tallenna tiedostoon...</span></td><td width="10"> </td><td>antaa sinun tallentaa eri asetukset erillisenä profiilina, joka avautuu kaksoisnapsautuksella  profiilin mukaisesti asetetuksi Pääteikkunaksi.</td></tr>
+<tr><td><span class="button">Palauta</span></td><td> </td><td>tuo sinulle takaisin ne asetukset, jotka olivat aktiivisia, kun avasit asetukset-paneelin.</td></tr>
+<tr><td><span class="button">Oletukset</span></td><td> </td><td>nollaa kaikki oletusarvoihin.</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Näppäimistön pikanäppäimet</a></h2>
 <p>Löydät hyödyllisten pikanäppäimien luettelon asiakirjasta <a href="../keyboard-shortcuts.html#terminal">Pikanäppäimet ja näppäinyhdistelmät</a>.</p>
-<p>Another nice feature that is more a key &amp; mouse combination: When holding <span class="key">ALT</span> a path or URL under the mouse pointer gets highlighted. A left-click opens the file/folder or website. A right-click opens a context menu to either <span class="menu">Copy path</span> or <span class="menu">Copy absolute path</span>. Imagine you're in <span class="path">/MyData/source/haiku/</span> and have the path <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> under the mouse pointer, the latter menu item  will result in the combined, absolute path &lt;<i>deep breath</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
-<p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
-<p>By the way, right-clicking into the Terminal window will insert the clipboard. In combination with copying parts of highlighted paths, this can be used for speedy navigation of deep folder hierarchies.</p>
+<p>Toinen näppärä ominaisuus, joka on enemmän näppäin &amp; hiiri-yhdistelmä: Pitämällä alhaalla näppäintä <span class="key">ALT</span> polku tai verkko-osoite hiiren osoittimen alla tulee korostetuksi. Hiiren ykköspainike avaa kohteen tiedosto/kansio file/folder tai webbisivun. Hiiren kakkospainike avaa joko asiayhteysvalikosta joko <span class="menu">Kopioi polku</span>- tai <span class="menu">Kopioi absoluuttinen polku</span>-rivin. Kuvittele, että olet kohteessa <span class="path">/MyData/source/haiku/</span> ja sinulla on hiiren osoittimen alla polku <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>, jälkimmäinen valikkorivi saa aikaan yhdistelmän, absoluuttisen polun &lt;<i>syvä henkäys</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>Jos pidät alhaalla näppäimiä <span class="key">ALT</span> <span class="key">VAIHTO</span>, korostetaan vain polku sieltä alusta, missä hiiren kohdistin sijaitsee.</p>
+<p>Muuten, hiiren kakkospainikkeen napsauttaminen lisää leikepöydän Pääteikkunaan. Korostettujen polkujen yhdistelmässä tätä voidaan käyttää nopeaan navigointiin syvälle kansiohierarkkiaan.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Bash-räätälöinti</a></h2>
-<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
-Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/settings/etc/</span>.</p>
+<p>Unixista tulevan bash-komentotulkin räätälöimiseksi on lukemattomia mahdollisuuksia. Sitä varten kaksi tiedostoa on käyttäjille erityisen tärkeitä: <span class="cli">.profile</span> ja <span class="cli">.inputrc</span><br />
+Molemmat tiedostot voidaan luoda <span class="path">home/</span>-kansioon ja niillä voidaan lisätä tai korvata järjestelmäoletukset, jotka on määritelty hakemistossa <span class="path">/boot/system/settings/etc/</span>.</p>
 
 <h3>.profile</h3>
 <p>Tiedosto <span class="cli">.profile</span> ladataan joka kerta avattaessa Pääteikkunaa. Se asettaa kaikentyyppisiä alias-määrittelyjä ja muuttujia, jotka vaikuttavat bash-komentotulkin käyttäytymiseen ja ulkonäköön. Löydät monia verkkoresursseja, jotka kertovat yksityiskohtaisesti kaikista mahdollisuuksista.</p>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminál (Terminal)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -79,18 +80,23 @@ Alap esetben, <tt>%1d: %p</tt>, a fülön az aktuális mappa neve, egy <tt>:</tt
 A <span class="menu">Szerkesztés | Ablak címe...</span> menüvel magának a Terminál ablaknak a címe módosítható épp úgy, mint a lap esetében.</p>
 <p>A lap-füleken jobb gombbal kattintva kapunk egy menüt: <span class="menu">Lap bezárása</span>, <span class="menu">Többi lap bezárása</span> vagy <span class="menu">Lap címének szerkesztése...</span> (épp úgy, mint dupla kattintáskor).</p>
 <p>A Terminál ablak épp úgy méretezheztő, mint bármely más ablak. Ugyanakkor előre beállított méretet is választhatunk a <span class="menu">Beállítások | Ablak mérete</span> menüből. Az <span class="key">ALT</span> <span class="key">ENTER</span> lenyomásakor pedig teljes képernyőre válthatunk.</p>
-<p>Az ablak mérete és a karakterkódolás csak a <span class="menu">Beállítások | Mentés alapértelemzettként</span> menüre nyomva őrizhető meg.</p>
+<p>All the settings you change directly through the <span class="menu">Settings</span> menu, like <span class="menu">Window title</span>, <span class="menu">Window size</span>, <span class="menu">Text encoding</span> or <span class="menu">Font size</span> are only kept for the current session. If you want to make permanent changes, you have to apply them in the <span class="menu">Settings...</span> panel.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Beállítások</a></h2>
 <p>A <span class="menu">Beállítások | Beállítások...</span> menü megnyit egy panelt, ahol a Terminál alapbeállíátsai módosíthatóak.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>A beállítások első részében különféle "képleteket" látunk, amivel megadható a lap és az ablak alapértelmezett címe. Ezeken a mezőkön is szintén kapunk egy kis segítséget ha az egérrel felettük maradunk. Alább a betűtípust, a betű méretét és a különféle színösszeállításokat találjuk. Itt választhatunk néhány előre megadott összeállításból, mint például: <span class="menu">Fehér alapon fekete</span> vagy <span class="menu">Fekete alapon fehér</span> vagy készíthetünk <span class="menu">Egyéni</span> összeállítást is az alsó színválasztó használatával.<br />
-A <span class="menu">Kilépés megerősítése ha van futó program</span> jelölőnégyzet bejelölésével kapunk egy figyelmeztetést mielőtt bezárnánk az ablakot miközben még éppen fut program benne.<br />
-Több profil is létrehozható külön-külön fájlba mentve, amin duplán kattintva a profil beállításaival megnyílik egy új Terminál.<br />
-A <span class="button">Rendben</span> megnyomásával ezeket a beállításokat a program elmenti alapértelmezettként.</p>
-
+<p>Most of the offered settings speak for themselves.<br />
+Hover your mouse over the "formulas" for naming tab and window titles to get tooltips for the available variables. <br />
+You can choose pre-defined color schema like <span class="menu">Midnight</span> or <span class="menu">Retro</span> or create a <span class="menu">Custom</span> one by selecting which color you want to change (<span class="menu">Text</span>, <span class="menu">Background</span>, <span class="menu">Cursor</span> etc.) and then use  the color picker below.</p>
+<p>A few more options follow: you can have a <span class="menu">Blinking cursor</span> and choose to <span class="menu">Use bright instead of bold text</span>. The latter setting avoids the sometimes rather unsightly rendering of bold fonts in the Terminal.<br />
+Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td class="onelinetop"><span class="button">Save to file...</span></td><td width="10"> </td><td>let's you save different settings as separate profiles, which on double-click open an accordingly configured Terminal.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you opened the settings panel.</td></tr>
+<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Billentyűzet parancsok</a></h2>

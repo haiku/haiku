@@ -47,9 +47,9 @@
 <li><a href="../../en/applications/vision.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="pe.html">Pe</a> 
-::  <a href="../applications.html#list-of-bundled-apps" class="uplink">Sovellukset</a> 
-::  <a href="wonderbrush.html">WonderBrush</a>  »
+ «  <a href="pe.html">Pe</a> 
+::  <a href="../applications.html#list-of-bundled-apps" class="uplink">Sovellukset</a> 
+::  <a href="wonderbrush.html">WonderBrush</a>  »
 </span></div>
 </div>
 
@@ -66,6 +66,187 @@
 <p>Vision on aluperin BeOS-käyttöjärjestelmää varten kehitetty IRC-asiakasohjelma. Dokumentaatio ja vianjäljitys löytyy osoiteesta <a href="http://vision.sourceforge.net/">Vision-webbisivu</a>.</p>
 <div class="box-info">Löydät opastusta muilta Haiku-käyttäjiltä ja kehittäjiltä <a href="http://www.haiku-os.org/community/irc">Haiku-kanavilta</a> eri kielillä.<br />
 Kaikkein sujuvinta on englanninkielinen #haiku osoitteessa irc.freenode.org.</div>
+<p>Tässä on sisäänrakennettujen komentojen luettelo, joka on otettu luvan kera Vision-webbisivulta.</p>
+<p>Syntaksi:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="0">
+<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>komento</td></tr>
+<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>vaadittu parametri</td></tr>
+<tr><td><tt>[optional]</tt></td><td></td><td>valinnainen parametri</td></tr>
+<tr><td><tt>|</tt></td><td></td><td>looginen OR</td></tr>
+<tr><td><tt>...</tt></td><td></td><td>lisäparametrit mahdollisia</td></tr>
+</table>
+
+<ul>
+<li><p><span class="menu">/ABOUT</span><br />
+Avaa Visionin Ohjelmasta-ikkunan.</p></li>
+
+<li><p><span class="menu">/ACRONYM [sana]</span><br />
+Avaa www.acronymfinder.com nykyisellä html-käsittelijällä. (Huomaa: Jos tiedostokäsittelijä ei ole selain, se avaa Tiedostotyyppiasetukset-sovelluksessa määritellyn sovelluksen.)</p></li>
+
+<li><p><span class="menu">/AWAY [poissaolon syy]</span><br />
+Asettaa poissaolon syyn nykyiseen verkkoon. Jos mitään poissaolon syytä ei ole määritelty, se on asetettu arvoon 'BRB'. (palaan pian)</p></li>
+
+<li><p><span class="menu">/BACK</span><br />
+Asettaa tilasi 'olen palannut takaisin' nykyisessä verkossa.</p></li>
+
+<li><p><span class="menu">/CLEAR</span><br />
+Nolla nykyisen tekstipuskurin sisällön.</p></li>
+
+<li><p><span class="menu">/CTCP &lt;käyttäjätunnus|kanava&gt; &lt;PING|VERSION|FINGER|TIME|CLIENTINFO|USERINFO&gt;</span><br />
+Suorittaa määritellyn ctcp-komennon kanavalla tai käyttäjätunnuksella.</p></li>
+
+<li><p><span class="menu">/DCC &lt;CHAT&gt; &lt;käyttäjätunnus&gt;</span><br />
+Avaa yksityisen dcc-verkkojutteluistunnon määritellyllä käyttäjätunnuksella.</p></li>
+
+<li><p><span class="menu">/DCC &lt;SEND&gt; &lt;käyttäjätunnus&gt; [tiedosto]</span><br />
+Lähettää tiedoston käyttäjälle &lt;käyttäjätunnus&gt;. Jos tiedostoa ei ole määritelty, Tiedosto-paneeli avautuu.</p></li>
+
+<li><p><span class="menu">/DEOP /DOP /DEVOICE &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
+Suorittaa De-ops tai de-voices &lt;käyttäjätunnus(käyttäjätunnuksille)&gt;.</p></li>
+
+<li><p><span class="menu">/DESCRIBE &lt;käyttäjätunnus&gt; &lt;viesti&gt;</span><br />
+Sama kuin /ME, mutta avaa kyselyn käyttäjälle &lt;käyttäjätunnus&gt;.</p></li>
+
+<li><p><span class="menu">/DNS &lt;verkkoaluenimi/IP-osoite&gt;</span><br />
+Ratkaisee annetun IP-osoitteen tai verkkoaluenimen.</p></li>
+
+<li><p><span class="menu">/EXIT</span><br />
+Poistuu Vision-ohjelmasta.</p></li>
+
+<li><p><span class="menu">/GAWAY [poissaolon syy]</span><br />
+Sama kuin /AWAY [poissaolon syy], mutta toteuttaa kaikille yhdistetyille verkoille.</p></li>
+
+<li><p><span class="menu">/GBACK</span><br />
+Sama kuin /BACK, mutta toteuttaa kaikille yhdistetyille verkoille.</p></li>
+
+<li><p><span class="menu">/GOOGLE [hakumerkkijono]</span><br />
+Avaa www.google.com nykyisellä html-käsittelijälläsi. (Huomaa: Jos tiedostokäsittelijä ei ole selain, avaa Tiedostotyyppiasetukset-ohjelmassa määritellyn sovelluksen.)</p></li>
+
+<li><p><span class="menu">/INVITE /I &lt;käyttäjätunnus&gt; &lt;kanava&gt;</span><br />
+Kutsuu &lt;käyttäjätunnus&gt; &lt;kanava&gt;:lle.</p></li>
+
+<li><p><span class="menu">/JOIN /J &lt;kanava&gt; [kanava-avain]</span><br />
+Liity &lt;kanava&gt;:lle. Tarjoa [kanava-avain], jos välttämätöntä.</p></li>
+
+<li><p><span class="menu">/KICK /K &lt;käyttäjätunnus&gt; [syy]</span><br />
+Antaa potkut käyttäjälle &lt;käyttäjätunnus&gt; nykyiseltä kanavalta. Jos [syy] ei ole määritelty, syyksi asetetaaan Asetuksissa määritelty syy.</p></li>
+
+<li><p><span class="menu">/KILL &lt;käyttäjätunnus&gt; [viesti]</span><br />
+IRC-operaattorikomento käyttäjän poistamiseksi verkosta.</p></li>
+
+<li><p><span class="menu">/LIST</span><br />
+Avaa uuden näkymän, jossa luetellaan nykyisen verkon kaikki kanavat. [paitsi piilotetut kanavat]</p></li>
+
+<li><p><span class="menu">/M</span><br />
+Näyttää nykyisen kanavan kanavatilat.</p></li>
+
+<li><p><span class="menu">/M &lt;+-ohvbeqa&gt; &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
+Sama kuin <span class="menu">MODE &lt;kanava&gt; &lt;tilat&gt; &lt;käyttäjätunnus&gt;</span>, mutta nykyiselle kanavalle.</p></li>
+
+<li><p><span class="menu">/M &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
+Sama kuin <span class="menu">/MODE &lt;kanava&gt; &lt;tilat&gt;</span>, mutta nykyiselle kanavalle.</p></li>
+
+<li><p><span class="menu">/ME &lt;text&gt;</span><br />
+Näyttää: <i>* emwe &lt;teksti&gt;.</i></p></li>
+
+<li><p><span class="menu">/MODE &lt;kanava&gt; &lt;+-ohvbeqa&gt; &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
+Asettaa tilan käyttäjälle &lt;käyttäjätunnus (käyttäjätunnukset)&gt; &lt;kanava&gt;:lle.<br />
+esim.: <span class="menu">/MODE #channel +o käyttäjätunnus1</span><br />
+tai <span class="menu">/MODE #channel +oo-o käyttäjätunnus1 käyttäjätunnus2 käyttäjätunnus3</span></p></li>
+
+<li><p><span class="menu">/MODE &lt;kanava&gt; &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
+Asettaa &lt;kanavan&gt; tilan. (Huomaa: Commata vain optiselle erotukselle.)<br />
+esim.: <span class="menu">/MODE #kanava +ms</span></p></li>
+
+<li><p><span class="menu">/MSG &lt;käyttäjätunnus&gt; &lt;viesti&gt;</span><br />
+Lähettää &lt;viesti&gt;:n käyttäjälle &lt;käyttäjätunnus&gt;.</p></li>
+
+<li><p><span class="menu">/NAMES</span><br />
+Näyttää kaikki verkon kanavat ja kaikki käyttäjätunnukset verkkoikkunassa. (Ole varovainen tämän kanssa)</p></li>
+
+<li><p><span class="menu">/NAMES &lt;kanava&gt;</span><br />
+Näyttää käyttäjätunnuksen (käyttäjätunnukset)  &lt;kanava&gt;:lla.</p></li>
+
+<li><p><span class="menu">/NICK &lt;uusi käyttäjätunnus&gt;</span><br />
+Muuttaa käyttäjätunnukseksesi &lt;uusi käyttäjätunnus&gt;.</p></li>
+
+<li><p><span class="menu">/NOTICE &lt;käyttäjätunnus&gt; &lt;viesti&gt;</span><br />
+Lähettää ilmoituksen käyttäjälle &lt;käyttäjätunnus&gt; tietyllä &lt;viesti&gt;:llä.</p></li>
+
+<li><p><span class="menu">/NOTIFY &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
+Lisää &lt;käyttäjätunnukset&gt; ilmoitusluetteloosi.</p></li>
+
+<li><p><span class="menu">/PEXEC /RRUN &lt;sovellus1&gt; [ | &lt;sovellus2&gt; | ... ]</span><br />
+Suorittaa tietyn &lt;sovelluksen&gt;. Jos tarjotaan enemmän kuin yhden sovelluksen, ne suoritetaan putkessa.<br />
+esim.: <span class="menu">/PEXEC Terminal | StyledEdit</span> avaa uuden Pääteikkunan, ja jälkeenpäin Tyylitetyn Editorin<br />
+tai <span class="menu">/PEXEC ls -la ~/Downloads/</span> näyttää ~/Downloads/-hakemistosi sisällön nykyisessä ikkunassa (Huomio!)</p></li>
+
+<li><p><span class="menu">/OP /VOICE &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
+Ops tai äänet &lt;käyttäjätunnuksille&gt;.</p></li>
+
+<li><p><span class="menu">/PART</span><br />
+Jättää nykyisen kanavan tai verkon.</p></li>
+
+<li><p><span class="menu">/PING &lt;käyttäjätunnus&gt;</span><br />
+Yhteyskokeilu &lt;käyttäjätunnukseen&gt; ja palauttaa yhteyskokeiluajan. Sama kuin <span class="menu">/CTCP &lt;käyttäjätunnus&gt; PING</span>.</p></li>
+
+<li><p><span class="menu">/QUERY /Q &lt;käyttäjätunnus&gt; [viesti]</span><br />
+Avaa kyselyikkunan &lt;käyttäjätunnuksella&gt;, valinnaisesti lisäksi [sanoma]lla.</p></li>
+
+<li><p><span class="menu">/QUIT /QUI [oma-poistumisviesti]</span><br />
+Poistuu nykyisestä verkosta. Jos [oma-poistumisviesti] ei ole määritelty, käytetään asetusten oletusjoukkoa.</p></li>
+
+<li><p><span class="menu">/RAW /QUOTE &lt;komento|teksti&gt;</span><br />
+Lähettää raaka-IRC komennon.</p></li>
+
+<li><p><span class="menu">/RECONNECT</span><br />
+Yhdistää uudelleen nykyiseen verkkoosi, os 47 automaattista uudelleenyhdistämisyritystä on epäonnistunut.</p></li>
+
+<li><p><span class="menu">/SLEEP &lt;desisekuntia&gt;</span><br />
+Saa nykyisen säikeen nukkumaan määritellyn ajan ; tulevaan skriptauskäyttöön.</p></li>
+
+<li><p><span class="menu">/SQUIT</span><br />
+IRC-operaattorikomento katkaisemaan yhteyden palvelimeen.</p></li>
+
+<li><p><span class="menu">/T</span><br />
+Näyttää nykyisen kanavan kanava-aiheen.</p></li>
+
+<li><p><span class="menu">/T &lt;uusi-kanava-aihe&gt;</span><br />
+Sama kuin <span class="menu">/TOPIC &lt;kanava&gt; &lt;uusi-kanava-aihe&gt;</span>, mutta nykyiselle kanavalle.</p></li>
+
+<li><p><span class="menu">/TIME &lt;käyttäjätunnus&gt;</span><br />
+Palauttaa &lt;käyttäjätunnuksen&gt; paikallisen ajan. Sama kuin <span class="menu">/CTCP &lt;käyttäjätunnus&gt; TIME.</span></p></li>
+
+<li><p><span class="menu">/TOPIC &lt;kanava&gt;</span><br />
+Näyttää &lt;kanavan&gt; kanava-aiheen.</p></li>
+
+<li><p><span class="menu">/TOPIC &lt;kanava&gt; &lt;uusi-kanava-aihe&gt;</span><br />
+Asettaa &lt;kanavan&gt; kanava-aiheeksi &lt;uusi-kanava-aihe&gt;.</p></li>
+
+<li><p><span class="menu">/UNNOTIFY &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
+Poistaa &lt;käyttäjätunnukset&gt; ilmoitusluettelostasi.</p></li>
+
+<li><p><span class="menu">/UPTIME [-l]</span><br />
+Näyttää ajan, jonka järjestelmät ovat olleet päällä. Jos [-l] on määritelty, päälläoloaika kaiutetaan paikallisesti, ja sitä ei lähetetä verkkoon.</p></li>
+
+<li><p><span class="menu">/VERSION &lt;käyttäjätunnus&gt;</span><br />
+Palauttaa &lt;käyttätunnusten&gt; IRC-asiakasohjelman asiakasversion. Sama kuin <span class="menu">/CTCP &lt;käyttäjätunnus&gt; VERSION</span>.</p></li>
+
+<li><p><span class="menu">/VISIT &lt;verko-osoite&gt;</span><br />
+Avaa &lt;verkko-osoitteen&gt; nykyisellä html-käsittelijälläsi. (Huomaa: Jos käsittelijä ei ole selain, se avaa sovelluksen, joka on määritelty TiedostoTyyppiAsetukset-sovelluksessa.)</p></li>
+
+<li><p><span class="menu">/WEBSTER /DICTIONARY [sana]</span><br />
+Avaa www.m-w.com (Merriam Webster) nykyisellä html-käsittelijälläsi. (Huomaa: Jos käsittelijä ei ole selain, se avaa sovelluksen, joka on määritelty TiedostoTyyppiAsetukset-sovelluksessa.)</p></li>
+
+<li><p><span class="menu">/VUPTIME [-l]</span><br />
+Näyttää Vision-ohjelman päälläoloajan. Parametrilla [-l] on sama vaikutus kuin parametrilla <span class="menu">/UPTIME</span>.</p></li>
+
+<li><p><span class="menu">/WALLOPS</span><br />
+IRC-operaattorikomento, joka lähettää wallops-viestin (näkyvissä niille käyttäjille, joiden umode w on aktiivinen).</p></li>
+
+<li><p><span class="menu">/WHOIS /W &lt;käyttäjätunnus&gt;</span><br />
+Palauttaa &lt;käyttäjätunnuksen&gt; whois-tiedot.</p></li>
+</ul>
 
 </div>
 </div>
@@ -73,9 +254,9 @@ Kaikkein sujuvinta on englanninkielinen #haiku osoitteessa irc.freenode.org.</di
 <!--
 <div class="nav">
 <div class="inner"><span>
- «  <a href="pe.html">Pe</a> 
-::  <a href="../applications.html#list-of-bundled-apps" class="uplink">Sovellukset</a> 
-::  <a href="wonderbrush.html">WonderBrush</a>  »
+ «  <a href="pe.html">Pe</a> 
+::  <a href="../applications.html#list-of-bundled-apps" class="uplink">Sovellukset</a> 
+::  <a href="wonderbrush.html">WonderBrush</a>  »
 </span></div>
 </div>
 -->

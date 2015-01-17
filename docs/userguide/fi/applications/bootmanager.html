@@ -16,7 +16,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Alkulataushallinta</title>
+	<title>Käynnistyshallinta</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -49,49 +49,49 @@
 <span>
  «  <a href="activitymonitor.html">Aktiviteettivalvonta</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
-::  <a href="cdplayer.html">CD-soitin</a>  »
+::  <a href="charactermap.html">Merkkikuvaus</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
 
-<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />Alkulataushallinta</h2>
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />Käynnistyshallinta</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki:</td><td style="width:15px;"></td><td><i>Ei valikkoriviä, käynnistetään normaalisti Asennusohjelman <span class="menu">Työkalut</span>-valikosta</i></td></tr>
 <tr><td>Sijainti:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
 <tr><td>Asetukset:</td><td></td><td><i>ei ole</i><br />MBR-varmuuskopiot tallennetaan oletuksena hakemistoon <span class="path">~/config/settings/bootman/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Jos et lisää Haiku-osiota olemassa olevaan alkulataushallintaan kuten GRUB, Alkulataushallinta voi asentaa Master Boot Record (MBR) -tietueeseen pienen alkulatausvalikon, joka näyttää likimain tällaiselta:</p>
+<p>Jos et lisää Haiku-osiota olemassa olevaan käynnistyshallintaan kuten GRUB, Käynnistyshallinta voi asentaa Master Boot Record (MBR) -tietueeseen pienen käynnistysvalikon, joka näyttää likimain tällaiselta:</p>
 <img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
-<div class="box-info">Alkulataushallintaa ei ole vielä testattu kovin hyvin ja siinä on vielä joitakin rajoituksia, joista se valittaa, jos ne kohdataan: valikko voidaan asentaa vain ensimmäiselle kiintolevylle ja siinä on oltava 2 kibitavua tilaa Master Boot Record (MBR) -tietueen jälkeen.</div>
-<p>Alkulataushallinta ohjaa sinut alkulatausvalikon asennusprosessin lävitse.</p>
+<div class="box-info">Käynnistyshallintaa ei ole vielä testattu kovin hyvin ja siinä on vielä joitakin rajoituksia, joista se valittaa, jos ne kohdataan: valikko voidaan asentaa vain ensimmäiselle kiintolevylle ja siinä on oltava 2 kibitavua tilaa Master Boot Record (MBR) -tietueen jälkeen.</div>
+<p>Käynnistyshallinta ohjaa sinut käynnistysvalikon asennusprosessin lävitse.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="1-drives" id="1-drives">Kohdelevyaseman valitsiminen</a></h2>
 <img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
-<p>Alkulataushallinta lähtee kaikkien käytettävissä olevien levyasemien luettelosta, josta valitset kohteen. Jos kohdelevyasemalla on jo olemassa alkulatausvalikko, painike <span class="button">Poista asennus</span> tulee aktiiviseksi johdatellen sinut yksinkertaisen proseduurin lävitse aiemmin varmuuskopioidun MBR:n palauttamiseksi, mikä poistaa taas alkulatausvalikon.<br />Muussa tapauksessa jatka valitsemalla <span class="button">Asenna</span>.</p>
+<p>Käynnistyshallinta lähtee kaikkien saatavilla olevien levyasemien luettelosta, josta valitset kohteen. Jos kohdelevyasemalla on jo olemassa käynnistysvalikko, painike <span class="button">Poista asennus</span> tulee aktiiviseksi johdatellen sinut yksinkertaisen proseduurin lävitse aiemmin varmuuskopioidun MBR:n palauttamiseksi, mikä poistaa taas käynnistysvalikon.<br />Muussa tapauksessa jatka valitsemalla <span class="button">Asenna</span>.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="2-backup" id="2-backup">Master Boot Record (MBR) -tietueen varmuuskopiointi</a></h2>
-<p>Master Boot Record (MBR) tallennetaan nyt siltä varalta, että jokin menee vikaan ja haluat taas poistaa alkulatausvalikon. Tämä on selvästi hyvin tärkeä askel. Varmista, että et vahingossa korvaa jotain toista MBR-varmuuskopiota esimerkiksi ehkä jostain aikaisemmasta kokeilusta!</p>
+<p>Master Boot Record (MBR) tallennetaan nyt siltä varalta, että jokin menee vikaan ja haluat taas poistaa käynnistysvalikon. Tämä on selvästi hyvin tärkeä askel. Varmista, että et vahingossa korvaa jotain toista MBR-varmuuskopiota esimerkiksi ehkä jostain aikaisemmasta kokeilusta!</p>
 <img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
 <img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
 <p>Valitse vain varmuuskopiotiedoston "<tt>MBR</tt>" kohde tai jätä oletuspolku. <span class="button">Seuraava</span>-painikkeen napsauttamisen jälkeen saat vahvistuksen siitä, että varmuuskopiointi onnistui.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="3-menu" id="3-menu">Alkulatausvalikon asettaminen</a></h2>
+<a name="3-menu" id="3-menu">Käynnistysvalikon asettaminen</a></h2>
 <img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
 <img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
-<p>Seuraavaksi sinulle esitellään kohdelevyaseman kaikkien osioiden luettelo. Asettamalla pukki-merkin päätät siitä, että mitkä osiot ilmaantuvat alkulatausvalikkoon. Tekstilaatikot sallivat sinun nimetä osiot uudelleen.</p>
-<p>Sen jälkeen valitset ponnahdusvalikosta, että miltä osiolta alkuladataan oletuksena ja aseta aikavalvonta alla olevasta liukukytkimestä. Tässä "<i>Heti</i>" ohittaa alkulatausvalikon kokonaan. "<i>Ei koskaan</i>" tarkoittaa, että alkulataus pysähtyy alkulatausvalikkoon. Voit ohittaa aikavalvonnan pitämällä <span class="key">ALT</span>-näppäintä alhaalla alkulatauksen aikana.</p>
+<p>Seuraavaksi sinulle esitellään kohdelevyaseman kaikkien osioiden luettelo. Asettamalla pukki-merkin päätät siitä, että mitkä osiot ilmaantuvat käynnistysvalikkoon. Tekstilaatikot sallivat sinun nimetä osiot uudelleen.</p>
+<p>Sen jälkeen valitset ponnahdusvalikosta, että miltä osiolta käynnistetään oletuksena ja aseta aikavalvonta alla olevasta liukukytkimestä. Tässä "<i>Heti</i>" ohittaa käynnistysvalikon kokonaan. "<i>Ei koskaan</i>" tarkoittaa, että käynnistys pysähtyy käynnistysvalikkoon. Voit ohittaa aikavalvonnan pitämällä <span class="key">ALT</span>-näppäintä alhaalla käynnistyksen aikana.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="4-mbr" id="4-mbr">Alkulatausvalikon kirjoittaminen</a></h2>
+<a name="4-mbr" id="4-mbr">Käynnistysvalikon kirjoittaminen</a></h2>
 <img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
 <img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
-<p>Ennen kuin alkulatausvalikko kirjoitetaan MBR-tietueeseen, saat asetuksesi yhteenvedon ja siten viimeisen mahdollisuuden keskeyttää toiminnon. Älä silti murehdi, niin kauan kuin pidät MBR-varmuuskopion tallessa, voit helposti perua muutokset. Jos asiat menevät kunnolla sekaisin, voit aina alkuladata Haikun asennus-CD-levyltä tai USB-tikulta ja kirjoittaa MBR-varmuuskopion takaisin kiintolevylle Alkulataushallinnan avulla.</p>
+<p>Ennen kuin käynnistysvalikko kirjoitetaan MBR-tietueeseen, saat asetuksesi yhteenvedon ja siten viimeisen mahdollisuuden keskeyttää toiminnon. Älä silti murehdi, niin kauan kuin pidät MBR-varmuuskopion tallessa, voit helposti perua muutokset. Jos asiat menevät kunnolla sekaisin, voit aina käynnistää Haikun asennus-CD-levyltä tai USB-tikulta ja kirjoittaa MBR-varmuuskopion takaisin kiintolevylle Käynnistyshallinnan avulla.</p>
 
 </div>
 </div>
@@ -100,7 +100,7 @@
 <div class="inner"><span>
  «  <a href="activitymonitor.html">Aktiviteettivalvonta</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Sovellukset</a> 
-::  <a href="cdplayer.html">CD-soitin</a>  »
+::  <a href="charactermap.html">Merkkikuvaus</a>  »
 </span></div>
 </div>
 

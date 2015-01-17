@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -79,18 +79,23 @@
 標準 (<tt>%1d: %p</tt>) では、タブはカレントディレクトリを表示し、<tt>:</tt> で区切った後、現在実行中のプロセス (bash が実行中かアイドル中の場合は <tt>--</tt>) を表示します。上のスクリーンショットでは、<span class="path">Desktop</span> フォルダー内の FTP セッションを最初のタブで実行しており、二つ目のタブは、<span class="path">home</span> でアイドルしています。<br /><span class="menu">設定 | ウィンドウタイトル... (Edit | Window title...)</span> でターミナルのウィンドウタイトルも同様に編集できます。</p>
 <p>タブを右クリックすると、<span class="menu">タブを閉じる (Close tab)</span> か、ダブルクリックのように<span class="menu">タブタイトルの編集... (Edit tab title...)</span> を行うコンテキストメニューが表示されます。</p>
 <p>ターミナルのウィンドウはほかのウィンドウのようにサイズを変更するか、<span class="menu">設定 | ウィンドウサイズ (Settings | Window size)</span> メニューでプリセットされたサイズを使えます。<span class="key">ALT</span> <span class="key">ENTER</span> で全画面表示に切り替えます。</p>
-<p>変更されたウィンドウサイズと文字エンコーディングは、<span class="menu">設定 | デフォルトで保存 (Settings | Save as default)</span> を選択しなければ保存されません。</p>
+<p>直接 <span class="menu">設定 (Settings)</span> メニューを介して変更したすべての設定 <span class="menu">ウィンドウタイトル (Window title)</span>、<span class="menu">ウィンドウサイズ (Window size)</span>、<span class="menu">テキストエンコーディング (Text encoding)</span>、または<span class="menu">フォントサイズ (Font size)</span> は、現在のセッション間のみ保存されます。変更を確定する場合は、<span class="menu">設定… (Settings...)</span> パネルを使用する必要があります。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">設定</a></h2>
 <p><span class="menu">設定 | 設定... (Settings | Settings...)</span> ではターミナルの標準設定を変更できます。</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>タブやウィンドウのタイトルの名前を付ける ”式” から始まります。この場合も、ツールチップは利用可能な変数を表示します。その下ではフォントタイプ、フォントサイズやテキストの背景色を設定できます。<span class="menu">白地に黒文字 (Black on white)</span> のようなプリセット配色を選択するか、下にあるカラー選択を使って、<span class="menu">カスタム (Custom)</span> 配色を作成できます。<br />
-チェックボックスをオンにすると、<span class="menu">実行中のプログラムがある場合、終了時に確認する (Confirm exit if active programs exist)</span> ことができ、プログラムが実行中にターミナルを終了しようとすると警告が出ます。<br />
-設定をファイルに保存でき、ファイルをダブルクリックすると設定されたターミナルが開きます。<br />
-<span class="button">OK</span> をクリックすると現在の設定をデフォルトとして保存します。</p>
-
+<p>用意された設定のほとんどは見ればわかるものです。<br />
+マウスポインターでタブタイトルとウィンドウタイトルの "式" を指すと、利用可能な変数についてのツールチップが表示されます。<br />
+<span class="menu">ミッドナイト (Midnight)</span> や<span class="menu">レトロ (Retro)</span> のような設定済みの配色パターンを選択できます。また、変更したい色 (<span class="menu">テキスト (Text)</span>、<span class="menu">背景 (Background)</span>、<span class="menu">カーソル (Cursor)</span> など) を選び、下にあるカラーピッカーを使って、<span class="menu">Custom</span>配色を作成できます。</p>
+<p>続けて、いくつかのオプションについて: <span class="menu">カーソルを点滅させる (Blinking cursor)</span> を使用でき、<span class="menu">太字の代わりに高輝度テキストを使う (Use bright instead of bold text)</span> を選択できます。後者の設定は、ターミナルでボールドフォントのレンダリングが時々多少見苦しくなることを回避します。<br />
+<span class="menu">実行中のプログラムがある場合、終了時に確認する (Confirm exit if active programs exist)</span> チェックボックスを有効にすると、アプリケーションがまだ実行されている時に、ターミナルウィンドウを閉じようとすると警告されるでしょう。</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td class="onelinetop"><span class="button">ファイルに保存… (Save to file...)</span></td><td width="10"> </td><td>異なる設定を別のプロファイルに保存します。プロファイルをダブルクリックすると、それに応じて設定されたターミナルが開きます。</td></tr>
+<tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>設定パネルを開いた時の設定に戻します。</td></tr>
+<tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべてをデフォルト値にリセットします。</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">キーボードショートカット</a></h2>
