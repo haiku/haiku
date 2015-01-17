@@ -18,22 +18,22 @@ namespace BPrivate {
 
 class PlainTextCatalog : public HashMapCatalog {
 	public:
-		PlainTextCatalog(const char *signature, const char *language,
+		PlainTextCatalog(const entry_ref& owner, const char *language,
 			uint32 fingerprint);
 				// constructor for normal use
-		PlainTextCatalog(entry_ref *appOrAddOnRef);
-				// constructor for embedded catalog
 		PlainTextCatalog(const char *path, const char *signature,
 			const char *language);
 				// constructor for editor-app
 
 		~PlainTextCatalog();
 
+		void SetSignature(const entry_ref &catalogOwner);
+
 		// implementation for editor-interface:
 		status_t ReadFromFile(const char *path = NULL);
 		status_t WriteToFile(const char *path = NULL);
 
-		static BCatalogData *Instantiate(const char *signature,
+		static BCatalogData *Instantiate(const entry_ref &signature,
 			const char *language, uint32 fingerprint);
 
 		static const char *kCatMimeType;

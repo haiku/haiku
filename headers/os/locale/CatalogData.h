@@ -99,8 +99,8 @@ BCatalogData::Next()
 //
 // 1. the function that instantiates a catalog for this add-on-type
 extern "C"
-BCatalogData* instantiate_catalog(const char* signature, const char* language,
-	uint32 fingerprint);
+BCatalogData* instantiate_catalog(const entry_ref& signature,
+	const char* language, uint32 fingerprint);
 
 // 2. the function that creates an empty catalog for this add-on-type
 extern "C"

@@ -14,6 +14,7 @@
 #include <sstream>
 #include <string>
 
+#include <AppFileInfo.h>
 #include <Application.h>
 #include <Directory.h>
 #include <File.h>
@@ -74,11 +75,14 @@ escapeQuotedChars(BString& stringToEscape)
  * InitCheck() will be B_OK if catalog could be loaded successfully, it will
  * give an appropriate error-code otherwise.
  */
-PlainTextCatalog::PlainTextCatalog(const char *signature, const char *language,
+PlainTextCatalog::PlainTextCatalog(const entry_ref &owner, const char *language,
 	uint32 fingerprint)
 	:
-	HashMapCatalog(signature, language, fingerprint)
+	HashMapCatalog("", language, fingerprint)
 {
+	// We created the catalog with an invalid signature, but we fix that now.
+	SetSignature(owner);
+
 	// give highest priority to catalog living in sub-folder of app's folder:
 	app_info appInfo;
 	be_app->GetAppInfo(&appInfo);
@@ -143,6 +147,32 @@ PlainTextCatalog::PlainTextCatalog(const char *path, const char *signature,
 
 PlainTextCatalog::~PlainTextCatalog()
 {
+}
+
+
+void
+PlainTextCatalog::SetSignature(const entry_ref &catalogOwner)
+{
+	// figure out mimetype from image
+	BFile objectFile(&catalogOwner, B_READ_ONLY);
+	BAppFileInfo objectInfo(&objectFile);
+	char objectSignature[B_MIME_TYPE_LENGTH];
+	if (objectInfo.GetSignature(objectSignature) != B_OK) {
+		fSignature = "";
+		return;
+	}
+
+	// drop supertype from mimetype (should be "application/"):
+	char* stripSignature = objectSignature;
+	while (*stripSignature != '/' && *stripSignature != '\0')
+		stripSignature ++;
+
+	if (*stripSignature == '\0')
+		stripSignature = objectSignature;
+	else
+		stripSignature ++;
+
+	fSignature = stripSignature;
 }
 
 
@@ -353,11 +383,11 @@ PlainTextCatalog::UpdateAttributes(const char* path)
 
 
 BCatalogData *
-PlainTextCatalog::Instantiate(const char *signature, const char *language,
+PlainTextCatalog::Instantiate(const entry_ref& owner, const char *language,
 	uint32 fingerprint)
 {
 	PlainTextCatalog *catalog
-		= new(std::nothrow) PlainTextCatalog(signature, language, fingerprint);
+		= new(std::nothrow) PlainTextCatalog(owner, language, fingerprint);
 	if (catalog && catalog->InitCheck() != B_OK) {
 		delete catalog;
 		return NULL;
@@ -367,11 +397,11 @@ PlainTextCatalog::Instantiate(const char *signature, const char *language,
 
 
 extern "C" BCatalogData *
-instantiate_catalog(const char *signature, const char *language,
+instantiate_catalog(const entry_ref& owner, const char *language,
 	uint32 fingerprint)
 {
 	PlainTextCatalog *catalog
-		= new(std::nothrow) PlainTextCatalog(signature, language, fingerprint);
+		= new(std::nothrow) PlainTextCatalog(owner, language, fingerprint);
 	if (catalog && catalog->InitCheck() != B_OK) {
 		delete catalog;
 		return NULL;
