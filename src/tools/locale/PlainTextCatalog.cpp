@@ -330,11 +330,11 @@ PlainTextCatalog::UpdateAttributes(const char* path)
 
 
 BCatalogData *
-PlainTextCatalog::Instantiate(const char *signature, const char *language,
+PlainTextCatalog::Instantiate(const entry_ref &owner, const char *language,
 	uint32 fingerprint)
 {
 	PlainTextCatalog *catalog
-		= new(std::nothrow) PlainTextCatalog(signature, language, fingerprint);
+		= new(std::nothrow) PlainTextCatalog(owner, language, fingerprint);
 	if (catalog && catalog->InitCheck() != B_OK) {
 		delete catalog;
 		return NULL;
@@ -347,16 +347,10 @@ PlainTextCatalog::Instantiate(const char *signature, const char *language,
 
 
 extern "C" BCatalogData *
-instantiate_catalog(const char *signature, const char *language,
+instantiate_catalog(const entry_ref &owner, const char *language,
 	uint32 fingerprint)
 {
-	PlainTextCatalog *catalog
-		= new(std::nothrow) PlainTextCatalog(signature, language, fingerprint);
-	if (catalog && catalog->InitCheck() != B_OK) {
-		delete catalog;
-		return NULL;
-	}
-	return catalog;
+	return PlainTextCatalog::Instantiate(owner, language, fingerprint);
 }
 
 
