@@ -72,8 +72,8 @@ DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner,
 {
 	fInitCheck = B_NOT_SUPPORTED;
 	fprintf(stderr,
-		"trying to load default-catalog(sig=%s, lang=%s) results in %s",
-		"", language, strerror(fInitCheck));
+		"trying to load default-catalog(lang=%s) results in %s",
+		language, strerror(fInitCheck));
 }
 
 

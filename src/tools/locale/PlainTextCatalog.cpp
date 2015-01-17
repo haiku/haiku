@@ -61,10 +61,10 @@ static int16 kCatArchiveVersion = 1;
 void
 escapeQuotedChars(BString& stringToEscape)
 {
-	stringToEscape.ReplaceAll("\\","\\\\");
-	stringToEscape.ReplaceAll("\n","\\n");
-	stringToEscape.ReplaceAll("\t","\\t");
-	stringToEscape.ReplaceAll("\"","\\\"");
+	stringToEscape.ReplaceAll("\\", "\\\\");
+	stringToEscape.ReplaceAll("\n", "\\n");
+	stringToEscape.ReplaceAll("\t", "\\t");
+	stringToEscape.ReplaceAll("\"", "\\\"");
 }
 
 
@@ -74,18 +74,18 @@ escapeQuotedChars(BString& stringToEscape)
  * InitCheck() will be B_OK if catalog could be loaded successfully, it will
  * give an appropriate error-code otherwise.
  */
-PlainTextCatalog::PlainTextCatalog(const char *signature, const char *language,
-	uint32 fingerprint)
+PlainTextCatalog::PlainTextCatalog(const entry_ref &signature,
+	const char *language, uint32 fingerprint)
 	:
-	HashMapCatalog(signature, language, fingerprint)
+	HashMapCatalog("", language, fingerprint)
 {
 	// Look for the catalog in the directory we are going to use
 	// This constructor is not used so lets disable that...
 
 	fInitCheck = B_NOT_SUPPORTED;
 	fprintf(stderr,
-		"trying to load default-catalog(sig=%s, lang=%s) results in %s\n",
-		signature, language, strerror(fInitCheck));
+		"trying to load plaintext-catalog(lang=%s) results in %s\n",
+		language, strerror(fInitCheck));
 }
 
 
