@@ -728,18 +728,20 @@ TCPEndpoint::Listen(int count)
 
 	MutexLocker _(fLock);
 
-	if (fState != CLOSED)
+	if (fState != CLOSED && fState != LISTEN)
 		return B_BAD_VALUE;
 
-	fAcceptSemaphore = create_sem(0, "tcp accept");
-	if (fAcceptSemaphore < B_OK)
-		return ENOBUFS;
-
-	status_t status = fManager->SetPassive(this);
-	if (status != B_OK) {
-		delete_sem(fAcceptSemaphore);
-		fAcceptSemaphore = -1;
-		return status;
+	if (fState == CLOSED) {
+		fAcceptSemaphore = create_sem(0, "tcp accept");
+		if (fAcceptSemaphore < B_OK)
+			return ENOBUFS;
+	
+		status_t status = fManager->SetPassive(this);
+		if (status != B_OK) {
+			delete_sem(fAcceptSemaphore);
+			fAcceptSemaphore = -1;
+			return status;
+		}
 	}
 
 	gSocketModule->set_max_backlog(socket, count);

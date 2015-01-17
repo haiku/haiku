@@ -239,22 +239,25 @@ UnixEndpoint::Listen(int backlog)
 
 	if (!IsBound())
 		RETURN_ERROR(EDESTADDRREQ);
-	if (fState != UNIX_ENDPOINT_NOT_CONNECTED)
+	if (fState != UNIX_ENDPOINT_NOT_CONNECTED
+		&& fState != UNIX_ENDPOINT_LISTENING)
 		RETURN_ERROR(EINVAL);
 
 	gSocketModule->set_max_backlog(socket, backlog);
 
-	fAcceptSemaphore = create_sem(0, "unix accept");
-	if (fAcceptSemaphore < 0)
-		RETURN_ERROR(ENOBUFS);
-
-	_UnsetReceiveFifo();
-
-	fCredentials.pid = getpid();
-	fCredentials.uid = geteuid();
-	fCredentials.gid = getegid();
-
-	fState = UNIX_ENDPOINT_LISTENING;
+	if (fState == UNIX_ENDPOINT_NOT_CONNECTED) {
+		fAcceptSemaphore = create_sem(0, "unix accept");
+		if (fAcceptSemaphore < 0)
+			RETURN_ERROR(ENOBUFS);
+	
+		_UnsetReceiveFifo();
+	
+		fCredentials.pid = getpid();
+		fCredentials.uid = geteuid();
+		fCredentials.gid = getegid();
+	
+		fState = UNIX_ENDPOINT_LISTENING;
+	}
 
 	RETURN_ERROR(B_OK);
 }
