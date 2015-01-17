@@ -103,10 +103,12 @@
 	You may pass \c NULL into \a message to delete the current message
 	without replacing it.
 
-	When Invoke() is called, the message is sent to the designated BHandler
-	known as the "target". The message is sent as a BMessage. The message is
-	not copied, rather ownership of the BMessage object is transferred to
-	the invoker.
+	When Invoke() is called without a specific message, a copy of the
+	message given here is sent to the "target" BHandler. The message
+	is sent as a BMessage.
+
+	BInvoker takes ownership of the BMessage object, so you must not delete
+	it yourself.
 
 	\since BeOS R3
 */
@@ -128,7 +130,7 @@
 	\brief Returns the message's \c what data member.
 
 	\note If a message has not been assigned to the invoker this method
-	      returns \c NULL instead.
+	      returns \c 0 instead.
 
 	\since BeOS R3
 */
@@ -137,6 +139,9 @@
 /*!
 	\fn status_t BInvoker::SetTarget(BMessenger messenger)
 	\brief Sets the invoker's target to \a messenger.
+
+	A BMessenger target can be used to designate a remote handler (living
+	in another team).
 
 	\since BeOS R3
 */
@@ -151,12 +156,10 @@
 	\note It is not necessary to specify both the \a handler and the
 	      \a looper, the unused parameter should be passed in as \c NULL.
 
-	If given a \a handler, it must be attached to a BLooper. The message
-	is always sent to a BLooper which distributes the message to the
-	correct handler (which might be the \a looper itself).
+	If given only a \a handler, it must already be attached to a BLooper.
 
-	The preferred handler, i.e. for a window, is the view that currently
-	has focus.
+	If given only a \a looper, the message will be sent to its preferred
+	handler (in the case of a BWindow that is the focused view).
 
 	\since BeOS R3
 */
@@ -220,8 +223,11 @@
 	\fn status_t BInvoker::Invoke(BMessage* message)
 	\brief Sends the \a message to the invoker's target.
 
-	If \a message is \c NULL the message previously set on the invoker is sent
-	to the invoker's target instead.
+	If \a message is \c NULL the default message is sent instead. You can set
+	the default message using \a SetMessage or in the constructor.
+
+	This method also sends a B_CONTROL_INVOKED notification to handlers
+	which registered themselves using StartWatching
 
 	\since BeOS R3
 */
@@ -236,7 +242,11 @@
 	of the invoker's handler will receive their expected notifications.
 	By default, \a kind is \c B_CONTROL_INVOKED, the same as sent by Invoke().
 
+	BInvoker does not send the notification itself, it is up to subclasses to
+	do that as needed.
+
 	\sa BLooper::StartWatching()
+	\sa BLooper::SendNotices()
 	\sa BHandler::NoticeChange()
 
 	\since BeOS R5
