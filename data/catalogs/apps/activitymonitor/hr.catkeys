@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-ActivityMonitor	1263269542
+1	croatian	x-vnd.Haiku-ActivityMonitor	2507280942
 Always on top	ActivityWindow		Uvijek na vrhu
 Teams	DataSource		Timovi
 MiB	DataSource		MiB
@@ -14,7 +14,6 @@ Sending	DataSource		Slanje
 Update time interval:	SettingsWindow		Dopuni vremenski interval:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Isključi
-%.1f KiB/s	DataSource		%.1f KB/s
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		CPU upotreba
 %.1f MiB	DataSource		%.1f MB

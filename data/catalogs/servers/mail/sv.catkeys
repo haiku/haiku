@@ -1,7 +1,8 @@
-1	swedish	x-vnd.Be-POST	2437005641
+1	swedish	x-vnd.Be-POST	2949558073
 Fetching mail for %name	Notifier		Hämtar e-post för %name
 Check for mails only	DeskbarView		Kontrollera bara e-post
 Send pending mails	DeskbarView		Skicka väntande meddelanden
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Ett nytt meddelande} other{# nya meddelanden}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nytt meddelande} other{# nya meddelanden}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nytt meddelande} other{# nya meddelanden}} för %name\n
 New Messages	MailDaemon		nya meddelanden

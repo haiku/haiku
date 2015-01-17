@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Keymap	439384761
+1	swedish	x-vnd.Haiku-Keymap	3155537444
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Skift:
 Revert	Modifier keys window		Återställ
@@ -80,6 +80,7 @@ Key	Modifier keys window	As in a computer keyboard key	Tangent
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-tangent
 Control:	Modifier keys window	Control key role name	Kontroll:
 Brazilian	Keyboard Layout View		Brazilianskt
+Remove	Keyboard Layout View		Ta bort
 Brazilian (ABNT2)	Keyboard Layout View		Brazilianskt (ABNT2)
 French (Bépo)	Keyboard Layout View		Franska (Bépo)
 Option	Keyboard Layout View	Option key	Alternativ

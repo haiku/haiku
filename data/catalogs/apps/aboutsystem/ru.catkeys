@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	86588006
+1	russian	x-vnd.Haiku-About	2555042707
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 Авторы Gutenprint.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 Ralink (firmware)	AboutWindow		Ralink (прошивка)
@@ -18,6 +18,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Все прав
 Source Code: 	AboutView		Исходный код: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Процессор:} few{# процессора:} other{# процессоров:}}
 Kernel:	AboutView		Ядро:
+Copyright © 2000 Jean-Pierre Lefebvre and Remi Lefebvre.	AboutView		Все права защищены © 2000 Jean-Pierre Lefebvre и Remi Lefebvre.
 BSD (4-clause)	AboutWindow		BSD (4-х пунктная)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Все права защищены © 2001-2002 Thomas Broyer, Charlie Bozeman и Daniel Veillard.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku® и логотип HAIKU® являются зарегистрированными торговыми марками Haiku, Inc.\n\n

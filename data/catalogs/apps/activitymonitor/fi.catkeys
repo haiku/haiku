@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	1211510241
+1	finnish	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		P-viat
 Media nodes	DataSource		Mediasolmut
 Threads	DataSource		Säikeet
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Päivitä aikaväli:
 TX	DataSource	Shorter version for Sending	Läh.
 Quit	ActivityWindow		Poistu
 Block cache memory	DataSource		Lohkovälimuisti
-%.1f KiB/s	DataSource		%.1f kibitavua/s
 Remove graph	ActivityView		Poista kuvaaja
 %lld sec.	SettingsWindow		%lld s
 %lld ms	SettingsWindow		%lld ms

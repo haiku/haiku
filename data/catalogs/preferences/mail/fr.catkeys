@@ -1,9 +1,10 @@
-1	french	x-vnd.Haiku-Mail	688530788
+1	french	x-vnd.Haiku-Mail	2750130554
 Settings	Config Window		Réglages
 Never	Config Window	show status window	Jamais
 While sending and receiving	Config Window		Pendant l’envoi et la réception
 Incoming	Config Window		En arrivée
 Server name:	E-Mail		Nom du serveur :
+An error occurred while creating the config view: %error.	Config Views		Une erreur est survenue durant la création de la vue de configuration : %error.
 OK	Config Window		OK
 E-mail address:	E-Mail		Adresse email :
 Account name:	E-Mail		Nom du compte :
@@ -18,8 +19,11 @@ Password:	E-Mail		Mot de passe :
 Accounts	Config Window		Comptes
 Finish	AutoConfigWindow		Terminer
 Remove	Config Window		Supprimer
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Créer un nouveau compte avec le bouton « Ajouter ».\n\nSupprimer un compte avec le bouton « Supprimer » sur l’élément sélectionné.\n\nSélectionner un élément de la liste pour changer ses réglages.
+Error!	Config Views		Erreur !
 Server Name:	E-Mail		Nom du serveur :
 While sending	Config Window		Pendant l’envoi
+Show notifications:	Config Window		Afficher les notifications :
 Enter a valid e-mail address.	AutoConfigWindow		Entrer une adresse de courrier valide.
 Add	Config Window		Ajouter
 Account settings	AutoConfigWindow		Réglages du compte

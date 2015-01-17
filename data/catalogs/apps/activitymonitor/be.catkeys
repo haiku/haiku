@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ActivityMonitor	1211510241
+1	belarusian	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		Памылкі старонак памяці
 Media nodes	DataSource		Медыя узлы
 Threads	DataSource		Патокі
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Інтэрвал часу абнаўлен
 TX	DataSource	Shorter version for Sending	Адпр.
 Quit	ActivityWindow		Выйсці
 Block cache memory	DataSource		Памяць блокавага кэшу
-%.1f KiB/s	DataSource		%.1f КБ/сек
 Remove graph	ActivityView		Выдаліць графік
 %lld sec.	SettingsWindow		%lld сек.
 %lld ms	SettingsWindow		%lld м.сек

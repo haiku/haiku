@@ -1,7 +1,12 @@
-1	french	x-vnd.Haiku-IMAP	3950045582
+1	french	x-vnd.Haiku-IMAP	354143849
 Destination:	imap_config		Destination :
+Ok	IMAPFolderConfig		Valider
 status	IMAPFolderConfig		état
+Configure IMAP Folders	imap_config		Configurer les dossiers IMAP
+Cancel	IMAPFolderConfig		Annuler
 Apply	IMAPFolderConfig		Appliquer
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Récupération des dossiers IMAP. Merci de patienter…
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Impossible de se connecter au serveur « %server% » :\n%error%
 IMAP Folders	IMAPFolderConfig		Dossiers IMAP
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Mise à jour des abonnements aux dossiers IMAP. Veuillez patientez...
 Failed to fetch available storage.	IMAPFolderConfig		Impossible de récupérer le courrier reçu.

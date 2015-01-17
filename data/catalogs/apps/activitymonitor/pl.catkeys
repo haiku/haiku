@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	1211510241
+1	polish	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		P-błędy
 Media nodes	DataSource		Węzły multimedialne
 Threads	DataSource		Wątki
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Częstotliwość odświeżania:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Zakończ
 Block cache memory	DataSource		Blokowa pamięć cache
-%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Usuń wykres
 %lld sec.	SettingsWindow		%lld s
 %lld ms	SettingsWindow		%lld ms

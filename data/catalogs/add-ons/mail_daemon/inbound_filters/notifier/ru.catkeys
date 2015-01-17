@@ -1,14 +1,13 @@
-1	russian	x-vnd.Haiku-NewMailNotification	4243490201
-{0, plural, one{# new message} other{# new messages}}	filter		{0, plural, one{# новое сообщение} few{# новых сообщения} other{# новых сообщений}}
-Keyboard LEDs	ConfigView		Клавиатурные светодиоды
-Log window	ConfigView		Окно журнала
-Central beep	ConfigView		Центральный звуковой сигнал
-Beep	ConfigView		Звуковой сигнал
-Method:	ConfigView		Метод:
-Central alert	ConfigView		Центральное оповещение
-Alert	ConfigView		Окно предупрежния
-none	ConfigView		нет
-You have {0, plural, one{# new message} other{# new messages}} for %account.	filter		У вас {0, plural, one{# новое сообщение} few{# новых сообщения} other{# новых сообщений}} для %account.
-New messages	filter		Новое сообщение
-New mails notification	ConfigView		Уведомление о новой почте
-OK	filter		OK
+1	russian	x-vnd.Haiku-NewMailNotification	2111731137
+none	NotifierConfigView		нет
+Method:	NotifierConfigView		Метод:
+Beep	NotifierConfigView		Звуковой сигнал
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Одно новое сообщение} few{# новых сообщения} other{# новых сообщений}}
+New mails notification	NotifierFilter		Уведомление о новой почте
+Central alert	NotifierConfigView		Центральное оповещение
+OK	NotifierFilter		OK
+New messages	NotifierFilter		Новое сообщение
+Log window	NotifierConfigView		Окно журнала
+Keyboard LEDs	NotifierConfigView		Клавиатурные светодиоды
+Central beep	NotifierConfigView		Центральный звуковой сигнал
+Alert	NotifierConfigView		Окно предупрежния

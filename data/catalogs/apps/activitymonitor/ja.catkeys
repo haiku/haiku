@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	1211510241
+1	japanese	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		ページフォルト
 Media nodes	DataSource		メディアノード数
 Threads	DataSource		スレッド数
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		更新間隔:
 TX	DataSource	Shorter version for Sending	送信
 Quit	ActivityWindow		終了
 Block cache memory	DataSource		ブロックキャッシュメモリ
-%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		グラフを削除
 %lld sec.	SettingsWindow		%lld 秒
 %lld ms	SettingsWindow		%lld マイクロ秒

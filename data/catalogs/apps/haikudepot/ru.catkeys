@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2140521490
+1	russian	x-vnd.Haiku-HaikuDepot	1203155322
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -96,6 +96,7 @@ Input validation	UserLoginWindow		Проверка ввода
 Update	RatePackageWindow		Обновить
 Video	Model		Видео
 All categories	FilterView		Все категории
+Contents	PackageInfoView		Содержимое
 An error occurred while refreshing the repository: %error%	MainWindow		Возникла ошибка при обновлении репозитория: %error%
 Try again	App		Попробовать снова
 Login or Create account	MainWindow		Войти или создать учетную запись

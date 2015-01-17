@@ -1,7 +1,8 @@
-1	german	x-vnd.Be-POST	2437005641
+1	german	x-vnd.Be-POST	2949558073
 Fetching mail for %name	Notifier		E-Mails für %name abrufen
 Check for mails only	DeskbarView		E-Mails nur abrufen für
 Send pending mails	DeskbarView		E-Mails senden
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Eine neue Nachricht} other{# neue Nachrichten}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# neue Nachricht} other{# neue Nachrichten}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# neue Nachricht} other{# neue Nachrichten}} für %name\n
 New Messages	MailDaemon		Neue Nachrichten

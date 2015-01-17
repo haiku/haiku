@@ -1,7 +1,12 @@
-1	swedish	x-vnd.Haiku-IMAP	3950045582
+1	swedish	x-vnd.Haiku-IMAP	354143849
 Destination:	imap_config		Mål:
+Ok	IMAPFolderConfig		OK
 status	IMAPFolderConfig		status
+Configure IMAP Folders	imap_config		Konfigurera IMAP Mappar
+Cancel	IMAPFolderConfig		Avsluta
 Apply	IMAPFolderConfig		Använd
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Hämtar IMAP mappar, vänligen vänta...
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Kunde inte koppla till server \"%server%\":\n%error%
 IMAP Folders	IMAPFolderConfig		IMAP mappar
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Uppdaterar prenumerationen för IMAP foldrarna, var god vänta...
 Failed to fetch available storage.	IMAPFolderConfig		Misslyckades att hämta tillgängligt lagringsutrymme.

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	1211510241
+1	russian	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		Ошибки страниц
 Media nodes	DataSource		Медиа узлы
 Threads	DataSource		Потоки
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Интервал обновления:
 TX	DataSource	Shorter version for Sending	Передача
 Quit	ActivityWindow		Выход
 Block cache memory	DataSource		Память блокового кэша
-%.1f KiB/s	DataSource		%.1f КБ/с
 Remove graph	ActivityView		Удалить график
 %lld sec.	SettingsWindow		%lld сек.
 %lld ms	SettingsWindow		%lld мс

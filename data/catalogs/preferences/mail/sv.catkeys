@@ -1,9 +1,10 @@
-1	swedish	x-vnd.Haiku-Mail	688530788
+1	swedish	x-vnd.Haiku-Mail	2750130554
 Settings	Config Window		Inställningar
 Never	Config Window	show status window	Aldrig
 While sending and receiving	Config Window		När sändning och mottagning sker
 Incoming	Config Window		Inkommande
 Server name:	E-Mail		Servernamn:
+An error occurred while creating the config view: %error.	Config Views		Ett fel inträffade vid skapandet av konfigurerings vy. %error.
 OK	Config Window		OK
 E-mail address:	E-Mail		E-postadress:
 Account name:	E-Mail		Kontonamn:
@@ -18,8 +19,11 @@ Password:	E-Mail		Lösenord:
 Accounts	Config Window		Konton
 Finish	AutoConfigWindow		Slutför
 Remove	Config Window		Ta bort
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Skapa ett nytt konto med Lägg till knappen.\n\nTa bort ett konto med Ta bort knappen på ett valt konto.\n\nVälj ett konto i listan för att ändra dess settings.
+Error!	Config Views		Fel!
 Server Name:	E-Mail		Servernamn:
 While sending	Config Window		När sändning sker
+Show notifications:	Config Window		Visa notifieringar:
 Enter a valid e-mail address.	AutoConfigWindow		Ange en giltig e-postadress.
 Add	Config Window		Lägg till
 Account settings	AutoConfigWindow		Kontoinställningar

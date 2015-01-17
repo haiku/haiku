@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	877153484
+1	french	x-vnd.Haiku-HaikuDepot	780031017
 Name	PackageListView		Nom
 Available packages	MainWindow		Paquets disponibles
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
@@ -75,6 +75,7 @@ Failed to update rating	RatePackageWindow		Impossible de modifier l’évaluatio
 Does not start	RatePackageWindow		Ne démarre pas
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Le service web n’a pas pu être joint.
+Only featured packages	MainWindow		Seulement les paquets significatifs
 There are problems in the form:\n\n	UserLoginWindow		Il y a des problèmes dans le formulaire :\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Le service web n’a pas trouvé le paquet. Ce dernier a probablement été retiré du dépôt duquel il provient. Dans ce cas, il n’est malheureusement plus possible d’évaluer le paquet.
 Create account	UserLoginWindow		Créer un compte
@@ -106,6 +107,7 @@ Input validation	UserLoginWindow		Validation des entrées
 Update	RatePackageWindow		Mettre à jour
 Video	Model		Vidéo
 All categories	FilterView		Toutes les catégories
+Contents	PackageInfoView		Contenu
 An error occurred while refreshing the repository: %error%	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error%
 Try again	App		Essayer à nouveau
 Login or Create account	MainWindow		Se connecter ou créer un compte

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	1211510241
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		Р-помилки
 Media nodes	DataSource		Мультимедійні вузли
 Threads	DataSource		Потоки
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Інтервал часу поновлен
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Вийти
 Block cache memory	DataSource		Блок кеш пам'яті
-%.1f KiB/s	DataSource		%.1f KіB/с
 Remove graph	ActivityView		Видалити графік
 %lld sec.	SettingsWindow		%lld сек.
 %lld ms	SettingsWindow		%lld мілісек.

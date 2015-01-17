@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ActivityMonitor	1211510241
+1	german	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		Seitenfehler
 Media nodes	DataSource		Media-Nodes
 Threads	DataSource		Threads
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Aktualisierungsintervall:
 TX	DataSource	Shorter version for Sending	Senden
 Quit	ActivityWindow		Beenden
 Block cache memory	DataSource		Block-Cache-Speicher
-%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Graph entfernen
 %lld sec.	SettingsWindow		%lld Sek.
 %lld ms	SettingsWindow		%lld ms

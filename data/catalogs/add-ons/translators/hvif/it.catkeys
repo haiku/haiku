@@ -1,6 +1,8 @@
-1	italian	x-vnd.Haiku-HVIFTranslator	2227623652
-HVIF icons	HVIFTranslator		HVIF icone
+1	italian	x-vnd.Haiku-HVIFTranslator	249304797
+Haiku vector icon translator	HVIFTranslator		Translator icona vettoriale Haiku
+HVIF icons	HVIFTranslator		Icone HVIF
 Render size:	HVIFView		Dimensione rendering:
-HVIFTranslator Settings	HVIFTranslator		HVIFTranslator Impostazioni 
-HVIF Settings	HVIFMain		HVIF Impostazioni 
+HVIFTranslator Settings	HVIFTranslator		Impostazioni Translator  HVIF
+Haiku vector icon translator	HVIFView		Translator icona vettoriale Haiku
+HVIF Settings	HVIFMain		Impostazioni HVIF
 Version %d.%d.%d, %s	HVIFView		Versione %d.%d.%d, %s

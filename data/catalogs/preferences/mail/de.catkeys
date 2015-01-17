@@ -1,9 +1,10 @@
-1	german	x-vnd.Haiku-Mail	688530788
+1	german	x-vnd.Haiku-Mail	2750130554
 Settings	Config Window		Einstellungen
 Never	Config Window	show status window	Nie
 While sending and receiving	Config Window		Beim Senden und Empfangen
 Incoming	Config Window		Eingang
 Server name:	E-Mail		Servername:
+An error occurred while creating the config view: %error.	Config Views		Beim Erzeugen des Config-View ist ein Fehler aufgetreten: %error.
 OK	Config Window		OK
 E-mail address:	E-Mail		E-Mail-Adresse:
 Account name:	E-Mail		Kontoname:
@@ -18,8 +19,11 @@ Password:	E-Mail		Passwort:
 Accounts	Config Window		Konten
 Finish	AutoConfigWindow		Beenden
 Remove	Config Window		Entfernen
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Mit "Hinzu" ein neues Konto anlegen.\n\nMit "Entfernen" das ausgewählte Konto löschen.\n\nEintrag in der Liste auswählen, um dessen Einstellungen zu ändern.
+Error!	Config Views		Fehler!
 Server Name:	E-Mail		Servername:
 While sending	Config Window		Beim Senden
+Show notifications:	Config Window		Benachrichtigungen anzeigen:
 Enter a valid e-mail address.	AutoConfigWindow		Eine gültige E-Mail-Adresse angeben.
 Add	Config Window		Hinzu
 Account settings	AutoConfigWindow		Kontoeinstellungen

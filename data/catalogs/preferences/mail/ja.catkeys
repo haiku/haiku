@@ -1,9 +1,10 @@
-1	japanese	x-vnd.Haiku-Mail	688530788
+1	japanese	x-vnd.Haiku-Mail	2750130554
 Settings	Config Window		設定
 Never	Config Window	show status window	表示しない
 While sending and receiving	Config Window		送受信中に
 Incoming	Config Window		受信
 Server name:	E-Mail		サーバー名:
+An error occurred while creating the config view: %error.	Config Views		config view の作成時にエラーが発生しました: %error.
 OK	Config Window		OK
 E-mail address:	E-Mail		E-mail アドレス
 Account name:	E-Mail		アカウント名:
@@ -18,8 +19,11 @@ Password:	E-Mail		パスワード:
 Accounts	Config Window		アカウント
 Finish	AutoConfigWindow		完了
 Remove	Config Window		削除
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		追加ボタンで新規アカウントを作成します。\n\nアカウントを選択して削除ボタンを押すと、アカウントが削除されます。\n\nアカウントの設定を変更するには、リスト内のアカウントを選択します。
+Error!	Config Views		エラー
 Server Name:	E-Mail		サーバー名:
 While sending	Config Window		送信中に
+Show notifications:	Config Window		通知を表示:
 Enter a valid e-mail address.	AutoConfigWindow		有効な E-mail アドレスを入力してください。
 Add	Config Window		追加
 Account settings	AutoConfigWindow		アカウント設定

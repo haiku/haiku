@@ -5,7 +5,7 @@ Continue	file:ZipOMaticWindow.cpp		Продолжить
 Preparing to archive	file:ZipperThread.cpp		Подготовка к архивации
 Drop files here.	file:ZipOMaticWindow.cpp		Переместите файлы сюда.
 Filename: %s	file:ZipOMaticWindow.cpp		Имя архива: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		У вас запущено {0, plural, one{# копия} few{# копии} other{# копий}} Zip-O-Matic.\n
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		У вас {0, plural, one{запущена # копия} few{запущено # копии} other{запущено # копий}} Zip-O-Matic.\n
 Let them continue	file:ZipOMatic.cpp		Позволить им продолжить
 Do you want to stop them?	file:ZipOMatic.cpp		Вы хотите остановить их?
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Вы уверены, что хотите остановить создание этого архива?

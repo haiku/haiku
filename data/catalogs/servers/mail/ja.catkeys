@@ -1,7 +1,8 @@
-1	japanese	x-vnd.Be-POST	2437005641
+1	japanese	x-vnd.Be-POST	2949558073
 Fetching mail for %name	Notifier		%name からのメールを受信中
 Check for mails only	DeskbarView		メール受信のみ
 Send pending mails	DeskbarView		保留メールを送信
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{1 件の新着メッセージ} other{# 件の新着メッセージ}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# 件の新着メッセージ} other{# 件の新着メッセージ}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		%name 宛に {0, plural, one{# 件の新着メッセージ} other{# 件の新着メッセージ}}\n
 New Messages	MailDaemon		新着メッセージ

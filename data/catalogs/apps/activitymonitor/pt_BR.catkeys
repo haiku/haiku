@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	1211510241
+1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		P-falhas
 Media nodes	DataSource		Nós de mídia
 Threads	DataSource		Processos
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Intervalo entre atualizações
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Sair
 Block cache memory	DataSource		Bloquear memória em cache
-%.1f KiB/s	DataSource		%.1f Kb/s
 Remove graph	ActivityView		Remover grafo
 %lld sec.	SettingsWindow		%lld seg.
 %lld ms	SettingsWindow		%lld ms

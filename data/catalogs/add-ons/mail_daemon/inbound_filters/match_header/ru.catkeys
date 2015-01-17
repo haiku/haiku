@@ -1,11 +1,12 @@
-1	russian	x-vnd.Haiku-MatchHeader	3677427558
+1	russian	x-vnd.Haiku-MatchHeader	491991630
 <Choose action>	ConfigView		<Выберите действие>
 has	ConfigView		содержит
 Move to	ConfigView		Переместить в
 Then	ConfigView		Тогда
 this field is based on the action	ConfigView		это поле зависит от действия
 Delete message	ConfigView		Удалить сообщение
-<Choose account>	ConfigView		<Выберите аккаунт>
+value (use REGEX: in front of regular expressions like *spam*)	ConfigView		значение (используйте регулярные выражения, например *спам*)
+<Choose account>	ConfigView		значение (используйте регулярные выражения, например *спам*)
 Set flags to	ConfigView		Установить флаги в
 Set as read	ConfigView		Отметить как прочитанное
 Reply with	ConfigView		Ответить с

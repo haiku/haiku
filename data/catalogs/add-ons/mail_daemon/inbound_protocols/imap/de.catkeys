@@ -1,7 +1,12 @@
-1	german	x-vnd.Haiku-IMAP	3950045582
+1	german	x-vnd.Haiku-IMAP	354143849
 Destination:	imap_config		Zielverzeichnis:
+Ok	IMAPFolderConfig		OK
 status	IMAPFolderConfig		Status
+Configure IMAP Folders	imap_config		IMAP Ordner konfigurieren
+Cancel	IMAPFolderConfig		Abbrechen
 Apply	IMAPFolderConfig		Anwenden
 Fetching IMAP folders, have patience...	IMAPFolderConfig		IMAP-Ordner werden angefordert. Bitte warten...
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Keine Verbindung zum Server \"%server%\":\n%error%
 IMAP Folders	IMAPFolderConfig		IMAP-Ordner
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Aktualisieren der IMAP Ordner... kann etwas dauern.
 Failed to fetch available storage.	IMAPFolderConfig		Keine der vorhandenen Ablagen konnte übertragen werden.

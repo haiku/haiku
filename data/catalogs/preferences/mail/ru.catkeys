@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Mail	688530788
+1	russian	x-vnd.Haiku-Mail	1147431952
 Settings	Config Window		Настройки
 Never	Config Window	show status window	никогда
 While sending and receiving	Config Window		во время отправки и получения
@@ -18,8 +18,10 @@ Password:	E-Mail		Пароль:
 Accounts	Config Window		Аккаунты
 Finish	AutoConfigWindow		Завершить
 Remove	Config Window		Удалить
+Error!	Config Views		Ошибка!
 Server Name:	E-Mail		Адрес сервера:
 While sending	Config Window		во время отправки
+Show notifications:	Config Window		Показывать уведомления:
 Enter a valid e-mail address.	AutoConfigWindow		Введите действительный почтовый адрес
 Add	Config Window		Добавить
 Account settings	AutoConfigWindow		Настройки аккаунта

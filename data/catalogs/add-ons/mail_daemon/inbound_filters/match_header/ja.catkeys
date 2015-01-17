@@ -1,13 +1,16 @@
-1	japanese	x-vnd.Haiku-MatchHeader	3677427558
+1	japanese	x-vnd.Haiku-MatchHeader	3405428083
 <Choose action>	ConfigView		<動作を選択>
 has	ConfigView		が 
 Move to	ConfigView		に移動する
 Then	ConfigView		ならば
 this field is based on the action	ConfigView		ここは動作によって意味が変わります
 Delete message	ConfigView		メッセージを削除する
+value (use REGEX: in front of regular expressions like *spam*)	ConfigView		値 (REGEX の使用: *spam* のような正規表現の前に記述)
 <Choose account>	ConfigView		<アカウントを選択>
 Set flags to	ConfigView		フラグを指定する
 Set as read	ConfigView		既読にする
+Match header	RuleFilter		ヘッダー検索
 Reply with	ConfigView		返事を書く
 If	ConfigView		条件:
+Match \"%attribute\" against \"%regex\"	RuleFilter		\"%regex\"  と一致する \"%attribute\" 
 header (e.g. Subject)	ConfigView		ヘッダー (たとえば Subject)

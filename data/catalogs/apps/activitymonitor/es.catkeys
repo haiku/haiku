@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	1211510241
+1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		Averías de P
 Media nodes	DataSource		Nodos de media
 Threads	DataSource		Hilos
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Intervalo de tiempo de actualización:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Salir
 Block cache memory	DataSource		Bloquear memoria de caché
-%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Quitar el gráfico
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms

@@ -137,7 +137,7 @@ Start media server	MediaPlayer-Main		Запустить медиа сервер
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Переключить в полноэкранный режим.
 ToggleFullscreen	MediaPlayer-Main		Переключить в полноэкранный режим
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, one{# Моно} few{# Стерео} other{# Каналов}}
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Моно} =2{Стерео} other{# Канала}}
 <unnamed>	PlaylistItem-name		<без названия>
 Open Clips	MediaPlayer-Main		Открыть клипы
 OK	MediaPlayer-PlaylistWindow		ОК

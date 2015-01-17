@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ActivityMonitor	1211510241
+1	english	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		页面错误
 Media nodes	DataSource		媒介节点
 Threads	DataSource		线程
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		更新频率：
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		退出
 Block cache memory	DataSource		高速缓存
-%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		删除图示
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms

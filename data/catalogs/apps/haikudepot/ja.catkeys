@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	1717397185
+1	japanese	x-vnd.Haiku-HaikuDepot	780031017
 Name	PackageListView		名前
 Available packages	MainWindow		使用可能なパッケージ
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
@@ -107,6 +107,7 @@ Input validation	UserLoginWindow		入力検証
 Update	RatePackageWindow		更新
 Video	Model		ビデオ
 All categories	FilterView		すべての分類
+Contents	PackageInfoView		内容
 An error occurred while refreshing the repository: %error%	MainWindow		リポジトリの更新中にエラーが発生しました: %error%
 Try again	App		再試行
 Login or Create account	MainWindow		ログインまたはアカウントの作成

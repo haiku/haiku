@@ -1,5 +1,6 @@
-1	german	x-vnd.Haiku-About	1827758916
+1	german	x-vnd.Haiku-About	3415235510
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 durch die Autoren von Gutenprint. Alle Rechte vorbehalten.
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm und Werner Lemberg.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (und seinen NewOS-Kernel)\n
 Ralink (firmware)	AboutWindow		Ralink (Firmware)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Alle Rechte vorbehalten.
@@ -18,6 +19,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 19
 Source Code: 	AboutView		Quellcode: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Prozessor:} other{# Prozessoren:}}
 Kernel:	AboutView		Kernel:
+Copyright © 2000 Jean-Pierre Lefebvre and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL und Remi Lefebvre.
 BSD (4-clause)	AboutWindow		BSD (4-Klausel)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman und Daniel Veillard. Alle Rechte vorbehalten.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Die Urheberrechte am Haiku-Code liegen bei Haiku, Inc., beziehungsweise bei den entsprechenden Autoren, die explizit im Quelltext aufgeführt sind. Haiku® und das HAIKU Logo® sind registrierte Marken von Haiku, Inc.\n\n

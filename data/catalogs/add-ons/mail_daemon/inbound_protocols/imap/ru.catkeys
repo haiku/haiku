@@ -1,7 +1,10 @@
-1	russian	x-vnd.Haiku-IMAP	3950045582
+1	russian	x-vnd.Haiku-IMAP	805946824
 Destination:	imap_config		Папка:
 status	IMAPFolderConfig		статус
+Cancel	IMAPFolderConfig		Отмена
 Apply	IMAPFolderConfig		Применить
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Запрашиваются IMAP папки, имейте терпение...
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Не удалось подключиться к серверу \"%server%\":\n%error%
 IMAP Folders	IMAPFolderConfig		IMAP папки
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Обновление подписки к IMAP папкам, имейте терпение…
 Failed to fetch available storage.	IMAPFolderConfig		Не удалось запросить доступное пространство.

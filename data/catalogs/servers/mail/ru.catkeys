@@ -1,7 +1,8 @@
-1	russian	x-vnd.Be-POST	2437005641
+1	russian	x-vnd.Be-POST	2949558073
 Fetching mail for %name	Notifier		Получение почты для %name
 Check for mails only	DeskbarView		Только проверить почту
 Send pending mails	DeskbarView		Отправить почту в ожидании
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Одно новое сообщение} few{# новых сообщения} other{# новых сообщений}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# новое сообщение} few{# новых сообщения} other{# новый сообщений}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# новое сообщение} few{# новых сообщения} other{# новый сообщений}} для %name\n
 New Messages	MailDaemon		Новые сообщения

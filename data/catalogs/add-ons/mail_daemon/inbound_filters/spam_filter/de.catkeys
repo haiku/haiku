@@ -1,6 +1,7 @@
-1	german	x-vnd.Haiku-SpamFilter	160316705
+1	german	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		oder leere E-Mail
 Genuine below and uncertain above:	SpamFilterConfig		Erwünscht unter und ungewiss über:
 Spam above:	SpamFilterConfig		Spam über:
 Add spam rating to start of subject	SpamFilterConfig		Spam-Einschätzung der Betreffzeile voranstellen
+Bayesian Spam Filter	SpamFilter		Bayesian Spam Filter
 Learn from all incoming e-mail	SpamFilterConfig		Von allen eingehenden E-Mails lernen

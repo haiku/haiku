@@ -1,5 +1,6 @@
-1	japanese	x-vnd.Haiku-About	1827758916
+1	japanese	x-vnd.Haiku-About	3415235510
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint の著者たち. All rights reserved.
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n
 Ralink (firmware)	AboutWindow		Ralink (ファームウェア)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. All rights reserved.
@@ -18,6 +19,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 19
 Source Code: 	AboutView		ソースコード:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{# プロセッサ:} other{# プロセッサ:}}
 Kernel:	AboutView		カーネル:
+Copyright © 2000 Jean-Pierre Lefebvre and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre Lefebvre and Remi Lefebvre.
 BSD (4-clause)	AboutWindow		BSD (四条項)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haikuのコードの著作権はHaiku, Inc.または各ソースコードに明示された個々の著者に帰属します。Haiku®およびHAIKUロゴ・マーク®はHaiku, Inc.の(登録)商標です。\n\n

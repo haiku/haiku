@@ -1,6 +1,7 @@
-1	swedish	x-vnd.Haiku-SpamFilter	160316705
+1	swedish	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		eller tomt e-post
 Genuine below and uncertain above:	SpamFilterConfig		Säkert under eller osäkert över:
 Spam above:	SpamFilterConfig		Skräppost över:
 Add spam rating to start of subject	SpamFilterConfig		Lägg till skräpranking före rubriken
+Bayesian Spam Filter	SpamFilter		Bayesian Spam Filter
 Learn from all incoming e-mail	SpamFilterConfig		Lär från all inkommande e-post

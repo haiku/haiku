@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ActivityMonitor	1211510241
+1	romanian	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		Defecțiuni de tip P
 Media nodes	DataSource		Noduri media
 Threads	DataSource		Fire de execuție
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Actualizează intervalul de timp:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Părăsește
 Block cache memory	DataSource		Blochează memoria tampon
-%.1f KiB/s	DataSource		%.1f KO/s
 Remove graph	ActivityView		Elimină grafic
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms

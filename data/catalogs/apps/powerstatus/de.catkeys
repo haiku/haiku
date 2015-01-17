@@ -1,8 +1,9 @@
-1	german	x-vnd.Haiku-PowerStatus	248799648
+1	german	x-vnd.Haiku-PowerStatus	3969330583
 Design capacity low warning: 	PowerStatus		Kapazitätswarnung (Herstellerangabe):
 Show percent	PowerStatus		Prozent anzeigen
 Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):
  mW	PowerStatus		mW
+The battery level is getting low, please plug in the device.	PowerStatus		Der Akku ist ziemlich leer; er sollte demnächst geladen werden.
 Battery low	PowerStatus		Ladezustand niedrig
 Type: 	PowerStatus		Typ:
 non-rechargeable	PowerStatus		nicht aufladbar
@@ -33,6 +34,7 @@ Capacity granularity 1: 	PowerStatus		Kapazitätsgenauigkeit 1:
 OEM info: 	PowerStatus		OEM-Info:
 Design voltage: 	PowerStatus		Spannung (lt. Hersteller):
 Battery charging	PowerStatus		Akku wird geladen
+The battery level is critical, please plug in the device immediately.	PowerStatus		Der Akku ist beinahe leer; er sollte sofort geladen werden.
 Design capacity warning: 	PowerStatus		Kapazitätswarnung (lt. Hersteller):
 Battery info	PowerStatus		Akku-Infos
 Quit	PowerStatus		Beenden

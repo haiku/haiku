@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	1717397185
+1	german	x-vnd.Haiku-HaikuDepot	780031017
 Name	PackageListView		Name
 Available packages	MainWindow		Verfügbare Pakete
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
@@ -107,6 +107,7 @@ Input validation	UserLoginWindow		Eingabeprüfung
 Update	RatePackageWindow		Aktualisieren
 Video	Model		Video
 All categories	FilterView		Alle Kategorien
+Contents	PackageInfoView		Inhalt
 An error occurred while refreshing the repository: %error%	MainWindow		Bei der Aktualisierung des Depots trat ein Fehler auf: %error%
 Try again	App		Nochmal versuchen
 Login or Create account	MainWindow		Anmelden oder Benutzerkonto anlegen

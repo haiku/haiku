@@ -1,10 +1,11 @@
-1	german	x-vnd.Haiku-libmail	161731481
+1	german	x-vnd.Haiku-libmail	3450478295
 Partially download messages larger than	ProtocolConfigView		Nur Kopfzeilen herunterladen bei E-Mails über
 Password:	ProtocolConfigView		Passwort:
 Remove mail from server when deleted	ProtocolConfigView		Gelöschte E-Mails auch vom Server löschen
 Mail server:	ProtocolConfigView		E-Mail-Server:
 Select…	MailKit		Auswählen…
 Connection type:	ProtocolConfigView		Verbindungsart:
+KB	ProtocolConfigView	kilo byte	KiB
 Leave mail on server	ProtocolConfigView		E-Mails auf dem Server belassen
 Username:	ProtocolConfigView		Benutzername:
 Login type:	ProtocolConfigView		Anmeldemethode:

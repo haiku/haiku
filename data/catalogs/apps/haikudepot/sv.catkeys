@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3293630594
+1	swedish	x-vnd.Haiku-HaikuDepot	780031017
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
@@ -8,7 +8,7 @@ Changelog	PackageInfoView		Ändringslogg
 Your rating:	RatePackageWindow		Dina betyg:
 The passwords do not match.	UserLoginWindow		Lösenorden stämmer inte överens.
 Log in…	MainWindow		Logga in...
-Rate %Package%	RatePackageWindow		Betyg%Package%
+Rate %Package%	RatePackageWindow		Betyg %Package%
 Stability:	RatePackageWindow		Stabilitet:
 Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
 Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
@@ -24,7 +24,7 @@ Account created successfully. You can now rate packages and do other useful thin
 Tools	MainWindow		Verktyg
 HaikuDepot	System name		HaikuDepot
 Close	UserLoginWindow		Stäng
-Rate package…	PackageInfoView		Hastighet paket...
+Rate package…	PackageInfoView		Betygsätt paket...
 Category	FilterView		Kategori
 Uninstall	PackageManager		Avinstallera
 An error occurred while obtaining the package list: %message%	MainWindow		Ett fel inträffade när packet manager hämtade paketlistan: %message%
@@ -44,6 +44,7 @@ Status	PackageListView		Status
 Switch account…	MainWindow		Byt konto...
 Ignore	UserLoginWindow		Ignorera
 Language	UserLoginWindow		Språk
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Lösenordet är för svagt eller inte rätt. Varvänlig och använd minst 8 tecken med minst 2 nummer och 2 stora bokstäver.
 Rate package	RatePackageWindow		Betygsatt paket
 Development	Model		Utveckling
 Fatal error	PackageManager		Allvarligt fel
@@ -55,32 +56,94 @@ But none could be listed here, sorry.	UserLoginWindow		Ursäkta, Men ingen kunde
 System & Utilities	Model		System & Verktyg
 Inactive	PackageListView		Inaktiv
 Refresh depots	MainWindow		Uppdatera depå
+The package action could not be scheduled: %Error%	PackageInfoView		Paket körningen kunde inte planeras: %Error%
+Science & Mathematics	Model		Vetenskap & Matematik
 Main Menu	MainWindow		Huvudmeny
 (%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Du har inte löst captcha pusslet rätt.
 Success	UserLoginWindow		Klar
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Servicen behövs för HaikuDepot och den verkar inte köra.\nSkulle du vilja starta den nu?
 Downloading:	PackageInfoView		Mestadels stabil
 Mostly stable	RatePackageWindow		Mestadels stabil
+There was a puzzling response from the web service.	RatePackageWindow		Det kom ett konstigt meddelande från webb servicen.
+Log out	MainWindow		Logga ut
+Education	Model		Utbildning
 Search terms:	FilterView		Sökvillkor
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
+Failed to update rating	RatePackageWindow		Misslyckades uppdatera betyg
+Does not start	RatePackageWindow		Starta inte
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error% (%details%)
+It was not possible to contact the web service.	RatePackageWindow		Det gick inte att få kontakt med webb servicen.
+Only featured packages	MainWindow		Bara framhävda paket
+There are problems in the form:\n\n	UserLoginWindow		Det finns problem i formuläret:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Paketet hittades inte av webb servicen. Troligen beror det på att paketet kommer från en depå som inte följs. Betygsättning av sådana paket supporteras tvärr inte.
+Create account	UserLoginWindow		Skapa konto
 Productivity	Model		Produktivitet
+No, quit HaikuDepot	App		Nej, avsluta HaikuDepot
+Authentication failed	UserLoginWindow		Autentisering misslyckades
+Logged in as %User%	MainWindow		Inloggad som %User%
+Language	RatePackageWindow		Språk
+Failed to create or update rating: %s\n	RatePackageWindow		Gick inte att skapa eller uppdatera betyg: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
+ It responded with: 	RatePackageWindow		 Den svarade med: 
+User name:	UserLoginWindow		Användarnamn:
+User Menu	MainWindow		Användarmeny
+Unstable but usable	RatePackageWindow		Ostabil men kan användas
+The email address appears to be malformed.	UserLoginWindow		E-post adressen är fel formulerat.
 Games	Model		Spel
 Rating	PackageListView		Betyg
 (%Votes%)	FeaturedPackagesView		(%Votes%)
+There was a puzzling response from the web service.	UserLoginWindow		Det komm ett konstigt meddelande från webb servicen.
 Graphics	Model		Grafik
 Local	MainWindow		Lokal
 Close	MainWindow		Stäng
+Preferred language:	UserLoginWindow		Föredraget språk:
+Failed to rate package	RatePackageWindow		Misslyckades gradera paketet
+Internet & Network	Model		Internet & Nätverk
+Cancel	MainWindow		Avbryt
+Quit HaikuDepot	App		Avsluta HaikuDepot
+Input validation	UserLoginWindow		Ogiltigt indata
+Update	RatePackageWindow		Uppdatera
 Video	Model		Video
+All categories	FilterView		Alla kategorier
+Contents	PackageInfoView		Innehåll
 An error occurred while refreshing the repository: %error%	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error%
+Try again	App		Försök igen
+Login or Create account	MainWindow		Logga in eller skapa konto
 Pending…	PackageListView		Väntar...
 Depot	FilterView		Depot
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# enhet} other{# enheter}}
+OK	PackageInfoView		OK
 Uninstalled	PackageListView		Avinstallera
+Show	MainWindow		Visa
+Stable	RatePackageWindow		Stabil
 Unknown	PackageListView		Okänd
 All depots	FilterView		All depots
+Comment language:	RatePackageWindow		Kommentarspråk:
+Pass phrase:	UserLoginWindow		Lösen fras:
+Screenshot	ScreenshotWindow		Skärmdump
+Not specified	RatePackageWindow		Inte angivet
 Available	PackageListView		Tillgänglig
+Develop packages	MainWindow		Utvecklingspaket
 n/a	PackageInfoView		oviktigt
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Om du inte anger en e-mail adress, kommer du inte kunna återställa ditt lösenord om du glömmer det.
+ It responded with: 	UserLoginWindow		 Den svarade med: 
+Authentication failed. Connection to the service failed.	UserLoginWindow		Autentiseringen misslyckades. Koppling till servicen misslyckades.
+Cancel	RatePackageWindow		Avbryt
+Package action failed	PackageInfoView		Paketåtgärden misslyckades
+OK	UserLoginWindow		OK
 Send	RatePackageWindow		Skicka
+Category:	FilterView		Kategori:
+Failed to create account	UserLoginWindow		Misslyckades skapa konto
+There are problems with the data you entered:\n\n	UserLoginWindow		Det är något problem med data du skrev:\n\n
+Featured packages	MainWindow		Framhävda paket
+Start package daemon	App		Starta paket-servicen
+Success	RatePackageWindow		Klar
+Business	Model		Företag
 Audio	Model		Ljud
 About	PackageInfoView		Om
 Active	PackageListView		Aktiv
+It was not possible to contact the web service.	UserLoginWindow		Det gick inte att kontakta webb servicen.
+Failed to create account: %s\n	UserLoginWindow		Misslyckades skapa konto: %s\n
+Cancel	UserLoginWindow		Avbryt

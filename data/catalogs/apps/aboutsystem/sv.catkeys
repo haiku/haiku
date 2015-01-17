@@ -1,5 +1,6 @@
-1	swedish	x-vnd.Haiku-About	1827758916
+1	swedish	x-vnd.Haiku-About	3415235510
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Upphovsrätt © 1999-2010 skaparna av Gutenprint. Med ensamrätt.
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Upphovsrätt © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (och hans NewOS-kärna)\n
 Ralink (firmware)	AboutWindow		Ralink (firmware)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Upphovsrätt © 1996-2005 Julian R Seward. Med ensamrätt.
@@ -18,6 +19,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Upphovsrätt ©
 Source Code: 	AboutView		Källkod: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processor:} other{# Processors:}}
 Kernel:	AboutView		Kärna:
+Copyright © 2000 Jean-Pierre Lefebvre and Remi Lefebvre.	AboutView		Upphovsrätt © 2000 Jean-Pierre erbefeL och Remi Lefebvre.
 BSD (4-clause)	AboutWindow		BSD (4-clause)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Upphovsrätt © 2001-2002 Thomas Broyer, Charlie Bozeman och Daniel Veillard. Med ensamrätt.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Upphovsrätten till Haiku's källkod en egendom tillhörande Haiku, Inc. eller respektive upphovsman, där det uttryckligen är angivet i källkoden. Haiku® och Haiku's logo® är registrerade varumärken tillhörande Haiku, Inc.\n\n

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	1211510241
+1	swedish	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		P-fel
 Media nodes	DataSource		Medianoder
 Threads	DataSource		Trådar
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Uppdateringsintervall:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Avsluta
 Block cache memory	DataSource		Blockcacheminne
-%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Ta bort graf
 %lld sec.	SettingsWindow		%lld sek.
 %lld ms	SettingsWindow		%lld ms

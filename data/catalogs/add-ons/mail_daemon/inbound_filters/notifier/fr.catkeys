@@ -1,14 +1,14 @@
-1	french	x-vnd.Haiku-NewMailNotification	4243490201
-{0, plural, one{# new message} other{# new messages}}	filter		{0, plural, one{# nouveau message} other{# nouveaux messages}}
-Keyboard LEDs	ConfigView		LEDs du clavier
-Log window	ConfigView		Fenêtre de connexion
-Central beep	ConfigView		Sonnerie générale
-Beep	ConfigView		Sonnerie
-Method:	ConfigView		Méthode :
-Central alert	ConfigView		Alerte générale
-Alert	ConfigView		Alerte
-none	ConfigView		aucune
-You have {0, plural, one{# new message} other{# new messages}} for %account.	filter		Vous avez {0, plural, one{# nouveau message} other{# nouveaux messages}} pour %account.
-New messages	filter		Nouveaux messages
-New mails notification	ConfigView		Notification de nouveaux courriers
-OK	filter		OK
+1	french	x-vnd.Haiku-NewMailNotification	73789504
+You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		%account a {0, plural, one{un nouveau message} other{# nouveaux messages}}.
+none	NotifierConfigView		aucune
+Method:	NotifierConfigView		Méthode :
+Beep	NotifierConfigView		Sonnerie
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Un nouveau message} other{# nouveaux messages}}
+New mails notification	NotifierFilter		Notification de nouveaux courriers
+Central alert	NotifierConfigView		Alerte générale
+OK	NotifierFilter		OK
+New messages	NotifierFilter		Nouveaux messages
+Log window	NotifierConfigView		Fenêtre de connexion
+Keyboard LEDs	NotifierConfigView		LEDs du clavier
+Central beep	NotifierConfigView		Sonnerie générale
+Alert	NotifierConfigView		Alerte

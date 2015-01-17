@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-ActivityMonitor	637395798
+1	lithuanian	x-vnd.Haiku-ActivityMonitor	1881407198
 P-faults	DataSource		Psl. klaidos
 Threads	DataSource		Gijos
 Always on top	ActivityWindow		Visada viršuje
@@ -26,7 +26,6 @@ Update time interval:	SettingsWindow		Atnaujinimo periodas:
 TX	DataSource	Shorter version for Sending	Išs.
 Quit	ActivityWindow		Baigti darbą
 Block cache memory	DataSource		Blokinio podėlio atmintis
-%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Pašalinti grafiką
 %lld sec.	SettingsWindow		%lld sek.
 %lld ms	SettingsWindow		%lld ms

@@ -1,13 +1,19 @@
-1	italian	x-vnd.Haiku-GIFTranslator	371294871
+1	italian	x-vnd.Haiku-GIFTranslator	1515001985
 Websafe	GIFView		Websafe
-Write interlaced images	GIFView		Scrivere le immagini interlacciate
+Write interlaced images	GIFView		Scrivere immagini interlacciate
 Optimal	GIFView		Ottimale
-Greyscale	GIFView		Scala di grigio
+Greyscale	GIFView		Scala di grigi
+Colors:	GIFView		Colori:
+GIF image translator	GIFTranslator		Translator immagine GIF
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Formato (GIFTranslator)
-GIF image	GIFTranslator		GIF immagine
+GIF image translator	GIFView		Translator immagine GIF
+Palette:	GIFView		Tavolozza:
+GIF image	GIFTranslator		Immagine GIF
 Write transparent images	GIFView		Scivere immagini trasparenti
+GIF images	GIFTranslator		Immagini GIF
 Use RGB color	GIFView		Usa colori RGB
 Use dithering	GIFView		Usa il dithering
-GIF Settings	GIFTranslator		GIF Impostazioni
+GIF Settings	GIFTranslator		Impostazioni GIF
 BeOS system	GIFView		Sistema BeOS
+v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		Automatico (dal canale alfa)

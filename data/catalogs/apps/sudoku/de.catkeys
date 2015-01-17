@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Sudoku	2463385585
+1	german	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Spielstand wiederherstellen
 Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku konnte nicht erstellt werden:\n%s\n
 Export as…	SudokuWindow		Exportieren als…
@@ -26,6 +26,7 @@ Text	SudokuWindow		Text
 Creating solvable field	SudokuGenerator		Lösbare Felder werden erstellt
 View	SudokuWindow		Ansicht
 Progress monitor	ProgressWindow		Fortschrittsanzeige
+Set all hints	SudokuWindow		Alle Hinweise zeigen
 Mark invalid values	SudokuWindow		Falsche Zahlen markieren
 Blank	SudokuWindow		Leer
 Help	SudokuWindow		Hilfe

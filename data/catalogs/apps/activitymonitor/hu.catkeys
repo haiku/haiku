@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ActivityMonitor	1211510241
+1	hungarian	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		P hibák
 Media nodes	DataSource		Média csomópontok
 Threads	DataSource		Szálak
@@ -27,7 +27,6 @@ Update time interval:	SettingsWindow		Frissítési gyakoriság:
 TX	DataSource	Shorter version for Sending	Adás
 Quit	ActivityWindow		Kilépés
 Block cache memory	DataSource		Blokk gyorsítótár
-%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Grafikon eltávolítása
 %lld sec.	SettingsWindow		%lld s.
 %lld ms	SettingsWindow		%lld ms
