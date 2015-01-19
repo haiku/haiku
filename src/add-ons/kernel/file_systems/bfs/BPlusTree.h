@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2015, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef B_PLUS_TREE_H
@@ -50,7 +50,7 @@ struct bplustree_header {
 	uint32 MaxNumberOfLevels() const
 		{ return BFS_ENDIAN_TO_HOST_INT32(max_number_of_levels); }
 
-	inline bool CheckNode(bplustree_node* node) const;
+	inline bool CheckNode(const bplustree_node* node) const;
 	inline bool IsValidLink(off_t link) const;
 	bool IsValid() const;
 } _PACKED;
@@ -531,7 +531,7 @@ TreeIterator::GetPreviousEntry(void* key, uint16* keyLength, uint16 maxLength,
 
 
 inline bool
-bplustree_header::CheckNode(bplustree_node* node) const
+bplustree_header::CheckNode(const bplustree_node* node) const
 {
 	// sanity checks (links, all_key_count)
 	return IsValidLink(node->LeftLink())
