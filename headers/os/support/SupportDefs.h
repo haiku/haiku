@@ -221,21 +221,21 @@ extern void*	get_stack_frame(void);
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
 
 
-static inline void
+static __inline__ void
 atomic_set(int32* value, int32 newValue)
 {
 	__atomic_store_n(value, newValue, __ATOMIC_RELEASE);
 }
 
 
-static inline int32
+static __inline__ int32
 atomic_get_and_set(int32* value, int32 newValue)
 {
 	return __atomic_exchange_n(value, newValue, __ATOMIC_SEQ_CST);
 }
 
 
-static inline int32
+static __inline__ int32
 atomic_test_and_set(int32* value, int32 newValue, int32 testAgainst)
 {
 	__atomic_compare_exchange_n(value, &testAgainst, newValue, 1,
@@ -244,49 +244,49 @@ atomic_test_and_set(int32* value, int32 newValue, int32 testAgainst)
 }
 
 
-static inline int32
+static __inline__ int32
 atomic_add(int32* value, int32 addValue)
 {
 	return __atomic_fetch_add(value, addValue, __ATOMIC_SEQ_CST);
 }
 
 
-static inline int32
+static __inline__ int32
 atomic_and(int32* value, int32 andValue)
 {
 	return __atomic_fetch_and(value, andValue, __ATOMIC_SEQ_CST);
 }
 
 
-static inline int32
+static __inline__ int32
 atomic_or(int32* value, int32 orValue)
 {
 	return __atomic_fetch_or(value, orValue, __ATOMIC_SEQ_CST);
 }
 
 
-static inline int32
+static __inline__ int32
 atomic_get(int32* value)
 {
 	return __atomic_load_n(value, __ATOMIC_ACQUIRE);
 }
 
 
-static inline void
+static __inline__ void
 atomic_set64(int64* value, int64 newValue)
 {
 	__atomic_store_n(value, newValue, __ATOMIC_RELEASE);
 }
 
 
-static inline int64
+static __inline__ int64
 atomic_get_and_set64(int64* value, int64 newValue)
 {
 	return __atomic_exchange_n(value, newValue, __ATOMIC_SEQ_CST);
 }
 
 
-static inline int64
+static __inline__ int64
 atomic_test_and_set64(int64* value, int64 newValue, int64 testAgainst)
 {
 	__atomic_compare_exchange_n(value, &testAgainst, newValue, 1,
@@ -295,35 +295,35 @@ atomic_test_and_set64(int64* value, int64 newValue, int64 testAgainst)
 }
 
 
-static inline int64
+static __inline__ int64
 atomic_add64(int64* value, int64 addValue)
 {
 	return __atomic_fetch_add(value, addValue, __ATOMIC_SEQ_CST);
 }
 
 
-static inline int64
+static __inline__ int64
 atomic_and64(int64* value, int64 andValue)
 {
 	return __atomic_fetch_and(value, andValue, __ATOMIC_SEQ_CST);
 }
 
 
-static inline int64
+static __inline__ int64
 atomic_or64(int64* value, int64 orValue)
 {
 	return __atomic_fetch_or(value, orValue, __ATOMIC_SEQ_CST);
 }
 
 
-static inline int64
+static __inline__ int64
 atomic_get64(int64* value)
 {
 	return __atomic_load_n(value, __ATOMIC_ACQUIRE);
 }
 
 
-#else	// __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
+#else	/* __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7) */
 
 #ifdef __cplusplus
 extern "C" {
