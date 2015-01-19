@@ -1215,8 +1215,24 @@ ScreenWindow::_BuildSupportedColorSpaces()
 void
 ScreenWindow::_CheckApplyEnabled()
 {
-	fApplyButton->SetEnabled(fSelected != fActive
-		|| fAllWorkspacesItem->IsMarked());
+	bool applyEnabled = true;
+	
+	if (fSelected == fActive) {
+		applyEnabled = false;
+		if (fAllWorkspacesItem->IsMarked()) {
+			screen_mode screenMode;
+			const int32 workspaceCount = count_workspaces();
+			for (int32 i = 0; i < workspaceCount; i++) {
+				fScreenMode.Get(screenMode, i);
+				if (screenMode != fSelected) {
+					applyEnabled = true;
+					break;
+				}
+			}
+		}
+	}
+	
+	fApplyButton->SetEnabled(applyEnabled);
 
 	uint32 columns;
 	uint32 rows;
@@ -1337,7 +1353,8 @@ ScreenWindow::_Apply()
 
 		if (fAllWorkspacesItem->IsMarked()) {
 			int32 originatingWorkspace = current_workspace();
-			for (int32 i = 0; i < count_workspaces(); i++) {
+			const int32 workspaceCount = count_workspaces();
+			for (int32 i = 0; i < workspaceCount; i++) {
 				if (i != originatingWorkspace)
 					screen.SetMode(i, &newMode, true);
 			}
