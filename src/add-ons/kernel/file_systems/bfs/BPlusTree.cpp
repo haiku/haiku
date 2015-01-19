@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2015, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  *
  * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
@@ -1433,8 +1433,8 @@ BPlusTree::_SplitNode(bplustree_node* node, off_t nodeOffset,
 		return B_BAD_VALUE;
 	}
 
-	// how many keys will fit in one (half) page?
-	// that loop will find the answer to this question and
+	// How many keys will fit in one (half) page?
+	// The following loop will find the answer to this question and
 	// change the key lengths indices for their new home
 
 	// "bytes" is the number of bytes written for the new key,
@@ -1444,25 +1444,23 @@ BPlusTree::_SplitNode(bplustree_node* node, off_t nodeOffset,
 
 	size_t size = fNodeSize >> 1;
 	int32 out, in;
+	size_t keyLengths = 0;
 	for (in = out = 0; in < node->NumKeys() + 1;) {
-		if (!bytes) {
-			bytesBefore = in > 0
-				? BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in - 1]) : 0;
-		}
+		keyLengths = BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in]);
 
 		if (in == keyIndex && !bytes) {
 			bytes = *_keyLength;
+			bytesBefore = in > 0
+				? BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in - 1]) : 0;
 		} else {
-			if (keyIndex < out) {
-				bytesAfter = BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in])
-					- bytesBefore;
-			}
+			if (keyIndex < out)
+				bytesAfter = keyLengths - bytesBefore;
 
 			in++;
 		}
 		out++;
 
-		if (key_align(sizeof(bplustree_node) + bytesBefore + bytesAfter + bytes)
+		if (key_align(sizeof(bplustree_node) + bytes + keyLengths)
 				+ out * (sizeof(uint16) + sizeof(off_t)) >= size) {
 			// we have found the number of keys in the new node!
 			break;
@@ -1471,8 +1469,11 @@ BPlusTree::_SplitNode(bplustree_node* node, off_t nodeOffset,
 
 	// if the new key was not inserted, set the length of the keys
 	// that can be copied directly
+
 	if (keyIndex >= out && in > 0)
 		bytesBefore = BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in - 1]);
+	else if (keyIndex + 1 < out)
+		bytesAfter = keyLengths - bytesBefore;
 
 	if (bytesBefore < 0 || bytesAfter < 0)
 		return B_BAD_DATA;
