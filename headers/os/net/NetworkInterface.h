@@ -8,11 +8,12 @@
 
 #include <net/if.h>
 #include <net/if_types.h>
+#include <sys/socket.h>
 
 #include <ObjectList.h>
-#include <NetworkAddress.h>
 
 
+class BNetworkAddress;
 class BNetworkInterface;
 
 
@@ -21,24 +22,20 @@ public:
 								BNetworkInterfaceAddress();
 								~BNetworkInterfaceAddress();
 
-			status_t			SetTo(const BNetworkInterface& interface,
+			status_t			SetTo(const char* interfaceName,
 									int32 index);
 
-			void				SetAddress(const BNetworkAddress& address);
-			void				SetMask(const BNetworkAddress& mask);
-			void				SetBroadcast(const BNetworkAddress& broadcast);
-			void				SetDestination(
-									const BNetworkAddress& destination);
+			void				SetAddress(const sockaddr& address);
+			void				SetMask(const sockaddr& mask);
+			void				SetBroadcast(const sockaddr& broadcast);
+			void				SetDestination(const sockaddr& destination);
 
-			BNetworkAddress&	Address() { return fAddress; }
-			BNetworkAddress&	Mask() { return fMask; }
-			BNetworkAddress&	Broadcast() { return fBroadcast; }
-			BNetworkAddress&	Destination() { return fBroadcast; }
-
-			const BNetworkAddress& Address() const { return fAddress; }
-			const BNetworkAddress& Mask() const { return fMask; }
-			const BNetworkAddress& Broadcast() const { return fBroadcast; }
-			const BNetworkAddress& Destination() const { return fBroadcast; }
+			const sockaddr&		Address() const { return (sockaddr&)fAddress; }
+			const sockaddr&		Mask() const { return (sockaddr&)fMask; }
+			const sockaddr&		Broadcast() const
+									{ return (sockaddr&)fBroadcast; }
+			const sockaddr&		Destination() const
+									{ return (sockaddr&)fBroadcast; }
 
 			void				SetFlags(uint32 flags);
 			uint32				Flags() const { return fFlags; }
@@ -47,9 +44,9 @@ public:
 
 private:
 			int32				fIndex;
-			BNetworkAddress		fAddress;
-			BNetworkAddress		fMask;
-			BNetworkAddress		fBroadcast;
+			sockaddr_storage	fAddress;
+			sockaddr_storage	fMask;
+			sockaddr_storage	fBroadcast;
 			uint32				fFlags;
 };
 

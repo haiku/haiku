@@ -138,9 +138,7 @@ public:
 
 								operator const sockaddr*() const;
 								operator const sockaddr&() const;
-								operator const sockaddr*();
 								operator sockaddr*();
-								operator const sockaddr&();
 								operator sockaddr&();
 
 private:

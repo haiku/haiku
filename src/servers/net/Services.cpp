@@ -274,8 +274,8 @@ Services::_StartService(struct service& service)
 
 		address.socket = socket(address.family, address.type, address.protocol);
 		if (address.socket < 0
-			|| bind(address.socket, address.address, address.address.Length())
-					< 0
+			|| bind(address.socket, &address.address.SockAddr(),
+				address.address.Length()) < 0
 			|| fcntl(address.socket, F_SETFD, FD_CLOEXEC) < 0) {
 			failed = true;
 			break;
