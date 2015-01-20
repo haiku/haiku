@@ -35,12 +35,14 @@ All rights reserved.
 #define _CONTAINER_WINDOW_H
 
 
+#include <StringList.h>
 #include <Window.h>
 
 #include "LockingList.h"
 #include "Model.h"
 #include "SlowContextPopup.h"
 #include "TaskLoop.h"
+
 
 class BPopUpMenu;
 class BMenuBar;
@@ -185,8 +187,7 @@ public:
 
 	// add-on iteration
 	void EachAddon(bool (*)(const Model*, const char*, uint32 shortcut,
-		uint32 modifiers, bool primary, void*), void*,
-		BObjectList<BString> &);
+		uint32 modifiers, bool primary, void*), void*, BStringList&);
 
 	BPopUpMenu* ContextMenu();
 
@@ -252,7 +253,7 @@ protected:
 	virtual void SetUpDiskMenu(BMenu*);
 
 	virtual void BuildAddOnMenu(BMenu*);
-	void BuildMimeTypeList(BObjectList<BString>& mimeTypes);
+	void BuildMimeTypeList(BStringList& mimeTypes);
 
 	enum UpdateMenuContext {
 		kMenuBarContext,
@@ -270,7 +271,7 @@ protected:
 
 	bool EachAddon(BPath &path,
 		bool (*)(const Model*, const char*, uint32, bool, void*),
-		BObjectList<Model>*, void*, BObjectList<BString> &);
+		BObjectList<Model>*, void*, BStringList&);
 	void LoadAddOn(BMessage*);
 
 	BPopUpMenu* fFileContextMenu;

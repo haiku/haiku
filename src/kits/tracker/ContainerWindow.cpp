@@ -291,19 +291,20 @@ OffsetFrameOne(const char* DEBUG_ONLY(name), uint32, off_t, void* castToRect,
 
 
 static void
-AddMimeTypeString(BObjectList<BString>& list, Model* model)
+AddMimeTypeString(BStringList& list, Model* model)
 {
-	const char* modelMimeType = model->MimeType();
-	if (modelMimeType != NULL && *modelMimeType != '\0') {
-		// only add the type if it's not already there
-		for (int32 i = list.CountItems(); i-- > 0;) {
-			BString* string = list.ItemAt(i);
-			if (string != NULL && string->ICompare(modelMimeType) == 0)
-				return;
-		}
+	if (model == NULL)
+		return;
 
-		list.AddItem(new BString(modelMimeType));
-	}
+	const char* modelMimeType = model->MimeType();
+	if (modelMimeType == NULL || *modelMimeType == '\0')
+		return;
+
+	BString type = BString(modelMimeType);
+	if (list.HasString(type, true))
+		return;
+
+	list.Add(type);
 }
 
 
@@ -3004,7 +3005,7 @@ BContainerWindow::AddTrashContextMenus(BMenu* menu)
 void
 BContainerWindow::EachAddon(bool (*eachAddon)(const Model*, const char*,
 	uint32 shortcut, uint32 modifiers, bool primary, void* context),
-	void* passThru, BObjectList<BString> &mimeTypes)
+	void* passThru, BStringList& mimeTypes)
 {
 	AutoLock<LockingList<AddonShortcut> > lock(fAddonsList);
 	if (lock.IsLocked()) {
@@ -3012,7 +3013,7 @@ BContainerWindow::EachAddon(bool (*eachAddon)(const Model*, const char*,
 			struct AddonShortcut* item = fAddonsList->ItemAt(i);
 			bool primary = false;
 
-			if (mimeTypes.CountItems()) {
+			if (mimeTypes.CountStrings() > 0) {
 				BFile file(item->model->EntryRef(), B_READ_ONLY);
 				if (file.InitCheck() == B_OK) {
 					BAppFileInfo info(&file);
@@ -3022,20 +3023,21 @@ BContainerWindow::EachAddon(bool (*eachAddon)(const Model*, const char*,
 						// does this add-on has types set at all?
 						BMessage message;
 						if (info.GetSupportedTypes(&message) == B_OK) {
-							type_code type;
+							type_code typeCode;
 							int32 count;
-							if (message.GetInfo("types", &type,
-									&count) == B_OK)
+							if (message.GetInfo("types", &typeCode,
+									&count) == B_OK) {
 								secondary = false;
+							}
 						}
 
 						// check all supported types if it has some set
 						if (!secondary) {
-							for (int32 i = mimeTypes.CountItems();
+							for (int32 i = mimeTypes.CountStrings();
 									!primary && i-- > 0;) {
-								BString* type = mimeTypes.ItemAt(i);
-								if (info.IsSupportedType(type->String())) {
-									BMimeType mimeType(type->String());
+								BString type = mimeTypes.StringAt(i);
+								if (info.IsSupportedType(type.String())) {
+									BMimeType mimeType(type.String());
 									if (info.Supports(&mimeType))
 										primary = true;
 									else
@@ -3057,7 +3059,7 @@ BContainerWindow::EachAddon(bool (*eachAddon)(const Model*, const char*,
 
 
 void
-BContainerWindow::BuildMimeTypeList(BObjectList<BString>& mimeTypes)
+BContainerWindow::BuildMimeTypeList(BStringList& mimeTypes)
 {
 	int32 count = PoseView()->SelectionList()->CountItems();
 	if (count <= 0) {
@@ -3111,7 +3113,7 @@ BContainerWindow::BuildAddOnMenu(BMenu* menu)
 
 	BObjectList<BMenuItem> primaryList;
 	BObjectList<BMenuItem> secondaryList;
-	BObjectList<BString> mimeTypes(10, true);
+	BStringList mimeTypes(10);
 	BuildMimeTypeList(mimeTypes);
 
 	AddOneAddonParams params;
