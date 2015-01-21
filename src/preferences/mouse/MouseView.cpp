@@ -42,13 +42,14 @@ static const int32 kOneButtonOffsets[4]
 static const int32 kTwoButtonOffsets[4]
 	= { 0, kMouseDownWidth / 2, kMouseDownWidth };
 static const int32 kThreeButtonOffsets[4]
-	= { 0, kMouseDownWidth / 3, kMouseDownWidth / 3 * 2, kMouseDownWidth };
+	= { 5, kMouseDownWidth / 3, kMouseDownWidth / 3 * 2, kMouseDownWidth - 4 };
 
 static const rgb_color kButtonTextColor = { 0, 0, 0, 255 };
 static const rgb_color kMouseShadowColor = { 100, 100, 100, 128 };
 static const rgb_color kMouseBodyTopColor = { 0xed, 0xed, 0xed, 255 };
 static const rgb_color kMouseBodyBottomColor = { 0x85, 0x85, 0x85, 255 };
 static const rgb_color kMouseOutlineColor = { 0x51, 0x51, 0x51, 255 };
+static const rgb_color kMouseButtonOutlineColor = { 0xa0, 0xa0, 0xa0, 255 };
 
 
 static const int32*
@@ -204,9 +205,9 @@ MouseView::Draw(BRect updateFrame)
 
 	BShape mouseShape;
 	mouseShape.MoveTo(BPoint(16, 12));
-	BPoint control[3] = { BPoint(12, 16), BPoint(8, 60), BPoint(32, 60) };
+	BPoint control[3] = { BPoint(12, 16), BPoint(8, 64), BPoint(32, 64) };
 	mouseShape.BezierTo(control);
-	BPoint control2[3] = { BPoint(56, 60), BPoint(52, 16), BPoint(48, 12) };
+	BPoint control2[3] = { BPoint(56, 64), BPoint(52, 16), BPoint(48, 12) };
 	mouseShape.BezierTo(control2);
 	BPoint control3[3] = { BPoint(44, 8), BPoint(20, 8), BPoint(16, 12) };
 	mouseShape.BezierTo(control3);
@@ -248,6 +249,7 @@ MouseView::Draw(BRect updateFrame)
 		buttonsOutline.LineTo(BPoint(32, 9));
 	}
 
+	SetHighColor(kMouseButtonOutlineColor);
 	StrokeShape(&buttonsOutline, B_SOLID_HIGH);
 
 	mouse_map map;
