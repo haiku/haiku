@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STRING_VIEW_H
@@ -28,6 +28,8 @@ public:
 			const char*			Text() const;
 			void				SetAlignment(alignment flag);
 			alignment			Alignment() const;
+			void				SetTruncation(uint32 truncationMode);
+			uint32				Truncation() const;
 
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
@@ -80,9 +82,10 @@ private:
 
 private:
 			char*				fText;
-			float				fStringWidth;
+			uint32				fTruncation;
 			alignment			fAlign;
 			BSize				fPreferredSize;
 };
+
 
 #endif // _STRING_VIEW_H

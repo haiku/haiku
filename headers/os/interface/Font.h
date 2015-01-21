@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2005-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FONT_H_
@@ -43,6 +43,7 @@ enum {
 
 // truncation modes
 enum {
+	B_NO_TRUNCATION			= ~0U,
 	B_TRUNCATE_END			= 0,
 	B_TRUNCATE_BEGINNING	= 1,
 	B_TRUNCATE_MIDDLE		= 2,
@@ -150,7 +151,7 @@ struct font_cache_info {
 
 struct tuned_font_info {
 	float    size;
-	float    shear; 
+	float    shear;
 	float    rotation;
 	uint32   flags;
 	uint16   face;
@@ -275,7 +276,7 @@ private:
 		friend void _init_global_fonts_();
 
 			void				_GetExtraFlags() const;
-			void				_GetBoundingBoxes(const char charArray[], 
+			void				_GetBoundingBoxes(const char charArray[],
 									int32 numChars, font_metric_mode mode,
 									bool string_escapement,
 									escapement_delta* delta,
@@ -313,7 +314,7 @@ status_t get_font_family(int32 index, font_family* name,
 int32 count_font_styles(font_family name);
 status_t get_font_style(font_family family, int32 index, font_style* name,
 	uint32* flags = NULL);
-status_t get_font_style(font_family family, int32 index, font_style* name, 
+status_t get_font_style(font_family family, int32 index, font_style* name,
 	uint16* face, uint32* flags = NULL);
 bool update_font_families(bool checkOnly);
 

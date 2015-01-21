@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -908,6 +908,9 @@ BFont::GetTunedInfo(int32 index, tuned_font_info* info) const
 void
 BFont::TruncateString(BString* inOut, uint32 mode, float width) const
 {
+	if (mode == B_NO_TRUNCATION)
+		return;
+
 	// NOTE: Careful, we cannot directly use "inOut->String()" as result
 	// array, because the string length increases by 3 bytes in the worst
 	// case scenario.

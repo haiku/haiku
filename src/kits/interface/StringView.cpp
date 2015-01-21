@@ -1,12 +1,14 @@
 /*
- * Copyright 2001-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Frans van Nispen (xlr8@tref.nl)
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
- *		Stephan Aßmus <superstippi@gmx.de>
  */
+
 
 //!	BStringView draws a non-editable text string.
 
@@ -50,9 +52,9 @@ BStringView::BStringView(BRect frame, const char* name, const char* text,
 	:
 	BView(frame, name, resizingMode, flags | B_FULL_UPDATE_ON_RESIZE),
 	fText(text ? strdup(text) : NULL),
-	fStringWidth(text ? StringWidth(text) : 0.0),
+	fTruncation(B_NO_TRUNCATION),
 	fAlign(B_ALIGN_LEFT),
-	fPreferredSize(-1, -1)
+	fPreferredSize(text ? StringWidth(text) : 0.0, -1)
 {
 }
 
@@ -61,9 +63,9 @@ BStringView::BStringView(const char* name, const char* text, uint32 flags)
 	:
 	BView(name, flags | B_FULL_UPDATE_ON_RESIZE),
 	fText(text ? strdup(text) : NULL),
-	fStringWidth(text ? StringWidth(text) : 0.0),
+	fTruncation(B_NO_TRUNCATION),
 	fAlign(B_ALIGN_LEFT),
-	fPreferredSize(-1, -1)
+	fPreferredSize(text ? StringWidth(text) : 0.0, -1)
 {
 }
 
@@ -72,18 +74,13 @@ BStringView::BStringView(BMessage* archive)
 	:
 	BView(archive),
 	fText(NULL),
-	fStringWidth(0.0),
-	fPreferredSize(-1, -1)
+	fTruncation(B_NO_TRUNCATION),
+	fPreferredSize(0, -1)
 {
-	int32 align;
-	if (archive->FindInt32("_align", &align) == B_OK)
-		fAlign = (alignment)align;
-	else
-		fAlign = B_ALIGN_LEFT;
+	fAlign = (alignment)archive->GetInt32("_align", B_ALIGN_LEFT);
+	fTruncation = (uint32)archive->GetInt32("_truncation", B_NO_TRUNCATION);
 
-	const char* text;
-	if (archive->FindString("_text", &text) != B_OK)
-		text = NULL;
+	const char* text = archive->GetString("_text", NULL);
 
 	SetText(text);
 	SetFlags(Flags() | B_FULL_UPDATE_ON_RESIZE);
@@ -112,15 +109,16 @@ BStringView::Instantiate(BMessage* data)
 status_t
 BStringView::Archive(BMessage* data, bool deep) const
 {
-	status_t err = BView::Archive(data, deep);
+	status_t status = BView::Archive(data, deep);
 
-	if (err == B_OK && fText)
-		err = data->AddString("_text", fText);
+	if (status == B_OK && fText)
+		status = data->AddString("_text", fText);
+	if (status == B_OK && fTruncation != B_NO_TRUNCATION)
+		status = data->AddInt32("_truncation", fTruncation);
+	if (status == B_OK)
+		status = data->AddInt32("_align", fAlign);
 
-	if (err == B_OK)
-		err = data->AddInt32("_align", fAlign);
-
-	return err;
+	return status;
 }
 
 
@@ -263,16 +261,28 @@ BStringView::Draw(BRect updateRect)
 
 	BRect bounds = Bounds();
 
+	const char* text = fText;
+	float width = fPreferredSize.width;
+	BString truncated;
+	if (fTruncation != B_NO_TRUNCATION && width > bounds.Width()) {
+		// The string needs to be truncated
+		// TODO: we should cache this
+		truncated = fText;
+		TruncateString(&truncated, fTruncation, bounds.Width());
+		text = truncated.String();
+		width = StringWidth(text);
+	}
+
 	float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
 		- ceilf(fontHeight.descent)) / 2.0 + ceilf(fontHeight.ascent);
 	float x;
 	switch (fAlign) {
 		case B_ALIGN_RIGHT:
-			x = bounds.Width() - fStringWidth;
+			x = bounds.Width() - width;
 			break;
 
 		case B_ALIGN_CENTER:
-			x = (bounds.Width() - fStringWidth) / 2.0;
+			x = (bounds.Width() - width) / 2.0;
 			break;
 
 		default:
@@ -280,7 +290,7 @@ BStringView::Draw(BRect updateRect)
 			break;
 	}
 
-	DrawString(fText, BPoint(x, y));
+	DrawString(text, BPoint(x, y));
 }
 
 
@@ -370,8 +380,8 @@ BStringView::SetText(const char* text)
 	fText = text ? strdup(text) : NULL;
 
 	float newStringWidth = StringWidth(fText);
-	if (fStringWidth != newStringWidth) {
-		fStringWidth = newStringWidth;
+	if (fPreferredSize.width != newStringWidth) {
+		fPreferredSize.width = newStringWidth;
 		InvalidateLayout();
 	}
 
@@ -398,6 +408,23 @@ alignment
 BStringView::Alignment() const
 {
 	return fAlign;
+}
+
+
+void
+BStringView::SetTruncation(uint32 truncationMode)
+{
+	if (fTruncation != truncationMode) {
+		fTruncation = truncationMode;
+		Invalidate();
+	}
+}
+
+
+uint32
+BStringView::Truncation() const
+{
+	return fTruncation;
 }
 
 
@@ -437,7 +464,7 @@ BStringView::SetFont(const BFont* font, uint32 mask)
 {
 	BView::SetFont(font, mask);
 
-	fStringWidth = StringWidth(fText);
+	fPreferredSize.width = StringWidth(fText);
 
 	Invalidate();
 	InvalidateLayout();
@@ -448,7 +475,7 @@ void
 BStringView::LayoutInvalidated(bool descendants)
 {
 	// invalidate cached preferred size
-	fPreferredSize.Set(-1, -1);
+	fPreferredSize.height = -1;
 }
 
 
@@ -541,10 +568,7 @@ BStringView::operator=(const BStringView&)
 BSize
 BStringView::_ValidatePreferredSize()
 {
-	if (fPreferredSize.width < 0) {
-		// width
-		fPreferredSize.width = ceilf(fStringWidth);
-
+	if (fPreferredSize.height < 0) {
 		// height
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
