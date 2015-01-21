@@ -445,10 +445,13 @@ ConfigWindow::_SaveSettings()
 
 	BMailSettings settings;
 	if (fSaveSettings) {
-		// figure out time interval
-		float floatInterval;
-		sscanf(fIntervalControl->Text(), "%f", &floatInterval);
-		bigtime_t interval = bigtime_t(60000000L * floatInterval);
+		bigtime_t interval = 0;
+		if (fCheckMailCheckBox->Value() == B_CONTROL_ON) {
+			// figure out time interval
+			float floatInterval;
+			sscanf(fIntervalControl->Text(), "%f", &floatInterval);
+			interval = bigtime_t(60000000L * floatInterval);
+		}
 
 		settings.SetAutoCheckInterval(interval);
 		settings.SetDaemonAutoStarts(!fAccounts.IsEmpty());
