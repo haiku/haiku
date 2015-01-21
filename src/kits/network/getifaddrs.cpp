@@ -119,6 +119,9 @@ getifaddrs(struct ifaddrs **ifap)
 			current->ifa_next = previous;
 			previous = current;
 		}
+
+		interfaces = (ifreq*)((uint8*)interfaces
+			+ _SIZEOF_ADDR_IFREQ(interfaces[0]));
 	}
 
 	*ifap = current;
