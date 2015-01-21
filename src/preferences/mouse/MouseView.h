@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,31 +20,31 @@ class MouseSettings;
 
 class MouseView : public BView {
 public:
-								MouseView(const MouseSettings &settings);
+								MouseView(const MouseSettings& settings);
 		virtual					~MouseView();
-
-		virtual	void			AttachedToWindow();
-		virtual	void			MouseDown(BPoint where);
-		virtual	void			MouseUp(BPoint where);
-		virtual	void			Draw(BRect frame);
-		virtual	void			GetPreferredSize(float *_width, float *_height);
 
 				void			SetMouseType(int32 type);
 				void			MouseMapUpdated();
 				void			UpdateFromSettings();
 
+		virtual	void			GetPreferredSize(float* _width, float* _height);
+		virtual	void			AttachedToWindow();
+		virtual	void			MouseUp(BPoint where);
+		virtual	void			MouseDown(BPoint where);
+		virtual	void			Draw(BRect frame);
+
 private:
-		int32 _ConvertFromVisualOrder(int32 button);
+				int32			_ConvertFromVisualOrder(int32 button);
 
-				typedef			BView inherited;
+private:
+	typedef BView inherited;
 
-		const	MouseSettings	&fSettings;
-				BBitmap			*fMouseBitmap, *fMouseDownBitmap;
-				BRect			fMouseDownBounds;
+		const	MouseSettings&	fSettings;
 
 				int32			fType;
 				uint32			fButtons;
 				uint32			fOldButtons;
 };
+
 
 #endif	/* MOUSE_VIEW_H */

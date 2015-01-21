@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -103,12 +103,46 @@ MouseView::~MouseView()
 
 
 void
+MouseView::SetMouseType(int32 type)
+{
+	fType = type;
+	Invalidate();
+}
+
+
+void
+MouseView::MouseMapUpdated()
+{
+	Invalidate();
+}
+
+
+void
+MouseView::UpdateFromSettings()
+{
+	SetMouseType(fSettings.MouseType());
+}
+
+
+void
 MouseView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width != NULL)
 		*_width = kMouseDownWidth + 2;
 	if (_height != NULL)
 		*_height = 104;
+}
+
+
+void
+MouseView::AttachedToWindow()
+{
+	if (Parent() != NULL)
+		SetViewColor(Parent()->ViewColor());
+	else
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	UpdateFromSettings();
 }
 
 
@@ -180,18 +214,6 @@ MouseView::MouseDown(BPoint where)
 		ConvertToScreen(&where);
 		menu.Go(where, true);
 	}
-}
-
-
-void
-MouseView::AttachedToWindow()
-{
-	if (Parent() != NULL)
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	UpdateFromSettings();
 }
 
 
@@ -300,26 +322,3 @@ MouseView::_ConvertFromVisualOrder(int32 i)
 			return 1;
 	}
 }
-
-
-void
-MouseView::SetMouseType(int32 type)
-{
-	fType = type;
-	Invalidate();
-}
-
-
-void
-MouseView::MouseMapUpdated()
-{
-	Invalidate();
-}
-
-
-void
-MouseView::UpdateFromSettings()
-{
-	SetMouseType(fSettings.MouseType());
-}
-
