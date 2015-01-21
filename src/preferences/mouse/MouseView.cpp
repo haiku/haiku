@@ -32,6 +32,7 @@
 #include "MouseSettings.h"
 #include "MouseWindow.h"
 
+
 static const int32 kButtonTop = 6;
 static const int32 kMouseDownWidth = 72;
 static const int32 kMouseDownHeight = 30;
@@ -44,10 +45,11 @@ static const int32 kThreeButtonOffsets[4]
 	= { 0, kMouseDownWidth / 3, kMouseDownWidth / 3 * 2, kMouseDownWidth };
 
 static const rgb_color kButtonTextColor = { 0, 0, 0, 255 };
-static const rgb_color kMouseShadowColor = { 150, 150, 150, 255 };
-static const rgb_color kMouseBodyTopColor = { 0xed, 0xed, 0xed, 255};
+static const rgb_color kMouseShadowColor = { 100, 100, 100, 128 };
+static const rgb_color kMouseBodyTopColor = { 0xed, 0xed, 0xed, 255 };
 static const rgb_color kMouseBodyBottomColor = { 0x85, 0x85, 0x85, 255 };
 static const rgb_color kMouseOutlineColor = { 0x51, 0x51, 0x51, 255 };
+
 
 static const int32*
 getButtonOffsets(int32 type)
@@ -102,10 +104,10 @@ MouseView::~MouseView()
 void
 MouseView::GetPreferredSize(float* _width, float* _height)
 {
-	if (_width)
+	if (_width != NULL)
 		*_width = kMouseDownWidth + 2;
-	if (_height)
-		*_height = 100;
+	if (_height != NULL)
+		*_height = 104;
 }
 
 
