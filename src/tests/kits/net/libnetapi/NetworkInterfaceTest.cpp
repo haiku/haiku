@@ -6,6 +6,7 @@
 
 #include "NetworkInterfaceTest.h"
 
+#include <NetworkAddress.h>
 #include <NetworkInterface.h>
 #include <NetworkRoster.h>
 
