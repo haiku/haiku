@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1272,8 +1272,8 @@ ActivityView::_LegendFrameAt(BRect frame, int32 index) const
 	int32 column = index & 1;
 	int32 row = index / 2;
 	if (column == 0) {
-		// The last item, if it is on the first column, can use the full width.
-		if (index < fSources.CountItems() - 1)
+		// Use the full width if there is only one item
+		if (fSources.CountItems() != 1)
 			frame.right = frame.left + floorf(frame.Width() / 2) - 5;
 	} else
 		frame.left = frame.right - floorf(frame.Width() / 2) + 5;
