@@ -103,12 +103,9 @@
 	You may pass \c NULL into \a message to delete the current message
 	without replacing it.
 
-	When Invoke() is called without a specific message, a copy of the
-	message given here is sent to the "target" BHandler. The message
-	is sent as a BMessage.
-
-	BInvoker takes ownership of the BMessage object, so you must not delete
-	it yourself.
+	When Invoke() is called with a \c NULL message parameter, a copy of the
+	passed in \a message is sent to the target BHandler. BInvoker takes
+	ownership of the BMessage object, so you should not delete it yourself.
 
 	\since BeOS R3
 */
