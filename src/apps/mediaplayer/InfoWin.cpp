@@ -2,6 +2,7 @@
  * InfoWin.cpp - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
+ * Copyright 2015 Axel Dörfler <axeld@pinc-software.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,7 +28,9 @@
 
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Debug.h>
+#include <LayoutBuilder.h>
 #include <MediaDefs.h>
 #include <MessageFormat.h>
 #include <Mime.h>
@@ -43,86 +46,57 @@
 #include "PlaylistItem.h"
 
 
-#define NAME "File info"
-#define MIN_WIDTH 400
+#define MIN_WIDTH 500
 
-#define BASE_HEIGHT (32 + 32)
-
-//const rgb_color kGreen = { 152, 203, 152, 255 };
-const rgb_color kRed =   { 203, 152, 152, 255 };
-const rgb_color kBlue =  {   0,   0, 220, 255 };
-const rgb_color kGreen = { 171, 221, 161, 255 };
-const rgb_color kBlack = {   0,   0,   0, 255 };
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MediaPlayer-InfoWin"
 
-// should later draw an icon
-class InfoView : public BView {
-public:
-						InfoView(BRect frame, const char* name, float divider);
-	virtual				~InfoView();
-	virtual	void		Draw(BRect updateRect);
 
-			status_t	SetIcon(const PlaylistItem* item);
-			status_t	SetIcon(const char* mimeType);
-			void		SetGenericIcon();
+class IconView : public BView {
+public:
+								IconView(const char* name, int32 iconSize);
+	virtual						~IconView();
+
+			status_t			SetIcon(const PlaylistItem* item);
+			status_t			SetIcon(const char* mimeType);
+			void				SetGenericIcon();
+
+	virtual	void				GetPreferredSize(float* _width, float* _height);
+	virtual void				AttachedToWindow();
+	virtual	void				Draw(BRect updateRect);
 
 private:
-			float		fDivider;
-			BBitmap*	fIconBitmap;
+			BBitmap*			fIconBitmap;
 };
 
 
-InfoView::InfoView(BRect frame, const char *name, float divider)
-	: BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-	  fDivider(divider),
-	  fIconBitmap(NULL)
+IconView::IconView(const char* name, int32 iconSize)
+	:
+	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	fIconBitmap(NULL)
 {
-	BRect rect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1);
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	fIconBitmap = new BBitmap(rect, B_RGBA32);
-#else
-	fIconBitmap = new BBitmap(rect, B_CMAP8);
-#endif
+	fIconBitmap = new BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1),
+		B_RGBA32);
+	SetExplicitMaxSize(PreferredSize());
 }
 
 
-InfoView::~InfoView()
+IconView::~IconView()
 {
 	delete fIconBitmap;
 }
 
-void
-InfoView::Draw(BRect updateRect)
-{
-	SetHighColor(kGreen);
-	BRect r(Bounds());
-	r.right = r.left + fDivider;
-	FillRect(r);
-
-	if (fIconBitmap) {
-		float left = r.left + ( r.right - r.left ) / 2 - B_LARGE_ICON / 2;
-		SetDrawingMode(B_OP_ALPHA);
-		DrawBitmap(fIconBitmap, BPoint(left, r.top + B_LARGE_ICON / 2));
-	}
-
-	SetHighColor(ui_color(B_DOCUMENT_TEXT_COLOR));
-	r.left = r.right;
-	FillRect(r);
-}
-
 
 status_t
-InfoView::SetIcon(const PlaylistItem* item)
+IconView::SetIcon(const PlaylistItem* item)
 {
 	return item->GetIcon(fIconBitmap, B_LARGE_ICON);
 }
 
 
 status_t
-InfoView::SetIcon(const char* mimeTypeString)
+IconView::SetIcon(const char* mimeTypeString)
 {
 	if (!mimeTypeString)
 		return B_BAD_VALUE;
@@ -144,7 +118,7 @@ InfoView::SetIcon(const char* mimeTypeString)
 
 
 void
-InfoView::SetGenericIcon()
+IconView::SetGenericIcon()
 {
 	// get default icon
 	BMimeType genericType(B_FILE_MIME_TYPE);
@@ -159,66 +133,132 @@ InfoView::SetGenericIcon()
 }
 
 
+void
+IconView::GetPreferredSize(float* _width, float* _height)
+{
+	if (_width != NULL) {
+		*_width = fIconBitmap->Bounds().Width()
+			+ 2 * be_control_look->DefaultItemSpacing();
+	}
+	if (_height != NULL) {
+		*_height = fIconBitmap->Bounds().Height()
+			+ 2 * be_control_look->DefaultItemSpacing();
+	}
+}
+
+
+void
+IconView::AttachedToWindow()
+{
+	if (Parent() != NULL)
+		SetViewColor(Parent()->ViewColor());
+	else
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
+void
+IconView::Draw(BRect updateRect)
+{
+	BRect rect(Bounds());
+
+	if (fIconBitmap != NULL) {
+		// Draw bitmap centered within the view
+		SetDrawingMode(B_OP_ALPHA);
+		DrawBitmap(fIconBitmap, BPoint(rect.left
+				+ (rect.Width() - fIconBitmap->Bounds().Width()) / 2,
+			rect.top + (rect.Height() - fIconBitmap->Bounds().Height()) / 2));
+	}
+}
+
+
 // #pragma mark -
 
 
 InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	:
 	BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + MIN_WIDTH - 1,
-		leftTop.y + 300), B_TRANSLATE(NAME), B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+		leftTop.y + 300), B_TRANSLATE("File info"), B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE),
 	fController(controller),
 	fControllerObserver(new ControllerObserver(this,
 		OBSERVE_FILE_CHANGES | OBSERVE_TRACK_CHANGES | OBSERVE_STAT_CHANGES))
 {
-	BRect rect = Bounds();
+	fIconView = new IconView("background", B_LARGE_ICON);
 
-	// accomodate for big fonts
-	float div = max_c(2 * 32, be_plain_font->StringWidth(
-		B_TRANSLATE("Display Mode")) + 10);
-
-	fInfoView = new InfoView(rect, "background", div);
-	fInfoView->SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
-	AddChild(fInfoView);
-
+	fFilenameView = _CreateInfo("filename");
 	BFont bigFont(be_plain_font);
-	bigFont.SetSize(bigFont.Size() + 6);
-	font_height fh;
-	bigFont.GetHeight(&fh);
-	fFilenameView = new BStringView(
-		BRect(div + 10, 20, rect.right - 10, 20 + fh.ascent + 5),
-		"filename", "");
-	AddChild(fFilenameView);
+	bigFont.SetSize(bigFont.Size() * 1.5f);
 	fFilenameView->SetFont(&bigFont);
-	fFilenameView->SetViewColor(fInfoView->ViewColor());
-	fFilenameView->SetLowColor(fInfoView->ViewColor());
-#ifdef B_BEOS_VERSION_DANO /* maybe we should support that as well ? */
-	fFilenameView->SetTruncation(B_TRUNCATE_END);
-#endif
 
-	rect.top = BASE_HEIGHT;
+	// Create info views
 
-	BRect lr(rect);
-	BRect cr(rect);
-	lr.right = div - 1;
-	cr.left = div + 1;
-	BRect tr;
-	tr = lr.OffsetToCopy(0, 0).InsetByCopy(5, 1);
-	fLabelsView = new BTextView(lr, "labels", tr, B_FOLLOW_BOTTOM);
-	fLabelsView->SetViewColor(kGreen);
-	fLabelsView->SetAlignment(B_ALIGN_RIGHT);
-	fLabelsView->SetWordWrap(false);
-	AddChild(fLabelsView);
-	tr = cr.OffsetToCopy(0, 0).InsetByCopy(10, 1);
-	fContentsView = new BTextView(cr, "contents", tr, B_FOLLOW_BOTTOM);
-	fContentsView->SetWordWrap(false);
-	AddChild(fContentsView);
+	BStringView* containerLabel = _CreateLabel("containerLabel",
+		B_TRANSLATE("Container"));
+	fContainerInfo = _CreateInfo("container");
 
-	fLabelsView->MakeSelectable();
-	fContentsView->MakeSelectable();
+	fVideoSeparator = _CreateSeparator();
+	fVideoLabel = _CreateLabel("videoLabel", B_TRANSLATE("Video"));
+	fVideoFormatInfo = _CreateInfo("videoFormat");
+	fVideoConfigInfo = _CreateInfo("videoConfig");
+	fDisplayModeLabel = _CreateLabel("displayModeLabel",
+		B_TRANSLATE("Display mode"));
+	fDisplayModeInfo = _CreateInfo("displayMode");
+
+	fAudioSeparator = _CreateSeparator();
+	fAudioLabel = _CreateLabel("audioLabel", B_TRANSLATE("Audio"));
+	fAudioFormatInfo = _CreateInfo("audioFormat");
+	fAudioConfigInfo = _CreateInfo("audioConfig");
+
+	BStringView* durationLabel = _CreateLabel("durationLabel",
+		B_TRANSLATE("Duration"));
+	fDurationInfo = _CreateInfo("duration");
+
+	BStringView* locationLabel = _CreateLabel("locationLabel",
+		B_TRANSLATE("Location"));
+	fLocationInfo = _CreateInfo("location");
+
+	fCopyrightSeparator = _CreateSeparator();
+	fCopyrightLabel = _CreateLabel("copyrightLabel", B_TRANSLATE("Copyright"));
+	fCopyrightInfo = _CreateInfo("copyright");
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fIconView, 0)
+			.Add(fFilenameView, 1)
+			.End()
+		.AddGrid(2, 13)
+			.Add(containerLabel, 0, 0)
+			.Add(fContainerInfo, 1, 0)
+			.Add(fVideoSeparator, 0, 1)
+			.Add(fVideoLabel, 0, 2)
+			.Add(fVideoFormatInfo, 1, 2)
+			.Add(fVideoConfigInfo, 1, 3)
+			.Add(fDisplayModeLabel, 0, 4)
+			.Add(fDisplayModeInfo, 1, 4)
+			.Add(fAudioSeparator, 0, 5)
+			.Add(fAudioLabel, 0, 6)
+			.Add(fAudioFormatInfo, 1, 6)
+			.Add(fAudioConfigInfo, 1, 7)
+			.Add(_CreateSeparator(), 0, 8)
+			.Add(durationLabel, 0, 9)
+			.Add(fDurationInfo, 1, 9)
+			.Add(_CreateSeparator(), 0, 10)
+			.Add(locationLabel, 0, 11)
+			.Add(fLocationInfo, 1, 11)
+			.Add(fCopyrightSeparator, 0, 12)
+			.Add(fCopyrightLabel, 0, 12)
+			.Add(fCopyrightInfo, 1, 12)
+			.SetColumnWeight(0, 0)
+			.SetColumnWeight(1, 1)
+			.SetSpacing(B_USE_DEFAULT_SPACING, 0)
+			.SetExplicitMinSize(BSize(MIN_WIDTH, B_SIZE_UNSET));
 
 	fController->AddListener(fControllerObserver);
 	Update();
+
+	UpdateSizeLimits();
 
 	// Move window on screen if needed
 	BScreen screen(this);
@@ -238,15 +278,6 @@ InfoWin::~InfoWin()
 }
 
 
-// #pragma mark -
-
-
-void
-InfoWin::FrameResized(float newWidth, float newHeight)
-{
-}
-
-
 void
 InfoWin::MessageReceived(BMessage* msg)
 {
@@ -257,14 +288,14 @@ InfoWin::MessageReceived(BMessage* msg)
 			Update(INFO_ALL);
 			break;
 		case MSG_CONTROLLER_VIDEO_TRACK_CHANGED:
-			Update(/*INFO_VIDEO | INFO_STATS*/INFO_ALL);
+			Update(INFO_VIDEO | INFO_STATS);
 			break;
 		case MSG_CONTROLLER_AUDIO_TRACK_CHANGED:
-			Update(/*INFO_AUDIO | INFO_STATS*/INFO_ALL);
+			Update(INFO_AUDIO | INFO_STATS);
 			break;
 		case MSG_CONTROLLER_VIDEO_STATS_CHANGED:
 		case MSG_CONTROLLER_AUDIO_STATS_CHANGED:
-			Update(/*INFO_STATS*/INFO_ALL);
+			Update(INFO_STATS);
 			break;
 		default:
 			BWindow::MessageReceived(msg);
@@ -294,226 +325,302 @@ InfoWin::Pulse()
 
 
 void
-InfoWin::ResizeToPreferred()
+InfoWin::Update(uint32 which)
 {
+	if (!fController->Lock())
+		return;
+
+	if ((which & INFO_FILE) != 0)
+		_UpdateFile();
+
+	// video track format information
+	if ((which & INFO_VIDEO) != 0)
+		_UpdateVideo();
+
+	// audio track format information
+	if ((which & INFO_AUDIO) != 0)
+		_UpdateAudio();
+
+	// statistics
+	if ((which & INFO_STATS) != 0) {
+		_UpdateDuration();
+		// TODO: demux/video/audio/... perfs (Kb/info)
+	}
+
+	if ((which & INFO_TRANSPORT) != 0) {
+		// Transport protocol info (file, http, rtsp, ...)
+	}
+
+	if ((which & INFO_COPYRIGHT)!=0)
+		_UpdateCopyright();
+
+	fController->Unlock();
 }
 
 
 void
-InfoWin::Update(uint32 which)
+InfoWin::_UpdateFile()
 {
-printf("InfoWin::Update(0x%08" B_PRIx32 ")\n", which);
-	fLabelsView->SetText("");
-	fContentsView->SetText("");
-	fLabelsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kBlue);
-	fLabelsView->Insert(" ");
-	fContentsView->SetFontAndColor(be_plain_font, B_FONT_ALL);
-//	fContentsView->Insert("");
+	bool iconSet = false;
+	if (fController->HasFile()) {
+		const PlaylistItem* item = fController->Item();
+		iconSet = fIconView->SetIcon(item) == B_OK;
+		media_file_format fileFormat;
+		status_t status = fController->GetFileFormatInfo(&fileFormat);
+		if (status == B_OK) {
+			fContainerInfo->SetText(fileFormat.pretty_name);
+			if (!iconSet)
+				iconSet = fIconView->SetIcon(fileFormat.mime_type) == B_OK;
+		} else
+			fContainerInfo->SetText(strerror(status));
 
-	if (!fController->Lock())
-		return;
+		BString info;
+		if (fController->GetLocation(&info) != B_OK)
+			info = B_TRANSLATE("<unknown>");
+		fLocationInfo->SetText(info.String());
+		fLocationInfo->SetToolTip(info.String());
 
-	fLabelsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kRed);
+		if (fController->GetName(&info) != B_OK || info.IsEmpty())
+			info = B_TRANSLATE("<unnamed media>");
+		fFilenameView->SetText(info.String());
+		fFilenameView->SetToolTip(info.String());
+	} else {
+		fFilenameView->SetText(B_TRANSLATE("<no media>"));
+		fContainerInfo->SetText("-");
+		fLocationInfo->SetText("-");
+	}
 
-	status_t err;
-	// video track format information
-	if ((which & INFO_VIDEO) && fController->VideoTrackCount() > 0) {
-		BString label = B_TRANSLATE("Video");
-		fLabelsView->Insert(label << "\n\n\n");
-		BString s;
+	if (!iconSet)
+		fIconView->SetGenericIcon();
+}
+
+
+void
+InfoWin::_UpdateVideo()
+{
+	bool visible = fController->VideoTrackCount() > 0;
+	if (visible) {
+		BString info;
 		media_format format;
 		media_raw_video_format videoFormat = {};
-		err = fController->GetEncodedVideoFormat(&format);
-		if (err < B_OK) {
-			s << "(" << strerror(err) << ")\n";
+		status_t status = fController->GetEncodedVideoFormat(&format);
+		if (status != B_OK) {
+			info << "(" << strerror(status) << ")\n";
 		} else if (format.type == B_MEDIA_ENCODED_VIDEO) {
 			videoFormat = format.u.encoded_video.output;
 			media_codec_info mci;
-			err = fController->GetVideoCodecInfo(&mci);
-			if (err < B_OK) {
-				s << B_TRANSLATE("Haiku Media Kit: ") << strerror(err);
+			status = fController->GetVideoCodecInfo(&mci);
+			if (status != B_OK) {
 				if (format.user_data_type == B_CODEC_TYPE_INFO) {
-					s << (char *)format.user_data << " "
+					info << (char *)format.user_data << " "
 						<< B_TRANSLATE("(not supported)");
-				}
+				} else
+					info = strerror(status);
 			} else
-				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
+				info << mci.pretty_name; //<< "(" << mci.short_name << ")";
 		} else if (format.type == B_MEDIA_RAW_VIDEO) {
 			videoFormat = format.u.raw_video;
-			s << B_TRANSLATE("raw video");
+			info << B_TRANSLATE("raw video");
 		} else
-			s << B_TRANSLATE("unknown format");
-		s << "\n";
-		s << format.Width() << " x " << format.Height();
+			info << B_TRANSLATE("unknown format");
+
+		fVideoFormatInfo->SetText(info.String());
+
+		info.SetToFormat("%" B_PRIu32 " x %" B_PRIu32, format.Width(),
+			format.Height());
+
 		// encoded has output as 1st field...
 		char fpsString[20];
 		snprintf(fpsString, sizeof(fpsString), B_TRANSLATE("%.3f fps"),
 			videoFormat.field_rate);
-		s << ", " << fpsString << "\n\n";
-		fContentsView->Insert(s.String());
+		info << ", " << fpsString;
+
+		fVideoConfigInfo->SetText(info.String());
+
+		if (fController->IsOverlayActive())
+			fDisplayModeInfo->SetText(B_TRANSLATE("Overlay"));
+		else
+			fDisplayModeInfo->SetText(B_TRANSLATE("DrawBitmap"));
 	}
 
-	// audio track format information
-	if ((which & INFO_AUDIO) && fController->AudioTrackCount() > 0) {
-		BString label = B_TRANSLATE("Audio");
-		fLabelsView->Insert(label << "\n\n\n");
-		BString s;
+	fVideoSeparator->SetVisible(visible);
+	_SetVisible(fVideoLabel, visible);
+	_SetVisible(fVideoFormatInfo, visible);
+	_SetVisible(fVideoConfigInfo, visible);
+	_SetVisible(fDisplayModeLabel, visible);
+	_SetVisible(fDisplayModeInfo, visible);
+}
+
+
+void
+InfoWin::_UpdateAudio()
+{
+	bool visible = fController->AudioTrackCount() > 0;
+	if (visible) {
+		BString info;
 		media_format format;
 		media_raw_audio_format audioFormat = {};
-		err = fController->GetEncodedAudioFormat(&format);
-		//string_for_format(format, buf, sizeof(buf));
-		//printf("%s\n", buf);
-		if (err < 0) {
-			s << "(" << strerror(err) << ")\n";
+
+		status_t status = fController->GetEncodedAudioFormat(&format);
+		if (status != B_OK) {
+			info << "(" << strerror(status) << ")\n";
 		} else if (format.type == B_MEDIA_ENCODED_AUDIO) {
 			audioFormat = format.u.encoded_audio.output;
 			media_codec_info mci;
-			err = fController->GetAudioCodecInfo(&mci);
-			if (err < 0) {
-				s << B_TRANSLATE("Haiku Media Kit: ") << strerror(err);
+			status = fController->GetAudioCodecInfo(&mci);
+			if (status != B_OK) {
 				if (format.user_data_type == B_CODEC_TYPE_INFO) {
-					s << (char *)format.user_data << " "
+					info << (char *)format.user_data << " "
 						<< B_TRANSLATE("(not supported)");
-				}
+				} else
+					info = strerror(status);
 			} else
-				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
+				info = mci.pretty_name;
 		} else if (format.type == B_MEDIA_RAW_AUDIO) {
 			audioFormat = format.u.raw_audio;
-			s << B_TRANSLATE("raw audio");
+			info = B_TRANSLATE("raw audio");
 		} else
-			s << B_TRANSLATE("unknown format");
-		s << "\n";
+			info = B_TRANSLATE("unknown format");
+
+		fAudioFormatInfo->SetText(info.String());
+
 		uint32 bitsPerSample = 8 * (audioFormat.format
 			& media_raw_audio_format::B_AUDIO_SIZE_MASK);
 		uint32 channelCount = audioFormat.channel_count;
 		float sr = audioFormat.frame_rate;
 
+		info.Truncate(0);
+
 		if (bitsPerSample > 0) {
 			char bitString[20];
 			snprintf(bitString, sizeof(bitString), B_TRANSLATE("%d Bit"),
 				bitsPerSample);
-			s << bitString << " ";
+			info << bitString << " ";
 		}
 
 		static BMessageFormat channelFormat(B_TRANSLATE(
 			"{0, plural, =1{Mono} =2{Stereo} other{# Channels}}"));
-		channelFormat.Format(s, channelCount);
+		channelFormat.Format(info, channelCount);
 
-		s << ", ";
+		info << ", ";
 		if (sr > 0.0) {
 			char rateString[20];
 			snprintf(rateString, sizeof(rateString),
 				B_TRANSLATE("%.3f kHz"), sr / 1000);
-			s << rateString;
+			info << rateString;
 		} else {
 			BString rateString = B_TRANSLATE("%d kHz");
 			rateString.ReplaceFirst("%d", "??");
-			s << rateString;
+			info << rateString;
 		}
 		if (format.type == B_MEDIA_ENCODED_AUDIO) {
 			float br = format.u.encoded_audio.bit_rate;
 			char string[20] = "";
 			if (br > 0.0)
-				s << ", " << string_for_rate(br, string, sizeof(string));
-		}
-		s << "\n\n";
-		fContentsView->Insert(s.String());
-	}
-
-	// statistics
-	if ((which & INFO_STATS) && fController->HasFile()) {
-		BString label = B_TRANSLATE("Duration");
-		fLabelsView->Insert(label << "\n");
-		BString s;
-		bigtime_t d = fController->TimeDuration();
-		bigtime_t v;
-
-		//s << d << "µs; ";
-
-		d /= 1000;
-
-		v = d / (3600 * 1000);
-		d = d % (3600 * 1000);
-		bool hours = v > 0;
-		if (hours)
-			s << v << ":";
-		v = d / (60 * 1000);
-		d = d % (60 * 1000);
-		s << v << ":";
-		v = d / 1000;
-		if (v < 10)
-			s << '0';
-		s << v;
-		if (hours)
-			s << " " << B_TRANSLATE_COMMENT("h", "Hours");
-		else
-			s << " " << B_TRANSLATE_COMMENT("min", "Minutes");
-		s << "\n";
-		fContentsView->Insert(s.String());
-		// TODO: demux/video/audio/... perfs (Kb/s)
-
-		BString content = B_TRANSLATE("Display mode");
-		fLabelsView->Insert(content << "\n");
-		if (fController->IsOverlayActive()) {
-			content = B_TRANSLATE("Overlay");
-			fContentsView->Insert(content << "\n");
-		} else {
-			content = B_TRANSLATE("DrawBitmap");
-			fContentsView->Insert(content << "\n");
+				info << ", " << string_for_rate(br, string, sizeof(string));
 		}
 
-		fLabelsView->Insert("\n");
-		fContentsView->Insert("\n");
+		fAudioConfigInfo->SetText(info.String());
 	}
 
-	if (which & INFO_TRANSPORT) {
-		// Transport protocol info (file, http, rtsp, ...)
+	fAudioSeparator->SetVisible(visible);
+	_SetVisible(fAudioLabel, visible);
+	_SetVisible(fAudioFormatInfo, visible);
+	_SetVisible(fAudioConfigInfo, visible);
+}
+
+
+void
+InfoWin::_UpdateDuration()
+{
+	if (!fController->HasFile()) {
+		fDurationInfo->SetText("-");
+		return;
 	}
 
-	if (which & INFO_FILE) {
-		bool iconSet = false;
-		if (fController->HasFile()) {
-			const PlaylistItem* item = fController->Item();
-			iconSet = fInfoView->SetIcon(item) == B_OK;
-			media_file_format fileFormat;
-			BString s;
-			if (fController->GetFileFormatInfo(&fileFormat) == B_OK) {
-				BString label = B_TRANSLATE("Container");
-				fLabelsView->Insert(label << "\n");
-				s << fileFormat.pretty_name;
-				s << "\n";
-				fContentsView->Insert(s.String());
-				if (!iconSet)
-					iconSet = fInfoView->SetIcon(fileFormat.mime_type) == B_OK;
-			} else
-				fContentsView->Insert("\n");
-			BString label = B_TRANSLATE("Location");
-			fLabelsView->Insert(label << "\n");
-			if (fController->GetLocation(&s) < B_OK)
-				s = B_TRANSLATE("<unknown>");
-			s << "\n";
-			fContentsView->Insert(s.String());
-			if (fController->GetName(&s) < B_OK)
-				s = B_TRANSLATE("<unnamed media>");
-			fFilenameView->SetText(s.String());
-		} else {
-			fFilenameView->SetText(B_TRANSLATE("<no media>"));
-		}
-		if (!iconSet)
-			fInfoView->SetGenericIcon();
-	}
+	BString info;
 
-	if ((which & INFO_COPYRIGHT) && fController->HasFile()) {
-		BString s;
-		if (fController->GetCopyright(&s) == B_OK && s.Length() > 0) {
-			BString label = B_TRANSLATE("Copyright");
-			fLabelsView->Insert(label << "\n\n");
-			s << "\n\n";
-			fContentsView->Insert(s.String());
-		}
-	}
+	bigtime_t d = fController->TimeDuration() / 1000;
+	bigtime_t v = d / (3600 * 1000);
+	d = d % (3600 * 1000);
+	bool hours = v > 0;
+	if (hours)
+		info << v << ":";
+	v = d / (60 * 1000);
+	d = d % (60 * 1000);
+	info << v << ":";
+	v = d / 1000;
+	if (v < 10)
+		info << '0';
+	info << v;
+	if (hours)
+		info << " " << B_TRANSLATE_COMMENT("h", "Hours");
+	else
+		info << " " << B_TRANSLATE_COMMENT("min", "Minutes");
 
-	fController->Unlock();
+	fDurationInfo->SetText(info.String());
+}
 
-	ResizeToPreferred();
+
+void
+InfoWin::_UpdateCopyright()
+{
+	BString info;
+
+	bool visible = fController->HasFile()
+		&& fController->GetCopyright(&info) == B_OK && !info.IsEmpty();
+	if (visible)
+		fCopyrightInfo->SetText(info.String());
+
+	fCopyrightSeparator->SetVisible(visible);
+	_SetVisible(fCopyrightLabel, visible);
+	_SetVisible(fCopyrightInfo, visible);
+}
+
+
+// #pragma mark -
+
+
+BStringView*
+InfoWin::_CreateLabel(const char* name, const char* label)
+{
+	static const rgb_color kLabelColor = tint_color(
+		ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_3_TINT);
+
+	BStringView* view = new BStringView(name, label);
+	view->SetAlignment(B_ALIGN_RIGHT);
+	view->SetHighColor(kLabelColor);
+
+	return view;
+}
+
+
+BStringView*
+InfoWin::_CreateInfo(const char* name)
+{
+	BStringView* view = new BStringView(name, "");
+	view->SetExplicitMinSize(BSize(200, B_SIZE_UNSET));
+	view->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	view->SetTruncation(B_TRUNCATE_SMART);
+
+	return view;
+}
+
+
+BLayoutItem*
+InfoWin::_CreateSeparator()
+{
+	return BSpaceLayoutItem::CreateVerticalStrut(
+		be_control_look->ComposeSpacing(B_USE_HALF_ITEM_SPACING));
+}
+
+
+void
+InfoWin::_SetVisible(BView* view, bool visible)
+{
+	bool hidden = view->IsHidden(view);
+	if (hidden && visible)
+		view->Show();
+	else if (!hidden && !visible)
+		view->Hide();
 }

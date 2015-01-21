@@ -24,11 +24,12 @@
 #include <Window.h>
 
 
+class BLayoutItem;
 class BStringView;
 class BTextView;
 class Controller;
 class ControllerObserver;
-class InfoView;
+class IconView;
 
 
 #define INFO_STATS		0x00000001
@@ -47,22 +48,49 @@ public:
 									Controller* controller);
 	virtual						~InfoWin();
 
-	virtual	void				FrameResized(float newWidth, float newHeight);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 	virtual void				Pulse();
 
-			void				ResizeToPreferred();
 			void				Update(uint32 which = INFO_ALL);
+
+private:
+			void				_UpdateFile();
+			void				_UpdateVideo();
+			void				_UpdateAudio();
+			void				_UpdateDuration();
+			void				_UpdateCopyright();
+
+			BStringView*		_CreateLabel(const char* name,
+									const char* label);
+			BStringView*		_CreateInfo(const char* name);
+			BLayoutItem*		_CreateSeparator();
+			void				_SetVisible(BView* view, bool visible);
 
 private:
 			Controller*			fController;
 			ControllerObserver*	fControllerObserver;
 
-			InfoView*			fInfoView;
+			IconView*			fIconView;
 			BStringView*		fFilenameView;
-			BTextView*			fLabelsView;
-			BTextView*			fContentsView;
+
+			BStringView*		fContainerInfo;
+			BLayoutItem*		fVideoSeparator;
+			BStringView*		fVideoLabel;
+			BStringView*		fVideoFormatInfo;
+			BStringView*		fVideoConfigInfo;
+			BStringView*		fDisplayModeLabel;
+			BStringView*		fDisplayModeInfo;
+			BLayoutItem*		fAudioSeparator;
+			BStringView*		fAudioLabel;
+			BStringView*		fAudioFormatInfo;
+			BStringView*		fAudioConfigInfo;
+			BStringView*		fDurationInfo;
+			BStringView*		fLocationInfo;
+			BLayoutItem*		fCopyrightSeparator;
+			BStringView*		fCopyrightLabel;
+			BStringView*		fCopyrightInfo;
 };
+
 
 #endif // __FILE_INFO_WIN_H
