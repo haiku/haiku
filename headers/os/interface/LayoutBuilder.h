@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2009-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_LAYOUT_BUILDER_H
@@ -194,6 +194,10 @@ public:
 
 	inline	ThisBuilder&		AddGlue(int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
+
+	inline	ThisBuilder&		SetHorizontalSpacing(float spacing);
+	inline	ThisBuilder&		SetVerticalSpacing(float spacing);
+	inline	ThisBuilder&		SetSpacing(float horizontal, float vertical);
 
 	inline	ThisBuilder&		SetColumnWeight(int32 column, float weight);
 	inline	ThisBuilder&		SetRowWeight(int32 row, float weight);
@@ -887,6 +891,33 @@ Grid<ParentBuilder>::AddGlue(int32 column, int32 row, int32 columnCount,
 {
 	fLayout->AddItem(BSpaceLayoutItem::CreateGlue(), column, row, columnCount,
 		rowCount);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::SetHorizontalSpacing(float spacing)
+{
+	fLayout->SetHorizontalSpacing(spacing);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::SetVerticalSpacing(float spacing)
+{
+	fLayout->SetVerticalSpacing(spacing);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::SetSpacing(float horizontal, float vertical)
+{
+	fLayout->SetSpacing(horizontal, vertical);
 	return *this;
 }
 
