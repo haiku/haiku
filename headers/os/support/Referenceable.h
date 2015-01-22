@@ -37,7 +37,7 @@ protected:
 // #pragma mark - BReference
 
 
-template<typename Type = BReferenceable>
+template<typename Type = BReferenceable, typename ConstType = Type>
 class BReference {
 public:
 	BReference()
@@ -57,7 +57,7 @@ public:
 		:
 		fObject(NULL)
 	{
-		SetTo(other.fObject);
+		SetTo(other.Get());
 	}
 
 	
@@ -92,34 +92,34 @@ public:
 		}
 	}
 
-	Type* Get() const
+	ConstType* Get() const
 	{
 		return fObject;
 	}
 
-	Type* Detach()
+	ConstType* Detach()
 	{
 		Type* object = fObject;
 		fObject = NULL;
 		return object;
 	}
 
-	Type& operator*() const
+	ConstType& operator*() const
 	{
 		return *fObject;
 	}
 
-	Type* operator->() const
+	ConstType* operator->() const
 	{
 		return fObject;
 	}
 
-	operator Type*() const
+	operator ConstType*() const
 	{
 		return fObject;
 	}
 
-	BReference& operator=(const BReference<Type>& other)
+	BReference& operator=(const BReference<Type, ConstType>& other)
 	{
 		SetTo(other.fObject);
 		return *this;
@@ -131,14 +131,14 @@ public:
 		return *this;
 	}
 
-	template<typename OtherType>
-	BReference& operator=(const BReference<OtherType>& other)
+	template<typename OtherType, typename OtherConstType>
+	BReference& operator=(const BReference<OtherType, OtherConstType>& other)
 	{
 		SetTo(other.Get());
 		return *this;
 	}
 
-	bool operator==(const BReference<Type>& other) const
+	bool operator==(const BReference<Type, ConstType>& other) const
 	{
 		return fObject == other.fObject;
 	}
@@ -148,7 +148,7 @@ public:
 		return fObject == other;
 	}
 
-	bool operator!=(const BReference<Type>& other) const
+	bool operator!=(const BReference<Type, ConstType>& other) const
 	{
 		return fObject != other.fObject;
 	}
@@ -160,6 +160,41 @@ public:
 
 private:
 	Type*	fObject;
+};
+
+
+// #pragma mark - BReference
+
+
+template<typename Type = BReferenceable>
+class BConstReference: public BReference<Type, const Type> {
+public:
+	BConstReference()
+		:
+		BReference<Type, const Type>()
+	{
+	}
+
+	BConstReference(Type* object, bool alreadyHasReference = false)
+		:
+		BReference<Type, const Type>(object, alreadyHasReference)
+	{
+	}
+
+	BConstReference(const BReference<Type>& other)
+		:
+		BReference<Type, const Type>(other)
+	{
+	}
+
+	// Allow assignment of a const reference from a mutable one (but not the
+	// reverse).
+	BConstReference& operator=(const BReference<Type, Type>& other)
+	{
+		SetTo(other.Get());
+		return *this;
+	}
+
 };
 
 
