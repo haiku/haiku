@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.01.05
-#	Date:    2015-01-05 03:15:01
+#	Version: 2015.01.21
+#	Date:    2015-01-21 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -9437,6 +9437,8 @@
 	0e0b  GK106 HDMI Audio Controller
 	0e0c  GF114 HDMI Audio Controller
 	0e0f  GK208 HDMI/DP Audio Controller
+	0e12  TegraK1 PCIe x4 Bridge
+	0e13  TegraK1 PCIe x1 Bridge
 	0e1a  GK110 HDMI Audio
 	0e1b  GK107 HDMI Audio Controller
 		103c 197b  ZBook 15
@@ -10010,6 +10012,7 @@
 		103c 2b22  GeForce GT 810A
 	1296  GK208M [GeForce 825M]
 	1298  GK208M [GeForce GT 720M]
+	1299  GK208M [N16V-GM]
 	12a0  GK208
 	12b9  GK208GLM [Quadro K610M]
 	12ba  GK208GLM [Quadro K510M]
@@ -10019,20 +10022,28 @@
 		17aa 3697  GeForce 840A
 		17aa 3699  GeForce 840A
 		17aa 369c  GeForce 840A
+	1346  GM108M [GeForce 930M]
+	1347  GM108M [GeForce 940M]
 	1380  GM107 [GeForce GTX 750 Ti]
 	1381  GM107 [GeForce GTX 750]
 	1382  GM107 [GeForce GTX 745]
-	1389  GM107GL [GRID M3]
+	1389  GM107GL [GRID M30]
 	1390  GM107M [GeForce 845M]
 	1391  GM107M [GeForce GTX 850M]
 		17aa 3697  GeForce GTX 850A
 		17aa a125  GeForce GTX 850A
 	1392  GM107M [GeForce GTX 860M]
 	1393  GM107M [GeForce 840M]
+	1398  GM107M [GeForce 845M]
+	139a  GM107M [GeForce GTX 950M]
+	139b  GM107M [GeForce GTX 960M]
+	139c  GM107M [N16S-GT1-KB-B]
+	13b0  GM107GLM [N16P-Q3]
 	13b3  GM107GLM [Quadro K2200M]
 	13ba  GM107GL [Quadro K2200]
 	13bb  GM107GL [Quadro K620]
-	13bd  GM107GL [Tesla M40]
+	13bc  GM107GL [Quadro K1200]
+	13bd  GM107GL [GRID M40]
 	13c0  GM204 [GeForce GTX 980]
 		1043 8504  GTX980-4GD5
 	13c1  GM204
@@ -17672,6 +17683,7 @@
 	0010  PCIe Counter Timer
 	0011  SIS1100-e single link
 	0012  SIS1100-e quad link
+	0015  SIS8100 [Gigabit link, MicroTCA]
 1797  Techwell Inc.
 	6801  TW6802 multimedia video card
 	6802  TW6802 multimedia other device
@@ -21163,6 +21175,11 @@
 	15a1  Ethernet Connection (2) I218-V
 	15a2  Ethernet Connection (3) I218-LM
 	15a3  Ethernet Connection (3) I218-V
+	15a8  Ethernet Connection X552 Virtual Function
+	15aa  Ethernet Connection X552 10 GbE Backplane
+	15ab  Ethernet Connection X552 10 GbE Backplane
+	15ac  Ethernet Connection X552 10 GbE SFP+
+	15ad  Ethernet Connection X552/X557-AT 10GBASE-T
 	15b7  Ethernet Connection (2) I219-LM
 	15b8  Ethernet Connection (2) I219-V
 	1600  Broadwell-U Host Bridge -OPI
