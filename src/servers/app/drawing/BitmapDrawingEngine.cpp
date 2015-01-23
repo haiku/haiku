@@ -48,7 +48,7 @@ BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 	}
 
 	SetHWInterface(NULL);
-	if (fHWInterface) {
+	if (fHWInterface != NULL) {
 		fHWInterface->LockExclusiveAccess();
 		fHWInterface->Shutdown();
 		fHWInterface->UnlockExclusiveAccess();
@@ -56,8 +56,10 @@ BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 		fHWInterface = NULL;
 	}
 
-	fBitmap->ReleaseReference();
-	fBitmap = NULL;
+	if (fBitmap != NULL) {
+		fBitmap->ReleaseReference();
+		fBitmap = NULL;
+	}
 
 	if (newWidth <= 0 || newHeight <= 0)
 		return B_OK;
