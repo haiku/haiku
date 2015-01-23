@@ -56,7 +56,7 @@ BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 		fHWInterface = NULL;
 	}
 
-	fBitmap.Unset();
+	fBitmap->ReleaseReference();
 
 	if (newWidth <= 0 || newHeight <= 0)
 		return B_OK;

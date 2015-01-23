@@ -25,7 +25,7 @@ virtual							~BitmapDrawingEngine();
 private:
 			color_space			fColorSpace;
 			BitmapHWInterface*	fHWInterface;
-			BReference<UtilityBitmap> fBitmap;
+			UtilityBitmap*		fBitmap;
 			BRegion				fClipping;
 };
 

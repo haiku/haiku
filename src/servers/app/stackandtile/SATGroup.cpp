@@ -791,7 +791,7 @@ Tab::CompareFunction(const Tab* tab1, const Tab* tab2)
 
 SATGroup::SATGroup()
 	:
-	fLinearSpec(new(std::nothrow) LinearSpec(), true),
+	fLinearSpec(new(std::nothrow) LinearSpec()),
 	fHorizontalTabsSorted(false),
 	fVerticalTabsSorted(false),
 	fActiveWindow(NULL)
@@ -806,6 +806,8 @@ SATGroup::~SATGroup()
 		debugger("Deleting a SATGroup which is not empty");
 	//while (fSATWindowList.CountItems() > 0)
 	//	RemoveWindow(fSATWindowList.ItemAt(0));
+	
+	fLinearSpec->ReleaseReference();
 }
 
 
