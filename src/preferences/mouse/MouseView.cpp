@@ -33,16 +33,16 @@
 #include "MouseWindow.h"
 
 
-static const int32 kButtonTop = 6;
+static const int32 kButtonTop = 3;
 static const int32 kMouseDownWidth = 72;
-static const int32 kMouseDownHeight = 30;
+static const int32 kMouseDownHeight = 35;
 
 static const int32 kOneButtonOffsets[4]
 	= { 0, kMouseDownWidth };
 static const int32 kTwoButtonOffsets[4]
 	= { 0, kMouseDownWidth / 2, kMouseDownWidth };
 static const int32 kThreeButtonOffsets[4]
-	= { 5, kMouseDownWidth / 3, kMouseDownWidth / 3 * 2, kMouseDownWidth - 4 };
+	= { 0, kMouseDownWidth / 3 + 1, kMouseDownWidth / 3 * 2, kMouseDownWidth };
 
 static const rgb_color kButtonTextColor = { 0, 0, 0, 255 };
 static const rgb_color kMouseShadowColor = { 100, 100, 100, 128 };
@@ -50,6 +50,7 @@ static const rgb_color kMouseBodyTopColor = { 0xed, 0xed, 0xed, 255 };
 static const rgb_color kMouseBodyBottomColor = { 0x85, 0x85, 0x85, 255 };
 static const rgb_color kMouseOutlineColor = { 0x51, 0x51, 0x51, 255 };
 static const rgb_color kMouseButtonOutlineColor = { 0xa0, 0xa0, 0xa0, 255 };
+static const rgb_color kButtonPressedColor = { 110, 110, 110, 110 };
 
 
 static const int32*
@@ -143,6 +144,12 @@ MouseView::AttachedToWindow()
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	UpdateFromSettings();
+	_CreateButtonsPicture();
+
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	fDigitHeight = int32(ceilf(fontHeight.ascent) + ceilf(fontHeight.descent));
+	fDigitBaseline = int32(ceilf(fontHeight.ascent));
 }
 
 
@@ -223,14 +230,16 @@ MouseView::Draw(BRect updateFrame)
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 	SetScale(1.8);
-	SetOrigin(-21, -14);
 
 	BShape mouseShape;
 	mouseShape.MoveTo(BPoint(16, 12));
+	// left
 	BPoint control[3] = { BPoint(12, 16), BPoint(8, 64), BPoint(32, 64) };
 	mouseShape.BezierTo(control);
+	// right
 	BPoint control2[3] = { BPoint(56, 64), BPoint(52, 16), BPoint(48, 12) };
 	mouseShape.BezierTo(control2);
+	// top
 	BPoint control3[3] = { BPoint(44, 8), BPoint(20, 8), BPoint(16, 12) };
 	mouseShape.BezierTo(control3);
 	mouseShape.Close();
@@ -255,54 +264,66 @@ MouseView::Draw(BRect updateFrame)
 
 	StrokeShape(&mouseShape, B_SOLID_HIGH);
 
+	// bottom button border
 	BShape buttonsOutline;
 	buttonsOutline.MoveTo(BPoint(13, 27));
 	BPoint control4[] = { BPoint(18, 30), BPoint(46, 30), BPoint(51, 27) };
 	buttonsOutline.BezierTo(control4);
 
-	// Separator between the buttons
-	if (fType == 3) {
-		buttonsOutline.MoveTo(BPoint(26, 29));
-		buttonsOutline.LineTo(BPoint(26, 9));
-		buttonsOutline.MoveTo(BPoint(38, 29));
-		buttonsOutline.LineTo(BPoint(38, 9));
-	} else if (fType == 2) {
-		buttonsOutline.MoveTo(BPoint(32, 29));
-		buttonsOutline.LineTo(BPoint(32, 9));
-	}
-
 	SetHighColor(kMouseButtonOutlineColor);
 	StrokeShape(&buttonsOutline, B_SOLID_HIGH);
+
+	SetScale(1);
+	SetOrigin(0, 0);
+
+	// Separator between the buttons
+	const int32* offset = getButtonOffsets(fType);
+	for (int32 i = 1; i < fType; i++) {
+		StrokeLine(BPoint(offset[i], kButtonTop),
+			BPoint(offset[i], kButtonTop + kMouseDownHeight));
+	}
 
 	mouse_map map;
 	fSettings.Mapping(map);
 
-	const int32* offset = getButtonOffsets(fType);
-//	bool middlePressed = fType == 3 && (map.button[2] & fButtons) != 0;
-
-	SetHighColor(kButtonTextColor);
 	SetDrawingMode(B_OP_OVER);
-	SetScale(1);
-	SetOrigin(0, 0);
+
+	if (fButtons != 0)
+		ClipToPicture(&fButtonsPicture, B_ORIGIN, false);
 
 	for (int32 i = 0; i < fType; i++) {
 		// draw mapping number centered over the button
 
 		bool pressed = (fButtons & map.button[_ConvertFromVisualOrder(i)]) != 0;
 			// is button currently pressed?
+		if (pressed) {
+			SetDrawingMode(B_OP_ALPHA);
+			SetHighColor(kButtonPressedColor);
+			FillRect(BRect(offset[i], kButtonTop, offset[i + 1] - 1,
+				kButtonTop + kMouseDownHeight));
+		}
 
-		SetFont(pressed ? be_bold_font : be_plain_font);
-
-		BRect border(offset[i] + 1, kButtonTop + 2, offset[i + 1] - 1,
+		BRect border(offset[i] + 1, kButtonTop + 5, offset[i + 1] - 1,
 			kButtonTop + kMouseDownHeight - 4);
+		if (i == 0)
+			border.left += 5;
+		if (i == fType - 1)
+			border.right -= 4;
 
 		char number[2] = {0};
 		number[0] = getMappingNumber(map.button[_ConvertFromVisualOrder(i)])
 			+ '1';
 
-		DrawString(number, BPoint(border.left +
-			(border.Width() - StringWidth(number)) / 2, kButtonTop + 18));
+		SetDrawingMode(B_OP_OVER);
+		SetHighColor(kButtonTextColor);
+		DrawString(number, BPoint(
+			border.left + (border.Width() - StringWidth(number)) / 2,
+			border.top + fDigitBaseline
+				+ (border.IntegerHeight() - fDigitHeight) / 2));
 	}
+
+	if (fButtons != 0)
+		ClipToPicture(NULL);
 }
 
 
@@ -321,4 +342,36 @@ MouseView::_ConvertFromVisualOrder(int32 i)
 		case 2:
 			return 1;
 	}
+}
+
+
+void
+MouseView::_CreateButtonsPicture()
+{
+	BeginPicture(&fButtonsPicture);
+	SetScale(1.8);
+	SetOrigin(-21, -14);
+
+	BShape mouseShape;
+	mouseShape.MoveTo(BPoint(48, 12));
+	// top
+	BPoint control3[3] = { BPoint(44, 8), BPoint(20, 8), BPoint(16, 12) };
+	mouseShape.BezierTo(control3);
+	// left
+	BPoint control[3] = { BPoint(12, 16), BPoint(13, 27), BPoint(13, 27) };
+	mouseShape.BezierTo(control);
+	// bottom
+	BPoint control4[] = { BPoint(18, 30), BPoint(46, 30), BPoint(51, 27) };
+	mouseShape.BezierTo(control4);
+	// right
+	BPoint control2[3] = { BPoint(51, 27), BPoint(50, 14), BPoint(48, 12) };
+	mouseShape.BezierTo(control2);
+
+	mouseShape.Close();
+
+	SetHighColor(255, 0, 0, 255);
+	FillShape(&mouseShape, B_SOLID_HIGH);
+
+	EndPicture();
+	SetScale(1);
 }

@@ -12,6 +12,7 @@
 
 
 #include <Bitmap.h>
+#include <Picture.h>
 #include <PopUpMenu.h>
 #include <View.h>
 
@@ -35,11 +36,16 @@ public:
 
 private:
 				int32			_ConvertFromVisualOrder(int32 button);
+				void			_CreateButtonsPicture();
 
 private:
 	typedef BView inherited;
 
 		const	MouseSettings&	fSettings;
+
+				BPicture		fButtonsPicture;
+				int32			fDigitBaseline;
+				int32			fDigitHeight;
 
 				int32			fType;
 				uint32			fButtons;
