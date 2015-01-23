@@ -57,6 +57,7 @@ BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 	}
 
 	fBitmap->ReleaseReference();
+	fBitmap = NULL;
 
 	if (newWidth <= 0 || newHeight <= 0)
 		return B_OK;
