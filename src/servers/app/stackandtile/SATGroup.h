@@ -244,7 +244,7 @@ public:
 								SATGroup();
 								~SATGroup();
 
-			LinearSpec*			GetLinearSpec() { return &fLinearSpec; }
+			LinearSpec*			GetLinearSpec() { return fLinearSpec.Get(); }
 
 			/*! Create a new WindowArea from the crossing and add the window. */
 			bool				AddWindow(SATWindow* window, Tab* left,
@@ -321,7 +321,7 @@ protected:
 			WindowAreaList		fWindowAreaList;
 			SATWindowList		fSATWindowList;
 
-			LinearSpec			fLinearSpec;
+			BReference<LinearSpec> fLinearSpec;
 
 private:
 			TabList				fHorizontalTabs;

@@ -377,14 +377,18 @@ WindowArea::MoveToTopLayer(SATWindow* window)
 void
 WindowArea::_UninitConstraints()
 {
-	LinearSpec* linearSpec = fGroup->GetLinearSpec();
+	if (fGroup != NULL) {
+		LinearSpec* linearSpec = fGroup->GetLinearSpec();
 
-	linearSpec->RemoveConstraint(fMinWidthConstraint, true);
-	linearSpec->RemoveConstraint(fMinHeightConstraint, true);
-	linearSpec->RemoveConstraint(fMaxWidthConstraint, true);
-	linearSpec->RemoveConstraint(fMaxHeightConstraint, true);
-	linearSpec->RemoveConstraint(fWidthConstraint, true);
-	linearSpec->RemoveConstraint(fHeightConstraint, true);
+		if (linearSpec != NULL) {
+			linearSpec->RemoveConstraint(fMinWidthConstraint, true);
+			linearSpec->RemoveConstraint(fMinHeightConstraint, true);
+			linearSpec->RemoveConstraint(fMaxWidthConstraint, true);
+			linearSpec->RemoveConstraint(fMaxHeightConstraint, true);
+			linearSpec->RemoveConstraint(fWidthConstraint, true);
+			linearSpec->RemoveConstraint(fHeightConstraint, true);
+		}
+	}
 
 	fMinWidthConstraint = NULL;
 	fMinHeightConstraint = NULL;
@@ -787,6 +791,7 @@ Tab::CompareFunction(const Tab* tab1, const Tab* tab2)
 
 SATGroup::SATGroup()
 	:
+	fLinearSpec(new(std::nothrow) LinearSpec(), true),
 	fHorizontalTabsSorted(false),
 	fVerticalTabsSorted(false),
 	fActiveWindow(NULL)
@@ -797,6 +802,8 @@ SATGroup::SATGroup()
 SATGroup::~SATGroup()
 {
 	// Should be empty
+	if (fSATWindowList.CountItems() > 0)
+		debugger("Deleting a SATGroup which is not empty");
 	//while (fSATWindowList.CountItems() > 0)
 	//	RemoveWindow(fSATWindowList.ItemAt(0));
 }
@@ -1100,12 +1107,14 @@ SATGroup::ArchiveGroup(BMessage& archive)
 BReference<Tab>
 SATGroup::_AddHorizontalTab(float position)
 {
-	Variable* variable = fLinearSpec.AddVariable();
-	if (!variable)
+	if (fLinearSpec == NULL)
+		return NULL;
+	Variable* variable = fLinearSpec->AddVariable();
+	if (variable == NULL)
 		return NULL;
 
 	Tab* tab = new (std::nothrow)Tab(this, variable, Tab::kHorizontal);
-	if (!tab)
+	if (tab == NULL)
 		return NULL;
 	BReference<Tab> tabRef(tab, true);
 
@@ -1121,12 +1130,14 @@ SATGroup::_AddHorizontalTab(float position)
 BReference<Tab>
 SATGroup::_AddVerticalTab(float position)
 {
-	Variable* variable = fLinearSpec.AddVariable();
-	if (!variable)
+	if (fLinearSpec == NULL)
+		return NULL;
+	Variable* variable = fLinearSpec->AddVariable();
+	if (variable == NULL)
 		return NULL;
 
 	Tab* tab = new (std::nothrow)Tab(this, variable, Tab::kVertical);
-	if (!tab)
+	if (tab == NULL)
 		return NULL;
 	BReference<Tab> tabRef(tab, true);
 
