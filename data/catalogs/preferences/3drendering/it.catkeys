@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-3DRendering	1248719493
+1	italian	x-vnd.Haiku-3DRendering	1725618140
 List stack size:	Capabilities		Dimensione stack elenchi:
 Information	InfoView		Informazione
 Max. clipping planes:	Capabilities		Max. piani di clipping:
@@ -18,6 +18,7 @@ Max. 2D texture size:	Capabilities		Dimensione massima texture 2D:
 Max. convolution:	Capabilities		Numero massimo di convoluzioni:
 GLUT API version:	InfoView		Versione API di GLUT:
 Texture stack size:	Capabilities		Dimensione stack texture:
+Max. evaluators equation order:	Capabilities		Ordine massimo equazione di valutazione: 
 Max. 3D texture size:	Capabilities		Dimensione massima texture 3D:
 3D Rendering	System name		Rendering 3D
 Capabilities	Capabilities		Capacità

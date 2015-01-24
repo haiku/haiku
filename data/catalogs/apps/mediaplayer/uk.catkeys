@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	3507634633
+1	ukrainian	x-vnd.Haiku-MediaPlayer	98667844
 raw audio	MediaPlayer-InfoWin		raw аудіо
 Location	MediaPlayer-InfoWin		Шлях
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Новий програвач…
 100% scale	MediaPlayer-Main		Масштаб 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Розміщення субтитрів:
 Close	MediaPlayer-Main		Закрити
-Display Mode	MediaPlayer-InfoWin		Режим показу
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Деякі файли не можуть бути переміщені в кошик.
 <unknown>	MediaPlayer-InfoWin		<невідомий>
 Seek	MediaPlayer-Main		Пошук
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Перемістити до ко�
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Заглушити
 Toggle pause/play.	MediaPlayer-Main		Перемикання пауза/відтворення
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit:
 min	MediaPlayer-InfoWin	Minutes	хв
 Small	MediaPlayer-SettingsWindow		Малий
 Randomize	MediaPlayer-PlaylistWindow		Випадковий

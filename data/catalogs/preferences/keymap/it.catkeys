@@ -1,22 +1,125 @@
-1	italian	x-vnd.Haiku-Keymap	2739695646
+1	italian	x-vnd.Haiku-Keymap	3155537444
+Dvorak	Keyboard Layout View		Dvorak
+Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Ripristina
-Tilde trigger	Keymap window		Attivatore accento tilde
-Grave trigger	Keymap window		Attivatore accento grave
-Select dead keys	Keymap window		Seleziona tasti morti
+Slovak	Keyboard Layout View		Slovacco
+Hungarian	Keyboard Layout View		Ungherese
+German	Keyboard Layout View		Tedesco
+Swiss-French	Keyboard Layout View		Francese (Svizzera)
+Warning: left and right key roles do not match	Modifier keys window		Attenzione: i tasti sinistro e destro hanno impostazioni diverse
+Belgian (comma)	Keyboard Layout View		Belga (virgola)
+Scroll lock	Keyboard Layout View		Blocca scorrimento
+Belarusian (Mac)	Keyboard Layout View		Bielorusso (Mac)
+Greek	Keyboard Layout View		Greco
+Menu	Keyboard Layout View	Menu key	Menu
+US	Keyboard Layout View		Stati Uniti
+Left control	Keyboard Layout View		Tasto control sinistro
+Spanish	Keyboard Layout View		Spagnolo
+Ukrainian (Mac)	Keyboard Layout View		Ucraino (Mac)
+Belarusian	Keyboard Layout View		Bielorusso
+Italian	Keyboard Layout View		Italiano
+Polish (Typewriter)	Keyboard Layout View		Polacco (Macchina da scrivere)
+Tilde trigger	Keymap window		Tilde
+Grave trigger	Keymap window		Grave
+Role	Modifier keys window	As in the role of a modifier key	Ruolo
+Caps lock	Keyboard Layout View		Bloc Maiusc
+Select dead keys	Keymap window		Tasti attivazione accenti
+Bulgarian (Cyrillic)	Keyboard Layout View		Bulgaro (cirillico)
+Cancel	Modifier keys window		Annulla
+Russian	Keyboard Layout View		Russo
+Icelandic	Keyboard Layout View		Islandese
+Command	Keyboard Layout View	Command key	Comando
+Polish	Keyboard Layout View		Polacco
+Serbian (Cyrillic)	Keyboard Layout View		Serbo (cirillico)
+French	Keyboard Layout View		Francese
+Faeroese	Keyboard Layout View		Faeroese
+Japanese	Keyboard Layout View		Giapponese
+Bulgarian (Phonetic)	Keyboard Layout View		Bulgaro (fonetica)
+Dvorak (programmer's)	Keyboard Layout View		Dvorak (per sviluppatori)
+Estonian	Keyboard Layout View		Estone
+Russian (Mac)	Keyboard Layout View		Russo (Mac)
+Defaults	Keymap window		Predefiniti
 Quit	Keymap window		Esci
-Switch shortcut keys to Haiku mode	Keymap window		Tasti di scelta rapida in modalità Haiku
-Circumflex trigger	Keymap window		Attivatore accento circonflesso
-Diaeresis trigger	Keymap window		Attivatore accento dieresi
+Dutch	Keyboard Layout View		Olandese
+Switch shortcut keys to Haiku mode	Keymap window		Modalità tasti di scelta rapida: Haiku
+Circumflex trigger	Keymap window		Circonflesso
+Hebrew	Keyboard Layout View		Ebraico
+ISO-9995	Keyboard Layout View		ISO-9995
+Diaeresis trigger	Keymap window		Dieresi
+Disabled	Modifier keys window	Do nothing	Disabilitato
+Belarusian (Latin)	Keyboard Layout View		Bielorusso (latino)
+Danish	Keyboard Layout View		Danese
 Open…	Keymap window		Apri…
+Russian (Typewriter)	Keyboard Layout View		Russa (macchina da scrivere)
+Error: duplicate keys	Modifier keys window		Errore: tasto duplicato
 System:	Keymap window		Sistema:
+Lithuanian	Keyboard Layout View		Lituano
+Finnish	Keyboard Layout View		Finnico
+Svorak	Keyboard Layout View		Svorak
+Left command	Keyboard Layout View		Command sinistro
+Romanian	Keyboard Layout View		Romeno
+Set modifier keys…	Keymap window		Imposta tasti modificatori…
+Option:	Modifier keys window	Option key role name	Opzione:
+Czech (Mac)	Keyboard Layout View		Ceco (Mac)
+Control	Keyboard Layout View	Control key	Control
+Left option	Keyboard Layout View		Opzione sinistro
+Portuguese	Keyboard Layout View		Portoghese
+Right control	Keyboard Layout View		Control destro
+Belgian (point)	Keyboard Layout View		Belga (punto)
 Switch shortcut keys	Keymap window		Tasti di scelta rapida
+Norwegian	Keyboard Layout View		Norvegese
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tasto Maiusc
 User:	Keymap window		Utente:
-Sample and clipboard:	Keymap window		Prova campione e appunti:
+Esperanto	Keyboard Layout View		Esperanto
+Arabic (102)	Keyboard Layout View		Arabo (102)
+United-Kingdom	Keyboard Layout View		Regno Unito
+German (Mac)	Keyboard Layout View		Tedesco (Mac)
+Right option	Keyboard Layout View		Option destro
+Right shift	Keyboard Layout View		Maiusc destro
+Key	Modifier keys window	As in a computer keyboard key	Tasto
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tasto Ctrl
+Control:	Modifier keys window	Control key role name	Control:
+Brazilian	Keyboard Layout View		Brasiliano
+Remove	Keyboard Layout View		Rimuovi
+Brazilian (ABNT2)	Keyboard Layout View		Brasiliano (ABNT-2)
+French (Bépo)	Keyboard Layout View		Francese (bépo)
+Option	Keyboard Layout View	Option key	Option
+US-International	Keyboard Layout View		Stati Uniti - internazionale
+Sample and clipboard:	Keymap window		Area di prova:
+Swiss-German	Keyboard Layout View		Tedesco (Svizzera)
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tasto Alt/Opt
 Layout	Keymap window		Layout
-Switch shortcut keys to Windows/Linux mode	Keymap window		Tasti di scelta rapida in modalità Windows/Linux
+Switch shortcut keys to Windows/Linux mode	Keymap window		Modalità tasti di scelta rapida: Windows/Linux
+Albanian	Keyboard Layout View		Albanese
+Right command	Keyboard Layout View		Command destro
 Revert	Keymap window		Ripristina
+Command:	Modifier keys window	Command key role name	Comando:
+Latin-American	Keyboard Layout View		America Latina
+Spanish (Dvorak)	Keyboard Layout View		Spagnolo (Dvorak)
+Lithuanian (Standard)	Keyboard Layout View		Lituana (standard)
+Canadian-French	Keyboard Layout View		Francese (Canada)
+Irish	Keyboard Layout View		Gaelico
+Turkish (Type-F)	Keyboard Layout View		Turco (Tipo F)
+Slovene	Keyboard Layout View		Sloveno
+Turkish (Type-Q)	Keyboard Layout View		Turco (Tipo Q)
 Save as…	Keymap window		Salva come…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tasto Win/Cmd
+Serbian (Latin)	Keyboard Layout View		Serbo (latino)
 File	Keymap window		File
+Num lock	Keyboard Layout View		Bloc Num
+Swedish	Keyboard Layout View		Svedese
+Macedonian	Keyboard Layout View		Macedone
 (Current)	Keymap window		(Attuale)
 Font	Keymap window		Font
-Acute trigger	Keymap window		Attivatore accento acuto
+Keymap	System name		Mappa Tastiera
+French (Mac)	Keyboard Layout View		Francese (Mac)
+Left shift	Keyboard Layout View		Maiusc sinistro
+Shift	Keyboard Layout View	Shift key	Maiusc
+Ukrainian	Keyboard Layout View		Ucraino
+Croatian	Keyboard Layout View		Croato
+Kazakh	Keyboard Layout View		Kazako
+Czech	Keyboard Layout View		Ceco
+Set modifier keys	Modifier keys window		Imposta i tasti modificatori
+Colemak	Keyboard Layout View		Colemak
+Modifier keys	Modifier keys window		Tasti modificatori
+Acute trigger	Keymap window		Acuto

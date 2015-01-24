@@ -1,21 +1,23 @@
-1	italian	x-vnd.Haiku-Media	4081089471
+1	italian	x-vnd.Haiku-Media	2163090586
 Couldn't add volume control in Deskbar: %s\n	Media views		Non è stato possibile aggiungere il controllo del volume nella Deskbar: %s\n
 Ready for use…	Media Window		Pronto all'uso…
 Video input:	Media views		Ingresso Video:
-Waiting for media_server to quit.	Media Window		In attesa del media_server per uscire.
+Waiting for media_server to quit.	Media Window		In attesa della chiusura di media_server.
 Cleaning up.	Media Window		Pulizia in corso.
 Defaults	Media views		Predefiniti
-Stopping media server…	Media Window		Interruzione del media server…
+MIDI Settings	Media Window		Impostazioni MIDI
+Stopping media server…	Media Window		Arresto di media server in corso…
 Quit	Media Window		Esci
-Starting media server…	Media Window		Avvio media server…
+Starting media server…	Media Window		Avvio di media server in corso…
 Done shutting down.	Media Window		Spegnimento effettuato.
 Video settings	Media Window		Impostazioni video
 Video output:	Media views		Uscita Video:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossibile connettersi al media server.\nVuoi avviarlo?
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossibile connettersi al media server.\nAvviarlo?
 Restart media services	Media views		Riavvio servizi media
 Couldn't remove volume control in Deskbar: %s\n	Media views		Non è stato possibile rimuovere il controllo del volume nella Deskbar: %s\n
 Media	System name		Media
-Telling media_addon_server to quit.	Media Window		Richiesta di uscita al media_addon_server.
+Telling media_addon_server to quit.	Media Window		Inviata richiesta di chiusura a media_addon_server.
+Media Service	Media Window		Servizio Media
 Audio mixer	Media Window		Mixer audio
 This hardware has no controls.	Media Window		Questo hardware non possiede controlli.
 Audio output:	Media views		Uscite Audio:
@@ -23,5 +25,5 @@ Audio settings	Media Window		Impostazioni Audio
 Start media server	Media Window		Avvia media server
 <none>	Media views		<niente>
 Channel:	Media views		Canale:
-Show volume control on Deskbar	Media views		Mostra controllo volume nella Deskbar
+Show volume control on Deskbar	Media views		Mostra controlli volume nella Deskbar
 Audio input:	Media views		Ingresso audio:

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	3100494273
+1	russian	x-vnd.Haiku-MediaPlayer	3986494780
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Новый плеер…
 100% scale	MediaPlayer-Main		Масштаб 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Расположение субтитров:
 Close	MediaPlayer-Main		Закрыть
-Display Mode	MediaPlayer-InfoWin		Режим показа
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Некоторые файлы не могут быть перемещены в Корзину.
 <unknown>	MediaPlayer-InfoWin		<неизвестно>
 Seek	MediaPlayer-Main		Поиск
@@ -125,7 +124,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Переместить в кор�
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Выключить звук
 Toggle pause/play.	MediaPlayer-Main		Переключить паузу/проигрывание.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit: 
 min	MediaPlayer-InfoWin	Minutes	мин
 Small	MediaPlayer-SettingsWindow		маленький
 Randomize	MediaPlayer-PlaylistWindow		Перемешать

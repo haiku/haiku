@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	68841021
+1	polish	x-vnd.Haiku-MediaPlayer	954841528
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Nowy odtwarzacz…
 100% scale	MediaPlayer-Main		100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Położenie napisów:
 Close	MediaPlayer-Main		Zamknij
-Display Mode	MediaPlayer-InfoWin		Tryb wyświetlania
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kilka plików nie mogło być przeniesionych do Kosza.
 <unknown>	MediaPlayer-InfoWin		<nieznany>
 Seek	MediaPlayer-Main		Przewiń
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Przenieś plik do Kosza
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Wycisz
 Toggle pause/play.	MediaPlayer-Main		Przełącz wstrzymanie/odtwarzanie.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit: 
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Małe
 Randomize	MediaPlayer-PlaylistWindow		Wymieszaj

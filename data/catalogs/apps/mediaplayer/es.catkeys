@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	3507634633
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	98667844
 raw audio	MediaPlayer-InfoWin		audio bruto
 Location	MediaPlayer-InfoWin		Ubicación
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Nuevo reproductor de medios...
 100% scale	MediaPlayer-Main		Escala al 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Posición del subtítulo
 Close	MediaPlayer-Main		Cerrar
-Display Mode	MediaPlayer-InfoWin		Modo de visualización
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		No se pudo poner algunos archivos en la papelera.
 <unknown>	MediaPlayer-InfoWin		<desconocido>
 Seek	MediaPlayer-Main		Buscar
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Mover archivo a la papelera
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Silenciar
 Toggle pause/play.	MediaPlayer-Main		Pausar/Reproducir
-Haiku Media Kit: 	MediaPlayer-InfoWin		Kit Multimedia de Haiku: 
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Pequeño
 Randomize	MediaPlayer-PlaylistWindow		Aleatorio

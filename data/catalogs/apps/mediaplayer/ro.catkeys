@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	3541682348
+1	romanian	x-vnd.Haiku-MediaPlayer	1015250753
 Location	MediaPlayer-InfoWin		Locaţie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 Stream settings	MediaPlayer-Main		Configurări flux
@@ -113,7 +113,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Mută fișierul la Gunoi
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Mut
 Toggle pause/play.	MediaPlayer-Main		Comută pornit/oprit.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Kit Media: 
 min	MediaPlayer-InfoWin	Minutes	minute
 Small	MediaPlayer-SettingsWindow		Mic
 Randomize	MediaPlayer-PlaylistWindow		Amestecă aleator

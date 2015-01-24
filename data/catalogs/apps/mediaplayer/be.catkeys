@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	3507634633
+1	belarusian	x-vnd.Haiku-MediaPlayer	98667844
 raw audio	MediaPlayer-InfoWin		нефарматаване аўдыё
 Location	MediaPlayer-InfoWin		Месцазнаходжанне
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Новы плеер…
 100% scale	MediaPlayer-Main		Маштаб 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Месцазнаходжанне субтытраў:
 Close	MediaPlayer-Main		Закрыць
-Display Mode	MediaPlayer-InfoWin		Рэжым паказу
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Нельга адправіць некаторыя файлы ў Сметніцу.
 <unknown>	MediaPlayer-InfoWin		<невядома>
 Seek	MediaPlayer-Main		Пракруціць
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Перасунуць файл у 
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Выкл. гук
 Toggle pause/play.	MediaPlayer-Main		Прыпыніць/працягваць.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit: 
 min	MediaPlayer-InfoWin	Minutes	хв
 Small	MediaPlayer-SettingsWindow		Маленькі
 Randomize	MediaPlayer-PlaylistWindow		Перамяшаць

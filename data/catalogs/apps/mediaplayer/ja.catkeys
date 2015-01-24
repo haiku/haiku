@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	68841021
+1	japanese	x-vnd.Haiku-MediaPlayer	954841528
 raw audio	MediaPlayer-InfoWin		raw オーディオ
 Location	MediaPlayer-InfoWin		場所
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		新規プレーヤー…
 100% scale	MediaPlayer-Main		100% 表示
 Subtitle placement:	MediaPlayer-SettingsWindow		字幕の位置:
 Close	MediaPlayer-Main		閉じる
-Display Mode	MediaPlayer-InfoWin		表示モード
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		いくつかのファイルはごみ箱に移動できませんでした。
 <unknown>	MediaPlayer-InfoWin		<不明>
 Seek	MediaPlayer-Main		シーク
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		ファイルをごみ箱に移動
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		ミュート
 Toggle pause/play.	MediaPlayer-Main		一時停止 / 再生
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku メディアキット:
 min	MediaPlayer-InfoWin	Minutes	分
 Small	MediaPlayer-SettingsWindow		小
 Randomize	MediaPlayer-PlaylistWindow		ランダムに並べ替え

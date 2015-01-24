@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	3507634633
+1	lithuanian	x-vnd.Haiku-MediaPlayer	98667844
 raw audio	MediaPlayer-InfoWin		neapdorotas garso įrašas
 Location	MediaPlayer-InfoWin		Vieta
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikietiškas)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Nauja leistuvė…
 100% scale	MediaPlayer-Main		Mastelis 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Subtitrų padėtis:
 Close	MediaPlayer-Main		Užverti
-Display Mode	MediaPlayer-InfoWin		Rodymo būdas
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kai kurių failų išmesti Šiukšlinėn nepavyko.
 <unknown>	MediaPlayer-InfoWin		<nežinomas>
 Seek	MediaPlayer-Main		Pervynioti
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Išmesti failą Šiukšlinėn
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Nutildyti
 Toggle pause/play.	MediaPlayer-Main		Leisti / pristabdyti.
-Haiku Media Kit: 	MediaPlayer-InfoWin		„Haiku“ medijos įrankinė: 
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Mažas
 Randomize	MediaPlayer-PlaylistWindow		Sumaišyti

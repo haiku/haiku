@@ -70,7 +70,7 @@ Log out	MainWindow		ログアウト
 Education	Model		教育
 Search terms:	FilterView		検索語句:
 %Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		ユーザー格付けがありません。
+No user ratings available.	PackageInfoView		ユーザー評価がありません。
 Failed to update rating	RatePackageWindow		評価の更新に失敗しました
 Does not start	RatePackageWindow		開始しない
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		リポジトリの更新中にエラーが発生しました: %error% (%details%)

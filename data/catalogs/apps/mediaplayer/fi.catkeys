@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	68841021
+1	finnish	x-vnd.Haiku-MediaPlayer	954841528
 raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Uusi soitin...
 100% scale	MediaPlayer-Main		100 % skaala
 Subtitle placement:	MediaPlayer-SettingsWindow		Tekstityksen sijainti:
 Close	MediaPlayer-Main		Sulje
-Display Mode	MediaPlayer-InfoWin		Näyttötila
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Joidenkin tiedostojen siirtäminen roskakoriin epäonnistui.
 <unknown>	MediaPlayer-InfoWin		<tuntematon>
 Seek	MediaPlayer-Main		Etsi
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Siirrä tiedosto roskakoriin
 URI	MediaPlayer-Main		Internet-resurssin tunnus
 Mute	MediaPlayer-Main		Mykistä
 Toggle pause/play.	MediaPlayer-Main		Vuorottele tauko/soita -tiloja.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit: 
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Pieni
 Randomize	MediaPlayer-PlaylistWindow		Satunnaista

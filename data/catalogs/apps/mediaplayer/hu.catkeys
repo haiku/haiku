@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	68841021
+1	hungarian	x-vnd.Haiku-MediaPlayer	954841528
 raw audio	MediaPlayer-InfoWin		nyers audio
 Location	MediaPlayer-InfoWin		Útvonal
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikai)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Új lejátszó…
 100% scale	MediaPlayer-Main		100%-os méret
 Subtitle placement:	MediaPlayer-SettingsWindow		Felirat helye:
 Close	MediaPlayer-Main		Bezárás
-Display Mode	MediaPlayer-InfoWin		Megjelenítési mód
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Néhány elemet nem lehetett a Szemetesbe helyezni.
 <unknown>	MediaPlayer-InfoWin		<ismeretlen>
 Seek	MediaPlayer-Main		Keresés
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Fájl Szemetesbe helyezése
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Némítás
 Toggle pause/play.	MediaPlayer-Main		Szünetletés/lejátszás közti váltás.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit:
 min	MediaPlayer-InfoWin	Minutes	perc
 Small	MediaPlayer-SettingsWindow		Kicsi
 Randomize	MediaPlayer-PlaylistWindow		Véletlenszerű

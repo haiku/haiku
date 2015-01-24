@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-PRNT	2906062670
+1	italian	x-vnd.Be-PRNT	2674539197
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Stampante: %printer_name%\nDriver: %driver%\n
 Waiting	JobListView		In attesa
 Print test page	PrintersWindow		Stampa pagina di prova
@@ -11,32 +11,33 @@ Green	TestPageView		Verde
 Printers	PrintersWindow		Stampanti
 Default Printer	PrinterListView		Stampante predefinita
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
-No pending jobs.	PrinterListView		Nessun lavoro in sospeso
+No pending jobs.	PrinterListView		Nessuna stampa in coda.
 pages	JobListView		pagine
-Printers	System name		Printers
-Processing	JobListView		In corso
+Printers	System name		Stampanti
+Processing	JobListView		Esecuzione in corso
 Red	TestPageView		Rosso
-Printer name:	AddPrinterDialog		Nome della stampante
+Printer name:	AddPrinterDialog		Nome della stampante:
 Driver: %driver%	PrinterListView		Driver: %driver%
+ pending jobs.	PrinterListView		 stampe in coda.
 Black	TestPageView		Nero
-Restart job	PrintersWindow		Riavvia la stampa
+Restart job	PrintersWindow		Stampa nuovamente
 Add	AddPrinterDialog		Aggiungi
 Make default	PrintersWindow		Rendi predefinita
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
 Cancel job	PrintersWindow		Annulla la stampa
 Yellow	TestPageView		Giallo
 Blue	TestPageView		Blu
-1 pending job.	PrinterListView		1 stampa in attesa.
+1 pending job.	PrinterListView		1 stampa in coda.
 Remove	PrintersWindow		Rimuovere
 <pick one>	AddPrinterDialog		<scegliere>
-Add …	PrintersWindow		Aggiungi ...
-Print jobs for 	PrintersWindow		Stampante in attesa per
+Add …	PrintersWindow		Aggiungi…
+Print jobs for 	PrintersWindow		Stampe di 
 Failed	JobListView		Fallita
 %.2f KB	JobListView		%.2f KB
 Magenta	TestPageView		Magenta
 Completed	JobListView		Completata
-No printer found!	TransportMenu		Nessuna stampante trovata!
-Print jobs: No printer selected	PrintersWindow		Stampa: nessuna stampante selezionata
+No printer found!	TransportMenu		Nessuna stampante trovata
+Print jobs: No printer selected	PrintersWindow		Nessuna stampante selezionata
 Cyan	TestPageView		Ciano
 Unknown status	JobListView		Status sconosciuto
 Connected to:	AddPrinterDialog		Connesso a:

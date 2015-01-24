@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-FileTypes	3583076725
+1	italian	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		Tipi dell'applicazione…
 Description:	Application Types Window		Descrizione
 Args only	Application Type Window		Solo argomenti
@@ -48,20 +48,24 @@ Name:	Application Types Window		Nome
 Group name:	New File Type Window		Nome del gruppo:
 Preferred application	FileType Window		Applicazione preferita
 Progress	Application Types Window		Progresso
+Set preferred application	Preferred App Menu		Seleziona l'applicazione preferita
+Don't save	Application Type Window		Non salvare
+Save changes before closing?	Application Type Window		Salvare le modifiche prima di uscire?
 File	Application Type Window		File
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Tipo di applicazione può essere rimosso} other{# Tipi di Applicazione possono essere rimossi}}
 Version:	Application Type Window		Versione:
 Select…	FileTypes Window		Seleziona…
 FileTypes request	FileTypes		Richiesta di FileTypes
 Open…	FileTypes Window		Apri…
 Select…	FileType Window		Seleziona…
 Launch	Application Types Window		Avvia
-Same as…	FileType Window	The same APPLICATION as ...	La stessa di...
+Same as…	FileType Window	The same APPLICATION as ...	La stessa di…
 Abort	Application Types Window		Annulla
 FileTypes	FileTypes		FileTypes
 OK	FileTypes		Ok
 Extra attributes	FileTypes Window		Attributi extra
 Development	Application Type Window		Sviluppo
-Edit…	Application Types Window		Modifica
+Edit…	Application Types Window		Modifica…
 Icon	FileType Window		Icona
 Final	Application Types Window		Finale
 Development	Application Types Window		Sviluppo
@@ -120,7 +124,7 @@ Attribute name:	Attribute Window		Nome attributo:
 Extension	Extension Window		Estensione
 Add type	New File Type Window		Aggiungi tipo
 Internal name:	Attribute Window		Nome intrinseco:
-Show in Tracker…	Application Types Window		Mostra nel Tracker
+Show in Tracker…	Application Types Window		Mostra nel Tracker…
 Final	Application Type Window		Finale
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Larghezza:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Mostra come:
@@ -147,7 +151,7 @@ Short description:	Application Type Window		Descrizione breve:
 File could not be opened	Preferred App Menu		Impossibile aprire il file
 Could not change file extensions	Extension Window		Impossibile modificare le estensioni del file
 Edit icon…	Icon View		Modifica icona…
-Same as…	FileType Window	The same TYPE as ...	Lo stesso di...
+Same as…	FileType Window	The same TYPE as ...	Lo stesso di…
 Save into resource file…	Application Type Window		Salva in un file risorsa…
 Visible	Attribute Window		Visibile
 Could not install file type	New File Type Window		Impossibile installare il tipo di file

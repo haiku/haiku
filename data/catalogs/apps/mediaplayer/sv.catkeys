@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	68841021
+1	swedish	x-vnd.Haiku-MediaPlayer	954841528
 raw audio	MediaPlayer-InfoWin		raw-ljud
 Location	MediaPlayer-InfoWin		Plats
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Ny spelare...
 100% scale	MediaPlayer-Main		Skala till 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Undertextsplacering:
 Close	MediaPlayer-Main		Stäng
-Display Mode	MediaPlayer-InfoWin		Visningsläge
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Några filer kunde inte flyttas till Papperskorgen.
 <unknown>	MediaPlayer-InfoWin		<okänd>
 Seek	MediaPlayer-Main		Sök
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Flytta filen till Papperskorgen
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Tyst läge
 Toggle pause/play.	MediaPlayer-Main		Aktivera pause/play.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit: 
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Liten
 Randomize	MediaPlayer-PlaylistWindow		Slumpa

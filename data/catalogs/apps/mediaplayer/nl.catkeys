@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	453757450
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1339757957
 raw audio	MediaPlayer-InfoWin		ruwe audio
 Location	MediaPlayer-InfoWin		Locatie
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Nieuwe speler...
 100% scale	MediaPlayer-Main		100% schaal
 Subtitle placement:	MediaPlayer-SettingsWindow		Positie van de ondertitels:
 Close	MediaPlayer-Main		Afsluiten
-Display Mode	MediaPlayer-InfoWin		Weergavemodus
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Sommige bestanden konden niet naar Trash worden verplaatst.
 <unknown>	MediaPlayer-InfoWin		<onbekend>
 Open	MediaPlayer-Main		Openen
@@ -122,7 +121,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Bestand naar de prullenbak verpla
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Geen geluid
 Toggle pause/play.	MediaPlayer-Main		Schakelen tussen pauzeren/afspelen.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit:
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Klein
 Randomize	MediaPlayer-PlaylistWindow		Randomizeren

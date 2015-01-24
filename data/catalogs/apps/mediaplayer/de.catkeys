@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	68841021
+1	german	x-vnd.Haiku-MediaPlayer	954841528
 raw audio	MediaPlayer-InfoWin		Raw-Audio
 Location	MediaPlayer-InfoWin		Ort
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Neuer Player…
 100% scale	MediaPlayer-Main		100% Zoom
 Subtitle placement:	MediaPlayer-SettingsWindow		Untertitelposition:
 Close	MediaPlayer-Main		Schließen
-Display Mode	MediaPlayer-InfoWin		Anzeigemodus
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Einige Dateien konnten nicht in den Papierkorb verschoben werden.
 <unknown>	MediaPlayer-InfoWin		<unbekannt>
 Seek	MediaPlayer-Main		Suchlauf
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		In Papierkorb verschieben
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Stumm
 Toggle pause/play.	MediaPlayer-Main		Pause/Wiedergabe umschalten.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit: 
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Klein
 Randomize	MediaPlayer-PlaylistWindow		Zufällige Reihenfolge

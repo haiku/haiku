@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	2469553323
+1	italian	x-vnd.Haiku-MediaPlayer	3355553830
 raw audio	MediaPlayer-InfoWin		audio grezzo
 Location	MediaPlayer-InfoWin		Luogo
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Nuova riproduzione…
 100% scale	MediaPlayer-Main		Scala 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Posizione dei sottotitoli:
 Close	MediaPlayer-Main		Chiudi
-Display Mode	MediaPlayer-InfoWin		Modalità di visualizzazione
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Impossibile spostare alcuni file nel Cestino.
 <unknown>	MediaPlayer-InfoWin		<sconosciuto>
 Seek	MediaPlayer-Main		Scorri
@@ -122,7 +121,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Sposta file nel Cestino
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Disattiva audio
 Toggle pause/play.	MediaPlayer-Main		Pausa/Riproduci
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku Media Kit: 
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Piccolo
 Randomize	MediaPlayer-PlaylistWindow		Casuale

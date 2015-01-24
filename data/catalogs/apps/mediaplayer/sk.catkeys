@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	453757450
+1	slovak	x-vnd.Haiku-MediaPlayer	1339757957
 raw audio	MediaPlayer-InfoWin		nespracovaný zvuk
 Location	MediaPlayer-InfoWin		Umiestnenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (americký)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Nový prehrávač…
 100% scale	MediaPlayer-Main		100% zmena veľkosti
 Subtitle placement:	MediaPlayer-SettingsWindow		Umiestnenie titulkov:
 Close	MediaPlayer-Main		Zatvoriť
-Display Mode	MediaPlayer-InfoWin		Zobrazovací režim
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Niektoré súbory nebolo možné presunúť do Koša.
 <unknown>	MediaPlayer-InfoWin		<neznámy>
 Open	MediaPlayer-Main		Otvoriť
@@ -122,7 +121,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Presunúť súbor do Koša
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Stlmiť
 Toggle pause/play.	MediaPlayer-Main		Prepnúť pozastavenie/prehrávanie.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Multimediálna sada Haiku: 
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Malá
 Randomize	MediaPlayer-PlaylistWindow		Náhodne

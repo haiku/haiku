@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	3507634633
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	98667844
 raw audio	MediaPlayer-InfoWin		áudio não processado
 Location	MediaPlayer-InfoWin		Local
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Novo tocador…
 100% scale	MediaPlayer-Main		escala de 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Colocação de legendas:
 Close	MediaPlayer-Main		Fechar
-Display Mode	MediaPlayer-InfoWin		Modo de Exibição
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alguns arquivos não puderam ser movidos para a Lixeira.
 <unknown>	MediaPlayer-InfoWin		<desconhecido>
 Seek	MediaPlayer-Main		Procurar
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Mover o arquivo para a Lixeira
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Mudo
 Toggle pause/play.	MediaPlayer-Main		Alternar pausa/reprodução.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Kit de Mídia do Haiku:
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Pequeno
 Randomize	MediaPlayer-PlaylistWindow		Aleatório

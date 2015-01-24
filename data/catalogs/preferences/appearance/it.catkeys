@@ -1,5 +1,6 @@
-1	italian	x-vnd.Haiku-Appearance	963859935
-Control highlight	Colors tab		Evidenziazione  del controllo
+1	italian	x-vnd.Haiku-Appearance	727801787
+Plain font:	Font view		Tipo di carattere:
+Control highlight	Colors tab		Evidenziazione del controllo
 Control border	Colors tab		Bordi del controllo
 Antialiasing type:	AntialiasingSettingsView		Tipo di antialias:
 Shadow	Colors tab		Ombra
@@ -8,12 +9,14 @@ Defaults	APRWindow		Predefiniti
 Grayscale	AntialiasingSettingsView		Scala di grigio
 Shine	Colors tab		Brillantezza
 About	DecorSettingsView		Informazioni su
+About decorator	DecorSettingsView		Informazioni sul decoratore
 Off	AntialiasingSettingsView		Disattivato
 Choose Decorator	DecorSettingsView		Scegli decorazione
 Success	Colors tab		Successo
 Inactive window tab text	Colors tab		Testo della linguetta della finestra inattiva
 Failure	Colors tab		Insuccesso
 Hinting menu	AntialiasingSettingsView		Menu dei suggerimenti
+Scroll bar:	DecorSettingsView		Barra di scorrimento:
 Document background	Colors tab		Sfondo del documento
 Revert	APRWindow		Ripristina
 Window tab	Colors tab		Linguetta della finestra
@@ -21,28 +24,46 @@ Tooltip background	Colors tab		Sfondo dei suggerimenti
 Selected menu item background	Colors tab		Sfondo della voce selezionata nel menu
 Antialiasing	APRWindow		Antialiasing
 Navigation base	Colors tab		Base del navigatore
+Selected list item text	Colors tab		Testo della voce selezionata nella lista
 Window border	Colors tab		Bordo finestra
+Double:	DecorSettingsView		Doppio:
 Window tab text	Colors tab		Testo della linguetta sulla finestra
 Document text	Colors tab		Testo del documento
 Navigation pulse	Colors tab		Navigation pulse
 Selected menu item text	Colors tab		Testo della voce selezionata nel menu
 Menu background	Colors tab		Sfondo del menu
-OK	DecorSettingsView		Ok
+List background	Colors tab		Sfondo della lista
+OK	DecorSettingsView		OK
+Control mark	Colors tab		Marcatore del controllo
+Size:	Font Selection view		Dimensione:
+Decorator:	DecorSettingsView		Decoratore:
+Selected list item background	Colors tab		Sfondo della voce selezionata nella lista
 Panel background	Colors tab		Sfondo del pannello
+Menu font:	Font view		Tipo di carattere del menu:
 Colors	APRWindow		Colori
 Control background	Colors tab		Sfondo del controllo
-Inactive window tab	Colors tab		Testo della linguetta sulla finestra inattiva
+Inactive window tab	Colors tab		Tab della finestra inattiva
+List item text	Colors tab		Testo dell'elemento della lista
 Appearance	System name		Aspetto
+Fixed font:	Font view		Carattere a spaziatura fissa:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Cantami, o Diva, del Pelide Achille l'ira funesta
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicenza: %decorLic\n\n%decorDesc\n
 Reduce colored edges filter strength:	AntialiasingSettingsView		Intensità del filtro di riduzione del bordi colorati:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		L'antialias con sub-pixel in combinazione con l'adattamento del glifo non è disponibile in questa versione di Haiku per evitare possibili problemi dovuti ai brevetti, per attivare questa funzionalità è necessario compilare da soli Haiku e abilitare alcune opzioni nell'intestazione di libfreetype.
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		L'antialias con sub-pixel in combinazione con l'hinting dei glifi non è disponibile in questa versione di Haiku per evitare accuse di violazione di brevetti. Per attivare questa funzionalità è necessario compilare da soli Haiku e abilitare alcune opzioni nella configurazione di libfreetype.
+Scroll bar thumb	Colors tab		Maniglia della barra di scorrimento
 Control text	Colors tab		Testo del controllo
+Single:	DecorSettingsView		Singolo:
 Tooltip text	Colors tab		Testo del suggerimento
+Bold font:	Font view		Carattere in grassetto:
 Inactive window border	Colors tab		Bordo finestra inattiva
 Menu item text	Colors tab		Testo della voce nel menu
 LCD subpixel	AntialiasingSettingsView		Sub-pixel LCD
 Selected menu item border	Colors tab		Bordo della voce selezionata nel menu
 Strong	AntialiasingSettingsView		Forte
 Panel text	Colors tab		Testo del pannello
+Arrow style	DecorSettingsView		Stile estremità linea
 Monospaced fonts only	AntialiasingSettingsView		Solo font con spaziatura fissa
-Antialiasing menu	AntialiasingSettingsView		Menu antialias
-Glyph hinting:	AntialiasingSettingsView		Adattamento glifo:
+Look and feel	APRWindow		Aspetto
+Antialiasing menu	AntialiasingSettingsView		Antialiasing sul menu
+Fonts	APRWindow		Tipi di carattere
+Glyph hinting:	AntialiasingSettingsView		Hinting dei glifi:

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaPlayer	68841021
+1	french	x-vnd.Haiku-MediaPlayer	954841528
 raw audio	MediaPlayer-InfoWin		audio brut
 Location	MediaPlayer-InfoWin		Emplacement
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
@@ -18,7 +18,6 @@ New player…	MediaPlayer-Main		Nouveau lecteur…
 100% scale	MediaPlayer-Main		Échelle 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Emplacement des sous-titres :
 Close	MediaPlayer-Main		Fermer
-Display Mode	MediaPlayer-InfoWin		Modes d’affichage
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Certains fichiers n’ont pas pu être envoyés à la corbeille.
 <unknown>	MediaPlayer-InfoWin		<inconnu>
 Seek	MediaPlayer-Main		Rechercher
@@ -126,7 +125,6 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Envoyer le fichier à la corbeill
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		Muet
 Toggle pause/play.	MediaPlayer-Main		Basculer entre lecture et pause.
-Haiku Media Kit: 	MediaPlayer-InfoWin		Média Kit Haiku : 
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Petit
 Randomize	MediaPlayer-PlaylistWindow		Mélanger
