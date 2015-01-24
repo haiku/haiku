@@ -67,7 +67,7 @@ RemotePackageRepository HaikuPorts
 	distcc-3.1-3
 	dmidecode-2.12-2
 	dos2unix-1.0.1-1
-	doxygen-1.6.3-3
+	doxygen-1.7.6.1-1
 	ducksaver-1.1.0-2
 	ed-1.7-1
 	expat-2.1.0-1
@@ -104,13 +104,12 @@ RemotePackageRepository HaikuPorts
 	giddy3-1.4-1
 	giflib-5.0.5-2
 	giflib_devel-5.0.5-2
-	git-1.8.3.4-4
-	git_arch-1.8.3.4-4
-	git_cvs-1.8.3.4-4
-	git_daemon-1.8.3.4-4
-	git_email-1.8.3.4-4
-	git_remote_helpers-1.8.3.4-4
-	git_svn-1.8.3.4-4
+	git-2.2.2-1
+	git_arch-2.2.2-1
+	git_cvs-2.2.2-1
+	git_daemon-2.2.2-1
+	git_email-2.2.2-1
+	git_svn-2.2.2-1
 	glew-1.11.0-1
 	glew_devel-1.11.0-1
 	glew_util-1.11.0-1
@@ -273,6 +272,7 @@ RemotePackageRepository HaikuPorts
 	pe-2.4.5-1
 	pecorename-1.5-3
 	perl-5.18.2-2
+	php-5.6.4-3
 	physfs-2.0.3-1
 	physfs_devel-2.0.3-1
 	pipepanic-0.1.3-3
@@ -367,7 +367,7 @@ RemotePackageRepository HaikuPorts
 	yasm-1.2.0-3
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
-	zsh-5.0.2-1
+	zsh-5.0.7-1
 
 	# secondary architecture (x86)
 	arm_none_eabi_binutils_x86-2.24_2014_03_19-6
@@ -456,6 +456,7 @@ RemotePackageRepository HaikuPorts
 	glu_x86_devel-9.0.0-4
 	gmp_x86-6.0.0-1
 	gmp_x86_devel-6.0.0-1
+	golang_x86-1.3-2
 	goonies_x86-1.4.1528-1
 	gpgme_x86-1.5.2-2
 	gpgme_x86_devel-1.5.2-2
@@ -605,7 +606,7 @@ RemotePackageRepository HaikuPorts
 	quassel_x86-0.10.0-2
 	quicklaunch-0.9.9-1
 	qupzilla_x86-1.7.x-4
-	rcs_x86-5.9.3-1
+	rcs_x86-5.9.3-2
 	readline_x86-6.3-2
 	readline_x86_devel-6.3-2
 	rocksndiamonds_x86-3.3.1.2-2
@@ -751,6 +752,7 @@ RemotePackageRepository HaikuPorts
 	glib2_x86
 	glu
 	gmp
+	golang_x86
 	gnupg
 	goonies_x86
 	gperf
@@ -893,6 +895,7 @@ RemotePackageRepository HaikuPorts
 	pe
 	pecorename
 	perl
+	php
 	physfs
 	pipepanic
 	pixman_x86
