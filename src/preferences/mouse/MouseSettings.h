@@ -27,6 +27,7 @@ public:
 		~MouseSettings();
 
 		void Revert();
+		bool IsRevertable();
 		void Defaults();
 		bool IsDefaultable();
 		void Dump();

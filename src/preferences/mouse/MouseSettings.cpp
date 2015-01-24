@@ -241,6 +241,23 @@ MouseSettings::Revert()
 }
 
 
+// Checks if the settings are different then the original settings
+bool
+MouseSettings::IsRevertable()
+{
+	return fSettings.click_speed != fOriginalSettings.click_speed
+		|| fSettings.accel.speed != fOriginalSettings.accel.speed
+		|| fSettings.type != fOriginalSettings.type
+		|| fSettings.accel.accel_factor != fOriginalSettings.accel.accel_factor
+		|| fMode != fOriginalMode
+		|| fFocusFollowsMouseMode != fOriginalFocusFollowsMouseMode
+		|| fAcceptFirstClick != fOriginalAcceptFirstClick
+		|| fSettings.map.button[0] != fOriginalSettings.map.button[0]
+		|| fSettings.map.button[1] != fOriginalSettings.map.button[1]
+		|| fSettings.map.button[2] != fOriginalSettings.map.button[2];
+}
+
+
 void
 MouseSettings::SetWindowPosition(BPoint corner)
 {
