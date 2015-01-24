@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -383,7 +383,8 @@ BPackageManager::JobProgress(BJob* job)
 	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
 		FetchFileJob* fetchJob = (FetchFileJob*)job;
 		fUserInteractionHandler->ProgressPackageDownloadActive(
-			fetchJob->DownloadFileName(), fetchJob->DownloadProgress());
+			fetchJob->DownloadFileName(), fetchJob->DownloadProgress(),
+			fetchJob->DownloadBytes(), fetchJob->DownloadTotalBytes());
 	}
 }
 
@@ -1105,7 +1106,8 @@ BPackageManager::UserInteractionHandler::ProgressPackageDownloadStarted(
 
 void
 BPackageManager::UserInteractionHandler::ProgressPackageDownloadActive(
-	const char* packageName, float completionPercentage)
+	const char* packageName, float completionPercentage, off_t bytes,
+	off_t totalBytes)
 {
 }
 

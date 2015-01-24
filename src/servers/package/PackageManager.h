@@ -65,7 +65,8 @@ private:
 									const char* packageName);
 	virtual	void				ProgressPackageDownloadActive(
 									const char* packageName,
-									float completionPercentage);
+									float completionPercentage,
+									off_t bytes, off_t totalBytes);
 	virtual	void				ProgressPackageDownloadComplete(
 									const char* packageName);
 	virtual	void				ProgressPackageChecksumStarted(

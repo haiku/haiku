@@ -1,10 +1,11 @@
 /*
- * Copyright 2011-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Oliver Tappe <zooey@hirschkaefer.de>
+ *		Axel Dörfler <axeld@pinc-software.de>
  *		Rene Gollent <rene@gollent.com>
+ *		Oliver Tappe <zooey@hirschkaefer.de>
  */
 
 
@@ -62,6 +63,20 @@ FetchFileJob::DownloadFileName() const
 }
 
 
+off_t
+FetchFileJob::DownloadBytes() const
+{
+	return fBytes;
+}
+
+
+off_t
+FetchFileJob::DownloadTotalBytes() const
+{
+	return fTotalBytes;
+}
+
+
 status_t
 FetchFileJob::Execute()
 {
@@ -77,8 +92,8 @@ FetchFileJob::Execute()
 
 	result = curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 0);
 
-	result = curl_easy_setopt(handle, CURLOPT_PROGRESSFUNCTION,
-		&_ProgressCallback);
+	result = curl_easy_setopt(handle, CURLOPT_XFERINFOFUNCTION,
+		&_TransferCallback);
 	if (result != CURLE_OK)
 		return B_BAD_VALUE;
 
@@ -117,12 +132,14 @@ FetchFileJob::Execute()
 
 
 int
-FetchFileJob::_ProgressCallback(void *userp, double dltotal, double dlnow,
-	double ultotal,	double ulnow)
+FetchFileJob::_TransferCallback(void* _job, off_t downloadTotal,
+	off_t downloaded, off_t uploadTotal, off_t uploaded)
 {
-	FetchFileJob* job = reinterpret_cast<FetchFileJob*>(userp);
-	if (dltotal != 0) {
-		job->fDownloadProgress = dlnow / dltotal;
+	FetchFileJob* job = reinterpret_cast<FetchFileJob*>(_job);
+	if (downloadTotal != 0) {
+		job->fBytes = downloaded;
+		job->fTotalBytes = downloadTotal;
+		job->fDownloadProgress = downloaded / downloadTotal;
 		job->NotifyStateListeners();
 	}
 	return 0;

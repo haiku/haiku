@@ -320,7 +320,7 @@ PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 
 void
 PackageManager::ProgressPackageDownloadActive(const char* packageName,
-	float completionPercentage)
+	float completionPercentage, off_t bytes, off_t totalBytes)
 {
 }
 
