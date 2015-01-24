@@ -295,9 +295,9 @@ ShortcutsWindow::QuitRequested()
 				// up the file requester
 				if (fLastSaved.InitCheck() == B_OK) {
 					if (_SaveKeySet(fLastSaved) == false) {
-						BAlert* alert = new BAlert(ERROR, 
+						BAlert* alert = new BAlert(ERROR,
 							B_TRANSLATE("Shortcuts was unable to save your "
-								"KeySet file!"), 
+								"KeySet file!"),
 							B_TRANSLATE("Oh no"));
 						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						alert->Go();
@@ -332,7 +332,7 @@ ShortcutsWindow::_GetSettingsFile(entry_ref* eref)
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return false;
-	else 
+	else
 		path.Append(SHORTCUTS_SETTING_FILE_NAME);
 
 	if (BEntry(path.Path(), true).GetRef(eref) == B_OK)
@@ -371,7 +371,7 @@ ShortcutsWindow::_SaveKeySet(BEntry& saveEntry)
 }
 
 
-// Appends new entries from the file specified in the "spec" entry of 
+// Appends new entries from the file specified in the "spec" entry of
 // (loadMessage). Returns true iff successful.
 bool
 ShortcutsWindow::_LoadKeySet(const BMessage& loadMessage)
@@ -495,7 +495,7 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 					0, false);
 				fOpenPanel->Show();
 			}
-			fOpenPanel->SetButtonLabel(B_DEFAULT_BUTTON, fLastOpenWasAppend ? 
+			fOpenPanel->SetButtonLabel(B_DEFAULT_BUTTON, fLastOpenWasAppend ?
 				B_TRANSLATE("Append") : B_TRANSLATE("Open"));
 			break;
 
@@ -545,14 +545,14 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 				BMessage fileMsg;
 				{
 					BFile file(&ref, B_READ_ONLY);
-					if ((file.InitCheck() != B_OK) 
+					if ((file.InitCheck() != B_OK)
 						|| (fileMsg.Unflatten(&file) != B_OK)) {
 						if (isStartMsg) {
 							// use this to save to anyway
 							fLastSaved = BEntry(&ref);
 							break;
 						} else {
-							BAlert* alert = new BAlert(ERROR, 
+							BAlert* alert = new BAlert(ERROR,
 								B_TRANSLATE("Shortcuts was couldn't open your "
 								"KeySet file!"), B_TRANSLATE("OK"));
 							alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -582,7 +582,7 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 					_GetSettingsFile(&eref);
 					if (ref == eref) fKeySetModified = false;
 				} else {
-					BAlert* alert = new BAlert(ERROR, 
+					BAlert* alert = new BAlert(ERROR,
 						B_TRANSLATE("Shortcuts was unable to parse your "
 						"KeySet file!"), B_TRANSLATE("OK"));
 					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -637,7 +637,7 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 
 			if (showSaveError) {
 				BAlert* alert = new BAlert(ERROR,
-					B_TRANSLATE("Shortcuts wasn't able to save your keyset."), 
+					B_TRANSLATE("Shortcuts wasn't able to save your keyset."),
 					B_TRANSLATE("OK"));
 				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go(NULL);
@@ -673,7 +673,7 @@ ShortcutsWindow::MessageReceived(BMessage* message)
 				_MarkKeySetModified();
 
 				// Rules for new selection: If there is an item at (index),
-				// select it. Otherwise, if there is an item at (index-1), 
+				// select it. Otherwise, if there is an item at (index-1),
 				// select it. Otherwise, select nothing.
 				int num = fColumnListView->CountRows();
 				if (num > 0) {
