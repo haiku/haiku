@@ -194,7 +194,6 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 				|| subpixelAntialiasing == fCurrentSubpixelAntialiasing)
 				break;
 
-			fSavedSubpixelAntialiasing = fCurrentSubpixelAntialiasing;
 			fCurrentSubpixelAntialiasing = subpixelAntialiasing;
 			fAverageWeightControl->SetEnabled(fCurrentSubpixelAntialiasing);
 
@@ -210,7 +209,6 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 				|| hinting == fCurrentHinting)
 				break;
 
-			fSavedHinting = fCurrentHinting;
 			fCurrentHinting = hinting;
 			set_hinting_mode(fCurrentHinting);
 
@@ -223,7 +221,6 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 			if (averageWeight == fCurrentAverageWeight)
 				break;
 
-			fSavedAverageWeight = fCurrentAverageWeight;
 			fCurrentAverageWeight = averageWeight;
 
 			set_average_weight(fCurrentAverageWeight);
