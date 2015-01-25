@@ -70,7 +70,7 @@ private:
 			void				_ClearPackage();
 
 			void				_RefreshRepositories(bool force);
-			void				_RefreshPackageList();
+			void				_RefreshPackageList(bool force);
 
 			void				_StartRefreshWorker(bool force = false);
 	static	status_t			_RefreshModelThreadWorker(void* arg);

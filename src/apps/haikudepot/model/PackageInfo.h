@@ -397,6 +397,8 @@ public:
 
 			bool				AddPackage(const PackageInfoRef& package);
 
+			void				SyncPackages(const PackageList& packages);
+
 private:
 			BString				fName;
 			PackageList			fPackages;

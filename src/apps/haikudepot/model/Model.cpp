@@ -460,6 +460,33 @@ Model::AddDepot(const DepotInfo& depot)
 }
 
 
+bool
+Model::HasDepot(const BString& name) const
+{
+	for (int32 i = fDepots.CountItems() - 1; i >= 0; i--) {
+		if (fDepots.ItemAtFast(i).Name() == name)
+			return true;
+	}
+	return false;
+}
+
+
+bool
+Model::SyncDepot(const DepotInfo& depot)
+{
+	for (int32 i = fDepots.CountItems() - 1; i >= 0; i--) {
+		const DepotInfo& existingDepot = fDepots.ItemAtFast(i);
+		if (existingDepot.Name() == depot.Name()) {
+			DepotInfo mergedDepot(existingDepot);
+			mergedDepot.SyncPackages(depot.Packages());
+			fDepots.Replace(i, mergedDepot);
+			return true;
+		}
+	}
+	return false;
+}
+
+
 void
 Model::Clear()
 {

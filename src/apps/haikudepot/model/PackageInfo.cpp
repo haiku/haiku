@@ -991,3 +991,42 @@ DepotInfo::AddPackage(const PackageInfoRef& package)
 {
 	return fPackages.Add(package);
 }
+
+
+void
+DepotInfo::SyncPackages(const PackageList& otherPackages)
+{
+	PackageList packages(fPackages);
+	
+	for (int32 i = otherPackages.CountItems() - 1; i >= 0; i--) {
+		const PackageInfoRef& otherPackage = otherPackages.ItemAtFast(i);
+		bool found = false;
+		for (int32 j = packages.CountItems() - 1; j >= 0; j--) {
+			const PackageInfoRef& package = packages.ItemAtFast(j);
+			if (package->Title() == otherPackage->Title()) {
+//				printf("%s: found package: '%s'\n", fName.String(),
+//					package->Title().String());
+				package->SetState(otherPackage->State());
+				package->SetLocalFilePath(otherPackage->LocalFilePath());
+				package->SetSystemDependency(
+					otherPackage->IsSystemDependency());
+				found = true;
+				packages.Remove(j);
+				break;
+			}
+		}
+		if (!found) {
+			printf("%s: new package: '%s'\n", fName.String(),
+				otherPackage->Title().String());
+			fPackages.Add(otherPackage);
+		}
+	}
+
+	for (int32 i = packages.CountItems() - 1; i >= 0; i--) {
+		const PackageInfoRef& package = packages.ItemAtFast(i);
+		printf("%s: removing package: '%s'\n", fName.String(),
+			package->Title().String());
+		fPackages.Remove(package);
+	}
+}
+

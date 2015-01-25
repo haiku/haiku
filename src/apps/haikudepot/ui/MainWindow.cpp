@@ -770,7 +770,7 @@ MainWindow::_RefreshRepositories(bool force)
 
 
 void
-MainWindow::_RefreshPackageList()
+MainWindow::_RefreshPackageList(bool force)
 {
 	if (fSinglePackageMode)
 		return;
@@ -885,10 +885,14 @@ MainWindow::_RefreshPackageList()
 			systemFlaggedPackages.Add(repoPackageInfo.FileName());
 	}
 
-	fModel.StopPopulatingAllPackages();
+	bool wasEmpty = fModel.Depots().IsEmpty();
+	if (force || wasEmpty)
+		fModel.StopPopulatingAllPackages();
 
 	BAutolock lock(fModel.Lock());
-	fModel.Clear();
+	
+	if (force)
+		fModel.Clear();
 
 	// filter remote packages from the found list
 	// any packages remaining will be locally installed packages
@@ -909,11 +913,15 @@ MainWindow::_RefreshPackageList()
 	}
 
 	for (DepotInfoMap::iterator it = depots.begin(); it != depots.end(); it++) {
-		fModel.AddDepot(it->second);
+		if (fModel.HasDepot(it->second.Name()))
+			fModel.SyncDepot(it->second);
+		else
+			fModel.AddDepot(it->second);
 	}
 
 	// start retrieving package icons and average ratings
-	fModel.PopulateAllPackages();
+	if (force || wasEmpty)
+		fModel.PopulateAllPackages();
 
 	// compute the OS package dependencies
 	try {
@@ -1034,7 +1042,7 @@ MainWindow::_RefreshModelThreadWorker(void* arg)
 	if (mainWindow->fTerminating)
 		return B_OK;
 
-	mainWindow->_RefreshPackageList();
+	mainWindow->_RefreshPackageList(parameters->forceRefresh);
 
 	messenger.SendMessage(MSG_MODEL_WORKER_DONE);
 

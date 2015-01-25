@@ -53,8 +53,10 @@ public:
 			PackageList			CreatePackageList() const;
 
 			bool				AddDepot(const DepotInfo& depot);
+			bool				HasDepot(const BString& name) const;
 			const DepotList&	Depots() const
 									{ return fDepots; }
+			bool				SyncDepot(const DepotInfo& depot);
 
 			void				Clear();
 
