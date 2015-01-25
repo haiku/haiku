@@ -533,7 +533,7 @@ public:
 		}
 
 		fPackageActions = actions;
-		if (!clearNeeded) {
+		if (!clearNeeded && fButtons.CountItems() == actions.CountItems()) {
 			int32 index = 0;
 			for (int32 i = fPackageActions.CountItems() - 1; i >= 0; i--) {
 				const PackageActionRef& action = fPackageActions.ItemAtFast(i);
@@ -1438,9 +1438,26 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 {
 	BAutolock _(fModelLock);
 
-	bool switchToDefaultTab = fPackage != packageRef;
-	fPackage = packageRef;
+	if (packageRef.Get() == NULL) {
+		Clear();
+		return;
+	}
 
+	bool switchToDefaultTab = true;
+	if (fPackage == packageRef) {
+		// When asked to display the already showing package ref,
+		// don't switch to the default tab.
+		switchToDefaultTab = false;
+	} else if (fPackage.Get() != NULL && packageRef.Get() != NULL
+		&& fPackage->Title() == packageRef->Title()) {
+		// When asked to display a different PackageInfo instance,
+		// but it has the same package title as the already showing
+		// instance, this probably means there was a repository
+		// refresh and we are in fact still requested to show the
+		// same package as before the refresh.
+		switchToDefaultTab = false;
+	}
+	
 	const PackageInfo& package = *packageRef.Get();
 
 	fTitleView->SetPackage(package);
@@ -1450,22 +1467,30 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 	fCardLayout->SetVisibleItem(1);
 
 	fPackageListener->SetPackage(packageRef);
+
+	// Set the fPackage reference last, so we keep a reference to the
+	// previous package before switching all the views to the new package.
+	// Otherwise the PackageInfo instance may go away because we had the
+	// last reference. And some of the views, the PackageActionView for
+	// example, keeps references to stuff from the previous package and
+	// access it while switching to the new package.
+	fPackage = packageRef;
 }
 
 
 void
 PackageInfoView::Clear()
 {
-	fPackage = PackageInfoRef(NULL);
-	
+	BAutolock _(fModelLock);
+
 	fTitleView->Clear();
 	fPackageActionView->Clear();
 	fPagesView->Clear();
 
 	fCardLayout->SetVisibleItem((int32)0);
 
-	BAutolock _(fModelLock);
+	fPackageListener->SetPackage(PackageInfoRef(NULL));
 
-	fPackageListener->SetPackage(fPackage);
+	fPackage.Unset();
 }
 
