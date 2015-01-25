@@ -9,6 +9,7 @@ RemotePackageRepository HaikuPorts
 	docbook_xml_dtd-4.5-2
 	docbook_xsl_stylesheets-1.78.1-1
 	droid-113-1
+	flare_x86_data-0.19-3
 	freedroidrpg_x86_data-0.15.1-1
 	openttd_gfx-0.4.7-1
 	openttd_msx-0.3.1-1
@@ -152,6 +153,7 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher-1.2.7.11-1
 	lame-3.99.5-3
 	lame_devel-3.99.5-3
+	lbreakout2-2.6.4-1
 	lcms-2.5-1
 	lcms_devel-2.5-1
 	less-451-4
@@ -228,7 +230,9 @@ RemotePackageRepository HaikuPorts
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
 	links-2.8-1
+	lmarbles-1.0.8-2
 	lnlauncher-1.1.2-1
+	ltris-1.0.19-1
 	lua-5.2.1-6
 	lua_devel-5.2.1-6
 	lynx-2.8.9dev.1-1
@@ -430,6 +434,7 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_x86_devel-0.11.5-2
 	flac_x86-1.3.0-1
 	flac_x86_devel-1.3.0-1
+	flare_x86-0.19-3
 	fluidsynth_x86-1.1.6-2
 	fluidsynth_x86_devel-1.1.6-2
 	fontconfig_x86-2.11.1-2
@@ -727,6 +732,7 @@ RemotePackageRepository HaikuPorts
 	fish_x86
 	ffmpeg
 	flac
+	flare_x86
 	flex
 	fluidsynth
 	fluidsynth_x86
@@ -781,6 +787,7 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher
 	lame
 	lame_x86
+	lbreakout2
 	lcms
 	less
 	lha
@@ -841,7 +848,9 @@ RemotePackageRepository HaikuPorts
 	libxslt_x86
 	links
 	llvm_x86
+	lmarbles
 	lnlauncher
+	ltris
 	luajit_x86
 	lua
 	lwtools_x86
