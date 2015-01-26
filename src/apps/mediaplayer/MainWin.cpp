@@ -1673,7 +1673,8 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
 		videoTrackMenu->AddItem(item);
 	}
 	if (count == 0) {
-		videoTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
+		videoTrackMenu->AddItem(new BMenuItem(B_TRANSLATE("none"),
+			new BMessage(M_DUMMY)));
 		videoTrackMenu->ItemAt(0)->SetMarked(true);
 	}
 	videoTrackMenu->SetEnabled(count > 1);
