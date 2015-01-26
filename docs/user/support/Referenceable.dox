@@ -1,0 +1,228 @@
+/*
+ * Copyright 2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *
+ * Corresponds to:
+ *		headers/os/support/Referenceable.h hrev48725
+ *		src/kits/support/Referenceable.cpp hrev48725
+ */
+
+
+/*!
+	\file Referenceable.h
+	\ingroup support
+	\ingroup libbe
+	\brief Provides the BReferenceable interface and declares the BReferenceable
+	       and BReference classes.
+*/
+
+
+/*!
+	\class BReferenceable
+	\ingroup support
+	\ingroup libbe
+	\brief Implementation of reference-counted memory management.
+
+	The C++ language provides two main ways of allocating objects: on the stack,
+	and on the heap. Objects created on the heap must be managed by the
+	application and deleted when they are not needed. Objects allocatede on the
+	stack have a lifetime limited to the execution of the block they are
+	declared in.
+
+	This approach is simple, but in some cases it can become quite difficult to
+	track ownership and lifetime of objects. The BReferenceable class allows to
+	implement reference counting, which allows a partially automated memory
+	management and some safety checks. It can also be used to implement pools
+	of reusable objects.
+
+	As the name implies, reference counting consists of keeping track, inside an
+	object, of how much references there are to it in the running application.
+	When the object is not referenced anymore, it can't be reached or used from
+	other parts of the application, so it is safe to delete or recycle the
+	object.
+
+	To use reference counting for a particular class, you make it inherit
+	BReferenceable. This provides all the support for reference counting.
+	Objects are created as usual, on the stack or using the new operator.
+
+	The object can then be referenced from other places. Each time a reference
+	to it is kept, the owner of the reference should call AcquireReference.
+	When the reference is not needed, it should call ReleaseReference.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BReferenceable::BReferenceable()
+	\brief Initialize the object with a reference count of 1.
+
+	The creator of the object is assumed to owns the first reference to it.
+*/
+
+
+/*!
+	\fn BReferenceable::~BReferenceable()
+	\brief Destructor.
+
+	The destructor should not be called directly, as the object is destructed
+	automatically when the last reference is released. This destructor is
+	public because you may still need to destroy the objects in the case where
+	LastReferenceReleased is overriden and you handle object destruction in
+	some other way.
+
+	In debug mode, the destructor checks that no references to the object are
+	still held. If the object was allocated on the stack, it allows exactly one
+	reference to be kept, which makes it possible to allocate BReferenceable
+	on the stack without needing to release the single reference to it.
+*/
+
+
+/*!
+	\fn int32 BReferenceable::AcquireReference()
+	\brief Acquire a reference to the object.
+	\returns the previous reference count
+
+	If the reference count was previously 0, this will call
+	FirstReferenceAcquired.
+*/
+
+
+/*!
+	\fn int32 BReferneceable::ReleaseReference()
+	\brief Release a reference to the object.
+	\returns the previous reference count
+
+	If the reference count was previously 1 (and is now 0), this will call
+	LastReferenceReleased.
+*/
+
+
+/*!
+	\fn int32 BReferenceable::CountReferences()
+	\brief Return the number of references to the object.
+	\returns the reference count.
+*/
+
+
+/*!
+	\fn void BReferenceble::FirstReferenceAcquired()
+	\brief Called when the first reference to the object is reacquired.
+
+	The default implementation does nothing. This method can be overriden to
+	implement reinitialization of the object, when using BReferenceable to
+	keep track of a pool of reusable objects.
+
+	In this use case, the objects are created (at initialization or lazily on an
+	as-needed basis) and stored in a pool. When an object is needed, if there
+	is an unused one waiting in the pool, it is reused instead of creating a
+	new one. Once a reference to it is acquired, this method is called and the
+	object can initialize itself to a clean state.
+
+	\warning This is currently not called when the object is first created, but
+	only on subsequent reuses.
+*/
+
+
+/*!
+	\fn void BReferenceable::LastReferenceReleased()
+	\brief Called when the last reference to the object is released.
+
+	This function is called when the object is not referenced anymore. The
+	default implementation deletes the object using the delete operator.
+
+	This behavior can be overriden. For example, to implement an object pool,
+	this method would not delete the object, but instead put it back in the
+	free object pool, ready for reuse at a later point.
+*/
+
+
+
+
+/*!
+	\class BReference
+	\ingroup support
+	\ingroup libbe
+	\brief A reference to a BReferenceable object.
+
+	BReference simplifies the use of BReferenceable and makes it more
+	transparent. It automatically acquires and release references to the pointed
+	objects. It provides an API similar to a standard C++ pointer, allowing use
+	of assignment and comparison operators and direct access to the object with
+	-> and *.
+*/
+
+
+/*!
+	\fn BReference::BReference()
+	\brief Creates a reference without initializing it
+
+	An uninitialized references behaves similarly to a NULL pointer.
+*/
+
+
+/*!
+	\fn BReference::BReference(Type*, bool)
+	\brief Creates and initialize a reference
+
+	The reference is set to the pointed object. If the parameter is set to
+	true, the reference count is not incremented, this should only be used when
+	referencing a freshly constructed object.
+*/
+
+
+/*!
+	\fn BReference::BReference(const BReference& other)
+	\brief Copy constructor
+
+	The reference is set to the same object as the source. The reference count
+	of the target object is incremented.
+*/
+
+
+/*!
+	\fn BReference::~BReference
+	\brief Destructor.
+
+	The reference count of the target object is decremented.
+*/
+
+
+/*!
+	\fn void BReference::SetTo(Type*, bool)
+	\brief Sets a new target for the reference.
+
+	The reference to the previously targetted object is released.
+	A reference to the new object is acquired only if \p alreadyHasReference
+	is true.
+*/
+
+
+/*!
+	\fn void BReference::Unset()
+	\brief Unsets the reference.
+
+	The targetted object is released. The reference is unset and can't be used
+	to access it anymore.
+*/
+
+
+/*!
+	\fn ConstType* BReference::Get() const
+	\brief Get the target object
+	\returns a raw pointer to the target object.
+*/
+
+
+/*!
+	\fn ConstType* BReference::Detach() const
+	\brief Detach the pointed object from the reference
+	\returns a raw pointer to the target object.
+
+	This returns the pointed object and unsets the reference, without
+	decrementing the object reference count. It is used to transfer ownership of
+	the reference to something else.
+*/
