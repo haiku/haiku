@@ -6,7 +6,10 @@
 
 #include <NetworkInterface.h>
 
+#include <assert.h>
 #include <errno.h>
+#include <net/if_dl.h>
+#include <netinet/in.h>
 #include <string.h>
 #include <sys/sockio.h>
 
@@ -48,6 +51,10 @@ do_ifaliasreq(const char* name, int32 option, BNetworkInterfaceAddress& address,
 	request.ifra_index = address.Index();
 	request.ifra_flags = address.Flags();
 
+	assert(address.Address().sa_len <= sizeof(sockaddr_storage));
+	assert(address.Mask().sa_len <= sizeof(sockaddr_storage));
+	assert(address.Broadcast().sa_len <= sizeof(sockaddr_storage));
+
 	memcpy(&request.ifra_addr, &address.Address(),
 		address.Address().sa_len);
 	memcpy(&request.ifra_mask, &address.Mask(),
@@ -81,6 +88,14 @@ BNetworkInterfaceAddress::BNetworkInterfaceAddress()
 	fIndex(-1),
 	fFlags(0)
 {
+	fAddress.ss_family = AF_UNSPEC;
+	fAddress.ss_len = 2;
+
+	fMask.ss_family = AF_UNSPEC;
+	fMask.ss_len = 2;
+
+	fBroadcast.ss_family = AF_UNSPEC;
+	fBroadcast.ss_len = 2;
 }
 
 
@@ -100,28 +115,76 @@ BNetworkInterfaceAddress::SetTo(const char* name, int32 index)
 void
 BNetworkInterfaceAddress::SetAddress(const sockaddr& address)
 {
-	memcpy(&fAddress, &address, address.sa_len);
+	size_t length = min_c(sizeof(sockaddr_storage), address.sa_len);
+	switch (address.sa_family) {
+		case AF_INET:
+			length = sizeof(sockaddr_in);
+			break;
+		case AF_INET6:
+			length = sizeof(sockaddr_in6);
+			break;
+		case AF_LINK:
+		{
+			sockaddr_dl& link = (sockaddr_dl&)address;
+			length = sizeof(sockaddr_dl) - sizeof(link.sdl_data) + link.sdl_alen
+				+ link.sdl_nlen + link.sdl_slen;
+			break;
+		}
+	}
+	memcpy(&fAddress, &address, length);
 }
 
 
 void
 BNetworkInterfaceAddress::SetMask(const sockaddr& mask)
 {
-	memcpy(&fMask, &mask, mask.sa_len);
+	size_t length = min_c(sizeof(sockaddr_storage), mask.sa_len);
+	switch (mask.sa_family) {
+		case AF_INET:
+			length = sizeof(sockaddr_in);
+			break;
+		case AF_INET6:
+			length = sizeof(sockaddr_in6);
+			break;
+		case AF_LINK:
+		{
+			sockaddr_dl& link = (sockaddr_dl&)mask;
+			length = sizeof(sockaddr_dl) - sizeof(link.sdl_data) + link.sdl_alen
+				+ link.sdl_nlen + link.sdl_slen;
+			break;
+		}
+	}
+	memcpy(&fMask, &mask, length);
 }
 
 
 void
 BNetworkInterfaceAddress::SetBroadcast(const sockaddr& broadcast)
 {
-	memcpy(&fBroadcast, &broadcast, broadcast.sa_len);
+	size_t length = min_c(sizeof(sockaddr_storage), broadcast.sa_len);
+	switch (broadcast.sa_family) {
+		case AF_INET:
+			length = sizeof(sockaddr_in);
+			break;
+		case AF_INET6:
+			length = sizeof(sockaddr_in6);
+			break;
+		case AF_LINK:
+		{
+			sockaddr_dl& link = (sockaddr_dl&)broadcast;
+			length = sizeof(sockaddr_dl) - sizeof(link.sdl_data) + link.sdl_alen
+				+ link.sdl_nlen + link.sdl_slen;
+			break;
+		}
+	}
+	memcpy(&fBroadcast, &broadcast, length);
 }
 
 
 void
 BNetworkInterfaceAddress::SetDestination(const sockaddr& destination)
 {
-	memcpy(&fBroadcast, &destination, destination.sa_len);
+	SetBroadcast(destination);
 }
 
 
