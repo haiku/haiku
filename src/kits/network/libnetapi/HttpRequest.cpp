@@ -79,10 +79,7 @@ BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
 	fOptFollowLocation(true)
 {
 	_ResetOptions();
-	if (fSSL)
-		fSocket = new(std::nothrow) CheckedSecureSocket(this);
-	else
-		fSocket = new(std::nothrow) BSocket();
+	fSocket = NULL;
 }
 
 
@@ -105,10 +102,7 @@ BHttpRequest::BHttpRequest(const BHttpRequest& other)
 {
 	_ResetOptions();
 		// FIXME some options may be copied from other instead.
-	if (fSSL)
-		fSocket = new(std::nothrow) CheckedSecureSocket(this);
-	else
-		fSocket = new(std::nothrow) BSocket();
+	fSocket = NULL;
 }
 
 
@@ -406,6 +400,12 @@ BHttpRequest::_ProtocolLoop()
 					if (--maxRedirs > 0) {
 						newRequest = true;
 
+						// Redirections may need a switch from http to https.
+						if (fUrl.Protocol() == "https")
+							fSSL = true;
+						else if (fUrl.Protocol() == "http")
+							fSSL = false;
+
 						_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT,
 							"Following: %s\n",
 							fUrl.UrlString().String());
@@ -472,6 +472,13 @@ BHttpRequest::_ProtocolLoop()
 status_t
 BHttpRequest::_MakeRequest()
 {
+	delete fSocket;
+
+	if (fSSL)
+		fSocket = new(std::nothrow) CheckedSecureSocket(this);
+	else
+		fSocket = new(std::nothrow) BSocket();
+
 	if (fSocket == NULL)
 		return B_NO_MEMORY;
 
