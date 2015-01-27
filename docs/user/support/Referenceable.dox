@@ -92,7 +92,7 @@
 
 
 /*!
-	\fn int32 BReferneceable::ReleaseReference()
+	\fn int32 BReferenceable::ReleaseReference()
 	\brief Release a reference to the object.
 	\returns the previous reference count
 
@@ -109,7 +109,7 @@
 
 
 /*!
-	\fn void BReferenceble::FirstReferenceAcquired()
+	\fn void BReferenceable::FirstReferenceAcquired()
 	\brief Called when the first reference to the object is reacquired.
 
 	The default implementation does nothing. This method can be overriden to
