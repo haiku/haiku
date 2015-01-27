@@ -528,7 +528,7 @@ if [ IsPackageAvailable ncurses_devel ] {
 		file: devel ncurses_devel
 			depends: base
 			library: $(developLibDir)/libncurses.so.5
-			headers: $(developHeadersDir) $(developHeadersDir)/ncurses
+			headers: $(developHeadersDir)
 		;
 
 	EnableBuildFeatures ncurses ;
