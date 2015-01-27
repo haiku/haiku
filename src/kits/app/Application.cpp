@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -961,6 +961,13 @@ bool
 BApplication::IsLaunching() const
 {
 	return !fReadyToRunCalled;
+}
+
+
+const char*
+BApplication::Signature() const
+{
+	return fAppName;
 }
 
 
