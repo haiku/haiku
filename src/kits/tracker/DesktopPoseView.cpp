@@ -56,10 +56,9 @@ All rights reserved.
 //	#pragma mark - DesktopPoseView
 
 
-DesktopPoseView::DesktopPoseView(Model* model, BRect frame, uint32 viewMode,
-	uint32 resizeMask)
+DesktopPoseView::DesktopPoseView(Model* model, uint32 viewMode)
 	:
-	BPoseView(model, frame, viewMode, resizeMask)
+	BPoseView(model, viewMode)
 {
 	SetFlags(Flags() | B_DRAW_ON_CHILDREN);
 }

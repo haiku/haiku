@@ -35,6 +35,7 @@ All rights reserved.
 #define _CONTAINER_WINDOW_H
 
 
+#include <GroupView.h>
 #include <StringList.h>
 #include <Window.h>
 
@@ -44,6 +45,9 @@ All rights reserved.
 #include "TaskLoop.h"
 
 
+class BGridView;
+class BGroupLayout;
+class BGroupView;
 class BPopUpMenu;
 class BMenuBar;
 
@@ -51,11 +55,13 @@ namespace BPrivate {
 
 class BNavigator;
 class BPoseView;
+class DraggableContainerIcon;
 class ModelMenuItem;
 class AttributeStreamNode;
 class BackgroundImage;
 class Model;
 class ModelNodeLazyOpener;
+class BorderedView;
 class SelectionWindow;
 
 
@@ -92,13 +98,14 @@ public:
 		uint32 containerWindowFlags,
 		window_look look = B_DOCUMENT_WINDOW_LOOK,
 		window_feel feel = B_NORMAL_WINDOW_FEEL,
-		uint32 flags = B_WILL_ACCEPT_FIRST_CLICK
-			| B_NO_WORKSPACE_ACTIVATION,
-		uint32 workspace = B_CURRENT_WORKSPACE);
+		uint32 flags = B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION,
+		uint32 workspace = B_CURRENT_WORKSPACE, bool useLayouts = true,
+		bool isDeskWindow = false);
 
 	virtual ~BContainerWindow();
 
 	virtual void Init(const BMessage* message = NULL);
+	virtual void InitLayout();
 
 	static BRect InitialWindowRect(window_feel);
 
@@ -123,7 +130,6 @@ public:
 	// virtuals that control setup of window
 	virtual bool ShouldAddMenus() const;
 	virtual bool ShouldAddScrollBars() const;
-	virtual bool ShouldAddCountView() const;
 
 	virtual void CheckScreenIntersect();
 
@@ -206,7 +212,7 @@ public:
 	bool IsPathWatchingEnabled(void) const;
 
 protected:
-	virtual BPoseView* NewPoseView(Model*, BRect, uint32);
+	virtual BPoseView* NewPoseView(Model*, uint32);
 		// instantiate a different flavor of BPoseView for different
 		// ContainerWindows
 
@@ -274,6 +280,13 @@ protected:
 		BObjectList<Model>*, void*, BStringList&);
 	void LoadAddOn(BMessage*);
 
+	BGroupLayout* fRootLayout;
+	BGroupView* fMenuContainer;
+	BGridView* fPoseContainer;
+	BorderedView* fBorderedView;
+	BGroupView* fVScrollBarContainer;
+	BGroupView* fCountContainer;
+
 	BPopUpMenu* fFileContextMenu;
 	BPopUpMenu* fWindowContextMenu;
 	BPopUpMenu* fDropContextMenu;
@@ -286,6 +299,7 @@ protected:
 	BMenuItem* fOpenWithItem;
 	ModelMenuItem* fNavigationItem;
 	BMenuBar* fMenuBar;
+	DraggableContainerIcon* fDraggableIcon;
 	BNavigator* fNavigator;
 	BPoseView* fPoseView;
 	LockingList<BWindow>* fWindowList;
@@ -301,6 +315,7 @@ protected:
 	bool fIsTrash;
 	bool fInTrash;
 	bool fIsPrinters;
+	bool fIsDesktop;
 
 	uint32 fContainerWindowFlags;
 	BackgroundImage* fBackgroundImage;
@@ -357,22 +372,22 @@ private:
 };
 
 
-class BackgroundView : public BView {
-	// background view placed in a BContainerWindow, under the pose view
+class BorderedView : public BGroupView {
 public:
-	BackgroundView(BRect);
-	virtual	void AttachedToWindow();
-	virtual	void FrameResized(float, float);
-	virtual	void Draw(BRect);
+	BorderedView();
 
 	void PoseViewFocused(bool);
 	virtual void Pulse();
+
+	void EnableBorderHighlight(bool);
 
 protected:
 	virtual void WindowActivated(bool);
 
 private:
-	typedef BView _inherited;
+	bool fEnableBorderHighlight;
+
+	typedef BGroupView _inherited;
 };
 
 

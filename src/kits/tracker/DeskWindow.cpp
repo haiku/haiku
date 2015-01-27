@@ -191,7 +191,8 @@ BDeskWindow::BDeskWindow(LockingList<BWindow>* windowList)
 	BContainerWindow(windowList, 0, kPrivateDesktopWindowLook,
 		kPrivateDesktopWindowFeel, B_NOT_MOVABLE | B_WILL_ACCEPT_FIRST_CLICK
 			| B_NOT_ZOOMABLE | B_NOT_CLOSABLE | B_NOT_MINIMIZABLE
-			| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES),
+			| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES,
+			false, true),
 	fDeskShelf(NULL),
 	fTrashContextMenu(NULL),
 	fNodeRef(NULL),
@@ -240,6 +241,12 @@ BDeskWindow::Init(const BMessage*)
 	PoseView()->SetShowHideSelection(false);
 	ResizeTo(fOldFrame.Width(), fOldFrame.Height());
 
+	InitKeyIndices();
+	InitAddonsList(false);
+	ApplyShortcutPreferences(false);
+
+	_inherited::Init();
+
 	entry_ref ref;
 	BPath path;
 	if (!BootedInSafeMode() && FSFindTrackerSettingsDir(&path) == B_OK) {
@@ -252,11 +259,6 @@ BDeskWindow::Init(const BMessage*)
 		if (fDeskShelf != NULL)
 			fDeskShelf->SetDisplaysZombies(true);
 	}
-	InitKeyIndices();
-	InitAddonsList(false);
-	ApplyShortcutPreferences(false);
-
-	_inherited::Init();
 }
 
 
@@ -402,16 +404,16 @@ BDeskWindow::Quit()
 
 
 BPoseView*
-BDeskWindow::NewPoseView(Model* model, BRect rect, uint32 viewMode)
+BDeskWindow::NewPoseView(Model* model, uint32 viewMode)
 {
-	return new DesktopPoseView(model, rect, viewMode);
+	return new DesktopPoseView(model, viewMode);
 }
 
 
 void
 BDeskWindow::CreatePoseView(Model* model)
 {
-	fPoseView = NewPoseView(model, Bounds(), kIconMode);
+	fPoseView = NewPoseView(model, kIconMode);
 	fPoseView->SetIconMapping(false);
 	fPoseView->SetEnsurePosesVisible(true);
 	fPoseView->SetAutoScroll(false);
@@ -431,6 +433,8 @@ BDeskWindow::CreatePoseView(Model* model)
 	fPoseView->SetViewColor(desktopColor);
 	fPoseView->SetLowColor(desktopColor);
 
+	fPoseView->SetResizingMode(B_FOLLOW_ALL);
+	fPoseView->ResizeTo(Bounds().Size());
 	AddChild(fPoseView);
 
 	PoseView()->StartSettingsWatch();

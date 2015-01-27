@@ -61,14 +61,12 @@ const bigtime_t kBarberPoleDelay = 500000;
 //	#pragma mark - BCountView
 
 
-BCountView::BCountView(BRect bounds, BPoseView* view)
+BCountView::BCountView(BPoseView* view)
 	:
-	BView(bounds, "CountVw", B_FOLLOW_LEFT + B_FOLLOW_BOTTOM,
-		B_PULSE_NEEDED | B_WILL_DRAW),
+	BView("CountVw", B_PULSE_NEEDED | B_WILL_DRAW),
 	fLastCount(-1),
 	fPoseView(view),
 	fShowingBarberPole(false),
-	fBorderHighlighted(false),
 	fBarberPoleMap(NULL),
 	fLastBarberPoleOffset(5),
 	fStartSpinningAfter(0),
@@ -110,17 +108,6 @@ void
 BCountView::Pulse()
 {
 	TrySpinningBarberPole();
-}
-
-
-void
-BCountView::WindowActivated(bool active)
-{
-	if (fBorderHighlighted) {
-		BRect dirty(Bounds());
-		dirty.bottom = dirty.top;
-		Invalidate(dirty);
-	}
 }
 
 
@@ -172,7 +159,7 @@ BRect
 BCountView::TextInvalRect() const
 {
 	BRect result = Bounds();
-	result.InsetBy(4, 2);
+	result.InsetBy(4, 3);
 
 	// if the barber pole is not present, use its space for text
 	if (fShowingBarberPole)
@@ -186,7 +173,7 @@ BRect
 BCountView::TextAndBarberPoleRect() const
 {
 	BRect result = Bounds();
-	result.InsetBy(4, 2);
+	result.InsetBy(4, 3);
 
 	return result;
 }
@@ -211,17 +198,11 @@ BCountView::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
 
-	if (be_control_look != NULL) {
-		rgb_color base = ViewColor();
-		if (fBorderHighlighted && Window()->IsActive())
-			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		else
-			SetHighColor(tint_color(base, B_DARKEN_2_TINT));
-		StrokeLine(bounds.LeftTop(), bounds.RightTop());
-		bounds.top++;
-		be_control_look->DrawMenuBarBackground(this, bounds, updateRect,
-			ViewColor());
-	}
+	be_control_look->DrawBorder(this, bounds, updateRect, ViewColor(),
+		B_PLAIN_BORDER, 0,
+		BControlLook::B_BOTTOM_BORDER | BControlLook::B_LEFT_BORDER);
+	be_control_look->DrawMenuBarBackground(this, bounds, updateRect,
+		ViewColor());
 
 	BString itemString;
 	if (IsTypingAhead())
@@ -407,17 +388,4 @@ bool
 BCountView::IsFiltering() const
 {
 	return fFilterString.Length() > 0;
-}
-
-
-void
-BCountView::SetBorderHighlighted(bool highlighted)
-{
-	if (fBorderHighlighted == highlighted)
-		return;
-
-	fBorderHighlighted = highlighted;
-	BRect dirty(Bounds());
-	dirty.bottom = dirty.top;
-	Invalidate(dirty);
 }

@@ -102,9 +102,9 @@ _DrawOutline(BView* view, BRect where)
 //	#pragma mark - BTitleView
 
 
-BTitleView::BTitleView(BRect frame, BPoseView* view)
+BTitleView::BTitleView(BPoseView* view)
 	:
-	BView(frame, "TitleView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
+	BView("BTitleView", B_WILL_DRAW),
 	fPoseView(view),
 	fTitleList(10, true),
 	fHorizontalResizeCursor(B_CURSOR_ID_RESIZE_EAST_WEST),

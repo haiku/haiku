@@ -91,8 +91,8 @@ namespace BPrivate {
 
 class BCountView;
 class BContainerWindow;
-class BHScrollBar;
 class EntryListBase;
+class TScrollBar;
 
 
 const int32 kSmallStep = 10;
@@ -106,8 +106,7 @@ const uint32 kCheckTypeahead = 'Tcty';
 
 class BPoseView : public BView {
 public:
-	BPoseView(Model*, BRect, uint32 viewMode,
-		uint32 resizeMask = B_FOLLOW_ALL);
+	BPoseView(Model*, uint32 viewMode);
 	virtual ~BPoseView();
 
 	// setup, teardown
@@ -164,6 +163,7 @@ public:
 	virtual void AttachedToWindow();
 	virtual void WindowActivated(bool active);
 	virtual void MakeFocus(bool = true);
+	virtual	BSize MinSize();
 	virtual void Draw(BRect update_rect);
 	virtual void DrawAfterChildren(BRect update_rect);
 	virtual void MouseMoved(BPoint, uint32, const BMessage*);
@@ -174,7 +174,6 @@ public:
 	virtual void MouseIdle(const BMessage*);
 	virtual void KeyDown(const char*, int32);
 	virtual void Pulse();
-	virtual void MoveBy(float, float);
 	virtual void ScrollTo(BPoint);
 
 	// misc. mode setters
@@ -199,9 +198,10 @@ public:
 	virtual void UpdateScrollRange();
 	virtual void SetScrollBarsTo(BPoint);
 	virtual void AddScrollBars();
-	BHScrollBar* HScrollBar() const;
+	BScrollBar* HScrollBar() const;
 	BScrollBar* VScrollBar() const ;
 	BCountView* CountView() const;
+	BTitleView* TitleView() const;
 	void DisableScrollBars();
 	void EnableScrollBars();
 
@@ -638,7 +638,6 @@ protected:
 	void RemoveFromExtent(const BRect&);
 
 	virtual void EditQueries();
-	virtual void AddCountView();
 
 	void HandleAttrMenuItemSelected(BMessage*);
 	void TryUpdatingBrokenLinks();
@@ -690,7 +689,7 @@ private:
 	void MoveSelectionOrEntryToTrash(const entry_ref* ref, bool selectNext);
 
 protected:
-	BHScrollBar* fHScrollBar;
+	TScrollBar* fHScrollBar;
 	BScrollBar* fVScrollBar;
 	Model* fModel;
 	BPose* fActivePose;
@@ -797,9 +796,9 @@ protected:
 };
 
 
-class BHScrollBar : public BScrollBar {
+class TScrollBar : public BScrollBar {
 public:
-	BHScrollBar(BRect, const char*, BView*);
+	TScrollBar(const char*, BView*, float, float);
 	void SetTitleView(BView*);
 
 	// BScrollBar overrides
@@ -890,7 +889,7 @@ BPoseView::MimeTypesInSelection()
 }
 
 
-inline BHScrollBar*
+inline BScrollBar*
 BPoseView::HScrollBar() const
 {
 	return fHScrollBar;
@@ -908,6 +907,13 @@ inline BCountView*
 BPoseView::CountView() const
 {
 	return fCountView;
+}
+
+
+inline BTitleView*
+BPoseView::TitleView() const
+{
+	return fTitleView;
 }
 
 
@@ -1164,6 +1170,13 @@ BPoseView::SetSelectionHandler(BLooper* looper)
 
 
 inline void
+TScrollBar::SetTitleView(BView* view)
+{
+	fTitleView = view;
+}
+
+
+inline void
 BPoseView::SetRefFilter(BRefFilter* filter)
 {
 	fRefFilter = filter;
@@ -1176,13 +1189,6 @@ inline BRefFilter*
 BPoseView::RefFilter() const
 {
 	return fRefFilter;
-}
-
-
-inline void
-BHScrollBar::SetTitleView(BView* view)
-{
-	fTitleView = view;
 }
 
 

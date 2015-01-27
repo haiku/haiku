@@ -43,18 +43,20 @@ namespace BPrivate {
 
 class BPoseView;
 
+const int32 kCountViewWidth = 76;
+
+
 class BCountView : public BView {
 	// displays the item count and a barber pole while the view is updating
 
 public:
-	BCountView(BRect, BPoseView*);
+	BCountView(BPoseView*);
 	~BCountView();
 
 	virtual void Draw(BRect);
 	virtual void MouseDown(BPoint);
 	virtual void AttachedToWindow();
 	virtual void Pulse();
-	virtual void WindowActivated(bool active);
 
 	void CheckCount();
 	void StartBarberPole();
@@ -70,8 +72,6 @@ public:
 	const char* Filter() const;
 	bool IsFiltering() const;
 
-	void SetBorderHighlighted(bool highlighted);
-
 private:
 	BRect BarberPoleInnerRect() const;
 	BRect BarberPoleOuterRect() const;
@@ -82,7 +82,6 @@ private:
 	int32 fLastCount;
 	BPoseView* fPoseView;
 	bool fShowingBarberPole : 1;
-	bool fBorderHighlighted : 1;
 	BBitmap* fBarberPoleMap;
 	float fLastBarberPoleOffset;
 	bigtime_t fStartSpinningAfter;

@@ -74,17 +74,16 @@ VirtualDirectoryWindow::VirtualDirectoryWindow(LockingList<BWindow>* windowList,
 void
 VirtualDirectoryWindow::CreatePoseView(Model* model)
 {
-	BRect rect(Bounds());
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	fPoseView = NewPoseView(model, rect, kListMode);
+	fPoseView = NewPoseView(model, kListMode);
 
-	AddChild(fPoseView);
+	fBorderedView->GroupLayout()->AddView(fPoseView);
+	fBorderedView->EnableBorderHighlight(false);
+	fBorderedView->GroupLayout()->SetInsets(0, 0, 1, 1);
 }
 
 
 BPoseView*
-VirtualDirectoryWindow::NewPoseView(Model* model, BRect rect, uint32 viewMode)
+VirtualDirectoryWindow::NewPoseView(Model* model, uint32 viewMode)
 {
 	// If the model (or rather the entry_ref to it) came from another
 	// application, it may refer to a subdirectory we cannot use directly. The
@@ -117,7 +116,7 @@ VirtualDirectoryWindow::NewPoseView(Model* model, BRect rect, uint32 viewMode)
 		}
 	}
 
-	return new VirtualDirectoryPoseView(model, rect);
+	return new VirtualDirectoryPoseView(model);
 }
 
 

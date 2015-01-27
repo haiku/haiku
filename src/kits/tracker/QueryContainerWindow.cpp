@@ -56,19 +56,17 @@ All rights reserved.
 
 
 BQueryContainerWindow::BQueryContainerWindow(LockingList<BWindow>* windowList,
-	uint32 containerWindowFlags, window_look look, window_feel feel,
-	uint32 flags, uint32 workspace)
+	uint32 containerWindowFlags)
 	:
-	BContainerWindow(windowList, containerWindowFlags, look, feel,
-		flags, workspace)
+	BContainerWindow(windowList, containerWindowFlags)
 {
 }
 
 
 BPoseView*
-BQueryContainerWindow::NewPoseView(Model* model, BRect rect, uint32)
+BQueryContainerWindow::NewPoseView(Model* model, uint32)
 {
-	return new BQueryPoseView(model, rect);
+	return new BQueryPoseView(model);
 }
 
 
@@ -82,12 +80,11 @@ BQueryContainerWindow::PoseView() const
 void
 BQueryContainerWindow::CreatePoseView(Model* model)
 {
-	BRect rect(Bounds());
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	fPoseView = NewPoseView(model, rect, kListMode);
+	fPoseView = NewPoseView(model, kListMode);
 
-	AddChild(fPoseView);
+	fBorderedView->GroupLayout()->AddView(fPoseView);
+	fBorderedView->EnableBorderHighlight(false);
+	fBorderedView->GroupLayout()->SetInsets(0, 0, 1, 1);
 }
 
 

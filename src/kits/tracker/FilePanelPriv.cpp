@@ -66,6 +66,7 @@ All rights reserved.
 #include "AttributeStream.h"
 #include "AutoLock.h"
 #include "Commands.h"
+#include "CountView.h"
 #include "DesktopPoseView.h"
 #include "DirMenu.h"
 #include "FavoritesMenu.h"
@@ -159,7 +160,7 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
 	window_look look, window_feel feel, bool hideWhenDone)
 	:
 	BContainerWindow(0, containerWindowFlags, look, feel, 0,
-		B_CURRENT_WORKSPACE),
+		B_CURRENT_WORKSPACE, false),
 	fDirMenu(NULL),
 	fDirMenuField(NULL),
 	fTextControl(NULL),
@@ -231,6 +232,7 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
 	fTaskLoop = new PiggybackTaskLoop;
 
 	AutoLock<BWindow> lock(this);
+	fBorderedView = new BorderedView;
 	CreatePoseView(model);
 	fPoseView->SetRefFilter(filter);
 	if (!fIsSavePanel)
@@ -641,9 +643,9 @@ TFilePanel::GetNextEntryRef(entry_ref* ref)
 
 
 BPoseView*
-TFilePanel::NewPoseView(Model* model, BRect rect, uint32)
+TFilePanel::NewPoseView(Model* model, uint32)
 {
-	return new BFilePanelPoseView(model, rect);
+	return new BFilePanelPoseView(model);
 }
 
 
@@ -651,7 +653,9 @@ void
 TFilePanel::Init(const BMessage*)
 {
 	BRect windRect(Bounds());
-	AddChild(fBackView = new BackgroundView(windRect));
+	fBackView = new BView(Bounds(), "View", B_FOLLOW_ALL, 0);
+	fBackView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(fBackView);
 
 	// add poseview menu bar
 	fMenuBar = new BMenuBar(BRect(0, 0, windRect.Width(), 1), "MenuBar");
@@ -763,31 +767,47 @@ TFilePanel::Init(const BMessage*)
 	} else
 		fButtonText.SetTo(B_TRANSLATE("Open"));
 
+	// Add PoseView
+	fBorderedView->SetName("PoseView");
+	fBorderedView->SetResizingMode(B_FOLLOW_ALL);
+	fBorderedView->EnableBorderHighlight(true);
+
 	rect = windRect;
 	rect.OffsetTo(10, fDirMenuField->Frame().bottom + 10);
 	rect.bottom = windRect.bottom - 60;
 	rect.right -= B_V_SCROLL_BAR_WIDTH + 20;
+	fBorderedView->MoveTo(rect.LeftTop());
+	fBorderedView->ResizeTo(rect.Width(), rect.Height());
 
-	// re-parent the poseview to our backview
-	// ToDo:
-	// This is terrible, fix it up
-	PoseView()->RemoveSelf();
-	if (fIsSavePanel)
-		fBackView->AddChild(PoseView(), fTextControl);
-	else
-		fBackView->AddChild(PoseView());
-
-	PoseView()->MoveTo(rect.LeftTop());
-	PoseView()->ResizeTo(rect.Width(), rect.Height());
 	PoseView()->AddScrollBars();
 	PoseView()->SetDragEnabled(false);
 	PoseView()->SetDropEnabled(false);
 	PoseView()->SetSelectionHandler(this);
 	PoseView()->SetSelectionChangedHook(true);
 	PoseView()->DisableSaveLocation();
-	PoseView()->VScrollBar()->MoveBy(0, -1);
-	PoseView()->VScrollBar()->ResizeBy(0, 1);
 
+	// horizontal
+	rect = fBorderedView->Frame();
+	rect.top = rect.bottom;
+	rect.bottom = rect.top + (float)B_H_SCROLL_BAR_HEIGHT;
+	PoseView()->HScrollBar()->MoveTo(rect.LeftTop());
+	PoseView()->HScrollBar()->ResizeTo(rect.Size());
+	PoseView()->HScrollBar()->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+	fBackView->AddChild(PoseView()->HScrollBar());
+
+	// vertical
+	rect = fBorderedView->Frame();
+	rect.left = rect.right;
+	rect.right = rect.left + (float)B_V_SCROLL_BAR_WIDTH;
+	PoseView()->VScrollBar()->MoveTo(rect.LeftTop());
+	PoseView()->VScrollBar()->ResizeTo(rect.Size());
+	PoseView()->VScrollBar()->SetResizingMode(B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT);
+	fBackView->AddChild(PoseView()->VScrollBar());
+
+	if (fIsSavePanel)
+		fBackView->AddChild(fBorderedView, fTextControl);
+	else
+		fBackView->AddChild(fBorderedView);
 
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(kCancelButton));
 	AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
@@ -877,6 +897,35 @@ TFilePanel::RestoreState()
 		RestoreWindowState(NULL);
 		PoseView()->Init(NULL);
 	}
+
+	// Finish UI creation now that the PoseView is initialized
+	BLayoutItem* item
+		= fBorderedView->GroupLayout()->AddView(0, fPoseView->TitleView());
+	BSize minSize = item->MinSize();
+	BSize maxSize = item->MaxSize();
+	item->SetExplicitMinSize(BSize(minSize.Width(), kTitleViewHeight));
+	item->SetExplicitMaxSize(BSize(maxSize.Width(), kTitleViewHeight));
+
+	BRect rect(fBorderedView->Frame());
+	rect.right = rect.left + kCountViewWidth;
+	rect.top = rect.bottom + 1;
+	rect.bottom = rect.top + PoseView()->HScrollBar()->Bounds().Height() - 1;
+	PoseView()->CountView()->MoveTo(rect.LeftTop());
+	PoseView()->CountView()->ResizeTo(rect.Size());
+	PoseView()->CountView()->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	fBackView->AddChild(PoseView()->CountView(), fBorderedView);
+
+	PoseView()->HScrollBar()->MoveBy(kCountViewWidth + 1, 0);
+	PoseView()->HScrollBar()->ResizeBy(-kCountViewWidth - 1, 0);
+
+	// The Be Book states that the BTitleView will have a name of "TitleView",
+	// and so some apps will try to grab it by that name and move it around.
+	// They don't need to, because resizing "PoseView" (really the BorderedView)
+	// will resize the BTitleView as well. So just create a dummy view here
+	// so that they don't get NULL when trying to find the view.
+	BView* dummyTitleView = new BView(BRect(), "TitleView", B_FOLLOW_NONE, 0);
+	fBackView->AddChild(dummyTitleView);
+	dummyTitleView->Hide();
 }
 
 
@@ -1650,9 +1699,9 @@ TFilePanel::WindowActivated(bool active)
 //	#pragma mark -
 
 
-BFilePanelPoseView::BFilePanelPoseView(Model* model, BRect frame,
-	uint32 resizeMask)
-	: BPoseView(model, frame, kListMode, resizeMask),
+BFilePanelPoseView::BFilePanelPoseView(Model* model)
+	:
+	BPoseView(model, kListMode),
 	fIsDesktop(model->IsDesktop())
 {
 }

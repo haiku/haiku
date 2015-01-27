@@ -50,7 +50,7 @@ class BMenuField;
 
 namespace BPrivate {
 
-class BackgroundView;
+class BorderedView;
 class BDirMenu;
 class AttributeStreamNode;
 class BFilePanelPoseView;
@@ -103,7 +103,7 @@ public:
 	bool TrackingMenu() const;
 
 protected:
-	BPoseView* NewPoseView(Model* model, BRect rect, uint32 viewMode);
+	BPoseView* NewPoseView(Model* model, uint32);
 	virtual	void Init(const BMessage* message = NULL);
 	virtual	void SaveState(bool hide = true);
 	virtual	void SaveState(BMessage &) const;
@@ -130,8 +130,6 @@ protected:
 		const char* button2 = NULL, const char* button3 = NULL);
 
 private:
-	friend class BackgroundView;
-
 	bool SwitchDirToDesktopIfNeeded(entry_ref &ref);
 	bool CanOpenParent() const;
 	void SwitchDirMenuTo(const entry_ref* ref);
@@ -142,7 +140,7 @@ private:
 
 	bool fIsSavePanel;
 	uint32 fNodeFlavors;
-	BackgroundView* fBackView;
+	BView* fBackView;
 	BDirMenu* fDirMenu;
 	BMenuField* fDirMenuField;
 	BTextControl* fTextControl;
@@ -160,7 +158,7 @@ private:
 
 class BFilePanelPoseView : public BPoseView {
 public:
-	BFilePanelPoseView(Model*, BRect, uint32 resizeMask = B_FOLLOW_ALL);
+	BFilePanelPoseView(Model*);
 
 	virtual bool IsFilePanel() const;
 	virtual bool FSNotification(const BMessage*);

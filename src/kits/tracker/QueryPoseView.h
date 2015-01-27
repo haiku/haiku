@@ -49,7 +49,7 @@ class QueryEntryListCollection;
 
 class BQueryPoseView : public BPoseView {
 public:
-	BQueryPoseView(Model*, BRect, uint32 resizeMask = B_FOLLOW_ALL);
+	BQueryPoseView(Model*);
 	virtual ~BQueryPoseView();
 
 	virtual void MessageReceived(BMessage* message);

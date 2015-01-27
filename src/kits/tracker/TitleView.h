@@ -63,7 +63,7 @@ const int32 kColumnStart = 40;
 
 class BTitleView : public BView {
 public:
-	BTitleView(BRect, BPoseView*);
+	BTitleView(BPoseView*);
 	virtual ~BTitleView();
 
 	virtual	void MouseDown(BPoint where);

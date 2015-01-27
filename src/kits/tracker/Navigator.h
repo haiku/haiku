@@ -35,8 +35,7 @@ All rights reserved.
 #define _NAVIGATOR_H
 
 
-#include <PictureButton.h>
-#include <View.h>
+#include <Toolbar.h>
 
 #include "ContainerWindow.h"
 #include "Model.h"
@@ -64,40 +63,16 @@ enum NavigationAction
 };
 
 
-// Custom BPictureButton which takes
-// bitmap resource IDs as arguments
-class BNavigatorButton : public BPictureButton {
+class BNavigator : public BToolbar {
 public:
-	BNavigatorButton(BRect rect, const char* name, BMessage* message,
-		int32 resIDon, int32 resIDoff, int32 resIDdisabled);
-
-	~BNavigatorButton();
-
-	virtual void AttachedToWindow();
-
-	void SetPicture(BBitmap*, bool enabled, bool on);
-
-private:
-	int32 fResIDOn;
-	int32 fResIDOff;
-	int32 fResIDDisabled;
-};
-
-
-class BNavigator : public BView {
-public:
-	BNavigator(const Model* model, BRect rect,
-		uint32 resizeMask = B_FOLLOW_LEFT_RIGHT);
+	BNavigator(const Model* model);
 	~BNavigator();
 
 	void UpdateLocation(const Model* newmodel, int32 action);
 
-	static float CalcNavigatorHeight(void);
-
 	BContainerWindow* Window() const;
 
 protected:
-	virtual void Draw(BRect rect);
 	virtual void MessageReceived(BMessage* msg);
 	virtual void AttachedToWindow();
 	virtual void AllAttached();
@@ -112,9 +87,6 @@ protected:
 
 private:
 	BPath fPath;
-	BNavigatorButton* fBack;
-	BNavigatorButton* fForw;
-	BNavigatorButton* fUp;
 	BTextControl* fLocation;
 
 	BObjectList<BPath> fBackHistory;

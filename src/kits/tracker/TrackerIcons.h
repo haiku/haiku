@@ -96,15 +96,9 @@ enum {
 	R_MoveStatusBitmap = 1039,
 	R_CopyStatusBitmap = 1040,
 	R_TrashStatusBitmap = 1041,
-	R_ResBackNavActive = 1042,
-	R_ResBackNavInactive = 1043,
-	R_ResForwNavActive = 1044,
-	R_ResForwNavInactive = 1045,
-	R_ResUpNavActive = 1046,
-	R_ResUpNavInactive = 1047,
-	R_ResBackNavActiveSel = 1048,
-	R_ResForwNavActiveSel = 1049,
-	R_ResUpNavActiveSel = 1050,
+	R_ResBackNav = 1042,
+	R_ResForwNav = 1043,
+	R_ResUpNav = 1044,
 	R_ShareIcon = 1051,
 	R_MICN_ShareIcon = 1051
 };

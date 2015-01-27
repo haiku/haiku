@@ -27,10 +27,9 @@ namespace BPrivate {
 //	#pragma mark - VirtualDirectoryPoseView
 
 
-VirtualDirectoryPoseView::VirtualDirectoryPoseView(Model* model, BRect frame,
-	uint32 resizeMask)
+VirtualDirectoryPoseView::VirtualDirectoryPoseView(Model* model)
 	:
-	BPoseView(model, frame, resizeMask),
+	BPoseView(model, kListMode),
 	fDirectoryPaths(),
 	fRootDefinitionFileRef(-1, -1),
 	fFileChangeTime(-1),

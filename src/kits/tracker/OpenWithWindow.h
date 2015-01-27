@@ -48,6 +48,7 @@ All rights reserved.
 #include "SlowMenu.h"
 #include "Utilities.h"
 
+class BGroupView;
 
 namespace BPrivate {
 
@@ -138,14 +139,12 @@ private:
 class OpenWithContainerWindow : public BContainerWindow {
 public:
 	OpenWithContainerWindow(BMessage* entriesToOpen,
-		LockingList<BWindow>* windowList,
-		window_look look = B_DOCUMENT_WINDOW_LOOK,
-		window_feel feel = B_NORMAL_WINDOW_FEEL,
-		uint32 flags = 0, uint32 workspace = B_CURRENT_WORKSPACE);
+		LockingList<BWindow>* windowList);
 		// <entriesToOpen> eventually get opened by the selected app
 	virtual ~OpenWithContainerWindow();
 
 	virtual void Init(const BMessage* message);
+	virtual void InitLayout();
 
 	const BMessage* EntryList() const;
 		// return the list of the entries we are supposed to open
@@ -156,8 +155,7 @@ public:
 	OpenWithPoseView* PoseView() const;
 
 protected:
-	virtual BPoseView* NewPoseView(Model* model, BRect rect,
-		uint32 viewMode);
+	virtual BPoseView* NewPoseView(Model* model, uint32 viewMode);
 
 	virtual	bool ShouldAddMenus() const;
 	virtual	void ShowContextMenu(BPoint, const entry_ref*, BView*);
@@ -191,7 +189,9 @@ private:
 	BMessage* fEntriesToOpen;
 	BButton* fLaunchButton;
 	BButton* fLaunchAndMakeDefaultButton;
-	float fMinimalWidth;
+	BButton* fCancelButton;
+
+	BGroupView* fButtonContainer;
 
 	typedef BContainerWindow _inherited;
 };
@@ -199,7 +199,7 @@ private:
 
 class OpenWithPoseView : public BPoseView {
 public:
-	OpenWithPoseView(BRect, uint32 resizeMask = B_FOLLOW_ALL);
+	OpenWithPoseView();
 
 	virtual void OpenSelection(BPose*, int32*);
 		// open entries with the selected app

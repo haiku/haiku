@@ -44,6 +44,8 @@ All rights reserved.
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
+#include <GridView.h>
+#include <GroupLayout.h>
 #include <Keymap.h>
 #include <Locale.h>
 #include <MenuItem.h>
@@ -116,14 +118,11 @@ namespace BPrivate {
 
 class DraggableContainerIcon : public BView {
 	public:
-		DraggableContainerIcon(BRect rect, const char* name,
-			uint32 resizeMask);
+		DraggableContainerIcon();
 
-		virtual void AttachedToWindow();
 		virtual void MouseDown(BPoint where);
 		virtual void MouseUp(BPoint);
 		virtual void MouseMoved(BPoint point, uint32, const BMessage*);
-		virtual void FrameMoved(BPoint);
 		virtual void Draw(BRect updateRect);
 
 	private:
@@ -144,9 +143,6 @@ struct StaggerOneParams {
 	bool rectFromParent;
 };
 
-
-const int32 kContainerWidthMinLimit = 120;
-const int32 kContainerWindowHeightLimit = 85;
 
 const int32 kWindowStaggerBy = 17;
 
@@ -311,22 +307,12 @@ AddMimeTypeString(BStringList& list, Model* model)
 //	#pragma mark - DraggableContainerIcon
 
 
-DraggableContainerIcon::DraggableContainerIcon(BRect rect, const char* name,
-	uint32 resizeMask)
+DraggableContainerIcon::DraggableContainerIcon()
 	:
-	BView(rect, name, resizeMask, B_WILL_DRAW | B_FRAME_EVENTS),
+	BView("DraggableContainerIcon", B_WILL_DRAW),
 	fDragButton(0),
 	fDragStarted(false)
 {
-}
-
-
-void
-DraggableContainerIcon::AttachedToWindow()
-{
-	SetViewColor(Parent()->ViewColor());
-	FrameMoved(BPoint(0, 0));
-		// this decides whether to hide the icon or not
 }
 
 
@@ -457,48 +443,16 @@ DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 
 
 void
-DraggableContainerIcon::FrameMoved(BPoint)
-{
-	BMenuBar* bar = dynamic_cast<BMenuBar*>(Parent());
-	ThrowOnAssert(bar != NULL);
-
-	// TODO: ugly hack following:
-	// This is a trick to get the actual width of all menu items
-	// (BMenuBar may not have set the item coordinates yet...)
-	float width, height;
-	uint32 resizingMode = bar->ResizingMode();
-	bar->SetResizingMode(B_FOLLOW_NONE);
-	bar->GetPreferredSize(&width, &height);
-	bar->SetResizingMode(resizingMode);
-
-	//BMenuItem* item = bar->ItemAt(bar->CountItems() - 1);
-	//if (item == NULL)
-	//	return;
-
-	// BeOS shifts the coordinates for hidden views, so we cannot
-	// use them to decide if we should be visible or not...
-
-	float gap = bar->Frame().Width() - 2 - width; //item->Frame().right;
-
-	if (gap <= Bounds().Width() && !IsHidden())
-		Hide();
-	else if (gap > Bounds().Width() && IsHidden())
-		Show();
-}
-
-
-void
 DraggableContainerIcon::Draw(BRect updateRect)
 {
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
 	ThrowOnAssert(window != NULL);
 
-	if (be_control_look != NULL) {
-		BRect rect(Bounds());
-		rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
-		be_control_look->DrawMenuBarBackground(this, rect, updateRect, base,
-			0, 0);
-	}
+	BRect rect(Bounds());
+	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
+	be_control_look->DrawBorder(this, rect, updateRect, base, B_PLAIN_BORDER,
+		0, BControlLook::B_BOTTOM_BORDER);
+	be_control_look->DrawMenuBarBackground(this, rect, updateRect, base);
 
 	// Draw the icon, straddling the border
 #ifdef __HAIKU__
@@ -507,9 +461,10 @@ DraggableContainerIcon::Draw(BRect updateRect)
 #else
 	SetDrawingMode(B_OP_OVER);
 #endif
-	float iconOffset = (Bounds().Width() - B_MINI_ICON) / 2;
+	float iconOffsetX = (Bounds().Width() - B_MINI_ICON) / 2;
+	float iconOffsetY = (Bounds().Height() - B_MINI_ICON) / 2;
 	IconCache::sIconCache->Draw(window->TargetModel(), this,
-		BPoint(iconOffset, iconOffset), kNormalIcon, B_MINI_ICON, true);
+		BPoint(iconOffsetX, iconOffsetY), kNormalIcon, B_MINI_ICON, true);
 }
 
 
@@ -518,10 +473,15 @@ DraggableContainerIcon::Draw(BRect updateRect)
 
 BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	uint32 containerWindowFlags, window_look look, window_feel feel,
-	uint32 flags, uint32 workspace)
+	uint32 flags, uint32 workspace, bool useLayouts, bool isDeskWindow)
 	:
 	BWindow(InitialWindowRect(feel), "TrackerWindow", look, feel, flags,
 		workspace),
+	fMenuContainer(NULL),
+	fPoseContainer(NULL),
+	fBorderedView(NULL),
+	fVScrollBarContainer(NULL),
+	fCountContainer(NULL),
 	fFileContextMenu(NULL),
 	fWindowContextMenu(NULL),
 	fDropContextMenu(NULL),
@@ -534,6 +494,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fOpenWithItem(NULL),
 	fNavigationItem(NULL),
 	fMenuBar(NULL),
+	fDraggableIcon(NULL),
 	fNavigator(NULL),
 	fPoseView(NULL),
 	fWindowList(list),
@@ -546,6 +507,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fIsTrash(false),
 	fInTrash(false),
 	fIsPrinters(false),
+	fIsDesktop(isDeskWindow),
 	fContainerWindowFlags(containerWindowFlags),
 	fBackgroundImage(NULL),
 	fSavedZoomRect(0, 0, -1, -1),
@@ -553,7 +515,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fDragMessage(NULL),
 	fCachedTypesList(NULL),
 	fStateNeedsSaving(false),
-	fSaveStateIsEnabled(dynamic_cast<BDeskWindow*>(this) == NULL),
+	fSaveStateIsEnabled(!fIsDesktop),
 	fIsWatchingPath(false)
 {
 	InitIconPreloader();
@@ -561,6 +523,29 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	if (list != NULL) {
 		ASSERT(list->IsLocked());
 		list->AddItem(this);
+	}
+
+	if (useLayouts) {
+		SetFlags(Flags() | B_AUTO_UPDATE_SIZE_LIMITS);
+
+		fRootLayout = new BGroupLayout(B_VERTICAL, 0);
+		fRootLayout->SetInsets(0);
+		SetLayout(fRootLayout);
+		fRootLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+		if (!fIsDesktop) {
+			fMenuContainer = new BGroupView(B_HORIZONTAL, 0);
+			fRootLayout->AddView(fMenuContainer);
+
+			fPoseContainer = new BGridView(0.0, 0.0);
+			fRootLayout->AddView(fPoseContainer);
+
+			fBorderedView = new BorderedView;
+			fPoseContainer->GridLayout()->AddView(fBorderedView, 0, 1);
+
+			fCountContainer = new BGroupView(B_HORIZONTAL, 0);
+			fPoseContainer->GridLayout()->AddView(fCountContainer, 0, 2);
+		}
 	}
 
 	AddCommonFilter(new BMessageFilter(B_MOUSE_DOWN, ActivateWindowFilter));
@@ -726,9 +711,9 @@ BContainerWindow::Quit()
 
 
 BPoseView*
-BContainerWindow::NewPoseView(Model* model, BRect rect, uint32 viewMode)
+BContainerWindow::NewPoseView(Model* model, uint32 viewMode)
 {
-	return new BPoseView(model, rect, viewMode);
+	return new BPoseView(model, viewMode);
 }
 
 
@@ -749,31 +734,20 @@ void
 BContainerWindow::CreatePoseView(Model* model)
 {
 	UpdateIfTrash(model);
-	BRect rect(Bounds());
+
+	fPoseView = NewPoseView(model, kListMode);
+	fBorderedView->GroupLayout()->AddView(fPoseView);
+	fBorderedView->EnableBorderHighlight(false);
 
 	TrackerSettings settings;
-	if (settings.SingleWindowBrowse() && settings.ShowNavigator()
-		&& model->IsDirectory()) {
-		rect.top += BNavigator::CalcNavigatorHeight() + 1;
-	}
-
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	fPoseView = NewPoseView(model, rect, kListMode);
-	AddChild(fPoseView);
-
 	if (settings.SingleWindowBrowse() && model->IsDirectory()
 		&& !fPoseView->IsFilePanel()) {
-		BRect rect(Bounds());
-		rect.top = 0;
-			// The KeyMenuBar isn't attached yet, otherwise we'd use that
-			// to get the offset.
-		rect.bottom = BNavigator::CalcNavigatorHeight();
-		fNavigator = new BNavigator(model, rect);
-		if (!settings.ShowNavigator())
+		fNavigator = new BNavigator(model);
+		fPoseContainer->GridLayout()->AddView(fNavigator, 0, 0, 2);
+		if (!settings.ShowNavigator()) {
 			fNavigator->Hide();
-
-		AddChild(fNavigator);
+			fBorderedView->GroupLayout()->SetInsets(1, 0, 1, 1);
+		}
 	}
 
 	SetPathWatchingEnabled(settings.ShowNavigator()
@@ -885,7 +859,6 @@ BContainerWindow::RepopulateMenus()
 void
 BContainerWindow::Init(const BMessage* message)
 {
-	float y_delta;
 	BEntry entry;
 
 	ASSERT(fPoseView != NULL);
@@ -909,30 +882,10 @@ BContainerWindow::Init(const BMessage* message)
 	TrackerSettings settings;
 
 	if (ShouldAddMenus()) {
-		// add menu bar, menus and resize poseview to fit
-		fMenuBar = new BMenuBar(BRect(0, 0, Bounds().Width() + 1, 1),
-			"MenuBar");
+		fMenuBar = new BMenuBar("MenuBar");
 		fMenuBar->SetBorder(B_BORDER_FRAME);
+		fMenuContainer->GroupLayout()->AddView(fMenuBar);
 		AddMenus();
-		AddChild(fMenuBar);
-
-		y_delta = KeyMenuBar()->Bounds().Height() + 1;
-
-		float navigatorDelta = 0;
-
-		if (Navigator() && settings.ShowNavigator()) {
-			Navigator()->MoveTo(BPoint(0, y_delta));
-			navigatorDelta = BNavigator::CalcNavigatorHeight() + 1;
-		}
-
-		fPoseView->MoveTo(BPoint(0, navigatorDelta + y_delta));
-		fPoseView->ResizeBy(0, -(y_delta));
-		if (fPoseView->VScrollBar()) {
-			fPoseView->VScrollBar()->MoveBy(0,
-				KeyMenuBar()->Bounds().Height());
-			fPoseView->VScrollBar()->ResizeBy(0,
-				-(KeyMenuBar()->Bounds().Height()));
-		}
 
 		if (!TargetModel()->IsRoot() && !IsTrash())
 			_AddFolderIcon();
@@ -999,7 +952,7 @@ BContainerWindow::Init(const BMessage* message)
 	MarkAttributeMenu(fAttrMenu);
 	CheckScreenIntersect();
 
-	if (fBackgroundImage != NULL && dynamic_cast<BDeskWindow*>(this) == NULL
+	if (fBackgroundImage != NULL && !fIsDesktop
 		&& PoseView()->ViewMode() != kListMode) {
 		fBackgroundImage->Show(PoseView(), current_workspace());
 	}
@@ -1011,13 +964,44 @@ BContainerWindow::Init(const BMessage* message)
 	SetFlags(Flags() & ~B_NO_WORKSPACE_ACTIVATION);
 }
 
+void
+BContainerWindow::InitLayout()
+{
+	BLayoutItem* item
+		= fBorderedView->GroupLayout()->AddView(0, fPoseView->TitleView());
+	BSize minSize = item->MinSize();
+	BSize maxSize = item->MaxSize();
+	item->SetExplicitMinSize(BSize(minSize.Width(), kTitleViewHeight));
+	item->SetExplicitMaxSize(BSize(maxSize.Width(), kTitleViewHeight));
+
+	item = fCountContainer->GroupLayout()->AddView(fPoseView->CountView());
+	minSize = item->MinSize();
+	maxSize = item->MaxSize();
+	item->SetExplicitMinSize(BSize(kCountViewWidth, minSize.Height()));
+	item->SetExplicitMaxSize(BSize(kCountViewWidth, maxSize.Height()));
+
+	// Eliminate the extra borders
+	fMenuContainer->GroupLayout()->SetInsets(0, 0, -1, 0);
+	fPoseContainer->GridLayout()->SetInsets(-1, 0, -1, -1);
+	fCountContainer->GroupLayout()->SetInsets(0, -1, 0, 0);
+
+	if (fPoseView->VScrollBar() != NULL) {
+		fVScrollBarContainer = new BGroupView(B_VERTICAL, 0);
+		fVScrollBarContainer->GroupLayout()->AddView(fPoseView->VScrollBar());
+		fVScrollBarContainer->GroupLayout()->SetInsets(-1, 0, 0, 1);
+		fPoseContainer->GridLayout()->AddView(fVScrollBarContainer, 1, 1);
+	}
+	if (fPoseView->HScrollBar() != NULL) {
+		BGroupView* hScrollBarContainer = new BGroupView(B_VERTICAL, 0);
+		hScrollBarContainer->GroupLayout()->AddView(fPoseView->HScrollBar());
+		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, 0, 0);
+		fCountContainer->GroupLayout()->AddView(hScrollBarContainer);
+	}
+}
 
 void
 BContainerWindow::RestoreState()
 {
-	SetSizeLimits(kContainerWidthMinLimit, 10000,
-		kContainerWindowHeightLimit, 10000);
-
 	UpdateTitle();
 
 	WindowStateNodeOpener opener(this, false);
@@ -1031,9 +1015,6 @@ BContainerWindow::RestoreState()
 void
 BContainerWindow::RestoreState(const BMessage &message)
 {
-	SetSizeLimits(kContainerWidthMinLimit, 10000,
-		kContainerWindowHeightLimit, 10000);
-
 	UpdateTitle();
 
 	RestoreWindowState(message);
@@ -1046,13 +1027,15 @@ BContainerWindow::RestoreState(const BMessage &message)
 void
 BContainerWindow::RestoreStateCommon()
 {
+	if (!fIsDesktop)
+		InitLayout();
+
 	if (BootedInSafeMode())
 		// don't pick up backgrounds in safe mode
 		return;
 
 	WindowStateNodeOpener opener(this, false);
 
-	bool isDesktop = dynamic_cast<BDeskWindow*>(this) != NULL;
 	if (!TargetModel()->IsRoot() && opener.Node() != NULL) {
 		// don't pick up background image for root disks
 		// to do this, would have to have a unique attribute for the
@@ -1060,16 +1043,16 @@ BContainerWindow::RestoreStateCommon()
 		// for R4 this was not done to make things simpler
 		// the default image will still work though
 		fBackgroundImage = BackgroundImage::GetBackgroundImage(
-			opener.Node(), isDesktop);
+			opener.Node(), fIsDesktop);
 			// look for background image info in the window's node
 	}
 
 	BNode defaultingNode;
-	if (fBackgroundImage == NULL && !isDesktop
+	if (fBackgroundImage == NULL && !fIsDesktop
 		&& DefaultStateSourceNode(kDefaultFolderTemplate, &defaultingNode)) {
 		// look for background image info in the source for defaults
 		fBackgroundImage = BackgroundImage::GetBackgroundImage(&defaultingNode,
-			isDesktop);
+			fIsDesktop);
 	}
 }
 
@@ -1101,21 +1084,20 @@ BContainerWindow::UpdateBackgroundImage()
 	if (BootedInSafeMode())
 		return;
 
-	bool isDesktop = dynamic_cast<BDeskWindow*>(this) != NULL;
 	WindowStateNodeOpener opener(this, false);
 
 	if (!TargetModel()->IsRoot() && opener.Node() != NULL) {
 		fBackgroundImage = BackgroundImage::Refresh(fBackgroundImage,
-			opener.Node(), isDesktop, PoseView());
+			opener.Node(), fIsDesktop, PoseView());
 	}
 
 		// look for background image info in the window's node
 	BNode defaultingNode;
-	if (!fBackgroundImage && !isDesktop
+	if (!fBackgroundImage && !fIsDesktop
 		&& DefaultStateSourceNode(kDefaultFolderTemplate, &defaultingNode)) {
 		// look for background image info in the source for defaults
 		fBackgroundImage = BackgroundImage::Refresh(fBackgroundImage,
-			&defaultingNode, isDesktop, PoseView());
+			&defaultingNode, fIsDesktop, PoseView());
 	}
 }
 
@@ -1172,14 +1154,6 @@ BContainerWindow::WorkspacesChanged(uint32, uint32)
 void
 BContainerWindow::ViewModeChanged(uint32 oldMode, uint32 newMode)
 {
-	if (fMenuBar != NULL) {
-		// make sure the draggable icon hides if it doesn't
-		// have space left anymore
-		BView* view = fMenuBar->FindView("ThisContainer");
-		if (view != NULL)
-			view->FrameMoved(view->Frame().LeftTop());
-	}
-
 	if (fBackgroundImage == NULL)
 		return;
 
@@ -1336,13 +1310,6 @@ BContainerWindow::ShouldAddMenus() const
 
 bool
 BContainerWindow::ShouldAddScrollBars() const
-{
-	return true;
-}
-
-
-bool
-BContainerWindow::ShouldAddCountView() const
 {
 	return true;
 }
@@ -1589,20 +1556,17 @@ BContainerWindow::MessageReceived(BMessage* message)
 
 					// Update draggable folder icon
 					if (fMenuBar != NULL) {
-						BView* view = fMenuBar->FindView("ThisContainer");
 						if (!TargetModel()->IsRoot() && !IsTrash()) {
 							// Folder icon should be visible, but in single
 							// window navigation, it might not be.
-							if (view != NULL) {
+							if (fDraggableIcon != NULL) {
 								IconCache::sIconCache->IconChanged(
 									TargetModel());
-								view->Invalidate();
+								fDraggableIcon->Invalidate();
 							} else
 								_AddFolderIcon();
-						} else if (view != NULL) {
-							view->RemoveSelf();
-							fMenuBar->Invalidate();
-						}
+						} else if (fDraggableIcon != NULL)
+							fDraggableIcon->RemoveSelf();
 					}
 
 					// Update window title
@@ -1664,21 +1628,19 @@ BContainerWindow::MessageReceived(BMessage* message)
 							&& TargetModel()->IsDirectory()
 							&& !PoseView()->IsFilePanel()
 							&& !PoseView()->IsDesktopWindow()) {
-							BRect rect(Bounds());
-							rect.top = KeyMenuBar()->Bounds().Height() + 1;
-							rect.bottom = rect.top
-								+ BNavigator::CalcNavigatorHeight();
-							fNavigator = new BNavigator(TargetModel(), rect);
+							fNavigator = new BNavigator(TargetModel());
+							fPoseContainer->GridLayout()->AddView(fNavigator,
+								0, 0, 2);
 							fNavigator->Hide();
-							AddChild(fNavigator);
+							fBorderedView->GroupLayout()->SetInsets(1, 0,
+								1, 1);
 							SetPathWatchingEnabled(settings.ShowNavigator()
 								|| settings.ShowFullPathInTitleBar());
 						}
 
 						if (!settings.SingleWindowBrowse()
-							&& dynamic_cast<BDeskWindow*>(this) == NULL
-							&& TargetModel()->IsDesktop()) {
-							// close the "Desktop" window, but not the Desktop
+							&& !fIsDesktop && TargetModel()->IsDesktop()) {
+							// Close the "Desktop" window, but not the Desktop
 							this->Quit();
 						}
 
@@ -2800,7 +2762,7 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref* ref, BView*)
 			return;
 
 		// Repopulate desktop menu if IsDesktop
-		if (dynamic_cast<BDeskWindow*>(this))
+		if (fIsDesktop)
 			RepopulateMenus();
 
 		MenusEnded();
@@ -3310,21 +3272,25 @@ BContainerWindow::_UpdateSelectionMIMEInfo()
 void
 BContainerWindow::_AddFolderIcon()
 {
-	if (fMenuBar == NULL)
+	if (fMenuBar == NULL) {
+		// We don't want to add the icon if there's no menubar
 		return;
+	}
+
 	float iconSize = fMenuBar->Bounds().Height() - 2;
 	if (iconSize < 16)
 		iconSize = 16;
-	float iconPosY = 1 + (fMenuBar->Bounds().Height() - 2
-		- iconSize) / 2;
-	BView* icon = new(std::nothrow) DraggableContainerIcon(
-		BRect(Bounds().Width() - 4 - iconSize + 1, iconPosY,
-			Bounds().Width() - 4, iconPosY + iconSize - 1), "ThisContainer",
-		B_FOLLOW_RIGHT);
-	if (icon != NULL)
-		fMenuBar->AddChild(icon);
-}
 
+	fDraggableIcon = new(std::nothrow)
+		DraggableContainerIcon;
+
+	if (fDraggableIcon != NULL) {
+		BLayoutItem* item =
+			fMenuContainer->GroupLayout()->AddView(fDraggableIcon);
+		item->SetExplicitMinSize(BSize(iconSize + 5, iconSize));
+		item->SetExplicitMaxSize(BSize(iconSize + 5, item->MaxSize().Height()));
+	}
+}
 
 
 BMenuItem*
@@ -4116,46 +4082,26 @@ BContainerWindow::ShowNavigator(bool show)
 			return;
 
 		if (Navigator() == NULL) {
-			BRect rect(Bounds());
-			rect.top = KeyMenuBar()->Bounds().Height() + 1;
-			rect.bottom = rect.top + BNavigator::CalcNavigatorHeight();
-			fNavigator = new BNavigator(TargetModel(), rect);
-			AddChild(fNavigator);
+			fNavigator = new BNavigator(TargetModel());
+			fPoseContainer->GridLayout()->AddView(fNavigator, 0, 0, 2);
 		}
 
-		if (Navigator()->IsHidden()) {
-			if (Navigator()->Bounds().top == 0)
-				Navigator()->MoveTo(0, KeyMenuBar()->Bounds().Height() + 1);
-				// This is if the navigator was created with a .top = 0.
+		if (Navigator()->IsHidden())
 			Navigator()->Show();
-		}
 
-		float displacement = Navigator()->Frame().Height() + 1;
-
-		PoseView()->MoveBy(0, displacement);
-		PoseView()->ResizeBy(0, -displacement);
-
-		if (PoseView()->VScrollBar()) {
-			PoseView()->VScrollBar()->MoveBy(0, displacement);
-			PoseView()->VScrollBar()->ResizeBy(0, -displacement);
+		if (PoseView()->VScrollBar())
 			PoseView()->UpdateScrollRange();
-		}
+
+		fBorderedView->GroupLayout()->SetInsets(1);
 	} else {
 		if (!Navigator() || Navigator()->IsHidden())
 			return;
 
-		float displacement = Navigator()->Frame().Height() + 1;
-
-		PoseView()->ResizeBy(0, displacement);
-		PoseView()->MoveBy(0, -displacement);
-
-		if (PoseView()->VScrollBar()) {
-			PoseView()->VScrollBar()->ResizeBy(0, displacement);
-			PoseView()->VScrollBar()->MoveBy(0, -displacement);
+		if (PoseView()->VScrollBar())
 			PoseView()->UpdateScrollRange();
-		}
 
 		fNavigator->Hide();
+		fBorderedView->GroupLayout()->SetInsets(1, 0, 1, 1);
 	}
 }
 
@@ -4398,119 +4344,65 @@ WindowStateNodeOpener::Node() const
 }
 
 
-//	#pragma mark - BackgroundView
+//	#pragma mark - BorderedView
 
 
-BackgroundView::BackgroundView(BRect frame)
+BorderedView::BorderedView()
 	:
-	BView(frame, "", B_FOLLOW_ALL,
-		B_FRAME_EVENTS | B_WILL_DRAW | B_PULSE_NEEDED)
+	BGroupView(B_VERTICAL, 0),
+	fEnableBorderHighlight(true)
 {
+	GroupLayout()->SetInsets(1);
+	SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_2_TINT));
 }
 
 
 void
-BackgroundView::AttachedToWindow()
+BorderedView::WindowActivated(bool active)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	// Update border color
+	PoseViewFocused(active);
+}
+
+
+void BorderedView::EnableBorderHighlight(bool enable)
+{
+	fEnableBorderHighlight = enable;
+	PoseViewFocused(false);
 }
 
 
 void
-BackgroundView::FrameResized(float, float)
-{
-	Invalidate();
-}
-
-
-void
-BackgroundView::PoseViewFocused(bool focused)
-{
-	Invalidate();
-
-	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
-	if (window == NULL)
-		return;
-
-	BScrollBar* hScrollBar = window->PoseView()->HScrollBar();
-	if (hScrollBar != NULL)
-		hScrollBar->SetBorderHighlighted(focused);
-
-	BScrollBar* vScrollBar = window->PoseView()->VScrollBar();
-	if (vScrollBar != NULL)
-		vScrollBar->SetBorderHighlighted(focused);
-
-	BCountView* countView = window->PoseView()->CountView();
-	if (countView != NULL)
-		countView->SetBorderHighlighted(focused);
-}
-
-
-void
-BackgroundView::WindowActivated(bool)
-{
-	Invalidate();
-}
-
-
-void
-BackgroundView::Draw(BRect updateRect)
+BorderedView::PoseViewFocused(bool focused)
 {
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
 	if (window == NULL)
 		return;
 
-	BPoseView* poseView = window->PoseView();
-	BRect frame(poseView->Frame());
-	frame.InsetBy(-1, -1);
-	frame.top -= kTitleViewHeight;
-	frame.bottom += B_H_SCROLL_BAR_HEIGHT;
-	frame.right += B_V_SCROLL_BAR_WIDTH;
+	rgb_color base;
+	if (focused && window->IsActive() && fEnableBorderHighlight) {
+		base = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
-	if (be_control_look != NULL) {
-		uint32 flags = 0;
-		if (window->IsActive() && window->PoseView()->IsFocus())
-			flags |= BControlLook::B_FOCUSED;
+		BScrollBar* hScrollBar = window->PoseView()->HScrollBar();
+		if (hScrollBar != NULL)
+			hScrollBar->SetBorderHighlighted(focused);
 
-		frame.top--;
-		frame.InsetBy(-1, -1);
-		BRect rect(frame);
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-
-		BScrollBar* hScrollBar = poseView->HScrollBar();
-		BScrollBar* vScrollBar = poseView->VScrollBar();
-
-		BRect verticalScrollBarFrame(0, 0, -1, -1);
-		if (vScrollBar)
-			verticalScrollBarFrame = vScrollBar->Frame();
-		BRect horizontalScrollBarFrame(0, 0, -1, -1);
-		if (hScrollBar) {
-			horizontalScrollBarFrame = hScrollBar->Frame();
-			// CountView extends horizontal scroll bar frame:
-			horizontalScrollBarFrame.left = frame.left + 1;
-		}
-
-		be_control_look->DrawScrollViewFrame(this, rect, updateRect,
-			verticalScrollBarFrame, horizontalScrollBarFrame, base,
-			B_FANCY_BORDER, flags);
-
-		return;
+		BScrollBar* vScrollBar = window->PoseView()->VScrollBar();
+		if (vScrollBar != NULL)
+			vScrollBar->SetBorderHighlighted(focused);
+	} else {
+		base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		base = tint_color(base, B_DARKEN_2_TINT);
 	}
+	SetViewColor(base);
 
-	SetHighColor(100, 100, 100);
-	StrokeRect(frame);
-
-	// draw the pose view focus
-	if (window->IsActive() && window->PoseView()->IsFocus()) {
-		frame.InsetBy(-2, -2);
-		SetHighColor(keyboard_navigation_color());
-		StrokeRect(frame);
-	}
+	Invalidate();
 }
 
 
 void
-BackgroundView::Pulse()
+BorderedView::Pulse()
 {
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
 	if (window != NULL)

@@ -111,7 +111,6 @@ using std::max;
 
 
 const float kDoubleClickTresh = 6;
-const float kCountViewWidth = 76;
 
 const uint32 kAddNewPoses = 'Tanp';
 const uint32 kAddPosesCompleted = 'Tapc';
@@ -203,13 +202,12 @@ static int
 PoseCompareAddWidget(const BPose* p1, const BPose* p2, BPoseView* view);
 
 
-// #pragma mark - BPoseView
+//	#pragma mark - BPoseView
 
 
-BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode,
-	uint32 resizeMask)
+BPoseView::BPoseView(Model* model, uint32 viewMode)
 	:
-	BView(bounds, "PoseView", resizeMask, B_WILL_DRAW | B_PULSE_NEEDED),
+	BView("BPoseView", B_WILL_DRAW | B_PULSE_NEEDED),
 	fIsDrawingSelectionRect(false),
 	fHScrollBar(NULL),
 	fVScrollBar(NULL),
@@ -320,23 +318,11 @@ BPoseView::InitCommon()
 {
 	BContainerWindow* window = ContainerWindow();
 
-	// create title view for window
-	BRect rect(Frame());
-	rect.bottom = rect.top + kTitleViewHeight;
-	fTitleView = new BTitleView(rect, this);
-	if (ViewMode() == kListMode) {
-		// resize and move poseview
-		MoveBy(0, kTitleViewHeight + 1);
-		ResizeBy(0, -(kTitleViewHeight + 1));
-
-		if (Parent() != NULL)
-			Parent()->AddChild(fTitleView);
-		else
-			Window()->AddChild(fTitleView);
-	}
-
-	if (fHScrollBar)
+	// Create the TitleView and CountView
+	fTitleView = new BTitleView(this);
+	if (fHScrollBar != NULL)
 		fHScrollBar->SetTitleView(fTitleView);
+	fCountView = new BCountView(this);
 
 	BPoint origin;
 	if (ViewMode() == kListMode)
@@ -360,9 +346,6 @@ BPoseView::InitCommon()
 
 	StartWatching();
 		// turn on volume node monitor, metamime monitor, etc.
-
-	if (window != NULL && window->ShouldAddCountView())
-		AddCountView();
 
 	// populate the window
 	if (window != NULL && window->IsTrash())
@@ -939,16 +922,6 @@ BPoseView::Pulse()
 
 
 void
-BPoseView::MoveBy(float x, float y)
-{
-	if (fTitleView && fTitleView->Window())
-		fTitleView->MoveBy(x, y);
-
-	_inherited::MoveBy(x, y);
-}
-
-
-void
 BPoseView::ScrollTo(BPoint where)
 {
 	_inherited::ScrollTo(where);
@@ -1063,10 +1036,19 @@ BPoseView::MakeFocus(bool focused)
 	_inherited::MakeFocus(focused);
 
 	if (invalidate) {
-		BackgroundView* view = dynamic_cast<BackgroundView*>(Parent());
+		BorderedView* view = dynamic_cast<BorderedView*>(Parent());
 		if (view != NULL)
 			view->PoseViewFocused(focused);
 	}
+}
+
+
+BSize
+BPoseView::MinSize()
+{
+	// Between the BTitleView, BCountView, and scrollbars,
+	// we don't need any extra room.
+	return BSize(0, 0);
 }
 
 
@@ -2080,33 +2062,8 @@ BPoseView::EnableScrollBars()
 void
 BPoseView::AddScrollBars()
 {
-	AutoLock<BWindow> lock(Window());
-	if (!lock)
-		return;
-
-	BRect bounds(Frame());
-
-	// horizontal
-	BRect rect(bounds);
-	rect.top = rect.bottom + 1;
-	rect.bottom = rect.top + (float)B_H_SCROLL_BAR_HEIGHT;
-	rect.right++;
-	fHScrollBar = new BHScrollBar(rect, "HScrollBar", this);
-	if (Parent() != NULL)
-		Parent()->AddChild(fHScrollBar);
-	else
-		Window()->AddChild(fHScrollBar);
-
-	// vertical
-	rect = bounds;
-	rect.left = rect.right + 1;
-	rect.right = rect.left + (float)B_V_SCROLL_BAR_WIDTH;
-	rect.bottom++;
-	fVScrollBar = new BScrollBar(rect, "VScrollBar", this, 0, 100, B_VERTICAL);
-	if (Parent() != NULL)
-		Parent()->AddChild(fVScrollBar);
-	else
-		Window()->AddChild(fVScrollBar);
+	fHScrollBar = new TScrollBar("HScrollBar", this, 0, 100);
+	fVScrollBar = new BScrollBar("VScrollBar", this, 0, 100, B_VERTICAL);
 }
 
 
@@ -2115,30 +2072,6 @@ BPoseView::UpdateCount()
 {
 	if (fCountView != NULL)
 		fCountView->CheckCount();
-}
-
-
-void
-BPoseView::AddCountView()
-{
-	AutoLock<BWindow> lock(Window());
-	if (!lock)
-		return;
-
-	BRect rect(Frame());
-	rect.right = rect.left + kCountViewWidth;
-	rect.top = rect.bottom + 1;
-	rect.bottom = rect.top + (float)B_H_SCROLL_BAR_HEIGHT - 1;
-	fCountView = new BCountView(rect, this);
-	if (Parent() != NULL)
-		Parent()->AddChild(fCountView);
-	else
-		Window()->AddChild(fCountView);
-
-	if (fHScrollBar != NULL) {
-		fHScrollBar->MoveBy(kCountViewWidth + 1, 0);
-		fHScrollBar->ResizeBy(-kCountViewWidth - 1, 0);
-	}
 }
 
 
@@ -3093,26 +3026,15 @@ BPoseView::SetViewMode(uint32 newMode)
 		if (fFiltering)
 			ClearFilter();
 
-		fTitleView->RemoveSelf();
-
 		if (window != NULL)
 			window->HideAttributeMenu();
 
-		MoveBy(0, -(kTitleViewHeight + 1));
-		ResizeBy(0, kTitleViewHeight + 1);
+		fTitleView->Hide();
 	} else if (newMode == kListMode) {
-		MoveBy(0, kTitleViewHeight + 1);
-		ResizeBy(0, -(kTitleViewHeight + 1));
-
 		if (window != NULL)
 			window->ShowAttributeMenu();
 
-		fTitleView->ResizeTo(Frame().Width(), fTitleView->Frame().Height());
-		fTitleView->MoveTo(Frame().left, Frame().top - (kTitleViewHeight + 1));
-		if (Parent() != NULL)
-			Parent()->AddChild(fTitleView);
-		else
-			Window()->AddChild(fTitleView);
+		fTitleView->Show();
 	}
 
 	CommitActivePose();
@@ -8402,28 +8324,15 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 
 	if (viewStateRestored) {
 		if (ViewMode() == kListMode && oldMode != kListMode) {
-
-			MoveBy(0, kTitleViewHeight + 1);
-			ResizeBy(0, -(kTitleViewHeight + 1));
-
 			if (ContainerWindow())
 				ContainerWindow()->ShowAttributeMenu();
 
-			fTitleView->ResizeTo(Frame().Width(), fTitleView->Frame().Height());
-			fTitleView->MoveTo(Frame().left, Frame().top
-				- (kTitleViewHeight + 1));
-			if (Parent() != NULL)
-				Parent()->AddChild(fTitleView);
-			else
-				Window()->AddChild(fTitleView);
+			fTitleView->Show();
 		} else if (ViewMode() != kListMode && oldMode == kListMode) {
-			fTitleView->RemoveSelf();
+			fTitleView->Hide();
 
 			if (ContainerWindow())
 				ContainerWindow()->HideAttributeMenu();
-
-			MoveBy(0, -(kTitleViewHeight + 1));
-			ResizeBy(0, kTitleViewHeight + 1);
 		} else if (ViewMode() == kListMode && oldMode == kListMode)
 			fTitleView->Invalidate();
 
@@ -10444,19 +10353,19 @@ BPoseView::ExcludeTrashFromSelection()
 }
 
 
-//	#pragma mark - BHScrollBar
+//	#pragma mark - TScrollBar
 
 
-BHScrollBar::BHScrollBar(BRect bounds, const char* name, BView* target)
+TScrollBar::TScrollBar(const char* name, BView* target, float min, float max)
 	:
-	BScrollBar(bounds, name, target, 0, 1, B_HORIZONTAL),
-	fTitleView(0)
+	BScrollBar(name, target, min, max, B_HORIZONTAL),
+	fTitleView(NULL)
 {
 }
 
 
 void
-BHScrollBar::ValueChanged(float value)
+TScrollBar::ValueChanged(float value)
 {
 	if (fTitleView) {
 		BPoint origin = fTitleView->LeftTop();

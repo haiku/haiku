@@ -28,8 +28,7 @@ public:
 
 protected:
 	virtual	void				CreatePoseView(Model* model);
-	virtual	BPoseView*			NewPoseView(Model* model, BRect rect,
-									uint32 viewMode);
+	virtual	BPoseView*			NewPoseView(Model* model, uint32 viewMode);
 	virtual	void				AddWindowMenu(BMenu* menu);
 	virtual	void				AddWindowContextMenus(BMenu* menu);
 

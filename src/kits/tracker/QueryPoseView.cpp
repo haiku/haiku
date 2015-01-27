@@ -77,9 +77,9 @@ using std::nothrow;
 //	#pragma mark - BQueryPoseView
 
 
-BQueryPoseView::BQueryPoseView(Model* model, BRect frame, uint32 resizeMask)
+BQueryPoseView::BQueryPoseView(Model* model)
 	:
-	BPoseView(model, frame, kListMode, resizeMask),
+	BPoseView(model, kListMode),
 	fShowResultsFromTrash(false),
 	fQueryList(NULL),
 	fQueryListContainer(NULL),

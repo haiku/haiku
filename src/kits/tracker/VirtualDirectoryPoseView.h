@@ -21,9 +21,7 @@ class VirtualDirectoryEntryList;
 
 class VirtualDirectoryPoseView : public BPoseView {
 public:
-								VirtualDirectoryPoseView(Model* model,
-									BRect frame,
-									uint32 resizeMask = B_FOLLOW_ALL);
+								VirtualDirectoryPoseView(Model* model);
 	virtual						~VirtualDirectoryPoseView();
 
 	virtual	void				MessageReceived(BMessage* message);

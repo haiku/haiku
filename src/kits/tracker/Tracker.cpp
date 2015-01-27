@@ -1059,8 +1059,10 @@ TTracker::OpenContainerWindow(Model* model, BMessage* originalRefsList,
 		window = new BContainerWindow(&fWindowList, openFlags);
 	}
 
-	if (model != NULL)
+	if (model != NULL && window->LockLooper()) {
 		window->CreatePoseView(model);
+		window->UnlockLooper();
+	}
 
 	BMessage restoreStateMessage(kRestoreState);
 
