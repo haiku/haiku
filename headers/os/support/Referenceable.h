@@ -37,7 +37,7 @@ protected:
 // #pragma mark - BReference
 
 
-template<typename Type = BReferenceable, typename ConstType = Type>
+template<typename Type = BReferenceable>
 class BReference {
 public:
 	BReference()
@@ -92,34 +92,34 @@ public:
 		}
 	}
 
-	ConstType* Get() const
+	Type* Get() const
 	{
 		return fObject;
 	}
 
-	ConstType* Detach()
+	Type* Detach()
 	{
 		Type* object = fObject;
 		fObject = NULL;
 		return object;
 	}
 
-	ConstType& operator*() const
+	Type& operator*() const
 	{
 		return *fObject;
 	}
 
-	ConstType* operator->() const
+	Type* operator->() const
 	{
 		return fObject;
 	}
 
-	operator ConstType*() const
+	operator Type*() const
 	{
 		return fObject;
 	}
 
-	BReference& operator=(const BReference<Type, ConstType>& other)
+	BReference& operator=(const BReference<Type>& other)
 	{
 		SetTo(other.fObject);
 		return *this;
@@ -131,14 +131,14 @@ public:
 		return *this;
 	}
 
-	template<typename OtherType, typename OtherConstType>
-	BReference& operator=(const BReference<OtherType, OtherConstType>& other)
+	template<typename OtherType>
+	BReference& operator=(const BReference<OtherType>& other)
 	{
 		SetTo(other.Get());
 		return *this;
 	}
 
-	bool operator==(const BReference<Type, ConstType>& other) const
+	bool operator==(const BReference<Type>& other) const
 	{
 		return fObject == other.fObject;
 	}
@@ -148,7 +148,7 @@ public:
 		return fObject == other;
 	}
 
-	bool operator!=(const BReference<Type, ConstType>& other) const
+	bool operator!=(const BReference<Type>& other) const
 	{
 		return fObject != other.fObject;
 	}
@@ -163,38 +163,104 @@ private:
 };
 
 
-// #pragma mark - BReference
+// #pragma mark - BReference<const>
 
 
-template<typename Type = BReferenceable>
-class BConstReference: public BReference<Type, const Type> {
+template<typename Type>
+class BReference<const Type> {
 public:
-	BConstReference()
+	BReference(Type* object, bool alreadyHasReference = false)
 		:
-		BReference<Type, const Type>()
+		fReference(object, alreadyHasReference)
 	{
 	}
 
-	BConstReference(Type* object, bool alreadyHasReference = false)
+	BReference(const BReference<const Type>& other)
 		:
-		BReference<Type, const Type>(object, alreadyHasReference)
+		fReference(other)
 	{
 	}
 
-	BConstReference(const BReference<Type>& other)
+	template<typename OtherType>
+	BReference(const BReference<OtherType>& other)
 		:
-		BReference<Type, const Type>(other)
+		fReference(other.Get())
 	{
 	}
 
-	// Allow assignment of a const reference from a mutable one (but not the
-	// reverse).
-	BConstReference& operator=(const BReference<Type, Type>& other)
+	void SetTo(Type* object, bool alreadyHasReference = false)
 	{
-		SetTo(other.Get());
-		return *this;
+		fReference.SetTo(object, alreadyHasReference);
 	}
 
+	void Unset()
+	{
+		fReference.Unset();
+	}
+
+	const Type* Get() const
+	{
+		return fReference.Get();
+	}
+
+	const Type* Detach()
+	{
+		return fReference.Detach();
+	}
+
+	const Type& operator*() const
+	{
+		return *fReference;
+	}
+
+	const Type* operator->() const
+	{
+		return fReference.Get();
+	}
+
+	operator const Type*() const
+	{
+		return fReference.Get();
+	}
+
+	BReference& operator=(const BReference<const Type>& other)
+	{
+		fReference = other.fReference;
+	}
+
+	BReference& operator=(Type* other)
+	{
+		fReference = other;
+	}
+
+	template<typename OtherType>
+	BReference& operator=(const BReference<OtherType>& other)
+	{
+		fReference = other.Get();
+	}
+
+	bool operator==(const BReference<const Type>& other) const
+	{
+		return fReference == other.Get();
+	}
+
+	bool operator==(const Type* other) const
+	{
+		return fReference == other;
+	}
+
+	bool operator!=(const BReference<const Type>& other) const
+	{
+		return fReference != other.Get();
+	}
+
+	bool operator!=(const Type* other) const
+	{
+		return fReference != other;
+	}
+
+private:
+	BReference<Type> fReference;
 };
 
 
