@@ -6,5 +6,5 @@ UsePrivateHeaders app ;
 
 Addon switch_workspace
 	: SwitchWorkspaceInputFilter.cpp
-	: be input_server $(TARGET_LIBSUPC++)
+	: be input_server [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 	;

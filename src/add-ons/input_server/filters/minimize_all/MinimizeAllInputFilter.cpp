@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Haiku, Inc. All rights reserved
+ * Copyright 2015 Haiku, Inc. All rights reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,8 @@
 #include "MinimizeAllInputFilter.h"
 
 #include <string.h>
+
+#include <new>
 
 #include <InterfaceDefs.h>
 #include <Message.h>
@@ -24,7 +26,7 @@
 
 
 extern "C" BInputServerFilter* instantiate_input_filter() {
-	return new MinimizeAllInputFilter();
+	return new(std::nothrow) MinimizeAllInputFilter();
 }
 
 

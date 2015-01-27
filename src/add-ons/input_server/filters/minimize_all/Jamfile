@@ -6,5 +6,5 @@ UsePrivateHeaders interface tracker ;
 
 Addon minimize_all
 	: MinimizeAllInputFilter.cpp
-	: be input_server $(TARGET_LIBSUPC++)
+	: be input_server [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 	;

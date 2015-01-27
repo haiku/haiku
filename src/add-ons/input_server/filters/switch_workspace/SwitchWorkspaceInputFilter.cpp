@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014 Haiku, Inc. All rights reserved
+ * Copyright 2009-2015 Haiku, Inc. All rights reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,8 @@
 
 #include <string.h>
 
+#include <new>
+
 #include <AppServerLink.h>
 #include <InterfaceDefs.h>
 #include <Message.h>
@@ -22,7 +24,7 @@
 
 
 extern "C" BInputServerFilter* instantiate_input_filter() {
-	return new SwitchWorkspaceInputFilter();
+	return new(std::nothrow) SwitchWorkspaceInputFilter();
 }
 
 
