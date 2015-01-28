@@ -32,12 +32,11 @@
 #define B_TRANSLATION_CONTEXT	"NetworkSetupWindow"
 
 
-// --------------------------------------------------------------
-NetworkSetupWindow::NetworkSetupWindow(const char *title)
+NetworkSetupWindow::NetworkSetupWindow()
 	:
-	BWindow(BRect(100, 100, 300, 300), title, B_TITLED_WINDOW,
+	BWindow(BRect(100, 100, 300, 300), B_TRANSLATE("Network"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
-	fAddonCount(0)
+	fAddOnCount(0)
 {
 	// ---- Profiles section
 #if 0
@@ -94,7 +93,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	_BuildShowTabView();
 
-	fAddonView = NULL;
+	fAddOnView = NULL;
 
 	CenterOnScreen();
 }
@@ -120,43 +119,39 @@ NetworkSetupWindow::MessageReceived(BMessage* message)
 		case kMsgProfileNew:
 			break;
 
-		case kMsgProfileSelected: {
-			BPath name;
-			const char *path;
-			bool is_default;
-			bool is_current;
-
+		case kMsgProfileSelected:
+		{
+			const char* path;
 			if (message->FindString("path", &path) != B_OK)
 				break;
 
-			name.SetTo(path);
+			BPath name(path);
+			bool isCurrent = strcmp(name.Leaf(), "current") == 0;
 
-			is_default = (strcmp(name.Leaf(), "default") == 0);
-			is_current = (strcmp(name.Leaf(), "current") == 0);
-
-			fApplyButton->SetEnabled(!is_current);
+			fApplyButton->SetEnabled(!isCurrent);
 			break;
 		}
 
-		case kMsgRevert: {
-			for (int addonIndex = 0; addonIndex < fAddonCount; addonIndex++) {
-				NetworkSetupAddOn* addon
-					= fNetworkAddOnMap[addonIndex];
-				addon->Revert();
+		case kMsgRevert:
+		{
+			for (int index = 0; index < fAddOnCount; index++) {
+				NetworkSetupAddOn* addOn = fNetworkAddOnMap[index];
+				addOn->Revert();
 			}
 			break;
 		}
 
-		case kMsgApply: {
-			for (int addonIndex = 0; addonIndex < fAddonCount; addonIndex++) {
-				NetworkSetupAddOn* addon
-					= fNetworkAddOnMap[addonIndex];
-				addon->Save();
+		case kMsgApply:
+		{
+			for (int index = 0; index < fAddOnCount; index++) {
+				NetworkSetupAddOn* addOn = fNetworkAddOnMap[index];
+				addOn->Save();
 			}
 			break;
 		}
 
-		case kMsgToggleReplicant: {
+		case kMsgToggleReplicant:
+		{
 			_ShowReplicant(message->GetInt32("be:value", B_CONTROL_OFF)
 				== B_CONTROL_ON);
 			break;
@@ -169,18 +164,15 @@ NetworkSetupWindow::MessageReceived(BMessage* message)
 
 
 void
-NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
+NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 what)
 {
-	BMenuItem*	item;
-	char current_profile[256] = { 0 };
+	char currentProfile[256] = { 0 };
 
 	menu->SetRadioMode(true);
 
 	BDirectory dir("/boot/system/settings/network/profiles");
-
 	if (dir.InitCheck() == B_OK) {
 		BEntry entry;
-		BMessage* msg;
 
 		dir.Rewind();
 		while (dir.GetNextEntry(&entry) >= 0) {
@@ -195,17 +187,17 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 					// oh oh, sorry, wrong symlink...
 					continue;
 
-				symlink.ReadLink(current_profile, sizeof(current_profile));
+				symlink.ReadLink(currentProfile, sizeof(currentProfile));
 				continue;
 			};
 
 			if (!entry.IsDirectory())
 				continue;
 
-			msg = new BMessage(msg_what);
-			msg->AddString("path", name.Path());
+			BMessage* message = new BMessage(what);
+			message->AddString("path", name.Path());
 
-			item = new BMenuItem(name.Leaf(), msg);
+			BMenuItem* item = new BMenuItem(name.Leaf(), message);
 			menu->AddItem(item);
 		}
 	}
@@ -216,11 +208,11 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Manage" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgProfileManage)));
 
-	if (strlen(current_profile)) {
-		item = menu->FindItem(current_profile);
-		if (item) {
-			BString label;
-			label << item->Label();
+	if (currentProfile[0] != '\0') {
+		BMenuItem* item = menu->FindItem(currentProfile);
+		if (item != NULL) {
+			// TODO: translate
+			BString label(item->Label());
 			label << " (current)";
 			item->SetLabel(label.String());
 			item->SetMarked(true);
@@ -233,32 +225,32 @@ void
 NetworkSetupWindow::_BuildShowTabView()
 {
 	BPath path;
-	BPath addon_path;
+	BPath addOnPath;
 	BDirectory dir;
 	BEntry entry;
 
-	char* search_paths = getenv("ADDON_PATH");
-	if (!search_paths)
+	char* searchPaths = getenv("ADDON_PATH");
+	if (!searchPaths)
 		return;
 
-	search_paths = strdup(search_paths);
-	char* next_path_token;
-	char* search_path = strtok_r(search_paths, ":", &next_path_token);
+	searchPaths = strdup(searchPaths);
+	char* nextPathToken;
+	char* searchPath = strtok_r(searchPaths, ":", &nextPathToken);
 
-	while (search_path) {
-		if (strncmp(search_path, "%A/", 3) == 0) {
+	while (searchPath) {
+		if (strncmp(searchPath, "%A/", 3) == 0) {
 			app_info ai;
 			be_app->GetAppInfo(&ai);
 			entry.SetTo(&ai.ref);
 			entry.GetPath(&path);
 			path.GetParent(&path);
-			path.Append(search_path + 3);
+			path.Append(searchPath + 3);
 		} else {
-			path.SetTo(search_path);
+			path.SetTo(searchPath);
 			path.Append("Network Setup");
 		}
 
-		search_path = strtok_r(NULL, ":", &next_path_token);
+		searchPath = strtok_r(NULL, ":", &nextPathToken);
 
 		dir.SetTo(path.Path());
 		if (dir.InitCheck() != B_OK)
@@ -269,16 +261,16 @@ NetworkSetupWindow::_BuildShowTabView()
 			if (entry.IsDirectory())
 				continue;
 
-			entry.GetPath(&addon_path);
-			image_id addon_id = load_add_on(addon_path.Path());
-			if (addon_id < 0) {
-				printf("Failed to load %s addon: %s.\n", addon_path.Path(),
-					strerror(addon_id));
+			entry.GetPath(&addOnPath);
+			image_id image = load_add_on(addOnPath.Path());
+			if (image < 0) {
+				printf("Failed to load %s addon: %s.\n", addOnPath.Path(),
+					strerror(image));
 				continue;
 			}
 
 			network_setup_addon_instantiate get_nth_addon;
-			status_t status = get_image_symbol(addon_id, "get_nth_addon",
+			status_t status = get_image_symbol(image, "get_nth_addon",
 				B_SYMBOL_TYPE_TEXT, (void **) &get_nth_addon);
 
 			int tabCount = 0;
@@ -286,22 +278,21 @@ NetworkSetupWindow::_BuildShowTabView()
 			if (status != B_OK) {
 				//  No "addon instantiate function" symbol found in this addon
 				printf("No symbol \"get_nth_addon\" found in %s addon: not a "
-					"network setup addon!\n", addon_path.Path());
-				unload_add_on(addon_id);
+					"network setup addon!\n", addOnPath.Path());
+				unload_add_on(image);
 				continue;
 			}
 
-			while ((fNetworkAddOnMap[fAddonCount]
-					= get_nth_addon(addon_id, tabCount)) != NULL) {
-				printf("Adding Tab: %d\n", fAddonCount);
-				BView* addon_view
-					= fNetworkAddOnMap[fAddonCount]->CreateView();
+			while ((fNetworkAddOnMap[fAddOnCount]
+					= get_nth_addon(image, tabCount)) != NULL) {
+				printf("Adding Tab: %d\n", fAddOnCount);
+				BView* view = fNetworkAddOnMap[fAddOnCount]->CreateView();
 
 				// FIXME rework this: we don't want to use a tab view here,
 				// instead add-ons should populate the "interfaces" list with
 				// interfaces, services, etc.
-				fPanel->AddTab(addon_view);
-				fAddonCount++;
+				fPanel->AddTab(view);
+				fAddOnCount++;
 					// Number of tab addons total
 				tabCount++;
 					// Tabs for *this* addon
@@ -309,7 +300,7 @@ NetworkSetupWindow::_BuildShowTabView()
 		}
 	}
 
-	free(search_paths);
+	free(searchPaths);
 }
 
 
@@ -317,16 +308,14 @@ void
 NetworkSetupWindow::_ShowReplicant(bool show)
 {
 	if (show) {
-		char* argv[] = {const_cast<char *>("--deskbar"), NULL};
+		const char* argv[] = {"--deskbar", NULL};
 
-		status_t ret = be_roster->Launch(
-			"application/x-vnd.Haiku-NetworkStatus", 1, argv);
-
-		if (ret != B_OK) {
+		status_t status = be_roster->Launch(be_app->Signature(), 1, argv);
+		if (status != B_OK) {
 			BString errorMessage;
 			errorMessage.SetToFormat(
 				B_TRANSLATE("Installing NetworkStatus in Deskbar failed: %s"),
-				strerror(ret));
+				strerror(status));
 			BAlert* alert = new BAlert(B_TRANSLATE("launch error"),
 				errorMessage, B_TRANSLATE("Ok"));
 			alert->Go(NULL);

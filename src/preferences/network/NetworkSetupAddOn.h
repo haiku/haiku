@@ -1,44 +1,46 @@
 /*
- * Copyright 2004-2011 Haiku Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  */
-#ifndef NETWORKSETUPADDON_H
-#define NETWORKSETUPADDON_H
+#ifndef NETWORK_SETUP_ADD_ON_H
+#define NETWORK_SETUP_ADD_ON_H
 
 
-#include <interface/View.h>
-#include <kernel/image.h>		// for image_id
-#include <storage/Resources.h>
+#include <image.h>
+#include <Resources.h>
+#include <View.h>
 
 
 class NetworkSetupProfile;
 
 class NetworkSetupAddOn {
-	public:
-		NetworkSetupAddOn(image_id addon_image);
-		virtual ~NetworkSetupAddOn();
+public:
+								NetworkSetupAddOn(image_id image);
+	virtual						~NetworkSetupAddOn();
 
-		virtual BView *			CreateView() = 0;
-		virtual status_t		Save();
-		virtual status_t		Revert();
+	virtual	BView*				CreateView() = 0;
+	virtual	status_t			Save();
+	virtual	status_t			Revert();
 
-		virtual const char *	Name();
-		virtual status_t		ProfileChanged(NetworkSetupProfile*
-									new_profile);
+	virtual const char*			Name();
+	virtual status_t			ProfileChanged(NetworkSetupProfile* newProfile);
 
-		NetworkSetupProfile * 	Profile();
-		bool 					IsDirty();
-		void 					SetDirty(bool dirty = true);
-		image_id				ImageId();
-		BResources*				Resources();
+			NetworkSetupProfile*
+								Profile();
+			bool 				IsDirty();
+			void 				SetDirty(bool dirty = true);
+			image_id			ImageId();
+			BResources*			Resources();
 
-	private:
-		bool 					fIsDirty;
-		NetworkSetupProfile*	fProfile;
-		image_id				fAddonImage;
-		BResources*				fAddonResources;
+private:
+			bool 				fIsDirty;
+			NetworkSetupProfile*
+								fProfile;
+			image_id			fImage;
+			BResources*			fResources;
 };
+
 
 extern "C" {
 
@@ -51,5 +53,4 @@ extern NetworkSetupAddOn* get_nth_addon(image_id image, int index);
 }
 
 
-#endif // ifdef NETWORKSETUPADDON_H
-
+#endif // NETWORKSETUPADDON_H

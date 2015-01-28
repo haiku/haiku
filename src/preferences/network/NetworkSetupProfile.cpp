@@ -1,12 +1,12 @@
 /*
- * Copyright 2004-2011 Haiku Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
  */
 
-#include <stdlib.h>
 
 #include "NetworkSetupProfile.h"
+
+#include <stdlib.h>
 
 
 NetworkSetupProfile::NetworkSetupProfile()
@@ -77,7 +77,7 @@ NetworkSetupProfile::SetTo(const entry_ref* ref)
 
 
 status_t
-NetworkSetupProfile::SetTo(BEntry *entry)
+NetworkSetupProfile::SetTo(BEntry* entry)
 {
 	delete fRoot;
 	delete fPath;
@@ -91,7 +91,7 @@ NetworkSetupProfile::SetTo(BEntry *entry)
 const char*
 NetworkSetupProfile::Name()
 {
-	if (!fName) {
+	if (fName == NULL) {
 		fRoot->GetPath(fPath);
 		fName = fPath->Leaf();
 	}
@@ -100,7 +100,7 @@ NetworkSetupProfile::Name()
 }
 
 
-status_t 
+status_t
 NetworkSetupProfile::SetName(const char* name)
 {
 	return B_OK;
@@ -143,6 +143,8 @@ NetworkSetupProfile::MakeCurrent()
 
 
 // #pragma mark -
+
+
 NetworkSetupProfile*
 NetworkSetupProfile::Default()
 {

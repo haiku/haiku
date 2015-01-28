@@ -1,14 +1,10 @@
 /*
- * Copyright 2004-2011 Haiku Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
  */
 
 
 #include "NetworkSetupAddOn.h"
-
-#include <kernel/image.h>
-#include <storage/Resources.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,15 +14,15 @@ NetworkSetupAddOn::NetworkSetupAddOn(image_id image)
 	:
 	fIsDirty(false),
 	fProfile(NULL),
-	fAddonImage(image),
-	fAddonResources(NULL)
+	fImage(image),
+	fResources(NULL)
 {
 }
 
 
 NetworkSetupAddOn::~NetworkSetupAddOn()
 {
-	delete fAddonResources;
+	delete fResources;
 }
 
 
@@ -45,9 +41,9 @@ NetworkSetupAddOn::Revert()
 
 
 status_t
-NetworkSetupAddOn::ProfileChanged(NetworkSetupProfile* new_profile)
+NetworkSetupAddOn::ProfileChanged(NetworkSetupProfile* newProfile)
 {
-	fProfile = new_profile;
+	fProfile = newProfile;
 	return B_OK;
 }
 
@@ -76,7 +72,7 @@ NetworkSetupAddOn::Profile()
 image_id
 NetworkSetupAddOn::ImageId()
 {
-	return fAddonImage;
+	return fImage;
 }
 
 
@@ -90,17 +86,17 @@ NetworkSetupAddOn::Name()
 BResources*
 NetworkSetupAddOn::Resources()
 {
-	if (!fAddonResources) {
+	if (fResources == NULL) {
 		image_info info;
-		if (get_image_info(fAddonImage, &info) != B_OK)
+		if (get_image_info(fImage, &info) != B_OK)
 			return NULL;
 
-		BResources *resources = new BResources();
-		BFile addon_file(info.name, O_RDONLY);
-		if (resources->SetTo(&addon_file) == B_OK)
-			fAddonResources = resources;
+		BResources* resources = new BResources();
+		BFile file(info.name, B_READ_ONLY);
+		if (resources->SetTo(&file) == B_OK)
+			fResources = resources;
 		else
 			delete resources;
 	}
-	return fAddonResources;
+	return fResources;
 }

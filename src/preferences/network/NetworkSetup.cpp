@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007 Haiku Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  */
@@ -13,41 +13,41 @@
 #include "NetworkSetupWindow.h"
 
 
-#define SOFTWARE_EDITOR			"Haiku"
-#define NAME					"Network"
-#define SOFTWARE_VERSION_LABEL	"1.0.0 alpha"
-
-#define APPLICATION_SIGNATURE	"application/x-vnd." SOFTWARE_EDITOR "-" NAME
+static const char* kSignature = "application/x-vnd.Haiku-Network";
 
 
-class Application : public BApplication
-{
-	public:
-		Application();
+class Application : public BApplication {
+public:
+								Application();
 
-	public:
-		void			ReadyToRun(void);
+public:
+	virtual	void				ReadyToRun();
 };
 
 
-int main()
-{
-	Application* app = new Application();
-	app->Run();
-	delete app;
-	return 0;
-}
-
-
 Application::Application()
-	: BApplication(APPLICATION_SIGNATURE)
+	:
+	BApplication(kSignature)
 {
 }
 
 
 void
-Application::ReadyToRun(void)
+Application::ReadyToRun()
 {
-	NetworkSetupWindow* window = new NetworkSetupWindow(NAME);
+	NetworkSetupWindow* window = new NetworkSetupWindow();
 	window->Show();
+}
+
+
+// #pragma mark -
+
+
+int
+main()
+{
+	Application* app = new Application();
+	app->Run();
+	delete app;
+	return 0;
 }
