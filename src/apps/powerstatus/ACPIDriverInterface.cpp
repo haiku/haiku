@@ -109,6 +109,8 @@ Battery::GetBatteryInfoCached(battery_info* info)
 	info->current_rate = fCachedInfo.current_rate;
 	info->capacity = fCachedInfo.capacity;
 	info->full_capacity = fExtendedBatteryInfo.last_full_charge;
+	if (info->full_capacity < 0)
+		info->full_capacity = fExtendedBatteryInfo.design_capacity;
 
 	fRateBuffer.AddRate(fCachedInfo.current_rate);
 	if (fCachedInfo.current_rate > 0 && fRateBuffer.GetMeanRate() != 0) {
