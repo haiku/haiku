@@ -1,0 +1,47 @@
+/*
+ * Copyright 2004 Philippe Houdoin
+ * Copyright 2009-2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Philippe Houdoin
+ *		John Scipione, jscipione@gmail.com
+ */
+
+
+/*!
+	\page network_intro Introduction to the Network Kit
+
+	The Haiku Network Kit consists of:
+	- A modular, add-ons based network stack
+	- Two shared libraries, libnet.so and libnetapi.so
+	- A stack driver, acting as interface between the network stack and
+	  libnet.so
+	- Basic network apps
+	- A modular GUI preflet
+
+	The libnet.so shared library is the way that BeOS R5 provided POSIX/BSD
+	API sockets to apps. Being binary compatible with BeOS R5 has made this
+	library implementation tedious. To counter this, the libnetapi.so shared
+	library was developed. It contains thin C++ classes wrapping the C
+	sockets POSIX/BSD API into these BNet* classes we're used under BeOS.
+
+	The stack driver is the interface between libnet.so and the real stack
+	behind it, hosted by the network stack kernel modules. Its purposes
+	include:
+	-# Providing sockets to file descriptors translation support
+	-# Providing support for select() on sockets
+	-# Loading the network stack on first access, and then keeping it for
+	   further accesses
+
+	The following diagram illustrates the network stack design on Haiku:
+
+	\image html obos_net_stack_design_1.gif
+
+	The Network Kit includes a handful of useful networking related apps
+	including ping, ifconfig, route, traceroute, and arp.
+
+	See the User Guide for more information about the
+	<a href="http://haiku-os.org/docs/userguide/en/preferences/network.html">Network preferences app</a>
+	included as part of the Network Kit.
+*/

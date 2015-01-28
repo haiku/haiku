@@ -766,6 +766,7 @@ IMAGE_PATH             = . \
                          interface/images \
                          keyboard \
                          midi2/images \
+                         net/images \
                          storage/images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
