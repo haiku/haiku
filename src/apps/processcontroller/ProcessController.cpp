@@ -1,7 +1,7 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org
-	Copyright (c) 2006-2013, Haiku, Inc. All rights reserved.
+	Copyright (c) 2006-2015, Haiku, Inc. All rights reserved.
 
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
@@ -244,13 +244,14 @@ ProcessController::Init()
 void
 ProcessController::_HandleDebugRequest(team_id team, thread_id thread)
 {
-	char *argv[2];
 	char paramString[16];
 	char idString[16];
-	strlcpy(paramString, thread > 0 ? "--thread" : "--team", sizeof(paramString));
-	snprintf(idString, sizeof(idString), "%" B_PRId32, thread > 0 ? thread : team);
-	argv[0] = paramString;
-	argv[1] = idString;
+	strlcpy(paramString, thread > 0 ? "--thread" : "--team",
+		sizeof(paramString));
+	snprintf(idString, sizeof(idString), "%" B_PRId32,
+		thread > 0 ? thread : team);
+
+	const char* argv[] = {paramString, idString, NULL};
 	status_t error = be_roster->Launch(kDebuggerSignature, 2, argv);
 	if (error != B_OK) {
 		// TODO: notify user

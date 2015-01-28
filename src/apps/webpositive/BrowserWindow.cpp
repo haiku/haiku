@@ -5,7 +5,7 @@
  * Copyright (C) 2010 Stephan Aßmus <superstippi@gmx.de>
  * Copyright (C) 2010 Michael Lotz <mmlr@mlotz.ch>
  * Copyright (C) 2010 Rene Gollent <rene@gollent.com>
- * Copyright 2013-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2013-2015 Haiku, Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -420,7 +420,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings"),
 		new BMessage(SHOW_SETTINGS_WINDOW)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Script console"),
-		new BMessage(SHOW_CONSOLE_WINDOW)));	
+		new BMessage(SHOW_CONSOLE_WINDOW)));
 	BMenuItem* aboutItem = new BMenuItem(B_TRANSLATE("About"),
 		new BMessage(B_ABOUT_REQUESTED));
 	menu->AddItem(aboutItem);
@@ -2502,7 +2502,7 @@ BrowserWindow::_SmartURLHandler(const BString& url)
 			temp = "application/x-vnd.Be.URL.";
 			temp += proto;
 
-			char* argv[1] = { (char*)url.String() };
+			const char* argv[1] = { url.String(), NULL };
 
 			if (be_roster->Launch(temp.String(), 1, argv) == B_OK)
 				return;
