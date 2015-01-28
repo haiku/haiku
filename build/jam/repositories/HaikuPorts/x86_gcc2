@@ -86,6 +86,7 @@ RemotePackageRepository HaikuPorts
 	flex-2.5.39-1
 	fluidsynth-1.1.6-2
 	fluidsynth_devel-1.1.6-2
+	fontboy-0.9.7-3
 	fontconfig-2.11.1-3
 	fontconfig_devel-2.11.1-3
 	fossil-1.29-1
@@ -337,7 +338,7 @@ RemotePackageRepository HaikuPorts
 	sqlite-3.8.4.3-1
 	sqlite_devel-3.8.4.3-1
 	srm-1.2.12-1
-	substrate-1.0-1
+	substrate-1.0b-1
 	subversion-1.8.11-1
 	subversion_devel-1.8.11-1
 	sum_it-0.2beta-3
@@ -736,6 +737,7 @@ RemotePackageRepository HaikuPorts
 	flex
 	fluidsynth
 	fluidsynth_x86
+	fontboy
 	fontconfig_x86
 	fossil
 	freedroidrpg_x86
