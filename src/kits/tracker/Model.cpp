@@ -67,8 +67,8 @@ All rights reserved.
 #include "Bitmaps.h"
 #include "FindPanel.h"
 #include "FSUtils.h"
-#include "MimeTypes.h"
 #include "IconCache.h"
+#include "MimeTypes.h"
 #include "Tracker.h"
 #include "Utilities.h"
 
