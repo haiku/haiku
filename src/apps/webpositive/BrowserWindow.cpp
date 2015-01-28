@@ -2502,7 +2502,7 @@ BrowserWindow::_SmartURLHandler(const BString& url)
 			temp = "application/x-vnd.Be.URL.";
 			temp += proto;
 
-			const char* argv[1] = { url.String(), NULL };
+			const char* argv[] = { url.String(), NULL };
 
 			if (be_roster->Launch(temp.String(), 1, argv) == B_OK)
 				return;
