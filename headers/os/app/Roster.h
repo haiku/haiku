@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ROSTER_H
@@ -101,20 +101,21 @@ public:
 	// launch app
 			status_t			Launch(const char* mimeType,
 									BMessage* initialMessage = NULL,
-									team_id* appTeam = NULL) const;
+									team_id* _appTeam = NULL) const;
 			status_t			Launch(const char* mimeType, BList* messageList,
-									team_id* appTeam = NULL) const;
+									team_id* _appTeam = NULL) const;
 			status_t			Launch(const char* mimeType, int argc,
-									char* *args, team_id* appTeam = NULL) const;
+									const char* const* args,
+									team_id* _appTeam = NULL) const;
 			status_t			Launch(const entry_ref* ref,
 									const BMessage* initialMessage = NULL,
-									team_id* appTeam = NULL) const;
+									team_id* _appTeam = NULL) const;
 			status_t			Launch(const entry_ref* ref,
 									const BList* messageList,
-									team_id* appTeam = NULL) const;
+									team_id* _appTeam = NULL) const;
 			status_t			Launch(const entry_ref* ref, int argc,
 									const char* const* args,
-									team_id* appTeam = NULL) const;
+									team_id* _appTeam = NULL) const;
 
 	// recent documents, folders, apps
 			void				GetRecentDocuments(BMessage* refList,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -910,7 +910,7 @@ BRoster::ActivateApp(team_id team) const
 
 status_t
 BRoster::Launch(const char* mimeType, BMessage* initialMessage,
-	team_id* appTeam) const
+	team_id* _appTeam) const
 {
 	if (mimeType == NULL)
 		return B_BAD_VALUE;
@@ -919,35 +919,35 @@ BRoster::Launch(const char* mimeType, BMessage* initialMessage,
 	if (initialMessage != NULL)
 		messageList.AddItem(initialMessage);
 
-	return _LaunchApp(mimeType, NULL, &messageList, 0, NULL, appTeam);
+	return _LaunchApp(mimeType, NULL, &messageList, 0, NULL, _appTeam);
 }
 
 
 status_t
 BRoster::Launch(const char* mimeType, BList* messageList,
-	team_id* appTeam) const
+	team_id* _appTeam) const
 {
 	if (mimeType == NULL)
 		return B_BAD_VALUE;
 
-	return _LaunchApp(mimeType, NULL, messageList, 0, NULL, appTeam);
+	return _LaunchApp(mimeType, NULL, messageList, 0, NULL, _appTeam);
 }
 
 
 status_t
-BRoster::Launch(const char* mimeType, int argc, char** args,
-	team_id* appTeam) const
+BRoster::Launch(const char* mimeType, int argc, const char* const* args,
+	team_id* _appTeam) const
 {
 	if (mimeType == NULL)
 		return B_BAD_VALUE;
 
-	return _LaunchApp(mimeType, NULL, NULL, argc, args, appTeam);
+	return _LaunchApp(mimeType, NULL, NULL, argc, args, _appTeam);
 }
 
 
 status_t
 BRoster::Launch(const entry_ref* ref, const BMessage* initialMessage,
-	team_id* appTeam) const
+	team_id* _appTeam) const
 {
 	if (ref == NULL)
 		return B_BAD_VALUE;
@@ -956,7 +956,7 @@ BRoster::Launch(const entry_ref* ref, const BMessage* initialMessage,
 	if (initialMessage != NULL)
 		messageList.AddItem(const_cast<BMessage*>(initialMessage));
 
-	return _LaunchApp(NULL, ref, &messageList, 0, NULL, appTeam);
+	return _LaunchApp(NULL, ref, &messageList, 0, NULL, _appTeam);
 }
 
 
@@ -983,23 +983,30 @@ BRoster::Launch(const entry_ref* ref, int argc, const char* const* args,
 
 
 #if __GNUC__ == 2
-/*!	Just here for providing binary compatibility
-	(for example "Guido" needs this)
-*/
+// #pragma mark - Binary compatibility
+
+
 extern "C" status_t
 Launch__C7BRosterP9entry_refP8BMessagePl(BRoster* roster, entry_ref* ref,
 	BMessage* initialMessage)
 {
 	return roster->BRoster::Launch(ref, initialMessage, NULL);
 }
-/*!	Just here for providing binary compatibility
-	(for example "BartLauncher" needs this)
-*/
+
+
+extern "C" status_t
+Launch__C7BRosterPCciPPcPl(BRoster* roster, const char* mimeType,
+	int argc, char** args, team_id* _appTeam)
+{
+	return roster->BRoster::Launch(mimeType, argc, args, _appTeam);
+}
+
+
 extern "C" status_t
 Launch__C7BRosterP9entry_refiPPcPl(BRoster* roster, entry_ref* ref,
-	int argc, char * const *args, team_id *app_team)
+	int argc, char* const* args, team_id* _appTeam)
 {
-	return roster->BRoster::Launch(ref, argc, args, app_team);
+	return roster->BRoster::Launch(ref, argc, args, _appTeam);
 }
 #endif	// __GNUC__ == 2
 
