@@ -28,6 +28,9 @@
 #include <stdlib.h>
 
 
+const char* kNetworkStatusSignature = "application/x-vnd.Haiku-NetworkStatus";
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT	"NetworkSetupWindow"
 
@@ -310,7 +313,7 @@ NetworkSetupWindow::_ShowReplicant(bool show)
 	if (show) {
 		const char* argv[] = {"--deskbar", NULL};
 
-		status_t status = be_roster->Launch(be_app->Signature(), 1, argv);
+		status_t status = be_roster->Launch(kNetworkStatusSignature, 1, argv);
 		if (status != B_OK) {
 			BString errorMessage;
 			errorMessage.SetToFormat(
