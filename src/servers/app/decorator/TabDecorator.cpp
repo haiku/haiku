@@ -430,22 +430,25 @@ TabDecorator::_DistributeTabSize(float delta)
 			secMaxTabSize = tabWidth;
 	}
 
-	float minus = ceil(std::min(maxTabSize - secMaxTabSize, delta));
+	float minus = ceilf(std::min(maxTabSize - secMaxTabSize, delta));
 	delta -= minus;
 	minus /= nTabsWithMaxSize;
 
-	Decorator::Tab* prevTab = NULL;
-	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+	Decorator::Tab* previousTab = NULL;
+	for (int32 i = 0; i < tabCount; i++) {
 		Decorator::Tab* tab = fTabList.ItemAt(i);
+		if (tab == NULL)
+			continue;
+
 		if (int_equal(maxTabSize, tab->tabRect.Width()))
 			tab->tabRect.right -= minus;
 
-		if (prevTab) {
-			tab->tabRect.OffsetBy(prevTab->tabRect.right - tab->tabRect.left,
-				0);
+		if (previousTab != NULL) {
+			float offsetX = previousTab->tabRect.right - tab->tabRect.left;
+			tab->tabRect.OffsetBy(offsetX, 0);
 		}
 
-		prevTab = tab;
+		previousTab = tab;
 	}
 
 	if (delta > 0) {
@@ -454,10 +457,13 @@ TabDecorator::_DistributeTabSize(float delta)
 	}
 
 	// done
-	prevTab->tabRect.right = floor(fFrame.right + fBorderWidth);
+	previousTab->tabRect.right = floorf(fFrame.right + fBorderWidth);
 
-	for (int32 i = 0; i < fTabList.CountItems(); i++) {
-		Decorator::Tab* tab = _TabAt(i);
+	for (int32 i = 0; i < tabCount; i++) {
+		Decorator::Tab* tab = fTabList.ItemAt(i);
+		if (tab == NULL)
+			continue;
+
 		tab->tabOffset = uint32(tab->tabRect.left - fLeftBorder.left);
 	}
 }
