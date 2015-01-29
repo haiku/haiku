@@ -10,26 +10,31 @@
 
 #include "NetworkSetupWindow.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <Alert.h>
 #include <Application.h>
+#include <Button.h>
 #include <Catalog.h>
+#include <CheckBox.h>
 #include <ControlLook.h>
 #include <Deskbar.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <InterfaceKit.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Roster.h>
 #include <StorageKit.h>
 #include <SupportKit.h>
 #include <TabView.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#define ENABLE_PROFILES 0
+#if ENABLE_PROFILES
+#	include <PopUpMenu.h>
+#endif
 
 
 const char* kNetworkStatusSignature = "application/x-vnd.Haiku-NetworkStatus";
-
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT	"NetworkSetupWindow"
@@ -42,11 +47,11 @@ NetworkSetupWindow::NetworkSetupWindow()
 	fAddOnCount(0)
 {
 	// ---- Profiles section
-#if 0
-	BMenu *profilesPopup = new BPopUpMenu("<none>");
+#if ENABLE_PROFILES
+	BPopUpMenu* profilesPopup = new BPopUpMenu("<none>");
 	_BuildProfilesMenu(profilesPopup, kMsgProfileSelected);
 
-	BMenuField *profilesMenuField = new BMenuField("profiles_menu",
+	BMenuField* profilesMenuField = new BMenuField("profiles_menu",
 		B_TRANSLATE("Profile:"), profilesPopup);
 
 	profilesMenuField->SetFont(be_bold_font);
@@ -67,14 +72,14 @@ NetworkSetupWindow::NetworkSetupWindow()
 
 	BMessage* message = new BMessage(kMsgToggleReplicant);
 	BCheckBox* replicantStatus = new BCheckBox("replicantStatus",
-		B_TRANSLATE("Show interfaces status in Deskbar"), message);
+		B_TRANSLATE("Show network status in Deskbar"), message);
 	replicantStatus->SetValue(_IsReplicantInstalled());
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_SMALL_SPACING)
-#if 0
+#if ENABLE_PROFILES
 		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.Add(profilesMenuField)
 			.AddGlue()
@@ -89,10 +94,7 @@ NetworkSetupWindow::NetworkSetupWindow()
 			.Add(fRevertButton)
 			.AddGlue()
 			.Add(fApplyButton)
-		.End()
-		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
-			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
-	);
+		.End();
 
 	_BuildShowTabView();
 
