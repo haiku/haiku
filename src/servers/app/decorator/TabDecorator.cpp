@@ -406,13 +406,17 @@ TabDecorator::_DoTabLayout()
 void
 TabDecorator::_DistributeTabSize(float delta)
 {
-	ASSERT(CountTabs() > 1);
+	int32 tabCount = fTabList.CountItems();
+	ASSERT(tabCount > 1);
 
 	float maxTabSize = 0;
 	float secMaxTabSize = 0;
 	int32 nTabsWithMaxSize = 0;
-	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+	for (int32 i = 0; i < tabCount; i++) {
 		Decorator::Tab* tab = fTabList.ItemAt(i);
+		if (tab == NULL)
+			continue;
+
 		float tabWidth = tab->tabRect.Width();
 		if (int_equal(maxTabSize, tabWidth)) {
 			nTabsWithMaxSize++;
