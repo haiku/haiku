@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.01.21
-#	Date:    2015-01-21 03:15:02
+#	Version: 2015.01.28
+#	Date:    2015-01-28 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10052,6 +10052,7 @@
 	13d7  GM204M [GeForce GTX 980M]
 	13d8  GM204M [GeForce GTX 970M]
 	13d9  GM204M [GeForce GTX 965M]
+	1401  GM206 [GeForce GTX 960]
 	17f0  GM200GL [Quadro M6000]
 10df  Emulex Corporation
 	0720  OneConnect NIC (Skyhawk)
@@ -10650,6 +10651,12 @@
 		1458 0691  VT82C691 Apollo Pro System Controller
 	0693  VT82C693 [Apollo Pro Plus]
 	0698  VT82C693A [Apollo Pro133 AGP]
+	0709  VX11 Standard Host Bridge
+	070a  VX11 PCI Express Root Port
+	070b  VX11 PCI Express Root Port
+	070c  VX11 PCI Express Root Port
+	070d  VX11 PCI Express Root Port
+	070e  VX11 PCI Express Root Port
 	0926  VT82C926 [Amazon]
 	1000  VT82C570MV
 	1106  VT82C570MV
@@ -10905,6 +10912,14 @@
 		1458 5000  GA-7VAX Mainboard
 # probably all K7VT2/4*/6
 		1849 3189  K7VT series Motherboards
+	31b0  VX11 Standard Host Bridge
+	31b1  VX11 Standard Host Bridge
+	31b2  VX11 DRAM Controller
+	31b3  VX11 Power Management Controller
+	31b4  VX11 I/O APIC
+	31b5  VX11 Scratch Device
+	31b7  VX11 Standard Host Bridge
+	31b8  VX11 PCI to PCI Bridge
 	3204  K8M800 Host Bridge
 	3205  VT8378 [KM400/A] Chipset Host Bridge
 		1458 5000  GA-7VM400M Motherboard
@@ -10957,6 +10972,9 @@
 	3410  VX900 DRAM Bus Control
 		19da a179  ZBOX nano VD01
 	3432  VL80x xHCI USB 3.0 Controller
+	3456  VX11 Standard Host Bridge
+	345b  VX11 Miscellaneous Bus
+	3a01  VX11 Graphics [Chrome 645/640]
 	4149  VIA VT6420 (ATA133) Controller
 	4204  K8M800 Host Bridge
 	4208  PT890 Host Bridge
@@ -11057,6 +11075,9 @@
 	8d01  PN133/PN133T [S3 Twister]
 	8d04  KM266/P4M266/P4M266A/P4N266 [S3 ProSavageDDR]
 	9001  VX900 Serial ATA Controller
+	9082  Standard AHCI 1.0 SATA Controller
+	9140  HDMI Audio Device
+	9201  USB3.0 Controller
 	9530  Secure Digital Memory Card Controller
 	95d0  SDIO Host Controller
 	a208  PT890 PCI to PCI Bridge Controller
@@ -11607,6 +11628,7 @@
 		0070 8993  WinTV HVR-2200
 		0070 89a0  WinTV HVR-2200
 		0070 89a1  WinTV HVR-2200
+		0070 f123  WinTV HVR-2205
 	7231  SAA7231
 		5ace 8000  Behold TV H8
 		5ace 8001  Behold TV H8
@@ -15640,6 +15662,7 @@
 	080f  Sentry5 DDR/SDR RAM Controller
 	0811  Sentry5 External Interface Core
 	0816  BCM3302 Sentry5 MIPS32 CPU
+	1570  720p FaceTime HD Camera
 	1600  NetXtreme BCM5752 Gigabit Ethernet PCI Express
 		1028 01c1  Precision 490
 		1028 01c2  Latitude D620
