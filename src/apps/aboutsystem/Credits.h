@@ -389,6 +389,7 @@ static const Translation kTranslations[] = {
 #define kContributors \
 	"Andrea Anzani\n" \
 	"Sean Bartell\n" \
+	"Sambuddha Basu\n" \
 	"Hannah Boneß\n" \
 	"Andre Braga\n" \
 	"Michael Bulash\n" \
