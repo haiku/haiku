@@ -14,6 +14,7 @@
 #include <USBKit.h>
 #include <stdio.h>
 #include <usb/USB_audio.h>
+#include <usb/USB_midi.h>
 
 #include "usbspec_private.h"
 #include "usb-utils.h"
@@ -729,7 +730,7 @@ void
 DumpAudioStreamCSEndpointDescriptor(
 	const usb_audio_streaming_endpoint_descriptor* descriptor)
 {
-	printf("                    Ttype ............. 0x%02x (CS_ENDPOINT)\n",
+	printf("                    Type .............. 0x%02x (CS_ENDPOINT)\n",
 		descriptor->descriptor_type);
 	printf("                    Subtype ........... 0x%02x (EP_GENERAL)\n",
 		descriptor->descriptor_subtype);
@@ -765,6 +766,127 @@ DumpAudioStreamCSEndpointDescriptor(
 		descriptor->lock_delay_units, units);
 	printf("                    Lock Delay ........ %u\n",
 		descriptor->lock_delay);
+}
+
+
+void
+DumpMidiInterfaceHeaderDescriptor(
+	const usb_midi_interface_header_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x (CS_ENDPOINT)\n",
+		descriptor->descriptor_type);
+	printf("                    Subtype ........... 0x%02x (MS_HEADER)\n",
+		descriptor->descriptor_subtype);
+	printf("                    MSC Version ....... 0x%04x\n",
+		descriptor->ms_version);
+	printf("                    Length ............ 0x%04x\n",
+		descriptor->total_length);
+}
+
+
+void
+DumpMidiInJackDescriptor(
+	const usb_midi_in_jack_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x (CS_INTERFACE)\n",
+		descriptor->descriptor_type);
+	printf("                    Subtype ........... 0x%02x (MIDI_IN_JACK)\n",
+		descriptor->descriptor_subtype);
+	printf("                    Jack ID ........... 0x%02x\n",
+		descriptor->id);
+	// TODO can we get the string?
+	printf("                    String ............ 0x%02x\n",
+		descriptor->string_descriptor);
+
+	switch (descriptor->type) {
+		case USB_MIDI_EMBEDDED_JACK:
+			printf("                    Jack Type ......... Embedded\n");
+			break;
+		case USB_MIDI_EXTERNAL_JACK:
+			printf("                    Jack Type ......... External\n");
+			break;
+		default:
+			printf("                    Jack Type ......... 0x%02x (unknown)\n",
+				descriptor->type);
+			break;
+	}
+}
+
+
+void
+DumpMidiOutJackDescriptor(
+	const usb_midi_out_jack_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x (CS_INTERFACE)\n",
+		descriptor->descriptor_type);
+	printf("                    Subtype ........... 0x%02x (MIDI_OUT_JACK)\n",
+		descriptor->descriptor_subtype);
+	printf("                    Jack ID ........... 0x%02x\n",
+		descriptor->id);
+
+	switch (descriptor->type) {
+		case USB_MIDI_EMBEDDED_JACK:
+			printf("                    Jack Type ......... Embedded\n");
+			break;
+		case USB_MIDI_EXTERNAL_JACK:
+			printf("                    Jack Type ......... External\n");
+			break;
+		default:
+			printf("                    Jack Type ......... 0x%02x (unknown)\n",
+				descriptor->type);
+			break;
+	}
+
+	for (int i = 0; i < descriptor->inputs_count; i++) {
+		printf("                    Pin %02d ............ (%d,%d)\n", i,
+			descriptor->input_source[i].source_id,
+			descriptor->input_source[i].source_pin);
+	}
+}
+
+
+void
+DumpMidiStreamCSInterfaceDescriptor(const usb_generic_descriptor* descriptor)
+{
+	uint8 subtype = descriptor->data[0];
+	switch (subtype) {
+		case USB_MS_HEADER_DESCRIPTOR:
+			DumpMidiInterfaceHeaderDescriptor(
+				(usb_midi_interface_header_descriptor*)descriptor);
+			break;
+		case USB_MS_MIDI_IN_JACK_DESCRIPTOR:
+			DumpMidiInJackDescriptor(
+				(usb_midi_in_jack_descriptor*)descriptor);
+			break;
+		case USB_MS_MIDI_OUT_JACK_DESCRIPTOR:
+			DumpMidiOutJackDescriptor(
+				(usb_midi_out_jack_descriptor*)descriptor);
+			break;
+		case USB_MS_ELEMENT_DESCRIPTOR:
+			// TODO
+			DumpDescriptorData(descriptor);
+			break;
+		default:
+			DumpDescriptorData(descriptor);
+			break;
+	}
+}
+
+
+void
+DumpMidiStreamCSEndpointDescriptor(
+	const usb_midi_endpoint_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x (CS_ENDPOINT)\n",
+		descriptor->descriptor_type);
+	printf("                    Subtype ........... 0x%02x (MS_GENERAL)\n",
+		descriptor->descriptor_subtype);
+	printf("                    Jacks ............. ");
+
+	for (int i = 0; i < descriptor->jacks_count; i++)
+		printf("%d, ", descriptor->jacks_id[i]);
+
+	printf("\n");
 }
 
 
@@ -821,6 +943,23 @@ DumpAudioDescriptor(const usb_generic_descriptor* descriptor, int subclass)
 					DumpDescriptorData(descriptor);
 					break;
 			}
+			break;
+		case USB_AUDIO_INTERFACE_MIDISTREAMING_SUBCLASS:
+			switch (descriptor->descriptor_type) {
+				case USB_AUDIO_CS_INTERFACE:
+					DumpMidiStreamCSInterfaceDescriptor(descriptor);
+					break;
+				case USB_AUDIO_CS_ENDPOINT:
+					DumpMidiStreamCSEndpointDescriptor(
+						(const usb_midi_endpoint_descriptor*)descriptor);
+					break;
+				default:
+					DumpDescriptorData(descriptor);
+					break;
+			}
+			break;
+		default:
+			DumpDescriptorData(descriptor);
 			break;
 	}
 }
