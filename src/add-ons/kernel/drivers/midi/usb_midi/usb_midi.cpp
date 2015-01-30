@@ -213,6 +213,9 @@ interpret_midi_buffer(usbmidi_device_info* midiDevice)
 		if (port == NULL) {
 			DPRINTF_ERR((MY_ID "no port matching cable number %d!\n",
 				packet->cn));
+		} else if (port->open_fd == NULL) {
+			DPRINTF_ERR((MY_ID "received data for port %d but it is closed!\n",
+				packet->cn));
 		} else {
 			ring_buffer_write(port->rbuf, packet->midi, pktlen);
 			release_sem_etc(port->open_fd->sem_cb, pktlen,
