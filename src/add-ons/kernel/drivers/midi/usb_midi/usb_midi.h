@@ -73,9 +73,6 @@ struct driver_cookie;
 
 typedef struct usbmidi_device_info
 {
-	/* list structure */ /* should not be needed eventually */
-	struct usbmidi_device_info* next;
-
 	/* Set of actual ports ("cables" -- one or more) */
 	struct usbmidi_port_info* ports[16];
 

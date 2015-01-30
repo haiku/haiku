@@ -448,7 +448,7 @@ static status_t
 usb_midi_removed(void* cookie)
 {
 	usbmidi_device_info* midiDevice = (usbmidi_device_info*)cookie;
-	
+
 	assert(cookie != NULL);
 
 	DPRINTF_INFO((MY_ID "usb_midi_removed(%s)\n", midiDevice->name));
@@ -457,6 +457,7 @@ usb_midi_removed(void* cookie)
 		usbmidi_port_info* port = midiDevice->ports[cable];
 		if (port == NULL)
 			break;
+		midiDevice->ports[cable] = NULL;
 		DPRINTF_DEBUG((MY_ID "removing port %d\n", cable));
 		if (port->open_fd != NULL) {
 			remove_port_info(port);
