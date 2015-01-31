@@ -5,6 +5,8 @@ RemotePackageRepository HaikuPorts
 	# architecture "any" packages
 	be_book-2008_10_26-1
 	ca_root_certificates-2014_04_08-2
+	caladea-20130214-1
+	carlito-20130920-1
 	dejavu-2.34-1
 	texi2html-1.82-2
 	timgmsoundfont-fixed-5
