@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	22895100
+1	polish	x-vnd.Haiku-Terminal	1993449439
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz terminal
 Change directory	Terminal TermView		Zmień folder
@@ -101,6 +101,7 @@ Find failed	Terminal TermWindow		Nie znaleziono
 Search forward	Terminal FindWindow		Szukaj dalej
 Edit tab title…	Terminal TermWindow		Edytuj nazwę karty…
 Open path	Terminal TermView		Otwórz ścieżkę
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktualny katalog roboczy aktywnego procesu.\n\t\t\tOpcjonalnie może być ustalona określona liczba elementów\n\t\t\tścieżki. Np. „%2d” dla maksymalnie dwóch elementów.\n\t%i\t-\tIndeks karty.\n\t%e\t-\tKodowanie karty. W przypadku UTF-8 niewyświetlane.\n\t%p\t-\tNazwa aktywnego procesu.\n\t%%\t-\t„%”.
 Find previous	Terminal TermWindow		Znajdź poprzedni
 Copy link location	Terminal TermView		Kopiuj adres odnośnika
 Tab title:	Terminal TermWindow		Tytuł karty:

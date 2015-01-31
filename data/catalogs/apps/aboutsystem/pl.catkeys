@@ -1,5 +1,6 @@
-1	polish	x-vnd.Haiku-About	3765303035
+1	polish	x-vnd.Haiku-About	3415235510
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 przez autorów Gutenprint. Wszelkie prawa zastrzeżone.
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travisa Geiselbrechta (i jego jądra NewOS)\n
 Ralink (firmware)	AboutWindow		Ralink (firmware)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Wszelkie prawa zastrzeżone.
@@ -18,6 +19,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 19
 Source Code: 	AboutView		Kod źródłowy: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{# procesor:} few{# procesory:} many{# procesorów:} other{# procesora:}}
 Kernel:	AboutView		Jądro:
+Copyright © 2000 Jean-Pierre Lefebvre and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre Lefebvre oraz Remi Lefebvre.
 BSD (4-clause)	AboutWindow		BSD (4-klauzulowa)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman oraz Daniel Veillard. Wszelkie prawa zastrzeżone.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Prawa autorskie do kodu Haiku są własnością Haiku Inc. lub autorów, gdzie jest to wyraźnie zaznaczone w źródłach. Haiku® i logo HAIKU® są zarejestrowanymi znakami towarowymi Haiku Inc.\n\n
@@ -42,6 +44,7 @@ Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright �
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. To oprogramowanie jest częściowo oparte na pracach Independent JPEG Group.
 Past maintainers:\n	AboutView		Wcześniejsi współpracownicy:\n
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Zawiera oprogramowanie z Projektu FreeBSD, udostępnione na licencji BSD:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Wszelkie prawa zastrzeżone.
 GNU GPL v3	AboutWindow		GNU GPL v3
 \n\nSpecial thanks to:\n	AboutView		\n\nSpecjalne podziękowania dla:\n
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… i prawdopodobnie paru innych, o których zapomnieliśmy wspomnieć (przepraszamy!)\n\n

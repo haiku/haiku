@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Keymap	439384761
+1	finnish	x-vnd.Haiku-Keymap	3155537444
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Vaihtonäppäin:
 Revert	Modifier keys window		Palauta
@@ -80,6 +80,7 @@ Key	Modifier keys window	As in a computer keyboard key	Näppäin
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-näppäin
 Control:	Modifier keys window	Control key role name	Ohjain:
 Brazilian	Keyboard Layout View		brasilialainen
+Remove	Keyboard Layout View		Poista
 Brazilian (ABNT2)	Keyboard Layout View		brasilialainen (ABNT2)
 French (Bépo)	Keyboard Layout View		ranskalainen (Bépo)
 Option	Keyboard Layout View	Option key	Valitsin

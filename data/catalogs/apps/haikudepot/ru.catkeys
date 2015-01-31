@@ -1,8 +1,9 @@
-1	russian	x-vnd.Haiku-HaikuDepot	1203155322
+1	russian	x-vnd.Haiku-HaikuDepot	3626723700
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
 Close	RatePackageWindow		Закрыть
+The captcha puzzle needs to be solved.	UserLoginWindow		Капча должна быть решена.
 Changelog	PackageInfoView		История изменений
 Your rating:	RatePackageWindow		Ваш рейтинг:
 The passwords do not match.	UserLoginWindow		Пароли не совпадают.
@@ -34,6 +35,7 @@ An error occurred while initializing the package manager: %message%	MainWindow		
 Email address:	UserLoginWindow		Email адрес:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Ваш рейтинг был успешно отправлен. Вы можете изменить или удалить его в любой момент оценив пакет еще раз.
 Very unstable	RatePackageWindow		Очень нестабилен 
+<Package contents not available for remote packages>	PackageContentsView		<Содержимое пакетов недоступно для нелокальных пакетов>
 The username is already taken. Please choose another.	UserLoginWindow		Такой логин уже занят, выберите другой.
 Close	PackageManager		Закрыть
 Not logged in	MainWindow		Вход не выполнен

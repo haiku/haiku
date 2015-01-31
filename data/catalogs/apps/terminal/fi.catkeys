@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	22895100
+1	finnish	x-vnd.Haiku-Terminal	1993449439
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -101,6 +101,7 @@ Find failed	Terminal TermWindow		Etsintä epäonnistui
 Search forward	Terminal FindWindow		Etsintä eteenpäin
 Edit tab title…	Terminal TermWindow		Muokkaa välilehtiotsikkoa...
 Open path	Terminal TermView		Avaa sijainti
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktiiviprosessin nykyinen työhakemisto.\n\t\t\tValinnaisesti polkukomponenttien enimmäismäärä voidaan\n\t\t\tmääritellä. Esim.: ’%2d’ enintään kahdelle komponentille.\n\t%i\t-\tVälilehtihakemisto.\n\t%e\t-\tNykyisen välilehden koodaus. Ei näytetä jos UTF-8.\n\t%p\t-\tAktiiviprosessin nimi.\n\t%%\t-\tMerkki ’%’.
 Find previous	Terminal TermWindow		Löydä edellinen
 Copy link location	Terminal TermView		Kopioi linkkisijainti
 Tab title:	Terminal TermWindow		Välilehtiotsikko:

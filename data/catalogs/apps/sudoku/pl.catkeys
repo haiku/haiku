@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Sudoku	2463385585
+1	polish	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Przywróć migawkę
 Could not set Sudoku:\n%s\n	SudokuWindow		Nie można ustawić Sudoku:\n%s\n
 Export as…	SudokuWindow		Eksportuj jako…
@@ -26,6 +26,7 @@ Text	SudokuWindow		Tekst
 Creating solvable field	SudokuGenerator		Tworzenie rozwiązywalnego pola
 View	SudokuWindow		Widok
 Progress monitor	ProgressWindow		Monitor postępu
+Set all hints	SudokuWindow		Ustaw wszystkie podpowiedzi
 Mark invalid values	SudokuWindow		Oznacz nieprawidłowe wartości
 Blank	SudokuWindow		Puste
 Help	SudokuWindow		Pomoc

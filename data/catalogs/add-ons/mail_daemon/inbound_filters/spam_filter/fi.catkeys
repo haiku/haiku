@@ -1,6 +1,7 @@
-1	finnish	x-vnd.Haiku-SpamFilter	160316705
+1	finnish	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		tai tyhjä sähköposti
 Genuine below and uncertain above:	SpamFilterConfig		Aito alla ja epävarma yllä:
 Spam above:	SpamFilterConfig		Roskaposti yllä:
 Add spam rating to start of subject	SpamFilterConfig		Lisää roskapostiarvosana aiheen alkuun
+Bayesian Spam Filter	SpamFilter		Bayesialainen roskapostisuodatin
 Learn from all incoming e-mail	SpamFilterConfig		Opi kaikesta tulevasta sähköpostista

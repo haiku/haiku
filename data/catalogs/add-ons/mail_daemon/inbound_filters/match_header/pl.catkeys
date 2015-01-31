@@ -1,13 +1,16 @@
-1	polish	x-vnd.Haiku-MatchHeader	3677427558
+1	polish	x-vnd.Haiku-MatchHeader	3405428083
 <Choose action>	ConfigView		<Wybierz akcję>
 has	ConfigView		ma
 Move to	ConfigView		Przenieś do
 Then	ConfigView		To
 this field is based on the action	ConfigView		to pole jest oparte na akcji
 Delete message	ConfigView		Usuń wiadomość
+value (use REGEX: in front of regular expressions like *spam*)	ConfigView		wartość (użyj wyrażeń regularnych, takich jak *spam*)
 <Choose account>	ConfigView		<Wybierz konto>
 Set flags to	ConfigView		Ustaw flagi na
 Set as read	ConfigView		Oznacz jako przeczytane
+Match header	RuleFilter		Porównaj nagłówek
 Reply with	ConfigView		Odpowiedz z
 If	ConfigView		Jeśli
+Match \"%attribute\" against \"%regex\"	RuleFilter		Porównaj „%attribute” z „%regex”
 header (e.g. Subject)	ConfigView		nagłówek (np. Temat)

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Keymap	439384761
+1	polish	x-vnd.Haiku-Keymap	3155537444
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Cofnij
@@ -80,6 +80,7 @@ Key	Modifier keys window	As in a computer keyboard key	Klawisz
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Klawisz Ctrl
 Control:	Modifier keys window	Control key role name	Kontrol:
 Brazilian	Keyboard Layout View		Brazylijski
+Remove	Keyboard Layout View		Usuń
 Brazilian (ABNT2)	Keyboard Layout View		Brazylijski (ABNT2)
 French (Bépo)	Keyboard Layout View		Francuski (Bépo)
 Option	Keyboard Layout View	Option key	Opcja

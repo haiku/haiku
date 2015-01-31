@@ -1,7 +1,8 @@
-1	finnish	x-vnd.Be-POST	2437005641
+1	finnish	x-vnd.Be-POST	2949558073
 Fetching mail for %name	Notifier		Noudetaan sähköpostia vastaanottajalle %name
 Check for mails only	DeskbarView		Tarkista vain sähköpostit
 Send pending mails	DeskbarView		Lähetä odottamassa olevat sähköpostit
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Yksi uusi viesti} other{# uutta viestiä}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# uusi viesti} other{# uutta viestiä}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# uusi viesti} other{# uutta viestiä}} lähettäjältä %name\n
 New Messages	MailDaemon		Uudet viestit

@@ -1,7 +1,12 @@
-1	polish	x-vnd.Haiku-IMAP	3950045582
+1	polish	x-vnd.Haiku-IMAP	354143849
 Destination:	imap_config		Katalog docelowy:
+Ok	IMAPFolderConfig		OK
 status	IMAPFolderConfig		status
+Configure IMAP Folders	imap_config		Skonfiguruj katalogi IMAP
+Cancel	IMAPFolderConfig		Anuluj
 Apply	IMAPFolderConfig		Zastosuj
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Pobieranie katalogów IMAP, cierpliwości...
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Nie można połączyć z serwerem „%server%”:\n%error%
 IMAP Folders	IMAPFolderConfig		Katalogi IMAP
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Aktualizowanie subskrybowanych katalogów IMAP, cierpliwości...
 Failed to fetch available storage.	IMAPFolderConfig		Nie udało się pobrać dostępnego miejsca.

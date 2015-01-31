@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libbe	1311938724
+1	polish	x-vnd.Haiku-libbe	2929679013
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -12,6 +12,7 @@ Copy	TextView		Kopiuj
 alpha	AboutWindow		alfa
 Error	PrintJob		Błąd
 All Rights Reserved.	AboutWindow		Wszelkie prawa zastrzeżone.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# bajt} few{# bajty} many{# bajtów} other{# bajta}}
 About %app%	AboutWindow		O %app%
 No pages to print!	PrintJob		Brak stron do wydrukowania!
 OK	Dragger		OK

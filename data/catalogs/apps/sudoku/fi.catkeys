@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Sudoku	2463385585
+1	finnish	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Palauta kuvakaappaus
 Could not set Sudoku:\n%s\n	SudokuWindow		Sudokun asettaminen epäonnistui:\n%s\n
 Export as…	SudokuWindow		Vie nimellä...
@@ -26,6 +26,7 @@ Text	SudokuWindow		Teksti
 Creating solvable field	SudokuGenerator		Luodaan ratkaistava kenttä
 View	SudokuWindow		Näkymä
 Progress monitor	ProgressWindow		Edistymisvalvonta
+Set all hints	SudokuWindow		Aseta kaikki vihjeet
 Mark invalid values	SudokuWindow		Merkitse väärät arvot
 Blank	SudokuWindow		Tyhjä
 Help	SudokuWindow		Opaste

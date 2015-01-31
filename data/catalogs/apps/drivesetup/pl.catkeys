@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	1450212098
+1	polish	x-vnd.Haiku-DriveSetup	2321187933
 DriveSetup	System name		DriveSetup
 Could not acquire partitioning information.	MainWindow		Nie można uzyskać informacji na temat partycji.
 Cancel	AbstractParametersPanel		Anuluj
@@ -44,6 +44,7 @@ Change	ChangeParametersPanel		Zmień
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na dysku %s bedą bezpowrotnie utracone!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz usunąć wybraną partycje?\n\nWszystkie dane na wybranej partycji zostaną utracone!
 Create…	MainWindow		Utwórz…
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Na pewno chcesz sformatować surowy dysk? (Większość osób najpierw inicjalizuje dysk systemem partycjonowania.) Zostaniesz spytany ponownie zanim zmiany zostaną zapisane na dysku.
 The disk has been successfully initialized.\n	MainWindow		Dysk został poprawnie zainicjalizowany.\n
 Could not unmount partition %s.	MainWindow		Nie można odmontować partycji %s.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Nie udało się zmienić parametrów partycji. Żadne zmiany nie zostały zapisane na dysk.

@@ -1,9 +1,10 @@
-1	finnish	x-vnd.Haiku-Mail	688530788
+1	finnish	x-vnd.Haiku-Mail	2750130554
 Settings	Config Window		Asetukset
 Never	Config Window	show status window	Ei koskaan
 While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
 Incoming	Config Window		Tuleva
 Server name:	E-Mail		Palvelinnimi:
+An error occurred while creating the config view: %error.	Config Views		Asetusnäkymää luodessa tapahtui virhe: %error.
 OK	Config Window		Valmis
 E-mail address:	E-Mail		Sähköpostiosoite:
 Account name:	E-Mail		Tilinimi:
@@ -18,8 +19,11 @@ Password:	E-Mail		Salasana:
 Accounts	Config Window		Tilit
 Finish	AutoConfigWindow		Valmis
 Remove	Config Window		Poista
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Luo uusi tili Lisää-painikkeella.\n\nPoista tili valitusta kohdasta Poista-painikkeella.\n\nValitse rivi luettelosta sen asetusten muuttamiseksi.
+Error!	Config Views		Virhe!
 Server Name:	E-Mail		Palvelinnimi:
 While sending	Config Window		Lähetettäessä
+Show notifications:	Config Window		Näytä ilmoitukset:
 Enter a valid e-mail address.	AutoConfigWindow		Kirjoita kelvollinen sähköpostiosoite.
 Add	Config Window		Lisää
 Account settings	AutoConfigWindow		Tiliasetukset

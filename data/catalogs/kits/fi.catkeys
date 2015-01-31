@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	1311938724
+1	finnish	x-vnd.Haiku-libbe	2929679013
 gamma	AboutWindow		gamma
 beta	AboutWindow		beeta
 %3.2f GiB	StringForSize		%3.2f gibitavua
@@ -12,6 +12,7 @@ Copy	TextView		Kopioi
 alpha	AboutWindow		alfa
 Error	PrintJob		Virhe
 All Rights Reserved.	AboutWindow		All Rights Reserved.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# merkki} other{# merkkiä}
 About %app%	AboutWindow		Ohjelmasta %app%
 No pages to print!	PrintJob		Ei ole tulostettavia sivuja!
 OK	Dragger		Valmis

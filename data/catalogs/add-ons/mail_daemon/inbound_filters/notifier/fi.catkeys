@@ -1,14 +1,14 @@
-1	finnish	x-vnd.Haiku-NewMailNotification	4243490201
-{0, plural, one{# new message} other{# new messages}}	filter		{0, monikko, yksi{# uusi viesti} muut{# uutta viestiä}}
-Keyboard LEDs	ConfigView		Näppäimistön ledit
-Log window	ConfigView		Loki-ikkuna
-Central beep	ConfigView		Keskeinen piip
-Beep	ConfigView		Piip
-Method:	ConfigView		Metodi:
-Central alert	ConfigView		Keskeinen hälytys
-Alert	ConfigView		Hälytys
-none	ConfigView		ei mitään
-You have {0, plural, one{# new message} other{# new messages}} for %account.	filter		Sinulla on {0, monikko, yksi{# uusi viesti} muut{# uutta viestiä}} tilillä %account.
-New messages	filter		Uudet viestit
-New mails notification	ConfigView		Uusien sähköpostiviestien ilmoitus
-OK	filter		Valmis
+1	finnish	x-vnd.Haiku-NewMailNotification	73789504
+You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		Sinulla on {0, plural, one{Yksi uusi viesti} other{# uutta viestä}} tilillä %account.
+none	NotifierConfigView		ei mitään
+Method:	NotifierConfigView		Metodi:
+Beep	NotifierConfigView		Piip
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{# uusi viesti} other{# uutta viestiä}}
+New mails notification	NotifierFilter		Uusien sähköpostiviestien ilmoitus
+Central alert	NotifierConfigView		Keskeinen hälytys
+OK	NotifierFilter		Valmis
+New messages	NotifierFilter		Uudet viestit
+Log window	NotifierConfigView		Loki-ikkuna
+Keyboard LEDs	NotifierConfigView		Näppäimistön ledit
+Central beep	NotifierConfigView		Keskeinen piip
+Alert	NotifierConfigView		Hälytys

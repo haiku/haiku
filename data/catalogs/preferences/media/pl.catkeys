@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Media	2338820526
+1	polish	x-vnd.Haiku-Media	2163090586
 Couldn't add volume control in Deskbar: %s\n	Media views		Nie można dodać sterowania głośnością w Deskbarze: %s\n
 Ready for use…	Media Window		Gotowe do użycia…
 Video input:	Media views		Wejście wideo:
@@ -17,6 +17,7 @@ Restart media services	Media views		Ponowne uruchomienie usług multimedialnych
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nie można usunąć sterowania głośnością w Deskbarze: %s\n
 Media	System name		Nośnik
 Telling media_addon_server to quit.	Media Window		Powiadamianie media_addon_server, by się zakończył.
+Media Service	Media Window		Usługa mediów
 Audio mixer	Media Window		Mikser audio
 This hardware has no controls.	Media Window		Ten sprzęt nie ma żadnych ustawień.
 Audio output:	Media views		Wyjście dźwięku:

@@ -1,6 +1,7 @@
-1	polish	x-vnd.Haiku-SpamFilter	160316705
+1	polish	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		lub pusty e-mail
 Genuine below and uncertain above:	SpamFilterConfig		Oryginalny poniżej i niepewne powyżej:
 Spam above:	SpamFilterConfig		Spam powyżej:
 Add spam rating to start of subject	SpamFilterConfig		Dodaj ocenę spamu na początek tytyłu
+Bayesian Spam Filter	SpamFilter		Filtr Bayesa
 Learn from all incoming e-mail	SpamFilterConfig		Ucz się ze wszystkich przychodzących wiadomości

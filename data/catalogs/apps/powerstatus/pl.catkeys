@@ -1,8 +1,9 @@
-1	polish	x-vnd.Haiku-PowerStatus	248799648
+1	polish	x-vnd.Haiku-PowerStatus	3969330583
 Design capacity low warning: 	PowerStatus		Ostrzeżenie o niskiej pojemności projektowej: 
 Show percent	PowerStatus		Pokaż procent
 Design capacity: 	PowerStatus		Pojemność projektowa: 
  mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Poziom naładowania akumulatora jest niski, podłącz urządzenie do prądu.
 Battery low	PowerStatus		Niski poziom naładowania akumulatora
 Type: 	PowerStatus		Typ: 
 non-rechargeable	PowerStatus		nieodnawialne
@@ -33,6 +34,7 @@ Capacity granularity 1: 	PowerStatus		Jednostka pojemności 1:
 OEM info: 	PowerStatus		Informacje OEM: 
 Design voltage: 	PowerStatus		Projektowe napięcie: 
 Battery charging	PowerStatus		Ładowanie baterii
+The battery level is critical, please plug in the device immediately.	PowerStatus		Poziom naładowania akumulatora jest krytycznie niski, natychmiast podłącz urządzenie do prądu.
 Design capacity warning: 	PowerStatus		Ostrzeżenie o projektowej pojemności: 
 Battery info	PowerStatus		Informacje o baterii
 Quit	PowerStatus		Wyjdź

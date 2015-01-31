@@ -1,8 +1,9 @@
-1	finnish	x-vnd.Haiku-PowerStatus	248799648
+1	finnish	x-vnd.Haiku-PowerStatus	3969330583
 Design capacity low warning: 	PowerStatus		Suunnittelukapasiteetti alhainen -varoitus: 
 Show percent	PowerStatus		Näytä prosenttiluku
 Design capacity: 	PowerStatus		Suunnittelukapasiteetti:
  mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Akkutaso on alhainen, kytke laite sähköverkkoon.
 Battery low	PowerStatus		Akku lähes tyhjä
 Type: 	PowerStatus		Tyyppi: 
 non-rechargeable	PowerStatus		ei-uudelleenladattava
@@ -33,6 +34,7 @@ Capacity granularity 1: 	PowerStatus		Kapasiteettirakeisuus 1:
 OEM info: 	PowerStatus		OEM-tiedot: 
 Design voltage: 	PowerStatus		Suunnittelujännite: 
 Battery charging	PowerStatus		Akkulataus
+The battery level is critical, please plug in the device immediately.	PowerStatus		Akkutaso on kriittinen, kytke laite heti sähköverkkoon.
 Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus: 
 Battery info	PowerStatus		Akkutiedot
 Quit	PowerStatus		Lopeta
