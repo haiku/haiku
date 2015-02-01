@@ -4,14 +4,14 @@
 #include <iostream.h>
 
 int main(int argc, char * argv[]) {
-	if(argc < 2) {
+	if (argc < 2) {
 		cerr << "Must supply a filename (*.mid)!" << endl;
 		return 1;
 	}
 	BMidiText * text = new BMidiText();
 	BMidiStore * store = new BMidiStore();
-	BEntry entry(argv[1],true);
-	if(!entry.Exists()) {
+	BEntry entry(argv[1], true);
+	if (!entry.Exists()) {
 		cerr << "File does not exist." << endl;
 		return 2;
 	}
@@ -21,7 +21,7 @@ int main(int argc, char * argv[]) {
 	store->Connect(text);
 	uint32 start_time = B_NOW;
 	store->Start();
-	while(store->IsRunning()) {
+	while (store->IsRunning()) {
 		snooze(100000);
 	}
 	store->Stop();
@@ -29,7 +29,7 @@ int main(int argc, char * argv[]) {
 	cout << "Start Time: " << dec << start_time << "ms" << endl;
 	cout << "Stop Time: " << dec << stop_time << "ms" << endl;
 	cout << "Total time: " << dec << stop_time - start_time << "ms" << endl;
-	
+
 	store->Disconnect(text);
 	delete store;
 	delete text;
