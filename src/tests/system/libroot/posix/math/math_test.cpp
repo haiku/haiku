@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 
 static image_id
 get_libroot_id()
