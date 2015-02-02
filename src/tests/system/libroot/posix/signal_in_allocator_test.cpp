@@ -72,7 +72,7 @@ main()
 	kill_thread(signalThread);
 	snooze(1000);
 
-	printf("test successful, handled %lld signals\n", sHandledSignals);
+	printf("test successful, handled %" B_PRId64 " signals\n", sHandledSignals);
 
 	return 0;
 }
