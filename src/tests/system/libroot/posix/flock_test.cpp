@@ -8,6 +8,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -19,7 +20,7 @@ bool gDone = false;
 static int32
 try_to_lock(void *_fd)
 {
-	int fd = (int)_fd;
+	intptr_t fd = (intptr_t)_fd;
 
 	struct flock flock = {
 		F_RDLCK,	// shared lock
@@ -60,7 +61,7 @@ try_to_lock(void *_fd)
 int 
 main(int argc, char **argv)
 {
-	int fd = open("/bin/sh", O_RDONLY);
+	intptr_t fd = open("/bin/sh", O_RDONLY);
 	if (fd < 0) {
 		fprintf(stderr, "could not open file: %s\n", strerror(errno));
 		return -1;
