@@ -42,8 +42,17 @@ InterfaceAddressView::InterfaceAddressView(int family,
 	// Create our controls
 	fModePopUpMenu = new BPopUpMenu("modes");
 
-	fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("DHCP"),
-		new BMessage(M_MODE_AUTO)));
+	if (fFamily == AF_INET) {
+		fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("DHCP"),
+			new BMessage(M_MODE_AUTO)));
+	}
+
+	if (fFamily == AF_INET6) {
+		// Automatic can be DHCPv6 or Router Advertisements
+		fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Automatic"),
+			new BMessage(M_MODE_AUTO)));
+	}
+	
 	fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Static"),
 		new BMessage(M_MODE_STATIC)));
 	fModePopUpMenu->AddSeparatorItem();
