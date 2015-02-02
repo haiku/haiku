@@ -95,7 +95,7 @@ main(int argc, char **argv)
 			double g = (double)j/4.0;
 			double x = copysign(f, g);
 			double y = be_copysign(f, g);
-			if ((x != y) && !(isnan(x) && isnan(y))) {
+			if ((x != y) && !(std::isnan(x) && std::isnan(y))) {
 				fprintf(stdout, "%0.1f\t%0.1f\t%0.6f\t%0.6f", f, g, x, y);
 				fprintf(stdout, " **");
 				fprintf(stdout, "\n");
@@ -113,7 +113,7 @@ main(int argc, char **argv)
 			double g = (double)j/4.0;
 			double x = drem(f, g);
 			double y = be_drem(f, g);
-			if ((x != y) && !(isnan(x) && isnan(y))) {
+			if ((x != y) && !(std::isnan(x) && std::isnan(y))) {
 				fprintf(stdout, "%0.2f\t%0.2f\t%0.10f\t%0.10f", f, g, x, y);
 				fprintf(stdout, " **");
 				fprintf(stdout, "\n");
