@@ -1,30 +1,30 @@
 /*
- * ice1712 BeOS/Haiku Driver for VIA - VT1712 Multi Channel Audio Controller
+ * Copyright 2004-2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Copyright (c) 2002, Jerome Duval		(jerome.duval@free.fr)
- * Copyright (c) 2003, Marcus Overhagen	(marcus@overhagen.de)
- * Copyright (c) 2007, Jerome Leveque	(leveque.jerome@neuf.fr)
- *
- * All rights reserved
- * Distributed under the terms of the MIT license.
+ * Authors:
+ *		Jérôme Duval, jerome.duval@free.fr
+ *		Marcus Overhagen, marcus@overhagen.de
+ *		Jérôme Lévêque, leveque.jerome@gmail.com
  */
+
+
 #ifndef _ICE1712_H_
 #define _ICE1712_H_
-
 
 #include "debug.h"
 #include "hmulti_audio.h"
 
 #include <PCI.h>
-
+#include <KernelExport.h>
 
 #define DRIVER_NAME "ice1712"
-#define VERSION "0.5"
+#define VERSION "0.6"
 
-#define ICE1712_VENDOR_ID			0x1412
-#define ICE1712_DEVICE_ID			0x1712
+#define ICE1712_VENDOR_ID 0x1412
+#define ICE1712_DEVICE_ID 0x1712
 
-typedef enum product_t {
+typedef enum ice1712Product {
 	ICE1712_SUBDEVICE_DELTA1010			= 0x121430d6,
 	ICE1712_SUBDEVICE_DELTADIO2496		= 0x121431d6,
 	ICE1712_SUBDEVICE_DELTA66			= 0x121432d6,
@@ -33,10 +33,11 @@ typedef enum product_t {
 	ICE1712_SUBDEVICE_DELTA410			= 0x121438d6,
 	ICE1712_SUBDEVICE_DELTA1010LT		= 0x12143bd6,
 	ICE1712_SUBDEVICE_VX442				= 0x12143cd6,
-} product_t;
+} ice1712Product;
 
 #define NUM_CARDS					4
-#define MAX_ADC						12	// + the output of the Digital mixer
+#define MAX_ADC						12
+// 5 stereo output + the Digital mixer
 #define MAX_DAC						10
 #define MAX_MIDI_INTERFACE			2
 #define SWAPPING_BUFFERS			2
@@ -45,7 +46,7 @@ typedef enum product_t {
 #define MAX_BUFFER_FRAMES			2048
 
 #define ICE1712_HARDWARE_VOLUME		10
-#define ICE1712_MUTE_VALUE 			0x7F
+#define ICE1712_MUTE_VALUE			0x7F
 
 #define PLAYBACK_BUFFER_SIZE		(MAX_BUFFER_FRAMES * MAX_DAC * SAMPLE_SIZE)
 #define RECORD_BUFFER_SIZE			(MAX_BUFFER_FRAMES * MAX_ADC * SAMPLE_SIZE)
@@ -68,68 +69,62 @@ typedef enum product_t {
 
 struct ice1712;
 
-typedef struct _midi_dev {
-	struct ice1712	*card;
-	void			*mpu401device;
-	uint8			int_mask;
-	char			name[64];
-} midi_dev;
-
-void ice_1712_midi_interrupt_op(int32 op, void *data);
-status_t ice_1712_midi_open(const char *name,
-	uint32 flags, void **cookie);
-status_t ice_1712_midi_close(void *cookie);
-status_t ice_1712_midi_free(void *cookie);
-status_t ice_1712_midi_control(void *cookie,
-	uint32 op, void *data, size_t len);
-status_t ice_1712_midi_read(void *cookie,
-	off_t pos, void *data, size_t *len);
-status_t ice_1712_midi_write(void *cookie,
-	off_t pos, const void *data, size_t *len);
+typedef struct ice1712Midi {
+	struct ice1712 *card;
+	void *mpu401device;
+	uint8 int_mask;
+	char name[64];
+} ice1712Midi;
 
 typedef struct _codecCommLines
 {
-	uint8	clock;
-	uint8	data_in;
-	uint8	data_out;
-	uint8	cs_mask; //a Mask for removing all Chip select
-	uint8	reserved[4];
+	uint8 clock;
+	uint8 data_in;
+	uint8 data_out;
+	uint8 cs_mask;
+	//a Mask for removing all Chip select
 } codecCommLines;
 
-typedef struct channel_volume
+typedef struct ice1712Volume
 {
 	float volume;
 	bool mute;
-} channel_volume;
+} ice1712Volume;
 
-typedef struct ice1712_settings
+typedef struct ice1712Settings
 {
-	channel_volume playback[ICE1712_HARDWARE_VOLUME];
-	channel_volume record[ICE1712_HARDWARE_VOLUME];
+	ice1712Volume playback[ICE1712_HARDWARE_VOLUME];
+	ice1712Volume record[ICE1712_HARDWARE_VOLUME];
 
 	uint32 bufferSize;
 
 	//General Settings
-	uint8 clock; //an index
+	uint8 clock;		//an index
 
 	//S/PDif Settings
-	uint8 outFormat; //an index
-	uint8 emphasis; //an index
-	uint8 copyMode; //an index
+	uint8 outFormat;	//an index
+	uint8 emphasis;		//an index
+	uint8 copyMode;		//an index
 
 	//Output settings
-	uint8 output[5]; //an index
+	uint8 output[5];	//an index
 
 	uint8 reserved[32];
-} ice1712_settings;
+} ice1712Settings;
 
-typedef struct ice1712_hconfig
+typedef struct ice1712HW
 {
-	int8 nb_ADC; //Mono Channel
-	int8 nb_DAC; //Mono Channel
+	int8 nb_ADC;		//Mono Channel
+	int8 nb_DAC;		//Mono Channel
 	int8 nb_MPU401;
 	int8 spdif;
-} ice1712_hconfig;
+
+	//in the format of the register
+	uint8 samplingRate;
+	uint32 lockSource;
+
+	ice1712Product product;
+} ice1712HW;
 
 typedef struct ice1712
 {
@@ -137,7 +132,7 @@ typedef struct ice1712
 	pci_info info;
 	char name[128];
 
-	midi_dev midi_interf[MAX_MIDI_INTERFACE];
+	ice1712Midi midiItf[MAX_MIDI_INTERFACE];
 
 	uint32 Controller;	//PCI_10
 	uint32 DDMA;		//PCI_14
@@ -145,8 +140,6 @@ typedef struct ice1712
 	uint32 Multi_Track;	//PCI_1C
 
 	uint8 eeprom_data[32];
-
-	product_t product;
 
 	//We hope all manufacturers will use same
 	//communication lines for speaking with codec
@@ -159,28 +152,21 @@ typedef struct ice1712
 
 	//Output
 	area_id mem_id_pb;
-	void *phys_addr_pb, *log_addr_pb;
+	physical_entry phys_pb;
+	addr_t log_addr_pb;
 	uint8 total_output_channels;
 
 	//Input
 	area_id mem_id_rec;
-	void *phys_addr_rec, *log_addr_rec;
+	physical_entry phys_rec;
+	addr_t log_addr_rec;
 	uint8 total_input_channels;
 
 	sem_id buffer_ready_sem;
 
-	uint8 sampling_rate; //in the format of the register
-	uint32 lock_source;
-
-	ice1712_hconfig 	config;
-	ice1712_settings	settings;
+	ice1712HW config;
+	ice1712Settings settings;
 } ice1712;
-
-status_t apply_settings(ice1712 *card);
-
-//For midi.c
-extern int32 num_cards;
-extern ice1712 cards[NUM_CARDS];
 
 //CSS_INTERRUPT_MASK
 #define CCS_INTERRUPT_MIDI_1			0x80
@@ -227,7 +213,7 @@ extern ice1712 cards[NUM_CARDS];
 #define VX442_CS_MASK					0x70	// Chip Select Mask
 
 #define GPIO_I2C_DELAY					5		//Clock Delay for writing
-                                                //I2C data throw GPIO
+												//I2C data throw GPIO
 
 //Register definition for the AK45xx codec (xx = 24 or 28)
 #define AK45xx_CHIP_ADDRESS				0x02	//Chip address of the codec
@@ -271,25 +257,27 @@ extern ice1712 cards[NUM_CARDS];
 */
 
 //This map comes from ALSA sound drivers
-#define E2PROM_MAP_SUBVENDOR_LOW	0x00
-#define E2PROM_MAP_SUBVENDOR_HIGH	0x01
-#define E2PROM_MAP_SUBDEVICE_LOW	0x02
-#define E2PROM_MAP_SUBDEVICE_HIGH	0x03
-#define E2PROM_MAP_SIZE				0x04
-#define E2PROM_MAP_VERSION			0x05
-#define E2PROM_MAP_CONFIG			0x06
-#define E2PROM_MAP_ACL				0x07
-#define E2PROM_MAP_I2S				0x08
-#define E2PROM_MAP_SPDIF			0x09
-#define E2PROM_MAP_GPIOMASK			0x0A
-#define E2PROM_MAP_GPIOSTATE		0x0B
-#define E2PROM_MAP_GPIODIR			0x0C
-#define E2PROM_MAP_AC97MAIN			0x0D
-#define E2PROM_MAP_AC97PCM			0x0F
-#define E2PROM_MAP_AC97REC			0x11
-#define E2PROM_MAP_AC97REC_SOURCE	0x13
-#define E2PROM_MAP_DAC_ID			0x14
-#define E2PROM_MAP_ADC_ID			0x18
-#define E2PROM_MAP_EXTRA			0x1C
+typedef enum ice1712EEprom {
+	E2PROM_MAP_SUBVENDOR_LOW	= 0x00,
+	E2PROM_MAP_SUBVENDOR_HIGH,
+	E2PROM_MAP_SUBDEVICE_LOW,
+	E2PROM_MAP_SUBDEVICE_HIGH,
+	E2PROM_MAP_SIZE,
+	E2PROM_MAP_VERSION,
+	E2PROM_MAP_CONFIG,
+	E2PROM_MAP_ACL,
+	E2PROM_MAP_I2S,
+	E2PROM_MAP_SPDIF,
+	E2PROM_MAP_GPIOMASK,
+	E2PROM_MAP_GPIOSTATE,
+	E2PROM_MAP_GPIODIR,
+	E2PROM_MAP_AC97MAIN,
+	E2PROM_MAP_AC97PCM			= 0x0F,
+	E2PROM_MAP_AC97REC			= 0x11,
+	E2PROM_MAP_AC97REC_SOURCE	= 0x13,
+	E2PROM_MAP_DAC_ID			= 0x14,
+	E2PROM_MAP_ADC_ID			= 0x18,
+	E2PROM_MAP_EXTRA			= 0x1C
+} ice1712EEprom;
 
 #endif

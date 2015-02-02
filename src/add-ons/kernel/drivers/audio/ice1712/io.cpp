@@ -1,13 +1,13 @@
 /*
- * ice1712 BeOS/Haiku Driver for VIA - VT1712 Multi Channel Audio Controller
+ * Copyright 2004-2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Copyright (c) 2002, Jerome Duval		(jerome.duval@free.fr)
- * Copyright (c) 2003, Marcus Overhagen	(marcus@overhagen.de)
- * Copyright (c) 2007, Jerome Leveque	(leveque.jerome@neuf.fr)
- *
- * All rights reserved
- * Distributed under the terms of the MIT license.
+ * Authors:
+ *		Jérôme Duval, jerome.duval@free.fr
+ *		Marcus Overhagen, marcus@overhagen.de
+ *		Jérôme Lévêque, leveque.jerome@gmail.com
  */
+
 
 #include "io.h"
 #include "ice1712_reg.h"
@@ -16,24 +16,23 @@
 extern pci_module_info *pci;
 
 static void ak45xx_write_gpio(ice1712 *ice, uint8 reg_addr,
-							uint8 data, uint8 chip_select, uint8 invert_cs);
+	uint8 data, uint8 chip_select, uint8 invert_cs);
 
 static void cs84xx_write_gpio(ice1712 *ice, uint8 reg_addr,
-							uint8 data, uint8 chip_select, uint8 invert_cs);
+	uint8 data, uint8 chip_select, uint8 invert_cs);
 
 static uint8 ak45xx_read_gpio(ice1712 *ice, uint8 reg_addr,
-							uint8 chip_select, uint8 invert_cs)
-			{return 0;} //Unimplemented
+	uint8 chip_select, uint8 invert_cs)
+		{return 0;} //Unimplemented
 
 static uint8 cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr,
-							uint8 chip_select, uint8 invert_cs);
+	uint8 chip_select, uint8 invert_cs);
 
 static void write_gpio_byte(ice1712 *ice, uint8 data, uint8 gpio_data);
 static uint8 read_gpio_byte(ice1712 *ice, uint8 gpio_data);
 
 
 //Address are [PCI_10] + xx
-
 uint8
 read_ccs_uint8(ice1712 *ice, int8 regno)
 {
@@ -91,10 +90,8 @@ write_cci_uint8(ice1712 *ice, int8 index, uint8 value)
 	write_ccs_uint8(ice, CCS_CCI_DATA, value);
 };
 
-//--------------------------------------------------
-//--------------------------------------------------
-//Address are [PCI_14] + xx
 
+//Address are [PCI_14] + xx
 uint8
 read_ddma_uint8(ice1712 *ice, int8 regno)
 {
@@ -137,8 +134,6 @@ write_ddma_uint32(ice1712 *ice, int8 regno, uint32 value)
 };
 
 
-//--------------------------------------------------
-//--------------------------------------------------
 //Address are [PCI_18] + x
 uint8
 read_ds_uint8(ice1712 *ice, int8 regno)
@@ -187,7 +182,7 @@ read_ds_channel_data(ice1712 *ice, uint8 channel, ds8_register index)
 {
 	uint8 ds8_channel_index = channel << 4 | index;
 
-	write_ds_uint8(ice,	DS_CHANNEL_INDEX, ds8_channel_index);
+	write_ds_uint8(ice, DS_CHANNEL_INDEX, ds8_channel_index);
 	return read_ds_uint32(ice, DS_CHANNEL_DATA);
 }
 
@@ -198,60 +193,60 @@ write_ds_channel_data(ice1712 *ice, uint8 channel, ds8_register index,
 {
 	uint8 ds8_channel_index = channel << 4 | index;
 
-	write_ds_uint8(ice,	DS_CHANNEL_INDEX, ds8_channel_index);
+	write_ds_uint8(ice, DS_CHANNEL_INDEX, ds8_channel_index);
 	write_ds_uint32(ice, DS_CHANNEL_DATA, data);
 }
 
 
-//--------------------------------------------------
-//--------------------------------------------------
 //Address are [PCI_1C] + xx
-
 uint8
-read_mt_uint8(ice1712 *ice,	int8 regno)
+read_mt_uint8(ice1712 *ice, int8 regno)
 {
-	return 	pci->read_io_8(ice->Multi_Track + regno);
+	return pci->read_io_8(ice->Multi_Track + regno);
 };
 
 
 uint16
-read_mt_uint16(ice1712 *ice,	int8 regno)
+read_mt_uint16(ice1712 *ice, int8 regno)
 {
-	return 	pci->read_io_16(ice->Multi_Track + regno);
+	return pci->read_io_16(ice->Multi_Track + regno);
 };
 
 
 uint32
-read_mt_uint32(ice1712 *ice,	int8 regno)
+read_mt_uint32(ice1712 *ice, int8 regno)
 {
 	return pci->read_io_32(ice->Multi_Track + regno);
 };
 
+
 void
-write_mt_uint8(ice1712 *ice,	int8 regno,	uint8 value)
+write_mt_uint8(ice1712 *ice, int8 regno, uint8 value)
 {
 	pci->write_io_8(ice->Multi_Track + regno, value);
 };
 
 
 void
-write_mt_uint16(ice1712 *ice,	int8 regno,	uint16 value)
+write_mt_uint16(ice1712 *ice, int8 regno, uint16 value)
 {
 	pci->write_io_16(ice->Multi_Track + regno, value);
 };
 
 
 void
-write_mt_uint32(ice1712 *ice,	int8 regno,	uint32 value)
+write_mt_uint32(ice1712 *ice, int8 regno, uint32 value)
 {
 	pci->write_io_32(ice->Multi_Track + regno, value);
 };
 
 
+/*
+ * return -1 if error else return an uint8
+ */
 int16
 read_i2c(ice1712 *ice, uint8 dev_addr, uint8 byte_addr)
-{//return -1 if error else return an uint8
-
+{
 	if (read_ccs_uint8(ice, CCS_I2C_CONTROL_STATUS) != 0x80)
 		return -1;
 	write_ccs_uint8(ice, CCS_I2C_BYTE_ADDRESS, byte_addr);
@@ -261,9 +256,12 @@ read_i2c(ice1712 *ice, uint8 dev_addr, uint8 byte_addr)
 }
 
 
+/*
+ * return -1 if error else return 0
+ */
 int16
 write_i2c(ice1712 *ice, uint8 dev_addr, uint8 byte_addr, uint8 value)
-{//return -1 if error else return 0
+{
 	if (read_ccs_uint8(ice, CCS_I2C_CONTROL_STATUS) != 0x80)
 		return -1;
 
@@ -302,11 +300,13 @@ int16 read_eeprom(ice1712 *ice, uint8 eeprom[32])
 void
 codec_write(ice1712 *ice, uint8 reg_addr, uint8 data)
 {
-	switch (ice->product) {
+	switch (ice->config.product) {
 		case ICE1712_SUBDEVICE_DELTA66:
 		case ICE1712_SUBDEVICE_DELTA44:
-			ak45xx_write_gpio(ice, reg_addr, data, DELTA66_CODEC_CS_0, 0);
-			ak45xx_write_gpio(ice, reg_addr, data, DELTA66_CODEC_CS_1, 0);
+			ak45xx_write_gpio(ice, reg_addr, data,
+				DELTA66_CODEC_CS_0, 0);
+			ak45xx_write_gpio(ice, reg_addr, data,
+				DELTA66_CODEC_CS_1, 0);
 			break;
 		case ICE1712_SUBDEVICE_DELTA410:
 		case ICE1712_SUBDEVICE_AUDIOPHILE_2496:
@@ -315,14 +315,14 @@ codec_write(ice1712 *ice, uint8 reg_addr, uint8 data)
 			break;
 		case ICE1712_SUBDEVICE_DELTA1010:
 		case ICE1712_SUBDEVICE_DELTA1010LT:
-			ak45xx_write_gpio(ice, reg_addr, data, DELTA1010LT_CODEC_CS_0,
-					DELTA1010LT_CS_NONE);
-			ak45xx_write_gpio(ice, reg_addr, data, DELTA1010LT_CODEC_CS_1,
-					DELTA1010LT_CS_NONE);
-			ak45xx_write_gpio(ice, reg_addr, data, DELTA1010LT_CODEC_CS_2,
-					DELTA1010LT_CS_NONE);
-			ak45xx_write_gpio(ice, reg_addr, data, DELTA1010LT_CODEC_CS_3,
-					DELTA1010LT_CS_NONE);
+			ak45xx_write_gpio(ice, reg_addr, data,
+				DELTA1010LT_CODEC_CS_0, DELTA1010LT_CS_NONE);
+			ak45xx_write_gpio(ice, reg_addr, data,
+				DELTA1010LT_CODEC_CS_1, DELTA1010LT_CS_NONE);
+			ak45xx_write_gpio(ice, reg_addr, data,
+				DELTA1010LT_CODEC_CS_2, DELTA1010LT_CS_NONE);
+			ak45xx_write_gpio(ice, reg_addr, data,
+				DELTA1010LT_CODEC_CS_3, DELTA1010LT_CS_NONE);
 			break;
 		case ICE1712_SUBDEVICE_VX442:
 			ak45xx_write_gpio(ice, reg_addr, data, VX442_CODEC_CS_0, 0);
@@ -335,7 +335,7 @@ codec_write(ice1712 *ice, uint8 reg_addr, uint8 data)
 void
 spdif_write(ice1712 *ice, uint8 reg_addr, uint8 data)
 {
-	switch (ice->product) {
+	switch (ice->config.product) {
 		case ICE1712_SUBDEVICE_DELTA1010:
 			break;
 		case ICE1712_SUBDEVICE_DELTADIO2496:
@@ -351,7 +351,7 @@ spdif_write(ice1712 *ice, uint8 reg_addr, uint8 data)
 			break;
 		case ICE1712_SUBDEVICE_DELTA1010LT:
 			cs84xx_write_gpio(ice, reg_addr, data, DELTA1010LT_SPDIF_CS,
-					DELTA1010LT_CS_NONE);
+				DELTA1010LT_CS_NONE);
 			break;
 		case ICE1712_SUBDEVICE_VX442:
 			cs84xx_write_gpio(ice, reg_addr, data, VX442_SPDIF_CS, 0);
@@ -364,7 +364,7 @@ uint8
 codec_read(ice1712 *ice, uint8 reg_addr)
 {
 	uint8 val = 0xFF;
-	switch (ice->product) {
+	switch (ice->config.product) {
 		case ICE1712_SUBDEVICE_DELTA66:
 		case ICE1712_SUBDEVICE_DELTA44:
 			val = ak45xx_read_gpio(ice, reg_addr, DELTA66_CODEC_CS_0, 0);
@@ -377,7 +377,7 @@ codec_read(ice1712 *ice, uint8 reg_addr)
 		case ICE1712_SUBDEVICE_DELTA1010:
 		case ICE1712_SUBDEVICE_DELTA1010LT:
 			val = ak45xx_read_gpio(ice, reg_addr, DELTA1010LT_CODEC_CS_0,
-							DELTA1010LT_CS_NONE);
+				DELTA1010LT_CS_NONE);
 			break;
 		case ICE1712_SUBDEVICE_VX442:
 			val = ak45xx_read_gpio(ice, reg_addr, VX442_CODEC_CS_0, 0);
@@ -392,7 +392,7 @@ uint8
 spdif_read(ice1712 *ice, uint8 reg_addr)
 {
 	uint8 val = 0xFF;
-	switch (ice->product) {
+	switch (ice->config.product) {
 		case ICE1712_SUBDEVICE_DELTA1010:
 			break;
 		case ICE1712_SUBDEVICE_DELTADIO2496:
@@ -408,7 +408,7 @@ spdif_read(ice1712 *ice, uint8 reg_addr)
 			break;
 		case ICE1712_SUBDEVICE_DELTA1010LT:
 			val = cs84xx_read_gpio(ice, reg_addr, DELTA1010LT_SPDIF_CS,
-							DELTA1010LT_CS_NONE);
+				DELTA1010LT_CS_NONE);
 			break;
 		case ICE1712_SUBDEVICE_VX442:
 			val = cs84xx_read_gpio(ice, reg_addr, VX442_SPDIF_CS, 0);
@@ -417,6 +417,7 @@ spdif_read(ice1712 *ice, uint8 reg_addr)
 
 	return val;
 }
+
 
 void
 write_gpio_byte(ice1712 *ice, uint8 data, uint8 gpio_data)
@@ -441,6 +442,7 @@ write_gpio_byte(ice1712 *ice, uint8 data, uint8 gpio_data)
 	}
 }
 
+
 uint8
 read_gpio_byte(ice1712 *ice, uint8 gpio_data)
 {
@@ -453,7 +455,7 @@ read_gpio_byte(ice1712 *ice, uint8 gpio_data)
 		write_gpio(ice, gpio_data);
 		snooze(GPIO_I2C_DELAY);
 
-		if (read_gpio(ice) &  ice->CommLines.data_in)
+		if (read_gpio(ice) &ice->CommLines.data_in)
 			data |= 1 << i;
 
 		gpio_data |= ice->CommLines.clock;
@@ -464,6 +466,7 @@ read_gpio_byte(ice1712 *ice, uint8 gpio_data)
 
 	return data;
 }
+
 
 void
 ak45xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data,
@@ -497,6 +500,7 @@ ak45xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data,
 	snooze(GPIO_I2C_DELAY);
 }
 
+
 void
 cs84xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data,
 	uint8 chip_select, uint8 invert_cs)
@@ -528,6 +532,7 @@ cs84xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data,
 	write_gpio(ice, tmp);
 	snooze(GPIO_I2C_DELAY);
 }
+
 
 uint8
 cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr, uint8 chip_select,
@@ -586,16 +591,21 @@ cs84xx_read_gpio(ice1712 *ice, uint8 reg_addr, uint8 chip_select,
 }
 
 
+/*
+ * return -1 if error else return an uint8
+ */
 uint8
 read_gpio(ice1712 *ice)
-{//return -1 if error else return an uint8
+{
 	return read_cci_uint8(ice, CCI_GPIO_DATA);
 }
 
 
+/*
+ * return -1 if error else return 0
+ */
 void
 write_gpio(ice1712 *ice, uint8 value)
-{//return -1 if error else return 0
+{
 	write_cci_uint8(ice, CCI_GPIO_DATA, value);
 }
-
