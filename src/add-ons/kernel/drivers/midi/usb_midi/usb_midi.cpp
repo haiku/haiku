@@ -431,13 +431,15 @@ got_one:
 	}
 
 	/* issue bulk transfer */
-	DPRINTF_DEBUG((MY_ID "queueing bulk xfer IN endpoint\n"));
-	status = usb->queue_bulk(midiDevice->ept_in->handle, midiDevice->buffer,
-		midiDevice->inMaxPkt,
-		(usb_callback_func)midi_usb_read_callback, midiDevice);
-	if (status != B_OK) {
-		DPRINTF_ERR((MY_ID "queue_bulk() error 0x%" B_PRIx32 "\n", status));
-		return B_ERROR;
+	if (midiDevice->ept_in != NULL) {
+		DPRINTF_DEBUG((MY_ID "queueing bulk xfer IN endpoint\n"));
+		status = usb->queue_bulk(midiDevice->ept_in->handle, midiDevice->buffer,
+			midiDevice->inMaxPkt,
+			(usb_callback_func)midi_usb_read_callback, midiDevice);
+		if (status != B_OK) {
+			DPRINTF_ERR((MY_ID "queue_bulk() error 0x%" B_PRIx32 "\n", status));
+			return B_ERROR;
+		}
 	}
 
 	*cookie = midiDevice;
@@ -471,8 +473,11 @@ usb_midi_removed(void* cookie)
 		}
 		remove_port(port);
 	}
-	usb->cancel_queued_transfers(midiDevice->ept_in->handle);
-	usb->cancel_queued_transfers(midiDevice->ept_out->handle);
+
+	if (midiDevice->ept_in != NULL)
+		usb->cancel_queued_transfers(midiDevice->ept_in->handle);
+	if (midiDevice->ept_out != NULL)
+		usb->cancel_queued_transfers(midiDevice->ept_out->handle);
 	DPRINTF_DEBUG((MY_ID "usb_midi_removed: doing remove: %s\n",
 		midiDevice->name));
 	remove_device(midiDevice);
