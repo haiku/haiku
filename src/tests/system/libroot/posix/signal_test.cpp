@@ -21,6 +21,14 @@ typedef void (*sighandler_t)(int);
 #	define ualarm(usec, interval) alarm(1)
 #endif
 
+#if !defined(__USE_GNU)
+// sighandler is a GNU extension. This matches the check
+// in signal.h.  We may want to use posix sigaction though
+// in the future which is posix
+typedef void (*sighandler_t)(int);
+#endif
+
+
 const void* kUserDataMagic = (void *)0x12345678;
 
 static char sAlternateStack[SIGSTKSZ];
