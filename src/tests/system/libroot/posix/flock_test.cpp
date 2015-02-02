@@ -61,7 +61,7 @@ try_to_lock(void *_fd)
 int 
 main(int argc, char **argv)
 {
-	intptr_t fd = open("/bin/sh", O_RDONLY);
+	intptr_t fd = open("/etc/passwd", O_RDONLY);
 	if (fd < 0) {
 		fprintf(stderr, "could not open file: %s\n", strerror(errno));
 		return -1;
@@ -92,7 +92,7 @@ main(int argc, char **argv)
 
 	close(fd);
 
-	fd = open("/bin/sh", O_RDWR);
+	fd = open("/etc/passwd", O_RDWR);
 	if (fd < 0) {
 		fprintf(stderr, "could not open file: %s\n", strerror(errno));
 		return -1;
