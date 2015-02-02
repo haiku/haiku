@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#define __USE_GNU
+#define _GNU_SOURCE
 	// for wmempcpy() and wcschrnul()
 
 #include <errno.h>
