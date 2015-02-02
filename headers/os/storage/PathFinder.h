@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PATH_FINDER_H
@@ -7,11 +7,10 @@
 
 
 #include <FindDirectory.h>
-#include <String.h>
+#include <StringList.h>
 
 
 class BPath;
-class BStringList;
 struct entry_ref;
 
 
