@@ -23,34 +23,34 @@ const char*
 string_for_rate(double rate, char* string, size_t stringSize, double base)
 {
 	double kbps = rate / base;
-	if (kbps < 1.0) {
-		const char* trKey = B_TRANSLATE_MARK("%.0f bps");
+	if (kbps < 10.0) {
+		const char* trKey = B_TRANSLATE_MARK("%d bps");
 		snprintf(string, stringSize, gSystemCatalog.GetString(trKey,
 			B_TRANSLATION_CONTEXT), (int)rate);
 		return string;
 	}
 	double mbps = kbps / base;
-	if (mbps < 1.0) {
-		const char* trKey = B_TRANSLATE_MARK("%.0f kbps");
+	if (mbps < 10.0) {
+		const char* trKey = B_TRANSLATE_MARK("%.0f Kbps");
 		snprintf(string, stringSize, gSystemCatalog.GetString(trKey,
 			B_TRANSLATION_CONTEXT), kbps);
 		return string;
 	}
 	double gbps = mbps / base;
-	if (gbps < 1.0) {
-		const char* trKey = B_TRANSLATE_MARK("%.0f mbps");
+	if (gbps < 10.0) {
+		const char* trKey = B_TRANSLATE_MARK("%.0f Mbps");
 		snprintf(string, stringSize, gSystemCatalog.GetString(trKey,
 			B_TRANSLATION_CONTEXT), mbps);
 		return string;
 	}
 	double tbps = gbps / base;
-	if (tbps < 1.0) {
-		const char* trKey = B_TRANSLATE_MARK("%.0f gbps");
+	if (tbps < 10.0) {
+		const char* trKey = B_TRANSLATE_MARK("%.0f Gbps");
 		snprintf(string, stringSize, gSystemCatalog.GetString(trKey,
 			B_TRANSLATION_CONTEXT), gbps);
 		return string;
 	}
-	const char* trKey = B_TRANSLATE_MARK("%.0f tbps");
+	const char* trKey = B_TRANSLATE_MARK("%.0f Tbps");
 	snprintf(string, stringSize, gSystemCatalog.GetString(trKey,
 		B_TRANSLATION_CONTEXT), tbps);
 	return string;
