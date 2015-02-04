@@ -447,7 +447,7 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 	SetHighColor(20, 20, 20);
-	SetDrawingMode(B_OP_OVER);
+	SetDrawingMode(B_OP_ALPHA);
 
 	const float buttonWidth = 22;
 	const float buttonHeight = 20;
@@ -465,23 +465,23 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 	switch (type) {
 		case kCopyState:
 			caption = B_TRANSLATE("Preparing to copy items" B_UTF8_ELLIPSIS);
-			id = R_CopyStatusBitmap;
+			id = R_CopyStatusIcon;
 			break;
 
 		case kMoveState:
 			caption = B_TRANSLATE("Preparing to move items" B_UTF8_ELLIPSIS);
-			id = R_MoveStatusBitmap;
+			id = R_MoveStatusIcon;
 			break;
 
 		case kCreateLinkState:
 			caption = B_TRANSLATE("Preparing to create links"
 				B_UTF8_ELLIPSIS);
-			id = R_MoveStatusBitmap;
+			id = R_MoveStatusIcon;
 			break;
 
 		case kTrashState:
 			caption = B_TRANSLATE("Preparing to empty Trash" B_UTF8_ELLIPSIS);
-			id = R_TrashStatusBitmap;
+			id = R_TrashIcon;
 			break;
 
 		case kVolumeState:
@@ -492,7 +492,7 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 		case kDeleteState:
 			caption = B_TRANSLATE("Preparing to delete items"
 				B_UTF8_ELLIPSIS);
-			id = R_TrashStatusBitmap;
+			id = R_TrashIcon;
 			break;
 
 		case kRestoreFromTrashState:
@@ -525,8 +525,9 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 	}
 
 	if (id != 0) {
-		GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, id,
-			&fBitmap);
+		fBitmap = new BBitmap(BRect(0, 0, 16, 16), B_RGBA32);
+		GetTrackerResources()->GetIconResource(id, B_MINI_ICON,
+			fBitmap);
 	}
 
 	rect = Bounds();

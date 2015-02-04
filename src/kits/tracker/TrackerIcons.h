@@ -64,6 +64,8 @@ enum {
 	R_PersonDirIcon = 1031,
 	R_UtilDirIcon = 1032,
 	R_ConfigDirIcon = 1033,
+	R_MoveStatusIcon = 1039,
+	R_CopyStatusIcon = 1040,
 	R_MICN_AppIcon = 1000,
 	R_MICN_FileIcon = 1001,
 	R_MICN_TrashIcon = 1003,
