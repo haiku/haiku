@@ -33,7 +33,8 @@ public:
 
 	virtual	BNetworkSettingsType
 								Type() const = 0;
-	virtual BListItem*			CreateListItem() = 0;
+	virtual BListItem*			ListItem() = 0;
+	virtual BView*				View() = 0;
 
 	virtual status_t			ProfileChanged(
 									const BNetworkProfile* newProfile);

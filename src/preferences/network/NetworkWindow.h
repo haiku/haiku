@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  *	Authors:
+ *		Axel Dörfler, <axeld@pinc-software.de>
  *		Alexander von Gluck, <kallisti5@unixzen.com>
  */
 #ifndef NETWORK_WINDOW_H
@@ -26,14 +27,6 @@ class BMenu;
 
 
 class NetworkWindow : public BWindow {
-public:
-	static	const uint32		kMsgProfileSelected = 'prof';
-	static	const uint32		kMsgProfileManage = 'mngp';
-	static	const uint32		kMsgProfileNew = 'newp';
-	static	const uint32		kMsgApply = 'aply';
-	static	const uint32		kMsgRevert = 'rvrt';
-	static	const uint32		kMsgToggleReplicant = 'trep';
-
 public:
 								NetworkWindow();
 	virtual						~NetworkWindow();

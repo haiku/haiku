@@ -3,8 +3,9 @@
  * Distributed under the terms of the MIT License.
  *
  *	Authors:
- *		Alexander von Gluck, <kallisti5@unixzen.com>
  *		Adrien Destugues, <pulkomandy@pulkomandy.tk>
+ *		Axel Dörfler, <axeld@pinc-software.de>
+ *		Alexander von Gluck, <kallisti5@unixzen.com>
  */
 
 
@@ -43,6 +44,15 @@
 
 const char* kNetworkStatusSignature = "application/x-vnd.Haiku-NetworkStatus";
 
+static const uint32 kMsgProfileSelected = 'prof';
+static const uint32 kMsgProfileManage = 'mngp';
+static const uint32 kMsgProfileNew = 'newp';
+static const uint32 kMsgApply = 'aply';
+static const uint32 kMsgRevert = 'rvrt';
+static const uint32 kMsgToggleReplicant = 'trep';
+static const uint32 kMsgItemSelected = 'ItSl';
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT	"NetworkWindow"
 
@@ -75,16 +85,18 @@ NetworkWindow::NetworkWindow()
 	// fRevertButton->SetEnabled(false);
 
 	BMessage* message = new BMessage(kMsgToggleReplicant);
-	BCheckBox* replicantStatus = new BCheckBox("replicantStatus",
+	BCheckBox* showReplicantCheckBox = new BCheckBox("showReplicantCheckBox",
 		B_TRANSLATE("Show network status in Deskbar"), message);
-	replicantStatus->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	replicantStatus->SetValue(_IsReplicantInstalled());
+	showReplicantCheckBox->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	showReplicantCheckBox->SetValue(_IsReplicantInstalled());
 
 	fListView = new BOutlineListView("list", B_SINGLE_SELECTION_LIST,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS | B_NAVIGABLE);
+	fListView->SetSelectionMessage(new BMessage(kMsgItemSelected));
 
-	BScrollView* scrollView = new BScrollView("ScrollView",
-		fListView, 0/*B_WILL_DRAW | B_FRAME_EVENTS*/, false, true);
+	BScrollView* scrollView = new BScrollView("ScrollView", fListView,
+		0, false, true);
 
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
@@ -100,7 +112,7 @@ NetworkWindow::NetworkWindow()
 			.Add(scrollView)
 			.AddGlue()
 			.End()
-		.Add(replicantStatus)
+		.Add(showReplicantCheckBox)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)
 			.AddGlue()
@@ -148,6 +160,9 @@ NetworkWindow::MessageReceived(BMessage* message)
 			fApplyButton->SetEnabled(!isCurrent);
 			break;
 		}
+
+		case kMsgItemSelected:
+			break;
 
 		case kMsgRevert:
 		{
@@ -315,7 +330,7 @@ NetworkWindow::_ScanAddOns()
 
 					fItems.AddItem(item);
 					// TODO: sort
-					fListView->AddUnder(interfaceItem, item->CreateListItem());
+					fListView->AddUnder(interfaceItem, item->ListItem());
 				}
 			}
 
@@ -328,8 +343,7 @@ NetworkWindow::_ScanAddOns()
 
 				fItems.AddItem(item);
 				// TODO: sort
-				fListView->AddUnder(_ItemFor(item->Type()),
-					item->CreateListItem());
+				fListView->AddUnder(_ItemFor(item->Type()), item->ListItem());
 			}
 		}
 	}
