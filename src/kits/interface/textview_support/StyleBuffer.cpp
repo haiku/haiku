@@ -165,6 +165,9 @@ SetStyleFromMode(uint32 mode, const BFont *fromFont, BFont *toFont,
 		if (mode & B_FONT_FAMILY_AND_STYLE)
 			toFont->SetFamilyAndStyle(fromFont->FamilyAndStyle());
 
+		if (mode & B_FONT_FACE)
+			toFont->SetFace(fromFont->Face());
+
 		if (mode & B_FONT_SIZE)
 			toFont->SetSize(fromFont->Size());
 
