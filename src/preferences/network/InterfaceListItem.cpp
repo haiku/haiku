@@ -14,36 +14,14 @@
 
 #include <algorithm>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <net/if_dl.h>
-#include <net/if_media.h>
-#include <net/if_types.h>
-#include <netinet/in.h>
-#include <net_notifications.h>
-#include <sys/socket.h>
-#include <sys/sockio.h>
-
 #include <Application.h>
 #include <Bitmap.h>
 #include <Catalog.h>
-#include <File.h>
 #include <IconUtils.h>
-#include <MenuItem.h>
 #include <NetworkDevice.h>
-#include <NetworkInterface.h>
-#include <NetworkRoster.h>
 #include <OutlineListView.h>
-#include <Point.h>
-#include <PopUpMenu.h>
 #include <Resources.h>
 #include <String.h>
-#include <SeparatorItem.h>
-#include <Window.h>
-
-#include <AutoDeleter.h>
 
 
 #define ICON_SIZE 37
