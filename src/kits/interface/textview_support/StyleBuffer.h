@@ -1,10 +1,10 @@
 /*
- * Copyright 2001-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2006 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Marc Flerackers, mflerackers@androme.be
+ *		Stefano Ceccherini, burton666@libero.it
  */
 
 
@@ -50,16 +50,17 @@ struct STEStyleRunDesc {
 
 // _BStyleRunDescBuffer_ class -------------------------------------------------
 class _BStyleRunDescBuffer_ : public _BTextViewSupportBuffer_<STEStyleRunDesc> {
-	public:
-		_BStyleRunDescBuffer_();
+public:
+								_BStyleRunDescBuffer_();
 
-		void	InsertDesc(STEStyleRunDesc* inDesc, int32 index);
-		void	RemoveDescs(int32 index, int32 count = 1);
+			void				InsertDesc(STEStyleRunDesc* inDesc,
+								int32 index);
+			void				RemoveDescs(int32 index, int32 count = 1);
 
-		int32	OffsetToRun(int32 offset) const;
-		void	BumpOffset(int32 delta, int32 index);
+			int32				OffsetToRun(int32 offset) const;
+			void				BumpOffset(int32 delta, int32 index);
 
-		STEStyleRunDesc* operator[](int32 index) const;
+			STEStyleRunDesc*	operator[](int32 index) const;
 };
 
 
@@ -72,17 +73,19 @@ _BStyleRunDescBuffer_::operator[](int32 index) const
 
 // _BStyleRecordBuffer_ class --------------------------------------------------
 class _BStyleRecordBuffer_ : public _BTextViewSupportBuffer_<STEStyleRecord> {
-	public:
-		_BStyleRecordBuffer_();
+public:
+								_BStyleRecordBuffer_();
 
-		int32	InsertRecord(const BFont *inFont, const rgb_color *inColor);
-		void	CommitRecord(int32 index);
-		void	RemoveRecord(int32 index);
+			int32				InsertRecord(const BFont* inFont,
+									const rgb_color* inColor);
+			void				CommitRecord(int32 index);
+			void				RemoveRecord(int32 index);
 
-		bool	MatchRecord(const BFont *inFont, const rgb_color *inColor,
-					int32 *outIndex);
+			bool				MatchRecord(const BFont* inFont,
+									const rgb_color* inColor,
+									int32* outIndex);
 
-		STEStyleRecord*	operator[](int32 index) const;
+			STEStyleRecord*		operator[](int32 index) const;
 };
 
 
@@ -95,55 +98,61 @@ _BStyleRecordBuffer_::operator[](int32 index) const
 
 // StyleBuffer class --------------------------------------------------------
 class BTextView::StyleBuffer {
-	public:
-						StyleBuffer(const BFont *inFont,
-							const rgb_color *inColor);
+public:
+								StyleBuffer(const BFont* inFont,
+									const rgb_color* inColor);
 
-		void			InvalidateNullStyle();
-		bool			IsValidNullStyle() const;
+			void				InvalidateNullStyle();
+			bool				IsValidNullStyle() const;
 
-		void			SyncNullStyle(int32 offset);
-		void			SetNullStyle(uint32 inMode, const BFont *inFont,
-							const rgb_color *inColor, int32 offset = 0);
-		void			GetNullStyle(const BFont **font,
-							const rgb_color **color) const;
+			void				SyncNullStyle(int32 offset);
+			void				SetNullStyle(uint32 inMode,
+									const BFont* inFont,
+									const rgb_color* inColor,
+									int32 offset = 0);
+			void				GetNullStyle(const BFont** font,
+									const rgb_color** color) const;
 
-		void			GetStyle(int32 inOffset, BFont *outFont,
-							rgb_color *outColor) const;
-		void			ContinuousGetStyle(BFont *, uint32 *, rgb_color *,
-							bool *, int32, int32) const;
+			void				GetStyle(int32 inOffset, BFont* outFont,
+									rgb_color* outColor) const;
+			void				ContinuousGetStyle(BFont*, uint32*,
+									rgb_color*, bool*, int32, int32) const;
 
-		STEStyleRange*	AllocateStyleRange(const int32 numStyles) const;
-		void			SetStyleRange(int32 fromOffset, int32 toOffset,
-							int32 textLen, uint32 inMode,
-							const BFont *inFont, const rgb_color *inColor);
-		STEStyleRange*	GetStyleRange(int32 startOffset,
-							int32 endOffset) const;
+			STEStyleRange*		AllocateStyleRange(
+									const int32 numStyles) const;
+			void				SetStyleRange(int32 fromOffset,
+									int32 toOffset, int32 textLen,
+									uint32 inMode, const BFont* inFont,
+									const rgb_color* inColor);
+			STEStyleRange*		GetStyleRange(int32 startOffset,
+									int32 endOffset) const;
 
-		void			RemoveStyleRange(int32 fromOffset, int32 toOffset);
-		void			RemoveStyles(int32 index, int32 count = 1);
+			void				RemoveStyleRange(int32 fromOffset,
+									int32 toOffset);
+			void				RemoveStyles(int32 index, int32 count = 1);
 
-		int32			Iterate(int32 fromOffset, int32 length,
-							InlineInput* input,
-							const BFont **outFont = NULL,
-							const rgb_color **outColor = NULL,
-							float *outAscent = NULL,
-							float *outDescen = NULL, uint32 * = NULL) const;
+			int32				Iterate(int32 fromOffset, int32 length,
+									InlineInput* input,
+									const BFont** outFont = NULL,
+									const rgb_color** outColor = NULL,
+									float* outAscent = NULL,
+									float* outDescen = NULL,
+									uint32* = NULL) const;
 
-		int32			OffsetToRun(int32 offset) const;
-		void			BumpOffset(int32 delta, int32 index);
+			int32				OffsetToRun(int32 offset) const;
+			void				BumpOffset(int32 delta, int32 index);
 
-		STEStyleRun		operator[](int32 index) const;
-		int32			NumRuns() const;
+			STEStyleRun			operator[](int32 index) const;
+			int32				NumRuns() const;
 
-		const _BStyleRunDescBuffer_& RunBuffer() const;
-		const _BStyleRecordBuffer_& RecordBuffer() const;
+	const	_BStyleRunDescBuffer_&	RunBuffer() const;
+	const	_BStyleRecordBuffer_&	RecordBuffer() const;
 
-	private:
-		_BStyleRunDescBuffer_	fStyleRunDesc;
-		_BStyleRecordBuffer_	fStyleRecord;
-		bool			fValidNullStyle;
-		STEStyle		fNullStyle;
+private:
+			_BStyleRunDescBuffer_	fStyleRunDesc;
+			_BStyleRecordBuffer_	fStyleRecord;
+			bool				fValidNullStyle;
+			STEStyle			fNullStyle;
 };
 
 
