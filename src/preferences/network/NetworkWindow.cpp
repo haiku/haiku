@@ -52,7 +52,7 @@ NetworkWindow::NetworkWindow()
 	BWindow(BRect(100, 100, 300, 300), B_TRANSLATE("Network"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	// ---- Profiles section
+	// Profiles section
 #if ENABLE_PROFILES
 	BPopUpMenu* profilesPopup = new BPopUpMenu("<none>");
 	_BuildProfilesMenu(profilesPopup, kMsgProfileSelected);
@@ -64,7 +64,7 @@ NetworkWindow::NetworkWindow()
 	profilesMenuField->SetEnabled(false);
 #endif
 
-	// ---- Settings section
+	// Settings section
 
 	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
 		new BMessage(kMsgApply));
@@ -80,7 +80,8 @@ NetworkWindow::NetworkWindow()
 	replicantStatus->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	replicantStatus->SetValue(_IsReplicantInstalled());
 
-	fListView = new BOutlineListView("list");
+	fListView = new BOutlineListView("list", B_SINGLE_SELECTION_LIST,
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS | B_NAVIGABLE);
 
 	BScrollView* scrollView = new BScrollView("ScrollView",
 		fListView, 0/*B_WILL_DRAW | B_FRAME_EVENTS*/, false, true);
