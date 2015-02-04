@@ -1,33 +1,37 @@
 SubDir HAIKU_TOP src preferences network ;
+
+UsePrivateHeaders net shared ;
+
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps networkstatus ] ;
 
 Preference Network :
-	NetworkSetup.cpp
-	NetworkSetupWindow.cpp
-	NetworkSetupProfile.cpp
-	NetworkSetupAddOn.cpp
+	Network.cpp
+	NetworkWindow.cpp
+	NetworkProfile.cpp
+	NetworkSettingsAddOn.cpp
+	InterfaceListItem.cpp
 
 	# from NetworkStatus
 	RadioView.cpp
 	WirelessNetworkMenuItem.cpp
 
-	: be root [ TargetLibstdc++ ] localestub
-	: NetworkSetup.rdef
+	: be root bnetapi [ TargetLibstdc++ ] localestub
+	: Network.rdef InterfaceIcons.rdef
 ;
 
 DoCatalogs Network :
 	x-vnd.Haiku-Network
 	:
-	NetworkSetup.cpp
-	NetworkSetupWindow.cpp
-	NetworkSetupProfile.cpp
-	NetworkSetupAddOn.cpp
+	Network.cpp
+	NetworkWindow.cpp
+	NetworkProfile.cpp
+	NetworkSettingsAddOn.cpp
 	RadioView.cpp
 	WirelessNetworkMenuItem.cpp
 ;
 
-SubInclude HAIKU_TOP src preferences network InterfacesAddOn ;
-SubInclude HAIKU_TOP src preferences network ServicesAddOn ;
+#SubInclude HAIKU_TOP src preferences network InterfacesAddOn ;
+#SubInclude HAIKU_TOP src preferences network ServicesAddOn ;
 #SubInclude HAIKU_TOP src preferences network DummyAddOn ;
 #SubInclude HAIKU_TOP src preferences network MultipleAddOns ;
 #SubInclude HAIKU_TOP src preferences network DialUpAddOn ;

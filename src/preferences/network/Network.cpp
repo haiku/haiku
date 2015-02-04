@@ -1,8 +1,8 @@
 /*
  * Copyright 2004-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
  */
+
 
 #include <Alert.h>
 #include <Application.h>
@@ -10,7 +10,7 @@
 #include <Locale.h>
 #include <Window.h>
 
-#include "NetworkSetupWindow.h"
+#include "NetworkWindow.h"
 
 
 static const char* kSignature = "application/x-vnd.Haiku-Network";
@@ -35,7 +35,7 @@ Application::Application()
 void
 Application::ReadyToRun()
 {
-	NetworkSetupWindow* window = new NetworkSetupWindow();
+	NetworkWindow* window = new NetworkWindow();
 	window->Show();
 }
 

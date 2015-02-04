@@ -8,8 +8,9 @@
  */
 
 
-#include "NetworkSetupWindow.h"
+#include "NetworkWindow.h"
 
+#include <net/if.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,30 +22,35 @@
 #include <CheckBox.h>
 #include <ControlLook.h>
 #include <Deskbar.h>
+#include <Directory.h>
 #include <LayoutBuilder.h>
-#include <Locale.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
+#include <OutlineListView.h>
+#include <Path.h>
+#include <PathFinder.h>
 #include <Roster.h>
-#include <StorageKit.h>
-#include <SupportKit.h>
-#include <TabView.h>
+#include <ScrollView.h>
+#include <SymLink.h>
 
 #define ENABLE_PROFILES 0
 #if ENABLE_PROFILES
 #	include <PopUpMenu.h>
 #endif
 
+#include "InterfaceListItem.h"
+
 
 const char* kNetworkStatusSignature = "application/x-vnd.Haiku-NetworkStatus";
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT	"NetworkSetupWindow"
+#define B_TRANSLATION_CONTEXT	"NetworkWindow"
 
 
-NetworkSetupWindow::NetworkSetupWindow()
+NetworkWindow::NetworkWindow()
 	:
 	BWindow(BRect(100, 100, 300, 300), B_TRANSLATE("Network"), B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
-	fAddOnCount(0)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	// ---- Profiles section
 #if ENABLE_PROFILES
@@ -60,8 +66,6 @@ NetworkSetupWindow::NetworkSetupWindow()
 
 	// ---- Settings section
 
-	fPanel = new BTabView("tabs", B_WIDTH_FROM_LABEL);
-
 	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
 		new BMessage(kMsgApply));
 	SetDefaultButton(fApplyButton);
@@ -73,7 +77,13 @@ NetworkSetupWindow::NetworkSetupWindow()
 	BMessage* message = new BMessage(kMsgToggleReplicant);
 	BCheckBox* replicantStatus = new BCheckBox("replicantStatus",
 		B_TRANSLATE("Show network status in Deskbar"), message);
+	replicantStatus->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	replicantStatus->SetValue(_IsReplicantInstalled());
+
+	fListView = new BOutlineListView("list");
+
+	BScrollView* scrollView = new BScrollView("ScrollView",
+		fListView, 0/*B_WILL_DRAW | B_FRAME_EVENTS*/, false, true);
 
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
@@ -86,9 +96,9 @@ NetworkSetupWindow::NetworkSetupWindow()
 		.End()
 #endif
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
-			.Add(fPanel)
-			.Add(new BGroupView("panel"))
-		.End()
+			.Add(scrollView)
+			.AddGlue()
+			.End()
 		.Add(replicantStatus)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)
@@ -96,7 +106,8 @@ NetworkSetupWindow::NetworkSetupWindow()
 			.Add(fApplyButton)
 		.End();
 
-	_BuildShowTabView();
+	_ScanInterfaces();
+	_ScanAddOns();
 
 	fAddOnView = NULL;
 
@@ -104,13 +115,13 @@ NetworkSetupWindow::NetworkSetupWindow()
 }
 
 
-NetworkSetupWindow::~NetworkSetupWindow()
+NetworkWindow::~NetworkWindow()
 {
 }
 
 
 bool
-NetworkSetupWindow::QuitRequested()
+NetworkWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
@@ -118,7 +129,7 @@ NetworkSetupWindow::QuitRequested()
 
 
 void
-NetworkSetupWindow::MessageReceived(BMessage* message)
+NetworkWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgProfileNew:
@@ -139,26 +150,22 @@ NetworkSetupWindow::MessageReceived(BMessage* message)
 
 		case kMsgRevert:
 		{
-			for (int index = 0; index < fAddOnCount; index++) {
-				NetworkSetupAddOn* addOn = fNetworkAddOnMap[index];
-				addOn->Revert();
-			}
+			for (int index = 0; index < fItems.CountItems(); index++)
+				fItems.ItemAt(index)->Revert();
 			break;
 		}
 
 		case kMsgApply:
 		{
-			for (int index = 0; index < fAddOnCount; index++) {
-				NetworkSetupAddOn* addOn = fNetworkAddOnMap[index];
-				addOn->Save();
-			}
+			for (int index = 0; index < fItems.CountItems(); index++)
+				fItems.ItemAt(index)->Save();
 			break;
 		}
 
 		case kMsgToggleReplicant:
 		{
-			_ShowReplicant(message->GetInt32("be:value", B_CONTROL_OFF)
-				== B_CONTROL_ON);
+			_ShowReplicant(
+				message->GetInt32("be:value", B_CONTROL_OFF) == B_CONTROL_ON);
 			break;
 		}
 
@@ -169,7 +176,7 @@ NetworkSetupWindow::MessageReceived(BMessage* message)
 
 
 void
-NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 what)
+NetworkWindow::_BuildProfilesMenu(BMenu* menu, int32 what)
 {
 	char currentProfile[256] = { 0 };
 
@@ -227,90 +234,137 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 what)
 
 
 void
-NetworkSetupWindow::_BuildShowTabView()
+NetworkWindow::_ScanInterfaces()
 {
-	BPath path;
-	BPath addOnPath;
-	BDirectory dir;
-	BEntry entry;
+	// Try existing devices first
+	BNetworkRoster& roster = BNetworkRoster::Default();
+	BNetworkInterface interface;
+	uint32 cookie = 0;
 
-	char* searchPaths = getenv("ADDON_PATH");
-	if (!searchPaths)
-		return;
-
-	searchPaths = strdup(searchPaths);
-	char* nextPathToken;
-	char* searchPath = strtok_r(searchPaths, ":", &nextPathToken);
-
-	while (searchPath) {
-		if (strncmp(searchPath, "%A/", 3) == 0) {
-			app_info ai;
-			be_app->GetAppInfo(&ai);
-			entry.SetTo(&ai.ref);
-			entry.GetPath(&path);
-			path.GetParent(&path);
-			path.Append(searchPath + 3);
-		} else {
-			path.SetTo(searchPath);
-			path.Append("Network Setup");
-		}
-
-		searchPath = strtok_r(NULL, ":", &nextPathToken);
-
-		dir.SetTo(path.Path());
-		if (dir.InitCheck() != B_OK)
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		if ((interface.Flags() & IFF_LOOPBACK) != 0)
 			continue;
 
-		dir.Rewind();
-		while (dir.GetNextEntry(&entry) >= 0) {
-			if (entry.IsDirectory())
-				continue;
-
-			entry.GetPath(&addOnPath);
-			image_id image = load_add_on(addOnPath.Path());
-			if (image < 0) {
-				printf("Failed to load %s addon: %s.\n", addOnPath.Path(),
-					strerror(image));
-				continue;
-			}
-
-			network_setup_addon_instantiate get_nth_addon;
-			status_t status = get_image_symbol(image, "get_nth_addon",
-				B_SYMBOL_TYPE_TEXT, (void **) &get_nth_addon);
-
-			int tabCount = 0;
-
-			if (status != B_OK) {
-				//  No "addon instantiate function" symbol found in this addon
-				printf("No symbol \"get_nth_addon\" found in %s addon: not a "
-					"network setup addon!\n", addOnPath.Path());
-				unload_add_on(image);
-				continue;
-			}
-
-			while ((fNetworkAddOnMap[fAddOnCount]
-					= get_nth_addon(image, tabCount)) != NULL) {
-				printf("Adding Tab: %d\n", fAddOnCount);
-				BView* view = fNetworkAddOnMap[fAddOnCount]->CreateView();
-
-				// FIXME rework this: we don't want to use a tab view here,
-				// instead add-ons should populate the "interfaces" list with
-				// interfaces, services, etc.
-				fPanel->AddTab(view);
-				fAddOnCount++;
-					// Number of tab addons total
-				tabCount++;
-					// Tabs for *this* addon
-			}
-		}
+		InterfaceListItem* item = new InterfaceListItem(interface.Name());
+		fInterfaceItemMap.insert(std::pair<BString, BListItem*>(
+			BString(interface.Name()), item));
+		fListView->AddItem(item);
 	}
 
-	free(searchPaths);
+	// TODO: Then consider those from the settings (for example, for USB)
 }
 
 
 void
-NetworkSetupWindow::_ShowReplicant(bool show)
+NetworkWindow::_ScanAddOns()
+{
+	BStringList paths;
+	BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "Network Settings",
+		paths);
+
+	for (int32 i = 0; i < paths.CountStrings(); i++) {
+		BDirectory directory(paths.StringAt(i));
+		BEntry entry;
+		while (directory.GetNextEntry(&entry) == B_OK) {
+			BPath path;
+			if (entry.GetPath(&path) != B_OK)
+				continue;
+
+			image_id image = load_add_on(path.Path());
+			if (image < 0) {
+				printf("Failed to load %s addon: %s.\n", path.Path(),
+					strerror(image));
+				continue;
+			}
+
+			BNetworkSettingsAddOn* (*instantiateAddOn)(image_id image);
+
+			status_t status = get_image_symbol(image,
+				"instantiate_network_settings_add_on",
+				B_SYMBOL_TYPE_TEXT, (void**)&instantiateAddOn);
+			if (status != B_OK) {
+				// No "addon instantiate function" symbol found in this addon
+				printf("No symbol \"instantiate_network_settings_add_on\" "
+					"found in %s addon: not a network setup addon!\n",
+					path.Path());
+				unload_add_on(image);
+				continue;
+			}
+
+			BNetworkSettingsAddOn* addOn = instantiateAddOn(image);
+			if (addOn == NULL) {
+				unload_add_on(image);
+				continue;
+			}
+
+			fAddOns.AddItem(addOn);
+
+			// Per interface items
+			ItemMap::const_iterator iterator = fInterfaceItemMap.begin();
+			for (; iterator != fInterfaceItemMap.end(); iterator++) {
+				const BString& interface = iterator->first;
+				BListItem* interfaceItem = iterator->second;
+
+				uint32 cookie = 0;
+				while (true) {
+					BNetworkSettingsItem* item = addOn->CreateNextInterfaceItem(
+						cookie, interface.String());
+					if (item == NULL)
+						break;
+
+					fItems.AddItem(item);
+					// TODO: sort
+					fListView->AddUnder(interfaceItem, item->CreateListItem());
+				}
+			}
+
+			// Generic items
+			uint32 cookie = 0;
+			while (true) {
+				BNetworkSettingsItem* item = addOn->CreateNextItem(cookie);
+				if (item == NULL)
+					break;
+
+				fItems.AddItem(item);
+				// TODO: sort
+				fListView->AddUnder(_ItemFor(item->Type()),
+					item->CreateListItem());
+			}
+		}
+	}
+}
+
+
+BListItem*
+NetworkWindow::_ItemFor(BNetworkSettingsType type)
+{
+	switch (type) {
+		case B_NETWORK_SETTINGS_TYPE_SERVICE:
+			if (fServicesItem == NULL)
+				fServicesItem = new BStringItem(B_TRANSLATE("Services"));
+
+			return fServicesItem;
+
+		case B_NETWORK_SETTINGS_TYPE_DIAL_UP:
+			if (fDialUpItem == NULL)
+				fDialUpItem = new BStringItem(B_TRANSLATE("Dial Up"));
+
+			return fDialUpItem;
+
+		case B_NETWORK_SETTINGS_TYPE_OTHER:
+			if (fOtherItem == NULL)
+				fOtherItem = new BStringItem(B_TRANSLATE("Other"));
+
+			return fOtherItem;
+
+		default:
+			return NULL;
+	}
+}
+
+
+void
+NetworkWindow::_ShowReplicant(bool show)
 {
 	if (show) {
 		const char* argv[] = {"--deskbar", NULL};
@@ -333,7 +387,7 @@ NetworkSetupWindow::_ShowReplicant(bool show)
 
 
 bool
-NetworkSetupWindow::_IsReplicantInstalled()
+NetworkWindow::_IsReplicantInstalled()
 {
 	BDeskbar deskbar;
 	return deskbar.HasItem("NetworkStatus");
