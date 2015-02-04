@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src preferences network ;
 
+UsePublicHeaders [ FDirName add-ons network_settings ] ;
 UsePrivateHeaders net shared ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps networkstatus ] ;
@@ -29,9 +30,3 @@ DoCatalogs Network :
 	RadioView.cpp
 	WirelessNetworkMenuItem.cpp
 ;
-
-#SubInclude HAIKU_TOP src preferences network InterfacesAddOn ;
-#SubInclude HAIKU_TOP src preferences network ServicesAddOn ;
-#SubInclude HAIKU_TOP src preferences network DummyAddOn ;
-#SubInclude HAIKU_TOP src preferences network MultipleAddOns ;
-#SubInclude HAIKU_TOP src preferences network DialUpAddOn ;
