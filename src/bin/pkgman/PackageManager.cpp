@@ -295,20 +295,45 @@ PackageManager::_PrintResult(InstalledRepository& installationRepository)
 	PackageList& packagesToDeactivate
 		= installationRepository.PackagesToDeactivate();
 
+	BStringList upgradedPackages;
+	for (int32 i = 0;
+		BSolverPackage* installPackage = packagesToActivate.ItemAt(i);
+		i++) {
+		for (int32 j = 0;
+			BSolverPackage* uninstallPackage = packagesToDeactivate.ItemAt(j);
+			j++) {
+			if (installPackage->Info().Name() == uninstallPackage->Info().Name()) {
+				upgradedPackages.Add(installPackage->Info().Name());
+				break;
+			}
+		}
+	}
+
 	for (int32 i = 0; BSolverPackage* package = packagesToActivate.ItemAt(i);
 		i++) {
-		if (dynamic_cast<MiscLocalRepository*>(package->Repository()) == NULL) {
-			printf("    install package %s from repository %s\n",
-				package->Info().FileName().String(),
-				package->Repository()->Name().String());
+		BString repository;
+		if (dynamic_cast<MiscLocalRepository*>(package->Repository()) != NULL)
+			repository = "local file";
+		else
+			repository.SetToFormat("repository %s", package->Repository()->Name().String());
+
+		if (upgradedPackages.HasString(package->Info().Name())) {
+			printf("    upgrade package %s to %s from %s\n",
+				package->Info().Name().String(),
+				package->Info().Version().ToString().String(),
+				repository.String());
 		} else {
-			printf("    install package %s from local file\n",
-				package->Info().FileName().String());
+			printf("    install package %s-%s from %s\n",
+				package->Info().Name().String(),
+				package->Info().Version().ToString().String(),
+				repository.String());
 		}
 	}
 
 	for (int32 i = 0; BSolverPackage* package = packagesToDeactivate.ItemAt(i);
 		i++) {
+		if (upgradedPackages.HasString(package->Info().Name()))
+			continue;
 		printf("    uninstall package %s\n", package->VersionedName().String());
 	}
 // TODO: Print file/download sizes. Unfortunately our package infos don't
