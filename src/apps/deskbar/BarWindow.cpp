@@ -136,7 +136,6 @@ TBarWindow::MenusBeginning()
 		return;
 	}
 
-	sDeskbarMenu->NeedsToRebuild();
 	sDeskbarMenu->ResetTargets();
 
 	fShowingMenu = true;
@@ -151,8 +150,7 @@ TBarWindow::MenusEnded()
 	BWindow::MenusEnded();
 
 	if (sDeskbarMenu->LockLooper()) {
-		// TODO: is this ok?
-		sDeskbarMenu->RemoveItems(0, sDeskbarMenu->CountItems(), true);
+		sDeskbarMenu->ForceRebuild();
 		sDeskbarMenu->UnlockLooper();
 	}
 }
