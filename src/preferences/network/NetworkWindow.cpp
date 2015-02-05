@@ -40,6 +40,7 @@
 #endif
 
 #include "InterfaceListItem.h"
+#include "InterfaceView.h"
 
 
 const char* kNetworkStatusSignature = "application/x-vnd.Haiku-NetworkStatus";
@@ -59,7 +60,7 @@ static const uint32 kMsgItemSelected = 'ItSl';
 
 NetworkWindow::NetworkWindow()
 	:
-	BWindow(BRect(100, 100, 300, 300), B_TRANSLATE("Network"), B_TITLED_WINDOW,
+	BWindow(BRect(100, 100, 400, 400), B_TRANSLATE("Network"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	// Profiles section
@@ -98,6 +99,12 @@ NetworkWindow::NetworkWindow()
 	BScrollView* scrollView = new BScrollView("ScrollView", fListView,
 		0, false, true);
 
+	fAddOnShellView = new BView("add-on shell", 0,
+		new BGroupLayout(B_VERTICAL));
+	fAddOnShellView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	fInterfaceView = new InterfaceView();
+
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
@@ -110,7 +117,7 @@ NetworkWindow::NetworkWindow()
 #endif
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(scrollView)
-			.AddGlue()
+			.Add(fAddOnShellView)
 			.End()
 		.Add(showReplicantCheckBox)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
@@ -122,7 +129,11 @@ NetworkWindow::NetworkWindow()
 	_ScanInterfaces();
 	_ScanAddOns();
 
-	fAddOnView = NULL;
+	// Set preferred size of the list view from its contents
+	float width;
+	float height;
+	fListView->GetPreferredSize(&width, &height);
+	fListView->SetExplicitMinSize(BSize(width, std::min(height, 400.f)));
 
 	CenterOnScreen();
 }
@@ -162,19 +173,29 @@ NetworkWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgItemSelected:
+		{
+			BListItem* listItem = fListView->FullListItemAt(
+				fListView->FullListCurrentSelection());
+			if (listItem == NULL)
+				break;
+
+			_SelectItem(listItem);
 			break;
+		}
 
 		case kMsgRevert:
 		{
-			for (int index = 0; index < fItems.CountItems(); index++)
-				fItems.ItemAt(index)->Revert();
+			SettingsMap::const_iterator iterator = fSettingsMap.begin();
+			for (; iterator != fSettingsMap.end(); iterator++)
+				iterator->second->Revert();
 			break;
 		}
 
 		case kMsgApply:
 		{
-			for (int index = 0; index < fItems.CountItems(); index++)
-				fItems.ItemAt(index)->Save();
+			SettingsMap::const_iterator iterator = fSettingsMap.begin();
+			for (; iterator != fSettingsMap.end(); iterator++)
+				iterator->second->Apply();
 			break;
 		}
 
@@ -328,7 +349,7 @@ NetworkWindow::_ScanAddOns()
 					if (item == NULL)
 						break;
 
-					fItems.AddItem(item);
+					fSettingsMap[item->ListItem()] = item;
 					// TODO: sort
 					fListView->AddUnder(interfaceItem, item->ListItem());
 				}
@@ -341,17 +362,29 @@ NetworkWindow::_ScanAddOns()
 				if (item == NULL)
 					break;
 
-				fItems.AddItem(item);
+				fSettingsMap[item->ListItem()] = item;
 				// TODO: sort
-				fListView->AddUnder(_ItemFor(item->Type()), item->ListItem());
+				fListView->AddUnder(_ListItemFor(item->Type()),
+					item->ListItem());
 			}
 		}
 	}
 }
 
 
+BNetworkSettingsItem*
+NetworkWindow::_SettingsItemFor(BListItem* item)
+{
+	SettingsMap::const_iterator found = fSettingsMap.find(item);
+	if (found != fSettingsMap.end())
+		return found->second;
+
+	return NULL;
+}
+
+
 BListItem*
-NetworkWindow::_ItemFor(BNetworkSettingsType type)
+NetworkWindow::_ListItemFor(BNetworkSettingsType type)
 {
 	switch (type) {
 		case B_NETWORK_SETTINGS_TYPE_SERVICE:
@@ -375,6 +408,34 @@ NetworkWindow::_ItemFor(BNetworkSettingsType type)
 		default:
 			return NULL;
 	}
+}
+
+
+void
+NetworkWindow::_SelectItem(BListItem* listItem)
+{
+	if (fAddOnShellView->CountChildren() > 0)
+		fAddOnShellView->ChildAt(0)->RemoveSelf();
+
+	BView* nextView = NULL;
+
+	BNetworkSettingsItem* item = _SettingsItemFor(listItem);
+	if (item != NULL) {
+		nextView = item->View();
+	} else {
+		InterfaceListItem* item = dynamic_cast<InterfaceListItem*>(
+			listItem);
+		if (item != NULL) {
+			fInterfaceView->SetTo(item->Name());
+			nextView = fInterfaceView;
+		}
+	}
+
+	if (nextView != NULL)
+		fAddOnShellView->AddChild(nextView);
+
+	fAddOnShellView->Invalidate();
+	InvalidateLayout();
 }
 
 

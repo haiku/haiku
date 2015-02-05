@@ -1,80 +1,81 @@
 /*
- * Copyright 2004-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Axel Dörfler, <axeld@pinc-software.de>
  *		Alexander von Gluck, kallisti5@unixzen.com
  *		John Scipione, jscipione@gmail.com
  */
 
 
-#include "InterfaceHardwareView.h"
-
 #include "InterfaceView.h"
-#include "NetworkSettings.h"
-#include "WirelessNetworkMenuItem.h"
+
+#include <set>
+
+#include <net/if_media.h>
 
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
-#include <MenuField.h>
-#include <MenuItem.h>
 #include <NetworkAddress.h>
-#include <Screen.h>
-#include <Size.h>
+#include <NetworkDevice.h>
 #include <StringForSize.h>
 #include <StringView.h>
 #include <TextControl.h>
 
-#include <set>
-#include <stdio.h>
+#include "MediaTypes.h"
+#include "WirelessNetworkMenuItem.h"
+
+
+static const uint32 kMsgInterfaceToggle = 'onof';
+static const uint32 kMsgInterfaceRenegotiate = 'redo';
+static const uint32 kMsgJoinNetwork = 'join';
 
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "IntefaceHardwareView"
+#define B_TRANSLATION_CONTEXT "IntefaceView"
 
 
-// #pragma mark - InterfaceHardwareView
+// #pragma mark - InterfaceView
 
 
-InterfaceHardwareView::InterfaceHardwareView(NetworkSettings* settings)
+InterfaceView::InterfaceView()
 	:
-	BGroupView(B_VERTICAL),
-	fSettings(settings)
+	BGroupView(B_VERTICAL)
 {
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	SetFlags(Flags() | B_PULSE_NEEDED);
 
-	// TODO : Small graph of throughput?
+	// TODO: Small graph of throughput?
 
 	float minimumWidth = be_control_look->DefaultItemSpacing() * 16;
 
-	BStringView* status = new BStringView("status label", B_TRANSLATE("Status:"));
-	status->SetAlignment(B_ALIGN_RIGHT);
+	BStringView* statusLabel = new BStringView("status label",
+		B_TRANSLATE("Status:"));
+	statusLabel->SetAlignment(B_ALIGN_RIGHT);
 	fStatusField = new BStringView("status field", "");
 	fStatusField->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
-	BStringView* macAddress = new BStringView("mac address label",
+	BStringView* macAddressLabel = new BStringView("mac address label",
 		B_TRANSLATE("MAC address:"));
-	macAddress->SetAlignment(B_ALIGN_RIGHT);
+	macAddressLabel->SetAlignment(B_ALIGN_RIGHT);
 	fMacAddressField = new BStringView("mac address field", "");
 	fMacAddressField->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
-	BStringView* linkSpeed = new BStringView("link speed label",
+	BStringView* linkSpeedLabel = new BStringView("link speed label",
 		B_TRANSLATE("Link speed:"));
-	linkSpeed->SetAlignment(B_ALIGN_RIGHT);
+	linkSpeedLabel->SetAlignment(B_ALIGN_RIGHT);
 	fLinkSpeedField = new BStringView("link speed field", "");
 	fLinkSpeedField->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
 
 	// TODO: These metrics may be better in a BScrollView?
-	BStringView* linkTx = new BStringView("tx label",
+	BStringView* linkTxLabel = new BStringView("tx label",
 		B_TRANSLATE("Sent:"));
-	linkTx->SetAlignment(B_ALIGN_RIGHT);
+	linkTxLabel->SetAlignment(B_ALIGN_RIGHT);
 	fLinkTxField = new BStringView("tx field", "");
 	fLinkTxField ->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
-	BStringView* linkRx = new BStringView("rx label",
+	BStringView* linkRxLabel = new BStringView("rx label",
 		B_TRANSLATE("Received:"));
-	linkRx->SetAlignment(B_ALIGN_RIGHT);
+	linkRxLabel->SetAlignment(B_ALIGN_RIGHT);
 	fLinkRxField = new BStringView("rx field", "");
 	fLinkRxField ->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
 
@@ -93,43 +94,44 @@ InterfaceHardwareView::InterfaceHardwareView(NetworkSettings* settings)
 
 	BLayoutBuilder::Group<>(this)
 		.AddGrid()
-			.Add(status, 0, 0)
+			.Add(statusLabel, 0, 0)
 			.Add(fStatusField, 1, 0)
 			.Add(fNetworkMenuField->CreateLabelLayoutItem(), 0, 1)
 			.Add(fNetworkMenuField->CreateMenuBarLayoutItem(), 1, 1)
-			.Add(macAddress, 0, 2)
+			.Add(macAddressLabel, 0, 2)
 			.Add(fMacAddressField, 1, 2)
-			.Add(linkSpeed, 0, 3)
+			.Add(linkSpeedLabel, 0, 3)
 			.Add(fLinkSpeedField, 1, 3)
-			.Add(linkTx, 0, 4)
+			.Add(linkTxLabel, 0, 4)
 			.Add(fLinkTxField, 1, 4)
-			.Add(linkRx, 0, 5)
+			.Add(linkRxLabel, 0, 5)
 			.Add(fLinkRxField, 1, 5)
 		.End()
 		.AddGlue()
 		.AddGroup(B_HORIZONTAL)
-			.Add(fOnOff)
 			.AddGlue()
+			.Add(fOnOff)
 			.Add(fRenegotiate)
-		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+		.End();
 }
 
 
-InterfaceHardwareView::~InterfaceHardwareView()
+InterfaceView::~InterfaceView()
 {
-
 }
-
-
-// #pragma mark - InterfaceHardwareView virtual methods
 
 
 void
-InterfaceHardwareView::AttachedToWindow()
+InterfaceView::SetTo(const char* name)
 {
-	Update();
+	fInterface.SetTo(name);
+}
+
+
+void
+InterfaceView::AttachedToWindow()
+{
+	_Update();
 		// Populate the fields
 
 	fOnOff->SetTarget(this);
@@ -138,25 +140,35 @@ InterfaceHardwareView::AttachedToWindow()
 
 
 void
-InterfaceHardwareView::MessageReceived(BMessage* message)
+InterfaceView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgNetwork:
+		case kMsgJoinNetwork:
 		{
-			fSettings->SetWirelessNetwork(message->FindString("name"));
+			const char* name;
+			BNetworkAddress address;
+			if (message->FindString("name", &name) == B_OK
+				&& message->FindFlat("address", &address) == B_OK) {
+				BNetworkDevice device(fInterface.Name());
+				status_t status = device.JoinNetwork(address);
+				if (status != B_OK) {
+					// This does not really matter, as it's stored this way,
+					// anyway.
+				}
+				// TODO: store value
+			}
 			break;
 		}
 		case kMsgInterfaceToggle:
 		{
-			fSettings->SetDisabled(!fSettings->IsDisabled());
-			Update();
-			Window()->FindView("interfaces")->Invalidate();
+			// TODO: disable/enable interface
+			_Update();
 			break;
 		}
 
 		case kMsgInterfaceRenegotiate:
 		{
-			fSettings->RenegotiateAddresses();
+			// TODO: renegotiate addresses
 			break;
 		}
 
@@ -167,31 +179,25 @@ InterfaceHardwareView::MessageReceived(BMessage* message)
 
 
 void
-InterfaceHardwareView::Pulse()
+InterfaceView::Pulse()
 {
-	// TODO maybe not everything needs to be updated here.
-	Update();
-}
-
-
-// #pragma mark - InterfaceHardwareView public methods
-
-
-status_t
-InterfaceHardwareView::Revert()
-{
-	Update();
-	return B_OK;
+	// Update the wireless network menu every 5 seconds
+	_Update((fPulseCount++ % 5) == 0);
 }
 
 
 status_t
-InterfaceHardwareView::Update()
+InterfaceView::_Update(bool updateWirelessNetworks)
 {
+	BNetworkDevice device(fInterface.Name());
+	bool isWireless = device.IsWireless();
+	bool disabled = (fInterface.Flags() & IFF_UP) == 0;
+
 	// Populate fields with current settings
-	if (fSettings->HasLink()) {
-		if (fSettings->IsWireless()) {
-			BString network = fSettings->WirelessNetwork();
+	if (fInterface.HasLink()) {
+		if (isWireless) {
+			// TODO!
+			BString network = "---";
 			network.Prepend(" (");
 			network.Prepend(B_TRANSLATE("connected"));
 			network.Append(")");
@@ -202,34 +208,39 @@ InterfaceHardwareView::Update()
 	} else
 		fStatusField->SetText(B_TRANSLATE("disconnected"));
 
-	fMacAddressField->SetText(fSettings->HardwareAddress());
+	BNetworkAddress hardwareAddress;
+	if (device.GetHardwareAddress(hardwareAddress) == B_OK)
+		fMacAddressField->SetText(hardwareAddress.ToString());
+	else
+		fMacAddressField->SetText("-");
 
-	// TODO : Find how to get link speed
-	fLinkSpeedField->SetText("100 Mb/s");
+	int media = fInterface.Media();
+	if ((media & IFM_ACTIVE) != 0)
+		fLinkSpeedField->SetText(media_type_to_string(media));
+	else
+		fLinkSpeedField->SetText("-");
 
 	// Update Link stats
 	ifreq_stats stats;
-	char buffer[100];
-	fSettings->Stats(&stats);
+	if (fInterface.GetStats(stats) == B_OK) {
+		char buffer[100];
 
-	string_for_size(stats.send.bytes, buffer, sizeof(buffer));
-	fLinkTxField->SetText(buffer);
+		string_for_size(stats.send.bytes, buffer, sizeof(buffer));
+		fLinkTxField->SetText(buffer);
 
-	string_for_size(stats.receive.bytes, buffer, sizeof(buffer));
-	fLinkRxField->SetText(buffer);
-
-	// TODO move the wireless info to a separate tab. We should have a
-	// BListView of available networks, rather than a menu, to make them more
-	// readable and easier to browse and select.
-	if (fNetworkMenuField->IsHidden(fNetworkMenuField)
-		&& fSettings->IsWireless()) {
-		fNetworkMenuField->Show();
-	} else if (!fNetworkMenuField->IsHidden(fNetworkMenuField)
-		&& !fSettings->IsWireless()) {
-		fNetworkMenuField->Hide();
+		string_for_size(stats.receive.bytes, buffer, sizeof(buffer));
+		fLinkRxField->SetText(buffer);
 	}
 
-	if (fSettings->IsWireless()) {
+	// TODO: move the wireless info to a separate tab. We should have a
+	// BListView of available networks, rather than a menu, to make them more
+	// readable and easier to browse and select.
+	if (fNetworkMenuField->IsHidden(fNetworkMenuField) && isWireless)
+		fNetworkMenuField->Show();
+	else if (!fNetworkMenuField->IsHidden(fNetworkMenuField) && !isWireless)
+		fNetworkMenuField->Hide();
+
+	if (isWireless && updateWirelessNetworks) {
 		// Rebuild network menu
 		BMenu* menu = fNetworkMenuField->Menu();
 		menu->RemoveItems(0, menu->CountItems(), true);
@@ -237,17 +248,18 @@ InterfaceHardwareView::Update()
 		std::set<BNetworkAddress> associated;
 		BNetworkAddress address;
 		uint32 cookie = 0;
-		while (fSettings->GetNextAssociatedNetwork(cookie, address) == B_OK)
+		while (device.GetNextAssociatedNetwork(cookie, address) == B_OK)
 			associated.insert(address);
 
 		wireless_network network;
 		int32 count = 0;
 		cookie = 0;
-		while (fSettings->GetNextNetwork(cookie, network) == B_OK) {
-			BMessage* message = new BMessage(kMsgNetwork);
+		while (device.GetNextNetwork(cookie, network) == B_OK) {
+			BMessage* message = new BMessage(kMsgJoinNetwork);
 
-			message->AddString("device", fSettings->Name());
+			message->AddString("device", fInterface.Name());
 			message->AddString("name", network.name);
+			message->AddFlat("address", &network.address);
 
 			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
 				network.signal_strength,
@@ -274,15 +286,8 @@ InterfaceHardwareView::Update()
 		menu->SetTargetForItems(this);
 	}
 
-	fRenegotiate->SetEnabled(!fSettings->IsDisabled());
-	fOnOff->SetLabel(fSettings->IsDisabled() ? "Enable" : "Disable");
+	fRenegotiate->SetEnabled(!disabled);
+	fOnOff->SetLabel(disabled ? "Enable" : "Disable");
 
-	return B_OK;
-}
-
-
-status_t
-InterfaceHardwareView::Save()
-{
 	return B_OK;
 }

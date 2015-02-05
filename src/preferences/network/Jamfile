@@ -3,7 +3,8 @@ SubDir HAIKU_TOP src preferences network ;
 UsePublicHeaders [ FDirName add-ons network_settings ] ;
 UsePrivateHeaders net shared ;
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps networkstatus ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps networkstatus ]
+	[ FDirName $(HAIKU_TOP) src bin network ifconfig ] ;
 
 Preference Network :
 	Network.cpp
@@ -11,12 +12,16 @@ Preference Network :
 	NetworkProfile.cpp
 	NetworkSettingsAddOn.cpp
 	InterfaceListItem.cpp
+	InterfaceView.cpp
 
 	# from NetworkStatus
 	RadioView.cpp
 	WirelessNetworkMenuItem.cpp
 
-	: be root bnetapi [ TargetLibstdc++ ] localestub
+	# from ifconfig
+	MediaTypes.cpp
+
+	: be bnetapi libshared.a [ TargetLibstdc++ ] localestub
 	: Network.rdef InterfaceIcons.rdef
 ;
 

@@ -41,8 +41,9 @@ public:
 			const BNetworkProfile*
 								Profile() const;
 
-	virtual	status_t			Save() = 0;
+	virtual	status_t			Apply() = 0;
 	virtual	status_t			Revert() = 0;
+	virtual bool				IsRevertable() = 0;
 
 private:
 			const BNetworkProfile*

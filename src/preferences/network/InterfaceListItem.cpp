@@ -28,7 +28,7 @@
 
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "InterfacesListView"
+#define B_TRANSLATION_CONTEXT "InterfaceListItem"
 
 
 InterfaceListItem::InterfaceListItem(const char* name)
@@ -74,57 +74,38 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 		list->FillRect(bounds);
 	}
 
-	BString interfaceState;
-	BBitmap* stateIcon(NULL);
-
 	// TODO: only update periodically
-	bool disabled = (fInterface.Flags() & IFF_UP) == 0;
+	_UpdateState();
 
-	if (disabled) {
-		interfaceState = "disabled";
-		stateIcon = fIconOffline;
-	} else if (!fInterface.HasLink()) {
-		interfaceState = "no link";
-		stateIcon = fIconOffline;
-	// TODO!
-//	} else if ((fSettings->IPAddr(AF_INET).IsEmpty()
-//		&& fSettings->IPAddr(AF_INET6).IsEmpty())
-//		&& (fSettings->AutoConfigure(AF_INET)
-//		|| fSettings->AutoConfigure(AF_INET6))) {
-//		interfaceState = "connecting" B_UTF8_ELLIPSIS;
-//		stateIcon = fIconPending;
-	} else {
-		interfaceState = "connected";
-		stateIcon = fIconOnline;
-	}
+	BBitmap* stateIcon = _StateIcon();
+	const char* stateText = _StateText();
 
 	// Set the initial bounds of item contents
-	BPoint iconPt = bounds.LeftTop();
-	BPoint namePt = bounds.LeftTop();
-	BPoint line2Pt = bounds.LeftTop();
-	BPoint line3Pt = bounds.LeftTop();
-	BPoint statePt = bounds.RightTop();
+	BPoint iconPoint = bounds.LeftTop();
+	BPoint namePoint = bounds.LeftTop();
+	BPoint line2Point = bounds.LeftTop();
+	BPoint line3Point = bounds.LeftTop();
+	BPoint statePoint = bounds.RightTop();
 
-	iconPt += BPoint(4, 4);
-	statePt += BPoint(0, fFirstlineOffset);
-	namePt += BPoint(ICON_SIZE + 12, fFirstlineOffset);
-	line2Pt += BPoint(ICON_SIZE + 12, fSecondlineOffset);
-	line3Pt += BPoint(ICON_SIZE + 12, fThirdlineOffset);
+	iconPoint += BPoint(4, 4);
+	statePoint += BPoint(0, fFirstlineOffset);
+	namePoint += BPoint(ICON_SIZE + 12, fFirstlineOffset);
+	line2Point += BPoint(ICON_SIZE + 12, fSecondlineOffset);
+	line3Point += BPoint(ICON_SIZE + 12, fThirdlineOffset);
 
-	statePt -= BPoint(
-		be_plain_font->StringWidth(interfaceState.String()) + 4.0f, 0);
+	statePoint -= BPoint(be_plain_font->StringWidth(stateText) + 4.0f, 0);
 
-	if (disabled) {
+	if (fDisabled) {
 		list->SetDrawingMode(B_OP_ALPHA);
 		list->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 		list->SetHighColor(0, 0, 0, 32);
 	} else
 		list->SetDrawingMode(B_OP_OVER);
 
-	list->DrawBitmapAsync(fIcon, iconPt);
-	list->DrawBitmapAsync(stateIcon, iconPt);
+	list->DrawBitmapAsync(fIcon, iconPoint);
+	list->DrawBitmapAsync(stateIcon, iconPoint);
 
-	if (disabled) {
+	if (fDisabled) {
 		rgb_color textColor;
 		if (IsSelected())
 			textColor = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
@@ -144,12 +125,9 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 	list->SetFont(be_bold_font);
 
-	BString name = Name();
-	name.RemoveFirst("/dev/net/");
-
-	list->DrawString(name, namePt);
+	list->DrawString(fDeviceName, namePoint);
 	list->SetFont(be_plain_font);
-	list->DrawString(interfaceState, statePt);
+	list->DrawString(stateText, statePoint);
 
 // TODO!
 /*	if (!disabled) {
@@ -160,7 +138,7 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 		else
 			ipv4Str << " " << BString(fSettings->IP(AF_INET));
 
-		list->DrawString(ipv4Str, line2Pt);
+		list->DrawString(ipv4Str, line2Point);
 	}
 
 	// Render IPv6 Address (if present)
@@ -168,7 +146,7 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 		BString ipv6Str(B_TRANSLATE_COMMENT("IPv6:", "IPv6 address label"));
 		ipv6Str << " " << BString(fSettings->IP(AF_INET6));
 
-		list->DrawString(ipv6Str, line3Pt);
+		list->DrawString(ipv6Str, line3Point);
 	}
 */
 	owner->PopState();
@@ -189,6 +167,11 @@ InterfaceListItem::Update(BView* owner, const BFont* font)
 	fSecondlineOffset = fFirstlineOffset + lineHeight;
 	fThirdlineOffset = fFirstlineOffset + (lineHeight * 2);
 
+	_UpdateState();
+
+	SetWidth(fIcon->Bounds().Width() + 24
+		+ be_bold_font->StringWidth(fDeviceName.String())
+		+ owner->StringWidth(_StateText()));
 	SetHeight(std::max(3 * lineHeight + 4, fIcon->Bounds().Height() + 8));
 		// either to the text height or icon height, whichever is taller
 }
@@ -278,4 +261,66 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType)
 			0, B_RGBA32);
 		BIconUtils::GetVectorIcon(onlineHVIF, iconSize, fIconOnline);
 	}
+}
+
+
+void
+InterfaceListItem::_UpdateState()
+{
+	fDeviceName = Name();
+	fDeviceName.RemoveFirst("/dev/net/");
+
+	fDisabled = (fInterface.Flags() & IFF_UP) == 0;
+	fHasLink = fInterface.HasLink();
+	fConnecting = (fInterface.Flags() & IFF_CONFIGURING) != 0;
+
+	int32 count = fInterface.CountAddresses();
+	size_t addressIndex = 0;
+	for (int32 index = 0; index < count; index++) {
+		if (addressIndex >= sizeof(fAddress) / sizeof(fAddress[0]))
+			break;
+
+		BNetworkInterfaceAddress address;
+		if (fInterface.GetAddressAt(index, address) == B_OK)
+			fAddress[addressIndex++] = address.Address().ToString();
+	}
+}
+
+
+BBitmap*
+InterfaceListItem::_StateIcon() const
+{
+	if (fDisabled)
+		return fIconOffline;
+	if (!fHasLink)
+		return fIconOffline;
+	// TODO!
+//	} else if ((fSettings->IPAddr(AF_INET).IsEmpty()
+//		&& fSettings->IPAddr(AF_INET6).IsEmpty())
+//		&& (fSettings->AutoConfigure(AF_INET)
+//		|| fSettings->AutoConfigure(AF_INET6))) {
+//		interfaceState = "connecting" B_UTF8_ELLIPSIS;
+//		stateIcon = fIconPending;
+
+	return fIconOnline;
+}
+
+
+const char*
+InterfaceListItem::_StateText() const
+{
+	if (fDisabled)
+		return B_TRANSLATE("disabled");
+	if (!fInterface.HasLink())
+		return B_TRANSLATE("no link");
+
+	// TODO!
+//	} else if ((fSettings->IPAddr(AF_INET).IsEmpty()
+//		&& fSettings->IPAddr(AF_INET6).IsEmpty())
+//		&& (fSettings->AutoConfigure(AF_INET)
+//		|| fSettings->AutoConfigure(AF_INET6))) {
+//		interfaceState = "connecting" B_UTF8_ELLIPSIS;
+//		stateIcon = fIconPending;
+
+	return B_TRANSLATE("connected");
 }

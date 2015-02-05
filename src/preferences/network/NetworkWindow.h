@@ -20,10 +20,9 @@
 
 using namespace BNetworkKit;
 
-
-class BTabView;
 class BButton;
 class BMenu;
+class InterfaceView;
 
 
 class NetworkWindow : public BWindow {
@@ -40,7 +39,10 @@ private:
 			void				_BuildProfilesMenu(BMenu* menu, int32 what);
 			void				_ScanInterfaces();
 			void				_ScanAddOns();
-			BListItem*			_ItemFor(BNetworkSettingsType type);
+			BNetworkSettingsItem*
+								_SettingsItemFor(BListItem* item);
+			BListItem*			_ListItemFor(BNetworkSettingsType type);
+			void				_SelectItem(BListItem* listItem);
 
 			bool				_IsReplicantInstalled();
 			void				_ShowReplicant(bool show);
@@ -49,6 +51,7 @@ private:
 	typedef BObjectList<BNetworkSettingsAddOn> AddOnList;
 	typedef BObjectList<BNetworkSettingsItem> ItemList;
 	typedef std::map<BString, BListItem*> ItemMap;
+	typedef std::map<BListItem*, BNetworkSettingsItem*> SettingsMap;
 
 			BButton*			fRevertButton;
 			BButton*			fApplyButton;
@@ -61,9 +64,10 @@ private:
 			BListItem*			fDialUpItem;
 			BListItem*			fOtherItem;
 
-			ItemList			fItems;
+			SettingsMap			fSettingsMap;
 
-			BView*				fAddOnView;
+			InterfaceView*		fInterfaceView;
+			BView*				fAddOnShellView;
 };
 
 

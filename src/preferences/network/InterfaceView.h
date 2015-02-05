@@ -1,48 +1,44 @@
 /*
- * Copyright 2004-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Axel Dörfler, <axeld@pinc-software.de>
  *		Alexander von Gluck, kallisti5@unixzen.com
  *		John Scipione, jscipione@gmail.com
  */
-#ifndef INTERFACE_HARDWARE_VIEW_H
-#define INTERFACE_HARDWARE_VIEW_H
+#ifndef INTERFACE_VIEW_H
+#define INTERFACE_VIEW_H
 
-
-#include "NetworkSettings.h"
 
 #include <GroupView.h>
-
-
-static const uint32 kMsgInterfaceToggle = 'onof';
-static const uint32 kMsgInterfaceRenegotiate = 'redo';
+#include <NetworkInterface.h>
 
 
 class BButton;
 class BMenuField;
 class BMessage;
-class BRect;
 class BStringView;
 
-class InterfaceHardwareView : public BGroupView {
+
+class InterfaceView : public BGroupView {
 public:
-								InterfaceHardwareView(
-									NetworkSettings* settings);
-	virtual						~InterfaceHardwareView();
+								InterfaceView();
+	virtual						~InterfaceView();
+
+			void				SetTo(const char* name);
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual void				AttachedToWindow();
-			void				Pulse();
-			status_t			Revert();
-			status_t			Save();
+	virtual	void				Pulse();
 
 private:
-			status_t			Update();
-
+			status_t			_Update(bool updateWirelessNetworks = true);
 			void				_EnableFields(bool enabled);
 
-			NetworkSettings*	fSettings;
+private:
+			BNetworkInterface	fInterface;
+			int					fPulseCount;
 
 			BStringView*		fStatusField;
 			BStringView*		fMacAddressField;
