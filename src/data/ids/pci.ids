@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.01.28
-#	Date:    2015-01-28 03:15:02
+#	Version: 2015.02.05
+#	Date:    2015-02-05 03:15:01
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10012,7 +10012,7 @@
 		103c 2b22  GeForce GT 810A
 	1296  GK208M [GeForce 825M]
 	1298  GK208M [GeForce GT 720M]
-	1299  GK208M [N16V-GM]
+	1299  GK208M [GeForce 920M]
 	12a0  GK208
 	12b9  GK208GLM [Quadro K610M]
 	12ba  GK208GLM [Quadro K510M]
@@ -10037,7 +10037,7 @@
 	1398  GM107M [GeForce 845M]
 	139a  GM107M [GeForce GTX 950M]
 	139b  GM107M [GeForce GTX 960M]
-	139c  GM107M [N16S-GT1-KB-B]
+	139c  GM107M [GeForce 940M]
 	13b0  GM107GLM [N16P-Q3]
 	13b3  GM107GLM [Quadro K2200M]
 	13ba  GM107GL [Quadro K2200]
@@ -10210,6 +10210,7 @@
 	5249  RTS5249 PCI Express Card Reader
 		103c 1909  ZBook 15
 	5288  RTS5288 PCI Express Card Reader
+	5289  RTL8411 PCI Express Card Reader
 	8029  RTL-8029(AS)
 		10b8 2011  EZ-Card (SMC1208)
 		10ec 8029  RTL-8029(AS)
@@ -18981,6 +18982,10 @@
 3513  ARCOM Control Systems Ltd
 37d9  ITD Firm ltd.
 	1138  SCHD-PH-8 Phase detector
+# 12-ch Relay Actuator Card
+	1140  VR-12-PCI
+# multiport serial board
+	1141  PCI-485(422)
 3842  eVga.com. Corp.
 38ef  4Links
 3d3d  3DLabs
@@ -20305,11 +20310,16 @@
 	0f0a  Atom Processor Z36xxx/Z37xxx Series LPIO1 HSUART Controller #1
 	0f0c  Atom Processor Z36xxx/Z37xxx Series LPIO1 HSUART Controller #2
 	0f0e  Atom Processor Z36xxx/Z37xxx Series LPIO1 SPI Controller
+	0f12  Atom Processor E3800 Series SMBus Controller
 	0f14  Atom Processor Z36xxx/Z37xxx Series SDIO Controller
 	0f15  Atom Processor Z36xxx/Z37xxx Series SDIO Controller
 	0f16  Atom Processor Z36xxx/Z37xxx Series SDIO Controller
 	0f18  Atom Processor Z36xxx/Z37xxx Series Trusted Execution Engine
 	0f1c  Atom Processor Z36xxx/Z37xxx Series Power Control Unit
+	0f20  Atom Processor E3800 Series SATA IDE Controller
+	0f21  Atom Processor E3800 Series SATA IDE Controller
+	0f22  Atom Processor E3800 Series SATA AHCI Controller
+	0f23  Atom Processor E3800 Series SATA AHCI Controller
 	0f28  Atom Processor Z36xxx/Z37xxx Series LPE Audio Controller
 	0f31  Atom Processor Z36xxx/Z37xxx Series Graphics & Display
 	0f34  Atom Processor Z36xxx/Z37xxx Series USB EHCI
@@ -20324,6 +20334,11 @@
 	0f45  Atom Processor Z36xxx/Z37xxx Series LPIO2 I2C Controller #5
 	0f46  Atom Processor Z36xxx/Z37xxx Series LPIO2 I2C Controller #6
 	0f47  Atom Processor Z36xxx/Z37xxx Series LPIO2 I2C Controller #7
+	0f48  Atom Processor E3800 Series PCI Express Root Port 1
+	0f4a  Atom Processor E3800 Series PCI Express Root Port 2
+	0f4c  Atom Processor E3800 Series PCI Express Root Port 3
+	0f4e  Atom Processor E3800 Series PCI Express Root Port 4
+	0f50  Atom Processor E3800 Series eMMC 4.5 Controller
 	1000  82542 Gigabit Ethernet Controller (Fiber)
 		0e11 b0df  NC6132 Gigabit Ethernet Adapter (1000-SX)
 		0e11 b0e0  NC6133 Gigabit Ethernet Adapter (1000-LX)
