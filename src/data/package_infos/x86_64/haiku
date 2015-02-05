@@ -78,6 +78,7 @@ provides {
 }
 
 requires {
+	coreutils
 	cmd:sh
 	lib:libcurl
 	lib:libgcc_s

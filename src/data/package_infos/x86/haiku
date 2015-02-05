@@ -79,6 +79,7 @@ provides {
 }
 
 requires {
+	coreutils
 	cmd:sh
 	lib:libcurl
 	lib:libfreetype
