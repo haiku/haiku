@@ -232,6 +232,8 @@ RemotePackageRepository HaikuPorts
 	libxml2_python-2.8.0-9
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
+	lighttpd-1.4.35-2
+	lighttpd_devel-1.4.35-2
 	links-2.8-1
 	lmarbles-1.0.8-2
 	lnlauncher-1.1.2-1
@@ -850,6 +852,7 @@ RemotePackageRepository HaikuPorts
 	libxml2_x86
 	libxslt
 	libxslt_x86
+	lighttpd
 	links
 	llvm_x86
 	lmarbles
