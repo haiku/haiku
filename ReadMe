@@ -1,265 +1,153 @@
-Building Haiku from source
-==========================
+Greetings.
 
-This is a overview into the process of building HAIKU from source.
-An online version is available at http://www.haiku-os.org/guides/building/
+This document is intended to serve as an introduction to the Haiku project.
+As such, this is only the tip of the iceberg.
 
-Official releases of Haiku are at http://www.haiku-os.org/get-haiku
-The (unstable) nightly builds are available at http://www.haiku-files.org
 
-To build Haiku, you will need to
- * ensure pre-requisite software is installed
- * download sources
- * configure your build
- * run jam to initiate the build process
+About the Haiku project
+-----------------------
+The Haiku project is comprised of numerous volunteers spread across the globe.
+While Haiku supports localization efforts, the primary language is English.
+The project is mindful of the language barrier for non-English speakers. To
+note, the native language of the majority of contributors is not English.
 
-We currently support these platforms:
- * Haiku
- * Linux
- * FreeBSD
- * Mac OS X Intel
 
-Pre-requisite software
-======================
+Design goals
+------------
+If the ideology of the Haiku project were to be explained in a few short words,
+it would be something like this. The software shall have sensible defaults with
+minimal configuration required. The code shall adhere to the coding guidelines
+and implement the functionality in best possible manner.
 
-Tools provided within Haiku's repositories
 
- * Jam (Jam 2.5-haiku-20111222)
- * Haiku's cross-compiler (needed only for non-Haiku platforms)
+Haiku project website
+---------------------
+http://www.haiku-os.org
 
-The tools to compile Haiku will vary, depending on the platform that you are
-using to build Haiku. When building from Haiku, all of the necessary
-development tools are included in official releases (e.g. R1 alpha 1) and in the
-(unstable) nightly builds.
+This is the main website for the Haiku project. It contains news posts from
+the project, blog posts (from developers, Google Summer of Code participants,
+and other frequent contributors), forums, and a vast collection of information.
 
- * Git client
- * SSH client (for developers with commit access)
- * gcc and the binutils (as, ld, etc., required by gcc)
- * make (GNU make)
- * bison
- * flex and lex (usually a mini shell script invoking flex)
- * makeinfo (part of texinfo, needed for building gcc 4 only)
- * autoheader (part of autoconf, needed for building gcc)
- * automake
- * gawk
- * nasm
- * wget
- * (un)zip
- * cdrtools (not genisoimage!)
- * case-sensitive file system
 
-Whether they are installed can be tested for instance by running them in the
-shell with the "--version" parameter.
+Communication
+-------------
+http://www.haiku-os.org/community/ml
+http://www.haiku-os.org/community/ml/etiquette
 
-The following libraries (and their respective headers) are required:
- * curl
- * zlib
+The primary means of communication are through mailing lists and are generally
+hosted by FreeLists. In addition to the mailing lists (ML), numerous users and
+contributors frequent IRC (irc.freenode.net#haiku). There is also BeShare, an
+online chat and file sharing application.
+ * http://haikuware.com/directory/view-details/internet-network/chat-irc/beshare
+ * http://dev.osdrawer.net/projects/beshare
 
-Specific: Haiku for the ARM platform
-------------------------------------
 
-The following tools are needed to compile Haiku for the ARM platform
+Development tracker
+-------------------
+http://dev.haiku-os.org/
 
- * mkimage (http://www.denx.de/wiki/UBoot)
- * Mtools (http://www.gnu.org/software/mtools/intro.html)
+This is the Haiku project's development tracker.
+ * Bug reports
+ * Browse the source
+ * Review changesets
+ * Development related wiki (limited write access)
 
-Specific: Mac OS X
+
+{OpenGrok
+---------
+http://grok.bikemonkey.org/source
+http://code.metager.de/source/xref/haiku
+https://github.com/search?q=repo%3Ahaiku%2Fhaiku&type=Code
+
+Graciously provided by Janne Johansson, Landon Fuller and MetaGer respectively.
+This allows you to quickly and easily search Haiku's source code.
+GitHub, while not {OpenGrok, also provides search functionality.
+
+
+Coding Guidelines
 ------------------
+http://www.haiku-os.org/development/coding-guidelines
 
-Disk Utility can create a case-sensitive disk image of at least 3 GiB in size.
-The following darwin ports need to be installed:
- * expat
- * gawk
- * gettext
- * libiconv
- * gnuregex
- * gsed
- * cdrtools
- * nasm
- * wget
- * less
- * mpfr
- * gmp
- * libmpc
-
-More information about individual distributions of Linux and BSD can be found
-at http://haiku-os.org/guides/building/pre-reqs
+The Haiku project takes pride in code quality. Both in terms of implementing
+the correct code, as well as ensuring the code is written in a consistent
+style. Learning and utilizing the coding guidelines is essential to
+contributing code to Haiku.
 
 
-Download Haiku's sources
-========================
+Haiku API documentation
+-----------------------
+http://api.haiku-os.org
+Old BeBook API: http://www.haiku-os.org/legacy-docs/bebook
 
-There are two parts to Haiku's sources -- the code for Haiku itself and a set
-of build tools for compiling Haiku on an operating system other than Haiku.
-The buildtools are needed only for non-Haiku platform.
-
-Anonymous checkout:
-  git clone git://git.haiku-os.org/haiku
-  git clone git://git.haiku-os.org/buildtools
-
-Developer with commit access:
-  git clone ssh://git.haiku-os.org/haiku
-  git clone ssh://git.haiku-os.org/buildtools
+This is the current (and in-progress) documentation for Haiku's API. As Haiku
+was formed on the idea of implementing binary compatibility with BeOS R5, the
+BeBook is fairly accurate. Contributions to Haiku's API book are encouraged.
 
 
-Building the Jam executable
-===========================
-
-This step applies only to non-Haiku platforms.
-
-Change to the buildtools folder and we will start to build 'jam' which is a
-requirement for building Haiku. Run the following commands to generate and
-install the tool:
-
-  cd  buildtools/jam
-  make
-  sudo ./jam0 install
-    -- or --
-  ./jam0 -sBINDIR=$HOME/bin install
-
-
-Configuring your build
-======================
-
-The configure script generates a file named "BuildConfig" in the
-"generated/build" directory. As long as configure is not modified (!) or the
-cross-compilation tools have been updated, there is no need to call it again.
-That is for re-building you only need to invoke jam (see below). If you don't
-update the source tree very frequently, you may want to execute 'configure'
-after each update just to be on the safe side.
-
-Depending on your goal, there are several different ways to configure Haiku.
-You can either call configure from within your Haiku trunk folder. That will
-prepare a folder named 'generated', which will contain the compiled objects.
-Another option is to manually created one or more 'generated.*' folders and run
-configure from within them. For example imagine the following directory setup
-
-  buildtools-trunk/
-  haiku-trunk/
-  haiku-trunk/generated.x86gcc2
-
-Configure a GCC 2.95 Hybrid, from non-Haiku platform
-----------------------------------------------------
-
-  cd haiku-trunk/generated.x86gcc2
-  ../configure --use-xattr-ref \
-    --build-cross-tools x86_gcc2 ../../buildtools/ \
-    --build-cross-tools x86
-
-Configure a GCC 2.95 Hybrid, from within Haiku
-----------------------------------------------
-
-  cd haiku-trunk/generated.x86gcc2
-  ../configure --target-arch x86_gcc2 --target-arch x86
-
-Additional information about GCC Hybrids can be found on the website,
-http://www.haiku-os.org/guides/building/gcc-hybrid
-
-Configure options
------------------
-
-The various runtime options for configure are documented in its onscreen help
-
-  ./configure --help
-
-
-Building via Jam
-================
-
-Haiku can be built in either of two ways, as disk image file (e.g. for use
-with emulators, to be written directly to a usb stick, burned as a compact
-disc) or as installation in a directory.
-
-Running Jam
------------
-
-There are various ways in which you can run jam.
-
- * If you have a single generated folder,
-   you can run 'jam' from the top level of Haiku's trunk.
- * If you have one or more generated folders,
-   (e.g. generated.x86gcc2), you can cd into that directory and run 'jam'
- * In either case, you can cd into a certain folder in the source tree (e.g.
-   src/apps/debugger) and run jam -sHAIKU_OUTPUT_DIR=<path to generated folder>
-
-Be sure to read build/jam/UserBuildConfig.ReadMe and UserBuildConfig.sample,
-as they contain information on customizing your build of Haiku.
-
-Building a Haiku anyboot file
----------------------------
-
-  jam -q @anyboot-image
-
-This generates an image file named 'haiku-anyboot.image' in your output
-directory under 'generated/'.
-
-Building a VMware image file
-----------------------------
-
-  jam -q @vmware-image
-
-This generates an image file named 'haiku.vmdk' in your output
-directory under 'generated/'.
-
-Directory Installation
-----------------------
-
-  HAIKU_INSTALL_DIR=/Haiku jam -q @install
-
-Installs all Haiku components into the volume mounted at "/Haiku" and
-automatically marks it as bootable. To create a partition in the first place
-use DriveSetup and initialize it to BFS.
-
-Note that installing Haiku in a directory only works as expected under Haiku,
-but it is not yet supported under Linux and other non-Haiku platforms.
-
-Building individual components
+Learning to Program with Haiku
 ------------------------------
+http://www.haiku-os.org/development/learning_to_program_with_haiku
 
-If you don't want to build the complete Haiku, but only a certain
-app/driver/etc. you can specify it as argument to jam, e.g.:
-
-  jam -q Debugger
-
-Alternatively, you can 'cd' to the directory of the component you want to
-build and run 'jam' from there. Note: if your generated directory named
-something other than "generated/", you will need to tell jam where it is.
-
-  jam -q -sHAIKU_OUTPUT_DIR=<path to generated folder>
-
-You can also force rebuilding of a component by using the "-a" parameter:
-
-  jam -qa Debugger
+A developer, DarkWyrm has published a book that is " aimed at people who want
+to be able to write simple programs to get stuff done, but never had anyone
+around teach them". He has chosen to distribute the PDF versions of the book
+under a Creative Commons license for noncommercial purposes.
 
 
-Running
-=======
+Programming with Haiku
+----------------------
+http://www.haiku-os.org/tags/programmingwithhaiku
 
-Generally there are two ways of running Haiku. On real hardware using a
-partition and on emulated hardware using an emulator like Bochs or QEMU.
-
-On Real Hardware
-----------------
-
-If you have installed Haiku to its own partition you can include this
-partition in your bootmanager and try to boot Haiku like any other OS you
-have installed. To include a new partition in the Haiku bootmanager run this
-in a Terminal:
-
-  BootManager
-
-On Emulated Hardware
---------------------
-
-For emulated hardware you should build disk image (see above). How to setup
-this image depends on your emulater. If you use QEMU, you can usually just
-provide the path to the image as command line argument to the "qemu"
-executable.
+Another series from Darkwyrm. It is "aimed at current codemonkeys who want to
+break into development for Haiku. Here begins a new series of programming
+lessons aimed at people who already have a basic grasp on C++: Programming with
+Haiku."
 
 
-Docbook documentation
-=====================
+ohloh
+-----
+http://www.ohloh.net/p/haiku
 
-Our documentation can be found in 'src/documentation/'. You can build it by
-running 'jam' in that folder. The results will be stored in the 'generated/'
-folder.
+"Ohloh is a free public directory of open source software and people." On
+there, you can view detailed reports and analysis of Haiku (and other open
+source software projects).
+
+
+Haiku Interface Translation
+---------------------------------
+http://i18n.haiku-os.org/pootle
+
+This is the current solution to assisting people in translating Haiku's
+on screen text to other languages. Consult the [haiku-i18n] mailing list
+for additional information: http://www.freelists.org/list/haiku-i18n
+
+
+Haiku User Guide Translation
+----------------------------
+http://i18n.haiku-os.org/userguide/
+
+Similar to the Haiku Interface Translation, this site is for coordinating the
+efforts of translating Haiku's User Guide and Welcome page to other spoken
+languages. Subscribe to the [haiku-doc] mailing list:
+http://www.freelists.org/list/haiku-doc
+
+
+HaikuPorts
+----------
+http://ports.haiku-files.org
+http://ports-space.haiku-files.org
+
+"HaikuPorts is a centralized collection of software ported to the Haiku
+platform." If you are interested in porting software to Haiku, then this
+is the site for you!
+
+
+Haikuware
+---------
+http://www.haikuware.com
+
+Haikuware is a website, which provides direct downloads for Haiku software.
+In addition to comments on application pages there are blogs and forums.
+Haikuware also holds a recurring Thank You Award and helps fund development
+through bounty programs.
+
