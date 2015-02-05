@@ -613,12 +613,12 @@ NetServer::_ConfigureInterface(BMessage& message)
 
 		if (!address.IsEmpty() || !mask.IsEmpty() || !broadcast.IsEmpty()) {
 			BNetworkInterfaceAddress interfaceAddress;
-			interfaceAddress.SetAddress(address.SockAddr());
-			interfaceAddress.SetMask(mask.SockAddr());
+			interfaceAddress.SetAddress(address);
+			interfaceAddress.SetMask(mask);
 			if (!broadcast.IsEmpty())
-				interfaceAddress.SetBroadcast(broadcast.SockAddr());
+				interfaceAddress.SetBroadcast(broadcast);
 			else if (!peer.IsEmpty())
-				interfaceAddress.SetDestination(peer.SockAddr());
+				interfaceAddress.SetDestination(peer);
 
 			status_t status = interface.SetAddress(interfaceAddress);
 			if (status != B_OK) {
@@ -949,9 +949,9 @@ NetServer::_ConfigureIPv6LinkLocal(const char* name)
 	}
 
 	BNetworkInterfaceAddress interfaceAddress;
-	interfaceAddress.SetAddress(localLinkAddress.SockAddr());
-	interfaceAddress.SetMask(localLinkMask.SockAddr());
-	interfaceAddress.SetBroadcast(localLinkMask.SockAddr());
+	interfaceAddress.SetAddress(localLinkAddress);
+	interfaceAddress.SetMask(localLinkMask);
+	interfaceAddress.SetBroadcast(localLinkMask);
 
 	/*	TODO: Duplicate Address Detection.  (DAD)
 		Need to blast an icmp packet over the IPv6 network from :: to ensure

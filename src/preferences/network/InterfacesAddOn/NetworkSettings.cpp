@@ -297,16 +297,16 @@ NetworkSettings::SetConfiguration()
 				BNetworkInterfaceAddress interfaceConfig;
 				fNetworkInterface->GetAddressAt(zeroAddr,
 					interfaceConfig);
-				interfaceConfig.SetAddress(fAddress[inet_id].SockAddr());
-				interfaceConfig.SetMask(fNetmask[inet_id].SockAddr());
+				interfaceConfig.SetAddress(fAddress[inet_id]);
+				interfaceConfig.SetMask(fNetmask[inet_id]);
 				fNetworkInterface->SetAddress(interfaceConfig);
 			} else {
 				// TODO : test this case (no address set for this protocol)
 				printf("no zeroAddr found for %s(%d), found %" B_PRIu32 "\n",
 					fProtocols[index].name, inet_id, zeroAddr);
 				BNetworkInterfaceAddress interfaceConfig;
-				interfaceConfig.SetAddress(fAddress[inet_id].SockAddr());
-				interfaceConfig.SetMask(fNetmask[inet_id].SockAddr());
+				interfaceConfig.SetAddress(fAddress[inet_id]);
+				interfaceConfig.SetMask(fNetmask[inet_id]);
 				fNetworkInterface->AddAddress(interfaceConfig);
 			}
 

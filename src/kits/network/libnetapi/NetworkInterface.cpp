@@ -8,25 +8,25 @@
 
 #include <errno.h>
 #include <net/if.h>
-#include <string.h>
 #include <sys/sockio.h>
 
 #include <AutoDeleter.h>
 #include <Messenger.h>
 #include <NetServer.h>
-#include <NetworkAddress.h>
 #include <RouteSupport.h>
 
+static int
+family_from_interface_address(const BNetworkInterfaceAddress& address)
+{
+	if (address.Address().Family() != AF_UNSPEC)
+		return address.Address().Family();
+	if (address.Mask().Family() != AF_UNSPEC)
+		return address.Mask().Family();
+	if (address.Destination().Family() != AF_UNSPEC)
+		return address.Destination().Family();
 
-namespace BPrivate {
-
-status_t do_ifaliasreq(const char* name, int32 option,
-	BNetworkInterfaceAddress& address, bool readBack = false);
-int family_from_interface_address(const BNetworkInterfaceAddress& address);
-
-};
-
-using namespace BPrivate;
+	return AF_INET;
+}
 
 
 static int
@@ -42,6 +42,46 @@ family_from_route(const route_entry& route)
 		return route.source->sa_family;
 
 	return AF_UNSPEC;
+}
+
+
+static status_t
+do_ifaliasreq(const char* name, int32 option, BNetworkInterfaceAddress& address,
+	bool readBack = false)
+{
+	int family = AF_INET;
+	if (!readBack)
+		family = family_from_interface_address(address);
+
+	int socket = ::socket(family, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
+
+	FileDescriptorCloser closer(socket);
+
+	ifaliasreq request;
+	strlcpy(request.ifra_name, name, IF_NAMESIZE);
+	request.ifra_index = address.Index();
+	request.ifra_flags = address.Flags();
+
+	memcpy(&request.ifra_addr, &address.Address().SockAddr(),
+		address.Address().Length());
+	memcpy(&request.ifra_mask, &address.Mask().SockAddr(),
+		address.Mask().Length());
+	memcpy(&request.ifra_broadaddr, &address.Broadcast().SockAddr(),
+		address.Broadcast().Length());
+
+	if (ioctl(socket, option, &request, sizeof(struct ifaliasreq)) < 0)
+		return errno;
+
+	if (readBack) {
+		address.SetFlags(request.ifra_flags);
+		address.Address().SetTo(request.ifra_addr);
+		address.Mask().SetTo(request.ifra_mask);
+		address.Broadcast().SetTo(request.ifra_broadaddr);
+	}
+
+	return B_OK;
 }
 
 
@@ -69,6 +109,65 @@ do_request(int family, T& request, const char* name, int option)
 		return errno;
 
 	return B_OK;
+}
+
+
+// #pragma mark -
+
+
+BNetworkInterfaceAddress::BNetworkInterfaceAddress()
+	:
+	fIndex(-1),
+	fFlags(0)
+{
+}
+
+
+BNetworkInterfaceAddress::~BNetworkInterfaceAddress()
+{
+}
+
+
+status_t
+BNetworkInterfaceAddress::SetTo(const BNetworkInterface& interface, int32 index)
+{
+	fIndex = index;
+	return do_ifaliasreq(interface.Name(), B_SOCKET_GET_ALIAS, *this, true);
+}
+
+
+void
+BNetworkInterfaceAddress::SetAddress(const BNetworkAddress& address)
+{
+	fAddress = address;
+}
+
+
+void
+BNetworkInterfaceAddress::SetMask(const BNetworkAddress& mask)
+{
+	fMask = mask;
+}
+
+
+void
+BNetworkInterfaceAddress::SetBroadcast(const BNetworkAddress& broadcast)
+{
+	fBroadcast = broadcast;
+}
+
+
+void
+BNetworkInterfaceAddress::SetDestination(const BNetworkAddress& destination)
+{
+	fBroadcast = destination;
+}
+
+
+void
+BNetworkInterfaceAddress::SetFlags(uint32 flags)
+{
+	fFlags = flags;
 }
 
 
@@ -281,7 +380,7 @@ BNetworkInterface::CountAddresses() const
 status_t
 BNetworkInterface::GetAddressAt(int32 index, BNetworkInterfaceAddress& address)
 {
-	return address.SetTo(Name(), index);
+	return address.SetTo(*this, index);
 }
 
 
@@ -346,7 +445,7 @@ status_t
 BNetworkInterface::AddAddress(const BNetworkAddress& local)
 {
 	BNetworkInterfaceAddress address;
-	address.SetAddress(local.SockAddr());
+	address.SetAddress(local);
 
 	return do_ifaliasreq(Name(), B_SOCKET_ADD_ALIAS, address);
 }
@@ -363,7 +462,8 @@ status_t
 BNetworkInterface::RemoveAddress(const BNetworkInterfaceAddress& address)
 {
 	ifreq request;
-	memcpy(&request.ifr_addr, &address.Address(), address.Address().sa_len);
+	memcpy(&request.ifr_addr, &address.Address().SockAddr(),
+		address.Address().Length());
 
 	return do_request(family_from_interface_address(address), request, Name(),
 		B_SOCKET_REMOVE_ALIAS);

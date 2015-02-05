@@ -527,7 +527,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 	option = 1;
 	setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
 
-	if (bind(socket, &local.SockAddr(), local.Length()) < 0) {
+	if (bind(socket, local, local.Length()) < 0) {
 		close(socket);
 		return errno;
 	}

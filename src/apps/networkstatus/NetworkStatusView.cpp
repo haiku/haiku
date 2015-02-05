@@ -357,12 +357,9 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 
 	size_t boldLength = text.Length();
 
-	text << "\n" << B_TRANSLATE("Address") << ": "
-		<< BNetworkAddress(address.Address()).ToString();
-	text << "\n" << B_TRANSLATE("Broadcast") << ": "
-		<< BNetworkAddress(address.Broadcast()).ToString();
-	text << "\n" << B_TRANSLATE("Netmask") << ": "
-		<< BNetworkAddress(address.Mask()).ToString();
+	text << "\n" << B_TRANSLATE("Address") << ": " << address.Address().ToString();
+	text << "\n" << B_TRANSLATE("Broadcast") << ": " << address.Broadcast().ToString();
+	text << "\n" << B_TRANSLATE("Netmask") << ": " << address.Mask().ToString();
 
 	BAlert* alert = new BAlert(name, text.String(), B_TRANSLATE("OK"));
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

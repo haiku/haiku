@@ -11,18 +11,13 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
 		UsePrivateSystemHeaders ;
-		UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 		local libnetwork = [ MultiArchDefaultGristFiles libnetwork.so ] ;
 		SharedLibrary $(libnetwork) :
-			getifaddrs.cpp
 			init.cpp
 			interfaces.cpp
 			socket.cpp
 			r5_compatibility.cpp
-
-			NetworkInterfaceAddress.cpp
-
 			:
 			<libbind!$(architecture)>libbind.o
 			[ TargetLibsupc++ ]

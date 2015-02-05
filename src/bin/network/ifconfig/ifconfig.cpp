@@ -474,24 +474,20 @@ list_interface_addresses(BNetworkInterface& interface, uint32 flags)
 			break;
 
 		const address_family* family
-			= address_family_for(address.Address().sa_family);
+			= address_family_for(address.Address().Family());
 
 		printf("\t%s addr: %s", family->name,
-			BNetworkAddress(address.Address()).ToString().String());
+			address.Address().ToString().String());
 
-		if ((flags & IFF_BROADCAST) != 0) {
-			printf(", Bcast: %s",
-				BNetworkAddress(address.Broadcast()).ToString().String());
-		}
+		if ((flags & IFF_BROADCAST) != 0)
+			printf(", Bcast: %s", address.Broadcast().ToString().String());
 
 		switch (family->preferred_format) {
 			case PREFER_OUTPUT_MASK:
-				printf(", Mask: %s",
-					BNetworkAddress(address.Mask()).ToString().String());
+				printf(", Mask: %s", address.Mask().ToString().String());
 				break;
 			case PREFER_OUTPUT_PREFIX_LENGTH:
-				printf(", Prefix Length: %zu",
-					BNetworkAddress(address.Mask()).PrefixLength());
+				printf(", Prefix Length: %zu", address.Mask().PrefixLength());
 				break;
 		}
 

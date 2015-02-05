@@ -1188,7 +1188,19 @@ BNetworkAddress::operator sockaddr*()
 }
 
 
+BNetworkAddress::operator const sockaddr*()
+{
+	return (sockaddr*)&fAddress;
+}
+
+
 BNetworkAddress::operator sockaddr&()
+{
+	return (sockaddr&)fAddress;
+}
+
+
+BNetworkAddress::operator const sockaddr&()
 {
 	return (sockaddr&)fAddress;
 }

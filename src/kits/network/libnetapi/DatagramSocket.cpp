@@ -127,10 +127,9 @@ BDatagramSocket::Write(const void* buffer, size_t size)
 {
 	ssize_t bytesSent;
 
-	if (!fIsConnected) {
-		bytesSent = sendto(Socket(), buffer, size, 0, &fPeer.SockAddr(),
-			fPeer.Length());
-	} else
+	if (!fIsConnected)
+		bytesSent = sendto(Socket(), buffer, size, 0, fPeer, fPeer.Length());
+	else
 		bytesSent = send(Socket(), buffer, size, 0);
 
 	if (bytesSent < 0) {
