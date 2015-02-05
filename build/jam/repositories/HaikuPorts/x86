@@ -34,6 +34,7 @@ RemotePackageRepository HaikuPorts
 	clang-3.4-3
 	clang_analysis-3.4-3
 	cmake-3.0.0_rc3-1
+	coreutils-8.22-1
 	cpio-2.10-1
 	ctags-5.8-3
 	curl-7.39.0-1
@@ -296,6 +297,7 @@ RemotePackageRepository HaikuPorts
 	cdrtools
 	clang
 	cmake
+	coreutils
 	cpio
 	ctags
 	curl
@@ -405,6 +407,7 @@ RemotePackageRepository HaikuPorts
 	zlib
 	:
 	# debuginfo packages
+	coreutils
 	grep
 	sed
 	tar

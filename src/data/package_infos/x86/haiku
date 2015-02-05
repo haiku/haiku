@@ -18,139 +18,51 @@ flags			system_package
 
 provides {
 	haiku=%HAIKU_VERSION% compat>=R1~alpha1
-	coreutils = 8.4 compat >= 0
 	diffutils = 2.8.1 compat >= 0
 	cmd:arp
-	cmd:base64
-	cmd:basename
 	cmd:bc
-	cmd:cat
-	cmd:chgrp
-	cmd:chmod
 	cmd:chop
-	cmd:chown
-	cmd:chroot
-	cmd:cksum
 	cmd:clear
 	cmd:cmp
-	cmd:comm
 	cmd:compress
-	cmd:cp = 8.4
-	cmd:csplit
-	cmd:cut
-	cmd:date
 	cmd:dc
-	cmd:dd
 	cmd:df
 	cmd:diff = 2.8.1
 	cmd:diff3
-	cmd:dirname
-	cmd:du
-	cmd:echo
-	cmd:env
-	cmd:expand
-	cmd:expr
-	cmd:factor
-	cmd:false
-	cmd:fmt
-	cmd:fold
-	cmd:frcode
 	cmd:ftp
 	cmd:ftpd
 	cmd:funzip
 	cmd:gdb
-	cmd:getlimits
-	cmd:groups
 	cmd:gunzip
 	cmd:gzexe
 	cmd:gzip
 	cmd:hd
-	cmd:head
 	cmd:hey
-	cmd:hostname
-	cmd:id
-	cmd:install
-	cmd:join
-	cmd:kill
-	cmd:link
-	cmd:ln = 8.4
 	cmd:login
-	cmd:logname
-	cmd:ls
-	cmd:md5sum
-	cmd:mkdir
-	cmd:mkfifo
-	cmd:mktemp
 	cmd:more
-	cmd:mv = 8.4
 	cmd:netcat
-	cmd:nl
-	cmd:nohup
-	cmd:nproc
-	cmd:od
 	cmd:passwd
-	cmd:paste
 	cmd:patch
-	cmd:pathchk
 	cmd:ping
 	cmd:ping6
-	cmd:pr
-	cmd:printenv
-	cmd:printf
 	cmd:prio
 	cmd:ps
-	cmd:ptx
-	cmd:pwd
-	cmd:readlink
 	cmd:renice
-	cmd:rm
-	cmd:rmdir
 	cmd:sdiff
-	cmd:seq
-	cmd:sha1sum
-	cmd:sha256sum
-	cmd:shred
-	cmd:shuf
-	cmd:sleep
-	cmd:sort
-	cmd:split
-	cmd:stat
-	cmd:stty
 	cmd:su
-	cmd:sum
-	cmd:sync
-	cmd:tac
-	cmd:tail
 	cmd:tcpdump
-	cmd:tee
 	cmd:telnet
 	cmd:telnetd
-	cmd:test
-	cmd:timeout
 	cmd:top
-	cmd:touch
 	cmd:tput
-	cmd:tr
 	cmd:traceroute
 	cmd:trash
-	cmd:true
-	cmd:truncate
-	cmd:tsort
-	cmd:tty
-	cmd:uname
 	cmd:unchop
-	cmd:unexpand
-	cmd:uniq
-	cmd:unlink
 	cmd:unzip = 5.50
 	cmd:unzipsfx
 	cmd:useradd
-	cmd:vdir
 	cmd:watch
-	cmd:wc
-	cmd:whoami
 	cmd:xres
-	cmd:yes
 	cmd:zcat
 	cmd:zcmp
 	cmd:zdiff

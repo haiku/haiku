@@ -23,7 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 # Include required packages:
 # primary architecture
 AddHaikuImagePackages [ FFilterByBuildFeatures
-	bash curl freetype icu libsolv zlib
+	bash coreutils curl freetype icu libsolv zlib
 
 	regular_image @{
 		bzip2 ctags ffmpeg findutils gawk glu grep gutenprint jasper jpeg

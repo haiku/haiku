@@ -63,6 +63,7 @@ RemotePackageRepository HaikuPorts
 	clockwerk-git-3
 	ctags-5.8-3
 	colors-2.3-1
+	coreutils-8.22-1
 	curl-7.39.0-1
 	curl_devel-7.39.0-1
 	cvs-1.12.13.1-6
@@ -711,6 +712,7 @@ RemotePackageRepository HaikuPorts
 	colors
 	confuse_x86
 	copynametoclipboard
+	coreutils
 	ctags
 	curl
 	cvs
@@ -1005,6 +1007,7 @@ RemotePackageRepository HaikuPorts
 	zsh
 	:
 	# debuginfo packages
+	coreutils
 	grep
 	sed
 	tar
