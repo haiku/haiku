@@ -10,10 +10,10 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	eject error
 	fdinfo ffm filepanel finddir findpaths fortune fstrim
 	ftp ftpd funzip
-	getarch groupadd groupdel groupmod gzip gzexe
+	getarch getlimits groupadd groupdel groupmod gzip gzexe
 	hd hey
 	ideinfo@ide idestatus@ide ifconfig iroster isvolume
-	kernel_debugger keymap keystore
+	kernel_debugger keymap keystore kill
 	linkcatkeys listarea listattr listimage listdev
 	listport listres listsem listusb locale logger login lsindex
 	makebootable message mimeset mkfs mkindex
