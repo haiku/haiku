@@ -77,6 +77,8 @@ BFileRequest::_ProtocolLoop()
 				return error;
 			fResult.SetLength(size);
 
+			fListener->HeadersReceived(this);
+
 			ssize_t chunkSize;
 			char chunk[4096];
 			while ((chunkSize = file.Read(chunk, sizeof(chunk))) > 0) {
@@ -111,6 +113,7 @@ BFileRequest::_ProtocolLoop()
 
 	if (fListener != NULL) {
 		fListener->ConnectionOpened(this);
+		fListener->HeadersReceived(this);
 
 		// Add a parent directory entry.
 		fListener->DataReceived(this, "+/,\t..\r\n", transferredSize, 8);

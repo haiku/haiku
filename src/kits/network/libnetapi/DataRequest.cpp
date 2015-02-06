@@ -60,22 +60,22 @@ BDataRequest::_ProtocolLoop()
 		data.Remove(0, separatorPosition + 1);
 
 		int pos = 0;
-		while(meta.Length() > 0)
+		while (meta.Length() > 0)
 		{
 			// Extract next parameter
 			pos = meta.FindFirst(';', pos);
 
 			BString parameter = meta;
-			if(pos >= 0) {
+			if (pos >= 0) {
 				parameter.Truncate(pos);
 				meta.Remove(0, pos+1);
 			} else
 				meta.Truncate(0);
 
 			// Interpret the parameter
-			if(parameter == "base64") {
+			if (parameter == "base64") {
 				isBase64 = true;
-			} else if(parameter.FindFirst("charset=") == 0) {
+			} else if (parameter.FindFirst("charset=") == 0) {
 				charset = parameter;
 			} else {
 				// Must be the MIME type
@@ -86,6 +86,7 @@ BDataRequest::_ProtocolLoop()
 		if (charset.Length() > 0)
 			mimeType << ";" << charset;
 		fResult.SetContentType(mimeType);
+
 	}
 
 	if (isBase64) {
@@ -104,7 +105,7 @@ BDataRequest::_ProtocolLoop()
 		// There may be some padding at the end of the base64 stream. This
 		// prevents us from computing the exact length we should get, so allow
 		// for some error margin.
-		if(length > data.Length() * 3 / 4
+		if (length > data.Length() * 3 / 4
 			|| length < data.Length() * 3 / 4 - 3) {
 			delete[] buffer;
 			return B_BAD_DATA;
@@ -117,6 +118,7 @@ BDataRequest::_ProtocolLoop()
 	fResult.SetLength(length);
 
 	if (fListener != NULL) {
+		fListener->HeadersReceived(this);
 		fListener->DownloadProgress(this, length, length);
 		if (length > 0)
 			fListener->DataReceived(this, payload, 0, length);
