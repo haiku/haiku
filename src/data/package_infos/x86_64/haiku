@@ -31,14 +31,12 @@ provides {
 	cmd:ftp
 	cmd:ftpd
 	cmd:funzip
-	cmd:getlimits
 	cmd:gdb
 	cmd:gunzip
 	cmd:gzexe
 	cmd:gzip
 	cmd:hd
 	cmd:hey
-	cmd:kill
 	cmd:login
 	cmd:more
 	cmd:netcat

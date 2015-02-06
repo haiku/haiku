@@ -33,13 +33,11 @@ provides {
 	cmd:ftpd
 	cmd:funzip
 	cmd:gdb
-	cmd:getlimits
 	cmd:gunzip
 	cmd:gzexe
 	cmd:gzip
 	cmd:hd
 	cmd:hey
-	cmd:kill
 	cmd:login
 	cmd:more
 	cmd:netcat
