@@ -12,11 +12,13 @@
 #include <OS.h>
 #include <string.h>
 
+#include <vm/vm.h>
+#include <vm/VMAddressSpace.h>
+
 #include "debug.h"
 #include "util.h"
 
 static spinlock slock = B_SPINLOCK_INITIALIZER;
-static uint32 round_to_pagesize(uint32 size);
 
 cpu_status
 lock(void)
@@ -35,27 +37,24 @@ unlock(cpu_status status)
 }
 
 
-uint32
-round_to_pagesize(uint32 size)
-{
-	return (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
-}
-
-
 area_id
 alloc_mem(physical_entry *phy, addr_t *log, size_t size, const char *name)
 {
 	void * logadr;
 	area_id areaid;
 	status_t rv;
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+	physicalRestrictions.high_address = 1 << 28;
+	// ICE1712 chipset can not deal with memory area beyond 256MB
 
 	ITRACE("Allocating %s: ", name);
 
-	size = round_to_pagesize(size);
-	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS, size,
-		B_32_BIT_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
-		// TODO: The rest of the code doesn't deal correctly with physical
-		// addresses > 4 GB, so we have to force 32 bit addresses here.
+	areaid = vm_create_anonymous_area(B_SYSTEM_TEAM, name, size, B_CONTIGUOUS,
+		B_READ_AREA | B_WRITE_AREA, 0, 0,
+		&virtualRestrictions, &physicalRestrictions, true, &logadr);
+
 	if (areaid < B_OK) {
 		ITRACE("couldn't allocate\n");
 		return B_ERROR;
