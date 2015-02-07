@@ -13,6 +13,7 @@ BootstrapPackageRepository HaikuPortsCross
 	bash_bootstrap-4.3.30-1
 	binutils_bootstrap-2.25_2014_12_27-1
 	bison_bootstrap-2.4.3-1
+	coreutils_bootstrap-8.22-1
 	curl_bootstrap-7.26.0-1
 	curl_bootstrap_devel-7.26.0-1
 	findutils_bootstrap-4.4.2-1
