@@ -34,7 +34,7 @@ RemotePackageRepository HaikuPorts
 	clang-3.4-3
 	clang_analysis-3.4-3
 	cmake-3.0.0_rc3-1
-	coreutils-8.22-1
+	coreutils-8.22-2
 	cpio-2.10-1
 	ctags-5.8-3
 	curl-7.39.0-1
