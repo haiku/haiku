@@ -34,7 +34,8 @@ AddResources POP3 : POP3.rdef ;
 Addon POP3
 	: $(sources)
 	: be libbnetapi.so libmail.so localestub
-		[ BuildFeatureAttribute openssl : libraries ] [ TargetLibsupc++ ]
+		[ BuildFeatureAttribute openssl : libraries ]
+		[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 		$(TARGET_NETWORK_LIBS)
 ;
 
