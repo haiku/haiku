@@ -41,9 +41,11 @@ RemotePackageRepository HaikuPorts
 	beae-1.2-2
 	beam-1.2alpha-4
 	becjk-1.0.1-1
+	befar-4.2_beta-2
 	belife-1.0.0-2
 	bemines-1.0b2-1
 	bepdf-1.2.0-1
+	bepodder-1.3.0-1
 	bescreencapture-1.9.4-1
 #	bezillabrowser-2.0.0.22pre_2010_05_02-1
 	binutils-2.17_2013_04_21-2
@@ -282,6 +284,7 @@ RemotePackageRepository HaikuPorts
 	pe-2.4.5-1
 	pecorename-1.5-3
 	perl-5.18.2-2
+	photograbber-2.2-1
 	php-5.6.4-3
 	physfs-2.0.3-1
 	physfs_devel-2.0.3-1
@@ -687,9 +690,11 @@ RemotePackageRepository HaikuPorts
 	beae
 	beam
 	becjk
+	befar
 	belife
 	bemines
 	bepdf
+	bepodder
 	bescreencapture
 	beshare_x86
 	blogpositive
@@ -913,6 +918,7 @@ RemotePackageRepository HaikuPorts
 	pe
 	pecorename
 	perl
+	photograbber
 	php
 	physfs
 	pipepanic
