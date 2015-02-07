@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	780031017
+1	swedish	x-vnd.Haiku-HaikuDepot	4261904725
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
@@ -35,6 +35,7 @@ An error occurred while initializing the package manager: %message%	MainWindow		
 Email address:	UserLoginWindow		E-postadress:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Din betygsättning laddadesupp ok. Du kan närsomhelst uppdatera eller tabort ditt betyg för paketet genom att ge ett nytt betyg.
 Very unstable	RatePackageWindow		Mycket ostabil
+<Package contents not available for remote packages>	PackageContentsView		<Paketinehållet är inte tillgängligt för externa paket>
 The username is already taken. Please choose another.	UserLoginWindow		Användarnamnet används redan. Välj ett annat.
 Close	PackageManager		Stäng
 Not logged in	MainWindow		Inte inloggad

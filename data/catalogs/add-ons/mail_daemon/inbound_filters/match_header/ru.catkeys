@@ -5,7 +5,7 @@ Move to	ConfigView		Переместить в
 Then	ConfigView		Тогда
 this field is based on the action	ConfigView		это поле зависит от действия
 Delete message	ConfigView		Удалить сообщение
-value (use REGEX: in front of regular expressions like *spam*)	ConfigView		значение (используйте регулярные выражения, например *спам*)
+value (use REGEX: in front of regular expressions like *spam*)	ConfigView		значение (используйте REGEX: перед регулярными выражениями, например *спам*)
 <Choose account>	ConfigView		значение (используйте регулярные выражения, например *спам*)
 Set flags to	ConfigView		Установить флаги в
 Set as read	ConfigView		Отметить как прочитанное
