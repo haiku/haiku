@@ -4,7 +4,7 @@ UsePrivateHeaders interface shared package ;
 
 # source directories
 local sourceDirs =
-	model textview ui ui_generic
+	edits_generic model textview ui ui_generic
 ;
 
 local sourceDir ;
@@ -15,6 +15,13 @@ for sourceDir in $(sourceDirs) {
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
 
 local textDocumentSources =
+	# edits_generic
+	CompoundEdit.cpp
+	EditContext.cpp
+	EditManager.cpp
+	EditStack.cpp
+	UndoableEdit.cpp
+	# textview
 	Bullet.cpp
 	BulletData.cpp
 	CharacterStyle.cpp
