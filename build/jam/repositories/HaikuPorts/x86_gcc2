@@ -51,6 +51,7 @@ RemotePackageRepository HaikuPorts
 	binutils-2.17_2013_04_21-2
 	bison-2.4.3-6
 	blogpositive-0.4.0-2
+	bookmarkconverter-0.4.3-1
 	buildbot_slave-0.8.8-4
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
@@ -702,6 +703,7 @@ RemotePackageRepository HaikuPorts
 	binutils_x86
 	bison
 	bison_x86
+	bookmarkconverter
 	boost_x86
 	buildbot_slave
 	bzip2
