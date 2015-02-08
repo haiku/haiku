@@ -55,7 +55,6 @@ provides {
 	cmd:telnetd
 	cmd:top
 	cmd:tput
-	cmd:tr
 	cmd:traceroute
 	cmd:trash
 	cmd:unchop

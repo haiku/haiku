@@ -16,6 +16,8 @@ BootstrapPackageRepository HaikuPortsCross
 	coreutils_bootstrap-8.22-1
 	curl_bootstrap-7.26.0-1
 	curl_bootstrap_devel-7.26.0-1
+	expat_bootstrap-2.1.0-1
+	expat_bootstrap_devel-2.1.0-1
 	findutils_bootstrap-4.4.2-1
 	flex_bootstrap-2.5.35-1
 	freetype_bootstrap-2.4.9-1
@@ -43,7 +45,9 @@ BootstrapPackageRepository HaikuPortsCross
 	bash_bootstrap
 	binutils_bootstrap
 	bison_bootstrap
+	coreutils_bootstrap
 	curl_bootstrap
+	expat_bootstrap
 	findutils_bootstrap
 	flex_bootstrap
 	freetype_bootstrap
