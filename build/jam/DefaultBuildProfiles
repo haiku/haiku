@@ -160,6 +160,7 @@ rule DefineDefaultBuildProfiles
 				bison
 				curl_devel
 				dejavu
+				expat
 				flex
 				freetype_devel
 				gawk
@@ -186,6 +187,7 @@ rule DefineDefaultBuildProfiles
 						binutils
 						curl
 						curl_devel
+						expat
 						freetype
 						freetype_devel
 						gcc
