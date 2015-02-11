@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -623,7 +623,7 @@ status_t
 BNetworkDevice::GetHardwareAddress(BNetworkAddress& address)
 {
 	ifreq request;
-	status_t status = do_request(request, Name(), SIOCSIFMEDIA);
+	status_t status = do_request(request, Name(), SIOCGIFADDR);
 	if (status != B_OK)
 		return status;
 
