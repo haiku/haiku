@@ -1,5 +1,0 @@
-# Host: NCR 3000 (Intel 386 running SVR4)
-
-NAT_FILE= nm-i386v4.h
-NATDEPFILES= corelow.o core-regset.o fork-child.o i386v4-nat.o procfs.o \
-	proc-api.o proc-events.o proc-flags.o proc-why.o

@@ -1,5 +1,0 @@
-# Host: PowerPC, running NetBSD
-NATDEPFILES= fork-child.o inf-ptrace.o infptrace.o ppcnbsd-nat.o bsd-kvm.o
-NAT_FILE= config/nm-nbsd.h
-
-LOADLIBES= -lkvm

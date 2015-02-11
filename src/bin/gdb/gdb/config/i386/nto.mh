@@ -1,3 +1,0 @@
-# Host: Intel 386 running QNX.
-
-NATDEPFILES= nto-procfs.o
