@@ -6,7 +6,6 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
 SYSTEM_BIN += [ FFilterByBuildFeatures
 	clipboard CortexAddOnHost
 	FirstBootPrompt	fwcontrol@x86
-	gdb@x86
 	installsound
 	mail2mbox mbox2mail mkdos mount_nfs
 	play playfile playsound playwav

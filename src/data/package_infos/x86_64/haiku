@@ -31,7 +31,6 @@ provides {
 	cmd:ftp
 	cmd:ftpd
 	cmd:funzip
-	cmd:gdb
 	cmd:gunzip
 	cmd:gzexe
 	cmd:gzip
