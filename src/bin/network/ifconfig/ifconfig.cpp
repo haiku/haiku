@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,6 +25,8 @@
 
 #include <NetServer.h>
 
+#include "MediaTypes.h"
+
 
 extern const char* __progname;
 const char* kProgramName = __progname;
@@ -35,28 +37,12 @@ enum preferred_output_format {
 	PREFER_OUTPUT_PREFIX_LENGTH,
 };
 
+
 struct address_family {
 	int			family;
 	const char*	name;
 	const char*	identifiers[4];
 	preferred_output_format	preferred_format;
-};
-
-struct media_type {
-	int			type;
-	const char*	name;
-	const char* pretty;
-	struct {
-		int subtype;
-		const char* name;
-		const char* pretty;
-	} subtypes [6];
-	struct {
-		int option;
-		bool read_only;
-		const char* name;
-		const char* pretty;
-	} options [6];
 };
 
 
@@ -74,45 +60,6 @@ static const address_family kFamilies[] = {
 		PREFER_OUTPUT_PREFIX_LENGTH
 	},
 	{ -1, NULL, {NULL}, PREFER_OUTPUT_MASK }
-};
-
-static const media_type kMediaTypes[] = {
-	{
-		0, // for generic options
-		"all",
-		"All",
-		{
-			{ IFM_AUTO, "auto", "Auto-select" },
-			{ -1, NULL, NULL }
-		},
-		{
-			{ IFM_FULL_DUPLEX, true, "fullduplex", "Full Duplex" },
-			{ IFM_HALF_DUPLEX, true, "halfduplex", "Half Duplex" },
-			{ IFM_LOOP, true, "loop", "Loop" },
-			//{ IFM_ACTIVE, false, "active", "Active" },
-			{ -1, false, NULL, NULL }
-		}
-	},
-	{
-		IFM_ETHER,
-		"ether",
-		"Ethernet",
-		{
-			//{ IFM_AUTO, "auto", "Auto-select" },
-			//{ IFM_AUI, "AUI", "10 MBit, AUI" },
-			//{ IFM_10_2, "10base2", "10 MBit, 10BASE-2" },
-			{ IFM_10_T, "10baseT", "10 MBit, 10BASE-T" },
-			{ IFM_100_TX, "100baseTX", "100 MBit, 100BASE-TX" },
-			{ IFM_1000_T, "1000baseT", "1 GBit, 1000BASE-T" },
-			{ IFM_1000_SX, "1000baseSX", "1 GBit, 1000BASE-SX" },
-			{ IFM_10G_T, "10GbaseT", "10 GBit, 10GBASE-T" },
-			{ -1, NULL, NULL }
-		},
-		{
-			{ -1, false, NULL, NULL }
-		}
-	},
-	{ -1, NULL, NULL, {{ -1, NULL, NULL }}, {{ -1, false, NULL, NULL }} }
 };
 
 
@@ -134,10 +81,12 @@ usage(int status)
 		"  media <media>      - media type to use (defaults to auto)\n",
 		kProgramName, kProgramName, kProgramName);
 
-	for (int32 i = 0; kMediaTypes[i].type >= 0; i++) {
-		printf("For %s <media> can be one of: ", kMediaTypes[i].pretty);
-		for (int32 j = 0; kMediaTypes[i].subtypes[j].subtype >= 0; j++)
-			printf("%s ", kMediaTypes[i].subtypes[j].name);
+	for (int32 i = 0; const char* type = get_media_type_name(i); i++) {
+		printf("For %s <media> can be one of: ", type);
+		for (int32 j = 0; const char* subType = get_media_subtype_name(i, j);
+				j++) {
+			printf("%s ", subType);
+		}
 		printf("\n");
 	}
 	printf("And <flags> can be: up, down, [-]promisc, [-]allmulti, [-]bcast, "
@@ -149,26 +98,6 @@ usage(int status)
 		kProgramName);
 
 	exit(status);
-}
-
-
-static bool
-media_parse_subtype(const char* string, int media, int* type)
-{
-	for (int32 i = 0; kMediaTypes[i].type >= 0; i++) {
-		// only check for generic or correct subtypes
-		if (kMediaTypes[i].type &&
-			kMediaTypes[i].type != media)
-			continue;
-		for (int32 j = 0; kMediaTypes[i].subtypes[j].subtype >= 0; j++) {
-			if (strcmp(kMediaTypes[i].subtypes[j].name, string) == 0) {
-				// found a match
-				*type = kMediaTypes[i].subtypes[j].subtype;
-				return true;
-			}
-		}
-	}
-	return false;
 }
 
 
@@ -541,30 +470,8 @@ list_interface(const char* name)
 	int media = interface.Media();
 	if ((media & IFM_ACTIVE) != 0) {
 		// dump media state in case we're linked
-		const char* type = "unknown";
-		bool show = false;
-
-		for (int32 i = 0; kMediaTypes[i].type >= 0; i++) {
-			// loopback don't really have a media anyway
-			if (IFM_TYPE(media) == 0/*IFT_LOOP*/)
-				break;
-
-			// only check for generic or correct subtypes
-			if (kMediaTypes[i].type
-				&& kMediaTypes[i].type != IFM_TYPE(media))
-				continue;
-
-			for (int32 j = 0; kMediaTypes[i].subtypes[j].subtype >= 0; j++) {
-				if (kMediaTypes[i].subtypes[j].subtype == IFM_SUBTYPE(media)) {
-					// found a match
-					type = kMediaTypes[i].subtypes[j].pretty;
-					show = true;
-					break;
-				}
-			}
-		}
-
-		if (show)
+		const char* type = media_type_to_string(media);
+		if (type != NULL)
 			printf("\tMedia type: %s\n", type);
 	}
 
