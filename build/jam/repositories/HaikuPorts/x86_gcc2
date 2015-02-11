@@ -109,6 +109,7 @@ RemotePackageRepository HaikuPorts
 	getopt-1.1.5-1
 	gettext-0.18.1.1-6
 	gettext_libintl-0.18.1.1-6
+	gdb-6.3-1
 	giddy3-1.4-1
 	giflib-5.0.5-2
 	giflib_devel-5.0.5-2
@@ -772,6 +773,7 @@ RemotePackageRepository HaikuPorts
 	getopt
 	gettext
 	gettext_x86
+	gdb
 	giflib
 	git
 	glew
