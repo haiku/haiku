@@ -315,6 +315,7 @@ static const Translation kTranslations[] = {
 	"Ithamar R. Adema\n" \
 	"Bruno G. Albuquerque\n" \
 	"Stephan Aßmus\n" \
+	"Augustin Cavalier\n" \
 	"Stefano Ceccherini\n" \
 	"Rudolf Cornelissen\n" \
 	"Alexandre Deckner\n" \
