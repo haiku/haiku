@@ -207,6 +207,8 @@ RemotePackageRepository HaikuPorts
 	libsanta_devel-3.0.0-3
 	libsdl-1.2.15-6
 	libsdl_devel-1.2.15-6
+	libsdl2-2.0.3-2
+	libsdl2_devel-2.0.3-2
 	libsndfile-1.0.25-2
 	libsndfile_devel-1.0.25-2
 	libsolv-0.3.0_haiku_2014_12_22-1
@@ -327,6 +329,10 @@ RemotePackageRepository HaikuPorts
 	sdl_sound_devel-1.0.3-2
 	sdl_ttf-2.0.11-1
 	sdl_ttf_devel-2.0.11-1
+	sdl2_image-2.0.0-4
+	sdl2_image_devel-2.0.0-4
+	sdl2_ttf-2.0.12-3
+	sdl2_ttf_devel-2.0.12-3
 	sdllopan-10-2
 	sed-4.2.1-6
 	serf-1.3.7-1
@@ -840,6 +846,7 @@ RemotePackageRepository HaikuPorts
 	libqt4_x86
 	libsanta
 	libsdl
+	libsdl2
 	libsdl2_x86
 	libsndfile
 	libsndfile_x86
@@ -960,6 +967,8 @@ RemotePackageRepository HaikuPorts
 	sdl_net
 	sdl_sound
 	sdl_ttf
+	sdl2_image
+	sdl2_ttf
 	sdllopan
 	sed
 	serf
