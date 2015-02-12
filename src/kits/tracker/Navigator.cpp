@@ -57,7 +57,7 @@ static const int32 kMaxHistory = 32;
 
 BNavigator::BNavigator(const Model* model)
 	:
-	BToolBar(BRect()), // FIXME in BToolbar: pointless BRect()
+	BToolBar(),
 	fBackHistory(8, true),
 	fForwHistory(8, true)
 {
@@ -102,7 +102,7 @@ BNavigator::AttachedToWindow()
 	SetActionEnabled(kNavigatorCommandUp, false);
 	delete bmpUp;
 
-	GroupLayout()->AddView(fLocation);
+	AddView(fLocation);
 	fLocation->SetTarget(this);
 }
 
