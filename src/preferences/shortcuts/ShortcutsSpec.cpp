@@ -191,9 +191,8 @@ ShortcutsSpec::ShortcutsSpec(BMessage* from)
 			printf(" Error, no modifiers int32 in archive BMessage!\n");
 		}
 
-	const char* string;
-	for (int i = 0; (string = from->GetString("strings", i, NULL)); i++)
-		SetField(new BStringField(string), i);
+	for (int i = 0; i <= STRING_COLUMN_INDEX; i++)
+		SetField(new BStringField(GetCellText(i)), i);
 }
 
 
@@ -225,12 +224,6 @@ ShortcutsSpec::Archive(BMessage* into, bool deep) const
 		return ret;
 
 	into->AddString("class", "ShortcutsSpec");
-
-	for (int i = 0; i < CountFields(); i++) {
-		const BStringField* field =
-			static_cast<const BStringField*>(GetField(i));
-		into->AddString("strings", field->String());
-	}
 
 	// These fields are for our prefs panel's benefit only
 	into->AddString("command", fCommand);
