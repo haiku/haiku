@@ -53,7 +53,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			StringForSize.cpp
 			TextTable.cpp
 			Thread.cpp
-			Toolbar.cpp
+			ToolBar.cpp
 			Variant.cpp
 			;
 

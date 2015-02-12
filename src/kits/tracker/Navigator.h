@@ -35,7 +35,7 @@ All rights reserved.
 #define _NAVIGATOR_H
 
 
-#include <Toolbar.h>
+#include <ToolBar.h>
 
 #include "ContainerWindow.h"
 #include "Model.h"
@@ -63,7 +63,7 @@ enum NavigationAction
 };
 
 
-class BNavigator : public BToolbar {
+class BNavigator : public BToolBar {
 public:
 	BNavigator(const Model* model);
 	~BNavigator();

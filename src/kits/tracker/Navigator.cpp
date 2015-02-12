@@ -57,7 +57,7 @@ static const int32 kMaxHistory = 32;
 
 BNavigator::BNavigator(const Model* model)
 	:
-	BToolbar(BRect()), // FIXME in BToolbar: pointless BRect()
+	BToolBar(BRect()), // FIXME in BToolbar: pointless BRect()
 	fBackHistory(8, true),
 	fForwHistory(8, true)
 {

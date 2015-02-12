@@ -11,7 +11,7 @@
 #define SHOW_IMAGE_WINDOW_H
 
 
-#include <Toolbar.h>
+#include <ToolBar.h>
 #include <Window.h>
 
 #include "ImageFileNavigator.h"
@@ -114,7 +114,7 @@ private:
 			BMenu*				fGoToPageMenu;
 			BMenu*				fSlideShowDelayMenu;
 			BMenu*				fRatingMenu;
-			BToolbar*			fToolbar;
+			BToolBar*			fToolBar;
 			bool				fToolBarVisible;
 			BScrollView*		fScrollView;
 			BScrollBar*			fVerticalScrollBar;

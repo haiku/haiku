@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TOOLBAR_H
@@ -12,11 +12,11 @@ class BButton;
 
 namespace BPrivate {
 
-class BToolbar : public BGroupView {
+class BToolBar : public BGroupView {
 public:
-								BToolbar(BRect frame,
-									orientation ont = B_HORIZONTAL);
-	virtual						~BToolbar();
+								BToolBar(BRect frame,
+										 orientation ont = B_HORIZONTAL);
+	virtual						~BToolBar();
 
 	virtual	void				Hide();
 
@@ -42,12 +42,12 @@ private:
 			void				_AddView(BView* view);
 			BButton*			_FindButton(uint32 command) const;
 			void				_HideToolTips() const;
-			
+
 			orientation			fOrientation;
 };
 
 } // namespace BPrivate
 
-using BPrivate::BToolbar;
+using BPrivate::BToolBar;
 
 #endif // _TOOLBAR_H
