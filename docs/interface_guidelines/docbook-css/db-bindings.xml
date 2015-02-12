@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<bindings xmlns="http://www.mozilla.org/xbl"
+     xmlns:html="http://www.w3.org/1999/xhtml">
+  <binding id="ulink">
+    <handlers>
+      <handler event="click" button="0"
+               action="window.location=this.attributes.url.value;"/>
+      <handler event="mouseover"
+               action="window.status=this.attributes.url.value;"/>
+      <handler event="mouseout"
+               action="window.status=null;"/>
+    </handlers>
+  </binding>
+
+  <binding id="image">
+    <content>
+      <html:img xbl:inherits="src=fileref"/>
+    </content>
+
+    <implementation>
+      <constructor>
+	var img = document.getAnonymousNodes(this)[0];
+	var file = this.getAttribute("fileref");
+	// HACK: using img.src=file 'inline' doesn't seem to work
+	//       but it does when called from a setTimeout()
+	var f = function() { img.src = file; }
+	setTimeout(f, 0);
+      </constructor>
+    </implementation>
+  </binding>
+</bindings>

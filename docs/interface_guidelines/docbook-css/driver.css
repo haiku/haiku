@@ -1,0 +1,27 @@
+/*
+ * driver.css
+ *
+ * Copyright (c) 2004 David Holroyd, and contributors
+ * See the file 'COPYING' for terms of use
+ *
+ * Part of the Docbook-CSS stylesheet
+ *   http://www.badgers-in-foil.co.uk/projects/docbook-css/
+ *
+ * This is the 'driver' file of the stylesheet.  It imports all the major
+ * stylesheet components.  If you want to make use of this stylesheet in your
+ * XML document (e.g. for display in a web browser), include a line like this
+ * at the top of the XML file (replacing <ver> with the version number):
+ *
+ *   <?xml-stylesheet href="docbook-css-<ver>/driver.css" type="text/css"?>
+ *
+ * If you want to customise the stylesheet, a customisation layer can be
+ * created by simply witing a new CSS file, and including a declaration to
+ * import this file at the top.  The customisation layer can then override any
+ * of the existing stylesheet rules, or create new ones.
+ */
+
+@import "core.css";
+@import "tables.css";
+@import "styles.css";
+@import "mozilla.css";
+@import "opera.css";

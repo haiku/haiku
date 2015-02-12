@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
+<?xml-stylesheet href="docbook-css/driver.css" type="text/css" ?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" >
 <book>
 
 <bookinfo>
 <date>9-1-2006</date>
-<title>Haiku Human Interface Guidelines...</title>
+<title>Haiku Human Interface Guidelines</title>
 <subtitle>Better Known as "How <emphasis>NOT</emphasis> to Write Software</subtitle>
 <authorgroup>
 	<author>DarkWyrm</author>
@@ -1440,33 +1441,6 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 </varlistentry>
 
 </variablelist>
-</chapter>
-
-<chapter id="chapter13">
-<title>Installation and Updates</title>
-
-<para>It is easy to get so wrapped up in developing great software that you forget about getting it onto a user's computer. It pays to pay attention to detail in the installation of your software -- if a user can't get your program to work on his machine, you've just managed to both hurt your reputation as a developer and lost a user at the same time. Installation is one of those elements of software development that is given little, if any, attention when it works well but is quickly noticed when something goes wrong. As of this writing, there are two main methods of packaging and installing software on BeOS-based operating systems: zip files and Software Valet packages. </para>
-
-<sect1>
-Zip Files
-
-<para>Zipped software is the simplest method for the developer at the cost of more work for the user. If your program has a simple structure, this is generally no big deal -- the user unzips it, sticks it somewhere, and creates a symlink in the Be menu. If, on the other hand, your program has shared libraries that need installed or other files that need to be installed in more than one folder, it is much, much better to use a Software Valet package.</para>
-</sect1>
-<sect1>
-<title>Software Valet packages</title>
-
-<para>Package files make more work for a developer but much less for the user. As a result, they are the method of choice when a software package requires files be stored in more than one folder on the user's hard drive. They also allow the user to choose different types of installation, such as just an update, minimal installs, or developer installs.</para>
-
-<para>When you make a Software Valet package, there are a few considerations to keep in mind. Installing shortcuts are a pain in the neck unless you have a fixed install location and you make separate packages for Zeta and R5. You should also make sure that all the little details, such as version, build date, and so forth have been set to the proper values. Lastly, test the installation before actually releasing the software to make sure that it actually works the way that it should.</para>
-</sect1>
-
-<sect1>
-<title>Getting Program Updates</title>
-
-<para>While there is no official support from the operating system, a conscientious developer will make a way for the user to easily update his program. Ideally, your program should automatically check for updates, ask the user if he would like to download them, download them in the background, and then install the updates when your program starts up. Providing a way to roll back the updates in case of something going seriously wrong is also a very good idea. The only problem with this kind of setup is that it is a *lot* of work.</para>
-
-<para>Because of the popularity of BeOS download sites such as BeBits, it is relatively simple to post updates merely by releasing the new version on such sites. It places the check-download-install responsibility on the user, though. More motivated users will update their software; a great many users will not, so keep this in mind if this is the route you would choose to go.</para>
-</sect1>
 </chapter>
 
 <appendix>

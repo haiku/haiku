@@ -1,0 +1,70 @@
+/*
+ * core.css
+ *
+ * Copyright (c) 2004 David Holroyd, and contributors
+ * See the file 'COPYING' for terms of use
+ *
+ * Part of the Docbook-CSS stylesheet
+ *   http://www.badgers-in-foil.co.uk/projects/docbook-css/
+ */
+
+/* Generated 2002-12-12 */
+abbrev, accel, acronym, action, application, artpagenums, authorinitials, 
+bibliocoverage, biblioid, bibliomisc, bibliorelation, bibliosource, citation, 
+citebiblioid, citerefentry, citetitle, city, classname, co, command, 
+computeroutput, constant, coref, country, database, date, email, emphasis, 
+envar, errorcode, errorname, errortext, errortype, exceptionname, fax, 
+filename, firstname, firstterm, funcdef, funcparams, function, group, 
+guibutton, guiicon, guilabel, guimenu, guimenuitem, guisubmenu, hardware, 
+honorific, initializer, inlineequation, inlinegraphic, inlinemediaobject, 
+interface, interfacename, invpartnumber, isbn, issn, keycap, keycode, 
+keycombo, keysym, lineage, lineannotation, link, literal, markup, medialabel, 
+member, menuchoice, methodname, methodparam, modifier, mousebutton, olink, 
+ooclass, ooexception, oointerface, option, optional, orgdiv, orgname, 
+otheraddr, othername, pagenums, paramdef, parameter, phone, phrase, pob, 
+postcode, productname, productnumber, prompt, property, pubdate, pubsnumber, 
+quote, refpurpose, replaceable, returnvalue, revnumber, seriesvolnums, 
+sgmltag, shortcut, state, street, structfield, structname, subscript, 
+superscript, surname, symbol, systemitem, token, trademark, type, ulink, 
+userinput, varname, volumenum, wordasword, year {
+	display:inline;
+}
+
+abstract, ackno, address, answer, appendix, article, attribution, authorblurb, 
+bibliodiv, biblioentry, bibliography, bibliomixed, bibliomset, biblioset, 
+blockquote, book, callout, calloutlist, caption, caution, chapter, 
+cmdsynopsis, colophon, constraintdef, dedication, epigraph, equation, example, 
+figure, formalpara, glossary, glossdef, glossdiv, glossentry, glosslist, 
+graphic, graphicco, highlights, imagedata, imageobjectco, important, index,
+indexdiv,  indexentry, informalequation, informalexample, informalfigure,
+informaltable, itemizedlist, legalnotice, listitem, lot, lotentry,
+mediaobject, mediaobjectco, msg, msgentry, msgexplan, msgmain, msgset, note,
+orderedlist, para, part, partintro, personblurb, preface, primaryie,
+printhistory, procedure, productionset, programlistingco, qandadiv, qandaentry,
+qandaset, question, refentry, refentrytitle, reference, refnamediv, refsect1,
+refsect2, refsect3, refsection, refsynopsisdiv, revhistory, screenco,
+screenshot, secondaryie, sect2, sect3, sect4, sect5, section, seealsoie, seeie,
+set, setindex, sidebar, simpara, simplemsgentry, simplesect, step, substeps, 
+subtitle, synopfragment, synopfragmentref, table, term, tertiaryie, tip, 
+title, toc, tocback, tocchap, tocentry, tocfront, toclevel1, toclevel2, 
+toclevel3, toclevel4, toclevel5, tocpart, variablelist, varlistentry, warning, 
+sect1 {
+	display:block;
+}
+
+appendixinfo, area, areaset, areaspec, articleinfo, bibliographyinfo, 
+blockinfo, bookinfo, chapterinfo, colspec, glossaryinfo, indexinfo, indexterm,
+itermset, modespec, objectinfo, partinfo, prefaceinfo, primary, refentryinfo, 
+referenceinfo, refmeta, refsect1info, refsect2info, refsect3info, 
+refsectioninfo, refsynopsisdivinfo, screeninfo, secondary, sect1info, 
+sect2info, sect3info, sect4info, sect5info, sectioninfo, see, seealso, 
+setindexinfo, setinfo, sidebarinfo, spanspec, tertiary {
+	display:none;
+}
+
+classsynopsisinfo, funcsynopsisinfo, literallayout, programlisting, screen, 
+synopsis {
+	white-space:pre;
+	font-family:monospace;
+	display:block;
+}

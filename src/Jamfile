@@ -5,7 +5,6 @@ SubInclude HAIKU_TOP src apps ;
 SubInclude HAIKU_TOP src bin ;
 SubInclude HAIKU_TOP src build ;
 SubInclude HAIKU_TOP src data ;
-SubInclude HAIKU_TOP src documentation ;
 SubInclude HAIKU_TOP src kits ;
 SubInclude HAIKU_TOP src libs ;
 SubInclude HAIKU_TOP src preferences ;

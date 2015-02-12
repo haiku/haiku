@@ -1,0 +1,33 @@
+/*
+ * opera.css
+ *
+ * Copyright (c) 2004 David Holroyd, and contributors
+ * See the file 'COPYING' for terms of use
+ *
+ * Part of the Docbook-CSS stylesheet
+ *   http://www.badgers-in-foil.co.uk/projects/docbook-css/
+ *
+ * This file contains CSS specific to the Opera browser.
+ */
+ 
+/*
+ * Discovered -o-link from,
+ * http://groups.google.com/groups?q=opera+styles+xml&start=10&hl=en&lr=&ie=UTF-8&newwindow=1&selm=opr6pgr0tgicz8n2%40news.opera.com&rnum=18
+ */
+ulink {
+	-o-link: attr(url);
+	-o-link-source: current;
+}
+
+/*
+ * Given the above rule, it makes sense to have this here too, though it's
+ * not Opera-specific
+ */
+ulink:focus {
+	outline: 1px dotted invert;
+}
+
+/* this was in the example I found, but it doesn't achive much */
+imagedata {
+	-o-replace: attr(fileref)
+}

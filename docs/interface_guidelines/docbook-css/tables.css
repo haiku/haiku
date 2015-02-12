@@ -1,0 +1,59 @@
+/*
+ * tables.css
+ *
+ * Copyright (c) 2004 David Holroyd, and contributors
+ * See the file 'COPYING' for terms of use
+ *
+ * Part of the Docbook-CSS stylesheet
+ *   http://www.badgers-in-foil.co.uk/projects/docbook-css/
+ *
+ */
+
+tgroup {
+	display: table;
+}
+
+row {
+	display: table-row;
+}
+
+thead {
+	display: table-header-group;
+}
+
+tbody {
+	display: table-row-group;
+}
+
+entry, entrytbl {
+	display: table-cell;
+}
+
+entry[valign=top] {
+	vertical-align: top;
+}
+entry[valign=bottom] {
+	vertical-align: bottom;
+}
+
+/*
+ * CSS can't generate the indended formatting for segmented lists, so we turn
+ * them into tables instead.
+ *
+ * TODO: seems to break formatting when nested in a table entry
+ */
+segmentedlist {
+	display: table;
+}
+
+seglistitem {
+	display: table-row;
+}
+
+seg, segtitle {
+	display: table-cell;
+}
+
+segmentedlist>title {
+	display: table-caption;
+}

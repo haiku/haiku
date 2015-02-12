@@ -255,11 +255,3 @@ For emulated hardware you should build disk image (see above). How to setup
 this image depends on your emulater. If you use QEMU, you can usually just
 provide the path to the image as command line argument to the "qemu"
 executable.
-
-
-Docbook documentation
-=====================
-
-Our documentation can be found in 'src/documentation/'. You can build it by
-running 'jam' in that folder. The results will be stored in the 'generated/'
-folder.

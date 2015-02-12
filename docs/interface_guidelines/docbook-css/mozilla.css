@@ -1,0 +1,44 @@
+/*
+ * mozilla.css
+ *
+ * Copyright (c) 2004 David Holroyd, and contributors
+ * See the file 'COPYING' for terms of use
+ *
+ * Part of the Docbook-CSS stylesheet
+ *   http://www.badgers-in-foil.co.uk/projects/docbook-css/
+ *
+ * This file contains CSS specific to mozilla.org's Gecko rendering engine.
+ * 
+ * Some of the rules here will take effect even if you aren't using a Mozilla-
+ * based browser.
+ */
+
+
+/* make <ulink>s clickable */
+ulink {
+	-moz-binding:url('db-bindings.xml#ulink');
+	cursor: pointer;
+	-moz-user-focus: normal;
+}
+
+ulink:active {
+	color: red;
+}
+
+ulink:focus {
+	-moz-outline: 1px dotted invert;
+}
+
+imagedata {
+	-moz-binding:url('db-bindings.xml#image');
+}
+
+
+guimenu, guimenuitem, guisubmenu {
+	font: menu;
+}
+
+orderedlist, itemizedlist, procedure {
+	/* this seems to be required to make auto-numbering work */
+	-moz-counter-reset: -html-counter 0;
+}
