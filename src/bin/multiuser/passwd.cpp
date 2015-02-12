@@ -30,7 +30,7 @@ extern const char *__progname;
 
 static const char* kUsage =
 	"Usage: %s [ <options> ] [ <user name> ]\n"
-	"Deletes the specified user.\n"
+	"Change the password of the specified user.\n"
 	"\n"
 	"Options:\n"
 	"  -d\n"
@@ -50,7 +50,7 @@ print_usage_and_exit(bool error)
 int
 main(int argc, const char* const* argv)
 {
-	bool deletePassword = false;;
+	bool deletePassword = false;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -63,7 +63,7 @@ main(int argc, const char* const* argv)
 		if (c == -1)
 			break;
 
-	
+
 		switch (c) {
 			case 'd':
 				deletePassword = true;
