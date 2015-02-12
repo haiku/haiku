@@ -94,7 +94,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 	AddHaikuImagePackages autoconf automake libtool perl texinfo ;
 
 	# some other build tools
-	AddHaikuImagePackages cmake pkgconfig scons ;
+	AddHaikuImagePackages pkgconfig scons ;
 
 	# devel packages for mandatory packages
 	local architectureObject ;
