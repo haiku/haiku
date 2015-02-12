@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.02.01
-# Date:    2015-02-01 20:34:05
+# Version: 2015.02.03
+# Date:    2015-02-03 20:34:06
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -16860,7 +16860,13 @@
 	0011  MTi-100 IMU
 	0012  MTi-200 VRU
 	0013  MTi-300 AHRS
-	0017  MTi-G-700 GPS INS
+	0017  MTi-G 7xx GNSS/INS
+	0100  Body Pack
+	0101  Awinda Station
+	0102  Awinda Dongle
+	0103  Sync Station
+	0200  MTw
+	d00d  Wireless Receiver
 2650  Electronics For Imaging, Inc. [hex]
 2659  Sundtek
 	1101  TNT DVB-T/DAB/DAB+/FM
