@@ -1,7 +1,16 @@
+/*
+ * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler <axeld@pinc-software.de>
+ *		Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Alex Wilson <yourpalal2@gmail.com>
+ */
+
 /*!
 \page compatibility Application Level API Incompatibilities with BeOS
-
-\author Ingo Weinhold
 
 Haiku R1 (x86) was designed and is being implemented to be binary and source
 compatible with applications written for BeOS R5 (x86) to a large extent, but
