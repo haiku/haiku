@@ -32,7 +32,7 @@
 /*!
 	\var B_STRING_SPACING
 
-	Optimizes the position of each character within it's space. Collisions
+	Optimizes the position of each character within its space. Collisions
 	are unlikely but characters may touch each other. Best mode to use when
 	the screen needs to match what appears on the printed page.
 
@@ -898,7 +898,7 @@
 \endcode
 
 	You can change the way a font renders with the SetFamilyAndStyle(),
-	SetFamilyAndFace(), SetSize(), SetShear(), SetRotation(), 
+	SetFamilyAndFace(), SetSize(), SetShear(), SetRotation(),
 	SetFalseBoldWidth(), SetSpacing(), SetEncoding(), SetFace(), and
 	SetFlags() methods.
 

@@ -970,7 +970,7 @@ SetViewColor(Parent()->ViewColor());
 	\brief Hook method called when the view receives a \c B_PULSE
 	       message.
 
-	An action is performed each time the App Server calls the Pulse() method. 
+	An action is performed each time the App Server calls the Pulse() method.
 	The pulse rate is set by SetPulseRate(). You can implement Pulse() to do
 	anything you want. The default version does nothing. The pulse granularity
 	is no better than once per 100,000 microseconds.
@@ -1393,7 +1393,7 @@ SetViewColor(Parent()->ViewColor());
 	\param cursor The BCursor object to assign to the view.
 	\param sync If \c true App Server is synchronized immediately forcing the
 	       change to occur. If \c false, the change will be put in the queue and
-	       will take effect when the pending requests are processed. 
+	       will take effect when the pending requests are processed.
 
 	\since BeOS R5
 */
@@ -3712,7 +3712,7 @@ SetViewColor(Parent()->ViewColor());
 	\brief Adds \a child to the view hierarchy immediately before \a before.
 
 	A view may only have one parent at a time so \a child must not have already
-	been added to the view hierarchy. if \a before \c NULL then \a child is added
+	been added to the view hierarchy. If \a before is \c NULL then \a child is added
 	to the end of the tree. If the view is attached to a window \a child and all
 	of its descendent views also become attached to the window invoking an
 	AttachedToWindow() method on each view.
