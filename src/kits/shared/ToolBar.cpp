@@ -49,15 +49,20 @@ BToolBar::BToolBar(BRect frame, orientation ont)
 	BGroupView(ont),
 	fOrientation(ont)
 {
-	float inset = ceilf(be_control_look->DefaultItemSpacing() / 2);
-	GroupLayout()->SetInsets(inset, 0, inset, 0);
-	GroupLayout()->SetSpacing(1);
-
-	SetFlags(Flags() | B_FRAME_EVENTS | B_PULSE_NEEDED);
+	_Init();
 
 	MoveTo(frame.LeftTop());
 	ResizeTo(frame.Width(), frame.Height());
 	SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+}
+
+
+BToolBar::BToolBar(orientation ont)
+	:
+	BGroupView(ont),
+	fOrientation(ont)
+{
+	_Init();
 }
 
 
@@ -98,7 +103,7 @@ BToolBar::AddAction(BMessage* message, BHandler* target,
 	button->SetFlat(true);
 	if (toolTipText != NULL)
 		button->SetToolTip(toolTipText);
-	_AddView(button);
+	AddView(button);
 	button->SetTarget(target);
 }
 
@@ -108,7 +113,7 @@ BToolBar::AddSeparator()
 {
 	orientation ont = (fOrientation == B_HORIZONTAL) ?
 		B_VERTICAL : B_HORIZONTAL;
-	_AddView(new BSeparatorView(ont, B_PLAIN_BORDER));
+	AddView(new BSeparatorView(ont, B_PLAIN_BORDER));
 }
 
 
@@ -116,6 +121,13 @@ void
 BToolBar::AddGlue()
 {
 	GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
+}
+
+
+void
+BToolBar::AddView(BView* view)
+{
+	GroupLayout()->AddView(view);
 }
 
 
@@ -150,6 +162,9 @@ BToolBar::SetActionVisible(uint32 command, bool visible)
 }
 
 
+// #pragma mark - Private methods
+
+
 void
 BToolBar::Pulse()
 {
@@ -170,9 +185,13 @@ BToolBar::FrameResized(float width, float height)
 
 
 void
-BToolBar::_AddView(BView* view)
+BToolBar::_Init()
 {
-	GroupLayout()->AddView(view);
+	float inset = ceilf(be_control_look->DefaultItemSpacing() / 2);
+	GroupLayout()->SetInsets(inset, 0, inset, 0);
+	GroupLayout()->SetSpacing(1);
+
+	SetFlags(Flags() | B_FRAME_EVENTS | B_PULSE_NEEDED);
 }
 
 

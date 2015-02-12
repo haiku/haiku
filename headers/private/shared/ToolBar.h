@@ -16,6 +16,7 @@ class BToolBar : public BGroupView {
 public:
 								BToolBar(BRect frame,
 										 orientation ont = B_HORIZONTAL);
+								BToolBar(orientation ont = B_HORIZONTAL);
 	virtual						~BToolBar();
 
 	virtual	void				Hide();
@@ -30,6 +31,7 @@ public:
 									bool lockable = false);
 			void				AddSeparator();
 			void				AddGlue();
+			void				AddView(BView* view);
 
 			void				SetActionEnabled(uint32 command, bool enabled);
 			void				SetActionPressed(uint32 command, bool pressed);
@@ -39,7 +41,7 @@ private:
 	virtual	void				Pulse();
 	virtual	void				FrameResized(float width, float height);
 
-			void				_AddView(BView* view);
+			void				_Init();
 			BButton*			_FindButton(uint32 command) const;
 			void				_HideToolTips() const;
 
