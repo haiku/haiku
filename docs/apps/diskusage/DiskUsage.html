@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head> 
+<title>DiskUsage</title>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+</head>
+<body style="background-color: #ffffff;"> 
+ 
+<br /> 
+<br /> 
+<h2><img src="icon.png" alt="DiskUsage icon" />&nbsp;<code>DiskUsage</code><br />Volume Utilization Visualizer</h2> 
+ 
+<hr /> 
+ 
+ 
+<h3>What is it?</h3> 
+ 
+<p><code>DiskUsage</code> shows a graphical representation of how the space on your volumes is utilized.  It uses concentric circles to represent different levels in the file system hierarchy.  It is useful for answering the question, "Where has all my disk space gone?"  And sometimes it's fun just to look at the pictures.
+</p>
+
+<p>Here is a picture of <code>DiskUsage</code> in action, so to speak.</p> 
+ 
+<p style="text-align:center;"><img src="home.png" alt="DiskUsage home" /></p> 
+ 
+<p>The circle in the middle represents my <code>/boot/home</code> directory. Each segment of the ring immediately outside that circle represents a file or directory within <code>/boot/home</code>.  And so on.
+</p> 
+ 
+<h3>Usage</h3> 
+
+<p>
+<strong>Startup.</strong>  You can launch <code>DiskUsage</code> from the <code>Tracker</code>, either directly or by dropping a volume or folder on its icon; or from the <code>Terminal</code>, optionally passing the names of one or more files or folders as arguments.  If you launch <code>DiskUsage</code> without specifying a volume, it will wait until you drop one or more volumes or folders on its window or select a volume from the menu.
+</p> 
+
+<p> 
+While <code>DiskUsage</code> is scanning a volume, it displays a status bar showing its progress.  Multiple volumes are scanned in parallel (each in its own thread).  You can view the progress on a volume by selecting that volume from the menu.
+</p> 
+
+<p> 
+<strong>The main display.</strong>  When <code>DiskUsage</code> finishes scanning a volume, it displays a graphical representation of the volume's files and directories.  As you move the mouse over each part of the picture, information about each file or directory appears in the area at the bottom of the window. You can resize the window to increase or decrease the number of levels that <code>DiskUsage</code> displays.
+</p> 
+
+<p> 
+<strong>Zooming.</strong>  You can "zoom" in on a directory by clicking the primary mouse button on it.  The picture is redrawn with that directory in the center circle.  You can zoom out one level by clicking the center circle.  At the outermost level, the center circle represents the volume itself, showing free and used space as pie slices.
+</p> 
+
+<p> 
+<strong>Pop-up menu.</strong>  Clicking the secondary mouse button on a part of the picture pops up a menu with <code>Tracker</code>-like options applicable to that file or directory.  For directories, the menu includes an option to rescan that directory and its subdirectories (not the entire volume).  This is useful since <code>DiskUsage</code> does not monitor changes to the file system.
+</p> 
+
+<p>
+<strong>Drag-and-drop.</strong>  You can drag files and directories from <code>DiskUsage</code> to other applications (or to the desktop, the trash, etc.) with the primary mouse button.  You can drop volumes and folders on <code>DiskUsage</code>'s window to zoom directly to them.
+</p> 
+
+<p> 
+<strong>Other controls.</strong>  The buttons in the top right corner of the <code>DiskUsage</code> window rescan the selected volume and display the documentation (this file).
+</p> 
+ 
+<p><strong>Notes:</strong></p> 
+ 
+<ul> 
+
+<li> If the graphical representation of a file or directory comprises less than about two degrees of a circle, it is excluded from the display.</li>
+
+<li> The number of files that <code>DiskUsage</code> reports for a directory includes files in subdirectories too.  A directory counts as a file.</li>
+ 
+<li> <code>DiskUsage</code> ignores symbolic links.</li>
+ 
+<li> If you don't like the colors <code>DiskUsage</code> uses, you can change them with your favorite resource editor.</li>
+
+</ul> 
+ 
+ 
+<h3>Credits, etc.</h3> 
+
+<p>
+Thanks to Steffen Gerlach for creating the Windows <a href="http://www.steffengerlach.de/freeware/index.html" title="Website of Steffen Gerlach">Scanner</a> utility, from which I took the idea for using concentric circles to represent disk usage.
+</p> 
+
+<p>
+Thanks to the <a href="http://www.vim.org/" title="Vim home page">Vim</a> development team for creating the best programmer's editor on the planet, with which <code>DiskUsage</code>'s original code and documentation were lovingly hand-crafted.
+</p>
+
+<p>
+Thanks to the folks at <u><span style="color:#0000ff;">B</span><span style="color:#ff0000;">e</span></u> for creating such a kick-butt OS.  It has made programming fun again.
+</p>
+
+<p>
+Thanks to Mike Steed for doing the programming.  All the code is original.
+</p> 
+
+<p>
+<code>DiskUsage</code> used to be called <code>guido</code> by it's original author. The name <code>guido</code> originated from GUI + <code>du</code> -- the command-line disk usage utility.  Plus, one of his favorite languages, <a href="http://www.python.org/" title="Python home page">Python</a>, was created by a fine programmer named Guido.
+</p>
+ 
+<h3>Known problems</h3> 
+ 
+<ul> 
+ 
+<li> You can drop multiple volumes or folders on the icon, but <code>DiskUsage</code> sees only one of them.  Why?</li>
+ 
+<li> Dropping a floppy disk volume on <code>DiskUsage</code>'s window works, but dropping it on the icon does not work (unless you force it by holding the Ctrl key while you drag).  <em>Why?!</em></li>
+ 
+</ul> 
+ 
+ 
+<h3>License</h3> 
+
+<p>
+<code>DiskUsage</code> is Copyright &copy; 1999 Mike Steed.  You are free to use and distribute this software as long as it is accompanied by this documentation and copyright notice.  The software comes with no warranty, etc.
+</p> 
+ 
+<hr /> 
+ 
+</body> 
+</html>
