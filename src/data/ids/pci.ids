@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.02.05
-#	Date:    2015-02-05 03:15:01
+#	Version: 2015.02.12
+#	Date:    2015-02-12 03:15:01
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -3491,6 +3491,7 @@
 	0160  64bit/66MHz PCI ATM 155 MMF
 	016e  GXT4000P Graphics Adapter
 	0170  GXT6000P Graphics Adapter
+		1092 0172  Fire GL2
 	017d  GXT300P Graphics Adapter
 	0180  Snipe chipset SCSI controller
 		1014 0241  iSeries 2757 DASD IOA
@@ -9664,6 +9665,7 @@
 		1025 0821  GeForce GT 720M
 		1025 0823  GeForce GT 720M
 		1025 0830  GeForce GT 720M
+		1025 0833  GeForce GT 720M
 		1025 0837  GeForce GT 720M
 		1025 083e  GeForce 820M
 		1025 0841  GeForce 710M
@@ -9680,8 +9682,18 @@
 		1025 087c  GeForce 810M
 		1025 0881  GeForce 820M
 		1025 088a  GeForce 820M
+		1025 089b  GeForce 820M
 		1025 090f  GeForce 820M
 		1025 0921  GeForce 820M
+		1025 092e  GeForce 810M
+		1025 092f  GeForce 820M
+		1025 093a  GeForce 820M
+		1025 093c  GeForce 820M
+		1025 093f  GeForce 820M
+		1025 0941  GeForce 820M
+		1025 0945  GeForce 820M
+		1025 0954  GeForce 820M
+		1025 0965  GeForce 820M
 		1028 054d  GeForce GT 630M
 		1028 054e  GeForce GT 630M
 		1028 0554  GeForce GT 620M
@@ -9744,6 +9756,15 @@
 		1043 227a  GeForce 820M
 		1043 228a  GeForce 820M
 		1043 8595  GeForce GT 720M
+		1043 85ea  GeForce GT 720M
+		1043 85eb  GeForce 820M
+		1043 85ec  GeForce 820M
+		1043 85ee  GeForce GT 720M
+		1043 85f3  GeForce 820M
+		1043 860e  GeForce 820M
+		1043 861a  GeForce 820M
+		1043 861b  GeForce 820M
+		1043 8628  GeForce 820M
 		1072 152d  GeForce GT 720M
 		10cf 17f5  GeForce GT 720M
 		1179 fa01  GeForce 710M
@@ -10211,6 +10232,7 @@
 		103c 1909  ZBook 15
 	5288  RTS5288 PCI Express Card Reader
 	5289  RTL8411 PCI Express Card Reader
+		1043 1457  K55A Laptop
 	8029  RTL-8029(AS)
 		10b8 2011  EZ-Card (SMC1208)
 		10ec 8029  RTL-8029(AS)
@@ -17552,6 +17574,12 @@
 	6302  XMC Module with user-configurable Virtex-6 FPGA, 365k logic cells, SFP front I/O
 	6303  XMC Module with user-configurable Virtex-6 FPGA, 240k logic cells, no front I/O
 	6304  XMC Module with user-configurable Virtex-6 FPGA, 365k logic cells, no front I/O
+	7000  XMC-7K325F: User-configurable Kintex-7 FPGA, 325k logic cells plus SFP front I/O
+	7001  XMC-7K410F: User-configurable Kintex-7 FPGA, 410k logic cells plus SFP front I/O
+	7002  XMC-7K325AX: User-Configurable Kintex-7 FPGA, 325k logic cells with AXM Plug-In I/O
+	7003  XMC-7K410AX: User-Configurable Kintex-7 FPGA, 410k logic cells with AXM Plug-In I/O
+	7004  XMC-7K325CC: User-Configurable Kintex-7 FPGA, 325k logic cells, conduction-cooled
+	7005  XMC-7K410CC: User-Configurable Kintex-7 FPGA, 410k logic cells, conduction-cooled
 16da  Advantech Co., Ltd.
 	0011  INES GPIB-PCI
 16df  PIKA Technologies Inc.
@@ -18879,6 +18907,9 @@
 1cf7  Subspace Dynamics
 # CEM Solutions Pvt. Ltd.
 1d21  Allo
+1d26  Kalray Inc.
+	0040  Turbocard2 Accelerator
+	e004  AB01/EMB01 Development Board
 1d44  DPT
 	a400  PM2x24/PM3224
 1d5c  Fantasia Trading LLC
@@ -20090,6 +20121,7 @@
 	0a22  Haswell-ULT Integrated Graphics Controller
 	0a26  Haswell-ULT Integrated Graphics Controller
 	0a2a  Haswell-ULT Integrated Graphics Controller
+	0a2e  Haswell-ULT Integrated Graphics Controller
 	0be0  Atom Processor D2xxx/N2xxx Integrated Graphics Controller
 	0be1  Atom Processor D2xxx/N2xxx Integrated Graphics Controller
 		105b 0d7c  D270S/D250S Motherboard
