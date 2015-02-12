@@ -1,12 +1,12 @@
 /*!
 \page midi1 The old Midi Kit (libmidi.so)
 
-The old Midi Kit, or midi1 for short, goes all the way back to DR8, when the 
+The old Midi Kit, or midi1 for short, goes all the way back to DR8, when the
 BeOS only ran on BeBoxen. Fortunately for us, it is pretty well documented:
 
-- <A HREF="http://bang.dhs.org/be/bebook/The%20Midi%20Kit/index.html">Midi 
+- <A HREF="https://www.haiku-os.org/legacy-docs/bebook/TheMidiKit_Overview.html">Midi
 Kit chapter in the online Be Book</A>
-- <A HREF="http://web.archive.org/web/20010618100542/www-classic.be.com/developers/developer_library/midi_kit.html">Midi 
+- <A HREF="http://web.archive.org/web/20010618100542/www-classic.be.com/developers/developer_library/midi_kit.html">Midi
 Kit section of the old Be Developer Library</A>
 - Be Newsletter Volume 1, Issue 49 - Introduces the MIDI synth
 - Be Newsletter Volume 1, Issue 52 - Follow-up on issue 49
@@ -31,7 +31,7 @@ The following classes let you use the Midi Kit's General MIDI synthesizer:
 - BMidiSynthFile connects a MIDI file to the synth
 - BSamples lets you access the synth's sound data stream
 
-To make MIDI data stream through your application, you create a "network" of 
+To make MIDI data stream through your application, you create a "network" of
 BMidi-derived objects that send and receive MIDI messages.
 
 The old Midi Kit is slowly fading into obscurity. You may want to use the
@@ -42,7 +42,7 @@ the BeBook says, but usually for the better.
 Especially the synth classes are not completely functional, but enough to
 play back General MIDI tunes. They should be backwards compatible with the
 majority of BeOS MIDI applications. Not all methods of BSynth, BMidiSynth,
-and BMidiSynthFile are implemented because some of them are rather obscure. 
-BSamples is a complete no-op; in other words, with the Haiku Midi Kit 
+and BMidiSynthFile are implemented because some of them are rather obscure.
+BSamples is a complete no-op; in other words, with the Haiku Midi Kit
 you cannot push waveform data into the output stream of the softsynth.
 */
