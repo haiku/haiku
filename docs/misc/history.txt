@@ -1,0 +1,50 @@
+In 1990, ex-Apple employees Jean-Louis Gassée and Steve Sakoman created a
+company: Be Incorporated. It was founded with a purpose in mind: to create
+a powerful, elegant, media-oriented, friendly computer that addressed the
+user's needs. They manufactured a product to tackle these goals head-on: a
+personal computer called the BeBox. This computer and its operating system,
+the BeOS, were first presented at Agenda 95 in October, 1995. The audience
+was elated.
+
+The BeBox and BeOS had features that were never before seen in the world of
+personal computing. The BeBox contained two processors and three additional
+chips dedicated to sound processing to provide a fast platform for video
+and audio. In the back of the BeBox was a feature of particular interest
+to computer enthusiasts and developers -- the GeekPort, which was a multi-
+purpose port intended for experimentation.
+
+The operating system, BeOS, was equally packed with features. Its design
+was attractive to many and its yellow tabbed windows distinguished it from
+the Macintosh and regular PCs. For many people, it was an operating system
+that was easy to fall in love with.
+
+Unfortunately, Be, Inc. abandoned its stake in the hardware market because
+of low sales and hardware supply problems. The BeOS was then modified to work
+on Apple Macintosh systems in 1997 and again to regular PCs in 1998. Although
+it had many enthusiastic users and developers, it never gained a significant
+market share for a variety of reasons which included a lack of third party
+programs, hardware support, and Microsoft's business tactics. In 2000,
+BeOS saw its fifth release in two versions: a Pro Edition and a Personal
+Edition. The Personal Edition didn't have quite as much software included
+as the Pro Edition, but it was free for anyone to download. This undermined
+the sales of the Pro Edition, increasing Be's financial difficulties.
+
+The company shifted its focus to attempt to use BeOS in Internet appliances.
+Some claim that this decision eroded the credibility of BeOS as a viable
+alternative to Windows or Linux. Be, Inc. filed for bankruptcy in 2001
+and soon after sold its intellectual property to Palm, Inc.
+
+Be, Inc. left behind a legacy: a community of dedicated and loyal users
+who continued to use BeOS despite the demise of its parent company. Some
+people added support for newer hardware and others wrote software to keep it
+current.
+
+Others wanted to recreate the entire operating system. Michael Phipps was
+one of them and in August 2001, he founded one of several projects started
+with the intention of reviving BeOS. The project was called OpenBeOS. Not
+only was OpenBeOS going to rewrite the operating system, but it also had the
+ambitious goal of writing it so that programs written for BeOS would run
+unmodified on the new software. In June of the following year, OpenBeOS held
+a convention in Columbus, Ohio where talks were given and a new name for the
+project was announced: Haiku. The rest, as is often said, is history.
+
