@@ -62,7 +62,7 @@ All rights reserved.
 const float kHPad = 8.0f;
 const float kVPad = 1.0f;
 const float kLabelOffset = 8.0f;
-const float kSwitchWidth = 12;
+const float kSwitchWidth = 12.0f;
 
 
 TTeamMenuItem::TTeamMenuItem(BList* team, BBitmap* icon, char* name, char* sig,
@@ -319,14 +319,14 @@ TTeamMenuItem::DrawContentLabel()
 		float offset = penloc.x - frame.left;
 		if (cachedWidth + offset > max) {
 			truncLabel = (char*)malloc(strlen(label) + 4);
-			if (!truncLabel)
+			if (truncLabel == NULL)
 				return;
 			TruncateLabel(max-offset, truncLabel);
 			label = truncLabel;
 		}
 	}
 
-	if (!label)
+	if (label == NULL)
 		label = Label();
 
 	bool canHandle = !fBarView->Dragging()
