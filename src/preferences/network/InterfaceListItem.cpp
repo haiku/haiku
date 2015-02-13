@@ -51,7 +51,7 @@ InterfaceListItem::~InterfaceListItem()
 
 
 void
-InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
+InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 {
 	BOutlineListView* list = dynamic_cast<BOutlineListView*>(owner);
 	if (list == NULL)
@@ -59,9 +59,6 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 	owner->PushState();
 
-	BRect bounds = list->ItemFrame(list->IndexOf(this));
-
-	//rgb_color highColor = list->HighColor();
 	rgb_color lowColor = list->LowColor();
 
 	if (IsSelected() || complete) {
@@ -169,7 +166,7 @@ InterfaceListItem::Update(BView* owner, const BFont* font)
 
 	_UpdateState();
 
-	SetWidth(fIcon->Bounds().Width() + 24
+	SetWidth(fIcon->Bounds().Width() + 44
 		+ be_bold_font->StringWidth(fDeviceName.String())
 		+ owner->StringWidth(_StateText()));
 	SetHeight(std::max(3 * lineHeight + 4, fIcon->Bounds().Height() + 8));
