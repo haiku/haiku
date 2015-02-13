@@ -1,0 +1,15 @@
+resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;
+
+resource app_signature "application/x-vnd.moon-Flanger.media_addon";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_DEVELOPMENT,
+	internal = 0,
+
+	short_info = "Flanger.media_addon",
+	long_info = "Flanger node add-on"
+};

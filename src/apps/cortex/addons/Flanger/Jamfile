@@ -2,6 +2,9 @@ SubDir HAIKU_TOP src apps cortex addons Flanger ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps cortex addons common ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps cortex addons common ] ;
+
+AddResources cortex_flanger.media_addon : Resource.rdef ;
+
 Addon cortex_flanger.media_addon :
 	FlangerApp.cpp
 	FlangerAddOn.cpp
@@ -11,5 +14,4 @@ Addon cortex_flanger.media_addon :
 	RawBuffer.cpp
 	SoundUtils.cpp
 	: be media [ TargetLibsupc++ ]
-	: Resource.rsrc
 ;
