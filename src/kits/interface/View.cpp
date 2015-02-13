@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -699,12 +699,13 @@ BView::~BView()
 {
 	STRACE(("BView(%s)::~BView()\n", this->Name()));
 
-	if (fOwner) {
+	if (fOwner != NULL) {
 		debugger("Trying to delete a view that belongs to a window. "
 			"Call RemoveSelf first.");
 	}
 
-	RemoveSelf();
+	_RemoveLayoutItemsFromLayout(true);
+	_RemoveSelf();
 
 	if (fToolTip != NULL)
 		fToolTip->ReleaseReference();
@@ -4152,17 +4153,7 @@ BView::PreviousSibling() const
 bool
 BView::RemoveSelf()
 {
-	if (fParent && fParent->fLayoutData->fLayout) {
-		int32 itemsRemaining = fLayoutData->fLayoutItems.CountItems();
-		while (itemsRemaining-- > 0) {
-			BLayoutItem* item = fLayoutData->fLayoutItems.ItemAt(0);
-				// always remove item at index 0, since items are shuffled
-				// downwards by BObjectList
-			item->Layout()->RemoveItem(item);
-				// removes item from fLayoutItems list
-			delete item;
-		}
-	}
+	_RemoveLayoutItemsFromLayout(false);
 
 	return _RemoveSelf();
 }
@@ -4198,6 +4189,23 @@ BView::_RemoveSelf()
 	STRACE(("DONE: BView(%s)::_RemoveSelf()\n", Name()));
 
 	return true;
+}
+
+
+void
+BView::_RemoveLayoutItemsFromLayout(bool deleteItems)
+{
+	if (fParent == NULL || fParent->fLayoutData->fLayout == NULL)
+		return;
+
+	int32 index = fLayoutData->fLayoutItems.CountItems();
+	while (index-- > 0) {
+		BLayoutItem* item = fLayoutData->fLayoutItems.ItemAt(index);
+		item->Layout()->RemoveItem(item);
+			// Removes item from fLayoutItems list
+		if (deleteItems)
+			delete item;
+	}
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_VIEW_H
@@ -106,6 +106,7 @@ inline uint32 _rule_(uint32 r1, uint32 r2, uint32 r3, uint32 r4)
 #define B_FOLLOW_BOTTOM		_rule_(_VIEW_BOTTOM_, 0, _VIEW_BOTTOM_, 0)
 #define B_FOLLOW_TOP_BOTTOM	_rule_(_VIEW_TOP_, 0, _VIEW_BOTTOM_, 0)
 #define B_FOLLOW_V_CENTER	_rule_(_VIEW_CENTER_, 0, _VIEW_CENTER_, 0)
+
 
 class BBitmap;
 class BCursor;
@@ -693,6 +694,7 @@ private:
 
 			bool				_AddChild(BView *child, BView *before);
 			bool				_RemoveSelf();
+			void				_RemoveLayoutItemsFromLayout(bool deleteItems);
 
 	// Debugging methods
 			void 				_PrintToStream();
