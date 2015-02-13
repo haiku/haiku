@@ -58,7 +58,9 @@ public:
 									float height = -1.0f);
 	virtual						~TTeamMenuItem();
 
-			status_t			Invoke(BMessage* msg = NULL);
+	virtual	void				SetLabel(const char* label);
+
+			status_t			Invoke(BMessage* message = NULL);
 
 			void				SetOverrideWidth(float width)
 									{ fOverrideWidth = width; };
@@ -88,7 +90,6 @@ protected:
 			void				GetContentSize(float* width, float* height);
 			void				Draw();
 			void				DrawContent();
-			void				DrawContentLabel();
 			void				DrawExpanderArrow();
 
 private:

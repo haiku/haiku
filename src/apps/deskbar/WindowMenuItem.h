@@ -47,45 +47,49 @@ class BBitmap;
 // sub of TeamMenuItem all DB positions
 class TWindowMenuItem : public BMenuItem {
 public:
-								TWindowMenuItem(const char* title, int32 id,
+								TWindowMenuItem(const char* label, int32 id,
 									bool mini, bool currentWorkSpace,
 									bool dragging = false);
 
-			void				ExpandedItem(bool state);
-			void				SetTo(const char* title, int32 id, bool mini,
+			void				SetTo(const char* label, int32 id, bool mini,
 									bool currentWorkSpace,
 									bool dragging = false);
-			int32				ID();
-			void				SetRequireUpdate();
-			bool				RequiresUpdate();
-			bool				ChangedState();
 
-	virtual	void				SetLabel(const char* string);
-			const char*			FullTitle() const;
+			int32				ID();
+			const char*			Name() const { return fName; };
+
+			bool				Expanded() { return fExpanded; };
+			void				SetExpanded(bool expand) { fExpanded = expand; };
+
+			bool				RequiresUpdate() { return fRequireUpdate; };
+			void				SetRequireUpdate(bool update) { fRequireUpdate = update; };
+
+			bool				ChangedState();
 
 	static	int32				InsertIndexFor(BMenu* menu, int32 startIndex,
 									TWindowMenuItem* item);
 
 protected:
-			void				Initialize(const char* title);
 	virtual void				GetContentSize(float* width, float* height);
 	virtual void				DrawContent();
 	virtual status_t			Invoke(BMessage* message = NULL);
 	virtual void				Draw();
 
 private:
+			void				_Init(const char* label);
+
 			int32				fID;
 			bool				fMini;
 			bool				fCurrentWorkSpace;
 			const BBitmap*		fBitmap;
-			float				fTitleWidth;
-			float				fTitleAscent;
-			float				fTitleDescent;
+			float				fLabelWidth;
+			float				fLabelAscent;
+			float				fLabelDescent;
 			bool				fDragging;
 			bool				fExpanded;
 			bool				fRequireUpdate;
 			bool				fModified;
-			BString				fFullTitle;
+			const char*			fName;
 };
 
 

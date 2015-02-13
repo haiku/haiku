@@ -368,10 +368,10 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					&& fBarView->ExpandoState() && item->IsExpanded()) {
 					// expando mode window menu item
 					fLastMousedOverItem = menuItem;
-					if (strcmp(windowMenuItem->Label(),
-							windowMenuItem->FullTitle()) != 0) {
+					if (strcasecmp(windowMenuItem->Label(),
+							windowMenuItem->Name()) > 0) {
 						// label is truncated, set tooltip
-						SetToolTip(windowMenuItem->FullTitle());
+						SetToolTip(windowMenuItem->Name());
 					} else
 						SetToolTip((const char*)NULL);
 
@@ -946,7 +946,7 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 			for (int32 i = 0; i < totalItems; i++) {
 				if (!teamMenu->SubmenuAt(i)) {
 					item = static_cast<TWindowMenuItem*>(teamMenu->ItemAt(i));
-					item->SetRequireUpdate();
+					item->SetRequireUpdate(true);
 				}
 			}
 
@@ -986,7 +986,7 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 										((1 << current_workspace())
 											& wInfo->workspaces) != 0);
 
-									if (strcmp(wInfo->name, item->Label()) != 0)
+									if (strcasecmp(item->Label(), wInfo->name) > 0)
 										item->SetLabel(wInfo->name);
 
 									if (item->ChangedState())
@@ -997,7 +997,7 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 										wInfo->server_token, wInfo->is_mini,
 										((1 << current_workspace())
 											& wInfo->workspaces) != 0, false);
-									item->ExpandedItem(true);
+									item->SetExpanded(true);
 									teamMenu->AddItem(item,
 										TWindowMenuItem::InsertIndexFor(
 											teamMenu, i + 1, item));

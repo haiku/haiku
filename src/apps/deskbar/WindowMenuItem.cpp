@@ -55,51 +55,28 @@ All rights reserved.
 const float kHPad = 10.0f;
 const float kVPad = 2.0f;
 const float kLabelOffset = 8.0f;
+
 const BRect kIconRect(1.0f, 1.0f, 13.0f, 14.0f);
 
 
-TWindowMenuItem::TWindowMenuItem(const char* title, int32 id, bool mini,
-		bool currentWorkspace, bool dragging)
+TWindowMenuItem::TWindowMenuItem(const char* label, int32 id, bool mini,
+	bool currentWorkspace, bool dragging)
 	:
-	BMenuItem(title, NULL),
+	BMenuItem(label, NULL),
 	fID(id),
 	fMini(mini),
 	fCurrentWorkSpace(currentWorkspace),
 	fDragging(dragging),
 	fExpanded(false),
 	fRequireUpdate(false),
-	fModified(false),
-	fFullTitle("")
+	fModified(false)
 {
-	Initialize(title);
+	_Init(label);
 }
 
 
 void
-TWindowMenuItem::Initialize(const char* title)
-{
-	if (fMini) {
-		fBitmap = fCurrentWorkSpace
-			? AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowHiddenIcon)
-			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowHiddenSwitchIcon);
-	} else {
-		fBitmap = fCurrentWorkSpace
-			? AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownIcon)
-			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownSwitchIcon);
-	}
-
-	BFont font(be_plain_font);
-	fTitleWidth = ceilf(font.StringWidth(title));
-	fFullTitle = title;
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
-	fTitleAscent = ceilf(fontHeight.ascent);
-	fTitleDescent = ceilf(fontHeight.descent + fontHeight.leading);
-}
-
-
-void
-TWindowMenuItem::SetTo(const char* title, int32 id, bool mini,
+TWindowMenuItem::SetTo(const char* label, int32 id, bool mini,
 	bool currentWorkspace, bool dragging)
 {
 	fModified = fCurrentWorkSpace != currentWorkspace || fMini != mini;
@@ -110,7 +87,7 @@ TWindowMenuItem::SetTo(const char* title, int32 id, bool mini,
 	fDragging = dragging;
 	fRequireUpdate = false;
 
-	Initialize(title);
+	_Init(label);
 }
 
 
@@ -121,32 +98,6 @@ TWindowMenuItem::ChangedState()
 }
 
 
-void
-TWindowMenuItem::SetLabel(const char* string)
-{
-	fFullTitle = string;
-	BString truncatedTitle = fFullTitle;
-
-	if (fExpanded && Menu()) {
-		BPoint contLoc = ContentLocation() + BPoint(kHPad, kVPad);
-		contLoc.x += kIconRect.Width() + kLabelOffset;
-
-		be_plain_font->TruncateString(&truncatedTitle, B_TRUNCATE_MIDDLE,
-			Frame().Width() - contLoc.x - 3.0f);
-	}
-
-	if (strcmp(Label(), truncatedTitle.String()) != 0)
-		BMenuItem::SetLabel(truncatedTitle.String());
-}
-
-
-const char*
-TWindowMenuItem::FullTitle() const
-{
-	return fFullTitle.String();
-}
-
-
 /*static*/ int32
 TWindowMenuItem::InsertIndexFor(BMenu* menu, int32 startIndex,
 	TWindowMenuItem* newItem)
@@ -154,9 +105,10 @@ TWindowMenuItem::InsertIndexFor(BMenu* menu, int32 startIndex,
 	for (int32 index = startIndex;; index++) {
 		TWindowMenuItem* item
 			= dynamic_cast<TWindowMenuItem*>(menu->ItemAt(index));
-		if (item == NULL || NaturalCompare(item->FullTitle(),
-				newItem->FullTitle()) > 0)
+		if (item == NULL
+			|| NaturalCompare(item->Label(), newItem->Label()) > 0) {
 			return index;
+		}
 	}
 }
 
@@ -173,7 +125,7 @@ TWindowMenuItem::GetContentSize(float* width, float* height)
 {
 	if (width != NULL) {
 		if (!fExpanded) {
-			*width = kHPad + fTitleWidth + kHPad;
+			*width = kHPad + fLabelWidth + kHPad;
 			if (fID >= 0)
 				*width += fBitmap->Bounds().Width() + kLabelOffset;
 		} else
@@ -187,7 +139,7 @@ TWindowMenuItem::GetContentSize(float* width, float* height)
 
 	if (height != NULL) {
 		*height = (fID >= 0) ? fBitmap->Bounds().Height() : 0.0f;
-		float labelHeight = fTitleAscent + fTitleDescent;
+		float labelHeight = fLabelAscent + fLabelDescent;
 		*height = (labelHeight > *height) ? labelHeight : *height;
 		*height += kVPad * 2;
 	}
@@ -228,13 +180,18 @@ TWindowMenuItem::Draw()
 
 	if (IsEnabled() && IsSelected() && !menu->IsRedrawAfterSticky()) {
 		// fill
-		menu->SetHighColor(tint_color(menuColor,
-			B_HIGHLIGHT_BACKGROUND_TINT));
+		rgb_color backColor = tint_color(menuColor,
+			B_HIGHLIGHT_BACKGROUND_TINT);
+		menu->SetLowColor(backColor);
+		menu->SetHighColor(backColor);
 		menu->FillRect(frame);
-	} else
+	} else {
 		menu->SetLowColor(menuColor);
+		menu->SetHighColor(menuColor);
+	}
 
 	DrawContent();
+
 	menu->PopState();
 }
 
@@ -243,18 +200,12 @@ void
 TWindowMenuItem::DrawContent()
 {
 	BMenu* menu = Menu();
-	menu->PushState();
-
-	BRect frame(Frame());
 	BPoint contLoc = ContentLocation() + BPoint(kHPad, kVPad);
-	//if (fExpanded)
-	//	contLoc.x += kHPad;
 
 	if (fID >= 0) {
 		menu->SetDrawingMode(B_OP_OVER);
 
 		float width = fBitmap->Bounds().Width();
-
 		if (width > 16)
 			contLoc.x -= 8;
 
@@ -266,22 +217,40 @@ TWindowMenuItem::DrawContent()
 
 		contLoc.x += kIconRect.Width() + kLabelOffset;
 	}
+	contLoc.y += fLabelAscent;
 
 	menu->SetDrawingMode(B_OP_COPY);
-
-	contLoc.y = frame.top
-		+ ((frame.Height() - fTitleAscent - fTitleDescent) / 2) + 1.0f;
-
 	menu->MovePenTo(contLoc);
+
+	float cachedWidth = menu->StringWidth(Label());
+	const char* label = Label();
+	char* truncLabel = NULL;
+	float maxWidth = menu->MaxContentWidth() - kVPad * 2;
+	if (maxWidth > 0) {
+		float offset = menu->PenLocation().x - Frame().left;
+		if (cachedWidth + offset > maxWidth) {
+			truncLabel = (char*)malloc(strlen(label) + 4);
+			if (truncLabel == NULL)
+				return;
+
+			TruncateLabel(maxWidth - offset, truncLabel);
+			label = truncLabel;
+		}
+	}
+
+	if (label == NULL)
+		label = Label();
+
+	SetLabel(label);
 
 	if (IsSelected())
 		menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
 	else
 		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
-	BMenuItem::DrawContent();
+	menu->DrawString(label);
 
-	menu->PopState();
+	free(truncLabel);
 }
 
 
@@ -314,25 +283,29 @@ TWindowMenuItem::Invoke(BMessage* /*message*/)
 }
 
 
+//	#pragma mark - private methods
+
+
 void
-TWindowMenuItem::ExpandedItem(bool status)
+TWindowMenuItem::_Init(const char* label)
 {
-	if (fExpanded != status) {
-		fExpanded = status;
-		SetLabel(fFullTitle.String());
+	if (fMini) {
+		fBitmap = fCurrentWorkSpace
+			? AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowHiddenIcon)
+			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowHiddenSwitchIcon);
+	} else {
+		fBitmap = fCurrentWorkSpace
+			? AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownIcon)
+			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownSwitchIcon);
 	}
-}
 
+	fName = label;
+	BFont font(be_plain_font);
+	fLabelWidth = ceilf(font.StringWidth(label));
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
+	fLabelAscent = ceilf(fontHeight.ascent);
+	fLabelDescent = ceilf(fontHeight.descent + fontHeight.leading);
 
-void
-TWindowMenuItem::SetRequireUpdate()
-{
-	fRequireUpdate = true;
-}
-
-
-bool
-TWindowMenuItem::RequiresUpdate()
-{
-	return fRequireUpdate;
+	SetLabel(label);
 }
