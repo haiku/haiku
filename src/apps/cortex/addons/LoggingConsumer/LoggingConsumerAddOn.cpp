@@ -80,10 +80,10 @@ status_t LoggingConsumerAddOn::GetFlavorAt(
 
 	flavor_info* pInfo = new flavor_info;
 	pInfo->internal_id = n;
-	strcpy(pInfo->name, "LoggingConsumer");
-	strcpy(pInfo->info, "An add-on version of the LoggingConsumer node.\n"
+	pInfo->name = (char*)"LoggingConsumer";
+	pInfo->info = (char*)"An add-on version of the LoggingConsumer node.\n"
 		"See the Be Developer Newsletter III.18: 5 May, 1999\n"
-		"adapted by Eric Moon (4 June, 1999)");
+		"adapted by Eric Moon (4 June, 1999)";
 	pInfo->kinds = B_BUFFER_CONSUMER | B_CONTROLLABLE;
 	pInfo->flavor_flags = 0;
 	pInfo->possible_count = 0;
