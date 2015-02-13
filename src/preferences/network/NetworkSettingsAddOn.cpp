@@ -51,6 +51,11 @@ BNetworkSettingsInterfaceItem::BNetworkSettingsInterfaceItem(
 }
 
 
+BNetworkSettingsInterfaceItem::~BNetworkSettingsInterfaceItem()
+{
+}
+
+
 BNetworkSettingsType
 BNetworkSettingsInterfaceItem::Type() const
 {

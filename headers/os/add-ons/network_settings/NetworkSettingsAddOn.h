@@ -55,6 +55,7 @@ class BNetworkSettingsInterfaceItem : public BNetworkSettingsItem {
 public:
 								BNetworkSettingsInterfaceItem(
 									const char* interface);
+	virtual						~BNetworkSettingsInterfaceItem();
 
 	virtual	BNetworkSettingsType
 								Type() const;
