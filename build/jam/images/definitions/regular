@@ -126,6 +126,7 @@ SYSTEM_ADD_ONS_TRANSLATORS += [ FFilterByBuildFeatures
 
 SYSTEM_ADD_ONS_MEDIA += [ FFilterByBuildFeatures
 	cortex_audioadapter.media_addon	cortex_flanger.media_addon
+	cortex_logging_consumer.media_addon
 	dvb.media_addon@x86
 	equalizer.media_addon
 	firewire_dv.media_addon@x86
