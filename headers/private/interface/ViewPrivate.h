@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku.
+ * Copyright 2003-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,6 +17,7 @@
 #include <Region.h>
 #include <ServerProtocolStructs.h>
 #include <View.h>
+
 
 const static uint32 kDeleteReplicant = 'JAHA';
 
@@ -53,38 +54,37 @@ enum {
 
 class BView::Private {
 public:
-	Private(BView* view)
-		:
-		fView(view)
-	{
-	}
+								Private(BView* view)
+									:
+									fView(view)
+								{
+								}
 
-	int16 ShowLevel()
-	{
-		return fView->fShowLevel;
-	}
+			int16				ShowLevel()
+									{ return fView->fShowLevel; }
 
-	// defined in View.cpp
-	bool	WillLayout();
-	bool	MinMaxValid();
+			// defined in View.cpp
+			bool				WillLayout();
+			bool				MinMaxValid();
 
-	BLayoutItem* LayoutItemAt(int32 index);
-	int32	CountLayoutItems();
-	void	RegisterLayoutItem(BLayoutItem* item);
-	void	DeregisterLayoutItem(BLayoutItem* item);
+			BLayoutItem*		LayoutItemAt(int32 index);
+			int32				CountLayoutItems();
+			void				RegisterLayoutItem(BLayoutItem* item);
+			void				DeregisterLayoutItem(BLayoutItem* item);
 
-	bool RemoveSelf()
-	{
-		return fView->_RemoveSelf();
-	}
+			bool				RemoveSelf()
+									{ return fView->_RemoveSelf(); }
 
-	BView* fView;
+private:
+			BView* fView;
 };
 
 
 namespace BPrivate {
 
+
 class PortLink;
+
 
 class ViewState {
 	public:
@@ -146,11 +146,13 @@ class ViewState {
 		BRect				print_rect;
 };
 
+
 inline bool
 ViewState::IsValid(uint32 bit) const
 {
 	return valid_flags & bit;
 }
+
 
 inline bool
 ViewState::IsAllValid() const
@@ -159,7 +161,9 @@ ViewState::IsAllValid() const
 		== (B_VIEW_ALL_BITS & ~B_VIEW_CLIP_REGION_BIT);
 }
 
+
 }	// namespace BPrivate
+
 
 struct _array_data_{
 		// the max number of points in the array
@@ -169,5 +173,6 @@ struct _array_data_{
 		// the array of points
 	ViewLineArrayInfo*	array;
 };
+
 
 #endif	/* VIEW_PRIVATE_H */
