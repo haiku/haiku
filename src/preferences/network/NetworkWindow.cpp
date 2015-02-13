@@ -351,7 +351,7 @@ NetworkWindow::_ScanAddOns()
 
 					fSettingsMap[item->ListItem()] = item;
 					// TODO: sort
-					fListView->AddUnder(interfaceItem, item->ListItem());
+					fListView->AddUnder(item->ListItem(), interfaceItem);
 				}
 			}
 
@@ -364,8 +364,8 @@ NetworkWindow::_ScanAddOns()
 
 				fSettingsMap[item->ListItem()] = item;
 				// TODO: sort
-				fListView->AddUnder(_ListItemFor(item->Type()),
-					item->ListItem());
+				fListView->AddUnder(item->ListItem(),
+					_ListItemFor(item->Type()));
 			}
 		}
 	}
@@ -414,7 +414,7 @@ NetworkWindow::_ListItemFor(BNetworkSettingsType type)
 void
 NetworkWindow::_SelectItem(BListItem* listItem)
 {
-	if (fAddOnShellView->CountChildren() > 0)
+	while (fAddOnShellView->CountChildren() > 0)
 		fAddOnShellView->ChildAt(0)->RemoveSelf();
 
 	BView* nextView = NULL;
@@ -433,9 +433,6 @@ NetworkWindow::_SelectItem(BListItem* listItem)
 
 	if (nextView != NULL)
 		fAddOnShellView->AddChild(nextView);
-
-	fAddOnShellView->Invalidate();
-	InvalidateLayout();
 }
 
 
