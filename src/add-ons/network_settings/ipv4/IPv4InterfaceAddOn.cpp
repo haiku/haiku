@@ -1,0 +1,148 @@
+/*
+ * Copyright 2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, <axeld@pinc-software.de>
+ */
+
+
+#include <Catalog.h>
+#include <NetworkSettingsAddOn.h>
+#include <StringItem.h>
+
+#include "InterfaceAddressView.h"
+
+
+using namespace BNetworkKit;
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "IPv4InterfaceAddOn"
+
+
+class IPv4InterfaceAddOn : public BNetworkSettingsAddOn {
+public:
+								IPv4InterfaceAddOn(image_id image);
+	virtual						~IPv4InterfaceAddOn();
+
+	virtual	BNetworkSettingsInterfaceItem*
+								CreateNextInterfaceItem(uint32& cookie,
+									const char* interface);
+};
+
+
+class IPv4InterfaceItem : public BNetworkSettingsInterfaceItem {
+public:
+								IPv4InterfaceItem(const char* interface);
+	virtual						~IPv4InterfaceItem();
+
+	virtual BListItem*			ListItem();
+	virtual BView*				View();
+
+	virtual	status_t			Apply();
+	virtual	status_t			Revert();
+	virtual bool				IsRevertable();
+
+private:
+			BStringItem*		fItem;
+			InterfaceAddressView*
+								fView;
+};
+
+
+// #pragma mark -
+
+
+IPv4InterfaceItem::IPv4InterfaceItem(const char* interface)
+	:
+	BNetworkSettingsInterfaceItem(interface),
+	fItem(new BStringItem(B_TRANSLATE("IPv4"))),
+	fView(NULL)
+{
+}
+
+
+IPv4InterfaceItem::~IPv4InterfaceItem()
+{
+	if (fView->Parent() == NULL)
+		delete fView;
+
+	delete fItem;
+}
+
+
+BListItem*
+IPv4InterfaceItem::ListItem()
+{
+	return fItem;
+}
+
+
+BView*
+IPv4InterfaceItem::View()
+{
+	if (fView == NULL) {
+		// TODO!
+		fView = new InterfaceAddressView(AF_INET, Interface());
+	}
+	return fView;
+}
+
+
+status_t
+IPv4InterfaceItem::Apply()
+{
+	return B_OK;
+}
+
+
+status_t
+IPv4InterfaceItem::Revert()
+{
+	return B_OK;
+}
+
+
+bool
+IPv4InterfaceItem::IsRevertable()
+{
+	return false;
+}
+
+
+// #pragma mark -
+
+
+IPv4InterfaceAddOn::IPv4InterfaceAddOn(image_id image)
+	:
+	BNetworkSettingsAddOn(image)
+{
+}
+
+
+IPv4InterfaceAddOn::~IPv4InterfaceAddOn()
+{
+}
+
+
+BNetworkSettingsInterfaceItem*
+IPv4InterfaceAddOn::CreateNextInterfaceItem(uint32& cookie,
+	const char* interface)
+{
+	if (cookie++ == 0)
+		return new IPv4InterfaceItem(interface);
+
+	return NULL;
+}
+
+
+// #pragma mark -
+
+
+extern "C"
+BNetworkSettingsAddOn*
+instantiate_network_settings_add_on(image_id image)
+{
+	return new IPv4InterfaceAddOn(image);
+}

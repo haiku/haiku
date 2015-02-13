@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,16 +10,8 @@
 #define INTERFACE_ADDRESS_VIEW_H
 
 
-#include "NetworkSettings.h"
-
 #include <GroupView.h>
-
-
-enum {
-	M_MODE_AUTO = 'iato',
-	M_MODE_STATIC = 'istc',
-	M_MODE_OFF = 'ioff'
-};
+#include <NetworkInterface.h>
 
 
 class BMenuField;
@@ -28,10 +20,11 @@ class BPopUpMenu;
 class BRect;
 class BTextControl;
 
+
 class InterfaceAddressView : public BGroupView {
 public:
 								InterfaceAddressView(int family,
-									NetworkSettings* settings);
+									const char* interface);
 	virtual						~InterfaceAddressView();
 
 	virtual void				AttachedToWindow();
@@ -44,8 +37,8 @@ private:
 			void				_EnableFields(bool enable);
 			void				_ShowFields(bool show);
 
-			NetworkSettings*	fSettings;
 			int					fFamily;
+			BNetworkInterface	fInterface;
 
 			BPopUpMenu*			fModePopUpMenu;
 			BMenuField*			fModeField;

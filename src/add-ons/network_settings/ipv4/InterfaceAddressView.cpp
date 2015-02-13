@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,7 +9,6 @@
 
 
 #include "InterfaceAddressView.h"
-#include "NetworkSettings.h"
 
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -27,15 +26,22 @@
 #define B_TRANSLATION_CONTEXT "IntefaceAddressView"
 
 
+enum {
+	M_MODE_AUTO = 'iato',
+	M_MODE_STATIC = 'istc',
+	M_MODE_OFF = 'ioff'
+};
+
+
 // #pragma mark - InterfaceAddressView
 
 
 InterfaceAddressView::InterfaceAddressView(int family,
-	NetworkSettings* settings)
+	const char* interface)
 	:
 	BGroupView(B_VERTICAL),
-	fSettings(settings),
-	fFamily(family)
+	fFamily(family),
+	fInterface(interface)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
@@ -52,7 +58,7 @@ InterfaceAddressView::InterfaceAddressView(int family,
 		fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Automatic"),
 			new BMessage(M_MODE_AUTO)));
 	}
-	
+
 	fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Static"),
 		new BMessage(M_MODE_STATIC)));
 	fModePopUpMenu->AddSeparatorItem();
@@ -175,6 +181,8 @@ InterfaceAddressView::Revert()
 {
 	// Populate address fields with current settings
 
+// TODO!
+/*
 	int32 mode;
 	if (fSettings->AutoConfigure(fFamily)) {
 		mode = M_MODE_AUTO;
@@ -199,7 +207,7 @@ InterfaceAddressView::Revert()
 		fNetmaskField->SetText(fSettings->Netmask(fFamily));
 		fGatewayField->SetText(fSettings->Gateway(fFamily));
 	}
-
+*/
 	return B_OK;
 }
 
@@ -210,11 +218,11 @@ InterfaceAddressView::Save()
 	BMenuItem* item = fModePopUpMenu->FindMarked();
 	if (item == NULL)
 		return B_ERROR;
-
+/*
 	fSettings->SetIP(fFamily, fAddressField->Text());
 	fSettings->SetNetmask(fFamily, fNetmaskField->Text());
 	fSettings->SetGateway(fFamily, fGatewayField->Text());
 	fSettings->SetAutoConfigure(fFamily, item->Command() == M_MODE_AUTO);
-
+*/
 	return B_OK;
 }
