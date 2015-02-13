@@ -237,8 +237,8 @@ RemotePackageRepository HaikuPorts
 	libxml2-2.8.0-9
 	libxml2_devel-2.8.0-9
 	libxml2_python-2.8.0-9
-	libxslt-1.1.28-2
-	libxslt_devel-1.1.28-2
+	libxslt-1.1.28-4
+	libxslt_devel-1.1.28-4
 	lighttpd-1.4.35-2
 	lighttpd_devel-1.4.35-2
 	links-2.8-1
@@ -380,6 +380,7 @@ RemotePackageRepository HaikuPorts
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-3
 	xcb_proto-1.6-2
+	xmlto-0.0.26-1
 	xml_parser-2.36-1
 	xproto-7.0.26-2
 	xrick-021212-2
@@ -1018,6 +1019,7 @@ RemotePackageRepository HaikuPorts
 	yasm
 	youtube_dl
 	xcb_proto
+	xmlto
 	xml_parser
 	xproto
 	xrick
