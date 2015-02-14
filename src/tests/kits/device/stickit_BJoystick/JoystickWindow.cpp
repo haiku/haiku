@@ -40,7 +40,6 @@ JoystickWindow::JoystickWindow(const char *deviceName, BJoystick *stick,
 
 bool
 JoystickWindow::QuitRequested(void) {
-	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
 
