@@ -379,10 +379,14 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 				}
 
 				if (!dynamic_cast<TBarApp*>(be_app)->Settings()->hideLabels) {
-					// item has a visible label, remove the tooltip
-					// and break out
+					// item has a visible label, set tool tip if truncated
 					fLastMousedOverItem = menuItem;
-					SetToolTip((const char*)NULL);
+					if (strcasecmp(item->Label(), item->Name()) > 0) {
+						// label is truncated, set tooltip
+						SetToolTip(item->Name());
+					} else
+						SetToolTip((const char*)NULL);
+
 					break;
 				}
 

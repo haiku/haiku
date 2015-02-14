@@ -274,57 +274,57 @@ TTeamMenuItem::DrawContent()
 		menu->MovePenTo(drawLoc);
 	}
 
-	if (!static_cast<TBarApp*>(be_app)->Settings()->hideLabels) {
-		menu->SetDrawingMode(B_OP_OVER);
-		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+	menu->SetDrawingMode(B_OP_OVER);
+	menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
-		// override the drawing of the content when the item is disabled
-		// the wrong lowcolor is used when the item is disabled since the
-		// text color does not change
-		menu->MovePenBy(0, fLabelAscent);
+	// override the drawing of the content when the item is disabled
+	// the wrong lowcolor is used when the item is disabled since the
+	// text color does not change
+	menu->MovePenBy(0, fLabelAscent);
 
-		float cachedWidth = menu->StringWidth(Label());
-		if (Submenu() != NULL && fBarView->Vertical())
-			cachedWidth += 18;
+	float cachedWidth = menu->StringWidth(Label());
+	if (Submenu() != NULL && fBarView->Vertical())
+		cachedWidth += 18;
 
-		const char* label = Label();
-		char* truncLabel = NULL;
-		float maxWidth = fBarView->Vertical()
-				&& static_cast<TBarApp*>(be_app)->Settings()->superExpando
-			? menu->MaxContentWidth() - kSwitchWidth
-			: menu->MaxContentWidth() - kVPad * 2;
-		if (maxWidth > 0) {
-			float offset = menu->PenLocation().x - Frame().left;
-			if (cachedWidth + offset > maxWidth) {
-				truncLabel = (char*)malloc(strlen(label) + 4);
-				if (truncLabel == NULL)
-					return;
-
+	const char* label = Label();
+	char* truncLabel = NULL;
+	float maxWidth = fBarView->Vertical()
+			&& static_cast<TBarApp*>(be_app)->Settings()->superExpando
+		? menu->MaxContentWidth() - kSwitchWidth
+		: menu->MaxContentWidth() - kVPad * 2;
+	if (maxWidth > 0) {
+		float offset = menu->PenLocation().x - Frame().left;
+		if (cachedWidth + offset > maxWidth) {
+			truncLabel = (char*)malloc(strlen(label) + 4);
+			if (truncLabel != NULL) {
 				TruncateLabel(maxWidth - offset, truncLabel);
 				label = truncLabel;
 			}
 		}
-
-		if (label == NULL)
-			label = Label();
-
-		bool canHandle = !fBarView->Dragging()
-			|| fBarView->AppCanHandleTypes(Signature());
-		if (_IsSelected() && IsEnabled() && canHandle)
-			menu->SetLowColor(tint_color(menu->LowColor(),
-				B_HIGHLIGHT_BACKGROUND_TINT));
-		else
-			menu->SetLowColor(menu->LowColor());
-
-		if (IsSelected())
-			menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
-		else
-			menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
-
-		menu->DrawString(label);
-
-		free(truncLabel);
 	}
+
+	if (label == NULL)
+		label = Label();
+
+	BMenuItem::SetLabel(label);
+
+	free(truncLabel);
+
+	bool canHandle = !fBarView->Dragging()
+		|| fBarView->AppCanHandleTypes(Signature());
+	if (_IsSelected() && IsEnabled() && canHandle)
+		menu->SetLowColor(tint_color(menu->LowColor(),
+			B_HIGHLIGHT_BACKGROUND_TINT));
+	else
+		menu->SetLowColor(menu->LowColor());
+
+	if (IsSelected())
+		menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+	else
+		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+
+	if (!static_cast<TBarApp*>(be_app)->Settings()->hideLabels)
+		menu->DrawString(label);
 
 	if (fBarView->Vertical()
 		&& static_cast<TBarApp*>(be_app)->Settings()->superExpando
