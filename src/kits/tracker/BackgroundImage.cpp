@@ -103,7 +103,7 @@ BackgroundImage::GetBackgroundImage(const BNode* node, bool isDesktop)
 		} else
 			break;
 
-		if (be_control_look != NULL && isDesktop)
+		if (isDesktop)
 			be_control_look->SetBackgroundInfo(container);
 
 		container.FindInt32(kBackgroundImageInfoWorkspaces, index,

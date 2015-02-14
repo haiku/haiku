@@ -244,17 +244,6 @@ BCountView::Draw(BRect updateRect)
 
 	BeginLineArray(fShowingBarberPole && !fStartSpinningAfter ? 9 : 5);
 
-	if (be_control_look == NULL) {
-		AddLine(bounds.LeftTop(), bounds.RightTop(), light);
-		AddLine(bounds.LeftTop(), bounds.LeftBottom(), light);
-		bounds.top--;
-
-		AddLine(bounds.LeftTop(), bounds.RightTop(), shadow);
-		AddLine(BPoint(bounds.right, bounds.top + 2), bounds.RightBottom(),
-			lightShadow);
-		AddLine(bounds.LeftBottom(), bounds.RightBottom(), lightShadow);
-	}
-
 	if (!fShowingBarberPole || fStartSpinningAfter) {
 		EndLineArray();
 		return;

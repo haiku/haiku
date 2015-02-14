@@ -87,11 +87,8 @@ _UndrawLine(BPoseView* view, BPoint from, BPoint to)
 static void
 _DrawOutline(BView* view, BRect where)
 {
-	if (be_control_look != NULL) {
-		where.right++;
-		where.bottom--;
-	} else
-		where.InsetBy(1, 1);
+	where.right++;
+	where.bottom--;
 	rgb_color highColor = view->HighColor();
 	view->SetHighColor(kHighlightColor);
 	view->StrokeRect(where);
@@ -225,30 +222,13 @@ BTitleView::Draw(BRect /*updateRect*/, bool useOffscreen, bool updateOnly,
 	} else
 		view = this;
 
-	if (be_control_look != NULL) {
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		view->SetHighColor(tint_color(base, B_DARKEN_2_TINT));
-		view->StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
-		bounds.bottom--;
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	view->SetHighColor(tint_color(base, B_DARKEN_2_TINT));
+	view->StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
+	bounds.bottom--;
 
-		be_control_look->DrawButtonBackground(view, bounds, bounds, base, 0,
-			BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
-	} else {
-		// fill background with light gray background
-		if (!updateOnly)
-			view->FillRect(bounds, B_SOLID_LOW);
-
-		view->BeginLineArray(4);
-		view->AddLine(bounds.LeftTop(), bounds.RightTop(), sShadowColor);
-		view->AddLine(bounds.LeftBottom(), bounds.RightBottom(),
-			sShadowColor);
-		// draw lighter gray and white inset lines
-		bounds.InsetBy(0, 1);
-		view->AddLine(bounds.LeftBottom(), bounds.RightBottom(),
-			sLightShadowColor);
-		view->AddLine(bounds.LeftTop(), bounds.RightTop(), sShineColor);
-		view->EndLineArray();
-	}
+	be_control_look->DrawButtonBackground(view, bounds, bounds, base, 0,
+		BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 
 	int32 count = fTitleList.CountItems();
 	float minx = bounds.right;
@@ -263,23 +243,11 @@ BTitleView::Draw(BRect /*updateRect*/, bool useOffscreen, bool updateOnly,
 			maxx = titleBounds.right;
 	}
 
-	if (be_control_look != NULL) {
-		bounds = Bounds();
-		minx--;
-		view->SetHighColor(sLightShadowColor);
-		view->StrokeLine(BPoint(minx, bounds.top),
-			BPoint(minx, bounds.bottom - 1));
-	} else {
-		// first and last shades before and after first column
-		maxx++;
-		minx--;
-		view->BeginLineArray(2);
-		view->AddLine(BPoint(minx, bounds.top),
-					  BPoint(minx, bounds.bottom), sShadowColor);
-		view->AddLine(BPoint(maxx, bounds.top),
-					  BPoint(maxx, bounds.bottom), sShineColor);
-		view->EndLineArray();
-	}
+	bounds = Bounds();
+	minx--;
+	view->SetHighColor(sLightShadowColor);
+	view->StrokeLine(BPoint(minx, bounds.top),
+		BPoint(minx, bounds.bottom - 1));
 
 #if !(APP_SERVER_CLEARS_BACKGROUND)
 	FillRect(BRect(bounds.left, bounds.top + 1, minx - 1, bounds.bottom - 1),
@@ -499,19 +467,14 @@ BColumnTitle::Draw(BView* view, bool pressed)
 	BPoint loc(0, bounds.bottom - 4);
 
 	if (pressed) {
-		if (be_control_look != NULL) {
-			bounds.bottom--;
-			BRect rect(bounds);
-			rect.right--;
-			rgb_color base = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-				B_DARKEN_1_TINT);
+		bounds.bottom--;
+		BRect rect(bounds);
+		rect.right--;
+		rgb_color base = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_DARKEN_1_TINT);
 
-			be_control_look->DrawButtonBackground(view, rect, rect, base, 0,
-				BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
-		} else {
-			view->SetLowColor(sDarkTitleBackground);
-			view->FillRect(bounds, B_SOLID_LOW);
-		}
+		be_control_look->DrawButtonBackground(view, rect, rect, base, 0,
+			BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 	}
 
 	BString titleString(fColumn->Title());
@@ -572,30 +535,8 @@ BColumnTitle::Draw(BView* view, bool pressed)
 		view->SetFlags(flags);
 	}
 
-	if (be_control_look != NULL) {
-		view->SetHighColor(sLightShadowColor);
-		view->StrokeLine(bounds.RightTop(), bounds.RightBottom());
-	} else {
-		BRect rect(bounds);
-
-		view->SetHighColor(sShadowColor);
-		view->StrokeRect(rect);
-
-		view->BeginLineArray(4);
-		// draw lighter gray and white inset lines
-		rect.InsetBy(1, 1);
-		view->AddLine(rect.LeftBottom(), rect.RightBottom(),
-			pressed ? sLightShadowColor : sLightShadowColor);
-		view->AddLine(rect.LeftTop(), rect.RightTop(),
-			pressed ? sDarkShadowColor : sShineColor);
-
-		view->AddLine(rect.LeftTop(), rect.LeftBottom(),
-			pressed ? sDarkShadowColor : sShineColor);
-		view->AddLine(rect.RightTop(), rect.RightBottom(),
-			pressed ? sLightShadowColor : sLightShadowColor);
-
-		view->EndLineArray();
-	}
+	view->SetHighColor(sLightShadowColor);
+	view->StrokeLine(bounds.RightTop(), bounds.RightBottom());
 }
 
 
