@@ -127,8 +127,7 @@ NormalPulseView::DetermineVendorAndProcessor()
 
 #if __POWERPC__
 	logo = PowerPCLogo;
-#endif
-#if __INTEL__
+#elif __INTEL__
 	uint32 topologyNodeCount = 0;
 	cpu_topology_node_info* topology = NULL;
 
