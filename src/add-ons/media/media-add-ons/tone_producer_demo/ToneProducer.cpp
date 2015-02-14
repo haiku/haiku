@@ -620,16 +620,8 @@ ToneProducer::LatencyChanged(
 		SetEventLatency(mLatency + mInternalLatency);
 	}
 }
-/*
-// Workaround for a Metrowerks PPC compiler bug
-status_t 
-ToneProducer::DeleteHook(BMediaNode* node)
-{
-	return BMediaEventLooper::DeleteHook(node);
-}
 
 //#pragma mark -
-*/
 
 // BMediaEventLooper methods
 void 
@@ -677,30 +669,6 @@ ToneProducer::Stop(bigtime_t performance_time, bool immediate)
 	// A bug in the current PowerPC compiler demands that we implement
 	// this, even though it just calls up to the inherited implementation.
 	BMediaEventLooper::Stop(performance_time, immediate);
-}
-
-void 
-ToneProducer::Seek(bigtime_t media_time, bigtime_t performance_time)
-{
-	// A bug in the current PowerPC compiler demands that we implement
-	// this, even though it just calls up to the inherited implementation.
-	BMediaEventLooper::Seek(media_time, performance_time);
-}
-
-void 
-ToneProducer::TimeWarp(bigtime_t at_real_time, bigtime_t to_performance_time)
-{
-	// A bug in the current PowerPC compiler demands that we implement
-	// this, even though it just calls up to the inherited implementation.
-	BMediaEventLooper::TimeWarp(at_real_time, to_performance_time);
-}
-
-status_t 
-ToneProducer::AddTimer(bigtime_t at_performance_time, int32 cookie)
-{
-	// A bug in the current PowerPC compiler demands that we implement
-	// this, even though it just calls up to the inherited implementation.
-	return BMediaEventLooper::AddTimer(at_performance_time, cookie);
 }
 
 void 
@@ -843,33 +811,7 @@ ToneProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness, bo
 	}
 }
 
-/*
-void 
-ToneProducer::CleanUpEvent(const media_timed_event *event)
-{
-	// A bug in the current PowerPC compiler demands that we implement
-	// this, even though it just calls up to the inherited implementation.
-	BMediaEventLooper::CleanUpEvent(event);
-}
-
-bigtime_t 
-ToneProducer::OfflineTime()
-{
-	// A bug in the current PowerPC compiler demands that we implement
-	// this, even though it just calls up to the inherited implementation.
-	return BMediaEventLooper::OfflineTime();
-}
-
-void 
-ToneProducer::ControlLoop()
-{
-	// A bug in the current PowerPC compiler demands that we implement
-	// this, even though it just calls up to the inherited implementation.
-	BMediaEventLooper::ControlLoop();
-}
-
 //#pragma mark -
-*/
 
 void 
 ToneProducer::AllocateBuffers()

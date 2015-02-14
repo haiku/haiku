@@ -160,36 +160,12 @@ public:
 	// Workaround for a Metrowerks PPC compiler bug
 	void Stop(bigtime_t performance_time, bool immediate);
 
-	// Workaround for a Metrowerks PPC compiler bug
-	void Seek(bigtime_t media_time, bigtime_t performance_time);
-
-	// Workaround for a Metrowerks PPC compiler bug
-	void TimeWarp(bigtime_t at_real_time, bigtime_t to_performance_time);
-
-	// Workaround for a Metrowerks PPC compiler bug
-	status_t AddTimer(bigtime_t at_performance_time, int32 cookie);
-
 	void SetRunMode(run_mode mode);
 
 	void HandleEvent(
 		const media_timed_event* event,
 		bigtime_t lateness,
 		bool realTimeEvent = false);
-
-/* removed e.moon 2jun99
-protected:
-	// Workaround for a Metrowerks PPC compiler bug
-	void CleanUpEvent(const media_timed_event *event);
-
-	// Workaround for a Metrowerks PPC compiler bug
-	bigtime_t OfflineTime();
-
-	// Workaround for a Metrowerks PPC compiler bug
-	void ControlLoop();
-		
-	// Workaround for a Metrowerks PPC compiler bug
-	status_t DeleteHook(BMediaNode* node);
-*/
 
 private:
 	void AllocateBuffers();
