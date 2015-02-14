@@ -26,5 +26,4 @@ class StickItWindow : public BWindow {
 		BListView*		fListView1;
 		BListView*		fListView2;
 		BJoystick*		fJoystick;
-		JoystickWindow*	fJoystickWindow;
 };

@@ -13,6 +13,7 @@ class BJoystick;
 class JoystickView : public BView {
 	public:
 							JoystickView(BRect bounds, BJoystick *stick);
+		virtual				~JoystickView();
 		virtual void		Draw(BRect updateRect);
 		virtual void		Pulse(void);
 	
@@ -29,7 +30,8 @@ class JoystickView : public BView {
 
 class JoystickWindow : public BWindow {
 	public:
-							JoystickWindow(BJoystick *stick, BRect rect);
+							JoystickWindow(const char *deviceName,
+								BJoystick *stick, BRect rect);
 		virtual bool		QuitRequested(void);
 	
 	private:

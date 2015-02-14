@@ -103,19 +103,22 @@ StickItWindow::MessageReceived(BMessage *message)
 					temp1 << "BJoystick::GetDeviceName(), id = " << id
 						<< ", name = " << devName;
 					temp1 = AddToList(fListView1, temp1.String());
-					err = fJoystick->Open(devName);
+					BJoystick *joystick = new BJoystick();
+					err = joystick->Open(devName);
 					if (err != B_ERROR) {
 						temp1 = AddToList(fListView1, "BJoystick::Open()");
 						temp1 = AddToList(fListView1, "BJoystick::Open()");
-						if(fJoystick->IsCalibrationEnabled())
+						if (joystick->IsCalibrationEnabled())
 							temp1 = AddToList(fListView1,
 								"BJoystick::IsCalibrationEnabled() - True");
 						else
 							temp1 = AddToList(fListView1,
 								"BJoystick::IsCalibrationEnabled() - False");
-						fJoystickWindow = new JoystickWindow(fJoystick,
+						JoystickWindow *window = new(std::nothrow)
+							JoystickWindow(devName, joystick,
 							BRect(50, 50, 405, 350));
-						fJoystickWindow->Show();
+						if (window != NULL)
+							window->Show();
 					} else
 						AddToList(fListView1,
 							"No controller connected on that port. Try again.");

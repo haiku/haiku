@@ -24,8 +24,9 @@ rgb_color rgb_grey = {216, 216, 216};
 int32 hatX[9] = {10, 10, 20, 20, 20, 10, 0, 0, 0};
 int32 hatY[9] = {10, 0, 0, 10, 20, 20, 20, 10, 0};
 
-JoystickWindow::JoystickWindow(BJoystick *stick, BRect rect)
-	: BWindow(rect, "StickIt", B_TITLED_WINDOW,
+JoystickWindow::JoystickWindow(const char *deviceName, BJoystick *stick,
+	BRect rect)
+	: BWindow(rect, deviceName, B_TITLED_WINDOW,
 	B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
 {
 	fView = new JoystickView(Bounds(), stick);
@@ -61,6 +62,11 @@ JoystickView::JoystickView(BRect frame, BJoystick *stick)
 	rect.bottom += 15;
 	rect = _BuildHats(stick, rect);
 	_BuildAxes(stick, rect);
+}
+
+
+JoystickView::~JoystickView() {
+	delete fStick;
 }
 
 
