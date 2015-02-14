@@ -2537,14 +2537,12 @@ FSGetTrashDir(BDirectory* trashDir, dev_t dev)
 			trashDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
 	}
 
-#ifdef __HAIKU__
 	if (trashDir->GetAttrInfo(kAttrIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
 		data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE,
 			R_TrashIcon, &size);
 		if (data != NULL)
 			trashDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
 	}
-#endif // __HAIKU__
 
 	return B_OK;
 }
@@ -2594,14 +2592,12 @@ FSGetDeskDir(BDirectory* deskDir)
 			deskDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
 	}
 
-#ifdef __HAIKU__
 	if (deskDir->GetAttrInfo(kAttrIcon, &attrInfo) == B_ENTRY_NOT_FOUND) {
 		data = GetTrackerResources()->LoadResource(B_VECTOR_ICON_TYPE,
 			R_DeskIcon, &size);
 		if (data != NULL)
 			deskDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
 	}
-#endif // __HAIKU__
 
 	return B_OK;
 }
@@ -3979,12 +3975,7 @@ WellKnowEntryList::AddOne(directory_which which, const char* path,
 
 WellKnowEntryList::WellKnowEntryList()
 {
-#ifdef __HAIKU__
 	AddOne(B_SYSTEM_DIRECTORY, "system");
-#else
-	AddOne(B_BEOS_DIRECTORY, "beos");
-	AddOne(B_BEOS_SYSTEM_DIRECTORY, "system");
-#endif
 	AddOne((directory_which)B_BOOT_DISK, "/boot", "boot");
 	AddOne(B_USER_DIRECTORY, "home");
 

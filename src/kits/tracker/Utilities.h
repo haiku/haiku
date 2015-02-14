@@ -80,11 +80,7 @@ const int64 kTBSize = kGBSize * kKBSize;
 
 const int32 kMiniIconSeparator = 3;
 
-#ifdef __HAIKU__
 const color_space kDefaultIconDepth = B_RGBA32;
-#else
-const color_space kDefaultIconDepth = B_CMAP8;
-#endif
 
 
 extern bool gLocalizedNamePreferred;
@@ -436,15 +432,6 @@ extern void MarkNamedMenuItem(BMenu* menu, uint32 commandName, bool on);
 extern void DeleteSubmenu(BMenuItem* submenuItem);
 
 extern bool BootedInSafeMode();
-
-// Now is in kits
-#if B_BEOS_VERSION <= B_BEOS_VERSION_MAUI && !defined(__HAIKU__)
-
-// Should be in kits
-bool operator==(const rgb_color&, const rgb_color&);
-bool operator!=(const rgb_color&, const rgb_color&);
-
-#endif
 
 
 inline rgb_color

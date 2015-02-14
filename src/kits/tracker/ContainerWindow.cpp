@@ -221,18 +221,7 @@ AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref dirRef)
 			result = get_image_symbol(addonImage, "process_refs", 2,
 				(void**)&processRefs);
 
-#ifndef __INTEL__
-			if (result < 0) {
-				PRINT(("trying old legacy ppc signature\n"));
-				// try old-style addon signature
-				result = get_image_symbol(addonImage,
-					"process_refs__F9entry_refP8BMessagePv", 2,
-					(void**)&processRefs);
-			}
-#endif
-
 			if (result >= 0) {
-
 				// call add-on code
 				(*processRefs)(dirRef, refsMessagePtr.get(), 0);
 
@@ -455,12 +444,8 @@ DraggableContainerIcon::Draw(BRect updateRect)
 	be_control_look->DrawMenuBarBackground(this, rect, updateRect, base);
 
 	// Draw the icon, straddling the border
-#ifdef __HAIKU__
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-#else
-	SetDrawingMode(B_OP_OVER);
-#endif
 	float iconOffsetX = (Bounds().Width() - B_MINI_ICON) / 2;
 	float iconOffsetY = (Bounds().Height() - B_MINI_ICON) / 2;
 	IconCache::sIconCache->Draw(window->TargetModel(), this,
@@ -3883,7 +3868,6 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 	if ((fContainerWindowFlags & kIsHidden) != 0)
 		Minimize(true);
 
-#ifdef __HAIKU__
 	// restore window decor settings
 	int32 size = node->Contains(kAttrWindowDecor, B_RAW_TYPE);
 	if (size > 0) {
@@ -3896,7 +3880,6 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 				SetDecoratorSettings(decorSettings);
 		}
 	}
-#endif // __HAIKU__
 }
 
 
@@ -3935,14 +3918,12 @@ BContainerWindow::RestoreWindowState(const BMessage& message)
 	if (fContainerWindowFlags & kIsHidden)
 		Minimize(true);
 
-#ifdef __HAIKU__
 	// restore window decor settings
 	BMessage decorSettings;
 	if ((fContainerWindowFlags & kRestoreDecor)
 		&& message.FindMessage(kAttrWindowDecor, &decorSettings) == B_OK) {
 		SetDecoratorSettings(decorSettings);
 	}
-#endif // __HAIKU__
 }
 
 
@@ -3974,7 +3955,6 @@ BContainerWindow::SaveWindowState(AttributeStreamNode* node)
 	node->Write(workspaceAttributeName, 0, B_INT32_TYPE, sizeof(uint32),
 		&workspaces);
 
-#ifdef __HAIKU__
 	BMessage decorSettings;
 	if (GetDecoratorSettings(&decorSettings) == B_OK) {
 		int32 size = decorSettings.FlattenedSize();
@@ -3983,7 +3963,6 @@ BContainerWindow::SaveWindowState(AttributeStreamNode* node)
 			node->Write(kAttrWindowDecor, 0, B_RAW_TYPE, size, buffer);
 		}
 	}
-#endif // __HAIKU__
 }
 
 
@@ -4006,12 +3985,10 @@ BContainerWindow::SaveWindowState(BMessage& message) const
 	message.AddRect(rectAttributeName, frame);
 	message.AddInt32(workspaceAttributeName, (int32)Workspaces());
 
-#ifdef __HAIKU__
 	BMessage decorSettings;
 	if (GetDecoratorSettings(&decorSettings) == B_OK) {
 		message.AddMessage(kAttrWindowDecor, &decorSettings);
 	}
-#endif // __HAIKU__
 }
 
 

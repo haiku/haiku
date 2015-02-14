@@ -40,12 +40,9 @@ All rights reserved.
 #include <Debug.h>
 #include <DataIO.h>
 #include <File.h>
+#include <IconUtils.h>
 #include <String.h>
 #include <SupportDefs.h>
-
-#ifdef __HAIKU__
-#	include <IconUtils.h>
-#endif
 
 
 //	#pragma mark - BImageResources
@@ -150,14 +147,12 @@ BImageResources::GetIconResource(int32 id, icon_size size,
 	size_t length = 0;
 	const void* data;
 
-#ifdef __HAIKU__
 	// try to load vector icon
 	data = LoadResource(B_VECTOR_ICON_TYPE, id, &length);
 	if (data != NULL
 		&& BIconUtils::GetVectorIcon((uint8*)data, length, dest) == B_OK) {
 		return B_OK;
 	}
-#endif
 
 	// fall back to R5 icon
 	if (size != B_LARGE_ICON && size != B_MINI_ICON)
@@ -172,12 +167,10 @@ BImageResources::GetIconResource(int32 id, icon_size size,
 		return B_ERROR;
 	}
 
-#ifdef __HAIKU__
 	if (dest->ColorSpace() != B_CMAP8) {
 		return BIconUtils::ConvertFromCMAP8((uint8*)data, size, size,
 			size, dest);
 	}
-#endif
 
 	dest->SetBits(data, (int32)length, 0, B_CMAP8);
 	return B_OK;
@@ -188,7 +181,6 @@ status_t
 BImageResources::GetIconResource(int32 id, const uint8** iconData,
 	size_t* iconSize) const
 {
-#ifdef __HAIKU__
 	// try to load vector icon data from resources
 	size_t length = 0;
 	const void* data = LoadResource(B_VECTOR_ICON_TYPE, id, &length);
@@ -199,9 +191,6 @@ BImageResources::GetIconResource(int32 id, const uint8** iconData,
 	*iconSize = length;
 
 	return B_OK;
-#else
-	return B_ERROR;
-#endif
 }
 
 

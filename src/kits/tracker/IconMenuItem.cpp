@@ -374,18 +374,12 @@ IconMenuItem::DrawContent()
 
 	if (fDeviceIcon) {
 		if (IsEnabled())
-#ifdef __HAIKU__
 			Menu()->SetDrawingMode(B_OP_ALPHA);
 		else {
 			Menu()->SetDrawingMode(B_OP_ALPHA);
 			Menu()->SetHighColor(0, 0, 0, 64);
 			Menu()->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 		}
-#else
-			Menu()->SetDrawingMode(B_OP_OVER);
-		else
-			Menu()->SetDrawingMode(B_OP_BLEND);
-#endif
 		Menu()->DrawBitmapAsync(fDeviceIcon, where);
 	}
 
