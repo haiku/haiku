@@ -3,16 +3,16 @@
 
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
-	
+
 	NOTES eamoon@meadgroup.com 11june99
 	- this node has some holes in it, but it's pretty useful starting
 	  point for writing producers.
 	- I've tried to clean up the format negotiation a bit, which didn't
 	  fare too well when faced with an apathetic downstream node
 	  (LoggingConsumer.)
-	  
+
 	KNOWN BUGS
-	  eamoon 17jun99	  
+	  eamoon 17jun99
 	  * Can't handle 2 channels, but is too polite to refuse.
 	    How embarrassing.
 
@@ -58,7 +58,7 @@ public:
 		bigtime_t when,
 		const void* value,
 		size_t size);
-		
+
 	status_t StartControlPanel(
 		BMessenger* pMessenger);
 
@@ -111,7 +111,7 @@ public:
 		char* out_name);
 
 	void Connect(
-		status_t error, 
+		status_t error,
 		const media_source& source,
 		const media_destination& destination,
 		const media_format& format,
@@ -196,7 +196,7 @@ private:
 	bigtime_t mGainLastChanged;
 	bigtime_t mFreqLastChanged;
 	bigtime_t mWaveLastChanged;
-	
+
 	// host addon
 	// [8jun99] e.moon
 	BMediaAddOn*		m_pAddOn;
