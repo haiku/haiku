@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-InterfacesAddOn	606366088
+1	swedish	x-vnd.Haiku-InterfacesAddOn	3297241710
 Interface	InterfaceWindow		Gränssnitt
 Network:	IntefaceHardwareView		Nätverk:
 Static	IntefaceAddressView		Statisk
@@ -14,6 +14,7 @@ Enable	InterfacesListView		Aktivera
 Received:	IntefaceHardwareView		Mottaget:
 Choose automatically	IntefaceHardwareView		Välj automatiskt
 connected	IntefaceHardwareView		ansluten
+Automatic	IntefaceAddressView		Automatisk
 Gateway:	IntefaceAddressView		Förmedlingsnod:
 Disable	InterfacesListView		Inaktivera
 Sent:	IntefaceHardwareView		Skickat:

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-InterfacesAddOn	606366088
+1	german	x-vnd.Haiku-InterfacesAddOn	3297241710
 Interface	InterfaceWindow		Adapter
 Network:	IntefaceHardwareView		Netzwerk:
 Static	IntefaceAddressView		Statisch
@@ -14,6 +14,7 @@ Enable	InterfacesListView		Aktivieren
 Received:	IntefaceHardwareView		Empfangen:
 Choose automatically	IntefaceHardwareView		Automatisch wählen
 connected	IntefaceHardwareView		verbunden
+Automatic	IntefaceAddressView		Automatisch
 Gateway:	IntefaceAddressView		Gateway:
 Disable	InterfacesListView		Deaktivieren
 Sent:	IntefaceHardwareView		Gesendet:

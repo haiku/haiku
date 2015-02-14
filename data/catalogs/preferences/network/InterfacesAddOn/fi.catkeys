@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-InterfacesAddOn	606366088
+1	finnish	x-vnd.Haiku-InterfacesAddOn	3297241710
 Interface	InterfaceWindow		Käyttöliittymä
 Network:	IntefaceHardwareView		Verkko:
 Static	IntefaceAddressView		Kiinteä
@@ -14,6 +14,7 @@ Enable	InterfacesListView		Ota käyttöön
 Received:	IntefaceHardwareView		Vastaanotettu:
 Choose automatically	IntefaceHardwareView		Valitse automaattisesti
 connected	IntefaceHardwareView		yhdistetty
+Automatic	IntefaceAddressView		Automaattinen
 Gateway:	IntefaceAddressView		Yhdyskäytävä:
 Disable	InterfacesListView		Poista käytöstä
 Sent:	IntefaceHardwareView		Lähetetty:

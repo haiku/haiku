@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-InterfacesAddOn	606366088
+1	japanese	x-vnd.Haiku-InterfacesAddOn	3297241710
 Interface	InterfaceWindow		インターフェース
 Network:	IntefaceHardwareView		ネットワーク:
 Static	IntefaceAddressView		固定
@@ -14,6 +14,7 @@ Enable	InterfacesListView		有効
 Received:	IntefaceHardwareView		受信:
 Choose automatically	IntefaceHardwareView		自動選択
 connected	IntefaceHardwareView		接続済み
+Automatic	IntefaceAddressView		自動
 Gateway:	IntefaceAddressView		ゲートウェイ:
 Disable	InterfacesListView		無効
 Sent:	IntefaceHardwareView		送信:
