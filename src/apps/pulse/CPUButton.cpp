@@ -313,7 +313,7 @@ CPUButton::AttachedToWindow()
 	SetTarget(this);
 	SetFont(be_plain_font);
 	SetFontSize(10);
-	
+
 	fReplicantInDeskbar = false;
 
 	if (fReplicant) {

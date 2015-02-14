@@ -26,7 +26,7 @@
 #define B_TRANSLATION_CONTEXT "PrefsWindow"
 
 
-PrefsWindow::PrefsWindow(BRect frame, const char *name, 
+PrefsWindow::PrefsWindow(BRect frame, const char *name,
 	BMessenger *messenger, Prefs *prefs)
 	: BWindow(frame, name, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 		| B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS),
@@ -52,7 +52,7 @@ PrefsWindow::PrefsWindow(BRect frame, const char *name,
 		PRV_NORMAL_CHANGE_COLOR, fTarget, prefs);
 	fTabView->AddTab(normalView);
 
-	ConfigView *miniView = new ConfigView(rect, B_TRANSLATE("Mini mode"), 
+	ConfigView *miniView = new ConfigView(rect, B_TRANSLATE("Mini mode"),
 		PRV_MINI_CHANGE_COLOR, fTarget, prefs);
 	fTabView->AddTab(miniView);
 
@@ -67,19 +67,19 @@ PrefsWindow::PrefsWindow(BRect frame, const char *name,
 	deskbarView->ResizeTo(width, height);
 
 	fTabView->Select(0L);
-	fTabView->ResizeTo(deskbarView->Bounds().Width() + 16.0f, 
-		deskbarView->Bounds().Height() + 
+	fTabView->ResizeTo(deskbarView->Bounds().Width() + 16.0f,
+		deskbarView->Bounds().Height() +
 		fTabView->ContainerView()->Frame().top + 16.0f);
 
-	BButton *okButton = new BButton(rect, "ok", B_TRANSLATE("OK"), 
+	BButton *okButton = new BButton(rect, "ok", B_TRANSLATE("OK"),
 		new BMessage(PRV_BOTTOM_OK), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	okButton->ResizeToPreferred();
 	okButton->MoveTo(Bounds().Width() - 8.0f - okButton->Bounds().Width(),
 		Bounds().Height() - 8.0f - okButton->Bounds().Height());
 	topView->AddChild(okButton);
 
-	BButton *defaultsButton = new BButton(okButton->Frame(), "defaults", 
-		B_TRANSLATE("Defaults"), new BMessage(PRV_BOTTOM_DEFAULTS), 
+	BButton *defaultsButton = new BButton(okButton->Frame(), "defaults",
+		B_TRANSLATE("Defaults"), new BMessage(PRV_BOTTOM_DEFAULTS),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	defaultsButton->ResizeToPreferred();
 	defaultsButton->MoveBy(-defaultsButton->Bounds().Width() - 10.0f, 0.0f);

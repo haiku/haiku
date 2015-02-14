@@ -42,7 +42,7 @@ max_font_size(BFont font, const char* text, float maxSize, float maxWidth)
 	return 4;
 }
 
-	
+
 //	#pragma mark -
 
 
@@ -58,7 +58,7 @@ NormalPulseView::NormalPulseView(BRect rect)
 	mode1->SetMessage(new BMessage(PV_MINI_MODE));
 	mode2->SetLabel(B_TRANSLATE("Deskbar mode"));
 	mode2->SetMessage(new BMessage(PV_DESKBAR_MODE));
-	
+
 	DetermineVendorAndProcessor();
 
 	// Allocate progress bars and button pointers
@@ -190,7 +190,7 @@ NormalPulseView::Draw(BRect rect)
 	StrokeLine(BPoint(1, frame.bottom + 1), BPoint(frame.right, frame.bottom + 1));
 	SetHighColor(255, 255, 255);
 	StrokeLine(BPoint(1, frame.bottom + 2), BPoint(frame.right, frame.bottom + 2));
-	
+
 	// Processor picture
 	DrawBitmap(fCpuLogo, BPoint(10, 10));
 
@@ -210,7 +210,7 @@ NormalPulseView::Draw(BRect rect)
 	// Draw processor type and speed
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(240, 240, 240);
-	
+
 	SetFontSize(fProcessorFontSize);
 	float width = StringWidth(fProcessor);
 	MovePenTo(10 + (32 - width / 2), 48);
@@ -222,7 +222,7 @@ NormalPulseView::Draw(BRect rect)
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("%.2f GHz"), cpuSpeed / 1000.0f);
 	else
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("%ld MHz"), cpuSpeed);
-	
+
 	// We can't assume anymore that a CPU clock speed is always static.
 	// Let's compute the best font size for the CPU speed string each time...
 	BFont font;

@@ -25,7 +25,7 @@ class MiniPulseView : public PulseView {
 		void Pulse();
 		void FrameResized(float width, float height);
 		void UpdateColors(BMessage *message);
-		
+
 	protected:
 		BMenuItem *quit;
 		rgb_color frame_color, active_color, idle_color;

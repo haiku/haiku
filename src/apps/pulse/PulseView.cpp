@@ -69,9 +69,9 @@ void PulseView::Init() {
 	popupmenu->SetFont(be_plain_font);
 	mode1 = new BMenuItem("", NULL, 0, 0);
 	mode2 = new BMenuItem("", NULL, 0, 0);
-	preferences = new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), 
+	preferences = new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(PV_PREFERENCES), 0, 0);
-	about = new BMenuItem(B_TRANSLATE("About Pulse" B_UTF8_ELLIPSIS), 
+	about = new BMenuItem(B_TRANSLATE("About Pulse" B_UTF8_ELLIPSIS),
 		new BMessage(PV_ABOUT), 0, 0);
 
 	popupmenu->AddItem(mode1);

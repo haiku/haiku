@@ -51,10 +51,10 @@ Prefs::Prefs()
 		return;
 	}
 	// While normal window position is under user control, size is not.
-	// Width is fixed and height must be dynamically computed each time, 
+	// Width is fixed and height must be dynamically computed each time,
 	// as number of CPUs could change since boot.
 	ComputeNormalWindowSize();
-	
+
 	r = GetMiniWindowRect();
 	if (!GetRect("mini_window_rect", &mini_window_rect, &r)) {
 		fFatalError = true;

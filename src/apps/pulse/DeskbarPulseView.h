@@ -23,15 +23,15 @@ class DeskbarPulseView : public MiniPulseView {
 		void MouseDown(BPoint point);
 		void AttachedToWindow();
 		void Pulse();
-		
+
 		void MessageReceived(BMessage *message);
 		static DeskbarPulseView *Instantiate(BMessage *data);
 		virtual	status_t Archive(BMessage *data, bool deep = true) const;
-		
+
 	private:
 		void Remove();
 		void SetMode(bool normal);
-		
+
 		PrefsWindow *prefswindow;
 		Prefs *prefs;
 		BMessageRunner *messagerunner;

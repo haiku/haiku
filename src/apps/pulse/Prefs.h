@@ -19,7 +19,7 @@ class Prefs {
 		Prefs();
 		bool Save();
 		~Prefs();
-		
+
 		int window_mode, deskbar_icon_width;
 		BRect normal_window_rect, mini_window_rect, prefs_window_rect;
 		int normal_bar_color, mini_active_color, mini_idle_color, mini_frame_color,
@@ -35,7 +35,7 @@ class Prefs {
 		bool PutInt(const char *name, int *value);
 		bool PutBool(const char *name, bool *value);
 		bool PutRect(const char *name, BRect *value);
-		
+
 		float GetNormalWindowHeight();
 		void ComputeNormalWindowSize();
 		BRect GetNormalWindowRect();

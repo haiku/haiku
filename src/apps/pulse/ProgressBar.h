@@ -37,7 +37,7 @@ class ProgressBar : public BView {
 
 	private:
 		void Render(bool all = false);
-		
+
 		segment segments[20];
 		int32 current_value, previous_value;
 };

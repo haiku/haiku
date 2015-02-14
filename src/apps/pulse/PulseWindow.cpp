@@ -33,13 +33,13 @@ PulseWindow::PulseWindow(BRect rect)
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	SetPulseRate(200000);
-	
+
 	PulseApp *pulseapp = (PulseApp *)be_app;
 	BRect bounds = Bounds();
 	fNormalPulseView = new NormalPulseView(bounds);
 	AddChild(fNormalPulseView);
 
-	fMiniPulseView = new MiniPulseView(bounds, "MiniPulseView", 
+	fMiniPulseView = new MiniPulseView(bounds, "MiniPulseView",
 		pulseapp->prefs);
 	AddChild(fMiniPulseView);
 
@@ -97,7 +97,7 @@ PulseWindow::MessageReceived(BMessage *message)
 			// Otherwise launch a new preferences window
 			PulseApp *pulseapp = (PulseApp *)be_app;
 			fPrefsWindow = new PrefsWindow(pulseapp->prefs->prefs_window_rect,
-				B_TRANSLATE("Pulse settings"), new BMessenger(this), 
+				B_TRANSLATE("Pulse settings"), new BMessenger(this),
 				pulseapp->prefs);
 			fPrefsWindow->Show();
 			break;

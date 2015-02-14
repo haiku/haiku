@@ -28,11 +28,11 @@ class CPUButton : public BControl {
 		virtual void MessageReceived(BMessage *message);
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
-		
+
 		status_t Invoke(BMessage *message = NULL);
 		static CPUButton *Instantiate(BMessage *data);
 		status_t Archive(BMessage *data, bool deep = true) const;
-		
+
 		void UpdateColors(int32 color);
 
 	private:

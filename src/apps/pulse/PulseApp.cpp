@@ -186,10 +186,10 @@ PulseApp::ShowAbout(bool asApplication)
 
 	BTextView* view = alert->TextView();
 	BFont font;
-				
-	view->SetStylable(true);			
+
+	view->SetStylable(true);
 	view->GetFont(&font);
-	
+
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, name.Length(), &font);
