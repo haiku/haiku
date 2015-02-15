@@ -527,7 +527,8 @@ LoggingConsumer::NodeRegistered()
 void
 LoggingConsumer::Start(bigtime_t performance_time)
 {
-	PRINT(("LoggingConsumer::Start(%ld): now %ld\n", performance_time, TimeSource()->Now()));
+	PRINT(("LoggingConsumer::Start(%" B_PRIdBIGTIME "): now %" B_PRIdBIGTIME "\n",
+		performance_time, TimeSource()->Now()));
 
 	log_message logMsg;
 	logMsg.now = TimeSource()->Now();
