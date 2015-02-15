@@ -40,9 +40,10 @@
 //#define TRACE_IPV6
 #ifdef TRACE_IPV6
 	#define TRACE(format, args...) \
-		dprintf("IPv6 [%llu] " format "\n", system_time(), ##args)
+		dprintf("IPv6 [%" B_PRIdBIGTIME "] " format "\n", system_time(), ##args)
 	#define TRACE_SK(protocol, format, args...) \
-		dprintf("IPv6 [%llu] %p " format "\n", system_time(), protocol, ##args)
+		dprintf("IPv6 [%" B_PRIdBIGTIME "] %p " format "\n", system_time(), \
+			protocol, ##args)
 #else
 	#define TRACE(args...)
 	#define TRACE_SK(args...)
@@ -610,7 +611,8 @@ static status_t
 send_fragments(ipv6_protocol* protocol, struct net_route* route,
 	net_buffer* buffer, uint32 mtu)
 {
-	TRACE_SK(protocol, "SendFragments(%lu bytes, mtu %lu)", buffer->size, mtu);
+	TRACE_SK(protocol, "SendFragments(%" B_PRIu32 " bytes, mtu %" B_PRIu32 ")",
+		buffer->size, mtu);
 
 	NetBufferHeaderReader<IPv6Header> originalHeader(buffer);
 	if (originalHeader.Status() != B_OK)
@@ -647,7 +649,8 @@ send_fragments(ipv6_protocol* protocol, struct net_route* route,
 	// this way)
 	mtu -= headersLength + sizeof(ip6_frag);
 	mtu &= ~7;
-	TRACE("  adjusted MTU to %ld, bytesLeft %ld", mtu, bytesLeft);
+	TRACE("  adjusted MTU to %" B_PRIu32 " bytesLeft %" B_PRIu32, mtu,
+		bytesLeft);
 
 	while (bytesLeft > 0) {
 		uint32 fragmentLength = min_c(bytesLeft, mtu);
@@ -667,8 +670,8 @@ send_fragments(ipv6_protocol* protocol, struct net_route* route,
 			fragmentHeader.ip6f_offlg |= IP6F_MORE_FRAG;
 		fragmentHeader.ip6f_ident = htonl(atomic_add(&sFragmentID, 1));
 
-		TRACE("  send fragment of %ld bytes (%ld bytes left)", fragmentLength,
-			bytesLeft);
+		TRACE("  send fragment of %" B_PRIu32 " bytes (%" B_PRIu32
+			" bytes left)", fragmentLength, bytesLeft);
 
 		net_buffer* fragmentBuffer;
 		if (!lastFragment)
@@ -1259,8 +1262,8 @@ ipv6_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	else
 		protocolNumber = buffer->protocol;
 
-	TRACE_SK(protocol, "SendRoutedData(%p, %p [%ld bytes])", route, buffer,
-		buffer->size);
+	TRACE_SK(protocol, "SendRoutedData(%p, %p [%" B_PRIu32 " bytes])", route,
+		buffer, buffer->size);
 
 	sockaddr_in6& source = *(sockaddr_in6*)buffer->source;
 	sockaddr_in6& destination = *(sockaddr_in6*)buffer->destination;
@@ -1339,7 +1342,8 @@ ipv6_send_data(net_protocol* _protocol, net_buffer* buffer)
 {
 	ipv6_protocol* protocol = (ipv6_protocol*)_protocol;
 
-	TRACE_SK(protocol, "SendData(%p [%ld bytes])", buffer, buffer->size);
+	TRACE_SK(protocol, "SendData(%p [%" B_PRIu32 " bytes])", buffer,
+		buffer->size);
 
 	sockaddr_in6* destination = (sockaddr_in6*)buffer->destination;
 
@@ -1384,7 +1388,8 @@ ipv6_read_data(net_protocol* _protocol, size_t numBytes, uint32 flags,
 	if (raw == NULL)
 		return B_ERROR;
 
-	TRACE_SK(protocol, "ReadData(%lu, 0x%lx)", numBytes, flags);
+	TRACE_SK(protocol, "ReadData(%" B_PRIuSIZE ", 0x%" B_PRIu32 ")", numBytes,
+		flags);
 
 	return raw->Dequeue(flags, _buffer);
 }
@@ -1432,7 +1437,7 @@ ipv6_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 status_t
 ipv6_receive_data(net_buffer* buffer)
 {
-	TRACE("ReceiveData(%p [%ld bytes])", buffer, buffer->size);
+	TRACE("ReceiveData(%p [%" B_PRIu32 " bytes])", buffer, buffer->size);
 
 	NetBufferHeaderReader<IPv6Header> bufferHeader(buffer);
 	if (bufferHeader.Status() != B_OK)
