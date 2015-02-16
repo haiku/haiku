@@ -20,7 +20,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	modifiers mount mountvolume
 	netcat netstat notify
 	open
-	package package_repo passwd patch pc ping ping6 pkgman
+	package package_repo passwd pc ping ping6 pkgman
 	prio profile ps
 	query quit
 	rc reindex release renice rmattr rmindex roster

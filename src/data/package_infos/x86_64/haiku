@@ -40,7 +40,6 @@ provides {
 	cmd:more
 	cmd:netcat
 	cmd:passwd
-	cmd:patch
 	cmd:ping
 	cmd:ping6
 	cmd:prio
