@@ -164,6 +164,7 @@ RemotePackageRepository HaikuPorts
 	openssl-1.0.0p-1
 	openssl_devel-1.0.0p-1
 	p7zip-9.20.1-4
+	patch-2.7.4-1
 	pe-2.4.4_2014_05_29-1
 	perl-5.18.2-2
 	pixman-0.32.6-1
@@ -371,6 +372,7 @@ RemotePackageRepository HaikuPorts
 	openssh
 	openssl
 	p7zip
+	patch
 	pe
 	perl
 	pixman
