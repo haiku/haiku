@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src preferences network MultipleAddOns ;
-
-UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] ;
-
-Addon Multiple : 
-	MultipleAddOn.cpp
-	: be <nogrist>Network  [ TargetLibstdc++ ] # $(HAIKU_NETWORK_LIBS)
-;
-
