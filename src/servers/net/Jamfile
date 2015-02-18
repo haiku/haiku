@@ -5,6 +5,8 @@ UsePrivateHeaders app net shared storage ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons network_settings ]
+	: true ;
 
 #UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] ;
 #UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
@@ -17,7 +19,6 @@ AddResources net_server : net_server.rdef ;
 
 Server net_server :
 	NetServer.cpp
-	Settings.cpp
 	AutoconfigClient.cpp
 	AutoconfigLooper.cpp
 	DHCPClient.cpp
