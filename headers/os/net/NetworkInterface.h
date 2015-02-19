@@ -106,8 +106,10 @@ public:
 			status_t			RemoveRoute(int family,
 									const route_entry& route);
 			status_t			RemoveDefaultRoute(int family);
-			status_t			GetRoutes(int family, BObjectList<route_entry>& routes) const;
-			status_t			GetDefaultRoute(int family, BNetworkAddress& gateway) const;
+			status_t			GetRoutes(int family,
+									BObjectList<route_entry>& routes) const;
+			status_t			GetDefaultRoute(int family,
+									BNetworkAddress& gateway) const;
 
 			status_t			AutoConfigure(int family);
 
