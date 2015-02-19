@@ -53,7 +53,6 @@ All rights reserved.
 #include <Window.h>
 
 #include "BarMenuBar.h"
-#include "ExpandoMenuBar.h"
 
 
 const char* const kDeskbarMenuEntriesFileName = "menu_entries";

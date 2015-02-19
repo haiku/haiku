@@ -43,7 +43,6 @@ All rights reserved.
 #include "BarApp.h"
 #include "BarView.h"
 #include "BarWindow.h"
-#include "ExpandoMenuBar.h"
 
 
 TBarMenuTitle::TBarMenuTitle(float width, float height, const BBitmap* icon,
