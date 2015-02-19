@@ -402,12 +402,12 @@ BHttpRequest::_ProtocolLoop()
 					if ((code == B_HTTP_STATUS_FOUND
 						|| code == B_HTTP_STATUS_SEE_OTHER)
 						&& fRequestMethod == B_HTTP_POST) {
-							SetMethod(B_HTTP_GET);
-							delete fOptPostFields;
-							fOptPostFields = NULL;
-							delete fOptInputData;
-							fOptInputData = NULL;
-							fOptInputDataSize = 0;
+						SetMethod(B_HTTP_GET);
+						delete fOptPostFields;
+						fOptPostFields = NULL;
+						delete fOptInputData;
+						fOptInputData = NULL;
+						fOptInputDataSize = 0;
 					}
 
 					if (--maxRedirs > 0) {
