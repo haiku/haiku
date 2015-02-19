@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.02.12
-#	Date:    2015-02-12 03:15:01
+#	Version: 2015.02.19
+#	Date:    2015-02-19 03:15:01
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -349,9 +349,9 @@
 		1028 1f48  PERC H730P Mini (for blades)
 		1028 1f49  PERC H730 Mini
 		1028 1f4a  PERC H730 Mini (for blades)
-		1028 1f4d  PERC FS33xS
+		1028 1f4d  PERC FD33xS
 		1028 1f4f  PERC H730P Slim
-		1028 1f54  PERC FS33xD
+		1028 1f54  PERC FD33xD
 		17aa 1052  ThinkServer RAID 720i
 		17aa 1053  ThinkServer RAID 720ix
 	005e  SAS1066 PCI-X Fusion-MPT SAS
@@ -1488,6 +1488,7 @@
 		174b e253  Radeon HD 7790 Dual-X OC
 		1787 2329  Radeon HD 7790 TurboDuo
 	665d  Bonaire [Radeon R7 200 Series]
+	665f  Tobago [Radeon R7 300 Series]
 	6660  Sun XT [Radeon HD 8670A/8670M/8690M]
 	6663  Sun PRO [Radeon HD 8570A/8570M]
 		1025 0846  Radeon HD 8570A
@@ -3474,7 +3475,7 @@
 	009f  PCI 4758 Cryptographic Accelerator
 	00a5  ATM Controller (1410a500)
 	00a6  ATM 155MBPS MM Controller (1410a600)
-	00b7  256-bit Graphics Rasterizer [FireGL1]
+	00b7  GXT2000P Graphics Adapter
 		1092 00b8  FireGL1 AGP 32Mb
 	00b8  GXT2000P Graphics Adapter
 	00be  ATM 622MBPS Controller (1410be00)
@@ -3492,6 +3493,9 @@
 	016e  GXT4000P Graphics Adapter
 	0170  GXT6000P Graphics Adapter
 		1092 0172  Fire GL2
+		1092 0173  Fire GL3
+		1092 0174  Fire GL4
+		1092 0184  Fire GL4s
 	017d  GXT300P Graphics Adapter
 	0180  Snipe chipset SCSI controller
 		1014 0241  iSeries 2757 DASD IOA
@@ -9624,7 +9628,8 @@
 	10c3  GT218 [GeForce 8400 GS Rev. 3]
 	10c5  GT218 [GeForce 405]
 	10d8  GT218 [NVS 300]
-	1140  GF117M [GeForce 610M/710M/820M / GT 620M/625M/630M/720M]
+	1140  GF117M [GeForce 610M/710M/810M/820M / GT 620M/625M/630M/720M]
+		1019 999f  GeForce GT 720M
 		1025 0600  GeForce GT 620M
 		1025 0606  GeForce GT 620M
 		1025 064a  GeForce GT 620M
@@ -9713,8 +9718,12 @@
 		1028 05e0  GeForce GT 720M
 		1028 05e8  GeForce GT 630M
 		1028 05f4  GeForce GT 720M
+		1028 060f  GeForce GT 720M
 		1028 064e  GeForce 820M
 		1028 0652  GeForce 820M
+		1028 0653  GeForce 820M
+		1028 0655  GeForce 820M
+		1028 065e  GeForce 820M
 		1028 0662  GeForce 820M
 		1028 068d  GeForce 820M
 		103c 18ef  GeForce GT 630M
@@ -9722,6 +9731,8 @@
 		103c 18fb  GeForce GT 630M
 		103c 18fd  GeForce GT 630M
 		103c 18ff  GeForce GT 630M
+		103c 2335  GeForce 820M
+		103c 2337  GeForce 820M
 		103c 2aef  GeForce GT 720A
 		103c 2af9  GeForce 710A
 		1043 10dd  NVS 5200M
@@ -9755,6 +9766,10 @@
 		1043 224a  GeForce GT 710M
 		1043 227a  GeForce 820M
 		1043 228a  GeForce 820M
+		1043 232a  GeForce 820M
+		1043 233a  GeForce 820M
+		1043 236a  GeForce 820M
+		1043 238a  GeForce 820M
 		1043 8595  GeForce GT 720M
 		1043 85ea  GeForce GT 720M
 		1043 85eb  GeForce 820M
@@ -9765,6 +9780,12 @@
 		1043 861a  GeForce 820M
 		1043 861b  GeForce 820M
 		1043 8628  GeForce 820M
+		1043 8643  GeForce 820M
+		1043 864c  GeForce 820M
+		1043 8652  GeForce 820M
+		105b 0dac  GeForce GT 720M
+		105b 0dad  GeForce GT 720M
+		105b 0ef3  GeForce GT 720M
 		1072 152d  GeForce GT 720M
 		10cf 17f5  GeForce GT 720M
 		1179 fa01  GeForce 710M
@@ -9797,17 +9818,27 @@
 		144d c0e2  NVS 5200M
 		144d c0e3  NVS 5200M
 		144d c0e4  NVS 5200M
+		144d c10d  GeForce 820M
 		144d c652  GeForce GT 620M
 		144d c709  GeForce 710M
 		144d c711  GeForce 710M
 		144d c736  GeForce 710M
+		144d c737  GeForce 710M
+		144d c745  GeForce 820M
+		144d c750  GeForce 820M
 		1462 10b8  GeForce GT 710M
 		1462 10e9  GeForce GT 720M
 		1462 1116  GeForce 820M
 		1462 aa33  GeForce 720M
 		1462 aaa2  GeForce GT 720M
 		1462 aaa3  GeForce 820M
+		1462 acb2  GeForce GT 720M
+		1462 acc1  GeForce GT 720M
+		1462 ae61  GeForce 720M
+		1462 ae65  GeForce GT 720M
+		1462 ae6a  GeForce 820M
 		1462 ae71  GeForce GT 720M
+		14c0 0083  GeForce 820M
 		152d 0926  GeForce 620M
 		152d 0982  GeForce GT 630M
 		152d 0983  GeForce GT 630M
@@ -9819,14 +9850,19 @@
 		152d 1067  GeForce GT 720M
 		152d 1072  GeForce GT 720M
 		152d 1086  GeForce 820M
+		152d 1092  GeForce 820M
 		17aa 2200  NVS 5200M
 		17aa 2213  GeForce GT 720M
 		17aa 2220  GeForce GT 720M
 		17aa 309c  GeForce GT 720A
 		17aa 30b4  GeForce 820A
+		17aa 30b7  GeForce 720A
+		17aa 361b  GeForce 820A
+		17aa 361c  GeForce 820A
 		17aa 3656  GeForce GT 620M
 		17aa 365a  GeForce 705M
 		17aa 365e  GeForce 800M
+		17aa 3661  GeForce 820A
 		17aa 366c  GeForce 800M
 		17aa 3685  GeForce 800M
 		17aa 3686  GeForce 800M
@@ -9836,6 +9872,10 @@
 		17aa 369c  GeForce 820A
 		17aa 369d  GeForce 820A
 		17aa 369e  GeForce 820A
+		17aa 36a9  GeForce 820A
+		17aa 36af  GeForce 820A
+		17aa 36b0  GeForce 820A
+		17aa 36b6  GeForce 820A
 		17aa 3800  GeForce GT 720M
 		17aa 3801  GeForce GT 720M
 		17aa 3802  GeForce GT 720M
@@ -9851,13 +9891,18 @@
 		17aa 3813  GeForce 820M
 		17aa 3816  GeForce 820M
 		17aa 3818  GeForce 820M
+		17aa 381a  GeForce 820M
+		17aa 381c  GeForce 820M
 		17aa 3901  GeForce 610M / GT 620M
 		17aa 3902  GeForce 710M
 		17aa 3903  GeForce 610M/710M
 		17aa 3904  GeForce GT 620M/625M
 		17aa 3905  GeForce GT 720M
+		17aa 3907  GeForce 820M
 		17aa 3910  GeForce 720M
 		17aa 3912  GeForce 720M
+		17aa 3913  GeForce 820M
+		17aa 3915  GeForce 820M
 		17aa 3977  GeForce GT 720M
 		17aa 3983  GeForce 610M
 		17aa 5001  GeForce 610M
@@ -9889,7 +9934,10 @@
 		1854 0192  GeForce GT 720M
 		1b0a 20dd  GeForce GT 620M
 		1b0a 20df  GeForce GT 620M
+		1b0a 210e  GeForce 820M
 		1b0a 2202  GeForce GT 720M
+		1b0a 90d7  GeForce 820M
+		1b0a 90dd  GeForce 820M
 	1180  GK104 [GeForce GTX 680]
 		1043 83f1  GTX680-DC2-2GD5
 		3842 3682  GeForce GTX 680 Mac Edition
@@ -9960,6 +10008,7 @@
 	11e2  GK106M [GeForce GTX 765M]
 	11e3  GK106M [GeForce GTX 760M]
 		17aa 3683  GeForce GTX 760A
+	11e7  GK106M
 	11fa  GK106GL [Quadro K4000]
 	11fc  GK106GLM [Quadro K2100M]
 	1200  GF114 [GeForce GTX 560 Ti]
@@ -16784,6 +16833,7 @@
 1541  MACHONE Communications
 1542  Concurrent Computer Corporation
 	9260  RCIM-II Real-Time Clock & Interrupt Module
+	9271  RCIM-III Real-Time Clock & Interrupt Module (PCIe)
 	9272  Pulse Width Modulator Card
 	9277  5 Volt Delta Sigma Converter Card
 	9278  10 Volt Delta Sigma Converter Card
@@ -18848,6 +18898,7 @@
 1bb0  SimpliVity Corporation
 	0002  OmniCube Accelerator OA-3000
 	0010  OmniCube Accelerator OA-3000-2
+1bb1  Seagate Technology PLC
 1bb3  Bluecherry
 	4304  BC-04120A MPEG4 4 port video encoder / decoder
 	4309  BC-08240A MPEG4 4 port video encoder / decoder
@@ -19690,9 +19741,9 @@
 	0336  80331 [Lindsay] I/O processor (ATU)
 	0340  41210 [Lanai] Serial to Parallel PCI Bridge (A-Segment Bridge)
 	0341  41210 [Lanai] Serial to Parallel PCI Bridge (B-Segment Bridge)
-	0370  80333 Segment-A PCI Express-to-PCI Express Bridge
+	0370  80333 Segment-A PCIe Express to PCI-X bridge
 	0371  80333 A-Bus IOAPIC
-	0372  80333 Segment-B PCI Express-to-PCI Express Bridge
+	0372  80333 Segment-B PCIe Express to PCI-X bridge
 	0373  80333 B-Bus IOAPIC
 	0374  80333 Address Translation Unit
 	0402  Xeon E3-1200 v3/4th Gen Core Processor Integrated Graphics Controller
