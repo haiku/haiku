@@ -78,19 +78,11 @@ InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 	const char* stateText = _StateText();
 
 	// Set the initial bounds of item contents
-	BPoint iconPoint = bounds.LeftTop();
-	BPoint namePoint = bounds.LeftTop();
-	BPoint line2Point = bounds.LeftTop();
-	BPoint line3Point = bounds.LeftTop();
-	BPoint statePoint = bounds.RightTop();
-
-	iconPoint += BPoint(4, 4);
-	statePoint += BPoint(0, fFirstlineOffset);
-	namePoint += BPoint(ICON_SIZE + 12, fFirstlineOffset);
-	line2Point += BPoint(ICON_SIZE + 12, fSecondlineOffset);
-	line3Point += BPoint(ICON_SIZE + 12, fThirdlineOffset);
-
-	statePoint -= BPoint(be_plain_font->StringWidth(stateText) + 4.0f, 0);
+	BPoint iconPoint = bounds.LeftTop() + BPoint(4, 4);
+	BPoint statePoint = bounds.RightTop() + BPoint(0, fFirstLineOffset)
+		- BPoint(be_plain_font->StringWidth(stateText) + 4.0f, 0);
+	BPoint namePoint = bounds.LeftTop()
+		+ BPoint(ICON_SIZE + 12, fFirstLineOffset);
 
 	if (fDisabled) {
 		list->SetDrawingMode(B_OP_ALPHA);
@@ -126,26 +118,15 @@ InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 	list->SetFont(be_plain_font);
 	list->DrawString(stateText, statePoint);
 
-// TODO!
-/*	if (!disabled) {
-		// Render IPv4 Address
-		BString ipv4Str(B_TRANSLATE_COMMENT("IP:", "IPv4 address label"));
-		if (fSettings->IPAddr(AF_INET).IsEmpty())
-			ipv4Str << " " << B_TRANSLATE("None");
-		else
-			ipv4Str << " " << BString(fSettings->IP(AF_INET));
+	BPoint linePoint = bounds.LeftTop() + BPoint(ICON_SIZE + 12,
+		fFirstLineOffset + fLineOffset);
 
-		list->DrawString(ipv4Str, line2Point);
+	for (size_t line = 0; line < sizeof(fAddress) / sizeof(fAddress[0]);
+			line++) {
+		list->DrawString(fAddress[line], linePoint);
+		linePoint.y += fLineOffset;
 	}
 
-	// Render IPv6 Address (if present)
-	if (!disabled && !fSettings->IPAddr(AF_INET6).IsEmpty()) {
-		BString ipv6Str(B_TRANSLATE_COMMENT("IPv6:", "IPv6 address label"));
-		ipv6Str << " " << BString(fSettings->IP(AF_INET6));
-
-		list->DrawString(ipv6Str, line3Point);
-	}
-*/
 	owner->PopState();
 }
 
@@ -160,9 +141,8 @@ InterfaceListItem::Update(BView* owner, const BFont* font)
 	float lineHeight = ceilf(height.ascent) + ceilf(height.descent)
 		+ ceilf(height.leading);
 
-	fFirstlineOffset = 2 + ceilf(height.ascent + height.leading / 2);
-	fSecondlineOffset = fFirstlineOffset + lineHeight;
-	fThirdlineOffset = fFirstlineOffset + (lineHeight * 2);
+	fFirstLineOffset = 2 + ceilf(height.ascent + height.leading / 2);
+	fLineOffset = lineHeight;
 
 	_UpdateState();
 
@@ -272,14 +252,21 @@ InterfaceListItem::_UpdateState()
 	fConnecting = (fInterface.Flags() & IFF_CONFIGURING) != 0;
 
 	int32 count = fInterface.CountAddresses();
+	int lastFamily = -1;
 	size_t addressIndex = 0;
 	for (int32 index = 0; index < count; index++) {
 		if (addressIndex >= sizeof(fAddress) / sizeof(fAddress[0]))
 			break;
 
 		BNetworkInterfaceAddress address;
-		if (fInterface.GetAddressAt(index, address) == B_OK)
+		if (fInterface.GetAddressAt(index, address) == B_OK) {
+			if (address.Address().IsEmpty()
+				|| lastFamily == address.Address().Family())
+				continue;
+
 			fAddress[addressIndex++] = address.Address().ToString();
+			lastFamily = address.Address().Family();
+		}
 	}
 }
 

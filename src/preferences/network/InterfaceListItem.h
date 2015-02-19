@@ -46,9 +46,8 @@ private:
 			BNetworkInterface	fInterface;
 				// Hardware Interface
 
-			float				fFirstlineOffset;
-			float				fSecondlineOffset;
-			float				fThirdlineOffset;
+			float				fFirstLineOffset;
+			float				fLineOffset;
 
 			BString				fDeviceName;
 			bool				fDisabled;
