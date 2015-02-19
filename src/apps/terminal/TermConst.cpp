@@ -30,8 +30,18 @@ const char* const kTooTipSetWindowTitlePlaceholders = B_TRANSLATE(
 	"\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n"
 	"\t%i\t-\tThe index of the window.\n"
 	"\t%p\t-\tThe name of the active process in the current tab.\n"
-	"\t%t\t-\tThe title of the current tab.\n"
-	"\t%%\t-\tThe character '%'.");
+	"\t%t\t-\tThe title of the current tab.");
+
+const char* const kToolTipCommonTitlePlaceholders = B_TRANSLATE(
+	"\t%%\t-\tThe character '%'.\n"
+	"\t%<\t-\tStarts a section that will only be shown if a placeholder\n"
+	"\t\t\tafterwards is not empty.\n"
+	"\t%>\t-\tStarts a section that will only be shown if a placeholder\n"
+	"\t\t\tbetween a previous %< section and this one is not empty.\n"
+	"\t%-\t-\tEnds a %< or %> section.\n\n"
+	"Any non alpha numeric character between '%' and the format "
+	"letter will insert a space only\nif the placeholder value is not "
+	"empty. It will add to the %< section.");
 
 const char* const kShellEscapeCharacters = " ~`#$&*()\\|[]{};'\"<>?!";
 const char* const kDefaultAdditionalWordCharacters = ":@-./_~";

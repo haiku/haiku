@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2015, Haiku, Inc. All Rights Reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai.
@@ -85,7 +85,7 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_IM_AWARE,			"0"},
 
 	{ PREF_TAB_TITLE,			"%1d: %p%e" },
-	{ PREF_WINDOW_TITLE,		"%T %i: %t" },
+	{ PREF_WINDOW_TITLE,		"%T% i: %t" },
 	{ PREF_BLINK_CURSOR,		PREF_TRUE },
 	{ PREF_WARN_ON_EXIT,		PREF_TRUE },
 	{ PREF_CURSOR_STYLE,		PREF_BLOCK_CURSOR },

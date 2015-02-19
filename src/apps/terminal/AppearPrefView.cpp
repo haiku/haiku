@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -133,7 +133,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		new BMessage(MSG_TAB_TITLE_SETTING_CHANGED));
 	fTabTitle->SetToolTip(BString(B_TRANSLATE(
 		"The pattern specifying the tab titles. The following placeholders\n"
-		"can be used:\n")) << kTooTipSetTabTitlePlaceholders);
+		"can be used:")) << "\n" << kTooTipSetTabTitlePlaceholders
+		<< "\n" << kToolTipCommonTitlePlaceholders);
 
 	fWindowTitle = new BTextControl("windowTitle", B_TRANSLATE("Window title:"),
 		"", NULL);
@@ -141,7 +142,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		new BMessage(MSG_WINDOW_TITLE_SETTING_CHANGED));
 	fWindowTitle->SetToolTip(BString(B_TRANSLATE(
 		"The pattern specifying the window titles. The following placeholders\n"
-		"can be used:\n")) << kTooTipSetWindowTitlePlaceholders);
+		"can be used:")) << "\n" << kTooTipSetWindowTitlePlaceholders
+		<< "\n" << kToolTipCommonTitlePlaceholders);
 
 	BLayoutBuilder::Group<>(this)
 		.SetInsets(5, 5, 5, 5)
