@@ -73,10 +73,12 @@ BNetworkSettingsInterfaceItem::Interface() const
 // #pragma mark -
 
 
-BNetworkSettingsAddOn::BNetworkSettingsAddOn(image_id image)
+BNetworkSettingsAddOn::BNetworkSettingsAddOn(image_id image,
+	BNetworkSettings& settings)
 	:
 	fImage(image),
-	fResources(NULL)
+	fResources(NULL),
+	fSettings(settings)
 {
 }
 
@@ -125,4 +127,11 @@ BNetworkSettingsAddOn::Resources()
 			delete resources;
 	}
 	return fResources;
+}
+
+
+BNetworkSettings&
+BNetworkSettingsAddOn::Settings()
+{
+	return fSettings;
 }

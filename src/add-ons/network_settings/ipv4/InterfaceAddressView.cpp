@@ -10,6 +10,8 @@
 
 #include "InterfaceAddressView.h"
 
+#include <stdio.h>
+
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
@@ -26,22 +28,21 @@
 #define B_TRANSLATION_CONTEXT "IntefaceAddressView"
 
 
-enum {
-	M_MODE_AUTO = 'iato',
-	M_MODE_STATIC = 'istc',
-	M_MODE_OFF = 'ioff'
-};
+const uint32 kModeAuto = 'iato';
+const uint32 kModeStatic = 'istc';
+const uint32 kModeDisabled = 'ioff';
 
 
 // #pragma mark - InterfaceAddressView
 
 
 InterfaceAddressView::InterfaceAddressView(int family,
-	const char* interface)
+	const char* interface, BNetworkSettings& settings)
 	:
 	BGroupView(B_VERTICAL),
 	fFamily(family),
-	fInterface(interface)
+	fInterface(interface),
+	fSettings(settings)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
@@ -50,38 +51,40 @@ InterfaceAddressView::InterfaceAddressView(int family,
 
 	if (fFamily == AF_INET) {
 		fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("DHCP"),
-			new BMessage(M_MODE_AUTO)));
+			new BMessage(kModeAuto)));
 	}
 
 	if (fFamily == AF_INET6) {
 		// Automatic can be DHCPv6 or Router Advertisements
 		fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Automatic"),
-			new BMessage(M_MODE_AUTO)));
+			new BMessage(kModeAuto)));
 	}
 
 	fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Static"),
-		new BMessage(M_MODE_STATIC)));
+		new BMessage(kModeStatic)));
 	fModePopUpMenu->AddSeparatorItem();
-	fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Off"),
-		new BMessage(M_MODE_OFF)));
+	fModePopUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Disabled"),
+		new BMessage(kModeDisabled)));
 
 	fModeField = new BMenuField(B_TRANSLATE("Mode:"), fModePopUpMenu);
-	fModeField->SetToolTip(BString(B_TRANSLATE("The method for obtaining an IP address")));
+	fModeField->SetToolTip(
+		B_TRANSLATE("The method for obtaining an IP address"));
 
 	float minimumWidth = be_control_look->DefaultItemSpacing() * 16;
 
 	fAddressField = new BTextControl(B_TRANSLATE("IP Address:"), NULL, NULL);
-	fAddressField->SetToolTip(BString(B_TRANSLATE("Your IP address")));
+	fAddressField->SetToolTip(B_TRANSLATE("Your IP address"));
 	fAddressField->TextView()->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
 	fNetmaskField = new BTextControl(B_TRANSLATE("Netmask:"), NULL, NULL);
-	fNetmaskField->SetToolTip(BString(B_TRANSLATE("Your netmask")));
+	fNetmaskField->SetToolTip(B_TRANSLATE("The netmask defines your local network"));
 	fNetmaskField->TextView()->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
 	fGatewayField = new BTextControl(B_TRANSLATE("Gateway:"), NULL, NULL);
-	fGatewayField->SetToolTip(BString(B_TRANSLATE("Your gateway")));
+	fGatewayField->SetToolTip(B_TRANSLATE("Your gateway to the internet"));
 	fGatewayField->TextView()->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
 
-	Revert();
-		// Populate the fields
+	fSettings.GetInterface(interface, fOriginalInterface);
+	fInterfaceSettings = fOriginalInterface;
+	_UpdateFields();
 
 	BLayoutBuilder::Group<>(this)
 		.AddGrid()
@@ -90,15 +93,12 @@ InterfaceAddressView::InterfaceAddressView(int family,
 			.AddTextControl(fNetmaskField, 0, 2, B_ALIGN_RIGHT)
 			.AddTextControl(fGatewayField, 0, 3, B_ALIGN_RIGHT)
 		.End()
-		.AddGlue()
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+		.AddGlue();
 }
 
 
 InterfaceAddressView::~InterfaceAddressView()
 {
-
 }
 
 
@@ -116,22 +116,11 @@ void
 InterfaceAddressView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case M_MODE_AUTO:
-			_EnableFields(false);
-			_ShowFields(true);
-			break;
-
-		case M_MODE_STATIC:
-			_EnableFields(true);
-			_ShowFields(true);
-			break;
-
-		case M_MODE_OFF:
-			fAddressField->SetText("");
-			fNetmaskField->SetText("");
-			fGatewayField->SetText("");
-			_EnableFields(false);
-			_ShowFields(false);
+		case kModeAuto:
+		case kModeStatic:
+		case kModeDisabled:
+			_SetModeField(message->what);
+			_UpdateSettings();
 			break;
 
 		default:
@@ -152,27 +141,6 @@ InterfaceAddressView::_EnableFields(bool enable)
 }
 
 
-void
-InterfaceAddressView::_ShowFields(bool show)
-{
-	if (show) {
-		if (fAddressField->IsHidden())
-			fAddressField->Show();
-		if (fNetmaskField->IsHidden())
-			fNetmaskField->Show();
-		if (fGatewayField->IsHidden())
-			fGatewayField->Show();
-	} else {
-		if (!fAddressField->IsHidden())
-			fAddressField->Hide();
-		if (!fNetmaskField->IsHidden())
-			fNetmaskField->Hide();
-		if (!fGatewayField->IsHidden())
-			fGatewayField->Hide();
-	}
-}
-
-
 // #pragma mark - InterfaceAddressView public methods
 
 
@@ -185,17 +153,14 @@ InterfaceAddressView::Revert()
 /*
 	int32 mode;
 	if (fSettings->AutoConfigure(fFamily)) {
-		mode = M_MODE_AUTO;
+		mode = kModeAuto;
 		_EnableFields(false);
-		_ShowFields(true);
 	} else if (fSettings->IPAddr(fFamily).IsEmpty()) {
-		mode = M_MODE_OFF;
+		mode = kModeDisabled;
 		_EnableFields(false);
-		_ShowFields(false);
 	} else {
-		mode = M_MODE_STATIC;
+		mode = kModeStatic;
 		_EnableFields(true);
-		_ShowFields(true);
 	}
 
 	BMenuItem* item = fModePopUpMenu->FindItem(mode);
@@ -222,7 +187,74 @@ InterfaceAddressView::Save()
 	fSettings->SetIP(fFamily, fAddressField->Text());
 	fSettings->SetNetmask(fFamily, fNetmaskField->Text());
 	fSettings->SetGateway(fFamily, fGatewayField->Text());
-	fSettings->SetAutoConfigure(fFamily, item->Command() == M_MODE_AUTO);
+	fSettings->SetAutoConfigure(fFamily, item->Command() == kModeAuto);
 */
 	return B_OK;
+}
+
+
+void
+InterfaceAddressView::_UpdateFields()
+{
+	bool autoConfigure = (fInterface.Flags()
+		& (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
+
+	BNetworkInterfaceAddress address;
+	status_t status = B_ERROR;
+
+	int32 index = fInterface.FindFirstAddress(fFamily);
+	if (index >= 0)
+		status = fInterface.GetAddressAt(index, address);
+	if (index < 0 || status != B_OK
+		|| address.Address().IsEmpty() && !autoConfigure) {
+		if (status == B_OK) {
+			// Check persistent settings for the mode -- the address
+			// can also be empty if the automatic configuration hasn't
+			// started yet.
+			autoConfigure = fInterfaceSettings.IsEmpty()
+				|| fInterfaceSettings.GetBool("auto_config", false);
+		}
+		if (!autoConfigure) {
+			_SetModeField(kModeDisabled);
+			return;
+		}
+	}
+
+	if (autoConfigure)
+		_SetModeField(kModeAuto);
+	else
+		_SetModeField(kModeStatic);
+
+	fAddressField->SetText(address.Address().ToString());
+	fNetmaskField->SetText(address.Mask().ToString());
+
+	BNetworkAddress gateway;
+	if (fInterface.GetDefaultRoute(fFamily, gateway) == B_OK)
+		fGatewayField->SetText(gateway.ToString());
+	else
+		fGatewayField->SetText(NULL);
+}
+
+
+void
+InterfaceAddressView::_SetModeField(uint32 mode)
+{
+	BMenuItem* item = fModePopUpMenu->FindItem(mode);
+	if (item != NULL)
+		item->SetMarked(true);
+
+	_EnableFields(mode == kModeStatic);
+
+	if (mode == kModeDisabled) {
+		fAddressField->SetText(NULL);
+		fNetmaskField->SetText(NULL);
+		fGatewayField->SetText(NULL);
+	}
+}
+
+
+/*!	Updates the current settings from the controls. */
+void
+InterfaceAddressView::_UpdateSettings()
+{
 }

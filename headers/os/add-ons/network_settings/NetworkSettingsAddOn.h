@@ -24,6 +24,7 @@ enum BNetworkSettingsType {
 };
 
 class BNetworkProfile;
+class BNetworkSettings;
 
 
 class BNetworkSettingsItem {
@@ -68,7 +69,8 @@ private:
 
 class BNetworkSettingsAddOn {
 public:
-								BNetworkSettingsAddOn(image_id image);
+								BNetworkSettingsAddOn(image_id image,
+									BNetworkSettings& settings);
 	virtual						~BNetworkSettingsAddOn();
 
 	virtual	BNetworkSettingsInterfaceItem*
@@ -79,16 +81,18 @@ public:
 
 			image_id			Image();
 			BResources*			Resources();
+			BNetworkSettings&	Settings();
 
 private:
 			image_id			fImage;
 			BResources*			fResources;
+			BNetworkSettings&	fSettings;
 };
 
 
 // Your add-on needs to export this hook in order to be picked up
 extern "C" BNetworkSettingsAddOn* instantiate_network_settings_add_on(
-	image_id image);
+	image_id image, BNetworkSettings& settings);
 
 
 }	// namespace BNetworkKit

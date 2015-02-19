@@ -23,7 +23,8 @@ using namespace BNetworkKit;
 
 class IPv4InterfaceAddOn : public BNetworkSettingsAddOn {
 public:
-								IPv4InterfaceAddOn(image_id image);
+								IPv4InterfaceAddOn(image_id image,
+									BNetworkSettings& settings);
 	virtual						~IPv4InterfaceAddOn();
 
 	virtual	BNetworkSettingsInterfaceItem*
@@ -34,7 +35,8 @@ public:
 
 class IPv4InterfaceItem : public BNetworkSettingsInterfaceItem {
 public:
-								IPv4InterfaceItem(const char* interface);
+								IPv4InterfaceItem(const char* interface,
+									BNetworkSettings& settings);
 	virtual						~IPv4InterfaceItem();
 
 	virtual BListItem*			ListItem();
@@ -45,6 +47,7 @@ public:
 	virtual bool				IsRevertable();
 
 private:
+			BNetworkSettings&	fSettings;
 			BStringItem*		fItem;
 			InterfaceAddressView*
 								fView;
@@ -54,9 +57,11 @@ private:
 // #pragma mark -
 
 
-IPv4InterfaceItem::IPv4InterfaceItem(const char* interface)
+IPv4InterfaceItem::IPv4InterfaceItem(const char* interface,
+	BNetworkSettings& settings)
 	:
 	BNetworkSettingsInterfaceItem(interface),
+	fSettings(settings),
 	fItem(new BStringItem(B_TRANSLATE("IPv4"))),
 	fView(NULL)
 {
@@ -82,10 +87,9 @@ IPv4InterfaceItem::ListItem()
 BView*
 IPv4InterfaceItem::View()
 {
-	if (fView == NULL) {
-		// TODO!
-		fView = new InterfaceAddressView(AF_INET, Interface());
-	}
+	if (fView == NULL)
+		fView = new InterfaceAddressView(AF_INET, Interface(), fSettings);
+
 	return fView;
 }
 
@@ -114,9 +118,10 @@ IPv4InterfaceItem::IsRevertable()
 // #pragma mark -
 
 
-IPv4InterfaceAddOn::IPv4InterfaceAddOn(image_id image)
+IPv4InterfaceAddOn::IPv4InterfaceAddOn(image_id image,
+	BNetworkSettings& settings)
 	:
-	BNetworkSettingsAddOn(image)
+	BNetworkSettingsAddOn(image, settings)
 {
 }
 
@@ -131,7 +136,7 @@ IPv4InterfaceAddOn::CreateNextInterfaceItem(uint32& cookie,
 	const char* interface)
 {
 	if (cookie++ == 0)
-		return new IPv4InterfaceItem(interface);
+		return new IPv4InterfaceItem(interface, Settings());
 
 	return NULL;
 }
@@ -142,7 +147,7 @@ IPv4InterfaceAddOn::CreateNextInterfaceItem(uint32& cookie,
 
 extern "C"
 BNetworkSettingsAddOn*
-instantiate_network_settings_add_on(image_id image)
+instantiate_network_settings_add_on(image_id image, BNetworkSettings& settings)
 {
-	return new IPv4InterfaceAddOn(image);
+	return new IPv4InterfaceAddOn(image, settings);
 }

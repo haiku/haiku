@@ -12,6 +12,7 @@
 
 #include <GroupView.h>
 #include <NetworkInterface.h>
+#include <NetworkSettings.h>
 
 
 class BMenuField;
@@ -21,10 +22,14 @@ class BRect;
 class BTextControl;
 
 
+using namespace BNetworkKit;
+
+
 class InterfaceAddressView : public BGroupView {
 public:
 								InterfaceAddressView(int family,
-									const char* interface);
+									const char* interface,
+									BNetworkSettings& settings);
 	virtual						~InterfaceAddressView();
 
 	virtual void				AttachedToWindow();
@@ -35,10 +40,17 @@ public:
 
 private:
 			void				_EnableFields(bool enable);
-			void				_ShowFields(bool show);
+			void				_UpdateFields();
+			void				_SetModeField(uint32 mode);
+			void				_UpdateSettings();
 
+private:
 			int					fFamily;
 			BNetworkInterface	fInterface;
+			BNetworkSettings&	fSettings;
+
+			BMessage			fOriginalInterface;
+			BMessage			fInterfaceSettings;
 
 			BPopUpMenu*			fModePopUpMenu;
 			BMenuField*			fModeField;

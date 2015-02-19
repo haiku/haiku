@@ -15,7 +15,8 @@
 #include <ObjectList.h>
 #include <Window.h>
 
-#include "NetworkSettingsAddOn.h"
+#include <NetworkSettings.h>
+#include <NetworkSettingsAddOn.h>
 
 
 using namespace BNetworkKit;
@@ -53,9 +54,7 @@ private:
 	typedef std::map<BString, BListItem*> ItemMap;
 	typedef std::map<BListItem*, BNetworkSettingsItem*> SettingsMap;
 
-			BButton*			fRevertButton;
-			BButton*			fApplyButton;
-
+			BNetworkSettings	fSettings;
 			AddOnList			fAddOns;
 
 			BOutlineListView*	fListView;
@@ -68,6 +67,9 @@ private:
 
 			InterfaceView*		fInterfaceView;
 			BView*				fAddOnShellView;
+
+			BButton*			fRevertButton;
+			BButton*			fApplyButton;
 };
 
 

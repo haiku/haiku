@@ -30,6 +30,7 @@
 #include <OutlineListView.h>
 #include <Path.h>
 #include <PathFinder.h>
+#include <PathMonitor.h>
 #include <Roster.h>
 #include <ScrollView.h>
 #include <SymLink.h>
@@ -129,13 +130,17 @@ NetworkWindow::NetworkWindow()
 	_ScanInterfaces();
 	_ScanAddOns();
 
-	// Set preferred size of the list view from its contents
+	// Set size of the list view from its contents
 	float width;
 	float height;
 	fListView->GetPreferredSize(&width, &height);
+	width += 2 * be_control_look->DefaultItemSpacing();
+	fListView->SetExplicitSize(BSize(width, B_SIZE_UNSET));
 	fListView->SetExplicitMinSize(BSize(width, std::min(height, 400.f)));
 
 	CenterOnScreen();
+
+	fSettings.StartMonitoring(this);
 }
 
 
@@ -203,6 +208,12 @@ NetworkWindow::MessageReceived(BMessage* message)
 		{
 			_ShowReplicant(
 				message->GetInt32("be:value", B_CONTROL_OFF) == B_CONTROL_ON);
+			break;
+		}
+
+		case B_PATH_MONITOR:
+		{
+			fSettings.Update(message);
 			break;
 		}
 
@@ -283,6 +294,8 @@ NetworkWindow::_ScanInterfaces()
 			continue;
 
 		InterfaceListItem* item = new InterfaceListItem(interface.Name());
+		item->SetExpanded(true);
+
 		fInterfaceItemMap.insert(std::pair<BString, BListItem*>(
 			BString(interface.Name()), item));
 		fListView->AddItem(item);
@@ -314,7 +327,8 @@ NetworkWindow::_ScanAddOns()
 				continue;
 			}
 
-			BNetworkSettingsAddOn* (*instantiateAddOn)(image_id image);
+			BNetworkSettingsAddOn* (*instantiateAddOn)(image_id image,
+				BNetworkSettings& settings);
 
 			status_t status = get_image_symbol(image,
 				"instantiate_network_settings_add_on",
@@ -328,7 +342,7 @@ NetworkWindow::_ScanAddOns()
 				continue;
 			}
 
-			BNetworkSettingsAddOn* addOn = instantiateAddOn(image);
+			BNetworkSettingsAddOn* addOn = instantiateAddOn(image, fSettings);
 			if (addOn == NULL) {
 				unload_add_on(image);
 				continue;
@@ -388,8 +402,10 @@ NetworkWindow::_ListItemFor(BNetworkSettingsType type)
 {
 	switch (type) {
 		case B_NETWORK_SETTINGS_TYPE_SERVICE:
-			if (fServicesItem == NULL)
+			if (fServicesItem == NULL) {
 				fServicesItem = new BStringItem(B_TRANSLATE("Services"));
+				fServicesItem->SetExpanded(true);
+			}
 
 			return fServicesItem;
 
