@@ -50,6 +50,9 @@ All rights reserved.
 #include "TeamMenuItem.h"
 
 
+//	#pragma mark - TTeamMenuItem
+
+
 TTeamMenu::TTeamMenu()
 	:
 	BMenu("Team Menu")

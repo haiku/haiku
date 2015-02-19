@@ -44,10 +44,11 @@ All rights reserved.
 #include "BarMenuBar.h"
 #include "BarView.h"
 #include "ExpandoMenuBar.h"
-#include "icons.h"
 #include "ResourceSet.h"
 #include "TeamMenu.h"
 #include "WindowMenu.h"
+
+#include "icons.h"
 
 
 const float kHPad = 10.0f;
@@ -55,6 +56,9 @@ const float kVPad = 2.0f;
 const float kLabelOffset = 8.0f;
 
 const BRect kIconRect(1.0f, 1.0f, 13.0f, 14.0f);
+
+
+//	#pragma mark - TWindowMenuItem
 
 
 TWindowMenuItem::TWindowMenuItem(const char* label, int32 id, bool mini,

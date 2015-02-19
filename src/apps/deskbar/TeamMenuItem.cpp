@@ -65,6 +65,9 @@ const float kLabelOffset = 8.0f;
 const float kSwitchWidth = 12.0f;
 
 
+//	#pragma mark - TTeamMenuItem
+
+
 TTeamMenuItem::TTeamMenuItem(BList* team, BBitmap* icon, char* name,
 	char* signature, float width, float height)
 	:

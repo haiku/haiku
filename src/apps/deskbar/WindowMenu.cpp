@@ -46,7 +46,6 @@ All rights reserved.
 
 #include "BarApp.h"
 #include "BarView.h"
-#include "ExpandoMenuBar.h"
 #include "ShowHideMenuItem.h"
 #include "TeamMenu.h"
 #include "TeamMenuItem.h"
@@ -65,6 +64,10 @@ const int32 kSystemFloater = 6;
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "WindowMenu"
+
+
+//	#pragma mark - TWindowMenu
+
 
 bool
 TWindowMenu::WindowShouldBeListed(client_window_info* info)
