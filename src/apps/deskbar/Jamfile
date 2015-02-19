@@ -35,6 +35,7 @@ Application Deskbar :
 	TeamMenu.cpp
 	TeamMenuItem.cpp
 	TimeView.cpp
+	TruncatableMenuItem.cpp
 	WindowMenu.cpp
 	WindowMenuItem.cpp
 	ResourceSet.cpp

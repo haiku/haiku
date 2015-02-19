@@ -36,8 +36,6 @@ All rights reserved.
 
 #include "WindowMenuItem.h"
 
-#include <stdio.h>
-
 #include <Bitmap.h>
 #include <Debug.h>
 #include <NaturalCompare.h>
@@ -62,7 +60,7 @@ const BRect kIconRect(1.0f, 1.0f, 13.0f, 14.0f);
 TWindowMenuItem::TWindowMenuItem(const char* label, int32 id, bool mini,
 	bool currentWorkspace, bool dragging)
 	:
-	BMenuItem(label, NULL),
+	TTruncatableMenuItem(label, NULL),
 	fID(id),
 	fMini(mini),
 	fCurrentWorkSpace(currentWorkspace),
@@ -91,13 +89,6 @@ TWindowMenuItem::SetTo(const char* label, int32 id, bool mini,
 }
 
 
-bool
-TWindowMenuItem::ChangedState()
-{
-	return fModified;
-}
-
-
 /*static*/ int32
 TWindowMenuItem::InsertIndexFor(BMenu* menu, int32 startIndex,
 	TWindowMenuItem* newItem)
@@ -110,13 +101,6 @@ TWindowMenuItem::InsertIndexFor(BMenu* menu, int32 startIndex,
 			return index;
 		}
 	}
-}
-
-
-int32
-TWindowMenuItem::ID()
-{
-	return fID;
 }
 
 
@@ -200,57 +184,38 @@ void
 TWindowMenuItem::DrawContent()
 {
 	BMenu* menu = Menu();
-	BPoint contLoc = ContentLocation() + BPoint(kHPad, kVPad);
+	BPoint contentLocation = ContentLocation() + BPoint(kHPad, kVPad);
 
 	if (fID >= 0) {
 		menu->SetDrawingMode(B_OP_OVER);
 
 		float width = fBitmap->Bounds().Width();
 		if (width > 16)
-			contLoc.x -= 8;
+			contentLocation.x -= 8;
 
-		menu->MovePenTo(contLoc);
+		menu->MovePenTo(contentLocation);
 		menu->DrawBitmapAsync(fBitmap);
 
 		if (width > 16)
-			contLoc.x += 8;
+			contentLocation.x += 8;
 
-		contLoc.x += kIconRect.Width() + kLabelOffset;
+		contentLocation.x += kIconRect.Width() + kLabelOffset;
 	}
-	contLoc.y += fLabelAscent;
+	contentLocation.y += fLabelAscent;
 
 	menu->SetDrawingMode(B_OP_COPY);
-	menu->MovePenTo(contLoc);
-
-	float cachedWidth = menu->StringWidth(Label());
-	const char* label = Label();
-	char* truncLabel = NULL;
-	float maxWidth = menu->MaxContentWidth() - kVPad * 2;
-	if (maxWidth > 0) {
-		float offset = menu->PenLocation().x - Frame().left;
-		if (cachedWidth + offset > maxWidth) {
-			truncLabel = (char*)malloc(strlen(label) + 4);
-			if (truncLabel == NULL)
-				return;
-
-			TruncateLabel(maxWidth - offset, truncLabel);
-			label = truncLabel;
-		}
-	}
-
-	if (label == NULL)
-		label = Label();
-
-	SetLabel(label);
+	menu->MovePenTo(contentLocation);
 
 	if (IsSelected())
 		menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
 	else
 		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
-	menu->DrawString(label);
+	float labelWidth = menu->StringWidth(Label());
+	BPoint penLocation = menu->PenLocation();
+	float offset = penLocation.x - Frame().left;
 
-	free(truncLabel);
+	menu->DrawString(Label(labelWidth + offset));
 }
 
 

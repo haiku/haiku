@@ -30,67 +30,92 @@ Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
 trademarks of Be Incorporated in the United States and other countries. Other
 brand product names are registered trademarks or trademarks of their respective
 holders.
+
 All rights reserved.
 */
-#ifndef WINDOWMENUITEM_H
-#define WINDOWMENUITEM_H
 
 
 #include "TruncatableMenuItem.h"
 
+#include <stdlib.h>
+
 #include <String.h>
 
-
-class BBitmap;
-
-// Individual windows of an application item for WindowMenu,
-// sub of TeamMenuItem all DB positions
-class TWindowMenuItem : public TTruncatableMenuItem {
-public:
-								TWindowMenuItem(const char* label, int32 id,
-									bool mini, bool currentWorkSpace,
-									bool dragging = false);
-
-			void				SetTo(const char* label, int32 id, bool mini,
-									bool currentWorkSpace,
-									bool dragging = false);
-
-			bool				Expanded() const { return fExpanded; };
-			void				SetExpanded(bool expand) { fExpanded = expand; };
-
-			int32				ID() const { return fID; };
-			bool				Modified() const { return fModified; };
-			const char*			Name() const { return fName; };
-
-			bool				RequiresUpdate() { return fRequireUpdate; };
-			void				SetRequireUpdate(bool update)
-									{ fRequireUpdate = update; };
-
-	static	int32				InsertIndexFor(BMenu* menu, int32 startIndex,
-									TWindowMenuItem* item);
-
-protected:
-	virtual void				GetContentSize(float* width, float* height);
-	virtual void				DrawContent();
-	virtual status_t			Invoke(BMessage* message = NULL);
-	virtual void				Draw();
-
-private:
-			void				_Init(const char* label);
-
-			int32				fID;
-			bool				fMini;
-			bool				fCurrentWorkSpace;
-			const BBitmap*		fBitmap;
-			float				fLabelWidth;
-			float				fLabelAscent;
-			float				fLabelDescent;
-			bool				fDragging;
-			bool				fExpanded;
-			bool				fRequireUpdate;
-			bool				fModified;
-			const char*			fName;
-};
+#include "BarApp.h"
+#include "BarView.h"
+#include "ExpandoMenuBar.h"
 
 
-#endif	/* WINDOWMENUITEM_H */
+const float kVPad = 2.0f;
+const float kSwitchWidth = 12.0f;
+
+
+//	#pragma mark - TTruncatableMenuItem
+
+
+TTruncatableMenuItem::TTruncatableMenuItem(const char* label, BMessage* message,
+	char shortcut, uint32 modifiers)
+	:
+	BMenuItem(label, message, shortcut, modifiers),
+	fTruncatedString(new BString())
+{
+}
+
+
+TTruncatableMenuItem::TTruncatableMenuItem(BMenu* menu, BMessage* message)
+	:
+	BMenuItem(menu, message),
+	fTruncatedString(new BString())
+{
+}
+
+
+TTruncatableMenuItem::TTruncatableMenuItem(BMessage* data)
+	:
+	BMenuItem(data),
+	fTruncatedString(new BString())
+{
+}
+
+
+TTruncatableMenuItem::~TTruncatableMenuItem()
+{
+	delete fTruncatedString;
+}
+
+
+const char*
+TTruncatableMenuItem::Label()
+{
+	return BMenuItem::Label();
+}
+
+
+const char*
+TTruncatableMenuItem::Label(float width)
+{
+	BMenu* menu = Menu();
+	TExpandoMenuBar* expandoMenuBar = dynamic_cast<TExpandoMenuBar*>(menu);
+
+	float maxWidth = menu->MaxContentWidth() - kVPad * 2;
+	if (expandoMenuBar != NULL
+		&& static_cast<TBarApp*>(be_app)->BarView()->Vertical()
+		&& static_cast<TBarApp*>(be_app)->Settings()->superExpando) {
+		maxWidth -= kSwitchWidth;
+	}
+
+	const char* label = Label();
+	if (width > 0 && maxWidth > 0 && width > maxWidth) {
+		char* truncatedLabel = (char*)malloc(strlen(label) + 4);
+		if (truncatedLabel != NULL) {
+			float labelWidth = menu->StringWidth(label);
+			float offset = width - labelWidth;
+			TruncateLabel(maxWidth - offset, truncatedLabel);
+			fTruncatedString->SetTo(truncatedLabel);
+			free(truncatedLabel);
+			return fTruncatedString->String();
+		}
+	}
+
+	return label;
+}

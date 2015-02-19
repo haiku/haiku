@@ -49,6 +49,7 @@ All rights reserved.
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
+#include <WindowInfo.h>
 
 #include "BarApp.h"
 #include "ResourceSet.h"

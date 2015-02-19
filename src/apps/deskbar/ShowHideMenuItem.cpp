@@ -42,6 +42,7 @@ All rights reserved.
 
 #include <Debug.h>
 #include <Roster.h>
+#include <WindowInfo.h>
 
 #include "WindowMenuItem.h"
 #include "tracker_private.h"

@@ -32,65 +32,29 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
-#ifndef WINDOWMENUITEM_H
-#define WINDOWMENUITEM_H
+#ifndef TRUNCATE_MENU_ITEM_H
+#define TRUNCATE_MENU_ITEM_H
 
 
-#include "TruncatableMenuItem.h"
-
-#include <String.h>
+#include <MenuItem.h>
 
 
-class BBitmap;
+class BString;
 
-// Individual windows of an application item for WindowMenu,
-// sub of TeamMenuItem all DB positions
-class TWindowMenuItem : public TTruncatableMenuItem {
+class TTruncatableMenuItem : public BMenuItem {
 public:
-								TWindowMenuItem(const char* label, int32 id,
-									bool mini, bool currentWorkSpace,
-									bool dragging = false);
+								TTruncatableMenuItem(const char* label, BMessage* message,
+									char shortcut = 0, uint32 modifiers = 0);
+								TTruncatableMenuItem(BMenu* menu, BMessage* message = NULL);
+								TTruncatableMenuItem(BMessage* data);
+	virtual						~TTruncatableMenuItem();
 
-			void				SetTo(const char* label, int32 id, bool mini,
-									bool currentWorkSpace,
-									bool dragging = false);
-
-			bool				Expanded() const { return fExpanded; };
-			void				SetExpanded(bool expand) { fExpanded = expand; };
-
-			int32				ID() const { return fID; };
-			bool				Modified() const { return fModified; };
-			const char*			Name() const { return fName; };
-
-			bool				RequiresUpdate() { return fRequireUpdate; };
-			void				SetRequireUpdate(bool update)
-									{ fRequireUpdate = update; };
-
-	static	int32				InsertIndexFor(BMenu* menu, int32 startIndex,
-									TWindowMenuItem* item);
-
-protected:
-	virtual void				GetContentSize(float* width, float* height);
-	virtual void				DrawContent();
-	virtual status_t			Invoke(BMessage* message = NULL);
-	virtual void				Draw();
+	virtual	const char*			Label();
+	virtual	const char*			Label(float width);
 
 private:
-			void				_Init(const char* label);
-
-			int32				fID;
-			bool				fMini;
-			bool				fCurrentWorkSpace;
-			const BBitmap*		fBitmap;
-			float				fLabelWidth;
-			float				fLabelAscent;
-			float				fLabelDescent;
-			bool				fDragging;
-			bool				fExpanded;
-			bool				fRequireUpdate;
-			bool				fModified;
-			const char*			fName;
+			BString*			fTruncatedString;
 };
 
 
-#endif	/* WINDOWMENUITEM_H */
+#endif	// TRUNCATE_MENU_ITEM_H

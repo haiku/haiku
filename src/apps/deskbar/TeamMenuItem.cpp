@@ -65,18 +65,18 @@ const float kLabelOffset = 8.0f;
 const float kSwitchWidth = 12.0f;
 
 
-TTeamMenuItem::TTeamMenuItem(BList* team, BBitmap* icon, char* name, char* sig,
-	float width, float height)
+TTeamMenuItem::TTeamMenuItem(BList* team, BBitmap* icon, char* name,
+	char* signature, float width, float height)
 	:
-	BMenuItem(new TWindowMenu(team, sig))
+	TTruncatableMenuItem(new TWindowMenu(team, signature))
 {
-	_InitData(team, icon, name, sig, width, height);
+	_InitData(team, icon, name, signature, width, height);
 }
 
 
 TTeamMenuItem::TTeamMenuItem(float width, float height)
 	:
-	BMenuItem("", NULL)
+	TTruncatableMenuItem("", NULL)
 {
 	_InitData(NULL, NULL, strdup(""), strdup(""), width, height);
 }
@@ -87,20 +87,7 @@ TTeamMenuItem::~TTeamMenuItem()
 	delete fTeam;
 	delete fIcon;
 	free(fName);
-	free(fSig);
-}
-
-
-void
-TTeamMenuItem::SetLabel(const char* label) {
-	BFont font(be_plain_font);
-	fLabelWidth = ceilf(font.StringWidth(label));
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
-	fLabelAscent = ceilf(fontHeight.ascent);
-	fLabelDescent = ceilf(fontHeight.descent + fontHeight.leading);
-
-	BMenuItem::SetLabel(label);
+	free(fSignature);
 }
 
 
@@ -243,35 +230,35 @@ TTeamMenuItem::DrawContent()
 		BRect iconBounds(fIcon->Bounds());
 		BRect dstRect(iconBounds);
 		float extra = fBarView->Vertical() ? 0.0f : -1.0f;
-		BPoint contLoc = ContentLocation();
-		BPoint drawLoc = contLoc + BPoint(kHPad, kVPad);
+		BPoint contentLocation = ContentLocation();
+		BPoint drawLocation = contentLocation + BPoint(kHPad, kVPad);
 
 		if (static_cast<TBarApp*>(be_app)->Settings()->hideLabels
 			|| (fBarView->Vertical() && iconBounds.Width() > 32)) {
-			float offsetx = contLoc.x
+			float offsetx = contentLocation.x
 				+ ((frame.Width() - iconBounds.Width()) / 2) + extra;
-			float offsety = contLoc.y + 3.0f + extra;
+			float offsety = contentLocation.y + 3.0f + extra;
 
 			dstRect.OffsetTo(BPoint(offsetx, offsety));
 			menu->DrawBitmapAsync(fIcon, dstRect);
 
-			drawLoc.x = ((frame.Width() - LabelWidth()) / 2);
-			drawLoc.y = frame.top + iconBounds.Height() + kVPad * 2;
+			drawLocation.x = ((frame.Width() - LabelWidth()) / 2);
+			drawLocation.y = frame.top + iconBounds.Height() + kVPad * 2;
 		} else {
-			float offsetx = contLoc.x + kHPad;
-			float offsety = contLoc.y + 
+			float offsetx = contentLocation.x + kHPad;
+			float offsety = contentLocation.y +
 				((frame.Height() - iconBounds.Height()) / 2) + extra;
 
 			dstRect.OffsetTo(BPoint(offsetx, offsety));
 			menu->DrawBitmapAsync(fIcon, dstRect);
 
 			float labelHeight = fLabelAscent + fLabelDescent;
-			drawLoc.x += iconBounds.Width() + kLabelOffset;
-			drawLoc.y = frame.top + ((frame.Height() - labelHeight) / 2)
+			drawLocation.x += iconBounds.Width() + kLabelOffset;
+			drawLocation.y = frame.top + ((frame.Height() - labelHeight) / 2)
 				+ extra;
 		}
 
-		menu->MovePenTo(drawLoc);
+		menu->MovePenTo(drawLocation);
 	}
 
 	menu->SetDrawingMode(B_OP_OVER);
@@ -281,34 +268,6 @@ TTeamMenuItem::DrawContent()
 	// the wrong lowcolor is used when the item is disabled since the
 	// text color does not change
 	menu->MovePenBy(0, fLabelAscent);
-
-	float cachedWidth = menu->StringWidth(Label());
-	if (Submenu() != NULL && fBarView->Vertical())
-		cachedWidth += 18;
-
-	const char* label = Label();
-	char* truncLabel = NULL;
-	float maxWidth = fBarView->Vertical()
-			&& static_cast<TBarApp*>(be_app)->Settings()->superExpando
-		? menu->MaxContentWidth() - kSwitchWidth
-		: menu->MaxContentWidth() - kVPad * 2;
-	if (maxWidth > 0) {
-		float offset = menu->PenLocation().x - Frame().left;
-		if (cachedWidth + offset > maxWidth) {
-			truncLabel = (char*)malloc(strlen(label) + 4);
-			if (truncLabel != NULL) {
-				TruncateLabel(maxWidth - offset, truncLabel);
-				label = truncLabel;
-			}
-		}
-	}
-
-	if (label == NULL)
-		label = Label();
-
-	BMenuItem::SetLabel(label);
-
-	free(truncLabel);
 
 	bool canHandle = !fBarView->Dragging()
 		|| fBarView->AppCanHandleTypes(Signature());
@@ -323,8 +282,12 @@ TTeamMenuItem::DrawContent()
 	else
 		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
-	if (!static_cast<TBarApp*>(be_app)->Settings()->hideLabels)
-		menu->DrawString(label);
+	if (!static_cast<TBarApp*>(be_app)->Settings()->hideLabels) {
+		float labelWidth = menu->StringWidth(Label());
+		BPoint penLocation = menu->PenLocation();
+		float offset = penLocation.x - Frame().left;
+		menu->DrawString(Label(labelWidth + offset));
+	}
 
 	if (fBarView->Vertical()
 		&& static_cast<TBarApp*>(be_app)->Settings()->superExpando
@@ -339,7 +302,7 @@ TTeamMenuItem::DrawExpanderArrow()
 {
 	BMenu* menu = Menu();
 	BRect frame(Frame());
-	BRect rect(0, 0, kSwitchWidth, 10);
+	BRect rect(0.0f, 0.0f, kSwitchWidth, kHPad + 2.0f);
 
 	rect.OffsetTo(BPoint(frame.right - rect.Width(),
 		ContentLocation().y + ((frame.Height() - rect.Height()) / 2)));
@@ -447,19 +410,27 @@ TTeamMenuItem::ExpanderBounds() const
 
 
 void
-TTeamMenuItem::_InitData(BList* team, BBitmap* icon, char* name, char* sig,
+TTeamMenuItem::_InitData(BList* team, BBitmap* icon, char* name, char* signature,
 	float width, float height)
 {
 	fTeam = team;
 	fIcon = icon;
 	fName = name;
-	fSig = sig;
+	fSignature = signature;
 	if (fName == NULL) {
 		char temp[32];
 		snprintf(temp, sizeof(temp), "team %ld", (addr_t)team->ItemAt(0));
 		fName = strdup(temp);
 	}
+	BFont font(be_plain_font);
+	fLabelWidth = ceilf(font.StringWidth(fName));
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
+	fLabelAscent = ceilf(fontHeight.ascent);
+	fLabelDescent = ceilf(fontHeight.descent + fontHeight.leading);
+
 	SetLabel(fName);
+
 	fOverrideWidth = width;
 	fOverrideHeight = height;
 

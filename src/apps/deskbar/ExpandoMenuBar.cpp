@@ -993,7 +993,7 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 									if (strcasecmp(item->Label(), wInfo->name) > 0)
 										item->SetLabel(wInfo->name);
 
-									if (item->ChangedState())
+									if (item->Modified())
 										itemModified = true;
 								} else if (teamItem->IsExpanded()) {
 									// Add the item

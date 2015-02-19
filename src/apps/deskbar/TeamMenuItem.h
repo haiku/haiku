@@ -41,24 +41,22 @@ All rights reserved.
 //	item for ExpandoMenuBar in vertical or horizontal expanded mode
 
 
-#include <MenuItem.h>
-
-#include "WindowMenuItem.h"
-#include "BarMenuBar.h"
+#include "TruncatableMenuItem.h"
 
 
 class BBitmap;
+class TBarView;
+class TWindowMenuItem;
 
-class TTeamMenuItem : public BMenuItem {
+class TTeamMenuItem : public TTruncatableMenuItem {
 public:
 								TTeamMenuItem(BList* team, BBitmap* icon,
-									char* name, char* sig,
+									char* name, char*
+										nature,
 									float width = -1.0f, float height = -1.0f);
 								TTeamMenuItem(float width = -1.0f,
 									float height = -1.0f);
 	virtual						~TTeamMenuItem();
-
-	virtual	void				SetLabel(const char* label);
 
 			status_t			Invoke(BMessage* message = NULL);
 
@@ -83,7 +81,7 @@ public:
 
 			float				LabelWidth() const { return fLabelWidth; };
 			BList*				Teams() const { return fTeam; };
-			const char*			Signature() const { return fSig; };
+			const char*			Signature() const { return fSignature; };
 			const char*			Name() const { return fName; };
 
 protected:
@@ -95,7 +93,7 @@ protected:
 private:
 	friend	class				TExpandoMenuBar;
 			void				_InitData(BList* team, BBitmap* icon,
-									char* name, char* sig,
+									char* name, char* signature,
 									float width = -1.0f, float height = -1.0f);
 
 			bool				_IsSelected() const;
@@ -104,7 +102,7 @@ private:
 			BList*				fTeam;
 			BBitmap*			fIcon;
 			char*				fName;
-			char*				fSig;
+			char*				fSignature;
 			float				fOverrideWidth;
 			float				fOverrideHeight;
 
