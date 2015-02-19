@@ -108,9 +108,10 @@ TTeamMenu::AttachedToWindow()
 				item->SetEnabled(canhandle);
 
 			BMenu* menu = item->Submenu();
-			if (menu)
+			if (menu != NULL) {
 				menu->SetTrackingHook(barview->MenuTrackingHook,
 					barview->GetTrackingHookData());
+			}
 		}
 	}
 
