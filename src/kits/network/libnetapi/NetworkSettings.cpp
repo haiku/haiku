@@ -139,13 +139,21 @@ BNetworkSettings::GetNextInterface(uint32& cookie, BMessage& interface)
 
 
 status_t
+BNetworkSettings::GetInterface(const char* name, BMessage& interface)
+{
+	int32 index;
+	return _GetItem(fInterfaces, "interface", "device", name, index, interface);
+}
+
+
+status_t
 BNetworkSettings::AddInterface(const BMessage& interface)
 {
 	const char* name = NULL;
 	if (interface.FindString("device", &name) != B_OK)
 		return B_BAD_VALUE;
 
-	_RemoveItem(fInterfaces, "interface", "device", name, NULL);
+	_RemoveItem(fInterfaces, "interface", "device", name);
 
 	status_t result = fInterfaces.AddMessage("interface", &interface);
 	if (result != B_OK)
@@ -187,13 +195,21 @@ BNetworkSettings::GetNextNetwork(uint32& cookie, BMessage& network) const
 
 
 status_t
+BNetworkSettings::GetNetwork(const char* name, BMessage& network)
+{
+	int32 index;
+	return _GetItem(fNetworks, "network", "name", name, index, network);
+}
+
+
+status_t
 BNetworkSettings::AddNetwork(const BMessage& network)
 {
 	const char* name = NULL;
 	if (network.FindString("name", &name) != B_OK)
 		return B_BAD_VALUE;
 
-	_RemoveItem(fNetworks, "network", "name", name, NULL);
+	_RemoveItem(fNetworks, "network", "name", name);
 
 	status_t result = fNetworks.AddMessage("network", &network);
 	if (result != B_OK)
@@ -211,6 +227,13 @@ BNetworkSettings::RemoveNetwork(const char* name)
 }
 
 
+const BMessage&
+BNetworkSettings::Services() const
+{
+	return fServices;
+}
+
+
 status_t
 BNetworkSettings::GetNextService(uint32& cookie, BMessage& service)
 {
@@ -223,10 +246,11 @@ BNetworkSettings::GetNextService(uint32& cookie, BMessage& service)
 }
 
 
-const BMessage&
-BNetworkSettings::Services() const
+status_t
+BNetworkSettings::GetService(const char* name, BMessage& service)
 {
-	return fServices;
+	int32 index;
+	return _GetItem(fServices, "service", "name", name, index, service);
 }
 
 
@@ -237,7 +261,7 @@ BNetworkSettings::AddService(const BMessage& service)
 	if (service.FindString("name", &name) != B_OK)
 		return B_BAD_VALUE;
 
-	_RemoveItem(fServices, "service", "name", name, NULL);
+	_RemoveItem(fServices, "service", "name", name);
 
 	status_t result = fServices.AddMessage("service", &service);
 	if (result != B_OK)
@@ -614,22 +638,36 @@ BNetworkSettings::_ConvertNetworkFromSettings(BMessage& message)
 
 
 status_t
-BNetworkSettings::_RemoveItem(BMessage& container, const char* itemField,
-	const char* nameField, const char* name, const char* store)
+BNetworkSettings::_GetItem(BMessage& container, const char* itemField,
+	const char* nameField, const char* name, int32& _index, BMessage& item)
 {
 	int32 index = 0;
-	BMessage item;
 	while (container.FindMessage(itemField, index, &item) == B_OK) {
 		const char* itemName = NULL;
 		if (item.FindString(nameField, &itemName) == B_OK
 			&& strcmp(itemName, name) == 0) {
-			container.RemoveData(itemField, index);
-			if (store != NULL)
-				return _Save(store);
+			_index = index;
 			return B_OK;
 		}
 
 		index++;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+BNetworkSettings::_RemoveItem(BMessage& container, const char* itemField,
+	const char* nameField, const char* name, const char* store)
+{
+	BMessage item;
+	int32 index;
+	if (_GetItem(container, itemField, nameField, name, index, item) == B_OK) {
+		container.RemoveData(itemField, index);
+		if (store != NULL)
+			return _Save(store);
+		return B_OK;
 	}
 
 	return B_ENTRY_NOT_FOUND;
