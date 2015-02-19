@@ -383,19 +383,32 @@ BHttpRequest::_ProtocolLoop()
 				break;
 
 			case B_HTTP_STATUS_CLASS_REDIRECTION:
+			{
 				// Redirection has been explicitly disabled
 				if (!fOptFollowLocation)
 					break;
 
-				//  TODO: Some browsers seems to translate POST requests to
-				// GET when following a 302 redirection. 303 should do the same,
-				// but NOT 307.
-				if (fResult.StatusCode() == B_HTTP_STATUS_MOVED_PERMANENTLY
-					|| fResult.StatusCode() == B_HTTP_STATUS_TEMPORARY_REDIRECT
-					|| fResult.StatusCode() == B_HTTP_STATUS_FOUND) {
+				int code = fResult.StatusCode();
+				if (code == B_HTTP_STATUS_MOVED_PERMANENTLY
+					|| code == B_HTTP_STATUS_FOUND
+					|| code == B_HTTP_STATUS_SEE_OTHER
+					|| code == B_HTTP_STATUS_TEMPORARY_REDIRECT) {
 					BString locationUrl = fHeaders["Location"];
 
 					fUrl = BUrl(fUrl, locationUrl);
+
+					// 302 and 303 redirections also convert POST requests to GET
+					// (and remove the posted form data)
+					if ((code == B_HTTP_STATUS_FOUND
+						|| code == B_HTTP_STATUS_SEE_OTHER)
+						&& fRequestMethod == B_HTTP_POST) {
+							SetMethod(B_HTTP_GET);
+							delete fOptPostFields;
+							fOptPostFields = NULL;
+							delete fOptInputData;
+							fOptInputData = NULL;
+							fOptInputDataSize = 0;
+					}
 
 					if (--maxRedirs > 0) {
 						newRequest = true;
@@ -412,6 +425,7 @@ BHttpRequest::_ProtocolLoop()
 					}
 				}
 				break;
+			}
 
 			case B_HTTP_STATUS_CLASS_CLIENT_ERROR:
 				if (fResult.StatusCode() == B_HTTP_STATUS_UNAUTHORIZED) {
