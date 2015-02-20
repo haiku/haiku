@@ -44,6 +44,7 @@ All rights reserved.
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <Debug.h>
+#include <MenuPrivate.h>
 #include <NodeInfo.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -792,7 +793,7 @@ void
 TExpandoMenuBar::SetMenuLayout(menu_layout layout)
 {
 	fVertical = layout == B_ITEMS_IN_COLUMN;
-	BMenu::_SetMenuLayout(layout);
+	BPrivate::MenuPrivate(this).SetLayout(layout);
 	SetMaxItemWidth();
 		// when the menu layout changes, make sure to set the max width
 }
