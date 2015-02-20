@@ -92,7 +92,6 @@ protected:
 			void				DrawExpanderArrow();
 
 private:
-	friend	class				TExpandoMenuBar;
 			void				_InitData(BList* team, BBitmap* icon,
 									char* name, char* signature,
 									float width = -1.0f, float height = -1.0f);
