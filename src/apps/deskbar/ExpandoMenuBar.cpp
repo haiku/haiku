@@ -1055,9 +1055,11 @@ TExpandoMenuBar::_FinishedDrag(bool invoke)
 	if (fPreviousDragTargetItem != NULL) {
 		if (invoke)
 			fPreviousDragTargetItem->Invoke();
+
 		fPreviousDragTargetItem->SetOverrideSelected(false);
 		fPreviousDragTargetItem = NULL;
 	}
+
 	if (!invoke && fBarView->Dragging())
 		fBarView->DragStop(true);
 }

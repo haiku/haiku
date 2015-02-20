@@ -78,37 +78,6 @@ TWindowMenuItem::TWindowMenuItem(const char* label, int32 id, bool mini,
 
 
 void
-TWindowMenuItem::SetTo(const char* label, int32 id, bool mini,
-	bool currentWorkspace, bool dragging)
-{
-	fModified = fCurrentWorkSpace != currentWorkspace || fMini != mini;
-
-	fID = id;
-	fMini = mini;
-	fCurrentWorkSpace = currentWorkspace;
-	fDragging = dragging;
-	fRequireUpdate = false;
-
-	_Init(label);
-}
-
-
-/*static*/ int32
-TWindowMenuItem::InsertIndexFor(BMenu* menu, int32 startIndex,
-	TWindowMenuItem* newItem)
-{
-	for (int32 index = startIndex;; index++) {
-		TWindowMenuItem* item
-			= dynamic_cast<TWindowMenuItem*>(menu->ItemAt(index));
-		if (item == NULL
-			|| NaturalCompare(item->Label(), newItem->Label()) > 0) {
-			return index;
-		}
-	}
-}
-
-
-void
 TWindowMenuItem::GetContentSize(float* width, float* height)
 {
 	if (width != NULL) {
@@ -249,6 +218,37 @@ TWindowMenuItem::Invoke(BMessage* /*message*/)
 		}
 	}
 	return B_OK;
+}
+
+
+void
+TWindowMenuItem::SetTo(const char* label, int32 id, bool mini,
+	bool currentWorkspace, bool dragging)
+{
+	fModified = fCurrentWorkSpace != currentWorkspace || fMini != mini;
+
+	fID = id;
+	fMini = mini;
+	fCurrentWorkSpace = currentWorkspace;
+	fDragging = dragging;
+	fRequireUpdate = false;
+
+	_Init(label);
+}
+
+
+/*static*/ int32
+TWindowMenuItem::InsertIndexFor(BMenu* menu, int32 startIndex,
+	TWindowMenuItem* newItem)
+{
+	for (int32 index = startIndex;; index++) {
+		TWindowMenuItem* item
+			= dynamic_cast<TWindowMenuItem*>(menu->ItemAt(index));
+		if (item == NULL
+			|| NaturalCompare(item->Label(), newItem->Label()) > 0) {
+			return index;
+		}
+	}
 }
 
 

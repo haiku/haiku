@@ -76,6 +76,7 @@ public:
 
 			bool				IsExpanded() const { return fExpanded; };
 			void				ToggleExpandState(bool resizeWindow);
+
 			BRect				ExpanderBounds() const;
 			TWindowMenuItem*	ExpandedWindowItem(int32 id);
 
@@ -103,6 +104,7 @@ private:
 			BBitmap*			fIcon;
 			char*				fName;
 			char*				fSignature;
+
 			float				fOverrideWidth;
 			float				fOverrideHeight;
 

@@ -176,7 +176,7 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 void
 TTeamMenuItem::Draw()
 {
-	BRect frame(Frame());
+	BRect frame = Frame();
 	BMenu* menu = Menu();
 
 	menu->PushState();
@@ -229,9 +229,9 @@ TTeamMenuItem::DrawContent()
 		} else
 			menu->SetDrawingMode(B_OP_OVER);
 
-		BRect frame(Frame());
-		BRect iconBounds(fIcon->Bounds());
-		BRect dstRect(iconBounds);
+		BRect frame = Frame();
+		BRect iconBounds = fIcon->Bounds();
+		BRect updateRect = iconBounds;
 		float extra = fBarView->Vertical() ? 0.0f : -1.0f;
 		BPoint contentLocation = ContentLocation();
 		BPoint drawLocation = contentLocation + BPoint(kHPad, kVPad);
@@ -242,8 +242,8 @@ TTeamMenuItem::DrawContent()
 				+ ((frame.Width() - iconBounds.Width()) / 2) + extra;
 			float offsety = contentLocation.y + 3.0f + extra;
 
-			dstRect.OffsetTo(BPoint(offsetx, offsety));
-			menu->DrawBitmapAsync(fIcon, dstRect);
+			updateRect.OffsetTo(BPoint(offsetx, offsety));
+			menu->DrawBitmapAsync(fIcon, updateRect);
 
 			drawLocation.x = ((frame.Width() - LabelWidth()) / 2);
 			drawLocation.y = frame.top + iconBounds.Height() + kVPad * 2;
@@ -252,8 +252,8 @@ TTeamMenuItem::DrawContent()
 			float offsety = contentLocation.y +
 				((frame.Height() - iconBounds.Height()) / 2) + extra;
 
-			dstRect.OffsetTo(BPoint(offsetx, offsety));
-			menu->DrawBitmapAsync(fIcon, dstRect);
+			updateRect.OffsetTo(BPoint(offsetx, offsety));
+			menu->DrawBitmapAsync(fIcon, updateRect);
 
 			float labelHeight = fLabelAscent + fLabelDescent;
 			drawLocation.x += iconBounds.Width() + kLabelOffset;
@@ -304,7 +304,7 @@ void
 TTeamMenuItem::DrawExpanderArrow()
 {
 	BMenu* menu = Menu();
-	BRect frame(Frame());
+	BRect frame = Frame();
 	BRect rect(0.0f, 0.0f, kSwitchWidth, kHPad + 2.0f);
 
 	rect.OffsetTo(BPoint(frame.right - rect.Width(),
