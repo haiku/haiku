@@ -99,7 +99,7 @@ TTeamMenu::AttachedToWindow()
 			width, -1);
 
 		if (settings->trackerAlwaysFirst
-			&& strcmp(barInfo->sig, kTrackerSignature) == 0) {
+			&& strcasecmp(barInfo->sig, kTrackerSignature) == 0) {
 			AddItem(item, 0);
 		} else
 			AddItem(item);
