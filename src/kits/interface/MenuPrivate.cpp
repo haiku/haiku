@@ -112,6 +112,13 @@ MenuPrivate::Layout() const
 
 
 void
+MenuPrivate::SetLayout(menu_layout layout)
+{
+	fMenu->fLayout = layout;
+}
+
+
+void
 MenuPrivate::ItemMarked(BMenuItem *item)
 {
 	fMenu->_ItemMarked(item);

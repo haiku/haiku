@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc.
+ * Copyright 2006-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,6 +36,7 @@ public:
 								MenuPrivate(BMenu* menu);
 
 			menu_layout			Layout() const;
+			void				SetLayout(menu_layout layout);
 
 			void				ItemMarked(BMenuItem* item);
 			void				CacheFontInfo();
