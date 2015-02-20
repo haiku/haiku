@@ -51,8 +51,7 @@ class TWindowMenuItem;
 class TTeamMenuItem : public TTruncatableMenuItem {
 public:
 								TTeamMenuItem(BList* team, BBitmap* icon,
-									char* name, char*
-										nature,
+									char* name, char* signature,
 									float width = -1.0f, float height = -1.0f);
 								TTeamMenuItem(float width = -1.0f,
 									float height = -1.0f);
