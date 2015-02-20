@@ -89,7 +89,6 @@ TTeamMenuItem::~TTeamMenuItem()
 {
 	delete fTeam;
 	delete fIcon;
-	free(fName);
 	free(fSignature);
 }
 
@@ -418,26 +417,27 @@ TTeamMenuItem::_Init(BList* team, BBitmap* icon, char* name, char* signature,
 {
 	fTeam = team;
 	fIcon = icon;
-	fName = name;
 	fSignature = signature;
-	if (fName == NULL) {
+
+	if (name == NULL) {
 		char temp[32];
 		snprintf(temp, sizeof(temp), "team %ld", (addr_t)team->ItemAt(0));
-		fName = strdup(temp);
+		name = strdup(temp);
 	}
-	BFont font(be_plain_font);
-	fLabelWidth = ceilf(font.StringWidth(fName));
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
-	fLabelAscent = ceilf(fontHeight.ascent);
-	fLabelDescent = ceilf(fontHeight.descent + fontHeight.leading);
 
-	SetLabel(fName);
+	SetLabel(name);
 
 	fOverrideWidth = width;
 	fOverrideHeight = height;
 
 	fBarView = static_cast<TBarApp*>(be_app)->BarView();
+
+	BFont font(be_plain_font);
+	fLabelWidth = ceilf(font.StringWidth(name));
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
+	fLabelAscent = ceilf(fontHeight.ascent);
+	fLabelDescent = ceilf(fontHeight.descent + fontHeight.leading);
 
 	fOverriddenSelected = false;
 

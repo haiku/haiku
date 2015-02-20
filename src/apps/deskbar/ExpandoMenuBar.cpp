@@ -367,10 +367,10 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					&& fBarView->ExpandoState() && item->IsExpanded()) {
 					// expando mode window menu item
 					fLastMousedOverItem = menuItem;
-					if (strcasecmp(windowMenuItem->Label(),
-							windowMenuItem->Name()) > 0) {
+					if (strcasecmp(windowMenuItem->TruncatedLabel(),
+						windowMenuItem->Label()) > 0) {
 						// label is truncated, set tooltip
-						SetToolTip(windowMenuItem->Name());
+						SetToolTip(windowMenuItem->Label());
 					} else
 						SetToolTip((const char*)NULL);
 
@@ -380,17 +380,17 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 				if (!dynamic_cast<TBarApp*>(be_app)->Settings()->hideLabels) {
 					// item has a visible label, set tool tip if truncated
 					fLastMousedOverItem = menuItem;
-					if (strcasecmp(item->Label(), item->Name()) > 0) {
+					if (strcasecmp(item->TruncatedLabel(), item->Label()) > 0) {
 						// label is truncated, set tooltip
-						SetToolTip(item->Name());
+						SetToolTip(item->Label());
 					} else
 						SetToolTip((const char*)NULL);
 
 					break;
 				}
 
-				SetToolTip(item->Name());
-					// new item, set the tooltip to the item name
+				SetToolTip(item->Label());
+					// new item, set the tooltip to the item label
 				fLastMousedOverItem = menuItem;
 					// save the current menuitem for the next MouseMoved() call
 				break;
@@ -639,7 +639,7 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 		int32 itemCount = CountItems();
 		while (i < itemCount) {
 			teamItem = dynamic_cast<TTeamMenuItem*>(ItemAt(i));
-			if (teamItem != NULL && strcasecmp(teamItem->Name(), name) > 0) {
+			if (teamItem != NULL && strcasecmp(teamItem->Label(), name) > 0) {
 				AddItem(item, i);
 				break;
 			}

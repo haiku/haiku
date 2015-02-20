@@ -47,11 +47,11 @@ class BBitmap;
 // sub of TeamMenuItem all DB positions
 class TWindowMenuItem : public TTruncatableMenuItem {
 public:
-								TWindowMenuItem(const char* label, int32 id,
+								TWindowMenuItem(const char* name, int32 id,
 									bool mini, bool currentWorkSpace,
 									bool dragging = false);
 
-			void				SetTo(const char* label, int32 id, bool mini,
+			void				SetTo(const char* name, int32 id, bool mini,
 									bool currentWorkSpace,
 									bool dragging = false);
 
@@ -60,7 +60,6 @@ public:
 
 			int32				ID() const { return fID; };
 			bool				Modified() const { return fModified; };
-			const char*			Name() const { return fName; };
 
 			bool				RequiresUpdate() { return fRequireUpdate; };
 			void				SetRequireUpdate(bool update)
@@ -76,7 +75,7 @@ protected:
 	virtual void				Draw();
 
 private:
-			void				_Init(const char* label);
+			void				_Init(const char* name);
 
 			int32				fID;
 			bool				fMini;
@@ -89,7 +88,6 @@ private:
 			bool				fExpanded;
 			bool				fRequireUpdate;
 			bool				fModified;
-			const char*			fName;
 };
 
 

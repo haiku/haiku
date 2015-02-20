@@ -144,7 +144,7 @@ TWindowMenu::AttachedToWindow()
 					TWindowMenuItem* item
 						= static_cast<TWindowMenuItem*>(ItemAt(addIndex));
 					if (item != NULL
-						&& strcasecmp(item->Name(), wInfo->name) > 0) {
+						&& strcasecmp(item->Label(), wInfo->name) > 0) {
 						break;
 					}
 				}

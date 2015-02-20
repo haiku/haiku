@@ -82,7 +82,6 @@ public:
 			float				LabelWidth() const { return fLabelWidth; };
 			BList*				Teams() const { return fTeam; };
 			const char*			Signature() const { return fSignature; };
-			const char*			Name() const { return fName; };
 
 protected:
 			void				GetContentSize(float* width, float* height);
@@ -100,7 +99,6 @@ private:
 private:
 			BList*				fTeam;
 			BBitmap*			fIcon;
-			char*				fName;
 			char*				fSignature;
 
 			float				fOverrideWidth;

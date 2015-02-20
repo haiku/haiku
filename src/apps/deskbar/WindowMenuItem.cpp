@@ -61,10 +61,10 @@ const BRect kIconRect(1.0f, 1.0f, 13.0f, 14.0f);
 //	#pragma mark - TWindowMenuItem
 
 
-TWindowMenuItem::TWindowMenuItem(const char* label, int32 id, bool mini,
+TWindowMenuItem::TWindowMenuItem(const char* name, int32 id, bool mini,
 	bool currentWorkspace, bool dragging)
 	:
-	TTruncatableMenuItem(label, NULL),
+	TTruncatableMenuItem(name, NULL),
 	fID(id),
 	fMini(mini),
 	fCurrentWorkSpace(currentWorkspace),
@@ -73,7 +73,7 @@ TWindowMenuItem::TWindowMenuItem(const char* label, int32 id, bool mini,
 	fRequireUpdate(false),
 	fModified(false)
 {
-	_Init(label);
+	_Init(name);
 }
 
 
@@ -222,7 +222,7 @@ TWindowMenuItem::Invoke(BMessage* /*message*/)
 
 
 void
-TWindowMenuItem::SetTo(const char* label, int32 id, bool mini,
+TWindowMenuItem::SetTo(const char* name, int32 id, bool mini,
 	bool currentWorkspace, bool dragging)
 {
 	fModified = fCurrentWorkSpace != currentWorkspace || fMini != mini;
@@ -233,7 +233,7 @@ TWindowMenuItem::SetTo(const char* label, int32 id, bool mini,
 	fDragging = dragging;
 	fRequireUpdate = false;
 
-	_Init(label);
+	_Init(name);
 }
 
 
@@ -256,7 +256,7 @@ TWindowMenuItem::InsertIndexFor(BMenu* menu, int32 startIndex,
 
 
 void
-TWindowMenuItem::_Init(const char* label)
+TWindowMenuItem::_Init(const char* name)
 {
 	if (fMini) {
 		fBitmap = fCurrentWorkSpace
@@ -268,13 +268,12 @@ TWindowMenuItem::_Init(const char* label)
 			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownSwitchIcon);
 	}
 
-	fName = label;
 	BFont font(be_plain_font);
-	fLabelWidth = ceilf(font.StringWidth(label));
+	fLabelWidth = ceilf(font.StringWidth(name));
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
 	fLabelAscent = ceilf(fontHeight.ascent);
 	fLabelDescent = ceilf(fontHeight.descent + fontHeight.leading);
 
-	SetLabel(label);
+	SetLabel(name);
 }
