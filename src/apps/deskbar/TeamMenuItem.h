@@ -91,7 +91,7 @@ protected:
 			void				DrawExpanderArrow();
 
 private:
-			void				_InitData(BList* team, BBitmap* icon,
+			void				_Init(BList* team, BBitmap* icon,
 									char* name, char* signature,
 									float width = -1.0f, float height = -1.0f);
 

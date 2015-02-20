@@ -73,7 +73,7 @@ TTeamMenuItem::TTeamMenuItem(BList* team, BBitmap* icon, char* name,
 	:
 	TTruncatableMenuItem(new TWindowMenu(team, signature))
 {
-	_InitData(team, icon, name, signature, width, height);
+	_Init(team, icon, name, signature, width, height);
 }
 
 
@@ -81,7 +81,7 @@ TTeamMenuItem::TTeamMenuItem(float width, float height)
 	:
 	TTruncatableMenuItem("", NULL)
 {
-	_InitData(NULL, NULL, strdup(""), strdup(""), width, height);
+	_Init(NULL, NULL, strdup(""), strdup(""), width, height);
 }
 
 
@@ -413,7 +413,7 @@ TTeamMenuItem::ExpanderBounds() const
 
 
 void
-TTeamMenuItem::_InitData(BList* team, BBitmap* icon, char* name, char* signature,
+TTeamMenuItem::_Init(BList* team, BBitmap* icon, char* name, char* signature,
 	float width, float height)
 {
 	fTeam = team;
