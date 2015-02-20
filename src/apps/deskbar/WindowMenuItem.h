@@ -32,8 +32,8 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
-#ifndef WINDOWMENUITEM_H
-#define WINDOWMENUITEM_H
+#ifndef WINDOW_MENU_ITEM_H
+#define WINDOW_MENU_ITEM_H
 
 
 #include "TruncatableMenuItem.h"
@@ -93,4 +93,4 @@ private:
 };
 
 
-#endif	/* WINDOWMENUITEM_H */
+#endif	// WINDOW_MENU_ITEM_H
