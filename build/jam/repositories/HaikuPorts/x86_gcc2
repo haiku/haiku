@@ -487,8 +487,8 @@ RemotePackageRepository HaikuPorts
 	gpgme_x86_devel-1.5.2-2
 	guilib_x86-1.2.1-1
 	guilib_x86_devel-1.2.1-1
-	haikuwebkit_x86-1.4.9-2
-	haikuwebkit_x86_devel-1.4.9-2
+	haikuwebkit_x86-1.4.10-1
+	haikuwebkit_x86_devel-1.4.10-1
 	icu_x86-54.1-4
 	icu_x86_devel-54.1-4
 	ilmbase_x86-2.2.0-1
