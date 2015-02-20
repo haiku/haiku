@@ -38,8 +38,8 @@ All rights reserved.
 
 #include <MenuItem.h>
 
+#include <String.h>
 
-class BString;
 
 class TTruncatableMenuItem : public BMenuItem {
 public:
@@ -52,8 +52,13 @@ public:
 	virtual	const char*			Label();
 	virtual	const char*			Label(float width);
 
+	virtual	void				SetLabel(const char* label);
+
+			const char*			TruncatedLabel() const
+									{ return fTruncatedString.String(); };
+
 private:
-			BString*			fTruncatedString;
+			BString				fTruncatedString;
 };
 
 

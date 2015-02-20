@@ -39,8 +39,6 @@ All rights reserved.
 
 #include <stdlib.h>
 
-#include <String.h>
-
 #include "BarApp.h"
 #include "BarView.h"
 #include "ExpandoMenuBar.h"
@@ -56,31 +54,28 @@ const float kSwitchWidth = 12.0f;
 TTruncatableMenuItem::TTruncatableMenuItem(const char* label, BMessage* message,
 	char shortcut, uint32 modifiers)
 	:
-	BMenuItem(label, message, shortcut, modifiers),
-	fTruncatedString(new BString())
+	BMenuItem(label, message, shortcut, modifiers)
 {
+	fTruncatedString = label;
 }
 
 
 TTruncatableMenuItem::TTruncatableMenuItem(BMenu* menu, BMessage* message)
 	:
-	BMenuItem(menu, message),
-	fTruncatedString(new BString())
+	BMenuItem(menu, message)
 {
 }
 
 
 TTruncatableMenuItem::TTruncatableMenuItem(BMessage* data)
 	:
-	BMenuItem(data),
-	fTruncatedString(new BString())
+	BMenuItem(data)
 {
 }
 
 
 TTruncatableMenuItem::~TTruncatableMenuItem()
 {
-	delete fTruncatedString;
 }
 
 
@@ -111,11 +106,22 @@ TTruncatableMenuItem::Label(float width)
 			float labelWidth = menu->StringWidth(label);
 			float offset = width - labelWidth;
 			TruncateLabel(maxWidth - offset, truncatedLabel);
-			fTruncatedString->SetTo(truncatedLabel);
+			fTruncatedString.SetTo(truncatedLabel);
 			free(truncatedLabel);
-			return fTruncatedString->String();
+			return fTruncatedString.String();
 		}
 	}
 
+	fTruncatedString.SetTo(label);
+
 	return label;
+}
+
+
+void
+TTruncatableMenuItem::SetLabel(const char* label)
+{
+	fTruncatedString.SetTo(label);
+
+	BMenuItem::SetLabel(label);
 }
