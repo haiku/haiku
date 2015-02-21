@@ -32,8 +32,10 @@
 #include <NodeInfo.h>
 #include <Path.h>
 
+#include "Globals.h"
 #include "TermConst.h"
 
+#include <iostream>
 
 /*
  * Startup preference settings.
@@ -110,7 +112,31 @@ PrefHandler::PrefHandler(bool loadSettings)
 		OpenText(path.Path());
 	}
 
-	_ConfirmFont(be_fixed_font);
+	// TODO: If no fixed font is available, be_fixed_font
+	// points to a proportional font.
+	if (IsFontUsable(be_fixed_font))
+		_ConfirmFont(be_fixed_font);
+	else {
+		int32 numFamilies = count_font_families();
+		for (int32 i = 0; i < numFamilies; i++) {
+			font_family family;
+			uint32 flags;
+			if (get_font_family(i, &family, &flags) == B_OK) {
+				font_style style;
+				int32 numStyles = count_font_styles(family);
+				for (int32 j = 0; j < numStyles; j++) {
+					if (get_font_style(family, j, &style) == B_OK) {
+						BFont fallBackFont;
+						fallBackFont.SetFamilyAndStyle(family, style);
+						if (IsFontUsable(fallBackFont)) {
+							_ConfirmFont(&fallBackFont);
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 
