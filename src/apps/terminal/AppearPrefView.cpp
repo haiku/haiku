@@ -27,6 +27,7 @@
 #include <View.h>
 
 #include "Colors.h"
+#include "Globals.h"
 #include "PrefHandler.h"
 #include "TermConst.h"
 #include "TermWindow.h"
@@ -35,35 +36,6 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Terminal AppearancePrefView"
 
-
-static bool
-IsFontUsable(const BFont& font)
-{
-	// TODO: If BFont::IsFullAndHalfFixed() was implemented, we could
-	// use that. But I don't think it's easily implementable using
-	// Freetype.
-
-	if (font.IsFixed())
-		return true;
-
-	// manually check if all applicable chars are the same width
-	char buffer[2] = { ' ', 0 };
-	int firstWidth = (int)ceilf(font.StringWidth(buffer));
-
-	// TODO: Workaround for broken fonts/font_subsystem
-	if (firstWidth <= 0)
-		return false;
-
-	for (int c = ' ' + 1; c <= 0x7e; c++) {
-		buffer[0] = c;
-		int width = (int)ceilf(font.StringWidth(buffer));
-
-		if (width != firstWidth)
-			return false;
-	}
-
-	return true;
-}
 
 
 // #pragma mark -
@@ -501,10 +473,9 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 {
 	BPopUpMenu* menu = new BPopUpMenu("");
 	int32 numFamilies = count_font_families();
-	uint32 flags;
-
 	for (int32 i = 0; i < numFamilies; i++) {
 		font_family family;
+		uint32 flags;
 		if (get_font_family(i, &family, &flags) == B_OK) {
 			BFont font;
 			font_style style;

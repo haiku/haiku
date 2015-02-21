@@ -7,9 +7,12 @@
 
 
 class BClipboard;
+class BFont;
 
 extern BClipboard* gMouseClipboard;
 	// clipboard used for mouse copy'n'paste
 
+
+bool IsFontUsable(const BFont& font);
 
 #endif	// GLOBALS_H
