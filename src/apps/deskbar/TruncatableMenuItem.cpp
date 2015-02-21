@@ -41,7 +41,7 @@ All rights reserved.
 
 #include "BarApp.h"
 #include "BarView.h"
-#include "ExpandoMenuBar.h"
+#include "TeamMenuItem.h"
 
 
 const float kVPad = 2.0f;
@@ -90,10 +90,9 @@ const char*
 TTruncatableMenuItem::Label(float width)
 {
 	BMenu* menu = Menu();
-	TExpandoMenuBar* expandoMenuBar = dynamic_cast<TExpandoMenuBar*>(menu);
 
 	float maxWidth = menu->MaxContentWidth() - kVPad * 2;
-	if (expandoMenuBar != NULL
+	if (dynamic_cast<TTeamMenuItem*>(this) != NULL
 		&& static_cast<TBarApp*>(be_app)->BarView()->Vertical()
 		&& static_cast<TBarApp*>(be_app)->Settings()->superExpando) {
 		maxWidth -= kSwitchWidth;
