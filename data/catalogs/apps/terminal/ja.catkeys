@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	1993449439
+1	japanese	x-vnd.Haiku-Terminal	235954604
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -36,7 +36,6 @@ Selected text	Terminal AppearancePrefView		選択されたテキスト
 Find	Terminal FindWindow		検索
 Appearance	Terminal PrefWindow		外観
 Tab title:	Terminal AppearancePrefView		タブタイトル:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		パターンは現在のウィンドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		背景
 Use selection	Terminal FindWindow		選択部で検索
@@ -69,7 +68,6 @@ Move here	Terminal TermView		カレントディレクトリへ移動
 Retro	Terminal colors scheme		レトロ
 Error!	Terminal getString		エラー!
 New tab	Terminal TermWindow		新しいタブ
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		パターンはタブタイトルを指定します。次のプレースホルダーが\n使用できます:\n
 Selected background	Terminal AppearancePrefView		選択されたテキストの背景
 Slate	Terminal colors scheme		スレート
 Text under cursor	Terminal AppearancePrefView		カーソル位置の文字
@@ -84,7 +82,6 @@ Clear all	Terminal TermWindow		すべて消去
 Text encoding	Terminal TermWindow		テキストエンコーディング
 size	Terminal TermView		サイズ
 Close window	Terminal TermWindow		ウィンドウを閉じる
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tタブ内で動作中のプロセスの作業中のフォルダー\n\t\t\tオプションでパスの最大要素を指定できます。\n\t\t\t例. '%2d' は2 つの要素を示します。\n\t%T\t-\t現在のロケールでの Terminal アプリケーション名\n\t%e\t-\tタブのエンコーディング。UTF-8 の場合は表示されません。\n\t%i\t-\tウィンドウのインデックス\n\t%p\t-\tタブ内で実行中のプロセス名\n\t%t\t-\tタブのタイトル.\n\t%%\t-\t文字 '%'
 Copy absolute path	Terminal TermView		絶対パスをコピー
 Set tab title	Terminal TermWindow		タブのタイトルを設定
 Settings…	Terminal TermWindow		設定…

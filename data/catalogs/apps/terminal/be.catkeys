@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	731520205
+1	belarusian	x-vnd.Haiku-Terminal	3268992666
 Not found.	Terminal TermWindow		Не знойдзена.
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Change directory	Terminal TermView		Змяніць дырэкторыю
@@ -34,7 +34,6 @@ Selected text	Terminal AppearancePrefView		Выбраны тэкст
 Find	Terminal FindWindow		Шукаць
 Appearance	Terminal PrefWindow		Знешні выгляд
 Tab title:	Terminal AppearancePrefView		Імя ўкладкі:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для цякучага імя вакна. Можна ўжываць наступныя\n запаўняльнікі:\n
 OK	Terminal SetTitleWindow		ОК
 Background	Terminal AppearancePrefView		Фон
 Use selection	Terminal FindWindow		Карыстаць выдзяленне
@@ -63,7 +62,6 @@ Move here	Terminal TermView		Перамясціць сюды
 Retro	Terminal colors scheme		Даўніна
 Error!	Terminal getString		Памылка!
 New tab	Terminal TermWindow		Новая ўкладка
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для імёнаў ўкладак. Можна ўжываць наступныя\n запаўняльнікі:\n
 Selected background	Terminal AppearancePrefView		Выбраны фон
 Slate	Terminal colors scheme		Шыфер
 Text under cursor	Terminal AppearancePrefView		Тэкст пад курсорам
@@ -78,7 +76,6 @@ Clear all	Terminal TermWindow		Ачысціць усё
 Text encoding	Terminal TermWindow		Кадоўка тэксту
 size	Terminal TermView		памер
 Close window	Terminal TermWindow		Закрыць вакно
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tРабочы каталог актыўнага працэсу\n\t\t\tў цякучай укладцы.Дадаткова можна ўказаць макісмальную колькасць кампанентаў пуці.\n\t\t\t Напрыклад, '%2d' - не больша за два кампаненты.\n\t%T\t-\tІмя праграмы Тэрмінала ў актуальнай лакалі.\n\t%e\t-\tКадоўка актыўнай укладкі. Калі UTF-8 то не паказваецца.\n\t%i\t-\tІндэкс вакна.\n\t%p\t-\tІмя актыўнага працэсу ў цякучай укладцы.\n\t%t\t-\tІмя цякучай укладкі.\n\t%%\t-\tСімвал '%'.
 Copy absolute path	Terminal TermView		Капіяваць абсалютны шлях
 Set tab title	Terminal TermWindow		Прызначыць імя ўкладкі
 Settings…	Terminal TermWindow		Наладкі…

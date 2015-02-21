@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	731520205
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	3268992666
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
@@ -34,7 +34,6 @@ Selected text	Terminal AppearancePrefView		Texto selecionado
 Find	Terminal FindWindow		Localizar
 Appearance	Terminal PrefWindow		Aparência
 Tab title:	Terminal AppearancePrefView		Título da guia:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		O padrão especificando os títulos da janela. Os seguintes espaços reservados podem ser utilizados:\n
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Plano de fundo
 Use selection	Terminal FindWindow		Usar seleção
@@ -63,7 +62,6 @@ Move here	Terminal TermView		Mover aqui
 Retro	Terminal colors scheme		Retrô
 Error!	Terminal getString		Erro!
 New tab	Terminal TermWindow		Nova aba
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		O padrão especificando os títulos da guia. Os seguintes espaços reservados podem ser usados:\n
 Selected background	Terminal AppearancePrefView		Plano de fundo selecionado
 Slate	Terminal colors scheme		Ardósia
 Text under cursor	Terminal AppearancePrefView		Texto sob cursor
@@ -78,7 +76,6 @@ Clear all	Terminal TermWindow		Limpar tudo
 Text encoding	Terminal TermWindow		Codificação de texto
 size	Terminal TermView		tamanho
 Close window	Terminal TermWindow		Fechar janela
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tO diretório atualmente em uso do processo ativo na\n\t\t\tguia atual. Opcionalmente o número máximo de componentes do caminho\n\t\t\tpode ser especificado. Por exemplo, '%2d' para ao menos dois componentes.\n\t%T\t-\tO nome do aplicativo Terminal para a localidade atual.\n\t%e\t-\tA codificação da guia atual. Não exibido para UTF-8.\n\t%i\t-\tO índice da janela.\n\t%p\t-\tO nome do processo ativo na guia atual.\n\t%t\t-\tO título da guia atual.\n\t%%\t-\tO caractere '%'.
 Copy absolute path	Terminal TermView		Copiar caminho absoluto
 Set tab title	Terminal TermWindow		Definir o título da guia
 Settings…	Terminal TermWindow		Configurações...

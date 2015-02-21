@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	1455245828
+1	dutch; flemish	x-vnd.Haiku-Terminal	2336803971
 Not found.	Terminal TermWindow		Niet gevonden.
 Switch Terminals	Terminal TermWindow		Wissel van Terminal
 Change directory	Terminal TermView		Directory veranderen
@@ -29,7 +29,6 @@ Selected text	Terminal AppearancePrefView		Geselecteerde tekst
 Find	Terminal FindWindow		Zoeken
 Appearance	Terminal PrefWindow		Uiterlijk
 Tab title:	Terminal AppearancePrefView		Tabtitel:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Het model dat de venstertitels bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
 OK	Terminal SetTitleWindow		Oké
 Background	Terminal AppearancePrefView		Achtergrond
 Use selection	Terminal FindWindow		Gebruik selectie
@@ -54,7 +53,6 @@ The process \"%1\" is still running.\nIf you close the Terminal, the process wil
 Move here	Terminal TermView		Hierheen verplaatsen
 Error!	Terminal getString		Fout!
 New tab	Terminal TermWindow		Nieuwe tab
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Het model dat de tabtitels bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
 Selected background	Terminal AppearancePrefView		Geselecteerde achtergrond
 Decrease	Terminal TermWindow		Verminderen
 Create link here	Terminal TermView		Hier een link maken

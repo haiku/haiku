@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Terminal	678855608
+1	romanian	x-vnd.Haiku-Terminal	1560413751
 Not found.	Terminal TermWindow		Nu a fost găsit.
 Switch Terminals	Terminal TermWindow		Comută terminale
 Change directory	Terminal TermView		Modifică dosar
@@ -35,7 +35,6 @@ Selected text	Terminal AppearancePrefView		Text selectat
 Find	Terminal FindWindow		Găsește
 Appearance	Terminal PrefWindow		Aspect
 Tab title:	Terminal AppearancePrefView		Titlu tab:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Tiparul care specifică titlurile ferestrei curente. Următoarele marcaje\npot fi utilizate:\n
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Fundal
 Use selection	Terminal FindWindow		Utilizează selecție
@@ -65,7 +64,6 @@ Move here	Terminal TermView		Mută aici
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Eroare!
 New tab	Terminal TermWindow		Tab nou
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Tiparul care specifică titlurile tabului curent. Următoarele marcaje\npot fi utilizate:\n
 Selected background	Terminal AppearancePrefView		Fundal selectat
 Decrease	Terminal TermWindow		Micșorează
 Default	Terminal colors scheme		Implicit

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Terminal	2387434523
+1	lithuanian	x-vnd.Haiku-Terminal	3268992666
 Not found.	Terminal TermWindow		Nerasta.
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Change directory	Terminal TermView		Keisti aplanką
@@ -34,7 +34,6 @@ Selected text	Terminal AppearancePrefView		Pažymėto teksto
 Find	Terminal FindWindow		Ieškoti
 Appearance	Terminal PrefWindow		Išvaizda
 Tab title:	Terminal AppearancePrefView		Kortelės antraštė:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Langų antraščių šablonas. Galite naudoti šiuos vietaženklius:\n
 OK	Terminal SetTitleWindow		Gerai
 Background	Terminal AppearancePrefView		Fono
 Use selection	Terminal FindWindow		Ieškoti pažymėto teksto
@@ -63,7 +62,6 @@ Move here	Terminal TermView		Perkelti čia
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Klaida!
 New tab	Terminal TermWindow		Nauja kortelė
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Kortelių antraščių šablonas. Galite naudoti šiuos vietaženklius:\n
 Selected background	Terminal AppearancePrefView		Pažymėto teksto fono
 Slate	Terminal colors scheme		Skalūnas
 Text under cursor	Terminal AppearancePrefView		Tekstas po žymekliu

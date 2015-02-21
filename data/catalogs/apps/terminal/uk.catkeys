@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	731520205
+1	ukrainian	x-vnd.Haiku-Terminal	3268992666
 Not found.	Terminal TermWindow		Не знайдено.
 Switch Terminals	Terminal TermWindow		Перемкнути термінали
 Change directory	Terminal TermView		Змінити каталог
@@ -34,7 +34,6 @@ Selected text	Terminal AppearancePrefView		Вибрати текст
 Find	Terminal FindWindow		Знайти
 Appearance	Terminal PrefWindow		Зовн. вигляд
 Tab title:	Terminal AppearancePrefView		Ім'я вкладки:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для поточного імені вкладки. Наступні заповнювачі\nможуть бути використані:\n
 OK	Terminal SetTitleWindow		Гаразд
 Background	Terminal AppearancePrefView		Тло
 Use selection	Terminal FindWindow		Використати вибране
@@ -63,7 +62,6 @@ Move here	Terminal TermView		Перемістити сюди
 Retro	Terminal colors scheme		Ретро
 Error!	Terminal getString		Помилка!
 New tab	Terminal TermWindow		Нова вкладка
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Шаблон для імен вікон. Наступні заповнювачі\nможуть бути використані:\n
 Selected background	Terminal AppearancePrefView		Вибрати тло
 Slate	Terminal colors scheme		Шифер
 Text under cursor	Terminal AppearancePrefView		Текст під курсором
@@ -78,7 +76,6 @@ Clear all	Terminal TermWindow		Очистити все
 Text encoding	Terminal TermWindow		Кодування тексту
 size	Terminal TermView		розмір
 Close window	Terminal TermWindow		Закрити вікно
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tБіжуча директорія активного процесу біжучої вкладки.\n\t\t\tОпціонально можна вказати максимальне число показаних компонентів шляху.\n\t\t\tНаприклад '%2d' покаже останні 2 компоненти.\n\t%T\t-\tІм'я додатку Термінал для біжучої локалі.\n\t%e\t-\tКодування біжучої вкладки. Для UTF-8 не показується.\n\t%i\t-\tНомер вікна.\n\t%p\t-\tНазва активного процесу в біжучій вкладці.\n\t%t\t-\tЗаголовок біжучої вкладки.\n\t%%\t-\tСимвол процента - '%'.
 Copy absolute path	Terminal TermView		Зкопіювати абсолютну адресу
 Set tab title	Terminal TermWindow		Встановити ім'я вкладки
 Settings…	Terminal TermWindow		Настройки…

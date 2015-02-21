@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	1993449439
+1	german	x-vnd.Haiku-Terminal	235954604
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -36,7 +36,6 @@ Selected text	Terminal AppearancePrefView		Ausgewählter Text
 Find	Terminal FindWindow		Suchen
 Appearance	Terminal PrefWindow		Darstellung
 Tab title:	Terminal AppearancePrefView		Reitertitel:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Die Formel für Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Hintergrund
 Use selection	Terminal FindWindow		Verwende Auswahl
@@ -69,7 +68,6 @@ Move here	Terminal TermView		Hierher verschieben
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Fehler!
 New tab	Terminal TermWindow		Neuer Reiter
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Die Formel für Reitertitel. Folgende Variablen\nstehen zur Verfügung:\n
 Selected background	Terminal AppearancePrefView		Auswahl-Hintergrund
 Slate	Terminal colors scheme		Schiefer
 Text under cursor	Terminal AppearancePrefView		Text unter Cursor
@@ -84,7 +82,6 @@ Clear all	Terminal TermWindow		Bildschirm leeren
 Text encoding	Terminal TermWindow		Kodierung
 size	Terminal TermView		Größe
 Close window	Terminal TermWindow		Fenster schließen
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%T\t-\tName der Terminalanwendung in der aktuellen Systemsprache\n\t%e\t-\tKodierung des aktuellen Reiters. Unterdrückt bei UTF-8\n\t%i\t-\tLaufende Nummer des Fensters\n\t%p\t-\tName des laufenden Prozesses im aktuellen Reiter\n\t%t\t-\tTitel des aktuellen Reiters\n\t%%\t-\tDas Zeichen '%'
 Copy absolute path	Terminal TermView		Absoluten Pfad kopieren
 Set tab title	Terminal TermWindow		Reiter umbenennen
 Settings…	Terminal TermWindow		Einstellungen...

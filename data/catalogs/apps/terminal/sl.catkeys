@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-Terminal	3635659326
+1	slovenian	x-vnd.Haiku-Terminal	2500449006
 Not found.	Terminal TermWindow		Ni mogoče najti.
 Change directory	Terminal TermView		Zamenjaj imenik
 Cursor	Terminal AppearancePrefView		Kurzor
@@ -33,7 +33,6 @@ Move here	Terminal TermView		Premakni sem
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Napaka!
 New tab	Terminal TermWindow		Nov jeziček
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Vzorec, ki določa naslov jezička. Uporabljate lahko spremenljivke:\n
 Selected background	Terminal AppearancePrefView		Ozadje izbranega
 Slate	Terminal colors scheme		Tabla
 Text under cursor	Terminal AppearancePrefView		Besedilo pod kurzorjem
@@ -41,7 +40,6 @@ Use bright instead of bold text	Terminal AppearancePrefView		Uporabi svetlo bese
 Text encoding	Terminal TermWindow		Kodiranje besedila
 size	Terminal TermView		velikost
 Close window	Terminal TermWindow		Zapri okno
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tTrenutni delovni imenik delujočega procesa v trenutnem jezičku.\n\t\t\tDoločite lahko tudi največje dovoljeno število komponent poti,\n\t\t\tnpr. '%2d' za največ dve komponenti.\n\t%T\t-\tIme aplikacije terminala.\n\t%e\t-\tKodiranje trenutnega jezička (ni prikazano za UTF-8).\n\t%i\t-\tIndeks okna.\n\t%p\t-\tIme delujočega procesa v trenutnem jezičku.\n\t%t\t-\tIme trenutnega jezička.\n\t%%\t-\tZnak '%'.
 Copy absolute path	Terminal TermView		Kopiraj absolutno pot
 Set tab title	Terminal TermWindow		Nastavi naslov jezička
 Settings…	Terminal TermWindow		Nastavitve…

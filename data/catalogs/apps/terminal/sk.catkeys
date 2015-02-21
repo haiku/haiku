@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Terminal	2104419382
+1	slovak	x-vnd.Haiku-Terminal	2985977525
 Not found.	Terminal TermWindow		Nenájdené.
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Change directory	Terminal TermView		Zmeniť adresár
@@ -34,7 +34,6 @@ Selected text	Terminal AppearancePrefView		Vybraný text
 Find	Terminal FindWindow		Nájsť
 Appearance	Terminal PrefWindow		Vzhľad
 Tab title:	Terminal AppearancePrefView		Titulok karty:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Vzor určujúci titulky okien. Možno použiť\nnasledovné zástupné symboly:\n
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Pozadie
 Use selection	Terminal FindWindow		Použiť výber
@@ -62,7 +61,6 @@ Move here	Terminal TermView		Presunúť sem
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Chyba!
 New tab	Terminal TermWindow		Nová karta
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Vzor určujúci titulky kariet. Možno použiť\nnasledovné zástupné symboly:\n
 Selected background	Terminal AppearancePrefView		Vybrané pozadie
 Slate	Terminal colors scheme		Bridlica
 Text under cursor	Terminal AppearancePrefView		Text pod kurzorom

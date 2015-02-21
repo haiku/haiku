@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Terminal	3706692639
+1	croatian	x-vnd.Haiku-Terminal	3084408124
 Not found.	Terminal TermWindow		Nije pronađeno.
 Switch Terminals	Terminal TermWindow		Zamjeni terminale
 Change directory	Terminal TermView		Promijeni direktorij
@@ -30,7 +30,6 @@ Selected text	Terminal AppearancePrefView		Odabrani tekst
 Find	Terminal FindWindow		Nađi
 Appearance	Terminal PrefWindow		Izgled
 Tab title:	Terminal AppearancePrefView		Naslov kartice:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Uzorak koji specificira naslov prozora. Sljedeće rezarvirano mjesto\n se može koristiti:\n
 OK	Terminal SetTitleWindow		U redu
 Background	Terminal AppearancePrefView		Pozadina
 Use selection	Terminal FindWindow		koristi izbor

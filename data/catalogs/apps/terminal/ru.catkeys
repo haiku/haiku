@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	1993449439
+1	russian	x-vnd.Haiku-Terminal	235954604
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -36,7 +36,6 @@ Selected text	Terminal AppearancePrefView		Выделенного текста
 Find	Terminal FindWindow		Найти
 Appearance	Terminal PrefWindow		Внешний вид
 Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки окна.\nВозможно использовать следующие переменные:\n
 OK	Terminal SetTitleWindow		ОК
 Background	Terminal AppearancePrefView		Фона
 Use selection	Terminal FindWindow		Использовать выделенный текст
@@ -69,7 +68,6 @@ Move here	Terminal TermView		Переместить сюда
 Retro	Terminal colors scheme		Ретро
 Error!	Terminal getString		Ошибка!
 New tab	Terminal TermWindow		Новая вкладка
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки вкладок.\nВозможно использовать следующие переменные:\n
 Selected background	Terminal AppearancePrefView		Выделенного фона
 Slate	Terminal colors scheme		Шифер
 Text under cursor	Terminal AppearancePrefView		Текст под курсором
@@ -84,7 +82,6 @@ Clear all	Terminal TermWindow		Очистить всё
 Text encoding	Terminal TermWindow		Кодировка
 size	Terminal TermView		размер
 Close window	Terminal TermWindow		Закрыть окно
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%T\t-\tИмя приложения Терминал для текущей локали.\n\t%e\t-\tКодировка текущей вкладки. Для UTF-8 не отображается.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n\t%%\t-\tСимвол процента - '%'.
 Copy absolute path	Terminal TermView		Скопировать абсолютный адрес
 Set tab title	Terminal TermWindow		Переименовть вкладку
 Settings…	Terminal TermWindow		Настройки…

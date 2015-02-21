@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Terminal	624680459
+1	italian	x-vnd.Haiku-Terminal	1506238602
 Not found.	Terminal TermWindow		Non trovato.
 Switch Terminals	Terminal TermWindow		Scambia Terminali
 Change directory	Terminal TermView		Cambia directory
@@ -27,7 +27,6 @@ Selected text	Terminal AppearancePrefView		Seleziona testo
 Find	Terminal FindWindow		Trova
 Appearance	Terminal PrefWindow		Aspetto
 Tab title:	Terminal AppearancePrefView		Titolo scheda:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Il modello specificando il titolo attuale scheda. I seguenti segnaposto \npossono essere utilizzati:\n
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Sfondo
 Use selection	Terminal FindWindow		Utilizza selezione
@@ -50,7 +49,6 @@ The process \"%1\" is still running.\nIf you close the Terminal, the process wil
 Move here	Terminal TermView		Sposta qui
 Error!	Terminal getString		Errore!
 New tab	Terminal TermWindow		Nuova tab
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Il modello specificando il titolo attuale scheda. I seguenti segnaposto \npossono essere utilizzati:\n
 Selected background	Terminal AppearancePrefView		Seleziona sfondo
 Decrease	Terminal TermWindow		Riduci
 Create link here	Terminal TermView		Crea collegamento qui

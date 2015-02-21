@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	1993449439
+1	hungarian	x-vnd.Haiku-Terminal	235954604
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -36,7 +36,6 @@ Selected text	Terminal AppearancePrefView		Kijelölt szöveg
 Find	Terminal FindWindow		Keresés
 Appearance	Terminal PrefWindow		Megjelenés
 Tab title:	Terminal AppearancePrefView		Lap címe:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Az ablakok címét meghatározó minta. A következő kódok használhatóak:\n
 OK	Terminal SetTitleWindow		Rendben
 Background	Terminal AppearancePrefView		Háttér
 Use selection	Terminal FindWindow		Kijelölés használata
@@ -69,7 +68,6 @@ Move here	Terminal TermView		Mozgatás
 Retro	Terminal colors scheme		Retro
 Error!	Terminal getString		Hiba!
 New tab	Terminal TermWindow		Új lap
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		A fülek címét meghatározó minta. A következő kódok használhatóak:
 Selected background	Terminal AppearancePrefView		Kijelölés háttere
 Slate	Terminal colors scheme		Pala
 Text under cursor	Terminal AppearancePrefView		Kurzor alatti szöveg
@@ -84,7 +82,6 @@ Clear all	Terminal TermWindow		Összes törlése
 Text encoding	Terminal TermWindow		Szöveg kódolása
 size	Terminal TermView		méret
 Close window	Terminal TermWindow		Ablak bezárása
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t %d\t -\t A jelenlegi mappa az aktuális fülön.\n\t \t \t Kiegészítésként a maximálisan megjelenő mappá száma\n\t \t \t is megadható. Például '%2d' a legutóbbi 2 részre.\n\t %T\t -\t A Terminál program neve az aktuális nyelven.\n\t %e\t -\t Az aktuális fül kódolása. UTF-8 esetében nem jelenik meg.\n\t %i\t -\t Az ablak sorszáma.\n\t %p\t -\t Az aktív parancs neve az aktuális fülön.\n\t %t\t -\t Aktuális fül címe.\n\t %%\t -\t '%' karakter.
 Copy absolute path	Terminal TermView		Teljes útvonal másolása
 Set tab title	Terminal TermWindow		Lap címének beállítása
 Settings…	Terminal TermWindow		Beállítások…
