@@ -516,6 +516,20 @@ TextDocument::RemoveListener(const TextListenerRef& listener)
 }
 
 
+bool
+TextDocument::AddUndoListener(const UndoableEditListenerRef& listener)
+{
+	return fUndoListeners.Add(listener);
+}
+
+
+bool
+TextDocument::RemoveUndoListener(const UndoableEditListenerRef& listener)
+{
+	return fUndoListeners.Remove(listener);
+}
+
+
 void
 TextDocument::_NotifyTextChanging(TextChangingEvent& event) const
 {
@@ -549,3 +563,18 @@ TextDocument::_NotifyTextChanged(const TextChangedEvent& event) const
 	}
 }
 
+
+void
+TextDocument::_NotifyUndoableEditHappened(const UndoableEditRef& edit) const
+{
+	// Copy listener list to have a stable list in case listeners
+	// are added/removed from within the notification hook.
+	UndoListenerList listeners(fUndoListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const UndoableEditListenerRef& listener = listeners.ItemAtFast(i);
+		if (listener.Get() == NULL)
+			continue;
+		listener->UndoableEditHappened(this, edit);
+	}
+}

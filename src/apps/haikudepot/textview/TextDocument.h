@@ -11,10 +11,12 @@
 #include "List.h"
 #include "Paragraph.h"
 #include "TextListener.h"
+#include "UndoableEditListener.h"
 
 
-typedef List<Paragraph, false>			ParagraphList;
-typedef List<TextListenerRef, false>	TextListenerList;
+typedef List<Paragraph, false>					ParagraphList;
+typedef List<TextListenerRef, false>			TextListenerList;
+typedef List<UndoableEditListenerRef, false>	UndoListenerList;
 
 class TextDocument;
 typedef BReference<TextDocument> TextDocumentRef;
@@ -83,12 +85,18 @@ public:
 			// Listener support
 			bool				AddListener(const TextListenerRef& listener);
 			bool				RemoveListener(const TextListenerRef& listener);
+			bool				AddUndoListener(
+									const UndoableEditListenerRef& listener);
+			bool				RemoveUndoListener(
+									const UndoableEditListenerRef& listener);
 
 private:
 			void				_NotifyTextChanging(
 									TextChangingEvent& event) const;
 			void				_NotifyTextChanged(
 									const TextChangedEvent& event) const;
+			void				_NotifyUndoableEditHappened(
+									const UndoableEditRef& edit) const;
 
 private:
 			ParagraphList		fParagraphs;
@@ -96,6 +104,7 @@ private:
 			CharacterStyle		fDefaultCharacterStyle;
 
 			TextListenerList	fTextListeners;
+			UndoListenerList	fUndoListeners;
 };
 
 
