@@ -39,6 +39,7 @@ local textDocumentSources =
 	TextSelection.cpp
 	TextSpan.cpp
 	TextView.cpp
+	UndoableEditListener.cpp
 ;
 
 Application HaikuDepot :
