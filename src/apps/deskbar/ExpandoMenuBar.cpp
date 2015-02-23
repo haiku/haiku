@@ -659,7 +659,7 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	} else
 		AddItem(item);
 
-	if (settings->superExpando && settings->expandNewTeams)
+	if (fVertical && settings->superExpando && settings->expandNewTeams)
 		item->ToggleExpandState(false);
 
 	SizeWindow(1);
