@@ -114,9 +114,6 @@ private:
 			TBarView*		fBarView;
 			bool			fVertical : 1;
 			bool			fOverflow : 1;
-			bool			fDrawLabel : 1;
-			bool			fShowTeamExpander : 1;
-			bool			fExpandNewTeams : 1;
 
 			float			fDeskbarMenuWidth;
 			TTeamMenuItem*	fPreviousDragTargetItem;
