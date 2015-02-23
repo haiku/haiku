@@ -85,10 +85,9 @@ typedef std::map<BString, TTeamMenuItem*> TeamMenuItemMap;
 //	#pragma mark - TExpandoMenuBar
 
 
-TExpandoMenuBar::TExpandoMenuBar(const char* name, TBarView* barView,
-	bool vertical)
+TExpandoMenuBar::TExpandoMenuBar(TBarView* barView, bool vertical)
 	:
-	BMenuBar(BRect(0, 0, 0, 0), name, B_FOLLOW_NONE,
+	BMenuBar(BRect(0, 0, 0, 0), "ExpandoMenuBar", B_FOLLOW_NONE,
 		vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW),
 	fBarView(barView),
 	fVertical(vertical),

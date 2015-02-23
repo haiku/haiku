@@ -61,8 +61,7 @@ class TTeamMenuItem;
 
 class TExpandoMenuBar : public BMenuBar {
 public:
-							TExpandoMenuBar(const char* name,
-								TBarView* barView, bool vertical);
+							TExpandoMenuBar(TBarView* barView, bool vertical);
 
 	virtual	void			AttachedToWindow();
 	virtual	void			DetachedFromWindow();

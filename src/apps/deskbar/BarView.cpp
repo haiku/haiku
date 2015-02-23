@@ -168,7 +168,7 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		AddChild(fDragRegion);
 
 	// create and add the application menubar
-	fExpandoMenuBar = new TExpandoMenuBar("ExpandoMenuBar", this, fVertical);
+	fExpandoMenuBar = new TExpandoMenuBar(this, fVertical);
 	fInlineScrollView = new TInlineScrollView(fExpandoMenuBar,
 		fVertical ? B_VERTICAL : B_HORIZONTAL);
 	AddChild(fInlineScrollView);
