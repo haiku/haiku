@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2012, Haiku, Inc. All rights reserved.
+ * Copyright 2012-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -114,27 +114,11 @@ The output shows the public name (SSID), MAC address, signal strength and authen
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">Consells</a></h2>
-<ul><li><p>Here is how you get to install your firmware if you don't yet have a working internet connection under Haiku. You download the following files while in another operating system, boot Haiku, copy them to their respective location and invoke the <span class="cli">install-wifi-firmwares.sh</span> script.</p>
-
-<ul>
-<li><p>Copy these two to <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/</span>:<br />
-		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2">http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/b43-fwcutter-012.tar.bz2</a><br />
-		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/string/byteswap.h</a></p>
-</li>
-<li><p>Copy this to <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/bits</span>:<br />
-		- <a href="http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h">http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc/include/arch/x86/bits/byteswap.h</a></p>
-</li>
-<li><p>Copy this to <span class="path">/boot/system/data/firmware/broadcom43xx/</span>:<br />
-		- <a href="http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o">http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o</a></p>
-</li>
-<li><p>Copy this to <span class="path">/boot/system/data/firmware/marvell88w8335/</span>:<br />
-		- <a href="http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz">http://www.haiku-files.org/files/wifi-firmwares/marvell/malo-firmware-1.4.tgz</a></p>
-</li>
-</ul>
-<p>When all those files are in their place, proceed as described above, i.e. open a Terminal and type:</p>
+<h3>Offline download of binary firmware files</h3>
+<p>If you cannot obtain the binary firmware files via the <tt>install-wifi-firmwares.sh</tt> script (for example due to lack of internet connection within Haiku), you can also download <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">this shell script</a>, and run it from any other OS that has <tt>wget</tt> and <tt>zip</tt> installed.<br />
+The script will download the needed files and create a zip file that is to be extracted to Haiku's <tt>/boot</tt>. Once unpacked, open a Terminal and type:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Review the licenses and accept them to install all of the now available firmware files.</p>
-</li></ul>
 
 </div>
 </div>

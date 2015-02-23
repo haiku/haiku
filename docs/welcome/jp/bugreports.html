@@ -59,7 +59,7 @@
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>目次</td></tr>
-<tr class="index"><td><a href="#account">Trac のアカウントを取得する</a><br />
+<tr class="index"><td><a href="#account">Trac アカウントを取得する</a><br />
                 <a href="#report">バグレポートの作成</a><br />
                 <a href="#app">アプリケーションのバグ</a><br />
                   <a href="#server">サーバーのバグ</a><br />
@@ -73,11 +73,11 @@
 
 <h1>バグの報告</h1>
 
-<p>開発者はあらゆるハードウェア構成でテストすることは不可能です。さまざまな要因がオペレーティングシステムに影響を与えるため、私たちはユーザーの動作報告などの情報に頼っています。そして Haiku はまだ幼いプロジェクトのため、バグに遭遇する可能性が高いです。私たちはバグを報告してくれるのを待っています。少しずつ Haiku を改善してもっと良いものにしていきませんか?</p>
+<p>開発者はすべてのハードウェア構成でテストを行えませんし、オペレーティングシステムとのあらゆる関わり方をテストすることもできないので、ユーザーの動作報告などの情報に頼っています。そして Haiku はまだ幼いプロジェクトのため、バグに遭遇する可能性が高いです。私たちはバグを報告してくれるのを待っています。少しずつ Haiku を改善してもっと良いものにしていきませんか?</p>
 <p>私たちのバグトラッカーを有効に保つため、<a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">バグトラッカーでのエチケット</a>を絶対に守ってください。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account" name="accout">Trac のアカウントを取得する</a></h2>
+<a id="account" name="accout">Trac アカウントを取得する</a></h2>
 <p>チケットを登録するには、<a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku バグトラッカー</a>でアカウントを取得する必要があります。<br />
 アカウントを作るときは、チケットの更新通知メールを受信するために<b>自分のメールアドレスを登録すること</b>が必要です。さまざまな確認のためのメールが届くため、アカウントを作成した後は、こまめに<b>迷惑メールフォルダ</b>をチェックするようにしてください。というのも、重要な確認メールがしばしば迷惑メールに分類されてしまうからです。</p>
 
@@ -86,7 +86,7 @@
 <p>バグを報告する前に、すでに報告されていないか<a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">確認を</a>するようにしてください。<a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">検索機能</a>が有用です。<br />
 報告されていないことを確認したら、以下の情報をできる限り多く提供してください。</p>
 <ul>
-	<li><p>そのバグが最新バージョンでも再現するかを確認してみてください。最新バージョンのイメージは<a href="http://haiku-files.org/">ここから入手できます</a>。</p></li>
+	<li><p>その問題が最新バージョンの Haiku でも再現するかを確認してみてください。テスト用のビルド済イメージが<a href="http://download.haiku-os.org">利用可能です</a>。</p></li>
 	<li><p>テストした環境の情報 (物理的なハードウェア、QEMU、VMware など)</p></li>
 	<li><p><acronym title="Git, the source code management system we use">GIT</acronym> でのリビジョン番号。リビジョン番号はデスクバーメニューの <span class="menu">Haiku について...</span> から見つけられます。また、Haiku をビルドした環境も必要かもしれません。(gcc2、gcc4、gcc2hybrid、gcc4hybrid) ダウンロードしたイメージの場合イメージ名を書いてください。自分でビルドした場合、何でビルドしたのかを知っておく必要があります。</p></li>
 	<li><p>できる限り正しく、実際に起きた挙動を説明し、その後自分が予測した挙動と、現在の挙動の問題を説明する</p></li>
