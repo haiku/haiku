@@ -369,7 +369,7 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					// expando mode window menu item
 					fLastMousedOverItem = menuItem;
 					if (strcasecmp(windowMenuItem->TruncatedLabel(),
-						windowMenuItem->Label()) > 0) {
+							windowMenuItem->Label()) > 0) {
 						// label is truncated, set tooltip
 						SetToolTip(windowMenuItem->Label());
 					} else
