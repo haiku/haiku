@@ -1090,7 +1090,7 @@ BContainerWindow::UpdateBackgroundImage()
 void
 BContainerWindow::FrameResized(float, float)
 {
-	if (PoseView() != NULL && dynamic_cast<BDeskWindow*>(this) == NULL) {
+	if (PoseView() != NULL && !fIsDesktop) {
 		BRect extent = PoseView()->Extent();
 		float offsetX = extent.left - PoseView()->Bounds().left;
 		float offsetY = extent.top - PoseView()->Bounds().top;
@@ -3793,7 +3793,7 @@ BContainerWindow::SetUpDefaultState()
 		return;
 	}
 
-	if (dynamic_cast<BDeskWindow*>(this) != NULL) {
+	if (fIsDesktop) {
 		// don't copy over the attributes if we are the Desktop
 		return;
 	}
@@ -3834,7 +3834,7 @@ BContainerWindow::SetUpDefaultState()
 void
 BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 {
-	if (node == NULL || dynamic_cast<BDeskWindow*>(this) != NULL) {
+	if (node == NULL || fIsDesktop) {
 		// don't restore any window state if we are the Desktop
 		return;
 	}
@@ -3886,7 +3886,7 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 void
 BContainerWindow::RestoreWindowState(const BMessage& message)
 {
-	if (dynamic_cast<BDeskWindow*>(this) != NULL) {
+	if (fIsDesktop) {
 		// don't restore any window state if we are the Desktop
 		return;
 	}
@@ -3930,7 +3930,7 @@ BContainerWindow::RestoreWindowState(const BMessage& message)
 void
 BContainerWindow::SaveWindowState(AttributeStreamNode* node)
 {
-	if (dynamic_cast<BDeskWindow*>(this) != NULL) {
+	if (fIsDesktop) {
 		// don't save window state if we are the Desktop
 		return;
 	}
