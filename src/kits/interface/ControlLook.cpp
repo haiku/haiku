@@ -3095,8 +3095,6 @@ BControlLook::_DrawRoundCornerBackgroundLeftBottom(BView* view, BRect& cornerRec
 	// gradient
 	ellipseRect.InsetBy(1, 1);
 	view->FillEllipse(ellipseRect, fillGradient);
-
-	view->PopState();
 }
 
 
