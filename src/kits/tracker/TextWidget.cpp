@@ -159,6 +159,7 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 					- (textWidth / 2);
 				if (result.left < 0)
 					result.left = 0;
+
 				result.right = result.left + textWidth + 1;
 				break;
 
@@ -168,6 +169,7 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 				if (result.left < 0)
 					result.left = 0;
 				break;
+
 			default:
 				TRESPASS();
 				break;
@@ -217,7 +219,7 @@ BTextWidget::CalcClickRect(BPoint poseLoc, const BColumn* column,
 	if (result.Width() < kWidthMargin) {
 		// if resulting rect too narrow, make it a bit wider
 		// for comfortable clicking
-		if (column && column->Width() < kWidthMargin)
+		if (column != NULL && column->Width() < kWidthMargin)
 			result.right = result.left + column->Width();
 		else
 			result.right = result.left + kWidthMargin;
@@ -436,7 +438,7 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	// make this text widget invisible while we edit it
 	SetVisible(false);
 
-	ASSERT(view->Window());
+	ASSERT(view->Window() != NULL);
 		// how can I not have a Window here???
 
 	if (view->Window()) {
@@ -452,7 +454,7 @@ BTextWidget::StopEdit(bool saveChanges, BPoint poseLoc, BPoseView* view,
 {
 	// find the text editing view
 	BView* scrollView = view->FindView("BorderView");
-	ASSERT(scrollView);
+	ASSERT(scrollView != NULL);
 	if (scrollView == NULL)
 		return;
 
@@ -480,7 +482,7 @@ BTextWidget::StopEdit(bool saveChanges, BPoint poseLoc, BPoseView* view,
 	scrollView->RemoveSelf();
 	delete scrollView;
 
-	ASSERT(view->Window());
+	ASSERT(view->Window() != NULL);
 	view->Window()->UpdateIfNeeded();
 	view->MakeFocus();
 

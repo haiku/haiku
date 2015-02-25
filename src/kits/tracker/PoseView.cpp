@@ -322,6 +322,7 @@ BPoseView::InitCommon()
 	fTitleView = new BTitleView(this);
 	if (fHScrollBar != NULL)
 		fHScrollBar->SetTitleView(fTitleView);
+
 	fCountView = new BCountView(this);
 
 	BPoint origin;
@@ -2660,6 +2661,7 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 	int32 count = fPoseList->CountItems();
 	for (int32 index = 0; index < count; index++)
 		fPoseList->ItemAt(index)->RemoveWidget(this, columnToRemove);
+
 	fColumnList->RemoveItem(columnToRemove, false);
 	fTitleView->RemoveTitle(columnToRemove);
 
@@ -2683,7 +2685,7 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 		int32 columnCount = CountColumns();
 		bool anyDateAttributesLeft = false;
 
-		for (int32 i = 0; i<columnCount; i++) {
+		for (int32 i = 0; i < columnCount; i++) {
 			BColumn* column = ColumnAt(i);
 			if (column->AttrType() == B_TIME_TYPE)
 				anyDateAttributesLeft = true;
@@ -2739,11 +2741,11 @@ BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 	PoseList* poseList = CurrentPoseList();
 	int32 count = poseList->CountItems();
 	int32 startIndex = (int32)(rect.top / fListElemHeight);
-	BPoint loc(0, startIndex* fListElemHeight);
+	BPoint loc(0, startIndex * fListElemHeight);
 
 	for (int32 index = startIndex; index < count; index++) {
 		BPose* pose = poseList->ItemAt(index);
-		if (!pose->WidgetFor(newColumn->AttrHash()))
+		if (pose->WidgetFor(newColumn->AttrHash()) == NULL)
 			pose->AddWidget(this, newColumn);
 
 		loc.y += fListElemHeight;
@@ -6370,6 +6372,7 @@ BPoseView::InvertSelection()
 		} else {
 			if (index == startIndex)
 				fSelectionPivotPose = pose;
+
 			fSelectionList->AddItem(pose);
 			pose->Select(true);
 		}
@@ -8998,13 +9001,14 @@ BPoseView::SynchronousUpdate(BRect updateRect, bool clip)
 
 
 void
-BPoseView::DrawViewCommon(const BRect &updateRect)
+BPoseView::DrawViewCommon(const BRect& updateRect)
 {
 	if (ViewMode() == kListMode) {
 		PoseList* poseList = CurrentPoseList();
 		int32 count = poseList->CountItems();
 		int32 startIndex
 			= (int32)((updateRect.top - fListElemHeight) / fListElemHeight);
+
 		if (startIndex < 0)
 			startIndex = 0;
 

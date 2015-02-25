@@ -1245,7 +1245,7 @@ EachTextWidget(BPose* pose, BPoseView* poseView,
 			break;
 
 		BTextWidget* widget = pose->WidgetFor(column->AttrHash());
-		if (widget)
+		if (widget != NULL)
 			(func)(widget, pose, poseView, column, p1);
 	}
 }
@@ -1263,7 +1263,7 @@ EachTextWidget(BPose* pose, BPoseView* poseView,
 			break;
 
 		BTextWidget* widget = pose->WidgetFor(column->AttrHash());
-		if (widget)
+		if (widget != NULL)
 			(func)(widget, pose, poseView, column, p1, p2);
 	}
 }
@@ -1281,12 +1281,13 @@ WhileEachTextWidget(BPose* pose, BPoseView* poseView,
 			break;
 
 		BTextWidget* widget = pose->WidgetFor(column->AttrHash());
-		if (widget) {
+		if (widget != NULL) {
 			Result result = (func)(widget, pose, poseView, column, p1, p2);
-			if (result)
+			if (result != 0)
 				return result;
 		}
 	}
+
 	return 0;
 }
 
