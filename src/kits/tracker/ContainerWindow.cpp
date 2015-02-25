@@ -500,7 +500,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fDragMessage(NULL),
 	fCachedTypesList(NULL),
 	fStateNeedsSaving(false),
-	fSaveStateIsEnabled(!fIsDesktop),
+	fSaveStateIsEnabled(true),
 	fIsWatchingPath(false)
 {
 	InitIconPreloader();
