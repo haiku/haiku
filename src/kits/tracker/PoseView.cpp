@@ -986,7 +986,7 @@ BPoseView::SetIconPoseHeight()
 {
 	switch (ViewMode()) {
 		case kIconMode:
-			// IconSize should allready be set in MessageReceived()
+			// IconSize should already be set in MessageReceived()
 			fIconPoseHeight = ceilf(IconSizeInt() + sFontHeight + 1);
 			break;
 
@@ -2128,7 +2128,7 @@ BPoseView::MessageReceived(BMessage* message)
 				if (size != (int32)IconSizeInt())
 					fViewState->SetIconSize(size);
 			} else if (message->FindInt32("scale", &scale) == B_OK
-						&& fViewState->ViewMode() == kIconMode) {
+				&& fViewState->ViewMode() == kIconMode) {
 				if (scale == 0 && (int32)IconSizeInt() != 32) {
 					switch ((int32)IconSizeInt()) {
 						case 40:
