@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,9 +18,9 @@
 
 
 struct service;
-struct service_address;
+struct service_connection;
 typedef std::map<std::string, service*> ServiceNameMap;
-typedef std::map<int, service_address*> ServiceSocketMap;
+typedef std::map<int, service_connection*> ServiceSocketMap;
 
 
 class Services : public BHandler {

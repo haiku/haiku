@@ -107,28 +107,6 @@ private:
 };
 
 
-struct address_family {
-	int			family;
-	const char*	name;
-	const char*	identifiers[4];
-};
-
-
-static const address_family kFamilies[] = {
-	{
-		AF_INET,
-		"inet",
-		{"AF_INET", "inet", "ipv4", NULL},
-	},
-	{
-		AF_INET6,
-		"inet6",
-		{"AF_INET6", "inet6", "ipv6", NULL},
-	},
-	{ -1, NULL, {NULL} }
-};
-
-
 // #pragma mark - private functions
 
 
@@ -153,61 +131,6 @@ set_80211(const char* name, int32 type, void* data,
 		return errno;
 
 	return B_OK;
-}
-
-
-// #pragma mark - exported functions
-
-
-int
-get_address_family(const char* argument)
-{
-	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
-		for (int32 j = 0; kFamilies[i].identifiers[j]; j++) {
-			if (!strcmp(argument, kFamilies[i].identifiers[j])) {
-				// found a match
-				return kFamilies[i].family;
-			}
-		}
-	}
-
-	return AF_UNSPEC;
-}
-
-
-/*!	Parses the \a argument as network \a address for the specified \a family.
-	If \a family is \c AF_UNSPEC, \a family will be overwritten with the family
-	of the successfully parsed address.
-*/
-bool
-parse_address(int32& family, const char* argument, BNetworkAddress& address)
-{
-	if (argument == NULL)
-		return false;
-
-	status_t status = address.SetTo(family, argument, (uint16)0,
-		B_NO_ADDRESS_RESOLUTION);
-	if (status != B_OK)
-		return false;
-
-	if (family == AF_UNSPEC) {
-		// Test if we support the resulting address family
-		bool supported = false;
-
-		for (int32 i = 0; kFamilies[i].family >= 0; i++) {
-			if (kFamilies[i].family == address.Family()) {
-				supported = true;
-				break;
-			}
-		}
-		if (!supported)
-			return false;
-
-		// Take over family from address
-		family = address.Family();
-	}
-
-	return true;
 }
 
 
@@ -254,7 +177,7 @@ NetServer::ReadyToRun()
 	_BringUpInterfaces();
 	_StartServices();
 
-	BPrivate::BPathMonitor::StartWatching("/dev/net", 
+	BPrivate::BPathMonitor::StartWatching("/dev/net",
 		B_WATCH_FILES_ONLY | B_WATCH_RECURSIVELY, this);
 }
 
@@ -548,60 +471,19 @@ NetServer::_ConfigureInterface(BMessage& message)
 	BMessage addressMessage;
 	for (int32 index = 0; message.FindMessage("address", index,
 			&addressMessage) == B_OK; index++) {
-		int32 family;
-		if (addressMessage.FindInt32("family", &family) != B_OK) {
-			const char* familyString;
-			if (addressMessage.FindString("family", &familyString) == B_OK) {
-				if (get_address_family(familyString) == AF_UNSPEC) {
-					// we don't support this family
-					fprintf(stderr, "%s: Ignore unknown family: %s\n", Name(),
-						familyString);
-					continue;
-				}
-			} else
-				family = AF_UNSPEC;
-		}
+		BNetworkInterfaceAddressSettings addressSettings(addressMessage);
 
-		// retrieve addresses
-
-		bool autoConfig;
-		if (addressMessage.FindBool("auto_config", &autoConfig) != B_OK)
-			autoConfig = false;
-
-		BNetworkAddress address;
-		BNetworkAddress mask;
-		BNetworkAddress broadcast;
-		BNetworkAddress peer;
-		BNetworkAddress gateway;
-
-		const char* string;
-
-		if (!autoConfig) {
-			if (addressMessage.FindString("address", &string) == B_OK) {
-				parse_address(family, string, address);
-
-				if (addressMessage.FindString("mask", &string) == B_OK)
-					parse_address(family, string, mask);
-			}
-
-			if (addressMessage.FindString("peer", &string) == B_OK)
-				parse_address(family, string, peer);
-
-			if (addressMessage.FindString("broadcast", &string) == B_OK)
-				parse_address(family, string, broadcast);
-		}
-
-		if (autoConfig) {
+		if (addressSettings.AutoConfigure()) {
 			_QuitLooperForDevice(name);
 			startAutoConfig = true;
-		} else if (addressMessage.FindString("gateway", &string) == B_OK
-			&& parse_address(family, string, gateway)) {
+		} else if (!addressSettings.Gateway().IsEmpty()) {
 			// add gateway route, if we're asked for it
-			interface.RemoveDefaultRoute(family);
+			interface.RemoveDefaultRoute(addressSettings.Family());
 				// Try to remove a previous default route, doesn't matter
 				// if it fails.
 
-			status_t status = interface.AddDefaultRoute(gateway);
+			status_t status = interface.AddDefaultRoute(
+				addressSettings.Gateway());
 			if (status != B_OK) {
 				fprintf(stderr, "%s: Could not add route for %s: %s\n",
 					Name(), name, strerror(errno));
@@ -610,14 +492,17 @@ NetServer::_ConfigureInterface(BMessage& message)
 
 		// set address/mask/broadcast/peer
 
-		if (!address.IsEmpty() || !mask.IsEmpty() || !broadcast.IsEmpty()) {
+		if (!addressSettings.Address().IsEmpty()
+			|| !addressSettings.Mask().IsEmpty()
+			|| !addressSettings.Broadcast().IsEmpty()
+			|| !addressSettings.Peer().IsEmpty()) {
 			BNetworkInterfaceAddress interfaceAddress;
-			interfaceAddress.SetAddress(address);
-			interfaceAddress.SetMask(mask);
-			if (!broadcast.IsEmpty())
-				interfaceAddress.SetBroadcast(broadcast);
-			else if (!peer.IsEmpty())
-				interfaceAddress.SetDestination(peer);
+			interfaceAddress.SetAddress(addressSettings.Address());
+			interfaceAddress.SetMask(addressSettings.Mask());
+			if (!addressSettings.Broadcast().IsEmpty())
+				interfaceAddress.SetBroadcast(addressSettings.Broadcast());
+			else if (!addressSettings.Peer().IsEmpty())
+				interfaceAddress.SetDestination(addressSettings.Peer());
 
 			status_t status = interface.SetAddress(interfaceAddress);
 			if (status != B_OK) {

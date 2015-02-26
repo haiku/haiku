@@ -9,6 +9,7 @@
 
 #include <NetworkSettings.h>
 
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -113,6 +114,119 @@ const static settings_template kServicesTemplate[] = {
 	{B_MESSAGE_TYPE, "service", kServiceTemplate},
 	{0, NULL, NULL}
 };
+
+
+struct address_family {
+	int			family;
+	const char*	name;
+	const char*	identifiers[4];
+};
+
+
+static const address_family kFamilies[] = {
+	{
+		AF_INET,
+		"inet",
+		{"AF_INET", "inet", "ipv4", NULL},
+	},
+	{
+		AF_INET6,
+		"inet6",
+		{"AF_INET6", "inet6", "ipv6", NULL},
+	},
+	{ -1, NULL, {NULL} }
+};
+
+
+static int
+get_address_family(const char* argument)
+{
+	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+		for (int32 j = 0; kFamilies[i].identifiers[j]; j++) {
+			if (!strcmp(argument, kFamilies[i].identifiers[j])) {
+				// found a match
+				return kFamilies[i].family;
+			}
+		}
+	}
+
+	return AF_UNSPEC;
+}
+
+
+/*!	Parses the \a argument as network \a address for the specified \a family.
+	If \a family is \c AF_UNSPEC, \a family will be overwritten with the family
+	of the successfully parsed address.
+*/
+static bool
+parse_address(int32& family, const char* argument, BNetworkAddress& address)
+{
+	if (argument == NULL)
+		return false;
+
+	status_t status = address.SetTo(family, argument, (uint16)0,
+		B_NO_ADDRESS_RESOLUTION);
+	if (status != B_OK)
+		return false;
+
+	if (family == AF_UNSPEC) {
+		// Test if we support the resulting address family
+		bool supported = false;
+
+		for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+			if (kFamilies[i].family == address.Family()) {
+				supported = true;
+				break;
+			}
+		}
+		if (!supported)
+			return false;
+
+		// Take over family from address
+		family = address.Family();
+	}
+
+	return true;
+}
+
+
+static int
+parse_type(const char* string)
+{
+	if (!strcasecmp(string, "stream"))
+		return SOCK_STREAM;
+
+	return SOCK_DGRAM;
+}
+
+
+static int
+parse_protocol(const char* string)
+{
+	struct protoent* proto = getprotobyname(string);
+	if (proto == NULL)
+		return IPPROTO_TCP;
+
+	return proto->p_proto;
+}
+
+
+static int
+type_for_protocol(int protocol)
+{
+	// default determined by protocol
+	switch (protocol) {
+		case IPPROTO_TCP:
+			return SOCK_STREAM;
+
+		case IPPROTO_UDP:
+		default:
+			return SOCK_DGRAM;
+	}
+}
+
+
+// #pragma mark -
 
 
 BNetworkSettings::BNetworkSettings()
@@ -384,7 +498,7 @@ BNetworkSettings::_Load(const char* name, uint32* _type)
 			}
 
 			if (_type != NULL)
-				*_type = kMsgInterfaceSettingsUpdated;
+				*_type = kMsgNetworkSettingsUpdated;
 		}
 	}
 	if (name == NULL || strcmp(name, kServicesSettingsName) == 0) {
@@ -671,4 +785,354 @@ BNetworkSettings::_RemoveItem(BMessage& container, const char* itemField,
 	}
 
 	return B_ENTRY_NOT_FOUND;
+}
+
+
+// #pragma mark - BNetworkInterfaceAddressSettings
+
+
+BNetworkInterfaceAddressSettings::BNetworkInterfaceAddressSettings(
+	const BMessage& data)
+{
+	if (data.FindInt32("family", &fFamily) != B_OK) {
+		const char* familyString;
+		if (data.FindString("family", &familyString) == B_OK) {
+			fFamily = get_address_family(familyString);
+			if (fFamily == AF_UNSPEC) {
+				// we don't support this family
+				fprintf(stderr, "Ignore unknown family: %s\n",
+					familyString);
+				return;
+			}
+		} else
+			fFamily = AF_UNSPEC;
+	}
+
+	fAutoConfigure = data.GetBool("auto_config", false);
+
+	if (!fAutoConfigure) {
+		if (parse_address(fFamily, data.GetString("address", NULL), fAddress))
+			parse_address(fFamily, data.GetString("mask", NULL), fMask);
+
+		parse_address(fFamily, data.GetString("peer", NULL), fPeer);
+		parse_address(fFamily, data.GetString("broadcast", NULL), fBroadcast);
+		parse_address(fFamily, data.GetString("gateway", NULL), fGateway);
+	}
+}
+
+
+BNetworkInterfaceAddressSettings::~BNetworkInterfaceAddressSettings()
+{
+}
+
+
+int
+BNetworkInterfaceAddressSettings::Family() const
+{
+	return fFamily;
+}
+
+
+bool
+BNetworkInterfaceAddressSettings::AutoConfigure() const
+{
+	return fAutoConfigure;
+}
+
+
+const BNetworkAddress&
+BNetworkInterfaceAddressSettings::Address() const
+{
+	return fAddress;
+}
+
+
+const BNetworkAddress&
+BNetworkInterfaceAddressSettings::Mask() const
+{
+	return fMask;
+}
+
+
+const BNetworkAddress&
+BNetworkInterfaceAddressSettings::Peer() const
+{
+	return fPeer;
+}
+
+
+const BNetworkAddress&
+BNetworkInterfaceAddressSettings::Broadcast() const
+{
+	return fBroadcast;
+}
+
+
+const BNetworkAddress&
+BNetworkInterfaceAddressSettings::Gateway() const
+{
+	return fGateway;
+}
+
+
+// #pragma mark - BNetworkServiceAddress
+
+
+BNetworkServiceAddressSettings::BNetworkServiceAddressSettings()
+{
+}
+
+
+BNetworkServiceAddressSettings::BNetworkServiceAddressSettings(
+	const BMessage& data, int serviceFamily, int serviceType,
+	int serviceProtocol, int servicePort)
+{
+	// TODO: dump problems in the settings to syslog
+	if (data.FindInt32("family", &fFamily) != B_OK) {
+		const char* familyString;
+		if (data.FindString("family", &familyString) == B_OK) {
+			fFamily = get_address_family(familyString);
+			if (fFamily == AF_UNSPEC) {
+				// we don't support this family
+				fprintf(stderr, "Ignore unknown family: %s\n",
+					familyString);
+				return;
+			}
+		} else
+			fFamily = serviceFamily;
+	}
+
+	if (!parse_address(fFamily, data.GetString("address"), fAddress))
+		fAddress.SetToWildcard(fFamily);
+
+	const char* string;
+	if (data.FindString("protocol", &string) == B_OK)
+		fProtocol = parse_protocol(string);
+	else
+		fProtocol = serviceProtocol;
+
+	if (data.FindString("type", &string) == B_OK)
+		fType = parse_type(string);
+	else if (fProtocol != serviceProtocol)
+		fType = type_for_protocol(fProtocol);
+	else
+		fType = serviceType;
+
+	fAddress.SetPort(data.GetInt32("port", servicePort));
+}
+
+
+BNetworkServiceAddressSettings::~BNetworkServiceAddressSettings()
+{
+}
+
+
+int
+BNetworkServiceAddressSettings::Family() const
+{
+	return fFamily;
+}
+
+
+void
+BNetworkServiceAddressSettings::SetFamily(int family)
+{
+	fFamily = family;
+}
+
+
+int
+BNetworkServiceAddressSettings::Protocol() const
+{
+	return fProtocol;
+}
+
+
+void
+BNetworkServiceAddressSettings::SetProtocol(int protocol)
+{
+	fProtocol = protocol;
+}
+
+
+int
+BNetworkServiceAddressSettings::Type() const
+{
+	return fType;
+}
+
+
+void
+BNetworkServiceAddressSettings::SetType(int type)
+{
+	fType = type;
+}
+
+
+const BNetworkAddress&
+BNetworkServiceAddressSettings::Address() const
+{
+	return fAddress;
+}
+
+
+BNetworkAddress&
+BNetworkServiceAddressSettings::Address()
+{
+	return fAddress;
+}
+
+
+status_t
+BNetworkServiceAddressSettings::GetMessage(BMessage& data)
+{
+	// TODO!
+	return B_NOT_SUPPORTED;
+}
+
+
+bool
+BNetworkServiceAddressSettings::operator==(
+	const BNetworkServiceAddressSettings& other) const
+{
+	return Family() == other.Family()
+		&& Type() == other.Type()
+		&& Protocol() == other.Protocol()
+		&& Address() == other.Address();
+}
+
+
+// #pragma mark - BNetworkServiceSettings
+
+
+BNetworkServiceSettings::BNetworkServiceSettings(const BMessage& message)
+	:
+	fData(message)
+{
+	// TODO: user/group is currently ignored!
+
+	// Default family/port/protocol/type for all addresses
+
+	// we default to inet/tcp/port-from-service-name if nothing is specified
+	const char* string;
+	if (message.FindString("family", &string) != B_OK)
+		string = "inet";
+
+	int32 serviceFamily = get_address_family(string);
+	if (serviceFamily == AF_UNSPEC)
+		serviceFamily = AF_INET;
+
+	int32 serviceProtocol;
+	if (message.FindString("protocol", &string) == B_OK)
+		serviceProtocol = parse_protocol(string);
+	else {
+		string = "tcp";
+			// we set 'string' here for an eventual call to getservbyname()
+			// below
+		serviceProtocol = IPPROTO_TCP;
+	}
+
+	int32 servicePort;
+	if (message.FindInt32("port", &servicePort) != B_OK) {
+		struct servent* servent = getservbyname(Name(), string);
+		if (servent != NULL)
+			servicePort = ntohs(servent->s_port);
+		else
+			servicePort = -1;
+	}
+
+	int32 serviceType = -1;
+	if (message.FindString("type", &string) == B_OK) {
+		serviceType = parse_type(string);
+	} else {
+		serviceType = type_for_protocol(serviceProtocol);
+	}
+
+	const char* argument;
+	for (int i = 0; message.FindString("launch", i, &argument) == B_OK; i++) {
+		fArguments.Add(argument);
+	}
+
+	BMessage addressData;
+	int32 i = 0;
+	for (; message.FindMessage("address", i, &addressData) == B_OK; i++) {
+		BNetworkServiceAddressSettings address(addressData, serviceFamily,
+			serviceType, serviceProtocol, servicePort);
+		fAddresses.push_back(address);
+	}
+
+	if (i == 0 && (serviceFamily < 0 || servicePort < 0)) {
+		// no address specified
+		printf("service %s has no address specified\n", Name());
+		return;
+	}
+
+	if (i == 0) {
+		// no address specified, but family/port were given; add empty address
+		BNetworkServiceAddressSettings address;
+		address.SetFamily(serviceFamily);
+		address.SetType(serviceType);
+		address.SetProtocol(serviceProtocol);
+		address.Address().SetToWildcard(serviceFamily, servicePort);
+
+		fAddresses.push_back(address);
+	}
+}
+
+
+BNetworkServiceSettings::~BNetworkServiceSettings()
+{
+}
+
+
+status_t
+BNetworkServiceSettings::InitCheck() const
+{
+	if (fData.HasString("name") && fData.HasString("launch")
+		&& CountAddresses() > 0)
+		return B_OK;
+
+	return B_BAD_VALUE;
+}
+
+
+const char*
+BNetworkServiceSettings::Name() const
+{
+	return fData.GetString("name");
+}
+
+
+bool
+BNetworkServiceSettings::IsStandAlone() const
+{
+	return fData.GetBool("stand_alone");
+}
+
+
+int32
+BNetworkServiceSettings::CountArguments() const
+{
+	return fArguments.CountStrings();
+}
+
+
+const char*
+BNetworkServiceSettings::ArgumentAt(int32 index) const
+{
+	return fArguments.StringAt(index);
+}
+
+
+int32
+BNetworkServiceSettings::CountAddresses() const
+{
+	return fAddresses.size();
+}
+
+
+const BNetworkServiceAddressSettings&
+BNetworkServiceSettings::AddressAt(int32 index) const
+{
+	return fAddresses[index];
 }
