@@ -215,7 +215,7 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fActivePose(NULL),
 	fExtent(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
 	fPoseList(new PoseList(40, true)),
-	fFilteredPoseList(new PoseList()),
+	fFilteredPoseList(new PoseList(20, true)),
 	fVSPoseList(new PoseList()),
 	fSelectionList(new PoseList()),
 	fMimeTypesInSelectionCache(20, true),
