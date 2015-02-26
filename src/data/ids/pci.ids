@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.02.19
-#	Date:    2015-02-19 03:15:01
+#	Version: 2015.02.26
+#	Date:    2015-02-26 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -2034,6 +2034,25 @@
 	67a9  Hawaii
 	67aa  Hawaii
 	67b0  Hawaii XT [Radeon R9 290X]
+		1043 046a  R9 290X DirectCU II
+		1043 046c  R9 290X DirectCU II OC
+		1043 0474  Matrix R9 290X Platinum
+		1043 0476  ARES III
+		1458 227c  R9 290X WindForce 3X OC
+		1458 2281  R9 290X WindForce 3X OC
+		1458 228c  R9 290X WindForce 3X
+		1458 228d  R9 290X WindForce 3X OC
+		1458 2290  R9 290X WindForce 3X
+		1462 3070  R9 290X Lightning
+		1462 3071  R9 290X Lightning
+		1462 3072  R9 290X Lightning LE
+		1462 3080  R9 290X Gaming
+		1462 3082  R9 290X Gaming OC
+		148c 2347  Devil 13 Dual Core R9 290X
+		1682 9290  Double Dissipation R9 290X
+		174b e282  Vapor-X R9 290X Tri-X OC
+		174b e285  R9 290X Tri-X OC
+		1787 2020  R9 290X IceQ X² Turbo
 	67b1  Hawaii PRO [Radeon R9 290]
 	67b9  Vesuvius [Radeon R9 295X2]
 	67be  Hawaii LE
@@ -3078,6 +3097,7 @@
 	985d  Mullins
 	985e  Mullins
 	985f  Mullins
+	9874  Carrizo
 	9900  Trinity [Radeon HD 7660G]
 # AMD A10-5800K CPU
 	9901  Trinity [Radeon HD 7660D]
@@ -11443,6 +11463,8 @@
 		1093 75ff  PXIe-8383mc DMA
 		1093 7600  PXIe-8383mc DMA
 		1093 7602  PXIe-8384
+# 32 port / 8 lane PCIe Gen 2 packet switch
+	808f  PES32NT8AG2
 111e  Eldec
 111f  Precision Digital Images
 	4a47  Precision MX Video engine interface
@@ -13468,6 +13490,12 @@
 		14fe 0429  ES56-PI Data Fax Modem
 125e  Specialvideo Engineering SRL
 125f  Concurrent Technologies, Inc.
+# 4 x serial ports, 2 x printer ports
+	2071  CC PMC/232
+# 4 x serial ports, 2 x printer ports
+	2084  CC PMC/23P
+# 4 x serial ports, RS422
+	2091  CC PMC/422
 1260  Intersil Corporation
 	3872  ISL3872 [Prism 3]
 		1468 0202  LAN-Express IEEE 802.11b Wireless LAN
@@ -18899,6 +18927,16 @@
 	0002  OmniCube Accelerator OA-3000
 	0010  OmniCube Accelerator OA-3000-2
 1bb1  Seagate Technology PLC
+	005d  Nytro PCIe Flash Storage
+		1bb1 6501  Nytro XP6500-8A1536 1.5TB
+# 2TB Nytro PCIe controller
+		1bb1 6502  Nytro XP6500-8A2048
+# 4TB Nytro PCIe controller
+		1bb1 6503  Nytro XP6500-8A4096
+# 2GB DRAM variant of Nytro card
+		1bb1 6511  Nytro XH6550-2GB DRAM
+# 8GB variant of Nytro PCIe controller
+		1bb1 6512  Nytro XH6550-8GB DRAM
 1bb3  Bluecherry
 	4304  BC-04120A MPEG4 4 port video encoder / decoder
 	4309  BC-08240A MPEG4 4 port video encoder / decoder
@@ -21165,6 +21203,7 @@
 		103c 337f  Ethernet 1Gb 2-port 361i Adapter
 		103c 3380  Ethernet 1Gb 4-port 366i Adapter
 		103c 339e  Ethernet 1Gb 2-port 361T Adapter
+		103c 8157  Ethernet 1Gb 4-port 366T Adapter
 		108e 7b16  Quad Port GbE PCIe 2.0 ExpressModule, UTP
 		108e 7b18  Quad Port GbE PCIe 2.0 Low Profile Adapter, UTP
 		1093 7648  PCIe-8237R Ethernet Adapter
@@ -21282,6 +21321,8 @@
 	1581  Ethernet Controller X710 for 10GbE backplane
 		1028 1f98  Ethernet 10G 4P X710-k bNDC
 	1583  Ethernet Controller XL710 for 40GbE QSFP+
+		108e 0000  Oracle 10 Gb and 40 Gb Ethernet Adapter
+		108e 7b1b  Oracle 10 Gb and 40 Gb Ethernet Adapter
 		8086 0000  Ethernet Converged Network Adapter XL710-Q2
 		8086 0001  Ethernet Converged Network Adapter XL710-Q2
 		8086 0002  Ethernet Converged Network Adapter XL710-Q2
@@ -21291,7 +21332,10 @@
 		8086 0001  Ethernet Converged Network Adapter XL710-Q1
 		8086 0002  Ethernet Converged Network Adapter XL710-Q1
 		8086 0003  Ethernet I/O Module XL710-Q1
-	1585  Ethernet Controller XL710 for 10GbE QSFP+
+	1585  Ethernet Controller X710 for 10GbE QSFP+
+	1586  Ethernet Controller X710 for 10GBASE-T
+		108e 0000  Ethernet Controller X710 for 10GBASE-T
+		108e 4857  Ethernet Controller X710 for 10GBASE-T
 	15a0  Ethernet Connection (2) I218-LM
 	15a1  Ethernet Connection (2) I218-V
 	15a2  Ethernet Connection (3) I218-LM
