@@ -75,7 +75,7 @@ BPose::BPose(Model* model, BPoseView* view, uint32 clipboardMode,
 	bool selected)
 	:
 	fModel(model),
-	fWidgetList(4, true),
+	fWidgetList(4, false),
 	fClipboardMode(clipboardMode),
 	fPercent(-1),
 	fSelectionTime(0),
