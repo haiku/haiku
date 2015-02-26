@@ -30,7 +30,6 @@ provides {
 	cmd:diff3
 	cmd:ftp
 	cmd:ftpd
-	cmd:funzip
 	cmd:gunzip
 	cmd:gzexe
 	cmd:gzip
@@ -55,8 +54,6 @@ provides {
 	cmd:traceroute
 	cmd:trash
 	cmd:unchop
-	cmd:unzip = 5.50
-	cmd:unzipsfx
 	cmd:useradd
 	cmd:watch
 	cmd:xres
@@ -67,8 +64,6 @@ provides {
 	cmd:zgrep
 	cmd:zip = 2.32
 	cmd:zipcloak
-	cmd:zipgrep
-	cmd:zipinfo
 	cmd:zipnote
 	cmd:zipsplit
 	cmd:zmore

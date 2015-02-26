@@ -29,7 +29,7 @@ AddHaikuImagePackages [ FFilterByBuildFeatures
 		bzip2 ctags ffmpeg findutils gawk glu grep gutenprint jasper jpeg
 		less libicns libpng libpng16 libwebp mesa mesa_devel mesa_swrast
 		sed sharutils
-		tar tiff wget which
+		tar tiff unzip wget which
 	}@
 ] ;
 if $(HAIKU_PACKAGING_ARCHS[1]) != x86_gcc2 {

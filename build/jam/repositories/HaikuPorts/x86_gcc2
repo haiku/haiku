@@ -373,6 +373,7 @@ RemotePackageRepository HaikuPorts
 	tinyxml_devel-2.6.2-1
 	ubertuber-0.9.10-3
 	unrar-5.1.5-1
+	unzip-6.0-1
 	util_macros-1.19.0-2
 	vim-7.4-3
 	virtualbox_guest_additions-4.3.53_svn-1
@@ -1012,6 +1013,7 @@ RemotePackageRepository HaikuPorts
 	transmission_x86
 	ubertuber
 	unrar
+	unzip
 	util_macros
 	vcmi_x86
 	vim

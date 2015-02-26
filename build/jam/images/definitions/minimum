@@ -9,7 +9,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	driveinfo dstcheck dumpcatalog
 	eject error
 	fdinfo ffm filepanel finddir findpaths fortune fstrim
-	ftp ftpd funzip
+	ftp ftpd
 	getarch groupadd groupdel groupmod gzip gzexe
 	hd hey
 	ideinfo@ide idestatus@ide ifconfig iroster isvolume
@@ -30,11 +30,11 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	strace su sysinfo
 	tcpdump tcptester telnet telnetd top
 	traceroute trash
-	unchop unmount unzip unzipsfx
+	unchop unmount
 	uptime urlwrapper useradd userdel
 	version vmstat
 	waitfor watch writembr@x86,x86_64 xres
-	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
+	zdiff zforce zgrep zip zipcloak zipnote zipsplit zmore znew
 ] ;
 
 SYSTEM_APPS = [ FFilterByBuildFeatures
