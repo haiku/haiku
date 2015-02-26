@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.02.03
-# Date:    2015-02-03 20:34:06
+# Version: 2015.02.21
+# Date:    2015-02-21 20:34:06
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -16946,6 +16946,9 @@
 	0a02  Jolla Phone Developer
 	0a05  Jolla PC connection
 	0afe  Jolla charging only
+2a03  dog hunter AG
+	0001  Linino One (CDC ACM)
+	8001  Linino ONE board
 2c02  Planex Communications
 	14ea  GW-US11H WLAN
 2c1a  Dolphin Peripherals
