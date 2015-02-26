@@ -2071,7 +2071,6 @@ BPoseView::UpdateCount()
 void
 BPoseView::MessageReceived(BMessage* message)
 {
-message->PrintToStream();
 	if (message->WasDropped() && HandleMessageDropped(message))
 		return;
 
