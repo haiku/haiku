@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 
+#include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
@@ -31,6 +32,7 @@
 const uint32 kModeAuto = 'iato';
 const uint32 kModeStatic = 'istc';
 const uint32 kModeDisabled = 'ioff';
+const uint32 kMsgApply = 'aply';
 
 
 // #pragma mark - InterfaceAddressView
@@ -82,6 +84,11 @@ InterfaceAddressView::InterfaceAddressView(int family,
 	fGatewayField->SetToolTip(B_TRANSLATE("Your gateway to the internet"));
 	fGatewayField->TextView()->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
 
+	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
+		new BMessage(kMsgApply));
+	fApplyButton->SetExplicitAlignment(
+		BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_UNSET));
+
 	fSettings.GetInterface(interface, fOriginalInterface);
 	fInterfaceSettings = fOriginalInterface;
 	_UpdateFields();
@@ -93,6 +100,7 @@ InterfaceAddressView::InterfaceAddressView(int family,
 			.AddTextControl(fNetmaskField, 0, 2, B_ALIGN_RIGHT)
 			.AddTextControl(fGatewayField, 0, 3, B_ALIGN_RIGHT)
 		.End()
+		.Add(fApplyButton)
 		.AddGlue();
 }
 
@@ -120,24 +128,17 @@ InterfaceAddressView::MessageReceived(BMessage* message)
 		case kModeStatic:
 		case kModeDisabled:
 			_SetModeField(message->what);
+			if (message->what != kModeStatic)
+				_UpdateSettings();
+			break;
+
+		case kMsgApply:
 			_UpdateSettings();
 			break;
 
 		default:
 			BView::MessageReceived(message);
 	}
-}
-
-
-// #pragma mark - InterfaceAddressView private methods
-
-
-void
-InterfaceAddressView::_EnableFields(bool enable)
-{
-	fAddressField->SetEnabled(enable);
-	fNetmaskField->SetEnabled(enable);
-	fGatewayField->SetEnabled(enable);
 }
 
 
@@ -177,22 +178,50 @@ InterfaceAddressView::Revert()
 }
 
 
-status_t
-InterfaceAddressView::Save()
+void
+InterfaceAddressView::ConfigurationUpdated(const BMessage& message)
+{
+	const char* device = message.GetString("device", NULL);
+	if (strcmp(device, fInterface.Name()) != 0)
+		return;
+
+	_UpdateFields();
+}
+
+
+// #pragma mark - InterfaceAddressView private methods
+
+
+void
+InterfaceAddressView::_Apply()
 {
 	BMenuItem* item = fModePopUpMenu->FindMarked();
 	if (item == NULL)
-		return B_ERROR;
+		return;
 /*
 	fSettings->SetIP(fFamily, fAddressField->Text());
 	fSettings->SetNetmask(fFamily, fNetmaskField->Text());
 	fSettings->SetGateway(fFamily, fGatewayField->Text());
 	fSettings->SetAutoConfigure(fFamily, item->Command() == kModeAuto);
 */
-	return B_OK;
 }
 
 
+void
+InterfaceAddressView::_EnableFields(bool enable)
+{
+	fAddressField->SetEnabled(enable);
+	fNetmaskField->SetEnabled(enable);
+	fGatewayField->SetEnabled(enable);
+}
+
+
+/*!	Updates the UI to match the current interface configuration.
+
+	The interface settings may be consulted to determine if the
+	automatic configuration has been specified, if there was no
+	configuration yet.
+*/
 void
 InterfaceAddressView::_UpdateFields()
 {
@@ -257,4 +286,27 @@ InterfaceAddressView::_SetModeField(uint32 mode)
 void
 InterfaceAddressView::_UpdateSettings()
 {
+	BMessage interface;
+	fSettings.GetInterface(fInterface.Name(), interface);
+
+	interface.SetString("device", fInterface.Name());
+
+	uint32 mode = kModeAuto;
+	BMenuItem* item = fModePopUpMenu->FindMarked();
+	if (item != NULL)
+		mode = item->Message()->what;
+
+	// Remove previous address for family
+
+	switch (mode) {
+		case kModeAuto:
+		default:
+			break;
+		case kModeDisabled:
+			break;
+		case kModeStatic:
+			break;
+	}
+
+	fSettings.AddInterface(interface);
 }

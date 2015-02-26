@@ -23,6 +23,10 @@ enum BNetworkSettingsType {
 	B_NETWORK_SETTINGS_TYPE_OTHER = 'othr'
 };
 
+enum {
+	kMsgSettingsItemUpdated = 'SIup'
+};
+
 class BNetworkProfile;
 class BNetworkSettings;
 
@@ -42,9 +46,11 @@ public:
 			const BNetworkProfile*
 								Profile() const;
 
-	virtual	status_t			Apply() = 0;
 	virtual	status_t			Revert() = 0;
 	virtual bool				IsRevertable() = 0;
+
+	virtual void				SettingsUpdated(uint32 type);
+	virtual void				ConfigurationUpdated(const BMessage& message);
 
 private:
 			const BNetworkProfile*

@@ -42,9 +42,10 @@ public:
 	virtual BListItem*			ListItem();
 	virtual BView*				View();
 
-	virtual	status_t			Apply();
 	virtual	status_t			Revert();
 	virtual bool				IsRevertable();
+
+	virtual void				ConfigurationUpdated(const BMessage& message);
 
 private:
 			BNetworkSettings&	fSettings;
@@ -95,13 +96,6 @@ IPv4InterfaceItem::View()
 
 
 status_t
-IPv4InterfaceItem::Apply()
-{
-	return B_OK;
-}
-
-
-status_t
 IPv4InterfaceItem::Revert()
 {
 	return B_OK;
@@ -112,6 +106,14 @@ bool
 IPv4InterfaceItem::IsRevertable()
 {
 	return false;
+}
+
+
+void
+IPv4InterfaceItem::ConfigurationUpdated(const BMessage& message)
+{
+	if (fView != NULL)
+		fView->ConfigurationUpdated(message);
 }
 
 

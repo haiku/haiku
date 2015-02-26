@@ -40,6 +40,18 @@ BNetworkSettingsItem::Profile() const
 }
 
 
+void
+BNetworkSettingsItem::SettingsUpdated(uint32 type)
+{
+}
+
+
+void
+BNetworkSettingsItem::ConfigurationUpdated(const BMessage& message)
+{
+}
+
+
 // #pragma mark -
 
 

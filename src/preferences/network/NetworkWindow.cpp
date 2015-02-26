@@ -26,6 +26,7 @@
 #include <Directory.h>
 #include <LayoutBuilder.h>
 #include <NetworkInterface.h>
+#include <NetworkNotifications.h>
 #include <NetworkRoster.h>
 #include <OutlineListView.h>
 #include <Path.h>
@@ -49,7 +50,6 @@ const char* kNetworkStatusSignature = "application/x-vnd.Haiku-NetworkStatus";
 static const uint32 kMsgProfileSelected = 'prof';
 static const uint32 kMsgProfileManage = 'mngp';
 static const uint32 kMsgProfileNew = 'newp';
-static const uint32 kMsgApply = 'aply';
 static const uint32 kMsgRevert = 'rvrt';
 static const uint32 kMsgToggleReplicant = 'trep';
 static const uint32 kMsgItemSelected = 'ItSl';
@@ -77,10 +77,6 @@ NetworkWindow::NetworkWindow()
 #endif
 
 	// Settings section
-
-	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
-		new BMessage(kMsgApply));
-	SetDefaultButton(fApplyButton);
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert));
@@ -124,7 +120,6 @@ NetworkWindow::NetworkWindow()
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)
 			.AddGlue()
-			.Add(fApplyButton)
 		.End();
 
 	_ScanInterfaces();
@@ -141,11 +136,15 @@ NetworkWindow::NetworkWindow()
 	CenterOnScreen();
 
 	fSettings.StartMonitoring(this);
+	start_watching_network(B_WATCH_NETWORK_INTERFACE_CHANGES
+		| B_WATCH_NETWORK_LINK_CHANGES | B_WATCH_NETWORK_WLAN_CHANGES, this);
 }
 
 
 NetworkWindow::~NetworkWindow()
 {
+	stop_watching_network(this);
+	fSettings.StopMonitoring(this);
 }
 
 
@@ -170,10 +169,7 @@ NetworkWindow::MessageReceived(BMessage* message)
 			if (message->FindString("path", &path) != B_OK)
 				break;
 
-			BPath name(path);
-			bool isCurrent = strcmp(name.Leaf(), "current") == 0;
-
-			fApplyButton->SetEnabled(!isCurrent);
+			// TODO!
 			break;
 		}
 
@@ -196,14 +192,6 @@ NetworkWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case kMsgApply:
-		{
-			SettingsMap::const_iterator iterator = fSettingsMap.begin();
-			for (; iterator != fSettingsMap.end(); iterator++)
-				iterator->second->Apply();
-			break;
-		}
-
 		case kMsgToggleReplicant:
 		{
 			_ShowReplicant(
@@ -216,6 +204,16 @@ NetworkWindow::MessageReceived(BMessage* message)
 			fSettings.Update(message);
 			break;
 		}
+
+		case B_NETWORK_MONITOR:
+			_BroadcastConfigurationUpdate(*message);
+			break;
+
+		case BNetworkSettings::kMsgInterfaceSettingsUpdated:
+		case BNetworkSettings::kMsgNetworkSettingsUpdated:
+		case BNetworkSettings::kMsgServiceSettingsUpdated:
+			_BroadcastSettingsUpdate(message->what);
+			break;
 
 		default:
 			inherited::MessageReceived(message);
@@ -449,6 +447,24 @@ NetworkWindow::_SelectItem(BListItem* listItem)
 
 	if (nextView != NULL)
 		fAddOnShellView->AddChild(nextView);
+}
+
+
+void
+NetworkWindow::_BroadcastSettingsUpdate(uint32 type)
+{
+	SettingsMap::const_iterator iterator = fSettingsMap.begin();
+	for (; iterator != fSettingsMap.end(); iterator++)
+		iterator->second->SettingsUpdated(type);
+}
+
+
+void
+NetworkWindow::_BroadcastConfigurationUpdate(const BMessage& message)
+{
+	SettingsMap::const_iterator iterator = fSettingsMap.begin();
+	for (; iterator != fSettingsMap.end(); iterator++)
+		iterator->second->ConfigurationUpdated(message);
 }
 
 

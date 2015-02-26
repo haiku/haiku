@@ -44,6 +44,9 @@ private:
 								_SettingsItemFor(BListItem* item);
 			BListItem*			_ListItemFor(BNetworkSettingsType type);
 			void				_SelectItem(BListItem* listItem);
+			void				_BroadcastSettingsUpdate(uint32 type);
+			void				_BroadcastConfigurationUpdate(
+									const BMessage& message);
 
 			bool				_IsReplicantInstalled();
 			void				_ShowReplicant(bool show);
@@ -69,7 +72,6 @@ private:
 			BView*				fAddOnShellView;
 
 			BButton*			fRevertButton;
-			BButton*			fApplyButton;
 };
 
 

@@ -15,6 +15,7 @@
 #include <NetworkSettings.h>
 
 
+class BButton;
 class BMenuField;
 class BMessage;
 class BPopUpMenu;
@@ -38,7 +39,11 @@ public:
 			status_t			Revert();
 			status_t			Save();
 
+			void				ConfigurationUpdated(const BMessage& message);
+
+
 private:
+			void				_Apply();
 			void				_EnableFields(bool enable);
 			void				_UpdateFields();
 			void				_SetModeField(uint32 mode);
@@ -57,6 +62,7 @@ private:
 			BTextControl*		fAddressField;
 			BTextControl*		fNetmaskField;
 			BTextControl*		fGatewayField;
+			BButton*			fApplyButton;
 };
 
 
