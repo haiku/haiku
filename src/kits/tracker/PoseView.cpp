@@ -37,11 +37,11 @@ All rights reserved.
 
 #include <algorithm>
 #include <functional>
+#include <map>
 
 #include <ctype.h>
 #include <errno.h>
 #include <float.h>
-#include <map>
 #include <stdlib.h>
 #include <strings.h>
 
@@ -104,10 +104,6 @@ All rights reserved.
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PoseView"
-
-
-using std::min;
-using std::max;
 
 
 const float kDoubleClickTresh = 6;
@@ -1599,10 +1595,10 @@ BPoseView::AddPosesCompleted()
 	// above the top of the view (leaving you with an empty window)
 	if (ViewMode() == kListMode) {
 		BRect bounds(Bounds());
-		float lastItemTop
-			= (CurrentPoseList()->CountItems() - 1) * fListElemHeight;
+		float lastItemTop = (CurrentPoseList()->CountItems() - 1)
+			* fListElemHeight;
 		if (bounds.top > lastItemTop)
-			BView::ScrollTo(bounds.left, max_c(lastItemTop, 0));
+			BView::ScrollTo(bounds.left, std::max(lastItemTop, 0.0f));
 	}
 }
 
@@ -2075,6 +2071,7 @@ BPoseView::UpdateCount()
 void
 BPoseView::MessageReceived(BMessage* message)
 {
+message->PrintToStream();
 	if (message->WasDropped() && HandleMessageDropped(message))
 		return;
 
@@ -7541,19 +7538,19 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint,
 	bool fadeRight = false;
 	bool fade = false;
 	if (inner.left > dragRect.left) {
-		inner.left = max(inner.left - 32, dragRect.left);
+		inner.left = std::max(inner.left - 32, dragRect.left);
 		fade = fadeLeft = true;
 	}
 	if (inner.right < dragRect.right) {
-		inner.right = min(inner.right + 32, dragRect.right);
+		inner.right = std::min(inner.right + 32, dragRect.right);
 		fade = fadeRight = true;
 	}
 	if (inner.top > dragRect.top) {
-		inner.top = max(inner.top - 32, dragRect.top);
+		inner.top = std::max(inner.top - 32, dragRect.top);
 		fade = fadeTop = true;
 	}
 	if (inner.bottom < dragRect.bottom) {
-		inner.bottom = min(inner.bottom + 32, dragRect.bottom);
+		inner.bottom = std::min(inner.bottom + 32, dragRect.bottom);
 		fade = fadeBottom = true;
 	}
 
@@ -8027,9 +8024,11 @@ BPoseView::DeletePose(const node_ref* itemNode, BPose* pose, int32 index)
 				int32 index = (int32)(bounds.bottom / fListElemHeight);
 				BPose* pose = CurrentPoseList()->ItemAt(index);
 
-				if (pose == NULL && bounds.top > 0) // scroll up a little
+				if (pose == NULL && bounds.top > 0) {
+					// scroll up a little
 					BView::ScrollTo(bounds.left,
-						max_c(bounds.top - fListElemHeight, 0));
+						std::max(bounds.top - fListElemHeight, 0.0f));
+				}
 			}
 		}
 
@@ -10224,7 +10223,7 @@ BPoseView::UpdateAfterFilterChange()
 		BRect bounds = Bounds();
 		float height = fFilteredPoseList->CountItems() * fListElemHeight;
 		if (bounds.top > 0 && bounds.bottom > height)
-			BView::ScrollTo(0, max_c(height - bounds.Height(), 0));
+			BView::ScrollTo(0, std::max(height - bounds.Height(), 0.0f));
 	}
 
 	UpdateScrollRange();
