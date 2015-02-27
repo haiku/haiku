@@ -198,6 +198,25 @@ static int
 PoseCompareAddWidget(const BPose* p1, const BPose* p2, BPoseView* view);
 
 
+static bool
+OneMatches(BPose* pose, BPoseView*, void* castToPose)
+{
+	return pose == (const BPose*)castToPose;
+}
+
+
+static void
+CopySelectionListToEntryRefList(const PoseList* original,
+	BObjectList<entry_ref>* copy)
+{
+	int32 count = original->CountItems();
+	for (int32 index = 0; index < count; index++) {
+		copy->AddItem(new entry_ref(*(original->ItemAt(
+			index)->TargetModel()->EntryRef())));
+	}
+}
+
+
 //	#pragma mark - BPoseView
 
 
@@ -4836,30 +4855,12 @@ BPoseView::LaunchAppWithSelection(Model* appModel, const BMessage* dragMessage,
 }
 
 
-static bool
-OneMatches(BPose* pose, BPoseView*, void* castToPose)
-{
-	return pose == (const BPose*)castToPose;
-}
-
-
 bool
 BPoseView::DragSelectionContains(const BPose* target,
 	const BMessage* dragMessage)
 {
 	return EachItemInDraggedSelection(dragMessage, OneMatches, 0,
 		(void*)target);
-}
-
-
-static void
-CopySelectionListToBListAsEntryRefs(const PoseList* original, BObjectList<entry_ref>* copy)
-{
-	int32 count = original->CountItems();
-	for (int32 index = 0; index < count; index++) {
-		copy->AddItem(new entry_ref(*(original->ItemAt(
-			index)->TargetModel()->EntryRef())));
-	}
 }
 
 
@@ -5027,7 +5028,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			dropOnGrid);
 		BObjectList<entry_ref>* srcList = new BObjectList<entry_ref>(
 			selectionList->CountItems(), true);
-		CopySelectionListToBListAsEntryRefs(selectionList, srcList);
+		CopySelectionListToEntryRefList(selectionList, srcList);
 
 		uint32 moveMode;
 		if (forceCopy)
@@ -5951,7 +5952,7 @@ BPoseView::DuplicateSelection(BPoint* dropStart, BPoint* dropEnd)
 	if (!fSelectionList->IsEmpty()) {
 		BObjectList<entry_ref>* srcList = new BObjectList<entry_ref>(
 			fSelectionList->CountItems(), true);
-		CopySelectionListToBListAsEntryRefs(fSelectionList, srcList);
+		CopySelectionListToEntryRefList(fSelectionList, srcList);
 
 		BList* dropPoints;
 		if (dropStart) {
