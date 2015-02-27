@@ -317,29 +317,23 @@ static const Translation kTranslations[] = {
 	"Stephan Aßmus\n" \
 	"Augustin Cavalier\n" \
 	"Stefano Ceccherini\n" \
-	"Rudolf Cornelissen\n" \
 	"Alexandre Deckner\n" \
 	"Adrien Destugues\n" \
-	"Oliver Ruiz Dorantes\n" \
 	"Axel Dörfler\n" \
 	"Jérôme Duval\n" \
 	"Pawel Dziepak\n" \
 	"René Gollent\n" \
-	"Bryce Groff\n" \
 	"Colin Günther\n" \
 	"Jessica Hamilton\n" \
 	"Julian Harnath\n" \
 	"Fredrik Holmqvist\n" \
 	"Philippe Houdoin\n" \
 	"Ryan Leavengood\n" \
-	"Andrew Lindesay\n" \
 	"Michael Lotz\n" \
 	"Matt Madia\n" \
 	"Scott McCreary\n" \
-	"David McPaul\n" \
 	"Fredrik Modéen\n" \
 	"Marcus Overhagen\n" \
-	"Michael Pfeiffer\n" \
 	"Joseph R. Prostko\n" \
 	"François Revol\n" \
 	"Philippe Saint-Pierre\n" \
@@ -351,7 +345,6 @@ static const Translation kTranslations[] = {
 	"Alexander von Gluck IV\n" \
 	"Ingo Weinhold\n" \
 	"Alex Wilson\n" \
-	"Artur Wyszyński\n" \
 	"Clemens Zeidler\n" \
 	"Siarzhuk Zharski\n" \
 	"\n"
@@ -359,9 +352,12 @@ static const Translation kTranslations[] = {
 #define kPastMaintainers \
 	"Andrew Bachmann\n" \
 	"Salvatore Benedetto\n" \
+	"Rudolf Cornelissen\n" \
 	"Tyler Dauwalder\n" \
+	"Oliver Ruiz Dorantes\n" \
 	"Daniel Furrer\n" \
 	"Andre Alves Garzia\n" \
+	"Bryce Groff\n" \
 	"Karsten Heimrich\n" \
 	"Erik Jaesler\n" \
 	"Maurice Kalinowski\n" \
@@ -370,7 +366,9 @@ static const Translation kTranslations[] = {
 	"Waldemar Kornewald\n" \
 	"Thomas Kurschel\n" \
 	"Brecht Machiels\n" \
+	"David McPaul\n" \
 	"Wim van der Meer\n" \
+	"Michael Pfeiffer\n" \
 	"Frans Van Nispen\n" \
 	"Adi Oanca\n" \
 	"Michael Phipps\n" \
@@ -383,8 +381,8 @@ static const Translation kTranslations[] = {
 	"Bryan Varner\n" \
 	"Nathan Whitehorn\n" \
 	"Michael Wilber\n" \
+	"Artur Wyszyński\n" \
 	"Jonathan Yoder\n" \
-	"Gabe Yoder\n" \
 	"\n"
 
 #define kContributors \
@@ -441,6 +439,7 @@ static const Translation kTranslations[] = {
 	"Raynald Lesieur\n" \
 	"Oscar Lesta\n" \
 	"Jerome Leveque\n" \
+	"Andrew Lindesay\n" \
 	"Freeman Lou\n" \
 	"Brian Luft\n" \
 	"Christof Lutteroth\n" \
@@ -493,6 +492,7 @@ static const Translation kTranslations[] = {
 	"Johannes Wischert\n" \
 	"James Woodcock\n" \
 	"Hong Yul Yang\n" \
+	"Gabe Yoder\n" \
 	"Gerald Zajac\n" \
 	"Łukasz Zemczak\n" \
 	"JiSheng Zhang\n" \
