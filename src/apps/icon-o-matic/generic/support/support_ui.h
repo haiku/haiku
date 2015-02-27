@@ -43,27 +43,4 @@ void print_modifiers();
 const char* string_for_color_space(color_space format);
 void print_color_space(color_space format);
 
-
-// Those are already defined in newer versions of BeOS
-#if !defined(B_BEOS_VERSION_DANO) && !defined(__HAIKU__)
-
-// rgb_color == rgb_color
-static inline bool
-operator==(const rgb_color& a, const rgb_color& b)
-{
-	return a.red == b.red
-			&& a.green == b.green
-			&& a.blue == b.blue
-			&& a.alpha == b.alpha;
-}
-
-// rgb_color != rgb_color
-static inline bool
-operator!=(const rgb_color& a, const rgb_color& b)
-{
-	return !(a == b);
-}
-
-#endif // B_BEOS_VERSION <= ...
-
 #endif // SUPPORT_UI_H
