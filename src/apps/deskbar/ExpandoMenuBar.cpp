@@ -616,7 +616,7 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 
 	float itemWidth = -1.0f;
 	if (fVertical)
-		itemWidth = Frame().Width();
+		itemWidth = fBarView->Bounds().Width();
 	else {
 		itemWidth = iconSize;
 		if (!settings->hideLabels)
