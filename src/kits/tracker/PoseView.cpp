@@ -5017,18 +5017,24 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 		okToMove = alert->Go() == 1;
 	}
 
-	// TODO: Handle correctly!
-	if (srcWindow->TargetModel()->IsVirtualDirectory())
-		okToMove = false;
-
 	if (okToMove) {
 		PoseList* selectionList = srcWindow->PoseView()->SelectionList();
 		BList* pointList = destWindow->PoseView()->GetDropPointList(clickPoint,
 			loc, selectionList, srcWindow->PoseView()->ViewMode() == kListMode,
 			dropOnGrid);
-		BObjectList<entry_ref>* srcList = new BObjectList<entry_ref>(
-			selectionList->CountItems(), true);
-		CopySelectionListToEntryRefList(selectionList, srcList);
+		int32 selectionSize = selectionList->CountItems();
+		BObjectList<entry_ref>* srcList
+			= new BObjectList<entry_ref>(selectionSize, true);
+
+		if (srcWindow->TargetModel()->IsVirtualDirectory()) {
+			// resolve symlink and add the resulting entry_ref to the list
+			for (int32 i = 0; i < selectionSize; i++) {
+				Model* model = selectionList->ItemAt(i)->ResolvedModel();
+				if (model != NULL)
+					srcList->AddItem(new entry_ref(*(model->EntryRef())));
+			}
+		} else
+			CopySelectionListToEntryRefList(selectionList, srcList);
 
 		uint32 moveMode;
 		if (forceCopy)
