@@ -5,7 +5,6 @@ StdBinCommands
 	: network : $(haiku-utils_rsrc) ;
 
 SubInclude HAIKU_TOP src bin network arp ;
-SubInclude HAIKU_TOP src bin network atftpd ;
 SubInclude HAIKU_TOP src bin network ftp ;
 SubInclude HAIKU_TOP src bin network ftpd ;
 SubInclude HAIKU_TOP src bin network ifconfig ;
