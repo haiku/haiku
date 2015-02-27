@@ -4964,7 +4964,6 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 		return;
 	}
 
-
 	BEntry* destEntry = new BEntry(destFolder->EntryRef());
 	bool destIsTrash = destFolder->IsTrash();
 
@@ -5039,11 +5038,10 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			moveMode = kCreateRelativeLink;
 		else if (createLink)
 			moveMode = kCreateLink;
-		else {
+		else if (!CheckDevicesEqual(srcList->ItemAt(0), destFolder))
+			moveMode = kCopySelectionTo;
+		else
 			moveMode = kMoveSelectionTo;
-			if (!CheckDevicesEqual(srcList->ItemAt(0), destFolder))
-				moveMode = kCopySelectionTo;
-		}
 
 		FSMoveToFolder(srcList, destEntry, moveMode, pointList);
 		return;
