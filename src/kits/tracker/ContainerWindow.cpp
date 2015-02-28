@@ -203,7 +203,7 @@ AddOneAddon(const Model* model, const char* name, uint32 shortcut,
 
 
 static int32
-AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref dirRef)
+AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref directoryRef)
 {
 	std::auto_ptr<BMessage> refsMessagePtr(refsMessage);
 
@@ -222,7 +222,7 @@ AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref dirRef)
 
 			if (result >= 0) {
 				// call add-on code
-				(*processRefs)(dirRef, refsMessagePtr.get(), 0);
+				(*processRefs)(directoryRef, refsMessagePtr.get(), NULL);
 
 				unload_add_on(addonImage);
 				return B_OK;
@@ -1664,7 +1664,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 						// there is fMenuBar
 						if (fMenuBar && fFileMenu) {
 							item = fFileMenu->FindItem(kMoveToTrash);
-							if (item) {
+							if (item != NULL) {
 								item->SetLabel(dontMoveToTrash
 									? B_TRANSLATE("Delete")
 									: B_TRANSLATE("Move to Trash"));
@@ -3213,12 +3213,11 @@ BContainerWindow::LoadAddOn(BMessage* message)
 
 	// add selected refs to message
 	BMessage* refs = new BMessage(B_REFS_RECEIVED);
-
-	BObjectList<BPose>* list = PoseView()->SelectionList();
+	BObjectList<BPose>* selectionList = PoseView()->SelectionList();
 
 	int32 index = 0;
 	BPose* pose;
-	while ((pose = list->ItemAt(index++)) != NULL)
+	while ((pose = selectionList->ItemAt(index++)) != NULL)
 		refs->AddRef("refs", pose->TargetModel()->EntryRef());
 
 	refs->AddMessenger("TrackerViewToken", BMessenger(PoseView()));

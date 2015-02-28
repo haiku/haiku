@@ -8566,8 +8566,7 @@ BPoseView::ClearSelection()
 	fSelectionPivotPose = NULL;
 	fRealPivotPose = NULL;
 
-	if (fSelectionList->CountItems()) {
-
+	if (fSelectionList->CountItems() > 0) {
 		// scan all visible poses first
 		BRect bounds(Bounds());
 
@@ -8613,6 +8612,7 @@ BPoseView::ClearSelection()
 
 		fSelectionList->MakeEmpty();
 	}
+
 	fMimeTypesInSelectionCache.MakeEmpty();
 }
 
@@ -8625,72 +8625,73 @@ BPoseView::ShowSelection(bool show)
 
 	fSelectionVisible = show;
 
-	if (fSelectionList->CountItems()) {
+	if (fSelectionList->CountItems() <= 0)
+		return;
 
-		// scan all visible poses first
-		BRect bounds(Bounds());
+	// scan all visible poses first
+	BRect bounds(Bounds());
 
-		if (ViewMode() == kListMode) {
-			int32 startIndex = (int32)(bounds.top / fListElemHeight);
-			BPoint loc(0, startIndex * fListElemHeight);
+	if (ViewMode() == kListMode) {
+		int32 startIndex = (int32)(bounds.top / fListElemHeight);
+		BPoint loc(0, startIndex * fListElemHeight);
 
-			PoseList* poseList = CurrentPoseList();
-			int32 count = poseList->CountItems();
-			for (int32 index = startIndex; index < count; index++) {
-				BPose* pose = poseList->ItemAt(index);
+		PoseList* poseList = CurrentPoseList();
+		int32 count = poseList->CountItems();
+		for (int32 index = startIndex; index < count; index++) {
+			BPose* pose = poseList->ItemAt(index);
+			if (fSelectionList->HasItem(pose))
+				if (pose->IsSelected() != show
+					|| fShowSelectionWhenInactive) {
+					if (!fShowSelectionWhenInactive)
+						pose->Select(show);
+
+					pose->Draw(BRect(pose->CalcRect(loc, this, false)),
+						bounds, this, false);
+				}
+
+			loc.y += fListElemHeight;
+			if (loc.y > bounds.bottom)
+				break;
+		}
+	} else {
+		int32 startIndex = FirstIndexAtOrBelow(
+			(int32)(bounds.top - IconPoseHeight()), true);
+		int32 count = fVSPoseList->CountItems();
+		for (int32 index = startIndex; index < count; index++) {
+			BPose* pose = fVSPoseList->ItemAt(index);
+			if (pose != NULL) {
 				if (fSelectionList->HasItem(pose))
 					if (pose->IsSelected() != show
 						|| fShowSelectionWhenInactive) {
 						if (!fShowSelectionWhenInactive)
 							pose->Select(show);
 
-						pose->Draw(BRect(pose->CalcRect(loc, this, false)),
-							bounds, this, false);
+						Invalidate(pose->CalcRect(this));
 					}
 
-				loc.y += fListElemHeight;
-				if (loc.y > bounds.bottom)
+				if (pose->Location(this).y > bounds.bottom)
 					break;
 			}
-		} else {
-			int32 startIndex = FirstIndexAtOrBelow(
-				(int32)(bounds.top - IconPoseHeight()), true);
-			int32 count = fVSPoseList->CountItems();
-			for (int32 index = startIndex; index < count; index++) {
-				BPose* pose = fVSPoseList->ItemAt(index);
-				if (pose != NULL) {
-					if (fSelectionList->HasItem(pose))
-						if (pose->IsSelected() != show
-							|| fShowSelectionWhenInactive) {
-							if (!fShowSelectionWhenInactive)
-								pose->Select(show);
-
-							Invalidate(pose->CalcRect(this));
-						}
-
-					if (pose->Location(this).y > bounds.bottom)
-						break;
-				}
-			}
 		}
+	}
 
-		// now set all other poses
-		int32 count = fSelectionList->CountItems();
-		for (int32 index = 0; index < count; index++) {
-			BPose* pose = fSelectionList->ItemAt(index);
-			if (pose->IsSelected() != show && !fShowSelectionWhenInactive)
-				pose->Select(show);
-		}
+	// now set all other poses
+	int32 count = fSelectionList->CountItems();
+	for (int32 index = 0; index < count; index++) {
+		BPose* pose = fSelectionList->ItemAt(index);
+		if (pose->IsSelected() != show && !fShowSelectionWhenInactive)
+			pose->Select(show);
+	}
 
-		// finally update fRealPivotPose/fSelectionPivotPose
-		if (!show) {
-			fRealPivotPose = fSelectionPivotPose;
-			fSelectionPivotPose = NULL;
-		} else {
-			if (fRealPivotPose)
-				fSelectionPivotPose = fRealPivotPose;
-			fRealPivotPose = NULL;
-		}
+	// finally update fRealPivotPose/fSelectionPivotPose
+	if (!show) {
+		fRealPivotPose = fSelectionPivotPose;
+		fSelectionPivotPose = NULL;
+	} else {
+		if (fRealPivotPose)
+			fSelectionPivotPose = fRealPivotPose;
+
+		fRealPivotPose = NULL;
 	}
 }
 

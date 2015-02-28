@@ -78,7 +78,7 @@ enum {
 class Model {
 public:
 	Model();
-	Model(const Model &);
+	Model(const Model& other);
 	Model(const BEntry* entry, bool open = false, bool writable = false);
 	Model(const entry_ref*, bool traverse = false, bool open = false,
 		bool writable = false);

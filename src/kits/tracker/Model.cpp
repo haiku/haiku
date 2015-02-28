@@ -118,33 +118,33 @@ Model::Model()
 }
 
 
-Model::Model(const Model &cloneThis)
+Model::Model(const Model& other)
 	:
-	fEntryRef(cloneThis.fEntryRef),
-	fMimeType(cloneThis.fMimeType),
+	fEntryRef(other.fEntryRef),
+	fMimeType(other.fMimeType),
 	fPreferredAppName(NULL),
-	fBaseType(cloneThis.fBaseType),
-	fIconFrom(cloneThis.fIconFrom),
+	fBaseType(other.fBaseType),
+	fIconFrom(other.fIconFrom),
 	fWritable(false),
 	fNode(NULL),
-	fLocalizedName(cloneThis.fLocalizedName),
-	fHasLocalizedName(cloneThis.fHasLocalizedName),
-	fLocalizedNameIsCached(cloneThis.fLocalizedNameIsCached)
+	fLocalizedName(other.fLocalizedName),
+	fHasLocalizedName(other.fHasLocalizedName),
+	fLocalizedNameIsCached(other.fLocalizedNameIsCached)
 {
-	fStatBuf.st_dev = cloneThis.NodeRef()->device;
-	fStatBuf.st_ino = cloneThis.NodeRef()->node;
+	fStatBuf.st_dev = other.NodeRef()->device;
+	fStatBuf.st_ino = other.NodeRef()->node;
 
-	if (cloneThis.IsSymLink() && cloneThis.LinkTo())
-		fLinkTo = new Model(*cloneThis.LinkTo());
+	if (other.IsSymLink() && other.LinkTo())
+		fLinkTo = new Model(*other.LinkTo());
 
-	fStatus = OpenNode(cloneThis.IsNodeOpenForWriting());
+	fStatus = OpenNode(other.IsNodeOpenForWriting());
 	if (fStatus == B_OK) {
 		ASSERT(fNode);
 		fNode->GetStat(&fStatBuf);
-		ASSERT(fStatBuf.st_dev == cloneThis.NodeRef()->device);
-		ASSERT(fStatBuf.st_ino == cloneThis.NodeRef()->node);
+		ASSERT(fStatBuf.st_dev == other.NodeRef()->device);
+		ASSERT(fStatBuf.st_ino == other.NodeRef()->node);
 	}
-	if (!cloneThis.IsNodeOpen())
+	if (!other.IsNodeOpen())
 		CloseNode();
 }
 
@@ -866,7 +866,7 @@ void
 Model::UpdateEntryRef(const node_ref* dirNode, const char* name)
 {
 	if (IsVolume()) {
-		if (fVolumeName)
+		if (fVolumeName != NULL)
 			DeletePreferredAppVolumeNameLinkTo();
 
 		fVolumeName = strdup(name);
@@ -875,7 +875,7 @@ Model::UpdateEntryRef(const node_ref* dirNode, const char* name)
 	fEntryRef.device = dirNode->device;
 	fEntryRef.directory = dirNode->node;
 
-	if (fEntryRef.name && strcmp(fEntryRef.name, name) == 0)
+	if (fEntryRef.name != NULL && strcmp(fEntryRef.name, name) == 0)
 		return;
 
 	fEntryRef.set_name(name);
@@ -887,7 +887,7 @@ Model::WatchVolumeAndMountPoint(uint32 , BHandler* target)
 {
 	ASSERT(IsVolume());
 
-	if (fEntryRef.name && fVolumeName
+	if (fEntryRef.name != NULL && fVolumeName != NULL
 		&& strcmp(fEntryRef.name, "boot") == 0) {
 		// watch mount point for boot volume
 		BString bootMountPoint("/");

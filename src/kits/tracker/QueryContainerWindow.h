@@ -50,22 +50,23 @@ class BQueryPoseView;
 
 class BQueryContainerWindow : public BContainerWindow {
 public:
-	BQueryContainerWindow(LockingList<BWindow>* windowList,
-		uint32 containerWindowFlags);
+								BQueryContainerWindow(
+									LockingList<BWindow>* windowList,
+									uint32 containerWindowFlags);
 
-	BQueryPoseView* PoseView() const;
-	bool ActiveOnDevice(dev_t) const;
+			BQueryPoseView*		PoseView() const;
+			bool				ActiveOnDevice(dev_t) const;
 
 protected:
-	virtual	void CreatePoseView(Model*);
-	virtual BPoseView* NewPoseView(Model* model, uint32 viewMode);
-	virtual	void AddWindowMenu(BMenu* menu);
-	virtual	void AddWindowContextMenus(BMenu* menu);
+	virtual	void				CreatePoseView(Model*);
+	virtual	BPoseView*			NewPoseView(Model* model, uint32 viewMode);
+	virtual	void				AddWindowMenu(BMenu* menu);
+	virtual	void				AddWindowContextMenus(BMenu* menu);
 
-	virtual void SetUpDefaultState();
+	virtual	void				SetUpDefaultState();
 
 private:
-	typedef BContainerWindow _inherited;
+	typedef BContainerWindow	_inherited;
 };
 
 } // namespace BPrivate

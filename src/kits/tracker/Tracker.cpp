@@ -67,6 +67,7 @@ All rights reserved.
 #include "ContainerWindow.h"
 #include "DeskWindow.h"
 #include "FindPanel.h"
+#include "FunctionObject.h"
 #include "FSClipboard.h"
 #include "FSUtils.h"
 #include "InfoWindow.h"
@@ -77,12 +78,11 @@ All rights reserved.
 #include "PoseView.h"
 #include "QueryContainerWindow.h"
 #include "StatusWindow.h"
-#include "TrashWatcher.h"
-#include "FunctionObject.h"
-#include "TrackerSettings.h"
-#include "TrackerSettingsWindow.h"
 #include "TaskLoop.h"
 #include "Thread.h"
+#include "TrackerSettings.h"
+#include "TrackerSettingsWindow.h"
+#include "TrashWatcher.h"
 #include "VirtualDirectoryWindow.h"
 
 
@@ -631,7 +631,7 @@ TTracker::Pulse()
 void
 TTracker::SetDefaultPrinter(const BMessage* message)
 {
-	//	get the first item selected
+	// get the first item selected
 	int32 count = 0;
 	uint32 type = 0;
 	message->GetInfo("refs", &type, &count);
@@ -677,7 +677,6 @@ TTracker::MoveRefsToTrash(const BMessage* message)
 	BObjectList<entry_ref>* srcList = new BObjectList<entry_ref>(count, true);
 
 	for (int32 index = 0; index < count; index++) {
-
 		entry_ref ref;
 		ASSERT(message->FindRef("refs", index, &ref) == B_OK);
 		if (message->FindRef("refs", index, &ref) != B_OK)
@@ -685,13 +684,14 @@ TTracker::MoveRefsToTrash(const BMessage* message)
 
 		AutoLock<WindowList> lock(&fWindowList);
 		BContainerWindow* window = FindParentContainerWindow(&ref);
-		if (window)
+		if (window != NULL) {
 			// if we have a window open for this entry, ask the pose to
 			// delete it, this will select the next entry
 			window->PoseView()->MoveEntryToTrash(&ref);
-		else
+		} else {
 			// add all others to a list that gets deleted separately
 			srcList->AddItem(new entry_ref(ref));
+		}
 	}
 
 	// async move to trash
@@ -817,7 +817,7 @@ TTracker::OpenRef(const entry_ref* ref, const node_ref* nodeToClose,
 
 	if (openAsContainer || selector == kRunOpenWithWindow) {
 		// special case opening plain folders, queries or using open with
-		OpenContainerWindow(model, 0, selector, kRestoreDecor);
+		OpenContainerWindow(model, NULL, selector, kRestoreDecor);
 			// window adopts model
 		if (nodeToClose)
 			CloseParentWaitingForChildSoon(ref, nodeToClose);
@@ -878,7 +878,7 @@ TTracker::RefsReceived(BMessage* message)
 
 	switch (selector) {
 		case kRunOpenWithWindow:
-			OpenContainerWindow(0, message, selector);
+			OpenContainerWindow(NULL, message, selector);
 				// window adopts model
 			break;
 
