@@ -75,12 +75,10 @@ All rights reserved.
 #include <PathMonitor.h>
 
 #include "Attributes.h"
-#include "AttributeStream.h"
 #include "AutoLock.h"
 #include "BackgroundImage.h"
 #include "Bitmaps.h"
 #include "Commands.h"
-#include "ContainerWindow.h"
 #include "CountView.h"
 #include "Cursors.h"
 #include "DeskWindow.h"
@@ -93,7 +91,6 @@ All rights reserved.
 #include "Navigator.h"
 #include "Pose.h"
 #include "InfoWindow.h"
-#include "Utilities.h"
 #include "Tests.h"
 #include "Thread.h"
 #include "Tracker.h"

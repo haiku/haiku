@@ -41,7 +41,6 @@ All rights reserved.
 #include "Bitmaps.h"
 #include "Commands.h"
 #include "FSUtils.h"
-#include "Model.h"
 #include "Tracker.h"
 
 

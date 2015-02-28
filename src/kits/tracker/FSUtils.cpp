@@ -83,7 +83,6 @@ respective holders. All rights reserved.
 #include "FSUtils.h"
 #include "InfoWindow.h"
 #include "MimeTypes.h"
-#include "Model.h"
 #include "OverrideAlert.h"
 #include "StatusWindow.h"
 #include "Thread.h"

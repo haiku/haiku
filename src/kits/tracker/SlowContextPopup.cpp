@@ -54,7 +54,6 @@ All rights reserved.
 #include "FSUtils.h"
 #include "FunctionObject.h"
 #include "IconMenuItem.h"
-#include "NavMenu.h"
 #include "PoseView.h"
 #include "QueryPoseView.h"
 #include "SlowContextPopup.h"

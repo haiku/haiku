@@ -84,7 +84,6 @@ All rights reserved.
 #include "IconMenuItem.h"
 #include "MimeTypes.h"
 #include "Tracker.h"
-#include "Utilities.h"
 
 
 #undef B_TRANSLATION_CONTEXT

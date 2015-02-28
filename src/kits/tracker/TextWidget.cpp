@@ -53,7 +53,6 @@ All rights reserved.
 #include "PoseView.h"
 #include "TextWidget.h"
 #include "Utilities.h"
-#include "WidgetAttributeText.h"
 
 
 #undef B_TRANSLATION_CONTEXT

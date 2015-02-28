@@ -38,7 +38,6 @@ All rights reserved.
 #include <Debug.h>
 
 #include "PoseList.h"
-#include "Pose.h"
 
 
 BPose*

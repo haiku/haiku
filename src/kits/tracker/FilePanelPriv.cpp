@@ -75,7 +75,6 @@ All rights reserved.
 #include "IconMenuItem.h"
 #include "MimeTypes.h"
 #include "NavMenu.h"
-#include "PoseView.h"
 #include "Tracker.h"
 #include "Utilities.h"
 

@@ -83,7 +83,6 @@ All rights reserved.
 #include "TrackerSettingsWindow.h"
 #include "TaskLoop.h"
 #include "Thread.h"
-#include "Utilities.h"
 #include "VirtualDirectoryWindow.h"
 
 

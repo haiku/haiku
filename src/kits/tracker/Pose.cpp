@@ -47,7 +47,6 @@ All rights reserved.
 #include "IconCache.h"
 #include "Pose.h"
 #include "PoseView.h"
-#include "Utilities.h"
 
 
 int32

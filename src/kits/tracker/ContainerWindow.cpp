@@ -82,7 +82,6 @@ All rights reserved.
 #include "IconMenuItem.h"
 #include "OpenWithWindow.h"
 #include "MimeTypes.h"
-#include "Model.h"
 #include "MountMenu.h"
 #include "Navigator.h"
 #include "NavMenu.h"
