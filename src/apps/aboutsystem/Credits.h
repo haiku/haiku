@@ -333,7 +333,9 @@ static const Translation kTranslations[] = {
 	"Michael Lotz\n" \
 	"Matt Madia\n" \
 	"Scott McCreary\n" \
+	"Puck Meerburg\n" \
 	"Fredrik Modéen\n" \
+	"Hamish Morrison\n" \
 	"Marcus Overhagen\n" \
 	"Joseph R. Prostko\n" \
 	"François Revol\n" \
@@ -449,12 +451,10 @@ static const Translation kTranslations[] = {
 	"Brian Matzon\n" \
 	"Christopher ML Zumwalt May\n" \
 	"Andrew McCall\n" \
-	"Puck Meerburg\n" \
 	"Nathan Mentley\n" \
 	"Marius Middelthon\n" \
 	"Marco Minutoli\n" \
 	"Misza\n" \
-	"Hamish Morrison\n" \
 	"MrSiggler\n" \
 	"Takashi Murai\n" \
 	"Alan Murta\n" \
