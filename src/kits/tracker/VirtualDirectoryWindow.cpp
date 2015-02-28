@@ -1,8 +1,9 @@
 /*
- * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Copyright 2013-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 /*
@@ -117,6 +118,13 @@ VirtualDirectoryWindow::NewPoseView(Model* model, uint32 viewMode)
 	}
 
 	return new VirtualDirectoryPoseView(model);
+}
+
+
+VirtualDirectoryPoseView*
+VirtualDirectoryWindow::PoseView() const
+{
+	return static_cast<VirtualDirectoryPoseView*>(fPoseView);
 }
 
 
