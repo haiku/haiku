@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-About	3415235510
+1	german	x-vnd.Haiku-About	3528201306
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 durch die Autoren von Gutenprint. Alle Rechte vorbehalten.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm und Werner Lemberg.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (und seinen NewOS-Kernel)\n
@@ -6,7 +6,6 @@ Ralink (firmware)	AboutWindow		Ralink (Firmware)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Alle Rechte vorbehalten.
 %d MiB total	AboutView		%d MiB gesamt
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (Projektgründer)\n\n
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. Alle Rechte vorbehalten.
 %d MiB used (%d%%)	AboutView		%d MiB benutzt (%d%%)
 Website, marketing & documentation:\n	AboutView		Webseite, Marketing & Dokumentation:\n
 AboutSystem	System name		Über Haiku
@@ -19,9 +18,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 19
 Source Code: 	AboutView		Quellcode: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Prozessor:} other{# Prozessoren:}}
 Kernel:	AboutView		Kernel:
-Copyright © 2000 Jean-Pierre Lefebvre and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL und Remi Lefebvre.
 BSD (4-clause)	AboutWindow		BSD (4-Klausel)
-Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman und Daniel Veillard. Alle Rechte vorbehalten.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Die Urheberrechte am Haiku-Code liegen bei Haiku, Inc., beziehungsweise bei den entsprechenden Autoren, die explizit im Quelltext aufgeführt sind. Haiku® und das HAIKU Logo® sind registrierte Marken von Haiku, Inc.\n\n
 Marvell (firmware)	AboutWindow		Marvell (Firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAlle Rechte vorbehalten.
@@ -29,7 +26,6 @@ GNU LGPL v2	AboutWindow		GNU LGPL v2
 The HaikuPorts team\n	AboutView		Das HaikuPorts-Team\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB gesamt, %inaccessible MiB nicht verfügbar
 Intel (2xxx firmware)	AboutWindow		Intel (2xxx Firmware)
-Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard, et al.
 Contributors:\n	AboutView		Mitwirkende:\n
 Unknown	AboutView		Unbekannt
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expat-Entwickler.
@@ -79,12 +75,10 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyri
 %ld MHz	AboutView		%ld MHz
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH und Thomas Merz. Alle Rechte vorbehalten.\nPDFlib und das PDFlib-Logo sind eingetragene Handelsmarken der PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Alle Rechte vorbehalten.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Enthält Software des GNU-Projekts, die unter den GPL- und LGPL-Lizenzen veröffentlicht wurde:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © Free Software Foundation.
 …and the many people making donations!\n\n	AboutView		...und die vielen Leute, die durch Spenden geholfen haben!\n\n
 MIT license. All rights reserved.	AboutView		MIT-Lizenz. Alle Rechte vorbehalten.
 [Click a license name to read the respective license.]\n\n	AboutView		[Ein Klick auf einen Lizenznamen zeigt den jeweiligen Lizenztext.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Alle Rechte vorbehalten.
-MIT (no promotion)	AboutWindow		MIT (ohne Promotion)
 BSD (3-clause)	AboutWindow		BSD (3-Klausel)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Alle Rechte vorbehalten.
 License: 	AboutView		Lizenz: 

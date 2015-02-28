@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Keymap	2389508189
+1	english	x-vnd.Haiku-Keymap	3155537444
 Dvorak	Keyboard Layout View		德沃夏克键盘
 Shift:	Modifier keys window	Shift key role name	Shift：
 Revert	Modifier keys window		取消
@@ -55,9 +55,19 @@ Error: duplicate keys	Modifier keys window		错误：重复按键
 System:	Keymap window		系统：
 Lithuanian	Keyboard Layout View		立陶宛文
 Finnish	Keyboard Layout View		芬兰文
+Svorak	Keyboard Layout View		Svorak键盘
+Left command	Keyboard Layout View		左侧 Command
+Romanian	Keyboard Layout View		罗马尼亚语
 Set modifier keys…	Keymap window		设置修饰键…
 Option:	Modifier keys window	Option key role name	选项：
+Czech (Mac)	Keyboard Layout View		Czech (Mac)
+Control	Keyboard Layout View	Control key	Control
+Left option	Keyboard Layout View		左侧 option
+Portuguese	Keyboard Layout View		葡萄牙语
+Right control	Keyboard Layout View		右侧 Ctrl
+Belgian (point)	Keyboard Layout View		比利时语 (point)
 Switch shortcut keys	Keymap window		切换快捷键
+Norwegian	Keyboard Layout View		挪威语
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift 键
 User:	Keymap window		用户：
 Esperanto	Keyboard Layout View		世界语
@@ -70,27 +80,46 @@ Key	Modifier keys window	As in a computer keyboard key	按键
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl 键
 Control:	Modifier keys window	Control key role name	控制：
 Brazilian	Keyboard Layout View		巴西
+Remove	Keyboard Layout View		删除
 Brazilian (ABNT2)	Keyboard Layout View		巴西(ABNT2)
 French (Bépo)	Keyboard Layout View		法语(Bépo)
+Option	Keyboard Layout View	Option key	选项
+US-International	Keyboard Layout View		US-国际
 Sample and clipboard:	Keymap window		示例和剪贴板：
+Swiss-German	Keyboard Layout View		瑞士-德语
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt 键
 Layout	Keymap window		布局
 Switch shortcut keys to Windows/Linux mode	Keymap window		切换快捷键为 Windows/Linux 模式
+Albanian	Keyboard Layout View		阿尔巴尼亚语
+Right command	Keyboard Layout View		右侧 Command键
 Revert	Keymap window		取消
 Command:	Modifier keys window	Command key role name	命令：
+Latin-American	Keyboard Layout View		拉丁美洲
+Spanish (Dvorak)	Keyboard Layout View		西班牙语(Dvorak)
+Lithuanian (Standard)	Keyboard Layout View		立陶宛语(标准)
+Canadian-French	Keyboard Layout View		加拿大-法语
 Irish	Keyboard Layout View		爱尔兰
 Turkish (Type-F)	Keyboard Layout View		土耳其(Type-F)
 Slovene	Keyboard Layout View		斯洛文尼亚
 Turkish (Type-Q)	Keyboard Layout View		土耳其(Type-Q)
 Save as…	Keymap window		保存为...
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd 键
+Serbian (Latin)	Keyboard Layout View		塞尔维亚语 (拉丁语)
 File	Keymap window		文件
 Num lock	Keyboard Layout View		Mum 锁
+Swedish	Keyboard Layout View		瑞典文
+Macedonian	Keyboard Layout View		马其顿语
 (Current)	Keymap window		（当前）
 Font	Keymap window		字体
 Keymap	System name		键盘映射
+French (Mac)	Keyboard Layout View		法语 (Mac)
 Left shift	Keyboard Layout View		左侧 shift 键
 Shift	Keyboard Layout View	Shift key	Shift
+Ukrainian	Keyboard Layout View		乌克兰语
+Croatian	Keyboard Layout View		克罗地亚语
+Kazakh	Keyboard Layout View		哈萨克语
+Czech	Keyboard Layout View		捷克文
 Set modifier keys	Modifier keys window		设置修饰键
+Colemak	Keyboard Layout View		Colemak键盘
 Modifier keys	Modifier keys window		修饰键
 Acute trigger	Keymap window		触发尖重音符

@@ -1,6 +1,7 @@
-1	portuguese (brazil)	x-vnd.Haiku-SpamFilter	160316705
+1	portuguese (brazil)	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		ou correio eletrônico vazio
 Genuine below and uncertain above:	SpamFilterConfig		Genuíno abaixo e incerto acima:
 Spam above:	SpamFilterConfig		Spam acima:
 Add spam rating to start of subject	SpamFilterConfig		Adicionar classificação de spam para o início do assunto
+Bayesian Spam Filter	SpamFilter		Filtro de Spam Bayesiano
 Learn from all incoming e-mail	SpamFilterConfig		Aprender com todos os correios recebidos

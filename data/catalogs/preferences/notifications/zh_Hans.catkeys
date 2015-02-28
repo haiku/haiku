@@ -1,4 +1,5 @@
-1	english	x-vnd.Haiku-Notifications	3502142944
+1	english	x-vnd.Haiku-Notifications	3961154942
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		首选项保存时发生错误。\n可能硬盘空间不足。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		静止秒数
 Revert	PrefletWin		还原

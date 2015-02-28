@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	235954604
+1	german	x-vnd.Haiku-Terminal	2696855708
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -33,7 +33,9 @@ Increase	Terminal TermWindow		Vergrößern
 Settings	Terminal TermWindow		Einstellungen
 Window size	Terminal TermWindow		Fenstergröße
 Selected text	Terminal AppearancePrefView		Ausgewählter Text
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%T\t-\tName der Terminalanwendung in der aktuellen Systemsprache\n\t%e\t-\tKodierung des aktuellen Reiters. Unterdrückt bei UTF-8\n\t%i\t-\tLaufende Nummer des Fensters\n\t%p\t-\tName des laufenden Prozesses im aktuellen Reiter\n\t%t\t-\tTitel des aktuellen Reiters\n
 Find	Terminal FindWindow		Suchen
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Die Formel für Fenstertitel. Folgende Variablen stehen zur Verfügung:
 Appearance	Terminal PrefWindow		Darstellung
 Tab title:	Terminal AppearancePrefView		Reitertitel:
 OK	Terminal SetTitleWindow		OK
@@ -76,6 +78,7 @@ Midnight	Terminal colors scheme		Mitternacht
 Decrease	Terminal TermWindow		Verkleinern
 Default	Terminal colors scheme		Standard
 Create link here	Terminal TermView		Verknüpfung hier erstellen
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Die Formel für Reitertitel. Folgende Variablen\nstehen zur Verfügung:
 Close	Terminal TermWindow		Schließen
 Text	Terminal AppearancePrefView		Text
 Clear all	Terminal TermWindow		Bildschirm leeren
@@ -104,6 +107,7 @@ Copy link location	Terminal TermView		Link-Adresse kopieren
 Tab title:	Terminal TermWindow		Reitertitel:
 Find next	Terminal TermWindow		Weitersuchen
 Close active tab	Terminal TermWindow		Aktiven Reiter schließen
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tDas Zeichen '%'.\n\t%<\t-\tKennzeichnet den Beginn eines Abschnitts der nur angezeigt\n\t\t\twird, falls die darauf folgende Variable nicht leer ist.\n\t%>\t-\tKennzeichnet den Beginn eines Abschnitts der nur angezeigt\n\t\t\twird, falls eine Variable zwischen diesem und eines vorangegangenen\n\t\t\t%< Abschnitts nicht leer ist.\n\t%-\t-\tKennzeichnet das Ende eines %< or %> Abschnitts.\n\nJedes nicht-numerische Zeichen zwischen '%' und dem Formattierungszeichen erzeugt nur \ndann ein Leerzeichen, wenn der Variablenwert nicht leer ist. Es wird dem %< Abschnitt \nhinzugefügt.
 Paste	Terminal TermWindow		Einfügen
 Shell 	Terminal TermWindow		Konsole
 Cancel	Terminal TermView		Abbrechen

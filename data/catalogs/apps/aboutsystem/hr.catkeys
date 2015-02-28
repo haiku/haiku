@@ -1,10 +1,9 @@
-1	croatian	x-vnd.Haiku-About	2757844502
+1	croatian	x-vnd.Haiku-About	428045436
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Autorsko pravo © 1999-2010 Gutenprint autora. Sva prava pridržana.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i njegov NewOS kernel)\n
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Autorska prava © 1996-2005 Julian R Seward.Sva prava pridržana.
 %d MiB total	AboutView		%d MiB ukupno
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (utemeljitelj projekta)\n\n
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Autorska prava © 1998-2003 Daniel Veillard.Sva prava pridržana.
 %d MiB used (%d%%)	AboutView		%d MiB korišteno (%d%%)
 Website, marketing & documentation:\n	AboutView		Web stranica, marketing i dokumentacija:\n
 AboutSystem	System name		O sustavu
@@ -17,7 +16,6 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Autorska prava 
 Source Code: 	AboutView		Izvorni kod: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, množina, jedan{Processor:} ostalo{# Procesori:}}
 Kernel:	AboutView		Kernel:
-Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Autorska prava © 2001-2002 Thomas Broyer, Charlie Bozeman i Daniel Veillard. Sva prava pridržana.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Autorska prava na Haiku kod su vlasništvo Haiku, Inc. ili poštovanih autora gdje je to naznačeno u izvornom kodu. Haiku® and the HAIKU logo® su registrirani zaštitni znaci Haiku, Inc.\n
 Marvell (firmware)	AboutWindow		Marvell (firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Autorska prava © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nSva prava pridržana.
@@ -25,7 +23,6 @@ GNU LGPL v2	AboutWindow		GNU LGPL v2
 The HaikuPorts team\n	AboutView		Haiku-Ports tim\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB ukupno, %inaccessible MiB nepristupačno
 Intel (2xxx firmware)	AboutWindow		Intel (2xxx firmware)
-Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Autorska prava © 2000-2007 Fabrice Bellard, et al.
 Contributors:\n	AboutView		Doprinositelji:\n
 Unknown	AboutView		Nepoznato
 Copyright © 2001-2003 Expat maintainers.	AboutView		Autorska prava © 2001-2003 Expat održavatelji.
@@ -70,7 +67,6 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		 Autor
 %ld MHz	AboutView		%ld MHz
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Autorska prava © 1997-2006 PDFlib GmbH and Thomas Merz. Sva prava pridržana.\nPDFlib and PDFlib logo su registrirani zaštitni znaci PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Autorska prava © 1991-2000 Silicon Graphics, Inc. Sva prava pridržana.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Sadrži software iz GNU projekta,objavljenih pod GPL i LGPL licencama:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nAutorska prava © The Free Software Foundation.
 …and the many people making donations!\n\n	AboutView		... i mnogi ljudi koji su donirali!\n\n
 MIT license. All rights reserved.	AboutView		MIT licenca.Sva prava pridržana.
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		 Autorska prava © 2007 Ralink Technology Corporation. Sva prava pridržana.

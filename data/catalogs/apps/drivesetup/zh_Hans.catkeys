@@ -1,5 +1,6 @@
-1	english	x-vnd.Haiku-DriveSetup	4273934970
+1	english	x-vnd.Haiku-DriveSetup	2321187933
 DriveSetup	System name		磁盘管理器
+Could not acquire partitioning information.	MainWindow		无法获取分区信息。
 Cancel	AbstractParametersPanel		取消
 Delete	MainWindow		删除
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行此操作，选中分区上的所有数据将丢失，无法恢复！
@@ -43,6 +44,7 @@ Change	ChangeParametersPanel		修改
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，磁盘 %s 中的所有数据将丢失，无法恢复！
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		您确定删除所选分区吗？\n\n如果执行该操作，分区中的所有数据将丢失，无法恢复！
 Create…	MainWindow		创建…
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		是否希望格式化磁盘？(通常需要首先利用分区软件初始化磁盘)在修改写入磁盘前需要再次进行确认。
 The disk has been successfully initialized.\n	MainWindow		磁盘 %s 已完成初始化。\n
 Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		修改分区参数失败。修改未写入磁盘。
@@ -66,6 +68,7 @@ The panel could not return successfully.	MainWindow		面板无法成功返回。
 Cancel	MainWindow		取消
 Delete partition	MainWindow		删除分区
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		是否确定修改所选分区参数？\n\n该分区以后可能无法被其他操作系统所识别！
+Disk system \"%s\" not found!	MainWindow		磁盘系统 \"%s\" 未发现！
 Eject	MainWindow		弹出
 Partition	MainWindow		分区
 Validation of the given parameters failed.	MainWindow		指定参数验证失败。

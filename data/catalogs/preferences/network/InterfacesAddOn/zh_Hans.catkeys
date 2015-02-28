@@ -1,0 +1,32 @@
+1	english	x-vnd.Haiku-InterfacesAddOn	3297241710
+Interface	InterfaceWindow		接口
+Network:	IntefaceHardwareView		网络:
+Static	IntefaceAddressView		静态
+None	InterfacesListView		无
+IP:	InterfacesListView	IPv4 address label	IP:
+Renegotiate address	InterfacesListView		重新协商地址
+Status:	IntefaceHardwareView		状态:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Link speed:	IntefaceHardwareView		连接速度:
+The method for obtaining an IP address	IntefaceAddressView		获取IP地址方式
+Your gateway	IntefaceAddressView		您的网关
+Enable	InterfacesListView		启用
+Received:	IntefaceHardwareView		接收到：
+Choose automatically	IntefaceHardwareView		自动选择
+connected	IntefaceHardwareView		已连接
+Automatic	IntefaceAddressView		自动
+Gateway:	IntefaceAddressView		网关:
+Disable	InterfacesListView		禁用
+Sent:	IntefaceHardwareView		发送：
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		模式:
+<no wireless networks found>	IntefaceHardwareView		<未发现无线网络>
+Your netmask	IntefaceAddressView		子网掩码
+IP Address:	IntefaceAddressView		IP地址:
+Off	IntefaceAddressView		关闭
+MAC address:	IntefaceHardwareView		MAC地址:
+Renegotiate	IntefaceHardwareView		重新协商
+Netmask:	IntefaceAddressView		子网掩码:
+Your IP address	IntefaceAddressView		IP地址
+disconnected	IntefaceHardwareView		连接断开
+Disable	IntefaceHardwareView		禁用

@@ -1,13 +1,16 @@
-1	english	x-vnd.Haiku-MatchHeader	3677427558
+1	english	x-vnd.Haiku-MatchHeader	3405428083
 <Choose action>	ConfigView		<选择动作>
 has	ConfigView		具有
 Move to	ConfigView		移动到
 Then	ConfigView		然后
 this field is based on the action	ConfigView		该域基于动作
 Delete message	ConfigView		删除消息
+value (use REGEX: in front of regular expressions like *spam*)	ConfigView		值 (使用 REGEX: 利用正则表达式，如 *spam*)
 <Choose account>	ConfigView		<选择账户>
 Set flags to	ConfigView		设置标志为
 Set as read	ConfigView		设为读取
+Match header	RuleFilter		头部匹配
 Reply with	ConfigView		回复为
 If	ConfigView		如果
+Match \"%attribute\" against \"%regex\"	RuleFilter		基于 \"%regex\" 进行 \"%attribute\" 匹配
 header (e.g. Subject)	ConfigView		邮件头（如 主题）

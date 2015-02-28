@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	1929083132
+1	english	x-vnd.haiku-icon_o_matic	3554185674
 Select All	Icon-O-Matic-PathManipulator		全选
 Add Style	Icon-O-Matic-AddStylesCmd		添加样式
 Color (#%02x%02x%02x)	Style name after dropping a color		颜色(#%02x%02x%02x)
@@ -67,6 +67,7 @@ HVIF Source Code	Icon-O-Matic-SavePanel		HVIF 源码
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		重置转换
 Settings	Icon-O-Matic-Menus		设置
 All	Icon-O-Matic-Properties		全部
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		您希望导入的文本文件太长，是否确定？
 Multi Paste Properties	Icon-O-Matic-Properties		批量粘贴属性
 Undo	Icon-O-Matic-Main		撤销
 Click on a shape above	Empty transformers list - 1st line		点击上述模型
@@ -186,6 +187,7 @@ Save	Icon-O-Matic-Menu-File		保存
 Append…	Icon-O-Matic-Menu-File		附加...
 Move Path	Icon-O-Matic-MovePathsCmd		移动路径
 Overwrite	Icon-O-Matic-SVGExport		覆盖
+Text too long	Icon-O-Matic-StyledTextImport		文本太长
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		冻结模型
 Split Control Point	Icon-O-Matic-SplitPointsCmd		分割控制点
 Open…	Icon-O-Matic-Menu-File		打开...

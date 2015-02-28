@@ -1,3 +1,16 @@
-1	english	x-vnd.Haiku-Network	107126666
+1	english	x-vnd.Haiku-Network	1423171766
 Revert	NetworkSetupWindow		恢复
+EAP	EAP protected network		EAP
+WPA2	WPA2 protected network		WPA2
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Installing NetworkStatus in Deskbar failed: %s	NetworkSetupWindow		在桌面栏安装网络状态失败: %s
 Apply	NetworkSetupWindow		应用
+Ok	NetworkSetupWindow		确定
+launch error	NetworkSetupWindow		启动错误
+Manage…	NetworkSetupWindow		管理...
+Show network status in Deskbar	NetworkSetupWindow		在桌面栏显示网络状态
+WPA	WPA protected network		WPA
+open	Open network		打开
+Network	NetworkSetupWindow		网络
+New…	NetworkSetupWindow		新建...
+WEP	WEP protected network		WEP

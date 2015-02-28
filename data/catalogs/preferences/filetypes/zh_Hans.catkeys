@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-FileTypes	3116280330
+1	english	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		应用程序类型...
 Description:	Application Types Window		描述：
 Args only	Application Type Window		仅含参数
@@ -52,6 +52,7 @@ Set preferred application	Preferred App Menu		设置首选应用
 Don't save	Application Type Window		不保存
 Save changes before closing?	Application Type Window		关闭前是否保存修改？
 File	Application Type Window		文件
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# 应用类型无法删除} other{# 应用类型无法删除}}
 Version:	Application Type Window		版本:
 Select…	FileTypes Window		选择
 FileTypes request	FileTypes		需要文件类型

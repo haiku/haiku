@@ -1,9 +1,10 @@
-1	english	x-vnd.Haiku-Mail	688530788
+1	english	x-vnd.Haiku-Mail	2750130554
 Settings	Config Window		设置
 Never	Config Window	show status window	从不
 While sending and receiving	Config Window		在发送和接收时
 Incoming	Config Window		收件箱
 Server name:	E-Mail		服务器名称：
+An error occurred while creating the config view: %error.	Config Views		创建配置视图出现错误：%error 。
 OK	Config Window		确定
 E-mail address:	E-Mail		邮箱地址：
 Account name:	E-Mail		用户名：
@@ -18,8 +19,11 @@ Password:	E-Mail		密码：
 Accounts	Config Window		帐户
 Finish	AutoConfigWindow		完成
 Remove	Config Window		删除
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		使用添加按钮新建账户。\n\n使用删除按钮删除选中的指定帐户。\n\n从列表中选中一项以修改设置。
+Error!	Config Views		出错！
 Server Name:	E-Mail		服务器：
 While sending	Config Window		在发送时
+Show notifications:	Config Window		显示通知：
 Enter a valid e-mail address.	AutoConfigWindow		输入有效邮箱地址
 Add	Config Window		添加
 Account settings	AutoConfigWindow		账户设置

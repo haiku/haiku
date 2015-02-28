@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Installer	3299873127
+1	portuguese (brazil)	x-vnd.Haiku-Installer	3421507633
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		O Gerenciador de Inicialização, aplicação para configurar o menu de inicialização do Haiku, não pode ser carregado.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Você tem certeza que deseja abortar a instalação e reiniciar o sistema?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\desenvolvido por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -17,12 +17,15 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		Sair do Gerenciador de Inicialização
 Stop	InstallerWindow		Parar
 \t\tchainloader +1\n	InstallerApp		\t \t chainloader +1\n
+If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Se o método do os-prober não funciona para você, o GRUB 2 utiliza um arquivo de configuração extra para adicionar entradas personalizadas no menu de inicialização. Para adicioná-las ao topo, você deve criar/editar um arquivo em seu editor favorito a partir do Terminal, como este:\n\n
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem e o disco de destinação nos menus pop-ups. Então clique em \"Iniciar\".
 \t# Haiku on /dev/sda7\n	InstallerApp		\t # Haiku on /dev/sda7\n
+Failed to launch Boot Manager	InstallerWindow		Falhou ao carregar o Gerenciador de Inicialização
 Install from:	InstallerWindow		Instalar de:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMAÇÕES IMPORTANTES ANTES DE INSTALAR O HAIKU\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		Esquema de nomeação do GRUB para partições é: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Continuar
 Write boot sector to '%s'	InstallerWindow		Escrever setor de inicialização para '%s'
 Collecting copy information.	InstallProgress		Coletando informações para cópia.
@@ -43,6 +46,7 @@ README	InstallerApp		LEIAME
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		O disco destino não tem espaço suficiente. Tente escolher um disco diferente ou escolha não instalar os items opcionais.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Por favor feche os programas Gerenciador de Inicialização e o Configurador de Drive antes de fechar a janela do Instalador
 Scanning for disks…	InstallerWindow		Analisando os discos…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		O disco não pode ser montado. Por favor escolha um disco diferente.
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\t menuentry \"Haiku Alpha\" {\n
@@ -87,6 +91,7 @@ With GRUB 2 the first logical partition always has the number \"5\", regardless 
 Write boot sector	InstallerWindow		Gravar o setor de inicialização
 Cancel	InstallerWindow		Cancelar
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Configurador de Unidade, o aplicativo para configurar partições de disco, não pôde ser carregado. 
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		O volume de destino não está vazio. Está seguro de que deseja instalar mesmo assim:\n\nNota: A pasta 'sistema' será uma cópia limpa do volume de origem mas irá conservar sua pasta de definições, todas as outras pastas serão mescladas, ao passo que arquivos e vínculos que existam em ambos os volumes serão sobreescritos com a versão do volume de origem.
 No optional packages available.	PackagesView		Nenhum pacote opcional disponível.
 All hard disks start with \"hd\".\n	InstallerApp		Todos os discos rígidos iniciam com \"hd\".\n
 Continue	InstallerApp		Continuar

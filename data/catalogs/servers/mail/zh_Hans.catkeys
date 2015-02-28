@@ -1,7 +1,10 @@
-1	english	x-vnd.Be-POST	825141276
+1	english	x-vnd.Be-POST	2949558073
 Fetching mail for %name	Notifier		获取 %name 的邮件
 Check for mails only	DeskbarView		只检查邮件
 Send pending mails	DeskbarView		发送挂起邮件
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{一个新消息} other{# 更多新消息}}
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# 新消息} other{# 更多新消息}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		%name 有 {0, plural, one{# 新消息} other{# 更多消息}} \n
 New Messages	MailDaemon		新邮件
 <no accounts>	DeskbarView		<无账户>
 Mail status	MailDaemon		邮箱状态

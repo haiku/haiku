@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-WebPositive	3378116449
+1	english	x-vnd.Haiku-WebPositive	3678460971
 Show home button	Settings Window		显示 home 按钮
 Username:	Authentication Panel		用户名：
 Copy URL to clipboard	Download Window		复制 URL 到剪贴板
@@ -18,6 +18,8 @@ Error opening downloads folder	Download Window		打开下载目录出错
 Paste	WebPositive Window		粘贴
 Double-click or middle-click to open new tab.	Tab Manager		双击或者单击中键以打开新标签。
 Proxy username:	Settings Window		代理服务器 用户名：
+Save page as…	WebPositive Window		页面保存为…
+Over %days left	Download Window		剩余 %days 天
 Settings	Settings Window		设置
 Confirmation	WebPositive Window		确认
 Window	WebPositive Window		窗口
@@ -46,6 +48,7 @@ Restart	Download Window		重新下载
 Proxy server	Settings Window		代理服务器
 Open containing folder	Download Window		打开文件目录
 New window	WebPositive Window		新建窗口：
+WebPositive	Download Window		WebPositive
 Open	Download Window		打开
 Reload	WebPositive Window		重载页面
 Downloads	Download Window		下载
@@ -108,6 +111,7 @@ Password:	Authentication Panel		密码：
 Back	WebPositive Window		后退
 New browser window	Download Window		新建浏览窗口
 Today	WebPositive Window		今天
+Over %hours left	Download Window		剩余 %hours 小时
 Remember username and password for this site	Authentication Panel		记住本站点的用户名和密码
 Earlier	WebPositive Window		早期
 Authentication required	Authentication Panel		需要身份验证
@@ -115,6 +119,7 @@ Use proxy server to connect to the internet	Settings Window		使用代理服务�
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		还有未完成的下载内容，确定退出 WebPositive？
 Auto-hide interface in full screen mode	Settings Window		全屏模式自动隐藏窗口
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url 失败
+%seconds left	Download Window		剩余 %seconds 秒
 New tab	WebPositive Window		新建标签页
 Downloads in progress	WebPositive		下载进度
 Style:	Font Selection view		样式：
@@ -126,7 +131,7 @@ Bookmark error	WebPositive Window		书签错误
 Do you really want to clear the browsing history?	WebPositive Window		确定清除浏览历史？
 Copy	WebPositive Window		复制
 Open bookmarks confirmation	WebPositive Window		打开书签确认
-Remove missing	Download Window		移除丢失内容
+Remove missing	Download Window		移除失败下载
 Clone current page	Settings Window		复制当前页面
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	确认全部打开 %addedCount 个书签页 
 OK	Authentication Panel		确定

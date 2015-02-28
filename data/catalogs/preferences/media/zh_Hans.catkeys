@@ -1,10 +1,11 @@
-1	english	x-vnd.Haiku-Media	4081089471
+1	english	x-vnd.Haiku-Media	2163090586
 Couldn't add volume control in Deskbar: %s\n	Media views		无法添加音量控件到桌面栏：%s\n
 Ready for use…	Media Window		准备使用…
 Video input:	Media views		视频输入:
 Waiting for media_server to quit.	Media Window		等待 media_server 退出。
 Cleaning up.	Media Window		清除。
 Defaults	Media views		默认
+MIDI Settings	Media Window		MIDI 设置
 Stopping media server…	Media Window		暂停 media server…
 Quit	Media Window		退出
 Starting media server…	Media Window		启动 media server…
@@ -16,6 +17,7 @@ Restart media services	Media views		重启多媒体服务
 Couldn't remove volume control in Deskbar: %s\n	Media views		无法移除桌面栏中的音量控件：%s\n
 Media	System name		多媒体
 Telling media_addon_server to quit.	Media Window		控制 media_addon_server 退出程序。
+Media Service	Media Window		多媒体服务
 Audio mixer	Media Window		音频混合器
 This hardware has no controls.	Media Window		硬件控制失败。
 Audio output:	Media views		音频输出：

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	98667844
+1	english	x-vnd.Haiku-MediaPlayer	2839813274
 raw audio	MediaPlayer-InfoWin		原生音频
 Location	MediaPlayer-InfoWin		位置
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
@@ -91,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		自动开始播放
 Track	Video Track Menu		轨道
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部错误（锁定失败）。保存播放列表失败。
 View options	MediaPlayer-SettingsWindow		查看选项
+none	MediaPlayer-Main		无
 Play mode	MediaPlayer-SettingsWindow		播放模式
 Remove Entries	MediaPlayer-RemovePLItemsCmd		删除条目
 Video track	MediaPlayer-Main		视频轨
@@ -137,6 +138,7 @@ Start media server	MediaPlayer-Main		启动媒体服务器
 Toggle fullscreen.	MediaPlayer-Main		切换全屏。
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		获取当前播放项目间隔（毫秒单位）。
 ToggleFullscreen	MediaPlayer-Main		全屏切换。
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{单声道} =2{立体声} other{# 多声道}}
 <unnamed>	PlaylistItem-name		<未命名>
 Open Clips	MediaPlayer-Main		打开片段
 OK	MediaPlayer-PlaylistWindow		确定

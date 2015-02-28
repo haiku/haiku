@@ -9,7 +9,7 @@ value (use REGEX: in front of regular expressions like *spam*)	ConfigView		値 (
 <Choose account>	ConfigView		<アカウントを選択>
 Set flags to	ConfigView		フラグを指定する
 Set as read	ConfigView		既読にする
-Match header	RuleFilter		ヘッダー検索
+Match header	RuleFilter		ヘッダー一致条件
 Reply with	ConfigView		返事を書く
 If	ConfigView		条件:
 Match \"%attribute\" against \"%regex\"	RuleFilter		\"%regex\"  と一致する \"%attribute\" 
