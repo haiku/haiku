@@ -82,7 +82,7 @@ POP3Protocol::POP3Protocol(const BMailAccountSettings& settings)
 
 	create_directory(fDestinationDir, 0777);
 
-	fFetchBodyLimit = 0;
+	fFetchBodyLimit = -1;
 	if (fSettings.HasInt32("partial_download_limit"))
 		fFetchBodyLimit = fSettings.FindInt32("partial_download_limit");
 }
