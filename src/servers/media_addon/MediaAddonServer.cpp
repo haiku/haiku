@@ -67,14 +67,14 @@ typedef std::vector<media_node> NodeVector;
 
 
 struct AddOnInfo {
-	media_addon_id		id;
-	bool				wants_autostart;
-	int32				flavor_count;
+			media_addon_id		id;
+			bool				wants_autostart;
+			int32				flavor_count;
 
-	NodeVector			active_flavors;
+			NodeVector			active_flavors;
 
-	BMediaAddOn*		addon;
-		// if != NULL, need to call gDormantNodeManager->PutAddOn(id)
+			// if != NULL, need to call gDormantNodeManager->PutAddOn(id)
+			BMediaAddOn*		addon;
 };
 
 
@@ -126,13 +126,13 @@ private:
 
 class MediaAddonServer::MonitorHandler : public AddOnMonitorHandler {
 public:
-							MonitorHandler(MediaAddonServer* server);
+								MonitorHandler(MediaAddonServer* server);
 
-	virtual void			AddOnEnabled(const add_on_entry_info* info);
-	virtual void			AddOnDisabled(const add_on_entry_info* info);
+	virtual void				AddOnEnabled(const add_on_entry_info* info);
+	virtual void				AddOnDisabled(const add_on_entry_info* info);
 
 private:
-	MediaAddonServer* fServer;
+			MediaAddonServer*	fServer;
 };
 
 
@@ -274,8 +274,8 @@ MediaAddonServer::ReadyToRun()
 	AddHandler(fMonitorHandler);
 
 	BMessage pulse(B_PULSE);
+	// the monitor handler needs a pulse to check if add-ons are ready
 	fPulseRunner = new BMessageRunner(fMonitorHandler, &pulse, 1000000LL);
-		// the monitor handler needs a pulse to check if add-ons are ready
 
 	fMonitorHandler->AddAddOnDirectories("media");
 
@@ -339,7 +339,7 @@ MediaAddonServer::MessageReceived(BMessage* message)
 
 			PlayMediaFile(type, name);
 			message->SendReply((uint32)B_OK);
-				// TODO: don't know which reply is expected
+			// TODO: don't know which reply is expected
 			return;
 		}
 
@@ -533,7 +533,8 @@ MediaAddonServer::_AddOnAdded(const char* path, ino_t fileNode)
 	AddOnInfo& info = found->second;
 
 	info.id = id;
-	info.wants_autostart = false; // temporary default
+	// temporary default
+	info.wants_autostart = false;
 	info.flavor_count = 0;
 	info.addon = addon;
 
