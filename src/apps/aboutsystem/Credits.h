@@ -500,6 +500,7 @@ static const Translation kTranslations[] = {
 
 #define kWebsiteTeam  \
 	"Urias McCullough\n" \
+	"Richie Nyhus\n" \
 	"Niels Sascha Reedijk\n" \
 	"Joachim Seemer (Humdinger)\n" \
 	"\n"
