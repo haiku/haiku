@@ -391,6 +391,7 @@ RemotePackageRepository HaikuPorts
 	yab-1.7.02-2
 	yab_ide-2.2.2-1
 	yasm-1.2.0-3
+	zip-3.0-1
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
 	zsh-5.0.7-1
@@ -1032,6 +1033,7 @@ RemotePackageRepository HaikuPorts
 	xproto
 	xrick
 	xz_utils_x86
+	zip
 	zlib
 	zsh
 	:

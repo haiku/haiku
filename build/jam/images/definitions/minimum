@@ -34,7 +34,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	uptime urlwrapper useradd userdel
 	version vmstat
 	waitfor watch writembr@x86,x86_64 xres
-	zdiff zforce zgrep zip zipcloak zipnote zipsplit zmore znew
+	zdiff zforce zgrep zmore znew
 ] ;
 
 SYSTEM_APPS = [ FFilterByBuildFeatures

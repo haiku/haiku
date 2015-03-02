@@ -206,6 +206,7 @@ RemotePackageRepository HaikuPorts
 	xml_parser-2.36-1
 	xz_utils-5.0.4-1
 	yasm-1.2.0-3
+	zip-3.0-1
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
 
@@ -408,6 +409,7 @@ RemotePackageRepository HaikuPorts
 	yasm
 	xml_parser
 	xz_utils
+	zip
 	zlib
 	:
 	# debuginfo packages

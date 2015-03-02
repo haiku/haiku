@@ -63,10 +63,6 @@ provides {
 	cmd:zdiff
 	cmd:zforce
 	cmd:zgrep
-	cmd:zip = 2.32
-	cmd:zipcloak
-	cmd:zipnote
-	cmd:zipsplit
 	cmd:zmore
 	cmd:znew
 }
