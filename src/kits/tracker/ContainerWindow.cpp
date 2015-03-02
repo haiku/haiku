@@ -461,6 +461,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	:
 	BWindow(InitialWindowRect(feel), "TrackerWindow", look, feel, flags,
 		workspace),
+	fUseLayouts(useLayouts),
 	fMenuContainer(NULL),
 	fPoseContainer(NULL),
 	fBorderedView(NULL),
@@ -1011,7 +1012,7 @@ BContainerWindow::RestoreState(const BMessage &message)
 void
 BContainerWindow::RestoreStateCommon()
 {
-	if (!fIsDesktop)
+	if (!fIsDesktop && fUseLayouts)
 		InitLayout();
 
 	if (BootedInSafeMode())
