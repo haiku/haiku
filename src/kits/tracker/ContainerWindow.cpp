@@ -962,7 +962,7 @@ BContainerWindow::InitLayout()
 	item = fCountContainer->GroupLayout()->AddView(fPoseView->CountView());
 	minSize = item->MinSize();
 	maxSize = item->MaxSize();
-	item->SetExplicitMinSize(BSize(kCountViewWidth, minSize.Height()));
+	item->SetExplicitMinSize(BSize(kCountViewWidth, B_H_SCROLL_BAR_HEIGHT));
 	item->SetExplicitMaxSize(BSize(kCountViewWidth, maxSize.Height()));
 
 	// Eliminate the extra borders
@@ -973,13 +973,13 @@ BContainerWindow::InitLayout()
 	if (fPoseView->VScrollBar() != NULL) {
 		fVScrollBarContainer = new BGroupView(B_VERTICAL, 0);
 		fVScrollBarContainer->GroupLayout()->AddView(fPoseView->VScrollBar());
-		fVScrollBarContainer->GroupLayout()->SetInsets(-1, 0, 0, 1);
+		fVScrollBarContainer->GroupLayout()->SetInsets(-1, 0, 0, 0);
 		fPoseContainer->GridLayout()->AddView(fVScrollBarContainer, 1, 1);
 	}
 	if (fPoseView->HScrollBar() != NULL) {
 		BGroupView* hScrollBarContainer = new BGroupView(B_VERTICAL, 0);
 		hScrollBarContainer->GroupLayout()->AddView(fPoseView->HScrollBar());
-		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, 0, 0);
+		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, 0, -1);
 		fCountContainer->GroupLayout()->AddView(hScrollBarContainer);
 	}
 }
