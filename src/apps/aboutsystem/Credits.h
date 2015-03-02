@@ -499,11 +499,14 @@ static const Translation kTranslations[] = {
 	"Zhao Shuai\n"
 
 #define kWebsiteTeam  \
-	"Phil Greenway\n" \
-	"Gavin James\n" \
 	"Urias McCullough\n" \
 	"Niels Sascha Reedijk\n" \
 	"Joachim Seemer (Humdinger)\n" \
+	"\n"
+
+#define kPastWebsiteTeam  \
+	"Phil Greenway\n" \
+	"Gavin James\n" \
 	"Jonathan Yoder\n" \
 	"\n"
 

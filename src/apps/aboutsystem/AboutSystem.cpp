@@ -885,10 +885,16 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(kPastMaintainers);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert(B_TRANSLATE("Website, marketing & documentation:\n"));
+	fCreditsView->Insert(B_TRANSLATE("Website & marketing:\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(kWebsiteTeam);
+
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
+	fCreditsView->Insert(B_TRANSLATE("Past website & marketing:\n"));
+
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(kPastWebsiteTeam);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert(B_TRANSLATE("Contributors:\n"));
