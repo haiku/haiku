@@ -661,9 +661,6 @@ TFilePanel::Init(const BMessage*)
 	fMenuBar->SetBorder(B_BORDER_FRAME);
 	fBackView->AddChild(fMenuBar);
 
-	AddMenus();
-	AddContextMenus();
-
 	FavoritesMenu* favorites = new FavoritesMenu(B_TRANSLATE("Favorites"),
 		new BMessage(kSwitchDirectory), new BMessage(B_REFS_RECEIVED),
 		BMessenger(this), IsSavePanel(), fPoseView->RefFilter());
@@ -855,6 +852,9 @@ TFilePanel::Init(const BMessage*)
 	default_button->MakeDefault(true);
 
 	RestoreState();
+
+	AddMenus();
+	AddContextMenus();
 
 	PoseView()->ScrollTo(B_ORIGIN);
 	PoseView()->UpdateScrollRange();
