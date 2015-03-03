@@ -294,7 +294,7 @@ NetworkWindow::_ScanInterfaces()
 		InterfaceListItem* item = new InterfaceListItem(interface.Name());
 		item->SetExpanded(true);
 
-		fInterfaceItemMap.insert(std::pair<BString, BListItem*>(
+		fInterfaceItemMap.insert(std::pair<BString, InterfaceListItem*>(
 			BString(interface.Name()), item));
 		fListView->AddItem(item);
 	}
@@ -349,10 +349,11 @@ NetworkWindow::_ScanAddOns()
 			fAddOns.AddItem(addOn);
 
 			// Per interface items
-			ItemMap::const_iterator iterator = fInterfaceItemMap.begin();
+			InterfaceItemMap::const_iterator iterator
+				= fInterfaceItemMap.begin();
 			for (; iterator != fInterfaceItemMap.end(); iterator++) {
 				const BString& interface = iterator->first;
-				BListItem* interfaceItem = iterator->second;
+				InterfaceListItem* interfaceItem = iterator->second;
 
 				uint32 cookie = 0;
 				while (true) {
@@ -462,9 +463,16 @@ NetworkWindow::_BroadcastSettingsUpdate(uint32 type)
 void
 NetworkWindow::_BroadcastConfigurationUpdate(const BMessage& message)
 {
+	InterfaceItemMap::const_iterator itemIterator = fInterfaceItemMap.begin();
+	for (; itemIterator != fInterfaceItemMap.end(); itemIterator++)
+		itemIterator->second->ConfigurationUpdated(message);
+
 	SettingsMap::const_iterator iterator = fSettingsMap.begin();
 	for (; iterator != fSettingsMap.end(); iterator++)
 		iterator->second->ConfigurationUpdated(message);
+
+	// TODO: improve invalidated region to the one that matters
+	fListView->Invalidate();
 }
 
 

@@ -23,6 +23,7 @@ using namespace BNetworkKit;
 
 class BButton;
 class BMenu;
+class InterfaceListItem;
 class InterfaceView;
 
 
@@ -54,14 +55,14 @@ private:
 private:
 	typedef BObjectList<BNetworkSettingsAddOn> AddOnList;
 	typedef BObjectList<BNetworkSettingsItem> ItemList;
-	typedef std::map<BString, BListItem*> ItemMap;
+	typedef std::map<BString, InterfaceListItem*> InterfaceItemMap;
 	typedef std::map<BListItem*, BNetworkSettingsItem*> SettingsMap;
 
 			BNetworkSettings	fSettings;
 			AddOnList			fAddOns;
 
 			BOutlineListView*	fListView;
-			ItemMap				fInterfaceItemMap;
+			InterfaceItemMap	fInterfaceItemMap;
 			BListItem*			fServicesItem;
 			BListItem*			fDialUpItem;
 			BListItem*			fOtherItem;

@@ -30,6 +30,8 @@ public:
 
 	inline	const char*			Name() { return fInterface.Name(); }
 
+			void				ConfigurationUpdated(const BMessage& message);
+
 private:
 			void 				_Init();
 			void				_PopulateBitmaps(const char* mediaType);

@@ -71,9 +71,6 @@ InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 		list->FillRect(bounds);
 	}
 
-	// TODO: only update periodically
-	_UpdateState();
-
 	BBitmap* stateIcon = _StateIcon();
 	const char* stateText = _StateText();
 
@@ -151,6 +148,13 @@ InterfaceListItem::Update(BView* owner, const BFont* font)
 		+ owner->StringWidth(_StateText()));
 	SetHeight(std::max(3 * lineHeight + 4, fIcon->Bounds().Height() + 8));
 		// either to the text height or icon height, whichever is taller
+}
+
+
+void
+InterfaceListItem::ConfigurationUpdated(const BMessage& message)
+{
+	_UpdateState();
 }
 
 
