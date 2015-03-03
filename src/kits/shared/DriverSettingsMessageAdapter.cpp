@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,6 +16,19 @@
 
 #include <File.h>
 #include <String.h>
+
+
+DriverSettingsConverter::DriverSettingsConverter()
+{
+}
+
+
+DriverSettingsConverter::~DriverSettingsConverter()
+{
+}
+
+
+// #pragma mark -
 
 
 DriverSettingsMessageAdapter::DriverSettingsMessageAdapter()
@@ -152,30 +165,42 @@ DriverSettingsMessageAdapter::_FindParentValueTemplate(
 
 status_t
 DriverSettingsMessageAdapter::_AddParameter(const driver_parameter& parameter,
-	const char* name, uint32 type, BMessage& message)
+	const settings_template& settingsTemplate, BMessage& message)
 {
 	for (int32 i = 0; i < parameter.value_count; i++) {
-		switch (type) {
+		if (settingsTemplate.converter != NULL) {
+			status_t status
+				= settingsTemplate.converter->ConvertFromDriverSettings(
+					parameter, settingsTemplate.name, settingsTemplate.type,
+					message);
+			if (status == B_OK)
+				continue;
+			if (status != B_NOT_SUPPORTED)
+				return status;
+		}
+
+		switch (settingsTemplate.type) {
 			case B_STRING_TYPE:
-				message.AddString(name, parameter.values[i]);
+				message.AddString(settingsTemplate.name, parameter.values[i]);
 				break;
 			case B_INT32_TYPE:
-				message.AddInt32(name, atoi(parameter.values[i]));
+				message.AddInt32(settingsTemplate.name,
+					atoi(parameter.values[i]));
 				break;
 			case B_BOOL_TYPE:
 				if (!strcasecmp(parameter.values[i], "true")
 					|| !strcasecmp(parameter.values[i], "on")
 					|| !strcasecmp(parameter.values[i], "enabled")
 					|| !strcasecmp(parameter.values[i], "1"))
-					message.AddBool(name, true);
+					message.AddBool(settingsTemplate.name, true);
 				else
-					message.AddBool(name, false);
+					message.AddBool(settingsTemplate.name, false);
 				break;
 		}
 	}
-	if (type == B_BOOL_TYPE && parameter.value_count == 0) {
-		// boolean parameters are always true
-		message.AddBool(name, true);
+	if (settingsTemplate.type == B_BOOL_TYPE && parameter.value_count == 0) {
+		// Empty boolean parameters are always true
+		return message.AddBool(settingsTemplate.name, true);
 	}
 
 	return B_OK;
@@ -193,7 +218,7 @@ DriverSettingsMessageAdapter::_ConvertFromDriverParameter(
 		return B_BAD_VALUE;
 	}
 
-	_AddParameter(parameter, parameter.name, settingsTemplate->type, message);
+	_AddParameter(parameter, *settingsTemplate, message);
 
 	if (settingsTemplate->type == B_MESSAGE_TYPE
 		&& parameter.parameter_count > 0) {
@@ -207,10 +232,8 @@ DriverSettingsMessageAdapter::_ConvertFromDriverParameter(
 
 			const settings_template* parentValueTemplate
 				= _FindParentValueTemplate(settingsTemplate);
-			if (parentValueTemplate != NULL) {
-				_AddParameter(parameter, parentValueTemplate->name,
-					parentValueTemplate->type, subMessage);
-			}
+			if (parentValueTemplate != NULL)
+				_AddParameter(parameter, *parentValueTemplate, subMessage);
 		}
 		if (status == B_OK)
 			message.AddMessage(parameter.name, &subMessage);
@@ -250,6 +273,15 @@ DriverSettingsMessageAdapter::_AppendSettings(
 	for (int32 valueIndex = 0; valueIndex < count; valueIndex++) {
 		if (valueIndex > 0 && type != B_MESSAGE_TYPE)
 			settings.Append(" ");
+
+		if (valueTemplate->converter != NULL) {
+			status_t status = valueTemplate->converter->ConvertToDriverSettings(
+				message, name, type, valueIndex, settings);
+			if (status == B_OK)
+				continue;
+			if (status != B_NOT_SUPPORTED)
+				return status;
+		}
 
 		switch (type) {
 			case B_BOOL_TYPE:
