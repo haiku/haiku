@@ -379,7 +379,7 @@ RemotePackageRepository HaikuPorts
 	virtualbox_guest_additions-4.3.53_svn-1
 	vmware_addons-1.1.1-2
 	vision-0.9.7.r949-2
-	wget-1.15-1
+	wget-1.16.2-1
 	which-2.20-1
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-3
@@ -447,7 +447,7 @@ RemotePackageRepository HaikuPorts
 	djvulibre_x86-3.5.25-1
 	djvulibre_x86_devel-3.5.25-1
 	documentviewer_x86-0.3_git-4
-	dtc_x86-1.4.0-1
+	dtc_x86-1.4.1-1
 	expat_x86-2.0.1-7
 	expat_x86_devel-2.0.1-7
 	faad2_x86-2.7-1

@@ -38,7 +38,7 @@ RemotePackageRepository HaikuPorts
 	curl_devel-7.39.0-1
 	cvs-1.12.13.1-6
 	doxygen-1.6.3-4
-	dtc-1.4.0-1
+	dtc-1.4.1-1
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
 	file-5.15-1
@@ -211,7 +211,7 @@ RemotePackageRepository HaikuPorts
 	unzip-6.0-1
 	vim-7.4-2
 	vision-0.9.7.r949-2
-	wget-1.15-1
+	wget-1.16.2-1
 	which-2.20-2
 	wpa_supplicant-2.0-3
 	xml_parser-2.36-1
