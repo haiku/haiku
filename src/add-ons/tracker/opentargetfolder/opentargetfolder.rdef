@@ -5,13 +5,15 @@ resource app_flags B_SINGLE_LAUNCH;
 resource app_version {
 	major  = 1,
 	middle = 0,
-	minor  = 0,
+	minor  = 1,
 
 	variety = B_APPV_FINAL,
 	internal = 1,
 
 	short_info = "Opens the link target's folder",
-	long_info = "Open Target Folder, Copyright 2003-2008 Axel Dörfler"
+	long_info = "Open Target Folder, "
+		"Copyright 2003-2008 Axel Dörfler, "
+		"Copyright 2015 Haiku, Inc."
 };
 
 resource file_types message {

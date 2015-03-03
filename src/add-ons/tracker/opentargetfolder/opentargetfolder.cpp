@@ -1,9 +1,11 @@
 /* 
  * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -14,7 +16,6 @@
 #include <string.h>
 
 #include <Alert.h>
-#include <Directory.h>
 #include <Entry.h>
 #include <Messenger.h>
 #include <Path.h>
@@ -26,51 +27,59 @@
 extern "C" void
 process_refs(entry_ref directoryRef, BMessage* message, void*)
 {
-	BDirectory directory(&directoryRef);
-	uint32 errors = 0;
 	entry_ref ref;
 
 	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
 		BSymLink link(&ref);
 		if (link.InitCheck() != B_OK || !link.IsSymLink()) {
-			errors++;
-			continue;
+			BAlert* alert = new BAlert("Open Target Folder",
+				"This add-on can only be used on symbolic links.\n"
+				"It opens the folder of the link target in Tracker.",
+				"OK");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go(NULL);
+			break;
 		}
 
-		BEntry targetEntry;
-		BPath path;
-		if (link.MakeLinkedPath(&directory, &path) < B_OK
-			|| targetEntry.SetTo(path.Path()) != B_OK
-			|| targetEntry.GetParent(&targetEntry) != B_OK) {
+		BEntry targetEntry(&directoryRef, true);
+		if (targetEntry.InitCheck() != B_OK) {
 			BAlert* alert = new BAlert("Open Target Folder",
-				"Cannot open target folder. Maybe this link is broken?",
+				"Cannot open target entry. Maybe this link is broken?",
 				"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go(NULL);
-			continue;
+			break;
+		}
+
+		BEntry parentEntry;
+		if (targetEntry.GetParent(&parentEntry) != B_OK) {
+			BAlert* alert = new BAlert("Open Target Folder",
+				"Cannot open target entry folder. Maybe this link is broken?",
+				"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go(NULL);
+			break;
+		}
+
+		entry_ref parent;
+		if (parentEntry.GetRef(&parent) != B_OK) {
+			BAlert* alert = new BAlert("Open Target Folder",
+				"Unable to locate entry_ref for the target entry folder.",
+				"OK");
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go(NULL);
+			break;
 		}
 
 		// create Tracker message...
-		entry_ref target;
-		targetEntry.GetRef(&target);
-
 		BMessage trackerMessage(B_REFS_RECEIVED);
-		trackerMessage.AddRef("refs", &target);
+		trackerMessage.AddRef("refs", &parent);
 
 		// ...and send it
 		BMessenger messenger(kTrackerSignature);
 		messenger.SendMessage(&trackerMessage);
 
 		// TODO: select entry via scripting?
-	}
-
-	if (errors > 0) {
-		BAlert* alert = new BAlert("Open Target Folder",
-			"This add-on can only be used on symbolic links.\n"
-			"It opens the folder of the link target in Tracker.",
-			"OK");
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		alert->Go(NULL);
 	}
 }
 
