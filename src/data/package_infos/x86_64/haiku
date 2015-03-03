@@ -44,6 +44,7 @@ provides {
 	cmd:prio
 	cmd:ps
 	cmd:renice
+	cmd:resattr
 	cmd:sdiff
 	cmd:su
 	cmd:tcpdump
