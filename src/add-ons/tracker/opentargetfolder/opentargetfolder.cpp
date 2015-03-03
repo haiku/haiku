@@ -1,9 +1,14 @@
 /* 
  * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 //! Open Target Folder - opens the folder of the link target in Tracker
+
 
 #include <stdio.h>
 #include <string.h>
@@ -15,18 +20,20 @@
 #include <Path.h>
 #include <SymLink.h>
 
+#include <tracker_private.h>
+
 
 extern "C" void
-process_refs(entry_ref directoryRef, BMessage *msg, void *)
+process_refs(entry_ref directoryRef, BMessage* message, void*)
 {
 	BDirectory directory(&directoryRef);
 	if (directory.InitCheck() != B_OK)
 		return;
 
-	int32 errors = 0;
+	uint32 errors = 0;
 	entry_ref ref;
-	int32 index;
-	for (index = 0; msg->FindRef("refs", index, &ref) == B_OK; index ++) {
+
+	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
 		BSymLink link(&ref);
 		if (link.InitCheck() != B_OK || !link.IsSymLink()) {
 			errors++;
@@ -50,17 +57,17 @@ process_refs(entry_ref directoryRef, BMessage *msg, void *)
 		entry_ref target;
 		targetEntry.GetRef(&target);
 
-		BMessage message(B_REFS_RECEIVED);
-		message.AddRef("refs", &target);
+		BMessage trackerMessage(B_REFS_RECEIVED);
+		trackerMessage.AddRef("refs", &target);
 
 		// ...and send it
-		BMessenger messenger("application/x-vnd.Be-TRAK");
-		messenger.SendMessage(&message);
+		BMessenger messenger(kTrackerSignature);
+		messenger.SendMessage(&trackerMessage);
 
 		// TODO: select entry via scripting?
 	}
 
-	if (errors) {
+	if (errors > 0) {
 		BAlert* alert = new BAlert("Open Target Folder",
 			"This add-on can only be used on symbolic links.\n"
 			"It opens the folder of the link target in Tracker.",
@@ -72,7 +79,7 @@ process_refs(entry_ref directoryRef, BMessage *msg, void *)
 
 
 int
-main(int /*argc*/, char **/*argv*/)
+main(int /*argc*/, char** /*argv*/)
 {
 	fprintf(stderr, "This can only be used as a Tracker add-on.\n");
 	return -1; 
