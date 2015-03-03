@@ -18,7 +18,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	listport listres listsem listusb locale logger login lsindex
 	makebootable message mimeset mkfs mkindex
 	modifiers mount mountvolume
-	netcat netstat notify
+	netstat notify
 	open
 	package package_repo passwd pc ping ping6 pkgman
 	prio profile ps

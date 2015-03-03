@@ -157,6 +157,7 @@ RemotePackageRepository HaikuPorts
 	ncurses_devel-5.9-10
 	neon-0.29.6-7
 	neon_devel-0.29.6-7
+	netcat-1.10-1
 	ninja-1.5.1-2
 	openjdk-1.7_2013_11_08-2
 	openssh-6.0p1-8
@@ -371,6 +372,7 @@ RemotePackageRepository HaikuPorts
 	nasm
 	ncurses
 	neon
+	netcat
 	openssh
 	openssl
 	p7zip

@@ -37,7 +37,6 @@ provides {
 	cmd:hey
 	cmd:login
 	cmd:more
-	cmd:netcat
 	cmd:passwd
 	cmd:ping
 	cmd:ping6
