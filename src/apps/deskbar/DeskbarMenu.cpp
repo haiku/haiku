@@ -50,9 +50,9 @@ All rights reserved.
 #include "DeskbarUtils.h"
 #include "IconMenuItem.h"
 #include "MountMenu.h"
-#include "PublicCommands.h"
 #include "RecentItems.h"
 #include "StatusView.h"
+
 #include "tracker_private.h"
 
 #undef B_TRANSLATION_CONTEXT

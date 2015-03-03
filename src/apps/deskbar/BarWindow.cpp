@@ -56,10 +56,9 @@ All rights reserved.
 #include "BarView.h"
 #include "DeskbarUtils.h"
 #include "DeskbarMenu.h"
-#include "PublicCommands.h"
 #include "StatusView.h"
-#include "tracker_private.h"
 
+#include "tracker_private.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MainWindow"

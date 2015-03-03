@@ -35,16 +35,18 @@ All rights reserved.
 #define _COMMANDS_H
 
 
-#include "PublicCommands.h"
-
 #include <MountServer.h>
+#include <SupportDefs.h>
+
+#include <tracker_private.h>
+	// public commands moved here so they may be included by other apps
+
 
 namespace BPrivate {
 
 // external app messages
 
 const uint32 kGetInfo = 'Tinf';
-const uint32 kMoveToTrash = 'Ttrs';
 const uint32 kDelete = 'Tdel';
 const uint32 kRestoreFromTrash = 'Tres';
 const uint32 kIdentifyEntry = 'Tidt';
