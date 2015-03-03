@@ -24,10 +24,19 @@
 #include <tracker_private.h>
 
 
+using namespace BPrivate;
+
 extern "C" void
 process_refs(entry_ref directoryRef, BMessage* message, void*)
 {
 	entry_ref ref;
+	uint32 selectCount = 0;
+
+	// create Tracker messenger...
+	BMessenger messenger(kTrackerSignature);
+
+	// create select message...
+	BMessage selectMessage(kSelect);
 
 	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
 		BSymLink link(&ref);
@@ -76,11 +85,22 @@ process_refs(entry_ref directoryRef, BMessage* message, void*)
 		trackerMessage.AddRef("refs", &parent);
 
 		// ...and send it
-		BMessenger messenger(kTrackerSignature);
 		messenger.SendMessage(&trackerMessage);
 
-		// TODO: select entry via scripting?
+		entry_ref target;
+		if (targetEntry.GetRef(&target) != B_OK) {
+			// don't alert, selection is not critical
+			break;
+		}
+
+		// add ref to selection message
+		selectMessage.AddRef("refs", &target);
+		selectCount++;
 	}
+
+	// ...and send it
+	if (selectCount > 0)
+		messenger.SendMessage(&selectMessage);
 }
 
 

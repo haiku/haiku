@@ -68,6 +68,9 @@ const uint32 kFSClipboardChanges = 'TCch';
 const uint32 kMoveToTrash = 'Ttrs';
 	// Used by ShowImage to delete images
 
+const uint32 kSelect = 'Tsel';
+	// Used by Open Target Folder tracker add-on to select files
+
 } // namespace BPrivate
 
 

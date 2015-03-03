@@ -82,6 +82,7 @@ All rights reserved.
 #include "Thread.h"
 #include "TrackerSettings.h"
 #include "TrackerSettingsWindow.h"
+#include "TrackerString.h"
 #include "TrashWatcher.h"
 #include "VirtualDirectoryWindow.h"
 
@@ -485,6 +486,10 @@ TTracker::MessageReceived(BMessage* message)
 			MoveRefsToTrash(message);
 			break;
 
+		case kSelect:
+			SelectRefs(message);
+			break;
+
 		case kCloseWindowAndChildren:
 		{
 			const node_ref* itemNode;
@@ -696,6 +701,52 @@ TTracker::MoveRefsToTrash(const BMessage* message)
 
 	// async move to trash
 	FSMoveToTrash(srcList);
+}
+
+
+void
+TTracker::SelectRefs(const BMessage* message)
+{
+	uint32 type = 0;
+	int32 count = 0;
+	message->GetInfo("refs", &type, &count);
+
+	for (int32 index = 0; index < count; index++) {
+		entry_ref ref;
+		message->FindRef("refs", index, &ref);
+		BEntry entry(&ref, true);
+		if (entry.InitCheck() != B_OK || !entry.Exists())
+			continue;
+
+		AutoLock<WindowList> lock(&fWindowList);
+		BContainerWindow* window = FindParentContainerWindow(&ref);
+		if (window == NULL)
+			continue;
+
+		char name[B_FILE_NAME_LENGTH];
+		if (entry.GetName(name) != B_OK)
+			continue;
+
+		BString expression;
+		expression << "^";
+		expression << name;
+		expression << "$";
+
+		BMessage* selectMessage = new BMessage(kSelectMatchingEntries);
+		selectMessage->AddInt32("ExpressionType", kRegexpMatch);
+		selectMessage->AddString("Expression", expression);
+		selectMessage->AddBool("InvertSelection", false);
+		selectMessage->AddBool("IgnoreCase", false);
+
+		window->Activate();
+			// must be activated to populate the pose list
+
+		snooze(100000);
+			// wait a bit for the pose list to be populated
+			// ToDo: figure out why this is necessary
+
+		window->PostMessage(selectMessage);
+	}
 }
 
 
