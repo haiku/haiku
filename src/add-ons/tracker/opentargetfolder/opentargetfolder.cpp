@@ -27,9 +27,6 @@ extern "C" void
 process_refs(entry_ref directoryRef, BMessage* message, void*)
 {
 	BDirectory directory(&directoryRef);
-	if (directory.InitCheck() != B_OK)
-		return;
-
 	uint32 errors = 0;
 	entry_ref ref;
 
