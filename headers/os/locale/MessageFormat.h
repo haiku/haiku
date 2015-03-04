@@ -28,7 +28,7 @@ public:
 
 			status_t			InitCheck();
 
-			status_t			Format(BString& buffer, const off_t arg) const;
+			status_t			Format(BString& buffer, const int64 arg) const;
 
 private:
 			status_t			_Initialize(const icu::UnicodeString&);

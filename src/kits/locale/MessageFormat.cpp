@@ -45,7 +45,7 @@ BMessageFormat::InitCheck()
 
 
 status_t
-BMessageFormat::Format(BString& output, const off_t arg) const
+BMessageFormat::Format(BString& output, const int64 arg) const
 {
 	if (fInitStatus != B_OK)
 		return fInitStatus;
@@ -54,7 +54,7 @@ BMessageFormat::Format(BString& output, const off_t arg) const
 	UErrorCode error = U_ZERO_ERROR;
 
 	Formattable arguments[] = {
-		(off_t)arg
+		(int64)arg
 	};
 
 	FieldPosition pos;
