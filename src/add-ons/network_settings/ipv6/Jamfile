@@ -1,21 +1,23 @@
-SubDir HAIKU_TOP src add-ons network_settings ipv4 ;
+SubDir HAIKU_TOP src add-ons network_settings ipv6 ;
 
 UsePublicHeaders [ FDirName add-ons network_settings ] ;
 UsePrivateHeaders shared ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons network_settings ipv4 ] ;
 
 AddResources Interfaces :
 	InterfacesIcons.rdef
 ;
 
-Addon IPv4Interface :
-	IPv4InterfaceAddOn.cpp
+Addon IPv6Interface :
+	IPv6InterfaceAddOn.cpp
 	InterfaceAddressView.cpp
 
 	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ] localestub
 ;
 
-DoCatalogs IPv4Interface : x-vnd.Haiku-IPv4Interface :
-	IPv4InterfaceAddOn.cpp
+DoCatalogs IPv6Interface : x-vnd.Haiku-IPv6Interface :
+	IPv6InterfaceAddOn.cpp
 	InterfaceAddressView.cpp
 ;
