@@ -342,9 +342,11 @@ DriverSettingsMessageAdapter::_AppendSettings(
 				subSettings.ReplaceAll("\n", "\n\t");
 				subSettings.RemoveFirst("\n");
 
-				settings.Append(" {\n");
-				settings.Append(subSettings);
-				settings.Append("\n}");
+				if (!subSettings.IsEmpty()) {
+					settings.Append(" {\n");
+					settings.Append(subSettings);
+					settings.Append("\n}");
+				}
 			}
 		}
 	}
