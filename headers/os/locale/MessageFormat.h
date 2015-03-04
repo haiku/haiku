@@ -1,6 +1,10 @@
 /*
- * Copyright 2014, Haiku, Inc.
+ * Copyright 2014-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef _B_MESSAGE_FORMAT_H_
 #define _B_MESSAGE_FORMAT_H_
@@ -24,7 +28,7 @@ public:
 
 			status_t			InitCheck();
 
-			status_t			Format(BString& buffer, const int32 arg) const;
+			status_t			Format(BString& buffer, const off_t arg) const;
 
 private:
 			status_t			_Initialize(const icu::UnicodeString&);

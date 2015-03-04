@@ -1,6 +1,10 @@
 /*
- * Copyright 2014, Haiku, Inc.
+ * Copyright 2014-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *		John Scipione, jscipione@gmail.com
  */
 #include <MessageFormat.h>
 
@@ -41,7 +45,7 @@ BMessageFormat::InitCheck()
 
 
 status_t
-BMessageFormat::Format(BString& output, const int32 arg) const
+BMessageFormat::Format(BString& output, const off_t arg) const
 {
 	if (fInitStatus != B_OK)
 		return fInitStatus;
@@ -50,7 +54,7 @@ BMessageFormat::Format(BString& output, const int32 arg) const
 	UErrorCode error = U_ZERO_ERROR;
 
 	Formattable arguments[] = {
-		(int32_t)arg
+		(off_t)arg
 	};
 
 	FieldPosition pos;
