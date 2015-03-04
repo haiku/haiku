@@ -33,10 +33,31 @@ static const char* kInterfaceSettingsName = "interfaces";
 static const char* kServicesSettingsName = "services";
 static const char* kNetworksSettingsName = "wireless_networks";
 
+
 // Interface templates
 
+namespace BPrivate {
+
+
+class InterfaceAddressFamilyConverter : public DriverSettingsConverter {
+public:
+	virtual	status_t			ConvertFromDriverSettings(
+									const driver_parameter& parameter,
+									const char* name, uint32 type,
+									BMessage& target);
+	virtual	status_t			ConvertToDriverSettings(const BMessage& source,
+									const char* name, int32 index,
+									uint32 type, BString& value);
+};
+
+
+}	// namespace BPrivate
+
+using BPrivate::InterfaceAddressFamilyConverter;
+
+
 const static settings_template kInterfaceAddressTemplate[] = {
-	{B_STRING_TYPE, "family", NULL, true},
+	{B_STRING_TYPE, "family", NULL, true, new InterfaceAddressFamilyConverter},
 	{B_STRING_TYPE, "address", NULL},
 	{B_STRING_TYPE, "mask", NULL},
 	{B_STRING_TYPE, "peer", NULL},
@@ -138,6 +159,17 @@ static const address_family kFamilies[] = {
 };
 
 
+static const char*
+get_family_name(int family)
+{
+	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+		if (kFamilies[i].family == family)
+			return kFamilies[i].name;
+	}
+	return NULL;
+}
+
+
 static int
 get_address_family(const char* argument)
 {
@@ -223,6 +255,37 @@ type_for_protocol(int protocol)
 		default:
 			return SOCK_DGRAM;
 	}
+}
+
+
+// #pragma mark -
+
+
+status_t
+InterfaceAddressFamilyConverter::ConvertFromDriverSettings(
+	const driver_parameter& parameter, const char* name, uint32 type,
+	BMessage& target)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+InterfaceAddressFamilyConverter::ConvertToDriverSettings(const BMessage& source,
+	const char* name, int32 index, uint32 type, BString& value)
+{
+	int32 family;
+	if (source.FindInt32("family", &family) == B_OK) {
+		const char* familyName = get_family_name(family);
+		if (familyName != NULL)
+			value << familyName;
+		else
+			value << family;
+
+		return B_OK;
+	}
+
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -791,6 +854,14 @@ BNetworkSettings::_RemoveItem(BMessage& container, const char* itemField,
 // #pragma mark - BNetworkInterfaceAddressSettings
 
 
+BNetworkInterfaceAddressSettings::BNetworkInterfaceAddressSettings()
+	:
+	fFamily(AF_UNSPEC),
+	fAutoConfigure(true)
+{
+}
+
+
 BNetworkInterfaceAddressSettings::BNetworkInterfaceAddressSettings(
 	const BMessage& data)
 {
@@ -821,6 +892,20 @@ BNetworkInterfaceAddressSettings::BNetworkInterfaceAddressSettings(
 }
 
 
+BNetworkInterfaceAddressSettings::BNetworkInterfaceAddressSettings(
+	const BNetworkInterfaceAddressSettings& other)
+	:
+	fFamily(other.fFamily),
+	fAutoConfigure(other.fAutoConfigure),
+	fAddress(other.fAddress),
+	fMask(other.fMask),
+	fPeer(other.fPeer),
+	fBroadcast(other.fBroadcast),
+	fGateway(other.fGateway)
+{
+}
+
+
 BNetworkInterfaceAddressSettings::~BNetworkInterfaceAddressSettings()
 {
 }
@@ -833,6 +918,13 @@ BNetworkInterfaceAddressSettings::Family() const
 }
 
 
+void
+BNetworkInterfaceAddressSettings::SetFamily(int family)
+{
+	fFamily = family;
+}
+
+
 bool
 BNetworkInterfaceAddressSettings::AutoConfigure() const
 {
@@ -840,8 +932,22 @@ BNetworkInterfaceAddressSettings::AutoConfigure() const
 }
 
 
+void
+BNetworkInterfaceAddressSettings::SetAutoConfigure(bool configure)
+{
+	fAutoConfigure = configure;
+}
+
+
 const BNetworkAddress&
 BNetworkInterfaceAddressSettings::Address() const
+{
+	return fAddress;
+}
+
+
+BNetworkAddress&
+BNetworkInterfaceAddressSettings::Address()
 {
 	return fAddress;
 }
@@ -854,8 +960,22 @@ BNetworkInterfaceAddressSettings::Mask() const
 }
 
 
+BNetworkAddress&
+BNetworkInterfaceAddressSettings::Mask()
+{
+	return fMask;
+}
+
+
 const BNetworkAddress&
 BNetworkInterfaceAddressSettings::Peer() const
+{
+	return fPeer;
+}
+
+
+BNetworkAddress&
+BNetworkInterfaceAddressSettings::Peer()
 {
 	return fPeer;
 }
@@ -868,6 +988,13 @@ BNetworkInterfaceAddressSettings::Broadcast() const
 }
 
 
+BNetworkAddress&
+BNetworkInterfaceAddressSettings::Broadcast()
+{
+	return fBroadcast;
+}
+
+
 const BNetworkAddress&
 BNetworkInterfaceAddressSettings::Gateway() const
 {
@@ -875,7 +1002,203 @@ BNetworkInterfaceAddressSettings::Gateway() const
 }
 
 
-// #pragma mark - BNetworkServiceAddress
+BNetworkAddress&
+BNetworkInterfaceAddressSettings::Gateway()
+{
+	return fGateway;
+}
+
+
+status_t
+BNetworkInterfaceAddressSettings::GetMessage(BMessage& data) const
+{
+	status_t status = B_OK;
+	if (fFamily != AF_UNSPEC)
+		status = data.SetInt32("family", fFamily);
+	if (status == B_OK && fAutoConfigure)
+		return data.SetBool("auto_config", fAutoConfigure);
+
+	if (status == B_OK && !fAddress.IsEmpty()) {
+		status = data.SetString("address", fAddress.ToString());
+		if (status == B_OK && !fMask.IsEmpty())
+			status = data.SetString("mask", fMask.ToString());
+	}
+	if (status == B_OK && !fPeer.IsEmpty())
+		status = data.SetString("peer", fPeer.ToString());
+	if (status == B_OK && !fBroadcast.IsEmpty())
+		status = data.SetString("broadcast", fBroadcast.ToString());
+	if (status == B_OK && !fGateway.IsEmpty())
+		status = data.SetString("gateway", fGateway.ToString());
+
+	return status;
+}
+
+
+BNetworkInterfaceAddressSettings&
+BNetworkInterfaceAddressSettings::operator=(
+	const BNetworkInterfaceAddressSettings& other)
+{
+	fFamily = other.fFamily;
+	fAutoConfigure = other.fAutoConfigure;
+	fAddress = other.fAddress;
+	fMask = other.fMask;
+	fPeer = other.fPeer;
+	fBroadcast = other.fBroadcast;
+	fGateway = other.fGateway;
+
+	return *this;
+}
+
+
+// #pragma mark - BNetworkInterfaceSettings
+
+
+BNetworkInterfaceSettings::BNetworkInterfaceSettings()
+	:
+	fFlags(0),
+	fMTU(0),
+	fMetric(0)
+{
+}
+
+
+BNetworkInterfaceSettings::BNetworkInterfaceSettings(const BMessage& message)
+{
+	fName = message.GetString("device");
+	fFlags = message.GetInt32("flags", 0);
+	fMTU = message.GetInt32("mtu", 0);
+	fMetric = message.GetInt32("metric", 0);
+
+	BMessage addressData;
+	for (int32 index = 0; message.FindMessage("address", index,
+			&addressData) == B_OK; index++) {
+		BNetworkInterfaceAddressSettings address(addressData);
+		fAddresses.push_back(address);
+	}
+}
+
+
+BNetworkInterfaceSettings::~BNetworkInterfaceSettings()
+{
+}
+
+
+const char*
+BNetworkInterfaceSettings::Name() const
+{
+	return fName;
+}
+
+
+void
+BNetworkInterfaceSettings::SetName(const char* name)
+{
+	fName = name;
+}
+
+
+int32
+BNetworkInterfaceSettings::Flags() const
+{
+	return fFlags;
+}
+
+
+void
+BNetworkInterfaceSettings::SetFlags(int32 flags)
+{
+	fFlags = flags;
+}
+
+
+int32
+BNetworkInterfaceSettings::MTU() const
+{
+	return fMTU;
+}
+
+
+void
+BNetworkInterfaceSettings::SetMTU(int32 mtu)
+{
+	fMTU = mtu;
+}
+
+
+int32
+BNetworkInterfaceSettings::Metric() const
+{
+	return fMetric;
+}
+
+
+void
+BNetworkInterfaceSettings::SetMetric(int32 metric)
+{
+	fMetric = metric;
+}
+
+
+int32
+BNetworkInterfaceSettings::CountAddresses() const
+{
+	return fAddresses.size();
+}
+
+
+const BNetworkInterfaceAddressSettings&
+BNetworkInterfaceSettings::AddressAt(int32 index) const
+{
+	return fAddresses[index];
+}
+
+
+BNetworkInterfaceAddressSettings&
+BNetworkInterfaceSettings::AddressAt(int32 index)
+{
+	return fAddresses[index];
+}
+
+
+void
+BNetworkInterfaceSettings::AddAddress(
+	const BNetworkInterfaceAddressSettings& address)
+{
+	fAddresses.push_back(address);
+}
+
+
+void
+BNetworkInterfaceSettings::RemoveAddress(int32 index)
+{
+	fAddresses.erase(fAddresses.begin() + index);
+}
+
+
+status_t
+BNetworkInterfaceSettings::GetMessage(BMessage& data) const
+{
+	status_t status = data.SetString("device", fName);
+	if (status == B_OK && fFlags != 0)
+		status = data.SetInt32("flags", fFlags);
+	if (status == B_OK && fMTU != 0)
+		status = data.SetInt32("mtu", fMTU);
+	if (status == B_OK && fMetric != 0)
+		status = data.SetInt32("metric", fMetric);
+
+	for (int32 i = 0; i < CountAddresses(); i++) {
+		BMessage address;
+		status = AddressAt(i).GetMessage(address);
+		if (status == B_OK)
+			status = data.AddMessage("address", &address);
+		if (status != B_OK)
+			break;
+	}
+	return status;
+}
+
+
+// #pragma mark - BNetworkServiceAddressSettings
 
 
 BNetworkServiceAddressSettings::BNetworkServiceAddressSettings()
@@ -984,7 +1307,7 @@ BNetworkServiceAddressSettings::Address()
 
 
 status_t
-BNetworkServiceAddressSettings::GetMessage(BMessage& data)
+BNetworkServiceAddressSettings::GetMessage(BMessage& data) const
 {
 	// TODO!
 	return B_NOT_SUPPORTED;

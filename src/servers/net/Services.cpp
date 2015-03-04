@@ -24,6 +24,8 @@
 
 
 using namespace std;
+using namespace BNetworkKit;
+
 
 struct service_connection {
 	struct service* owner;

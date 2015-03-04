@@ -95,23 +95,41 @@ private:
 
 class BNetworkInterfaceAddressSettings {
 public:
+								BNetworkInterfaceAddressSettings();
 								BNetworkInterfaceAddressSettings(
 									const BMessage& data);
+								BNetworkInterfaceAddressSettings(
+									const BNetworkInterfaceAddressSettings&
+										other);
 								~BNetworkInterfaceAddressSettings();
 
 			int					Family() const;
+			void				SetFamily(int family);
 			bool				AutoConfigure() const;
+			void				SetAutoConfigure(bool configure);
 
 			const BNetworkAddress&
 								Address() const;
+			BNetworkAddress&	Address();
 			const BNetworkAddress&
 								Mask() const;
+			BNetworkAddress&	Mask();
 			const BNetworkAddress&
 								Peer() const;
+			BNetworkAddress&	Peer();
 			const BNetworkAddress&
 								Broadcast() const;
+			BNetworkAddress&	Broadcast();
 			const BNetworkAddress&
 								Gateway() const;
+			BNetworkAddress&	Gateway();
+
+			status_t			GetMessage(BMessage& data) const;
+
+			BNetworkInterfaceAddressSettings&
+								operator=(
+									const BNetworkInterfaceAddressSettings&
+										other);
 
 private:
 			int32				fFamily;
@@ -126,16 +144,40 @@ private:
 
 class BNetworkInterfaceSettings {
 public:
+								BNetworkInterfaceSettings();
 								BNetworkInterfaceSettings(
 									const BMessage& message);
 								~BNetworkInterfaceSettings();
 
 			const char*			Name() const;
+			void				SetName(const char* name);
 
+			int32				Flags() const;
+			void				SetFlags(int32 flags);
+			int32				MTU() const;
+			void				SetMTU(int32 mtu);
+			int32				Metric() const;
+			void				SetMetric(int32 metric);
+
+			int32				CountAddresses() const;
+			const BNetworkInterfaceAddressSettings&
+								AddressAt(int32 index) const;
+			BNetworkInterfaceAddressSettings&
+								AddressAt(int32 index);
+			void				AddAddress(const
+									BNetworkInterfaceAddressSettings& address);
+			void				RemoveAddress(int32 index);
+
+			status_t			GetMessage(BMessage& data) const;
+
+private:
+			BString				fName;
+			int32				fFlags;
+			int32				fMTU;
+			int32				fMetric;
+			std::vector<BNetworkInterfaceAddressSettings>
+								fAddresses;
 };
-
-
-}	// namespace BNetworkKit
 
 
 class BNetworkServiceAddressSettings {
@@ -158,7 +200,7 @@ public:
 								Address() const;
 			BNetworkAddress&	Address();
 
-			status_t			GetMessage(BMessage& data);
+			status_t			GetMessage(BMessage& data) const;
 
 			bool				operator==(
 									const BNetworkServiceAddressSettings& other)
@@ -196,6 +238,9 @@ private:
 			std::vector<BNetworkServiceAddressSettings>
 								fAddresses;
 };
+
+
+}	// namespace BNetworkKit
 
 
 #endif	// SETTINGS_H
