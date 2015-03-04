@@ -117,6 +117,7 @@ void
 InterfaceAddressView::AttachedToWindow()
 {
 	fModePopUpMenu->SetTargetForItems(this);
+	fApplyButton->SetTarget(this);
 }
 
 
@@ -127,6 +128,9 @@ InterfaceAddressView::MessageReceived(BMessage* message)
 		case kModeAuto:
 		case kModeStatic:
 		case kModeDisabled:
+			if (message->what == fLastMode)
+				break;
+
 			_SetModeField(message->what);
 			if (message->what != kModeStatic)
 				_UpdateSettings();
@@ -181,8 +185,8 @@ InterfaceAddressView::Revert()
 void
 InterfaceAddressView::ConfigurationUpdated(const BMessage& message)
 {
-	const char* device = message.GetString("device", NULL);
-	if (strcmp(device, fInterface.Name()) != 0)
+	const char* interface = message.GetString("interface", NULL);
+	if (interface == NULL || strcmp(interface, fInterface.Name()) != 0)
 		return;
 
 	_UpdateFields();
@@ -193,26 +197,12 @@ InterfaceAddressView::ConfigurationUpdated(const BMessage& message)
 
 
 void
-InterfaceAddressView::_Apply()
-{
-	BMenuItem* item = fModePopUpMenu->FindMarked();
-	if (item == NULL)
-		return;
-/*
-	fSettings->SetIP(fFamily, fAddressField->Text());
-	fSettings->SetNetmask(fFamily, fNetmaskField->Text());
-	fSettings->SetGateway(fFamily, fGatewayField->Text());
-	fSettings->SetAutoConfigure(fFamily, item->Command() == kModeAuto);
-*/
-}
-
-
-void
 InterfaceAddressView::_EnableFields(bool enable)
 {
 	fAddressField->SetEnabled(enable);
 	fNetmaskField->SetEnabled(enable);
 	fGatewayField->SetEnabled(enable);
+	fApplyButton->SetEnabled(enable);
 }
 
 
@@ -279,6 +269,8 @@ InterfaceAddressView::_SetModeField(uint32 mode)
 		fNetmaskField->SetText(NULL);
 		fGatewayField->SetText(NULL);
 	}
+
+	fLastMode = mode;
 }
 
 
@@ -288,25 +280,93 @@ InterfaceAddressView::_UpdateSettings()
 {
 	BMessage interface;
 	fSettings.GetInterface(fInterface.Name(), interface);
+	BNetworkInterfaceSettings settings(interface);
 
-	interface.SetString("device", fInterface.Name());
+	settings.SetName(fInterface.Name());
 
+	// Remove previous address for family
+
+	int32 index = _FindFirstAddress(settings, fFamily);
+	if (index < 0)
+		index = _FindFirstAddress(settings, AF_UNSPEC);
+	if (index >= 0 && index < settings.CountAddresses()) {
+		BNetworkInterfaceAddressSettings& address = settings.AddressAt(index);
+		printf("family = %d", address.Family());
+		_ConfigureAddress(address);
+	} else {
+		BNetworkInterfaceAddressSettings address;
+		_ConfigureAddress(address);
+		settings.AddAddress(address);
+	}
+
+	interface.MakeEmpty();
+
+	// TODO: better error reporting!
+	status_t status = settings.GetMessage(interface);
+	if (status == B_OK)
+		fSettings.AddInterface(interface);
+	else
+		fprintf(stderr, "Could not add interface: %s\n", strerror(status));
+}
+
+
+uint32
+InterfaceAddressView::_Mode() const
+{
 	uint32 mode = kModeAuto;
 	BMenuItem* item = fModePopUpMenu->FindMarked();
 	if (item != NULL)
 		mode = item->Message()->what;
 
-	// Remove previous address for family
+	return mode;
+}
 
-	switch (mode) {
-		case kModeAuto:
-		default:
-			break;
-		case kModeDisabled:
-			break;
-		case kModeStatic:
-			break;
+
+int32
+InterfaceAddressView::_FindFirstAddress(
+	const BNetworkInterfaceSettings& settings, int family)
+{
+	for (int32 index = 0; index < settings.CountAddresses(); index++) {
+		const BNetworkInterfaceAddressSettings address
+			= settings.AddressAt(index);
+		if (address.Family() == family)
+			return index;
 	}
+	return -1;
+}
 
-	fSettings.AddInterface(interface);
+
+void
+InterfaceAddressView::_ConfigureAddress(
+	BNetworkInterfaceAddressSettings& settings)
+{
+	uint32 mode = _Mode();
+
+printf("family: %d\n", (int)fFamily);
+	settings.SetFamily(fFamily);
+	settings.SetAutoConfigure(mode == kModeAuto);
+
+	settings.Address().Unset();
+	settings.Mask().Unset();
+	settings.Peer().Unset();
+	settings.Broadcast().Unset();
+	settings.Gateway().Unset();
+
+	if (mode == kModeStatic) {
+		_SetAddress(settings.Address(), fAddressField->Text());
+		_SetAddress(settings.Mask(), fNetmaskField->Text());
+		_SetAddress(settings.Gateway(), fGatewayField->Text());
+	}
+}
+
+
+void
+InterfaceAddressView::_SetAddress(BNetworkAddress& address, const char* text)
+{
+	BString string(text);
+	string.Trim();
+	if (string.IsEmpty())
+		return;
+
+	address.SetTo(string.String());
 }

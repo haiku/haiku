@@ -43,16 +43,25 @@ public:
 
 
 private:
-			void				_Apply();
 			void				_EnableFields(bool enable);
 			void				_UpdateFields();
 			void				_SetModeField(uint32 mode);
 			void				_UpdateSettings();
+			uint32				_Mode() const;
+			int32				_FindFirstAddress(
+									const BNetworkInterfaceSettings& settings,
+									int family);
+
+			void				_ConfigureAddress(
+									BNetworkInterfaceAddressSettings& address);
+			void				_SetAddress(BNetworkAddress& address,
+									const char* text);
 
 private:
 			int					fFamily;
 			BNetworkInterface	fInterface;
 			BNetworkSettings&	fSettings;
+			uint32				fLastMode;
 
 			BMessage			fOriginalInterface;
 			BMessage			fInterfaceSettings;
