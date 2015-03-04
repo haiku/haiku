@@ -34,4 +34,4 @@ private:
 };
 
 
-#endif
+#endif	// _B_MESSAGE_FORMAT_H_
