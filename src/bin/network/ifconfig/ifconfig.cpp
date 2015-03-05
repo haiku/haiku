@@ -178,6 +178,16 @@ prefix_length_to_mask(int family, const char* argument, BNetworkAddress& mask)
 }
 
 
+BString
+to_string(const BNetworkAddress& address)
+{
+	if (address.IsEmpty())
+		return "--";
+
+	return address.ToString();
+}
+
+
 //	#pragma mark - wireless support
 
 
@@ -406,14 +416,14 @@ list_interface_addresses(BNetworkInterface& interface, uint32 flags)
 			= address_family_for(address.Address().Family());
 
 		printf("\t%s addr: %s", family->name,
-			address.Address().ToString().String());
+			to_string(address.Address()).String());
 
 		if ((flags & IFF_BROADCAST) != 0)
-			printf(", Bcast: %s", address.Broadcast().ToString().String());
+			printf(", Bcast: %s", to_string(address.Broadcast()).String());
 
 		switch (family->preferred_format) {
 			case PREFER_OUTPUT_MASK:
-				printf(", Mask: %s", address.Mask().ToString().String());
+				printf(", Mask: %s", to_string(address.Mask()).String());
 				break;
 			case PREFER_OUTPUT_PREFIX_LENGTH:
 				printf(", Prefix Length: %zu", address.Mask().PrefixLength());
