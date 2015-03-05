@@ -55,14 +55,14 @@ private:
 private:
 	typedef BObjectList<BNetworkSettingsAddOn> AddOnList;
 	typedef BObjectList<BNetworkSettingsItem> ItemList;
-	typedef std::map<BString, InterfaceListItem*> InterfaceItemMap;
+	typedef std::map<BString, BListItem*> ItemMap;
 	typedef std::map<BListItem*, BNetworkSettingsItem*> SettingsMap;
 
 			BNetworkSettings	fSettings;
 			AddOnList			fAddOns;
 
 			BOutlineListView*	fListView;
-			InterfaceItemMap	fInterfaceItemMap;
+			ItemMap				fInterfaceItemMap;
 			BListItem*			fServicesItem;
 			BListItem*			fDialUpItem;
 			BListItem*			fOtherItem;

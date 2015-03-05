@@ -49,7 +49,8 @@ public:
 
 private:
 			BNetworkSettings&	fSettings;
-			BStringItem*		fItem;
+			BNetworkInterfaceListItem*
+								fItem;
 			InterfaceAddressView*
 								fView;
 };
@@ -63,7 +64,8 @@ IPv4InterfaceItem::IPv4InterfaceItem(const char* interface,
 	:
 	BNetworkSettingsInterfaceItem(interface),
 	fSettings(settings),
-	fItem(new BStringItem(B_TRANSLATE("IPv4"))),
+	fItem(new BNetworkInterfaceListItem(AF_INET, Interface(),
+		B_TRANSLATE("IPv4"), settings)),
 	fView(NULL)
 {
 }

@@ -10,7 +10,11 @@
 #include <image.h>
 #include <ListItem.h>
 #include <Resources.h>
+#include <String.h>
 #include <View.h>
+
+
+class BNetworkAddress;
 
 
 namespace BNetworkKit {
@@ -31,7 +35,14 @@ class BNetworkProfile;
 class BNetworkSettings;
 
 
-class BNetworkSettingsItem {
+class BNetworkConfigurationListener {
+public:
+	virtual void				ConfigurationUpdated(
+									const BMessage& message) = 0;
+};
+
+
+class BNetworkSettingsItem : public BNetworkConfigurationListener {
 public:
 								BNetworkSettingsItem();
 	virtual						~BNetworkSettingsItem();
@@ -70,6 +81,36 @@ public:
 
 private:
 			const char*			fInterface;
+};
+
+
+class BNetworkInterfaceListItem : public BListItem,
+	public BNetworkConfigurationListener {
+public:
+								BNetworkInterfaceListItem(int family,
+									const char* interface, const char* label,
+									BNetworkSettings& settings);
+								~BNetworkInterfaceListItem();
+
+	virtual	void				DrawItem(BView* owner,
+									BRect bounds, bool complete);
+	virtual	void				Update(BView* owner, const BFont* font);
+
+	virtual void				ConfigurationUpdated(const BMessage& message);
+
+private:
+			BFont				_AddressFont();
+			void				_UpdateState();
+
+private:
+			BNetworkSettings&	fSettings;
+			int					fFamily;
+			const char*			fInterface;
+			const char*			fLabel;
+			BString				fAddress;
+			bool				fDisabled;
+			float				fLineOffset;
+			float				fSpacing;
 };
 
 

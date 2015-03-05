@@ -349,11 +349,10 @@ NetworkWindow::_ScanAddOns()
 			fAddOns.AddItem(addOn);
 
 			// Per interface items
-			InterfaceItemMap::const_iterator iterator
-				= fInterfaceItemMap.begin();
+			ItemMap::const_iterator iterator = fInterfaceItemMap.begin();
 			for (; iterator != fInterfaceItemMap.end(); iterator++) {
 				const BString& interface = iterator->first;
-				InterfaceListItem* interfaceItem = iterator->second;
+				BListItem* interfaceItem = iterator->second;
 
 				uint32 cookie = 0;
 				while (true) {
@@ -463,9 +462,13 @@ NetworkWindow::_BroadcastSettingsUpdate(uint32 type)
 void
 NetworkWindow::_BroadcastConfigurationUpdate(const BMessage& message)
 {
-	InterfaceItemMap::const_iterator itemIterator = fInterfaceItemMap.begin();
-	for (; itemIterator != fInterfaceItemMap.end(); itemIterator++)
-		itemIterator->second->ConfigurationUpdated(message);
+	for (int32 index = 0; index < fListView->FullListCountItems(); index++) {
+		BNetworkConfigurationListener* listener
+			= dynamic_cast<BNetworkConfigurationListener*>(
+				fListView->FullListItemAt(index));
+		if (listener != NULL)
+			listener->ConfigurationUpdated(message);
+	}
 
 	SettingsMap::const_iterator iterator = fSettingsMap.begin();
 	for (; iterator != fSettingsMap.end(); iterator++)

@@ -49,7 +49,8 @@ public:
 
 private:
 			BNetworkSettings&	fSettings;
-			BStringItem*		fItem;
+			BNetworkInterfaceListItem*
+								fItem;
 			InterfaceAddressView*
 								fView;
 };
@@ -63,7 +64,8 @@ IPv6InterfaceItem::IPv6InterfaceItem(const char* interface,
 	:
 	BNetworkSettingsInterfaceItem(interface),
 	fSettings(settings),
-	fItem(new BStringItem(B_TRANSLATE("IPv6"))),
+	fItem(new BNetworkInterfaceListItem(AF_INET6, Interface(),
+		B_TRANSLATE("IPv6"), settings)),
 	fView(NULL)
 {
 }

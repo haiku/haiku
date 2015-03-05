@@ -14,12 +14,14 @@
 
 #include <ListItem.h>
 #include <NetworkInterface.h>
+#include <NetworkSettingsAddOn.h>
 
 
 class BBitmap;
 
 
-class InterfaceListItem : public BListItem {
+class InterfaceListItem : public BListItem,
+	public BNetworkKit::BNetworkConfigurationListener {
 public:
 								InterfaceListItem(const char* name);
 								~InterfaceListItem();
@@ -30,7 +32,7 @@ public:
 
 	inline	const char*			Name() { return fInterface.Name(); }
 
-			void				ConfigurationUpdated(const BMessage& message);
+	virtual	void				ConfigurationUpdated(const BMessage& message);
 
 private:
 			void 				_Init();
@@ -55,7 +57,7 @@ private:
 			bool				fDisabled;
 			bool				fHasLink;
 			bool				fConnecting;
-			BString				fAddress[2];
+			BString				fSubtitle;
 };
 
 

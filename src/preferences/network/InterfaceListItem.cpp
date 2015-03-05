@@ -24,7 +24,7 @@
 #include <String.h>
 
 
-#define ICON_SIZE 37
+#define ICON_SIZE 32
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -53,43 +53,39 @@ InterfaceListItem::~InterfaceListItem()
 void
 InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 {
-	BOutlineListView* list = dynamic_cast<BOutlineListView*>(owner);
-	if (list == NULL)
-		return;
-
 	owner->PushState();
 
-	rgb_color lowColor = list->LowColor();
+	rgb_color lowColor = owner->LowColor();
 
 	if (IsSelected() || complete) {
 		if (IsSelected()) {
-			list->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
-			list->SetLowColor(list->HighColor());
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
+			owner->SetLowColor(owner->HighColor());
 		} else
-			list->SetHighColor(lowColor);
+			owner->SetHighColor(lowColor);
 
-		list->FillRect(bounds);
+		owner->FillRect(bounds);
 	}
 
 	BBitmap* stateIcon = _StateIcon();
 	const char* stateText = _StateText();
 
 	// Set the initial bounds of item contents
-	BPoint iconPoint = bounds.LeftTop() + BPoint(4, 4);
+	BPoint iconPoint = bounds.LeftTop() + BPoint(4, 2);
 	BPoint statePoint = bounds.RightTop() + BPoint(0, fFirstLineOffset)
 		- BPoint(be_plain_font->StringWidth(stateText) + 4.0f, 0);
 	BPoint namePoint = bounds.LeftTop()
 		+ BPoint(ICON_SIZE + 12, fFirstLineOffset);
 
 	if (fDisabled) {
-		list->SetDrawingMode(B_OP_ALPHA);
-		list->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
-		list->SetHighColor(0, 0, 0, 32);
+		owner->SetDrawingMode(B_OP_ALPHA);
+		owner->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+		owner->SetHighColor(0, 0, 0, 32);
 	} else
-		list->SetDrawingMode(B_OP_OVER);
+		owner->SetDrawingMode(B_OP_OVER);
 
-	list->DrawBitmapAsync(fIcon, iconPoint);
-	list->DrawBitmapAsync(stateIcon, iconPoint);
+	owner->DrawBitmapAsync(fIcon, iconPoint);
+	owner->DrawBitmapAsync(stateIcon, iconPoint);
 
 	if (fDisabled) {
 		rgb_color textColor;
@@ -99,30 +95,25 @@ InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 			textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
 
 		if (textColor.red + textColor.green + textColor.blue > 128 * 3)
-			list->SetHighColor(tint_color(textColor, B_DARKEN_1_TINT));
+			owner->SetHighColor(tint_color(textColor, B_DARKEN_1_TINT));
 		else
-			list->SetHighColor(tint_color(textColor, B_LIGHTEN_1_TINT));
+			owner->SetHighColor(tint_color(textColor, B_LIGHTEN_1_TINT));
 	} else {
 		if (IsSelected())
-			list->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
 		else
-			list->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	}
 
-	list->SetFont(be_bold_font);
+	owner->SetFont(be_bold_font);
 
-	list->DrawString(fDeviceName, namePoint);
-	list->SetFont(be_plain_font);
-	list->DrawString(stateText, statePoint);
+	owner->DrawString(fDeviceName, namePoint);
+	owner->SetFont(be_plain_font);
+	owner->DrawString(stateText, statePoint);
 
 	BPoint linePoint = bounds.LeftTop() + BPoint(ICON_SIZE + 12,
 		fFirstLineOffset + fLineOffset);
-
-	for (size_t line = 0; line < sizeof(fAddress) / sizeof(fAddress[0]);
-			line++) {
-		list->DrawString(fAddress[line], linePoint);
-		linePoint.y += fLineOffset;
-	}
+	owner->DrawString(fSubtitle, linePoint);
 
 	owner->PopState();
 }
@@ -146,7 +137,7 @@ InterfaceListItem::Update(BView* owner, const BFont* font)
 	SetWidth(fIcon->Bounds().Width() + 44
 		+ be_bold_font->StringWidth(fDeviceName.String())
 		+ owner->StringWidth(_StateText()));
-	SetHeight(std::max(3 * lineHeight + 4, fIcon->Bounds().Height() + 8));
+	SetHeight(std::max(2 * lineHeight + 4, fIcon->Bounds().Height() + 4));
 		// either to the text height or icon height, whichever is taller
 }
 
@@ -255,23 +246,13 @@ InterfaceListItem::_UpdateState()
 	fHasLink = fInterface.HasLink();
 	fConnecting = (fInterface.Flags() & IFF_CONFIGURING) != 0;
 
-	int32 count = fInterface.CountAddresses();
-	int lastFamily = -1;
-	size_t addressIndex = 0;
-	for (int32 index = 0; index < count; index++) {
-		if (addressIndex >= sizeof(fAddress) / sizeof(fAddress[0]))
-			break;
-
-		BNetworkInterfaceAddress address;
-		if (fInterface.GetAddressAt(index, address) == B_OK) {
-			if (address.Address().IsEmpty()
-				|| lastFamily == address.Address().Family())
-				continue;
-
-			fAddress[addressIndex++] = address.Address().ToString();
-			lastFamily = address.Address().Family();
-		}
-	}
+	BNetworkDevice device(Name());
+	if (device.IsWireless())
+		fSubtitle = B_TRANSLATE("Wireless device");
+	else if (device.IsEthernet())
+		fSubtitle = B_TRANSLATE("Ethernet device");
+	else
+		fSubtitle = "";
 }
 
 
