@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.02.26
-#	Date:    2015-02-26 03:15:02
+#	Version: 2015.03.03
+#	Date:    2015-03-03 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10397,6 +10397,7 @@
 		1462 7522  X58 Pro-E
 		1775 11cc  CC11/CL11
 		1849 8168  Motherboard (one of many)
+		7470 3468  TG-3468 Gigabit PCI Express Network Adapter
 		8086 d615  Desktop Board D510MO/D525MW
 	8169  RTL8169 PCI Gigabit Ethernet Controller
 		1025 0079  Aspire 5024WLMi
@@ -10573,7 +10574,7 @@
 	7005  SB Audigy LS Game Port
 		1102 1001  SB0310 Audigy LS MIDI/Game port
 		1102 1002  SB0312 Audigy LS MIDI/Game port
-	7006  [SB X-Fi Xtreme Audio] CA0110-IBG PCI to PCIe Bridge
+	7006  [SB X-Fi Xtreme Audio] CA0110-IBG PCIe to PCI Bridge
 	8938  Ectiva EV1938
 		1033 80e5  SlimTower-Jim (NEC)
 		1071 7150  Mitac 7150
@@ -11722,7 +11723,8 @@
 		0070 8993  WinTV HVR-2200
 		0070 89a0  WinTV HVR-2200
 		0070 89a1  WinTV HVR-2200
-		0070 f123  WinTV HVR-2205
+		0070 f120  WinTV HVR-2205
+		0070 f123  WinTV HVR-2215
 	7231  SAA7231
 		5ace 8000  Behold TV H8
 		5ace 8001  Behold TV H8
@@ -17543,8 +17545,8 @@
 # Also used as Gigabyte GC-WB150 on a PCIe-to-mini-PCIe converter
 		1a3b 2100  AW-NB100H 802.11n Wireless Mini PCIe Card
 	003c  QCA988x 802.11ac Wireless Network Adapter
-# all QCA6174 devices?
-	003e  Killer N1525 Wireless-AC
+	003e  QCA6174 802.11ac Wireless Network Adapter
+		1a56 1525  Killer N1525 Wireless-AC
 	0207  AR5210 Wireless Network Adapter [AR5000 802.11a]
 	1014  AR5212 802.11abg NIC
 		1014 058a  ThinkPad 11a/b/g Wireless LAN Mini Express Adapter (AR5BXB6)
@@ -19602,6 +19604,7 @@
 7284  HT OMEGA Inc.
 7401  EndRun Technologies
 	e100  PTP3100 PCIe PTP Slave Clock
+7470  TP-LINK Technologies Co., Ltd.
 7604  O.N. Electronic Co Ltd.
 7bde  MIDAC Corporation
 7fed  PowerTV
@@ -21305,6 +21308,8 @@
 	1571  XL710/X710 Virtual Function
 	1572  Ethernet Controller X710 for 10GbE SFP+
 		1028 1f99  Ethernet 10G 4P X710/I350 rNDC
+		1137 0000  Ethernet Converged NIC X710-4
+		1137 013b  Ethernet Converged NIC X710-4
 		17aa 0000  ThinkServer XL710 AnyFabric
 		17aa 4001  ThinkServer XL710-4 AnyFabric
 		8086 0000  Ethernet Converged Network Adapter X710
@@ -21323,6 +21328,8 @@
 	1583  Ethernet Controller XL710 for 40GbE QSFP+
 		108e 0000  Oracle 10 Gb and 40 Gb Ethernet Adapter
 		108e 7b1b  Oracle 10 Gb and 40 Gb Ethernet Adapter
+		1137 0000  Ethernet Converged NIC XL710-Q2
+		1137 013c  Ethernet Converged NIC XL710-Q2
 		8086 0000  Ethernet Converged Network Adapter XL710-Q2
 		8086 0001  Ethernet Converged Network Adapter XL710-Q2
 		8086 0002  Ethernet Converged Network Adapter XL710-Q2
