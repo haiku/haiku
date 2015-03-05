@@ -473,7 +473,7 @@ NetServer::_ConfigureInterface(BMessage& message)
 			&addressMessage) == B_OK; index++) {
 		BNetworkInterfaceAddressSettings addressSettings(addressMessage);
 
-		if (addressSettings.AutoConfigure()) {
+		if (addressSettings.IsAutoConfigure()) {
 			_QuitLooperForDevice(name);
 			startAutoConfig = true;
 		} else if (!addressSettings.Gateway().IsEmpty()) {

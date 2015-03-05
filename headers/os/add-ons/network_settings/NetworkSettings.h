@@ -21,6 +21,9 @@
 namespace BNetworkKit {
 
 
+class BNetworkInterfaceSettings;
+
+
 class BNetworkSettings {
 public:
 	static	const uint32		kMsgInterfaceSettingsUpdated = 'SUif';
@@ -37,6 +40,8 @@ public:
 									BMessage& interface);
 			status_t			AddInterface(const BMessage& interface);
 			status_t			RemoveInterface(const char* name);
+			BNetworkInterfaceSettings
+								Interface(const char* name);
 
 			int32				CountNetworks() const;
 			status_t			GetNextNetwork(uint32& cookie,
@@ -105,7 +110,7 @@ public:
 
 			int					Family() const;
 			void				SetFamily(int family);
-			bool				AutoConfigure() const;
+			bool				IsAutoConfigure() const;
 			void				SetAutoConfigure(bool configure);
 
 			const BNetworkAddress&
@@ -164,9 +169,12 @@ public:
 								AddressAt(int32 index) const;
 			BNetworkInterfaceAddressSettings&
 								AddressAt(int32 index);
+			int32				FindFirstAddress(int family) const;
 			void				AddAddress(const
 									BNetworkInterfaceAddressSettings& address);
 			void				RemoveAddress(int32 index);
+
+			bool				IsAutoConfigure(int family) const;
 
 			status_t			GetMessage(BMessage& data) const;
 

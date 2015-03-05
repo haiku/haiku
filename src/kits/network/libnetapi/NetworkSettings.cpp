@@ -19,6 +19,7 @@
 #include <FindDirectory.h>
 #include <fs_interface.h>
 #include <NetworkDevice.h>
+#include <NetworkInterface.h>
 #include <Path.h>
 #include <PathMonitor.h>
 #include <String.h>
@@ -345,6 +346,15 @@ BNetworkSettings::RemoveInterface(const char* name)
 {
 	return _RemoveItem(fInterfaces, "interface", "device", name,
 		kInterfaceSettingsName);
+}
+
+
+BNetworkInterfaceSettings
+BNetworkSettings::Interface(const char* name)
+{
+	BMessage interface;
+	GetInterface(name, interface);
+	return BNetworkInterfaceSettings(interface);
 }
 
 
@@ -926,7 +936,7 @@ BNetworkInterfaceAddressSettings::SetFamily(int family)
 
 
 bool
-BNetworkInterfaceAddressSettings::AutoConfigure() const
+BNetworkInterfaceAddressSettings::IsAutoConfigure() const
 {
 	return fAutoConfigure;
 }
@@ -1160,6 +1170,18 @@ BNetworkInterfaceSettings::AddressAt(int32 index)
 }
 
 
+int32
+BNetworkInterfaceSettings::FindFirstAddress(int family) const
+{
+	for (int32 index = 0; index < CountAddresses(); index++) {
+		const BNetworkInterfaceAddressSettings address = AddressAt(index);
+		if (address.Family() == family)
+			return index;
+	}
+	return -1;
+}
+
+
 void
 BNetworkInterfaceSettings::AddAddress(
 	const BNetworkInterfaceAddressSettings& address)
@@ -1172,6 +1194,47 @@ void
 BNetworkInterfaceSettings::RemoveAddress(int32 index)
 {
 	fAddresses.erase(fAddresses.begin() + index);
+}
+
+
+/*!	This is a convenience method that returns the current state of the
+	interface, not just the one configured.
+
+	This means, even if the settings say: auto configured, this method
+	may still return false, if the configuration has been manually tempered
+	with.
+*/
+bool
+BNetworkInterfaceSettings::IsAutoConfigure(int family) const
+{
+	BNetworkInterface interface(fName);
+	// TODO: this needs to happen at protocol level
+	if ((interface.Flags() & (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0)
+		return true;
+
+	BNetworkInterfaceAddress address;
+	status_t status = B_ERROR;
+
+	int32 index = interface.FindFirstAddress(family);
+	if (index >= 0)
+		status = interface.GetAddressAt(index, address);
+	if (index < 0 || status != B_OK || address.Address().IsEmpty()) {
+		if (status == B_OK) {
+			// Check persistent settings for the mode -- the address
+			// can also be empty if the automatic configuration hasn't
+			// started yet (for example, because there is no link).
+			int32 index = FindFirstAddress(family);
+			if (index < 0)
+				index = FindFirstAddress(AF_UNSPEC);
+			if (index >= 0) {
+				const BNetworkInterfaceAddressSettings& address
+					= AddressAt(index);
+				return address.IsAutoConfigure();
+			}
+		}
+	}
+
+	return false;
 }
 
 

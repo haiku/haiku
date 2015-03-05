@@ -13,6 +13,7 @@
 #include <GroupView.h>
 #include <NetworkInterface.h>
 #include <NetworkSettings.h>
+#include <NetworkSettingsAddOn.h>
 
 
 class BButton;
@@ -41,16 +42,12 @@ public:
 
 			void				ConfigurationUpdated(const BMessage& message);
 
-
 private:
 			void				_EnableFields(bool enable);
 			void				_UpdateFields();
 			void				_SetModeField(uint32 mode);
 			void				_UpdateSettings();
 			uint32				_Mode() const;
-			int32				_FindFirstAddress(
-									const BNetworkInterfaceSettings& settings,
-									int family);
 
 			void				_ConfigureAddress(
 									BNetworkInterfaceAddressSettings& address);

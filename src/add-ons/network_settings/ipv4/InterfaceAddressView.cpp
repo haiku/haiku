@@ -215,8 +215,11 @@ InterfaceAddressView::_EnableFields(bool enable)
 void
 InterfaceAddressView::_UpdateFields()
 {
-	bool autoConfigure = (fInterface.Flags()
-		& (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
+	bool autoConfigure = fInterfaceSettings.IsEmpty();
+	if (!autoConfigure) {
+		BNetworkInterfaceSettings settings(fInterfaceSettings);
+		autoConfigure = settings.IsAutoConfigure(fFamily);
+	}
 
 	BNetworkInterfaceAddress address;
 	status_t status = B_ERROR;
@@ -226,13 +229,6 @@ InterfaceAddressView::_UpdateFields()
 		status = fInterface.GetAddressAt(index, address);
 	if (index < 0 || status != B_OK
 		|| address.Address().IsEmpty() && !autoConfigure) {
-		if (status == B_OK) {
-			// Check persistent settings for the mode -- the address
-			// can also be empty if the automatic configuration hasn't
-			// started yet.
-			autoConfigure = fInterfaceSettings.IsEmpty()
-				|| fInterfaceSettings.GetBool("auto_config", false);
-		}
 		if (!autoConfigure) {
 			_SetModeField(kModeDisabled);
 			return;
@@ -286,12 +282,11 @@ InterfaceAddressView::_UpdateSettings()
 
 	// Remove previous address for family
 
-	int32 index = _FindFirstAddress(settings, fFamily);
+	int32 index = settings.FindFirstAddress(fFamily);
 	if (index < 0)
-		index = _FindFirstAddress(settings, AF_UNSPEC);
+		index = settings.FindFirstAddress(AF_UNSPEC);
 	if (index >= 0 && index < settings.CountAddresses()) {
 		BNetworkInterfaceAddressSettings& address = settings.AddressAt(index);
-		printf("family = %d", address.Family());
 		_ConfigureAddress(address);
 	} else {
 		BNetworkInterfaceAddressSettings address;
@@ -322,27 +317,12 @@ InterfaceAddressView::_Mode() const
 }
 
 
-int32
-InterfaceAddressView::_FindFirstAddress(
-	const BNetworkInterfaceSettings& settings, int family)
-{
-	for (int32 index = 0; index < settings.CountAddresses(); index++) {
-		const BNetworkInterfaceAddressSettings address
-			= settings.AddressAt(index);
-		if (address.Family() == family)
-			return index;
-	}
-	return -1;
-}
-
-
 void
 InterfaceAddressView::_ConfigureAddress(
 	BNetworkInterfaceAddressSettings& settings)
 {
 	uint32 mode = _Mode();
 
-printf("family: %d\n", (int)fFamily);
 	settings.SetFamily(fFamily);
 	settings.SetAutoConfigure(mode == kModeAuto);
 
