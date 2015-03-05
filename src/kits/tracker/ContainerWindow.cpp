@@ -3223,6 +3223,7 @@ BContainerWindow::LoadAddOn(BMessage* message)
 	refs->AddMessenger("TrackerViewToken", BMessenger(PoseView()));
 
 	const entry_ref* modelRef = TargetModel()->IsContainer()
+			&& selectionList->ItemAt(0) != NULL
 		? selectionList->ItemAt(0)->TargetModel()->EntryRef()
 		: TargetModel()->EntryRef();
 
