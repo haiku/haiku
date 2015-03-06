@@ -1,7 +1,7 @@
 # Raspberry Pi board-specific definitions
 
 HAIKU_BOARD_DESCRIPTION = "Raspberry Pi" ;
-HAIKU_BOOT_PLATFORM = raspberrypi_arm ;
+HAIKU_BOOT_PLATFORM = u-boot ;
 
 #
 # Various hardcoded addresses
