@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src system boot platform u-boot arch arm ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
+SubDirHdrs $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ;
+
 UsePrivateSystemHeaders ;
 UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] 
 	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
@@ -11,6 +13,8 @@ SubDirC++Flags -fno-rtti ;
 BootMergeObject boot_platform_u-boot_arm.o :
 	# must come first to have _start_* at correct locations
 	shell.S
+
+	arch_mailbox.cpp
 	: -fno-pic
 ;
 

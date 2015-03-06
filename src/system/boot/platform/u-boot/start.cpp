@@ -60,6 +60,10 @@ extern "C" int start_gen(int argc, const char **argv,
 	struct image_header *uimage=NULL, void *fdt=NULL);
 extern "C" void dump_uimage(struct image_header *image);
 extern "C" void dump_fdt(const void *fdt);
+#if defined(__ARM__)
+extern "C" status_t arch_mailbox_init();
+#endif
+
 
 // declared in shell.S
 // those are initialized to NULL but not in the BSS
@@ -210,6 +214,9 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 		gFDT = args.platform.fdt_data;
 	}
 
+	#if defined(__ARM__)
+	arch_mailbox_init();
+	#endif
 	serial_init(gFDT);
 	console_init();
 	// initialize the OpenFirmware wrapper

@@ -11,7 +11,8 @@
 
 #define BOARD_NAME_PRETTY "Raspberry Pi"
 
-#define BOARD_CPU_ARM6 1
+#define BOARD_CPU_TYPE_ARM6 1
+#define BOARD_CPU_BCM2708 1
 
 #include <arch/arm/bcm2708.h>
 
