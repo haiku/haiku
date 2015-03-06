@@ -8,6 +8,9 @@ HAIKU_BOOT_PLATFORM = u-boot ;
 #
 
 HAIKU_BOARD_LOADER_BASE = 0x0 ;
+HAIKU_BOARD_LOADER_ENTRY_RAW = 0x01000000 ;
+HAIKU_BOARD_LOADER_ENTRY_LINUX = 0x01000000 ;
+HAIKU_BOARD_LOADER_ENTRY_NBSD = 0x01000000 ;
 
 HAIKU_BOARD_BOOT_ARCHIVE_BASE = 0x04000000 ;
 HAIKU_BOARD_BOOT_ARCHIVE_SIZE = 0x00400000 ;
@@ -46,8 +49,11 @@ HAIKU_BOARD_SDIMAGE_SIZE = 256 ;
 # gcc flags for the specific cpu
 #
 
-HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += -mtune=arm1176jzf-s -march=armv6 ;
-HAIKU_C++FLAGS_$(HAIKU_PACKAGING_ARCH) += -mtune=arm1176jzf-s -march=armv6 ;
+local flags = -mtune=arm1176jzf-s -march=armv6 ;
+
+HAIKU_ASFLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;
+HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;
+HAIKU_C++FLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;
 
 # Workaround for ld using 32k for alignment despite forcing it in the config...
 # should definitely not be needed!
