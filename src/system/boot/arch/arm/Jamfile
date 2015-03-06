@@ -9,7 +9,7 @@ UseLibraryHeaders [ FDirName libfdt ] ;
 
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) -fno-rtti ;
+	SubDirC++Flags $(defines) -fno-rtti -std=c++1y ;
 }
 
 # TODO: Is there any reason to recompile arch_string.S here?
