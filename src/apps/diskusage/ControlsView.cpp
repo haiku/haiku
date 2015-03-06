@@ -138,6 +138,7 @@ ControlsView::VolumeTabView::VolumeTabView()
 	:
 	BTabView("volume_tabs", B_WIDTH_FROM_LABEL)
 {
+	SetBorder(B_NO_BORDER);
 }
 
 

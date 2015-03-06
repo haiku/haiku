@@ -35,7 +35,7 @@ MainWindow::MainWindow(BRect pieRect)
 
 	AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
 		.Add(fControlsView)
-		.SetInsets(5, 5, 5, 5)
+		.SetInsets(0, B_USE_WINDOW_INSETS, 0, 0)
 	);
 	float maxHeight = BScreen(this).Frame().Height() - 12;
 	fControlsView->SetExplicitMaxSize(BSize(maxHeight, maxHeight));
