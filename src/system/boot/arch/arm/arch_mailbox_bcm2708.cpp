@@ -4,9 +4,10 @@
  *
  * Authors:
  *		Michael Lotz, mmlr@mlotz.ch
- *      François Revol, revol@free.fr
+ *		François Revol, revol@free.fr
  *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
+
 
 #include "arch_mailbox.h"
 
@@ -47,7 +48,7 @@ public:
 							ArchMailboxArmBCM2708(addr_t base)
 								:
 								ArchMailbox(base) {}
-                            ~ArchMailboxArmBCM2708() {}
+							~ArchMailboxArmBCM2708() {}
 
 virtual status_t			Write(uint8 channel, uint32 value);
 virtual status_t			Read(uint8 channel, uint32& value);
@@ -57,7 +58,7 @@ virtual status_t			Read(uint8 channel, uint32& value);
 extern "C" ArchMailbox*
 arch_get_mailbox_arm_bcm2708(addr_t base)
 {
-    return new ArchMailboxArmBCM2708(base);
+	return new ArchMailboxArmBCM2708(base);
 }
 
 

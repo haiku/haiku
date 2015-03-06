@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Michael Lotz, mmlr@mlotz.ch
- *      François Revol, revol@free.fr
+ *		François Revol, revol@free.fr
  *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
@@ -27,20 +27,6 @@
 
 #include "arch_mailbox.h"
 
-/*
-#include <string.h>
-
-#include <arm_mmu.h>
-
-#include "arch_mmu.h"
-
-#include "arch_framebuffer.h"
-
-#include "bcm2708.h"
-#include "mailbox.h"
-
-#include "platform_debug.h"
-*/
 
 //XXX
 extern "C" addr_t
