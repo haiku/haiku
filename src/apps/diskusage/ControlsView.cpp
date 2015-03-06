@@ -155,7 +155,7 @@ ControlsView::VolumeTabView::TabFrame(int32 index) const
 	float x = 0.0f;
 	float width = 0.0f;
 	float minStringWidth = StringWidth("Haiku");
-	int countTabs = CountTabs();
+	int32 countTabs = CountTabs();
 
 	// calculate the total width if no truncation is made at all
 	float averageWidth = Frame().Width() / countTabs;
