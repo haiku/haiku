@@ -46,8 +46,8 @@ HAIKU_BOARD_SDIMAGE_SIZE = 256 ;
 # gcc flags for the specific cpu
 #
 
-HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += -mtune=arm1176jzf-s ;
-HAIKU_C++FLAGS_$(HAIKU_PACKAGING_ARCH) += -mtune=arm1176jzf-s ;
+HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += -mtune=arm1176jzf-s -march=armv6 ;
+HAIKU_C++FLAGS_$(HAIKU_PACKAGING_ARCH) += -mtune=arm1176jzf-s -march=armv6 ;
 
 # Workaround for ld using 32k for alignment despite forcing it in the config...
 # should definitely not be needed!
