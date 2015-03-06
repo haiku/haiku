@@ -20,8 +20,7 @@ arch_mailbox_init()
 {
 	#if defined(BOARD_CPU_BCM2708)
 	extern ArchMailbox *arch_get_mailbox_arm_bcm2708(addr_t base);
-	#warning ARM: Add gPeripheralBase to ARM_CTRL_0_MAILBOX_BASE
-	gMailbox = arch_get_mailbox_arm_bcm2708(ARM_CTRL_0_MAILBOX_BASE);
+	gMailbox = arch_get_mailbox_arm_bcm2708(DEVICE_BASE);
 	#endif
 	return B_OK;
 }

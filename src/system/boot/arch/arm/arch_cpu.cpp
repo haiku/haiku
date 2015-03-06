@@ -109,14 +109,14 @@ check_cpu_features()
 }
 
 
-void
+extern "C" void
 arch_cpu_memory_read_barrier(void)
 {
 	asm volatile ("" : : : "memory");
 }
 
 
-void
+extern "C" void
 arch_cpu_memory_write_barrier(void)
 {
 	asm volatile ("" : : : "memory");
