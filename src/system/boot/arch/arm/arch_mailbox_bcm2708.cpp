@@ -8,6 +8,7 @@
  *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
+#include <atomic>
 
 #include "arch_mailbox.h"
 
@@ -26,6 +27,7 @@ virtual status_t			Write(uint8 channel, uint32 value);
 virtual status_t			Read(uint8 channel, uint32& value);
 
 private:
+		auto&				GetRegister(unsigned reg);
 		void				RegisterWrite(addr_t reg, uint32 value);
 		uint32				RegisterRead(addr_t reg);
 };
@@ -73,18 +75,22 @@ ArchMailboxArmBCM2708::Read(uint8 channel, uint32& value)
 }
 
 
-uint32
+inline auto&
+ArchMailboxArmBCM2708::GetRegister(unsigned reg)
+{
+	auto addr = fBase + ARM_CTRL_0_MAILBOX_BASE + reg;
+	return *reinterpret_cast<std::atomic<uint32_t>*>(addr);
+}
+
+inline uint32
 ArchMailboxArmBCM2708::RegisterRead(addr_t reg)
 {
-	uint32 result = *(volatile uint32*)(fBase + ARM_CTRL_0_MAILBOX_BASE + reg);
-	arch_cpu_memory_read_barrier();
-	return result;
+	return GetRegister(reg).load(std::memory_order_acquire);
 }
 
 
-void
+inline void
 ArchMailboxArmBCM2708::RegisterWrite(addr_t reg, uint32 value)
 {
-	arch_cpu_memory_write_barrier();
-	*(volatile uint32*)(fBase + ARM_CTRL_0_MAILBOX_BASE + reg) = value;
+	GetRegister(reg).store(value, std::memory_order_release);
 }
