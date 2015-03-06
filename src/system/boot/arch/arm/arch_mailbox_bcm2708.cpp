@@ -16,15 +16,15 @@
 #include "bcm2708.h"
 
 
-class ArchMailboxArmBCM2708 : public ArchMailbox {
+class ArchMailboxArmBCM2708 final : public ArchMailbox {
 public:
 							ArchMailboxArmBCM2708(addr_t base)
 								:
 								ArchMailbox(base) {}
 							~ArchMailboxArmBCM2708() {}
 
-virtual status_t			Write(uint8 channel, uint32 value);
-virtual status_t			Read(uint8 channel, uint32& value);
+virtual status_t			Write(uint8 channel, uint32 value) override;
+virtual status_t			Read(uint8 channel, uint32& value) override;
 
 private:
 		auto&				GetRegister(unsigned reg);
