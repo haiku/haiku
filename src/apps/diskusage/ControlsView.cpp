@@ -10,6 +10,8 @@
 
 #include "ControlsView.h"
 
+#include <string.h>
+
 #include <Bitmap.h>
 #include <Box.h>
 #include <TabView.h>
@@ -226,7 +228,14 @@ ControlsView::VolumeTabView::AttachedToWindow()
 			BVolume* volume = new BVolume(tempVolume);
 			VolumeTab* item = new VolumeTab(volume);
 			char name[B_PATH_NAME_LENGTH];
-			volume->GetName(name);			
+			if (volume->GetName(name) != B_OK)
+				continue;
+
+			if (strcmp(name, "system") == 0
+				|| strcmp(name, "config") == 0) {
+				// Don't include virtual volumes.
+				continue;
+			}
 			AddTab(new VolumeView(name, volume), item);
 		}
 	}
