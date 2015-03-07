@@ -23,8 +23,8 @@
  * Authors:
  *		Alexander von Gluck, kallisti5@unixzen.com
  */
-#ifndef __PLATFORM_BCM2708_H
-#define __PLATFORM_BCM2708_H
+#ifndef __PLATFORM_BCM2835_H
+#define __PLATFORM_BCM2835_H
 
 
 #define SIZE_4K 0x00001000
@@ -37,19 +37,19 @@
  */
 
 // Section 1.2.2
-#define BCM2708_SDRAM_BASE		0x00000000
-#define BCM2708_PERIPHERAL_BASE	0x20000000
+#define BCM2835_SDRAM_BASE		0x00000000
+#define BCM2835_PERIPHERAL_BASE	0x20000000
 
 // Added to physical addresses to select the different cache behaviours
-#define BCM2708_VIDEO_CORE_L1_L2_CACHED		(0 << 30)
-#define BCM2708_VIDEO_CORE_L2_COHERENT		(1 << 30)
-#define BCM2708_VIDEO_CORE_L2_CACHED		(2 << 30)
-#define BCM2708_VIDEO_CORE_UNCACHED			(3 << 30)
+#define BCM2835_VIDEO_CORE_L1_L2_CACHED		(0 << 30)
+#define BCM2835_VIDEO_CORE_L2_COHERENT		(1 << 30)
+#define BCM2835_VIDEO_CORE_L2_CACHED		(2 << 30)
+#define BCM2835_VIDEO_CORE_UNCACHED			(3 << 30)
 
 // The highest two bits are used to select aliases to the physical memory
 // with different cache semantic. Clearing them converts the address to
 // physical memory as seen by ARM.
-#define BCM2708_BUS_TO_PHYSICAL(x)			(x & ~BCM2708_VIDEO_CORE_UNCACHED)
+#define BCM2835_BUS_TO_PHYSICAL(x)			(x & ~BCM2835_VIDEO_CORE_UNCACHED)
 
 
 #define ST_BASE			0x3000
@@ -57,7 +57,7 @@
 #define DMA_BASE		0x7000
 	// DMA Controller, sec 4.2, page 39
 #define ARM_BASE		0xB000
-	// BCM2708 ARM Control Block, sec 7.5, page 112
+	// BCM2835 ARM Control Block, sec 7.5, page 112
 #define PM_BASE			0x100000
 	// Power Management, Reset controller and Watchdog registers
 #define GPIO_BASE		0x200000
@@ -89,10 +89,10 @@
 #define VECT_BASE 0xFFFF0000
 #define VECT_SIZE SIZE_4K
 
-#define DEVICE_BASE	BCM2708_PERIPHERAL_BASE
+#define DEVICE_BASE	BCM2835_PERIPHERAL_BASE
 #define DEVICE_SIZE	0xFFFFFF
 
-#define SDRAM_BASE		BCM2708_SDRAM_BASE
+#define SDRAM_BASE		BCM2835_SDRAM_BASE
 #define SDRAM_SIZE		0x4000000
 	// 64Mb
 
@@ -149,4 +149,4 @@
 
 #define ARM_MAILBOX_CHANNEL_FRAMEBUFFER		1
 
-#endif /* __PLATFORM_BCM2708_H */
+#endif /* __PLATFORM_BCM2835_H */

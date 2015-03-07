@@ -13,15 +13,15 @@
 #include "arch_mailbox.h"
 
 #include "arch_cpu.h"
-#include "bcm2708.h"
+#include "bcm2835.h"
 
 
-class ArchMailboxArmBCM2708 final : public ArchMailbox {
+class ArchMailboxArmBCM2835 final : public ArchMailbox {
 public:
-							ArchMailboxArmBCM2708(addr_t base)
+							ArchMailboxArmBCM2835(addr_t base)
 								:
 								ArchMailbox(base) {}
-							~ArchMailboxArmBCM2708() {}
+							~ArchMailboxArmBCM2835() {}
 
 virtual status_t			Write(uint8 channel, uint32 value) override;
 virtual status_t			Read(uint8 channel, uint32& value) override;
@@ -34,14 +34,14 @@ private:
 
 
 extern "C" ArchMailbox*
-arch_get_mailbox_arm_bcm2708(addr_t base)
+arch_get_mailbox_arm_bcm2835(addr_t base)
 {
-	return new ArchMailboxArmBCM2708(base);
+	return new ArchMailboxArmBCM2835(base);
 }
 
 
 status_t
-ArchMailboxArmBCM2708::Write(uint8 channel, uint32 value)
+ArchMailboxArmBCM2835::Write(uint8 channel, uint32 value)
 {
 	// We have to wait for the mailbox to drain if it is marked full.
 	while ((RegisterRead(ARM_MAILBOX_STATUS) & ARM_MAILBOX_FULL) != 0)
@@ -54,7 +54,7 @@ ArchMailboxArmBCM2708::Write(uint8 channel, uint32 value)
 
 
 status_t
-ArchMailboxArmBCM2708::Read(uint8 channel, uint32& value)
+ArchMailboxArmBCM2835::Read(uint8 channel, uint32& value)
 {
 	while (true) {
 		// Wait for something to arrive in the mailbox.
@@ -76,21 +76,21 @@ ArchMailboxArmBCM2708::Read(uint8 channel, uint32& value)
 
 
 inline auto&
-ArchMailboxArmBCM2708::GetRegister(unsigned reg)
+ArchMailboxArmBCM2835::GetRegister(unsigned reg)
 {
 	auto addr = fBase + ARM_CTRL_0_MAILBOX_BASE + reg;
 	return *reinterpret_cast<std::atomic<uint32_t>*>(addr);
 }
 
 inline uint32
-ArchMailboxArmBCM2708::RegisterRead(addr_t reg)
+ArchMailboxArmBCM2835::RegisterRead(addr_t reg)
 {
 	return GetRegister(reg).load(std::memory_order_acquire);
 }
 
 
 inline void
-ArchMailboxArmBCM2708::RegisterWrite(addr_t reg, uint32 value)
+ArchMailboxArmBCM2835::RegisterWrite(addr_t reg, uint32 value)
 {
 	GetRegister(reg).store(value, std::memory_order_release);
 }

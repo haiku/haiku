@@ -18,9 +18,9 @@ ArchMailbox *gMailbox = NULL;
 extern "C" status_t
 arch_mailbox_init()
 {
-	#if defined(BOARD_CPU_BCM2708)
-	extern ArchMailbox *arch_get_mailbox_arm_bcm2708(addr_t base);
-	gMailbox = arch_get_mailbox_arm_bcm2708(DEVICE_BASE);
+	#if defined(BOARD_CPU_BCM2835) || defined(BOARD_CPU_BCM2836)
+	extern ArchMailbox *arch_get_mailbox_arm_bcm2835(addr_t base);
+	gMailbox = arch_get_mailbox_arm_bcm2835(DEVICE_BASE);
 	#endif
 	return B_OK;
 }

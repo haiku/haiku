@@ -12,9 +12,9 @@
 #define BOARD_NAME_PRETTY "Raspberry Pi"
 
 #define BOARD_CPU_TYPE_ARM6 1
-#define BOARD_CPU_BCM2708 1
+#define BOARD_CPU_BCM2835 1
 
-#include <arch/arm/bcm2708.h>
+#include <arch/arm/bcm2825.h>
 
 // UART Settings
 #define BOARD_UART_AMBA_PL011 1

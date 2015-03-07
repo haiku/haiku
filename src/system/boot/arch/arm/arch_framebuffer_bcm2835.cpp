@@ -11,7 +11,7 @@
 
 #include "arch_framebuffer.h"
 
-#include <arch/arm/bcm2708.h>
+#include <arch/arm/bcm2835.h>
 #include <arch/cpu.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
@@ -53,11 +53,11 @@ struct framebuffer_config {
 static framebuffer_config sFramebufferConfig __attribute__((aligned(16)));
 
 
-class ArchFBArmBCM2708 : public ArchFramebuffer {
+class ArchFBArmBCM2835 : public ArchFramebuffer {
 public:
-							ArchFBArmBCM2708(addr_t base)
+							ArchFBArmBCM2835(addr_t base)
 								: ArchFramebuffer(base) {}
-							~ArchFBArmBCM2708() {}
+							~ArchFBArmBCM2835() {}
 
 virtual	status_t			Init();
 virtual	status_t			Probe();
@@ -67,28 +67,28 @@ virtual	status_t			SetVideoMode(int width, int height, int depth);
 
 
 extern "C" ArchFramebuffer*
-arch_get_fb_arm_bcm2708(addr_t base)
+arch_get_fb_arm_bcm2835(addr_t base)
 {
-    return new ArchFBArmBCM2708(base);
+    return new ArchFBArmBCM2835(base);
 }
 
 
 status_t
-ArchFBArmBCM2708::Init()
-{
-	return B_OK;
-}
-
-
-status_t
-ArchFBArmBCM2708::Probe()
+ArchFBArmBCM2835::Init()
 {
 	return B_OK;
 }
 
 
 status_t
-ArchFBArmBCM2708::SetDefaultMode()
+ArchFBArmBCM2835::Probe()
+{
+	return B_OK;
+}
+
+
+status_t
+ArchFBArmBCM2835::SetDefaultMode()
 {
 	status_t result;
 	do {
@@ -100,7 +100,7 @@ ArchFBArmBCM2708::SetDefaultMode()
 
 
 status_t
-ArchFBArmBCM2708::SetVideoMode(int width, int height, int depth)
+ArchFBArmBCM2835::SetVideoMode(int width, int height, int depth)
 {
 	//debug_assert(((uint32)&sFramebufferConfig & 0x0f) == 0);
 
@@ -124,7 +124,7 @@ ArchFBArmBCM2708::SetVideoMode(int width, int height, int depth)
 
 // TODO: arch_mailbox calls!
 //	status_t result = write_mailbox(ARM_MAILBOX_CHANNEL_FRAMEBUFFER,
-//		(uint32)&sFramebufferConfig | BCM2708_VIDEO_CORE_L2_COHERENT);
+//		(uint32)&sFramebufferConfig | BCM2835_VIDEO_CORE_L2_COHERENT);
 //	if (result != B_OK)
 //		return result;
 
@@ -159,7 +159,7 @@ ArchFBArmBCM2708::SetVideoMode(int width, int height, int depth)
 	//		* sFramebufferConfig.height);
 
 	fPhysicalBase
-		= BCM2708_BUS_TO_PHYSICAL(sFramebufferConfig.frame_buffer_address);
+		= BCM2835_BUS_TO_PHYSICAL(sFramebufferConfig.frame_buffer_address);
 	fSize = sFramebufferConfig.screen_size;
 
 	// TODO: kDefaultPageFlags
