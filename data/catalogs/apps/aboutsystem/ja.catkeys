@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	3528201306
+1	japanese	x-vnd.Haiku-About	1095433662
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint の著者たち. All rights reserved.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n
@@ -7,7 +7,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyrigh
 %d MiB total	AboutView		合計 %d MiB
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (プロジェクト創立者)\n\n
 %d MiB used (%d%%)	AboutView		%d MiB 使用中 (%d%%)
-Website, marketing & documentation:\n	AboutView		ウェブサイト、広報 & ドキュメント:\n
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		以下の GNU プロジェクトからのソフトウェアを含んでいます。それらは GPL および LGPL ライセンスです。\nGNU C Library、GNU coretools、diffutils、findutils、sharutils、gawk、bison、m4、make、wget、ncurses、termcap、Bourne Again Shell\nCopyright © The Free Software Foundation.
 AboutSystem	System name		このシステムについて
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe他.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. All rights reserved.
@@ -65,6 +65,7 @@ Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 19
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center LtdおよびClark Cooper.
 Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 Intel Corporation. All rights reserved.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2014 Fabrice Bellard ほか
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
 The BeGeistert team\n	AboutView		BeGeistert チーム\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Auckland 大学 および Christof Lutteroth\n\n

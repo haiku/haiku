@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	2051756236
+1	russian	x-vnd.Haiku-About	372142674
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 Авторы Gutenprint.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 Ralink (firmware)	AboutWindow		Ralink (прошивка)
@@ -6,7 +6,6 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Все �
 %d MiB total	AboutView		Всего %d МБ
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
 %d MiB used (%d%%)	AboutView		%d МБ использовано (%d%%)
-Website, marketing & documentation:\n	AboutView		Веб-сайт, маркетинг и документация:\n
 AboutSystem	System name		О системе
 Copyright © 2003 Peter Hanappe and others.	AboutView		Все права защищены © 2003 Peter Hanappe и другие.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Все права защищены © 1994-1997 Mark Kilgard.

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	235954604
+1	hungarian	x-vnd.Haiku-Terminal	2090807552
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -33,7 +33,9 @@ Increase	Terminal TermWindow		Növelés
 Settings	Terminal TermWindow		Beállítások
 Window size	Terminal TermWindow		Ablak mérete
 Selected text	Terminal AppearancePrefView		Kijelölt szöveg
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tA jelenlegi folyamat munka mappája az aktuális fülön.\n\t\t\tOpcionálisan megadható a maximális útvonal-elemek száma.\n\t\t\tPéldául '%2d' a legutolsó kettő elem.\n\t%T\t-\tA Terminal neve az aktuális nyelven.\n\t%e\t-\tA jelenlegi fül kódolása. UTF-8 esetén nem látszik.\n\t%i\t-\tAz ablak sorszáma.\n\t%p\t-\tAz aktív folyamat neve az aktuális fülön.\n\t%t\t-\tA jelenlegi fül címe.
 Find	Terminal FindWindow		Keresés
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Minta alapján megadható az ablak cím. Az alábbi behelyettesítések használhatóak:
 Appearance	Terminal PrefWindow		Megjelenés
 Tab title:	Terminal AppearancePrefView		Lap címe:
 OK	Terminal SetTitleWindow		Rendben
@@ -76,6 +78,7 @@ Midnight	Terminal colors scheme		Éjfél
 Decrease	Terminal TermWindow		Csökkentés
 Default	Terminal colors scheme		Eredeti
 Create link here	Terminal TermView		Hivatkozás létrehozása
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Minta alapján megadható a fül cím. Az alábbi behelyettesítések használhatóak:
 Close	Terminal TermWindow		Bezárás
 Text	Terminal AppearancePrefView		Szöveg
 Clear all	Terminal TermWindow		Összes törlése

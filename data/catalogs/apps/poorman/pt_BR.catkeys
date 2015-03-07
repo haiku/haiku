@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PoorMan	3296382959
+1	portuguese (brazil)	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		Local do sítio web
 Error Server	PoorMan		Erro do Servidor
 Settings…	PoorMan		Definições…
@@ -12,6 +12,7 @@ PoorMan settings	PoorMan		Definições do Pobre Homem
 Clear hit counter	PoorMan		Limpar contador de visitas
 Copy	PoorMan		Copiar
 Max. simultaneous connections:	PoorMan		Conexões simultâneas máximas:
+Create public_html	PoorMan		Criar public_html
 Start page:	PoorMan		Página inicial:
 done.\n	PoorMan		concluído.\n
 Create	PoorMan		Criar
@@ -33,6 +34,7 @@ Log to console	PoorMan		Registrar no console
 Directory: (none)	PoorMan		Diretório: (nenhum)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor escolha a pasta a ser publicada na web.\n\nÉ possível que o Pobre Homem crie um arquivo padrão \"public_html\" na sua pasta home.\nOu selecione um de suas próprias pastas.
 Log To Console	PoorMan		Registrar no Console
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, um{# conexão} outro{# conexões}}
 Connections	PoorMan		Conexões
 Status: Running	PoorMan		Status: Executando
 Controls	PoorMan		Controles

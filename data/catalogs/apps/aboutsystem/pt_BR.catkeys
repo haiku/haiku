@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-About	3528201306
+1	portuguese (brazil)	x-vnd.Haiku-About	1095433662
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Direitos autorais © 1999-2010 pelos autores do Gutenprint. Todos os direitos reservados.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Direitos autorais © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e seu kernel NewOS)\n
@@ -7,7 +7,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Direitos
 %d MiB total	AboutView		%d MB total
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projeto)\n\n
 %d MiB used (%d%%)	AboutView		%d MiB usados (%d%%)
-Website, marketing & documentation:\n	AboutView		Website, marketing e documentação:\n
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Contém software do Projeto GNU, lançado sob as licenças GPL e LGPL:\nBiblioteca GNU C, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nDireitos autorais © The Free Software Foundation.
 AboutSystem	System name		Sobre o Sistema
 Copyright © 2003 Peter Hanappe and others.	AboutView		Direitos autorais © 2003 Peter Hanappe e outros.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Direitos autorais © 1994-1997 Mark Kilgard. Todos os direitos reservados.
@@ -65,6 +65,7 @@ Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Direitos autora
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Direitos autorais © 1998-2000 Thai Open Source Software Center Ltd e Clark Cooper.
 Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Direitos autorais © 2004-2005 Intel Corporation. Todos os direitos reservados.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Direitos autorais © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Direitos autorais © 2000-20014 Fabrice Bellard, e outros.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Direitos autorais © 1999-2007 Michael C. Ring. Todos os direitos reservados.
 The BeGeistert team\n	AboutView		A equipe BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		A Universidade de Auckland e Christof Lutteroth\n\n

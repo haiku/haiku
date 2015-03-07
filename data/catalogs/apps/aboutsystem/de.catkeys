@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-About	3528201306
+1	german	x-vnd.Haiku-About	1095433662
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 durch die Autoren von Gutenprint. Alle Rechte vorbehalten.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm und Werner Lemberg.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (und seinen NewOS-Kernel)\n
@@ -7,7 +7,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyrigh
 %d MiB total	AboutView		%d MiB gesamt
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (Projektgründer)\n\n
 %d MiB used (%d%%)	AboutView		%d MiB benutzt (%d%%)
-Website, marketing & documentation:\n	AboutView		Webseite, Marketing & Dokumentation:\n
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Enthält Software des GNU-Projekts, die unter den GPL- und LGPL-Lizenzen veröffentlicht wurde:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © Free Software Foundation.
 AboutSystem	System name		Über Haiku
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe und andere.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Alle Rechte vorbehalten.
@@ -65,6 +65,7 @@ Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 19
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd und Clark Cooper.
 Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 Intel Corporation. Alle Rechte vorbehalten.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2014 Fabrice Bellard, et al.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Alle Rechte vorbehalten.
 The BeGeistert team\n	AboutView		Das BeGeistert-Team\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Die Universität von Auckland und Christof Lutteroth\n\n
