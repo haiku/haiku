@@ -8,12 +8,14 @@
  *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
-#include <atomic>
 
 #include "arch_mailbox.h"
 
-#include "arch_cpu.h"
+#include <atomic>
+#include <board_config.h>
 #include <arch/arm/bcm283X.h>
+
+#include "arch_cpu.h"
 
 
 class ArchMailboxArmBCM2835 final : public ArchMailbox {

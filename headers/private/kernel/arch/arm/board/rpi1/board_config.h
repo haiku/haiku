@@ -5,8 +5,8 @@
  * Authors:
  *		Alexander von Gluck, kallisti5@unixzen.com
  */
-#ifndef _BOARD_RASPBERRY_PI_BOARD_CONFIG_H
-#define _BOARD_RASPBERRY_PI_BOARD_CONFIG_H
+#ifndef _BOARD_RPI1_BOARD_CONFIG_H
+#define _BOARD_RPI1_BOARD_CONFIG_H
 
 
 #define BOARD_NAME_PRETTY "Raspberry Pi"
@@ -32,4 +32,4 @@
 	/* 3Mhz */
 
 
-#endif /* _BOARD_RASPBERRY_PI_BOARD_CONFIG_H */
+#endif /* _BOARD_RPI1_BOARD_CONFIG_H */

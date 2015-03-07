@@ -483,7 +483,8 @@ supportedTargetArchs="
 	"
 supportedTargetBoards="
 	beagle
-	raspberry_pi
+	rpi1
+	rpi2
 	verdex
 	"
 
