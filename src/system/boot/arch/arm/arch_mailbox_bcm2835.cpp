@@ -13,7 +13,7 @@
 #include "arch_mailbox.h"
 
 #include "arch_cpu.h"
-#include "bcm2835.h"
+#include <arch/arm/bcm283X.h>
 
 
 class ArchMailboxArmBCM2835 final : public ArchMailbox {

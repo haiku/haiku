@@ -11,7 +11,7 @@
 
 #include "arch_framebuffer.h"
 
-#include <arch/arm/bcm2835.h>
+#include <arch/arm/bcm283X.h>
 #include <arch/cpu.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
@@ -124,7 +124,7 @@ ArchFBArmBCM2835::SetVideoMode(int width, int height, int depth)
 
 // TODO: arch_mailbox calls!
 //	status_t result = write_mailbox(ARM_MAILBOX_CHANNEL_FRAMEBUFFER,
-//		(uint32)&sFramebufferConfig | BCM2835_VIDEO_CORE_L2_COHERENT);
+//		(uint32)&sFramebufferConfig | BCM283X_VIDEO_CORE_L2_COHERENT);
 //	if (result != B_OK)
 //		return result;
 
@@ -159,7 +159,7 @@ ArchFBArmBCM2835::SetVideoMode(int width, int height, int depth)
 	//		* sFramebufferConfig.height);
 
 	fPhysicalBase
-		= BCM2835_BUS_TO_PHYSICAL(sFramebufferConfig.frame_buffer_address);
+		= BCM283X_BUS_TO_PHYSICAL(sFramebufferConfig.frame_buffer_address);
 	fSize = sFramebufferConfig.screen_size;
 
 	// TODO: kDefaultPageFlags

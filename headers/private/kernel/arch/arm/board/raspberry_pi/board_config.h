@@ -14,7 +14,7 @@
 #define BOARD_CPU_TYPE_ARM6 1
 #define BOARD_CPU_BCM2835 1
 
-#include <arch/arm/bcm2825.h>
+#include <arch/arm/bcm283X.h>
 
 // UART Settings
 #define BOARD_UART_AMBA_PL011 1

@@ -111,7 +111,7 @@ platform_init_video(void)
 	#elif defined(BOARD_CPU_BCM2835) || defined(BOARD_CPU_BCM2836)
 		extern ArchFramebuffer *arch_get_fb_arm_bcm2835(addr_t base);
 		// BCM2835/BCM2836 gets their framebuffer base from a Mailbox
-		gFramebuffer = arch_get_fb_arm_bcm2825(0x0);
+		gFramebuffer = arch_get_fb_arm_bcm2835(0x0);
 	#elif defined(BOARD_CPU_OMAP3)
 		extern ArchFramebuffer *arch_get_fb_arm_omap3(addr_t base);
 		gFramebuffer = arch_get_fb_arm_omap3(FB_BASE);

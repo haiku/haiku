@@ -11,7 +11,7 @@
 
 #include <SupportDefs.h>
 
-#include <arch/arm/bcm2835.h>
+#include <arch/arm/bcm283X.h>
 
 
 #define GPIO_IN		0
