@@ -88,8 +88,7 @@ serial_cleanup(void)
 extern "C" void
 serial_init(void)
 {
-	gUART = arch_get_uart_pl011(gPeripheralBase + BOARD_UART_DEBUG,
-		BOARD_UART_CLOCK);
+	gUART = arch_get_uart_pl011(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
 	gUART->InitEarly();
 	gUART->InitPort(9600);
 

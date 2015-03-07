@@ -17,7 +17,7 @@
 #include <arch/arm/bcm283X.h>
 
 // UART Settings
-#define BOARD_UART_AMBA_PL011 1
+#define BOARD_UART_PL011 1
 
 #define BOARD_UART1_BASE UART0_BASE
 	// PL011 UART
@@ -26,7 +26,7 @@
 #define BOARD_UART3_BASE 0
 	// N/A
 
-#define BOARD_UART_DEBUG BOARD_UART1_BASE
+#define BOARD_UART_DEBUG DEVICE_BASE + BOARD_UART1_BASE
 
 #define BOARD_UART_CLOCK 3000000
 	/* 3Mhz */

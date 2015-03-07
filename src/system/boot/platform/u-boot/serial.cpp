@@ -10,6 +10,7 @@
 #include "serial.h"
 
 #include <debug_uart_8250.h>
+#include <arch_uart_pl011.h>
 #include <board_config.h>
 #include <boot/platform.h>
 #include <arch/cpu.h>
@@ -83,10 +84,8 @@ extern "C" void
 serial_enable(void)
 {
 	/* should already be initialized by U-Boot */
-	/*
 	gUART->InitEarly();
-	gUART->InitPort(9600);
-	*/
+	gUART->InitPort(115200);
 	sSerialEnabled++;
 }
 
@@ -113,8 +112,13 @@ serial_init(const void *fdt)
 
 #ifdef BOARD_UART_DEBUG
 	// fallback to hardcoded board UART
-	if (gUART == NULL)
+	if (gUART == NULL) {
+		#if defined(BOARD_UART_PL011)
+		gUART = arch_get_uart_pl011(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
+		#else
 		gUART = arch_get_uart_8250(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
+		#endif
+	}
 #endif
 
 	if (gUART == NULL)
