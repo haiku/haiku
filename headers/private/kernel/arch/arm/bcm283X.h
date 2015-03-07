@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Haiku Inc.
+ * Copyright (c) 2012-2015 Haiku, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files
@@ -38,7 +38,14 @@
 
 // Section 1.2.2
 #define BCM283X_SDRAM_BASE		0x00000000
+#if defined(BOARD_CPU_BCM2835)
 #define BCM283X_PERIPHERAL_BASE	0x20000000
+#elif defined(BOARD_CPU_BCM2836)
+#define BCM283X_PERIPHERAL_BASE	0x3f000000
+#else
+#error Unknown BCM283X!
+#endif
+
 
 // Added to physical addresses to select the different cache behaviours
 #define BCM283X_VIDEO_CORE_L1_L2_CACHED		(0 << 30)
