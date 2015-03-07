@@ -10,7 +10,9 @@
 #include "serial.h"
 
 #include <debug_uart_8250.h>
+#if defined(__ARM__)
 #include <arch_uart_pl011.h>
+#endif
 #include <board_config.h>
 #include <boot/platform.h>
 #include <arch/cpu.h>
