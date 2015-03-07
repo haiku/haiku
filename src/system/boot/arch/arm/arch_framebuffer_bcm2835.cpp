@@ -11,7 +11,6 @@
 
 #include "arch_framebuffer.h"
 
-#include <board_config.h>
 #include <arch/arm/bcm283X.h>
 #include <arch/cpu.h>
 #include <boot/stage2.h>

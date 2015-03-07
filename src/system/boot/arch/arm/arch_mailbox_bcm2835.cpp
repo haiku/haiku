@@ -12,7 +12,6 @@
 #include "arch_mailbox.h"
 
 #include <atomic>
-#include <board_config.h>
 #include <arch/arm/bcm283X.h>
 
 #include "arch_cpu.h"

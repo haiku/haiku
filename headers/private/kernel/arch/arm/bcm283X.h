@@ -27,8 +27,10 @@
 #define __PLATFORM_BCM283X_H
 
 
-#define SIZE_4K 0x00001000
+#include <board_config.h>
 
+
+#define SIZE_4K 0x00001000
 
 /*
  * Found in:
