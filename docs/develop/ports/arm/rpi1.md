@@ -61,7 +61,7 @@ The Raspberry Pi SD card generally uses the MBR file system layout below. Partit
 
 These will be condensed and automated long-term via uEnv.txt :-)
 
-* `fatload mmc 0 ${fdt_addr_r} bcm2836-rpi-2-b.dtb`
+* `fatload mmc 0 ${fdt_addr_r} bcm2835-rpi-b.dtb`
 * `fdt addr ${fdt_addr_r}`
 * `fatload mmc 0 ${ramdisk_addr_r} haiku-floppyboot.tgz.ub`
 * `fatload mmc 0 ${kernel_addr_r} haiku_loader_linux.ub`
