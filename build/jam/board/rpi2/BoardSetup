@@ -12,38 +12,49 @@ HAIKU_BOARD_LOADER_ENTRY_RAW = $(HAIKU_BOARD_LOADER_BASE) ;
 HAIKU_BOARD_LOADER_ENTRY_NBSD = `printf \"obase=16;ibase=16;8 + %x\\n\" $(HAIKU_BOARD_LOADER_BASE)|bc` ;
 HAIKU_BOARD_LOADER_ENTRY_LINUX = `printf \"obase=16;ibase=16;10 + %x\\n\" $(HAIKU_BOARD_LOADER_BASE)|bc` ;
 
-HAIKU_BOARD_BOOT_ARCHIVE_BASE = 0x02100000 ;
-HAIKU_BOARD_BOOT_ARCHIVE_SIZE = 0x00400000 ;
-	# TODO: needs to be configured in the config.txt
-	#	ramfsfile=haiku-floppyboot.tgz and ramfsaddr=x
-
-#
-# Flash image
-#
-
-# N/A for Raspberry Pi
-
 #
 # mmc/SD image
 #
 
-HAIKU_BOARD_FIRMWARE_URL = http://github.com/raspberrypi/firmware/raw/master/boot/ ;
+# u-boot image
+HAIKU_BOARD_UBOOT_IMAGE_URL = https://github.com/kallisti5/rpi-uboot-bins/raw/master/rpi2 ;
+ubootFile = [ DownloadFile u-boot.bin : $(HAIKU_BOARD_UBOOT_IMAGE_URL)/u-boot.bin ] ;
+configFile = [ DownloadFile config.txt : $(HAIKU_BOARD_UBOOT_IMAGE_URL)/config.txt ] ;
+
+# Raspberry Pi foundation loader
+HAIKU_BOARD_FIRMWARE_URL = https://github.com/raspberrypi/firmware/raw/master/boot ;
+bootcodeFile = [ DownloadFile bootcode.bin : $(HAIKU_BOARD_FIRMWARE_URL)/bootcode.bin ] ;
+startFile = [ DownloadFile start.elf : $(HAIKU_BOARD_FIRMWARE_URL)/start.elf ] ;
+licenseFile = [ DownloadFile LICENCE.broadcom : $(HAIKU_BOARD_FIRMWARE_URL)/LICENCE.broadcom ] ;
+# TODO: Find rpi2 FDT, bring in-tree
+fdtFile = [ DownloadFile bcm2836-rpi-2-b.dtb : $(HAIKU_BOARD_FIRMWARE_URL)/bcm2709-rpi-2-b.dtb ] ;
+
 HAIKU_BOARD_FIRMWARE_FILES =
-	bootcode.bin
-	loader.bin
-	arm224_start.elf # start.elf
-	LICENSE.broadcom
+	$(bootcodeFile)
+	$(startFile)
+	$(licenseFile)
+	$(fdtFile)
 ;
 
-# in MB
+HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = boot.scr ;
+HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
+fatload mmc 0 ${fdt_addr_r} bcm2836-rpi-2-b.dtb \
+    fdt addr ${fdt_addr_r} \
+    fatload mmc 0 ${ramdisk_addr_r} haiku-floppyboot.tgz.ub \
+    fatload mmc 0 ${kernel_addr_r} haiku_loader_linux.ub \
+    bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}" ;
+
 HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
-HAIKU_BOARD_SDIMAGE_FAT_FILES =
+HAIKU_BOARD_SDIMAGE_FILES = 
 	$(HAIKU_BOARD_FIRMWARE_FILES)
-	haiku_loader
+	$(configFile)
+	$(ubootFile)
+	haiku_loader_linux.ub
+	haiku-floppyboot.tgz.ub
+	$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME)
 ;
 
-# in MB
-HAIKU_BOARD_SDIMAGE_SIZE = 256 ;
+HAIKU_BOARD_SDIMAGE_SIZE = 128 ;
 
 #
 # gcc flags for the specific cpu
