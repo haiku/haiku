@@ -34,6 +34,7 @@ mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags);
 extern "C" bool
 mmu_get_virtual_mapping(addr_t virtualAddress, phys_addr_t *_physicalAddress);
 
+extern ArchMailbox *gMailbox;
 
 struct framebuffer_config {
 	uint32	width;
@@ -122,16 +123,15 @@ ArchFBArmBCM2835::SetVideoMode(int width, int height, int depth)
 			sFramebufferConfig.color_map[i] = 0x1111 * i;
 	}
 
-// TODO: arch_mailbox calls!
-//	status_t result = write_mailbox(ARM_MAILBOX_CHANNEL_FRAMEBUFFER,
-//		(uint32)&sFramebufferConfig | BCM283X_VIDEO_CORE_L2_COHERENT);
-//	if (result != B_OK)
-//		return result;
+	status_t result = gMailbox->Write(ARM_MAILBOX_CHANNEL_FRAMEBUFFER,
+		(uint32)&sFramebufferConfig | BCM283X_VIDEO_CORE_L2_COHERENT);
+	if (result != B_OK)
+		return result;
 
 	uint32 value;
-//	result = read_mailbox(ARM_MAILBOX_CHANNEL_FRAMEBUFFER, value);
-//	if (result != B_OK)
-//		return result;
+	result = gMailbox->Read(ARM_MAILBOX_CHANNEL_FRAMEBUFFER, value);
+	if (result != B_OK)
+		return result;
 
 	if (value != 0) {
 		dprintf("failed to configure framebuffer: %" B_PRIx32 "\n", value);
