@@ -259,15 +259,15 @@ MediaAddonServer::ReadyToRun()
 	if (result != B_OK) {
 		fprintf(stderr, "Can't register system time source : %s\n",
 			strerror(result));
-		debugger("Can't register system time source");
+		ERROR("Can't register system time source");
 	}
 
 	if (fSystemTimeSource->ID() != NODE_SYSTEM_TIMESOURCE_ID)
-		debugger("System time source got wrong node ID");
+		ERROR("System time source got wrong node ID");
 	media_node node = fSystemTimeSource->Node();
 	result = MediaRosterEx(fMediaRoster)->SetNode(SYSTEM_TIME_SOURCE, &node);
 	if (result != B_OK)
-		debugger("Can't setup system time source as default");
+		ERROR("Can't setup system time source as default");
 
 	// During startup, first all add-ons are loaded, then all
 	// nodes (flavors) representing physical inputs and outputs
