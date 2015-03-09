@@ -1,7 +1,7 @@
 /*
  * Copyright 2004 DarkWyrm <darkwyrm@earthlink.net>
  * Copyright 2013 FeemanLou
- * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2015 Haiku, Inc. All rights reserved.
  *
  * Distributed under the terms of the MIT license.
  *
@@ -391,9 +391,9 @@ SpinnerArrow::SpinnerArrow(BRect frame, const char* name,
 	fIsMouseOver(false),
 	fRepeatDelay(100000)
 {
-	rgb_color backgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetViewColor(backgroundColor);
-	SetLowColor(backgroundColor);
+	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	SetViewColor(bgColor);
+	SetLowColor(bgColor);
 }
 
 
@@ -429,54 +429,43 @@ SpinnerArrow::Draw(BRect updateRect)
 
 	BView::Draw(updateRect);
 
-	float tint;
+	float fgTint;
 	if (!fIsEnabled)
-		tint = B_DARKEN_1_TINT;
+		fgTint = B_DARKEN_1_TINT;
 	else if (fIsMouseDown)
-		tint = B_DARKEN_MAX_TINT;
-	else if (fIsMouseOver)
-		tint = B_DARKEN_3_TINT;
+		fgTint = B_DARKEN_MAX_TINT;
 	else
-		tint = B_DARKEN_2_TINT;
+		fgTint = B_DARKEN_3_TINT;
 
-	rgb_color backgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetHighColor(tint_color(backgroundColor, tint));
+	float bgTint;
+	if (fIsEnabled && fIsMouseOver)
+		bgTint = B_DARKEN_1_TINT;
+	else
+		bgTint = B_NO_TINT;
 
-	// draw a gradient background
-	BGradientLinear gradient;
-	gradient.AddColor(tint_color(backgroundColor, B_LIGHTEN_2_TINT), 0);
-	gradient.AddColor(backgroundColor, 255);
-	gradient.SetStart(rect.LeftTop());
-	gradient.SetEnd(rect.LeftBottom());
-	FillRect(rect, gradient);
+	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-	// draw the border
-	StrokeRect(rect);
+	uint32 borders = be_control_look->B_TOP_BORDER
+		| be_control_look->B_BOTTOM_BORDER;
+	if (fArrowDirection == ARROW_UP)
+		borders |= be_control_look->B_LEFT_BORDER;
+	else
+		borders |= be_control_look->B_RIGHT_BORDER;
+
+	// draw the button
+	be_control_look->DrawButtonFrame(this, rect, updateRect,
+		tint_color(bgColor, fgTint), bgColor, 0, borders);
+	be_control_look->DrawButtonBackground(this, rect, updateRect,
+		tint_color(bgColor, bgTint), 0, borders);
+
+	rect.InsetBy(0.0f, 1.0f);
+	uint32 arrowDirection = fArrowDirection == ARROW_UP
+		? be_control_look->B_UP_ARROW
+		: be_control_look->B_DOWN_ARROW;
 
 	// draw the arrow
-	BPoint point1;
-	BPoint point2;
-	BPoint point3;
-	if (fArrowDirection == ARROW_UP) {
-		point1.x = ceilf(rect.Width() / 2);
-		point1.y = rect.top + 1.0f;
-
-		point2.x = point1.x - 3.0f;
-		point2.y = rect.bottom - 2.0f;
-
-		point3.x = point1.x + 3.0f;
-		point3.y = rect.bottom - 2.0f;
-	} else {
-		point1.x = ceilf(rect.Width() / 2);
-		point1.y = rect.bottom - 1.0f;
-
-		point2.x = point1.x - 3.0f;
-		point2.y = rect.top + 2.0f;
-
-		point3.x = point1.x + 3.0f;
-		point3.y = rect.top + 2.0f;
-	}
-	FillTriangle(point1, point2, point3);
+	be_control_look->DrawArrowShape(this, rect, updateRect, bgColor,
+		arrowDirection, 0, fgTint);
 }
 
 
@@ -585,9 +574,9 @@ SpinnerTextView::SpinnerTextView(BRect rect, BRect textRect)
 		B_WILL_DRAW | B_NAVIGABLE),
 	fParent(NULL)
 {
-	rgb_color backgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetViewColor(backgroundColor);
-	SetLowColor(backgroundColor);
+	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	SetViewColor(bgColor);
+	SetLowColor(bgColor);
 
 	SetAlignment(B_ALIGN_RIGHT);
 	for (uint32 c = 0; c <= 42; c++)
@@ -1640,9 +1629,9 @@ BSpinner::_DrawTextView(BRect updateRect)
 void
 BSpinner::_InitObject()
 {
-	rgb_color backgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetViewColor(backgroundColor);
-	SetLowColor(backgroundColor);
+	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	SetViewColor(bgColor);
+	SetLowColor(bgColor);
 
 	fAlignment = B_ALIGN_LEFT;
 	if (Label() != NULL) {
@@ -1664,24 +1653,22 @@ BSpinner::_InitObject()
 
 	rect.left = fDivider;
 	rect.InsetBy(kFrameMargin, kFrameMargin);
-	rect.right -= rect.Height();
+	rect.right -= rect.Height() * 2 + kFrameMargin + 1.0f;
 	BRect textRect(rect.OffsetToCopy(B_ORIGIN));
 
 	fTextView = new SpinnerTextView(rect, textRect);
 	AddChild(fTextView);
 
-	float halfHeight = rect.Height() / 2.0f;
+	rect.InsetBy(0.0f, -kFrameMargin);
 
-	rect.left = rect.right + kFrameMargin;
-	rect.right = rect.left + rect.Height();
-	rect.top -= 1.0f;
-	rect.bottom = rect.top + halfHeight;
+	rect.left = rect.right + kFrameMargin * 2;
+	rect.right = rect.left + rect.Height() - kFrameMargin * 2;
 
 	fIncrement = new SpinnerArrow(rect, "increment", ARROW_UP);
 	AddChild(fIncrement);
 
-	rect.bottom = fTextView->Frame().bottom;
-	rect.top = rect.bottom - halfHeight;
+	rect.left = rect.right + 1.0f;
+	rect.right = rect.left + rect.Height() - kFrameMargin * 2;
 
 	fDecrement = new SpinnerArrow(rect, "decrement", ARROW_DOWN);
 	AddChild(fDecrement);
@@ -1695,37 +1682,33 @@ BSpinner::_InitObject()
 void
 BSpinner::_LayoutTextView()
 {
-	BRect frame;
+	BRect rect;
 	if (fLayoutData->text_view_layout_item != NULL) {
-		frame = fLayoutData->text_view_layout_item->FrameInParent();
+		rect = fLayoutData->text_view_layout_item->FrameInParent();
 	} else {
-		frame = Bounds();
-		frame.left = fDivider;
+		rect = Bounds();
+		rect.left = fDivider;
 	}
-	frame.InsetBy(kFrameMargin, kFrameMargin);
-		// we are stroking the frame around the text view,
-		// which is 2 pixels wide
-	frame.right -= frame.Height();
+	rect.InsetBy(kFrameMargin, kFrameMargin);
+	rect.right -= rect.Height() * 2 + kFrameMargin + 1.0f;
 
-	fTextView->MoveTo(frame.left, frame.top);
-	fTextView->ResizeTo(frame.Width(), frame.Height());
-	fTextView->SetTextRect(frame.OffsetToCopy(B_ORIGIN));
+	fTextView->MoveTo(rect.left, rect.top);
+	fTextView->ResizeTo(rect.Width(), rect.Height());
+	fTextView->SetTextRect(rect.OffsetToCopy(B_ORIGIN));
 
-	float halfHeight = frame.Height() / 2;
+	rect.InsetBy(0.0f, -kFrameMargin);
 
-	frame.left = frame.right + kFrameMargin;
-	frame.right = frame.left + frame.Height();
-	frame.top -= 1;
-	frame.bottom = frame.top + halfHeight;
+	rect.left = rect.right + kFrameMargin * 2;
+	rect.right = rect.left + rect.Height() - kFrameMargin * 2;
 
-	fIncrement->ResizeTo(frame.Width(), frame.Height());
-	fIncrement->MoveTo(frame.LeftTop());
+	fIncrement->ResizeTo(rect.Width(), rect.Height());
+	fIncrement->MoveTo(rect.LeftTop());
 
-	frame.bottom = fTextView->Frame().bottom;
-	frame.top = frame.bottom - halfHeight;
+	rect.left = rect.right + 1.0f;
+	rect.right = rect.left + rect.Height() - kFrameMargin * 2;
 
-	fDecrement->ResizeTo(frame.Width(), frame.Height());
-	fDecrement->MoveTo(frame.LeftTop());
+	fDecrement->ResizeTo(rect.Width(), rect.Height());
+	fDecrement->MoveTo(rect.LeftTop());
 }
 
 
@@ -1763,7 +1746,7 @@ void
 BSpinner::_UpdateTextViewColors(bool enable)
 {
 	rgb_color textColor;
-	rgb_color backgroundColor;
+	rgb_color bgColor;
 	BFont font;
 
 	fTextView->GetFontAndColor(0, &font);
@@ -1778,14 +1761,14 @@ BSpinner::_UpdateTextViewColors(bool enable)
 	fTextView->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
 	if (enable)
-		backgroundColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+		bgColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 	else {
-		backgroundColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		bgColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			B_LIGHTEN_2_TINT);
 	}
 
-	fTextView->SetViewColor(backgroundColor);
-	fTextView->SetLowColor(backgroundColor);
+	fTextView->SetViewColor(bgColor);
+	fTextView->SetLowColor(bgColor);
 }
 
 
@@ -1832,7 +1815,7 @@ BSpinner::_ValidateLayoutData()
 		fTextView->StringWidth("99999")));
 
 	float textViewHeight = fTextView->LineHeight(0) + kFrameMargin * 2;
-	float textViewWidth = textWidth + textViewHeight;
+	float textViewWidth = textWidth + textViewHeight * 2;
 
 	fLayoutData->text_view_width = textViewWidth;
 	fLayoutData->text_view_height = textViewHeight;
