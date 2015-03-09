@@ -230,15 +230,15 @@ static property_info sProperties[] = {
 
 
 typedef enum {
-	ARROW_UP,
-	ARROW_DOWN
-} arrow_direction;
+	SPINNER_INCREMENT,
+	SPINNER_DECREMENT
+} spinner_direction;
 
 
 class SpinnerArrow : public BView {
 public:
 								SpinnerArrow(BRect frame, const char* name,
-									arrow_direction direction);
+									spinner_direction direction);
 	virtual						~SpinnerArrow();
 
 	virtual	void				AttachedToWindow();
@@ -256,7 +256,7 @@ private:
 			void				_DoneTracking(BPoint where);
 			void				_Track(BPoint where, uint32);
 
-			arrow_direction		fArrowDirection;
+			spinner_direction	fSpinnerDirection;
 			BSpinner*			fParent;
 			bool				fIsEnabled;
 			bool				fIsMouseDown;
@@ -381,10 +381,10 @@ struct BSpinner::LayoutData {
 
 
 SpinnerArrow::SpinnerArrow(BRect frame, const char* name,
-	arrow_direction direction)
+	spinner_direction direction)
 	:
 	BView(frame, name, B_FOLLOW_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW),
-	fArrowDirection(direction),
+	fSpinnerDirection(direction),
 	fParent(NULL),
 	fIsEnabled(true),
 	fIsMouseDown(false),
@@ -444,13 +444,19 @@ SpinnerArrow::Draw(BRect updateRect)
 		bgTint = B_NO_TINT;
 
 	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	if (bgColor.red + bgColor.green + bgColor.blue <= 128 * 3) {
+		// if dark background make the tint lighter
+		fgTint = 2.0f - fgTint;
+		bgTint = 2.0f - bgTint;
+	}
 
 	uint32 borders = be_control_look->B_TOP_BORDER
 		| be_control_look->B_BOTTOM_BORDER;
-	if (fArrowDirection == ARROW_UP)
-		borders |= be_control_look->B_LEFT_BORDER;
-	else
+
+	if (fSpinnerDirection == SPINNER_INCREMENT)
 		borders |= be_control_look->B_RIGHT_BORDER;
+	else
+		borders |= be_control_look->B_LEFT_BORDER;
 
 	// draw the button
 	be_control_look->DrawButtonFrame(this, rect, updateRect,
@@ -458,14 +464,28 @@ SpinnerArrow::Draw(BRect updateRect)
 	be_control_look->DrawButtonBackground(this, rect, updateRect,
 		tint_color(bgColor, bgTint), 0, borders);
 
-	rect.InsetBy(0.0f, 1.0f);
-	uint32 arrowDirection = fArrowDirection == ARROW_UP
-		? be_control_look->B_UP_ARROW
-		: be_control_look->B_DOWN_ARROW;
+	BFont font;
+	fParent->GetFont(&font);
+	float inset = floorf(font.Size() / 4);
+	rect.InsetBy(inset, inset);
 
-	// draw the arrow
-	be_control_look->DrawArrowShape(this, rect, updateRect, bgColor,
-		arrowDirection, 0, fgTint);
+	if (rect.IntegerWidth() % 2 != 0)
+		rect.right -= 1;
+
+	if (rect.IntegerHeight() % 2 != 0)
+		rect.bottom -= 1;
+
+	SetHighColor(tint_color(bgColor, fgTint));
+
+	// draw the +/-
+	float halfHeight = floorf(rect.Height() / 2);
+	StrokeLine(BPoint(rect.left, rect.top + halfHeight),
+		BPoint(rect.right, rect.top + halfHeight));
+	if (fSpinnerDirection == SPINNER_INCREMENT) {
+		float halfWidth = floorf(rect.Width() / 2);
+		StrokeLine(BPoint(rect.left + halfWidth, rect.top),
+			BPoint(rect.left + halfWidth, rect.bottom));
+	}
 }
 
 
@@ -543,7 +563,7 @@ SpinnerArrow::_Track(BPoint where, uint32)
 	}
 	fIsMouseDown = true;
 
-	double step = fArrowDirection == ARROW_UP
+	double step = fSpinnerDirection == SPINNER_INCREMENT
 		? fParent->Step()
 		: -fParent->Step();
 	double newValue = fParent->Value() + step;
@@ -1653,7 +1673,7 @@ BSpinner::_InitObject()
 
 	rect.left = fDivider;
 	rect.InsetBy(kFrameMargin, kFrameMargin);
-	rect.right -= rect.Height() * 2 + kFrameMargin + 1.0f;
+	rect.right -= rect.Height() * 2 + kFrameMargin * 2 + 1.0f;
 	BRect textRect(rect.OffsetToCopy(B_ORIGIN));
 
 	fTextView = new SpinnerTextView(rect, textRect);
@@ -1664,14 +1684,14 @@ BSpinner::_InitObject()
 	rect.left = rect.right + kFrameMargin * 2;
 	rect.right = rect.left + rect.Height() - kFrameMargin * 2;
 
-	fIncrement = new SpinnerArrow(rect, "increment", ARROW_UP);
-	AddChild(fIncrement);
+	fDecrement = new SpinnerArrow(rect, "decrement", SPINNER_DECREMENT);
+	AddChild(fDecrement);
 
 	rect.left = rect.right + 1.0f;
 	rect.right = rect.left + rect.Height() - kFrameMargin * 2;
 
-	fDecrement = new SpinnerArrow(rect, "decrement", ARROW_DOWN);
-	AddChild(fDecrement);
+	fIncrement = new SpinnerArrow(rect, "increment", SPINNER_INCREMENT);
+	AddChild(fIncrement);
 
 	uint32 navigableFlags = Flags() & B_NAVIGABLE;
 	if (navigableFlags != 0)
@@ -1690,7 +1710,7 @@ BSpinner::_LayoutTextView()
 		rect.left = fDivider;
 	}
 	rect.InsetBy(kFrameMargin, kFrameMargin);
-	rect.right -= rect.Height() * 2 + kFrameMargin + 1.0f;
+	rect.right -= rect.Height() * 2 + kFrameMargin * 2 + 1.0f;
 
 	fTextView->MoveTo(rect.left, rect.top);
 	fTextView->ResizeTo(rect.Width(), rect.Height());
@@ -1701,14 +1721,14 @@ BSpinner::_LayoutTextView()
 	rect.left = rect.right + kFrameMargin * 2;
 	rect.right = rect.left + rect.Height() - kFrameMargin * 2;
 
-	fIncrement->ResizeTo(rect.Width(), rect.Height());
-	fIncrement->MoveTo(rect.LeftTop());
+	fDecrement->ResizeTo(rect.Width(), rect.Height());
+	fDecrement->MoveTo(rect.LeftTop());
 
 	rect.left = rect.right + 1.0f;
 	rect.right = rect.left + rect.Height() - kFrameMargin * 2;
 
-	fDecrement->ResizeTo(rect.Width(), rect.Height());
-	fDecrement->MoveTo(rect.LeftTop());
+	fIncrement->ResizeTo(rect.Width(), rect.Height());
+	fIncrement->MoveTo(rect.LeftTop());
 }
 
 
