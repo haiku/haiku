@@ -2,3 +2,4 @@ SubDir HAIKU_TOP src add-ons network_settings ;
 
 SubInclude HAIKU_TOP src add-ons network_settings ipv4 ;
 SubInclude HAIKU_TOP src add-ons network_settings ipv6 ;
+SubInclude HAIKU_TOP src add-ons network_settings sshd ;

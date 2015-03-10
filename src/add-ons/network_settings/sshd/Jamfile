@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons network_settings sshd ;
+
+UsePublicHeaders [ FDirName add-ons network_settings ] ;
+UsePrivateHeaders shared ;
+
+Addon SSHService :
+	SSHServiceAddOn.cpp
+
+	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
+		[ TargetLibstdc++ ] localestub
+;
+
+DoCatalogs SSHService : x-vnd.Haiku-SSHService :
+	SSHServiceAddOn.cpp
+;
