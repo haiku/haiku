@@ -43,7 +43,9 @@ private:
 			void				_ScanAddOns();
 			BNetworkSettingsItem*
 								_SettingsItemFor(BListItem* item);
+			void				_SortItemsUnder(BListItem* item);
 			BListItem*			_ListItemFor(BNetworkSettingsType type);
+			BListItem*			_CreateItem(const char* label);
 			void				_SelectItem(BListItem* listItem);
 			void				_BroadcastSettingsUpdate(uint32 type);
 			void				_BroadcastConfigurationUpdate(
@@ -51,6 +53,12 @@ private:
 
 			bool				_IsReplicantInstalled();
 			void				_ShowReplicant(bool show);
+
+	static	const char*			_ItemName(const BListItem* item);
+	static	int					_CompareTopLevelListItems(const BListItem* a,
+									const BListItem* b);
+	static	int					_CompareListItems(const BListItem* a,
+									const BListItem* b);
 
 private:
 	typedef BObjectList<BNetworkSettingsAddOn> AddOnList;

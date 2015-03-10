@@ -106,6 +106,13 @@ BNetworkInterfaceListItem::~BNetworkInterfaceListItem()
 }
 
 
+const char*
+BNetworkInterfaceListItem::Label() const
+{
+	return fLabel;
+}
+
+
 void
 BNetworkInterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 {

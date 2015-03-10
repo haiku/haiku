@@ -92,6 +92,8 @@ public:
 									BNetworkSettings& settings);
 								~BNetworkInterfaceListItem();
 
+			const char*			Label() const;
+
 	virtual	void				DrawItem(BView* owner,
 									BRect bounds, bool complete);
 	virtual	void				Update(BView* owner, const BFont* font);

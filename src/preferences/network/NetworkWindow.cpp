@@ -34,6 +34,7 @@
 #include <PathMonitor.h>
 #include <Roster.h>
 #include <ScrollView.h>
+#include <StringItem.h>
 #include <SymLink.h>
 
 #define ENABLE_PROFILES 0
@@ -62,7 +63,10 @@ static const uint32 kMsgItemSelected = 'ItSl';
 NetworkWindow::NetworkWindow()
 	:
 	BWindow(BRect(100, 100, 400, 400), B_TRANSLATE("Network"), B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	fServicesItem(NULL),
+	fDialUpItem(NULL),
+	fOtherItem(NULL)
 {
 	// Profiles section
 #if ENABLE_PROFILES
@@ -362,9 +366,10 @@ NetworkWindow::_ScanAddOns()
 						break;
 
 					fSettingsMap[item->ListItem()] = item;
-					// TODO: sort
 					fListView->AddUnder(item->ListItem(), interfaceItem);
 				}
+				fListView->SortItemsUnder(interfaceItem, true,
+					NetworkWindow::_CompareListItems);
 			}
 
 			// Generic items
@@ -375,12 +380,18 @@ NetworkWindow::_ScanAddOns()
 					break;
 
 				fSettingsMap[item->ListItem()] = item;
-				// TODO: sort
 				fListView->AddUnder(item->ListItem(),
 					_ListItemFor(item->Type()));
 			}
+
+			_SortItemsUnder(fServicesItem);
+			_SortItemsUnder(fDialUpItem);
+			_SortItemsUnder(fOtherItem);
 		}
 	}
+
+	fListView->SortItemsUnder(NULL, true,
+		NetworkWindow::_CompareTopLevelListItems);
 }
 
 
@@ -395,33 +406,46 @@ NetworkWindow::_SettingsItemFor(BListItem* item)
 }
 
 
+void
+NetworkWindow::_SortItemsUnder(BListItem* item)
+{
+	if (item != NULL)
+		fListView->SortItemsUnder(item, true, NetworkWindow::_CompareListItems);
+}
+
+
 BListItem*
 NetworkWindow::_ListItemFor(BNetworkSettingsType type)
 {
 	switch (type) {
 		case B_NETWORK_SETTINGS_TYPE_SERVICE:
-			if (fServicesItem == NULL) {
-				fServicesItem = new BStringItem(B_TRANSLATE("Services"));
-				fServicesItem->SetExpanded(true);
-			}
-
+			if (fServicesItem == NULL)
+				fServicesItem = _CreateItem(B_TRANSLATE("Services"));
 			return fServicesItem;
 
 		case B_NETWORK_SETTINGS_TYPE_DIAL_UP:
 			if (fDialUpItem == NULL)
-				fDialUpItem = new BStringItem(B_TRANSLATE("Dial Up"));
-
+				fDialUpItem = _CreateItem(B_TRANSLATE("Dial Up"));
 			return fDialUpItem;
 
 		case B_NETWORK_SETTINGS_TYPE_OTHER:
 			if (fOtherItem == NULL)
-				fOtherItem = new BStringItem(B_TRANSLATE("Other"));
-
+				fOtherItem = _CreateItem(B_TRANSLATE("Other"));
 			return fOtherItem;
 
 		default:
 			return NULL;
 	}
+}
+
+
+BListItem*
+NetworkWindow::_CreateItem(const char* label)
+{
+	BListItem* item = new BStringItem(label);
+	item->SetExpanded(true);
+	fListView->AddItem(item);
+	return item;
 }
 
 
@@ -507,4 +531,68 @@ NetworkWindow::_IsReplicantInstalled()
 {
 	BDeskbar deskbar;
 	return deskbar.HasItem("NetworkStatus");
+}
+
+
+/*static*/ const char*
+NetworkWindow::_ItemName(const BListItem* item)
+{
+	if (const BNetworkInterfaceListItem* listItem = dynamic_cast<
+			const BNetworkInterfaceListItem*>(item))
+		return listItem->Label();
+
+	if (const BStringItem* stringItem = dynamic_cast<const BStringItem*>(item))
+		return stringItem->Text();
+
+	return NULL;
+}
+
+
+/*static*/ int
+NetworkWindow::_CompareTopLevelListItems(const BListItem* a, const BListItem* b)
+{
+	if (a == b)
+		return 0;
+
+	if (const InterfaceListItem* itemA
+			= dynamic_cast<const InterfaceListItem*>(a)) {
+		if (const InterfaceListItem* itemB
+				= dynamic_cast<const InterfaceListItem*>(b)) {
+			return strcasecmp(itemA->Name(), itemB->Name());
+		}
+		return -1;
+	} else if (dynamic_cast<const InterfaceListItem*>(b) != NULL)
+		return 1;
+/*
+	if (a == fDialUpItem)
+		return -1;
+	if (b == fDialUpItem)
+		return 1;
+
+	if (a == fServicesItem)
+		return -1;
+	if (b == fServicesItem)
+		return 1;
+*/
+	return _CompareListItems(a, b);
+}
+
+
+/*static*/ int
+NetworkWindow::_CompareListItems(const BListItem* a, const BListItem* b)
+{
+	if (a == b)
+		return 0;
+
+	const char* nameA = _ItemName(a);
+	const char* nameB = _ItemName(b);
+
+	if (nameA != NULL && nameB != NULL)
+		return strcasecmp(nameA, nameB);
+	if (nameA != NULL)
+		return 1;
+	if (nameB != NULL)
+		return -1;
+
+	return (addr_t)a > (addr_t)b ? 1 : -1;
 }
