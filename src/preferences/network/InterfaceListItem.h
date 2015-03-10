@@ -30,7 +30,7 @@ public:
 									BRect bounds, bool complete);
 			void				Update(BView* owner, const BFont* font);
 
-	inline	const char*			Name() { return fInterface.Name(); }
+	inline	const char*			Name() const { return fInterface.Name(); }
 
 	virtual	void				ConfigurationUpdated(const BMessage& message);
 
