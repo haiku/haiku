@@ -120,6 +120,7 @@ const static settings_template kServiceAddressTemplate[] = {
 
 const static settings_template kServiceTemplate[] = {
 	{B_STRING_TYPE, "name", NULL, true},
+	{B_BOOL_TYPE, "disabled", NULL},
 	{B_MESSAGE_TYPE, "address", kServiceAddressTemplate},
 	{B_STRING_TYPE, "user", NULL},
 	{B_STRING_TYPE, "group", NULL},
@@ -463,6 +464,15 @@ BNetworkSettings::RemoveService(const char* name)
 {
 	return _RemoveItem(fServices, "service", "name", name,
 		kServicesSettingsName);
+}
+
+
+BNetworkServiceSettings
+BNetworkSettings::Service(const char* name)
+{
+	BMessage service;
+	GetService(name, service);
+	return BNetworkServiceSettings(service);
 }
 
 
@@ -1393,9 +1403,15 @@ BNetworkServiceAddressSettings::operator==(
 
 BNetworkServiceSettings::BNetworkServiceSettings(const BMessage& message)
 	:
-	fData(message)
+	fType(-1),
+	fProtocol(-1),
+	fPort(-1),
+	fEnabled(true),
+	fStandAlone(false)
 {
 	// TODO: user/group is currently ignored!
+
+	fName = message.GetString("name");
 
 	// Default family/port/protocol/type for all addresses
 
@@ -1404,35 +1420,33 @@ BNetworkServiceSettings::BNetworkServiceSettings(const BMessage& message)
 	if (message.FindString("family", &string) != B_OK)
 		string = "inet";
 
-	int32 serviceFamily = get_address_family(string);
-	if (serviceFamily == AF_UNSPEC)
-		serviceFamily = AF_INET;
+	fFamily = get_address_family(string);
+	if (fFamily == AF_UNSPEC)
+		fFamily = AF_INET;
 
-	int32 serviceProtocol;
 	if (message.FindString("protocol", &string) == B_OK)
-		serviceProtocol = parse_protocol(string);
+		fProtocol = parse_protocol(string);
 	else {
 		string = "tcp";
 			// we set 'string' here for an eventual call to getservbyname()
 			// below
-		serviceProtocol = IPPROTO_TCP;
+		fProtocol = IPPROTO_TCP;
 	}
 
-	int32 servicePort;
-	if (message.FindInt32("port", &servicePort) != B_OK) {
+	if (message.FindInt32("port", &fPort) != B_OK) {
 		struct servent* servent = getservbyname(Name(), string);
 		if (servent != NULL)
-			servicePort = ntohs(servent->s_port);
+			fPort = ntohs(servent->s_port);
 		else
-			servicePort = -1;
+			fPort = -1;
 	}
 
-	int32 serviceType = -1;
-	if (message.FindString("type", &string) == B_OK) {
-		serviceType = parse_type(string);
-	} else {
-		serviceType = type_for_protocol(serviceProtocol);
-	}
+	if (message.FindString("type", &string) == B_OK)
+		fType = parse_type(string);
+	else
+		fType = type_for_protocol(fProtocol);
+
+	fStandAlone = message.GetBool("stand_alone");
 
 	const char* argument;
 	for (int i = 0; message.FindString("launch", i, &argument) == B_OK; i++) {
@@ -1442,12 +1456,12 @@ BNetworkServiceSettings::BNetworkServiceSettings(const BMessage& message)
 	BMessage addressData;
 	int32 i = 0;
 	for (; message.FindMessage("address", i, &addressData) == B_OK; i++) {
-		BNetworkServiceAddressSettings address(addressData, serviceFamily,
-			serviceType, serviceProtocol, servicePort);
+		BNetworkServiceAddressSettings address(addressData, fFamily,
+			fType, fProtocol, fPort);
 		fAddresses.push_back(address);
 	}
 
-	if (i == 0 && (serviceFamily < 0 || servicePort < 0)) {
+	if (i == 0 && (fFamily < 0 || fPort < 0)) {
 		// no address specified
 		printf("service %s has no address specified\n", Name());
 		return;
@@ -1456,10 +1470,10 @@ BNetworkServiceSettings::BNetworkServiceSettings(const BMessage& message)
 	if (i == 0) {
 		// no address specified, but family/port were given; add empty address
 		BNetworkServiceAddressSettings address;
-		address.SetFamily(serviceFamily);
-		address.SetType(serviceType);
-		address.SetProtocol(serviceProtocol);
-		address.Address().SetToWildcard(serviceFamily, servicePort);
+		address.SetFamily(fFamily);
+		address.SetType(fType);
+		address.SetProtocol(fProtocol);
+		address.Address().SetToWildcard(fFamily, fPort);
 
 		fAddresses.push_back(address);
 	}
@@ -1474,8 +1488,7 @@ BNetworkServiceSettings::~BNetworkServiceSettings()
 status_t
 BNetworkServiceSettings::InitCheck() const
 {
-	if (fData.HasString("name") && fData.HasString("launch")
-		&& CountAddresses() > 0)
+	if (!fName.IsEmpty() && !fArguments.IsEmpty() && CountAddresses() > 0)
 		return B_OK;
 
 	return B_BAD_VALUE;
@@ -1485,14 +1498,98 @@ BNetworkServiceSettings::InitCheck() const
 const char*
 BNetworkServiceSettings::Name() const
 {
-	return fData.GetString("name");
+	return fName.String();
+}
+
+
+void
+BNetworkServiceSettings::SetName(const char* name)
+{
+	fName = name;
 }
 
 
 bool
 BNetworkServiceSettings::IsStandAlone() const
 {
-	return fData.GetBool("stand_alone");
+	return fStandAlone;
+}
+
+
+void
+BNetworkServiceSettings::SetStandAlone(bool alone)
+{
+	fStandAlone = alone;
+}
+
+
+bool
+BNetworkServiceSettings::IsEnabled() const
+{
+	return InitCheck() == B_OK && !fEnabled;
+}
+
+
+void
+BNetworkServiceSettings::SetEnabled(bool enable)
+{
+	fEnabled = enable;
+}
+
+
+int
+BNetworkServiceSettings::Family() const
+{
+	return fFamily;
+}
+
+
+void
+BNetworkServiceSettings::SetFamily(int family)
+{
+	fFamily = family;
+}
+
+
+int
+BNetworkServiceSettings::Protocol() const
+{
+	return fProtocol;
+}
+
+
+void
+BNetworkServiceSettings::SetProtocol(int protocol)
+{
+	fProtocol = protocol;
+}
+
+
+int
+BNetworkServiceSettings::Type() const
+{
+	return fType;
+}
+
+
+void
+BNetworkServiceSettings::SetType(int type)
+{
+	fType = type;
+}
+
+
+int
+BNetworkServiceSettings::Port() const
+{
+	return fPort;
+}
+
+
+void
+BNetworkServiceSettings::SetPort(int port)
+{
+	fPort = port;
 }
 
 
@@ -1521,4 +1618,56 @@ const BNetworkServiceAddressSettings&
 BNetworkServiceSettings::AddressAt(int32 index) const
 {
 	return fAddresses[index];
+}
+
+
+void
+BNetworkServiceSettings::AddAddress(
+	const BNetworkServiceAddressSettings& address)
+{
+	fAddresses.push_back(address);
+}
+
+
+void
+BNetworkServiceSettings::RemoveAddress(int32 index)
+{
+	fAddresses.erase(fAddresses.begin() + index);
+}
+
+
+status_t
+BNetworkServiceSettings::GetMessage(BMessage& data) const
+{
+	status_t status = data.SetString("name", fName);
+	if (status == B_OK && !fEnabled)
+		status = data.SetBool("disabled", true);
+	if (status == B_OK && fStandAlone)
+		status = data.SetBool("stand_alone", true);
+
+	if (fFamily != AF_UNSPEC)
+		status = data.SetInt32("family", fFamily);
+	if (fType != -1)
+		status = data.SetInt32("type", fType);
+	if (fProtocol != -1)
+		status = data.SetInt32("protocol", fProtocol);
+	if (fPort != -1)
+		status = data.SetInt32("port", fPort);
+
+	for (int32 i = 0; i < fArguments.CountStrings(); i++) {
+		if (status == B_OK)
+			status = data.AddString("launch", fArguments.StringAt(i));
+		if (status != B_OK)
+			break;
+	}
+
+	for (int32 i = 0; i < CountAddresses(); i++) {
+		BMessage address;
+		status = AddressAt(i).GetMessage(address);
+		if (status == B_OK)
+			status = data.AddMessage("address", &address);
+		if (status != B_OK)
+			break;
+	}
+	return status;
 }

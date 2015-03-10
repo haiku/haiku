@@ -326,6 +326,8 @@ Services::_ToService(const BMessage& message, struct service*& service)
 	status_t status = settings.InitCheck();
 	if (status != B_OK)
 		return status;
+	if (!settings.IsEnabled())
+		return B_NAME_NOT_FOUND;
 
 	service = new (std::nothrow) ::service;
 	if (service == NULL)

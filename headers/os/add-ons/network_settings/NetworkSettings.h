@@ -22,6 +22,7 @@ namespace BNetworkKit {
 
 
 class BNetworkInterfaceSettings;
+class BNetworkServiceSettings;
 
 
 class BNetworkSettings {
@@ -57,6 +58,8 @@ public:
 			status_t			GetService(const char* name, BMessage& service);
 			status_t			AddService(const BMessage& service);
 			status_t			RemoveService(const char* name);
+			BNetworkServiceSettings
+								Service(const char* name);
 
 			status_t			StartMonitoring(const BMessenger& target);
 			status_t			StopMonitoring(const BMessenger& target);
@@ -231,17 +234,43 @@ public:
 			status_t			InitCheck() const;
 
 			const char*			Name() const;
+			void				SetName(const char* name);
 			bool				IsStandAlone() const;
+			void				SetStandAlone(bool alone);
+			bool				IsEnabled() const;
+			void				SetEnabled(bool enable);
+
+			int					Family() const;
+			void				SetFamily(int family);
+			int					Protocol() const;
+			void				SetProtocol(int protocol);
+			int					Type() const;
+			void				SetType(int type);
+			int					Port() const;
+			void				SetPort(int port);
 
 			int32				CountArguments() const;
 			const char*			ArgumentAt(int32 index) const;
+			void				AddArgument(const char* argument);
+			void				RemoveArgument(int32 index);
 
 			int32				CountAddresses() const;
 			const BNetworkServiceAddressSettings&
 								AddressAt(int32 index) const;
+			void				AddAddress(const
+									BNetworkServiceAddressSettings& address);
+			void				RemoveAddress(int32 index);
+
+			status_t			GetMessage(BMessage& data) const;
 
 private:
-			const BMessage&		fData;
+			BString				fName;
+			int32				fFamily;
+			int32				fType;
+			int32				fProtocol;
+			int32				fPort;
+			bool				fEnabled;
+			bool				fStandAlone;
 			BStringList			fArguments;
 			std::vector<BNetworkServiceAddressSettings>
 								fAddresses;
