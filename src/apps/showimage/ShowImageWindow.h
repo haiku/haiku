@@ -105,6 +105,7 @@ private:
 
 			void				_SetToolBarVisible(bool visible,
 									bool animate = false);
+			void				_SetToolBarBorder(bool visible);
 
 private:
 			ImageFileNavigator	fNavigator;

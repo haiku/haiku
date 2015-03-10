@@ -28,6 +28,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <Clipboard.h>
+#include <ControlLook.h>
 #include <DurationFormat.h>
 #include <Entry.h>
 #include <File.h>
@@ -1286,6 +1287,7 @@ ShowImageWindow::_ToggleFullScreen()
 
 	fToolBar->SetActionVisible(MSG_FULL_SCREEN, fFullScreen);
 	_SetToolBarVisible(!fFullScreen && fShowToolBar);
+	_SetToolBarBorder(!fFullScreen);
 
 	MoveTo(frame.left, frame.top);
 	ResizeTo(frame.Width(), frame.Height());
@@ -1545,6 +1547,16 @@ ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 		if (!visible)
 			fToolBar->Hide();
 	}
+}
+
+
+void
+ShowImageWindow::_SetToolBarBorder(bool visible)
+{
+	float inset = visible
+		? ceilf(be_control_look->DefaultItemSpacing() / 2) : 0;
+
+	fToolBar->GroupLayout()->SetInsets(inset, 0, inset, 0);
 }
 
 
