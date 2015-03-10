@@ -5,10 +5,6 @@ UsePrivateHeaders shared ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons network_settings ipv4 ] ;
 
-AddResources Interfaces :
-	InterfacesIcons.rdef
-;
-
 Addon IPv6Interface :
 	IPv6InterfaceAddOn.cpp
 	InterfaceAddressView.cpp

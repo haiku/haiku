@@ -3,10 +3,6 @@ SubDir HAIKU_TOP src add-ons network_settings ipv4 ;
 UsePublicHeaders [ FDirName add-ons network_settings ] ;
 UsePrivateHeaders shared ;
 
-AddResources Interfaces :
-	InterfacesIcons.rdef
-;
-
 Addon IPv4Interface :
 	IPv4InterfaceAddOn.cpp
 	InterfaceAddressView.cpp
