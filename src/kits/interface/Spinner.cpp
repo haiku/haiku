@@ -1175,6 +1175,12 @@ BSpinner::FrameResized(float width, float height)
 
 
 void
+BSpinner::ValueChanged()
+{
+	// hook method - does nothing
+}
+
+
 BSpinner::MakeFocus(bool focus)
 {
 	fTextView->MakeFocus(focus);
@@ -1214,13 +1220,6 @@ BSpinner::SetFlags(uint32 flags)
 	flags &= ~B_NAVIGABLE;
 
 	BView::SetFlags(flags);
-}
-
-
-void
-BSpinner::ValueChanged()
-{
-	// hook method - does nothing
 }
 
 

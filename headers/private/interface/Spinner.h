@@ -52,10 +52,11 @@ public:
 	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				FrameResized(float width, float height);
+	virtual	void				ValueChanged();
+
 	virtual	void				MakeFocus(bool focus = true);
 	virtual	void				ResizeToPreferred();
 	virtual	void				SetFlags(uint32 flags);
-	virtual	void				ValueChanged();
 	virtual	void				WindowActivated(bool active);
 
 			alignment			Alignment() const { return fAlignment; };
