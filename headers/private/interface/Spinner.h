@@ -54,9 +54,12 @@ public:
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				ValueChanged();
 
+	virtual	void				Decrement();
+	virtual	void				Increment();
 	virtual	void				MakeFocus(bool focus = true);
 	virtual	void				ResizeToPreferred();
 	virtual	void				SetFlags(uint32 flags);
+	virtual	void				SetValueFromText();
 	virtual	void				WindowActivated(bool active);
 
 			alignment			Alignment() const { return fAlignment; };

@@ -276,8 +276,6 @@ public:
 	virtual	void				MakeFocus(bool focus);
 
 private:
-			void				_SetValueToText();
-
 			BSpinner*			fParent;
 };
 
@@ -563,22 +561,9 @@ SpinnerArrow::_Track(BPoint where, uint32)
 	}
 	fIsMouseDown = true;
 
-	double step = fSpinnerDirection == SPINNER_INCREMENT
-		? fParent->Step()
-		: -fParent->Step();
-	double newValue = fParent->Value() + step;
-	if (newValue < fParent->MinValue()) {
-		// new value is below lower bound, clip to lower bound
-		fParent->SetValue(fParent->MinValue());
-	} else if (newValue>fParent->MaxValue()) {
-		// new value is above upper bound, clip to upper bound
-		fParent->SetValue(fParent->MaxValue());
-	} else {
-		// new value is in range
-		fParent->SetValue(newValue);
-	}
-	fParent->Invoke();
-	fParent->Invalidate();
+	fSpinnerDirection == SPINNER_INCREMENT
+		? fParent->Increment()
+		: fParent->Decrement();
 
 	snooze(fRepeatDelay);
 	fRepeatDelay = 10000;
@@ -642,7 +627,7 @@ SpinnerTextView::KeyDown(const char* bytes, int32 numBytes)
 	switch (bytes[0]) {
 		case B_ENTER:
 		case B_SPACE:
-			_SetValueToText();
+			fParent->SetValueFromText();
 			break;
 
 		case B_TAB:
@@ -651,18 +636,13 @@ SpinnerTextView::KeyDown(const char* bytes, int32 numBytes)
 
 		case B_UP_ARROW:
 		case B_PAGE_UP:
+			fParent->Increment();
+			break;
+
 		case B_DOWN_ARROW:
 		case B_PAGE_DOWN:
-		{
-			double step = fParent->Step();
-			if (*bytes == B_DOWN_ARROW || *bytes == B_PAGE_DOWN)
-				step *= -1;
-
-			fParent->SetValue(fParent->Value() + step);
-			fParent->Invoke();
-			fParent->Invalidate();
+			fParent->Decrement();
 			break;
-		}
 
 		default:
 			BTextView::KeyDown(bytes, numBytes);
@@ -675,28 +655,15 @@ SpinnerTextView::MakeFocus(bool focus)
 {
 	BTextView::MakeFocus(focus);
 
-	if (focus)
-		SelectAll();
-	else
-		_SetValueToText();
-
-	if (fParent != NULL)
-		fParent->_DrawTextView(fParent->Bounds());
-}
-
-
-//	#pragma mark - SpinnerTextView private methods
-
-
-void
-SpinnerTextView::_SetValueToText()
-{
 	if (fParent == NULL)
 		return;
 
-	fParent->SetValue(roundTo(atof(Text()), fParent->Precision()));
-	fParent->Invoke();
-	fParent->Invalidate();
+	if (focus)
+		SelectAll();
+	else
+		fParent->SetValueFromText();
+
+	fParent->_DrawTextView(fParent->Bounds());
 }
 
 
@@ -1181,6 +1148,21 @@ BSpinner::ValueChanged()
 }
 
 
+void
+BSpinner::Decrement()
+{
+	SetValue(Value() - Step());
+}
+
+
+void
+BSpinner::Increment()
+{
+	SetValue(Value() + Step());
+}
+
+
+void
 BSpinner::MakeFocus(bool focus)
 {
 	fTextView->MakeFocus(focus);
@@ -1358,7 +1340,18 @@ BSpinner::SetValue(double value)
 
 	fValue = value;
 	ValueChanged();
+
+	Invoke();
+	Invalidate();
 }
+
+
+void
+BSpinner::SetValueFromText()
+{
+	SetValue(roundTo(atof(TextView()->Text()), Precision()));
+}
+
 
 
 bool
