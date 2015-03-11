@@ -227,6 +227,7 @@ private:
 
 class BNetworkServiceSettings {
 public:
+								BNetworkServiceSettings();
 								BNetworkServiceSettings(
 									const BMessage& message);
 								~BNetworkServiceSettings();

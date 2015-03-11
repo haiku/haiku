@@ -1401,6 +1401,18 @@ BNetworkServiceAddressSettings::operator==(
 // #pragma mark - BNetworkServiceSettings
 
 
+BNetworkServiceSettings::BNetworkServiceSettings()
+	:
+	fFamily(AF_UNSPEC),
+	fType(-1),
+	fProtocol(-1),
+	fPort(-1),
+	fEnabled(true),
+	fStandAlone(false)
+{
+}
+
+
 BNetworkServiceSettings::BNetworkServiceSettings(const BMessage& message)
 	:
 	fType(-1),
@@ -1604,6 +1616,20 @@ const char*
 BNetworkServiceSettings::ArgumentAt(int32 index) const
 {
 	return fArguments.StringAt(index);
+}
+
+
+void
+BNetworkServiceSettings::AddArgument(const char* argument)
+{
+	fArguments.Add(argument);
+}
+
+
+void
+BNetworkServiceSettings::RemoveArgument(int32 index)
+{
+	fArguments.Remove(index);
 }
 
 
