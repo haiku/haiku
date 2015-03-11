@@ -38,10 +38,11 @@ RemotePackageRepository HaikuPorts
 	automake-1.13.1-4
 	avra-1.3.0-1
 	bash-4.3.33-1
-	beae-1.2-2
+	beae-1.2-3
 	beam-1.2alpha-4
 	becjk-1.0.1-1
-	befar-4.2_beta-2
+	beezer-0.99.hg-3
+	befar-4.2_beta-3
 	belife-1.0.0-2
 	bemines-1.0b2-1
 	bepdf-1.2.0-1
@@ -71,6 +72,7 @@ RemotePackageRepository HaikuPorts
 	curl-7.39.0-1
 	curl_devel-7.39.0-1
 	cvs-1.12.13.1-6
+	desknotes-1.1-2
 	dfu_util-0.7-1
 	distcc-3.1-3
 	dmidecode-2.12-2
@@ -372,13 +374,14 @@ RemotePackageRepository HaikuPorts
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
 	ubertuber-0.9.10-3
-	unrar-5.1.5-1
+	unrar-5.2.6-1
 	unzip-6.0-1
 	util_macros-1.19.0-2
 	vim-7.4-3
 	virtualbox_guest_additions-4.3.53_svn-1
 	vmware_addons-1.1.1-2
 	vision-0.9.7.r949-2
+	weather-0.1.1_git-1
 	wget-1.16.2-1
 	which-2.20-1
 	wonderbrush-2.1.2-4
@@ -704,6 +707,7 @@ RemotePackageRepository HaikuPorts
 	beae
 	beam
 	becjk
+	beezer
 	befar
 	belife
 	bemines
@@ -740,6 +744,7 @@ RemotePackageRepository HaikuPorts
 	cvsps_x86
 	dbus_x86
 	ddrescue_x86
+	desknotes
 	devil_x86
 	dfu_util
 	djvulibre_x86
@@ -1016,6 +1021,7 @@ RemotePackageRepository HaikuPorts
 	unrar
 	unzip
 	util_macros
+	weather
 	vcmi_x86
 	vim
 	vision
