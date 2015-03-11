@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src add-ons network_settings sshd ;
 
 UsePublicHeaders [ FDirName add-ons network_settings ] ;
-UsePrivateHeaders shared ;
+UsePrivateHeaders app libroot kernel net shared ;
 
 Addon SSHService :
 	SSHServiceAddOn.cpp
