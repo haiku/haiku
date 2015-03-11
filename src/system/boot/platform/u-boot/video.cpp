@@ -121,10 +121,18 @@ platform_init_video(void)
 	#endif
 #endif
 
-	if (gFramebuffer != NULL) {
-		gFramebuffer->Probe();
-		gFramebuffer->Init();
+	if (gFramebuffer == NULL) {
+		ERROR("No framebuffer device found!\n");
+		return B_ERROR;
 	}
+
+	status_t result = gFramebuffer->Probe();
+	if (result != B_OK)
+		return result;
+
+	gFramebuffer->Init();
+	if (result != B_OK)
+		return result;
 
 	return B_OK;
 }
