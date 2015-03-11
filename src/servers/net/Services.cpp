@@ -22,6 +22,8 @@
 #include <NetworkAddress.h>
 #include <NetworkSettings.h>
 
+#include <NetServer.h>
+
 
 using namespace std;
 using namespace BNetworkKit;
@@ -195,6 +197,19 @@ Services::MessageReceived(BMessage* message)
 		case kMsgUpdateServices:
 			_Update(*message);
 			break;
+
+		case kMsgIsServiceRunning:
+		{
+			const char* name = message->GetString("name");
+			if (name == NULL)
+				break;
+
+			BMessage reply(B_REPLY);
+			reply.AddString("name", name);
+			reply.AddBool("running", fNameMap.find(name) != fNameMap.end());
+			message->SendReply(&reply);
+			break;
+		}
 
 		default:
 			BHandler::MessageReceived(message);

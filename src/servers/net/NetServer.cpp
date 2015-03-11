@@ -304,6 +304,15 @@ NetServer::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgIsServiceRunning:
+		{
+			// Forward the message to the handler that can answer it
+			BHandler* handler = fServices.Target(NULL);
+			if (handler != NULL)
+				handler->MessageReceived(message);
+			break;
+		}
+
 		default:
 			BApplication::MessageReceived(message);
 			return;
