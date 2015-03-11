@@ -103,23 +103,17 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	// Menu settings
 	fMenuRecentDocuments->SetValue(fSettings.recentDocsEnabled);
 	fMenuRecentDocumentCount->SetEnabled(fSettings.recentDocsEnabled);
-	fMenuRecentDocumentCount->SetPrecision(0);
 	fMenuRecentDocumentCount->SetRange(0, 50);
-	fMenuRecentDocumentCount->SetStep(1);
 	fMenuRecentDocumentCount->SetValue(fSettings.recentDocsCount);
 
 	fMenuRecentApplications->SetValue(fSettings.recentAppsEnabled);
 	fMenuRecentApplicationCount->SetEnabled(fSettings.recentAppsEnabled);
-	fMenuRecentApplicationCount->SetPrecision(0);
 	fMenuRecentApplicationCount->SetRange(0, 50);
-	fMenuRecentApplicationCount->SetStep(1);
 	fMenuRecentApplicationCount->SetValue(fSettings.recentAppsCount);
 
 	fMenuRecentFolders->SetValue(fSettings.recentFoldersEnabled);
 	fMenuRecentFolderCount->SetEnabled(fSettings.recentFoldersEnabled);
-	fMenuRecentFolderCount->SetPrecision(0);
 	fMenuRecentFolderCount->SetRange(0, 50);
-	fMenuRecentFolderCount->SetStep(1);
 	fMenuRecentFolderCount->SetValue(fSettings.recentFoldersCount);
 
 	// Applications settings

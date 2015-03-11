@@ -307,9 +307,7 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 	fDaysInHistory = new BSpinner("days in history",
 		B_TRANSLATE("Number of days to keep links in History menu:"),
 		new BMessage(MSG_HISTORY_MENU_DAYS_CHANGED));
-	fDaysInHistory->SetPrecision(0);
 	fDaysInHistory->SetRange(1, 35);
-	fDaysInHistory->SetStep(1);
 	fDaysInHistory->SetValue(
 		BrowsingHistory::DefaultInstance()->MaxHistoryItemAge());
 
