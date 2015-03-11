@@ -79,7 +79,7 @@ ArchMailboxArmBCM2835::Read(uint8 channel, uint32& value)
 inline auto&
 ArchMailboxArmBCM2835::GetRegister(unsigned reg)
 {
-	auto addr = fBase + ARM_CTRL_0_MAILBOX_BASE + reg;
+	auto addr = fBase + reg;
 	return *reinterpret_cast<std::atomic<uint32_t>*>(addr);
 }
 
