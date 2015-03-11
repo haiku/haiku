@@ -487,7 +487,7 @@ BControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 		view->SetHighColor(markColor);
 
 		rect.InsetBy(2, 2);
-		view->SetPenSize(max_c(1.0, ceilf(rect.Width() / 3.5)));
+		view->SetPenSize(std::max(1.0f, ceilf(rect.Width() / 3.5)));
 		view->SetDrawingMode(B_OP_OVER);
 
 		view->StrokeLine(rect.LeftTop(), rect.RightBottom());
@@ -1264,7 +1264,7 @@ BControlLook::DrawSliderHashMarks(BView* view, BRect& rect,
 		darkColor = tint_color(base, 1.14);
 	}
 
-	int32 hashMarkCount = max_c(count, 2);
+	int32 hashMarkCount = std::max(count, (int32)2);
 		// draw at least two hashmarks at min/max if
 		// fHashMarks != B_HASH_MARKS_NONE
 	float factor;
