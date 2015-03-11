@@ -477,11 +477,10 @@ BControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 		dark1BorderColor, dark1BorderColor,
 		dark2BorderColor, dark2BorderColor);
 
-	if ((flags & B_DISABLED) != 0) {
+	if ((flags & B_DISABLED) != 0)
 		_FillGradient(view, rect, base, 0.4, 0.2);
-	} else {
+	else
 		_FillGradient(view, rect, base, 0.15, 0.0);
-	}
 
 	rgb_color markColor;
 	if (_RadioButtonAndCheckBoxMarkColor(base, markColor, flags)) {
@@ -1306,8 +1305,7 @@ BControlLook::DrawSliderHashMarks(BView* view, BRect& rect,
 		view->EndLineArray();
 	}
 
-	if (location & B_HASH_MARKS_BOTTOM) {
-
+	if ((location & B_HASH_MARKS_BOTTOM) != 0) {
 		view->BeginLineArray(hashMarkCount * 2);
 
 		if (orientation == B_HORIZONTAL) {
