@@ -34,6 +34,7 @@ mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags);
 extern "C" bool
 mmu_get_virtual_mapping(addr_t virtualAddress, phys_addr_t *_physicalAddress);
 
+
 extern ArchMailbox *gMailbox;
 
 struct framebuffer_config {
@@ -77,6 +78,7 @@ arch_get_fb_arm_bcm2835(addr_t base)
 status_t
 ArchFBArmBCM2835::Init()
 {
+	gKernelArgs.frame_buffer.enabled = true;
 	return B_OK;
 }
 
@@ -135,13 +137,11 @@ ArchFBArmBCM2835::SetVideoMode(int width, int height, int depth)
 
 	if (value != 0) {
 		dprintf("failed to configure framebuffer: %" B_PRIx32 "\n", value);
-		//debug_toggle_led(5, DEBUG_DELAY_SHORT);
 		return B_ERROR;
 	}
 
 	if (sFramebufferConfig.frame_buffer_address == 0) {
 		dprintf("didn't get the framebuffer address\n");
-		//debug_toggle_led(10, DEBUG_DELAY_SHORT);
 		return B_ERROR;
 	}
 
@@ -162,16 +162,19 @@ ArchFBArmBCM2835::SetVideoMode(int width, int height, int depth)
 		= BCM283X_BUS_TO_PHYSICAL(sFramebufferConfig.frame_buffer_address);
 	fSize = sFramebufferConfig.screen_size;
 
-	// TODO: kDefaultPageFlags
-	//fBase = (addr_t)mmu_map_physical_memory(fPhysicalBase, fSize,
-	//	kDefaultPageFlags);
-
+	// kDefaultPageFlags?
 	fBase = (addr_t)mmu_map_physical_memory(fPhysicalBase, fSize, 0);
+
+	dprintf("video framebuffer: va: %p pa: %p\n", (void *)fBase,
+		(void *)fPhysicalBase);
 
 	fCurrentWidth = width;
 	fCurrentHeight = height;
 	fCurrentDepth = depth;
 	fCurrentBytesPerRow = sFramebufferConfig.bytes_per_row;
+
+	gKernelArgs.frame_buffer.physical_buffer.start = (addr_t)fPhysicalBase;
+
 	return B_OK;
 }
 
