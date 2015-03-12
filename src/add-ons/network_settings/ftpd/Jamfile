@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src add-ons network_settings ftpd ;
+
+UsePublicHeaders [ FDirName add-ons network_settings ] ;
+UsePrivateHeaders app libroot kernel net shared ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons network_settings sshd ] ;
+
+Addon FTPService :
+	FTPServiceAddOn.cpp
+	ServiceView.cpp
+
+	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
+		[ TargetLibstdc++ ] localestub
+;
+
+DoCatalogs FTPService : x-vnd.Haiku-FTPService :
+	FTPServiceAddOn.cpp
+	ServiceView.cpp
+;
