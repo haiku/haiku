@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.03.03
-#	Date:    2015-03-03 03:15:02
+#	Version: 2015.03.12
+#	Date:    2015-03-12 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10149,6 +10149,7 @@
 		17aa 1056  ThinkServer OCm14102-UX-L AnyFabric
 		17aa 1057  ThinkServer OCm14104-UX-L AnyFabric
 		17aa 1059  ThinkServer OCm14104-UT-L AnyFabric
+		17aa 4014  ThinkServer OCm14102-NX-L AnyFabric
 	0722  OneConnect iSCSI Initiator (Skyhawk)
 	0723  OneConnect iSCSI Initiator + Target (Skyhawk)
 	0724  OneConnect FCoE Initiator (Skyhawk)
@@ -14582,19 +14583,52 @@
 1396  Cipher Systems Inc
 1397  Cologne Chip Designs GmbH
 	08b4  ISDN network Controller [HFC-4S]
+		1397 08b4  HFC-4S [Cologne Chip HFC-4S Eval. Board]
+		1397 b51a  HFC-4S [Allo.com BRI card]
 		1397 b520  HFC-4S [IOB4ST]
-		1397 b540  HFC-4S [Swyx 4xS0 SX2 QuadBri]
-		1397 b550  HFC-4S [Junghanns quadBRI]
-		1397 b556  HFC-4S [Junghanns DuoDBRI]
+		1397 b540  HFC-4S [Swyx SX2 QuadBri]
+		1397 b550  HFC-4S [Junghanns.NET quadBRI]
+		1397 b556  HFC-4S [Junghanns.NET duoBRI]
+		1397 b559  HFC-4S [Junghanns.NET duoBRI miniPCI]
+		1397 b560  HFC-4S [BeroNet BN4S0]
+		1397 b566  HFC-4S [BeroNet BN2S0]
+		1397 b567  HFC-4S [BeroNet BN1S0 miniPCI]
+		1397 b568  HFC-4S [BeroNet BN4S0 miniPCI]
+		1397 b569  HFC-4S [BeroNet BN2S0 miniPCI]
+		1397 b620  HFC-4S
+		1397 b752  HFC-4S [Junghanns.NET quadBRI PCIe]
+		1397 b761  HFC-4S [BeroNet BN2S0 PCIe]
+		1397 b762  HFC-4S [BeroNet BN4S0 PCIe]
+		1397 e884  HFC-4S [OpenVox B200P]
 		1397 e888  HFC-4S [OpenVox B200P / B400P]
 	16b8  ISDN network Controller [HFC-8S]
-		1397 b562  HFC-8S [IOB8ST]
+		1397 16b8  HFC-8S [Cologne Chip HFC-8S Eval. Board]
+		1397 b521  HFC-8S [IOB4ST Recording]
+		1397 b522  HFC-8S [IOB8ST]
+		1397 b552  HFC-8S [Junghanns.NET octoBRI]
+		1397 b55b  HFC-8S [Junghanns.NET octoBRI]
+		1397 b562  HFC-8S [BeroNet BN8S0]
+		1397 b56b  HFC-8S [BeroNet BN8S0+]
+		1397 b622  HFC-8S
+		1397 e998  HFC-8S [OpenVox B800P]
 	2bd0  ISDN network controller [HFC-PCI]
 		0675 1704  ISDN Adapter (PCI Bus, D, C)
 		0675 1708  ISDN Adapter (PCI Bus, D, C, ACPI)
 		1397 2bd0  ISDN Board
 		e4bf 1000  CI1-1-Harp
 	30b1  ISDN network Controller [HFC-E1]
+		1397 30b1  HFC-E1 [Cologne Chip HFC-E1 Eval. Board]
+		1397 b523  HFC-E1 [IOB1E1]
+		1397 b543  HFC-E1 [Swyx SX2 SinglePRI V2]
+		1397 b544  HFC-E1 [Swyx SX2 DualPRI V2]
+		1397 b553  HFC-E1 [Junghanns.NET singleE1]
+		1397 b554  HFC-E1 [Junghanns.NET doubleE1]
+		1397 b555  HFC-E1 [Junghanns.NET doubleE1 2.0]
+		1397 b55a  HFC-E1 [Junghanns.NET singleE1 miniPCI]
+		1397 b563  HFC-E1 [beroNet BN1E1]
+		1397 b564  HFC-E1 [beroNet BN2E1]
+		1397 b565  HFC-E1 [beroNet BN2E1+]
+		1397 b56a  HFC-E1 [beroNet BN1E1 miniPCI]
 	b700  ISDN network controller PrimuX S0 [HFC-PCI]
 	f001  GSM Network Controller [HFC-4GSM]
 1398  Clarion co. Ltd
@@ -15277,6 +15311,7 @@
 	5087  T580-5087 Unified Wire Ethernet Controller
 	5088  T570-5088 Unified Wire Ethernet Controller
 	5089  T520-5089 Unified Wire Ethernet Controller
+	5090  T540-5090 Unified Wire Ethernet Controller
 	5401  T520-CR Unified Wire Ethernet Controller
 	5402  T522-CR Unified Wire Ethernet Controller
 	5403  T540-CR Unified Wire Ethernet Controller
@@ -15308,6 +15343,7 @@
 	5487  T580-5087 Unified Wire Ethernet Controller
 	5488  T570-5088 Unified Wire Ethernet Controller
 	5489  T520-5089 Unified Wire Ethernet Controller
+	5490  T540-5090 Unified Wire Ethernet Controller
 	5501  T520-CR Unified Wire Storage Controller
 	5502  T522-CR Unified Wire Storage Controller
 	5503  T540-CR Unified Wire Storage Controller
@@ -15339,6 +15375,7 @@
 	5587  T580-5087 Unified Wire Storage Controller
 	5588  T570-5088 Unified Wire Storage Controller
 	5589  T520-5089 Unified Wire Storage Controller
+	5590  T540-5090 Unified Wire Storage Controller
 	5601  T520-CR Unified Wire Storage Controller
 	5602  T522-CR Unified Wire Storage Controller
 	5603  T540-CR Unified Wire Storage Controller
@@ -15370,6 +15407,7 @@
 	5687  T580-5087 Unified Wire Storage Controller
 	5688  T570-5088 Unified Wire Storage Controller
 	5689  T520-5089 Unified Wire Storage Controller
+	5690  T540-5090 Unified Wire Storage Controller
 	5701  T520-CR Unified Wire Ethernet Controller
 	5702  T522-CR Unified Wire Ethernet Controller
 	5703  T540-CR Unified Wire Ethernet Controller
@@ -15401,6 +15439,7 @@
 	5787  T580-5087 Unified Wire Ethernet Controller
 	5788  T570-5088 Unified Wire Ethernet Controller
 	5789  T520-5089 Unified Wire Ethernet Controller
+	5790  T540-5090 Unified Wire Ethernet Controller
 	5801  T520-CR Unified Wire Ethernet Controller [VF]
 	5802  T522-CR Unified Wire Ethernet Controller [VF]
 	5803  T540-CR Unified Wire Ethernet Controller [VF]
@@ -15432,6 +15471,7 @@
 	5887  T580-5087 Unified Wire Ethernet Controller [VF]
 	5888  T570-5088 Unified Wire Ethernet Controller [VF]
 	5889  T520-5089 Unified Wire Ethernet Controller [VF]
+	5890  T540-5090 Unified Wire Ethernet Controller [VF]
 	a000  PE10K Unified Wire Ethernet Controller
 1426  Storage Technology Corp.
 1427  Better On-Line Solutions
@@ -18378,6 +18418,8 @@
 		1924 8007  SFN7322F-R2 Precision Time SFP+ Server Adapter
 		1924 8009  SFN7x22F-R2 Flareon Ultra 7000 Series 10G Adapter
 		1924 800a  SFN7x02F-R2 Flareon 7000 Series 10G Adapter
+		1924 800b  SFN7x22F-R3 Flareon Ultra 7000 Series 10G Adapter
+		1924 800c  SFN7x02F-R3 Flareon 7000 Series 10G Adapter
 	0923  SFC9140
 		1924 800b  SFN7x42Q-R1 Flareon Ultra 7000 Series 10/40G Adapter
 	1803  SFC9020 Virtual Function [Solarstorm]
@@ -26271,6 +26313,9 @@
 919a  Gigapixel Corp
 9412  Holtek
 	6565  6565
+9413  Softlogic Co., Ltd.
+	6010  SOLO6010 MPEG-4 Video encoder/decoder
+	6110  SOLO6110 H.264 Video encoder/decoder
 9618  JusonTech Corporation
 	0001  JusonTech Gigabit Ethernet Controller
 9699  Omni Media Technology Inc
