@@ -507,6 +507,7 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	const BStringList& rightsList = info.CopyrightList();
 	if (rightsList.CountStrings() > 0)
 		publisherName = rightsList.StringAt(0);
+	publisherName.Prepend("© ");
 
 	fPublisher = PublisherInfo(BitmapRef(), publisherName, "", publisherURL);
 }
