@@ -1,10 +1,12 @@
 /*
- * Copyright 2014 Haiku Inc. All rights reserved.
+ * Copyright 2014-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  */
+#ifndef DNS_SETTINGS_VIEW_H
+#define DNS_SETTINGS_VIEW_H
 
 
 #include <GroupView.h>
@@ -16,28 +18,32 @@ class BListView;
 class BTextControl;
 
 
-class DNSSettingsView: public BGroupView
-{
+class DNSSettingsView : public BGroupView {
 public:
-							DNSSettingsView();
-		void				AttachedToWindow();
-		void				MessageReceived(BMessage* message);
+								DNSSettingsView();
+								~DNSSettingsView();
 
-		status_t			Apply();
-		status_t			Revert();
+			status_t			Apply();
+			status_t			Revert();
 
-private:
-		status_t			_LoadDNSConfiguration();
-		status_t			_SaveDNSConfiguration();
+	virtual	void				AttachedToWindow();
+	virtual	void				MessageReceived(BMessage* message);
 
 private:
-		BListView*			fServerListView;
-		BStringList			fRevertList;
-		BTextControl*		fTextControl;
-		BTextControl*		fDomain;
+			status_t			_LoadDNSConfiguration();
+			status_t			_SaveDNSConfiguration();
 
-		BButton*			fAddButton;
-		BButton*			fRemoveButton;
-		BButton*			fUpButton;
-		BButton*			fDownButton;
+private:
+			BListView*			fServerListView;
+			BStringList			fRevertList;
+			BTextControl*		fTextControl;
+			BTextControl*		fDomain;
+
+			BButton*			fAddButton;
+			BButton*			fRemoveButton;
+			BButton*			fUpButton;
+			BButton*			fDownButton;
 };
+
+
+#endif // DNS_SETTINGS_VIEW_H
