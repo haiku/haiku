@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.02.21
-# Date:    2015-02-21 20:34:06
+# Version: 2015.03.10
+# Date:    2015-03-10 20:34:08
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -187,6 +187,7 @@
 	0212  DeskJet 1220C
 	0217  LaserJet 2200
 	0218  APOLLO P2500/2600
+	022a  Laserjet CP1525nw
 	0241  Link-5 micro dongle
 	0304  DeskJet 810c/812c
 	0305  ScanJet 4300c
@@ -459,7 +460,7 @@
 	3f02  PhotoSmart 7550~
 	3f11  PSC-1315/PSC-1317
 	4002  PhotoSmart 635/715/720/735/935 (storage)
-	4004  cp1160
+	4004  CP1160
 	4102  PhotoSmart 618
 	4105  ScanJet 4370
 	4111  OfficeJet 7200 series
@@ -711,6 +712,7 @@
 	0232  Serial Converter
 	1060  JTAG adapter
 	1234  IronLogic RFID Adapter [Z-2 USB]
+	1235  Iron Logic Z-397 RS-485/422 converter
 	6001  FT232 USB-Serial (UART) IC
 	6002  Lumel PD12
 	6007  Serial Converter
@@ -735,6 +737,7 @@
 	8b2a  Alpermann+Velte Rubidium Q1
 	8b2b  Alpermann+Velte TCD
 	8b2c  Alpermann+Velte TCC70
+	9090  SNAP Stick 200
 	9132  LCD and Temperature Interface
 	9133  CallerID
 	9135  Rotary Pub alarm
@@ -1123,6 +1126,7 @@
 	00db  External Hard Drive HD-PF32OU2 [Buffalo Ministation]
 	00e8  WLI-UC-G300N Wireless LAN Adapter [Ralink RT2870]
 	0105  External Hard Drive HD-CEU2 [Drive Station]
+	012c  SATA Bridge
 	012e  WLI-UC-AG300N Wireless LAN Adapter
 	0148  WLI-UC-G300HP Wireless LAN Adapter
 	0150  WLP-UC-AG300 Wireless LAN Adapter
@@ -1812,6 +1816,8 @@
 	6070  RNDIS/BeWAN ADSL2+
 	625f  TUSB6250 ATA Bridge
 	8042  Hub
+	8142  TUSB8041 4-Port Hub
+	926b  TUSB9260 Boot Loader
 	dbc0  Device Bay Controller
 	e001  GraphLink [SilverLink]
 	e003  TI-84 Plus Calculator
@@ -2474,6 +2480,7 @@
 	0a17  G330 Headset
 	0a1f  G930
 	0a29  H600 [Wireless Headset]
+	0a37  USB Headset H540
 	0a38  Headset H340
 	0a44  Wired headset
 	0a4d  G430 Surround Sound Gaming Headset
@@ -2555,7 +2562,7 @@
 	c11f  Harmony 900/1100 Remote
 	c121  Harmony One Remote
 	c122  Harmony 650/700 Remote
-	c124  Harmony 300 Remote
+	c124  Harmony 300/350 Remote
 	c125  Harmony 200 Remote
 	c126  Harmony Link
 	c129  Harmony Hub
@@ -2830,6 +2837,7 @@
 	20d0  SPZ2000 Webcam [PixArt PAC7332]
 	20e3  GoGear Raga
 	20e4  GoGear ViBE 8GB
+	2160  Mio LINK Heart Rate Monitor
 	262c  SPC230NC Webcam
 	485d  Senselock SenseIV v2.x
 	df55  LPCXpresso LPC-Link
@@ -3002,6 +3010,7 @@
 	2017  Biometric Smart Card Reader
 	2018  BioSimKey
 	2302  Portable Flash Device (PFD)
+	347b  ST-LINK/V2-1
 	3744  STLINK Pseudo disk
 	3747  ST Micro Connect Lite
 	3748  ST-LINK/V2
@@ -3034,6 +3043,7 @@
 	e00f  Foxconn T77H114 BCM2070 [Single-Chip Bluetooth 2.1 + EDR Adapter]
 	e016  Ubee PXU1900 WiMAX Adapter [Beceem BCSM250]
 	e02c  Atheros AR5BBU12 Bluetooth Device
+	e04d  Atheros AR3012 Bluetooth
 048a  S-MOS Systems, Inc.
 048c  Alps Electric Ireland, Ltd
 048d  Integrated Technology Express, Inc.
@@ -4445,6 +4455,7 @@
 	f437  SBE Tech Ultrasonic Anemometer
 	f4b5  SmartScope
 	f8da  Hughski Ltd. ColorHug
+	f8e8  Harmony 300/350 Remote
 	f91c  SPROG IIv3
 	faff  Dangerous Prototypes BusPirate v4 Bootloader mode
 	fb00  Dangerous Prototypes BusPirate v4
@@ -4811,7 +4822,7 @@
 	662e  MITs Sync
 	6630  MITs Sync
 	6632  MITs Sync
-	663e  D900e Phone
+	663e  D900e/B2100 Phone
 	663f  SGH-E720/SGH-E840
 	6640  Usb Modem Enumerator
 	6651  i8510 Innov8
@@ -4819,8 +4830,8 @@
 	6708  U600 Phone
 	6709  U600
 	6734  Juke
-	6759  D900e Media Player
-	675a  D900e Mass Storage
+	6759  D900e/B2100 Media Player
+	675a  D900e/B2100 Mass Storage
 	675b  D900e Camera
 	6772  Standalone LTE device (Trial)
 	6795  S5230
@@ -5737,6 +5748,7 @@
 	0485  MHS-PM5 HD camcorder
 	04cb  WALKMAN NWZ-E354
 	0541  DSC-HX100V [Cybershot Digital Still Camera]
+	05c4  DualShock 4
 	0689  Walkman NWZ-B173F
 	06bb  WALKMAN NWZ-F805
 	088c  Portable Headphone Amplifier
@@ -5976,6 +5988,7 @@
 	00de  CTH-470 [Bamboo Fun Pen & Touch]
 	00f6  Cintiq 24HD touch (DTH-2400) touchscreen
 	00f8  Cintiq 24HD touch (DTH-2400) tablet
+	0302  Intuos CTH480S2 [Manga]
 	0307  Cintiq Companion Hybrid 13HD (DTH-A1300) tablet
 	0309  Cintiq Companion Hybrid 13HD (DTH-A1300) touchscreen
 	030e  Intuos Pen Small (CTL480)
@@ -6856,7 +6869,7 @@
 	1389  Bluetooth Wireless Adapter
 05b4  LG Semicon Co., Ltd
 	4857  M-Any DAH-210
-	6001  Digisette DUO-MP3 AR-100
+	6001  HYUNDAI GDS30C6001 SSFDC / MMC I/F Controller
 05b5  Dialogic Corp.
 05b6  Proxima Corp.
 05b7  Medianix Semiconductor, Inc.
@@ -6892,6 +6905,7 @@
 	9000  SIMCom SIM5218 modem
 	9001  Gobi Wireless Modem
 	9002  Gobi Wireless Modem
+	9003  Quectel UC20
 	9008  Gobi Wireless Modem (QDL mode)
 	9018  Qualcomm HSUSB Device
 	9025  Qualcomm HSUSB Device
@@ -7202,6 +7216,7 @@
 	a811  16GB Gizmo!
 	a813  16gB flash thumb drive
 	a815  JumpDrive V10
+	a833  JumpDrive S23 64GB
 	b002  USB CF Reader
 	b018  Multi-Card Reader
 	b047  SDHC Reader [RW047-7000]
@@ -7550,6 +7565,7 @@
 	a136  Asus Integrated Webcam [CN031B]
 	a219  1.3M WebCam (notebook emachines E730, Acer sub-brand)
 	c107  HP webcam [dv6-1190en]
+	c335  HP TrueVision HD
 	d101  Acer CrystalEye Webcam
 	d217  HP TrueVision HD
 	e201  Lenovo Integrated Webcam
@@ -8637,6 +8653,7 @@
 0764  Cyber Power System, Inc.
 	0005  Cyber Power UPS
 	0501  CP1500 AVR UPS
+	0601  PR1500LCDRT2U UPS
 0765  X-Rite, Inc.
 	5001  Huey PRO Colorimeter
 	5020  i1 Display Pro
@@ -8987,6 +9004,7 @@
 	090c  OpticBook 3600 Plus Scanner
 	0a06  TVcam VD100
 	0b00  SmartPhoto F50
+	0c00  OpticPro ST64 Scanner
 	0c03  OpticPro ST64+ Scanner
 	0c04  Optic Film 7200i scanner
 	0c0c  PL806 Scanner
@@ -9002,7 +9020,7 @@
 	0109  C-370Z/C-500Z/D-535Z/X-450
 	010a  MAUSB-10 xD and SmartMedia Card Reader
 	0112  MAUSB-100 xD Card Reader
-	0113  Mju 500
+	0113  Mju 500 / Stylus Digital Camera (PTP)
 	0114  C-350Z Camera
 	0118  Mju Mini Digital/Mju Digital 500 Camera / Stylus 850 SW
 	0125  Tough TG-1 Camera
@@ -9550,6 +9568,7 @@
 	9040  WNA1000 Wireless-N 150 [Atheros AR9170+AR9101]
 	9041  WNA1000M 802.11bgn [Realtek RTL8188CUS]
 	9042  On Networks N150MA 802.11bgn [Realtek RTL8188CUS]
+	9043  WNA1000Mv2 802.11bgn [Realtek RTL8188CUS?]
 	9050  A6200 802.11a/b/g/n/ac Wireless Adapter [Broadcom BCM43526]
 	9052  A6100 AC600 DB Wireless Adapter [Realtek RTL8811AU]
 	a001  PA101 10 Mbps HPNA Home Phoneline RJ-1
@@ -9831,6 +9850,7 @@
 	0102  ADSL
 	0301  RNIS
 08e4  Pioneer Corp.
+	0184  DDJ-WeGO
 	0185  DDJ-WeGO2
 08e5  Litronic
 08e6  Gemalto (was Gemplus)
@@ -10017,6 +10037,7 @@
 	0373  Silicon Motion Camera
 	037a  Silicon Motion Camera
 	037b  Silicon Motion Camera
+	037c  300k Pixel Camera
 	1000  Flash Drive
 	1132  5-in-1 Card Reader
 	337b  Silicon Motion Camera
@@ -10031,6 +10052,7 @@
 	937b  Silicon Motion Camera
 	b370  Silicon Motion SM370 Camera
 	b371  Silicon Motion SM371 Camera
+	f37d  Endoscope camera
 090d  Multiport Computer Vertriebs GmbH
 090e  Shining Technology, Inc.
 090f  Fujitsu Devices, Inc.
@@ -10128,6 +10150,7 @@
 0927  Summus, Ltd
 0928  PLX Technology, Inc. (formerly Oxford Semiconductor, Ltd)
 	8000  Firmware uploader
+	ffff  Blank Oxford Device
 0929  American Biometric Co.
 092a  Toshiba Information & Industrial Sys. And Services
 092b  Sena Technologies, Inc.
@@ -11945,6 +11968,9 @@
 	0401  cyberJack pinpad(a2)
 	0500  cyberJack RFID standard dual interface smartcard reader
 	0501  cyberJack RFID comfort dual interface smartcard reader
+	0502  cyberJack compact
+	0504  cyberJack go / go plus
+	0505  cyberJack wave
 	9102  cyberJack RFID basis contactless smartcard reader
 0c4c  Needham's Electronics
 	0021  EMP-21 Universal Programmer
@@ -12014,6 +12040,16 @@
 0c5a  TRS International Mfg., Inc.
 0c5e  Xytronix Research & Design
 0c60  Apogee Electronics Corp.
+	0001  MiniMe
+	0002  MiniDAC
+	0003  ONE
+	0004  GiO
+	0007  Duet
+	0009  Jam
+	000a  Jam Bootloader
+	000b  MiC
+	000c  MiC Bootloader
+	8007  Duet DFU Mode
 0c62  Chant Sincere Co., Ltd
 0c63  Toko, Inc.
 0c64  Signality System Engineering Co., Ltd
@@ -12528,7 +12564,7 @@
 0da1  Suzhou Peter's Precise Industrial Co., Ltd
 0da2  Land Instruments International, Ltd
 0da3  Nippon Electro-Sensory Devices Corp.
-0da4  Polar Electro OY
+0da4  Polar Electro Oy
 	0001  Interface
 	0008  Loop
 0da7  IOGear, Inc.
@@ -12576,6 +12612,10 @@
 0db2  Shian Hwi Plug Parts, Plastic Factory
 0db3  Tekram Technology Co., Ltd
 0db4  Chung Fu Chen Yeh Enterprise Corp.
+0db5  Access IS
+	0139  LSR116 CDC
+	013a  LSR116 Keyboard
+	013b  LSR116 HID
 0db7  ELCON Systemtechnik
 	0002  Goldpfeil P-LAN
 0dba  Digidesign
@@ -12857,6 +12897,7 @@
 	0003  Freebird wireless Controller
 	0005  Eclipse wireless Controller
 	0006  Edge wireless Controller
+	0128  Wireless PS3 Controller
 0e70  Tokyo Electronic Industry Co., Ltd
 0e72  Hsi-Chin Electronics Co., Ltd
 0e75  TVS Electronics, Ltd
@@ -12893,6 +12934,7 @@
 	0016  4 port USB 1.1 hub UH-174
 	0020  USB to PS/2 Adapter
 	0021  Multimedia Keyboard Controller
+	0022  multimedia keyboard controller
 	0201  SmartJoy Frag Xpad/PS2 adaptor
 0e90  WiebeTech, LLC
 	0100  Storage Adapter V1
@@ -12973,6 +13015,7 @@
 0ee3  ComTrue Technology Corp.
 	1000  Image Tank 1.5
 0ee4  Sunrich Technology, Ltd
+	0690  SATA 3 Adapter
 0eee  Digital Stream Technology, Inc.
 	8810  Mass Storage Drive
 0eef  D-WAV Scientific Co., Ltd
@@ -13241,7 +13284,7 @@
 	e166  Xperia Mini Pro
 	e167  XPERIA mini
 	e19b  C2005 [Xperia M dual] (Mass Storage)
-	f0fa  Liveview micro display MN800 in DFU mode
+	f0fa  MN800 / Smartwatch 2 (DFU mode)
 0fcf  Dynastream Innovations, Inc.
 	1003  ANT Development Board
 	1004  ANTUSB Stick
@@ -13315,14 +13358,15 @@
 	61c5  P880 / Charge only
 	61c6  Vortex (msc)
 	61cc  Optimus S
+	61da  G2 Android Phone [tethering mode]
 	61f1  Optimus Android Phone [LG Software mode]
 	61f9  Optimus (Various Models) MTP Mode
 	61fc  Optimus 3
 	61fe  Optimus Android Phone [USB tethering mode]
 	6300  Optimus Android Phone
-	631c  Optimus Android Phone [MTP mode]
+	631c  G2/Optimus Android Phone [MTP mode]
 	631d  Optimus Android Phone (Camera/PTP Mode)
-	631e  Optimus Android Phone [Camera/PTP mode]
+	631e  G2/Optimus Android Phone [Camera/PTP mode]
 	631f  Optimus Android Phone (Charge Mode)
 	6356  Optimus Android Phone [Virtual CD mode]
 	6800  CDMA Modem
@@ -13434,6 +13478,7 @@
 	8901  Bluetooth Device
 	9967  W9967CF/W9968CF Webcam IC
 1048  Targus Group International
+	2010  4-Port hub
 104b  Mylex / Buslogic
 104c  AMCO TEC International, Inc.
 104d  Newport Corporation
@@ -13449,9 +13494,12 @@
 	0009  RE-BL PlayStation 3 IR-to-Bluetooth converter
 1050  Yubico.com
 	0010  Yubikey
-	0110  Yubikey NEO OTP
-	0111  Yubikey NEO OTP+CCID
-	0112  Yubikey NEO CCID
+	0110  Yubikey NEO(-N) OTP
+	0111  Yubikey NEO(-N) OTP+CCID
+	0112  Yubikey NEO(-N) CCID
+	0113  Yubikey NEO(-N) U2F
+	0114  Yubikey NEO(-N) OTP+U2F
+	0115  Yubikey NEO(-N) U2F+CCID
 	0200  U2F Gnubby
 	0211  Gnubby
 1053  Immanuel Electronics Co., Ltd
