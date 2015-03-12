@@ -9,8 +9,8 @@
 #define DNS_SETTINGS_VIEW_H
 
 
-#include <GroupView.h>
 #include <StringList.h>
+#include <View.h>
 
 
 class BButton;
@@ -18,12 +18,11 @@ class BListView;
 class BTextControl;
 
 
-class DNSSettingsView : public BGroupView {
+class DNSSettingsView : public BView {
 public:
 								DNSSettingsView();
 								~DNSSettingsView();
 
-			status_t			Apply();
 			status_t			Revert();
 
 	virtual	void				AttachedToWindow();
@@ -43,6 +42,7 @@ private:
 			BButton*			fRemoveButton;
 			BButton*			fUpButton;
 			BButton*			fDownButton;
+			BButton*			fApplyButton;
 };
 
 

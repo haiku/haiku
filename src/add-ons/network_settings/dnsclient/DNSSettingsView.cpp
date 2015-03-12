@@ -16,50 +16,72 @@
 #include <string.h>
 #include <sys/socket.h>
 
+#include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Path.h>
 #include <ScrollView.h>
+#include <StringView.h>
 #include <TextControl.h>
 
 
-static const int32 kAddServer = 'adds';
-static const int32 kDeleteServer = 'dels';
-static const int32 kMoveUp = 'mvup';
-static const int32 kMoveDown = 'mvdn';
-static const int32 kEditServer = 'edit';
+static const int32 kMsgAddServer = 'adds';
+static const int32 kMsgDeleteServer = 'dels';
+static const int32 kMsgMoveUp = 'mvup';
+static const int32 kMsgMoveDown = 'mvdn';
+static const int32 kMsgEditServer = 'edit';
+static const int32 kMsgApply = 'aply';
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "DNSSettingsView"
 
 
 DNSSettingsView::DNSSettingsView()
 	:
-	BGroupView(B_VERTICAL)
+	BView("dns", 0)
 {
 	fServerListView = new BListView("nameservers");
 	fTextControl = new BTextControl("", "", NULL);
-	fTextControl->SetModificationMessage(new BMessage(kEditServer));
+	fTextControl->SetModificationMessage(new BMessage(kMsgEditServer));
 	fTextControl->SetExplicitMinSize(BSize(fTextControl->StringWidth("5") * 18,
 		B_SIZE_UNSET));
 
-	fAddButton = new BButton("Add", new BMessage(kAddServer));
-	fUpButton = new BButton("Move up", new BMessage(kMoveUp));
-	fDownButton = new BButton("Move down", new BMessage(kMoveDown));
-	fRemoveButton = new BButton("Remove", new BMessage(kDeleteServer));
+	fAddButton = new BButton(B_TRANSLATE("Add"), new BMessage(kMsgAddServer));
+	fAddButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fUpButton = new BButton(B_TRANSLATE("Move up"), new BMessage(kMsgMoveUp));
+	fUpButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fDownButton = new BButton(B_TRANSLATE("Move down"),
+		new BMessage(kMsgMoveDown));
+	fDownButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fRemoveButton = new BButton(B_TRANSLATE("Remove"), new BMessage(kMsgDeleteServer));
+	fRemoveButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	BLayoutBuilder::Group<>(this)
-		.AddGrid()
-			.Add(fTextControl, 0, 0)
-			.Add(fAddButton, 1, 0)
-			.Add(new BScrollView("scroll", fServerListView, 0, false, true),
-				0, 1, 1, 4)
-			.Add(fUpButton, 1, 1)
-			.Add(fDownButton, 1, 2)
-			.Add(fRemoveButton, 1, 3)
-		.End()
-		.Add(fDomain = new BTextControl("Domain", "", NULL))
-	.End();
+	fApplyButton = new BButton(B_TRANSLATE("Apply"), new BMessage(kMsgApply));
+
+	BBox* box = new BBox("dns");
+	box->SetLabel(B_TRANSLATE("DNS servers"));
+	box->AddChild(BLayoutBuilder::Grid<>()
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(fTextControl, 0, 0)
+		.Add(fAddButton, 1, 0)
+		.Add(new BScrollView("scroll", fServerListView, 0, false, true),
+			0, 1, 1, 3)
+		.Add(fUpButton, 1, 1)
+		.Add(fDownButton, 1, 2)
+		.Add(fRemoveButton, 1, 3)
+		.View());
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(box)
+		.Add(fDomain = new BTextControl(B_TRANSLATE("Domain"), "", NULL))
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fApplyButton);
 
 	_LoadDNSConfiguration();
 }
@@ -67,68 +89,6 @@ DNSSettingsView::DNSSettingsView()
 
 DNSSettingsView::~DNSSettingsView()
 {
-}
-
-
-void
-DNSSettingsView::AttachedToWindow()
-{
-	fAddButton->SetTarget(this);
-	fRemoveButton->SetTarget(this);
-	fUpButton->SetTarget(this);
-	fDownButton->SetTarget(this);
-
-	fTextControl->SetTarget(this);
-}
-
-
-void
-DNSSettingsView::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case kAddServer:
-		{
-			const char* address = fTextControl->Text();
-			fServerListView->AddItem(new BStringItem(address));
-			break;
-		}
-		case kDeleteServer:
-			delete fServerListView->RemoveItem(
-				fServerListView->CurrentSelection());
-			break;
-
-		case kMoveUp:
-		{
-			int index = fServerListView->CurrentSelection();
-			if (index > 0)
-				fServerListView->SwapItems(index, index - 1);
-			break;
-		}
-		case kMoveDown:
-		{
-			int index = fServerListView->CurrentSelection();
-			if (index < fServerListView->CountItems() - 1)
-				fServerListView->SwapItems(index, index + 1);
-			break;
-		}
-		case kEditServer:
-		{
-			struct in_addr dummy;
-			bool success = inet_aton(fTextControl->Text(), &dummy);
-			fTextControl->MarkAsInvalid(!success);
-			fAddButton->SetEnabled(success);
-			break;
-		}
-		default:
-			BGroupView::MessageReceived(message);
-	}
-}
-
-
-status_t
-DNSSettingsView::Apply()
-{
-	return _SaveDNSConfiguration();
 }
 
 
@@ -152,6 +112,68 @@ DNSSettingsView::Revert()
 		delete fServerListView->RemoveItem(i);
 
 	return B_OK;
+}
+
+
+void
+DNSSettingsView::AttachedToWindow()
+{
+	fAddButton->SetTarget(this);
+	fRemoveButton->SetTarget(this);
+	fUpButton->SetTarget(this);
+	fDownButton->SetTarget(this);
+
+	fTextControl->SetTarget(this);
+
+	fApplyButton->SetTarget(this);
+}
+
+
+void
+DNSSettingsView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMsgAddServer:
+		{
+			const char* address = fTextControl->Text();
+			fServerListView->AddItem(new BStringItem(address));
+			break;
+		}
+		case kMsgDeleteServer:
+			delete fServerListView->RemoveItem(
+				fServerListView->CurrentSelection());
+			break;
+
+		case kMsgMoveUp:
+		{
+			int index = fServerListView->CurrentSelection();
+			if (index > 0)
+				fServerListView->SwapItems(index, index - 1);
+			break;
+		}
+		case kMsgMoveDown:
+		{
+			int index = fServerListView->CurrentSelection();
+			if (index < fServerListView->CountItems() - 1)
+				fServerListView->SwapItems(index, index + 1);
+			break;
+		}
+		case kMsgEditServer:
+		{
+			struct in_addr dummy;
+			bool success = inet_aton(fTextControl->Text(), &dummy);
+			fTextControl->MarkAsInvalid(!success);
+			fAddButton->SetEnabled(success);
+			break;
+		}
+		case kMsgApply:
+			_SaveDNSConfiguration();
+			break;
+
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
 }
 
 
@@ -194,7 +216,7 @@ DNSSettingsView::_SaveDNSConfiguration()
 		return file.InitCheck();
 	}
 
-	BString content("# Generated by Network Preflet\n");
+	BString content("# Generated by Network preferences\n");
 
 	for (int i = 0; i < fServerListView->CountItems(); i++) {
 		BString item = ((BStringItem*)fServerListView->ItemAt(i))->Text();
