@@ -445,8 +445,8 @@ BNetworkSettings::GetService(const char* name, BMessage& service)
 status_t
 BNetworkSettings::AddService(const BMessage& service)
 {
-	const char* name = NULL;
-	if (service.FindString("name", &name) != B_OK)
+	const char* name = service.GetString("name");
+	if (name == NULL)
 		return B_BAD_VALUE;
 
 	_RemoveItem(fServices, "service", "name", name);
@@ -1538,7 +1538,7 @@ BNetworkServiceSettings::SetStandAlone(bool alone)
 bool
 BNetworkServiceSettings::IsEnabled() const
 {
-	return InitCheck() == B_OK && !fEnabled;
+	return InitCheck() == B_OK && fEnabled;
 }
 
 
@@ -1688,10 +1688,20 @@ BNetworkServiceSettings::GetMessage(BMessage& data) const
 	}
 
 	for (int32 i = 0; i < CountAddresses(); i++) {
-		BMessage address;
-		status = AddressAt(i).GetMessage(address);
+		BNetworkServiceAddressSettings address = AddressAt(i);
+		if (address.Family() == Family()
+			&& address.Type() == Type()
+			&& address.Protocol() == Protocol()
+			&& address.Address().IsWildcard()
+			&& address.Address().Port() == Port()) {
+			// This address will be created automatically, no need to store it
+			continue;
+		}
+
+		BMessage addressMessage;
+		status = AddressAt(i).GetMessage(addressMessage);
 		if (status == B_OK)
-			status = data.AddMessage("address", &address);
+			status = data.AddMessage("address", &addressMessage);
 		if (status != B_OK)
 			break;
 	}
