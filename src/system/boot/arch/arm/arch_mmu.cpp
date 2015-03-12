@@ -700,8 +700,8 @@ mmu_init(void)
 	sPageTableRegionEnd = (addr_t)sPageDirectory + 0x200000;
 
 	// Mark start for dynamic allocation
-	sNextPhysicalAddress =
-	sNextVirtualAddress = sPageTableRegionEnd;
+	sNextPhysicalAddress = sPageTableRegionEnd;
+	sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
 
 	// mark allocated ranges, so they don't get overwritten
 	insert_physical_allocated_range((addr_t)&_start, (addr_t)&_end - (addr_t)&_start);
