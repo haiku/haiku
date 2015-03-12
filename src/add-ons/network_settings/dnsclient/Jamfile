@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src add-ons network_settings dnsclient ;
+
+UsePublicHeaders [ FDirName add-ons network_settings ] ;
+UsePrivateHeaders app libroot kernel net ;
+
+Addon DNSClientService :
+	DNSClientServiceAddOn.cpp
+	DNSSettingsView.cpp
+
+	: be network bnetapi <nogrist>Network [ TargetLibsupc++ ]
+		[ TargetLibstdc++ ] localestub
+;
+
+DoCatalogs DNSClientService : x-vnd.Haiku-DNSClientService :
+	DNSClientServiceAddOn.cpp
+	DNSSettingsView.cpp
+;
