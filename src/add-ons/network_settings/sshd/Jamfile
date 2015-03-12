@@ -5,6 +5,7 @@ UsePrivateHeaders app libroot kernel net shared ;
 
 Addon SSHService :
 	SSHServiceAddOn.cpp
+	ServiceView.cpp
 
 	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ] localestub
@@ -12,4 +13,5 @@ Addon SSHService :
 
 DoCatalogs SSHService : x-vnd.Haiku-SSHService :
 	SSHServiceAddOn.cpp
+	ServiceView.cpp
 ;

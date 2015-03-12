@@ -24,6 +24,8 @@
 #include <user_group.h>
 #include <util/KMessage.h>
 
+#include "ServiceView.h"
+
 
 using namespace BNetworkKit;
 
@@ -46,24 +48,13 @@ public:
 };
 
 
-class ServiceView : public BView {
+class SSHServiceView : public ServiceView {
 public:
-								ServiceView(BNetworkSettings& settings);
-	virtual						~ServiceView();
+								SSHServiceView(BNetworkSettings& settings);
+	virtual						~SSHServiceView();
 
-			void				ConfigurationUpdated(const BMessage& message);
-
-	virtual void				MessageReceived(BMessage* message);
-
-private:
-			bool				_IsEnabled() const;
-			void				_Enable();
-			void				_Disable();
-			void				_UpdateEnableButton();
-
-private:
-			BNetworkSettings&	fSettings;
-			BButton*			fEnableButton;
+protected:
+	virtual	void				Enable();
 };
 
 
@@ -81,7 +72,7 @@ public:
 	virtual	status_t			Revert();
 	virtual bool				IsRevertable();
 
-	virtual void				ConfigurationUpdated(const BMessage& message);
+	virtual void				SettingsUpdated(uint32 which);
 
 private:
 			BNetworkSettings&	fSettings;
@@ -93,87 +84,23 @@ private:
 // #pragma mark -
 
 
-ServiceView::ServiceView(BNetworkSettings& settings)
+SSHServiceView::SSHServiceView(BNetworkSettings& settings)
 	:
-	BView("service", 0),
-	fSettings(settings)
-{
-	BStringView* titleView = new BStringView("service",
-		B_TRANSLATE("SSH server"));
-	titleView->SetFont(be_bold_font);
-	titleView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-
-	BTextView* descriptionView = new BTextView("description");
-	descriptionView->SetText(B_TRANSLATE("The SSH server allows you to "
+	ServiceView("ssh", NULL, B_TRANSLATE("SSH server"), B_TRANSLATE(
+		"The SSH server allows you to "
 		"remotely access your machine with a terminal session, as well as "
-		"file access using the SCP and SFTP protocols."));
-	descriptionView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	descriptionView->MakeEditable(false);
-
-	fEnableButton = new BButton("toggler", B_TRANSLATE("Enable"),
-		new BMessage(kMsgToggleService));
-
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.Add(titleView)
-		.Add(descriptionView)
-		.AddGroup(B_HORIZONTAL)
-			.AddGlue()
-			.Add(fEnableButton);
-
-	SetExplicitMinSize(BSize(200, B_SIZE_UNSET));
-	_UpdateEnableButton();
+		"file access using the SCP and SFTP protocols."), settings)
+{
 }
 
 
-ServiceView::~ServiceView()
+SSHServiceView::~SSHServiceView()
 {
 }
 
 
 void
-ServiceView::ConfigurationUpdated(const BMessage& message)
-{
-	_UpdateEnableButton();
-}
-
-
-void
-ServiceView::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case kMsgToggleService:
-			if (_IsEnabled())
-				_Disable();
-			else
-				_Enable();
-
-			_UpdateEnableButton();
-			break;
-		default:
-			BView::MessageReceived(message);
-			break;
-	}
-}
-
-
-bool
-ServiceView::_IsEnabled() const
-{
-	BMessage request(kMsgIsServiceRunning);
-	request.AddString("name", "ssh");
-
-	BMessenger networkServer(kNetServerSignature);
-	BMessage reply;
-	status_t status = networkServer.SendMessage(&request, &reply);
-	if (status == B_OK)
-		return reply.GetBool("running");
-
-	return false;
-}
-
-
-void
-ServiceView::_Enable()
+SSHServiceView::Enable()
 {
 	if (getpwnam("sshd") == NULL) {
 		// We need to create a dedicated user for the service
@@ -238,22 +165,6 @@ ServiceView::_Enable()
 }
 
 
-void
-ServiceView::_Disable()
-{
-	// Since the sshd user may have been customized, we don't remove it
-	fSettings.RemoveService("ssh");
-}
-
-
-void
-ServiceView::_UpdateEnableButton()
-{
-	fEnableButton->SetLabel(_IsEnabled()
-		? B_TRANSLATE("Disable") : B_TRANSLATE("Enable"));
-}
-
-
 // #pragma mark -
 
 
@@ -293,7 +204,7 @@ BView*
 SSHServiceItem::View()
 {
 	if (fView == NULL)
-		fView = new ServiceView(fSettings);
+		fView = new SSHServiceView(fSettings);
 
 	return fView;
 }
@@ -314,10 +225,10 @@ SSHServiceItem::IsRevertable()
 
 
 void
-SSHServiceItem::ConfigurationUpdated(const BMessage& message)
+SSHServiceItem::SettingsUpdated(uint32 which)
 {
 	if (fView != NULL)
-		fView->ConfigurationUpdated(message);
+		fView->SettingsUpdated(which);
 }
 
 
