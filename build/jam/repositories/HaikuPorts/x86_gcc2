@@ -229,6 +229,8 @@ RemotePackageRepository HaikuPorts
 	libusb_compat_devel-0.1.5-2
 	libuuid-1.0.3-2
 	libuuid_devel-1.0.3-2
+	libunistring-0.9.5-1
+	libunistring_devel-0.9.5-1
 	libvorbis-1.3.4-1
 	libvorbis_devel-1.3.4-1
 	libvpx-1.0.0-2
@@ -270,6 +272,8 @@ RemotePackageRepository HaikuPorts
 	moe-1.1.2-1
 	mog-0.63.1548-1
 	most-pre5.1_15-1
+	mpg123-1.22.0-1
+	mpg123_devel-1.22.0-1
 	mtr-0.73-1
 	multitalk-1.4-1
 	nano-2.2.6-3
@@ -358,8 +362,8 @@ RemotePackageRepository HaikuPorts
 	smpeg_devel-0.4.5-3
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.4.3-1
-	sqlite_devel-3.8.4.3-1
+	sqlite-3.8.8.3-1
+	sqlite_devel-3.8.8.3-1
 	srm-1.2.12-1
 	substrate-1.0b-1
 	subversion-1.8.11-1
@@ -602,8 +606,8 @@ RemotePackageRepository HaikuPorts
 	mpd_x86-0.18.12_git-1
 	mpfr_x86-3.1.2-2
 	mpfr_x86_devel-3.1.2-2
-	mpg123_x86-1.12.1-2
-	mpg123_x86_devel-1.12.1-2
+	mpg123_x86-1.22.0-1
+	mpg123_x86_devel-1.22.0-1
 	mupdf_x86-1.6-1
 	muscle_x86-6.00-1
 	musicpc_x86-0.26-1
@@ -666,8 +670,8 @@ RemotePackageRepository HaikuPorts
 	smpeg_x86_devel-0.4.5-3
 	speex_x86-1.2~rc1-2
 	speex_x86_devel-1.2~rc1-2
-	sqlite_x86-3.8.0.2-1
-	sqlite_x86_devel-3.8.0.2-1
+	sqlite_x86-3.8.8.3-1
+	sqlite_x86_devel-3.8.8.3-1
 	stlink_x86-1.0.0-1
 	stm32flash_x86-0.3-1
 	strigi_x86-0.7.5-2
@@ -870,6 +874,7 @@ RemotePackageRepository HaikuPorts
 	libssh2
 	libtheora
 	libtool
+	libunistring
 	libusb
 	libusb_x86
 	libusb_compat
@@ -915,7 +920,7 @@ RemotePackageRepository HaikuPorts
 	most
 	mpd_x86
 	mpfr_x86
-	mpg123_x86
+	mpg123
 	mtr
 	multitalk
 	mupdf_x86

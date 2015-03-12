@@ -140,6 +140,8 @@ RemotePackageRepository HaikuPorts
 	libtheora_devel-1.1.1-2
 	libtool-2.4.2-1
 	libtool_libltdl-2.4.2-1
+	libunistring-0.9.5-1
+	libunistring_devel-0.9.5-1
 	libvorbis-1.3.4-1
 	libvorbis_devel-1.3.4-1
 	libvpx-1.0.0-2
@@ -165,6 +167,8 @@ RemotePackageRepository HaikuPorts
 	mesa_swrast-10.1.1-1
 	mesa_swpipe-10.1.1-1
 	mkdepend-1.7-3
+	mpg123-1.22.0-1
+	mpg123_devel-1.22.0-1
 	nano-2.2.6-3
 	nasm-2.11.02-1
 	ncurses-5.9-10
@@ -200,8 +204,8 @@ RemotePackageRepository HaikuPorts
 	sharutils-4.14-1
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.6-1
-	sqlite_devel-3.8.6-1
+	sqlite-3.8.8.3-1
+	sqlite_devel-3.8.8.3-1
 	subversion-1.8.11-1
 	subversion_devel-1.8.11-1
 	tar-1.27.1-2
@@ -301,6 +305,7 @@ RemotePackageRepository HaikuPorts
 	libtool
 	libvorbis
 	libvpx
+	libunistring
 	libwebp
 	libxml2
 	libxslt
@@ -313,6 +318,7 @@ RemotePackageRepository HaikuPorts
 	mercurial
 	mesa
 	mkdepend
+	mpg123
 	nano
 	nasm
 	ncurses
