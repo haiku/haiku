@@ -217,8 +217,8 @@ RemotePackageRepository HaikuPorts
 	libsndfile_devel-1.0.25-2
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
-	libssh2-1.4.3-1
-	libssh2_devel-1.4.3-1
+	libssh2-1.5.0-1
+	libssh2_devel-1.5.0-1
 	libtheora-1.1.1-2
 	libtheora_devel-1.1.1-2
 	libtool-2.4-8
@@ -253,6 +253,8 @@ RemotePackageRepository HaikuPorts
 	lynx-2.8.9dev.1-1
 	lz4-r117-1
 	lz4_devel-r117-1
+	lzo-2.09-1
+	lzo_devel-2.09-1
 	m4-1.4.16-5
 	make-3.82-5
 	man-1.6g-4
@@ -588,8 +590,8 @@ RemotePackageRepository HaikuPorts
 	luajit_x86_devel-2.0.2-2
 	lwtools_x86-4.10-1
 	lzip_x86-1.16-1
-	lzo_x86-2.06-1
-	lzo_x86_devel-2.06-1
+	lzo_x86-2.09-1
+	lzo_x86_devel-2.09-1
 	mesa_x86-10.1.0-2
 	mesa_x86_devel-10.1.0-2
 	mesa_x86_swrast-10.1.0-2
@@ -894,7 +896,7 @@ RemotePackageRepository HaikuPorts
 	lynx
 	lz4
 	lzip_x86
-	lzo_x86
+	lzo
 	m4
 	make
 	man

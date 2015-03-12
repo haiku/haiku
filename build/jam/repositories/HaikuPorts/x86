@@ -123,6 +123,8 @@ RemotePackageRepository HaikuPorts
 	libpng16_devel-1.6.16-1
 	libsdl-1.2.15-6
 	libsdl_devel-1.2.15-6
+	libssh2-1.5.0-1
+	libssh2_devel-1.5.0-1
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
 	libtheora-1.1.1-2
@@ -142,6 +144,8 @@ RemotePackageRepository HaikuPorts
 	libxslt_devel-1.1.28-2
 	lz4-r117-1
 	lz4_devel-r117-1
+	lzo-2.09-1
+	lzo_devel-2.09-1
 	m4-1.4.16-5
 	make-3.82-5
 	man-1.6g-3
@@ -352,6 +356,7 @@ RemotePackageRepository HaikuPorts
 	libpng
 	libpng16
 	libsdl
+	libssh2
 	libsolv
 	libtheora
 	libtool
@@ -361,6 +366,7 @@ RemotePackageRepository HaikuPorts
 	libxml2
 	libxslt
 	lz4
+	lzo
 	m4
 	make
 	man
