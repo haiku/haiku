@@ -380,15 +380,11 @@ Services::_Update(const BMessage& services)
 	BMessage message;
 	for (int32 index = 0; services.FindMessage("service", index,
 			&message) == B_OK; index++) {
-		const char* name;
-		if (message.FindString("name", &name) != B_OK)
-			continue;
-
 		struct service* service;
 		if (_ToService(message, service) != B_OK)
 			continue;
 
-		ServiceNameMap::iterator iterator = fNameMap.find(name);
+		ServiceNameMap::iterator iterator = fNameMap.find(service->name);
 		if (iterator == fNameMap.end()) {
 			// this service does not exist yet, start it
 			printf("New service %s\n", service->name.c_str());
@@ -465,7 +461,10 @@ Services::_LaunchService(struct service& service, int socket)
 		if (socket != -1)
 			close(socket);
 
-		if (service.stand_alone)
+		if (child < 0) {
+			fprintf(stderr, "Could not start service %s\n",
+				service.name.c_str());
+		} else if (service.stand_alone)
 			service.process = child;
 	}
 
