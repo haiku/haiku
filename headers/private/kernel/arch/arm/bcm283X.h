@@ -39,13 +39,20 @@
  */
 
 // Section 1.2.2
+// These board bases should go away when we start using FDT's
+// (all loader drivers compiled in, drivers chosen based on FDT)
+//
 #define BCM283X_SDRAM_BASE		0x00000000
 #if defined(BOARD_CPU_BCM2835)
 #define BCM283X_PERIPHERAL_BASE	0x20000000
 #elif defined(BOARD_CPU_BCM2836)
 #define BCM283X_PERIPHERAL_BASE	0x3f000000
 #else
-#error Unknown BCM283X!
+// This will always trigger on non-BCM arm boards
+// Leave in until we use FDT to pick needed board drivers at runtime.
+// We can get peripheral base from the DTB long-term
+#define BCM283X_PERIPHERAL_BASE	0x0
+#warning Unknown BCM283X chipset!
 #endif
 
 
