@@ -12,7 +12,9 @@
 #include <Mime.h>
 
 #include <fs_attr.h>
-#include <parsedate.h>
+#ifdef __HAIKU__
+#	include <parsedate.h>
+#endif
 
 #include <ctype.h>
 #include <errno.h>
@@ -113,6 +115,7 @@ writeAttr(int fd, type_code type, const char* name, const char* value, size_t le
 			return writeAttrValue<uint8>(fd, name, B_BOOL_TYPE, boolValue);
 		}
 
+#ifdef __HAIKU__
 		case B_TIME_TYPE:
 		{
 			time_t timeValue = parsedate(value, time(NULL));
@@ -121,6 +124,7 @@ writeAttr(int fd, type_code type, const char* name, const char* value, size_t le
 
 			return writeAttrValue<time_t>(fd, name, B_TIME_TYPE, timeValue);
 		}
+#endif
 
 		case B_STRING_TYPE:
 		case B_MIME_STRING_TYPE:
