@@ -486,10 +486,22 @@ BControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 	if (_RadioButtonAndCheckBoxMarkColor(base, markColor, flags)) {
 		view->SetHighColor(markColor);
 
-		rect.InsetBy(2, 2);
-		view->SetPenSize(std::max(1.0f, ceilf(rect.Width() / 3.5)));
-		view->SetDrawingMode(B_OP_OVER);
+		BFont font;
+		view->GetFont(&font);
+		float inset = std::max(2.0f, roundf(font.Size() / 6));
+		rect.InsetBy(inset, inset);
 
+		float penSize = std::max(1.0f, ceilf(rect.Width() / 3.5f));
+		if (penSize > 1.0f && fmodf(penSize, 2.0f) == 0.0f) {
+			// Tweak ends to "include" the pixel at the index,
+			// we need to do this in order to produce results like R5,
+			// where coordinates were inclusive
+			rect.right++;
+			rect.bottom++;
+		}
+
+		view->SetPenSize(penSize);
+		view->SetDrawingMode(B_OP_OVER);
 		view->StrokeLine(rect.LeftTop(), rect.RightBottom());
 		view->StrokeLine(rect.LeftBottom(), rect.RightTop());
 	}
