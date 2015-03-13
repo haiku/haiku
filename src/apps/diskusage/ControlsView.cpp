@@ -224,20 +224,23 @@ ControlsView::VolumeTabView::AttachedToWindow()
 
 	BVolume tempVolume;
 	while (fVolumeRoster->GetNextVolume(&tempVolume) == B_OK) {
-		if (tempVolume.IsPersistent()) {
-			BVolume* volume = new BVolume(tempVolume);
-			VolumeTab* item = new VolumeTab(volume);
-			char name[B_PATH_NAME_LENGTH];
-			if (volume->GetName(name) != B_OK)
-				continue;
+		if (!tempVolume.IsPersistent())
+			continue;
 
-			if (strcmp(name, "system") == 0
-				|| strcmp(name, "config") == 0) {
-				// Don't include virtual volumes.
-				continue;
-			}
-			AddTab(new VolumeView(name, volume), item);
+		char name[B_PATH_NAME_LENGTH];
+		if (tempVolume.GetName(name) != B_OK)
+			continue;
+
+		if (strcmp(name, "system") == 0
+			|| strcmp(name, "config") == 0) {
+			// Don't include virtual volumes.
+			continue;
 		}
+
+		BVolume* volume = new BVolume(tempVolume);
+		VolumeView* volumeView = new VolumeView(name, volume);
+		VolumeTab* volumeTab = new VolumeTab(volume);
+		AddTab(volumeView, volumeTab);
 	}
 
 	// Begin watching mount and unmount events.
