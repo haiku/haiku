@@ -637,7 +637,7 @@ find_physical_memory_ranges(uint64 &total)
 			size = fdt64_to_cpu(*(uint64_t *)p);
 		else
 			size = fdt32_to_cpu(*(uint32_t *)p);
-		p += regAddressCells;
+		p += regSizeCells;
 		len -= sizeof(uint32) * (regAddressCells + regSizeCells);
 
 		if (size <= 0) {
