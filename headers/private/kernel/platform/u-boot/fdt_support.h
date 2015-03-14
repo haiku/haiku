@@ -13,9 +13,10 @@
 
 
 void dump_fdt(const void *fdt);
-status_t fdt_get_cell_count(int32 pathOffset,
-	int32 &addressCells, int32 &sizeCells);
+status_t fdt_get_cell_count(int node, int32 &addressCells, int32 &sizeCells);
 
+addr_t fdt_get_device_reg_byname(const char* name);
+addr_t fdt_get_device_reg_byalias(const char* alias);
 
 
 #endif /*__FDT_SUPPORT_H*/

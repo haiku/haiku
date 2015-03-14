@@ -645,101 +645,6 @@ find_physical_memory_ranges(uint64 &total)
 }
 
 
-static uint64
-fdt_get_range_offset(int32 node)
-{
-	// Obtain the offset of the device by searching
-	// for the first ranges start in parents.
-
-	// It could be possible that there are multiple
-	// offset ranges in several parents + children.
-	// Lets hope that no system designer is that insane.
-	int depth = fdt_node_depth(gFDT, node);
-	int32 examineNode = node;
-	uint64 pathOffset = 0x0;
-
-	while (depth > 0) {
-		int len;
-		const void* prop;
-		prop = fdt_getprop(gFDT, examineNode, "ranges", &len);
-		if (prop) {
-			int32 regAddressCells = 1;
-			int32 regSizeCells = 1;
-			fdt_get_cell_count(examineNode, regAddressCells, regSizeCells);
-
-			const uint32 *p = (const uint32 *)prop;
-			// All we are interested in is the start offset
-			if (regAddressCells == 2)
-				pathOffset = fdt64_to_cpu(*(uint64_t *)p);
-			else
-				pathOffset = fdt32_to_cpu(*(uint32_t *)p);
-			break;
-		}
-		int32 parentNode = fdt_parent_offset(gFDT, examineNode);
-		depth = fdt_node_depth(gFDT, parentNode);
-		examineNode = parentNode;
-	}
-
-	dprintf("%s: range offset: 0x%" B_PRIx64 "\n", __func__, pathOffset);
-
-	return pathOffset;
-}
-
-
-static status_t
-fdt_get_device_base(const char* device)
-{
-	int node;
-	const void *prop;
-	int len;
-
-	// Find device in FDT
-	node = fdt_path_offset(gFDT, device);
-
-	int32 regAddressCells = 1;
-	int32 regSizeCells = 1;
-	fdt_get_cell_count(node, regAddressCells, regSizeCells);
-
-	if (node < 0) {
-		dprintf("%s: %s not found in FDT!\n", __func__, device);
-		return B_ERROR;
-	}
-
-	prop = fdt_getprop(gFDT, node, "reg", &len);
-
-	if (prop < 0) {
-		dprintf("%s: reg property not found on device %s in FDT!\n", __func__,
-			device);
-		return B_ERROR;
-	}
-
-	const uint32 *p = (const uint32 *)prop;
-	uint64 baseDevice = 0x0;
-	uint64 size = 0x0;
-
-	// soc base address cells
-	if (regAddressCells == 2)
-		baseDevice = fdt64_to_cpu(*(uint64_t *)p);
-	else
-		baseDevice = fdt32_to_cpu(*(uint32_t *)p);
-	p += regAddressCells;
-
-	// size
-	if (regSizeCells == 2)
-		size = fdt64_to_cpu(*(uint64_t *)p);
-	else if (regSizeCells == 1)
-		size = fdt32_to_cpu(*(uint32_t *)p);
-	// we can have 0 size cells
-	//p += regSizeCells;
-
-	baseDevice -= fdt_get_range_offset(node);
-
-	dprintf("%s: %s found @ 0x%" B_PRIx64 " , size: 0x%" B_PRIx64 "\n",
-		__func__, device, baseDevice, size);
-	return B_OK;
-}
-
-
 extern "C" void
 mmu_init(void)
 {
@@ -767,7 +672,8 @@ mmu_init(void)
 	}
 
 	// XXX: A simple test.
-	fdt_get_device_base("/soc/gpio");
+	fdt_get_device_reg_byname("/soc/gpio");
+	fdt_get_device_reg_byalias("gpio");
 
 	// see if subpages are disabled
 	if (mmu_read_C1() & (1 << 23))

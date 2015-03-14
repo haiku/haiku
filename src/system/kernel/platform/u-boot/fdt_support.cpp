@@ -1,7 +1,12 @@
 /*
- * Copyright 2012, François Revol, revol@free.fr.
+ * Copyright 2012-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		François Revol, revol@free.fr
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
+
 
 #include "fdt_support.h"
 
@@ -17,17 +22,17 @@ extern "C" {
 #include <libfdt_env.h>
 };
 
-//#define TRACE_FDT
+
+#define TRACE_FDT
 #ifdef TRACE_FDT
-#   define TRACE(x) dprintf x
+#   define TRACE(x...) dprintf(x)
 #else
-#   define TRACE(x) ;
+#   define TRACE(x...) ;
 #endif
 
 //#define FDT_DUMP_NODES
 //#define FDT_DUMP_PROPS
 //#define FDT_DUMP_PROP_VALUES
-
 
 #ifdef FDT_DUMP_NODES
 static const char *sTabTab = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
@@ -127,8 +132,49 @@ void dump_fdt(const void *fdt)
 }
 
 
+static uint64
+fdt_get_range_offset(int32 node)
+{
+	// Obtain the offset of the device by searching
+	// for the first ranges start in parents.
+
+	// It could be possible that there are multiple
+	// offset ranges in several parents + children.
+	// Lets hope that no system designer is that insane.
+	int depth = fdt_node_depth(gFDT, node);
+	int32 examineNode = node;
+	uint64 pathOffset = 0x0;
+
+	while (depth > 0) {
+		int len;
+		const void* prop;
+		prop = fdt_getprop(gFDT, examineNode, "ranges", &len);
+		if (prop) {
+			int32 regAddressCells = 1;
+			int32 regSizeCells = 1;
+			fdt_get_cell_count(examineNode, regAddressCells, regSizeCells);
+
+			const uint32 *p = (const uint32 *)prop;
+			// All we are interested in is the start offset
+			if (regAddressCells == 2)
+				pathOffset = fdt64_to_cpu(*(uint64_t *)p);
+			else
+				pathOffset = fdt32_to_cpu(*(uint32_t *)p);
+			break;
+		}
+		int32 parentNode = fdt_parent_offset(gFDT, examineNode);
+		depth = fdt_node_depth(gFDT, parentNode);
+		examineNode = parentNode;
+	}
+
+	dprintf("%s: range offset: 0x%" B_PRIx64 "\n", __func__, pathOffset);
+
+	return pathOffset;
+}
+
+
 status_t
-fdt_get_cell_count(int32 pathOffset, int32 &addressCells, int32 &sizeCells)
+fdt_get_cell_count(int node, int32 &addressCells, int32 &sizeCells)
 {
 	// It would be nice if libfdt provided this.
 
@@ -139,16 +185,16 @@ fdt_get_cell_count(int32 pathOffset, int32 &addressCells, int32 &sizeCells)
 	// TODO: assert !gFDT || !pathOffset?
 
 	int len;
-	if (!pathOffset) {
-		TRACE(("%s: Invalid FDT pathOffset provided!\n", __func__));
+	if (node < 0) {
+		TRACE("%s: Invalid FDT node id provided!\n", __func__);
 		return B_ERROR;
 	}
 
 	const void *prop;
-	prop = fdt_getprop(gFDT, pathOffset, "#address-cells", &len);
+	prop = fdt_getprop(gFDT, node, "#address-cells", &len);
 	if (prop && len == sizeof(uint32))
 		addressCells = fdt32_to_cpu(*(uint32_t *)prop);
-	prop = fdt_getprop(gFDT, pathOffset, "#size-cells", &len);
+	prop = fdt_getprop(gFDT, node, "#size-cells", &len);
 	if (prop && len == sizeof(uint32))
 		sizeCells = fdt32_to_cpu(*(uint32_t *)prop);
 
@@ -161,4 +207,86 @@ fdt_get_cell_count(int32 pathOffset, int32 &addressCells, int32 &sizeCells)
 	}
 
 	return B_OK;
+}
+
+
+static addr_t
+fdt_get_device_reg(int node)
+{
+	const void *prop;
+	int len;
+
+	int32 regAddressCells = 1;
+	int32 regSizeCells = 1;
+	fdt_get_cell_count(node, regAddressCells, regSizeCells);
+
+	prop = fdt_getprop(gFDT, node, "reg", &len);
+
+	if (!prop) {
+		dprintf("%s: reg property not found on node in FDT!\n", __func__);
+		return 0;
+	}
+
+	const uint32 *p = (const uint32 *)prop;
+	uint64 baseDevice = 0x0;
+	uint64 size = 0x0;
+
+	// soc base address cells
+	if (regAddressCells == 2)
+		baseDevice = fdt64_to_cpu(*(uint64_t *)p);
+	else
+		baseDevice = fdt32_to_cpu(*(uint32_t *)p);
+	p += regAddressCells;
+
+	// size (atm, we don't pass this back :-\)
+	if (regSizeCells == 2)
+		size = fdt64_to_cpu(*(uint64_t *)p);
+	else if (regSizeCells == 1)
+		size = fdt32_to_cpu(*(uint32_t *)p);
+	// we can have 0 size cells
+	//p += regSizeCells;
+
+	baseDevice -= fdt_get_range_offset(node);
+
+	return (addr_t)baseDevice;
+}
+
+
+addr_t
+fdt_get_device_reg_byname(const char* name)
+{
+	// Find device in FDT
+	int node = fdt_path_offset(gFDT, name);
+
+	if (node < 0) {
+		dprintf("%s: %s not found in FDT!\n", __func__, name);
+		return 0;
+	}
+
+	addr_t deviceReg = fdt_get_device_reg(node);
+	if (deviceReg > 0) {
+		//TRACE("%s: %s found @ 0x%" B_PRIx64 " , size: 0x%" B_PRIx64 "\n",
+		//	__func__, name, deviceReg, size);
+		TRACE("%s: %s found @ 0x%" B_PRIxADDR "\n", __func__, name, deviceReg);
+	} else {
+		dprintf("%s: No valid reg entry on FDT device %s!\n",
+			__func__, name);
+		return 0;
+	}
+	return deviceReg; 
+}
+
+
+addr_t
+fdt_get_device_reg_byalias(const char* alias)
+{
+	const char* name = fdt_get_alias(gFDT, alias);
+
+	if (name == NULL) {
+		dprintf("%s: No alias found for %s!\n", __func__, alias);
+		return 0;
+	}
+
+	addr_t deviceReg = fdt_get_device_reg_byname(name);
+	return deviceReg; 
 }
