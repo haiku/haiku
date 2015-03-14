@@ -18,6 +18,8 @@ extern "C" {
 #include <libfdt_env.h>
 };
 
+#include "fdt_support.h"
+
 
 extern "C" DebugUART *debug_uart_from_fdt(const void *fdt);
 
@@ -26,7 +28,7 @@ DebugUART *
 debug_uart_from_fdt(const void *fdt)
 {
 	const char *name;
-	const char *type;
+	//const char *type;
 	int node;
 	int len;
 	phys_addr_t regs;
@@ -43,6 +45,8 @@ debug_uart_from_fdt(const void *fdt)
 		name = fdt_get_alias(fdt, "serial0");
 	if (name == NULL)
 		name = fdt_get_alias(fdt, "serial1");
+	if (name == NULL)
+		name = fdt_get_alias(fdt, "uart0");
 	// TODO: else use /chosen linux,stdout-path
 	if (name == NULL)
 		return NULL;
@@ -52,27 +56,11 @@ debug_uart_from_fdt(const void *fdt)
 	if (node < 0)
 		return NULL;
 
-	type = (const char *)fdt_getprop(fdt, node, "device_type", &len);
-	//dprintf("serial: type: '%s'\n", type);
-	if (type == NULL || strcmp(type, "serial"))
-		return NULL;
-
 	// determine the MMIO address
-	// TODO: ppc460 use 64bit addressing, but U-Boot seems to map it below 4G,
-	// and the FDT is not very clear. libfdt is also getting 64bit addr support.
-	// so FIXME someday.
-	prop = fdt_getprop(fdt, node, "virtual-reg", &len);
-	if (prop && len == 4) {
-		regs = fdt32_to_cpu(*(uint32_t *)prop);
-		//dprintf("serial: virtual-reg 0x%08llx\n", (int64)regs);
-	} else {
-		prop = fdt_getprop(fdt, node, "reg", &len);
-		if (prop && len >= 4) {
-			regs = fdt32_to_cpu(*(uint32_t *)prop);
-			//dprintf("serial: reg 0x%08llx\n", (int64)regs);
-		} else
-			return NULL;
-	}
+	regs = fdt_get_device_reg(node);
+
+	if (regs == 0)
+		return NULL;
 
 	// get the UART clock rate
 	prop = fdt_getprop(fdt, node, "clock-frequency", &len);
@@ -96,8 +84,7 @@ debug_uart_from_fdt(const void *fdt)
 		(void)speed;
 	} else {
 		// TODO: handle more UART types
-		// for when we can use U-Boot's console
-		panic("Unknown UART type %s", type);
+		return NULL;
 	}
 
 	return uart;

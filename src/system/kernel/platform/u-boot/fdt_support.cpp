@@ -210,7 +210,7 @@ fdt_get_cell_count(int node, int32 &addressCells, int32 &sizeCells)
 }
 
 
-static addr_t
+phys_addr_t
 fdt_get_device_reg(int node)
 {
 	const void *prop;
@@ -219,6 +219,8 @@ fdt_get_device_reg(int node)
 	int32 regAddressCells = 1;
 	int32 regSizeCells = 1;
 	fdt_get_cell_count(node, regAddressCells, regSizeCells);
+
+	// TODO: check for virtual-reg, and don't -= fdt_get_range_offset?
 
 	prop = fdt_getprop(gFDT, node, "reg", &len);
 
@@ -248,11 +250,11 @@ fdt_get_device_reg(int node)
 
 	baseDevice -= fdt_get_range_offset(node);
 
-	return (addr_t)baseDevice;
+	return baseDevice;
 }
 
 
-addr_t
+phys_addr_t
 fdt_get_device_reg_byname(const char* name)
 {
 	// Find device in FDT
@@ -277,7 +279,7 @@ fdt_get_device_reg_byname(const char* name)
 }
 
 
-addr_t
+phys_addr_t
 fdt_get_device_reg_byalias(const char* alias)
 {
 	const char* name = fdt_get_alias(gFDT, alias);
@@ -287,6 +289,6 @@ fdt_get_device_reg_byalias(const char* alias)
 		return 0;
 	}
 
-	addr_t deviceReg = fdt_get_device_reg_byname(name);
+	phys_addr_t deviceReg = fdt_get_device_reg_byname(name);
 	return deviceReg; 
 }
