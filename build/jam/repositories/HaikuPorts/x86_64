@@ -90,8 +90,8 @@ RemotePackageRepository HaikuPorts
 	gutenprint_devel-5.2.10-1
 	haikuwebkit-1.4.10-1
 	haikuwebkit_devel-1.4.10-1
-	harfbuzz-0.9.38-2
-	harfbuzz_devel-0.9.38-2
+	harfbuzz-0.9.39-1
+	harfbuzz_devel-0.9.39-1
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
 	icu-54.1-4
@@ -142,8 +142,8 @@ RemotePackageRepository HaikuPorts
 	libtool_libltdl-2.4.2-1
 	libunistring-0.9.5-1
 	libunistring_devel-0.9.5-1
-	libvorbis-1.3.4-1
-	libvorbis_devel-1.3.4-1
+	libvorbis-1.3.5-1
+	libvorbis_devel-1.3.5-1
 	libvpx-1.0.0-2
 	libvpx_devel-1.0.0-2
 	libwebp-0.4.1-1
@@ -170,7 +170,7 @@ RemotePackageRepository HaikuPorts
 	mpg123-1.22.0-1
 	mpg123_devel-1.22.0-1
 	nano-2.2.6-3
-	nasm-2.11.02-1
+	nasm-2.11.08-1
 	ncurses-5.9-10
 	ncurses_devel-5.9-10
 	neon-0.29.6-7
