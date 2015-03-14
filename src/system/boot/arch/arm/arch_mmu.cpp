@@ -683,6 +683,12 @@ find_physical_memory_ranges(uint64 &total)
 static uint64
 fdt_get_range_offset(int32 node)
 {
+	// Obtain the offset of the device by searching
+	// for the first ranges start in parents.
+
+	// It could be possible that there are multiple
+	// offset ranges in several parents + children.
+	// Lets hope that no system designer is that insane.
 	int depth = fdt_node_depth(gFDT, node);
 	int32 examineNode = node;
 	uint64 pathOffset = 0x0;
@@ -697,7 +703,7 @@ fdt_get_range_offset(int32 node)
 			fdt_get_cell_count(examineNode, regAddressCells, regSizeCells);
 
 			const uint32 *p = (const uint32 *)prop;
-			// soc base address cells
+			// All we are interested in is the start offset
 			if (regAddressCells == 2)
 				pathOffset = fdt64_to_cpu(*(uint64_t *)p);
 			else
@@ -758,9 +764,8 @@ fdt_get_device_base(const char* device)
 		size = fdt64_to_cpu(*(uint64_t *)p);
 	else if (regSizeCells == 1)
 		size = fdt32_to_cpu(*(uint32_t *)p);
+	// we can have 0 size cells
 	//p += regSizeCells;
-
-	dprintf("%s: before: %" B_PRIx64 "\n", __func__, baseDevice);
 
 	baseDevice -= fdt_get_range_offset(node);
 
@@ -796,6 +801,7 @@ mmu_init(void)
 		dprintf("total physical memory = %" B_PRId64 "MB\n", total / (1024 * 1024));
 	}
 
+	// XXX: A simple test.
 	fdt_get_device_base("/soc/gpio");
 
 	// see if subpages are disabled
