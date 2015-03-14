@@ -7,6 +7,7 @@
 #include "serial.h"
 #include "console.h"
 #include "cpu.h"
+#include "fdt_support.h"
 #include "mmu.h"
 #include "smp.h"
 #include "uimage.h"
@@ -59,7 +60,6 @@ extern "C" void _start(void);
 extern "C" int start_gen(int argc, const char **argv,
 	struct image_header *uimage=NULL, void *fdt=NULL);
 extern "C" void dump_uimage(struct image_header *image);
-extern "C" void dump_fdt(const void *fdt);
 #if defined(__ARM__)
 extern "C" status_t arch_mailbox_init();
 #endif

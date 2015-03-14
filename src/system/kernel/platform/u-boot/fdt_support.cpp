@@ -3,6 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "fdt_support.h"
+
 #include <KernelExport.h>
 #include <ByteOrder.h>
 #include <ctype.h>
@@ -15,12 +17,12 @@ extern "C" {
 #include <libfdt_env.h>
 };
 
-#ifndef _BOOT_MODE
-/* the bootloader has it in asm code to avoid it ending up in .bss */
-void *gFDT;
+//#define TRACE_FDT
+#ifdef TRACE_FDT
+#   define TRACE(x) dprintf x
+#else
+#   define TRACE(x) ;
 #endif
-
-extern "C" void dump_fdt(const void *fdt);
 
 //#define FDT_DUMP_NODES
 //#define FDT_DUMP_PROPS
@@ -31,6 +33,14 @@ extern "C" void dump_fdt(const void *fdt);
 static const char *sTabTab = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 #define DS "%.*s"
 #define DA depth - 1, sTabTab
+#endif
+
+
+#ifndef _BOOT_MODE
+/* the bootloader has it in asm code to avoid it ending up in .bss */
+void *gFDT;
+#else
+extern void *gFDT;
 #endif
 
 
@@ -116,3 +126,39 @@ void dump_fdt(const void *fdt)
 #endif
 }
 
+
+status_t
+fdt_get_cell_count(int32 pathOffset, int32 &addressCells, int32 &sizeCells)
+{
+	// It would be nice if libfdt provided this.
+
+	// Memory base addresses are provided in 32 or 64 bit flavors
+	// #address-cells and #size-cells matches the number of 32-bit 'cells'
+	// representing the length of the base address and size fields
+
+	// TODO: assert !gFDT || !pathOffset?
+
+	int len;
+	if (!pathOffset) {
+		TRACE(("%s: Invalid FDT pathOffset provided!\n", __func__));
+		return B_ERROR;
+	}
+
+	const void *prop;
+	prop = fdt_getprop(gFDT, pathOffset, "#address-cells", &len);
+	if (prop && len == sizeof(uint32))
+		addressCells = fdt32_to_cpu(*(uint32_t *)prop);
+	prop = fdt_getprop(gFDT, pathOffset, "#size-cells", &len);
+	if (prop && len == sizeof(uint32))
+		sizeCells = fdt32_to_cpu(*(uint32_t *)prop);
+
+	// NOTE : Cells over 2 is possible in theory... 
+	if (addressCells > 2 || sizeCells > 2) {
+		panic("%s: Unsupported FDT cell count detected.\n"
+			"Address Cells: %" B_PRId32 "; Size Cells: %" B_PRId32
+			" (CPU > 64bit?).\n", __func__, addressCells, sizeCells);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}

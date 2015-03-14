@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system boot platform u-boot ;
 
 SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+SubDirHdrs $(HAIKU_TOP) headers private kernel platform $(TARGET_BOOT_PLATFORM) ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ;
 
