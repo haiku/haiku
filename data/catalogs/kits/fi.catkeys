@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	2929679013
+1	finnish	x-vnd.Haiku-libbe	436685149
 gamma	AboutWindow		gamma
 beta	AboutWindow		beeta
 %3.2f GiB	StringForSize		%3.2f gibitavua
@@ -29,7 +29,6 @@ Special Thanks:	AboutWindow		Erityiskiitokset:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Ei voi paikallistaa sovellusta replikantille. Sovellusallekirjoitusta ei ole tarjottu.\n%error
 Redo	TextView		Tee uudelleen
 <empty>	Menu		<tyhjä>
-Select All	TextView		Valitse kaikki
 Warning	Dragger		Varoitus
 Undo	TextView		Peru
 Red:	ColorControl		Punainen:

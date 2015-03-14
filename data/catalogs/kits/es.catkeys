@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libbe	1409488127
+1	spanish; castilian	x-vnd.Haiku-libbe	3211461559
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -26,7 +26,6 @@ Special Thanks:	AboutWindow		Agradecimientos especiales:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No se puede localizar la aplicación para el replicante. Ninguna firma de aplicación se proporcionó:\n%error
 Redo	TextView		Rehacer
 <empty>	Menu		<vacío>
-Select All	TextView		Seleccionar todo
 Warning	Dragger		Advertencia
 Undo	TextView		Deshacer
 Red:	ColorControl		Rojo:

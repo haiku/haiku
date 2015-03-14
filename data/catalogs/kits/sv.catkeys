@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libbe	2929679013
+1	swedish	x-vnd.Haiku-libbe	436685149
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -29,7 +29,6 @@ Special Thanks:	AboutWindow		Särskilt tack till:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kan inte hitta programmet för replikanten. Ingen programsignatur är angiven.\n%error
 Redo	TextView		Gör om
 <empty>	Menu		<tom>
-Select All	TextView		Markera alla
 Warning	Dragger		Varning
 Undo	TextView		Ångra
 Red:	ColorControl		Röd:

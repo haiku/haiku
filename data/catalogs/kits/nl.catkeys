@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libbe	2189587031
+1	dutch; flemish	x-vnd.Haiku-libbe	3991560463
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Door:
 About %app%	AboutMenuItem		Over %app%
@@ -18,7 +18,6 @@ Paste	TextView		Plakken
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		De applicatie voor de replica kan niet gelocaliseerd worden. Er is geen applicatiehandtekening gegeven.\n%error
 Redo	TextView		Opnieuw
 <empty>	Menu		<leeg>
-Select All	TextView		Alles selecteren
 Warning	Dragger		Waarschuwing
 Undo	TextView		Ongedaan maken
 Red:	ColorControl		Rood:

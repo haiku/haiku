@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libbe	2555809888
+1	italian	x-vnd.Haiku-libbe	62816024
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -28,7 +28,6 @@ Special Thanks:	AboutWindow		Ringraziamenti speciali:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossibile individuare l'applicazione da cui generare il replicante. Non è stata fornita alcuna firma per l'applicazione. \n%error
 Redo	TextView		Ripeti
 <empty>	Menu		<vuoto>
-Select All	TextView		Seleziona tutto
 Warning	Dragger		Attenzione
 Undo	TextView		Annulla
 Red:	ColorControl		Rosso:

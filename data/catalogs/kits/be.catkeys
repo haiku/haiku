@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libbe	1409488127
+1	belarusian	x-vnd.Haiku-libbe	3211461559
 gamma	AboutWindow		гамма
 beta	AboutWindow		бэта
 %3.2f GiB	StringForSize		%3.2f ГіБ
@@ -26,7 +26,6 @@ Special Thanks:	AboutWindow		Адмысловыя падзякі:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Праграма рэпліканата не знойдзена. Подпис праграмы не зададзены.\n%error
 Redo	TextView		Зрабіць наноў
 <empty>	Menu		<няма>
-Select All	TextView		Пазначыць ўсё
 Warning	Dragger		Папярэджанне
 Undo	TextView		Адвярнуць
 Red:	ColorControl		Чырвоны:

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libbe	1409488127
+1	portuguese (brazil)	x-vnd.Haiku-libbe	3211461559
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GB
@@ -26,7 +26,6 @@ Special Thanks:	AboutWindow		Agradecimentos Especiais
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Não é possível localizar o aplicativo para o replicante. Nenhuma assinatura de aplicativo fornecida.\n%error
 Redo	TextView		Refazer
 <empty>	Menu		<vazio>
-Select All	TextView		Selecionar Tudo
 Warning	Dragger		Aviso
 Undo	TextView		Desfazer
 Red:	ColorControl		Vermelho:

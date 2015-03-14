@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libbe	2003106319
+1	slovak	x-vnd.Haiku-libbe	3805079751
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -25,7 +25,6 @@ Special Thanks:	AboutWindow		Zvláštne poďakovanie:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nemožno nájsť aplikáciu pre replikanta. Nebol dodaný žiaden podpis aplikácie.\n%error
 Redo	TextView		Opakovať
 <empty>	Menu		<prázdne>
-Select All	TextView		Vybrať všetko
 Warning	Dragger		Upozornenie
 Undo	TextView		Späť
 Red:	ColorControl		Červená:

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libbe	3061565693
+1	croatian	x-vnd.Haiku-libbe	568571829
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Napisao:
 Cut	TextView		Izreži
@@ -11,7 +11,6 @@ Green:	ColorControl		Zeleno:
 OK	ZombieReplicantView		U redu
 Paste	TextView		Zalijepi
 %.2f TiB	StringForSize		%.2f TiB
-Select All	TextView		Odaberi sve
 Warning	Dragger		Upozorenje
 Undo	TextView		Poništi
 Red:	ColorControl		Crveno:

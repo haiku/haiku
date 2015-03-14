@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libbe	2929679013
+1	hungarian	x-vnd.Haiku-libbe	436685149
 gamma	AboutWindow		gamma
 beta	AboutWindow		béta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -29,7 +29,6 @@ Special Thanks:	AboutWindow		Külön köszönet:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nem található a replikánshoz tartozó program. Nincs megadva programaláírás.\n%error
 Redo	TextView		Újra
 <empty>	Menu		<üres>
-Select All	TextView		Mind kijelölése
 Warning	Dragger		Figyelmeztetés
 Undo	TextView		Visszavonás
 Red:	ColorControl		Vörös:

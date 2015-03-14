@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libbe	2929679013
+1	english	x-vnd.Haiku-libbe	436685149
 gamma	AboutWindow		伽马
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -29,7 +29,6 @@ Special Thanks:	AboutWindow		特别感谢：
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		无法定位克隆控件应用。未提供应用程序署名。\n%error
 Redo	TextView		恢复
 <empty>	Menu		<空>
-Select All	TextView		全选
 Warning	Dragger		警告
 Undo	TextView		撤销
 Red:	ColorControl		红色:
