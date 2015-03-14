@@ -580,6 +580,43 @@ mmu_init_for_kernel(void)
 }
 
 
+static status_t
+fdt_get_cell_count(int32 pathOffset, int32 &addressCells, int32 &sizeCells)
+{
+	// It would be nice if libfdt provided this.
+
+	// Memory base addresses are provided in 32 or 64 bit flavors
+	// #address-cells and #size-cells matches the number of 32-bit 'cells'
+	// representing the length of the base address and size fields
+
+	// TODO: assert !gFDT || !pathOffset?
+
+	int len;
+	if (!pathOffset) {
+		TRACE(("%s: Invalid FDT pathOffset provided!\n", __func__));
+		return B_ERROR;
+	}
+
+	const void *prop;
+	prop = fdt_getprop(gFDT, pathOffset, "#address-cells", &len);
+	if (prop && len == sizeof(uint32))
+		addressCells = fdt32_to_cpu(*(uint32_t *)prop);
+	prop = fdt_getprop(gFDT, pathOffset, "#size-cells", &len);
+	if (prop && len == sizeof(uint32))
+		sizeCells = fdt32_to_cpu(*(uint32_t *)prop);
+
+	// NOTE : Cells over 2 is possible in theory... 
+	if (addressCells > 2 || sizeCells > 2) {
+		panic("%s: Unsupported FDT cell count detected.\n"
+			"Address Cells: %" B_PRId32 "; Size Cells: %" B_PRId32
+			" (CPU > 64bit?).\n", __func__, addressCells, sizeCells);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
 //TODO:move this to generic/ ?
 static status_t
 find_physical_memory_ranges(uint64 &total)
@@ -596,27 +633,9 @@ find_physical_memory_ranges(uint64 &total)
 
 	total = 0;
 
-	// Memory base addresses are provided in 32 or 64 bit flavors
-	// #address-cells and #size-cells matches the number of 32-bit 'cells'
-	// representing the length of the base address and size fields
-	int root = fdt_path_offset(gFDT, "/");
 	int32 regAddressCells = 1;
 	int32 regSizeCells = 1;
-	prop = fdt_getprop(gFDT, root, "#address-cells", &len);
-	if (prop && len == sizeof(uint32))
-		regAddressCells = fdt32_to_cpu(*(uint32_t *)prop);
-	prop = fdt_getprop(gFDT, root, "#size-cells", &len);
-	if (prop && len == sizeof(uint32))
-		regSizeCells = fdt32_to_cpu(*(uint32_t *)prop);
-
-
-	// NOTE : Size Cells of 2 is possible in theory... but I haven't seen it yet.
-	if (regAddressCells > 2 || regSizeCells > 1) {
-		panic("%s: Unsupported FDT cell count detected.\n"
-		"Address Cells: %" B_PRId32 "; Size Cells: %" B_PRId32
-		" (CPU > 64bit?).\n", __func__, regAddressCells, regSizeCells);
-		return B_ERROR;
-	}
+	fdt_get_cell_count(node, regAddressCells, regSizeCells);
 
 	prop = fdt_getprop(gFDT, node, "reg", &len);
 	if (prop == NULL) {
@@ -661,6 +680,96 @@ find_physical_memory_ranges(uint64 &total)
 }
 
 
+static uint64
+fdt_get_range_offset(int32 node)
+{
+	int depth = fdt_node_depth(gFDT, node);
+	int32 examineNode = node;
+	uint64 pathOffset = 0x0;
+
+	while (depth > 0) {
+		int len;
+		const void* prop;
+		prop = fdt_getprop(gFDT, examineNode, "ranges", &len);
+		if (prop) {
+			int32 regAddressCells = 1;
+			int32 regSizeCells = 1;
+			fdt_get_cell_count(examineNode, regAddressCells, regSizeCells);
+
+			const uint32 *p = (const uint32 *)prop;
+			// soc base address cells
+			if (regAddressCells == 2)
+				pathOffset = fdt64_to_cpu(*(uint64_t *)p);
+			else
+				pathOffset = fdt32_to_cpu(*(uint32_t *)p);
+			break;
+		}
+		int32 parentNode = fdt_parent_offset(gFDT, examineNode);
+		depth = fdt_node_depth(gFDT, parentNode);
+		examineNode = parentNode;
+	}
+
+	dprintf("%s: range offset: 0x%" B_PRIx64 "\n", __func__, pathOffset);
+
+	return pathOffset;
+}
+
+
+static status_t
+fdt_get_device_base(const char* device)
+{
+	int node;
+	const void *prop;
+	int len;
+
+	// Find device in FDT
+	node = fdt_path_offset(gFDT, device);
+
+	int32 regAddressCells = 1;
+	int32 regSizeCells = 1;
+	fdt_get_cell_count(node, regAddressCells, regSizeCells);
+
+	if (node < 0) {
+		dprintf("%s: %s not found in FDT!\n", __func__, device);
+		return B_ERROR;
+	}
+
+	prop = fdt_getprop(gFDT, node, "reg", &len);
+
+	if (prop < 0) {
+		dprintf("%s: reg property not found on device %s in FDT!\n", __func__,
+			device);
+		return B_ERROR;
+	}
+
+	const uint32 *p = (const uint32 *)prop;
+	uint64 baseDevice = 0x0;
+	uint64 size = 0x0;
+
+	// soc base address cells
+	if (regAddressCells == 2)
+		baseDevice = fdt64_to_cpu(*(uint64_t *)p);
+	else
+		baseDevice = fdt32_to_cpu(*(uint32_t *)p);
+	p += regAddressCells;
+
+	// size
+	if (regSizeCells == 2)
+		size = fdt64_to_cpu(*(uint64_t *)p);
+	else if (regSizeCells == 1)
+		size = fdt32_to_cpu(*(uint32_t *)p);
+	//p += regSizeCells;
+
+	dprintf("%s: before: %" B_PRIx64 "\n", __func__, baseDevice);
+
+	baseDevice -= fdt_get_range_offset(node);
+
+	dprintf("%s: %s found @ 0x%" B_PRIx64 " , size: 0x%" B_PRIx64 "\n",
+		__func__, device, baseDevice, size);
+	return B_OK;
+}
+
+
 extern "C" void
 mmu_init(void)
 {
@@ -686,6 +795,8 @@ mmu_init(void)
 		}
 		dprintf("total physical memory = %" B_PRId64 "MB\n", total / (1024 * 1024));
 	}
+
+	fdt_get_device_base("/soc/gpio");
 
 	// see if subpages are disabled
 	if (mmu_read_C1() & (1 << 23))
