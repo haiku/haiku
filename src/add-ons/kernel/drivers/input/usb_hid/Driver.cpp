@@ -170,13 +170,6 @@ usb_hid_device_removed(void *cookie)
 		if (device->ParentCookie() != parentCookie)
 			continue;
 
-		// this handler's device belongs to the one removed
-		if (device->IsOpen()) {
-			// the device and it's handlers will be deleted in the free hook
-			device->Removed();
-			break;
-		}
-
 		// remove all the handlers
 		for (uint32 i = 0;; i++) {
 			handler = device->ProtocolHandlerAt(i);
@@ -186,7 +179,13 @@ usb_hid_device_removed(void *cookie)
 			gDeviceList->RemoveDevice(NULL, handler);
 		}
 
-		delete device;
+		// this handler's device belongs to the one removed
+		if (device->IsOpen()) {
+			// the device and it's handlers will be deleted in the free hook
+			device->Removed();
+		} else
+			delete device;
+
 		break;
 	}
 
@@ -287,14 +286,6 @@ usb_hid_free(void *_cookie)
 	} else if (device->IsRemoved()) {
 		// the parent device is removed already and none of its handlers are
 		// open anymore so we can free it here
-		for (uint32 i = 0;; i++) {
-			ProtocolHandler *handler = device->ProtocolHandlerAt(i);
-			if (handler == NULL)
-				break;
-
-			gDeviceList->RemoveDevice(NULL, handler);
-		}
-
 		delete device;
 	}
 
