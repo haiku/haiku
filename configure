@@ -89,7 +89,7 @@ options:
                               architecture of the Haiku to build, subsequent
                               ones the secondary architectures.
   --target-board <board>      ARM only: Specify the board to build for. Must be
-                              one of beagle,raspberry_pi,verdex.
+                              one of beagle,rpi1,rpi2,verdex.
   --update                    re-runs last configure invocation [must be given
                               as first option!]
   --use-clang                 Build with host Clang instead of GCC cross
