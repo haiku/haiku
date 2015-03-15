@@ -72,7 +72,7 @@ RemotePackageRepository HaikuPorts
 	curl-7.39.0-1
 	curl_devel-7.39.0-1
 	cvs-1.12.13.1-6
-	desknotes-1.1-2
+	desknotes-1.1-4
 	dfu_util-0.7-1
 	distcc-3.1-3
 	dmidecode-2.12-2
@@ -265,6 +265,7 @@ RemotePackageRepository HaikuPorts
 	mesa-7.9.2-10
 	mesa_devel-7.9.2-10
 	mesa_swrast-7.9.2-10
+	mev-0.9.0-1
 	milkytracker-0.90.86-1
 	mirrormagic-2.0.2-1
 	mkdepend-1.7-3
@@ -347,6 +348,7 @@ RemotePackageRepository HaikuPorts
 	sdl2_ttf_devel-2.0.12-3
 	sdllopan-10-2
 	sed-4.2.1-6
+	seeker-1.0-2
 	serf-1.3.7-1
 	serf_devel-1.3.7-1
 	sge-030809-2
@@ -455,7 +457,7 @@ RemotePackageRepository HaikuPorts
 	devil_x86_devel-1.7.8-2
 	djvulibre_x86-3.5.25-1
 	djvulibre_x86_devel-3.5.25-1
-	documentviewer_x86-0.3_git-4
+	documentviewer_x86-0.3_git-5
 	dtc_x86-1.4.1-1
 	expat_x86-2.0.1-7
 	expat_x86_devel-2.0.1-7
@@ -909,6 +911,7 @@ RemotePackageRepository HaikuPorts
 	mercurial
 	mesa
 	mesa_x86
+	mev
 	milkytracker
 	mirrormagic
 	mkdepend
@@ -993,6 +996,7 @@ RemotePackageRepository HaikuPorts
 	sdl2_image
 	sdl2_ttf
 	sdllopan
+	seeker
 	sed
 	serf
 	sge
