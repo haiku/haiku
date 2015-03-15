@@ -170,6 +170,7 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 		if ((descriptor->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
 			&& (descriptor->attributes & USB_ENDPOINT_ATTR_MASK)
 				== USB_ENDPOINT_ATTR_INTERRUPT) {
+			fEndpointAddress = descriptor->endpoint_address;
 			fInterruptPipe = interface->endpoint[i].handle;
 			break;
 		}
@@ -310,16 +311,31 @@ HIDDevice::ProtocolHandlerAt(uint32 index) const
 
 
 void
+HIDDevice::_UnstallCallback(void *cookie, status_t status, void *data,
+	size_t actualLength)
+{
+	HIDDevice *device = (HIDDevice *)cookie;
+	if (status != B_OK) {
+		TRACE_ALWAYS("Unable to unstall device: %s\n", strerror(status));
+	}
+
+	// Now report the original failure, since we're ready to retry
+	_TransferCallback(cookie, B_ERROR, device->fTransferBuffer, 0);
+}
+
+
+void
 HIDDevice::_TransferCallback(void *cookie, status_t status, void *data,
 	size_t actualLength)
 {
 	HIDDevice *device = (HIDDevice *)cookie;
 	if (status == B_DEV_STALLED && !device->fRemoved) {
 		// try clearing stalls right away, the report listeners will resubmit
-		gUSBModule->clear_feature(device->fInterruptPipe,
-			USB_FEATURE_ENDPOINT_HALT);
+		gUSBModule->queue_request(device->fDevice,
+			USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT, USB_REQUEST_CLEAR_FEATURE,
+			USB_FEATURE_ENDPOINT_HALT, device->fEndpointAddress, 0, NULL, _UnstallCallback, device);
+		return;
 	}
-
 	atomic_set(&device->fTransferScheduled, 0);
 	device->fParser.SetReport(status, device->fTransferBuffer, actualLength);
 }
