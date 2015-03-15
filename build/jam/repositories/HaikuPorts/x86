@@ -51,7 +51,7 @@ RemotePackageRepository HaikuPorts
 	ffmpeg-0.10.2-4
 	ffmpeg_devel-0.10.2-4
 	flex-2.5.39-1
-	fossil-1.29-1
+	fossil-1.32-2
 	freetype-2.5.5-1
 	freetype_devel-2.5.5-1
 	gawk-4.1.0-2
