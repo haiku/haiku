@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src add-ons network_settings ipv6 ;
 
 UsePublicHeaders [ FDirName add-ons network_settings ] ;
 UsePrivateHeaders shared ;
+UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons network_settings ipv4 ] ;
 

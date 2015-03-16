@@ -24,6 +24,8 @@
 #include <StringView.h>
 #include <TextControl.h>
 
+#include "IPAddressControl.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "IntefaceAddressView"
@@ -74,15 +76,23 @@ InterfaceAddressView::InterfaceAddressView(int family,
 
 	float minimumWidth = be_control_look->DefaultItemSpacing() * 16;
 
-	fAddressField = new BTextControl(B_TRANSLATE("IP Address:"), NULL, NULL);
+	fAddressField = new IPAddressControl(fFamily, B_TRANSLATE("IP Address:"),
+		NULL);
 	fAddressField->SetToolTip(B_TRANSLATE("Your IP address"));
-	fAddressField->TextView()->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
-	fNetmaskField = new BTextControl(B_TRANSLATE("Netmask:"), NULL, NULL);
-	fNetmaskField->SetToolTip(B_TRANSLATE("The netmask defines your local network"));
-	fNetmaskField->TextView()->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
-	fGatewayField = new BTextControl(B_TRANSLATE("Gateway:"), NULL, NULL);
+	fAddressField->TextView()->SetExplicitMinSize(
+		BSize(minimumWidth, B_SIZE_UNSET));
+	fAddressField->SetAllowEmpty(false);
+	fNetmaskField = new IPAddressControl(fFamily, B_TRANSLATE("Netmask:"),
+		NULL);
+	fNetmaskField->SetToolTip(B_TRANSLATE(
+		"The netmask defines your local network"));
+	fNetmaskField->TextView()->SetExplicitMinSize(
+		BSize(minimumWidth, B_SIZE_UNSET));
+	fGatewayField = new IPAddressControl(fFamily, B_TRANSLATE("Gateway:"),
+		NULL);
 	fGatewayField->SetToolTip(B_TRANSLATE("Your gateway to the internet"));
-	fGatewayField->TextView()->SetExplicitMinSize(BSize(minimumWidth, B_SIZE_UNSET));
+	fGatewayField->TextView()->SetExplicitMinSize(
+		BSize(minimumWidth, B_SIZE_UNSET));
 
 	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
 		new BMessage(kMsgApply));

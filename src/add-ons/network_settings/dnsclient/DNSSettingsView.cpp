@@ -26,14 +26,14 @@
 #include <Path.h>
 #include <ScrollView.h>
 #include <StringView.h>
-#include <TextControl.h>
+
+#include "IPAddressControl.h"
 
 
 static const int32 kMsgAddServer = 'adds';
 static const int32 kMsgDeleteServer = 'dels';
 static const int32 kMsgMoveUp = 'mvup';
 static const int32 kMsgMoveDown = 'mvdn';
-static const int32 kMsgEditServer = 'edit';
 static const int32 kMsgApply = 'aply';
 
 
@@ -46,8 +46,7 @@ DNSSettingsView::DNSSettingsView()
 	BView("dns", 0)
 {
 	fServerListView = new BListView("nameservers");
-	fTextControl = new BTextControl("", "", NULL);
-	fTextControl->SetModificationMessage(new BMessage(kMsgEditServer));
+	fTextControl = new IPAddressControl(AF_UNSPEC, "server", "");
 	fTextControl->SetExplicitMinSize(BSize(fTextControl->StringWidth("5") * 18,
 		B_SIZE_UNSET));
 
@@ -156,14 +155,6 @@ DNSSettingsView::MessageReceived(BMessage* message)
 			int index = fServerListView->CurrentSelection();
 			if (index < fServerListView->CountItems() - 1)
 				fServerListView->SwapItems(index, index + 1);
-			break;
-		}
-		case kMsgEditServer:
-		{
-			struct in_addr dummy;
-			bool success = inet_aton(fTextControl->Text(), &dummy);
-			fTextControl->MarkAsInvalid(!success);
-			fAddButton->SetEnabled(success);
 			break;
 		}
 		case kMsgApply:

@@ -22,6 +22,7 @@ class BMessage;
 class BPopUpMenu;
 class BRect;
 class BTextControl;
+class IPAddressControl;
 
 
 using namespace BNetworkKit;
@@ -65,9 +66,9 @@ private:
 
 			BPopUpMenu*			fModePopUpMenu;
 			BMenuField*			fModeField;
-			BTextControl*		fAddressField;
-			BTextControl*		fNetmaskField;
-			BTextControl*		fGatewayField;
+			IPAddressControl*	fAddressField;
+			IPAddressControl*	fNetmaskField;
+			IPAddressControl*	fGatewayField;
 			BButton*			fApplyButton;
 };
 
