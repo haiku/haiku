@@ -54,7 +54,7 @@ public:
 		return true;
 	}
 	
-	bool Get(int32 index, value **v)
+	bool Get(int32 index, value **v) const
 	{
 		if (index < 0 || index >= item_count)
 			return false;
@@ -74,7 +74,7 @@ public:
 		return true;
 	}
 	
-	int Find(const value &v) 
+	int Find(const value &v) const
 	{
 		for (int i = 0; i < item_count; i++)
 			if (*items[i] == v)
