@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,8 +28,9 @@ namespace BPrivate {
 
 
 _BTextInput_::_BTextInput_(BRect frame, BRect textRect, uint32 resizeMask,
-		uint32 flags)
-	: BTextView(frame, "_input_", textRect, resizeMask, flags),
+	uint32 flags)
+	:
+	BTextView(frame, "_input_", textRect, resizeMask, flags),
 	fPreviousText(NULL)
 {
 	MakeResizable(true);
@@ -37,7 +38,8 @@ _BTextInput_::_BTextInput_(BRect frame, BRect textRect, uint32 resizeMask,
 
 
 _BTextInput_::_BTextInput_(BMessage* archive)
-	: BTextView(archive),
+	:
+	BTextView(archive),
 	fPreviousText(NULL)
 {
 	MakeResizable(true);
@@ -93,7 +95,7 @@ void
 _BTextInput_::KeyDown(const char* bytes, int32 numBytes)
 {
 	switch (*bytes) {
-		case B_ENTER: 
+		case B_ENTER:
 		{
 			if (!TextControl()->IsEnabled())
 				break;
@@ -171,15 +173,13 @@ _BTextInput_::AlignTextRect()
 	// the text rect to be in the middle, normally this means there
 	// is one pixel spacing on each side
 	BRect textRect(Bounds());
-	float vInset = max_c(1, 
+	float vInset = max_c(1,
 			floorf((textRect.Height() - LineHeight(0)) / 2.0));
 	float hInset = 2;
 	float textFontWidth = TextRect().right;
 
-	if (be_control_look != NULL) 
-	{
-		switch(Alignment())
-		{
+	if (be_control_look != NULL)  {
+		switch (Alignment()) {
 			case B_ALIGN_LEFT:
 				hInset = be_control_look->DefaultLabelSpacing();
 				break;
@@ -190,7 +190,7 @@ _BTextInput_::AlignTextRect()
 				break;
 
 			case B_ALIGN_CENTER:
-				hInset = (textRect.right - textFontWidth)/ 2.0;
+				hInset = (textRect.right - textFontWidth) / 2.0;
 				break;
 
 			default:
@@ -209,7 +209,7 @@ _BTextInput_::SetInitialText()
 	free(fPreviousText);
 	fPreviousText = NULL;
 
-	if (Text())
+	if (Text() != NULL)
 		fPreviousText = strdup(Text());
 }
 
@@ -259,11 +259,10 @@ BTextControl*
 _BTextInput_::TextControl()
 {
 	BTextControl* textControl = NULL;
-
-	if (Parent())
+	if (Parent() != NULL)
 		textControl = dynamic_cast<BTextControl*>(Parent());
 
-	if (!textControl)
+	if (textControl == NULL)
 		debugger("_BTextInput_ should have a BTextControl as parent");
 
 	return textControl;
