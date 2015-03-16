@@ -42,7 +42,14 @@ public:
 };
 
 
-class BNetworkSettingsItem : public BNetworkConfigurationListener {
+class BNetworkSettingsListener {
+public:
+	virtual void				SettingsUpdated(uint32 type) = 0;
+};
+
+
+class BNetworkSettingsItem : public BNetworkConfigurationListener,
+	BNetworkSettingsListener {
 public:
 								BNetworkSettingsItem();
 	virtual						~BNetworkSettingsItem();

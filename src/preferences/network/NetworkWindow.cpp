@@ -477,6 +477,14 @@ NetworkWindow::_SelectItem(BListItem* listItem)
 void
 NetworkWindow::_BroadcastSettingsUpdate(uint32 type)
 {
+	for (int32 index = 0; index < fListView->FullListCountItems(); index++) {
+		BNetworkSettingsListener* listener
+			= dynamic_cast<BNetworkSettingsListener*>(
+				fListView->FullListItemAt(index));
+		if (listener != NULL)
+			listener->SettingsUpdated(type);
+	}
+
 	SettingsMap::const_iterator iterator = fSettingsMap.begin();
 	for (; iterator != fSettingsMap.end(); iterator++)
 		iterator->second->SettingsUpdated(type);
