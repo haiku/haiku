@@ -7,8 +7,11 @@
 
 
 #include <TimeSource.h>
+
 #include <Autolock.h>
+
 #include <string.h>
+
 #include "debug.h"
 #include "DataExchange.h"
 #include "ServerInterface.h"
@@ -26,10 +29,13 @@ namespace BPrivate { namespace media {
 
 #define _atomic_read(p) 	atomic_or((p), 0)
 
-#define TS_AREA_SIZE		B_PAGE_SIZE		// must be multiple of page size
-#define TS_INDEX_COUNT 		128				// must be power of two
+// must be multiple of page size
+#define TS_AREA_SIZE		B_PAGE_SIZE
+// must be power of two
+#define TS_INDEX_COUNT		128
 
-struct TimeSourceTransmit // sizeof(TimeSourceTransmit) must be <= TS_AREA_SIZE
+// sizeof(TimeSourceTransmit) must be <= TS_AREA_SIZE
+struct TimeSourceTransmit
 {
 	int32 readindex;
 	int32 writeindex;
@@ -92,8 +98,7 @@ BTimeSource::~BTimeSource()
 
 status_t
 BTimeSource::SnoozeUntil(bigtime_t performance_time,
-						 bigtime_t with_latency,
-						 bool retry_signals)
+	bigtime_t with_latency, bool retry_signals)
 {
 	CALLED();
 	bigtime_t time;
@@ -125,13 +130,14 @@ BTimeSource::PerformanceTimeFor(bigtime_t real_time)
 	if (GetTime(&last_perf_time, &last_real_time, &last_drift) != B_OK)
 		debugger("BTimeSource::PerformanceTimeFor: GetTime failed");
 
-	return last_perf_time + (bigtime_t)((real_time - last_real_time) * last_drift);
+	return last_perf_time
+		+ (bigtime_t)((real_time - last_real_time) * last_drift);
 }
 
 
 bigtime_t
 BTimeSource::RealTimeFor(bigtime_t performance_time,
-						 bigtime_t with_latency)
+	bigtime_t with_latency)
 {
 	PRINT(8, "CALLED BTimeSource::RealTimeFor()\n");
 
@@ -146,7 +152,8 @@ BTimeSource::RealTimeFor(bigtime_t performance_time,
 	if (GetTime(&last_perf_time, &last_real_time, &last_drift) != B_OK)
 		debugger("BTimeSource::RealTimeFor: GetTime failed");
 
-	return last_real_time - with_latency + (bigtime_t)((performance_time - last_perf_time) / last_drift);
+	return last_real_time - with_latency
+		+ (bigtime_t)((performance_time - last_perf_time) / last_drift);
 }
 
 
@@ -157,8 +164,9 @@ BTimeSource::IsRunning()
 
 	bool isrunning;
 
+	// The system time source is always running
 	if (fIsRealtime)
-		isrunning = true; // The system time source is always running :)
+		isrunning = true;
 	else
 		isrunning = fBuf ? atomic_add(&fBuf->isrunning, 0) : fStarted;
 
@@ -169,9 +177,8 @@ BTimeSource::IsRunning()
 
 
 status_t
-BTimeSource::GetTime(bigtime_t *performance_time,
-					 bigtime_t *real_time,
-					 float *drift)
+BTimeSource::GetTime(bigtime_t* performance_time,
+	bigtime_t* real_time, float* drift)
 {
 	PRINT(8, "CALLED BTimeSource::GetTime()\n");
 
@@ -180,12 +187,6 @@ BTimeSource::GetTime(bigtime_t *performance_time,
 		*drift = 1.0f;
 		return B_OK;
 	}
-//	if (fBuf == 0) {
-//		PRINT(1, "BTimeSource::GetTime: fBuf == 0, name %s, id %ld\n",Name(),ID());
-//		*performance_time = *real_time = system_time();
-//		*drift = 1.0f;
-//		return B_OK;
-//	}
 
 	int32 index;
 	index = _atomic_read(&fBuf->readindex);
@@ -193,13 +194,6 @@ BTimeSource::GetTime(bigtime_t *performance_time,
 	*real_time = fBuf->realtime[index];
 	*performance_time = fBuf->perftime[index];
 	*drift = fBuf->drift[index];
-
-//	if (*real_time == 0) {
-//		*performance_time = *real_time = system_time();
-//		*drift = 1.0f;
-//		return B_OK;
-//	}
-//	printf("BTimeSource::GetTime timesource %ld, index %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), index, *performance_time, *real_time, *drift);
 
 	TRACE_TIMESOURCE("BTimeSource::GetTime     timesource %" B_PRId32
 		", perf %16" B_PRId64 ", real %16" B_PRId64 ", drift %2.2f\n", ID(),
@@ -217,7 +211,7 @@ BTimeSource::RealTime()
 
 
 status_t
-BTimeSource::GetStartLatency(bigtime_t *out_latency)
+BTimeSource::GetStartLatency(bigtime_t* out_latency)
 {
 	CALLED();
 	*out_latency = 0;
@@ -229,7 +223,8 @@ BTimeSource::GetStartLatency(bigtime_t *out_latency)
  *************************************************************/
 
 
-BTimeSource::BTimeSource() :
+BTimeSource::BTimeSource()
+	:
 	BMediaNode("This one is never called"),
 	fStarted(false),
 	fArea(-1),
@@ -239,8 +234,6 @@ BTimeSource::BTimeSource() :
 {
 	CALLED();
 	AddNodeKind(B_TIME_SOURCE);
-//	printf("##### BTimeSource::BTimeSource() name %s, id %ld\n", Name(), ID());
-
 	// This constructor is only called by real time sources that inherit
 	// BTimeSource. We create the communication area in FinishCreate(),
 	// since we don't have a correct ID() until this node is registered.
@@ -248,9 +241,8 @@ BTimeSource::BTimeSource() :
 
 
 status_t
-BTimeSource::HandleMessage(int32 message,
-						   const void *rawdata,
-						   size_t size)
+BTimeSource::HandleMessage(int32 message, const void* rawdata,
+	size_t size)
 {
 	PRINT(4, "BTimeSource::HandleMessage %#" B_PRIx32 ", node %" B_PRId32 "\n",
 		message, fNodeID);
@@ -258,7 +250,8 @@ BTimeSource::HandleMessage(int32 message,
 	switch (message) {
 		case TIMESOURCE_OP:
 		{
-			const time_source_op_info *data = static_cast<const time_source_op_info *>(rawdata);
+			const time_source_op_info* data
+				= static_cast<const time_source_op_info*>(rawdata);
 
 			status_t result;
 			result = TimeSourceOp(*data, NULL);
@@ -285,21 +278,24 @@ BTimeSource::HandleMessage(int32 message,
 
 		case TIMESOURCE_ADD_SLAVE_NODE:
 		{
-			const timesource_add_slave_node_command *data = static_cast<const timesource_add_slave_node_command *>(rawdata);
+			const timesource_add_slave_node_command* data
+				= static_cast<const timesource_add_slave_node_command*>(rawdata);
 			DirectAddMe(data->node);
 			return B_OK;
 		}
 
 		case TIMESOURCE_REMOVE_SLAVE_NODE:
 		{
-			const timesource_remove_slave_node_command *data = static_cast<const timesource_remove_slave_node_command *>(rawdata);
+			const timesource_remove_slave_node_command* data
+				= static_cast<const timesource_remove_slave_node_command*>(rawdata);
 			DirectRemoveMe(data->node);
 			return B_OK;
 		}
 
 		case TIMESOURCE_GET_START_LATENCY:
 		{
-			const timesource_get_start_latency_request *request = static_cast<const timesource_get_start_latency_request *>(rawdata);
+			const timesource_get_start_latency_request* request
+				= static_cast<const timesource_get_start_latency_request*>(rawdata);
 			timesource_get_start_latency_reply reply;
 			rv = GetStartLatency(&reply.start_latency);
 			request->SendReply(rv, &reply, sizeof(reply));
@@ -312,8 +308,7 @@ BTimeSource::HandleMessage(int32 message,
 
 void
 BTimeSource::PublishTime(bigtime_t performance_time,
-						 bigtime_t real_time,
-						 float drift)
+	bigtime_t real_time, float drift)
 {
 	TRACE_TIMESOURCE("BTimeSource::PublishTime timesource %" B_PRId32
 		", perf %16" B_PRId64 ", real %16" B_PRId64 ", drift %2.2f\n", ID(),
@@ -332,14 +327,12 @@ BTimeSource::PublishTime(bigtime_t performance_time,
 	fBuf->perftime[index] = performance_time;
 	fBuf->drift[index] = drift;
 	atomic_add(&fBuf->readindex, 1);
-
-//	printf("BTimeSource::PublishTime timesource %ld, write index %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), index, performance_time, real_time, drift);
 }
 
 
 void
 BTimeSource::BroadcastTimeWarp(bigtime_t at_real_time,
-							   bigtime_t new_performance_time)
+	bigtime_t new_performance_time)
 {
 	CALLED();
 	ASSERT(fSlaveNodes != NULL);
@@ -410,7 +403,8 @@ status_t BTimeSource::_Reserved_TimeSource_4(void *) { return B_ERROR; }
 status_t BTimeSource::_Reserved_TimeSource_5(void *) { return B_ERROR; }
 
 /* explicit */
-BTimeSource::BTimeSource(media_node_id id) :
+BTimeSource::BTimeSource(media_node_id id)
+	:
 	BMediaNode("This one is never called"),
 	fStarted(false),
 	fArea(-1),
@@ -421,10 +415,10 @@ BTimeSource::BTimeSource(media_node_id id) :
 	CALLED();
 	AddNodeKind(B_TIME_SOURCE);
 	ASSERT(id > 0);
-//	printf("###### explicit BTimeSource::BTimeSource() id %ld, name %s\n", id, Name());
 
-	// This constructor is only called by the derived BPrivate::media::TimeSourceObject objects
-	// We create a clone of the communication area
+	// This constructor is only called by the derived
+	// BPrivate::media::TimeSourceObject objects
+	// We create a clone of the communication area.
 	char name[32];
 	area_id area;
 	sprintf(name, "__timesource_buf_%" B_PRId32, id);
@@ -435,7 +429,13 @@ BTimeSource::BTimeSource(media_node_id id) :
 		return;
 	}
 	sprintf(name, "__cloned_timesource_buf_%" B_PRId32, id);
-	fArea = clone_area(name, reinterpret_cast<void **>(const_cast<BPrivate::media::TimeSourceTransmit **>(&fBuf)), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
+
+	void** buf = reinterpret_cast<void**>
+		(const_cast<BPrivate::media::TimeSourceTransmit**>(&fBuf));
+
+	fArea = clone_area(name, buf, B_ANY_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, area);
+
 	if (fArea <= 0) {
 		ERROR("BTimeSource::BTimeSource couldn't clone area, node %" B_PRId32
 			"\n", id);
@@ -448,11 +448,16 @@ void
 BTimeSource::FinishCreate()
 {
 	CALLED();
-	//printf("BTimeSource::FinishCreate(), id %ld\n", ID());
 
 	char name[32];
 	sprintf(name, "__timesource_buf_%" B_PRId32, ID());
-	fArea = create_area(name, reinterpret_cast<void **>(const_cast<BPrivate::media::TimeSourceTransmit **>(&fBuf)), B_ANY_ADDRESS, TS_AREA_SIZE, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+
+	void** buf = reinterpret_cast<void**>
+		(const_cast<BPrivate::media::TimeSourceTransmit**>(&fBuf));
+
+	fArea = create_area(name, buf, B_ANY_ADDRESS, TS_AREA_SIZE,
+		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+
 	if (fArea <= 0) {
 		ERROR("BTimeSource::BTimeSource couldn't create area, node %" B_PRId32
 			"\n", ID());
@@ -469,13 +474,14 @@ BTimeSource::FinishCreate()
 
 
 status_t
-BTimeSource::RemoveMe(BMediaNode *node)
+BTimeSource::RemoveMe(BMediaNode* node)
 {
 	CALLED();
 	if (fKinds & NODE_KIND_SHADOW_TIMESOURCE) {
 		timesource_remove_slave_node_command cmd;
 		cmd.node = node->Node();
-		SendToPort(fControlPort, TIMESOURCE_REMOVE_SLAVE_NODE, &cmd, sizeof(cmd));
+		SendToPort(fControlPort, TIMESOURCE_REMOVE_SLAVE_NODE,
+			&cmd, sizeof(cmd));
 	} else {
 		DirectRemoveMe(node->Node());
 	}
@@ -484,7 +490,7 @@ BTimeSource::RemoveMe(BMediaNode *node)
 
 
 status_t
-BTimeSource::AddMe(BMediaNode *node)
+BTimeSource::AddMe(BMediaNode* node)
 {
 	CALLED();
 	if (fKinds & NODE_KIND_SHADOW_TIMESOURCE) {
@@ -499,7 +505,7 @@ BTimeSource::AddMe(BMediaNode *node)
 
 
 void
-BTimeSource::DirectAddMe(const media_node &node)
+BTimeSource::DirectAddMe(const media_node& node)
 {
 	// XXX this code has race conditions and is pretty dumb, and it
 	// XXX won't detect nodes that crash and don't remove themself.
@@ -536,7 +542,7 @@ BTimeSource::DirectAddMe(const media_node &node)
 }
 
 void
-BTimeSource::DirectRemoveMe(const media_node &node)
+BTimeSource::DirectRemoveMe(const media_node& node)
 {
 	// XXX this code has race conditions and is pretty dumb, and it
 	// XXX won't detect nodes that crash and don't remove themself.
@@ -580,8 +586,7 @@ BTimeSource::DirectStart(bigtime_t at)
 
 
 void
-BTimeSource::DirectStop(bigtime_t at,
-						bool immediate)
+BTimeSource::DirectStop(bigtime_t at, bool immediate)
 {
 	CALLED();
 	if (fBuf)
@@ -592,8 +597,7 @@ BTimeSource::DirectStop(bigtime_t at,
 
 
 void
-BTimeSource::DirectSeek(bigtime_t to,
-						bigtime_t at)
+BTimeSource::DirectSeek(bigtime_t to, bigtime_t at)
 {
 	UNIMPLEMENTED();
 }
