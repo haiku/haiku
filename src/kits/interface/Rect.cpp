@@ -50,20 +50,20 @@ BRect::SetRightTop(const BPoint point)
 void
 BRect::InsetBy(BPoint point)
 {
-	 left += point.x;
-	 right -= point.x;
-	 top += point.y;
-	 bottom -= point.y;
+	left += point.x;
+	right -= point.x;
+	top += point.y;
+	bottom -= point.y;
 }
 
 
 void
 BRect::InsetBy(float dx, float dy)
 {
-	 left += dx;
-	 right -= dx;
-	 top += dy;
-	 bottom -= dy;
+	left += dx;
+	right -= dx;
+	top += dy;
+	bottom -= dy;
 }
 
 
@@ -104,20 +104,20 @@ BRect::InsetByCopy(float dx, float dy) const
 void
 BRect::OffsetBy(BPoint point)
 {
-	 left += point.x;
-	 right += point.x;
-	 top += point.y;
-	 bottom += point.y;
+	left += point.x;
+	right += point.x;
+	top += point.y;
+	bottom += point.y;
 }
 
 
 void
 BRect::OffsetBy(float dx, float dy)
 {
-	 left += dx;
-	 right += dx;
-	 top += dy;
-	 bottom += dy;
+	left += dx;
+	right += dx;
+	top += dy;
+	bottom += dy;
 }
 
 
@@ -158,20 +158,20 @@ BRect::OffsetByCopy(float dx, float dy) const
 void
 BRect::OffsetTo(BPoint point)
 {
-	 right = (right - left) + point.x;
-	 left = point.x;
-	 bottom = (bottom - top) + point.y;
-	 top = point.y;
+	right = (right - left) + point.x;
+	left = point.x;
+	bottom = (bottom - top) + point.y;
+	top = point.y;
 }
 
 
 void
 BRect::OffsetTo(float x, float y)
 {
-	 right = (right - left) + x;
-	 left = x;
-	 bottom = (bottom - top) + y;
-	 top=y;
+	right = (right - left) + x;
+	left = x;
+	bottom = (bottom - top) + y;
+	top=y;
 }
 
 
