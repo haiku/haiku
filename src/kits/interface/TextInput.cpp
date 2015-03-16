@@ -140,16 +140,14 @@ _BTextInput_::MakeFocus(bool state)
 		fPreviousText = NULL;
 	}
 
-//	if (Window()) {
-// TODO: why do we have to invalidate here?
-// I'm leaving this in, but it looks suspicious... :-)
-//		Invalidate(Bounds());
+	if (Window() != NULL) {
+		// Invalidate parent to draw or remove the focus mark
 		if (BTextControl* parent = dynamic_cast<BTextControl*>(Parent())) {
 			BRect frame = Frame();
 			frame.InsetBy(-1.0, -1.0);
 			parent->Invalidate(frame);
 		}
-//	}
+	}
 }
 
 
