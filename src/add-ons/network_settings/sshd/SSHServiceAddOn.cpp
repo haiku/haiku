@@ -15,7 +15,6 @@
 #include <LayoutBuilder.h>
 #include <NetworkSettings.h>
 #include <NetworkSettingsAddOn.h>
-#include <StringItem.h>
 #include <StringView.h>
 #include <TextView.h>
 
@@ -24,6 +23,7 @@
 #include <user_group.h>
 #include <util/KMessage.h>
 
+#include "ServiceListItem.h"
 #include "ServiceView.h"
 
 
@@ -76,7 +76,7 @@ public:
 
 private:
 			BNetworkSettings&	fSettings;
-			BStringItem*		fItem;
+			BListItem*			fItem;
 			ServiceView*		fView;
 };
 
@@ -171,7 +171,7 @@ SSHServiceView::Enable()
 SSHServiceItem::SSHServiceItem(BNetworkSettings& settings)
 	:
 	fSettings(settings),
-	fItem(new BStringItem(B_TRANSLATE("SSH server"))),
+	fItem(new ServiceListItem("ssh", B_TRANSLATE("SSH server"), settings)),
 	fView(NULL)
 {
 }
