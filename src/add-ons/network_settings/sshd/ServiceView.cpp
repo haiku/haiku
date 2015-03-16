@@ -12,13 +12,15 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <LayoutBuilder.h>
+#include <MessageRunner.h>
 #include <StringView.h>
 #include <TextView.h>
 
-#include <NetServer.h>
-
 
 static const uint32 kMsgToggleService = 'tgls';
+static const uint32 kMsgEnableToggleButton = 'entg';
+
+static const bigtime_t kDisableDuration = 500000;
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -54,11 +56,28 @@ ServiceView::ServiceView(const char* name, const char* executable,
 
 	SetExplicitMinSize(BSize(200, B_SIZE_UNSET));
 	_UpdateEnableButton();
+
+	fWasEnabled = IsEnabled();
 }
 
 
 ServiceView::~ServiceView()
 {
+}
+
+
+bool
+ServiceView::IsRevertable()
+{
+	return IsEnabled() != fWasEnabled;
+}
+
+
+void
+ServiceView::Revert()
+{
+	if (IsRevertable())
+		_Toggle();
 }
 
 
@@ -82,13 +101,14 @@ ServiceView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgToggleService:
-			if (IsEnabled())
-				Disable();
-			else
-				Enable();
+			_Toggle();
+			break;
 
+		case kMsgEnableToggleButton:
+			fEnableButton->SetEnabled(true);
 			_UpdateEnableButton();
 			break;
+
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -99,16 +119,7 @@ ServiceView::MessageReceived(BMessage* message)
 bool
 ServiceView::IsEnabled() const
 {
-	BMessage request(kMsgIsServiceRunning);
-	request.AddString("name", fName);
-
-	BMessenger networkServer(kNetServerSignature);
-	BMessage reply;
-	status_t status = networkServer.SendMessage(&request, &reply);
-	if (status == B_OK)
-		return reply.GetBool("running");
-
-	return false;
+	return fSettings.Service(fName).IsRunning();
 }
 
 
@@ -129,6 +140,20 @@ void
 ServiceView::Disable()
 {
 	fSettings.RemoveService(fName);
+}
+
+
+void
+ServiceView::_Toggle()
+{
+	if (IsEnabled())
+		Disable();
+	else
+		Enable();
+
+	fEnableButton->SetEnabled(false);
+	BMessage reenable(kMsgEnableToggleButton);
+	BMessageRunner::StartSending(this, &reenable, kDisableDuration, 1);
 }
 
 

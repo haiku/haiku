@@ -26,6 +26,9 @@ public:
 									BNetworkSettings& settings);
 	virtual						~ServiceView();
 
+			bool				IsRevertable();
+			void				Revert();
+
 			void				SettingsUpdated(uint32 which);
 
 	virtual	void				AttachedToWindow();
@@ -37,6 +40,7 @@ protected:
 	virtual	void				Disable();
 
 private:
+			void				_Toggle();
 			void				_UpdateEnableButton();
 
 protected:
@@ -44,6 +48,7 @@ protected:
 			const char*			fExecutable;
 			BNetworkSettings&	fSettings;
 			BButton*			fEnableButton;
+			bool				fWasEnabled;
 };
 
 
