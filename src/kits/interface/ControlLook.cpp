@@ -558,7 +558,10 @@ BControlLook::DrawRadioButton(BView* view, BRect& rect, const BRect& updateRect,
 	rgb_color markColor;
 	if (_RadioButtonAndCheckBoxMarkColor(base, markColor, flags)) {
 		view->SetHighColor(markColor);
-		rect.InsetBy(3, 3);
+		BFont font;
+		view->GetFont(&font);
+		float inset = roundf(font.Size() / 4);
+		rect.InsetBy(inset, inset);
 		view->FillEllipse(rect);
 	}
 }
