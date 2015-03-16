@@ -60,6 +60,31 @@ static const uint32 kMsgItemSelected = 'ItSl';
 #define B_TRANSLATION_CONTEXT	"NetworkWindow"
 
 
+class TitleItem : public BStringItem {
+public:
+	TitleItem(const char* title)
+		:
+		BStringItem(title)
+	{
+	}
+
+	void DrawItem(BView* owner, BRect bounds, bool complete)
+	{
+		owner->SetFont(be_bold_font);
+		BStringItem::DrawItem(owner, bounds, complete);
+		owner->SetFont(be_plain_font);
+	}
+
+	void Update(BView* owner, const BFont* font)
+	{
+		BStringItem::Update(owner, be_bold_font);
+	}
+};
+
+
+// #pragma mark -
+
+
 NetworkWindow::NetworkWindow()
 	:
 	BWindow(BRect(100, 100, 400, 400), B_TRANSLATE("Network"), B_TITLED_WINDOW,
@@ -442,7 +467,7 @@ NetworkWindow::_ListItemFor(BNetworkSettingsType type)
 BListItem*
 NetworkWindow::_CreateItem(const char* label)
 {
-	BListItem* item = new BStringItem(label);
+	BListItem* item = new TitleItem(label);
 	item->SetExpanded(true);
 	fListView->AddItem(item);
 	return item;
