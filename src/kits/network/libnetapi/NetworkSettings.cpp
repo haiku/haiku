@@ -25,6 +25,7 @@
 #include <String.h>
 
 #include <DriverSettingsMessageAdapter.h>
+#include <NetServer.h>
 
 
 using namespace BNetworkKit;
@@ -318,7 +319,7 @@ BNetworkSettings::GetNextInterface(uint32& cookie, BMessage& interface)
 
 
 status_t
-BNetworkSettings::GetInterface(const char* name, BMessage& interface)
+BNetworkSettings::GetInterface(const char* name, BMessage& interface) const
 {
 	int32 index;
 	return _GetItem(fInterfaces, "interface", "device", name, index, interface);
@@ -359,6 +360,15 @@ BNetworkSettings::Interface(const char* name)
 }
 
 
+const BNetworkInterfaceSettings
+BNetworkSettings::Interface(const char* name) const
+{
+	BMessage interface;
+	GetInterface(name, interface);
+	return BNetworkInterfaceSettings(interface);
+}
+
+
 int32
 BNetworkSettings::CountNetworks() const
 {
@@ -383,7 +393,7 @@ BNetworkSettings::GetNextNetwork(uint32& cookie, BMessage& network) const
 
 
 status_t
-BNetworkSettings::GetNetwork(const char* name, BMessage& network)
+BNetworkSettings::GetNetwork(const char* name, BMessage& network) const
 {
 	int32 index;
 	return _GetItem(fNetworks, "network", "name", name, index, network);
@@ -435,7 +445,7 @@ BNetworkSettings::GetNextService(uint32& cookie, BMessage& service)
 
 
 status_t
-BNetworkSettings::GetService(const char* name, BMessage& service)
+BNetworkSettings::GetService(const char* name, BMessage& service) const
 {
 	int32 index;
 	return _GetItem(fServices, "service", "name", name, index, service);
@@ -469,6 +479,15 @@ BNetworkSettings::RemoveService(const char* name)
 
 BNetworkServiceSettings
 BNetworkSettings::Service(const char* name)
+{
+	BMessage service;
+	GetService(name, service);
+	return BNetworkServiceSettings(service);
+}
+
+
+const BNetworkServiceSettings
+BNetworkSettings::Service(const char* name) const
 {
 	BMessage service;
 	GetService(name, service);
@@ -835,8 +854,9 @@ BNetworkSettings::_ConvertNetworkFromSettings(BMessage& message)
 
 
 status_t
-BNetworkSettings::_GetItem(BMessage& container, const char* itemField,
-	const char* nameField, const char* name, int32& _index, BMessage& item)
+BNetworkSettings::_GetItem(const BMessage& container, const char* itemField,
+	const char* nameField, const char* name, int32& _index,
+	BMessage& item) const
 {
 	int32 index = 0;
 	while (container.FindMessage(itemField, index, &item) == B_OK) {
@@ -1659,6 +1679,25 @@ void
 BNetworkServiceSettings::RemoveAddress(int32 index)
 {
 	fAddresses.erase(fAddresses.begin() + index);
+}
+
+
+/*!	This is a convenience method that returns the current state of the
+	service, independent of the current settings.
+*/
+bool
+BNetworkServiceSettings::IsRunning() const
+{
+	BMessage request(kMsgIsServiceRunning);
+	request.AddString("name", fName);
+
+	BMessenger networkServer(kNetServerSignature);
+	BMessage reply;
+	status_t status = networkServer.SendMessage(&request, &reply);
+	if (status == B_OK)
+		return reply.GetBool("running");
+
+	return false;
 }
 
 

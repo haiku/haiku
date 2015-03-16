@@ -38,28 +38,33 @@ public:
 			status_t			GetNextInterface(uint32& cookie,
 									BMessage& interface);
 			status_t			GetInterface(const char* name,
-									BMessage& interface);
+									BMessage& interface) const;
 			status_t			AddInterface(const BMessage& interface);
 			status_t			RemoveInterface(const char* name);
 			BNetworkInterfaceSettings
 								Interface(const char* name);
+			const BNetworkInterfaceSettings
+								Interface(const char* name) const;
 
 			int32				CountNetworks() const;
 			status_t			GetNextNetwork(uint32& cookie,
 									BMessage& network) const;
 			status_t			GetNetwork(const char* name,
-									BMessage& network);
+									BMessage& network) const;
 			status_t			AddNetwork(const BMessage& network);
 			status_t			RemoveNetwork(const char* name);
 
 			const BMessage&		Services() const;
 			status_t			GetNextService(uint32& cookie,
 									BMessage& service);
-			status_t			GetService(const char* name, BMessage& service);
+			status_t			GetService(const char* name,
+									BMessage& service) const;
 			status_t			AddService(const BMessage& service);
 			status_t			RemoveService(const char* name);
 			BNetworkServiceSettings
 								Service(const char* name);
+			const BNetworkServiceSettings
+								Service(const char* name) const;
 
 			status_t			StartMonitoring(const BMessenger& target);
 			status_t			StopMonitoring(const BMessenger& target);
@@ -84,10 +89,10 @@ private:
 			status_t			_ConvertNetworkToSettings(BMessage& message);
 			status_t			_ConvertNetworkFromSettings(BMessage& message);
 
-			status_t			_GetItem(BMessage& container,
+			status_t			_GetItem(const BMessage& container,
 									const char* itemField,
 									const char* nameField, const char* name,
-									int32& _index, BMessage& item);
+									int32& _index, BMessage& item) const;
 			status_t			_RemoveItem(BMessage& container,
 									const char* itemField,
 									const char* nameField, const char* name,
@@ -261,6 +266,8 @@ public:
 			void				AddAddress(const
 									BNetworkServiceAddressSettings& address);
 			void				RemoveAddress(int32 index);
+
+			bool				IsRunning() const;
 
 			status_t			GetMessage(BMessage& data) const;
 
