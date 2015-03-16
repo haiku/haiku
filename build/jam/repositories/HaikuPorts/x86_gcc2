@@ -466,6 +466,8 @@ RemotePackageRepository HaikuPorts
 	fish_x86-1.23.1_git-1
 	ffmpeg_x86-0.11.5-2
 	ffmpeg_x86_devel-0.11.5-2
+	fftw_x86-3.3.4-4
+	fftw_x86_devel-3.3.4-4
 	flac_x86-1.3.0-1
 	flac_x86_devel-1.3.0-1
 	flare_x86-0.19-3
@@ -567,6 +569,8 @@ RemotePackageRepository HaikuPorts
 	libpng16_x86_devel-1.6.16-1
 	libqt4_x86-4.8.6.4-1
 	libqt4_x86_devel-4.8.6.4-1
+	libsamplerate_x86-0.1.8-1
+	libsamplerate_x86_devel-0.1.8-1
 	libsdl_x86-1.2.15-7
 	libsdl_x86_devel-1.2.15-7
 	libsdl2_x86-2.0.1-3
@@ -592,6 +596,7 @@ RemotePackageRepository HaikuPorts
 	libxslt_x86-1.1.28-2
 	libxslt_x86_devel-1.1.28-2
 	llvm_x86-3.4-1
+	lmms_x86-1.2.0_git-1
 	luajit_x86-2.0.2-2
 	luajit_x86_devel-2.0.2-2
 	lwtools_x86-4.10-1
@@ -772,6 +777,7 @@ RemotePackageRepository HaikuPorts
 	findutils
 	fish_x86
 	ffmpeg
+	fftw_x86
 	flac
 	flare_x86
 	flex
@@ -867,6 +873,7 @@ RemotePackageRepository HaikuPorts
 	libpthread_stubs
 	libqt4_x86
 	libsanta
+	libsamplerate_x86
 	libsdl
 	libsdl2
 	libsdl2_x86
@@ -894,6 +901,7 @@ RemotePackageRepository HaikuPorts
 	lighttpd
 	links
 	llvm_x86
+	lmms_x86
 	lmarbles
 	lnlauncher
 	ltris
