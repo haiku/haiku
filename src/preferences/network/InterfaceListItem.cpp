@@ -17,6 +17,7 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <IconUtils.h>
 #include <NetworkDevice.h>
 #include <OutlineListView.h>
@@ -71,9 +72,11 @@ InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 	const char* stateText = _StateText();
 
 	// Set the initial bounds of item contents
-	BPoint iconPoint = bounds.LeftTop() + BPoint(4, 2);
+	BPoint iconPoint = bounds.LeftTop()
+		+ BPoint(be_control_look->DefaultLabelSpacing(), 2);
 	BPoint statePoint = bounds.RightTop() + BPoint(0, fFirstLineOffset)
-		- BPoint(be_plain_font->StringWidth(stateText) + 4.0f, 0);
+		- BPoint(be_plain_font->StringWidth(stateText)
+			+ be_control_look->DefaultLabelSpacing(), 0);
 	BPoint namePoint = bounds.LeftTop()
 		+ BPoint(ICON_SIZE + 12, fFirstLineOffset);
 
@@ -134,7 +137,8 @@ InterfaceListItem::Update(BView* owner, const BFont* font)
 
 	_UpdateState();
 
-	SetWidth(fIcon->Bounds().Width() + 44
+	SetWidth(fIcon->Bounds().Width() + 36
+		+ be_control_look->DefaultLabelSpacing()
 		+ be_bold_font->StringWidth(fDeviceName.String())
 		+ owner->StringWidth(_StateText()));
 	SetHeight(std::max(2 * lineHeight + 4, fIcon->Bounds().Height() + 4));
