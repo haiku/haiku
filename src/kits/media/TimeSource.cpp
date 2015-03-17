@@ -2,7 +2,9 @@
  * Copyright 2002-2012, Haiku. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
  *
- * Author: Marcus Overhagen
+ * Authors:
+ *    Dario Casalinuovo
+ *    Marcus Overhagen
  */
 
 
@@ -16,6 +18,7 @@
 #include "DataExchange.h"
 #include "ServerInterface.h"
 #include "TimeSourceObject.h"
+#include "TMap.h"
 
 #define DEBUG_TIMESOURCE 0
 
@@ -45,39 +48,75 @@ struct TimeSourceTransmit
 	float drift[TS_INDEX_COUNT];
 };
 
-#define SLAVE_NODES_COUNT 300
+#define MAX_SLAVE_NODES 300
 
-// XXX TODO: storage for slave nodes uses public data members, this should be changed
 
-class SlaveNodes
+class SlaveNodes : public BLocker
 {
 public:
-					SlaveNodes();
-					~SlaveNodes();
-public:
-	BLocker *		locker;
-	int32			count;
-	media_node_id	node_id[SLAVE_NODES_COUNT];
-	port_id			node_port[SLAVE_NODES_COUNT];
+								SlaveNodes();
+								~SlaveNodes();
+
+	int32						CountSlaves() const;
+	bool						GetNextSlave(port_id** id);
+	void						Rewind();
+
+	bool						InsertSlave(const media_node& node);
+	bool						RemoveSlave(const media_node& node);
+private:
+	Map<media_node_id, port_id>	fSlaveList;
 };
 
 
 SlaveNodes::SlaveNodes()
+	:
+	BLocker("BTimeSource slavenodes")
 {
-	locker = new BLocker("BTimeSource SlaveNodes");
-	count = 0;
-	memset(node_id, 0, sizeof(node_id));
-	memset(node_port, 0, sizeof(node_port));
 }
 
 
 SlaveNodes::~SlaveNodes()
 {
-	delete locker;
+	fSlaveList.MakeEmpty();
 }
 
 
-} }
+int32
+SlaveNodes::CountSlaves() const
+{
+	return fSlaveList.CountItems();
+}
+
+
+bool
+SlaveNodes::GetNextSlave(port_id** id)
+{
+	return fSlaveList.GetNext(id);
+}
+
+
+void
+SlaveNodes::Rewind()
+{
+	fSlaveList.Rewind();
+}
+
+
+bool
+SlaveNodes::InsertSlave(const media_node& node)
+{
+	return fSlaveList.Insert(node.node, node.port);
+}
+
+
+bool
+SlaveNodes::RemoveSlave(const media_node& node)
+{
+	return fSlaveList.Remove(node.node);
+}
+
+
+} } // namespace BPrivate::media
 
 
 /*************************************************************
@@ -343,17 +382,17 @@ BTimeSource::BroadcastTimeWarp(bigtime_t at_real_time,
 		", new_performance_time %" B_PRId64 "\n", at_real_time,
 		new_performance_time);
 
-	BAutolock lock(fSlaveNodes->locker);
+	BAutolock lock(fSlaveNodes);
 
-	for (int i = 0, n = 0; i < SLAVE_NODES_COUNT && n != fSlaveNodes->count; i++) {
-		if (fSlaveNodes->node_id[i] != 0) {
-			node_time_warp_command cmd;
-			cmd.at_real_time = at_real_time;
-			cmd.to_performance_time = new_performance_time;
-			SendToPort(fSlaveNodes->node_port[i], NODE_TIME_WARP, &cmd, sizeof(cmd));
-			n++;
-		}
+	port_id* port = NULL;
+	while (fSlaveNodes->GetNextSlave(&port) == true) {
+		node_time_warp_command cmd;
+		cmd.at_real_time = at_real_time;
+		cmd.to_performance_time = new_performance_time;
+		SendToPort(*port, NODE_TIME_WARP,
+			&cmd, sizeof(cmd));
 	}
+	fSlaveNodes->Rewind();
 }
 
 
@@ -365,16 +404,16 @@ BTimeSource::SendRunMode(run_mode mode)
 
 	// send the run mode change to all slaved nodes
 
-	BAutolock lock(fSlaveNodes->locker);
+	BAutolock lock(fSlaveNodes);
 
-	for (int i = 0, n = 0; i < SLAVE_NODES_COUNT && n != fSlaveNodes->count; i++) {
-		if (fSlaveNodes->node_id[i] != 0) {
-			node_set_run_mode_command cmd;
-			cmd.mode = mode;
-			SendToPort(fSlaveNodes->node_port[i], NODE_SET_RUN_MODE, &cmd, sizeof(cmd));
-			n++;
-		}
+	port_id* port = NULL;
+	while (fSlaveNodes->GetNextSlave(&port) == true) {
+		node_set_run_mode_command cmd;
+		cmd.mode = mode;
+		SendToPort(*port, NODE_SET_RUN_MODE,
+			&cmd, sizeof(cmd));
 	}
+	fSlaveNodes->Rewind();
 }
 
 
@@ -420,9 +459,8 @@ BTimeSource::BTimeSource(media_node_id id)
 	// BPrivate::media::TimeSourceObject objects
 	// We create a clone of the communication area.
 	char name[32];
-	area_id area;
 	sprintf(name, "__timesource_buf_%" B_PRId32, id);
-	area = find_area(name);
+	area_id area = find_area(name);
 	if (area <= 0) {
 		ERROR("BTimeSource::BTimeSource couldn't find area, node %" B_PRId32
 			"\n", id);
@@ -512,34 +550,34 @@ BTimeSource::DirectAddMe(const media_node& node)
 
 	CALLED();
 	ASSERT(fSlaveNodes != NULL);
-	BAutolock lock(fSlaveNodes->locker);
+	BAutolock lock(fSlaveNodes);
 
-	if (fSlaveNodes->count == SLAVE_NODES_COUNT) {
-		ERROR("BTimeSource::DirectAddMe out of slave node slots\n");
+	if (fSlaveNodes->CountSlaves() == MAX_SLAVE_NODES) {
+		ERROR("BTimeSource::DirectAddMe reached maximum number of slaves\n");
 		return;
 	}
 	if (fNodeID == node.node) {
 		ERROR("BTimeSource::DirectAddMe should not add itself to slave nodes\n");
 		return;
 	}
-	for (int i = 0; i < SLAVE_NODES_COUNT; i++) {
-		if (fSlaveNodes->node_id[i] == 0) {
-			fSlaveNodes->node_id[i] = node.node;
-			fSlaveNodes->node_port[i] = node.port;
-			fSlaveNodes->count += 1;
-			if (fSlaveNodes->count == 1) {
-				// start the time source
-				time_source_op_info msg;
-				msg.op = B_TIMESOURCE_START;
-				msg.real_time = RealTime();
-				TRACE_TIMESOURCE("starting time source %" B_PRId32 "\n", ID());
-				write_port(fControlPort, TIMESOURCE_OP, &msg, sizeof(msg));
-			}
-			return;
-		}
+
+	if (fSlaveNodes->InsertSlave(node) != true) {
+		ERROR("BTimeSource::DirectAddMe failed\n");
+		return;
 	}
-	ERROR("BTimeSource::DirectAddMe failed\n");
-}
+
+	if (fSlaveNodes->CountSlaves() == 1) {
+		// start the time source
+		time_source_op_info msg;
+		msg.op = B_TIMESOURCE_START;
+		msg.real_time = RealTime();
+
+		TRACE_TIMESOURCE("starting time source %" B_PRId32 "\n", ID());
+
+		write_port(fControlPort, TIMESOURCE_OP, &msg, sizeof(msg));
+	}
+ }
+
 
 void
 BTimeSource::DirectRemoveMe(const media_node& node)
@@ -549,30 +587,30 @@ BTimeSource::DirectRemoveMe(const media_node& node)
 
 	CALLED();
 	ASSERT(fSlaveNodes != NULL);
-	BAutolock lock(fSlaveNodes->locker);
+	BAutolock lock(fSlaveNodes);
 
-	if (fSlaveNodes->count == 0) {
+	if (fSlaveNodes->CountSlaves() == 0) {
 		ERROR("BTimeSource::DirectRemoveMe no slots used\n");
 		return;
 	}
-	for (int i = 0; i < SLAVE_NODES_COUNT; i++) {
-		if (fSlaveNodes->node_id[i] == node.node && fSlaveNodes->node_port[i] == node.port) {
-			fSlaveNodes->node_id[i] = 0;
-			fSlaveNodes->node_port[i] = 0;
-			fSlaveNodes->count -= 1;
-			if (fSlaveNodes->count == 0) {
-				// stop the time source
-				time_source_op_info msg;
-				msg.op = B_TIMESOURCE_STOP_IMMEDIATELY;
-				msg.real_time = RealTime();
-				TRACE_TIMESOURCE("stopping time source %" B_PRId32 "\n", ID());
-				write_port(fControlPort, TIMESOURCE_OP, &msg, sizeof(msg));
-			}
-			return;
-		}
+
+	if (fSlaveNodes->RemoveSlave(node) != true) {
+		ERROR("BTimeSource::DirectRemoveMe failed\n");
+		return;
 	}
-	ERROR("BTimeSource::DirectRemoveMe failed\n");
+
+	if (fSlaveNodes->CountSlaves() == 0) {
+		// stop the time source
+		time_source_op_info msg;
+		msg.op = B_TIMESOURCE_STOP_IMMEDIATELY;
+		msg.real_time = RealTime();
+
+		TRACE_TIMESOURCE("stopping time source %" B_PRId32 "\n", ID());
+
+		write_port(fControlPort, TIMESOURCE_OP, &msg, sizeof(msg));
+	}
 }
+
 
 void
 BTimeSource::DirectStart(bigtime_t at)
