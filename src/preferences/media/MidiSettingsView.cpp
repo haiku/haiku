@@ -105,11 +105,6 @@ MidiSettingsView::_RetrieveSoftSynthList()
 		if (directory.InitCheck() != B_OK)
 			continue;
 		while (directory.GetNextEntry(&entry) == B_OK) {
-			// TODO: Get rid of this as soon as we update
-			// the SoundFont package not to create the link
-			// anymore
-			if (!strcmp(entry.Name(), "big_synth.sy"))
-				continue;
 			BNode node(&entry);
 			BNodeInfo nodeInfo(&node);
 			char mimeType[B_MIME_TYPE_LENGTH];
@@ -129,8 +124,7 @@ void
 MidiSettingsView::_LoadSettings()
 {
 	// TODO: Duplicated code between here
-	// and BSoftSynth::LoadDefaultInstruments
-
+	// and BSoftSynth::SetDefaultInstrumentsFile
 	char buffer[512];
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
@@ -160,6 +154,7 @@ MidiSettingsView::_SaveSettings()
 	int32 selection = fListView->CurrentSelection();
 	if (selection < 0)
 		return;
+
 	BStringItem* item = (BStringItem*)fListView->ItemAt(selection);
 	if (item == NULL)
 		return;
