@@ -2830,6 +2830,10 @@ BMediaRoster::SetRefFor(const media_node& file_interface, const entry_ref& file,
 {
 	CALLED();
 
+	if (IS_INVALID_NODE(file_interface)
+		|| (file_interface.kind & B_FILE_INTERFACE) == 0)
+		return B_MEDIA_BAD_NODE;
+
 	fileinterface_set_ref_request request;
 	fileinterface_set_ref_reply reply;
 	status_t rv;
@@ -2859,6 +2863,10 @@ BMediaRoster::GetRefFor(const media_node& node, entry_ref* _file,
 {
 	CALLED();
 
+	if (IS_INVALID_NODE(node)
+		|| (node.kind & B_FILE_INTERFACE) == 0)
+		return B_MEDIA_BAD_NODE;
+
 	if (!_file)
 		return B_BAD_VALUE;
 
@@ -2885,6 +2893,11 @@ BMediaRoster::SniffRefFor(const media_node& file_interface,
 	const entry_ref& file, BMimeType* mimeType, float* _capability)
 {
 	CALLED();
+
+	if (IS_INVALID_NODE(file_interface)
+		|| (file_interface.kind & B_FILE_INTERFACE) == 0)
+		return B_MEDIA_BAD_NODE;
+
 	if (mimeType == NULL || _capability == NULL)
 		return B_BAD_VALUE;
 
