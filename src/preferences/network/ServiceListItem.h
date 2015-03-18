@@ -25,6 +25,8 @@ public:
 									const BNetworkSettings& settings);
 	virtual						~ServiceListItem();
 
+			const char*			Label() const { return fLabel; }
+
 	virtual	void				DrawItem(BView* owner,
 									BRect bounds, bool complete);
 	virtual	void				Update(BView* owner, const BFont* font);

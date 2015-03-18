@@ -44,6 +44,7 @@
 
 #include "InterfaceListItem.h"
 #include "InterfaceView.h"
+#include "ServiceListItem.h"
 
 
 const char* kNetworkStatusSignature = "application/x-vnd.Haiku-NetworkStatus";
@@ -572,6 +573,10 @@ NetworkWindow::_ItemName(const BListItem* item)
 {
 	if (const BNetworkInterfaceListItem* listItem = dynamic_cast<
 			const BNetworkInterfaceListItem*>(item))
+		return listItem->Label();
+
+	if (const ServiceListItem* listItem = dynamic_cast<
+			const ServiceListItem*>(item))
 		return listItem->Label();
 
 	if (const BStringItem* stringItem = dynamic_cast<const BStringItem*>(item))
