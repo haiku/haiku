@@ -6,7 +6,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
 
 Addon IPv4Interface :
 	IPv4InterfaceAddOn.cpp
-	InterfaceAddressView.cpp
 
 	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ] localestub
@@ -14,5 +13,4 @@ Addon IPv4Interface :
 
 DoCatalogs IPv4Interface : x-vnd.Haiku-IPv4Interface :
 	IPv4InterfaceAddOn.cpp
-	InterfaceAddressView.cpp
 ;

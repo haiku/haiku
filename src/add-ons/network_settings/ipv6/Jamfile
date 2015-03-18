@@ -8,7 +8,6 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons network_settings ipv4 ] ;
 
 Addon IPv6Interface :
 	IPv6InterfaceAddOn.cpp
-	InterfaceAddressView.cpp
 
 	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ] localestub
@@ -16,5 +15,4 @@ Addon IPv6Interface :
 
 DoCatalogs IPv6Interface : x-vnd.Haiku-IPv6Interface :
 	IPv6InterfaceAddOn.cpp
-	InterfaceAddressView.cpp
 ;

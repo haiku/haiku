@@ -2,12 +2,10 @@ SubDir HAIKU_TOP src add-ons network_settings telnetd ;
 
 UsePublicHeaders [ FDirName add-ons network_settings ] ;
 UsePrivateHeaders app libroot kernel net shared ;
-
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons network_settings sshd ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
 
 Addon TelnetService :
 	TelnetServiceAddOn.cpp
-	ServiceView.cpp
 
 	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ] localestub
@@ -15,5 +13,4 @@ Addon TelnetService :
 
 DoCatalogs TelnetService : x-vnd.Haiku-TelnetService :
 	TelnetServiceAddOn.cpp
-	ServiceView.cpp
 ;

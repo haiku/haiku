@@ -13,7 +13,12 @@ Preference Network :
 	NetworkSettingsAddOn.cpp
 	InterfaceListItem.cpp
 	InterfaceView.cpp
+
+	# Common functionality for add-ons
 	IPAddressControl.cpp
+	InterfaceAddressView.cpp
+	ServiceListItem.cpp
+	ServiceView.cpp
 
 	# from NetworkStatus
 	RadioView.cpp
@@ -35,4 +40,8 @@ DoCatalogs Network :
 	NetworkSettingsAddOn.cpp
 	RadioView.cpp
 	WirelessNetworkMenuItem.cpp
+
+	InterfaceAddressView.cpp
+	ServiceListItem.cpp
+	ServiceView.cpp
 ;
