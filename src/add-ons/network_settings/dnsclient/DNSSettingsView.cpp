@@ -41,9 +41,10 @@ static const int32 kMsgApply = 'aply';
 #define B_TRANSLATION_CONTEXT "DNSSettingsView"
 
 
-DNSSettingsView::DNSSettingsView()
+DNSSettingsView::DNSSettingsView(BNetworkSettingsItem* item)
 	:
-	BView("dns", 0)
+	BView("dns", 0),
+	fItem(item)
 {
 	fServerListView = new BListView("nameservers");
 	fTextControl = new IPAddressControl(AF_UNSPEC, "server", "");
@@ -158,7 +159,8 @@ DNSSettingsView::MessageReceived(BMessage* message)
 			break;
 		}
 		case kMsgApply:
-			_SaveDNSConfiguration();
+			if (_SaveDNSConfiguration() == B_OK)
+				fItem->NotifySettingsUpdated();
 			break;
 
 		default:

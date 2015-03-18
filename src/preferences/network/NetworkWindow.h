@@ -27,6 +27,11 @@ class InterfaceListItem;
 class InterfaceView;
 
 
+enum {
+	kMsgSettingsItemUpdated = 'SIup'
+};
+
+
 class NetworkWindow : public BWindow {
 public:
 								NetworkWindow();
@@ -62,7 +67,6 @@ private:
 
 private:
 	typedef BObjectList<BNetworkSettingsAddOn> AddOnList;
-	typedef BObjectList<BNetworkSettingsItem> ItemList;
 	typedef std::map<BString, BListItem*> ItemMap;
 	typedef std::map<BListItem*, BNetworkSettingsItem*> SettingsMap;
 
@@ -82,6 +86,9 @@ private:
 
 			BButton*			fRevertButton;
 };
+
+
+extern BMessenger gNetworkWindow;
 
 
 #endif // NETWORK_WINDOW_H

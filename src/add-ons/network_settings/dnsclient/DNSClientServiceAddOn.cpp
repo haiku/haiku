@@ -94,7 +94,7 @@ BView*
 DNSClientServiceItem::View()
 {
 	if (fView == NULL)
-		fView = new DNSSettingsView();
+		fView = new DNSSettingsView(this);
 
 	return fView;
 }

@@ -56,6 +56,8 @@ static const uint32 kMsgRevert = 'rvrt';
 static const uint32 kMsgToggleReplicant = 'trep';
 static const uint32 kMsgItemSelected = 'ItSl';
 
+BMessenger gNetworkWindow;
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT	"NetworkWindow"
@@ -151,6 +153,8 @@ NetworkWindow::NetworkWindow()
 			.Add(fRevertButton)
 			.AddGlue()
 		.End();
+
+	gNetworkWindow = this;
 
 	_ScanInterfaces();
 	_ScanAddOns();

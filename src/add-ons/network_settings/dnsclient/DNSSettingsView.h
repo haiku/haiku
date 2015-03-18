@@ -9,9 +9,12 @@
 #define DNS_SETTINGS_VIEW_H
 
 
+#include <NetworkSettingsAddOn.h>
 #include <StringList.h>
 #include <View.h>
 
+
+using namespace BNetworkKit;
 
 class BButton;
 class BListView;
@@ -20,7 +23,7 @@ class BTextControl;
 
 class DNSSettingsView : public BView {
 public:
-								DNSSettingsView();
+								DNSSettingsView(BNetworkSettingsItem* item);
 								~DNSSettingsView();
 
 			status_t			Revert();
@@ -33,6 +36,8 @@ private:
 			status_t			_SaveDNSConfiguration();
 
 private:
+			BNetworkSettingsItem*
+								fItem;
 			BListView*			fServerListView;
 			BStringList			fRevertList;
 			BTextControl*		fTextControl;

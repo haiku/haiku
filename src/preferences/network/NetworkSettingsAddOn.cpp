@@ -14,6 +14,8 @@
 #include <NetworkInterface.h>
 #include <NetworkSettings.h>
 
+#include "NetworkWindow.h"
+
 
 using namespace BNetworkKit;
 
@@ -54,6 +56,16 @@ BNetworkSettingsItem::SettingsUpdated(uint32 type)
 void
 BNetworkSettingsItem::ConfigurationUpdated(const BMessage& message)
 {
+}
+
+
+void
+BNetworkSettingsItem::NotifySettingsUpdated()
+{
+	// TODO: post to network window
+	BMessage updated(kMsgSettingsItemUpdated);
+	updated.AddPointer("item", this);
+	gNetworkWindow.SendMessage(&updated);
 }
 
 
