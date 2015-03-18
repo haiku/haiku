@@ -99,8 +99,7 @@ InterfaceAddressView::InterfaceAddressView(int family,
 	fApplyButton->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_UNSET));
 
-	fSettings.GetInterface(interface, fOriginalInterface);
-	fInterfaceSettings = fOriginalInterface;
+	fSettings.GetInterface(interface, fOriginalSettings);
 	_UpdateFields();
 
 	BLayoutBuilder::Group<>(this)
@@ -162,33 +161,17 @@ InterfaceAddressView::MessageReceived(BMessage* message)
 status_t
 InterfaceAddressView::Revert()
 {
-	// Populate address fields with current settings
+	return fSettings.AddInterface(fOriginalSettings);
+}
 
-// TODO!
-/*
-	int32 mode;
-	if (fSettings->AutoConfigure(fFamily)) {
-		mode = kModeAuto;
-		_EnableFields(false);
-	} else if (fSettings->IPAddr(fFamily).IsEmpty()) {
-		mode = kModeDisabled;
-		_EnableFields(false);
-	} else {
-		mode = kModeStatic;
-		_EnableFields(true);
-	}
 
-	BMenuItem* item = fModePopUpMenu->FindItem(mode);
-	if (item != NULL)
-		item->SetMarked(true);
+bool
+InterfaceAddressView::IsRevertable() const
+{
+	BMessage settings;
+	fSettings.GetInterface(fInterface.Name(), settings);
 
-	if (!fSettings->IPAddr(fFamily).IsEmpty()) {
-		fAddressField->SetText(fSettings->IP(fFamily));
-		fNetmaskField->SetText(fSettings->Netmask(fFamily));
-		fGatewayField->SetText(fSettings->Gateway(fFamily));
-	}
-*/
-	return B_OK;
+	return !settings.HasSameData(fOriginalSettings);
 }
 
 
@@ -225,9 +208,12 @@ InterfaceAddressView::_EnableFields(bool enable)
 void
 InterfaceAddressView::_UpdateFields()
 {
-	bool autoConfigure = fInterfaceSettings.IsEmpty();
+	BMessage interfaceSettings;
+	fSettings.GetInterface(fInterface.Name(), interfaceSettings);
+
+	bool autoConfigure = interfaceSettings.IsEmpty();
 	if (!autoConfigure) {
-		BNetworkInterfaceSettings settings(fInterfaceSettings);
+		BNetworkInterfaceSettings settings(interfaceSettings);
 		autoConfigure = settings.IsAutoConfigure(fFamily);
 	}
 

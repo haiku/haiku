@@ -26,8 +26,8 @@ public:
 									BNetworkSettings& settings);
 	virtual						~ServiceView();
 
-			bool				IsRevertable();
-			void				Revert();
+			bool				IsRevertable() const;
+			status_t			Revert();
 
 			void				SettingsUpdated(uint32 which);
 

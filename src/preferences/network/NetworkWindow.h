@@ -55,6 +55,7 @@ private:
 			void				_BroadcastSettingsUpdate(uint32 type);
 			void				_BroadcastConfigurationUpdate(
 									const BMessage& message);
+			void				_UpdateRevertButton();
 
 			bool				_IsReplicantInstalled();
 			void				_ShowReplicant(bool show);

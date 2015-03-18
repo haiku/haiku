@@ -111,14 +111,14 @@ TelnetServiceItem::View()
 status_t
 TelnetServiceItem::Revert()
 {
-	return B_OK;
+	return fView != NULL ? fView->Revert() : B_OK;
 }
 
 
 bool
 TelnetServiceItem::IsRevertable()
 {
-	return false;
+	return fView != NULL ? fView->IsRevertable() : false;
 }
 
 

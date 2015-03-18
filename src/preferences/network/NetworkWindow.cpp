@@ -112,7 +112,6 @@ NetworkWindow::NetworkWindow()
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert));
-	// fRevertButton->SetEnabled(false);
 
 	BMessage* message = new BMessage(kMsgToggleReplicant);
 	BCheckBox* showReplicantCheckBox = new BCheckBox("showReplicantCheckBox",
@@ -158,6 +157,7 @@ NetworkWindow::NetworkWindow()
 
 	_ScanInterfaces();
 	_ScanAddOns();
+	_UpdateRevertButton();
 
 	// Set size of the list view from its contents
 	float width;
@@ -247,6 +247,11 @@ NetworkWindow::MessageReceived(BMessage* message)
 		case BNetworkSettings::kMsgNetworkSettingsUpdated:
 		case BNetworkSettings::kMsgServiceSettingsUpdated:
 			_BroadcastSettingsUpdate(message->what);
+			break;
+
+		case kMsgSettingsItemUpdated:
+			// TODO: update list item
+			_UpdateRevertButton();
 			break;
 
 		default:
@@ -518,6 +523,8 @@ NetworkWindow::_BroadcastSettingsUpdate(uint32 type)
 	SettingsMap::const_iterator iterator = fSettingsMap.begin();
 	for (; iterator != fSettingsMap.end(); iterator++)
 		iterator->second->SettingsUpdated(type);
+
+	_UpdateRevertButton();
 }
 
 
@@ -538,6 +545,23 @@ NetworkWindow::_BroadcastConfigurationUpdate(const BMessage& message)
 
 	// TODO: improve invalidated region to the one that matters
 	fListView->Invalidate();
+	_UpdateRevertButton();
+}
+
+
+void
+NetworkWindow::_UpdateRevertButton()
+{
+	bool enabled = false;
+	SettingsMap::const_iterator iterator = fSettingsMap.begin();
+	for (; iterator != fSettingsMap.end(); iterator++) {
+		if (iterator->second->IsRevertable()) {
+			enabled = true;
+			break;
+		}
+	}
+
+	fRevertButton->SetEnabled(enabled);
 }
 
 

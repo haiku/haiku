@@ -39,7 +39,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 			status_t			Revert();
-			status_t			Save();
+			bool				IsRevertable() const;
 
 			void				ConfigurationUpdated(const BMessage& message);
 
@@ -61,8 +61,7 @@ private:
 			BNetworkSettings&	fSettings;
 			uint32				fLastMode;
 
-			BMessage			fOriginalInterface;
-			BMessage			fInterfaceSettings;
+			BMessage			fOriginalSettings;
 
 			BPopUpMenu*			fModePopUpMenu;
 			BMenuField*			fModeField;

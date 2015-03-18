@@ -115,6 +115,14 @@ DNSSettingsView::Revert()
 }
 
 
+bool
+DNSSettingsView::IsRevertable() const
+{
+	// TODO
+	return false;
+}
+
+
 void
 DNSSettingsView::AttachedToWindow()
 {

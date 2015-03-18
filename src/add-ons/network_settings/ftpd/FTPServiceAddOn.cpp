@@ -109,14 +109,14 @@ FTPServiceItem::View()
 status_t
 FTPServiceItem::Revert()
 {
-	return B_OK;
+	return fView != NULL ? fView->Revert() : B_OK;
 }
 
 
 bool
 FTPServiceItem::IsRevertable()
 {
-	return false;
+	return fView != NULL ? fView->IsRevertable() : false;
 }
 
 

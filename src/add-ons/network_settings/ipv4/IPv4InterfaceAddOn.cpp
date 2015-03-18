@@ -100,14 +100,14 @@ IPv4InterfaceItem::View()
 status_t
 IPv4InterfaceItem::Revert()
 {
-	return B_OK;
+	return fView != NULL ? fView->Revert() : B_OK;
 }
 
 
 bool
 IPv4InterfaceItem::IsRevertable()
 {
-	return false;
+	return fView != NULL ? fView->IsRevertable() : false;
 }
 
 

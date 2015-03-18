@@ -27,6 +27,7 @@ public:
 								~DNSSettingsView();
 
 			status_t			Revert();
+			bool				IsRevertable() const;
 
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);

@@ -67,17 +67,19 @@ ServiceView::~ServiceView()
 
 
 bool
-ServiceView::IsRevertable()
+ServiceView::IsRevertable() const
 {
 	return IsEnabled() != fWasEnabled;
 }
 
 
-void
+status_t
 ServiceView::Revert()
 {
 	if (IsRevertable())
 		_Toggle();
+
+	return B_OK;
 }
 
 

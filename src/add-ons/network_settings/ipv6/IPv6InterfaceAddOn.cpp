@@ -100,14 +100,14 @@ IPv6InterfaceItem::View()
 status_t
 IPv6InterfaceItem::Revert()
 {
-	return B_OK;
+	return fView != NULL ? fView->Revert() : B_OK;
 }
 
 
 bool
 IPv6InterfaceItem::IsRevertable()
 {
-	return false;
+	return fView != NULL ? fView->IsRevertable() : false;
 }
 
 
