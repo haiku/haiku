@@ -10,8 +10,8 @@
 #include <Catalog.h>
 #include <NetworkSettings.h>
 #include <NetworkSettingsAddOn.h>
-#include <StringItem.h>
 
+#include "ServiceListItem.h"
 #include "ServiceView.h"
 
 
@@ -51,7 +51,7 @@ public:
 
 private:
 			BNetworkSettings&	fSettings;
-			BStringItem*		fItem;
+			BListItem*			fItem;
 			ServiceView*		fView;
 };
 
@@ -62,7 +62,7 @@ private:
 FTPServiceItem::FTPServiceItem(BNetworkSettings& settings)
 	:
 	fSettings(settings),
-	fItem(new BStringItem(B_TRANSLATE("FTP server"))),
+	fItem(new ServiceListItem("ftp", B_TRANSLATE("FTP server"), settings)),
 	fView(NULL)
 {
 }
