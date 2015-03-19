@@ -210,11 +210,12 @@ AHCIController::Init()
 		TRACE("cap2: BIOS/OS Handoff: %s\n",
 			(fRegs->cap2 & CAP2_BOH) ? "yes" : "no");
 	}
-	TRACE("ghc: AHCI Enable: %s\n",						(fRegs->ghc & GHC_AE) ? "yes" : "no");
-	TRACE("Ports Implemented Mask: %#08" B_PRIx32 "\n",	fPortImplementedMask);
-	TRACE("Number of Available Ports: %d\n",			count_bits_set(fPortImplementedMask));
-	TRACE("AHCI Version %" B_PRIu32 ".%" B_PRIu32 "\n",	fRegs->vs >> 16, fRegs->vs & 0xff);
-	TRACE("Interrupt %u\n",								fIRQ);
+	TRACE("ghc: AHCI Enable: %s\n",	(fRegs->ghc & GHC_AE) ? "yes" : "no");
+	TRACE("Ports Implemented Mask: %#08" B_PRIx32 " Number of Available Ports:"
+		" %d\n", fPortImplementedMask, count_bits_set(fPortImplementedMask));
+	TRACE("AHCI Version %02x%02x.%02x.%02x Interrupt %u\n", fRegs->vs >> 24,
+		(fRegs->vs >> 16) & 0xff, (fRegs->vs >> 8) & 0xff, fRegs->vs & 0xff,
+		fIRQ);
 
 	// setup interrupt handler
 	if (install_io_interrupt_handler(fIRQ, Interrupt, this, 0) < B_OK) {
