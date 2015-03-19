@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.03.10
-# Date:    2015-03-10 20:34:08
+# Version: 2015.03.17
+# Date:    2015-03-17 20:34:06
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -514,6 +514,7 @@
 	5912  Officejet Pro 8600
 	5a11  PhotoSmart C7100 series
 	5b11  OfficeJet J2100 series
+	5b12  Officejet Pro 8100
 	5c11  PhotoSmart C4200 Printer series
 	5c12  OfficeJet 6700
 	5c17  LaserJet P2055 series
@@ -4474,6 +4475,7 @@
 	1503  Shortboard Lefty
 	1603  Keyboard
 	1702  Keyboard LKS02
+	2011  Keyboard [Diatec Filco Majestouch 1]
 	2013  Keyboard [Das Keyboard]
 	2221  Keyboard
 	2323  Keyboard
@@ -5994,6 +5996,7 @@
 	030e  Intuos Pen Small (CTL480)
 	0400  PenPartner 4x5
 	4850  PenPartner 6x8
+	5010  Thinkpad T550 touchscreen
 056b  Decicon, Inc.
 056c  eTEK Labs
 	0006  KwikLink Host-Host Connector
@@ -6047,6 +6050,7 @@
 	c686  Geniatech T220A DVB-T2 TV Stick
 	c688  Geniatech T230 DVB-T2 TV Stick
 	cafc  CX861xx ROM Boot Loader
+	cafd  CX82310 ROM Boot Loader
 	cafe  AccessRunner ADSL Modem
 	cb00  ADSL Modem
 	cb01  ADSL Modem
@@ -6413,8 +6417,10 @@
 	000f  Digital Camera
 0586  ZyXEL Communications Corp.
 	0025  802.11b/g/n USB Wireless Network Adapter
-	0102  omni.net II ISDN TA
-	1000  Omni NET Modem / ISDN TA
+	0100  omni.net
+	0102  omni.net II ISDN TA [HFC-S]
+	0110  omni.net Plus
+	1000  omni.net LCD Plus - ISDN TA
 	1500  Omni 56K Plus
 	2011  Scorpion-980N keyboard
 	3304  LAN Modem
@@ -6651,6 +6657,7 @@
 	2800  SuperCAM
 	4519  Webcam Classic
 	7670  OV7670 Webcam
+	8065  GAIA Sensor FPGA Demo Board
 	8519  OV519 Webcam
 	a511  OV511+ Webcam
 	a518  D-Link DSB-C310 Webcam
@@ -7555,6 +7562,7 @@
 064c  Ji-Haw Industrial Co., Ltd
 064d  TriTech Microelectronics, Ltd
 064e  Suyin Corp.
+	2100  Sony Visual Communication Camera
 	a100  Acer OrbiCam
 	a101  Acer CrystalEye Webcam
 	a102  Acer/Lenovo Webcam [CN0316]
@@ -7759,8 +7767,8 @@
 	0110  Vigor 128 ISDN TA
 	0530  Vigor530 IEEE 802.11G Adapter (ISL3880+NET2280)
 	0550  Vigor550
-	1688  miniVigor 128 ISDN TA
-	6694  USB ISDN TA
+	1688  miniVigor 128 ISDN TA [HFC-S]
+	6694  miniVigor 128 ISDN TA
 0676  Teles AG
 0677  Aiwa Co., Ltd
 	07d5  TM-ED1285(USB)
@@ -8443,8 +8451,9 @@
 	32bb  Music Mediatouch
 071c  Xionics Document Technologies, Inc.
 071d  Eicon Networks Corp.
-	1000  Diva ISDN TA
-	1003  Diva
+	1000  Diva 2.01 S/T [PSB2115F]
+	1003  Diva ISDN 2.0
+	1005  Diva ISDN 4.0 [HFC-S]
 	2000  Teledat Surf
 071e  Ariston Technologies
 0723  Centillium Communications Corp.
@@ -8569,6 +8578,10 @@
 	0d00  StarSign Bio Token 3.0 EU
 073e  NEC, Inc.
 	0301  Game Pad
+0742  Stollmann
+	2008  ISDN TA [HFC-S]
+	2009  ISDN TA [HFC-S]
+	200a  ISDN TA [HFC-S]
 0745  Syntech Information Co., Ltd
 0746  Onkyo Corp.
 	5500  SE-U55 Audio Device
@@ -8958,8 +8971,8 @@
 	0002  ISDN TA128 Plus
 	0003  ISDN TA128 Deluxe
 	0005  ISDN TA128 SE
-	0006  ISDN TA128 CE
-	0007  ISDN TA
+	0006  ISDN TA 128 [HFC-S]
+	0007  ISDN TA [HFC-S]
 	0008  ISDN TA
 07b1  IMP, Inc.
 07b2  Motorola BCS, Inc.
@@ -9353,6 +9366,8 @@
 07f9  Dotop Technology, Inc.
 07fa  DrayTek Corp.
 	0778  miniVigor 128 ISDN TA
+	0846  ISDN TA [HFC-S]
+	0847  ISDN TA [HFC-S]
 	1012  BeWAN ADSL USB ST (grey)
 	1196  BWIFI-USB54AR 802.11bg
 	a904  BeWAN ADSL
@@ -9848,7 +9863,7 @@
 	0100  Interface ADSL
 	0101  Interface ADSL
 	0102  ADSL
-	0301  RNIS
+	0301  RNIS ISDN TA [HFC-S]
 08e4  Pioneer Corp.
 	0184  DDJ-WeGO
 	0185  DDJ-WeGO2
@@ -10373,7 +10388,7 @@
 	fb18  LC Device
 0958  CompuLink Research, Inc.
 0959  Cologne Chip AG
-	2bd0  Intelligent ISDN (Ver. 3.60.04)
+	2bd0  Intelligent ISDN (Ver. 3.60.04) [HFC-S]
 095a  Portsmith
 	3003  Express Ethernet
 095b  Medialogic Corp.
@@ -10620,6 +10635,7 @@
 	0015  Optio S40/S5i
 	003b  Optio 50 (mass storage mode)
 	003d  Optio S55
+	0041  Optio S5z
 	0043  *ist DL
 	0047  Optio S60
 	0052  Optio 60 Digital Camera
@@ -12752,6 +12768,7 @@
 	2200  Sitecom bluetooth2.0 class 2 dongle CN-512
 	2208  Sitecom bluetooth2.0 class 2 dongle CN-520
 	2209  Sitecom bluetooth2.0 class 1 dongle CN-521
+	3068  DC-104v2 ISDN Adapter [HFC-S]
 	9071  WL-113 rev 1 Wireless Network USB Adapter
 	9075  WL-117 Hi-Speed USB Adapter
 	90ac  WL-172 Wireless Network USB Adapter 54g Turbo
@@ -13500,6 +13517,8 @@
 	0113  Yubikey NEO(-N) U2F
 	0114  Yubikey NEO(-N) OTP+U2F
 	0115  Yubikey NEO(-N) U2F+CCID
+	0116  Yubikey NEO(-N) OTP+U2F+CCID
+	0120  Yubikey Touch U2F Security Key
 	0200  U2F Gnubby
 	0211  Gnubby
 1053  Immanuel Electronics Co., Ltd
@@ -13531,6 +13550,7 @@
 	07a8  My Passport (WDBBEP), My Passport for Mac (WDBLUZ)
 	0810  My Passport Ultra (WDBZFP)
 	0820  My Passport Ultra (WDBMWV, WDBZFP)
+	0830  My Passport Ultra (WDBZFP)
 	0900  MyBook Essential External HDD
 	0901  My Book Essential Edition (Green Ring) (WDG1U)
 	0902  My Book Pro Edition (WDG1T)
@@ -13561,6 +13581,8 @@
 	1230  My Book (WDBFJK0030HBK)
 1059  Giesecke & Devrient GmbH
 	000b  StarSign Bio Token 3.0
+105b  Foxconn International, Inc.
+	e065  BCM43142A0 Bluetooth module
 105c  Hong Ji Electric Wire & Cable (Dongguan) Co., Ltd
 105d  Delkin Devices, Inc.
 105e  Valence Semiconductor Design, Ltd
@@ -13666,6 +13688,7 @@
 1084  Pantech Co., Ltd
 108a  Chloride Power Protection
 108b  Grand-tek Technology Co., Ltd
+	0005  HID Keyboard/Mouse PS/2 Translator
 108c  Robert Bosch GmbH
 108e  Lotes Co., Ltd.
 1099  Surface Optics Corp.
@@ -13773,7 +13796,8 @@
 	8863  C8051F34x Bootloader
 	8897  C8051F38x HDMI Splitter [UHBX]
 	8918  C8051F38x HDMI Audio Extractor [VSA-HA-DP]
-	8973  C8051F38x HDMI Splitter [UHBX-8X]
+	8973  C8051F38x HDMI Extender [UHBX-8X]
+	89e1  C8051F38x HDMI Extender [UHBX-SW3-WP]
 	ea60  CP210x UART Bridge / myAVR mySmartUSB light
 	ea61  CP210x UART Bridge
 	ea70  CP210x UART Bridge
@@ -13798,12 +13822,15 @@
 	0101  USB-Module for Spider8, CP32
 	0202  CP22 - Communication Processor
 	0301  CP42 - Communication Processor
+10d2  RayComposer - R. Adams
+	5243  RayComposer
 10d4  Man Boon Manufactory, Ltd
 10d5  Uni Class Technology Co., Ltd
 	0004  PS/2 Converter
 	5552  KVM Human Interface Composite Device (Keyboard/Mouse ports)
 	55a2  2Port KVMSwitcher
 10d6  Actions Semiconductor Co., Ltd
+	0c02  BioniQ 1001 Tablet
 	1000  MP3 Player
 	1100  MPMan MP-Ki 128 MP3 Player/Recorder
 	1101  D-Wave 2GB MP4 Player / AK1025 MP3/MP4 Player
@@ -13875,6 +13902,7 @@
 112e  Master Hill Electric Wire and Cable Co., Ltd
 112f  Cellon International, Inc.
 1130  Tenx Technology, Inc.
+	0001  BlyncLight
 	0002  iBuddy
 	0202  Rocket Launcher
 	6604  MCE IR-Receiver
@@ -14448,6 +14476,7 @@
 1390  TOMTOM B.V.
 	0001  GO 520 T/GO 630/ONE XL (v9)
 	5454  Blue & Me 2
+	7474  GPS Sport Watch [Runner, Multi-Sport]
 1391  IdealTEK, Inc.
 	1000  URTC-1000
 1395  Sennheiser Communications
@@ -14545,6 +14574,7 @@
 	3304  Asus Integrated Bluetooth module [AR3011]
 	3306  Mediao 802.11n WLAN [Realtek RTL8191SU]
 	3315  Bluetooth module
+	3362  Atheros AR3012 Bluetooth 4.0 Adapter
 	3375  Atheros AR3012 Bluetooth 4.0 Adapter
 	3392  Azurewave 43228+20702
 	3394  Bluetooth
@@ -14816,7 +14846,6 @@
 	0501  WR-G528e 'CHEETAH'
 14e1  Dialogue Technology Corp.
 	5000  PenMount 5000 Touch Controller
-14e4  Broadcom Corp.
 14e5  SAIN Information & Communications Co., Ltd.
 14ea  Planex Communications
 	ab10  GW-US54GZ
@@ -14851,6 +14880,7 @@
 	0002  HDReye (before firmware loads)
 1519  Comneon
 	0020  HSIC Device
+	0443  Telit LN930
 1520  Bitwire Corp.
 1524  ENE Technology Inc
 	6680  UTS 6680
@@ -14860,11 +14890,15 @@
 1529  UBIQUAM Co., Ltd.
 	3100  CDMA 1xRTT USB Modem (U-100/105/200/300/520)
 152a  Thesycon Systemsoftware & Consulting GmbH
+	8350  NET Gmbh iCube Camera
 	8400  INI DVS128
 	840d  INI DAViS
 	841a  INI DAViS FX3
+152b  FLYTECH Technology CO Ltd
+	0003  M.I.R. srl Minispir
 152d  JMicron Technology Corp. / JMicron USA Technology Corp.
-	0539  JMS539 SuperSpeed SATA II 3.0G Bridge
+	0539  JMS539/567 SuperSpeed SATA II/III 3.0G/6.0G Bridge
+	0567  JMS567 SATA 6.0Gb/s bridge
 	0770  Alienware Integrated Webcam
 	2329  JM20329 SATA Bridge
 	2335  ATA/ATAPI Bridge
@@ -16995,8 +17029,29 @@
 	0a05  Jolla PC connection
 	0afe  Jolla charging only
 2a03  dog hunter AG
-	0001  Linino One (CDC ACM)
-	8001  Linino ONE board
+	0001  Linino ONE (bootloader)
+	0036  Arduino Leonardo (bootloader)
+	0037  Arduino Micro (bootloader)
+	0038  Arduino Robot Control (bootloader)
+	0039  Arduino Robot Motor (bootloader)
+	003a  Arduino Micro ADK rev3 (bootloader)
+	003b  Arduino Serial
+	003c  Arduino Explora (bootloader)
+	003d  Arduino Due (usb2serial)
+	003e  Arduino Due
+	0041  Arduino Yùn (bootloader)
+	0042  Arduino Mega 2560 Rev3
+	0043  Arduino Uno Rev3
+	004d  Arduino Zero Pro (bootloader)
+	8001  Linino ONE (CDC ACM)
+	8036  Arduino Leonardo (CDC ACM)
+	8037  Arduino Micro (CDC ACM)
+	8038  Arduino Robot Control (CDC ACM)
+	8039  Arduino Robot Motor (CDC ACM)
+	803a  Arduino Micro ADK rev3 (CDC ACM)
+	803c  Arduino Explora (CDC ACM)
+	8041  Arduino Yùn (CDC ACM)
+	804d  Arduino Zero Pro (CDC ACM)
 2c02  Planex Communications
 	14ea  GW-US11H WLAN
 2c1a  Dolphin Peripherals
