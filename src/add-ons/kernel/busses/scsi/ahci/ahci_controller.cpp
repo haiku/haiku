@@ -213,9 +213,9 @@ AHCIController::Init()
 	TRACE("ghc: AHCI Enable: %s\n",	(fRegs->ghc & GHC_AE) ? "yes" : "no");
 	TRACE("Ports Implemented Mask: %#08" B_PRIx32 " Number of Available Ports:"
 		" %d\n", fPortImplementedMask, count_bits_set(fPortImplementedMask));
-	TRACE("AHCI Version %02x%02x.%02x.%02x Interrupt %u\n", fRegs->vs >> 24,
-		(fRegs->vs >> 16) & 0xff, (fRegs->vs >> 8) & 0xff, fRegs->vs & 0xff,
-		fIRQ);
+	TRACE("AHCI Version %02" B_PRIx32 "%02" B_PRIx32 ".%02" B_PRIx32 ".%02"
+		B_PRIx32 " Interrupt %u\n", fRegs->vs >> 24, (fRegs->vs >> 16) & 0xff,
+		(fRegs->vs >> 8) & 0xff, fRegs->vs & 0xff, fIRQ);
 
 	// setup interrupt handler
 	if (install_io_interrupt_handler(fIRQ, Interrupt, this, 0) < B_OK) {
