@@ -265,7 +265,7 @@ RemotePackageRepository HaikuPorts
 	mesa-7.9.2-10
 	mesa_devel-7.9.2-10
 	mesa_swrast-7.9.2-10
-	mev-0.9.0-1
+	mev-0.9.0-2
 	milkytracker-0.90.86-1
 	mirrormagic-2.0.2-1
 	mkdepend-1.7-3
