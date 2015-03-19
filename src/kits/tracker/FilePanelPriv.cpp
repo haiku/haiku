@@ -661,55 +661,6 @@ TFilePanel::Init(const BMessage*)
 	fMenuBar->SetBorder(B_BORDER_FRAME);
 	fBackView->AddChild(fMenuBar);
 
-	FavoritesMenu* favorites = new FavoritesMenu(B_TRANSLATE("Favorites"),
-		new BMessage(kSwitchDirectory), new BMessage(B_REFS_RECEIVED),
-		BMessenger(this), IsSavePanel(), fPoseView->RefFilter());
-	favorites->AddItem(new BMenuItem(B_TRANSLATE("Add current folder"),
-		new BMessage(kAddCurrentDir)));
-	favorites->AddItem(new BMenuItem(
-		B_TRANSLATE("Edit favorites" B_UTF8_ELLIPSIS),
-		new BMessage(kEditFavorites)));
-
-	fMenuBar->AddItem(favorites);
-
-	// configure menus
-	BMenuItem* item = fMenuBar->FindItem(B_TRANSLATE("Window"));
-	if (item) {
-		fMenuBar->RemoveItem(item);
-		delete item;
-	}
-
-	item = fMenuBar->FindItem(B_TRANSLATE("File"));
-	if (item) {
-		BMenu* menu = item->Submenu();
-		if (menu) {
-			item = menu->FindItem(kOpenSelection);
-			if (item && menu->RemoveItem(item))
-				delete item;
-
-			item = menu->FindItem(kDuplicateSelection);
-			if (item && menu->RemoveItem(item))
-				delete item;
-
-			// remove add-ons menu, identifier menu, separator
-			item = menu->FindItem(B_TRANSLATE("Add-ons"));
-			if (item) {
-				int32 index = menu->IndexOf(item);
-				delete menu->RemoveItem(index);
-				delete menu->RemoveItem(--index);
-				delete menu->RemoveItem(--index);
-			}
-
-			// remove separator
-			item = menu->FindItem(B_CUT);
-			if (item) {
-				item = menu->ItemAt(menu->IndexOf(item)-1);
-				if (item && menu->RemoveItem(item))
-					delete item;
-			}
-		}
-	}
-
 	// add directory menu and menufield
 	fDirMenu = new BDirMenu(0, this, kSwitchDirectory, "refs");
 
@@ -855,6 +806,55 @@ TFilePanel::Init(const BMessage*)
 
 	AddMenus();
 	AddContextMenus();
+
+	FavoritesMenu* favorites = new FavoritesMenu(B_TRANSLATE("Favorites"),
+		new BMessage(kSwitchDirectory), new BMessage(B_REFS_RECEIVED),
+		BMessenger(this), IsSavePanel(), fPoseView->RefFilter());
+	favorites->AddItem(new BMenuItem(B_TRANSLATE("Add current folder"),
+		new BMessage(kAddCurrentDir)));
+	favorites->AddItem(new BMenuItem(
+		B_TRANSLATE("Edit favorites" B_UTF8_ELLIPSIS),
+		new BMessage(kEditFavorites)));
+
+	fMenuBar->AddItem(favorites);
+
+	// configure menus
+	BMenuItem* item = fMenuBar->FindItem(B_TRANSLATE("Window"));
+	if (item) {
+		fMenuBar->RemoveItem(item);
+		delete item;
+	}
+
+	item = fMenuBar->FindItem(B_TRANSLATE("File"));
+	if (item) {
+		BMenu* menu = item->Submenu();
+		if (menu) {
+			item = menu->FindItem(kOpenSelection);
+			if (item && menu->RemoveItem(item))
+				delete item;
+
+			item = menu->FindItem(kDuplicateSelection);
+			if (item && menu->RemoveItem(item))
+				delete item;
+
+			// remove add-ons menu, identifier menu, separator
+			item = menu->FindItem(B_TRANSLATE("Add-ons"));
+			if (item) {
+				int32 index = menu->IndexOf(item);
+				delete menu->RemoveItem(index);
+				delete menu->RemoveItem(--index);
+				delete menu->RemoveItem(--index);
+			}
+
+			// remove separator
+			item = menu->FindItem(B_CUT);
+			if (item) {
+				item = menu->ItemAt(menu->IndexOf(item)-1);
+				if (item && menu->RemoveItem(item))
+					delete item;
+			}
+		}
+	}
 
 	PoseView()->ScrollTo(B_ORIGIN);
 	PoseView()->UpdateScrollRange();
