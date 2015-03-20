@@ -384,14 +384,12 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	BRect bounds = list->ItemFrame(list->IndexOf(this));
 
 	rgb_color color = owner->ViewColor();
-	rgb_color oldViewColor = color;
 	rgb_color oldLowColor = owner->LowColor();
 	rgb_color oldHighColor = owner->HighColor();
 
 	if (IsSelected())
 		color = tint_color(color, B_HIGHLIGHT_BACKGROUND_TINT);
 
-	owner->SetViewColor(color);
 	owner->SetLowColor(color);
 	owner->SetHighColor(color);
 
@@ -473,7 +471,6 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	owner->DrawString(s.String(), s.Length(), commentPt);
 
 	owner->SetDrawingMode(mode);
-	owner->SetViewColor(oldViewColor);
 }
 
 

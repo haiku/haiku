@@ -272,14 +272,12 @@ JobItem::DrawItem(BView *owner, BRect, bool complete)
 		BRect bounds = list->ItemFrame(list->IndexOf(this));
 
 		rgb_color color = owner->ViewColor();
-		rgb_color oldViewColor = color;
 		rgb_color oldLowColor = owner->LowColor();
 		rgb_color oldHighColor = owner->HighColor();
 
 		if (IsSelected())
 			color = tint_color(color, B_HIGHLIGHT_BACKGROUND_TINT);
 
-		owner->SetViewColor(color);
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
 
@@ -321,6 +319,5 @@ JobItem::DrawItem(BView *owner, BRect, bool complete)
 		owner->DrawString(fSize.String(), fSize.Length(), sizePt);
 
 		owner->SetDrawingMode(mode);
-		owner->SetViewColor(oldViewColor);
 	}
 }
