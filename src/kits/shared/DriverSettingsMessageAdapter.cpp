@@ -179,24 +179,36 @@ DriverSettingsMessageAdapter::_AddParameter(const driver_parameter& parameter,
 				return status;
 		}
 
+		status_t status = B_OK;
+
 		switch (settingsTemplate.type) {
 			case B_STRING_TYPE:
-				message.AddString(settingsTemplate.name, parameter.values[i]);
+				status = message.AddString(settingsTemplate.name,
+					parameter.values[i]);
 				break;
 			case B_INT32_TYPE:
-				message.AddInt32(settingsTemplate.name,
+				status = message.AddInt32(settingsTemplate.name,
 					atoi(parameter.values[i]));
 				break;
 			case B_BOOL_TYPE:
-				if (!strcasecmp(parameter.values[i], "true")
+			{
+				bool value=!strcasecmp(parameter.values[i], "true")
 					|| !strcasecmp(parameter.values[i], "on")
+					|| !strcasecmp(parameter.values[i], "yes")
 					|| !strcasecmp(parameter.values[i], "enabled")
-					|| !strcasecmp(parameter.values[i], "1"))
-					message.AddBool(settingsTemplate.name, true);
-				else
-					message.AddBool(settingsTemplate.name, false);
+					|| !strcasecmp(parameter.values[i], "1");
+				status = message.AddBool(settingsTemplate.name, value);
 				break;
+			}
+			case B_MESSAGE_TYPE:
+				// Is handled outside of this method
+				break;
+
+			default:
+				return B_BAD_VALUE;
 		}
+		if (status != B_OK)
+			return status;
 	}
 	if (settingsTemplate.type == B_BOOL_TYPE && parameter.value_count == 0) {
 		// Empty boolean parameters are always true
@@ -214,32 +226,33 @@ DriverSettingsMessageAdapter::_ConvertFromDriverParameter(
 {
 	settingsTemplate = _FindSettingsTemplate(settingsTemplate, parameter.name);
 	if (settingsTemplate == NULL) {
+		// We almost silently ignore this kind of issues
 		fprintf(stderr, "unknown parameter %s\n", parameter.name);
-		return B_BAD_VALUE;
+		return B_OK;
 	}
 
-	_AddParameter(parameter, *settingsTemplate, message);
+	status_t status = _AddParameter(parameter, *settingsTemplate, message);
+	if (status != B_OK)
+		return status;
 
-	if (settingsTemplate->type == B_MESSAGE_TYPE
-		&& parameter.parameter_count > 0) {
-		status_t status = B_OK;
+	if (settingsTemplate->type == B_MESSAGE_TYPE) {
 		BMessage subMessage;
 		for (int32 j = 0; j < parameter.parameter_count; j++) {
 			status = _ConvertFromDriverParameter(parameter.parameters[j],
 				settingsTemplate->sub_template, subMessage);
 			if (status != B_OK)
-				break;
-
-			const settings_template* parentValueTemplate
-				= _FindParentValueTemplate(settingsTemplate);
-			if (parentValueTemplate != NULL)
-				_AddParameter(parameter, *parentValueTemplate, subMessage);
+				return status;
 		}
+
+		const settings_template* parentValueTemplate
+			= _FindParentValueTemplate(settingsTemplate);
+		if (parentValueTemplate != NULL)
+			status = _AddParameter(parameter, *parentValueTemplate, subMessage);
 		if (status == B_OK)
-			message.AddMessage(parameter.name, &subMessage);
+			status = message.AddMessage(parameter.name, &subMessage);
 	}
 
-	return B_OK;
+	return status;
 }
 
 
