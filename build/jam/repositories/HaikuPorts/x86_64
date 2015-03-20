@@ -178,8 +178,8 @@ RemotePackageRepository HaikuPorts
 	netcat-1.10-1
 	ninja-1.5.1-2
 	openssh-6.6p1-1
-	openssl-1.0.0p-1
-	openssl_devel-1.0.0p-1
+	openssl-1.0.0r-1
+	openssl_devel-1.0.0r-1
 	p7zip-9.20.1-5
 	patch-2.7.4-1
 	pe-2.4.5-1

@@ -290,8 +290,8 @@ RemotePackageRepository HaikuPorts
 	opensound-4.2_git-2
 	openssh-6.6p1-1
 	# sync openssl with secondary architecture (x86)
-	openssl-1.0.0p-1
-	openssl_devel-1.0.0p-1
+	openssl-1.0.0r-1
+	openssl_devel-1.0.0r-1
 	p7zip-9.20.1-4
 	paladin-git-5
 	patch-2.7.4-1
@@ -629,8 +629,8 @@ RemotePackageRepository HaikuPorts
 	openjdk_x86-1.7_u80_b02-1
 	openjpeg_x86-2.1.0-2
 	openjpeg_x86_devel-2.1.0-2
-	openssl_x86-1.0.0p-1
-	openssl_x86_devel-1.0.0p-1
+	openssl_x86-1.0.0r-1
+	openssl_x86_devel-1.0.0r-1
 	openttd_x86-1.3.3-1
 	pciutils_x86-3.2.1-1
 	pciutils_x86_devel-3.2.1-1
