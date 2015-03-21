@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libbe	436685149
+1	german	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		Gamma
 beta	AboutWindow		Beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -20,6 +20,7 @@ OK	PrintJob		OK
 Green:	ColorControl		Grün:
 Version history:	AboutWindow		Historie:
 Remove replicant	Dragger		Replikant entfernen
+Select all	TextView		Alles auswählen
 OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Drucker-Server reagiert nicht.

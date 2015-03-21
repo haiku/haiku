@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libbe	436685149
+1	swedish	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -20,6 +20,7 @@ OK	PrintJob		OK
 Green:	ColorControl		Grön:
 Version history:	AboutWindow		Versionshistorik:
 Remove replicant	Dragger		Ta bort replikant
+Select all	TextView		Markera allt
 OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Utskriftservern svarar inte.

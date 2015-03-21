@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libbe	436685149
+1	japanese	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		γ
 beta	AboutWindow		β
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -20,6 +20,7 @@ OK	PrintJob		OK
 Green:	ColorControl		緑:
 Version history:	AboutWindow		改訂履歴:
 Remove replicant	Dragger		レプリカントを削除
+Select all	TextView		すべて選択
 OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		プリントサーバーが応答しません。

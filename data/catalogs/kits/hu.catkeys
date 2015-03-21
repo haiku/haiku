@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libbe	436685149
+1	hungarian	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		gamma
 beta	AboutWindow		béta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -20,6 +20,7 @@ OK	PrintJob		Rendben
 Green:	ColorControl		Zöld:
 Version history:	AboutWindow		Előző verziók:
 Remove replicant	Dragger		Replikáns eltávolítása
+Select all	TextView		Összes kijelölése
 OK	AboutWindow		Rendben
 OK	ZombieReplicantView		Rendben
 Print Server is not responding.	PrintJob		A nyomtatókiszolgáló nem válaszol.
