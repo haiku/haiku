@@ -144,6 +144,7 @@ RemotePackageRepository HaikuPorts
 	libxml2_python-2.9.2-1
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
+	llvm-3.5.1-1
 	lz4-r117-1
 	lz4_devel-r117-1
 	lzo-2.09-1
@@ -370,6 +371,7 @@ RemotePackageRepository HaikuPorts
 	libwebp
 	libxml2
 	libxslt
+	llvm
 	lz4
 	lzo
 	m4
