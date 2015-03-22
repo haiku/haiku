@@ -227,7 +227,7 @@ RemotePackageRepository HaikuPorts
 	xz_utils-5.0.6-1
 	xz_utils_devel-5.0.6-1
 	yasm-1.2.0-3
-	zip-3.0-1
+	zip-3.0-2
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
 
