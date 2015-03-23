@@ -171,7 +171,7 @@ DriverSettingsMessageAdapter::_AddParameter(const driver_parameter& parameter,
 		if (settingsTemplate.converter != NULL) {
 			status_t status
 				= settingsTemplate.converter->ConvertFromDriverSettings(
-					parameter, settingsTemplate.name, settingsTemplate.type,
+					parameter, settingsTemplate.name, i, settingsTemplate.type,
 					message);
 			if (status == B_OK)
 				continue;

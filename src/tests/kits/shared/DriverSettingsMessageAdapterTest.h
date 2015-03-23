@@ -17,8 +17,8 @@ public:
 
 			void				TestPrimitivesToMessage();
 			void				TestMessage();
-			void				TestEmptyMessage();
 			void				TestParent();
+			void				TestConverter();
 
 	static	void				AddTests(BTestSuite& suite);
 };

@@ -45,7 +45,7 @@ class InterfaceAddressFamilyConverter : public DriverSettingsConverter {
 public:
 	virtual	status_t			ConvertFromDriverSettings(
 									const driver_parameter& parameter,
-									const char* name, uint32 type,
+									const char* name, int32 index, uint32 type,
 									BMessage& target);
 	virtual	status_t			ConvertToDriverSettings(const BMessage& source,
 									const char* name, int32 index,
@@ -266,8 +266,8 @@ type_for_protocol(int protocol)
 
 status_t
 InterfaceAddressFamilyConverter::ConvertFromDriverSettings(
-	const driver_parameter& parameter, const char* name, uint32 type,
-	BMessage& target)
+	const driver_parameter& parameter, const char* name, int32 index,
+	uint32 type, BMessage& target)
 {
 	return B_NOT_SUPPORTED;
 }

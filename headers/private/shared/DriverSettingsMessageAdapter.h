@@ -21,7 +21,7 @@ public:
 
 	virtual	status_t			ConvertFromDriverSettings(
 									const driver_parameter& parameter,
-									const char* name, uint32 type,
+									const char* name, int32 index, uint32 type,
 									BMessage& target) = 0;
 	virtual	status_t			ConvertToDriverSettings(const BMessage& source,
 									const char* name, int32 index,

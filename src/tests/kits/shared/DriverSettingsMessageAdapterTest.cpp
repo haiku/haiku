@@ -30,8 +30,6 @@ public:
 	status_t ToMessage(const settings_template* settingsTemplate,
 		BMessage& message)
 	{
-		message.MakeEmpty();
-
 		DriverSettingsMessageAdapter adapter;
 		return adapter.ConvertFromDriverSettings(
 			*get_driver_settings(fSettings), settingsTemplate, message);
@@ -107,6 +105,7 @@ DriverSettingsMessageAdapterTest::TestPrimitivesToMessage()
 	CPPUNIT_ASSERT_EQUAL(10, message.CountNames(B_BOOL_TYPE));
 	CPPUNIT_ASSERT_EQUAL(2, message.CountNames(B_INT32_TYPE));
 	CPPUNIT_ASSERT_EQUAL(2, message.CountNames(B_STRING_TYPE));
+	CPPUNIT_ASSERT_EQUAL(14, message.CountNames(B_ANY_TYPE));
 
 	// bool values
 	CPPUNIT_ASSERT_EQUAL_MESSAGE("bool1", true, message.GetBool("bool1"));
@@ -141,12 +140,33 @@ DriverSettingsMessageAdapterTest::TestPrimitivesToMessage()
 void
 DriverSettingsMessageAdapterTest::TestMessage()
 {
-}
+	const settings_template kSubTemplate[] = {
+		{B_BOOL_TYPE, "bool", NULL},
+		{}
+	};
+	const settings_template kTemplate[] = {
+		{B_MESSAGE_TYPE, "message", kSubTemplate},
+		{}
+	};
+	Settings settingsA("message {\n"
+		"    bool\n"
+		"}\n");
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, settingsA.ToMessage(kTemplate, message));
+	BMessage subMessage;
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("message", &subMessage));
+	CPPUNIT_ASSERT_EQUAL_MESSAGE("bool", true, subMessage.GetBool("bool"));
+	CPPUNIT_ASSERT_EQUAL(1, message.CountNames(B_ANY_TYPE));
 
+	Settings settingsB("message {\n"
+		"}\n");
+	CPPUNIT_ASSERT_EQUAL(B_OK, settingsB.ToMessage(kTemplate, message));
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("message", &subMessage));
+	CPPUNIT_ASSERT_EQUAL(1, message.CountNames(B_ANY_TYPE));
 
-void
-DriverSettingsMessageAdapterTest::TestEmptyMessage()
-{
+	Settings settingsC("\n");
+	CPPUNIT_ASSERT_EQUAL(B_OK, settingsC.ToMessage(kTemplate, message));
+	CPPUNIT_ASSERT(message.IsEmpty());
 }
 
 
@@ -209,18 +229,67 @@ DriverSettingsMessageAdapterTest::TestParent()
 }
 
 
+void
+DriverSettingsMessageAdapterTest::TestConverter()
+{
+	class InterfaceAddressFamilyConverter : public DriverSettingsConverter {
+	public:
+		status_t ConvertFromDriverSettings(const driver_parameter& parameter,
+			const char* name, int32 index, uint32 type, BMessage& target)
+		{
+			const char* value = parameter.values[index];
+			if (value[0] == '0' && value[1] == 'x')
+				return target.AddInt32(name, (int32)strtol(value, NULL, 0));
+			return B_NOT_SUPPORTED;
+		}
+
+		status_t ConvertToDriverSettings(const BMessage& source,
+			const char* name, int32 index, uint32 type, BString& value)
+		{
+			int32 intValue;
+			if (index == 0 && source.FindInt32(name, 0, &intValue) == B_OK) {
+				BString string;
+				string.SetToFormat("0x%" B_PRIu32, intValue);
+				value << string;
+
+				return B_OK;
+			}
+			return B_NOT_SUPPORTED;
+		}
+	} converter;
+
+	const settings_template kTemplate[] = {
+		{B_INT32_TYPE, "test", NULL, false, &converter},
+		{}
+	};
+
+	Settings settings("test 0x2a 43");
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, settings.ToMessage(kTemplate, message));
+	CPPUNIT_ASSERT_EQUAL(42, message.GetInt32("test", 0, 0));
+	CPPUNIT_ASSERT_EQUAL(43, message.GetInt32("test", 1, 0));
+	CPPUNIT_ASSERT_EQUAL(1, message.CountNames(B_ANY_TYPE));
+}
+
+
 /*static*/ void
 DriverSettingsMessageAdapterTest::AddTests(BTestSuite& parent)
 {
 	CppUnit::TestSuite& suite = *new CppUnit::TestSuite(
 		"DriverSettingsMessageAdapterTest");
 
-//	suite.addTest(new CppUnit::TestCaller<DriverSettingsMessageAdapterTest>(
-//		"DriverSettingsMessageAdapterTest::TestPrimitivesToMessage",
-//		&DriverSettingsMessageAdapterTest::TestPrimitivesToMessage));
+	suite.addTest(new CppUnit::TestCaller<DriverSettingsMessageAdapterTest>(
+		"DriverSettingsMessageAdapterTest::TestPrimitivesToMessage",
+		&DriverSettingsMessageAdapterTest::TestPrimitivesToMessage));
+	suite.addTest(new CppUnit::TestCaller<DriverSettingsMessageAdapterTest>(
+		"DriverSettingsMessageAdapterTest::TestMessage",
+		&DriverSettingsMessageAdapterTest::TestMessage));
 	suite.addTest(new CppUnit::TestCaller<DriverSettingsMessageAdapterTest>(
 		"DriverSettingsMessageAdapterTest::TestParent",
 		&DriverSettingsMessageAdapterTest::TestParent));
+	suite.addTest(new CppUnit::TestCaller<DriverSettingsMessageAdapterTest>(
+		"DriverSettingsMessageAdapterTest::TestConverter",
+		&DriverSettingsMessageAdapterTest::TestConverter));
 
 	parent.addTest("DriverSettingsMessageAdapterTest", &suite);
 }
