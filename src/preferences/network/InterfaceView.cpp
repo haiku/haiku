@@ -85,12 +85,12 @@ InterfaceView::InterfaceView()
 	fNetworkMenuField->Menu()->SetLabelFromMarked(true);
 
 	// Construct the BButtons
-	fOnOff = new BButton("onoff", B_TRANSLATE("Disable"),
+	fToggleButton = new BButton("onoff", B_TRANSLATE("Disable"),
 		new BMessage(kMsgInterfaceToggle));
 
-	fRenegotiate = new BButton("heal", B_TRANSLATE("Renegotiate"),
+	fRenegotiateButton = new BButton("heal", B_TRANSLATE("Renegotiate"),
 		new BMessage(kMsgInterfaceRenegotiate));
-	fRenegotiate->SetEnabled(false);
+	fRenegotiateButton->SetEnabled(false);
 
 	BLayoutBuilder::Group<>(this)
 		.AddGrid()
@@ -110,8 +110,8 @@ InterfaceView::InterfaceView()
 		.AddGlue()
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
-			.Add(fOnOff)
-			.Add(fRenegotiate)
+			.Add(fToggleButton)
+			.Add(fRenegotiateButton)
 		.End();
 }
 
@@ -134,8 +134,8 @@ InterfaceView::AttachedToWindow()
 	_Update();
 		// Populate the fields
 
-	fOnOff->SetTarget(this);
-	fRenegotiate->SetTarget(this);
+	fToggleButton->SetTarget(this);
+	fRenegotiateButton->SetTarget(this);
 }
 
 
@@ -161,8 +161,15 @@ InterfaceView::MessageReceived(BMessage* message)
 		}
 		case kMsgInterfaceToggle:
 		{
-			// TODO: disable/enable interface
-			_Update();
+			// Disable/enable interface
+			uint32 flags = fInterface.Flags();
+			if ((flags & IFF_UP) != 0)
+				flags &= ~IFF_UP;
+			else
+				flags |= IFF_UP;
+
+			if (fInterface.SetFlags(flags) == B_OK)
+				_Update();
 			break;
 		}
 
@@ -186,6 +193,8 @@ InterfaceView::Pulse()
 }
 
 
+/*!	Populate fields with current settings.
+*/
 status_t
 InterfaceView::_Update(bool updateWirelessNetworks)
 {
@@ -193,7 +202,6 @@ InterfaceView::_Update(bool updateWirelessNetworks)
 	bool isWireless = device.IsWireless();
 	bool disabled = (fInterface.Flags() & IFF_UP) == 0;
 
-	// Populate fields with current settings
 	if (fInterface.HasLink()) {
 		if (isWireless) {
 			// TODO!
@@ -286,8 +294,8 @@ InterfaceView::_Update(bool updateWirelessNetworks)
 		menu->SetTargetForItems(this);
 	}
 
-	fRenegotiate->SetEnabled(!disabled);
-	fOnOff->SetLabel(disabled ? "Enable" : "Disable");
+	//fRenegotiateButton->SetEnabled(!disabled);
+	fToggleButton->SetLabel(disabled ? "Enable" : "Disable");
 
 	return B_OK;
 }

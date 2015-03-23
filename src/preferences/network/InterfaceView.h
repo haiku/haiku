@@ -48,8 +48,8 @@ private:
 
 			BMenuField*			fNetworkMenuField;
 
-			BButton*			fOnOff;
-			BButton*			fRenegotiate;
+			BButton*			fToggleButton;
+			BButton*			fRenegotiateButton;
 };
 
 
