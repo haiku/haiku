@@ -47,7 +47,8 @@ DNSSettingsView::DNSSettingsView(BNetworkSettingsItem* item)
 	fItem(item)
 {
 	fServerListView = new BListView("nameservers");
-	fTextControl = new IPAddressControl(AF_UNSPEC, "server", "");
+	fTextControl = new IPAddressControl(AF_UNSPEC, B_TRANSLATE("Server"),
+		"server");
 	fTextControl->SetExplicitMinSize(BSize(fTextControl->StringWidth("5") * 18,
 		B_SIZE_UNSET));
 
