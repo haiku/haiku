@@ -504,7 +504,8 @@ NetServer::_ConfigureInterface(BMessage& message)
 		if (!addressSettings.Address().IsEmpty()
 			|| !addressSettings.Mask().IsEmpty()
 			|| !addressSettings.Broadcast().IsEmpty()
-			|| !addressSettings.Peer().IsEmpty()) {
+			|| !addressSettings.Peer().IsEmpty()
+			|| !addressSettings.IsAutoConfigure()) {
 			BNetworkInterfaceAddress interfaceAddress;
 			interfaceAddress.SetAddress(addressSettings.Address());
 			interfaceAddress.SetMask(addressSettings.Mask());

@@ -196,8 +196,11 @@ get_address_family(const char* argument)
 static bool
 parse_address(int32& family, const char* argument, BNetworkAddress& address)
 {
-	if (argument == NULL)
+	if (argument == NULL) {
+		if (family != AF_UNSPEC)
+			address.SetToWildcard(family);
 		return false;
+	}
 
 	status_t status = address.SetTo(family, argument, (uint16)0,
 		B_NO_ADDRESS_RESOLUTION);
