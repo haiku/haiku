@@ -260,7 +260,8 @@ InterfaceAddressView::_SetModeField(uint32 mode)
 		fAddressField->SetText(NULL);
 		fNetmaskField->SetText(NULL);
 		fGatewayField->SetText(NULL);
-	}
+	} else if (mode == kModeStatic)
+		fAddressField->MakeFocus(true);
 
 	fLastMode = mode;
 }
