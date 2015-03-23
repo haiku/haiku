@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -118,7 +118,9 @@ ipv6_is_empty_address(const sockaddr *_address, bool checkPort)
 		return true;
 
 	const sockaddr_in6 *address = (const sockaddr_in6 *)_address;
-	if (checkPort && address->sin6_port != 0) return false;
+	if (checkPort && address->sin6_port != 0)
+		return false;
+
 	return IN6_IS_ADDR_UNSPECIFIED(&address->sin6_addr);
 }
 
