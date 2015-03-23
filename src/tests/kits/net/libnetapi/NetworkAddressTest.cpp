@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -73,9 +73,13 @@ NetworkAddressTest::TestWildcard()
 	CPPUNIT_ASSERT(wildcard.Port() == 0);
 	CPPUNIT_ASSERT(((sockaddr_in&)wildcard.SockAddr()).sin_addr.s_addr
 		== INADDR_ANY);
+	CPPUNIT_ASSERT(wildcard.IsEmpty());
 
 	BNetworkAddress null(AF_INET, NULL);
 	CPPUNIT_ASSERT(wildcard == null);
+
+	wildcard.SetPort(555);
+	CPPUNIT_ASSERT(!wildcard.IsEmpty());
 }
 
 
