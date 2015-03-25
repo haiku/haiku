@@ -1,7 +1,6 @@
 /*!
 	\file MidiRoster.h
 	\ingroup midi2
-	\ingroup libbe
 	\brief Defines the heart of the MIDI Kit: the MIDI Roster.
 */
 
@@ -27,8 +26,6 @@
 /*!
 	\class BMidiRoster MidiRoster.h
 	\ingroup midi2
-	\ingroup libmidi2
-	\ingroup libbe
 	\brief Interface to the system-wide Midi Roster.
 
 	BMidiRoster allows you to find available MIDI consumer and producer

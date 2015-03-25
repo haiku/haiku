@@ -1,7 +1,6 @@
 /*!
 	\file Midi2Defs.h
 	\ingroup midi2
-	\ingroup libbe
 	\brief Some definitions to define raw MIDI events.
 */
 
@@ -57,7 +56,7 @@
 //! @}
 
 
-/*! 
+/*!
 	\name System Messages
 	\brief Some definitions to define the raw MIDI system messages.
 
@@ -140,7 +139,7 @@
 //! @}
 
 
-/*! 
+/*!
 	\name Controller Numbers
 	\brief Constants that represent specific controller messages.
 
@@ -231,13 +230,13 @@
 */
 
 
-/*! 
+/*!
 	\var B_SOSTENUTO
 */
 
 
 /*!
-	\var B_SOFT_PEDAL 
+	\var B_SOFT_PEDAL
 */
 
 
@@ -277,7 +276,7 @@
 
 
 /*!
-	\var B_TREMOLO_DEPTH 
+	\var B_TREMOLO_DEPTH
 */
 
 
@@ -312,7 +311,7 @@
 
 
 /*!
-	\var B_LOCAL_CONTROL 
+	\var B_LOCAL_CONTROL
 */
 
 
@@ -327,7 +326,7 @@
 
 
 /*!
-	\var B_OMNI_MODE_ON 
+	\var B_OMNI_MODE_ON
 */
 
 

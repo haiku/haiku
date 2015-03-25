@@ -1,7 +1,6 @@
 /*!
 	\file MidiEndpoint.h
 	\ingroup midi2
-	\ingroup libbe
 	\brief Defines the Baseclass of all MIDI consumers and producers.
 */
 
@@ -9,8 +8,6 @@
 /*!
 	\class BMidiEndpoint
 	\ingroup midi2
-	\ingroup libmidi2
-	\ingroup libbe
 	\brief Base class for all MIDI endpoints.
 
 	BMidiEndpoint is the abstract base class that represents either a
@@ -261,7 +258,7 @@ if (endpoint->GetProperties(&props) == B_OK)
 {
     ...add data to the message...
     endpoint->SetProperties(&props);
-} 
+}
 \endcode
 
 	You are only allowed to call SetProperties() on a local object.
@@ -310,7 +307,7 @@ if (endpoint->GetProperties(&props) == B_OK)
 
 \code
 BMessage props;
-if (endpoint->GetProperties(&props) == B_OK) 
+if (endpoint->GetProperties(&props) == B_OK)
 {
     ...examine the contents of the message...
 }

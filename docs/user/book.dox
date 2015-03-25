@@ -469,9 +469,6 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 		- <A HREF="http://www.io.com/~jimm/midi_ref.html">Jim Menard's MIDI Reference</A>
 
 
-	\defgroup libmidi2 (libmidi2.so)
-
-
 	\defgroup network Network Kit
 	\brief Classes that deal with all network connections and communications.
 
