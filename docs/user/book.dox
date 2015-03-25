@@ -18,7 +18,7 @@
 	detailed on the \ref compatibility page. New classes and methods
 	and incompatible API changes to the BeOS R5 API are noted in the
 	appropriate sections.
-	
+
 	A complete reference to the BeOS R5 API is available on the web in
 	<a href="http://haiku-os.org/legacy-docs/bebook/">The Be Book</a>.
 	The Be Book is used with permission from
@@ -91,7 +91,7 @@
 		- BMessageQueue
 		- BMessageRunner
 		- BMessenger
- 
+
 	The second group is the system interaction classes. These classes
 	provide hooks for your application to interact with the rest of the system.
 	The most important class in this group is BApplication. Below is a list of
@@ -434,7 +434,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 	Filters should ignore the time argument from the spray and hook functions,
 	and  simply pass it on unchanged. Objects that only filter data should
 	process the  event as quickly as possible and be done with it. Do not
-	<CODE>snooze_until()</CODE> in the consumer endpoint of a filter!	
+	<CODE>snooze_until()</CODE> in the consumer endpoint of a filter!
 
 	\section midi2apidiffs API Differences
 
@@ -611,5 +611,6 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
 ///// Special Topics /////
 
-\defgroup drivers Device Drivers
-\defgroup keyboard Keyboard
+/*!
+	\defgroup drivers Device Drivers
+*/
