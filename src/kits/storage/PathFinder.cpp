@@ -145,7 +145,7 @@ BPathFinder::FindPaths(const char* architecture,
 BPathFinder::FindPaths(path_base_directory baseDirectory, const char* subPath,
 	uint32 flags, BStringList& _paths)
 {
-	return FindPaths(NULL, baseDirectory, subPath, 0, _paths);
+	return FindPaths(NULL, baseDirectory, subPath, flags, _paths);
 }
 
 
