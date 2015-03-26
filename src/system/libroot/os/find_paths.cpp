@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -83,6 +84,16 @@ public:
 	bool IsValid() const
 	{
 		return fLocations[0] != NULL && fLocations[1] != NULL;
+	}
+
+	bool IsUserIndex(size_t index) const
+	{
+		return index==0 || index==1;
+	}
+
+	bool IsSystemIndex(size_t index) const
+	{
+		return index==2 || index==3;
 	}
 
 	static InstallationLocations* Default()
@@ -674,6 +685,12 @@ __find_paths_etc(const char* architecture, path_base_directory baseDirectory,
 	size_t totalSize = 0;
 
 	for (size_t i = 0; i < InstallationLocations::kCount; i++) {
+		if (((flags & B_FIND_PATHS_USER_ONLY) != 0
+				&& !installationLocations->IsUserIndex(i))
+			|| ((flags & B_FIND_PATHS_SYSTEM_ONLY) != 0
+				&& !installationLocations->IsSystemIndex(i)))
+			continue;
+
 		relativePaths[i] = get_relative_directory_path(i, baseDirectory);
 		if (relativePaths[i] == NULL)
 			return B_BAD_VALUE;
@@ -696,6 +713,12 @@ __find_paths_etc(const char* architecture, path_base_directory baseDirectory,
 	char* pathBuffer = (char*)(paths + InstallationLocations::kCount);
 	const char* pathBufferEnd = pathBuffer + totalSize;
 	for (size_t i = 0; i < InstallationLocations::kCount; i++) {
+		if (((flags & B_FIND_PATHS_USER_ONLY) != 0
+				&& !installationLocations->IsUserIndex(i))
+			|| ((flags & B_FIND_PATHS_SYSTEM_ONLY) != 0
+				&& !installationLocations->IsSystemIndex(i)))
+			continue;
+
 		ssize_t pathSize = process_path(installationLocations->At(i),
 			architecture, relativePaths[i], subPath, flags, pathBuffer,
 			pathBufferEnd - pathBuffer);

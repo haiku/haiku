@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2015, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FIND_DIRECTORY_H
@@ -126,6 +126,9 @@ enum {
 	B_FIND_PATH_CREATE_DIRECTORY			= 0x0001,
 	B_FIND_PATH_CREATE_PARENT_DIRECTORY		= 0x0002,
 	B_FIND_PATH_EXISTING_ONLY				= 0x0004,
+
+	B_FIND_PATHS_SYSTEM_ONLY				= 0x0010,
+	B_FIND_PATHS_USER_ONLY					= 0x0020,
 };
 
 
