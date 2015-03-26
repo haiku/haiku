@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.03.17
-# Date:    2015-03-17 20:34:06
+# Version: 2015.03.24
+# Date:    2015-03-24 12:10:50
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -15545,6 +15545,8 @@
 	0c31  Telldus TellStick Duo
 	0c9f  USBtiny
 	1eef  OpenAPC SecuKey
+	1ef0  E1701 Modular Controller Card
+	1ef1  E1701 Modular Controller Card
 1782  Spreadtrum Communications Inc.
 1784  TopSeed Technology Corp.
 	0001  eHome Infrared Transceiver
@@ -15892,6 +15894,10 @@
 1995  Trillium Technology Pty. Ltd.
 	3202  REC-ADPT-USB (recorder)
 	3203  REC-A-ADPT-USB (recorder)
+1996  PixeLINK
+	3010  Camera Release 4
+	3011  OEM Camera
+	3012  e-ImageData Corp. ScanPro
 199b  MicroStrain, Inc.
 	3065  3DM-GX3-25 Orientation Sensor
 199e  The Imaging Source Europe GmbH
@@ -17039,7 +17045,7 @@
 	003c  Arduino Explora (bootloader)
 	003d  Arduino Due (usb2serial)
 	003e  Arduino Due
-	0041  Arduino Yùn (bootloader)
+	0041  Arduino Yun (bootloader)
 	0042  Arduino Mega 2560 Rev3
 	0043  Arduino Uno Rev3
 	004d  Arduino Zero Pro (bootloader)
@@ -17050,7 +17056,7 @@
 	8039  Arduino Robot Motor (CDC ACM)
 	803a  Arduino Micro ADK rev3 (CDC ACM)
 	803c  Arduino Explora (CDC ACM)
-	8041  Arduino Yùn (CDC ACM)
+	8041  Arduino Yun (CDC ACM)
 	804d  Arduino Zero Pro (CDC ACM)
 2c02  Planex Communications
 	14ea  GW-US11H WLAN
@@ -17506,7 +17512,6 @@
 	2000  Flashdisk
 8564  Transcend Information, Inc.
 	1000  JetFlash
-		8564 1000  JetFlash
 	4000  RDF8
 8644  Intenso GmbG
 	8003  Micro Line
