@@ -52,6 +52,8 @@
 using namespace BPrivate;
 
 
+static const char* kDefaultLooperName = "AppLooperPort";
+
 BApplication* be_app = NULL;
 BMessenger be_app_messenger;
 
@@ -210,19 +212,6 @@ check_app_signature(const char* signature)
 }
 
 
-// Returns the looper name for a given signature.
-// Normally this is "AppLooperPort", but in case of the registrar it gets a
-// special name.
-static const char*
-looper_name_for(const char* signature)
-{
-	if (signature != NULL && !strcasecmp(signature, kRegistrarSignature))
-		return BPrivate::get_roster_port_name();
-
-	return "AppLooperPort";
-}
-
-
 #ifndef RUN_WITHOUT_REGISTRAR
 // Fills the passed BMessage with B_ARGV_RECEIVED infos.
 static void
@@ -255,7 +244,7 @@ fill_argv_message(BMessage &message)
 
 BApplication::BApplication(const char* signature)
 	:
-	BLooper(looper_name_for(signature))
+	BLooper(kDefaultLooperName)
 {
 	_InitData(signature, true, NULL);
 }
@@ -263,16 +252,16 @@ BApplication::BApplication(const char* signature)
 
 BApplication::BApplication(const char* signature, status_t* _error)
 	:
-	BLooper(looper_name_for(signature))
+	BLooper(kDefaultLooperName)
 {
 	_InitData(signature, true, _error);
 }
 
 
-BApplication::BApplication(const char* signature, bool initGUI,
-	status_t* _error)
+BApplication::BApplication(const char* signature, const char* looperName,
+	bool initGUI, status_t* _error)
 	:
-	BLooper(looper_name_for(signature))
+	BLooper(looperName != NULL ? looperName : kDefaultLooperName)
 {
 	_InitData(signature, initGUI, _error);
 }
@@ -282,7 +271,7 @@ BApplication::BApplication(BMessage* data)
 	// Note: BeOS calls the private BLooper(int32, port_id, const char*)
 	// constructor here, test if it's needed
 	:
-	BLooper(looper_name_for(NULL))
+	BLooper(kDefaultLooperName)
 {
 	const char* signature = NULL;
 	data->FindString("mime_sig", &signature);

@@ -101,6 +101,7 @@ private:
 	friend class BServer;
 
 								BApplication(const char* signature,
+									const char* looperName,
 									bool initGUI, status_t* error);
 								BApplication(uint32 signature);
 								BApplication(const BApplication&);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,9 +55,10 @@ static const bigtime_t kRosterSanityEventInterval = 1000000LL;
 	\param error Passed to the BApplication constructor for returning an
 		   error code.
 */
-Registrar::Registrar(status_t *error)
+Registrar::Registrar(status_t* _error)
 	:
-	BServer(kRegistrarSignature, false, error),
+	BServer(kRegistrarSignature, BPrivate::get_roster_port_name(), false,
+		_error),
 	fRoster(NULL),
 	fClipboardHandler(NULL),
 	fMIMEManager(NULL),
