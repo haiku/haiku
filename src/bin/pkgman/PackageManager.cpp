@@ -195,10 +195,14 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 		"\xE2\x96\x88",
 	};
 
-	struct winsize w;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	const int width = (w.ws_col > 77)
-		? 70 : (w.ws_col - 7); // we need 70 chars for the bar + 7 for %.
+	int width = 70;
+
+	struct winsize winSize;
+	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &winSize) == 0
+		&& winSize.ws_col < 77) {
+		// We need 7 characters for the percent display
+		width = windowSize.ws_col - 7;
+	}
 
 	int position;
 	int ipart = (int)(completionPercentage * width);
