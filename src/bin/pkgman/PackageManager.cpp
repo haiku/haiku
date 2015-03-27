@@ -201,7 +201,7 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &winSize) == 0
 		&& winSize.ws_col < 77) {
 		// We need 7 characters for the percent display
-		width = windowSize.ws_col - 7;
+		width = winSize.ws_col - 7;
 	}
 
 	int position;
