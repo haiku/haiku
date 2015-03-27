@@ -12,6 +12,7 @@
 #include "MediaTypes.h"
 
 #include <net/if_media.h>
+#include <string.h>
 
 
 struct media_type {

@@ -223,12 +223,10 @@ InterfaceAddressView::_UpdateFields()
 	int32 index = fInterface.FindFirstAddress(fFamily);
 	if (index >= 0)
 		status = fInterface.GetAddressAt(index, address);
-	if (index < 0 || status != B_OK
-		|| address.Address().IsEmpty() && !autoConfigure) {
-		if (!autoConfigure) {
-			_SetModeField(kModeDisabled);
-			return;
-		}
+	if (!autoConfigure && (index < 0 || status != B_OK
+			|| address.Address().IsEmpty())) {
+		_SetModeField(kModeDisabled);
+		return;
 	}
 
 	if (autoConfigure)
