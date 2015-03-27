@@ -10,6 +10,9 @@
 
 #include "PackageManager.h"
 
+#include <sys/ioctl.h>
+#include <unistd.h>
+
 #include <package/CommitTransactionResult.h>
 #include <package/DownloadFileRequest.h>
 #include <package/RefreshRepositoryRequest.h>
@@ -189,7 +192,10 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 		"\xE2\x96\x88",
 	};
 
-	const int width = 70;
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	const int width = (w.ws_col > 77)
+		? 70 : (w.ws_col - 7); // we need 70 chars for the bar + 7 for %.
 
 	int position;
 	int ipart = (int)(completionPercentage * width);
