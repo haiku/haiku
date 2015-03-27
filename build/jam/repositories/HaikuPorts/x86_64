@@ -122,10 +122,10 @@ RemotePackageRepository HaikuPorts
 	libogg_devel-1.3.0-2
 	libpcre-8.21-5
 	libpcre_devel-8.21-5
-	libpng-1.5.21-1
-	libpng_devel-1.5.21-1
-	libpng16-1.6.16-1
-	libpng16_devel-1.6.16-1
+	libpng-1.5.22-1
+	libpng_devel-1.5.22-1
+	libpng16-1.6.17-1
+	libpng16_devel-1.6.17-1
 	libsndfile-1.0.25-3
 	libsndfile_devel-1.0.25-3
 	libsdl-1.2.15-6

@@ -202,10 +202,10 @@ RemotePackageRepository HaikuPorts
 	libpaper_devel-1.1.24-1
 	libpcre-8.21-5
 	libpcre_devel-8.21-5
-	libpng-1.5.21-1
-	libpng_devel-1.5.21-1
-	libpng16-1.6.16-1
-	libpng16_devel-1.6.16-1
+	libpng-1.5.22-1
+	libpng_devel-1.5.22-1
+	libpng16-1.6.17-1
+	libpng16_devel-1.6.17-1
 	libpthread_stubs-0.3-2
 	libsanta-3.0.0-3
 	libsanta_devel-3.0.0-3
@@ -563,10 +563,10 @@ RemotePackageRepository HaikuPorts
 	libpaper_x86_devel-1.1.24-1
 	libpcre_x86-8.33-2
 	libpcre_x86_devel-8.33-2
-	libpng_x86-1.5.21-1
-	libpng_x86_devel-1.5.21-1
-	libpng16_x86-1.6.16-1
-	libpng16_x86_devel-1.6.16-1
+	libpng_x86-1.5.22-1
+	libpng_x86_devel-1.5.22-1
+	libpng16_x86-1.6.17-1
+	libpng16_x86_devel-1.6.17-1
 	libqt4_x86-4.8.6.4-1
 	libqt4_x86_devel-4.8.6.4-1
 	libsamplerate_x86-0.1.8-1
