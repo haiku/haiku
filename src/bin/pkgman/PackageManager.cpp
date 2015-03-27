@@ -181,6 +181,9 @@ void
 PackageManager::ProgressPackageDownloadActive(const char* packageName,
 	float completionPercentage)
 {
+	if (!fInteractive)
+		return;
+
 	static const char* progressChars[] = {
 		"\xE2\x96\x8F",
 		"\xE2\x96\x8E",
@@ -201,7 +204,7 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 	int ipart = (int)(completionPercentage * width);
 	int fpart = (int)(((completionPercentage * width) - ipart) * 8);
 
-	printf("\r"); // erase the line
+	printf("\r"); // return to the beginning of the line
 
 	for (position = 0; position < width; position++) {
 		if (position < ipart) {
@@ -226,21 +229,31 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 void
 PackageManager::ProgressPackageDownloadComplete(const char* packageName)
 {
-	printf("\nFinished downloading %s.\n", packageName);
+	if (fInteractive) {
+		// Overwrite the progress bar with whitespace
+		printf("\r");
+		struct winsize w;
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+		for (int i = 0; i < (w.ws_col); i++)
+			printf(" ");
+		printf("\r\x1b[1A"); // Go to previous line.
+	}
+
+	printf("Downloading %s...done.\n", packageName);
 }
 
 
 void
 PackageManager::ProgressPackageChecksumStarted(const char* title)
 {
-	printf("%s...\n", title);
+	printf("%s...", title);
 }
 
 
 void
 PackageManager::ProgressPackageChecksumComplete(const char* title)
 {
-	printf("%s complete.\n", title);
+	printf("done.\n");
 }
 
 
