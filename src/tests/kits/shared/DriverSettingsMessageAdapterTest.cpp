@@ -6,6 +6,8 @@
 
 #include "DriverSettingsMessageAdapterTest.h"
 
+#include <stdlib.h>
+
 #include <driver_settings.h>
 #include <String.h>
 
