@@ -40,7 +40,6 @@
 #include <string.h>
 
 //#include "libc_private.h"
-#define __weak_reference(a, b)
 
 extern const char *_getprogname(void);
 
