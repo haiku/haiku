@@ -13,5 +13,5 @@ __dremf(float x, float y)
 {
 	return __remainderf(x, y);
 }
+weak_alias (__dremf, dremf)
 
-float dremf(float, float) __attribute__((weak, alias("__dremf")));
