@@ -13,6 +13,7 @@
 
 #include <MediaDefs.h>
 #include <MediaNode.h>
+#include <MediaRoster.h>
 #include <Roster.h>
 
 #include "debug.h"
@@ -1287,17 +1288,22 @@ shutdown_media_server(bigtime_t timeout,
 status_t
 launch_media_server(uint32 flags)
 {
-	status_t err;
-
-	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE))
+	if (BMediaRoster::IsRunning())
 		return B_ALREADY_RUNNING;
 
+	// The media_server crashed
 	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
 		kill_team(be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE));
 		snooze(1000000);
 	}
 
-	err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
+	// The media_addon_server crashed
+	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
+		kill_team(be_roster->TeamFor(B_MEDIA_SERVER_SIGNATURE));
+		snooze(1000000);
+	}
+
+	status_t err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
 	if (err != B_OK)
 		return err;
 
