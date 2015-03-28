@@ -11,9 +11,7 @@
 #include <arch/arm/reg.h>
 #include <arch/generic/debug_uart.h>
 #include <arch/arm/arch_uart_pl011.h>
-//#include <board_config.h>
 #include <new>
-//#include <target/debugconfig.h>
 
 
 #define PL01x_DR	0x00 // Data read or written

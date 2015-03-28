@@ -214,15 +214,18 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 		gFDT = args.platform.fdt_data;
 	}
 
+	// We have to cpu_init *before* calling FDT functions
+	cpu_init();
+
 	#if defined(__ARM__)
 	arch_mailbox_init();
 	#endif
-	serial_init(gFDT);
+
 	console_init();
+	serial_init(gFDT);
+
 	// initialize the OpenFirmware wrapper
 	of_init(NULL);
-
-	cpu_init();
 
 	// if we get passed an FDT, check /chosen for initrd and bootargs
 	if (gFDT != NULL) {

@@ -600,7 +600,7 @@ find_physical_memory_ranges(uint64 &total)
 
 	int32 regAddressCells = 1;
 	int32 regSizeCells = 1;
-	fdt_get_cell_count(node, regAddressCells, regSizeCells);
+	fdt_get_cell_count(gFDT, node, regAddressCells, regSizeCells);
 
 	prop = fdt_getprop(gFDT, node, "reg", &len);
 	if (prop == NULL) {
@@ -670,10 +670,6 @@ mmu_init(void)
 		}
 		dprintf("total physical memory = %" B_PRId64 "MB\n", total / (1024 * 1024));
 	}
-
-	// XXX: A simple test.
-	fdt_get_device_reg_byname("/soc/gpio");
-	fdt_get_device_reg_byalias("gpio");
 
 	// see if subpages are disabled
 	if (mmu_read_C1() & (1 << 23))
