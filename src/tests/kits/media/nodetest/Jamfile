@@ -7,6 +7,6 @@ SimpleTest NodeTest
 	ConsumerNode.cpp
 	ProducerNode.cpp
 
-	: be media
+	: be media [ TargetLibsupc++ ]
 ;
 

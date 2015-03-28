@@ -11,9 +11,9 @@
 
 ConsumerNode::ConsumerNode()
 	:
+	BMediaNode("ConsumerNode"),
 	BBufferConsumer(B_MEDIA_RAW_AUDIO),
-	BMediaEventLooper(),
-	BMediaNode("ConsumerNode")
+	BMediaEventLooper()
 {
 	out("ConsumerNode::ConsumerNode\n");
 }

@@ -210,6 +210,12 @@ int main()
 	rv = roster->StartNode(sourceNode, start); 
 	val(rv);
 
+	out("Testing SyncToNode performance time set is 5 sec\n");
+	rv = roster->SyncToNode(sourceNode,
+		producer->TimeSource()->PerformanceTimeFor(
+			BTimeSource::RealTime() + 5000000), B_INFINITE_TIMEOUT);
+	val(rv);
+
 	out("########################## PRESS ENTER TO QUIT ##########################\n");
 	getchar();
 

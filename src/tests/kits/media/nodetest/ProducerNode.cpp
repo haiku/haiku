@@ -14,9 +14,9 @@
 
 ProducerNode::ProducerNode()
 	:
+	BMediaNode("ProducerNode"),
 	BBufferProducer(B_MEDIA_RAW_AUDIO),
 	BMediaEventLooper(),
-	BMediaNode("ProducerNode"),
 	mBufferGroup(0),
 	mBufferProducerSem(-1),
 	mBufferProducer(-1),
@@ -443,7 +443,7 @@ ProducerNode::BufferProducer()
 		buffer->Header()->start_time = TimeSource()->Now() + DELAY / 2;
 		out("ProducerNode: SendBuffer, sheduled time = %5.4f\n",
 			buffer->Header()->start_time / 1E6);
-		rv = SendBuffer(buffer, mOutput.destination);
+		rv = SendBuffer(buffer, mOutput.source, mOutput.destination);
 		if (rv != B_OK) {
 		}
 	}
