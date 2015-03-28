@@ -1,7 +1,7 @@
 # Raspberry Pi 2 board-specific definitions
 
 HAIKU_BOARD_DESCRIPTION = "Raspberry Pi 2" ;
-HAIKU_BOOT_PLATFORM = u-boot ;
+HAIKU_BOARD_FDT_NAME = "rpi2" ;
 
 #
 # Various hardcoded addresses
@@ -26,19 +26,19 @@ HAIKU_BOARD_FIRMWARE_URL = https://github.com/raspberrypi/firmware/raw/master/bo
 bootcodeFile = [ DownloadFile bootcode.bin : $(HAIKU_BOARD_FIRMWARE_URL)/bootcode.bin ] ;
 startFile = [ DownloadFile start.elf : $(HAIKU_BOARD_FIRMWARE_URL)/start.elf ] ;
 licenseFile = [ DownloadFile LICENCE.broadcom : $(HAIKU_BOARD_FIRMWARE_URL)/LICENCE.broadcom ] ;
-# TODO: Find rpi2 FDT, bring in-tree
-fdtFile = [ DownloadFile bcm2836-rpi-2-b.dtb : $(HAIKU_BOARD_FIRMWARE_URL)/bcm2709-rpi-2-b.dtb ] ;
+
+local fdtBinary = [ FDirName $(HAIKU_OUTPUT_DIR) $(HAIKU_BOARD_FDT_NAME).dtb ] ;
+CompileDTS $(fdtBinary) : [ FDirName $(HAIKU_TOP) src data dts arch arm $(HAIKU_BOARD_FDT_NAME).dts ] ;
 
 HAIKU_BOARD_FIRMWARE_FILES =
 	$(bootcodeFile)
 	$(startFile)
 	$(licenseFile)
-	$(fdtFile)
 ;
 
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = boot.scr ;
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
-fatload mmc 0 ${fdt_addr_r} bcm2836-rpi-2-b.dtb \
+fatload mmc 0 ${fdt_addr_r} $(HAIKU_BOARD_FDT_NAME).dtb \
     fdt addr ${fdt_addr_r} \
     fatload mmc 0 ${ramdisk_addr_r} haiku-floppyboot.tgz.ub \
     fatload mmc 0 ${kernel_addr_r} haiku_loader_linux.ub \
@@ -48,6 +48,7 @@ HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
 HAIKU_BOARD_SDIMAGE_FILES = 
 	$(HAIKU_BOARD_FIRMWARE_FILES)
 	$(configFile)
+	$(fdtBinary)
 	$(ubootFile)
 	haiku_loader_linux.ub
 	haiku-floppyboot.tgz.ub
