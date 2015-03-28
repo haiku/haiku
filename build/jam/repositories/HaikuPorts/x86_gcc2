@@ -75,6 +75,8 @@ RemotePackageRepository HaikuPorts
 	desknotes-1.1-4
 	dfu_util-0.7-1
 	distcc-3.1-3
+	djvulibre-3.5.25-2
+	djvulibre_devel-3.5.25-2
 	dmidecode-2.12-2
 	dos2unix-1.0.1-1
 	doxygen-1.7.6.1-1
@@ -760,6 +762,7 @@ RemotePackageRepository HaikuPorts
 	desknotes
 	devil_x86
 	dfu_util
+	djvulibre
 	djvulibre_x86
 	distcc
 	dmidecode
