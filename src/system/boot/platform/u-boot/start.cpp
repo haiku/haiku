@@ -217,15 +217,16 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 	// We have to cpu_init *before* calling FDT functions
 	cpu_init();
 
+	serial_init(gFDT);
+
 	#if defined(__ARM__)
 	arch_mailbox_init();
 	#endif
 
-	console_init();
-	serial_init(gFDT);
-
 	// initialize the OpenFirmware wrapper
 	of_init(NULL);
+
+	console_init();
 
 	// if we get passed an FDT, check /chosen for initrd and bootargs
 	if (gFDT != NULL) {
@@ -267,9 +268,10 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 			dprintf("argv[%d] @%lx = '%s'\n", i, (uint32)argv[i], argv[i]);
 		dprintf("os: %d\n", (int)gUBootOS);
 		dprintf("gd @ %p\n", gUBootGlobalData);
-		if (gUBootGlobalData)
+		if (gUBootGlobalData) {
 			dprintf("gd->bd @ %p\n", gUBootGlobalData->bd);
-		//dprintf("fb_base %p\n", (void*)gUBootGlobalData->fb_base);
+			dprintf("gd->fb_base @ %p\n", (void*)gUBootGlobalData->fb_base);
+		}
 		if (gUImage)
 			dump_uimage(gUImage);
 		if (gFDT)
@@ -283,6 +285,7 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 
 	// save the size of the FDT so we can map it easily after mmu_init
 	size_t fdtSize = gFDT ? fdt_totalsize(gFDT) : 0;
+	dprintf("fdtSize: 0x%" B_PRIxSIZE "\n", fdtSize);
 
 	mmu_init();
 
@@ -314,7 +317,7 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 				args.arguments_count = 1;
 			}
 		}
-		dprintf("args.arguments_count = %d\n", args.arguments_count);
+		dprintf("args.arguments_count = %" B_PRId32 "\n", args.arguments_count);
 		for (int i = 0; i < args.arguments_count; i++)
 			dprintf("args.arguments[%d] @%lx = '%s'\n", i,
 				(uint32)args.arguments[i], args.arguments[i]);
