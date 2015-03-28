@@ -19,6 +19,8 @@
 
 
 #include <stdio_private.h>
+
+#include <limits.h>
 #include <string.h>
 
 

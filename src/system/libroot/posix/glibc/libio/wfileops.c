@@ -33,6 +33,7 @@
 #include <gconv.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 
 #ifndef _LIBC

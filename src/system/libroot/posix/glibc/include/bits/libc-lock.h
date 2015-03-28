@@ -1,45 +1,41 @@
-/* libc-internal interface for mutex locks.  BeOS version.
-   Copyright (C)  1998 Be Inc.
-*/
+/* libc-internal interface for mutex locks.  NPTL version.
+   Copyright (C) 1996-2015 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; see the file COPYING.LIB.  If
+   not, see <http://www.gnu.org/licenses/>.  */
 
 #ifndef _BITS_LIBC_LOCK_H
 #define _BITS_LIBC_LOCK_H 1
 
-#include <Errors.h>
-#include <OS.h>
-#include <SupportDefs.h>
+#include <pthread.h>
+#define __need_NULL
+#include <stddef.h>
 
-
-/* Helper definitions and prototypes.  */
-
-/* Atomic operations.  */
-
-extern char	_single_threaded;
-
-static inline int
-__compare_and_swap (volatile int32 *p, int oldval, int newval)
-{
-	int32 readval = atomic_test_and_set((int32*)p, newval, oldval);
-	return (readval == oldval ? 1 : 0);
-}
-
+#define __libc_maybe_call(func, args, else) func args
+#define __pthread_mutex_init pthread_mutex_init
+#define __pthread_mutex_destroy pthread_mutex_destroy
+#define __pthread_mutexattr_init pthread_mutexattr_init
+#define __pthread_mutexattr_destroy pthread_mutexattr_destroy
+#define __pthread_mutexattr_settype pthread_mutexattr_settype
+#define __pthread_mutex_lock pthread_mutex_lock
+#define __pthread_mutex_unlock pthread_mutex_unlock
+#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP	PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+#define PTHREAD_MUTEX_RECURSIVE_NP	PTHREAD_MUTEX_RECURSIVE
 
 /* Mutex type.  */
-typedef struct __libc_lock_t {
-	volatile int32	count;
-	sem_id			sem;
-	thread_id		owner;
-	int				owner_count;
-} __libc_lock_t;
-
-#define __LIBC_LOCK_INITIALIZER { 0, 0, 0, 0 }
-#define _LIBC_LOCK_RECURSIVE_INITIALIZER { 0, 0, 0, 0 }
-
-/* Type for object to ensure once-only execution.  */
-typedef struct {
-	int __initialized;
-	__libc_lock_t __lock;
-} __libc_once_t;
+typedef struct { pthread_mutex_t mutex; } __libc_lock_recursive_t;
 
 /* Define a lock variable NAME with storage class CLASS.  The lock must be
    initialized with __libc_lock_init before it can be used (or define it
@@ -48,199 +44,41 @@ typedef struct {
    definitions you must use a pointer to the lock structure (i.e., NAME
    begins with a `*'), because its storage size will not be known outside
    of libc.  */
-#define __libc_lock_define(CLASS,NAME) \
-	CLASS __libc_lock_t NAME;
-
-#define __libc_lock_define_recursive(CLASS, NAME) \
-	CLASS __libc_lock_t NAME;
-
-/* Define an initialized lock variable NAME with storage class CLASS.  */
-#define __libc_lock_define_initialized(CLASS,NAME) \
-	CLASS __libc_lock_t NAME = __LIBC_LOCK_INITIALIZER;
+#define __libc_lock_define_recursive(CLASS,NAME) \
+  CLASS __libc_lock_recursive_t NAME;
 
 /* Define an initialized recursive lock variable NAME with storage
    class CLASS.  */
-#define __libc_lock_define_initialized_recursive(CLASS,NAME) \
-  __libc_lock_define_initialized (CLASS, NAME)
+# define __libc_lock_define_initialized_recursive(CLASS,NAME) \
+  CLASS __libc_lock_recursive_t NAME = _LIBC_LOCK_RECURSIVE_INITIALIZER;
+# define _LIBC_LOCK_RECURSIVE_INITIALIZER \
+  {PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP}
 
-/* Initialize the named lock variable, leaving it in a consistent, unlocked
-   state.  */
-#define __libc_lock_init(NAME) \
-    (NAME).count = (NAME).sem = (NAME).owner_count = (NAME).owner = 0  \
-
-/* Same as last but this time we initialize a recursive mutex.  */
-#define __libc_lock_init_recursive(NAME) \
-  __libc_lock_init(NAME)
-
-/* Finalize the named lock variable, which must be locked.  It cannot be
-   used again until __libc_lock_init is called again on it.  This must be
-   called on a lock variable before the containing storage is reused.  */
-#define __libc_lock_fini(NAME) \
-  do { \
-    if ((NAME).sem) \
-      delete_sem((NAME).sem); \
-  } while(0)
+/* Initialize a recursive mutex.  */
+# define __libc_lock_init_recursive(NAME) \
+  do {									      \
+    pthread_mutexattr_t __attr;					      \
+	__pthread_mutexattr_init (&__attr);				      \
+	__pthread_mutexattr_settype (&__attr, PTHREAD_MUTEX_RECURSIVE_NP);    \
+	__pthread_mutex_init (&(NAME).mutex, &__attr);			      \
+	__pthread_mutexattr_destroy (&__attr);				      \
+  } while (0)
 
 /* Finalize recursive named lock.  */
-#define __libc_lock_fini_recursive(NAME) __libc_lock_fini(NAME)
-
-/* Lock the named lock variable.  */
-#define __libc_lock_lock(NAME) \
-  do { \
-	if (!_single_threaded) { \
-    	long err; \
-    	long old = atomic_add(&(NAME).count, 1); \
-    	if (old > 0) { \
-			if ((NAME).sem == 0) { \
-				sem_id __new_sem = create_sem (0, "libc:" #NAME);	      \
-				if (!__compare_and_swap ((volatile int32 *)&(NAME).sem, 0, __new_sem))		      \
-				/* We do not need the semaphore.  */				      \
-					delete_sem (__new_sem);					      \
-			} \
-    	    do { \
-    	      err = acquire_sem((NAME).sem); \
-		    } while (err == B_INTERRUPTED); \
-    	} \
-	} \
-  } while (0)
-
+# define __libc_lock_fini_recursive(NAME) \
+  __libc_maybe_call (__pthread_mutex_destroy, (&(NAME).mutex), 0)
 
 /* Lock the recursive named lock variable.  */
-#define __libc_lock_lock_recursive(NAME) \
-  do { \
-	if (!_single_threaded) { \
-    	thread_id owner = find_thread(NULL); \
-    	long old, err = B_OK; \
-    	if (owner == (NAME).owner) { \
-    	  (NAME).owner_count++; \
-    	  break; \
-    	} \
-    	old = atomic_add(&(NAME).count, 1); \
-    	if (old > 0) { \
-    	    if ((NAME).sem == 0) { \
-				sem_id __new_sem = create_sem (0, "libc:" #NAME);	      \
-				if (!__compare_and_swap ((volatile int32 *)&(NAME).sem, 0, __new_sem))		      \
-				/* We do not need the semaphore.  */				      \
-					delete_sem (__new_sem);					      \
-			} \
-    	    do { \
-    	      err = acquire_sem((NAME).sem); \
-		    } while (err == B_INTERRUPTED); \
-		} \
-    	if (err == B_OK) { \
-    	  (NAME).owner = owner; \
-    	  (NAME).owner_count = 1; \
-		} \
-	} \
-  } while (0)
+# define __libc_lock_lock_recursive(NAME) \
+  __libc_maybe_call (__pthread_mutex_lock, (&(NAME).mutex), 0)
 
-#if 0
-/* Try to lock the named lock variable.  */
-#define __libc_lock_trylock(NAME) \
-	({									      \
-		int __result = EBUSY;						      \
-		status_t err; \
-		if (!(NAME).sem) {							      \
-			__libc_sem_id __new_sem = create_sem (1, "libc:" #NAME);	      \
-			if (!__compare_and_swap (&(NAME).sem, 0, __new_sem))		      \
-			/* We do not need the semaphore.  */				      \
-				delete_sem (__new_sem);					      \
-		}									      \
-		do { \
-    		err = acquire_sem_etc ((NAME).sem, 1, B_TIMEOUT, 0); \
-			if (err == B_OK) { \
-				NAME.__count = 1;						      \
-				__result = 0;							      \
-			}									      \
-		} while (err == B_INTERRUPTED); \
-	__result; })
-#endif
-
-#if 0
 /* Try to lock the recursive named lock variable.  */
-#define __libc_lock_trylock_recursive(NAME) \
-	({									      \
-		__libc_thread_id __me = find_thread (NULL);				      \
-		int __result = EBUSY;						      \
-		status_t err;							 \
-		if (!(NAME).sem) {							      \
-			__libc_sem_id __new_sem = create_sem (1, "libc:" #NAME);	      \
-			if (!__compare_and_swap (&(NAME).sem, 0, __new_sem))		      \
-			/* We do not need the semaphore.  */				      \
-				delete_sem (__new_sem);					      \
-		}									      \
-		if ((NAME).__owner == __me) {\
-			++(NAME).__count;							      \
-			__result = 0;							      \
-		} else \
-			do { \
-				err = acquire_sem_etc ((NAME).sem, 1, B_TIMEOUT, 0); \
-				if (err == B_OK) {						  \
-					(NAME).__owner = __me;					      \
-					(NAME).__count = 1;						      \
-					__result = 0;							      \
-				}								      \
-			} while (err == B_INTERRUPTED); \
-    __result; })
-#endif
-
-/* Unlock the named lock variable.  */
-#define __libc_lock_unlock(NAME) \
-  do { \
-	if (!_single_threaded) { \
-    	if (atomic_add(&(NAME).count, -1) > 1) { \
-    	    if ((NAME).sem == 0) { \
-				sem_id __new_sem = create_sem (0, "libc:" #NAME);	      \
-				if (!__compare_and_swap ((volatile int32 *)&(NAME).sem, 0, __new_sem))		      \
-				/* We do not need the semaphore.  */				      \
-					delete_sem (__new_sem);					      \
-			} \
-			release_sem((NAME).sem); \
-		} \
-	} \
-  } while(0) 
+# define __libc_lock_trylock_recursive(NAME) \
+  __libc_maybe_call (__pthread_mutex_trylock, (&(NAME).mutex), 0)
 
 /* Unlock the recursive named lock variable.  */
-#define __libc_lock_unlock_recursive(NAME) \
-  do { \
-	if (!_single_threaded) { \
-    	(NAME).owner_count--; \
-    	if ((NAME).owner_count == 0) { \
-    	  (NAME).owner = 0; \
-    	  if (atomic_add(&(NAME).count, -1) > 1) { \
-    	    if ((NAME).sem == 0) { \
-				sem_id __new_sem = create_sem (0, "libc:" #NAME);	      \
-				if (!__compare_and_swap ((volatile int32 *)&(NAME).sem, 0, __new_sem))		      \
-				/* We do not need the semaphore.  */				      \
-					delete_sem (__new_sem);					      \
-			} \
-    	    release_sem((NAME).sem); \
-		  } \
-		} \
-	} \
-  } while(0) 
-
-
-/* Define once control variable.  */
-#define __libc_once_define(CLASS, NAME) \
-  CLASS __libc_once_t NAME = { 0, __LIBC_LOCK_INITIALIZER }
-
-/* Call handler iff the first call.  */
-#define __libc_once(ONCE_CONTROL, INIT_FUNCTION) \
-  do {									      \
-    if (! ONCE_CONTROL.__initialized)					      \
-      {									      \
-	__libc_lock_lock (ONCE_CONTROL.__lock);				      \
-	if (! ONCE_CONTROL.__initialized)				      \
-	  {								      \
-	    /* Still not initialized, then call the function.  */	      \
-	    INIT_FUNCTION ();						      \
-	    ONCE_CONTROL.__initialized = 1;				      \
-	  }								      \
-	__libc_lock_unlock (ONCE_CONTROL.__lock);			      \
-      }									      \
-  } while (0)
-
+# define __libc_lock_unlock_recursive(NAME) \
+  __libc_maybe_call (__pthread_mutex_unlock, (&(NAME).mutex), 0)
 
 /* Start critical region with cleanup.  */
 #define __libc_cleanup_region_start(DOIT, FCT, ARG) \
