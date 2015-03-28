@@ -26,4 +26,12 @@
 #	define ITRACE_VV(a...) (void)0
 #endif
 
+#undef ASSERT
+#if DEBUG > 0
+	#define ASSERT(a)		if (a) {} else \
+		dprintf("ASSERT failed! file = %s, line = %d\n",__FILE__,__LINE__)
+#else
+	#define ASSERT(a)	((void)(0))
+#endif
+
 #endif // _DEBUG_ICE1712_H_

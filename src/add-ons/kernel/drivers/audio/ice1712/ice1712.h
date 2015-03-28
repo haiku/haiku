@@ -7,16 +7,16 @@
  *		Marcus Overhagen, marcus@overhagen.de
  *		Jérôme Lévêque, leveque.jerome@gmail.com
  */
-
-
 #ifndef _ICE1712_H_
 #define _ICE1712_H_
+
+
+#include <PCI.h>
+#include <KernelExport.h>
 
 #include "debug.h"
 #include "hmulti_audio.h"
 
-#include <PCI.h>
-#include <KernelExport.h>
 
 #define DRIVER_NAME "ice1712"
 #define VERSION "0.6"
