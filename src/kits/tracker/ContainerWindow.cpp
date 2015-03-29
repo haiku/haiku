@@ -722,6 +722,7 @@ BContainerWindow::CreatePoseView(Model* model)
 
 	fPoseView = NewPoseView(model, kListMode);
 	fBorderedView->GroupLayout()->AddView(fPoseView);
+	fBorderedView->GroupLayout()->SetInsets(1, 0, 1, 1);
 	fBorderedView->EnableBorderHighlight(false);
 
 	TrackerSettings settings;
@@ -729,10 +730,10 @@ BContainerWindow::CreatePoseView(Model* model)
 		&& !fPoseView->IsFilePanel()) {
 		fNavigator = new BNavigator(model);
 		fPoseContainer->GridLayout()->AddView(fNavigator, 0, 0, 2);
-		if (!settings.ShowNavigator()) {
+		if (settings.ShowNavigator())
+			fBorderedView->GroupLayout()->SetInsets(1);
+		else
 			fNavigator->Hide();
-			fBorderedView->GroupLayout()->SetInsets(1, 0, 1, 1);
-		}
 	}
 
 	SetPathWatchingEnabled(settings.ShowNavigator()
