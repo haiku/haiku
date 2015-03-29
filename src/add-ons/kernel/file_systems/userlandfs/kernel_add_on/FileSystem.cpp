@@ -202,7 +202,7 @@ FileSystem::~FileSystem()
 
 	if (fSelectSyncs) {
 		for (SelectSyncMap::Iterator it = fSelectSyncs->GetIterator();
-			 it.HasNext();) {
+				it.HasNext();) {
 			SelectSyncMap::Entry entry = it.Next();
 			delete entry.value;
 		}

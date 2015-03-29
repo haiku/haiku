@@ -23,7 +23,7 @@ KernelDebug::DebugUFS(int argc, char** argv)
 	KDebugFSMap& fileSystems = userlandFS->fFileSystems->GetUnsynchronizedMap();
 
 	for (KDebugFSMap::Iterator it = fileSystems.GetIterator();
-		 it.HasNext();) {
+			it.HasNext();) {
 		KDebugFSMap::Entry entry = it.Next();
 		FileSystemInitializer* fsInitializer = entry.value;
 		FileSystem* fs = fsInitializer->GetFileSystem();
