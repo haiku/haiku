@@ -79,7 +79,8 @@ VolumeControl::VolumeControl(BMessage* archive)
 
 	fMixerControl = new MixerControl(volumeWhich);
 
-	archive->SendReply(new BMessage(B_QUIT_REQUESTED));
+	BMessage msg(B_QUIT_REQUESTED);
+	archive->SendReply(&msg);
 }
 
 
