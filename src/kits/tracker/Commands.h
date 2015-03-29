@@ -130,6 +130,7 @@ const uint32 kShowNavigatorChanged = 'Snvc';
 const uint32 kShowSelectionWhenInactiveChanged = 'Sswi';
 const uint32 kTransparentSelectionChanged = 'Trse';
 const uint32 kSortFolderNamesFirstChanged = 'Sfnf';
+const uint32 kHideDotFilesChanged = 'Hdfc';
 const uint32 kTypeAheadFilteringChanged = 'Tafc';
 
 const uint32 kDesktopFilePanelRootChanged = 'Dfpr';

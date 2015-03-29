@@ -886,6 +886,7 @@ BPoseView::DetachedFromWindow()
 		tracker->StopWatching(this, kShowSelectionWhenInactiveChanged);
 		tracker->StopWatching(this, kTransparentSelectionChanged);
 		tracker->StopWatching(this, kSortFolderNamesFirstChanged);
+		tracker->StopWatching(this, kHideDotFilesChanged);
 		tracker->StopWatching(this, kTypeAheadFilteringChanged);
 		tracker->Unlock();
 	}
@@ -986,6 +987,7 @@ BPoseView::AttachedToWindow()
 		tracker->StartWatching(this, kShowSelectionWhenInactiveChanged);
 		tracker->StartWatching(this, kTransparentSelectionChanged);
 		tracker->StartWatching(this, kSortFolderNamesFirstChanged);
+		tracker->StartWatching(this, kHideDotFilesChanged);
 		tracker->StartWatching(this, kTypeAheadFilteringChanged);
 		tracker->Unlock();
 	}
@@ -2624,6 +2626,19 @@ BPoseView::MessageReceived(BMessage* message)
 							Invalidate();
 						}
 						break;
+
+					case kHideDotFilesChanged:
+					{
+						TrackerSettings settings;
+						bool hideDotFiles;
+						if (message->FindBool("HideDotFiles",
+								&hideDotFiles) == B_OK) {
+							settings.SetHideDotFiles(hideDotFiles);
+						}
+
+						Refresh();
+						break;
+					}
 
 					case kTypeAheadFilteringChanged:
 					{
