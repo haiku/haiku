@@ -70,6 +70,11 @@ provides {
 requires {
 	coreutils
 	cmd:sh
+#ifdef HAIKU_REGULAR_BUILD
+	cmd:bunzip2
+	cmd:tar
+	cmd:unzip
+#endif
 	lib:libfreetype
 	lib:libgcc_s
 	lib:libicudata
