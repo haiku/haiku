@@ -77,8 +77,8 @@ RemotePackageRepository HaikuPorts
 	distcc-3.1-3
 	djvulibre-3.5.25-2
 	djvulibre_devel-3.5.25-2
-	djvutranslator-1.0.1-1
-	djvuviewer-1.2.1-1
+	djvutranslator-1.0.1-2
+	djvuviewer-1.2.1-2
 	dmidecode-2.12-2
 	dos2unix-1.0.1-1
 	doxygen-1.7.6.1-1
