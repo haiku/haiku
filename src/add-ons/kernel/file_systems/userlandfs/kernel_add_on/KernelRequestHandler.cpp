@@ -167,8 +167,8 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 			case B_ENTRY_REMOVED:
 			case B_ATTR_CHANGED:
 				if (!name) {
-					ERROR(("NotifyListenerRequest: NULL name for opcode: %ld\n",
-						request->operation));
+					ERROR(("NotifyListenerRequest: NULL name for opcode: %"
+						B_PRId32 "\n", request->operation));
 					result = B_BAD_VALUE;
 				}
 				break;
@@ -181,22 +181,25 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 	if (result == B_OK) {
 		switch (request->operation) {
 			case B_ENTRY_CREATED:
-				PRINT(("notify_entry_created(%ld, %lld, \"%s\", %lld)\n",
-					request->device, request->directory, name, request->node));
+				PRINT(("notify_entry_created(%" B_PRId32 ", %" B_PRId64 ", "
+					\"%s\", %" B_PRId64 ")\n", request->device,
+					request->directory, name, request->node));
 				result = notify_entry_created(request->device,
 					request->directory, name, request->node);
 				break;
 
 			case B_ENTRY_REMOVED:
-				PRINT(("notify_entry_removed(%ld, %lld, \"%s\", %lld)\n",
-					request->device, request->directory, name, request->node));
+				PRINT(("notify_entry_removed(%" B_PRId32 ", %" B_PRId64 ", "
+					\"%s\", %" B_PRId64 ")\n", request->device,
+					request->directory, name, request->node));
 				result = notify_entry_removed(request->device,
 					request->directory, name, request->node);
 				break;
 
 			case B_ENTRY_MOVED:
-				PRINT(("notify_entry_moved(%ld, %lld, \"%s\", %lld, \"%s\", "
-					"%lld)\n", request->device, request->oldDirectory, oldName,
+				PRINT(("notify_entry_moved(%" B_PRId32 ", %" B_PRId64 ", "
+					"\"%s\", %" B_PRId64 ", \"%s\", %" B_PRId64 ")\n",
+					request->device, request->oldDirectory, oldName,
 					request->directory, name, request->node));
 				result = notify_entry_moved(request->device,
 					request->oldDirectory, oldName, request->directory, name,
@@ -204,23 +207,24 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 				break;
 
 			case B_STAT_CHANGED:
-				PRINT(("notify_stat_changed(%ld, %lld, 0x%lx)\n",
-					request->device, request->node, request->details));
+				PRINT(("notify_stat_changed(%" B_PRId32 ", %" B_PRId64 ", "
+					"0x%" B_PRIx32 ")\n", request->device, request->node,
+					request->details));
 				result = notify_stat_changed(request->device, request->node,
 					request->details);
 				break;
 
 			case B_ATTR_CHANGED:
-				PRINT(("notify_attribute_changed(%ld, %lld, \"%s\", 0x%lx)\n",
-					request->device, request->node, name,
-					(int32)request->details));
+				PRINT(("notify_attribute_changed(%" B_PRId32 ", %" B_PRId64 ", "
+					"\"%s\", 0x%" B_PRIx32 ")\n", request->device,
+					request->node, name, (int32)request->details));
 				result = notify_attribute_changed(request->device,
 					request->node, name, (int32)request->details);
 				break;
 
 			default:
-				ERROR(("NotifyQueryRequest: unsupported operation: %ld\n",
-					request->operation));
+				ERROR(("NotifyQueryRequest: unsupported operation: %" B_PRId32
+					"\n", request->operation));
 				result = B_BAD_VALUE;
 				break;
 		}
@@ -295,18 +299,20 @@ KernelRequestHandler::_HandleRequest(NotifyQueryRequest* request)
 	if (result == B_OK) {
 		switch (request->operation) {
 			case B_ENTRY_CREATED:
-				PRINT(("notify_query_entry_created(%ld, %ld, %ld, %lld,"
-					" \"%s\", %lld)\n", request->port, request->token,
-					request->device, request->directory, name, request->node));
+				PRINT(("notify_query_entry_created(%" B_PRId32 ", %" B_PRId32
+					", %" B_PRId32 ", %" B_PRId64 ", \"%s\", %" B_PRId64 ")\n",
+					request->port, request->token, request->device,
+					request->directory, name, request->node));
 				result = notify_query_entry_created(request->port,
 					request->token, request->device, request->directory, name,
 					request->node);
 				break;
 
 			case B_ENTRY_REMOVED:
-				PRINT(("notify_query_entry_removed(%ld, %ld, %ld, %lld,"
-					" \"%s\", %lld)\n", request->port, request->token,
-					request->device, request->directory, name, request->node));
+				PRINT(("notify_query_entry_removed(%" B_PRId32 ", %" B_PRId32
+					", %" B_PRId32 ", %" B_PRId64 ", \"%s\", %" B_PRId64 ")\n",
+					request->port, request->token, request->device,
+					request->directory, name, request->node));
 				result = notify_query_entry_removed(request->port,
 					request->token, request->device, request->directory, name,
 					request->node);
@@ -314,8 +320,8 @@ KernelRequestHandler::_HandleRequest(NotifyQueryRequest* request)
 
 			case B_ENTRY_MOVED:
 			default:
-				ERROR(("NotifyQueryRequest: unsupported operation: %ld\n",
-					request->operation));
+				ERROR(("NotifyQueryRequest: unsupported operation: %" B_PRId32
+					"\n", request->operation));
 				result = B_BAD_VALUE;
 				break;
 		}

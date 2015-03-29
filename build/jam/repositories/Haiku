@@ -16,7 +16,7 @@ local packages = [ FFilterByBuildFeatures
 	haiku_welcome
 	makefile_engine
 	netfs@!x86_64
-	userland_fs@!x86_64
+	userland_fs
 
 	haiku_$(secondaryArchs)
 	haiku_$(secondaryArchs)_devel

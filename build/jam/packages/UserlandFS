@@ -11,11 +11,13 @@ AddFilesToPackage servers : userlandfs_server ;
 
 
 # libs
-local userlandfsLibs =
-	libuserlandfs_beos_kernel.so
-	libuserlandfs_haiku_kernel.so
-	libuserlandfs_fuse.so
-;
+local userlandfsLibs = [ FFilterByBuildFeatures
+		libuserlandfs_beos_kernel.so@!x86_64
+		libuserlandfs_haiku_kernel.so
+		libuserlandfs_fuse.so
+	]
+	;
+
 AddLibrariesToPackage lib : $(userlandfsLibs) ;
 
 # TODO move development stuff to a separate package?

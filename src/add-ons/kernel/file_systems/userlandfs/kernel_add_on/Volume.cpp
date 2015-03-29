@@ -82,7 +82,7 @@ protected:	// should be private, but gcc 2.95.3 issues a warning
 	{
 		if (fileCache != NULL)
 		{
-			ERROR(("VNode %lld still has a file cache!\n", id));
+			ERROR(("VNode %" B_PRId64 " still has a file cache!\n", id));
 			file_cache_delete(fileCache);
 		}
 	}
@@ -334,7 +334,7 @@ Volume::~Volume()
 status_t
 Volume::GetVNode(ino_t vnid, void** _node)
 {
-PRINT(("get_vnode(%ld, %lld)\n", GetID(), vnid));
+	PRINT(("get_vnode(%" B_PRId32 ", %" B_PRId64 ")\n", GetID(), vnid));
 	void* vnode;
 	status_t error = get_vnode(fFSVolume, vnid, &vnode);
 	if (error == B_OK) {
@@ -349,7 +349,7 @@ PRINT(("get_vnode(%ld, %lld)\n", GetID(), vnid));
 status_t
 Volume::PutVNode(ino_t vnid)
 {
-PRINT(("put_vnode(%ld, %lld)\n", GetID(), vnid));
+	PRINT(("put_vnode(%" B_PRId32 ", %" B_PRId64 ")\n", GetID(), vnid));
 	// Decrement the count first. We might not have another chance, since
 	// put_vnode() could put the last reference, thus causing the node to be
 	// removed from our map. This is all not very dramatic, but this way we
@@ -364,7 +364,7 @@ PRINT(("put_vnode(%ld, %lld)\n", GetID(), vnid));
 status_t
 Volume::AcquireVNode(ino_t vnid)
 {
-PRINT(("acquire_vnode(%ld, %lld)\n", GetID(), vnid));
+	PRINT(("acquire_vnode(%" B_PRId32 ", %" B_PRId64 ")\n", GetID(), vnid));
 	status_t error = acquire_vnode(fFSVolume, vnid);
 	if (error == B_OK)
 		_IncrementVNodeCount(vnid);
@@ -377,7 +377,7 @@ status_t
 Volume::NewVNode(ino_t vnid, void* clientNode,
 	const FSVNodeCapabilities& capabilities)
 {
-PRINT(("new_vnode(%ld, %lld)\n", GetID(), vnid));
+	PRINT(("new_vnode(%" B_PRId32 ", %" B_PRId64 ")\n", GetID(), vnid));
 	// lookup the node
 	MutexLocker locker(fLock);
 	VNode* node = fVNodes->Lookup(vnid);
@@ -427,7 +427,9 @@ status_t
 Volume::PublishVNode(ino_t vnid, void* clientNode, int type, uint32 flags,
 	const FSVNodeCapabilities& capabilities)
 {
-PRINT(("publish_vnode(%ld, %lld, %p)\n", GetID(), vnid, clientNode));
+	PRINT(("publish_vnode(%" B_PRId32 ", %" B_PRId64 ", %p)\n", GetID(), vnid,
+		clientNode));
+
 	// lookup the node
 	MutexLocker locker(fLock);
 	VNode* node = fVNodes->Lookup(vnid);
@@ -435,8 +437,8 @@ PRINT(("publish_vnode(%ld, %lld, %p)\n", GetID(), vnid, clientNode));
 
 	if (nodeKnown) {
 		if (node->published) {
-			WARN(("publish_vnode(): vnode (%ld, %lld) already published!\n",
-				GetID(), vnid));
+			WARN(("publish_vnode(): vnode (%" B_PRId32 ", %" B_PRId64
+				") already published!\n", GetID(), vnid));
 			RETURN_ERROR(B_BAD_VALUE);
 		}
 	} else if (!nodeKnown) {
@@ -492,7 +494,7 @@ PRINT(("publish_vnode(%ld, %lld, %p)\n", GetID(), vnid, clientNode));
 status_t
 Volume::RemoveVNode(ino_t vnid)
 {
-PRINT(("remove_vnode(%ld, %lld)\n", GetID(), vnid));
+	PRINT(("remove_vnode(%" B_PRId32 ", %" B_PRId64 ")\n", GetID(), vnid));
 	return remove_vnode(fFSVolume, vnid);
 }
 
@@ -500,7 +502,7 @@ PRINT(("remove_vnode(%ld, %lld)\n", GetID(), vnid));
 status_t
 Volume::UnremoveVNode(ino_t vnid)
 {
-PRINT(("unremove_vnode(%ld, %lld)\n", GetID(), vnid));
+	PRINT(("unremove_vnode(%" B_PRId32 ", %" B_PRId64 ")\n", GetID(), vnid));
 	return unremove_vnode(fFSVolume, vnid);
 }
 
@@ -508,7 +510,8 @@ PRINT(("unremove_vnode(%ld, %lld)\n", GetID(), vnid));
 status_t
 Volume::GetVNodeRemoved(ino_t vnid, bool* removed)
 {
-PRINT(("get_vnode_removed(%ld, %lld, %p)\n", GetID(), vnid, removed));
+	PRINT(("get_vnode_removed(%" B_PRId32 ", %" B_PRId64 ", %p)\n", GetID(),
+		vnid, removed));
 	return get_vnode_removed(fFSVolume, vnid, removed);
 }
 
@@ -2448,8 +2451,9 @@ Volume::ReadDir(void* _node, void* cookie, void* buffer, size_t bufferSize,
 		return B_BAD_DATA;
 	if ((int32)bufferSize < reply->buffer.GetSize())
 		return B_BAD_DATA;
-PRINT(("Volume::ReadDir(): buffer returned: %ld bytes\n",
-reply->buffer.GetSize()));
+
+	PRINT(("Volume::ReadDir(): buffer returned: %" B_PRId32 " bytes\n",
+		reply->buffer.GetSize()));
 
 	*countRead = reply->count;
 	if (*countRead > 0) {
@@ -4427,8 +4431,8 @@ Volume::_IncrementVNodeCount(ino_t vnid)
 
 	VNode* vnode = fVNodes->Lookup(vnid);
 	if (vnode == NULL) {
-		ERROR(("Volume::_IncrementVNodeCount(): Node with ID %lld not "
-			"known!\n", vnid));
+		ERROR(("Volume::_IncrementVNodeCount(): Node with ID %" B_PRId64
+			" not known!\n", vnid));
 		return;
 	}
 
@@ -4448,7 +4452,7 @@ Volume::_DecrementVNodeCount(ino_t vnid)
 
 	VNode* vnode = fVNodes->Lookup(vnid);
 	if (vnode == NULL) {
-		ERROR(("Volume::_DecrementVNodeCount(): Node with ID %lld not "
+		ERROR(("Volume::_DecrementVNodeCount(): Node with ID %" B_PRId64 " not "
 			"known!\n", vnid));
 		return;
 	}
@@ -4466,8 +4470,8 @@ Volume::_RemoveInvalidVNode(ino_t vnid)
 
 	VNode* vnode = fVNodes->Lookup(vnid);
 	if (vnode == NULL) {
-		ERROR(("Volume::_RemoveInvalidVNode(): Node with ID %lld not known!\n",
-			vnid));
+		ERROR(("Volume::_RemoveInvalidVNode(): Node with ID %" B_PRId64
+			" not known!\n", vnid));
 		return;
 	}
 
@@ -4591,8 +4595,8 @@ PRINT(("Volume::_PutAllPendingVNodes()\n"));
 		}
 	} while (nodeFound);
 
-	PRINT(("Volume::_PutAllPendingVNodes() successful: Put %ld vnodes\n",
-		putVNodeCount));
+	PRINT(("Volume::_PutAllPendingVNodes() successful: Put %" B_PRId32
+		" vnodes\n", putVNodeCount));
 
 	return B_OK;
 }

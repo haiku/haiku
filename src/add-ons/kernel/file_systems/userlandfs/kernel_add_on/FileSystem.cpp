@@ -35,7 +35,7 @@ static const bigtime_t kNotificationRequestTimeout = 50000;	// 50 ms
 
 
 struct FileSystem::SelectSyncMap
-	: public SynchronizedHashMap<HashKey32<selectsync*>, int32*> {
+	: public SynchronizedHashMap<HashKeyPointer<selectsync*>, int32*> {
 };
 
 
@@ -221,7 +221,7 @@ FileSystem::~FileSystem()
 		ops = next;
 	}
 	if (count > 0)
-		WARN(("Deleted %ld vnode ops vectors!\n", count));
+		WARN(("Deleted %" B_PRId32 " vnode ops vectors!\n", count));
 
 
 	mutex_destroy(&fVolumeLock);

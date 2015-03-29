@@ -688,7 +688,7 @@ _mutex_lock_threads_locked(mutex* lock)
 		lock->holder = find_thread(NULL);
 		return B_OK;
 	} else if (lock->holder == find_thread(NULL)) {
-		panic("_mutex_lock(): double lock of %p by thread %ld", lock,
+		panic("_mutex_lock(): double lock of %p by thread %" B_PRId32, lock,
 			lock->holder);
 	} else if (lock->holder == 0)
 		panic("_mutex_lock(): using unitialized lock %p", lock);
@@ -743,9 +743,9 @@ _mutex_unlock_threads_locked(mutex* lock)
 {
 #if KDEBUG
 	if (find_thread(NULL) != lock->holder) {
-		panic("_mutex_unlock() failure: thread %ld is trying to release "
-			"mutex %p (current holder %ld)\n", find_thread(NULL),
-			lock, lock->holder);
+		panic("_mutex_unlock() failure: thread %" B_PRId32 " is trying to "
+			"release mutex %p (current holder %" B_PRId32 ")\n",
+			find_thread(NULL), lock, lock->holder);
 		return;
 	}
 #endif
