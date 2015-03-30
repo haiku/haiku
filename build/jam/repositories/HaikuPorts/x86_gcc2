@@ -4,7 +4,7 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
-	ca_root_certificates-2014_04_08-2
+	ca_root_certificates-2015_02_25-1
 	caladea-20130214-3
 	carlito-20130920-1
 	dejavu-2.34-2
