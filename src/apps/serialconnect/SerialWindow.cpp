@@ -20,8 +20,8 @@
 #include "TermView.h"
 
 
-const int SerialWindow::kBaudrates[] = { 50, 75, 110, 134, 150, 200, 300, 600,
-	1200, 1800, 2400, 4800, 9600, 19200, 31250, 38400, 57600, 115200, 230400
+const int SerialWindow::kBaudrates[] = { 75, 110, 300, 1200, 2400, 4800, 9600,
+	19200, 31250, 38400, 57600, 115200, 230400
 };
 
 
@@ -159,7 +159,7 @@ SerialWindow::SerialWindow()
 	fStopbitsMenu->SetTargetForItems(be_app);
 
 	// Loop backwards to add fastest rates at top of menu
-	for (int i = sizeof(kBaudrates) / sizeof(char*); --i >= 0;)
+	for (int i = sizeof(kBaudrates) / sizeof(kBaudrates[0]); --i >= 0;)
 	{
 		message = new BMessage(kMsgSettings);
 		message->AddInt32("baudrate", kBaudrateConstants[i]);
