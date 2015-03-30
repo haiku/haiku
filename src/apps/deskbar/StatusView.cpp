@@ -89,7 +89,7 @@ const char* const kInstantiateEntryCFunctionName = "instantiate_deskbar_entry";
 const char* const kReplicantSettingsFile = "replicants";
 const char* const kReplicantPathField = "replicant_path";
 
-float sMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
+float gMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
 
 
 static void
@@ -142,9 +142,9 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
 		R_LeafLogoBitmap);
 	if (logoBitmap != NULL) {
-		sMinimumWindowWidth = std::max(sMinimumWindowWidth,
+		gMinimumWindowWidth = std::max(gMinimumWindowWidth,
 			2 * (logoBitmap->Bounds().Width() + 8));
-		fMinimumTrayWidth = sMinimumWindowWidth - kGutter - kDragRegionWidth;
+		fMinimumTrayWidth = gMinimumWindowWidth - kGutter - kDragRegionWidth;
 	}
 
 	// Create the time view
@@ -1540,8 +1540,8 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 		BRect frame = screen.Frame();
 
 		float hDivider = frame.Width() / 6;
-		hDivider = (hDivider < sMinimumWindowWidth + 10.0f)
-			? sMinimumWindowWidth + 10.0f : hDivider;
+		hDivider = (hDivider < gMinimumWindowWidth + 10.0f)
+			? gMinimumWindowWidth + 10.0f : hDivider;
 		float miniDivider = frame.top + kMiniHeight + 10.0f;
 		float vDivider = frame.Height() / 2;
 #ifdef FULL_MODE

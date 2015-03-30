@@ -470,7 +470,7 @@ TExpandoMenuBar::BuildItems()
 	else {
 		itemWidth = iconSize;
 		if (!settings->hideLabels)
-			itemWidth += sMinimumWindowWidth - kMinimumIconSize;
+			itemWidth += gMinimumWindowWidth - kMinimumIconSize;
 		else
 			itemWidth += kIconPadding * 2;
 	}
@@ -620,7 +620,7 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	else {
 		itemWidth = iconSize;
 		if (!settings->hideLabels)
-			itemWidth += sMinimumWindowWidth - kMinimumIconSize;
+			itemWidth += gMinimumWindowWidth - kMinimumIconSize;
 		else
 			itemWidth += kIconPadding * 2;
 	}
@@ -744,7 +744,7 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 		? iconOnlyWidth + kMinMenuItemWidth
 		: iconOnlyWidth - kIconPadding;
 	float maxItemWidth = drawLabels
-		? sMinimumWindowWidth + iconSize - kMinimumIconSize
+		? gMinimumWindowWidth + iconSize - kMinimumIconSize
 		: iconOnlyWidth;
 	float menuWidth = maxItemWidth * CountItems() + fDeskbarMenuWidth
 		+ kSepItemWidth;
@@ -889,11 +889,11 @@ void
 TExpandoMenuBar::SetMaxItemWidth()
 {
 	if (fVertical)
-		SetMaxContentWidth(sMinimumWindowWidth);
+		SetMaxContentWidth(gMinimumWindowWidth);
 	else {
 		// Make more room for the icon in horizontal mode
 		int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
-		SetMaxContentWidth(sMinimumWindowWidth + iconSize
+		SetMaxContentWidth(gMinimumWindowWidth + iconSize
 			- kMinimumIconSize);
 	}
 }

@@ -85,7 +85,7 @@ TTeamMenu::AttachedToWindow()
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
-	float width = sMinimumWindowWidth - iconSize - 4;
+	float width = gMinimumWindowWidth - iconSize - 4;
 
 	if (settings->sortRunningApps)
 		teamList.SortItems(CompareByName);
@@ -95,8 +95,7 @@ TTeamMenu::AttachedToWindow()
 		// add items back
 		BarTeamInfo* barInfo = (BarTeamInfo*)teamList.ItemAt(i);
 		TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
-			barInfo->icon, barInfo->name, barInfo->sig,
-			width, -1);
+			barInfo->icon, barInfo->name, barInfo->sig, width, -1);
 
 		if (settings->trackerAlwaysFirst
 			&& strcasecmp(barInfo->sig, kTrackerSignature) == 0) {
