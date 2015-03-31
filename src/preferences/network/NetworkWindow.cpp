@@ -368,9 +368,9 @@ NetworkWindow::_ScanAddOns()
 		}
 	}
 
-	for (PathMap::const_iterator iterator = addOnMap.begin();
-			iterator != addOnMap.end(); iterator++) {
-		const BPath& path = iterator->second;
+	for (PathMap::const_iterator addOnIterator = addOnMap.begin();
+			addOnIterator != addOnMap.end(); addOnIterator++) {
+		const BPath& path = addOnIterator->second;
 
 		image_id image = load_add_on(path.Path());
 		if (image < 0) {
