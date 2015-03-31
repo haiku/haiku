@@ -6,6 +6,7 @@
 #define GREPPER_H
 
 #include <Messenger.h>
+#include <String.h>
 
 class FileIterator;
 class Model;
@@ -13,7 +14,7 @@ class Model;
 // Executes "grep" in a background thread.
 class Grepper {
 public:
-								Grepper(const char* pattern, const Model* model,
+								Grepper(BString pattern, const Model* model,
 									const BHandler* target,
 									FileIterator* iterator);
 	virtual						~Grepper();
@@ -30,16 +31,14 @@ private:
 	// The thread function that does the actual grepping.
 			int32				_GrepperThread();
 
-	// Remembers, and possibly escapes, the search pattern.
-			void				_SetPattern(const char* source);
-
-	// Prepends all quotes, dollars and backslashes with at backslash
-	// to prevent the shell from misinterpreting them.
-			bool				_EscapeSpecialChars(char* buffer,
-									ssize_t bufferSize);
+	// Counts the number of linebreaks from startPos to endPos.
+			int32				_CountLines(BString& str, int32 startPos,
+											int32 endPos);
+	// Gets the complete line that "pos" is on.
+			BString				_GetLine(BString& str, int32 pos);
 	private:
-	// The (escaped) search pattern.
-			char*				fPattern;
+	// The search pattern.
+			BString				fPattern;
 
 	// The settings from the model.
 			BMessenger			fTarget;
