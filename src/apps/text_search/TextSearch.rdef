@@ -1,7 +1,8 @@
-
 resource app_signature "application/x-vnd.Haiku.TextSearch";
 
 resource app_name_catalog_entry "x-vnd.Haiku.TextSearch:System name:TextSearch";
+
+resource app_flags B_SINGLE_LAUNCH;
 
 resource app_version {
 	major  = 5,
@@ -15,7 +16,7 @@ resource app_version {
 	long_info = "Text search in Tracker, a GUI wrapper of /bin/grep."
 };
 
-resource app_flags B_SINGLE_LAUNCH;
+resource(100, "BEOS:default_shortcut") "G";
 
 resource file_types message {
 	"types" = "text",
@@ -44,5 +45,3 @@ resource vector_icon {
 	$"010B000A05010D1001178400040A08010D000A05010C1001178400040A07010C"
 	$"000A09010C023C00000000000000003C000048B00048F000"
 };
-
-resource(100, "BEOS:default_shortcut") "G";
