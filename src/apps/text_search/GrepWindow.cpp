@@ -108,7 +108,6 @@ GrepWindow::GrepWindow(BMessage* message)
 	fEscapeText(NULL),
 	fTextOnly(NULL),
 	fInvokePe(NULL),
-	fShowLinesMenuitem(NULL),
 	fHistoryMenu(NULL),
 	fEncodingMenu(NULL),
 	fUTF8(NULL),
@@ -296,10 +295,6 @@ void GrepWindow::MessageReceived(BMessage* message)
 			_OnSelectInTracker();
 			break;
 
-		case MSG_MENU_SHOW_LINES:
-			_OnMenuShowLines();
-			break;
-
 		case MSG_CHECKBOX_SHOW_LINES:
 			_OnCheckboxShowLines();
 			break;
@@ -482,10 +477,6 @@ GrepWindow::_CreateMenus()
 	fInvokePe = new BMenuItem(
 		B_TRANSLATE("Open files in Pe"), new BMessage(MSG_INVOKE_PE));
 
-	fShowLinesMenuitem = new BMenuItem(
-		B_TRANSLATE("Show lines"), new BMessage(MSG_MENU_SHOW_LINES), 'L');
-	fShowLinesMenuitem->SetMarked(true);
-
 	fUTF8 = new BMenuItem("UTF8", new BMessage('utf8'));
 	fShiftJIS = new BMenuItem("ShiftJIS", new BMessage(B_SJIS_CONVERSION));
 	fEUC = new BMenuItem("EUC", new BMessage(B_EUC_CONVERSION));
@@ -514,8 +505,6 @@ GrepWindow::_CreateMenus()
 	fPreferencesMenu->AddItem(fEscapeText);
 	fPreferencesMenu->AddItem(fTextOnly);
 	fPreferencesMenu->AddItem(fInvokePe);
-	fPreferencesMenu->AddSeparatorItem();
-	fPreferencesMenu->AddItem(fShowLinesMenuitem);
 
 	fEncodingMenu->AddItem(fUTF8);
 	fEncodingMenu->AddItem(fShiftJIS);
@@ -681,11 +670,6 @@ GrepWindow::_LoadPrefs()
 	fEscapeText->SetMarked(fModel->fEscapeText);
 	fTextOnly->SetMarked(fModel->fTextOnly);
 	fInvokePe->SetMarked(fModel->fInvokePe);
-
-	fShowLinesCheckbox->SetValue(
-		fModel->fShowContents ? B_CONTROL_ON : B_CONTROL_OFF);
-	fShowLinesMenuitem->SetMarked(
-		fModel->fShowContents ? true : false);
 
 	switch (fModel->fEncoding) {
 		case 0:
@@ -1075,7 +1059,7 @@ GrepWindow::_OnReportResult(BMessage* message)
 	if (item == NULL) {
 		item = new ResultItem(ref);
 		fSearchResults->AddItem(item);
-		item->SetExpanded(fModel->fShowContents);
+		item->SetExpanded(fShowLinesCheckbox->Value() == 1);
 	}
 
 	const char* buf;
@@ -1178,10 +1162,6 @@ GrepWindow::_OnInvokePe()
 void
 GrepWindow::_OnCheckboxShowLines()
 {
-	// toggle checkbox and menuitem
-	fModel->fShowContents = !fModel->fShowContents;
-	fShowLinesMenuitem->SetMarked(!fShowLinesMenuitem->IsMarked());
-
 	// Selection in BOutlineListView in multiple selection mode
 	// gets weird when collapsing. I've tried all sorts of things.
 	// It seems impossible to make it behave just right.
@@ -1212,7 +1192,7 @@ GrepWindow::_OnCheckboxShowLines()
 	for (int32 x = 0; x < numItems; ++x) {
 		BListItem* listItem = fSearchResults->FullListItemAt(x);
 		if (listItem->OutlineLevel() == 0) {
-			if (fModel->fShowContents) {
+			if (fShowLinesCheckbox->Value() == 1) {
 				if (!fSearchResults->IsExpanded(x))
 					fSearchResults->Expand(listItem);
 			} else {
@@ -1225,15 +1205,6 @@ GrepWindow::_OnCheckboxShowLines()
 	fSearchResults->Invalidate();
 
 	_SavePrefs();
-}
-
-
-void
-GrepWindow::_OnMenuShowLines()
-{
-	// toggle companion checkbox
-	fShowLinesCheckbox->SetValue(!fShowLinesCheckbox->Value());
-	_OnCheckboxShowLines();
 }
 
 

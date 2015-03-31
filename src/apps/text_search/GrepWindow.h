@@ -76,7 +76,6 @@ private:
 			void				_OnTextOnly();
 			void				_OnInvokePe();
 			void				_OnCheckboxShowLines();
-			void				_OnMenuShowLines();
 			void				_OnInvokeItem();
 			void				_OnSearchText();
 			void				_OnHistoryItem(BMessage* message);
@@ -124,7 +123,6 @@ private:
 			BMenuItem*			fEscapeText;
 			BMenuItem*			fTextOnly;
 			BMenuItem*			fInvokePe;
-			BMenuItem*			fShowLinesMenuitem;
 			BMenu*				fHistoryMenu;
 			BMenu*				fEncodingMenu;
 			BMenuItem*			fUTF8;

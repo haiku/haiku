@@ -43,7 +43,6 @@ enum {
 	MSG_ESCAPE_TEXT,
 	MSG_TEXT_ONLY,
 	MSG_INVOKE_PE,
-	MSG_MENU_SHOW_LINES,
 	MSG_CHECKBOX_SHOW_LINES,
 	MSG_SEARCH_TEXT,
 	MSG_INVOKE_ITEM,
@@ -113,9 +112,6 @@ public:
 
 			// Whether we open the item in Pe and jump to the correct line.
 			bool				fInvokePe;
-
-			// Whether to show the contents of matching files.
-			bool				fShowContents;
 
 			// The dimensions of the window.
 			BRect				fFrame;
