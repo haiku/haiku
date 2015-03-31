@@ -397,7 +397,7 @@ GrepWindow::_SetWindowTitle()
 		if (entry.GetPath(&path) == B_OK) {
 			if (fOldPattern.Length()) {
 				title = B_TRANSLATE("%appname% : %path% : %searchtext%");
-				title.ReplaceAll("%searchtext%", fOldPattern.String()); 
+				title.ReplaceAll("%searchtext%", fOldPattern.String());
 			} else
 				title = B_TRANSLATE("%appname% : %path%");
 
@@ -787,7 +787,7 @@ GrepWindow::_OnStartCancel()
 		fButton->MoveTo(
 			fMenuBar->Frame().Width() - fButton->Frame().Width() - 8,
 			8 + fSearchText->Frame().Height() + 8);
-		
+
 		fSearch->SetEnabled(false);
 
 		// We need to remember the search pattern, because during
@@ -844,7 +844,7 @@ GrepWindow::_OnSearchFinished()
 	fButton->MoveTo(
 		fMenuBar->Frame().Width() - fButton->Frame().Width() - 8,
 		8 + fSearchText->Frame().Height() + 8);
-		
+
 	fButton->SetEnabled(true);
 	fSearch->SetEnabled(true);
 
@@ -1028,7 +1028,7 @@ GrepWindow::_OnReportFileName(BMessage* message)
 		fSearchText->TruncateString(&name, B_TRUNCATE_MIDDLE,
 			fSearchBoxWidth - 10);
 
-		fSearchText->SetText(name);		
+		fSearchText->SetText(name);
 	}
 }
 
@@ -1440,7 +1440,7 @@ GrepWindow::_OnSelectInTracker()
 		BString str1;
 		str1 << B_TRANSLATE("%APP_NAME couldn't open one or more folders.");
 		str1.ReplaceFirst("%APP_NAME",APP_NAME);
-		BAlert* alert = new BAlert(NULL, str1.String(), B_TRANSLATE("OK"), 
+		BAlert* alert = new BAlert(NULL, str1.String(), B_TRANSLATE("OK"),
 			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);

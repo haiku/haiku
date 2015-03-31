@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 1998-2007 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 #ifndef MODEL_H
@@ -60,7 +60,7 @@ enum {
 	MSG_REFS_RECEIVED,
 	MSG_TRY_QUIT,
 	MSG_QUIT_NOW,
-	
+
 	MSG_TRIM_SELECTION,
 	MSG_COPY_TEXT,
 	MSG_SELECT_IN_TRACKER,
@@ -78,7 +78,7 @@ enum state_t {
 class Model {
 public:
 								Model();
-	
+
 			status_t			LoadPrefs();
 			status_t			SavePrefs();
 
@@ -124,13 +124,13 @@ public:
 
 			// Grep string encoding ?
 			uint32				fEncoding;
-		
+
 private:
 			bool				_LoadHistory(BList& items) const;
 			status_t			_SaveHistory(const BList& items) const;
 			void				_FreeHistory(const BList& items) const;
 			status_t			_OpenFile(BFile* file, const char* name,
-									uint32 openMode = B_READ_ONLY, 
+									uint32 openMode = B_READ_ONLY,
 									directory_which which
 										= B_USER_SETTINGS_DIRECTORY,
 									BVolume* volume = NULL) const;

@@ -24,7 +24,7 @@ using std::nothrow;
 #endif
 
 
-ChangesIterator::ChangesIterator(const Model* model) 
+ChangesIterator::ChangesIterator(const Model* model)
 	: FileIterator(),
 	  fPathMap(),
 	  fIteratorIndex(0),

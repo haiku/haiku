@@ -11,7 +11,7 @@
 
 
 int
-main() 
+main()
 {
 	GrepApp app;
 	app.Run();

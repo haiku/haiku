@@ -1,23 +1,23 @@
 /*
  * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>
  * Copyright (c) 1998-2007 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 
@@ -40,7 +40,7 @@ using std::nothrow;
 // For the moment I don't know the life cycle of the InitialIterator object.
 
 
-InitialIterator::InitialIterator(const Model* model) 
+InitialIterator::InitialIterator(const Model* model)
 	: FileIterator(),
 	  fDirectories(10),
 	  fCurrentDir(new (nothrow) BDirectory(&model->fDirectory)),
@@ -90,7 +90,7 @@ InitialIterator::GetNextName(char* buffer)
 			return false;
 
 		// If the entry is a subdir, then add it to the
-		// list of directories and continue the loop. 
+		// list of directories and continue the loop.
 		// If the entry is a file and we can grep it
 		// (i.e. it is a text file), then we're done
 		// here. Otherwise, continue with the next entry.
@@ -119,12 +119,12 @@ InitialIterator::NotifyNegatives() const
 bool
 InitialIterator::GetTopEntry(BEntry& entry)
 {
-	// If the user selected one or more files, we must look 
-	// at the "refs" inside the message that was passed into 
-	// our add-on's process_refs(). If the user didn't select 
-	// any files, we will simply read all the entries from the 
+	// If the user selected one or more files, we must look
+	// at the "refs" inside the message that was passed into
+	// our add-on's process_refs(). If the user didn't select
+	// any files, we will simply read all the entries from the
 	// current working directory.
-	
+
 	entry_ref fileRef;
 
 	if (fSelectedFiles.FindRef("refs", fCurrentRef, &fileRef) == B_OK) {
@@ -184,7 +184,7 @@ InitialIterator::_GetSubEntry(BEntry& entry)
 	if (fCurrentDir->GetNextEntry(&entry, fRecurseLinks) == B_OK)
 		return true;
 
-	// If we get here, there are no more entries in 
+	// If we get here, there are no more entries in
 	// this subdir, so return to the parent directory.
 
 	fDirectories.RemoveItem(fCurrentDir);
