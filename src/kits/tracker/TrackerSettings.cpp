@@ -225,7 +225,7 @@ TTrackerState::LoadSettingsIfNeeded()
 		= new BooleanValueSetting("TransparentSelection", true));
 	Add(fSortFolderNamesFirst
 		= new BooleanValueSetting("SortFolderNamesFirst", true));
-	Add(fHideDotFiles = new BooleanValueSetting("HideDotFiles", true));
+	Add(fHideDotFiles = new BooleanValueSetting("HideDotFiles", false));
 	Add(fTypeAheadFiltering
 		= new BooleanValueSetting("TypeAheadFiltering", false));
 	Add(fSingleWindowBrowse
