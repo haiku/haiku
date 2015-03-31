@@ -18,8 +18,8 @@ ResultItem::ResultItem(const entry_ref& ref)
 
 
 GrepListView::GrepListView()
-	: BOutlineListView(BRect(0, 0, 40, 80), "SearchResults",
-		B_MULTIPLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES,
+	: BOutlineListView("SearchResults",
+		B_MULTIPLE_SELECTION_LIST,
 		B_WILL_DRAW | B_NAVIGABLE)
 {
 }

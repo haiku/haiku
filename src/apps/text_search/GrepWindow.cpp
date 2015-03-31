@@ -16,10 +16,12 @@
 #include <AppFileInfo.h>
 #include <Alert.h>
 #include <Clipboard.h>
+#include <LayoutBuilder.h>
 #include <MessageRunner.h>
 #include <Path.h>
 #include <PathMonitor.h>
 #include <Roster.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <UTF8.h>
 
@@ -66,7 +68,8 @@ static const bigtime_t kChangesPulseInterval = 150000;
 
 
 GrepWindow::GrepWindow(BMessage* message)
-	: BWindow(BRect(0, 0, 1, 1), NULL, B_DOCUMENT_WINDOW, 0),
+	: BWindow(BRect(0, 0, 525, 430), NULL, B_DOCUMENT_WINDOW,
+		B_AUTO_UPDATE_SIZE_LIMITS),
 	fSearchText(NULL),
 	fSearchResults(NULL),
 	fMenuBar(NULL),
@@ -139,7 +142,6 @@ GrepWindow::~GrepWindow()
 
 void GrepWindow::FrameResized(float width, float height)
 {
-	fSearchBoxWidth = fSearchText->Bounds().Width();
 	BWindow::FrameResized(width, height);
 	fModel->fFrame = Frame();
 	_SavePrefs();
@@ -398,7 +400,7 @@ GrepWindow::_SetWindowTitle()
 void
 GrepWindow::_CreateMenus()
 {
-	fMenuBar = new BMenuBar(BRect(0, 0, 1, 1), "menubar");
+	fMenuBar = new BMenuBar("menubar");
 
 	fFileMenu = new BMenu(B_TRANSLATE("File"));
 	fActionMenu = new BMenu(B_TRANSLATE("Actions"));
@@ -504,9 +506,6 @@ GrepWindow::_CreateMenus()
 	fMenuBar->AddItem(fHistoryMenu);
 	fMenuBar->AddItem(fEncodingMenu);
 
-	AddChild(fMenuBar);
-	SetKeyMenuBar(fMenuBar);
-
 	fSearch->SetEnabled(false);
 }
 
@@ -519,96 +518,55 @@ GrepWindow::_CreateViews()
 	// does this and we don't want to send the same message twice.
 
 	fSearchText = new BTextControl(
-		BRect(0, 0, 0, 1), "SearchText", NULL, NULL, NULL,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		"SearchText", NULL, NULL, NULL,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_NAVIGABLE);
 
 	fSearchText->TextView()->SetMaxBytes(1000);
-	fSearchText->ResizeToPreferred();
-		// because it doesn't have a label
-
 	fSearchText->SetModificationMessage(new BMessage(MSG_SEARCH_TEXT));
 
 	fButton = new BButton(
-		BRect(0, 1, 80, 1), "Button", B_TRANSLATE("Search"),
-		new BMessage(MSG_START_CANCEL), B_FOLLOW_RIGHT);
-
+		"Button", B_TRANSLATE("Search"),
+		new BMessage(MSG_START_CANCEL));
 	fButton->MakeDefault(true);
-	fButton->ResizeToPreferred();
 	fButton->SetEnabled(false);
 
 	fShowLinesCheckbox = new BCheckBox(
-		BRect(0, 0, 1, 1), "ShowLines", B_TRANSLATE("Show lines"),
-		new BMessage(MSG_CHECKBOX_SHOW_LINES), B_FOLLOW_LEFT);
-
+		"ShowLines", B_TRANSLATE("Show lines"),
+		new BMessage(MSG_CHECKBOX_SHOW_LINES));
 	fShowLinesCheckbox->SetValue(B_CONTROL_ON);
-	fShowLinesCheckbox->ResizeToPreferred();
 
 	fSearchResults = new GrepListView();
-
 	fSearchResults->SetInvocationMessage(new BMessage(MSG_INVOKE_ITEM));
-	fSearchResults->ResizeToPreferred();
 }
 
 
 void
 GrepWindow::_LayoutViews()
 {
-	float menubarWidth, menubarHeight = 20;
-	fMenuBar->GetPreferredSize(&menubarWidth, &menubarHeight);
-
-	BBox* background = new BBox(
-		BRect(0, menubarHeight + 1, 2, menubarHeight + 2), B_EMPTY_STRING,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-		B_PLAIN_BORDER);
-
 	BScrollView* scroller = new BScrollView(
-		"ScrollSearchResults", fSearchResults, B_FOLLOW_ALL_SIDES,
-		B_FULL_UPDATE_ON_RESIZE, true, true, B_NO_BORDER);
+		"ScrollSearchResults", fSearchResults,
+		B_FULL_UPDATE_ON_RESIZE, true, true);
 
-	scroller->ResizeToPreferred();
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+		.SetInsets(0, 0, -1, -1)
+		.Add(fMenuBar)
+		.AddGrid(B_USE_HALF_ITEM_SPACING)
+			.SetInsets(B_USE_ITEM_INSETS, B_USE_HALF_ITEM_INSETS,
+				B_USE_ITEM_INSETS, 0)
+			.Add(fSearchText, 0, 0, 3)
+			.Add(fShowLinesCheckbox, 0, 1)
+			.Add(BSpaceLayoutItem::CreateGlue(), 1, 1)
+			.Add(fButton, 2, 1)
+		.End()
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-1, 0, -1, -1)
+			.Add(scroller)
+		.End()
+	.End();
 
-	float width = 8 + fShowLinesCheckbox->Frame().Width()
-		+ 8 + fButton->Frame().Width() + 8;
-
-	float height = 8 + fSearchText->Frame().Height() + 8
-		+ fButton->Frame().Height() + 8 + scroller->Frame().Height();
-
-	float backgroundHeight = 8 + fSearchText->Frame().Height()
-		+ 8 + fButton->Frame().Height() + 8;
-
-	ResizeTo(width, height);
-
-	AddChild(background);
-	background->ResizeTo(width,	backgroundHeight);
-	background->AddChild(fSearchText);
-	background->AddChild(fShowLinesCheckbox);
-	background->AddChild(fButton);
-
-	fSearchText->MoveTo(8, 8);
-	fSearchText->ResizeTo(width - 16, fSearchText->Frame().Height());
 	fSearchText->MakeFocus(true);
 
-	fShowLinesCheckbox->MoveTo(
-		8, 8 + fSearchText->Frame().Height() + 8
-			+ (fButton->Frame().Height() - fShowLinesCheckbox->Frame().Height())/2);
-
-	fButton->MoveTo(
-		width - fButton->Frame().Width() - 8,
-		8 + fSearchText->Frame().Height() + 8);
-
-	AddChild(scroller);
-	scroller->MoveTo(0, menubarHeight + 1 + backgroundHeight + 1);
-	scroller->ResizeTo(width + 1, height - backgroundHeight - menubarHeight - 1);
-
-	BRect screenRect = BScreen(this).Frame();
-
-	MoveTo(
-		(screenRect.Width() - width) / 2,
-		(screenRect.Height() - height) / 2);
-
-	SetSizeLimits(width, 10000, height, 10000);
+	SetKeyMenuBar(fMenuBar);
 }
 
 
@@ -765,10 +723,6 @@ GrepWindow::_OnStartCancel()
 
 		fButton->MakeFocus(true);
 		fButton->SetLabel(B_TRANSLATE("Cancel"));
-		fButton->ResizeToPreferred();
-		fButton->MoveTo(
-			fMenuBar->Frame().Width() - fButton->Frame().Width() - 8,
-			8 + fSearchText->Frame().Height() + 8);
 
 		fSearch->SetEnabled(false);
 
@@ -822,10 +776,6 @@ GrepWindow::_OnSearchFinished()
 	fEncodingMenu->SetEnabled(true);
 
 	fButton->SetLabel(B_TRANSLATE("Search"));
-	fButton->ResizeToPreferred();
-	fButton->MoveTo(
-		fMenuBar->Frame().Width() - fButton->Frame().Width() - 8,
-		8 + fSearchText->Frame().Height() + 8);
 
 	fButton->SetEnabled(true);
 	fSearch->SetEnabled(true);
