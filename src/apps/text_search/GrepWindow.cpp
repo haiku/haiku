@@ -44,7 +44,6 @@
 #include "GlobalDefs.h"
 #include "Grepper.h"
 #include "InitialIterator.h"
-#include "Translation.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "GrepWindow"
