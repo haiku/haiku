@@ -126,6 +126,7 @@ NetworkWindow::NetworkWindow()
 
 	BScrollView* scrollView = new BScrollView("ScrollView", fListView,
 		0, false, true);
+	scrollView->SetExplicitMinSize(BSize(B_SIZE_UNSET, 42));
 
 	fAddOnShellView = new BView("add-on shell", 0,
 		new BGroupLayout(B_VERTICAL));
@@ -349,6 +350,11 @@ NetworkWindow::_ScanAddOns()
 	BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "Network Settings",
 		paths);
 
+	// Collect add-on paths by name, so that each name will only be
+	// loaded once.
+	typedef std::map<BString, BPath> PathMap;
+	PathMap addOnMap;
+
 	for (int32 i = 0; i < paths.CountStrings(); i++) {
 		BDirectory directory(paths.StringAt(i));
 		BEntry entry;
@@ -357,72 +363,79 @@ NetworkWindow::_ScanAddOns()
 			if (entry.GetPath(&path) != B_OK)
 				continue;
 
-			image_id image = load_add_on(path.Path());
-			if (image < 0) {
-				printf("Failed to load %s addon: %s.\n", path.Path(),
-					strerror(image));
-				continue;
-			}
+			if (addOnMap.find(path.Leaf()) == addOnMap.end())
+				addOnMap.insert(std::pair<BString, BPath>(path.Leaf(), path));
+		}
+	}
 
-			BNetworkSettingsAddOn* (*instantiateAddOn)(image_id image,
-				BNetworkSettings& settings);
+	for (PathMap::const_iterator iterator = addOnMap.begin();
+			iterator != addOnMap.end(); iterator++) {
+		const BPath& path = iterator->second;
 
-			status_t status = get_image_symbol(image,
-				"instantiate_network_settings_add_on",
-				B_SYMBOL_TYPE_TEXT, (void**)&instantiateAddOn);
-			if (status != B_OK) {
-				// No "addon instantiate function" symbol found in this addon
-				printf("No symbol \"instantiate_network_settings_add_on\" "
-					"found in %s addon: not a network setup addon!\n",
-					path.Path());
-				unload_add_on(image);
-				continue;
-			}
+		image_id image = load_add_on(path.Path());
+		if (image < 0) {
+			printf("Failed to load %s addon: %s.\n", path.Path(),
+				strerror(image));
+			continue;
+		}
 
-			BNetworkSettingsAddOn* addOn = instantiateAddOn(image, fSettings);
-			if (addOn == NULL) {
-				unload_add_on(image);
-				continue;
-			}
+		BNetworkSettingsAddOn* (*instantiateAddOn)(image_id image,
+			BNetworkSettings& settings);
 
-			fAddOns.AddItem(addOn);
+		status_t status = get_image_symbol(image,
+			"instantiate_network_settings_add_on",
+			B_SYMBOL_TYPE_TEXT, (void**)&instantiateAddOn);
+		if (status != B_OK) {
+			// No "addon instantiate function" symbol found in this addon
+			printf("No symbol \"instantiate_network_settings_add_on\" found "
+				"in %s addon: not a network setup addon!\n", path.Path());
+			unload_add_on(image);
+			continue;
+		}
 
-			// Per interface items
-			ItemMap::const_iterator iterator = fInterfaceItemMap.begin();
-			for (; iterator != fInterfaceItemMap.end(); iterator++) {
-				const BString& interface = iterator->first;
-				BListItem* interfaceItem = iterator->second;
+		BNetworkSettingsAddOn* addOn = instantiateAddOn(image, fSettings);
+		if (addOn == NULL) {
+			unload_add_on(image);
+			continue;
+		}
 
-				uint32 cookie = 0;
-				while (true) {
-					BNetworkSettingsItem* item = addOn->CreateNextInterfaceItem(
-						cookie, interface.String());
-					if (item == NULL)
-						break;
+		fAddOns.AddItem(addOn);
 
-					fSettingsMap[item->ListItem()] = item;
-					fListView->AddUnder(item->ListItem(), interfaceItem);
-				}
-				fListView->SortItemsUnder(interfaceItem, true,
-					NetworkWindow::_CompareListItems);
-			}
+		// Per interface items
+		ItemMap::const_iterator iterator = fInterfaceItemMap.begin();
+		for (; iterator != fInterfaceItemMap.end(); iterator++) {
+			const BString& interface = iterator->first;
+			BListItem* interfaceItem = iterator->second;
 
-			// Generic items
 			uint32 cookie = 0;
 			while (true) {
-				BNetworkSettingsItem* item = addOn->CreateNextItem(cookie);
+				BNetworkSettingsItem* item = addOn->CreateNextInterfaceItem(
+					cookie, interface.String());
 				if (item == NULL)
 					break;
 
 				fSettingsMap[item->ListItem()] = item;
-				fListView->AddUnder(item->ListItem(),
-					_ListItemFor(item->Type()));
+				fListView->AddUnder(item->ListItem(), interfaceItem);
 			}
-
-			_SortItemsUnder(fServicesItem);
-			_SortItemsUnder(fDialUpItem);
-			_SortItemsUnder(fOtherItem);
+			fListView->SortItemsUnder(interfaceItem, true,
+				NetworkWindow::_CompareListItems);
 		}
+
+		// Generic items
+		uint32 cookie = 0;
+		while (true) {
+			BNetworkSettingsItem* item = addOn->CreateNextItem(cookie);
+			if (item == NULL)
+				break;
+
+			fSettingsMap[item->ListItem()] = item;
+			fListView->AddUnder(item->ListItem(),
+				_ListItemFor(item->Type()));
+		}
+
+		_SortItemsUnder(fServicesItem);
+		_SortItemsUnder(fDialUpItem);
+		_SortItemsUnder(fOtherItem);
 	}
 
 	fListView->SortItemsUnder(NULL, true,
