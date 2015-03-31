@@ -160,6 +160,11 @@ NetworkWindow::NetworkWindow()
 	_ScanAddOns();
 	_UpdateRevertButton();
 
+	fListView->Select(0);
+	_SelectItem(fListView->ItemAt(0));
+		// Call this manually, so that CenterOnScreen() below already
+		// knows the final window size.
+
 	// Set size of the list view from its contents
 	float width;
 	float height;

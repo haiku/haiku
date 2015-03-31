@@ -74,7 +74,7 @@ InterfaceAddressView::InterfaceAddressView(int family,
 	fModeField->SetToolTip(
 		B_TRANSLATE("The method for obtaining an IP address"));
 
-	float minimumWidth = be_control_look->DefaultItemSpacing() * 16;
+	float minimumWidth = be_control_look->DefaultItemSpacing() * 15;
 
 	fAddressField = new IPAddressControl(fFamily, B_TRANSLATE("IP Address:"),
 		NULL);
@@ -96,8 +96,6 @@ InterfaceAddressView::InterfaceAddressView(int family,
 
 	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
 		new BMessage(kMsgApply));
-	fApplyButton->SetExplicitAlignment(
-		BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_UNSET));
 
 	fSettings.GetInterface(interface, fOriginalSettings);
 	_UpdateFields();
@@ -109,7 +107,10 @@ InterfaceAddressView::InterfaceAddressView(int family,
 			.AddTextControl(fNetmaskField, 0, 2, B_ALIGN_RIGHT)
 			.AddTextControl(fGatewayField, 0, 3, B_ALIGN_RIGHT)
 		.End()
-		.Add(fApplyButton)
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fApplyButton)
+		.End()
 		.AddGlue();
 }
 
