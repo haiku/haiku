@@ -46,12 +46,6 @@ export LC_COLLATE=$LC_MESSAGES
 export LC_CTYPE=$LC_MESSAGES
 export LC_MONETARY=$LC_NUMERIC
 
-# media kit
-if [ -f $HOME/config/settings/use_old_audio ]
-then
-	export USE_OLD_AUDIO=true
-fi
-
 if [ "$SAFEMODE" != "yes" ]
 then
 	if [ -f $HOME/config/settings/boot/UserSetupEnvironment ]
