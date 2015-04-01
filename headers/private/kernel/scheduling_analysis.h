@@ -42,7 +42,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("sem create \"%s\" -> %ld", fName, fID);
+		out.Print("sem create \"%s\" -> %" B_PRId32 "", fName, fID);
 	}
 
 	virtual uint32 Type() const
