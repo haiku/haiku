@@ -61,13 +61,12 @@ PlayMediaFile(const char* media_type, const char* media_name)
 MediaFilePlayer::MediaFilePlayer(const char* media_type,
 	const char* media_name, entry_ref* ref)
 	:
+	fName(media_name),
 	fInitCheck(B_ERROR),
 	fRef(*ref),
 	fSoundPlayer(NULL),
 	fPlayTrack(NULL)
 {
-	fName = strdup(media_name);
-
 	fPlayFile = new BMediaFile(&fRef);
 	fInitCheck = fPlayFile->InitCheck();
 	if (fInitCheck != B_OK)
@@ -111,7 +110,6 @@ MediaFilePlayer::~MediaFilePlayer()
 {
 	delete fSoundPlayer;
 	delete fPlayFile;
-	free(fName);
 }
 
 

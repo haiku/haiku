@@ -11,6 +11,7 @@
 #include <MediaFile.h>
 #include <MediaTrack.h>
 #include <SoundPlayer.h>
+#include <String.h>
 
 
 void PlayMediaFile(const char* media_type, const char* media_name);
@@ -38,7 +39,7 @@ public:
 								const media_raw_audio_format& format);
 
 private:
-	char*					fName;
+	BString					fName;
 	status_t				fInitCheck;
 	entry_ref				fRef;
 	BSoundPlayer*			fSoundPlayer;
