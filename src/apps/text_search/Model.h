@@ -23,6 +23,7 @@ enum {
 	MSG_RECURSE_DIRS,
 	MSG_SKIP_DOT_DIRS,
 	MSG_CASE_SENSITIVE,
+	MSG_ESCAPE_TEXT,
 	MSG_TEXT_ONLY,
 	MSG_INVOKE_PE,
 	MSG_CHECKBOX_SHOW_LINES,
@@ -34,6 +35,7 @@ enum {
 
 	MSG_REPORT_FILE_NAME,
 	MSG_REPORT_RESULT,
+	MSG_REPORT_ERROR,
 	MSG_SEARCH_FINISHED,
 
 	MSG_NEW_WINDOW,
@@ -84,6 +86,9 @@ public:
 
 			// Whether the search is case sensitive.
 			bool				fCaseSensitive;
+
+			// Whether the search pattern will be escaped.
+			bool				fEscapeText;
 
 			// Whether we look at text files only.
 			bool				fTextOnly;

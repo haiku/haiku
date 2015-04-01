@@ -90,6 +90,7 @@ GrepWindow::GrepWindow(BMessage* message)
 	fRecurseDirs(NULL),
 	fSkipDotDirs(NULL),
 	fCaseSensitive(NULL),
+	fEscapeText(NULL),
 	fTextOnly(NULL),
 	fInvokePe(NULL),
 	fHistoryMenu(NULL),
@@ -210,6 +211,10 @@ void GrepWindow::MessageReceived(BMessage* message)
 			_OnCaseSensitive();
 			break;
 
+		case MSG_ESCAPE_TEXT:
+			_OnEscapeText();
+			break;
+
 		case MSG_TEXT_ONLY:
 			_OnTextOnly();
 			break;
@@ -252,6 +257,10 @@ void GrepWindow::MessageReceived(BMessage* message)
 
 		case MSG_REPORT_RESULT:
 			_OnReportResult(message);
+			break;
+
+		case MSG_REPORT_ERROR:
+			_OnReportError(message);
 			break;
 
 		case MSG_SELECT_ALL:
@@ -443,6 +452,9 @@ GrepWindow::_CreateMenus()
 	fCaseSensitive = new BMenuItem(
 		B_TRANSLATE("Case-sensitive"), new BMessage(MSG_CASE_SENSITIVE));
 
+	fEscapeText = new BMenuItem(
+		B_TRANSLATE("Escape search text"), new BMessage(MSG_ESCAPE_TEXT));
+
 	fTextOnly = new BMenuItem(
 		B_TRANSLATE("Text files only"), new BMessage(MSG_TEXT_ONLY));
 
@@ -474,6 +486,7 @@ GrepWindow::_CreateMenus()
 	fPreferencesMenu->AddItem(fRecurseDirs);
 	fPreferencesMenu->AddItem(fSkipDotDirs);
 	fPreferencesMenu->AddItem(fCaseSensitive);
+	fPreferencesMenu->AddItem(fEscapeText);
 	fPreferencesMenu->AddItem(fTextOnly);
 	fPreferencesMenu->AddItem(fInvokePe);
 
@@ -594,6 +607,7 @@ GrepWindow::_LoadPrefs()
 	fRecurseLinks->SetMarked(fModel->fRecurseLinks);
 	fSkipDotDirs->SetMarked(fModel->fSkipDotDirs);
 	fCaseSensitive->SetMarked(fModel->fCaseSensitive);
+	fEscapeText->SetMarked(fModel->fEscapeText);
 	fTextOnly->SetMarked(fModel->fTextOnly);
 	fInvokePe->SetMarked(fModel->fInvokePe);
 
@@ -1006,6 +1020,15 @@ GrepWindow::_OnReportResult(BMessage* message)
 
 
 void
+GrepWindow::_OnReportError(BMessage* message)
+{
+	const char* buf;
+	if (message->FindString("error", &buf) == B_OK)
+		fSearchResults->AddItem(new BStringItem(buf));
+}
+
+
+void
 GrepWindow::_OnRecurseLinks()
 {
 	fModel->fRecurseLinks = !fModel->fRecurseLinks;
@@ -1028,6 +1051,15 @@ GrepWindow::_OnSkipDotDirs()
 {
 	fModel->fSkipDotDirs = !fModel->fSkipDotDirs;
 	fSkipDotDirs->SetMarked(fModel->fSkipDotDirs);
+	_ModelChanged();
+}
+
+
+void
+GrepWindow::_OnEscapeText()
+{
+	fModel->fEscapeText = !fModel->fEscapeText;
+	fEscapeText->SetMarked(fModel->fEscapeText);
 	_ModelChanged();
 }
 

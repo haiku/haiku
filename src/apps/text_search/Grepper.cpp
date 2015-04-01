@@ -17,7 +17,6 @@
 #include <Locale.h>
 #include <NodeInfo.h>
 #include <Path.h>
-#include <String.h>
 #include <UTF8.h>
 
 #include "FileIterator.h"
@@ -60,10 +59,33 @@ strdup_to_utf8(uint32 encode, const char* src, int32 length)
 }
 
 
-Grepper::Grepper(BString pattern, const Model* model,
+char*
+strdup_from_utf8(uint32 encode, const char* src, int32 length)
+{
+	int32 srcLen = length;
+	int32 dstLen = srcLen;
+	char* dst = new (nothrow) char[dstLen + 1];
+	if (dst == NULL)
+		return NULL;
+	int32 cookie = 0;
+	convert_from_utf8(encode, src, &srcLen, dst, &dstLen, &cookie);
+	// TODO: See above.
+	dst[dstLen] = '\0';
+	char* dup = strdup(dst);
+	delete[] dst;
+	if (srcLen != length) {
+		fprintf(stderr, "strdup_from_utf8(%" B_PRId32 ", %" B_PRId32
+			") dst allocate smalled(%" B_PRId32 ")\n", encode, length, dstLen);
+	}
+	return dup;
+}
+
+
+Grepper::Grepper(const char* pattern, const Model* model,
 		const BHandler* target, FileIterator* iterator)
-	: fPattern(pattern),
+	: fPattern(NULL),
 	  fTarget(target),
+	  fEscapeText(model->fEscapeText),
 	  fCaseSensitive(model->fCaseSensitive),
 	  fEncoding(model->fEncoding),
 
@@ -71,12 +93,19 @@ Grepper::Grepper(BString pattern, const Model* model,
 	  fThreadId(-1),
 	  fMustQuit(false)
 {
+	if (fEncoding > 0) {
+		char* src = strdup_from_utf8(fEncoding, pattern, strlen(pattern));
+		_SetPattern(src);
+		free(src);
+	} else
+		_SetPattern(pattern);
 }
 
 
 Grepper::~Grepper()
 {
 	Cancel();
+	free(fPattern);
 	delete fIterator;
 }
 
@@ -131,9 +160,17 @@ int32
 Grepper::_GrepperThread()
 {
 	BMessage message;
+
 	char fileName[B_PATH_NAME_LENGTH];
+	char tempString[B_PATH_NAME_LENGTH];
+	char command[B_PATH_NAME_LENGTH + 32];
+
+	BPath tempFile;
+	sprintf(fileName, "/tmp/SearchText%" B_PRId32, fThreadId);
+	tempFile.SetTo(fileName);
 
 	while (!fMustQuit && fIterator->GetNextName(fileName)) {
+
 		message.MakeEmpty();
 		message.what = MSG_REPORT_FILE_NAME;
 		message.AddString("filename", fileName);
@@ -154,43 +191,57 @@ Grepper::_GrepperThread()
 			continue;
 		}
 
-		BString contents;
+		if (!_EscapeSpecialChars(fileName, B_PATH_NAME_LENGTH)) {
+			sprintf(tempString, B_TRANSLATE("%s: Not enough room to escape "
+				"the filename."), fileName);
 
-		BFile file(&ref, B_READ_WRITE);
-		off_t size;
-		file.GetSize(&size);
-		file.Seek(0, SEEK_SET);
-		char* buffer = new char[size];
-		file.Read(buffer, size);
-		if (fEncoding > 0) {
-			char* temp = strdup_to_utf8(fEncoding, buffer, size);
-			contents.SetTo(temp, size);
-			free(temp);
-		} else
-			contents.SetTo(buffer, size);
-		delete[] buffer;
-
-		int32 index = 0, lines = 1; // First line is 1 not 0
-		while (true) {
-			int32 newPos;
-			if (fCaseSensitive)
-				newPos = contents.FindFirst(fPattern, index);
-			else
-				newPos = contents.IFindFirst(fPattern, index);
-			if (newPos == B_ERROR)
-				break;
-
-			lines += _CountLines(contents, index, newPos);
-			BString linenoAndLine;
-			linenoAndLine.SetToFormat("%" B_PRId32 ":%s", lines, _GetLine(contents, newPos).String());
-			message.AddString("text", linenoAndLine);
-
-			index = newPos + 1;
+			message.MakeEmpty();
+			message.what = MSG_REPORT_ERROR;
+			message.AddString("error", tempString);
+			fTarget.SendMessage(&message);
+			continue;
 		}
 
-		if (message.HasString("text") || fIterator->NotifyNegatives())
-			fTarget.SendMessage(&message);
+		sprintf(command, "grep -hn %s %s \"%s\" > \"%s\"",
+			fCaseSensitive ? "" : "-i", fPattern, fileName, tempFile.Path());
+
+		int res = system(command);
+
+		if (res == 0 || res == 1) {
+			FILE *results = fopen(tempFile.Path(), "r");
+
+			if (results != NULL) {
+				while (fgets(tempString, B_PATH_NAME_LENGTH, results) != 0) {
+					if (fEncoding > 0) {
+						char* tempdup = strdup_to_utf8(fEncoding, tempString,
+							strlen(tempString));
+						message.AddString("text", tempdup);
+						free(tempdup);
+					} else
+						message.AddString("text", tempString);
+				}
+
+				if (message.HasString("text") || fIterator->NotifyNegatives())
+					fTarget.SendMessage(&message);
+
+				fclose(results);
+				continue;
+			}
+		}
+
+		sprintf(tempString, B_TRANSLATE("%s: There was a problem running grep."), fileName);
+
+		message.MakeEmpty();
+		message.what = MSG_REPORT_ERROR;
+		message.AddString("error", tempString);
+		fTarget.SendMessage(&message);
 	}
+
+	// We wait with removing the temporary file until after the
+	// entire search has finished, to prevent a lot of flickering
+	// if the Tracker window for /tmp/ might be open.
+
+	remove(tempFile.Path());
 
 	message.MakeEmpty();
 	message.what = MSG_SEARCH_FINISHED;
@@ -200,36 +251,79 @@ Grepper::_GrepperThread()
 }
 
 
-int32
-Grepper::_CountLines(BString& str, int32 startPos, int32 endPos)
+void
+Grepper::_SetPattern(const char* src)
 {
-	int32 ret = 0;
-	for (int32 i = startPos; i < endPos; i++) {
-		if (str[i] == '\n')
-			ret++;
+	if (src == NULL)
+		return;
+
+	if (!fEscapeText) {
+		fPattern = strdup(src);
+		return;
 	}
-	return ret;
+
+	// We will simply guess the size of the memory buffer
+	// that we need. This should always be large enough.
+	fPattern = (char*)malloc((strlen(src) + 1) * 3 * sizeof(char));
+	if (fPattern == NULL)
+		return;
+
+	const char* srcPtr = src;
+	char* dstPtr = fPattern;
+
+	// Put double quotes around the pattern, so separate
+	// words are considered to be part of a single string.
+	*dstPtr++ = '"';
+
+	while (*srcPtr != '\0') {
+		char c = *srcPtr++;
+
+		// Put a backslash in front of characters
+		// that should be escaped.
+		if ((c == '.')  || (c == ',')
+			||  (c == '[')  || (c == ']')
+			||  (c == '?')  || (c == '*')
+			||  (c == '+')  || (c == '-')
+			||  (c == ':')  || (c == '^')
+			||  (c == '"')	|| (c == '`')) {
+			*dstPtr++ = '\\';
+		} else if ((c == '\\') || (c == '$')) {
+			// Some characters need to be escaped
+			// with *three* backslashes in a row.
+			*dstPtr++ = '\\';
+			*dstPtr++ = '\\';
+			*dstPtr++ = '\\';
+		}
+
+		// Note: we do not have to escape the
+		// { } ( ) < > and | characters.
+
+		*dstPtr++ = c;
+	}
+
+	*dstPtr++ = '"';
+	*dstPtr = '\0';
 }
 
 
-BString
-Grepper::_GetLine(BString& str, int32 pos)
+bool
+Grepper::_EscapeSpecialChars(char* buffer, ssize_t bufferSize)
 {
-	int32 startPos = 0;
-	int32 endPos = str.Length();
-	for (int32 i = pos; i > 0; i--) {
-		if (str[i] == '\n') {
-			startPos = i + 1;
+	char* copy = strdup(buffer);
+	char* start = buffer;
+	uint32 len = strlen(copy);
+	bool result = true;
+	for (uint32 count = 0; count < len; ++count) {
+		if (copy[count] == '"' || copy[count] == '$')
+			*buffer++ = '\\';
+		if (buffer - start == bufferSize - 1) {
+			result = false;
 			break;
 		}
+		*buffer++ = copy[count];
 	}
-	for (int32 i = pos; i < endPos; i++) {
-		if (str[i] == '\n') {
-			endPos = i;
-			break;
-		}
-	}
-
-	BString ret;
-	return str.CopyInto(ret, startPos, endPos - startPos);
+	*buffer = '\0';
+	free(copy);
+	return result;
 }
+

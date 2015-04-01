@@ -50,9 +50,11 @@ private:
 			void				_OnNodeMonitorPulse();
 			void				_OnReportFileName(BMessage* message);
 			void				_OnReportResult(BMessage* message);
+			void				_OnReportError(BMessage* message);
 			void				_OnRecurseLinks();
 			void				_OnRecurseDirs();
 			void				_OnSkipDotDirs();
+			void				_OnEscapeText();
 			void				_OnCaseSensitive();
 			void				_OnTextOnly();
 			void				_OnInvokePe();
@@ -101,6 +103,7 @@ private:
 			BMenuItem*			fRecurseDirs;
 			BMenuItem*			fSkipDotDirs;
 			BMenuItem*			fCaseSensitive;
+			BMenuItem*			fEscapeText;
 			BMenuItem*			fTextOnly;
 			BMenuItem*			fInvokePe;
 			BMenu*				fHistoryMenu;
