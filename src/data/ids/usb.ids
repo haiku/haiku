@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.03.24
-# Date:    2015-03-24 12:10:50
+# Version: 2015.03.31
+# Date:    2015-03-31 20:34:09
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -2986,6 +2986,7 @@
 	a009  Stor.E Basics
 	a00d  STOR.E BASICS 500GB
 	b001  Stor.E Partner
+	d000  External Disk 2TB Model DT01ABA200
 	d010  External Disk 3TB
 	d011  Canvio Desk
 0481  Zenith Data Systems
@@ -3044,6 +3045,8 @@
 	e00f  Foxconn T77H114 BCM2070 [Single-Chip Bluetooth 2.1 + EDR Adapter]
 	e016  Ubee PXU1900 WiMAX Adapter [Beceem BCSM250]
 	e02c  Atheros AR5BBU12 Bluetooth Device
+	e032  Broadcom BCM20702 Bluetooth
+	e042  Broadcom BCM20702 Bluetooth
 	e04d  Atheros AR3012 Bluetooth
 048a  S-MOS Systems, Inc.
 048c  Alps Electric Ireland, Ltd
@@ -4169,7 +4172,7 @@
 	0881  PX-404A [ME OFFICE 535]
 	0883  ME 340 Series/Stylus NX130 Series
 	0884  Stylus NX430W Series
-	0885  Stylus NX230 Series
+	0885  Stylus NX230/SX235W Series
 	088f  Stylus Office BX635FWD
 	0890  ME OFFICE 940FW Series/Stylus Office BX630FW Series
 	0891  Stylus Office BX535WD
@@ -5110,7 +5113,7 @@
 	017b  Imagistics sx2100
 	0180  MFC-7420
 	0181  MFC-7820N Port(FaxModem)
-	0182  Composite Device
+	0182  DCP-7010
 	0183  DCP-7020
 	0184  DCP-7025 Printer
 	0185  MFC-7220 Printer
@@ -11666,6 +11669,7 @@
 	2831  RTL2831U DVB-T
 	2832  RTL2832U DVB-T
 	2838  RTL2838 DVB-T
+	5401  RTL 8153 USB 3.0 hub with gigabit ethernet
 	5730  HP 2.0MP High Definition Webcam
 	5775  HP "Truevision HD" laptop camera
 	8150  RTL8150 Fast Ethernet Adapter
@@ -13225,6 +13229,7 @@
 	00d4  C902 [MTP]
 	00d9  C702 Phone
 	0112  W995 Walkman Phone
+	014e  J108i Cedar (MTP mode)
 	015a  Xperia Pro [Media Transfer Protocol]
 	0166  Xperia Mini Pro
 	0167  ST15i (Xperia mini)
@@ -13239,6 +13244,7 @@
 	2137  Xperia X10 mini (USB debug)
 	2138  Xperia X10 mini pro (Debug)
 	2149  Xperia X8 (debug)
+	214e  J108i Cedar (Windows-driver mode)
 	3137  Xperia X10 mini
 	3138  Xperia X10 mini pro
 	3149  Xperia X8
@@ -13276,7 +13282,7 @@
 	d0e1  MD400 Mobile Broadband Modem
 	d12a  U100i Yari Phone
 	d12e  Xperia X10
-	d14e  J108i Cedar
+	d14e  J108i Cedar (modem mode)
 	e000  K810 (PictBridge mode)
 	e039  K800i (msc mode)
 	e042  W810i Phone
@@ -13295,6 +13301,7 @@
 	e112  W995 Phone (Mass Storage)
 	e12e  X10i Phone
 	e133  Vivaz
+	e14e  J108i Cedar (mass-storage mode)
 	e14f  Xperia Arc/X12
 	e15a  Xperia Pro [Mass Storage Class]
 	e161  Xperia Ray
@@ -13674,6 +13681,7 @@
 1076  GCT Semiconductor, Inc.
 	0031  Bluetooth Device
 	0032  Bluetooth Device
+	8002  LU150 LTE Modem [Yota LU150]
 107b  Gateway, Inc.
 	3009  eHome Infrared Transceiver
 	55b2  WBU-110 802.11b Wireless Adapter [Intersil PRISM 3]
@@ -14578,6 +14586,7 @@
 	3375  Atheros AR3012 Bluetooth 4.0 Adapter
 	3392  Azurewave 43228+20702
 	3394  Bluetooth
+	3474  Atheros AR3012 Bluetooth
 	5070  Webcam
 	5111  Integrated Webcam
 	5115  Integrated Webcam
@@ -14894,8 +14903,28 @@
 	8400  INI DVS128
 	840d  INI DAViS
 	841a  INI DAViS FX3
-152b  FLYTECH Technology CO Ltd
-	0003  M.I.R. srl Minispir
+152b  MIR Srl
+	0001  spirobank II
+	0002  spirolab III
+	0003  MiniSpir
+	0004  Oxi
+	0005  spiros II
+	0006  smiths spirobank II
+	0007  smiths spirobank G-USB
+	0008  smiths MiniSpir
+	0009  spirobank G-USB
+	000a  smiths Oxi
+	000b  smiths spirolab III
+	000c  chorus III
+	000d  spirolab III Bw
+	000e  spirolab III
+	000f  easySpiro
+	0010  Spirotel converter
+	0011  spirobank
+	0012  spiro3 Zimmer
+	0013  spirotel serial
+	0014  spirotel II
+	0015  spirodoc
 152d  JMicron Technology Corp. / JMicron USA Technology Corp.
 	0539  JMS539/567 SuperSpeed SATA II/III 3.0G/6.0G Bridge
 	0567  JMS567 SATA 6.0Gb/s bridge
@@ -14908,6 +14937,10 @@
 	2339  JM20339 SATA Bridge
 	2352  ATA/ATAPI Bridge
 	2509  JMS539 SuperSpeed SATA II 3.0G Bridge
+	2551  JMS551 SATA 3Gb/s bridge
+	2566  JMS566 SATA 3Gb/s bridge
+	3562  JMS567 SATA 6.0Gb/s bridge
+	3569  ATA/ATAPI Bridge [AdPlus SuperVer]
 152e  LG (HLDS)
 	2507  PL-2507 IDE Controller
 	e001  GSA-5120D DVD-RW
@@ -14932,6 +14965,7 @@
 	1181  Cinergy S2 PCIe Dual Port 1
 	1182  Cinergy S2 PCIe Dual Port 2
 1546  U-Blox AG
+	01a5  NL-402U
 1547  SG Intec Ltd & Co KG
 	1000  SG-Lock[U2]
 154a  Celectronic GmbH
@@ -14940,9 +14974,13 @@
 	0010  USB 2.0 Flash Drive
 	0048  Flash Drive
 	004d  8 GB Flash Drive
+	0053  Flash Drive
 	0057  32GB Micro Slide Attache Flash Drive
-	007a  8GB Classic Attache Flash Drive
+	005b  Flash Drive
+	0062  Flash Drive
+	007a  Classic Attache Flash Drive
 	6545  FD Device
+	fa05  Flash Drive
 154d  ConnectCounty Holdings Berhad
 154e  D&M Holdings, Inc. (Denon/Marantz)
 	3000  Marantz RC9001 Remote Control
@@ -15002,6 +15040,7 @@
 	0006  Wireless 11n USB Adapter
 	0010  802.11n USB Wireless Card
 	0012  WUBR-208N 802.11abgn Wireless Adapter [Ralink RT2870]
+	002d  WLTUBA-107 [Yota 4G LTE]
 15aa  Gearway Electronics (Dong Guan) Co., Ltd.
 15ad  VMware Inc.
 15ba  Olimex Ltd.
@@ -15194,7 +15233,7 @@
 1631  Good Way Technology
 	6200  GWUSB2E
 	c019  RT2573
-1645  Cross Match Technologies GmbH
+1645  Entrega [hex]
 	0001  1S Serial Port
 	0002  2S Serial Port
 	0003  1S25 Serial Port
@@ -15233,6 +15272,8 @@
 165c  Kondo Kagaku
 	0002  Serial Adapter
 1660  Creatix Polymedia GmbH
+1667  GIGA-TMS INC.
+	0005  PCR330A RFID Reader (125 kHz, keyboard emulation)
 1668  Actiontec Electronics, Inc. [hex]
 	0009  Gateway
 	0333  Modem
@@ -15541,6 +15582,16 @@
 	083e  MetaGeek Wi-Spy
 	083f  MetaGeek Wi-Spy 2.4x
 	0938  Iguanaworks USB IR Transceiver
+	0a96  raphnet.net usb_game12
+	0a97  raphnet.net SNES mouse adapter
+	0a98  raphnet.net USBTenki
+	0a99  raphnet.net NES
+	0a9a  raphnet.net Gamecube/N64 controller
+	0a9b  raphnet.net DB9Joy
+	0a9c  raphnet.net Intellivision
+	0a9d  raphnet.net 4nes4snes
+	0a9e  raphnet.net Megadrive multitap
+	0a9f  raphnet.net MultiDB9joy
 	0c30  Telldus TellStick
 	0c31  Telldus TellStick Duo
 	0c9f  USBtiny
@@ -17029,6 +17080,22 @@
 	3300  WL-140 / Hawking HWU36D 802.11b Wireless Adapter [Intersil PRISM 3]
 2899  Toptronic Industrial Co., Ltd
 	012c  Camera Device
+289b  Dracal/Raphnet technologies
+	0001  Gamecube/N64 controller v2.2
+	0002  2nes2snes
+	0003  4nes4snes
+	0004  Gamecube/N64 controller v2.3
+	0005  Saturn (Joystick mode)
+	0006  Saturn (Mouse mode)
+	0007  Famicom controller
+	0008  Dreamcast (Joystick mode)
+	0009  Dreamcast (Mouse mode)
+	000a  Dreamcast (Keyboard mode)
+	000b  Gamecube/N64 controller v2.9 (Keyboard mode)
+	000c  Gamecube/N64 controller v2.9 (Joystick mode)
+	0100  Dual-relay board
+	0500  Energy meter
+	0502  Precision barometer
 2931  Jolla Oy
 	0a01  Jolla Phone MTP
 	0a02  Jolla Phone Developer
@@ -17058,6 +17125,15 @@
 	803c  Arduino Explora (CDC ACM)
 	8041  Arduino Yun (CDC ACM)
 	804d  Arduino Zero Pro (CDC ACM)
+2a45  Meizu Corp.
+	0001  MX Phone (BICR)
+	0c02  MX Phone (MTP & ADB)
+	0c03  MX Phone (BICR & ADB)
+	2008  MX Phone (MTP)
+	200a  MX Phone (MTP & ACM & ADB)
+	200b  MX Phone (PTP)
+	200c  MX Phone (PTP & ADB)
+	2012  MX Phone (MTP & ACM)
 2c02  Planex Communications
 	14ea  GW-US11H WLAN
 2c1a  Dolphin Peripherals
