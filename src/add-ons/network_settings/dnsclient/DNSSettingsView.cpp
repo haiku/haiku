@@ -182,7 +182,9 @@ DNSSettingsView::MessageReceived(BMessage* message)
 status_t
 DNSSettingsView::_LoadDNSConfiguration()
 {
-	res_init();
+	if (res_init() != 0)
+		return B_ERROR;
+
 	res_state state = __res_state();
 
 	if (state != NULL) {
