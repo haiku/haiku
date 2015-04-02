@@ -108,7 +108,10 @@ BNetworkInterfaceListItem::BNetworkInterfaceListItem(int family,
 	fSettings(settings),
 	fFamily(family),
 	fInterface(interface),
-	fLabel(label)
+	fLabel(label),
+	fDisabled(false),
+	fLineOffset(0),
+	fSpacing(0)
 {
 }
 

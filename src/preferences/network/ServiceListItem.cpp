@@ -27,6 +27,8 @@ ServiceListItem::ServiceListItem(const char* name, const char* label,
 	fName(name),
 	fLabel(label),
 	fSettings(settings),
+	fOwner(NULL),
+	fLineOffset(0),
 	fEnabled(false)
 {
 }

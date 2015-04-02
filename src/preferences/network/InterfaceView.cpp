@@ -43,7 +43,8 @@ static const uint32 kMsgJoinNetwork = 'join';
 
 InterfaceView::InterfaceView()
 	:
-	BGroupView(B_VERTICAL)
+	BGroupView(B_VERTICAL),
+	fPulseCount(0)
 {
 	SetFlags(Flags() | B_PULSE_NEEDED);
 

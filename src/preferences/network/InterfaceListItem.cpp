@@ -35,7 +35,12 @@
 InterfaceListItem::InterfaceListItem(const char* name)
 	:
 	BListItem(0, false),
-	fIcon(NULL)
+	fIcon(NULL),
+	fFirstLineOffset(0),
+	fLineOffset(0),
+	fDisabled(false),
+	fHasLink(false),
+	fConnecting(false)
 {
 	fInterface.SetTo(name);
 	_Init();
