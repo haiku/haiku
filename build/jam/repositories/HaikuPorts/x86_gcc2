@@ -68,7 +68,7 @@ RemotePackageRepository HaikuPorts
 	clockwerk-git-3
 	ctags-5.8-3
 	colors-2.3-1
-	coreutils-8.22-2
+	coreutils-8.23-1
 	curl-7.39.0-1
 	curl_devel-7.39.0-1
 	cvs-1.12.13.1-6
