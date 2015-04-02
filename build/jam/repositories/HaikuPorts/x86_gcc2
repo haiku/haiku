@@ -306,6 +306,7 @@ RemotePackageRepository HaikuPorts
 	patch-2.7.5-1
 	pciutils-3.2.1-1
 	pciutils_devel-3.2.1-1
+	pdftranslator-1.0.0-3
 	pe-2.4.5-1
 	pecorename-1.5-3
 	perl-5.18.2-2
@@ -973,6 +974,7 @@ RemotePackageRepository HaikuPorts
 	paladin
 	patch
 	pciutils
+	pdftranslator
 	pe
 	pecorename
 	perl
