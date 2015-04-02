@@ -57,8 +57,8 @@ static const bigtime_t kRosterSanityEventInterval = 1000000LL;
 */
 Registrar::Registrar(status_t* _error)
 	:
-	BServer(kRegistrarSignature, BPrivate::get_roster_port_name(), false,
-		_error),
+	BServer(kRegistrarSignature, BPrivate::get_roster_port_name(), -1,
+		false, _error),
 	fRoster(NULL),
 	fClipboardHandler(NULL),
 	fMIMEManager(NULL),

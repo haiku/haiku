@@ -110,7 +110,7 @@ BLooper::BLooper(const char* name, int32 priority, int32 portCapacity)
 	:
 	BHandler(name)
 {
-	_InitData(name, priority, portCapacity);
+	_InitData(name, priority, -1, portCapacity);
 }
 
 
@@ -183,7 +183,7 @@ BLooper::BLooper(BMessage* data)
 	if (data->FindInt32("_prio", &priority) != B_OK)
 		priority = B_NORMAL_PRIORITY;
 
-	_InitData(Name(), priority, portCapacity);
+	_InitData(Name(), priority, -1, portCapacity);
 }
 
 
@@ -827,9 +827,7 @@ BLooper::operator=(const BLooper& other)
 
 BLooper::BLooper(int32 priority, port_id port, const char* name)
 {
-	// This must be a legacy constructor
-	fMsgPort = port;
-	_InitData(name, priority, B_LOOPER_PORT_DEFAULT_CAPACITY);
+	_InitData(name, priority, port, B_LOOPER_PORT_DEFAULT_CAPACITY);
 }
 
 
@@ -935,7 +933,8 @@ BLooper::_LockComplete(BLooper* looper, int32 oldCount, thread_id thread,
 
 
 void
-BLooper::_InitData(const char* name, int32 priority, int32 portCapacity)
+BLooper::_InitData(const char* name, int32 priority, port_id port,
+	int32 portCapacity)
 {
 	fOwner = B_ERROR;
 	fCachedStack = 0;
@@ -961,7 +960,10 @@ BLooper::_InitData(const char* name, int32 priority, int32 portCapacity)
 	if (portCapacity <= 0)
 		portCapacity = B_LOOPER_PORT_DEFAULT_CAPACITY;
 
-	fMsgPort = create_port(portCapacity, name);
+	if (port >= 0)
+		fMsgPort = port;
+	else
+		fMsgPort = create_port(portCapacity, name);
 
 	fInitPriority = priority;
 

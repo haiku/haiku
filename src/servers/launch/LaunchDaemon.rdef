@@ -1,0 +1,15 @@
+resource app_signature "application/x-vnd.haiku-launch_daemon";
+
+resource app_flags B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP;
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_ALPHA,
+	internal = 0,
+
+	short_info = "launch_daemon",
+	long_info = "launch_daemon ©2015 Haiku Inc."
+};

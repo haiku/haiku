@@ -41,6 +41,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Handler.cpp
 			InitTerminateLibBe.cpp
 			Invoker.cpp
+			LaunchRoster.cpp
 			LinkReceiver.cpp
 			LinkSender.cpp
 			Looper.cpp

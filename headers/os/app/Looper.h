@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -135,14 +135,16 @@ private:
 	static	status_t		_LockComplete(BLooper* loop, int32 old,
 								thread_id this_tid, sem_id sem,
 								bigtime_t timeout);
-			void			_InitData(const char* name, int32 priority, int32 capacity);
+			void			_InitData(const char* name, int32 priority,
+								port_id port, int32 capacity);
 			void			AddMessage(BMessage* msg);
 			void			_AddMessagePriv(BMessage* msg);
 	static	status_t		_task0_(void* arg);
 
 			void*			ReadRawFromPort(int32* code,
-								bigtime_t tout = B_INFINITE_TIMEOUT);
-			BMessage*		ReadMessageFromPort(bigtime_t tout = B_INFINITE_TIMEOUT);
+								bigtime_t timeout = B_INFINITE_TIMEOUT);
+			BMessage*		ReadMessageFromPort(
+								bigtime_t timeout = B_INFINITE_TIMEOUT);
 	virtual	BMessage*		ConvertToMessage(void* raw, int32 code);
 	virtual	void			task_looper();
 			void			_QuitRequested(BMessage* msg);

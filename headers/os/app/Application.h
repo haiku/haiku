@@ -101,7 +101,7 @@ private:
 	friend class BServer;
 
 								BApplication(const char* signature,
-									const char* looperName,
+									const char* looperName, port_id port,
 									bool initGUI, status_t* error);
 								BApplication(uint32 signature);
 								BApplication(const BApplication&);
@@ -121,6 +121,7 @@ private:
 									const char* property);
 			void				_InitData(const char* signature, bool initGUI,
 									status_t* error);
+			port_id				_GetPort(const char* signature);
 			void				BeginRectTracking(BRect r, bool trackWhole);
 			void				EndRectTracking();
 			status_t			_SetupServerAllocator();

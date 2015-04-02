@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src servers launch ;
+
+UsePrivateHeaders app shared ;
+UsePrivateSystemHeaders ;
+
+Server launch_daemon
+	:
+	LaunchDaemon.cpp
+	:
+	be libshared.a [ TargetLibstdc++ ]
+	:
+	LaunchDaemon.rdef
+;

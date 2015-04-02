@@ -40,6 +40,8 @@
 #include <AutoLocker.h>
 #include <BitmapPrivate.h>
 #include <DraggerPrivate.h>
+#include <LaunchDaemonDefs.h>
+#include <LaunchRoster.h>
 #include <LooperList.h>
 #include <MenuWindow.h>
 #include <PicturePrivate.h>
@@ -259,9 +261,10 @@ BApplication::BApplication(const char* signature, status_t* _error)
 
 
 BApplication::BApplication(const char* signature, const char* looperName,
-	bool initGUI, status_t* _error)
+	port_id port, bool initGUI, status_t* _error)
 	:
-	BLooper(looperName != NULL ? looperName : kDefaultLooperName)
+	BLooper(B_NORMAL_PRIORITY + 1, port < 0 ? _GetPort(signature) : port,
+		looperName != NULL ? looperName : kDefaultLooperName)
 {
 	_InitData(signature, initGUI, _error);
 }
@@ -356,8 +359,9 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 	fAppName = signature;
 
 #ifndef RUN_WITHOUT_REGISTRAR
-	bool isRegistrar = signature
-		&& strcasecmp(signature, kRegistrarSignature) == 0;
+	bool registerApp = signature == NULL
+		|| (strcasecmp(signature, kRegistrarSignature) != 0
+			&& strcasecmp(signature, kLaunchDaemonSignature) != 0);
 	// get team and thread
 	team_id team = Team();
 	thread_id thread = BPrivate::main_thread_for(team);
@@ -396,7 +400,7 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 
 #ifndef RUN_WITHOUT_REGISTRAR
 	// check whether be_roster is valid
-	if (fInitError == B_OK && !isRegistrar
+	if (fInitError == B_OK && registerApp
 		&& !BRoster::Private().IsMessengerValid(false)) {
 		printf("FATAL: be_roster is not valid. Is the registrar running?\n");
 		fInitError = B_NO_INIT;
@@ -405,7 +409,7 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 	// check whether or not we are pre-registered
 	bool preRegistered = false;
 	app_info appInfo;
-	if (fInitError == B_OK && !isRegistrar) {
+	if (fInitError == B_OK && registerApp) {
 		if (BRoster::Private().IsAppRegistered(&ref, team, 0, &preRegistered,
 				&appInfo) != B_OK) {
 			preRegistered = false;
@@ -429,8 +433,7 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 	} else if (fInitError == B_OK) {
 		// not pre-registered -- try to register the application
 		team_id otherTeam = -1;
-		// the registrar must not register
-		if (!isRegistrar) {
+		if (registerApp) {
 			fInitError = BRoster::Private().AddApplication(signature, &ref,
 				appFlags, team, thread, fMsgPort, true, NULL, &otherTeam);
 			if (fInitError != B_OK) {
@@ -522,6 +525,22 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 		exit(0);
 	}
 DBG(OUT("BApplication::InitData() done\n"));
+}
+
+
+port_id
+BApplication::_GetPort(const char* signature)
+{
+	BLaunchRoster launchRoster;
+	BMessage data;
+	status_t status = launchRoster.GetData(signature, data);
+	if (status == B_OK) {
+		port_id port = data.GetInt32("port", B_NAME_NOT_FOUND);
+		if (port >= 0)
+			return port;
+	}
+
+	return -1;
 }
 
 
