@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.03.26
-#	Date:    2015-03-26 03:15:02
+#	Version: 2015.04.02
+#	Date:    2015-04-02 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -1067,8 +1067,9 @@
 	4e4a  R360 [Radeon 9800 XXL/XT]
 		1002 4e4a  R360 [Radeon 9800 XT]
 	4e4b  R350 GL [FireGL X2 AGP Pro]
-	4e50  RV350/M10 [Mobility Radeon 9600 PRO Turbo]
+	4e50  RV350/M10 / RV360/M11 [Mobility Radeon 9600 (PRO) / 9700]
 		1025 005a  TravelMate 290
+		1025 0064  Extensa 3000 series laptop: ATI RV360/M11 [Mobility Radeon 9700]
 		103c 088c  NC8000 laptop
 		103c 0890  NC6000 laptop
 		144d c00c  P35 notebook
@@ -5062,16 +5063,19 @@
 	802e  PCI7x20 1394a-2000 OHCI Two-Port PHY/Link-Layer Controller
 		1028 018d  Inspiron 700m/710m
 	8031  PCIxx21/x515 Cardbus Controller
+		1025 0064  Extensa 3000 series laptop
 		1025 0080  Aspire 5024WLMi
 		103c 0934  Compaq nw8240/nx8220
 		103c 099c  NX6110/NC6120
 		103c 308b  MX6125
 	8032  OHCI Compliant IEEE 1394 Host Controller
+		1025 0064  Extensa 3000 series laptop
 		1025 0080  Aspire 5024WLMi
 		103c 0934  Compaq nw8240/nx8220
 		103c 099c  NX6110/NC6120
 		103c 308b  MX6125
 	8033  PCIxx21 Integrated FlashMedia Controller
+		1025 0064  Extensa 3000 series laptop
 		1025 0080  Aspire 5024WLMi
 		103c 0934  Compaq nw8240/nx8220
 		103c 099c  NX6110/NC6120
@@ -9542,6 +9546,8 @@
 		10de 101e  GRID K100
 	0fe9  GK107M [GeForce GT 750M Mac Edition]
 	0fea  GK107M [GeForce GT 755M Mac Edition]
+	0fec  GK107M [GeForce 710A]
+	0fed  GK107M [GeForce 820M]
 	0fef  GK107GL [GRID K340]
 	0ff1  GK107 [NVS 1000]
 	0ff2  GK107GL [GRID K1]
@@ -10040,6 +10046,7 @@
 	11c3  GK106 [GeForce GTX 650 Ti OEM]
 		10de 1030  GeForce GTX 650 Ti OEM
 	11c4  GK106 [GeForce GTX 645 OEM]
+	11c5  GK106 [GeForce GT 740]
 	11c6  GK106 [GeForce GTX 650 Ti]
 	11c7  GK106 [GeForce GTX 750 Ti]
 	11c8  GK106 [GeForce GTX 650 OEM]
@@ -10126,6 +10133,7 @@
 	1296  GK208M [GeForce 825M]
 	1298  GK208M [GeForce GT 720M]
 	1299  GK208M [GeForce 920M]
+	129a  GK208GL [N16V-GL]
 	12a0  GK208
 	12b9  GK208GLM [Quadro K610M]
 	12ba  GK208GLM [Quadro K510M]
@@ -16409,6 +16417,7 @@
 	43ec  BCM4356 802.11ac Wireless Network Adapter
 	4401  BCM4401 100Base-T
 		1025 0035  TravelMate 660
+		1025 0064  Extensa 3000 series laptop
 		103c 08b0  tc1100 tablet
 		1043 80a8  A7V8X motherboard
 	4402  BCM4402 Integrated 10/100BaseT
@@ -19656,6 +19665,7 @@
 	8032  tDVR8032 32-chan video capture card
 5853  XenSource, Inc.
 	0001  Xen Platform Device
+	c000  Citrix XenServer PCI Device for Windows Update
 # Virtual device surfaced in guests to provide HID events.
 	c110  Virtualized HID
 # Device surfaced in guests to provide 2d graphics capabilities
@@ -21347,6 +21357,7 @@
 		103c 192d  561FLR-T 2-port 10Gb Ethernet Adapter
 		103c 2004  Ethernet 10Gb 2-port 561i Adapter
 		103c 211a  Ethernet 10Gb 2-port 561T Adapter
+		108e 4853  Ethernet Controller 10-Gigabit X540-AT2
 		108e 7b14  Sun Dual Port 10 GbE PCIe 2.0 ExpressModule, Base-T
 		108e 7b15  Sun Dual Port 10 GbE PCIe 2.0 Low Profile Adapter, Base-T
 		1137 00bf  Ethernet Converged Network Adapter X540-T2
@@ -21357,6 +21368,7 @@
 		8086 00a2  Ethernet Converged Network Adapter X540-T1
 		8086 1f61  Ethernet 10G 4P X540/I350 rNDC
 		8086 5003  Ethernet 10G 2P X540-t Adapter
+		8086 5004  Ethernet 10G 2P X540-t Adapter
 	1529  82599 10 Gigabit Dual Port Network Connection with FCoE
 	152a  82599 10 Gigabit Dual Port Backplane Connection with FCoE
 	1533  I210 Gigabit Network Connection
@@ -22228,6 +22240,7 @@
 		1014 0267  NetVista A30p
 		1014 052d  ThinkPad
 		1025 005a  TravelMate 290
+		1025 0064  Extensa 3000 series laptop: Intel 82801DBM (ICH4-M)
 		1028 0126  Optiplex GX260
 		1028 0163  Latitude D505
 		1028 018d  Inspiron 700m/710m
@@ -22253,6 +22266,7 @@
 		1014 0267  NetVista A30p
 		1014 052d  ThinkPad
 		1025 005a  TravelMate 290
+		1025 0064  Extensa 3000 series laptop: Intel 82801DBM (ICH4-M)
 		1028 0126  Optiplex GX260
 		1028 014f  Latitude X300
 		1028 018d  Inspiron 700m/710m
@@ -22274,6 +22288,7 @@
 		1014 0267  NetVista A30p
 		1014 052d  ThinkPad
 		1025 005a  TravelMate 290
+		1025 0064  Extensa 3000 series laptop: Intel 82801DBM (ICH4-M)
 		1028 0126  Optiplex GX260
 		1028 0163  Latitude D505
 		1028 018d  Inspiron 700m/710m
@@ -22298,6 +22313,7 @@
 		1014 0537  ThinkPad T4x Series
 		1014 055f  Thinkpad R50e model 1634
 		1025 005a  TravelMate 290
+		1025 0064  Extensa 3000 series laptop: Intel 82801DBM (ICH4-M)
 		1028 0139  Latitude D400
 		1028 014f  Latitude X300
 		1028 0152  Latitude D500
@@ -22324,6 +22340,7 @@
 		1014 0559  ThinkPad R50e
 		1025 003c  Aspire 2001WLCi (Compal CL50 motherboard) implementation
 		1025 005a  TravelMate 290
+		1025 0064  Extensa 3000 series laptop: Intel 82801DBM (ICH4-M)
 		1028 0196  Inspiron 5160
 		103c 088c  NC8000 laptop
 		103c 0890  NC6000 laptop
@@ -22340,6 +22357,7 @@
 		1014 0267  NetVista A30p
 		1014 052d  ThinkPad
 		1025 005a  TravelMate 290
+		1025 0064  Extensa 3000 series laptop: Intel 82801DBM (ICH4-M)
 		1028 0126  Optiplex GX260
 		1028 0163  Latitude D505
 		1028 018d  Inspiron 700m/710m
@@ -22361,6 +22379,7 @@
 	24ca  82801DBM (ICH4-M) IDE Controller
 		1014 052d  ThinkPad
 		1025 005a  TravelMate 290
+		1025 0064  Extensa 3000 series laptop: Intel 82801DBM (ICH4-M)
 		1028 014f  Latitude X300
 		1028 0163  Latitude D505
 		1028 018d  Inspiron 700m/710m
@@ -22391,6 +22410,7 @@
 		1014 0267  NetVista A30p
 		1014 052e  ThinkPad
 		1025 005a  TravelMate 290
+		1025 0064  Extensa 3000 series laptop: Intel 82801DBM (ICH4-M)
 		1028 011d  Latitude D600
 		1028 0126  Optiplex GX260
 		1028 0139  Latitude D400
@@ -24528,6 +24548,7 @@
 	3578  82830M/MG/MP Host Bridge
 	3580  82852/82855 GM/GME/PM/GMV Processor to I/O Controller
 		1014 055c  ThinkPad R50e
+		1025 0064  Extensa 3000 series laptop
 		1028 0139  Latitude D400
 		1028 014f  Latitude X300
 		1028 0152  Latitude D500
@@ -24560,6 +24581,7 @@
 		e4bf 0cd2  CD2-BEBOP
 	3584  82852/82855 GM/GME/PM/GMV Processor to I/O Controller
 		1014 055d  ThinkPad R50e
+		1025 0064  Extensa 3000 series laptop
 		1028 0139  Latitude D400
 		1028 014f  Latitude X300
 		1028 0152  Latitude D500
@@ -24574,6 +24596,7 @@
 		4c53 10e0  PSL09 PrPMC
 	3585  82852/82855 GM/GME/PM/GMV Processor to I/O Controller
 		1014 055e  ThinkPad R50e
+		1025 0064  Extensa 3000 series laptop
 		1028 0139  Latitude D400
 		1028 014f  Latitude X300
 		1028 0152  Latitude D500
@@ -25070,7 +25093,7 @@
 	4220  PRO/Wireless 2200BG [Calexico2] Network Connection
 		103c 0934  Compaq nw8240/nx8220
 		103c 12f6  nc6120/nx8220/nw8240
-		8086 2701  WM3B2300BG Mini-PCI Card
+		8086 2701  WM3B2200BG Mini-PCI Card
 		8086 2712  IBM ThinkPad R50e
 		8086 2721  Dell B130 laptop integrated WLAN
 		8086 2722  Dell Latitude D600
@@ -26484,6 +26507,7 @@ bdbd  Blackmagic Design
 	a130  DeckLink Mini Recorder
 	a132  UltraStudio 4K
 	a138  Decklink SDI 4K
+	a139  Intensity Pro 4K
 c001  TSI Telsys
 c0a9  Micron/Crucial Technology
 c0de  Motorola
