@@ -37,6 +37,8 @@ All rights reserved.
 
 #include "TruncatableMenuItem.h"
 
+#include <StackOrHeapArray.h>
+
 #include <stdlib.h>
 
 #include "BarApp.h"
@@ -100,13 +102,12 @@ TTruncatableMenuItem::Label(float width)
 
 	const char* label = Label();
 	if (width > 0 && maxWidth > 0 && width > maxWidth) {
-		char* truncatedLabel = (char*)malloc(strlen(label) + 4);
-		if (truncatedLabel != NULL) {
+		BStackOrHeapArray<char, 128> truncatedLabel(strlen(label) + 4);
+		if (truncatedLabel.IsValid()) {
 			float labelWidth = menu->StringWidth(label);
 			float offset = width - labelWidth;
 			TruncateLabel(maxWidth - offset, truncatedLabel);
 			fTruncatedString.SetTo(truncatedLabel);
-			free(truncatedLabel);
 			return fTruncatedString.String();
 		}
 	}
