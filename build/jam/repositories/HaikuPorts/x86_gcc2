@@ -162,6 +162,8 @@ RemotePackageRepository HaikuPorts
 	jasper-1.900.1-4
 	jasper_devel-1.900.1-4
 	jasper_tools-1.900.1-4
+	jbig2dec-0.11-2
+	jbig2dec_devel-0.11-2
 	jpeg-9-3
 	jpeg_devel-9-3
 	jpeg_tools-9-3
@@ -839,6 +841,7 @@ RemotePackageRepository HaikuPorts
 	itstool
 	jam
 	jasper
+	jbig2dec
 	jbig2dec_x86
 	jpeg
 	keymapswitcher
