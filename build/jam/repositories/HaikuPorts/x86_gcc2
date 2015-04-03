@@ -297,6 +297,8 @@ RemotePackageRepository HaikuPorts
 	netpulse-0.2.3-4
 	netsurf-3.2-1
 	ocaml-4.02.1-1
+	openjpeg-2.1.0-2
+	openjpeg_devel-2.1.0-2
 	opensound-4.2_git-2
 	openssh-6.6p1-1
 	# sync openssl with secondary architecture (x86)
@@ -966,6 +968,7 @@ RemotePackageRepository HaikuPorts
 	ocp_x86
 	openal_x86
 	openexr_x86
+	openjpeg
 	openjpeg_x86
 	opensound
 	openssh
