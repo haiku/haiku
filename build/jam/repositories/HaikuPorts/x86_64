@@ -162,10 +162,10 @@ RemotePackageRepository HaikuPorts
 	make-3.82-5
 	man-1.6g-4
 	mercurial-2.9.2-1
-	mesa-10.1.1-1
-	mesa_devel-10.1.1-1
-	mesa_swrast-10.1.1-1
-	mesa_swpipe-10.1.1-1
+	mesa-10.5.2-1
+	mesa_devel-10.5.2-1
+	mesa_swrast-10.5.2-1
+	mesa_swpipe-10.5.2-1
 	mkdepend-1.7-3
 	mpg123-1.22.0-1
 	mpg123_devel-1.22.0-1
