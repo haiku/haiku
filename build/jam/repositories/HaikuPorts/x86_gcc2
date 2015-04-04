@@ -112,7 +112,7 @@ RemotePackageRepository HaikuPorts
 	gcal-3.6.3-1
 	gcc-2.95.3_2014_10_14-3
 	gcc_syslibs_devel-2.95.3_2014_10_14-3
-	genesiscommander-0.42-1
+	genesis_commander-0.42-2
 	getconf-r260000-1
 	getopt-1.1.5-1
 	gettext-0.18.1.1-6
@@ -309,7 +309,7 @@ RemotePackageRepository HaikuPorts
 	patch-2.7.5-1
 	pciutils-3.2.1-1
 	pciutils_devel-3.2.1-1
-	pdftranslator-1.0.0-3
+	pdftranslator-1.0.1-3
 	pe-2.4.5-1
 	pecorename-1.5-3
 	perl-5.18.2-2
