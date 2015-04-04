@@ -252,7 +252,7 @@ guarded_heap_free_page(guarded_heap_area& area, size_t pageIndex,
 static void
 guarded_heap_pages_allocated(guarded_heap& heap, size_t pagesAllocated)
 {
-	atomic_add((vint32*)&heap.used_pages, pagesAllocated);
+	atomic_add((int32*)&heap.used_pages, pagesAllocated);
 }
 
 
@@ -529,7 +529,7 @@ guarded_heap_area_free(guarded_heap_area& area, void* address)
 
 	if (area.heap->reuse_memory) {
 		area.used_pages -= pagesFreed;
-		atomic_add((vint32*)&area.heap->used_pages, -pagesFreed);
+		atomic_add((int32*)&area.heap->used_pages, -pagesFreed);
 	}
 
 	return true;
