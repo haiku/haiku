@@ -380,14 +380,14 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_PACKAGE_SELECTED:
 		{
-			BString title;
-			if (message->FindString("title", &title) == B_OK) {
+			BString name;
+			if (message->FindString("name", &name) == B_OK) {
 				BAutolock locker(fModel.Lock());
 				int count = fVisiblePackages.CountItems();
 				for (int i = 0; i < count; i++) {
 					const PackageInfoRef& package
 						= fVisiblePackages.ItemAtFast(i);
-					if (package.Get() != NULL && package->Title() == title) {
+					if (package.Get() != NULL && package->Name() == name) {
 						locker.Unlock();
 						_AdoptPackage(package);
 						break;
@@ -864,7 +864,7 @@ MainWindow::_RefreshPackageList(bool force)
 		if (dynamic_cast<BPackageManager::RemoteRepository*>(repository)
 				!= NULL) {
 			depots[repository->Name()].AddPackage(modelInfo);
-			remotePackages[modelInfo->Title()] = modelInfo;
+			remotePackages[modelInfo->Name()] = modelInfo;
 		} else {
 			if (repository == static_cast<const BSolverRepository*>(
 					manager.SystemRepository())) {

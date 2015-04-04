@@ -621,7 +621,7 @@ private:
 		if (result != B_OK) {
 			fprintf(stderr, "Failed to schedule action: "
 				"%s '%s': %s\n", action->Label(),
-				action->Package()->Title().String(),
+				action->Package()->Name().String(),
 				strerror(result));
 			BString message(B_TRANSLATE("The package action "
 				"could not be scheduled: %Error%"));
@@ -1397,25 +1397,27 @@ PackageInfoView::MessageReceived(BMessage* message)
 			if (fPackageListener->Package().Get() == NULL)
 				break;
 
-			BString title;
+			BString name;
 			uint32 changes;
-			if (message->FindString("title", &title) != B_OK
+			if (message->FindString("name", &name) != B_OK
 				|| message->FindUInt32("changes", &changes) != B_OK) {
 				break;
 			}
 
 			const PackageInfoRef& package = fPackageListener->Package();
-			if (package->Title() != title)
+			if (package->Name() != name)
 				break;
 
 			BAutolock _(fModelLock);
 
-			if ((changes & PKG_CHANGED_DESCRIPTION) != 0
+			if ((changes & PKG_CHANGED_SUMMARY) != 0
+				|| (changes & PKG_CHANGED_DESCRIPTION) != 0
 				|| (changes & PKG_CHANGED_SCREENSHOTS) != 0) {
 				fPagesView->SetPackage(package, false);
 			}
 
-			if ((changes & PKG_CHANGED_RATINGS) != 0) {
+			if ((changes & PKG_CHANGED_TITLE) != 0
+				|| (changes & PKG_CHANGED_RATINGS) != 0) {
 				fPagesView->SetPackage(package, false);
 				fTitleView->SetPackage(*package.Get());
 			}
@@ -1449,7 +1451,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 		// don't switch to the default tab.
 		switchToDefaultTab = false;
 	} else if (fPackage.Get() != NULL && packageRef.Get() != NULL
-		&& fPackage->Title() == packageRef->Title()) {
+		&& fPackage->Name() == packageRef->Name()) {
 		// When asked to display a different PackageInfo instance,
 		// but it has the same package title as the already showing
 		// instance, this probably means there was a repository

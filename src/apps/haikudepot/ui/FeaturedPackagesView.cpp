@@ -141,7 +141,7 @@ public:
 		
 		if (bounds.Contains(where) && Window()->IsActive()) {
 			BMessage message(MSG_PACKAGE_SELECTED);
-			message.AddString("title", PackageTitle());
+			message.AddString("name", PackageName());
 			Window()->PostMessage(&message);
 		}
 	}
@@ -214,6 +214,14 @@ public:
 		return fTitleView->Text();
 	}
 
+	const char* PackageName() const
+	{
+		if (fPackageListener->Package().Get() != NULL)
+			return fPackageListener->Package()->Name();
+		else
+			return "";
+	}
+
 	void SetSelected(bool selected)
 	{
 		if (fSelected == selected)
@@ -264,6 +272,7 @@ private:
 
 	bool							fSelected;
 
+	BString							fPackageName;
 };
 
 
@@ -310,12 +319,13 @@ FeaturedPackagesView::AddPackage(const PackageInfoRef& package)
 		if (view == NULL)
 			break;
 
-		BString title = view->PackageTitle();
-		if (title == package->Title()) {
+		BString name = view->PackageName();
+		if (name == package->Name()) {
 			// Don't add packages more than once
 			return;
 		}
 
+		BString title = view->PackageTitle();
 		if (title.Compare(package->Title()) < 0)
 			index++;
 	}
@@ -336,8 +346,8 @@ FeaturedPackagesView::RemovePackage(const PackageInfoRef& package)
 		if (view == NULL)
 			break;
 
-		BString title = view->PackageTitle();
-		if (title == package->Title()) {
+		BString name = view->PackageName();
+		if (name == package->Name()) {
 			view->RemoveSelf();
 			delete view;
 			break;
@@ -363,17 +373,17 @@ FeaturedPackagesView::Clear()
 void
 FeaturedPackagesView::SelectPackage(const PackageInfoRef& package)
 {
-	BString selectedTitle;
+	BString selectedName;
 	if (package.Get() != NULL)
-		selectedTitle = package->Title();
+		selectedName = package->Name();
 	
 	for (int32 i = 0; BLayoutItem* item = fPackageListLayout->ItemAt(i); i++) {
 		PackageView* view = dynamic_cast<PackageView*>(item->View());
 		if (view == NULL)
 			break;
 
-		BString title = view->PackageTitle();
-		view->SetSelected(title == selectedTitle);
+		BString name = view->PackageName();
+		view->SetSelected(name == selectedName);
 	}
 }
 

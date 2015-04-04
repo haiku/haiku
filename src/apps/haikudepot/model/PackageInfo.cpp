@@ -455,6 +455,7 @@ PackageInfo::sDefaultIcon(new(std::nothrow) SharedBitmap(
 PackageInfo::PackageInfo()
 	:
 	fIcon(sDefaultIcon),
+	fName(),
 	fTitle(),
 	fVersion(),
 	fPublisher(),
@@ -480,7 +481,8 @@ PackageInfo::PackageInfo()
 PackageInfo::PackageInfo(const BPackageInfo& info)
 	:
 	fIcon(sDefaultIcon),
-	fTitle(info.Name()),
+	fName(info.Name()),
+	fTitle(),
 	fVersion(info.Version()),
 	fPublisher(),
 	fShortDescription(info.Summary()),
@@ -514,13 +516,14 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 }
 
 
-PackageInfo::PackageInfo(const BString& title,
+PackageInfo::PackageInfo(const BString& name,
 		const BPackageVersion& version, const PublisherInfo& publisher,
 		const BString& shortDescription, const BString& fullDescription,
 		int32 flags, const char* architecture)
 	:
 	fIcon(sDefaultIcon),
-	fTitle(title),
+	fName(name),
+	fTitle(),
 	fVersion(version),
 	fPublisher(publisher),
 	fShortDescription(shortDescription),
@@ -546,6 +549,7 @@ PackageInfo::PackageInfo(const BString& title,
 PackageInfo::PackageInfo(const PackageInfo& other)
 	:
 	fIcon(other.fIcon),
+	fName(other.fName),
 	fTitle(other.fTitle),
 	fVersion(other.fVersion),
 	fPublisher(other.fPublisher),
@@ -574,6 +578,7 @@ PackageInfo&
 PackageInfo::operator=(const PackageInfo& other)
 {
 	fIcon = other.fIcon;
+	fName = other.fName;
 	fTitle = other.fTitle;
 	fVersion = other.fVersion;
 	fPublisher = other.fPublisher;
@@ -603,6 +608,7 @@ bool
 PackageInfo::operator==(const PackageInfo& other) const
 {
 	return fIcon == other.fIcon
+		&& fName == other.fName
 		&& fTitle == other.fTitle
 		&& fVersion == other.fVersion
 		&& fPublisher == other.fPublisher
@@ -629,6 +635,23 @@ bool
 PackageInfo::operator!=(const PackageInfo& other) const
 {
 	return !(*this == other);
+}
+
+
+void
+PackageInfo::SetTitle(const BString& title)
+{
+	if (fTitle != title) {
+		fTitle = title;
+		_NotifyListeners(PKG_CHANGED_TITLE);
+	}
+}
+
+
+const BString&
+PackageInfo::Title() const
+{
+	return fTitle.Length() > 0 ? fTitle : fName;
 }
 
 
@@ -1005,9 +1028,9 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 		bool found = false;
 		for (int32 j = packages.CountItems() - 1; j >= 0; j--) {
 			const PackageInfoRef& package = packages.ItemAtFast(j);
-			if (package->Title() == otherPackage->Title()) {
+			if (package->Name() == otherPackage->Name()) {
 //				printf("%s: found package: '%s'\n", fName.String(),
-//					package->Title().String());
+//					package->Name().String());
 				package->SetState(otherPackage->State());
 				package->SetLocalFilePath(otherPackage->LocalFilePath());
 				package->SetSystemDependency(
@@ -1019,7 +1042,7 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 		}
 		if (!found) {
 			printf("%s: new package: '%s'\n", fName.String(),
-				otherPackage->Title().String());
+				otherPackage->Name().String());
 			fPackages.Add(otherPackage);
 		}
 	}
@@ -1027,7 +1050,7 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 	for (int32 i = packages.CountItems() - 1; i >= 0; i--) {
 		const PackageInfoRef& package = packages.ItemAtFast(i);
 		printf("%s: removing package: '%s'\n", fName.String(),
-			package->Title().String());
+			package->Name().String());
 		fPackages.Remove(package);
 	}
 }

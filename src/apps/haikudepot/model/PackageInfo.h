@@ -241,7 +241,7 @@ public:
 								PackageInfo();
 								PackageInfo(const BPackageInfo& info);
 								PackageInfo(
-									const BString& title,
+									const BString& name,
 									const BPackageVersion& version,
 									const PublisherInfo& publisher,
 									const BString& shortDescription,
@@ -254,8 +254,10 @@ public:
 			bool				operator==(const PackageInfo& other) const;
 			bool				operator!=(const PackageInfo& other) const;
 
-			const BString&		Title() const
-									{ return fTitle; }
+			const BString&		Name() const
+									{ return fName; }
+			void				SetTitle(const BString& title);
+			const BString&		Title() const;
 			const BPackageVersion& Version() const
 									{ return fVersion; }
 			void				SetShortDescription(const BString& description);
@@ -346,6 +348,7 @@ private:
 
 private:
 			BitmapRef			fIcon;
+			BString				fName;
 			BString				fTitle;
 			BPackageVersion		fVersion;
 			PublisherInfo		fPublisher;

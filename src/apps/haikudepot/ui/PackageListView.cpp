@@ -163,7 +163,7 @@ public:
 		const PackageInfo& package = *event.Package().Get();
 
 		BMessage message(MSG_UPDATE_PACKAGE);
-		message.AddString("title", package.Title());
+		message.AddString("name", package.Name());
 		message.AddUInt32("changes", event.Changes());
 
 		messenger.SendMessage(&message);
@@ -682,16 +682,18 @@ PackageListView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_UPDATE_PACKAGE:
 		{
-			BString title;
+			BString name;
 			uint32 changes;
-			if (message->FindString("title", &title) != B_OK
+			if (message->FindString("name", &name) != B_OK
 				|| message->FindUInt32("changes", &changes) != B_OK) {
 				break;
 			}
 
 			BAutolock _(fModelLock);
-			PackageRow* row = _FindRow(title);
+			PackageRow* row = _FindRow(name);
 			if (row != NULL) {
+				if ((changes & PKG_CHANGED_TITLE) != 0)
+					row->UpdateTitle();
 				if ((changes & PKG_CHANGED_SUMMARY) != 0)
 					row->UpdateSummary();
 				if ((changes & PKG_CHANGED_RATINGS) != 0)
@@ -720,7 +722,7 @@ PackageListView::SelectionChanged()
 
 	PackageRow* selected = dynamic_cast<PackageRow*>(CurrentSelection());
 	if (selected != NULL)
-		message.AddString("title", selected->Package()->Title());
+		message.AddString("name", selected->Package()->Name());
 
 	Window()->PostMessage(&message);
 }
@@ -807,17 +809,17 @@ PackageListView::_FindRow(const PackageInfoRef& package, PackageRow* parent)
 
 
 PackageRow*
-PackageListView::_FindRow(const BString& packageTitle, PackageRow* parent)
+PackageListView::_FindRow(const BString& packageName, PackageRow* parent)
 {
 	for (int32 i = CountRows(parent) - 1; i >= 0; i--) {
 		PackageRow* row = dynamic_cast<PackageRow*>(RowAt(i, parent));
 		if (row != NULL && row->Package().Get() != NULL
-			&& row->Package()->Title() == packageTitle) {
+			&& row->Package()->Name() == packageName) {
 			return row;
 		}
 		if (CountRows(row) > 0) {
 			// recurse into child rows
-			row = _FindRow(packageTitle, row);
+			row = _FindRow(packageName, row);
 			if (row != NULL)
 				return row;
 		}

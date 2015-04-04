@@ -287,7 +287,7 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 		return;
 
 //	printf("PackageContentsView::SetPackage(%s)\n",
-//		package.Get() != NULL ? package->Title().String() : "NULL");
+//		package.Get() != NULL ? package->Name().String() : "NULL");
 
 	Clear();
 

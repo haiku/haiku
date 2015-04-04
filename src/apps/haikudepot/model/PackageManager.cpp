@@ -134,7 +134,7 @@ public:
 		if (ref->IsLocalFile())
 			packageName = ref->LocalFilePath();
 		else
-			packageName = ref->Title();
+			packageName = ref->Name();
 
 		const char* packageNameString = packageName.String();
 		try {
@@ -242,7 +242,7 @@ public:
 		PackageInfoRef ref(Package());
 		fPackageManager->SetCurrentActionPackage(ref, false);
 		fPackageManager->AddProgressListener(this);
-		const char* packageName = ref->Title().String();
+		const char* packageName = ref->Name().String();
 		try {
 			fPackageManager->Uninstall(&packageName, 1);
 		} catch (BFatalErrorException ex) {
@@ -813,12 +813,11 @@ PackageManager::_GetSolverPackage(PackageInfoRef package)
 		flags |= BSolver::B_FIND_INSTALLED_ONLY;
 
 	BObjectList<BSolverPackage> packages;
-	status_t result = Solver()->FindPackages(package->Title(),
-		flags, packages);
+	status_t result = Solver()->FindPackages(package->Name(), flags, packages);
 	if (result == B_OK) {
 		for (int32 i = 0; i < packages.CountItems(); i++) {
 			BSolverPackage* solverPackage = packages.ItemAt(i);
-			if (solverPackage->Name() != package->Title())
+			if (solverPackage->Name() != package->Name())
 				continue;
 			else if (package->State() == NONE
 				&& dynamic_cast<BPackageManager::RemoteRepository*>(

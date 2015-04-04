@@ -410,7 +410,7 @@ RatePackageWindow::_QueryRatingThread()
 	BMessage info;
 
 	status_t status = interface.RetrieveUserRating(
-		package->Title(), package->Version(), package->Architecture(),
+		package->Name(), package->Version(), package->Architecture(),
 		username, info);
 
 //	info.PrintToStream();
@@ -489,7 +489,7 @@ RatePackageWindow::_SendRatingThread()
 		return;
 	}
 
-	BString package = fPackage->Title();
+	BString package = fPackage->Name();
 	BString architecture = fPackage->Architecture();
 	int rating = (int)fRating;
 	BString stability = fStability;

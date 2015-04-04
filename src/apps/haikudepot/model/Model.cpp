@@ -174,7 +174,7 @@ public:
 		if (package.Get()==NULL)
 			return false;
 
-		printf("TEST %s\n", package->Title().String());
+		printf("TEST %s\n", package->Name().String());
 
 		for (int32 i = 0; i < fPackageLists.CountItems(); i++) {
 			if (fPackageLists.ItemAtFast(i)->Contains(package)) {
@@ -235,7 +235,8 @@ public:
 		// Every search term must be found in one of the package texts
 		for (int32 i = fSearchTerms.CountItems() - 1; i >= 0; i--) {
 			const BString& term = fSearchTerms.ItemAtFast(i);
-			if (!_TextContains(package->Title(), term)
+			if (!_TextContains(package->Name(), term)
+				&& !_TextContains(package->Title(), term)
 				&& !_TextContains(package->Publisher().Name(), term)
 				&& !_TextContains(package->ShortDescription(), term)
 				&& !_TextContains(package->FullDescription(), term)) {
@@ -288,7 +289,7 @@ public:
 static inline bool
 is_source_package(const PackageInfoRef& package)
 {
-	const BString& packageName = package->Title();
+	const BString& packageName = package->Name();
 	return packageName.EndsWith("_source");
 }
 
@@ -296,7 +297,7 @@ is_source_package(const PackageInfoRef& package)
 static inline bool
 is_develop_package(const PackageInfoRef& package)
 {
-	const BString& packageName = package->Title();
+	const BString& packageName = package->Name();
 	return packageName.EndsWith("_devel");
 }
 
@@ -662,7 +663,7 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 		BString architecture;	
 		{
 			BAutolock locker(&fLock);
-			packageName = package->Title();
+			packageName = package->Name();
 			architecture = package->Architecture();
 		}
 	
@@ -903,7 +904,7 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 				break;
 			const PackageInfoRef& package = packagesWithIconsList.ItemAtFast(i);
 			printf("Getting/Updating native icon for %s\n",
-				package->Title().String());
+				package->Name().String());
 			_PopulatePackageIcon(package, fromCacheOnly);
 		}
 	}
@@ -963,7 +964,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 
 		BFile file;
 		BPath path;
-		BString name(package->Title());
+		BString name(package->Name());
 		name << ".info";
 		if (_GetCacheFile(path, file, B_USER_CACHE_DIRECTORY,
 			"HaikuDepot", name, fromCacheOnly, 60 * 60)) {
@@ -988,7 +989,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 	StringList packageArchitectures;
 	for (int i = 0; i < packages.CountItems(); i++) {
 		const PackageInfoRef& package = packages.ItemAtFast(i);
-		packageNames.Add(package->Title());
+		packageNames.Add(package->Name());
 		packageArchitectures.Add(package->Architecture());
 	}
 
@@ -1019,7 +1020,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 				bool found = false;
 				for (int i = 0; i < packages.CountItems(); i++) {
 					const PackageInfoRef& package = packages.ItemAtFast(i);
-					if (pkgName == package->Title()) {
+					if (pkgName == package->Name()) {
 						_PopulatePackageInfo(package, pkgInfo);
 						if (_HasNativeIcon(pkgInfo))
 							packagesWithIcons.Add(package);
@@ -1027,7 +1028,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 						// Store in cache
 						BFile file;
 						BPath path;
-						BString fileName(package->Title());
+						BString fileName(package->Name());
 						fileName << ".info";
 						if (_GetCacheFile(path, file, B_USER_CACHE_DIRECTORY,
 								"HaikuDepot", fileName,
@@ -1070,7 +1071,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 	if (packages.CountItems() > 0) {
 		for (int i = 0; i < packages.CountItems(); i++) {
 			const PackageInfoRef& package = packages.ItemAtFast(i);
-			printf("No package info for %s\n", package->Title().String());
+			printf("No package info for %s\n", package->Name().String());
 		}
 	}
 }
@@ -1085,7 +1086,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
 	// Retrieve info from web-app
 	BMessage info;
 
-	status_t status = fWebAppInterface.RetrievePackageInfo(package->Title(),
+	status_t status = fWebAppInterface.RetrievePackageInfo(package->Name(),
 		package->Architecture(), info);
 	if (status == B_OK) {
 		// Parse message
@@ -1112,6 +1113,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 	BAutolock locker(&fLock);
 
 	BString foundInfo;
+	data.PrintToStream();
 
 	BMessage versions;
 	if (data.FindMessage("versions", &versions) == B_OK) {
@@ -1123,13 +1125,12 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 			BMessage version;
 			if (versions.FindMessage(name, &version) != B_OK)
 				break;
-			BString languageCode;
-			if (version.FindString("naturalLanguageCode",
-					&languageCode) != B_OK 
-				|| languageCode != fPreferredLanguage) {
-				continue;
-			}
 
+			BString title;
+			if (version.FindString("title", &title) == B_OK) {
+				package->SetTitle(title);
+				append_word_list(foundInfo, "title");
+			}
 			BString summary;
 			if (version.FindString("summary", &summary) == B_OK) {
 				package->SetShortDescription(summary);
@@ -1217,7 +1218,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 	
 	if (foundInfo.Length() > 0) {
 		printf("Populated package info for %s: %s\n",
-			package->Title().String(), foundInfo.String());
+			package->Name().String(), foundInfo.String());
 	}
 
 	// If the user already clicked this package, remove it from the
@@ -1234,7 +1235,7 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 	// See if there is a cached icon file
 	BFile iconFile;
 	BPath iconCachePath;
-	BString iconName(package->Title());
+	BString iconName(package->Name());
 	iconName << ".hvif";
 	if (_GetCacheFile(iconCachePath, iconFile, B_USER_CACHE_DIRECTORY,
 		"HaikuDepot", iconName, fromCacheOnly, 60 * 60)) {
@@ -1251,7 +1252,7 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 	// Retrieve icon from web-app
 	BMallocIO buffer;
 
-	status_t status = fWebAppInterface.RetrievePackageIcon(package->Title(),
+	status_t status = fWebAppInterface.RetrievePackageIcon(package->Name(),
 		&buffer);
 	if (status == B_OK) {
 		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
