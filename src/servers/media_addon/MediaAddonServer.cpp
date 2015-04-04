@@ -335,11 +335,11 @@ MediaAddonServer::QuitRequested()
 		fSystemTimeSource = NULL;
 	}
 
-	BMediaRoster::CurrentRoster()->Lock();
-	BMediaRoster::CurrentRoster()->Quit();
-
 	for (iterator = fInfoMap.begin(); iterator != fInfoMap.end(); iterator++)
 		_PutAddonIfPossible(iterator->second);
+
+	BMediaRoster::CurrentRoster()->Lock();
+	BMediaRoster::CurrentRoster()->Quit();
 
 	return true;
 }
