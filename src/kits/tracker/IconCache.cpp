@@ -1408,13 +1408,13 @@ SharedIconCache::SharedIconCache()
 	:
 #if DEBUG
 	SimpleIconCache("Shared icon cache aka \"The Dead-Locker\""),
-	fHashTable(20),
 	fElementArray(20),
+	fHashTable(20),
 	fRetiredBitmaps(20, true)
 #else
 	SimpleIconCache("Tracker shared icon cache"),
-	fHashTable(1000),
 	fElementArray(1024),
+	fHashTable(1000),
 	fRetiredBitmaps(256, true)
 #endif
 {
@@ -1765,12 +1765,12 @@ NodeIconCache::NodeIconCache()
 	:
 #if DEBUG
 	SimpleIconCache("Node icon cache aka \"The Dead-Locker\""),
-	fHashTable(20),
-	fElementArray(20)
+	fElementArray(20),
+	fHashTable(20)
 #else
 	SimpleIconCache("Tracker node icon cache"),
-	fHashTable(100),
-	fElementArray(100)
+	fElementArray(100),
+	fHashTable(100)
 #endif
 {
 	fHashTable.SetElementVector(&fElementArray);
