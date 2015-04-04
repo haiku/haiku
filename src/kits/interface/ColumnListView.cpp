@@ -2739,6 +2739,9 @@ TitleView::MouseDown(BPoint position)
 				&& (fColumnFlags & B_ALLOW_COLUMN_RESIZE) != 0) {
 
 				int32 clicks = 0;
+				fSelectedColumn = column;
+				fSelectedColumnRect.Set(leftEdge, 0, rightEdge,
+					fVisibleRect.Height());
 				Window()->CurrentMessage()->FindInt32("clicks", &clicks);
 				if (clicks == 2 || buttons == B_TERTIARY_MOUSE_BUTTON) {
 					ResizeSelectedColumn(position, true);
@@ -2746,9 +2749,6 @@ TitleView::MouseDown(BPoint position)
 					break;
 				}
 				fCurrentState = RESIZING_COLUMN;
-				fSelectedColumn = column;
-				fSelectedColumnRect.Set(leftEdge, 0, rightEdge,
-					fVisibleRect.Height());
 				fClickPoint = BPoint(position.x - rightEdge - 1,
 					position.y - fSelectedColumnRect.top);
 				SetMouseEventMask(B_POINTER_EVENTS,
