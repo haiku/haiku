@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	2839813274
+1	english	x-vnd.Haiku-MediaPlayer	3890917719
 raw audio	MediaPlayer-InfoWin		原生音频
 Location	MediaPlayer-InfoWin		位置
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
@@ -140,7 +140,6 @@ Gets the duration of the currently playing item in microseconds.	MediaPlayer-Mai
 ToggleFullscreen	MediaPlayer-Main		全屏切换。
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{单声道} =2{立体声} other{# 多声道}}
 <unnamed>	PlaylistItem-name		<未命名>
-Open Clips	MediaPlayer-Main		打开片段
 OK	MediaPlayer-PlaylistWindow		确定
 none	Audio track menu		无
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		设置音量为（0.0-2.0）。

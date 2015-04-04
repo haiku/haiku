@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	2839813274
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	3890917719
 raw audio	MediaPlayer-InfoWin		áudio não processado
 Location	MediaPlayer-InfoWin		Local
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -140,7 +140,6 @@ Gets the duration of the currently playing item in microseconds.	MediaPlayer-Mai
 ToggleFullscreen	MediaPlayer-Main		Alternar para Tela Cheia
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Estéreo} outros{# Canais}}
 <unnamed>	PlaylistItem-name		<sem nome>
-Open Clips	MediaPlayer-Main		Clipes Abertos
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		nenhum
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obtém/define o volume (0.0-2.0).

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	98667844
+1	lithuanian	x-vnd.Haiku-MediaPlayer	1149772289
 raw audio	MediaPlayer-InfoWin		neapdorotas garso įrašas
 Location	MediaPlayer-InfoWin		Vieta
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikietiškas)
@@ -138,7 +138,6 @@ Toggle fullscreen.	MediaPlayer-Main		Įjungti / išjungti viso ekrano veikseną.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Gauna šiuo metu atkuriamo įrašo trukmę mikrosekundėmis.
 ToggleFullscreen	MediaPlayer-Main		ToggleFullscreen
 <unnamed>	PlaylistItem-name		<be pavadinimo>
-Open Clips	MediaPlayer-Main		Atverti įrašus
 OK	MediaPlayer-PlaylistWindow		Gerai
 none	Audio track menu		nėra
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Gauna / nustato garsumą (0.0-2.0).

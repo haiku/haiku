@@ -1,7 +1,33 @@
-1	hungarian	x-vnd.Haiku-Network	3077078267
+1	hungarian	x-vnd.Haiku-Network	950262959
+Static	IntefaceAddressView		Állandó
 EAP	EAP protected network		EAP
+Services	NetworkWindow		Szolgáltatások
 WPA2	WPA2 protected network		WPA2
+The netmask defines your local network	IntefaceAddressView		A hálózati masz határozza meg a helyi hálózatot
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Network	NetworkWindow		Hálózat
+Show network status in Deskbar	NetworkWindow		A felület megjelenítése az Asztalsávon
+The method for obtaining an IP address	IntefaceAddressView		Az IP-cím megszerzésének módja
+Dial Up	NetworkWindow		Betárcsázó
+Apply	IntefaceAddressView		Alkalmaz
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		A Hálózat állapot telepítése az Asztalsávra sikertelen: %s
+Disabled	IntefaceAddressView		Letiltva
+Ok	NetworkWindow		Rendben
+launch error	NetworkWindow		indítási hiba
+Other	NetworkWindow		Egyéb
+Automatic	IntefaceAddressView		Automatikus
+Gateway:	IntefaceAddressView		Átjáró:
+Revert	NetworkWindow		Visszaállít
+Enable	ServiceView		Engedélyezés
+Your gateway to the internet	IntefaceAddressView		Az átjáró az internetre
+New…	NetworkWindow		Új…
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Mód:
 WPA	WPA protected network		WPA
 open	Open network		titkosítatlan
+IP Address:	IntefaceAddressView		IP-cím:
+Netmask:	IntefaceAddressView		Hálózati maszk:
+Disable	ServiceView		Letiltás
+Your IP address	IntefaceAddressView		Az Ön IP-címe
+Manage…	NetworkWindow		Kezelés…
 WEP	WEP protected network		WEP

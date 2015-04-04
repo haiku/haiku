@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	235954604
+1	polish	x-vnd.Haiku-Terminal	2918699501
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz terminal
 Change directory	Terminal TermView		Zmień folder
@@ -34,6 +34,7 @@ Settings	Terminal TermWindow		Ustawienia
 Window size	Terminal TermWindow		Rozmiar okna
 Selected text	Terminal AppearancePrefView		Zaznaczony tekst
 Find	Terminal FindWindow		Znajdź
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Szablon określający tytuły okien. Znaczenie poszczególnych symboli jest następujące:
 Appearance	Terminal PrefWindow		Wygląd
 Tab title:	Terminal AppearancePrefView		Tytuł karty:
 OK	Terminal SetTitleWindow		OK
@@ -76,6 +77,7 @@ Midnight	Terminal colors scheme		O północy
 Decrease	Terminal TermWindow		Zmniejsz
 Default	Terminal colors scheme		Domyślny
 Create link here	Terminal TermView		Utwórz link tutaj
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Szablon określający tytuły zakładek. Następujące symbole mogą\nzostać użyte:
 Close	Terminal TermWindow		Zamknij
 Text	Terminal AppearancePrefView		Tekst
 Clear all	Terminal TermWindow		Wyczyść wszystko

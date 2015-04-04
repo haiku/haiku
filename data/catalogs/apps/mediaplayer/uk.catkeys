@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	98667844
+1	ukrainian	x-vnd.Haiku-MediaPlayer	1149772289
 raw audio	MediaPlayer-InfoWin		raw аудіо
 Location	MediaPlayer-InfoWin		Шлях
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
@@ -138,7 +138,6 @@ Toggle fullscreen.	MediaPlayer-Main		Перемкнути у повноекра�
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Отримати тривалість фрагменту, що відтворюється в мілісекундах. 
 ToggleFullscreen	MediaPlayer-Main		Переключити у повноекранний режим
 <unnamed>	PlaylistItem-name		<неназваний>
-Open Clips	MediaPlayer-Main		Відкрити Кліпи
 OK	MediaPlayer-PlaylistWindow		Гаразд
 none	Audio track menu		нічого
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Отримання/встановлення гучності (0.0-2.0).

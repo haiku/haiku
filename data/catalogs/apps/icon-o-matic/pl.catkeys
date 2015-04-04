@@ -146,7 +146,7 @@ Error: 	Icon-O-Matic-Exporter		Błąd:
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Dodanie transformatorów
 Diamond	Icon-O-Matic-StyleTypes		Diament
 Path	Icon-O-Matic-PropertyNames		Ścieżka
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nie udało się otworzyć pliku '%s' jako dokument SVG.\n\nBłąd: %s
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nie udało się otworzyć pliku „%s” jako dokument SVG.\n\nBłąd: %s
 Swatches	Icon-O-Matic-Menus		Próbki
 <unavailable>	Icon-O-Matic-StyleTypes		<niedostępny>
 Rotation	Icon-O-Matic-PropertyNames		Obrót

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	954841528
+1	swedish	x-vnd.Haiku-MediaPlayer	2005945973
 raw audio	MediaPlayer-InfoWin		raw-ljud
 Location	MediaPlayer-InfoWin		Plats
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -139,7 +139,6 @@ Gets the duration of the currently playing item in microseconds.	MediaPlayer-Mai
 ToggleFullscreen	MediaPlayer-Main		Växla helskärmsläge
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Kanaler}}
 <unnamed>	PlaylistItem-name		<odöpt>
-Open Clips	MediaPlayer-Main		Öppna klipp
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		ingen
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Hämta/sätt volymen (0.0-2.0)

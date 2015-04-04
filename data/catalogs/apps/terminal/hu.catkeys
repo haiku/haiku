@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	2090807552
+1	hungarian	x-vnd.Haiku-Terminal	2696855708
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -107,6 +107,7 @@ Copy link location	Terminal TermView		Hivatkozás másolása
 Tab title:	Terminal TermWindow		Lap címe:
 Find next	Terminal TermWindow		Következő keresése
 Close active tab	Terminal TermWindow		Aktív lap bezárása
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t'%' karakter.\n\t%<\t-\tEgy szakasz kezdete, ami akkor jelenik meg, ha az utána lévő helykitöltő nem üres.\n\t%>\t-\tEgy szakasz kezdete, ami akkor jelenik meg, ha az előző %< szakasz és a jelenlegi nem üres.\n\t%-\t-\tEgy %< vagy %> szakasz vége.\n\n Bármi más karakter a '%' jel és a formázási karakter között csak egy szóközt fog beilleszteni,\n ha a helykitöltő értéke nem üres. A %< szakaszhoz kerül hozzáadásra.
 Paste	Terminal TermWindow		Beillesztés
 Shell 	Terminal TermWindow		Shell
 Cancel	Terminal TermView		Mégse

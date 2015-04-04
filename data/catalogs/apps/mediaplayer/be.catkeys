@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	98667844
+1	belarusian	x-vnd.Haiku-MediaPlayer	1149772289
 raw audio	MediaPlayer-InfoWin		нефарматаване аўдыё
 Location	MediaPlayer-InfoWin		Месцазнаходжанне
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
@@ -138,7 +138,6 @@ Toggle fullscreen.	MediaPlayer-Main		Пераключыць поўны экра�
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Узяць працягласьць бягучага элемента ў мікрасекундах.
 ToggleFullscreen	MediaPlayer-Main		ПераключыцьПоўныЭкран
 <unnamed>	PlaylistItem-name		<неназваны>
-Open Clips	MediaPlayer-Main		Адкрыць Кліпы
 OK	MediaPlayer-PlaylistWindow		ОК
 none	Audio track menu		няма
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Вызначае/прызначае гучнасць (0.0-2.0).

@@ -119,7 +119,7 @@ Send message	Mail		Wyślij wiadomość
 Remove enclosure	Mail		Usuń załącznik
 Account:	Mail		Konto:
 Decoding:	Mail		Dekodowanie:
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Przepraszamy, nie można znaleźć aplikacji która wspiera typ danych "Osoba".
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Przepraszamy, nie można znaleźć aplikacji która wspiera typ danych „Osoba”.
 Delete	Mail		Usuń
 Don't send	Mail		Nie wysyłaj
 Leave as '%s'	Mail		Pozostaw jako „%s”

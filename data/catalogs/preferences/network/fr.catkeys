@@ -1,7 +1,33 @@
-1	french	x-vnd.Haiku-Network	3077078267
+1	french	x-vnd.Haiku-Network	950262959
+Static	IntefaceAddressView		Statique
 EAP	EAP protected network		EAP
+Services	NetworkWindow		Services
 WPA2	WPA2 protected network		WPA2
+The netmask defines your local network	IntefaceAddressView		Le masque réseau détermine votre réseau local
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Network	NetworkWindow		Réseau
+Show network status in Deskbar	NetworkWindow		Afficher l’État du réseau dans la Deskbar
+The method for obtaining an IP address	IntefaceAddressView		Méthode d'obtention de l'adresse IP
+Dial Up	NetworkWindow		Connexion téléphonique
+Apply	IntefaceAddressView		Appliquer
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Échec de l’installation de l’État du réseau dans la Deskbar : %s
+Disabled	IntefaceAddressView		Désactivé
+Ok	NetworkWindow		Valider
+launch error	NetworkWindow		erreur du lancement
+Other	NetworkWindow		Autre
+Automatic	IntefaceAddressView		Automatique
+Gateway:	IntefaceAddressView		Passerelle :
+Revert	NetworkWindow		Rétablir
+Enable	ServiceView		Activer
+Your gateway to the internet	IntefaceAddressView		Votre passerelle vers l'internet
+New…	NetworkWindow		Nouveau…
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Mode :
 WPA	WPA protected network		WPA
 open	Open network		ouvrir
+IP Address:	IntefaceAddressView		Adresse IP :
+Netmask:	IntefaceAddressView		Masque réseau :
+Disable	ServiceView		Désactiver
+Your IP address	IntefaceAddressView		Votre adresse IP
+Manage…	NetworkWindow		Gérer…
 WEP	WEP protected network		WEP

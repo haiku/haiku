@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	954841528
+1	polish	x-vnd.Haiku-MediaPlayer	2005945973
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -139,7 +139,6 @@ Gets the duration of the currently playing item in microseconds.	MediaPlayer-Mai
 ToggleFullscreen	MediaPlayer-Main		PrzałączeniePełnegoEkranu
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} few{# kanały} many{# kanałów} other{# kanału}}
 <unnamed>	PlaylistItem-name		<bez nazwy>
-Open Clips	MediaPlayer-Main		Otwórz pliki
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		brak
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Pobiera/ustawia głośność (0.0-2.0).

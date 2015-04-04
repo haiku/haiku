@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	98667844
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1149772289
 raw audio	MediaPlayer-InfoWin		audio bruto
 Location	MediaPlayer-InfoWin		Ubicación
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -138,7 +138,6 @@ Toggle fullscreen.	MediaPlayer-Main		Alternar la vista de pantalla completa.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obtiene la duración del elemento reproduciéndose actualmente en microsegundos.
 ToggleFullscreen	MediaPlayer-Main		Cambiar a pantalla completa
 <unnamed>	PlaylistItem-name		<sin nombre>
-Open Clips	MediaPlayer-Main		Abrir las secuencias
 OK	MediaPlayer-PlaylistWindow		Aceptar
 none	Audio track menu		ninguno
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obtener/Configurar el voluman (0.0-2.0)

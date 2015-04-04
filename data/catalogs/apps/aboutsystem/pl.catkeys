@@ -1,12 +1,14 @@
-1	polish	x-vnd.Haiku-About	1848587744
+1	polish	x-vnd.Haiku-About	3251436090
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 przez autorów Gutenprint. Wszelkie prawa zastrzeżone.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
+Past website & marketing:\n	AboutView		Strona internetowa i marketing (dawniej):\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travisa Geiselbrechta (i jego jądra NewOS)\n
 Ralink (firmware)	AboutWindow		Ralink (firmware)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Wszelkie prawa zastrzeżone.
 %d MiB total	AboutView		%d MiB ogółem
 Michael Phipps (project founder)\n\n	AboutView		Michaela Phippsa (założyciela projektu)\n\n
 %d MiB used (%d%%)	AboutView		%d MiB użyte (%d%%)
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Zawiera oprogramowanie z Projektu GNU wydane na licencjach GPL i LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, bash\nCopyright © The Free Software Foundation.
 AboutSystem	System name		OSystemie
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe i inni.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Wszelkie prawa zastrzeżone.
@@ -58,12 +60,14 @@ Google and their Google Summer of Code and Google Code In programs\n	AboutView		
 The Haikuware team and their bounty program\n	AboutView		Zespołu Haikuware i ich programu nagród\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Wszelkie prawa zastrzeżone.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Wszelkie prawa zastrzeżone.
+Website & marketing:\n	AboutView		Strona internetowa i marketing:\n
 About this system	AboutWindow		O systemie
 Version:	AboutView		Wersja:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Wszelkie prawa zastrzeżone.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd oraz Clark Cooper.
 Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 Intel Corporation. Wszelkie prawa zastrzeżone.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2014 Fabrice Bellard, et al.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Wszelkie prawa zastrzeżone.
 The BeGeistert team\n	AboutView		Grupy BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Uniwersytetu w Auckland oraz Christofa Lutterotha\n\n

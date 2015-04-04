@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-InterfacesAddOn	606366088
+1	polish	x-vnd.Haiku-InterfacesAddOn	3297241710
 Interface	InterfaceWindow		Interfejs
 Network:	IntefaceHardwareView		Sieć:
 Static	IntefaceAddressView		Statyczny
@@ -14,6 +14,7 @@ Enable	InterfacesListView		Włącz
 Received:	IntefaceHardwareView		Otrzymano:
 Choose automatically	IntefaceHardwareView		Wybierz automatycznie
 connected	IntefaceHardwareView		połączony
+Automatic	IntefaceAddressView		Automatyczny
 Gateway:	IntefaceAddressView		Brama:
 Disable	InterfacesListView		Wyłącz
 Sent:	IntefaceHardwareView		Wysłano:

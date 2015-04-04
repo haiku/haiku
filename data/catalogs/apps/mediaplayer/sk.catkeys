@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	1339757957
+1	slovak	x-vnd.Haiku-MediaPlayer	2390862402
 raw audio	MediaPlayer-InfoWin		nespracovaný zvuk
 Location	MediaPlayer-InfoWin		Umiestnenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (americký)
@@ -133,7 +133,6 @@ Start media server	MediaPlayer-Main		Spustiť multimediálny server
 Toggle fullscreen.	MediaPlayer-Main		Prepnúť celoobrazovkový režim.
 ToggleFullscreen	MediaPlayer-Main		Prepnúť celoobrazovkový režim
 <unnamed>	PlaylistItem-name		<bez názvu>
-Open Clips	MediaPlayer-Main		Otvoriť klipy
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		žiadne
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Zistí/nastaví hlasitosť (0.0-2.0).

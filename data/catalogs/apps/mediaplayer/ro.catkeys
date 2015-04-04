@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	1015250753
+1	romanian	x-vnd.Haiku-MediaPlayer	2066355198
 Location	MediaPlayer-InfoWin		Locaţie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
 Stream settings	MediaPlayer-Main		Configurări flux
@@ -125,7 +125,6 @@ Start media server	MediaPlayer-Main		Pornește server media
 Toggle fullscreen.	MediaPlayer-Main		Comutare ecran complet.
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Canale}}
 <unnamed>	PlaylistItem-name		<nedenumit>
-Open Clips	MediaPlayer-Main		Deschide clipuri
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		nimic
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obține/configurează volumul (0.0-2.0)

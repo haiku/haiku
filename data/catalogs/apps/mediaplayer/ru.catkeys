@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	3986494780
+1	russian	x-vnd.Haiku-MediaPlayer	2627603675
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -90,6 +90,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Начинать про�
 Track	Video Track Menu		Дорожка
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (не сработала блокировка). Не удалось сохранить плейлист.
 View options	MediaPlayer-SettingsWindow		Настройки вида
+none	MediaPlayer-Main		отсутствуют
 Play mode	MediaPlayer-SettingsWindow		Режим проигрывания
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Удалить записи
 Video track	MediaPlayer-Main		Видео дорожка
@@ -135,9 +136,8 @@ Start media server	MediaPlayer-Main		Запустить медиа сервер
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Переключить в полноэкранный режим.
 ToggleFullscreen	MediaPlayer-Main		Переключить в полноэкранный режим
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Моно} =2{Стерео} other{# Канала}}
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Моно} =2{Стерео} few{# канала} other{# каналов}}
 <unnamed>	PlaylistItem-name		<без названия>
-Open Clips	MediaPlayer-Main		Открыть клипы
 OK	MediaPlayer-PlaylistWindow		ОК
 none	Audio track menu		пусто
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Получить/установить громкость (0.0-2.0).

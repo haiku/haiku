@@ -15,7 +15,7 @@ Choose type	Type List Window		Wybierz typ
 New file type	New File Type Window		Nowy typ pliku
 Rule:	FileTypes Window		Zasada:
 Add icon…	Icon View		Dodaj ikonę…
-Multiple files from \"%s\" file type	FileType Window		Wiele plików z typu pliku \"%s\"
+Multiple files from \"%s\" file type	FileType Window		Wiele plików z typu pliku „%s”
 File type	FileType Window		Typ pliku
 Could not change attributes	Attribute Window		Nie można zmienić atrybutów
 Could not retrieve preferred application of this file	Preferred App Menu		Nie można odnaleźć preferowanej aplikacji dla tego typu pliku
@@ -83,7 +83,7 @@ Select preferred application	FileType Window		Wybierz preferowaną aplikację
 Single launch	Application Type Window		Pojedyncze uruchomienie
 Golden master	Application Types Window		Golden master
 %s file type	FileType Window		typ pliku %s
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Program \"%s\" nie obsługuje tego typu plików.\nCzy chcesz go ustawić mimo to?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Program „%s” nie obsługuje tego typu plików.\nCzy chcesz go ustawić mimo to?
 Type:	Attribute Window		Typ:
 Removing uninstalled application types	Application Types Window		Usuwanie typów odinstalowanych aplikacji
 Done	Attribute Window		Gotowe
@@ -99,7 +99,7 @@ New resource file…	FileTypes Window		Nowy plik zasobów…
 Cancel	New File Type Window		Anuluj
 Icon	FileTypes Window		Ikona
 Extension:	Extension Window		Rozszerzenie:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Usuwanie supertypu nie może być cofnięte.\nWszystkie typy plików które należą do supertypu zostaną utracone!\n\nCzy na pewno chcsz to zrobić? Aby usunąć całą grupę, przytrzymaj klawisz Shift i naciśnij \"Usuń\".
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Usuwanie supertypu nie może być cofnięte.\nWszystkie typy plików które należą do supertypu zostaną utracone!\n\nCzy na pewno chcesz to zrobić? Aby usunąć całą grupę, przytrzymaj klawisz Shift i naciśnij „Usuń”.
 Internal name:	FileTypes Window		Wewnętrzna nazwa:
 Add	Attribute Window		Dodaj
 Close	Application Type Window		Zamknij
@@ -107,7 +107,7 @@ File recognition	FileTypes Window		Rozpoznawanie pliku
 Remove uninstalled	Application Types Window		Usuń odinstalowane
 Center	Attribute Window	Attribute column alignment in Tracker	Do środka
 Golden master	Application Type Window		Golden master
-Could not open \"%s\":\n%s	FileTypes		Nie można otworzyć \"%s\":\n%s
+Could not open \"%s\":\n%s	FileTypes		Nie można otworzyć „%s”:\n%s
 Alignment:	Attribute Window		Wyrównanie:
 Left	Attribute Window	Attribute column alignment in Tracker	Do lewej
 Cancel	Extension Window		Anuluj

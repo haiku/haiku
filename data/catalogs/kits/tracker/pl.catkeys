@@ -327,7 +327,7 @@ Handles any file	OpenWithWindow		Wspiera każdy plik
 Get info	FilePanelPriv		Pokaż informacje
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Anuluj
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Typ dokumentu, którego zamierzasz otworzyć programem \"%appname\", nie jest przez niego obsługiwany.\nCzy jesteś pewien, że chcesz to zrobić?\n\nJeśli jesteś pewien, że program wspiera taki typ dokumentu, powinieneś skontaktować się z wydawcą programu i poprosić, żeby zaktualizowano listę wspieranych typów dokumentów.
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Typ dokumentu, którego zamierzasz otworzyć programem „%appname”, nie jest przez niego obsługiwany.\nCzy jesteś pewien, że chcesz to zrobić?\n\nJeśli jesteś pewien, że program wspiera taki typ dokumentu, powinieneś skontaktować się z wydawcą programu i poprosić, żeby zaktualizowano listę wspieranych typów dokumentów.
 Disks	DirMenu		Dyski
 New folder %ld	FSUtils		Nowy folder %ld
 All BeOS disks	AutoMounterSettings		Wszystkie dyski BeOS
@@ -335,7 +335,7 @@ Used space color	SettingsView		Kolor zajętego miejsca
 Sorry, could not create a new folder.	FSUtils		Nie można utworzyć nowego folderu.
 Disk mount	TrackerSettingsWindow		Montowanie dysków
 multiple disks	FindPanel		wiele dysków
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Musisz upuścić obiekty na jednej z ikon dysków w oknie \"Disks\".
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Musisz upuścić obiekty na jednej z ikon dysków w oknie „Dyski”.
 Untitled clipping	PoseView		Wycinanie bez nazwy
 Don't automount	AutoMounterSettings		Nie montuj automatycznie
 Save	FilePanelPriv		Zapisz
@@ -355,14 +355,14 @@ Favorites	FilePanelPriv		Ulubione
 Name	QueryPoseView		Nazwa
 Delete	FSUtils		Usuń
 Modified	FindPanel		Zmodyfikowano
-Error moving \"%name\" to Trash. (%error)	FSUtils		Błąd przy przenoszeniu \"%name\" do Kosza. (%error)
+Error moving \"%name\" to Trash. (%error)	FSUtils		Błąd przy przenoszeniu „%name” do Kosza. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Nie możesz podmienić folderu jednym z jego podfolderów.
 <No recent items>	FavoritesMenu		<Brak ostatnio otwieranych obiektów>
 Preferences…	ContainerWindow		Ustawienia...
 Move	PoseView		Przenieś
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Jesteś pewien, że chcesz usunąć zaznaczone obiekty? Ta operacja nie może być cofnięta.
-If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeśli wykonasz '%ifYouDoAction' wobec katalogu domowego, %osName może nie zachowywać się właściwie!\n\nCzy jesteś pewien, że chcesz wykonać operację '%ifYouDoAction'?\n\nJeśli pomimo wszystko wciąż chcesz wykonać '%toDoAction', to przytrzymaj klawisz Shift i kliknij \"%toConfirmAction\".
+If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeśli wykonasz „%ifYouDoAction” wobec katalogu domowego, %osName może nie zachowywać się właściwie!\n\nCzy jesteś pewien, że chcesz wykonać operację „%ifYouDoAction”?\n\nJeśli mimo wszystko wciąż chcesz wykonać „%toDoAction”, to przytrzymaj klawisz Shift i kliknij „%toConfirmAction”.
 Add-ons	DeskWindow		Wtyczki
 Name	FindPanel		Nazwa
 And	FindPanel		I
@@ -371,7 +371,7 @@ Copy	FilePanelPriv		Kopiuj
 Icon view	DeskWindow		Widok ikon
 Select all	QueryContainerWindow		Zaznacz wszystko
 Files cannot be moved or deleted from a read-only volume.	PoseView		Pliki nie mogą zostać przeniesione do woluminu tylko do odczytu.
-There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Pojawił się problem przy modyfikowaniu \"%name\". Plik może być zajęty lub otwarty przez inny proces.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Pojawił się problem przy modyfikowaniu „%name”. Plik może być zajęty lub otwarty przez inny proces.
 Owner	FilePermissionsView		Właściciel
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Pojawił się problem przy zapisywaniu we wskazanej lokalizacji. Proszę podać inną lokalizację.
 Restore	ContainerWindow		Przywróć
@@ -388,9 +388,9 @@ That name is too long. Please type another one.	InfoWindow		Ta nazwa jest zbyt d
 OK	FSUtils		OK
 Paste layout	ContainerWindow		Wklej motyw
 Select	InfoWindow		Wybierz
-Could not update permissions of file \"%name\". %error	FSUtils		Nie można zauktualizować uprawnień dla pliku \"%name\". %error
+Could not update permissions of file \"%name\". %error	FSUtils		Nie można zaktualizować uprawnień dla pliku „%name”. %error
 Select…	FilePanelPriv		Wybierz…
-\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" jest plikiem wykonywalnym w starym formacie. Zdobądź zaktualizowaną wersję lub skompiluj aplikację jeszcze raz.
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		„%name” jest plikiem wykonywalnym w starym formacie. Zdobądź zaktualizowaną wersję lub skompiluj aplikację jeszcze raz.
 There was an error resolving the link.	Tracker		Pojawił się problem przy przetwarzaniu skrótu.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		nie możesz przenieść ani skopiować kosza.
@@ -421,7 +421,7 @@ Move to Trash	FSUtils		Przenieś do kosza
 Automatic disk mounting	AutoMounterSettings		Automatyczne montowanie dysku
 Original name	ContainerWindow		Nazwa orygialna
 Find	FSUtils		Znajdź
-Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Błąd przy kopiowaniu pliku \"%name\":\n\t%error\n\nCzy chcesz kontynuować?
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Błąd przy kopiowaniu pliku „%name”:\n\t%error\n\nCzy chcesz kontynuować?
 Single window navigation	SettingsView		Nawigacja pojedynczym oknem
 parent folder	NavMenu		folder główny
 contains	FindPanel		zawiera
