@@ -13,6 +13,7 @@
 #include <Catalog.h>
 #include <MessageFormat.h>
 #include <ScrollBar.h>
+#include <StringForSize.h>
 #include <Window.h>
 
 #include "MainWindow.h"
@@ -130,6 +131,7 @@ public:
 			void				UpdateSummary();
 			void				UpdateState();
 			void				UpdateRating();
+			void				UpdateSize();
 
 private:
 			PackageInfoRef		fPackage;
@@ -451,7 +453,7 @@ enum {
 	kTitleColumn,
 	kRatingColumn,
 	kDescriptionColumn,
-//	kSizeColumn,
+	kSizeColumn,
 	kStatusColumn,
 };
 
@@ -479,12 +481,10 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	UpdateSummary();
 
 	// Size
-	// TODO: Store package size
-//	SetField(new BStringField("0 KiB"), kSizeColumn);
+	UpdateSize();
 
 	// Status
-	SetField(new BStringField(package_state_to_string(fPackage)),
-		kStatusColumn);
+	UpdateState();
 
 	package.AddListener(fPackageListener);
 }
@@ -539,6 +539,22 @@ PackageRow::UpdateRating()
 		return;
 	RatingSummary summary = fPackage->CalculateRatingSummary();
 	SetField(new RatingField(summary.averageRating), kRatingColumn);
+}
+
+
+void
+PackageRow::UpdateSize()
+{
+	if (fPackage.Get() == NULL)
+		return;
+	BString size;
+	if (fPackage->Size() == 0) {
+		size = B_TRANSLATE_CONTEXT("-", "no package size");
+	} else {
+		char buffer[256];
+		size = string_for_size(fPackage->Size(), buffer, sizeof(buffer));
+	}
+	SetField(new BStringField(size), kSizeColumn);
 }
 
 
@@ -640,8 +656,10 @@ PackageListView::PackageListView(BLocker* modelLock)
 		B_TRUNCATE_MIDDLE), kRatingColumn);
 	AddColumn(new PackageColumn(B_TRANSLATE("Description"), 300, 80, 1000,
 		B_TRUNCATE_MIDDLE), kDescriptionColumn);
-//	AddColumn(new PackageColumn(B_TRANSLATE("Size"), 60, 50, 100,
-//		B_TRUNCATE_END), kSizeColumn);
+	PackageColumn* sizeColumn = new PackageColumn(B_TRANSLATE("Size"),
+		60, 50, 100, B_TRUNCATE_END);
+	sizeColumn->SetAlignment(B_ALIGN_RIGHT);
+	AddColumn(sizeColumn, kSizeColumn);
 	AddColumn(new PackageColumn(B_TRANSLATE("Status"), 60, 60, 100,
 		B_TRUNCATE_END), kStatusColumn);
 
@@ -700,6 +718,8 @@ PackageListView::MessageReceived(BMessage* message)
 					row->UpdateRating();
 				if ((changes & PKG_CHANGED_STATE) != 0)
 					row->UpdateState();
+				if ((changes & PKG_CHANGED_SIZE) != 0)
+					row->UpdateSize();
 				if ((changes & PKG_CHANGED_ICON) != 0)
 					row->UpdateTitle();
 			}

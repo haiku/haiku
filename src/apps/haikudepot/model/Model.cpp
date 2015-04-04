@@ -1113,7 +1113,6 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 	BAutolock locker(&fLock);
 
 	BString foundInfo;
-	data.PrintToStream();
 
 	BMessage versions;
 	if (data.FindMessage("versions", &versions) == B_OK) {
@@ -1140,6 +1139,11 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 			if (version.FindString("description", &description) == B_OK) {
 				package->SetFullDescription(description);
 				append_word_list(foundInfo, "description");
+			}
+			double payloadLength;
+			if (version.FindDouble("payloadLength", &payloadLength) == B_OK) {
+				package->SetSize((int64)payloadLength);
+				append_word_list(foundInfo, "size");
 			}
 			break;
 		}

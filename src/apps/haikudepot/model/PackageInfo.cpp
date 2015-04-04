@@ -499,7 +499,8 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fSystemDependency(false),
 	fArchitecture(info.ArchitectureName()),
 	fLocalFilePath(),
-	fFileName(info.FileName())
+	fFileName(info.FileName()),
+	fSize(0) // TODO: Retrieve local file size
 {
 	BString publisherURL;
 	if (info.URLList().CountStrings() > 0)
@@ -541,7 +542,8 @@ PackageInfo::PackageInfo(const BString& name,
 	fSystemDependency(false),
 	fArchitecture(architecture),
 	fLocalFilePath(),
-	fFileName()
+	fFileName(),
+	fSize(0)
 {
 }
 
@@ -569,7 +571,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fSystemDependency(other.fSystemDependency),
 	fArchitecture(other.fArchitecture),
 	fLocalFilePath(other.fLocalFilePath),
-	fFileName(other.fFileName)
+	fFileName(other.fFileName),
+	fSize(other.fSize)
 {
 }
 
@@ -599,6 +602,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fArchitecture = other.fArchitecture;
 	fLocalFilePath = other.fLocalFilePath;
 	fFileName = other.fFileName;
+	fSize = other.fSize;
 
 	return *this;
 }
@@ -627,7 +631,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fSystemDependency == other.fSystemDependency
 		&& fArchitecture == other.fArchitecture
 		&& fLocalFilePath == other.fLocalFilePath
-		&& fFileName == other.fFileName;
+		&& fFileName == other.fFileName
+		&& fSize == other.fSize;
 }
 
 
@@ -912,6 +917,16 @@ PackageInfo::AddScreenshot(const BitmapRef& screenshot)
 	_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
 
 	return true;
+}
+
+
+void
+PackageInfo::SetSize(int64 size)
+{
+	if (fSize != size) {
+		fSize = size;
+		_NotifyListeners(PKG_CHANGED_SIZE);
+	}
 }
 
 

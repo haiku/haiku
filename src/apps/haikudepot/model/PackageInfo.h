@@ -336,6 +336,10 @@ public:
 			const BitmapList&	Screenshots() const
 									{ return fScreenshots; }
 
+			void				SetSize(int64 size);
+			int64				Size() const
+									{ return fSize; }
+
 			bool				AddListener(
 									const PackageInfoListenerRef& listener);
 			void				RemoveListener(
@@ -371,6 +375,7 @@ private:
 			BString				fArchitecture;
 			BString				fLocalFilePath;
 			BString				fFileName;
+			int64				fSize;
 
 	static	BitmapRef			sDefaultIcon;
 };
