@@ -4023,9 +4023,9 @@ void
 BView::AddChild(BView* child, BView* before)
 {
 	STRACE(("BView(%s)::AddChild(child '%s', before '%s')\n",
- 		this->Name(),
- 		child != NULL && child->Name() ? child->Name() : "NULL",
- 		before != NULL && before->Name() ? before->Name() : "NULL"));
+		this->Name(),
+		child != NULL && child->Name() ? child->Name() : "NULL",
+		before != NULL && before->Name() ? before->Name() : "NULL"));
 
 	if (!_AddChild(child, before))
 		return;
@@ -5783,7 +5783,8 @@ BView::_SwitchServerCurrentView() const
 	int32 serverToken = _get_object_token_(this);
 
 	if (fOwner->fLastViewToken != serverToken) {
-		STRACE(("contacting app_server... sending token: %ld\n", serverToken));
+		STRACE(("contacting app_server... sending token: %" B_PRId32 "\n",
+			serverToken));
 		fOwner->fLink->StartMessage(AS_SET_CURRENT_VIEW);
 		fOwner->fLink->Attach<int32>(serverToken);
 
