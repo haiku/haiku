@@ -20,4 +20,4 @@ const char* string_for_size(double size, char* string, size_t stringSize);
 using BPrivate::string_for_size;
 
 
-#endif // COLOR_QUANTIZER_H
+#endif // STRING_FOR_SIZE_H
