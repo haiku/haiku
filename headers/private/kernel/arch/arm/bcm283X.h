@@ -27,9 +27,6 @@
 #define __PLATFORM_BCM283X_H
 
 
-#include <board_config.h>
-
-
 #define SIZE_4K 0x00001000
 
 /*
@@ -43,17 +40,8 @@
 // (all loader drivers compiled in, drivers chosen based on FDT)
 //
 #define BCM283X_SDRAM_BASE		0x00000000
-#if defined(BOARD_CPU_BCM2835)
-#define BCM283X_PERIPHERAL_BASE	0x20000000
-#elif defined(BOARD_CPU_BCM2836)
-#define BCM283X_PERIPHERAL_BASE	0x3f000000
-#else
-// This will always trigger on non-BCM arm boards
-// Leave in until we use FDT to pick needed board drivers at runtime.
-// We can get peripheral base from the DTB long-term
-#define BCM283X_PERIPHERAL_BASE	0x0
-#warning Unknown BCM283X chipset!
-#endif
+#define BCM2835_PERIPHERAL_BASE	0x20000000
+#define BCM2836_PERIPHERAL_BASE	0x3f000000
 
 
 // Added to physical addresses to select the different cache behaviours
@@ -101,16 +89,6 @@
 	// Timer 0 and 1
 #define ARM_CTRL_0_SBM_BASE		(ARM_BASE + 0x800)
 	// ARM Semaphores, Doorbells, and Mailboxes
-
-#define VECT_BASE 0xFFFF0000
-#define VECT_SIZE SIZE_4K
-
-#define DEVICE_BASE	BCM283X_PERIPHERAL_BASE
-#define DEVICE_SIZE	0xFFFFFF
-
-#define SDRAM_BASE		BCM283X_SDRAM_BASE
-#define SDRAM_SIZE		0x4000000
-	// 64Mb
 
 
 /* UART */

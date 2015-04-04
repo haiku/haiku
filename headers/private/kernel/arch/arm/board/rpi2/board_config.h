@@ -16,6 +16,16 @@
 
 #include <arch/arm/bcm283X.h>
 
+#define DEVICE_BASE BCM2836_PERIPHERAL_BASE
+#define DEVICE_SIZE 0xFFFFFF
+
+#define VECT_BASE 0xFFFF0000
+#define VECT_SIZE SIZE_4K
+
+#define SDRAM_BASE      BCM283X_SDRAM_BASE
+#define SDRAM_SIZE      0x4000000
+	// 64Mb
+
 // UART Settings
 #define BOARD_UART_PL011 1
 
