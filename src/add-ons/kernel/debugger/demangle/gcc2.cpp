@@ -43,6 +43,9 @@ ignore_qualifiers(const char** _arg)
 			// skip function declaration
 			while (**_arg && **_arg != '_')
 				(*_arg)++;
+
+			if (**_arg == 0)
+				break;
 		}
 
 		(*_arg)++;
