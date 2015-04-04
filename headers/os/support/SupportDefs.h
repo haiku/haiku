@@ -27,7 +27,7 @@ typedef	__haiku_int64			int64;
 typedef __haiku_uint64			uint64;
 
 /* shorthand types */
-typedef volatile int8   		vint8;
+typedef volatile int8			vint8;
 typedef volatile uint8			vuint8;
 typedef volatile int16			vint16;
 typedef volatile uint16			vuint16;
@@ -47,7 +47,7 @@ typedef volatile unsigned short	vushort;
 typedef volatile unsigned char	vuchar;
 
 typedef unsigned char			uchar;
-typedef unsigned short          unichar;
+typedef unsigned short			unichar;
 
 /* descriptive types */
 typedef int32					status_t;
@@ -89,23 +89,23 @@ typedef	generic_addr_t			generic_size_t;
 #define B_PRIx64		__HAIKU_PRI_PREFIX_64 "x"
 #define B_PRIX64		__HAIKU_PRI_PREFIX_64 "X"
 
-#define B_SCNd8 		"hhd"
-#define B_SCNi8 		"hhi"
+#define B_SCNd8			"hhd"
+#define B_SCNi8			"hhi"
 #define B_SCNd16		"hd"
-#define B_SCNi16	 	"hi"
-#define B_SCNd32 		__HAIKU_PRI_PREFIX_32 "d"
-#define B_SCNi32	 	__HAIKU_PRI_PREFIX_32 "i"
+#define B_SCNi16		"hi"
+#define B_SCNd32		__HAIKU_PRI_PREFIX_32 "d"
+#define B_SCNi32		__HAIKU_PRI_PREFIX_32 "i"
 #define B_SCNd64		__HAIKU_PRI_PREFIX_64 "d"
-#define B_SCNi64 		__HAIKU_PRI_PREFIX_64 "i"
-#define B_SCNu8 		"hhu"
-#define B_SCNo8 		"hho"
-#define B_SCNx8 		"hhx"
+#define B_SCNi64		__HAIKU_PRI_PREFIX_64 "i"
+#define B_SCNu8			"hhu"
+#define B_SCNo8			"hho"
+#define B_SCNx8			"hhx"
 #define B_SCNu16		"hu"
 #define B_SCNo16		"ho"
 #define B_SCNx16		"hx"
-#define B_SCNu32 		__HAIKU_PRI_PREFIX_32 "u"
-#define B_SCNo32 		__HAIKU_PRI_PREFIX_32 "o"
-#define B_SCNx32 		__HAIKU_PRI_PREFIX_32 "x"
+#define B_SCNu32		__HAIKU_PRI_PREFIX_32 "u"
+#define B_SCNo32		__HAIKU_PRI_PREFIX_32 "o"
+#define B_SCNx32		__HAIKU_PRI_PREFIX_32 "x"
 #define B_SCNu64		__HAIKU_PRI_PREFIX_64 "u"
 #define B_SCNo64		__HAIKU_PRI_PREFIX_64 "o"
 #define B_SCNx64		__HAIKU_PRI_PREFIX_64 "x"
