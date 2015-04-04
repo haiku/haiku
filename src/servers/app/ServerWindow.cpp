@@ -1265,8 +1265,10 @@ fDesktop->UnlockSingleWindow();
 							EventTarget(), token);
 fDesktop->LockSingleWindow();
 					}
-					if (fCurrentView == view)
+
+					if (fCurrentView == view || fCurrentView->HasParent(view))
 						_SetCurrentView(parent);
+
 					delete view;
 				} // else we don't delete the root view
 			}
