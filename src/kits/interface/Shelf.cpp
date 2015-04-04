@@ -560,6 +560,8 @@ BShelf::~BShelf()
 		fReplicants.RemoveItem((int32)0);
 		delete data;
 	}
+
+	fContainerView->_SetShelf(NULL);
 }
 
 
