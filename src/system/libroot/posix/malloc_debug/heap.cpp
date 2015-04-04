@@ -44,6 +44,7 @@ static bool sParanoidValidation = false;
 static thread_id sWallCheckThread = -1;
 static bool sStopWallChecking = false;
 static bool sUseGuardPage = false;
+static bool sDefaultAlignment = 0;
 
 
 void
@@ -1465,7 +1466,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	newSize -= sizeof(addr_t) + sizeof(heap_leak_check_info);
 
 	// if not, allocate a new chunk of memory
-	*newAddress = memalign(0, newSize);
+	*newAddress = memalign(sDefaultAlignment, newSize);
 	if (*newAddress == NULL) {
 		// we tried but it didn't work out, but still the operation is done
 		return B_OK;
@@ -1682,6 +1683,13 @@ heap_debug_set_debugger_calls(bool enabled)
 
 
 extern "C" void
+heap_debug_set_default_alignment(size_t defaultAlignment)
+{
+	sDefaultAlignment = defaultAlignment;
+}
+
+
+extern "C" void
 heap_debug_validate_heaps()
 {
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
@@ -1839,6 +1847,14 @@ __init_heap_post_env(void)
 			sUseGuardPage = true;
 		if (strchr(mode, 'r'))
 			heap_debug_set_memory_reuse(false);
+
+		size_t defaultAlignment = 0;
+		const char *argument = strchr(mode, 'a');
+		if (argument != NULL
+			&& sscanf(argument, "a%" B_SCNuSIZE, &defaultAlignment) == 1
+			&& defaultAlignment > 0) {
+			heap_debug_set_default_alignment(defaultAlignment);
+		}
 	}
 }
 
@@ -1937,7 +1953,7 @@ malloc(size_t size)
 	if (sUseGuardPage)
 		return heap_debug_malloc_with_guard_page(size);
 
-	return memalign(0, size);
+	return memalign(sDefaultAlignment, size);
 }
 
 
@@ -1978,7 +1994,7 @@ void *
 realloc(void *address, size_t newSize)
 {
 	if (address == NULL)
-		return memalign(0, newSize);
+		return memalign(sDefaultAlignment, newSize);
 
 	if (newSize == 0) {
 		free(address);

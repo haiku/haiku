@@ -19,6 +19,7 @@
 
 
 static bool sDebuggerCalls = true;
+static size_t sDefaultAlignment = 0;
 
 
 static void
@@ -834,6 +835,13 @@ heap_debug_set_debugger_calls(bool enabled)
 
 
 extern "C" void
+heap_debug_set_default_alignment(size_t defaultAlignment)
+{
+	sDefaultAlignment = defaultAlignment;
+}
+
+
+extern "C" void
 heap_debug_validate_heaps()
 {
 }
@@ -937,6 +945,14 @@ __init_heap_post_env(void)
 	if (mode != NULL) {
 		if (strchr(mode, 'r'))
 			heap_debug_set_memory_reuse(false);
+
+		size_t defaultAlignment = 0;
+		const char *argument = strchr(mode, 'a');
+		if (argument != NULL
+			&& sscanf(argument, "a%" B_SCNuSIZE, &defaultAlignment) == 1
+			&& defaultAlignment > 0) {
+			heap_debug_set_default_alignment(defaultAlignment);
+		}
 	}
 }
 
@@ -966,7 +982,7 @@ memalign(size_t alignment, size_t size)
 extern "C" void*
 malloc(size_t size)
 {
-	return memalign(0, size);
+	return memalign(sDefaultAlignment, size);
 }
 
 
@@ -987,7 +1003,7 @@ realloc(void* address, size_t newSize)
 	}
 
 	if (address == NULL)
-		return memalign(0, newSize);
+		return memalign(sDefaultAlignment, newSize);
 
 	return guarded_heap_realloc(address, newSize);
 }
