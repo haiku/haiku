@@ -139,7 +139,7 @@ FetchFileJob::_TransferCallback(void* _job, off_t downloadTotal,
 	if (downloadTotal != 0) {
 		job->fBytes = downloaded;
 		job->fTotalBytes = downloadTotal;
-		job->fDownloadProgress = downloaded / downloadTotal;
+		job->fDownloadProgress = (float)downloaded / downloadTotal;
 		job->NotifyStateListeners();
 	}
 	return 0;
