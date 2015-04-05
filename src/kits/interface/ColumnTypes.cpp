@@ -75,9 +75,8 @@ BTitledColumn::DrawString(const char* string, BView* parent, BRect rect)
 
 	parent->GetFont(&font);
 	font.GetHeight(&finfo);
-	y = rect.top + ((rect.Height()
-		- (finfo.ascent + finfo.descent + finfo.leading)) / 2)
-		+ (finfo.ascent + finfo.descent) - 2;
+	y = rect.top + finfo.ascent
+		+ (rect.Height() - ceilf(finfo.ascent + finfo.descent)) / 2.0f;
 
 	switch (Alignment()) {
 		default:

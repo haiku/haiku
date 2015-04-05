@@ -121,7 +121,8 @@ public:
 // a parent of a row, using the AddRow() function in BColumnListView().
 class BRow {
 public:
-								BRow(float height = 16.0);
+								BRow();
+								BRow(float height);
 	virtual 					~BRow();
 	virtual bool		 		HasLatch() const;
 

@@ -47,6 +47,7 @@ All rights reserved.
 
 #include <typeinfo>
 
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -126,7 +127,10 @@ static const unsigned char kUpSortArrow8x8Invert[] = {
 
 static const float kTintedLineTint = 1.04;
 
-static const float kTitleHeight = 16.0;
+static const float kMinTitleHeight = 16.0;
+static const float kMinRowHeight = 16.0;
+static const float kTitleSpacing = 1.4;
+static const float kRowSpacing = 1.4;
 static const float kLatchWidth = 15.0;
 
 
@@ -441,6 +445,20 @@ BColumn::MouseUp(BColumnListView* /*parent*/, BRow* /*row*/, BField* /*field*/)
 
 
 // #pragma mark -
+
+
+BRow::BRow()
+	:
+	fChildList(NULL),
+	fIsExpanded(false),
+	fHeight(std::max(kMinRowHeight,
+		ceilf(be_plain_font->Size() * kRowSpacing))),
+	fNextSelected(NULL),
+	fPrevSelected(NULL),
+	fParent(NULL),
+	fList(NULL)
+{
+}
 
 
 BRow::BRow(float height)
@@ -1913,7 +1931,9 @@ BColumnListView::MinSize()
 {
 	BSize size;
 	size.width = 100;
-	size.height = kTitleHeight + 4 * B_H_SCROLL_BAR_HEIGHT;
+	size.height = std::max(kMinTitleHeight,
+		ceilf(be_plain_font->Size() * kTitleSpacing))
+		+ 4 * B_H_SCROLL_BAR_HEIGHT;
 	if (!fHorizontalScrollBar->IsHidden())
 		size.height += fHorizontalScrollBar->Frame().Height() + 1;
 	// TODO: Take border size into account
@@ -2071,7 +2091,8 @@ BColumnListView::_GetChildViewRects(const BRect& bounds, BRect& titleRect,
 	BRect& outlineRect, BRect& vScrollBarRect, BRect& hScrollBarRect)
 {
 	titleRect = bounds;
-	titleRect.bottom = titleRect.top + kTitleHeight;
+	titleRect.bottom = titleRect.top + std::max(kMinTitleHeight,
+		ceilf(be_plain_font->Size() * kTitleSpacing));
 #if !LOWER_SCROLLBAR
 	titleRect.right -= B_V_SCROLL_BAR_WIDTH;
 #endif
@@ -2084,7 +2105,8 @@ BColumnListView::_GetChildViewRects(const BRect& bounds, BRect& titleRect,
 
 	vScrollBarRect = bounds;
 #if LOWER_SCROLLBAR
-	vScrollBarRect.top += kTitleHeight;
+	vScrollBarRect.top += std::max(kMinTitleHeight,
+		ceilf(be_plain_font->Size() * kTitleSpacing));
 #endif
 
 	vScrollBarRect.left = vScrollBarRect.right - B_V_SCROLL_BAR_WIDTH;
