@@ -199,6 +199,11 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 		B_TRANSLATE("Zoom in"), false);
 	fToolBar->AddAction(MSG_ZOOM_OUT, this, tool_bar_icon(kIconZoomOut),
 		B_TRANSLATE("Zoom out"), false);
+	fToolBar->AddSeparator();
+	fToolBar->AddAction(MSG_PAGE_PREV, this, tool_bar_icon(kIconPagePrevious),
+		B_TRANSLATE("Previous page"), false);
+	fToolBar->AddAction(MSG_PAGE_NEXT, this, tool_bar_icon(kIconPageNext),
+		B_TRANSLATE("Next page"), false);
 	fToolBar->AddGlue();
 	fToolBar->AddAction(MSG_FULL_SCREEN, this,
 		tool_bar_icon(kIconViewWindowed), B_TRANSLATE("Leave full screen"),

@@ -32,7 +32,9 @@ enum {
 	kIconZoomFitViewBest,
 	kIconZoomIn,
 	kIconZoomOriginal,
-	kIconZoomOut
+	kIconZoomOut,
+	kIconPagePrevious,
+	kIconPageNext
 };
 
 
