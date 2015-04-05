@@ -182,7 +182,7 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 		switch (request->operation) {
 			case B_ENTRY_CREATED:
 				PRINT(("notify_entry_created(%" B_PRId32 ", %" B_PRId64 ", "
-					\"%s\", %" B_PRId64 ")\n", request->device,
+					"\"%s\", %" B_PRId64 ")\n", request->device,
 					request->directory, name, request->node));
 				result = notify_entry_created(request->device,
 					request->directory, name, request->node);
@@ -190,7 +190,7 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 
 			case B_ENTRY_REMOVED:
 				PRINT(("notify_entry_removed(%" B_PRId32 ", %" B_PRId64 ", "
-					\"%s\", %" B_PRId64 ")\n", request->device,
+					"\"%s\", %" B_PRId64 ")\n", request->device,
 					request->directory, name, request->node));
 				result = notify_entry_removed(request->device,
 					request->directory, name, request->node);
