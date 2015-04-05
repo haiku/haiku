@@ -47,16 +47,16 @@ PrefWindow::PrefWindow(const BMessenger& messenger)
 			.Add(fAppearanceView = new AppearancePrefView(
 				B_TRANSLATE("Appearance"), fTerminalMessenger))
 			.AddGroup(B_HORIZONTAL)
-				.Add(fSaveAsFileButton = new BButton("savebutton",
-					B_TRANSLATE("Save to file" B_UTF8_ELLIPSIS),
-					new BMessage(MSG_SAVEAS_PRESSED), B_WILL_DRAW))
-				.AddGlue()
+				.Add(fDefaultsButton = new BButton("defaultsbutton",
+					B_TRANSLATE("Defaults"), new BMessage(MSG_DEFAULTS_PRESSED),
+					B_WILL_DRAW))
 				.Add(fRevertButton = new BButton("revertbutton",
 					B_TRANSLATE("Revert"), new BMessage(MSG_REVERT_PRESSED),
 					B_WILL_DRAW))
-				.Add(fDefaultsButton = new BButton("okbutton",
-					B_TRANSLATE("Defaults"), new BMessage(MSG_DEFAULTS_PRESSED),
-					B_WILL_DRAW))
+				.AddGlue()
+				.Add(fSaveAsFileButton = new BButton("savebutton",
+					B_TRANSLATE("Save to file" B_UTF8_ELLIPSIS),
+					new BMessage(MSG_SAVEAS_PRESSED), B_WILL_DRAW))
 			.End()
 		.End();
 
