@@ -351,7 +351,7 @@ ServerWindow::_Show()
 	fDesktop->ShowWindow(fWindow);
 	if (fDirectWindowInfo && fDirectWindowInfo->IsFullScreen())
 		_ResizeToFullScreen();
-		
+
 	fDesktop->LockSingleWindow();
 }
 
@@ -1964,7 +1964,7 @@ fDesktop->LockSingleWindow();
 			} else {
 				_UpdateCurrentDrawingRegion();
 				BRegion region(fCurrentDrawingRegion);
-				fCurrentView->ConvertFromScreen(&region);
+				fCurrentView->ScreenToLocalTransform().Apply(&region);
 				fLink.AttachRegion(region);
 			}
 			fLink.Flush();
@@ -2254,8 +2254,10 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 					info.endPoint.x, info.endPoint.y));
 
 			BPoint penPos = info.endPoint;
-			fCurrentView->ConvertToScreenForDrawing(&info.startPoint);
-			fCurrentView->ConvertToScreenForDrawing(&info.endPoint);
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
+			transform.Apply(&info.startPoint);
+			transform.Apply(&info.endPoint);
 			drawingEngine->StrokeLine(info.startPoint, info.endPoint);
 
 			// We update the pen here because many DrawingEngine calls which
@@ -2279,7 +2281,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				fCurrentView->Name(), rect.left, rect.top, rect.right,
 				rect.bottom));
 
-			fCurrentView->ConvertToScreenForDrawing(&rect);
+			fCurrentView->PenToScreenTransform().Apply(&rect);
 			drawingEngine->InvertRect(rect);
 			break;
 		}
@@ -2294,7 +2296,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				fCurrentView->Name(), rect.left, rect.top, rect.right,
 				rect.bottom));
 
-			fCurrentView->ConvertToScreenForDrawing(&rect);
+			fCurrentView->PenToScreenTransform().Apply(&rect);
 			drawingEngine->StrokeRect(rect);
 			break;
 		}
@@ -2309,7 +2311,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				fCurrentView->Name(), rect.left, rect.top, rect.right,
 				rect.bottom));
 
-			fCurrentView->ConvertToScreenForDrawing(&rect);
+			fCurrentView->PenToScreenTransform().Apply(&rect);
 			drawingEngine->FillRect(rect);
 			break;
 		}
@@ -2326,8 +2328,10 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				fCurrentView->Name(), rect.left, rect.top, rect.right,
 				rect.bottom));
 
-			fCurrentView->ConvertToScreenForDrawing(&rect);
-			fCurrentView->ConvertToScreenForDrawing(gradient);
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
+			transform.Apply(&rect);
+			transform.Apply(gradient);
 			drawingEngine->FillRect(rect, *gradient);
 			delete gradient;
 			break;
@@ -2356,7 +2360,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 					info.viewRect.left, info.viewRect.top,
 					info.viewRect.right, info.viewRect.bottom));
 
-				fCurrentView->ConvertToScreenForDrawing(&info.viewRect);
+				fCurrentView->PenToScreenTransform().Apply(&info.viewRect);
 
 // TODO: Unbreak...
 //				if ((info.options & B_WAIT_FOR_RETRACE) != 0)
@@ -2382,7 +2386,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			if (link.Read<float>(&span) != B_OK)
 				break;
 
-			fCurrentView->ConvertToScreenForDrawing(&r);
+			fCurrentView->PenToScreenTransform().Apply(&r);
 			drawingEngine->DrawArc(r, angle, span, code == AS_FILL_ARC);
 			break;
 		}
@@ -2399,8 +2403,10 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			BGradient* gradient;
 			if (link.ReadGradient(&gradient) != B_OK)
 				break;
-			fCurrentView->ConvertToScreenForDrawing(&r);
-			fCurrentView->ConvertToScreenForDrawing(gradient);
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
+			transform.Apply(&r);
+			transform.Apply(gradient);
 			drawingEngine->FillArc(r, angle, span, *gradient);
 			delete gradient;
 			break;
@@ -2411,11 +2417,13 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_BEZIER\n",
 				Title()));
 
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
 			BPoint pts[4];
 			status_t status;
 			for (int32 i = 0; i < 4; i++) {
 				status = link.Read<BPoint>(&(pts[i]));
-				fCurrentView->ConvertToScreenForDrawing(&pts[i]);
+				transform.Apply(&pts[i]);
 			}
 			if (status != B_OK)
 				break;
@@ -2428,15 +2436,17 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			GTRACE(("ServerWindow %s: Message AS_FILL_BEZIER_GRADIENT\n",
 				Title()));
 
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
 			BPoint pts[4];
 			for (int32 i = 0; i < 4; i++) {
 				link.Read<BPoint>(&(pts[i]));
-				fCurrentView->ConvertToScreenForDrawing(&pts[i]);
+				transform.Apply(&pts[i]);
 			}
 			BGradient* gradient;
 			if (link.ReadGradient(&gradient) != B_OK)
 				break;
-			fCurrentView->ConvertToScreenForDrawing(gradient);
+			transform.Apply(gradient);
 			drawingEngine->FillBezier(pts, *gradient);
 			delete gradient;
 			break;
@@ -2451,7 +2461,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			if (link.Read<BRect>(&rect) != B_OK)
 				break;
 
-			fCurrentView->ConvertToScreenForDrawing(&rect);
+			fCurrentView->PenToScreenTransform().Apply(&rect);
 			drawingEngine->DrawEllipse(rect, code == AS_FILL_ELLIPSE);
 			break;
 		}
@@ -2465,8 +2475,10 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			BGradient* gradient;
 			if (link.ReadGradient(&gradient) != B_OK)
 				break;
-			fCurrentView->ConvertToScreenForDrawing(&rect);
-			fCurrentView->ConvertToScreenForDrawing(gradient);
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
+			transform.Apply(&rect);
+			transform.Apply(gradient);
 			drawingEngine->FillEllipse(rect, *gradient);
 			delete gradient;
 			break;
@@ -2485,7 +2497,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			if (link.Read<float>(&yRadius) != B_OK)
 				break;
 
-			fCurrentView->ConvertToScreenForDrawing(&rect);
+			fCurrentView->PenToScreenTransform().Apply(&rect);
 			float scale = fCurrentView->CurrentState()->CombinedScale();
 			drawingEngine->DrawRoundRect(rect, xRadius * scale, yRadius * scale,
 				code == AS_FILL_ROUNDRECT);
@@ -2504,8 +2516,10 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			BGradient* gradient;
 			if (link.ReadGradient(&gradient) != B_OK)
 				break;
-			fCurrentView->ConvertToScreenForDrawing(&rect);
-			fCurrentView->ConvertToScreenForDrawing(gradient);
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
+			transform.Apply(&rect);
+			transform.Apply(gradient);
 			drawingEngine->FillRoundRect(rect, xrad, yrad, *gradient);
 			delete gradient;
 			break;
@@ -2516,18 +2530,20 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_TRIANGLE\n",
 				Title()));
 
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
 			BPoint pts[3];
 			BRect rect;
 
 			for (int32 i = 0; i < 3; i++) {
 				link.Read<BPoint>(&(pts[i]));
-				fCurrentView->ConvertToScreenForDrawing(&pts[i]);
+				transform.Apply(&pts[i]);
 			}
 
 			if (link.Read<BRect>(&rect) != B_OK)
 				break;
 
-			fCurrentView->ConvertToScreenForDrawing(&rect);
+			transform.Apply(&rect);
 			drawingEngine->DrawTriangle(pts, rect, code == AS_FILL_TRIANGLE);
 			break;
 		}
@@ -2536,18 +2552,20 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE_GRADIENT\n",
 				Title()));
 
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
 			BPoint pts[3];
 			BRect rect;
 			for (int32 i = 0; i < 3; i++) {
 				link.Read<BPoint>(&(pts[i]));
-				fCurrentView->ConvertToScreenForDrawing(&pts[i]);
+				transform.Apply(&pts[i]);
 			}
 			link.Read<BRect>(&rect);
 			BGradient* gradient;
 			if (link.ReadGradient(&gradient) != B_OK)
 				break;
-			fCurrentView->ConvertToScreenForDrawing(&rect);
-			fCurrentView->ConvertToScreenForDrawing(gradient);
+			transform.Apply(&rect);
+			transform.Apply(gradient);
 			drawingEngine->FillTriangle(pts, rect, *gradient);
 			delete gradient;
 			break;
@@ -2567,11 +2585,13 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				link.Read<bool>(&isClosed);
 			link.Read<int32>(&pointCount);
 
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
 			BPoint* pointList = new(nothrow) BPoint[pointCount];
 			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK) {
 				for (int32 i = 0; i < pointCount; i++)
-					fCurrentView->ConvertToScreenForDrawing(&pointList[i]);
-				fCurrentView->ConvertToScreenForDrawing(&polyFrame);
+					transform.Apply(&pointList[i]);
+				transform.Apply(&polyFrame);
 
 				drawingEngine->DrawPolygon(pointList, pointCount, polyFrame,
 					code == AS_FILL_POLYGON, isClosed && pointCount > 2);
@@ -2590,14 +2610,16 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			link.Read<BRect>(&polyFrame);
 			link.Read<int32>(&pointCount);
 
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
 			BPoint* pointList = new(nothrow) BPoint[pointCount];
 			BGradient* gradient;
 			if (link.Read(pointList, pointCount * sizeof(BPoint)) == B_OK
 				&& link.ReadGradient(&gradient) == B_OK) {
 				for (int32 i = 0; i < pointCount; i++)
-					fCurrentView->ConvertToScreenForDrawing(&pointList[i]);
-				fCurrentView->ConvertToScreenForDrawing(&polyFrame);
-				fCurrentView->ConvertToScreenForDrawing(gradient);
+					transform.Apply(&pointList[i]);
+				transform.Apply(&polyFrame);
+				transform.Apply(gradient);
 
 				drawingEngine->FillPolygon(pointList, pointCount,
 					polyFrame, *gradient, isClosed && pointCount > 2);
@@ -2631,8 +2653,10 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 					= fCurrentView->CurrentState()->PenLocation();
 				shapeFrame.OffsetBy(screenOffset);
 
-				fCurrentView->ConvertToScreenForDrawing(&screenOffset);
-				fCurrentView->ConvertToScreenForDrawing(&shapeFrame);
+				const SimpleTransform transform =
+					fCurrentView->PenToScreenTransform();
+				transform.Apply(&screenOffset);
+				transform.Apply(&shapeFrame);
 
 				drawingEngine->DrawShape(shapeFrame, opCount, opList, ptCount,
 					ptList, code == AS_FILL_SHAPE, screenOffset,
@@ -2669,9 +2693,11 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 					= fCurrentView->CurrentState()->PenLocation();
 				shapeFrame.OffsetBy(screenOffset);
 
-				fCurrentView->ConvertToScreenForDrawing(&screenOffset);
-				fCurrentView->ConvertToScreenForDrawing(&shapeFrame);
-				fCurrentView->ConvertToScreenForDrawing(gradient);
+				const SimpleTransform transform =
+					fCurrentView->PenToScreenTransform();
+				transform.Apply(&screenOffset);
+				transform.Apply(&shapeFrame);
+				transform.Apply(gradient);
 				drawingEngine->FillShape(shapeFrame, opCount, opList,
 					ptCount, ptList, *gradient, screenOffset,
 					fCurrentView->Scale());
@@ -2690,7 +2716,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			if (link.ReadRegion(&region) < B_OK)
 				break;
 
-			fCurrentView->ConvertToScreenForDrawing(&region);
+			fCurrentView->PenToScreenTransform().Apply(&region);
 			drawingEngine->FillRegion(region);
 
 			break;
@@ -2707,8 +2733,10 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			if (link.ReadGradient(&gradient) != B_OK)
 				break;
 
-			fCurrentView->ConvertToScreenForDrawing(&region);
-			fCurrentView->ConvertToScreenForDrawing(gradient);
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
+			transform.Apply(&region);
+			transform.Apply(gradient);
 			drawingEngine->FillRegion(region, *gradient);
 			delete gradient;
 			break;
@@ -2747,11 +2775,11 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			}
 
 			// Convert to screen coords and draw
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
 			for (int32 i = 0; i < lineCount; i++) {
-				fCurrentView->ConvertToScreenForDrawing(
-					&lineData[i].startPoint);
-				fCurrentView->ConvertToScreenForDrawing(
-					&lineData[i].endPoint);
+				transform.Apply(&lineData[i].startPoint);
+				transform.Apply(&lineData[i].endPoint);
 			}
 			drawingEngine->StrokeLineArray(lineCount, lineData);
 
@@ -2796,11 +2824,11 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING, View: %s "
 				"-> %s\n", Title(), fCurrentView->Name(), string));
 
-			fCurrentView->ConvertToScreenForDrawing(&info.location);
+			fCurrentView->PenToScreenTransform().Apply(&info.location);
 			BPoint penLocation = drawingEngine->DrawString(string,
 				info.stringLength, info.location, delta);
 
-			fCurrentView->ConvertFromScreenForDrawing(&penLocation);
+			fCurrentView->ScreenToPenTransform().Apply(&penLocation);
 			fCurrentView->CurrentState()->SetPenLocation(penLocation);
 
 			if (string != stackString)
@@ -2853,13 +2881,15 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING_WITH_OFFSETS, View: %s "
 				"-> %s\n", Title(), fCurrentView->Name(), string));
 
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
 			for (int32 i = 0; i < glyphCount; i++)
-				fCurrentView->ConvertToScreenForDrawing(&locations[i]);
+				transform.Apply(&locations[i]);
 
 			BPoint penLocation = drawingEngine->DrawString(string,
 				stringLength, locations);
 
-			fCurrentView->ConvertFromScreenForDrawing(&penLocation);
+			fCurrentView->ScreenToPenTransform().Apply(&penLocation);
 			fCurrentView->CurrentState()->SetPenLocation(penLocation);
 
 			break;
@@ -3703,11 +3733,11 @@ ServerWindow::_UpdateDrawState(View* view)
 	if (view != NULL && drawingEngine != NULL) {
 		BPoint leftTop(0, 0);
 		if (view->GetAlphaMask() != NULL) {
-			view->ConvertToScreen(&leftTop);
+			view->LocalToScreenTransform().Apply(&leftTop);
  			view->GetAlphaMask()->Update(view->Bounds(), leftTop);
 			leftTop = BPoint(0, 0);
 		}
-		view->ConvertToScreenForDrawing(&leftTop);
+		view->PenToScreenTransform().Apply(&leftTop);
 		drawingEngine->SetDrawState(view->CurrentState(), leftTop.x, leftTop.y);
 	}
 }

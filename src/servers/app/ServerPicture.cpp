@@ -204,7 +204,7 @@ ShapePainter::Draw(BRect frame, bool filled)
 		}
 
 		BPoint offset(fCanvas->CurrentState()->PenLocation());
-		fCanvas->ConvertToScreenForDrawing(&offset);
+		fCanvas->PenToScreenTransform().Apply(&offset);
 		fCanvas->GetDrawingEngine()->DrawShape(frame, opCount, opList,
 			ptCount, ptList, filled, offset, fCanvas->Scale());
 
@@ -265,8 +265,9 @@ stroke_line(Canvas* canvas, BPoint start, BPoint end)
 {
 	BPoint penPos = end;
 
-	canvas->ConvertToScreenForDrawing(&start);
-	canvas->ConvertToScreenForDrawing(&end);
+	const SimpleTransform transform = canvas->PenToScreenTransform();
+	transform.Apply(&start);
+	transform.Apply(&end);
 	canvas->GetDrawingEngine()->StrokeLine(start, end);
 
 	canvas->CurrentState()->SetPenLocation(penPos);
@@ -279,7 +280,7 @@ stroke_line(Canvas* canvas, BPoint start, BPoint end)
 static void
 stroke_rect(Canvas* canvas, BRect rect)
 {
-	canvas->ConvertToScreenForDrawing(&rect);
+	canvas->PenToScreenTransform().Apply(&rect);
 	canvas->GetDrawingEngine()->StrokeRect(rect);
 }
 
@@ -287,7 +288,7 @@ stroke_rect(Canvas* canvas, BRect rect)
 static void
 fill_rect(Canvas* canvas, BRect rect)
 {
-	canvas->ConvertToScreenForDrawing(&rect);
+	canvas->PenToScreenTransform().Apply(&rect);
 	canvas->GetDrawingEngine()->FillRect(rect);
 }
 
@@ -295,7 +296,7 @@ fill_rect(Canvas* canvas, BRect rect)
 static void
 draw_round_rect(Canvas* canvas, BRect rect, BPoint radii, bool fill)
 {
-	canvas->ConvertToScreenForDrawing(&rect);
+	canvas->PenToScreenTransform().Apply(&rect);
 	float scale = canvas->CurrentState()->CombinedScale();
 	canvas->GetDrawingEngine()->DrawRoundRect(rect, radii.x * scale,
 		radii.y * scale, fill);
@@ -320,8 +321,7 @@ static void
 stroke_bezier(Canvas* canvas, const BPoint* viewPoints)
 {
 	BPoint points[4];
-	canvas->ConvertToScreenForDrawing(points, viewPoints, 4);
-
+	canvas->PenToScreenTransform().Apply(points, viewPoints, 4);
 	canvas->GetDrawingEngine()->DrawBezier(points, false);
 }
 
@@ -330,8 +330,7 @@ static void
 fill_bezier(Canvas* canvas, const BPoint* viewPoints)
 {
 	BPoint points[4];
-	canvas->ConvertToScreenForDrawing(points, viewPoints, 4);
-
+	canvas->PenToScreenTransform().Apply(points, viewPoints, 4);
 	canvas->GetDrawingEngine()->DrawBezier(points, true);
 }
 
@@ -342,7 +341,7 @@ stroke_arc(Canvas* canvas, BPoint center, BPoint radii,
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
-	canvas->ConvertToScreenForDrawing(&rect);
+	canvas->PenToScreenTransform().Apply(&rect);
 	canvas->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, false);
 }
 
@@ -353,7 +352,7 @@ fill_arc(Canvas* canvas, BPoint center, BPoint radii,
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
-	canvas->ConvertToScreenForDrawing(&rect);
+	canvas->PenToScreenTransform().Apply(&rect);
 	canvas->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, true);
 }
 
@@ -363,7 +362,7 @@ stroke_ellipse(Canvas* canvas, BPoint center, BPoint radii)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
-	canvas->ConvertToScreenForDrawing(&rect);
+	canvas->PenToScreenTransform().Apply(&rect);
 	canvas->GetDrawingEngine()->DrawEllipse(rect, false);
 }
 
@@ -373,7 +372,7 @@ fill_ellipse(Canvas* canvas, BPoint center, BPoint radii)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
-	canvas->ConvertToScreenForDrawing(&rect);
+	canvas->PenToScreenTransform().Apply(&rect);
 	canvas->GetDrawingEngine()->DrawEllipse(rect, true);
 }
 
@@ -391,8 +390,7 @@ stroke_polygon(Canvas* canvas, int32 numPoints,
 		char data[200 * sizeof(BPoint)];
 		BPoint* points = (BPoint*)data;
 
-		canvas->ConvertToScreenForDrawing(points, viewPoints, numPoints);
-
+		canvas->PenToScreenTransform().Apply(points, viewPoints, numPoints);
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
@@ -405,8 +403,7 @@ stroke_polygon(Canvas* canvas, int32 numPoints,
 		if (points == NULL)
 			return;
 
-		canvas->ConvertToScreenForDrawing(points, viewPoints, numPoints);
-
+		canvas->PenToScreenTransform().Apply(points, viewPoints, numPoints);
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
@@ -430,8 +427,7 @@ fill_polygon(Canvas* canvas, int32 numPoints,
 		char data[200 * sizeof(BPoint)];
 		BPoint* points = (BPoint*)data;
 
-		canvas->ConvertToScreenForDrawing(points, viewPoints, numPoints);
-
+		canvas->PenToScreenTransform().Apply(points, viewPoints, numPoints);
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
@@ -444,8 +440,7 @@ fill_polygon(Canvas* canvas, int32 numPoints,
 		if (points == NULL)
 			return;
 
-		canvas->ConvertToScreenForDrawing(points, viewPoints, numPoints);
-
+		canvas->PenToScreenTransform().Apply(points, viewPoints, numPoints);
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
@@ -486,11 +481,11 @@ draw_string(Canvas* canvas, const char* string, float deltaSpace,
 	BPoint location = canvas->CurrentState()->PenLocation();
 
 	escapement_delta delta = { deltaSpace, deltaNonSpace };
-	canvas->ConvertToScreenForDrawing(&location);
+	canvas->PenToScreenTransform().Apply(&location);
 	location = canvas->GetDrawingEngine()->DrawString(string, strlen(string),
 		location, &delta);
 
-	canvas->ConvertFromScreenForDrawing(&location);
+	canvas->PenToScreenTransform().Apply(&location);
 	canvas->CurrentState()->SetPenLocation(location);
 	// the DrawingEngine/Painter does not need to be updated, since this
 	// effects only the view->screen coord conversion, which is handled
@@ -511,7 +506,7 @@ draw_pixels(Canvas* canvas, BRect src, BRect dest, int32 width,
 
 	memcpy(bitmap.Bits(), data, height * bytesPerRow);
 
-	canvas->ConvertToScreenForDrawing(&dest);
+	canvas->PenToScreenTransform().Apply(&dest);
 	canvas->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest, options);
 }
 
@@ -570,7 +565,7 @@ pop_state(Canvas* canvas)
 	canvas->PopState();
 
 	BPoint p(0, 0);
-	canvas->ConvertToScreenForDrawing(&p);
+	canvas->PenToScreenTransform().Apply(&p);
 	canvas->GetDrawingEngine()->SetDrawState(canvas->CurrentState(),
 		(int32)p.x, (int32)p.y);
 }

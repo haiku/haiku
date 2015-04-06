@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Adi Oanca <adioanca@mymail.ro>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 #ifndef _DRAW_STATE_H_
 #define _DRAW_STATE_H_
@@ -20,6 +21,7 @@
 
 #include "ServerFont.h"
 #include "PatternHandler.h"
+#include "SimpleTransform.h"
 
 class AlphaMask;
 class BRegion;
@@ -78,14 +80,8 @@ public:
 			AlphaMask*		GetAlphaMask() const;
 
 							// coordinate transformations
-				void		Transform(float* x, float* y) const;
-				void		InverseTransform(float* x, float* y) const;
-
-				void		Transform(BPoint* point) const;
-				void		Transform(BRect* rect) const;
-				void		Transform(BRegion* region) const;
-
-				void		InverseTransform(BPoint* point) const;
+				void		Transform(SimpleTransform& transform) const;
+				void		InverseTransform(SimpleTransform& transform) const;
 
 							// color
 		void				SetHighColor(rgb_color color);

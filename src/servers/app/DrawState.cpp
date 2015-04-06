@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 
 //!	Data classes for working with BView states and draw parameters
@@ -211,7 +212,7 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 	ViewSetStateInfo info;
 
 	link.Read<ViewSetStateInfo>(&info);
-	
+
 	fPenLocation = info.penLocation;
 	fPenSize = info.penSize;
 	fHighColor = info.highColor;
@@ -407,8 +408,9 @@ DrawState::GetCombinedClippingRegion(BRegion* region) const
 {
 	if (fClippingRegion != NULL) {
 		BRegion localTransformedClipping(*fClippingRegion);
-		Transform(&localTransformedClipping);
-
+		SimpleTransform penTransform;
+		Transform(penTransform);
+		penTransform.Apply(&localTransformedClipping);
 		if (fPreviousState != NULL
 			&& fPreviousState->GetCombinedClippingRegion(region)) {
 			localTransformedClipping.IntersectWith(region);
@@ -438,7 +440,7 @@ DrawState::SetAlphaMask(AlphaMask* mask)
 	fAlphaMask = mask;
 	if (fAlphaMask != NULL && fPreviousState != NULL)
 		fAlphaMask->SetPrevious(fPreviousState->fAlphaMask);
-		
+
 }
 
 
@@ -453,83 +455,19 @@ DrawState::GetAlphaMask() const
 
 
 void
-DrawState::Transform(float* x, float* y) const
+DrawState::Transform(SimpleTransform& transform) const
 {
-	// scale relative to origin, therefore
-	// scale first then translate to
-	// origin
-	*x *= fCombinedScale;
-	*y *= fCombinedScale;
-	*x += fCombinedOrigin.x;
-	*y += fCombinedOrigin.y;
+	transform.AddOffset(fCombinedOrigin.x, fCombinedOrigin.y);
+	transform.SetScale(fCombinedScale);
 }
 
 
 void
-DrawState::InverseTransform(float* x, float* y) const
+DrawState::InverseTransform(SimpleTransform& transform) const
 {
-	*x -= fCombinedOrigin.x;
-	*y -= fCombinedOrigin.y;
-	if (fCombinedScale != 0.0) {
-		*x /= fCombinedScale;
-		*y /= fCombinedScale;
-	}
-}
-
-
-void
-DrawState::Transform(BPoint* point) const
-{
-	Transform(&(point->x), &(point->y));
-}
-
-
-void
-DrawState::Transform(BRect* rect) const
-{
-	Transform(&(rect->left), &(rect->top));
-	Transform(&(rect->right), &(rect->bottom));
-}
-
-
-void
-DrawState::Transform(BRegion* region) const
-{
-	if (fCombinedScale == 1.0) {
-		region->OffsetBy(fCombinedOrigin.x, fCombinedOrigin.y);
-	} else {
-		// TODO: optimize some more
-		BRegion converted;
-		int32 count = region->CountRects();
-		for (int32 i = 0; i < count; i++) {
-			BRect r = region->RectAt(i);
-			BPoint lt(r.LeftTop());
-			BPoint rb(r.RightBottom());
-			// offset to bottom right corner of pixel before transformation
-			rb.x++;
-			rb.y++;
-			// apply transformation
-			Transform(&lt.x, &lt.y);
-			Transform(&rb.x, &rb.y);
-			// reset bottom right to pixel "index"
-			rb.x--;
-			rb.y--;
-			// add rect to converted region
-			// NOTE/TODO: the rect would not have to go
-			// through the whole intersection test process,
-			// it is guaranteed not to overlap with any rect
-			// already contained in the region
-			converted.Include(BRect(lt, rb));
-		}
-		*region = converted;
-	}
-}
-
-
-void
-DrawState::InverseTransform(BPoint* point) const
-{
-	InverseTransform(&(point->x), &(point->y));
+	transform.AddOffset(-fCombinedOrigin.x, -fCombinedOrigin.y);
+	if (fCombinedScale != 0.0)
+		transform.SetScale(1.0 / fCombinedScale);
 }
 
 

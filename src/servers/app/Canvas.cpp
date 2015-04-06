@@ -17,15 +17,20 @@
 
 #include <new>
 
-#include <GradientLinear.h>
-#include <GradientRadial.h>
-#include <GradientRadialFocus.h>
-#include <GradientDiamond.h>
-#include <GradientConic.h>
 #include <Region.h>
 
 #include "DrawingEngine.h"
 #include "DrawState.h"
+
+
+#if __GNUC__ >= 3
+#	define GCC_2_NRV(x)
+	// GCC >= 3.1 doesn't need it anymore
+#else
+#	define GCC_2_NRV(x) return x;
+	// GCC 2 named return value syntax
+	// see http://gcc.gnu.org/onlinedocs/gcc-2.95.2/gcc_5.html#SEC106
+#endif
 
 
 Canvas::Canvas()
@@ -149,179 +154,49 @@ Canvas::GetAlphaMask() const
 }
 
 
-//! converts a point from local *drawing* to screen coordinate system
-void
-Canvas::ConvertToScreenForDrawing(BPoint* point) const
+SimpleTransform
+Canvas::LocalToScreenTransform() const GCC_2_NRV(transform)
 {
-	fDrawState->Transform(point);
-	// NOTE: from here on, don't use the
-	// "*ForDrawing()" versions of the parent!
-	ConvertToScreen(point);
+#if __GNUC__ >= 3
+	SimpleTransform transform;
+#endif
+	_LocalToScreenTransform(transform);
+	return transform;
 }
 
 
-//! converts a rect from local *drawing* to screen coordinate system
-void
-Canvas::ConvertToScreenForDrawing(BRect* rect) const
+SimpleTransform
+Canvas::ScreenToLocalTransform() const GCC_2_NRV(transform)
 {
-	fDrawState->Transform(rect);
-	// NOTE: from here on, don't use the
-	// "*ForDrawing()" versions of the parent!
-	ConvertToScreen(rect);
+#if __GNUC__ >= 3
+	SimpleTransform transform;
+#endif
+	_ScreenToLocalTransform(transform);
+	return transform;
 }
 
 
-//! converts a region from local *drawing* to screen coordinate system
-void
-Canvas::ConvertToScreenForDrawing(BRegion* region) const
+SimpleTransform
+Canvas::PenToScreenTransform() const GCC_2_NRV(transform)
 {
-	fDrawState->Transform(region);
-	// NOTE: from here on, don't use the
-	// "*ForDrawing()" versions of the parent!
-	ConvertToScreen(region);
+#if __GNUC__ >= 3
+	SimpleTransform transform;
+#endif
+	fDrawState->Transform(transform);
+	_LocalToScreenTransform(transform);
+	return transform;
 }
 
 
-//! converts a gradient from local *drawing* to screen coordinate system
-void
-Canvas::ConvertToScreenForDrawing(BGradient* gradient) const
+SimpleTransform
+Canvas::ScreenToPenTransform() const GCC_2_NRV(transform)
 {
-	switch (gradient->GetType()) {
-		case BGradient::TYPE_LINEAR:
-		{
-			BGradientLinear* linear = (BGradientLinear*) gradient;
-			BPoint start = linear->Start();
-			BPoint end = linear->End();
-			fDrawState->Transform(&start);
-			ConvertToScreen(&start);
-			fDrawState->Transform(&end);
-			ConvertToScreen(&end);
-			linear->SetStart(start);
-			linear->SetEnd(end);
-			break;
-		}
-		case BGradient::TYPE_RADIAL:
-		{
-			BGradientRadial* radial = (BGradientRadial*) gradient;
-			BPoint center = radial->Center();
-			fDrawState->Transform(&center);
-			ConvertToScreen(&center);
-			radial->SetCenter(center);
-			break;
-		}
-		case BGradient::TYPE_RADIAL_FOCUS:
-		{
-			BGradientRadialFocus* radialFocus = (BGradientRadialFocus*) gradient;
-			BPoint center = radialFocus->Center();
-			BPoint focal = radialFocus->Focal();
-			fDrawState->Transform(&center);
-			ConvertToScreen(&center);
-			fDrawState->Transform(&focal);
-			ConvertToScreen(&focal);
-			radialFocus->SetCenter(center);
-			radialFocus->SetFocal(focal);
-			break;
-		}
-		case BGradient::TYPE_DIAMOND:
-		{
-			BGradientDiamond* diamond = (BGradientDiamond*) gradient;
-			BPoint center = diamond->Center();
-			fDrawState->Transform(&center);
-			ConvertToScreen(&center);
-			diamond->SetCenter(center);
-			break;
-		}
-		case BGradient::TYPE_CONIC:
-		{
-			BGradientConic* conic = (BGradientConic*) gradient;
-			BPoint center = conic->Center();
-			fDrawState->Transform(&center);
-			ConvertToScreen(&center);
-			conic->SetCenter(center);
-			break;
-		}
-		case BGradient::TYPE_NONE:
-		{
-			break;
-		}
-	}
-
-	// Make sure the gradient is fully padded so that out of bounds access
-	// get the correct colors
-	gradient->SortColorStopsByOffset();
-
-	BGradient::ColorStop* end = gradient->ColorStopAtFast(
-		gradient->CountColorStops() - 1);
-
-	if (end->offset != 255)
-		gradient->AddColor(end->color, 255);
-
-	BGradient::ColorStop* start = gradient->ColorStopAtFast(0);
-
-	if (start->offset != 0)
-		gradient->AddColor(start->color, 0);
-
-	gradient->SortColorStopsByOffset();
-}
-
-
-//! converts points from local *drawing* to screen coordinate system
-void
-Canvas::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const
-{
-	// TODO: optimize this, it should be smarter
-	while (num--) {
-		*dst = *src;
-		fDrawState->Transform(dst);
-		// NOTE: from here on, don't use the
-		// "*ForDrawing()" versions of the parent!
-		ConvertToScreen(dst);
-		src++;
-		dst++;
-	}
-}
-
-
-//! converts rects from local *drawing* to screen coordinate system
-void
-Canvas::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const
-{
-	// TODO: optimize this, it should be smarter
-	while (num--) {
-		*dst = *src;
-		fDrawState->Transform(dst);
-		// NOTE: from here on, don't use the
-		// "*ForDrawing()" versions of the parent!
-		ConvertToScreen(dst);
-		src++;
-		dst++;
-	}
-}
-
-
-//! converts regions from local *drawing* to screen coordinate system
-void
-Canvas::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const
-{
-	// TODO: optimize this, it should be smarter
-	while (num--) {
-		*dst = *src;
-		fDrawState->Transform(dst);
-		// NOTE: from here on, don't use the
-		// "*ForDrawing()" versions of the parent!
-		ConvertToScreen(dst);
-		src++;
-		dst++;
-	}
-}
-
-
-//! converts a point from screen to local coordinate system
-void
-Canvas::ConvertFromScreenForDrawing(BPoint* point) const
-{
-	ConvertFromScreen(point);
-	fDrawState->InverseTransform(point);
+#if __GNUC__ >= 3
+	SimpleTransform transform;
+#endif
+	_ScreenToLocalTransform(transform);
+	fDrawState->InverseTransform(transform);
+	return transform;
 }
 
 

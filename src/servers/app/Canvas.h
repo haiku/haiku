@@ -17,6 +17,8 @@
 
 #include <Point.h>
 
+#include "SimpleTransform.h"
+
 
 class AlphaMask;
 class BGradient;
@@ -52,31 +54,22 @@ public:
 			void			SetAlphaMask(AlphaMask* mask);
 			AlphaMask*		GetAlphaMask() const;
 
-			void			ConvertToScreenForDrawing(BPoint* point) const;
-			void			ConvertToScreenForDrawing(BRect* rect) const;
-			void			ConvertToScreenForDrawing(BRegion* region) const;
-			void			ConvertToScreenForDrawing(BGradient* gradient) const;
-
-			void			ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const;
-			void			ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const;
-			void			ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const;
-
-			void			ConvertFromScreenForDrawing(BPoint* point) const;
-				// used when updating the pen position
-
-	virtual	void			ConvertToScreen(BPoint* point) const = 0;
-	virtual	void			ConvertToScreen(IntPoint* point) const = 0;
-	virtual	void			ConvertToScreen(BRect* rect) const = 0;
-	virtual	void			ConvertToScreen(IntRect* rect) const = 0;
-	virtual	void			ConvertToScreen(BRegion* region) const = 0;
-
-	virtual	void			ConvertFromScreen(BPoint* point) const = 0;
+			SimpleTransform LocalToScreenTransform() const;
+			SimpleTransform ScreenToLocalTransform() const;
+			SimpleTransform PenToScreenTransform() const;
+			SimpleTransform ScreenToPenTransform() const;
 
 	virtual	DrawingEngine*	GetDrawingEngine() const = 0;
 	virtual ServerPicture*	GetPicture(int32 token) const = 0;
 	virtual	void			RebuildClipping(bool deep) = 0;
 	virtual void			ResyncDrawState() {};
 	virtual void			UpdateCurrentDrawingRegion() {};
+
+protected:
+	virtual	void			_LocalToScreenTransform(
+								SimpleTransform& transform) const = 0;
+	virtual	void			_ScreenToLocalTransform(
+								SimpleTransform& transform) const = 0;
 
 protected:
 			DrawState*		fDrawState;
@@ -88,22 +81,17 @@ public:
 							OffscreenCanvas(DrawingEngine* engine,
 								const DrawState& state);
 
-							// Screen and View coordinates are the same for us.
-							// DrawState already takes care of World<>View
-							// conversions.
-	virtual void			ConvertToScreen(BPoint*) const {}
-	virtual void			ConvertToScreen(IntPoint*) const {}
-	virtual void			ConvertToScreen(BRect*) const {}
-	virtual void			ConvertToScreen(IntRect*) const {}
-	virtual void			ConvertToScreen(BRegion*) const {}
-	virtual void			ConvertFromScreen(BPoint*) const {}
-
 	virtual DrawingEngine*	GetDrawingEngine() const { return fDrawingEngine; }
 
 	virtual void			RebuildClipping(bool deep) { /* TODO */ }
 	virtual void			ResyncDrawState();
 	virtual ServerPicture*	GetPicture(int32 token) const
 								{ /* TODO */ return NULL; }
+
+protected:
+	virtual	void			_LocalToScreenTransform(SimpleTransform&) const {}
+	virtual	void			_ScreenToLocalTransform(SimpleTransform&) const {}
+
 private:
 			DrawingEngine*	fDrawingEngine;
 };
