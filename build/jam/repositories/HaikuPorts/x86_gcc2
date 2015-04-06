@@ -3,6 +3,7 @@ RemotePackageRepository HaikuPorts
 	: http://packages.haiku-os.org/haikuports/master/repo/x86_gcc2
 	:
 	# architecture "any" packages
+	avr_libc_x86-1.8.0-1
 	be_book-2008_10_26-1
 	ca_root_certificates-2014_08_13-1
 	caladea-20130214-3
@@ -426,6 +427,8 @@ RemotePackageRepository HaikuPorts
 	arm_none_eabi_gdb_x86-7.7-1
 	arm_none_eabi_newlib_x86-2.1.0-2
 	automoc_x86-0.9.88-2
+	avr_binutils_x86-2.24_2014_03_19-5
+	avr_gcc_x86-4.8.2_2014_03_20-1
 	avrdude_x86-6.0.1-1
 	beshare_x86-4-1
 	binutils_x86-2.25_2014_12_27-1
@@ -728,6 +731,9 @@ RemotePackageRepository HaikuPorts
 	autoconf
 	automake
 	automoc_x86
+	avr_binutils_x86
+	avr_gcc_x86
+	avr_libc_x86
 	avra
 	avrdude_x86
 	bash
