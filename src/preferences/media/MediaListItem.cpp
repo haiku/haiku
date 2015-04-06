@@ -76,11 +76,10 @@ struct MediaListItem::Renderer {
 	{
 		const rgb_color lowColor = onto->LowColor();
 		const rgb_color highColor = onto->HighColor();
-		const rgb_color kBlack = {0, 0, 0, 255};
 
 		if (fSelected || complete) {
 			if (fSelected)
-				onto->SetLowColor(tint_color(lowColor, B_DARKEN_2_TINT));
+				onto->SetLowColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 			onto->FillRect(frame, B_SOLID_LOW);
 		}
 
@@ -105,7 +104,6 @@ struct MediaListItem::Renderer {
 		}
 
 		onto->SetDrawingMode(B_OP_COPY);
-		onto->SetHighColor(kBlack);
 
 		BFont font = be_plain_font;
 		font_height	fontInfo;

@@ -70,6 +70,7 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 	bool selected = IsSelected();
 	BRect frame = Frame();
 	BMenu* menu = Menu();
+	rgb_color highColor = menu->HighColor();
 
 	// draw the bar itself
 	BRect cadre (frame.right - kMargin - kBarWidth, frame.top + 5,
@@ -133,7 +134,7 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 			menu->SetHighColor(kWhite);
 		menu->FillRect(r);
 	}
-	menu->SetHighColor(kBlack);
+	menu->SetHighColor(highColor);
 	fGrenze1 = grenze1;
 	fGrenze2 = grenze2;
 
@@ -150,7 +151,7 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 		BRect trect(cadre.left - kMargin - gMemoryTextWidth, frame.top,
 			cadre.left - kMargin, frame.bottom);
 		menu->FillRect(trect);
-		menu->SetHighColor(kBlack);
+		menu->SetHighColor(highColor);
 
 		char infos[128];
 		string_for_size(fCachedMemory * 1024.0, infos, sizeof(infos));

@@ -388,7 +388,7 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	rgb_color oldHighColor = owner->HighColor();
 
 	if (IsSelected())
-		color = tint_color(color, B_HIGHLIGHT_BACKGROUND_TINT);
+		color = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 
 	owner->SetLowColor(color);
 	owner->SetHighColor(color);

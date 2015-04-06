@@ -114,6 +114,7 @@ MemoryBarMenuItem::DrawBar(bool force)
 	bool selected = IsSelected();
 	BRect frame = Frame();
 	BMenu* menu = Menu();
+	rgb_color highColor = menu->HighColor();
 
 	// draw the bar itself
 
@@ -186,7 +187,7 @@ MemoryBarMenuItem::DrawBar(bool force)
 		menu->FillRect(r);
 	}
 
-	menu->SetHighColor(kBlack);
+	menu->SetHighColor(highColor);
 	fGrenze1 = grenze1;
 	fGrenze2 = grenze2;
 
@@ -210,7 +211,10 @@ MemoryBarMenuItem::DrawBar(bool force)
 	fLastWrite = fWriteMemory;
 	fLastAll = fAllMemory;
 
-	menu->SetHighColor(kBlack);
+	if (selected)
+		menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+	else
+		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
 	char infos[128];
 	string_for_size(fWriteMemory * 1024.0, infos, sizeof(infos));
@@ -222,6 +226,7 @@ MemoryBarMenuItem::DrawBar(bool force)
 	string_for_size(fAllMemory * 1024.0, infos, sizeof(infos));
 	loc.x = rect.left - kMargin - menu->StringWidth(infos);
 	menu->DrawString(infos, loc);
+	menu->SetHighColor(highColor);
 }
 
 
