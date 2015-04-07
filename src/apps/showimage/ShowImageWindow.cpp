@@ -1234,7 +1234,7 @@ status_t
 ShowImageWindow::_LoadImage(bool forward)
 {
 	BMessenger us(this);
-	status_t status = ImageCache::Default().RetrieveImage(
+	status_t status = my_app->DefaultCache().RetrieveImage(
 		fNavigator.CurrentRef(), fNavigator.CurrentPage(), &us);
 	if (status != B_OK)
 		return status;
@@ -1263,7 +1263,7 @@ ShowImageWindow::_PreloadImage(bool forward, entry_ref& ref)
 		|| (!forward && !fNavigator.GetPreviousFile(currentRef, ref)))
 		return false;
 
-	return ImageCache::Default().RetrieveImage(ref) == B_OK;
+	return my_app->DefaultCache().RetrieveImage(ref) == B_OK;
 }
 
 

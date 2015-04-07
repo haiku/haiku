@@ -11,6 +11,7 @@
 #define SHOW_IMAGE_APP_H
 
 
+#include "ImageCache.h"
 #include "ShowImageSettings.h"
 
 #include <Application.h>
@@ -35,6 +36,7 @@ public:
 	virtual	bool				QuitRequested();
 
 			ShowImageSettings* 	Settings() { return &fSettings; }
+			ImageCache& 		DefaultCache() { return fImageCache; }
 
 private:
 			void				_StartPulse();
@@ -48,6 +50,7 @@ private:
 			BFilePanel*			fOpenPanel;
 			bool				fPulseStarted;
 			ShowImageSettings	fSettings;
+			ImageCache			fImageCache;
 			BRect				fLastWindowFrame;
 };
 
