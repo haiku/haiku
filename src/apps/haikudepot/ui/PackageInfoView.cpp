@@ -215,7 +215,7 @@ public:
 		const BMessage* dragMessage)
 	{
 		BButton::MouseMoved(point, transit, dragMessage);
-		
+
 		if (fTransitMessage != NULL && transit == B_EXITED_VIEW)
 			Invoke(fTransitMessage);
 	}
@@ -251,7 +251,7 @@ public:
 		const BMessage* dragMessage)
 	{
 		RatingView::MouseMoved(point, transit, dragMessage);
-		
+
 		if (fTransitMessage != NULL && transit == B_ENTERED_VIEW)
 			Invoke(fTransitMessage);
 	}
@@ -564,12 +564,12 @@ public:
 	{
 		if (fButtons.CountItems() > 0)
 			Clear();
-		
+
 		if (fStatusBar == NULL) {
 			fStatusLabel = new BStringView("progress label",
 				B_TRANSLATE("Downloading:"));
 			fLayout->AddView(fStatusLabel);
-			
+
 			fStatusBar = new BStatusBar("progress");
 			fStatusBar->SetMaxValue(100.0);
 			fStatusBar->SetExplicitMinSize(
@@ -577,7 +577,7 @@ public:
 
 			fLayout->AddView(fStatusBar);
 		}
-		
+
 		fStatusBar->SetTo(package.DownloadProgress() * 100.0);
 	}
 
@@ -769,7 +769,7 @@ public:
 				Window()->PostMessage(message, Window());
 				break;
 			}
-			
+
 			case MSG_EMAIL_PUBLISHER:
 			{
 				// TODO: Implement. If memory serves, there is a
@@ -1068,7 +1068,7 @@ public:
 			.Add(scrollView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
-	
+
 		_InitPreferredLanguages();
 	}
 
@@ -1144,7 +1144,7 @@ private:
 			return;
 
 		BMessage preferredLanguages;
-		if (localeRoster->GetPreferredLanguages(&preferredLanguages) != B_OK) 
+		if (localeRoster->GetPreferredLanguages(&preferredLanguages) != B_OK)
 			return;
 
 		BString language;
@@ -1280,7 +1280,7 @@ public:
 		AddTab(fUserRatingsView);
 		AddTab(fChangelogView);
 		AddTab(fContentsView);
-		
+
 		TabAt(0)->SetLabel(B_TRANSLATE("About"));
 		TabAt(1)->SetLabel(B_TRANSLATE("Ratings"));
 		TabAt(2)->SetLabel(B_TRANSLATE("Changelog"));
@@ -1334,7 +1334,7 @@ PackageInfoView::PackageInfoView(BLocker* modelLock,
 {
 	fCardLayout = new BCardLayout();
 	SetLayout(fCardLayout);
-	
+
 	BGroupView* noPackageCard = new BGroupView("no package card", B_VERTICAL);
 	AddChild(noPackageCard);
 
@@ -1459,7 +1459,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 		// same package as before the refresh.
 		switchToDefaultTab = false;
 	}
-	
+
 	const PackageInfo& package = *packageRef.Get();
 
 	fTitleView->SetPackage(package);

@@ -30,7 +30,7 @@ TextDocumentView::TextDocumentView(const char* name)
 	fMouseDown(false)
 {
 	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
-	
+
 	// Set default TextEditor
 	SetTextEditor(TextEditorRef(new(std::nothrow) TextEditor(), true));
 
@@ -142,10 +142,10 @@ TextDocumentView::MouseDown(BPoint where)
 	int32 modifiers = 0;
 	if (Window() != NULL && Window()->CurrentMessage() != NULL)
 		Window()->CurrentMessage()->FindInt32("modifiers", &modifiers);
-	
+
 	fMouseDown = true;
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-	
+
 	bool extendSelection = (modifiers & B_SHIFT_KEY) != 0;
 	SetCaret(where, extendSelection);
 }
@@ -184,7 +184,7 @@ TextDocumentView::KeyDown(const char* bytes, int32 numBytes)
 	event.length = numBytes;
 	event.key = 0;
 	event.modifiers = modifiers();
-	
+
 	if (Window() != NULL && Window()->CurrentMessage() != NULL) {
 		BMessage* message = Window()->CurrentMessage();
 		message->FindInt32("raw_char", &event.key);
@@ -391,10 +391,10 @@ TextDocumentView::Copy(BClipboard* clipboard)
 		// Nothing to copy, don't clear clipboard contents for now reason.
 		return;
 	}
-	
+
 	if (clipboard == NULL || !clipboard->Lock())
 		return;
-	
+
 	clipboard->Clear();
 
 	BMessage* clip = clipboard->Data();
@@ -402,13 +402,13 @@ TextDocumentView::Copy(BClipboard* clipboard)
 		int32 start;
 		int32 end;
 		GetSelection(start, end);
-		
+
 		BString text = fTextDocument->Text(start, end - start);
 		clip->AddData("text/plain", B_MIME_TYPE, text.String(),
 			text.Length());
-		
+
 		// TODO: Support for "application/x-vnd.Be-text_run_array"
-		
+
 		clipboard->Commit();
 	}
 
@@ -585,7 +585,7 @@ TextDocumentView::_GetSelectionShape(BShape& shape, int32 start, int32 end)
 	} else {
 		// Selection over multiple lines
 		float width = ceilf(fTextDocumentLayout.Width());
-		
+
 		shape.MoveTo(BPoint(startX1, startY1));
 		shape.LineTo(BPoint(width, startY1));
 		shape.LineTo(BPoint(width, endY1));

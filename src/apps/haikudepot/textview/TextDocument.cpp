@@ -133,7 +133,7 @@ TextDocument::Insert(int32 textOffset, const BString& text,
 				chunkEnd++;
 			else
 				chunkEnd = length;
-			
+
 			BString chunk;
 			text.CopyCharsInto(chunk, chunkStart, chunkEnd - chunkStart);
 			TextSpan span(chunk, characterStyle);
@@ -171,7 +171,7 @@ TextDocument::Insert(int32 textOffset, const BString& text,
 		if (!fParagraphs.Replace(index, paragraph))
 			return B_NO_MEMORY;
 	}
-	
+
 	return B_OK;
 }
 
@@ -214,7 +214,7 @@ TextDocument::Remove(int32 textOffset, int32 length)
 		&& index + 1 < fParagraphs.CountItems()) {
 		// Line break between paragraphs got removed. Shift the next
 		// paragraph's text spans into the resulting one.
-		
+
 		const TextSpanList&	textSpans = ParagraphAt(index + 1).TextSpans();
 		int32 spanCount = textSpans.CountItems();
 		for (int32 i = 0; i < spanCount; i++) {
@@ -225,7 +225,7 @@ TextDocument::Remove(int32 textOffset, int32 length)
 	}
 
 	textOffset = 0;
-	
+
 	while (length > 0 && index + 1 < fParagraphs.CountItems()) {
 		const Paragraph& paragraph = ParagraphAt(index + 1);
 		paragraphLength = paragraph.Length();
@@ -251,7 +251,7 @@ TextDocument::Remove(int32 textOffset, int32 length)
 				const TextSpan& span = textSpans.ItemAtFast(i);
 				resultParagraph.Append(span);
 			}
-			
+
 			break;
 		}
 	}
@@ -288,7 +288,7 @@ TextDocument::Replace(int32 textOffset, int32 length, const BString& text,
 	status_t ret = Remove(textOffset, length);
 	if (ret != B_OK)
 		return ret;
-	
+
 	return Insert(textOffset, text, characterStyle, paragraphStyle);
 }
 
@@ -405,9 +405,9 @@ TextDocument::Text(int32 start, int32 length) const
 {
 	if (start < 0)
 		start = 0;
-	
+
 	BString text;
-	
+
 	int32 count = fParagraphs.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
@@ -423,9 +423,9 @@ TextDocument::Text(int32 start, int32 length) const
 		// Remaining paragraph length after start
 		paragraphLength -= start;
 		int32 copyLength = std::min(paragraphLength, length);
-		
+
 		text << paragraph.Text(start, copyLength);
-		
+
 		length -= copyLength;
 		if (length == 0)
 			break;
@@ -443,10 +443,10 @@ TextDocument::SubDocument(int32 start, int32 length) const
 {
 	TextDocumentRef result(new(std::nothrow) TextDocument(
 		fDefaultCharacterStyle, fEmptyLastParagraph.Style()), true);
-	
+
 	if (result.Get() == NULL)
 		return result;
-	
+
 	if (start < 0)
 		start = 0;
 
@@ -465,7 +465,7 @@ TextDocument::SubDocument(int32 start, int32 length) const
 		// Remaining paragraph length after start
 		paragraphLength -= start;
 		int32 copyLength = std::min(paragraphLength, length);
-		
+
 		result->Append(paragraph.SubParagraph(start, copyLength));
 
 		length -= copyLength;

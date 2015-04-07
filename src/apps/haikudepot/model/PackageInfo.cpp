@@ -196,7 +196,7 @@ RatingSummary::operator==(const RatingSummary& other) const
 		if (ratingCountByStar[i] != other.ratingCountByStar[i])
 			return false;
 	}
-	
+
 	return true;
 }
 
@@ -818,7 +818,7 @@ PackageInfo::CalculateRatingSummary() const
 {
 	if (fUserRatings.CountItems() == 0)
 		return fCachedRatingSummary;
-	
+
 	RatingSummary summary;
 	summary.ratingCount = fUserRatings.CountItems();
 	summary.averageRating = 0.0f;
@@ -1037,7 +1037,7 @@ void
 DepotInfo::SyncPackages(const PackageList& otherPackages)
 {
 	PackageList packages(fPackages);
-	
+
 	for (int32 i = otherPackages.CountItems() - 1; i >= 0; i--) {
 		const PackageInfoRef& otherPackage = otherPackages.ItemAtFast(i);
 		bool found = false;

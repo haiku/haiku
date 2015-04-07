@@ -97,7 +97,7 @@ TextDocumentLayout::InvalidateParagraphs(int32 start, int32 count)
 				start);
 			info.layout->SetParagraph(paragraph);
 		}
-		
+
 		start++;
 		count--;
 	}
@@ -161,11 +161,11 @@ TextDocumentLayout::LineIndexForOffset(int32 textOffset)
 		for (int32 i = 0; i < index; i++) {
 			lineIndex += fParagraphLayouts.ItemAtFast(i).layout->CountLines();
 		}
-	
+
 		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
 		return lineIndex + info.layout->LineIndexForOffset(textOffset);
 	}
-	
+
 	return 0;
 }
 
@@ -275,7 +275,7 @@ TextDocumentLayout::TextOffsetAt(float x, float y, bool& rightOfCenter)
 		textOffset += info.layout->TextOffsetAt(x, y - info.y, rightOfCenter);
 		break;
 	}
-	
+
 	return textOffset;
 }
 
@@ -342,16 +342,16 @@ TextDocumentLayout::_ParagraphLayoutIndexForOffset(int32& textOffset)
 	int32 paragraphs = fParagraphLayouts.CountItems();
 	for (int32 i = 0; i < paragraphs - 1; i++) {
 		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
-		
+
 		int32 length = info.layout->CountGlyphs();
 		if (textOffset >= length) {
 			textOffset -= length;
 			continue;
 		}
-		
+
 		return i;
 	}
-	
+
 	if (paragraphs > 0) {
 		const ParagraphLayoutInfo& info = fParagraphLayouts.LastItem();
 
@@ -361,7 +361,7 @@ TextDocumentLayout::_ParagraphLayoutIndexForOffset(int32& textOffset)
 		if (textOffset <= length)
 			return paragraphs - 1;
 	}
-	
+
 	return -1;
 }
 
@@ -382,7 +382,7 @@ TextDocumentLayout::_ParagraphLayoutIndexForLineIndex(int32& lineIndex,
 			paragraphOffset += info.layout->CountGlyphs();
 			continue;
 		}
-		
+
 		return i;
 	}
 

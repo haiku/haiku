@@ -301,7 +301,7 @@ ParagraphLayout::LineIndexForOffset(int32 textOffset)
 
 	if (textOffset < 0)
 		textOffset = 0;
-	
+
 	const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
 	return glyph.lineIndex;
 }
@@ -396,7 +396,7 @@ ParagraphLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 
 	if (textOffset < 0)
 		textOffset = 0;
-	
+
 	const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
 	const LineInfo& line = fLineInfos.ItemAt(glyph.lineIndex);
 

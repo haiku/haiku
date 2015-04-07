@@ -660,13 +660,13 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 		BMessage info;
 
 		BString packageName;
-		BString architecture;	
+		BString architecture;
 		{
 			BAutolock locker(&fLock);
 			packageName = package->Name();
 			architecture = package->Architecture();
 		}
-	
+
 		status_t status = fWebAppInterface.RetrieveUserRatings(packageName,
 			architecture, 0, 50, info);
 		if (status == B_OK) {
@@ -683,7 +683,7 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 				while (true) {
 					BString name;
 					name << index++;
-					
+
 					BMessage item;
 					if (items.FindMessage(name, &item) != B_OK)
 						break;
@@ -831,7 +831,7 @@ Model::_UpdateIsFeaturedFilter()
 {
 	if (fShowFeaturedPackages && SearchTerms().IsEmpty())
 		fIsFeaturedFilter = PackageFilterRef(new IsFeaturedFilter(), true);
-	else 
+	else
 		fIsFeaturedFilter = PackageFilterRef(new AnyFilter(), true);
 }
 
@@ -860,7 +860,7 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 		PackageInfoRef package;
 		{
 			BAutolock locker(&fLock);
-			
+
 			if (depotIndex >= fDepots.CountItems())
 				break;
 			const DepotInfo& depot = fDepots.ItemAt(depotIndex);
@@ -872,14 +872,14 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 				depotIndex++;
 				continue;
 			}
-			
+
 			package = packages.ItemAt(packageIndex);
 			packageIndex++;
 		}
-		
+
 		if (package.Get() == NULL)
 			continue;
-	
+
 		//_PopulatePackageInfo(package, fromCacheOnly);
 		bulkPackageList.Add(package);
 		if (bulkPackageList.CountItems() == 50) {
@@ -954,7 +954,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 {
 	if (fStopPopulatingAllPackages)
 		return;
-	
+
 	// See if there are cached info files
 	for (int i = packages.CountItems() - 1; i >= 0; i--) {
 		if (fStopPopulatingAllPackages)
@@ -978,10 +978,10 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 			}
 		}
 	}
-	
+
 	if (fromCacheOnly || packages.IsEmpty())
 		return;
-	
+
 	// Retrieve info from web-app
 	BMessage info;
 
@@ -1011,11 +1011,11 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 				BMessage pkgInfo;
 				if (pkgs.FindMessage(name, &pkgInfo) != B_OK)
 					break;
-			
+
 				BString pkgName;
 				if (pkgInfo.FindString("name", &pkgName) != B_OK)
 					continue;
-			
+
 				// Find the PackageInfoRef
 				bool found = false;
 				for (int i = 0; i < packages.CountItems(); i++) {
@@ -1082,7 +1082,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
 {
 	if (fromCacheOnly)
 		return;
-	
+
 	// Retrieve info from web-app
 	BMessage info;
 
@@ -1104,7 +1104,7 @@ append_word_list(BString& words, const char* word)
 	if (words.Length() > 0)
 		words << ", ";
 	words << word;
-} 
+}
 
 
 void
@@ -1173,7 +1173,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 		if (foundCategory)
 			append_word_list(foundInfo, "categories");
 	}
-	
+
 	double derivedRating;
 	if (data.FindDouble("derivedRating", &derivedRating) == B_OK) {
 		RatingSummary summary;
@@ -1182,14 +1182,14 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 
 		append_word_list(foundInfo, "rating");
 	}
-	
+
 	double prominenceOrdering;
 	if (data.FindDouble("prominenceOrdering", &prominenceOrdering) == B_OK) {
 		package->SetProminence(prominenceOrdering);
 
 		append_word_list(foundInfo, "prominence");
 	}
-	
+
 	BMessage screenshots;
 	if (data.FindMessage("pkgScreenshots", &screenshots) == B_OK) {
 		package->ClearScreenshotInfos();
@@ -1198,7 +1198,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 		while (true) {
 			BString name;
 			name << index++;
-			
+
 			BMessage screenshot;
 			if (screenshots.FindMessage(name, &screenshot) != B_OK)
 				break;
@@ -1219,7 +1219,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 		if (foundScreenshot)
 			append_word_list(foundInfo, "screenshots");
 	}
-	
+
 	if (foundInfo.Length() > 0) {
 		printf("Populated package info for %s: %s\n",
 			package->Name().String(), foundInfo.String());
@@ -1346,11 +1346,11 @@ Model::_HasNativeIcon(const BMessage& message) const
 	while (true) {
 		BString name;
 		name << index++;
-		
+
 		BMessage typeCodeInfo;
 		if (pkgIcons.FindMessage(name, &typeCodeInfo) != B_OK)
 			break;
-	
+
 		BString mediaTypeCode;
 		if (typeCodeInfo.FindString("mediaTypeCode", &mediaTypeCode) == B_OK
 			&& mediaTypeCode == "application/x-vnd.haiku-icon") {

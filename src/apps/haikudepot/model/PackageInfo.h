@@ -306,7 +306,7 @@ public:
 			bool				IsLocalFile() const;
 			const BString&		FileName() const
 									{ return fFileName; }
-			
+
 			void				ClearCategories();
 			bool				AddCategory(const CategoryRef& category);
 			const CategoryList&	Categories() const

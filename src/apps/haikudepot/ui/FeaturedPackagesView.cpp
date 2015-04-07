@@ -46,7 +46,7 @@ public:
 	{
 		SetViewColor(255, 255, 255);
 		SetEventMask(B_POINTER_EVENTS);
-		
+
 		fIconView = new BitmapView("package icon view");
 		fInstalledIconView = new BitmapView("installed icon view");
 		fTitleView = new BStringView("package title view", "");
@@ -131,14 +131,14 @@ public:
 				break;
 		}
 	}
-	
+
 	virtual void MouseDown(BPoint where)
 	{
 		BRect bounds = Bounds();
 		BRect parentBounds = Parent()->Bounds();
 		ConvertFromParent(&parentBounds);
 		bounds = bounds & parentBounds;
-		
+
 		if (bounds.Contains(where) && Window()->IsActive()) {
 			BMessage message(MSG_PACKAGE_SELECTED);
 			message.AddString("name", PackageName());
@@ -227,13 +227,13 @@ public:
 		if (fSelected == selected)
 			return;
 		fSelected = selected;
-		
+
 		rgb_color bgColor;
 		if (fSelected)
 			bgColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 		else
 			bgColor = (rgb_color){ 255, 255, 255, 255 };
-		
+
 		List<BView*, true> views;
 
 		views.Add(this);
@@ -245,10 +245,10 @@ public:
 		views.Add(fRatingView);
 		views.Add(fAvgRating);
 		views.Add(fVoteInfo);
-		
+
 		for (int32 i = 0; i < views.CountItems(); i++) {
 			BView* view = views.ItemAtFast(i);
-		
+
 			view->SetViewColor(bgColor);
 			view->SetLowColor(bgColor);
 			view->Invalidate();
@@ -376,7 +376,7 @@ FeaturedPackagesView::SelectPackage(const PackageInfoRef& package)
 	BString selectedName;
 	if (package.Get() != NULL)
 		selectedName = package->Name();
-	
+
 	for (int32 i = 0; BLayoutItem* item = fPackageListLayout->ItemAt(i); i++) {
 		PackageView* view = dynamic_cast<PackageView*>(item->View());
 		if (view == NULL)

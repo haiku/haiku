@@ -33,7 +33,7 @@ MessagePackageListener::PackageChanged(const PackageInfoEvent& event)
 {
 	if ((event.Changes() & fChangesMask) == 0)
 		return;
-	
+
 	BMessenger messenger(fTarget);
 	if (!messenger.IsValid())
 		return;

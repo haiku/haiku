@@ -239,11 +239,11 @@ TextEditor::KeyDown(KeyEvent event)
 			if (event.bytes != NULL && event.length > 0) {
 				// Handle null-termintating the string
 				BString text(event.bytes, event.length);
-				
+
 				// Remove selection, if any
 				if (HasSelection())
 					Remove(SelectionStart(), SelectionLength());
-				
+
 				Insert(fSelection.Caret(), text);
 			}
 			break;
@@ -262,9 +262,9 @@ TextEditor::Insert(int32 offset, const BString& string)
 	if (ret == B_OK) {
 		// TODO: Via listener, and only affected paragraphs
 		fLayout->Invalidate();
-	
+
 		_SetCaretOffset(offset + string.CountChars(), true, false, true);
-	
+
 		fDocument->PrintToStream();
 	}
 
@@ -283,7 +283,7 @@ TextEditor::Remove(int32 offset, int32 length)
 	if (ret == B_OK) {
 		// TODO: Via listener, and only affected paragraphs
 		fLayout->Invalidate();
-	
+
 		_SetCaretOffset(offset, true, false, true);
 
 		fDocument->PrintToStream();
@@ -437,7 +437,7 @@ TextEditor::_SetSelection(int32 caret, int32 anchor, bool updateAnchor,
 {
 	if (fLayout.Get() == NULL)
 		return;
-	
+
 	if (caret == fSelection.Caret() && anchor == fSelection.Anchor())
 		return;
 
