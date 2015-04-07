@@ -173,7 +173,7 @@ ImageCache::Stop()
 	thread_id thread;
 	while (true) {
 		thread = find_thread("image loader");
-		if (thread == B_NAME_NOT_FOUND)
+		if (thread < 0)
 			break;
 		wait_for_thread(thread, NULL);
 	}
